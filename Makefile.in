@@ -223,33 +223,14 @@ CMO_EXPORT =  src/lib.cmo src/rc.cmo src/loc.cmo \
            src/env.cmo src/rename.cmo src/explain.cmo 	\
 	   src/xml.cmo src/project.cmo 
 
-CMO = src/lib.cmo src/rc.cmo tools/dpConfig.cmo \
-      src/version.cmo src/options.cmo src/linenum.cmo src/loc.cmo \
-	   src/ident.cmo src/print_real.cmo  \
-	   src/effect.cmo src/pp.cmo src/option_misc.cmo src/misc.cmo 	\
-	   src/parser.cmo src/lexer.cmo src/report.cmo \
-           src/env.cmo src/rename.cmo src/explain.cmo src/util.cmo 	\
-           src/ltyping.cmo src/typing.cmo src/wp.cmo src/fastwp.cmo \
-           src/monad.cmo src/mlize.cmo src/red.cmo src/vcg.cmo \
-	   src/predDefExpansor.cmo \
-	   src/encoding_rec.cmo src/encoding_pred.cmo src/encoding_strat.cmo \
-	   src/encoding_mono.cmo src/monomorph.cmo src/encoding.cmo \
-	   src/pvs.cmo src/hol4.cmo src/gappa.cmo \
-	   src/holl.cmo src/harvey.cmo src/simplify.cmo  \
-           src/regen.cmo src/mizar.cmo src/smtlib.cmo src/coq.cmo \
-	   src/zenon.cmo src/z3.cmo src/cvcl.cmo tools/calldp.cmo \
-	   src/xml.cmo src/project.cmo src/pretty.cmo  \
-           src/unionfind.cmo src/theoryreducer.cmo \
-           src/theory_filtering.cmo src/hypotheses_filtering.cmo \
-           src/dispatcher.cmo src/isabelle.cmo src/ocaml.cmo  \
-	   src/main.cmo 
+CMO = src/name.cmo src/hashcons.cmo src/term.cmo
 CMX      = $(CMO:.cmo=.cmx)
 
-bin/why.opt: $(CMX) src/why.cmx 
+bin/why.opt: $(CMX) 
 	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ unix.cmxa str.cmxa nums.cmxa graph.cmxa $^
 	$(STRIP) $@
 
-bin/why.byte: $(CMO) src/why.cmo
+bin/why.byte: $(CMO) 
 	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ unix.cma str.cma nums.cma graph.cma $^
 
 bin/why.static: $(CMX) src/why.cmx 

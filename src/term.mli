@@ -159,10 +159,3 @@ val t_alpha_equal : term -> term -> bool
 
 val f_equal : fmla -> fmla -> bool
 val f_alpha_equal : fmla -> fmla -> bool
-
-(* pretty-printers *)
-
-val print_term : Format.formatter -> term -> unit
-val print_fmla : Format.formatter -> fmla -> unit
-
-
