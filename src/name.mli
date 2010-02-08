@@ -35,6 +35,6 @@ val reset : unit -> unit
 module M : Map.S with type key = t
 module S : Set.S with type elt = t
 
-val build_map : t list -> int M.t
-(** from the list [ [n_1; ... ; n_m] ] of names build the map
- * [ n_1 |-> 0 ; ... n_m |-> m -1 ] *)
+(* val build_map : t list -> int M.t *)
+(* (\** from the list [ [n_1; ... ; n_m] ] of names build the map *)
+(*  * [ n_1 |-> 0 ; ... n_m |-> m -1 ] *\) *)

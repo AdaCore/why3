@@ -59,3 +59,13 @@ module type S =
   end
 
 module Make(H : HashedType) : (S with type node = H.node and type t = H.t)
+
+
+(* helpers *)
+
+val combine : int -> int -> int
+val combine2 : int -> int -> int -> int
+val combine3 : int -> int -> int -> int -> int
+val combine_list : ('a -> int) -> int -> 'a list -> int
+
+

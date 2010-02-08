@@ -87,13 +87,15 @@ struct
 
   let next_sz n = min (3*n/2 + 3) (Sys.max_array_length - 1)
 
+  let hash n = (H.hash n) land 0x3fffffff
+
   let rec resize t =
     let oldlen = Array.length t.table in
     let newlen = next_sz oldlen in
     if newlen > oldlen then begin
       let newt = create newlen in
       newt.limit <- t.limit + 100;          (* prevent resizing of newt *)
-      fold (fun d () -> add newt d (H.hash (H.node d))) t ();
+      fold (fun d () -> add newt d (hash (H.node d))) t ();
       t.table <- newt.table;
       t.limit <- t.limit + 2;
     end
@@ -124,7 +126,7 @@ struct
   let t = create 5003
 
   let hashcons d f =
-    let hkey = H.hash d in
+    let hkey = hash d in
     let index = hkey mod (Array.length t.table) in
     let bucket = t.table.(index) in
     let sz = Weak.length bucket in
@@ -162,3 +164,9 @@ struct
     (len, count t, totlen, lens.(0), lens.(len/2), lens.(len-1))
   
 end
+
+let combine acc n = n * 65599 + acc
+let combine2 acc n1 n2 = combine acc (combine n1 n2)
+let combine3 acc n1 n2 n3 = combine acc (combine n1 (combine n2 n3))
+let combine_list f = List.fold_left (fun acc x -> combine acc (f x))
+
