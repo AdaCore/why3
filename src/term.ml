@@ -28,34 +28,34 @@ module Ty = struct
   }
 
   let equal_tysymbol s1 s2 = Name.equal s1.ty_name s2.ty_name
+      
+  module H = struct
 
-  let rec equal_ty_node ty1 ty2 = match ty1, ty2 with
-    | Tyvar n1, Tyvar n2 -> 
-	Name.equal n1 n2
-    | Tyapp (s1, l1), Tyapp (s2, l2) -> 
-	equal_tysymbol s1 s2 && List.for_all2 equal_ty l1 l2
-    | _ ->
-	false
+    type node = ty_node
+      
+    let rec equal ty1 ty2 = match ty1, ty2 with
+      | Tyvar n1, Tyvar n2 -> 
+	  Name.equal n1 n2
+      | Tyapp (s1, l1), Tyapp (s2, l2) -> 
+	  equal_tysymbol s1 s2 && List.for_all2 (==) l1 l2
+      | _ ->
+	  false
 
-  and equal_ty = (==)
+    let rec hash = function
+      | Tyvar v -> 
+	  Name.hash v
+      | Tyapp (s, tl) -> 
+	  Hashcons.combine_list hash_ty (Name.hash s.ty_name) tl
 
-  let rec hash_ty_node = function
-    | Tyvar v -> 
-	Name.hash v
-    | Tyapp (s, tl) -> 
-	Hashcons.combine_list hash_ty (Name.hash s.ty_name) tl
+    and hash_ty ty = 
+      ty.ty_tag
 
-  and hash_ty ty = 
-    ty.ty_tag
+    type t = ty
+    let node t = t.ty_node
+    
+  end
 
-  module Hty = Hashcons.Make(
-    struct
-      type node = ty_node
-      let equal = equal_ty_node
-      let hash = hash_ty_node
-      type t = ty
-      let node t = t.ty_node
-    end)
+  module Hty = Hashcons.Make(H)
 
   let mk_ty n t = { ty_node = n; ty_tag = t }
   let ty_var n = Hty.hashcons (Tyvar n) mk_ty
@@ -65,9 +65,140 @@ end
 
 
 
+type tysymbol = Ty.tysymbol
+type ty = Ty.ty
+
+type fsymbol = {
+  f_name   : Name.t;
+  f_scheme : ty list * ty;
+}
+
+let create_fsymbol n s = {
+  f_name = n;
+  f_scheme = s;
+}
+
+let eq_fsymbol s1 s2 = Name.equal s1.f_name s2.f_name
+
+type psymbol = {
+  p_name   : Name.t;
+  p_scheme : ty list;
+}
+
+let create_psymbol n s = {
+  p_name = n;
+  p_scheme = s;
+}
+
+let eq_psymbol s1 s2 = Name.equal s1.p_name s2.p_name
+
+type quant = 
+  | Fforall
+  | Fexists
+
+type binop = 
+  | Fand
+  | For
+  | Fimplies
+  | Fiff
+
+type unop =
+  | Fnot
+
+type pattern = {
+  pat_node : pattern_node;
+  pat_tag : int;
+}
+
+and pattern_node = 
+  | Pwild 
+  | Pvar of vsymbol
+  | Papp of fsymbol * pattern list
+  | Pas of pattern * vsymbol
+
+module Pattern = struct
+
+  type node = pattern_node
+
+  let rec equal p1 p2 = match p1, p2 with
+    | Pwild, Pwild ->
+	true
+    | Pvar n1, Pvar n2 ->
+	Name.equal n1 n2
+    | Papp (s1, l1), Papp (s2, l2) ->
+	eq_fsymbol s1 s2 && List.for_all2 (==) l1 l2
+    | Pas (p1, n1), Pas (p2, n2) ->
+	p1 == p2 && Name.equal n1 n2
+    | _ ->
+	false
+
+  let rec hash = function
+    | Pwild -> 0
+    | Pvar n -> Name.hash n
+    | Papp (s, pl) -> Hashcons.combine_list hash_pattern (Name.hash s.f_name) pl
+    | Pas (p, n) -> Hashcons.combine (hash_pattern p) (Name.hash n)
+
+  and hash_pattern p = p.pat_tag
+
+  type t = pattern
+  let node t = t.pat_node
+
+end
+module Hpattern = Hashcons.Make(Pattern)
+
+let mk_pattern n t = { pat_node = n; pat_tag = t }
+let pat_wild = Hpattern.hashcons Pwild mk_pattern
+let pat_var n = Hpattern.hashcons (Pvar n) mk_pattern
+let pat_app f pl = Hpattern.hashcons (Papp (f, pl)) mk_pattern
+let pat_as p n = Hpattern.hashcons (Pas (p, n)) mk_pattern
 
 
+type term = { 
+  t_node : term_node; 
+  t_label : label;
+  t_ty : ty;
+  t_tag : int;
+}
 
+and fmla = {
+  f_node : fmla_node;
+  f_label : label;
+  f_tag : int;
+}
+
+and term_node = 
+  | Tbvar of int * int
+  | Tvar of vsymbol
+  | Tapp of fsymbol * term list
+  | Tcase of term * tbranch list
+  | Tlet of term * bind_term
+  | Teps of bind_fmla
+
+and fmla_node = 
+  | Fapp of psymbol * term list
+  | Fquant of quant * bind_fmla
+  | Fbinop of binop * fmla * fmla
+  | Funop of unop * fmla
+  | Ftrue
+  | Ffalse
+  | Fif of fmla * fmla * fmla
+  | Flet of term * bind_fmla
+  | Fcase of term * fbranch list
+
+and bind_term = vsymbol * ty * term
+
+and tbranch = pattern * term
+
+and bind_fmla = vsymbol * ty * fmla
+
+and fbranch = pattern * fmla
+
+
+let print_term fmt t =
+  assert false (*TODO*)
+
+let print_fmla fmt f = 
+  assert false (*TODO*)
 
 
 (********

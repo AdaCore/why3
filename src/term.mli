@@ -36,10 +36,14 @@ type fsymbol = private {
   f_scheme : ty list * ty;
 }
 
+val create_fsymbol : Name.t -> ty list * ty -> fsymbol
+
 type psymbol = private {
   p_name   : Name.t;
   p_scheme : ty list;
 }
+
+val create_psymbol : Name.t -> ty list -> psymbol
 
 type quant = 
   | Fforall
@@ -97,7 +101,16 @@ and fbranch
 
 (* patterns *)
 
-type pattern
+type pattern = private {
+  pat_node : pattern_node;
+  pat_tag : int;
+}
+
+and pattern_node = private
+  | Pwild 
+  | Pvar of vsymbol
+  | Papp of fsymbol * pattern list
+  | Pas of pattern * vsymbol
 
 val pat_wild : pattern
 val pat_var : vsymbol -> pattern
