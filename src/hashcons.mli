@@ -1,6 +1,7 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) Jean-Christophe Filliatre                               *)
+(*  Copyright (C) Francois Bobot, Jean-Christophe Filliatre,              *)
+(*  Johannes Kanig and Andrei Paskevich.                                  *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
 (*  modify it under the terms of the GNU Library General Public           *)
