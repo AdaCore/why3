@@ -23,27 +23,23 @@ let gentag =
 
 module type HashedType =
   sig
-    type node
-    val equal : node -> node -> bool
-    val hash : node -> int
-
     type t
-    val node : t -> node
+    val equal : t -> t -> bool
+    val hash : t -> int
+    val tag : int -> t -> t
   end
 
 module type S =
   sig
-    type node
     type t
-    val hashcons : node -> (node -> int -> t) -> t
+    val hashcons : t -> t
     val iter : (t -> unit) -> unit
     val stats : unit -> int * int * int * int * int * int
   end
 
-module Make(H : HashedType) : (S with type node = H.node and type t = H.t) = 
+module Make(H : HashedType) : (S with type t = H.t) = 
 struct
 
-  type node = H.node
   type t = H.t
 
   type table = {
@@ -96,7 +92,7 @@ struct
     if newlen > oldlen then begin
       let newt = create newlen in
       newt.limit <- t.limit + 100;          (* prevent resizing of newt *)
-      fold (fun d () -> add newt d (hash (H.node d))) t ();
+      fold (fun d () -> add newt d (hash d)) t ();
       t.table <- newt.table;
       t.limit <- t.limit + 2;
     end
@@ -126,19 +122,19 @@ struct
 
   let t = create 5003
 
-  let hashcons d f =
+  let hashcons d =
     let hkey = hash d in
     let index = hkey mod (Array.length t.table) in
     let bucket = t.table.(index) in
     let sz = Weak.length bucket in
     let rec loop i =
       if i >= sz then begin
-	let hnode = f d (gentag ()) in
+	let hnode = H.tag (gentag ()) d in
 	add t hnode hkey;
 	hnode
       end else begin
         match Weak.get_copy bucket i with
-        | Some v when H.equal (H.node v) d -> 
+        | Some v when H.equal v d -> 
 	    begin match Weak.get bucket i with
               | Some v -> v
               | None -> loop (i+1)

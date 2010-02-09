@@ -46,9 +46,9 @@ module Ty = struct
       
   module H = struct
 
-    type node = ty_node
-      
-    let equal ty1 ty2 = match ty1, ty2 with
+    type t = ty
+
+    let equal ty1 ty2 = match ty1.ty_node, ty2.ty_node with
       | Tyvar n1, Tyvar n2 -> 
 	  Name.equal n1 n2
       | Tyapp (s1, l1), Tyapp (s2, l2) -> 
@@ -59,22 +59,21 @@ module Ty = struct
     let hash_ty ty = 
       ty.ty_tag
 
-    let hash = function
+    let hash ty = match ty.ty_node with
       | Tyvar v -> 
 	  Name.hash v
       | Tyapp (s, tl) -> 
 	  Hashcons.combine_list hash_ty (Name.hash s.ty_name) tl
 
-    type t = ty
-    let node t = t.ty_node
+    let tag n t = { t with ty_tag = n }
     
   end
 
   module Hty = Hashcons.Make(H)
 
-  let mk_ty n t = { ty_node = n; ty_tag = t }
-  let ty_var n = Hty.hashcons (Tyvar n) mk_ty
-  let ty_app s tl = Hty.hashcons (Tyapp (s, tl)) mk_ty
+  let mk_ty n = { ty_node = n; ty_tag = -1 }
+  let ty_var n = Hty.hashcons (mk_ty (Tyvar n))
+  let ty_app s tl = Hty.hashcons (mk_ty (Tyapp (s, tl)))
 
 end
 
@@ -133,9 +132,9 @@ and pattern_node =
 
 module Pattern = struct
 
-  type node = pattern_node
+  type t = pattern
 
-  let equal p1 p2 = match p1, p2 with
+  let equal p1 p2 = match p1.pat_node, p2.pat_node with
     | Pwild, Pwild ->
 	true
     | Pvar n1, Pvar n2 ->
@@ -149,23 +148,22 @@ module Pattern = struct
 
   let hash_pattern p = p.pat_tag
 
-  let hash = function
+  let hash p = match p.pat_node with
     | Pwild -> 0
     | Pvar n -> Name.hash n
     | Papp (s, pl) -> Hashcons.combine_list hash_pattern (Name.hash s.f_name) pl
     | Pas (p, n) -> Hashcons.combine (hash_pattern p) (Name.hash n)
 
-  type t = pattern
-  let node t = t.pat_node
+  let tag n p = { p with pat_tag = n }
 
 end
 module Hpattern = Hashcons.Make(Pattern)
 
-let mk_pattern n t = { pat_node = n; pat_tag = t }
-let pat_wild = Hpattern.hashcons Pwild mk_pattern
-let pat_var n = Hpattern.hashcons (Pvar n) mk_pattern
-let pat_app f pl = Hpattern.hashcons (Papp (f, pl)) mk_pattern
-let pat_as p n = Hpattern.hashcons (Pas (p, n)) mk_pattern
+let mk_pattern n = { pat_node = n; pat_tag = -1 }
+let pat_wild = Hpattern.hashcons (mk_pattern Pwild)
+let pat_var n = Hpattern.hashcons (mk_pattern (Pvar n))
+let pat_app f pl = Hpattern.hashcons (mk_pattern (Papp (f, pl)))
+let pat_as p n = Hpattern.hashcons (mk_pattern (Pas (p, n)))
 
 
 type term = { 
@@ -208,12 +206,8 @@ and bind_fmla = vsymbol * ty * fmla
 
 and fbranch = pattern * fmla
 
-module rec T : sig
-  include Hashcons.HashedType 
-    with type node = term_node * label list * ty and type t = term 
-  val hash_term : term -> int
-end = struct
-  type node = term_node * label list * ty
+module rec T : Hashcons.HashedType with type t = term = 
+struct
   type t = term
 
   let eq_tbranch (p1, t1) (p2, t2) = 
@@ -238,41 +232,39 @@ end = struct
     | _ -> 
 	false
 
-  let equal (n1, l1, ty1) (n2, l2, ty2) = 
-    equal_term_node n1 n2 && 
-    (try List.for_all2 (=) l1 l2 with _ -> false) &&
-    ty1 == ty2
-
-  let hash_term t = t.t_tag
+  let equal t1 t2 =
+    equal_term_node t1.t_node t2.t_node && 
+    (try List.for_all2 (=) t1.t_label t2.t_label with _ -> false) &&
+    t1.t_ty == t2.t_ty
 
   let hash_bind_term (v, ty, t) = 
-    Hashcons.combine2 (Name.hash v) ty.Ty.ty_tag (hash_term t)
+    Hashcons.combine2 (Name.hash v) ty.Ty.ty_tag t.t_tag
 
   let hash_tbranch (p, t) =
     Hashcons.combine p.pat_tag t.t_tag
+
+  let hash_term t = t.t_tag
 
   let hash_term_node = function
     | Tbvar n -> n
     | Tvar v -> Name.hash v
     | Tapp (f, tl) -> Hashcons.combine_list hash_term (Name.hash f.f_name) tl
-    | Tcase (t, bl) -> Hashcons.combine_list hash_tbranch (hash_term t) bl
-    | Tlet (t, bt) -> Hashcons.combine (hash_term t) (hash_bind_term bt)
+    | Tcase (t, bl) -> Hashcons.combine_list hash_tbranch t.t_tag bl
+    | Tlet (t, bt) -> Hashcons.combine t.t_tag (hash_bind_term bt)
     | Teps f -> F.hash_bind_fmla f
 
-  let hash (n, l, ty) =
-    Hashcons.combine (hash_term_node n) 
-      (Hashcons.combine_list Hashtbl.hash ty.Ty.ty_tag l)
+  let hash t =
+    Hashcons.combine (hash_term_node t.t_node) 
+      (Hashcons.combine_list Hashtbl.hash t.t_ty.Ty.ty_tag t.t_label)
       
-  let node t = t.t_node
+  let tag n t = { t with t_tag = n }
 end
 
 and F : sig 
-  include Hashcons.HashedType 
-    with type node = fmla_node * label list and type t = fmla 
+  include Hashcons.HashedType with type t = fmla 
   val eq_bind_fmla : bind_fmla -> bind_fmla -> bool
   val hash_bind_fmla : bind_fmla -> int
 end = struct
-  type node = fmla_node
   type t = fmla
 
   let eq_fbranch (p1, f1) (p2, f2) = 
@@ -281,7 +273,7 @@ end = struct
   let eq_bind_fmla (v1, ty1, f1) (v2, ty2, f2) =
     Name.equal v1 v2 && ty1 == ty2 && f1 == f2
 
-  let equal t1 t2 = match t1, t2 with
+  let equal_fmla_node f1 f2 = match f1, f2 with
     | Fapp (s1, tl1), Fapp (s2, tl2) ->
 	Name.equal s1.p_name s2.p_name && List.for_all2 (==) tl1 tl2
     | Fquant (q1, bf1), Fquant (q2, bf2) ->
@@ -302,6 +294,10 @@ end = struct
     | _ -> 
 	false
 
+  let equal f1 f2 =
+    equal_fmla_node f1.f_node f2.f_node && 
+    (try List.for_all2 (=) f1.f_label f2.f_label with _ -> false)
+
   let hash_fmla f = f.f_tag
 
   let hash_bind_fmla (v, ty, f) = 
@@ -310,8 +306,10 @@ end = struct
   let hash_fbranch (p, f) =
     Hashcons.combine p.pat_tag f.f_tag
 
-  let hash = function
-    | Fapp (p, tl) -> Hashcons.combine_list T.hash_term (Name.hash p.p_name) tl
+  let hash_term t = t.t_tag
+
+  let hash_fmla_node = function
+    | Fapp (p, tl) -> Hashcons.combine_list hash_term (Name.hash p.p_name) tl
     | Fquant (q, bf) -> Hashcons.combine (Hashtbl.hash q) (hash_bind_fmla bf)
     | Fbinop (op, f1, f2) -> 
 	Hashcons.combine2 (Hashtbl.hash op) (hash_fmla f1) (hash_fmla f2)
@@ -320,16 +318,26 @@ end = struct
     | Ffalse -> 1
     | Fif (f1, f2, f3) -> 
 	Hashcons.combine2 (hash_fmla f1) (hash_fmla f2) (hash_fmla f3)
-    | Flet (t, bf) -> Hashcons.combine (T.hash_term t) (hash_bind_fmla bf)
-    | Fcase (t, bl) -> Hashcons.combine_list hash_fbranch (T.hash_term t) bl
+    | Flet (t, bf) -> Hashcons.combine t.t_tag (hash_bind_fmla bf)
+    | Fcase (t, bl) -> Hashcons.combine_list hash_fbranch t.t_tag bl
 
-  let node f = f.f_node
+  let hash f =
+    Hashcons.combine_list Hashtbl.hash (hash_fmla_node f.f_node) f.f_label
+
+  let tag n f = { f with f_tag = n }
 end
 module Hterm = Hashcons.Make(T)
 module Hfmla = Hashcons.Make(F)
 
-let mk_fmla (n, l) t = { f_node = n; f_label = l; f_tag = t }
-let f_true = Hfmla.hashcons Ftrue mk_fmla
+let mk_term n ty = { t_node = n; t_label = []; t_ty = ty; t_tag = -1 }
+let t_var v ty = Hterm.hashcons (mk_term (Tvar v) ty)
+let t_label l t = Hterm.hashcons { t with t_label = l :: t.t_label }
+
+let mk_fmla n = { f_node = n; f_label = []; f_tag = -1 }
+let f_true = Hfmla.hashcons (mk_fmla Ftrue)
+let f_false = Hfmla.hashcons (mk_fmla Ffalse)
+
+let f_label l f = Hfmla.hashcons { f with f_label = l :: f.f_label }
 
 (********
 

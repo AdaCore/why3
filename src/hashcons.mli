@@ -29,20 +29,17 @@
 
 module type HashedType =
   sig
-    type node
-    val equal : node -> node -> bool
-    val hash : node -> int
-
     type t
-    val node : t -> node
+    val equal : t -> t -> bool
+    val hash : t -> int
+    val tag : int -> t -> t
   end
 
 module type S =
   sig
-    type node
     type t
 
-    val hashcons : node -> (node -> int -> t) -> t
+    val hashcons : t -> t
       (** [hashcons n f] hash-cons the value [n] using function [f] i.e. returns
 	  any existing value in the table equal to [n], if any; 
 	  otherwise, creates a new value with function [f], stores it
@@ -59,7 +56,7 @@ module type S =
 	  bucket length. *)
   end
 
-module Make(H : HashedType) : (S with type node = H.node and type t = H.t)
+module Make(H : HashedType) : (S with type t = H.t)
 
 
 (* helpers *)

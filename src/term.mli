@@ -140,6 +140,8 @@ val t_case : term -> (pattern * term) list -> term
 val t_let : vsymbol -> term -> term -> term
 val t_eps : fmla -> term
 
+val t_label : label -> term -> term
+
 (* smart constructors for fmla *)
 
 val f_app : psymbol -> term list -> fmla
@@ -154,6 +156,8 @@ val f_false : fmla
 val f_if : fmla -> fmla -> fmla -> fmla
 val f_let : vsymbol -> term -> fmla -> fmla
 val f_case :  term -> (pattern * fmla) list -> fmla
+
+val f_label : label -> fmla -> fmla
 
 (* transformations ? *)
 
