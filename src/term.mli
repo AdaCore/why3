@@ -75,19 +75,19 @@ type unop =
 
 type term = private { 
   t_node : term_node; 
-  t_label : label;
+  t_label : label list;
   t_ty : ty;
   t_tag : int;
 }
 
 and fmla = private {
   f_node : fmla_node;
-  f_label : label;
+  f_label : label list;
   f_tag : int;
 }
 
 and term_node = private
-  | Tbvar of int * int
+  | Tbvar of int
   | Tvar of vsymbol
   | Tapp of fsymbol * term list
   | Tcase of term * tbranch list
@@ -118,7 +118,7 @@ and fbranch
 
 type pattern = private {
   pat_node : pattern_node;
-  pat_vars : vsymbol_set;
+  pat_ty : ty;
   pat_tag : int;
 }
 
@@ -128,16 +128,16 @@ and pattern_node = private
   | Papp of fsymbol * pattern list
   | Pas of pattern * vsymbol
 
-val pat_wild : pattern
+val pat_wild : ty -> pattern
 val pat_var : vsymbol -> ty -> pattern
-val pat_app : fsymbol -> pattern list -> pattern
+val pat_app : fsymbol -> pattern list -> ty -> pattern
 val pat_as : pattern -> vsymbol -> pattern
 
 (* smart constructors for term *)
 
 val t_var : vsymbol -> ty -> term
-val t_app : fsymbol -> term list -> term
-val t_case : term -> (pattern * term) list -> term
+val t_app : fsymbol -> term list -> ty -> term
+val t_case : term -> (pattern * term) list -> ty -> term
 val t_let : vsymbol -> term -> term -> term
 val t_eps : vsymbol -> ty -> fmla -> term
 
@@ -172,11 +172,11 @@ val f_label_add : label -> fmla -> fmla
 
 (* bindings *)
 
-val open_bind_term : bind_term -> vsymbol * term
-val open_tbranch : tbranch -> pattern * term
+val open_bind_term : bind_term -> vsymbol * ty * term
+val open_tbranch : tbranch -> pattern * vsymbol_set * term
 
-val open_bind_fmla : bind_fmla -> vsymbol * fmla
-val open_fbranch : fbranch -> pattern * fmla
+val open_bind_fmla : bind_fmla -> vsymbol * ty * fmla
+val open_fbranch : fbranch -> pattern * vsymbol_set * fmla
 
 (* equality *)
 
