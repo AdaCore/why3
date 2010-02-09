@@ -118,6 +118,7 @@ and fbranch
 
 type pattern = private {
   pat_node : pattern_node;
+  pat_vars : vsymbol_set;
   pat_tag : int;
 }
 
@@ -128,7 +129,7 @@ and pattern_node = private
   | Pas of pattern * vsymbol
 
 val pat_wild : pattern
-val pat_var : vsymbol -> pattern
+val pat_var : vsymbol -> ty -> pattern
 val pat_app : fsymbol -> pattern list -> pattern
 val pat_as : pattern -> vsymbol -> pattern
 
@@ -138,7 +139,7 @@ val t_var : vsymbol -> ty -> term
 val t_app : fsymbol -> term list -> term
 val t_case : term -> (pattern * term) list -> term
 val t_let : vsymbol -> term -> term -> term
-val t_eps : fmla -> term
+val t_eps : vsymbol -> ty -> fmla -> term
 
 val t_label : label list -> term -> term
 val t_label_add : label -> term -> term
@@ -172,10 +173,10 @@ val f_label_add : label -> fmla -> fmla
 (* bindings *)
 
 val open_bind_term : bind_term -> vsymbol * term
-val open_tbranch : tbranch -> vsymbol_set * pattern * term
+val open_tbranch : tbranch -> pattern * term
 
-val open_fmla : bind_fmla -> vsymbol * fmla
-val open_fbranch : fbranch -> vsymbol_set * pattern * fmla
+val open_bind_fmla : bind_fmla -> vsymbol * fmla
+val open_fbranch : fbranch -> pattern * fmla
 
 (* equality *)
 

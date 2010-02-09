@@ -121,13 +121,13 @@ type unop =
 
 type pattern = {
   pat_node : pattern_node;
-  pat_vars : Name.S.t;
+  pat_ty : ty;
   pat_tag : int;
 }
 
 and pattern_node = 
   | Pwild 
-  | Pvar of vsymbol
+  | Pvar of vsymbol 
   | Papp of fsymbol * pattern list
   | Pas of pattern * vsymbol
 
@@ -135,7 +135,7 @@ module Pattern = struct
 
   type t = pattern
 
-  let equal p1 p2 = match p1.pat_node, p2.pat_node with
+  let equal_node p1 p2 = match p1, p2 with
     | Pwild, Pwild ->
 	true
     | Pvar n1, Pvar n2 ->
@@ -147,35 +147,40 @@ module Pattern = struct
     | _ ->
 	false
 
+  let equal p1 p2 =
+    equal_node p1.pat_node p2.pat_node && p1.pat_ty == p2.pat_ty
+
   let hash_pattern p = p.pat_tag
 
-  let hash p = match p.pat_node with
+  let hash_node = function
     | Pwild -> 0
     | Pvar n -> Name.hash n
     | Papp (s, pl) -> Hashcons.combine_list hash_pattern (Name.hash s.f_name) pl
     | Pas (p, n) -> Hashcons.combine (hash_pattern p) (Name.hash n)
+
+  let hash p = Hashcons.combine (hash_node p.pat_node) p.pat_ty.Ty.ty_tag
 
   let tag n p = { p with pat_tag = n }
 
 end
 module Hpattern = Hashcons.Make(Pattern)
 
-let pat_vars acc p = 
-  assert (Name.S.is_empty (Name.S.inter acc p.pat_vars));
-  Name.S.union acc p.pat_vars
+(* let pat_vars acc0 p =  *)
+(*   Name.M.fold  *)
+(*     (fun x ty acc -> assert (not (Name.M.mem x acc0)); Name.M.add x ty acc) *)
+(*     p.pat_vars acc0 *)
 
-let patn_vars acc = function
-  | Pwild -> acc
-  | Pvar n -> assert (not (Name.S.mem n acc)); Name.S.add n acc
-  | Papp (_, pl) -> List.fold_left pat_vars acc pl 
-  | Pas (p, n) -> assert (not (Name.S.mem n acc)); pat_vars (Name.S.add n acc) p
+(* let patn_vars acc = function *)
+(*   | Pwild -> acc *)
+(*   | Pvar (n, ty) -> assert (not (Name.M.mem n acc)); Name.M.add n ty acc *)
+(*   | Papp (_, pl) -> List.fold_left pat_vars acc pl  *)
+(*   | Pas (p, n) -> assert (not (Name.S.mem n acc)); pat_vars (Name.S.add n acc) p *)
 
-let mk_pattern n = 
-  { pat_node = n; pat_vars = patn_vars Name.S.empty n; pat_tag = -1 }
-let pat_wild = Hpattern.hashcons (mk_pattern Pwild)
-let pat_var n = Hpattern.hashcons (mk_pattern (Pvar n))
-let pat_app f pl = Hpattern.hashcons (mk_pattern (Papp (f, pl)))
-let pat_as p n = Hpattern.hashcons (mk_pattern (Pas (p, n)))
+let mk_pattern n ty = { pat_node = n; pat_ty = ty; pat_tag = -1 }
+let pat_wild ty = Hpattern.hashcons (mk_pattern Pwild ty)
+let pat_var n ty = Hpattern.hashcons (mk_pattern (Pvar n) ty)
+let pat_app f pl ty = Hpattern.hashcons (mk_pattern (Papp (f, pl)) ty)
+let pat_as p n = Hpattern.hashcons (mk_pattern (Pas (p, n)) p.pat_ty)
 
 
 type term = { 
@@ -212,17 +217,17 @@ and fmla_node =
 
 and bind_term = vsymbol * ty * term
 
-and tbranch = pattern * term
+and tbranch = pattern * int * term
 
 and bind_fmla = vsymbol * ty * fmla
 
-and fbranch = pattern * fmla
+and fbranch = pattern * int * fmla
 
 module rec T : Hashcons.HashedType with type t = term = 
 struct
   type t = term
 
-  let eq_tbranch (p1, t1) (p2, t2) = 
+  let eq_tbranch (p1, _, t1) (p2, _, t2) = 
     p1 == p2 && t1 == t2
     
   let eq_bind_term (v1, ty1, t1) (v2, ty2, t2) = 
@@ -252,7 +257,7 @@ struct
   let hash_bind_term (v, ty, t) = 
     Hashcons.combine2 (Name.hash v) ty.Ty.ty_tag t.t_tag
 
-  let hash_tbranch (p, t) =
+  let hash_tbranch (p, _, t) =
     Hashcons.combine p.pat_tag t.t_tag
 
   let hash_term t = t.t_tag
@@ -279,7 +284,7 @@ and F : sig
 end = struct
   type t = fmla
 
-  let eq_fbranch (p1, f1) (p2, f2) = 
+  let eq_fbranch (p1, _, f1) (p2, _, f2) = 
     p1 == p2 && f1 == f2
     
   let eq_bind_fmla (v1, ty1, f1) (v2, ty2, f2) =
@@ -315,7 +320,7 @@ end = struct
   let hash_bind_fmla (v, ty, f) = 
     Hashcons.combine2 (Name.hash v) ty.Ty.ty_tag (hash_fmla f)
 
-  let hash_fbranch (p, f) =
+  let hash_fbranch (p, _, f) =
     Hashcons.combine p.pat_tag f.f_tag
 
   let hash_term t = t.t_tag
@@ -353,7 +358,7 @@ let t_label_add l t = Hterm.hashcons { t with t_label = l :: t.t_label }
 let t_let v t1 t2 = 
   Hterm.hashcons (mk_term (Tlet (t1, (v, t1.t_ty, t2))) t2.t_ty)
 
-let t_case t bl = assert false (*TODO*)
+let t_case t bl ty = Hterm.hashcons (mk_term (Tcase (t, bl)) ty)
 let t_eps u ty f = Hterm.hashcons (mk_term (Teps (u, ty, f)) ty)
 
 (* hash-consing constructors for formulas *)
@@ -362,22 +367,27 @@ let mk_fmla n = { f_node = n; f_label = []; f_tag = -1 }
 let f_app f tl = Hfmla.hashcons (mk_fmla (Fapp (f, tl)))
 let f_true = Hfmla.hashcons (mk_fmla Ftrue)
 let f_false = Hfmla.hashcons (mk_fmla Ffalse)
+
 let f_binary op f1 f2 = Hfmla.hashcons (mk_fmla (Fbinop (op, f1, f2)))
 let f_and = f_binary Fand
 let f_or = f_binary For
 let f_implies = f_binary Fimplies
 let f_iff = f_binary Fiff
+
 let f_unary op f = Hfmla.hashcons (mk_fmla (Funop (op, f)))
 let f_not f = Hfmla.hashcons (mk_fmla (Funop (Fnot, f)))
+
 let f_if f1 f2 f3 = Hfmla.hashcons (mk_fmla (Fif (f1, f2, f3)))
 let f_quant q u ty f = Hfmla.hashcons (mk_fmla (Fquant (q, (u, ty, f))))
 let f_let v t f = Hfmla.hashcons (mk_fmla (Flet (t, (v, t.t_ty, f))))
-let f_case t bl = assert false (*TODO*)
+let f_case t bl = Hfmla.hashcons (mk_fmla (Fcase (t, bl)))
 
 let f_label l f = Hfmla.hashcons { f with f_label = l }
 let f_label_add l f = Hfmla.hashcons { f with f_label = l :: f.f_label }
 
-(* substitutions, etc. *)
+(* abstractions / substitutions *)
+
+let name_map_cardinal m = Name.M.fold (fun _ _ acc -> acc + 1) m 0
 
 (* replaces named variables [v] in term [t] by de Bruijn index 0 *)
 let rec abs_term lvl v ty t = match t.t_node with
@@ -390,20 +400,20 @@ let rec abs_term lvl v ty t = match t.t_node with
   | Tapp (f, tl) -> 
       t_app f (List.map (abs_term lvl v ty) tl) t.t_ty
   | Tcase (t1, bl) -> 
-      t_case (abs_term lvl v ty t1) (List.map (abs_tbranch lvl v ty) bl)
+      t_case (abs_term lvl v ty t1) (List.map (abs_tbranch lvl v ty) bl) t.t_ty
   | Tlet (t1, (u, _, t2)) -> 
       t_let u (abs_term lvl v ty t1) (abs_term (lvl + 1) v ty t2)
   | Teps (u, tyu, f) -> 
       t_eps u tyu (abs_fmla (lvl + 1) v ty f)
 
-and abs_tbranch lvl v ty (pat, t) =
-  (pat, abs_term (lvl + Name.S.cardinal pat.pat_vars) v ty t)
+and abs_tbranch lvl v ty (pat, m, t) =
+  (pat, m, abs_term (lvl + m) v ty t)
 
 and abs_fmla lvl v ty f = match f.f_node with
   | Fapp (p, tl) -> 
       f_app p (List.map (abs_term lvl v ty) tl)
-  | Fquant (q, (u, tyu, f)) -> 
-      f_quant q u tyu (abs_fmla (lvl + 1) v ty f)
+  | Fquant (q, (u, tyu, f1)) -> 
+      f_quant q u tyu (abs_fmla (lvl + 1) v ty f1)
   | Fbinop (op, f1, f2) -> 
       f_binary op (abs_fmla lvl v ty f1) (abs_fmla lvl v ty f2)
   | Funop (op, f1) -> 
@@ -417,19 +427,166 @@ and abs_fmla lvl v ty f = match f.f_node with
   | Fcase (t, bl) -> 
       f_case (abs_term lvl v ty t) (List.map (abs_fbranch lvl v ty) bl)
 
-and abs_fbranch lvl v ty (pat, f) =
-  (pat, abs_fmla (lvl + Name.S.cardinal pat.pat_vars) v ty f)
+and abs_fbranch lvl v ty (pat, m, f) =
+  (pat, m, abs_fmla (lvl + m) v ty f)
 
+(* applies substitution [s] (mapping de Bruijn variables to terms) to [t2] *)
+
+module Subst = struct
+  module Im = Map.Make(
+    struct 
+      type t = int 
+      let compare = Pervasives.compare 
+    end)
+  type t = term Im.t
+  let empty = Im.empty
+  let add = Im.add
+  let find = Im.find
+  let singleton t = Im.add 0 t Im.empty
+end
+
+
+let rec subst_term lvl s t = match t.t_node with
+  | Tbvar n when n < lvl -> 
+      t
+  | Tbvar n ->
+      (try Subst.find (n - lvl) s with Not_found -> assert false)
+  | Tvar _ ->
+      t
+  | Tapp (f, tl) -> 
+      t_app f (List.map (subst_term lvl s) tl) t.t_ty
+  | Tcase (t1, bl) -> 
+      t_case (subst_term lvl s t1) (List.map (subst_tbranch lvl s) bl) t.t_ty
+  | Tlet (t1, (u, _, t2)) -> 
+      t_let u (subst_term lvl s t1) (subst_term (lvl + 1) s t2)
+  | Teps (u, tyu, f) -> 
+      t_eps u tyu (subst_fmla (lvl + 1) s f)
+
+and subst_tbranch lvl s (pat, m, t) =
+  (pat, m, subst_term (lvl + m) s t)
+
+and subst_fmla lvl s f = match f.f_node with
+  | Fapp (p, tl) -> 
+      f_app p (List.map (subst_term lvl s) tl)
+  | Fquant (q, (u, tyu, f1)) -> 
+      f_quant q u tyu (subst_fmla (lvl + 1) s f1)
+  | Fbinop (op, f1, f2) -> 
+      f_binary op (subst_fmla lvl s f1) (subst_fmla lvl s f2)
+  | Funop (op, f1) -> 
+      f_unary op (subst_fmla lvl s f1)
+  | Ftrue | Ffalse -> 
+      f
+  | Fif (f1, f2, f3) -> 
+      f_if (subst_fmla lvl s f1) (subst_fmla lvl s f2) (subst_fmla lvl s f3)
+  | Flet (t, (u, _, f1)) -> 
+      f_let u (subst_term lvl s t) (subst_fmla (lvl + 1) s f1)
+  | Fcase (t, bl) -> 
+      f_case (subst_term lvl s t) (List.map (subst_fbranch lvl s) bl)
+
+and subst_fbranch lvl s (pat, m, f) =
+  (pat, m, subst_fmla (lvl + m) s f)
+
+
+(* smart constructors *)
 
 let t_let v t1 t2 = t_let v t1 (abs_term 0 v t1.t_ty t2)
-  
+let t_eps v ty f = t_eps v ty (abs_fmla 0 v ty f)  
+
 let t_app f tl = assert false (*TODO*)
+let t_case t bl = assert false (*TODO*)
+
+let f_quant q v ty f = f_quant q v ty (abs_fmla 0 v ty f) 
+let f_forall = f_quant Fforall
+let f_exists = f_quant Fexists
+let f_let v t1 f2 = f_let v t1 (abs_fmla 0 v t1.t_ty f2)
+let f_case t bl = assert false (*TODO*)
+
+(* opening binders *)
+
+let open_bind_term (v, ty, t) =
+  let v = Name.fresh v in
+  v, ty, subst_term 0 (Subst.singleton (t_var v ty)) t
+
+let rec subst_pat ns p = match p.pat_node with
+  | Pwild -> 
+      p
+  | Pvar n ->
+      (try pat_var (Name.M.find n ns) p.pat_ty with Not_found -> assert false)
+  | Papp (f, pl) ->
+      pat_app f (List.map (subst_pat ns) pl) p.pat_ty
+  | Pas (p, n) ->
+      pat_as (subst_pat ns p) 
+	(try Name.M.find n ns with Not_found -> assert false) 
+
+let substs_for_pat m =
+  let i = ref (-1) in
+  Name.M.fold 
+    (fun x ty (s, ns) -> 
+       incr i; 
+       let x' = Name.fresh x in
+       Subst.add !i (t_var x' ty) s, Name.M.add x x' ns) 
+    m 
+    (Subst.empty, Name.M.empty)
+
+let open_tbranch (pat, m, t) =
+  let s, ns = substs_for_pat m in
+  (subst_pat ns pat, subst_term 0 s t)
+
+let open_bind_fmla (v, ty, f) =
+  let v = Name.fresh v in
+  v, ty, subst_fmla 0 (Subst.singleton (t_var v ty)) f
+
+let open_fbranch (pat, m, f) =
+  let s, ns = substs_for_pat m in
+  (subst_pat ns pat, subst_fmla 0 s f)
+
+
+(* TODO : substitution functions named variables -> terms
+   performing typing *)
 
 (* equality *)
 
 let t_equal = (==)
 let f_equal = (==)
 
+let rec t_alpha_equal t1 t2 = 
+  t1 == t2 ||
+  t1.t_ty == t2.t_ty &&
+  match t1.t_node, t2.t_node with
+    | Tbvar x1, Tbvar x2 -> 
+	x1 == x2
+    | Tvar v1, Tvar v2 -> 
+	Name.equal v1 v2
+    | Tapp (s1, l1), Tapp (s2, l2) -> 
+	Name.equal s1.f_name s2.f_name && List.for_all2 t_alpha_equal l1 l2
+    | Tcase (t1, l1), Tcase (t2, l2) ->
+	t_alpha_equal t1 t2 && List.for_all2 tbranch_alpha_equal l1 l2
+    | Tlet (t1, b1), Tlet (t2, b2) ->
+	t_alpha_equal t1 t2 && bind_term_alpha_equal b1 b2
+    | Teps f1, Teps f2 ->
+	bind_fmla_alpha_equal f1 f2
+    | _ -> 
+	false
+
+and tbranch_alpha_equal (pat1, _, t1) (pat2, _, t2) =
+  pat_alpha_equal pat1 pat2 && t_alpha_equal t1 t2
+
+and pat_alpha_equal p1 p2 = match p1.pat_node, p2.pat_node with
+  | Pwild, Pwild ->
+      true
+  | Pvar n1, Pvar n2 ->
+      assert false (*TODO*)
+  | _ ->
+      assert false (*TODO*)
+
+and bind_term_alpha_equal (_, _, t1) (_, _, t2) =
+  t_alpha_equal t1 t2
+
+and bind_fmla_alpha_equal (_, _, f1) (_, _, f2) =
+  f_alpha_equal f1 f2
+
+and f_alpha_equal f1 f2 = 
+  assert false (*TODO*)
 
 (********
 
