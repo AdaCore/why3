@@ -14,33 +14,33 @@
 (*                                                                        *)
 (**************************************************************************)
 
-#load "hashcons.cmo";;
-#load "name.cmo";;
-#load "term.cmo";;
-#load "pp.cmo";;
-#load "pretty.cmo";;
-#install_printer Name.print;;
-#install_printer Pretty.print_ty;;
-#install_printer Pretty.print_term;;
-
+open Format
+open Pp
 open Term
+open Ty
 
-let alpha = Name.from_string "alpha"
-let var_alpha = Ty.ty_var alpha
+let rec print_ty fmt ty = match ty.ty_node with
+  | Tyvar n ->
+      fprintf fmt "'%a" Name.print n
+  | Tyapp (s, []) -> 
+      Name.print fmt s.ty_name
+  | Tyapp (s, [t]) -> 
+      fprintf fmt "%a %a" print_ty t Name.print s.ty_name
+  | Tyapp (s, l) -> 
+      fprintf fmt "(%a) %a" (print_list comma print_ty) l Name.print s.ty_name
+  
+let rec print_term fmt t = match t.t_node with
+  | Tbvar n -> 
+      assert false
+  | Tvar n -> 
+      Name.print fmt n
+  | Tapp (s, tl) ->
+      fprintf fmt "(%a(%a) : %a)" 
+	Name.print s.f_name (print_list comma print_term) tl
+	print_ty t.t_ty
+  | _ ->
+      assert false (*TODO*)
 
-let list = Ty.create_tysymbol (Name.from_string "list") [alpha] None
-
-let list_alpha = Ty.ty_app list [var_alpha]
-let list_list_alpha = Ty.ty_app list [list_alpha]
-
-let nil = create_fsymbol (Name.from_string "nil") ([], list_alpha)
-let t_nil = t_app nil [] list_alpha
-let tt_nil = t_app nil [] list_list_alpha
-
-let cons = create_fsymbol (Name.from_string "cons") 
-  ([var_alpha; list_alpha], list_alpha)
-
-let int_ = Ty.create_tysymbol (Name.from_string "int") [] None
-
-let _ = t_app cons [t_nil; tt_nil] list_list_alpha
+let rec print_fmla fmt f =
+  assert false (*TODO*)
 

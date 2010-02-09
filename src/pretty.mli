@@ -14,33 +14,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-#load "hashcons.cmo";;
-#load "name.cmo";;
-#load "term.cmo";;
-#load "pp.cmo";;
-#load "pretty.cmo";;
-#install_printer Name.print;;
-#install_printer Pretty.print_ty;;
-#install_printer Pretty.print_term;;
-
+open Format
 open Term
 
-let alpha = Name.from_string "alpha"
-let var_alpha = Ty.ty_var alpha
+val print_ty : formatter -> ty -> unit
 
-let list = Ty.create_tysymbol (Name.from_string "list") [alpha] None
+val print_term : formatter -> term -> unit
 
-let list_alpha = Ty.ty_app list [var_alpha]
-let list_list_alpha = Ty.ty_app list [list_alpha]
-
-let nil = create_fsymbol (Name.from_string "nil") ([], list_alpha)
-let t_nil = t_app nil [] list_alpha
-let tt_nil = t_app nil [] list_list_alpha
-
-let cons = create_fsymbol (Name.from_string "cons") 
-  ([var_alpha; list_alpha], list_alpha)
-
-let int_ = Ty.create_tysymbol (Name.from_string "int") [] None
-
-let _ = t_app cons [t_nil; tt_nil] list_list_alpha
+val print_fmla : formatter -> fmla -> unit
 

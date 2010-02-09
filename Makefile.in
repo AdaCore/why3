@@ -48,7 +48,7 @@ OCAMLBEST= @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 CAMLP4   = @CAMLP4O@
 
-INCLUDES = -I src 
+INCLUDES = -I lib -I src 
 BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ 
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
 OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ 
@@ -88,7 +88,9 @@ check: $(BINARY) $(PRELUDE)
 # why
 #####
 
-CMO = src/name.cmo src/hashcons.cmo src/term.cmo
+LIBCMO = lib/pp.cmo
+
+CMO = $(LIBCMO) src/name.cmo src/hashcons.cmo src/term.cmo src/pretty.cmo
 CMX = $(CMO:.cmo=.cmx)
 
 bin/why.opt: $(CMX) 
@@ -372,7 +374,7 @@ otags:
 	otags src/*.mli src/*.ml c/*.mli c/*.ml intf/*.mli intf/*.ml
 
 wc:
-	ocamlwc -p src/*.ml* jc/*.ml* c/*.ml* intf/*.ml* tools/*.ml* java/*.ml*
+	ocamlwc -p src/*.ml* 
 
 # distrib
 #########
@@ -548,7 +550,7 @@ coq-clean::
 .PHONY: depend
 .depend depend: $(GENERATED)
 	rm -f .depend
-	$(OCAMLDEP) -slash $(INCLUDES) src/*.ml src/*.mli jc/*.mli jc/*.ml c/*.mli c/*.ml java/*.mli java/*.ml intf/*.ml intf/*.mli tools/*.mli tools/*.ml mix/*.mli mix/*.ml ml/*.ml ml/*.mli > .depend
+	$(OCAMLDEP) -slash $(INCLUDES) lib/*.ml lib/*.mli src/*.ml src/*.mli > .depend
 	$(OCAMLDEP) -slash $(MLINCLUDES) ml/parsing/*.ml ml/parsing/*.mli ml/typing/*.ml ml/typing/*.mli ml/utils/*.ml ml/utils/*.mli >> .depend
 ifeq ($(FRAMAC),yes)
 #	$(MAKE) -C $(JESSIE_PLUGIN_PATH) depend
