@@ -140,24 +140,30 @@ val t_case : term -> (pattern * term) list -> term
 val t_let : vsymbol -> term -> term -> term
 val t_eps : fmla -> term
 
-val t_label : label -> term -> term
+val t_label : label list -> term -> term
+val t_label_add : label -> term -> term
 
 (* smart constructors for fmla *)
 
 val f_app : psymbol -> term list -> fmla
-val f_forall : vsymbol -> ty -> fmla -> fmla
-val f_exists : vsymbol -> ty -> fmla -> fmla
-val f_and : fmla -> fmla -> fmla
-val f_or_ : fmla -> fmla -> fmla
-val f_implies : fmla -> fmla -> fmla
-val f_iff : fmla -> fmla -> fmla
+
 val f_true : fmla
 val f_false : fmla
+val f_and : fmla -> fmla -> fmla
+val f_or : fmla -> fmla -> fmla
+val f_implies : fmla -> fmla -> fmla
+val f_iff : fmla -> fmla -> fmla
+val f_not : fmla -> fmla
+
+val f_forall : vsymbol -> ty -> fmla -> fmla
+val f_exists : vsymbol -> ty -> fmla -> fmla
+
 val f_if : fmla -> fmla -> fmla -> fmla
 val f_let : vsymbol -> term -> fmla -> fmla
 val f_case :  term -> (pattern * fmla) list -> fmla
 
-val f_label : label -> fmla -> fmla
+val f_label : label list -> fmla -> fmla
+val f_label_add : label -> fmla -> fmla
 
 (* transformations ? *)
 
