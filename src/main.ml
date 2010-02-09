@@ -14,6 +14,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Format
+
+let file = Sys.argv.(1)
+
+let () =
+  try
+    let c = open_in file in
+    let lb = Lexing.from_channel c in
+    lb.Lexing.lex_curr_p <- 
+      { lb.Lexing.lex_curr_p with Lexing.pos_fname = file };
+    let _f = Lexer.parse_logic_file lb in 
+    close_in c
+  with
+    | Lexer.Lexical_error s ->
+	eprintf "lexical error: %s@." s; exit 1
+    | Loc.Located (loc, Parsing.Parse_error) ->
+	eprintf "%asyntax error@." Loc.report_position loc; exit 1
+
+(****
+
 #load "hashcons.cmo";;
 #load "name.cmo";;
 #load "term.cmo";;
@@ -44,3 +64,4 @@ let int_ = Ty.create_tysymbol (Name.from_string "int") [] None
 
 let _ = t_app cons [t_nil; tt_nil] list_list_alpha
 
+****)
