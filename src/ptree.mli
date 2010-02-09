@@ -55,7 +55,7 @@ type plogic_type =
   | PPredicate of ppure_type list
   | PFunction of ppure_type list * ppure_type
 
-type decl = 
+type logic_decl = 
   | Logic of loc * external_ * string list * plogic_type
   | Predicate_def of loc * string * (loc * string * ppure_type) list * lexpr
   | Inductive_def of loc * string * plogic_type * (loc * string * lexpr) list
@@ -67,4 +67,4 @@ type decl =
   | AlgType of (loc * string list * string
       * (loc * string * ppure_type list) list) list
 
-type file = decl list
+type logic_file = logic_decl list

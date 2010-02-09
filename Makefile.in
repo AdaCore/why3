@@ -59,7 +59,7 @@ COQDEP = @COQDEP@
 COQLIB = "@COQLIB@"
 COQVER = @COQVER@
 
-GENERATED = src/version.ml 
+GENERATED = src/version.ml src/parser.mli src/parser.ml src/lexer.ml
 
 # main targets
 ##############
@@ -90,7 +90,8 @@ check: $(BINARY) $(PRELUDE)
 
 LIBCMO = lib/pp.cmo lib/loc.cmo
 
-CMO = $(LIBCMO) src/name.cmo src/hashcons.cmo src/term.cmo src/pretty.cmo
+CMO = $(LIBCMO) src/name.cmo src/hashcons.cmo src/term.cmo src/pretty.cmo \
+      src/parser.cmo src/lexer.cmo
 CMX = $(CMO:.cmo=.cmx)
 
 bin/why.opt: $(CMX) 
