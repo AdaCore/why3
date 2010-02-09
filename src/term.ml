@@ -479,10 +479,13 @@ and subst_fbranch lvl s (pat, nv, f) =
 
 let name_map_singleton v = Name.M.add v 0 Name.M.empty
 
+(* TODO: checks *)
 let t_let v t1 t2 = t_let v t1 (abs_term 0 (name_map_singleton v) t2)
+
+(* TODO: checks *)
 let t_eps v ty f = t_eps v ty (abs_fmla 0 (name_map_singleton v) f)  
 
-let t_app f tl = assert false (*TODO*)
+let t_app f tl ty = assert false (*TODO*)
 
 let varmap_for_pattern p =
   let i = ref (-1) in
@@ -501,19 +504,24 @@ let varmap_for_pattern p =
   let m = make Name.M.empty p in
   m, !i + 1
 
+(* TODO: checks *)
 let t_case t bl = 
   let make_tbranch (p, t) =
     let m, nv = varmap_for_pattern p in (p, nv, abs_term 0 m t)
   in
   t_case t (List.map make_tbranch bl)
 
+(* TODO: checks *)
 let f_quant q v ty f = f_quant q v ty (abs_fmla 0 (name_map_singleton v) f) 
 let f_forall = f_quant Fforall
 let f_exists = f_quant Fexists
+
+(* TODO: checks *)
 let f_let v t1 f2 = f_let v t1 (abs_fmla 0 (name_map_singleton v) f2)
 
 let f_app s tl = assert false (*TODO*)
 
+(* TODO: checks *)
 let f_case t bl = 
   let make_fbranch (p, f) =
     let m, nv = varmap_for_pattern p in (p, nv, abs_fmla 0 m f)
@@ -585,17 +593,20 @@ let rec t_alpha_equal t1 t2 =
 	bind_fmla_alpha_equal f1 f2
     | _ -> 
 	false
-
+ 
 and tbranch_alpha_equal (pat1, _, t1) (pat2, _, t2) =
   pat_alpha_equal pat1 pat2 && t_alpha_equal t1 t2
 
 and pat_alpha_equal p1 p2 = match p1.pat_node, p2.pat_node with
-  | Pwild, Pwild ->
+  | Pwild, Pwild
+  | Pvar _, Pvar _ ->
       true
-  | Pvar n1, Pvar n2 ->
-      assert false (*TODO*)
+  | Papp (_, l1), Papp (_, l2) ->
+      (try List.for_all2 pat_alpha_equal l1 l2 with _ -> false)
+  | Pas (p1, _), Pas (p2, _) ->
+      pat_alpha_equal p1 p2
   | _ ->
-      assert false (*TODO*)
+      false
 
 and bind_term_alpha_equal (_, _, t1) (_, _, t2) =
   t_alpha_equal t1 t2
@@ -604,7 +615,31 @@ and bind_fmla_alpha_equal (_, _, f1) (_, _, f2) =
   f_alpha_equal f1 f2
 
 and f_alpha_equal f1 f2 = 
-  assert false (*TODO*)
+  f1 == f2 ||
+  match f1.f_node, f2.f_node with
+    | Fapp (s1, tl1), Fapp (s2, tl2) ->
+	Name.equal s1.p_name s2.p_name && List.for_all2 t_alpha_equal tl1 tl2
+    | Fquant (q1, bf1), Fquant (q2, bf2) ->
+	q1 == q2 && bind_fmla_alpha_equal bf1 bf2
+    | Fbinop (op1, f1, g1), Fbinop (op2, f2, g2) ->
+	op1 == op2 && f_alpha_equal f1 f2 && f_alpha_equal g1 g2
+    | Funop (op1, f1), Funop (op2, f2) ->
+	op1 == op2 && f_alpha_equal f1 f2
+    | Ftrue, Ftrue 
+    | Ffalse, Ffalse ->
+	true
+    | Fif (f1, g1, h1), Fif (f2, g2, h2) ->
+	f_alpha_equal f1 f2 && f_alpha_equal g1 g2 && f_alpha_equal h1 h2
+    | Flet (t1, bf1), Flet (t2, bf2) ->
+	t_alpha_equal t1 t2 && bind_fmla_alpha_equal bf1 bf2
+    | Fcase (t1, bl1), Fcase (t2, bl2) ->
+	t_alpha_equal t1 t2 && List.for_all2 fbranch_alpha_equal bl1 bl2
+    | _ -> 
+	false
+
+and fbranch_alpha_equal (pat1, _, f1) (pat2, _, f2) =
+  pat_alpha_equal pat1 pat2 && f_alpha_equal f1 f2
+
 
 (********
 
