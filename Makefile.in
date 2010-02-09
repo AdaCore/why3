@@ -88,7 +88,7 @@ check: $(BINARY) $(PRELUDE)
 # why
 #####
 
-LIBCMO = lib/pp.cmo
+LIBCMO = lib/pp.cmo lib/loc.cmo
 
 CMO = $(LIBCMO) src/name.cmo src/hashcons.cmo src/term.cmo src/pretty.cmo
 CMX = $(CMO:.cmo=.cmx)
