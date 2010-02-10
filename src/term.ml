@@ -385,117 +385,58 @@ let f_case t bl = Hfmla.hashcons (mk_fmla (Fcase (t, bl)))
 let f_label l f = Hfmla.hashcons { f with f_label = l }
 let f_label_add l f = Hfmla.hashcons { f with f_label = l :: f.f_label }
 
-(* abstractions / substitutions *)
+(* unsafe map with level *)
 
-let name_map_cardinal m = Name.M.fold (fun _ _ acc -> acc + 1) m 0
+let brlvl fn lvl (pat, nv, t) = (pat, nv, fn (lvl + nv) t)
 
-(* replaces named variables by de Bruijn indices in term [t] 
-   using a map [m] *)
-let rec abs_term lvl m t = match t.t_node with
-  | Tbvar _ -> 
-      t
+let map_term_unsafe fnT fnF lvl t = match t.t_node with
+  | Tbvar _ | Tvar _ -> t
+  | Tapp (f, tl) -> t_app f (List.map (fnT lvl) tl) t.t_ty
+  | Tcase (t1, bl) -> t_case (fnT lvl t1) (List.map (brlvl fnT lvl) bl) t.t_ty
+  | Tlet (t1, (u, _, t2)) -> t_let u (fnT lvl t1) (fnT (lvl + 1) t2)
+  | Teps (u, tyu, f) -> t_eps u tyu (fnF (lvl + 1) f)
+
+let map_fmla_unsafe fnT fnF lvl f = match f.f_node with
+  | Fapp (p, tl) -> f_app p (List.map (fnT lvl) tl)
+  | Fquant (q, (u, tyu, f1)) -> f_quant q u tyu (fnF (lvl + 1) f1)
+  | Fbinop (op, f1, f2) -> f_binary op (fnF lvl f1) (fnF lvl f2)
+  | Funop (op, f1) -> f_unary op (fnF lvl f1)
+  | Ftrue | Ffalse -> f
+  | Fif (f1, f2, f3) -> f_if (fnF lvl f1) (fnF lvl f2) (fnF lvl f3)
+  | Flet (t, (u, _, f1)) -> f_let u (fnT lvl t) (fnF (lvl + 1) f1)
+  | Fcase (t, bl) -> f_case (fnT lvl t) (List.map (brlvl fnF lvl) bl)
+
+(* replaces variables with de Bruijn indices in term [t] using a map [m] *)
+
+let rec abst_term m lvl t = match t.t_node with
   | Tvar u -> 
-      (try let i = Name.M.find u m in t_bvar (i + lvl) t.t_ty
-       with Not_found -> t)
-  | Tapp (f, tl) -> 
-      t_app f (List.map (abs_term lvl m) tl) t.t_ty
-  | Tcase (t1, bl) -> 
-      t_case (abs_term lvl m t1) (List.map (abs_tbranch lvl m) bl) t.t_ty
-  | Tlet (t1, (u, _, t2)) -> 
-      t_let u (abs_term lvl m t1) (abs_term (lvl + 1) m t2)
-  | Teps (u, tyu, f) -> 
-      t_eps u tyu (abs_fmla (lvl + 1) m f)
+      (try t_bvar (Name.M.find u m + lvl) t.t_ty
+      with Not_found -> t)
+  | _ -> map_term_unsafe (abst_term m) (abst_fmla m) lvl t
 
-and abs_tbranch lvl m (pat, nv, t) =
-  (pat, nv, abs_term (lvl + nv) m t)
+and abst_fmla m lvl f = map_fmla_unsafe (abst_term m) (abst_fmla m) lvl f
 
-and abs_fmla lvl m f = match f.f_node with
-  | Fapp (p, tl) -> 
-      f_app p (List.map (abs_term lvl m) tl)
-  | Fquant (q, (u, tyu, f1)) -> 
-      f_quant q u tyu (abs_fmla (lvl + 1) m f1)
-  | Fbinop (op, f1, f2) -> 
-      f_binary op (abs_fmla lvl m f1) (abs_fmla lvl m f2)
-  | Funop (op, f1) -> 
-      f_unary op (abs_fmla lvl m f1)
-  | Ftrue | Ffalse -> 
-      f
-  | Fif (f1, f2, f3) -> 
-      f_if (abs_fmla lvl m f1) (abs_fmla lvl m f2) (abs_fmla lvl m f3)
-  | Flet (t, (u, _, f1)) -> 
-      f_let u (abs_term lvl m t) (abs_fmla (lvl + 1) m f1)
-  | Fcase (t, bl) -> 
-      f_case (abs_term lvl m t) (List.map (abs_fbranch lvl m) bl)
+(* replaces de Bruijn indices with variables in term [t] using a map [m] *)
 
-and abs_fbranch lvl m (pat, nv, f) =
-  (pat, nv, abs_fmla (lvl + nv) m f)
+module Im = Map.Make(struct type t = int let compare = Pervasives.compare end)
 
-(* applies substitution [s] (mapping de Bruijn variables to terms) to [t2] *)
+let rec inst_term m lvl t = match t.t_node with
+  | Tbvar n when n >= lvl ->
+      (try t_var (Im.find (n - lvl) m) t.t_ty 
+      with Not_found -> assert false)
+  | _ -> map_term_unsafe (inst_term m) (inst_fmla m) lvl t
 
-module Subst = struct
-  module Im = Map.Make(
-    struct 
-      type t = int 
-      let compare = Pervasives.compare 
-    end)
-  type t = term Im.t
-  let empty = Im.empty
-  let add = Im.add
-  let find = Im.find
-  let singleton t = Im.add 0 t Im.empty
-end
-
-
-let rec subst_term lvl s t = match t.t_node with
-  | Tbvar n when n < lvl -> 
-      t
-  | Tbvar n ->
-      (try t_var (Subst.find (n - lvl) s) t.t_ty
-       with Not_found -> assert false)
-  | Tvar _ ->
-      t
-  | Tapp (f, tl) -> 
-      t_app f (List.map (subst_term lvl s) tl) t.t_ty
-  | Tcase (t1, bl) -> 
-      t_case (subst_term lvl s t1) (List.map (subst_tbranch lvl s) bl) t.t_ty
-  | Tlet (t1, (u, _, t2)) -> 
-      t_let u (subst_term lvl s t1) (subst_term (lvl + 1) s t2)
-  | Teps (u, tyu, f) -> 
-      t_eps u tyu (subst_fmla (lvl + 1) s f)
-
-and subst_tbranch lvl s (pat, nv, t) =
-  (pat, nv, subst_term (lvl + nv) s t)
-
-and subst_fmla lvl s f = match f.f_node with
-  | Fapp (p, tl) -> 
-      f_app p (List.map (subst_term lvl s) tl)
-  | Fquant (q, (u, tyu, f1)) -> 
-      f_quant q u tyu (subst_fmla (lvl + 1) s f1)
-  | Fbinop (op, f1, f2) -> 
-      f_binary op (subst_fmla lvl s f1) (subst_fmla lvl s f2)
-  | Funop (op, f1) -> 
-      f_unary op (subst_fmla lvl s f1)
-  | Ftrue | Ffalse -> 
-      f
-  | Fif (f1, f2, f3) -> 
-      f_if (subst_fmla lvl s f1) (subst_fmla lvl s f2) (subst_fmla lvl s f3)
-  | Flet (t, (u, _, f1)) -> 
-      f_let u (subst_term lvl s t) (subst_fmla (lvl + 1) s f1)
-  | Fcase (t, bl) -> 
-      f_case (subst_term lvl s t) (List.map (subst_fbranch lvl s) bl)
-
-and subst_fbranch lvl s (pat, nv, f) =
-  (pat, nv, subst_fmla (lvl + nv) s f)
+and inst_fmla m lvl f = map_fmla_unsafe (inst_term m) (inst_fmla m) lvl f
 
 (* smart constructors *)
 
 let name_map_singleton v = Name.M.add v 0 Name.M.empty
 
 (* TODO: checks *)
-let t_let v t1 t2 = t_let v t1 (abs_term 0 (name_map_singleton v) t2)
+let t_let v t1 t2 = t_let v t1 (abst_term (name_map_singleton v) 0 t2)
 
 (* TODO: checks *)
-let t_eps v ty f = t_eps v ty (abs_fmla 0 (name_map_singleton v) f)  
+let t_eps v ty f = t_eps v ty (abst_fmla (name_map_singleton v) 0 f)  
 
 let t_app f tl ty = 
   let args, res = f.f_scheme in
@@ -526,17 +467,17 @@ let varmap_for_pattern p =
 (* TODO: checks *)
 let t_case t bl = 
   let make_tbranch (p, t) =
-    let m, nv = varmap_for_pattern p in (p, nv, abs_term 0 m t)
+    let m, nv = varmap_for_pattern p in (p, nv, abst_term m 0 t)
   in
   t_case t (List.map make_tbranch bl)
 
 (* TODO: checks *)
-let f_quant q v ty f = f_quant q v ty (abs_fmla 0 (name_map_singleton v) f) 
+let f_quant q v ty f = f_quant q v ty (abst_fmla (name_map_singleton v) 0 f) 
 let f_forall = f_quant Fforall
 let f_exists = f_quant Fexists
 
 (* TODO: checks *)
-let f_let v t1 f2 = f_let v t1 (abs_fmla 0 (name_map_singleton v) f2)
+let f_let v t1 f2 = f_let v t1 (abst_fmla (name_map_singleton v) 0 f2)
 
 let f_app f tl = 
   let args = f.p_scheme in
@@ -551,15 +492,17 @@ let f_app f tl =
 (* TODO: checks *)
 let f_case t bl = 
   let make_fbranch (p, f) =
-    let m, nv = varmap_for_pattern p in (p, nv, abs_fmla 0 m f)
+    let m, nv = varmap_for_pattern p in (p, nv, abst_fmla m 0 f)
   in
   f_case t (List.map make_fbranch bl)
 
 (* opening binders *)
 
+let int_map_singleton t = Im.add 0 t Im.empty
+
 let open_bind_term (v, ty, t) =
   let v = Name.fresh v in
-  v, ty, subst_term 0 (Subst.singleton v) t
+  v, ty, inst_term (int_map_singleton v) 0 t
 
 let rec subst_pat ns p = match p.pat_node with
   | Pwild -> 
@@ -577,21 +520,21 @@ let substs_for_pat pat =
   Name.M.fold 
     (fun x i (vars, s, ns) -> 
        let x' = Name.fresh x in
-       Name.S.add x' vars, Subst.add i x' s, Name.M.add x x' ns) 
+       Name.S.add x' vars, Im.add i x' s, Name.M.add x x' ns) 
     m 
-    (Name.S.empty, Subst.empty, Name.M.empty)
+    (Name.S.empty, Im.empty, Name.M.empty)
 
 let open_tbranch (pat, _, t) =
   let vars, s, ns = substs_for_pat pat in
-  (subst_pat ns pat, vars, subst_term 0 s t)
+  (subst_pat ns pat, vars, inst_term s 0 t)
 
 let open_bind_fmla (v, ty, f) =
   let v = Name.fresh v in
-  v, ty, subst_fmla 0 (Subst.singleton v) f
+  v, ty, inst_fmla (int_map_singleton v) 0 f
 
 let open_fbranch (pat, _, f) =
   let vars, s, ns = substs_for_pat pat in
-  (subst_pat ns pat, vars, subst_fmla 0 s f)
+  (subst_pat ns pat, vars, inst_fmla s 0 f)
 
 
 (* TODO: substitution functions (named variables -> terms)
