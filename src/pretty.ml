@@ -23,20 +23,20 @@ let rec print_ty fmt ty = match ty.ty_node with
   | Tyvar n ->
       fprintf fmt "'%a" Name.print n
   | Tyapp (s, []) -> 
-      Name.print fmt s.ty_name
+      Name.print fmt s.ts_name
   | Tyapp (s, [t]) -> 
-      fprintf fmt "%a %a" print_ty t Name.print s.ty_name
+      fprintf fmt "%a %a" print_ty t Name.print s.ts_name
   | Tyapp (s, l) -> 
-      fprintf fmt "(%a) %a" (print_list comma print_ty) l Name.print s.ty_name
+      fprintf fmt "(%a) %a" (print_list comma print_ty) l Name.print s.ts_name
   
 let rec print_term fmt t = match t.t_node with
   | Tbvar n -> 
       assert false
   | Tvar n -> 
-      Name.print fmt n
+      Name.print fmt n.vs_name
   | Tapp (s, tl) ->
       fprintf fmt "(%a(%a) : %a)" 
-	Name.print s.f_name (print_list comma print_term) tl
+	Name.print s.fs_name (print_list comma print_term) tl
 	print_ty t.t_ty
   | _ ->
       assert false (*TODO*)

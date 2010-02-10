@@ -25,7 +25,7 @@ val empty : env
 val find_tysymbol : string -> env -> tysymbol
 val find_fsymbol : string -> env -> fsymbol
 val find_psymbol : string -> env -> psymbol
-val find_tyvar : string -> env -> vsymbol
+val find_tyvar : string -> env -> tvsymbol
 val find_var : string -> env -> vsymbol
 
 (** typing *)

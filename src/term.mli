@@ -16,55 +16,107 @@
 
 type label
 
-type vsymbol = Name.t
-type vsymbol_set = Name.S.t
+(** Types *)
 
 module Ty : sig
 
+  type tvsymbol = Name.t
+
+  (* type symbols and types *)
+
   type tysymbol = private {
-    ty_name : Name.t;
-    ty_args : vsymbol list;
-    ty_def  : ty option;
+    ts_name : Name.t;
+    ts_args : tvsymbol list;
+    ts_def  : ty option;
+    ts_alg  : bool;
+    ts_tag  : int;
   }
 
-  and ty = private { 
-    ty_node : ty_node; 
-    ty_tag : int; 
-  } 
+  and ty = private {
+    ty_node : ty_node;
+    ty_tag  : int;
+  }
 
   and ty_node = private
-    | Tyvar of vsymbol
+    | Tyvar of tvsymbol
     | Tyapp of tysymbol * ty list
 
-  val create_tysymbol : Name.t -> vsymbol list -> ty option -> tysymbol
+  val create_tysymbol : Name.t -> tvsymbol list -> ty option
+                                                -> bool -> tysymbol
 
-  val ty_var : vsymbol -> ty
+  val ty_var : tvsymbol -> ty
   val ty_app : tysymbol -> ty list -> ty
 
 end
 
+type tvsymbol = Ty.tvsymbol
 type tysymbol = Ty.tysymbol
 type ty = Ty.ty
 
-type fsymbol = private {
-  f_name   : Name.t;
-  f_scheme : ty list * ty;
+(** Variable symbols *)
+
+type vsymbol = private {
+  vs_name : Name.t;
+  vs_ty : ty;
+  vs_tag : int;
 }
 
-val create_fsymbol : Name.t -> ty list * ty -> fsymbol
+module Mvs : Map.S with type key = vsymbol
+module Svs : Set.S with type elt = vsymbol
+
+type vsymbol_set = Svs.t
+
+val create_vsymbol : Name.t -> ty -> vsymbol
+
+(** Function symbols *)
+
+type fsymbol = private {
+  fs_name   : Name.t;
+  fs_scheme : ty list * ty;
+  fs_constr : bool;
+  fs_tag    : int;
+}
+
+val create_fsymbol : Name.t -> ty list * ty -> bool -> fsymbol
+
+(** Predicate symbols *)
 
 type psymbol = private {
-  p_name   : Name.t;
-  p_scheme : ty list;
+  ps_name   : Name.t;
+  ps_scheme : ty list;
+  ps_tag    : int;
 }
 
 val create_psymbol : Name.t -> ty list -> psymbol
 
-type quant = 
+(** Patterns *)
+
+type pattern = private {
+  pat_node : pattern_node;
+  pat_ty : ty;
+  pat_tag : int;
+}
+
+and pattern_node = private
+  | Pwild
+  | Pvar of vsymbol
+  | Papp of fsymbol * pattern list
+  | Pas of pattern * vsymbol
+
+(* smart constructors for patterns *)
+
+val pat_wild : ty -> pattern
+val pat_var : vsymbol -> pattern
+val pat_app : fsymbol -> pattern list -> ty -> pattern
+val pat_as : pattern -> vsymbol -> pattern
+
+(** Terms and formulas *)
+
+type quant =
   | Fforall
   | Fexists
 
-type binop = 
+type binop =
   | Fand
   | For
   | Fimplies
@@ -73,8 +125,8 @@ type binop =
 type unop =
   | Fnot
 
-type term = private { 
-  t_node : term_node; 
+type term = private {
+  t_node : term_node;
   t_label : label list;
   t_ty : ty;
   t_tag : int;
@@ -107,39 +159,19 @@ and fmla_node = private
 
 and bind_term
 
-and tbranch
-
 and bind_fmla
+
+and tbranch
 
 and fbranch
 
-
-(* patterns *)
-
-type pattern = private {
-  pat_node : pattern_node;
-  pat_ty : ty;
-  pat_tag : int;
-}
-
-and pattern_node = private
-  | Pwild 
-  | Pvar of vsymbol
-  | Papp of fsymbol * pattern list
-  | Pas of pattern * vsymbol
-
-val pat_wild : ty -> pattern
-val pat_var : vsymbol -> ty -> pattern
-val pat_app : fsymbol -> pattern list -> ty -> pattern
-val pat_as : pattern -> vsymbol -> pattern
-
 (* smart constructors for term *)
 
-val t_var : vsymbol -> ty -> term
+val t_var : vsymbol -> term
 val t_app : fsymbol -> term list -> ty -> term
 val t_case : term -> (pattern * term) list -> ty -> term
 val t_let : vsymbol -> term -> term -> term
-val t_eps : vsymbol -> ty -> fmla -> term
+val t_eps : vsymbol -> fmla -> term
 
 val t_label : label list -> term -> term
 val t_label_add : label -> term -> term
@@ -156,8 +188,8 @@ val f_implies : fmla -> fmla -> fmla
 val f_iff : fmla -> fmla -> fmla
 val f_not : fmla -> fmla
 
-val f_forall : vsymbol -> ty -> fmla -> fmla
-val f_exists : vsymbol -> ty -> fmla -> fmla
+val f_forall : vsymbol -> fmla -> fmla
+val f_exists : vsymbol -> fmla -> fmla
 
 val f_if : fmla -> fmla -> fmla -> fmla
 val f_let : vsymbol -> term -> fmla -> fmla
@@ -172,10 +204,10 @@ val f_label_add : label -> fmla -> fmla
 
 (* bindings *)
 
-val open_bind_term : bind_term -> vsymbol * ty * term
+val open_bind_term : bind_term -> vsymbol * term
 val open_tbranch : tbranch -> pattern * vsymbol_set * term
 
-val open_bind_fmla : bind_fmla -> vsymbol * ty * fmla
+val open_bind_fmla : bind_fmla -> vsymbol * fmla
 val open_fbranch : fbranch -> pattern * vsymbol_set * fmla
 
 (* equality *)

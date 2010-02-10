@@ -42,7 +42,7 @@ type env = {
   tysymbols : tysymbol M.t;
   fsymbols  : fsymbol M.t;
   psymbols  : psymbol M.t;
-  tyvars    : vsymbol M.t;
+  tyvars    : tvsymbol M.t;
   vars      : vsymbol M.t;
 }
 
@@ -80,7 +80,7 @@ let add_type loc ext sl s env =
     { env with tyvars = M.add x v env.tyvars}, v
   in
   let _, vl = map_fold_left add_ty_var env sl in
-  let ty = Ty.create_tysymbol (Name.from_string s) vl None in
+  let ty = Ty.create_tysymbol (Name.from_string s) vl None false in
   { env with tysymbols = M.add s ty env.tysymbols }
 
 let add env = function
