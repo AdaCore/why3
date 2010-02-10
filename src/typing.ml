@@ -50,6 +50,9 @@ let find_var s env = M.find s env.vars
 let term env t =
   assert false (*TODO*)
 
+let fmla env f =
+  assert false (*TODO*)
+
 (** building environments *)
 
 open Ptree

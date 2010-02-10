@@ -16,6 +16,7 @@ val find_var : string -> env -> vsymbol
 (** typing *)
 
 val term : env -> Ptree.lexpr -> term
+val fmla : env -> Ptree.lexpr -> fmla
 
 (** building environments *)
 
