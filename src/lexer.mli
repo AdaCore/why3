@@ -1,7 +1,7 @@
 
 type error
 
-exception Lexical_error of error
+exception Error of error
 
 val report : Format.formatter -> error -> unit
 

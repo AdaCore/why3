@@ -12,7 +12,7 @@
     | UnterminatedComment
     | UnterminatedString
 
-  exception Lexical_error of error
+  exception Error of error
 
   let report fmt = function
     | IllegalCharacter c -> fprintf fmt "illegal character %c" c
@@ -213,7 +213,7 @@ rule token = parse
   | eof 
       { EOF }
   | _ as c
-      { raise (Lexical_error (IllegalCharacter c)) }
+      { raise (Error (IllegalCharacter c)) }
 
 and comment = parse
   | "*)" 
@@ -223,7 +223,7 @@ and comment = parse
   | newline 
       { newline lexbuf; comment lexbuf }
   | eof
-      { raise (Lexical_error UnterminatedComment) }
+      { raise (Error UnterminatedComment) }
   | _ 
       { comment lexbuf }
 
@@ -235,7 +235,7 @@ and string = parse
   | newline 
       { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
   | eof
-      { raise (Lexical_error UnterminatedString) }
+      { raise (Error UnterminatedString) }
   | _ as c
       { Buffer.add_char string_buf c; string lexbuf }
 

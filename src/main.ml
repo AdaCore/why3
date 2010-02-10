@@ -19,12 +19,14 @@ open Format
 let file = Sys.argv.(1)
 
 let rec report fmt = function
-  | Lexer.Lexical_error e ->
+  | Lexer.Error e ->
       fprintf fmt "lexical error: %a" Lexer.report e;
   | Loc.Located (loc, e) ->
       fprintf fmt "%a%a" Loc.report_position loc report e
   | Parsing.Parse_error ->
       fprintf fmt "syntax error"
+  | Typing.Error e ->
+      Typing.report fmt e
   | e ->
       fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
@@ -33,8 +35,9 @@ let () =
     let c = open_in file in
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
-    let _f = Lexer.parse_logic_file lb in 
-    close_in c
+    let f = Lexer.parse_logic_file lb in 
+    close_in c;
+    ignore (List.fold_left Typing.add Typing.empty f)
   with e ->
     eprintf "%a@." report e;
     exit 1
