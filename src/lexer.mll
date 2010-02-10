@@ -1,8 +1,23 @@
 
 {
+  open Format
   open Lexing
   open Ptree
   open Parser
+
+  (* lexical errors *)
+
+  type error = 
+    | IllegalCharacter of char
+    | UnterminatedComment
+    | UnterminatedString
+
+  exception Lexical_error of error
+
+  let report fmt = function
+    | IllegalCharacter c -> fprintf fmt "illegal character %c" c
+    | UnterminatedComment -> fprintf fmt "unterminated comment"
+    | UnterminatedString -> fprintf fmt "unterminated string"
 
   let keywords = Hashtbl.create 97
   let () = 
@@ -69,8 +84,6 @@
       { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
 
   let string_buf = Buffer.create 1024
-
-  exception Lexical_error of string
 
   let char_for_backslash = function
     | 'n' -> '\n'
@@ -200,7 +213,7 @@ rule token = parse
   | eof 
       { EOF }
   | _ as c
-      { raise (Lexical_error ("illegal character: " ^ String.make 1 c)) }
+      { raise (Lexical_error (IllegalCharacter c)) }
 
 and comment = parse
   | "*)" 
@@ -210,7 +223,7 @@ and comment = parse
   | newline 
       { newline lexbuf; comment lexbuf }
   | eof
-      { raise (Lexical_error "unterminated comment") }
+      { raise (Lexical_error UnterminatedComment) }
   | _ 
       { comment lexbuf }
 
@@ -222,7 +235,7 @@ and string = parse
   | newline 
       { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
   | eof
-      { raise (Lexical_error "unterminated string") }
+      { raise (Lexical_error UnterminatedString) }
   | _ as c
       { Buffer.add_char string_buf c; string lexbuf }
 

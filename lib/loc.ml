@@ -35,6 +35,10 @@ type position = Lexing.position * Lexing.position
 
 exception Located of position * exn
 
+let set_file file lb =
+  lb.Lexing.lex_curr_p <- 
+    { lb.Lexing.lex_curr_p with Lexing.pos_fname = file }
+
 let dummy_position = Lexing.dummy_pos, Lexing.dummy_pos
 
 let gen_report_line fmt (f,l,b,e) = 

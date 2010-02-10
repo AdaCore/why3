@@ -11,6 +11,8 @@ type position = Lexing.position * Lexing.position
 
 exception Located of position * exn
 
+val set_file : string -> Lexing.lexbuf -> unit
+
 val string : position -> string
 val parse : string -> position
 
