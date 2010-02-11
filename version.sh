@@ -21,4 +21,3 @@ echo "let libdir = \"$LIBDIR/why\"" >> $WHYVF
 DOCF=doc/version.tex
 mkdir -p doc
 printf '\\newcommand{\\whyversion}{'$VERSION'}\n' > $DOCF
-printf '\\newcommand{\\caduceusversion}{'$CVERSION'}\n' >> $DOCF

@@ -85,6 +85,14 @@ check: $(BINARY) $(PRELUDE)
 		WHYLIB=lib $(BINARY) -tc $$f; \
 	done
 
+# version number
+################
+
+include Version
+
+doc/version.tex src/version.ml: Version version.sh config.status
+	BINDIR=$(BINDIR) LIBDIR=$(LIBDIR) COQVER=$(COQVER) ./version.sh
+
 # why
 #####
 
