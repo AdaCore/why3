@@ -17,6 +17,7 @@
 open Util
 open Format
 open Term
+open Ptree
 
 (** errors *)
 
@@ -60,10 +61,15 @@ let find_psymbol s env = M.find s env.psymbols
 let find_tyvar s env = M.find s env.tyvars
 let find_var s env = M.find s env.vars
 
+let add_tyvar x v env = { env with tyvars = M.add x v env.tyvars}
+let add_tysymbol x ty env = { env with tysymbols = M.add x ty env.tysymbols }
+
 (** typing *)
 
-let term env t =
-  assert false (*TODO*)
+let term env t = match t.pp_desc with
+  | _ ->
+      assert false (*TODO*)
+
 
 let fmla env f =
   assert false (*TODO*)
@@ -77,11 +83,11 @@ let add_type loc ext sl s env =
   let add_ty_var env x =
     if M.mem x env.tyvars then error ~loc (BadTypeArity x);
     let v = Name.from_string x in
-    { env with tyvars = M.add x v env.tyvars}, v
+    add_tyvar x v env, v
   in
   let _, vl = map_fold_left add_ty_var env sl in
   let ty = Ty.create_tysymbol (Name.from_string s) vl None in
-  { env with tysymbols = M.add s ty env.tysymbols }
+  add_tysymbol s ty env
 
 let add env = function
   | TypeDecl (loc, ext, sl, s) ->
