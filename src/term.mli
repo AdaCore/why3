@@ -28,7 +28,6 @@ module Ty : sig
     ts_name : Name.t;
     ts_args : tvsymbol list;
     ts_def  : ty option;
-    ts_alg  : bool;
     ts_tag  : int;
   }
 
@@ -41,8 +40,7 @@ module Ty : sig
     | Tyvar of tvsymbol
     | Tyapp of tysymbol * ty list
 
-  val create_tysymbol : Name.t -> tvsymbol list -> ty option
-                                                -> bool -> tysymbol
+  val create_tysymbol : Name.t -> tvsymbol list -> ty option -> tysymbol
 
   val ty_var : tvsymbol -> ty
   val ty_app : tysymbol -> ty list -> ty
@@ -101,14 +99,16 @@ and pattern_node = private
   | Pwild
   | Pvar of vsymbol
   | Papp of fsymbol * pattern list
-  | Pas of pattern * vsymbol
+  | Pas  of pattern * vsymbol
 
 (* smart constructors for patterns *)
 
 val pat_wild : ty -> pattern
 val pat_var : vsymbol -> pattern
 val pat_app : fsymbol -> pattern list -> ty -> pattern
-val pat_as : pattern -> vsymbol -> pattern
+val pat_as  : pattern -> vsymbol -> pattern
+
+val pat_alpha_equal : pattern -> pattern -> bool
 
 (** Terms and formulas *)
 
@@ -121,9 +121,6 @@ type binop =
   | For
   | Fimplies
   | Fiff
-
-type unop =
-  | Fnot
 
 type term = private {
   t_node : term_node;
@@ -142,15 +139,15 @@ and term_node = private
   | Tbvar of int
   | Tvar of vsymbol
   | Tapp of fsymbol * term list
-  | Tcase of term * tbranch list
   | Tlet of term * bind_term
+  | Tcase of term * tbranch list
   | Teps of bind_fmla
 
 and fmla_node = private
   | Fapp of psymbol * term list
   | Fquant of quant * bind_fmla
   | Fbinop of binop * fmla * fmla
-  | Funop of unop * fmla
+  | Fnot of fmla
   | Ftrue
   | Ffalse
   | Fif of fmla * fmla * fmla
@@ -169,8 +166,8 @@ and fbranch
 
 val t_var : vsymbol -> term
 val t_app : fsymbol -> term list -> ty -> term
-val t_case : term -> (pattern * term) list -> ty -> term
 val t_let : vsymbol -> term -> term -> term
+val t_case : term -> (pattern * term) list -> ty -> term
 val t_eps : vsymbol -> fmla -> term
 
 val t_label : label list -> term -> term
@@ -179,18 +176,15 @@ val t_label_add : label -> term -> term
 (* smart constructors for fmla *)
 
 val f_app : psymbol -> term list -> fmla
-
-val f_true : fmla
-val f_false : fmla
+val f_forall : vsymbol -> fmla -> fmla
+val f_exists : vsymbol -> fmla -> fmla
 val f_and : fmla -> fmla -> fmla
 val f_or : fmla -> fmla -> fmla
 val f_implies : fmla -> fmla -> fmla
 val f_iff : fmla -> fmla -> fmla
 val f_not : fmla -> fmla
-
-val f_forall : vsymbol -> fmla -> fmla
-val f_exists : vsymbol -> fmla -> fmla
-
+val f_true : fmla
+val f_false : fmla
 val f_if : fmla -> fmla -> fmla -> fmla
 val f_let : vsymbol -> term -> fmla -> fmla
 val f_case :  term -> (pattern * fmla) list -> fmla
@@ -212,8 +206,8 @@ val open_fbranch : fbranch -> pattern * vsymbol_set * fmla
 
 (* equality *)
 
-val t_equal : term -> term -> bool
+(* val t_equal : term -> term -> bool *)
 val t_alpha_equal : term -> term -> bool
 
-val f_equal : fmla -> fmla -> bool
+(* val f_equal : fmla -> fmla -> bool *)
 val f_alpha_equal : fmla -> fmla -> bool

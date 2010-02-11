@@ -28,7 +28,6 @@ module Ty = struct
     ts_name : Name.t;
     ts_args : tvsymbol list;
     ts_def  : ty option;
-    ts_alg  : bool;
     ts_tag  : int;
   }
 
@@ -49,15 +48,14 @@ module Ty = struct
   end
   module Hts = Hashcons.Make(Tsym)
 
-  let mk_ts name args def alg = {
+  let mk_ts name args def = {
     ts_name = name;
     ts_args = args;
     ts_def  = def;
-    ts_alg  = alg;
     ts_tag  = -1
   }
 
-  let create_tysymbol name args def alg = Hts.hashcons (mk_ts name args def alg)
+  let create_tysymbol name args def = Hts.hashcons (mk_ts name args def)
 
   module Ty = struct
 
@@ -82,6 +80,12 @@ module Ty = struct
   let mk_ty n = { ty_node = n; ty_tag = -1 }
   let ty_var n = Hty.hashcons (mk_ty (Tyvar n))
   let ty_app s tl = Hty.hashcons (mk_ty (Tyapp (s, tl)))
+
+  exception BadTypeArity
+
+  let ty_app s tl =
+    if List.length tl == List.length s.ts_args
+      then ty_app s tl else raise BadTypeArity
 
   exception TypeMismatch
 
@@ -226,16 +230,20 @@ let pat_as p v = Hp.hashcons (mk_pattern (Pas (p, v)) p.pat_ty)
 
 (* smart constructors for patterns *)
 
+exception BadArity
+
 exception ConstructorExpected
 
 let pat_app f pl ty =
+  if not f.fs_constr then raise ConstructorExpected else
   let args, res = f.fs_scheme in
   let _ =
-    List.fold_left2
-      Ty.matching (Ty.matching Name.M.empty res ty)
-      args (List.map (fun p -> p.pat_ty) pl)
+    try List.fold_left2 Ty.matching
+        (Ty.matching Name.M.empty res ty)
+        args (List.map (fun p -> p.pat_ty) pl)
+    with Invalid_argument _ -> raise BadArity
   in
-  if f.fs_constr then pat_app f pl ty else raise ConstructorExpected
+  pat_app f pl ty
 
 let pat_as p v =
   if p.pat_ty == v.vs_ty then pat_as p v else raise Ty.TypeMismatch
@@ -264,9 +272,6 @@ type binop =
   | Fimplies
   | Fiff
 
-type unop =
-  | Fnot
-
 type term = {
   t_node : term_node;
   t_label : label list;
@@ -284,15 +289,15 @@ and term_node =
   | Tbvar of int
   | Tvar of vsymbol
   | Tapp of fsymbol * term list
-  | Tcase of term * tbranch list
   | Tlet of term * bind_term
+  | Tcase of term * tbranch list
   | Teps of bind_fmla
 
 and fmla_node =
   | Fapp of psymbol * term list
   | Fquant of quant * bind_fmla
   | Fbinop of binop * fmla * fmla
-  | Funop of unop * fmla
+  | Fnot of fmla
   | Ftrue
   | Ffalse
   | Fif of fmla * fmla * fmla
@@ -321,11 +326,11 @@ module T = struct
     | Tbvar x1, Tbvar x2 -> x1 == x2
     | Tvar v1, Tvar v2 -> v1 == v2
     | Tapp (s1, l1), Tapp (s2, l2) -> s1 == s2 && List.for_all2 (==) l1 l2
+    | Tlet (t1, b1), Tlet (t2, b2) -> t1 == t2 && eq_bind_term b1 b2
     | Tcase (t1, l1), Tcase (t2, l2) ->
         t1 == t2 &&
         (try List.for_all2 eq_tbranch l1 l2
         with Invalid_argument _ -> false)
-    | Tlet (t1, b1), Tlet (t2, b2) -> t1 == t2 && eq_bind_term b1 b2
     | Teps f1, Teps f2 -> eq_bind_fmla f1 f2
     | _ -> false
 
@@ -347,8 +352,8 @@ module T = struct
     | Tbvar n -> n
     | Tvar v -> v.vs_tag
     | Tapp (f, tl) -> Hashcons.combine_list hash_term (f.fs_tag) tl
-    | Tcase (t, bl) -> Hashcons.combine_list hash_tbranch t.t_tag bl
     | Tlet (t, bt) -> Hashcons.combine t.t_tag (hash_bind_term bt)
+    | Tcase (t, bl) -> Hashcons.combine_list hash_tbranch t.t_tag bl
     | Teps f -> hash_bind_fmla f
 
   let hash t =
@@ -375,8 +380,8 @@ module F = struct
         q1 == q2 && eq_bind_fmla bf1 bf2
     | Fbinop (op1, f1, g1), Fbinop (op2, f2, g2) ->
         op1 == op2 && f1 == f2 && g1 == g2
-    | Funop (op1, f1), Funop (op2, f2) ->
-        op1 == op2 && f1 == f2
+    | Fnot f1, Fnot f2 ->
+        f1 == f2
     | Ftrue, Ftrue
     | Ffalse, Ffalse ->
         true
@@ -409,7 +414,7 @@ module F = struct
     | Fquant (q, bf) -> Hashcons.combine (Hashtbl.hash q) (hash_bind_fmla bf)
     | Fbinop (op, f1, f2) ->
         Hashcons.combine2 (Hashtbl.hash op) f1.f_tag f2.f_tag
-    | Funop (op, f) -> Hashcons.combine (Hashtbl.hash op) f.f_tag
+    | Fnot f -> Hashcons.combine 1 f.f_tag
     | Ftrue -> 0
     | Ffalse -> 1
     | Fif (f1, f2, f3) -> Hashcons.combine2 f1.f_tag f2.f_tag f3.f_tag
@@ -430,8 +435,6 @@ let mk_term n ty = { t_node = n; t_label = []; t_ty = ty; t_tag = -1 }
 let t_bvar n ty = Hterm.hashcons (mk_term (Tbvar n) ty)
 let t_var v = Hterm.hashcons (mk_term (Tvar v) v.vs_ty)
 let t_app f tl ty = Hterm.hashcons (mk_term (Tapp (f, tl)) ty)
-let t_label l t = Hterm.hashcons { t with t_label = l }
-let t_label_add l t = Hterm.hashcons { t with t_label = l :: t.t_label }
 
 let t_let v t1 t2 =
   Hterm.hashcons (mk_term (Tlet (t1, (v, t2))) t2.t_ty)
@@ -439,12 +442,14 @@ let t_let v t1 t2 =
 let t_case t bl ty = Hterm.hashcons (mk_term (Tcase (t, bl)) ty)
 let t_eps u f = Hterm.hashcons (mk_term (Teps (u, f)) u.vs_ty)
 
+let t_label l t = Hterm.hashcons { t with t_label = l }
+let t_label_add l t = Hterm.hashcons { t with t_label = l :: t.t_label }
+
 (* hash-consing constructors for formulas *)
 
 let mk_fmla n = { f_node = n; f_label = []; f_tag = -1 }
 let f_app f tl = Hfmla.hashcons (mk_fmla (Fapp (f, tl)))
-let f_true = Hfmla.hashcons (mk_fmla Ftrue)
-let f_false = Hfmla.hashcons (mk_fmla Ffalse)
+let f_quant q u f = Hfmla.hashcons (mk_fmla (Fquant (q, (u, f))))
 
 let f_binary op f1 f2 = Hfmla.hashcons (mk_fmla (Fbinop (op, f1, f2)))
 let f_and = f_binary Fand
@@ -452,11 +457,10 @@ let f_or = f_binary For
 let f_implies = f_binary Fimplies
 let f_iff = f_binary Fiff
 
-let f_unary op f = Hfmla.hashcons (mk_fmla (Funop (op, f)))
-let f_not = f_unary Fnot
-
+let f_not f = Hfmla.hashcons (mk_fmla (Fnot f))
+let f_true = Hfmla.hashcons (mk_fmla Ftrue)
+let f_false = Hfmla.hashcons (mk_fmla Ffalse)
 let f_if f1 f2 f3 = Hfmla.hashcons (mk_fmla (Fif (f1, f2, f3)))
-let f_quant q u f = Hfmla.hashcons (mk_fmla (Fquant (q, (u, f))))
 let f_let v t f = Hfmla.hashcons (mk_fmla (Flet (t, (v, f))))
 let f_case t bl = Hfmla.hashcons (mk_fmla (Fcase (t, bl)))
 
@@ -470,15 +474,15 @@ let brlvl fn lvl (pat, nv, t) = (pat, nv, fn (lvl + nv) t)
 let map_term_unsafe fnT fnF lvl t = match t.t_node with
   | Tbvar _ | Tvar _ -> t
   | Tapp (f, tl) -> t_app f (List.map (fnT lvl) tl) t.t_ty
-  | Tcase (t1, bl) -> t_case (fnT lvl t1) (List.map (brlvl fnT lvl) bl) t.t_ty
   | Tlet (t1, (u, t2)) -> t_let u (fnT lvl t1) (fnT (lvl + 1) t2)
+  | Tcase (t1, bl) -> t_case (fnT lvl t1) (List.map (brlvl fnT lvl) bl) t.t_ty
   | Teps (u, f) -> t_eps u (fnF (lvl + 1) f)
 
 let map_fmla_unsafe fnT fnF lvl f = match f.f_node with
   | Fapp (p, tl) -> f_app p (List.map (fnT lvl) tl)
   | Fquant (q, (u, f1)) -> f_quant q u (fnF (lvl + 1) f1)
   | Fbinop (op, f1, f2) -> f_binary op (fnF lvl f1) (fnF lvl f2)
-  | Funop (op, f1) -> f_unary op (fnF lvl f1)
+  | Fnot f1 -> f_not (fnF lvl f1)
   | Ftrue | Ffalse -> f
   | Fif (f1, f2, f3) -> f_if (fnF lvl f1) (fnF lvl f2) (fnF lvl f3)
   | Flet (t, (u, f1)) -> f_let u (fnT lvl t) (fnF (lvl + 1) f1)
@@ -509,16 +513,16 @@ and inst_fmla m lvl f = map_fmla_unsafe (inst_term m) (inst_fmla m) lvl f
 let abst_term_single v t = abst_term (Mvs.add v 0 Mvs.empty) 0 t
 let abst_fmla_single v f = abst_fmla (Mvs.add v 0 Mvs.empty) 0 f
 
-(* TODO: checks *)
-let t_let v t1 t2 = t_let v t1 (abst_term_single v t2)
+let t_let v t1 t2 =
+  if v.vs_ty == t1.t_ty then t_let v t1 (abst_term_single v t2)
+                        else raise Ty.TypeMismatch
 
-(* TODO: checks *)
-let f_let v t1 f2 = f_let v t1 (abst_fmla_single v f2)
+let f_let v t1 f2 =
+  if v.vs_ty == t1.t_ty then f_let v t1 (abst_fmla_single v f2)
+                        else raise Ty.TypeMismatch
 
-(* TODO: checks *)
 let t_eps v f = t_eps v (abst_fmla_single v f)
 
-(* TODO: checks *)
 let f_quant q v f = f_quant q v (abst_fmla_single v f)
 let f_forall = f_quant Fforall
 let f_exists = f_quant Fexists
@@ -526,20 +530,20 @@ let f_exists = f_quant Fexists
 let t_app f tl ty =
   let args, res = f.fs_scheme in
   let _ =
-    List.fold_left2
-      Ty.matching (Ty.matching Name.M.empty res ty)
-      args (List.map (fun t -> t.t_ty) tl)
+    try List.fold_left2 Ty.matching
+        (Ty.matching Name.M.empty res ty)
+        args (List.map (fun t -> t.t_ty) tl)
+    with Invalid_argument _ -> raise BadArity
   in
   t_app f tl ty
 
-let f_app f tl =
-  let args = f.ps_scheme in
+let f_app p tl =
   let _ =
-    List.fold_left2
-      Ty.matching Name.M.empty
-      args (List.map (fun t -> t.t_ty) tl)
+    try List.fold_left2 Ty.matching Name.M.empty
+        p.ps_scheme (List.map (fun t -> t.t_ty) tl)
+    with Invalid_argument _ -> raise BadArity
   in
-  f_app f tl
+  f_app p tl
 
 let varmap_for_pattern p =
   let i = ref (-1) in
@@ -558,17 +562,18 @@ let varmap_for_pattern p =
   let m = make Mvs.empty p in
   m, !i + 1
 
-(* TODO: checks *)
-let t_case t bl =
-  let make_tbranch (p, t) =
-    let m, nv = varmap_for_pattern p in (p, nv, abst_term m 0 t)
+let t_case t bl ty =
+  let make_tbranch (p, tbr) =
+    if tbr.t_ty != ty then raise Ty.TypeMismatch else
+    if p.pat_ty != t.t_ty then raise Ty.TypeMismatch else
+    let m, nv = varmap_for_pattern p in (p, nv, abst_term m 0 tbr)
   in
-  t_case t (List.map make_tbranch bl)
+  t_case t (List.map make_tbranch bl) ty
 
-(* TODO: checks *)
 let f_case t bl =
-  let make_fbranch (p, f) =
-    let m, nv = varmap_for_pattern p in (p, nv, abst_fmla m 0 f)
+  let make_fbranch (p, fbr) =
+    if p.pat_ty != t.t_ty then raise Ty.TypeMismatch else
+    let m, nv = varmap_for_pattern p in (p, nv, abst_fmla m 0 fbr)
   in
   f_case t (List.map make_fbranch bl)
 
@@ -617,8 +622,8 @@ let open_fbranch (pat, _, f) =
 
 (* equality *)
 
-let t_equal = (==)
-let f_equal = (==)
+(* let t_equal = (==) *)
+(* let f_equal = (==) *)
 
 let rec t_alpha_equal t1 t2 =
   t1 == t2 ||
@@ -630,12 +635,12 @@ let rec t_alpha_equal t1 t2 =
         v1 == v2
     | Tapp (s1, l1), Tapp (s2, l2) ->
         s1 == s2 && List.for_all2 t_alpha_equal l1 l2
+    | Tlet (t1, (v1, b1)), Tlet (t2, (v2, b2)) ->
+        t_alpha_equal t1 t2 && v1.vs_ty == v2.vs_ty && t_alpha_equal b1 b2
     | Tcase (t1, l1), Tcase (t2, l2) ->
         t_alpha_equal t1 t2 &&
         (try List.for_all2 tbranch_alpha_equal l1 l2
         with Invalid_argument _ -> false)
-    | Tlet (t1, (v1, b1)), Tlet (t2, (v2, b2)) ->
-        t_alpha_equal t1 t2 && v1.vs_ty == v2.vs_ty && t_alpha_equal b1 b2
     | Teps (v1, f1), Teps (v2, f2) ->
         v1.vs_ty == v2.vs_ty && f_alpha_equal f1 f2
     | _ -> false
@@ -649,8 +654,8 @@ and f_alpha_equal f1 f2 =
         q1 == q2 && v1.vs_ty == v2.vs_ty && f_alpha_equal f1 f2
     | Fbinop (op1, f1, g1), Fbinop (op2, f2, g2) ->
         op1 == op2 && f_alpha_equal f1 f2 && f_alpha_equal g1 g2
-    | Funop (op1, f1), Funop (op2, f2) ->
-        op1 == op2 && f_alpha_equal f1 f2
+    | Fnot f1, Fnot f2 ->
+        f_alpha_equal f1 f2
     | Ftrue, Ftrue
     | Ffalse, Ffalse ->
         true
