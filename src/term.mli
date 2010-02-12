@@ -192,10 +192,6 @@ val f_case :  term -> (pattern * fmla) list -> fmla
 val f_label : label list -> fmla -> fmla
 val f_label_add : label -> fmla -> fmla
 
-(* transformations ? *)
-
-(* val map : (term -> term) -> term -> term *)
-
 (* bindings *)
 
 val open_bind_term : bind_term -> vsymbol * term
@@ -204,10 +200,58 @@ val open_tbranch : tbranch -> pattern * vsymbol_set * term
 val open_bind_fmla : bind_fmla -> vsymbol * fmla
 val open_fbranch : fbranch -> pattern * vsymbol_set * fmla
 
+(* variable occurrence check *)
+
+val occurs_term : Svs.t -> term -> bool
+val occurs_fmla : Svs.t -> fmla -> bool
+
+val occurs_term_single : vsymbol -> term -> bool
+val occurs_fmla_single : vsymbol -> fmla -> bool
+
+(* substitution for variables *)
+
+val subst_term : term Mvs.t -> term -> term
+val subst_fmla : term Mvs.t -> fmla -> fmla
+
+val subst_term_single : term -> vsymbol -> term -> term
+val subst_fmla_single : term -> vsymbol -> fmla -> fmla
+
+(* set of free variables *)
+
+val freevars_term : term -> Svs.t
+val freevars_fmla : fmla -> Svs.t
+
 (* equality *)
 
-(* val t_equal : term -> term -> bool *)
-val t_alpha_equal : term -> term -> bool
+val t_equal : term -> term -> bool
+val f_equal : fmla -> fmla -> bool
 
-(* val f_equal : fmla -> fmla -> bool *)
+(* alpha-equivalence *)
+
+val t_alpha_equal : term -> term -> bool
 val f_alpha_equal : fmla -> fmla -> bool
+
+(* occurrence check *)
+
+val t_occurs_term : term -> term -> bool
+val t_occurs_fmla : term -> fmla -> bool
+val f_occurs_term : fmla -> term -> bool
+val f_occurs_fmla : fmla -> fmla -> bool
+
+val t_alpha_occurs_term : term -> term -> bool
+val t_alpha_occurs_fmla : term -> fmla -> bool
+val f_alpha_occurs_term : fmla -> term -> bool
+val f_alpha_occurs_fmla : fmla -> fmla -> bool
+
+(* term/fmla replacement *)
+
+val t_subst_term : term -> term -> term -> term
+val t_subst_fmla : term -> term -> fmla -> fmla
+val f_subst_term : fmla -> fmla -> term -> term
+val f_subst_fmla : fmla -> fmla -> fmla -> fmla
+
+val t_alpha_subst_term : term -> term -> term -> term
+val t_alpha_subst_fmla : term -> term -> fmla -> fmla
+val f_alpha_subst_term : fmla -> fmla -> term -> term
+val f_alpha_subst_fmla : fmla -> fmla -> fmla -> fmla
+

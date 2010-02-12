@@ -488,7 +488,52 @@ let map_fmla_unsafe fnT fnF lvl f = match f.f_node with
   | Flet (t, (u, f1)) -> f_let u (fnT lvl t) (fnF (lvl + 1) f1)
   | Fcase (t, bl) -> f_case (fnT lvl t) (List.map (brlvl fnF lvl) bl)
 
-(* replaces variables with de Bruijn indices in term [t] using a map [m] *)
+(* unsafe fold with level *)
+
+let brlvl fn lvl acc (_, nv, t) = fn (lvl + nv) acc t
+
+let fold_term_unsafe fnT fnF lvl acc t = match t.t_node with
+  | Tbvar _ | Tvar _ -> acc
+  | Tapp (f, tl) -> List.fold_left (fnT lvl) acc tl
+  | Tlet (t1, (u, t2)) -> fnT (lvl + 1) (fnT lvl acc t1) t2
+  | Tcase (t1, bl) -> List.fold_left (brlvl fnT lvl) (fnT lvl acc t1) bl
+  | Teps (u, f) -> fnF (lvl + 1) acc f
+
+let fold_fmla_unsafe fnT fnF lvl acc f = match f.f_node with
+  | Fapp (p, tl) -> List.fold_left (fnT lvl) acc tl
+  | Fquant (q, (u, f1)) -> fnF (lvl + 1) acc f1
+  | Fbinop (op, f1, f2) -> fnF lvl (fnF lvl acc f1) f2
+  | Fnot f1 -> fnF lvl acc f1
+  | Ftrue | Ffalse -> acc
+  | Fif (f1, f2, f3) -> fnF lvl (fnF lvl (fnF lvl acc f1) f2) f3
+  | Flet (t, (u, f1)) -> fnF (lvl + 1) (fnT lvl acc t) f1
+  | Fcase (t, bl) -> List.fold_left (brlvl fnF lvl) (fnT lvl acc t) bl
+
+exception FoldSkip
+
+let forall_fnT prT lvl _ t = prT lvl t || raise FoldSkip
+let forall_fnF prF lvl _ f = prF lvl f || raise FoldSkip
+
+let forall_term_unsafe prT prF lvl t =
+  try fold_term_unsafe (forall_fnT prT) (forall_fnF prF) lvl true t
+  with FoldSkip -> false
+
+let forall_fmla_unsafe prT prF lvl f =
+  try fold_fmla_unsafe (forall_fnT prT) (forall_fnF prF) lvl true f
+  with FoldSkip -> false
+
+let exists_fnT prT lvl _ t = prT lvl t && raise FoldSkip
+let exists_fnF prF lvl _ f = prF lvl f && raise FoldSkip
+
+let exists_term_unsafe prT prF lvl t =
+  try fold_term_unsafe (exists_fnT prT) (exists_fnF prF) lvl false t
+  with FoldSkip -> true
+
+let exists_fmla_unsafe prT prF lvl f =
+  try fold_fmla_unsafe (exists_fnT prT) (exists_fnF prF) lvl false f
+  with FoldSkip -> true
+
+(* replaces variables with de Bruijn indices in term [t] using map [m] *)
 
 let rec abst_term m lvl t = match t.t_node with
   | Tvar u ->
@@ -497,7 +542,10 @@ let rec abst_term m lvl t = match t.t_node with
 
 and abst_fmla m lvl f = map_fmla_unsafe (abst_term m) (abst_fmla m) lvl f
 
-(* replaces de Bruijn indices with variables in term [t] using a map [m] *)
+let abst_term_single v t = abst_term (Mvs.add v 0 Mvs.empty) 0 t
+let abst_fmla_single v f = abst_fmla (Mvs.add v 0 Mvs.empty) 0 f
+
+(* replaces de Bruijn indices with variables in term [t] using map [m] *)
 
 module Im = Map.Make(struct type t = int let compare = Pervasives.compare end)
 
@@ -508,10 +556,219 @@ let rec inst_term m lvl t = match t.t_node with
 
 and inst_fmla m lvl f = map_fmla_unsafe (inst_term m) (inst_fmla m) lvl f
 
-(* smart constructors *)
+let inst_term_single v t = inst_term (Im.add 0 v Im.empty) 0 t
+let inst_fmla_single v f = inst_fmla (Im.add 0 v Im.empty) 0 f
 
-let abst_term_single v t = abst_term (Mvs.add v 0 Mvs.empty) 0 t
-let abst_fmla_single v f = abst_fmla (Mvs.add v 0 Mvs.empty) 0 f
+(* looks for occurrence of a variable from set [s] in a term [t] *)
+
+let rec occurs_term s lvl t =
+  (match t.t_node with Tvar u -> Svs.mem u s | _ -> false) ||
+  exists_term_unsafe (occurs_term s) (occurs_fmla s) lvl t
+
+and occurs_fmla s lvl f =
+  exists_fmla_unsafe (occurs_term s) (occurs_fmla s) lvl f
+
+let occurs_term_single v t = occurs_term (Svs.add v Svs.empty) 0 t
+let occurs_fmla_single v f = occurs_fmla (Svs.add v Svs.empty) 0 f
+
+let occurs_term s t = occurs_term s 0 t
+let occurs_fmla s f = occurs_fmla s 0 f
+
+(* replaces variables with terms in term [t] using map [m] *)
+
+let rec subst_term m lvl t = match t.t_node with
+  | Tvar u -> (try Mvs.find u m with Not_found -> t)
+  | _ -> map_term_unsafe (subst_term m) (subst_fmla m) lvl t
+
+and subst_fmla m lvl f = map_fmla_unsafe (subst_term m) (subst_fmla m) lvl f
+
+let subst_term_single t1 v t =
+  if v.vs_ty == t1.t_ty then subst_term (Mvs.add v t1 Mvs.empty) 0 t
+                        else raise Ty.TypeMismatch
+
+let subst_fmla_single t1 v f =
+  if v.vs_ty == t1.t_ty then subst_fmla (Mvs.add v t1 Mvs.empty) 0 f
+                        else raise Ty.TypeMismatch
+
+let vt_check v t = if v.vs_ty == t.t_ty then () else raise Ty.TypeMismatch
+
+let subst_term m t = let _ = Mvs.iter vt_check m in subst_term m 0 t
+let subst_fmla m f = let _ = Mvs.iter vt_check m in subst_fmla m 0 f
+
+(* set of free variables *)
+
+let rec freevars_term lvl acc t = match t.t_node with
+  | Tvar u -> Svs.add u acc
+  | _ -> fold_term_unsafe freevars_term freevars_fmla lvl acc t
+
+and freevars_fmla lvl acc t =
+  fold_fmla_unsafe freevars_term freevars_fmla lvl acc t
+
+let freevars_term t = freevars_term 0 Svs.empty t
+let freevars_fmla f = freevars_fmla 0 Svs.empty f
+
+(* equality *)
+
+let t_equal = (==)
+let f_equal = (==)
+
+(* alpha-equivalence *)
+
+let rec t_alpha_equal t1 t2 =
+  t1 == t2 ||
+  t1.t_ty == t2.t_ty &&
+  match t1.t_node, t2.t_node with
+    | Tbvar x1, Tbvar x2 ->
+        x1 == x2
+    | Tvar v1, Tvar v2 ->
+        v1 == v2
+    | Tapp (s1, l1), Tapp (s2, l2) ->
+        s1 == s2 && List.for_all2 t_alpha_equal l1 l2
+    | Tlet (t1, (v1, b1)), Tlet (t2, (v2, b2)) ->
+        (* assert (v1.vs_ty == t1.t_ty && v2.vs_ty == t2.t_ty); *)
+        t_alpha_equal t1 t2 && t_alpha_equal b1 b2
+    | Tcase (t1, l1), Tcase (t2, l2) ->
+        t_alpha_equal t1 t2 &&
+        (try List.for_all2 tbranch_alpha_equal l1 l2
+        with Invalid_argument _ -> false)
+    | Teps (v1, f1), Teps (v2, f2) ->
+        (* assert (v1.vs_ty == t1.t_ty && v2.vs_ty == t2.t_ty); *)
+        f_alpha_equal f1 f2
+    | _ -> false
+
+and f_alpha_equal f1 f2 =
+  f1 == f2 ||
+  match f1.f_node, f2.f_node with
+    | Fapp (s1, tl1), Fapp (s2, tl2) ->
+        (* assert (List.length tl1 == List.length tl2); *)
+        s1 == s2 && List.for_all2 t_alpha_equal tl1 tl2
+    | Fquant (q1, (v1, f1)), Fquant (q2, (v2, f2)) ->
+        q1 == q2 && v1.vs_ty == v2.vs_ty && f_alpha_equal f1 f2
+    | Fbinop (op1, f1, g1), Fbinop (op2, f2, g2) ->
+        op1 == op2 && f_alpha_equal f1 f2 && f_alpha_equal g1 g2
+    | Fnot f1, Fnot f2 ->
+        f_alpha_equal f1 f2
+    | Ftrue, Ftrue
+    | Ffalse, Ffalse ->
+        true
+    | Fif (f1, g1, h1), Fif (f2, g2, h2) ->
+        f_alpha_equal f1 f2 && f_alpha_equal g1 g2 && f_alpha_equal h1 h2
+    | Flet (t1, (v1, f1)), Flet (t2, (v2, f2)) ->
+        (* assert (v1.vs_ty == t1.t_ty && v2.vs_ty == t2.t_ty); *)
+        t_alpha_equal t1 t2 && f_alpha_equal f1 f2
+    | Fcase (t1, bl1), Fcase (t2, bl2) ->
+        t_alpha_equal t1 t2 &&
+        (try List.for_all2 fbranch_alpha_equal bl1 bl2
+        with Invalid_argument _ -> false)
+    | _ ->
+        false
+
+and tbranch_alpha_equal (pat1, _, t1) (pat2, _, t2) =
+  pat_alpha_equal pat1 pat2 && t_alpha_equal t1 t2
+
+and fbranch_alpha_equal (pat1, _, f1) (pat2, _, f2) =
+  pat_alpha_equal pat1 pat2 && f_alpha_equal f1 f2
+
+(* occurrence check *)
+
+let rec t_occurs_term r lvl t = r == t ||
+  exists_term_unsafe (t_occurs_term r) (t_occurs_fmla r) lvl t
+
+and t_occurs_fmla r lvl f =
+  exists_fmla_unsafe (t_occurs_term r) (t_occurs_fmla r) lvl f
+
+let t_occurs_term r t = t_occurs_term r 0 t
+let t_occurs_fmla r f = t_occurs_fmla r 0 f
+
+let rec f_occurs_term r lvl t =
+  exists_term_unsafe (f_occurs_term r) (f_occurs_fmla r) lvl t
+
+and f_occurs_fmla r lvl f = r == f ||
+  exists_fmla_unsafe (f_occurs_term r) (f_occurs_fmla r) lvl f
+
+let f_occurs_term r t = f_occurs_term r 0 t
+let f_occurs_fmla r f = f_occurs_fmla r 0 f
+
+(* occurrence check modulo alpha *)
+
+let rec t_alpha_occurs_term r lvl t = t_alpha_equal r t ||
+  exists_term_unsafe (t_alpha_occurs_term r) (t_alpha_occurs_fmla r) lvl t
+
+and t_alpha_occurs_fmla r lvl f =
+  exists_fmla_unsafe (t_alpha_occurs_term r) (t_alpha_occurs_fmla r) lvl f
+
+let t_alpha_occurs_term r t = t_alpha_occurs_term r 0 t
+let t_alpha_occurs_fmla r f = t_alpha_occurs_fmla r 0 f
+
+let rec f_alpha_occurs_term r lvl t =
+  exists_term_unsafe (f_alpha_occurs_term r) (f_alpha_occurs_fmla r) lvl t
+
+and f_alpha_occurs_fmla r lvl f = f_alpha_equal r f ||
+  exists_fmla_unsafe (f_alpha_occurs_term r) (f_alpha_occurs_fmla r) lvl f
+
+let f_alpha_occurs_term r t = f_alpha_occurs_term r 0 t
+let f_alpha_occurs_fmla r f = f_alpha_occurs_fmla r 0 f
+
+(* substitutes term [t1] for term [t2] in term [t] *)
+
+let rec t_subst_term t1 t2 lvl t =
+  if t == t2 then t1 else
+  map_term_unsafe (t_subst_term t1 t2) (t_subst_fmla t1 t2) lvl t
+
+and t_subst_fmla t1 t2 lvl f =
+  map_fmla_unsafe (t_subst_term t1 t2) (t_subst_fmla t1 t2) lvl f
+
+let t_subst_term t1 t2 t =
+  if t1.t_ty == t2.t_ty then t_subst_term t1 t2 0 t
+                        else raise Ty.TypeMismatch
+
+let t_subst_fmla t1 t2 f =
+  if t1.t_ty == t2.t_ty then t_subst_fmla t1 t2 0 f
+                        else raise Ty.TypeMismatch
+
+(* substitutes fmla [f1] for fmla [f2] in term [t] *)
+
+let rec f_subst_term f1 f2 lvl t =
+  map_term_unsafe (f_subst_term f1 f2) (f_subst_fmla f1 f2) lvl t
+
+and f_subst_fmla f1 f2 lvl f =
+  if f == f2 then f1 else
+  map_fmla_unsafe (f_subst_term f1 f2) (f_subst_fmla f1 f2) lvl f
+
+let f_subst_term f1 f2 t = f_subst_term f1 f2 0 t
+let f_subst_fmla f1 f2 f = f_subst_fmla f1 f2 0 f
+
+(* substitutes term [t1] for term [t2] in term [t] modulo alpha *)
+
+let rec t_alpha_subst_term t1 t2 lvl t =
+  if t == t2 then t1 else
+  map_term_unsafe (t_alpha_subst_term t1 t2) (t_alpha_subst_fmla t1 t2) lvl t
+
+and t_alpha_subst_fmla t1 t2 lvl f =
+  map_fmla_unsafe (t_alpha_subst_term t1 t2) (t_alpha_subst_fmla t1 t2) lvl f
+
+let t_alpha_subst_term t1 t2 t =
+  if t1.t_ty == t2.t_ty then t_alpha_subst_term t1 t2 0 t
+                        else raise Ty.TypeMismatch
+
+let t_alpha_subst_fmla t1 t2 f =
+  if t1.t_ty == t2.t_ty then t_alpha_subst_fmla t1 t2 0 f
+                        else raise Ty.TypeMismatch
+
+(* alpha_substitutes fmla [f1] for fmla [f2] in term [t] modulo alpha *)
+
+let rec f_alpha_subst_term f1 f2 lvl t =
+  map_term_unsafe (f_alpha_subst_term f1 f2) (f_alpha_subst_fmla f1 f2) lvl t
+
+and f_alpha_subst_fmla f1 f2 lvl f =
+  if f == f2 then f1 else
+  map_fmla_unsafe (f_alpha_subst_term f1 f2) (f_alpha_subst_fmla f1 f2) lvl f
+
+let f_alpha_subst_term f1 f2 t = f_alpha_subst_term f1 f2 0 t
+let f_alpha_subst_fmla f1 f2 f = f_alpha_subst_fmla f1 f2 0 f
+
+
+(* smart constructors *)
 
 let t_let v t1 t2 =
   if v.vs_ty == t1.t_ty then t_let v t1 (abst_term_single v t2)
@@ -579,9 +836,6 @@ let f_case t bl =
 
 (* opening binders *)
 
-let inst_term_single v t = inst_term (Im.add 0 v Im.empty) 0 t
-let inst_fmla_single v f = inst_fmla (Im.add 0 v Im.empty) 0 f
-
 let open_bind_term (v, t) =
   let v = fresh_vsymbol v in v, inst_term_single v t
 
@@ -615,65 +869,5 @@ let open_tbranch (pat, _, t) =
 let open_fbranch (pat, _, f) =
   let vars, s, ns = substs_for_pattern pat in
   (rename_pat ns pat, vars, inst_fmla s 0 f)
-
-
-(* TODO: substitution functions (named variables -> terms)
-   performing typing *)
-
-(* equality *)
-
-(* let t_equal = (==) *)
-(* let f_equal = (==) *)
-
-let rec t_alpha_equal t1 t2 =
-  t1 == t2 ||
-  t1.t_ty == t2.t_ty &&
-  match t1.t_node, t2.t_node with
-    | Tbvar x1, Tbvar x2 ->
-        x1 == x2
-    | Tvar v1, Tvar v2 ->
-        v1 == v2
-    | Tapp (s1, l1), Tapp (s2, l2) ->
-        s1 == s2 && List.for_all2 t_alpha_equal l1 l2
-    | Tlet (t1, (v1, b1)), Tlet (t2, (v2, b2)) ->
-        t_alpha_equal t1 t2 && v1.vs_ty == v2.vs_ty && t_alpha_equal b1 b2
-    | Tcase (t1, l1), Tcase (t2, l2) ->
-        t_alpha_equal t1 t2 &&
-        (try List.for_all2 tbranch_alpha_equal l1 l2
-        with Invalid_argument _ -> false)
-    | Teps (v1, f1), Teps (v2, f2) ->
-        v1.vs_ty == v2.vs_ty && f_alpha_equal f1 f2
-    | _ -> false
-
-and f_alpha_equal f1 f2 =
-  f1 == f2 ||
-  match f1.f_node, f2.f_node with
-    | Fapp (s1, tl1), Fapp (s2, tl2) ->
-        s1 == s2 && List.for_all2 t_alpha_equal tl1 tl2
-    | Fquant (q1, (v1, f1)), Fquant (q2, (v2, f2)) ->
-        q1 == q2 && v1.vs_ty == v2.vs_ty && f_alpha_equal f1 f2
-    | Fbinop (op1, f1, g1), Fbinop (op2, f2, g2) ->
-        op1 == op2 && f_alpha_equal f1 f2 && f_alpha_equal g1 g2
-    | Fnot f1, Fnot f2 ->
-        f_alpha_equal f1 f2
-    | Ftrue, Ftrue
-    | Ffalse, Ffalse ->
-        true
-    | Fif (f1, g1, h1), Fif (f2, g2, h2) ->
-        f_alpha_equal f1 f2 && f_alpha_equal g1 g2 && f_alpha_equal h1 h2
-    | Flet (t1, (v1, f1)), Flet (t2, (v2, f2)) ->
-        t_alpha_equal t1 t2 && v1.vs_ty == v2.vs_ty && f_alpha_equal f1 f2
-    | Fcase (t1, bl1), Fcase (t2, bl2) ->
-        t_alpha_equal t1 t2 &&
-        (try List.for_all2 fbranch_alpha_equal bl1 bl2
-        with Invalid_argument _ -> false)
-    | _ ->
-        false
-
-and tbranch_alpha_equal (pat1, _, t1) (pat2, _, t2) =
-  pat_alpha_equal pat1 pat2 && t_alpha_equal t1 t2
-
-and fbranch_alpha_equal (pat1, _, f1) (pat2, _, f2) =
-  pat_alpha_equal pat1 pat2 && f_alpha_equal f1 f2
 
 
