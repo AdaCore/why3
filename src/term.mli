@@ -45,6 +45,8 @@ module Ty : sig
   val ty_var : tvsymbol -> ty
   val ty_app : tysymbol -> ty list -> ty
 
+  val ty_match : ty -> ty -> ty Name.M.t -> ty Name.M.t option
+
 end
 
 type tvsymbol = Ty.tvsymbol
@@ -61,8 +63,6 @@ type vsymbol = private {
 
 module Mvs : Map.S with type key = vsymbol
 module Svs : Set.S with type elt = vsymbol
-
-type vsymbol_set = Svs.t
 
 val create_vsymbol : Name.t -> ty -> vsymbol
 
@@ -162,6 +162,11 @@ and tbranch
 
 and fbranch
 
+module Mterm : Map.S with type key = term
+module Sterm : Set.S with type elt = term
+module Mfmla : Map.S with type key = fmla
+module Sfmla : Set.S with type elt = fmla
+
 (* smart constructors for term *)
 
 val t_var : vsymbol -> term
@@ -195,10 +200,42 @@ val f_label_add : label -> fmla -> fmla
 (* bindings *)
 
 val open_bind_term : bind_term -> vsymbol * term
-val open_tbranch : tbranch -> pattern * vsymbol_set * term
+val open_tbranch : tbranch -> pattern * Svs.t * term
 
 val open_bind_fmla : bind_fmla -> vsymbol * fmla
-val open_fbranch : fbranch -> pattern * vsymbol_set * fmla
+val open_fbranch : fbranch -> pattern * Svs.t * fmla
+
+(* safe opening map/fold *)
+
+val map_open_term : (term -> term) -> (fmla -> fmla) -> term -> term
+val map_open_fmla : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
+
+val fold_open_term : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
+                                         -> 'a -> term -> 'a
+
+val fold_open_fmla : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
+                                         -> 'a -> fmla -> 'a
+
+val forall_open_term : (term -> bool) -> (fmla -> bool) -> term -> bool
+val forall_open_fmla : (term -> bool) -> (fmla -> bool) -> fmla -> bool
+val exists_open_term : (term -> bool) -> (fmla -> bool) -> term -> bool
+val exists_open_fmla : (term -> bool) -> (fmla -> bool) -> fmla -> bool
+
+(* safe transparent map/fold *)
+
+val map_trans_term : (term -> term) -> (fmla -> fmla) -> term -> term
+val map_trans_fmla : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
+
+val fold_trans_term : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
+                                          -> 'a -> term -> 'a
+
+val fold_trans_fmla : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
+                                          -> 'a -> fmla -> 'a
+
+val forall_trans_term : (term -> bool) -> (fmla -> bool) -> term -> bool
+val forall_trans_fmla : (term -> bool) -> (fmla -> bool) -> fmla -> bool
+val exists_trans_term : (term -> bool) -> (fmla -> bool) -> term -> bool
+val exists_trans_fmla : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 
 (* variable occurrence check *)
 
@@ -221,10 +258,13 @@ val subst_fmla_single : term -> vsymbol -> fmla -> fmla
 val freevars_term : term -> Svs.t
 val freevars_fmla : fmla -> Svs.t
 
+(* USE PHYSICAL EQUALITY *)
+(*
 (* equality *)
 
 val t_equal : term -> term -> bool
 val f_equal : fmla -> fmla -> bool
+*)
 
 (* alpha-equivalence *)
 
@@ -254,4 +294,9 @@ val t_alpha_subst_term : term -> term -> term -> term
 val t_alpha_subst_fmla : term -> term -> fmla -> fmla
 val f_alpha_subst_term : fmla -> fmla -> term -> term
 val f_alpha_subst_fmla : fmla -> fmla -> fmla -> fmla
+
+(* term/fmla matching modulo alpha in the pattern *)
+
+val t_match : term -> term -> term Mvs.t -> term Mvs.t option
+val f_match : fmla -> fmla -> term Mvs.t -> term Mvs.t option
 
