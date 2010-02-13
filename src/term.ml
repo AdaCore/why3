@@ -712,10 +712,9 @@ let rec t_match m s t1 t2 =
     | Tbvar x1, Tbvar x2 when x1 == x2 ->
         s
     | Tvar v1, _ ->
-        if Mterm.find t2 m < 0 then
-          try if Mvs.find v1 s == t2 then s else raise NoMatch
-          with Not_found -> Mvs.add v1 t2 s
-        else raise NoMatch
+        (try if Mvs.find v1 s == t2 then s else raise NoMatch
+        with Not_found -> if Mterm.find t2 m < 0
+          then Mvs.add v1 t2 s else raise NoMatch)
     | Tapp (s1, l1), Tapp (s2, l2) when s1 == s2 ->
         (* assert (List.length l1 == List.length l2); *)
         List.fold_left2 (t_match m) s l1 l2
