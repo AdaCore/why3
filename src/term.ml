@@ -569,11 +569,19 @@ and inst_fmla m lvl f = map_fmla_unsafe (inst_term m) (inst_fmla m) lvl f
 let inst_term_single v t = inst_term (Im.add 0 v Im.empty) 0 t
 let inst_fmla_single v f = inst_fmla (Im.add 0 v Im.empty) 0 f
 
+(* looks for free de Bruijn indices *)
+
+let rec closed_term lvl t = match t.t_node with
+  | Tbvar x -> x < lvl
+  | _ -> forall_term_unsafe closed_term closed_fmla lvl t
+
+and closed_fmla lvl f = forall_fmla_unsafe closed_term closed_fmla lvl f
+
 (* looks for occurrence of a variable from set [s] in a term [t] *)
 
-let rec occurs_term s lvl t =
-  (match t.t_node with Tvar u -> Svs.mem u s | _ -> false) ||
-  exists_term_unsafe (occurs_term s) (occurs_fmla s) lvl t
+let rec occurs_term s lvl t = match t.t_node with
+  | Tvar u -> Svs.mem u s
+  | _ -> exists_term_unsafe (occurs_term s) (occurs_fmla s) lvl t
 
 and occurs_fmla s lvl f =
   exists_fmla_unsafe (occurs_term s) (occurs_fmla s) lvl f
@@ -682,30 +690,11 @@ and tbranch_alpha_equal (pat1, _, t1) (pat2, _, t2) =
 and fbranch_alpha_equal (pat1, _, f1) (pat2, _, f2) =
   pat_alpha_equal pat1 pat2 && f_alpha_equal f1 f2
 
-(* calculate the greatest free de Bruijn index *)
-
-let ix_empty = (Mterm.empty, Mfmla.empty)
-
-let max_ix_term mT lvl acc t = max acc (Mterm.find t mT - lvl)
-let max_ix_fmla mF lvl acc f = max acc (Mfmla.find f mF - lvl)
-
-let rec build_max_term lvl acc t = match t.t_node with
-  | Tbvar ix -> let mT,mF = acc in (Mterm.add t ix mT, mF)
-  | _ ->
-      let mT,mF = fold_term_unsafe build_max_term build_max_fmla lvl acc t in
-      let ix = fold_term_unsafe (max_ix_term mT) (max_ix_fmla mF) 0 (-1) t in
-      (Mterm.add t ix mT, mF)
-
-and build_max_fmla lvl acc f =
-      let mT,mF = fold_fmla_unsafe build_max_term build_max_fmla lvl acc f in
-      let ix = fold_fmla_unsafe (max_ix_term mT) (max_ix_fmla mF) 0 (-1) f in
-      (mT, Mfmla.add f ix mF)
-
 (* matching modulo alpha in the pattern *)
 
 exception NoMatch
 
-let rec t_match m s t1 t2 =
+let rec t_match s t1 t2 =
   if t1 == t2 then s else
   if t1.t_ty != t2.t_ty then raise NoMatch else
   match t1.t_node, t2.t_node with
@@ -713,61 +702,56 @@ let rec t_match m s t1 t2 =
         s
     | Tvar v1, _ ->
         (try if Mvs.find v1 s == t2 then s else raise NoMatch
-        with Not_found -> if Mterm.find t2 m < 0
+        with Not_found -> if closed_term 0 t2
           then Mvs.add v1 t2 s else raise NoMatch)
     | Tapp (s1, l1), Tapp (s2, l2) when s1 == s2 ->
         (* assert (List.length l1 == List.length l2); *)
-        List.fold_left2 (t_match m) s l1 l2
+        List.fold_left2 t_match s l1 l2
     | Tlet (t1, (v1, b1)), Tlet (t2, (v2, b2)) ->
         (* assert (v1.vs_ty == t1.t_ty && v2.vs_ty == t2.t_ty); *)
-        t_match m (t_match m s t1 t2) b1 b2
+        t_match (t_match s t1 t2) b1 b2
     | Tcase (t1, l1), Tcase (t2, l2) ->
-        (try List.fold_left2 (tbranch_match m) (t_match m s t1 t2) l1 l2
+        (try List.fold_left2 tbranch_match (t_match s t1 t2) l1 l2
         with Invalid_argument _ -> raise NoMatch)
     | Teps (v1, f1), Teps (v2, f2) ->
         (* assert (v1.vs_ty == t1.t_ty && v2.vs_ty == t2.t_ty); *)
-        f_match m s f1 f2
+        f_match s f1 f2
     | _ -> raise NoMatch
 
-and f_match m s f1 f2 =
+and f_match s f1 f2 =
   if f1 == f2 then s else
   match f1.f_node, f2.f_node with
     | Fapp (s1, l1), Fapp (s2, l2) when s1 == s2 ->
         (* assert (List.length l1 == List.length l2); *)
-        List.fold_left2 (t_match m) s l1 l2
+        List.fold_left2 t_match s l1 l2
     | Fquant (q1, (v1, f1)), Fquant (q2, (v2, f2))
             when q1 == q2 && v1.vs_ty == v2.vs_ty ->
-        f_match m s f1 f2
+        f_match s f1 f2
     | Fbinop (op1, f1, g1), Fbinop (op2, f2, g2) when op1 == op2 ->
-        f_match m (f_match m s f1 f2) g1 g2
+        f_match (f_match s f1 f2) g1 g2
     | Fnot f1, Fnot f2 ->
-        f_match m s f1 f2
+        f_match s f1 f2
     | Ftrue, Ftrue
     | Ffalse, Ffalse ->
         s
     | Fif (f1, g1, h1), Fif (f2, g2, h2) ->
-        f_match m (f_match m (f_match m s f1 f2) g1 g2) h1 h2
+        f_match (f_match (f_match s f1 f2) g1 g2) h1 h2
     | Flet (t1, (v1, f1)), Flet (t2, (v2, f2)) ->
         (* assert (v1.vs_ty == t1.t_ty && v2.vs_ty == t2.t_ty); *)
-        f_match m (t_match m s t1 t2) f1 f2
+        f_match (t_match s t1 t2) f1 f2
     | Fcase (t1, l1), Fcase (t2, l2) ->
-        (try List.fold_left2 (fbranch_match m) (t_match m s t1 t2) l1 l2
+        (try List.fold_left2 fbranch_match (t_match s t1 t2) l1 l2
         with Invalid_argument _ -> raise NoMatch)
     | _ -> raise NoMatch
 
-and tbranch_match m s (pat1, _, t1) (pat2, _, t2) =
-  if pat_alpha_equal pat1 pat2 then t_match m s t1 t2 else raise NoMatch
+and tbranch_match s (pat1, _, t1) (pat2, _, t2) =
+  if pat_alpha_equal pat1 pat2 then t_match s t1 t2 else raise NoMatch
 
-and fbranch_match m s (pat1, _, f1) (pat2, _, f2) =
-  if pat_alpha_equal pat1 pat2 then f_match m s f1 f2 else raise NoMatch
+and fbranch_match s (pat1, _, f1) (pat2, _, f2) =
+  if pat_alpha_equal pat1 pat2 then f_match s f1 f2 else raise NoMatch
 
-let t_match t1 t2 s =
-  let m,_ = build_max_term 0 ix_empty t2 in
-  try Some (t_match m s t1 t2) with NoMatch -> None
-
-let f_match f1 f2 s =
-  let m,_ = build_max_fmla 0 ix_empty f2 in
-  try Some (f_match m s f1 f2) with NoMatch -> None
+let t_match t1 t2 s = try Some (t_match s t1 t2) with NoMatch -> None
+let f_match f1 f2 s = try Some (f_match s f1 f2) with NoMatch -> None
 
 (* occurrence check *)
 
@@ -866,6 +850,25 @@ and f_alpha_subst_fmla f1 f2 lvl f =
 
 let f_alpha_subst_term f1 f2 t = f_alpha_subst_term f1 f2 0 t
 let f_alpha_subst_fmla f1 f2 f = f_alpha_subst_fmla f1 f2 0 f
+
+(* calculate the greatest free de Bruijn index *)
+
+let ix_empty = (Mterm.empty, Mfmla.empty)
+
+let max_ix_term mT lvl acc t = max acc (Mterm.find t mT - lvl)
+let max_ix_fmla mF lvl acc f = max acc (Mfmla.find f mF - lvl)
+
+let rec build_max_term lvl acc t = match t.t_node with
+  | Tbvar ix -> let mT,mF = acc in (Mterm.add t ix mT, mF)
+  | _ ->
+      let mT,mF = fold_term_unsafe build_max_term build_max_fmla lvl acc t in
+      let ix = fold_term_unsafe (max_ix_term mT) (max_ix_fmla mF) 0 (-1) t in
+      (Mterm.add t ix mT, mF)
+
+and build_max_fmla lvl acc f =
+      let mT,mF = fold_fmla_unsafe build_max_term build_max_fmla lvl acc f in
+      let ix = fold_fmla_unsafe (max_ix_term mT) (max_ix_fmla mF) 0 (-1) f in
+      (mT, Mfmla.add f ix mF)
 
 (* safe transparent map *)
 
