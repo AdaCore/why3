@@ -1,9 +1,17 @@
 
 (* test file *)
 
-type ('a, 'b) list 
+type 'a list 
 
-(* logic nil  : 'a list *)
-(* logic cons : 'a, 'a list -> 'a list *)
+logic nil  : 'a list
+
+logic cons : 'a, 'a list -> 'a list
+
+type int
+
+logic length : 'a list -> int
+
+logic is_nil : 'a list -> prop
+
 
 

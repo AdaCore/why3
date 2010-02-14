@@ -64,7 +64,7 @@
 	"in", IN;
 	"include", INCLUDE;
 	"inductive", INDUCTIVE;
-	"int", INT;
+	(*"int", INT;*)
 	"invariant", INVARIANT;
 	"let", LET;
 	"logic", LOGIC;

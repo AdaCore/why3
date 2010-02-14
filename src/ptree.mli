@@ -37,10 +37,12 @@ type pp_prefix =
   PPneg | PPnot
 
 type ppure_type =
+(*
   | PPTint
   | PPTbool
   | PPTreal
   | PPTunit
+*)
   | PPTvarid of string * Loc.position
   | PPTexternal of ppure_type list * string * Loc.position
 

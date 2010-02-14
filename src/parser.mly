@@ -228,6 +228,7 @@ indcase:
 ;
 
 primitive_type:
+/*
 | INT 
    { PPTint }
 | BOOL 
@@ -236,6 +237,7 @@ primitive_type:
    { PPTreal }
 | UNIT 
    { PPTunit }
+*/
 | type_var 
    { PPTvarid ($1, loc ()) }
 | ident 
