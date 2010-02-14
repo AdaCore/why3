@@ -853,44 +853,39 @@ let f_alpha_subst_fmla f1 f2 f = f_alpha_subst_fmla f1 f2 0 f
 
 (* calculate the greatest free de Bruijn index *)
 
-let ix_empty = (Mterm.empty, Mfmla.empty)
+let skip_empty = (Sterm.empty, Sfmla.empty, -1)
 
-let max_ix_term mT lvl acc t = max acc (Mterm.find t mT - lvl)
-let max_ix_fmla mF lvl acc f = max acc (Mfmla.find f mF - lvl)
-
-let rec build_max_term lvl acc t = match t.t_node with
-  | Tbvar ix -> let mT,mF = acc in (Mterm.add t ix mT, mF)
+let rec skip_term lvl (sT,sF,acc) t = match t.t_node with
+  | Tbvar i -> (sT, sF, max acc (i - lvl))
   | _ ->
-      let mT,mF = fold_term_unsafe build_max_term build_max_fmla lvl acc t in
-      let ix = fold_term_unsafe (max_ix_term mT) (max_ix_fmla mF) 0 (-1) t in
-      (Mterm.add t ix mT, mF)
+    let (sT,sF,i) = fold_term_unsafe skip_term skip_fmla 0 (sT,sF,-1) t in
+    ((if i < 0 then Sterm.add t sT else sT), sF, max acc (i - lvl))
 
-and build_max_fmla lvl acc f =
-      let mT,mF = fold_fmla_unsafe build_max_term build_max_fmla lvl acc f in
-      let ix = fold_fmla_unsafe (max_ix_term mT) (max_ix_fmla mF) 0 (-1) f in
-      (mT, Mfmla.add f ix mF)
+and skip_fmla lvl (sT,sF,acc) f =
+    let (sT,sF,i) = fold_fmla_unsafe skip_term skip_fmla 0 (sT,sF,-1) f in
+    (sT, (if i < 0 then Sfmla.add f sF else sF), max acc (i - lvl))
 
 (* safe transparent map *)
 
-let rec map_skip_term fnT fnF mT mF lvl t =
-  if Mterm.find t mT < 0 then fnT t
-  else  map_term_unsafe (map_skip_term fnT fnF mT mF)
-                        (map_skip_fmla fnT fnF mT mF) lvl t
+let rec map_skip_term fnT fnF sT sF lvl t =
+  if Sterm.mem t sT then fnT t
+  else  map_term_unsafe (map_skip_term fnT fnF sT sF)
+                        (map_skip_fmla fnT fnF sT sF) lvl t
 
-and map_skip_fmla fnT fnF mT mF lvl f =
-  if Mfmla.find f mF < 0 then fnF f
-  else  map_fmla_unsafe (map_skip_term fnT fnF mT mF)
-                        (map_skip_fmla fnT fnF mT mF) lvl f
+and map_skip_fmla fnT fnF sT sF lvl f =
+  if Sfmla.mem f sF then fnF f
+  else  map_fmla_unsafe (map_skip_term fnT fnF sT sF)
+                        (map_skip_fmla fnT fnF sT sF) lvl f
 
 let map_skip_term fnT fnF lvl t =
   if lvl == 0 then fnT t
-  else  let mT,mF = build_max_term lvl ix_empty t in
-        map_skip_term fnT fnF mT mF lvl t
+  else  let sT,sF,_ = skip_term lvl skip_empty t in
+        map_skip_term fnT fnF sT sF lvl t
 
 let map_skip_fmla fnT fnF lvl f =
   if lvl == 0 then fnF f
-  else  let mT,mF = build_max_fmla lvl ix_empty f in
-        map_skip_fmla fnT fnF mT mF lvl f
+  else  let sT,sF,_ = skip_fmla lvl skip_empty f in
+        map_skip_fmla fnT fnF sT sF lvl f
 
 let map_trans_term fnT fnF t =
   map_term_unsafe (map_skip_term fnT fnF) (map_skip_fmla fnT fnF) 0 t
@@ -900,25 +895,25 @@ let map_trans_fmla fnT fnF f =
 
 (* safe transparent fold *)
 
-let rec fold_skip_term fnT fnF mT mF lvl acc t =
-  if Mterm.find t mT < 0 then fnT acc t
-  else fold_term_unsafe (fold_skip_term fnT fnF mT mF)
-                        (fold_skip_fmla fnT fnF mT mF) lvl acc t
+let rec fold_skip_term fnT fnF sT sF lvl acc t =
+  if Sterm.mem t sT then fnT acc t
+  else fold_term_unsafe (fold_skip_term fnT fnF sT sF)
+                        (fold_skip_fmla fnT fnF sT sF) lvl acc t
 
-and fold_skip_fmla fnT fnF mT mF lvl acc f =
-  if Mfmla.find f mF < 0 then fnF acc f
-  else fold_fmla_unsafe (fold_skip_term fnT fnF mT mF)
-                        (fold_skip_fmla fnT fnF mT mF) lvl acc f
+and fold_skip_fmla fnT fnF sT sF lvl acc f =
+  if Sfmla.mem f sF then fnF acc f
+  else fold_fmla_unsafe (fold_skip_term fnT fnF sT sF)
+                        (fold_skip_fmla fnT fnF sT sF) lvl acc f
 
 let fold_skip_term fnT fnF lvl acc t =
   if lvl == 0 then fnT acc t
-  else  let mT,mF = build_max_term lvl ix_empty t in
-        fold_skip_term fnT fnF mT mF lvl acc t
+  else  let sT,sF,_ = skip_term lvl skip_empty t in
+        fold_skip_term fnT fnF sT sF lvl acc t
 
 let fold_skip_fmla fnT fnF lvl acc f =
   if lvl == 0 then fnF acc f
-  else  let mT,mF = build_max_fmla lvl ix_empty f in
-        fold_skip_fmla fnT fnF mT mF lvl acc f
+  else  let sT,sF,_ = skip_fmla lvl skip_empty f in
+        fold_skip_fmla fnT fnF sT sF lvl acc f
 
 let fold_trans_term fnT fnF acc t =
   fold_term_unsafe (fold_skip_term fnT fnF) (fold_skip_fmla fnT fnF) 0 acc t
