@@ -323,11 +323,11 @@ lexpr:
    { infix_pp $1 PPmod $3 }
 | MINUS lexpr %prec uminus
    { prefix_pp PPneg $2 }
-/***
-| qualid_ident
+| ident
    { mk_pp (PPvar $1) }
-| qualid_ident LEFTPAR list1_lexpr_sep_comma RIGHTPAR
+| ident LEFTPAR list1_lexpr_sep_comma RIGHTPAR
    { mk_pp (PPapp ($1, $3)) }
+/***
 | qualid_ident LEFTSQ lexpr RIGHTSQ
    { mk_pp (PPapp (Ident.access, [mk_pp_i 1 (PPvar $1); $3])) }
 ***/

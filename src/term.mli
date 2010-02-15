@@ -187,6 +187,7 @@ val f_and : fmla -> fmla -> fmla
 val f_or : fmla -> fmla -> fmla
 val f_implies : fmla -> fmla -> fmla
 val f_iff : fmla -> fmla -> fmla
+val f_binary : binop -> fmla -> fmla -> fmla
 val f_not : fmla -> fmla
 val f_true : fmla
 val f_false : fmla
