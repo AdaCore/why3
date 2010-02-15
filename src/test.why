@@ -15,7 +15,7 @@ logic is_nil : 'a list -> prop
 
 logic eq : 'a, 'a -> prop
 
-axiom a : forall x:'a list. forall y: 'a list. eq(x, y)
+axiom a : forall x : 'a. not eq(nil, cons(x, nil))
 
 
 
