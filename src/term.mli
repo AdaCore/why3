@@ -183,6 +183,7 @@ val t_label_add : label -> term -> term
 val f_app : psymbol -> term list -> fmla
 val f_forall : vsymbol -> fmla -> fmla
 val f_exists : vsymbol -> fmla -> fmla
+val f_quant : quant -> vsymbol -> fmla -> fmla
 val f_and : fmla -> fmla -> fmla
 val f_or : fmla -> fmla -> fmla
 val f_implies : fmla -> fmla -> fmla

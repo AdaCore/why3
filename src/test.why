@@ -13,7 +13,15 @@ logic length : 'a list -> int
 
 logic is_nil : 'a list -> prop
 
-axiom a : forall x:'a list. if true then not false else false
+logic eq : 'a, 'a -> prop
+
+axiom a : forall x:'a list. forall y: 'a list. eq(x, y)
+
+
+
+
+
+
 
 
 
