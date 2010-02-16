@@ -16,6 +16,14 @@
 
 type label = string
 
+exception FoldSkip
+
+let forall_fn pr _ t = pr t || raise FoldSkip
+let exists_fn pr _ t = pr t && raise FoldSkip
+
+exception NonLinearPattern
+exception UnboundVariable
+
 (** Types *)
 
 module Ty = struct
@@ -80,6 +88,24 @@ module Ty = struct
   let mk_ty n = { ty_node = n; ty_tag = -1 }
   let ty_var n = Hty.hashcons (mk_ty (Tyvar n))
   let ty_app s tl = Hty.hashcons (mk_ty (Tyapp (s, tl)))
+
+  (* generic traversal functions *)
+
+  let ty_map fn ty = match ty.ty_node with
+    | Tyvar _ -> ty
+    | Tyapp (f, tl) -> ty_app f (List.map fn tl)
+
+  let ty_fold fn acc ty = match ty.ty_node with
+    | Tyvar _ -> acc
+    | Tyapp (f, tl) -> List.fold_left fn acc tl
+
+  let ty_forall pr ty =
+    try ty_fold (forall_fn pr) true ty with FoldSkip -> false
+
+  let ty_exists pr ty =
+    try ty_fold (exists_fn pr) false ty with FoldSkip -> true
+
+  (* smart constructors *)
 
   exception BadTypeArity
 
@@ -231,6 +257,24 @@ let pat_var v = Hp.hashcons (mk_pattern (Pvar v) v.vs_ty)
 let pat_app f pl ty = Hp.hashcons (mk_pattern (Papp (f, pl)) ty)
 let pat_as p v = Hp.hashcons (mk_pattern (Pas (p, v)) p.pat_ty)
 
+(* generic traversal functions *)
+
+let pat_map_unsafe fn pat = match pat.pat_node with
+  | Pwild | Pvar _ -> pat
+  | Papp (s, pl) -> pat_app s (List.map fn pl) pat.pat_ty
+  | Pas (p, v) -> pat_as (fn p) v
+
+let pat_fold fn acc pat = match pat.pat_node with
+  | Pwild | Pvar _ -> acc
+  | Papp (_, pl) -> List.fold_left fn acc pl
+  | Pas (p, _) -> fn acc p
+
+let pat_forall pr pat =
+  try pat_fold (forall_fn pr) true pat with FoldSkip -> false
+
+let pat_exists pr pat =
+  try pat_fold (exists_fn pr) false pat with FoldSkip -> true
+
 (* smart constructors for patterns *)
 
 exception BadArity
@@ -250,6 +294,13 @@ let pat_app f pl ty =
 
 let pat_as p v =
   if p.pat_ty == v.vs_ty then pat_as p v else raise Ty.TypeMismatch
+
+(* safe map over patterns *)
+
+let pat_map fn pat = match pat.pat_node with
+  | Pwild | Pvar _ -> pat
+  | Papp (s, pl) -> pat_app s (List.map fn pl) pat.pat_ty
+  | Pas (p, v) -> pat_as (fn p) v
 
 (* alpha-equality on patterns *)
 
@@ -517,8 +568,6 @@ let f_fold_unsafe fnT fnF lvl acc f = match f.f_node with
   | Flet (t, (u, f1)) -> fnF (lvl + 1) (fnT lvl acc t) f1
   | Fcase (t, bl) -> List.fold_left (brlvl fnF lvl) (fnT lvl acc t) bl
 
-exception FoldSkip
-
 let forall_fnT prT lvl _ t = prT lvl t || raise FoldSkip
 let forall_fnF prF lvl _ f = prF lvl f || raise FoldSkip
 let exists_fnT prT lvl _ t = prT lvl t && raise FoldSkip
@@ -646,7 +695,7 @@ let rec t_equal_alpha t1 t2 =
         t_equal_alpha t1 t2 && t_equal_alpha b1 b2
     | Tcase (t1, l1), Tcase (t2, l2) ->
         t_equal_alpha t1 t2 &&
-        (try List.for_all2 t_branch_equal_alpha l1 l2
+        (try List.for_all2 t_equal_branch_alpha l1 l2
         with Invalid_argument _ -> false)
     | Teps (v1, f1), Teps (v2, f2) ->
         (* assert (v1.vs_ty == t1.t_ty && v2.vs_ty == t2.t_ty); *)
@@ -675,14 +724,14 @@ and f_equal_alpha f1 f2 =
         t_equal_alpha t1 t2 && f_equal_alpha f1 f2
     | Fcase (t1, l1), Fcase (t2, l2) ->
         t_equal_alpha t1 t2 &&
-        (try List.for_all2 f_branch_equal_alpha l1 l2
+        (try List.for_all2 f_equal_branch_alpha l1 l2
         with Invalid_argument _ -> false)
     | _ -> false
 
-and t_branch_equal_alpha (pat1, _, t1) (pat2, _, t2) =
+and t_equal_branch_alpha (pat1, _, t1) (pat2, _, t2) =
   pat_equal_alpha pat1 pat2 && t_equal_alpha t1 t2
 
-and f_branch_equal_alpha (pat1, _, f1) (pat2, _, f2) =
+and f_equal_branch_alpha (pat1, _, f1) (pat2, _, f2) =
   pat_equal_alpha pat1 pat2 && f_equal_alpha f1 f2
 
 (* matching modulo alpha in the pattern *)
@@ -706,7 +755,7 @@ let rec t_match s t1 t2 =
         (* assert (v1.vs_ty == t1.t_ty && v2.vs_ty == t2.t_ty); *)
         t_match (t_match s t1 t2) b1 b2
     | Tcase (t1, l1), Tcase (t2, l2) ->
-        (try List.fold_left2 t_branch_match (t_match s t1 t2) l1 l2
+        (try List.fold_left2 t_match_branch (t_match s t1 t2) l1 l2
         with Invalid_argument _ -> raise NoMatch)
     | Teps (v1, f1), Teps (v2, f2) ->
         (* assert (v1.vs_ty == t1.t_ty && v2.vs_ty == t2.t_ty); *)
@@ -735,14 +784,14 @@ and f_match s f1 f2 =
         (* assert (v1.vs_ty == t1.t_ty && v2.vs_ty == t2.t_ty); *)
         f_match (t_match s t1 t2) f1 f2
     | Fcase (t1, l1), Fcase (t2, l2) ->
-        (try List.fold_left2 f_branch_match (t_match s t1 t2) l1 l2
+        (try List.fold_left2 f_match_branch (t_match s t1 t2) l1 l2
         with Invalid_argument _ -> raise NoMatch)
     | _ -> raise NoMatch
 
-and t_branch_match s (pat1, _, t1) (pat2, _, t2) =
+and t_match_branch s (pat1, _, t1) (pat2, _, t2) =
   if pat_equal_alpha pat1 pat2 then t_match s t1 t2 else raise NoMatch
 
-and f_branch_match s (pat1, _, f1) (pat2, _, f2) =
+and f_match_branch s (pat1, _, f1) (pat2, _, f2) =
   if pat_equal_alpha pat1 pat2 then f_match s f1 f2 else raise NoMatch
 
 let t_match t1 t2 s = try Some (t_match s t1 t2) with NoMatch -> None
@@ -863,7 +912,8 @@ and f_skip lvl (sT,sF,acc) f =
 (* safe transparent map *)
 
 let rec t_map_skip fnT fnF sT sF lvl t =
-  if Sterm.mem t sT then fnT t
+  if Sterm.mem t sT then let t1 = fnT t in
+    if (t1.t_ty == t.t_ty) then t1 else raise Ty.TypeMismatch
   else t_map_unsafe (t_map_skip fnT fnF sT sF)
                     (f_map_skip fnT fnF sT sF) lvl t
 
@@ -873,7 +923,8 @@ and f_map_skip fnT fnF sT sF lvl f =
                     (f_map_skip fnT fnF sT sF) lvl f
 
 let t_map_skip fnT fnF lvl t =
-  if lvl == 0 then fnT t
+  if lvl == 0 then let t1 = fnT t in
+    if (t1.t_ty == t.t_ty) then t1 else raise Ty.TypeMismatch
   else  let sT,sF,_ = t_skip lvl skip_empty t in
         t_map_skip fnT fnF sT sF lvl t
 
@@ -916,25 +967,20 @@ let t_fold_trans fnT fnF acc t =
 let f_fold_trans fnT fnF acc f =
   f_fold_unsafe (t_fold_skip fnT fnF) (f_fold_skip fnT fnF) 0 acc f
 
-let forall_fnT prT _ t = prT t || raise FoldSkip
-let forall_fnF prF _ f = prF f || raise FoldSkip
-let exists_fnT prT _ t = prT t && raise FoldSkip
-let exists_fnF prF _ f = prF f && raise FoldSkip
-
 let t_forall_trans prT prF t =
-  try t_fold_trans (forall_fnT prT) (forall_fnF prF) true t
+  try t_fold_trans (forall_fn prT) (forall_fn prF) true t
   with FoldSkip -> false
 
 let f_forall_trans prT prF f =
-  try f_fold_trans (forall_fnT prT) (forall_fnF prF) true f
+  try f_fold_trans (forall_fn prT) (forall_fn prF) true f
   with FoldSkip -> false
 
 let t_exists_trans prT prF t =
-  try t_fold_trans (exists_fnT prT) (exists_fnF prF) false t
+  try t_fold_trans (exists_fn prT) (exists_fn prF) false t
   with FoldSkip -> true
 
 let f_exists_trans prT prF f =
-  try f_fold_trans (exists_fnT prT) (exists_fnF prF) false f
+  try f_fold_trans (exists_fn prT) (exists_fn prF) false f
   with FoldSkip -> true
 
 (* smart constructors *)
@@ -1085,18 +1131,18 @@ let f_fold_open fnT fnF acc f = match f.f_node with
   | Fcase (t, bl) -> List.fold_left (f_branch fnF) (fnT acc t) bl
 
 let t_forall_open prT prF t =
-  try t_fold_open (forall_fnT prT) (forall_fnF prF) true t
+  try t_fold_open (forall_fn prT) (forall_fn prF) true t
   with FoldSkip -> false
 
 let f_forall_open prT prF f =
-  try f_fold_open (forall_fnT prT) (forall_fnF prF) true f
+  try f_fold_open (forall_fn prT) (forall_fn prF) true f
   with FoldSkip -> false
 
 let t_exists_open prT prF t =
-  try t_fold_open (exists_fnT prT) (exists_fnF prF) false t
+  try t_fold_open (exists_fn prT) (exists_fn prF) false t
   with FoldSkip -> true
 
 let f_exists_open prT prF f =
-  try f_fold_open (exists_fnT prT) (exists_fnF prF) false f
+  try f_fold_open (exists_fn prT) (exists_fn prF) false f
   with FoldSkip -> true
 

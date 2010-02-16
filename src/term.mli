@@ -45,6 +45,9 @@ module Ty : sig
   val ty_var : tvsymbol -> ty
   val ty_app : tysymbol -> ty list -> ty
 
+  val ty_map : (ty -> ty) -> ty -> ty
+  val ty_fold : ('a -> ty -> 'a) -> 'a -> ty -> 'a
+
   val ty_match : ty -> ty -> ty Name.M.t -> ty Name.M.t option
 
 end
@@ -107,6 +110,9 @@ val pat_wild : ty -> pattern
 val pat_var : vsymbol -> pattern
 val pat_app : fsymbol -> pattern list -> ty -> pattern
 val pat_as  : pattern -> vsymbol -> pattern
+
+val pat_map : (pattern -> pattern) -> pattern -> pattern
+val pat_fold : ('a -> pattern -> 'a) -> 'a -> pattern -> 'a
 
 val pat_equal_alpha : pattern -> pattern -> bool
 
