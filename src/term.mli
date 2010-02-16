@@ -108,7 +108,7 @@ val pat_var : vsymbol -> pattern
 val pat_app : fsymbol -> pattern list -> ty -> pattern
 val pat_as  : pattern -> vsymbol -> pattern
 
-val pat_alpha_equal : pattern -> pattern -> bool
+val pat_equal_alpha : pattern -> pattern -> bool
 
 (** Terms and formulas *)
 
@@ -139,28 +139,28 @@ and term_node = private
   | Tbvar of int
   | Tvar of vsymbol
   | Tapp of fsymbol * term list
-  | Tlet of term * bind_term
-  | Tcase of term * tbranch list
-  | Teps of bind_fmla
+  | Tlet of term * term_bound
+  | Tcase of term * term_branch list
+  | Teps of fmla_bound
 
 and fmla_node = private
   | Fapp of psymbol * term list
-  | Fquant of quant * bind_fmla
+  | Fquant of quant * fmla_bound
   | Fbinop of binop * fmla * fmla
   | Fnot of fmla
   | Ftrue
   | Ffalse
   | Fif of fmla * fmla * fmla
-  | Flet of term * bind_fmla
-  | Fcase of term * fbranch list
+  | Flet of term * fmla_bound
+  | Fcase of term * fmla_branch list
 
-and bind_term
+and term_bound
 
-and bind_fmla
+and fmla_bound
 
-and tbranch
+and term_branch
 
-and fbranch
+and fmla_branch
 
 module Mterm : Map.S with type key = term
 module Sterm : Set.S with type elt = term
@@ -201,64 +201,64 @@ val f_label_add : label -> fmla -> fmla
 
 (* bindings *)
 
-val open_bind_term : bind_term -> vsymbol * term
-val open_tbranch : tbranch -> pattern * Svs.t * term
+val t_open_bound : term_bound -> vsymbol * term
+val t_open_branch : term_branch -> pattern * Svs.t * term
 
-val open_bind_fmla : bind_fmla -> vsymbol * fmla
-val open_fbranch : fbranch -> pattern * Svs.t * fmla
+val f_open_bound : fmla_bound -> vsymbol * fmla
+val f_open_branch : fmla_branch -> pattern * Svs.t * fmla
 
 (* safe opening map/fold *)
 
-val map_open_term : (term -> term) -> (fmla -> fmla) -> term -> term
-val map_open_fmla : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
+val t_map_open : (term -> term) -> (fmla -> fmla) -> term -> term
+val f_map_open : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
 
-val fold_open_term : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
+val t_fold_open : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
                                          -> 'a -> term -> 'a
 
-val fold_open_fmla : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
+val f_fold_open : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
                                          -> 'a -> fmla -> 'a
 
-val forall_open_term : (term -> bool) -> (fmla -> bool) -> term -> bool
-val forall_open_fmla : (term -> bool) -> (fmla -> bool) -> fmla -> bool
-val exists_open_term : (term -> bool) -> (fmla -> bool) -> term -> bool
-val exists_open_fmla : (term -> bool) -> (fmla -> bool) -> fmla -> bool
+val t_forall_open : (term -> bool) -> (fmla -> bool) -> term -> bool
+val f_forall_open : (term -> bool) -> (fmla -> bool) -> fmla -> bool
+val t_exists_open : (term -> bool) -> (fmla -> bool) -> term -> bool
+val f_exists_open : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 
 (* safe transparent map/fold *)
 
-val map_trans_term : (term -> term) -> (fmla -> fmla) -> term -> term
-val map_trans_fmla : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
+val t_map_trans : (term -> term) -> (fmla -> fmla) -> term -> term
+val f_map_trans : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
 
-val fold_trans_term : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
+val t_fold_trans : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
                                           -> 'a -> term -> 'a
 
-val fold_trans_fmla : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
+val f_fold_trans : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
                                           -> 'a -> fmla -> 'a
 
-val forall_trans_term : (term -> bool) -> (fmla -> bool) -> term -> bool
-val forall_trans_fmla : (term -> bool) -> (fmla -> bool) -> fmla -> bool
-val exists_trans_term : (term -> bool) -> (fmla -> bool) -> term -> bool
-val exists_trans_fmla : (term -> bool) -> (fmla -> bool) -> fmla -> bool
+val t_forall_trans : (term -> bool) -> (fmla -> bool) -> term -> bool
+val f_forall_trans : (term -> bool) -> (fmla -> bool) -> fmla -> bool
+val t_exists_trans : (term -> bool) -> (fmla -> bool) -> term -> bool
+val f_exists_trans : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 
 (* variable occurrence check *)
 
-val occurs_term : Svs.t -> term -> bool
-val occurs_fmla : Svs.t -> fmla -> bool
+val t_occurs : Svs.t -> term -> bool
+val f_occurs : Svs.t -> fmla -> bool
 
-val occurs_term_single : vsymbol -> term -> bool
-val occurs_fmla_single : vsymbol -> fmla -> bool
+val t_occurs_single : vsymbol -> term -> bool
+val f_occurs_single : vsymbol -> fmla -> bool
 
 (* substitution for variables *)
 
-val subst_term : term Mvs.t -> term -> term
-val subst_fmla : term Mvs.t -> fmla -> fmla
+val t_subst : term Mvs.t -> term -> term
+val f_subst : term Mvs.t -> fmla -> fmla
 
-val subst_term_single : term -> vsymbol -> term -> term
-val subst_fmla_single : term -> vsymbol -> fmla -> fmla
+val t_subst_single : term -> vsymbol -> term -> term
+val f_subst_single : term -> vsymbol -> fmla -> fmla
 
 (* set of free variables *)
 
-val freevars_term : term -> Svs.t
-val freevars_fmla : fmla -> Svs.t
+val t_freevars : term -> Svs.t
+val f_freevars : fmla -> Svs.t
 
 (* USE PHYSICAL EQUALITY *)
 (*
@@ -268,34 +268,34 @@ val t_equal : term -> term -> bool
 val f_equal : fmla -> fmla -> bool
 *)
 
-(* alpha-equivalence *)
+(* equality modulo alpha *)
 
-val t_alpha_equal : term -> term -> bool
-val f_alpha_equal : fmla -> fmla -> bool
+val t_equal_alpha : term -> term -> bool
+val f_equal_alpha : fmla -> fmla -> bool
 
 (* occurrence check *)
 
 val t_occurs_term : term -> term -> bool
-val t_occurs_fmla : term -> fmla -> bool
-val f_occurs_term : fmla -> term -> bool
+val f_occurs_term : term -> fmla -> bool
+val t_occurs_fmla : fmla -> term -> bool
 val f_occurs_fmla : fmla -> fmla -> bool
 
-val t_alpha_occurs_term : term -> term -> bool
-val t_alpha_occurs_fmla : term -> fmla -> bool
-val f_alpha_occurs_term : fmla -> term -> bool
-val f_alpha_occurs_fmla : fmla -> fmla -> bool
+val t_occurs_term_alpha : term -> term -> bool
+val f_occurs_term_alpha : term -> fmla -> bool
+val t_occurs_fmla_alpha : fmla -> term -> bool
+val f_occurs_fmla_alpha : fmla -> fmla -> bool
 
 (* term/fmla replacement *)
 
 val t_subst_term : term -> term -> term -> term
-val t_subst_fmla : term -> term -> fmla -> fmla
-val f_subst_term : fmla -> fmla -> term -> term
+val f_subst_term : term -> term -> fmla -> fmla
+val t_subst_fmla : fmla -> fmla -> term -> term
 val f_subst_fmla : fmla -> fmla -> fmla -> fmla
 
-val t_alpha_subst_term : term -> term -> term -> term
-val t_alpha_subst_fmla : term -> term -> fmla -> fmla
-val f_alpha_subst_term : fmla -> fmla -> term -> term
-val f_alpha_subst_fmla : fmla -> fmla -> fmla -> fmla
+val t_subst_term_alpha : term -> term -> term -> term
+val f_subst_term_alpha : term -> term -> fmla -> fmla
+val t_subst_fmla_alpha : fmla -> fmla -> term -> term
+val f_subst_fmla_alpha : fmla -> fmla -> fmla -> fmla
 
 (* term/fmla matching modulo alpha in the pattern *)
 
