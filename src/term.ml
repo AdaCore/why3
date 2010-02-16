@@ -596,11 +596,11 @@ let rec t_subst m lvl t = match t.t_node with
 
 and f_subst m lvl f = f_map_unsafe (t_subst m) (f_subst m) lvl f
 
-let t_subst_single t1 v t =
+let t_subst_single v t1 t =
   if v.vs_ty == t1.t_ty then t_subst (Mvs.add v t1 Mvs.empty) 0 t
                         else raise Ty.TypeMismatch
 
-let f_subst_single t1 v f =
+let f_subst_single v t1 f =
   if v.vs_ty == t1.t_ty then f_subst (Mvs.add v t1 Mvs.empty) 0 f
                         else raise Ty.TypeMismatch
 
@@ -788,10 +788,10 @@ and f_occurs_fmla_alpha r lvl f = f_equal_alpha r f ||
 let t_occurs_fmla_alpha r t = t_occurs_fmla_alpha r 0 t
 let f_occurs_fmla_alpha r f = f_occurs_fmla_alpha r 0 f
 
-(* substitutes term [t1] for term [t2] in term [t] *)
+(* substitutes term [t2] for term [t1] in term [t] *)
 
 let rec t_subst_term t1 t2 lvl t =
-  if t == t2 then t1 else
+  if t == t1 then t2 else
   t_map_unsafe (t_subst_term t1 t2) (f_subst_term t1 t2) lvl t
 
 and f_subst_term t1 t2 lvl f =
@@ -805,22 +805,22 @@ let f_subst_term t1 t2 f =
   if t1.t_ty == t2.t_ty then f_subst_term t1 t2 0 f
                         else raise Ty.TypeMismatch
 
-(* substitutes fmla [f1] for fmla [f2] in term [t] *)
+(* substitutes fmla [f2] for fmla [f1] in term [t] *)
 
 let rec t_subst_fmla f1 f2 lvl t =
   t_map_unsafe (t_subst_fmla f1 f2) (f_subst_fmla f1 f2) lvl t
 
 and f_subst_fmla f1 f2 lvl f =
-  if f == f2 then f1 else
+  if f == f1 then f2 else
   f_map_unsafe (t_subst_fmla f1 f2) (f_subst_fmla f1 f2) lvl f
 
 let t_subst_fmla f1 f2 t = t_subst_fmla f1 f2 0 t
 let f_subst_fmla f1 f2 f = f_subst_fmla f1 f2 0 f
 
-(* substitutes term [t1] for term [t2] in term [t] modulo alpha *)
+(* substitutes term [t2] for term [t1] in term [t] modulo alpha *)
 
 let rec t_subst_term_alpha t1 t2 lvl t =
-  if t == t2 then t1 else
+  if t == t1 then t2 else
   t_map_unsafe (t_subst_term_alpha t1 t2) (f_subst_term_alpha t1 t2) lvl t
 
 and f_subst_term_alpha t1 t2 lvl f =
@@ -834,13 +834,13 @@ let f_subst_term_alpha t1 t2 f =
   if t1.t_ty == t2.t_ty then f_subst_term_alpha t1 t2 0 f
                         else raise Ty.TypeMismatch
 
-(* substitutes fmla [f1] for fmla [f2] in term [t] modulo alpha *)
+(* substitutes fmla [f2] for fmla [f1] in term [t] modulo alpha *)
 
 let rec t_subst_fmla_alpha f1 f2 lvl t =
   t_map_unsafe (t_subst_fmla_alpha f1 f2) (f_subst_fmla_alpha f1 f2) lvl t
 
 and f_subst_fmla_alpha f1 f2 lvl f =
-  if f == f2 then f1 else
+  if f == f1 then f2 else
   f_map_unsafe (t_subst_fmla_alpha f1 f2) (f_subst_fmla_alpha f1 f2) lvl f
 
 let t_subst_fmla_alpha f1 f2 t = t_subst_fmla_alpha f1 f2 0 t

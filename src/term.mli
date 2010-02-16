@@ -252,8 +252,8 @@ val f_occurs_single : vsymbol -> fmla -> bool
 val t_subst : term Mvs.t -> term -> term
 val f_subst : term Mvs.t -> fmla -> fmla
 
-val t_subst_single : term -> vsymbol -> term -> term
-val f_subst_single : term -> vsymbol -> fmla -> fmla
+val t_subst_single : vsymbol -> term -> term -> term
+val f_subst_single : vsymbol -> term -> fmla -> fmla
 
 (* set of free variables *)
 
