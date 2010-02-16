@@ -105,6 +105,12 @@ module Ty = struct
   let ty_exists pr ty =
     try ty_fold (exists_fn pr) false ty with FoldSkip -> true
 
+  (* set of free type variables *)
+
+  let rec ty_vars acc ty = match ty.ty_node with
+    | Tyvar u -> Name.S.add u acc
+    | _ -> ty_fold ty_vars acc ty
+
   (* smart constructors *)
 
   exception BadTypeArity
@@ -660,14 +666,14 @@ let f_subst m f = let _ = Mvs.iter vt_check m in f_subst m 0 f
 
 (* set of free variables *)
 
-let rec t_freevars lvl acc t = match t.t_node with
+let rec t_vars lvl acc t = match t.t_node with
   | Tvar u -> Svs.add u acc
-  | _ -> t_fold_unsafe t_freevars f_freevars lvl acc t
+  | _ -> t_fold_unsafe t_vars f_vars lvl acc t
 
-and f_freevars lvl acc t = f_fold_unsafe t_freevars f_freevars lvl acc t
+and f_vars lvl acc t = f_fold_unsafe t_vars f_vars lvl acc t
 
-let t_freevars t = t_freevars 0 Svs.empty t
-let f_freevars f = f_freevars 0 Svs.empty f
+let t_vars s t = t_vars 0 s t
+let f_vars s f = f_vars 0 s f
 
 (* USE PHYSICAL EQUALITY *)
 (*
@@ -1017,35 +1023,32 @@ let f_app p tl =
   in
   f_app p tl
 
-let varmap_for_pattern p =
+let pat_varmap p =
   let i = ref (-1) in
-  let rec make acc p = match p.pat_node with
-    | Pwild ->
-        acc
+  let rec mk_map acc p = match p.pat_node with
     | Pvar n ->
-        assert (not (Mvs.mem n acc));
+        if Mvs.mem n acc then raise NonLinearPattern;
         incr i; Mvs.add n !i acc
-    | Papp (_, pl) ->
-        List.fold_left make acc pl
     | Pas (p, n) ->
-        assert (not (Mvs.mem n acc));
-        incr i; make (Mvs.add n !i acc) p
+        if Mvs.mem n acc then raise NonLinearPattern;
+        incr i; mk_map (Mvs.add n !i acc) p
+    | _ -> pat_fold mk_map acc p
   in
-  let m = make Mvs.empty p in
+  let m = mk_map Mvs.empty p in
   m, !i + 1
 
 let t_case t bl ty =
   let t_make_branch (p, tbr) =
     if tbr.t_ty != ty then raise Ty.TypeMismatch else
     if p.pat_ty != t.t_ty then raise Ty.TypeMismatch else
-    let m, nv = varmap_for_pattern p in (p, nv, t_abst m 0 tbr)
+    let m, nv = pat_varmap p in (p, nv, t_abst m 0 tbr)
   in
   t_case t (List.map t_make_branch bl) ty
 
 let f_case t bl =
   let f_make_branch (p, fbr) =
     if p.pat_ty != t.t_ty then raise Ty.TypeMismatch else
-    let m, nv = varmap_for_pattern p in (p, nv, f_abst m 0 fbr)
+    let m, nv = pat_varmap p in (p, nv, f_abst m 0 fbr)
   in
   f_case t (List.map f_make_branch bl)
 
@@ -1058,18 +1061,12 @@ let f_open_bound (v, f) =
   let v = fresh_vsymbol v in v, f_inst_single v f
 
 let rec pat_rename ns p = match p.pat_node with
-  | Pwild ->
-      p
-  | Pvar n ->
-      (try pat_var (Mvs.find n ns) with Not_found -> assert false)
-  | Papp (f, pl) ->
-      pat_app f (List.map (pat_rename ns) pl) p.pat_ty
-  | Pas (p, n) ->
-      pat_as (pat_rename ns p)
-        (try Mvs.find n ns with Not_found -> assert false)
+  | Pvar n -> pat_var (Mvs.find n ns)
+  | Pas (p, n) -> pat_as (pat_rename ns p) (Mvs.find n ns)
+  | _ -> pat_map_unsafe (pat_rename ns) p
 
-let substs_for_pattern pat =
-  let m, _ = varmap_for_pattern pat in
+let pat_substs pat =
+  let m, _ = pat_varmap pat in
   Mvs.fold
     (fun x i (vars, s, ns) ->
        let x' = fresh_vsymbol x in
@@ -1078,11 +1075,11 @@ let substs_for_pattern pat =
     (Svs.empty, Im.empty, Mvs.empty)
 
 let t_open_branch (pat, _, t) =
-  let vars, s, ns = substs_for_pattern pat in
+  let vars, s, ns = pat_substs pat in
   (pat_rename ns pat, vars, t_inst s 0 t)
 
 let f_open_branch (pat, _, f) =
-  let vars, s, ns = substs_for_pattern pat in
+  let vars, s, ns = pat_substs pat in
   (pat_rename ns pat, vars, f_inst s 0 f)
 
 (* safe opening map *)

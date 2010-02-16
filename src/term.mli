@@ -47,6 +47,9 @@ module Ty : sig
 
   val ty_map : (ty -> ty) -> ty -> ty
   val ty_fold : ('a -> ty -> 'a) -> 'a -> ty -> 'a
+  val ty_forall : (ty -> bool) -> ty -> bool
+  val ty_exists : (ty -> bool) -> ty -> bool
+  val ty_vars : Name.S.t -> ty -> Name.S.t
 
   val ty_match : ty -> ty -> ty Name.M.t -> ty Name.M.t option
 
@@ -113,6 +116,8 @@ val pat_as  : pattern -> vsymbol -> pattern
 
 val pat_map : (pattern -> pattern) -> pattern -> pattern
 val pat_fold : ('a -> pattern -> 'a) -> 'a -> pattern -> 'a
+val pat_forall : (pattern -> bool) -> pattern -> bool
+val pat_exists : (pattern -> bool) -> pattern -> bool
 
 val pat_equal_alpha : pattern -> pattern -> bool
 
@@ -263,8 +268,8 @@ val f_subst_single : vsymbol -> term -> fmla -> fmla
 
 (* set of free variables *)
 
-val t_freevars : term -> Svs.t
-val f_freevars : fmla -> Svs.t
+val t_vars : Svs.t -> term -> Svs.t
+val f_vars : Svs.t -> fmla -> Svs.t
 
 (* USE PHYSICAL EQUALITY *)
 (*
