@@ -49,7 +49,6 @@ module Ty : sig
   val ty_fold : ('a -> ty -> 'a) -> 'a -> ty -> 'a
   val ty_forall : (ty -> bool) -> ty -> bool
   val ty_exists : (ty -> bool) -> ty -> bool
-  val ty_vars : Name.S.t -> ty -> Name.S.t
 
   val ty_match : ty -> ty -> ty Name.M.t -> ty Name.M.t option
 
@@ -268,8 +267,8 @@ val f_subst_single : vsymbol -> term -> fmla -> fmla
 
 (* set of free variables *)
 
-val t_vars : Svs.t -> term -> Svs.t
-val f_vars : Svs.t -> fmla -> Svs.t
+val t_freevars : Svs.t -> term -> Svs.t
+val f_freevars : Svs.t -> fmla -> Svs.t
 
 (* USE PHYSICAL EQUALITY *)
 (*

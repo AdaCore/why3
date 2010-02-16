@@ -105,19 +105,30 @@ module Ty = struct
   let ty_exists pr ty =
     try ty_fold (exists_fn pr) false ty with FoldSkip -> true
 
-  (* set of free type variables *)
-
-  let rec ty_vars acc ty = match ty.ty_node with
-    | Tyvar u -> Name.S.add u acc
-    | _ -> ty_fold ty_vars acc ty
-
   (* smart constructors *)
+
+  let tv_add_unique vs tv = if Name.S.mem tv vs
+    then raise NonLinearPattern else Name.S.add tv vs
+
+  let rec tv_known vs ty = match ty.ty_node with
+    | Tyvar n -> Name.S.mem n vs
+    | _ -> ty_forall (tv_known vs) ty
+
+  let create_tysymbol name args def =
+    let tvs = List.fold_left tv_add_unique Name.S.empty args in
+    let _ = match def with
+      | Some ty -> tv_known tvs ty || raise UnboundVariable
+      | _ -> true
+    in
+    create_tysymbol name args def
 
   exception BadTypeArity
 
   let ty_app s tl =
     if List.length tl == List.length s.ts_args
       then ty_app s tl else raise BadTypeArity
+
+  (* type matching *)
 
   exception TypeMismatch
 
@@ -672,8 +683,8 @@ let rec t_vars lvl acc t = match t.t_node with
 
 and f_vars lvl acc t = f_fold_unsafe t_vars f_vars lvl acc t
 
-let t_vars s t = t_vars 0 s t
-let f_vars s f = f_vars 0 s f
+let t_freevars s t = t_vars 0 s t
+let f_freevars s f = f_vars 0 s f
 
 (* USE PHYSICAL EQUALITY *)
 (*
