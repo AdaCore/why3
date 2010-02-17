@@ -71,28 +71,21 @@ let report fmt = function
 module M = Map.Make(String)
 
 type env = {
-  tysymbols : tysymbol M.t;
-  fsymbols  : fsymbol M.t;
-  psymbols  : psymbol M.t;
-  tyvars    : tvsymbol M.t;
-  vars      : vsymbol M.t;
+  tysymbols : tysymbol M.t; (* type symbols *)
+  fsymbols  : fsymbol M.t;  (* function symbols *)
+  psymbols  : psymbol M.t;  (* predicate symbols *)
 }
 
 let empty = {
   tysymbols = M.empty;
   fsymbols  = M.empty;
   psymbols  = M.empty;
-  tyvars    = M.empty;
-  vars      = M.empty;
 }
 
 let find_tysymbol s env = M.find s env.tysymbols
 let find_fsymbol s env = M.find s env.fsymbols
 let find_psymbol s env = M.find s env.psymbols
-let find_tyvar s env = M.find s env.tyvars
-let find_var s env = M.find s env.vars
 
-let add_tyvar x v env = { env with tyvars = M.add x v env.tyvars}
 let add_tysymbol x ty env = { env with tysymbols = M.add x ty env.tysymbols }
 
 
@@ -166,15 +159,17 @@ let rec unify t1 t2 = match t1, t2 with
   | Tyvar {user=true; tag=t1}, Tyvar {user=true; tag=t2} -> 
       t1 = t2
 
-(** environment + destructive type variables environment *)
+(** Destructive typing environment, that is
+    environment + type variables (user or destructive) + local variables.
+    It is only local to this module and created with [create_denv] below. *)
 
 module Htv = Hashtbl.Make(Name)
 
 type denv = { 
   env : env;
-  utyvars : (string, type_var) Hashtbl.t; (* user type vars *)
-  dtyvars : type_var Htv.t;    (* destructive type vars *)
-  dvars : dty M.t;
+  utyvars : (string, type_var) Hashtbl.t; (* user type variables *)
+  dtyvars : type_var Htv.t;  (* destructive type variables for unification *)
+  dvars : dty M.t; (* local variables, to be bound later *)
 }
 
 let create_denv env = { 
@@ -200,7 +195,7 @@ let find_type_var tv env =
     Htv.add env.dtyvars tv v;
     v
  
-(** typing types *)
+(** Typing types *)
 
 (* parsed types -> intermediate types *)
 let rec dty env = function
@@ -229,7 +224,7 @@ let rec specialize env t = match t.Ty.ty_node with
   | Ty.Tyapp (s, tl) ->
       Tyapp (s, List.map (specialize env) tl)
 	
-(** typing terms and formulas *)
+(** Typing terms and formulas *)
 
 type dterm = { dt_node : dterm_node; dt_ty : dty }
 
@@ -372,18 +367,20 @@ and fmla env = function
       f_app s (List.map (term env) tl)
 
 
-(** building environments *)
+(** Typing declarations, that is building environments. *)
 
 open Ptree
 
 let add_type loc ext sl s env =
   if M.mem s env.tysymbols then error ~loc (ClashType s);
-  let add_ty_var env x =
-    if M.mem x env.tyvars then error ~loc (BadTypeArity x);
+  let tyvars = ref M.empty in
+  let add_ty_var x =
+    if M.mem x !tyvars then error ~loc (BadTypeArity x);
     let v = Name.from_string x in
-    add_tyvar x v env, v
+    tyvars := M.add x v !tyvars;
+    v
   in
-  let _, vl = map_fold_left add_ty_var env sl in
+  let vl = List.map add_ty_var sl in
   let ty = Ty.create_tysymbol (Name.from_string s) vl None in
   add_tysymbol s ty env
 
