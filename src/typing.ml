@@ -34,6 +34,7 @@ type error =
   | TermExpectedType of (formatter -> unit) * (formatter -> unit) 
       (* actual / expected *)
   | BadNumberOfArguments of Name.t * int * int 
+  | ClashTheory of string
 
 exception Error of error
 
@@ -65,6 +66,8 @@ let report fmt = function
   | TermExpectedType (ty1, ty2) ->
       fprintf fmt "@[This term has type "; ty1 fmt; 
       fprintf fmt "@ but is expected to have type@ "; ty2 fmt; fprintf fmt "@]"
+  | ClashTheory s ->
+      fprintf fmt "clash with previous theory %s" s
 
 (** typing environments *)
 
@@ -74,13 +77,20 @@ type env = {
   tysymbols : tysymbol M.t; (* type symbols *)
   fsymbols  : fsymbol M.t;  (* function symbols *)
   psymbols  : psymbol M.t;  (* predicate symbols *)
+  theories  : env M.t;
 }
 
 let empty = {
   tysymbols = M.empty;
   fsymbols  = M.empty;
   psymbols  = M.empty;
+  theories  = M.empty;
 }
+
+let is_empty env = 
+  M.is_empty env.tysymbols &&
+  M.is_empty env.fsymbols &&
+  M.is_empty env.psymbols
 
 let find_tysymbol s env = M.find s env.tysymbols
 let find_fsymbol s env = M.find s env.fsymbols
@@ -160,22 +170,18 @@ let rec unify t1 t2 = match t1, t2 with
       t1 = t2
 
 (** Destructive typing environment, that is
-    environment + type variables (user or destructive) + local variables.
+    environment + local variables.
     It is only local to this module and created with [create_denv] below. *)
-
-module Htv = Hashtbl.Make(Name)
 
 type denv = { 
   env : env;
   utyvars : (string, type_var) Hashtbl.t; (* user type variables *)
-  dtyvars : type_var Htv.t;  (* destructive type variables for unification *)
   dvars : dty M.t; (* local variables, to be bound later *)
 }
 
 let create_denv env = { 
   env = env; 
   utyvars = Hashtbl.create 17; 
-  dtyvars = Htv.create 17; 
   dvars = M.empty;
 }
 
@@ -185,14 +191,6 @@ let find_user_type_var x env =
   with Not_found ->
     let v = create_type_var ~user:true (Name.from_string x) in
     Hashtbl.add env.utyvars x v;
-    v
- 
-let find_type_var tv env =
-  try
-    Htv.find env.dtyvars tv
-  with Not_found ->
-    let v = create_type_var ~user:false tv in
-    Htv.add env.dtyvars tv v;
     v
  
 (** Typing types *)
@@ -218,12 +216,35 @@ let rec ty = function
   | Tyapp (s, tl) ->
       Ty.ty_app s (List.map ty tl)
 
+(* Specialize *)
+
+module Htv = Hashtbl.Make(Name)
+
+let find_type_var tv env =
+  try
+    Htv.find env tv
+  with Not_found ->
+    let v = create_type_var ~user:false tv in
+    Htv.add env tv v;
+    v
+ 
 let rec specialize env t = match t.Ty.ty_node with
   | Ty.Tyvar tv -> 
       Tyvar (find_type_var tv env)
   | Ty.Tyapp (s, tl) ->
       Tyapp (s, List.map (specialize env) tl)
 	
+let specialize_fsymbol x env =
+  let s = find_fsymbol x env.env in
+  let tl, t = s.fs_scheme in
+  let env = Htv.create 17 in
+  s, List.map (specialize env) tl, specialize env t
+
+let specialize_psymbol x env =
+  let s = find_psymbol x env.env in
+  let env = Htv.create 17 in
+  s, List.map (specialize env) s.ps_scheme
+
 (** Typing terms and formulas *)
 
 type dterm = { dt_node : dterm_node; dt_ty : dty }
@@ -253,11 +274,6 @@ let binop = function
   | PPimplies -> Fimplies
   | PPiff -> Fiff
   | _ -> assert false 
-
-let specialize_fsymbol x env =
-  let s = find_fsymbol x env.env in
-  let tl, t = s.fs_scheme in
-  s, List.map (specialize env) tl, specialize env t
 
 let rec dterm env t = 
   let n, ty = dterm_node t.pp_loc env t.pp_desc in
@@ -311,10 +327,9 @@ and dfmla env e = match e.pp_desc with
       let env = { env with dvars = M.add id ty env.dvars } in
       Fquant (Fexists, id, ty, dfmla env a)
   | PPapp (x, tl) ->
-      let s, tyl =
+      let s, tyl = 
 	try 
-	  let s = find_psymbol x env.env in
-	  s, List.map (specialize env) s.ps_scheme
+	  specialize_psymbol x env 
 	with Not_found -> 
 	  error ~loc:e.pp_loc (UnboundSymbol x)
       in
@@ -414,7 +429,7 @@ let axiom loc s f env =
   ignore (fmla env f);
   env
 
-let add env = function
+let rec add_decl env = function
   | TypeDecl (loc, ext, sl, s) ->
       add_type loc ext sl s env
   | Logic (loc, ext, ids, PPredicate pl) ->
@@ -423,5 +438,16 @@ let add env = function
       List.fold_left (add_function loc pl t) env ids
   | Axiom (loc, s, f) ->
       axiom loc s f env
+  | Theory (loc, s, u, dl) ->
+      add_theory loc s u dl env
   | _ ->
       assert false (*TODO*)
+
+and add_decls env = List.fold_left add_decl env
+
+and add_theory loc s u dl env =
+  assert (is_empty env);
+  if M.mem s env.theories then error ~loc (ClashTheory s);
+  let env = add_decls env dl in
+  { empty with theories = M.add s env env.theories }
+

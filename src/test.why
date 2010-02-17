@@ -1,34 +1,32 @@
 
 (* test file *)
 
-type 'a list 
+theory test  
 
-logic nil  : 'a list
+  type 'a list
 
-logic cons : 'a, 'a list -> 'a list
+  logic nil  : 'a list
 
-type int
+  logic cons : 'a, 'a list -> 'a list
 
-logic length : 'a list -> int
+  type int
 
-logic is_nil : 'a list -> prop
+  logic length : 'a list -> int
 
-logic eq : 'a, 'a -> prop
+  logic is_nil : 'a list -> prop
 
-axiom a : forall x : 'a. not eq(nil, cons(x, nil))
+  logic eq : 'a, 'a -> prop
 
+  axiom a : forall x : 'a. not eq(nil, cons(nil, nil))
 
+end
 
+theory test2
 
+  type elt
 
+  type t 
 
+  logic add : elt, t -> t
 
-
-
-
-
-
-
-
-
-
+end

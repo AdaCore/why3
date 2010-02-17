@@ -37,7 +37,7 @@ let () =
     Loc.set_file file lb;
     let f = Lexer.parse_logic_file lb in 
     close_in c;
-    ignore (List.fold_left Typing.add Typing.empty f)
+    ignore (Typing.add_decls Typing.empty f)
   with e ->
     eprintf "%a@." report e;
     exit 1

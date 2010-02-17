@@ -83,10 +83,12 @@
 	"ref", REF;
 	"returns", RETURNS;
 	"then", THEN;
+	"theory", THEORY;
 	"true", TRUE;
 	"try", TRY;
 	"type", TYPE;
 	"unit", UNIT;
+	"uses", USES;
 	"variant", VARIANT;
 	"void", VOID;
 	"while", WHILE;

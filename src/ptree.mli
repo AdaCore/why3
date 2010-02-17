@@ -72,6 +72,8 @@ type plogic_type =
   | PPredicate of ppure_type list
   | PFunction of ppure_type list * ppure_type
 
+type uses = string
+
 type logic_decl = 
   | Logic of loc * external_ * string list * plogic_type
   | Predicate_def of loc * string * (loc * string * ppure_type) list * lexpr
@@ -83,5 +85,6 @@ type logic_decl =
   | TypeDecl of loc * external_ * string list * string
   | AlgType of (loc * string list * string
       * (loc * string * ppure_type list) list) list
+  | Theory of loc * string * uses list * logic_decl list
 
 type logic_file = logic_decl list

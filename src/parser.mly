@@ -101,7 +101,7 @@
 %token QUOTE RAISE RAISES READS REAL REC REF RETURNS RIGHTB RIGHTBRIGHTB
 %token RIGHTPAR RIGHTSQ 
 %token SEMICOLON SLASH 
-%token THEN TIMES TRUE TRY TYPE UNIT VARIANT VOID WHILE WITH WRITES
+%token THEN THEORY TIMES TRUE TRY TYPE UNIT USES VARIANT VOID WHILE WITH WRITES
 
 /* Precedences */
 
@@ -147,6 +147,8 @@
 logic_file:
 | list1_decl EOF 
    { $1 }
+| list1_theory EOF
+   { $1 }
 | EOF 
    { [] }
 ;
@@ -156,6 +158,13 @@ list1_decl:
    { [$1] }
 | decl list1_decl 
    { $1 :: $2 }
+;
+
+list0_decl:
+| /* epsilon */
+   { [] }
+| list1_decl 
+   { $1 }
 ;
 
 decl:
@@ -176,6 +185,24 @@ decl:
    { let loc, vl, id = $3 in TypeDecl (loc, true, vl, id) }
 | TYPE typedecl typedefn
    { let loc, vl, id = $2 in $3 loc vl id }
+;
+
+list1_theory:
+| theory 
+   { [$1] }
+| theory list1_theory 
+   { $1 :: $2 }
+;
+
+theory:
+| THEORY ident uses list0_decl END { Theory (loc (), $2, $3, $4) }
+;
+
+uses:
+| /* epsilon */ 
+    { [] }
+| USES list1_ident_sep_comma
+    { $2 }
 ;
 
 typedecl:

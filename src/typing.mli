@@ -33,7 +33,8 @@ val fmla : env -> Ptree.lexpr -> fmla
 
 (** building environments *)
 
-val add : env -> Ptree.logic_decl -> env
+val add_decl : env -> Ptree.logic_decl -> env
+val add_decls : env -> Ptree.logic_decl list -> env
 
 (** error reporting *)
 
