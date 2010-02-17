@@ -36,6 +36,12 @@ type pp_infix =
 type pp_prefix = 
   PPneg | PPnot
 
+type ident = { id : string; id_loc : loc }
+
+type qualid =
+  | Qident of ident
+  | Qdot of ident * ident
+
 type ppure_type =
 (*
   | PPTint
@@ -43,26 +49,26 @@ type ppure_type =
   | PPTreal
   | PPTunit
 *)
-  | PPTvarid of string * Loc.position
-  | PPTexternal of ppure_type list * string * Loc.position
+  | PPTvarid of ident
+  | PPTexternal of ppure_type list * qualid
 
 type lexpr = 
   { pp_loc : loc; pp_desc : pp_desc }
 
 and pp_desc =
-  | PPvar of string
-  | PPapp of string * lexpr list
+  | PPvar of qualid
+  | PPapp of qualid * lexpr list
   | PPtrue
   | PPfalse
   | PPconst of constant
   | PPinfix of lexpr * pp_infix * lexpr
   | PPprefix of pp_prefix * lexpr
   | PPif of lexpr * lexpr * lexpr
-  | PPforall of string * ppure_type * lexpr list list * lexpr
-  | PPexists of string * ppure_type * lexpr
+  | PPforall of ident * ppure_type * lexpr list list * lexpr
+  | PPexists of ident * ppure_type * lexpr
   | PPnamed of string * lexpr
-  | PPlet of string * lexpr * lexpr
-  | PPmatch of lexpr * ((string * string list * loc) * lexpr) list
+  | PPlet of ident* lexpr * lexpr
+  | PPmatch of lexpr * ((qualid * ident list * loc) * lexpr) list
 
 (*s Declarations. *)
 
@@ -72,19 +78,19 @@ type plogic_type =
   | PPredicate of ppure_type list
   | PFunction of ppure_type list * ppure_type
 
-type uses = string
+type uses = ident
 
 type logic_decl = 
-  | Logic of loc * external_ * string list * plogic_type
-  | Predicate_def of loc * string * (loc * string * ppure_type) list * lexpr
-  | Inductive_def of loc * string * plogic_type * (loc * string * lexpr) list
+  | Logic of loc * external_ * ident list * plogic_type
+  | Predicate_def of loc * ident * (loc * ident * ppure_type) list * lexpr
+  | Inductive_def of loc * ident * plogic_type * (loc * ident * lexpr) list
   | Function_def 
-      of loc * string * (loc * string * ppure_type) list * ppure_type * lexpr
-  | Axiom of loc * string * lexpr
-  | Goal of loc * string * lexpr
-  | TypeDecl of loc * external_ * string list * string
-  | AlgType of (loc * string list * string
-      * (loc * string * ppure_type list) list) list
-  | Theory of loc * string * uses list * logic_decl list
+      of loc * ident * (loc * ident * ppure_type) list * ppure_type * lexpr
+  | Axiom of loc * ident * lexpr
+  | Goal of loc * ident * lexpr
+  | TypeDecl of loc * external_ * ident list * ident
+  | AlgType of (loc * ident list * ident
+      * (loc * ident * ppure_type list) list) list
+  | Theory of loc * ident * uses list * logic_decl list
 
 type logic_file = logic_decl list

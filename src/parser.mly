@@ -167,6 +167,15 @@ list0_decl:
    { $1 }
 ;
 
+ident:
+| IDENT { { id = $1; id_loc = loc () } }
+;
+
+qualid:
+| ident           { Qident $1 }
+| ident DOT ident { Qdot ($1, $3) }
+;
+
 decl:
 | external_ LOGIC list1_ident_sep_comma COLON logic_type
    { Logic (loc_i 3, $1, $3, $5) }
@@ -266,13 +275,13 @@ primitive_type:
    { PPTunit }
 */
 | type_var 
-   { PPTvarid ($1, loc ()) }
-| ident 
-   { PPTexternal ([], $1, loc ()) }
-| primitive_type ident
-   { PPTexternal ([$1], $2, loc_i 2) }
-| LEFTPAR primitive_type COMMA list1_primitive_type_sep_comma RIGHTPAR ident
-   { PPTexternal ($2 :: $4, $6, loc_i 6) }
+   { PPTvarid $1 }
+| qualid
+   { PPTexternal ([], $1) }
+| primitive_type qualid
+   { PPTexternal ([$1], $2) }
+| LEFTPAR primitive_type COMMA list1_primitive_type_sep_comma RIGHTPAR qualid
+   { PPTexternal ($2 :: $4, $6) }
 /*
 | LEFTPAR list1_primitive_type_sep_comma RIGHTPAR
    { match $2 with [p] -> p | _ -> raise Parse_error }
@@ -350,9 +359,9 @@ lexpr:
    { infix_pp $1 PPmod $3 }
 | MINUS lexpr %prec uminus
    { prefix_pp PPneg $2 }
-| ident
+| qualid
    { mk_pp (PPvar $1) }
-| ident LEFTPAR list1_lexpr_sep_comma RIGHTPAR
+| qualid LEFTPAR list1_lexpr_sep_comma RIGHTPAR
    { mk_pp (PPapp ($1, $3)) }
 /***
 | qualid_ident LEFTSQ lexpr RIGHTSQ
@@ -361,14 +370,14 @@ lexpr:
 | IF lexpr THEN lexpr ELSE lexpr %prec prec_if 
    { mk_pp (PPif ($2, $4, $6)) }
 | FORALL list1_ident_sep_comma COLON primitive_type triggers 
-  DOT lexpr %prec prec_forall
+  COMMA lexpr %prec prec_forall
    { let rec mk = function
        | [] -> assert false
        | [id] -> mk_pp (PPforall (id, $4, $5, $7))
        | id :: l -> mk_pp (PPforall (id, $4, [], mk l))
      in
      mk $2 }
-| EXISTS ident COLON primitive_type DOT lexpr %prec prec_exists
+| EXISTS ident COLON primitive_type COMMA lexpr %prec prec_exists
    { mk_pp (PPexists ($2, $4, $6)) }
 | INTEGER
    { mk_pp (PPconst (ConstInt $1)) }
@@ -402,8 +411,8 @@ match_case:
 ;
 
 pattern:
-| ident                                         { ($1, [], loc ()) }
-| ident LEFTPAR list1_ident_sep_comma RIGHTPAR  { ($1, $3, loc ()) }
+| qualid                                         { ($1, [], loc ()) }
+| qualid LEFTPAR list1_ident_sep_comma RIGHTPAR  { ($1, $3, loc ()) }
 ;
 
 triggers:
@@ -443,15 +452,13 @@ list1_type_var_sep_comma:
 | type_var COMMA list1_type_var_sep_comma { $1 :: $3 }
 ;
 
-ident:
-| IDENT { $1 }
-;
-
+/***
 qualid_ident:
 | IDENT          { $1, None }
 | IDENT AT       { $1, Some "" }
 | IDENT AT IDENT { $1, Some $3 }
 ;
+***/
 
 ident_or_string:
 | IDENT  { $1 }

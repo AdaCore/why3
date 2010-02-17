@@ -25,16 +25,17 @@ open Ptree
 type error = 
   | ClashType of string
   | BadTypeArity of string
-  | UnboundType of string
-  | TypeArity of string * int * int
+  | UnboundType of qualid
+  | TypeArity of qualid * int * int
   | Clash of string
   | PredicateExpected
   | TermExpected
-  | UnboundSymbol of string
+  | UnboundSymbol of qualid
   | TermExpectedType of (formatter -> unit) * (formatter -> unit) 
       (* actual / expected *)
   | BadNumberOfArguments of Name.t * int * int 
   | ClashTheory of string
+  | UnboundTheory of string
 
 exception Error of error
 
@@ -42,15 +43,19 @@ let error ?loc e = match loc with
   | None -> raise (Error e)
   | Some loc -> raise (Loc.Located (loc, Error e))
 
+let print_qualid fmt = function
+  | Qident s -> fprintf fmt "%s" s.id
+  | Qdot (m, s) -> fprintf fmt "%s.%s" m.id s.id
+
 let report fmt = function
   | ClashType s ->
       fprintf fmt "clash with previous type %s" s
   | BadTypeArity s ->
       fprintf fmt "duplicate type parameter %s" s
   | UnboundType s ->
-       fprintf fmt "Unbound type '%s'" s
+       fprintf fmt "Unbound type '%a'" print_qualid s
   | TypeArity (id, a, n) ->
-      fprintf fmt "@[The type %s expects %d argument(s),@ " id a;
+      fprintf fmt "@[The type %a expects %d argument(s),@ " print_qualid id a;
       fprintf fmt "but is applied to %d argument(s)@]" n
   | Clash id ->
       fprintf fmt "Clash with previous constant %s" id
@@ -59,7 +64,7 @@ let report fmt = function
   | TermExpected ->
       fprintf fmt "syntax error: term expected"
   | UnboundSymbol s ->
-       fprintf fmt "Unbound symbol '%s'" s
+       fprintf fmt "Unbound symbol '%a'" print_qualid s
   | BadNumberOfArguments (s, n, m) ->
       fprintf fmt "@[Symbol `%a' is aplied to %d terms,@ " Name.print s n;
       fprintf fmt "but is expecting %d arguments@]" m
@@ -68,6 +73,8 @@ let report fmt = function
       fprintf fmt "@ but is expected to have type@ "; ty2 fmt; fprintf fmt "@]"
   | ClashTheory s ->
       fprintf fmt "clash with previous theory %s" s
+  | UnboundTheory s ->
+      fprintf fmt "unbound theory %s" s
 
 (** typing environments *)
 
@@ -193,18 +200,70 @@ let find_user_type_var x env =
     Hashtbl.add env.utyvars x v;
     v
  
+(* Specialize *)
+
+module Htv = Hashtbl.Make(Name)
+
+let find_type_var env tv =
+  try
+    Htv.find env tv
+  with Not_found ->
+    let v = create_type_var ~user:false tv in
+    Htv.add env tv v;
+    v
+ 
+let rec specialize env t = match t.Ty.ty_node with
+  | Ty.Tyvar tv -> 
+      Tyvar (find_type_var env tv)
+  | Ty.Tyapp (s, tl) ->
+      Tyapp (s, List.map (specialize env) tl)
+
+let find_theory t env =
+  try M.find t.id env.theories
+  with Not_found -> error ~loc:t.id_loc (UnboundTheory t.id)
+
+let find f q env = match q with
+  | Qident x -> 
+      f x.id env
+  | Qdot (m, x) -> 
+      let env = find_theory m env in
+      f x.id env
+
+let specialize_tysymbol x env =
+  let s = find find_tysymbol x env.env in
+  let env = Htv.create 17 in
+  s, List.map (find_type_var env) s.Ty.ts_args
+	
+let specialize_fsymbol x env =
+  let s = find find_fsymbol x env.env in
+  let tl, t = s.fs_scheme in
+  let env = Htv.create 17 in
+  s, List.map (specialize env) tl, specialize env t
+
+let specialize_psymbol x env =
+  let s = find find_psymbol x env.env in
+  let env = Htv.create 17 in
+  s, List.map (specialize env) s.ps_scheme
+
 (** Typing types *)
+
+let qloc = function
+  | Qident x -> x.id_loc
+  | Qdot (m, x) -> Loc.join m.id_loc x.id_loc
 
 (* parsed types -> intermediate types *)
 let rec dty env = function
-  | PPTvarid (x, _) -> 
+  | PPTvarid {id=x} -> 
       Tyvar (find_user_type_var x env)
-  | PPTexternal (p, id, loc) ->
-      if not (M.mem id env.env.tysymbols) then error ~loc (UnboundType id);
-      let s = M.find id env.env.tysymbols in
+  | PPTexternal (p, x) ->
+      let loc = qloc x in
+      let s, tv = 
+	try specialize_tysymbol x env
+	with Not_found -> error ~loc:loc (UnboundType x);
+      in
       let np = List.length p in
-      let a = List.length s.Ty.ts_args in
-      if np <> a then error ~loc (TypeArity (id, a, np));
+      let a = List.length tv in
+      if np <> a then error ~loc (TypeArity (x, a, np));
       Tyapp (s, List.map (dty env) p)
 
 (* intermediate types -> types *)
@@ -215,35 +274,6 @@ let rec ty = function
       Ty.ty_var tv
   | Tyapp (s, tl) ->
       Ty.ty_app s (List.map ty tl)
-
-(* Specialize *)
-
-module Htv = Hashtbl.Make(Name)
-
-let find_type_var tv env =
-  try
-    Htv.find env tv
-  with Not_found ->
-    let v = create_type_var ~user:false tv in
-    Htv.add env tv v;
-    v
- 
-let rec specialize env t = match t.Ty.ty_node with
-  | Ty.Tyvar tv -> 
-      Tyvar (find_type_var tv env)
-  | Ty.Tyapp (s, tl) ->
-      Tyapp (s, List.map (specialize env) tl)
-	
-let specialize_fsymbol x env =
-  let s = find_fsymbol x env.env in
-  let tl, t = s.fs_scheme in
-  let env = Htv.create 17 in
-  s, List.map (specialize env) tl, specialize env t
-
-let specialize_psymbol x env =
-  let s = find_psymbol x env.env in
-  let env = Htv.create 17 in
-  s, List.map (specialize env) s.ps_scheme
 
 (** Typing terms and formulas *)
 
@@ -280,13 +310,13 @@ let rec dterm env t =
   { dt_node = n; dt_ty = ty }
 
 and dterm_node loc env = function
-  | PPvar x ->
-      begin try
-	(* local variable *)
-	let ty = M.find x env.dvars in
-	Tvar x, ty
-      with Not_found -> try 
-	(* 0-arity symbol (constant) *)
+  | PPvar (Qident {id=x}) when M.mem x env.dvars ->
+      (* local variable *)
+      let ty = M.find x env.dvars in
+      Tvar x, ty
+  | PPvar x -> 
+      (* 0-arity symbol (constant) *)
+      begin try 
 	let s, tyl, ty = specialize_fsymbol x env in
 	let n = List.length tyl in
 	if n > 0 then error ~loc (BadNumberOfArguments (s.fs_name, 0, n));
@@ -318,14 +348,14 @@ and dfmla env e = match e.pp_desc with
       error ~loc:e.pp_loc PredicateExpected
   | PPif (a, b, c) ->
       Fif (dfmla env a, dfmla env b, dfmla env c)  
-  | PPforall (id, ty, _, a) -> (* TODO: triggers *)
+  | PPforall ({id=x}, ty, _, a) -> (* TODO: triggers *)
       let ty = dty env ty in
-      let env = { env with dvars = M.add id ty env.dvars } in
-      Fquant (Fforall, id, ty, dfmla env a)
-  | PPexists (id, ty, a) -> (* TODO: triggers *)
+      let env = { env with dvars = M.add x ty env.dvars } in
+      Fquant (Fforall, x, ty, dfmla env a)
+  | PPexists ({id=x}, ty, a) -> (* TODO: triggers *)
       let ty = dty env ty in
-      let env = { env with dvars = M.add id ty env.dvars } in
-      Fquant (Fexists, id, ty, dfmla env a)
+      let env = { env with dvars = M.add x ty env.dvars } in
+      Fquant (Fexists, x, ty, dfmla env a)
   | PPapp (x, tl) ->
       let s, tyl = 
 	try 
@@ -387,19 +417,19 @@ and fmla env = function
 open Ptree
 
 let add_type loc ext sl s env =
-  if M.mem s env.tysymbols then error ~loc (ClashType s);
+  if M.mem s.id env.tysymbols then error ~loc (ClashType s.id);
   let tyvars = ref M.empty in
-  let add_ty_var x =
+  let add_ty_var {id=x} =
     if M.mem x !tyvars then error ~loc (BadTypeArity x);
     let v = Name.from_string x in
     tyvars := M.add x v !tyvars;
     v
   in
   let vl = List.map add_ty_var sl in
-  let ty = Ty.create_tysymbol (Name.from_string s) vl None in
-  add_tysymbol s ty env
+  let ty = Ty.create_tysymbol (Name.from_string s.id) vl None in
+  add_tysymbol s.id ty env
 
-let add_function loc pl t env id =
+let add_function loc pl t env {id=id} =
   if M.mem id env.fsymbols then error ~loc (Clash id);
   let denv = create_denv env in
   let pl = List.map (dty denv) pl and t = dty denv t in
@@ -407,7 +437,7 @@ let add_function loc pl t env id =
   let s = create_fsymbol (Name.from_string id) (pl, t) false in
   { env with fsymbols = M.add id s env.fsymbols }
 
-let add_predicate loc pl env id =
+let add_predicate loc pl env {id=id} =
   if M.mem id env.psymbols then error ~loc (Clash id);
   let denv = create_denv env in
   let pl = List.map (dty denv) pl in
@@ -447,7 +477,12 @@ and add_decls env = List.fold_left add_decl env
 
 and add_theory loc s u dl env =
   assert (is_empty env);
-  if M.mem s env.theories then error ~loc (ClashTheory s);
+  if M.mem s.id env.theories then error ~loc:s.id_loc (ClashTheory s.id);
   let env = add_decls env dl in
-  { empty with theories = M.add s env env.theories }
+  { empty with theories = M.add s.id env env.theories }
 
+(*
+Local Variables: 
+compile-command: "make -C .. test"
+End: 
+*)

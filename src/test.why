@@ -1,7 +1,13 @@
 
 (* test file *)
 
-theory test  
+theory int
+
+  type int
+
+end
+
+theory list
 
   type 'a list
 
@@ -9,24 +15,40 @@ theory test
 
   logic cons : 'a, 'a list -> 'a list
 
-  type int
-
-  logic length : 'a list -> int
-
   logic is_nil : 'a list -> prop
 
-  logic eq : 'a, 'a -> prop
-
-  axiom a : forall x : 'a. not eq(nil, cons(nil, nil))
+  logic length : 'a list -> int.int
 
 end
 
-theory test2
+theory eq 
+
+  logic eq : 'a, 'a -> prop
+
+end
+
+theory set
 
   type elt
 
   type t 
 
+  logic In : elt, t -> prop
+
+  logic empty : t
+
+  axiom empty_def1 : forall x:elt, not In(x, empty)
+
   logic add : elt, t -> t
 
+  axiom add_def1 : forall x,y:elt, forall s:t, 
+                   In(x, add(y, s)) <-> (eq.eq(x, y) or In(x, s))
+
 end
+
+theory test
+
+ axiom a : forall x : 'a, not eq.eq(list.nil, list.cons(list.nil, list.nil))
+
+end
+
