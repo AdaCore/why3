@@ -1,0 +1,12 @@
+
+syntaxe
+-------
+
+  - le point (.) dans les noms qualifiés introduit un conflit dans la syntaxe 
+    de forall/exists 	
+
+		forall x : a. b
+		forall x : a.b: c
+
+    -> changement temporaire de syntaxe pour forall / exists : virgule
+       plutôt que point
