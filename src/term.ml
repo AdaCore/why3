@@ -21,8 +21,7 @@ exception FoldSkip
 let forall_fn pr _ t = pr t || raise FoldSkip
 let exists_fn pr _ t = pr t && raise FoldSkip
 
-exception NonLinearPattern
-exception UnboundVariable
+exception NonLinear
 
 (** Types *)
 
@@ -107,26 +106,37 @@ module Ty = struct
 
   (* smart constructors *)
 
-  let tv_add_unique vs tv = if Name.S.mem tv vs
-    then raise NonLinearPattern else Name.S.add tv vs
+  exception UnboundTypeVariable
 
   let rec tv_known vs ty = match ty.ty_node with
     | Tyvar n -> Name.S.mem n vs
     | _ -> ty_forall (tv_known vs) ty
 
   let create_tysymbol name args def =
-    let tvs = List.fold_left tv_add_unique Name.S.empty args in
+    let add s v = if Name.S.mem v s
+        then raise NonLinear else Name.S.add v s in
+    let s = List.fold_left add Name.S.empty args in
     let _ = match def with
-      | Some ty -> tv_known tvs ty || raise UnboundVariable
+      | Some ty -> tv_known s ty || raise UnboundTypeVariable
       | _ -> true
     in
     create_tysymbol name args def
 
   exception BadTypeArity
 
+  let rec tv_inst m ty = match ty.ty_node with
+    | Tyvar n -> Name.M.find n m
+    | _ -> ty_map (tv_inst m) ty
+
   let ty_app s tl =
     if List.length tl == List.length s.ts_args
-      then ty_app s tl else raise BadTypeArity
+    then match s.ts_def with
+      | Some ty ->
+          let add m v t = Name.M.add v t m in
+          tv_inst (List.fold_left2 add Name.M.empty s.ts_args tl) ty
+      | _ ->
+          ty_app s tl
+    else raise BadTypeArity
 
   (* type matching *)
 
@@ -223,7 +233,7 @@ module Hps = Hashcons.Make(Psym)
 let mk_ps name scheme = { ps_name = name; ps_scheme = scheme; ps_tag = -1 }
 let create_psymbol name scheme = Hps.hashcons (mk_ps name scheme)
 
-(** Hpats *)
+(** Patterns *)
 
 type pattern = {
   pat_node : pattern_node;
@@ -1038,10 +1048,10 @@ let pat_varmap p =
   let i = ref (-1) in
   let rec mk_map acc p = match p.pat_node with
     | Pvar n ->
-        if Mvs.mem n acc then raise NonLinearPattern;
+        if Mvs.mem n acc then raise NonLinear;
         incr i; Mvs.add n !i acc
     | Pas (p, n) ->
-        if Mvs.mem n acc then raise NonLinearPattern;
+        if Mvs.mem n acc then raise NonLinear;
         incr i; mk_map (Mvs.add n !i acc) p
     | _ -> pat_fold mk_map acc p
   in
