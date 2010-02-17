@@ -204,7 +204,8 @@ list1_theory:
 ;
 
 theory:
-| THEORY ident uses list0_decl END { Theory (loc (), $2, $3, $4) }
+| THEORY ident uses list0_decl END 
+   { Theory ({ th_loc = loc (); th_name = $2; th_uses = $3; th_decl = $4 }) }
 ;
 
 uses:

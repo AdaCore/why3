@@ -9,6 +9,8 @@ end
 
 theory list
 
+  uses int
+
   type 'a list
 
   logic nil  : 'a list
@@ -29,6 +31,8 @@ end
 
 theory set
 
+  uses eq
+
   type elt
 
   type t 
@@ -48,7 +52,9 @@ end
 
 theory test
 
- axiom a : forall x : 'a, not eq.eq(list.nil, list.cons(list.nil, list.nil))
+  uses eq, list
+
+  axiom a : forall x : 'a, not eq.eq(list.nil, list.cons(list.nil, list.nil))
 
 end
 

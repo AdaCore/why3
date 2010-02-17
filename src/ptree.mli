@@ -80,7 +80,14 @@ type plogic_type =
 
 type uses = ident
 
-type logic_decl = 
+type theory = {
+  th_loc  : loc;
+  th_name : ident;
+  th_uses : uses list;
+  th_decl : logic_decl list;
+}
+
+and logic_decl = 
   | Logic of loc * external_ * ident list * plogic_type
   | Predicate_def of loc * ident * (loc * ident * ppure_type) list * lexpr
   | Inductive_def of loc * ident * plogic_type * (loc * ident * lexpr) list
@@ -91,6 +98,6 @@ type logic_decl =
   | TypeDecl of loc * external_ * ident list * ident
   | AlgType of (loc * ident list * ident
       * (loc * ident * ppure_type list) list) list
-  | Theory of loc * ident * uses list * logic_decl list
+  | Theory of theory
 
 type logic_file = logic_decl list

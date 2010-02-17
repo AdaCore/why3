@@ -84,7 +84,7 @@ type env = {
   tysymbols : tysymbol M.t; (* type symbols *)
   fsymbols  : fsymbol M.t;  (* function symbols *)
   psymbols  : psymbol M.t;  (* predicate symbols *)
-  theories  : env M.t;
+  theories  : env M.t;      (* theories introduced with uses *)
 }
 
 let empty = {
@@ -105,6 +105,14 @@ let find_psymbol s env = M.find s env.psymbols
 
 let add_tysymbol x ty env = { env with tysymbols = M.add x ty env.tysymbols }
 
+let loaded_theories = Hashtbl.create 17
+
+let add_global_theory env t =
+  try
+    let th = Hashtbl.find loaded_theories t.id in
+    { env with theories = M.add t.id th env.theories }
+  with Not_found ->
+    error ~loc:t.id_loc (UnboundTheory t.id)
 
 (** typing using destructive type variables 
 
@@ -218,7 +226,7 @@ let rec specialize env t = match t.Ty.ty_node with
   | Ty.Tyapp (s, tl) ->
       Tyapp (s, List.map (specialize env) tl)
 
-let find_theory t env =
+let find_local_theory t env =
   try M.find t.id env.theories
   with Not_found -> error ~loc:t.id_loc (UnboundTheory t.id)
 
@@ -226,7 +234,7 @@ let find f q env = match q with
   | Qident x -> 
       f x.id env
   | Qdot (m, x) -> 
-      let env = find_theory m env in
+      let env = find_local_theory m env in
       f x.id env
 
 let specialize_tysymbol x env =
@@ -280,7 +288,6 @@ let rec ty = function
 type dterm = { dt_node : dterm_node; dt_ty : dty }
 
 and dterm_node =
-  | Tbvar of int
   | Tvar of string
   | Tapp of fsymbol * dterm list
   | Tlet of dterm * string * dterm
@@ -392,6 +399,8 @@ let rec term env t = match t.dt_node with
       t_var (M.find x env)
   | Tapp (s, tl) ->
       t_app s (List.map (term env) tl) (ty t.dt_ty)
+  | _ ->
+      assert false (* TODO *)
 
 and fmla env = function
   | Ftrue ->
@@ -468,18 +477,20 @@ let rec add_decl env = function
       List.fold_left (add_function loc pl t) env ids
   | Axiom (loc, s, f) ->
       axiom loc s f env
-  | Theory (loc, s, u, dl) ->
-      add_theory loc s u dl env
+  | Theory th ->
+      add_theory th env
   | _ ->
       assert false (*TODO*)
 
 and add_decls env = List.fold_left add_decl env
 
-and add_theory loc s u dl env =
-  assert (is_empty env);
-  if M.mem s.id env.theories then error ~loc:s.id_loc (ClashTheory s.id);
-  let env = add_decls env dl in
-  { empty with theories = M.add s.id env env.theories }
+and add_theory th env =
+  let id = th.th_name.id in
+  if M.mem id env.theories then error ~loc:th.th_loc (ClashTheory id);
+  let th_env = List.fold_left add_global_theory empty th.th_uses in
+  let th_env = add_decls th_env th.th_decl in
+  Hashtbl.add loaded_theories id th_env;
+  env
 
 (*
 Local Variables: 
