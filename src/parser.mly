@@ -208,6 +208,8 @@ decl:
    { let loc, vl, id = $3 in TypeDecl (loc, true, vl, id) }
 | TYPE typedecl typedefn
    { let loc, vl, id = $2 in $3 loc vl id }
+| USES list1_ident_sep_comma
+   { Uses (loc (), $2) }
 ;
 
 list1_theory:
@@ -218,15 +220,8 @@ list1_theory:
 ;
 
 theory:
-| THEORY ident uses list0_decl END 
-   { Theory ({ th_loc = loc (); th_name = $2; th_uses = $3; th_decl = $4 }) }
-;
-
-uses:
-| /* epsilon */ 
-    { [] }
-| USES list1_ident_sep_comma
-    { $2 }
+| THEORY ident list0_decl END 
+   { Theory ({ th_loc = loc (); th_name = $2; th_decl = $3 }) }
 ;
 
 typedecl:
@@ -385,14 +380,14 @@ lexpr:
 | IF lexpr THEN lexpr ELSE lexpr %prec prec_if 
    { mk_pp (PPif ($2, $4, $6)) }
 | FORALL list1_ident_sep_comma COLON primitive_type triggers 
-  COMMA lexpr %prec prec_forall
+  DOT lexpr %prec prec_forall
    { let rec mk = function
        | [] -> assert false
        | [id] -> mk_pp (PPforall (id, $4, $5, $7))
        | id :: l -> mk_pp (PPforall (id, $4, [], mk l))
      in
      mk $2 }
-| EXISTS ident COLON primitive_type COMMA lexpr %prec prec_exists
+| EXISTS ident COLON primitive_type DOT lexpr %prec prec_exists
    { mk_pp (PPexists ($2, $4, $6)) }
 | INTEGER
    { mk_pp (PPconst (ConstInt $1)) }

@@ -2,14 +2,7 @@
 syntaxe
 -------
 
-  - le point (.) dans les noms qualifiés introduit un conflit dans la syntaxe 
-    de forall/exists 	
-
-		forall x : a. b
-		forall x : a.b: c
-
-    -> changement temporaire de syntaxe pour forall / exists : virgule
-       plutôt que point
+  - open
 
 
 sémantique
@@ -17,3 +10,7 @@ sémantique
  
   - uses : pour l'instant, l'ordre des théories dans le fichier est important 
     i.e. les théories mentionnées par uses doivent être définies précédemment
+
+  - open (et échouer si "open A" et "open B" avec A et B déclarant un symbole 
+    de même nom)
+

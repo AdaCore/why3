@@ -83,7 +83,6 @@ type uses = ident
 type theory = {
   th_loc  : loc;
   th_name : ident;
-  th_uses : uses list;
   th_decl : logic_decl list;
 }
 
@@ -99,5 +98,7 @@ and logic_decl =
   | AlgType of (loc * ident list * ident
       * (loc * ident * ppure_type list) list) list
   | Theory of theory
+  | Uses of loc * uses list
+
 
 type logic_file = logic_decl list

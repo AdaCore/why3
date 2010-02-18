@@ -483,6 +483,8 @@ let rec add_decl env = function
       axiom loc s f env
   | Theory th ->
       add_theory th env
+  | Uses (loc, uses) ->
+      List.fold_left add_global_theory env uses
   | _ ->
       assert false (*TODO*)
 
@@ -491,8 +493,7 @@ and add_decls env = List.fold_left add_decl env
 and add_theory th env =
   let id = th.th_name.id in
   if M.mem id env.theories then error ~loc:th.th_loc (ClashTheory id);
-  let th_env = List.fold_left add_global_theory empty th.th_uses in
-  let th_env = add_decls th_env th.th_decl in
+  let th_env = add_decls empty th.th_decl in
   Hashtbl.add loaded_theories id th_env;
   env
 
