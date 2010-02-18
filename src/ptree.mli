@@ -40,7 +40,7 @@ type ident = { id : string; id_loc : loc }
 
 type qualid =
   | Qident of ident
-  | Qdot of ident * ident
+  | Qdot of qualid * ident
 
 type ppure_type =
 (*

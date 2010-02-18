@@ -22,9 +22,9 @@ type env
 
 val empty : env
 
-val find_tysymbol : string -> env -> tysymbol
-val find_fsymbol : string -> env -> fsymbol
-val find_psymbol : string -> env -> psymbol
+val find_tysymbol : Ptree.ident -> env -> tysymbol
+val find_fsymbol : Ptree.ident -> env -> fsymbol
+val find_psymbol : Ptree.ident -> env -> psymbol
 
 (** typing *)
 

@@ -87,7 +87,7 @@
 
 /* Tokens */ 
 
-%token <string> IDENT
+%token <string> LIDENT UIDENT
 %token <string> INTEGER
 %token <Ptree.real_constant> FLOAT
 %token <string> STRING
@@ -168,12 +168,26 @@ list0_decl:
 ;
 
 ident:
-| IDENT { { id = $1; id_loc = loc () } }
+| LIDENT { { id = $1; id_loc = loc () } }
+| UIDENT { { id = $1; id_loc = loc () } }
 ;
 
-qualid:
-| ident           { Qident $1 }
-| ident DOT ident { Qdot ($1, $3) }
+lident:
+| LIDENT { { id = $1; id_loc = loc () } }
+;
+
+uident:
+| UIDENT { { id = $1; id_loc = loc () } }
+;
+
+lqualid:
+| lident             { Qident $1 }
+| uqualid DOT lident { Qdot ($1, $3) }
+;
+
+uqualid:
+| uident             { Qident $1 }
+| uqualid DOT uident { Qdot ($1, $3) }
 ;
 
 decl:
@@ -277,11 +291,11 @@ primitive_type:
 */
 | type_var 
    { PPTvarid $1 }
-| qualid
+| lqualid
    { PPTexternal ([], $1) }
-| primitive_type qualid
+| primitive_type lqualid
    { PPTexternal ([$1], $2) }
-| LEFTPAR primitive_type COMMA list1_primitive_type_sep_comma RIGHTPAR qualid
+| LEFTPAR primitive_type COMMA list1_primitive_type_sep_comma RIGHTPAR lqualid
    { PPTexternal ($2 :: $4, $6) }
 /*
 | LEFTPAR list1_primitive_type_sep_comma RIGHTPAR
@@ -360,9 +374,9 @@ lexpr:
    { infix_pp $1 PPmod $3 }
 | MINUS lexpr %prec uminus
    { prefix_pp PPneg $2 }
-| qualid
+| lqualid
    { mk_pp (PPvar $1) }
-| qualid LEFTPAR list1_lexpr_sep_comma RIGHTPAR
+| lqualid LEFTPAR list1_lexpr_sep_comma RIGHTPAR
    { mk_pp (PPapp ($1, $3)) }
 /***
 | qualid_ident LEFTSQ lexpr RIGHTSQ
@@ -412,8 +426,8 @@ match_case:
 ;
 
 pattern:
-| qualid                                         { ($1, [], loc ()) }
-| qualid LEFTPAR list1_ident_sep_comma RIGHTPAR  { ($1, $3, loc ()) }
+| uqualid                                         { ($1, [], loc ()) }
+| uqualid LEFTPAR list1_ident_sep_comma RIGHTPAR  { ($1, $3, loc ()) }
 ;
 
 triggers:
@@ -462,7 +476,7 @@ qualid_ident:
 ***/
 
 ident_or_string:
-| IDENT  { $1 }
+| ident  { $1.id }
 | STRING { $1 }
 ;
 

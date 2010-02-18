@@ -127,10 +127,12 @@
 
 let newline = '\n'
 let space = [' ' '\t' '\r']
-let alpha = ['a'-'z' 'A'-'Z']
-let letter = alpha | '_'
+let lalpha = ['a'-'z' '_']
+let ualpha = ['A'-'Z']
+let alpha = lalpha | ualpha
 let digit = ['0'-'9']
-let ident = letter (letter | digit | '\'')*
+let lident = lalpha (alpha | digit | '\'')*
+let uident = ualpha (alpha | digit | '\'')*
 let hexadigit = ['0'-'9' 'a'-'f' 'A'-'F']
 (*
 let hexafloat = '0' ['x' 'X'] (hexadigit* '.' hexadigit+ | hexadigit+ '.' hexadigit* ) ['p' 'P'] ['-' '+']? digit+
@@ -144,8 +146,10 @@ rule token = parse
       { newline lexbuf; token lexbuf }
   | space+  
       { token lexbuf }
-  | ident as id  
-      { try Hashtbl.find keywords id with Not_found -> IDENT id }
+  | lident as id  
+      { try Hashtbl.find keywords id with Not_found -> LIDENT id }
+  | uident as id  
+      { UIDENT id }
   | digit+ as s
       { INTEGER s }
   | (digit+ as i) ("" as f) ['e' 'E'] (['-' '+']? digit+ as e)

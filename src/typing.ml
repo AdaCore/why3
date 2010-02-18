@@ -23,6 +23,7 @@ open Ptree
 (** errors *)
 
 type error = 
+  | Message of string
   | ClashType of string
   | BadTypeArity of string
   | UnboundType of qualid
@@ -43,11 +44,13 @@ let error ?loc e = match loc with
   | None -> raise (Error e)
   | Some loc -> raise (Loc.Located (loc, Error e))
 
-let print_qualid fmt = function
+let rec print_qualid fmt = function
   | Qident s -> fprintf fmt "%s" s.id
-  | Qdot (m, s) -> fprintf fmt "%s.%s" m.id s.id
+  | Qdot (m, s) -> fprintf fmt "%a.%s" print_qualid m s.id
 
 let report fmt = function
+  | Message s ->
+      fprintf fmt "%s" s
   | ClashType s ->
       fprintf fmt "clash with previous type %s" s
   | BadTypeArity s ->
@@ -99,9 +102,9 @@ let is_empty env =
   M.is_empty env.fsymbols &&
   M.is_empty env.psymbols
 
-let find_tysymbol s env = M.find s env.tysymbols
-let find_fsymbol s env = M.find s env.fsymbols
-let find_psymbol s env = M.find s env.psymbols
+let find_tysymbol s env = M.find s.id env.tysymbols
+let find_fsymbol s env = M.find s.id env.fsymbols
+let find_psymbol s env = M.find s.id env.psymbols
 
 let add_tysymbol x ty env = { env with tysymbols = M.add x ty env.tysymbols }
 
@@ -226,16 +229,17 @@ let rec specialize env t = match t.Ty.ty_node with
   | Ty.Tyapp (s, tl) ->
       Tyapp (s, List.map (specialize env) tl)
 
-let find_local_theory t env =
+let find_local_theory t env = 
   try M.find t.id env.theories
   with Not_found -> error ~loc:t.id_loc (UnboundTheory t.id)
 
-let find f q env = match q with
-  | Qident x -> 
-      f x.id env
-  | Qdot (m, x) -> 
-      let env = find_local_theory m env in
-      f x.id env
+let rec find_theory q env = match q with
+  | Qident t -> find_local_theory t env
+  | Qdot (q, t) -> let env = find_theory q env in find_local_theory t env
+
+let rec find f q env = match q with
+  | Qident x -> f x env
+  | Qdot (m, x) -> let env = find_theory m env in f x env
 
 let specialize_tysymbol x env =
   let s = find find_tysymbol x env.env in
@@ -255,9 +259,9 @@ let specialize_psymbol x env =
 
 (** Typing types *)
 
-let qloc = function
+let rec qloc = function
   | Qident x -> x.id_loc
-  | Qdot (m, x) -> Loc.join m.id_loc x.id_loc
+  | Qdot (m, x) -> Loc.join (qloc m) x.id_loc
 
 (* parsed types -> intermediate types *)
 let rec dty env = function
@@ -267,7 +271,7 @@ let rec dty env = function
       let loc = qloc x in
       let s, tv = 
 	try specialize_tysymbol x env
-	with Not_found -> error ~loc:loc (UnboundType x);
+	with Not_found -> error ~loc:loc (UnboundType x)
       in
       let np = List.length p in
       let a = List.length tv in
