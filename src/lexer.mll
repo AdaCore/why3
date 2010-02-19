@@ -146,6 +146,8 @@ rule token = parse
       { newline lexbuf; token lexbuf }
   | space+  
       { token lexbuf }
+  | '_'
+      { UNDERSCORE }
   | lident as id  
       { try Hashtbl.find keywords id with Not_found -> LIDENT id }
   | uident as id  
