@@ -42,15 +42,9 @@ type qualid =
   | Qident of ident
   | Qdot of qualid * ident
 
-type ppure_type =
-(*
-  | PPTint
-  | PPTbool
-  | PPTreal
-  | PPTunit
-*)
-  | PPTvarid of ident
-  | PPTexternal of ppure_type list * qualid
+type pty =
+  | PPTtyvar of ident
+  | PPTtyapp of pty list * qualid
 
 type lexpr = 
   { pp_loc : loc; pp_desc : pp_desc }
@@ -64,19 +58,17 @@ and pp_desc =
   | PPinfix of lexpr * pp_infix * lexpr
   | PPprefix of pp_prefix * lexpr
   | PPif of lexpr * lexpr * lexpr
-  | PPforall of ident * ppure_type * lexpr list list * lexpr
-  | PPexists of ident * ppure_type * lexpr
+  | PPforall of ident * pty * lexpr list list * lexpr
+  | PPexists of ident * pty * lexpr
   | PPnamed of string * lexpr
   | PPlet of ident* lexpr * lexpr
   | PPmatch of lexpr * ((qualid * ident list * loc) * lexpr) list
 
 (*s Declarations. *)
 
-type external_ = bool
-
 type plogic_type =
-  | PPredicate of ppure_type list
-  | PFunction of ppure_type list * ppure_type
+  | PPredicate of pty list
+  | PFunction of pty list * pty
 
 type uses = ident
 
@@ -87,16 +79,14 @@ type theory = {
 }
 
 and logic_decl = 
-  | Logic of loc * external_ * ident list * plogic_type
-  | Predicate_def of loc * ident * (loc * ident * ppure_type) list * lexpr
+  | Logic of loc * ident list * plogic_type
+  | Predicate_def of loc * ident * (loc * ident * pty) list * lexpr
   | Inductive_def of loc * ident * plogic_type * (loc * ident * lexpr) list
-  | Function_def 
-      of loc * ident * (loc * ident * ppure_type) list * ppure_type * lexpr
+  | Function_def of loc * ident * (loc * ident * pty) list * pty * lexpr
   | Axiom of loc * ident * lexpr
   | Goal of loc * ident * lexpr
-  | TypeDecl of loc * external_ * ident list * ident
-  | AlgType of (loc * ident list * ident
-      * (loc * ident * ppure_type list) list) list
+  | TypeDecl of loc * ident list * ident
+  | AlgType of (loc * ident list * ident * (loc * ident * pty list) list) list
   | Theory of theory
   | Uses of loc * uses list
 

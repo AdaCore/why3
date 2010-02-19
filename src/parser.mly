@@ -191,24 +191,24 @@ uqualid:
 ;
 
 decl:
-| external_ LOGIC list1_ident_sep_comma COLON logic_type
-   { Logic (loc_i 3, $1, $3, $5) }
+| LOGIC list1_lident_sep_comma COLON logic_type
+   { Logic (loc_i 3, $2, $4) }
 | AXIOM ident COLON lexpr
    { Axiom (loc (), $2, $4) }
-| PREDICATE ident LEFTPAR list0_logic_binder_sep_comma RIGHTPAR EQUAL lexpr
+| PREDICATE lident LEFTPAR list0_logic_binder_sep_comma RIGHTPAR EQUAL lexpr
    { Predicate_def (loc (), $2, $4, $7) }
-| INDUCTIVE ident COLON logic_type inddefn
+| INDUCTIVE lident COLON logic_type inddefn
    { Inductive_def (loc (), $2, $4, $5) }
-| FUNCTION ident LEFTPAR list0_logic_binder_sep_comma RIGHTPAR COLON 
+| FUNCTION lident LEFTPAR list0_logic_binder_sep_comma RIGHTPAR COLON 
   primitive_type EQUAL lexpr
    { Function_def (loc (), $2, $4, $7, $9) }
 | GOAL ident COLON lexpr
    { Goal (loc (), $2, $4) }
-| EXTERNAL TYPE typedecl
-   { let loc, vl, id = $3 in TypeDecl (loc, true, vl, id) }
+| TYPE typedecl
+   { let loc, vl, id = $2 in TypeDecl (loc, vl, id) }
 | TYPE typedecl typedefn
    { let loc, vl, id = $2 in $3 loc vl id }
-| USES list1_ident_sep_comma
+| USES list1_uident_sep_comma
    { Uses (loc (), $2) }
 ;
 
@@ -220,22 +220,22 @@ list1_theory:
 ;
 
 theory:
-| THEORY ident list0_decl END 
+| THEORY uident list0_decl END 
    { Theory ({ th_loc = loc (); th_name = $2; th_decl = $3 }) }
 ;
 
 typedecl:
-| ident
+| lident
     { (loc_i 1, [], $1) }
-| type_var ident
+| type_var lident
     { (loc_i 2, [$1], $2) }
-| LEFTPAR type_var COMMA list1_type_var_sep_comma RIGHTPAR ident
+| LEFTPAR type_var COMMA list1_type_var_sep_comma RIGHTPAR lident
     { (loc_i 6, $2 :: $4, $6) }
 ;
 
 typedefn:
 | /* epsilon */
-    { fun loc vl id -> TypeDecl (loc, false, vl, id) }
+    { fun loc vl id -> TypeDecl (loc, vl, id) }
 | EQUAL bar_ typecases typecont
     { fun loc vl id -> AlgType ((loc, vl, id, $3) :: $4) }
 ;
@@ -285,13 +285,13 @@ primitive_type:
    { PPTunit }
 */
 | type_var 
-   { PPTvarid $1 }
+   { PPTtyvar $1 }
 | lqualid
-   { PPTexternal ([], $1) }
+   { PPTtyapp ([], $1) }
 | primitive_type lqualid
-   { PPTexternal ([$1], $2) }
+   { PPTtyapp ([$1], $2) }
 | LEFTPAR primitive_type COMMA list1_primitive_type_sep_comma RIGHTPAR lqualid
-   { PPTexternal ($2 :: $4, $6) }
+   { PPTtyapp ($2 :: $4, $6) }
 /*
 | LEFTPAR list1_primitive_type_sep_comma RIGHTPAR
    { match $2 with [p] -> p | _ -> raise Parse_error }
@@ -331,7 +331,7 @@ list1_logic_binder_sep_comma:
 ;
 
 logic_binder:
-| ident COLON primitive_type       
+| lident COLON primitive_type       
     { (loc_i 1, $1, $3) }
 /***
 | ident COLON primitive_type ARRAY 
@@ -379,7 +379,7 @@ lexpr:
 ***/
 | IF lexpr THEN lexpr ELSE lexpr %prec prec_if 
    { mk_pp (PPif ($2, $4, $6)) }
-| FORALL list1_ident_sep_comma COLON primitive_type triggers 
+| FORALL list1_lident_sep_comma COLON primitive_type triggers 
   DOT lexpr %prec prec_forall
    { let rec mk = function
        | [] -> assert false
@@ -387,7 +387,7 @@ lexpr:
        | id :: l -> mk_pp (PPforall (id, $4, [], mk l))
      in
      mk $2 }
-| EXISTS ident COLON primitive_type DOT lexpr %prec prec_exists
+| EXISTS lident COLON primitive_type DOT lexpr %prec prec_exists
    { mk_pp (PPexists ($2, $4, $6)) }
 | INTEGER
    { mk_pp (PPconst (ConstInt $1)) }
@@ -405,7 +405,7 @@ lexpr:
    { $2 }
 | ident_or_string COLON lexpr %prec prec_named
    { mk_pp (PPnamed ($1, $3)) }
-| LET ident EQUAL lexpr IN lexpr 
+| LET lident EQUAL lexpr IN lexpr 
    { mk_pp (PPlet ($2, $4, $6)) }
 | MATCH lexpr WITH bar_ match_cases END
    { mk_pp (PPmatch ($2, $5)) }
@@ -483,6 +483,16 @@ bar_:
 list1_ident_sep_comma:
 | ident                             { [$1] }
 | ident COMMA list1_ident_sep_comma { $1 :: $3 }
+;
+
+list1_lident_sep_comma:
+| lident                              { [$1] }
+| lident COMMA list1_lident_sep_comma { $1 :: $3 }
+;
+
+list1_uident_sep_comma:
+| uident                             { [$1] }
+| uident COMMA list1_uident_sep_comma { $1 :: $3 }
 ;
 
 /******* programs **************************************************

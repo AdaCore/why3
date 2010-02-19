@@ -265,9 +265,9 @@ let rec qloc = function
 
 (* parsed types -> intermediate types *)
 let rec dty env = function
-  | PPTvarid {id=x} -> 
+  | PPTtyvar {id=x} -> 
       Tyvar (find_user_type_var x env)
-  | PPTexternal (p, x) ->
+  | PPTtyapp (p, x) ->
       let loc = qloc x in
       let s, tv = 
 	try specialize_tysymbol x env
@@ -429,7 +429,7 @@ and fmla env = function
 
 open Ptree
 
-let add_type loc ext sl s env =
+let add_type loc sl s env =
   if M.mem s.id env.tysymbols then error ~loc (ClashType s.id);
   let tyvars = ref M.empty in
   let add_ty_var {id=x} =
@@ -473,11 +473,11 @@ let axiom loc s f env =
   env
 
 let rec add_decl env = function
-  | TypeDecl (loc, ext, sl, s) ->
-      add_type loc ext sl s env
-  | Logic (loc, ext, ids, PPredicate pl) ->
+  | TypeDecl (loc, sl, s) ->
+      add_type loc sl s env
+  | Logic (loc, ids, PPredicate pl) ->
       List.fold_left (add_predicate loc pl) env ids
-  | Logic (loc, ext, ids, PFunction (pl, t)) ->
+  | Logic (loc, ids, PFunction (pl, t)) ->
       List.fold_left (add_function loc pl t) env ids
   | Axiom (loc, s, f) ->
       axiom loc s f env
