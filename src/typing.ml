@@ -90,7 +90,7 @@ type env = {
   tysymbols : tysymbol M.t; (* type symbols *)
   fsymbols  : fsymbol M.t;  (* function symbols *)
   psymbols  : psymbol M.t;  (* predicate symbols *)
-  theories  : env M.t;      (* theories introduced *)
+  theories  : env M.t;      (* theories (including "self") *)
 }
 
 let empty = {
@@ -100,18 +100,30 @@ let empty = {
   theories  = M.empty;
 }
 
-let is_empty env = 
-  M.is_empty env.tysymbols &&
-  M.is_empty env.fsymbols &&
-  M.is_empty env.psymbols
-
 let find_tysymbol s env = M.find s.id env.tysymbols
 let find_fsymbol s env = M.find s.id env.fsymbols
 let find_psymbol s env = M.find s.id env.psymbols
 
-let add_tysymbol x ty env = { env with tysymbols = M.add x ty env.tysymbols }
-
 let loaded_theories = Hashtbl.create 17
+
+let add_tysymbol x ty env = { env with tysymbols = M.add x ty env.tysymbols }
+let add_fsymbol x ty env = { env with fsymbols = M.add x ty env.fsymbols }
+let add_psymbol x ty env = { env with psymbols = M.add x ty env.psymbols }
+let add_theory x t env = { env with theories = M.add x t env.theories }
+
+let self_id = "(*self*)"
+
+let add_self f ?(self=true) x v env = 
+  if self then
+    f x v { env with theories = 
+        M.add self_id (f x v (M.find self_id env.theories)) env.theories }
+  else 
+    f x v env
+
+let add_tysymbol = add_self add_tysymbol
+let add_fsymbol  = add_self add_fsymbol
+let add_psymbol  = add_self add_psymbol
+let add_theory   = add_self add_theory
 
 (** typing using destructive type variables 
 
@@ -448,7 +460,7 @@ let add_function loc pl t env {id=id} =
   let pl = List.map (dty denv) pl and t = dty denv t in
   let pl = List.map ty pl and t = ty t in
   let s = create_fsymbol (Name.from_string id) (pl, t) false in
-  { env with fsymbols = M.add id s env.fsymbols }
+  add_fsymbol id s env
 
 let add_predicate loc pl env {id=id} =
   if M.mem id env.psymbols then error ~loc (Clash id);
@@ -456,7 +468,7 @@ let add_predicate loc pl env {id=id} =
   let pl = List.map (dty denv) pl in
   let pl = List.map ty pl in
   let s = create_psymbol (Name.from_string id) pl in
-  { env with psymbols = M.add id s env.psymbols }
+  add_psymbol id s env
 
 let fmla env f =
   let denv = create_denv env in
@@ -483,12 +495,17 @@ let uses_theory env (as_t, q) =
   let id, th = find_theory q in
   let id = match as_t with None -> id | Some x -> x.id in
   if M.mem id env.theories then error ~loc (AlreadyTheory id);
-  { env with theories = M.add id th env.theories }
+  add_theory id th env
 
 let open_theory t env =
   let loc = t.id_loc and id = t.id in
   if not (M.mem id env.theories) then error ~loc (UnboundTheory id);
-  assert false (*TODO*)
+  let th = M.find id env.theories in
+  let open_map m1 m2 = M.fold M.add m1 m2 in
+  { tysymbols = open_map th.tysymbols env.tysymbols;
+    fsymbols  = open_map th.fsymbols  env.fsymbols;
+    psymbols  = open_map th.psymbols  env.psymbols;
+    theories  = open_map th.theories  env.theories }
 
 let rec add_decl env = function
   | TypeDecl (loc, sl, s) ->
@@ -518,8 +535,9 @@ and add_decls env = List.fold_left add_decl env
 and add_theory th env =
   let id = th.th_name.id in
   if Hashtbl.mem loaded_theories id then error ~loc:th.th_loc (ClashTheory id);
-  let th_env = add_decls empty th.th_decl in
-  Hashtbl.add loaded_theories id th_env;
+  let th_env = { empty with theories = M.add self_id empty M.empty } in
+  let th_env = add_decls th_env th.th_decl in
+  Hashtbl.add loaded_theories id (M.find self_id th_env.theories);
   env
 
 (*

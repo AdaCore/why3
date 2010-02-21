@@ -2,28 +2,26 @@
 (* test file *)
 
 theory A
-
   type t
   logic c:t
-
 end
 
 theory B
   uses A
-  logic d : A.t
-  logic p : A.t -> prop
+  open A
+  logic d : t
+  logic p : t -> prop
 end
 
 theory C
-  uses B, T:B.A 
-  logic e : B.A.t
+  uses B
+  uses T:B.A 
+  logic e : T.t
   axiom test : B.p(T.c)
 end
 
 theory Int
-
   type int
-
 end
 
 theory List
@@ -36,9 +34,10 @@ theory List
 
   logic is_nil : 'a list -> prop
 
-  uses Int
-
-  logic length : 'a list -> Int.int
+  uses Int 
+  open Int
+  
+  logic length : 'a list -> int
 
 end
 
@@ -72,8 +71,8 @@ end
 theory Test
 
   uses Eq, L : List
-
-  axiom a : forall x : 'a. not Eq.eq(L.nil, L.cons(L.nil, L.nil))
+  open L
+  axiom a : forall x : 'a. not Eq.eq(nil, cons(nil, nil))
 
 end
 
