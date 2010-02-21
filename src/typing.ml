@@ -37,6 +37,7 @@ type error =
   | BadNumberOfArguments of Name.t * int * int 
   | ClashTheory of string
   | UnboundTheory of string
+  | AlreadyTheory of string
 
 exception Error of error
 
@@ -78,6 +79,8 @@ let report fmt = function
       fprintf fmt "clash with previous theory %s" s
   | UnboundTheory s ->
       fprintf fmt "unbound theory %s" s
+  | AlreadyTheory s ->
+      fprintf fmt "already using a theory with name %s" s
 
 (** typing environments *)
 
@@ -87,7 +90,7 @@ type env = {
   tysymbols : tysymbol M.t; (* type symbols *)
   fsymbols  : fsymbol M.t;  (* function symbols *)
   psymbols  : psymbol M.t;  (* predicate symbols *)
-  theories  : env M.t;      (* theories introduced with uses *)
+  theories  : env M.t;      (* theories introduced *)
 }
 
 let empty = {
@@ -109,13 +112,6 @@ let find_psymbol s env = M.find s.id env.psymbols
 let add_tysymbol x ty env = { env with tysymbols = M.add x ty env.tysymbols }
 
 let loaded_theories = Hashtbl.create 17
-
-let add_global_theory env t =
-  try
-    let th = Hashtbl.find loaded_theories t.id in
-    { env with theories = M.add t.id th env.theories }
-  with Not_found ->
-    error ~loc:t.id_loc (UnboundTheory t.id)
 
 (** typing using destructive type variables 
 
@@ -231,6 +227,10 @@ let rec specialize env t = match t.Ty.ty_node with
 
 let find_local_theory t env = 
   try M.find t.id env.theories
+  with Not_found -> error ~loc:t.id_loc (UnboundTheory t.id)
+
+let find_global_theory t =
+  try Hashtbl.find loaded_theories t.id
   with Not_found -> error ~loc:t.id_loc (UnboundTheory t.id)
 
 let rec find_theory q env = match q with
@@ -472,6 +472,24 @@ let axiom loc s f env =
   ignore (fmla env f);
   env
 
+let uses_theory env (as_t, q) =
+  let loc = qloc q in
+  let rec find_theory q = match q with
+    | Qident t -> 
+	t.id, find_global_theory t
+    | Qdot (q, t) -> 
+	let _, env = find_theory q in t.id, find_local_theory t env
+  in
+  let id, th = find_theory q in
+  let id = match as_t with None -> id | Some x -> x.id in
+  if M.mem id env.theories then error ~loc (AlreadyTheory id);
+  { env with theories = M.add id th env.theories }
+
+let open_theory t env =
+  let loc = t.id_loc and id = t.id in
+  if not (M.mem id env.theories) then error ~loc (UnboundTheory id);
+  assert false (*TODO*)
+
 let rec add_decl env = function
   | TypeDecl (loc, sl, s) ->
       add_type loc sl s env
@@ -484,15 +502,22 @@ let rec add_decl env = function
   | Theory th ->
       add_theory th env
   | Uses (loc, uses) ->
-      List.fold_left add_global_theory env uses
-  | _ ->
+      List.fold_left uses_theory env uses
+  | Open id ->
+      open_theory id env
+  | AlgType _ 
+  | Goal _ 
+  | Function_def _ 
+  | Predicate_def _ 
+  | Inductive_def _ ->
       assert false (*TODO*)
+
 
 and add_decls env = List.fold_left add_decl env
 
 and add_theory th env =
   let id = th.th_name.id in
-  if M.mem id env.theories then error ~loc:th.th_loc (ClashTheory id);
+  if Hashtbl.mem loaded_theories id then error ~loc:th.th_loc (ClashTheory id);
   let th_env = add_decls empty th.th_decl in
   Hashtbl.add loaded_theories id th_env;
   env

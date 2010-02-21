@@ -70,7 +70,7 @@ type plogic_type =
   | PPredicate of pty list
   | PFunction of pty list * pty
 
-type uses = ident
+type uses = ident option * qualid
 
 type theory = {
   th_loc  : loc;
@@ -89,6 +89,6 @@ and logic_decl =
   | AlgType of (loc * ident list * ident * (loc * ident * pty list) list) list
   | Theory of theory
   | Uses of loc * uses list
-
+  | Open of ident
 
 type logic_file = logic_decl list

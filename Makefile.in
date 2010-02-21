@@ -150,10 +150,8 @@ bin/gwhy.byte: $(GCMO)
 
 WHYVO=lib/coq/Why.vo
 
-bench:: $(BINARY) $(WHYVO)
+bench:: $(BINARY) 
 	cd bench; sh ./bench "../$(BINARY)"
-	make -C bench fastwp.bench.ergo
-	make -C examples ergo
 
 # installation
 ##############

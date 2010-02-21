@@ -71,6 +71,7 @@
 	"match", MATCH;
 	"not", NOT;
 	"of", OF;
+	"open", OPEN;
 	"or", OR;
 	"parameter", PARAMETER;
 	"predicate", PREDICATE;

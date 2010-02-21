@@ -9,18 +9,15 @@ theory A
 end
 
 theory B
-
   uses A
-
   logic d : A.t
   logic p : A.t -> prop
-
 end
 
 theory C
-  uses B
+  uses B, T:B.A 
   logic e : B.A.t
-  axiom test : B.p(B.A.c)
+  axiom test : B.p(T.c)
 end
 
 theory Int
@@ -74,9 +71,9 @@ end
 
 theory Test
 
-  uses Eq, List
+  uses Eq, L : List
 
-  axiom a : forall x : 'a. not Eq.eq(List.nil, List.cons(List.nil, List.nil))
+  axiom a : forall x : 'a. not Eq.eq(L.nil, L.cons(L.nil, L.nil))
 
 end
 

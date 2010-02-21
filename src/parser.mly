@@ -97,7 +97,7 @@
 %token EXCEPTION EXISTS EXTERNAL FALSE FOR FORALL FPI FUN FUNCTION GE GOAL GT
 %token IF IN INCLUDE INDUCTIVE INT INVARIANT
 %token LE LEFTB LEFTBLEFTB LEFTPAR LEFTSQ LET LOGIC LRARROW LT MATCH MINUS
-%token NOT NOTEQ OF OR PARAMETER PERCENT PLUS PREDICATE PROP 
+%token NOT NOTEQ OF OPEN OR PARAMETER PERCENT PLUS PREDICATE PROP 
 %token QUOTE RAISE RAISES READS REAL REC REF RETURNS RIGHTB RIGHTBRIGHTB
 %token RIGHTPAR RIGHTSQ 
 %token SEMICOLON SLASH 
@@ -205,12 +205,12 @@ decl:
    { Function_def (loc (), $2, $4, $7, $9) }
 | GOAL ident COLON lexpr
    { Goal (loc (), $2, $4) }
-| TYPE typedecl
-   { let loc, vl, id = $2 in TypeDecl (loc, vl, id) }
 | TYPE typedecl typedefn
    { let loc, vl, id = $2 in $3 loc vl id }
-| USES list1_uident_sep_comma
+| USES list1_uses_sep_comma
    { Uses (loc (), $2) }
+| OPEN uident
+   { Open $2 }
 ;
 
 list1_theory:
@@ -491,9 +491,14 @@ list1_lident_sep_comma:
 | lident COMMA list1_lident_sep_comma { $1 :: $3 }
 ;
 
-list1_uident_sep_comma:
-| uident                             { [$1] }
-| uident COMMA list1_uident_sep_comma { $1 :: $3 }
+list1_uses_sep_comma:
+| uses                            { [$1] }
+| uses COMMA list1_uses_sep_comma { $1 :: $3 }
+;
+
+uses:
+| uqualid              { None, $1 }
+| uident COLON uqualid { Some $1, $3 }
 ;
 
 /******* programs **************************************************

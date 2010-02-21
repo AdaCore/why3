@@ -16,7 +16,7 @@
 
 open Term
 
-(** typing environments *)
+(** Typing environments *)
 
 type env
 

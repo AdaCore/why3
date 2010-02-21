@@ -16,7 +16,17 @@
 
 open Format
 
-let file = Sys.argv.(1)
+let files = ref []
+let parse_only = ref false
+let type_only = ref false
+
+let () = 
+  Arg.parse 
+    ["--parse-only", Arg.Set parse_only, "stops after parsing";
+     "--type-only", Arg.Set type_only, "stops after type-checking";
+    ]
+    (fun f -> files := f :: !files)
+    "usage: why [options] files..."
 
 let rec report fmt = function
   | Lexer.Error e ->
@@ -30,14 +40,17 @@ let rec report fmt = function
   | e ->
       fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
+let type_file env file =
+  let c = open_in file in
+  let lb = Lexing.from_channel c in
+  Loc.set_file file lb;
+  let f = Lexer.parse_logic_file lb in 
+  close_in c;
+  if !parse_only then env else Typing.add_decls env f
+
 let () =
   try
-    let c = open_in file in
-    let lb = Lexing.from_channel c in
-    Loc.set_file file lb;
-    let f = Lexer.parse_logic_file lb in 
-    close_in c;
-    ignore (Typing.add_decls Typing.empty f)
+    ignore (List.fold_left type_file Typing.empty !files)
   with e ->
     eprintf "%a@." report e;
     exit 1
