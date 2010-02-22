@@ -1,0 +1,150 @@
+
+\newtheorem{example}{Example}[chapter]
+
+% common Why title page
+
+\newcommand{\whytitlepage}[4]{%
+\begin{titlepage}
+\begin{center}
+~\vfill
+\rule\textwidth{0.1cm}\\[0.5cm]
+\begin{Huge}\sffamily
+#1 % title
+\end{Huge}
+\\[1cm]
+\begin{Large}\sffamily
+#2
+\end{Large}
+\\[0.1cm]
+\rule\textwidth{0.1cm}\\[1cm]
+Version #3\\[3cm]
+#4
+\vfill
+\today\\
+INRIA Team-Project \emph{Proval} \url{http://proval.lri.fr} \\
+INRIA Saclay - \^Ile-de-France \& LRI, CNRS UMR 8623\\ 
+4, rue Jacques Monod, 91893 Orsay cedex, France
+\end{center}
+\end{titlepage}}
+
+\newcommand{\why}{\textsf{Why}}
+\newcommand{\Why}{\why}
+\newcommand{\java}{\textsc{Java}\index{Java@\textsf{Java}}}
+\newcommand{\Java}{\java}
+\newcommand{\krakatoa}{\textsf{Krakatoa}\index{Krakatoa@\textsf{Krakatoa}}}
+\newcommand{\Krakatoa}{\krakatoa}
+\newcommand{\caduceus}{\textsf{Caduceus}\index{Caduceus@\textsf{Caduceus}}}
+\newcommand{\Caduceus}{\caduceus}
+\newcommand{\coq}{\textsf{Coq}\index{Coq@\textsf{Coq}}}
+\newcommand{\Coq}{\coq}
+\newcommand{\pvs}{\textsf{PVS}\index{PVS@\textsf{PVS}}}
+
+%
+
+\newcommand{\kw}[1]{\ensuremath{\mathsf{#1}}}
+
+% types
+\newcommand{\bool}{\kw{bool}}
+\newcommand{\unit}{\kw{unit}}
+%\newcommand{\tref}[1]{\ensuremath{#1~\kw{ref}}}
+\newcommand{\tref}[1]{\ensuremath{#1~\mathsf{ref}}}
+\newcommand{\tarray}[2]{\ensuremath{\kw{array}~#1~\kw{of}~#2}}
+
+% constructs
+\newcommand{\prepost}[3]{\ensuremath{\{#1\}\,#2\,\{#3\}}}
+\newcommand{\result}{\ensuremath{\mathit{result}}}
+
+\newcommand{\void}{\kw{void}}
+\newcommand{\access}[1]{\ensuremath{!#1}}
+\newcommand{\assign}[2]{\ensuremath{#1~:=~#2}}
+\newcommand{\pref}[1]{\ensuremath{\kw{ref}~#1}}
+\newcommand{\taccess}[2]{\ensuremath{#1\texttt{[}#2\texttt{]}}}
+\newcommand{\tassign}[3]{\ensuremath{#1\texttt{[}#2\texttt{]}~\texttt{:=}~#3}}
+\newcommand{\faccess}[2]{\ensuremath{(\mathit{access}~#1~#2)}}
+\newcommand{\fupdate}[3]{\ensuremath{(\mathit{update}~#1~#2~#3)}}
+%\newcommand{\taccess}[2]{\ensuremath{#1[#2]}}
+%\newcommand{\tassign}[3]{\ensuremath{#1[#2]~:=~#3}}
+%\newcommand{\faccess}[2]{\ensuremath{(\mathit{access}~#1~#2)}}
+%\newcommand{\fupdate}[3]{\ensuremath{(\mathit{update}~#1~#2~#3)}}
+% \newcommand{\block}[1]{\ensuremath{\kw{begin}~#1~\kw{end}}}
+\newcommand{\seq}[2]{\ensuremath{#1;~#2}}
+%\newcommand{\plabel}[2]{\ensuremath{#1:#2}}
+\newcommand{\plabel}[2]{\ensuremath{#1\texttt{:}#2}}
+\newcommand{\assert}[2]{\ensuremath{\kw{assert}~\{#1\};~#2}}
+\newcommand{\while}[4]{\ensuremath{\kw{while}~#1~\kw{do}~\{\kw{invariant}~#2~\kw{variant}~#3\}~#4~\kw{done}}}
+\newcommand{\ite}[3]{\ensuremath{\kw{if}~#1~\kw{then}~#2~\kw{else}~#3}}
+\newcommand{\fun}[3]{\ensuremath{\kw{fun}~#1:#2\rightarrow#3}}
+\newcommand{\app}[2]{\ensuremath{(#1~#2)}}
+\newcommand{\rec}[4]{\ensuremath{\kw{rec}~#1:#2~\{\kw{variant}~#3\}=#4}}
+\newcommand{\letin}[3]{\ensuremath{\kw{let}~#1=#2~\kw{in}~#3}}
+\newcommand{\raisex}[2]{\ensuremath{\kw{raise}~(#1~#2)}}
+\newcommand{\exn}[1]{\ensuremath{\kw{Exn}~#1}}
+\newcommand{\try}[2]{\ensuremath{\kw{try}~#1~\kw{with}~#2~\kw{end}}}
+\newcommand{\coerce}[2]{\ensuremath{(#1:#2)}}
+
+\newcommand{\statement}{\textit{statement}}
+\newcommand{\program}{\textit{program}}
+\newcommand{\expression}{\textit{expression}}
+\newcommand{\predicate}{\textit{predicate}}
+
+% inference rules
+\newcommand{\espacev}{\rule{0in}{1em}}
+\newcommand{\espacevn}{\rule[-0.4em]{0in}{1em}}
+\newcommand{\irule}[2]
+  {\frac{\espacevn\displaystyle#1}{\espacev\displaystyle#2}}
+\newcommand{\typage}[3]{#1 \, \vdash \, #2 : #3}
+\newcommand{\iname}[1]{\textsf{#1}}
+
+\newcommand{\emptyef}{\bot}
+\newcommand{\wf}[1]{#1~\kw{wf}}
+\newcommand{\pur}[1]{#1~\kw{pure}}
+\newcommand{\variant}[1]{#1~\kw{variant}}
+
+\newcommand{\wpre}[2]{\ensuremath{\mathit{wp}(#1,#2)}}
+\newcommand{\wprx}[3]{\ensuremath{\mathit{wp}(#1,#2,#3)}}
+
+\newcommand{\barre}[1]{\ensuremath{\overline{#1}}}
+
+
+% backslash keywords
+
+\newcommand{\ttkw}[1]{\texttt{#1}}
+\newcommand{\bskw}[1]{\ttkw{\char'134 #1}}
+\newcommand{\bkw}[1]{\ttkw{\textbf{#1}}}
+
+
+\newcommand{\caml}{\textsf{Caml}}
+\newcommand{\ergo}{\textsf{Ergo}\index{Ergo@\textsf{Ergo}}}
+\newcommand{\yices}{\textsf{Yices}\index{Yices@\textsf{Yices}}}
+\newcommand{\harvey}{\textsf{haRVey}\index{haRVey@\textsf{haRVey}}}
+\newcommand{\simplify}{\textsf{Simplify}\index{Simplify@\textsf{Simplify}}}
+\newcommand{\mizar}{\textsf{Mizar}\index{Mizar@\textsf{Mizar}}}
+\newcommand{\hollight}{\textsf{HOL Light}\index{HOL Light@\textsf{HOL Light}}}
+\newcommand{\isabelle}{\textsf{Isabelle/HOL}\index{Isabelle/HOL@\textsf{Isabelle/HOL}}}
+\newcommand{\holfour}{\textsf{HOL 4}\index{HOL 4@\textsf{HOL 4}}}
+\newcommand{\cvclite}{\textsf{CVC Lite}\index{CVC Lite@\textsf{CVC Lite}}}
+\newcommand{\cvcthree}{\textsf{CVC 3}\index{CVC 3@\textsf{CVC 3}}}
+\newcommand{\zenon}{\textsf{Zenon}\index{Zenon@\textsf{Zenon}}}
+\newcommand{\jml}{\textsc{JML}\index{JML@\textsf{JML}}}
+\newcommand{\caveat}{\paragraph{Caveat.}}
+\newcommand{\caveats}{\paragraph{Caveats.}}
+
+% BNF syntax
+
+\newenvironment{syntax}{\begin{tabular}{lrll}}{\end{tabular}}
+\newcommand{\te}[1]{\texttt{#1}}
+\newcommand{\nt}[1]{$\langle$\textsl{#1}$\rangle$}
+\newcommand{\indexnt}[1]{\index{#1@\textsl{#1}, grammar entry}}
+\newcommand{\indextt}[1]{\index{#1@\texttt{#1}}}
+\newcommand{\repstar}{$^{\star}$}
+\newcommand{\repstarsep}[1]{$^{\star}_#1$}
+\newcommand{\repplus}{$^+$}
+\newcommand{\repplussep}[1]{$^+_#1$}
+\newcommand{\orelse}{$\mid$}
+\newcommand{\is}{ & $::=$ &}
+\newcommand{\newl}{ \\ & $|$ &}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "doc"
+%%% End: 

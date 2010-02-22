@@ -1,0 +1,1160 @@
+\documentclass[a4paper,12pt]{report}
+
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage{makeidx}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\input{./version.tex}
+\input{./macros.tex}
+
+\makeindex
+
+\begin{document}
+
+%%% coverpage
+\whytitlepage{The WHY verification tool}{Tutorial and Reference
+  Manual}{\whyversion}{Team-Project ProVal}
+
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter*{Foreword}
+\addcontentsline{toc}{chapter}{Foreword}
+
+
+
+\subsection*{License}
+
+The \why\ tool is \copyright\ 2002--2010 team-project ProVal
+(\url{proval.lri.fr}).
+It is open source and freely available under the terms of the Gnu
+Library General Public License Version 2.1 (see the file
+\texttt{LICENSE} included in the distribution).
+
+\subsection*{Availability}
+
+The \why\ tool is available from \url{http://why.lri.fr/}, in source
+and binary formats, together with this documentation and many
+examples.
+
+
+\subsection*{Contact}
+
+There is a mailing list for \why;
+see \url{http://lists.lri.fr/mailman/listinfo/why}.
+
+% TODO BTS
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Syntax of input files}
+\label{syntax}
+
+\section{Lexical conventions}
+
+Comments are opened with \texttt{(*}, closed
+with \texttt{*)} and can be nested.
+
+Identifiers are made of letters, digits,
+the underscore character \texttt{\_} and the single quote \texttt{'},
+starting with a letter. In many cases, identifiers starting with
+lowercase or uppercase characters are distinguished.
+
+\begin{center}\framebox{\begin{syntax}
+  \nt{lident}\indexnt{lident}
+      \is \te{a}..\te{z} \nt{ident\_char}\repstar \\
+  \nt{uident}\indexnt{uident}
+      \is \te{A}..\te{Z} \nt{ident\_char}\repstar \\
+  \nt{ident\_char} 
+      \is \te{A}..\te{Z} \orelse \te{a}..\te{z} \orelse
+      \te{0}..\te{9} \orelse \te{\_} \orelse \te{'} \\[0.1em]
+  \nt{ident} 
+      \is \nt{lident} \orelse\ \nt{uident}
+\end{syntax}}\end{center}
+
+Keywords are the following:
+\begin{center}
+{\tt\begin{tabular}{l@{\qquad}l@{\qquad}l@{\qquad}l@{\qquad}l}
+        absurd &
+	and &
+        array &
+	as &
+	assert \\
+	axiom &
+	begin &
+        bool &
+	do &
+	done \\
+        else &
+	end &
+	exception &
+	exists &
+	external \\
+        false &
+	for &
+	forall &
+	fun &
+	function \\
+	goal &
+	if &
+	in &
+	int &
+	invariant \\
+%	label &
+	let &
+	logic &
+	not &
+	of \\
+	or &
+	parameter &
+	predicate &
+	prop &
+	raise \\
+	raises &
+	reads &
+	real &
+	rec &
+	ref \\
+	returns &
+	then &
+	true &
+	try &
+	type \\
+	unit &
+	variant &
+	void &
+	while &
+	with \\
+        writes &
+\end{tabular}}
+\end{center}
+
+\section{Grammar}
+
+\subsection{Qualified names}
+
+\begin{center}\framebox{\begin{syntax}
+  \nt{lqualid} \is 
+\end{syntax}}\end{center}
+
+\subsection{Terms}
+
+
+\begin{figure}[htbp]
+\begin{center}
+\hrulefill\\
+\begin{tabular}{lrl}
+  \nt{term}\indexnt{term}
+    \is   \nt{constant} 
+    \newl \nt{term} \nt{arith\_op} \nt{term} \\
+      & $|$ & \te{-} \nt{term} \\
+      & $|$ & \nt{lab\_identifier} \\
+      & $|$ & \nt{identifier} \te{(} \nt{term}\repplussep{\te{,}} \te{)} \\
+      & $|$ & \nt{lab\_identifier} \te{[} \nt{term} \te{]} \\
+      & $|$ & \te{if} \nt{term} \te{then} \nt{term} \te{else} \nt{term} \\
+      & $|$ & \te{let} \nt{identifier} \te{=} \nt{term} \te{in} \nt{term} \\
+      & $|$ & \te{(} \nt{term} \te{)} \\
+  \\[0.1em]
+
+  \nt{constant}\indexnt{constant}
+    & $::=$ & \nt{integer-constant} \\
+      & $|$ & \nt{real-constant} \\
+\end{tabular}\\
+\hrulefill
+\caption{Syntax of terms}
+\label{fig:terms}
+\end{center}            
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\hrulefill\\
+\begin{tabular}{lrl}
+  \nt{predicate}\indexnt{predicate}
+    & $::=$ & \te{true} \\
+      & $|$ & \te{false} \\
+      & $|$ & \nt{identifier} \\
+      & $|$ & \nt{identifier} \te{(} \nt{term}\repplussep{\te{,}} \te{)} \\
+      & $|$ & \nt{term} \nt{relation} \nt{term} 
+              $[$ \nt{relation} \nt{term} $]$ \\
+      & $|$ & \nt{predicate} \te{->} \nt{predicate} \\
+      & $|$ & \nt{predicate} \te{<->} \nt{predicate} \\
+      & $|$ & \nt{predicate} \te{or} \nt{predicate} \\
+      & $|$ & \nt{predicate} \te{and} \nt{predicate} \\
+      & $|$ & \te{not} \nt{predicate} \\
+      & $|$ & \te{if} \nt{term} \te{then} \nt{predicate} 
+              \te{else} \nt{predicate} \\
+      & $|$ & \te{let} \nt{identifier} \te{=} \nt{term} 
+              \te{in} \nt{predicate} \\
+      & $|$ & \te{forall} \nt{identifier}\repplussep{\te{,}}
+              \te{:} \nt{primitive\_type} $[$ \nt{triggers} $]$
+              \te{.} \nt{predicate} \\
+      & $|$ & \te{exists} \nt{identifier}\repplussep{\te{,}}
+              \te{:} \nt{primitive\_type}
+              \te{.} \nt{predicate} \\
+      & $|$ & \te{(} \nt{predicate} \te{)} \\
+      & $|$ & (\nt{identifier} $|$ \nt{string}) \te{:} \nt{predicate} \\
+  \\[0.1em]
+ 
+  \nt{triggers}
+    & $::=$ & \te{[} \nt{trigger}\repplussep{\te{|}} \te{]} \\
+  \nt{trigger}
+    & $::=$ & \nt{term}\repplussep{\te{,}} \\
+  \\[0.1em]
+
+  \nt{primitive\_type}\indexnt{primitive\_type}
+    & $::=$ & \te{int} $|$ \te{bool} $|$ \te{real} $|$ 
+              \te{unit} $|$ \nt{identifier} $|$ \te{'} \nt{identifier} \\
+    & $|$ & \nt{primitive\_type} \nt{identifier} $|$ \te{(}
+    \nt{primitive\_type}\repstarsep{\te{,}} \te{)} \nt{identifier} \\
+  \\[0.1em]
+
+  \nt{relation}\indexnt{relation}
+    & $::=$ & \te{=} $|$ \te{<>} $|$ 
+              \te{<} $|$ \te{<=} $|$ \te{>} $|$ \te{>=}
+\end{tabular}\\
+\hrulefill
+\caption{Syntax of predicates}
+\label{fig:predicates}
+\end{center}            
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\hrulefill\\
+\begin{tabular}{lrl}
+  \nt{l\_declaration}
+    & $::=$ & $[$ \te{external} $]$ \te{type} $[$ \nt{type\_parameters} $]$
+              \nt{identifier} \\\indextt{type} \indextt{external}
+      & $|$ & $[$ \te{external} $]$ \te{logic} \nt{identifier}\repplussep{\te{,}}
+              \te{:} \nt{logic\_type} \\\indextt{logic} \indextt{external}
+      & $|$ & \te{function} \nt{identifier}
+              \te{(} \nt{logic\_binder}\repstarsep{\te{,}}
+              \te{)} \te{:} \nt{primitive\_type} \\
+          & & \te{=} \nt{term} \\ \indextt{function}
+      & $|$ & \te{predicate} \nt{identifier}
+              \te{(} \nt{logic\_binder}\repstarsep{\te{,}}
+              \te{)} \te{=} \nt{predicate} \\ \indextt{predicate}
+      & $|$ & \te{inductive} \nt{identifier}
+              \te{:} \nt{logic\_type} \te{=}\\ 
+          & &(\te{|} \nt{identifier} \te{:} \nt{predicate})\repstar{}
+              \te{\}} \\ \indextt{predicate}
+      & $|$ & \te{axiom} \nt{identifier} \te{:} 
+              \nt{predicate} \\\indextt{axiom}
+      & $|$ & \te{goal} \nt{identifier} \te{:} 
+              \nt{predicate} \\\indextt{goal}
+   \\[0.1em]
+
+  \nt{logic\_type}
+    & $::=$ & \nt{logic\_arg\_type}\repstarsep{\te{,}} \te{->} \te{prop} 
+              \\ \indextt{prop}
+      & $|$ & \nt{logic\_arg\_type}\repstarsep{\te{,}} \te{->} 
+              \nt{primitive\_type} \\ \indextt{logic}
+   \\[0.1em]
+
+  \nt{logic\_arg\_type}
+    & $::=$ & \nt{primitive\_type} $|$ \nt{primitive\_type} \te{array} \\
+   \\[0.1em]
+
+   \nt{logic\_binder}
+    & $::=$ & \nt{identifier} \te{:} \nt{primitive\_type} \\
+   \\[0.1em]
+
+   \nt{type\_parameters}
+    & $::=$ & \te{'}\nt{identifier} $|$ 
+              \te{(} (\te{'}\nt{identifier})\repplussep{\te{,}} \te{)}
+\end{tabular}\\
+\hrulefill
+\caption{Syntax of logic declarations}
+\label{fig:ldecl}
+\end{center}           
+\end{figure}
+
+\subsubsection{Programs}
+
+Syntax of types is given Figure~\ref{fig:types}.
+Syntax of annotated programs is given Figure~\ref{fig:caml}.
+Syntax of input files is given Figure~\ref{fig:input}.
+
+\begin{figure}[htbp]
+\begin{center}
+\hrulefill\\
+\begin{tabular}{lrl}
+  \nt{simple\_value\_type}\indexnt{simple\_value\_type}
+    & $::=$ & \nt{primitive\_type} \\
+      & $|$ & \nt{primitive\_type} \te{ref} \\
+      & $|$ & \nt{primitive\_type} \te{array} \\
+      & $|$ & \te{(} \nt{value\_type} \te{)} \\
+  \\[0.1em]
+
+  \nt{value\_type}\indexnt{value\_type}
+    & $::=$ & \nt{simple\_value\_type} \\
+      & $|$ & \nt{simple\_value\_type} \te{->} \nt{computation\_type} \\
+      & $|$ & \nt{identifier} \te{:} \nt{simple\_value\_type} 
+              \te{->} \nt{computation\_type} \\
+  \\[0.1em]
+
+  \nt{computation\_type}\indexnt{computation\_type}
+    & $::=$ & \te{\{} $[$ \nt{precondition} $]$ \te{\}} \\
+      &     & $[$ \te{returns} \nt{identifier} \te{:} $]$ \nt{value\_type}
+              \nt{effects} \\
+      &     & \te{\{} $[$ \nt{postcondition} $]$ \te{\}} \\
+      & $|$ & \nt{value\_type} \\
+  \\[0.1em]
+
+  \nt{effects}
+    & $::=$ & $[$ \te{reads} \nt{identifier}\repstarsep{\te{,}} $]$
+              $[$ \te{writes}  \nt{identifier}\repstarsep{\te{,}}  $]$ 
+              $[$ \te{raises}  \nt{identifier}\repstarsep{\te{,}}  $]$ \\
+  \\[0.1em]
+
+  \nt{precondition}\indexnt{precondition}
+    & $::=$ & \nt{assertion} \\
+  \\[0.1em]
+
+  \nt{postcondition}\indexnt{postcondition}
+    & $::=$ & \nt{assertion} \nt{exn\_condition}\repstar \\
+  \\[0.1em]
+
+  \nt{exn\_condition} 
+    & $::=$ & \te{|} \nt{identifier} \te{=>} \nt{assertion} \\
+  \\[0.1em]
+
+  \nt{assertion} 
+    & $::=$ & \nt{predicate} $[$ \te{as} \nt{identifier} $]$ \\
+\end{tabular}\\
+\hrulefill
+\caption{Syntax of types}
+\label{fig:types}
+\end{center}            
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\hrulefill\\
+\begin{tabular}{lrl}
+  \nt{prog}\indexnt{prog}
+    & $::=$ & \nt{constant} \\
+      & $|$ & \nt{identifier} \\
+      & $|$ & \te{!} \nt{identifier} \\
+      & $|$ & \nt{identifier} \te{:=} \nt{prog} \\
+      & $|$ & \nt{identifier} \te{[} \nt{prog} \te{]} \\
+      & $|$ & \nt{identifier} \te{[} \nt{prog} \te{]} \te{:=} \nt{prog} \\
+      & $|$ & \nt{prog} \nt{infix} \nt{prog} \\
+      & $|$ & \nt{prefix} \nt{prog} \\
+      & $|$ & \te{let} \nt{identifier} \te{=} \nt{prog} 
+              \te{in} \nt{prog} \\
+      & $|$ & \te{let} \nt{identifier} \te{=} \te{ref} 
+              \nt{prog} \te{in} \nt{prog} \\
+      & $|$ & \te{if} \nt{prog} \te{then} \nt{prog}
+              $[$ \te{else} \nt{prog} $]$ \\
+      & $|$ & \te{while} \nt{prog} \te{do}
+              [ \nt{loop\_annot} ] \nt{prog} \te{done} \\
+      & $|$ & \nt{prog} \te{;} \nt{prog} \\
+      & $|$ & \nt{identifier} \te{:} \nt{prog} \\
+      & $|$ & \te{assert} (\te{\{} \nt{assertion} \te{\}})\repplus\
+              \te{;} \nt{prog} \\
+      & $|$ & \nt{prog} \te{\{}\ \nt{postcondition} \te{\}} \\
+      & $|$ & \nt{prog} \te{\{\{}\ \nt{postcondition} \te{\}\}} \\
+      & $|$ & \te{fun} \nt{binders} \te{->} \nt{prog} \\
+      & $|$ & \te{let} \nt{identifier} \nt{binders} \te{=} \nt{prog} 
+              \te{in} \nt{prog} \\
+      & $|$ & \te{let} \te{rec} \nt{recfun} $[$ \te{in} \nt{prog} $]$ \\
+      & $|$ & \nt{prog} \nt{prog} \\
+      & $|$ & \te{raise} \nt{identifier} $[$ \te{:} \nt{value\_type} $]$ \\
+      & $|$ & \te{raise} \te{(} \nt{identifier} \nt{prog} \te{)}
+              $[$ \te{:} \nt{value\_type} $]$ \\
+      & $|$ & \te{try} \nt{prog} \te{with} 
+              \nt{handler}\repplussep{\te{|}} \te{end} \\
+      & $|$ & \te{absurd} $[$ \te{:} \nt{value\_type} $]$ \\ \indextt{absurd}
+      & $|$ & \te{(} \nt{prog} \te{)} \\
+      & $|$ & \te{begin} \nt{prog} \te{end} \\
+  \\[0.1em]
+
+  \nt{infix}
+    & $::=$ & \te{+} $|$ \te{-} $|$ \te{*} $|$ \te{/} $|$ \te{\%} $|$ 
+              \te{=} $|$ \te{<>} $|$ 
+              \te{<} $|$ \te{<=} $|$ \te{>} $|$ \te{>=} $|$
+              \te{||} $|$ \te{\&\&} \\
+  \nt{prefix}
+    & $::=$ & \te{-} $|$ \te{not} \\
+  \\[0.1em]
+
+  \nt{binders}\indexnt{binders}
+    & $::=$ & \te{(} \nt{identifier}\repplussep{\te{,}} \te{:}
+              \nt{value\_type} \te{)}\repplus \\
+  \\[0.1em]
+
+  \nt{recfun}
+    & $::=$ & \nt{identifier} \nt{binders} \te{:}
+              value\_type \\
+      &     & \te{\{} \te{variant} \nt{wf\_arg} \te{\}}
+              \te{=} \nt{prog} \\
+  \\[0.1em]
+
+  \nt{loop\_annot}
+    & $::=$ & \te{\{} [ \te{invariant} \nt{assertion} ]
+              [ \te{variant} \nt{wf\_arg} ] \te{\}} \\
+  \\[0.1em]
+
+  \nt{wf\_arg} 
+    & $::=$ & \nt{term} $[$ \te{for} \nt{identifier} $]$ \\
+
+  \\[0.1em]
+
+  \nt{handler}\indexnt{handler}
+    & $::=$ & \nt{identifier} \te{->} \nt{prog} \\
+      & $|$ & \nt{identifier} \nt{identifier} \te{->} \nt{prog} \\
+  
+\end{tabular}\\
+\hrulefill\caption{Syntax of annotated programs}
+\label{fig:caml}
+\end{center}
+\end{figure}
+
+
+\begin{figure}[htbp]
+\begin{center}
+\hrulefill\\
+\begin{tabular}{lrl}
+  \nt{file}
+    & $::=$ & \nt{declaration}\repstar\ \\
+  \\[0.1em]
+
+  \nt{declaration}
+    & $::=$ & \te{let} \nt{identifier} $[$ \nt{binders} $]$ \te{=} \nt{prog} \\
+      & $|$ & \te{let} \te{rec} \nt{recfun} \\
+      & $|$ & $[$ \te{external} $]$ 
+              \te{parameter} \nt{identifier}\repplussep{\te{,}}
+              \te{:} \nt{value\_type} \\ \indextt{parameter}\indextt{external}
+      & $|$ & \te{exception} \nt{identifier} 
+              $[$ \te{of} \nt{primitive\_type} $]$ \\ \indextt{exception}
+      & $|$ & \nt{l\_declaration}
+\end{tabular}\\
+\hrulefill
+\caption{Syntax of input files}
+\label{fig:input}
+\end{center}           
+\end{figure}
+
+\section{Semantics}\label{semantics}\index{Semantics}
+
+\subsection{Logic}\label{semantics:logic}
+
+The abstract syntax for types ($\tau$), terms ($t$) and predicates
+($P$) is given by the following grammars:
+\begin{displaymath}
+  \begin{array}{rrl}
+    \tau & ~::=~ & \alpha ~|~ (\tau,\dots,\tau)~s \\
+    t & ~::=~ & x ~|~ f(t,\dots,t) \\
+    P & ~::=~ & p(t,\dots,t) \\ 
+      &    |~~ & \top ~|~ \bot ~|~ P \land P ~|~ P \lor P
+                 ~|~ \lnot P ~|~ P\Rightarrow P \\
+      &    |~~ & \forall x:\tau.\,P ~|~ \exists x:\tau.\,P
+  \end{array}
+\end{displaymath}
+A theory $\Sigma$ is a finite list of declarations $\delta$ where
+\begin{displaymath}
+  \begin{array}{rrl}
+  \delta & ~::=~ & 
+      \texttt{type}~\vec{\alpha}~s ~|~ x:\tau ~|~
+      \mathtt{logic}~f:\forall\vec{\alpha}.\,\tau,\dots,\tau\rightarrow\tau \\
+         &    |~~ &   
+      \mathtt{logic}~p:\forall\vec{\alpha}.\,\tau,\dots,\tau\rightarrow\mathtt{prop} ~|~ 
+      \texttt{axiom}~\forall\vec{\alpha}.\,P ~|~
+      \texttt{goal}~\forall\vec{\alpha}.\,P \\
+  \end{array} 
+\end{displaymath}
+
+\subsubsection{Typing}
+
+\newcommand{\Subst}[2]{\ensuremath{\mathsf{Subst}(#1,#2)}}
+
+Well-formed types ($\Sigma\vdash\wf{\tau}$):
+% types wf
+\begin{displaymath}
+  \frac{}{\Sigma\vdash\wf{\alpha}}(\mathsf{Ty}_1)
+  \qquad
+  \frac{\mathtt{type}~(\alpha_1,\dots,\alpha_n)~s\in\Sigma
+        \quad
+        \forall i,\,\Sigma\vdash\wf{\tau_i}}
+       {\Sigma\vdash\wf{(\tau_1,\dots,\tau_n)~s}}(\mathsf{Ty}_2)
+\end{displaymath}
+Well-typed terms ($\Sigma\vdash t:\tau$):
+\begin{displaymath}
+  \frac{x:\tau\in\Sigma}{\Sigma\vdash x:\tau}(\mathsf{T}_1)
+  \qquad
+  \frac{
+    \begin{array}{c}
+      \texttt{logic}~f:\forall\vec{\alpha}.\,\tau_1,\dots,\tau_n\rightarrow\tau\in\Sigma \\[0.2em]
+      \Subst{\sigma}{\Sigma} \quad
+       \forall i,\, \Sigma\vdash t_i:\sigma(\tau_i) \\
+    \end{array}}
+       {\Sigma\vdash f(t_1,\dots,t_n):\sigma(\tau)}(\mathsf{T}_2)
+\end{displaymath}
+\begin{description}
+\item[~~~]
+  where $\sigma$ is a mapping from type variables to types, naturally
+  extended to types with $\sigma((\tau_1,\dots,\tau_n)~s) =
+  (\sigma(\tau_1),\dots,\sigma(\tau_n))~s$. 
+  We write $\Subst{\sigma}{\Sigma}$ whenever
+  $\Sigma\vdash\wf{\sigma(\alpha)}$ holds for any type variable $\alpha$.
+\end{description}
+Well-typed predicates ($\Sigma\vdash\wf{P}$):
+\begin{displaymath}
+ \frac{
+    \begin{array}{c}
+      \texttt{logic}~p:\forall\vec{\alpha}.\,\tau_1,\dots,\tau_n\rightarrow\mathtt{prop}\in\Sigma \quad
+        \Subst{\sigma}{\Sigma} \quad
+        \forall i,\,\Sigma\vdash t_i:\sigma(\tau_i) \\
+    \end{array}}
+       {\Sigma\vdash\wf{p(t_1,\dots,t_n)}}(\mathsf{P}_1)
+\end{displaymath}
+\begin{displaymath}
+  \frac{}
+       {\Sigma\vdash\wf{\top}}(\mathsf{P}_2)
+  \qquad
+  \frac{}
+       {\Sigma\vdash\wf{\bot}}(\mathsf{P}_3)
+  \qquad
+  \frac{\Sigma\vdash\wf{P_1} \quad \Sigma\vdash\wf{P_2}}
+       {\Sigma\vdash\wf{P_1\land P_2}}(\mathsf{P}_4)
+\end{displaymath}
+\begin{displaymath}
+  \frac{\Sigma\vdash\wf{P_1} \quad \Sigma\vdash\wf{P_2}}
+       {\Sigma\vdash\wf{P_1\lor P_2}}(\mathsf{P}_5)
+  \qquad
+  \frac{\Sigma\vdash\wf{P}}
+       {\Sigma\vdash\wf{\lnot P}}(\mathsf{P}_6)
+\end{displaymath}
+\begin{displaymath}
+  \frac{\Sigma\vdash\wf{P_1} \quad \Sigma\vdash\wf{P_2}}
+       {\Sigma\vdash\wf{P_1\Rightarrow P_2}}(\mathsf{P}_7)
+\end{displaymath}
+\begin{displaymath}
+  \frac{\Sigma,x:\tau\vdash\wf{P}}
+       {\Sigma\vdash\wf{\forall x:\tau.\,P}}(\mathsf{P}_8)
+  \qquad
+  \frac{\Sigma,x:\tau\vdash\wf{P}}
+       {\Sigma\vdash\wf{\exists x:\tau.\,P}}(\mathsf{P}_8)
+\end{displaymath}
+Well-formed theories ($\vdash\wf{\Sigma}$):
+\begin{displaymath}
+  \frac{}{\vdash\wf{\emptyset}}(\textsf{Th}_1)
+  \qquad
+  \frac{\texttt{type}~s\not\in\Sigma}
+       {\vdash\wf{\Sigma,\texttt{type}~(\alpha_1,\dots,\alpha_n)~s}}(\textsf{Th}_2)
+  \qquad
+  \frac{x\not\in\Sigma \quad \Sigma\vdash\wf{\tau}}
+       {\vdash\wf{\Sigma,x:\tau}}(\textsf{Th}_3)
+\end{displaymath}
+\begin{displaymath}
+  \frac{\texttt{logic}~f\not\in\Sigma \quad
+        \forall i,\, \Sigma\vdash\wf{\tau_i}}
+       {\vdash\wf{\Sigma,\mathtt{logic}~f:\forall\vec{\alpha}.\,\tau_1,\dots,\tau_n\rightarrow\tau_{n+1}}}(\textsf{Th}_4)
+\end{displaymath}
+\begin{displaymath}
+  \frac{\texttt{logic}~p\not\in\Sigma \quad
+        \forall i,\, \Sigma\vdash\wf{\tau_i}}
+       {\vdash\wf{\Sigma,\mathtt{logic}~p:\forall\vec{\alpha}.\,\tau_1,\dots,\tau_n\rightarrow\mathtt{prop}}}(\textsf{Th}_5)
+\end{displaymath}
+\begin{displaymath}
+  \frac{\Sigma\vdash\wf{P}}
+       {\vdash\wf{\Sigma,\texttt{axiom}~\forall\vec{\alpha}.\,P}}(\textsf{Th}_6)  \qquad
+  \frac{\Sigma\vdash\wf{P}}
+       {\vdash\wf{\Sigma,\texttt{goal}~\forall\vec{\alpha}.\,P}}(\textsf{Th}_6)  
+\end{displaymath}
+Well-formed definitions of functions and predicates:
+\begin{displaymath}
+  \frac{\Sigma\vdash\wf{\tau_i} \quad
+        \Sigma,x_1:\tau_1,\dots,x_n:\tau_n\vdash t:\tau}
+       {\Sigma\vdash\wf{\mathtt{function}~f(x_1:\tau_1,\dots,x_n:\tau_n) : \tau = t}}(\textsf{Th}_7)
+\end{displaymath}
+\begin{displaymath}
+  \frac{\Sigma\vdash\wf{\tau_i} \quad
+        \Sigma,x_1:\tau_1,\dots,x_n:\tau_n\vdash\wf{P}}
+       {\Sigma\vdash\wf{\mathtt{predicate}~p(x_1:\tau_1,\dots,x_n:\tau_n) = P}}(\textsf{Th}_8)
+\end{displaymath}
+Then, as far as typing and validity in concerned, the function $f$
+(resp. the predicate $p$) is added to $\Sigma$ as 
+$\mathtt{logic}~f:\tau_1,\dots,\tau_n\rightarrow\tau$
+(resp. $\mathtt{logic}~p:\tau_1,\dots,\tau_n\rightarrow\mathtt{prop}$).
+
+\subsubsection{Validity}
+
+Validity is defined as a set of natural deduction rules
+($\Sigma\models P$). For the sake of clarity, 
+we write $\Sigma,P$ for $\Sigma,\texttt{axiom}~P$ in the following.
+A substitution $\sigma$ over from type variables to types in extended
+to terms and predicates in the obvious way. We write $P[t/x]$ for the
+substitution of all the occurrences of a free variable $x$ in $P$ by a
+term $t$. 
+\begin{displaymath}
+  \frac{\texttt{axiom}~\forall\vec{\alpha}.\,P\in\Sigma \quad
+        \Subst{\sigma}{\Sigma}}
+       {\Sigma\models\sigma(P)}(\mathsf{Ax})
+  \qquad
+  \frac{\Sigma\models Q \quad 
+        \Sigma,Q\models P}
+       {\Sigma\models P}(\mathsf{Cut})
+\end{displaymath}
+\begin{displaymath}
+  \frac{}{\Sigma\models\top}(\mathsf{True})
+  \qquad
+  \frac{\Sigma\models\bot \quad \Sigma\vdash\wf{P}}
+       {\Sigma\models P}(\mathsf{False})
+  \qquad
+  \frac{\Sigma\vdash\wf{P}}{\Sigma\models P\lor\lnot P}(\mathsf{EM})
+\end{displaymath}
+% and
+\begin{displaymath}
+  \frac{\Sigma\models P \quad \Sigma\models Q}
+       {\Sigma\models P\land Q}(\mathsf{And}_1)
+  \qquad
+  \frac{\Sigma\models P\land Q}
+       {\Sigma\models P}(\mathsf{And}_2)
+  \qquad
+  \frac{\Sigma\models P\land Q}
+       {\Sigma\models Q}(\mathsf{And}_3)
+\end{displaymath}
+% or
+\begin{displaymath}
+  \frac{\Sigma\models P \quad \Sigma\vdash\wf{Q}}
+       {\Sigma\models P\lor Q}(\mathsf{Or}_1)
+  \qquad
+  \frac{\Sigma\models Q \quad \Sigma\vdash\wf{P}}
+       {\Sigma\models P\lor Q}(\mathsf{Or}_2)
+\end{displaymath}
+\begin{displaymath}
+  \frac{\Sigma\models P\lor Q \quad
+        \Sigma,P\models R \quad \Sigma,Q\models R}
+       {\Sigma\models R}(\mathsf{Or}_3)
+\end{displaymath}
+% not
+\begin{displaymath}
+  \frac{\Sigma\vdash\wf{P} \quad \Sigma,P\models\bot}
+       {\Sigma\models\lnot P}(\mathsf{Not}_1)
+  \qquad
+  \frac{\Sigma\models P \quad \Sigma\models\lnot P}
+       {\Sigma\models\bot}(\mathsf{Not}_2)
+\end{displaymath}
+% implies
+\begin{displaymath}
+  \frac{\Sigma\vdash\wf{P} \quad \Sigma,P\models Q}
+       {\Sigma\models P\Rightarrow Q}(\mathsf{Imp}_1)
+  \qquad
+  \frac{\Sigma\models P\Rightarrow Q \quad \Sigma\models P}
+       {\Sigma\models Q}(\mathsf{Imp}_2)
+\end{displaymath}
+% forall
+\begin{displaymath}
+  \frac{x\not\in\Sigma \quad
+        \Sigma\vdash\wf{\tau} \quad 
+        \Sigma,x:\tau\models P}
+       {\Sigma\models\forall x:\tau.\,P}(\mathsf{Forall}_1)
+\end{displaymath}
+\begin{displaymath}
+  \frac{\Sigma\models\forall x:\tau.\,P \quad
+        \Sigma\vdash t:\tau}
+       {\Sigma\models P[t/x]}(\mathsf{Forall}_2)
+\end{displaymath}
+% exists
+\begin{displaymath}
+  \frac{%\Sigma\vdash\wf{\tau} \quad INUTILE CAR CONSEQUENCE
+        \Sigma\vdash t:\tau \quad
+        x\not\in\Sigma \quad
+        \Sigma\models P[t/x]}
+       {\Sigma\models\exists x:\tau.\,P}(\mathsf{Exists}_1)
+\end{displaymath}
+\begin{displaymath}
+  \frac{\Sigma\models\exists x:\tau.\,P \quad
+        x\not\in\Sigma \quad
+        \Sigma,x:\tau,P\models Q}
+       {\Sigma\models Q}(\mathsf{Exists}_2)
+\end{displaymath}
+Deduction rules for equality: 
+\begin{displaymath}
+  \frac{\Sigma\vdash t:\tau}
+       {\Sigma\models t=t}(\mathsf{Eq}_1)
+  \qquad
+  \frac{\Sigma\models x=y \quad
+        \Sigma,z:\tau\vdash\wf{P} \quad 
+        \Sigma\models P[x/z]}
+       {\Sigma\models P[y/z]}(\mathsf{Eq}_2)
+\end{displaymath}
+Arithmetic:
+An arithmetic proposition $P$ is a proposition built from 
+variables of type \textit{int}, integers constants,
+the functions symbols \textit{add\_int} and \textit{sub\_int}, the predicates
+\textit{lt\_int, le\_int, gt\_int, ge\_int} and the equality.
+If $x_1,\dots,x_n$ are the free variables of $P$,
+we write $x_1,\dots,x_n\models_A P$ whenever $P$ is valid in
+Presburger arithmetic (which is decidable).
+Then we have the following deduction rule for arithmetic:
+\begin{displaymath}
+  \frac{x_1,\dots,x_n\models_A P}
+       {\Sigma\models\forall x_1:\mathit{int}.\,\dots\forall
+         x_n:\mathit{int}.\, P}(\mathsf{Arith})
+\end{displaymath}
+
+
+\subsection{Programs}\label{semantics:programs}
+
+\newcommand{\pget}[1]{\ensuremath{\texttt{!}#1}}
+\newcommand{\pset}[2]{\ensuremath{#1~\texttt{:=}~#2}}
+
+
+\newcommand{\pblock}[1]{\ensuremath{\kw{begin}~#1~\kw{end}}}
+\newcommand{\pseq}[2]{\ensuremath{#1\texttt{;}~#2}}
+\newcommand{\ppre}[2]{\ensuremath{\{#1\}~#2}}
+\newcommand{\passert}[2]{\ensuremath{\kw{assert}~\{#1\};~#2}}
+\newcommand{\passume}[2]{\ensuremath{\{\kw{assume}~#1\}~#2}}
+\newcommand{\ppost}[2]{\ensuremath{#1~\{#2\}}}
+\newcommand{\popost}[2]{\ensuremath{#1~\{\{#2\}\}}}
+\newcommand{\prefine}[4]{\ensuremath{\langle\{#1\}~#2~#3~\{#4\}\rangle}}
+\newcommand{\ploop}[2]{\ensuremath{\kw{loop}~#1~\{\kw{variant}~#2\}}}
+\newcommand{\ploopI}[3]{\ensuremath{\kw{loop}~#1~\{\kw{invariant}~#2~\kw{variant}~#3\}}}
+\newcommand{\pwhile}[3]{\ensuremath{\kw{while}~#1~\kw{do}~#2~\{\kw{variant}~#3\}}}
+\newcommand{\pwhileI}[4]{\ensuremath{\kw{while}~#1~\kw{do}~#2~\{\kw{invariant}~#3~\kw{variant}~#4\}}}
+\newcommand{\pite}[3]{\ensuremath{\kw{if}~#1~\kw{then}~#2~\kw{else}~#3}}
+\newcommand{\pfun}[4]{\ensuremath{\kw{fun}~(#1:#2)\rightarrow\{#3\}~#4}}
+\newcommand{\tapp}[2]{\ensuremath{#1\texttt{(}#2\texttt{)}}}
+\newcommand{\papp}[2]{\ensuremath{#1~#2}}
+\newcommand{\precfun}[5]{\ensuremath{\kw{rec}~#1:#2~\{\kw{variant}~#3\}=\{#4\}~#5}}
+\newcommand{\closure}[3]{\ensuremath{\kw{rec}~#1~#2=#3}}
+\newcommand{\pletin}[3]{\ensuremath{\kw{let}~#1~\texttt{=}~#2~\kw{in}~#3}}
+\newcommand{\pletref}[3]{\ensuremath{\kw{let}~#1~\texttt{=}~\kw{ref}~#2~\kw{in}~#3}}
+\newcommand{\praisex}[3]{\ensuremath{\kw{raise}~({#1}~{#2}):#3}}
+\renewcommand{\exn}[2]{\ensuremath{\kw{exception}~#1~\kw{of}~#2}}
+\newcommand{\Exit}{\ensuremath{\mathit{Exit}}}
+\newcommand{\ptrywith}[4]{\ensuremath{\kw{try}~#1~\kw{with}~#2~#3\rightarrow#4~\kw{end}}}
+\newcommand{\pcoerce}[2]{\ensuremath{(#1:#2)}}
+
+\newcommand{\tint}{\kw{int}}
+\renewcommand{\tarray}[1]{\ensuremath{#1~\kw{array}}}
+\newcommand{\tfun}[3]{\ensuremath{#1:#2\rightarrow#3}}
+
+\renewcommand{\prepost}[3]{\ensuremath{\{#1\}\,#2\,\{#3\}}}
+\newcommand{\prepostE}[4]{\ensuremath{\{#1\}\,#2\,\{#3 ~|~ E \Rightarrow #4\}}}
+\renewcommand{\result}{\ensuremath{\mathit{result}}}
+
+\newcommand{\ptrue}{\ensuremath{\top}}
+\newcommand{\pfalse}{\ensuremath{\kw{false}}}
+\newcommand{\pnot}[1]{\ensuremath{\kw{not}~#1}}
+\newcommand{\pand}[2]{\ensuremath{#1~\kw{and}~#2}}
+\newcommand{\por}[2]{\ensuremath{#1~\kw{or}~#2}}
+\newcommand{\pimplies}[2]{\ensuremath{#1~\kw{->}~#2}}
+\newcommand{\pif}[3]{\ensuremath{\kw{if}~#1~\kw{then}~#2~\kw{else}~#3}}
+\newcommand{\pforall}[2]{\ensuremath{\kw{forall}~#1\texttt{.}~#2}}
+\newcommand{\pexists}[2]{\ensuremath{\kw{exists}~#1\texttt{.}~#2}}
+\newcommand{\eqdef}{\equiv}
+
+Program types ($\theta$) and specifications ($\kappa$) 
+are classified as follows:
+\begin{displaymath}
+  \begin{array}{rrl}
+    \theta & ~::=~ & \tau ~|~ \tref{\tau} ~|~ (x:\theta) \rightarrow\kappa \\
+    \kappa &~::=~& \prepost{p}{\theta~\epsilon}{q} \\
+    q &~::=~& p;E\Rightarrow p;\dots;E\Rightarrow p \\
+    \epsilon &~::=~&
+    \kw{reads}~x,\dots,x~\kw{writes}~x,\dots,x ~ \kw{raises}~E,\dots,E 
+  \end{array}
+\end{displaymath}
+A value of type $\theta$ is either an immutable variable of a
+pure type ($\tau$), a reference containing a value of a pure type
+($\tref{\tau}$) or a function of type
+$(x:\theta)\rightarrow\prepost{p}{\theta'~\epsilon}{q}$ 
+mapping the formal parameter $x$ to the specification of its body, that
+is a precondition $p$, the type $\theta'$ for the returned value,
+an effect $\epsilon$ and a postcondition $q$. An effect
+is made of tree lists of variables: the references possibly accessed
+(\texttt{reads}), the references possibly modified (\texttt{writes})
+and the exceptions possibly raised (\texttt{raises}). A postcondition
+$q$ is made of several parts: one 
+for the normal termination and one for each possibly raised exception
+($E$ stands for an exception name).
+
+When a function specification $\prepost{p}{\theta~\epsilon}{q}$ has no
+precondition and no postcondition (both being \ptrue) and no effect
+($\epsilon$ is made of three empty lists) it can be shortened to
+$\theta$. In particular,
+$(x_1:\theta_1)\rightarrow\cdots\rightarrow(x_n:\theta_n)\rightarrow\kappa$
+denotes the type of a function with $n$ arguments that has no effect
+as long as it not applied to $n$ arguments. Note that functions can be
+partially applied.
+
+The syntax for program expressions is given in Figure~\ref{fig:prog:expr}.
+In particular, programs contain \emph{pure terms} ($t$) made of
+constants, variables, dereferences (written $\pget{x}$) and application
+of function symbols from the logic to pure terms. 
+$\ploopI{e}{p}{t}$ is an infinite loop of body $e$, invariant $p$ and
+which termination is ensured by the variant $t$. 
+
+\begin{figure}[htbp]
+  %\centering
+  \begin{displaymath}
+    \begin{array}{rrl}
+      t & ~::=~ & x ~|~ \pget{x} ~|~ \tapp{f}{t,\dots,t} \\
+      e & ~::=~ & t \\
+        &  |~ & \pletin{x}{e}{e} \\
+        &  |~ & \pletref{x}{e}{e} \\
+        &  |~ & \pite{e}{e}{e} \\
+        &  |~ & \ploopI{e}{p}{t} \\
+        &  |~ & \plabel{L}{e} \\
+        &  |~ & \praisex{E}{e}{\theta} \\
+        &  |~ & \ptrywith{e}{E}{x}{e} \\
+        &  |~ & \passert{p}{e} \\
+        &  |~ & \ppost{e}{q} \\
+        &  |~ & \popost{e}{q} \\
+        &  |~ & \pfun{x}{\theta}{p}{e} \\
+        &  |~ & \precfun{x~(x:\theta)\dots(x:\theta)}{\theta}{t}{p}{e} \\
+        &  |~ & \papp{e}{e}
+    \end{array}
+  \end{displaymath}
+  \caption{Abstract syntax of program expressions}
+  \label{fig:prog:expr}
+\end{figure}
+
+\paragraph{Syntactic sugar.}
+The traditional sequence construct is only syntactic sugar for a
+\texttt{let-in} binder where the variable does not occur in $e_2$: 
+\begin{displaymath}
+\pseq{e_1}{e_2} ~\eqdef~ \pletin{\_}{e_1}{e_2}
+\end{displaymath}
+The assignment construct is syntactic sugar for the application of the
+function \texttt{ref\_set} from \why's prelude (see~\ref{prelude}):
+\begin{displaymath}
+  \pset{x}{e} ~\eqdef~ \mathtt{ref\_set}~x~e
+\end{displaymath}
+We also simplify the \texttt{raise} construct whenever both the exception
+contents and the whole \texttt{raise} expression have type \texttt{unit}:
+\begin{displaymath}
+  \kw{raise}~E ~\eqdef~ \praisex{E}{\void}{\unit}
+\end{displaymath}
+The traditional \texttt{while} loop is also syntactic sugar for a
+combination of an infinite loop and the use of an exception $\Exit$ to
+exit the loop:
+\begin{displaymath}
+  \begin{array}{ll}
+    \pwhileI{e_1}{e_2}{p}{t} ~\equiv \\
+    \quad \kw{try} \\
+    \quad \quad \kw{loop} ~ \pite{e_1}{e_2}{\kw{raise}~\Exit} \\
+    \quad \quad \{\kw{invariant} ~ p ~ \kw{variant} ~ t\} \\
+    \quad \kw{with} ~ \Exit~\_ ~ \texttt{->} ~ \void ~ \kw{end}
+  \end{array}
+\end{displaymath}
+
+\subsubsection{Typing}
+
+The typing of program expressions is straightforward, with
+polymorphism but no type inference.
+
+% TODO: give typing rules
+
+\subsubsection{Operational semantics}
+
+The language is strict (all arguments always evaluated before the
+function call), with a left-to-right evaluation order.
+
+% TODO: give operation semantics rules
+
+\subsubsection{Weakest preconditions}\label{wp}
+\index{Weakest preconditions}
+
+\renewcommand{\wpre}[2]{\ensuremath{\mathit{wp}(#1,#2)}}
+\renewcommand{\wprx}[3]{\ensuremath{\mathit{wp}(#1,#2;#3)}}
+\newcommand{\unref}[1]{#1}
+\newcommand{\old}[1]{\ensuremath{\mathtt{old}(#1)}}
+\newcommand{\at}[2]{\ensuremath{\mathtt{at}(#1,#2)}}
+
+Programs correctness is defined using a calculus of weakest
+preconditions. We note $\wprx{e}{q}{r}$ the weakest precondition for a
+program expression $e$ and a postcondition $q;r$ where $q$ is the
+property to hold when terminating normally and $r = E_1\Rightarrow
+q_1; \dots; E_n\Rightarrow q_n$ is the set of properties to hold for
+each possibly uncaught exception.
+Expressing the correctness of a program $e$ is simply a matter of
+computing $\wpre{e}{\textsf{True}}$.
+
+The rules for the basic constructs are the following:
+\begin{displaymath}
+  \begin{array}{rl}
+    \wprx{t}{q}{r} & = 
+       q[\result \leftarrow \unref{t}] \\
+%    \wprx{\pset{x}{e}}{q}{r} & = 
+%       \wprx{e}{q[\result\leftarrow\void; x\leftarrow\result]}{r} \\
+    \wprx{\pletin{x}{e_1}{e_2}}{q}{r} & =
+       \wprx{e_1}{\wprx{e_2}{q}{r}[x\leftarrow\result]}{r} \\
+    \wprx{\pletref{x}{e_1}{e_2}}{q}{r} & =
+       \wprx{e_1}{\wprx{e_2}{q}{r}[x\leftarrow\result]}{r} \\
+    \wprx{\pite{e_1}{e_2}{e_3}}{q}{r} & =
+       \wprx{e_1}{\pite{\result}{\wprx{e_2}{q}{r}}{\wprx{e_3}{q}{r}}}{r} \\
+    \wprx{\plabel{L}{e}}{q}{r} & =
+       \wprx{e}{q}{r}[\at{x}{L}\leftarrow x] \\
+  \end{array}
+\end{displaymath}
+On the case of an exception free sequence, we retrieve the usual rule:
+\begin{displaymath}
+  \wpre{\pseq{e_1}{e_2}}{q} = \wpre{e_1}{\wpre{e_2}{q}}
+\end{displaymath}
+The cases of exceptions and annotations are also straightforward:
+\begin{displaymath}
+  \begin{array}{rl}
+    \wprx{\praisex{E}{e}{\theta}}{q}{r} & = 
+       \wprx{e}{r(E)}{r} \\
+    \wprx{\ptrywith{e_1}{E}{x}{e_2}}{q}{r} & = 
+       \wprx{e_1}{q}{E\Rightarrow\wprx{e_2}{q}{r}[x\leftarrow\result];r} \\
+       % FAUX \wprx{e_1}{q}{\wprx{e_2}{q}{r}[v\leftarrow\result]} \\
+    \wprx{\passert{p}{e}}{q}{r} & =
+       p \land \wprx{e}{q}{r} \\ 
+    \wprx{\ppost{e}{q';r'}}{q}{r} & =
+       \wprx{e}{q' \land q}{r'\land r} \\ 
+    \wprx{\popost{e}{q';r'}}{q}{r} & =
+       \wprx{e}{q'}{r'} \land
+       \forall\omega.\forall\result.q'\Rightarrow q\land r'\Rightarrow r \\ 
+  \end{array}
+\end{displaymath}
+The last implication $r'\Rightarrow r$ is actually an abuse for the 
+conjunction of all implications for each postcondition part.
+The case of an infinite loop is more subtle:
+\begin{displaymath}
+  \begin{array}{rl}
+    \wprx{\ploopI{e}{p}{t}}{q}{r} & = 
+       p ~\land~ \forall\omega. ~ 
+       p \Rightarrow \wprx{\plabel{L}{e}}{p\land t<\at{t}{L}}{r} \\
+  \end{array}
+\end{displaymath}
+where $\omega$ stands for the set of references possibly modified by
+the loop body (the \texttt{writes} part of $e$'s effect).
+Here the weakest precondition expresses that the invariant must hold
+initially and that for each turn in the loop (represented by
+$\omega$), either
+$p$ is preserved by $e$ and $e$ decreases the value of $t$ (to ensure
+termination), or $e$ raises an exception and thus must establish $r$
+directly. 
+
+By combining this rule and the rule for the conditional, we can retrieve
+the rule for the usual while loop:
+\begin{displaymath}
+  \begin{array}{ll}
+    & \wprx{\pwhileI{e_1}{e_2}{p}{t}}{q}{r} \\
+   =& p ~\land~ \forall\omega. ~ p \Rightarrow \\
+    &    \mathit{wp}(\plabel{L}{\pite{e_1}{e_2}{\kw{raise}~E}},
+         p\land t<\at{t}{L},E\Rightarrow q;r) \\
+   =&p ~\land~ \forall\omega. ~ p \Rightarrow \\
+    & \mathit{wp}(e_1,\pite{\result}{\wpre{e_2}{p\land t<\at{t}{L}}}{q},r)%
+      [\at{x}{L}\leftarrow x]
+  \end{array}
+\end{displaymath}
+
+Finally, we give the rules for functions and function calls.
+Since a function cannot be mentioned within the postcondition, the
+weakest preconditions for function constructs \texttt{fun} and
+\texttt{rec} are only expressing the correctness of the function body:
+\begin{displaymath}
+  \begin{array}{rl}
+    \wprx{\pfun{x}{\theta}{p}{e}}{q}{r} 
+    & = q ~\land~ \forall x.\forall\rho. p \Rightarrow\wpre{e}{\textsf{True}}
+  \end{array}
+\end{displaymath}
+\begin{displaymath}
+  \begin{array}{l}
+    \wprx{\precfun{f~(x_1:\theta_1)\dots(x_n:\theta_n)}{\theta}{t}{p}{e}}{q}{r}
+    \\ = q ~\land~ \forall x_1.\dots\forall x_n.\forall\rho. 
+    p \Rightarrow\wpre{\plabel{L}{e}}{\textsf{True}}
+  \end{array}
+\end{displaymath}
+where $\rho$ stands for the set of references possibly accessed by
+the loop body (the \texttt{reads} part of $e$'s effect).
+In the case of a recursive function,
+$\wpre{\plabel{L}{e}}{\textsf{True}}$ must be computed within an
+environment where $f$ is assumed to have type
+$(x_1:\theta_1)\rightarrow\cdots\rightarrow(x_n:\theta_n)\rightarrow\prepost{p\land
+  t<\at{t}{L}}{\theta~\epsilon}{q}$
+i.e. where the decreasing of the variant $t$ has been added to the
+precondition of $f$.
+
+The case of a function call $\papp{e1}{e2}$ can be simplified to the
+case of an application $\papp{x_1}{x_2}$ of one variable to another,
+using the following transformation if needed:
+\begin{displaymath}
+    \papp{e_1}{e_2} \equiv 
+      \pletin{x_1}{e_1}{\pletin{x_2}{e_2}{\papp{x_1}{x_2}}}
+\end{displaymath}
+Then assuming that $x_1$ has type
+$(x:\theta)\rightarrow\prepost{p'}{\theta'~\epsilon}{q'}$, we define
+\begin{displaymath}
+  \wpre{x_1~x_2}{q} = p'[x\leftarrow x_2] ~\land~
+  \forall\omega. \forall\result. 
+    (q'[x\leftarrow x_2] \Rightarrow q)[\old{t}\leftarrow t]
+\end{displaymath}
+that is (1) the precondition of the function must hold and (2) its
+postcondition must imply the expected property $q$ whatever the
+values of the modified references and of the result are.
+Note that $q$ and $q'$ may contain exceptional parts and thus the
+implication is again an abuse for the conjunction of all implications for
+each postcondition part.
+
+In the case of an assignment $\pset{x}{e}$ the rules above combined
+with the specification of \texttt{ref\_set} give
+(assuming that $\result$ does not occur in $q$):
+\begin{displaymath}
+  \wprx{\pset{x}{e}}{q}{r} = \wprx{e}{x=\result \Rightarrow q}{r} 
+\end{displaymath}
+And in the case of the assigment of a side-effect free expression $t$,
+it simplifies to
+\begin{displaymath}
+  \wpre{\pset{x}{t}}{q} = (x=t \Rightarrow q)
+\end{displaymath}
+which is equivalent to the usual rule $\wpre{\pset{x}{t}}{q} =
+q[x\leftarrow t]$.
+
+\section{Prelude}
+\label{prelude}\index{Prelude}
+
+Apart from the type names \texttt{unit}, \texttt{bool}, \texttt{int},
+\texttt{real}, and the type constructor \texttt{ref}, nothing is
+built-in in the \why\ tool. But two prelude 
+files are read before considering the files given on the command
+line. The prelude files are
+\begin{itemize}
+\item \url{/usr/local/lib/why/prelude.why}, and
+\item \url{/usr/local/lib/why/arrays.why}
+\end{itemize}
+(unless your library path is set differently).
+The interpretation of this prelude is prover-dependent. 
+It is possible not to load the prelude using the command-line option
+\texttt{--no-prelude}, or to load only the first prelude file using
+the command-line option \texttt{--no-arrays}.
+The remaining of this section describes the contents of the prelude files.
+
+\subsection{\texttt{prelude.why}}
+
+{\small
+\verbatiminput{../lib/why/prelude.why}
+}
+
+\subsection{\texttt{arrays.why}}
+
+{\small
+\verbatiminput{../lib/why/arrays.why}
+}
+
+\section{Provers specificities}
+
+\subsection{Coq}
+\label{lib:coq}\index{Coq library}
+
+Several \coq\ modules are delivered with \why. If installation is
+properly done, they should be found in subdirectory \texttt{user-contrib}
+of the \coq\ standard library (usually \texttt{/usr/lib/coq}
+unless some other path was specified when installing \coq). 
+
+% \coq\ files generated by \why\ usually start with \texttt{Require Why}
+% (unless specified otherwise using command line option
+% \texttt{--coq-preamble}). For this module to be found by \coq, the
+% \coq\ load path must be set accordingly, either using the \coq\ command
+% line option \texttt{-I} or the \coq\ command \texttt{Add LoadPath} (to
+% be put in a \texttt{.coqrc} file for instance).
+
+\paragraph{Types.} 
+Types are mapped as follows:
+\begin{center}
+  \begin{tabular}{|l|l|}
+    \hline
+    \why & \coq \\
+    \hline
+    \texttt{unit} & \texttt{unit} \\
+    \hline
+    \texttt{bool} & \texttt{bool} \\
+    \hline
+    \texttt{int} & \texttt{Z} \\
+    \hline
+    \texttt{real} & \texttt{R} \\
+    \hline
+    $\tau$ \texttt{array} & \texttt{(array $\tau$)},
+                            from module \texttt{WhyArrays} \\
+    \hline
+  \end{tabular}
+\end{center}
+
+\paragraph{Arrays.} 
+Arrays are introduced in module \texttt{WhyArrays}. 
+Some tactics are provided to help the user simplifying array expressions
+in proof obligations:
+\begin{description}
+\item[\texttt{WhyArrays}] : repeatedly simplifies
+  \texttt{access}/\texttt{update}using combinations and
+  \texttt{array\_length} expressions
+\item[\texttt{AccessSame}] : rewrites
+  $\texttt{access}~(\mathtt{update}~t~i~v)~i$  into $v$,
+  simplifies with \texttt{WhyArrays} and attempts \texttt{omega} on
+  every subgoal
+\item[\texttt{AccessOther}] : rewrites 
+    $\texttt{access}~(\mathtt{update}~t~i~v)~j$  into $\mathtt{access}~t~j$,
+  simplifies with \texttt{WhyArrays} and attempts \texttt{omega} on
+  every subgoal
+\item[\texttt{ArraySubst} $t$] : similar to \texttt{subst $t$}, with
+  additional simplifications
+\end{description}
+
+\subsection{PVS}
+\label{lib:pvs}\index{PVS library}
+
+\paragraph{Types.} 
+Types are mapped as follows:
+\begin{center}
+  \begin{tabular}{|l|l|}
+    \hline
+    \why & \coq \\
+    \hline
+    \texttt{unit} & \texttt{unit}, from theory \texttt{why} \\
+    \hline
+    \texttt{bool} & \texttt{bool} \\
+    \hline
+    \texttt{int} & \texttt{int} \\
+    \hline
+    \texttt{real} & \texttt{real} \\
+    \hline
+    $\tau$ \texttt{array} & \texttt{warray[$\tau$]},
+                            from theory \texttt{why} \\
+    \hline
+  \end{tabular}
+\end{center}
+
+\paragraph{Arrays.} An array whose elements are of type \texttt{T} is a
+\pvs\ value of type \texttt{warray[T]}. This type is defined in the
+theory \texttt{why\_arrays}, as
+a pair of an integer, the array length, and a function mapping
+indices to elements :
+\begin{verbatim}
+     warray: TYPE = [ n:int, [ below(n) -> T ] ]
+\end{verbatim}
+Two other theories, \texttt{why\_int\_array\_pred} and
+\texttt{why\_array\_pred}, introduce the various predicates over
+arrays presented in Section~\ref{prelude}.
+
+\appendix
+\chapter{DTD of Why project files}
+
+\verbatiminput{../lib/why.dtd}
+
+
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{./biblio}
+
+
+
+\newpage
+\addcontentsline{toc}{chapter}{Index}
+\printindex
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
