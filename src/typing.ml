@@ -93,7 +93,7 @@ type env = {
   theories  : env M.t;      (* theories (including "self") *)
 }
 
-let empty = {
+let empty0 = {
   tysymbols = M.empty;
   fsymbols  = M.empty;
   psymbols  = M.empty;
@@ -104,26 +104,40 @@ let find_tysymbol s env = M.find s.id env.tysymbols
 let find_fsymbol s env = M.find s.id env.fsymbols
 let find_psymbol s env = M.find s.id env.psymbols
 
-let loaded_theories = Hashtbl.create 17
-
 let add_tysymbol x ty env = { env with tysymbols = M.add x ty env.tysymbols }
 let add_fsymbol x ty env = { env with fsymbols = M.add x ty env.fsymbols }
 let add_psymbol x ty env = { env with psymbols = M.add x ty env.psymbols }
 let add_theory x t env = { env with theories = M.add x t env.theories }
 
 let self_id = "(*self*)"
+let self env = M.find self_id env.theories
+let empty = { empty0 with theories = M.add self_id empty0 M.empty }
 
-let add_self f ?(self=true) x v env = 
-  if self then
-    f x v { env with theories = 
-        M.add self_id (f x v (M.find self_id env.theories)) env.theories }
-  else 
-    f x v env
+let add_self f x v env = 
+  f x v { env with theories = 
+      M.add self_id (f x v (self env)) env.theories }
 
 let add_tysymbol = add_self add_tysymbol
 let add_fsymbol  = add_self add_fsymbol
 let add_psymbol  = add_self add_psymbol
 let add_theory   = add_self add_theory
+
+(** debugging *)
+
+let rec print_env fmt env =
+  fprintf fmt "@[<hov 2>types: ";
+  M.iter (fun x ty -> fprintf fmt "%s -> %a;@ " x Name.print ty.Ty.ts_name)
+    env.tysymbols;
+  fprintf fmt "@]@\n@[<hov 2>function symbols: ";
+  M.iter (fun x s -> fprintf fmt "%s -> %a;@ " x Name.print s.fs_name)
+    env.fsymbols;
+  fprintf fmt "@]@\n@[<hov 2>predicate symbols: ";
+  M.iter (fun x s -> fprintf fmt "%s -> %a;@ " x Name.print s.ps_name)
+    env.psymbols;
+  fprintf fmt "@]@\n@[<hov 2>theories: ";
+  M.iter (fun x th -> fprintf fmt "%s -> [@[%a@]];@ " x print_env th)
+    env.theories;
+  fprintf fmt "@]"
 
 (** typing using destructive type variables 
 
@@ -239,10 +253,6 @@ let rec specialize env t = match t.Ty.ty_node with
 
 let find_local_theory t env = 
   try M.find t.id env.theories
-  with Not_found -> error ~loc:t.id_loc (UnboundTheory t.id)
-
-let find_global_theory t =
-  try Hashtbl.find loaded_theories t.id
   with Not_found -> error ~loc:t.id_loc (UnboundTheory t.id)
 
 let rec find_theory q env = match q with
@@ -488,13 +498,13 @@ let uses_theory env (as_t, q) =
   let loc = qloc q in
   let rec find_theory q = match q with
     | Qident t -> 
-	t.id, find_global_theory t
+	t.id, find_local_theory t env
     | Qdot (q, t) -> 
 	let _, env = find_theory q in t.id, find_local_theory t env
   in
   let id, th = find_theory q in
   let id = match as_t with None -> id | Some x -> x.id in
-  if M.mem id env.theories then error ~loc (AlreadyTheory id);
+  if M.mem id (self env).theories then error ~loc (AlreadyTheory id);
   add_theory id th env
 
 let open_theory t env =
@@ -534,11 +544,11 @@ and add_decls env = List.fold_left add_decl env
 
 and add_theory th env =
   let id = th.th_name.id in
-  if Hashtbl.mem loaded_theories id then error ~loc:th.th_loc (ClashTheory id);
-  let th_env = { empty with theories = M.add self_id empty M.empty } in
+  if M.mem id env.theories then error ~loc:th.th_loc (ClashTheory id);
+  let th_env = { env with theories = M.add self_id empty0 env.theories } in
   let th_env = add_decls th_env th.th_decl in
-  Hashtbl.add loaded_theories id (M.find self_id th_env.theories);
-  env
+(*   printf "add_theory %s@\n%a@." id print_env (M.find self_id th_env.theories); *)
+  { env with theories = M.add id (M.find self_id th_env.theories) env.theories }
 
 (*
 Local Variables: 

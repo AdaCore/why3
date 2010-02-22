@@ -22,17 +22,6 @@ type env
 
 val empty : env
 
-val find_tysymbol : Ptree.ident -> env -> tysymbol
-val find_fsymbol : Ptree.ident -> env -> fsymbol
-val find_psymbol : Ptree.ident -> env -> psymbol
-
-(** typing *)
-
-val term : env -> Ptree.lexpr -> term
-val fmla : env -> Ptree.lexpr -> fmla
-
-(** building environments *)
-
 val add_decl : env -> Ptree.logic_decl -> env
 val add_decls : env -> Ptree.logic_decl list -> env
 
