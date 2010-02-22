@@ -132,6 +132,24 @@ Keywords are the following:
 \end{center}
 
 \section{Grammar}
+%% file := decl*
+%% decl := | "theory" uident decl* "end"
+%%         | "theory" uident "." uqualid ("with" instance+ )?
+%%         | "use" "open"?  uqualid ("as" ident)
+%%         | "use" "include" uqualid %% pas de as pour include
+%%         | ("axiom"|"lemma"|"goal") ident ":" fmla
+%%         | "type" typarams lident ("=" (ty-alg | ty))?
+%%           ("and" typarams lident ("=" (ty-alg | ty))?)* 
+%% Il faut verifier qu'il y a toujours un constructeur entre deux
+%% définitions récursives. 
+%%         | "logic" def ("and" def)*
+%%         | "inductive" ...
+
+%% def := lident_ou_infix ("(" formal+, ")")? (":" ty)? ("=" lexpr)?
+%% formal := ((lident|_)":")? ty         
+
+%% instance := | lqualid "=" lqualid
+%% ty-alg := | uident ("(" ty,+ ")")? ("|" uident ...)*
 
 \subsection{Qualified names}
 
