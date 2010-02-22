@@ -135,8 +135,7 @@ Keywords are the following:
 %% file := decl*
 %% decl := | "theory" uident decl* "end"
 %%         | "theory" uident "." uqualid ("with" instance+ )?
-%%         | "use" "open"?  uqualid ("as" ident)
-%%         | "use" "include" uqualid %% pas de as pour include
+%%         | "use" ("open" | "include")?  uqualid ("as" ident)
 %%         | ("axiom"|"lemma"|"goal") ident ":" fmla
 %%         | "type" typarams lident ("=" (ty-alg | ty))?
 %%           ("and" typarams lident ("=" (ty-alg | ty))?)* 
