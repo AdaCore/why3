@@ -191,6 +191,10 @@ uqualid:
 | uqualid DOT uident { Qdot ($1, $3) }
 ;
 
+qualid:
+|lqualid {$1}
+|uqualid {$1}
+
 decl:
 | LOGIC list1_lident_sep_comma COLON logic_type
    { Logic (loc_i 3, $2, $4) }
@@ -370,9 +374,9 @@ lexpr:
    { infix_pp $1 PPmod $3 }
 | MINUS lexpr %prec uminus
    { prefix_pp PPneg $2 }
-| lqualid
+| qualid
    { mk_pp (PPvar $1) }
-| lqualid LEFTPAR list1_lexpr_sep_comma RIGHTPAR
+| qualid LEFTPAR list1_lexpr_sep_comma RIGHTPAR
    { mk_pp (PPapp ($1, $3)) }
 /***
 | qualid_ident LEFTSQ lexpr RIGHTSQ
