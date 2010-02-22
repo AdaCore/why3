@@ -135,19 +135,22 @@ end
 
 theory Set_array
   uses Array, Bool
-  (*type 'a t = ('a,bool_.t) Array.t*)
+  (*type 'a t = ('a,Bool.t) Array.t*)
 
   uses Eq
-  logic empty : ('a,Bool.t) Array.t
-  axiom empty : Eq.eq(empty,Array.const(Bool.False))
+  (*logic empty : ('a,Bool.t) Array.t
+  axiom empty : Eq.eq(empty,Array.const(Bool.False))*)
+  function empty() : ('a,Bool.t) Array.t = Array.const(Bool.False)
 
-
-  logic in_ : 'a, ('a,Bool.t) Array.t -> prop
+  (*logic in_ : 'a, ('a,Bool.t) Array.t -> prop
   axiom in_ : forall s:'a t. forall e:'a. 
         in_(e,s) <-> Eq.eq(select(x,y),Bool.True)
+        *)
 
+  predicate in_(s:'a t, e:'a) = Eq.eq(select(x,y),Bool.True)
 
-  logic add : 'a, ('a,Bool.t) Array.t -> ('a,Bool.t) Array.t (* add(x,s) = store(x,s,bool.True) *)
-  axiom add : forall x:'a. forall s: ('a,Bool.t) Array.t. Eq.eq(add(x,s),store(s,x,Bool.True))
+  (*logic add : 'a, ('a,Bool.t) Array.t -> ('a,Bool.t) Array.t (* add(x,s) = store(x,s,bool.True) *)
+  axiom add : forall x:'a. forall s: ('a,Bool.t) Array.t. Eq.eq(add(x,s),store(s,x,Bool.True))*)
+  function add(x:'a,s: ('a,Bool.t) Array.t) : ('a,Bool.t) Array.t =  store(s,x,Bool.True)
 
 end
