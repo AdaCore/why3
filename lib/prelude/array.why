@@ -1,0 +1,17 @@
+theory Array
+
+  type ('a,'b) t
+
+  logic select (('a,'b) t,'a) : 'b
+  logic store (('a,'b) t,'a,'b) : ('a,'b) t
+  
+  axiom select_eq : forall m : ('a,'b) t. forall a1,a2 : 'a. forall b : 'b.
+        a1=a2 -> Eq.eq(select(store(m,a1,b),a2),b)
+
+  axiom select_eq : forall m : ('a,'b) t. forall a1,a2 : 'a. forall b : 'b.
+        not a1 = a2 -> select(store(m,a1,b),a2) = select(m,a2)
+
+  logic const ('b) : ('a,'b) t
+  axiom const : forall b:'b. forall a:'a. select(const(b),a) = b
+
+end

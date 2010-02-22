@@ -61,96 +61,10 @@ theory Eq
 
 end
 
-theory Set
-
-  type elt
-
-  type t 
-
-  logic in_ : elt , t -> prop
-
-  logic empty : t
-
-  axiom empty_def1 : forall x:elt. not in_(x, empty)
-
-  logic add : elt, t -> t
-
-  uses Eq
-
-  axiom add_def1 : forall x,y:elt. forall s:t.
-                   in_(x, add(y, s)) <-> (Eq.eq(x, y) or in_(x, s))
-
-end
-
-theory Set_poly
-
-  type 'a t 
-
-  logic in_ : 'a , 'a t -> prop
-
-  logic empty : 'a t
-
-  axiom empty_def1 : forall x:'a. not in_(x, empty)
-
-  logic add : 'a, 'a t -> 'a t
-
-  uses Eq
-
-  axiom add_def1 : forall x,y:'a. forall s:'a t.
-                   in_(x, add(y, s)) <-> (Eq.eq(x, y) or in_(x, s))
-
-end
-
 theory Test
 
   uses Eq, L : List
   open L
   axiom a : forall x : 'a. not Eq.eq(nil, cons(nil, nil))
-
-end
-
-
-theory Array
-
-  type ('a,'b) t
-
-  logic select : ('a,'b) t,'a -> 'b
-  logic store : ('a,'b) t,'a,'b -> ('a,'b) t
-  
-  uses Eq
-  axiom select_eq : forall m : ('a,'b) t. forall a1,a2 : 'a. forall b : 'b.
-        Eq.eq(a1,a2) -> Eq.eq(select(store(m,a1,b),a2),b)
-
-  axiom select_eq : forall m : ('a,'b) t. forall a1,a2 : 'a. forall b : 'b.
-        not Eq.eq(a1,a2) -> Eq.eq(select(store(m,a1,b),a2),select(m,a2))
-
-  logic const : 'b -> ('a,'b) t
-  axiom const : forall b:'b. forall a:'a. Eq.eq(select(const(b),a),b)
-
-end
-
-theory Bool
-  type t = | True | False
-end
-
-theory Set_array
-  uses Array, Bool
-  (*type 'a t = ('a,Bool.t) Array.t*)
-
-  uses Eq
-  (*logic empty : ('a,Bool.t) Array.t
-  axiom empty : Eq.eq(empty,Array.const(Bool.False))*)
-  function empty() : ('a,Bool.t) Array.t = Array.const(Bool.False)
-
-  (*logic in_ : 'a, ('a,Bool.t) Array.t -> prop
-  axiom in_ : forall s:'a t. forall e:'a. 
-        in_(e,s) <-> Eq.eq(select(x,y),Bool.True)
-        *)
-
-  predicate in_(s:'a t, e:'a) = Eq.eq(select(x,y),Bool.True)
-
-  (*logic add : 'a, ('a,Bool.t) Array.t -> ('a,Bool.t) Array.t (* add(x,s) = store(x,s,bool.True) *)
-  axiom add : forall x:'a. forall s: ('a,Bool.t) Array.t. Eq.eq(add(x,s),store(s,x,Bool.True))*)
-  function add(x:'a,s: ('a,Bool.t) Array.t) : ('a,Bool.t) Array.t =  store(s,x,Bool.True)
 
 end

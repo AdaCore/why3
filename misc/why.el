@@ -28,7 +28,7 @@
   (list
    '("(\\*\\([^*]\\|\\*[^)]\\)*\\*)" . font-lock-comment-face)
    '("{\\([^}]*\\)}" . font-lock-type-face)
-   `(,(why-regexp-opt '("include" "inductive" "external" "logic" "parameter" "exception" "axiom" "predicate" "function" "goal" "type")) . font-lock-builtin-face)
+   `(,(why-regexp-opt '("use" "open" "include" "inductive" "external" "logic" "parameter" "exception" "axiom" "lemma" "goal" "type")) . font-lock-builtin-face)
    `(,(why-regexp-opt '("let" "rec" "in" "if" "then" "else" "begin" "end" "while" "do" "done" "label" "assert" "try" "with" "theory" "uses")) . font-lock-keyword-face)
    ; `(,(why-regexp-opt '("unit" "bool" "int" "float" "prop" "array")) . font-lock-type-face)
    )
