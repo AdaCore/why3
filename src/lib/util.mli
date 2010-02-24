@@ -16,3 +16,10 @@
 
 val map_fold_left : 
   ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a list -> 'acc * 'b list
+
+exception FoldSkip
+
+val forall_fn : ('a -> bool) -> 'b -> 'a -> bool
+val exists_fn : ('a -> bool) -> 'b -> 'a -> bool
+
+

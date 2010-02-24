@@ -23,3 +23,7 @@ let map_fold_left f acc l =
   acc, List.rev rev
 
     
+exception FoldSkip
+
+let forall_fn pr _ t = pr t || raise FoldSkip
+let exists_fn pr _ t = pr t && raise FoldSkip

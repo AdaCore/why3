@@ -1,0 +1,138 @@
+
+open Util
+
+(** Types *)
+
+type tvsymbol = Name.t
+
+(* type symbols and types *)
+    
+type tysymbol = {
+  ts_name : Name.t;
+  ts_args : tvsymbol list;
+  ts_def  : ty option;
+  ts_tag  : int;
+}
+
+and ty = {
+  ty_node : ty_node;
+  ty_tag : int;
+}
+
+and ty_node =
+  | Tyvar of tvsymbol
+  | Tyapp of tysymbol * ty list
+
+module Tsym = struct
+  type t = tysymbol
+  let equal ts1 ts2 = Name.equal ts1.ts_name ts2.ts_name
+  let hash ts = Name.hash ts.ts_name
+  let tag n ts = { ts with ts_tag = n }
+  let compare ts1 ts2 = Pervasives.compare ts1.ts_tag ts2.ts_tag
+end
+module Hts = Hashcons.Make(Tsym)
+module Sts = Set.Make(Tsym)
+module Mts = Map.Make(Tsym)
+
+let mk_ts name args def = {
+  ts_name = name;
+  ts_args = args;
+  ts_def  = def;
+  ts_tag  = -1
+}
+
+let create_tysymbol name args def = Hts.hashcons (mk_ts name args def)
+
+module Ty = struct
+
+  type t = ty
+
+  let equal ty1 ty2 = match ty1.ty_node, ty2.ty_node with
+    | Tyvar n1, Tyvar n2 -> Name.equal n1 n2
+    | Tyapp (s1, l1), Tyapp (s2, l2) -> s1 == s2 && List.for_all2 (==) l1 l2
+    | _ -> false
+
+  let hash_ty ty = ty.ty_tag
+
+  let hash ty = match ty.ty_node with
+    | Tyvar v -> Name.hash v
+    | Tyapp (s, tl) -> Hashcons.combine_list hash_ty (s.ts_tag) tl
+
+  let tag n ty = { ty with ty_tag = n }
+
+end
+module Hty = Hashcons.Make(Ty)
+
+let mk_ty n = { ty_node = n; ty_tag = -1 }
+let ty_var n = Hty.hashcons (mk_ty (Tyvar n))
+let ty_app s tl = Hty.hashcons (mk_ty (Tyapp (s, tl)))
+
+(* generic traversal functions *)
+
+let ty_map fn ty = match ty.ty_node with
+  | Tyvar _ -> ty
+  | Tyapp (f, tl) -> ty_app f (List.map fn tl)
+
+let ty_fold fn acc ty = match ty.ty_node with
+  | Tyvar _ -> acc
+  | Tyapp (f, tl) -> List.fold_left fn acc tl
+
+let ty_forall pr ty =
+  try ty_fold (forall_fn pr) true ty with FoldSkip -> false
+
+let ty_exists pr ty =
+  try ty_fold (exists_fn pr) false ty with FoldSkip -> true
+
+(* smart constructors *)
+
+exception NonLinear
+exception UnboundTypeVariable
+
+let rec tv_known vs ty = match ty.ty_node with
+  | Tyvar n -> Name.S.mem n vs
+  | _ -> ty_forall (tv_known vs) ty
+
+let create_tysymbol name args def =
+  let add s v = if Name.S.mem v s
+  then raise NonLinear else Name.S.add v s in
+  let s = List.fold_left add Name.S.empty args in
+  let _ = match def with
+    | Some ty -> tv_known s ty || raise UnboundTypeVariable
+    | _ -> true
+  in
+  create_tysymbol name args def
+
+exception BadTypeArity
+
+let rec tv_inst m ty = match ty.ty_node with
+  | Tyvar n -> Name.M.find n m
+  | _ -> ty_map (tv_inst m) ty
+
+let ty_app s tl =
+  if List.length tl == List.length s.ts_args
+  then match s.ts_def with
+    | Some ty ->
+        let add m v t = Name.M.add v t m in
+        tv_inst (List.fold_left2 add Name.M.empty s.ts_args tl) ty
+    | _ ->
+        ty_app s tl
+  else raise BadTypeArity
+
+(* type matching *)
+
+exception TypeMismatch
+
+let rec matching s ty1 ty2 =
+  if ty1 == ty2 then s
+  else match ty1.ty_node, ty2.ty_node with
+    | Tyvar n1, _ ->
+        (try if Name.M.find n1 s == ty2 then s else raise TypeMismatch
+         with Not_found -> Name.M.add n1 ty2 s)
+    | Tyapp (f1, l1), Tyapp (f2, l2) when f1 == f2 ->
+        List.fold_left2 matching s l1 l2
+    | _ ->
+        raise TypeMismatch
+
+let ty_match ty1 ty2 s =
+  try Some (matching s ty1 ty2) with TypeMismatch -> None
+

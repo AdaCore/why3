@@ -1,6 +1,7 @@
 
 open Format
 open Pp
+open Ty
 open Term
 
 (** Error reporting *)

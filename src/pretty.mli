@@ -15,6 +15,7 @@
 (**************************************************************************)
 
 open Format
+open Ty
 open Term
 
 val print_ty : formatter -> ty -> unit

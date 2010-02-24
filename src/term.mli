@@ -14,49 +14,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Ty
+
 type label
-
-(** Types *)
-
-module Ty : sig
-
-  type tvsymbol = Name.t
-
-  (* type symbols and types *)
-
-  type tysymbol = private {
-    ts_name : Name.t;
-    ts_args : tvsymbol list;
-    ts_def  : ty option;
-    ts_tag  : int;
-  }
-
-  and ty = private {
-    ty_node : ty_node;
-    ty_tag  : int;
-  }
-
-  and ty_node = private
-    | Tyvar of tvsymbol
-    | Tyapp of tysymbol * ty list
-
-  val create_tysymbol : Name.t -> tvsymbol list -> ty option -> tysymbol
-
-  val ty_var : tvsymbol -> ty
-  val ty_app : tysymbol -> ty list -> ty
-
-  val ty_map : (ty -> ty) -> ty -> ty
-  val ty_fold : ('a -> ty -> 'a) -> 'a -> ty -> 'a
-  val ty_forall : (ty -> bool) -> ty -> bool
-  val ty_exists : (ty -> bool) -> ty -> bool
-
-  val ty_match : ty -> ty -> ty Name.M.t -> ty Name.M.t option
-
-end
-
-type tvsymbol = Ty.tvsymbol
-type tysymbol = Ty.tysymbol
-type ty = Ty.ty
 
 (** Variable symbols *)
 
@@ -66,8 +26,8 @@ type vsymbol = private {
   vs_tag : int;
 }
 
-module Mvs : Map.S with type key = vsymbol
 module Svs : Set.S with type elt = vsymbol
+module Mvs : Map.S with type key = vsymbol
 
 val create_vsymbol : Name.t -> ty -> vsymbol
 
@@ -82,6 +42,9 @@ type fsymbol = private {
 
 val create_fsymbol : Name.t -> ty list * ty -> bool -> fsymbol
 
+module Sfs : Set.S with type elt = fsymbol
+module Mfs : Map.S with type key = fsymbol
+
 (** Predicate symbols *)
 
 type psymbol = private {
@@ -91,6 +54,9 @@ type psymbol = private {
 }
 
 val create_psymbol : Name.t -> ty list -> psymbol
+
+module Sps : Set.S with type elt = psymbol
+module Mps : Map.S with type key = psymbol
 
 (** Patterns *)
 

@@ -1,18 +1,30 @@
 
+open Ty
 open Term
 
 type t
 
 (** Building *)
 
-val create : string list -> t
-  (** create an environment for a given loadpath *)
+val empty : t
 
-val open_theory : t -> t
-val close_theory : t -> string -> t
+type th
 
-val open_namespace : t -> t
-val close_namespace : t -> string -> t
+val open_theory : t -> string -> th
+val close_theory : th -> t
+
+val open_namespace : th -> string -> import:bool -> th
+val close_namespace : th -> th
+
+val use_export : th -> string -> th
+
+type th_subst = {
+  subst_ts : tysymbol Mts.t;
+  subst_fs : fsymbol  Mfs.t;
+  subst_ps : psymbol  Mps.t;
+}
+
+val clone_export : th -> string -> th_subst -> th
 
 (** Querying *)
 
@@ -20,7 +32,7 @@ type path =
   | Pident of string
   | Pdot of path * string
 
-val find_tysymbol : path -> t -> tysymbol
+val find_tysymbol : th -> path -> tysymbol
 
 
 (** Error reporting *)
