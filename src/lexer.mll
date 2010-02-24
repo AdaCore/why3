@@ -47,12 +47,14 @@
 	"begin", BEGIN;
         "bool", BOOL;
         "check", CHECK;
+	"clone", CLONE;
 	"do", DO;
 	"done", DONE;
         "else", ELSE;
 	"end", END;
 	"exception", EXCEPTION; 
 	"exists", EXISTS;
+	"export", EXPORT;
 	"external", EXTERNAL;
         "false", FALSE;
 	"for", FOR;
@@ -61,17 +63,17 @@
 	"function", FUNCTION;
 	"goal", GOAL;
 	"if", IF;
+	"import", IMPORT;
 	"in", IN;
-	"include", INCLUDE;
 	"inductive", INDUCTIVE;
 	(*"int", INT;*)
 	"invariant", INVARIANT;
 	"let", LET;
 	"logic", LOGIC;
 	"match", MATCH;
+	"namespace", NAMESPACE;
 	"not", NOT;
 	"of", OF;
-	"open", OPEN;
 	"or", OR;
 	"parameter", PARAMETER;
 	"predicate", PREDICATE;
@@ -89,7 +91,7 @@
 	"try", TRY;
 	"type", TYPE;
 	"unit", UNIT;
-	"uses", USES;
+	"use", USE;
 	"variant", VARIANT;
 	"void", VOID;
 	"while", WHILE;

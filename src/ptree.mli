@@ -70,15 +70,16 @@ type plogic_type =
   | PPredicate of pty list
   | PFunction of pty list * pty
 
-type uses = ident option * qualid
+type imp_exp =
+  | Import | Export | Nothing
 
-type theory = {
-  th_loc  : loc;
-  th_name : ident;
-  th_decl : logic_decl list;
+type use = {
+  use_theory : qualid;
+  use_as : ident option;
+  use_imp_exp : imp_exp;
 }
 
-and logic_decl = 
+type logic_decl = 
   | Logic of loc * ident list * plogic_type
   | Predicate_def of loc * ident * (loc * ident * pty) list * lexpr
   | Inductive_def of loc * ident * plogic_type * (loc * ident * lexpr) list
@@ -87,8 +88,14 @@ and logic_decl =
   | Goal of loc * ident * lexpr
   | TypeDecl of loc * ident list * ident
   | AlgType of (loc * ident list * ident * (loc * ident * pty list) list) list
-  | Theory of theory
-  | Uses of loc * uses list
-  | Open of ident
+  | Use of loc * use
+  | Namespace of loc * ident * logic_decl list
 
-type logic_file = logic_decl list
+type theory = {
+  th_loc  : loc;
+  th_name : ident;
+  th_decl : logic_decl list;
+}
+
+type logic_file = theory list
+

@@ -46,11 +46,12 @@ let type_file env file =
   Loc.set_file file lb;
   let f = Lexer.parse_logic_file lb in 
   close_in c;
-  if !parse_only then env else Typing.add_decls env f
+  if !parse_only then env else List.fold_left Typing.add_theory env f
 
 let () =
   try
-    ignore (List.fold_left type_file Typing.empty !files)
+    let env = Env.create [] in
+    ignore (List.fold_left type_file env !files)
   with e ->
     eprintf "%a@." report e;
     exit 1

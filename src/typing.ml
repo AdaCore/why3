@@ -82,63 +82,6 @@ let report fmt = function
   | AlreadyTheory s ->
       fprintf fmt "already using a theory with name %s" s
 
-(** typing environments *)
-
-module M = Map.Make(String)
-
-type env = {
-  tysymbols : tysymbol M.t; (* type symbols *)
-  fsymbols  : fsymbol M.t;  (* function symbols *)
-  psymbols  : psymbol M.t;  (* predicate symbols *)
-  theories  : env M.t;      (* theories (including "self") *)
-}
-
-let empty0 = {
-  tysymbols = M.empty;
-  fsymbols  = M.empty;
-  psymbols  = M.empty;
-  theories  = M.empty;
-}
-
-let find_tysymbol s env = M.find s.id env.tysymbols
-let find_fsymbol s env = M.find s.id env.fsymbols
-let find_psymbol s env = M.find s.id env.psymbols
-
-let add_tysymbol x ty env = { env with tysymbols = M.add x ty env.tysymbols }
-let add_fsymbol x ty env = { env with fsymbols = M.add x ty env.fsymbols }
-let add_psymbol x ty env = { env with psymbols = M.add x ty env.psymbols }
-let add_theory x t env = { env with theories = M.add x t env.theories }
-
-let self_id = "(*self*)"
-let self env = M.find self_id env.theories
-let empty = { empty0 with theories = M.add self_id empty0 M.empty }
-
-let add_self f x v env = 
-  f x v { env with theories = 
-      M.add self_id (f x v (self env)) env.theories }
-
-let add_tysymbol = add_self add_tysymbol
-let add_fsymbol  = add_self add_fsymbol
-let add_psymbol  = add_self add_psymbol
-let add_theory   = add_self add_theory
-
-(** debugging *)
-
-let rec print_env fmt env =
-  fprintf fmt "@[<hov 2>types: ";
-  M.iter (fun x ty -> fprintf fmt "%s -> %a;@ " x Name.print ty.Ty.ts_name)
-    env.tysymbols;
-  fprintf fmt "@]@\n@[<hov 2>function symbols: ";
-  M.iter (fun x s -> fprintf fmt "%s -> %a;@ " x Name.print s.fs_name)
-    env.fsymbols;
-  fprintf fmt "@]@\n@[<hov 2>predicate symbols: ";
-  M.iter (fun x s -> fprintf fmt "%s -> %a;@ " x Name.print s.ps_name)
-    env.psymbols;
-  fprintf fmt "@]@\n@[<hov 2>theories: ";
-  M.iter (fun x th -> fprintf fmt "%s -> [@[%a@]];@ " x print_env th)
-    env.theories;
-  fprintf fmt "@]"
-
 (** typing using destructive type variables 
 
     parsed trees        intermediate trees       typed trees
@@ -213,8 +156,10 @@ let rec unify t1 t2 = match t1, t2 with
     environment + local variables.
     It is only local to this module and created with [create_denv] below. *)
 
+module M = Map.Make(String)
+
 type denv = { 
-  env : env;
+  env : Env.t;
   utyvars : (string, type_var) Hashtbl.t; (* user type variables *)
   dvars : dty M.t; (* local variables, to be bound later *)
 }
@@ -251,31 +196,19 @@ let rec specialize env t = match t.Ty.ty_node with
   | Ty.Tyapp (s, tl) ->
       Tyapp (s, List.map (specialize env) tl)
 
-let find_local_theory t env = 
-  try M.find t.id env.theories
-  with Not_found -> error ~loc:t.id_loc (UnboundTheory t.id)
-
-let rec find_theory q env = match q with
-  | Qident t -> find_local_theory t env
-  | Qdot (q, t) -> let env = find_theory q env in find_local_theory t env
-
-let rec find f q env = match q with
-  | Qident x -> f x env
-  | Qdot (m, x) -> let env = find_theory m env in f x env
-
 let specialize_tysymbol x env =
-  let s = find find_tysymbol x env.env in
+  let s = Env.find_tysymbol x env.env in
   let env = Htv.create 17 in
   s, List.map (find_type_var env) s.Ty.ts_args
 	
 let specialize_fsymbol x env =
-  let s = find find_fsymbol x env.env in
+  let s = (* Env.find_fsymbol x env *) assert false (*TODO*) in
   let tl, t = s.fs_scheme in
   let env = Htv.create 17 in
   s, List.map (specialize env) tl, specialize env t
 
 let specialize_psymbol x env =
-  let s = find find_psymbol x env.env in
+  let s = (* find_psymbol x env.env *) assert false (*TODO*) in
   let env = Htv.create 17 in
   s, List.map (specialize env) s.ps_scheme
 
@@ -285,6 +218,10 @@ let rec qloc = function
   | Qident x -> x.id_loc
   | Qdot (m, x) -> Loc.join (qloc m) x.id_loc
 
+let rec path = function
+  | Qident x -> Env.Pident x.id
+  | Qdot (p, x) -> Env.Pdot (path p, x.id)
+
 (* parsed types -> intermediate types *)
 let rec dty env = function
   | PPTtyvar {id=x} -> 
@@ -292,7 +229,7 @@ let rec dty env = function
   | PPTtyapp (p, x) ->
       let loc = qloc x in
       let s, tv = 
-	try specialize_tysymbol x env
+	try specialize_tysymbol (path x) env 
 	with Not_found -> error ~loc:loc (UnboundType x)
       in
       let np = List.length p in
@@ -451,6 +388,7 @@ and fmla env = function
 
 open Ptree
 
+(***
 let add_type loc sl s env =
   if M.mem s.id env.tysymbols then error ~loc (ClashType s.id);
   let tyvars = ref M.empty in
@@ -479,6 +417,7 @@ let add_predicate loc pl env {id=id} =
   let pl = List.map ty pl in
   let s = create_psymbol (Name.from_string id) pl in
   add_psymbol id s env
+***)
 
 let fmla env f =
   let denv = create_denv env in
@@ -494,6 +433,7 @@ let axiom loc s f env =
   ignore (fmla env f);
   env
 
+(***
 let uses_theory env (as_t, q) =
   let loc = qloc q in
   let rec find_theory q = match q with
@@ -516,22 +456,25 @@ let open_theory t env =
     fsymbols  = open_map th.fsymbols  env.fsymbols;
     psymbols  = open_map th.psymbols  env.psymbols;
     theories  = open_map th.theories  env.theories }
+***)
 
 let rec add_decl env = function
   | TypeDecl (loc, sl, s) ->
-      add_type loc sl s env
+      (* add_type loc sl s env *)
+      assert false (*TODO*)
   | Logic (loc, ids, PPredicate pl) ->
-      List.fold_left (add_predicate loc pl) env ids
+      (* List.fold_left (add_predicate loc pl) env ids *)
+      assert false (*TODO*) 
   | Logic (loc, ids, PFunction (pl, t)) ->
-      List.fold_left (add_function loc pl t) env ids
+      (* List.fold_left (add_function loc pl t) env ids *)
+      assert false (*TODO*)
   | Axiom (loc, s, f) ->
       axiom loc s f env
-  | Theory th ->
-      add_theory th env
-  | Uses (loc, uses) ->
-      List.fold_left uses_theory env uses
-  | Open id ->
-      open_theory id env
+  | Use (loc, use) ->
+      (* use_theory env use *)
+      assert false (*TODO*)
+  | Namespace _ ->
+      assert false (*TODO*)
   | AlgType _ 
   | Goal _ 
   | Function_def _ 
@@ -542,13 +485,14 @@ let rec add_decl env = function
 
 and add_decls env = List.fold_left add_decl env
 
-and add_theory th env =
-  let id = th.th_name.id in
-  if M.mem id env.theories then error ~loc:th.th_loc (ClashTheory id);
-  let th_env = { env with theories = M.add self_id empty0 env.theories } in
-  let th_env = add_decls th_env th.th_decl in
-(*   printf "add_theory %s@\n%a@." id print_env (M.find self_id th_env.theories); *)
-  { env with theories = M.add id (M.find self_id th_env.theories) env.theories }
+let add_theory env th =
+  assert false (*TODO*)
+(*   let id = th.th_name.id in *)
+(*   if M.mem id env.theories then error ~loc:th.th_loc (ClashTheory id); *)
+(*   let th_env = { env with theories = M.add self_id empty0 env.theories } in *)
+(*   let th_env = add_decls th_env th.th_decl in *)
+(* (\*   printf "add_theory %s@\n%a@." id print_env (M.find self_id th_env.theories); *\) *)
+(*   { env with theories = M.add id (M.find self_id th_env.theories) env.theories } *)
 
 (*
 Local Variables: 

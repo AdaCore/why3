@@ -14,16 +14,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Term
-
 (** Typing environments *)
 
-type env
-
-val empty : env
-
-val add_decl : env -> Ptree.logic_decl -> env
-val add_decls : env -> Ptree.logic_decl list -> env
+val add_theory : Env.t -> Ptree.theory -> Env.t
 
 (** error reporting *)
 
@@ -32,3 +25,4 @@ type error
 exception Error of error
 
 val report : Format.formatter -> error -> unit
+

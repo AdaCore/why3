@@ -7,15 +7,14 @@ theory A
 end
 
 theory B
-  uses A
-  open A
+  use import A
   logic d : t
   logic p : t -> prop
 end
 
 theory C
-  uses B
-  uses T : B.A 
+  use B
+  use T : B.A 
   logic e : T.t
   axiom test : B.p(T.c)
 end
@@ -34,8 +33,7 @@ theory List
 
   logic is_nil : 'a list -> prop
 
-  uses Int 
-  open Int
+  use import Int 
   
   logic length : 'a list -> int
 
@@ -63,8 +61,8 @@ end
 
 theory Test
 
-  uses Eq, L : List
-  open L
+  use Eq
+  use import L : List
   axiom a : forall x : 'a. not Eq.eq(nil, cons(nil, nil))
 
 end

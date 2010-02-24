@@ -93,16 +93,18 @@
 %token <string> STRING
 %token ABSURD AMPAMP AND ARRAY ARROW AS ASSERT AT AXIOM 
 %token BANG BAR BARBAR BEGIN 
-%token BIGARROW BOOL CHECK COLON COLONEQUAL COMMA DO DONE DOT ELSE END EOF EQUAL
-%token EXCEPTION EXISTS EXTERNAL FALSE FOR FORALL FPI FUN FUNCTION GE GOAL GT
-%token IF IN INCLUDE INDUCTIVE INT INVARIANT
+%token BIGARROW BOOL CHECK CLONE COLON COLONEQUAL COMMA DO 
+%token DONE DOT ELSE END EOF EQUAL
+%token EXCEPTION EXISTS EXPORT EXTERNAL FALSE FOR FORALL FPI 
+%token FUN FUNCTION GE GOAL GT
+%token IF IMPORT IN INCLUDE INDUCTIVE INT INVARIANT
 %token LE LEFTB LEFTBLEFTB LEFTPAR LEFTSQ LET LOGIC LRARROW LT MATCH MINUS
-%token NOT NOTEQ OF OPEN OR PARAMETER PERCENT PLUS PREDICATE PROP 
+%token NAMESPACE NOT NOTEQ OF OR PARAMETER PERCENT PLUS PREDICATE PROP 
 %token QUOTE RAISE RAISES READS REAL REC REF RETURNS RIGHTB RIGHTBRIGHTB
 %token RIGHTPAR RIGHTSQ 
 %token SEMICOLON SLASH 
 %token THEN THEORY TIMES TRUE TRY TYPE UNDERSCORE
-%token UNIT USES VARIANT VOID WHILE WITH WRITES
+%token UNIT USE VARIANT VOID WHILE WITH WRITES
 
 /* Precedences */
 
@@ -146,8 +148,6 @@
 %%
 
 logic_file:
-| list1_decl EOF 
-   { $1 }
 | list1_theory EOF
    { $1 }
 | EOF 
@@ -211,10 +211,10 @@ decl:
    { Goal (loc (), $2, $4) }
 | TYPE typedecl typedefn
    { let loc, vl, id = $2 in $3 loc vl id }
-| USES list1_uses_sep_comma
-   { Uses (loc (), $2) }
-| OPEN uident
-   { Open $2 }
+| USE use
+   { Use (loc (), $2) }
+| NAMESPACE uident list0_decl END
+   { Namespace (loc (), $2, $3) }
 ;
 
 list1_theory:
@@ -226,7 +226,7 @@ list1_theory:
 
 theory:
 | THEORY uident list0_decl END 
-   { Theory ({ th_loc = loc (); th_name = $2; th_decl = $3 }) }
+   { { th_loc = loc (); th_name = $2; th_decl = $3 } }
 ;
 
 typedecl:
@@ -495,14 +495,17 @@ list1_lident_sep_comma:
 | lident COMMA list1_lident_sep_comma { $1 :: $3 }
 ;
 
-list1_uses_sep_comma:
-| uses                            { [$1] }
-| uses COMMA list1_uses_sep_comma { $1 :: $3 }
+use:
+| imp_exp uqualid              
+    { { use_theory = $2; use_as = None; use_imp_exp = $1 } }
+| imp_exp uident COLON uqualid 
+    { { use_theory = $4; use_as = Some $2; use_imp_exp = $1 } }
 ;
 
-uses:
-| uqualid              { None, $1 }
-| uident COLON uqualid { Some $1, $3 }
+imp_exp:
+| IMPORT        { Import }
+| EXPORT        { Export }
+| /* epsilon */ { Nothing }
 ;
 
 /******* programs **************************************************
