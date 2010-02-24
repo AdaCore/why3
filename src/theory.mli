@@ -20,38 +20,70 @@
 open Ty
 open Term
 
-type t
+type ty_def = 
+  | Ty_abstract
+  | Ty_algebraic of fsymbol list
+
+type ty_decl = tysymbol * ty_def 
+
+type logic_decl = 
+  | Lfunction  of fsymbol * (vsymbol list * term) option (* FIXME: binders *)
+  | Lpredicate of psymbol * (vsymbol list * fmla) option (* FIXME: binders *)
+  | Linductive of psymbol * (Name.t * fmla) list
+
+type prop_kind = 
+  | Axiom | Lemma | Goal
+
+type decl =
+  | Dtype  of ty_decl list
+  | Dlogic of logic_decl list
+  | Dprop  of prop_kind * Name.t * fmla
+
+type decl_or_use =
+  | Decl of decl
+  | Use of t
+
+and t = private {
+  th_name : Name.t;
+  th_namespace : namespace;
+  th_decls : decl_or_use list;
+}
+
+and namespace
 
 (** Building *)
 
-val empty : t
-
 type th
+  (** a theory under construction *)
 
-val open_theory : t -> string -> th
-val close_theory : th -> t
+val create_theory :  Name.t -> th
 
-val open_namespace : th -> string -> import:bool -> th
+val open_namespace : th -> Name.t -> import:bool -> th
 val close_namespace : th -> th
 
 val use_export : th -> string -> th
 
-type th_subst = {
-  subst_ts : tysymbol Mts.t;
-  subst_fs : fsymbol  Mfs.t;
-  subst_ps : psymbol  Mps.t;
+type th_inst = {
+  inst_ts : tysymbol Mts.t;
+  inst_fs : fsymbol  Mfs.t;
+  inst_ps : psymbol  Mps.t;
 }
 
-val clone_export : th -> string -> th_subst -> th
+val clone_export : th -> string -> th_inst -> th
+
+val add_decl : th -> decl -> th
+
+val close_theory : th -> t
 
 (** Querying *)
 
-type path =
-  | Pident of string
-  | Pdot of path * string
+val get_namespace : th -> namespace
 
-val find_tysymbol : th -> path -> tysymbol
-
+val find_tysymbol : namespace -> string -> tysymbol
+val find_fsymbol  : namespace -> string -> fsymbol
+val find_psymbol  : namespace -> string -> psymbol
+val find_namespace: namespace -> string -> namespace
+val find_fmla     : namespace -> string -> fmla
 
 (** Error reporting *)
 

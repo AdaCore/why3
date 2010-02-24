@@ -102,7 +102,7 @@ doc/version.tex src/version.ml: Version version.sh config.status
 LIBCMO = src/lib/pp.cmo src/lib/loc.cmo src/lib/util.cmo src/lib/hashcons.cmo 
 
 CMO = $(LIBCMO) src/name.cmo src/ty.cmo src/term.cmo src/pretty.cmo \
-      src/parser.cmo src/lexer.cmo src/env.cmo src/typing.cmo src/main.cmo
+      src/parser.cmo src/lexer.cmo src/theory.cmo src/typing.cmo src/main.cmo
 CMX = $(CMO:.cmo=.cmx)
 
 bin/why.opt: $(CMX) 

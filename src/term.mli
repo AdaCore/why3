@@ -21,6 +21,11 @@ open Ty
 
 type label
 
+exception NonLinear
+exception BadArity
+exception ConstructorExpected
+exception NoMatch
+
 (** Variable symbols *)
 
 type vsymbol = private {
