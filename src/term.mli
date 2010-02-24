@@ -19,12 +19,9 @@
 
 open Ty
 
-type label
-
 exception NonLinear
 exception BadArity
 exception ConstructorExpected
-exception NoMatch
 
 (** Variable symbols *)
 
@@ -95,6 +92,8 @@ val pat_exists : (pattern -> bool) -> pattern -> bool
 val pat_equal_alpha : pattern -> pattern -> bool
 
 (** Terms and formulas *)
+
+type label
 
 type quant =
   | Fforall

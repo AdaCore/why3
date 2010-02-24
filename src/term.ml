@@ -20,10 +20,6 @@
 open Util
 open Ty
 
-type label = string
-
-exception NonLinear
-
 (** Variable symbols *)
 
 type vsymbol = {
@@ -210,6 +206,8 @@ let rec pat_equal_alpha p1 p2 =
   | _ -> false
 
 (** Terms and formulas *)
+
+type label = string
 
 type quant =
   | Fforall
@@ -911,6 +909,8 @@ let f_app p tl =
     with Invalid_argument _ -> raise BadArity
   in
   f_app p tl
+
+exception NonLinear
 
 let pat_varmap p =
   let i = ref (-1) in

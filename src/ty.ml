@@ -24,7 +24,7 @@ open Util
 type tvsymbol = Name.t
 
 (* type symbols and types *)
-    
+
 type tysymbol = {
   ts_name : Name.t;
   ts_args : tvsymbol list;
