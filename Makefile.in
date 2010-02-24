@@ -48,7 +48,7 @@ OCAMLBEST= @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 CAMLP4   = @CAMLP4O@
 
-INCLUDES = -I lib -I src 
+INCLUDES = -I src/lib -I src 
 BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ 
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
 OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ 
@@ -96,7 +96,7 @@ doc/version.tex src/version.ml: Version version.sh config.status
 # why
 #####
 
-LIBCMO = lib/pp.cmo lib/loc.cmo lib/util.cmo
+LIBCMO = src/lib/pp.cmo src/lib/loc.cmo src/lib/util.cmo
 
 CMO = $(LIBCMO) src/name.cmo src/hashcons.cmo src/term.cmo src/pretty.cmo \
       src/parser.cmo src/lexer.cmo src/typing.cmo src/main.cmo
@@ -559,8 +559,7 @@ coq-clean::
 .PHONY: depend
 .depend depend: $(GENERATED)
 	rm -f .depend
-	$(OCAMLDEP) -slash $(INCLUDES) lib/*.ml lib/*.mli src/*.ml src/*.mli > .depend
-	$(OCAMLDEP) -slash $(MLINCLUDES) ml/parsing/*.ml ml/parsing/*.mli ml/typing/*.ml ml/typing/*.mli ml/utils/*.ml ml/utils/*.mli >> .depend
+	$(OCAMLDEP) -slash $(INCLUDES) src/lib/*.ml src/lib/*.mli src/*.ml src/*.mli > .depend
 ifeq ($(FRAMAC),yes)
 #	$(MAKE) -C $(JESSIE_PLUGIN_PATH) depend
 endif
