@@ -96,25 +96,25 @@ doc/version.tex src/version.ml: Version version.sh config.status
 # why
 #####
 
-LIBCMO = src/lib/pp.cmo src/lib/loc.cmo src/lib/util.cmo
+LIBCMO = src/lib/pp.cmo src/lib/loc.cmo src/lib/util.cmo src/lib/hashcons.cmo 
 
-CMO = $(LIBCMO) src/name.cmo src/hashcons.cmo src/term.cmo src/pretty.cmo \
+CMO = $(LIBCMO) src/name.cmo src/term.cmo src/pretty.cmo \
       src/parser.cmo src/lexer.cmo src/env.cmo src/typing.cmo src/main.cmo
 CMX = $(CMO:.cmo=.cmx)
 
 bin/why.opt: $(CMX) 
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ unix.cmxa str.cmxa nums.cmxa graph.cmxa $^
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ $^
 	$(STRIP) $@
 
 bin/why.byte: $(CMO) 
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ unix.cma str.cma nums.cma graph.cma $^
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ $^
 
 bin/why.static: $(CMX) src/why.cmx 
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) -cclib -static $(OFLAGS) -o $@ unix.cmxa str.cmxa nums.cmxa graph.cmxa $^ 
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) -cclib -static $(OFLAGS) -o $@ $^ 
 	$(STRIP) $@
 
 bin/top: $(CMO)
-	ocamlmktop $(BFLAGS) -o $@ str.cma $^
+	ocamlmktop $(BFLAGS) -o $@ $^
 
 test: bin/why.byte
 	ocamlrun -bt bin/why.byte src/test.why

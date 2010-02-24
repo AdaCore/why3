@@ -22,8 +22,6 @@ type path =
 
 val find_tysymbol : path -> t -> tysymbol
 
-(* val find_fsymbol : t -> path -> fsymbol *)
-
 
 (** Error reporting *)
 
