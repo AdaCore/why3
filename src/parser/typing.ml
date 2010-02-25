@@ -20,6 +20,7 @@
 open Util
 open Format
 open Pp
+open Ident
 open Ty
 open Term
 open Ptree
@@ -39,7 +40,7 @@ type error =
   | UnboundSymbol of string
   | TermExpectedType of (formatter -> unit) * (formatter -> unit) 
       (* actual / expected *)
-  | BadNumberOfArguments of Name.t * int * int 
+  | BadNumberOfArguments of Ident.ident * int * int 
   | ClashTheory of string
   | ClashNamespace of string
   | UnboundTheory of string
@@ -81,7 +82,7 @@ let report fmt = function
   | UnboundSymbol s ->
        fprintf fmt "Unbound symbol '%s'" s
   | BadNumberOfArguments (s, n, m) ->
-      fprintf fmt "@[Symbol `%a' is aplied to %d terms,@ " Name.print s n;
+      fprintf fmt "@[Symbol `%s' is aplied to %d terms,@ " s.id_short n;
       fprintf fmt "but is expecting %d arguments@]" m
   | TermExpectedType (ty1, ty2) ->
       fprintf fmt "@[This term has type "; ty1 fmt; 
@@ -147,14 +148,14 @@ let rec print_dty fmt = function
   | Tyvar { type_val = Some t } ->
       print_dty fmt t
   | Tyvar { type_val = None; tvsymbol = v } ->
-      fprintf fmt "'%a" Name.print v
+      fprintf fmt "'%s" v.id_short
   | Tyapp (s, []) ->
-      fprintf fmt "%a" Name.print s.Ty.ts_name
+      fprintf fmt "%s" s.ts_name.id_short
   | Tyapp (s, [t]) -> 
-      fprintf fmt "%a %a" print_dty t Name.print s.Ty.ts_name
+      fprintf fmt "%a %s" print_dty t s.ts_name.id_short
   | Tyapp (s, l) -> 
-      fprintf fmt "(%a) %a" 
-	(print_list comma print_dty) l Name.print s.Ty.ts_name
+      fprintf fmt "(%a) %s" 
+	(print_list comma print_dty) l s.ts_name.id_short
 
 let create_type_var =
   let t = ref 0 in
@@ -209,13 +210,14 @@ let find_user_type_var x env =
   try
     Hashtbl.find env.utyvars x
   with Not_found ->
-    let v = create_type_var ~user:true (Name.from_string x) in
+    (* TODO: shouldn't we localize this ident? *)
+    let v = create_type_var ~user:true (id_fresh x x) in
     Hashtbl.add env.utyvars x v;
     v
  
 (* Specialize *)
 
-module Htv = Hashtbl.Make(Name)
+module Htv = Hid
 
 let find_type_var env tv =
   try
@@ -225,7 +227,7 @@ let find_type_var env tv =
     Htv.add env tv v;
     v
  
-let rec specialize env t = match t.Ty.ty_node with
+let rec specialize env t = match t.ty_node with
   | Ty.Tyvar tv -> 
       Tyvar (find_type_var env tv)
   | Ty.Tyapp (s, tl) ->
@@ -257,7 +259,7 @@ let find_tysymbol p th =
 let specialize_tysymbol x env =
   let s = find_tysymbol x env.th in
   let env = Htv.create 17 in
-  s, List.map (find_type_var env) s.Ty.ts_args
+  s, List.map (find_type_var env) s.ts_args
 	
 let find_fsymbol {id=x; id_loc=loc} ns = 
   try find_fsymbol ns x 
@@ -429,7 +431,8 @@ and fmla env = function
   | Fif (f1, f2, f3) ->
       f_if (fmla env f1) (fmla env f2) (fmla env f3)
   | Fquant (q, x, t, f1) ->
-      let v = create_vsymbol (Name.from_string x) (ty t) in
+      (* TODO: shouldn't we localize this ident? *)
+      let v = create_vsymbol (id_fresh x x) (ty t) in
       let env = M.add x v env in
       f_quant q v (fmla env f1)
   | Fapp (s, tl) ->
@@ -440,18 +443,21 @@ and fmla env = function
 
 open Ptree
 
-let add_type loc sl s th =
+let add_type loc sl {id=id} th =
   let ns = get_namespace th in
-  if mem_tysymbol ns s.id then error ~loc (ClashType s.id);
+  if mem_tysymbol ns id then error ~loc (ClashType id);
   let tyvars = ref M.empty in
   let add_ty_var {id=x} =
     if M.mem x !tyvars then error ~loc (BadTypeArity x);
-    let v = Name.from_string x in
+    (* TODO: shouldn't we localize this ident? *)
+    let v = id_user x x loc in
     tyvars := M.add x v !tyvars;
     v
   in
   let vl = List.map add_ty_var sl in
-  let ty = Ty.create_tysymbol (Name.from_string s.id) vl None in
+  (* TODO: add the theory name to the long name *)
+  let v = id_user id id loc in
+  let ty = create_tysymbol v vl None in
   add_decl th (Dtype [ty, Ty_abstract])
 
 let add_function loc pl t th {id=id} =
@@ -460,7 +466,9 @@ let add_function loc pl t th {id=id} =
   let denv = create_denv th in
   let pl = List.map (dty denv) pl and t = dty denv t in
   let pl = List.map ty pl and t = ty t in
-  let s = create_fsymbol (Name.from_string id) (pl, t) false in
+  (* TODO: add the theory name to the long name *)
+  let v = id_user id id loc in
+  let s = create_fsymbol v (pl, t) false in
   add_decl th (Dlogic [Lfunction (s, None)])
 
 let add_predicate loc pl th {id=id} =
@@ -469,7 +477,9 @@ let add_predicate loc pl th {id=id} =
   let denv = create_denv th in
   let pl = List.map (dty denv) pl in
   let pl = List.map ty pl in
-  let s = create_psymbol (Name.from_string id) pl in
+  (* TODO: add the theory name to the long name *)
+  let v = id_user id id loc in
+  let s = create_psymbol v pl in
   add_decl th (Dlogic [Lpredicate (s, None)])
 
 let fmla env f =
@@ -593,7 +603,8 @@ let rec find_theory env q = match q with
 	error ~loc:id.id_loc (UnboundTheory id.id);
 
 and type_theory env id pt =
-  let n = Name.from_string id in
+  (* TODO: shouldn't we localize this ident? *)
+  let n = id_fresh id id in
   let th = create_theory n in
   let th = add_decls env th pt.th_decl in
   close_theory th
@@ -613,7 +624,7 @@ and add_decl env th = function
       let t = find_theory env use.use_theory in
       let n = match use.use_as with 
 	| None -> t.t_name
-	| Some x -> Name.from_string x.id
+	| Some x -> id_user x.id x.id loc
       in
       begin match use.use_imp_exp with
 	| Nothing ->
@@ -634,7 +645,7 @@ and add_decl env th = function
       if mem_namespace ns id then error ~loc (ClashNamespace id);
       let th = open_namespace th in
       let th = add_decls env th dl in
-      let n = Name.from_string id in
+      let n = id_user id id loc in
       close_namespace th n ~import:false
   | AlgType _ 
   | Goal _ 

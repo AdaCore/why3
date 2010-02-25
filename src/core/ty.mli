@@ -17,14 +17,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Ident
+
 (** Types *)
 
-type tvsymbol = Name.t
+type tvsymbol = ident
 
 (* type symbols and types *)
 
 type tysymbol = private {
-  ts_name : Name.t;
+  ts_name : ident;
   ts_args : tvsymbol list;
   ts_def  : ty option;
   ts_tag  : int;
@@ -42,7 +44,7 @@ and ty_node = private
 exception NonLinear
 exception UnboundTypeVariable
 
-val create_tysymbol : Name.t -> tvsymbol list -> ty option -> tysymbol
+val create_tysymbol : ident -> tvsymbol list -> ty option -> tysymbol
 
 module Sts : Set.S with type elt = tysymbol
 module Mts : Map.S with type key = tysymbol
@@ -59,6 +61,6 @@ val ty_exists : (ty -> bool) -> ty -> bool
 
 exception TypeMismatch
 
-val matching : ty Name.M.t -> ty -> ty -> ty Name.M.t
-val ty_match : ty -> ty -> ty Name.M.t -> ty Name.M.t option
+val matching : ty Mid.t -> ty -> ty -> ty Mid.t
+val ty_match : ty -> ty -> ty Mid.t -> ty Mid.t option
 

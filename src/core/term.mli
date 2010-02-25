@@ -17,6 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Ident
 open Ty
 
 exception NonLinear
@@ -26,7 +27,7 @@ exception ConstructorExpected
 (** Variable symbols *)
 
 type vsymbol = private {
-  vs_name : Name.t;
+  vs_name : ident;
   vs_ty : ty;
   vs_tag : int;
 }
@@ -34,18 +35,18 @@ type vsymbol = private {
 module Svs : Set.S with type elt = vsymbol
 module Mvs : Map.S with type key = vsymbol
 
-val create_vsymbol : Name.t -> ty -> vsymbol
+val create_vsymbol : ident -> ty -> vsymbol
 
 (** Function symbols *)
 
 type fsymbol = private {
-  fs_name   : Name.t;
+  fs_name   : ident;
   fs_scheme : ty list * ty;
   fs_constr : bool;
   fs_tag    : int;
 }
 
-val create_fsymbol : Name.t -> ty list * ty -> bool -> fsymbol
+val create_fsymbol : ident -> ty list * ty -> bool -> fsymbol
 
 module Sfs : Set.S with type elt = fsymbol
 module Mfs : Map.S with type key = fsymbol
@@ -53,12 +54,12 @@ module Mfs : Map.S with type key = fsymbol
 (** Predicate symbols *)
 
 type psymbol = private {
-  ps_name   : Name.t;
+  ps_name   : ident;
   ps_scheme : ty list;
   ps_tag    : int;
 }
 
-val create_psymbol : Name.t -> ty list -> psymbol
+val create_psymbol : ident -> ty list -> psymbol
 
 module Sps : Set.S with type elt = psymbol
 module Mps : Map.S with type key = psymbol

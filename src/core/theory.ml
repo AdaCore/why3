@@ -19,6 +19,7 @@
 
 open Format
 open Pp
+open Ident
 open Ty
 open Term
 
@@ -47,7 +48,7 @@ type ty_decl = tysymbol * ty_def
 type logic_decl = 
   | Lfunction  of fsymbol * (vsymbol list * term) option (* FIXME: binders *)
   | Lpredicate of psymbol * (vsymbol list * fmla) option (* FIXME: binders *)
-  | Linductive of psymbol * (Name.t * fmla) list
+  | Linductive of psymbol * (ident * fmla) list
 
 type prop_kind = 
   | Axiom | Lemma | Goal
@@ -55,14 +56,14 @@ type prop_kind =
 type decl =
   | Dtype  of ty_decl list
   | Dlogic of logic_decl list
-  | Dprop  of prop_kind * Name.t * fmla
+  | Dprop  of prop_kind * ident * fmla
 
 type decl_or_use =
   | Decl of decl
   | Use of t
 
 and t = {
-  t_name : Name.t;
+  t_name : ident;
   t_namespace : namespace;
   t_decls : decl_or_use list;
 }
@@ -76,7 +77,7 @@ and namespace = {
 }
 
 type th = {
-  th_name  : Name.t;
+  th_name  : ident;
   th_stack : (namespace * namespace) list; (* stack of imports/exports *)
   th_decls : decl_or_use list;
 }
@@ -113,7 +114,7 @@ let open_namespace th = match th.th_stack with
 
 let close_namespace th n ~import = match th.th_stack with
   | (_, e0) :: (i, e) :: st ->
-      let s = Name.to_string n in
+      let s = n.id_short in
       let add ns = { ns with namespace = M.add s e0 ns.namespace } in
       { th with th_stack = (add i, add e) :: st }
   | [_] ->
@@ -139,7 +140,7 @@ let add_psymbol x ty ns = { ns with psymbols = M.add x ty ns.psymbols }
 
 let add_ns add x v th = match th.th_stack with
   | (i, e) :: st -> 
-      let x = Name.unsafe_to_string x in (add x v i, add x v e) :: st
+      let x = x.id_short in (add x v i, add x v e) :: st
   | [] -> assert false
 
 let add_decl th d = 
@@ -189,15 +190,20 @@ let report fmt = function
 
 (** Debugging *)
 
+let print_ident =
+  let printer = create_printer () in
+  let print fmt id = Format.fprintf fmt "%s" (id_unique printer id) in
+  print
+
 let rec print_namespace fmt ns =
   fprintf fmt "@[<hov 2>types: ";
-  M.iter (fun x ty -> fprintf fmt "%s -> %a;@ " x Name.print ty.Ty.ts_name)
+  M.iter (fun x ty -> fprintf fmt "%s -> %a;@ " x print_ident ty.ts_name)
     ns.tysymbols;
   fprintf fmt "@]@\n@[<hov 2>function symbols: ";
-  M.iter (fun x s -> fprintf fmt "%s -> %a;@ " x Name.print s.fs_name)
+  M.iter (fun x s -> fprintf fmt "%s -> %a;@ " x print_ident s.fs_name)
     ns.fsymbols;
   fprintf fmt "@]@\n@[<hov 2>predicate symbols: ";
-  M.iter (fun x s -> fprintf fmt "%s -> %a;@ " x Name.print s.ps_name)
+  M.iter (fun x s -> fprintf fmt "%s -> %a;@ " x print_ident s.ps_name)
     ns.psymbols;
   fprintf fmt "@]@\n@[<hov 2>namespace: ";
   M.iter (fun x th -> fprintf fmt "%s -> [@[%a@]];@ " x print_namespace th)

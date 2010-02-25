@@ -17,6 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Ident
 open Ty
 open Term
 
@@ -29,7 +30,7 @@ type ty_decl = tysymbol * ty_def
 type logic_decl = 
   | Lfunction  of fsymbol * (vsymbol list * term) option (* FIXME: binders *)
   | Lpredicate of psymbol * (vsymbol list * fmla) option (* FIXME: binders *)
-  | Linductive of psymbol * (Name.t * fmla) list
+  | Linductive of psymbol * (ident * fmla) list
 
 type prop_kind = 
   | Axiom | Lemma | Goal
@@ -37,14 +38,14 @@ type prop_kind =
 type decl =
   | Dtype  of ty_decl list
   | Dlogic of logic_decl list
-  | Dprop  of prop_kind * Name.t * fmla
+  | Dprop  of prop_kind * ident * fmla
 
 type decl_or_use =
   | Decl of decl
   | Use of t
 
 and t = private {
-  t_name : Name.t;
+  t_name : ident;
   t_namespace : namespace;
   t_decls : decl_or_use list;
 }
@@ -56,10 +57,10 @@ and namespace
 type th
   (** a theory under construction *)
 
-val create_theory : Name.t -> th
+val create_theory : ident -> th
 
 val open_namespace : th -> th
-val close_namespace : th -> Name.t -> import:bool -> th
+val close_namespace : th -> ident -> import:bool -> th
 
 val use_export : th -> t -> th
 

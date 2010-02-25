@@ -18,20 +18,21 @@
 (**************************************************************************)
 
 open Util
+open Ident
 open Ty
 
 (** Variable symbols *)
 
 type vsymbol = {
-  vs_name : Name.t;
+  vs_name : ident;
   vs_ty   : ty;
   vs_tag  : int;
 }
 
 module Vsym = struct
   type t = vsymbol
-  let equal vs1 vs2 = Name.equal vs1.vs_name vs2.vs_name
-  let hash vs = Name.hash vs.vs_name
+  let equal vs1 vs2 = vs1.vs_name == vs2.vs_name
+  let hash vs = vs.vs_name.id_tag
   let tag n vs = { vs with vs_tag = n }
   let compare vs1 vs2 = Pervasives.compare vs1.vs_tag vs2.vs_tag
 end
@@ -43,13 +44,12 @@ module Svs = Set.Make(Vsym)
 let mk_vs name ty = { vs_name = name; vs_ty = ty; vs_tag = -1 }
 let create_vsymbol name ty = Hvs.hashcons (mk_vs name ty)
 
-(* TODO: needs refactoring *)
-let fresh_vsymbol v = create_vsymbol (Name.fresh v.vs_name) v.vs_ty
+let fresh_vsymbol v = create_vsymbol (id_clone v.vs_name) v.vs_ty
 
 (** Function symbols *)
 
 type fsymbol = {
-  fs_name   : Name.t;
+  fs_name   : ident;
   fs_scheme : ty list * ty;
   fs_constr : bool;
   fs_tag    : int;
@@ -57,8 +57,8 @@ type fsymbol = {
 
 module Fsym = struct
   type t = fsymbol
-  let equal fs1 fs2 = Name.equal fs1.fs_name fs2.fs_name
-  let hash fs = Name.hash fs.fs_name
+  let equal fs1 fs2 = fs1.fs_name == fs2.fs_name
+  let hash fs = fs.fs_name.id_tag
   let tag n fs = { fs with fs_tag = n }
   let compare fs1 fs2 = Pervasives.compare fs1.fs_tag fs2.fs_tag
 end
@@ -78,15 +78,15 @@ let create_fsymbol name scheme constr = Hfs.hashcons (mk_fs name scheme constr)
 (** Predicate symbols *)
 
 type psymbol = {
-  ps_name   : Name.t;
+  ps_name   : ident;
   ps_scheme : ty list;
   ps_tag    : int;
 }
 
 module Psym = struct
   type t = psymbol
-  let equal ps1 ps2 = Name.equal ps1.ps_name ps2.ps_name
-  let hash ps = Name.hash ps.ps_name
+  let equal ps1 ps2 = ps1.ps_name == ps2.ps_name
+  let hash ps = ps.ps_name.id_tag
   let tag n ps = { ps with ps_tag = n }
   let compare ps1 ps2 = Pervasives.compare ps1.ps_tag ps2.ps_tag
 end
@@ -133,7 +133,7 @@ module Hpat = struct
     | Papp (s, pl) -> Hashcons.combine_list hash_pattern s.fs_tag pl
     | Pas (p, v) -> Hashcons.combine (hash_pattern p) v.vs_tag
 
-  let hash p = Hashcons.combine (hash_node p.pat_node) p.pat_ty.Ty.ty_tag
+  let hash p = Hashcons.combine (hash_node p.pat_node) p.pat_ty.ty_tag
 
   let tag n p = { p with pat_tag = n }
 
@@ -176,15 +176,15 @@ let pat_app f pl ty =
   if not f.fs_constr then raise ConstructorExpected else
   let args, res = f.fs_scheme in
   let _ =
-    try List.fold_left2 Ty.matching
-        (Ty.matching Name.M.empty res ty)
+    try List.fold_left2 matching
+        (matching Mid.empty res ty)
         args (List.map (fun p -> p.pat_ty) pl)
     with Invalid_argument _ -> raise BadArity
   in
   pat_app f pl ty
 
 let pat_as p v =
-  if p.pat_ty == v.vs_ty then pat_as p v else raise Ty.TypeMismatch
+  if p.pat_ty == v.vs_ty then pat_as p v else raise TypeMismatch
 
 (* safe map over patterns *)
 
@@ -305,7 +305,7 @@ module T = struct
 
   let hash t =
     Hashcons.combine (t_hash_node t.t_node)
-      (Hashcons.combine_list Hashtbl.hash t.t_ty.Ty.ty_tag t.t_label)
+      (Hashcons.combine_list Hashtbl.hash t.t_ty.ty_tag t.t_label)
 
   let tag n t = { t with t_tag = n }
 
@@ -540,13 +540,13 @@ and f_subst m lvl f = f_map_unsafe (t_subst m) (f_subst m) lvl f
 
 let t_subst_single v t1 t =
   if v.vs_ty == t1.t_ty then t_subst (Mvs.add v t1 Mvs.empty) 0 t
-                        else raise Ty.TypeMismatch
+                        else raise TypeMismatch
 
 let f_subst_single v t1 f =
   if v.vs_ty == t1.t_ty then f_subst (Mvs.add v t1 Mvs.empty) 0 f
-                        else raise Ty.TypeMismatch
+                        else raise TypeMismatch
 
-let vt_check v t = if v.vs_ty == t.t_ty then () else raise Ty.TypeMismatch
+let vt_check v t = if v.vs_ty == t.t_ty then () else raise TypeMismatch
 
 let t_subst m t = let _ = Mvs.iter vt_check m in t_subst m 0 t
 let f_subst m f = let _ = Mvs.iter vt_check m in f_subst m 0 f
@@ -741,11 +741,11 @@ and f_subst_term t1 t2 lvl f =
 
 let t_subst_term t1 t2 t =
   if t1.t_ty == t2.t_ty then t_subst_term t1 t2 0 t
-                        else raise Ty.TypeMismatch
+                        else raise TypeMismatch
 
 let f_subst_term t1 t2 f =
   if t1.t_ty == t2.t_ty then f_subst_term t1 t2 0 f
-                        else raise Ty.TypeMismatch
+                        else raise TypeMismatch
 
 (* substitutes fmla [f2] for fmla [f1] in term [t] *)
 
@@ -770,11 +770,11 @@ and f_subst_term_alpha t1 t2 lvl f =
 
 let t_subst_term_alpha t1 t2 t =
   if t1.t_ty == t2.t_ty then t_subst_term_alpha t1 t2 0 t
-                        else raise Ty.TypeMismatch
+                        else raise TypeMismatch
 
 let f_subst_term_alpha t1 t2 f =
   if t1.t_ty == t2.t_ty then f_subst_term_alpha t1 t2 0 f
-                        else raise Ty.TypeMismatch
+                        else raise TypeMismatch
 
 (* substitutes fmla [f2] for fmla [f1] in term [t] modulo alpha *)
 
@@ -806,7 +806,7 @@ and f_skip lvl (sT,sF,acc) f =
 
 let rec t_map_skip fnT fnF sT sF lvl t =
   if Sterm.mem t sT then let t1 = fnT t in
-    if (t1.t_ty == t.t_ty) then t1 else raise Ty.TypeMismatch
+    if (t1.t_ty == t.t_ty) then t1 else raise TypeMismatch
   else t_map_unsafe (t_map_skip fnT fnF sT sF)
                     (f_map_skip fnT fnF sT sF) lvl t
 
@@ -817,7 +817,7 @@ and f_map_skip fnT fnF sT sF lvl f =
 
 let t_map_skip fnT fnF lvl t =
   if lvl == 0 then let t1 = fnT t in
-    if (t1.t_ty == t.t_ty) then t1 else raise Ty.TypeMismatch
+    if (t1.t_ty == t.t_ty) then t1 else raise TypeMismatch
   else  let sT,sF,_ = t_skip lvl skip_empty t in
         t_map_skip fnT fnF sT sF lvl t
 
@@ -880,11 +880,11 @@ let f_exists_trans prT prF f =
 
 let t_let v t1 t2 =
   if v.vs_ty == t1.t_ty then t_let v t1 (t_abst_single v t2)
-                        else raise Ty.TypeMismatch
+                        else raise TypeMismatch
 
 let f_let v t1 f2 =
   if v.vs_ty == t1.t_ty then f_let v t1 (f_abst_single v f2)
-                        else raise Ty.TypeMismatch
+                        else raise TypeMismatch
 
 let t_eps v f = t_eps v (f_abst_single v f)
 
@@ -895,8 +895,8 @@ let f_exists = f_quant Fexists
 let t_app f tl ty =
   let args, res = f.fs_scheme in
   let _ =
-    try List.fold_left2 Ty.matching
-        (Ty.matching Name.M.empty res ty)
+    try List.fold_left2 matching
+        (matching Mid.empty res ty)
         args (List.map (fun t -> t.t_ty) tl)
     with Invalid_argument _ -> raise BadArity
   in
@@ -904,7 +904,7 @@ let t_app f tl ty =
 
 let f_app p tl =
   let _ =
-    try List.fold_left2 Ty.matching Name.M.empty
+    try List.fold_left2 matching Mid.empty
         p.ps_scheme (List.map (fun t -> t.t_ty) tl)
     with Invalid_argument _ -> raise BadArity
   in
@@ -928,15 +928,15 @@ let pat_varmap p =
 
 let t_case t bl ty =
   let t_make_branch (p, tbr) =
-    if tbr.t_ty != ty then raise Ty.TypeMismatch else
-    if p.pat_ty != t.t_ty then raise Ty.TypeMismatch else
+    if tbr.t_ty != ty then raise TypeMismatch else
+    if p.pat_ty != t.t_ty then raise TypeMismatch else
     let m, nv = pat_varmap p in (p, nv, t_abst m 0 tbr)
   in
   t_case t (List.map t_make_branch bl) ty
 
 let f_case t bl =
   let f_make_branch (p, fbr) =
-    if p.pat_ty != t.t_ty then raise Ty.TypeMismatch else
+    if p.pat_ty != t.t_ty then raise TypeMismatch else
     let m, nv = pat_varmap p in (p, nv, f_abst m 0 fbr)
   in
   f_case t (List.map f_make_branch bl)

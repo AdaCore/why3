@@ -19,27 +19,33 @@
 
 open Format
 open Pp
-open Term
+open Ident
 open Ty
+open Term
+
+let print_ident =
+  let printer = create_printer () in
+  let print fmt id = Format.fprintf fmt "%s" (id_unique printer id) in
+  print
 
 let rec print_ty fmt ty = match ty.ty_node with
   | Tyvar n ->
-      fprintf fmt "'%a" Name.print n
+      fprintf fmt "'%a" print_ident n
   | Tyapp (s, []) -> 
-      Name.print fmt s.ts_name
+      print_ident fmt s.ts_name
   | Tyapp (s, [t]) -> 
-      fprintf fmt "%a %a" print_ty t Name.print s.ts_name
+      fprintf fmt "%a %a" print_ty t print_ident s.ts_name
   | Tyapp (s, l) -> 
-      fprintf fmt "(%a) %a" (print_list comma print_ty) l Name.print s.ts_name
+      fprintf fmt "(%a) %a" (print_list comma print_ty) l print_ident s.ts_name
   
 let rec print_term fmt t = match t.t_node with
   | Tbvar n -> 
       assert false
   | Tvar n -> 
-      Name.print fmt n.vs_name
+      print_ident fmt n.vs_name
   | Tapp (s, tl) ->
       fprintf fmt "(%a(%a) : %a)" 
-	Name.print s.fs_name (print_list comma print_term) tl
+	print_ident s.fs_name (print_list comma print_term) tl
 	print_ty t.t_ty
   | _ ->
       assert false (*TODO*)

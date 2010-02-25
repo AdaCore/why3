@@ -18,15 +18,16 @@
 (**************************************************************************)
 
 open Util
+open Ident
 
 (** Types *)
 
-type tvsymbol = Name.t
+type tvsymbol = ident
 
 (* type symbols and types *)
 
 type tysymbol = {
-  ts_name : Name.t;
+  ts_name : ident;
   ts_args : tvsymbol list;
   ts_def  : ty option;
   ts_tag  : int;
@@ -43,8 +44,8 @@ and ty_node =
 
 module Tsym = struct
   type t = tysymbol
-  let equal ts1 ts2 = Name.equal ts1.ts_name ts2.ts_name
-  let hash ts = Name.hash ts.ts_name
+  let equal ts1 ts2 = ts1.ts_name == ts2.ts_name
+  let hash ts = ts.ts_name.id_tag
   let tag n ts = { ts with ts_tag = n }
   let compare ts1 ts2 = Pervasives.compare ts1.ts_tag ts2.ts_tag
 end
@@ -66,14 +67,14 @@ module Ty = struct
   type t = ty
 
   let equal ty1 ty2 = match ty1.ty_node, ty2.ty_node with
-    | Tyvar n1, Tyvar n2 -> Name.equal n1 n2
+    | Tyvar n1, Tyvar n2 -> n1 == n2
     | Tyapp (s1, l1), Tyapp (s2, l2) -> s1 == s2 && List.for_all2 (==) l1 l2
     | _ -> false
 
   let hash_ty ty = ty.ty_tag
 
   let hash ty = match ty.ty_node with
-    | Tyvar v -> Name.hash v
+    | Tyvar v -> v.id_tag
     | Tyapp (s, tl) -> Hashcons.combine_list hash_ty (s.ts_tag) tl
 
   let tag n ty = { ty with ty_tag = n }
@@ -107,13 +108,13 @@ exception NonLinear
 exception UnboundTypeVariable
 
 let rec tv_known vs ty = match ty.ty_node with
-  | Tyvar n -> Name.S.mem n vs
+  | Tyvar n -> Sid.mem n vs
   | _ -> ty_forall (tv_known vs) ty
 
 let create_tysymbol name args def =
-  let add s v = if Name.S.mem v s
-  then raise NonLinear else Name.S.add v s in
-  let s = List.fold_left add Name.S.empty args in
+  let add s v = if Sid.mem v s
+  then raise NonLinear else Sid.add v s in
+  let s = List.fold_left add Sid.empty args in
   let _ = match def with
     | Some ty -> tv_known s ty || raise UnboundTypeVariable
     | _ -> true
@@ -123,15 +124,15 @@ let create_tysymbol name args def =
 exception BadTypeArity
 
 let rec tv_inst m ty = match ty.ty_node with
-  | Tyvar n -> Name.M.find n m
+  | Tyvar n -> Mid.find n m
   | _ -> ty_map (tv_inst m) ty
 
 let ty_app s tl =
   if List.length tl == List.length s.ts_args
   then match s.ts_def with
     | Some ty ->
-        let add m v t = Name.M.add v t m in
-        tv_inst (List.fold_left2 add Name.M.empty s.ts_args tl) ty
+        let add m v t = Mid.add v t m in
+        tv_inst (List.fold_left2 add Mid.empty s.ts_args tl) ty
     | _ ->
         ty_app s tl
   else raise BadTypeArity
@@ -144,8 +145,8 @@ let rec matching s ty1 ty2 =
   if ty1 == ty2 then s
   else match ty1.ty_node, ty2.ty_node with
     | Tyvar n1, _ ->
-        (try if Name.M.find n1 s == ty2 then s else raise TypeMismatch
-         with Not_found -> Name.M.add n1 ty2 s)
+        (try if Mid.find n1 s == ty2 then s else raise TypeMismatch
+         with Not_found -> Mid.add n1 ty2 s)
     | Tyapp (f1, l1), Tyapp (f2, l2) when f1 == f2 ->
         List.fold_left2 matching s l1 l2
     | _ ->
