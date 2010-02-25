@@ -545,17 +545,62 @@ let locate_file env q =
   if not (Sys.file_exists file) then error ~loc:(qloc q) (UnboundFile file);
   file
 
-let find_theory env q = match q with
+type loaded_theory = {
+  parsed : Ptree.theory;
+  mutable typed : Theory.t option;
+}
+
+let loaded_theories = Hashtbl.create 17 (* file -> theory -> loaded_theory *)
+
+(* parse file and store all theories into parsed_theories *)
+let load_theories file =
+  if not (Hashtbl.mem loaded_theories file) then begin
+    let c = open_in file in
+    let lb = Lexing.from_channel c in
+    Loc.set_file file lb;
+    let tl = Lexer.parse_logic_file lb in 
+    close_in c;
+    let h = Hashtbl.create 17 in
+    Hashtbl.add loaded_theories file h;
+    List.iter 
+      (fun pt -> 
+	 Hashtbl.add h pt.th_name.id { parsed = pt; typed = None }) 
+      tl
+  end
+
+let rec find_theory env q = match q with
   | Qident id -> 
+      (* local theory *)
       begin 
 	try M.find id.id env.theories 
 	with Not_found -> error ~loc:id.id_loc (UnboundTheory id.id) 
       end
   | Qdot (f, id) ->
-      let f = locate_file env f in
-      assert false
+      (* theory in file f *)
+      let file = locate_file env f in
+      load_theories file;
+      let h = Hashtbl.find loaded_theories file in
+      try 
+	let t = Hashtbl.find h id.id in
+	match t.typed with
+	  | Some th -> 
+	      th
+	  | None -> 
+	      let th = type_theory env id.id t.parsed in 
+	      t.typed <- Some th; 
+	      th
+      with Not_found ->
+	error ~loc:id.id_loc (UnboundTheory id.id);
 
-let rec add_decl env th = function
+and type_theory env id pt =
+  let n = Name.from_string id in
+  let th = create_theory n in
+  let th = add_decls env th pt.th_decl in
+  close_theory th
+
+and add_decls env th = List.fold_left (add_decl env) th
+
+and add_decl env th = function
   | TypeDecl (loc, sl, s) ->
       add_type loc sl s th
   | Logic (loc, ids, PPredicate pl) ->
@@ -597,14 +642,6 @@ let rec add_decl env th = function
   | Predicate_def _ 
   | Inductive_def _ ->
       assert false (*TODO*)
-
-and add_decls env th = List.fold_left (add_decl env) th
-
-and type_theory env id pt =
-  let n = Name.from_string id in
-  let th = create_theory n in
-  let th = add_decls env th pt.th_decl in
-  close_theory th
 
 let add_theory env pt =
   let id = pt.th_name.id in

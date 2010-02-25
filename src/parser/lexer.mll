@@ -43,7 +43,7 @@
       (fun (x,y) -> Hashtbl.add keywords x y)
       [ "absurd", ABSURD;
 	"and", AND;
-        "array", ARRAY;
+        (*"array", ARRAY;*)
 	"as", AS;
 	"assert", ASSERT;
 	"axiom", AXIOM;
