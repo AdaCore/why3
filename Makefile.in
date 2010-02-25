@@ -100,8 +100,8 @@ doc/version.tex src/version.ml: Version version.sh config.status
 # why
 #####
 
-CORE_CMO = src/core/name.cmo src/core/ty.cmo src/core/term.cmo \
-           src/core/theory.cmo
+CORE_CMO = src/core/name.cmo src/core/ident.cmo src/core/ty.cmo \
+	   src/core/term.cmo src/core/theory.cmo
 UTIL_CMO = src/util/pp.cmo src/util/loc.cmo src/util/util.cmo \
            src/util/hashcons.cmo 
 PARSER_CMO = src/parser/parser.cmo src/parser/lexer.cmo src/parser/typing.cmo
