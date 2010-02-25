@@ -499,7 +499,10 @@ let open_theory t env =
     theories  = open_map th.theories  env.theories }
 ***)
 
-let rec add_decl th = function
+let find_theory env q =
+  assert false (* TODO *)
+
+let rec add_decl env th = function
   | TypeDecl (loc, sl, s) ->
       add_type loc sl s th
   | Logic (loc, ids, PPredicate pl) ->
@@ -509,13 +512,30 @@ let rec add_decl th = function
   | Axiom (loc, s, f) ->
       axiom loc s f th
   | Use (loc, use) ->
-      (* use_theory env use *)
-      assert false (*TODO*)
+      let t = find_theory env use.use_theory in
+      let n = match use.use_as with 
+	| None -> t.t_name
+	| Some x -> Name.from_string x.id
+      in
+      begin match use.use_imp_exp with
+	| Nothing ->
+	    (* use T = namespace T use_export T end *)
+	    let th = open_namespace th in
+	    let th = use_export th t in
+	    close_namespace th n ~import:false
+	| Import ->
+	    (* use import T = namespace T use_export T end import T *)
+	    let th = open_namespace th in
+	    let th = use_export th t in
+	    close_namespace th n ~import:true
+	| Export ->
+	    use_export th t
+      end
   | Namespace (_, {id=id; id_loc=loc}, dl) ->
       let ns = get_namespace th in
       if mem_namespace ns id then error ~loc (ClashNamespace id);
       let th = open_namespace th in
-      let th = add_decls th dl in
+      let th = add_decls env th dl in
       let n = Name.from_string id in
       close_namespace th n ~import:false
   | AlgType _ 
@@ -525,14 +545,14 @@ let rec add_decl th = function
   | Inductive_def _ ->
       assert false (*TODO*)
 
-and add_decls th = List.fold_left add_decl th
+and add_decls env th = List.fold_left (add_decl env) th
 
 let add_theory env pt =
   let id = pt.th_name.id in
   if M.mem id env.theories then error ~loc:pt.th_loc (ClashTheory id);
   let n = Name.from_string id in
   let th = create_theory n in
-  let th = add_decls th pt.th_decl in
+  let th = add_decls env th pt.th_decl in
   let t = close_theory th in
   { env with theories = M.add id t env.theories }
 

@@ -105,15 +105,6 @@ let close_theory th = match th.th_stack with
   | _ -> 
       error CloseTheory
 
-(*
-  use export T = use_export T
-
-  use T        = namespace T use_export T end
-
-  use import T = namespace T use_export T end import T
-
-*)
-
 let open_namespace th = match th.th_stack with
   | (i, _) :: _ as st ->
       { th with th_stack = (i, empty_ns) :: st }
