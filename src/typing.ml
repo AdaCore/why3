@@ -20,8 +20,10 @@
 open Util
 open Format
 open Pp
+open Ty
 open Term
 open Ptree
+open Theory
 
 (** errors *)
 
@@ -29,18 +31,20 @@ type error =
   | Message of string
   | ClashType of string
   | BadTypeArity of string
-  | UnboundType of qualid
+  | UnboundType of string
   | TypeArity of qualid * int * int
   | Clash of string
   | PredicateExpected
   | TermExpected
-  | UnboundSymbol of qualid
+  | UnboundSymbol of string
   | TermExpectedType of (formatter -> unit) * (formatter -> unit) 
       (* actual / expected *)
   | BadNumberOfArguments of Name.t * int * int 
   | ClashTheory of string
+  | ClashNamespace of string
   | UnboundTheory of string
   | AlreadyTheory of string
+  | UnboundNamespace of string
 
 exception Error of error
 
@@ -60,7 +64,7 @@ let report fmt = function
   | BadTypeArity s ->
       fprintf fmt "duplicate type parameter %s" s
   | UnboundType s ->
-       fprintf fmt "Unbound type '%a'" print_qualid s
+       fprintf fmt "Unbound type '%s'" s
   | TypeArity (id, a, n) ->
       fprintf fmt "@[The type %a expects %d argument(s),@ " print_qualid id a;
       fprintf fmt "but is applied to %d argument(s)@]" n
@@ -71,7 +75,7 @@ let report fmt = function
   | TermExpected ->
       fprintf fmt "syntax error: term expected"
   | UnboundSymbol s ->
-       fprintf fmt "Unbound symbol '%a'" print_qualid s
+       fprintf fmt "Unbound symbol '%s'" s
   | BadNumberOfArguments (s, n, m) ->
       fprintf fmt "@[Symbol `%a' is aplied to %d terms,@ " Name.print s n;
       fprintf fmt "but is expecting %d arguments@]" m
@@ -80,10 +84,28 @@ let report fmt = function
       fprintf fmt "@ but is expected to have type@ "; ty2 fmt; fprintf fmt "@]"
   | ClashTheory s ->
       fprintf fmt "clash with previous theory %s" s
+  | ClashNamespace s ->
+      fprintf fmt "clash with previous namespace %s" s
   | UnboundTheory s ->
       fprintf fmt "unbound theory %s" s
   | AlreadyTheory s ->
       fprintf fmt "already using a theory with name %s" s
+  | UnboundNamespace s ->
+      fprintf fmt "unbound namespace %s" s
+
+(** Environments *)
+
+module M = Map.Make(String)
+
+type env = {
+  loadpath : string list;
+  theories : Theory.t M.t; (* local theories *)
+}
+
+let create lp = {
+  loadpath = lp;
+  theories = M.empty;
+}
 
 (** typing using destructive type variables 
 
@@ -159,16 +181,14 @@ let rec unify t1 t2 = match t1, t2 with
     environment + local variables.
     It is only local to this module and created with [create_denv] below. *)
 
-module M = Map.Make(String)
-
 type denv = { 
-  env : Env.t;
+  th : Theory.th; (* the theory under construction *)
   utyvars : (string, type_var) Hashtbl.t; (* user type variables *)
   dvars : dty M.t; (* local variables, to be bound later *)
 }
 
-let create_denv env = { 
-  env = env; 
+let create_denv th = { 
+  th = th; 
   utyvars = Hashtbl.create 17; 
   dvars = M.empty;
 }
@@ -199,19 +219,56 @@ let rec specialize env t = match t.Ty.ty_node with
   | Ty.Tyapp (s, tl) ->
       Tyapp (s, List.map (specialize env) tl)
 
+(** generic find function using a path *)
+
+let find_local_namespace {id=x; id_loc=loc} ns = 
+  try find_namespace ns x 
+  with Not_found -> error ~loc (UnboundNamespace x)
+
+let rec find_namespace q ns = match q with
+  | Qident t -> find_local_namespace t ns
+  | Qdot (q, t) -> let ns = find_namespace q ns in find_local_namespace t ns
+
+let rec find f q ns = match q with
+  | Qident x -> f x ns
+  | Qdot (m, x) -> let ns = find_namespace m ns in f x ns
+
+(** specific find functions using a path *)
+
+let find_tysymbol {id=x; id_loc=loc} ns = 
+  try find_tysymbol ns x 
+  with Not_found -> error ~loc (UnboundType x)
+
+let find_tysymbol p th = 
+  find find_tysymbol p (get_namespace th)
+
 let specialize_tysymbol x env =
-  let s = Env.find_tysymbol x env.env in
+  let s = find_tysymbol x env.th in
   let env = Htv.create 17 in
   s, List.map (find_type_var env) s.Ty.ts_args
 	
+let find_fsymbol {id=x; id_loc=loc} ns = 
+  try find_fsymbol ns x 
+  with Not_found -> error ~loc (UnboundSymbol x)
+
+let find_fsymbol p th = 
+  find find_fsymbol p (get_namespace th)
+
 let specialize_fsymbol x env =
-  let s = (* Env.find_fsymbol x env *) assert false (*TODO*) in
+  let s = find_fsymbol x env.th in
   let tl, t = s.fs_scheme in
   let env = Htv.create 17 in
   s, List.map (specialize env) tl, specialize env t
 
+let find_psymbol {id=x; id_loc=loc} ns = 
+  try find_psymbol ns x 
+  with Not_found -> error ~loc (UnboundSymbol x)
+
+let find_psymbol p th =
+  find find_psymbol p (get_namespace th)
+
 let specialize_psymbol x env =
-  let s = (* find_psymbol x env.env *) assert false (*TODO*) in
+  let s = find_psymbol x env.th in
   let env = Htv.create 17 in
   s, List.map (specialize env) s.ps_scheme
 
@@ -221,20 +278,13 @@ let rec qloc = function
   | Qident x -> x.id_loc
   | Qdot (m, x) -> Loc.join (qloc m) x.id_loc
 
-let rec path = function
-  | Qident x -> Env.Pident x.id
-  | Qdot (p, x) -> Env.Pdot (path p, x.id)
-
 (* parsed types -> intermediate types *)
 let rec dty env = function
   | PPTtyvar {id=x} -> 
       Tyvar (find_user_type_var x env)
   | PPTtyapp (p, x) ->
       let loc = qloc x in
-      let s, tv = 
-	try specialize_tysymbol (path x) env 
-	with Not_found -> error ~loc:loc (UnboundType x)
-      in
+      let s, tv = specialize_tysymbol x env in
       let np = List.length p in
       let a = List.length tv in
       if np <> a then error ~loc (TypeArity (x, a, np));
@@ -289,22 +339,14 @@ and dterm_node loc env = function
       Tvar x, ty
   | PPvar x -> 
       (* 0-arity symbol (constant) *)
-      begin try 
-	let s, tyl, ty = specialize_fsymbol x env in
-	let n = List.length tyl in
-	if n > 0 then error ~loc (BadNumberOfArguments (s.fs_name, 0, n));
-	Tapp (s, []), ty
-      with Not_found -> 
-	error ~loc (UnboundSymbol x)
-      end
+      let s, tyl, ty = specialize_fsymbol x env in
+      let n = List.length tyl in
+      if n > 0 then error ~loc (BadNumberOfArguments (s.fs_name, 0, n));
+      Tapp (s, []), ty
   | PPapp (x, tl) ->
-      begin try
-	let s, tyl, ty = specialize_fsymbol x env in
-	let tl = dtype_args s.fs_name loc env tyl tl in
-	Tapp (s, tl), ty
-      with Not_found ->
-	error ~loc (UnboundSymbol x)
-      end
+      let s, tyl, ty = specialize_fsymbol x env in
+      let tl = dtype_args s.fs_name loc env tyl tl in
+      Tapp (s, tl), ty
   | _ ->
       assert false (*TODO*)
 
@@ -330,12 +372,7 @@ and dfmla env e = match e.pp_desc with
       let env = { env with dvars = M.add x ty env.dvars } in
       Fquant (Fexists, x, ty, dfmla env a)
   | PPapp (x, tl) ->
-      let s, tyl = 
-	try 
-	  specialize_psymbol x env 
-	with Not_found -> 
-	  error ~loc:e.pp_loc (UnboundSymbol x)
-      in
+      let s, tyl = specialize_psymbol x env in
       let tl = dtype_args s.ps_name e.pp_loc env tyl tl in
       Fapp (s, tl)
   | _ ->
@@ -391,9 +428,9 @@ and fmla env = function
 
 open Ptree
 
-(***
-let add_type loc sl s env =
-  if M.mem s.id env.tysymbols then error ~loc (ClashType s.id);
+let add_type loc sl s th =
+  let ns = get_namespace th in
+  if mem_tysymbol ns s.id then error ~loc (ClashType s.id);
   let tyvars = ref M.empty in
   let add_ty_var {id=x} =
     if M.mem x !tyvars then error ~loc (BadTypeArity x);
@@ -403,24 +440,25 @@ let add_type loc sl s env =
   in
   let vl = List.map add_ty_var sl in
   let ty = Ty.create_tysymbol (Name.from_string s.id) vl None in
-  add_tysymbol s.id ty env
+  add_decl th (Dtype [ty, Ty_abstract])
 
-let add_function loc pl t env {id=id} =
-  if M.mem id env.fsymbols then error ~loc (Clash id);
-  let denv = create_denv env in
+let add_function loc pl t th {id=id} =
+  let ns = get_namespace th in
+  if mem_fsymbol ns id then error ~loc (Clash id);
+  let denv = create_denv th in
   let pl = List.map (dty denv) pl and t = dty denv t in
   let pl = List.map ty pl and t = ty t in
   let s = create_fsymbol (Name.from_string id) (pl, t) false in
-  add_fsymbol id s env
+  add_decl th (Dlogic [Lfunction (s, None)])
 
-let add_predicate loc pl env {id=id} =
-  if M.mem id env.psymbols then error ~loc (Clash id);
-  let denv = create_denv env in
+let add_predicate loc pl th {id=id} =
+  let ns = get_namespace th in
+  if mem_psymbol ns id then error ~loc (Clash id);
+  let denv = create_denv th in
   let pl = List.map (dty denv) pl in
   let pl = List.map ty pl in
   let s = create_psymbol (Name.from_string id) pl in
-  add_psymbol id s env
-***)
+  add_decl th (Dlogic [Lpredicate (s, None)])
 
 let fmla env f =
   let denv = create_denv env in
@@ -461,23 +499,25 @@ let open_theory t env =
     theories  = open_map th.theories  env.theories }
 ***)
 
-let rec add_decl env = function
+let rec add_decl th = function
   | TypeDecl (loc, sl, s) ->
-      (* add_type loc sl s env *)
-      assert false (*TODO*)
+      add_type loc sl s th
   | Logic (loc, ids, PPredicate pl) ->
-      (* List.fold_left (add_predicate loc pl) env ids *)
-      assert false (*TODO*) 
+      List.fold_left (add_predicate loc pl) th ids
   | Logic (loc, ids, PFunction (pl, t)) ->
-      (* List.fold_left (add_function loc pl t) env ids *)
-      assert false (*TODO*)
+      List.fold_left (add_function loc pl t) th ids
   | Axiom (loc, s, f) ->
-      axiom loc s f env
+      axiom loc s f th
   | Use (loc, use) ->
       (* use_theory env use *)
       assert false (*TODO*)
-  | Namespace _ ->
-      assert false (*TODO*)
+  | Namespace (_, {id=id; id_loc=loc}, dl) ->
+      let ns = get_namespace th in
+      if mem_namespace ns id then error ~loc (ClashNamespace id);
+      let th = open_namespace th in
+      let th = add_decls th dl in
+      let n = Name.from_string id in
+      close_namespace th n ~import:false
   | AlgType _ 
   | Goal _ 
   | Function_def _ 
@@ -485,17 +525,16 @@ let rec add_decl env = function
   | Inductive_def _ ->
       assert false (*TODO*)
 
+and add_decls th = List.fold_left add_decl th
 
-and add_decls env = List.fold_left add_decl env
-
-let add_theory env th =
-  assert false (*TODO*)
-(*   let id = th.th_name.id in *)
-(*   if M.mem id env.theories then error ~loc:th.th_loc (ClashTheory id); *)
-(*   let th_env = { env with theories = M.add self_id empty0 env.theories } in *)
-(*   let th_env = add_decls th_env th.th_decl in *)
-(* (\*   printf "add_theory %s@\n%a@." id print_env (M.find self_id th_env.theories); *\) *)
-(*   { env with theories = M.add id (M.find self_id th_env.theories) env.theories } *)
+let add_theory env pt =
+  let id = pt.th_name.id in
+  if M.mem id env.theories then error ~loc:pt.th_loc (ClashTheory id);
+  let n = Name.from_string id in
+  let th = create_theory n in
+  let th = add_decls th pt.th_decl in
+  let t = close_theory th in
+  { env with theories = M.add id t env.theories }
 
 (*
 Local Variables: 

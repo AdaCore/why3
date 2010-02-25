@@ -3,20 +3,15 @@
 
 theory A
   type t
-  logic c:t
+  logic c : t
 end
 
 theory B
-  use import A
-  logic d : t
-  logic p : t -> prop
-end
-
-theory C
-  use B
-  use T : B.A 
-  logic e : T.t
-  axiom test : B.p(T.c)
+  namespace S type t end
+  logic d : S.t
+  logic f : S.t -> S.t
+  logic p : S.t -> prop
+  axiom Ax : forall x:S.t. p(x) or p(f(x))
 end
 
 theory Int
@@ -33,7 +28,7 @@ theory List
 
   logic is_nil : 'a list -> prop
 
-  use import Int 
+  type int (* use import Int *)
   
   logic length : 'a list -> int
 
@@ -59,6 +54,7 @@ theory Eq
 
 end
 
+(*
 theory Test
 
   use Eq
@@ -66,3 +62,4 @@ theory Test
   axiom a : forall x : 'a. not Eq.eq(nil, cons(nil, nil))
 
 end
+*)

@@ -44,9 +44,9 @@ type decl_or_use =
   | Use of t
 
 and t = private {
-  th_name : Name.t;
-  th_namespace : namespace;
-  th_decls : decl_or_use list;
+  t_name : Name.t;
+  t_namespace : namespace;
+  t_decls : decl_or_use list;
 }
 
 and namespace
@@ -56,12 +56,12 @@ and namespace
 type th
   (** a theory under construction *)
 
-val create_theory :  Name.t -> th
+val create_theory : Name.t -> th
 
-val open_namespace : th -> Name.t -> import:bool -> th
-val close_namespace : th -> th
+val open_namespace : th -> th
+val close_namespace : th -> Name.t -> import:bool -> th
 
-val use_export : th -> string -> th
+val use_export : th -> t -> th
 
 type th_inst = {
   inst_ts : tysymbol Mts.t;
@@ -69,7 +69,7 @@ type th_inst = {
   inst_ps : psymbol  Mps.t;
 }
 
-val clone_export : th -> string -> th_inst -> th
+val clone_export : th -> t -> th_inst -> th
 
 val add_decl : th -> decl -> th
 
@@ -85,6 +85,12 @@ val find_psymbol  : namespace -> string -> psymbol
 val find_namespace: namespace -> string -> namespace
 val find_fmla     : namespace -> string -> fmla
 
+val mem_tysymbol : namespace -> string -> bool
+val mem_fsymbol  : namespace -> string -> bool
+val mem_psymbol  : namespace -> string -> bool
+val mem_namespace: namespace -> string -> bool
+val mem_fmla     : namespace -> string -> bool
+
 (** Error reporting *)
 
 type error
@@ -96,4 +102,5 @@ val report : Format.formatter -> error -> unit
 
 (** Debugging *)
 
-val print : Format.formatter -> t -> unit
+val print_th : Format.formatter -> th -> unit
+val print_t  : Format.formatter -> t  -> unit

@@ -19,7 +19,12 @@
 
 (** Typing environments *)
 
-val add_theory : Env.t -> Ptree.theory -> Env.t
+type env
+
+val create : string list -> env
+  (** creates a new typing environment for a given loadpath *)
+
+val add_theory : env -> Ptree.theory -> env
 
 (** error reporting *)
 

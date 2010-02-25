@@ -25,7 +25,6 @@ open Term
 (** Error reporting *)
 
 type error = 
-  | UnboundNamespace of string
   | OpenTheory
   | CloseTheory
   | NoOpenedTheory
@@ -39,25 +38,47 @@ let error e = raise (Error e)
 
 module M = Map.Make(String)
 
-type namespace = {
+type ty_def = 
+  | Ty_abstract
+  | Ty_algebraic of fsymbol list
+
+type ty_decl = tysymbol * ty_def 
+
+type logic_decl = 
+  | Lfunction  of fsymbol * (vsymbol list * term) option (* FIXME: binders *)
+  | Lpredicate of psymbol * (vsymbol list * fmla) option (* FIXME: binders *)
+  | Linductive of psymbol * (Name.t * fmla) list
+
+type prop_kind = 
+  | Axiom | Lemma | Goal
+
+type decl =
+  | Dtype  of ty_decl list
+  | Dlogic of logic_decl list
+  | Dprop  of prop_kind * Name.t * fmla
+
+type decl_or_use =
+  | Decl of decl
+  | Use of t
+
+and t = {
+  t_name : Name.t;
+  t_namespace : namespace;
+  t_decls : decl_or_use list;
+}
+
+and namespace = {
   tysymbols : tysymbol M.t;  (* type symbols *)
   fsymbols  : fsymbol M.t;   (* function symbols *)
   psymbols  : psymbol M.t;   (* predicate symbols *)
+  fmlas     : fmla M.t;      (* formula *)
   namespace : namespace M.t;      
 }
 
-type decl = 
-  unit (* TODO *)
-
-type theory = {
-  th_ns   : namespace;
-  th_decl : decl list;
-}
-
-type t = {
-  loadpath : string list;
-  theories : theory M.t;
-  ns_stack : (namespace * namespace) list; (* stack of imports/exports *)
+type th = {
+  th_name  : Name.t;
+  th_stack : (namespace * namespace) list; (* stack of imports/exports *)
+  th_decls : decl_or_use list;
 }
 
 (** Creating environments *)
@@ -66,98 +87,106 @@ let empty_ns = {
   tysymbols = M.empty;
   fsymbols  = M.empty;
   psymbols  = M.empty;
+  fmlas     = M.empty;
   namespace = M.empty;
 }
 
-let is_empty_ns ns =
-  M.is_empty ns.tysymbols &&
-  M.is_empty ns.fsymbols  &&
-  M.is_empty ns.psymbols  &&
-  M.is_empty ns.namespace
-
-let create lp = {
-  loadpath = lp;
-  theories = M.empty;
-  ns_stack = [];
+let create_theory n = {
+  th_name = n;
+  th_stack = [empty_ns, empty_ns];
+  th_decls = [];
 }
-
-let open_theory t = match t.ns_stack with
-  | [] -> { t with ns_stack = [empty_ns, empty_ns] }
-  | _  -> error OpenTheory
   
-let close_theory t s = match t.ns_stack with
+let close_theory th = match th.th_stack with
   | [_, e] -> 
-      let th = { th_ns = e; th_decl = [] (* TODO *) } in
-      { t with theories = M.add s th t.theories }
+      { t_name = th.th_name;
+	t_namespace = e;
+	t_decls = th.th_decls; }
   | _ -> 
       error CloseTheory
 
-let open_namespace t = match t.ns_stack with
-  | (i, _) :: _ as st ->
-      { t with ns_stack = (i, empty_ns) :: st }
-  | [] ->
-      error NoOpenedTheory
+(*
+  use export T = use_export T
 
-let close_namespace t s = match t.ns_stack with
+  use T        = namespace T use_export T end
+
+  use import T = namespace T use_export T end import T
+
+*)
+
+let open_namespace th = match th.th_stack with
+  | (i, _) :: _ as st ->
+      { th with th_stack = (i, empty_ns) :: st }
+  | [] ->
+      assert false
+
+let close_namespace th n ~import = match th.th_stack with
   | (_, e0) :: (i, e) :: st ->
+      let s = Name.to_string n in
       let add ns = { ns with namespace = M.add s e0 ns.namespace } in
-      { t with ns_stack = (add i, add e) :: st }
+      { th with th_stack = (add i, add e) :: st }
   | [_] ->
       error NoOpenedNamespace
   | [] ->
-      error NoOpenedTheory
+      assert false
 
-let add_tysymbol x ty env = { env with tysymbols = M.add x ty env.tysymbols }
-let add_fsymbol x ty env = { env with fsymbols = M.add x ty env.fsymbols }
-let add_psymbol x ty env = { env with psymbols = M.add x ty env.psymbols }
+let use_export th t =
+  assert false (* TODO *)
 
-(* let self_id = "(\*self*\)" *)
-(* let self env = M.find self_id env.theories *)
-(* let empty = { empty_env with theories = M.add self_id empty_env M.empty } *)
+type th_inst = {
+  inst_ts : tysymbol Mts.t;
+  inst_fs : fsymbol  Mfs.t;
+  inst_ps : psymbol  Mps.t;
+}
 
-(* let add_self f x v env = *)
-(*   f x v { env with theories = *)
-(*       M.add self_id (f x v (self env)) env.theories } *)
+let clone_export th t i =
+  assert false (* TODO *)
 
-(* let add_tysymbol = add_self add_tysymbol *)
-(* let add_fsymbol  = add_self add_fsymbol *)
-(* let add_psymbol  = add_self add_psymbol *)
-(* let add_theory   = add_self add_theory *)
+let add_tysymbol x ty ns = { ns with tysymbols = M.add x ty ns.tysymbols }
+let add_fsymbol x ty ns = { ns with fsymbols = M.add x ty ns.fsymbols }
+let add_psymbol x ty ns = { ns with psymbols = M.add x ty ns.psymbols }
+
+let add_ns add x v th = match th.th_stack with
+  | (i, e) :: st -> 
+      let x = Name.unsafe_to_string x in (add x v i, add x v e) :: st
+  | [] -> assert false
+
+let add_decl th d = 
+  let st = match d with
+    | Dtype [ty, Ty_abstract] ->
+	add_ns add_tysymbol ty.ts_name ty th
+    | Dlogic [Lfunction (fs, None)] ->
+	add_ns add_fsymbol fs.fs_name fs th
+    | Dlogic [Lpredicate (ps, None)] ->
+	add_ns add_psymbol ps.ps_name ps th
+    | _ ->
+	assert false (* TODO *)
+  in
+  { th with 
+      th_stack = st;
+      th_decls = (Decl d) :: th.th_decls }
 
 (** Querying environments *)
 
-let ns env = match env.ns_stack with
+let get_namespace th = match th.th_stack with
   | (ns, _) :: _ -> ns
-  | [] -> error NoOpenedTheory
+  | [] -> assert false
 
-let find_tysymbol s env = M.find s env.tysymbols
-let find_fsymbol s env = M.find s env.fsymbols
-let find_psymbol s env = M.find s env.psymbols
+let find_tysymbol  ns s = M.find s ns.tysymbols
+let find_fsymbol   ns s = M.find s ns.fsymbols
+let find_psymbol   ns s = M.find s ns.psymbols
+let find_namespace ns s = M.find s ns.namespace
+let find_fmla      ns s = M.find s ns.fmlas
 
-type path =
-  | Pident of string
-  | Pdot of path * string
-
-let find_local_namespace s env = 
-  try M.find s env.namespace
-  with Not_found -> error (UnboundNamespace s)
-
-let rec find_namespace q env = match q with
-  | Pident t -> find_local_namespace t env
-  | Pdot (q, t) -> let env = find_namespace q env in find_local_namespace t env
-
-let rec find f q env = match q with
-  | Pident x -> f x env
-  | Pdot (m, x) -> let env = find_namespace m env in f x env
-
-let find_tysymbol p env = find find_tysymbol p (ns env)
-
+let mem_tysymbol  ns s = M.mem s ns.tysymbols
+let mem_fsymbol   ns s = M.mem s ns.fsymbols
+let mem_psymbol   ns s = M.mem s ns.psymbols
+let mem_namespace ns s = M.mem s ns.namespace
+let mem_fmla      ns s = M.mem s ns.fmlas
 
 (** Error reporting *)
 
 let report fmt = function
-  | UnboundNamespace s ->
-      fprintf fmt "unbound namespace %s" s
   | OpenTheory ->
       fprintf fmt "cannot open a new theory in a non-empty context"
   | CloseTheory ->
@@ -169,23 +198,26 @@ let report fmt = function
 
 (** Debugging *)
 
-let rec print_env fmt env =
+let rec print_namespace fmt ns =
   fprintf fmt "@[<hov 2>types: ";
   M.iter (fun x ty -> fprintf fmt "%s -> %a;@ " x Name.print ty.Ty.ts_name)
-    env.tysymbols;
+    ns.tysymbols;
   fprintf fmt "@]@\n@[<hov 2>function symbols: ";
   M.iter (fun x s -> fprintf fmt "%s -> %a;@ " x Name.print s.fs_name)
-    env.fsymbols;
+    ns.fsymbols;
   fprintf fmt "@]@\n@[<hov 2>predicate symbols: ";
   M.iter (fun x s -> fprintf fmt "%s -> %a;@ " x Name.print s.ps_name)
-    env.psymbols;
+    ns.psymbols;
   fprintf fmt "@]@\n@[<hov 2>namespace: ";
-  M.iter (fun x th -> fprintf fmt "%s -> [@[%a@]];@ " x print_env th)
-    env.namespace;
+  M.iter (fun x th -> fprintf fmt "%s -> [@[%a@]];@ " x print_namespace th)
+    ns.namespace;
   fprintf fmt "@]"
 
-let print fmt t =
-  print_env fmt (ns t)
+let print_th fmt th =
+  print_namespace fmt (get_namespace th)
+
+let print_t fmt t = 
+  fprintf fmt "<theory (TODO>"
 
 (*
 Local Variables: 
