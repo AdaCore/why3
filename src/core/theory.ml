@@ -72,7 +72,7 @@ and namespace = {
   tysymbols : tysymbol M.t;  (* type symbols *)
   fsymbols  : fsymbol M.t;   (* function symbols *)
   psymbols  : psymbol M.t;   (* predicate symbols *)
-  fmlas     : fmla M.t;      (* formula *)
+  props     : fmla M.t;      (* formula *)
   namespace : namespace M.t;      
 }
 
@@ -88,7 +88,7 @@ let empty_ns = {
   tysymbols = M.empty;
   fsymbols  = M.empty;
   psymbols  = M.empty;
-  fmlas     = M.empty;
+  props     = M.empty;
   namespace = M.empty;
 }
 
@@ -168,13 +168,13 @@ let find_tysymbol  ns s = M.find s ns.tysymbols
 let find_fsymbol   ns s = M.find s ns.fsymbols
 let find_psymbol   ns s = M.find s ns.psymbols
 let find_namespace ns s = M.find s ns.namespace
-let find_fmla      ns s = M.find s ns.fmlas
+let find_prop      ns s = M.find s ns.props
 
 let mem_tysymbol  ns s = M.mem s ns.tysymbols
 let mem_fsymbol   ns s = M.mem s ns.fsymbols
 let mem_psymbol   ns s = M.mem s ns.psymbols
 let mem_namespace ns s = M.mem s ns.namespace
-let mem_fmla      ns s = M.mem s ns.fmlas
+let mem_prop      ns s = M.mem s ns.props
 
 (** Error reporting *)
 

@@ -84,13 +84,13 @@ val find_tysymbol : namespace -> string -> tysymbol
 val find_fsymbol  : namespace -> string -> fsymbol
 val find_psymbol  : namespace -> string -> psymbol
 val find_namespace: namespace -> string -> namespace
-val find_fmla     : namespace -> string -> fmla
+val find_prop     : namespace -> string -> fmla
 
 val mem_tysymbol : namespace -> string -> bool
 val mem_fsymbol  : namespace -> string -> bool
 val mem_psymbol  : namespace -> string -> bool
 val mem_namespace: namespace -> string -> bool
-val mem_fmla     : namespace -> string -> bool
+val mem_prop     : namespace -> string -> bool
 
 (** Error reporting *)
 
