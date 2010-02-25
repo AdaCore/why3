@@ -52,7 +52,7 @@
 
 # check for one particular file of the sources 
 # ADAPT THE FOLLOWING LINE TO YOUR SOURCES!
-AC_INIT(src/term.mli)
+AC_INIT(src/)
 
 # verbosemake feature
 
@@ -201,7 +201,7 @@ if test "$OCAMLGRAPH" = no ; then
    if test "$OCAMLGRAPH" = no ; then	
       AC_CHECK_FILE(ocamlgraph/src/sig.mli,OCAMLGRAPH=yes,OCAMLGRAPH=no)
       if test "$OCAMLGRAPH" = no ; then	
-	 AC_MSG_ERROR(Cannot find ocamlgraph library. Please install the *libocamlgraph-ocaml-dev* Debian package - or use the GODI caml package system *http://godi.ocaml-programming.de/* - or compile from sources *http://ocamlgraph.lri.fr/*)
+	 AC_MSG_WARN(Cannot find ocamlgraph library. Please install the *libocamlgraph-ocaml-dev* Debian package - or use the GODI caml package system *http://godi.ocaml-programming.de/* - or compile from sources *http://ocamlgraph.lri.fr/*)
       else
 	 OCAMLGRAPHLIB="-I ocamlgraph"
 	 OCAMLGRAPHVER=" in local subdir ocamlgraph"

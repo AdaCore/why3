@@ -51,7 +51,7 @@ OCAMLBEST= @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 CAMLP4   = @CAMLP4O@
 
-INCLUDES = -I src/lib -I src 
+INCLUDES = -I src/core -I src/util -I src/parser -I src 
 BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ 
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
 OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ 
@@ -62,7 +62,7 @@ COQDEP = @COQDEP@
 COQLIB = "@COQLIB@"
 COQVER = @COQVER@
 
-GENERATED = src/version.ml src/parser.mli src/parser.ml src/lexer.ml
+GENERATED = src/version.ml src/parser/parser.mli src/parser/parser.ml src/parser/lexer.ml
 
 # main targets
 ##############
@@ -99,10 +99,11 @@ doc/version.tex src/version.ml: Version version.sh config.status
 # why
 #####
 
-LIBCMO = src/lib/pp.cmo src/lib/loc.cmo src/lib/util.cmo src/lib/hashcons.cmo 
+CORE_CMO = src/core/name.cmo src/core/ty.cmo src/core/term.cmo src/core/theory.cmo
+UTIL_CMO = src/util/pp.cmo src/util/loc.cmo src/util/util.cmo src/util/hashcons.cmo 
+PARSER_CMO = src/parser/parser.cmo src/parser/lexer.cmo src/parser/typing.cmo
 
-CMO = $(LIBCMO) src/name.cmo src/ty.cmo src/term.cmo src/pretty.cmo \
-      src/parser.cmo src/lexer.cmo src/theory.cmo src/typing.cmo src/main.cmo
+CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) src/pretty.cmo src/main.cmo
 CMX = $(CMO:.cmo=.cmx)
 
 bin/why.opt: $(CMX) 
@@ -522,6 +523,7 @@ configure: configure.in
 
 clean::
 	rm -f src/*.cm[iox] src/*.o src/*~ src/*.annot src/*.output
+	rm -f src/*/*.cm[iox] src/*/*.o src/*/*~ src/*/*.annot src/*/*.output
 	rm -f c/*.cm[iox] c/*.o c/*~ c/*.annot c/*.output
 	rm -f intf/*.cm[iox] intf/*.o intf/*~ intf/*.annot
 	rm -f tools/*.cm[iox] tools/*.o tools/*~ tools/*.annot
@@ -562,7 +564,7 @@ coq-clean::
 .PHONY: depend
 .depend depend: $(GENERATED)
 	rm -f .depend
-	$(OCAMLDEP) -slash $(INCLUDES) src/lib/*.ml src/lib/*.mli src/*.ml src/*.mli > .depend
+	$(OCAMLDEP) -slash $(INCLUDES) src/*/*.ml src/*/*.mli src/*.ml src/*.mli > .depend
 ifeq ($(FRAMAC),yes)
 #	$(MAKE) -C $(JESSIE_PLUGIN_PATH) depend
 endif
