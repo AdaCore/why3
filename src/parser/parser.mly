@@ -194,9 +194,14 @@ uqualid:
 | uqualid DOT uident { Qdot ($1, $3) }
 ;
 
+tqualid:
+| ident             { Qident $1 }
+| tqualid DOT ident { Qdot ($1, $3) }
+;
+
 qualid:
-|lqualid {$1}
-|uqualid {$1}
+| lqualid {$1}
+| uqualid {$1}
 
 decl:
 | LOGIC list1_lident_sep_comma COLON logic_type
@@ -499,9 +504,9 @@ list1_lident_sep_comma:
 ;
 
 use:
-| imp_exp uqualid              
+| imp_exp tqualid              
     { { use_theory = $2; use_as = None; use_imp_exp = $1 } }
-| imp_exp uident COLON uqualid 
+| imp_exp uident COLON tqualid 
     { { use_theory = $4; use_as = Some $2; use_imp_exp = $1 } }
 ;
 

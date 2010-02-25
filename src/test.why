@@ -2,6 +2,7 @@
 (* test file *)
 
 theory A
+  use prelude.list.List
   type t
   logic c : t
 end
@@ -16,22 +17,6 @@ end
 
 theory Int
   type int
-end
-
-theory List
-
-  type 'a list
-
-  logic nil  : 'a list
-
-  logic cons : 'a, 'a list -> 'a list
-
-  logic is_nil : 'a list -> prop
-
-  type int (* use import Int *)
-  
-  logic length : 'a list -> int
-
 end
 
 theory Eq 

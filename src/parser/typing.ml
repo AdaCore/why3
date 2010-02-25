@@ -45,6 +45,10 @@ type error =
   | UnboundTheory of string
   | AlreadyTheory of string
   | UnboundNamespace of string
+  | UnboundFile of string
+  | UnboundDir of string
+  | AmbiguousPath of string * string
+  | NotInLoadpath of string
 
 exception Error of error
 
@@ -92,6 +96,14 @@ let report fmt = function
       fprintf fmt "already using a theory with name %s" s
   | UnboundNamespace s ->
       fprintf fmt "unbound namespace %s" s
+  | UnboundFile s ->
+      fprintf fmt "no such file %s" s
+  | UnboundDir s ->
+      fprintf fmt "no such directory %s" s
+  | AmbiguousPath (f1, f2) ->
+      fprintf fmt "@[ambiguous path:@ both `%s'@ and `%s'@ match@]" f1 f2
+  | NotInLoadpath f ->
+      fprintf fmt "cannot find `%s' in loadpath" f
 
 (** Environments *)
 
@@ -499,8 +511,49 @@ let open_theory t env =
     theories  = open_map th.theories  env.theories }
 ***)
 
-let find_theory env q =
-  assert false (* TODO *)
+let find_in_loadpath env f =
+  let rec find c lp = match lp, c with
+    | [], None -> 
+	error ~loc:f.id_loc (NotInLoadpath f.id)
+    | [], Some file ->
+	file
+    | dir :: lp, _ ->
+	let file = Filename.concat dir f.id in
+	if Sys.file_exists file then begin match c with
+	  | None -> find (Some file) lp
+	  | Some file' -> error ~loc:f.id_loc (AmbiguousPath (file, file'))
+	end else
+	  find c lp
+  in
+  find None env.loadpath
+
+let locate_file env q = 
+  let rec locate_dir = function
+    | Qident d ->
+	find_in_loadpath env d
+    | Qdot (q, d) -> 
+	let dir = locate_dir q in
+	let dir = Filename.concat dir d.id in
+	if not (Sys.file_exists dir) then error ~loc:d.id_loc (UnboundDir dir);
+	dir
+  in
+  let file = match q with
+    | Qident f -> find_in_loadpath env f
+    | Qdot (p, f) -> let dir = locate_dir p in Filename.concat dir f.id
+  in
+  let file = file ^ ".why" in
+  if not (Sys.file_exists file) then error ~loc:(qloc q) (UnboundFile file);
+  file
+
+let find_theory env q = match q with
+  | Qident id -> 
+      begin 
+	try M.find id.id env.theories 
+	with Not_found -> error ~loc:id.id_loc (UnboundTheory id.id) 
+      end
+  | Qdot (f, id) ->
+      let f = locate_file env f in
+      assert false
 
 let rec add_decl env th = function
   | TypeDecl (loc, sl, s) ->
@@ -547,13 +600,16 @@ let rec add_decl env th = function
 
 and add_decls env th = List.fold_left (add_decl env) th
 
-let add_theory env pt =
-  let id = pt.th_name.id in
-  if M.mem id env.theories then error ~loc:pt.th_loc (ClashTheory id);
+and type_theory env id pt =
   let n = Name.from_string id in
   let th = create_theory n in
   let th = add_decls env th pt.th_decl in
-  let t = close_theory th in
+  close_theory th
+
+let add_theory env pt =
+  let id = pt.th_name.id in
+  if M.mem id env.theories then error ~loc:pt.th_loc (ClashTheory id);
+  let t = type_theory env id pt in
   { env with theories = M.add id t env.theories }
 
 (*

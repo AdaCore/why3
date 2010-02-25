@@ -53,7 +53,7 @@ let type_file env file =
 
 let () =
   try
-    let env = Typing.create [] in
+    let env = Typing.create ["lib"] in
     ignore (List.fold_left type_file env !files)
   with e ->
     eprintf "%a@." report e;
