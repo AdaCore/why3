@@ -101,7 +101,7 @@ let close_theory th = match th.th_stack with
   | [_, e] -> 
       { t_name = th.th_name;
 	t_namespace = e;
-	t_decls = th.th_decls; }
+	t_decls = List.rev th.th_decls; }
   | _ -> 
       error CloseTheory
 
