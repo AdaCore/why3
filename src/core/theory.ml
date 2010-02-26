@@ -145,10 +145,15 @@ let close_namespace uc n ~import =
   match uc.uc_visible, uc.uc_import, uc.uc_export with
   | v0 :: v1 :: stv, i0 :: i1 :: sti, e0 :: e1 :: ste ->
       let s = n.id_short in
-      let add ns1 ns2 = { ns2 with namespace = M.add s ns1 ns2.namespace } in
-      let v1 = add v0 v1 and i1 = add i0 i1 and e1 = add e0 e1 in
+      let add ~check ns1 ns2 = 
+	if check && M.mem s ns2.namespace then raise (ClashSymbol s);
+	{ ns2 with namespace = M.add s ns1 ns2.namespace } 
+      in
+      let v1 = add ~check:false v0 v1 in
+      let i1 = add ~check:true  i0 i1 in
+      let e1 = add ~check:false e0 e1 in
       let v1 = if import then fusion ~check:false v0 v1 else v1 in
-      let i1 = if import then fusion ~check:true i0 i1 else i1 in
+      let i1 = if import then fusion ~check:true  i0 i1 else i1 in
       add_known n 
 	{ uc with 
 	    uc_visible = v1 :: stv; 
@@ -200,6 +205,9 @@ let clone_export th t i =
   Mps.iter check_ps i.inst_ps;
   assert false (* TODO *)
 
+let check_fmla k f =
+  () (* TODO *)
+
 let generic_add ~check x v m =
   if check && M.mem x m then raise (ClashSymbol x);
   M.add x v m
@@ -210,6 +218,8 @@ let add_fsymbol ~check x ty ns =
   { ns with fsymbols = generic_add ~check x ty ns.fsymbols }
 let add_psymbol ~check x ty ns = 
   { ns with psymbols = generic_add ~check x ty ns.psymbols }
+let add_prop ~check x v ns =
+  { ns with props = generic_add ~check x v ns.props }
 
 let add_symbol add x v uc = 
   match uc.uc_visible, uc.uc_import, uc.uc_export with
@@ -238,6 +248,10 @@ let add_decl uc d =
     | Dlogic [Lpredicate (ps, None)] ->
         let uc = add_param ps.ps_name uc in
         add_symbol add_psymbol ps.ps_name ps uc
+    | Dprop (k, id, f) ->
+	check_fmla uc.uc_known f;
+	let uc = add_known id uc in
+	add_symbol add_prop id f uc
     | _ ->
         assert false (* TODO *)
   in

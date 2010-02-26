@@ -512,9 +512,12 @@ let term env t =
   let t = dterm denv t in
   term M.empty t
 
-let axiom loc s f env =
-  ignore (fmla env f);
-  env
+let add_prop k loc s f th =
+  let f = fmla th f in
+  try
+    add_decl th (Dprop (k, id_user s.id s.id loc, f))
+  with ClashSymbol _ ->
+    error ~loc (Clash s.id)
 
 let find_in_loadpath env f =
   let rec find c lp = match lp, c with
@@ -606,7 +609,7 @@ and add_decl env th = function
   | Logic (loc, ids, PFunction (pl, t)) ->
       List.fold_left (add_function loc pl t) th ids
   | Axiom (loc, s, f) ->
-      axiom loc s f th
+      add_prop Theory.Axiom loc s f th
   | Use (loc, use) ->
       let t = find_theory env use.use_theory in
       let n = match use.use_as with 
