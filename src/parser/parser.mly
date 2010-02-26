@@ -101,7 +101,8 @@
 %token EXCEPTION EXISTS EXPORT EXTERNAL FALSE FOR FORALL FPI 
 %token FUN FUNCTION GE GOAL GT
 %token IF IMPORT IN INCLUDE INDUCTIVE INT INVARIANT
-%token LE LEFTB LEFTBLEFTB LEFTPAR LEFTSQ LET LOGIC LRARROW LT MATCH MINUS
+%token LE LEFTB LEFTBLEFTB LEFTPAR LEFTSQ LEMMA 
+%token LET LOGIC LRARROW LT MATCH MINUS
 %token NAMESPACE NOT NOTEQ OF OR PARAMETER PERCENT PLUS PREDICATE PROP 
 %token QUOTE RAISE RAISES READS REAL REC REF RETURNS RIGHTB RIGHTBRIGHTB
 %token RIGHTPAR RIGHTSQ 
@@ -259,11 +260,13 @@ decl:
 | list1_logic_decl
    { Logic (loc (), $1) }
 | AXIOM uident COLON lexpr
-   { Axiom (loc (), $2, $4) }
+   { Prop (loc (), Kaxiom, $2, $4) }
+| GOAL uident COLON lexpr
+   { Prop (loc (), Kgoal, $2, $4) }
+| LEMMA uident COLON lexpr
+   { Prop (loc (), Klemma, $2, $4) }
 | INDUCTIVE lident COLON logic_type inddefn
    { Inductive_def (loc (), $2, $4, $5) }
-| GOAL uident COLON lexpr
-   { Goal (loc (), $2, $4) }
 | USE use
    { Use (loc (), $2) }
 | NAMESPACE uident list0_decl END

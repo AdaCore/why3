@@ -71,6 +71,7 @@
 	"inductive", INDUCTIVE;
 	(*"int", INT;*)
 	"invariant", INVARIANT;
+	"lemma", LEMMA;
 	"let", LET;
 	"logic", LOGIC;
 	"match", MATCH;

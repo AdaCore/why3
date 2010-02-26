@@ -104,12 +104,14 @@ type logic_decl = {
   ld_def    : lexpr option;
 }
 
+type prop_kind =
+  | Kaxiom | Klemma | Kgoal
+
 type decl = 
   | TypeDecl of loc * type_decl list
   | Logic of loc * logic_decl list
   | Inductive_def of loc * ident * plogic_type * (loc * ident * lexpr) list
-  | Axiom of loc * ident * lexpr
-  | Goal of loc * ident * lexpr
+  | Prop of loc * prop_kind * ident * lexpr
   | Use of loc * use
   | Namespace of loc * ident * decl list
 

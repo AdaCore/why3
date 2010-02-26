@@ -694,6 +694,11 @@ let load_file file =
   close_in c;
   tl
 
+let prop_kind = function
+  | Kaxiom -> Axiom
+  | Kgoal -> Goal
+  | Klemma -> Lemma
+
 let rec find_theory env q = match q with
   | Qident id -> 
       (* local theory *)
@@ -734,8 +739,8 @@ and add_decl env th = function
       add_types loc dl th
   | Logic (loc, dl) ->
       add_logics loc dl th
-  | Axiom (loc, s, f) ->
-      add_prop Theory.Axiom loc s f th
+  | Prop (loc, k, s, f) ->
+      add_prop (prop_kind k) loc s f th
   | Use (loc, use) ->
       let t = find_theory env use.use_theory in
       let n = match use.use_as with 
@@ -765,7 +770,6 @@ and add_decl env th = function
       let th = add_decls env th dl in
       let n = id_user id id loc in
       close_namespace th n ~import:false
-  | Goal _ 
   | Inductive_def _ ->
       assert false (*TODO*)
 
