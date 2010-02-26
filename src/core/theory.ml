@@ -244,22 +244,26 @@ let add_type uc (ty, def) = match def with
   | Ty_algebraic _ ->
       assert false (*TODO*)
 
+let add_logic uc = function
+  | Lfunction (fs, _) ->
+      let uc = add_param fs.fs_name uc in
+      add_symbol add_fsymbol fs.fs_name fs uc
+  | Lpredicate (ps, _) ->
+      let uc = add_param ps.ps_name uc in
+      add_symbol add_psymbol ps.ps_name ps uc
+  | Linductive _ ->
+      assert false (*TODO*)
+
 let add_decl uc d = 
   let uc = match d with
     | Dtype dl ->
 	List.fold_left add_type uc dl
-    | Dlogic [Lfunction (fs, None)] ->
-        let uc = add_param fs.fs_name uc in
-        add_symbol add_fsymbol fs.fs_name fs uc
-    | Dlogic [Lpredicate (ps, None)] ->
-        let uc = add_param ps.ps_name uc in
-        add_symbol add_psymbol ps.ps_name ps uc
+    | Dlogic dl ->
+	List.fold_left add_logic uc dl
     | Dprop (k, id, f) ->
 	check_fmla uc.uc_known f;
 	let uc = add_known id uc in
 	add_symbol add_prop id f uc
-    | _ ->
-        assert false (* TODO *)
   in
   { uc with uc_decls = (Decl d) :: uc.uc_decls }
 

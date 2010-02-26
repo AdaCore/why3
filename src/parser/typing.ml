@@ -561,15 +561,84 @@ let add_predicate loc pl th {id=id} =
   let s = create_psymbol v pl in
   add_decl th (Dlogic [Lpredicate (s, None)])
 
-let fmla env f =
-  let denv = create_denv env in
-  let f = dfmla denv f in
-  fmla M.empty f
+let env_of_vsymbol_list vl =
+  List.fold_left (fun env v -> M.add v.vs_name.id_short v env) M.empty vl
+
+let add_logics loc dl th =
+  let fsymbols = Hashtbl.create 17 in
+  let psymbols = Hashtbl.create 17 in
+  (* 1. create all symbols and make an environment with these symbols *)
+  let create_symbol th d = 
+    let id = d.ld_ident.id in
+    let v = id_user id id loc in
+    let denv = create_denv th in
+    let type_ty (_,t) = ty (dty denv t) in
+    let pl = List.map type_ty d.ld_params in
+    match d.ld_type with
+      | None -> (* predicate *)
+	  let ps = create_psymbol v pl in
+	  Hashtbl.add psymbols id ps;
+	  add_decl th (Dlogic [Lpredicate (ps, None)])
+      | Some t -> (* function *)
+	  let t = type_ty (None, t) in
+	  let fs = create_fsymbol v (pl, t) false in
+	  Hashtbl.add fsymbols id fs;
+	  add_decl th (Dlogic [Lfunction (fs, None)])
+  in
+  let th' = List.fold_left create_symbol th dl in
+  (* 2. then type-check all definitions *)
+  let type_decl d = 
+    let id = d.ld_ident.id in
+    let dadd_var denv (x, ty) = match x with
+      | None -> denv
+      | Some id -> { denv with dvars = M.add id.id (dty denv ty) denv.dvars }
+    in
+    let denv = List.fold_left dadd_var (create_denv th') d.ld_params in
+    let create_var (x, _) ty = 
+      let id = match x with 
+	| None -> id_fresh "%x" "%x"
+	| Some id -> id_user id.id id.id id.id_loc
+      in
+      create_vsymbol id ty
+    in
+    match d.ld_type with
+    | None -> (* predicate *)
+	let ps = Hashtbl.find psymbols id in
+	let def = match d.ld_def with
+	  | None -> 
+	      None
+	  | Some f -> 
+	      let f = dfmla denv f in
+	      let vl = List.map2 create_var d.ld_params ps.ps_scheme in
+	      let env = env_of_vsymbol_list vl in
+	      Some (vl, fmla env f)
+	in
+	Lpredicate (ps, def)
+    | Some t -> (* function *)
+	let fs = Hashtbl.find fsymbols id in
+	let def = match d.ld_def with
+	  | None -> 
+	      None
+	  | Some t -> 
+	      let t = dterm denv t in
+	      let vl = List.map2 create_var d.ld_params (fst fs.fs_scheme) in
+	      let env = env_of_vsymbol_list vl in
+	      Some (vl, term env t)
+	in
+	Lfunction (fs, def)
+  in
+  let dl = List.map type_decl dl in
+  add_decl th (Dlogic dl)
 
 let term env t =
   let denv = create_denv env in
   let t = dterm denv t in
   term M.empty t
+
+let fmla env f =
+  let denv = create_denv env in
+  let f = dfmla denv f in
+  fmla M.empty f
 
 let add_prop k loc s f th =
   let f = fmla th f in
@@ -663,10 +732,8 @@ and add_decls env th = List.fold_left (add_decl env) th
 and add_decl env th = function
   | TypeDecl (loc, dl) ->
       add_types loc dl th
-(*   | Logic (loc, ids, PPredicate pl) -> *)
-(*       List.fold_left (add_predicate loc pl) th ids *)
-(*   | Logic (loc, ids, PFunction (pl, t)) -> *)
-(*       List.fold_left (add_function loc pl t) th ids *)
+  | Logic (loc, dl) ->
+      add_logics loc dl th
   | Axiom (loc, s, f) ->
       add_prop Theory.Axiom loc s f th
   | Use (loc, use) ->
@@ -714,6 +781,6 @@ let add_theories =
 
 (*
 Local Variables: 
-compile-command: "make -C .. test"
+compile-command: "make -C ../.. test"
 End: 
 *)

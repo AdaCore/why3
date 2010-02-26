@@ -3,8 +3,13 @@
 
 theory A
   type 'a list
-  type t 
-  type u = t list
+  logic nil : 'a list
+  logic cons('a, 'a list) : 'a list
+
+  type t
+  logic p('a list)
+  logic is_nil(x: 'a list) = p(x)
+  logic c : t list
 end
 
 theory B

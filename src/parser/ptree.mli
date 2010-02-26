@@ -71,14 +71,14 @@ and pp_desc =
 
 type plogic_type =
   | PPredicate of pty list
-  | PFunction of pty list * pty
+  | PFunction  of pty list * pty
 
 type imp_exp =
   | Import | Export | Nothing
 
 type use = {
-  use_theory : qualid;
-  use_as : ident option;
+  use_theory  : qualid;
+  use_as      : ident option;
   use_imp_exp : imp_exp;
 }
 
@@ -86,30 +86,28 @@ type param = ident option * pty
 
 type type_def = 
   | TDabstract
-  | TDalias of pty
+  | TDalias     of pty
   | TDalgebraic of (loc * ident * param list) list
 
 type type_decl = {
-  td_loc : loc;
-  td_ident : ident;
+  td_loc    : loc;
+  td_ident  : ident;
   td_params : ident list;
-  td_def : type_def;
+  td_def    : type_def;
 }
 
 type logic_decl = { 
-  ld_loc : loc;
-  ld_ident : ident;
+  ld_loc    : loc;
+  ld_ident  : ident;
   ld_params : param list;
-  ld_type : pty option;
-  ld_def : lexpr option;
+  ld_type   : pty option;
+  ld_def    : lexpr option;
 }
 
 type decl = 
   | TypeDecl of loc * type_decl list
   | Logic of loc * logic_decl list
   | Inductive_def of loc * ident * plogic_type * (loc * ident * lexpr) list
-(*   | Function_def of loc * ident * (loc * ident * pty) list * pty * lexpr *)
-(*   | Predicate_def of loc * ident * (loc * ident * pty) list * lexpr *)
   | Axiom of loc * ident * lexpr
   | Goal of loc * ident * lexpr
   | Use of loc * use
