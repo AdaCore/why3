@@ -95,9 +95,9 @@ type logic_decl =
   | Namespace of loc * ident * logic_decl list
 
 type theory = {
-  th_loc  : loc;
-  th_name : ident;
-  th_decl : logic_decl list;
+  pt_loc  : loc;
+  pt_name : ident;
+  pt_decl : logic_decl list;
 }
 
 type logic_file = theory list

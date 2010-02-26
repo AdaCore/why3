@@ -22,11 +22,13 @@ open Format
 let files = ref []
 let parse_only = ref false
 let type_only = ref false
+let debug = ref false
 
 let () = 
   Arg.parse 
     ["--parse-only", Arg.Set parse_only, "stops after parsing";
      "--type-only", Arg.Set type_only, "stops after type-checking";
+     "--debug", Arg.Set debug, "sets the debug flag";
     ]
     (fun f -> files := f :: !files)
     "usage: why [options] files..."
@@ -49,13 +51,13 @@ let type_file env file =
   Loc.set_file file lb;
   let f = Lexer.parse_logic_file lb in 
   close_in c;
-  if !parse_only then env else List.fold_left Typing.add_theory env f
+  if !parse_only then env else Typing.add_theories env f
 
 let () =
   try
-    let env = Typing.create ["lib"] in
+    let env = Typing.create ["lib"; ""] in
     ignore (List.fold_left type_file env !files)
-  with e ->
+  with e when not !debug ->
     eprintf "%a@." report e;
     exit 1
 

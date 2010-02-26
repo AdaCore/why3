@@ -42,29 +42,29 @@ type decl =
 
 type decl_or_use =
   | Decl of decl
-  | Use of t
+  | Use of theory
 
-and t = private {
-  t_name : ident;
-  t_local : Sid.t;           (* locally declared abstract symbols *)
-  t_known : Sid.t;           (* imported and locally declared symbols *)
-  t_namespace : namespace;
-  t_decls : decl_or_use list;
+and theory = private {
+  th_name   : ident;
+  th_param  : Sid.t;           (* locally declared abstract symbols *)
+  th_known  : ident Mid.t;     (* imported and locally declared symbols *)
+  th_export : namespace;
+  th_decls  : decl_or_use list;
 }
 
 and namespace
 
 (** Building *)
 
-type th
+type theory_uc
   (** a theory under construction *)
 
-val create_theory : ident -> th
+val create_theory : ident -> theory_uc
 
-val open_namespace : th -> th
-val close_namespace : th -> ident -> import:bool -> th
+val open_namespace : theory_uc -> theory_uc
+val close_namespace : theory_uc -> ident -> import:bool -> theory_uc
 
-val use_export : th -> t -> th
+val use_export : theory_uc -> theory -> theory_uc
 
 type th_inst = {
   inst_ts : tysymbol Mts.t;
@@ -72,15 +72,15 @@ type th_inst = {
   inst_ps : psymbol  Mps.t;
 }
 
-val clone_export : th -> t -> th_inst -> th
+val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 
-val add_decl : th -> decl -> th
+val add_decl : theory_uc -> decl -> theory_uc
 
-val close_theory : th -> t
+val close_theory : theory_uc -> theory
 
 (** Querying *)
 
-val get_namespace : th -> namespace
+val get_namespace : theory_uc -> namespace
 
 val find_tysymbol : namespace -> string -> tysymbol
 val find_fsymbol  : namespace -> string -> fsymbol
@@ -94,16 +94,16 @@ val mem_psymbol  : namespace -> string -> bool
 val mem_namespace: namespace -> string -> bool
 val mem_prop     : namespace -> string -> bool
 
-(** Error reporting *)
+(** Exceptions *)
 
-type error
-
-exception Error of error
-
-val report : Format.formatter -> error -> unit
+exception CloseTheory
+exception NoOpenedNamespace
+exception RedeclaredIdent of ident
+exception CannotInstantiate
+exception ClashSymbol of string
 
 
 (** Debugging *)
 
-val print_th : Format.formatter -> th -> unit
-val print_t  : Format.formatter -> t  -> unit
+val print_th : Format.formatter -> theory_uc -> unit
+val print_t  : Format.formatter -> theory  -> unit

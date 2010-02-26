@@ -6,6 +6,6 @@ theory A
 end
 
 theory B
-  type t
-  use A
+  use export A
+  logic c : A.t
 end

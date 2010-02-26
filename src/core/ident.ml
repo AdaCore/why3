@@ -61,7 +61,7 @@ let id_user sh ln loc = create_ident sh ln (User loc)
 
 type printer = (string, int) Hashtbl.t * (int, string) Hashtbl.t
 
-let create_printer _ = Hashtbl.create 1997, Hashtbl.create 1997
+let create_printer () = Hashtbl.create 1997, Hashtbl.create 1997
 
 let rec find_index indices name ind =
   if Hashtbl.mem indices (name ^ string_of_int ind)
@@ -71,16 +71,17 @@ let find_unique indices name =
   try
     let ind = Hashtbl.find indices name + 1 in
     let ind = find_index indices name ind in
-    let _ = Hashtbl.add indices name ind in
+    Hashtbl.add indices name ind;
     name ^ string_of_int ind
   with Not_found ->
     name
 
 let id_unique (indices,values) id =
-  try Hashtbl.find values id.id_tag
+  try 
+    Hashtbl.find values id.id_tag
   with Not_found ->
     let name = find_unique indices id.id_long in
-    let _ = Hashtbl.add values id.id_tag name in
-    let _ = Hashtbl.add indices name 0 in
+    Hashtbl.add values id.id_tag name;
+    Hashtbl.add indices name 0;
     name
 

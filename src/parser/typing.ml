@@ -74,7 +74,7 @@ let report fmt = function
       fprintf fmt "@[The type %a expects %d argument(s),@ " print_qualid id a;
       fprintf fmt "but is applied to %d argument(s)@]" n
   | Clash id ->
-      fprintf fmt "Clash with previous constant %s" id
+      fprintf fmt "Clash with previous symbol %s" id
   | PredicateExpected ->
       fprintf fmt "syntax error: predicate expected"
   | TermExpected ->
@@ -82,7 +82,7 @@ let report fmt = function
   | UnboundSymbol s ->
        fprintf fmt "Unbound symbol '%s'" s
   | BadNumberOfArguments (s, n, m) ->
-      fprintf fmt "@[Symbol `%s' is aplied to %d terms,@ " s.id_short n;
+      fprintf fmt "@[Symbol `%s' is applied to %d terms,@ " s.id_short n;
       fprintf fmt "but is expecting %d arguments@]" m
   | TermExpectedType (ty1, ty2) ->
       fprintf fmt "@[This term has type "; ty1 fmt; 
@@ -106,13 +106,31 @@ let report fmt = function
   | NotInLoadpath f ->
       fprintf fmt "cannot find `%s' in loadpath" f
 
+(****
+
+  | OpenTheory ->
+      fprintf fmt "cannot open a new theory in a non-empty context"
+  | CloseTheory ->
+      fprintf fmt "cannot close theory: there are still unclosed namespaces"
+  | NoOpenedTheory ->
+      fprintf fmt "no opened theory"
+  | NoOpenedNamespace ->
+      fprintf fmt "no opened namespace"
+  | RedeclaredIdent id ->
+      fprintf fmt "cannot redeclare identifier %s" id.id_short
+  | CannotInstantiate ->
+      fprintf fmt "cannot instantiate a defined symbol"
+
+****)
+
+
 (** Environments *)
 
 module M = Map.Make(String)
 
 type env = {
   loadpath : string list;
-  theories : Theory.t M.t; (* local theories *)
+  theories : theory M.t; (* local theories *)
 }
 
 let create lp = {
@@ -195,7 +213,7 @@ let rec unify t1 t2 = match t1, t2 with
     It is only local to this module and created with [create_denv] below. *)
 
 type denv = { 
-  th : Theory.th; (* the theory under construction *)
+  th : theory_uc; (* the theory under construction *)
   utyvars : (string, type_var) Hashtbl.t; (* user type variables *)
   dvars : dty M.t; (* local variables, to be bound later *)
 }
@@ -444,8 +462,6 @@ and fmla env = function
 open Ptree
 
 let add_type loc sl {id=id} th =
-  let ns = get_namespace th in
-  if mem_tysymbol ns id then error ~loc (ClashType id);
   let tyvars = ref M.empty in
   let add_ty_var {id=x} =
     if M.mem x !tyvars then error ~loc (BadTypeArity x);
@@ -458,7 +474,11 @@ let add_type loc sl {id=id} th =
   (* TODO: add the theory name to the long name *)
   let v = id_user id id loc in
   let ty = create_tysymbol v vl None in
-  add_decl th (Dtype [ty, Ty_abstract])
+  try
+    add_decl th (Dtype [ty, Ty_abstract])
+  with Theory.ClashSymbol _ ->
+    error ~loc (ClashType id)
+
 
 let add_function loc pl t th {id=id} =
   let ns = get_namespace th in
@@ -496,31 +516,6 @@ let axiom loc s f env =
   ignore (fmla env f);
   env
 
-(***
-let uses_theory env (as_t, q) =
-  let loc = qloc q in
-  let rec find_theory q = match q with
-    | Qident t -> 
-	t.id, find_local_theory t env
-    | Qdot (q, t) -> 
-	let _, env = find_theory q in t.id, find_local_theory t env
-  in
-  let id, th = find_theory q in
-  let id = match as_t with None -> id | Some x -> x.id in
-  if M.mem id (self env).theories then error ~loc (AlreadyTheory id);
-  add_theory id th env
-
-let open_theory t env =
-  let loc = t.id_loc and id = t.id in
-  if not (M.mem id env.theories) then error ~loc (UnboundTheory id);
-  let th = M.find id env.theories in
-  let open_map m1 m2 = M.fold M.add m1 m2 in
-  { tysymbols = open_map th.tysymbols env.tysymbols;
-    fsymbols  = open_map th.fsymbols  env.fsymbols;
-    psymbols  = open_map th.psymbols  env.psymbols;
-    theories  = open_map th.theories  env.theories }
-***)
-
 let find_in_loadpath env f =
   let rec find c lp = match lp, c with
     | [], None -> 
@@ -547,36 +542,26 @@ let locate_file env q =
 	if not (Sys.file_exists dir) then error ~loc:d.id_loc (UnboundDir dir);
 	dir
   in
-  let file = match q with
-    | Qident f -> find_in_loadpath env f
-    | Qdot (p, f) -> let dir = locate_dir p in Filename.concat dir f.id
-  in
-  let file = file ^ ".why" in
-  if not (Sys.file_exists file) then error ~loc:(qloc q) (UnboundFile file);
-  file
+  match q with
+    | Qident f -> 
+	find_in_loadpath env { f with id = f.id ^ ".why" }
+    | Qdot (p, f) -> 
+	let dir = locate_dir p in 
+	let file = Filename.concat dir f.id ^ ".why" in
+	if not (Sys.file_exists file) then 
+	  error ~loc:(qloc q) (UnboundFile file);
+	file
 
-type loaded_theory = {
-  parsed : Ptree.theory;
-  mutable typed : Theory.t option;
-}
-
-let loaded_theories = Hashtbl.create 17 (* file -> theory -> loaded_theory *)
+let loaded_theories = Hashtbl.create 17 (* file -> string -> Theory.t *)
 
 (* parse file and store all theories into parsed_theories *)
-let load_theories file =
-  if not (Hashtbl.mem loaded_theories file) then begin
-    let c = open_in file in
-    let lb = Lexing.from_channel c in
-    Loc.set_file file lb;
-    let tl = Lexer.parse_logic_file lb in 
-    close_in c;
-    let h = Hashtbl.create 17 in
-    Hashtbl.add loaded_theories file h;
-    List.iter 
-      (fun pt -> 
-	 Hashtbl.add h pt.th_name.id { parsed = pt; typed = None }) 
-      tl
-  end
+let load_file file =
+  let c = open_in file in
+  let lb = Lexing.from_channel c in
+  Loc.set_file file lb;
+  let tl = Lexer.parse_logic_file lb in 
+  close_in c;
+  tl
 
 let rec find_theory env q = match q with
   | Qident id -> 
@@ -588,25 +573,27 @@ let rec find_theory env q = match q with
   | Qdot (f, id) ->
       (* theory in file f *)
       let file = locate_file env f in
-      load_theories file;
+      if not (Hashtbl.mem loaded_theories file) then begin
+	let tl = load_file file in
+	let h = Hashtbl.create 17 in
+	Hashtbl.add loaded_theories file h;
+	let env = { env with theories = M.empty } in
+	let add env pt =
+	  let t, env = add_theory env pt in
+	  Hashtbl.add h t.th_name.id_short t;
+	  env
+	in
+	ignore (List.fold_left add env tl);
+      end;
       let h = Hashtbl.find loaded_theories file in
-      try 
-	let t = Hashtbl.find h id.id in
-	match t.typed with
-	  | Some th -> 
-	      th
-	  | None -> 
-	      let th = type_theory env id.id t.parsed in 
-	      t.typed <- Some th; 
-	      th
-      with Not_found ->
-	error ~loc:id.id_loc (UnboundTheory id.id);
+      try Hashtbl.find h id.id
+      with Not_found -> error ~loc:id.id_loc (UnboundTheory id.id)
 
 and type_theory env id pt =
-  (* TODO: shouldn't we localize this ident? *)
-  let n = id_fresh id id in
+  (* TODO: use long name *)
+  let n = id_user id.id id.id id.id_loc in
   let th = create_theory n in
-  let th = add_decls env th pt.th_decl in
+  let th = add_decls env th pt.pt_decl in
   close_theory th
 
 and add_decls env th = List.fold_left (add_decl env) th
@@ -623,10 +610,10 @@ and add_decl env th = function
   | Use (loc, use) ->
       let t = find_theory env use.use_theory in
       let n = match use.use_as with 
-	| None -> t.t_name
+	| None -> id_clone t.th_name
 	| Some x -> id_user x.id x.id loc
       in
-      begin match use.use_imp_exp with
+      begin try match use.use_imp_exp with
 	| Nothing ->
 	    (* use T = namespace T use_export T end *)
 	    let th = open_namespace th in
@@ -639,6 +626,8 @@ and add_decl env th = function
 	    close_namespace th n ~import:true
 	| Export ->
 	    use_export th t
+      with Theory.ClashSymbol s ->
+	error ~loc (Clash s)
       end
   | Namespace (_, {id=id; id_loc=loc}, dl) ->
       let ns = get_namespace th in
@@ -654,11 +643,15 @@ and add_decl env th = function
   | Inductive_def _ ->
       assert false (*TODO*)
 
-let add_theory env pt =
-  let id = pt.th_name.id in
-  if M.mem id env.theories then error ~loc:pt.th_loc (ClashTheory id);
+and add_theory env pt =
+  let id = pt.pt_name in
+  if M.mem id.id env.theories then error ~loc:pt.pt_loc (ClashTheory id.id);
   let t = type_theory env id pt in
-  { env with theories = M.add id t env.theories }
+  t, { env with theories = M.add id.id t env.theories }
+
+let add_theories =
+  List.fold_left
+    (fun env pt -> let _, env = add_theory env pt in env) 
 
 (*
 Local Variables: 

@@ -194,19 +194,19 @@ uqualid:
 | uqualid DOT uident { Qdot ($1, $3) }
 ;
 
-tqualid:
-| ident             { Qident $1 }
-| tqualid DOT ident { Qdot ($1, $3) }
+any_qualid:
+| ident                { Qident $1 }
+| any_qualid DOT ident { Qdot ($1, $3) }
 ;
 
 qualid:
-| lqualid {$1}
-| uqualid {$1}
+| ident             { Qident $1 }
+| uqualid DOT ident { Qdot ($1, $3) }
 
 decl:
 | LOGIC list1_lident_sep_comma COLON logic_type
    { Logic (loc_i 3, $2, $4) }
-| AXIOM ident COLON lexpr
+| AXIOM uident COLON lexpr
    { Axiom (loc (), $2, $4) }
 | PREDICATE lident LEFTPAR list0_logic_binder_sep_comma RIGHTPAR EQUAL lexpr
    { Predicate_def (loc (), $2, $4, $7) }
@@ -215,7 +215,7 @@ decl:
 | FUNCTION lident LEFTPAR list0_logic_binder_sep_comma RIGHTPAR COLON 
   primitive_type EQUAL lexpr
    { Function_def (loc (), $2, $4, $7, $9) }
-| GOAL ident COLON lexpr
+| GOAL uident COLON lexpr
    { Goal (loc (), $2, $4) }
 | TYPE typedecl typedefn
    { let loc, vl, id = $2 in $3 loc vl id }
@@ -234,7 +234,7 @@ list1_theory:
 
 theory:
 | THEORY uident list0_decl END 
-   { { th_loc = loc (); th_name = $2; th_decl = $3 } }
+   { { pt_loc = loc (); pt_name = $2; pt_decl = $3 } }
 ;
 
 typedecl:
@@ -266,9 +266,9 @@ typecases:
 ;
 
 typecase:
-| ident
+| uident
     { (loc_i 1,$1,[]) }
-| ident LEFTPAR list1_primitive_type_sep_comma RIGHTPAR
+| uident LEFTPAR list1_primitive_type_sep_comma RIGHTPAR
     { (loc_i 1,$1,$3) }
 ;
 
@@ -283,7 +283,7 @@ indcases:
 ;
 
 indcase:
-| ident COLON lexpr { (loc_i 1,$1,$3) }
+| uident COLON lexpr { (loc_i 1,$1,$3) }
 ;
 
 primitive_type:
@@ -350,11 +350,6 @@ logic_binder:
 | ident COLON primitive_type ARRAY 
     { (loc_i 1, $1, PPTexternal ([$3], Ident.farray, loc_i 3)) }
 ***/
-;
-
-external_:
-| /* epsilon */ { false }
-| EXTERNAL      { true  }
 ;
 
 lexpr:
@@ -435,7 +430,7 @@ match_case:
 
 pattern:
 | uqualid                                         { ($1, [], loc ()) }
-| uqualid LEFTPAR list1_ident_sep_comma RIGHTPAR  { ($1, $3, loc ()) }
+| uqualid LEFTPAR list1_lident_sep_comma RIGHTPAR  { ($1, $3, loc ()) }
 ;
 
 triggers:
@@ -493,21 +488,16 @@ bar_:
 | BAR           { () }
 ;
 
-list1_ident_sep_comma:
-| ident                             { [$1] }
-| ident COMMA list1_ident_sep_comma { $1 :: $3 }
-;
-
 list1_lident_sep_comma:
 | lident                              { [$1] }
 | lident COMMA list1_lident_sep_comma { $1 :: $3 }
 ;
 
 use:
-| imp_exp tqualid              
+| imp_exp any_qualid              
     { { use_theory = $2; use_as = None; use_imp_exp = $1 } }
-| imp_exp uident COLON tqualid 
-    { { use_theory = $4; use_as = Some $2; use_imp_exp = $1 } }
+| imp_exp any_qualid AS uident
+    { { use_theory = $2; use_as = Some $4; use_imp_exp = $1 } }
 ;
 
 imp_exp:
