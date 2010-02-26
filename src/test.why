@@ -5,10 +5,10 @@ theory A
   type 'a list
   type t 
   type u = t list
-  axiom Ax : forall x:t. true
 end
 
 theory B
-  use A
+  use import A
+  axiom Ax : forall x : t list. true
 end
 
