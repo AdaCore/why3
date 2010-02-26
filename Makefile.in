@@ -124,7 +124,7 @@ bin/top: $(CMO)
 	ocamlmktop $(BFLAGS) -o $@ $^
 
 test: bin/why.byte
-	ocamlrun -bt bin/why.byte src/test.why
+	ocamlrun -bt bin/why.byte -I lib/prelude/ src/test.why
 
 # graphical interface
 #####################

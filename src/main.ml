@@ -23,12 +23,15 @@ let files = ref []
 let parse_only = ref false
 let type_only = ref false
 let debug = ref false
+let loadpath = ref []
 
 let () = 
   Arg.parse 
     ["--parse-only", Arg.Set parse_only, "stops after parsing";
      "--type-only", Arg.Set type_only, "stops after type-checking";
      "--debug", Arg.Set debug, "sets the debug flag";
+     "-I", Arg.String (fun s -> loadpath := s :: !loadpath), 
+       "<dir>  adds dir to the loadpath";
     ]
     (fun f -> files := f :: !files)
     "usage: why [options] files..."
@@ -55,7 +58,7 @@ let type_file env file =
 
 let () =
   try
-    let env = Typing.create ["lib"; ""] in
+    let env = Typing.create !loadpath in
     ignore (List.fold_left type_file env !files)
   with e when not !debug ->
     eprintf "%a@." report e;

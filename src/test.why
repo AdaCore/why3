@@ -1,19 +1,21 @@
 
 (* test file *)
 
-theory A
-  type 'a list
-  logic nil : 'a list
-  logic cons('a, 'a list) : 'a list
+theory TestPrelude 
+  use prelude.List
+  use list.IntList
+end
 
+theory A
   type t
-  logic p('a list)
-  logic is_nil(x: 'a list) = p(x)
-  logic c : t list
+  logic p(t)
+  logic q(x: t) = p(x)
+  logic c : t
 end
 
 theory B
-  use import A
+  use import prelude.List
+  type t
   axiom Ax : forall x : t list. true
 end
 

@@ -1,0 +1,24 @@
+
+(* The Why prelude *)
+
+theory Int 
+
+  type int
+
+end
+
+theory List
+
+  (* type 'a list = Nil | Cons ('a, 'a list) *)
+
+  type 'a list
+
+  logic nil : 'a list
+
+  logic cons('a, 'a list) : 'a list
+
+  logic is_nil('a list)
+
+end
+
+

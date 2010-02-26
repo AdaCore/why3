@@ -1,18 +1,9 @@
-theory List
 
-  type 'a list
+(* additional theories over lists *)
 
-  (* type 'a list = Nil | Cons ('a,'a list) *)
+theory IntList
 
-  logic nil  : 'a list
-
-  logic cons : 'a, 'a list -> 'a list
-
-  logic is_nil : 'a list -> prop
-
-  type int (* use import Int *)
-  
-  logic length : 'a list -> int
+  use prelude.List
 
 end
 
