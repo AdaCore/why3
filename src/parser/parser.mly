@@ -142,6 +142,9 @@
 %left prec_ident
 %left LEFTSQ
 
+%nonassoc prec_logics prec_types
+%nonassoc LOGIC TYPE
+
 /* Entry points */
 
 %type <Ptree.lexpr> lexpr
@@ -203,22 +206,64 @@ qualid:
 | ident             { Qident $1 }
 | uqualid DOT ident { Qdot ($1, $3) }
 
+params:
+| /* epsilon */                          { [] }
+| LEFTPAR list1_param_sep_comma RIGHTPAR { $2 }
+;
+
+param:
+| primitive_type              { None, $1 }
+| lident COLON primitive_type { Some $1, $3 }
+;
+
+list1_param_sep_comma:
+| param                             { [$1] }
+| param COMMA list1_param_sep_comma { $1 :: $3 }
+;
+
+logic_type_option:
+| /* epsilon */        { None }
+| COLON primitive_type { Some $2 }
+;
+
+logic_def_option:
+| /* epsilon */ { None }
+| EQUAL lexpr   { Some $2 }
+;
+
+logic_decl:
+| LOGIC lident params logic_type_option logic_def_option
+    { { ld_loc = loc ();
+	ld_ident = $2; ld_params = $3; ld_type = $4; ld_def = $5; } }
+;
+
+list1_logic_decl:
+| logic_decl                  %prec prec_logics { [$1] }
+| logic_decl list1_logic_decl                   { $1 :: $2 }
+;
+
+type_decl:
+| TYPE typedecl typedefn
+  { let _, pl, id = $2 in
+    { td_loc = loc (); td_ident = id; td_params = pl; td_def = $3 } }
+;
+
+list1_type_decl:
+| type_decl                  %prec prec_types { [$1] }
+| type_decl list1_type_decl                   { $1 :: $2 }
+;
+
 decl:
-| LOGIC list1_lident_sep_comma COLON logic_type
-   { Logic (loc_i 3, $2, $4) }
+| list1_type_decl
+   { TypeDecl (loc (), $1) }
+| list1_logic_decl
+   { Logic (loc (), $1) }
 | AXIOM uident COLON lexpr
    { Axiom (loc (), $2, $4) }
-| PREDICATE lident LEFTPAR list0_logic_binder_sep_comma RIGHTPAR EQUAL lexpr
-   { Predicate_def (loc (), $2, $4, $7) }
 | INDUCTIVE lident COLON logic_type inddefn
    { Inductive_def (loc (), $2, $4, $5) }
-| FUNCTION lident LEFTPAR list0_logic_binder_sep_comma RIGHTPAR COLON 
-  primitive_type EQUAL lexpr
-   { Function_def (loc (), $2, $4, $7, $9) }
 | GOAL uident COLON lexpr
    { Goal (loc (), $2, $4) }
-| TYPE typedecl typedefn
-   { let loc, vl, id = $2 in $3 loc vl id }
 | USE use
    { Use (loc (), $2) }
 | NAMESPACE uident list0_decl END
@@ -248,16 +293,11 @@ typedecl:
 
 typedefn:
 | /* epsilon */
-    { fun loc vl id -> TypeDecl (loc, vl, id) }
-| EQUAL bar_ typecases typecont
-    { fun loc vl id -> AlgType ((loc, vl, id, $3) :: $4) }
-;
-
-typecont:
-| /* epsilon */
-    { [] }
-| AND typedecl EQUAL bar_ typecases typecont
-    { let loc, vl, id = $2 in (loc, vl, id, $5) :: $6 }
+    { TDabstract }
+| EQUAL primitive_type
+    { TDalias $2 }
+| EQUAL BAR typecases 
+    { TDalgebraic $3 }
 ;
 
 typecases:
@@ -268,7 +308,7 @@ typecases:
 typecase:
 | uident
     { (loc_i 1,$1,[]) }
-| uident LEFTPAR list1_primitive_type_sep_comma RIGHTPAR
+| uident LEFTPAR list1_param_sep_comma RIGHTPAR
     { (loc_i 1,$1,$3) }
 ;
 
@@ -331,25 +371,6 @@ list0_primitive_type_sep_comma:
 list1_primitive_type_sep_comma:
 | primitive_type                                      { [$1] }
 | primitive_type COMMA list1_primitive_type_sep_comma { $1 :: $3 }
-;
-
-list0_logic_binder_sep_comma:
-| /* epsilon */                { [] }
-| list1_logic_binder_sep_comma { $1 }
-;
-
-list1_logic_binder_sep_comma:
-| logic_binder                                    { [$1] }
-| logic_binder COMMA list1_logic_binder_sep_comma { $1 :: $3 }
-;
-
-logic_binder:
-| lident COLON primitive_type       
-    { (loc_i 1, $1, $3) }
-/***
-| ident COLON primitive_type ARRAY 
-    { (loc_i 1, $1, PPTexternal ([$3], Ident.farray, loc_i 3)) }
-***/
 ;
 
 lexpr:

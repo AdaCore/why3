@@ -82,22 +82,43 @@ type use = {
   use_imp_exp : imp_exp;
 }
 
-type logic_decl = 
-  | Logic of loc * ident list * plogic_type
-  | Predicate_def of loc * ident * (loc * ident * pty) list * lexpr
+type param = ident option * pty
+
+type type_def = 
+  | TDabstract
+  | TDalias of pty
+  | TDalgebraic of (loc * ident * param list) list
+
+type type_decl = {
+  td_loc : loc;
+  td_ident : ident;
+  td_params : ident list;
+  td_def : type_def;
+}
+
+type logic_decl = { 
+  ld_loc : loc;
+  ld_ident : ident;
+  ld_params : param list;
+  ld_type : pty option;
+  ld_def : lexpr option;
+}
+
+type decl = 
+  | TypeDecl of loc * type_decl list
+  | Logic of loc * logic_decl list
   | Inductive_def of loc * ident * plogic_type * (loc * ident * lexpr) list
-  | Function_def of loc * ident * (loc * ident * pty) list * pty * lexpr
+(*   | Function_def of loc * ident * (loc * ident * pty) list * pty * lexpr *)
+(*   | Predicate_def of loc * ident * (loc * ident * pty) list * lexpr *)
   | Axiom of loc * ident * lexpr
   | Goal of loc * ident * lexpr
-  | TypeDecl of loc * ident list * ident
-  | AlgType of (loc * ident list * ident * (loc * ident * pty list) list) list
   | Use of loc * use
-  | Namespace of loc * ident * logic_decl list
+  | Namespace of loc * ident * decl list
 
 type theory = {
   pt_loc  : loc;
   pt_name : ident;
-  pt_decl : logic_decl list;
+  pt_decl : decl list;
 }
 
 type logic_file = theory list
