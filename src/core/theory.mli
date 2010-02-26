@@ -46,6 +46,8 @@ type decl_or_use =
 
 and t = private {
   t_name : ident;
+  t_local : Sid.t;           (* locally declared abstract symbols *)
+  t_known : Sid.t;           (* imported and locally declared symbols *)
   t_namespace : namespace;
   t_decls : decl_or_use list;
 }

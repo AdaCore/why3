@@ -30,6 +30,8 @@ type error =
   | CloseTheory
   | NoOpenedTheory
   | NoOpenedNamespace
+  | RedeclaredIdent
+  | CannotInstantiate
 
 exception Error of error
 
@@ -64,6 +66,8 @@ type decl_or_use =
 
 and t = {
   t_name : ident;
+  t_local : Sid.t;           (* locally declared abstract symbols *)
+  t_known : Sid.t;           (* imported and locally declared symbols *)
   t_namespace : namespace;
   t_decls : decl_or_use list;
 }
@@ -78,6 +82,8 @@ and namespace = {
 
 type th = {
   th_name  : ident;
+  th_local : Sid.t;
+  th_known : Sid.t;
   th_stack : (namespace * namespace) list; (* stack of imports/exports *)
   th_decls : decl_or_use list;
 }
@@ -94,6 +100,8 @@ let empty_ns = {
 
 let create_theory n = {
   th_name = n;
+  th_local = Sid.empty;
+  th_known = Sid.empty;
   th_stack = [empty_ns, empty_ns];
   th_decls = [];
 }
@@ -101,8 +109,10 @@ let create_theory n = {
 let close_theory th = match th.th_stack with
   | [_, e] -> 
       { t_name = th.th_name;
-	t_namespace = e;
-	t_decls = List.rev th.th_decls; }
+        t_local = th.th_local;
+        t_known = th.th_known;
+        t_namespace = e;
+        t_decls = List.rev th.th_decls; }
   | _ -> 
       error CloseTheory
 
@@ -131,7 +141,16 @@ type th_inst = {
   inst_ps : psymbol  Mps.t;
 }
 
+let check_sym id t =
+  if Sid.mem id t.t_local then () else error CannotInstantiate
+
 let clone_export th t i =
+  let check_ts s _ = check_sym s.ts_name t in
+  let _ = Mts.iter check_ts i.inst_ts in
+  let check_fs s _ = check_sym s.fs_name t in
+  let _ = Mfs.iter check_fs i.inst_fs in
+  let check_ps s _ = check_sym s.ps_name t in
+  let _ = Mps.iter check_ps i.inst_ps in
   assert false (* TODO *)
 
 let add_tysymbol x ty ns = { ns with tysymbols = M.add x ty ns.tysymbols }
@@ -143,16 +162,29 @@ let add_ns add x v th = match th.th_stack with
       let x = x.id_short in (add x v i, add x v e) :: st
   | [] -> assert false
 
+let add_known id th =
+  let _ = if Sid.mem id th.th_known 
+          then error RedeclaredIdent else ()
+  in
+  { th with th_known = Sid.add id th.th_known }
+
+let add_local id th =
+  let th = add_known id th in
+  { th with th_local = Sid.add id th.th_local }
+
 let add_decl th d = 
   let st = match d with
     | Dtype [ty, Ty_abstract] ->
-	add_ns add_tysymbol ty.ts_name ty th
+        let th = add_local ty.ts_name th in
+        add_ns add_tysymbol ty.ts_name ty th
     | Dlogic [Lfunction (fs, None)] ->
-	add_ns add_fsymbol fs.fs_name fs th
+        let th = add_local fs.fs_name th in
+        add_ns add_fsymbol fs.fs_name fs th
     | Dlogic [Lpredicate (ps, None)] ->
-	add_ns add_psymbol ps.ps_name ps th
+        let th = add_local ps.ps_name th in
+        add_ns add_psymbol ps.ps_name ps th
     | _ ->
-	assert false (* TODO *)
+        assert false (* TODO *)
   in
   { th with 
       th_stack = st;
@@ -187,6 +219,10 @@ let report fmt = function
       fprintf fmt "no opened theory"
   | NoOpenedNamespace ->
       fprintf fmt "no opened namespace"
+  | RedeclaredIdent ->
+      fprintf fmt "cannot redeclare identifiers"
+  | CannotInstantiate ->
+      fprintf fmt "cannot instantiate a defined symbol"
 
 (** Debugging *)
 
