@@ -237,11 +237,17 @@ let add_param id uc =
   let uc = add_known id uc in
   { uc with uc_param = Sid.add id uc.uc_param }
 
+let add_type uc (ty, def) = match def with
+  | Ty_abstract ->
+      let uc = add_param ty.ts_name uc in
+      add_symbol add_tysymbol ty.ts_name ty uc
+  | Ty_algebraic _ ->
+      assert false (*TODO*)
+
 let add_decl uc d = 
   let uc = match d with
-    | Dtype [ty, Ty_abstract] ->
-        let uc = add_param ty.ts_name uc in
-        add_symbol add_tysymbol ty.ts_name ty uc
+    | Dtype dl ->
+	List.fold_left add_type uc dl
     | Dlogic [Lfunction (fs, None)] ->
         let uc = add_param fs.fs_name uc in
         add_symbol add_fsymbol fs.fs_name fs uc

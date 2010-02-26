@@ -2,12 +2,13 @@
 (* test file *)
 
 theory A
-  type t
+  type 'a list
+  type t 
+  type u = t list
   axiom Ax : forall x:t. true
 end
 
 theory B
-  use A
   use A
 end
 

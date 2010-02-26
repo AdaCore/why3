@@ -31,7 +31,7 @@ open Theory
 type error = 
   | Message of string
   | ClashType of string
-  | BadTypeArity of string
+  | DuplicateTypeVar of string
   | UnboundType of string
   | TypeArity of qualid * int * int
   | Clash of string
@@ -50,6 +50,8 @@ type error =
   | UnboundDir of string
   | AmbiguousPath of string * string
   | NotInLoadpath of string
+  | CyclicTypeDef
+  | UnboundTypeVar of string
 
 exception Error of error
 
@@ -66,7 +68,7 @@ let report fmt = function
       fprintf fmt "%s" s
   | ClashType s ->
       fprintf fmt "clash with previous type %s" s
-  | BadTypeArity s ->
+  | DuplicateTypeVar s ->
       fprintf fmt "duplicate type parameter %s" s
   | UnboundType s ->
        fprintf fmt "Unbound type '%s'" s
@@ -105,6 +107,10 @@ let report fmt = function
       fprintf fmt "@[ambiguous path:@ both `%s'@ and `%s'@ match@]" f1 f2
   | NotInLoadpath f ->
       fprintf fmt "cannot find `%s' in loadpath" f
+  | CyclicTypeDef ->
+      fprintf fmt "cyclic type definition"
+  | UnboundTypeVar s ->
+      fprintf fmt "unbound type variable '%s" s
 
 (****
 
@@ -126,6 +132,7 @@ let report fmt = function
 
 (** Environments *)
 
+module S = Set.Make(String)
 module M = Map.Make(String)
 
 type env = {
@@ -461,24 +468,76 @@ and fmla env = function
 
 open Ptree
 
-let add_type loc sl {id=id} th =
-  let tyvars = ref M.empty in
-  let add_ty_var {id=x} =
-    if M.mem x !tyvars then error ~loc (BadTypeArity x);
-    (* TODO: shouldn't we localize this ident? *)
-    let v = id_user x x loc in
-    tyvars := M.add x v !tyvars;
-    v
+let add_types loc dl th =
+  let def = 
+    List.fold_left 
+      (fun def d -> 
+	 let id = d.td_ident in
+	 if M.mem id.id def then error ~loc:id.id_loc (ClashType id.id);
+	 M.add id.id d def) 
+      M.empty dl 
   in
-  let vl = List.map add_ty_var sl in
-  (* TODO: add the theory name to the long name *)
-  let v = id_user id id loc in
-  let ty = create_tysymbol v vl None in
-  try
-    add_decl th (Dtype [ty, Ty_abstract])
-  with Theory.ClashSymbol _ ->
-    error ~loc (ClashType id)
-
+  let tysymbols = Hashtbl.create 17 in
+  let rec visit x = 
+    try
+      match Hashtbl.find tysymbols x with
+	| None -> error CyclicTypeDef
+	| Some ts -> ts
+    with Not_found ->
+      Hashtbl.add tysymbols x None;
+      let d = M.find x def in
+      let id = d.td_ident.id in
+      let vars = Hashtbl.create 17 in
+      let vl = 
+	List.map 
+	  (fun v -> 
+	     if Hashtbl.mem vars v.id then 
+	       error ~loc:v.id_loc (DuplicateTypeVar v.id);
+	     let i = id_user v.id v.id v.id_loc in
+	     Hashtbl.add vars v.id i;
+	     i)
+	  d.td_params 
+      in
+      let id = id_user id id d.td_ident.id_loc in
+      let ts = match d.td_def with
+	| TDalias ty -> 
+	    let rec apply = function
+	      | PPTtyvar v -> 
+		  begin 
+		    try ty_var (Hashtbl.find vars v.id)
+		    with Not_found -> error ~loc:v.id_loc (UnboundTypeVar v.id)
+		  end
+	      | PPTtyapp (tyl, q) ->
+		  let ts = match q with
+		    | Qident x when M.mem x.id def ->
+			visit x.id
+		    | Qident _ | Qdot _ ->
+			find_tysymbol q th
+		  in
+		  try
+		    ty_app ts (List.map apply tyl)
+		  with Ty.BadTypeArity ->
+		    error ~loc:(qloc q) (TypeArity (q, List.length ts.ts_args,
+						    List.length tyl))
+	    in
+	    create_tysymbol id vl (Some (apply ty))
+	| TDabstract | TDalgebraic _ -> 
+	    create_tysymbol id vl None
+      in
+      Hashtbl.add tysymbols x (Some ts);
+      ts
+  in
+  M.iter (fun x _ -> ignore (visit x)) def;
+  let decl d = 
+    (match Hashtbl.find tysymbols d.td_ident.id with
+       | None -> assert false
+       | Some ts -> ts),
+    (match d.td_def with
+       | TDabstract | TDalias _ -> Ty_abstract
+       | TDalgebraic _ -> assert false (*TODO*))
+  in
+  let dl = List.map decl dl in
+  add_decl th (Dtype dl)
 
 let add_function loc pl t th {id=id} =
   let ns = get_namespace th in
@@ -602,12 +661,12 @@ and type_theory env id pt =
 and add_decls env th = List.fold_left (add_decl env) th
 
 and add_decl env th = function
-  | TypeDecl (loc, sl, s) ->
-      add_type loc sl s th
-  | Logic (loc, ids, PPredicate pl) ->
-      List.fold_left (add_predicate loc pl) th ids
-  | Logic (loc, ids, PFunction (pl, t)) ->
-      List.fold_left (add_function loc pl t) th ids
+  | TypeDecl (loc, dl) ->
+      add_types loc dl th
+(*   | Logic (loc, ids, PPredicate pl) -> *)
+(*       List.fold_left (add_predicate loc pl) th ids *)
+(*   | Logic (loc, ids, PFunction (pl, t)) -> *)
+(*       List.fold_left (add_function loc pl t) th ids *)
   | Axiom (loc, s, f) ->
       add_prop Theory.Axiom loc s f th
   | Use (loc, use) ->
@@ -639,10 +698,7 @@ and add_decl env th = function
       let th = add_decls env th dl in
       let n = id_user id id loc in
       close_namespace th n ~import:false
-  | AlgType _ 
   | Goal _ 
-  | Function_def _ 
-  | Predicate_def _ 
   | Inductive_def _ ->
       assert false (*TODO*)
 
