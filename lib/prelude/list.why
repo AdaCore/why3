@@ -3,7 +3,23 @@
 
 theory IntList
 
-  use prelude.List
+  use import prelude.Int
+  use import prelude.List
+
+  logic sorted(int list)
+
+  axiom Sorted_nil : 
+    sorted(nil)
+  axiom Sorted_one : 
+    forall x: int. sorted(cons(x, nil))
+  axiom Sorted_cons: 
+    forall x,y: int. forall l: int list.
+    sorted(cons(y, l)) -> le(x, y) -> sorted(cons(x, cons(y, l)))
 
 end
 
+(*
+Local Variables: 
+compile-command: "make -C ../.. test"
+End: 
+*)

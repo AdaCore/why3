@@ -4,6 +4,7 @@
 theory TestPrelude 
   use prelude.List
   use list.IntList
+  use array.IntArray
 end
 
 theory A
@@ -19,3 +20,8 @@ theory B
   axiom Ax : forall x : t list. true
 end
 
+(*
+Local Variables: 
+compile-command: "make -C .. test"
+End: 
+*)

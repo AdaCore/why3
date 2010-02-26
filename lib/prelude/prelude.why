@@ -5,6 +5,17 @@ theory Int
 
   type int
 
+  logic lt(int, int)
+  logic le(int, int)
+  logic gt(int, int)
+  logic ge(int, int)
+  
+end
+
+theory Bool
+
+  (*type t = | True | False*)
+
 end
 
 theory List
@@ -49,3 +60,9 @@ theory Array
   axiom Const : forall b:'b. forall a:'a. Eq.eq(select(const(b),a), b)
 
 end
+
+(*
+Local Variables: 
+compile-command: "make -C ../.. test"
+End: 
+*)
