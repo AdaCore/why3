@@ -299,7 +299,9 @@ typedefn:
     { TDabstract }
 | EQUAL primitive_type
     { TDalias $2 }
-| EQUAL BAR typecases   /* TODO: optional BAR */
+| EQUAL typecases
+    { TDalgebraic $2 }
+| EQUAL BAR typecases
     { TDalgebraic $3 }
 ;
 
