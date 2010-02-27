@@ -65,5 +65,5 @@ val combine : int -> int -> int
 val combine2 : int -> int -> int -> int
 val combine3 : int -> int -> int -> int -> int
 val combine_list : ('a -> int) -> int -> 'a list -> int
-
-
+val combine_option : ('a -> int) -> 'a option -> int
+val combine_pair : ('a -> int) -> ('b -> int) -> 'a * 'b -> int

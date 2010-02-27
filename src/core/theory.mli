@@ -35,10 +35,12 @@ type logic_decl =
 type prop_kind = 
   | Axiom | Lemma | Goal
 
-type decl =
+type decl_node =
   | Dtype  of ty_decl list
   | Dlogic of logic_decl list
   | Dprop  of prop_kind * ident * fmla
+
+type decl = private {d_node : decl_node; d_tag : int}
 
 type decl_or_use =
   | Decl of decl
@@ -74,7 +76,7 @@ type th_inst = {
 
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 
-val add_decl : theory_uc -> decl -> theory_uc
+val add_decl : theory_uc -> decl_node -> theory_uc
 
 val close_theory : theory_uc -> theory
 

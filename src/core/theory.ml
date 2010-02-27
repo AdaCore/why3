@@ -49,10 +49,12 @@ type logic_decl =
 type prop_kind = 
   | Axiom | Lemma | Goal
 
-type decl =
+type decl_node =
   | Dtype  of ty_decl list
   | Dlogic of logic_decl list
   | Dprop  of prop_kind * ident * fmla
+
+type decl = {d_node : decl_node; d_tag : int}
 
 type decl_or_use =
   | Decl of decl
@@ -83,6 +85,82 @@ type theory_uc = {
   uc_export : namespace list;
   uc_decls  : decl_or_use list;
 }
+
+(** Hashconsing of decl_node *)
+module Hsh = Hashcons
+module TDecl = 
+struct
+  type t = decl
+  let hash t = 
+    match t.d_node with
+      | Dtype tyl -> 
+          let htyd acc = function
+            | Ty_abstract -> acc
+            | Ty_algebraic fsl -> 1 + 
+                Hsh.combine_list (fun x -> x.fs_tag) acc fsl in  
+          let hty (tys,tyd) = htyd tys.ts_tag tyd in 
+          Hsh.combine_list hty 0 tyl
+      | Dlogic ldl -> 
+          let ldhash = function
+            | Lfunction (fs,opt) ->
+                let hvslt (vsl,t) = Hsh.combine_list (fun x -> x.vs_tag) 
+                  t.t_tag vsl in
+                Hsh.combine fs.fs_tag (Hsh.combine_option hvslt opt)
+            | Lpredicate (ps,opt) ->
+                let hvslt (vsl,f) = Hsh.combine_list (fun x -> x.vs_tag) 
+                  f.f_tag vsl in
+                Hsh.combine ps.ps_tag (Hsh.combine_option hvslt opt)
+            | Linductive (ps,ifl) ->
+                let hif (i,f) = Hsh.combine i.Ident.id_tag f.f_tag in
+                Hsh.combine_list hif ps.ps_tag ifl
+          in
+          Hsh.combine_list ldhash 0 ldl
+      | Dprop (k,i,f) ->
+          let hk = match k with
+            | Axiom -> 1
+            | Lemma -> 2
+            | Goal -> 3 in
+          Hsh.combine2 hk i.Ident.id_tag f.f_tag
+
+  let equal d1 d2 =
+    try
+      match d1.d_node,d2.d_node with
+        | Dtype tyl1, Dtype tyl2 -> List.for_all2 
+            (fun (tys1,tyd1) (tys2,tyd2) -> tys1 == tys2 &&
+               match tyd1,tyd2 with
+                 | Ty_abstract, Ty_abstract -> true
+                 | Ty_algebraic fsl1, Ty_algebraic fsl2 -> 
+                     List.for_all2 (==) fsl1 fsl2
+                 | _ -> false) tyl1 tyl2
+        | Dlogic ldl1, Dlogic ldl2 -> 
+            let equal_funpred fs1 opt1 fs2 opt2 =
+              fs1 == fs2 &&
+                match opt1,opt2 with
+                  | None, None -> true
+                  | Some (vsl1,t1), Some (vsl2,t2) -> t1 == t2 &&
+                      List.for_all2 (==) vsl1 vsl2
+                  | _ -> false in 
+            List.for_all2 
+              (fun e1 e2 -> match e1,e2 with
+                 | Lfunction (fs1, opt1),Lfunction (fs2, opt2) -> 
+                     equal_funpred fs1 opt1 fs2 opt2
+                 | Lpredicate (ps1, opt1),Lpredicate (ps2, opt2) -> 
+                     equal_funpred ps1 opt1 ps2 opt2
+                 | Linductive (ps1,ifl1), Linductive (ps2,ifl2) ->
+                     ps1 == ps2 &&
+                       List.for_all2 (fun (i1,f1) (i2,f2)-> i1 == i2 && f1 == f2)
+                       ifl1 ifl2
+                 | _ -> false) ldl1 ldl2
+        | Dprop (k1,i1,f1),Dprop (k2,i2,f2) -> i1 == i2 && f1 == f2 && k1 = k2
+        | _ -> false
+    with Invalid_argument _ -> false 
+
+  let tag x t = {t with d_tag = x}
+end
+
+module Hdecl = Hashcons.Make(TDecl)
+
+let hashdecl x = Hdecl.hashcons {d_node = x;d_tag = 0}
 
 (** Creating environments *)
 
@@ -265,7 +343,7 @@ let add_decl uc d =
 	let uc = add_known id uc in
 	add_symbol add_prop id f uc
   in
-  { uc with uc_decls = (Decl d) :: uc.uc_decls }
+  { uc with uc_decls = (Decl (hashdecl d)) :: uc.uc_decls }
 
 (** Querying environments *)
 

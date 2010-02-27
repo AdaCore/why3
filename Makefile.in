@@ -51,7 +51,7 @@ OCAMLBEST= @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 CAMLP4   = @CAMLP4O@
 
-INCLUDES = -I src/core -I src/util -I src/parser -I src 
+INCLUDES = -I src/core -I src/util -I src/parser -I src/transform -I src 
 BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ 
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
 OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ 
@@ -106,7 +106,9 @@ UTIL_CMO = src/util/pp.cmo src/util/loc.cmo src/util/util.cmo \
            src/util/hashcons.cmo 
 PARSER_CMO = src/parser/parser.cmo src/parser/lexer.cmo src/parser/typing.cmo
 
-CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) src/pretty.cmo src/main.cmo
+TRANSFORM_CMO = src/transform/transform.cmo
+
+CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(TRANSFORM_CMO) src/pretty.cmo src/main.cmo
 CMX = $(CMO:.cmo=.cmx)
 
 bin/why.opt: $(CMX) 
