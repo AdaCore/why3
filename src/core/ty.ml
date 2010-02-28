@@ -136,6 +136,22 @@ let ty_app s tl =
         ty_app s tl
   else raise BadTypeArity
 
+(* symbol-wise map/fold *)
+
+let rec ty_s_map fn ty = match ty.ty_node with
+  | Tyvar _ -> ty
+  | Tyapp (f, tl) -> ty_app (fn f) (List.map (ty_s_map fn) tl)
+
+let rec ty_s_fold fn acc ty = match ty.ty_node with
+  | Tyvar _ -> acc
+  | Tyapp (f, tl) -> List.fold_left (ty_s_fold fn) (fn acc f) tl
+
+let ty_s_forall pr ty =
+  try ty_s_fold (forall_fn pr) true ty with FoldSkip -> false
+
+let ty_s_exists pr ty =
+  try ty_s_fold (exists_fn pr) false ty with FoldSkip -> true
+
 (* type matching *)
 
 exception TypeMismatch
