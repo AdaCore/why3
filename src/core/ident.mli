@@ -35,17 +35,29 @@ module Sid : Set.S with type elt = ident
 module Mid : Map.S with type key = ident
 module Hid : Hashtbl.S with type key = ident
 
-(* create a fresh ident *)
-val id_fresh : string -> string -> ident
+(* a user-created type of unregistered identifiers *)
+type preid
 
-(* create a derived ident *)
-val id_derive : string -> string -> ident -> ident
+(* register a pre-ident (never use this function) *)
+val id_register : preid -> ident
 
-(* create a derived ident with the same name *)
-val id_clone : ident -> ident
+(* create a fresh pre-ident *)
+val id_fresh : string -> preid
+val id_fresh_long : string -> string -> preid
 
-(* create a localized ident *)
-val id_user : string -> string -> Loc.position -> ident
+(* create a localized pre-ident *)
+val id_user : string -> Loc.position -> preid
+val id_user_long : string -> string -> Loc.position -> preid
+
+(* create a derived pre-ident *)
+val id_derive : string -> ident -> preid
+val id_derive_long : string -> string -> ident -> preid
+
+(* create a derived pre-ident with the same name *)
+val id_clone : ident -> preid
+
+(* create a duplicate pre-ident *)
+val id_dup : ident -> preid
 
 (** Unique persistent names for pretty printing *)
 

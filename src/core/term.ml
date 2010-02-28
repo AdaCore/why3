@@ -26,25 +26,26 @@ open Ty
 type vsymbol = {
   vs_name : ident;
   vs_ty   : ty;
-  vs_tag  : int;
 }
 
 module Vsym = struct
   type t = vsymbol
-  let equal vs1 vs2 = vs1.vs_name == vs2.vs_name
+  let equal = (==)
   let hash vs = vs.vs_name.id_tag
-  let tag n vs = { vs with vs_tag = n }
-  let compare vs1 vs2 = Pervasives.compare vs1.vs_tag vs2.vs_tag
+  let compare vs1 vs2 =
+    Pervasives.compare vs1.vs_name.id_tag vs2.vs_name.id_tag
 end
 
-module Hvs = Hashcons.Make(Vsym)
 module Mvs = Map.Make(Vsym)
 module Svs = Set.Make(Vsym)
+module Hvs = Hashtbl.Make(Vsym)
 
-let mk_vs name ty = { vs_name = name; vs_ty = ty; vs_tag = -1 }
-let create_vsymbol name ty = Hvs.hashcons (mk_vs name ty)
+let create_vsymbol name ty = {
+  vs_name = id_register name;
+  vs_ty   = ty;
+}
 
-let fresh_vsymbol v = create_vsymbol (id_clone v.vs_name) v.vs_ty
+let fresh_vsymbol v = create_vsymbol (id_dup v.vs_name) v.vs_ty
 
 (** Function symbols *)
 
@@ -52,50 +53,47 @@ type fsymbol = {
   fs_name   : ident;
   fs_scheme : ty list * ty;
   fs_constr : bool;
-  fs_tag    : int;
 }
 
 module Fsym = struct
   type t = fsymbol
-  let equal fs1 fs2 = fs1.fs_name == fs2.fs_name
+  let equal = (==)
   let hash fs = fs.fs_name.id_tag
-  let tag n fs = { fs with fs_tag = n }
-  let compare fs1 fs2 = Pervasives.compare fs1.fs_tag fs2.fs_tag
+  let compare fs1 fs2 =
+    Pervasives.compare fs1.fs_name.id_tag fs2.fs_name.id_tag
 end
-module Hfs = Hashcons.Make(Fsym)
 module Sfs = Set.Make(Fsym)
 module Mfs = Map.Make(Fsym)
+module Hfs = Hashtbl.Make(Fsym)
 
-let mk_fs name scheme constr = {
-  fs_name = name;
+let create_fsymbol name scheme constr = {
+  fs_name   = id_register name;
   fs_scheme = scheme;
   fs_constr = constr;
-  fs_tag = -1
 }
-
-let create_fsymbol name scheme constr = Hfs.hashcons (mk_fs name scheme constr)
 
 (** Predicate symbols *)
 
 type psymbol = {
   ps_name   : ident;
   ps_scheme : ty list;
-  ps_tag    : int;
 }
 
 module Psym = struct
   type t = psymbol
-  let equal ps1 ps2 = ps1.ps_name == ps2.ps_name
+  let equal = (==)
   let hash ps = ps.ps_name.id_tag
-  let tag n ps = { ps with ps_tag = n }
-  let compare ps1 ps2 = Pervasives.compare ps1.ps_tag ps2.ps_tag
+  let compare ps1 ps2 =
+    Pervasives.compare ps1.ps_name.id_tag ps2.ps_name.id_tag
 end
-module Hps = Hashcons.Make(Psym)
 module Sps = Set.Make(Psym)
 module Mps = Map.Make(Psym)
+module Hps = Hashtbl.Make(Psym)
 
-let mk_ps name scheme = { ps_name = name; ps_scheme = scheme; ps_tag = -1 }
-let create_psymbol name scheme = Hps.hashcons (mk_ps name scheme)
+let create_psymbol name scheme = {
+  ps_name   = id_register name;
+  ps_scheme = scheme;
+}
 
 (** Patterns *)
 
@@ -129,9 +127,9 @@ module Hpat = struct
 
   let hash_node = function
     | Pwild -> 0
-    | Pvar v -> v.vs_tag
-    | Papp (s, pl) -> Hashcons.combine_list hash_pattern s.fs_tag pl
-    | Pas (p, v) -> Hashcons.combine (hash_pattern p) v.vs_tag
+    | Pvar v -> v.vs_name.id_tag
+    | Papp (s, pl) -> Hashcons.combine_list hash_pattern s.fs_name.id_tag pl
+    | Pas (p, v) -> Hashcons.combine (hash_pattern p) v.vs_name.id_tag
 
   let hash p = Hashcons.combine (hash_node p.pat_node) p.pat_ty.ty_tag
 
@@ -289,16 +287,16 @@ module T = struct
 
   let t_hash_branch (p, _, t) = Hashcons.combine p.pat_tag t.t_tag
 
-  let t_hash_bound (v, t) = Hashcons.combine v.vs_tag t.t_tag
+  let t_hash_bound (v, t) = Hashcons.combine v.vs_name.id_tag t.t_tag
 
-  let f_hash_bound (v, f) = Hashcons.combine v.vs_tag f.f_tag
+  let f_hash_bound (v, f) = Hashcons.combine v.vs_name.id_tag f.f_tag
 
   let t_hash t = t.t_tag
 
   let t_hash_node = function
     | Tbvar n -> n
-    | Tvar v -> v.vs_tag
-    | Tapp (f, tl) -> Hashcons.combine_list t_hash (f.fs_tag) tl
+    | Tvar v -> v.vs_name.id_tag
+    | Tapp (f, tl) -> Hashcons.combine_list t_hash (f.fs_name.id_tag) tl
     | Tlet (t, bt) -> Hashcons.combine t.t_tag (t_hash_bound bt)
     | Tcase (t, bl) -> Hashcons.combine_list t_hash_branch t.t_tag bl
     | Teps f -> f_hash_bound f
@@ -354,14 +352,14 @@ module F = struct
 
   let f_hash_branch (p, _, f) = Hashcons.combine p.pat_tag f.f_tag
 
-  let f_hash_bound (v, f) = Hashcons.combine v.vs_tag f.f_tag
+  let f_hash_bound (v, f) = Hashcons.combine v.vs_name.id_tag f.f_tag
 
   let t_hash t = t.t_tag
 
   let f_hash f = f.f_tag
 
   let f_hash_node = function
-    | Fapp (p, tl) -> Hashcons.combine_list t_hash p.ps_tag tl
+    | Fapp (p, tl) -> Hashcons.combine_list t_hash p.ps_name.id_tag tl
     | Fquant (q, bf) -> Hashcons.combine (Hashtbl.hash q) (f_hash_bound bf)
     | Fbinop (op, f1, f2) ->
         Hashcons.combine2 (Hashtbl.hash op) f1.f_tag f2.f_tag

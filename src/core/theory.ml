@@ -23,6 +23,144 @@ open Ident
 open Ty
 open Term
 
+(** Declarations *)
+
+(* type declaration *)
+
+type ty_def =
+  | Tabstract
+  | Talgebraic of fsymbol list
+
+type ty_decl = tysymbol * ty_def
+
+(* logic declaration *)
+
+type logic_decl =
+  | Lfunction  of fsymbol * (vsymbol list * term) option (* FIXME: binders *)
+  | Lpredicate of psymbol * (vsymbol list * fmla) option (* FIXME: binders *)
+  | Linductive of psymbol * (ident * fmla) list
+
+(* proposition declaration *)
+
+type prop_kind =
+  | Paxiom
+  | Plemma
+  | Pgoal
+
+type prop_decl = prop_kind * ident * fmla
+
+(* declaration *)
+
+type decl_node =
+  | Dtype  of ty_decl list
+  | Dlogic of logic_decl list
+  | Dprop  of prop_decl
+
+type decl = {
+  d_node : decl_node;
+  d_tag  : int;
+}
+
+module D = struct
+
+  type t = decl
+
+  let for_all2 pr l1 l2 =
+    try List.for_all2 pr l1 l2 with Invalid_argument _ -> false
+
+  let eq_td (ts1,td1) (ts2,td2) = ts1 == ts2 && match td1,td2 with
+    | Tabstract, Tabstract -> true
+    | Talgebraic l1, Talgebraic l2 -> for_all2 (==) l1 l2
+    | _ -> false
+
+  let eq_fd fs1 fs2 fd1 fd2 = fs1 == fs2 && match fd1,fd2 with
+    | None, None -> true
+    | Some (l1,t1), Some (l2,t2) -> t1 == t2 && for_all2 (==) l1 l2
+    | _ -> false
+
+  let eq_ld ld1 ld2 = match ld1,ld2 with
+    | Lfunction  (fs1,fd1), Lfunction  (fs2,fd2) -> eq_fd fs1 fs2 fd1 fd2
+    | Lpredicate (ps1,pd1), Lpredicate (ps2,pd2) -> eq_fd ps1 ps2 pd1 pd2
+    | Linductive (ps1,l1),  Linductive (ps2,l2)  -> ps1 == ps2 &&
+        for_all2 (fun (i1,f1) (i2,f2) -> i1 == i2 && f1 == f2) l1 l2
+    | _ -> false
+
+  let equal d1 d2 = match d1.d_node, d2.d_node with
+    | Dtype  l1, Dtype  l2 -> for_all2 eq_td l1 l2
+    | Dlogic l1, Dlogic l2 -> for_all2 eq_ld l1 l2
+    | Dprop (k1,i1,f1), Dprop (k2,i2,f2) -> k1 == k2 && i1 == i2 && f1 == f2
+    | _ -> false
+
+  let hs_td (ts,td) = match td with
+    | Tabstract -> ts.ts_name.id_tag
+    | Talgebraic l ->
+        let tag fs = fs.fs_name.id_tag in
+        1 + Hashcons.combine_list tag ts.ts_name.id_tag l
+
+  let hs_ld ld = match ld with
+    | Lfunction  (fs,fd) ->
+        let tag vs = vs.vs_name.id_tag in
+        let hsh (l,t) = Hashcons.combine_list tag t.t_tag l in
+        Hashcons.combine fs.fs_name.id_tag (Hashcons.combine_option hsh fd)
+    | Lpredicate (ps,pd) ->
+        let tag vs = vs.vs_name.id_tag in
+        let hsh (l,f) = Hashcons.combine_list tag f.f_tag l in
+        Hashcons.combine ps.ps_name.id_tag (Hashcons.combine_option hsh pd)
+    | Linductive (ps,l)  ->
+        let hs_pair (i,f) = Hashcons.combine i.id_tag f.f_tag in
+        Hashcons.combine_list hs_pair ps.ps_name.id_tag l
+
+  let hash d = match d.d_node with
+    | Dtype  l -> Hashcons.combine_list hs_td 0 l
+    | Dlogic l -> Hashcons.combine_list hs_ld 1 l
+    | Dprop (Paxiom,i,f) -> Hashcons.combine2 0 i.id_tag f.f_tag
+    | Dprop (Plemma,i,f) -> Hashcons.combine2 1 i.id_tag f.f_tag
+    | Dprop (Pgoal, i,f) -> Hashcons.combine2 2 i.id_tag f.f_tag
+
+  let tag n d = { d with d_tag = n }
+
+  let compare d1 d2 = Pervasives.compare d1.d_tag d2.d_tag
+
+end
+module Hdecl = Hashcons.Make(D)
+module Mdecl = Map.Make(D)
+module Sdecl = Set.Make(D)
+
+(* smart constructors *)
+
+let mk_decl n = { d_node = n; d_tag = -1 }
+
+let create_type tdl = Hdecl.hashcons (mk_decl (Dtype tdl))
+let create_logic ldl = Hdecl.hashcons (mk_decl (Dlogic ldl))
+let create_prop k i f = Hdecl.hashcons (mk_decl (Dprop (k, id_register i, f)))
+
+
+(** Theory *)
+
+module Snm = Set.Make(String)
+module Mnm = Map.Make(String)
+
+type theory = {
+  th_name   : ident;
+  th_param  : Sid.t;          (* locally declared abstract symbols *)
+  th_known  : ident Mid.t;    (* imported and locally declared symbols *)
+  th_export : namespace;
+  th_decls  : decl_or_use list;
+}
+
+and namespace = {
+  ns_ts   : tysymbol Mnm.t;   (* type symbols *)
+  ns_fs   : fsymbol Mnm.t;    (* function symbols *)
+  ns_ps   : psymbol Mnm.t;    (* predicate symbols *)
+  ns_ns   : namespace Mnm.t;  (* inner namespaces *)
+  ns_prop : fmla Mnm.t;       (* propositions *)
+}
+
+and decl_or_use =
+  | Decl of decl
+  | Use of theory
+
+
 (** Error reporting *)
 
 exception CloseTheory
@@ -31,50 +169,8 @@ exception RedeclaredIdent of ident
 exception CannotInstantiate
 exception ClashSymbol of string
 
-(** The environment type *)
 
-module M = Map.Make(String)
-
-type ty_def = 
-  | Ty_abstract
-  | Ty_algebraic of fsymbol list
-
-type ty_decl = tysymbol * ty_def 
-
-type logic_decl = 
-  | Lfunction  of fsymbol * (vsymbol list * term) option (* FIXME: binders *)
-  | Lpredicate of psymbol * (vsymbol list * fmla) option (* FIXME: binders *)
-  | Linductive of psymbol * (ident * fmla) list
-
-type prop_kind = 
-  | Axiom | Lemma | Goal
-
-type decl_node =
-  | Dtype  of ty_decl list
-  | Dlogic of logic_decl list
-  | Dprop  of prop_kind * ident * fmla
-
-type decl = {d_node : decl_node; d_tag : int}
-
-type decl_or_use =
-  | Decl of decl
-  | Use of theory
-
-and theory = {
-  th_name      : ident;
-  th_param     : Sid.t;           (* locally declared abstract symbols *)
-  th_known     : ident Mid.t;     (* imported and locally declared symbols *)
-  th_export    : namespace;
-  th_decls     : decl_or_use list;
-}
-
-and namespace = {
-  tysymbols : tysymbol M.t;  (* type symbols *)
-  fsymbols  : fsymbol M.t;   (* function symbols *)
-  psymbols  : psymbol M.t;   (* predicate symbols *)
-  props     : fmla M.t;      (* formula *)
-  namespace : namespace M.t;      
-}
+(** Theory under construction *)
 
 type theory_uc = {
   uc_name   : ident;
@@ -86,181 +182,93 @@ type theory_uc = {
   uc_decls  : decl_or_use list;
 }
 
-(** Hashconsing of decl_node *)
-module Hsh = Hashcons
-module TDecl = 
-struct
-  type t = decl
-  let hash t = 
-    match t.d_node with
-      | Dtype tyl -> 
-          let htyd acc = function
-            | Ty_abstract -> acc
-            | Ty_algebraic fsl -> 1 + 
-                Hsh.combine_list (fun x -> x.fs_tag) acc fsl in  
-          let hty (tys,tyd) = htyd tys.ts_tag tyd in 
-          Hsh.combine_list hty 0 tyl
-      | Dlogic ldl -> 
-          let ldhash = function
-            | Lfunction (fs,opt) ->
-                let hvslt (vsl,t) = Hsh.combine_list (fun x -> x.vs_tag) 
-                  t.t_tag vsl in
-                Hsh.combine fs.fs_tag (Hsh.combine_option hvslt opt)
-            | Lpredicate (ps,opt) ->
-                let hvslt (vsl,f) = Hsh.combine_list (fun x -> x.vs_tag) 
-                  f.f_tag vsl in
-                Hsh.combine ps.ps_tag (Hsh.combine_option hvslt opt)
-            | Linductive (ps,ifl) ->
-                let hif (i,f) = Hsh.combine i.Ident.id_tag f.f_tag in
-                Hsh.combine_list hif ps.ps_tag ifl
-          in
-          Hsh.combine_list ldhash 0 ldl
-      | Dprop (k,i,f) ->
-          let hk = match k with
-            | Axiom -> 1
-            | Lemma -> 2
-            | Goal -> 3 in
-          Hsh.combine2 hk i.Ident.id_tag f.f_tag
-
-  let equal d1 d2 =
-    try
-      match d1.d_node,d2.d_node with
-        | Dtype tyl1, Dtype tyl2 -> List.for_all2 
-            (fun (tys1,tyd1) (tys2,tyd2) -> tys1 == tys2 &&
-               match tyd1,tyd2 with
-                 | Ty_abstract, Ty_abstract -> true
-                 | Ty_algebraic fsl1, Ty_algebraic fsl2 -> 
-                     List.for_all2 (==) fsl1 fsl2
-                 | _ -> false) tyl1 tyl2
-        | Dlogic ldl1, Dlogic ldl2 -> 
-            let equal_funpred fs1 opt1 fs2 opt2 =
-              fs1 == fs2 &&
-                match opt1,opt2 with
-                  | None, None -> true
-                  | Some (vsl1,t1), Some (vsl2,t2) -> t1 == t2 &&
-                      List.for_all2 (==) vsl1 vsl2
-                  | _ -> false in 
-            List.for_all2 
-              (fun e1 e2 -> match e1,e2 with
-                 | Lfunction (fs1, opt1),Lfunction (fs2, opt2) -> 
-                     equal_funpred fs1 opt1 fs2 opt2
-                 | Lpredicate (ps1, opt1),Lpredicate (ps2, opt2) -> 
-                     equal_funpred ps1 opt1 ps2 opt2
-                 | Linductive (ps1,ifl1), Linductive (ps2,ifl2) ->
-                     ps1 == ps2 &&
-                       List.for_all2 (fun (i1,f1) (i2,f2)-> i1 == i2 && f1 == f2)
-                       ifl1 ifl2
-                 | _ -> false) ldl1 ldl2
-        | Dprop (k1,i1,f1),Dprop (k2,i2,f2) -> i1 == i2 && f1 == f2 && k1 = k2
-        | _ -> false
-    with Invalid_argument _ -> false 
-
-  let tag x t = {t with d_tag = x}
-end
-
-module Hdecl = Hashcons.Make(TDecl)
-
-let hashdecl x = Hdecl.hashcons {d_node = x;d_tag = 0}
-
-(** Creating environments *)
+(* creating environments *)
 
 let empty_ns = {
-  tysymbols = M.empty;
-  fsymbols  = M.empty;
-  psymbols  = M.empty;
-  props     = M.empty;
-  namespace = M.empty;
+  ns_ts   = Mnm.empty;
+  ns_fs   = Mnm.empty;
+  ns_ps   = Mnm.empty;
+  ns_ns   = Mnm.empty;
+  ns_prop = Mnm.empty;
 }
 
 let create_theory n = {
-  uc_name  = n;
-  uc_param = Sid.empty;
-  uc_known = Mid.add n n Mid.empty;
-  uc_visible = [empty_ns];
-  uc_import = [empty_ns];
-  uc_export = [empty_ns];
-  uc_decls = [];
+  uc_name     = n;
+  uc_param    = Sid.empty;
+  uc_known    = Mid.add n n Mid.empty;
+  uc_visible  = [empty_ns];
+  uc_import   = [empty_ns];
+  uc_export   = [empty_ns];
+  uc_decls    = [];
 }
-  
-let close_theory th = match th.uc_export with
-  | [e] -> 
-      { th_name   = th.uc_name;
-        th_param  = th.uc_param;
-        th_known  = th.uc_known;
+
+let create_theory n = create_theory (id_register n)
+
+let close_theory uc = match uc.uc_export with
+  | [e] ->
+      { th_name   = uc.uc_name;
+        th_param  = uc.uc_param;
+        th_known  = uc.uc_known;
         th_export = e;
-        th_decls  = List.rev th.uc_decls; }
-  | _ -> 
+        th_decls  = List.rev uc.uc_decls; }
+  | _ ->
       raise CloseTheory
 
-let open_namespace th = match th.uc_visible with
+let open_namespace uc = match uc.uc_visible with
   | ns :: _ as st ->
-      { th with 
+      { uc with
 	  uc_visible = ns :: st;
-	  uc_import  = empty_ns :: th.uc_import;
-	  uc_export  = empty_ns :: th.uc_export; }
+	  uc_import  = empty_ns :: uc.uc_import;
+	  uc_export  = empty_ns :: uc.uc_export; }
   | [] ->
       assert false
 
-let fusion ~check ns1 ns2 =
-  let merge_ns m1 m2 =
-    M.fold 
-      (fun k1 v1 m2 -> 
-	 if check && M.mem k1 m2 then raise (ClashSymbol k1);
-	 M.add k1 v1 m2) 
-      m1 m2
+let merge_ns ~check ns1 ns2 =
+  let add k v m =
+    if check && Mnm.mem k m then raise (ClashSymbol k);
+    Mnm.add k v m
   in
-  { tysymbols = merge_ns ns1.tysymbols ns2.tysymbols;
-    fsymbols  = merge_ns ns1.fsymbols  ns2.fsymbols;
-    psymbols  = merge_ns ns1.psymbols  ns2.psymbols;
-    props     = merge_ns ns1.props     ns2.props;
-    namespace = merge_ns ns1.namespace ns2.namespace; }
+  { ns_ts   = Mnm.fold add ns1.ns_ts ns2.ns_ts;
+    ns_fs   = Mnm.fold add ns1.ns_fs ns2.ns_fs;
+    ns_ps   = Mnm.fold add ns1.ns_ps ns2.ns_ps;
+    ns_ns   = Mnm.fold add ns1.ns_ns ns2.ns_ns;
+    ns_prop = Mnm.fold add ns1.ns_prop ns2.ns_prop; }
 
-let add_known id uc =
-  if Mid.mem id uc.uc_known then raise (RedeclaredIdent id);
-  { uc with uc_known = Mid.add id uc.uc_name uc.uc_known }
-
-let close_namespace uc n ~import = 
+let close_namespace uc s ~import =
   match uc.uc_visible, uc.uc_import, uc.uc_export with
-  | v0 :: v1 :: stv, i0 :: i1 :: sti, e0 :: e1 :: ste ->
-      let s = n.id_short in
-      let add ~check ns1 ns2 = 
-	if check && M.mem s ns2.namespace then raise (ClashSymbol s);
-	{ ns2 with namespace = M.add s ns1 ns2.namespace } 
-      in
-      let v1 = add ~check:false v0 v1 in
-      let i1 = add ~check:true  i0 i1 in
-      let e1 = add ~check:false e0 e1 in
-      let v1 = if import then fusion ~check:false v0 v1 else v1 in
-      let i1 = if import then fusion ~check:true  i0 i1 else i1 in
-      add_known n 
-	{ uc with 
-	    uc_visible = v1 :: stv; 
-	    uc_import = i1 :: sti; 
-	    uc_export = e1 :: ste; }
+  | _ :: v1 :: stv, _ :: i1 :: sti, e0 :: e1 :: ste ->
+      if Mnm.mem s i1.ns_ns then raise (ClashSymbol s);
+      let v1 = { v1 with ns_ns = Mnm.add s e0 v1.ns_ns } in
+      let i1 = { i1 with ns_ns = Mnm.add s e0 i1.ns_ns } in
+      let e1 = { e1 with ns_ns = Mnm.add s e0 e1.ns_ns } in
+      let v1 = if import then merge_ns ~check:false e0 v1 else v1 in
+      let i1 = if import then merge_ns ~check:true  e0 i1 else i1 in
+      { uc with
+          uc_visible = v1 :: stv;
+          uc_import = i1 :: sti;
+          uc_export = e1 :: ste; }
   | [_], [_], [_] ->
       raise NoOpenedNamespace
   | _ ->
       assert false
 
 let merge_known m1 m2 =
-  Mid.fold 
-    (fun k1 id1 m -> 
-       try
-	 let id2 = Mid.find k1 m2 in
-	 if id1 != id2 then raise (RedeclaredIdent id1);
-	 m
-       with Not_found -> 
-	 Mid.add k1 id1 m) 
-    m1 m2
+  let add k i m =
+    try
+      if Mid.find k m2 != i then raise (RedeclaredIdent i);
+      m
+    with Not_found -> Mid.add k i m
+  in
+  Mid.fold add m1 m2
 
 let use_export uc th =
   match uc.uc_visible, uc.uc_import, uc.uc_export with
     | v0 :: stv, i0 :: sti, e0 :: ste ->
-	{ uc with 
-	    uc_visible = fusion ~check:false th.th_export v0 :: stv; 
-	    uc_import  = fusion ~check:true  th.th_export i0 :: sti; 
-	    uc_export  = fusion ~check:false th.th_export e0 :: ste;
-	    uc_known   = merge_known uc.uc_known th.th_known; 
+	{ uc with
+	    uc_visible = merge_ns ~check:false th.th_export v0 :: stv;
+	    uc_import  = merge_ns ~check:true  th.th_export i0 :: sti;
+	    uc_export  = merge_ns ~check:false th.th_export e0 :: ste;
+	    uc_known   = merge_known uc.uc_known th.th_known;
 	}
     | _ ->
 	assert false
@@ -287,53 +295,71 @@ let check_fmla k f =
   () (* TODO *)
 
 let generic_add ~check x v m =
-  if check && M.mem x m then raise (ClashSymbol x);
-  M.add x v m
+  if check && Mnm.mem x m then raise (ClashSymbol x);
+  Mnm.add x v m
 
-let add_tysymbol ~check x ty ns = 
-  { ns with tysymbols = generic_add ~check x ty ns.tysymbols }
-let add_fsymbol ~check x ty ns = 
-  { ns with fsymbols = generic_add ~check x ty ns.fsymbols }
-let add_psymbol ~check x ty ns = 
-  { ns with psymbols = generic_add ~check x ty ns.psymbols }
+let add_tysymbol ~check x ty ns =
+  { ns with ns_ts = generic_add ~check x ty ns.ns_ts }
+
+let add_fsymbol ~check x ty ns =
+  { ns with ns_fs = generic_add ~check x ty ns.ns_fs }
+
+let add_psymbol ~check x ty ns =
+  { ns with ns_ps = generic_add ~check x ty ns.ns_ps }
+
 let add_prop ~check x v ns =
-  { ns with props = generic_add ~check x v ns.props }
+  { ns with ns_prop = generic_add ~check x v ns.ns_prop }
 
-let add_symbol add x v uc = 
+let add_symbol add x v uc =
   match uc.uc_visible, uc.uc_import, uc.uc_export with
   | v0 :: stv, i0 :: sti, e0 :: ste ->
       let x = x.id_short in
-      { uc with 
-	  uc_visible = add ~check:false x v v0 :: stv; 
-	  uc_import  = add ~check:true  x v i0 :: sti; 
+      { uc with
+	  uc_visible = add ~check:false x v v0 :: stv;
+	  uc_import  = add ~check:true  x v i0 :: sti;
 	  uc_export  = add ~check:false x v e0 :: ste }
 
-  | _ -> 
+  | _ ->
       assert false
+
+let add_known id uc =
+  if Mid.mem id uc.uc_known then raise (RedeclaredIdent id);
+  { uc with uc_known = Mid.add id uc.uc_name uc.uc_known }
 
 let add_param id uc =
   let uc = add_known id uc in
   { uc with uc_param = Sid.add id uc.uc_param }
 
-let add_type uc (ty, def) = match def with
-  | Ty_abstract ->
-      let uc = add_param ty.ts_name uc in
-      add_symbol add_tysymbol ty.ts_name ty uc
-  | Ty_algebraic _ ->
+let add_type uc (ts, def) = match def with
+  | Tabstract ->
+      let uc = match ts.ts_def with
+        | Some _ -> add_known ts.ts_name uc
+        | None   -> add_param ts.ts_name uc
+      in
+      add_symbol add_tysymbol ts.ts_name ts uc
+  | Talgebraic _ ->
       assert false (*TODO*)
 
 let add_logic uc = function
-  | Lfunction (fs, _) ->
-      let uc = add_param fs.fs_name uc in
+  | Lfunction (fs, df) ->
+      let uc = match df with
+        | Some _  -> add_known fs.fs_name uc
+        | None    -> add_param fs.fs_name uc
+      in
       add_symbol add_fsymbol fs.fs_name fs uc
-  | Lpredicate (ps, _) ->
-      let uc = add_param ps.ps_name uc in
+  | Lpredicate (ps, dp) ->
+      let uc = match dp with
+        | Some _  -> add_known ps.ps_name uc
+        | None    -> add_param ps.ps_name uc
+      in
       add_symbol add_psymbol ps.ps_name ps uc
-  | Linductive _ ->
+  | Linductive (ps, dp) ->
+      let uc = add_known ps.ps_name uc in
+      let uc = add_symbol add_psymbol ps.ps_name ps uc in
       assert false (*TODO*)
 
-let add_decl uc d = 
-  let uc = match d with
+let add_decl uc d =
+  let uc = match d.d_node with
     | Dtype dl ->
 	List.fold_left add_type uc dl
     | Dlogic dl ->
@@ -343,7 +369,7 @@ let add_decl uc d =
 	let uc = add_known id uc in
 	add_symbol add_prop id f uc
   in
-  { uc with uc_decls = (Decl (hashdecl d)) :: uc.uc_decls }
+  { uc with uc_decls = Decl d :: uc.uc_decls }
 
 (** Querying environments *)
 
@@ -351,17 +377,19 @@ let get_namespace th = match th.uc_visible with
   | ns :: _ -> ns
   | [] -> assert false
 
-let find_tysymbol  ns s = M.find s ns.tysymbols
-let find_fsymbol   ns s = M.find s ns.fsymbols
-let find_psymbol   ns s = M.find s ns.psymbols
-let find_namespace ns s = M.find s ns.namespace
-let find_prop      ns s = M.find s ns.props
+(*
+let find_tysymbol  ns s = Mnm.find s ns.ns_ts
+let find_fsymbol   ns s = Mnm.find s ns.ns_fs
+let find_psymbol   ns s = Mnm.find s ns.ns_ps
+let find_namespace ns s = Mnm.find s ns.ns_ns
+let find_prop      ns s = Mnm.find s ns.ns_prop
 
-let mem_tysymbol  ns s = M.mem s ns.tysymbols
-let mem_fsymbol   ns s = M.mem s ns.fsymbols
-let mem_psymbol   ns s = M.mem s ns.psymbols
-let mem_namespace ns s = M.mem s ns.namespace
-let mem_prop      ns s = M.mem s ns.props
+let mem_tysymbol  ns s = Mnm.mem s ns.ns_ts
+let mem_fsymbol   ns s = Mnm.mem s ns.ns_fs
+let mem_psymbol   ns s = Mnm.mem s ns.ns_ps
+let mem_namespace ns s = Mnm.mem s ns.ns_ns
+let mem_prop      ns s = Mnm.mem s ns.ns_prop
+*)
 
 (** Debugging *)
 
@@ -372,27 +400,27 @@ let print_ident =
 
 let rec print_namespace fmt ns =
   fprintf fmt "@[<hov 2>types: ";
-  M.iter (fun x ty -> fprintf fmt "%s -> %a;@ " x print_ident ty.ts_name)
-    ns.tysymbols;
+  Mnm.iter (fun x ty -> fprintf fmt "%s -> %a;@ " x print_ident ty.ts_name)
+    ns.ns_ts;
   fprintf fmt "@]@\n@[<hov 2>function symbols: ";
-  M.iter (fun x s -> fprintf fmt "%s -> %a;@ " x print_ident s.fs_name)
-    ns.fsymbols;
+  Mnm.iter (fun x s -> fprintf fmt "%s -> %a;@ " x print_ident s.fs_name)
+    ns.ns_fs;
   fprintf fmt "@]@\n@[<hov 2>predicate symbols: ";
-  M.iter (fun x s -> fprintf fmt "%s -> %a;@ " x print_ident s.ps_name)
-    ns.psymbols;
+  Mnm.iter (fun x s -> fprintf fmt "%s -> %a;@ " x print_ident s.ps_name)
+    ns.ns_ps;
   fprintf fmt "@]@\n@[<hov 2>namespace: ";
-  M.iter (fun x th -> fprintf fmt "%s -> [@[%a@]];@ " x print_namespace th)
-    ns.namespace;
+  Mnm.iter (fun x th -> fprintf fmt "%s -> [@[%a@]];@ " x print_namespace th)
+    ns.ns_ns;
   fprintf fmt "@]"
 
 let print_th fmt th =
   print_namespace fmt (get_namespace th)
 
-let print_t fmt t = 
+let print_t fmt t =
   fprintf fmt "<theory (TODO>"
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "make -C .. test"
-End: 
+End:
 *)

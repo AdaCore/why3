@@ -29,13 +29,13 @@ exception ConstructorExpected
 type vsymbol = private {
   vs_name : ident;
   vs_ty : ty;
-  vs_tag : int;
 }
 
 module Svs : Set.S with type elt = vsymbol
 module Mvs : Map.S with type key = vsymbol
+module Hvs : Hashtbl.S with type key = vsymbol
 
-val create_vsymbol : ident -> ty -> vsymbol
+val create_vsymbol : preid -> ty -> vsymbol
 
 (** Function symbols *)
 
@@ -43,26 +43,26 @@ type fsymbol = private {
   fs_name   : ident;
   fs_scheme : ty list * ty;
   fs_constr : bool;
-  fs_tag    : int;
 }
 
-val create_fsymbol : ident -> ty list * ty -> bool -> fsymbol
+val create_fsymbol : preid -> ty list * ty -> bool -> fsymbol
 
 module Sfs : Set.S with type elt = fsymbol
 module Mfs : Map.S with type key = fsymbol
+module Hfs : Hashtbl.S with type key = fsymbol
 
 (** Predicate symbols *)
 
 type psymbol = private {
   ps_name   : ident;
   ps_scheme : ty list;
-  ps_tag    : int;
 }
 
-val create_psymbol : ident -> ty list -> psymbol
+val create_psymbol : preid -> ty list -> psymbol
 
 module Sps : Set.S with type elt = psymbol
 module Mps : Map.S with type key = psymbol
+module Hps : Hashtbl.S with type key = psymbol
 
 (** Patterns *)
 

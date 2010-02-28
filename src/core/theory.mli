@@ -21,50 +21,88 @@ open Ident
 open Ty
 open Term
 
-type ty_def = 
-  | Ty_abstract
-  | Ty_algebraic of fsymbol list
+(** Declarations *)
 
-type ty_decl = tysymbol * ty_def 
+(* type declaration *)
 
-type logic_decl = 
+type ty_def =
+  | Tabstract
+  | Talgebraic of fsymbol list
+
+type ty_decl = tysymbol * ty_def
+
+(* logic declaration *)
+
+type logic_decl =
   | Lfunction  of fsymbol * (vsymbol list * term) option (* FIXME: binders *)
   | Lpredicate of psymbol * (vsymbol list * fmla) option (* FIXME: binders *)
   | Linductive of psymbol * (ident * fmla) list
 
-type prop_kind = 
-  | Axiom | Lemma | Goal
+(* proposition declaration *)
+
+type prop_kind =
+  | Paxiom
+  | Plemma
+  | Pgoal
+
+type prop_decl = prop_kind * ident * fmla
+
+(* declaration *)
 
 type decl_node =
   | Dtype  of ty_decl list
   | Dlogic of logic_decl list
-  | Dprop  of prop_kind * ident * fmla
+  | Dprop  of prop_decl
 
-type decl = private {d_node : decl_node; d_tag : int}
+type decl = private {
+  d_node : decl_node;
+  d_tag  : int;
+}
 
-type decl_or_use =
-  | Decl of decl
-  | Use of theory
+(* smart constructors *)
 
-and theory = private {
+val create_type : ty_decl list -> decl
+val create_logic : logic_decl list -> decl
+val create_prop : prop_kind -> preid -> fmla -> decl
+
+(** Theory *)
+
+module Snm : Set.S with type elt = string
+module Mnm : Map.S with type key = string
+
+type theory = private {
   th_name   : ident;
-  th_param  : Sid.t;           (* locally declared abstract symbols *)
-  th_known  : ident Mid.t;     (* imported and locally declared symbols *)
+  th_param  : Sid.t;          (* locally declared abstract symbols *)
+  th_known  : ident Mid.t;    (* imported and locally declared symbols *)
   th_export : namespace;
   th_decls  : decl_or_use list;
 }
 
-and namespace
+and namespace = private {
+  ns_ts   : tysymbol Mnm.t;   (* type symbols *)
+  ns_fs   : fsymbol Mnm.t;    (* function symbols *)
+  ns_ps   : psymbol Mnm.t;    (* predicate symbols *)
+  ns_ns   : namespace Mnm.t;  (* inner namespaces *)
+  ns_prop : fmla Mnm.t;       (* propositions *)
+}
+
+and decl_or_use =
+  | Decl of decl
+  | Use of theory
 
 (** Building *)
 
-type theory_uc
-  (** a theory under construction *)
+type theory_uc  (* a theory under construction *)
 
-val create_theory : ident -> theory_uc
+val create_theory : preid -> theory_uc
+
+val close_theory : theory_uc -> theory
 
 val open_namespace : theory_uc -> theory_uc
-val close_namespace : theory_uc -> ident -> import:bool -> theory_uc
+
+val close_namespace : theory_uc -> string -> import:bool -> theory_uc
+
+val add_decl : theory_uc -> decl -> theory_uc
 
 val use_export : theory_uc -> theory -> theory_uc
 
@@ -76,25 +114,7 @@ type th_inst = {
 
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 
-val add_decl : theory_uc -> decl_node -> theory_uc
-
-val close_theory : theory_uc -> theory
-
-(** Querying *)
-
 val get_namespace : theory_uc -> namespace
-
-val find_tysymbol : namespace -> string -> tysymbol
-val find_fsymbol  : namespace -> string -> fsymbol
-val find_psymbol  : namespace -> string -> psymbol
-val find_namespace: namespace -> string -> namespace
-val find_prop     : namespace -> string -> fmla
-
-val mem_tysymbol : namespace -> string -> bool
-val mem_fsymbol  : namespace -> string -> bool
-val mem_psymbol  : namespace -> string -> bool
-val mem_namespace: namespace -> string -> bool
-val mem_prop     : namespace -> string -> bool
 
 (** Exceptions *)
 
@@ -103,7 +123,6 @@ exception NoOpenedNamespace
 exception RedeclaredIdent of ident
 exception CannotInstantiate
 exception ClashSymbol of string
-
 
 (** Debugging *)
 

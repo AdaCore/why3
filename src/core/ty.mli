@@ -29,7 +29,6 @@ type tysymbol = private {
   ts_name : ident;
   ts_args : tvsymbol list;
   ts_def  : ty option;
-  ts_tag  : int;
 }
 
 and ty = private {
@@ -44,10 +43,12 @@ and ty_node = private
 exception NonLinear
 exception UnboundTypeVariable
 
-val create_tysymbol : ident -> tvsymbol list -> ty option -> tysymbol
+val create_tvsymbol : preid -> tvsymbol
+val create_tysymbol : preid -> tvsymbol list -> ty option -> tysymbol
 
 module Sts : Set.S with type elt = tysymbol
 module Mts : Map.S with type key = tysymbol
+module Hts : Hashtbl.S with type key = tysymbol
 
 exception BadTypeArity
 

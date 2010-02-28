@@ -21,7 +21,7 @@ type t = { tag : int ; name : string }
 
 let fresh =
   let cnt = ref 0 in
-  fun t -> 
+  fun t ->
     let tag = !cnt in
     incr cnt;
     { t with tag = tag }
@@ -38,8 +38,8 @@ let name_map = Hashtbl.create 47
 
 let default_string = "anon"
 
-let strip_numbers s = 
-  let rec aux n = 
+let strip_numbers s =
+  let rec aux n =
     if n <= 0 then 0
     else
       match s.[n-1] with
@@ -48,7 +48,7 @@ let strip_numbers s =
   let n = aux (String.length s) in
   if n = 0 then default_string else String.sub s 0 n
 
-let fresh_string name = 
+let fresh_string name =
   let s = strip_numbers name in
   try
     let i = Hashtbl.find name_map s in
@@ -74,10 +74,10 @@ module S = Set.Make (HT)
 
 let get_cur_name, reset =
   let current_name_map = H.create 47 in
-  let reset () = 
-    H.clear current_name_map; 
+  let reset () =
+    H.clear current_name_map;
     Hashtbl.clear name_map in
-  let get_name x = 
+  let get_name x =
     try H.find current_name_map x
     with Not_found ->
       let s = to_string x in
@@ -86,12 +86,12 @@ let get_cur_name, reset =
   get_name, reset
 
 let to_string = get_cur_name
-  
+
 let print fmt x = Format.fprintf fmt "%s" (get_cur_name x)
 
-let build_map nl = 
-  let m,_ = 
-    List.fold_left (fun (m, i) n -> M.add n i m, i + 1) 
+let build_map nl =
+  let m,_ =
+    List.fold_left (fun (m, i) n -> M.add n i m, i + 1)
       (M.empty, 0) nl in
   m
 

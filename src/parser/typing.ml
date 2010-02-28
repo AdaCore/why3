@@ -236,7 +236,8 @@ let find_user_type_var x env =
     Hashtbl.find env.utyvars x
   with Not_found ->
     (* TODO: shouldn't we localize this ident? *)
-    let v = create_type_var ~user:true (id_fresh x x) in
+    let v = create_tvsymbol (id_fresh x) in
+    let v = create_type_var ~user:true v in
     Hashtbl.add env.utyvars x v;
     v
  
@@ -261,7 +262,7 @@ let rec specialize env t = match t.ty_node with
 (** generic find function using a path *)
 
 let find_local_namespace {id=x; id_loc=loc} ns = 
-  try find_namespace ns x 
+  try Mnm.find x ns.ns_ns
   with Not_found -> error ~loc (UnboundNamespace x)
 
 let rec find_namespace q ns = match q with
@@ -275,7 +276,7 @@ let rec find f q ns = match q with
 (** specific find functions using a path *)
 
 let find_tysymbol {id=x; id_loc=loc} ns = 
-  try find_tysymbol ns x 
+  try Mnm.find x ns.ns_ts
   with Not_found -> error ~loc (UnboundType x)
 
 let find_tysymbol p th = 
@@ -287,7 +288,7 @@ let specialize_tysymbol x env =
   s, List.map (find_type_var env) s.ts_args
 	
 let find_fsymbol {id=x; id_loc=loc} ns = 
-  try find_fsymbol ns x 
+  try Mnm.find x ns.ns_fs
   with Not_found -> error ~loc (UnboundSymbol x)
 
 let find_fsymbol p th = 
@@ -300,7 +301,7 @@ let specialize_fsymbol x env =
   s, List.map (specialize env) tl, specialize env t
 
 let find_psymbol {id=x; id_loc=loc} ns = 
-  try find_psymbol ns x 
+  try Mnm.find x ns.ns_ps
   with Not_found -> error ~loc (UnboundSymbol x)
 
 let find_psymbol p th =
@@ -457,7 +458,7 @@ and fmla env = function
       f_if (fmla env f1) (fmla env f2) (fmla env f3)
   | Fquant (q, x, t, f1) ->
       (* TODO: shouldn't we localize this ident? *)
-      let v = create_vsymbol (id_fresh x x) (ty t) in
+      let v = create_vsymbol (id_fresh x) (ty t) in
       let env = M.add x v env in
       f_quant q v (fmla env f1)
   | Fapp (s, tl) ->
@@ -493,12 +494,12 @@ let add_types loc dl th =
 	  (fun v -> 
 	     if Hashtbl.mem vars v.id then 
 	       error ~loc:v.id_loc (DuplicateTypeVar v.id);
-	     let i = id_user v.id v.id v.id_loc in
+	     let i = create_tvsymbol (id_user v.id v.id_loc) in
 	     Hashtbl.add vars v.id i;
 	     i)
 	  d.td_params 
       in
-      let id = id_user id id d.td_ident.id_loc in
+      let id = id_user id d.td_ident.id_loc in
       let ts = match d.td_def with
 	| TDalias ty -> 
 	    let rec apply = function
@@ -533,33 +534,33 @@ let add_types loc dl th =
        | None -> assert false
        | Some ts -> ts),
     (match d.td_def with
-       | TDabstract | TDalias _ -> Ty_abstract
+       | TDabstract | TDalias _ -> Tabstract
        | TDalgebraic _ -> assert false (*TODO*))
   in
   let dl = List.map decl dl in
-  add_decl th (Dtype dl)
+  add_decl th (create_type dl)
 
 let add_function loc pl t th {id=id} =
   let ns = get_namespace th in
-  if mem_fsymbol ns id then error ~loc (Clash id);
+  if Mnm.mem id ns.ns_fs then error ~loc (Clash id);
   let denv = create_denv th in
   let pl = List.map (dty denv) pl and t = dty denv t in
   let pl = List.map ty pl and t = ty t in
   (* TODO: add the theory name to the long name *)
-  let v = id_user id id loc in
+  let v = id_user id loc in
   let s = create_fsymbol v (pl, t) false in
-  add_decl th (Dlogic [Lfunction (s, None)])
+  add_decl th (create_logic [Lfunction (s, None)])
 
 let add_predicate loc pl th {id=id} =
   let ns = get_namespace th in
-  if mem_psymbol ns id then error ~loc (Clash id);
+  if Mnm.mem id ns.ns_ps then error ~loc (Clash id);
   let denv = create_denv th in
   let pl = List.map (dty denv) pl in
   let pl = List.map ty pl in
   (* TODO: add the theory name to the long name *)
-  let v = id_user id id loc in
+  let v = id_user id loc in
   let s = create_psymbol v pl in
-  add_decl th (Dlogic [Lpredicate (s, None)])
+  add_decl th (create_logic [Lpredicate (s, None)])
 
 let env_of_vsymbol_list vl =
   List.fold_left (fun env v -> M.add v.vs_name.id_short v env) M.empty vl
@@ -570,7 +571,7 @@ let add_logics loc dl th =
   (* 1. create all symbols and make an environment with these symbols *)
   let create_symbol th d = 
     let id = d.ld_ident.id in
-    let v = id_user id id loc in
+    let v = id_user id loc in
     let denv = create_denv th in
     let type_ty (_,t) = ty (dty denv t) in
     let pl = List.map type_ty d.ld_params in
@@ -578,12 +579,12 @@ let add_logics loc dl th =
       | None -> (* predicate *)
 	  let ps = create_psymbol v pl in
 	  Hashtbl.add psymbols id ps;
-	  add_decl th (Dlogic [Lpredicate (ps, None)])
+	  add_decl th (create_logic [Lpredicate (ps, None)])
       | Some t -> (* function *)
 	  let t = type_ty (None, t) in
 	  let fs = create_fsymbol v (pl, t) false in
 	  Hashtbl.add fsymbols id fs;
-	  add_decl th (Dlogic [Lfunction (fs, None)])
+	  add_decl th (create_logic [Lfunction (fs, None)])
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
@@ -596,8 +597,8 @@ let add_logics loc dl th =
     let denv = List.fold_left dadd_var (create_denv th') d.ld_params in
     let create_var (x, _) ty = 
       let id = match x with 
-	| None -> id_fresh "%x" "%x"
-	| Some id -> id_user id.id id.id id.id_loc
+	| None -> id_fresh "%x"
+	| Some id -> id_user id.id id.id_loc
       in
       create_vsymbol id ty
     in
@@ -628,7 +629,7 @@ let add_logics loc dl th =
 	Lfunction (fs, def)
   in
   let dl = List.map type_decl dl in
-  add_decl th (Dlogic dl)
+  add_decl th (create_logic dl)
 
 let term env t =
   let denv = create_denv env in
@@ -643,7 +644,7 @@ let fmla env f =
 let add_prop k loc s f th =
   let f = fmla th f in
   try
-    add_decl th (Dprop (k, id_user s.id s.id loc, f))
+    add_decl th (create_prop k (id_user s.id loc) f)
   with ClashSymbol _ ->
     error ~loc (Clash s.id)
 
@@ -695,9 +696,9 @@ let load_file file =
   tl
 
 let prop_kind = function
-  | Kaxiom -> Axiom
-  | Kgoal -> Goal
-  | Klemma -> Lemma
+  | Kaxiom -> Paxiom
+  | Kgoal -> Pgoal
+  | Klemma -> Plemma
 
 let rec find_theory env q = match q with
   | Qident id -> 
@@ -727,7 +728,7 @@ let rec find_theory env q = match q with
 
 and type_theory env id pt =
   (* TODO: use long name *)
-  let n = id_user id.id id.id id.id_loc in
+  let n = id_user id.id id.id_loc in
   let th = create_theory n in
   let th = add_decls env th pt.pt_decl in
   close_theory th
@@ -744,8 +745,8 @@ and add_decl env th = function
   | Use (loc, use) ->
       let t = find_theory env use.use_theory in
       let n = match use.use_as with 
-	| None -> id_clone t.th_name
-	| Some x -> id_user x.id x.id loc
+	| None -> t.th_name.id_short
+	| Some x -> x.id
       in
       begin try match use.use_imp_exp with
 	| Nothing ->
@@ -765,11 +766,10 @@ and add_decl env th = function
       end
   | Namespace (_, {id=id; id_loc=loc}, dl) ->
       let ns = get_namespace th in
-      if mem_namespace ns id then error ~loc (ClashNamespace id);
+      if Mnm.mem id ns.ns_ns then error ~loc (ClashNamespace id);
       let th = open_namespace th in
       let th = add_decls env th dl in
-      let n = id_user id id loc in
-      close_namespace th n ~import:false
+      close_namespace th id ~import:false
   | Inductive_def _ ->
       assert false (*TODO*)
 

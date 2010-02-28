@@ -30,7 +30,6 @@ type tysymbol = {
   ts_name : ident;
   ts_args : tvsymbol list;
   ts_def  : ty option;
-  ts_tag  : int;
 }
 
 and ty = {
@@ -44,23 +43,23 @@ and ty_node =
 
 module Tsym = struct
   type t = tysymbol
-  let equal ts1 ts2 = ts1.ts_name == ts2.ts_name
+  let equal = (==)
   let hash ts = ts.ts_name.id_tag
-  let tag n ts = { ts with ts_tag = n }
-  let compare ts1 ts2 = Pervasives.compare ts1.ts_tag ts2.ts_tag
+  let compare ts1 ts2 =
+    Pervasives.compare ts1.ts_name.id_tag ts2.ts_name.id_tag
 end
-module Hts = Hashcons.Make(Tsym)
 module Sts = Set.Make(Tsym)
 module Mts = Map.Make(Tsym)
+module Hts = Hashtbl.Make(Tsym)
 
 let mk_ts name args def = {
   ts_name = name;
   ts_args = args;
   ts_def  = def;
-  ts_tag  = -1
 }
 
-let create_tysymbol name args def = Hts.hashcons (mk_ts name args def)
+let create_tvsymbol = id_register
+let create_tysymbol name args def = mk_ts (id_register name) args def
 
 module Ty = struct
 
@@ -75,7 +74,7 @@ module Ty = struct
 
   let hash ty = match ty.ty_node with
     | Tyvar v -> v.id_tag
-    | Tyapp (s, tl) -> Hashcons.combine_list hash_ty (s.ts_tag) tl
+    | Tyapp (s, tl) -> Hashcons.combine_list hash_ty s.ts_name.id_tag tl
 
   let tag n ty = { ty with ty_tag = n }
 
