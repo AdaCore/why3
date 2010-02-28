@@ -286,9 +286,9 @@ let close_theory uc = match uc.uc_export with
 let open_namespace uc = match uc.uc_visible with
   | ns :: _ as st ->
       { uc with
-	  uc_visible = ns :: st;
-	  uc_import  = empty_ns :: uc.uc_import;
-	  uc_export  = empty_ns :: uc.uc_export; }
+          uc_visible = ns :: st;
+          uc_import  = empty_ns :: uc.uc_import;
+          uc_export  = empty_ns :: uc.uc_export; }
   | [] ->
       assert false
 
@@ -333,14 +333,14 @@ let merge_known m1 m2 =
 let use_export uc th =
   match uc.uc_visible, uc.uc_import, uc.uc_export with
     | v0 :: stv, i0 :: sti, e0 :: ste ->
-	{ uc with
-	    uc_visible = merge_ns ~check:false th.th_export v0 :: stv;
-	    uc_import  = merge_ns ~check:true  th.th_export i0 :: sti;
-	    uc_export  = merge_ns ~check:false th.th_export e0 :: ste;
-	    uc_known   = merge_known uc.uc_known th.th_known;
-	}
+        { uc with
+            uc_visible = merge_ns ~check:false th.th_export v0 :: stv;
+            uc_import  = merge_ns ~check:true  th.th_export i0 :: sti;
+            uc_export  = merge_ns ~check:false th.th_export e0 :: ste;
+            uc_known   = merge_known uc.uc_known th.th_known;
+        }
     | _ ->
-	assert false
+        assert false
 
 type th_inst = {
   inst_ts : tysymbol Mts.t;
@@ -348,20 +348,45 @@ type th_inst = {
   inst_ps : psymbol  Mps.t;
 }
 
-let check_sym id t =
-  if not (Sid.mem id t.th_param) then raise CannotInstantiate
-
 let clone_export th t i =
-  let check_ts s _ = check_sym s.ts_name t in
-  Mts.iter check_ts i.inst_ts;
-  let check_fs s _ = check_sym s.fs_name t in
-  Mfs.iter check_fs i.inst_fs;
-  let check_ps s _ = check_sym s.ps_name t in
-  Mps.iter check_ps i.inst_ps;
+  let check_sym id =
+    if not (Sid.mem id t.th_param) then raise CannotInstantiate
+  in
+  let check_ts s _ = check_sym s.ts_name in Mts.iter check_ts i.inst_ts;
+  let check_fs s _ = check_sym s.fs_name in Mfs.iter check_fs i.inst_fs;
+  let check_ps s _ = check_sym s.ps_name in Mps.iter check_ps i.inst_ps;
   assert false (* TODO *)
 
-let check_fmla k f =
-  () (* TODO *)
+(* Manage the set of known idents *)
+
+let add_known id uc =
+  if Mid.mem id uc.uc_known then raise (RedeclaredIdent id);
+  { uc with uc_known = Mid.add id uc.uc_name uc.uc_known }
+
+let add_param id uc =
+  let uc = add_known id uc in
+  { uc with uc_param = Sid.add id uc.uc_param }
+
+exception UnknownIdent of ident
+
+let is_known_id ids id =
+  if not (Mid.mem id ids) then raise (UnknownIdent id)
+
+let is_known_ts ids () ts = is_known_id ids ts.ts_name
+let is_known_fs ids () fs = is_known_id ids fs.fs_name
+let is_known_ps ids () ps = is_known_id ids ps.ps_name
+
+let is_known_ty ids ty = ty_s_fold (is_known_ts ids) () ty
+
+let is_known_term ids t =
+  t_s_fold (is_known_ts ids) (fun _ _ -> ())
+           (is_known_fs ids) (is_known_ps ids) () t
+
+let is_known_fmla ids f =
+  f_s_fold (is_known_ts ids) (fun _ _ -> ())
+           (is_known_fs ids) (is_known_ps ids) () f
+
+(* Manage new symbols *)
 
 let generic_add ~check x v m =
   if check && Mnm.mem x m then raise (ClashSymbol x);
@@ -384,20 +409,14 @@ let add_symbol add x v uc =
   | v0 :: stv, i0 :: sti, e0 :: ste ->
       let x = x.id_short in
       { uc with
-	  uc_visible = add ~check:false x v v0 :: stv;
-	  uc_import  = add ~check:true  x v i0 :: sti;
-	  uc_export  = add ~check:false x v e0 :: ste }
+          uc_visible = add ~check:false x v v0 :: stv;
+          uc_import  = add ~check:true  x v i0 :: sti;
+          uc_export  = add ~check:false x v e0 :: ste }
 
   | _ ->
       assert false
 
-let add_known id uc =
-  if Mid.mem id uc.uc_known then raise (RedeclaredIdent id);
-  { uc with uc_known = Mid.add id uc.uc_name uc.uc_known }
-
-let add_param id uc =
-  let uc = add_known id uc in
-  { uc with uc_param = Sid.add id uc.uc_param }
+(* Manage new declarations *)
 
 let add_type uc (ts, def) = match def with
   | Tabstract ->
@@ -430,13 +449,13 @@ let add_logic uc = function
 let add_decl uc d =
   let uc = match d.d_node with
     | Dtype dl ->
-	List.fold_left add_type uc dl
+        List.fold_left add_type uc dl
     | Dlogic dl ->
-	List.fold_left add_logic uc dl
+        List.fold_left add_logic uc dl
     | Dprop (k, id, f) ->
-	check_fmla uc.uc_known f;
-	let uc = add_known id uc in
-	add_symbol add_prop id f uc
+        is_known_fmla uc.uc_known f;
+        let uc = add_known id uc in
+        add_symbol add_prop id f uc
   in
   { uc with uc_decls = Decl d :: uc.uc_decls }
 
