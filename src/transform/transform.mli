@@ -1,52 +1,68 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (C) 2010-                                                   *)
+(*    Francois Bobot                                                      *)
+(*    Jean-Christophe Filliatre                                           *)
+(*    Johannes Kanig                                                      *)
+(*    Andrei Paskevich                                                    *)
+(*                                                                        *)
+(*  This software is free software; you can redistribute it and/or        *)
+(*  modify it under the terms of the GNU Library General Public           *)
+(*  License version 2.1, with the special exception on linking            *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(*  This software is distributed in the hope that it will be useful,      *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
+(*                                                                        *)
+(**************************************************************************)
+
+
 (* Tranformation on list of element with some memoisations *)
 
-(* The functors need a type with a tag function *)
-module type Sig =
-sig
-  type t
+(* The type of transformation from list of 'a to list of 'b *)
+type ('a,'b) t
 
-  (* return an unique int for each element of t *)
-  val tag : t -> int
-end
+(* compose two transformation, the underlying datastructures for
+   the memoisation are shared *)
+val compose : ('a,'b) t -> ('b,'c) t -> ('a,'c) t
+    
+(* apply a transformation and memoise *)
+val apply : ('a,'b) t -> 'a list -> 'b list
+    
+(* clear the datastructures used to store the memoisation *)
+val clear : ('a,'b) t -> unit
+
 
 module type S =
 sig
   (* The type of the elements of the list*)
-  type elt
-
-  (* The type of the transformations on list of elt *)
-  type t
+  type elt1
+  type elt2
 
   (* The general tranformation only one memoisation is performed with
      the argument given *)
-  val all : (elt list -> elt list) -> t
+  val all : (elt1 list -> elt2 list) -> (elt1,elt2) t
 
   (* map the element of the list from the first to the last.
      only one memoisation is performed *)
-  val fold_map_right : ('a -> elt -> ('a * elt list)) -> 'a -> t
+  val fold_map_right : ('a -> elt1 -> ('a * elt2 list)) -> 'a -> (elt1,elt2) t
 
   (* map the element of the list from the last to the first.
      A memoisation is performed at each step *)
-  val fold_map_left : ('a -> elt -> ('a * elt list)) -> 'a -> t
+  val fold_map_left : ('a -> elt1 -> ('a * elt2 list)) -> 'a -> (elt1,elt2) t
 
   (* map the element of the list without an environnment.
      A memoisation is performed at each step, and for each elements *)
-  val elt : (elt -> elt list) -> t
+  val elt : (elt1 -> elt2 list) -> (elt1,elt2) t
     
-  (* compose two transformation, the underliying datastructures for
-     the memoisation are shared *)
-  val compose : t -> t -> t
-    
-  (* apply a transformation and memoise *)
-  val apply : t -> elt list -> elt list
-    
-  (* clear the datastructures used to store the memoisation *)
-  val clear : t -> unit
-
 end
 
-module Make : functor (X : Sig) -> S with type elt = X.t
+open Theory
+
+module TDecl : S with type elt1 = decl and type elt2 = decl
+(*module TDecl_or_Use : S with type elt1 = decl_or_use and type elt2 = decl_or_use*)
+module TTheory : S with type elt1 = theory and type elt2 = theory
+module TTheory_Decl : S with type elt1 = theory and type elt2 = decl
 
 
-module TDecl : S with type elt = Theory.decl
-module TDecl_or_Use : S with type elt = Theory.decl_or_use

@@ -106,7 +106,7 @@ UTIL_CMO = src/util/pp.cmo src/util/loc.cmo src/util/util.cmo \
            src/util/hashcons.cmo 
 PARSER_CMO = src/parser/parser.cmo src/parser/lexer.cmo src/parser/typing.cmo
 
-TRANSFORM_CMO = src/transform/transform.cmo
+TRANSFORM_CMO = src/transform/transform.cmo src/transform/simplify_recursive_definition.cmo
 
 CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(TRANSFORM_CMO) src/pretty.cmo src/main.cmo
 CMX = $(CMO:.cmo=.cmx)

@@ -1,32 +1,39 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (C) 2010-                                                   *)
+(*    Francois Bobot                                                      *)
+(*    Jean-Christophe Filliatre                                           *)
+(*    Johannes Kanig                                                      *)
+(*    Andrei Paskevich                                                    *)
+(*                                                                        *)
+(*  This software is free software; you can redistribute it and/or        *)
+(*  modify it under the terms of the GNU Library General Public           *)
+(*  License version 2.1, with the special exception on linking            *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(*  This software is distributed in the hope that it will be useful,      *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
+(*                                                                        *)
+(**************************************************************************)
+
+(* This module has the invariant that each type has only one tag function *)
+
+type 'a hashconsedlist = (int * 'a) list
+
+
 module type Sig =
 sig
   type t
   val tag : t -> int
 end
 
-module type S =
-sig
-  type elt
-  type t
-
-  val all : (elt list -> elt list) -> t
-  val fold_map_right : ('a -> elt -> ('a * elt list)) -> 'a -> t
-  val fold_map_left : ('a -> elt -> ('a * elt list)) -> 'a -> t
-  val elt : (elt -> elt list) -> t
-
-  val compose : t -> t -> t
-  val apply : t -> elt list -> elt list
-  val clear : t -> unit
-end
-
-module Make (X : Sig) =
+(* The datastructure for hashconsed list *)
+module LH (X:Sig) = 
 struct
-  type elt = X.t
-
-  (* The datastructure for hashconsed list *)
-  module L = 
+  module L =
   struct
-    type t = (int * elt) list
+    type t = X.t hashconsedlist
     let equal a b = 
       match a,b with
         | [], [] -> true
@@ -39,31 +46,89 @@ struct
         | (_,ae)::[] -> X.tag ae
         | (_,ae)::(at,_)::_ -> Hashcons.combine (X.tag ae) at
     let tag t = function
-        | [] -> []
-        | (_,ae)::al -> (t,ae)::al
+      | [] -> []
+      | (_,ae)::al -> (t,ae)::al
   end
-
   module LH = Hashcons.Make(L)
+    
+  type t = L.t
 
-  let empty = []
-  let cons e l = LH.hashcons ((0,e)::l)
-  let tag_elt = X.tag
-  let tag_t = function
+  let empty : t = []
+  let cons e l : t = LH.hashcons ((0,e)::l)
+
+  let to_list : t -> X.t list =
+    let rec aux acc t =
+      match t with
+        | [] -> acc
+        | (_,e)::t -> aux (e::acc) t
+    in
+    aux []
+      
+  let from_list = List.fold_left (fun t e -> cons e t) empty        
+
+  let tag = function
     | [] -> -1
     | (t,_)::_ -> t
+    
+end
 
-  (* the memoisation is inside the function *)
-  type t = { all : L.t -> L.t;
-             clear : unit -> unit;
-             memo_to_list : (int,elt list) Hashtbl.t }
 
-  let memo f tag h x =
-    try Hashtbl.find h (tag x:int)
-    with Not_found -> 
-      let r = f x in
-      Hashtbl.add h (tag x) r;
-      r
+(* the memoisation is inside the function *)
+type ('a,'b) t = { all : 'a hashconsedlist -> 'b hashconsedlist;
+                   clear : unit -> unit;
+                   from_list : 'a list -> 'a hashconsedlist;
+                   to_list : 'b hashconsedlist -> 'b list;
+                   clear_to_list : unit -> unit}
 
+
+let compose f g = {all = (fun x -> g.all (f.all x));
+                   clear = (fun () -> f.clear (); g.clear ());
+                   from_list = f.from_list;
+                   to_list = g.to_list;
+                   clear_to_list = g.clear_to_list}
+
+let apply f x = f.to_list (f.all (f.from_list x))
+    
+let clear f = f.clear ();f.clear_to_list ()
+
+let memo f tag h x =
+  try Hashtbl.find h (tag x:int)
+  with Not_found -> 
+    let r = f x in
+    Hashtbl.add h (tag x) r;
+    r
+
+
+module type S =
+sig
+  type elt1
+  type elt2
+
+  val all : (elt1 list -> elt2 list) -> (elt1,elt2) t
+  val fold_map_right : ('a -> elt1 -> ('a * elt2 list)) -> 'a -> (elt1,elt2) t
+  val fold_map_left : ('a -> elt1 -> ('a * elt2 list)) -> 'a -> (elt1,elt2) t
+  val elt : (elt1 -> elt2 list) -> (elt1,elt2) t
+end
+
+module Make (X1 : Sig) (X2 : Sig) =
+struct
+  type elt1 = X1.t
+  type elt2 = X2.t
+
+  module LH1 = LH(X1)
+  module LH2 = LH(X2)
+
+  let memo_to_list2 h : X2.t hashconsedlist -> X2.t list = 
+    memo LH2.to_list LH2.tag h
+
+  let t all clear = 
+    let h_to_list = Hashtbl.create 16 in
+    {all = all;
+     clear = clear;
+     from_list = LH1.from_list;
+     to_list = memo_to_list2 h_to_list;
+     clear_to_list = (fun () -> Hashtbl.clear h_to_list)
+    } 
 
   let fold_map_left f_fold v_empty =
     let memo_t = Hashtbl.create 64 in
@@ -71,68 +136,41 @@ struct
       let edone,_ = List.fold_left 
         (fun (edone,v) (tag,elts) -> 
            let v,l = f_fold v elts in
-           let edone = List.fold_left (fun e t -> cons t e) edone l in
+           let edone = List.fold_left (fun e t -> LH2.cons t e) edone l in
            Hashtbl.add memo_t tag (edone,v);
            (edone,v)) edonev eltss in
       edone in
     let rec f acc t1 = 
       match t1 with
-        | [] -> rewind (empty,v_empty) acc
+        | [] -> rewind (LH2.empty,v_empty) acc
         | (tag,e)::t2 -> 
             try 
               let edonev = Hashtbl.find memo_t tag in
               rewind edonev acc
             with Not_found -> f ((tag,e)::acc) t2 
     in
-    {all = f [];
-     clear = (fun () -> Hashtbl.clear memo_t);
-     memo_to_list = Hashtbl.create 16} 
+    t (f []) (fun () -> Hashtbl.clear memo_t)
 
   let elt f_elt = 
     let memo_elt = Hashtbl.create 64 in
-    let f_elt () x = (),memo f_elt tag_elt memo_elt x in
+    let f_elt () x = (),memo f_elt X1.tag memo_elt x in
     let f = fold_map_left f_elt () in
     {f with clear = fun () -> Hashtbl.clear memo_elt; f.clear ()}
 
   let fold_map_right f_fold v_empty =
     let rec f (acc,v) t = 
       match t with
-        | [] -> List.fold_left (List.fold_left (fun t e -> cons e t)) empty acc
+        | [] -> List.fold_left (List.fold_left (fun t e -> LH2.cons e t)) LH2.empty acc
         | (_,e)::t -> 
             let v,res = f_fold v e in
             f (res::acc,v) t in
     let memo_t = Hashtbl.create 16 in
-    { all = memo (f ([],v_empty)) tag_t memo_t;
-      clear = (fun () -> Hashtbl.clear memo_t);
-      memo_to_list = Hashtbl.create 16}
-
-  let to_list =
-    let rec aux acc t =
-    match t with
-      | [] -> acc
-      | (_,e)::t -> aux (e::acc) t
-    in
-    aux []
-
-  let from_list = List.fold_left (fun t e -> cons e t) empty        
+    t (memo (f ([],v_empty)) LH1.tag memo_t) (fun () -> Hashtbl.clear memo_t)
 
   let all f =
-    let f x = from_list (f (to_list x)) in
+    let f x = LH2.from_list (f (LH1.to_list x)) in
     let memo_t = Hashtbl.create 16 in
-    { all = memo f tag_t memo_t;
-      clear = (fun () -> Hashtbl.clear memo_t);
-      memo_to_list = Hashtbl.create 16}
-
-
-  let compose f g = {all = (fun x -> g.all (f.all x));
-                     clear = (fun () -> f.clear (); g.clear ());
-                     memo_to_list = g.memo_to_list}
-  let apply f x = 
-    let res = f.all (from_list x) in
-    memo to_list tag_t f.memo_to_list res
-
-  let clear f = f.clear ();Hashtbl.clear f.memo_to_list
-
+    t (memo f LH1.tag memo_t) (fun () -> Hashtbl.clear memo_t)
 end
 
 open Term
@@ -145,7 +183,7 @@ module SDecl =
     let tag x = x.d_tag
   end
 
-module TDecl = Make(SDecl)
+module TDecl = Make(SDecl)(SDecl)
 
 module SDecl_or_Use =
   struct
@@ -155,4 +193,14 @@ module SDecl_or_Use =
       | Use t -> 1+t.th_name.Ident.id_tag 
   end
 
-module TDecl_or_Use = Make(SDecl_or_Use)
+module TDecl_or_Use = Make(SDecl_or_Use)(SDecl_or_Use)
+
+module STheory =
+  struct
+    type t = theory
+    let tag t = t.th_name.Ident.id_tag 
+  end
+
+module TTheory = Make(STheory)(STheory)
+
+module TTheory_Decl = Make(STheory)(SDecl)
