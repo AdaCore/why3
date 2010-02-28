@@ -111,8 +111,10 @@ let rec tv_known vs ty = match ty.ty_node with
   | _ -> ty_forall (tv_known vs) ty
 
 let create_tysymbol name args def =
-  let add s v = if Sid.mem v s
-  then raise NonLinear else Sid.add v s in
+  let add s v =
+    if Sid.mem v s then raise NonLinear;
+    Sid.add v s
+  in
   let s = List.fold_left add Sid.empty args in
   let _ = match def with
     | Some ty -> tv_known s ty || raise UnboundTypeVariable

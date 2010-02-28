@@ -134,6 +134,75 @@ let create_type tdl = Hdecl.hashcons (mk_decl (Dtype tdl))
 let create_logic ldl = Hdecl.hashcons (mk_decl (Dlogic ldl))
 let create_prop k i f = Hdecl.hashcons (mk_decl (Dprop (k, id_register i, f)))
 
+exception BadConstructor
+
+exception BadAlgebraicType
+
+let create_type tdl =
+  let check_constructor ty fs =
+    if not fs.fs_constr then raise BadConstructor;
+    let lty,rty = fs.fs_scheme in
+    ignore (Ty.matching Mid.empty rty ty);
+    let add s ty = match ty.ty_node with
+      | Tyvar v -> Sid.add v s
+      | _ -> assert false
+    in
+    let vs = ty_fold add Sid.empty rty in
+    let rec check () ty = match ty.ty_node with
+      | Tyvar v -> if not (Sid.mem v vs) then raise BadConstructor
+      | _ -> ty_fold check () ty
+    in
+    List.iter (check ()) lty
+  in
+  let check_decl (ts,td) = match td with
+    | Tabstract -> ()
+    | Talgebraic fsl ->
+        if ts.ts_def != None then raise BadAlgebraicType;
+        let ty = ty_app ts (List.map ty_var ts.ts_args) in
+        List.iter (check_constructor ty) fsl
+  in
+  List.iter check_decl tdl;
+  create_type tdl
+
+exception BadDefinition
+
+let create_logic ldl =
+  let add s v =
+    if Svs.mem v s then raise BadDefinition;
+    Svs.add v s
+  in
+  let check_vs vs vl =
+    let vs2 = List.fold_left add Svs.empty vl in
+    if not (Svs.subset vs vs2) then raise BadDefinition
+  in
+  let lmatch sbs ty v = Ty.matching sbs ty v.vs_ty in
+  let rmatch sbs v ty = Ty.matching sbs v.vs_ty ty in
+  let check_decl = function
+    | Lfunction (fs, Some (vl, t)) ->
+        let lty,rty = fs.fs_scheme in
+        let lsubst = Ty.matching Mid.empty rty t.t_ty in
+        let rsubst = Ty.matching Mid.empty t.t_ty rty in
+        ignore (List.fold_left2 lmatch lsubst lty vl);
+        ignore (List.fold_left2 rmatch rsubst vl lty);
+        check_vs (t_freevars Svs.empty t) vl
+    | Lpredicate (ps, Some (vl, f)) ->
+        let lty = ps.ps_scheme in
+        ignore (List.fold_left2 lmatch Mid.empty lty vl);
+        ignore (List.fold_left2 rmatch Mid.empty vl lty);
+        check_vs (f_freevars Svs.empty f) vl
+    | Linductive (ps,la) -> assert false (* TODO *)
+    | _ -> ()
+  in
+  List.iter check_decl ldl;
+  create_logic ldl
+
+exception UnboundVars
+
+let create_prop k i f =
+  let fvs = f_freevars Svs.empty f in
+  if not (Svs.is_empty fvs) then raise UnboundVars;
+  create_prop k i f
+
 
 (** Theory *)
 

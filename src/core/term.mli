@@ -288,14 +288,6 @@ val f_subst_single : vsymbol -> term -> fmla -> fmla
 val t_freevars : Svs.t -> term -> Svs.t
 val f_freevars : Svs.t -> fmla -> Svs.t
 
-(* USE PHYSICAL EQUALITY *)
-(*
-(* equality *)
-
-val t_equal : term -> term -> bool
-val f_equal : fmla -> fmla -> bool
-*)
-
 (* equality modulo alpha *)
 
 val t_equal_alpha : term -> term -> bool
