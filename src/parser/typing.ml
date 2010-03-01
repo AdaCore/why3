@@ -294,8 +294,7 @@ let find_fsymbol {id=x; id_loc=loc} ns =
 let find_fsymbol p th = 
   find find_fsymbol p (get_namespace th)
 
-let specialize_fsymbol x env =
-  let s = find_fsymbol x env.th in
+let specialize_fsymbol s =
   let tl, t = s.fs_scheme in
   let env = Htv.create 17 in
   s, List.map (specialize env) tl, specialize env t
@@ -307,8 +306,7 @@ let find_psymbol {id=x; id_loc=loc} ns =
 let find_psymbol p th =
   find find_psymbol p (get_namespace th)
 
-let specialize_psymbol x env =
-  let s = find_psymbol x env.th in
+let specialize_psymbol s =
   let env = Htv.create 17 in
   s, List.map (specialize env) s.ps_scheme
 
@@ -379,12 +377,14 @@ and dterm_node loc env = function
       Tvar x, ty
   | PPvar x -> 
       (* 0-arity symbol (constant) *)
-      let s, tyl, ty = specialize_fsymbol x env in
+      let s = find_fsymbol x env.th in
+      let s, tyl, ty = specialize_fsymbol s in
       let n = List.length tyl in
       if n > 0 then error ~loc (BadNumberOfArguments (s.fs_name, 0, n));
       Tapp (s, []), ty
   | PPapp (x, tl) ->
-      let s, tyl, ty = specialize_fsymbol x env in
+      let s = find_fsymbol x env.th in
+      let s, tyl, ty = specialize_fsymbol s in
       let tl = dtype_args s.fs_name loc env tyl tl in
       Tapp (s, tl), ty
   | _ ->
@@ -399,6 +399,10 @@ and dfmla env e = match e.pp_desc with
       Fnot (dfmla env a)
   | PPinfix (a, (PPand | PPor | PPimplies | PPiff as op), b) ->
       Fbinop (binop op, dfmla env a, dfmla env b)
+  | PPinfix (a, (PPeq | PPneq as op), b) ->
+      let s, _ = specialize_psymbol Theory.eq in
+      let f = Fapp (s, [dterm env a; dterm env b]) in
+      if op = PPeq then f else Fnot f
   | PPinfix _ ->
       error ~loc:e.pp_loc PredicateExpected
   | PPif (a, b, c) ->
@@ -412,7 +416,8 @@ and dfmla env e = match e.pp_desc with
       let env = { env with dvars = M.add x ty env.dvars } in
       Fquant (Fexists, x, ty, dfmla env a)
   | PPapp (x, tl) ->
-      let s, tyl = specialize_psymbol x env in
+      let s = find_psymbol x env.th in
+      let s, tyl = specialize_psymbol s in
       let tl = dtype_args s.ps_name e.pp_loc env tyl tl in
       Fapp (s, tl)
   | _ ->

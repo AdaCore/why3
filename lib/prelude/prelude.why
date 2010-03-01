@@ -32,15 +32,7 @@ theory List
 
 end
 
-theory Eq 
-
-  logic eq('a, 'a)
-
-end
-
 theory Array
-
-  use Eq
 
   type ('a,'b) t
 
@@ -49,15 +41,15 @@ theory Array
   
   axiom Select_eq : 
     forall m : ('a,'b) t. forall a1,a2 : 'a. forall b : 'b.
-    Eq.eq(a1, a2) -> Eq.eq(select(store(m,a1,b),a2),b)
+    a1 = a2 -> select(store(m,a1,b),a2) = b
 
   axiom Select_neq : 
     forall m : ('a,'b) t. forall a1,a2 : 'a. forall b : 'b.
-    not Eq.eq(a1, a2) -> Eq.eq(select(store(m,a1,b),a2), select(m,a2))
+    a1 <> a2 -> select(store(m,a1,b),a2) = select(m,a2)
 
   logic const('b) : ('a,'b) t
 
-  axiom Const : forall b:'b. forall a:'a. Eq.eq(select(const(b),a), b)
+  axiom Const : forall b:'b. forall a:'a. select(const(b),a) = b
 
 end
 

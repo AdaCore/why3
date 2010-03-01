@@ -124,6 +124,10 @@ val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 
 val get_namespace : theory_uc -> namespace
 
+(* equality *)
+
+val eq : psymbol
+
 (* exceptions *)
 
 exception CloseTheory

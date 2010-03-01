@@ -245,6 +245,17 @@ exception UnknownIdent of ident
 exception CannotInstantiate of ident
 exception ClashSymbol of string
 
+(** equality *)
+
+let eq =
+  let v = ty_var (create_tvsymbol (id_fresh "a")) in
+  create_psymbol (id_fresh "eq") [v; v;]
+
+let eq_th =
+  id_register (id_fresh "Eq")
+
+let known_eq =
+  Mid.add eq.ps_name eq_th Mid.empty
 
 (** Theory under construction *)
 
@@ -271,7 +282,7 @@ let empty_ns = {
 let create_theory n = {
   uc_name     = n;
   uc_param    = Sid.empty;
-  uc_known    = Mid.add n n Mid.empty;
+  uc_known    = Mid.add n n known_eq;
   uc_visible  = [empty_ns];
   uc_import   = [empty_ns];
   uc_export   = [empty_ns];
