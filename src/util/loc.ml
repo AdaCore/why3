@@ -104,8 +104,10 @@ let report_obligation_position ?(onlybasename=false) fmt loc =
 let current_offset = ref 0
 let reloc p = { p with pos_cnum = p.pos_cnum + !current_offset }
 
+(*
 (* Identifiers localization *)
 
 let ident_t = Hashtbl.create 97
 let add_ident = Hashtbl.add ident_t
 let ident = Hashtbl.find ident_t
+*)
