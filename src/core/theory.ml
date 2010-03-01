@@ -134,13 +134,17 @@ let create_type tdl = Hdecl.hashcons (mk_decl (Dtype tdl))
 let create_logic ldl = Hdecl.hashcons (mk_decl (Dlogic ldl))
 let create_prop k i f = Hdecl.hashcons (mk_decl (Dprop (k, id_register i, f)))
 
-exception BadConstructor
+(* error reporting *)
 
-exception BadAlgebraicType
+exception NotAConstructor of fsymbol
+exception IllegalTypeAlias of tysymbol
+exception DuplicateVariable of vsymbol
+exception UnboundTypeVar of ident
+exception UnboundVars of Svs.t
 
 let create_type tdl =
   let check_constructor ty fs =
-    if not fs.fs_constr then raise BadConstructor;
+    if not fs.fs_constr then raise (NotAConstructor fs);
     let lty,rty = fs.fs_scheme in
     ignore (Ty.matching Mid.empty rty ty);
     let add s ty = match ty.ty_node with
@@ -149,7 +153,7 @@ let create_type tdl =
     in
     let vs = ty_fold add Sid.empty rty in
     let rec check () ty = match ty.ty_node with
-      | Tyvar v -> if not (Sid.mem v vs) then raise BadConstructor
+      | Tyvar v -> if not (Sid.mem v vs) then raise (UnboundTypeVar v)
       | _ -> ty_fold check () ty
     in
     List.iter (check ()) lty
@@ -157,23 +161,26 @@ let create_type tdl =
   let check_decl (ts,td) = match td with
     | Tabstract -> ()
     | Talgebraic fsl ->
-        if ts.ts_def != None then raise BadAlgebraicType;
+        if ts.ts_def != None then raise (IllegalTypeAlias ts);
         let ty = ty_app ts (List.map ty_var ts.ts_args) in
         List.iter (check_constructor ty) fsl
   in
   List.iter check_decl tdl;
   create_type tdl
 
-exception BadDefinition
-
 let create_logic ldl =
   let add s v =
-    if Svs.mem v s then raise BadDefinition;
+    if Svs.mem v s then raise (DuplicateVariable v);
     Svs.add v s
   in
   let check_vs vs vl =
     let vs2 = List.fold_left add Svs.empty vl in
-    if not (Svs.subset vs vs2) then raise BadDefinition
+    if not (Svs.subset vs vs2) then raise (UnboundVars vs)
+  in
+  let check_ax (_,f) =
+    let fvs = f_freevars Svs.empty f in
+    if not (Svs.is_empty fvs) then raise (UnboundVars fvs);
+    assert false (* TODO *)
   in
   let lmatch sbs ty v = Ty.matching sbs ty v.vs_ty in
   let rmatch sbs v ty = Ty.matching sbs v.vs_ty ty in
@@ -190,17 +197,16 @@ let create_logic ldl =
         ignore (List.fold_left2 lmatch Mid.empty lty vl);
         ignore (List.fold_left2 rmatch Mid.empty vl lty);
         check_vs (f_freevars Svs.empty f) vl
-    | Linductive (ps,la) -> assert false (* TODO *)
+    | Linductive (ps,la) ->
+        List.iter check_ax la
     | _ -> ()
   in
   List.iter check_decl ldl;
   create_logic ldl
 
-exception UnboundVars
-
 let create_prop k i f =
   let fvs = f_freevars Svs.empty f in
-  if not (Svs.is_empty fvs) then raise UnboundVars;
+  if not (Svs.is_empty fvs) then raise (UnboundVars fvs);
   create_prop k i f
 
 
@@ -235,7 +241,8 @@ and decl_or_use =
 exception CloseTheory
 exception NoOpenedNamespace
 exception RedeclaredIdent of ident
-exception CannotInstantiate
+exception UnknownIdent of ident
+exception CannotInstantiate of ident
 exception ClashSymbol of string
 
 
@@ -338,6 +345,7 @@ let use_export uc th =
             uc_import  = merge_ns ~check:true  th.th_export i0 :: sti;
             uc_export  = merge_ns ~check:false th.th_export e0 :: ste;
             uc_known   = merge_known uc.uc_known th.th_known;
+            uc_decls   = Use th :: uc.uc_decls;
         }
     | _ ->
         assert false
@@ -350,7 +358,7 @@ type th_inst = {
 
 let clone_export th t i =
   let check_sym id =
-    if not (Sid.mem id t.th_param) then raise CannotInstantiate
+    if not (Sid.mem id t.th_param) then raise (CannotInstantiate id)
   in
   let check_ts s _ = check_sym s.ts_name in Mts.iter check_ts i.inst_ts;
   let check_fs s _ = check_sym s.fs_name in Mfs.iter check_fs i.inst_fs;
@@ -358,16 +366,6 @@ let clone_export th t i =
   assert false (* TODO *)
 
 (* Manage the set of known idents *)
-
-let add_known id uc =
-  if Mid.mem id uc.uc_known then raise (RedeclaredIdent id);
-  { uc with uc_known = Mid.add id uc.uc_name uc.uc_known }
-
-let add_param id uc =
-  let uc = add_known id uc in
-  { uc with uc_param = Sid.add id uc.uc_param }
-
-exception UnknownIdent of ident
 
 let is_known_id ids id =
   if not (Mid.mem id ids) then raise (UnknownIdent id)
@@ -386,25 +384,32 @@ let is_known_fmla ids f =
   f_s_fold (is_known_ts ids) (fun _ _ -> ())
            (is_known_fs ids) (is_known_ps ids) () f
 
+let add_known id uc =
+  if Mid.mem id uc.uc_known then raise (RedeclaredIdent id);
+  { uc with uc_known = Mid.add id uc.uc_name uc.uc_known }
+
+let add_param id uc = { uc with uc_param = Sid.add id uc.uc_param }
+
 (* Manage new symbols *)
 
 let generic_add ~check x v m =
   if check && Mnm.mem x m then raise (ClashSymbol x);
   Mnm.add x v m
 
-let add_tysymbol ~check x ty ns =
-  { ns with ns_ts = generic_add ~check x ty ns.ns_ts }
+let add_ts ~check x ts ns =
+  { ns with ns_ts = generic_add ~check x ts ns.ns_ts }
 
-let add_fsymbol ~check x ty ns =
-  { ns with ns_fs = generic_add ~check x ty ns.ns_fs }
+let add_fs ~check x fs ns =
+  { ns with ns_fs = generic_add ~check x fs ns.ns_fs }
 
-let add_psymbol ~check x ty ns =
-  { ns with ns_ps = generic_add ~check x ty ns.ns_ps }
+let add_ps ~check x ps ns =
+  { ns with ns_ps = generic_add ~check x ps ns.ns_ps }
 
-let add_prop ~check x v ns =
-  { ns with ns_prop = generic_add ~check x v ns.ns_prop }
+let add_prop ~check x f ns =
+  { ns with ns_prop = generic_add ~check x f ns.ns_prop }
 
 let add_symbol add x v uc =
+  let uc = add_known x uc in
   match uc.uc_visible, uc.uc_import, uc.uc_export with
   | v0 :: stv, i0 :: sti, e0 :: ste ->
       let x = x.id_short in
@@ -412,49 +417,73 @@ let add_symbol add x v uc =
           uc_visible = add ~check:false x v v0 :: stv;
           uc_import  = add ~check:true  x v i0 :: sti;
           uc_export  = add ~check:false x v e0 :: ste }
-
   | _ ->
       assert false
 
 (* Manage new declarations *)
 
-let add_type uc (ts, def) = match def with
+let add_type uc (ts,def) =
+  let uc = add_symbol add_ts ts.ts_name ts uc in
+  match def with
   | Tabstract ->
-      let uc = match ts.ts_def with
-        | Some _ -> add_known ts.ts_name uc
-        | None   -> add_param ts.ts_name uc
-      in
-      add_symbol add_tysymbol ts.ts_name ts uc
-  | Talgebraic _ ->
-      assert false (*TODO*)
+      if ts.ts_def == None then add_param ts.ts_name uc else uc
+  | Talgebraic lfs ->
+      let add_constr uc fs = add_symbol add_fs fs.fs_name fs uc in
+      List.fold_left add_constr uc lfs
+
+let check_type kn (ts,def) = match def with
+  | Tabstract ->
+      begin match ts.ts_def with
+        | Some ty -> is_known_ty kn ty
+        | None -> ()
+      end
+  | Talgebraic lfs ->
+      let check fs = List.iter (is_known_ty kn) (fst fs.fs_scheme) in
+      List.iter check lfs
 
 let add_logic uc = function
   | Lfunction (fs, df) ->
-      let uc = match df with
-        | Some _  -> add_known fs.fs_name uc
-        | None    -> add_param fs.fs_name uc
-      in
-      add_symbol add_fsymbol fs.fs_name fs uc
+      let uc = add_symbol add_fs fs.fs_name fs uc in
+      if df == None then add_param fs.fs_name uc else uc
   | Lpredicate (ps, dp) ->
-      let uc = match dp with
-        | Some _  -> add_known ps.ps_name uc
-        | None    -> add_param ps.ps_name uc
-      in
-      add_symbol add_psymbol ps.ps_name ps uc
-  | Linductive (ps, dp) ->
-      let uc = add_known ps.ps_name uc in
-      let uc = add_symbol add_psymbol ps.ps_name ps uc in
-      assert false (*TODO*)
+      let uc = add_symbol add_ps ps.ps_name ps uc in
+      if dp == None then add_param ps.ps_name uc else uc
+  | Linductive (ps, la) ->
+      let uc = add_symbol add_ps ps.ps_name ps uc in
+      let add uc (id,f) = add_symbol add_prop id f uc in
+      List.fold_left add uc la
+
+let check_logic kn = function
+  | Lfunction (fs, df) ->
+      is_known_ty kn (snd fs.fs_scheme);
+      List.iter (is_known_ty kn) (fst fs.fs_scheme);
+      begin match df with
+        | Some (_,t) -> is_known_term kn t
+        | None -> ()
+      end
+  | Lpredicate (ps, dp) ->
+      List.iter (is_known_ty kn) ps.ps_scheme;
+      begin match dp with
+        | Some (_,f) -> is_known_fmla kn f
+        | None -> ()
+      end
+  | Linductive (ps, la) ->
+      List.iter (is_known_ty kn) ps.ps_scheme;
+      let check (_,f) = is_known_fmla kn f in
+      List.iter check la
 
 let add_decl uc d =
   let uc = match d.d_node with
     | Dtype dl ->
-        List.fold_left add_type uc dl
+        let uc = List.fold_left add_type uc dl in
+        List.iter (check_type uc.uc_known) dl;
+        uc
     | Dlogic dl ->
-        List.fold_left add_logic uc dl
+        let uc = List.fold_left add_logic uc dl in
+        List.iter (check_logic uc.uc_known) dl;
+        uc
     | Dprop (k, id, f) ->
         is_known_fmla uc.uc_known f;
-        let uc = add_known id uc in
         add_symbol add_prop id f uc
   in
   { uc with uc_decls = Decl d :: uc.uc_decls }

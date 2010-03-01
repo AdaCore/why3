@@ -65,6 +65,14 @@ val create_type : ty_decl list -> decl
 val create_logic : logic_decl list -> decl
 val create_prop : prop_kind -> preid -> fmla -> decl
 
+(* exceptions *)
+
+exception NotAConstructor of fsymbol
+exception IllegalTypeAlias of tysymbol
+exception DuplicateVariable of vsymbol
+exception UnboundTypeVar of ident
+exception UnboundVars of Svs.t
+
 (** Theory *)
 
 module Snm : Set.S with type elt = string
@@ -90,7 +98,7 @@ and decl_or_use =
   | Decl of decl
   | Use of theory
 
-(** Building *)
+(* theory construction *)
 
 type theory_uc  (* a theory under construction *)
 
@@ -116,12 +124,12 @@ val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 
 val get_namespace : theory_uc -> namespace
 
-(** Exceptions *)
+(* exceptions *)
 
 exception CloseTheory
 exception NoOpenedNamespace
 exception RedeclaredIdent of ident
-exception CannotInstantiate
+exception CannotInstantiate of ident
 exception ClashSymbol of string
 
 (** Debugging *)
