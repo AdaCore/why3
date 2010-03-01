@@ -21,3 +21,5 @@
 (* Simplify the recursive type and logic definition *)
 
 val t : (Theory.decl,Theory.decl) Transform.t
+
+val t_use : (Theory.decl_or_use,Theory.decl_or_use) Transform.t

@@ -24,6 +24,8 @@ open Ty
 open Term
 open Theory
 
+let print_list_paren x = print_list_delim lparen rparen x
+
 let print_ident =
   let printer = create_printer () in
   let print fmt id = Format.fprintf fmt "%s" (id_unique printer id) in
@@ -80,19 +82,25 @@ let rec print_fmla fmt f = match f.f_node with
 let print_fsymbol fmt {fs_name = fs_name; fs_scheme = tyl,ty} = 
   fprintf fmt "%a%a :@ %a" 
     print_ident fs_name
-    (print_list_par comma print_ty) tyl 
+    (print_list_paren comma print_ty) tyl 
     print_ty ty
 
 let print_psymbol fmt {ps_name = ps_name; ps_scheme = tyl} = 
   fprintf fmt "%a%a" 
     print_ident ps_name
-    (print_list_par comma print_ty) tyl 
+    (print_list_paren comma print_ty) tyl 
 
 let print_ty_decl fmt (ts,tydef) = match tydef,ts.ts_def with
-  | Tabstract,None -> fprintf fmt "type %a@." print_ident ts.ts_name
-  | Tabstract,Some f -> fprintf fmt "type %a =@ %a@." print_ident ts.ts_name
+  | Tabstract,None -> fprintf fmt "type %a%a@." 
+      (print_list_paren comma print_ident) ts.ts_args
+      print_ident ts.ts_name
+  | Tabstract,Some f -> fprintf fmt "type %a%a =@ %a@." 
+      (print_list_paren comma print_ident) ts.ts_args
+      print_ident ts.ts_name
       print_ty f
-  | Talgebraic d, None -> fprintf fmt "type %a =@ %a@." print_ident ts.ts_name
+  | Talgebraic d, None -> fprintf fmt "type %a%a =@ %a@." 
+      (print_list_paren comma print_ident) ts.ts_args
+      print_ident ts.ts_name
       (print_list newline print_fsymbol) d
   | Talgebraic _, Some _ -> assert false
 
@@ -103,12 +111,12 @@ let print_logic_decl fmt = function
   | Lfunction (fs,None) -> fprintf fmt "logic %a@." print_fsymbol fs
   | Lfunction (fs,Some (vsl,t)) -> 
       fprintf fmt "logic %a%a =@ %a@." print_ident fs.fs_name
-      (print_list_par comma print_vsymbol) vsl
+      (print_list_paren comma print_vsymbol) vsl
         print_term t
   | Lpredicate (fs,None) -> fprintf fmt "logic %a@." print_psymbol fs
   | Lpredicate (ps,Some (vsl,t)) -> 
       fprintf fmt "logic %a%a =@ %a@." print_ident ps.ps_name
-      (print_list_par comma print_vsymbol) vsl
+      (print_list_paren comma print_vsymbol) vsl
         print_fmla t
   | Linductive _ -> assert false (*TODO*)
 
@@ -123,9 +131,9 @@ let print_decl fmt d = match d.d_node with
         print_fmla fmla
 
 let print_decl_or_use fmt = function
-  | Decl d -> print_decl fmt d
+  | Decl d -> fprintf fmt "%a" print_decl d
   | Use u -> fprintf fmt "use export %a@." print_ident u.th_name
 
 let print_theory fmt t =
-  fprintf fmt "theory %a@.%a@.end" print_ident t.th_name 
+  fprintf fmt "theory %a@.%aend@." print_ident t.th_name 
     (print_list newline print_decl_or_use) t.th_decls

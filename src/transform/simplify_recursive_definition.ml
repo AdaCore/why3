@@ -149,3 +149,8 @@ let elt d =
         List.map (fun e -> create_type (List.map (Hid.find mem) e)) l
 
 let t = Transform.TDecl.elt elt
+
+let t_use = Transform.TDecl_or_Use.elt 
+  (function 
+     | Decl d -> List.map (fun d -> Decl d) (elt d) 
+     | Use _ as u -> [u])

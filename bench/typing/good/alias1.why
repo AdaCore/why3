@@ -1,0 +1,13 @@
+theory Test
+
+type t1 = t2
+
+type t5
+
+type t2 = t5
+
+logic f(x : t1, y : t2) : t5
+
+logic g(x : t1) : t5 = f(x,x) 
+
+end

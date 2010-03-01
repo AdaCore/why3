@@ -61,7 +61,7 @@ end
 open Theory
 
 module TDecl : S with type elt1 = decl and type elt2 = decl
-(*module TDecl_or_Use : S with type elt1 = decl_or_use and type elt2 = decl_or_use*)
+module TDecl_or_Use : S with type elt1 = decl_or_use and type elt2 = decl_or_use
 module TTheory : S with type elt1 = theory and type elt2 = theory
 module TTheory_Decl : S with type elt1 = theory and type elt2 = decl
 

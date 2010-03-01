@@ -25,6 +25,7 @@ let type_only = ref false
 let debug = ref false
 let loadpath = ref []
 let print_stdout = ref false
+let print_simplify_recursive = ref false
 let () = 
   Arg.parse 
     ["--parse-only", Arg.Set parse_only, "stops after parsing";
@@ -32,7 +33,8 @@ let () =
      "--debug", Arg.Set debug, "sets the debug flag";
      "-I", Arg.String (fun s -> loadpath := s :: !loadpath), 
        "<dir>  adds dir to the loadpath";
-     "-print_stdout", Arg.Set print_stdout, "print the results to stdout";
+     "--print_stdout", Arg.Set print_stdout, "print the results to stdout";
+     "--print_simplify_recursive", Arg.Set print_simplify_recursive, "print the results of simplify recursive definition";
     ]
     (fun f -> files := f :: !files)
     "usage: why [options] files..."
@@ -63,6 +65,13 @@ let () =
     let l = List.fold_left type_file env !files in
     if !print_stdout then 
       List.iter (Pretty.print_theory Format.std_formatter) 
+        (Typing.list_theory l);
+    if !print_simplify_recursive then 
+      List.iter (fun t ->
+                   let de = Transform.apply 
+                     Simplify_recursive_definition.t_use t.Theory.th_decls in
+                   (Pp.print_list Pp.newline Pretty.print_decl_or_use) 
+                     Format.std_formatter de) 
         (Typing.list_theory l)
   with e when not !debug ->
     eprintf "%a@." report e;
