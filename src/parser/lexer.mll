@@ -43,7 +43,6 @@
       (fun (x,y) -> Hashtbl.add keywords x y)
       [ "absurd", ABSURD;
 	"and", AND;
-        (*"array", ARRAY;*)
 	"as", AS;
 	"assert", ASSERT;
 	"axiom", AXIOM;
@@ -69,7 +68,6 @@
 	"import", IMPORT;
 	"in", IN;
 	"inductive", INDUCTIVE;
-	(*"int", INT;*)
 	"invariant", INVARIANT;
 	"lemma", LEMMA;
 	"let", LET;
@@ -85,7 +83,6 @@
 	"raise", RAISE;
 	"raises", RAISES;
 	"reads", READS;
-	"real", REAL;
 	"rec", REC;
 	"ref", REF;
 	"returns", RETURNS;
@@ -194,9 +191,7 @@ rule token = parse
       { LRARROW }
   | "="
       { EQUAL }
-  | "<>"
-      { NOTEQ }
-  | "<" | "<=" | ">" | ">=" as s
+  | "<>" | "<" | "<=" | ">" | ">=" as s
       { INFIXOP0 s }
   | "+" 
       { INFIXOP2 "+" }

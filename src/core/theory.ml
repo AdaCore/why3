@@ -324,15 +324,38 @@ let add_symbol add id v uc =
 let get_namespace uc = List.hd uc.uc_import
 
 
-(** Equality *)
+(** Builtin symbols *)
+
+let t_int  = create_tysymbol (id_fresh "int") [] None
+let t_real = create_tysymbol (id_fresh "real") [] None
 
 let eq =
   let v = ty_var (create_tvsymbol (id_fresh "a")) in
-  create_psymbol (id_fresh "eq") [v; v;]
+  create_psymbol (id_fresh "=") [v; v;]
+let neq =
+  let v = ty_var (create_tvsymbol (id_fresh "a")) in
+  create_psymbol (id_fresh "<>") [v; v;]
 
-let eq_th = id_register (id_fresh "Eq")
+let builtin_tysymbols = [t_int; t_real]
+let builtin_psymbols  = [eq; neq]
 
-let known_eq = Mid.add eq.ps_name eq_th Mid.empty
+let ts_name x = x.ts_name
+let ps_name x = x.ps_name
+
+let builtin_ns =
+  let add adder name = List.fold_right (fun s -> adder (name s).id_short s) in
+  let ns = add add_ts ts_name builtin_tysymbols empty_ns in
+  let ns = add add_ps ps_name builtin_psymbols ns in
+  ns
+    
+let builtin_th = id_register (id_fresh "Builtin")
+
+let builtin_known = 
+  let add name = List.fold_right (fun s -> Mid.add (name s) builtin_th) in
+  let kn = Mid.add builtin_th builtin_th Mid.empty in
+  let kn = add ts_name builtin_tysymbols kn in
+  let kn = add ps_name builtin_psymbols kn in
+  kn
 
 
 (** Manage theories *)
@@ -340,8 +363,8 @@ let known_eq = Mid.add eq.ps_name eq_th Mid.empty
 let create_theory n = {
   uc_name   = n;
   uc_param  = Sid.empty;
-  uc_known  = Mid.add n n known_eq;
-  uc_import = [empty_ns];
+  uc_known  = Mid.add n n builtin_known;
+  uc_import = [builtin_ns];
   uc_export = [empty_ns];
   uc_decls  = [];
 }
@@ -511,6 +534,6 @@ let print_t fmt t =
 
 (*
 Local Variables:
-compile-command: "make -C .. test"
+compile-command: "make -C ../.. test"
 End:
 *)

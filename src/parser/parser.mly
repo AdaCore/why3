@@ -101,11 +101,11 @@
 %token DONE DOT ELSE END EOF EQUAL
 %token EXCEPTION EXISTS EXPORT EXTERNAL FALSE FOR FORALL FPI 
 %token FUN FUNCTION GOAL
-%token IF IMPORT IN INCLUDE INDUCTIVE INT INVARIANT
+%token IF IMPORT IN INCLUDE INDUCTIVE INVARIANT
 %token LEFTB LEFTBLEFTB LEFTPAR LEFTSQ LEMMA 
 %token LET LOGIC LRARROW MATCH MINUS
-%token NAMESPACE NOT NOTEQ OF OR PARAMETER  PREDICATE PROP 
-%token QUOTE RAISE RAISES READS REAL REC REF RETURNS RIGHTB RIGHTBRIGHTB
+%token NAMESPACE NOT OF OR PARAMETER  PREDICATE PROP 
+%token QUOTE RAISE RAISES READS REC REF RETURNS RIGHTB RIGHTBRIGHTB
 %token RIGHTPAR RIGHTSQ 
 %token SEMICOLON SLASH 
 %token THEN THEORY TIMES TRUE TRY TYPE UNDERSCORE
@@ -136,7 +136,7 @@
 %right AND AMPAMP
 %right NOT
 %right prec_if
-%left EQUAL NOTEQ INFIXOP0
+%left EQUAL INFIXOP0
 %left INFIXOP2 MINUS
 %left INFIXOP3
 %right uminus
@@ -190,6 +190,7 @@ lident_infix:
 | INFIXOP0 { $1 }
 | INFIXOP2 { $1 }
 | INFIXOP3 { $1 }
+| EQUAL    { "=" }
 | MINUS    { "-" }
 
 
@@ -342,16 +343,6 @@ indcase:
 ;
 
 primitive_type:
-/*
-| INT 
-   { PPTint }
-| BOOL 
-   { PPTbool }
-| REAL 
-   { PPTreal }
-| UNIT 
-   { PPTunit }
-*/
 | type_var 
    { PPTtyvar $1 }
 | lqualid
@@ -383,9 +374,8 @@ lexpr:
 | NOT lexpr 
    { prefix_pp PPnot $2 }
 | lexpr EQUAL lexpr 
-   { infix_pp $1 PPeq $3 }
-| lexpr NOTEQ lexpr 
-   { infix_pp $1 PPneq $3 }
+   { let id = { id = "="; id_loc = loc_i 2 } in
+     mk_pp (PPapp (Qident id, [$1; $3])) }
 | lexpr INFIXOP0 lexpr 
    { let id = { id = $2; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$1; $3])) }

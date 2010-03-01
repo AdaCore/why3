@@ -3,15 +3,16 @@
 
 theory TestPrelude 
   use prelude.List
-  use list.IntList
+  (* use list.IntList *)
   use array.IntArray
 end
 
 theory A
+  use import prelude.Int
   type t
   logic p(t)
   logic q(x: t) = p(x)
-  logic c : t
+  logic c : real
 end
 
 theory B

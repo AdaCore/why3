@@ -32,7 +32,7 @@ type constant =
   | ConstFloat of real_constant
 
 type pp_infix = 
-  | PPand | PPor | PPimplies | PPiff | PPeq | PPneq 
+  | PPand | PPor | PPimplies | PPiff 
 
 type pp_prefix = 
   | PPneg | PPnot

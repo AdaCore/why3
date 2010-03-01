@@ -112,23 +112,6 @@ let report fmt = function
   | UnboundTypeVar s ->
       fprintf fmt "unbound type variable '%s" s
 
-(****
-
-  | OpenTheory ->
-      fprintf fmt "cannot open a new theory in a non-empty context"
-  | CloseTheory ->
-      fprintf fmt "cannot close theory: there are still unclosed namespaces"
-  | NoOpenedTheory ->
-      fprintf fmt "no opened theory"
-  | NoOpenedNamespace ->
-      fprintf fmt "no opened namespace"
-  | RedeclaredIdent id ->
-      fprintf fmt "cannot redeclare identifier %s" id.id_short
-  | CannotInstantiate ->
-      fprintf fmt "cannot instantiate a defined symbol"
-
-****)
-
 
 (** Environments *)
 
@@ -364,7 +347,6 @@ let binop = function
   | PPor -> For
   | PPimplies -> Fimplies
   | PPiff -> Fiff
-  | _ -> assert false 
 
 let rec dterm env t = 
   let n, ty = dterm_node t.pp_loc env t.pp_desc in
@@ -399,10 +381,10 @@ and dfmla env e = match e.pp_desc with
       Fnot (dfmla env a)
   | PPinfix (a, (PPand | PPor | PPimplies | PPiff as op), b) ->
       Fbinop (binop op, dfmla env a, dfmla env b)
-  | PPinfix (a, (PPeq | PPneq as op), b) ->
-      let s, _ = specialize_psymbol Theory.eq in
-      let f = Fapp (s, [dterm env a; dterm env b]) in
-      if op = PPeq then f else Fnot f
+(*   | PPinfix (a, (PPeq | PPneq as op), b) -> *)
+(*       let s, _ = specialize_psymbol Theory.eq in *)
+(*       let f = Fapp (s, [dterm env a; dterm env b]) in *)
+(*       if op = PPeq then f else Fnot f *)
   | PPif (a, b, c) ->
       Fif (dfmla env a, dfmla env b, dfmla env c)  
   | PPforall ({id=x}, ty, _, a) -> (* TODO: triggers *)
@@ -473,11 +455,13 @@ and fmla env = function
 open Ptree
 
 let add_types loc dl th =
+  let ns = get_namespace th in
   let def = 
     List.fold_left 
       (fun def d -> 
 	 let id = d.td_ident in
-	 if M.mem id.id def then error ~loc:id.id_loc (ClashType id.id);
+	 if M.mem id.id def || Mnm.mem id.id ns.ns_ts then 
+	   error ~loc:id.id_loc (ClashType id.id);
 	 M.add id.id d def) 
       M.empty dl 
   in
