@@ -260,6 +260,7 @@ and fmla = {
 and term_node =
   | Tbvar of int
   | Tvar of vsymbol
+  | Tconst of unit
   | Tapp of fsymbol * term list
   | Tlet of term * term_bound
   | Tcase of term * term_branch list
@@ -327,6 +328,7 @@ module T = struct
   let t_hash_node = function
     | Tbvar n -> n
     | Tvar v -> v.vs_name.id_tag
+    | Tconst () -> 0
     | Tapp (f, tl) -> Hashcons.combine_list t_hash (f.fs_name.id_tag) tl
     | Tlet (t, bt) -> Hashcons.combine t.t_tag (t_hash_bound bt)
     | Tcase (t, bl) -> Hashcons.combine_list t_hash_branch t.t_tag bl
@@ -464,7 +466,7 @@ let f_label_add l f = Hfmla.hashcons { f with f_label = l :: f.f_label }
 let brlvl fn lvl (pat, nv, t) = (pat, nv, fn (lvl + nv) t)
 
 let t_map_unsafe fnT fnF lvl t = match t.t_node with
-  | Tbvar _ | Tvar _ -> t
+  | Tbvar _ | Tvar _ | Tconst _ -> t
   | Tapp (f, tl) -> t_app f (List.map (fnT lvl) tl) t.t_ty
   | Tlet (t1, (u, t2)) -> t_let u (fnT lvl t1) (fnT (lvl + 1) t2)
   | Tcase (t1, bl) -> t_case (fnT lvl t1) (List.map (brlvl fnT lvl) bl) t.t_ty
@@ -486,7 +488,7 @@ let f_map_unsafe fnT fnF lvl f = match f.f_node with
 let brlvl fn lvl acc (_, nv, t) = fn (lvl + nv) acc t
 
 let t_fold_unsafe fnT fnF lvl acc t = match t.t_node with
-  | Tbvar _ | Tvar _ -> acc
+  | Tbvar _ | Tvar _ | Tconst _ -> acc
   | Tapp (f, tl) -> List.fold_left (fnT lvl) acc tl
   | Tlet (t1, (u, t2)) -> fnT (lvl + 1) (fnT lvl acc t1) t2
   | Tcase (t1, bl) -> List.fold_left (brlvl fnT lvl) (fnT lvl acc t1) bl
@@ -1048,7 +1050,7 @@ let t_branch fn b = let pat,_,t = t_open_branch b in (pat, fn t)
 
 let t_map_open fnT fnF t = match t.t_node with
   | Tbvar _ -> assert false
-  | Tvar _ -> t
+  | Tvar _ | Tconst _ -> t
   | Tapp (f, tl) -> t_app f (List.map fnT tl) t.t_ty
   | Tlet (t1, b) -> let u,t2 = t_open_bound b in t_let u (fnT t1) (fnT t2)
   | Tcase (t1, bl) -> t_case (fnT t1) (List.map (t_branch fnT) bl) t.t_ty
@@ -1074,7 +1076,7 @@ let f_branch fn acc b = let _,_,f = f_open_branch b in fn acc f
 
 let t_fold_open fnT fnF acc t = match t.t_node with
   | Tbvar _ -> assert false
-  | Tvar _ -> acc
+  | Tvar _ | Tconst _ -> acc
   | Tapp (f, tl) -> List.fold_left fnT acc tl
   | Tlet (t1, b) -> let _,t2 = t_open_bound b in fnT (fnT acc t1) t2
   | Tcase (t1, bl) -> List.fold_left (t_branch fnT) (fnT acc t1) bl
@@ -1118,6 +1120,8 @@ let rec t_s_map fnT fnV fnF fnP t =
         assert false
     | Tvar v ->
         t_var (fnV v ty)
+    | Tconst _ ->
+        t
     | Tapp (f, tl) ->
         t_app (fnF f) (List.map fn_t tl) ty
     | Tlet (t1, b) ->
@@ -1174,7 +1178,7 @@ let rec t_s_fold fnT fnF fnP acc t =
   let fn_b acc b = t_s_branch fnT fnF fnP acc b in
   let acc = ty_s_fold fnT acc t.t_ty in
   match t.t_node with
-    | Tbvar _ | Tvar _ -> acc
+    | Tbvar _ | Tvar _ | Tconst _ -> acc
     | Tapp (f, tl) -> List.fold_left fn_t (fnF acc f) tl
     | Tlet (t1, (_,t2)) -> fn_t (fn_t acc t1) t2
     | Tcase (t1, bl) -> List.fold_left fn_b (fn_t acc t1) bl

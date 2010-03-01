@@ -46,6 +46,8 @@ let rec print_term fmt t = match t.t_node with
       assert false
   | Tvar n -> 
       print_ident fmt n.vs_name
+  | Tconst _ ->
+      assert false
   | Tapp (s, tl) ->
       fprintf fmt "(%a(%a@,)@ : %a@,@,)" 
 	print_ident s.fs_name (print_list comma print_term) tl

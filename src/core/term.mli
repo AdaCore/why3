@@ -137,6 +137,7 @@ and fmla = private {
 and term_node = private
   | Tbvar of int
   | Tvar of vsymbol
+  | Tconst of unit
   | Tapp of fsymbol * term list
   | Tlet of term * term_bound
   | Tcase of term * term_branch list
