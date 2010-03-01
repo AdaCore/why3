@@ -407,9 +407,9 @@ lexpr:
 | EXISTS lident COLON primitive_type DOT lexpr %prec prec_exists
    { mk_pp (PPexists ($2, $4, $6)) }
 | INTEGER
-   { mk_pp (PPconst (ConstInt $1)) }
+   { mk_pp (PPconst (Term.ConstInt $1)) }
 | FLOAT
-   { mk_pp (PPconst (ConstFloat $1)) }
+   { mk_pp (PPconst (Term.ConstReal $1)) }
 | TRUE
    { mk_pp PPtrue }
 | FALSE

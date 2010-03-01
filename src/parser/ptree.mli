@@ -23,13 +23,8 @@ type loc = Loc.position
 
 (*s Logical expressions (for both terms and predicates) *)
 
-type real_constant = 
-  | RConstDecimal of string * string * string option (* int / frac / exp *)
-  | RConstHexa of string * string * string
-
-type constant =
-  | ConstInt of string
-  | ConstFloat of real_constant
+type real_constant = Term.real_constant
+type constant = Term.constant
 
 type pp_infix = 
   | PPand | PPor | PPimplies | PPiff 

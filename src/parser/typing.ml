@@ -326,6 +326,7 @@ type dterm = { dt_node : dterm_node; dt_ty : dty }
 
 and dterm_node =
   | Tvar of string
+  | Tconst of constant
   | Tapp of fsymbol * dterm list
   | Tlet of dterm * string * dterm
 (*   | Tcase of dterm * tbranch list *)
@@ -369,6 +370,10 @@ and dterm_node loc env = function
       let s, tyl, ty = specialize_fsymbol s in
       let tl = dtype_args s.fs_name loc env tyl tl in
       Tapp (s, tl), ty
+  | PPconst (ConstInt _ as c) ->
+      Tconst c, Tyapp (Theory.t_int, [])
+  | PPconst (ConstReal _ as c) ->
+      Tconst c, Tyapp (Theory.t_real, [])
   | _ ->
       assert false (*TODO*)
 
@@ -425,6 +430,8 @@ let rec term env t = match t.dt_node with
   | Tvar x ->
       assert (M.mem x env);
       t_var (M.find x env)
+  | Tconst c ->
+      t_const c (ty t.dt_ty)
   | Tapp (s, tl) ->
       t_app s (List.map (term env) tl) (ty t.dt_ty)
   | _ ->

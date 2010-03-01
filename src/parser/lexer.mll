@@ -20,6 +20,7 @@
 {
   open Format
   open Lexing
+  open Term
   open Ptree
   open Parser
 

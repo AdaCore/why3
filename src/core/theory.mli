@@ -124,9 +124,10 @@ val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 
 val get_namespace : theory_uc -> namespace
 
-(* equality *)
+(* builtin *)
 
-val eq : psymbol
+val t_int  : tysymbol
+val t_real : tysymbol
 
 (* exceptions *)
 

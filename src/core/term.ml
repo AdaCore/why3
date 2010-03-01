@@ -244,6 +244,14 @@ type binop =
   | Fimplies
   | Fiff
 
+type real_constant = 
+  | RConstDecimal of string * string * string option (* int / frac / exp *)
+  | RConstHexa of string * string * string
+
+type constant =
+  | ConstInt of string
+  | ConstReal of real_constant
+
 type term = {
   t_node : term_node;
   t_label : label list;
@@ -260,7 +268,7 @@ and fmla = {
 and term_node =
   | Tbvar of int
   | Tvar of vsymbol
-  | Tconst of unit
+  | Tconst of constant
   | Tapp of fsymbol * term list
   | Tlet of term * term_bound
   | Tcase of term * term_branch list
@@ -302,6 +310,7 @@ module T = struct
   let t_equal_node t1 t2 = match t1, t2 with
     | Tbvar x1, Tbvar x2 -> x1 == x2
     | Tvar v1, Tvar v2 -> v1 == v2
+    | Tconst c1, Tconst c2 -> c1 = c2
     | Tapp (s1, l1), Tapp (s2, l2) -> s1 == s2 && List.for_all2 (==) l1 l2
     | Tlet (t1, b1), Tlet (t2, b2) -> t1 == t2 && t_eq_bound b1 b2
     | Tcase (t1, l1), Tcase (t2, l2) ->
@@ -328,7 +337,7 @@ module T = struct
   let t_hash_node = function
     | Tbvar n -> n
     | Tvar v -> v.vs_name.id_tag
-    | Tconst () -> 0
+    | Tconst c -> Hashtbl.hash c
     | Tapp (f, tl) -> Hashcons.combine_list t_hash (f.fs_name.id_tag) tl
     | Tlet (t, bt) -> Hashcons.combine t.t_tag (t_hash_bound bt)
     | Tcase (t, bl) -> Hashcons.combine_list t_hash_branch t.t_tag bl
@@ -431,6 +440,7 @@ module Sfmla = Set.Make(F)
 let mk_term n ty = { t_node = n; t_label = []; t_ty = ty; t_tag = -1 }
 let t_bvar n ty = Hterm.hashcons (mk_term (Tbvar n) ty)
 let t_var v = Hterm.hashcons (mk_term (Tvar v) v.vs_ty)
+let t_const c ty = Hterm.hashcons (mk_term (Tconst c) ty)
 let t_app f tl ty = Hterm.hashcons (mk_term (Tapp (f, tl)) ty)
 let t_let v t1 t2 = Hterm.hashcons (mk_term (Tlet (t1, (v, t2))) t2.t_ty)
 let t_case t bl ty = Hterm.hashcons (mk_term (Tcase (t, bl)) ty)

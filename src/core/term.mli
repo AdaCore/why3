@@ -121,6 +121,14 @@ type binop =
   | Fimplies
   | Fiff
 
+type real_constant = 
+  | RConstDecimal of string * string * string option (* int / frac / exp *)
+  | RConstHexa of string * string * string
+
+type constant =
+  | ConstInt of string
+  | ConstReal of real_constant
+
 type term = private {
   t_node : term_node;
   t_label : label list;
@@ -137,7 +145,7 @@ and fmla = private {
 and term_node = private
   | Tbvar of int
   | Tvar of vsymbol
-  | Tconst of unit
+  | Tconst of constant
   | Tapp of fsymbol * term list
   | Tlet of term * term_bound
   | Tcase of term * term_branch list
@@ -174,6 +182,7 @@ module Sfmla : Set.S with type elt = fmla
 (* smart constructors for term *)
 
 val t_var : vsymbol -> term
+val t_const : constant -> ty -> term
 val t_app : fsymbol -> term list -> ty -> term
 val t_let : vsymbol -> term -> term -> term
 val t_case : term -> (pattern * term) list -> ty -> term
