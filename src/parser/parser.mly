@@ -231,6 +231,10 @@ list1_param_sep_comma:
 | param COMMA list1_param_sep_comma { $1 :: $3 }
 ;
 
+primitive_types:
+| /* epsilon */                                   { [] }
+| LEFTPAR list1_primitive_type_sep_comma RIGHTPAR { $2 }
+
 logic_type_option:
 | /* epsilon */        { None }
 | COLON primitive_type { Some $2 }
@@ -274,8 +278,8 @@ decl:
    { Prop (loc (), Kgoal, $2, $4) }
 | LEMMA uident COLON lexpr
    { Prop (loc (), Klemma, $2, $4) }
-| INDUCTIVE lident COLON logic_type inddefn
-   { Inductive_def (loc (), $2, $4, $5) }
+| INDUCTIVE lident primitive_types inddefn
+   { Inductive_def (loc (), $2, $3, $4) }
 | USE use
    { Use (loc (), $2) }
 | NAMESPACE uident list0_decl END
@@ -320,10 +324,7 @@ typecases:
 ;
 
 typecase:
-| uident
-    { (loc_i 1,$1,[]) }
-| uident LEFTPAR list1_param_sep_comma RIGHTPAR
-    { (loc_i 1,$1,$3) }
+| uident params { (loc_i 1,$1,$2) }
 ;
 
 inddefn:
@@ -363,23 +364,6 @@ primitive_type:
 | LEFTPAR list1_primitive_type_sep_comma RIGHTPAR
    { match $2 with [p] -> p | _ -> raise Parse_error }
 */
-;
-
-
-logic_type:
-| list0_primitive_type_sep_comma ARROW PROP
-   { PPredicate $1 }
-| PROP
-   { PPredicate [] }
-| list0_primitive_type_sep_comma ARROW primitive_type
-   { PFunction ($1, $3) }
-| primitive_type
-   { PFunction ([], $1) }
-;
-
-list0_primitive_type_sep_comma:
-| /* epsilon */                  { [] }
-| list1_primitive_type_sep_comma { $1 }
 ;
 
 list1_primitive_type_sep_comma:

@@ -108,7 +108,7 @@ type prop_kind =
 type decl = 
   | TypeDecl of loc * type_decl list
   | Logic of loc * logic_decl list
-  | Inductive_def of loc * ident * plogic_type * (loc * ident * lexpr) list
+  | Inductive_def of loc * ident * pty list * (loc * ident * lexpr) list
   | Prop of loc * prop_kind * ident * lexpr
   | Use of loc * use
   | Namespace of loc * ident * decl list
