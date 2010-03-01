@@ -32,6 +32,8 @@ val add_theories : env -> Ptree.theory list -> env
 val find_theory : env -> Ptree.qualid -> Theory.theory
   (** searches for a theory using the environment's loadpath *)
 
+val list_theory : env -> Theory.theory list
+
 (** error reporting *)
 
 type error

@@ -783,6 +783,9 @@ let add_theories =
   List.fold_left
     (fun env pt -> let _, env = add_theory env pt in env) 
 
+let list_theory env = 
+  M.fold (fun _ v acc -> v::acc) env.theories []
+
 (*
 Local Variables: 
 compile-command: "make -C ../.. test"

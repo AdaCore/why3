@@ -24,7 +24,7 @@ let parse_only = ref false
 let type_only = ref false
 let debug = ref false
 let loadpath = ref []
-
+let print_stdout = ref false
 let () = 
   Arg.parse 
     ["--parse-only", Arg.Set parse_only, "stops after parsing";
@@ -32,6 +32,7 @@ let () =
      "--debug", Arg.Set debug, "sets the debug flag";
      "-I", Arg.String (fun s -> loadpath := s :: !loadpath), 
        "<dir>  adds dir to the loadpath";
+     "-print_stdout", Arg.Set print_stdout, "print the results to stdout";
     ]
     (fun f -> files := f :: !files)
     "usage: why [options] files..."
@@ -59,7 +60,10 @@ let type_file env file =
 let () =
   try
     let env = Typing.create !loadpath in
-    ignore (List.fold_left type_file env !files)
+    let l = List.fold_left type_file env !files in
+    if !print_stdout then 
+      List.iter (Pretty.print_theory Format.std_formatter) 
+        (Typing.list_theory l)
   with e when not !debug ->
     eprintf "%a@." report e;
     exit 1

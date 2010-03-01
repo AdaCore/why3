@@ -19,7 +19,7 @@
 
 (* This module has the invariant that each type has only one tag function *)
 
-type 'a hashconsedlist = (int * 'a) list
+type 'a hashconsedlist = (int * 'a list) list
 
 
 module type Sig =
@@ -39,32 +39,39 @@ struct
         | [], [] -> true
         | [], _ | _, [] -> false
             (* work evenif al and bl are nil *)
-        | (_,ae)::al,(_,be)::bl -> X.tag ae = X.tag be && al == bl
+        | (_,ae::_)::al,(_,be::_)::bl -> X.tag ae = X.tag be && al == bl
+        | (_,[])::_,_ | _,(_,[])::_ ->  assert false 
     let hash a = 
       match a with
         | [] -> 0
-        | (_,ae)::[] -> X.tag ae
-        | (_,ae)::(at,_)::_ -> Hashcons.combine (X.tag ae) at
+        | (_,[ae])::[] -> X.tag ae
+        | _::[] -> assert false
+        | (_,ae::_)::(at,_)::_ -> Hashcons.combine (X.tag ae) at
+        | (_,[])::_ ->  assert false 
     let tag t = function
       | [] -> []
-      | (_,ae)::al -> (t,ae)::al
+      | (_,lae)::al -> (t,lae)::al
   end
   module LH = Hashcons.Make(L)
     
   type t = L.t
 
   let empty : t = []
-  let cons e l : t = LH.hashcons ((0,e)::l)
+  let cons e l : t = match l with
+    | [] -> LH.hashcons ([0,[e]])
+    | (_,l2)::_ -> LH.hashcons ((0,e::l2)::l)
 
-  let to_list : t -> X.t list =
-    let rec aux acc t =
-      match t with
-        | [] -> acc
-        | (_,e)::t -> aux (e::acc) t
-    in
-    aux []
+  let to_list t : X.t list = match t with
+    | [] -> []
+    | (_,l)::_ -> l
       
   let from_list = List.fold_left (fun t e -> cons e t) empty        
+
+  let fold_left f acc l =
+    List.fold_left (fun acc l -> match l with
+                      | [] -> acc
+                      | (tag,ae::_)::_ -> f acc tag ae
+                      | (_,[])::_ -> assert false) acc l
 
   let tag = function
     | [] -> -1
@@ -77,19 +84,17 @@ end
 type ('a,'b) t = { all : 'a hashconsedlist -> 'b hashconsedlist;
                    clear : unit -> unit;
                    from_list : 'a list -> 'a hashconsedlist;
-                   to_list : 'b hashconsedlist -> 'b list;
-                   clear_to_list : unit -> unit}
+                   to_list : 'b hashconsedlist -> 'b list}
 
 
 let compose f g = {all = (fun x -> g.all (f.all x));
                    clear = (fun () -> f.clear (); g.clear ());
                    from_list = f.from_list;
-                   to_list = g.to_list;
-                   clear_to_list = g.clear_to_list}
+                   to_list = g.to_list}
 
 let apply f x = f.to_list (f.all (f.from_list x))
     
-let clear f = f.clear ();f.clear_to_list ()
+let clear f = f.clear ()
 
 let memo f tag h x =
   try Hashtbl.find h (tag x:int)
@@ -126,8 +131,7 @@ struct
     {all = all;
      clear = clear;
      from_list = LH1.from_list;
-     to_list = memo_to_list2 h_to_list;
-     clear_to_list = (fun () -> Hashtbl.clear h_to_list)
+     to_list = memo_to_list2 h_to_list
     } 
 
   let fold_map_left f_fold v_empty =
@@ -143,7 +147,8 @@ struct
     let rec f acc t1 = 
       match t1 with
         | [] -> rewind (LH2.empty,v_empty) acc
-        | (tag,e)::t2 -> 
+        | (_,[])::_ -> assert false
+        | (tag,e::_)::t2 -> 
             try 
               let edonev = Hashtbl.find memo_t tag in
               rewind edonev acc
@@ -161,7 +166,8 @@ struct
     let rec f (acc,v) t = 
       match t with
         | [] -> List.fold_left (List.fold_left (fun t e -> LH2.cons e t)) LH2.empty acc
-        | (_,e)::t -> 
+        | (_,[])::_ ->  assert false 
+        | (_,e::_)::t -> 
             let v,res = f_fold v e in
             f (res::acc,v) t in
     let memo_t = Hashtbl.create 16 in
