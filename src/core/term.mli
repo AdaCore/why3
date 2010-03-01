@@ -144,7 +144,7 @@ and term_node = private
 
 and fmla_node = private
   | Fapp of psymbol * term list
-  | Fquant of quant * fmla_bound
+  | Fquant of quant * fmla_quant
   | Fbinop of binop * fmla * fmla
   | Fnot of fmla
   | Ftrue
@@ -157,9 +157,13 @@ and term_bound
 
 and fmla_bound
 
+and fmla_quant
+
 and term_branch
 
 and fmla_branch
+
+and trigger = term list
 
 module Mterm : Map.S with type key = term
 module Sterm : Set.S with type elt = term
@@ -180,9 +184,9 @@ val t_label_add : label -> term -> term
 (* smart constructors for fmla *)
 
 val f_app : psymbol -> term list -> fmla
-val f_forall : vsymbol -> fmla -> fmla
-val f_exists : vsymbol -> fmla -> fmla
-val f_quant : quant -> vsymbol -> fmla -> fmla
+val f_forall : vsymbol list -> trigger list -> fmla -> fmla
+val f_exists : vsymbol list -> trigger list -> fmla -> fmla
+val f_quant : quant -> vsymbol list -> trigger list -> fmla -> fmla
 val f_and : fmla -> fmla -> fmla
 val f_or : fmla -> fmla -> fmla
 val f_implies : fmla -> fmla -> fmla
@@ -205,6 +209,8 @@ val t_open_branch : term_branch -> pattern * Svs.t * term
 
 val f_open_bound : fmla_bound -> vsymbol * fmla
 val f_open_branch : fmla_branch -> pattern * Svs.t * fmla
+
+val f_open_quant : fmla_quant -> vsymbol list * trigger list * fmla
 
 (* opening map/fold *)
 

@@ -57,15 +57,21 @@ let rec print_term fmt t = match t.t_node with
   | Tcase _ -> assert false (*TODO*)
   | Teps _ -> assert false
 
+let print_vs fmt vs = 
+  fprintf fmt "%a :@ %a" print_ident vs.vs_name print_ty vs.vs_ty
+
+let print_tl fmt tl =
+  fprintf fmt "[%a]" (print_list alt (print_list comma print_term)) tl
+
 let rec print_fmla fmt f = match f.f_node with
   | Fapp (s,tl) -> 
       fprintf fmt "(%a(%a@,)@,)" 
 	print_ident s.ps_name (print_list comma print_term) tl
-  | Fquant (q,fbound) ->
-      let vs,f = f_open_bound fbound in
-      fprintf fmt "(%s %a :@ %a.@ %a@,)"
+  | Fquant (q,fquant) ->
+      let vl,tl,f = f_open_quant fquant in
+      fprintf fmt "(%s %a %a.@ %a@,)"
         (match q with Fforall -> "forall" | Fexists -> "exists")
-        print_ident vs.vs_name print_ty vs.vs_ty print_fmla f
+        (print_list comma print_vs) vl print_tl tl print_fmla f
   | Ftrue -> fprintf fmt "(true@,)"
   | Ffalse -> fprintf fmt "(false@,)"
   | Fbinop (b,f1,f2) -> 

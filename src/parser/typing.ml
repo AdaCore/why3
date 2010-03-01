@@ -463,7 +463,7 @@ and fmla env = function
       (* TODO: shouldn't we localize this ident? *)
       let v = create_vsymbol (id_fresh x) (ty t) in
       let env = M.add x v env in
-      f_quant q v (fmla env f1)
+      f_quant q [v] [] (fmla env f1)
   | Fapp (s, tl) ->
       f_app s (List.map (term env) tl)
 

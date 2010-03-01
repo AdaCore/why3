@@ -267,7 +267,7 @@ and term_node =
 
 and fmla_node =
   | Fapp of psymbol * term list
-  | Fquant of quant * fmla_bound
+  | Fquant of quant * fmla_quant
   | Fbinop of binop * fmla * fmla
   | Fnot of fmla
   | Ftrue
@@ -280,9 +280,13 @@ and term_bound = vsymbol * term
 
 and fmla_bound = vsymbol * fmla
 
+and fmla_quant = vsymbol list * int * trigger list * fmla
+
 and term_branch = pattern * int * term
 
 and fmla_branch = pattern * int * fmla
+
+and trigger = term list
 
 module T = struct
 
@@ -349,11 +353,16 @@ module F = struct
 
   let f_eq_bound (v1, f1) (v2, f2) = v1 == v2 && f1 == f2
 
+  let f_eq_quant (vl1, n1, tl1, f1) (vl2, n2, tl2, f2) =
+    n1 == n2 && f1 == f2 && List.for_all2 (==) vl1 vl2 &&
+    try List.for_all2 (List.for_all2 (==)) tl1 tl2
+    with Invalid_argument _ -> false
+
   let f_equal_node f1 f2 = match f1, f2 with
     | Fapp (s1, l1), Fapp (s2, l2) ->
         s1 == s2 && List.for_all2 (==) l1 l2
     | Fquant (q1, b1), Fquant (q2, b2) ->
-        q1 == q2 && f_eq_bound b1 b2
+        q1 == q2 && f_eq_quant b1 b2
     | Fbinop (op1, f1, g1), Fbinop (op2, f2, g2) ->
         op1 == op2 && f1 == f2 && g1 == g2
     | Fnot f1, Fnot f2 ->
@@ -377,17 +386,23 @@ module F = struct
     try List.for_all2 (=) f1.f_label f2.f_label
     with Invalid_argument _ -> false
 
-  let f_hash_branch (p, _, f) = Hashcons.combine p.pat_tag f.f_tag
-
-  let f_hash_bound (v, f) = Hashcons.combine v.vs_name.id_tag f.f_tag
+  let v_hash v = v.vs_name.id_tag
 
   let t_hash t = t.t_tag
 
   let f_hash f = f.f_tag
 
+  let f_hash_branch (p, _, f) = Hashcons.combine p.pat_tag f.f_tag
+
+  let f_hash_bound (v, f) = Hashcons.combine v.vs_name.id_tag f.f_tag
+
+  let f_hash_quant (vl, _, tl, f) =
+    let h = Hashcons.combine_list v_hash f.f_tag vl in
+    List.fold_left (Hashcons.combine_list t_hash) h tl
+
   let f_hash_node = function
     | Fapp (p, tl) -> Hashcons.combine_list t_hash p.ps_name.id_tag tl
-    | Fquant (q, bf) -> Hashcons.combine (Hashtbl.hash q) (f_hash_bound bf)
+    | Fquant (q, bf) -> Hashcons.combine (Hashtbl.hash q) (f_hash_quant bf)
     | Fbinop (op, f1, f2) ->
         Hashcons.combine2 (Hashtbl.hash op) f1.f_tag f2.f_tag
     | Fnot f -> Hashcons.combine 1 f.f_tag
@@ -426,7 +441,7 @@ let t_label_add l t = Hterm.hashcons { t with t_label = l :: t.t_label }
 
 let mk_fmla n = { f_node = n; f_label = []; f_tag = -1 }
 let f_app f tl = Hfmla.hashcons (mk_fmla (Fapp (f, tl)))
-let f_quant q u f = Hfmla.hashcons (mk_fmla (Fquant (q, (u, f))))
+let f_quant q ul n tl f = Hfmla.hashcons (mk_fmla (Fquant (q, (ul,n,tl,f))))
 
 let f_binary op f1 f2 = Hfmla.hashcons (mk_fmla (Fbinop (op, f1, f2)))
 let f_and = f_binary Fand
@@ -457,7 +472,8 @@ let t_map_unsafe fnT fnF lvl t = match t.t_node with
 
 let f_map_unsafe fnT fnF lvl f = match f.f_node with
   | Fapp (p, tl) -> f_app p (List.map (fnT lvl) tl)
-  | Fquant (q, (u, f1)) -> f_quant q u (fnF (lvl + 1) f1)
+  | Fquant (q, (vl, nv, tl, f1)) -> let lvl = lvl + nv in
+      f_quant q vl nv (List.map (List.map (fnT lvl)) tl) (fnF lvl f1)
   | Fbinop (op, f1, f2) -> f_binary op (fnF lvl f1) (fnF lvl f2)
   | Fnot f1 -> f_not (fnF lvl f1)
   | Ftrue | Ffalse -> f
@@ -478,7 +494,8 @@ let t_fold_unsafe fnT fnF lvl acc t = match t.t_node with
 
 let f_fold_unsafe fnT fnF lvl acc f = match f.f_node with
   | Fapp (p, tl) -> List.fold_left (fnT lvl) acc tl
-  | Fquant (q, (u, f1)) -> fnF (lvl + 1) acc f1
+  | Fquant (q, (vl, nv, tl, f1)) -> let lvl = lvl + nv in
+      List.fold_left (List.fold_left (fnT lvl)) (fnF lvl acc f1) tl
   | Fbinop (op, f1, f2) -> fnF lvl (fnF lvl acc f1) f2
   | Fnot f1 -> fnF lvl acc f1
   | Ftrue | Ffalse -> acc
@@ -633,8 +650,8 @@ and f_equal_alpha f1 f2 =
     | Fapp (s1, l1), Fapp (s2, l2) ->
         (* assert (List.length l1 == List.length l2); *)
         s1 == s2 && List.for_all2 t_equal_alpha l1 l2
-    | Fquant (q1, (v1, f1)), Fquant (q2, (v2, f2)) ->
-        q1 == q2 && v1.vs_ty == v2.vs_ty && f_equal_alpha f1 f2
+    | Fquant (q1, b1), Fquant (q2, b2) ->
+        q1 == q2 && f_equal_quant_alpha b1 b2
     | Fbinop (op1, f1, g1), Fbinop (op2, f2, g2) ->
         op1 == op2 && f_equal_alpha f1 f2 && f_equal_alpha g1 g2
     | Fnot f1, Fnot f2 ->
@@ -658,6 +675,11 @@ and t_equal_branch_alpha (pat1, _, t1) (pat2, _, t2) =
 
 and f_equal_branch_alpha (pat1, _, f1) (pat2, _, f2) =
   pat_equal_alpha pat1 pat2 && f_equal_alpha f1 f2
+
+and f_equal_quant_alpha (vl1, nv1, tl1, f1) (vl2, nv2, tl2, f2) =
+  nv1 == nv2 && List.for_all2 (fun v1 v2 -> v1.vs_ty == v2.vs_ty) vl1 vl2 &&
+    (* FIXME: should we compare the triggers? *)
+    f_equal_alpha f1 f2
 
 (* matching modulo alpha in the pattern *)
 
@@ -693,8 +715,10 @@ and f_match s f1 f2 =
     | Fapp (s1, l1), Fapp (s2, l2) when s1 == s2 ->
         (* assert (List.length l1 == List.length l2); *)
         List.fold_left2 t_match s l1 l2
-    | Fquant (q1, (v1, f1)), Fquant (q2, (v2, f2))
-            when q1 == q2 && v1.vs_ty == v2.vs_ty ->
+    | Fquant (q1, (vl1, nv1, _, f1)), Fquant (q2, (vl2, nv2, _, f2))
+        when q1 == q2 && nv1 == nv2 &&
+          List.for_all2 (fun v1 v2 -> v1.vs_ty == v2.vs_ty) vl1 vl2 ->
+        (* FIXME: should we match the triggers? *)
         f_match s f1 f2
     | Fbinop (op1, f1, g1), Fbinop (op2, f2, g2) when op1 == op2 ->
         f_match (f_match s f1 f2) g1 g2
@@ -920,15 +944,22 @@ let f_let v t1 f2 =
 
 let t_eps v f = t_eps v (f_abst_single v f)
 
-let f_quant q v f = f_quant q v (f_abst_single v f)
+let f_quant q vl tl f =
+  let i = ref (-1) in
+  let add m v = incr i; Mvs.add v !i m in
+  let m = List.fold_left add Mvs.empty vl in
+  let tl = List.map (List.map (t_abst m 0)) tl in
+  (* FIXME: should we do any checks for triggers? *)
+  f_quant q vl (!i + 1) tl (f_abst m 0 f)
+
 let f_forall = f_quant Fforall
 let f_exists = f_quant Fexists
 
 let t_app f tl ty =
   let args, res = f.fs_scheme in
   let _ =
-    try List.fold_left2 matching
-        (matching Mid.empty res ty)
+    try List.fold_left2 Ty.matching
+        (Ty.matching Mid.empty res ty)
         args (List.map (fun t -> t.t_ty) tl)
     with Invalid_argument _ -> raise BadArity
   in
@@ -936,7 +967,7 @@ let t_app f tl ty =
 
 let f_app p tl =
   let _ =
-    try List.fold_left2 matching Mid.empty
+    try List.fold_left2 Ty.matching Mid.empty
         p.ps_scheme (List.map (fun t -> t.t_ty) tl)
     with Invalid_argument _ -> raise BadArity
   in
@@ -981,6 +1012,14 @@ let t_open_bound (v, t) =
 let f_open_bound (v, f) =
   let v = fresh_vsymbol v in v, f_inst_single v f
 
+let f_open_quant (vl, _, tl, f) =
+  let i = ref (-1) in
+  let add m v = incr i; Im.add !i v m in
+  let vl = List.map fresh_vsymbol vl in
+  let m = List.fold_left add Im.empty vl in
+  let tl = List.map (List.map (t_inst m 0)) tl in
+  (vl, tl, f_inst m 0 f)
+
 let rec pat_rename ns p = match p.pat_node with
   | Pvar n -> pat_var (Mvs.find n ns)
   | Pas (p, n) -> pat_as (pat_rename ns p) (Mvs.find n ns)
@@ -1019,7 +1058,8 @@ let f_branch fn b = let pat,_,f = f_open_branch b in (pat, fn f)
 
 let f_map_open fnT fnF f = match f.f_node with
   | Fapp (p, tl) -> f_app p (List.map fnT tl)
-  | Fquant (q, b) -> let u,f1 = f_open_bound b in f_quant q u (fnF f1)
+  | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
+      f_quant q vl (List.map (List.map fnT) tl) (fnF f1)
   | Fbinop (op, f1, f2) -> f_binary op (fnF f1) (fnF f2)
   | Fnot f1 -> f_not (fnF f1)
   | Ftrue | Ffalse -> f
@@ -1042,7 +1082,8 @@ let t_fold_open fnT fnF acc t = match t.t_node with
 
 let f_fold_open fnT fnF acc f = match f.f_node with
   | Fapp (p, tl) -> List.fold_left fnT acc tl
-  | Fquant (q, b) -> let _,f1 = f_open_bound b in fnF acc f1
+  | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
+      List.fold_left (List.fold_left fnT) (fnF acc f1) tl
   | Fbinop (op, f1, f2) -> fnF (fnF acc f1) f2
   | Fnot f1 -> fnF acc f1
   | Ftrue | Ffalse -> acc
@@ -1101,9 +1142,10 @@ and f_s_map fnT fnV fnF fnP f =
     | Fapp (p, tl) ->
         f_app (fnP p) (List.map fn_t tl)
     | Fquant (q, b) ->
-        let u,f1 = f_open_bound b in
-        let ty = ty_s_map fnT u.vs_ty in
-        f_quant q (fnV u ty) (fn_f f1)
+        let vl, tl, f1 = f_open_quant b in
+        let tl = List.map (List.map fn_t) tl in
+        let fn_v u = fnV u (ty_s_map fnT u.vs_ty) in
+        f_quant q (List.map fn_v vl) tl (fn_f f1)
     | Fbinop (op, f1, f2) ->
         f_binary op (fn_f f1) (fn_f f2)
     | Fnot f1 ->
@@ -1145,9 +1187,12 @@ and f_s_fold fnT fnF fnP acc f =
   let fn_t acc t = t_s_fold fnT fnF fnP acc t in
   let fn_f acc f = f_s_fold fnT fnF fnP acc f in
   let fn_b acc b = f_s_branch fnT fnF fnP acc b in
+  let fn_v acc u = ty_s_fold fnT acc u.vs_ty in
   match f.f_node with
     | Fapp (p, tl) -> List.fold_left fn_t (fnP acc p) tl
-    | Fquant (q, (u,f1)) -> fn_f (ty_s_fold fnT acc u.vs_ty) f1
+    | Fquant (q, (vl,_,tl,f1)) ->
+        let acc = List.fold_left fn_v acc vl in
+        fn_f (List.fold_left (List.fold_left fn_t) acc tl) f1
     | Fbinop (op, f1, f2) -> fn_f (fn_f acc f1) f2
     | Fnot f1 -> fn_f acc f1
     | Ftrue | Ffalse -> acc
