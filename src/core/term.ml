@@ -244,7 +244,7 @@ type binop =
   | Fimplies
   | Fiff
 
-type real_constant = 
+type real_constant =
   | RConstDecimal of string * string * string option (* int / frac / exp *)
   | RConstHexa of string * string * string
 
@@ -641,6 +641,8 @@ let rec t_equal_alpha t1 t2 =
         x1 == x2
     | Tvar v1, Tvar v2 ->
         v1 == v2
+    | Tconst c1, Tconst c2 ->
+        c1 = c2
     | Tapp (s1, l1), Tapp (s2, l2) ->
         (* assert (List.length l1 == List.length l2); *)
         s1 == s2 && List.for_all2 t_equal_alpha l1 l2
@@ -702,6 +704,8 @@ let rec t_match s t1 t2 =
   if t1.t_ty != t2.t_ty then raise NoMatch else
   match t1.t_node, t2.t_node with
     | Tbvar x1, Tbvar x2 when x1 == x2 ->
+        s
+    | Tconst c1, Tconst c2 when c1 = c2 ->
         s
     | Tvar v1, _ ->
         (try if Mvs.find v1 s == t2 then s else raise NoMatch
