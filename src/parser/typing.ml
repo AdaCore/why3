@@ -374,8 +374,15 @@ and dterm_node loc env = function
       Tconst c, Tyapp (Theory.t_int, [])
   | PPconst (ConstReal _ as c) ->
       Tconst c, Tyapp (Theory.t_real, [])
-  | _ ->
-      assert false (*TODO*)
+  | PPmatch _ ->
+      assert false (* TODO *)
+  | PPlet _ ->
+      assert false (* TODO *)
+  | PPnamed _ ->
+      assert false (* TODO *)
+  | PPexists _ | PPforall _ | PPif _ 
+  | PPprefix _ | PPinfix _ | PPfalse | PPtrue ->
+      error ~loc TermExpected
 
 and dfmla env e = match e.pp_desc with
   | PPtrue ->
@@ -386,10 +393,6 @@ and dfmla env e = match e.pp_desc with
       Fnot (dfmla env a)
   | PPinfix (a, (PPand | PPor | PPimplies | PPiff as op), b) ->
       Fbinop (binop op, dfmla env a, dfmla env b)
-(*   | PPinfix (a, (PPeq | PPneq as op), b) -> *)
-(*       let s, _ = specialize_psymbol Theory.eq in *)
-(*       let f = Fapp (s, [dterm env a; dterm env b]) in *)
-(*       if op = PPeq then f else Fnot f *)
   | PPif (a, b, c) ->
       Fif (dfmla env a, dfmla env b, dfmla env c)  
   | PPforall ({id=x}, ty, _, a) -> (* TODO: triggers *)
@@ -405,8 +408,16 @@ and dfmla env e = match e.pp_desc with
       let s, tyl = specialize_psymbol s in
       let tl = dtype_args s.ps_name e.pp_loc env tyl tl in
       Fapp (s, tl)
-  | _ ->
-      assert false (*TODO*)
+  | PPmatch _ ->
+      assert false (* TODO *)
+  | PPlet _ ->
+      assert false (* TODO *)
+  | PPnamed _ ->
+      assert false (* TODO *)
+  | PPvar _ -> 
+      assert false (* TODO *)
+  | PPconst _ | PPprefix (PPneg, _) ->
+      error ~loc:e.pp_loc PredicateExpected
 
 and dtype_args s loc env el tl =
   let n = List.length el and m = List.length tl in
@@ -609,7 +620,7 @@ let add_logics loc dl th =
 	      Some (vl, fmla env f)
 	in
 	Lpredicate (ps, def)
-    | Some t -> (* function *)
+    | Some _ -> (* function *)
 	let fs = Hashtbl.find fsymbols id in
 	let def = match d.ld_def with
 	  | None -> 
@@ -624,6 +635,7 @@ let add_logics loc dl th =
   in
   let dl = List.map type_decl dl in
   add_decl th (create_logic dl)
+
 
 let term env t =
   let denv = create_denv env in
