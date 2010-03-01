@@ -138,10 +138,17 @@ let alpha = lalpha | ualpha
 let digit = ['0'-'9']
 let lident = lalpha (alpha | digit | '\'')*
 let uident = ualpha (alpha | digit | '\'')*
+let decimal_literal =
+  ['0'-'9'] ['0'-'9' '_']*
+let hex_literal =
+  '0' ['x' 'X'] ['0'-'9' 'A'-'F' 'a'-'f']['0'-'9' 'A'-'F' 'a'-'f' '_']*
+let oct_literal =
+  '0' ['o' 'O'] ['0'-'7'] ['0'-'7' '_']*
+let bin_literal =
+  '0' ['b' 'B'] ['0'-'1'] ['0'-'1' '_']*
+let int_literal =
+  decimal_literal | hex_literal | oct_literal | bin_literal
 let hexadigit = ['0'-'9' 'a'-'f' 'A'-'F']
-(*
-let hexafloat = '0' ['x' 'X'] (hexadigit* '.' hexadigit+ | hexadigit+ '.' hexadigit* ) ['p' 'P'] ['-' '+']? digit+
-  *)
 
 rule token = parse
   | "#" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
@@ -157,7 +164,7 @@ rule token = parse
       { try Hashtbl.find keywords id with Not_found -> LIDENT id }
   | uident as id  
       { UIDENT id }
-  | digit+ as s
+  | int_literal as s
       { INTEGER s }
   | (digit+ as i) ("" as f) ['e' 'E'] (['-' '+']? digit+ as e)
   | (digit+ as i) '.' (digit* as f) (['e' 'E'] (['-' '+']? digit+ as e))?
