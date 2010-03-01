@@ -217,23 +217,35 @@ module Mnm = Map.Make(String)
 
 type theory = {
   th_name   : ident;
-  th_param  : Sid.t;          (* locally declared abstract symbols *)
-  th_known  : ident Mid.t;    (* imported and locally declared symbols *)
+  th_param  : Sid.t;        (* locally declared abstract symbols *)
+  th_known  : ident Mid.t;  (* imported and locally declared symbols *)
   th_export : namespace;
   th_decls  : decl_or_use list;
 }
 
 and namespace = {
-  ns_ts   : tysymbol Mnm.t;   (* type symbols *)
-  ns_fs   : fsymbol Mnm.t;    (* function symbols *)
-  ns_ps   : psymbol Mnm.t;    (* predicate symbols *)
-  ns_ns   : namespace Mnm.t;  (* inner namespaces *)
-  ns_prop : fmla Mnm.t;       (* propositions *)
+  ns_ts : tysymbol Mnm.t;   (* type symbols *)
+  ns_fs : fsymbol Mnm.t;    (* function symbols *)
+  ns_ps : psymbol Mnm.t;    (* predicate symbols *)
+  ns_ns : namespace Mnm.t;  (* inner namespaces *)
+  ns_pr : fmla Mnm.t;       (* propositions *)
 }
 
 and decl_or_use =
   | Decl of decl
   | Use of theory
+
+
+(** Theory under construction *)
+
+type theory_uc = {
+  uc_name   : ident;
+  uc_param  : Sid.t;
+  uc_known  : ident Mid.t;
+  uc_import : namespace list;
+  uc_export : namespace list;
+  uc_decls  : decl_or_use list;
+}
 
 
 (** Error reporting *)
@@ -245,48 +257,99 @@ exception UnknownIdent of ident
 exception CannotInstantiate of ident
 exception ClashSymbol of string
 
-(** equality *)
+
+(** Manage known symbols *)
+
+let known_id kn id =
+  if not (Mid.mem id kn) then raise (UnknownIdent id)
+
+let known_ts kn () ts = known_id kn ts.ts_name
+let known_fs kn () fs = known_id kn fs.fs_name
+let known_ps kn () ps = known_id kn ps.ps_name
+
+let known_ty kn ty = ty_s_fold (known_ts kn) () ty
+
+let known_term kn t =
+  t_s_fold (known_ts kn) (fun _ _ -> ())
+           (known_fs kn) (known_ps kn) () t
+
+let known_fmla kn f =
+  f_s_fold (known_ts kn) (fun _ _ -> ())
+           (known_fs kn) (known_ps kn) () f
+
+let merge_known kn1 kn2 =
+  let add id tid kn =
+    try
+      if Mid.find id kn2 != tid then raise (RedeclaredIdent id);
+      kn
+    with Not_found -> Mid.add id tid kn
+  in
+  Mid.fold add kn1 kn2
+
+let add_known id uc =
+  if Mid.mem id uc.uc_known then raise (RedeclaredIdent id);
+  { uc with uc_known = Mid.add id uc.uc_name uc.uc_known }
+
+
+(** Manage namespaces *)
+
+let empty_ns = {
+  ns_ts = Mnm.empty;
+  ns_fs = Mnm.empty;
+  ns_ps = Mnm.empty;
+  ns_ns = Mnm.empty;
+  ns_pr = Mnm.empty;
+}
+
+let add_to_ns x v m =
+  if Mnm.mem x m then raise (ClashSymbol x);
+  Mnm.add x v m
+
+let merge_ns ns1 ns2 =
+  { ns_ts = Mnm.fold add_to_ns ns1.ns_ts ns2.ns_ts;
+    ns_fs = Mnm.fold add_to_ns ns1.ns_fs ns2.ns_fs;
+    ns_ps = Mnm.fold add_to_ns ns1.ns_ps ns2.ns_ps;
+    ns_ns = Mnm.fold add_to_ns ns1.ns_ns ns2.ns_ns;
+    ns_pr = Mnm.fold add_to_ns ns1.ns_pr ns2.ns_pr; }
+
+let add_ts x ts ns = { ns with ns_ts = add_to_ns x ts ns.ns_ts }
+let add_fs x fs ns = { ns with ns_fs = add_to_ns x fs ns.ns_fs }
+let add_ps x ps ns = { ns with ns_ps = add_to_ns x ps ns.ns_ps }
+let add_pr x f  ns = { ns with ns_pr = add_to_ns x f  ns.ns_pr }
+
+let add_symbol add id v uc =
+  let uc = add_known id uc in
+  match uc.uc_import, uc.uc_export with
+  | i0 :: sti, e0 :: ste ->
+      let im = add id.id_short v i0 :: sti in
+      let ex = add id.id_short v e0 :: ste in
+      { uc with uc_import = im; uc_export = ex }
+  | _ ->
+      assert false
+
+let get_namespace uc = List.hd uc.uc_import
+
+
+(** Equality *)
 
 let eq =
   let v = ty_var (create_tvsymbol (id_fresh "a")) in
   create_psymbol (id_fresh "eq") [v; v;]
 
-let eq_th =
-  id_register (id_fresh "Eq")
+let eq_th = id_register (id_fresh "Eq")
 
-let known_eq =
-  Mid.add eq.ps_name eq_th Mid.empty
+let known_eq = Mid.add eq.ps_name eq_th Mid.empty
 
-(** Theory under construction *)
 
-type theory_uc = {
-  uc_name   : ident;
-  uc_param  : Sid.t;
-  uc_known  : ident Mid.t;
-  uc_visible: namespace list; (* stack of visible symbols *)
-  uc_import : namespace list;
-  uc_export : namespace list;
-  uc_decls  : decl_or_use list;
-}
-
-(* creating environments *)
-
-let empty_ns = {
-  ns_ts   = Mnm.empty;
-  ns_fs   = Mnm.empty;
-  ns_ps   = Mnm.empty;
-  ns_ns   = Mnm.empty;
-  ns_prop = Mnm.empty;
-}
+(** Manage theories *)
 
 let create_theory n = {
-  uc_name     = n;
-  uc_param    = Sid.empty;
-  uc_known    = Mid.add n n known_eq;
-  uc_visible  = [empty_ns];
-  uc_import   = [empty_ns];
-  uc_export   = [empty_ns];
-  uc_decls    = [];
+  uc_name   = n;
+  uc_param  = Sid.empty;
+  uc_known  = Mid.add n n known_eq;
+  uc_import = [empty_ns];
+  uc_export = [empty_ns];
+  uc_decls  = [];
 }
 
 let create_theory n = create_theory (id_register n)
@@ -301,65 +364,112 @@ let close_theory uc = match uc.uc_export with
   | _ ->
       raise CloseTheory
 
-let open_namespace uc = match uc.uc_visible with
-  | ns :: _ as st ->
+let open_namespace uc = match uc.uc_import with
+  | ns :: _ ->
       { uc with
-          uc_visible = ns :: st;
-          uc_import  = empty_ns :: uc.uc_import;
-          uc_export  = empty_ns :: uc.uc_export; }
+          uc_import =       ns :: uc.uc_import;
+          uc_export = empty_ns :: uc.uc_export; }
   | [] ->
       assert false
 
-let merge_ns ~check ns1 ns2 =
-  let add k v m =
-    if check && Mnm.mem k m then raise (ClashSymbol k);
-    Mnm.add k v m
-  in
-  { ns_ts   = Mnm.fold add ns1.ns_ts ns2.ns_ts;
-    ns_fs   = Mnm.fold add ns1.ns_fs ns2.ns_fs;
-    ns_ps   = Mnm.fold add ns1.ns_ps ns2.ns_ps;
-    ns_ns   = Mnm.fold add ns1.ns_ns ns2.ns_ns;
-    ns_prop = Mnm.fold add ns1.ns_prop ns2.ns_prop; }
-
 let close_namespace uc s ~import =
-  match uc.uc_visible, uc.uc_import, uc.uc_export with
-  | _ :: v1 :: stv, _ :: i1 :: sti, e0 :: e1 :: ste ->
+  match uc.uc_import, uc.uc_export with
+  | _ :: i1 :: sti, e0 :: e1 :: ste ->
       if Mnm.mem s i1.ns_ns then raise (ClashSymbol s);
-      let v1 = { v1 with ns_ns = Mnm.add s e0 v1.ns_ns } in
+      let i1 = if import then merge_ns e0 i1 else i1 in
       let i1 = { i1 with ns_ns = Mnm.add s e0 i1.ns_ns } in
       let e1 = { e1 with ns_ns = Mnm.add s e0 e1.ns_ns } in
-      let v1 = if import then merge_ns ~check:false e0 v1 else v1 in
-      let i1 = if import then merge_ns ~check:true  e0 i1 else i1 in
-      { uc with
-          uc_visible = v1 :: stv;
-          uc_import = i1 :: sti;
-          uc_export = e1 :: ste; }
-  | [_], [_], [_] ->
+      { uc with uc_import = i1 :: sti; uc_export = e1 :: ste; }
+  | [_], [_] ->
       raise NoOpenedNamespace
   | _ ->
       assert false
 
-let merge_known m1 m2 =
-  let add k i m =
-    try
-      if Mid.find k m2 != i then raise (RedeclaredIdent i);
-      m
-    with Not_found -> Mid.add k i m
-  in
-  Mid.fold add m1 m2
-
 let use_export uc th =
-  match uc.uc_visible, uc.uc_import, uc.uc_export with
-    | v0 :: stv, i0 :: sti, e0 :: ste ->
+  match uc.uc_import, uc.uc_export with
+    | i0 :: sti, e0 :: ste ->
         { uc with
-            uc_visible = merge_ns ~check:false th.th_export v0 :: stv;
-            uc_import  = merge_ns ~check:true  th.th_export i0 :: sti;
-            uc_export  = merge_ns ~check:false th.th_export e0 :: ste;
-            uc_known   = merge_known uc.uc_known th.th_known;
-            uc_decls   = Use th :: uc.uc_decls;
+            uc_import = merge_ns th.th_export i0 :: sti;
+            uc_export = merge_ns th.th_export e0 :: ste;
+            uc_known  = merge_known uc.uc_known th.th_known;
+            uc_decls  = Use th :: uc.uc_decls;
         }
     | _ ->
         assert false
+
+
+(** Manage new declarations *)
+
+let add_param id uc = { uc with uc_param = Sid.add id uc.uc_param }
+
+let add_type uc (ts,def) =
+  let uc = add_symbol add_ts ts.ts_name ts uc in
+  match def with
+  | Tabstract ->
+      if ts.ts_def == None then add_param ts.ts_name uc else uc
+  | Talgebraic lfs ->
+      let add_constr uc fs = add_symbol add_fs fs.fs_name fs uc in
+      List.fold_left add_constr uc lfs
+
+let check_type kn (ts,def) = match def with
+  | Tabstract ->
+      begin match ts.ts_def with
+        | Some ty -> known_ty kn ty
+        | None -> ()
+      end
+  | Talgebraic lfs ->
+      let check fs = List.iter (known_ty kn) (fst fs.fs_scheme) in
+      List.iter check lfs
+
+let add_logic uc = function
+  | Lfunction (fs, df) ->
+      let uc = add_symbol add_fs fs.fs_name fs uc in
+      if df == None then add_param fs.fs_name uc else uc
+  | Lpredicate (ps, dp) ->
+      let uc = add_symbol add_ps ps.ps_name ps uc in
+      if dp == None then add_param ps.ps_name uc else uc
+  | Linductive (ps, la) ->
+      let uc = add_symbol add_ps ps.ps_name ps uc in
+      let add uc (id,f) = add_symbol add_pr id f uc in
+      List.fold_left add uc la
+
+let check_logic kn = function
+  | Lfunction (fs, df) ->
+      known_ty kn (snd fs.fs_scheme);
+      List.iter (known_ty kn) (fst fs.fs_scheme);
+      begin match df with
+        | Some (_,t) -> known_term kn t
+        | None -> ()
+      end
+  | Lpredicate (ps, dp) ->
+      List.iter (known_ty kn) ps.ps_scheme;
+      begin match dp with
+        | Some (_,f) -> known_fmla kn f
+        | None -> ()
+      end
+  | Linductive (ps, la) ->
+      List.iter (known_ty kn) ps.ps_scheme;
+      let check (_,f) = known_fmla kn f in
+      List.iter check la
+
+let add_decl uc d =
+  let uc = match d.d_node with
+    | Dtype dl ->
+        let uc = List.fold_left add_type uc dl in
+        List.iter (check_type uc.uc_known) dl;
+        uc
+    | Dlogic dl ->
+        let uc = List.fold_left add_logic uc dl in
+        List.iter (check_logic uc.uc_known) dl;
+        uc
+    | Dprop (k, id, f) ->
+        known_fmla uc.uc_known f;
+        add_symbol add_pr id f uc
+  in
+  { uc with uc_decls = Decl d :: uc.uc_decls }
+
+
+(** Clone theories *)
 
 type th_inst = {
   inst_ts : tysymbol Mts.t;
@@ -376,148 +486,6 @@ let clone_export th t i =
   let check_ps s _ = check_sym s.ps_name in Mps.iter check_ps i.inst_ps;
   assert false (* TODO *)
 
-(* Manage the set of known idents *)
-
-let is_known_id ids id =
-  if not (Mid.mem id ids) then raise (UnknownIdent id)
-
-let is_known_ts ids () ts = is_known_id ids ts.ts_name
-let is_known_fs ids () fs = is_known_id ids fs.fs_name
-let is_known_ps ids () ps = is_known_id ids ps.ps_name
-
-let is_known_ty ids ty = ty_s_fold (is_known_ts ids) () ty
-
-let is_known_term ids t =
-  t_s_fold (is_known_ts ids) (fun _ _ -> ())
-           (is_known_fs ids) (is_known_ps ids) () t
-
-let is_known_fmla ids f =
-  f_s_fold (is_known_ts ids) (fun _ _ -> ())
-           (is_known_fs ids) (is_known_ps ids) () f
-
-let add_known id uc =
-  if Mid.mem id uc.uc_known then raise (RedeclaredIdent id);
-  { uc with uc_known = Mid.add id uc.uc_name uc.uc_known }
-
-let add_param id uc = { uc with uc_param = Sid.add id uc.uc_param }
-
-(* Manage new symbols *)
-
-let generic_add ~check x v m =
-  if check && Mnm.mem x m then raise (ClashSymbol x);
-  Mnm.add x v m
-
-let add_ts ~check x ts ns =
-  { ns with ns_ts = generic_add ~check x ts ns.ns_ts }
-
-let add_fs ~check x fs ns =
-  { ns with ns_fs = generic_add ~check x fs ns.ns_fs }
-
-let add_ps ~check x ps ns =
-  { ns with ns_ps = generic_add ~check x ps ns.ns_ps }
-
-let add_prop ~check x f ns =
-  { ns with ns_prop = generic_add ~check x f ns.ns_prop }
-
-let add_symbol add x v uc =
-  let uc = add_known x uc in
-  match uc.uc_visible, uc.uc_import, uc.uc_export with
-  | v0 :: stv, i0 :: sti, e0 :: ste ->
-      let x = x.id_short in
-      { uc with
-          uc_visible = add ~check:false x v v0 :: stv;
-          uc_import  = add ~check:true  x v i0 :: sti;
-          uc_export  = add ~check:false x v e0 :: ste }
-  | _ ->
-      assert false
-
-(* Manage new declarations *)
-
-let add_type uc (ts,def) =
-  let uc = add_symbol add_ts ts.ts_name ts uc in
-  match def with
-  | Tabstract ->
-      if ts.ts_def == None then add_param ts.ts_name uc else uc
-  | Talgebraic lfs ->
-      let add_constr uc fs = add_symbol add_fs fs.fs_name fs uc in
-      List.fold_left add_constr uc lfs
-
-let check_type kn (ts,def) = match def with
-  | Tabstract ->
-      begin match ts.ts_def with
-        | Some ty -> is_known_ty kn ty
-        | None -> ()
-      end
-  | Talgebraic lfs ->
-      let check fs = List.iter (is_known_ty kn) (fst fs.fs_scheme) in
-      List.iter check lfs
-
-let add_logic uc = function
-  | Lfunction (fs, df) ->
-      let uc = add_symbol add_fs fs.fs_name fs uc in
-      if df == None then add_param fs.fs_name uc else uc
-  | Lpredicate (ps, dp) ->
-      let uc = add_symbol add_ps ps.ps_name ps uc in
-      if dp == None then add_param ps.ps_name uc else uc
-  | Linductive (ps, la) ->
-      let uc = add_symbol add_ps ps.ps_name ps uc in
-      let add uc (id,f) = add_symbol add_prop id f uc in
-      List.fold_left add uc la
-
-let check_logic kn = function
-  | Lfunction (fs, df) ->
-      is_known_ty kn (snd fs.fs_scheme);
-      List.iter (is_known_ty kn) (fst fs.fs_scheme);
-      begin match df with
-        | Some (_,t) -> is_known_term kn t
-        | None -> ()
-      end
-  | Lpredicate (ps, dp) ->
-      List.iter (is_known_ty kn) ps.ps_scheme;
-      begin match dp with
-        | Some (_,f) -> is_known_fmla kn f
-        | None -> ()
-      end
-  | Linductive (ps, la) ->
-      List.iter (is_known_ty kn) ps.ps_scheme;
-      let check (_,f) = is_known_fmla kn f in
-      List.iter check la
-
-let add_decl uc d =
-  let uc = match d.d_node with
-    | Dtype dl ->
-        let uc = List.fold_left add_type uc dl in
-        List.iter (check_type uc.uc_known) dl;
-        uc
-    | Dlogic dl ->
-        let uc = List.fold_left add_logic uc dl in
-        List.iter (check_logic uc.uc_known) dl;
-        uc
-    | Dprop (k, id, f) ->
-        is_known_fmla uc.uc_known f;
-        add_symbol add_prop id f uc
-  in
-  { uc with uc_decls = Decl d :: uc.uc_decls }
-
-(** Querying environments *)
-
-let get_namespace th = match th.uc_visible with
-  | ns :: _ -> ns
-  | [] -> assert false
-
-(*
-let find_tysymbol  ns s = Mnm.find s ns.ns_ts
-let find_fsymbol   ns s = Mnm.find s ns.ns_fs
-let find_psymbol   ns s = Mnm.find s ns.ns_ps
-let find_namespace ns s = Mnm.find s ns.ns_ns
-let find_prop      ns s = Mnm.find s ns.ns_prop
-
-let mem_tysymbol  ns s = Mnm.mem s ns.ns_ts
-let mem_fsymbol   ns s = Mnm.mem s ns.ns_fs
-let mem_psymbol   ns s = Mnm.mem s ns.ns_ps
-let mem_namespace ns s = Mnm.mem s ns.ns_ns
-let mem_prop      ns s = Mnm.mem s ns.ns_prop
-*)
 
 (** Debugging *)
 

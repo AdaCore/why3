@@ -80,18 +80,18 @@ module Mnm : Map.S with type key = string
 
 type theory = private {
   th_name   : ident;
-  th_param  : Sid.t;          (* locally declared abstract symbols *)
-  th_known  : ident Mid.t;    (* imported and locally declared symbols *)
+  th_param  : Sid.t;        (* locally declared abstract symbols *)
+  th_known  : ident Mid.t;  (* imported and locally declared symbols *)
   th_export : namespace;
   th_decls  : decl_or_use list;
 }
 
 and namespace = private {
-  ns_ts   : tysymbol Mnm.t;   (* type symbols *)
-  ns_fs   : fsymbol Mnm.t;    (* function symbols *)
-  ns_ps   : psymbol Mnm.t;    (* predicate symbols *)
-  ns_ns   : namespace Mnm.t;  (* inner namespaces *)
-  ns_prop : fmla Mnm.t;       (* propositions *)
+  ns_ts : tysymbol Mnm.t;   (* type symbols *)
+  ns_fs : fsymbol Mnm.t;    (* function symbols *)
+  ns_ps : psymbol Mnm.t;    (* predicate symbols *)
+  ns_ns : namespace Mnm.t;  (* inner namespaces *)
+  ns_pr : fmla Mnm.t;       (* propositions *)
 }
 
 and decl_or_use =
