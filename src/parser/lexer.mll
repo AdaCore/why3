@@ -194,26 +194,16 @@ rule token = parse
       { LRARROW }
   | "="
       { EQUAL }
-  | "<"
-      { LT }
-  | "<="
-      { LE }
-  | ">"
-      { GT }
-  | ">="
-      { GE }
   | "<>"
       { NOTEQ }
-  | "+"
-      { PLUS }
+  | "<" | "<=" | ">" | ">=" as s
+      { INFIXOP0 s }
+  | "+" 
+      { INFIXOP2 "+" }
   | "-"
       { MINUS }
-  | "*"
-      { TIMES }
-  | "/"
-      { SLASH }
-  | "%"
-      { PERCENT }
+  | "*" | "/" | "%" as c
+      { INFIXOP3 (String.make 1 c) }
   | "@"
       { AT }
   | "."

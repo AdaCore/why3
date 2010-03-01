@@ -32,12 +32,10 @@ type constant =
   | ConstFloat of real_constant
 
 type pp_infix = 
-  PPand | PPor | PPimplies | PPiff |
-  PPlt | PPle | PPgt | PPge | PPeq | PPneq |
-  PPadd | PPsub | PPmul | PPdiv | PPmod
+  | PPand | PPor | PPimplies | PPiff | PPeq | PPneq 
 
 type pp_prefix = 
-  PPneg | PPnot
+  | PPneg | PPnot
 
 type ident = { id : string; id_loc : loc }
 

@@ -403,8 +403,6 @@ and dfmla env e = match e.pp_desc with
       let s, _ = specialize_psymbol Theory.eq in
       let f = Fapp (s, [dterm env a; dterm env b]) in
       if op = PPeq then f else Fnot f
-  | PPinfix _ ->
-      error ~loc:e.pp_loc PredicateExpected
   | PPif (a, b, c) ->
       Fif (dfmla env a, dfmla env b, dfmla env c)  
   | PPforall ({id=x}, ty, _, a) -> (* TODO: triggers *)

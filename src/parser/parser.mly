@@ -92,6 +92,7 @@
 
 %token <string> LIDENT UIDENT
 %token <string> INTEGER
+%token <string> INFIXOP0 INFIXOP2 INFIXOP3
 %token <Ptree.real_constant> FLOAT
 %token <string> STRING
 %token ABSURD AMPAMP AND ARRAY ARROW AS ASSERT AT AXIOM 
@@ -99,11 +100,11 @@
 %token BIGARROW BOOL CHECK CLONE COLON COLONEQUAL COMMA DO 
 %token DONE DOT ELSE END EOF EQUAL
 %token EXCEPTION EXISTS EXPORT EXTERNAL FALSE FOR FORALL FPI 
-%token FUN FUNCTION GE GOAL GT
+%token FUN FUNCTION GOAL
 %token IF IMPORT IN INCLUDE INDUCTIVE INT INVARIANT
-%token LE LEFTB LEFTBLEFTB LEFTPAR LEFTSQ LEMMA 
-%token LET LOGIC LRARROW LT MATCH MINUS
-%token NAMESPACE NOT NOTEQ OF OR PARAMETER PERCENT PLUS PREDICATE PROP 
+%token LEFTB LEFTBLEFTB LEFTPAR LEFTSQ LEMMA 
+%token LET LOGIC LRARROW MATCH MINUS
+%token NAMESPACE NOT NOTEQ OF OR PARAMETER  PREDICATE PROP 
 %token QUOTE RAISE RAISES READS REAL REC REF RETURNS RIGHTB RIGHTBRIGHTB
 %token RIGHTPAR RIGHTSQ 
 %token SEMICOLON SLASH 
@@ -135,9 +136,9 @@
 %right AND AMPAMP
 %right NOT
 %right prec_if
-%left prec_relation EQUAL NOTEQ LT LE GT GE
-%left PLUS MINUS
-%left TIMES SLASH PERCENT
+%left EQUAL NOTEQ INFIXOP0
+%left INFIXOP2 MINUS
+%left INFIXOP3
 %right uminus
 %left prec_app
 %left prec_ident
@@ -181,8 +182,16 @@ ident:
 ;
 
 lident:
-| LIDENT { { id = $1; id_loc = loc () } }
+| LIDENT                        { { id = $1; id_loc = loc () } }
+| LEFTPAR lident_infix RIGHTPAR { { id = $2; id_loc = loc () } }
 ;
+
+lident_infix:
+| INFIXOP0 { $1 }
+| INFIXOP2 { $1 }
+| INFIXOP3 { $1 }
+| MINUS    { "-" }
+
 
 uident:
 | UIDENT { { id = $1; id_loc = loc () } }
@@ -389,28 +398,28 @@ lexpr:
    { infix_pp $1 PPand $3 }
 | NOT lexpr 
    { prefix_pp PPnot $2 }
-| lexpr relation lexpr %prec prec_relation
-   { infix_pp $1 $2 $3 }
-| lexpr PLUS lexpr
-   { infix_pp $1 PPadd $3 }
+| lexpr EQUAL lexpr 
+   { infix_pp $1 PPeq $3 }
+| lexpr NOTEQ lexpr 
+   { infix_pp $1 PPneq $3 }
+| lexpr INFIXOP0 lexpr 
+   { let id = { id = $2; id_loc = loc_i 2 } in
+     mk_pp (PPapp (Qident id, [$1; $3])) }
 | lexpr MINUS lexpr
-   { infix_pp $1 PPsub $3 }
-| lexpr TIMES lexpr
-   { infix_pp $1 PPmul $3 }
-| lexpr SLASH lexpr
-   { infix_pp $1 PPdiv $3 }
-| lexpr PERCENT lexpr
-   { infix_pp $1 PPmod $3 }
+   { let id = { id = "-"; id_loc = loc_i 2 } in
+     mk_pp (PPapp (Qident id, [$1; $3])) }
+| lexpr INFIXOP2 lexpr 
+   { let id = { id = $2; id_loc = loc_i 2 } in
+     mk_pp (PPapp (Qident id, [$1; $3])) }
+| lexpr INFIXOP3 lexpr 
+   { let id = { id = $2; id_loc = loc_i 2 } in
+     mk_pp (PPapp (Qident id, [$1; $3])) }
 | MINUS lexpr %prec uminus
    { prefix_pp PPneg $2 }
 | qualid
    { mk_pp (PPvar $1) }
 | qualid LEFTPAR list1_lexpr_sep_comma RIGHTPAR
    { mk_pp (PPapp ($1, $3)) }
-/***
-| qualid_ident LEFTSQ lexpr RIGHTSQ
-   { mk_pp (PPapp (Ident.access, [mk_pp_i 1 (PPvar $1); $3])) }
-***/
 | IF lexpr THEN lexpr ELSE lexpr %prec prec_if 
    { mk_pp (PPif ($2, $4, $6)) }
 | FORALL list1_lident_sep_comma COLON primitive_type triggers 
@@ -431,10 +440,6 @@ lexpr:
    { mk_pp PPtrue }
 | FALSE
    { mk_pp PPfalse }    
-/***
-| VOID
-   { mk_pp (PPconst ConstUnit) }
-***/
 | LEFTPAR lexpr RIGHTPAR
    { $2 }
 | ident_or_string COLON lexpr %prec prec_named
@@ -476,15 +481,6 @@ trigger:
 list1_lexpr_sep_comma:
 | lexpr                             { [$1] }
 | lexpr COMMA list1_lexpr_sep_comma { $1 :: $3 }
-;
-
-relation:
-| LT { PPlt }
-| LE { PPle }
-| GT { PPgt }
-| GE { PPge }
-| EQUAL { PPeq }
-| NOTEQ { PPneq }
 ;
 
 type_var:

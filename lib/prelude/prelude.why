@@ -5,11 +5,19 @@ theory Int
 
   type int
 
-  logic lt(int, int)
-  logic le(int, int)
-  logic gt(int, int)
-  logic ge(int, int)
+  logic (<) (int, int)
+  logic (<=)(int, int)
+  logic (>) (int, int)
+  logic (>=)(int, int)
   
+  logic ( + ) (int, int) : int
+  logic ( - ) (int, int) : int
+  logic ( * ) (int, int) : int
+  logic ( / ) (int, int) : int
+  logic ( % ) (int, int) : int
+  
+  axiom TestArith : forall x,y,z:int. x < y -> x+z < y+z
+
 end
 
 theory Bool
