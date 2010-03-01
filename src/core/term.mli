@@ -97,14 +97,11 @@ val pat_exists : (pattern -> bool) -> pattern -> bool
 val pat_s_map : (tysymbol -> tysymbol) -> (vsymbol -> ty -> vsymbol)
                       -> (fsymbol -> fsymbol) -> pattern -> pattern
 
-val pat_s_fold : ('a -> tysymbol -> 'a) -> ('a -> vsymbol -> 'a)
-                      -> ('a -> fsymbol -> 'a) -> 'a -> pattern -> 'a
+val pat_s_fold :
+     ('a -> tysymbol -> 'a) -> ('a -> fsymbol -> 'a) -> 'a -> pattern -> 'a
 
-val pat_s_forall : (tysymbol -> bool) -> (vsymbol -> bool)
-                      -> (fsymbol -> bool) -> pattern -> bool
-
-val pat_s_exists : (tysymbol -> bool) -> (vsymbol -> bool)
-                      -> (fsymbol -> bool) -> pattern -> bool
+val pat_s_forall : (tysymbol -> bool) -> (fsymbol -> bool) -> pattern -> bool
+val pat_s_exists : (tysymbol -> bool) -> (fsymbol -> bool) -> pattern -> bool
 
 (* equality modulo alpha *)
 
@@ -209,7 +206,7 @@ val t_open_branch : term_branch -> pattern * Svs.t * term
 val f_open_bound : fmla_bound -> vsymbol * fmla
 val f_open_branch : fmla_branch -> pattern * Svs.t * fmla
 
-(* safe opening map/fold *)
+(* opening map/fold *)
 
 val t_map_open : (term -> term) -> (fmla -> fmla) -> term -> term
 val f_map_open : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
@@ -225,7 +222,7 @@ val f_forall_open : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 val t_exists_open : (term -> bool) -> (fmla -> bool) -> term -> bool
 val f_exists_open : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 
-(* safe transparent map/fold *)
+(* transparent map/fold *)
 
 val t_map_trans : (term -> term) -> (fmla -> fmla) -> term -> term
 val f_map_trans : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
@@ -241,7 +238,7 @@ val f_forall_trans : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 val t_exists_trans : (term -> bool) -> (fmla -> bool) -> term -> bool
 val f_exists_trans : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 
-(* safe symbol-wise map/fold *)
+(* symbol-wise map/fold *)
 
 val t_s_map : (tysymbol -> tysymbol) -> (vsymbol -> ty -> vsymbol)
   -> (fsymbol -> fsymbol) -> (psymbol -> psymbol) -> term -> term
@@ -249,23 +246,37 @@ val t_s_map : (tysymbol -> tysymbol) -> (vsymbol -> ty -> vsymbol)
 val f_s_map : (tysymbol -> tysymbol) -> (vsymbol -> ty -> vsymbol)
   -> (fsymbol -> fsymbol) -> (psymbol -> psymbol) -> fmla -> fmla
 
-val t_s_fold : ('a -> tysymbol -> 'a) -> ('a -> vsymbol -> 'a)
-  -> ('a -> fsymbol -> 'a) -> ('a -> psymbol -> 'a) -> 'a -> term -> 'a
+val t_s_fold : ('a -> tysymbol -> 'a) -> ('a -> fsymbol -> 'a)
+            -> ('a -> psymbol -> 'a) -> 'a -> term -> 'a
 
-val f_s_fold : ('a -> tysymbol -> 'a) -> ('a -> vsymbol -> 'a)
-  -> ('a -> fsymbol -> 'a) -> ('a -> psymbol -> 'a) -> 'a -> fmla -> 'a
+val f_s_fold : ('a -> tysymbol -> 'a) -> ('a -> fsymbol -> 'a)
+            -> ('a -> psymbol -> 'a) -> 'a -> fmla -> 'a
 
-val t_s_forall : (tysymbol -> bool) -> (vsymbol -> bool)
-  -> (fsymbol -> bool) -> (psymbol -> bool) -> term -> bool
+val t_s_forall : (tysymbol -> bool) -> (fsymbol -> bool)
+                                    -> (psymbol -> bool) -> term -> bool
 
-val f_s_forall : (tysymbol -> bool) -> (vsymbol -> bool)
-  -> (fsymbol -> bool) -> (psymbol -> bool) -> fmla -> bool
+val f_s_forall : (tysymbol -> bool) -> (fsymbol -> bool)
+                                    -> (psymbol -> bool) -> fmla -> bool
 
-val t_s_exists : (tysymbol -> bool) -> (vsymbol -> bool)
-  -> (fsymbol -> bool) -> (psymbol -> bool) -> term -> bool
+val t_s_exists : (tysymbol -> bool) -> (fsymbol -> bool)
+                                    -> (psymbol -> bool) -> term -> bool
 
-val f_s_exists : (tysymbol -> bool) -> (vsymbol -> bool)
-  -> (fsymbol -> bool) -> (psymbol -> bool) -> fmla -> bool
+val f_s_exists : (tysymbol -> bool) -> (fsymbol -> bool)
+                                    -> (psymbol -> bool) -> fmla -> bool
+
+(* map/fold over free variables *)
+
+val t_v_map : (vsymbol -> term) -> term -> term
+val f_v_map : (vsymbol -> term) -> fmla -> fmla
+
+val t_v_fold : ('a -> vsymbol -> 'a) -> 'a -> term -> 'a
+val f_v_fold : ('a -> vsymbol -> 'a) -> 'a -> fmla -> 'a
+
+val t_v_forall : (vsymbol -> bool) -> term -> bool
+val f_v_forall : (vsymbol -> bool) -> fmla -> bool
+
+val t_v_exists : (vsymbol -> bool) -> term -> bool
+val f_v_exists : (vsymbol -> bool) -> fmla -> bool
 
 (* variable occurrence check *)
 

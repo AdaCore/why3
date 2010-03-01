@@ -268,14 +268,8 @@ let known_fs kn () fs = known_id kn fs.fs_name
 let known_ps kn () ps = known_id kn ps.ps_name
 
 let known_ty kn ty = ty_s_fold (known_ts kn) () ty
-
-let known_term kn t =
-  t_s_fold (known_ts kn) (fun _ _ -> ())
-           (known_fs kn) (known_ps kn) () t
-
-let known_fmla kn f =
-  f_s_fold (known_ts kn) (fun _ _ -> ())
-           (known_fs kn) (known_ps kn) () f
+let known_term kn t = t_s_fold (known_ts kn) (known_fs kn) (known_ps kn) () t
+let known_fmla kn f = f_s_fold (known_ts kn) (known_fs kn) (known_ps kn) () f
 
 let merge_known kn1 kn2 =
   let add id tid kn =
