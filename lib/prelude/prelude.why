@@ -99,6 +99,34 @@ theory Array
 
 end
 
+theory Set
+
+  type 'a t 
+
+  logic mem ('a, 'a t)
+
+  logic empty : 'a t
+
+  axiom Empty_def1 : forall x : 'a. not mem(x, empty)
+
+  logic add ('a, 'a t) : 'a t
+
+  axiom Add_def1 : 
+    forall x, y : 'a. forall s : 'a t.
+    mem(x, add(y, s)) <-> (x = y or mem(x, s))
+
+  logic union('a t, 'a t) : 'a t
+
+  axiom Union_def1 : 
+    forall s1, s2 : 'a t. forall x : 'a.
+    mem(x, union(s1, s2)) <-> (mem(x, s1) or mem(x, s2))
+
+  logic equal(s1 : 'a t, s2 : 'a t) = forall x : 'a. mem(x, s1) <-> mem(x, s2)
+
+end
+
+
+
 (*
 Local Variables: 
 compile-command: "make -C ../.. test"

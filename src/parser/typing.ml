@@ -545,41 +545,21 @@ let add_types loc dl th =
   let dl = List.map decl dl in
   add_decl th (create_type dl)
 
-(*
-let add_function loc pl t th {id=id} =
-  let ns = get_namespace th in
-  if Mnm.mem id ns.ns_fs then error ~loc (Clash id);
-  let denv = create_denv th in
-  let pl = List.map (dty denv) pl and t = dty denv t in
-  let pl = List.map ty pl and t = ty t in
-  (* TODO: add the theory name to the long name *)
-  let v = id_user id loc in
-  let s = create_fsymbol v (pl, t) false in
-  add_decl th (create_logic [Lfunction (s, None)])
-
-let add_predicate loc pl th {id=id} =
-  let ns = get_namespace th in
-  if Mnm.mem id ns.ns_ps then error ~loc (Clash id);
-  let denv = create_denv th in
-  let pl = List.map (dty denv) pl in
-  let pl = List.map ty pl in
-  (* TODO: add the theory name to the long name *)
-  let v = id_user id loc in
-  let s = create_psymbol v pl in
-  add_decl th (create_logic [Lpredicate (s, None)])
-*)
-
 let env_of_vsymbol_list vl =
   List.fold_left (fun env v -> M.add v.vs_name.id_short v env) M.empty vl
 
 let add_logics loc dl th =
+  let ns = get_namespace th in
   let fsymbols = Hashtbl.create 17 in
   let psymbols = Hashtbl.create 17 in
+  let denvs = Hashtbl.create 17 in
   (* 1. create all symbols and make an environment with these symbols *)
   let create_symbol th d = 
     let id = d.ld_ident.id in
+    if Hashtbl.mem denvs id || Mnm.mem id ns.ns_fs then error ~loc (Clash id);
     let v = id_user id loc in
     let denv = create_denv th in
+    Hashtbl.add denvs id denv;
     let type_ty (_,t) = ty (dty denv t) in
     let pl = List.map type_ty d.ld_params in
     match d.ld_type with
@@ -601,7 +581,9 @@ let add_logics loc dl th =
       | None -> denv
       | Some id -> { denv with dvars = M.add id.id (dty denv ty) denv.dvars }
     in
-    let denv = List.fold_left dadd_var (create_denv th') d.ld_params in
+    let denv = Hashtbl.find denvs id in
+    let denv = { denv with th = th' } in
+    let denv = List.fold_left dadd_var denv d.ld_params in
     let create_var (x, _) ty = 
       let id = match x with 
 	| None -> id_fresh "%x"
@@ -622,16 +604,22 @@ let add_logics loc dl th =
 	      let env = env_of_vsymbol_list vl in
               make_pdef ps vl (fmla env f)
         end
-    | Some _ -> (* function *)
+    | Some ty -> (* function *)
 	let fs = Hashtbl.find fsymbols id in
 	begin match d.ld_def with
 	  | None -> 
               Lfunction (fs, None)
 	  | Some t -> 
+	      let loc = t.pp_loc in
 	      let t = dterm denv t in
 	      let vl = mk_vlist (fst fs.fs_scheme) in
 	      let env = env_of_vsymbol_list vl in
-              make_fdef fs vl (term env t)
+              try 
+		make_fdef fs vl (term env t) 
+	      with _ -> 
+		error ~loc (TermExpectedType 
+			      ((fun f -> print_dty f t.dt_ty),
+			       (fun f -> print_dty f (dty denv ty))))
         end
   in
   let dl = List.map type_decl dl in

@@ -1,6 +1,10 @@
 
 (* test file *)
 
+theory Test
+  logic id(x:'a) : 'a = x
+end
+
 theory TestPrelude 
   use prelude.Int
   use prelude.List
@@ -8,11 +12,13 @@ end
 
 theory A
   use import prelude.Int
-  type t
-  logic p(t)
-  logic q(x: t) = p(x)
-  logic c : int = 42
-  logic c' : real = 42.5
+ 
+  logic c : int
+
+  type 'a t
+
+  logic mem('a, 'a t)
+  logic p(s : 'a t) = forall x:'a. mem(x, s)
 end
 
 theory B

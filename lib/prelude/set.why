@@ -1,18 +1,3 @@
-theory Set
-  type 'a t 
-
-  logic mem ('a , 'a t)
-
-  logic empty : 'a t
-
-  axiom empty_def1 : forall x:'a. not mem(x, empty)
-
-  logic add ('a, 'a t) : 'a t
-
-  axiom add_def1 : forall x,y:'a. forall s:'a t.
-                   mem(x, add(y, s)) <-> (x = y or mem(x, s))
-end
-
 theory Set_list 
     use open List
     logic add(x:'a,s:'a t) : 'a t = Cons(x,s)   
