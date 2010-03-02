@@ -173,7 +173,7 @@ exception ConstructorExpected of fsymbol
 let pat_app fs pl ty =
   if not fs.fs_constr then raise (ConstructorExpected fs);
   let args, res = fs.fs_scheme in
-  ignore (try 
+  ignore (try
     List.fold_left2 Ty.matching
       (Ty.matching Mid.empty res ty)
         args (List.map (fun p -> p.pat_ty) pl)
@@ -617,6 +617,7 @@ let f_v_any pr f = try f_v_fold (any_fn pr) 0 false f with FoldSkip -> true
 
 let t_v_map fn = t_v_map fn 0
 let f_v_map fn = f_v_map fn 0
+
 let t_v_fold fn = t_v_fold fn 0
 let f_v_fold fn = f_v_fold fn 0
 
@@ -1077,6 +1078,7 @@ let f_open_branch (pat, _, f) =
 (* safe opening map *)
 
 let t_branch fn b = let pat,_,t = t_open_branch b in (pat, fn t)
+let f_branch fn b = let pat,_,f = f_open_branch b in (pat, fn f)
 
 let t_map fnT fnF t = t_label_try t.t_label (match t.t_node with
   | Tbvar _ -> assert false
@@ -1085,8 +1087,6 @@ let t_map fnT fnF t = t_label_try t.t_label (match t.t_node with
   | Tlet (t1, b) -> let u,t2 = t_open_bound b in t_let u (fnT t1) (fnT t2)
   | Tcase (t1, bl) -> t_case (fnT t1) (List.map (t_branch fnT) bl) t.t_ty
   | Teps b -> let u,f = f_open_bound b in t_eps u (fnF f))
-
-let f_branch fn b = let pat,_,f = f_open_branch b in (pat, fn f)
 
 let f_map fnT fnF f = f_label_try f.f_label (match f.f_node with
   | Fapp (p, tl) -> f_app p (List.map fnT tl)

@@ -140,8 +140,8 @@ exception IllegalTypeAlias of tysymbol
 exception UnboundTypeVar of ident
 
 exception IllegalConstructor of fsymbol
-exception MalformedDefinition
 exception UnboundVars of Svs.t
+exception BadDecl of ident
 
 let check_fvs f =
   let fvs = f_freevars Svs.empty f in
@@ -192,12 +192,10 @@ let create_type tdl =
 
 let create_logic ldl =
   let check_decl = function
-    | Lfunction (fs, Some fd) ->
-        let (s,_,_,_) = fd in
-        if fs != s then raise MalformedDefinition
-    | Lpredicate (ps, Some pd) ->
-        let (s,_,_,_) = pd in
-        if ps != s then raise MalformedDefinition
+    | Lfunction (fs, Some (s,_,_,_)) when s != fs ->
+        raise (BadDecl fs.fs_name)
+    | Lpredicate (ps, Some (s,_,_,_)) when s != ps ->
+        raise (BadDecl ps.ps_name)
     | Linductive (ps,la) ->
         let check_ax (_,f) =
           ignore (check_fvs f);

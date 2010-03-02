@@ -84,8 +84,8 @@ exception IllegalTypeAlias of tysymbol
 exception UnboundTypeVar of ident
 
 exception IllegalConstructor of fsymbol
-exception MalformedDefinition
 exception UnboundVars of Svs.t
+exception BadDecl of ident
 
 (** Theory *)
 
