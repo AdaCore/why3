@@ -96,11 +96,11 @@ val pat_any : (pattern -> bool) -> pattern -> bool
 
 (* symbol-wise map/fold *)
 
-val pat_s_map : (tysymbol -> tysymbol) -> (vsymbol -> ty -> vsymbol)
-                      -> (fsymbol -> fsymbol) -> pattern -> pattern
+val pat_s_map :
+  (tysymbol -> tysymbol) -> (fsymbol -> fsymbol) -> pattern -> pattern
 
 val pat_s_fold :
-     ('a -> tysymbol -> 'a) -> ('a -> fsymbol -> 'a) -> 'a -> pattern -> 'a
+  ('a -> tysymbol -> 'a) -> ('a -> fsymbol -> 'a) -> 'a -> pattern -> 'a
 
 val pat_s_all : (tysymbol -> bool) -> (fsymbol -> bool) -> pattern -> bool
 val pat_s_any : (tysymbol -> bool) -> (fsymbol -> bool) -> pattern -> bool
@@ -234,10 +234,10 @@ val t_map : (term -> term) -> (fmla -> fmla) -> term -> term
 val f_map : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
 
 val t_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
-                                      -> 'a -> term -> 'a
+                                 -> 'a -> term -> 'a
 
 val f_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
-                                      -> 'a -> fmla -> 'a
+                                 -> 'a -> fmla -> 'a
 
 val t_all : (term -> bool) -> (fmla -> bool) -> term -> bool
 val f_all : (term -> bool) -> (fmla -> bool) -> fmla -> bool
@@ -246,29 +246,29 @@ val f_any : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 
 (* symbol-wise map/fold *)
 
-val t_s_map : (tysymbol -> tysymbol) -> (vsymbol -> ty -> vsymbol)
-  -> (fsymbol -> fsymbol) -> (psymbol -> psymbol) -> term -> term
+val t_s_map : (tysymbol -> tysymbol) -> (fsymbol -> fsymbol)
+                    -> (psymbol -> psymbol) -> term -> term
 
-val f_s_map : (tysymbol -> tysymbol) -> (vsymbol -> ty -> vsymbol)
-  -> (fsymbol -> fsymbol) -> (psymbol -> psymbol) -> fmla -> fmla
+val f_s_map : (tysymbol -> tysymbol) -> (fsymbol -> fsymbol)
+                    -> (psymbol -> psymbol) -> fmla -> fmla
 
 val t_s_fold : ('a -> tysymbol -> 'a) -> ('a -> fsymbol -> 'a)
-            -> ('a -> psymbol -> 'a) -> 'a -> term -> 'a
+                 -> ('a -> psymbol -> 'a) -> 'a -> term -> 'a
 
 val f_s_fold : ('a -> tysymbol -> 'a) -> ('a -> fsymbol -> 'a)
-            -> ('a -> psymbol -> 'a) -> 'a -> fmla -> 'a
+                 -> ('a -> psymbol -> 'a) -> 'a -> fmla -> 'a
 
 val t_s_all : (tysymbol -> bool) -> (fsymbol -> bool)
-                                    -> (psymbol -> bool) -> term -> bool
+                -> (psymbol -> bool) -> term -> bool
 
 val f_s_all : (tysymbol -> bool) -> (fsymbol -> bool)
-                                    -> (psymbol -> bool) -> fmla -> bool
+                -> (psymbol -> bool) -> fmla -> bool
 
 val t_s_any : (tysymbol -> bool) -> (fsymbol -> bool)
-                                    -> (psymbol -> bool) -> term -> bool
+                -> (psymbol -> bool) -> term -> bool
 
 val f_s_any : (tysymbol -> bool) -> (fsymbol -> bool)
-                                    -> (psymbol -> bool) -> fmla -> bool
+                -> (psymbol -> bool) -> fmla -> bool
 
 (* map/fold over free variables *)
 
