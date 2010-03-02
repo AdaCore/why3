@@ -47,7 +47,7 @@ let rec print_term fmt t = match t.t_node with
   | Tvar n -> 
       print_ident fmt n.vs_name
   | Tconst _ ->
-      assert false
+      fprintf fmt "[const]"
   | Tapp (s, tl) ->
       fprintf fmt "(%a(%a@,)@ : %a@,@,)" 
 	print_ident s.fs_name (print_list comma print_term) tl
@@ -118,11 +118,11 @@ let print_vsymbol fmt {vs_name = vs_name; vs_ty = vs_ty} =
 let print_logic_decl fmt = function
   | Lfunction (fs,None) -> fprintf fmt "logic %a@." print_fsymbol fs
   | Lfunction (fs,Some fd) -> 
-      fprintf fmt "logic %a @: %a@." print_ident fs.fs_name
+      fprintf fmt "logic %a :@ %a@." print_ident fs.fs_name
         print_fmla fd
   | Lpredicate (fs,None) -> fprintf fmt "logic %a@." print_psymbol fs
   | Lpredicate (ps,Some fd) -> 
-      fprintf fmt "logic %a @: %a@." print_ident ps.ps_name
+      fprintf fmt "logic %a :@ %a@." print_ident ps.ps_name
         print_fmla fd
   | Linductive _ -> assert false (*TODO*)
 

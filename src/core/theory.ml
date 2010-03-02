@@ -181,7 +181,7 @@ let create_logic ldl =
     check_fv fd;
     match fd.f_node with
       | Fquant (Fforall, fq) -> f_open_quant fq
-      | _ -> raise (MalformedDefinition fd)
+      | _ -> ([],[],fd)
   in
   let check_ax (_,f) =
     check_fv f;

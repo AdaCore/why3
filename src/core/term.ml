@@ -960,7 +960,7 @@ let f_let v t1 f2 =
 
 let t_eps v f = t_eps v (f_abst_single v f)
 
-let f_quant q vl tl f =
+let f_quant q vl tl f = if vl = [] then f else
   let i = ref (-1) in
   let add m v = incr i; Mvs.add v !i m in
   let m = List.fold_left add Mvs.empty vl in
@@ -1248,7 +1248,7 @@ let ps_neq =
   create_psymbol (id_fresh "<>") [v; v]
 
 (* FIXME: is it right to do so? *)
-let f_app p tl = 
+let f_app p tl =
   if p == ps_neq then f_not (f_app ps_equ tl) else f_app p tl
 
 let f_equ t1 t2 = f_app ps_equ [t1; t2]
