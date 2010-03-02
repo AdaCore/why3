@@ -133,9 +133,11 @@ let create_prop k i f = Hdecl.hashcons (mk_decl (Dprop (k, id_register i, f)))
 (* error reporting *)
 
 exception NotAConstructor of fsymbol
-exception MalformedDefinition of fmla
 exception IllegalTypeAlias of tysymbol
 exception UnboundTypeVar of ident
+
+exception IllegalConstructor of fsymbol
+exception MalformedDefinition of fmla
 exception UnboundVars of Svs.t
 
 let make_fdef fs vl t =
@@ -189,6 +191,7 @@ let create_logic ldl =
   in
   let check_decl = function
     | Lfunction (fs, Some fd) ->
+        if fs.fs_constr then raise (IllegalConstructor fs);
         let (vl,_,f) = check_def fd in
         let hd = match f.f_node with
           | Fapp (ps, [hd; _]) when ps == ps_equ -> hd

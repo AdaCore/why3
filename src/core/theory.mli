@@ -71,9 +71,11 @@ val create_prop : prop_kind -> preid -> fmla -> decl
 (* exceptions *)
 
 exception NotAConstructor of fsymbol
-exception MalformedDefinition of fmla
 exception IllegalTypeAlias of tysymbol
 exception UnboundTypeVar of ident
+
+exception IllegalConstructor of fsymbol
+exception MalformedDefinition of fmla
 exception UnboundVars of Svs.t
 
 (** Theory *)
