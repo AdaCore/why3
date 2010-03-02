@@ -35,9 +35,12 @@ type ty_decl = tysymbol * ty_def
 
 (* logic declaration *)
 
+type fs_defn = fsymbol * vsymbol list * term * fmla
+type ps_defn = psymbol * vsymbol list * fmla * fmla
+
 type logic_decl =
-  | Lfunction  of fsymbol * fmla option
-  | Lpredicate of psymbol * fmla option
+  | Lfunction  of fsymbol * fs_defn option
+  | Lpredicate of psymbol * ps_defn option
   | Linductive of psymbol * (ident * fmla) list
 
 (* proposition declaration *)
@@ -74,7 +77,7 @@ module D = struct
     | _ -> false
 
   let eq_fd fs1 fd1 fs2 fd2 = fs1 == fs2 && match fd1,fd2 with
-    | Some fd1, Some fd2 -> fd1 == fd2
+    | Some (_,_,_,fd1), Some (_,_,_,fd2) -> fd1 == fd2
     | None, None -> true
     | _ -> false
 
@@ -97,7 +100,7 @@ module D = struct
         let tag fs = fs.fs_name.id_tag in
         1 + Hashcons.combine_list tag ts.ts_name.id_tag l
 
-  let hs_fd fd = Hashcons.combine_option (fun f -> f.f_tag) fd
+  let hs_fd fd = Hashcons.combine_option (fun (_,_,_,f) -> f.f_tag) fd
 
   let hs_ld ld = match ld with
     | Lfunction  (fs,fd) -> Hashcons.combine fs.fs_name.id_tag (hs_fd fd)
@@ -137,16 +140,29 @@ exception IllegalTypeAlias of tysymbol
 exception UnboundTypeVar of ident
 
 exception IllegalConstructor of fsymbol
-exception MalformedDefinition of fmla
+exception MalformedDefinition
 exception UnboundVars of Svs.t
 
-let make_fdef fs vl t =
-  let hd = t_app fs (List.map t_var vl) t.t_ty in
-  Lfunction  (fs, Some (f_forall vl [] (f_equ hd t)))
+let check_fvs f =
+  let fvs = f_freevars Svs.empty f in
+  if Svs.is_empty fvs then f else raise (UnboundVars fvs)
 
-let make_pdef ps vl f =
+let make_fs_defn fs vl t =
+  if fs.fs_constr then raise (IllegalConstructor fs);
+  let hd = t_app fs (List.map t_var vl) t.t_ty in
+  let fd = f_forall vl [] (f_equ hd t) in
+  fs, vl, t, check_fvs fd
+
+let make_ps_defn ps vl f =
   let hd = f_app ps (List.map t_var vl) in
-  Lpredicate (ps, Some (f_forall vl [] (f_iff hd f)))
+  let pd = f_forall vl [] (f_iff hd f) in
+  ps, vl, f, check_fvs pd
+
+let open_fs_defn (fs,vl,t,_) = (fs,vl,t)
+let open_ps_defn (ps,vl,f,_) = (ps,vl,f)
+
+let fs_defn_axiom (_,_,_,fd) = fd
+let ps_defn_axiom (_,_,_,pd) = pd
 
 let create_type tdl =
   let check_constructor ty fs =
@@ -175,43 +191,18 @@ let create_type tdl =
   create_type tdl
 
 let create_logic ldl =
-  let check_fv f =
-    let fvs = f_freevars Svs.empty f in
-    if not (Svs.is_empty fvs) then raise (UnboundVars fvs);
-  in
-  let check_def fd =
-    check_fv fd;
-    match fd.f_node with
-      | Fquant (Fforall, fq) -> f_open_quant fq
-      | _ -> ([],[],fd)
-  in
-  let check_ax (_,f) =
-    check_fv f;
-    assert false (* TODO *)
-  in
   let check_decl = function
     | Lfunction (fs, Some fd) ->
-        if fs.fs_constr then raise (IllegalConstructor fs);
-        let (vl,_,f) = check_def fd in
-        let hd = match f.f_node with
-          | Fapp (ps, [hd; _]) when ps == ps_equ -> hd
-          | _ -> raise (MalformedDefinition fd)
-        in
-        let t = try t_app fs (List.map t_var vl) hd.t_ty with
-          | _ -> raise (MalformedDefinition fd)
-        in
-        if t != hd then raise (MalformedDefinition fd)
+        let (s,_,_,_) = fd in
+        if fs != s then raise MalformedDefinition
     | Lpredicate (ps, Some pd) ->
-        let (vl,_,f) = check_def pd in
-        let hd = match f.f_node with
-          | Fbinop (Fiff, hd, _) -> hd
-          | _ -> raise (MalformedDefinition pd)
-        in
-        let f = try f_app ps (List.map t_var vl) with
-          | _ -> raise (MalformedDefinition pd)
-        in
-        if f != hd then raise (MalformedDefinition pd)
+        let (s,_,_,_) = pd in
+        if ps != s then raise MalformedDefinition
     | Linductive (ps,la) ->
+        let check_ax (_,f) =
+          ignore (check_fvs f);
+          assert false (* TODO *)
+        in
         List.iter check_ax la
     | _ -> ()
   in
@@ -459,13 +450,13 @@ let check_logic kn = function
       known_ty kn (snd fs.fs_scheme);
       List.iter (known_ty kn) (fst fs.fs_scheme);
       begin match df with
-        | Some f -> known_fmla kn f
+        | Some (_,_,_,f) -> known_fmla kn f
         | None -> ()
       end
   | Lpredicate (ps, dp) ->
       List.iter (known_ty kn) ps.ps_scheme;
       begin match dp with
-        | Some f -> known_fmla kn f
+        | Some (_,_,_,f) -> known_fmla kn f
         | None -> ()
       end
   | Linductive (ps, la) ->
@@ -509,7 +500,7 @@ let clone_export uc th i =
   let ts_table = Hashtbl.create 17 in
   let known = ref th.th_known in
   let rec memo_ts ts =
-    try 
+    try
       Hashtbl.find ts_table ts.ts_name
     with Not_found ->
       let nm = id_clone ts.ts_name in
@@ -522,14 +513,14 @@ let clone_export uc th i =
       known := Mid.add ts'.ts_name uc.uc_name (Mid.remove ts.ts_name !known);
       ts'
   in
-  let find_ts ts = 
+  let find_ts ts =
     let tid = Mid.find ts.ts_name th.th_known in
     if tid == th.th_name then memo_ts ts else ts
   in
   (* 1. merge in the new namespace *)
   let rec merge_namespace acc ns =
-    let acc = 
-      Mnm.fold (fun n ts acc -> add_ts n (find_ts ts) acc) ns.ns_ts acc 
+    let acc =
+      Mnm.fold (fun n ts acc -> add_ts n (find_ts ts) acc) ns.ns_ts acc
     in
     (* ... *)
     (* let acc = Mnm.fold (fun n ns acc -> ) ns.ns_ns acc in *)

@@ -657,32 +657,30 @@ let add_logics loc dl th =
     match d.ld_type with
     | None -> (* predicate *)
 	let ps = Hashtbl.find psymbols id in
-	begin match d.ld_def with
-	  | None -> 
-              Lpredicate (ps, None)
+        let defn = match d.ld_def with
+	  | None -> None
 	  | Some f -> 
 	      let f = dfmla denv f in
 	      let vl = mk_vlist ps.ps_scheme in
 	      let env = env_of_vsymbol_list vl in
-              make_pdef ps vl (fmla env f)
-        end
+              Some (make_ps_defn ps vl (fmla env f))
+        in
+        Lpredicate (ps, defn)
     | Some ty -> (* function *)
 	let fs = Hashtbl.find fsymbols id in
-	begin match d.ld_def with
-	  | None -> 
-              Lfunction (fs, None)
+        let defn = match d.ld_def with
+	  | None -> None
 	  | Some t -> 
 	      let loc = t.pp_loc in
 	      let t = dterm denv t in
 	      let vl = mk_vlist (fst fs.fs_scheme) in
 	      let env = env_of_vsymbol_list vl in
-              try 
-		make_fdef fs vl (term env t) 
-	      with _ -> 
-		error ~loc (TermExpectedType 
-			      ((fun f -> print_dty f t.dt_ty),
-			       (fun f -> print_dty f (dty denv ty))))
-        end
+              try Some (make_fs_defn fs vl (term env t))
+	      with _ -> error ~loc (TermExpectedType 
+                ((fun f -> print_dty f t.dt_ty),
+                 (fun f -> print_dty f (dty denv ty))))
+        in
+        Lfunction (fs, defn)
   in
   let dl = List.map type_decl dl in
   add_decl th (create_logic dl)

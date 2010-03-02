@@ -102,13 +102,15 @@ let elt d =
                 let s = match l with
                   | None -> Sid.empty
                   | Some fd -> 
+                      let fd = fs_defn_axiom fd in
                       f_s_fold tyoccurences toccurences foccurences Sid.empty fd in
                 Mid.add fs.fs_name s acc
              | Lpredicate (ps,l) -> 
                 let s = match l with
                   | None -> Sid.empty
                   | Some fd -> 
-                      f_s_fold  tyoccurences toccurences foccurences Sid.empty fd in
+                      let fd = ps_defn_axiom fd in
+                      f_s_fold tyoccurences toccurences foccurences Sid.empty fd in
                 Mid.add ps.ps_name s acc
              | Linductive (ps,l) -> 
                 let s = List.fold_left 

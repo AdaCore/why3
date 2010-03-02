@@ -20,10 +20,6 @@
 open Ident
 open Ty
 
-exception NonLinear
-exception BadArity
-exception ConstructorExpected
-
 (** Variable symbols *)
 
 type vsymbol = private {
@@ -63,6 +59,12 @@ val create_psymbol : preid -> ty list -> psymbol
 module Sps : Set.S with type elt = psymbol
 module Mps : Map.S with type key = psymbol
 module Hps : Hashtbl.S with type key = psymbol
+
+(** Exceptions *)
+
+exception BadArity
+exception NonLinear of vsymbol
+exception ConstructorExpected of fsymbol
 
 (** Patterns *)
 

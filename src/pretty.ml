@@ -126,11 +126,11 @@ let print_logic_decl fmt = function
   | Lfunction (fs,None) -> fprintf fmt "@[<hov 2>logic %a@]" print_fsymbol fs
   | Lfunction (fs,Some fd) -> 
       fprintf fmt "@[<hov 2>logic %a :@ %a@]" print_ident fs.fs_name
-        print_fmla fd
+        print_fmla (fs_defn_axiom fd)
   | Lpredicate (fs,None) -> fprintf fmt "@[<hov 2>logic %a@]" print_psymbol fs
   | Lpredicate (ps,Some fd) -> 
       fprintf fmt "@[<hov 2>logic %a :@ %a@]" print_ident ps.ps_name
-        print_fmla fd
+        print_fmla (ps_defn_axiom fd)
   | Linductive _ -> assert false (*TODO*)
 
 let print_decl fmt d = match d.d_node with

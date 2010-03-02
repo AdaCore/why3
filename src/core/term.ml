@@ -168,18 +168,17 @@ let pat_any pr pat =
 
 exception BadArity
 
-exception ConstructorExpected
+exception ConstructorExpected of fsymbol
 
-let pat_app f pl ty =
-  if not f.fs_constr then raise ConstructorExpected else
-  let args, res = f.fs_scheme in
-  let _ =
-    try List.fold_left2 matching
-        (matching Mid.empty res ty)
+let pat_app fs pl ty =
+  if not fs.fs_constr then raise (ConstructorExpected fs);
+  let args, res = fs.fs_scheme in
+  ignore (try 
+    List.fold_left2 Ty.matching
+      (Ty.matching Mid.empty res ty)
         args (List.map (fun p -> p.pat_ty) pl)
-    with Invalid_argument _ -> raise BadArity
-  in
-  pat_app f pl ty
+    with Invalid_argument _ -> raise BadArity);
+  pat_app fs pl ty
 
 let pat_as p v =
   if p.pat_ty == v.vs_ty then pat_as p v else raise TypeMismatch
@@ -975,12 +974,16 @@ let f_let v t1 f2 =
 
 let t_eps v f = t_eps v (f_abst_single v f)
 
+exception NonLinear of vsymbol
+
 let f_quant q vl tl f = if vl = [] then f else
   let i = ref (-1) in
-  let add m v = incr i; Mvs.add v !i m in
+  let add m v =
+    if Mvs.mem v m then raise (NonLinear v);
+    incr i; Mvs.add v !i m
+  in
   let m = List.fold_left add Mvs.empty vl in
   let tl = tr_map (t_abst m 0) (f_abst m 0) tl in
-  (* FIXME: should we do any checks for triggers? *)
   f_quant q vl (!i + 1) tl (f_abst m 0 f)
 
 let f_forall = f_quant Fforall
@@ -1004,16 +1007,14 @@ let f_app p tl =
   in
   f_app p tl
 
-exception NonLinear
-
 let pat_varmap p =
   let i = ref (-1) in
   let rec mk_map acc p = match p.pat_node with
     | Pvar n ->
-        if Mvs.mem n acc then raise NonLinear;
+        if Mvs.mem n acc then raise (NonLinear n);
         incr i; Mvs.add n !i acc
     | Pas (p, n) ->
-        if Mvs.mem n acc then raise NonLinear;
+        if Mvs.mem n acc then raise (NonLinear n);
         incr i; mk_map (Mvs.add n !i acc) p
     | _ -> pat_fold mk_map acc p
   in
@@ -1022,15 +1023,15 @@ let pat_varmap p =
 
 let t_case t bl ty =
   let t_make_branch (p, tbr) =
-    if tbr.t_ty != ty then raise TypeMismatch else
-    if p.pat_ty != t.t_ty then raise TypeMismatch else
+    if tbr.t_ty != ty then raise TypeMismatch;
+    if p.pat_ty != t.t_ty then raise TypeMismatch;
     let m, nv = pat_varmap p in (p, nv, t_abst m 0 tbr)
   in
   t_case t (List.map t_make_branch bl) ty
 
 let f_case t bl =
   let f_make_branch (p, fbr) =
-    if p.pat_ty != t.t_ty then raise TypeMismatch else
+    if p.pat_ty != t.t_ty then raise TypeMismatch;
     let m, nv = pat_varmap p in (p, nv, f_abst m 0 fbr)
   in
   f_case t (List.map f_make_branch bl)

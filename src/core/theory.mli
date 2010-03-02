@@ -33,9 +33,12 @@ type ty_decl = tysymbol * ty_def
 
 (* logic declaration *)
 
+type fs_defn
+type ps_defn
+
 type logic_decl =
-  | Lfunction  of fsymbol * fmla option
-  | Lpredicate of psymbol * fmla option
+  | Lfunction  of fsymbol * fs_defn option
+  | Lpredicate of psymbol * ps_defn option
   | Linductive of psymbol * (ident * fmla) list
 
 (* proposition declaration *)
@@ -61,8 +64,14 @@ type decl = private {
 
 (* smart constructors *)
 
-val make_fdef : fsymbol -> vsymbol list -> term -> logic_decl
-val make_pdef : psymbol -> vsymbol list -> fmla -> logic_decl
+val make_fs_defn : fsymbol -> vsymbol list -> term -> fs_defn
+val make_ps_defn : psymbol -> vsymbol list -> fmla -> ps_defn
+
+val open_fs_defn : fs_defn -> fsymbol * vsymbol list * term
+val open_ps_defn : ps_defn -> psymbol * vsymbol list * fmla
+
+val fs_defn_axiom : fs_defn -> fmla
+val ps_defn_axiom : ps_defn -> fmla
 
 val create_type : ty_decl list -> decl
 val create_logic : logic_decl list -> decl
@@ -75,7 +84,7 @@ exception IllegalTypeAlias of tysymbol
 exception UnboundTypeVar of ident
 
 exception IllegalConstructor of fsymbol
-exception MalformedDefinition of fmla
+exception MalformedDefinition
 exception UnboundVars of Svs.t
 
 (** Theory *)
