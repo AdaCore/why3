@@ -91,33 +91,28 @@ let elt d =
                      | Lfunction  (fs,_) as a -> Hid.add mem fs.fs_name a
                      | Lpredicate (ps,_) as a -> Hid.add mem ps.ps_name a
                      | Linductive (ps,_) as a -> Hid.add mem ps.ps_name a) l;
-        let toccurences acc t = 
-          match t.t_node with
-            | Tapp (fs,_) when Hid.mem mem fs.fs_name -> 
-                Sid.add fs.fs_name acc
-            | _ -> acc in
-        let foccurences acc f =
-          match f.f_node with
-            | Fapp (ps,_) when Hid.mem mem ps.ps_name -> 
-                Sid.add ps.ps_name acc
-            | _ -> acc in 
+        let tyoccurences acc _ = acc in
+        let toccurences acc fs = 
+          if Hid.mem mem fs.fs_name then Sid.add fs.fs_name acc else acc in
+        let foccurences acc ps =
+          if  Hid.mem mem ps.ps_name then Sid.add ps.ps_name acc else acc in
         let m = List.fold_left 
           (fun acc a -> match a with 
              | Lfunction (fs,l) -> 
                 let s = match l with
                   | None -> Sid.empty
                   | Some fd -> 
-                      f_fold_trans toccurences foccurences Sid.empty fd in
+                      f_s_fold tyoccurences toccurences foccurences Sid.empty fd in
                 Mid.add fs.fs_name s acc
              | Lpredicate (ps,l) -> 
                 let s = match l with
                   | None -> Sid.empty
                   | Some fd -> 
-                      f_fold_trans toccurences foccurences Sid.empty fd in
+                      f_s_fold  tyoccurences toccurences foccurences Sid.empty fd in
                 Mid.add ps.ps_name s acc
              | Linductive (ps,l) -> 
                 let s = List.fold_left 
-                  (fun acc (_,f) -> f_fold_trans toccurences foccurences acc f)
+                  (fun acc (_,f) -> f_s_fold tyoccurences toccurences foccurences acc f)
                   Sid.empty l in
                 Mid.add ps.ps_name s acc) Mid.empty l in
           let l = connexe m in
