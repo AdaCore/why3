@@ -65,9 +65,6 @@ let rec print_term fmt t = match t.t_node with
 let print_vs fmt vs = 
   fprintf fmt "%a :@ %a" print_ident vs.vs_name print_ty vs.vs_ty
 
-let print_tl fmt tl =
-  fprintf fmt "[%a]" (print_list alt (print_list comma print_term)) tl
-
 let rec print_fmla fmt f = match f.f_node with
   | Fapp (s,tl) -> 
       fprintf fmt "(%a(%a))" 
@@ -88,6 +85,13 @@ let rec print_fmla fmt f = match f.f_node with
         print_fmla f2
   | Fnot f -> fprintf fmt "(not@ %a)" print_fmla f
   | _ -> assert false (*TODO*) 
+
+and print_tl fmt tl =
+  fprintf fmt "[%a]" (print_list alt (print_list comma print_tr)) tl
+
+and print_tr fmt = function
+  | TrTerm t -> print_term fmt t
+  | TrFmla f -> print_fmla fmt f
 
 
 let print_fsymbol fmt {fs_name = fs_name; fs_scheme = tyl,ty} = 

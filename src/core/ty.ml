@@ -95,11 +95,11 @@ let ty_fold fn acc ty = match ty.ty_node with
   | Tyvar _ -> acc
   | Tyapp (f, tl) -> List.fold_left fn acc tl
 
-let ty_forall pr ty =
-  try ty_fold (forall_fn pr) true ty with FoldSkip -> false
+let ty_all pr ty =
+  try ty_fold (all_fn pr) true ty with FoldSkip -> false
 
-let ty_exists pr ty =
-  try ty_fold (exists_fn pr) false ty with FoldSkip -> true
+let ty_any pr ty =
+  try ty_fold (any_fn pr) false ty with FoldSkip -> true
 
 (* smart constructors *)
 
@@ -108,7 +108,7 @@ exception UnboundTypeVariable
 
 let rec tv_known vs ty = match ty.ty_node with
   | Tyvar n -> Sid.mem n vs
-  | _ -> ty_forall (tv_known vs) ty
+  | _ -> ty_all (tv_known vs) ty
 
 let create_tysymbol name args def =
   let add s v =
@@ -147,11 +147,11 @@ let rec ty_s_fold fn acc ty = match ty.ty_node with
   | Tyvar _ -> acc
   | Tyapp (f, tl) -> List.fold_left (ty_s_fold fn) (fn acc f) tl
 
-let ty_s_forall pr ty =
-  try ty_s_fold (forall_fn pr) true ty with FoldSkip -> false
+let ty_s_all pr ty =
+  try ty_s_fold (all_fn pr) true ty with FoldSkip -> false
 
-let ty_s_exists pr ty =
-  try ty_s_fold (exists_fn pr) false ty with FoldSkip -> true
+let ty_s_any pr ty =
+  try ty_s_fold (any_fn pr) false ty with FoldSkip -> true
 
 (* type matching *)
 

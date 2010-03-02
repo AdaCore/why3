@@ -89,8 +89,8 @@ val pat_as  : pattern -> vsymbol -> pattern
 
 val pat_map : (pattern -> pattern) -> pattern -> pattern
 val pat_fold : ('a -> pattern -> 'a) -> 'a -> pattern -> 'a
-val pat_forall : (pattern -> bool) -> pattern -> bool
-val pat_exists : (pattern -> bool) -> pattern -> bool
+val pat_all : (pattern -> bool) -> pattern -> bool
+val pat_any : (pattern -> bool) -> pattern -> bool
 
 (* symbol-wise map/fold *)
 
@@ -100,8 +100,8 @@ val pat_s_map : (tysymbol -> tysymbol) -> (vsymbol -> ty -> vsymbol)
 val pat_s_fold :
      ('a -> tysymbol -> 'a) -> ('a -> fsymbol -> 'a) -> 'a -> pattern -> 'a
 
-val pat_s_forall : (tysymbol -> bool) -> (fsymbol -> bool) -> pattern -> bool
-val pat_s_exists : (tysymbol -> bool) -> (fsymbol -> bool) -> pattern -> bool
+val pat_s_all : (tysymbol -> bool) -> (fsymbol -> bool) -> pattern -> bool
+val pat_s_any : (tysymbol -> bool) -> (fsymbol -> bool) -> pattern -> bool
 
 (* equality modulo alpha *)
 
@@ -172,7 +172,11 @@ and term_branch
 
 and fmla_branch
 
-and trigger = term list
+and trigger_elt =
+  | TrTerm of term
+  | TrFmla of fmla
+
+and trigger = trigger_elt list
 
 module Mterm : Map.S with type key = term
 module Sterm : Set.S with type elt = term
@@ -188,7 +192,7 @@ val t_let : vsymbol -> term -> term -> term
 val t_case : term -> (pattern * term) list -> ty -> term
 val t_eps : vsymbol -> fmla -> term
 
-val t_label : label list -> term -> term
+val t_label_set : label list -> term -> term
 val t_label_add : label -> term -> term
 
 (* smart constructors for fmla *)
@@ -209,7 +213,7 @@ val f_if : fmla -> fmla -> fmla -> fmla
 val f_let : vsymbol -> term -> fmla -> fmla
 val f_case :  term -> (pattern * fmla) list -> fmla
 
-val f_label : label list -> fmla -> fmla
+val f_label_set : label list -> fmla -> fmla
 val f_label_add : label -> fmla -> fmla
 
 (* bindings *)
@@ -224,35 +228,19 @@ val f_open_quant : fmla_quant -> vsymbol list * trigger list * fmla
 
 (* opening map/fold *)
 
-val t_map_open : (term -> term) -> (fmla -> fmla) -> term -> term
-val f_map_open : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
+val t_map : (term -> term) -> (fmla -> fmla) -> term -> term
+val f_map : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
 
-val t_fold_open : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
+val t_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
                                       -> 'a -> term -> 'a
 
-val f_fold_open : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
+val f_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
                                       -> 'a -> fmla -> 'a
 
-val t_forall_open : (term -> bool) -> (fmla -> bool) -> term -> bool
-val f_forall_open : (term -> bool) -> (fmla -> bool) -> fmla -> bool
-val t_exists_open : (term -> bool) -> (fmla -> bool) -> term -> bool
-val f_exists_open : (term -> bool) -> (fmla -> bool) -> fmla -> bool
-
-(* transparent map/fold *)
-
-val t_map_trans : (term -> term) -> (fmla -> fmla) -> term -> term
-val f_map_trans : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
-
-val t_fold_trans : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
-                                       -> 'a -> term -> 'a
-
-val f_fold_trans : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
-                                       -> 'a -> fmla -> 'a
-
-val t_forall_trans : (term -> bool) -> (fmla -> bool) -> term -> bool
-val f_forall_trans : (term -> bool) -> (fmla -> bool) -> fmla -> bool
-val t_exists_trans : (term -> bool) -> (fmla -> bool) -> term -> bool
-val f_exists_trans : (term -> bool) -> (fmla -> bool) -> fmla -> bool
+val t_all : (term -> bool) -> (fmla -> bool) -> term -> bool
+val f_all : (term -> bool) -> (fmla -> bool) -> fmla -> bool
+val t_any : (term -> bool) -> (fmla -> bool) -> term -> bool
+val f_any : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 
 (* symbol-wise map/fold *)
 
@@ -268,16 +256,16 @@ val t_s_fold : ('a -> tysymbol -> 'a) -> ('a -> fsymbol -> 'a)
 val f_s_fold : ('a -> tysymbol -> 'a) -> ('a -> fsymbol -> 'a)
             -> ('a -> psymbol -> 'a) -> 'a -> fmla -> 'a
 
-val t_s_forall : (tysymbol -> bool) -> (fsymbol -> bool)
+val t_s_all : (tysymbol -> bool) -> (fsymbol -> bool)
                                     -> (psymbol -> bool) -> term -> bool
 
-val f_s_forall : (tysymbol -> bool) -> (fsymbol -> bool)
+val f_s_all : (tysymbol -> bool) -> (fsymbol -> bool)
                                     -> (psymbol -> bool) -> fmla -> bool
 
-val t_s_exists : (tysymbol -> bool) -> (fsymbol -> bool)
+val t_s_any : (tysymbol -> bool) -> (fsymbol -> bool)
                                     -> (psymbol -> bool) -> term -> bool
 
-val f_s_exists : (tysymbol -> bool) -> (fsymbol -> bool)
+val f_s_any : (tysymbol -> bool) -> (fsymbol -> bool)
                                     -> (psymbol -> bool) -> fmla -> bool
 
 (* map/fold over free variables *)
@@ -288,11 +276,11 @@ val f_v_map : (vsymbol -> term) -> fmla -> fmla
 val t_v_fold : ('a -> vsymbol -> 'a) -> 'a -> term -> 'a
 val f_v_fold : ('a -> vsymbol -> 'a) -> 'a -> fmla -> 'a
 
-val t_v_forall : (vsymbol -> bool) -> term -> bool
-val f_v_forall : (vsymbol -> bool) -> fmla -> bool
+val t_v_all : (vsymbol -> bool) -> term -> bool
+val f_v_all : (vsymbol -> bool) -> fmla -> bool
 
-val t_v_exists : (vsymbol -> bool) -> term -> bool
-val f_v_exists : (vsymbol -> bool) -> fmla -> bool
+val t_v_any : (vsymbol -> bool) -> term -> bool
+val f_v_any : (vsymbol -> bool) -> fmla -> bool
 
 (* variable occurrence check *)
 

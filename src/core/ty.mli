@@ -57,13 +57,13 @@ val ty_app : tysymbol -> ty list -> ty
 
 val ty_map : (ty -> ty) -> ty -> ty
 val ty_fold : ('a -> ty -> 'a) -> 'a -> ty -> 'a
-val ty_forall : (ty -> bool) -> ty -> bool
-val ty_exists : (ty -> bool) -> ty -> bool
+val ty_all : (ty -> bool) -> ty -> bool
+val ty_any : (ty -> bool) -> ty -> bool
 
 val ty_s_map : (tysymbol -> tysymbol) -> ty -> ty
 val ty_s_fold : ('a -> tysymbol -> 'a) -> 'a -> ty -> 'a
-val ty_s_forall : (tysymbol -> bool) -> ty -> bool
-val ty_s_exists : (tysymbol -> bool) -> ty -> bool
+val ty_s_all : (tysymbol -> bool) -> ty -> bool
+val ty_s_any : (tysymbol -> bool) -> ty -> bool
 
 exception TypeMismatch
 

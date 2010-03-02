@@ -15,15 +15,15 @@
 (**************************************************************************)
 
 let map_fold_left f acc l =
-  let acc, rev = 
-    List.fold_left 
-      (fun (acc, rev) e -> let acc, e = f acc e in acc, e :: rev) 
-      (acc, []) l 
+  let acc, rev =
+    List.fold_left
+      (fun (acc, rev) e -> let acc, e = f acc e in acc, e :: rev)
+      (acc, []) l
   in
   acc, List.rev rev
 
-    
+
 exception FoldSkip
 
-let forall_fn pr _ t = pr t || raise FoldSkip
-let exists_fn pr _ t = pr t && raise FoldSkip
+let all_fn pr _ t = pr t || raise FoldSkip
+let any_fn pr _ t = pr t && raise FoldSkip

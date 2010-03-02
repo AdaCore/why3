@@ -19,7 +19,7 @@ val map_fold_left :
 
 exception FoldSkip
 
-val forall_fn : ('a -> bool) -> 'b -> 'a -> bool
-val exists_fn : ('a -> bool) -> 'b -> 'a -> bool
+val all_fn : ('a -> bool) -> 'b -> 'a -> bool
+val any_fn : ('a -> bool) -> 'b -> 'a -> bool
 
 
