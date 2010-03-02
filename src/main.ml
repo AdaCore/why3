@@ -25,7 +25,9 @@ let type_only = ref false
 let debug = ref false
 let loadpath = ref []
 let print_stdout = ref false
-let print_simplify_recursive = ref false
+let simplify_recursive = ref false
+let inlining = ref false
+
 let () = 
   Arg.parse 
     ["--parse-only", Arg.Set parse_only, "stops after parsing";
@@ -34,7 +36,8 @@ let () =
      "-I", Arg.String (fun s -> loadpath := s :: !loadpath), 
        "<dir>  adds dir to the loadpath";
      "--print-stdout", Arg.Set print_stdout, "print the results to stdout";
-     "--print-simplify-recursive", Arg.Set print_simplify_recursive, "print the results of simplify recursive definition";
+     "--simplify-recursive", Arg.Set simplify_recursive, "simplify recursive definition";
+     "--inline", Arg.Set inlining, "inline the definition not recursive";
     ]
     (fun f -> files := f :: !files)
     "usage: why [options] files..."
@@ -59,20 +62,31 @@ let type_file env file =
   close_in c;
   if !parse_only then env else Typing.add_theories env f
 
+let transform l =
+  let transform = !simplify_recursive || !inlining in
+  if !print_stdout && not transform then 
+    List.iter (Pretty.print_theory Format.std_formatter) 
+      (Typing.list_theory l)
+  else
+    let l = List.map (fun t -> t.Theory.th_decls) (Typing.list_theory l) in
+    let l = if !simplify_recursive 
+    then 
+      List.map (fun t -> Transform.apply 
+                     Simplify_recursive_definition.t_use t) l
+    else l in
+    let l = if !inlining 
+    then 
+      List.map (fun t -> Transform.apply Inlining.t_use t) l
+    else l in
+    if !print_stdout then 
+      List.iter (Pretty.print_decl_or_use_list Format.std_formatter) l
+
+
 let () =
   try
     let env = Typing.create !loadpath in
     let l = List.fold_left type_file env !files in
-    if !print_stdout then 
-      List.iter (Pretty.print_theory Format.std_formatter) 
-        (Typing.list_theory l);
-    if !print_simplify_recursive then 
-      List.iter (fun t ->
-                   let de = Transform.apply 
-                     Simplify_recursive_definition.t_use t.Theory.th_decls in
-                   (Pp.print_list Pp.newline Pretty.print_decl_or_use) 
-                     Format.std_formatter de) 
-        (Typing.list_theory l)
+    transform l
   with e when not !debug ->
     eprintf "%a@." report e;
     exit 1

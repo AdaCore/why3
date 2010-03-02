@@ -44,6 +44,24 @@ let print_list_delim start stop sep pr fmt = function
   | [] -> ()
   | l -> fprintf fmt "%a%a%a" start () (print_list sep pr) l stop ()
 
+
+let print_iter1 iter sep print fmt l =
+  let first = ref true in
+  iter (fun x -> 
+          if !first
+          then first := false
+          else sep fmt (); 
+          print fmt x ) l
+
+let print_iter2 iter sep1 sep2 print1 print2 fmt l =
+  let first = ref true in
+  iter (fun x y -> 
+          if !first
+          then first := false
+          else sep1 fmt (); 
+          print1 fmt x;sep2 fmt (); print2 fmt y) l
+
+
 let print_pair_delim start sep stop pr1 pr2 fmt (a,b) =
   fprintf fmt "%a%a%a%a%a" start () pr1 a sep () pr2 b stop ()
 

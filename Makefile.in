@@ -100,18 +100,28 @@ doc/version.tex src/version.ml: Version version.sh config.status
 # why
 #####
 
-CORE_CMO = src/core/name.cmo src/core/ident.cmo src/core/ty.cmo \
-	   src/core/term.cmo src/core/theory.cmo
-UTIL_CMO = src/util/pp.cmo src/util/loc.cmo src/util/util.cmo \
-           src/util/hashcons.cmo 
-PARSER_CMO = src/parser/parser.cmo src/parser/lexer.cmo src/parser/typing.cmo
+CORE_CMO := name.cmo ident.cmo ty.cmo term.cmo theory.cmo
 
-TRANSFORM_CMO = src/transform/transform.cmo src/transform/simplify_recursive_definition.cmo
+CORE_CMO := $(addprefix src/core/,$(CORE_CMO))
 
-CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(TRANSFORM_CMO) src/pretty.cmo src/main.cmo
+UTIL_CMO := pp.cmo loc.cmo util.cmo hashcons.cmo 
+
+UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
+
+PARSER_CMO := parser.cmo lexer.cmo typing.cmo
+
+PARSER_CMO := $(addprefix src/parser/,$(PARSER_CMO))
+
+TRANSFORM_CMO := transform.cmo simplify_recursive_definition.cmo \
+	inlining.cmo
+
+TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
+
+CMO = $(UTIL_CMO) $(CORE_CMO) src/pretty.cmo $(PARSER_CMO) $(TRANSFORM_CMO)  src/main.cmo
 CMX = $(CMO:.cmo=.cmx)
 
 bin/why.opt: $(CMX) 
+	echo $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(TRANSFORM_CMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ $^
 	$(STRIP) $@
 

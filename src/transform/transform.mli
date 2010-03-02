@@ -33,7 +33,6 @@ val apply : ('a,'b) t -> 'a list -> 'b list
 (* clear the datastructures used to store the memoisation *)
 val clear : ('a,'b) t -> unit
 
-
 module type S =
 sig
   (* The type of the elements of the list*)

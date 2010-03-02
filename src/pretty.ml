@@ -147,6 +147,10 @@ let print_decl_or_use fmt = function
   | Decl d -> fprintf fmt "%a" print_decl d
   | Use u -> fprintf fmt "use export %a@\n" print_ident u.th_name
 
+let print_decl_or_use_list fmt de = 
+  fprintf fmt "@[<hov>%a@]"
+    (Pp.print_list Pp.newline print_decl_or_use) de
+
 let print_theory fmt t =
   fprintf fmt "@[@[<hov 2>theory %a@\n%a@]@\nend@]@\n@\n" print_ident t.th_name 
     (print_list newline print_decl_or_use) t.th_decls;

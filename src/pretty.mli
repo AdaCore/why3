@@ -32,4 +32,6 @@ val print_decl : formatter -> decl -> unit
 
 val print_decl_or_use : formatter -> decl_or_use -> unit
 
+val print_decl_or_use_list : formatter -> decl_or_use list -> unit
+
 val print_theory : formatter -> theory -> unit

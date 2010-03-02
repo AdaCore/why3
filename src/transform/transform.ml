@@ -177,6 +177,7 @@ struct
     let f x = LH2.from_list (f (LH1.to_list x)) in
     let memo_t = Hashtbl.create 16 in
     t (memo f LH1.tag memo_t) (fun () -> Hashtbl.clear memo_t)
+
 end
 
 open Term
