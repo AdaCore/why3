@@ -136,7 +136,7 @@ bin/top: $(CMO)
 	ocamlmktop $(BFLAGS) -o $@ $^
 
 test: bin/why.byte
-	ocamlrun -bt bin/why.byte --print-simplify-recursive -I lib/prelude/ src/test.why
+	ocamlrun -bt bin/why.byte --print-stdout -I lib/prelude/ src/test.why
 
 # graphical interface
 #####################
