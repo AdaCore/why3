@@ -545,6 +545,7 @@ let add_types loc dl th =
   let dl = List.map decl dl in
   add_decl th (create_type dl)
 
+(*
 let add_function loc pl t th {id=id} =
   let ns = get_namespace th in
   if Mnm.mem id ns.ns_fs then error ~loc (Clash id);
@@ -566,6 +567,7 @@ let add_predicate loc pl th {id=id} =
   let v = id_user id loc in
   let s = create_psymbol v pl in
   add_decl th (create_logic [Lpredicate (s, None)])
+*)
 
 let env_of_vsymbol_list vl =
   List.fold_left (fun env v -> M.add v.vs_name.id_short v env) M.empty vl
