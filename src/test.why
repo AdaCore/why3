@@ -5,6 +5,8 @@ theory Test
   type 'a list = Nil | Cons('a, 'a list)
   type 'a tree = Leaf('a) | Node('a forest)
   type 'a forest = 'a tree list
+
+  axiom Ax : Cons(Nil,Nil)=Nil
 end
 
 theory TestPrelude 

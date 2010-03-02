@@ -52,12 +52,24 @@ type error =
   | NotInLoadpath of string
   | CyclicTypeDef
   | UnboundTypeVar of string
+  | AnyMessage of string
 
 exception Error of error
 
 let error ?loc e = match loc with
   | None -> raise (Error e)
   | Some loc -> raise (Loc.Located (loc, Error e))
+
+let errorm ?loc f =
+  let buf = Buffer.create 512 in
+  let fmt = Format.formatter_of_buffer buf in
+  Format.kfprintf 
+    (fun _ -> 
+       Format.pp_print_flush fmt ();
+       let s = Buffer.contents buf in
+       Buffer.clear buf;
+       error ?loc (AnyMessage s))
+    fmt f
 
 let rec print_qualid fmt = function
   | Qident s -> fprintf fmt "%s" s.id
@@ -111,7 +123,8 @@ let report fmt = function
       fprintf fmt "cyclic type definition"
   | UnboundTypeVar s ->
       fprintf fmt "unbound type variable '%s" s
-
+  | AnyMessage s ->
+      fprintf fmt "%s" s
 
 (** Environments *)
 
@@ -150,6 +163,7 @@ and type_var = {
   user : bool;
   tvsymbol : tvsymbol;
   mutable type_val : dty option;
+  type_var_loc : loc option;
 }
 
 let rec print_dty fmt = function
@@ -167,9 +181,10 @@ let rec print_dty fmt = function
 
 let create_type_var =
   let t = ref 0 in
-  fun ~user tv -> 
+  fun ?loc ~user tv -> 
     incr t; 
-    { tag = !t; user = user; tvsymbol = tv; type_val = None }
+    { tag = !t; user = user; tvsymbol = tv; type_val = None;
+      type_var_loc = loc }
 
 let rec occurs v = function
   | Tyvar { type_val = Some t } -> occurs v t
@@ -228,19 +243,19 @@ let find_user_type_var x env =
 
 module Htv = Hid
 
-let find_type_var env tv =
+let find_type_var ~loc env tv =
   try
     Htv.find env tv
   with Not_found ->
-    let v = create_type_var ~user:false tv in
+    let v = create_type_var ~loc ~user:false tv in
     Htv.add env tv v;
     v
  
-let rec specialize env t = match t.ty_node with
+let rec specialize ~loc env t = match t.ty_node with
   | Ty.Tyvar tv -> 
-      Tyvar (find_type_var env tv)
+      Tyvar (find_type_var ~loc env tv)
   | Ty.Tyapp (s, tl) ->
-      Tyapp (s, List.map (specialize env) tl)
+      Tyapp (s, List.map (specialize ~loc env) tl)
 
 (** generic find function using a path *)
 
@@ -265,10 +280,10 @@ let find_tysymbol {id=x; id_loc=loc} ns =
 let find_tysymbol p th = 
   find find_tysymbol p (get_namespace th)
 
-let specialize_tysymbol x env =
+let specialize_tysymbol ~loc x env =
   let s = find_tysymbol x env.th in
   let env = Htv.create 17 in
-  s, List.map (find_type_var env) s.ts_args
+  s, List.map (find_type_var ~loc env) s.ts_args
 	
 let find_fsymbol {id=x; id_loc=loc} ns = 
   try Mnm.find x ns.ns_fs
@@ -277,10 +292,10 @@ let find_fsymbol {id=x; id_loc=loc} ns =
 let find_fsymbol p th = 
   find find_fsymbol p (get_namespace th)
 
-let specialize_fsymbol s =
+let specialize_fsymbol ~loc s =
   let tl, t = s.fs_scheme in
   let env = Htv.create 17 in
-  s, List.map (specialize env) tl, specialize env t
+  s, List.map (specialize ~loc env) tl, specialize ?loc env t
 
 let find_psymbol {id=x; id_loc=loc} ns = 
   try Mnm.find x ns.ns_ps
@@ -289,9 +304,9 @@ let find_psymbol {id=x; id_loc=loc} ns =
 let find_psymbol p th =
   find find_psymbol p (get_namespace th)
 
-let specialize_psymbol s =
+let specialize_psymbol ~loc s =
   let env = Htv.create 17 in
-  s, List.map (specialize env) s.ps_scheme
+  s, List.map (specialize ~loc env) s.ps_scheme
 
 (** Typing types *)
 
@@ -310,7 +325,7 @@ let rec dty env = function
       Tyvar (find_user_type_var x env)
   | PPTtyapp (p, x) ->
       let loc = qloc x in
-      let ts, tv = specialize_tysymbol x env in
+      let ts, tv = specialize_tysymbol ~loc x env in
       let np = List.length p in
       let a = List.length tv in
       if np <> a then error ~loc (TypeArity (x, a, np));
@@ -327,6 +342,8 @@ let rec dty env = function
 let rec ty_of_dty = function
   | Tyvar { type_val = Some t } ->
       ty_of_dty t
+  | Tyvar { type_val = None; user = false; type_var_loc = loc } ->
+      errorm ?loc "undefined type variable"
   | Tyvar { tvsymbol = tv } ->
       Ty.ty_var tv
   | Tyapp (s, tl) ->
@@ -373,13 +390,13 @@ and dterm_node loc env = function
   | PPvar x -> 
       (* 0-arity symbol (constant) *)
       let s = find_fsymbol x env.th in
-      let s, tyl, ty = specialize_fsymbol s in
+      let s, tyl, ty = specialize_fsymbol ~loc s in
       let n = List.length tyl in
       if n > 0 then error ~loc (BadNumberOfArguments (s.fs_name, 0, n));
       Tapp (s, []), ty
   | PPapp (x, tl) ->
       let s = find_fsymbol x env.th in
-      let s, tyl, ty = specialize_fsymbol s in
+      let s, tyl, ty = specialize_fsymbol ~loc s in
       let tl = dtype_args s.fs_name loc env tyl tl in
       Tapp (s, tl), ty
   | PPconst (ConstInt _ as c) ->
@@ -417,7 +434,7 @@ and dfmla env e = match e.pp_desc with
       Fquant (Fexists, x, ty, dfmla env a)
   | PPapp (x, tl) ->
       let s = find_psymbol x env.th in
-      let s, tyl = specialize_psymbol s in
+      let s, tyl = specialize_psymbol ~loc:e.pp_loc s in
       let tl = dtype_args s.ps_name e.pp_loc env tyl tl in
       Fapp (s, tl)
   | PPmatch _ ->
