@@ -75,6 +75,12 @@ type use = {
   use_imp_exp : imp_exp;
 }
 
+type clone_subst = {
+  ts_subst : (qualid * qualid) list;
+  fs_subst : (qualid * qualid) list;
+  ps_subst : (qualid * qualid) list;
+}
+
 type param = ident option * pty
 
 type type_def = 
@@ -105,7 +111,7 @@ type decl =
   | Logic of loc * logic_decl list
   | Inductive_def of loc * ident * pty list * (loc * ident * lexpr) list
   | Prop of loc * prop_kind * ident * lexpr
-  | Use of loc * use
+  | UseClone of loc * use * clone_subst option
   | Namespace of loc * ident * decl list
 
 type theory = {

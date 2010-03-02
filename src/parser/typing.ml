@@ -273,12 +273,15 @@ let rec find f q ns = match q with
 
 (** specific find functions using a path *)
 
-let find_tysymbol {id=x; id_loc=loc} ns = 
+let find_local_tysymbol {id=x; id_loc=loc} ns = 
   try Mnm.find x ns.ns_ts
   with Not_found -> error ~loc (UnboundType x)
 
+let find_tysymbol_ns p ns =
+  find find_local_tysymbol p ns
+
 let find_tysymbol p th = 
-  find find_tysymbol p (get_namespace th)
+  find_tysymbol_ns p (get_namespace th)
 
 let specialize_tysymbol ~loc x env =
   let s = find_tysymbol x env.th in
@@ -289,8 +292,11 @@ let find_fsymbol {id=x; id_loc=loc} ns =
   try Mnm.find x ns.ns_fs
   with Not_found -> error ~loc (UnboundSymbol x)
 
+let find_fsymbol_ns p ns = 
+  find find_fsymbol p ns
+
 let find_fsymbol p th = 
-  find find_fsymbol p (get_namespace th)
+  find_fsymbol_ns p (get_namespace th)
 
 let specialize_fsymbol ~loc s =
   let tl, t = s.fs_scheme in
@@ -301,8 +307,11 @@ let find_psymbol {id=x; id_loc=loc} ns =
   try Mnm.find x ns.ns_ps
   with Not_found -> error ~loc (UnboundSymbol x)
 
+let find_psymbol_ns p ns =
+  find find_psymbol p ns
+
 let find_psymbol p th =
-  find find_psymbol p (get_namespace th)
+  find_psymbol_ns p (get_namespace th)
 
 let specialize_psymbol ~loc s =
   let env = Htv.create 17 in
@@ -790,8 +799,28 @@ and add_decl env th = function
       add_logics loc dl th
   | Prop (loc, k, s, f) ->
       add_prop (prop_kind k) loc s f th
-  | Use (loc, use) ->
+  | UseClone (loc, use, subst) ->
       let t = find_theory env use.use_theory in
+      let use_or_clone th = match subst with
+	| None -> 
+	    use_export th t
+	| Some s -> 
+	    let add_ts m (p, q) = 
+	      Mts.add (find_tysymbol_ns p t.th_export) (find_tysymbol q th) m
+	    in
+	    let add_fs m (p, q) = 
+	      Mfs.add (find_fsymbol_ns p t.th_export) (find_fsymbol q th) m
+	    in
+	    let add_ps m (p, q) = 
+	      Mps.add (find_psymbol_ns p t.th_export) (find_psymbol q th) m
+	    in
+	    let s = 
+	      { inst_ts = List.fold_left add_ts Mts.empty s.ts_subst;
+		inst_fs = List.fold_left add_fs Mfs.empty s.fs_subst;
+		inst_ps = List.fold_left add_ps Mps.empty s.ps_subst; }
+	    in
+	    clone_export th t s
+      in
       let n = match use.use_as with 
 	| None -> t.th_name.id_short
 	| Some x -> x.id
@@ -800,15 +829,15 @@ and add_decl env th = function
 	| Nothing ->
 	    (* use T = namespace T use_export T end *)
 	    let th = open_namespace th in
-	    let th = use_export th t in
+	    let th = use_or_clone th in
 	    close_namespace th n ~import:false
 	| Import ->
 	    (* use import T = namespace T use_export T end import T *)
 	    let th = open_namespace th in
-	    let th = use_export th t in
+	    let th = use_or_clone th in
 	    close_namespace th n ~import:true
 	| Export ->
-	    use_export th t
+	    use_or_clone th 
       with Theory.ClashSymbol s ->
 	error ~loc (Clash s)
       end

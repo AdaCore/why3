@@ -281,8 +281,10 @@ decl:
    { Prop (loc (), Klemma, $2, $4) }
 | INDUCTIVE lident primitive_types inddefn
    { Inductive_def (loc (), $2, $3, $4) }
+| CLONE use clone_subst
+   { UseClone (loc (), $2, Some $3) }
 | USE use
-   { Use (loc (), $2) }
+   { UseClone (loc (), $2, None) }
 | NAMESPACE uident list0_decl END
    { Namespace (loc (), $2, $3) }
 ;
@@ -500,6 +502,27 @@ imp_exp:
 | IMPORT        { Import }
 | EXPORT        { Export }
 | /* epsilon */ { Nothing }
+;
+
+clone_subst:
+| /* epsilon */ 
+    { { ts_subst = []; fs_subst = []; ps_subst = [] } } 
+| WITH list1_comma_subst
+    { let t, f, p = $2 in
+      { ts_subst = t; fs_subst = f; ps_subst = p } } 
+;
+
+list1_comma_subst:
+| subst                         
+    { $1 }
+| subst COMMA list1_comma_subst 
+    { let t,f,p = $1 in let tl,fl,pl = $3 in t@tl, f@fl, p@pl }
+;
+
+subst:
+| TYPE      qualid EQUAL qualid { [$2, $4], [], [] }
+| FUNCTION  qualid EQUAL qualid { [], [$2, $4], [] }
+| PREDICATE qualid EQUAL qualid { [], [], [$2, $4] }
 ;
 
 /******* programs **************************************************

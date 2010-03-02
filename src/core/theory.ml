@@ -498,14 +498,56 @@ type th_inst = {
   inst_ps : psymbol  Mps.t;
 }
 
-let clone_export th t i =
+let clone_export uc th i =
   let check_sym id =
-    if not (Sid.mem id t.th_param) then raise (CannotInstantiate id)
+    if not (Sid.mem id th.th_param) then raise (CannotInstantiate id)
   in
   let check_ts s _ = check_sym s.ts_name in Mts.iter check_ts i.inst_ts;
   let check_fs s _ = check_sym s.fs_name in Mfs.iter check_fs i.inst_fs;
   let check_ps s _ = check_sym s.ps_name in Mps.iter check_ps i.inst_ps;
-  assert false (* TODO *)
+  (* memo tables *)
+  let ts_table = Hashtbl.create 17 in
+  let known = ref th.th_known in
+  let rec memo_ts ts =
+    try 
+      Hashtbl.find ts_table ts.ts_name
+    with Not_found ->
+      let nm = id_clone ts.ts_name in
+      let def = match ts.ts_def with
+	| None -> None
+	| Some ty -> Some (ty_s_map memo_ts ty)
+      in
+      let ts' = create_tysymbol nm ts.ts_args def in
+      Hashtbl.add ts_table ts.ts_name ts';
+      known := Mid.add ts'.ts_name uc.uc_name (Mid.remove ts.ts_name !known);
+      ts'
+  in
+  let find_ts ts = 
+    let tid = Mid.find ts.ts_name th.th_known in
+    if tid == th.th_name then memo_ts ts else ts
+  in
+  (* 1. merge in the new namespace *)
+  let rec merge_namespace acc ns =
+    let acc = 
+      Mnm.fold (fun n ts acc -> add_ts n (find_ts ts) acc) ns.ns_ts acc 
+    in
+    (* ... *)
+    (* let acc = Mnm.fold (fun n ns acc -> ) ns.ns_ns acc in *)
+    acc
+  in
+  let ns = merge_namespace empty_ns th.th_export in
+  let uc = match uc.uc_import, uc.uc_export with
+    | i0 :: sti, e0 :: ste ->
+        { uc with
+            uc_import = merge_ns ns i0 :: sti;
+            uc_export = merge_ns ns e0 :: ste;
+	    uc_known  = merge_known uc.uc_known !known }
+    | _ ->
+	assert false
+  in
+  (* 2. merge in the new declarations *)
+  (* ... *)
+  uc
 
 
 (** Debugging *)

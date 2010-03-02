@@ -1,12 +1,22 @@
 
 (* test file *)
 
-theory Test
+theory A
+  type t
+  logic c : t
+end
+
+theory B
+  use A as C
+  clone import A
+  logic f(C.t) : t
+  axiom Ax : forall x:t. x = C.c
+end
+
+theory TreeForest
   type 'a list = Nil | Cons('a, 'a list)
   type 'a tree = Leaf('a) | Node('a forest)
   type 'a forest = 'a tree list
-
-  axiom Ax : Cons(Nil,Nil)=Nil
 end
 
 theory TestPrelude 
@@ -14,24 +24,6 @@ theory TestPrelude
   use prelude.List
 end
 
-theory A
-  use import prelude.Int
- 
-  logic c : int
-
-  type 'a t
-
-  logic mem('a, 'a t)
-  logic p(s : 'a t) = forall x:'a. mem(x, s)
-end
-
-theory B
-  use import prelude.List
-  type t
-  axiom Ax : forall x : t list. true
-  lemma L  : forall x : t list. true
-  goal  G  : forall x : t list. true
-end
 
 (*
 Local Variables: 
