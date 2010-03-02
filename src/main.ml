@@ -33,8 +33,8 @@ let () =
      "--debug", Arg.Set debug, "sets the debug flag";
      "-I", Arg.String (fun s -> loadpath := s :: !loadpath), 
        "<dir>  adds dir to the loadpath";
-     "--print_stdout", Arg.Set print_stdout, "print the results to stdout";
-     "--print_simplify_recursive", Arg.Set print_simplify_recursive, "print the results of simplify recursive definition";
+     "--print-stdout", Arg.Set print_stdout, "print the results to stdout";
+     "--print-simplify-recursive", Arg.Set print_simplify_recursive, "print the results of simplify recursive definition";
     ]
     (fun f -> files := f :: !files)
     "usage: why [options] files..."

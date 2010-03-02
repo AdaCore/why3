@@ -129,14 +129,13 @@ let rec tv_inst m ty = match ty.ty_node with
   | _ -> ty_map (tv_inst m) ty
 
 let ty_app s tl =
-  if List.length tl == List.length s.ts_args
-  then match s.ts_def with
+  if List.length tl != List.length s.ts_args then raise BadTypeArity;
+  match s.ts_def with
     | Some ty ->
         let add m v t = Mid.add v t m in
         tv_inst (List.fold_left2 add Mid.empty s.ts_args tl) ty
     | _ ->
         ty_app s tl
-  else raise BadTypeArity
 
 (* symbol-wise map/fold *)
 

@@ -300,25 +300,37 @@ let rec qloc = function
   | Qdot (m, x) -> Loc.join (qloc m) x.id_loc
 
 (* parsed types -> intermediate types *)
+
+let rec type_inst s ty = match ty.ty_node with
+  | Ty.Tyvar n -> Mid.find n s
+  | Ty.Tyapp (ts, tyl) -> Tyapp (ts, List.map (type_inst s) tyl)
+
 let rec dty env = function
   | PPTtyvar {id=x} -> 
       Tyvar (find_user_type_var x env)
   | PPTtyapp (p, x) ->
       let loc = qloc x in
-      let s, tv = specialize_tysymbol x env in
+      let ts, tv = specialize_tysymbol x env in
       let np = List.length p in
       let a = List.length tv in
       if np <> a then error ~loc (TypeArity (x, a, np));
-      Tyapp (s, List.map (dty env) p)
+      let tyl = List.map (dty env) p in
+      match ts.ts_def with
+	| None -> 
+	    Tyapp (ts, tyl)
+	| Some ty -> 
+	    let add m v t = Mid.add v t m in
+            let s = List.fold_left2 add Mid.empty ts.ts_args tyl in
+	    type_inst s ty
 
 (* intermediate types -> types *)
-let rec ty = function
+let rec ty_of_dty = function
   | Tyvar { type_val = Some t } ->
-      ty t
+      ty_of_dty t
   | Tyvar { tvsymbol = tv } ->
       Ty.ty_var tv
   | Tyapp (s, tl) ->
-      Ty.ty_app s (List.map ty tl)
+      Ty.ty_app s (List.map ty_of_dty tl)
 
 (** Typing terms and formulas *)
 
@@ -442,9 +454,9 @@ let rec term env t = match t.dt_node with
       assert (M.mem x env);
       t_var (M.find x env)
   | Tconst c ->
-      t_const c (ty t.dt_ty)
+      t_const c (ty_of_dty t.dt_ty)
   | Tapp (s, tl) ->
-      t_app s (List.map (term env) tl) (ty t.dt_ty)
+      t_app s (List.map (term env) tl) (ty_of_dty t.dt_ty)
   | _ ->
       assert false (* TODO *)
 
@@ -461,7 +473,7 @@ and fmla env = function
       f_if (fmla env f1) (fmla env f2) (fmla env f3)
   | Fquant (q, x, t, f1) ->
       (* TODO: shouldn't we localize this ident? *)
-      let v = create_vsymbol (id_fresh x) (ty t) in
+      let v = create_vsymbol (id_fresh x) (ty_of_dty t) in
       let env = M.add x v env in
       f_quant q [v] [] (fmla env f1)
   | Fapp (s, tl) ->
@@ -533,14 +545,38 @@ let add_types loc dl th =
       Hashtbl.add tysymbols x (Some ts);
       ts
   in
-  M.iter (fun x _ -> ignore (visit x)) def;
+  let th' = 
+    let tsl = 
+      M.fold (fun x _ tsl -> let ts = visit x in (ts, Tabstract) :: tsl) def []
+    in
+    add_decl th (create_type tsl)
+  in
   let decl d = 
-    (match Hashtbl.find tysymbols d.td_ident.id with
-       | None -> assert false
-       | Some ts -> ts),
-    (match d.td_def with
-       | TDabstract | TDalias _ -> Tabstract
-       | TDalgebraic _ -> assert false (*TODO*))
+    let ts, th' = match Hashtbl.find tysymbols d.td_ident.id with
+      | None -> 
+	  assert false
+      | Some ts -> 
+	  let th' = create_denv th' in
+	  let vars = th'.utyvars in
+	  List.iter 
+	    (fun v -> 
+	       Hashtbl.add vars v.id_short (create_type_var ~user:true v)) 
+	    ts.ts_args;
+	  ts, th'
+    in
+    let d = match d.td_def with
+      | TDabstract | TDalias _ -> 
+	  Tabstract
+      | TDalgebraic cl -> 
+	  let ty = ty_app ts (List.map ty_var ts.ts_args) in
+	  let constructor (loc, id, pl) = 
+	    let param (_, t) = ty_of_dty (dty th' t) in
+	    let tyl = List.map param pl in
+	    create_fsymbol (id_user id.id id.id_loc) (tyl, ty) true
+	  in
+	  Talgebraic (List.map constructor cl)
+    in
+    ts, d
   in
   let dl = List.map decl dl in
   add_decl th (create_type dl)
@@ -560,7 +596,7 @@ let add_logics loc dl th =
     let v = id_user id loc in
     let denv = create_denv th in
     Hashtbl.add denvs id denv;
-    let type_ty (_,t) = ty (dty denv t) in
+    let type_ty (_,t) = ty_of_dty (dty denv t) in
     let pl = List.map type_ty d.ld_params in
     match d.ld_type with
       | None -> (* predicate *)

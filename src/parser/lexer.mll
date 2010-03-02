@@ -175,6 +175,8 @@ rule token = parse
 		  |(hexadigit+ as i) ("" as f))
     ['p' 'P'] (['-' '+']? digit+ as e)
       { FLOAT (RConstHexa (i, f, remove_leading_plus e)) }
+  | "(*)"
+      { LIDENT "*" }
   | "(*"
       { comment lexbuf; token lexbuf }
   | "'"
@@ -279,7 +281,7 @@ and string = parse
 
 (*
 Local Variables: 
-compile-command: "unset LANG; make -j -C .. bin/why.byte"
+compile-command: "unset LANG; make -C ../.. test"
 End: 
 *)
 

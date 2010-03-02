@@ -2,7 +2,9 @@
 (* test file *)
 
 theory Test
-  logic id(x:'a) : 'a = x
+  type 'a list = Nil | Cons('a, 'a list)
+  type 'a tree = Leaf('a) | Node('a forest)
+  type 'a forest = 'a tree list
 end
 
 theory TestPrelude 
