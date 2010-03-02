@@ -34,8 +34,8 @@ type ty_decl = tysymbol * ty_def
 (* logic declaration *)
 
 type logic_decl =
-  | Lfunction  of fsymbol * (vsymbol list * term) option (* FIXME: binders *)
-  | Lpredicate of psymbol * (vsymbol list * fmla) option (* FIXME: binders *)
+  | Lfunction  of fsymbol * fmla option
+  | Lpredicate of psymbol * fmla option
   | Linductive of psymbol * (ident * fmla) list
 
 (* proposition declaration *)
@@ -61,6 +61,9 @@ type decl = private {
 
 (* smart constructors *)
 
+val make_fdef : fsymbol -> vsymbol list -> term -> logic_decl
+val make_pdef : psymbol -> vsymbol list -> fmla -> logic_decl
+
 val create_type : ty_decl list -> decl
 val create_logic : logic_decl list -> decl
 val create_prop : prop_kind -> preid -> fmla -> decl
@@ -68,8 +71,8 @@ val create_prop : prop_kind -> preid -> fmla -> decl
 (* exceptions *)
 
 exception NotAConstructor of fsymbol
+exception MalformedDefinition of fmla
 exception IllegalTypeAlias of tysymbol
-exception DuplicateVariable of vsymbol
 exception UnboundTypeVar of ident
 exception UnboundVars of Svs.t
 
@@ -123,11 +126,6 @@ type th_inst = {
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 
 val get_namespace : theory_uc -> namespace
-
-(* builtin *)
-
-val t_int  : tysymbol
-val t_real : tysymbol
 
 (* exceptions *)
 

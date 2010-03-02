@@ -172,3 +172,11 @@ let rec matching s ty1 ty2 =
 let ty_match ty1 ty2 s =
   try Some (matching s ty1 ty2) with TypeMismatch -> None
 
+(* built-in symbols *)
+
+let ts_int  = create_tysymbol (id_fresh "int")  [] None
+let ts_real = create_tysymbol (id_fresh "real") [] None
+
+let ty_int  = ty_app ts_int  []
+let ty_real = ty_app ts_real []
+

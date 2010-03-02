@@ -1237,3 +1237,20 @@ let f_s_exists prT prF prP f =
   try f_s_fold (exists_fn prT) (exists_fn prF) (exists_fn prP) false f
   with FoldSkip -> true
 
+(* built-in symbols *)
+
+let ps_equ =
+  let v = ty_var (create_tvsymbol (id_fresh "a")) in
+  create_psymbol (id_fresh "=") [v; v]
+
+let ps_neq =
+  let v = ty_var (create_tvsymbol (id_fresh "a")) in
+  create_psymbol (id_fresh "<>") [v; v]
+
+(* FIXME: is it right to do so? *)
+let f_app p tl = 
+  if p == ps_neq then f_not (f_app ps_equ tl) else f_app p tl
+
+let f_equ t1 t2 = f_app ps_equ [t1; t2]
+let f_neq t1 t2 = f_app ps_neq [t1; t2]
+

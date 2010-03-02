@@ -121,7 +121,7 @@ type binop =
   | Fimplies
   | Fiff
 
-type real_constant = 
+type real_constant =
   | RConstDecimal of string * string * string option (* int / frac / exp *)
   | RConstHexa of string * string * string
 
@@ -348,4 +348,12 @@ val f_subst_fmla_alpha : fmla -> fmla -> fmla -> fmla
 
 val t_match : term -> term -> term Mvs.t -> term Mvs.t option
 val f_match : fmla -> fmla -> term Mvs.t -> term Mvs.t option
+
+(* built-in symbols *)
+
+val ps_equ : psymbol
+val ps_neq : psymbol
+
+val f_equ : term -> term -> fmla
+val f_neq : term -> term -> fmla
 

@@ -70,3 +70,11 @@ exception TypeMismatch
 val matching : ty Mid.t -> ty -> ty -> ty Mid.t
 val ty_match : ty -> ty -> ty Mid.t -> ty Mid.t option
 
+(* built-in symbols *)
+
+val ts_int  : tysymbol
+val ts_real : tysymbol
+
+val ty_int  : ty
+val ty_real : ty
+

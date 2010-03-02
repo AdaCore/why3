@@ -106,14 +106,14 @@ let elt d =
              | Lfunction (fs,l) -> 
                 let s = match l with
                   | None -> Sid.empty
-                  | Some (_,t) -> 
-                      t_fold_trans toccurences foccurences Sid.empty t in
+                  | Some fd -> 
+                      f_fold_trans toccurences foccurences Sid.empty fd in
                 Mid.add fs.fs_name s acc
              | Lpredicate (ps,l) -> 
                 let s = match l with
                   | None -> Sid.empty
-                  | Some (_,f) -> 
-                      f_fold_trans toccurences foccurences Sid.empty f in
+                  | Some fd -> 
+                      f_fold_trans toccurences foccurences Sid.empty fd in
                 Mid.add ps.ps_name s acc
              | Linductive (ps,l) -> 
                 let s = List.fold_left 

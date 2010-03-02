@@ -117,15 +117,13 @@ let print_vsymbol fmt {vs_name = vs_name; vs_ty = vs_ty} =
 
 let print_logic_decl fmt = function
   | Lfunction (fs,None) -> fprintf fmt "logic %a@." print_fsymbol fs
-  | Lfunction (fs,Some (vsl,t)) -> 
-      fprintf fmt "logic %a%a =@ %a@." print_ident fs.fs_name
-      (print_list_paren comma print_vsymbol) vsl
-        print_term t
+  | Lfunction (fs,Some fd) -> 
+      fprintf fmt "logic %a @: %a@." print_ident fs.fs_name
+        print_fmla fd
   | Lpredicate (fs,None) -> fprintf fmt "logic %a@." print_psymbol fs
-  | Lpredicate (ps,Some (vsl,t)) -> 
-      fprintf fmt "logic %a%a =@ %a@." print_ident ps.ps_name
-      (print_list_paren comma print_vsymbol) vsl
-        print_fmla t
+  | Lpredicate (ps,Some fd) -> 
+      fprintf fmt "logic %a @: %a@." print_ident ps.ps_name
+        print_fmla fd
   | Linductive _ -> assert false (*TODO*)
 
 let print_decl fmt d = match d.d_node with

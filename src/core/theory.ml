@@ -36,8 +36,8 @@ type ty_decl = tysymbol * ty_def
 (* logic declaration *)
 
 type logic_decl =
-  | Lfunction  of fsymbol * (vsymbol list * term) option (* FIXME: binders *)
-  | Lpredicate of psymbol * (vsymbol list * fmla) option (* FIXME: binders *)
+  | Lfunction  of fsymbol * fmla option
+  | Lpredicate of psymbol * fmla option
   | Linductive of psymbol * (ident * fmla) list
 
 (* proposition declaration *)
@@ -73,16 +73,16 @@ module D = struct
     | Talgebraic l1, Talgebraic l2 -> for_all2 (==) l1 l2
     | _ -> false
 
-  let eq_fd fs1 fs2 fd1 fd2 = fs1 == fs2 && match fd1,fd2 with
+  let eq_fd fs1 fd1 fs2 fd2 = fs1 == fs2 && match fd1,fd2 with
+    | Some fd1, Some fd2 -> fd1 == fd2
     | None, None -> true
-    | Some (l1,t1), Some (l2,t2) -> t1 == t2 && for_all2 (==) l1 l2
     | _ -> false
 
   let eq_ld ld1 ld2 = match ld1,ld2 with
-    | Lfunction  (fs1,fd1), Lfunction  (fs2,fd2) -> eq_fd fs1 fs2 fd1 fd2
-    | Lpredicate (ps1,pd1), Lpredicate (ps2,pd2) -> eq_fd ps1 ps2 pd1 pd2
-    | Linductive (ps1,l1),  Linductive (ps2,l2)  -> ps1 == ps2 &&
-        for_all2 (fun (i1,f1) (i2,f2) -> i1 == i2 && f1 == f2) l1 l2
+    | Lfunction  (fs1,fd1), Lfunction  (fs2,fd2) -> eq_fd fs1 fd1 fs2 fd2
+    | Lpredicate (ps1,pd1), Lpredicate (ps2,pd2) -> eq_fd ps1 pd1 ps2 pd2
+    | Linductive (ps1,al1), Linductive (ps2,al2) -> ps1 == ps2 &&
+        for_all2 (fun (i1,f1) (i2,f2) -> i1 == i2 && f1 == f2) al1 al2
     | _ -> false
 
   let equal d1 d2 = match d1.d_node, d2.d_node with
@@ -97,15 +97,11 @@ module D = struct
         let tag fs = fs.fs_name.id_tag in
         1 + Hashcons.combine_list tag ts.ts_name.id_tag l
 
+  let hs_fd fd = Hashcons.combine_option (fun f -> f.f_tag) fd
+
   let hs_ld ld = match ld with
-    | Lfunction  (fs,fd) ->
-        let tag vs = vs.vs_name.id_tag in
-        let hsh (l,t) = Hashcons.combine_list tag t.t_tag l in
-        Hashcons.combine fs.fs_name.id_tag (Hashcons.combine_option hsh fd)
-    | Lpredicate (ps,pd) ->
-        let tag vs = vs.vs_name.id_tag in
-        let hsh (l,f) = Hashcons.combine_list tag f.f_tag l in
-        Hashcons.combine ps.ps_name.id_tag (Hashcons.combine_option hsh pd)
+    | Lfunction  (fs,fd) -> Hashcons.combine fs.fs_name.id_tag (hs_fd fd)
+    | Lpredicate (ps,pd) -> Hashcons.combine ps.ps_name.id_tag (hs_fd pd)
     | Linductive (ps,l)  ->
         let hs_pair (i,f) = Hashcons.combine i.id_tag f.f_tag in
         Hashcons.combine_list hs_pair ps.ps_name.id_tag l
@@ -137,10 +133,18 @@ let create_prop k i f = Hdecl.hashcons (mk_decl (Dprop (k, id_register i, f)))
 (* error reporting *)
 
 exception NotAConstructor of fsymbol
+exception MalformedDefinition of fmla
 exception IllegalTypeAlias of tysymbol
-exception DuplicateVariable of vsymbol
 exception UnboundTypeVar of ident
 exception UnboundVars of Svs.t
+
+let make_fdef fs vl t =
+  let hd = t_app fs (List.map t_var vl) t.t_ty in
+  Lfunction  (fs, Some (f_forall vl [] (f_equ hd t)))
+
+let make_pdef ps vl f =
+  let hd = f_app ps (List.map t_var vl) in
+  Lpredicate (ps, Some (f_forall vl [] (f_iff hd f)))
 
 let create_type tdl =
   let check_constructor ty fs =
@@ -169,34 +173,41 @@ let create_type tdl =
   create_type tdl
 
 let create_logic ldl =
-  let add s v =
-    if Svs.mem v s then raise (DuplicateVariable v);
-    Svs.add v s
-  in
-  let check_vs vs vl =
-    let vs2 = List.fold_left add Svs.empty vl in
-    if not (Svs.subset vs vs2) then raise (UnboundVars vs)
-  in
-  let check_ax (_,f) =
+  let check_fv f =
     let fvs = f_freevars Svs.empty f in
     if not (Svs.is_empty fvs) then raise (UnboundVars fvs);
+  in
+  let check_def fd =
+    check_fv fd;
+    match fd.f_node with
+      | Fquant (Fforall, fq) -> f_open_quant fq
+      | _ -> raise (MalformedDefinition fd)
+  in
+  let check_ax (_,f) =
+    check_fv f;
     assert false (* TODO *)
   in
-  let lmatch sbs ty v = Ty.matching sbs ty v.vs_ty in
-  let rmatch sbs v ty = Ty.matching sbs v.vs_ty ty in
   let check_decl = function
-    | Lfunction (fs, Some (vl, t)) ->
-        let lty,rty = fs.fs_scheme in
-        let lsubst = Ty.matching Mid.empty rty t.t_ty in
-        let rsubst = Ty.matching Mid.empty t.t_ty rty in
-        ignore (List.fold_left2 lmatch lsubst lty vl);
-        ignore (List.fold_left2 rmatch rsubst vl lty);
-        check_vs (t_freevars Svs.empty t) vl
-    | Lpredicate (ps, Some (vl, f)) ->
-        let lty = ps.ps_scheme in
-        ignore (List.fold_left2 lmatch Mid.empty lty vl);
-        ignore (List.fold_left2 rmatch Mid.empty vl lty);
-        check_vs (f_freevars Svs.empty f) vl
+    | Lfunction (fs, Some fd) ->
+        let (vl,_,f) = check_def fd in
+        let hd = match f.f_node with
+          | Fapp (ps, [hd; _]) when ps == ps_equ -> hd
+          | _ -> raise (MalformedDefinition fd)
+        in
+        let t = try t_app fs (List.map t_var vl) hd.t_ty with
+          | _ -> raise (MalformedDefinition fd)
+        in
+        if t != hd then raise (MalformedDefinition fd)
+    | Lpredicate (ps, Some pd) ->
+        let (vl,_,f) = check_def pd in
+        let hd = match f.f_node with
+          | Fbinop (Fiff, hd, _) -> hd
+          | _ -> raise (MalformedDefinition pd)
+        in
+        let f = try f_app ps (List.map t_var vl) with
+          | _ -> raise (MalformedDefinition pd)
+        in
+        if f != hd then raise (MalformedDefinition pd)
     | Linductive (ps,la) ->
         List.iter check_ax la
     | _ -> ()
@@ -324,37 +335,27 @@ let add_symbol add id v uc =
 let get_namespace uc = List.hd uc.uc_import
 
 
-(** Builtin symbols *)
+(** Built-in symbols *)
 
-let t_int  = create_tysymbol (id_fresh "int") [] None
-let t_real = create_tysymbol (id_fresh "real") [] None
-
-let eq =
-  let v = ty_var (create_tvsymbol (id_fresh "a")) in
-  create_psymbol (id_fresh "=") [v; v;]
-let neq =
-  let v = ty_var (create_tvsymbol (id_fresh "a")) in
-  create_psymbol (id_fresh "<>") [v; v;]
-
-let builtin_tysymbols = [t_int; t_real]
-let builtin_psymbols  = [eq; neq]
+let builtin_ts = [ts_int; ts_real]
+let builtin_ps = [ps_equ; ps_neq]
 
 let ts_name x = x.ts_name
 let ps_name x = x.ps_name
 
 let builtin_ns =
   let add adder name = List.fold_right (fun s -> adder (name s).id_short s) in
-  let ns = add add_ts ts_name builtin_tysymbols empty_ns in
-  let ns = add add_ps ps_name builtin_psymbols ns in
+  let ns = add add_ts ts_name builtin_ts empty_ns in
+  let ns = add add_ps ps_name builtin_ps ns in
   ns
-    
+
 let builtin_th = id_register (id_fresh "Builtin")
 
-let builtin_known = 
+let builtin_known =
   let add name = List.fold_right (fun s -> Mid.add (name s) builtin_th) in
   let kn = Mid.add builtin_th builtin_th Mid.empty in
-  let kn = add ts_name builtin_tysymbols kn in
-  let kn = add ps_name builtin_psymbols kn in
+  let kn = add ts_name builtin_ts kn in
+  let kn = add ps_name builtin_ps kn in
   kn
 
 
@@ -455,13 +456,13 @@ let check_logic kn = function
       known_ty kn (snd fs.fs_scheme);
       List.iter (known_ty kn) (fst fs.fs_scheme);
       begin match df with
-        | Some (_,t) -> known_term kn t
+        | Some f -> known_fmla kn f
         | None -> ()
       end
   | Lpredicate (ps, dp) ->
       List.iter (known_ty kn) ps.ps_scheme;
       begin match dp with
-        | Some (_,f) -> known_fmla kn f
+        | Some f -> known_fmla kn f
         | None -> ()
       end
   | Linductive (ps, la) ->

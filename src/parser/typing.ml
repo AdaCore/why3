@@ -371,9 +371,9 @@ and dterm_node loc env = function
       let tl = dtype_args s.fs_name loc env tyl tl in
       Tapp (s, tl), ty
   | PPconst (ConstInt _ as c) ->
-      Tconst c, Tyapp (Theory.t_int, [])
+      Tconst c, Tyapp (Ty.ts_int, [])
   | PPconst (ConstReal _ as c) ->
-      Tconst c, Tyapp (Theory.t_real, [])
+      Tconst c, Tyapp (Ty.ts_real, [])
   | PPmatch _ ->
       assert false (* TODO *)
   | PPlet _ ->
@@ -607,31 +607,30 @@ let add_logics loc dl th =
       in
       create_vsymbol id ty
     in
+    let mk_vlist = List.map2 create_var d.ld_params in
     match d.ld_type with
     | None -> (* predicate *)
 	let ps = Hashtbl.find psymbols id in
-	let def = match d.ld_def with
+	begin match d.ld_def with
 	  | None -> 
-	      None
+              Lpredicate (ps, None)
 	  | Some f -> 
 	      let f = dfmla denv f in
-	      let vl = List.map2 create_var d.ld_params ps.ps_scheme in
+	      let vl = mk_vlist ps.ps_scheme in
 	      let env = env_of_vsymbol_list vl in
-	      Some (vl, fmla env f)
-	in
-	Lpredicate (ps, def)
+              make_pdef ps vl (fmla env f)
+        end
     | Some _ -> (* function *)
 	let fs = Hashtbl.find fsymbols id in
-	let def = match d.ld_def with
+	begin match d.ld_def with
 	  | None -> 
-	      None
+              Lfunction (fs, None)
 	  | Some t -> 
 	      let t = dterm denv t in
-	      let vl = List.map2 create_var d.ld_params (fst fs.fs_scheme) in
+	      let vl = mk_vlist (fst fs.fs_scheme) in
 	      let env = env_of_vsymbol_list vl in
-	      Some (vl, term env t)
-	in
-	Lfunction (fs, def)
+              make_fdef fs vl (term env t)
+        end
   in
   let dl = List.map type_decl dl in
   add_decl th (create_logic dl)
