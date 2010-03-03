@@ -30,7 +30,7 @@ type pp_infix =
   | PPand | PPor | PPimplies | PPiff 
 
 type pp_prefix = 
-  | PPneg | PPnot
+  | PPnot
 
 type ident = { id : string; id_loc : loc }
 

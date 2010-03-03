@@ -486,7 +486,7 @@ and dfmla env e = match e.pp_desc with
       Fnamed (x, f1)
   | PPvar _ -> 
       assert false (* TODO *)
-  | PPconst _ | PPprefix (PPneg, _) ->
+  | PPconst _ ->
       error ~loc:e.pp_loc PredicateExpected
 
 and dtype_args s loc env el tl =

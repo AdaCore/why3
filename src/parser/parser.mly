@@ -36,6 +36,10 @@
   let prefix_ppl loc p a = mk_ppl loc (PPprefix (p, a))
   let prefix_pp p a = prefix_ppl (loc ()) p a
 
+  let infix s = "infix " ^ s
+  let prefix s = "prefix " ^ s
+  let postfix s = "postfix " ^ s
+
 (***
   let with_loc loc d = { pdesc = d; ploc = loc }
   let locate d = with_loc (loc ()) d
@@ -92,7 +96,7 @@
 
 %token <string> LIDENT UIDENT
 %token <string> INTEGER
-%token <string> INFIXOP0 INFIXOP2 INFIXOP3
+%token <string> OP0 OP1 OP2 OP3
 %token <Ptree.real_constant> FLOAT
 %token <string> STRING
 %token ABSURD AMPAMP AND ARRAY ARROW AS ASSERT AT AXIOM 
@@ -103,12 +107,12 @@
 %token FUN FUNCTION GOAL
 %token IF IMPORT IN INCLUDE INDUCTIVE INVARIANT
 %token LEFTB LEFTBLEFTB LEFTPAR LEFTSQ LEMMA 
-%token LET LOGIC LRARROW MATCH MINUS
+%token LET LOGIC LRARROW MATCH 
 %token NAMESPACE NOT OF OR PARAMETER  PREDICATE PROP 
 %token QUOTE RAISE RAISES READS REC REF RETURNS RIGHTB RIGHTBRIGHTB
 %token RIGHTPAR RIGHTSQ 
-%token SEMICOLON SLASH 
-%token THEN THEORY TIMES TRUE TRY TYPE UNDERSCORE
+%token SEMICOLON 
+%token THEN THEORY TRUE TRY TYPE UNDERSCORE
 %token UNIT USE VARIANT VOID WHILE WITH WRITES
 
 /* Precedences */
@@ -136,10 +140,11 @@
 %right AND AMPAMP
 %right NOT
 %right prec_if
-%left EQUAL INFIXOP0
-%left INFIXOP2 MINUS
-%left INFIXOP3
-%right uminus
+%left EQUAL OP0
+%left OP1
+%left OP2
+%left OP3
+%right unary_op
 %left prec_app
 %left prec_ident
 %left LEFTSQ
@@ -177,22 +182,40 @@ list0_decl:
 ;
 
 ident:
-| LIDENT { { id = $1; id_loc = loc () } }
-| UIDENT { { id = $1; id_loc = loc () } }
+| lident_string { { id = $1; id_loc = loc () } }
+| UIDENT        { { id = $1; id_loc = loc () } }
 ;
 
 lident:
-| LIDENT                        { { id = $1; id_loc = loc () } }
-| LEFTPAR lident_infix RIGHTPAR { { id = $2; id_loc = loc () } }
+| lident_string
+    { { id = $1; id_loc = loc () } }
 ;
 
-lident_infix:
-| INFIXOP0 { $1 }
-| INFIXOP2 { $1 }
-| INFIXOP3 { $1 }
-| EQUAL    { "=" }
-| MINUS    { "-" }
+lident_string:
+| LIDENT                        
+    { $1 }
+| LEFTPAR UNDERSCORE lident_op UNDERSCORE RIGHTPAR 
+    { infix $3 }
+| LEFTPAR lident_op UNDERSCORE RIGHTPAR 
+    { prefix $2 }
+/*
+| LEFTPAR UNDERSCORE lident_op RIGHTPAR 
+    { postfix $3 }
+*/
+;
 
+lident_op:
+| OP0   { $1 }
+| OP2   { $1 }
+| OP3   { $1 }
+| EQUAL { "=" }
+;
+
+any_op:
+| OP0   { $1 }
+| OP2   { $1 }
+| OP3   { $1 }
+;
 
 uident:
 | UIDENT { { id = $1; id_loc = loc () } }
@@ -372,22 +395,28 @@ lexpr:
 | NOT lexpr 
    { prefix_pp PPnot $2 }
 | lexpr EQUAL lexpr 
-   { let id = { id = "="; id_loc = loc_i 2 } in
+   { let id = { id = infix "="; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$1; $3])) }
-| lexpr INFIXOP0 lexpr 
-   { let id = { id = $2; id_loc = loc_i 2 } in
+| lexpr OP0 lexpr 
+   { let id = { id = infix $2; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$1; $3])) }
-| lexpr MINUS lexpr
-   { let id = { id = "-"; id_loc = loc_i 2 } in
+| lexpr OP1 lexpr 
+   { let id = { id = infix $2; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$1; $3])) }
-| lexpr INFIXOP2 lexpr 
-   { let id = { id = $2; id_loc = loc_i 2 } in
+| lexpr OP2 lexpr 
+   { let id = { id = infix $2; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$1; $3])) }
-| lexpr INFIXOP3 lexpr 
-   { let id = { id = $2; id_loc = loc_i 2 } in
+| lexpr OP3 lexpr 
+   { let id = { id = infix $2; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$1; $3])) }
-| MINUS lexpr %prec uminus
-   { prefix_pp PPneg $2 }
+| any_op lexpr %prec unary_op
+   { let id = { id = prefix $1; id_loc = loc_i 2 } in
+     mk_pp (PPapp (Qident id, [$2])) }
+/*
+| lexpr any_op %prec unary_op
+   { let id = { id = postfix $2; id_loc = loc_i 2 } in
+     mk_pp (PPapp (Qident id, [$1])) }
+*/
 | qualid
    { mk_pp (PPvar $1) }
 | qualid LEFTPAR list1_lexpr_sep_comma RIGHTPAR

@@ -174,8 +174,6 @@ rule token = parse
 		  |(hexadigit+ as i) ("" as f))
     ['p' 'P'] (['-' '+']? digit+ as e)
       { FLOAT (RConstHexa (i, f, remove_leading_plus e)) }
-  | "(*)"
-      { LIDENT "*" }
   | "(*"
       { comment lexbuf; token lexbuf }
   | "'"
@@ -201,13 +199,11 @@ rule token = parse
   | "="
       { EQUAL }
   | "<>" | "<" | "<=" | ">" | ">=" as s
-      { INFIXOP0 s }
-  | "+" 
-      { INFIXOP2 "+" }
-  | "-"
-      { MINUS }
+      { OP0 s }
+  | "+" | "-" as c
+      { OP2 (String.make 1 c) }
   | "*" | "/" | "%" as c
-      { INFIXOP3 (String.make 1 c) }
+      { OP3 (String.make 1 c) }
   | "@"
       { AT }
   | "."

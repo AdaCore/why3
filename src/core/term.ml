@@ -1178,11 +1178,11 @@ let f_any prT prF f =
 
 let ps_equ =
   let v = ty_var (create_tvsymbol (id_fresh "a")) in
-  create_psymbol (id_fresh "=") [v; v]
+  create_psymbol (id_fresh "infix =") [v; v]
 
 let ps_neq =
   let v = ty_var (create_tvsymbol (id_fresh "a")) in
-  create_psymbol (id_fresh "<>") [v; v]
+  create_psymbol (id_fresh "infix <>") [v; v]
 
 (* FIXME: is it right to do so? *)
 let f_app p tl =
