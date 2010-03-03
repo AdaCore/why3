@@ -74,10 +74,10 @@ let transform l =
       List.map (fun t -> Transform.apply 
                      Simplify_recursive_definition.t_use t) l
     else l in
-    let l = if !inlining 
-    then 
-      List.map (fun t -> Transform.apply Inlining.t_use t) l
-    else l in
+(*     let l = if !inlining  *)
+(*     then  *)
+(*       List.map (fun t -> Transform.apply Inlining.t_use t) l *)
+(*     else l in *)
     if !print_stdout then 
       List.iter (Pretty.print_decl_or_use_list Format.std_formatter) l
 

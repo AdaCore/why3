@@ -54,7 +54,7 @@ and pp_desc =
   | PPinfix of lexpr * pp_infix * lexpr
   | PPprefix of pp_prefix * lexpr
   | PPif of lexpr * lexpr * lexpr
-  | PPforall of ident * pty * lexpr list list * lexpr
+  | PPforall of ident list * pty * lexpr list list * lexpr
   | PPexists of ident * pty * lexpr
   | PPnamed of string * lexpr
   | PPlet of ident* lexpr * lexpr

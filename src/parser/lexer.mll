@@ -48,7 +48,6 @@
 	"assert", ASSERT;
 	"axiom", AXIOM;
 	"begin", BEGIN;
-        "bool", BOOL;
         "check", CHECK;
 	"clone", CLONE;
 	"do", DO;

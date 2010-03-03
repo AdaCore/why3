@@ -2,15 +2,8 @@
 (* test file *)
 
 theory A
-  type t
-  logic c : t
-end
-
-theory B
-  use A as C
-  clone import A
-  logic f(C.t) : t
-  axiom Ax : forall x:t. x = C.c
+  use import prelude.Int
+  axiom A : forall x:int [x+x,x=0]. x+x = x -> x = 0
 end
 
 theory TreeForest

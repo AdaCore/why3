@@ -97,7 +97,7 @@
 %token <string> STRING
 %token ABSURD AMPAMP AND ARRAY ARROW AS ASSERT AT AXIOM 
 %token BANG BAR BARBAR BEGIN 
-%token BIGARROW BOOL CHECK CLONE COLON COLONEQUAL COMMA DO 
+%token BIGARROW CHECK CLONE COLON COLONEQUAL COMMA DO 
 %token DONE DOT ELSE END EOF EQUAL
 %token EXCEPTION EXISTS EXPORT EXTERNAL FALSE FOR FORALL FPI 
 %token FUN FUNCTION GOAL
@@ -353,10 +353,6 @@ primitive_type:
    { PPTtyapp ([$1], $2) }
 | LEFTPAR primitive_type COMMA list1_primitive_type_sep_comma RIGHTPAR lqualid
    { PPTtyapp ($2 :: $4, $6) }
-/*
-| LEFTPAR list1_primitive_type_sep_comma RIGHTPAR
-   { match $2 with [p] -> p | _ -> raise Parse_error }
-*/
 ;
 
 list1_primitive_type_sep_comma:
@@ -398,14 +394,15 @@ lexpr:
    { mk_pp (PPapp ($1, $3)) }
 | IF lexpr THEN lexpr ELSE lexpr %prec prec_if 
    { mk_pp (PPif ($2, $4, $6)) }
-| FORALL list1_lident_sep_comma COLON primitive_type triggers 
-  DOT lexpr %prec prec_forall
-   { let rec mk = function
+| FORALL list1_lident_sep_comma COLON primitive_type triggers DOT lexpr 
+  %prec prec_forall
+   { mk_pp (PPforall ($2, $4, $5, $7))
+     (*let rec mk = function
        | [] -> assert false
        | [id] -> mk_pp (PPforall (id, $4, $5, $7))
        | id :: l -> mk_pp (PPforall (id, $4, [], mk l))
      in
-     mk $2 }
+     mk $2 *) }
 | EXISTS lident COLON primitive_type DOT lexpr %prec prec_exists
    { mk_pp (PPexists ($2, $4, $6)) }
 | INTEGER
@@ -468,14 +465,6 @@ list1_type_var_sep_comma:
 | type_var COMMA list1_type_var_sep_comma { $1 :: $3 }
 ;
 
-/***
-qualid_ident:
-| IDENT          { $1, None }
-| IDENT AT       { $1, Some "" }
-| IDENT AT IDENT { $1, Some $3 }
-;
-***/
-
 ident_or_string:
 | ident  { $1.id }
 | STRING { $1 }
@@ -526,6 +515,12 @@ subst:
 ;
 
 /******* programs **************************************************
+
+qualid_ident:
+| IDENT          { $1, None }
+| IDENT AT       { $1, Some "" }
+| IDENT AT IDENT { $1, Some $3 }
+;
 
 list0_ident_sep_comma:
 | /* epsilon * /         { [] }

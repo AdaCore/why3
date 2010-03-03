@@ -372,7 +372,7 @@ and dterm_node =
 
 and dfmla = 
   | Fapp of psymbol * dterm list
-  | Fquant of quant * string * dty * dfmla
+  | Fquant of quant * string list * dty * dtrigger list list * dfmla
   | Fbinop of binop * dfmla * dfmla
   | Fnot of dfmla
   | Ftrue
@@ -380,6 +380,10 @@ and dfmla =
   | Fif of dfmla * dfmla * dfmla
 (*   | Flet of dterm * string * dfmla *)
 (*   | Fcase of dterm * (pattern * dfmla) list *)
+
+and dtrigger =
+  | TRterm of dterm
+  | TRfmla of dfmla
 
 let binop = function
   | PPand -> Fand
@@ -433,14 +437,27 @@ and dfmla env e = match e.pp_desc with
       Fbinop (binop op, dfmla env a, dfmla env b)
   | PPif (a, b, c) ->
       Fif (dfmla env a, dfmla env b, dfmla env c)  
-  | PPforall ({id=x}, ty, _, a) -> (* TODO: triggers *)
+  | PPforall (idl, ty, trl, a) ->
+      let ty = dty env ty in
+      let env, idl = 
+	map_fold_left
+	  (fun env {id=x} -> { env with dvars = M.add x ty env.dvars }, x)
+	  env idl
+      in
+      let trigger e = (* FIXME? *)
+	try 
+	  TRterm (dterm env e) 
+	with 
+	  | Error (TermExpected | UnboundSymbol _) 
+	  | Loc.Located (_, Error (TermExpected | UnboundSymbol _)) -> 
+	      TRfmla (dfmla env e) 
+      in
+      let trl = List.map (List.map trigger) trl in
+      Fquant (Fforall, idl, ty, trl, dfmla env a)
+  | PPexists ({id=x}, ty, a) -> (* TODO: triggers? *)
       let ty = dty env ty in
       let env = { env with dvars = M.add x ty env.dvars } in
-      Fquant (Fforall, x, ty, dfmla env a)
-  | PPexists ({id=x}, ty, a) -> (* TODO: triggers *)
-      let ty = dty env ty in
-      let env = { env with dvars = M.add x ty env.dvars } in
-      Fquant (Fexists, x, ty, dfmla env a)
+      Fquant (Fexists, [x], ty, [], dfmla env a)
   | PPapp (x, tl) ->
       let s = find_psymbol x env.th in
       let s, tyl = specialize_psymbol ~loc:e.pp_loc s in
@@ -497,11 +514,16 @@ and fmla env = function
       f_binary op (fmla env f1) (fmla env f2)
   | Fif (f1, f2, f3) ->
       f_if (fmla env f1) (fmla env f2) (fmla env f3)
-  | Fquant (q, x, t, f1) ->
+  | Fquant (q, xl, ty, trl, f1) ->
       (* TODO: shouldn't we localize this ident? *)
-      let v = create_vsymbol (id_fresh x) (ty_of_dty t) in
-      let env = M.add x v env in
-      f_quant q [v] [] (fmla env f1)
+      let ty = ty_of_dty ty in
+      let env, vl = 
+	map_fold_left 
+	  (fun env x -> 
+	     let v = create_vsymbol (id_fresh x) ty in M.add x v env, v) 
+	  env xl 
+      in
+      f_quant q vl [] (fmla env f1)
   | Fapp (s, tl) ->
       f_app s (List.map (term env) tl)
 

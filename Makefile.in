@@ -112,8 +112,8 @@ PARSER_CMO := parser.cmo lexer.cmo typing.cmo
 
 PARSER_CMO := $(addprefix src/parser/,$(PARSER_CMO))
 
-TRANSFORM_CMO := transform.cmo simplify_recursive_definition.cmo \
-	inlining.cmo
+TRANSFORM_CMO := transform.cmo simplify_recursive_definition.cmo 
+#	inlining.cmo
 
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
