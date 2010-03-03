@@ -100,7 +100,7 @@ val pat_equal_alpha : pattern -> pattern -> bool
 
 (** Terms and formulas *)
 
-type label
+type label = string
 
 type quant =
   | Fforall

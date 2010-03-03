@@ -368,6 +368,7 @@ and dterm_node =
   | Tapp of fsymbol * dterm list
   | Tlet of dterm * string * dterm
 (*   | Tcase of dterm * tbranch list *)
+  | Tnamed of string * dterm
   | Teps of string * dfmla
 
 and dfmla = 
@@ -380,6 +381,7 @@ and dfmla =
   | Fif of dfmla * dfmla * dfmla
   | Flet of dterm * string * dfmla
 (*   | Fcase of dterm * (pattern * dfmla) list *)
+  | Fnamed of string * fmla
 
 and dtrigger =
   | TRterm of dterm
@@ -429,8 +431,9 @@ and dterm_node loc env = function
       Tlet (e1, x, e2), e2.dt_ty
   | PPmatch _ ->
       assert false (* TODO *)
-  | PPnamed _ ->
-      assert false (* TODO *)
+  | PPnamed (x, e1) ->
+      let e1 = dterm env e1 in
+      Tnamed (x, e1), e1.dt_ty
   | PPexists _ | PPforall _ | PPif _ 
   | PPprefix _ | PPinfix _ | PPfalse | PPtrue ->
       error ~loc TermExpected
@@ -518,6 +521,9 @@ let rec term env t = match t.dt_node with
       let env = M.add x v env in
       let e2 = term env e2 in
       t_let v e1 e2
+  | Tnamed (x, e1) ->
+      let e1 = term env e1 in
+      t_label_add x e1
   | Teps _ ->
       assert false (*TODO*)
 
@@ -544,13 +550,15 @@ and fmla env = function
       f_quant q vl [] (fmla env f1)
   | Fapp (s, tl) ->
       f_app s (List.map (term env) tl)
-  | Flet (e1, x, e2) ->
+  | Flet (e1, x, f2) ->
       let ty = ty_of_dty e1.dt_ty in
       let e1 = term env e1 in 
       let v = create_vsymbol (id_fresh x) ty in
       let env = M.add x v env in
-      let e2 = fmla env e2 in
-      f_let v e1 e2
+      let f2 = fmla env f2 in
+      f_let v e1 f2
+  | Fnamed (x, f1) ->
+      f_label_add x f1
 
 (** Typing declarations, that is building environments. *)
 
