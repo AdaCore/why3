@@ -94,17 +94,6 @@ val pat_fold : ('a -> pattern -> 'a) -> 'a -> pattern -> 'a
 val pat_all : (pattern -> bool) -> pattern -> bool
 val pat_any : (pattern -> bool) -> pattern -> bool
 
-(* symbol-wise map/fold *)
-
-val pat_s_map :
-  (tysymbol -> tysymbol) -> (fsymbol -> fsymbol) -> pattern -> pattern
-
-val pat_s_fold :
-  ('a -> tysymbol -> 'a) -> ('a -> fsymbol -> 'a) -> 'a -> pattern -> 'a
-
-val pat_s_all : (tysymbol -> bool) -> (fsymbol -> bool) -> pattern -> bool
-val pat_s_any : (tysymbol -> bool) -> (fsymbol -> bool) -> pattern -> bool
-
 (* equality modulo alpha *)
 
 val pat_equal_alpha : pattern -> pattern -> bool
@@ -194,7 +183,7 @@ val t_let : vsymbol -> term -> term -> term
 val t_case : term -> (pattern * term) list -> ty -> term
 val t_eps : vsymbol -> fmla -> term
 
-val t_label_set : label list -> term -> term
+val t_label : label list -> term -> term
 val t_label_add : label -> term -> term
 
 (* smart constructors for fmla *)
@@ -215,7 +204,7 @@ val f_if : fmla -> fmla -> fmla -> fmla
 val f_let : vsymbol -> term -> fmla -> fmla
 val f_case :  term -> (pattern * fmla) list -> fmla
 
-val f_label_set : label list -> fmla -> fmla
+val f_label : label list -> fmla -> fmla
 val f_label_add : label -> fmla -> fmla
 
 (* bindings *)
@@ -280,7 +269,6 @@ val f_v_fold : ('a -> vsymbol -> 'a) -> 'a -> fmla -> 'a
 
 val t_v_all : (vsymbol -> bool) -> term -> bool
 val f_v_all : (vsymbol -> bool) -> fmla -> bool
-
 val t_v_any : (vsymbol -> bool) -> term -> bool
 val f_v_any : (vsymbol -> bool) -> fmla -> bool
 

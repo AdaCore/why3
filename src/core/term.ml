@@ -209,14 +209,6 @@ let rec pat_s_fold fnT fnF acc pat =
     | Papp (s, pl) -> List.fold_left fn (fnF acc s) pl
     | Pas (p, _) -> fn acc p
 
-let pat_s_all prT prF pat =
-  try pat_s_fold (all_fn prT) (all_fn prF) true pat
-  with FoldSkip -> false
-
-let pat_s_any prT prF pat =
-  try pat_s_fold (any_fn prT) (any_fn prF) false pat
-  with FoldSkip -> true
-
 (* alpha-equality on patterns *)
 
 let rec pat_equal_alpha p1 p2 =
@@ -466,9 +458,9 @@ let t_let v t1 t2 = Hterm.hashcons (mk_term (Tlet (t1, (v, t2))) t2.t_ty)
 let t_case t bl ty = Hterm.hashcons (mk_term (Tcase (t, bl)) ty)
 let t_eps u f = Hterm.hashcons (mk_term (Teps (u, f)) u.vs_ty)
 
-let t_label_set l t = Hterm.hashcons { t with t_label = l }
+let t_label     l t = Hterm.hashcons { t with t_label = l }
 let t_label_add l t = Hterm.hashcons { t with t_label = l :: t.t_label }
-let t_label_try l t = if l == []  then t else t_label_set l t
+let t_label_try l t = if l == []  then t else t_label l t
 
 (* hash-consing constructors for formulas *)
 
@@ -489,9 +481,9 @@ let f_if f1 f2 f3 = Hfmla.hashcons (mk_fmla (Fif (f1, f2, f3)))
 let f_let v t f = Hfmla.hashcons (mk_fmla (Flet (t, (v, f))))
 let f_case t bl = Hfmla.hashcons (mk_fmla (Fcase (t, bl)))
 
-let f_label_set l f = Hfmla.hashcons { f with f_label = l }
+let f_label     l f = Hfmla.hashcons { f with f_label = l }
 let f_label_add l f = Hfmla.hashcons { f with f_label = l :: f.f_label }
-let f_label_try l f = if l == []  then f else f_label_set l f
+let f_label_try l f = if l == []  then f else f_label l f
 
 (* unsafe map with level *)
 
@@ -873,96 +865,6 @@ and f_subst_fmla_alpha f1 f2 lvl f =
 let t_subst_fmla_alpha f1 f2 t = t_subst_fmla_alpha f1 f2 0 t
 let f_subst_fmla_alpha f1 f2 f = f_subst_fmla_alpha f1 f2 0 f
 
-(*
-(* calculate the set of closed subterms/subformulas *)
-
-let skip_empty = (Sterm.empty, Sfmla.empty, -1)
-
-let rec t_skip lvl (sT,sF,acc) t = match t.t_node with
-  | Tbvar i -> (sT, sF, max acc (i - lvl))
-  | _ ->
-    let (sT,sF,i) = t_fold_unsafe t_skip f_skip 0 (sT,sF,-1) t in
-    ((if i < 0 then Sterm.add t sT else sT), sF, max acc (i - lvl))
-
-and f_skip lvl (sT,sF,acc) f =
-    let (sT,sF,i) = f_fold_unsafe t_skip f_skip 0 (sT,sF,-1) f in
-    (sT, (if i < 0 then Sfmla.add f sF else sF), max acc (i - lvl))
-
-(* safe transparent map *)
-
-let rec t_map_skip fnT fnF sT sF lvl t =
-  if Sterm.mem t sT then let t1 = fnT t in
-    if (t1.t_ty == t.t_ty) then t1 else raise TypeMismatch
-  else t_map_unsafe (t_map_skip fnT fnF sT sF)
-                    (f_map_skip fnT fnF sT sF) lvl t
-
-and f_map_skip fnT fnF sT sF lvl f =
-  if Sfmla.mem f sF then fnF f
-  else f_map_unsafe (t_map_skip fnT fnF sT sF)
-                    (f_map_skip fnT fnF sT sF) lvl f
-
-let t_map_skip fnT fnF lvl t =
-  if lvl == 0 then let t1 = fnT t in
-    if (t1.t_ty == t.t_ty) then t1 else raise TypeMismatch
-  else  let sT,sF,_ = t_skip lvl skip_empty t in
-        t_map_skip fnT fnF sT sF lvl t
-
-let f_map_skip fnT fnF lvl f =
-  if lvl == 0 then fnF f
-  else  let sT,sF,_ = f_skip lvl skip_empty f in
-        f_map_skip fnT fnF sT sF lvl f
-
-let t_map_trans fnT fnF t =
-  t_map_unsafe (t_map_skip fnT fnF) (f_map_skip fnT fnF) 0 t
-
-let f_map_trans fnT fnF f =
-  f_map_unsafe (t_map_skip fnT fnF) (f_map_skip fnT fnF) 0 f
-
-(* safe transparent fold *)
-
-let rec t_fold_skip fnT fnF sT sF lvl acc t =
-  if Sterm.mem t sT then fnT acc t
-  else  t_fold_unsafe (t_fold_skip fnT fnF sT sF)
-                      (f_fold_skip fnT fnF sT sF) lvl acc t
-
-and f_fold_skip fnT fnF sT sF lvl acc f =
-  if Sfmla.mem f sF then fnF acc f
-  else  f_fold_unsafe (t_fold_skip fnT fnF sT sF)
-                      (f_fold_skip fnT fnF sT sF) lvl acc f
-
-let t_fold_skip fnT fnF lvl acc t =
-  if lvl == 0 then fnT acc t
-  else  let sT,sF,_ = t_skip lvl skip_empty t in
-        t_fold_skip fnT fnF sT sF lvl acc t
-
-let f_fold_skip fnT fnF lvl acc f =
-  if lvl == 0 then fnF acc f
-  else  let sT,sF,_ = f_skip lvl skip_empty f in
-        f_fold_skip fnT fnF sT sF lvl acc f
-
-let t_fold_trans fnT fnF acc t =
-  t_fold_unsafe (t_fold_skip fnT fnF) (f_fold_skip fnT fnF) 0 acc t
-
-let f_fold_trans fnT fnF acc f =
-  f_fold_unsafe (t_fold_skip fnT fnF) (f_fold_skip fnT fnF) 0 acc f
-
-let t_all_trans prT prF t =
-  try t_fold_trans (all_fn prT) (all_fn prF) true t
-  with FoldSkip -> false
-
-let f_all_trans prT prF f =
-  try f_fold_trans (all_fn prT) (all_fn prF) true f
-  with FoldSkip -> false
-
-let t_any_trans prT prF t =
-  try t_fold_trans (any_fn prT) (any_fn prF) false t
-  with FoldSkip -> true
-
-let f_any_trans prT prF f =
-  try f_fold_trans (any_fn prT) (any_fn prF) false f
-  with FoldSkip -> true
-*)
-
 (* unsafe constructors with type checking *)
 
 let t_let v t1 t2 =
@@ -1009,7 +911,6 @@ let f_case t bl =
 let rec t_s_map fnT fnV fnF fnP t =
   let fn_t = t_s_map fnT fnV fnF fnP in
   let fn_f = f_s_map fnT fnV fnF fnP in
-  let fn_b (pat, nv, t) = (pat_s_map fnT fnV fnF pat, nv, fn_t t) in
   let ty = fnT t.t_ty in
   t_label_try t.t_label (match t.t_node with
     | Tbvar n -> t_bvar n ty
@@ -1018,13 +919,17 @@ let rec t_s_map fnT fnV fnF fnP t =
     | Tapp (f, tl) -> t_app (fnF f) (List.map fn_t tl) ty
     | Tlet (t1, (u, t2)) ->
         let t1 = fn_t t1 in t_let (fnV u t1.t_ty) t1 (fn_t t2)
-    | Tcase (t1, bl) -> t_case (fn_t t1) (List.map fn_b bl) ty
+    | Tcase (t1, bl) ->
+        let fn_b = t_branch fnT fnV fnF fnP in
+        t_case (fn_t t1) (List.map fn_b bl) ty
     | Teps (u, f) -> t_eps (fnV u ty) (fn_f f))
+
+and t_branch fnT fnV fnF fnP (pat, nv, t) =
+  (pat_s_map fnT fnV fnF pat, nv, t_s_map fnT fnV fnF fnP t)
 
 and f_s_map fnT fnV fnF fnP f =
   let fn_t = t_s_map fnT fnV fnF fnP in
   let fn_f = f_s_map fnT fnV fnF fnP in
-  let fn_b (pat, nv, f) = (pat_s_map fnT fnV fnF pat, nv, fn_f f) in
   f_label_try f.f_label (match f.f_node with
     | Fapp (p, tl) -> f_app (fnP p) (List.map fn_t tl)
     | Fquant (q, (vl, nv, tl, f1)) ->
@@ -1037,7 +942,12 @@ and f_s_map fnT fnV fnF fnP f =
     | Fif (f1, f2, f3) -> f_if (fn_f f1) (fn_f f2) (fn_f f3)
     | Flet (t, (u, f1)) ->
         let t1 = fn_t t in f_let (fnV u t1.t_ty) t1 (fn_f f1)
-    | Fcase (t, bl) -> f_case (fn_t t) (List.map fn_b bl))
+    | Fcase (t, bl) ->
+        let fn_b = f_branch fnT fnV fnF fnP in
+        f_case (fn_t t) (List.map fn_b bl))
+
+and f_branch fnT fnV fnF fnP (pat, nv, f) =
+  (pat_s_map fnT fnV fnF pat, nv, f_s_map fnT fnV fnF fnP f)
 
 let get_fnV () =
   let ht = Hid.create 17 in
@@ -1060,28 +970,30 @@ let get_fnT fn =
   in
   fnT
 
-let t_s_map fnT fnF fnP t = t_s_map   (get_fnT fnT) (get_fnV ()) fnF fnP t
-let f_s_map fnT fnF fnP f = f_s_map   (get_fnT fnT) (get_fnV ()) fnF fnP f
-let pat_s_map fnT fnF pat = pat_s_map (get_fnT fnT) (get_fnV ()) fnF pat
+let t_s_map fnT fnF fnP t = t_s_map (get_fnT fnT) (get_fnV ()) fnF fnP t
+let f_s_map fnT fnF fnP f = f_s_map (get_fnT fnT) (get_fnV ()) fnF fnP f
 
 (* symbol-wise fold *)
 
 let rec t_s_fold fnT fnF fnP acc t =
   let fn_t = t_s_fold fnT fnF fnP in
   let fn_f = f_s_fold fnT fnF fnP in
-  let fn_b acc (pat,_,t) = fn_t (pat_s_fold fnT fnF acc pat) t in
   let acc = ty_s_fold fnT acc t.t_ty in
   match t.t_node with
     | Tbvar _ | Tvar _ | Tconst _ -> acc
     | Tapp (f, tl) -> List.fold_left fn_t (fnF acc f) tl
     | Tlet (t1, (_,t2)) -> fn_t (fn_t acc t1) t2
-    | Tcase (t1, bl) -> List.fold_left fn_b (fn_t acc t1) bl
+    | Tcase (t1, bl) ->
+        let fn_b = t_branch fnT fnF fnP in
+        List.fold_left fn_b (fn_t acc t1) bl
     | Teps (_,f) -> fn_f acc f
+
+and t_branch fnT fnF fnP acc (pat,_,t) =
+  t_s_fold fnT fnF fnP (pat_s_fold fnT fnF acc pat) t
 
 and f_s_fold fnT fnF fnP acc f =
   let fn_t = t_s_fold fnT fnF fnP in
   let fn_f = f_s_fold fnT fnF fnP in
-  let fn_b acc (pat,_,f) = fn_f (pat_s_fold fnT fnF acc pat) f in
   let fn_v acc u = ty_s_fold fnT acc u.vs_ty in
   match f.f_node with
     | Fapp (p, tl) -> List.fold_left fn_t (fnP acc p) tl
@@ -1093,7 +1005,12 @@ and f_s_fold fnT fnF fnP acc f =
     | Ftrue | Ffalse -> acc
     | Fif (f1, f2, f3) -> fn_f (fn_f (fn_f acc f1) f2) f3
     | Flet (t, (_,f1)) -> fn_f (fn_t acc t) f1
-    | Fcase (t, bl) -> List.fold_left fn_b (fn_t acc t) bl
+    | Fcase (t, bl) ->
+        let fn_b = f_branch fnT fnF fnP in
+        List.fold_left fn_b (fn_t acc t) bl
+
+and f_branch fnT fnF fnP acc (pat,_,f) =
+  f_s_fold fnT fnF fnP (pat_s_fold fnT fnF acc pat) f
 
 let t_s_all prT prF prP t =
   try t_s_fold (all_fn prT) (all_fn prF) (all_fn prP) true t
@@ -1110,7 +1027,6 @@ let t_s_any prT prF prP t =
 let f_s_any prT prF prP f =
   try f_s_fold (any_fn prT) (any_fn prF) (any_fn prP) false f
   with FoldSkip -> true
-
 
 (* safe smart constructors *)
 
