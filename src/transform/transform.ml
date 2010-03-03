@@ -92,7 +92,7 @@ let compose f g = {all = (fun x -> g.all (f.all x));
                    from_list = f.from_list;
                    to_list = g.to_list}
 
-let apply f x = f.to_list (f.all (f.from_list (List.rev x)))
+let apply f x = (List.rev (f.to_list (f.all (f.from_list x))))
     
 let clear f = f.clear ()
 

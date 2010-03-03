@@ -35,13 +35,16 @@ val print_list_delim :
   (Format.formatter -> unit -> unit) ->
   (Format.formatter -> unit -> unit) ->
   (Format.formatter -> 'b -> unit) -> Format.formatter -> 'b list -> unit
+
 val print_pair_delim :
   (Format.formatter -> unit -> unit) ->
   (Format.formatter -> unit -> unit) ->
   (Format.formatter -> unit -> unit) ->
   (Format.formatter -> 'a -> unit) -> 
   (Format.formatter -> 'b -> unit) -> Format.formatter -> 'a * 'b -> unit
-
+val print_pair :
+  (Format.formatter -> 'a -> unit) -> 
+  (Format.formatter -> 'b -> unit) -> Format.formatter -> 'a * 'b -> unit
 
 val print_iter1 : 
   (('a -> unit) -> 'b -> unit) ->
@@ -56,11 +59,6 @@ val print_iter2:
   (Format.formatter -> 'a -> unit) -> 
   (Format.formatter -> 'b -> unit) -> 
   Format.formatter -> 'c -> unit
-
-
-val print_pair :
-  (Format.formatter -> 'a -> unit) -> 
-  (Format.formatter -> 'b -> unit) -> Format.formatter -> 'a * 'b -> unit
 
 val space : formatter -> unit -> unit
 val alt : formatter -> unit -> unit

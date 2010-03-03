@@ -22,6 +22,12 @@ open Ty
 open Term
 open Theory
 
+val print_vsymbol : formatter -> vsymbol -> unit
+
+val print_fsymbol : formatter -> fsymbol -> unit
+
+val print_psymbol : formatter -> psymbol -> unit
+
 val print_ty : formatter -> ty -> unit
 
 val print_term : formatter -> term -> unit

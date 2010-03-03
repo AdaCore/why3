@@ -52,7 +52,7 @@ let rec print_term fmt t = match t.t_node with
   | Tconst _ ->
       fprintf fmt "[const]"
   | Tapp (s, tl) ->
-      fprintf fmt "(%a(%a)@ : %a)" 
+      fprintf fmt "@[<hov>(%a(%a)@ : %a)@]" 
 	print_ident s.fs_name (print_list comma print_term) tl
 	print_ty t.t_ty
   | Tlet (t1,tbound) -> 
@@ -62,18 +62,18 @@ let rec print_term fmt t = match t.t_node with
   | Tcase _ -> assert false (*TODO*)
   | Teps _ -> assert false
 
-let print_vs fmt vs = 
+let print_vsymbol fmt vs = 
   fprintf fmt "%a :@ %a" print_ident vs.vs_name print_ty vs.vs_ty
 
 let rec print_fmla fmt f = match f.f_node with
   | Fapp (s,tl) -> 
-      fprintf fmt "(%a(%a))" 
+      fprintf fmt "@[<hov>(%a(%a))@]" 
 	print_ident s.ps_name (print_list comma print_term) tl
   | Fquant (q,fquant) ->
       let vl,tl,f = f_open_quant fquant in
       fprintf fmt "(%s %a %a.@ %a)"
         (match q with Fforall -> "forall" | Fexists -> "exists")
-        (print_list comma print_vs) vl print_tl tl print_fmla f
+        (print_list comma print_vsymbol) vl print_tl tl print_fmla f
   | Ftrue -> fprintf fmt "true"
   | Ffalse -> fprintf fmt "false)"
   | Fbinop (b,f1,f2) -> 
@@ -106,14 +106,14 @@ let print_psymbol fmt {ps_name = ps_name; ps_scheme = tyl} =
     (print_list_paren comma print_ty) tyl 
 
 let print_ty_decl fmt (ts,tydef) = match tydef,ts.ts_def with
-  | Tabstract,None -> fprintf fmt "type %a %a" 
+  | Tabstract,None -> fprintf fmt "@[<hov>type %a %a@]" 
       (print_list_paren comma print_typevar) ts.ts_args
       print_ident ts.ts_name
-  | Tabstract,Some f -> fprintf fmt "type %a %a =@ %a" 
+  | Tabstract,Some f -> fprintf fmt "@[<hov>type %a %a =@ @[<hov>%a@]@]" 
       (print_list_paren comma print_typevar) ts.ts_args
       print_ident ts.ts_name
       print_ty f
-  | Talgebraic d, None -> fprintf fmt "type %a %a =@ %a" 
+  | Talgebraic d, None -> fprintf fmt "@[<hov>type %a %a =@ @[<hov>%a@]@]" 
       (print_list_paren comma print_typevar) ts.ts_args
       print_ident ts.ts_name
       (print_list newline print_fsymbol) d
@@ -134,8 +134,8 @@ let print_logic_decl fmt = function
   | Linductive _ -> assert false (*TODO*)
 
 let print_decl fmt d = match d.d_node with
-  | Dtype tl -> fprintf fmt "(* *)@\n%a" (print_list newline print_ty_decl) tl
-  | Dlogic ldl -> fprintf fmt "(* *)@\n%a" 
+  | Dtype tl -> fprintf fmt "@[<hov>%a@]@ (* *)" (print_list newline print_ty_decl) tl
+  | Dlogic ldl -> fprintf fmt "@[<hov>%a@]@ (* *)" 
       (print_list newline print_logic_decl) ldl 
   | Dprop (k,id,fmla) -> 
       fprintf fmt "%s %a :@ %a@\n" 
@@ -148,11 +148,10 @@ let print_decl_or_use fmt = function
   | Use u -> fprintf fmt "use export %a@\n" print_ident u.th_name
 
 let print_decl_or_use_list fmt de = 
-  fprintf fmt "@[<hov>%a@]"
-    (Pp.print_list Pp.newline print_decl_or_use) de
+  fprintf fmt "@[<hov>%a@]" (print_list newline print_decl_or_use) de
 
 let print_theory fmt t =
   fprintf fmt "@[@[<hov 2>theory %a@\n%a@]@\nend@]@\n@\n" print_ident t.th_name 
-    (print_list newline print_decl_or_use) t.th_decls;
+    print_decl_or_use_list t.th_decls;
   fprintf fmt "@?"
 

@@ -78,7 +78,7 @@ let connexe (m:Sid.t Mid.t)  =
         l::acc
       end
   in
-  Hid.fold (fun _ -> visit) ce []
+  List.rev (Hid.fold (fun _ -> visit) ce [])
 
 
 
