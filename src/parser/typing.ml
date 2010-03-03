@@ -381,7 +381,7 @@ and dfmla =
   | Fif of dfmla * dfmla * dfmla
   | Flet of dterm * string * dfmla
 (*   | Fcase of dterm * (pattern * dfmla) list *)
-  | Fnamed of string * fmla
+  | Fnamed of string * dfmla
 
 and dtrigger =
   | TRterm of dterm
@@ -481,8 +481,9 @@ and dfmla env e = match e.pp_desc with
       Flet (e1, x, e2)
   | PPmatch _ ->
       assert false (* TODO *)
-  | PPnamed _ ->
-      assert false (* TODO *)
+  | PPnamed (x, f1) ->
+      let f1 = dfmla env f1 in
+      Fnamed (x, f1)
   | PPvar _ -> 
       assert false (* TODO *)
   | PPconst _ | PPprefix (PPneg, _) ->
@@ -558,6 +559,7 @@ and fmla env = function
       let f2 = fmla env f2 in
       f_let v e1 f2
   | Fnamed (x, f1) ->
+      let f1 = fmla env f1 in
       f_label_add x f1
 
 (** Typing declarations, that is building environments. *)
