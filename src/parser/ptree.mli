@@ -77,8 +77,7 @@ type use = {
 
 type clone_subst = {
   ts_subst : (qualid * qualid) list;
-  fs_subst : (qualid * qualid) list;
-  ps_subst : (qualid * qualid) list;
+  ls_subst : (qualid * qualid) list;
 }
 
 type param = ident option * pty

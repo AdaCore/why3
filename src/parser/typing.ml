@@ -288,34 +288,41 @@ let specialize_tysymbol ~loc x env =
   let env = Htv.create 17 in
   s, List.map (find_type_var ~loc env) s.ts_args
 	
-let find_fsymbol {id=x; id_loc=loc} ns = 
-  try Mnm.find x ns.ns_fs
+let find_lsymbol {id=x; id_loc=loc} ns = 
+  try Mnm.find x ns.ns_ls
   with Not_found -> error ~loc (UnboundSymbol x)
 
-let find_fsymbol_ns p ns = 
-  find find_fsymbol p ns
+let find_lsymbol_ns p ns = 
+  find find_lsymbol p ns
 
-let find_fsymbol p th = 
-  find_fsymbol_ns p (get_namespace th)
+let find_lsymbol p th = 
+  find_lsymbol_ns p (get_namespace th)
 
 let specialize_fsymbol ~loc s =
-  let tl, t = s.fs_scheme in
+  let tl, t = match s.ls_value with
+    | Some t -> s.ls_args, t
+    | _ -> assert false (* FIXME: is it right? *)
+  in
   let env = Htv.create 17 in
   s, List.map (specialize ~loc env) tl, specialize ?loc env t
 
-let find_psymbol {id=x; id_loc=loc} ns = 
-  try Mnm.find x ns.ns_ps
+let find_lsymbol {id=x; id_loc=loc} ns = 
+  try Mnm.find x ns.ns_ls
   with Not_found -> error ~loc (UnboundSymbol x)
 
-let find_psymbol_ns p ns =
-  find find_psymbol p ns
+let find_lsymbol_ns p ns =
+  find find_lsymbol p ns
 
-let find_psymbol p th =
-  find_psymbol_ns p (get_namespace th)
+let find_lsymbol p th =
+  find_lsymbol_ns p (get_namespace th)
 
 let specialize_psymbol ~loc s =
+  let tl = match s.ls_value with
+    | None -> s.ls_args
+    | _ -> assert false (* FIXME: is it right? *)
+  in
   let env = Htv.create 17 in
-  s, List.map (specialize ~loc env) s.ps_scheme
+  s, List.map (specialize ~loc env) tl
 
 (** Typing types *)
 
@@ -365,14 +372,14 @@ type dterm = { dt_node : dterm_node; dt_ty : dty }
 and dterm_node =
   | Tvar of string
   | Tconst of constant
-  | Tapp of fsymbol * dterm list
+  | Tapp of lsymbol * dterm list
   | Tlet of dterm * string * dterm
 (*   | Tcase of dterm * tbranch list *)
   | Tnamed of string * dterm
   | Teps of string * dfmla
 
 and dfmla = 
-  | Fapp of psymbol * dterm list
+  | Fapp of lsymbol * dterm list
   | Fquant of quant * string list * dty * dtrigger list list * dfmla
   | Fbinop of binop * dfmla * dfmla
   | Fnot of dfmla
@@ -409,15 +416,15 @@ and dterm_node loc env = function
       Tvar x, ty
   | PPvar x -> 
       (* 0-arity symbol (constant) *)
-      let s = find_fsymbol x env.th in
+      let s = find_lsymbol x env.th in
       let s, tyl, ty = specialize_fsymbol ~loc s in
       let n = List.length tyl in
-      if n > 0 then error ~loc (BadNumberOfArguments (s.fs_name, 0, n));
+      if n > 0 then error ~loc (BadNumberOfArguments (s.ls_name, 0, n));
       Tapp (s, []), ty
   | PPapp (x, tl) ->
-      let s = find_fsymbol x env.th in
+      let s = find_lsymbol x env.th in
       let s, tyl, ty = specialize_fsymbol ~loc s in
-      let tl = dtype_args s.fs_name loc env tyl tl in
+      let tl = dtype_args s.ls_name loc env tyl tl in
       Tapp (s, tl), ty
   | PPconst (ConstInt _ as c) ->
       Tconst c, Tyapp (Ty.ts_int, [])
@@ -469,9 +476,9 @@ and dfmla env e = match e.pp_desc with
       let env = { env with dvars = M.add x ty env.dvars } in
       Fquant (Fexists, [x], ty, [], dfmla env a)
   | PPapp (x, tl) ->
-      let s = find_psymbol x env.th in
+      let s = find_lsymbol x env.th in
       let s, tyl = specialize_psymbol ~loc:e.pp_loc s in
-      let tl = dtype_args s.ps_name e.pp_loc env tyl tl in
+      let tl = dtype_args s.ls_name e.pp_loc env tyl tl in
       Fapp (s, tl)
   | PPlet ({id=x}, e1, e2) ->
       let e1 = dterm env e1 in
@@ -654,7 +661,7 @@ let add_types loc dl th =
 	  let constructor (loc, id, pl) = 
 	    let param (_, t) = ty_of_dty (dty th' t) in
 	    let tyl = List.map param pl in
-	    create_fsymbol (id_user id.id id.id_loc) (tyl, ty) true
+	    create_fconstr (id_user id.id id.id_loc) tyl ty
 	  in
 	  Talgebraic (List.map constructor cl)
     in
@@ -674,7 +681,7 @@ let add_logics loc dl th =
   (* 1. create all symbols and make an environment with these symbols *)
   let create_symbol th d = 
     let id = d.ld_ident.id in
-    if Hashtbl.mem denvs id || Mnm.mem id ns.ns_fs then error ~loc (Clash id);
+    if Hashtbl.mem denvs id || Mnm.mem id ns.ns_ls then error ~loc (Clash id);
     let v = id_user id loc in
     let denv = create_denv th in
     Hashtbl.add denvs id denv;
@@ -687,7 +694,7 @@ let add_logics loc dl th =
 	  add_decl th (create_logic [Lpredicate (ps, None)])
       | Some t -> (* function *)
 	  let t = type_ty (None, t) in
-	  let fs = create_fsymbol v (pl, t) false in
+	  let fs = create_fsymbol v pl t in
 	  Hashtbl.add fsymbols id fs;
 	  add_decl th (create_logic [Lfunction (fs, None)])
   in
@@ -717,7 +724,10 @@ let add_logics loc dl th =
 	  | None -> None
 	  | Some f -> 
 	      let f = dfmla denv f in
-	      let vl = mk_vlist ps.ps_scheme in
+              let vl = match ps.ls_value with
+                | None -> mk_vlist ps.ls_args
+                | _ -> assert false
+              in
 	      let env = env_of_vsymbol_list vl in
               Some (make_ps_defn ps vl (fmla env f))
         in
@@ -729,7 +739,10 @@ let add_logics loc dl th =
 	  | Some t -> 
 	      let loc = t.pp_loc in
 	      let t = dterm denv t in
-	      let vl = mk_vlist (fst fs.fs_scheme) in
+              let vl = match fs.ls_value with
+                | Some _ -> mk_vlist fs.ls_args
+                | _ -> assert false
+              in
 	      let env = env_of_vsymbol_list vl in
               try Some (make_fs_defn fs vl (term env t))
 	      with _ -> error ~loc (TermExpectedType 
@@ -862,16 +875,12 @@ and add_decl env th = function
 	    let add_ts m (p, q) = 
 	      Mts.add (find_tysymbol_ns p t.th_export) (find_tysymbol q th) m
 	    in
-	    let add_fs m (p, q) = 
-	      Mfs.add (find_fsymbol_ns p t.th_export) (find_fsymbol q th) m
-	    in
-	    let add_ps m (p, q) = 
-	      Mps.add (find_psymbol_ns p t.th_export) (find_psymbol q th) m
+	    let add_ls m (p, q) = 
+	      Mls.add (find_lsymbol_ns p t.th_export) (find_lsymbol q th) m
 	    in
 	    let s = 
 	      { inst_ts = List.fold_left add_ts Mts.empty s.ts_subst;
-		inst_fs = List.fold_left add_fs Mfs.empty s.fs_subst;
-		inst_ps = List.fold_left add_ps Mps.empty s.ps_subst; }
+                inst_ls = List.fold_left add_ls Mls.empty s.ls_subst; }
 	    in
 	    clone_export th t s
       in

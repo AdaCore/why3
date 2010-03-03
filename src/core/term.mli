@@ -33,38 +33,30 @@ module Hvs : Hashtbl.S with type key = vsymbol
 
 val create_vsymbol : preid -> ty -> vsymbol
 
-(** Function symbols *)
+(** Function and predicate symbols *)
 
-type fsymbol = private {
-  fs_name   : ident;
-  fs_scheme : ty list * ty;
-  fs_constr : bool;
+type lsymbol = private {
+  ls_name   : ident;
+  ls_args   : ty list;
+  ls_value  : ty option;
+  ls_constr : bool;
 }
 
-val create_fsymbol : preid -> ty list * ty -> bool -> fsymbol
+val create_fsymbol : preid -> ty list -> ty -> lsymbol
+val create_fconstr : preid -> ty list -> ty -> lsymbol
+val create_psymbol : preid -> ty list -> lsymbol
 
-module Sfs : Set.S with type elt = fsymbol
-module Mfs : Map.S with type key = fsymbol
-module Hfs : Hashtbl.S with type key = fsymbol
-
-(** Predicate symbols *)
-
-type psymbol = private {
-  ps_name   : ident;
-  ps_scheme : ty list;
-}
-
-val create_psymbol : preid -> ty list -> psymbol
-
-module Sps : Set.S with type elt = psymbol
-module Mps : Map.S with type key = psymbol
-module Hps : Hashtbl.S with type key = psymbol
+module Sls : Set.S with type elt = lsymbol
+module Mls : Map.S with type key = lsymbol
+module Hls : Hashtbl.S with type key = lsymbol
 
 (** Exceptions *)
 
 exception BadArity
 exception NonLinear of vsymbol
-exception ConstructorExpected of fsymbol
+exception ConstructorExpected of lsymbol
+exception FunctionSymbolExpected of lsymbol
+exception PredicateSymbolExpected of lsymbol
 
 (** Patterns *)
 
@@ -77,14 +69,14 @@ type pattern = private {
 and pattern_node = private
   | Pwild
   | Pvar of vsymbol
-  | Papp of fsymbol * pattern list
+  | Papp of lsymbol * pattern list
   | Pas  of pattern * vsymbol
 
 (* smart constructors for patterns *)
 
 val pat_wild : ty -> pattern
 val pat_var : vsymbol -> pattern
-val pat_app : fsymbol -> pattern list -> ty -> pattern
+val pat_app : lsymbol -> pattern list -> ty -> pattern
 val pat_as  : pattern -> vsymbol -> pattern
 
 (* generic traversal functions *)
@@ -137,13 +129,13 @@ and term_node = private
   | Tbvar of int
   | Tvar of vsymbol
   | Tconst of constant
-  | Tapp of fsymbol * term list
+  | Tapp of lsymbol * term list
   | Tlet of term * term_bound
   | Tcase of term * term_branch list
   | Teps of fmla_bound
 
 and fmla_node = private
-  | Fapp of psymbol * term list
+  | Fapp of lsymbol * term list
   | Fquant of quant * fmla_quant
   | Fbinop of binop * fmla * fmla
   | Fnot of fmla
@@ -178,7 +170,7 @@ module Sfmla : Set.S with type elt = fmla
 
 val t_var : vsymbol -> term
 val t_const : constant -> ty -> term
-val t_app : fsymbol -> term list -> ty -> term
+val t_app : lsymbol -> term list -> ty -> term
 val t_let : vsymbol -> term -> term -> term
 val t_case : term -> (pattern * term) list -> ty -> term
 val t_eps : vsymbol -> fmla -> term
@@ -188,7 +180,7 @@ val t_label_add : label -> term -> term
 
 (* smart constructors for fmla *)
 
-val f_app : psymbol -> term list -> fmla
+val f_app : lsymbol -> term list -> fmla
 val f_forall : vsymbol list -> trigger list -> fmla -> fmla
 val f_exists : vsymbol list -> trigger list -> fmla -> fmla
 val f_quant : quant -> vsymbol list -> trigger list -> fmla -> fmla
@@ -222,11 +214,11 @@ val f_open_quant : fmla_quant -> vsymbol list * trigger list * fmla
 val t_map : (term -> term) -> (fmla -> fmla) -> term -> term
 val f_map : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
 
-val t_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
-                                 -> 'a -> term -> 'a
+val t_fold :
+  ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> term -> 'a
 
-val f_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a)
-                                 -> 'a -> fmla -> 'a
+val f_fold :
+  ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> fmla -> 'a
 
 val t_all : (term -> bool) -> (fmla -> bool) -> term -> bool
 val f_all : (term -> bool) -> (fmla -> bool) -> fmla -> bool
@@ -235,29 +227,19 @@ val f_any : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 
 (* symbol-wise map/fold *)
 
-val t_s_map : (tysymbol -> tysymbol) -> (fsymbol -> fsymbol)
-                    -> (psymbol -> psymbol) -> term -> term
+val t_s_map : (tysymbol -> tysymbol) -> (lsymbol -> lsymbol) -> term -> term
+val f_s_map : (tysymbol -> tysymbol) -> (lsymbol -> lsymbol) -> fmla -> fmla
 
-val f_s_map : (tysymbol -> tysymbol) -> (fsymbol -> fsymbol)
-                    -> (psymbol -> psymbol) -> fmla -> fmla
+val t_s_fold :
+  ('a -> tysymbol -> 'a) -> ('a -> lsymbol -> 'a) -> 'a -> term -> 'a
 
-val t_s_fold : ('a -> tysymbol -> 'a) -> ('a -> fsymbol -> 'a)
-                 -> ('a -> psymbol -> 'a) -> 'a -> term -> 'a
+val f_s_fold :
+  ('a -> tysymbol -> 'a) -> ('a -> lsymbol -> 'a) -> 'a -> fmla -> 'a
 
-val f_s_fold : ('a -> tysymbol -> 'a) -> ('a -> fsymbol -> 'a)
-                 -> ('a -> psymbol -> 'a) -> 'a -> fmla -> 'a
-
-val t_s_all : (tysymbol -> bool) -> (fsymbol -> bool)
-                -> (psymbol -> bool) -> term -> bool
-
-val f_s_all : (tysymbol -> bool) -> (fsymbol -> bool)
-                -> (psymbol -> bool) -> fmla -> bool
-
-val t_s_any : (tysymbol -> bool) -> (fsymbol -> bool)
-                -> (psymbol -> bool) -> term -> bool
-
-val f_s_any : (tysymbol -> bool) -> (fsymbol -> bool)
-                -> (psymbol -> bool) -> fmla -> bool
+val t_s_all : (tysymbol -> bool) -> (lsymbol -> bool) -> term -> bool
+val f_s_all : (tysymbol -> bool) -> (lsymbol -> bool) -> fmla -> bool
+val t_s_any : (tysymbol -> bool) -> (lsymbol -> bool) -> term -> bool
+val f_s_any : (tysymbol -> bool) -> (lsymbol -> bool) -> fmla -> bool
 
 (* map/fold over free variables *)
 
@@ -329,8 +311,8 @@ val f_match : fmla -> fmla -> term Mvs.t -> term Mvs.t option
 
 (* built-in symbols *)
 
-val ps_equ : psymbol
-val ps_neq : psymbol
+val ps_equ : lsymbol
+val ps_neq : lsymbol
 
 val f_equ : term -> term -> fmla
 val f_neq : term -> term -> fmla

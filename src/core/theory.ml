@@ -19,6 +19,7 @@
 
 open Format
 open Pp
+open Util
 open Ident
 open Ty
 open Term
@@ -29,19 +30,19 @@ open Term
 
 type ty_def =
   | Tabstract
-  | Talgebraic of fsymbol list
+  | Talgebraic of lsymbol list
 
 type ty_decl = tysymbol * ty_def
 
 (* logic declaration *)
 
-type fs_defn = fsymbol * vsymbol list * term * fmla
-type ps_defn = psymbol * vsymbol list * fmla * fmla
+type fs_defn = lsymbol * vsymbol list * term * fmla
+type ps_defn = lsymbol * vsymbol list * fmla * fmla
 
 type logic_decl =
-  | Lfunction  of fsymbol * fs_defn option
-  | Lpredicate of psymbol * ps_defn option
-  | Linductive of psymbol * (ident * fmla) list
+  | Lfunction  of lsymbol * fs_defn option
+  | Lpredicate of lsymbol * ps_defn option
+  | Linductive of lsymbol * (ident * fmla) list
 
 (* proposition declaration *)
 
@@ -97,17 +98,17 @@ module D = struct
   let hs_td (ts,td) = match td with
     | Tabstract -> ts.ts_name.id_tag
     | Talgebraic l ->
-        let tag fs = fs.fs_name.id_tag in
+        let tag fs = fs.ls_name.id_tag in
         1 + Hashcons.combine_list tag ts.ts_name.id_tag l
 
   let hs_fd fd = Hashcons.combine_option (fun (_,_,_,f) -> f.f_tag) fd
 
   let hs_ld ld = match ld with
-    | Lfunction  (fs,fd) -> Hashcons.combine fs.fs_name.id_tag (hs_fd fd)
-    | Lpredicate (ps,pd) -> Hashcons.combine ps.ps_name.id_tag (hs_fd pd)
+    | Lfunction  (fs,fd) -> Hashcons.combine fs.ls_name.id_tag (hs_fd fd)
+    | Lpredicate (ps,pd) -> Hashcons.combine ps.ls_name.id_tag (hs_fd pd)
     | Linductive (ps,l)  ->
         let hs_pair (i,f) = Hashcons.combine i.id_tag f.f_tag in
-        Hashcons.combine_list hs_pair ps.ps_name.id_tag l
+        Hashcons.combine_list hs_pair ps.ls_name.id_tag l
 
   let hash d = match d.d_node with
     | Dtype  l -> Hashcons.combine_list hs_td 0 l
@@ -135,11 +136,11 @@ let create_prop k i f = Hdecl.hashcons (mk_decl (Dprop (k, id_register i, f)))
 
 (* error reporting *)
 
-exception NotAConstructor of fsymbol
+exception ConstructorExpected of lsymbol
 exception IllegalTypeAlias of tysymbol
 exception UnboundTypeVar of ident
 
-exception IllegalConstructor of fsymbol
+exception IllegalConstructor of lsymbol
 exception UnboundVars of Svs.t
 exception BadDecl of ident
 
@@ -148,7 +149,7 @@ let check_fvs f =
   if Svs.is_empty fvs then f else raise (UnboundVars fvs)
 
 let make_fs_defn fs vl t =
-  if fs.fs_constr then raise (IllegalConstructor fs);
+  if fs.ls_constr then raise (IllegalConstructor fs);
   let hd = t_app fs (List.map t_var vl) t.t_ty in
   let fd = f_forall vl [] (f_equ hd t) in
   fs, vl, t, check_fvs fd
@@ -166,19 +167,19 @@ let ps_defn_axiom (_,_,_,pd) = pd
 
 let create_type tdl =
   let check_constructor ty fs =
-    if not fs.fs_constr then raise (NotAConstructor fs);
-    let lty,rty = fs.fs_scheme in
-    ignore (Ty.matching Mid.empty rty ty);
+    if not fs.ls_constr then raise (ConstructorExpected fs);
+    let vty = of_option fs.ls_value in
+    ignore (Ty.matching Mid.empty vty ty);
     let add s ty = match ty.ty_node with
       | Tyvar v -> Sid.add v s
       | _ -> assert false
     in
-    let vs = ty_fold add Sid.empty rty in
+    let vs = ty_fold add Sid.empty vty in
     let rec check () ty = match ty.ty_node with
       | Tyvar v -> if not (Sid.mem v vs) then raise (UnboundTypeVar v)
       | _ -> ty_fold check () ty
     in
-    List.iter (check ()) lty
+    List.iter (check ()) fs.ls_args
   in
   let check_decl (ts,td) = match td with
     | Tabstract -> ()
@@ -193,9 +194,9 @@ let create_type tdl =
 let create_logic ldl =
   let check_decl = function
     | Lfunction (fs, Some (s,_,_,_)) when s != fs ->
-        raise (BadDecl fs.fs_name)
+        raise (BadDecl fs.ls_name)
     | Lpredicate (ps, Some (s,_,_,_)) when s != ps ->
-        raise (BadDecl ps.ps_name)
+        raise (BadDecl ps.ls_name)
     | Linductive (ps,la) ->
         let check_ax (_,f) =
           ignore (check_fvs f);
@@ -228,8 +229,7 @@ type theory = {
 
 and namespace = {
   ns_ts : tysymbol Mnm.t;   (* type symbols *)
-  ns_fs : fsymbol Mnm.t;    (* function symbols *)
-  ns_ps : psymbol Mnm.t;    (* predicate symbols *)
+  ns_ls : lsymbol Mnm.t;    (* logic symbols *)
   ns_ns : namespace Mnm.t;  (* inner namespaces *)
   ns_pr : fmla Mnm.t;       (* propositions *)
 }
@@ -267,12 +267,11 @@ let known_id kn id =
   if not (Mid.mem id kn) then raise (UnknownIdent id)
 
 let known_ts kn () ts = known_id kn ts.ts_name
-let known_fs kn () fs = known_id kn fs.fs_name
-let known_ps kn () ps = known_id kn ps.ps_name
+let known_ls kn () ls = known_id kn ls.ls_name
 
 let known_ty kn ty = ty_s_fold (known_ts kn) () ty
-let known_term kn t = t_s_fold (known_ts kn) (known_fs kn) (known_ps kn) () t
-let known_fmla kn f = f_s_fold (known_ts kn) (known_fs kn) (known_ps kn) () f
+let known_term kn t = t_s_fold (known_ts kn) (known_ls kn) () t
+let known_fmla kn f = f_s_fold (known_ts kn) (known_ls kn) () f
 
 let merge_known kn1 kn2 =
   let add id tid kn =
@@ -292,8 +291,7 @@ let add_known id uc =
 
 let empty_ns = {
   ns_ts = Mnm.empty;
-  ns_fs = Mnm.empty;
-  ns_ps = Mnm.empty;
+  ns_ls = Mnm.empty;
   ns_ns = Mnm.empty;
   ns_pr = Mnm.empty;
 }
@@ -304,14 +302,12 @@ let add_to_ns x v m =
 
 let merge_ns ns1 ns2 =
   { ns_ts = Mnm.fold add_to_ns ns1.ns_ts ns2.ns_ts;
-    ns_fs = Mnm.fold add_to_ns ns1.ns_fs ns2.ns_fs;
-    ns_ps = Mnm.fold add_to_ns ns1.ns_ps ns2.ns_ps;
+    ns_ls = Mnm.fold add_to_ns ns1.ns_ls ns2.ns_ls;
     ns_ns = Mnm.fold add_to_ns ns1.ns_ns ns2.ns_ns;
     ns_pr = Mnm.fold add_to_ns ns1.ns_pr ns2.ns_pr; }
 
 let add_ts x ts ns = { ns with ns_ts = add_to_ns x ts ns.ns_ts }
-let add_fs x fs ns = { ns with ns_fs = add_to_ns x fs ns.ns_fs }
-let add_ps x ps ns = { ns with ns_ps = add_to_ns x ps ns.ns_ps }
+let add_ls x fs ns = { ns with ns_ls = add_to_ns x fs ns.ns_ls }
 let add_pr x f  ns = { ns with ns_pr = add_to_ns x f  ns.ns_pr }
 
 let add_symbol add id v uc =
@@ -330,15 +326,15 @@ let get_namespace uc = List.hd uc.uc_import
 (** Built-in symbols *)
 
 let builtin_ts = [ts_int; ts_real]
-let builtin_ps = [ps_equ; ps_neq]
+let builtin_ls = [ps_equ; ps_neq]
 
 let ts_name x = x.ts_name
-let ps_name x = x.ps_name
+let ls_name x = x.ls_name
 
 let builtin_ns =
   let add adder name = List.fold_right (fun s -> adder (name s).id_short s) in
   let ns = add add_ts ts_name builtin_ts empty_ns in
-  let ns = add add_ps ps_name builtin_ps ns in
+  let ns = add add_ls ls_name builtin_ls ns in
   ns
 
 let builtin_th = id_register (id_fresh "Builtin")
@@ -347,7 +343,7 @@ let builtin_known =
   let add name = List.fold_right (fun s -> Mid.add (name s) builtin_th) in
   let kn = Mid.add builtin_th builtin_th Mid.empty in
   let kn = add ts_name builtin_ts kn in
-  let kn = add ps_name builtin_ps kn in
+  let kn = add ls_name builtin_ls kn in
   kn
 
 
@@ -418,7 +414,7 @@ let add_type uc (ts,def) =
   | Tabstract ->
       if ts.ts_def == None then add_param ts.ts_name uc else uc
   | Talgebraic lfs ->
-      let add_constr uc fs = add_symbol add_fs fs.fs_name fs uc in
+      let add_constr uc fs = add_symbol add_ls fs.ls_name fs uc in
       List.fold_left add_constr uc lfs
 
 let check_type kn (ts,def) = match def with
@@ -428,37 +424,37 @@ let check_type kn (ts,def) = match def with
         | None -> ()
       end
   | Talgebraic lfs ->
-      let check fs = List.iter (known_ty kn) (fst fs.fs_scheme) in
+      let check fs = List.iter (known_ty kn) fs.ls_args in
       List.iter check lfs
 
 let add_logic uc = function
   | Lfunction (fs, df) ->
-      let uc = add_symbol add_fs fs.fs_name fs uc in
-      if df == None then add_param fs.fs_name uc else uc
+      let uc = add_symbol add_ls fs.ls_name fs uc in
+      if df == None then add_param fs.ls_name uc else uc
   | Lpredicate (ps, dp) ->
-      let uc = add_symbol add_ps ps.ps_name ps uc in
-      if dp == None then add_param ps.ps_name uc else uc
+      let uc = add_symbol add_ls ps.ls_name ps uc in
+      if dp == None then add_param ps.ls_name uc else uc
   | Linductive (ps, la) ->
-      let uc = add_symbol add_ps ps.ps_name ps uc in
+      let uc = add_symbol add_ls ps.ls_name ps uc in
       let add uc (id,f) = add_symbol add_pr id f uc in
       List.fold_left add uc la
 
 let check_logic kn = function
   | Lfunction (fs, df) ->
-      known_ty kn (snd fs.fs_scheme);
-      List.iter (known_ty kn) (fst fs.fs_scheme);
+      known_ty kn (of_option fs.ls_value);
+      List.iter (known_ty kn) fs.ls_args;
       begin match df with
-        | Some (_,_,_,f) -> known_fmla kn f
+        | Some (_,_,t,_) -> known_term kn t
         | None -> ()
       end
   | Lpredicate (ps, dp) ->
-      List.iter (known_ty kn) ps.ps_scheme;
+      List.iter (known_ty kn) ps.ls_args;
       begin match dp with
-        | Some (_,_,_,f) -> known_fmla kn f
+        | Some (_,_,f,_) -> known_fmla kn f
         | None -> ()
       end
   | Linductive (ps, la) ->
-      List.iter (known_ty kn) ps.ps_scheme;
+      List.iter (known_ty kn) ps.ls_args;
       let check (_,f) = known_fmla kn f in
       List.iter check la
 
@@ -483,8 +479,7 @@ let add_decl uc d =
 
 type th_inst = {
   inst_ts : tysymbol Mts.t;
-  inst_fs : fsymbol  Mfs.t;
-  inst_ps : psymbol  Mps.t;
+  inst_ls : lsymbol  Mls.t;
 }
 
 let clone_export uc th i =
@@ -492,8 +487,7 @@ let clone_export uc th i =
     if not (Sid.mem id th.th_param) then raise (CannotInstantiate id)
   in
   let check_ts s _ = check_sym s.ts_name in Mts.iter check_ts i.inst_ts;
-  let check_fs s _ = check_sym s.fs_name in Mfs.iter check_fs i.inst_fs;
-  let check_ps s _ = check_sym s.ps_name in Mps.iter check_ps i.inst_ps;
+  let check_ls s _ = check_sym s.ls_name in Mls.iter check_ls i.inst_ls;
   (* memo tables *)
   let ts_table = Hashtbl.create 17 in
   let known = ref th.th_known in
@@ -550,22 +544,16 @@ let rec print_namespace fmt ns =
   fprintf fmt "@[<hov 2>types: ";
   Mnm.iter (fun x ty -> fprintf fmt "%s -> %a;@ " x print_ident ty.ts_name)
     ns.ns_ts;
-  fprintf fmt "@]@\n@[<hov 2>function symbols: ";
-  Mnm.iter (fun x s -> fprintf fmt "%s -> %a;@ " x print_ident s.fs_name)
-    ns.ns_fs;
-  fprintf fmt "@]@\n@[<hov 2>predicate symbols: ";
-  Mnm.iter (fun x s -> fprintf fmt "%s -> %a;@ " x print_ident s.ps_name)
-    ns.ns_ps;
+  fprintf fmt "@]@\n@[<hov 2>logic symbols: ";
+  Mnm.iter (fun x s -> fprintf fmt "%s -> %a;@ " x print_ident s.ls_name)
+    ns.ns_ls;
   fprintf fmt "@]@\n@[<hov 2>namespace: ";
   Mnm.iter (fun x th -> fprintf fmt "%s -> [@[%a@]];@ " x print_namespace th)
     ns.ns_ns;
   fprintf fmt "@]"
 
-let print_th fmt th =
-  print_namespace fmt (get_namespace th)
-
-let print_t fmt t =
-  fprintf fmt "<theory (TODO>"
+let print_uc fmt uc = print_namespace fmt (get_namespace uc)
+let print_th fmt th = fprintf fmt "<theory (TODO>"
 
 (*
 Local Variables:

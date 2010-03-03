@@ -27,7 +27,7 @@ open Term
 
 type ty_def =
   | Tabstract
-  | Talgebraic of fsymbol list
+  | Talgebraic of lsymbol list
 
 type ty_decl = tysymbol * ty_def
 
@@ -37,9 +37,9 @@ type fs_defn
 type ps_defn
 
 type logic_decl =
-  | Lfunction  of fsymbol * fs_defn option
-  | Lpredicate of psymbol * ps_defn option
-  | Linductive of psymbol * (ident * fmla) list
+  | Lfunction  of lsymbol * fs_defn option
+  | Lpredicate of lsymbol * ps_defn option
+  | Linductive of lsymbol * (ident * fmla) list
 
 (* proposition declaration *)
 
@@ -64,11 +64,11 @@ type decl = private {
 
 (* smart constructors *)
 
-val make_fs_defn : fsymbol -> vsymbol list -> term -> fs_defn
-val make_ps_defn : psymbol -> vsymbol list -> fmla -> ps_defn
+val make_fs_defn : lsymbol -> vsymbol list -> term -> fs_defn
+val make_ps_defn : lsymbol -> vsymbol list -> fmla -> ps_defn
 
-val open_fs_defn : fs_defn -> fsymbol * vsymbol list * term
-val open_ps_defn : ps_defn -> psymbol * vsymbol list * fmla
+val open_fs_defn : fs_defn -> lsymbol * vsymbol list * term
+val open_ps_defn : ps_defn -> lsymbol * vsymbol list * fmla
 
 val fs_defn_axiom : fs_defn -> fmla
 val ps_defn_axiom : ps_defn -> fmla
@@ -79,11 +79,11 @@ val create_prop : prop_kind -> preid -> fmla -> decl
 
 (* exceptions *)
 
-exception NotAConstructor of fsymbol
+exception ConstructorExpected of lsymbol
 exception IllegalTypeAlias of tysymbol
 exception UnboundTypeVar of ident
 
-exception IllegalConstructor of fsymbol
+exception IllegalConstructor of lsymbol
 exception UnboundVars of Svs.t
 exception BadDecl of ident
 
@@ -102,8 +102,7 @@ type theory = private {
 
 and namespace = private {
   ns_ts : tysymbol Mnm.t;   (* type symbols *)
-  ns_fs : fsymbol Mnm.t;    (* function symbols *)
-  ns_ps : psymbol Mnm.t;    (* predicate symbols *)
+  ns_ls : lsymbol Mnm.t;    (* logic symbols *)
   ns_ns : namespace Mnm.t;  (* inner namespaces *)
   ns_pr : fmla Mnm.t;       (* propositions *)
 }
@@ -130,8 +129,7 @@ val use_export : theory_uc -> theory -> theory_uc
 
 type th_inst = {
   inst_ts : tysymbol Mts.t;
-  inst_fs : fsymbol  Mfs.t;
-  inst_ps : psymbol  Mps.t;
+  inst_ls : lsymbol  Mls.t;
 }
 
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc
@@ -148,5 +146,5 @@ exception ClashSymbol of string
 
 (** Debugging *)
 
-val print_th : Format.formatter -> theory_uc -> unit
-val print_t  : Format.formatter -> theory  -> unit
+val print_uc : Format.formatter -> theory_uc -> unit
+val print_th : Format.formatter -> theory -> unit

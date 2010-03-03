@@ -27,9 +27,7 @@ val print_ident : formatter -> ident -> unit
 
 val print_vsymbol : formatter -> vsymbol -> unit
 
-val print_fsymbol : formatter -> fsymbol -> unit
-
-val print_psymbol : formatter -> psymbol -> unit
+val print_lsymbol : formatter -> lsymbol -> unit
 
 val print_ty : formatter -> ty -> unit
 

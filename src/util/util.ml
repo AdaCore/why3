@@ -22,6 +22,7 @@ let map_fold_left f acc l =
   in
   acc, List.rev rev
 
+let of_option = function Some v -> v | None -> assert false
 
 exception FoldSkip
 

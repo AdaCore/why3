@@ -47,53 +47,36 @@ let create_vsymbol name ty = {
 
 let fresh_vsymbol v = create_vsymbol (id_dup v.vs_name) v.vs_ty
 
-(** Function symbols *)
+(** Function and predicate symbols *)
 
-type fsymbol = {
-  fs_name   : ident;
-  fs_scheme : ty list * ty;
-  fs_constr : bool;
+type lsymbol = {
+  ls_name   : ident;
+  ls_args   : ty list;
+  ls_value  : ty option;
+  ls_constr : bool;
 }
 
-module Fsym = struct
-  type t = fsymbol
+module Lsym = struct
+  type t = lsymbol
   let equal = (==)
-  let hash fs = fs.fs_name.id_tag
+  let hash fs = fs.ls_name.id_tag
   let compare fs1 fs2 =
-    Pervasives.compare fs1.fs_name.id_tag fs2.fs_name.id_tag
+    Pervasives.compare fs1.ls_name.id_tag fs2.ls_name.id_tag
 end
-module Sfs = Set.Make(Fsym)
-module Mfs = Map.Make(Fsym)
-module Hfs = Hashtbl.Make(Fsym)
+module Sls = Set.Make(Lsym)
+module Mls = Map.Make(Lsym)
+module Hls = Hashtbl.Make(Lsym)
 
-let create_fsymbol name scheme constr = {
-  fs_name   = id_register name;
-  fs_scheme = scheme;
-  fs_constr = constr;
+let mk_lsymbol name args value constr = {
+  ls_name   = id_register name;
+  ls_args   = args;
+  ls_value  = value;
+  ls_constr = constr;
 }
 
-(** Predicate symbols *)
-
-type psymbol = {
-  ps_name   : ident;
-  ps_scheme : ty list;
-}
-
-module Psym = struct
-  type t = psymbol
-  let equal = (==)
-  let hash ps = ps.ps_name.id_tag
-  let compare ps1 ps2 =
-    Pervasives.compare ps1.ps_name.id_tag ps2.ps_name.id_tag
-end
-module Sps = Set.Make(Psym)
-module Mps = Map.Make(Psym)
-module Hps = Hashtbl.Make(Psym)
-
-let create_psymbol name scheme = {
-  ps_name   = id_register name;
-  ps_scheme = scheme;
-}
+let create_fsymbol nm al vl = mk_lsymbol nm al (Some vl) false
+let create_fconstr nm al vl = mk_lsymbol nm al (Some vl) true
+let create_psymbol nm al    = mk_lsymbol nm al None false
 
 (** Patterns *)
 
@@ -106,7 +89,7 @@ type pattern = {
 and pattern_node =
   | Pwild
   | Pvar of vsymbol
-  | Papp of fsymbol * pattern list
+  | Papp of lsymbol * pattern list
   | Pas of pattern * vsymbol
 
 module Hpat = struct
@@ -128,7 +111,7 @@ module Hpat = struct
   let hash_node = function
     | Pwild -> 0
     | Pvar v -> v.vs_name.id_tag
-    | Papp (s, pl) -> Hashcons.combine_list hash_pattern s.fs_name.id_tag pl
+    | Papp (s, pl) -> Hashcons.combine_list hash_pattern s.ls_name.id_tag pl
     | Pas (p, v) -> Hashcons.combine (hash_pattern p) v.vs_name.id_tag
 
   let hash p = Hashcons.combine (hash_node p.pat_node) p.pat_ty.ty_tag
@@ -167,17 +150,19 @@ let pat_any pr pat =
 (* smart constructors for patterns *)
 
 exception BadArity
-
-exception ConstructorExpected of fsymbol
+exception ConstructorExpected of lsymbol
+exception FunctionSymbolExpected of lsymbol
+exception PredicateSymbolExpected of lsymbol
 
 let pat_app fs pl ty =
-  if not fs.fs_constr then raise (ConstructorExpected fs);
-  let args, res = fs.fs_scheme in
-  ignore (try
-    List.fold_left2 Ty.matching
-      (Ty.matching Mid.empty res ty)
-        args (List.map (fun p -> p.pat_ty) pl)
-    with Invalid_argument _ -> raise BadArity);
+  if not fs.ls_constr then raise (ConstructorExpected fs);
+  let s = match fs.ls_value with
+    | Some vty -> Ty.matching Mid.empty vty ty
+    | None -> raise (FunctionSymbolExpected fs)
+  in
+  let mtch s ty p = Ty.matching s ty p.pat_ty in
+  ignore (try List.fold_left2 mtch s fs.ls_args pl
+          with Invalid_argument _ -> raise BadArity);
   pat_app fs pl ty
 
 let pat_as p v =
@@ -192,21 +177,21 @@ let pat_map fn pat = match pat.pat_node with
 
 (* symbol-wise map/fold *)
 
-let rec pat_s_map fnT fnV fnF pat =
-  let fn p = pat_s_map fnT fnV fnF p in
+let rec pat_s_map fnT fnV fnL pat =
+  let fn p = pat_s_map fnT fnV fnL p in
   let ty = fnT pat.pat_ty in
   match pat.pat_node with
     | Pwild -> pat_wild ty
     | Pvar v -> pat_var (fnV v ty)
-    | Papp (s, pl) -> pat_app (fnF s) (List.map fn pl) ty
+    | Papp (s, pl) -> pat_app (fnL s) (List.map fn pl) ty
     | Pas (p, v) -> pat_as (fn p) (fnV v ty)
 
-let rec pat_s_fold fnT fnF acc pat =
-  let fn acc p = pat_s_fold fnT fnF acc p in
+let rec pat_s_fold fnT fnL acc pat =
+  let fn acc p = pat_s_fold fnT fnL acc p in
   let acc = ty_s_fold fnT acc pat.pat_ty in
   match pat.pat_node with
     | Pwild | Pvar _ -> acc
-    | Papp (s, pl) -> List.fold_left fn (fnF acc s) pl
+    | Papp (s, pl) -> List.fold_left fn (fnL acc s) pl
     | Pas (p, _) -> fn acc p
 
 (* alpha-equality on patterns *)
@@ -260,13 +245,13 @@ and term_node =
   | Tbvar of int
   | Tvar of vsymbol
   | Tconst of constant
-  | Tapp of fsymbol * term list
+  | Tapp of lsymbol * term list
   | Tlet of term * term_bound
   | Tcase of term * term_branch list
   | Teps of fmla_bound
 
 and fmla_node =
-  | Fapp of psymbol * term list
+  | Fapp of lsymbol * term list
   | Fquant of quant * fmla_quant
   | Fbinop of binop * fmla * fmla
   | Fnot of fmla
@@ -343,7 +328,7 @@ module T = struct
     | Tbvar n -> n
     | Tvar v -> v.vs_name.id_tag
     | Tconst c -> Hashtbl.hash c
-    | Tapp (f, tl) -> Hashcons.combine_list t_hash (f.fs_name.id_tag) tl
+    | Tapp (f, tl) -> Hashcons.combine_list t_hash (f.ls_name.id_tag) tl
     | Tlet (t, bt) -> Hashcons.combine t.t_tag (t_hash_bound bt)
     | Tcase (t, bl) -> Hashcons.combine_list t_hash_branch t.t_tag bl
     | Teps f -> f_hash_bound f
@@ -424,7 +409,7 @@ module F = struct
     List.fold_left (Hashcons.combine_list tr_hash) h tl
 
   let f_hash_node = function
-    | Fapp (p, tl) -> Hashcons.combine_list t_hash p.ps_name.id_tag tl
+    | Fapp (p, tl) -> Hashcons.combine_list t_hash p.ls_name.id_tag tl
     | Fquant (q, bf) -> Hashcons.combine (Hashtbl.hash q) (f_hash_quant bf)
     | Fbinop (op, f1, f2) ->
         Hashcons.combine2 (Hashtbl.hash op) f1.f_tag f2.f_tag
@@ -873,23 +858,25 @@ let t_let v t1 t2 =
 let f_let v t1 f2 =
   if v.vs_ty == t1.t_ty then f_let v t1 f2 else raise TypeMismatch
 
-let t_app f tl ty =
-  let args, res = f.fs_scheme in
-  let _ =
-    try List.fold_left2 Ty.matching
-        (Ty.matching Mid.empty res ty)
-        args (List.map (fun t -> t.t_ty) tl)
-    with Invalid_argument _ -> raise BadArity
+let t_app fs tl ty =
+  let s = match fs.ls_value with
+    | Some vty -> Ty.matching Mid.empty vty ty
+    | _ -> raise (FunctionSymbolExpected fs)
   in
-  t_app f tl ty
+  let mtch s ty t = Ty.matching s ty t.t_ty in
+  ignore (try List.fold_left2 mtch s fs.ls_args tl
+          with Invalid_argument _ -> raise BadArity);
+  t_app fs tl ty
 
-let f_app p tl =
-  let _ =
-    try List.fold_left2 Ty.matching Mid.empty
-        p.ps_scheme (List.map (fun t -> t.t_ty) tl)
-    with Invalid_argument _ -> raise BadArity
+let f_app ps tl =
+  let s = match ps.ls_value with
+    | None -> Mid.empty
+    | _ -> raise (PredicateSymbolExpected ps)
   in
-  f_app p tl
+  let mtch s ty t = Ty.matching s ty t.t_ty in
+  ignore (try List.fold_left2 mtch s ps.ls_args tl
+          with Invalid_argument _ -> raise BadArity);
+  f_app ps tl
 
 let t_case t bl ty =
   let t_check_branch (p, _, tbr) =
@@ -908,30 +895,30 @@ let f_case t bl =
 
 (* symbol-wise map *)
 
-let rec t_s_map fnT fnV fnF fnP t =
-  let fn_t = t_s_map fnT fnV fnF fnP in
-  let fn_f = f_s_map fnT fnV fnF fnP in
+let rec t_s_map fnT fnV fnL t =
+  let fn_t = t_s_map fnT fnV fnL in
+  let fn_f = f_s_map fnT fnV fnL in
   let ty = fnT t.t_ty in
   t_label_try t.t_label (match t.t_node with
     | Tbvar n -> t_bvar n ty
     | Tvar v -> t_var (fnV v ty)
     | Tconst _ -> t
-    | Tapp (f, tl) -> t_app (fnF f) (List.map fn_t tl) ty
+    | Tapp (f, tl) -> t_app (fnL f) (List.map fn_t tl) ty
     | Tlet (t1, (u, t2)) ->
         let t1 = fn_t t1 in t_let (fnV u t1.t_ty) t1 (fn_t t2)
     | Tcase (t1, bl) ->
-        let fn_b = t_branch fnT fnV fnF fnP in
+        let fn_b = t_branch fnT fnV fnL in
         t_case (fn_t t1) (List.map fn_b bl) ty
     | Teps (u, f) -> t_eps (fnV u ty) (fn_f f))
 
-and t_branch fnT fnV fnF fnP (pat, nv, t) =
-  (pat_s_map fnT fnV fnF pat, nv, t_s_map fnT fnV fnF fnP t)
+and t_branch fnT fnV fnL (pat, nv, t) =
+  (pat_s_map fnT fnV fnL pat, nv, t_s_map fnT fnV fnL t)
 
-and f_s_map fnT fnV fnF fnP f =
-  let fn_t = t_s_map fnT fnV fnF fnP in
-  let fn_f = f_s_map fnT fnV fnF fnP in
+and f_s_map fnT fnV fnL f =
+  let fn_t = t_s_map fnT fnV fnL in
+  let fn_f = f_s_map fnT fnV fnL in
   f_label_try f.f_label (match f.f_node with
-    | Fapp (p, tl) -> f_app (fnP p) (List.map fn_t tl)
+    | Fapp (p, tl) -> f_app (fnL p) (List.map fn_t tl)
     | Fquant (q, (vl, nv, tl, f1)) ->
         let tl = tr_map fn_t fn_f tl in
         let fn_v u = fnV u (fnT u.vs_ty) in
@@ -943,11 +930,11 @@ and f_s_map fnT fnV fnF fnP f =
     | Flet (t, (u, f1)) ->
         let t1 = fn_t t in f_let (fnV u t1.t_ty) t1 (fn_f f1)
     | Fcase (t, bl) ->
-        let fn_b = f_branch fnT fnV fnF fnP in
+        let fn_b = f_branch fnT fnV fnL in
         f_case (fn_t t) (List.map fn_b bl))
 
-and f_branch fnT fnV fnF fnP (pat, nv, f) =
-  (pat_s_map fnT fnV fnF pat, nv, f_s_map fnT fnV fnF fnP f)
+and f_branch fnT fnV fnL (pat, nv, f) =
+  (pat_s_map fnT fnV fnL pat, nv, f_s_map fnT fnV fnL f)
 
 let get_fnV () =
   let ht = Hid.create 17 in
@@ -970,33 +957,33 @@ let get_fnT fn =
   in
   fnT
 
-let t_s_map fnT fnF fnP t = t_s_map (get_fnT fnT) (get_fnV ()) fnF fnP t
-let f_s_map fnT fnF fnP f = f_s_map (get_fnT fnT) (get_fnV ()) fnF fnP f
+let t_s_map fnT fnL t = t_s_map (get_fnT fnT) (get_fnV ()) fnL t
+let f_s_map fnT fnL f = f_s_map (get_fnT fnT) (get_fnV ()) fnL f
 
 (* symbol-wise fold *)
 
-let rec t_s_fold fnT fnF fnP acc t =
-  let fn_t = t_s_fold fnT fnF fnP in
-  let fn_f = f_s_fold fnT fnF fnP in
+let rec t_s_fold fnT fnL acc t =
+  let fn_t = t_s_fold fnT fnL in
+  let fn_f = f_s_fold fnT fnL in
   let acc = ty_s_fold fnT acc t.t_ty in
   match t.t_node with
     | Tbvar _ | Tvar _ | Tconst _ -> acc
-    | Tapp (f, tl) -> List.fold_left fn_t (fnF acc f) tl
+    | Tapp (f, tl) -> List.fold_left fn_t (fnL acc f) tl
     | Tlet (t1, (_,t2)) -> fn_t (fn_t acc t1) t2
     | Tcase (t1, bl) ->
-        let fn_b = t_branch fnT fnF fnP in
+        let fn_b = t_branch fnT fnL in
         List.fold_left fn_b (fn_t acc t1) bl
     | Teps (_,f) -> fn_f acc f
 
-and t_branch fnT fnF fnP acc (pat,_,t) =
-  t_s_fold fnT fnF fnP (pat_s_fold fnT fnF acc pat) t
+and t_branch fnT fnL acc (pat,_,t) =
+  t_s_fold fnT fnL (pat_s_fold fnT fnL acc pat) t
 
-and f_s_fold fnT fnF fnP acc f =
-  let fn_t = t_s_fold fnT fnF fnP in
-  let fn_f = f_s_fold fnT fnF fnP in
+and f_s_fold fnT fnL acc f =
+  let fn_t = t_s_fold fnT fnL in
+  let fn_f = f_s_fold fnT fnL in
   let fn_v acc u = ty_s_fold fnT acc u.vs_ty in
   match f.f_node with
-    | Fapp (p, tl) -> List.fold_left fn_t (fnP acc p) tl
+    | Fapp (p, tl) -> List.fold_left fn_t (fnL acc p) tl
     | Fquant (q, (vl,_,tl,f1)) ->
         let acc = List.fold_left fn_v acc vl in
         fn_f (tr_fold fn_t fn_f acc tl) f1
@@ -1006,27 +993,23 @@ and f_s_fold fnT fnF fnP acc f =
     | Fif (f1, f2, f3) -> fn_f (fn_f (fn_f acc f1) f2) f3
     | Flet (t, (_,f1)) -> fn_f (fn_t acc t) f1
     | Fcase (t, bl) ->
-        let fn_b = f_branch fnT fnF fnP in
+        let fn_b = f_branch fnT fnL in
         List.fold_left fn_b (fn_t acc t) bl
 
-and f_branch fnT fnF fnP acc (pat,_,f) =
-  f_s_fold fnT fnF fnP (pat_s_fold fnT fnF acc pat) f
+and f_branch fnT fnL acc (pat,_,f) =
+  f_s_fold fnT fnL (pat_s_fold fnT fnL acc pat) f
 
-let t_s_all prT prF prP t =
-  try t_s_fold (all_fn prT) (all_fn prF) (all_fn prP) true t
-  with FoldSkip -> false
+let t_s_all prT prL t =
+  try t_s_fold (all_fn prT) (all_fn prL) true t with FoldSkip -> false
 
-let f_s_all prT prF prP f =
-  try f_s_fold (all_fn prT) (all_fn prF) (all_fn prP) true f
-  with FoldSkip -> false
+let f_s_all prT prL f =
+  try f_s_fold (all_fn prT) (all_fn prL) true f with FoldSkip -> false
 
-let t_s_any prT prF prP t =
-  try t_s_fold (any_fn prT) (any_fn prF) (any_fn prP) false t
-  with FoldSkip -> true
+let t_s_any prT prL t =
+  try t_s_fold (any_fn prT) (any_fn prL) false t with FoldSkip -> true
 
-let f_s_any prT prF prP f =
-  try f_s_fold (any_fn prT) (any_fn prF) (any_fn prP) false f
-  with FoldSkip -> true
+let f_s_any prT prL f =
+  try f_s_fold (any_fn prT) (any_fn prL) false f with FoldSkip -> true
 
 (* safe smart constructors *)
 

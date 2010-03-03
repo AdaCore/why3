@@ -524,23 +524,22 @@ imp_exp:
 
 clone_subst:
 | /* epsilon */ 
-    { { ts_subst = []; fs_subst = []; ps_subst = [] } } 
+    { { ts_subst = []; ls_subst = [] } } 
 | WITH list1_comma_subst
-    { let t, f, p = $2 in
-      { ts_subst = t; fs_subst = f; ps_subst = p } } 
+    { let t,l = $2 in
+      { ts_subst = t; ls_subst = l } } 
 ;
 
 list1_comma_subst:
 | subst                         
     { $1 }
 | subst COMMA list1_comma_subst 
-    { let t,f,p = $1 in let tl,fl,pl = $3 in t@tl, f@fl, p@pl }
+    { let t,l = $1 in let tl,ll = $3 in t@tl, l@ll }
 ;
 
 subst:
-| TYPE      qualid EQUAL qualid { [$2, $4], [], [] }
-| FUNCTION  qualid EQUAL qualid { [], [$2, $4], [] }
-| PREDICATE qualid EQUAL qualid { [], [], [$2, $4] }
+| TYPE  qualid EQUAL qualid { [$2, $4], [] }
+| LOGIC qualid EQUAL qualid { [], [$2, $4] }
 ;
 
 /******* programs **************************************************

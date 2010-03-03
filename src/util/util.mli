@@ -14,12 +14,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val map_fold_left : 
+val map_fold_left :
   ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a list -> 'acc * 'b list
+
+val of_option : 'a option -> 'a
 
 exception FoldSkip
 
 val all_fn : ('a -> bool) -> 'b -> 'a -> bool
 val any_fn : ('a -> bool) -> 'b -> 'a -> bool
-
 

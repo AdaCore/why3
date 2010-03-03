@@ -55,7 +55,7 @@ let rec print_term fmt t = match t.t_node with
       fprintf fmt "<real constant>"
   | Tapp (s, tl) ->
       fprintf fmt "@[<hov>(%a(%a)@ : %a)@](" 
-	print_ident s.fs_name (print_list comma print_term) tl
+	print_ident s.ls_name (print_list comma print_term) tl
 	print_ty t.t_ty
   | Tlet (t1,tbound) -> 
       let vs,t2 = t_open_bound tbound in
@@ -72,7 +72,7 @@ let print_vsymbol fmt vs =
 let rec print_fmla fmt f = match f.f_node with
   | Fapp (s,tl) -> 
       fprintf fmt "@[<hov>(%a(%a))@]" 
-	print_ident s.ps_name (print_list comma print_term) tl
+	print_ident s.ls_name (print_list comma print_term) tl
   | Fquant (q,fquant) ->
       let vl,tl,f = f_open_quant fquant in
       fprintf fmt "(%s %a %a.@ %a)"
@@ -107,17 +107,15 @@ and print_tr fmt = function
   | TrTerm t -> print_term fmt t
   | TrFmla f -> print_fmla fmt f
 
-
-let print_fsymbol fmt {fs_name = fs_name; fs_scheme = tyl,ty} = 
-  fprintf fmt "%a%a :@ %a" 
-    print_ident fs_name
-    (print_list_paren comma print_ty) tyl 
-    print_ty ty
-
-let print_psymbol fmt {ps_name = ps_name; ps_scheme = tyl} = 
-  fprintf fmt "%a%a" 
-    print_ident ps_name
-    (print_list_paren comma print_ty) tyl 
+let print_lsymbol fmt {ls_name = ls_name; ls_args = tyl; ls_value = vty } = 
+  match vty with
+    | Some ty ->
+        fprintf fmt "%a%a :@ %a" print_ident ls_name
+          (print_list_paren comma print_ty) tyl 
+          print_ty ty
+    | None ->
+        fprintf fmt "%a%a" print_ident ls_name
+          (print_list_paren comma print_ty) tyl 
 
 let print_ty_decl fmt (ts,tydef) = match tydef,ts.ts_def with
   | Tabstract,None -> 
@@ -133,7 +131,7 @@ let print_ty_decl fmt (ts,tydef) = match tydef,ts.ts_def with
       fprintf fmt "@[<hov>type %a %a =@ @[<hov>%a@]@]" 
 	(print_list_paren comma print_typevar) ts.ts_args
 	print_ident ts.ts_name
-	(print_list newline print_fsymbol) d
+	(print_list newline print_lsymbol) d
   | Talgebraic _, Some _ -> 
       assert false
 
@@ -142,14 +140,14 @@ let print_vsymbol fmt {vs_name = vs_name; vs_ty = vs_ty} =
 
 let print_logic_decl fmt = function
   | Lfunction (fs,None) -> 
-      fprintf fmt "@[<hov 2>logic %a@]" print_fsymbol fs
+      fprintf fmt "@[<hov 2>logic %a@]" print_lsymbol fs
   | Lfunction (fs,Some fd) -> 
-      fprintf fmt "@[<hov 2>logic %a :@ %a@]" print_ident fs.fs_name
+      fprintf fmt "@[<hov 2>logic %a :@ %a@]" print_ident fs.ls_name
         print_fmla (fs_defn_axiom fd)
   | Lpredicate (fs,None) -> 
-      fprintf fmt "@[<hov 2>logic %a@]" print_psymbol fs
+      fprintf fmt "@[<hov 2>logic %a@]" print_lsymbol fs
   | Lpredicate (ps,Some fd) -> 
-      fprintf fmt "@[<hov 2>logic %a :@ %a@]" print_ident ps.ps_name
+      fprintf fmt "@[<hov 2>logic %a :@ %a@]" print_ident ps.ls_name
         print_fmla (ps_defn_axiom fd)
   | Linductive _ -> 
       assert false (*TODO*)

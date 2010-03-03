@@ -5,26 +5,26 @@ open Theory
 let ttrue _ = true
 let ffalse _ = false
 
-type env = { fs : (vsymbol list * term) Mfs.t;
-             ps : (vsymbol list * fmla) Mps.t}
+type env = { fs : (vsymbol list * term) Mls.t;
+             ps : (vsymbol list * fmla) Mls.t}
 
-let empty_env = { fs = Mfs.empty;
-                  ps = Mps.empty}
+let empty_env = { fs = Mls.empty;
+                  ps = Mls.empty}
 open Format
 
 let print_env fmt env =
   let print_map iter pterm pfs = Pp.print_iter2 iter Pp.newline Pp.comma pfs
     (Pp.print_pair (Pp.print_list Pp.comma Pretty.print_vsymbol) pterm) in
   fprintf fmt "fs:@[<hov>%a@]@\nps:@[<hov>%a@]@\n"
-    (print_map Mfs.iter Pretty.print_term Pretty.print_fsymbol) env.fs
-    (print_map Mps.iter Pretty.print_fmla Pretty.print_psymbol) env.ps
+    (print_map Mls.iter Pretty.print_term Pretty.print_lsymbol) env.fs
+    (print_map Mls.iter Pretty.print_fmla Pretty.print_lsymbol) env.ps
 
 let rec replacet env t = 
   let t = substt env t in
   match t.t_node with
     | Tapp (fs,tl) ->
         begin try 
-          let (vs,t) = Mfs.find fs env.fs in
+          let (vs,t) = Mls.find fs env.fs in
           let m = List.fold_left2 (fun acc x y -> Mvs.add x y acc)
             Mvs.empty vs tl in
           t_subst m t
@@ -36,7 +36,7 @@ and replacep env f =
   match f.f_node with
     | Fapp (ps,tl) ->
         begin try 
-          let (vs,t) = Mps.find ps env.ps in
+          let (vs,t) = Mls.find ps env.ps in
           let m = List.fold_left2 (fun acc x y -> Mvs.add x y acc) 
             Mvs.empty vs tl in
           f_subst m f
@@ -54,16 +54,16 @@ let fold env d =
           | Lfunction (fs,Some fmla) -> 
               let _,vs,t = open_fs_defn fmla in
               let t = replacet env t in
-              if t_s_any ffalse ((==) fs) ffalse t 
+              if t_s_any ffalse ((==) fs) t 
               then  env,[create_logic [Lfunction(fs,Some (make_fs_defn fs vs t))]]
-              else {env with fs = Mfs.add fs (vs,t) env.fs},[]
+              else {env with fs = Mls.add fs (vs,t) env.fs},[]
           | Lpredicate (ps,None) -> env,[d]
           | Lpredicate (ps,Some fmla) -> 
               let _,vs,f = open_ps_defn fmla in
               let f = replacep env f in
-              if f_s_any ffalse ffalse ((==) ps) f 
+              if f_s_any ffalse ((==) ps) f 
               then  env,[create_logic [Lpredicate(ps,Some (make_ps_defn ps vs f))]]
-              else {env with ps = Mps.add ps (vs,f) env.ps},[]
+              else {env with ps = Mls.add ps (vs,f) env.ps},[]
           | Linductive (ps,fmlal) -> 
               let fmlal = List.map (fun (id,fmla) -> id,replacep env fmla) fmlal in
               env,[create_logic [Linductive (ps,fmlal)]]
