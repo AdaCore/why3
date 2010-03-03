@@ -378,7 +378,7 @@ and dfmla =
   | Ftrue
   | Ffalse
   | Fif of dfmla * dfmla * dfmla
-(*   | Flet of dterm * string * dfmla *)
+  | Flet of dterm * string * dfmla
 (*   | Fcase of dterm * (pattern * dfmla) list *)
 
 and dtrigger =
@@ -390,6 +390,11 @@ let binop = function
   | PPor -> For
   | PPimplies -> Fimplies
   | PPiff -> Fiff
+
+let rec trigger_not_a_term_exn = function
+  | Error (TermExpected | UnboundSymbol _) -> true
+  | Loc.Located (_, exn) -> trigger_not_a_term_exn exn
+  | _ -> false
 
 let rec dterm env t = 
   let n, ty = dterm_node t.pp_loc env t.pp_desc in
@@ -416,9 +421,13 @@ and dterm_node loc env = function
       Tconst c, Tyapp (Ty.ts_int, [])
   | PPconst (ConstReal _ as c) ->
       Tconst c, Tyapp (Ty.ts_real, [])
+  | PPlet ({id=x}, e1, e2) ->
+      let e1 = dterm env e1 in
+      let ty = e1.dt_ty in
+      let env = { env with dvars = M.add x ty env.dvars } in
+      let e2 = dterm env e2 in
+      Tlet (e1, x, e2), e2.dt_ty
   | PPmatch _ ->
-      assert false (* TODO *)
-  | PPlet _ ->
       assert false (* TODO *)
   | PPnamed _ ->
       assert false (* TODO *)
@@ -447,10 +456,8 @@ and dfmla env e = match e.pp_desc with
       let trigger e = (* FIXME? *)
 	try 
 	  TRterm (dterm env e) 
-	with 
-	  | Error (TermExpected | UnboundSymbol _) 
-	  | Loc.Located (_, Error (TermExpected | UnboundSymbol _)) -> 
-	      TRfmla (dfmla env e) 
+	with exn when trigger_not_a_term_exn exn ->
+	  TRfmla (dfmla env e) 
       in
       let trl = List.map (List.map trigger) trl in
       Fquant (Fforall, idl, ty, trl, dfmla env a)
@@ -463,9 +470,13 @@ and dfmla env e = match e.pp_desc with
       let s, tyl = specialize_psymbol ~loc:e.pp_loc s in
       let tl = dtype_args s.ps_name e.pp_loc env tyl tl in
       Fapp (s, tl)
+  | PPlet ({id=x}, e1, e2) ->
+      let e1 = dterm env e1 in
+      let ty = e1.dt_ty in
+      let env = { env with dvars = M.add x ty env.dvars } in
+      let e2 = dfmla env e2 in
+      Flet (e1, x, e2)
   | PPmatch _ ->
-      assert false (* TODO *)
-  | PPlet _ ->
       assert false (* TODO *)
   | PPnamed _ ->
       assert false (* TODO *)
@@ -500,8 +511,15 @@ let rec term env t = match t.dt_node with
       t_const c (ty_of_dty t.dt_ty)
   | Tapp (s, tl) ->
       t_app s (List.map (term env) tl) (ty_of_dty t.dt_ty)
-  | _ ->
-      assert false (* TODO *)
+  | Tlet (e1, x, e2) ->
+      let ty = ty_of_dty e1.dt_ty in
+      let e1 = term env e1 in 
+      let v = create_vsymbol (id_fresh x) ty in
+      let env = M.add x v env in
+      let e2 = term env e2 in
+      t_let v e1 e2
+  | Teps _ ->
+      assert false (*TODO*)
 
 and fmla env = function
   | Ftrue ->
@@ -526,7 +544,13 @@ and fmla env = function
       f_quant q vl [] (fmla env f1)
   | Fapp (s, tl) ->
       f_app s (List.map (term env) tl)
-
+  | Flet (e1, x, e2) ->
+      let ty = ty_of_dty e1.dt_ty in
+      let e1 = term env e1 in 
+      let v = create_vsymbol (id_fresh x) ty in
+      let env = M.add x v env in
+      let e2 = fmla env e2 in
+      f_let v e1 e2
 
 (** Typing declarations, that is building environments. *)
 

@@ -3,7 +3,8 @@
 
 theory A
   use import prelude.Int
-  axiom A : forall x:int [x+x,x=0]. x+x = x -> x = 0
+  axiom A : 
+    let x = 2+2 in x*x = 16
 end
 
 theory TreeForest

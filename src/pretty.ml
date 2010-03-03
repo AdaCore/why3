@@ -49,8 +49,10 @@ let rec print_term fmt t = match t.t_node with
       assert false
   | Tvar n -> 
       print_ident fmt n.vs_name
-  | Tconst _ ->
-      fprintf fmt "[const]"
+  | Tconst (ConstInt s) ->
+      fprintf fmt "%s" s
+  | Tconst (ConstReal _) ->
+      fprintf fmt "<real constant>"
   | Tapp (s, tl) ->
       fprintf fmt "@[<hov>(%a(%a)@ : %a)@]" 
 	print_ident s.fs_name (print_list comma print_term) tl
@@ -59,8 +61,10 @@ let rec print_term fmt t = match t.t_node with
       let vs,t2 = t_open_bound tbound in
       fprintf fmt "(let %a = %a in@ %a)"
       print_ident vs.vs_name print_term t1 print_term t2
-  | Tcase _ -> assert false (*TODO*)
-  | Teps _ -> assert false
+  | Tcase _ ->
+      assert false (*TODO*)
+  | Teps _ -> 
+      assert false (*TODO*)
 
 let print_vsymbol fmt vs = 
   fprintf fmt "%a :@ %a" print_ident vs.vs_name print_ty vs.vs_ty
@@ -74,8 +78,10 @@ let rec print_fmla fmt f = match f.f_node with
       fprintf fmt "(%s %a %a.@ %a)"
         (match q with Fforall -> "forall" | Fexists -> "exists")
         (print_list comma print_vsymbol) vl print_tl tl print_fmla f
-  | Ftrue -> fprintf fmt "true"
-  | Ffalse -> fprintf fmt "false)"
+  | Ftrue -> 
+      fprintf fmt "true"
+  | Ffalse -> 
+      fprintf fmt "false)"
   | Fbinop (b,f1,f2) -> 
       fprintf fmt "(%a@ %s@ %a)"
         print_fmla f1
@@ -83,8 +89,16 @@ let rec print_fmla fmt f = match f.f_node with
            | Fand -> "and" | For -> "or" 
            | Fimplies -> "->" | Fiff -> "<->")
         print_fmla f2
-  | Fnot f -> fprintf fmt "(not@ %a)" print_fmla f
-  | _ -> assert false (*TODO*) 
+  | Fnot f -> 
+      fprintf fmt "(not@ %a)" print_fmla f
+  | Flet (t, f) -> 
+      let v,f = f_open_bound f in
+      fprintf fmt "@[<hov 2>let %a = %a in@ %a@]" print_ident v.vs_name
+	print_term t print_fmla f
+  | Fcase _ ->
+      assert false (*TODO*)
+  | Fif _ ->
+      assert false (*TODO*)
 
 and print_tl fmt tl =
   fprintf fmt "[%a]" (print_list alt (print_list comma print_tr)) tl
@@ -106,37 +120,46 @@ let print_psymbol fmt {ps_name = ps_name; ps_scheme = tyl} =
     (print_list_paren comma print_ty) tyl 
 
 let print_ty_decl fmt (ts,tydef) = match tydef,ts.ts_def with
-  | Tabstract,None -> fprintf fmt "@[<hov>type %a %a@]" 
-      (print_list_paren comma print_typevar) ts.ts_args
-      print_ident ts.ts_name
-  | Tabstract,Some f -> fprintf fmt "@[<hov>type %a %a =@ @[<hov>%a@]@]" 
-      (print_list_paren comma print_typevar) ts.ts_args
-      print_ident ts.ts_name
-      print_ty f
-  | Talgebraic d, None -> fprintf fmt "@[<hov>type %a %a =@ @[<hov>%a@]@]" 
-      (print_list_paren comma print_typevar) ts.ts_args
-      print_ident ts.ts_name
-      (print_list newline print_fsymbol) d
-  | Talgebraic _, Some _ -> assert false
+  | Tabstract,None -> 
+      fprintf fmt "@[<hov>type %a %a@]" 
+	(print_list_paren comma print_typevar) ts.ts_args
+	print_ident ts.ts_name
+  | Tabstract,Some f -> 
+      fprintf fmt "@[<hov>type %a %a =@ @[<hov>%a@]@]" 
+	(print_list_paren comma print_typevar) ts.ts_args
+	print_ident ts.ts_name
+	print_ty f
+  | Talgebraic d, None -> 
+      fprintf fmt "@[<hov>type %a %a =@ @[<hov>%a@]@]" 
+	(print_list_paren comma print_typevar) ts.ts_args
+	print_ident ts.ts_name
+	(print_list newline print_fsymbol) d
+  | Talgebraic _, Some _ -> 
+      assert false
 
 let print_vsymbol fmt {vs_name = vs_name; vs_ty = vs_ty} =
   fprintf fmt "%a :@ %a" print_ident vs_name print_ty vs_ty
 
 let print_logic_decl fmt = function
-  | Lfunction (fs,None) -> fprintf fmt "@[<hov 2>logic %a@]" print_fsymbol fs
+  | Lfunction (fs,None) -> 
+      fprintf fmt "@[<hov 2>logic %a@]" print_fsymbol fs
   | Lfunction (fs,Some fd) -> 
       fprintf fmt "@[<hov 2>logic %a :@ %a@]" print_ident fs.fs_name
         print_fmla (fs_defn_axiom fd)
-  | Lpredicate (fs,None) -> fprintf fmt "@[<hov 2>logic %a@]" print_psymbol fs
+  | Lpredicate (fs,None) -> 
+      fprintf fmt "@[<hov 2>logic %a@]" print_psymbol fs
   | Lpredicate (ps,Some fd) -> 
       fprintf fmt "@[<hov 2>logic %a :@ %a@]" print_ident ps.ps_name
         print_fmla (ps_defn_axiom fd)
-  | Linductive _ -> assert false (*TODO*)
+  | Linductive _ -> 
+      assert false (*TODO*)
 
 let print_decl fmt d = match d.d_node with
-  | Dtype tl -> fprintf fmt "@[<hov>%a@]@ (* *)" (print_list newline print_ty_decl) tl
-  | Dlogic ldl -> fprintf fmt "@[<hov>%a@]@ (* *)" 
-      (print_list newline print_logic_decl) ldl 
+  | Dtype tl -> 
+      fprintf fmt "@[<hov>%a@]@ (* *)" (print_list newline print_ty_decl) tl
+  | Dlogic ldl -> 
+      fprintf fmt "@[<hov>%a@]@ (* *)" 
+	(print_list newline print_logic_decl) ldl 
   | Dprop (k,id,fmla) -> 
       fprintf fmt "%s %a :@ %a@\n" 
         (match k with Paxiom -> "axiom" | Pgoal -> "goal" | Plemma -> "lemma")
@@ -146,7 +169,7 @@ let print_decl fmt d = match d.d_node with
 let print_decl_or_use fmt = function
   | Decl d -> fprintf fmt "%a" print_decl d
   | Use u -> fprintf fmt "use export %a@\n" print_ident u.th_name
-
+      
 let print_decl_or_use_list fmt de = 
   fprintf fmt "@[<hov>%a@]" (print_list newline print_decl_or_use) de
 
