@@ -134,7 +134,7 @@
 
 %right prec_named
 %left COLONEQUAL
-%right prec_forall prec_exists
+%right prec_quant
 %right ARROW LRARROW
 %right OR BARBAR
 %right AND AMPAMP
@@ -423,17 +423,10 @@ lexpr:
    { mk_pp (PPapp ($1, $3)) }
 | IF lexpr THEN lexpr ELSE lexpr %prec prec_if 
    { mk_pp (PPif ($2, $4, $6)) }
-| FORALL list1_lident_sep_comma COLON primitive_type triggers DOT lexpr 
-  %prec prec_forall
-   { mk_pp (PPforall ($2, $4, $5, $7))
-     (*let rec mk = function
-       | [] -> assert false
-       | [id] -> mk_pp (PPforall (id, $4, $5, $7))
-       | id :: l -> mk_pp (PPforall (id, $4, [], mk l))
-     in
-     mk $2 *) }
-| EXISTS lident COLON primitive_type DOT lexpr %prec prec_exists
-   { mk_pp (PPexists ($2, $4, $6)) }
+| FORALL list1_uquant_sep_comma triggers DOT lexpr %prec prec_quant
+   { mk_pp (PPquant (PPforall, $2, $3, $5)) }
+| EXISTS list1_uquant_sep_comma triggers DOT lexpr %prec prec_quant
+   { mk_pp (PPquant (PPexists, $2, $3, $5)) }
 | INTEGER
    { mk_pp (PPconst (Term.ConstInt $1)) }
 | FLOAT
@@ -451,6 +444,13 @@ lexpr:
 | MATCH lexpr WITH bar_ match_cases END
    { mk_pp (PPmatch ($2, $5)) }
 ;
+
+list1_uquant_sep_comma:
+| uquant                              { [$1] }
+| uquant COMMA list1_uquant_sep_comma { $1::$3 }
+
+uquant:
+| list1_lident_sep_comma COLON primitive_type { $1,$3 }
 
 match_cases:
 | match_case                  { [$1] }

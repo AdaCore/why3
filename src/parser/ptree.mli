@@ -26,6 +26,9 @@ type loc = Loc.position
 type real_constant = Term.real_constant
 type constant = Term.constant
 
+type pp_quant =
+  | PPforall | PPexists
+
 type pp_infix = 
   | PPand | PPor | PPimplies | PPiff 
 
@@ -42,6 +45,9 @@ type pty =
   | PPTtyvar of ident
   | PPTtyapp of pty list * qualid
 
+type uquant =
+  ident list * pty
+
 type lexpr = 
   { pp_loc : loc; pp_desc : pp_desc }
 
@@ -54,10 +60,9 @@ and pp_desc =
   | PPinfix of lexpr * pp_infix * lexpr
   | PPprefix of pp_prefix * lexpr
   | PPif of lexpr * lexpr * lexpr
-  | PPforall of ident list * pty * lexpr list list * lexpr
-  | PPexists of ident * pty * lexpr
+  | PPquant of pp_quant * uquant list * lexpr list list * lexpr
   | PPnamed of string * lexpr
-  | PPlet of ident* lexpr * lexpr
+  | PPlet of ident * lexpr * lexpr
   | PPmatch of lexpr * ((qualid * ident list * loc) * lexpr) list
 
 (*s Declarations. *)
