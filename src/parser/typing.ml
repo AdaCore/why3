@@ -915,7 +915,7 @@ let add_theories =
     (fun env pt -> let _, env = add_theory env pt in env) 
 
 let list_theory env = 
-  M.fold (fun _ v acc -> v::acc) env.theories []
+  List.rev (M.fold (fun _ v acc -> v::acc) env.theories [])
 
 (*
 Local Variables: 

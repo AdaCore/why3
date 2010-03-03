@@ -18,9 +18,12 @@
 (**************************************************************************)
 
 open Format
+open Ident
 open Ty
 open Term
 open Theory
+
+val print_ident : formatter -> ident -> unit
 
 val print_vsymbol : formatter -> vsymbol -> unit
 
@@ -35,6 +38,8 @@ val print_term : formatter -> term -> unit
 val print_fmla : formatter -> fmla -> unit
 
 val print_decl : formatter -> decl -> unit
+
+val print_decl_list : formatter -> decl list -> unit
 
 val print_decl_or_use : formatter -> decl_or_use -> unit
 

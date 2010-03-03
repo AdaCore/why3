@@ -27,6 +27,7 @@ let loadpath = ref []
 let print_stdout = ref false
 let simplify_recursive = ref false
 let inlining = ref false
+let transform = ref false
 
 let () = 
   Arg.parse 
@@ -38,9 +39,12 @@ let () =
      "--print-stdout", Arg.Set print_stdout, "print the results to stdout";
      "--simplify-recursive", Arg.Set simplify_recursive, "simplify recursive definition";
      "--inline", Arg.Set inlining, "inline the definition not recursive";
+     "--transform", Arg.Set transform, "transform the goal (--inline,and --simplify-recursive set it) ";
     ]
     (fun f -> files := f :: !files)
     "usage: why [options] files..."
+
+let transform = !transform || !simplify_recursive || !inlining
 
 let rec report fmt = function
   | Lexer.Error e ->
@@ -63,23 +67,27 @@ let type_file env file =
   if !parse_only then env else Typing.add_theories env f
 
 let transform l =
-  let transform = !simplify_recursive || !inlining in
+  let l = Typing.list_theory l in
   if !print_stdout && not transform then 
-    List.iter (Pretty.print_theory Format.std_formatter) 
-      (Typing.list_theory l)
+    List.iter (Pretty.print_theory Format.std_formatter) l
   else
-    let l = List.map (fun t -> t.Theory.th_decls) (Typing.list_theory l) in
+    let l = List.map (fun t -> t,Transform.apply Flatten.t t.Theory.th_decls)
+      l in
     let l = if !simplify_recursive 
     then 
-      List.map (fun t -> Transform.apply 
-                     Simplify_recursive_definition.t_use t) l
+      List.map (fun (t,dl) -> t,Transform.apply 
+                     Simplify_recursive_definition.t dl) l
     else l in
     let l = if !inlining
     then
-      List.map (fun t -> Transform.apply Inlining.t_use t) l
+      List.map (fun (t,dl) -> t,Transform.apply Inlining.t dl) l
     else l in
     if !print_stdout then 
-      List.iter (Pretty.print_decl_or_use_list Format.std_formatter) l
+      List.iter (fun (t,dl) ->
+                   Format.printf "@[@[<hov 2>theory %a@\n%a@]@\nend@]@\n@\n@?" 
+                     Pretty.print_ident t.Theory.th_name 
+                     Pretty.print_decl_list dl
+                ) l
 
 
 let () =

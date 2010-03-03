@@ -54,7 +54,7 @@ let rec print_term fmt t = match t.t_node with
   | Tconst (ConstReal _) ->
       fprintf fmt "<real constant>"
   | Tapp (s, tl) ->
-      fprintf fmt "@[<hov>(%a(%a)@ : %a)@]" 
+      fprintf fmt "@[<hov>(%a(%a)@ : %a)@](" 
 	print_ident s.fs_name (print_list comma print_term) tl
 	print_ty t.t_ty
   | Tlet (t1,tbound) -> 
@@ -156,15 +156,18 @@ let print_logic_decl fmt = function
 
 let print_decl fmt d = match d.d_node with
   | Dtype tl -> 
-      fprintf fmt "@[<hov>%a@]@ (* *)" (print_list newline print_ty_decl) tl
+      fprintf fmt "@[<hov>%a@ (* *)@]" (print_list newline print_ty_decl) tl
   | Dlogic ldl -> 
-      fprintf fmt "@[<hov>%a@]@ (* *)" 
+      fprintf fmt "@[<hov>%a@ (* *)@]" 
 	(print_list newline print_logic_decl) ldl 
   | Dprop (k,id,fmla) -> 
       fprintf fmt "%s %a :@ %a@\n" 
         (match k with Paxiom -> "axiom" | Pgoal -> "goal" | Plemma -> "lemma")
         print_ident id
         print_fmla fmla
+
+let print_decl_list fmt de = 
+  fprintf fmt "@[<hov>%a@]" (print_list newline print_decl) de
 
 let print_decl_or_use fmt = function
   | Decl d -> fprintf fmt "%a" print_decl d

@@ -22,10 +22,12 @@
 type 'a hashconsedlist = (int * 'a list) list
 
 
+type 'a tag = 'a -> int
+
 module type Sig =
 sig
   type t
-  val tag : t -> int
+  val tag : t tag
 end
 
 (* The datastructure for hashconsed list *)
@@ -106,19 +108,19 @@ let memo f tag h x =
 
 module type S =
 sig
-  type elt1
-  type elt2
+  type t1
+  type t2
 
-  val all : (elt1 list -> elt2 list) -> (elt1,elt2) t
-  val fold_map_right : ('a -> elt1 -> ('a * elt2 list)) -> 'a -> (elt1,elt2) t
-  val fold_map_left : ('a -> elt1 -> ('a * elt2 list)) -> 'a -> (elt1,elt2) t
-  val elt : (elt1 -> elt2 list) -> (elt1,elt2) t
+  val all : (t1 list -> t2 list) -> (t1,t2) t
+  val fold_map_right : ('a -> t1 -> ('a * t2 list)) -> 'a -> (t1,t2) t
+  val fold_map_left : ('a -> t1 -> ('a * t2 list)) -> 'a -> (t1,t2) t
+  val elt : (t1 -> t2 list) -> (t1,t2) t
 end
 
 module Make (X1 : Sig) (X2 : Sig) =
 struct
-  type elt1 = X1.t
-  type elt2 = X2.t
+  type t1 = X1.t
+  type t2 = X2.t
 
   module LH1 = LH(X1)
   module LH2 = LH(X2)
@@ -190,8 +192,6 @@ module SDecl =
     let tag x = x.d_tag
   end
 
-module TDecl = Make(SDecl)(SDecl)
-
 module SDecl_or_Use =
   struct
     type t = decl_or_use
@@ -200,14 +200,26 @@ module SDecl_or_Use =
       | Use t -> 1+t.th_name.Ident.id_tag 
   end
 
-module TDecl_or_Use = Make(SDecl_or_Use)(SDecl_or_Use)
-
 module STheory =
   struct
     type t = theory
     let tag t = t.th_name.Ident.id_tag 
   end
 
-module TTheory = Make(STheory)(STheory)
+module STerm =
+  struct
+    type t = Term.term
+    let tag t = t.Term.t_tag
+  end
 
+module SFmla =
+  struct
+    type t = Term.fmla
+    let tag t = t.Term.f_tag
+  end
+
+module TDecl = Make(SDecl)(SDecl)
+module TDecl_or_Use = Make(SDecl_or_Use)(SDecl_or_Use)
+module TDecl_or_Use_Decl = Make(SDecl_or_Use)(SDecl)
+module TTheory = Make(STheory)(STheory)
 module TTheory_Decl = Make(STheory)(SDecl)
