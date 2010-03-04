@@ -298,31 +298,23 @@ let find_lsymbol_ns p ns =
 let find_lsymbol p th = 
   find_lsymbol_ns p (get_namespace th)
 
-let specialize_fsymbol ~loc s =
-  let tl, t = match s.ls_value with
-    | Some t -> s.ls_args, t
-    | _ -> assert false (* FIXME: is it right? *)
-  in
+let specialize_lsymbol ~loc s =
+  let tl = s.ls_args in
+  let t = s.ls_value in
   let env = Htv.create 17 in
-  s, List.map (specialize ~loc env) tl, specialize ?loc env t
+  s, List.map (specialize ~loc env) tl, option_map (specialize ~loc env) t
 
-let find_lsymbol {id=x; id_loc=loc} ns = 
-  try Mnm.find x ns.ns_ls
-  with Not_found -> error ~loc (UnboundSymbol x)
+let specialize_fsymbol ~loc s = 
+  let s, tl, ty = specialize_lsymbol ~loc s in
+  match ty with
+    | None -> error ~loc TermExpected
+    | Some ty -> s, tl, ty
 
-let find_lsymbol_ns p ns =
-  find find_lsymbol p ns
-
-let find_lsymbol p th =
-  find_lsymbol_ns p (get_namespace th)
-
-let specialize_psymbol ~loc s =
-  let tl = match s.ls_value with
-    | None -> s.ls_args
-    | _ -> assert false (* FIXME: is it right? *)
-  in
-  let env = Htv.create 17 in
-  s, List.map (specialize ~loc env) tl
+let specialize_psymbol ~loc s = 
+  let s, tl, ty = specialize_lsymbol ~loc s in
+  match ty with
+    | None -> s, tl
+    | Some _ -> error ~loc PredicateExpected
 
 (** Typing types *)
 
@@ -461,6 +453,14 @@ let rec trigger_not_a_term_exn = function
   | Loc.Located (_, exn) -> trigger_not_a_term_exn exn
   | _ -> false
 
+let check_linearity uqu =
+  let s = ref S.empty in
+  let check id = 
+    if S.mem id.id !s then errorm ~loc:id.id_loc "duplicate variable %s" id.id;
+    s := S.add id.id !s
+  in
+  List.iter (fun (idl, _) -> List.iter check idl) uqu
+
 let rec dterm env t = 
   let n, ty = dterm_node t.pp_loc env t.pp_desc in
   { dt_node = n; dt_ty = ty }
@@ -521,6 +521,7 @@ and dfmla env e = match e.pp_desc with
   | PPif (a, b, c) ->
       Fif (dfmla env a, dfmla env b, dfmla env c)  
   | PPquant (q, uqu, trl, a) ->
+      check_linearity uqu;
       let uquant env (idl,ty) =
         let ty = dty env ty in
         let env, idl = 

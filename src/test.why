@@ -3,8 +3,8 @@
 
 theory A
   use import prelude.Int
-  axiom A : 
-    F : let x = 2+2 in G : x*x = 16
+  logic p(int, int)
+  axiom A : forall x,y:int, z,t:real. x=x
 end
 
 theory TreeForest

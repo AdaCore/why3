@@ -19,6 +19,8 @@ val map_fold_left :
 
 val of_option : 'a option -> 'a
 
+val option_map : ('a -> 'b) -> 'a option -> 'b option
+
 exception FoldSkip
 
 val all_fn : ('a -> bool) -> 'b -> 'a -> bool

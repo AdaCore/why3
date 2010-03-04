@@ -24,6 +24,8 @@ let map_fold_left f acc l =
 
 let of_option = function Some v -> v | None -> assert false
 
+let option_map f = function None -> None | Some x -> Some (f x)
+
 exception FoldSkip
 
 let all_fn pr _ t = pr t || raise FoldSkip
