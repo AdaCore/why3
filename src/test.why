@@ -1,6 +1,11 @@
 
 (* test file *)
 
+theory T
+  use prelude.List
+  use graph.Path
+end
+
 theory A
   type t
   namespace S 
@@ -24,6 +29,8 @@ theory Test
   | Even_nil : even_length(Nil : int list)
   | Even_cons: forall x,y:'a, l:'a list. 
                even_length(l) -> even_length(Cons(x,Cons(y,l)))
+
+  lemma Ax : even_length(Cons(1,Cons(2,Nil)))
 end
 
 theory TestPrelude 

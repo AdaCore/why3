@@ -1,0 +1,21 @@
+
+(* graph theory *)
+
+theory Path
+
+  use import prelude.List
+
+  type vertex
+
+  logic edge(vertex, vertex)
+
+  inductive simple_path(vertex, vertex list, vertex) =
+  | Path_empty : 
+      forall v:vertex. simple_path(v, Nil : vertex list, v)
+  | Path_cons  : 
+      forall src, v, dst : vertex. forall l : vertex list.
+      simple_path(v, l, dst) -> edge(src, v) -> not mem(v, l) ->
+      simple_path(src, Cons(v, l), dst)
+
+end
+

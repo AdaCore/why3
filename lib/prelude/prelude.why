@@ -70,6 +70,11 @@ theory List
 
   logic is_nil(x : 'a list) = x = Nil
 
+  logic mem(x: 'a, l : 'a list) = match l with
+    | Nil -> false
+    | Cons(y, r) -> x = y or mem(x, r)
+    end
+
 end
 
 theory Array
