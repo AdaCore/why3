@@ -461,7 +461,7 @@ and dpat_args s loc env el pl = assert false (* TODO *)
 *)
 
 let rec trigger_not_a_term_exn = function
-  | Error (TermExpected | UnboundSymbol _) -> true
+  | Error TermExpected -> true
   | Loc.Located (_, exn) -> trigger_not_a_term_exn exn
   | _ -> false
 
@@ -551,7 +551,7 @@ and dfmla env e = match e.pp_desc with
         env, (idl,ty)
       in
       let env, uqu = map_fold_left uquant env uqu in
-      let trigger e = (* FIXME? *)
+      let trigger e =
 	try 
 	  TRterm (dterm env e) 
 	with exn when trigger_not_a_term_exn exn ->
@@ -674,8 +674,12 @@ and fmla env = function
           env xl 
       in
       let env, vl = map_fold_left uquant env uqu in
-      (* TODO: triggers *)
-      f_quant q (List.concat vl) [] (fmla env f1)
+      let trigger = function
+	| TRterm t -> TrTerm (term env t) 
+	| TRfmla f -> TrFmla (fmla env f) 
+      in
+      let trl = List.map (List.map trigger) trl in
+      f_quant q (List.concat vl) trl (fmla env f1)
   | Fapp (s, tl) ->
       f_app s (List.map (term env) tl)
   | Flet (e1, x, f2) ->
