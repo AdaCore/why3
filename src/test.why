@@ -2,15 +2,9 @@
 (* test file *)
 
 theory A
-  use import prelude.Int
-  logic p(int, int)
-  axiom A : forall x:int. x = x
-end
-
-theory TreeForest
   type 'a list = Nil | Cons('a, 'a list)
-  type 'a tree = Leaf('a) | Node('a forest)
-  type 'a forest = 'a tree list
+
+  axiom A : forall l:int list. (match l with Cons(x,x) -> 0 | Nil -> 1 end) = 2
 end
 
 theory TestPrelude 

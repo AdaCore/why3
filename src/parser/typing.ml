@@ -402,6 +402,20 @@ let binop = function
   | PPimplies -> Fimplies
   | PPiff -> Fiff
 
+let check_pat_linearity pat =
+  let s = ref S.empty in
+  let add id =
+    if S.mem id.id !s then errorm ~loc:id.id_loc "duplicate variable %s" id.id;
+    s := S.add id.id !s
+  in
+  let rec check p = match p.pat_desc with
+    | PPpwild -> ()
+    | PPpvar id -> add id
+    | PPpapp (_, pl) -> List.iter check pl
+    | PPpas (p, id) -> check p; add id
+  in
+  check pat
+
 let rec dpat env pat =
   let env, n, ty = dpat_node pat.pat_loc env pat.pat_desc in
   env, { dp_node = n; dp_ty = ty }
@@ -412,7 +426,6 @@ and dpat_node loc env = function
       let ty = Tyvar (create_type_var ~loc ~user:false tv) in
       env, Pwild, ty
   | PPpvar {id=x} ->
-      if M.mem x env.dvars then assert false; (* FIXME? *)
       let tv = create_tvsymbol (id_user "a" loc) in
       let ty = Tyvar (create_type_var ~loc ~user:false tv) in
       let env = { env with dvars = M.add x ty env.dvars } in
@@ -424,7 +437,6 @@ and dpat_node loc env = function
       env, Papp (s, pl), ty
   | PPpas (p, {id=x}) ->
       let env, p = dpat env p in
-      if M.mem x env.dvars then assert false; (* FIXME? *)
       let env = { env with dvars = M.add x p.dp_ty env.dvars } in
       env, Pas (p,x), p.dp_ty
 
@@ -453,7 +465,7 @@ let rec trigger_not_a_term_exn = function
   | Loc.Located (_, exn) -> trigger_not_a_term_exn exn
   | _ -> false
 
-let check_linearity uqu =
+let check_quant_linearity uqu =
   let s = ref S.empty in
   let check id = 
     if S.mem id.id !s then errorm ~loc:id.id_loc "duplicate variable %s" id.id;
@@ -496,6 +508,7 @@ and dterm_node loc env = function
       (* TODO: unify e1.type with patterns *)
       (* TODO: unify branch types with each other *)
       let branch (pat, e) =
+	check_pat_linearity pat;
         let env, pat = dpat env pat in
         pat, dterm env e
       in
@@ -527,7 +540,7 @@ and dfmla env e = match e.pp_desc with
   | PPif (a, b, c) ->
       Fif (dfmla env a, dfmla env b, dfmla env c)  
   | PPquant (q, uqu, trl, a) ->
-      check_linearity uqu;
+      check_quant_linearity uqu;
       let uquant env (idl,ty) =
         let ty = dty env ty in
         let env, idl = 
@@ -565,6 +578,7 @@ and dfmla env e = match e.pp_desc with
       (* TODO: unify e1.type with patterns *)
       (* TODO: unify branch types with each other *)
       let branch (pat, e) =
+	check_pat_linearity pat;
         let env, pat = dpat env pat in
         pat, dfmla env e
       in
