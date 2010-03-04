@@ -70,8 +70,8 @@ let transform l =
   let l = Typing.list_theory l in
   if !print_stdout && not transform then 
     List.iter (Pretty.print_theory Format.std_formatter) l
-  else
-    let l = List.map (fun t -> t,Transform.apply Flatten.t t.Theory.th_decls)
+  (* else 
+    let l = List.map (fun t -> t,Transform.apply Flatten.t t.Theory.th_ctxt)
       l in
     let l = if !simplify_recursive 
     then 
@@ -88,7 +88,7 @@ let transform l =
                      Pretty.print_ident t.Theory.th_name 
                      Pretty.print_decl_list dl
                 ) l
-
+	 *)
 
 let () =
   try

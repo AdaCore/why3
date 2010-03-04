@@ -583,7 +583,6 @@ and dfmla env e = match e.pp_desc with
   | PPmatch (e1, bl) ->
       let e1 = dterm env e1 in
       let ty = e1.dt_ty in
-      (* TODO: unify branch types with each other *)
       let branch (pat, e) =
 	let loc = pat.pat_loc in
 	check_pat_linearity pat;

@@ -63,9 +63,14 @@ module Mnm = Map.Make(String)
 type theory = {
   th_name   : ident;
   th_param  : Sid.t;        (* locally declared abstract symbols *)
-  th_known  : ident Mid.t;  (* imported and locally declared symbols *)
   th_export : namespace;
-  th_decls  : decl list;
+  th_ctxt   : ctxt;
+}
+
+and ctxt = {
+  ctxt_tag   : int;
+  ctxt_known : decl Mid.t;  (* imported and locally declared symbols *)
+  ctxt_decls : (decl * ctxt) option;
 }
 
 and namespace = {
@@ -246,10 +251,9 @@ let create_prop k i f =
 type theory_uc = {
   uc_name   : ident;
   uc_param  : Sid.t;
-  uc_known  : ident Mid.t;
   uc_import : namespace list;
   uc_export : namespace list;
-  uc_decls  : decl list;
+  uc_ctxt   : ctxt;
 }
 
 
@@ -284,11 +288,6 @@ let merge_known kn1 kn2 =
   in
   Mid.fold add kn1 kn2
 
-let add_known id uc =
-  if Mid.mem id uc.uc_known then raise (RedeclaredIdent id);
-  { uc with uc_known = Mid.add id uc.uc_name uc.uc_known }
-
-
 (** Manage namespaces *)
 
 let empty_ns = {
@@ -313,7 +312,6 @@ let add_ls x fs ns = { ns with ns_ls = add_to_ns x fs ns.ns_ls }
 let add_pr x f  ns = { ns with ns_pr = add_to_ns x f  ns.ns_pr }
 
 let add_symbol add id v uc =
-  let uc = add_known id uc in
   match uc.uc_import, uc.uc_export with
   | i0 :: sti, e0 :: ste ->
       let im = add id.id_short v i0 :: sti in
@@ -328,36 +326,155 @@ let get_namespace uc = List.hd uc.uc_import
 (** Built-in symbols *)
 
 let builtin_ts = [ts_int; ts_real]
+let builtin_type = 
+  List.map (fun ts -> ts.ts_name, ts, create_type [ts, Tabstract]) builtin_ts
 let builtin_ls = [ps_equ; ps_neq]
-
-let ts_name x = x.ts_name
-let ls_name x = x.ls_name
+let builtin_logic = 
+  List.map (fun ls -> ls.ls_name, ls, create_logic [Lpredicate (ls, None)]) 
+    builtin_ls
 
 let builtin_ns =
-  let add adder name = List.fold_right (fun s -> adder (name s).id_short s) in
-  let ns = add add_ts ts_name builtin_ts empty_ns in
-  let ns = add add_ls ls_name builtin_ls ns in
+  let add adder = List.fold_right (fun (id,s,_) -> adder id.id_short s) in
+  let ns = add add_ts builtin_type empty_ns in
+  let ns = add add_ls builtin_logic ns in
   ns
 
 let builtin_th = id_register (id_fresh "Builtin")
 
 let builtin_known =
-  let add name = List.fold_right (fun s -> Mid.add (name s) builtin_th) in
-  let kn = Mid.add builtin_th builtin_th Mid.empty in
-  let kn = add ts_name builtin_ts kn in
-  let kn = add ls_name builtin_ls kn in
+  let add l = List.fold_right (fun (n,_,d) -> Mid.add n d) l in
+  let kn = Mid.empty in
+  let kn = add builtin_type kn in
+  let kn = add builtin_logic kn in
   kn
 
 
 (** Manage theories *)
 
+module Ctxt =
+  struct
+    type t = ctxt
+    let hash ctxt = match ctxt.ctxt_decls with
+      | None -> 0
+      | Some (d,n) -> 1 + (Hashcons.combine n.ctxt_tag d.d_tag)
+
+    let equal a b = match a.ctxt_decls, b.ctxt_decls with
+      | None, None -> 
+	  true
+      | Some (da, na), Some (db, nb) -> 
+	  na.ctxt_decls == nb.ctxt_decls && da.d_tag == db.d_tag
+      | _ -> 
+	  false
+
+    let tag i ctxt = {ctxt with ctxt_tag = i}
+  end
+
+module Hctxt = Hashcons.Make(Ctxt)
+
+let empty_ctxt = Hctxt.hashcons {
+  ctxt_tag   = -1;
+  ctxt_known = builtin_known;
+  ctxt_decls = None;
+}
+
+module Context = struct
+
+  let add_known ctxt id decl =
+    try
+      let d = Mid.find id ctxt.ctxt_known in
+      if d != decl then raise (RedeclaredIdent id);
+      ctxt
+    with Not_found ->
+      { ctxt with ctxt_known = Mid.add id decl ctxt.ctxt_known }
+
+  let check_type kn (ts,def) = match def with
+    | Tabstract ->
+	begin match ts.ts_def with
+          | Some ty -> known_ty kn ty
+          | None -> ()
+	end
+    | Talgebraic lfs ->
+	let check fs = List.iter (known_ty kn) fs.ls_args in
+	List.iter check lfs
+
+  let add_type d ctxt (ts,def) =
+    let ctxt = add_known ctxt ts.ts_name d in
+    match def with
+      | Tabstract ->
+	  ctxt
+      | Talgebraic lfs ->
+	  let add_constr ctxt fs = add_known ctxt fs.ls_name d in
+	  List.fold_left add_constr ctxt lfs
+
+  let check_logic kn = function
+    | Lfunction (fs, df) ->
+	known_ty kn (of_option fs.ls_value);
+	List.iter (known_ty kn) fs.ls_args;
+	begin match df with
+          | Some (_,_,t,_) -> known_term kn t
+          | None -> ()
+	end
+    | Lpredicate (ps, dp) ->
+	List.iter (known_ty kn) ps.ls_args;
+	begin match dp with
+          | Some (_,_,f,_) -> known_fmla kn f
+          | None -> ()
+	end
+    | Linductive (ps, la) ->
+	List.iter (known_ty kn) ps.ls_args;
+	let check (_,f) = known_fmla kn f in
+	List.iter check la
+
+  let add_logic d ctxt = function
+    | Lfunction (fs, df) ->
+	add_known ctxt fs.ls_name d
+    | Lpredicate (ps, dp) ->
+	add_known ctxt ps.ls_name d
+    | Linductive (ps, la) ->
+	let ctxt = add_known ctxt ps.ls_name d in
+	let add ctxt (id,f) = add_known ctxt id d in
+	List.fold_left add ctxt la
+
+  let add_decl ctxt d =
+    let ctxt = match d.d_node with
+      | Duse th ->
+	  let kn = merge_known ctxt.ctxt_known th.th_ctxt.ctxt_known in
+	  { ctxt with ctxt_known = kn }
+      | Dtype dl ->
+          let ctxt = List.fold_left (add_type d) ctxt dl in
+          List.iter (check_type ctxt.ctxt_known) dl;
+          ctxt
+      | Dlogic dl ->
+          let ctxt = List.fold_left (add_logic d) ctxt dl in
+          List.iter (check_logic ctxt.ctxt_known) dl;
+          ctxt
+      | Dprop (k, id, f) ->
+          known_fmla ctxt.ctxt_known f;
+          add_known ctxt id d
+      | Dclone _ -> 
+	  assert false (* TODO *)
+    in
+    Hctxt.hashcons { ctxt with ctxt_decls = Some (d, ctxt) }
+
+  let rec iter f c = match c.ctxt_decls with
+    | None -> ()
+    | Some (d, ctxt) -> iter f ctxt; f d
+ 
+  let rec fold_left f acc c = match c.ctxt_decls with
+    | None -> acc
+    | Some (d, ctxt) -> let acc = fold_left f acc ctxt in f acc d
+
+end
+
+
+(* theories *)
+
 let create_theory n = {
   uc_name   = n;
   uc_param  = Sid.empty;
-  uc_known  = Mid.add n n builtin_known;
   uc_import = [builtin_ns];
   uc_export = [empty_ns];
-  uc_decls  = [];
+  uc_ctxt   = empty_ctxt;
 }
 
 let create_theory n = create_theory (id_register n)
@@ -366,9 +483,8 @@ let close_theory uc = match uc.uc_export with
   | [e] ->
       { th_name   = uc.uc_name;
         th_param  = uc.uc_param;
-        th_known  = uc.uc_known;
         th_export = e;
-        th_decls  = List.rev uc.uc_decls; }
+        th_ctxt   = uc.uc_ctxt; }
   | _ ->
       raise CloseTheory
 
@@ -396,11 +512,11 @@ let close_namespace uc s ~import =
 let use_export uc th =
   match uc.uc_import, uc.uc_export with
     | i0 :: sti, e0 :: ste ->
+	let ctxt = Context.add_decl uc.uc_ctxt (mk_decl (Duse th)) in
         { uc with
             uc_import = merge_ns th.th_export i0 :: sti;
             uc_export = merge_ns th.th_export e0 :: ste;
-            uc_known  = merge_known uc.uc_known th.th_known;
-            uc_decls  = mk_decl (Duse th) :: uc.uc_decls;
+            uc_ctxt   = ctxt;
         }
     | _ ->
         assert false
@@ -419,16 +535,6 @@ let add_type uc (ts,def) =
       let add_constr uc fs = add_symbol add_ls fs.ls_name fs uc in
       List.fold_left add_constr uc lfs
 
-let check_type kn (ts,def) = match def with
-  | Tabstract ->
-      begin match ts.ts_def with
-        | Some ty -> known_ty kn ty
-        | None -> ()
-      end
-  | Talgebraic lfs ->
-      let check fs = List.iter (known_ty kn) fs.ls_args in
-      List.iter check lfs
-
 let add_logic uc = function
   | Lfunction (fs, df) ->
       let uc = add_symbol add_ls fs.ls_name fs uc in
@@ -441,43 +547,6 @@ let add_logic uc = function
       let add uc (id,f) = add_symbol add_pr id f uc in
       List.fold_left add uc la
 
-let check_logic kn = function
-  | Lfunction (fs, df) ->
-      known_ty kn (of_option fs.ls_value);
-      List.iter (known_ty kn) fs.ls_args;
-      begin match df with
-        | Some (_,_,t,_) -> known_term kn t
-        | None -> ()
-      end
-  | Lpredicate (ps, dp) ->
-      List.iter (known_ty kn) ps.ls_args;
-      begin match dp with
-        | Some (_,_,f,_) -> known_fmla kn f
-        | None -> ()
-      end
-  | Linductive (ps, la) ->
-      List.iter (known_ty kn) ps.ls_args;
-      let check (_,f) = known_fmla kn f in
-      List.iter check la
-
-let add_decl uc d =
-  let uc = match d.d_node with
-    | Dtype dl ->
-        let uc = List.fold_left add_type uc dl in
-        List.iter (check_type uc.uc_known) dl;
-        uc
-    | Dlogic dl ->
-        let uc = List.fold_left add_logic uc dl in
-        List.iter (check_logic uc.uc_known) dl;
-        uc
-    | Dprop (k, id, f) ->
-        known_fmla uc.uc_known f;
-        add_symbol add_pr id f uc
-    | Dclone _ | Duse _ -> assert false
-  in
-  { uc with uc_decls = d :: uc.uc_decls }
-
-
 (** Clone theories *)
 
 type th_inst = {
@@ -485,6 +554,7 @@ type th_inst = {
   inst_ls : lsymbol  Mls.t;
 }
 
+(***
 let clone_export uc th i =
   let check_sym id =
     if not (Sid.mem id th.th_param) then raise (CannotInstantiate id)
@@ -534,6 +604,20 @@ let clone_export uc th i =
   (* 2. merge in the new declarations *)
   (* ... *)
   uc
+***)
+let clone_export uc th i = assert false (*TODO*)
+
+let add_decl uc d =
+  let uc = { uc with uc_ctxt = Context.add_decl uc.uc_ctxt d } in
+  match d.d_node with
+    | Dtype dl ->
+        List.fold_left add_type uc dl
+    | Dlogic dl ->
+        List.fold_left add_logic uc dl
+    | Dprop (k, id, f) ->
+        add_symbol add_pr id f uc
+    | Dclone _ | Duse _ -> 
+	assert false (* TODO *)
 
 
 (** Debugging *)

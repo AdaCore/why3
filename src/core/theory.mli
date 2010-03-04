@@ -21,7 +21,7 @@ open Ident
 open Ty
 open Term
 
-(** Declarations *)
+(** Theory *)
 
 (* type declaration *)
 
@@ -50,25 +50,30 @@ type prop_kind =
 
 type prop_decl = prop_kind * ident * fmla
 
-(* declaration *)
-(** Theory *)
+(* smart constructors *)
 
-module Snm : Set.S with type elt = string
+val make_fs_defn : lsymbol -> vsymbol list -> term -> fs_defn
+val make_ps_defn : lsymbol -> vsymbol list -> fmla -> ps_defn
+
+val open_fs_defn : fs_defn -> lsymbol * vsymbol list * term
+val open_ps_defn : ps_defn -> lsymbol * vsymbol list * fmla
+
+val fs_defn_axiom : fs_defn -> fmla
+val ps_defn_axiom : ps_defn -> fmla
+
 module Mnm : Map.S with type key = string
 
 type theory = private {
   th_name   : ident;
   th_param  : Sid.t;        (* locally declared abstract symbols *)
-  th_known  : ident Mid.t;  (* imported and locally declared symbols *)
   th_export : namespace;
-  th_decls  : decl list;
+  th_ctxt   : ctxt;
 }
 
-and namespace = private {
-  ns_ts : tysymbol Mnm.t;   (* type symbols *)
-  ns_ls : lsymbol Mnm.t;    (* logic symbols *)
-  ns_ns : namespace Mnm.t;  (* inner namespaces *)
-  ns_pr : fmla Mnm.t;       (* propositions *)
+and ctxt = private {
+  ctxt_tag   : int;
+  ctxt_known : decl Mid.t;  (* imported and locally declared symbols *)
+  ctxt_decls : (decl * ctxt) option;
 }
 
 and decl_node =
@@ -83,16 +88,12 @@ and decl = private {
   d_tag  : int;
 }
 
-(* smart constructors *)
-
-val make_fs_defn : lsymbol -> vsymbol list -> term -> fs_defn
-val make_ps_defn : lsymbol -> vsymbol list -> fmla -> ps_defn
-
-val open_fs_defn : fs_defn -> lsymbol * vsymbol list * term
-val open_ps_defn : ps_defn -> lsymbol * vsymbol list * fmla
-
-val fs_defn_axiom : fs_defn -> fmla
-val ps_defn_axiom : ps_defn -> fmla
+and namespace = private {
+  ns_ts : tysymbol Mnm.t;   (* type symbols *)
+  ns_ls : lsymbol Mnm.t;    (* logic symbols *)
+  ns_ns : namespace Mnm.t;  (* inner namespaces *)
+  ns_pr : fmla Mnm.t;       (* propositions *)
+}
 
 val create_type : ty_decl list -> decl
 val create_logic : logic_decl list -> decl
@@ -107,6 +108,18 @@ exception UnboundTypeVar of ident
 exception IllegalConstructor of lsymbol
 exception UnboundVars of Svs.t
 exception BadDecl of ident
+
+(* context *)
+
+module Context : sig
+
+  val add_decl : ctxt -> decl -> ctxt
+
+  val iter : (decl -> unit) -> ctxt -> unit
+
+  val fold_left : ('a -> decl -> 'a) -> 'a -> ctxt -> 'a
+
+end
 
 (* theory construction *)
 

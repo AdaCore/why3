@@ -8,12 +8,6 @@ theory A
 
   type t = A
 
-  axiom Ax : 
-     forall l:int list list. 
-     match l with 
-         | Nil -> Nil
-         | Cons(Cons(y,ll),lll) -> ll
-     end = l
 
   inductive even_length(int list) =
   | Even_nil : even_length(Nil)
