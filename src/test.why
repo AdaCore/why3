@@ -6,10 +6,20 @@ theory A
 
   type 'a list = Nil | Cons('a, 'a list)
 
+  type t = A
+
+  axiom Ax : 
+     forall l:int list list. 
+     match l with 
+         | Nil -> Nil
+         | Cons(Cons(y,ll),lll) -> ll
+     end = l
+
   inductive even_length(int list) =
   | Even_nil : even_length(Nil)
   | Even_cons: forall x,y:'a, l:'a list. 
                even_length(l) -> even_length(cons(x,cons(y,l)))
+
 end
 
 theory TestPrelude 

@@ -440,25 +440,22 @@ and dpat_node loc env = function
       let env = { env with dvars = M.add x p.dp_ty env.dvars } in
       env, Pas (p,x), p.dp_ty
 
-and dpat_args s loc env el pl = assert false (* TODO *)
-(*
-  let n = List.length el and m = List.length tl in
+and dpat_args s loc env el pl = 
+  let n = List.length el and m = List.length pl in
   if n <> m then error ~loc (BadNumberOfArguments (s, m, n));
-  let rec check_arg = function
+  let rec check_arg env = function
     | [], [] -> 
-	[]
-    | a :: al, t :: bl ->
-	let loc = t.pp_loc in
-	let t = dterm env t in
-	if not (unify a t.dt_ty) then
-	  error ~loc (TermExpectedType ((fun f -> print_dty f t.dt_ty),
-					(fun f -> print_dty f a)));
-	t :: check_arg (al, bl)
+	env, []
+    | a :: al, p :: pl ->
+	let loc = p.pat_loc in
+	let env, p = dpat env p in
+	if not (unify a p.dp_ty) then term_expected_type ~loc p.dp_ty a;
+	let env, pl = check_arg env (al, pl) in
+	env, p :: pl
     | _ ->
 	assert false
   in
-  check_arg (el, tl)
-*)
+  check_arg env (el, pl)
 
 let rec trigger_not_a_term_exn = function
   | Error TermExpected -> true
@@ -505,16 +502,25 @@ and dterm_node loc env = function
       let e2 = dterm env e2 in
       Tlet (e1, x, e2), e2.dt_ty
   | PPmatch (e1, bl) ->
-      (* TODO: unify e1.type with patterns *)
-      (* TODO: unify branch types with each other *)
+      let e1 = dterm env e1 in
+      let ty = e1.dt_ty in
+      let tb = (* the type of all branches *)
+	let tv = create_tvsymbol (id_user "a" loc) in
+	Tyvar (create_type_var ~loc ~user:false tv) 
+      in
       let branch (pat, e) =
+	let loc = pat.pat_loc in
 	check_pat_linearity pat;
         let env, pat = dpat env pat in
-        pat, dterm env e
+	if not (unify pat.dp_ty ty) then term_expected_type ~loc pat.dp_ty ty;
+	let loc = e.pp_loc in
+	let e = dterm env e in
+	if not (unify e.dt_ty tb) then term_expected_type ~loc e.dt_ty tb;
+        pat, e
       in
       let bl = List.map branch bl in
       let ty = (snd (List.hd bl)).dt_ty in
-      Tmatch (dterm env e1, bl), ty
+      Tmatch (e1, bl), ty
   | PPnamed (x, e1) ->
       let e1 = dterm env e1 in
       Tnamed (x, e1), e1.dt_ty
@@ -575,14 +581,17 @@ and dfmla env e = match e.pp_desc with
       let e2 = dfmla env e2 in
       Flet (e1, x, e2)
   | PPmatch (e1, bl) ->
-      (* TODO: unify e1.type with patterns *)
+      let e1 = dterm env e1 in
+      let ty = e1.dt_ty in
       (* TODO: unify branch types with each other *)
       let branch (pat, e) =
+	let loc = pat.pat_loc in
 	check_pat_linearity pat;
         let env, pat = dpat env pat in
+	if not (unify pat.dp_ty ty) then term_expected_type ~loc pat.dp_ty ty;
         pat, dfmla env e
       in
-      Fmatch (dterm env e1, List.map branch bl)
+      Fmatch (e1, List.map branch bl)
   | PPnamed (x, f1) ->
       let f1 = dfmla env f1 in
       Fnamed (x, f1)
