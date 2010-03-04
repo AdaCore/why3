@@ -1,27 +1,9 @@
 
 (* test file *)
 
-theory A
-end
-
-theory B
-  use import A 
-end
-
-theory C
-  use A
-  use B
-end  
-
 theory Test
-  type 'a list = Nil | Cons('a, 'a list)
- 
-  inductive even_length('a list) =
-  | Even_nil : even_length(Nil : int list)
-  | Even_cons: forall x,y:'a, l:'a list. 
-               even_length(l) -> even_length(Cons(x,Cons(y,l)))
-
-  lemma Ax : even_length(Cons(1,Cons(2,Nil)))
+  inductive p(int) =
+  | A : 0=0
 end
 
 theory TestPrelude 

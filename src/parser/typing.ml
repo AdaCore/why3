@@ -973,7 +973,7 @@ let rec check_unquantified_clausal_form loc ps f = match f.f_node with
       (* TODO: vérifier également que les arguments de ps' ont exactement
 	 les mêmes types que ceux de la déclaration de ps (et non plus 
 	 précis) *)
-      if ps.ls_name != ps.ls_name then
+      if ps'.ls_name != ps.ls_name then
 	errorm ~loc "head of clause does not contain the inductive predicate"
   | _ -> 
       errorm ~loc "this case is not in clausal form"
