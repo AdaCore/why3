@@ -65,7 +65,7 @@ module Mnm : Map.S with type key = string
 
 type theory = private {
   th_name   : ident;
-  th_param  : Sid.t;        (* locally declared abstract symbols *)
+  th_local  : Sid.t;        (* locally declared abstract symbols *)
   th_export : namespace;
   th_ctxt   : ctxt;
 }
@@ -116,9 +116,10 @@ module Context : sig
   val add_decl : ctxt -> decl -> ctxt
 
   val iter : (decl -> unit) -> ctxt -> unit
-
+    (** bottom-up, tail-rec *)
   val fold_left : ('a -> decl -> 'a) -> 'a -> ctxt -> 'a
-
+    (** bottom-up, tail-rec *)
+    
 end
 
 (* theory construction *)

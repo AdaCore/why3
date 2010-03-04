@@ -67,16 +67,16 @@ module Sls = Set.Make(Lsym)
 module Mls = Map.Make(Lsym)
 module Hls = Hashtbl.Make(Lsym)
 
-let mk_lsymbol name args value constr = {
+let create_lsymbol name args value constr = {
   ls_name   = id_register name;
   ls_args   = args;
   ls_value  = value;
   ls_constr = constr;
 }
 
-let create_fsymbol nm al vl = mk_lsymbol nm al (Some vl) false
-let create_fconstr nm al vl = mk_lsymbol nm al (Some vl) true
-let create_psymbol nm al    = mk_lsymbol nm al None false
+let create_fsymbol nm al vl = create_lsymbol nm al (Some vl) false
+let create_fconstr nm al vl = create_lsymbol nm al (Some vl) true
+let create_psymbol nm al    = create_lsymbol nm al None false
 
 (** Patterns *)
 

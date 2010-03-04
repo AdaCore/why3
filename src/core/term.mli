@@ -42,6 +42,7 @@ type lsymbol = private {
   ls_constr : bool;
 }
 
+val create_lsymbol : preid -> ty list -> ty option -> bool -> lsymbol
 val create_fsymbol : preid -> ty list -> ty -> lsymbol
 val create_fconstr : preid -> ty list -> ty -> lsymbol
 val create_psymbol : preid -> ty list -> lsymbol

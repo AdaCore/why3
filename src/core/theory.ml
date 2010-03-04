@@ -62,7 +62,7 @@ module Mnm = Map.Make(String)
 
 type theory = {
   th_name   : ident;
-  th_param  : Sid.t;        (* locally declared abstract symbols *)
+  th_local  : Sid.t;        (* locally declared abstract symbols *)
   th_export : namespace;
   th_ctxt   : ctxt;
 }
@@ -250,7 +250,7 @@ let create_prop k i f =
 
 type theory_uc = {
   uc_name   : ident;
-  uc_param  : Sid.t;
+  uc_local  : Sid.t;
   uc_import : namespace list;
   uc_export : namespace list;
   uc_ctxt   : ctxt;
@@ -458,11 +458,11 @@ module Context = struct
 
   let rec iter f c = match c.ctxt_decls with
     | None -> ()
-    | Some (d, ctxt) -> iter f ctxt; f d
+    | Some (d, ctxt) -> f d; iter f ctxt
  
   let rec fold_left f acc c = match c.ctxt_decls with
     | None -> acc
-    | Some (d, ctxt) -> let acc = fold_left f acc ctxt in f acc d
+    | Some (d, ctxt) -> fold_left f (f acc d) ctxt
 
 end
 
@@ -471,7 +471,7 @@ end
 
 let create_theory n = {
   uc_name   = n;
-  uc_param  = Sid.empty;
+  uc_local  = Sid.empty;
   uc_import = [builtin_ns];
   uc_export = [empty_ns];
   uc_ctxt   = empty_ctxt;
@@ -482,7 +482,7 @@ let create_theory n = create_theory (id_register n)
 let close_theory uc = match uc.uc_export with
   | [e] ->
       { th_name   = uc.uc_name;
-        th_param  = uc.uc_param;
+        th_local  = uc.uc_local;
         th_export = e;
         th_ctxt   = uc.uc_ctxt; }
   | _ ->
@@ -524,13 +524,13 @@ let use_export uc th =
 
 (** Manage new declarations *)
 
-let add_param id uc = { uc with uc_param = Sid.add id uc.uc_param }
+let add_local id uc = { uc with uc_local = Sid.add id uc.uc_local }
 
 let add_type uc (ts,def) =
   let uc = add_symbol add_ts ts.ts_name ts uc in
   match def with
   | Tabstract ->
-      if ts.ts_def == None then add_param ts.ts_name uc else uc
+      if ts.ts_def == None then add_local ts.ts_name uc else uc
   | Talgebraic lfs ->
       let add_constr uc fs = add_symbol add_ls fs.ls_name fs uc in
       List.fold_left add_constr uc lfs
@@ -538,10 +538,10 @@ let add_type uc (ts,def) =
 let add_logic uc = function
   | Lfunction (fs, df) ->
       let uc = add_symbol add_ls fs.ls_name fs uc in
-      if df == None then add_param fs.ls_name uc else uc
+      if df == None then add_local fs.ls_name uc else uc
   | Lpredicate (ps, dp) ->
       let uc = add_symbol add_ls ps.ls_name ps uc in
-      if dp == None then add_param ps.ls_name uc else uc
+      if dp == None then add_local ps.ls_name uc else uc
   | Linductive (ps, la) ->
       let uc = add_symbol add_ls ps.ls_name ps uc in
       let add uc (id,f) = add_symbol add_pr id f uc in
@@ -554,35 +554,104 @@ type th_inst = {
   inst_ls : lsymbol  Mls.t;
 }
 
-(***
 let clone_export uc th i =
-  let check_sym id =
-    if not (Sid.mem id th.th_param) then raise (CannotInstantiate id)
-  in
-  let check_ts s _ = check_sym s.ts_name in Mts.iter check_ts i.inst_ts;
-  let check_ls s _ = check_sym s.ls_name in Mls.iter check_ls i.inst_ls;
   (* memo tables *)
-  let ts_table = Hashtbl.create 17 in
-  let known = ref th.th_known in
-  let rec memo_ts ts =
-    try
-      Hashtbl.find ts_table ts.ts_name
-    with Not_found ->
-      let nm = id_clone ts.ts_name in
-      let def = match ts.ts_def with
-	| None -> None
-	| Some ty -> Some (ty_s_map memo_ts ty)
-      in
-      let ts' = create_tysymbol nm ts.ts_args def in
-      Hashtbl.add ts_table ts.ts_name ts';
-      known := Mid.add ts'.ts_name uc.uc_name (Mid.remove ts.ts_name !known);
-      ts'
+  let ts_table = Hts.create 17 in
+  let ls_table = Hls.create 17 in
+  let pr_table = Hid.create 17 in
+  let id_table = Hid.create 17 in
+  (* fill tables with substitution i *)
+  Mts.iter
+    (fun ts ts' -> 
+       Hts.add ts_table ts ts'; 
+       Hid.add id_table ts.ts_name ts'.ts_name) 
+    i.inst_ts;
+  Mls.iter
+    (fun ls ls' -> 
+       Hls.add ls_table ls ls'; 
+       Hid.add id_table ls.ls_name ls'.ls_name) 
+    i.inst_ls;
+  let rec find_ts ts =
+    if Sid.mem ts.ts_name th.th_local then
+      try
+	Hts.find ts_table ts
+      with Not_found ->
+	let ts' = 
+	  create_tysymbol (id_dup ts.ts_name) ts.ts_args
+	    (option_map trans_ty ts.ts_def)
+	in
+	Hts.add ts_table ts ts';
+	Hid.add id_table ts.ts_name ts'.ts_name;
+	ts'
+    else
+      ts
+  and trans_ty ty = ty_s_map find_ts ty in
+  let find_ls ls =
+    if Sid.mem ls.ls_name th.th_local then
+      try
+	Hls.find ls_table ls
+      with Not_found ->
+	let ls' = 
+	  create_lsymbol 
+	    (id_dup ls.ls_name) 
+	    (List.map trans_ty ls.ls_args)
+	    (option_map trans_ty ls.ls_value)
+	    ls.ls_constr
+	in
+	Hls.add ls_table ls ls';
+	Hid.add id_table ls.ls_name ls'.ls_name;
+	ls'
+    else
+      ls
   in
-  let find_ts ts =
-    let tid = Mid.find ts.ts_name th.th_known in
-    if tid == th.th_name then memo_ts ts else ts
+  let trans_term t = t_s_map find_ts find_ls t in
+  let trans_fmla f = f_s_map find_ts find_ls f in
+  (* 1. merge in the new declarations *)
+  let decl = 
+    let add_type acc (ts, def) = 
+      if Mts.mem ts i.inst_ts then begin
+	if ts.ts_def <> None || def <> Tabstract then 
+	  raise (CannotInstantiate ts.ts_name);
+	acc 
+      end else 
+	let ts' = find_ts ts in
+	let def' = match def with
+	  | Tabstract -> Tabstract
+	  | Talgebraic ls -> Talgebraic (List.map find_ls ls) 
+	in
+	(ts', def') :: acc
+    in
+    let add_logic acc = function
+      | Lfunction _ -> assert false (*TODO*)
+      | Lpredicate _ -> assert false (*TODO*)
+      | Linductive _ -> assert false (*TODO*)
+    in
+    let add_prop acc k id f = match k with
+      | Pgoal ->
+	  acc
+      | Paxiom | Plemma -> 
+	  let id' = id_dup id in
+	  Hid.add pr_table id id';
+	  create_prop Paxiom id' (trans_fmla f) :: acc
+    in
+    let add_one acc d = match d.d_node with
+      | Dtype tyl -> 
+	  let l = List.fold_left add_type [] tyl in
+	  if l = [] then acc else create_type l :: acc
+      | Dlogic ll -> 
+	  let l = List.fold_left add_logic [] ll in
+	  if l = [] then acc else create_logic l :: acc
+      | Dprop (k, id, f) ->
+	  add_prop acc k id f
+      | Duse _ ->
+	  d :: acc
+      | Dclone _ ->
+	  assert false (*TODO*)
+    in
+    Context.fold_left add_one [] th.th_ctxt
   in
-  (* 1. merge in the new namespace *)
+  (* 2. merge in the new namespace *)
+(***
   let rec merge_namespace acc ns =
     let acc =
       Mnm.fold (fun n ts acc -> add_ts n (find_ts ts) acc) ns.ns_ts acc
@@ -592,20 +661,18 @@ let clone_export uc th i =
     acc
   in
   let ns = merge_namespace empty_ns th.th_export in
+***)
+  let ns = assert false (*TODO*) in
   let uc = match uc.uc_import, uc.uc_export with
     | i0 :: sti, e0 :: ste ->
         { uc with
             uc_import = merge_ns ns i0 :: sti;
             uc_export = merge_ns ns e0 :: ste;
-	    uc_known  = merge_known uc.uc_known !known }
+	    uc_ctxt   = List.fold_left Context.add_decl uc.uc_ctxt decl }
     | _ ->
 	assert false
   in
-  (* 2. merge in the new declarations *)
-  (* ... *)
   uc
-***)
-let clone_export uc th i = assert false (*TODO*)
 
 let add_decl uc d =
   let uc = { uc with uc_ctxt = Context.add_decl uc.uc_ctxt d } in

@@ -62,7 +62,6 @@
 	"for", FOR;
 	"forall", FORALL;
 	"fun", FUN;
-	"function", FUNCTION;
 	"goal", GOAL;
 	"if", IF;
 	"import", IMPORT;
@@ -78,7 +77,6 @@
 	"of", OF;
 	"or", OR;
 	"parameter", PARAMETER;
-	"predicate", PREDICATE;
 	"prop", PROP;
 	"raise", RAISE;
 	"raises", RAISES;
