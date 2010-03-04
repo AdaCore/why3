@@ -535,6 +535,167 @@ let f_any_unsafe prT prF lvl f =
   try f_fold_unsafe (any_fnT prT) (any_fnF prF) lvl false f
   with FoldSkip -> true
 
+(* unsafe constructors with type checking *)
+
+let t_app fs tl ty =
+  let s = match fs.ls_value with
+    | Some vty -> Ty.matching Mid.empty vty ty
+    | _ -> raise (FunctionSymbolExpected fs)
+  in
+  let mtch s ty t = Ty.matching s ty t.t_ty in
+  ignore (try List.fold_left2 mtch s fs.ls_args tl
+          with Invalid_argument _ -> raise BadArity);
+  t_app fs tl ty
+
+let f_app ps tl =
+  let s = match ps.ls_value with
+    | None -> Mid.empty
+    | _ -> raise (PredicateSymbolExpected ps)
+  in
+  let mtch s ty t = Ty.matching s ty t.t_ty in
+  ignore (try List.fold_left2 mtch s ps.ls_args tl
+          with Invalid_argument _ -> raise BadArity);
+  f_app ps tl
+
+let t_case t bl ty =
+  let t_check_branch (p, _, tbr) =
+    if p.pat_ty != t.t_ty then raise TypeMismatch;
+    if tbr.t_ty != ty then raise TypeMismatch
+  in
+  List.iter t_check_branch bl;
+  t_case t bl ty
+
+let f_case t bl =
+  let f_check_branch (p, _, fbr) =
+    if p.pat_ty != t.t_ty then raise TypeMismatch
+  in
+  List.iter f_check_branch bl;
+  f_case t bl
+
+let t_let v t1 t2 =
+  if v.vs_ty == t1.t_ty then t_let v t1 t2 else raise TypeMismatch
+
+let f_let v t1 f2 =
+  if v.vs_ty == t1.t_ty then f_let v t1 f2 else raise TypeMismatch
+
+(* map over symbols *)
+
+let rec t_s_map fnT fnV fnL t =
+  let fn_t = t_s_map fnT fnV fnL in
+  let fn_f = f_s_map fnT fnV fnL in
+  let ty = fnT t.t_ty in
+  t_label_try t.t_label (match t.t_node with
+    | Tbvar n -> t_bvar n ty
+    | Tvar v -> t_var (fnV v ty)
+    | Tconst _ -> t
+    | Tapp (f, tl) -> t_app (fnL f) (List.map fn_t tl) ty
+    | Tlet (t1, (u, t2)) ->
+        let t1 = fn_t t1 in t_let (fnV u t1.t_ty) t1 (fn_t t2)
+    | Tcase (t1, bl) ->
+        let fn_b = t_branch fnT fnV fnL in
+        t_case (fn_t t1) (List.map fn_b bl) ty
+    | Teps (u, f) -> t_eps (fnV u ty) (fn_f f))
+
+and t_branch fnT fnV fnL (pat, nv, t) =
+  (pat_s_map fnT fnV fnL pat, nv, t_s_map fnT fnV fnL t)
+
+and f_s_map fnT fnV fnL f =
+  let fn_t = t_s_map fnT fnV fnL in
+  let fn_f = f_s_map fnT fnV fnL in
+  f_label_try f.f_label (match f.f_node with
+    | Fapp (p, tl) -> f_app (fnL p) (List.map fn_t tl)
+    | Fquant (q, (vl, nv, tl, f1)) ->
+        let tl = tr_map fn_t fn_f tl in
+        let fn_v u = fnV u (fnT u.vs_ty) in
+        f_quant q (List.map fn_v vl) nv tl (fn_f f1)
+    | Fbinop (op, f1, f2) -> f_binary op (fn_f f1) (fn_f f2)
+    | Fnot f1 -> f_not (fn_f f1)
+    | Ftrue | Ffalse -> f
+    | Fif (f1, f2, f3) -> f_if (fn_f f1) (fn_f f2) (fn_f f3)
+    | Flet (t, (u, f1)) ->
+        let t1 = fn_t t in f_let (fnV u t1.t_ty) t1 (fn_f f1)
+    | Fcase (t, bl) ->
+        let fn_b = f_branch fnT fnV fnL in
+        f_case (fn_t t) (List.map fn_b bl))
+
+and f_branch fnT fnV fnL (pat, nv, f) =
+  (pat_s_map fnT fnV fnL pat, nv, f_s_map fnT fnV fnL f)
+
+let get_fnT fn =
+  let ht = Hashtbl.create 17 in
+  let fnT ty =
+    try Hashtbl.find ht ty.ty_tag with Not_found ->
+      let nt = ty_s_map fn ty in
+      Hashtbl.add ht ty.ty_tag nt;
+      nt
+  in
+  fnT
+
+let get_fnV () =
+  let ht = Hid.create 17 in
+  let fnV vs ty =
+    if vs.vs_ty == ty then vs else
+      try Hid.find ht vs.vs_name with Not_found ->
+        let nv = create_vsymbol (id_dup vs.vs_name) ty in
+        Hid.add ht vs.vs_name nv;
+        nv
+  in
+  fnV
+
+let t_s_map fnT fnL t = t_s_map (get_fnT fnT) (get_fnV ()) fnL t
+let f_s_map fnT fnL f = f_s_map (get_fnT fnT) (get_fnV ()) fnL f
+
+(* fold over symbols *)
+
+let rec t_s_fold fnT fnL acc t =
+  let fn_t = t_s_fold fnT fnL in
+  let fn_f = f_s_fold fnT fnL in
+  let acc = ty_s_fold fnT acc t.t_ty in
+  match t.t_node with
+    | Tbvar _ | Tvar _ | Tconst _ -> acc
+    | Tapp (f, tl) -> List.fold_left fn_t (fnL acc f) tl
+    | Tlet (t1, (_,t2)) -> fn_t (fn_t acc t1) t2
+    | Tcase (t1, bl) ->
+        let fn_b = t_branch fnT fnL in
+        List.fold_left fn_b (fn_t acc t1) bl
+    | Teps (_,f) -> fn_f acc f
+
+and t_branch fnT fnL acc (pat,_,t) =
+  t_s_fold fnT fnL (pat_s_fold fnT fnL acc pat) t
+
+and f_s_fold fnT fnL acc f =
+  let fn_t = t_s_fold fnT fnL in
+  let fn_f = f_s_fold fnT fnL in
+  let fn_v acc u = ty_s_fold fnT acc u.vs_ty in
+  match f.f_node with
+    | Fapp (p, tl) -> List.fold_left fn_t (fnL acc p) tl
+    | Fquant (q, (vl,_,tl,f1)) ->
+        let acc = List.fold_left fn_v acc vl in
+        fn_f (tr_fold fn_t fn_f acc tl) f1
+    | Fbinop (op, f1, f2) -> fn_f (fn_f acc f1) f2
+    | Fnot f1 -> fn_f acc f1
+    | Ftrue | Ffalse -> acc
+    | Fif (f1, f2, f3) -> fn_f (fn_f (fn_f acc f1) f2) f3
+    | Flet (t, (_,f1)) -> fn_f (fn_t acc t) f1
+    | Fcase (t, bl) ->
+        let fn_b = f_branch fnT fnL in
+        List.fold_left fn_b (fn_t acc t) bl
+
+and f_branch fnT fnL acc (pat,_,f) =
+  f_s_fold fnT fnL (pat_s_fold fnT fnL acc pat) f
+
+let t_s_all prT prL t =
+  try t_s_fold (all_fn prT) (all_fn prL) true t with FoldSkip -> false
+
+let f_s_all prT prL f =
+  try f_s_fold (all_fn prT) (all_fn prL) true f with FoldSkip -> false
+
+let t_s_any prT prL t =
+  try t_s_fold (any_fn prT) (any_fn prL) false t with FoldSkip -> true
+
+let f_s_any prT prL f =
+  try f_s_fold (any_fn prT) (any_fn prL) false f with FoldSkip -> true
+
 (* replaces variables with de Bruijn indices in term [t] using map [m] *)
 
 let rec t_abst m lvl t = match t.t_node with
@@ -561,13 +722,165 @@ and f_inst m lvl f = f_map_unsafe (t_inst m) (f_inst m) lvl f
 let t_inst_single v t = t_inst (Im.add 0 v Im.empty) 0 t
 let f_inst_single v f = f_inst (Im.add 0 v Im.empty) 0 f
 
-(* looks for free de Bruijn indices *)
+(* safe smart constructors *)
 
-let rec t_closed lvl t = match t.t_node with
-  | Tbvar x -> x < lvl
-  | _ -> t_all_unsafe t_closed f_closed lvl t
+exception NonLinear of vsymbol
 
-and f_closed lvl f = f_all_unsafe t_closed f_closed lvl f
+let f_quant q vl tl f = if vl = [] then f else
+  let i = ref (-1) in
+  let add m v =
+    if Mvs.mem v m then raise (NonLinear v);
+    incr i; Mvs.add v !i m
+  in
+  let m = List.fold_left add Mvs.empty vl in
+  let tl = tr_map (t_abst m 0) (f_abst m 0) tl in
+  f_quant q vl (!i + 1) tl (f_abst m 0 f)
+
+let f_forall = f_quant Fforall
+let f_exists = f_quant Fexists
+
+let pat_varmap p =
+  let i = ref (-1) in
+  let rec mk_map acc p = match p.pat_node with
+    | Pvar n ->
+        if Mvs.mem n acc then raise (NonLinear n);
+        incr i; Mvs.add n !i acc
+    | Pas (p, n) ->
+        if Mvs.mem n acc then raise (NonLinear n);
+        incr i; mk_map (Mvs.add n !i acc) p
+    | _ -> pat_fold mk_map acc p
+  in
+  let m = mk_map Mvs.empty p in
+  m, !i + 1
+
+let t_case t bl ty =
+  let t_make_branch (p, tbr) =
+    let m, nv = pat_varmap p in (p, nv, t_abst m 0 tbr)
+  in
+  t_case t (List.map t_make_branch bl) ty
+
+let f_case t bl =
+  let f_make_branch (p, fbr) =
+    let m, nv = pat_varmap p in (p, nv, f_abst m 0 fbr)
+  in
+  f_case t (List.map f_make_branch bl)
+
+let t_let v t1 t2 = t_let v t1 (t_abst_single v t2)
+let f_let v t1 f2 = f_let v t1 (f_abst_single v f2)
+
+let t_eps v f = t_eps v (f_abst_single v f)
+
+(* opening binders *)
+
+let t_open_bound (v, t) =
+  let v = fresh_vsymbol v in v, t_inst_single (t_var v) t
+
+let f_open_bound (v, f) =
+  let v = fresh_vsymbol v in v, f_inst_single (t_var v) f
+
+let f_open_quant (vl, _, tl, f) =
+  let i = ref (-1) in
+  let add m v = incr i; Im.add !i (t_var v) m in
+  let vl = List.map fresh_vsymbol vl in
+  let m = List.fold_left add Im.empty vl in
+  let tl = tr_map (t_inst m 0) (f_inst m 0) tl in
+  (vl, tl, f_inst m 0 f)
+
+let rec f_open_forall f = match f.f_node with
+  | Fquant (Fforall, f) ->
+      let vl, _, f = f_open_quant f in
+      let vl', f = f_open_forall f in
+      vl@vl', f
+  | _ -> [], f
+
+let rec f_open_exists f = match f.f_node with
+  | Fquant (Fexists, f) ->
+      let vl, _, f = f_open_quant f in
+      let vl', f = f_open_exists f in
+      vl@vl', f
+  | _ -> [], f
+
+let rec pat_rename ns p = match p.pat_node with
+  | Pvar n -> pat_var (Mvs.find n ns)
+  | Pas (p, n) -> pat_as (pat_rename ns p) (Mvs.find n ns)
+  | _ -> pat_map_unsafe (pat_rename ns) p
+
+let pat_substs pat =
+  let m, _ = pat_varmap pat in
+  Mvs.fold
+    (fun x i (vars, s, ns) ->
+       let x' = fresh_vsymbol x in
+       Svs.add x' vars, Im.add i (t_var x') s, Mvs.add x x' ns)
+    m
+    (Svs.empty, Im.empty, Mvs.empty)
+
+let t_open_branch (pat, _, t) =
+  let vars, s, ns = pat_substs pat in
+  (pat_rename ns pat, vars, t_inst s 0 t)
+
+let f_open_branch (pat, _, f) =
+  let vars, s, ns = pat_substs pat in
+  (pat_rename ns pat, vars, f_inst s 0 f)
+
+(* safe opening map *)
+
+let t_branch fn b = let pat,_,t = t_open_branch b in (pat, fn t)
+let f_branch fn b = let pat,_,f = f_open_branch b in (pat, fn f)
+
+let t_map fnT fnF t = t_label_try t.t_label (match t.t_node with
+  | Tbvar _ -> assert false
+  | Tvar _ | Tconst _ -> t
+  | Tapp (f, tl) -> t_app f (List.map fnT tl) t.t_ty
+  | Tlet (t1, b) -> let u,t2 = t_open_bound b in t_let u (fnT t1) (fnT t2)
+  | Tcase (t1, bl) -> t_case (fnT t1) (List.map (t_branch fnT) bl) t.t_ty
+  | Teps b -> let u,f = f_open_bound b in t_eps u (fnF f))
+
+let f_map fnT fnF f = f_label_try f.f_label (match f.f_node with
+  | Fapp (p, tl) -> f_app p (List.map fnT tl)
+  | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
+      f_quant q vl (tr_map fnT fnF tl) (fnF f1)
+  | Fbinop (op, f1, f2) -> f_binary op (fnF f1) (fnF f2)
+  | Fnot f1 -> f_not (fnF f1)
+  | Ftrue | Ffalse -> f
+  | Fif (f1, f2, f3) -> f_if (fnF f1) (fnF f2) (fnF f3)
+  | Flet (t, b) -> let u,f1 = f_open_bound b in f_let u (fnT t) (fnF f1)
+  | Fcase (t, bl) -> f_case (fnT t) (List.map (f_branch fnF) bl))
+
+(* safe opening fold *)
+
+let t_branch fn acc b = let _,_,t = t_open_branch b in fn acc t
+let f_branch fn acc b = let _,_,f = f_open_branch b in fn acc f
+
+let t_fold fnT fnF acc t = match t.t_node with
+  | Tbvar _ -> assert false
+  | Tvar _ | Tconst _ -> acc
+  | Tapp (f, tl) -> List.fold_left fnT acc tl
+  | Tlet (t1, b) -> let _,t2 = t_open_bound b in fnT (fnT acc t1) t2
+  | Tcase (t1, bl) -> List.fold_left (t_branch fnT) (fnT acc t1) bl
+  | Teps b -> let _,f = f_open_bound b in fnF acc f
+
+let f_fold fnT fnF acc f = match f.f_node with
+  | Fapp (p, tl) -> List.fold_left fnT acc tl
+  | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
+      tr_fold fnT fnF (fnF acc f1) tl
+  | Fbinop (op, f1, f2) -> fnF (fnF acc f1) f2
+  | Fnot f1 -> fnF acc f1
+  | Ftrue | Ffalse -> acc
+  | Fif (f1, f2, f3) -> fnF (fnF (fnF acc f1) f2) f3
+  | Flet (t, b) -> let _,f1 = f_open_bound b in fnF (fnT acc t) f1
+  | Fcase (t, bl) -> List.fold_left (f_branch fnF) (fnT acc t) bl
+
+let t_all prT prF t =
+  try t_fold (all_fn prT) (all_fn prF) true t with FoldSkip -> false
+
+let f_all prT prF f =
+  try f_fold (all_fn prT) (all_fn prF) true f with FoldSkip -> false
+
+let t_any prT prF t =
+  try t_fold (any_fn prT) (any_fn prF) false t with FoldSkip -> true
+
+let f_any prT prF f =
+  try f_fold (any_fn prT) (any_fn prF) false f with FoldSkip -> true
 
 (* map/fold over free variables *)
 
@@ -685,6 +998,14 @@ and f_equal_branch_alpha (pat1, _, f1) (pat2, _, f2) =
 and f_equal_quant_alpha (vl1, nv1, tl1, f1) (vl2, nv2, tl2, f2) =
   nv1 == nv2 && List.for_all2 (fun v1 v2 -> v1.vs_ty == v2.vs_ty) vl1 vl2 &&
     f_equal_alpha f1 f2
+
+(* looks for free de Bruijn indices *)
+
+let rec t_closed lvl t = match t.t_node with
+  | Tbvar x -> x < lvl
+  | _ -> t_all_unsafe t_closed f_closed lvl t
+
+and f_closed lvl f = f_all_unsafe t_closed f_closed lvl f
 
 (* matching modulo alpha in the pattern *)
 
@@ -850,313 +1171,6 @@ and f_subst_fmla_alpha f1 f2 lvl f =
 let t_subst_fmla_alpha f1 f2 t = t_subst_fmla_alpha f1 f2 0 t
 let f_subst_fmla_alpha f1 f2 f = f_subst_fmla_alpha f1 f2 0 f
 
-(* unsafe constructors with type checking *)
-
-let t_let v t1 t2 =
-  if v.vs_ty == t1.t_ty then t_let v t1 t2 else raise TypeMismatch
-
-let f_let v t1 f2 =
-  if v.vs_ty == t1.t_ty then f_let v t1 f2 else raise TypeMismatch
-
-let t_app fs tl ty =
-  let s = match fs.ls_value with
-    | Some vty -> Ty.matching Mid.empty vty ty
-    | _ -> raise (FunctionSymbolExpected fs)
-  in
-  let mtch s ty t = Ty.matching s ty t.t_ty in
-  ignore (try List.fold_left2 mtch s fs.ls_args tl
-          with Invalid_argument _ -> raise BadArity);
-  t_app fs tl ty
-
-let f_app ps tl =
-  let s = match ps.ls_value with
-    | None -> Mid.empty
-    | _ -> raise (PredicateSymbolExpected ps)
-  in
-  let mtch s ty t = Ty.matching s ty t.t_ty in
-  ignore (try List.fold_left2 mtch s ps.ls_args tl
-          with Invalid_argument _ -> raise BadArity);
-  f_app ps tl
-
-let t_case t bl ty =
-  let t_check_branch (p, _, tbr) =
-    if tbr.t_ty != ty then raise TypeMismatch;
-    if p.pat_ty != t.t_ty then raise TypeMismatch
-  in
-  List.iter t_check_branch bl;
-  t_case t bl ty
-
-let f_case t bl =
-  let f_check_branch (p, _, fbr) =
-    if p.pat_ty != t.t_ty then raise TypeMismatch
-  in
-  List.iter f_check_branch bl;
-  f_case t bl
-
-(* symbol-wise map *)
-
-let rec t_s_map fnT fnV fnL t =
-  let fn_t = t_s_map fnT fnV fnL in
-  let fn_f = f_s_map fnT fnV fnL in
-  let ty = fnT t.t_ty in
-  t_label_try t.t_label (match t.t_node with
-    | Tbvar n -> t_bvar n ty
-    | Tvar v -> t_var (fnV v ty)
-    | Tconst _ -> t
-    | Tapp (f, tl) -> t_app (fnL f) (List.map fn_t tl) ty
-    | Tlet (t1, (u, t2)) ->
-        let t1 = fn_t t1 in t_let (fnV u t1.t_ty) t1 (fn_t t2)
-    | Tcase (t1, bl) ->
-        let fn_b = t_branch fnT fnV fnL in
-        t_case (fn_t t1) (List.map fn_b bl) ty
-    | Teps (u, f) -> t_eps (fnV u ty) (fn_f f))
-
-and t_branch fnT fnV fnL (pat, nv, t) =
-  (pat_s_map fnT fnV fnL pat, nv, t_s_map fnT fnV fnL t)
-
-and f_s_map fnT fnV fnL f =
-  let fn_t = t_s_map fnT fnV fnL in
-  let fn_f = f_s_map fnT fnV fnL in
-  f_label_try f.f_label (match f.f_node with
-    | Fapp (p, tl) -> f_app (fnL p) (List.map fn_t tl)
-    | Fquant (q, (vl, nv, tl, f1)) ->
-        let tl = tr_map fn_t fn_f tl in
-        let fn_v u = fnV u (fnT u.vs_ty) in
-        f_quant q (List.map fn_v vl) nv tl (fn_f f1)
-    | Fbinop (op, f1, f2) -> f_binary op (fn_f f1) (fn_f f2)
-    | Fnot f1 -> f_not (fn_f f1)
-    | Ftrue | Ffalse -> f
-    | Fif (f1, f2, f3) -> f_if (fn_f f1) (fn_f f2) (fn_f f3)
-    | Flet (t, (u, f1)) ->
-        let t1 = fn_t t in f_let (fnV u t1.t_ty) t1 (fn_f f1)
-    | Fcase (t, bl) ->
-        let fn_b = f_branch fnT fnV fnL in
-        f_case (fn_t t) (List.map fn_b bl))
-
-and f_branch fnT fnV fnL (pat, nv, f) =
-  (pat_s_map fnT fnV fnL pat, nv, f_s_map fnT fnV fnL f)
-
-let get_fnV () =
-  let ht = Hid.create 17 in
-  let fnV vs ty =
-    if vs.vs_ty == ty then vs else
-      try Hid.find ht vs.vs_name with Not_found ->
-        let nv = create_vsymbol (id_dup vs.vs_name) ty in
-        Hid.add ht vs.vs_name nv;
-        nv
-  in
-  fnV
-
-let get_fnT fn =
-  let ht = Hashtbl.create 17 in
-  let fnT ty =
-    try Hashtbl.find ht ty.ty_tag with Not_found ->
-      let nt = ty_s_map fn ty in
-      Hashtbl.add ht ty.ty_tag nt;
-      nt
-  in
-  fnT
-
-let t_s_map fnT fnL t = t_s_map (get_fnT fnT) (get_fnV ()) fnL t
-let f_s_map fnT fnL f = f_s_map (get_fnT fnT) (get_fnV ()) fnL f
-
-(* symbol-wise fold *)
-
-let rec t_s_fold fnT fnL acc t =
-  let fn_t = t_s_fold fnT fnL in
-  let fn_f = f_s_fold fnT fnL in
-  let acc = ty_s_fold fnT acc t.t_ty in
-  match t.t_node with
-    | Tbvar _ | Tvar _ | Tconst _ -> acc
-    | Tapp (f, tl) -> List.fold_left fn_t (fnL acc f) tl
-    | Tlet (t1, (_,t2)) -> fn_t (fn_t acc t1) t2
-    | Tcase (t1, bl) ->
-        let fn_b = t_branch fnT fnL in
-        List.fold_left fn_b (fn_t acc t1) bl
-    | Teps (_,f) -> fn_f acc f
-
-and t_branch fnT fnL acc (pat,_,t) =
-  t_s_fold fnT fnL (pat_s_fold fnT fnL acc pat) t
-
-and f_s_fold fnT fnL acc f =
-  let fn_t = t_s_fold fnT fnL in
-  let fn_f = f_s_fold fnT fnL in
-  let fn_v acc u = ty_s_fold fnT acc u.vs_ty in
-  match f.f_node with
-    | Fapp (p, tl) -> List.fold_left fn_t (fnL acc p) tl
-    | Fquant (q, (vl,_,tl,f1)) ->
-        let acc = List.fold_left fn_v acc vl in
-        fn_f (tr_fold fn_t fn_f acc tl) f1
-    | Fbinop (op, f1, f2) -> fn_f (fn_f acc f1) f2
-    | Fnot f1 -> fn_f acc f1
-    | Ftrue | Ffalse -> acc
-    | Fif (f1, f2, f3) -> fn_f (fn_f (fn_f acc f1) f2) f3
-    | Flet (t, (_,f1)) -> fn_f (fn_t acc t) f1
-    | Fcase (t, bl) ->
-        let fn_b = f_branch fnT fnL in
-        List.fold_left fn_b (fn_t acc t) bl
-
-and f_branch fnT fnL acc (pat,_,f) =
-  f_s_fold fnT fnL (pat_s_fold fnT fnL acc pat) f
-
-let t_s_all prT prL t =
-  try t_s_fold (all_fn prT) (all_fn prL) true t with FoldSkip -> false
-
-let f_s_all prT prL f =
-  try f_s_fold (all_fn prT) (all_fn prL) true f with FoldSkip -> false
-
-let t_s_any prT prL t =
-  try t_s_fold (any_fn prT) (any_fn prL) false t with FoldSkip -> true
-
-let f_s_any prT prL f =
-  try f_s_fold (any_fn prT) (any_fn prL) false f with FoldSkip -> true
-
-(* safe smart constructors *)
-
-let t_let v t1 t2 = t_let v t1 (t_abst_single v t2)
-let f_let v t1 f2 = f_let v t1 (f_abst_single v f2)
-
-let t_eps v f = t_eps v (f_abst_single v f)
-
-exception NonLinear of vsymbol
-
-let f_quant q vl tl f = if vl = [] then f else
-  let i = ref (-1) in
-  let add m v =
-    if Mvs.mem v m then raise (NonLinear v);
-    incr i; Mvs.add v !i m
-  in
-  let m = List.fold_left add Mvs.empty vl in
-  let tl = tr_map (t_abst m 0) (f_abst m 0) tl in
-  f_quant q vl (!i + 1) tl (f_abst m 0 f)
-
-let f_forall = f_quant Fforall
-let f_exists = f_quant Fexists
-
-let pat_varmap p =
-  let i = ref (-1) in
-  let rec mk_map acc p = match p.pat_node with
-    | Pvar n ->
-        if Mvs.mem n acc then raise (NonLinear n);
-        incr i; Mvs.add n !i acc
-    | Pas (p, n) ->
-        if Mvs.mem n acc then raise (NonLinear n);
-        incr i; mk_map (Mvs.add n !i acc) p
-    | _ -> pat_fold mk_map acc p
-  in
-  let m = mk_map Mvs.empty p in
-  m, !i + 1
-
-let t_case t bl ty =
-  let t_make_branch (p, tbr) =
-    let m, nv = pat_varmap p in (p, nv, t_abst m 0 tbr)
-  in
-  t_case t (List.map t_make_branch bl) ty
-
-let f_case t bl =
-  let f_make_branch (p, fbr) =
-    let m, nv = pat_varmap p in (p, nv, f_abst m 0 fbr)
-  in
-  f_case t (List.map f_make_branch bl)
-
-(* opening binders *)
-
-let t_open_bound (v, t) =
-  let v = fresh_vsymbol v in v, t_inst_single (t_var v) t
-
-let f_open_bound (v, f) =
-  let v = fresh_vsymbol v in v, f_inst_single (t_var v) f
-
-let f_open_quant (vl, _, tl, f) =
-  let i = ref (-1) in
-  let add m v = incr i; Im.add !i (t_var v) m in
-  let vl = List.map fresh_vsymbol vl in
-  let m = List.fold_left add Im.empty vl in
-  let tl = tr_map (t_inst m 0) (f_inst m 0) tl in
-  (vl, tl, f_inst m 0 f)
-
-let rec pat_rename ns p = match p.pat_node with
-  | Pvar n -> pat_var (Mvs.find n ns)
-  | Pas (p, n) -> pat_as (pat_rename ns p) (Mvs.find n ns)
-  | _ -> pat_map_unsafe (pat_rename ns) p
-
-let pat_substs pat =
-  let m, _ = pat_varmap pat in
-  Mvs.fold
-    (fun x i (vars, s, ns) ->
-       let x' = fresh_vsymbol x in
-       Svs.add x' vars, Im.add i (t_var x') s, Mvs.add x x' ns)
-    m
-    (Svs.empty, Im.empty, Mvs.empty)
-
-let t_open_branch (pat, _, t) =
-  let vars, s, ns = pat_substs pat in
-  (pat_rename ns pat, vars, t_inst s 0 t)
-
-let f_open_branch (pat, _, f) =
-  let vars, s, ns = pat_substs pat in
-  (pat_rename ns pat, vars, f_inst s 0 f)
-
-(* safe opening map *)
-
-let t_branch fn b = let pat,_,t = t_open_branch b in (pat, fn t)
-let f_branch fn b = let pat,_,f = f_open_branch b in (pat, fn f)
-
-let t_map fnT fnF t = t_label_try t.t_label (match t.t_node with
-  | Tbvar _ -> assert false
-  | Tvar _ | Tconst _ -> t
-  | Tapp (f, tl) -> t_app f (List.map fnT tl) t.t_ty
-  | Tlet (t1, b) -> let u,t2 = t_open_bound b in t_let u (fnT t1) (fnT t2)
-  | Tcase (t1, bl) -> t_case (fnT t1) (List.map (t_branch fnT) bl) t.t_ty
-  | Teps b -> let u,f = f_open_bound b in t_eps u (fnF f))
-
-let f_map fnT fnF f = f_label_try f.f_label (match f.f_node with
-  | Fapp (p, tl) -> f_app p (List.map fnT tl)
-  | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
-      f_quant q vl (tr_map fnT fnF tl) (fnF f1)
-  | Fbinop (op, f1, f2) -> f_binary op (fnF f1) (fnF f2)
-  | Fnot f1 -> f_not (fnF f1)
-  | Ftrue | Ffalse -> f
-  | Fif (f1, f2, f3) -> f_if (fnF f1) (fnF f2) (fnF f3)
-  | Flet (t, b) -> let u,f1 = f_open_bound b in f_let u (fnT t) (fnF f1)
-  | Fcase (t, bl) -> f_case (fnT t) (List.map (f_branch fnF) bl))
-
-(* safe opening fold *)
-
-let t_branch fn acc b = let _,_,t = t_open_branch b in fn acc t
-let f_branch fn acc b = let _,_,f = f_open_branch b in fn acc f
-
-let t_fold fnT fnF acc t = match t.t_node with
-  | Tbvar _ -> assert false
-  | Tvar _ | Tconst _ -> acc
-  | Tapp (f, tl) -> List.fold_left fnT acc tl
-  | Tlet (t1, b) -> let _,t2 = t_open_bound b in fnT (fnT acc t1) t2
-  | Tcase (t1, bl) -> List.fold_left (t_branch fnT) (fnT acc t1) bl
-  | Teps b -> let _,f = f_open_bound b in fnF acc f
-
-let f_fold fnT fnF acc f = match f.f_node with
-  | Fapp (p, tl) -> List.fold_left fnT acc tl
-  | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
-      tr_fold fnT fnF (fnF acc f1) tl
-  | Fbinop (op, f1, f2) -> fnF (fnF acc f1) f2
-  | Fnot f1 -> fnF acc f1
-  | Ftrue | Ffalse -> acc
-  | Fif (f1, f2, f3) -> fnF (fnF (fnF acc f1) f2) f3
-  | Flet (t, b) -> let _,f1 = f_open_bound b in fnF (fnT acc t) f1
-  | Fcase (t, bl) -> List.fold_left (f_branch fnF) (fnT acc t) bl
-
-let t_all prT prF t =
-  try t_fold (all_fn prT) (all_fn prF) true t with FoldSkip -> false
-
-let f_all prT prF f =
-  try f_fold (all_fn prT) (all_fn prF) true f with FoldSkip -> false
-
-let t_any prT prF t =
-  try t_fold (any_fn prT) (any_fn prF) false t with FoldSkip -> true
-
-let f_any prT prF f =
-  try f_fold (any_fn prT) (any_fn prF) false f with FoldSkip -> true
-
 (* built-in symbols *)
 
 let ps_equ =
@@ -1167,7 +1181,6 @@ let ps_neq =
   let v = ty_var (create_tvsymbol (id_fresh "a")) in
   create_psymbol (id_fresh "infix <>") [v; v]
 
-(* FIXME: is it right to do so? *)
 let f_app p tl =
   if p == ps_neq then f_not (f_app ps_equ tl) else f_app p tl
 

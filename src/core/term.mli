@@ -210,23 +210,30 @@ val f_open_branch : fmla_branch -> pattern * Svs.t * fmla
 
 val f_open_quant : fmla_quant -> vsymbol list * trigger list * fmla
 
-(* opening map/fold *)
+val f_open_forall : fmla -> vsymbol list * fmla
+val f_open_exists : fmla -> vsymbol list * fmla
+
+(* generic term/fmla traversal *)
 
 val t_map : (term -> term) -> (fmla -> fmla) -> term -> term
 val f_map : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
 
-val t_fold :
-  ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> term -> 'a
-
-val f_fold :
-  ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> fmla -> 'a
+val t_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> term -> 'a
+val f_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> fmla -> 'a
 
 val t_all : (term -> bool) -> (fmla -> bool) -> term -> bool
 val f_all : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 val t_any : (term -> bool) -> (fmla -> bool) -> term -> bool
 val f_any : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 
-(* symbol-wise map/fold *)
+(* trigger traversal *)
+
+val tr_map : (term -> term) -> (fmla -> fmla) -> trigger list -> trigger list
+
+val tr_fold :
+  ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> trigger list -> 'a
+
+(* map/fold over symbols *)
 
 val t_s_map : (tysymbol -> tysymbol) -> (lsymbol -> lsymbol) -> term -> term
 val f_s_map : (tysymbol -> tysymbol) -> (lsymbol -> lsymbol) -> fmla -> fmla
