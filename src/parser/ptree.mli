@@ -45,6 +45,15 @@ type pty =
   | PPTtyvar of ident
   | PPTtyapp of pty list * qualid
 
+type pattern =
+  { pat_loc : loc; pat_desc : pat_desc }
+
+and pat_desc =
+  | PPpwild
+  | PPpvar of ident
+  | PPpapp of qualid * pattern list
+  | PPpas of pattern * ident
+
 type uquant =
   ident list * pty
 
@@ -63,7 +72,7 @@ and pp_desc =
   | PPquant of pp_quant * uquant list * lexpr list list * lexpr
   | PPnamed of string * lexpr
   | PPlet of ident * lexpr * lexpr
-  | PPmatch of lexpr * ((qualid * ident list * loc) * lexpr) list
+  | PPmatch of lexpr * (pattern * lexpr) list
 
 (*s Declarations. *)
 

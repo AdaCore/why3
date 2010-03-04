@@ -367,6 +367,14 @@ let rec ty_of_dty = function
 
 (** Typing terms and formulas *)
 
+type dpattern = { dp_node : dpattern_node; dp_ty : dty }
+
+and dpattern_node =
+  | Pwild
+  | Pvar of string
+  | Papp of lsymbol * dpattern list
+  | Pas of dpattern * string
+
 type uquant = string list * dty
 
 type dterm = { dt_node : dterm_node; dt_ty : dty }
@@ -376,7 +384,7 @@ and dterm_node =
   | Tconst of constant
   | Tapp of lsymbol * dterm list
   | Tlet of dterm * string * dterm
-(*   | Tcase of dterm * tbranch list *)
+  | Tmatch of dterm * (dpattern * dterm) list
   | Tnamed of string * dterm
   | Teps of string * dfmla
 
@@ -389,7 +397,7 @@ and dfmla =
   | Ffalse
   | Fif of dfmla * dfmla * dfmla
   | Flet of dterm * string * dfmla
-(*   | Fcase of dterm * (pattern * dfmla) list *)
+  | Fmatch of dterm * (dpattern * dfmla) list
   | Fnamed of string * dfmla
 
 and dtrigger =
@@ -401,6 +409,52 @@ let binop = function
   | PPor -> For
   | PPimplies -> Fimplies
   | PPiff -> Fiff
+
+let rec dpat env pat =
+  let env, n, ty = dpat_node pat.pat_loc env pat.pat_desc in
+  env, { dp_node = n; dp_ty = ty }
+
+and dpat_node loc env = function
+  | PPpwild -> 
+      let tv = create_tvsymbol (id_user "a" loc) in
+      let ty = Tyvar (create_type_var ~loc ~user:false tv) in
+      env, Pwild, ty
+  | PPpvar {id=x} ->
+      if M.mem x env.dvars then assert false; (* FIXME? *)
+      let tv = create_tvsymbol (id_user "a" loc) in
+      let ty = Tyvar (create_type_var ~loc ~user:false tv) in
+      let env = { env with dvars = M.add x ty env.dvars } in
+      env, Pvar x, ty
+  | PPpapp (x, pl) ->
+      let s = find_lsymbol x env.th in
+      let s, tyl, ty = specialize_fsymbol ~loc s in
+      let env, pl = dpat_args s.ls_name loc env tyl pl in
+      env, Papp (s, pl), ty
+  | PPpas (p, {id=x}) ->
+      let env, p = dpat env p in
+      if M.mem x env.dvars then assert false; (* FIXME? *)
+      let env = { env with dvars = M.add x p.dp_ty env.dvars } in
+      env, Pas (p,x), p.dp_ty
+
+and dpat_args s loc env el pl = assert false (* TODO *)
+(*
+  let n = List.length el and m = List.length tl in
+  if n <> m then error ~loc (BadNumberOfArguments (s, m, n));
+  let rec check_arg = function
+    | [], [] -> 
+	[]
+    | a :: al, t :: bl ->
+	let loc = t.pp_loc in
+	let t = dterm env t in
+	if not (unify a t.dt_ty) then
+	  error ~loc (TermExpectedType ((fun f -> print_dty f t.dt_ty),
+					(fun f -> print_dty f a)));
+	t :: check_arg (al, bl)
+    | _ ->
+	assert false
+  in
+  check_arg (el, tl)
+*)
 
 let rec trigger_not_a_term_exn = function
   | Error (TermExpected | UnboundSymbol _) -> true
@@ -438,8 +492,16 @@ and dterm_node loc env = function
       let env = { env with dvars = M.add x ty env.dvars } in
       let e2 = dterm env e2 in
       Tlet (e1, x, e2), e2.dt_ty
-  | PPmatch _ ->
-      assert false (* TODO *)
+  | PPmatch (e1, bl) ->
+      (* TODO: unify e1.type with patterns *)
+      (* TODO: unify branch types with each other *)
+      let branch (pat, e) =
+        let env, pat = dpat env pat in
+        pat, dterm env e
+      in
+      let bl = List.map branch bl in
+      let ty = (snd (List.hd bl)).dt_ty in
+      Tmatch (dterm env e1, bl), ty
   | PPnamed (x, e1) ->
       let e1 = dterm env e1 in
       Tnamed (x, e1), e1.dt_ty
@@ -492,8 +554,14 @@ and dfmla env e = match e.pp_desc with
       let env = { env with dvars = M.add x ty env.dvars } in
       let e2 = dfmla env e2 in
       Flet (e1, x, e2)
-  | PPmatch _ ->
-      assert false (* TODO *)
+  | PPmatch (e1, bl) ->
+      (* TODO: unify e1.type with patterns *)
+      (* TODO: unify branch types with each other *)
+      let branch (pat, e) =
+        let env, pat = dpat env pat in
+        pat, dfmla env e
+      in
+      Fmatch (dterm env e1, List.map branch bl)
   | PPnamed (x, f1) ->
       let f1 = dfmla env f1 in
       Fnamed (x, f1)
@@ -520,6 +588,23 @@ and dtype_args s loc env el tl =
   in
   check_arg (el, tl)
 
+let rec pattern env p = 
+  let ty = ty_of_dty p.dp_ty in
+  match p.dp_node with
+  | Pwild -> env, pat_wild ty
+  | Pvar x -> 
+      if M.mem x env then assert false; (* FIXME? *)
+      let v = create_vsymbol (id_fresh x) ty in
+      M.add x v env, pat_var v
+  | Papp (s, pl) -> 
+      let env, pl = map_fold_left pattern env pl in
+      env, pat_app s pl ty
+  | Pas (p, x) ->
+      if M.mem x env then assert false; (* FIXME? *)
+      let v = create_vsymbol (id_fresh x) ty in
+      let env, p = pattern (M.add x v env) p in
+      env, pat_as p v
+
 let rec term env t = match t.dt_node with
   | Tvar x ->
       assert (M.mem x env);
@@ -535,6 +620,14 @@ let rec term env t = match t.dt_node with
       let env = M.add x v env in
       let e2 = term env e2 in
       t_let v e1 e2
+  | Tmatch (e1, bl) ->
+      let branch (pat,e) =
+        let env, pat = pattern env pat in
+        (pat, term env e)
+      in
+      let bl = List.map branch bl in
+      let ty = (snd (List.hd bl)).t_ty in
+      t_case (term env e1) bl ty
   | Tnamed (x, e1) ->
       let e1 = term env e1 in
       t_label_add x e1
@@ -573,6 +666,12 @@ and fmla env = function
       let env = M.add x v env in
       let f2 = fmla env f2 in
       f_let v e1 f2
+  | Fmatch (e1, bl) ->
+      let branch (pat,e) =
+        let env, pat = pattern env pat in
+        (pat, fmla env e)
+      in
+      f_case (term env e1) (List.map branch bl)
   | Fnamed (x, f1) ->
       let f1 = fmla env f1 in
       f_label_add x f1

@@ -30,6 +30,8 @@
   let mk_pp d = mk_ppl (loc ()) d
   let mk_pp_i i d = mk_ppl (loc_i i) d
 		    
+  let mk_pat p = { pat_loc = loc (); pat_desc = p }
+
   let infix_ppl loc a i b = mk_ppl loc (PPinfix (a, i, b))
   let infix_pp a i b = infix_ppl (loc ()) a i b
 
@@ -461,9 +463,16 @@ match_case:
 | pattern ARROW lexpr { ($1,$3) }
 ;
 
+list1_pat_sep_comma:
+| pattern                           { [$1] }
+| pattern COMMA list1_pat_sep_comma { $1::$3 }
+
 pattern:
-| uqualid                                         { ($1, [], loc ()) }
-| uqualid LEFTPAR list1_lident_sep_comma RIGHTPAR  { ($1, $3, loc ()) }
+| UNDERSCORE                                    { mk_pat (PPpwild) }
+| lident                                        { mk_pat (PPpvar $1) }
+| uqualid                                       { mk_pat (PPpapp ($1, [])) }
+| uqualid LEFTPAR list1_pat_sep_comma RIGHTPAR  { mk_pat (PPpapp ($1, $3)) }
+| pattern AS lident                             { mk_pat (PPpas ($1,$3)) }
 ;
 
 triggers:
