@@ -439,12 +439,14 @@ lexpr:
    { mk_pp PPfalse }    
 | LEFTPAR lexpr RIGHTPAR
    { $2 }
-| ident_or_string COLON lexpr %prec prec_named
-   { mk_pp (PPnamed ($1, $3)) }
+| STRING lexpr %prec prec_named
+   { mk_pp (PPnamed ($1, $2)) }
 | LET lident EQUAL lexpr IN lexpr 
    { mk_pp (PPlet ($2, $4, $6)) }
 | MATCH lexpr WITH bar_ match_cases END
    { mk_pp (PPmatch ($2, $5)) }
+| lexpr COLON primitive_type
+   { mk_pp (PPcast ($1, $3)) }
 ;
 
 list1_uquant_sep_comma:
@@ -501,11 +503,6 @@ type_var:
 list1_type_var_sep_comma:
 | type_var                                { [$1] }
 | type_var COMMA list1_type_var_sep_comma { $1 :: $3 }
-;
-
-ident_or_string:
-| ident  { $1.id }
-| STRING { $1 }
 ;
 
 bar_:

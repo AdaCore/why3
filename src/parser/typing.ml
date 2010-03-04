@@ -38,8 +38,6 @@ type error =
   | PredicateExpected
   | TermExpected
   | UnboundSymbol of string
-  | TermExpectedType of (formatter -> unit) * (formatter -> unit) 
-      (* actual / expected *)
   | BadNumberOfArguments of Ident.ident * int * int 
   | ClashTheory of string
   | ClashNamespace of string
@@ -98,9 +96,6 @@ let report fmt = function
   | BadNumberOfArguments (s, n, m) ->
       fprintf fmt "@[Symbol `%s' is applied to %d terms,@ " s.id_short n;
       fprintf fmt "but is expecting %d arguments@]" m
-  | TermExpectedType (ty1, ty2) ->
-      fprintf fmt "@[This term has type "; ty1 fmt; 
-      fprintf fmt "@ but is expected to have type@ "; ty2 fmt; fprintf fmt "@]"
   | ClashTheory s ->
       fprintf fmt "clash with previous theory %s" s
   | ClashNamespace s ->
@@ -178,6 +173,11 @@ let rec print_dty fmt = function
   | Tyapp (s, l) -> 
       fprintf fmt "(%a) %s" 
 	(print_list comma print_dty) l s.ts_name.id_short
+
+let term_expected_type ~loc ty1 ty2 =
+  errorm ~loc
+    "@[This term has type %a@ but is expected to have type@ %a@]"
+    print_dty ty1 print_dty ty2
 
 let create_type_var =
   let t = ref 0 in
@@ -505,6 +505,12 @@ and dterm_node loc env = function
   | PPnamed (x, e1) ->
       let e1 = dterm env e1 in
       Tnamed (x, e1), e1.dt_ty
+  | PPcast (e1, ty) ->
+      let loc = e1.pp_loc in
+      let e1 = dterm env e1 in
+      let ty = dty env ty in
+      if not (unify e1.dt_ty ty) then term_expected_type ~loc e1.dt_ty ty;
+      e1.dt_node, ty
   | PPquant _ | PPif _ 
   | PPprefix _ | PPinfix _ | PPfalse | PPtrue ->
       error ~loc TermExpected
@@ -568,7 +574,7 @@ and dfmla env e = match e.pp_desc with
       Fnamed (x, f1)
   | PPvar _ -> 
       assert false (* TODO *)
-  | PPconst _ ->
+  | PPconst _ | PPcast _ ->
       error ~loc:e.pp_loc PredicateExpected
 
 and dtype_args s loc env el tl =
@@ -580,9 +586,7 @@ and dtype_args s loc env el tl =
     | a :: al, t :: bl ->
 	let loc = t.pp_loc in
 	let t = dterm env t in
-	if not (unify a t.dt_ty) then
-	  error ~loc (TermExpectedType ((fun f -> print_dty f t.dt_ty),
-					(fun f -> print_dty f a)));
+	if not (unify a t.dt_ty) then term_expected_type ~loc t.dt_ty a;
 	t :: check_arg (al, bl)
     | _ ->
 	assert false
@@ -853,9 +857,7 @@ let add_logics loc dl th =
               in
 	      let env = env_of_vsymbol_list vl in
               try Some (make_fs_defn fs vl (term env t))
-	      with _ -> error ~loc (TermExpectedType 
-                ((fun f -> print_dty f t.dt_ty),
-                 (fun f -> print_dty f (dty denv ty))))
+	      with _ -> term_expected_type ~loc t.dt_ty (dty denv ty)
         in
         Lfunction (fs, defn)
   in
