@@ -67,13 +67,13 @@ type theory = private {
   th_name   : ident;
   th_local  : Sid.t;        (* locally declared abstract symbols *)
   th_export : namespace;
-  th_ctxt   : ctxt;
+  th_ctxt   : context;
 }
 
-and ctxt = private {
+and context = private {
   ctxt_tag   : int;
   ctxt_known : decl Mid.t;  (* imported and locally declared symbols *)
-  ctxt_decls : (decl * ctxt) option;
+  ctxt_decls : (decl * context) option;
 }
 
 and decl_node =
@@ -113,11 +113,11 @@ exception BadDecl of ident
 
 module Context : sig
 
-  val add_decl : ctxt -> decl -> ctxt
+  val add_decl : context -> decl -> context
 
-  val iter : (decl -> unit) -> ctxt -> unit
+  val iter : (decl -> unit) -> context -> unit
     (** bottom-up, tail-rec *)
-  val fold_left : ('a -> decl -> 'a) -> 'a -> ctxt -> 'a
+  val fold_left : ('a -> decl -> 'a) -> 'a -> context -> 'a
     (** bottom-up, tail-rec *)
     
 end

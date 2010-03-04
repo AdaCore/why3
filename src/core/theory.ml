@@ -64,13 +64,13 @@ type theory = {
   th_name   : ident;
   th_local  : Sid.t;        (* locally declared abstract symbols *)
   th_export : namespace;
-  th_ctxt   : ctxt;
+  th_ctxt   : context;
 }
 
-and ctxt = {
+and context = {
   ctxt_tag   : int;
   ctxt_known : decl Mid.t;  (* imported and locally declared symbols *)
-  ctxt_decls : (decl * ctxt) option;
+  ctxt_decls : (decl * context) option;
 }
 
 and namespace = {
@@ -185,6 +185,30 @@ let make_fs_defn fs vl t =
   let fd = f_forall vl [] (f_equ hd t) in
   fs, vl, t, check_fvs fd
 
+let make_fs_defn_from_fmla f = match f.f_node with
+  | Fquant (Fforall, qf) ->
+      let vl, _, ef = f_open_quant qf in
+      begin match ef.f_node with
+	| Fapp (s, [t1; t2]) when s == ps_equ -> begin match t1.t_node with
+	    | Tapp (fs, _) -> fs, (fs, vl, t2, f)
+	    | _ -> assert false
+	  end
+	| _ -> assert false
+      end
+  | _ -> assert false
+
+let make_ps_defn_from_fmla f = match f.f_node with
+  | Fquant (Fforall, qf) ->
+      let vl, _, ef = f_open_quant qf in
+      begin match ef.f_node with
+	| Fbinop (Fiff, f1, f2) -> begin match f1.f_node with
+	    | Fapp (ps, _) -> ps, (ps, vl, f2, f)
+	    | _ -> assert false
+	  end
+	| _ -> assert false
+      end
+  | _ -> assert false
+
 let make_ps_defn ps vl f =
   let hd = f_app ps (List.map t_var vl) in
   let pd = f_forall vl [] (f_iff hd f) in
@@ -253,7 +277,7 @@ type theory_uc = {
   uc_local  : Sid.t;
   uc_import : namespace list;
   uc_export : namespace list;
-  uc_ctxt   : ctxt;
+  uc_ctxt   : context;
 }
 
 
@@ -310,6 +334,7 @@ let merge_ns ns1 ns2 =
 let add_ts x ts ns = { ns with ns_ts = add_to_ns x ts ns.ns_ts }
 let add_ls x fs ns = { ns with ns_ls = add_to_ns x fs ns.ns_ls }
 let add_pr x f  ns = { ns with ns_pr = add_to_ns x f  ns.ns_pr }
+let add_ns x v  ns = { ns with ns_ns = add_to_ns x v  ns.ns_ns }
 
 let add_symbol add id v uc =
   match uc.uc_import, uc.uc_export with
@@ -353,7 +378,7 @@ let builtin_known =
 
 module Ctxt =
   struct
-    type t = ctxt
+    type t = context
     let hash ctxt = match ctxt.ctxt_decls with
       | None -> 0
       | Some (d,n) -> 1 + (Hashcons.combine n.ctxt_tag d.d_tag)
@@ -558,7 +583,7 @@ let clone_export uc th i =
   (* memo tables *)
   let ts_table = Hts.create 17 in
   let ls_table = Hls.create 17 in
-  let pr_table = Hid.create 17 in
+  let pr_table = Hashtbl.create 17 in
   let id_table = Hid.create 17 in
   (* fill tables with substitution i *)
   Mts.iter
@@ -604,7 +629,6 @@ let clone_export uc th i =
     else
       ls
   in
-  let trans_term t = t_s_map find_ts find_ls t in
   let trans_fmla f = f_s_map find_ts find_ls f in
   (* 1. merge in the new declarations *)
   let decl = 
@@ -622,17 +646,42 @@ let clone_export uc th i =
 	(ts', def') :: acc
     in
     let add_logic acc = function
-      | Lfunction _ -> assert false (*TODO*)
-      | Lpredicate _ -> assert false (*TODO*)
-      | Linductive _ -> assert false (*TODO*)
+      | Lfunction (ls, Some _) | Lpredicate (ls, Some _) | Linductive (ls, _) 
+        when Mls.mem ls i.inst_ls ->
+	  raise (CannotInstantiate ls.ls_name)
+      | Lfunction (ls, Some (_,_,_,f)) ->
+	  let f' = trans_fmla f in
+	  let ls', def' = make_fs_defn_from_fmla f' in
+	  Lfunction (ls', Some def') :: acc
+      | Lpredicate (_, Some (_,_,_,f)) -> 
+	  let f' = trans_fmla f in
+	  let ls', def' = make_ps_defn_from_fmla f' in
+	  Lpredicate (ls', Some def') :: acc
+      | Lfunction (ls, None) | Lpredicate (ls, None) 
+	when Mls.mem ls i.inst_ls ->
+	  acc
+      | Lfunction (ls, None) ->
+	  Lfunction (find_ls ls, None) :: acc
+      | Lpredicate (ls, None) ->
+	  Lpredicate (find_ls ls, None) :: acc
+      | Linductive (ls, fl) -> 
+	  let trans (id, f) = (id, trans_fmla f) in
+	  Linductive (find_ls ls, List.map trans fl) :: acc
     in
     let add_prop acc k id f = match k with
       | Pgoal ->
 	  acc
       | Paxiom | Plemma -> 
 	  let id' = id_dup id in
-	  Hid.add pr_table id id';
-	  create_prop Paxiom id' (trans_fmla f) :: acc
+	  let f' = trans_fmla f in
+	  let d' = create_prop Paxiom id' f' in
+	  let id' = match d'.d_node with
+	    | Dprop (_, id', _) -> id'
+	    | _ -> assert false
+	  in
+	  Hashtbl.add pr_table f.f_tag f';
+	  Hid.add id_table id id';
+	  d' :: acc
     in
     let add_one acc d = match d.d_node with
       | Dtype tyl -> 
@@ -651,18 +700,26 @@ let clone_export uc th i =
     Context.fold_left add_one [] th.th_ctxt
   in
   (* 2. merge in the new namespace *)
-(***
   let rec merge_namespace acc ns =
     let acc =
       Mnm.fold (fun n ts acc -> add_ts n (find_ts ts) acc) ns.ns_ts acc
     in
-    (* ... *)
-    (* let acc = Mnm.fold (fun n ns acc -> ) ns.ns_ns acc in *)
+    let acc =
+      Mnm.fold (fun n ls acc -> add_ls n (find_ls ls) acc) ns.ns_ls acc
+    in
+    let acc =
+      Mnm.fold 
+	(fun n f acc -> add_pr n (Hashtbl.find pr_table f.f_tag) acc) 
+	ns.ns_pr acc
+    in
+    let acc = 
+      Mnm.fold 
+	(fun n ns acc -> add_ns n (merge_namespace empty_ns ns) acc) 
+	ns.ns_ns acc 
+    in
     acc
   in
   let ns = merge_namespace empty_ns th.th_export in
-***)
-  let ns = assert false (*TODO*) in
   let uc = match uc.uc_import, uc.uc_export with
     | i0 :: sti, e0 :: ste ->
         { uc with
