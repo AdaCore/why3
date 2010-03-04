@@ -1,26 +1,17 @@
 
 (* test file *)
 
-theory T
-  use prelude.List
-  use graph.Path
-end
-
 theory A
-  type t
-  namespace S 
-    logic c : t
-    logic f(t) : t
-  end
-  axiom Toto : 1=2 
 end
 
 theory B
-  use A as B
-  clone import A with type t = int
-  logic d : t
-  axiom Ax : Toto <-> 2=3
+  use import A 
 end
+
+theory C
+  use A
+  use B
+end  
 
 theory Test
   type 'a list = Nil | Cons('a, 'a list)
