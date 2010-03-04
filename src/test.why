@@ -6,7 +6,10 @@ theory A
 
   type 'a list = Nil | Cons('a, 'a list)
 
-  axiom A : forall x,y:int, z:real [x+y, z=z]. x=x
+  inductive even_length(int list) =
+  | Even_nil : even_length(Nil)
+  | Even_cons: forall x,y:'a, l:'a list. 
+               even_length(l) -> even_length(cons(x,cons(y,l)))
 end
 
 theory TestPrelude 

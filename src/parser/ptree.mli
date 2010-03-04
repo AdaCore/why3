@@ -123,8 +123,8 @@ type prop_kind =
 type decl = 
   | TypeDecl of loc * type_decl list
   | Logic of loc * logic_decl list
-  | Inductive_def of loc * ident * pty list * (loc * ident * lexpr) list
   | Prop of loc * prop_kind * ident * lexpr
+  | Inductive_def of loc * ident * pty list * (ident * lexpr) list
   | UseClone of loc * use * clone_subst option
   | Namespace of loc * ident * decl list
 

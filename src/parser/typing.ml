@@ -900,6 +900,14 @@ let add_prop k loc s f th =
   with ClashSymbol _ ->
     error ~loc (Clash s.id)
 
+let add_inductive loc id tyl cl th =
+  let denv = create_denv th in
+  let pl = List.map (fun ty -> ty_of_dty (dty denv ty)) tyl in
+  let ps = create_psymbol (id_user id.id loc) pl in
+  let th' = add_decl th (create_logic [Lpredicate (ps, None)]) in
+  (*TODO*)
+  add_decl th (create_logic [Linductive (ps, [])])
+
 let find_in_loadpath env f =
   let rec find c lp = match lp, c with
     | [], None -> 
@@ -994,6 +1002,8 @@ and add_decl env th = function
       add_logics loc dl th
   | Prop (loc, k, s, f) ->
       add_prop (prop_kind k) loc s f th
+  | Inductive_def (loc, id, tyl, cl) ->
+      add_inductive loc id tyl cl th
   | UseClone (loc, use, subst) ->
       let t = find_theory env use.use_theory in
       let use_or_clone th = match subst with
@@ -1038,8 +1048,6 @@ and add_decl env th = function
       let th = open_namespace th in
       let th = add_decls env th dl in
       close_namespace th id ~import:false
-  | Inductive_def _ ->
-      assert false (*TODO*)
 
 and add_theory env pt =
   let id = pt.pt_name in

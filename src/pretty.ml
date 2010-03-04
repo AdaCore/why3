@@ -149,8 +149,9 @@ let print_logic_decl fmt = function
   | Lpredicate (ps,Some fd) -> 
       fprintf fmt "@[<hov 2>logic %a :@ %a@]" print_ident ps.ls_name
         print_fmla (ps_defn_axiom fd)
-  | Linductive _ -> 
-      assert false (*TODO*)
+  | Linductive (ps, fl) -> 
+      fprintf fmt "@[<hov 2>inductive %a ...@]" print_ident ps.ls_name
+
 
 let print_decl fmt d = match d.d_node with
   | Dtype tl -> 
