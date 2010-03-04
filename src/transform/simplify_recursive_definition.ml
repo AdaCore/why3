@@ -144,10 +144,6 @@ let elt d =
              Mid.add ts.ts_name s acc) Mid.empty l in
         let l = connexe m in
         List.map (fun e -> create_type (List.map (Hid.find mem) e)) l
+    | Dclone _ | Duse _ -> [d]
 
 let t = Transform.TDecl.elt elt
-
-let t_use = Transform.TDecl_or_Use.elt 
-  (function 
-     | Decl d -> List.map (fun d -> Decl d) (elt d) 
-     | Use _ as u -> [u])

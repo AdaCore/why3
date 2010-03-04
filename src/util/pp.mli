@@ -68,6 +68,7 @@ val comma : formatter -> unit -> unit
 val simple_comma : formatter -> unit -> unit
 val semi : formatter -> unit -> unit
 val underscore : formatter -> unit -> unit
+val equal : formatter -> unit -> unit
 val arrow : formatter -> unit -> unit
 val lbrace : formatter -> unit -> unit
 val rbrace : formatter -> unit -> unit

@@ -192,14 +192,6 @@ module SDecl =
     let tag x = x.d_tag
   end
 
-module SDecl_or_Use =
-  struct
-    type t = decl_or_use
-    let tag = function
-      | Decl d -> -d.d_tag
-      | Use t -> 1+t.th_name.Ident.id_tag 
-  end
-
 module STheory =
   struct
     type t = theory
@@ -219,7 +211,5 @@ module SFmla =
   end
 
 module TDecl = Make(SDecl)(SDecl)
-module TDecl_or_Use = Make(SDecl_or_Use)(SDecl_or_Use)
-module TDecl_or_Use_Decl = Make(SDecl_or_Use)(SDecl)
 module TTheory = Make(STheory)(STheory)
 module TTheory_Decl = Make(STheory)(SDecl)

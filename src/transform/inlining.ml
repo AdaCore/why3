@@ -89,12 +89,6 @@ let fold env d =
               ) dl)]
     | Dtype dl -> env,[d]
     | Dprop (k,i,fmla) -> env,[create_prop k (id_dup i) (replacep env fmla)]
+    | Duse _ | Dclone _ -> env,[d]
         
 let t = Transform.TDecl.fold_map_left fold empty_env
-  
-let t_use = Transform.TDecl_or_Use.fold_map_left 
-  (fun env d -> match d with 
-     | Decl d -> let env,l = (fold env d) in
-       env,List.map (fun d -> Decl d) l 
-     | Use _ as u -> env,[u]) empty_env
-  

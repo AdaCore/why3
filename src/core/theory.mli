@@ -51,13 +51,34 @@ type prop_kind =
 type prop_decl = prop_kind * ident * fmla
 
 (* declaration *)
+(** Theory *)
 
-type decl_node =
+module Snm : Set.S with type elt = string
+module Mnm : Map.S with type key = string
+
+type theory = private {
+  th_name   : ident;
+  th_param  : Sid.t;        (* locally declared abstract symbols *)
+  th_known  : ident Mid.t;  (* imported and locally declared symbols *)
+  th_export : namespace;
+  th_decls  : decl list;
+}
+
+and namespace = private {
+  ns_ts : tysymbol Mnm.t;   (* type symbols *)
+  ns_ls : lsymbol Mnm.t;    (* logic symbols *)
+  ns_ns : namespace Mnm.t;  (* inner namespaces *)
+  ns_pr : fmla Mnm.t;       (* propositions *)
+}
+
+and decl_node =
   | Dtype  of ty_decl list
   | Dlogic of logic_decl list
   | Dprop  of prop_decl
+  | Duse of theory
+  | Dclone of (ident * ident) list
 
-type decl = private {
+and decl = private {
   d_node : decl_node;
   d_tag  : int;
 }
@@ -86,30 +107,6 @@ exception UnboundTypeVar of ident
 exception IllegalConstructor of lsymbol
 exception UnboundVars of Svs.t
 exception BadDecl of ident
-
-(** Theory *)
-
-module Snm : Set.S with type elt = string
-module Mnm : Map.S with type key = string
-
-type theory = private {
-  th_name   : ident;
-  th_param  : Sid.t;        (* locally declared abstract symbols *)
-  th_known  : ident Mid.t;  (* imported and locally declared symbols *)
-  th_export : namespace;
-  th_decls  : decl_or_use list;
-}
-
-and namespace = private {
-  ns_ts : tysymbol Mnm.t;   (* type symbols *)
-  ns_ls : lsymbol Mnm.t;    (* logic symbols *)
-  ns_ns : namespace Mnm.t;  (* inner namespaces *)
-  ns_pr : fmla Mnm.t;       (* propositions *)
-}
-
-and decl_or_use =
-  | Decl of decl
-  | Use of theory
 
 (* theory construction *)
 

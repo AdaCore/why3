@@ -74,7 +74,6 @@ open Term
 module STerm : Sig with type t = term
 module SFmla : Sig with type t = fmla
 module SDecl : Sig with type t = decl
-module SDecl_or_Use : Sig with type t = decl_or_use
 module STheory : Sig with type t = theory
 
 (* The functor to construct transformation from one S.t to another *)
@@ -82,7 +81,5 @@ module Make (X1 : Sig)(X2 : Sig) : S with type t1 = X1.t with type t2 = X2.t
 
 (* Predefined transformation *)
 module TDecl : S with type t1 = decl and type t2 = decl
-module TDecl_or_Use : S with type t1 = decl_or_use and type t2 = decl_or_use
-module TDecl_or_Use_Decl : S with type t1 = decl_or_use and type t2 = decl
 module TTheory : S with type t1 = theory and type t2 = theory
 module TTheory_Decl : S with type t1 = theory and type t2 = decl

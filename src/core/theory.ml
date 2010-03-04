@@ -55,12 +55,35 @@ type prop_decl = prop_kind * ident * fmla
 
 (* declaration *)
 
-type decl_node =
+(** Theory *)
+
+module Snm = Set.Make(String)
+module Mnm = Map.Make(String)
+
+type theory = {
+  th_name   : ident;
+  th_param  : Sid.t;        (* locally declared abstract symbols *)
+  th_known  : ident Mid.t;  (* imported and locally declared symbols *)
+  th_export : namespace;
+  th_decls  : decl list;
+}
+
+and namespace = {
+  ns_ts : tysymbol Mnm.t;   (* type symbols *)
+  ns_ls : lsymbol Mnm.t;    (* logic symbols *)
+  ns_ns : namespace Mnm.t;  (* inner namespaces *)
+  ns_pr : fmla Mnm.t;       (* propositions *)
+}
+
+and decl_node =
   | Dtype  of ty_decl list
   | Dlogic of logic_decl list
   | Dprop  of prop_decl
+  | Duse of theory
+  | Dclone of (ident * ident) list
 
-type decl = {
+
+and decl = {
   d_node : decl_node;
   d_tag  : int;
 }
@@ -112,11 +135,14 @@ module D = struct
 
   let hash d = match d.d_node with
     | Dtype  l -> Hashcons.combine_list hs_td 0 l
-    | Dlogic l -> Hashcons.combine_list hs_ld 1 l
-    | Dprop (Paxiom,i,f) -> Hashcons.combine2 0 i.id_tag f.f_tag
-    | Dprop (Plemma,i,f) -> Hashcons.combine2 1 i.id_tag f.f_tag
-    | Dprop (Pgoal, i,f) -> Hashcons.combine2 2 i.id_tag f.f_tag
-
+    | Dlogic l -> Hashcons.combine_list hs_ld 3 l
+    | Dprop (Paxiom,i,f) -> Hashcons.combine2 7 i.id_tag f.f_tag
+    | Dprop (Plemma,i,f) -> Hashcons.combine2 11 i.id_tag f.f_tag
+    | Dprop (Pgoal, i,f) -> Hashcons.combine2 13 i.id_tag f.f_tag
+    | Duse th -> 17 * th.th_name.id_tag
+    | Dclone sl -> Hashcons.combine_list
+        (fun (i1,i2) -> Hashcons.combine i1.id_tag i2.id_tag)
+          19 sl
   let tag n d = { d with d_tag = n }
 
   let compare d1 d2 = Pervasives.compare d1.d_tag d2.d_tag
@@ -214,30 +240,6 @@ let create_prop k i f =
   create_prop k i f
 
 
-(** Theory *)
-
-module Snm = Set.Make(String)
-module Mnm = Map.Make(String)
-
-type theory = {
-  th_name   : ident;
-  th_param  : Sid.t;        (* locally declared abstract symbols *)
-  th_known  : ident Mid.t;  (* imported and locally declared symbols *)
-  th_export : namespace;
-  th_decls  : decl_or_use list;
-}
-
-and namespace = {
-  ns_ts : tysymbol Mnm.t;   (* type symbols *)
-  ns_ls : lsymbol Mnm.t;    (* logic symbols *)
-  ns_ns : namespace Mnm.t;  (* inner namespaces *)
-  ns_pr : fmla Mnm.t;       (* propositions *)
-}
-
-and decl_or_use =
-  | Decl of decl
-  | Use of theory
-
 
 (** Theory under construction *)
 
@@ -247,7 +249,7 @@ type theory_uc = {
   uc_known  : ident Mid.t;
   uc_import : namespace list;
   uc_export : namespace list;
-  uc_decls  : decl_or_use list;
+  uc_decls  : decl list;
 }
 
 
@@ -398,7 +400,7 @@ let use_export uc th =
             uc_import = merge_ns th.th_export i0 :: sti;
             uc_export = merge_ns th.th_export e0 :: ste;
             uc_known  = merge_known uc.uc_known th.th_known;
-            uc_decls  = Use th :: uc.uc_decls;
+            uc_decls  = mk_decl (Duse th) :: uc.uc_decls;
         }
     | _ ->
         assert false
@@ -471,8 +473,9 @@ let add_decl uc d =
     | Dprop (k, id, f) ->
         known_fmla uc.uc_known f;
         add_symbol add_pr id f uc
+    | Dclone _ | Duse _ -> assert false
   in
-  { uc with uc_decls = Decl d :: uc.uc_decls }
+  { uc with uc_decls = d :: uc.uc_decls }
 
 
 (** Clone theories *)

@@ -1,10 +1,12 @@
 open Theory
 
+(* Il faut supprimer les goals et transformer les lemmes en axioms *)
+
 let elt a =
-  let rec aux acc = function
-    | Decl a -> a::acc
-    | Use t -> List.fold_left aux acc t.th_decls in
-  List.rev (aux [] a)
+  let rec aux acc d = match d.d_node with
+    | Duse t -> List.fold_left aux (d::acc) t.th_decls
+    | _ -> d::acc 
+  in List.rev (aux [] a)
 
 
-let t = Transform.TDecl_or_Use_Decl.elt elt
+let t = Transform.TDecl.elt elt
