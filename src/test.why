@@ -7,13 +7,14 @@ theory A
     logic c : t
     logic f(t) : t
   end
+  axiom Toto : 1=2 
 end
 
 theory B
   use A as B
   clone import A with type t = int
   logic d : t
-  axiom Ax : S.f(1) = 2
+  axiom Ax : Toto <-> 2=3
 end
 
 theory Test

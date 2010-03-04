@@ -298,6 +298,13 @@ let find_lsymbol_ns p ns =
 let find_lsymbol p th = 
   find_lsymbol_ns p (get_namespace th)
 
+let find_local_prop {id=x; id_loc=loc} ns = 
+  try Mnm.find x ns.ns_pr
+  with Not_found -> errorm ~loc "unbound formula %s" x
+
+let find_prop p th =
+  find find_local_prop p (get_namespace th)
+
 let specialize_lsymbol ~loc s =
   let tl = s.ls_args in
   let t = s.ls_value in
@@ -391,6 +398,7 @@ and dfmla =
   | Flet of dterm * string * dfmla
   | Fmatch of dterm * (dpattern * dfmla) list
   | Fnamed of string * dfmla
+  | Fvar of fmla
 
 and dtrigger =
   | TRterm of dterm
@@ -594,8 +602,8 @@ and dfmla env e = match e.pp_desc with
   | PPnamed (x, f1) ->
       let f1 = dfmla env f1 in
       Fnamed (x, f1)
-  | PPvar _ -> 
-      assert false (* TODO *)
+  | PPvar x -> 
+      Fvar (find_prop x env.th)      
   | PPconst _ | PPcast _ ->
       error ~loc:e.pp_loc PredicateExpected
 
@@ -706,6 +714,8 @@ and fmla env = function
   | Fnamed (x, f1) ->
       let f1 = fmla env f1 in
       f_label_add x f1
+  | Fvar f ->
+      f
 
 (** Typing declarations, that is building environments. *)
 
