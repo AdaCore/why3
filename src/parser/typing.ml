@@ -918,13 +918,86 @@ let add_prop k loc s f th =
   with ClashSymbol _ ->
     error ~loc (Clash s.id)
 
+(** [check_clausal_form loc ps f] checks whether the formula [f] 
+    has a valid clausal form 
+      \forall x_1,.., x_k. P1 -> ... -> P_n -> P
+    where P is headed by ps and ps has only positive occurrences in P1 .. Pn *)
+
+let rec occurrences ps f = match f.f_node with
+  | Term.Ftrue | Term.Ffalse -> 
+      0, 0
+  | Term.Fapp (ps', _) -> 
+      (if ps'.ls_name == ps.ls_name then 1 else 0), 0
+  | Term.Fbinop (Fimplies, f1, f2) -> 
+      let pos1, neg1 = occurrences ps f1 in
+      let pos2, neg2 = occurrences ps f2 in
+      neg1+pos2, pos1+neg2
+  | Term.Fbinop ((Fand | For), f1, f2) -> 
+      let pos1, neg1 = occurrences ps f1 in
+      let pos2, neg2 = occurrences ps f2 in
+      pos1+pos2, neg1+neg2
+  | Term.Fbinop (Fiff, f1, f2) -> 
+      let pos1, neg1 = occurrences ps f1 in
+      let pos2, neg2 = occurrences ps f2 in
+      let n = pos1+pos2+neg1+neg2 in
+      n, n
+  | Term.Fnot p1 -> 
+      let pos1, neg1 = occurrences ps p1 in neg1, pos1
+  | Term.Fquant (_, qf) ->
+      assert false (* TODO *)
+      (* occurrences pi p *)
+  | Term.Flet (t, bf) ->
+      let _, f = f_open_bound bf in
+      occurrences ps f
+  | Term.Fif (f1, f2, f3) ->
+      let pos1, neg1 = occurrences ps f1 in
+      let pos2, neg2 = occurrences ps f2 in
+      let pos3, neg3 = occurrences ps f3 in
+      pos1+pos2+pos3, neg1+neg2+neg3
+  | Term.Fcase (_, bl) ->
+      List.fold_left
+	(fun (pos, neg) br ->
+	   let _, _, f1 = f_open_branch br in
+	   let pos1, neg1 = occurrences ps f1 in
+	   pos+pos1, neg+neg1)
+	(0, 0) bl
+      
+let rec check_unquantified_clausal_form loc ps f = match f.f_node with
+  | Term.Fbinop (Fimplies, f1, f2) -> 
+      check_unquantified_clausal_form loc ps f2;
+      let _, neg1 = occurrences ps f1 in
+      if neg1 > 0 then 
+	errorm ~loc 
+	  "inductive predicate has a negative occurrence in this case"
+  | Term.Fapp (ps', _) -> 
+      (* TODO: vérifier également que les arguments de ps' ont exactement
+	 les mêmes types que ceux de la déclaration de ps (et non plus 
+	 précis) *)
+      if ps.ls_name != ps.ls_name then
+	errorm ~loc "head of clause does not contain the inductive predicate"
+  | _ -> 
+      errorm ~loc "this case is not in clausal form"
+
+let rec check_clausal_form loc ps f = match f.f_node with
+  | Term.Fquant (Fforall, qf) ->
+      let vl, _, f = f_open_quant qf in
+      check_clausal_form loc ps f
+  | _ -> 
+      check_unquantified_clausal_form loc ps f
+
 let add_inductive loc id tyl cl th =
   let denv = create_denv th in
   let pl = List.map (fun ty -> ty_of_dty (dty denv ty)) tyl in
   let ps = create_psymbol (id_user id.id loc) pl in
   let th' = add_decl th (create_logic [Lpredicate (ps, None)]) in
-  (*TODO*)
-  add_decl th (create_logic [Linductive (ps, [])])
+  let clause (id, f) = 
+    let loc = f.pp_loc in
+    let f' = fmla th' f in
+    check_clausal_form loc ps f';
+    id_register (id_user id.id id.id_loc), f'
+  in
+  let cl = List.map clause cl in
+  add_decl th (create_logic [Linductive (ps, cl)])
 
 let find_in_loadpath env f =
   let rec find c lp = match lp, c with

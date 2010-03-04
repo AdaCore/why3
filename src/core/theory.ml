@@ -254,8 +254,7 @@ let create_logic ldl =
         raise (BadDecl ps.ls_name)
     | Linductive (ps,la) ->
         let check_ax (_,f) =
-          ignore (check_fvs f);
-          assert false (* TODO *)
+          ignore (check_fvs f) (* TODO *)
         in
         List.iter check_ax la
     | _ -> ()

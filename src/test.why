@@ -20,10 +20,10 @@ end
 theory Test
   type 'a list = Nil | Cons('a, 'a list)
  
-  inductive even_length(int list) =
-  | Even_nil : even_length(Nil)
+  inductive even_length('a list) =
+  | Even_nil : even_length(Nil : int list)
   | Even_cons: forall x,y:'a, l:'a list. 
-               even_length(l) -> even_length(cons(x,cons(y,l)))
+               even_length(l) -> even_length(Cons(x,Cons(y,l)))
 end
 
 theory TestPrelude 
