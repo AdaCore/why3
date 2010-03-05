@@ -6,20 +6,10 @@ open Ty
 open Term
 open Theory
 
-let ident_table = Hid.create 5003
-
-let fresh_ident =
-  let ident_count = ref 0 in
-  fun () -> incr ident_count; "x" ^ string_of_int !ident_count
+let ident_printer = create_printer ()
 
 let print_ident fmt id =
-  let s = 
-    try 
-      Hid.find ident_table id
-    with Not_found -> 
-      let s = fresh_ident () in Hid.add ident_table id s; s
-  in
-  pp_print_string fmt s
+  fprintf fmt "%s" (id_unique ident_printer id)
 
 let rec print_type fmt ty = match ty.ty_node with
   | Tyvar id -> 
@@ -143,3 +133,7 @@ let print_context fmt ctxt =
   let decls = Context.get_decls ctxt in
   print_list newline2 print_decl fmt decls
 
+
+let print_goal fmt (id, f, ctxt) =
+  print_context fmt ctxt;
+  fprintf fmt "@[<hov 2>goal %a : %a@]" print_ident id print_fmla f

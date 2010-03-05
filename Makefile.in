@@ -138,7 +138,7 @@ bin/top: $(CMO)
 
 test: bin/why.byte
 	ocamlrun -bt bin/why.byte --print-stdout -I lib/prelude/ src/test.why
-	bin/why.byte --alt-ergo -I lib/prelude/ src/test.why
+#	bin/why.byte --alt-ergo -I lib/prelude/ src/test.why
 
 # graphical interface
 #####################

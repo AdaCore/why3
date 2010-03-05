@@ -14,15 +14,13 @@ theory Int
   logic (_/_) (int, int) : int
   logic (_%_) (int, int) : int
 
+  logic zero : int = 0
   logic (-_)(int) : int
   
   (* ring structure *)
-  axiom Add_assoc:    forall x,y,z:int. x + (y + z) = (x + y) + z
-  axiom Add_comm:     forall x,y:int. x + y = y + x
-  axiom Zero_neutral: forall x:int. x + 0 = x
-  axiom Neg:          forall x:int. x + -x = 0
-  axiom Mul_assoc:    forall x,y,z:int. x * (y * z) = (x * y) * z
-  axiom Mul_distr:    forall x,y,z:int. x * (y + z) = x * y + x * z
+  clone export math.RingStructure with 
+     type t = int, logic zero = zero, 
+     logic (_+_) = (_+_), logic (_*_) = (_*_), logic (-_) = (-_)
 
   (* int is a unitary, communtative ring *)
   axiom Mul_comm:     forall x,y:int. x * y = y * x

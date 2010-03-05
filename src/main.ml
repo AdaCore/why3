@@ -76,19 +76,27 @@ let type_file env file =
   close_in c;
   if !parse_only then env else Typing.add_theories env f
 
+let extract_goals th =
+  let ctx = Context.use_export Context.empty_context th in
+  assert false
+
 let transform l =
   let l = Typing.list_theory l in
   if !print_stdout && not transform then 
     List.iter (Pretty.print_theory Format.std_formatter) l
-  else if !alt_ergo then
-    List.iter (fun th -> Alt_ergo.print_context std_formatter th.th_ctxt) l
-   else 
+  else if !alt_ergo then match l with
+    | th :: _ -> begin match extract_goals th with
+	| g :: _ -> Alt_ergo.print_goal std_formatter g
+	| [] -> ()
+      end	
+    | [] -> ()
+  else 
     let l = List.map (fun t -> t,Transform.apply Flatten.t t.th_ctxt)
       l in
     let l = if !simplify_recursive 
     then 
       List.map (fun (t,dl) -> t,Transform.apply 
-                     Simplify_recursive_definition.t dl) l
+                  Simplify_recursive_definition.t dl) l
     else l in
     let l = if !inlining
     then

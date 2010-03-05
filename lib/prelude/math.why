@@ -1,0 +1,16 @@
+
+theory RingStructure
+  type t
+  logic zero : t
+  logic (_+_)(t, t) : t
+  logic (-_)(t) : t
+  logic (_*_)(t, t) : t
+
+  axiom Add_assoc:    forall x,y,z:t. x + (y + z) = (x + y) + z
+  axiom Add_comm:     forall x,y:t. x + y = y + x
+  axiom Zero_neutral: forall x:t. x + zero = x
+  axiom Neg:          forall x:t. x + -x = zero
+  axiom Mul_assoc:    forall x,y,z:t. x * (y * z) = (x * y) * z
+  axiom Mul_distr:    forall x,y,z:t. x * (y + z) = x * y + x * z
+end
+
