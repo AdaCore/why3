@@ -6,10 +6,15 @@ open Ty
 open Term
 open Theory
 
-let ident_printer = create_printer ()
+let ident_printer = 
+  let bls = ["let"; "forall"; "exists"; "and"; "or"] in
+  let san = sanitizer char_to_alpha char_to_alnumus in
+  create_printer bls ~sanitizer:san
 
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
+
+let forget_var v = forget_id ident_printer v.vs_name
 
 let rec print_type fmt ty = match ty.ty_node with
   | Tyvar id -> 
@@ -37,7 +42,8 @@ let rec print_term fmt t = match t.t_node with
   | Tlet (t1, tb) ->
       let v, t2 = t_open_bound tb in
       fprintf fmt "@[(let %a = %a@ in %a)@]" print_ident v.vs_name
-	print_term t1 print_term t2
+        print_term t1 print_term t2;
+      forget_var v
   | Tcase _ ->
       assert false
   | Teps _ ->
@@ -57,7 +63,8 @@ let rec print_fmla fmt f = match f.f_node with
 	fprintf fmt "forall %a:%a" print_ident v.vs_name print_type v.vs_ty
       in
       fprintf fmt "@[<hov2>(%a%a.@ %a)@]" (print_list dot forall) vl
-	(print_list alt print_triggers) tl print_fmla f
+        (print_list alt print_triggers) tl print_fmla f;
+      List.iter forget_var vl
   | Fquant (Fexists, fq) ->
       assert false (*TODO*)
   | Fbinop (Fand, f1, f2) ->
@@ -109,7 +116,8 @@ let print_logic_decl fmt = function
       let _, vl, t = open_fs_defn defn in
       let ty = match ls.ls_value with None -> assert false | Some ty -> ty in
       fprintf fmt "@[<hov 2>function %a(%a) : %a =@ %a@]@\n" print_ident id
-	(print_list comma print_logic_binder) vl print_type ty print_term t
+        (print_list comma print_logic_binder) vl print_type ty print_term t;
+      List.iter forget_var vl
   | Lpredicate _ ->
       assert false (*TODO*)
   | Linductive _ ->

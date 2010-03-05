@@ -750,7 +750,7 @@ end
 (** Debugging *)
 
 let print_ident =
-  let printer = create_printer () in
+  let printer = create_printer [] in
   let print fmt id = Format.fprintf fmt "%s" (id_unique printer id) in
   print
 

@@ -70,29 +70,84 @@ let id_dup id = { id with id_tag = -1 }
 
 (** Unique names for pretty printing *)
 
-type printer = (string, int) Hashtbl.t * (int, string) Hashtbl.t
-
-let create_printer () = Hashtbl.create 1997, Hashtbl.create 1997
+type printer =
+  (string, int) Hashtbl.t * (int, string) Hashtbl.t * (string -> string)
 
 let rec find_index indices name ind =
   if Hashtbl.mem indices (name ^ string_of_int ind)
   then find_index indices name (succ ind) else ind
 
 let find_unique indices name =
-  try
+  let name = try
     let ind = Hashtbl.find indices name + 1 in
     let ind = find_index indices name ind in
-    Hashtbl.add indices name ind;
+    Hashtbl.replace indices name ind;
     name ^ string_of_int ind
-  with Not_found ->
-    name
+  with Not_found -> name in
+  Hashtbl.replace indices name 0;
+  name
 
-let id_unique (indices,values) id =
+let same x = x
+
+let create_printer ?(sanitizer = same) sl =
+  let indices = Hashtbl.create 1997 in
+  let block n = ignore (find_unique indices n) in
+  List.iter block sl;
+  indices, Hashtbl.create 1997, sanitizer
+
+let id_unique (indices,values,san0) ?(sanitizer = same) id =
   try
     Hashtbl.find values id.id_tag
   with Not_found ->
-    let name = find_unique indices id.id_long in
-    Hashtbl.add values id.id_tag name;
-    Hashtbl.add indices name 0;
+    let name = sanitizer (san0 id.id_long) in
+    let name = find_unique indices name in
+    Hashtbl.replace values id.id_tag name;
     name
+
+let forget_id (indices,values,_) id =
+  try
+    let name = Hashtbl.find values id.id_tag in
+    Hashtbl.remove indices name;
+    Hashtbl.remove values id.id_tag
+  with Not_found -> ()
+
+(** Sanitizers *)
+
+exception Unsanitizable
+
+let char_to_alpha c = match c with
+  | 'a'..'z' | 'A'..'Z' -> String.make 1 c
+  | ' ' -> "sp" | '_'  -> "us" | '#' -> "sh"
+  | '`' -> "bq" | '~'  -> "tl" | '!' -> "ex"
+  | '@' -> "at" | '$'  -> "dl" | '%' -> "pc"
+  | '^' -> "cf" | '&'  -> "et" | '*' -> "as"
+  | '(' -> "lp" | ')'  -> "rp" | '-' -> "mn"
+  | '+' -> "pl" | '='  -> "eq" | '[' -> "lb"
+  | ']' -> "rb" | '{'  -> "lc" | '}' -> "rc"
+  | ':' -> "cl" | '\'' -> "qt" | '"' -> "dq"
+  | '<' -> "ls" | '>'  -> "gt" | '/' -> "sl"
+  | '?' -> "qu" | '\\' -> "bs" | '|' -> "br"
+  | ';' -> "sc" | ','  -> "cm" | '.' -> "dt"
+  | '0' -> "zr" | '1'  -> "un" | '2' -> "du"
+  | '3' -> "tr" | '4'  -> "qr" | '5' -> "qn"
+  | '6' -> "sx" | '7'  -> "st" | '8' -> "oc"
+  | '9' -> "nn" | _ -> raise Unsanitizable
+
+let char_to_lalpha c = String.uncapitalize (char_to_alpha c)
+let char_to_ualpha c = String.capitalize (char_to_alpha c)
+
+let char_to_alnum c =
+  match c with '0'..'9' -> String.make 1 c | _ -> char_to_alpha c
+
+let char_to_alnumus c =
+  match c with '_' | ' ' -> "_" | _ -> char_to_alnum c
+
+let sanitizer head rest n =
+  let lst = ref [] in
+  let code c = lst := rest c :: !lst in
+  let n = if n = "" then "zilch" else n in
+  String.iter code n;
+  let rst = List.tl (List.rev !lst) in
+  let cs = head (String.get n 0) :: rst in
+  String.concat "" cs
 

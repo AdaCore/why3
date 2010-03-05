@@ -26,10 +26,13 @@ open Theory
 
 let print_list_paren x = print_list_delim lparen rparen x
 
-let print_ident =
-  let printer = create_printer () in
-  let print fmt id = Format.fprintf fmt "%s" (id_unique printer id) in
-  print
+let printer =
+  let sanitize = sanitizer char_to_alpha char_to_alnumus in
+  create_printer [] ~sanitizer:sanitize
+
+let print_ident fmt id = Format.fprintf fmt "%s" (id_unique printer id)
+
+let forget_var v = forget_id printer v.vs_name
 
 let print_typevar fmt x =
   fprintf fmt "'%a" print_ident x
@@ -54,13 +57,14 @@ let rec print_term fmt t = match t.t_node with
   | Tconst (ConstReal _) ->
       fprintf fmt "<real constant>"
   | Tapp (s, tl) ->
-      fprintf fmt "@[<hov>(%a(%a)@ : %a)@](" 
+      fprintf fmt "@[<hov>%a(%a):%a@]" 
 	print_ident s.ls_name (print_list comma print_term) tl
 	print_ty t.t_ty
   | Tlet (t1,tbound) -> 
       let vs,t2 = t_open_bound tbound in
       fprintf fmt "(let %a = %a in@ %a)"
-      print_ident vs.vs_name print_term t1 print_term t2
+      print_ident vs.vs_name print_term t1 print_term t2;
+      forget_var vs
   | Tcase _ ->
       assert false (*TODO*)
   | Teps _ -> 
@@ -71,13 +75,14 @@ let print_vsymbol fmt vs =
 
 let rec print_fmla fmt f = match f.f_node with
   | Fapp (s,tl) -> 
-      fprintf fmt "@[<hov>(%a(%a))@]" 
+      fprintf fmt "@[<hov>%a(%a)@]" 
 	print_ident s.ls_name (print_list comma print_term) tl
   | Fquant (q,fquant) ->
       let vl,tl,f = f_open_quant fquant in
       fprintf fmt "(%s %a %a.@ %a)"
         (match q with Fforall -> "forall" | Fexists -> "exists")
-        (print_list comma print_vsymbol) vl print_tl tl print_fmla f
+        (print_list comma print_vsymbol) vl print_tl tl print_fmla f;
+      List.iter forget_var vl
   | Ftrue -> 
       fprintf fmt "true"
   | Ffalse -> 
@@ -94,7 +99,8 @@ let rec print_fmla fmt f = match f.f_node with
   | Flet (t, f) -> 
       let v,f = f_open_bound f in
       fprintf fmt "@[<hov 2>let %a = %a in@ %a@]" print_ident v.vs_name
-	print_term t print_fmla f
+        print_term t print_fmla f;
+      forget_var v
   | Fcase _ ->
       assert false (*TODO*)
   | Fif _ ->
