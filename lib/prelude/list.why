@@ -9,12 +9,12 @@ theory IntList
   logic sorted(int list)
 
   axiom Sorted_nil : 
-    sorted(nil)
+    sorted(Nil)
   axiom Sorted_one : 
-    forall x: int. sorted(cons(x, nil))
+    forall x: int. sorted(Cons(x, Nil))
   axiom Sorted_cons: 
     forall x,y: int. forall l: int list.
-    sorted(cons(y, l)) -> x <= y -> sorted(cons(x, cons(y, l)))
+    sorted(Cons(y, l)) -> x <= y -> sorted(Cons(x, Cons(y, l)))
 
 end
 

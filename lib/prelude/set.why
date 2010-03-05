@@ -1,5 +1,6 @@
+(***
 theory Set_list 
-    use open List
+    use import List
     logic add(x:'a,s:'a t) : 'a t = Cons(x,s)   
     logic mem(x:'a,s:'a t) = match s with        
           | Nil -> false
@@ -40,3 +41,4 @@ theory Set_array
   use include Set_array
 
 end
+***)
