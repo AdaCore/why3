@@ -1,12 +1,16 @@
 open Theory
 
-(* Il faut supprimer les goals et transformer les lemmes en axioms *)
-
 let elt a =
-  let rec aux acc d = match d.d_node with
-    | Duse t -> Context.ctxt_fold aux (d::acc) t.th_ctxt
+  let rec aux first_level acc d = match first_level, d.d_node with
+    | _,Duse t -> Context.ctxt_fold (aux false) (d::acc) t.th_ctxt
+    | false,Dprop (Pgoal,_,_) -> acc
+    | false,Dprop (Plemma,i,f) -> (create_prop Paxiom (Ident.id_dup i) f)::acc
     | _ -> d::acc 
-  in List.rev (aux [] a)
+  in
+  (* Pourquoi ce rev? *)
+  let r =  (aux true [] a) in
+  Format.printf "flat %a : %a@\n" Pretty.print_decl a Pretty.print_decl_list r;
+  r
 
 
-let t = Transform.TDecl.elt elt
+let t = Transform.elt elt

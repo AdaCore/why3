@@ -1,6 +1,7 @@
 open Ident
 open Term
 open Theory
+open Context
 
 let ttrue _ = true
 let ffalse _ = false
@@ -46,30 +47,34 @@ and replacep env f =
 and substt env d = t_map (replacet env) (replacep env) d
 and substp env d = f_map (replacet env) (replacep env) d
 
-let fold env d = 
+let fold _ env ctxt d = 
+  Format.printf "I see : %a@\n%a@\n" Pretty.print_decl d print_env env;
   match d.d_node with
     | Dlogic [l] -> begin
         match l with
-          | Lfunction (fs,None) -> env,[d] 
+          | Lfunction (fs,None) -> env,add_decl ctxt d 
           | Lfunction (fs,Some fmla) -> 
               let _,vs,t = open_fs_defn fmla in
               let t = replacet env t in
               if t_s_any ffalse ((==) fs) t 
-              then  env,[create_logic [Lfunction(fs,Some (make_fs_defn fs vs t))]]
-              else {env with fs = Mls.add fs (vs,t) env.fs},[]
-          | Lpredicate (ps,None) -> env,[d]
+              then  env,
+              add_decl ctxt (create_logic [Lfunction(fs,Some (make_fs_defn fs vs t))])
+              else {env with fs = Mls.add fs (vs,t) env.fs},ctxt
+          | Lpredicate (ps,None) -> env,add_decl ctxt d
           | Lpredicate (ps,Some fmla) -> 
               let _,vs,f = open_ps_defn fmla in
               let f = replacep env f in
               if f_s_any ffalse ((==) ps) f 
-              then  env,[create_logic [Lpredicate(ps,Some (make_ps_defn ps vs f))]]
-              else {env with ps = Mls.add ps (vs,f) env.ps},[]
+              then  env,
+              add_decl ctxt 
+                (create_logic [Lpredicate(ps,Some (make_ps_defn ps vs f))])
+              else {env with ps = Mls.add ps (vs,f) env.ps},ctxt
           | Linductive (ps,fmlal) -> 
               let fmlal = List.map (fun (id,fmla) -> id,replacep env fmla) fmlal in
-              env,[create_logic [Linductive (ps,fmlal)]]
+              env,add_decl ctxt (create_logic [Linductive (ps,fmlal)])
       end
     | Dlogic dl -> env,
-        [create_logic 
+        add_decl ctxt (create_logic 
            (List.map 
               (function
                  | Lfunction (fs,None) as a -> a 
@@ -86,9 +91,9 @@ let fold env d =
                      let fmlal = List.map 
                        (fun (id,fmla) -> id,replacep env fmla) fmlal in
                      Linductive (ps,fmlal)
-              ) dl)]
-    | Dtype dl -> env,[d]
-    | Dprop (k,i,fmla) -> env,[create_prop k (id_dup i) (replacep env fmla)]
-    | Duse _ | Dclone _ -> env,[d]
+              ) dl))
+    | Dtype dl -> env,add_decl ctxt d
+    | Dprop (k,i,fmla) -> env,add_decl ctxt (create_prop k (id_dup i) (replacep env fmla))
+    | Duse _ | Dclone _ -> env,add_decl ctxt d
         
-let t = Transform.TDecl.fold_map_left fold empty_env
+let t = Transform.fold_map_up fold empty_env

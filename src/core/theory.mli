@@ -128,8 +128,10 @@ module Context : sig
   val use_export   : context -> theory -> context
   val clone_export : context -> theory -> th_inst -> context
 
-  val ctxt_fold : ('a -> decl -> 'a) -> 'a -> context -> 'a
+  val ctxt_fold : ('a -> decl -> 'a) -> 'a -> context -> 'a     
+    (** bottom-up, tail-rec *)
   val ctxt_iter : (decl -> unit) -> context -> unit
+    (** bottom-up, tail-rec *)
 
   val get_decls : context -> decl list (* top-down list of decls *)
 

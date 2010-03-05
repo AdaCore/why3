@@ -146,4 +146,4 @@ let elt d =
         List.map (fun e -> create_type (List.map (Hid.find mem) e)) l
     | Dclone _ | Duse _ -> [d]
 
-let t = Transform.TDecl.elt elt
+let t = Transform.elt elt

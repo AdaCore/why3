@@ -20,4 +20,4 @@
 
 (* Simplify the recursive type and logic definition *)
 
-val t : (Theory.decl,Theory.decl) Transform.t
+val t : Transform.t

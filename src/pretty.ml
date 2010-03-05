@@ -171,10 +171,11 @@ let print_decl fmt d = match d.d_node with
 let print_decl_list fmt de = 
   fprintf fmt "@[<hov>%a@]" (print_list newline print_decl) de
 
-let print_ctxt = print_iter1 Context.ctxt_iter newline print_decl 
+let print_context fmt ctxt = print_list newline print_decl fmt 
+  (Context.get_decls ctxt) 
 
 let print_theory fmt t =
   fprintf fmt "@[@[<hov 2>theory %a@\n%a@]@\nend@]@\n@\n" print_ident t.th_name 
-    print_ctxt t.th_ctxt;
+    print_context t.th_ctxt;
   fprintf fmt "@?"
 

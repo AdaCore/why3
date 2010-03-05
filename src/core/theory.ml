@@ -566,6 +566,7 @@ module Context = struct
     let d = create_clone (Hid.fold add id_table []) in
     push_decl ctxt d
 
+
   let add_clone ctxt th inst =
     let add_decl ctxt d = match d.d_node with
       | Dtype _ | Dlogic _ | Dprop _ -> add_decl ctxt d
