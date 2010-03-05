@@ -28,7 +28,6 @@ let loadpath = ref []
 let print_stdout = ref false
 let simplify_recursive = ref false
 let inlining = ref false
-let transform = ref false
 let alt_ergo = ref false
 
 let () = 
@@ -41,14 +40,13 @@ let () =
      "--print-stdout", Arg.Set print_stdout, "print the results to stdout";
      "--simplify-recursive", Arg.Set simplify_recursive, "simplify recursive definition";
      "--inline", Arg.Set inlining, "inline the definition not recursive";
-     "--transform", Arg.Set transform, "transform the goal (--inline,and --simplify-recursive set it) ";
      "--alt-ergo", Arg.Set alt_ergo, "output for Alt-Ergo on stdout";
     ]
     (fun f -> files := f :: !files)
     "usage: why [options] files..."
 
 let in_emacs = Sys.getenv "TERM" = "dumb"
-let transform = !transform || !simplify_recursive || !inlining
+let transform = !simplify_recursive || !inlining
 
 let rec report fmt = function
   | Lexer.Error e ->
@@ -90,7 +88,7 @@ let transform l =
 	| [] -> ()
       end	
     | [] -> ()
-  else 
+  else if transform then
     let l = List.map (fun t -> t,Transform.apply Flatten.t t.th_ctxt)
       l in
     let l = if !simplify_recursive 
