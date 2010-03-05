@@ -58,8 +58,8 @@ let rec report fmt = function
       fprintf fmt "syntax error"
   | Typing.Error e ->
       Typing.report fmt e
-  | Theory.Context.UnknownIdent i ->
-      fprintf fmt "anomaly: unknownident %s" i.Ident.id_short
+(*  | Theory.Context.UnknownIdent i ->
+      fprintf fmt "anomaly: unknownident %s" i.Ident.id_short*)
   | e ->
       fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
