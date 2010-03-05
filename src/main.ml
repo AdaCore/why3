@@ -18,6 +18,7 @@
 (**************************************************************************)
 
 open Format
+open Theory
 
 let files = ref []
 let parse_only = ref false
@@ -28,6 +29,7 @@ let print_stdout = ref false
 let simplify_recursive = ref false
 let inlining = ref false
 let transform = ref false
+let alt_ergo = ref false
 
 let () = 
   Arg.parse 
@@ -40,6 +42,7 @@ let () =
      "--simplify-recursive", Arg.Set simplify_recursive, "simplify recursive definition";
      "--inline", Arg.Set inlining, "inline the definition not recursive";
      "--transform", Arg.Set transform, "transform the goal (--inline,and --simplify-recursive set it) ";
+     "--alt-ergo", Arg.Set alt_ergo, "output for Alt-Ergo on stdout";
     ]
     (fun f -> files := f :: !files)
     "usage: why [options] files..."
@@ -70,8 +73,10 @@ let transform l =
   let l = Typing.list_theory l in
   if !print_stdout && not transform then 
     List.iter (Pretty.print_theory Format.std_formatter) l
+  else if !alt_ergo then
+    List.iter (fun th -> Alt_ergo.print_context std_formatter th.th_ctxt) l
    else 
-    let l = List.map (fun t -> t,Transform.apply Flatten.t t.Theory.th_ctxt)
+    let l = List.map (fun t -> t,Transform.apply Flatten.t t.th_ctxt)
       l in
     let l = if !simplify_recursive 
     then 
@@ -85,7 +90,7 @@ let transform l =
     if !print_stdout then 
       List.iter (fun (t,dl) ->
                    Format.printf "@[@[<hov 2>theory %a@\n%a@]@\nend@]@\n@\n@?" 
-                     Pretty.print_ident t.Theory.th_name 
+                     Pretty.print_ident t.th_name 
                      Pretty.print_context dl
                 ) l
 	

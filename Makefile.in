@@ -51,7 +51,8 @@ OCAMLBEST= @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 CAMLP4   = @CAMLP4O@
 
-INCLUDES = -I src/core -I src/util -I src/parser -I src/transform -I src 
+INCLUDES = -I src/core -I src/util -I src/parser -I src/output \
+           -I src/transform -I src 
 BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ 
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
 OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ 
@@ -101,24 +102,23 @@ doc/version.tex src/version.ml: Version version.sh config.status
 #####
 
 CORE_CMO := name.cmo ident.cmo ty.cmo term.cmo theory.cmo transform.cmo
-
 CORE_CMO := $(addprefix src/core/,$(CORE_CMO))
 
 UTIL_CMO := pp.cmo loc.cmo util.cmo hashcons.cmo 
-
 UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
 
 PARSER_CMO := parser.cmo lexer.cmo typing.cmo
-
 PARSER_CMO := $(addprefix src/parser/,$(PARSER_CMO))
 
 TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
 	flatten.cmo
-
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
+OUTPUT_CMO := alt_ergo.cmo
+OUTPUT_CMO := $(addprefix src/output/,$(OUTPUT_CMO))
+
 CMO = $(UTIL_CMO) $(CORE_CMO) src/pretty.cmo $(PARSER_CMO)	\
-	$(TRANSFORM_CMO) src/main.cmo
+      $(TRANSFORM_CMO) $(OUTPUT_CMO) src/main.cmo
 CMX = $(CMO:.cmo=.cmx)
 
 bin/why.opt: $(CMX) 
@@ -138,6 +138,7 @@ bin/top: $(CMO)
 
 test: bin/why.byte
 	ocamlrun -bt bin/why.byte --print-stdout -I lib/prelude/ src/test.why
+	bin/why.byte --alt-ergo -I lib/prelude/ src/test.why
 
 # graphical interface
 #####################

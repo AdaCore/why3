@@ -65,6 +65,7 @@ let print_iter2 iter sep1 sep2 print1 print2 fmt l =
 let print_pair_delim start sep stop pr1 pr2 fmt (a,b) =
   fprintf fmt "%a%a%a%a%a" start () pr1 a sep () pr2 b stop ()
 
+let dot fmt () = fprintf fmt ".@ "
 let comma fmt () = fprintf fmt ",@ "
 let simple_comma fmt () = fprintf fmt ", "
 let underscore fmt () = fprintf fmt "_"
