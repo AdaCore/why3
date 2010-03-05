@@ -443,7 +443,7 @@ module Context = struct
     let d = create_use th in
     try
       let kn = add_known ctxt.ctxt_known th.th_name d in
-      let ctxt = Hctxt.hashcons { ctxt with ctxt_known = kn } in
+      let ctxt = push_kn_decl ctxt kn d in
       let add_decl ctxt d = match d.d_node with
         | Dtype _ | Dlogic _ | Dprop _ -> add_decl ctxt d
         | Duse th -> use_export ctxt th

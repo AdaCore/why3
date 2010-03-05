@@ -1,14 +1,18 @@
 
 (* test file *)
 
-theory Test
-  inductive p(int) =
-  | A : 0=0
+theory ThA
+    type 'a t = None | Some ('a)
+    type s
+    logic c : s
 end
 
-theory TestPrelude 
-  use prelude.Int
-  use prelude.List
+theory ThB
+    use export prelude.List
+    clone ThA with type s = int
+end
+
+theory ThC
 end
 
 
