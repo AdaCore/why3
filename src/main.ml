@@ -47,6 +47,7 @@ let () =
     (fun f -> files := f :: !files)
     "usage: why [options] files..."
 
+let in_emacs = Sys.getenv "TERM" = "dumb"
 let transform = !transform || !simplify_recursive || !inlining
 
 let rec report fmt = function
@@ -61,8 +62,12 @@ let rec report fmt = function
   | Context.UnknownIdent i ->
       fprintf fmt "anomaly: unknownident %s" i.Ident.id_short
   | e ->
-      fprintf fmt "anomaly: %s" (Printexc.to_string e)
-
+      if in_emacs then
+        let dir = Filename.dirname (Filename.dirname Sys.executable_name) in
+        fprintf fmt "Entering directory `%s'@\n" dir; 
+        fprintf fmt "anomaly:@\n%s" (Printexc.to_string e)
+      else 
+        fprintf fmt "anomaly: %s" (Printexc.to_string e)
 let type_file env file =
   let c = open_in file in
   let lb = Lexing.from_channel c in

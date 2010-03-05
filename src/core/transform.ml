@@ -124,3 +124,8 @@ let elt_of_oelt ~ty ~logic ~prop ~use ~clone d =
     | Dprop p -> prop p
     | Duse th -> use th
     | Dclone c -> clone c
+
+let fold_context_of_decl f ctxt env ctxt_done d =
+  let env,decls = f ctxt env d in
+  env,List.fold_left add_decl ctxt_done decls
+  

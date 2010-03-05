@@ -76,3 +76,9 @@ val elt_of_oelt :
   use:(theory -> decl list) ->
   clone:((ident * ident) list -> decl list) ->
   (decl -> decl list)
+
+
+val fold_context_of_decl:
+  (context -> 'a -> decl -> 'a * decl list) ->
+  context -> 'a -> context -> decl -> ('a * context)
+
