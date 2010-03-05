@@ -26,6 +26,8 @@ let of_option = function Some v -> v | None -> assert false
 
 let option_map f = function None -> None | Some x -> Some (f x)
 
+let option_iter f = function None -> () | Some x -> f x
+
 exception FoldSkip
 
 let all_fn pr _ t = pr t || raise FoldSkip

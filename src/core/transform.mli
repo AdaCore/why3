@@ -26,10 +26,10 @@ type ('a,'b) t
 (* compose two transformation, the underlying datastructures for
    the memoisation are shared *)
 val compose : ('a,'b) t -> ('b,'c) t -> ('a,'c) t
-    
+
 (* apply a transformation and memoise *)
 val apply : ('a,'b) t -> 'a list -> 'b list
-    
+
 (* clear the datastructures used to store the memoisation *)
 val clear : ('a,'b) t -> unit
 
@@ -55,7 +55,7 @@ sig
   (* map the element of the list without an environnment.
      A memoisation is performed at each step, and for each elements *)
   val elt : (t1 -> t2 list) -> (t1,t2) t
-    
+
 end
 
 (* a type with a tag function  *)

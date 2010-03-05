@@ -21,7 +21,7 @@ open Ident
 open Ty
 open Term
 
-(** Theory *)
+(** Declarations *)
 
 (* type declaration *)
 
@@ -41,17 +41,6 @@ type logic_decl =
   | Lpredicate of lsymbol * ps_defn option
   | Linductive of lsymbol * (ident * fmla) list
 
-(* proposition declaration *)
-
-type prop_kind =
-  | Paxiom
-  | Plemma
-  | Pgoal
-
-type prop_decl = prop_kind * ident * fmla
-
-(* smart constructors *)
-
 val make_fs_defn : lsymbol -> vsymbol list -> term -> fs_defn
 val make_ps_defn : lsymbol -> vsymbol list -> fmla -> ps_defn
 
@@ -61,31 +50,25 @@ val open_ps_defn : ps_defn -> lsymbol * vsymbol list * fmla
 val fs_defn_axiom : fs_defn -> fmla
 val ps_defn_axiom : ps_defn -> fmla
 
+(* proposition declaration *)
+
+type prop_kind =
+  | Paxiom
+  | Plemma
+  | Pgoal
+
+type prop_decl = prop_kind * ident * fmla
+
+(** Context and Theory *)
+
+module Snm : Set.S with type elt = string
 module Mnm : Map.S with type key = string
 
 type theory = private {
-  th_name   : ident;
-  th_local  : Sid.t;        (* locally declared abstract symbols *)
-  th_export : namespace;
-  th_ctxt   : context;
-}
-
-and context = private {
-  ctxt_tag   : int;
-  ctxt_known : decl Mid.t;  (* imported and locally declared symbols *)
-  ctxt_decls : (decl * context) option;
-}
-
-and decl_node =
-  | Dtype  of ty_decl list
-  | Dlogic of logic_decl list
-  | Dprop  of prop_decl
-  | Duse of theory
-  | Dclone of (ident * ident) list
-
-and decl = private {
-  d_node : decl_node;
-  d_tag  : int;
+  th_name   : ident;        (* theory name *)
+  th_ctxt   : context;      (* theory declarations *)
+  th_export : namespace;    (* exported namespace *)
+  th_local  : Sid.t;        (* locally declared idents *)
 }
 
 and namespace = private {
@@ -94,6 +77,26 @@ and namespace = private {
   ns_ns : namespace Mnm.t;  (* inner namespaces *)
   ns_pr : fmla Mnm.t;       (* propositions *)
 }
+
+and context = private {
+  ctxt_decls : (decl * context) option;
+  ctxt_known : decl Mid.t;
+  ctxt_tag   : int;
+}
+
+and decl = private {
+  d_node : decl_node;
+  d_tag  : int;
+}
+
+and decl_node =
+  | Dtype  of ty_decl list
+  | Dlogic of logic_decl list
+  | Dprop  of prop_decl
+  | Duse   of theory
+  | Dclone of (ident * ident) list
+
+(** Declaration constructors *)
 
 val create_type : ty_decl list -> decl
 val create_logic : logic_decl list -> decl
@@ -109,51 +112,57 @@ exception IllegalConstructor of lsymbol
 exception UnboundVars of Svs.t
 exception BadDecl of ident
 
-(* context *)
-
-module Context : sig
-
-  val add_decl : context -> decl -> context
-
-  val iter : (decl -> unit) -> context -> unit
-    (** bottom-up, tail-rec *)
-  val fold_left : ('a -> decl -> 'a) -> 'a -> context -> 'a
-    (** bottom-up, tail-rec *)
-    
-end
-
-(* theory construction *)
-
-type theory_uc  (* a theory under construction *)
-
-val create_theory : preid -> theory_uc
-
-val close_theory : theory_uc -> theory
-
-val open_namespace : theory_uc -> theory_uc
-
-val close_namespace : theory_uc -> string -> import:bool -> theory_uc
-
-val add_decl : theory_uc -> decl -> theory_uc
-
-val use_export : theory_uc -> theory -> theory_uc
+(** Context constructors and utilities *)
 
 type th_inst = {
   inst_ts : tysymbol Mts.t;
   inst_ls : lsymbol  Mls.t;
 }
 
-val clone_export : theory_uc -> theory -> th_inst -> theory_uc
+module Context : sig
 
-val get_namespace : theory_uc -> namespace
+  val empty_context : context
 
-(* exceptions *)
+  val add_decl : context -> decl -> context
 
-exception CloseTheory
-exception NoOpenedNamespace
-exception RedeclaredIdent of ident
-exception CannotInstantiate of ident
-exception ClashSymbol of string
+  val use_export   : context -> theory -> context
+  val clone_export : context -> theory -> th_inst -> context
+
+  val ctxt_fold : ('a -> decl -> 'a) -> 'a -> context -> 'a
+  val ctxt_iter : (decl -> unit) -> context -> unit
+
+  val get_decls : context -> decl list (* top-down list of decls *)
+
+  exception UnknownIdent of ident
+  exception RedeclaredIdent of ident
+  exception CannotInstantiate of ident
+
+end
+
+(** Theory constructors and utilities *)
+
+type theory_uc  (* a theory under construction *)
+
+module Theory : sig
+
+  val create_theory : preid -> theory_uc
+  val close_theory  : theory_uc -> theory
+
+  val add_decl : theory_uc -> decl -> theory_uc
+
+  val open_namespace  : theory_uc -> theory_uc
+  val close_namespace : theory_uc -> string -> import:bool -> theory_uc
+
+  val use_export   : theory_uc -> theory -> theory_uc
+  val clone_export : theory_uc -> theory -> th_inst -> theory_uc
+
+  val get_namespace : theory_uc -> namespace
+
+  exception CloseTheory
+  exception NoOpenedNamespace
+  exception ClashSymbol of string
+
+end
 
 (** Debugging *)
 

@@ -26,6 +26,8 @@ open Term
 open Ptree
 open Theory
 
+open Theory
+
 (** errors *)
 
 type error = 

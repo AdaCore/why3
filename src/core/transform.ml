@@ -31,31 +31,31 @@ sig
 end
 
 (* The datastructure for hashconsed list *)
-module LH (X:Sig) = 
+module LH (X:Sig) =
 struct
   module L =
   struct
     type t = X.t hashconsedlist
-    let equal a b = 
+    let equal a b =
       match a,b with
         | [], [] -> true
         | [], _ | _, [] -> false
             (* work evenif al and bl are nil *)
         | (_,ae::_)::al,(_,be::_)::bl -> X.tag ae = X.tag be && al == bl
-        | (_,[])::_,_ | _,(_,[])::_ ->  assert false 
-    let hash a = 
+        | (_,[])::_,_ | _,(_,[])::_ ->  assert false
+    let hash a =
       match a with
         | [] -> 0
         | (_,[ae])::[] -> X.tag ae
         | _::[] -> assert false
         | (_,ae::_)::(at,_)::_ -> Hashcons.combine (X.tag ae) at
-        | (_,[])::_ ->  assert false 
+        | (_,[])::_ ->  assert false
     let tag t = function
       | [] -> []
       | (_,lae)::al -> (t,lae)::al
   end
   module LH = Hashcons.Make(L)
-    
+
   type t = L.t
 
   let empty : t = []
@@ -66,8 +66,8 @@ struct
   let to_list t : X.t list = match t with
     | [] -> []
     | (_,l)::_ -> l
-      
-  let from_list = List.fold_left (fun t e -> cons e t) empty        
+
+  let from_list = List.fold_left (fun t e -> cons e t) empty
 
   let fold_left f acc l =
     List.fold_left (fun acc l -> match l with
@@ -78,7 +78,7 @@ struct
   let tag = function
     | [] -> -1
     | (t,_)::_ -> t
-    
+
 end
 
 
@@ -95,12 +95,12 @@ let compose f g = {all = (fun x -> g.all (f.all x));
                    to_list = g.to_list}
 
 let apply f x = (List.rev (f.to_list (f.all (f.from_list x))))
-    
+
 let clear f = f.clear ()
 
 let memo f tag h x =
   try Hashtbl.find h (tag x:int)
-  with Not_found -> 
+  with Not_found ->
     let r = f x in
     Hashtbl.add h (tag x) r;
     r
@@ -125,51 +125,51 @@ struct
   module LH1 = LH(X1)
   module LH2 = LH(X2)
 
-  let memo_to_list2 h : X2.t hashconsedlist -> X2.t list = 
+  let memo_to_list2 h : X2.t hashconsedlist -> X2.t list =
     memo LH2.to_list LH2.tag h
 
-  let t all clear = 
+  let t all clear =
     let h_to_list = Hashtbl.create 16 in
     {all = all;
      clear = clear;
      from_list = LH1.from_list;
      to_list = memo_to_list2 h_to_list
-    } 
+    }
 
   let fold_map_left f_fold v_empty =
     let memo_t = Hashtbl.create 64 in
-    let rewind edonev eltss = 
-      let edone,_ = List.fold_left 
-        (fun (edone,v) (tag,elts) -> 
+    let rewind edonev eltss =
+      let edone,_ = List.fold_left
+        (fun (edone,v) (tag,elts) ->
            let v,l = f_fold v elts in
            let edone = List.fold_left (fun e t -> LH2.cons t e) edone l in
            Hashtbl.add memo_t tag (edone,v);
            (edone,v)) edonev eltss in
       edone in
-    let rec f acc t1 = 
+    let rec f acc t1 =
       match t1 with
         | [] -> rewind (LH2.empty,v_empty) acc
         | (_,[])::_ -> assert false
-        | (tag,e::_)::t2 -> 
-            try 
+        | (tag,e::_)::t2 ->
+            try
               let edonev = Hashtbl.find memo_t tag in
               rewind edonev acc
-            with Not_found -> f ((tag,e)::acc) t2 
+            with Not_found -> f ((tag,e)::acc) t2
     in
     t (f []) (fun () -> Hashtbl.clear memo_t)
 
-  let elt f_elt = 
+  let elt f_elt =
     let memo_elt = Hashtbl.create 64 in
     let f_elt () x = (),memo f_elt X1.tag memo_elt x in
     let f = fold_map_left f_elt () in
     {f with clear = fun () -> Hashtbl.clear memo_elt; f.clear ()}
 
   let fold_map_right f_fold v_empty =
-    let rec f (acc,v) t = 
+    let rec f (acc,v) t =
       match t with
         | [] -> List.fold_left (List.fold_left (fun t e -> LH2.cons e t)) LH2.empty acc
-        | (_,[])::_ ->  assert false 
-        | (_,e::_)::t -> 
+        | (_,[])::_ ->  assert false
+        | (_,e::_)::t ->
             let v,res = f_fold v e in
             f (res::acc,v) t in
     let memo_t = Hashtbl.create 16 in
@@ -195,7 +195,7 @@ module SDecl =
 module STheory =
   struct
     type t = theory
-    let tag t = t.th_name.Ident.id_tag 
+    let tag t = t.th_name.Ident.id_tag
   end
 
 module STerm =

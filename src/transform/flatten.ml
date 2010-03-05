@@ -4,7 +4,7 @@ open Theory
 
 let elt a =
   let rec aux acc d = match d.d_node with
-    | Duse t -> Context.fold_left aux (d::acc) t.th_ctxt
+    | Duse t -> Context.ctxt_fold aux (d::acc) t.th_ctxt
     | _ -> d::acc 
   in List.rev (aux [] a)
 

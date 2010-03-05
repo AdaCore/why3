@@ -21,6 +21,8 @@ val of_option : 'a option -> 'a
 
 val option_map : ('a -> 'b) -> 'a option -> 'b option
 
+val option_iter : ('a -> unit) -> 'a option -> unit
+
 exception FoldSkip
 
 val all_fn : ('a -> bool) -> 'b -> 'a -> bool
