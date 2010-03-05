@@ -146,4 +146,9 @@ let elt d =
         List.map (fun e -> create_type (List.map (Hid.find mem) e)) l
     | Dclone _ | Duse _ -> [d]
 
+let elt d = 
+  let r = elt d in
+(*  Format.printf "srd : %a -> %a@\n" Pretty.print_decl d Pretty.print_decl_list r;*)
+  r
+
 let t = Transform.elt elt

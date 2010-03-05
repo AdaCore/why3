@@ -35,7 +35,7 @@ let apply f x = f.all x
 let clear f = f.clear ()
 
 let memo f tag h x =
-  try Hashtbl.find h (tag x:int)
+  try Hashtbl.find h (tag x)
   with Not_found ->
     let r = f x in
     Hashtbl.add h (tag x) r;
@@ -66,7 +66,7 @@ let fold_map_up ?clear f_fold v_empty =
       | Some (decls,ctxt2) -> 
           try 
             let ecdone = Hashtbl.find memo_t ctxt2.ctxt_tag in
-            rewind ecdone todo
+            rewind ecdone ((decls,ctxt)::todo)
           with Not_found -> f ((decls,ctxt)::todo) ctxt2 
   in
   t (f []) clear (fun () -> Hashtbl.clear memo_t)
