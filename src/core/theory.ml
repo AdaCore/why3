@@ -615,34 +615,35 @@ module Theory = struct
     ns_pr = Mnm.empty;
   }
 
-  let add_symbol x v m =
-    try
+  let add_symbol chk x v m =
+    if not chk then Mnm.add x v m
+    else try
       if Mnm.find x m != v then raise (ClashSymbol x);
       m
     with Not_found -> Mnm.add x v m
 
-  let merge_ns ns1 ns2 =
-    { ns_ts = Mnm.fold add_symbol ns1.ns_ts ns2.ns_ts;
-      ns_ls = Mnm.fold add_symbol ns1.ns_ls ns2.ns_ls;
-      ns_ns = Mnm.fold add_symbol ns1.ns_ns ns2.ns_ns;
-      ns_pr = Mnm.fold add_symbol ns1.ns_pr ns2.ns_pr; }
+  let merge_ns chk ns1 ns2 =
+    { ns_ts = Mnm.fold (add_symbol chk) ns1.ns_ts ns2.ns_ts;
+      ns_ls = Mnm.fold (add_symbol chk) ns1.ns_ls ns2.ns_ls;
+      ns_ns = Mnm.fold (add_symbol chk) ns1.ns_ns ns2.ns_ns;
+      ns_pr = Mnm.fold (add_symbol chk) ns1.ns_pr ns2.ns_pr; }
 
-  let add_ts x ts ns = { ns with ns_ts = add_symbol x ts ns.ns_ts }
-  let add_ls x fs ns = { ns with ns_ls = add_symbol x fs ns.ns_ls }
-  let add_pr x f  ns = { ns with ns_pr = add_symbol x f  ns.ns_pr }
-  let add_ns x v  ns = { ns with ns_ns = add_symbol x v  ns.ns_ns }
+  let add_ts chk x ts ns = { ns with ns_ts = add_symbol chk x ts ns.ns_ts }
+  let add_ls chk x fs ns = { ns with ns_ls = add_symbol chk x fs ns.ns_ls }
+  let add_pr chk x f  ns = { ns with ns_pr = add_symbol chk x f  ns.ns_pr }
+  let add_ns chk x v  ns = { ns with ns_ns = add_symbol chk x v  ns.ns_ns }
 
   let add_symbol add id v uc =
     match uc.uc_import, uc.uc_export with
     | i0 :: sti, e0 :: ste -> { uc with
-        uc_import = add id.id_short v i0 :: sti;
-        uc_export = add id.id_short v e0 :: ste;
+        uc_import = add false id.id_short v i0 :: sti;
+        uc_export = add true  id.id_short v e0 :: ste;
         uc_local  = Sid.add id uc.uc_local }
     | _ ->
         assert false
 
   let builtin_ns =
-    let add fn = List.fold_right (fun (id,s,_) -> fn id.id_short s) in
+    let add fn = List.fold_right (fun (id,s,_) -> fn true id.id_short s) in
     add add_ls builtin_logic (add add_ts builtin_type empty_ns)
 
   (* Manage theories *)
@@ -677,10 +678,10 @@ module Theory = struct
   let close_namespace uc s ~import =
     match uc.uc_import, uc.uc_export with
     | _ :: i1 :: sti, e0 :: e1 :: ste ->
-        if Mnm.mem s i1.ns_ns then raise (ClashSymbol s);
-        let i1 = if import then merge_ns e0 i1 else i1 in
-        let i1 = { i1 with ns_ns = Mnm.add s e0 i1.ns_ns } in
-        let e1 = { e1 with ns_ns = Mnm.add s e0 e1.ns_ns } in
+        let i1 = if import then merge_ns false e0 i1 else i1 in
+        let _  = if import then merge_ns true  e0 e1 else e1 in
+        let i1 = add_ns false s e0 i1 in
+        let e1 = add_ns true  s e0 e1 in
         { uc with uc_import = i1 :: sti; uc_export = e1 :: ste; }
     | [_], [_] ->
         raise NoOpenedNamespace
@@ -690,17 +691,17 @@ module Theory = struct
   let use_export uc th =
     match uc.uc_import, uc.uc_export with
       | i0 :: sti, e0 :: ste -> { uc with
-          uc_import = merge_ns th.th_export i0 :: sti;
-          uc_export = merge_ns th.th_export e0 :: ste;
+          uc_import = merge_ns false th.th_export i0 :: sti;
+          uc_export = merge_ns true  th.th_export e0 :: ste;
           uc_ctxt   = Context.add_use uc.uc_ctxt th }
       | _ ->
           assert false
 
   let clone_export uc th inst =
     let ts_t, ls_t, pr_t, ctxt = Context.add_clone uc.uc_ctxt th inst in
-    let f_ts n ts acc = add_ts n (Hts.find ts_t ts) acc in
-    let f_ls n ls acc = add_ls n (Hls.find ls_t ls) acc in
-    let f_pr n f  acc = add_pr n (Hashtbl.find pr_t f.f_tag) acc in
+    let f_ts n ts acc = add_ts true n (Hts.find ts_t ts) acc in
+    let f_ls n ls acc = add_ls true n (Hls.find ls_t ls) acc in
+    let f_pr n f  acc = add_pr true n (Hashtbl.find pr_t f.f_tag) acc in
 
     let rec merge_namespace acc ns =
       let acc = Mnm.fold f_ts ns.ns_ts acc in
@@ -708,13 +709,13 @@ module Theory = struct
       let acc = Mnm.fold f_pr ns.ns_pr acc in
       let acc = Mnm.fold f_ns ns.ns_ns acc in acc
 
-    and f_ns n ns acc = add_ns n (merge_namespace empty_ns ns) acc in
+    and f_ns n ns acc = add_ns true n (merge_namespace empty_ns ns) acc in
 
     let ns = merge_namespace empty_ns th.th_export in
     match uc.uc_import, uc.uc_export with
       | i0 :: sti, e0 :: ste -> { uc with
-              uc_import = merge_ns ns i0 :: sti;
-              uc_export = merge_ns ns e0 :: ste;
+              uc_import = merge_ns false ns i0 :: sti;
+              uc_export = merge_ns true  ns e0 :: ste;
               uc_ctxt   = ctxt }
       | _ ->
           assert false
