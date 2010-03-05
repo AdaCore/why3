@@ -434,15 +434,15 @@ module Context = struct
     with DejaVu ->
       ctxt
 
-  let rec use_export ctxt th =
+  let rec use_export hide ctxt th =
     let d = create_use th in
     try
       let kn = add_known th.th_name d ctxt.ctxt_known in
       let ctxt = push_decl ctxt kn d in
       let add_decl ctxt d = match d.d_node with
-        | Duse th -> use_export ctxt th
-        | Dprop (Pgoal,_,_) -> ctxt
-        | Dprop (Plemma,id,f) ->
+        | Duse th -> use_export true ctxt th
+        | Dprop (Pgoal,_,_) when hide -> ctxt
+        | Dprop (Plemma,id,f) when hide ->
             add_decl ctxt (create_prop Paxiom (id_dup id) f)
         | _ -> add_decl ctxt d
       in
@@ -575,12 +575,14 @@ module Context = struct
 
   let clone_export ctxt th inst =
     let add_decl ctxt d = match d.d_node with
-      | Duse th  -> use_export ctxt th
+      | Duse th  -> use_export true ctxt th
       | _ -> add_decl ctxt d
     in
     let _, _, _, id_t, decls = clone_theory th inst in
     let ctxt = List.fold_left add_decl ctxt decls in
     add_final ctxt id_t
+
+  let use_export ctxt th = use_export false ctxt th
 
 end
 
