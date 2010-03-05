@@ -67,9 +67,9 @@ let extract_fs_defn f =
   match ef.f_node with
     | Fapp (s, [t1; t2]) when s == ps_equ ->
         begin match t1.t_node with
-	  | Tapp (fs, _) -> fs, (fs, vl, t2, f)
-	  | _ -> assert false
-	end
+          | Tapp (fs, _) -> fs, (fs, vl, t2, f)
+          | _ -> assert false
+        end
     | _ -> assert false
 
 let extract_ps_defn f =
@@ -77,8 +77,8 @@ let extract_ps_defn f =
   match ef.f_node with
     | Fbinop (Fiff, f1, f2) ->
         begin match f1.f_node with
-	  | Fapp (ps, _) -> ps, (ps, vl, f2, f)
-	  | _ -> assert false
+          | Fapp (ps, _) -> ps, (ps, vl, f2, f)
+          | _ -> assert false
         end
     | _ -> assert false
 
@@ -352,7 +352,7 @@ module Context = struct
 
   exception DejaVu
 
-  let add_known kn id decl =
+  let add_known id decl kn =
     try
       if Mid.find id kn != decl then raise (RedeclaredIdent id);
       raise DejaVu
@@ -361,8 +361,8 @@ module Context = struct
   (* Manage declarations *)
 
   let add_type d kn (ts,def) =
-    let kn = add_known kn ts.ts_name d in
-    let add_constr kn fs = add_known kn fs.ls_name d in
+    let kn = add_known ts.ts_name d kn in
+    let add_constr kn fs = add_known fs.ls_name d kn in
     match def with
       | Tabstract -> kn
       | Talgebraic lfs -> List.fold_left add_constr kn lfs
@@ -374,12 +374,12 @@ module Context = struct
       | Talgebraic lfs -> List.iter check_constr lfs
 
   let add_logic d kn = function
-    | Lfunction  (fs, df) -> add_known kn fs.ls_name d
-    | Lpredicate (ps, dp) -> add_known kn ps.ls_name d
+    | Lfunction  (fs, df) -> add_known fs.ls_name d kn
+    | Lpredicate (ps, dp) -> add_known ps.ls_name d kn
     | Linductive (ps, la) ->
-	let kn = add_known kn ps.ls_name d in
-	let add kn (id,f) = add_known kn id d in
-	List.fold_left add kn la
+        let kn = add_known ps.ls_name d kn in
+        let add kn (id,f) = add_known id d kn in
+        List.fold_left add kn la
 
   let check_logic kn d =
     let check chk (_,_,e,_) = chk e in
@@ -402,7 +402,7 @@ module Context = struct
       let kn = match d.d_node with
         | Dtype dl  -> List.fold_left (add_type d) kn dl
         | Dlogic dl -> List.fold_left (add_logic d) kn dl
-        | Dprop (k, id, _) -> add_known kn id d;
+        | Dprop (k, id, _) -> add_known id d kn;
         | Duse _ | Dclone _ -> assert false
       in
       let () = match d.d_node with
@@ -432,7 +432,7 @@ module Context = struct
   let add_use ctxt th =
     let d = create_use th in
     try
-      let kn = add_known ctxt.ctxt_known th.th_name d in
+      let kn = add_known th.th_name d ctxt.ctxt_known in
       let kn = merge_known kn th.th_ctxt.ctxt_known in
       push_kn_decl ctxt kn d
     with DejaVu ->
@@ -441,7 +441,7 @@ module Context = struct
   let rec use_export ctxt th =
     let d = create_use th in
     try
-      let kn = add_known ctxt.ctxt_known th.th_name d in
+      let kn = add_known th.th_name d ctxt.ctxt_known in
       let ctxt = push_kn_decl ctxt kn d in
       let add_decl ctxt d = match d.d_node with
         | Dtype _ | Dlogic _ | Dprop _ -> add_decl ctxt d
@@ -614,20 +614,22 @@ module Theory = struct
     ns_pr = Mnm.empty;
   }
 
-  let add_to_ns x v m =
-    if Mnm.mem x m then raise (ClashSymbol x);
-    Mnm.add x v m
+  let add_symbol x v m =
+    try
+      if Mnm.find x m != v then raise (ClashSymbol x);
+      m
+    with Not_found -> Mnm.add x v m
 
   let merge_ns ns1 ns2 =
-    { ns_ts = Mnm.fold add_to_ns ns1.ns_ts ns2.ns_ts;
-      ns_ls = Mnm.fold add_to_ns ns1.ns_ls ns2.ns_ls;
-      ns_ns = Mnm.fold add_to_ns ns1.ns_ns ns2.ns_ns;
-      ns_pr = Mnm.fold add_to_ns ns1.ns_pr ns2.ns_pr; }
+    { ns_ts = Mnm.fold add_symbol ns1.ns_ts ns2.ns_ts;
+      ns_ls = Mnm.fold add_symbol ns1.ns_ls ns2.ns_ls;
+      ns_ns = Mnm.fold add_symbol ns1.ns_ns ns2.ns_ns;
+      ns_pr = Mnm.fold add_symbol ns1.ns_pr ns2.ns_pr; }
 
-  let add_ts x ts ns = { ns with ns_ts = add_to_ns x ts ns.ns_ts }
-  let add_ls x fs ns = { ns with ns_ls = add_to_ns x fs ns.ns_ls }
-  let add_pr x f  ns = { ns with ns_pr = add_to_ns x f  ns.ns_pr }
-  let add_ns x v  ns = { ns with ns_ns = add_to_ns x v  ns.ns_ns }
+  let add_ts x ts ns = { ns with ns_ts = add_symbol x ts ns.ns_ts }
+  let add_ls x fs ns = { ns with ns_ls = add_symbol x fs ns.ns_ls }
+  let add_pr x f  ns = { ns with ns_pr = add_symbol x f  ns.ns_pr }
+  let add_ns x v  ns = { ns with ns_ns = add_symbol x v  ns.ns_ns }
 
   let add_symbol add id v uc =
     match uc.uc_import, uc.uc_export with
