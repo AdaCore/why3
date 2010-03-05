@@ -1,6 +1,17 @@
 
 (* test file *)
 
+theory Test1
+  type t
+  logic (_+_)(t,t) : t
+end
+
+theory Test2
+  logic f(int, int) : int
+  clone export Test1 with type t = int, logic (_+_) = f
+  axiom Ax : 1+1 = f(1,1)
+end
+
 theory ThA
     type 'a t = None | Some ('a)
     type s
@@ -15,6 +26,35 @@ end
 theory ThC
 end
 
+theory RingStructure
+  type t
+  logic zero : t
+  logic (_+_)(t, t) : t
+  logic (-_)(t) : t
+  logic (_*_)(t, t) : t
+
+  axiom Add_assoc:    forall x,y,z:t. x + (y + z) = (x + y) + z
+  axiom Add_comm:     forall x,y:t. x + y = y + x
+  axiom Zero_neutral: forall x:t. x + zero = x
+  axiom Neg:          forall x:t. x + -x = zero
+  axiom Mul_assoc:    forall x,y,z:t. x * (y * z) = (x * y) * z
+  axiom Mul_distr:    forall x,y,z:t. x * (y + z) = x * y + x * z
+end
+
+theory IntRing
+  type t
+  logic c0 : t
+  logic add(t, t) : t
+  logic neg(t) : t
+  logic mul(t, t) : t
+  (*clone export RingStructure with type t = t*)
+end
+
+theory Test
+  use graph.Path
+  use import prelude.List
+  axiom Ax : forall l:int list. l=l
+end
 
 (*
 Local Variables: 

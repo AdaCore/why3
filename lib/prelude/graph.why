@@ -17,5 +17,8 @@ theory Path
       simple_path(v, l, dst) -> edge(src, v) -> not mem(v, l) ->
       simple_path(src, Cons(v, l), dst)
 
+  logic simple_cycle(v : vertex) =
+    exists l : vertex list. l <> Nil and simple_path(v, l, v)
+
 end
 

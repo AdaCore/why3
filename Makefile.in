@@ -405,6 +405,11 @@ otags:
 wc:
 	ocamlwc -p src/*.ml* src/*/*.ml*
 
+dep: 
+	$(MAKE) depend
+	cat .depend | ocamldot | dot -Tps > dep.ps
+	gv dep.ps
+
 # distrib
 #########
 
