@@ -17,6 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Ident
 open Theory
 open Context
 
@@ -107,3 +108,19 @@ let all ?clear f =
   let memo_t = Hashtbl.create 16 in
   t (memo f ctxt_tag memo_t) clear (fun () -> Hashtbl.clear memo_t)
 
+(* Utils *)
+
+(*type odecl = 
+  | Otype of ty_decl
+  | Ologic of logic_decl
+  | Oprop of prop_decl
+  | Ouse   of theory
+  | Oclone of (ident * ident) list*)
+
+let elt_of_oelt ~ty ~logic ~prop ~use ~clone d = 
+  match d.d_node with
+    | Dtype l -> [create_type (List.map ty l)]
+    | Dlogic l -> [create_logic (List.map logic l)] 
+    | Dprop p -> prop p
+    | Duse th -> use th
+    | Dclone c -> clone c

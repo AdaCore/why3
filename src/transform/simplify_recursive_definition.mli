@@ -21,3 +21,8 @@
 (* Simplify the recursive type and logic definition *)
 
 val t : Transform.t
+
+
+(* ungroup recursive definition *)
+
+val elt : Theory.decl -> Theory.decl list
