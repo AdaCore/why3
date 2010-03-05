@@ -315,12 +315,7 @@ module Context = struct
     ctxt_tag   = -1;
   }
 
-  let push_decl ctxt d =
-    Hctxt.hashcons { ctxt with
-      ctxt_decls = Some (d, ctxt);
-    }
-
-  let push_kn_decl ctxt kn d =
+  let push_decl ctxt kn d =
     Hctxt.hashcons { ctxt with
       ctxt_decls = Some (d, ctxt);
       ctxt_known = kn
@@ -403,15 +398,16 @@ module Context = struct
         | Dtype dl  -> List.fold_left (add_type d) kn dl
         | Dlogic dl -> List.fold_left (add_logic d) kn dl
         | Dprop (k, id, _) -> add_known id d kn;
-        | Duse _ | Dclone _ -> assert false
+        | Duse th -> add_known th.th_name d kn;
+        | Dclone _ -> kn
       in
       let () = match d.d_node with
         | Dtype dl  -> List.iter (check_type kn) dl
         | Dlogic dl -> List.iter (check_logic kn) dl;
         | Dprop (_, _, f) -> known_fmla kn f
-        | Duse _ | Dclone _ -> assert false
+        | Duse _ | Dclone _ -> ()
       in
-      push_kn_decl ctxt kn d
+      push_decl ctxt kn d
     with DejaVu ->
       ctxt
 
@@ -434,7 +430,7 @@ module Context = struct
     try
       let kn = add_known th.th_name d ctxt.ctxt_known in
       let kn = merge_known kn th.th_ctxt.ctxt_known in
-      push_kn_decl ctxt kn d
+      push_decl ctxt kn d
     with DejaVu ->
       ctxt
 
@@ -442,11 +438,13 @@ module Context = struct
     let d = create_use th in
     try
       let kn = add_known th.th_name d ctxt.ctxt_known in
-      let ctxt = push_kn_decl ctxt kn d in
+      let ctxt = push_decl ctxt kn d in
       let add_decl ctxt d = match d.d_node with
-        | Dtype _ | Dlogic _ | Dprop _ -> add_decl ctxt d
         | Duse th -> use_export ctxt th
-        | Dclone _ -> push_decl ctxt d
+        | Dprop (Pgoal,_,_) -> ctxt
+        | Dprop (Plemma,id,f) ->
+            add_decl ctxt (create_prop Paxiom (id_dup id) f)
+        | _ -> add_decl ctxt d
       in
       let decls = get_decls th.th_ctxt in
       List.fold_left add_decl ctxt decls
@@ -564,14 +562,12 @@ module Context = struct
   let add_final ctxt id_table =
     let add id id' acc = (id,id') :: acc in
     let d = create_clone (Hid.fold add id_table []) in
-    push_decl ctxt d
-
+    add_decl ctxt d
 
   let add_clone ctxt th inst =
     let add_decl ctxt d = match d.d_node with
-      | Dtype _ | Dlogic _ | Dprop _ -> add_decl ctxt d
-      | Duse th  -> add_use ctxt th
-      | Dclone _ -> push_decl ctxt d
+      | Duse th -> add_use ctxt th
+      | _ -> add_decl ctxt d
     in
     let ts_t, ls_t, pr_t, id_t, decls = clone_theory th inst in
     let ctxt = List.fold_left add_decl ctxt decls in
@@ -579,9 +575,8 @@ module Context = struct
 
   let clone_export ctxt th inst =
     let add_decl ctxt d = match d.d_node with
-      | Dtype _ | Dlogic _ | Dprop _ -> add_decl ctxt d
       | Duse th  -> use_export ctxt th
-      | Dclone _ -> push_decl ctxt d
+      | _ -> add_decl ctxt d
     in
     let _, _, _, id_t, decls = clone_theory th inst in
     let ctxt = List.fold_left add_decl ctxt decls in
@@ -714,9 +709,9 @@ module Theory = struct
     let ns = merge_namespace empty_ns th.th_export in
     match uc.uc_import, uc.uc_export with
       | i0 :: sti, e0 :: ste -> { uc with
-              uc_import = merge_ns false ns i0 :: sti;
-              uc_export = merge_ns true  ns e0 :: ste;
-              uc_ctxt   = ctxt }
+          uc_import = merge_ns false ns i0 :: sti;
+          uc_export = merge_ns true  ns e0 :: ste;
+          uc_ctxt   = ctxt }
       | _ ->
           assert false
 
@@ -742,7 +737,7 @@ module Theory = struct
       | Dtype dl  -> List.fold_left add_type uc dl
       | Dlogic dl -> List.fold_left add_logic uc dl
       | Dprop (_, id, f) -> add_symbol add_pr id f uc
-      | Dclone _ | Duse _ -> assert false
+      | Dclone _ | Duse _ -> uc
     in
     { uc with uc_ctxt = Context.add_decl uc.uc_ctxt d }
 
