@@ -48,7 +48,7 @@ and substt env d = t_map (replacet env) (replacep env) d
 and substp env d = f_map (replacet env) (replacep env) d
 
 let fold _ env ctxt d = 
-  Format.printf "I see : %a@\n%a@\n" Pretty.print_decl d print_env env;
+(*  Format.printf "I see : %a@\n%a@\n" Pretty.print_decl d print_env env;*)
   match d.d_node with
     | Dlogic [l] -> begin
         match l with
