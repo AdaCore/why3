@@ -31,7 +31,7 @@ let printer =
             "namespace"; "import"; "export"; "end";
             "forall"; "exists"; "and"; "or"; "not";
             "true"; "false"; "if"; "then"; "else";
-            "let"; "in"; "match"; "with"; "as"]
+            "let"; "in"; "match"; "with"; "as"; "epsilon" ]
   in
   let sanitize = sanitizer char_to_alpha char_to_alnumus in
   create_printer bl ~sanitizer:sanitize
@@ -151,15 +151,15 @@ and print_tnode fmt t = match t.t_node with
         (print_paren_r print_term) tl print_ty t.t_ty
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt "@[<hov>let %a = %a in@ %a@]" print_vs v
+      fprintf fmt "let %a =@ %a in@ %a" print_vs v
         print_term t1 print_term t2;
       forget_var v
   | Tcase (t1,bl) ->
-      fprintf fmt "@[<hov>match %a with@\n@[<hov>%a@]@]@\nend" print_term t1
+      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend" print_term t1
         (print_list newline print_tbranch) bl
   | Teps fb ->
       let v,f = f_open_bound fb in
-      fprintf fmt "@[<hov>epsilon %a in@ %a]" print_vs v print_fmla f;
+      fprintf fmt "epsilon %a in@ %a" print_vsty v print_fmla f;
       forget_var v
 
 and print_tbranch fmt br =
@@ -174,7 +174,7 @@ and print_fmla fmt f = match f.f_label with
 
 and print_fnode fmt f = match f.f_node with
   | Fapp (ps,[t1;t2]) when ps = ps_equ ->
-      fprintf fmt "%a = %a" print_term t1 print_term t2
+      fprintf fmt "%a =@ %a" print_term t1 print_term t2
   | Fapp (ps,tl) ->
       fprintf fmt "%a%a" print_ls ps
         (print_paren_r print_term) tl
@@ -193,14 +193,14 @@ and print_fnode fmt f = match f.f_node with
       fprintf fmt "not %a" print_fmla f
   | Flet (t,f) ->
       let v,f = f_open_bound f in
-      fprintf fmt "@[<hov>let %a = %a in@ %a@]" print_vs v
+      fprintf fmt "let %a =@ %a in@ %a" print_vs v
         print_term t print_fmla f;
       forget_var v
   | Fcase (t,bl) ->
-      fprintf fmt "@[<hov>match %a with@\n@[<hov>%a@]@]@\nend" print_term t
+      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend" print_term t
         (print_list newline print_fbranch) bl
   | Fif (f1,f2,f3) ->
-      fprintf fmt "@[<hov>if %a@ then %a@ else %a@]"
+      fprintf fmt "if %a@ then %a@ else %a"
         print_fmla f1 print_fmla f2 print_fmla f3
 
 and print_fbranch fmt br =
@@ -220,7 +220,7 @@ and print_tr fmt = function
 (** Declarations *)
 
 let print_constr fmt cs =
-  fprintf fmt "| %a%a" print_ls cs (print_paren_l print_ty) cs.ls_args
+  fprintf fmt "@[<hov 4>| %a%a@]" print_ls cs (print_paren_l print_ty) cs.ls_args
 
 let print_ty_args fmt = function
   | [] -> ()
@@ -230,50 +230,47 @@ let print_ty_args fmt = function
 let print_type_decl fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
       | None ->
-          fprintf fmt "@[<hov>type%a %a@]"
+          fprintf fmt "@[<hov 2>type%a %a@]"
             print_ty_args ts.ts_args print_ts ts
       | Some ty ->
-          fprintf fmt "@[<hov>type%a %a =@ @[<hov>%a@]@]"
+          fprintf fmt "@[<hov 2>type%a %a =@ %a@]"
             print_ty_args ts.ts_args print_ts ts print_ty ty
-      end;
-      forget_tvs ()
+      end
   | Talgebraic csl ->
-      fprintf fmt "@[<hov>type%a %a =@\n@[<hov>%a@]@]"
+      fprintf fmt "@[<hov 2>type%a %a =@\n@[<hov>%a@]@]"
         print_ty_args ts.ts_args print_ts ts
-        (print_list newline print_constr) csl;
-      forget_tvs ()
+        (print_list newline print_constr) csl
+
+let print_type_decl fmt d = print_type_decl fmt d; forget_tvs ()
 
 let print_indbr fmt (id,f) =
   fprintf fmt "@[<hov 4>| %a : %a@]" print_uc id print_fmla f
 
 let print_logic_decl fmt = function
-  | Lfunction  (fs,None) ->
+  | Lfunction (fs,None) ->
       fprintf fmt "@[<hov 2>logic %a%a :@ %a@]"
         print_ls fs (print_paren_l print_ty) fs.ls_args
-          print_ty (of_option fs.ls_value);
-      forget_tvs ()
+          print_ty (of_option fs.ls_value)
   | Lpredicate (ps,None) ->
       fprintf fmt "@[<hov 2>logic %a%a@]"
-        print_ls ps (print_paren_l print_ty) ps.ls_args;
-      forget_tvs ()
+        print_ls ps (print_paren_l print_ty) ps.ls_args
   | Lfunction (fs,Some fd) ->
       let _,vl,t = open_fs_defn fd in
       fprintf fmt "@[<hov 2>logic %a%a :@ %a =@ %a@]"
         print_ls fs (print_paren_l print_vsty) vl
         print_ty t.t_ty print_term t;
-      List.iter forget_var vl;
-      forget_tvs ()
+      List.iter forget_var vl
   | Lpredicate (ps,Some fd) ->
       let _,vl,f = open_ps_defn fd in
       fprintf fmt "@[<hov 2>logic %a%a =@ %a@]"
         print_ls ps (print_paren_l print_vsty) vl print_fmla f;
-      List.iter forget_var vl;
-      forget_tvs ()
+      List.iter forget_var vl
   | Linductive (ps, bl) ->
-      fprintf fmt "@[<hov>inductive %a%a =@\n@[<hov>%a@]@]"
+      fprintf fmt "inductive %a%a =@;<1 2>@[<hov>%a@]"
          print_ls ps (print_paren_l print_ty) ps.ls_args
-         (print_list newline print_indbr) bl;
-      forget_tvs ()
+         (print_list newline print_indbr) bl
+
+let print_logic_decl fmt d = print_logic_decl fmt d; forget_tvs ()
 
 let print_pkind fmt = function
   | Paxiom -> fprintf fmt "axiom"
