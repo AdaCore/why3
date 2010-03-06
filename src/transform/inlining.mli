@@ -1,6 +1,20 @@
+
+
 (* Inline the definition not recursive *)
 
-val t : Theory.context Transform.t
+val t :
+  isnotinlinedt:(Term.term -> bool) ->
+  isnotinlinedf:(Term.fmla -> bool) -> Theory.context Transform.t
+
+
+(* Inline them all *)
+
+val all : Theory.context Transform.t
+
+(* Inline only the trivial definition :
+   logic c : t = a
+   logic f(x : t,...., ) : t = g(y : t2,...) *)
+val trivial : Theory.context Transform.t
 
 
 (* Function to use in other transformations if inlining is needed *)

@@ -98,7 +98,7 @@ let transform l =
     else l in
     let l = if !inlining
     then
-      List.map (fun (t,dl) -> t,Transform.apply Inlining.t dl) l
+      List.map (fun (t,dl) -> t,Transform.apply Inlining.all dl) l
     else l in
     if !print_stdout then 
       List.iter (fun (t,dl) ->

@@ -47,7 +47,7 @@ and replacep env f =
 and substt env d = t_map (replacet env) (replacep env) d
 and substp env d = f_map (replacet env) (replacep env) d
 
-let fold _ env ctxt d = 
+let fold isnotinlinedt isnotinlinedf _ env ctxt d = 
 (*  Format.printf "I see : %a@\n%a@\n" Pretty.print_decl d print_env env;*)
   match d.d_node with
     | Dlogic [l] -> begin
@@ -56,21 +56,24 @@ let fold _ env ctxt d =
           | Lfunction (fs,Some fmla) -> 
               let _,vs,t = open_fs_defn fmla in
               let t = replacet env t in
-              if t_s_any ffalse ((==) fs) t 
+              if t_s_any ffalse ((==) fs) t || isnotinlinedt t
               then  env,
-              add_decl ctxt (create_logic [Lfunction(fs,Some (make_fs_defn fs vs t))])
+              add_decl ctxt 
+                (create_logic [Lfunction(fs,
+                                         Some (make_fs_defn fs vs t))])
               else {env with fs = Mls.add fs (vs,t) env.fs},ctxt
           | Lpredicate (ps,None) -> env,add_decl ctxt d
           | Lpredicate (ps,Some fmla) -> 
               let _,vs,f = open_ps_defn fmla in
               let f = replacep env f in
-              if f_s_any ffalse ((==) ps) f 
+              if f_s_any ffalse ((==) ps) f || isnotinlinedf f
               then  env,
               add_decl ctxt 
                 (create_logic [Lpredicate(ps,Some (make_ps_defn ps vs f))])
               else {env with ps = Mls.add ps (vs,f) env.ps},ctxt
           | Linductive (ps,fmlal) -> 
-              let fmlal = List.map (fun (id,fmla) -> id,replacep env fmla) fmlal in
+              let fmlal = List.map 
+                (fun (id,fmla) -> id,replacep env fmla) fmlal in
               env,add_decl ctxt (create_logic [Linductive (ps,fmlal)])
       end
     | Dlogic dl -> env,
@@ -93,7 +96,20 @@ let fold _ env ctxt d =
                      Linductive (ps,fmlal)
               ) dl))
     | Dtype dl -> env,add_decl ctxt d
-    | Dprop (k,i,fmla) -> env,add_decl ctxt (create_prop k (id_dup i) (replacep env fmla))
+    | Dprop (k,i,fmla) -> env,add_decl ctxt (create_prop k (id_dup i) 
+                                               (replacep env fmla))
     | Duse _ | Dclone _ -> env,add_decl ctxt d
         
-let t = Transform.fold_map_up fold empty_env
+let t ~isnotinlinedt ~isnotinlinedf = 
+  Transform.fold_map_up (fold isnotinlinedt isnotinlinedf) empty_env
+
+let all = t ~isnotinlinedt:(fun _ -> false) ~isnotinlinedf:(fun _ -> false)
+
+let trivial = t 
+  ~isnotinlinedt:(fun m -> match m.t_node with
+                    | Tconst _ | Tvar _ -> false
+                    | Tapp (ls,tl) when List.for_all 
+                        (fun m -> match m.t_node with Tvar _ -> true | _ -> false) tl -> true
+                    | _ -> true )
+  ~isnotinlinedf:(fun m -> match m.f_node with Ftrue | Ffalse | Fapp _ -> false
+                    | _ -> true)
