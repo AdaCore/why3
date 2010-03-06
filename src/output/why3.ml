@@ -50,8 +50,15 @@ let print_lc fmt id =
   let n = id_unique printer ~sanitizer:sanitize id in
   fprintf fmt "%s" n
 
+let tv_set = ref Sid.empty
+
+let forget_tvs () =
+  Sid.iter (forget_id printer) !tv_set;
+  tv_set := Sid.empty
+
 (* type variables always start with a quote *)
 let print_tv fmt v =
+  tv_set := Sid.add v !tv_set;
   let sanitize n = String.concat "" ["'"; n] in
   let n = id_unique printer ~sanitizer:sanitize v in
   fprintf fmt "%s" n
@@ -64,16 +71,17 @@ let print_ls fmt ls =
                   else print_lc fmt ls.ls_name
 
 let forget_var v = forget_id printer v.vs_name
-let forget_tv v  = forget_id printer v
 
 (** Types *)
+
+let rec ns_comma fmt () = fprintf fmt ",@,"
 
 let rec print_ty fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
   | Tyapp (ts, []) -> print_ts fmt ts
   | Tyapp (ts, [t]) -> fprintf fmt "%a %a" print_ty t print_ts ts
   | Tyapp (ts, l) -> fprintf fmt "(%a) %a"
-      (print_list comma print_ty) l print_ts ts
+      (print_list ns_comma print_ty) l print_ts ts
 
 let print_const fmt = function
   | ConstInt s -> fprintf fmt "%s" s
@@ -156,7 +164,7 @@ and print_tnode fmt t = match t.t_node with
 
 and print_tbranch fmt br =
   let pat,svs,t = t_open_branch br in
-  fprintf fmt "@[<hov>| %a ->@ %a@]" print_pat pat print_term t;
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat pat print_term t;
   Svs.iter forget_var svs
 
 and print_fmla fmt f = match f.f_label with
@@ -197,7 +205,7 @@ and print_fnode fmt f = match f.f_node with
 
 and print_fbranch fmt br =
   let pat,svs,f = f_open_branch br in
-  fprintf fmt "@[<hov>| %a ->@ %a@]" print_pat pat print_fmla f;
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat pat print_fmla f;
   Svs.iter forget_var svs
 
 and print_tl fmt tl =
@@ -217,7 +225,7 @@ let print_constr fmt cs =
 let print_ty_args fmt = function
   | [] -> ()
   | [tv] -> fprintf fmt " %a" print_tv tv
-  | l -> print_paren_l print_tv fmt l
+  | l -> fprintf fmt " (%a)" (print_list ns_comma print_tv) l
 
 let print_type_decl fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
@@ -228,38 +236,44 @@ let print_type_decl fmt (ts,def) = match def with
           fprintf fmt "@[<hov>type%a %a =@ @[<hov>%a@]@]"
             print_ty_args ts.ts_args print_ts ts print_ty ty
       end;
-      List.iter forget_tv ts.ts_args
+      forget_tvs ()
   | Talgebraic csl ->
       fprintf fmt "@[<hov>type%a %a =@\n@[<hov>%a@]@]"
         print_ty_args ts.ts_args print_ts ts
         (print_list newline print_constr) csl;
-      List.iter forget_tv ts.ts_args
+      forget_tvs ()
 
 let print_indbr fmt (id,f) =
-  fprintf fmt "| %a : %a" print_uc id print_fmla f
+  fprintf fmt "@[<hov 4>| %a : %a@]" print_uc id print_fmla f
 
 let print_logic_decl fmt = function
   | Lfunction  (fs,None) ->
       fprintf fmt "@[<hov 2>logic %a%a :@ %a@]"
         print_ls fs (print_paren_l print_ty) fs.ls_args
-          print_ty (of_option fs.ls_value)
+          print_ty (of_option fs.ls_value);
+      forget_tvs ()
   | Lpredicate (ps,None) ->
       fprintf fmt "@[<hov 2>logic %a%a@]"
-        print_ls ps (print_paren_l print_ty) ps.ls_args
+        print_ls ps (print_paren_l print_ty) ps.ls_args;
+      forget_tvs ()
   | Lfunction (fs,Some fd) ->
       let _,vl,t = open_fs_defn fd in
       fprintf fmt "@[<hov 2>logic %a%a :@ %a =@ %a@]"
         print_ls fs (print_paren_l print_vsty) vl
         print_ty t.t_ty print_term t;
-      List.iter forget_var vl
+      List.iter forget_var vl;
+      forget_tvs ()
   | Lpredicate (ps,Some fd) ->
       let _,vl,f = open_ps_defn fd in
       fprintf fmt "@[<hov 2>logic %a%a =@ %a@]"
         print_ls ps (print_paren_l print_vsty) vl print_fmla f;
-      List.iter forget_var vl
+      List.iter forget_var vl;
+      forget_tvs ()
   | Linductive (ps, bl) ->
-      fprintf fmt "@[<hov 2>inductive %a@\n@[<hov>%a@]@]"
-         print_ls ps (print_list newline print_indbr) bl
+      fprintf fmt "@[<hov>inductive %a%a =@\n@[<hov>%a@]@]"
+         print_ls ps (print_paren_l print_ty) ps.ls_args
+         (print_list newline print_indbr) bl;
+      forget_tvs ()
 
 let print_pkind fmt = function
   | Paxiom -> fprintf fmt "axiom"
@@ -274,7 +288,8 @@ let print_decl fmt d = match d.d_node with
   | Dlogic ll -> print_list newline2 print_logic_decl fmt ll
   | Dprop (k,id,fmla) ->
       fprintf fmt "@[<hov 2>%a %a :@ %a@]"
-        print_pkind k print_uc id print_fmla fmla
+        print_pkind k print_uc id print_fmla fmla;
+      forget_tvs ()
   | Duse th ->
       fprintf fmt "use export %a" print_id th.th_name
   | Dclone inst ->
