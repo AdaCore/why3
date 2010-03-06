@@ -81,7 +81,7 @@ let extract_goals th =
 let transform l =
   let l = Typing.list_theory l in
   if !print_stdout && not transform then 
-    List.iter (Pretty.print_theory Format.std_formatter) l
+    List.iter (Why3.print_theory Format.std_formatter) l
   else if !alt_ergo then match l with
     | th :: _ -> begin match extract_goals th with
 	| g :: _ -> Alt_ergo.print_goal std_formatter g

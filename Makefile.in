@@ -114,7 +114,7 @@ TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
 	flatten.cmo
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
-OUTPUT_CMO := alt_ergo.cmo
+OUTPUT_CMO := alt_ergo.cmo why3.cmo
 OUTPUT_CMO := $(addprefix src/output/,$(OUTPUT_CMO))
 
 CMO = $(UTIL_CMO) $(CORE_CMO) src/pretty.cmo $(PARSER_CMO)	\
