@@ -1,6 +1,6 @@
 (* Inline the definition not recursive *)
 
-val t : Transform.t
+val t : Theory.context Transform.t
 
 
 (* Function to use in other transformations if inlining is needed *)

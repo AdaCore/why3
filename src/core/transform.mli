@@ -23,43 +23,55 @@ open Theory
 (* Tranformation on context with some memoisations *)
 
 (* The type of transformation from list of 'a to list of 'b *)
-type t
+type 'a  t
 
 (* compose two transformations, the underlying datastructures for
    the memoisation are shared *)
-val compose : t -> t -> t
+val compose : context t -> 'a t -> 'a t
 
 (* apply a transformation and memoise *)
-val apply : t -> context -> context
+val apply : 'a t -> context -> 'a
 
 (* clear the datastructures used to store the memoisation *)
-val clear : t -> unit
+val clear : 'a t -> unit
 
 (* the general tranformation only one memoisation is performed at the
    beginning *)
 val all : 
   ?clear:(unit -> unit) ->
-  (context -> context) -> t
+  (context -> 'a) -> 'a t
   
 (* map the element of the list from the first to the last. only one
    memoisation is performed at the beginning. But if a tag function is
    given a memoisation is performed at each step *)
 val fold_map_bottom : 
-  ?tag:('a -> int) -> 
+  ?tag:('a -> int) ->
   ?clear:(unit -> unit) ->
-  (context -> 'a -> decl -> 'a * decl list) -> 'a -> t
+  (context -> 'a -> decl -> 'a * decl list) -> 'a -> context t
   
 (* map the element of the list from the last to the first.
    A memoisation is performed at each step *)
 val fold_map_up : 
   ?clear:(unit -> unit) ->
-  (context -> 'a -> context -> decl -> ('a * context)) -> 'a -> t
+  (context -> 'a -> context -> decl -> ('a * context)) -> 'a -> context t
  
 (* map the element of the list without an environnment.
    A memoisation is performed at each step, and for each elements *)
 val elt : 
   ?clear:(unit -> unit) ->
-  (decl -> decl list) -> t
+  (decl -> decl list) -> context t
+
+
+val fold_bottom :
+  ?tag:('a -> int) ->
+  ?clear:(unit -> unit) ->
+  (context -> 'a  -> decl -> 'a) -> 'a -> 'a t
+
+
+val fold_up :
+  ?clear:(unit -> unit) ->
+  (context -> 'a -> decl -> 'a) -> 'a -> 'a t
+
 
 
 (*type odecl = 

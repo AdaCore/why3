@@ -22,7 +22,7 @@ open Theory
 open Context
 
 (* the memoisation is inside the function *)
-type t = { all : context -> context;
+type 'a t = { all : context -> 'a;
            clear : unit -> unit;
          }
 
@@ -30,6 +30,9 @@ type t = { all : context -> context;
 let compose f g = {all = (fun x -> g.all (f.all x));
                    clear = (fun () -> f.clear (); g.clear ());
                   }
+
+let translation f c = {all = (fun x -> c (f.all x));
+                       clear = f.clear}
 
 let apply f x = f.all x
 
@@ -52,25 +55,30 @@ let t all clear clearf =
      | Some clear -> (fun () -> clear ();clear ())
   } 
 
-let fold_map_up ?clear f_fold v_empty =
+let fold_up ?clear f_fold v_empty =
   let memo_t = Hashtbl.create 64 in
-  let rewind ecdone todo = 
-    let _,ctxt_done = List.fold_left 
-      (fun (env_done,ctxt_done) (desc,ctxt) -> 
-         let ecdone = f_fold ctxt env_done ctxt_done desc in
-         Hashtbl.add memo_t ctxt.ctxt_tag ecdone;
-         ecdone) ecdone todo in
-    ctxt_done in
+  let rewind env todo =
+    List.fold_left 
+      (fun env (desc,ctxt) -> 
+         let env = f_fold ctxt env desc in
+         Hashtbl.add memo_t ctxt.ctxt_tag env;
+         env) env todo in
   let rec f todo ctxt = 
     match ctxt.ctxt_decls with
-      | None -> rewind (v_empty,empty_context) todo
+      | None -> rewind v_empty todo
       | Some (decls,ctxt2) -> 
           try 
-            let ecdone = Hashtbl.find memo_t ctxt2.ctxt_tag in
-            rewind ecdone ((decls,ctxt)::todo)
+            let env = Hashtbl.find memo_t ctxt2.ctxt_tag in
+            rewind env ((decls,ctxt)::todo)
           with Not_found -> f ((decls,ctxt)::todo) ctxt2 
   in
   t (f []) clear (fun () -> Hashtbl.clear memo_t)
+
+
+let fold_map_up ?clear f_fold v_empty =
+  let v_empty = v_empty,empty_context in
+  let f_fold ctxt (env,ctxt2) decl = f_fold ctxt env ctxt2 decl in
+  translation (fold_up ?clear f_fold v_empty) snd
 
 let elt ?clear f_elt = 
   let memo_elt = Hashtbl.create 64 in
@@ -78,6 +86,29 @@ let elt ?clear f_elt =
     List.fold_left add_decl ctx (memo f_elt d_tag memo_elt x) in
   let f = fold_map_up ?clear f_elt () in
   {f with clear = fun () -> Hashtbl.clear memo_elt; f.clear ()}
+
+let fold_bottom ?tag ?clear f_fold v_empty =
+  let tag_clear,tag_memo = match tag with
+    | None -> (fun () -> ()), (fun f v ctxt -> f v ctxt)
+    | Some tag_env -> 
+        let memo_t = Hashtbl.create 64 in
+        (fun () -> Hashtbl.clear memo_t),(fun f v ctxt ->
+           try 
+             Hashtbl.find memo_t (ctxt.ctxt_tag,(tag_env v : int))
+           with Not_found ->
+             let r = f v ctxt in
+             Hashtbl.add memo_t (ctxt.ctxt_tag,tag_env v) r;
+             r
+        ) in
+  let rec f v ctxt = 
+    match ctxt.ctxt_decls with
+      | None -> v
+      | Some(d,ctxt2) ->
+          let v = f_fold ctxt v d in
+          tag_memo f v ctxt2 in
+  let memo_t = Hashtbl.create 16 in
+  t (memo (f v_empty) ctxt_tag memo_t) clear (fun () -> tag_clear ();Hashtbl.clear memo_t)
+
 
 let fold_map_bottom ?tag ?clear f_fold v_empty =
   let rewind ldone ctxt =
