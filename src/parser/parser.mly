@@ -151,8 +151,8 @@
 %left prec_ident
 %left LEFTSQ
 
-%nonassoc prec_logics prec_types
-%nonassoc LOGIC TYPE
+%nonassoc prec_decls
+%nonassoc LOGIC TYPE INDUCTIVE
 
 /* Entry points */
 
@@ -273,45 +273,44 @@ logic_def_option:
 
 logic_decl:
 | LOGIC lident params logic_type_option logic_def_option
-    { { ld_loc = loc ();
-	ld_ident = $2; ld_params = $3; ld_type = $4; ld_def = $5; } }
+  { { ld_loc = loc (); ld_ident = $2; ld_params = $3; 
+      ld_type = $4; ld_def = $5; } }
 ;
 
 list1_logic_decl:
-| logic_decl                  %prec prec_logics { [$1] }
-| logic_decl list1_logic_decl                   { $1 :: $2 }
+| logic_decl                  %prec prec_decls { [$1] }
+| logic_decl list1_logic_decl                  { $1 :: $2 }
 ;
 
 type_decl:
-| TYPE typedecl typedefn
-  { let _, pl, id = $2 in
-    { td_loc = loc (); td_ident = id; td_params = pl; td_def = $3 } }
+| TYPE type_args lident typedefn
+  { { td_loc = loc (); td_ident = $3; td_params = $2; td_def = $4 } }
 ;
 
 list1_type_decl:
-| type_decl                  %prec prec_types { [$1] }
+| type_decl                  %prec prec_decls { [$1] }
 | type_decl list1_type_decl                   { $1 :: $2 }
 ;
 
-decl:
-| list1_type_decl
-   { TypeDecl (loc (), $1) }
-| list1_logic_decl
-   { Logic (loc (), $1) }
-| AXIOM uident COLON lexpr
-   { Prop (loc (), Kaxiom, $2, $4) }
-| GOAL uident COLON lexpr
-   { Prop (loc (), Kgoal, $2, $4) }
-| LEMMA uident COLON lexpr
-   { Prop (loc (), Klemma, $2, $4) }
+inductive_decl:
 | INDUCTIVE lident primitive_types inddefn
-   { Inductive_def (loc (), $2, $3, $4) }
-| CLONE use clone_subst
-   { UseClone (loc (), $2, Some $3) }
-| USE use
-   { UseClone (loc (), $2, None) }
-| NAMESPACE uident list0_decl END
-   { Namespace (loc (), $2, $3) }
+  { { in_loc = loc (); in_ident = $2; in_params = $3; in_def = $4 } }
+
+list1_inductive_decl:
+| inductive_decl                      %prec prec_decls { [$1] }
+| inductive_decl list1_inductive_decl                  { $1 :: $2 }
+;
+
+decl:
+| list1_type_decl                 { TypeDecl $1 }
+| list1_logic_decl                { LogicDecl $1 }
+| list1_inductive_decl            { IndDecl $1 }
+| AXIOM uident COLON lexpr        { PropDecl (loc (), Kaxiom, $2, $4) }
+| LEMMA uident COLON lexpr        { PropDecl (loc (), Klemma, $2, $4) }
+| GOAL uident COLON lexpr         { PropDecl (loc (), Kgoal, $2, $4) }
+| USE use                         { UseClone (loc (), $2, None) }
+| CLONE use clone_subst           { UseClone (loc (), $2, Some $3) }
+| NAMESPACE uident list0_decl END { Namespace (loc (), $2, $3) }
 ;
 
 list1_theory:
@@ -326,13 +325,10 @@ theory:
    { { pt_loc = loc (); pt_name = $2; pt_decl = $3 } }
 ;
 
-typedecl:
-| lident
-    { (loc_i 1, [], $1) }
-| type_var lident
-    { (loc_i 2, [$1], $2) }
-| LEFTPAR type_var COMMA list1_type_var_sep_comma RIGHTPAR lident
-    { (loc_i 6, $2 :: $4, $6) }
+type_args:
+| /* epsilon */                                             { [] }
+| type_var                                                  { [$1] }
+| LEFTPAR type_var COMMA list1_type_var_sep_comma RIGHTPAR  { $2 :: $4 }
 ;
 
 typedefn:

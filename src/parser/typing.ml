@@ -726,7 +726,7 @@ and fmla env = function
 
 open Ptree
 
-let add_types loc dl th =
+let add_types dl th =
   let ns = get_namespace th in
   let def = 
     List.fold_left 
@@ -826,7 +826,7 @@ let add_types loc dl th =
 let env_of_vsymbol_list vl =
   List.fold_left (fun env v -> M.add v.vs_name.id_short v env) M.empty vl
 
-let add_logics loc dl th =
+let add_logics dl th =
   let ns = get_namespace th in
   let fsymbols = Hashtbl.create 17 in
   let psymbols = Hashtbl.create 17 in
@@ -834,8 +834,9 @@ let add_logics loc dl th =
   (* 1. create all symbols and make an environment with these symbols *)
   let create_symbol th d = 
     let id = d.ld_ident.id in
-    if Hashtbl.mem denvs id || Mnm.mem id ns.ns_ls then error ~loc (Clash id);
-    let v = id_user id loc in
+    if Hashtbl.mem denvs id || Mnm.mem id ns.ns_ls 
+      then error ~loc:d.ld_loc (Clash id);
+    let v = id_user id d.ld_ident.id_loc in
     let denv = create_denv th in
     Hashtbl.add denvs id denv;
     let type_ty (_,t) = ty_of_dty (dty denv t) in
@@ -990,19 +991,37 @@ let rec check_clausal_form loc ps f = match f.f_node with
   | _ -> 
       check_unquantified_clausal_form loc ps f
 
-let add_inductive loc id tyl cl th =
-  let denv = create_denv th in
-  let pl = List.map (fun ty -> ty_of_dty (dty denv ty)) tyl in
-  let ps = create_psymbol (id_user id.id loc) pl in
-  let th' = add_decl th (create_logic_decl [Lpredicate (ps, None)]) in
-  let clause (id, f) = 
-    let loc = f.pp_loc in
-    let f' = fmla th' f in
-    check_clausal_form loc ps f';
-    create_prop (id_user id.id id.id_loc) f'
+let add_inductives dl th =
+  let ns = get_namespace th in
+  let psymbols = Hashtbl.create 17 in
+  (* 1. create all symbols and make an environment with these symbols *)
+  let create_symbol th d = 
+    let id = d.in_ident.id in
+    if Hashtbl.mem psymbols id || Mnm.mem id ns.ns_ls 
+      then error ~loc:d.in_loc (Clash id);
+    let v = id_user id d.in_ident.id_loc in
+    let denv = create_denv th in
+    let type_ty t = ty_of_dty (dty denv t) in
+    let pl = List.map type_ty d.in_params in
+    let ps = create_psymbol v pl in
+    Hashtbl.add psymbols id ps;
+    add_decl th (create_logic_decl [Lpredicate (ps, None)])
   in
-  let cl = List.map clause cl in
-  add_decl th (create_ind_decl [(ps,cl)])
+  let th' = List.fold_left create_symbol th dl in
+  (* 2. then type-check all definitions *)
+  let type_decl d = 
+    let id = d.in_ident.id in
+    let ps = Hashtbl.find psymbols id in
+    let clause (id, f) = 
+      let loc = f.pp_loc in
+      let f' = fmla th' f in
+      check_clausal_form loc ps f';
+      create_prop (id_user id.id id.id_loc) f'
+    in
+    ps, List.map clause d.in_def
+  in
+  let dl = List.map type_decl dl in
+  add_decl th (create_ind_decl dl)
 
 let find_in_loadpath env f =
   let rec find c lp = match lp, c with
@@ -1092,14 +1111,14 @@ and type_theory env id pt =
 and add_decls env th = List.fold_left (add_decl env) th
 
 and add_decl env th = function
-  | TypeDecl (loc, dl) ->
-      add_types loc dl th
-  | Logic (loc, dl) ->
-      add_logics loc dl th
-  | Prop (loc, k, s, f) ->
+  | TypeDecl dl ->
+      add_types dl th
+  | LogicDecl dl ->
+      add_logics dl th
+  | IndDecl dl ->
+      add_inductives dl th
+  | PropDecl (loc, k, s, f) ->
       add_prop (prop_kind k) loc s f th
-  | Inductive_def (loc, id, tyl, cl) ->
-      add_inductive loc id tyl cl th
   | UseClone (loc, use, subst) ->
       let t = find_theory env use.use_theory in
       let use_or_clone th = match subst with

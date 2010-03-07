@@ -119,14 +119,21 @@ type logic_decl = {
   ld_def    : lexpr option;
 }
 
+type ind_decl = {
+  in_loc    : loc;
+  in_ident  : ident;
+  in_params : pty list;
+  in_def    : (ident * lexpr) list;
+}
+
 type prop_kind =
   | Kaxiom | Klemma | Kgoal
 
 type decl = 
-  | TypeDecl of loc * type_decl list
-  | Logic of loc * logic_decl list
-  | Prop of loc * prop_kind * ident * lexpr
-  | Inductive_def of loc * ident * pty list * (ident * lexpr) list
+  | TypeDecl of type_decl list
+  | LogicDecl of logic_decl list
+  | IndDecl of ind_decl list
+  | PropDecl of loc * prop_kind * ident * lexpr
   | UseClone of loc * use * clone_subst list option
   | Namespace of loc * ident * decl list
 
