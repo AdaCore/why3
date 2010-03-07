@@ -91,10 +91,11 @@ type use = {
   use_imp_exp : imp_exp;
 }
 
-type clone_subst = {
-  ts_subst : (qualid * qualid) list;
-  ls_subst : (qualid * qualid) list;
-}
+type clone_subst =
+  | CStsym  of qualid * qualid
+  | CSlsym  of qualid * qualid
+  | CSlemma of qualid
+  | CSgoal  of qualid
 
 type param = ident option * pty
 
@@ -126,7 +127,7 @@ type decl =
   | Logic of loc * logic_decl list
   | Prop of loc * prop_kind * ident * lexpr
   | Inductive_def of loc * ident * pty list * (ident * lexpr) list
-  | UseClone of loc * use * clone_subst option
+  | UseClone of loc * use * clone_subst list option
   | Namespace of loc * ident * decl list
 
 type theory = {

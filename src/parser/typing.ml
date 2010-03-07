@@ -300,12 +300,15 @@ let find_lsymbol_ns p ns =
 let find_lsymbol p th = 
   find_lsymbol_ns p (get_namespace th)
 
-let find_local_prop {id=x; id_loc=loc} ns = 
+let find_prop {id=x; id_loc=loc} ns = 
   try Mnm.find x ns.ns_pr
   with Not_found -> errorm ~loc "unbound formula %s" x
 
+let find_prop_ns p ns =
+  find find_prop p ns
+
 let find_prop p th =
-  find find_local_prop p (get_namespace th)
+  find_prop_ns p (get_namespace th)
 
 let specialize_lsymbol ~loc s =
   let tl = s.ls_args in
@@ -1103,16 +1106,23 @@ and add_decl env th = function
 	| None -> 
 	    use_export th t
 	| Some s -> 
-	    let add_ts m (p, q) = 
-	      Mts.add (find_tysymbol_ns p t.th_export) (find_tysymbol q th) m
+            let add_inst s = function
+              | CStsym (p,q) ->
+                  let ts1 = find_tysymbol_ns p t.th_export in
+                  let ts2 = find_tysymbol q th in
+                  { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
+              | CSlsym (p,q) ->
+                  let ls1 = find_lsymbol_ns p t.th_export in
+                  let ls2 = find_lsymbol q th in
+                  { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
+              | CSlemma p ->
+                  let pr = find_prop_ns p t.th_export in
+                  { s with inst_lemma = Spr.add pr s.inst_lemma }
+              | CSgoal p ->
+                  let pr = find_prop_ns p t.th_export in
+                  { s with inst_goal = Spr.add pr s.inst_goal }
 	    in
-	    let add_ls m (p, q) = 
-	      Mls.add (find_lsymbol_ns p t.th_export) (find_lsymbol q th) m
-	    in
-	    let s = 
-	      { inst_ts = List.fold_left add_ts Mts.empty s.ts_subst;
-                inst_ls = List.fold_left add_ls Mls.empty s.ls_subst; }
-	    in
+            let s = List.fold_left add_inst empty_inst s in
 	    clone_export th t s
       in
       let n = match use.use_as with 

@@ -133,9 +133,13 @@ exception BadDecl of ident
 (** Context constructors and utilities *)
 
 type th_inst = {
-  inst_ts : tysymbol Mts.t;
-  inst_ls : lsymbol  Mls.t;
+  inst_ts    : tysymbol Mts.t;
+  inst_ls    : lsymbol  Mls.t;
+  inst_lemma : Spr.t;
+  inst_goal  : Spr.t;
 }
+
+val empty_inst : th_inst
 
 module Context : sig
 

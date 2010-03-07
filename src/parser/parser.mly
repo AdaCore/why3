@@ -529,23 +529,20 @@ imp_exp:
 ;
 
 clone_subst:
-| /* epsilon */ 
-    { { ts_subst = []; ls_subst = [] } } 
-| WITH list1_comma_subst
-    { let t,l = $2 in
-      { ts_subst = t; ls_subst = l } } 
+| /* epsilon */          { [] } 
+| WITH list1_comma_subst { $2 }
 ;
 
 list1_comma_subst:
-| subst                         
-    { $1 }
-| subst COMMA list1_comma_subst 
-    { let t,l = $1 in let tl,ll = $3 in t@tl, l@ll }
+| subst                         { [$1] }
+| subst COMMA list1_comma_subst { $1 :: $3 } 
 ;
 
 subst:
-| TYPE  qualid EQUAL qualid { [$2, $4], [] }
-| LOGIC qualid EQUAL qualid { [], [$2, $4] }
+| TYPE  qualid EQUAL qualid { CStsym ($2, $4) }
+| LOGIC qualid EQUAL qualid { CSlsym ($2, $4) }
+| LEMMA qualid              { CSlemma $2 }
+| GOAL  qualid              { CSgoal  $2 }
 ;
 
 /******* programs **************************************************

@@ -322,8 +322,17 @@ end
 module Hctxt = Hashcons.Make(Ctxt)
 
 type th_inst = {
-  inst_ts : tysymbol Mts.t;
-  inst_ls : lsymbol  Mls.t;
+  inst_ts    : tysymbol Mts.t;
+  inst_ls    : lsymbol  Mls.t;
+  inst_lemma : Spr.t;
+  inst_goal  : Spr.t;
+}
+
+let empty_inst = {
+  inst_ts    = Mts.empty;
+  inst_ls    = Mls.empty;
+  inst_lemma = Spr.empty;
+  inst_goal  = Spr.empty;
 }
 
 module Context = struct
@@ -446,7 +455,7 @@ module Context = struct
 
   let get_decls ctxt = ctxt_fold (fun acc d -> d::acc) [] ctxt
 
-  (* Use and clone *)
+  (* Use *)
 
   let add_use ctxt th =
     let d = create_use_decl th in
@@ -474,116 +483,141 @@ module Context = struct
     with DejaVu ->
       ctxt
 
+  (* Clone *)
+
   exception CannotInstantiate of ident
 
-  let clone_theory th inst =
-    let ts_table = Hts.create 17 in
-    let ls_table = Hls.create 17 in
-    let pr_table = Hpr.create 17 in
-    let id_table = Hid.create 17 in
+  type clones = {
+    ts_table : tysymbol Hts.t;
+    ls_table : lsymbol Hls.t;
+    pr_table : prop Hpr.t;
+    id_table : ident Hid.t;
+    id_local : Sid.t;
+  }
 
-    let add_ts ts ts' =
-      Hts.add ts_table ts ts';
-      Hid.add id_table ts.ts_name ts'.ts_name
-    in
-    let add_ls ls ls' =
-      Hls.add ls_table ls ls';
-      Hid.add id_table ls.ls_name ls'.ls_name
-    in
-    let add_pr pr pr' =
-      Hpr.add pr_table pr pr';
-      Hid.add id_table pr.pr_name pr'.pr_name
-    in
-    Mts.iter add_ts inst.inst_ts;
-    Mls.iter add_ls inst.inst_ls;
+  let empty_clones s = {
+    ts_table = Hts.create 17;
+    ls_table = Hls.create 17;
+    pr_table = Hpr.create 17;
+    id_table = Hid.create 17;
+    id_local = s;
+  }
 
-    let rec find_ts ts =
-      if not (Sid.mem ts.ts_name th.th_local) then ts
-      else try Hts.find ts_table ts
-      with Not_found ->
-        let td' = option_map trans_ty ts.ts_def in
-        let ts' = create_tysymbol (id_dup ts.ts_name) ts.ts_args td' in
-        add_ts ts ts';
-        ts'
+  let cl_add_ts cl ts ts' =
+    Hts.add cl.ts_table ts ts';
+    Hid.add cl.id_table ts.ts_name ts'.ts_name
 
-    and trans_ty ty = ty_s_map find_ts ty in
+  let cl_add_ls cl ls ls' =
+    Hls.add cl.ls_table ls ls';
+    Hid.add cl.id_table ls.ls_name ls'.ls_name
 
-    let find_ls ls =
-      if not (Sid.mem ls.ls_name th.th_local) then ls
-      else try Hls.find ls_table ls
-      with Not_found ->
-        let ta' = List.map trans_ty ls.ls_args in
-        let vt' = option_map trans_ty ls.ls_value in
-        let ls' = create_lsymbol (id_dup ls.ls_name) ta' vt' ls.ls_constr in
-        add_ls ls ls';
-        ls'
-    in
-    let trans_fmla f = f_s_map find_ts find_ls f in
+  let cl_add_pr cl pr pr' =
+    Hpr.add cl.pr_table pr pr';
+    Hid.add cl.id_table pr.pr_name pr'.pr_name
 
-    let add_type acc (ts, def) =
-      if Mts.mem ts inst.inst_ts then begin
-        if ts.ts_def <> None || def <> Tabstract then
-          raise (CannotInstantiate ts.ts_name);
-        acc
-      end else
-        let ts' = find_ts ts in
-        let def' = match def with
-          | Tabstract -> Tabstract
-          | Talgebraic ls -> Talgebraic (List.map find_ls ls)
-        in
-        (ts', def') :: acc
-    in
-    let add_logic acc = function
-      | Lfunction (ls, Some _) | Lpredicate (ls, Some _)
-        when Mls.mem ls inst.inst_ls ->
-          raise (CannotInstantiate ls.ls_name)
-      | Lfunction (ls, Some (_,_,_,f)) ->
-          let f' = trans_fmla f in
-          let ls', def' = extract_fs_defn f' in
-          Lfunction (ls', Some def') :: acc
-      | Lpredicate (_, Some (_,_,_,f)) ->
-          let f' = trans_fmla f in
-          let ls', def' = extract_ps_defn f' in
-          Lpredicate (ls', Some def') :: acc
-      | Lfunction (ls, None) | Lpredicate (ls, None)
-        when Mls.mem ls inst.inst_ls ->
-          acc
-      | Lfunction (ls, None) ->
-          Lfunction (find_ls ls, None) :: acc
-      | Lpredicate (ls, None) ->
-          Lpredicate (find_ls ls, None) :: acc
-    in
-    let add_prop pr =
-      let pr' = create_prop (id_dup pr.pr_name) (trans_fmla pr.pr_fmla) in
-      add_pr pr pr';
+  let rec cl_find_ts cl ts =
+    if not (Sid.mem ts.ts_name cl.id_local) then ts
+    else try Hts.find cl.ts_table ts
+    with Not_found ->
+      let td' = option_map (ty_s_map (cl_find_ts cl)) ts.ts_def in
+      let ts' = create_tysymbol (id_dup ts.ts_name) ts.ts_args td' in
+      cl_add_ts cl ts ts';
+      ts'
+
+  let cl_trans_ty cl ty = ty_s_map (cl_find_ts cl) ty
+
+  let cl_find_ls cl ls =
+    if not (Sid.mem ls.ls_name cl.id_local) then ls
+    else try Hls.find cl.ls_table ls
+    with Not_found ->
+      let ta' = List.map (cl_trans_ty cl) ls.ls_args in
+      let vt' = option_map (cl_trans_ty cl) ls.ls_value in
+      let ls' = create_lsymbol (id_dup ls.ls_name) ta' vt' ls.ls_constr in
+      cl_add_ls cl ls ls';
+      ls'
+
+  let cl_trans_fmla cl f = f_s_map (cl_find_ts cl) (cl_find_ls cl) f
+
+  let cl_find_pr cl pr =
+    if not (Sid.mem pr.pr_name cl.id_local) then pr
+    else try Hpr.find cl.pr_table pr
+    with Not_found ->
+      let f' = cl_trans_fmla cl pr.pr_fmla in
+      let pr' = create_prop (id_dup pr.pr_name) f' in
+      cl_add_pr cl pr pr';
       pr'
-    in
-    let add_ind (ps,la) =
-      if Mls.mem ps inst.inst_ls then raise (CannotInstantiate ps.ls_name);
-      find_ls ps, List.map add_prop la
-    in
-    let add_decl acc d = match d.d_node with
-      | Dtype tyl ->
-          let l = List.rev (List.fold_left add_type [] tyl) in
-          if l = [] then acc else create_ty_decl l :: acc
-      | Dlogic ll ->
-          let l = List.rev (List.fold_left add_logic [] ll) in
-          if l = [] then acc else create_logic_decl l :: acc
-      | Dind indl ->
-          create_ind_decl (List.map add_ind indl) :: acc
-      | Dprop (Pgoal, _) ->
-          acc
-      | Dprop (_, pr) ->
-          create_prop_decl Paxiom (add_prop pr) :: acc
-      | Duse _ | Dclone _ ->
-          d :: acc
-    in
-    let decls = ctxt_fold add_decl [] th.th_ctxt in
-    ts_table, ls_table, pr_table, id_table, decls
 
-  let add_final ctxt id_table =
+  let cl_add_type cl inst_ts acc (ts, def) =
+    if Mts.mem ts inst_ts then begin
+      if ts.ts_def <> None || def <> Tabstract then
+        raise (CannotInstantiate ts.ts_name);
+      acc
+    end else
+      let ts' = cl_find_ts cl ts in
+      let def' = match def with
+        | Tabstract -> Tabstract
+        | Talgebraic ls -> Talgebraic (List.map (cl_find_ls cl) ls)
+      in
+      (ts', def') :: acc
+
+  let cl_add_logic cl inst_ls acc = function
+    | Lfunction (ls, Some _) | Lpredicate (ls, Some _)
+      when Mls.mem ls inst_ls ->
+        raise (CannotInstantiate ls.ls_name)
+    | Lfunction (ls, Some (_,_,_,f)) ->
+        let f' = cl_trans_fmla cl f in
+        let ls', def' = extract_fs_defn f' in
+        Lfunction (ls', Some def') :: acc
+    | Lpredicate (_, Some (_,_,_,f)) ->
+        let f' = cl_trans_fmla cl f in
+        let ls', def' = extract_ps_defn f' in
+        Lpredicate (ls', Some def') :: acc
+    | Lfunction (ls, None) | Lpredicate (ls, None)
+      when Mls.mem ls inst_ls ->
+        acc
+    | Lfunction (ls, None) ->
+        Lfunction (cl_find_ls cl ls, None) :: acc
+    | Lpredicate (ls, None) ->
+        Lpredicate (cl_find_ls cl ls, None) :: acc
+
+  let cl_add_ind cl inst_ls (ps,la) =
+    if Mls.mem ps inst_ls then raise (CannotInstantiate ps.ls_name);
+    cl_find_ls cl ps, List.map (cl_find_pr cl) la
+
+  let cl_add_decl cl inst acc d = match d.d_node with
+    | Dtype tyl ->
+        let add = cl_add_type cl inst.inst_ts in
+        let l = List.rev (List.fold_left add [] tyl) in
+        if l = [] then acc else create_ty_decl l :: acc
+    | Dlogic ll ->
+        let add = cl_add_logic cl inst.inst_ls in
+        let l = List.rev (List.fold_left add [] ll) in
+        if l = [] then acc else create_logic_decl l :: acc
+    | Dind indl ->
+        let add = cl_add_ind cl inst.inst_ls in
+        create_ind_decl (List.map add indl) :: acc
+    | Dprop (Pgoal, _) ->
+        acc
+    | Dprop (_, pr) ->
+        let k = if Spr.mem pr inst.inst_lemma then Plemma
+          else if Spr.mem pr inst.inst_goal then Pgoal
+          else Paxiom
+        in
+        create_prop_decl k (cl_find_pr cl pr) :: acc
+    | Duse _ | Dclone _ ->
+        d :: acc
+
+  let clone_theory th inst =
+    let cl = empty_clones th.th_local in
+    Mts.iter (cl_add_ts cl) inst.inst_ts;
+    Mls.iter (cl_add_ls cl) inst.inst_ls;
+    let add = cl_add_decl cl inst in
+    let decls = ctxt_fold add [] th.th_ctxt in
+    cl, decls
+
+  let add_final ctxt cl =
     let add id id' acc = (id,id') :: acc in
-    let d = create_clone_decl (Hid.fold add id_table []) in
+    let d = create_clone_decl (Hid.fold add cl.id_table []) in
     add_decl ctxt d
 
   let add_clone ctxt th inst =
@@ -591,18 +625,18 @@ module Context = struct
       | Duse th -> add_use ctxt th
       | _ -> add_decl ctxt d
     in
-    let ts_t, ls_t, pr_t, id_t, decls = clone_theory th inst in
+    let cl, decls = clone_theory th inst in
     let ctxt = List.fold_left add_decl ctxt decls in
-    ts_t, ls_t, pr_t, add_final ctxt id_t
+    cl, add_final ctxt cl
 
   let clone_export ctxt th inst =
     let add_decl ctxt d = match d.d_node with
       | Duse th  -> use_export true ctxt th
       | _ -> add_decl ctxt d
     in
-    let _, _, _, id_t, decls = clone_theory th inst in
+    let cl, decls = clone_theory th inst in
     let ctxt = List.fold_left add_decl ctxt decls in
-    add_final ctxt id_t
+    add_final ctxt cl
 
   let use_export ctxt th = use_export false ctxt th
 
@@ -717,10 +751,10 @@ module Theory = struct
           assert false
 
   let clone_export uc th inst =
-    let ts_t, ls_t, pr_t, ctxt = Context.add_clone uc.uc_ctxt th inst in
-    let f_ts n ts acc = add_ts true n (Hts.find ts_t ts) acc in
-    let f_ls n ls acc = add_ls true n (Hls.find ls_t ls) acc in
-    let f_pr n pr acc = add_pr true n (Hpr.find pr_t pr) acc in
+    let cl, ctxt = Context.add_clone uc.uc_ctxt th inst in
+    let f_ts n t ns = add_ts true n (Hts.find cl.Context.ts_table t) ns in
+    let f_ls n l ns = add_ls true n (Hls.find cl.Context.ls_table l) ns in
+    let f_pr n p ns = add_pr true n (Hpr.find cl.Context.pr_table p) ns in
 
     let rec merge_namespace acc ns =
       let acc = Mnm.fold f_ts ns.ns_ts acc in
