@@ -22,8 +22,8 @@ open Theory
 open Context
 
 (* the memoisation is inside the function *)
-type 'a t = { all : context -> 'a;
-           clear : unit -> unit;
+type ('a,'b) t = { all : 'a -> 'b;
+                   clear : unit -> unit;
          }
 
 
@@ -31,8 +31,19 @@ let compose f g = {all = (fun x -> g.all (f.all x));
                    clear = (fun () -> f.clear (); g.clear ());
                   }
 
-let conv f c = {all = (fun x -> c (f.all x));
-                       clear = f.clear}
+let conv_arg f c = {all = (fun x -> f.all (c x));
+                    clear = f.clear}
+
+let conv_res f c = {all = (fun x -> c (f.all x));
+                    clear = f.clear}
+
+let conv f c1 c2 = {all = (fun x -> let arg,env = c1 x in
+                           c2 ((f.all arg),env));
+                    clear = f.clear}
+
+let conv_map f m = {all = (fun x -> m f.all x);
+                    clear = f.clear}
+
 
 let apply f x = f.all x
 
@@ -44,6 +55,11 @@ let memo f tag h x =
     let r = f x in
     Hashtbl.add h (tag x) r;
     r
+
+let conv_memo f tag = 
+  let h = Hashtbl.create 16 in 
+  {all = memo f.all tag h;
+   clear = (fun () -> Hashtbl.clear h; f.clear ())}
 
 let d_tag d = d.d_tag
 let ctxt_tag c = c.ctxt_tag
@@ -109,7 +125,7 @@ let fold_bottom ?tag ?clear f_fold v_empty =
 let fold_map_up ?clear f_fold v_empty =
   let v_empty = v_empty,empty_context in
   let f_fold ctxt (env,ctxt2) decl = f_fold ctxt env ctxt2 decl in
-  conv (fold_up ?clear f_fold v_empty) snd
+  conv_res (fold_up ?clear f_fold v_empty) snd
 
 let elt ?clear f_elt = 
   let memo_elt = Hashtbl.create 64 in
@@ -156,7 +172,7 @@ let split_goals =
       | Dprop (Pgoal,_) -> (ctxt,(add_decl ctxt decl)::l)
       | _ -> (add_decl ctxt decl,l) in
   let g = fold_up f (empty_context,[]) in
-  conv g snd
+  conv_res g snd
 
 let extract_goals =
   let f _ (ctxt,l) decl = 
@@ -164,7 +180,10 @@ let extract_goals =
       | Dprop (Pgoal,f) -> (ctxt,(f.pr_name,f.pr_fmla,ctxt)::l)
       | _ -> (add_decl ctxt decl,l) in
   let g = fold_up f (empty_context,[]) in
-  conv g snd
+  conv_res g snd
 
 
 let unit_tag () = 0
+
+let identity = {all = (fun x -> x);
+                clear = (fun () -> ())}

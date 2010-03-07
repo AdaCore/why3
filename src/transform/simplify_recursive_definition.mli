@@ -20,7 +20,7 @@
 
 (* Simplify the recursive type and logic definition *)
 
-val t : Theory.context Transform.t
+val t : (Theory.context,Theory.context) Transform.t
 
 
 (* ungroup recursive definition *)

@@ -146,4 +146,4 @@ let print_context fmt ctxt =
 
 let print_goal fmt (id, f, ctxt) =
   print_context fmt ctxt;
-  fprintf fmt "@[<hov 2>goal %a : %a@]" print_ident id print_fmla f
+  fprintf fmt "@\n@[<hov 2>goal %a : %a@]" print_ident id print_fmla f

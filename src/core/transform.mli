@@ -25,31 +25,40 @@ open Theory
 (** General functions *)
 
 (* The type of transformation from list of 'a to list of 'b *)
-type 'a t
+type ('a,'b) t
 
 (* compose two transformations, the underlying datastructures for
    the memoisation are shared *)
-val compose : context t -> 'a t -> 'a t
+val compose : ('a,'b) t -> ('b,'c) t -> ('a,'c) t
 
 (* apply a transformation and memoise *)
-val apply : 'a t -> context -> 'a
+val apply : ('a,'b) t -> 'a -> 'b
 
-(* convert the result of a transformation witout memoisation *)
-val conv : 'a t -> ('a -> 'b) -> 'b t
+(* convert the argument of a transformation without memoisation *)
+val conv_arg : ('a,'b) t -> ('c -> 'a) -> ('c,'b) t
+
+(* convert the result of a transformation without memoisation *)
+val conv_res : ('a,'b) t -> ('b -> 'c) -> ('a,'c) t
+
+val conv : ('a,'b) t -> ('c -> 'a * 'e)  -> ('b * 'e -> 'd) -> ('c,'d) t
+
+val conv_map : ('a,'b) t -> (('a -> 'b) -> 'c -> 'd) -> ('c,'d) t
+
+val conv_memo : ('a,'b) t -> ('a -> int) -> ('a,'b) t
 
 (* clear the datastructures used to store the memoisation *)
-val clear : 'a t -> unit
+val clear : ('a,'b) t -> unit
 
 (** General constructors *)
 val fold_up :
   ?clear:(unit -> unit) ->
-  (context -> 'a -> decl -> 'a) -> 'a -> 'a t
+  (context -> 'a -> decl -> 'a) -> 'a -> (context,'a) t
 
 
 val fold_bottom :
   ?tag:('a -> int) ->
   ?clear:(unit -> unit) ->
-  (context -> 'a  -> decl -> 'a) -> 'a -> 'a t
+  (context -> 'a  -> decl -> 'a) -> 'a -> (context,'a) t
 
 
 val fold_bottom_up :
@@ -57,7 +66,7 @@ val fold_bottom_up :
   ?clear:(unit -> unit) ->
   top:('a -> 'c) ->
   down:('c -> 'b -> 'c) ->
-  (context -> 'a  -> decl -> 'a * 'b) -> 'a -> 'c t
+  (context -> 'a  -> decl -> 'a * 'b) -> 'a -> (context,'c) t
 
 
 
@@ -66,7 +75,7 @@ val fold_bottom_up :
    beginning *)
 val all :
   ?clear:(unit -> unit) ->
-  (context -> 'a) -> 'a t
+  (context -> 'a) -> (context,'a) t
 
 (* map the element of the list from the first to the last. only one
    memoisation is performed at the beginning. But if a tag function is
@@ -74,19 +83,20 @@ val all :
 val fold_map_bottom :
   ?tag:('a -> int) ->
   ?clear:(unit -> unit) ->
-  (context -> 'a -> decl -> 'a * decl list) -> 'a -> context t
+  (context -> 'a -> decl -> 'a * decl list) -> 'a -> (context,context) t
 
 (* map the element of the list from the last to the first.
    A memoisation is performed at each step *)
 val fold_map_up :
   ?clear:(unit -> unit) ->
-  (context -> 'a -> context -> decl -> ('a * context)) -> 'a -> context t
+  (context -> 'a -> context -> decl -> ('a * context)) -> 'a -> 
+  (context,context) t
 
 (* map the element of the list without an environnment.
    A memoisation is performed at each step, and for each elements *)
 val elt :
   ?clear:(unit -> unit) ->
-  (decl -> decl list) -> context t
+  (decl -> decl list) -> (context,context) t
 
 
 
@@ -114,6 +124,8 @@ val fold_context_of_decl:
 (* Utils *)
 val unit_tag : unit -> int
 
-val split_goals : context list t
+val split_goals : (context,context list) t
 
-val extract_goals : (Ident.ident * Term.fmla * context) list t
+val extract_goals : (context,(Ident.ident * Term.fmla * context) list) t
+
+val identity : ('a,'a) t

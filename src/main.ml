@@ -46,7 +46,15 @@ let () =
     "usage: why [options] files..."
 
 let in_emacs = Sys.getenv "TERM" = "dumb"
-let transform = !simplify_recursive || !inlining
+let transformation = 
+  Transform.conv_map
+    (Transform.compose
+       (if !simplify_recursive then Simplify_recursive_definition.t 
+        else Transform.identity)
+       (if !inlining then Inlining.all 
+        else Transform.identity)
+    )
+    (fun f l -> List.map (fun (t,c) -> t,f c) l)
 
 let rec report fmt = function
   | Lexer.Error e ->
@@ -79,13 +87,7 @@ let extract_goals ctxt =
 
 let transform l =
   let l = List.map (fun t -> t,t.th_ctxt) (Typing.list_theory l) in
-  let l = if !simplify_recursive 
-  then List.map (fun (t,dl) -> t,Transform.apply 
-                   Simplify_recursive_definition.t dl) l 
-  else l in
-  let l = if !inlining
-  then List.map (fun (t,dl) -> t,Transform.apply Inlining.all dl) l
-  else l in
+  let l = Transform.apply transformation l in
   if !print_stdout then 
     List.iter (fun (t,ctxt) -> Why3.print_context_th std_formatter t.th_name ctxt) l
   else if !alt_ergo then match l with
