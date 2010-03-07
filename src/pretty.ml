@@ -155,9 +155,6 @@ let print_logic_decl fmt = function
   | Lpredicate (ps,Some fd) -> 
       fprintf fmt "@[<hov 2>logic %a :@ %a@]" print_ident ps.ls_name
         print_fmla (ps_defn_axiom fd)
-  | Linductive (ps, fl) -> 
-      fprintf fmt "@[<hov 2>inductive %a ...@]" print_ident ps.ls_name
-
 
 let print_decl fmt d = match d.d_node with
   | Dtype tl -> 
@@ -170,6 +167,8 @@ let print_decl fmt d = match d.d_node with
         (match k with Paxiom -> "axiom" | Pgoal -> "goal" | Plemma -> "lemma")
         print_ident id
         print_fmla fmla
+  | Dind (ps, fl) -> 
+      fprintf fmt "@[<hov 2>inductive %a ...@]" print_ident ps.ls_name
   | Duse u -> fprintf fmt "use export %a@\n" print_ident u.th_name
   | Dclone il -> fprintf fmt "(*@[<hov 2>clone export _ with %a@]@\n" 
       (print_list comma (print_pair_delim nothing nothing equal print_ident print_ident)) il 

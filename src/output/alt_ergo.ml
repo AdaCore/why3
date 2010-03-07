@@ -120,14 +120,14 @@ let print_logic_decl fmt = function
       List.iter forget_var vl
   | Lpredicate _ ->
       assert false (*TODO*)
-  | Linductive _ ->
-      assert false
 
 let print_decl fmt d = match d.d_node with
   | Dtype dl ->
       print_list newline print_type_decl fmt dl
   | Dlogic dl ->
       print_list newline print_logic_decl fmt dl
+  | Dind _ ->
+      assert false
   | Dprop (Paxiom, id, f) ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n" print_ident id print_fmla f
   | Dprop (Pgoal, id, f) ->

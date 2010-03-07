@@ -85,13 +85,11 @@ let connexe (m:Sid.t Mid.t)  =
 
 let elt d = 
   match d.d_node with
-    | Dprop _ -> [d]
     | Dlogic l -> 
         let mem = Hid.create 16 in
         List.iter (function
                      | Lfunction  (fs,_) as a -> Hid.add mem fs.ls_name a
-                     | Lpredicate (ps,_) as a -> Hid.add mem ps.ls_name a
-                     | Linductive (ps,_) as a -> Hid.add mem ps.ls_name a) l;
+                     | Lpredicate (ps,_) as a -> Hid.add mem ps.ls_name a) l;
         let tyoccurences acc _ = acc in
         let loccurences acc ls = 
           if Hid.mem mem ls.ls_name then Sid.add ls.ls_name acc else acc in
@@ -110,11 +108,6 @@ let elt d =
                   | Some fd -> 
                       let fd = ps_defn_axiom fd in
                       f_s_fold tyoccurences loccurences Sid.empty fd in
-                Mid.add ps.ls_name s acc
-             | Linductive (ps,l) -> 
-                let s = List.fold_left 
-                  (fun acc (_,f) -> f_s_fold tyoccurences loccurences acc f)
-                  Sid.empty l in
                 Mid.add ps.ls_name s acc) Mid.empty l in
           let l = connexe m in
           List.map (fun e -> create_logic (List.map (Hid.find mem) e)) l
@@ -144,7 +137,7 @@ let elt d =
              Mid.add ts.ts_name s acc) Mid.empty l in
         let l = connexe m in
         List.map (fun e -> create_type (List.map (Hid.find mem) e)) l
-    | Dclone _ | Duse _ -> [d]
+    | Dprop _ | Dind _ | Dclone _ | Duse _ -> [d]
 
 let elt d = 
   let r = elt d in

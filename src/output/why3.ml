@@ -254,9 +254,6 @@ let print_type_decl fmt (ts,def) = match def with
 
 let print_type_decl fmt d = print_type_decl fmt d; forget_tvs ()
 
-let print_indbr fmt (id,f) =
-  fprintf fmt "@[<hov 4>| %a : %a@]" print_uc id print_fmla f
-
 let print_logic_decl fmt = function
   | Lfunction (fs,None) ->
       fprintf fmt "@[<hov 2>logic %a%a :@ %a@]"
@@ -276,12 +273,11 @@ let print_logic_decl fmt = function
       fprintf fmt "@[<hov 2>logic %a%a =@ %a@]"
         print_ls ps (print_paren_l print_vsty) vl print_fmla f;
       List.iter forget_var vl
-  | Linductive (ps, bl) ->
-      fprintf fmt "@[<hov 2>inductive %a%a =@ @[<hov>%a@]@]"
-         print_ls ps (print_paren_l print_ty) ps.ls_args
-         (print_list newline print_indbr) bl
 
 let print_logic_decl fmt d = print_logic_decl fmt d; forget_tvs ()
+
+let print_indbr fmt (id,f) =
+  fprintf fmt "@[<hov 4>| %a : %a@]" print_uc id print_fmla f
 
 let print_pkind fmt = function
   | Paxiom -> fprintf fmt "axiom"
@@ -294,6 +290,11 @@ let print_inst fmt (id1,id2) =
 let print_decl fmt d = match d.d_node with
   | Dtype tl  -> print_list newline2 print_type_decl  fmt tl
   | Dlogic ll -> print_list newline2 print_logic_decl fmt ll
+  | Dind (ps,bl) ->
+      fprintf fmt "@[<hov 2>inductive %a%a =@ @[<hov>%a@]@]"
+         print_ls ps (print_paren_l print_ty) ps.ls_args
+         (print_list newline print_indbr) bl;
+      forget_tvs ()
   | Dprop (k,id,fmla) ->
       fprintf fmt "@[<hov 2>%a %a :@ %a@]"
         print_pkind k print_uc id print_fmla fmla;

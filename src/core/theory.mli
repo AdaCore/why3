@@ -39,7 +39,6 @@ type ps_defn
 type logic_decl =
   | Lfunction  of lsymbol * fs_defn option
   | Lpredicate of lsymbol * ps_defn option
-  | Linductive of lsymbol * (ident * fmla) list
 
 val make_fs_defn : lsymbol -> vsymbol list -> term -> fs_defn
 val make_ps_defn : lsymbol -> vsymbol list -> fmla -> ps_defn
@@ -49,6 +48,10 @@ val open_ps_defn : ps_defn -> lsymbol * vsymbol list * fmla
 
 val fs_defn_axiom : fs_defn -> fmla
 val ps_defn_axiom : ps_defn -> fmla
+
+(* inductive predicate declaration *)
+
+type ind_decl = lsymbol * (ident * fmla) list
 
 (* proposition declaration *)
 
@@ -90,17 +93,19 @@ and decl = private {
 }
 
 and decl_node =
-  | Dtype  of ty_decl list
-  | Dlogic of logic_decl list
-  | Dprop  of prop_decl
-  | Duse   of theory
-  | Dclone of (ident * ident) list
+  | Dtype  of ty_decl list      (* mutually recursive types *)
+  | Dlogic of logic_decl list   (* mutually recursive functions/predicates *)
+  | Dind   of ind_decl          (* inductive predicate *)
+  | Dprop  of prop_decl         (* axiom / lemma / goal *)
+  | Duse   of theory                (* depend on a theory *)
+  | Dclone of (ident * ident) list  (* replicate a theory *)
 
 (** Declaration constructors *)
 
 val create_type : ty_decl list -> decl
 val create_logic : logic_decl list -> decl
 val create_prop : prop_kind -> preid -> fmla -> decl
+val create_ind : lsymbol -> (preid * fmla) list -> decl
 
 (* exceptions *)
 
@@ -128,12 +133,12 @@ module Context : sig
   val use_export   : context -> theory -> context
   val clone_export : context -> theory -> th_inst -> context
 
-  val ctxt_fold : ('a -> decl -> 'a) -> 'a -> context -> 'a     
-    (** bottom-up, tail-rec *)
+  (* bottom-up, tail-recursive traversal functions *)
+  val ctxt_fold : ('a -> decl -> 'a) -> 'a -> context -> 'a
   val ctxt_iter : (decl -> unit) -> context -> unit
-    (** bottom-up, tail-rec *)
 
-  val get_decls : context -> decl list (* top-down list of decls *)
+  (* top-down list of declarations *)
+  val get_decls : context -> decl list
 
   exception UnknownIdent of ident
   exception RedeclaredIdent of ident

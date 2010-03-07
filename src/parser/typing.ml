@@ -996,10 +996,10 @@ let add_inductive loc id tyl cl th =
     let loc = f.pp_loc in
     let f' = fmla th' f in
     check_clausal_form loc ps f';
-    id_register (id_user id.id id.id_loc), f'
+    id_user id.id id.id_loc, f'
   in
   let cl = List.map clause cl in
-  add_decl th (create_logic [Linductive (ps, cl)])
+  add_decl th (create_ind ps cl)
 
 let find_in_loadpath env f =
   let rec find c lp = match lp, c with

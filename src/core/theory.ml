@@ -41,7 +41,6 @@ type ps_defn = lsymbol * vsymbol list * fmla * fmla
 type logic_decl =
   | Lfunction  of lsymbol * fs_defn option
   | Lpredicate of lsymbol * ps_defn option
-  | Linductive of lsymbol * (ident * fmla) list
 
 exception UnboundVars of Svs.t
 
@@ -88,6 +87,10 @@ let open_ps_defn (ps,vl,f,_) = (ps,vl,f)
 let fs_defn_axiom (_,_,_,fd) = fd
 let ps_defn_axiom (_,_,_,pd) = pd
 
+(* inductive predicate declaration *)
+
+type ind_decl = lsymbol * (ident * fmla) list
+
 (* proposition declaration *)
 
 type prop_kind =
@@ -128,12 +131,12 @@ and decl = {
 }
 
 and decl_node =
-  | Dtype  of ty_decl list
-  | Dlogic of logic_decl list
-  | Dprop  of prop_decl
-  | Duse   of theory
-  | Dclone of (ident * ident) list
-
+  | Dtype  of ty_decl list      (* mutually recursive types *)
+  | Dlogic of logic_decl list   (* mutually recursive functions/predicates *)
+  | Dind   of ind_decl          (* inductive predicate *)
+  | Dprop  of prop_decl         (* axiom / lemma / goal *)
+  | Duse   of theory                (* depend on a theory *)
+  | Dclone of (ident * ident) list  (* replicate a theory *)
 
 (** Declarations *)
 
@@ -157,13 +160,15 @@ module Decl = struct
   let eq_ld ld1 ld2 = match ld1,ld2 with
     | Lfunction  (fs1,fd1), Lfunction  (fs2,fd2) -> eq_fd fs1 fd1 fs2 fd2
     | Lpredicate (ps1,pd1), Lpredicate (ps2,pd2) -> eq_fd ps1 pd1 ps2 pd2
-    | Linductive (ps1,al1), Linductive (ps2,al2) -> ps1 == ps2 &&
-        for_all2 (fun (i1,f1) (i2,f2) -> i1 == i2 && f1 == f2) al1 al2
     | _ -> false
+
+  let eq_ind ps1 al1 ps2 al2 = ps1 == ps2 &&
+    for_all2 (fun (i1,f1) (i2,f2) -> i1 == i2 && f1 == f2) al1 al2
 
   let equal d1 d2 = match d1.d_node, d2.d_node with
     | Dtype  l1, Dtype  l2 -> for_all2 eq_td l1 l2
     | Dlogic l1, Dlogic l2 -> for_all2 eq_ld l1 l2
+    | Dind (ps1,al1), Dind (ps2,al2) -> eq_ind ps1 al1 ps2 al2
     | Dprop (k1,i1,f1), Dprop (k2,i2,f2) -> k1 == k2 && i1 == i2 && f1 == f2
     | Duse th1, Duse th2 -> th1.th_name == th2.th_name
     | _ -> false
@@ -179,13 +184,15 @@ module Decl = struct
   let hs_ld ld = match ld with
     | Lfunction  (fs,fd) -> Hashcons.combine fs.ls_name.id_tag (hs_fd fd)
     | Lpredicate (ps,pd) -> Hashcons.combine ps.ls_name.id_tag (hs_fd pd)
-    | Linductive (ps,l)  ->
-        let hs_pair (i,f) = Hashcons.combine i.id_tag f.f_tag in
-        Hashcons.combine_list hs_pair ps.ls_name.id_tag l
+
+  let hs_ind ps al =
+      let hs_pair (i,f) = Hashcons.combine i.id_tag f.f_tag in
+      Hashcons.combine_list hs_pair ps.ls_name.id_tag al
 
   let hash d = match d.d_node with
     | Dtype  l -> Hashcons.combine_list hs_td 0 l
     | Dlogic l -> Hashcons.combine_list hs_ld 3 l
+    | Dind (ps,al) -> Hashcons.combine 5 (hs_ind ps al)
     | Dprop (Paxiom,i,f) -> Hashcons.combine2 7  i.id_tag f.f_tag
     | Dprop (Plemma,i,f) -> Hashcons.combine2 11 i.id_tag f.f_tag
     | Dprop (Pgoal, i,f) -> Hashcons.combine2 13 i.id_tag f.f_tag
@@ -209,7 +216,8 @@ let mk_decl n = { d_node = n; d_tag = -1 }
 
 let create_type tdl = Hdecl.hashcons (mk_decl (Dtype tdl))
 let create_logic ldl = Hdecl.hashcons (mk_decl (Dlogic ldl))
-let create_prop k i f = Hdecl.hashcons (mk_decl (Dprop (k, id_register i, f)))
+let create_ind ps la = Hdecl.hashcons (mk_decl (Dind (ps, la)))
+let create_prop k i f = Hdecl.hashcons (mk_decl (Dprop (k, i, f)))
 let create_use th = Hdecl.hashcons (mk_decl (Duse th))
 let create_clone sl = Hdecl.hashcons (mk_decl (Dclone sl))
 
@@ -251,20 +259,22 @@ let create_logic ldl =
         raise (BadDecl fs.ls_name)
     | Lpredicate (ps, Some (s,_,_,_)) when s != ps ->
         raise (BadDecl ps.ls_name)
-    | Linductive (ps,la) ->
-        let check_ax (_,f) =
-          ignore (check_fvs f);
-        in
-        List.iter check_ax la
     | _ -> ()
   in
   List.iter check_decl ldl;
   create_logic ldl
 
+let create_ind ps la =
+  let make_ax (i,f) =
+    ignore (check_fvs f);
+    id_register i, f
+  in
+  create_ind ps (List.map make_ax la)
+
 let create_prop k i f =
   let fvs = f_freevars Svs.empty f in
   if not (Svs.is_empty fvs) then raise (UnboundVars fvs);
-  create_prop k i f
+  create_prop k (id_register i) f
 
 
 (** Built-in symbols *)
@@ -371,10 +381,6 @@ module Context = struct
   let add_logic d kn = function
     | Lfunction  (fs, df) -> add_known fs.ls_name d kn
     | Lpredicate (ps, dp) -> add_known ps.ls_name d kn
-    | Linductive (ps, la) ->
-        let kn = add_known ps.ls_name d kn in
-        let add kn (id,f) = add_known id d kn in
-        List.fold_left add kn la
 
   let check_logic kn d =
     let check chk (_,_,e,_) = chk e in
@@ -386,10 +392,16 @@ module Context = struct
       | Lpredicate (ps, dp) ->
           List.iter (known_ty kn) ps.ls_args;
           option_iter (check (known_fmla kn)) dp
-      | Linductive (ps, la) ->
-          List.iter (known_ty kn) ps.ls_args;
-          let check (_,f) = known_fmla kn f in
-          List.iter check la
+
+  let add_ind d kn ps la =
+      let kn = add_known ps.ls_name d kn in
+      let add kn (id,f) = add_known id d kn in
+      List.fold_left add kn la
+
+  let check_ind kn ps la =
+      List.iter (known_ty kn) ps.ls_args;
+      let check (_,f) = known_fmla kn f in
+      List.iter check la
 
   let add_decl ctxt d =
     try
@@ -397,14 +409,16 @@ module Context = struct
       let kn = match d.d_node with
         | Dtype dl  -> List.fold_left (add_type d) kn dl
         | Dlogic dl -> List.fold_left (add_logic d) kn dl
-        | Dprop (k, id, _) -> add_known id d kn;
-        | Duse th -> add_known th.th_name d kn;
+        | Dind (ps,la) -> add_ind d kn ps la
+        | Dprop (k,id, _) -> add_known id d kn
+        | Duse th -> add_known th.th_name d kn
         | Dclone _ -> kn
       in
       let () = match d.d_node with
         | Dtype dl  -> List.iter (check_type kn) dl
-        | Dlogic dl -> List.iter (check_logic kn) dl;
-        | Dprop (_, _, f) -> known_fmla kn f
+        | Dlogic dl -> List.iter (check_logic kn) dl
+        | Dind (ps,la) -> check_ind kn ps la
+        | Dprop (_,_,f) -> known_fmla kn f
         | Duse _ | Dclone _ -> ()
       in
       push_decl ctxt kn d
@@ -467,6 +481,10 @@ module Context = struct
       Hls.add ls_table ls ls';
       Hid.add id_table ls.ls_name ls'.ls_name
     in
+    let add_pr id f id' f' =
+      Hashtbl.add pr_table f.f_tag f';
+      Hid.add id_table id id'
+    in
     Mts.iter add_ts inst.inst_ts;
     Mls.iter add_ls inst.inst_ls;
 
@@ -507,7 +525,7 @@ module Context = struct
         (ts', def') :: acc
     in
     let add_logic acc = function
-      | Lfunction (ls, Some _) | Lpredicate (ls, Some _) | Linductive (ls, _)
+      | Lfunction (ls, Some _) | Lpredicate (ls, Some _)
         when Mls.mem ls inst.inst_ls ->
           raise (CannotInstantiate ls.ls_name)
       | Lfunction (ls, Some (_,_,_,f)) ->
@@ -525,24 +543,24 @@ module Context = struct
           Lfunction (find_ls ls, None) :: acc
       | Lpredicate (ls, None) ->
           Lpredicate (find_ls ls, None) :: acc
-      | Linductive (ls, fl) ->
-          let trans (id, f) = (id, trans_fmla f) in
-          Linductive (find_ls ls, List.map trans fl) :: acc
+    in
+    let add_ind acc ps la =
+      if Mls.mem ps inst.inst_ls then raise (CannotInstantiate ps.ls_name);
+      let trans (id,f) = (id_dup id, trans_fmla f) in
+      let add_ax (id,f) (id',f') = add_pr id f id' f' in
+      let d' = create_ind (find_ls ps) (List.map trans la) in
+      match d'.d_node with
+        | Dind (_,la') -> List.iter2 add_ax la la'; d' :: acc
+        | _ -> assert false
     in
     let add_prop acc k id f = match k with
       | Pgoal ->
           acc
       | Paxiom | Plemma ->
-          let id' = id_dup id in
-          let f' = trans_fmla f in
-          let d' = create_prop Paxiom id' f' in
-          let id' = match d'.d_node with
-            | Dprop (_, id', _) -> id'
+          let d' = create_prop Paxiom (id_dup id) (trans_fmla f) in
+          match d'.d_node with
+            | Dprop (_,id',f') -> add_pr id f id' f'; d' :: acc
             | _ -> assert false
-          in
-          Hashtbl.add pr_table f.f_tag f';
-          Hid.add id_table id id';
-          d' :: acc
     in
     let add_decl acc d = match d.d_node with
       | Dtype tyl ->
@@ -551,6 +569,8 @@ module Context = struct
       | Dlogic ll ->
           let l = List.fold_left add_logic [] ll in
           if l = [] then acc else create_logic l :: acc
+      | Dind (ps, la) ->
+          add_ind acc ps la
       | Dprop (k, id, f) ->
           add_prop acc k id f
       | Duse _ | Dclone _ ->
@@ -729,15 +749,17 @@ module Theory = struct
   let add_logic uc = function
     | Lfunction  (fs,_) -> add_symbol add_ls fs.ls_name fs uc
     | Lpredicate (ps,_) -> add_symbol add_ls ps.ls_name ps uc
-    | Linductive (ps, la) ->
-        let uc = add_symbol add_ls ps.ls_name ps uc in
-        let add uc (id,f) = add_symbol add_pr id f uc in
-        List.fold_left add uc la
+
+  let add_ind uc ps la =
+    let uc = add_symbol add_ls ps.ls_name ps uc in
+    let add uc (id,f) = add_symbol add_pr id f uc in
+    List.fold_left add uc la
 
   let add_decl uc d =
     let uc = match d.d_node with
       | Dtype dl  -> List.fold_left add_type uc dl
       | Dlogic dl -> List.fold_left add_logic uc dl
+      | Dind (ps, la) -> add_ind uc ps la
       | Dprop (_, id, f) -> add_symbol add_pr id f uc
       | Dclone _ | Duse _ -> uc
     in

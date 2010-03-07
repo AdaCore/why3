@@ -71,11 +71,11 @@ let fold isnotinlinedt isnotinlinedf _ env ctxt d =
               add_decl ctxt 
                 (create_logic [Lpredicate(ps,Some (make_ps_defn ps vs f))])
               else {env with ps = Mls.add ps (vs,f) env.ps},ctxt
-          | Linductive (ps,fmlal) -> 
-              let fmlal = List.map 
-                (fun (id,fmla) -> id,replacep env fmla) fmlal in
-              env,add_decl ctxt (create_logic [Linductive (ps,fmlal)])
       end
+    | Dind (ps,fmlal) ->
+        let fmlal = List.map 
+          (fun (id,fmla) -> id_dup id,replacep env fmla) fmlal in
+        env,add_decl ctxt (create_ind ps fmlal)
     | Dlogic dl -> env,
         add_decl ctxt (create_logic 
            (List.map 
@@ -90,10 +90,6 @@ let fold isnotinlinedt isnotinlinedf _ env ctxt d =
                      let _,vs,t = open_ps_defn  fmla in
                      let t = replacep env t in
                      Lpredicate (ps,Some (make_ps_defn ps vs t))
-                 | Linductive (ps,fmlal) ->
-                     let fmlal = List.map 
-                       (fun (id,fmla) -> id,replacep env fmla) fmlal in
-                     Linductive (ps,fmlal)
               ) dl))
     | Dtype dl -> env,add_decl ctxt d
     | Dprop (k,i,fmla) -> env,add_decl ctxt (create_prop k (id_dup i) 
