@@ -30,5 +30,6 @@ val print_fmla : formatter -> fmla -> unit
 val print_decl : formatter -> decl -> unit
 val print_decl_list : formatter -> decl list -> unit
 val print_context : formatter -> context -> unit
+val print_context_th : formatter -> ident -> context -> unit
 val print_theory : formatter -> theory -> unit
 

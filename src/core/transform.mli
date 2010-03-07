@@ -22,8 +22,10 @@ open Theory
 
 (* Tranformation on context with some memoisations *)
 
+(** General functions *)
+
 (* The type of transformation from list of 'a to list of 'b *)
-type 'a  t
+type 'a t
 
 (* compose two transformations, the underlying datastructures for
    the memoisation are shared *)
@@ -32,8 +34,33 @@ val compose : context t -> 'a t -> 'a t
 (* apply a transformation and memoise *)
 val apply : 'a t -> context -> 'a
 
+(* convert the result of a transformation witout memoisation *)
+val conv : 'a t -> ('a -> 'b) -> 'b t
+
 (* clear the datastructures used to store the memoisation *)
 val clear : 'a t -> unit
+
+(** General constructors *)
+val fold_up :
+  ?clear:(unit -> unit) ->
+  (context -> 'a -> decl -> 'a) -> 'a -> 'a t
+
+
+val fold_bottom :
+  ?tag:('a -> int) ->
+  ?clear:(unit -> unit) ->
+  (context -> 'a  -> decl -> 'a) -> 'a -> 'a t
+
+
+val fold_bottom_up :
+  ?tag:('a -> int) ->
+  ?clear:(unit -> unit) ->
+  top:('a -> 'c) ->
+  down:('c -> 'b -> 'c) ->
+  (context -> 'a  -> decl -> 'a * 'b) -> 'a -> 'c t
+
+
+
 
 (* the general tranformation only one memoisation is performed at the
    beginning *)
@@ -62,17 +89,6 @@ val elt :
   (decl -> decl list) -> context t
 
 
-val fold_bottom :
-  ?tag:('a -> int) ->
-  ?clear:(unit -> unit) ->
-  (context -> 'a  -> decl -> 'a) -> 'a -> 'a t
-
-
-val fold_up :
-  ?clear:(unit -> unit) ->
-  (context -> 'a -> decl -> 'a) -> 'a -> 'a t
-
-
 
 (*type odecl =
   | Otype of ty_decl
@@ -84,7 +100,7 @@ val fold_up :
 val elt_of_oelt :
   ty:(ty_decl -> ty_decl) ->
   logic:(logic_decl -> logic_decl) ->
-  ind:(ind_decl -> ind_decl) ->
+  ind:(ind_decl list -> decl list) ->
   prop:(prop_decl -> decl list) ->
   use:(theory -> decl list) ->
   clone:((ident * ident) list -> decl list) ->
@@ -95,3 +111,9 @@ val fold_context_of_decl:
   (context -> 'a -> decl -> 'a * decl list) ->
   context -> 'a -> context -> decl -> ('a * context)
 
+(* Utils *)
+val unit_tag : unit -> int
+
+val split_goals : context list t
+
+val extract_goals : (Ident.ident * Term.fmla * context) list t

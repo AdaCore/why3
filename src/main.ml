@@ -74,38 +74,27 @@ let type_file env file =
   close_in c;
   if !parse_only then env else Typing.add_theories env f
 
-let extract_goals th =
-  let ctx = Context.use_export Context.empty_context th in
-  assert false
+let extract_goals ctxt =
+  Transform.apply Transform.extract_goals ctxt
 
 let transform l =
-  let l = Typing.list_theory l in
-  if !print_stdout && not transform then 
-    List.iter (Why3.print_theory Format.std_formatter) l
+  let l = List.map (fun t -> t,t.th_ctxt) (Typing.list_theory l) in
+  let l = if !simplify_recursive 
+  then List.map (fun (t,dl) -> t,Transform.apply 
+                   Simplify_recursive_definition.t dl) l 
+  else l in
+  let l = if !inlining
+  then List.map (fun (t,dl) -> t,Transform.apply Inlining.all dl) l
+  else l in
+  if !print_stdout then 
+    List.iter (fun (t,ctxt) -> Why3.print_context_th std_formatter t.th_name ctxt) l
   else if !alt_ergo then match l with
-    | th :: _ -> begin match extract_goals th with
+    | (_,ctxt) :: _ -> begin match extract_goals ctxt with
 	| g :: _ -> Alt_ergo.print_goal std_formatter g
 	| [] -> ()
       end	
     | [] -> ()
-  else if transform then
-    let l = List.map (fun t -> t,Transform.apply Flatten.t t.th_ctxt)
-      l in
-    let l = if !simplify_recursive 
-    then 
-      List.map (fun (t,dl) -> t,Transform.apply 
-                  Simplify_recursive_definition.t dl) l
-    else l in
-    let l = if !inlining
-    then
-      List.map (fun (t,dl) -> t,Transform.apply Inlining.all dl) l
-    else l in
-    if !print_stdout then 
-      List.iter (fun (t,dl) ->
-                   Format.printf "@[@[<hov 2>theory %a@\n%a@]@\nend@]@\n@\n@?" 
-                     Pretty.print_ident t.th_name 
-                     Pretty.print_context dl
-                ) l
+
 	
 
 let () =

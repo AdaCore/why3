@@ -320,7 +320,8 @@ let print_decl_list fmt dl =
 let print_context fmt ctxt =
   print_list newline2 print_decl fmt (Context.get_decls ctxt)
 
-let print_theory fmt t =
+let print_context_th fmt name ctxt =
   fprintf fmt "@[<hov 2>theory %a@\n%a@]@\nend@\n@."
-    print_id t.th_name print_context t.th_ctxt
+    print_id name print_context ctxt
 
+let print_theory fmt t = print_context_th fmt t.th_name t.th_ctxt
