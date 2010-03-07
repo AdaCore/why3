@@ -85,14 +85,14 @@ let type_file env file =
 let extract_goals ctxt =
   Transform.apply Transform.extract_goals ctxt
 
-let transform l =
+let transform env l =
   let l = List.map (fun t -> t,t.th_ctxt) (Typing.list_theory l) in
   let l = Transform.apply transformation l in
   if !print_stdout then 
     List.iter (fun (t,ctxt) -> Why3.print_context_th std_formatter t.th_name ctxt) l
   else if !alt_ergo then match l with
     | (_,ctxt) :: _ -> begin match extract_goals ctxt with
-	| g :: _ -> Alt_ergo.print_goal std_formatter g
+	| g :: _ -> Alt_ergo.print_goal env std_formatter g
 	| [] -> ()
       end	
     | [] -> ()
@@ -103,7 +103,7 @@ let () =
   try
     let env = Typing.create !loadpath in
     let l = List.fold_left type_file env !files in
-    transform l
+    transform env l
   with e when not !debug ->
     eprintf "%a@." report e;
     exit 1

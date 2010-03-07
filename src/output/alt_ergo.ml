@@ -105,11 +105,25 @@ let print_type_decl fmt = function
   | _, Talgebraic _ ->
       assert false
 
-let print_logic_decl fmt = function
+let ac_th = (Ptree.Qdot 
+               (Ptree.Qident {Ptree.id = "algebra";id_loc = Loc.dummy_position},
+                {Ptree.id = "AC";id_loc = Loc.dummy_position}))
+
+let is_ac env ctxt ls1 =
+  try
+    let th = Typing.find_theory env ac_th in
+    let ls2 = Mnm.find "op" th.th_export.ns_ls in
+    if Context_utils.cloned_from ctxt ls1.ls_name ls2.ls_name
+    then "ac " else ""
+  with Loc.Located _ -> ""
+
+let print_logic_decl env ctxt fmt = function
   | Lfunction (ls, None) ->
       let tyl = ls.ls_args in
       let ty = match ls.ls_value with None -> assert false | Some ty -> ty in
-      fprintf fmt "@[<hov 2>logic %a : %a -> %a@]@\n" print_ident ls.ls_name
+      fprintf fmt "@[<hov 2>logic %s%a : %a -> %a@]@\n" 
+        (is_ac env ctxt ls) 
+        print_ident ls.ls_name
 	(print_list comma print_type) tyl print_type ty
   | Lfunction (ls, Some defn) ->
       let id = ls.ls_name in
@@ -121,11 +135,11 @@ let print_logic_decl fmt = function
   | Lpredicate _ ->
       assert false (*TODO*)
 
-let print_decl fmt d = match d.d_node with
+let print_decl env ctxt fmt d = match d.d_node with
   | Dtype dl ->
       print_list newline print_type_decl fmt dl
   | Dlogic dl ->
-      print_list newline print_logic_decl fmt dl
+      print_list newline (print_logic_decl env ctxt) fmt dl
   | Dind _ ->
       assert false
   | Dprop (Paxiom, pr) ->
@@ -139,11 +153,11 @@ let print_decl fmt d = match d.d_node with
   | Duse _ | Dclone _ ->
       ()
 
-let print_context fmt ctxt = 
+let print_context env fmt ctxt = 
   let decls = Context.get_decls ctxt in
-  print_list newline2 print_decl fmt decls
+  print_list newline2 (print_decl env ctxt) fmt decls
 
 
-let print_goal fmt (id, f, ctxt) =
-  print_context fmt ctxt;
+let print_goal env fmt (id, f, ctxt) =
+  print_context env fmt ctxt;
   fprintf fmt "@\n@[<hov 2>goal %a : %a@]" print_ident id print_fmla f

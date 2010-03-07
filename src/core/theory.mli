@@ -97,6 +97,7 @@ and namespace = private {
 and context = private {
   ctxt_decls : (decl * context) option;
   ctxt_known : decl Mid.t;
+  ctxt_cloned : ident Mid.t;
   ctxt_tag   : int;
 }
 

@@ -145,6 +145,7 @@ and namespace = {
 and context = {
   ctxt_decls : (decl * context) option;
   ctxt_known : decl Mid.t;
+  ctxt_cloned : ident Mid.t;
   ctxt_tag   : int;
 }
 
@@ -340,13 +341,19 @@ module Context = struct
   let empty_context = Hctxt.hashcons {
     ctxt_decls = None;
     ctxt_known = builtin_known;
+    ctxt_cloned = Mid.empty;
     ctxt_tag   = -1;
   }
 
   let push_decl ctxt kn d =
+    let cloned = match d.d_node with
+      | Dclone l -> List.fold_left (fun m (i1,i2) -> Mid.add i1 i2 m) 
+          ctxt.ctxt_cloned l
+      | _ -> ctxt.ctxt_cloned in
     Hctxt.hashcons { ctxt with
       ctxt_decls = Some (d, ctxt);
-      ctxt_known = kn
+      ctxt_known = kn;
+      ctxt_cloned = cloned;
     }
 
   (* Manage known symbols *)
