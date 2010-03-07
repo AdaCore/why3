@@ -156,19 +156,23 @@ let print_logic_decl fmt = function
       fprintf fmt "@[<hov 2>logic %a :@ %a@]" print_ident ps.ls_name
         print_fmla (ps_defn_axiom fd)
 
+let print_ind_decl fmt (ps,_) =
+  fprintf fmt "@[<hov 2>inductive %a ...@]" print_ident ps.ls_name
+
 let print_decl fmt d = match d.d_node with
   | Dtype tl -> 
       fprintf fmt "@[<hov>%a@ (* *)@]" (print_list newline print_ty_decl) tl
   | Dlogic ldl -> 
       fprintf fmt "@[<hov>%a@ (* *)@]" 
 	(print_list newline print_logic_decl) ldl 
-  | Dprop (k,id,fmla) -> 
+  | Dind idl -> 
+      fprintf fmt "@[<hov>%a@ (* *)@]" 
+	(print_list newline print_ind_decl) idl 
+  | Dprop (k,pr) -> 
       fprintf fmt "%s %a :@ %a@\n" 
         (match k with Paxiom -> "axiom" | Pgoal -> "goal" | Plemma -> "lemma")
-        print_ident id
-        print_fmla fmla
-  | Dind (ps, fl) -> 
-      fprintf fmt "@[<hov 2>inductive %a ...@]" print_ident ps.ls_name
+        print_ident pr.pr_name
+        print_fmla pr.pr_fmla
   | Duse u -> fprintf fmt "use export %a@\n" print_ident u.th_name
   | Dclone il -> fprintf fmt "(*@[<hov 2>clone export _ with %a@]@\n" 
       (print_list comma (print_pair_delim nothing nothing equal print_ident print_ident)) il 

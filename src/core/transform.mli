@@ -37,27 +37,27 @@ val clear : 'a t -> unit
 
 (* the general tranformation only one memoisation is performed at the
    beginning *)
-val all : 
+val all :
   ?clear:(unit -> unit) ->
   (context -> 'a) -> 'a t
-  
+
 (* map the element of the list from the first to the last. only one
    memoisation is performed at the beginning. But if a tag function is
    given a memoisation is performed at each step *)
-val fold_map_bottom : 
+val fold_map_bottom :
   ?tag:('a -> int) ->
   ?clear:(unit -> unit) ->
   (context -> 'a -> decl -> 'a * decl list) -> 'a -> context t
-  
+
 (* map the element of the list from the last to the first.
    A memoisation is performed at each step *)
-val fold_map_up : 
+val fold_map_up :
   ?clear:(unit -> unit) ->
   (context -> 'a -> context -> decl -> ('a * context)) -> 'a -> context t
- 
+
 (* map the element of the list without an environnment.
    A memoisation is performed at each step, and for each elements *)
-val elt : 
+val elt :
   ?clear:(unit -> unit) ->
   (decl -> decl list) -> context t
 
@@ -74,7 +74,7 @@ val fold_up :
 
 
 
-(*type odecl = 
+(*type odecl =
   | Otype of ty_decl
   | Ologic of logic_decl
   | Oprop of prop_decl
@@ -84,6 +84,7 @@ val fold_up :
 val elt_of_oelt :
   ty:(ty_decl -> ty_decl) ->
   logic:(logic_decl -> logic_decl) ->
+  ind:(ind_decl -> ind_decl) ->
   prop:(prop_decl -> decl list) ->
   use:(theory -> decl list) ->
   clone:((ident * ident) list -> decl list) ->

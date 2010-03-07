@@ -3,8 +3,8 @@ open Theory
 let elt a =
   let rec aux first_level acc d = match first_level, d.d_node with
     | _,Duse t -> Context.ctxt_fold (aux false) acc t.th_ctxt
-    | false,Dprop (Pgoal,_,_) -> acc
-    | false,Dprop (Plemma,i,f) -> (create_prop Paxiom (Ident.id_dup i) f)::acc
+    | false,Dprop (Pgoal,_) -> acc
+    | false,Dprop (Plemma,pr) -> create_prop_decl Paxiom pr::acc
     | _ -> d::acc 
   in
   let r =  (aux true [] a) in

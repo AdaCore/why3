@@ -59,7 +59,7 @@ let fold isnotinlinedt isnotinlinedf _ env ctxt d =
               if t_s_any ffalse ((==) fs) t || isnotinlinedt t
               then  env,
               add_decl ctxt 
-                (create_logic [Lfunction(fs,
+                (create_logic_decl [Lfunction(fs,
                                          Some (make_fs_defn fs vs t))])
               else {env with fs = Mls.add fs (vs,t) env.fs},ctxt
           | Lpredicate (ps,None) -> env,add_decl ctxt d
@@ -69,15 +69,16 @@ let fold isnotinlinedt isnotinlinedf _ env ctxt d =
               if f_s_any ffalse ((==) ps) f || isnotinlinedf f
               then  env,
               add_decl ctxt 
-                (create_logic [Lpredicate(ps,Some (make_ps_defn ps vs f))])
+                (create_logic_decl [Lpredicate(ps,Some (make_ps_defn ps vs f))])
               else {env with ps = Mls.add ps (vs,f) env.ps},ctxt
       end
-    | Dind (ps,fmlal) ->
-        let fmlal = List.map 
-          (fun (id,fmla) -> id_dup id,replacep env fmla) fmlal in
-        env,add_decl ctxt (create_ind ps fmlal)
+    | Dind dl ->
+        env, add_decl ctxt (create_ind_decl 
+          (List.map (fun (ps,fmlal) -> ps, List.map (fun pr ->
+            create_prop (id_dup pr.pr_name) (replacep env pr.pr_fmla)) 
+          fmlal) dl))
     | Dlogic dl -> env,
-        add_decl ctxt (create_logic 
+        add_decl ctxt (create_logic_decl 
            (List.map 
               (function
                  | Lfunction (fs,None) as a -> a 
@@ -92,8 +93,8 @@ let fold isnotinlinedt isnotinlinedf _ env ctxt d =
                      Lpredicate (ps,Some (make_ps_defn ps vs t))
               ) dl))
     | Dtype dl -> env,add_decl ctxt d
-    | Dprop (k,i,fmla) -> env,add_decl ctxt (create_prop k (id_dup i) 
-                                               (replacep env fmla))
+    | Dprop (k,pr) -> env,add_decl ctxt (create_prop_decl k
+        (create_prop (id_dup pr.pr_name) (replacep env pr.pr_fmla)))
     | Duse _ | Dclone _ -> env,add_decl ctxt d
         
 let t ~isnotinlinedt ~isnotinlinedf = 

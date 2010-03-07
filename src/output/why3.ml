@@ -276,8 +276,16 @@ let print_logic_decl fmt = function
 
 let print_logic_decl fmt d = print_logic_decl fmt d; forget_tvs ()
 
-let print_indbr fmt (id,f) =
-  fprintf fmt "@[<hov 4>| %a : %a@]" print_uc id print_fmla f
+let print_prop fmt pr =
+  fprintf fmt "%a : %a" print_uc pr.pr_name print_fmla pr.pr_fmla
+
+let print_ind fmt pr = fprintf fmt "@[<hov 4>| %a@]" print_prop pr
+
+let print_ind_decl fmt (ps,bl) =
+  fprintf fmt "@[<hov 2>inductive %a%a =@ @[<hov>%a@]@]"
+     print_ls ps (print_paren_l print_ty) ps.ls_args
+     (print_list newline print_ind) bl;
+  forget_tvs ()
 
 let print_pkind fmt = function
   | Paxiom -> fprintf fmt "axiom"
@@ -288,21 +296,16 @@ let print_inst fmt (id1,id2) =
   fprintf fmt "%a = %a" print_id id1 print_id id2
 
 let print_decl fmt d = match d.d_node with
-  | Dtype tl  -> print_list newline2 print_type_decl  fmt tl
+  | Dtype tl  -> print_list newline2 print_type_decl fmt tl
   | Dlogic ll -> print_list newline2 print_logic_decl fmt ll
-  | Dind (ps,bl) ->
-      fprintf fmt "@[<hov 2>inductive %a%a =@ @[<hov>%a@]@]"
-         print_ls ps (print_paren_l print_ty) ps.ls_args
-         (print_list newline print_indbr) bl;
-      forget_tvs ()
-  | Dprop (k,id,fmla) ->
-      fprintf fmt "@[<hov 2>%a %a :@ %a@]"
-        print_pkind k print_uc id print_fmla fmla;
+  | Dind il   -> print_list newline2 print_ind_decl fmt il
+  | Dprop (k,pr) ->
+      fprintf fmt "@[<hov 2>%a %a@]" print_pkind k print_prop pr;
       forget_tvs ()
   | Duse th ->
-      fprintf fmt "@[<hov 2>use export %a@]" print_id th.th_name
+      fprintf fmt "@[<hov 2>(* use export %a *)@]" print_id th.th_name
   | Dclone inst ->
-      fprintf fmt "@[<hov 2>(* clone with@ %a *)@]"
+      fprintf fmt "@[<hov 2>(* clone with %a *)@]"
       (print_list comma print_inst) inst
 
 (* let print_decl fmt d = fprintf fmt "%a@\n" print_decl d *)

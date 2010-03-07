@@ -110,7 +110,7 @@ let elt d =
                       f_s_fold tyoccurences loccurences Sid.empty fd in
                 Mid.add ps.ls_name s acc) Mid.empty l in
           let l = connexe m in
-          List.map (fun e -> create_logic (List.map (Hid.find mem) e)) l
+          List.map (fun e -> create_logic_decl (List.map (Hid.find mem) e)) l
     | Dtype l -> 
         let mem = Hid.create 16 in
         List.iter (fun ((ts,_) as a) -> Hid.add mem ts.ts_name a) l;
@@ -136,8 +136,9 @@ let elt d =
                      ) Sid.empty l in
              Mid.add ts.ts_name s acc) Mid.empty l in
         let l = connexe m in
-        List.map (fun e -> create_type (List.map (Hid.find mem) e)) l
-    | Dprop _ | Dind _ | Dclone _ | Duse _ -> [d]
+        List.map (fun e -> create_ty_decl (List.map (Hid.find mem) e)) l
+    | Dind _ -> [d] (* TODO *)
+    | Dprop _ | Dclone _ | Duse _ -> [d]
 
 let elt d = 
   let r = elt d in

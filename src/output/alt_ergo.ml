@@ -128,11 +128,13 @@ let print_decl fmt d = match d.d_node with
       print_list newline print_logic_decl fmt dl
   | Dind _ ->
       assert false
-  | Dprop (Paxiom, id, f) ->
-      fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n" print_ident id print_fmla f
-  | Dprop (Pgoal, id, f) ->
-      fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n" print_ident id print_fmla f
-  | Dprop (Plemma, _, _) ->
+  | Dprop (Paxiom, pr) ->
+      fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n" 
+        print_ident pr.pr_name print_fmla pr.pr_fmla
+  | Dprop (Pgoal, pr) ->
+      fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
+        print_ident pr.pr_name print_fmla pr.pr_fmla
+  | Dprop (Plemma, _) ->
       assert false
   | Duse _ | Dclone _ ->
       ()

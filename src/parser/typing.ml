@@ -181,7 +181,7 @@ let term_expected_type ~loc ty1 ty2 =
     "@[This term has type %a@ but is expected to have type@ %a@]"
     print_dty ty1 print_dty ty2
 
-let create_type_var =
+let create_ty_decl_var =
   let t = ref 0 in
   fun ?loc ~user tv -> 
     incr t; 
@@ -237,7 +237,7 @@ let find_user_type_var x env =
   with Not_found ->
     (* TODO: shouldn't we localize this ident? *)
     let v = create_tvsymbol (id_fresh x) in
-    let v = create_type_var ~user:true v in
+    let v = create_ty_decl_var ~user:true v in
     Hashtbl.add env.utyvars x v;
     v
  
@@ -249,7 +249,7 @@ let find_type_var ~loc env tv =
   try
     Htv.find env tv
   with Not_found ->
-    let v = create_type_var ~loc ~user:false tv in
+    let v = create_ty_decl_var ~loc ~user:false tv in
     Htv.add env tv v;
     v
  
@@ -433,11 +433,11 @@ let rec dpat env pat =
 and dpat_node loc env = function
   | PPpwild -> 
       let tv = create_tvsymbol (id_user "a" loc) in
-      let ty = Tyvar (create_type_var ~loc ~user:false tv) in
+      let ty = Tyvar (create_ty_decl_var ~loc ~user:false tv) in
       env, Pwild, ty
   | PPpvar {id=x} ->
       let tv = create_tvsymbol (id_user "a" loc) in
-      let ty = Tyvar (create_type_var ~loc ~user:false tv) in
+      let ty = Tyvar (create_ty_decl_var ~loc ~user:false tv) in
       let env = { env with dvars = M.add x ty env.dvars } in
       env, Pvar x, ty
   | PPpapp (x, pl) ->
@@ -516,7 +516,7 @@ and dterm_node loc env = function
       let ty = e1.dt_ty in
       let tb = (* the type of all branches *)
 	let tv = create_tvsymbol (id_user "a" loc) in
-	Tyvar (create_type_var ~loc ~user:false tv) 
+	Tyvar (create_ty_decl_var ~loc ~user:false tv) 
       in
       let branch (pat, e) =
 	let loc = pat.pat_loc in
@@ -605,7 +605,7 @@ and dfmla env e = match e.pp_desc with
       let f1 = dfmla env f1 in
       Fnamed (x, f1)
   | PPvar x -> 
-      Fvar (find_prop x env.th)      
+      Fvar (find_prop x env.th).pr_fmla 
   | PPconst _ | PPcast _ ->
       error ~loc:e.pp_loc PredicateExpected
 
@@ -788,7 +788,7 @@ let add_types loc dl th =
     let tsl = 
       M.fold (fun x _ tsl -> let ts = visit x in (ts, Tabstract) :: tsl) def []
     in
-    add_decl th (create_type tsl)
+    add_decl th (create_ty_decl tsl)
   in
   let decl d = 
     let ts, th' = match Hashtbl.find tysymbols d.td_ident.id with
@@ -799,7 +799,7 @@ let add_types loc dl th =
 	  let vars = th'.utyvars in
 	  List.iter 
 	    (fun v -> 
-	       Hashtbl.add vars v.id_short (create_type_var ~user:true v)) 
+	       Hashtbl.add vars v.id_short (create_ty_decl_var ~user:true v)) 
 	    ts.ts_args;
 	  ts, th'
     in
@@ -818,7 +818,7 @@ let add_types loc dl th =
     ts, d
   in
   let dl = List.map decl dl in
-  add_decl th (create_type dl)
+  add_decl th (create_ty_decl dl)
 
 let env_of_vsymbol_list vl =
   List.fold_left (fun env v -> M.add v.vs_name.id_short v env) M.empty vl
@@ -841,12 +841,12 @@ let add_logics loc dl th =
       | None -> (* predicate *)
 	  let ps = create_psymbol v pl in
 	  Hashtbl.add psymbols id ps;
-	  add_decl th (create_logic [Lpredicate (ps, None)])
+	  add_decl th (create_logic_decl [Lpredicate (ps, None)])
       | Some t -> (* function *)
 	  let t = type_ty (None, t) in
 	  let fs = create_fsymbol v pl t in
 	  Hashtbl.add fsymbols id fs;
-	  add_decl th (create_logic [Lfunction (fs, None)])
+	  add_decl th (create_logic_decl [Lfunction (fs, None)])
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
@@ -900,7 +900,7 @@ let add_logics loc dl th =
         Lfunction (fs, defn)
   in
   let dl = List.map type_decl dl in
-  add_decl th (create_logic dl)
+  add_decl th (create_logic_decl dl)
 
 
 let term env t =
@@ -916,7 +916,7 @@ let fmla env f =
 let add_prop k loc s f th =
   let f = fmla th f in
   try
-    add_decl th (create_prop k (id_user s.id loc) f)
+    add_decl th (create_prop_decl k (create_prop (id_user s.id loc) f))
   with ClashSymbol _ ->
     error ~loc (Clash s.id)
 
@@ -991,15 +991,15 @@ let add_inductive loc id tyl cl th =
   let denv = create_denv th in
   let pl = List.map (fun ty -> ty_of_dty (dty denv ty)) tyl in
   let ps = create_psymbol (id_user id.id loc) pl in
-  let th' = add_decl th (create_logic [Lpredicate (ps, None)]) in
+  let th' = add_decl th (create_logic_decl [Lpredicate (ps, None)]) in
   let clause (id, f) = 
     let loc = f.pp_loc in
     let f' = fmla th' f in
     check_clausal_form loc ps f';
-    id_user id.id id.id_loc, f'
+    create_prop (id_user id.id id.id_loc) f'
   in
   let cl = List.map clause cl in
-  add_decl th (create_ind ps cl)
+  add_decl th (create_ind_decl [(ps,cl)])
 
 let find_in_loadpath env f =
   let rec find c lp = match lp, c with

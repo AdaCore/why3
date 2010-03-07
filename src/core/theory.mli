@@ -21,6 +21,19 @@ open Ident
 open Ty
 open Term
 
+(** Named propositions *)
+
+type prop = private {
+  pr_name : ident;
+  pr_fmla : fmla;
+}
+
+module Spr : Set.S with type elt = prop
+module Mpr : Map.S with type key = prop
+module Hpr : Hashtbl.S with type key = prop
+
+val create_prop : preid -> fmla -> prop
+
 (** Declarations *)
 
 (* type declaration *)
@@ -51,7 +64,7 @@ val ps_defn_axiom : ps_defn -> fmla
 
 (* inductive predicate declaration *)
 
-type ind_decl = lsymbol * (ident * fmla) list
+type ind_decl = lsymbol * prop list
 
 (* proposition declaration *)
 
@@ -60,7 +73,7 @@ type prop_kind =
   | Plemma
   | Pgoal
 
-type prop_decl = prop_kind * ident * fmla
+type prop_decl = prop_kind * prop
 
 (** Context and Theory *)
 
@@ -78,7 +91,7 @@ and namespace = private {
   ns_ts : tysymbol Mnm.t;   (* type symbols *)
   ns_ls : lsymbol Mnm.t;    (* logic symbols *)
   ns_ns : namespace Mnm.t;  (* inner namespaces *)
-  ns_pr : fmla Mnm.t;       (* propositions *)
+  ns_pr : prop Mnm.t;       (* propositions *)
 }
 
 and context = private {
@@ -93,19 +106,19 @@ and decl = private {
 }
 
 and decl_node =
-  | Dtype  of ty_decl list      (* mutually recursive types *)
-  | Dlogic of logic_decl list   (* mutually recursive functions/predicates *)
-  | Dind   of ind_decl          (* inductive predicate *)
+  | Dtype  of ty_decl list      (* recursive types *)
+  | Dlogic of logic_decl list   (* recursive functions/predicates *)
+  | Dind   of ind_decl list     (* inductive predicates *)
   | Dprop  of prop_decl         (* axiom / lemma / goal *)
   | Duse   of theory                (* depend on a theory *)
   | Dclone of (ident * ident) list  (* replicate a theory *)
 
 (** Declaration constructors *)
 
-val create_type : ty_decl list -> decl
-val create_logic : logic_decl list -> decl
-val create_prop : prop_kind -> preid -> fmla -> decl
-val create_ind : lsymbol -> (preid * fmla) list -> decl
+val create_ty_decl : ty_decl list -> decl
+val create_logic_decl : logic_decl list -> decl
+val create_ind_decl : ind_decl list -> decl
+val create_prop_decl : prop_kind -> prop -> decl
 
 (* exceptions *)
 
