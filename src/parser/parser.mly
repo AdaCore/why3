@@ -184,25 +184,30 @@ list0_decl:
 ;
 
 ident:
-| lident_string { { id = $1; id_loc = loc () } }
-| UIDENT        { { id = $1; id_loc = loc () } }
+| uident { $1 }
+| lident { $1 }
+;
+
+ident_rich:
+| uident      { $1 }
+| lident_rich { $1 }
 ;
 
 lident:
-| lident_string
+| LIDENT
     { { id = $1; id_loc = loc () } }
 ;
 
-lident_string:
-| LIDENT                        
+lident_rich:
+| lident
     { $1 }
 | LEFTPAR UNDERSCORE lident_op UNDERSCORE RIGHTPAR 
-    { infix $3 }
+    { { id = infix $3; id_loc = loc () } }
 | LEFTPAR lident_op UNDERSCORE RIGHTPAR 
-    { prefix $2 }
+    { { id = prefix $2; id_loc = loc () } }
 /*
 | LEFTPAR UNDERSCORE lident_op RIGHTPAR 
-    { postfix $3 }
+    { { id = postfix $3; id_loc = loc () } }
 */
 ;
 
@@ -238,9 +243,13 @@ any_qualid:
 | any_qualid DOT ident { Qdot ($1, $3) }
 ;
 
+tqualid:
+| uident                { Qident $1 }
+| any_qualid DOT uident { Qdot ($1, $3) }
+
 qualid:
-| ident             { Qident $1 }
-| uqualid DOT ident { Qdot ($1, $3) }
+| ident_rich             { Qident $1 }
+| uqualid DOT ident_rich { Qdot ($1, $3) }
 
 params:
 | /* epsilon */                          { [] }
@@ -272,7 +281,7 @@ logic_def_option:
 ;
 
 logic_decl:
-| LOGIC lident params logic_type_option logic_def_option
+| LOGIC lident_rich params logic_type_option logic_def_option
   { { ld_loc = loc (); ld_ident = $2; ld_params = $3; 
       ld_type = $4; ld_def = $5; } }
 ;
@@ -293,7 +302,7 @@ list1_type_decl:
 ;
 
 inductive_decl:
-| INDUCTIVE lident primitive_types inddefn
+| INDUCTIVE lident_rich primitive_types inddefn
   { { in_loc = loc (); in_ident = $2; in_params = $3; in_def = $4 } }
 
 list1_inductive_decl:
@@ -512,9 +521,9 @@ list1_lident_sep_comma:
 ;
 
 use:
-| imp_exp any_qualid              
+| imp_exp tqualid              
     { { use_theory = $2; use_as = None; use_imp_exp = $1 } }
-| imp_exp any_qualid AS uident
+| imp_exp tqualid AS uident
     { { use_theory = $2; use_as = Some $4; use_imp_exp = $1 } }
 ;
 
