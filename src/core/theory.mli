@@ -95,10 +95,10 @@ and namespace = private {
 }
 
 and context = private {
-  ctxt_decls : (decl * context) option;
-  ctxt_known : decl Mid.t;
+  ctxt_decls  : (decl * context) option;
+  ctxt_known  : decl Mid.t;
   ctxt_cloned : Sid.t Mid.t;
-  ctxt_tag   : int;
+  ctxt_tag    : int;
 }
 
 and decl = private {
@@ -111,8 +111,8 @@ and decl_node =
   | Dlogic of logic_decl list   (* recursive functions/predicates *)
   | Dind   of ind_decl list     (* inductive predicates *)
   | Dprop  of prop_decl         (* axiom / lemma / goal *)
-  | Duse   of theory                (* depend on a theory *)
-  | Dclone of (ident * ident) list  (* replicate a theory *)
+  | Duse   of theory                         (* depend on a theory *)
+  | Dclone of theory * (ident * ident) list  (* replicate a theory *)
 
 (** Declaration constructors *)
 
@@ -120,6 +120,7 @@ val create_ty_decl : ty_decl list -> decl
 val create_logic_decl : logic_decl list -> decl
 val create_ind_decl : ind_decl list -> decl
 val create_prop_decl : prop_kind -> prop -> decl
+
 val create_prop_and_decl : prop_kind -> preid -> fmla -> decl
 
 (* exceptions *)

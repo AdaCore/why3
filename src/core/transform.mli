@@ -113,7 +113,7 @@ val elt_of_oelt :
   ind:(ind_decl list -> decl list) ->
   prop:(prop_decl -> decl list) ->
   use:(theory -> decl list) ->
-  clone:((ident * ident) list -> decl list) ->
+  clone:(theory -> (ident * ident) list -> decl list) ->
   (decl -> decl list)
 
 

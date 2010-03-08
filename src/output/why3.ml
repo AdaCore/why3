@@ -303,10 +303,10 @@ let print_decl fmt d = match d.d_node with
       fprintf fmt "@[<hov 2>%a %a@]" print_pkind k print_prop pr;
       forget_tvs ()
   | Duse th ->
-      fprintf fmt "@[<hov 2>(* use export %a *)@]" print_id th.th_name
-  | Dclone inst ->
-      fprintf fmt "@[<hov 2>(* clone with %a *)@]"
-      (print_list comma print_inst) inst
+      fprintf fmt "@[<hov 2>(* use %a *)@]" print_id th.th_name
+  | Dclone (th,inst) ->
+      fprintf fmt "@[<hov 2>(* clone %a with %a *)@]"
+        print_id th.th_name (print_list comma print_inst) inst
 
 (* let print_decl fmt d = fprintf fmt "%a@\n" print_decl d *)
 

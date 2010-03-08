@@ -160,7 +160,7 @@ let elt_of_oelt ~ty ~logic ~ind ~prop ~use ~clone d =
     | Dind l -> ind l 
     | Dprop p -> prop p
     | Duse th -> use th
-    | Dclone c -> clone c
+    | Dclone (th,c) -> clone th c
 
 let fold_context_of_decl f ctxt env ctxt_done d =
   let env,decls = f ctxt env d in

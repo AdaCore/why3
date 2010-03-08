@@ -174,7 +174,8 @@ let print_decl fmt d = match d.d_node with
         print_ident pr.pr_name
         print_fmla pr.pr_fmla
   | Duse u -> fprintf fmt "use export %a@\n" print_ident u.th_name
-  | Dclone il -> fprintf fmt "(*@[<hov 2>clone export _ with %a@]@\n" 
+  | Dclone (th,il) -> fprintf fmt "(*@[<hov 2>clone export %a with %a@]@\n" 
+      print_ident th.th_name
       (print_list comma (print_pair_delim nothing nothing equal print_ident print_ident)) il 
 
 let print_decl_list fmt de = 

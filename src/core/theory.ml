@@ -143,10 +143,10 @@ and namespace = {
 }
 
 and context = {
-  ctxt_decls : (decl * context) option;
-  ctxt_known : decl Mid.t;
+  ctxt_decls  : (decl * context) option;
+  ctxt_known  : decl Mid.t;
   ctxt_cloned : Sid.t Mid.t;
-  ctxt_tag   : int;
+  ctxt_tag    : int;
 }
 
 and decl = {
@@ -159,8 +159,8 @@ and decl_node =
   | Dlogic of logic_decl list   (* recursive functions/predicates *)
   | Dind   of ind_decl list     (* inductive predicates *)
   | Dprop  of prop_decl         (* axiom / lemma / goal *)
-  | Duse   of theory                (* depend on a theory *)
-  | Dclone of (ident * ident) list  (* replicate a theory *)
+  | Duse   of theory                         (* depend on a theory *)
+  | Dclone of theory * (ident * ident) list  (* replicate a theory *)
 
 (** Declarations *)
 
@@ -219,10 +219,11 @@ module Decl = struct
     | Dprop (Paxiom,pr) -> Hashcons.combine 7  pr.pr_name.id_tag
     | Dprop (Plemma,pr) -> Hashcons.combine 11 pr.pr_name.id_tag
     | Dprop (Pgoal, pr) -> Hashcons.combine 13 pr.pr_name.id_tag
-    | Duse th -> 17 * th.th_name.id_tag
-    | Dclone sl ->
+    | Duse th -> Hashcons.combine 17 th.th_name.id_tag
+    | Dclone (th,sl) ->
+        let tag = Hashcons.combine 19 th.th_name.id_tag in
         let hs_pair (i1,i2) = Hashcons.combine i1.id_tag i2.id_tag in
-        Hashcons.combine_list hs_pair 19 sl
+        Hashcons.combine_list hs_pair tag sl
 
   let tag n d = { d with d_tag = n }
 
@@ -241,9 +242,10 @@ let create_ty_decl tdl = Hdecl.hashcons (mk_decl (Dtype tdl))
 let create_logic_decl ldl = Hdecl.hashcons (mk_decl (Dlogic ldl))
 let create_ind_decl indl = Hdecl.hashcons (mk_decl (Dind indl))
 let create_prop_decl k p = Hdecl.hashcons (mk_decl (Dprop (k, p)))
-let create_prop_and_decl k preid f = Hdecl.hashcons (mk_decl (Dprop (k, create_prop preid f)))
 let create_use_decl th = Hdecl.hashcons (mk_decl (Duse th))
-let create_clone_decl sl = Hdecl.hashcons (mk_decl (Dclone sl))
+let create_clone_decl th sl = Hdecl.hashcons (mk_decl (Dclone (th,sl)))
+
+let create_prop_and_decl k n f = create_prop_decl k (create_prop n f)
 
 exception ConstructorExpected of lsymbol
 exception UnboundTypeVar of ident
@@ -347,18 +349,16 @@ module Context = struct
   }
 
   let push_decl ctxt kn d =
-    (* get the set of prototype symbols represented by [id] *)
     let get_cl m id = try Mid.find id m with Not_found -> Sid.empty in
-    (* add a new association: [id'] represents [id] *)
-    let add_cl m (id,id') =
-      (* from now on [id'] represents [id] and everything
-       * that [id] represented at the moment of cloning *)
-      Mid.add id' (Sid.add id (Sid.union (get_cl m id) (get_cl m id'))) m
+    let add_cl th m' (id,id') =
+      let m = th.th_ctxt.ctxt_cloned in
+      Mid.add id' (Sid.add id (Sid.union (get_cl m id) (get_cl m' id'))) m'
     in
     let cloned = match d.d_node with
-      | Dclone l -> List.fold_left add_cl ctxt.ctxt_cloned l
-      | _ -> ctxt.ctxt_cloned in
-    Hctxt.hashcons 
+      | Dclone (th,sl) -> List.fold_left (add_cl th) ctxt.ctxt_cloned sl
+      | _ -> ctxt.ctxt_cloned
+    in
+    Hctxt.hashcons
       { ctxt with
           ctxt_decls = Some (d, ctxt);
           ctxt_known = kn;
@@ -658,9 +658,9 @@ module Context = struct
     Spr.iter check_pr inst.inst_goal;
     cl, ctxt_fold (cl_add_decl cl inst) [] th.th_ctxt
 
-  let add_final ctxt cl =
+  let add_final ctxt th cl =
     let add id id' acc = (id,id') :: acc in
-    let d = create_clone_decl (Hid.fold add cl.id_table []) in
+    let d = create_clone_decl th (Hid.fold add cl.id_table []) in
     add_decl ctxt d
 
   let add_clone ctxt th inst =
@@ -670,7 +670,7 @@ module Context = struct
     in
     let cl, decls = clone_theory th inst in
     let ctxt = List.fold_left add_decl ctxt decls in
-    cl, add_final ctxt cl
+    cl, add_final ctxt th cl
 
   let clone_export ctxt th inst =
     let add_decl ctxt d = match d.d_node with
@@ -679,7 +679,7 @@ module Context = struct
     in
     let cl, decls = clone_theory th inst in
     let ctxt = List.fold_left add_decl ctxt decls in
-    add_final ctxt cl
+    add_final ctxt th cl
 
   let use_export ctxt th = use_export false ctxt th
 
@@ -881,8 +881,8 @@ let print_uc fmt uc = print_namespace fmt (Theory.get_namespace uc)
 
 let print_ctxt fmt ctxt =
   fprintf fmt "@[<hov 2>ctxt : cloned : %a@]"
-    (Pp.print_iter2 Mid.iter Pp.semi (Pp.constant_string "->") 
-    print_ident (Pp.print_iter1 Sid.iter Pp.simple_comma print_ident)) 
+    (Pp.print_iter2 Mid.iter Pp.semi (Pp.constant_string "->")
+    print_ident (Pp.print_iter1 Sid.iter Pp.simple_comma print_ident))
     ctxt.ctxt_cloned
 
 let print_th fmt th = fprintf fmt "<theory (TODO>"
