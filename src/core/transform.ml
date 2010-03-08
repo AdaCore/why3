@@ -79,7 +79,8 @@ let fold_up ?clear f_fold v_empty =
          let env = f_fold ctxt env desc in
          Hashtbl.add memo_t ctxt.ctxt_tag env;
          env) env todo in
-  let rec f todo ctxt =
+  let rec f todo ctxt = assert false
+(*
     match ctxt.ctxt_decls with
       | None -> rewind v_empty todo
       | Some (decls,ctxt2) ->
@@ -87,6 +88,7 @@ let fold_up ?clear f_fold v_empty =
             let env = Hashtbl.find memo_t ctxt2.ctxt_tag in
             rewind env ((decls,ctxt)::todo)
           with Not_found -> f ((decls,ctxt)::todo) ctxt2
+*)
   in
   t (f []) clear (fun () -> Hashtbl.clear memo_t)
 
@@ -107,12 +109,13 @@ let fold_bottom_up ?tag ?clear ~top ~down f_fold v_empty =
              Hashtbl.add memo_t (ctxt.ctxt_tag,tag_env v) env_down;
              env_down
         ) in
-  let rec f ldone v ctxt =
+  let rec f ldone v ctxt = assert false
+(*
     match ctxt.ctxt_decls with
       | None -> rewind ldone (top v)
       | Some(d,ctxt2) ->
           let v,res = f_fold ctxt v d in
-          tag_memo f (res::ldone) v ctxt2 in
+          tag_memo f (res::ldone) v ctxt2 *) in
   let memo_t = Hashtbl.create 16 in
   t (memo (f [] v_empty) ctxt_tag memo_t) clear (fun () -> tag_clear ();Hashtbl.clear memo_t)
 
@@ -123,7 +126,7 @@ let fold_bottom ?tag ?clear f_fold v_empty =
   fold_bottom_up ?tag ?clear ~top ~down f_fold v_empty
 
 let fold_map_up ?clear f_fold v_empty =
-  let v_empty = v_empty,empty_context in
+  let v_empty = v_empty,create_context in
   let f_fold ctxt (env,ctxt2) decl = f_fold ctxt env ctxt2 decl in
   conv_res (fold_up ?clear f_fold v_empty) snd
 
@@ -136,7 +139,7 @@ let elt ?clear f_elt =
 
 
 let fold_map_bottom ?tag ?clear f_fold v_empty =
-  let top _ = empty_context in
+  let top _ = create_context in
   let down = (List.fold_left add_decl) in
   fold_bottom_up ?tag ?clear ~top ~down f_fold v_empty
     
@@ -176,7 +179,7 @@ let split_goals =
           (add_decl ctxt d1,
            (add_decl ctxt d2)::l)
       | _ -> (add_decl ctxt decl,l) in
-  let g = fold_up f (empty_context,[]) in
+  let g = fold_up f (create_context,[]) in
   conv_res g snd
 
 let extract_goals =
@@ -188,7 +191,7 @@ let extract_goals =
           (add_decl ctxt d,
            (f.pr_name,f.pr_fmla,ctxt)::l)
       | _ -> (add_decl ctxt decl,l) in
-  let g = fold_up f (empty_context,[]) in
+  let g = fold_up f (create_context,[]) in
   conv_res g snd
 
 

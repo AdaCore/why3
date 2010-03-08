@@ -89,7 +89,7 @@ let extract_goals ctxt =
 
 let transform env l =
   let l = List.map 
-    (fun t -> t, Context.use_export Context.empty_context t) 
+    (fun t -> t, Context.use_export Context.create_context t) 
       (Typing.list_theory l) in
   let l = Transform.apply transformation l in
   if !print_stdout then 

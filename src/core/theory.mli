@@ -90,12 +90,13 @@ type theory = private {
 and namespace = private {
   ns_ts : tysymbol Mnm.t;   (* type symbols *)
   ns_ls : lsymbol Mnm.t;    (* logic symbols *)
-  ns_ns : namespace Mnm.t;  (* inner namespaces *)
   ns_pr : prop Mnm.t;       (* propositions *)
+  ns_ns : namespace Mnm.t;  (* inner namespaces *)
 }
 
 and context = private {
-  ctxt_decls  : (decl * context) option;
+  ctxt_decl   : decl;
+  ctxt_prev   : context option;
   ctxt_known  : decl Mid.t;
   ctxt_cloned : Sid.t Mid.t;
   ctxt_tag    : int;
@@ -146,7 +147,7 @@ val empty_inst : th_inst
 
 module Context : sig
 
-  val empty_context : context
+  val create_context : context
 
   val add_decl : context -> decl -> context
 
@@ -170,6 +171,8 @@ module Context : sig
 end
 
 (** Theory constructors and utilities *)
+
+val builtin_theory : theory
 
 type theory_uc  (* a theory under construction *)
 

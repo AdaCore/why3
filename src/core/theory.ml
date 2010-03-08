@@ -1,4 +1,4 @@
-(**************************************************************************)
+
 (*                                                                        *)
 (*  Copyright (C) 2010-                                                   *)
 (*    Francois Bobot                                                      *)
@@ -138,12 +138,13 @@ type theory = {
 and namespace = {
   ns_ts : tysymbol Mnm.t;   (* type symbols *)
   ns_ls : lsymbol Mnm.t;    (* logic symbols *)
-  ns_ns : namespace Mnm.t;  (* inner namespaces *)
   ns_pr : prop Mnm.t;       (* propositions *)
+  ns_ns : namespace Mnm.t;  (* inner namespaces *)
 }
 
 and context = {
-  ctxt_decls  : (decl * context) option;
+  ctxt_decl   : decl;
+  ctxt_prev   : context option;
   ctxt_known  : decl Mid.t;
   ctxt_cloned : Sid.t Mid.t;
   ctxt_tag    : int;
@@ -292,40 +293,70 @@ let create_logic_decl ldl =
   List.iter check_decl ldl;
   create_logic_decl ldl
 
-(** Built-in symbols *)
 
-let builtin_ts = [ts_int; ts_real]
-let builtin_type =
-  let decl ts = ts.ts_name, ts, create_ty_decl [ts, Tabstract] in
-  List.map decl builtin_ts
-
-let builtin_ls = [ps_equ; ps_neq]
-let builtin_logic =
-  let decl ls = ls.ls_name, ls, create_logic_decl [Lpredicate (ls, None)] in
-  List.map decl builtin_ls
-
-let builtin_known =
-  let add l = List.fold_right (fun (n,_,d) -> Mid.add n d) l in
-  add builtin_logic (add builtin_type Mid.empty)
-
-
-(** Context constructors and utilities *)
+(** Built-in theory *)
 
 module Ctxt = struct
   type t = context
 
-  let equal a b = match a.ctxt_decls, b.ctxt_decls with
-    | Some (da, na), Some (db, nb) -> da == db && na == nb
-    | None, None -> true
-    | _ -> false
+  let equal a b = a.ctxt_decl == b.ctxt_decl &&
+    match a.ctxt_prev, b.ctxt_prev with
+      | Some na, Some nb -> na == nb
+      | None, None -> true
+      | _ -> false
 
-  let hash ctxt = match ctxt.ctxt_decls with
-    | Some (d,n) -> 1 + (Hashcons.combine n.ctxt_tag d.d_tag)
-    | None -> 0
+  let hash ctxt =
+    let prev = match ctxt.ctxt_prev with
+      | Some ctxt -> 1 + ctxt.ctxt_tag
+      | None -> 0
+    in
+    Hashcons.combine ctxt.ctxt_decl.d_tag prev
 
   let tag i ctxt = { ctxt with ctxt_tag = i }
 end
 module Hctxt = Hashcons.Make(Ctxt)
+
+let mk_context decl prev known cloned = Hctxt.hashcons {
+  ctxt_decl = decl;
+  ctxt_prev = prev;
+  ctxt_known = known;
+  ctxt_cloned = cloned;
+  ctxt_tag = -1;
+}
+
+let builtin_theory =
+  let decl_int  = create_ty_decl [ts_int, Tabstract] in
+  let decl_real = create_ty_decl [ts_real, Tabstract] in
+  let decl_equ  = create_logic_decl [Lpredicate (ps_equ, None)] in
+  let decl_neq  = create_logic_decl [Lpredicate (ps_neq, None)] in
+
+  let kn_int    = Mid.add ts_int.ts_name decl_int Mid.empty in
+  let kn_real   = Mid.add ts_real.ts_name decl_real kn_int in
+  let kn_equ    = Mid.add ps_equ.ls_name decl_equ kn_real in
+  let kn_neq    = Mid.add ps_neq.ls_name decl_neq kn_equ in
+
+  let ctxt_int  = mk_context decl_int None kn_int Mid.empty in
+  let ctxt_real = mk_context decl_real (Some ctxt_int) kn_real Mid.empty in
+  let ctxt_equ  = mk_context decl_equ (Some ctxt_real) kn_equ Mid.empty in
+  let ctxt_neq  = mk_context decl_neq (Some ctxt_equ) kn_neq Mid.empty in
+
+  let ns_int    = Mnm.add ts_int.ts_name.id_short ts_int Mnm.empty in
+  let ns_real   = Mnm.add ts_real.ts_name.id_short ts_real ns_int in
+  let ns_equ    = Mnm.add ps_equ.ls_name.id_short ps_equ Mnm.empty in
+  let ns_neq    = Mnm.add ps_neq.ls_name.id_short ps_neq ns_equ in
+
+  let export = {  ns_ts = ns_real;    ns_ls = ns_neq;
+                  ns_pr = Mnm.empty;  ns_ns = Mnm.empty } in
+
+  { th_name   = id_register (id_fresh "BuiltIn");
+    th_ctxt   = ctxt_neq;
+    th_export = export;
+    th_local  = Sid.empty }
+
+let use_builtin = create_use_decl builtin_theory
+
+
+(** Context constructors and utilities *)
 
 type th_inst = {
   inst_ts    : tysymbol Mts.t;
@@ -343,12 +374,10 @@ let empty_inst = {
 
 module Context = struct
 
-  let empty_context = Hctxt.hashcons {
-    ctxt_decls  = None;
-    ctxt_known  = builtin_known;
-    ctxt_cloned = Mid.empty;
-    ctxt_tag    = -1;
-  }
+  let create_context =
+    let known = builtin_theory.th_ctxt.ctxt_known in
+    let known = Mid.add builtin_theory.th_name use_builtin known in
+    mk_context use_builtin None known Mid.empty
 
   let push_decl ctxt kn d =
     let get_cl m id = try Mid.find id m with Not_found -> Sid.empty in
@@ -361,11 +390,7 @@ module Context = struct
           List.fold_left (add_cl m) ctxt.ctxt_cloned sl
       | _ -> ctxt.ctxt_cloned
     in
-    Hctxt.hashcons { ctxt with
-      ctxt_decls  = Some (d, ctxt);
-      ctxt_known  = kn;
-      ctxt_cloned = cloned;
-    }
+    mk_context d (Some ctxt) kn cloned
 
   (* Manage known symbols *)
 
@@ -463,13 +488,17 @@ module Context = struct
 
   (* Generic utilities *)
 
-  let rec ctxt_fold fn acc ctxt = match ctxt.ctxt_decls with
-    | Some (d, ctxt) -> ctxt_fold fn (fn acc d) ctxt
-    | None -> acc
+  let rec ctxt_fold fn acc ctxt =
+    let acc = fn acc ctxt.ctxt_decl in
+    match ctxt.ctxt_prev with
+      | Some ctxt -> ctxt_fold fn acc ctxt
+      | None -> acc
 
-  let rec ctxt_iter fn ctxt = match ctxt.ctxt_decls with
-    | Some (d, ctxt) -> fn d; ctxt_iter fn ctxt
-    | None -> ()
+  let rec ctxt_iter fn ctxt =
+    fn ctxt.ctxt_decl;
+    match ctxt.ctxt_prev with
+      | Some ctxt -> ctxt_iter fn ctxt
+      | None -> ()
 
   let get_decls ctxt = ctxt_fold (fun acc d -> d::acc) [] ctxt
 
@@ -740,17 +769,13 @@ module Theory = struct
     | _ ->
         assert false
 
-  let builtin_ns =
-    let add fn = List.fold_right (fun (id,s,_) -> fn true id.id_short s) in
-    add add_ls builtin_logic (add add_ts builtin_type empty_ns)
-
   (* Manage theories *)
 
   let create_theory n = {
     uc_name   = n;
-    uc_ctxt   = Context.empty_context;
-    uc_import = [builtin_ns];
-    uc_export = [empty_ns];
+    uc_ctxt   = Context.create_context;
+    uc_import = [empty_ns];
+    uc_export = [builtin_theory.th_export];
     uc_local  = Sid.empty;
   }
 
