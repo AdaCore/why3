@@ -422,6 +422,10 @@ else
     fi
 fi
 
+#Viewer for ps and pdf
+AC_CHECK_PROGS(PSVIEWER,gv evince)
+AC_CHECK_PROGS(PDFVIEWER,xpdf acroread evince)
+
 # substitutions to perform
 AC_SUBST(VERBOSEMAKE)
 AC_SUBST(EXE)
@@ -473,6 +477,8 @@ AC_SUBST(MIZARLIB)
 
 AC_SUBST(FORPACK)
 
+AC_SUBST(PSVIEWER)
+AC_SUBST(PDFVIEWER)
 # Finally create the Makefile from Makefile.in
 dnl AC_OUTPUT(Makefile)
 AC_OUTPUT(Makefile bench/bench)

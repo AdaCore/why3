@@ -50,6 +50,8 @@ OCAMLLIB = @OCAMLLIB@
 OCAMLBEST= @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 CAMLP4   = @CAMLP4O@
+PSVIEWER = @PSVIEWER@
+PDFVIEWER = @PDFVIEWER@
 
 INCLUDES = -I src/core -I src/util -I src/parser -I src/output \
            -I src/transform -I src 
@@ -409,8 +411,8 @@ wc:
 
 dep: 
 	$(MAKE) depend
-	cat .depend | ocamldot | dot -Tps > dep.ps
-	gv dep.ps
+	cat .depend | ocamldot | dot -Tpdf > dep.pdf
+	$(PDFVIEWER) dep.pdf
 
 # distrib
 #########

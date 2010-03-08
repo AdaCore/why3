@@ -145,7 +145,7 @@ and namespace = {
 and context = {
   ctxt_decls : (decl * context) option;
   ctxt_known : decl Mid.t;
-  ctxt_cloned : ident list Mid.t;
+  ctxt_cloned : Sid.t Mid.t;
   ctxt_tag   : int;
 }
 
@@ -340,19 +340,23 @@ let empty_inst = {
 module Context = struct
 
   let empty_context = Hctxt.hashcons {
-    ctxt_decls = None;
-    ctxt_known = builtin_known;
+    ctxt_decls  = None;
+    ctxt_known  = builtin_known;
     ctxt_cloned = Mid.empty;
-    ctxt_tag   = -1;
+    ctxt_tag    = -1;
   }
 
   let push_decl ctxt kn d =
+    (* get the set of prototype symbols represented by [id] *)
+    let get_cl m id = try Mid.find id m with Not_found -> Sid.empty in
+    (* add a new association: [id'] represents [id] *)
+    let add_cl m (id,id') =
+      (* from now on [id'] represents [id] and everything
+       * that [id] represented at the moment of cloning *)
+      Mid.add id' (Sid.add id (Sid.union (get_cl m id) (get_cl m id'))) m
+    in
     let cloned = match d.d_node with
-      | Dclone l -> List.fold_left 
-          (fun m (i1,i2) ->
-             let l = try Mid.find i1 m with Not_found -> [] in
-             Mid.add i1 (i2::l) m)
-          ctxt.ctxt_cloned l
+      | Dclone l -> List.fold_left add_cl ctxt.ctxt_cloned l
       | _ -> ctxt.ctxt_cloned in
     Hctxt.hashcons 
       { ctxt with
@@ -878,7 +882,7 @@ let print_uc fmt uc = print_namespace fmt (Theory.get_namespace uc)
 let print_ctxt fmt ctxt =
   fprintf fmt "@[<hov 2>ctxt : cloned : %a@]"
     (Pp.print_iter2 Mid.iter Pp.semi (Pp.constant_string "->") 
-    print_ident (Pp.print_list Pp.simple_comma print_ident)) 
+    print_ident (Pp.print_iter1 Sid.iter Pp.simple_comma print_ident)) 
     ctxt.ctxt_cloned
 
 let print_th fmt th = fprintf fmt "<theory (TODO>"

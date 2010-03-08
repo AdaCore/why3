@@ -12,14 +12,14 @@ type env = { fs : (vsymbol list * term) Mls.t;
 let empty_env = { fs = Mls.empty;
                   ps = Mls.empty}
 open Format
-
+(*
 let print_env fmt env =
   let print_map iter pterm pfs = Pp.print_iter2 iter Pp.newline Pp.comma pfs
     (Pp.print_pair (Pp.print_list Pp.comma Pretty.print_vsymbol) pterm) in
   fprintf fmt "fs:@[<hov>%a@]@\nps:@[<hov>%a@]@\n"
     (print_map Mls.iter Pretty.print_term Pretty.print_lsymbol) env.fs
     (print_map Mls.iter Pretty.print_fmla Pretty.print_lsymbol) env.ps
-
+*)
 let rec replacet env t = 
   let t = substt env t in
   match t.t_node with
