@@ -86,7 +86,9 @@ let extract_goals ctxt =
   Transform.apply Transform.extract_goals ctxt
 
 let transform env l =
-  let l = List.map (fun t -> t,t.th_ctxt) (Typing.list_theory l) in
+  let l = List.map 
+    (fun t -> t, Context.use_export Context.empty_context t) 
+      (Typing.list_theory l) in
   let l = Transform.apply transformation l in
   if !print_stdout then 
     List.iter (fun (t,ctxt) -> Why3.print_context_th std_formatter t.th_name ctxt) l
