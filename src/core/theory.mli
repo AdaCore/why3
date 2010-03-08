@@ -97,7 +97,7 @@ and namespace = private {
 and context = private {
   ctxt_decls : (decl * context) option;
   ctxt_known : decl Mid.t;
-  ctxt_cloned : ident Mid.t;
+  ctxt_cloned : ident list Mid.t;
   ctxt_tag   : int;
 }
 
@@ -194,5 +194,7 @@ end
 
 (** Debugging *)
 
+val print_ident : Format.formatter -> ident -> unit
 val print_uc : Format.formatter -> theory_uc -> unit
+val print_ctxt : Format.formatter -> context -> unit
 val print_th : Format.formatter -> theory -> unit

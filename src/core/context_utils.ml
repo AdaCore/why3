@@ -3,10 +3,14 @@ open Theory
 
 
 let cloned_from ctxt i1 i2 =
+(*  Format.printf "@[<hov 2>cloned (%a = %a)?: %a@]@\n" 
+    print_ident i2 print_ident i1 
+    print_ctxt ctxt;*)
   let rec aux i =
-    i == i2 || (let i3 = Mid.find i1 ctxt.ctxt_cloned in
-                aux i3)
+    i == i1 ||   
+      try 
+        let i3 = Mid.find i ctxt.ctxt_cloned in
+        List.exists aux i3
+      with Not_found -> false
   in
-  try
-    aux i1
-  with Not_found -> false
+  aux i2

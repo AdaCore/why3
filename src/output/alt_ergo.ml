@@ -109,20 +109,27 @@ let ac_th = (Ptree.Qdot
                (Ptree.Qident {Ptree.id = "algebra";id_loc = Loc.dummy_position},
                 {Ptree.id = "AC";id_loc = Loc.dummy_position}))
 
-let is_ac env ctxt ls1 =
+let is_ls env ctxt s ls1 =
   try
     let th = Typing.find_theory env ac_th in
-    let ls2 = Mnm.find "op" th.th_export.ns_ls in
-    if Context_utils.cloned_from ctxt ls1.ls_name ls2.ls_name
-    then "ac " else ""
-  with Loc.Located _ -> ""
+    let ls2 = Mnm.find s th.th_export.ns_ls in
+    Context_utils.cloned_from ctxt ls1.ls_name ls2.ls_name
+  with Loc.Located _ -> assert false
+
+let is_pr env ctxt s pr1 =
+  try
+    let th = Typing.find_theory env ac_th in
+    let pr2 = Mnm.find s th.th_export.ns_pr in
+    Context_utils.cloned_from ctxt pr1.pr_name pr2.pr_name
+  with Loc.Located _ -> assert false
+
 
 let print_logic_decl env ctxt fmt = function
   | Lfunction (ls, None) ->
       let tyl = ls.ls_args in
       let ty = match ls.ls_value with None -> assert false | Some ty -> ty in
       fprintf fmt "@[<hov 2>logic %s%a : %a -> %a@]@\n" 
-        (is_ac env ctxt ls) 
+        (if is_ls env ctxt "op" ls then "ac " else "") 
         print_ident ls.ls_name
 	(print_list comma print_type) tyl print_type ty
   | Lfunction (ls, Some defn) ->
@@ -142,6 +149,9 @@ let print_decl env ctxt fmt d = match d.d_node with
       print_list newline (print_logic_decl env ctxt) fmt dl
   | Dind _ ->
       assert false
+  | Dprop (Paxiom, pr) when 
+      (is_pr env ctxt "Comm" pr
+       || is_pr env ctxt "Assoc" pr) -> ()
   | Dprop (Paxiom, pr) ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n" 
         print_ident pr.pr_name print_fmla pr.pr_fmla

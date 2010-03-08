@@ -145,7 +145,7 @@ and namespace = {
 and context = {
   ctxt_decls : (decl * context) option;
   ctxt_known : decl Mid.t;
-  ctxt_cloned : ident Mid.t;
+  ctxt_cloned : ident list Mid.t;
   ctxt_tag   : int;
 }
 
@@ -347,14 +347,18 @@ module Context = struct
 
   let push_decl ctxt kn d =
     let cloned = match d.d_node with
-      | Dclone l -> List.fold_left (fun m (i1,i2) -> Mid.add i1 i2 m) 
+      | Dclone l -> List.fold_left 
+          (fun m (i1,i2) ->
+             let l = try Mid.find i1 m with Not_found -> [] in
+             Mid.add i1 (i2::l) m)
           ctxt.ctxt_cloned l
       | _ -> ctxt.ctxt_cloned in
-    Hctxt.hashcons { ctxt with
-      ctxt_decls = Some (d, ctxt);
-      ctxt_known = kn;
-      ctxt_cloned = cloned;
-    }
+    Hctxt.hashcons 
+      { ctxt with
+          ctxt_decls = Some (d, ctxt);
+          ctxt_known = kn;
+          ctxt_cloned = cloned;
+      }
 
   (* Manage known symbols *)
 
@@ -869,5 +873,12 @@ let rec print_namespace fmt ns =
   fprintf fmt "@]"
 
 let print_uc fmt uc = print_namespace fmt (Theory.get_namespace uc)
+
+let print_ctxt fmt ctxt =
+  fprintf fmt "@[<hov 2>ctxt : cloned : %a@]"
+    (Pp.print_iter2 Mid.iter Pp.semi (Pp.constant_string "->") 
+    print_ident (Pp.print_list Pp.simple_comma print_ident)) 
+    ctxt.ctxt_cloned
+
 let print_th fmt th = fprintf fmt "<theory (TODO>"
 
