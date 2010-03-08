@@ -22,130 +22,87 @@ open Theory
 open Context
 
 (* the memoisation is inside the function *)
-type ('a,'b) t = { all : 'a -> 'b;
-                   clear : unit -> unit;
+type 'a t = { all : context -> 'a;
+              clear : unit -> unit;
          }
 
+type ctxt_t = context t
+
+
+let conv_res f c = {all = (fun x -> c (f.all x));
+                    clear = f.clear}
 
 let compose f g = {all = (fun x -> g.all (f.all x));
                    clear = (fun () -> f.clear (); g.clear ());
                   }
 
-let conv_arg f c = {all = (fun x -> f.all (c x));
-                    clear = f.clear}
-
-let conv_res f c = {all = (fun x -> c (f.all x));
-                    clear = f.clear}
-
-let conv f c1 c2 = {all = (fun x -> let arg,env = c1 x in
-                           c2 ((f.all arg),env));
-                    clear = f.clear}
-
-let conv_map f m = {all = (fun x -> m f.all x);
-                    clear = f.clear}
-
-
 let apply f x = f.all x
 
 let clear f = f.clear ()
 
-let memo f tag h x =
-  try Hashtbl.find h (tag x)
-  with Not_found ->
-    let r = f x in
-    Hashtbl.add h (tag x) r;
-    r
+let ymemo f tag h =
+  let rec aux x =
+    let t = tag x in
+    try 
+      Hashtbl.find h t
+    with Not_found -> 
+      let r = f aux x in
+      Hashtbl.add h t r;
+      r in
+  aux
 
-let conv_memo f tag = 
-  let h = Hashtbl.create 16 in 
-  {all = memo f.all tag h;
-   clear = (fun () -> Hashtbl.clear h; f.clear ())}
+let memo f tag h = ymemo (fun _ -> f) tag h
 
 let d_tag d = d.d_tag
 let ctxt_tag c = c.ctxt_tag
 
-let t all clear clearf =
+let t ?(clear=(fun () -> ())) all clear_all =
   {all = all;
-   clear = match clear with
-     | None -> clearf
-     | Some clear -> (fun () -> clear ();clear ())
+   clear = (fun () -> clear ();clear_all ())
   }
 
-let fold_up ?clear f_fold v_empty =
+let fold ?clear f_fold v_empty =
   let memo_t = Hashtbl.create 64 in
   let rewind env todo =
     List.fold_left
-      (fun env (desc,ctxt) ->
-         let env = f_fold ctxt env desc in
+      (fun env ctxt ->
+         let env = f_fold ctxt env in
          Hashtbl.add memo_t ctxt.ctxt_tag env;
          env) env todo in
-  let rec f todo ctxt = assert false
-(*
-    match ctxt.ctxt_decls with
+  let rec f todo ctxt = 
+    match ctxt.ctxt_prev with
       | None -> rewind v_empty todo
-      | Some (decls,ctxt2) ->
+      | Some (ctxt2) ->
           try
             let env = Hashtbl.find memo_t ctxt2.ctxt_tag in
-            rewind env ((decls,ctxt)::todo)
-          with Not_found -> f ((decls,ctxt)::todo) ctxt2
-*)
+            rewind env (ctxt::todo)
+          with Not_found -> f (ctxt::todo) ctxt2
   in
-  t (f []) clear (fun () -> Hashtbl.clear memo_t)
+  t ?clear (f []) (fun () -> Hashtbl.clear memo_t)
 
-
-let fold_bottom_up ?tag ?clear ~top ~down f_fold v_empty =
-  let rewind ldone env_down =
-    List.fold_left down env_down ldone in
-  let tag_clear,tag_memo = match tag with
-    | None -> (fun () -> ()), (fun f ldone v ctxt -> f ldone v ctxt)
-    | Some tag_env ->
-        let memo_t = Hashtbl.create 64 in
-        (fun () -> Hashtbl.clear memo_t),(fun f ldone v ctxt ->
-           try
-             let env_down = Hashtbl.find memo_t (ctxt.ctxt_tag,tag_env v) in
-             rewind ldone env_down
-           with Not_found ->
-             let env_down = f ldone v ctxt in
-             Hashtbl.add memo_t (ctxt.ctxt_tag,tag_env v) env_down;
-             env_down
-        ) in
-  let rec f ldone v ctxt = assert false
-(*
-    match ctxt.ctxt_decls with
-      | None -> rewind ldone (top v)
-      | Some(d,ctxt2) ->
-          let v,res = f_fold ctxt v d in
-          tag_memo f (res::ldone) v ctxt2 *) in
-  let memo_t = Hashtbl.create 16 in
-  t (memo (f [] v_empty) ctxt_tag memo_t) clear (fun () -> tag_clear ();Hashtbl.clear memo_t)
-
-let fold_bottom ?tag ?clear f_fold v_empty =
-  let top x = x in
-  let down x () = x in
-  let f_fold ctxt env d = f_fold ctxt env d, () in
-  fold_bottom_up ?tag ?clear ~top ~down f_fold v_empty
-
-let fold_map_up ?clear f_fold v_empty =
+let fold_map ?clear f_fold v_empty =
   let v_empty = v_empty,create_context in
-  let f_fold ctxt (env,ctxt2) decl = f_fold ctxt env ctxt2 decl in
-  conv_res (fold_up ?clear f_fold v_empty) snd
+  let f_fold ctxt (env,ctxt2) = f_fold ctxt ctxt2 env in
+  conv_res (fold ?clear f_fold v_empty) snd
+
+let map ?clear f_map =
+  fold_map ?clear (fun ctxt1 ctxt2 () -> (),f_map ctxt1 ctxt2) ()
+
+let map_concat ?clear f_elt = 
+  let f_elt ctxt0 ctxt = 
+    List.fold_left add_decl ctxt (f_elt ctxt0) in
+  map ?clear f_elt
+
 
 let elt ?clear f_elt = 
   let memo_elt = Hashtbl.create 64 in
-  let f_elt _ () ctx x = (),
-    List.fold_left add_decl ctx (memo f_elt d_tag memo_elt x) in
-  let f = fold_map_up ?clear f_elt () in
+  let f_elt ctxt0 = memo f_elt d_tag memo_elt ctxt0.ctxt_decl in
+  let f = map_concat ?clear f_elt in
   {f with clear = fun () -> Hashtbl.clear memo_elt; f.clear ()}
-
-
-let fold_map_bottom ?tag ?clear f_fold v_empty =
-  let top _ = create_context in
-  let down = (List.fold_left add_decl) in
-  fold_bottom_up ?tag ?clear ~top ~down f_fold v_empty
     
-let all ?clear f =
+let register ?clear f =
   let memo_t = Hashtbl.create 16 in
-  t (memo f ctxt_tag memo_t) clear (fun () -> Hashtbl.clear memo_t)
+  t ?clear (memo f ctxt_tag memo_t) (fun () -> Hashtbl.clear memo_t)
 
 (* Utils *)
 
@@ -170,7 +127,8 @@ let fold_context_of_decl f ctxt env ctxt_done d =
   env,List.fold_left add_decl ctxt_done decls
   
 let split_goals =
-  let f _ (ctxt,l) decl = 
+  let f ctxt0 (ctxt,l) =
+    let decl = ctxt0.ctxt_decl in
     match decl.d_node with
       | Dprop (Pgoal,_) -> (ctxt,(add_decl ctxt decl)::l)
       | Dprop (Plemma,f) ->
@@ -179,11 +137,12 @@ let split_goals =
           (add_decl ctxt d1,
            (add_decl ctxt d2)::l)
       | _ -> (add_decl ctxt decl,l) in
-  let g = fold_up f (create_context,[]) in
+  let g = fold f (create_context,[]) in
   conv_res g snd
 
 let extract_goals =
-  let f _ (ctxt,l) decl = 
+  let f ctxt0 (ctxt,l) =
+    let decl = ctxt0.ctxt_decl in    
     match decl.d_node with
       | Dprop (Pgoal,f) -> (ctxt,(f.pr_name,f.pr_fmla,ctxt)::l)
       | Dprop (Plemma,f) ->
@@ -191,7 +150,7 @@ let extract_goals =
           (add_decl ctxt d,
            (f.pr_name,f.pr_fmla,ctxt)::l)
       | _ -> (add_decl ctxt decl,l) in
-  let g = fold_up f (create_context,[]) in
+  let g = fold f (create_context,[]) in
   conv_res g snd
 
 

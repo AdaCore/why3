@@ -47,15 +47,14 @@ let () =
 
 let in_emacs = Sys.getenv "TERM" = "dumb"
 
-let transformation = 
-  Transform.conv_map
-    (Transform.compose
-       (if !simplify_recursive then Simplify_recursive_definition.t 
-        else Transform.identity)
-       (if !inlining then Inlining.all 
-        else Transform.identity)
-    )
-    (fun f l -> List.map (fun (t,c) -> t,f c) l)
+let transformation l = 
+  List.map (fun (t,c) ->
+              let c = if !simplify_recursive 
+              then Transform.apply Simplify_recursive_definition.t c
+              else c in
+              let c = if !inlining then Transform.apply Inlining.all c
+              else c in
+              (t,c)) l
 
 let rec report fmt = function
   | Lexer.Error e ->
@@ -91,7 +90,7 @@ let transform env l =
   let l = List.map 
     (fun t -> t, Context.use_export Context.create_context t) 
       (Typing.list_theory l) in
-  let l = Transform.apply transformation l in
+  let l = transformation l in
   if !print_stdout then 
     List.iter 
       (fun (t,ctxt) -> Why3.print_context_th std_formatter t.th_name ctxt) l

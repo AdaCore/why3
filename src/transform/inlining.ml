@@ -66,8 +66,9 @@ and replacep env f =
 and substt env d = t_map (replacet env) (replacep env) d
 and substp env d = f_map (replacet env) (replacep env) d
 
-let fold isnotinlinedt isnotinlinedf _ env ctxt d = 
+let fold isnotinlinedt isnotinlinedf ctxt0 ctxt env = 
 (*  Format.printf "I see : %a@\n%a@\n" Pretty.print_decl d print_env env;*)
+  let d = ctxt0.ctxt_decl in
   match d.d_node with
     | Dlogic [l] -> begin
         match l with
@@ -117,7 +118,7 @@ let fold isnotinlinedt isnotinlinedf _ env ctxt d =
     | Duse _ | Dclone _ -> env,add_decl ctxt d
         
 let t ~isnotinlinedt ~isnotinlinedf = 
-  Transform.fold_map_up (fold isnotinlinedt isnotinlinedf) empty_env
+  Transform.fold_map (fold isnotinlinedt isnotinlinedf) empty_env
 
 let all = t ~isnotinlinedt:(fun _ -> false) ~isnotinlinedf:(fun _ -> false)
 
