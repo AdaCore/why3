@@ -1,16 +1,11 @@
 
 (* test file *)
 
-theory Test1
-  use import prelude.Int
-  axiom Ax : forall x :int. x=1 and forall x:int. x=2
-  logic g(x: int) : int = x+2
-end
-
 theory Test
-  use graph.Path
-  use import prelude.List
-  axiom Ax : forall l:int list. l=l
+  use import prelude.Int
+  logic id(x: int) : int = x
+  logic even(x: int) = 2*(x/2) = x
+  goal G : forall x:int. even(4) 
 end
 
 (*

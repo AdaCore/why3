@@ -117,7 +117,7 @@ TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
 	flatten.cmo
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
-OUTPUT_CMO := alt_ergo.cmo why3.cmo
+OUTPUT_CMO := print_real.cmo alt_ergo.cmo why3.cmo
 OUTPUT_CMO := $(addprefix src/output/,$(OUTPUT_CMO))
 
 CMO = $(UTIL_CMO) $(CORE_CMO) src/pretty.cmo $(PARSER_CMO)	\
@@ -126,22 +126,23 @@ CMX = $(CMO:.cmo=.cmx)
 
 bin/why.opt: $(CMX) 
 	echo $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(TRANSFORM_CMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ $^
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ nums.cmxa $^
 	$(STRIP) $@
 
 bin/why.byte: $(CMO) 
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ $^
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ nums.cma $^
 
 bin/why.static: $(CMX) src/why.cmx 
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) -cclib -static $(OFLAGS) -o $@ $^ 
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) -cclib -static $(OFLAGS) -o $@ nums.cmxa $^ 
 	$(STRIP) $@
 
 bin/top: $(CMO)
-	ocamlmktop $(BFLAGS) -o $@ $^
+	ocamlmktop $(BFLAGS) -o $@ nums.cma $^
 
 test: bin/why.byte
 	ocamlrun -bt bin/why.byte --print-stdout -I lib/prelude/ src/test.why
-#	bin/why.byte --alt-ergo -I lib/prelude/ src/test.why
+	bin/why.byte --alt-ergo -I lib/prelude/ src/test.why > ergo.why
+	timeout 3 alt-ergo ergo.why
 
 # graphical interface
 #####################

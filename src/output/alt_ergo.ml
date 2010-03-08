@@ -57,16 +57,15 @@ let rec print_fmla fmt f = match f.f_node with
   | Fapp (ls, tl) ->
       fprintf fmt "%a(%a)" 
 	print_ident ls.ls_name (print_list comma print_term) tl
-  | Fquant (Fforall, fq) ->
+  | Fquant (q, fq) ->
+      let q = match q with Fforall -> "forall" | Fexists -> "exists" in
       let vl, tl, f = f_open_quant fq in
       let forall fmt v = 
-	fprintf fmt "forall %a:%a" print_ident v.vs_name print_type v.vs_ty
+	fprintf fmt "%s %a:%a" q print_ident v.vs_name print_type v.vs_ty
       in
       fprintf fmt "@[<hov2>(%a%a.@ %a)@]" (print_list dot forall) vl
         (print_list alt print_triggers) tl print_fmla f;
       List.iter forget_var vl
-  | Fquant (Fexists, fq) ->
-      assert false (*TODO*)
   | Fbinop (Fand, f1, f2) ->
       fprintf fmt "(%a and %a)" print_fmla f1 print_fmla f2
   | Fbinop (For, f1, f2) ->
@@ -123,8 +122,14 @@ let print_logic_decl env ctxt fmt = function
       fprintf fmt "@[<hov 2>function %a(%a) : %a =@ %a@]@\n" print_ident id
         (print_list comma print_logic_binder) vl print_type ty print_term t;
       List.iter forget_var vl
-  | Lpredicate _ ->
-      assert false (*TODO*)
+  | Lpredicate (ls, None) ->
+      fprintf fmt "@[<hov 2>logic %a : %a -> prop@]"
+	print_ident ls.ls_name (print_list comma print_type) ls.ls_args
+  | Lpredicate (ls, Some fd) ->
+      let _,vl,f = open_ps_defn fd in
+      fprintf fmt "@[<hov 2>predicate %a(%a) = %a@]"
+	print_ident ls.ls_name 
+        (print_list comma print_logic_binder) vl print_fmla f
 
 let print_decl env ctxt fmt d = match d.d_node with
   | Dtype dl ->
@@ -154,4 +159,4 @@ let print_context env fmt ctxt =
 
 let print_goal env fmt (id, f, ctxt) =
   print_context env fmt ctxt;
-  fprintf fmt "@\n@[<hov 2>goal %a : %a@]" print_ident id print_fmla f
+  fprintf fmt "@\n@[<hov 2>goal %a : %a@]@\n" print_ident id print_fmla f

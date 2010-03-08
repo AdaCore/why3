@@ -46,6 +46,7 @@ let () =
     "usage: why [options] files..."
 
 let in_emacs = Sys.getenv "TERM" = "dumb"
+
 let transformation = 
   Transform.conv_map
     (Transform.compose
@@ -74,6 +75,7 @@ let rec report fmt = function
         fprintf fmt "anomaly:@\n%s" (Printexc.to_string e)
       else 
         fprintf fmt "anomaly: %s" (Printexc.to_string e)
+
 let type_file env file =
   let c = open_in file in
   let lb = Lexing.from_channel c in
@@ -91,15 +93,14 @@ let transform env l =
       (Typing.list_theory l) in
   let l = Transform.apply transformation l in
   if !print_stdout then 
-    List.iter (fun (t,ctxt) -> Why3.print_context_th std_formatter t.th_name ctxt) l
+    List.iter 
+      (fun (t,ctxt) -> Why3.print_context_th std_formatter t.th_name ctxt) l
   else if !alt_ergo then match l with
     | (_,ctxt) :: _ -> begin match extract_goals ctxt with
 	| g :: _ -> Alt_ergo.print_goal env std_formatter g
-	| [] -> ()
+	| [] -> eprintf "no goal@."
       end	
     | [] -> ()
-
-	
 
 let () =
   try
