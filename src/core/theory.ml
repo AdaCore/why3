@@ -774,7 +774,7 @@ module Theory = struct
   let create_theory n = {
     uc_name   = n;
     uc_ctxt   = Context.create_context;
-    uc_import = [empty_ns];
+    uc_import = [builtin_theory.th_export];
     uc_export = [builtin_theory.th_export];
     uc_local  = Sid.empty;
   }
