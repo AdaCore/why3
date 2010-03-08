@@ -614,13 +614,40 @@ module Context = struct
     | Duse _ | Dclone _ ->
         d :: acc
 
+  exception NonLocal of ident
+  exception BadInstance of ident * ident
+
   let clone_theory th inst =
     let cl = empty_clones th.th_local in
-    Mts.iter (cl_add_ts cl) inst.inst_ts;
-    Mls.iter (cl_add_ls cl) inst.inst_ls;
-    let add = cl_add_decl cl inst in
-    let decls = ctxt_fold add [] th.th_ctxt in
-    cl, decls
+    let check_ts ts ts' = let id = ts.ts_name in
+      if not (Sid.mem id th.th_local) then raise (NonLocal id);
+      if List.length ts.ts_args <> List.length ts'.ts_args
+        then raise (BadInstance (id, ts'.ts_name));
+      cl_add_ts cl ts ts'
+    in
+    let check_ls ls ls' = let id = ls.ls_name in
+      if not (Sid.mem id th.th_local) then raise (NonLocal id);
+      let tymatch sb ty ty' =
+        try Ty.matching sb ty' (cl_trans_ty cl ty)
+        with TypeMismatch -> raise (BadInstance (id, ls'.ls_name))
+      in
+      let sb = match ls.ls_value,ls'.ls_value with
+        | Some ty, Some ty' -> tymatch Mid.empty ty ty'
+        | None, None -> Mid.empty
+        | _ -> raise (BadInstance (id, ls'.ls_name))
+      in
+      ignore (try List.fold_left2 tymatch sb ls.ls_args ls'.ls_args
+      with Invalid_argument _ -> raise (BadInstance (id, ls'.ls_name)));
+      cl_add_ls cl ls ls'
+    in
+    let check_pr pr = let id = pr.pr_name in
+      if not (Sid.mem id th.th_local) then raise (NonLocal id);
+    in
+    Mts.iter check_ts inst.inst_ts;
+    Mls.iter check_ls inst.inst_ls;
+    Spr.iter check_pr inst.inst_lemma;
+    Spr.iter check_pr inst.inst_goal;
+    cl, ctxt_fold (cl_add_decl cl inst) [] th.th_ctxt
 
   let add_final ctxt cl =
     let add id id' acc = (id,id') :: acc in
@@ -758,24 +785,34 @@ module Theory = struct
           assert false
 
   let clone_export uc th inst =
-    let cl, ctxt = Context.add_clone uc.uc_ctxt th inst in
-    let f_ts n t ns = add_ts true n (Hts.find cl.Context.ts_table t) ns in
-    let f_ls n l ns = add_ls true n (Hls.find cl.Context.ls_table l) ns in
-    let f_pr n p ns = add_pr true n (Hpr.find cl.Context.pr_table p) ns in
+    let cl,ctxt = Context.add_clone uc.uc_ctxt th inst in
 
-    let rec merge_namespace acc ns =
+    let add_local _ id' acc =
+      if Mid.mem id' uc.uc_ctxt.ctxt_known then acc else Sid.add id' acc in
+    let local = Hid.fold add_local cl.Context.id_table uc.uc_local in
+
+    let find_ts ts = if Sid.mem ts.ts_name th.th_local
+      then Hts.find cl.Context.ts_table ts else ts in
+    let find_ls ls = if Sid.mem ls.ls_name th.th_local
+      then Hls.find cl.Context.ls_table ls else ls in
+    let find_pr pr = if Sid.mem pr.pr_name th.th_local
+      then Hpr.find cl.Context.pr_table pr else pr in
+    let f_ts n ts ns = add_ts true n (find_ts ts) ns in
+    let f_ls n ls ns = add_ls true n (find_ls ls) ns in
+    let f_pr n pr ns = add_pr true n (find_pr pr) ns in
+    let rec f_ns n s = add_ns true n (merge_namespace empty_ns s)
+    and merge_namespace acc ns =
       let acc = Mnm.fold f_ts ns.ns_ts acc in
       let acc = Mnm.fold f_ls ns.ns_ls acc in
       let acc = Mnm.fold f_pr ns.ns_pr acc in
-      let acc = Mnm.fold f_ns ns.ns_ns acc in acc
-
-    and f_ns n ns acc = add_ns true n (merge_namespace empty_ns ns) acc in
-
+      let acc = Mnm.fold f_ns ns.ns_ns acc in acc  in
     let ns = merge_namespace empty_ns th.th_export in
+
     match uc.uc_import, uc.uc_export with
       | i0 :: sti, e0 :: ste -> { uc with
           uc_import = merge_ns false ns i0 :: sti;
           uc_export = merge_ns true  ns e0 :: ste;
+          uc_local  = local;
           uc_ctxt   = ctxt }
       | _ ->
           assert false

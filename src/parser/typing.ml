@@ -1129,16 +1129,24 @@ and add_decl env th = function
               | CStsym (p,q) ->
                   let ts1 = find_tysymbol_ns p t.th_export in
                   let ts2 = find_tysymbol q th in
+                  if Mts.mem ts1 s.inst_ts
+                  then error ~loc (Clash ts1.ts_name.id_short);
                   { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
               | CSlsym (p,q) ->
                   let ls1 = find_lsymbol_ns p t.th_export in
                   let ls2 = find_lsymbol q th in
+                  if Mls.mem ls1 s.inst_ls
+                  then error ~loc (Clash ls1.ls_name.id_short);
                   { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
               | CSlemma p ->
                   let pr = find_prop_ns p t.th_export in
+                  if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
+                  then error ~loc (Clash pr.pr_name.id_short);
                   { s with inst_lemma = Spr.add pr s.inst_lemma }
               | CSgoal p ->
                   let pr = find_prop_ns p t.th_export in
+                  if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
+                  then error ~loc (Clash pr.pr_name.id_short);
                   { s with inst_goal = Spr.add pr s.inst_goal }
 	    in
             let s = List.fold_left add_inst empty_inst s in

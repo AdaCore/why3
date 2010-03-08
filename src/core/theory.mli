@@ -160,7 +160,10 @@ module Context : sig
 
   exception UnknownIdent of ident
   exception RedeclaredIdent of ident
+
+  exception NonLocal of ident
   exception CannotInstantiate of ident
+  exception BadInstance of ident * ident
 
 end
 
