@@ -194,7 +194,9 @@ module Decl = struct
     | Dind   l1, Dind   l2 -> for_all2 eq_ind l1 l2
     | Dprop (k1,pr1), Dprop (k2,pr2) -> k1 == k2 && pr1 == pr2
     | Duse th1, Duse th2 -> th1.th_name == th2.th_name
-    | _ -> false
+    | Dclone (th1,sl1), Dclone (th2,sl2) -> th1.th_name == th2.th_name
+        && for_all2 (fun (i,i') (j,j') -> i == j && i' == j') sl1 sl2
+    | _,_ -> false
 
   let hs_td (ts,td) = match td with
     | Tabstract -> ts.ts_name.id_tag
@@ -245,7 +247,7 @@ let create_prop_decl k p = Hdecl.hashcons (mk_decl (Dprop (k, p)))
 let create_use_decl th = Hdecl.hashcons (mk_decl (Duse th))
 let create_clone_decl th sl = Hdecl.hashcons (mk_decl (Dclone (th,sl)))
 
-let create_prop_and_decl k n f = create_prop_decl k (create_prop n f)
+let prop_decl_of_fmla k n f = create_prop_decl k (create_prop n f)
 
 exception ConstructorExpected of lsymbol
 exception UnboundTypeVar of ident
@@ -350,20 +352,20 @@ module Context = struct
 
   let push_decl ctxt kn d =
     let get_cl m id = try Mid.find id m with Not_found -> Sid.empty in
-    let add_cl th m' (id,id') =
-      let m = th.th_ctxt.ctxt_cloned in
+    let add_cl m m' (id,id') =
       Mid.add id' (Sid.add id (Sid.union (get_cl m id) (get_cl m' id'))) m'
     in
     let cloned = match d.d_node with
-      | Dclone (th,sl) -> List.fold_left (add_cl th) ctxt.ctxt_cloned sl
+      | Dclone (th,sl) ->
+          let m = th.th_ctxt.ctxt_cloned in
+          List.fold_left (add_cl m) ctxt.ctxt_cloned sl
       | _ -> ctxt.ctxt_cloned
     in
-    Hctxt.hashcons
-      { ctxt with
-          ctxt_decls = Some (d, ctxt);
-          ctxt_known = kn;
-          ctxt_cloned = cloned;
-      }
+    Hctxt.hashcons { ctxt with
+      ctxt_decls  = Some (d, ctxt);
+      ctxt_known  = kn;
+      ctxt_cloned = cloned;
+    }
 
   (* Manage known symbols *)
 
