@@ -1153,31 +1153,38 @@ and add_decl env th = function
 	    clone_export th t s
       in
       let n = match use.use_as with 
-	| None -> t.th_name.id_short
-	| Some x -> x.id
+	| None -> Some t.th_name.id_short
+	| Some (Some x) -> Some x.id
+	| Some None -> None
       in
       begin try match use.use_imp_exp with
 	| Nothing ->
 	    (* use T = namespace T use_export T end *)
 	    let th = open_namespace th in
 	    let th = use_or_clone th in
-	    close_namespace th n ~import:false
+	    close_namespace th false n
 	| Import ->
 	    (* use import T = namespace T use_export T end import T *)
 	    let th = open_namespace th in
 	    let th = use_or_clone th in
-	    close_namespace th n ~import:true
+	    close_namespace th true n
 	| Export ->
 	    use_or_clone th 
       with Theory.ClashSymbol s ->
 	error ~loc (Clash s)
       end
-  | Namespace (_, {id=id; id_loc=loc}, dl) ->
+  | Namespace (_, import, name, dl) ->
       let ns = get_namespace th in
-      if Mnm.mem id ns.ns_ns then error ~loc (ClashNamespace id);
+      let id = match name with
+        | Some { id=id; id_loc=loc } ->
+            if Mnm.mem id ns.ns_ns then error ~loc (ClashNamespace id);
+            Some id
+        | None ->
+            None
+      in
       let th = open_namespace th in
       let th = add_decls env th dl in
-      close_namespace th id ~import:false
+      close_namespace th import id
 
 and add_theory env pt =
   let id = pt.pt_name in

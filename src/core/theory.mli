@@ -184,7 +184,7 @@ module Theory : sig
   val add_decl : theory_uc -> decl -> theory_uc
 
   val open_namespace  : theory_uc -> theory_uc
-  val close_namespace : theory_uc -> string -> import:bool -> theory_uc
+  val close_namespace : theory_uc -> bool -> string option -> theory_uc
 
   val use_export   : theory_uc -> theory -> theory_uc
   val clone_export : theory_uc -> theory -> th_inst -> theory_uc

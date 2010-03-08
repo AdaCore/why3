@@ -311,15 +311,30 @@ list1_inductive_decl:
 ;
 
 decl:
-| list1_type_decl                 { TypeDecl $1 }
-| list1_logic_decl                { LogicDecl $1 }
-| list1_inductive_decl            { IndDecl $1 }
-| AXIOM uident COLON lexpr        { PropDecl (loc (), Kaxiom, $2, $4) }
-| LEMMA uident COLON lexpr        { PropDecl (loc (), Klemma, $2, $4) }
-| GOAL uident COLON lexpr         { PropDecl (loc (), Kgoal, $2, $4) }
-| USE use                         { UseClone (loc (), $2, None) }
-| CLONE use clone_subst           { UseClone (loc (), $2, Some $3) }
-| NAMESPACE uident list0_decl END { Namespace (loc (), $2, $3) }
+| list1_type_decl
+    { TypeDecl $1 }
+| list1_logic_decl
+    { LogicDecl $1 }
+| list1_inductive_decl
+    { IndDecl $1 }
+| AXIOM uident COLON lexpr
+    { PropDecl (loc (), Kaxiom, $2, $4) }
+| LEMMA uident COLON lexpr
+    { PropDecl (loc (), Klemma, $2, $4) }
+| GOAL uident COLON lexpr
+    { PropDecl (loc (), Kgoal, $2, $4) }
+| USE use
+    { UseClone (loc (), $2, None) }
+| CLONE use clone_subst
+    { UseClone (loc (), $2, Some $3) }
+| NAMESPACE uident list0_decl END
+    { Namespace (loc (), false, Some $2, $3) }
+| NAMESPACE UNDERSCORE list0_decl END
+    { Namespace (loc (), false, None, $3) }
+| NAMESPACE IMPORT uident list0_decl END
+    { Namespace (loc (), false, Some $3, $4) }
+| NAMESPACE IMPORT UNDERSCORE list0_decl END
+    { Namespace (loc (), false, None, $4) }
 ;
 
 list1_theory:
@@ -524,7 +539,9 @@ use:
 | imp_exp tqualid              
     { { use_theory = $2; use_as = None; use_imp_exp = $1 } }
 | imp_exp tqualid AS uident
-    { { use_theory = $2; use_as = Some $4; use_imp_exp = $1 } }
+    { { use_theory = $2; use_as = Some (Some $4); use_imp_exp = $1 } }
+| imp_exp tqualid AS UNDERSCORE
+    { { use_theory = $2; use_as = Some None; use_imp_exp = $1 } }
 ;
 
 imp_exp:

@@ -87,7 +87,7 @@ type imp_exp =
 
 type use = {
   use_theory  : qualid;
-  use_as      : ident option;
+  use_as      : ident option option;
   use_imp_exp : imp_exp;
 }
 
@@ -135,7 +135,7 @@ type decl =
   | IndDecl of ind_decl list
   | PropDecl of loc * prop_kind * ident * lexpr
   | UseClone of loc * use * clone_subst list option
-  | Namespace of loc * ident * decl list
+  | Namespace of loc * bool * ident option * decl list
 
 type theory = {
   pt_loc  : loc;
