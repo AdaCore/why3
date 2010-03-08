@@ -170,6 +170,11 @@ let split_goals =
   let f _ (ctxt,l) decl = 
     match decl.d_node with
       | Dprop (Pgoal,_) -> (ctxt,(add_decl ctxt decl)::l)
+      | Dprop (Plemma,f) ->
+          let d1 = create_prop_and_decl Paxiom (id_dup f.pr_name) f.pr_fmla in
+          let d2 = create_prop_and_decl Pgoal (id_dup f.pr_name) f.pr_fmla in
+          (add_decl ctxt d1,
+           (add_decl ctxt d2)::l)
       | _ -> (add_decl ctxt decl,l) in
   let g = fold_up f (empty_context,[]) in
   conv_res g snd
@@ -178,6 +183,10 @@ let extract_goals =
   let f _ (ctxt,l) decl = 
     match decl.d_node with
       | Dprop (Pgoal,f) -> (ctxt,(f.pr_name,f.pr_fmla,ctxt)::l)
+      | Dprop (Plemma,f) ->
+          let d = create_prop_and_decl Paxiom (id_dup f.pr_name) f.pr_fmla in
+          (add_decl ctxt d,
+           (f.pr_name,f.pr_fmla,ctxt)::l)
       | _ -> (add_decl ctxt decl,l) in
   let g = fold_up f (empty_context,[]) in
   conv_res g snd

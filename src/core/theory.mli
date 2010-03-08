@@ -120,6 +120,7 @@ val create_ty_decl : ty_decl list -> decl
 val create_logic_decl : logic_decl list -> decl
 val create_ind_decl : ind_decl list -> decl
 val create_prop_decl : prop_kind -> prop -> decl
+val create_prop_and_decl : prop_kind -> preid -> fmla -> decl
 
 (* exceptions *)
 

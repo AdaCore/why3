@@ -241,6 +241,7 @@ let create_ty_decl tdl = Hdecl.hashcons (mk_decl (Dtype tdl))
 let create_logic_decl ldl = Hdecl.hashcons (mk_decl (Dlogic ldl))
 let create_ind_decl indl = Hdecl.hashcons (mk_decl (Dind indl))
 let create_prop_decl k p = Hdecl.hashcons (mk_decl (Dprop (k, p)))
+let create_prop_and_decl k preid f = Hdecl.hashcons (mk_decl (Dprop (k, create_prop preid f)))
 let create_use_decl th = Hdecl.hashcons (mk_decl (Duse th))
 let create_clone_decl sl = Hdecl.hashcons (mk_decl (Dclone sl))
 
