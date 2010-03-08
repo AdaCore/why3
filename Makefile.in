@@ -66,7 +66,8 @@ COQLIB = "@COQLIB@"
 COQVER = @COQVER@
 
 GENERATED = src/version.ml src/parser/parser.mli src/parser/parser.ml \
-            src/parser/lexer.ml
+            src/parser/lexer.ml src/output/driver_lexer.ml \
+            src/output/driver_parser.mli src/output/driver_parser.ml
 
 # main targets
 ##############
@@ -117,7 +118,8 @@ TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
 	flatten.cmo
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
-OUTPUT_CMO := print_real.cmo alt_ergo.cmo why3.cmo
+OUTPUT_CMO := driver_parser.cmo driver_lexer.cmo driver.cmo \
+              print_real.cmo alt_ergo.cmo why3.cmo
 OUTPUT_CMO := $(addprefix src/output/,$(OUTPUT_CMO))
 
 CMO = $(UTIL_CMO) $(CORE_CMO) src/pretty.cmo $(PARSER_CMO)	\
@@ -530,7 +532,7 @@ binary: $(ALLBINARYFILES)
 headers:
 	headache -c misc/headache_config.txt -h misc/header.txt \
 		Makefile.in configure.in \
-		*/*.ml */*.ml[ily4] 
+		*/*.ml */*.ml[ily4] */*/*.ml */*/*.ml[ily4] 
 
 # myself
 ########
