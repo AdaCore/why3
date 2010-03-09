@@ -81,7 +81,7 @@ let fold ?clear f_fold v_empty =
   t ?clear (f []) (fun () -> Hashtbl.clear memo_t)
 
 let fold_map ?clear f_fold v_empty =
-  let v_empty = v_empty,create_context in
+  let v_empty = v_empty,init_context in
   let f_fold ctxt (env,ctxt2) = f_fold ctxt ctxt2 env in
   conv_res (fold ?clear f_fold v_empty) snd
 
@@ -137,7 +137,7 @@ let split_goals =
           (add_decl ctxt d1,
            (add_decl ctxt d2)::l)
       | _ -> (add_decl ctxt decl,l) in
-  let g = fold f (create_context,[]) in
+  let g = fold f (init_context,[]) in
   conv_res g snd
 
 let extract_goals =
@@ -150,7 +150,7 @@ let extract_goals =
           (add_decl ctxt d,
            (f.pr_name,f.pr_fmla,ctxt)::l)
       | _ -> (add_decl ctxt decl,l) in
-  let g = fold f (create_context,[]) in
+  let g = fold f (init_context,[]) in
   conv_res g snd
 
 

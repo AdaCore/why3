@@ -19,6 +19,7 @@
 
 open Format
 open Theory
+open Driver
 
 let files = ref []
 let parse_only = ref false
@@ -28,7 +29,7 @@ let loadpath = ref []
 let print_stdout = ref false
 let simplify_recursive = ref false
 let inlining = ref false
-let alt_ergo = ref false
+let driver = ref None
 
 let () = 
   Arg.parse 
@@ -38,9 +39,11 @@ let () =
      "-I", Arg.String (fun s -> loadpath := s :: !loadpath), 
        "<dir>  adds dir to the loadpath";
      "--print-stdout", Arg.Set print_stdout, "print the results to stdout";
-     "--simplify-recursive", Arg.Set simplify_recursive, "simplify recursive definition";
+     "--simplify-recursive", Arg.Set simplify_recursive, 
+       "simplify recursive definition";
      "--inline", Arg.Set inlining, "inline the definition not recursive";
-     "--alt-ergo", Arg.Set alt_ergo, "output for Alt-Ergo on stdout";
+     "--driver", Arg.String (fun s -> driver := Some s),
+       "<file>  set the driver file";
     ]
     (fun f -> files := f :: !files)
     "usage: why [options] files..."
@@ -67,6 +70,8 @@ let rec report fmt = function
       Typing.report fmt e
   | Context.UnknownIdent i ->
       fprintf fmt "anomaly: unknownident %s" i.Ident.id_short
+  | Driver.Error e ->
+      Driver.report fmt e
   | e ->
       if in_emacs then
         let dir = Filename.dirname (Filename.dirname Sys.executable_name) in
@@ -84,46 +89,38 @@ let type_file env file =
     close_in c;
     env
   end else 
-    Typing.add_file env file
+    Typing.add_from_file env file
 
 let extract_goals ctxt =
-  Transform.apply Transform.extract_goals ctxt
-
-let driver_rules = ref Driver.empty_rules
+  Transform.apply Transform.split_goals ctxt
 
 let transform env l =
   let l = List.map 
-    (fun t -> t, Context.use_export Context.create_context t) 
+    (fun t -> t, Context.use_export Context.init_context t) 
       (Typing.local_theories l) in
   let l = transformation l in
   if !print_stdout then 
     List.iter 
       (fun (t,ctxt) -> Why3.print_context_th std_formatter t.th_name ctxt) l
-  else if !alt_ergo then match l with
-    | (_,ctxt) :: _ -> begin match extract_goals ctxt with
-	| g :: _ -> 
-	    let drv = Driver.create !driver_rules ctxt in
-	    Alt_ergo.print_goal drv std_formatter g
-	| [] -> 
-	    eprintf "no goal@."
-      end	
-    | [] -> ()
-
-let handle_file env file =
-  if Filename.check_suffix file ".why" then
-    type_file env file
-  else if Filename.check_suffix file ".drv" then begin
-    driver_rules := Driver.load file;
-    env
-  end else begin
-    eprintf "%s: don't know what to do with file %s@." Sys.argv.(0) file;
-    exit 1
-  end
+  else match !driver with
+    | None ->
+	()
+    | Some file ->
+	let drv = load_driver file env in
+	begin match l with
+	  | (_,ctxt) :: _ -> begin match extract_goals ctxt with
+	      | g :: _ -> 
+		  Driver.print_context drv std_formatter g
+	      | [] -> 
+		  eprintf "no goal@."
+	    end
+	  | [] -> ()
+	end
 
 let () =
   try
     let env = Typing.create !loadpath in
-    let l = List.fold_left handle_file env !files in
+    let l = List.fold_left type_file env !files in
     transform env l
   with e when not !debug ->
     eprintf "%a@." report e;

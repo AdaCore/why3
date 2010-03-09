@@ -1,11 +1,15 @@
 
 (* Why driver for Alt-Ergo *)
 
-"(* this is a prelude for Alt-Ergo*)"
+prelude "(* this is a prelude for Alt-Ergo*)"
+
+printer "alt-ergo"
+
+call_on_file  "alt-ergo %s"
 
 theory prelude.Int
 
-  "(* this is a prelude for Alt-Ergo arithmetic *)"
+  prelude "(* this is a prelude for Alt-Ergo arithmetic *)"
 
   syntax zero "0"
 

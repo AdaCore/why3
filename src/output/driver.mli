@@ -17,23 +17,50 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Format
 open Ident
 open Theory
 
-type t
+(** creating drivers *)
+
+type driver 
+
+val load_driver : string -> Typing.env -> driver
+
+(** querying drivers *)
 
 type translation = 
   | Remove
   | Syntax of string
   | Tag of string list
 
-val ident : t -> ident -> translation
+val query_ident : driver -> ident -> translation
 
-type rules
+(** registering printers *)
 
-val empty_rules : rules
+type printer = driver -> formatter -> context -> unit
 
-val load : string -> rules
+val register_printer : string -> printer -> unit
 
-val create : rules -> context -> t
+(** using drivers *)
 
+val print_context : printer
+
+type prover_answer =
+  | Valid
+  | Invalid
+  | Unknown of string
+  | Failure of string
+  | Timeout
+
+val call_prover : driver -> context -> prover_answer
+val call_prover_on_file : driver -> string -> prover_answer
+val call_prover_on_channel : driver -> string -> in_channel -> prover_answer
+
+(* error reporting *)
+
+type error
+
+exception Error of error
+
+val report : formatter -> error -> unit

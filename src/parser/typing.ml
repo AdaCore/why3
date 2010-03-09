@@ -1042,11 +1042,15 @@ let locate_file env sl =
     | file1 :: file2 :: _ -> error (AmbiguousPath (file1, file2))
 
 (* parse file and store all theories into parsed_theories *)
-let load_file file =
-  let c = open_in file in
+
+let load_channel file c =
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
-  let tl = Lexer.parse_logic_file lb in 
+  Lexer.parse_logic_file lb
+
+let load_file file =
+  let c = open_in file in
+  let tl = load_channel file c in
   close_in c;
   tl
 
@@ -1178,10 +1182,19 @@ and type_and_add_theory q env pt =
   with 
     | Error (ClashTheory _ as e) -> error ~loc:id.id_loc e
    
+let clear_local_theories env =
+  { env with theories = M.empty }
 
-and add_file env file =
-  let tl = load_file file in
+let add_local_theories env tl =
   List.fold_left (type_and_add_theory "") env tl
+
+let add_from_file env file =
+  let tl = load_file file in
+  add_local_theories env tl
+
+let add_from_channel env file ic =
+  let tl = load_channel file ic in
+  add_local_theories env tl
 
 let local_theories env = 
   List.rev (M.fold (fun _ v acc -> v::acc) env.theories [])

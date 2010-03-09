@@ -25,10 +25,18 @@ val create : string list -> env
   (** creates a new typing environment for a given loadpath *)
 
 val add_theory : env -> Theory.theory -> env
-  (** add a local theory *)
+  (** adds a local theory *)
 
-val add_file : env -> string -> env
-  (** add local theories from a given file *)
+val clear_local_theories : env -> env
+  (** clears the local theories *)
+
+val add_from_file : env -> string -> env
+  (** adds local theories from a given file *)
+
+val add_from_channel : env -> string -> in_channel -> env
+  (** [add_from_channel env filename ic] adds local theories 
+      from a given input channel [ic]; [filename] is only used for 
+      locations *)
 
 val find_theory : env -> string list -> string -> Theory.theory
   (** searches for a theory using the environment's loadpath *)

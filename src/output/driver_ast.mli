@@ -19,9 +19,7 @@
 
 type loc = Loc.position
 
-type ident = Ptree.ident
-
-type qualid = Ptree.qualid
+type qualid = loc * string list
 
 type cloned = bool
 
@@ -29,14 +27,24 @@ type trule =
   | Rremove of cloned * qualid
   | Rsyntax of qualid * string
   | Rtag    of cloned * qualid * string
+  | Rprelude of string
 
 type theory_rules = {
   th_name    : qualid;
-  th_prelude : string option;
   th_rules   : trule list;
 }
 
+type global =
+  | Prelude of string
+  | Printer of string
+  | CallStdin of string
+  | CallFile of string
+  | RegexpValid of string
+  | RegexpInvalid of string
+  | RegexpUnknown of string * string
+  | RegexpFailure of string * string
+
 type file = {
-  f_prelude : string option;
-  f_rules   : theory_rules list;
+  f_global : (loc * global) list;
+  f_rules  : theory_rules list;
 }

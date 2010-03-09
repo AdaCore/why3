@@ -170,10 +170,11 @@ let print_decl drv ctxt fmt d = match d.d_node with
   | Duse _ | Dclone _ ->
       ()
 
-let print_context env fmt ctxt = 
+let print_context drv fmt ctxt = 
   let decls = Context.get_decls ctxt in
-  print_list newline2 (print_decl env ctxt) fmt decls
+  print_list newline2 (print_decl drv ctxt) fmt decls
 
+let () = Driver.register_printer "alt-ergo" print_context
 
 let print_goal env fmt (id, f, ctxt) =
   print_context env fmt ctxt;

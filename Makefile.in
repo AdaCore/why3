@@ -143,7 +143,7 @@ bin/top: $(CMO)
 
 test: bin/why.byte
 	ocamlrun -bt bin/why.byte --print-stdout -I lib/prelude/ src/test.why
-	bin/why.byte --alt-ergo -I lib/prelude/ src/test.why > ergo.why
+	bin/why.byte --driver lib/drivers/alt_ergo.drv -I lib/prelude/ src/test.why > ergo.why
 	timeout 3 alt-ergo ergo.why
 
 # graphical interface

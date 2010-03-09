@@ -18,10 +18,10 @@
 /**************************************************************************/
 
 %{
-  open Ptree
   open Driver_ast
   open Parsing
   let loc () = (symbol_start_pos (), symbol_end_pos ())
+  let loc_i i = (rhs_start_pos i, rhs_end_pos i)
   let infix s = "infix " ^ s
   let prefix s = "prefix " ^ s
 %}
@@ -29,7 +29,8 @@
 %token <string> IDENT
 %token <string> STRING
 %token <string> OPERATOR
-%token THEORY END SYNTAX REMOVE TAG
+%token THEORY END SYNTAX REMOVE TAG PRELUDE PRINTER CALL_ON_FILE CALL_ON_STDIN
+%token VALID INVALID UNKNOWN FAIL
 %token UNDERSCORE LEFTPAR RIGHTPAR CLONED DOT EOF
 
 %type <Driver_ast.file> file
@@ -38,13 +39,24 @@
 %%
 
 file:
-| string_option list0_theory EOF
-    { { f_prelude = $1; f_rules = $2 } }
+| list0_global list0_theory EOF
+    { { f_global = $1; f_rules = $2 } }
 ;
 
-string_option:
-| /* epsilon */ { None }
-| STRING        { Some $1 }
+list0_global:
+| /* epsilon */       { [] }
+| global list0_global { (loc_i 1, $1) :: $2 }
+;
+
+global:
+| PRELUDE STRING { Prelude $2 }
+| PRINTER STRING { Printer $2 }
+| CALL_ON_FILE STRING { CallFile $2 }
+| CALL_ON_STDIN STRING { CallStdin $2 }
+| VALID STRING { RegexpValid $2 }
+| INVALID STRING { RegexpInvalid $2 }
+| UNKNOWN STRING STRING { RegexpUnknown ($2, $3) }
+| FAIL STRING STRING { RegexpFailure ($2, $3) }
 ;
 
 list0_theory:
@@ -53,8 +65,8 @@ list0_theory:
 ;
 
 theory:
-| THEORY qualid string_option list0_trule END
-    { { th_name = $2; th_prelude = $3; th_rules = $4 } }
+| THEORY qualid list0_trule END
+    { { th_name = $2; th_rules = $3 } }
 ;
 
 list0_trule:
@@ -63,6 +75,7 @@ list0_trule:
 ;
 
 trule:
+| PRELUDE STRING           { Rprelude $2 }
 | REMOVE cloned qualid     { Rremove ($2, $3) }
 | SYNTAX qualid STRING     { Rsyntax ($2, $3) }
 | TAG cloned qualid STRING { Rtag    ($2, $3, $4) }
@@ -74,18 +87,24 @@ cloned:
 ;
 
 qualid:
-| ident            { Qident $1 }
-| qualid DOT ident { Qdot ($1, $3) }
+| ident            { loc(), [$1] }
+| ident DOT qualid { loc(), ($1 :: snd $3) }
 ;
 
 ident:
 | IDENT  
-    { { id = $1; id_loc = loc () } }
+    { $1 }
 | STRING 
-    { { id = $1; id_loc = loc () } }
+    { $1 }
 | LEFTPAR UNDERSCORE OPERATOR UNDERSCORE RIGHTPAR 
-    { { id = infix $3; id_loc = loc () } }
+    { infix $3 }
 | LEFTPAR OPERATOR UNDERSCORE RIGHTPAR 
-    { { id = prefix $2; id_loc = loc () } }
+    { prefix $2 }
+/*
+| LEFTPAR UNDERSCORE lident_op RIGHTPAR 
+    { { id = postfix $3; id_loc = loc () } }
+*/
+| PRELUDE
+    { "prelude" }
 ;
 

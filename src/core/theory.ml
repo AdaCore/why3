@@ -374,7 +374,7 @@ let empty_inst = {
 
 module Context = struct
 
-  let create_context =
+  let init_context =
     let known = builtin_theory.th_ctxt.ctxt_known in
     let known = Mid.add builtin_theory.th_name use_builtin known in
     mk_context use_builtin None known Mid.empty
@@ -773,7 +773,7 @@ module Theory = struct
 
   let create_theory n = {
     uc_name   = n;
-    uc_ctxt   = Context.create_context;
+    uc_ctxt   = Context.init_context;
     uc_import = [builtin_theory.th_export];
     uc_export = [builtin_theory.th_export];
     uc_local  = Sid.empty;

@@ -147,7 +147,7 @@ val empty_inst : th_inst
 
 module Context : sig
 
-  val create_context : context
+  val init_context : context
 
   val add_decl : context -> decl -> context
 

@@ -33,6 +33,14 @@
 	"remove", REMOVE;
 	"tag", TAG;
 	"cloned", CLONED;
+	"prelude", PRELUDE;
+	"printer", PRINTER;
+	"call_on_file", CALL_ON_FILE;
+	"call_on_stdin", CALL_ON_STDIN;
+	"valid", VALID;
+	"invalid", INVALID;
+	"unknown", UNKNOWN;
+	"fail", FAIL;
       ]
 
 }
