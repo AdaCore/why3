@@ -101,10 +101,21 @@ let transform env l =
       end	
     | [] -> ()
 
+let handle_file env file =
+  if Filename.check_suffix file ".why" then
+    type_file env file
+  else if Filename.check_suffix file ".drv" then begin
+    ignore (Driver.load file);
+    env
+  end else begin
+    eprintf "%s: don't know what to do with file %s@." Sys.argv.(0) file;
+    exit 1
+  end
+
 let () =
   try
     let env = Typing.create !loadpath in
-    let l = List.fold_left type_file env !files in
+    let l = List.fold_left handle_file env !files in
     transform env l
   with e when not !debug ->
     eprintf "%a@." report e;

@@ -6,50 +6,6 @@ export WHYLIB=../lib
 
 pgm=$1
 option=$2
-coqc="coqc -I ../lib/coq"
-
-pvstc () {
-    context=`dirname $1`
-    theory=`basename $1`
-    cd $context
-    echo "(typecheck "'"'$theory'"'")" > pvstc.el
-    pvs -q -batch -l pvstc.el
-    cd ..
-}
-
-provers () {
-    file=$1
-    base=$2
-    dir=`dirname $1`
-    # running Coq
-    if ! $coqc "$base"_why.v > /dev/null 2>&1; then
-	echo "coq FAILED"
-	$coqc "$base"_why.v
-	exit 1
-    fi
-#      if ! $coqc -I $dir "$base"_valid.v > /dev/null 2>&1; then
-#  	echo "coq validation FAILED"
-#  	$coqc -I $dir "$base"_valid.v
-#  	exit 1
-#      fi
-    echo -n "coq ok... "
-    # running PVS
-    if ! $pgm --pvs $f > /dev/null 2>&1; then
-	echo "pvs generation FAILED"
-	$pgm --pvs $f
-	exit 1
-    fi
-    if test "$option" = "pvs"; then 
-    if ! pvstc "$base"_why > /dev/null 2>&1; then
-	echo "pvs typecheck FAILED"
-	pvs -q -v 3 -batch -l pvstc.el
-	exit 1
-    fi
-    echo "pvs ok"
-    else
-    echo
-    fi
-}
 
 goods () {
     for f in $1/*.why; do
@@ -62,28 +18,6 @@ goods () {
 	    exit 1
 	fi
 	echo "why ok... "
-    done
-}
-
-good_ml () {
-    for f in $1/*.why; do
-	echo -n "  "$f"... "
-	base=$1/`basename $f .why`
-	# running Why
-	if ! $pgm --coq-@COQVER@ $f > /dev/null 2>&1; then
-	    echo "why FAILED"
-	    $pgm --coq-@COQVER@ $f
-	    exit 1
-	fi
-	echo -n "why ok... "
-	provers $f $base
-#  		echo -n "coq ok..."
-#  		$pgm --ocaml --ocaml-ext $f > $base.ml 2>/dev/null
-#  		if ocamlc -c $base.ml > /dev/null 2>&1; then
-#  		    echo "ocaml ok"
-#  		else
-#  		    echo "ocaml FAILED"
-#  		fi
     done
 }
 
@@ -100,21 +34,39 @@ bads () {
     done
 }
 
+drivers () {
+    for f in $1/*.drv; do
+	echo -n "  "$f"... "
+	base=$1/`basename $f .why`
+	# running Why
+	if ! $pgm $2 $f > /dev/null 2>&1; then
+	    echo "why FAILED"
+	    $pgm $2 $f
+	    exit 1
+	fi
+	echo "why ok... "
+    done
+}
+
 # 1. Syntax
 echo "=== Parsing good files  ==="
-goods typing/bad --parse-only
+goods bench/typing/bad --parse-only
 echo ""
 
 # 2. Typing
 echo "=== Type-checking bad files ==="
-bads typing/bad --type-only
+bads bench/typing/bad --type-only
 echo ""
 
 echo "=== Type-checking good files ==="
-goods typing/good --type-only
+goods bench/typing/good --type-only
 echo ""
 
 echo "=== Type-checking lib/prelude ==="
-goods ../lib/prelude --type-only
+goods lib/prelude --type-only
+echo ""
+
+echo "=== Checking lib/drivers ==="
+drivers lib/drivers
 echo ""
 

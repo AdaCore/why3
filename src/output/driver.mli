@@ -18,6 +18,7 @@
 (**************************************************************************)
 
 open Ident
+open Theory
 
 type t
 
@@ -27,4 +28,10 @@ type translation =
   | Tag of string list
 
 val ident : t -> ident -> translation
+
+type rules
+
+val load : string -> rules
+
+val create : rules -> context -> t
 

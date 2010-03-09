@@ -17,7 +17,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
 type t
 
 type translation = 
@@ -25,5 +24,19 @@ type translation =
   | Syntax of string
   | Tag of string list
 
+type rules = unit
+    
+let load file =
+  let c = open_in file in
+  let lb = Lexing.from_channel c in
+  Loc.set_file file lb;
+  let f = Driver_lexer.parse_file lb in 
+  close_in c;
+  ()
+
+let create rules ctxt =
+  assert false (*TODO*)
+
 let ident dr id =
   assert false (*TODO*)
+

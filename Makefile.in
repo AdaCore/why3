@@ -178,7 +178,7 @@ bin/gwhy.byte: $(GCMO)
 WHYVO=lib/coq/Why.vo
 
 bench:: $(BINARY) 
-	cd bench; sh ./bench "../$(BINARY) -I ../lib/prelude/"
+	sh bench/bench "$(BINARY) -I lib/prelude/"
 
 # installation
 ##############

@@ -21,12 +21,15 @@
   open Driver_ast
   open Parsing
   let loc () = (symbol_start_pos (), symbol_end_pos ())
+  let infix s = "infix " ^ s
+  let prefix s = "prefix " ^ s
 %}
 
 %token <string> IDENT
 %token <string> STRING
+%token <string> OPERATOR
 %token THEORY END SYNTAX REMOVE TAG
-%token STAR DOT EOF
+%token UNDERSCORE LEFTPAR RIGHTPAR STAR DOT EOF
 
 %type <Driver_ast.file> file
 %start file
@@ -59,7 +62,8 @@ list0_trule:
 ;
 
 trule:
-| REMOVE star qualid { Rremove ($2, $3) }
+| REMOVE star qualid   { Rremove ($2, $3) }
+| SYNTAX qualid STRING { Rsyntax ($2, $3) }
 ;
 
 star:
@@ -73,7 +77,13 @@ qualid:
 ;
 
 ident:
-| IDENT  { { id = $1; loc = loc () } }
-| STRING { { id = $1; loc = loc () } }
+| IDENT  
+    { { id = $1; loc = loc () } }
+| STRING 
+    { { id = $1; loc = loc () } }
+| LEFTPAR UNDERSCORE OPERATOR UNDERSCORE RIGHTPAR 
+    { { id = infix $3; loc = loc () } }
+| LEFTPAR OPERATOR UNDERSCORE RIGHTPAR 
+    { { id = prefix $2; loc = loc () } }
 ;
 

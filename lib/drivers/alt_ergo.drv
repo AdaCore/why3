@@ -1,0 +1,31 @@
+
+(* Why driver for Alt-Ergo *)
+
+"(* this is a prelude for Alt-Ergo*)"
+
+theory prelude.Int
+
+  "(* this is a prelude for Alt-Ergo arithmetic *)"
+
+  syntax zero "0"
+  syntax (_+_) "(%1 + %2)"
+  syntax (_-_) "(%1 - %2)"
+  syntax (_*_) "(%1 * %2)"
+  syntax (_/_) "(%1 / %2)"
+  syntax (-_)  "(-%1)"
+
+  syntax (_<=_) "(%1 <= %2)"
+  syntax (_< _) "(%1 <  %2)"
+  syntax (_>=_) "(%1 >= %2)"
+  syntax (_> _) "(%1 >  %2)"
+
+  remove Mul_comm
+  remove One_neutral
+end
+
+(*
+Local Variables: 
+mode: why
+compile-command: "make -C ../.. bench"
+End: 
+*)
