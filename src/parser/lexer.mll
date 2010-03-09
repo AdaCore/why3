@@ -227,7 +227,7 @@ rule token = parse
   | "=>"
       { BIGARROW }
   | "\""
-      { Buffer.clear string_buf; string lexbuf }
+      { STRING (string lexbuf) }
   | eof 
       { EOF }
   | _ as c
@@ -247,7 +247,9 @@ and comment = parse
 
 and string = parse
   | "\""
-      { STRING (Buffer.contents string_buf) }
+      { let s = Buffer.contents string_buf in
+	Buffer.clear string_buf; 
+	s }
   | "\\" (_ as c)
       { Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
   | newline 

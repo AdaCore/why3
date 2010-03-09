@@ -24,15 +24,16 @@ type env
 val create : string list -> env
   (** creates a new typing environment for a given loadpath *)
 
-val add_theory : env -> Ptree.theory -> Theory.theory * env
-  (** adds a local theory into the environment *)
+val add_theory : env -> Theory.theory -> env
+  (** add a local theory *)
 
-val add_theories : env -> Ptree.theory list -> env
+val add_file : env -> string -> env
+  (** add local theories from a given file *)
 
-val find_theory : env -> Ptree.qualid -> Theory.theory
+val find_theory : env -> string list -> string -> Theory.theory
   (** searches for a theory using the environment's loadpath *)
 
-val list_theory : env -> Theory.theory list
+val local_theories : env -> Theory.theory list
 
 (** error reporting *)
 

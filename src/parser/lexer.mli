@@ -17,9 +17,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type error
+type error = 
+  | IllegalCharacter of char
+  | UnterminatedComment
+  | UnterminatedString
 
 exception Error of error
+
+val newline : Lexing.lexbuf -> unit
+
+val comment : Lexing.lexbuf -> unit
+
+val string : Lexing.lexbuf -> string
 
 val report : Format.formatter -> error -> unit
 

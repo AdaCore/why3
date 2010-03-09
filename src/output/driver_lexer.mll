@@ -21,18 +21,7 @@
   open Format
   open Lexing
   open Driver_parser
-
-  type error = 
-    | IllegalCharacter of char
-    | UnterminatedComment
-    | UnterminatedString
-
-  exception Error of error
-
-  let report fmt = function
-    | IllegalCharacter c -> fprintf fmt "illegal character %c" c
-    | UnterminatedComment -> fprintf fmt "unterminated comment"
-    | UnterminatedString -> fprintf fmt "unterminated string"
+  open Lexer
 
   let keywords = Hashtbl.create 97
   let () = 
@@ -45,18 +34,6 @@
 	"tag", TAG;
 	"cloned", CLONED;
       ]
-
-  let newline lexbuf =
-    let pos = lexbuf.lex_curr_p in
-    lexbuf.lex_curr_p <- 
-      { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
-
-  let string_buf = Buffer.create 1024
-
-  let char_for_backslash = function
-    | 'n' -> '\n'
-    | 't' -> '\t'
-    | c -> c
 
 }
 
@@ -88,35 +65,11 @@ rule token = parse
   | "."
       { DOT }
   | "\""
-      { Buffer.clear string_buf; string lexbuf }
+      { STRING (string lexbuf) }
   | eof 
       { EOF }
   | _ as c
       { raise (Error (IllegalCharacter c)) }
-
-and comment = parse
-  | "*)" 
-      { () }
-  | "(*" 
-      { comment lexbuf; comment lexbuf }
-  | '\n'
-      { newline lexbuf; comment lexbuf }
-  | eof
-      { raise (Error UnterminatedComment) }
-  | _ 
-      { comment lexbuf }
-
-and string = parse
-  | "\""
-      { STRING (Buffer.contents string_buf) }
-  | "\\" (_ as c)
-      { Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
-  | '\n'
-      { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
-  | eof
-      { raise (Error UnterminatedString) }
-  | _ as c
-      { Buffer.add_char string_buf c; string lexbuf }
 
 {
   let loc lb = (lexeme_start_p lb, lexeme_end_p lb)

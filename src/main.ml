@@ -76,12 +76,15 @@ let rec report fmt = function
         fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
 let type_file env file =
-  let c = open_in file in
-  let lb = Lexing.from_channel c in
-  Loc.set_file file lb;
-  let f = Lexer.parse_logic_file lb in 
-  close_in c;
-  if !parse_only then env else Typing.add_theories env f
+  if !parse_only then begin
+    let c = open_in file in
+    let lb = Lexing.from_channel c in
+    Loc.set_file file lb;
+    let _ = Lexer.parse_logic_file lb in 
+    close_in c;
+    env
+  end else 
+    Typing.add_file env file
 
 let extract_goals ctxt =
   Transform.apply Transform.extract_goals ctxt
@@ -91,7 +94,7 @@ let driver_rules = ref Driver.empty_rules
 let transform env l =
   let l = List.map 
     (fun t -> t, Context.use_export Context.create_context t) 
-      (Typing.list_theory l) in
+      (Typing.local_theories l) in
   let l = transformation l in
   if !print_stdout then 
     List.iter 

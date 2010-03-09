@@ -43,7 +43,7 @@ type error =
   | BadNumberOfArguments of Ident.ident * int * int 
   | ClashTheory of string
   | ClashNamespace of string
-  | UnboundTheory of string
+  | UnboundTheory of qualid
   | AlreadyTheory of string
   | UnboundNamespace of string
   | UnboundFile of string
@@ -102,8 +102,8 @@ let report fmt = function
       fprintf fmt "clash with previous theory %s" s
   | ClashNamespace s ->
       fprintf fmt "clash with previous namespace %s" s
-  | UnboundTheory s ->
-      fprintf fmt "unbound theory %s" s
+  | UnboundTheory q ->
+      fprintf fmt "unbound theory %a" print_qualid q
   | AlreadyTheory s ->
       fprintf fmt "already using a theory with name %s" s
   | UnboundNamespace s ->
@@ -130,11 +130,13 @@ module M = Map.Make(String)
 
 type env = {
   loadpath : string list;
+  loaded_theories : (string list, theory M.t) Hashtbl.t;
   theories : theory M.t; (* local theories *)
 }
 
 let create lp = {
   loadpath = lp;
+  loaded_theories = Hashtbl.create 17;
   theories = M.empty;
 }
 
@@ -333,6 +335,14 @@ let specialize_psymbol ~loc s =
 let rec qloc = function
   | Qident x -> x.id_loc
   | Qdot (m, x) -> Loc.join (qloc m) x.id_loc
+
+let rec string_list_of_qualid acc = function
+  | Qident id -> id.id :: acc
+  | Qdot (p, id) -> string_list_of_qualid (id.id :: acc) p
+
+let split_qualid = function
+  | Qident id -> [], id.id
+  | Qdot (p, id) -> string_list_of_qualid [] p, id.id
 
 (* parsed types -> intermediate types *)
 
@@ -1023,43 +1033,13 @@ let add_inductives dl th =
   let dl = List.map type_decl dl in
   add_decl th (create_ind_decl dl)
 
-let find_in_loadpath env f =
-  let rec find c lp = match lp, c with
-    | [], None -> 
-	error ~loc:f.id_loc (NotInLoadpath f.id)
-    | [], Some file ->
-	file
-    | dir :: lp, _ ->
-	let file = Filename.concat dir f.id in
-	if Sys.file_exists file then begin match c with
-	  | None -> find (Some file) lp
-	  | Some file' -> error ~loc:f.id_loc (AmbiguousPath (file, file'))
-	end else
-	  find c lp
-  in
-  find None env.loadpath
-
-let locate_file env q = 
-  let rec locate_dir = function
-    | Qident d ->
-	find_in_loadpath env d
-    | Qdot (q, d) -> 
-	let dir = locate_dir q in
-	let dir = Filename.concat dir d.id in
-	if not (Sys.file_exists dir) then error ~loc:d.id_loc (UnboundDir dir);
-	dir
-  in
-  match q with
-    | Qident f -> 
-	find_in_loadpath env { f with id = f.id ^ ".why" }
-    | Qdot (p, f) -> 
-	let dir = locate_dir p in 
-	let file = Filename.concat dir f.id ^ ".why" in
-	if not (Sys.file_exists file) then 
-	  error ~loc:(qloc q) (UnboundFile file);
-	file
-
-let loaded_theories = Hashtbl.create 17 (* file -> string -> Theory.t *)
+let locate_file env sl =
+  let f = List.fold_left Filename.concat "" sl ^ ".why" in
+  let fl = List.map (fun dir -> Filename.concat  dir f) env.loadpath in
+  match List.filter Sys.file_exists fl with
+    | [] -> raise Not_found
+    | [file] -> file
+    | file1 :: file2 :: _ -> error (AmbiguousPath (file1, file2))
 
 (* parse file and store all theories into parsed_theories *)
 let load_file file =
@@ -1075,35 +1055,27 @@ let prop_kind = function
   | Kgoal -> Pgoal
   | Klemma -> Plemma
 
-let rec find_theory env q = match q with
-  | Qident id -> 
+let rec find_theory env q id = match q with
+  | [] -> 
       (* local theory *)
-      begin 
-	try M.find id.id env.theories 
-	with Not_found -> error ~loc:id.id_loc (UnboundTheory id.id) 
-      end
-  | Qdot (f, id) ->
+      M.find id env.theories 
+  | _ :: _ ->
       (* theory in file f *)
-      let file = locate_file env f in
-      if not (Hashtbl.mem loaded_theories file) then begin
+      if not (Hashtbl.mem env.loaded_theories q) then begin
+	Hashtbl.add env.loaded_theories q M.empty;
+	let file = locate_file env q in
 	let tl = load_file file in
-	let h = Hashtbl.create 17 in
-	Hashtbl.add loaded_theories file h;
-	let env = { env with theories = M.empty } in
-	let add env pt =
-	  let t, env = add_theory env pt in
-	  Hashtbl.add h t.th_name.id_short t;
-	  env
-	in
-	ignore (List.fold_left add env tl);
+	let long = String.concat "." q in
+	let env' = { env with theories = M.empty } in
+	let env' = List.fold_left (type_and_add_theory long) env' tl in
+	Hashtbl.replace env.loaded_theories q env'.theories;
       end;
-      let h = Hashtbl.find loaded_theories file in
-      try Hashtbl.find h id.id
-      with Not_found -> error ~loc:id.id_loc (UnboundTheory id.id)
+      let h = Hashtbl.find env.loaded_theories q in
+      M.find id h
 
-and type_theory env id pt =
-  (* TODO: use long name *)
-  let n = id_user id.id id.id_loc in
+and type_theory env q id pt =
+  let long = if q = "" then id.id else q ^ "." ^ id.id in
+  let n = id_user_long id.id long id.id_loc in
   let th = create_theory n in
   let th = add_decls env th pt.pt_decl in
   close_theory th
@@ -1120,7 +1092,14 @@ and add_decl env th = function
   | PropDecl (loc, k, s, f) ->
       add_prop (prop_kind k) loc s f th
   | UseClone (loc, use, subst) ->
-      let t = find_theory env use.use_theory in
+      let q, id = split_qualid use.use_theory in
+      let t = 
+	try
+	  find_theory env q id
+	with 
+	  | Not_found -> error ~loc (UnboundTheory use.use_theory)
+	  | Error (AmbiguousPath _ as e) -> error ~loc e
+      in
       let use_or_clone th = match subst with
 	| None -> 
 	    use_export th t
@@ -1186,17 +1165,25 @@ and add_decl env th = function
       let th = add_decls env th dl in
       close_namespace th import id
 
-and add_theory env pt =
+and add_theory env th =
+  let id = th.th_name.id_short in
+  if M.mem id env.theories then error (ClashTheory id);
+  { env with theories = M.add id th env.theories }
+
+and type_and_add_theory q env pt =
   let id = pt.pt_name in
-  if M.mem id.id env.theories then error ~loc:pt.pt_loc (ClashTheory id.id);
-  let t = type_theory env id pt in
-  t, { env with theories = M.add id.id t env.theories }
+  try
+    let th = type_theory env q id pt in
+    add_theory env th
+  with 
+    | Error (ClashTheory _ as e) -> error ~loc:id.id_loc e
+   
 
-let add_theories =
-  List.fold_left
-    (fun env pt -> let _, env = add_theory env pt in env) 
+and add_file env file =
+  let tl = load_file file in
+  List.fold_left (type_and_add_theory "") env tl
 
-let list_theory env = 
+let local_theories env = 
   List.rev (M.fold (fun _ v acc -> v::acc) env.theories [])
 
 (*
