@@ -86,6 +86,8 @@ let type_file env file =
 let extract_goals ctxt =
   Transform.apply Transform.extract_goals ctxt
 
+let driver_rules = ref Driver.empty_rules
+
 let transform env l =
   let l = List.map 
     (fun t -> t, Context.use_export Context.create_context t) 
@@ -96,8 +98,11 @@ let transform env l =
       (fun (t,ctxt) -> Why3.print_context_th std_formatter t.th_name ctxt) l
   else if !alt_ergo then match l with
     | (_,ctxt) :: _ -> begin match extract_goals ctxt with
-	| g :: _ -> Alt_ergo.print_goal env std_formatter g
-	| [] -> eprintf "no goal@."
+	| g :: _ -> 
+	    let drv = Driver.create !driver_rules ctxt in
+	    Alt_ergo.print_goal drv std_formatter g
+	| [] -> 
+	    eprintf "no goal@."
       end	
     | [] -> ()
 
@@ -105,7 +110,7 @@ let handle_file env file =
   if Filename.check_suffix file ".why" then
     type_file env file
   else if Filename.check_suffix file ".drv" then begin
-    ignore (Driver.load file);
+    driver_rules := Driver.load file;
     env
   end else begin
     eprintf "%s: don't know what to do with file %s@." Sys.argv.(0) file;
@@ -120,6 +125,12 @@ let () =
   with e when not !debug ->
     eprintf "%a@." report e;
     exit 1
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C .. test"
+End: 
+*)
 
 (****
 

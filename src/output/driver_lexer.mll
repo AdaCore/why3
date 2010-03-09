@@ -43,6 +43,7 @@
 	"syntax", SYNTAX;
 	"remove", REMOVE;
 	"tag", TAG;
+	"cloned", CLONED;
       ]
 
   let newline lexbuf =

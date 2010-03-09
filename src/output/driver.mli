@@ -31,6 +31,8 @@ val ident : t -> ident -> translation
 
 type rules
 
+val empty_rules : rules
+
 val load : string -> rules
 
 val create : rules -> context -> t

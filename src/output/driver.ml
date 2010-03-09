@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type t
+type t = unit
 
 type translation = 
   | Remove
@@ -25,18 +25,26 @@ type translation =
   | Tag of string list
 
 type rules = unit
+
+let empty_rules = ()
     
 let load file =
   let c = open_in file in
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
-  let f = Driver_lexer.parse_file lb in 
+  let _f = Driver_lexer.parse_file lb in 
   close_in c;
   ()
 
 let create rules ctxt =
-  assert false (*TODO*)
+  (* TODO *)
+  ()
 
 let ident dr id =
   assert false (*TODO*)
 
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. test"
+End: 
+*)

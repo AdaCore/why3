@@ -18,6 +18,7 @@
 /**************************************************************************/
 
 %{
+  open Ptree
   open Driver_ast
   open Parsing
   let loc () = (symbol_start_pos (), symbol_end_pos ())
@@ -29,7 +30,7 @@
 %token <string> STRING
 %token <string> OPERATOR
 %token THEORY END SYNTAX REMOVE TAG
-%token UNDERSCORE LEFTPAR RIGHTPAR STAR DOT EOF
+%token UNDERSCORE LEFTPAR RIGHTPAR CLONED DOT EOF
 
 %type <Driver_ast.file> file
 %start file
@@ -62,13 +63,14 @@ list0_trule:
 ;
 
 trule:
-| REMOVE star qualid   { Rremove ($2, $3) }
-| SYNTAX qualid STRING { Rsyntax ($2, $3) }
+| REMOVE cloned qualid     { Rremove ($2, $3) }
+| SYNTAX qualid STRING     { Rsyntax ($2, $3) }
+| TAG cloned qualid STRING { Rtag    ($2, $3, $4) }
 ;
 
-star:
+cloned:
 | /* epsilon */ { false }
-| STAR          { true  }
+| CLONED        { true  }
 ;
 
 qualid:
@@ -78,12 +80,12 @@ qualid:
 
 ident:
 | IDENT  
-    { { id = $1; loc = loc () } }
+    { { id = $1; id_loc = loc () } }
 | STRING 
-    { { id = $1; loc = loc () } }
+    { { id = $1; id_loc = loc () } }
 | LEFTPAR UNDERSCORE OPERATOR UNDERSCORE RIGHTPAR 
-    { { id = infix $3; loc = loc () } }
+    { { id = infix $3; id_loc = loc () } }
 | LEFTPAR OPERATOR UNDERSCORE RIGHTPAR 
-    { { id = prefix $2; loc = loc () } }
+    { { id = prefix $2; id_loc = loc () } }
 ;
 

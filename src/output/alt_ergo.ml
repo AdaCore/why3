@@ -125,12 +125,12 @@ let print_type_decl fmt = function
 let ac_th = ["algebra";"AC"]
 open Transform_utils
 
-let print_logic_decl env ctxt fmt = function
+let print_logic_decl drv ctxt fmt = function
   | Lfunction (ls, None) ->
       let tyl = ls.ls_args in
       let ty = match ls.ls_value with None -> assert false | Some ty -> ty in
-      fprintf fmt "@[<hov 2>logic %s%a : %a -> %a@]@\n" 
-        (if cloned_from_ls env ctxt ac_th "op" ls then "ac " else "") 
+      fprintf fmt "@[<hov 2>logic %a : %a -> %a@]@\n" 
+        (*(if cloned_from_ls env ctxt ac_th "op" ls then "ac " else "") *)
         print_ident ls.ls_name
 	(print_list comma print_type) tyl print_type ty
   | Lfunction (ls, Some defn) ->
@@ -149,16 +149,16 @@ let print_logic_decl env ctxt fmt = function
 	print_ident ls.ls_name 
         (print_list comma print_logic_binder) vl print_fmla f
 
-let print_decl env ctxt fmt d = match d.d_node with
+let print_decl drv ctxt fmt d = match d.d_node with
   | Dtype dl ->
       print_list newline print_type_decl fmt dl
   | Dlogic dl ->
-      print_list newline (print_logic_decl env ctxt) fmt dl
+      print_list newline (print_logic_decl drv ctxt) fmt dl
   | Dind _ ->
       assert false
-  | Dprop (Paxiom, pr) when 
-      (cloned_from_pr env ctxt ac_th "Comm" pr
-       || cloned_from_pr env ctxt ac_th "Assoc" pr) -> ()
+(*   | Dprop (Paxiom, pr) when  *)
+(*       (cloned_from_pr drv ctxt ac_th "Comm" pr *)
+(*        || cloned_from_pr env ctxt ac_th "Assoc" pr) -> () *)
   | Dprop (Paxiom, pr) ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n" 
         print_ident pr.pr_name print_fmla pr.pr_fmla

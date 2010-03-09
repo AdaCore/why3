@@ -19,18 +19,16 @@
 
 type loc = Loc.position
 
-type ident = { id : string; loc : loc }
+type ident = Ptree.ident
 
-type qualid = 
-  | Qident of ident
-  | Qdot   of qualid * ident
+type qualid = Ptree.qualid
 
-type star = bool
+type cloned = bool
 
 type trule =
-  | Rremove of star * qualid
+  | Rremove of cloned * qualid
   | Rsyntax of qualid * string
-  | Rtag    of star * qualid * string
+  | Rtag    of cloned * qualid * string
 
 type theory_rules = {
   th_name    : qualid;
