@@ -61,17 +61,19 @@ val id_dup : ident -> preid
 
 (** Unique persistent names for pretty printing *)
 
-type printer
+type ident_printer
 
-(* create new printing session with a sanitizing function and a blacklist *)
-val create_printer : ?sanitizer : (string -> string) -> string list -> printer
+(* start a new printer with a sanitizing function and a blacklist *)
+val create_ident_printer :
+  ?sanitizer : (string -> string) -> string list -> ident_printer
 
-(* generate a unique name for ident in the printing session *)
+(* use ident_printer to generate a unique name for ident *)
 (* an optional sanitizer is applied over the printer's sanitizer *)
-val id_unique : printer -> ?sanitizer : (string -> string) -> ident -> string
+val id_unique :
+  ident_printer -> ?sanitizer : (string -> string) -> ident -> string
 
 (* forget an ident *)
-val forget_id : printer -> ident -> unit
+val forget_id : ident_printer -> ident -> unit
 
 (* generic sanitizer taking a separate encoder for the first letter *)
 val sanitizer : (char -> string) -> (char -> string) -> string -> string

@@ -70,7 +70,7 @@ let id_dup id = { id with id_tag = -1 }
 
 (** Unique names for pretty printing *)
 
-type printer =
+type ident_printer =
   (string, int) Hashtbl.t * (int, string) Hashtbl.t * (string -> string)
 
 let rec find_index indices name ind =
@@ -89,7 +89,7 @@ let find_unique indices name =
 
 let same x = x
 
-let create_printer ?(sanitizer = same) sl =
+let create_ident_printer ?(sanitizer = same) sl =
   let indices = Hashtbl.create 1997 in
   let block n = ignore (find_unique indices n) in
   List.iter block sl;

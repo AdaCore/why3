@@ -34,7 +34,7 @@ let printer =
             "let"; "in"; "match"; "with"; "as"; "epsilon" ]
   in
   let sanitize = sanitizer char_to_alpha char_to_alnumus in
-  create_printer bl ~sanitizer:sanitize
+  create_ident_printer bl ~sanitizer:sanitize
 
 let print_id fmt id = Format.fprintf fmt "%s" (id_unique printer id)
 

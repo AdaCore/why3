@@ -727,7 +727,7 @@ type theory_uc = {
   uc_local  : Sid.t;
 }
 
-module Theory = struct
+module TheoryUC = struct
 
   exception CloseTheory
   exception NoOpenedNamespace
@@ -888,7 +888,7 @@ end
 (** Debugging *)
 
 let print_ident =
-  let printer = create_printer [] in
+  let printer = create_ident_printer [] in
   let print fmt id = Format.fprintf fmt "%s" (id_unique printer id) in
   print
 
@@ -904,7 +904,7 @@ let rec print_namespace fmt ns =
     ns.ns_ns;
   fprintf fmt "@]"
 
-let print_uc fmt uc = print_namespace fmt (Theory.get_namespace uc)
+let print_uc fmt uc = print_namespace fmt (TheoryUC.get_namespace uc)
 
 let print_ctxt fmt ctxt =
   fprintf fmt "@[<hov 2>ctxt : cloned : %a@]"

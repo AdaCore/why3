@@ -27,7 +27,7 @@ open Theory
 let ident_printer = 
   let bls = ["let"; "forall"; "exists"; "and"; "or"] in
   let san = sanitizer char_to_alpha char_to_alnumus in
-  create_printer bls ~sanitizer:san
+  create_ident_printer bls ~sanitizer:san
 
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)

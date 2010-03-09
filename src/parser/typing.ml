@@ -25,8 +25,7 @@ open Ty
 open Term
 open Ptree
 open Theory
-
-open Theory
+open TheoryUC
 
 (** errors *)
 
@@ -1153,7 +1152,7 @@ and add_decl env th = function
 	    close_namespace th true n
 	| Export ->
 	    use_or_clone th 
-      with Theory.ClashSymbol s ->
+      with ClashSymbol s ->
 	error ~loc (Clash s)
       end
   | Namespace (_, import, name, dl) ->

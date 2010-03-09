@@ -176,7 +176,7 @@ val builtin_theory : theory
 
 type theory_uc  (* a theory under construction *)
 
-module Theory : sig
+module TheoryUC : sig
 
   val create_theory : preid -> theory_uc
   val close_theory  : theory_uc -> theory
