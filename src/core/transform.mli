@@ -52,7 +52,7 @@ val fold :
 
 val fold_map :
   ?clear:(unit -> unit) ->
-  (context  -> context -> 'a -> ('a * context)) -> 'a -> 
+  (context  -> 'a * context -> 'a * context) -> 'a -> 
   context t
 
 val map :
@@ -80,6 +80,7 @@ val elt :
   | Ouse   of theory
   | Oclone of (ident * ident) list
 *)
+(*
 val elt_of_oelt :
   ty:(ty_decl -> ty_decl) ->
   logic:(logic_decl -> logic_decl) ->
@@ -89,16 +90,13 @@ val elt_of_oelt :
   clone:(theory -> (ident * ident) list -> decl list) ->
   (decl -> decl list)
 
-
 val fold_context_of_decl:
   (context -> 'a -> decl -> 'a * decl list) ->
   context -> 'a -> context -> decl -> ('a * context)
+*)
 
 (* Utils *)
-val unit_tag : unit -> int
 
-val split_goals : context list t
-
-val extract_goals : (Ident.ident * Term.fmla * context) list t
+val split_goals : unit -> context list t
 
 val identity : context t

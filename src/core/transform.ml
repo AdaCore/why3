@@ -82,11 +82,11 @@ let fold ?clear f_fold v_empty =
 
 let fold_map ?clear f_fold v_empty =
   let v_empty = v_empty,init_context in
-  let f_fold ctxt (env,ctxt2) = f_fold ctxt ctxt2 env in
+  let f_fold ctxt env_ctxt2 = f_fold ctxt env_ctxt2 in
   conv_res (fold ?clear f_fold v_empty) snd
 
 let map ?clear f_map =
-  fold_map ?clear (fun ctxt1 ctxt2 () -> (),f_map ctxt1 ctxt2) ()
+  fold_map ?clear (fun ctxt1 ctxt2 -> (), f_map ctxt1 (snd ctxt2)) ()
 
 let map_concat ?clear f_elt = 
   let f_elt ctxt0 ctxt = 
@@ -126,7 +126,7 @@ let fold_context_of_decl f ctxt env ctxt_done d =
   let env,decls = f ctxt env d in
   env,List.fold_left add_decl ctxt_done decls
   
-let split_goals =
+let split_goals () =
   let f ctxt0 (ctxt,l) =
     let decl = ctxt0.ctxt_decl in
     match decl.d_node with

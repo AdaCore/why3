@@ -66,7 +66,7 @@ and replacep env f =
 and substt env d = t_map (replacet env) (replacep env) d
 and substp env d = f_map (replacet env) (replacep env) d
 
-let fold isnotinlinedt isnotinlinedf ctxt0 ctxt env = 
+let fold isnotinlinedt isnotinlinedf ctxt0 (env, ctxt) = 
 (*  Format.printf "I see : %a@\n%a@\n" Pretty.print_decl d print_env env;*)
   let d = ctxt0.ctxt_decl in
   match d.d_node with

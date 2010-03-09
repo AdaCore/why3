@@ -92,7 +92,7 @@ let type_file env file =
     Typing.add_from_file env file
 
 let extract_goals ctxt =
-  Transform.apply Transform.split_goals ctxt
+  Transform.apply (Transform.split_goals ()) ctxt
 
 let transform env l =
   let l = List.map 
