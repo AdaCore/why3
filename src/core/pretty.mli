@@ -23,22 +23,32 @@ open Ty
 open Term
 open Theory
 
-val print_ident : formatter -> ident -> unit
+val forget_tvs : unit -> unit     (* flush id_unique for type vars *)
+val forget_var : vsymbol -> unit  (* flush id_unique for a variable *)
 
-val print_vsymbol : formatter -> vsymbol -> unit
+val print_id : formatter -> ident -> unit         (* ident *)
+val print_tv : formatter -> tvsymbol -> unit      (* type variable *)
+val print_ts : formatter -> tysymbol -> unit      (* type symbol *)
+val print_ty : formatter -> ty -> unit            (* type *)
+val print_vs : formatter -> vsymbol -> unit       (* variable *)
+val print_vsty : formatter -> vsymbol -> unit     (* variable : type *)
+val print_ls : formatter -> lsymbol -> unit       (* logic symbol *)
+val print_const : formatter -> constant -> unit   (* int/real constant *)
+val print_pat : formatter -> pattern -> unit      (* pattern *)
+val print_term : formatter -> term -> unit        (* term *)
+val print_fmla : formatter -> fmla -> unit        (* formula *)
 
-val print_lsymbol : formatter -> lsymbol -> unit
+val print_type_decl : formatter -> ty_decl -> unit
+val print_logic_decl : formatter -> logic_decl -> unit
+val print_ind_decl : formatter -> ind_decl -> unit
 
-val print_ty : formatter -> ty -> unit
-
-val print_term : formatter -> term -> unit
-
-val print_fmla : formatter -> fmla -> unit
+val print_pkind : formatter -> prop_kind -> unit
+val print_prop : formatter -> prop -> unit
 
 val print_decl : formatter -> decl -> unit
-
-val print_decl_list : formatter -> decl list -> unit
-
+val print_decls : formatter -> decl list -> unit
 val print_context : formatter -> context -> unit
-
 val print_theory : formatter -> theory -> unit
+
+val print_named_context : formatter -> string -> context -> unit
+

@@ -101,7 +101,8 @@ let transform env l =
   let l = transformation l in
   if !print_stdout then 
     List.iter 
-      (fun (t,ctxt) -> Why3.print_context_th std_formatter t.th_name ctxt) l
+      (fun (t,ctxt) -> Pretty.print_named_context
+        std_formatter t.th_name.Ident.id_long ctxt) l
   else match !driver with
     | None ->
 	()

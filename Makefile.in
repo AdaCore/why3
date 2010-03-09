@@ -104,8 +104,8 @@ doc/version.tex src/version.ml: Version version.sh config.status
 # why
 #####
 
-CORE_CMO := ident.cmo ty.cmo term.cmo theory.cmo transform.cmo \
-	context_utils.cmo
+CORE_CMO := ident.cmo ty.cmo term.cmo theory.cmo pretty.cmo \
+    	    transform.cmo context_utils.cmo
 CORE_CMO := $(addprefix src/core/,$(CORE_CMO))
 
 UTIL_CMO := pp.cmo loc.cmo util.cmo hashcons.cmo 
@@ -114,15 +114,15 @@ UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
 PARSER_CMO := parser.cmo lexer.cmo typing.cmo transform_utils.cmo
 PARSER_CMO := $(addprefix src/parser/,$(PARSER_CMO))
 
-TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
-	flatten.cmo
+TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo \
+		 flatten.cmo
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
 OUTPUT_CMO := driver_parser.cmo driver_lexer.cmo driver.cmo \
               print_real.cmo alt_ergo.cmo why3.cmo
 OUTPUT_CMO := $(addprefix src/output/,$(OUTPUT_CMO))
 
-CMO = $(UTIL_CMO) $(CORE_CMO) src/pretty.cmo $(PARSER_CMO)	\
+CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) \
       $(TRANSFORM_CMO) $(OUTPUT_CMO) src/main.cmo
 CMX = $(CMO:.cmo=.cmx)
 
