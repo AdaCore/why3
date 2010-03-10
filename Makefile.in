@@ -104,7 +104,7 @@ doc/version.tex src/version.ml: Version version.sh config.status
 # why
 #####
 
-CORE_CMO := ident.cmo ty.cmo term.cmo termlib.cmo theory.cmo \
+CORE_CMO := ident.cmo ty.cmo term.cmo theory.cmo \
             pretty.cmo transform.cmo context_utils.cmo
 CORE_CMO := $(addprefix src/core/,$(CORE_CMO))
 
