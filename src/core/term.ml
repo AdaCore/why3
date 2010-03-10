@@ -434,8 +434,9 @@ let t_eps u f = Hterm.hashcons (mk_term (Teps (u, f)) u.vs_ty)
 
 let t_label     l t = Hterm.hashcons { t with t_label = l }
 let t_label_add l t = Hterm.hashcons { t with t_label = l :: t.t_label }
-
 let t_label_copy { t_label = l } t = if l == [] then t else t_label l t
+
+let t_app_unsafe = t_app
 
 (* hash-consing constructors for formulas *)
 
@@ -458,8 +459,9 @@ let f_case t bl = Hfmla.hashcons (mk_fmla (Fcase (t, bl)))
 
 let f_label     l f = Hfmla.hashcons { f with f_label = l }
 let f_label_add l f = Hfmla.hashcons { f with f_label = l :: f.f_label }
-
 let f_label_copy { f_label = l } f = if l == [] then f else f_label l f
+
+let f_app_unsafe = f_app
 
 (* unsafe map with level *)
 
@@ -867,13 +869,13 @@ let f_branch fn b = let pat,_,f = f_open_branch b in (pat, fn f)
 let t_map fnT fnF t = t_label_copy t (match t.t_node with
   | Tbvar _ -> raise UnboundIndex
   | Tvar _ | Tconst _ -> t
-  | Tapp (f, tl) -> t_app f (List.map fnT tl) t.t_ty
+  | Tapp (f, tl) -> t_app_unsafe f (List.map fnT tl) t.t_ty
   | Tlet (t1, b) -> let u,t2 = t_open_bound b in t_let u (fnT t1) (fnT t2)
   | Tcase (t1, bl) -> t_case (fnT t1) (List.map (t_branch fnT) bl) t.t_ty
   | Teps b -> let u,f = f_open_bound b in t_eps u (fnF f))
 
 let f_map fnT fnF f = f_label_copy f (match f.f_node with
-  | Fapp (p, tl) -> f_app p (List.map fnT tl)
+  | Fapp (p, tl) -> f_app_unsafe p (List.map fnT tl)
   | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
       f_quant q vl (tr_map fnT fnF tl) (fnF f1)
   | Fbinop (op, f1, f2) -> f_binary op (fnF f1) (fnF f2)
@@ -882,6 +884,13 @@ let f_map fnT fnF f = f_label_copy f (match f.f_node with
   | Fif (f1, f2, f3) -> f_if (fnF f1) (fnF f2) (fnF f3)
   | Flet (t, b) -> let u,f1 = f_open_bound b in f_let u (fnT t) (fnF f1)
   | Fcase (t, bl) -> f_case (fnT t) (List.map (f_branch fnF) bl))
+
+let protect fn t =
+  let res = fn t in
+  if res.t_ty != t.t_ty then raise TypeMismatch;
+  res
+
+let t_map fnT = t_map (protect fnT)
 
 (* safe opening fold *)
 
