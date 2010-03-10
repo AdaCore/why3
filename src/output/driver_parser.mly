@@ -32,6 +32,7 @@
 %token THEORY END SYNTAX REMOVE TAG PRELUDE PRINTER CALL_ON_FILE CALL_ON_STDIN
 %token VALID INVALID UNKNOWN FAIL
 %token UNDERSCORE LEFTPAR RIGHTPAR CLONED DOT EOF
+%token LOGIC TYPE PROP
 
 %type <Driver_ast.file> file
 %start file
@@ -75,10 +76,13 @@ list0_trule:
 ;
 
 trule:
-| PRELUDE STRING           { Rprelude (loc (),$2) }
-| REMOVE cloned qualid     { Rremove ($2, $3) }
-| SYNTAX qualid STRING     { Rsyntax ($2, $3) }
-| TAG cloned qualid STRING { Rtag    ($2, $3, $4) }
+| PRELUDE STRING                      { Rprelude  (loc (),$2) }
+| REMOVE PROP cloned qualid           { Rremove   ($3, $4) }
+| SYNTAX TYPE qualid STRING           { Rsyntaxty ($3, $4) }
+| SYNTAX LOGIC qualid STRING          { Rsyntaxls ($3, $4) }
+| TAG TYPE cloned qualid STRING       { Rtagty    ($3, $4, $5) }
+| TAG LOGIC cloned qualid STRING      { Rtagls    ($3, $4, $5) }
+| TAG PROP cloned qualid STRING       { Rtagpr    ($3, $4, $5) }
 ;
 
 cloned:

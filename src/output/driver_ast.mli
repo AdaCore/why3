@@ -25,8 +25,11 @@ type cloned = bool
 
 type trule =
   | Rremove of cloned * qualid
-  | Rsyntax of qualid * string
-  | Rtag    of cloned * qualid * string
+  | Rsyntaxty of qualid * string
+  | Rsyntaxls of qualid * string
+  | Rtagty    of cloned * qualid * string
+  | Rtagls    of cloned * qualid * string
+  | Rtagpr    of cloned * qualid * string
   | Rprelude of loc * string
 
 type theory_rules = {

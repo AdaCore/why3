@@ -75,11 +75,16 @@ let rec print_term drv fmt t = match t.t_node with
 let rec print_fmla drv fmt f = match f.f_node with
   | Fapp ({ ls_name = id }, []) ->
       print_ident fmt id
-  | Fapp (ls, [t1; t2]) when ls == ps_equ ->
-      fprintf fmt "(%a = %a)" (print_term drv) t1 (print_term drv) t2
   | Fapp (ls, tl) ->
-      fprintf fmt "%a(%a)" 
-	print_ident ls.ls_name (print_list comma (print_term drv)) tl
+      begin      
+        match Driver.query_ident drv ls.ls_name with
+          | Driver.Remove -> assert false (* Mettre une erreur *)
+          | Driver.Syntax s ->
+              Driver.syntax_arguments s (print_term drv) fmt tl
+          | Driver.Tag _ -> 
+              fprintf fmt "%a(%a)" 
+	        print_ident ls.ls_name (print_list comma (print_term drv)) tl
+      end
   | Fquant (q, fq) ->
       let q = match q with Fforall -> "forall" | Fexists -> "exists" in
       let vl, tl, f = f_open_quant fq in
@@ -152,8 +157,15 @@ let print_logic_decl drv ctxt fmt = function
         (print_list comma print_logic_binder) vl print_type ty (print_term drv) t;
       List.iter forget_var vl
   | Lpredicate (ls, None) ->
-      fprintf fmt "@[<hov 2>logic %a : %a -> prop@]"
-	print_ident ls.ls_name (print_list comma print_type) ls.ls_args
+      begin
+        match Driver.query_ident drv ls.ls_name with
+          | Driver.Remove -> ()
+          | Driver.Syntax _ -> ()
+          | Driver.Tag s -> 
+              let sac = if Snm.mem "AC" s then "ac " else "" in
+              fprintf fmt "@[<hov 2>logic %s%a : %a -> prop@]" sac
+	        print_ident ls.ls_name (print_list comma print_type) ls.ls_args
+      end
   | Lpredicate (ls, Some fd) ->
       let _,vl,f = open_ps_defn fd in
       fprintf fmt "@[<hov 2>predicate %a(%a) = %a@]"

@@ -169,8 +169,7 @@ let string_of_qualid thl idl =
 
 let regexp_arg_pos = Str.regexp "%\\([0-9]+\\)"
 
-let check_syntax loc s ls = 
-  let len = List.length ls.ls_args in
+let check_syntax loc s len = 
   iter_group regexp_arg_pos 
     (fun s ->
        let i = int_of_string (matched_group 1 s) in
@@ -194,41 +193,66 @@ let load_rules env driver {thr_name = loc,qualid; thr_rules = trl} =
     with Not_found ->
       let t23 = if cloned then (Tag Snm.empty),t else t,(Tag Snm.empty) in
       Hid.add driver.drv_theory id t23 in
-  let rec find_lident ns = function
+  let rec find_l ns = function
     | [] -> assert false
     | [a] -> Mnm.find a ns.ns_ls
-    | a::l -> find_lident (Mnm.find a ns.ns_ns) l in
-  let rec find_tyident ns = function
+    | a::l -> find_l (Mnm.find a ns.ns_ns) l in
+  let rec find_ty ns = function
     | [] -> assert false
-    | [a] -> (Mnm.find a ns.ns_ts).ts_name
-    | a::l -> find_tyident (Mnm.find a ns.ns_ns) l in
-  let rec find_prident ns = function
+    | [a] -> Mnm.find a ns.ns_ts
+    | a::l -> find_ty (Mnm.find a ns.ns_ns) l in
+  let rec find_pr ns = function
     | [] -> assert false
-    | [a] -> (Mnm.find a ns.ns_pr).pr_name
-    | a::l -> find_prident (Mnm.find a ns.ns_ns) l in
+    | [a] -> Mnm.find a ns.ns_pr
+    | a::l -> find_pr (Mnm.find a ns.ns_ns) l in
   let add = function
     | Rremove (c,(loc,q)) -> 
         begin
           try
-            add_htheory c (find_prident th.th_export q) Remove
+            add_htheory c (find_pr th.th_export q).pr_name Remove
           with Not_found -> errorm ~loc "Unknown axioms %s" 
             (string_of_qualid qualid q)
         end 
-    | Rsyntax ((loc,q),s) -> 
+    | Rsyntaxls ((loc,q),s) -> 
         begin
           try
-            let ls = (find_lident th.th_export q) in
-            check_syntax loc s ls;
+            let ls = (find_l th.th_export q) in
+            check_syntax loc s (List.length ls.ls_args);
             add_htheory false ls.ls_name (Syntax s)
           with Not_found -> errorm ~loc "Unknown logic %s" 
             (string_of_qualid qualid q)
         end 
-    | Rtag (c,(loc,q),s) ->
+    | Rsyntaxty ((loc,q),s) -> 
         begin
           try
-            add_htheory c (find_lident th.th_export q).ls_name 
+            let ts = find_ty th.th_export q in
+            check_syntax loc s (List.length ts.ts_args);
+            add_htheory false ts.ts_name (Syntax s)
+          with Not_found -> errorm ~loc "Unknown type %s" 
+            (string_of_qualid qualid q)
+        end
+    | Rtagls (c,(loc,q),s) ->
+        begin
+          try
+            add_htheory c (find_l th.th_export q).ls_name 
               (Tag (Snm.singleton s))
           with Not_found -> errorm ~loc "Unknown logic %s" 
+            (string_of_qualid qualid q)
+        end
+    | Rtagty (c,(loc,q),s) ->
+        begin
+          try
+            add_htheory c (find_ty th.th_export q).ts_name 
+              (Tag (Snm.singleton s))
+          with Not_found -> errorm ~loc "Unknown type %s" 
+            (string_of_qualid qualid q)
+        end
+    | Rtagpr (c,(loc,q),s) ->
+        begin
+          try
+            add_htheory c (find_pr th.th_export q).pr_name 
+              (Tag (Snm.singleton s))
+          with Not_found -> errorm ~loc "Unknown proposition %s" 
             (string_of_qualid qualid q)
         end
     | Rprelude (loc,s) -> if Hid.mem driver.drv_thprelude th.th_name

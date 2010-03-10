@@ -41,6 +41,9 @@
 	"invalid", INVALID;
 	"unknown", UNKNOWN;
 	"fail", FAIL;
+        "logic", LOGIC;
+        "type", TYPE;
+        "prop", PROP;
       ]
 
 }

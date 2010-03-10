@@ -7,31 +7,42 @@ printer "alt-ergo"
 
 call_on_file  "alt-ergo %s"
 
+
+theory BuiltIn
+
+  syntax logic (_=_) "(%1 = %1)"
+
+ (* inutile car  "<>" devient "not =" *)
+  syntax logic (_<>_) "(%1 = %1)"
+
+end
+
+
 theory prelude.Int
 
   prelude "(* this is a prelude for Alt-Ergo arithmetic *)"
 
-  syntax zero "0"
+  syntax logic zero "0"
 
-  syntax (_+_) "(%1 + %2)"
-  syntax (_-_) "(%1 - %2)"
-  syntax (_*_) "(%1 * %2)"
-  syntax (_/_) "(%1 / %2)"
-  syntax (-_)  "(-%1)"
+  syntax logic (_+_) "(%1 + %2)"
+  syntax logic (_-_) "(%1 - %2)"
+  syntax logic (_*_) "(%1 * %2)"
+  syntax logic (_/_) "(%1 / %2)"
+  syntax logic (-_)  "(-%1)"
 
-  syntax (_<=_) "(%1 <= %2)"
-  syntax (_< _) "(%1 <  %2)"
-  syntax (_>=_) "(%1 >= %2)"
-  syntax (_> _) "(%1 >  %2)"
+  syntax logic (_<=_) "(%1 <= %2)"
+  syntax logic (_< _) "(%1 <  %2)"
+  syntax logic (_>=_) "(%1 >= %2)"
+  syntax logic (_> _) "(%1 >  %2)"
 
-  remove Mul_comm
-  remove One_neutral
+  remove prop Mul_comm
+  remove prop One_neutral
 end
 
 theory algebra.AC
-  tag cloned op "AC"
-  remove cloned Comm
-  remove cloned Assoc
+  tag logic cloned op "AC"
+  remove prop cloned Comm
+  remove prop cloned Assoc
 end
 
 (*
