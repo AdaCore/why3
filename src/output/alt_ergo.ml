@@ -48,10 +48,8 @@ let rec print_type fmt ty = match ty.ty_node with
 let rec print_term fmt t = match t.t_node with
   | Tbvar _ -> 
       assert false
-  | Tconst (ConstInt s) ->
-      fprintf fmt "%s" s
-  | Tconst (ConstReal _) ->
-      assert false (*TODO*)
+  | Tconst c ->
+      Pretty.print_const fmt c
   | Tvar { vs_name = id } | Tapp ({ ls_name = id }, []) ->
       print_ident fmt id
   | Tapp (ls, tl) ->
