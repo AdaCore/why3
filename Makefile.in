@@ -114,7 +114,7 @@ PARSER_CMO := parser.cmo lexer.cmo typing.cmo
 PARSER_CMO := $(addprefix src/parser/,$(PARSER_CMO))
 
 TRANSFORM_CMO := transform.cmo simplify_recursive_definition.cmo	\
-	inlining.cmo flatten.cmo
+	inlining.cmo 
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
 OUTPUT_CMO := driver_parser.cmo driver_lexer.cmo driver.cmo \
