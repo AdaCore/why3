@@ -32,7 +32,7 @@ val load_driver : string -> Typing.env -> driver
 type translation = 
   | Remove
   | Syntax of string
-  | Tag of string list
+  | Tag of Snm.t
 
 val query_ident : driver -> ident -> translation
 

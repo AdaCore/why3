@@ -21,15 +21,6 @@ open Ty
 open Term
 open Theory
 
-let qualid_of_lstring s =
-  assert false (*TODO*)
-(* let qualid_of_lstring = function *)
-(*   | [] -> invalid_arg "Transfrom_utils.qualid_of_lstring : empty list" *)
-(*   | a :: l ->  *)
-(*       let id = Ptree.Qident {Ptree.id = a;id_loc = Loc.dummy_position} in *)
-(*       List.fold_left (fun acc x ->  *)
-(*                         Ptree.Qdot (acc,{Ptree.id = x;id_loc = Loc.dummy_position})) id l *)
-
 let cloned_from_ts env ctxt l s ls1 =
   assert false (*TODO*)
 (*   try *)

@@ -50,12 +50,14 @@ let () =
 
 let in_emacs = Sys.getenv "TERM" = "dumb"
 
-let transformation l = 
+let transformation env l = 
+  let t1 = Simplify_recursive_definition.t env in
+  let t2 = Inlining.all env in
   List.map (fun (t,c) ->
               let c = if !simplify_recursive 
-              then Transform.apply Simplify_recursive_definition.t c
+              then Transform.apply t1 c
               else c in
-              let c = if !inlining then Transform.apply Inlining.all c
+              let c = if !inlining then Transform.apply t2 c
               else c in
               (t,c)) l
 
@@ -91,14 +93,14 @@ let type_file env file =
   end else 
     Typing.add_from_file env file
 
-let extract_goals ctxt =
-  Transform.apply (Transform.split_goals ()) ctxt
+let extract_goals env ctxt =
+  Transform.apply (Transform.split_goals env) ctxt
 
 let transform env l =
   let l = List.map 
     (fun t -> t, Context.use_export Context.init_context t) 
       (Typing.local_theories l) in
-  let l = transformation l in
+  let l = transformation env l in
   if !print_stdout then 
     List.iter 
       (fun (t,ctxt) -> Pretty.print_named_context
@@ -109,7 +111,7 @@ let transform env l =
     | Some file ->
 	let drv = load_driver file env in
 	begin match l with
-	  | (_,ctxt) :: _ -> begin match extract_goals ctxt with
+	  | (_,ctxt) :: _ -> begin match extract_goals env ctxt with
 	      | g :: _ -> 
 		  Driver.print_context drv std_formatter g
 	      | [] -> 

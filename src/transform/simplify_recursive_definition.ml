@@ -140,9 +140,4 @@ let elt d =
     | Dind _ -> [d] (* TODO *)
     | Dprop _ | Dclone _ | Duse _ -> [d]
 
-let elt d = 
-  let r = elt d in
-(*  Format.printf "srd : %a -> %a@\n" Pretty.print_decl d Pretty.print_decl_list r;*)
-  r
-
-let t = Transform.elt elt
+let t env = Transform.elt (fun _ -> elt) env

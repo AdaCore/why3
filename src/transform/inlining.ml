@@ -118,8 +118,8 @@ let fold isnotinlinedt isnotinlinedf ctxt0 (env, ctxt) =
         (create_prop (id_dup pr.pr_name) (replacep env pr.pr_fmla)))
     | Duse _ | Dclone _ -> env,add_decl ctxt d
         
-let t ~isnotinlinedt ~isnotinlinedf = 
-  Transform.fold_map (fold isnotinlinedt isnotinlinedf) empty_env
+let t ~isnotinlinedt ~isnotinlinedf env = 
+  Transform.fold_map (fun _ -> fold isnotinlinedt isnotinlinedf) empty_env env
 
 let all = t ~isnotinlinedt:(fun _ -> false) ~isnotinlinedf:(fun _ -> false)
 

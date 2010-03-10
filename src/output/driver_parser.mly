@@ -66,7 +66,7 @@ list0_theory:
 
 theory:
 | THEORY qualid list0_trule END
-    { { th_name = $2; th_rules = $3 } }
+    { { thr_name = $2; thr_rules = $3 } }
 ;
 
 list0_trule:
@@ -75,7 +75,7 @@ list0_trule:
 ;
 
 trule:
-| PRELUDE STRING           { Rprelude $2 }
+| PRELUDE STRING           { Rprelude (loc (),$2) }
 | REMOVE cloned qualid     { Rremove ($2, $3) }
 | SYNTAX qualid STRING     { Rsyntax ($2, $3) }
 | TAG cloned qualid STRING { Rtag    ($2, $3, $4) }

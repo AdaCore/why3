@@ -20,21 +20,29 @@
 open Ident
 open Theory
 open Context
+open Typing
 
 (* the memoisation is inside the function *)
 type 'a t = { all : context -> 'a;
               clear : unit -> unit;
+              env : env;
          }
 
 type ctxt_t = context t
 
 
 let conv_res f c = {all = (fun x -> c (f.all x));
-                    clear = f.clear}
+                    clear = f.clear;
+                    env = f.env}
 
-let compose f g = {all = (fun x -> g.all (f.all x));
-                   clear = (fun () -> f.clear (); g.clear ());
-                  }
+exception CompositionOfIncompatibleTranformation
+
+let compose f g =
+  if g.env != f.env then raise CompositionOfIncompatibleTranformation;
+  {all = (fun x -> g.all (f.all x));
+   clear = (fun () -> f.clear (); g.clear ());
+   env = f.env
+  }
 
 let apply f x = f.all x
 
@@ -56,17 +64,18 @@ let memo f tag h = ymemo (fun _ -> f) tag h
 let d_tag d = d.d_tag
 let ctxt_tag c = c.ctxt_tag
 
-let t ?(clear=(fun () -> ())) all clear_all =
+let t all clear_all env =
   {all = all;
-   clear = (fun () -> clear ();clear_all ())
+   clear = clear_all;
+   env = env;
   }
 
-let fold ?clear f_fold v_empty =
+let fold f_fold v_empty tenv =
   let memo_t = Hashtbl.create 64 in
   let rewind env todo =
     List.fold_left
       (fun env ctxt ->
-         let env = f_fold ctxt env in
+         let env = f_fold tenv ctxt env in
          Hashtbl.add memo_t ctxt.ctxt_tag env;
          env) env todo in
   let rec f todo ctxt = 
@@ -78,31 +87,31 @@ let fold ?clear f_fold v_empty =
             rewind env (ctxt::todo)
           with Not_found -> f (ctxt::todo) ctxt2
   in
-  t ?clear (f []) (fun () -> Hashtbl.clear memo_t)
+  t  (f []) (fun () -> Hashtbl.clear memo_t) tenv
 
-let fold_map ?clear f_fold v_empty =
+let fold_map f_fold v_empty env =
   let v_empty = v_empty,init_context in
-  let f_fold ctxt env_ctxt2 = f_fold ctxt env_ctxt2 in
-  conv_res (fold ?clear f_fold v_empty) snd
+  let f_fold env ctxt env_ctxt2 = f_fold env ctxt env_ctxt2 in
+  conv_res (fold f_fold v_empty env) snd
 
-let map ?clear f_map =
-  fold_map ?clear (fun ctxt1 ctxt2 -> (), f_map ctxt1 (snd ctxt2)) ()
+let map f_map env =
+  fold_map  (fun env ctxt1 ctxt2 -> (), f_map env ctxt1 (snd ctxt2)) () env
 
-let map_concat ?clear f_elt = 
-  let f_elt ctxt0 ctxt = 
-    List.fold_left add_decl ctxt (f_elt ctxt0) in
-  map ?clear f_elt
+let map_concat f_elt env = 
+  let f_elt env ctxt0 ctxt = 
+    List.fold_left add_decl ctxt (f_elt env ctxt0) in
+  map f_elt env
 
 
-let elt ?clear f_elt = 
+let elt f_elt env = 
   let memo_elt = Hashtbl.create 64 in
-  let f_elt ctxt0 = memo f_elt d_tag memo_elt ctxt0.ctxt_decl in
-  let f = map_concat ?clear f_elt in
+  let f_elt env ctxt0 = memo (f_elt env) d_tag memo_elt ctxt0.ctxt_decl in
+  let f = map_concat f_elt env in
   {f with clear = fun () -> Hashtbl.clear memo_elt; f.clear ()}
     
-let register ?clear f =
+let register f env =
   let memo_t = Hashtbl.create 16 in
-  t ?clear (memo f ctxt_tag memo_t) (fun () -> Hashtbl.clear memo_t)
+  t  (memo (f env) ctxt_tag memo_t) (fun () -> Hashtbl.clear memo_t) env
 
 (* Utils *)
 
@@ -126,8 +135,8 @@ let fold_context_of_decl f ctxt env ctxt_done d =
   let env,decls = f ctxt env d in
   env,List.fold_left add_decl ctxt_done decls
   
-let split_goals () =
-  let f ctxt0 (ctxt,l) =
+let split_goals env =
+  let f _ ctxt0 (ctxt,l) =
     let decl = ctxt0.ctxt_decl in
     match decl.d_node with
       | Dprop (Pgoal,_) -> (ctxt,(add_decl ctxt decl)::l)
@@ -137,11 +146,11 @@ let split_goals () =
           (add_decl ctxt d1,
            (add_decl ctxt d2)::l)
       | _ -> (add_decl ctxt decl,l) in
-  let g = fold f (init_context,[]) in
+  let g = fold f (init_context,[]) env in
   conv_res g snd
 
-let extract_goals =
-  let f ctxt0 (ctxt,l) =
+let extract_goals env =
+  let f env ctxt0 (ctxt,l) =
     let decl = ctxt0.ctxt_decl in    
     match decl.d_node with
       | Dprop (Pgoal,f) -> (ctxt,(f.pr_name,f.pr_fmla,ctxt)::l)
@@ -150,11 +159,10 @@ let extract_goals =
           (add_decl ctxt d,
            (f.pr_name,f.pr_fmla,ctxt)::l)
       | _ -> (add_decl ctxt decl,l) in
-  let g = fold f (init_context,[]) in
+  let g = fold f (init_context,[]) env in
   conv_res g snd
 
 
-let unit_tag () = 0
-
-let identity = {all = (fun x -> x);
-                clear = (fun () -> ())}
+let identity env = {all = (fun x -> x);
+                    clear = (fun () -> ());
+                    env = env}

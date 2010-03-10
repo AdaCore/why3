@@ -127,10 +127,14 @@ open Transform_utils
 
 let print_logic_decl drv ctxt fmt = function
   | Lfunction (ls, None) ->
+      let sac = match Driver.query_ident drv ls.ls_name with
+        | Driver.Remove -> assert false (*TODO message *)
+        | Driver.Syntax _ -> assert false (*TODO substitution *)
+        | Driver.Tag s -> if Snm.mem "AC" s then "ac " else "" in
       let tyl = ls.ls_args in
       let ty = match ls.ls_value with None -> assert false | Some ty -> ty in
-      fprintf fmt "@[<hov 2>logic %a : %a -> %a@]@\n" 
-        (*(if cloned_from_ls env ctxt ac_th "op" ls then "ac " else "") *)
+      fprintf fmt "@[<hov 2>logic %s%a : %a -> %a@]@\n"
+        sac
         print_ident ls.ls_name
 	(print_list comma print_type) tyl print_type ty
   | Lfunction (ls, Some defn) ->
@@ -154,11 +158,9 @@ let print_decl drv ctxt fmt d = match d.d_node with
       print_list newline print_type_decl fmt dl
   | Dlogic dl ->
       print_list newline (print_logic_decl drv ctxt) fmt dl
-  | Dind _ ->
-      assert false
-(*   | Dprop (Paxiom, pr) when  *)
-(*       (cloned_from_pr drv ctxt ac_th "Comm" pr *)
-(*        || cloned_from_pr env ctxt ac_th "Assoc" pr) -> () *)
+  | Dind _ -> assert false (* TODO *)
+  | Dprop (Paxiom, pr) when
+      Driver.query_ident drv pr.pr_name = Driver.Remove -> ()
   | Dprop (Paxiom, pr) ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n" 
         print_ident pr.pr_name print_fmla pr.pr_fmla

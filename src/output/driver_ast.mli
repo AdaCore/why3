@@ -27,11 +27,11 @@ type trule =
   | Rremove of cloned * qualid
   | Rsyntax of qualid * string
   | Rtag    of cloned * qualid * string
-  | Rprelude of string
+  | Rprelude of loc * string
 
 type theory_rules = {
-  th_name    : qualid;
-  th_rules   : trule list;
+  thr_name    : qualid;
+  thr_rules   : trule list;
 }
 
 type global =

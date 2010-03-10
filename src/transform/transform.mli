@@ -19,6 +19,7 @@
 
 open Ident
 open Theory
+open Typing
 
 (* Tranformation on context with some memoisations *)
 
@@ -28,6 +29,7 @@ open Theory
 type 'a t
 type ctxt_t = context t
 
+exception CompositionOfIncompatibleTranformation
 (* compose two transformations, the underlying datastructures for
    the memoisation are shared *)
 val compose : context t -> 'a t -> 'a t
@@ -35,41 +37,26 @@ val compose : context t -> 'a t -> 'a t
 (* apply a transformation and memoise *)
 val apply : 'a t -> context -> 'a
 
-(* clear the datastructures used to store the memoisation *)
-val clear : 'a t -> unit
-
 (** General constructors *)
 (* create a transformation with only one memoisation *)
-val register :
-  ?clear:(unit -> unit) ->
-  (context -> 'a) -> 'a t
+val register : (env -> context -> 'a) -> env -> 'a t
 
 (* Fold from the first declaration to the last with a memoisation at
    each step *)
-val fold :
-  ?clear:(unit -> unit) ->
-  (context -> 'a -> 'a) -> 'a -> 'a t
+val fold : (env -> context -> 'a -> 'a) -> 'a -> env -> 'a t
 
-val fold_map :
-  ?clear:(unit -> unit) ->
-  (context  -> 'a * context -> 'a * context) -> 'a -> 
-  context t
+val fold_map : (env -> context  -> 'a * context -> 'a * context) -> 'a -> 
+  env -> context t
 
-val map :
-  ?clear:(unit -> unit) ->
-  (context -> context -> context) -> context t
+val map : (env -> context -> context -> context) -> env -> context t
 
 
-val map_concat :
-  ?clear:(unit -> unit) ->
-  (context -> decl list) -> context t
+val map_concat : (env -> context -> decl list) -> env -> context t
 
 
 (* map the element of the list without an environnment.
    A memoisation is performed at each step, and for each elements *)
-val elt :
-  ?clear:(unit -> unit) ->
-  (decl -> decl list) -> context t
+val elt : (env -> decl -> decl list) -> env -> context t
 
 
 (** Utils *)
@@ -97,6 +84,6 @@ val fold_context_of_decl:
 
 (* Utils *)
 
-val split_goals : unit -> context list t
+val split_goals : env -> context list t
 
-val identity : context t
+val identity : env -> context t

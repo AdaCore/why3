@@ -19,4 +19,4 @@
 
 (* a list of decl_or_use to a list of decl *)
 
-val t : Transform.ctxt_t
+val t : Typing.env -> Transform.ctxt_t
