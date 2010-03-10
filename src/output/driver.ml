@@ -127,7 +127,10 @@ let string_of_qualid thl idl =
 
 let load_rules env driver {thr_name = loc,qualid; thr_rules = trl} =
   let id,qfile = qualid_to_slist qualid in
-  let th = Typing.find_theory env qfile id in
+  let th = try
+    Typing.find_theory env qfile id 
+  with Not_found -> errorm ~loc "theory %s not found" 
+    (String.concat "." qualid) in
   let add_htheory cloned id t =
     try
       let t2,t3 = Hid.find driver.drv_theory id in
@@ -211,7 +214,7 @@ let load_driver file env =
                    drv_prelude    = !prelude;
                    drv_thprelude  = Hid.create 16;
                    drv_theory     = Hid.create 16;
-                   drv_with_ctxt  = Hid.create 16;
+                   drv_with_ctxt  = Hid.create 1;
                    drv_env        = env;
   } in
   List.iter (load_rules env driver) f.f_rules;
@@ -238,7 +241,8 @@ let query_ident drv id =
 
 let print_context drv fmt ctxt = match drv.drv_printer with
   | None -> errorm "no printer"
-  | Some f -> f {drv with drv_context = ctxt} fmt ctxt 
+  | Some f -> f {drv with drv_context = ctxt;
+                   drv_with_ctxt  = Hid.create 17} fmt ctxt 
 
 let call_prover drv ctx = assert false (*TODO*)
 let call_prover_on_file drv filename = assert false (*TODO*)

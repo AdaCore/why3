@@ -74,13 +74,7 @@ let rec report fmt = function
       fprintf fmt "anomaly: unknownident %s" i.Ident.id_short
   | Driver.Error e ->
       Driver.report fmt e
-  | e ->
-      if in_emacs then
-        let dir = Filename.dirname (Filename.dirname Sys.executable_name) in
-        fprintf fmt "Entering directory `%s'@\n" dir; 
-        fprintf fmt "anomaly:@\n%s" (Printexc.to_string e)
-      else 
-        fprintf fmt "anomaly: %s" (Printexc.to_string e)
+  | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
 let type_file env file =
   if !parse_only then begin
