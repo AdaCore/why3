@@ -55,9 +55,9 @@ PDFVIEWER = @PDFVIEWER@
 
 INCLUDES = -I src/core -I src/util -I src/parser -I src/output \
            -I src/transform -I src 
-BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ 
+BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cma
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
-OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ 
+OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cmxa
 
 COQC7  = @COQC7@
 COQC8  = @COQC8@

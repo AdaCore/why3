@@ -24,6 +24,48 @@ open Theory
 open Driver_ast
 open Ident
 
+(* Utils from Str *)
+
+(* From global_substitute of str *)
+open Str
+let string_after s n fmt = pp_print_string fmt
+  (String.sub s n (String.length s - n))
+
+let opt_search_forward re s pos =
+  try Some(search_forward re s pos) with Not_found -> None
+
+let global_substitute expr repl_fun text fmt =
+  let rec replace start last_was_empty =
+    let startpos = if last_was_empty then start + 1 else start in
+    if startpos > String.length text then
+      string_after text start fmt
+    else
+      match opt_search_forward expr text startpos with
+      | None ->
+          string_after text start fmt
+      | Some pos ->
+          let end_pos = match_end() in
+          pp_print_string fmt (String.sub text start (pos-start));
+          repl_fun text fmt;
+          replace end_pos (end_pos = pos)
+  in
+    (replace 0 false)
+
+let iter_group expr iter_fun text =
+  let rec iter start last_was_empty =
+    let startpos = if last_was_empty then start + 1 else start in
+    if startpos < String.length text then
+      match opt_search_forward expr text startpos with
+        | None -> ()
+        | Some pos ->
+            let end_pos = match_end() in
+            iter_fun text;
+            iter end_pos (end_pos = pos)
+  in
+  iter 0 false
+ 
+(* *)
+
 type error = string
 
 exception Error of string
@@ -125,6 +167,17 @@ let string_of_qualid thl idl =
   let idl = String.concat "." idl in
   thl^"."^idl
 
+let regexp_arg_pos = Str.regexp "%\\([0-9]+\\)"
+
+let check_syntax loc s ls = 
+  let len = List.length ls.ls_args in
+  iter_group regexp_arg_pos 
+    (fun s ->
+       let i = int_of_string (matched_group 1 s) in
+       if i=0 then errorm ~loc "invalid indice of argument : the first one is %%1 and not %%0";
+       if i>len then errorm ~loc "invalid indice of argument \"%%%i\" this logic has only %i argument" i len) s
+
+
 let load_rules env driver {thr_name = loc,qualid; thr_rules = trl} =
   let id,qfile = qualid_to_slist qualid in
   let th = try
@@ -143,7 +196,7 @@ let load_rules env driver {thr_name = loc,qualid; thr_rules = trl} =
       Hid.add driver.drv_theory id t23 in
   let rec find_lident ns = function
     | [] -> assert false
-    | [a] -> (Mnm.find a ns.ns_ls).ls_name
+    | [a] -> Mnm.find a ns.ns_ls
     | a::l -> find_lident (Mnm.find a ns.ns_ns) l in
   let rec find_tyident ns = function
     | [] -> assert false
@@ -164,14 +217,17 @@ let load_rules env driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rsyntax ((loc,q),s) -> 
         begin
           try
-            add_htheory false (find_lident th.th_export q) (Syntax s)
+            let ls = (find_lident th.th_export q) in
+            check_syntax loc s ls;
+            add_htheory false ls.ls_name (Syntax s)
           with Not_found -> errorm ~loc "Unknown logic %s" 
             (string_of_qualid qualid q)
         end 
     | Rtag (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (find_lident th.th_export q) (Tag (Snm.singleton s))
+            add_htheory c (find_lident th.th_export q).ls_name 
+              (Tag (Snm.singleton s))
           with Not_found -> errorm ~loc "Unknown logic %s" 
             (string_of_qualid qualid q)
         end
@@ -237,6 +293,14 @@ let query_ident drv id =
        with Not_found -> acc) r tr in
     Hid.add drv.drv_with_ctxt id tr;
     tr
+
+let syntax_arguments s print fmt l =
+  let args = Array.of_list l in
+  let repl_fun s fmt = 
+    let i = int_of_string (matched_group 1 s) in
+    print fmt args.(i-1) in
+  global_substitute regexp_arg_pos repl_fun s fmt
+ 
 (** using drivers *)
 
 let print_context drv fmt ctxt = match drv.drv_printer with

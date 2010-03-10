@@ -6,7 +6,7 @@ theory Test
   use BuiltIn
   logic id(x: int) : int = x
   logic even(x: int) = 2*(x/2) = x
-  goal G : (0 : BuiltIn.int) = 0
+  goal G : forall x:int. even(4 + 5) 
 end
 
 (*
