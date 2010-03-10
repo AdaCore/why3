@@ -19,6 +19,7 @@
 
 open Ident
 open Term
+open Termlib
 open Theory
 open Context
 
