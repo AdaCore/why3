@@ -30,5 +30,5 @@ let elt a =
   (*Format.printf "flat %a : %a@\n" Pretty.print_decl a Pretty.print_decl_list r;*)
   r
 
+let t = Transform.elt elt
 
-let t env = Transform.elt (fun _ -> elt) env

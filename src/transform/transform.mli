@@ -19,7 +19,6 @@
 
 open Ident
 open Theory
-open Typing
 
 (* Tranformation on context with some memoisations *)
 
@@ -39,24 +38,25 @@ val apply : 'a t -> context -> 'a
 
 (** General constructors *)
 (* create a transformation with only one memoisation *)
-val register : (env -> context -> 'a) -> env -> 'a t
+val register : (context -> 'a) -> 'a t
 
 (* Fold from the first declaration to the last with a memoisation at
    each step *)
-val fold : (env -> context -> 'a -> 'a) -> 'a -> env -> 'a t
+val fold : (context -> 'a -> 'a) -> 'a -> 'a t
 
-val fold_map : (env -> context  -> 'a * context -> 'a * context) -> 'a -> 
-  env -> context t
+val fold_env : (context -> 'a -> 'a) -> (env -> 'a) -> 'a t
 
-val map : (env -> context -> context -> context) -> env -> context t
+val fold_map : (context -> 'a * context -> 'a * context) -> 'a -> context t
+
+val map : (context -> context -> context) -> context t
 
 
-val map_concat : (env -> context -> decl list) -> env -> context t
+val map_concat : (context -> decl list) -> context t
 
 
 (* map the element of the list without an environnment.
    A memoisation is performed at each step, and for each elements *)
-val elt : (env -> decl -> decl list) -> env -> context t
+val elt : (decl -> decl list) -> context t
 
 
 (** Utils *)
@@ -84,6 +84,6 @@ val fold_context_of_decl:
 
 (* Utils *)
 
-val split_goals : env -> context list t
+val split_goals : context list t
 
-val identity : env -> context t
+val identity : context t

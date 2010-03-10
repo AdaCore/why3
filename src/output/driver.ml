@@ -90,7 +90,7 @@ and driver = {
   (* the first is the translation only for this ident, the second is also for representant *)
   drv_theory     : (translation * translation) Hid.t;
   drv_with_ctxt  : translation Hid.t;
-  drv_env : Typing.env;
+  drv_env : env;
 }
 
 
@@ -128,7 +128,7 @@ let string_of_qualid thl idl =
 let load_rules env driver {thr_name = loc,qualid; thr_rules = trl} =
   let id,qfile = qualid_to_slist qualid in
   let th = try
-    Typing.find_theory env qfile id 
+    find_theory env qfile id 
   with Not_found -> errorm ~loc "theory %s not found" 
     (String.concat "." qualid) in
   let add_htheory cloned id t =
@@ -207,7 +207,7 @@ let load_driver file env =
   in
   List.iter add f.f_global;
   let driver =   { drv_printer    = !printer;
-                   drv_context    = Context.init_context;
+                   drv_context    = Context.init_context env;
                    drv_call_stdin = !call_stdin;
                    drv_call_file  = !call_file;
                    drv_regexps    = !regexps;

@@ -140,4 +140,5 @@ let elt d =
     | Dind _ -> [d] (* TODO *)
     | Dprop _ | Dclone _ | Duse _ -> [d]
 
-let t env = Transform.elt (fun _ -> elt) env
+let t = Transform.elt elt
+

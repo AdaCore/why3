@@ -5,7 +5,7 @@ theory Test
   use import prelude.Int
   logic id(x: int) : int = x
   logic even(x: int) = 2*(x/2) = x
-  goal G : forall x:int. even(4) 
+  goal G : (0 : BuiltIn.int) = 0
 end
 
 (*

@@ -19,29 +19,14 @@
 
 (** Typing environments *)
 
-type env
+open Theory
 
-val create : string list -> env
+val retrieve : string list -> retrieve_theory
   (** creates a new typing environment for a given loadpath *)
 
-val add_theory : env -> Theory.theory -> env
-  (** adds a local theory *)
+val read_file : env -> string -> theory Mnm.t
 
-val clear_local_theories : env -> env
-  (** clears the local theories *)
-
-val add_from_file : env -> string -> env
-  (** adds local theories from a given file *)
-
-val add_from_channel : env -> string -> in_channel -> env
-  (** [add_from_channel env filename ic] adds local theories 
-      from a given input channel [ic]; [filename] is only used for 
-      locations *)
-
-val find_theory : env -> string list -> string -> Theory.theory
-  (** searches for a theory using the environment's loadpath *)
-
-val local_theories : env -> Theory.theory list
+val read_channel : env -> string -> in_channel -> theory Mnm.t
 
 (** error reporting *)
 

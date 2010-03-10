@@ -50,9 +50,9 @@ let () =
 
 let in_emacs = Sys.getenv "TERM" = "dumb"
 
-let transformation env l = 
-  let t1 = Simplify_recursive_definition.t env in
-  let t2 = Inlining.all env in
+let transformation l = 
+  let t1 = Simplify_recursive_definition.t in
+  let t2 = Inlining.all in
   List.map (fun (t,c) ->
               let c = if !simplify_recursive 
               then Transform.apply t1 c
@@ -76,25 +76,16 @@ let rec report fmt = function
       Driver.report fmt e
   | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
-let type_file env file =
-  if !parse_only then begin
-    let c = open_in file in
-    let lb = Lexing.from_channel c in
-    Loc.set_file file lb;
-    let _ = Lexer.parse_logic_file lb in 
-    close_in c;
-    env
-  end else 
-    Typing.add_from_file env file
-
-let extract_goals env ctxt =
-  Transform.apply (Transform.split_goals env) ctxt
+let extract_goals ctxt =
+  Transform.apply Transform.split_goals ctxt
 
 let transform env l =
-  let l = List.map 
-    (fun t -> t, Context.use_export Context.init_context t) 
-      (Typing.local_theories l) in
-  let l = transformation env l in
+  let l = 
+    List.map 
+      (fun t -> t, Context.use_export (Context.init_context env) t) 
+      l
+  in
+  let l = transformation l in
   if !print_stdout then 
     List.iter 
       (fun (t,ctxt) -> Pretty.print_named_context
@@ -105,7 +96,7 @@ let transform env l =
     | Some file ->
 	let drv = load_driver file env in
 	begin match l with
-	  | (_,ctxt) :: _ -> begin match extract_goals env ctxt with
+	  | (_,ctxt) :: _ -> begin match extract_goals ctxt with
 	      | g :: _ -> 
 		  Driver.print_context drv std_formatter g
 	      | [] -> 
@@ -114,11 +105,23 @@ let transform env l =
 	  | [] -> ()
 	end
 
+let type_file env file =
+  if !parse_only then begin
+    let c = open_in file in
+    let lb = Lexing.from_channel c in
+    Loc.set_file file lb;
+    let _ = Lexer.parse_logic_file lb in 
+    close_in c
+  end else begin
+    let m = Typing.read_file env file in
+    let l = Mnm.fold (fun _ th acc -> th :: acc) m [] in
+    transform env l
+  end
+
 let () =
   try
-    let env = Typing.create !loadpath in
-    let l = List.fold_left type_file env !files in
-    transform env l
+    let env = create_env (Typing.retrieve !loadpath) in
+    List.iter (type_file env) !files
   with e when not !debug ->
     eprintf "%a@." report e;
     exit 1

@@ -144,12 +144,21 @@ and namespace = {
 }
 
 and context = {
+  ctxt_env    : env;
   ctxt_decl   : decl;
   ctxt_prev   : context option;
   ctxt_known  : decl Mid.t;
   ctxt_cloned : Sid.t Mid.t;
   ctxt_tag    : int;
 }
+
+and env = {
+  env_retrieve : retrieve_theory;
+  env_memo     : (string list, theory Mnm.t) Hashtbl.t;
+  env_tag      : int;
+}
+
+and retrieve_theory = env -> string list -> theory Mnm.t
 
 and decl = {
   d_node : decl_node;
@@ -294,13 +303,14 @@ let create_logic_decl ldl =
   List.iter check_decl ldl;
   create_logic_decl ldl
 
-
 (** Built-in theory *)
 
 module Ctxt = struct
   type t = context
 
-  let equal a b = a.ctxt_decl == b.ctxt_decl &&
+  let equal a b = 
+    a.ctxt_env  == b.ctxt_env  &&
+    a.ctxt_decl == b.ctxt_decl &&
     match a.ctxt_prev, b.ctxt_prev with
       | Some na, Some nb -> na == nb
       | None, None -> true
@@ -311,13 +321,14 @@ module Ctxt = struct
       | Some ctxt -> 1 + ctxt.ctxt_tag
       | None -> 0
     in
-    Hashcons.combine ctxt.ctxt_decl.d_tag prev
+    Hashcons.combine2 ctxt.ctxt_decl.d_tag prev ctxt.ctxt_env.env_tag
 
   let tag i ctxt = { ctxt with ctxt_tag = i }
 end
 module Hctxt = Hashcons.Make(Ctxt)
 
-let mk_context decl prev known cloned = Hctxt.hashcons {
+let mk_context env decl prev known cloned = Hctxt.hashcons {
+  ctxt_env = env;
   ctxt_decl = decl;
   ctxt_prev = prev;
   ctxt_known = known;
@@ -325,7 +336,9 @@ let mk_context decl prev known cloned = Hctxt.hashcons {
   ctxt_tag = -1;
 }
 
-let builtin_theory =
+let builtin_name = "BuiltIn"
+
+let builtin_theory env =
   let decl_int  = create_ty_decl [ts_int, Tabstract] in
   let decl_real = create_ty_decl [ts_real, Tabstract] in
   let decl_equ  = create_logic_decl [Lpredicate (ps_equ, None)] in
@@ -336,10 +349,10 @@ let builtin_theory =
   let kn_equ    = Mid.add ps_equ.ls_name decl_equ kn_real in
   let kn_neq    = Mid.add ps_neq.ls_name decl_neq kn_equ in
 
-  let ctxt_int  = mk_context decl_int None kn_int Mid.empty in
-  let ctxt_real = mk_context decl_real (Some ctxt_int) kn_real Mid.empty in
-  let ctxt_equ  = mk_context decl_equ (Some ctxt_real) kn_equ Mid.empty in
-  let ctxt_neq  = mk_context decl_neq (Some ctxt_equ) kn_neq Mid.empty in
+  let ctxt_int  = mk_context env decl_int None kn_int Mid.empty in
+  let ctxt_real = mk_context env decl_real (Some ctxt_int) kn_real Mid.empty in
+  let ctxt_equ  = mk_context env decl_equ (Some ctxt_real) kn_equ Mid.empty in
+  let ctxt_neq  = mk_context env decl_neq (Some ctxt_equ) kn_neq Mid.empty in
 
   let ns_int    = Mnm.add ts_int.ts_name.id_short ts_int Mnm.empty in
   let ns_real   = Mnm.add ts_real.ts_name.id_short ts_real ns_int in
@@ -349,12 +362,42 @@ let builtin_theory =
   let export = {  ns_ts = ns_real;    ns_ls = ns_neq;
                   ns_pr = Mnm.empty;  ns_ns = Mnm.empty } in
 
-  { th_name   = id_register (id_fresh "BuiltIn");
+  { th_name   = id_register (id_fresh builtin_name);
     th_ctxt   = ctxt_neq;
     th_export = export;
     th_local  = Sid.empty }
 
-let use_builtin = create_use_decl builtin_theory
+
+(** Environments *)
+
+let create_env = 
+  let r = ref 0 in
+  fun retrieve ->
+    incr r;
+    let env = 
+      { env_retrieve = retrieve;
+	env_memo     = Hashtbl.create 17;
+	env_tag      = !r; }
+    in
+    let builtin = builtin_theory env in
+    let m = Mnm.add builtin.th_name.id_short builtin Mnm.empty in
+    Hashtbl.add env.env_memo [] m;
+    env
+
+exception TheoryNotFound of string list * string
+
+let find_theory env sl s =
+  let m = 
+    try
+      Hashtbl.find env.env_memo sl
+    with Not_found ->
+      Hashtbl.add env.env_memo sl Mnm.empty;
+      let m = env.env_retrieve env sl in
+      Hashtbl.replace env.env_memo sl m;
+      m
+  in
+  try Mnm.find s m 
+  with Not_found -> raise (TheoryNotFound (sl, s)) 
 
 
 (** Context constructors and utilities *)
@@ -375,10 +418,8 @@ let empty_inst = {
 
 module Context = struct
 
-  let init_context =
-    let known = builtin_theory.th_ctxt.ctxt_known in
-    let known = Mid.add builtin_theory.th_name use_builtin known in
-    mk_context use_builtin None known Mid.empty
+  let init_context env =
+    (find_theory env [] builtin_name).th_ctxt
 
   let push_decl ctxt kn d =
     let get_cl m id = try Mid.find id m with Not_found -> Sid.empty in
@@ -391,7 +432,7 @@ module Context = struct
           List.fold_left (add_cl m) ctxt.ctxt_cloned sl
       | _ -> ctxt.ctxt_cloned
     in
-    mk_context d (Some ctxt) kn cloned
+    mk_context ctxt.ctxt_env d (Some ctxt) kn cloned
 
   (* Manage known symbols *)
 
@@ -772,15 +813,15 @@ module TheoryUC = struct
 
   (* Manage theories *)
 
-  let create_theory n = {
-    uc_name   = n;
-    uc_ctxt   = Context.init_context;
-    uc_import = [builtin_theory.th_export];
-    uc_export = [builtin_theory.th_export];
-    uc_local  = Sid.empty;
-  }
+  let create_theory env n = 
+    let builtin = find_theory env [] builtin_name in
+    { uc_name   = n;
+      uc_ctxt   = builtin.th_ctxt;
+      uc_import = [builtin.th_export];
+      uc_export = [builtin.th_export];
+      uc_local  = Sid.empty; }
 
-  let create_theory n = create_theory (id_register n)
+  let create_theory env n = create_theory env (id_register n)
 
   let close_theory uc = match uc.uc_export with
     | [e] ->

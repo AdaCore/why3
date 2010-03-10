@@ -25,7 +25,7 @@ open Theory
 
 type driver 
 
-val load_driver : string -> Typing.env -> driver
+val load_driver : string -> env -> driver
 
 (** querying drivers *)
 

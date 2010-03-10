@@ -95,12 +95,15 @@ and namespace = private {
 }
 
 and context = private {
+  ctxt_env    : env;
   ctxt_decl   : decl;
   ctxt_prev   : context option;
   ctxt_known  : decl Mid.t;
   ctxt_cloned : Sid.t Mid.t;
   ctxt_tag    : int;
 }
+
+and env
 
 and decl = private {
   d_node : decl_node;
@@ -134,6 +137,16 @@ exception IllegalConstructor of lsymbol
 exception UnboundVars of Svs.t
 exception BadDecl of ident
 
+(** Environements *)
+
+type retrieve_theory = env -> string list -> theory Mnm.t
+
+val create_env : retrieve_theory -> env
+
+exception TheoryNotFound of string list * string
+
+val find_theory : env -> string list -> string -> theory
+
 (** Context constructors and utilities *)
 
 type th_inst = {
@@ -147,7 +160,7 @@ val empty_inst : th_inst
 
 module Context : sig
 
-  val init_context : context
+  val init_context : env -> context
 
   val add_decl : context -> decl -> context
 
@@ -172,13 +185,11 @@ end
 
 (** Theory constructors and utilities *)
 
-val builtin_theory : theory
-
 type theory_uc  (* a theory under construction *)
 
 module TheoryUC : sig
 
-  val create_theory : preid -> theory_uc
+  val create_theory : env -> preid -> theory_uc
   val close_theory  : theory_uc -> theory
 
   val add_decl : theory_uc -> decl -> theory_uc
@@ -196,6 +207,8 @@ module TheoryUC : sig
   exception ClashSymbol of string
 
 end
+
+val builtin_name : string
 
 (** Debugging *)
 

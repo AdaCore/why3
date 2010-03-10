@@ -123,7 +123,6 @@ let print_type_decl fmt = function
       assert false
 
 let ac_th = ["algebra";"AC"]
-open Transform_utils
 
 let print_logic_decl drv ctxt fmt = function
   | Lfunction (ls, None) ->
