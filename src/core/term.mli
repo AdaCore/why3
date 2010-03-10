@@ -54,6 +54,7 @@ module Hls : Hashtbl.S with type key = lsymbol
 (** Exceptions *)
 
 exception BadArity
+exception UnboundIndex
 exception NonLinear of vsymbol
 exception ConstructorExpected of lsymbol
 exception FunctionSymbolExpected of lsymbol

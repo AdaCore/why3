@@ -40,7 +40,7 @@ let t_branch fn b = let pat,_,t = t_open_branch b in (pat, fn t)
 let f_branch fn b = let pat,_,f = f_open_branch b in (pat, fn f)
 
 let t_map fnT fnF t = t_label_copy t (match t.t_node with
-  | Tbvar _ -> assert false
+  | Tbvar _ -> raise UnboundIndex
   | Tvar _ | Tconst _ -> t
   | Tapp (f, tl) -> t_app f (List.map fnT tl) t.t_ty
   | Tlet (t1, b) -> let u,t2 = t_open_bound b in t_let u (fnT t1) (fnT t2)
@@ -64,7 +64,7 @@ let t_branch fn acc b = let _,_,t = t_open_branch b in fn acc t
 let f_branch fn acc b = let _,_,f = f_open_branch b in fn acc f
 
 let t_fold fnT fnF acc t = match t.t_node with
-  | Tbvar _ -> assert false
+  | Tbvar _ -> raise UnboundIndex
   | Tvar _ | Tconst _ -> acc
   | Tapp (f, tl) -> List.fold_left fnT acc tl
   | Tlet (t1, b) -> let _,t2 = t_open_bound b in fnT (fnT acc t1) t2
