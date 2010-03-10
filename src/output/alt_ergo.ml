@@ -34,17 +34,26 @@ let print_ident fmt id =
 
 let forget_var v = forget_id ident_printer v.vs_name
 
-let rec print_type fmt ty = match ty.ty_node with
+let rec print_type drv fmt ty = match ty.ty_node with
   | Tyvar id -> 
       fprintf fmt "'%a" print_ident id
-  | Tyapp (ts, []) -> 
-      print_ident fmt ts.ts_name
-  | Tyapp (ts, [ty]) -> 
-      fprintf fmt "%a %a" print_type ty print_ident ts.ts_name
-  | Tyapp (ts, tyl) ->
-      fprintf fmt "(%a) %a" 
-	(print_list comma print_type) tyl print_ident ts.ts_name
-
+  | Tyapp (ts, tl) -> 
+      match Driver.query_ident drv ts.ts_name with
+        | Driver.Remove -> assert false (* Mettre une erreur *)
+        | Driver.Syntax s ->
+            Driver.syntax_arguments s (print_type drv) fmt tl
+        | Driver.Tag _ -> 
+            begin
+              match ty.ty_node with
+                | Tyvar _ -> assert false
+                | Tyapp (ts,[]) -> 
+                    print_ident fmt ts.ts_name
+                | Tyapp (ts, [ty]) -> 
+                    fprintf fmt "%a %a" (print_type drv) ty print_ident ts.ts_name
+                | Tyapp (ts, tyl) ->
+                    fprintf fmt "(%a) %a" 
+	              (print_list comma (print_type drv)) tyl print_ident ts.ts_name
+            end
 let rec print_term drv fmt t = match t.t_node with
   | Tbvar _ -> 
       assert false
@@ -89,7 +98,7 @@ let rec print_fmla drv fmt f = match f.f_node with
       let q = match q with Fforall -> "forall" | Fexists -> "exists" in
       let vl, tl, f = f_open_quant fq in
       let forall fmt v = 
-	fprintf fmt "%s %a:%a" q print_ident v.vs_name print_type v.vs_ty
+	fprintf fmt "%s %a:%a" q print_ident v.vs_name (print_type drv) v.vs_ty
       in
       fprintf fmt "@[<hov2>(%a%a.@ %a)@]" (print_list dot forall) vl
         (print_list alt (print_triggers drv)) tl (print_fmla drv) f;
@@ -123,12 +132,17 @@ and print_trigger drv fmt = function
 and print_triggers drv fmt tl = print_list comma (print_trigger drv) fmt tl
 
 
-let print_logic_binder fmt v =
-  fprintf fmt "%a: %a" print_ident v.vs_name print_type v.vs_ty
+let print_logic_binder drv fmt v =
+  fprintf fmt "%a: %a" print_ident v.vs_name (print_type drv) v.vs_ty
 
-let print_type_decl fmt = function
+let print_type_decl drv fmt = function
   | ts, Tabstract ->
-      fprintf fmt "type %a" print_ident ts.ts_name
+      begin
+        match Driver.query_ident drv ts.ts_name with
+          | Driver.Remove -> ()
+          | Driver.Syntax _ -> ()
+          | Driver.Tag s -> fprintf fmt "type %a" print_ident ts.ts_name
+      end
   | _, Talgebraic _ ->
       assert false
 
@@ -147,14 +161,14 @@ let print_logic_decl drv ctxt fmt = function
               fprintf fmt "@[<hov 2>logic %s%a : %a -> %a@]@\n"
                 sac
                 print_ident ls.ls_name
-	        (print_list comma print_type) tyl print_type ty
+	        (print_list comma (print_type drv)) tyl (print_type drv) ty
       end
   | Lfunction (ls, Some defn) ->
       let id = ls.ls_name in
       let _, vl, t = open_fs_defn defn in
       let ty = match ls.ls_value with None -> assert false | Some ty -> ty in
       fprintf fmt "@[<hov 2>function %a(%a) : %a =@ %a@]@\n" print_ident id
-        (print_list comma print_logic_binder) vl print_type ty (print_term drv) t;
+        (print_list comma (print_logic_binder drv)) vl (print_type drv) ty (print_term drv) t;
       List.iter forget_var vl
   | Lpredicate (ls, None) ->
       begin
@@ -164,17 +178,17 @@ let print_logic_decl drv ctxt fmt = function
           | Driver.Tag s -> 
               let sac = if Snm.mem "AC" s then "ac " else "" in
               fprintf fmt "@[<hov 2>logic %s%a : %a -> prop@]" sac
-	        print_ident ls.ls_name (print_list comma print_type) ls.ls_args
+	        print_ident ls.ls_name (print_list comma (print_type drv)) ls.ls_args
       end
   | Lpredicate (ls, Some fd) ->
       let _,vl,f = open_ps_defn fd in
       fprintf fmt "@[<hov 2>predicate %a(%a) = %a@]"
 	print_ident ls.ls_name 
-        (print_list comma print_logic_binder) vl (print_fmla drv) f
+        (print_list comma (print_logic_binder drv)) vl (print_fmla drv) f
 
 let print_decl drv ctxt fmt d = match d.d_node with
   | Dtype dl ->
-      print_list newline print_type_decl fmt dl
+      print_list newline (print_type_decl drv) fmt dl
   | Dlogic dl ->
       print_list newline (print_logic_decl drv ctxt) fmt dl
   | Dind _ -> assert false (* TODO *)

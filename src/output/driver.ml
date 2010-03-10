@@ -128,11 +128,11 @@ and driver = {
   drv_call_file  : string option;
   drv_regexps    : (string * prover_answer) list;
   drv_prelude    : string option;
+  drv_rules      : theory_rules list;
   drv_thprelude  : string Hid.t;
   (* the first is the translation only for this ident, the second is also for representant *)
   drv_theory     : (translation * translation) Hid.t;
   drv_with_ctxt  : translation Hid.t;
-  drv_env : env;
 }
 
 
@@ -177,10 +177,10 @@ let check_syntax loc s len =
        if i>len then errorm ~loc "invalid indice of argument \"%%%i\" this logic has only %i argument" i len) s
 
 
-let load_rules env driver {thr_name = loc,qualid; thr_rules = trl} =
+let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
   let id,qfile = qualid_to_slist qualid in
   let th = try
-    find_theory env qfile id 
+    find_theory driver.drv_context.ctxt_env qfile id 
   with Not_found -> errorm ~loc "theory %s not found" 
     (String.concat "." qualid) in
   let add_htheory cloned id t =
@@ -286,19 +286,17 @@ let load_driver file env =
     | RegexpFailure (s1,s2) -> regexps:=(s1,Failure s2)::!regexps
   in
   List.iter add f.f_global;
-  let driver =   { drv_printer    = !printer;
-                   drv_context    = Context.init_context env;
-                   drv_call_stdin = !call_stdin;
-                   drv_call_file  = !call_file;
-                   drv_regexps    = !regexps;
-                   drv_prelude    = !prelude;
-                   drv_thprelude  = Hid.create 16;
-                   drv_theory     = Hid.create 16;
-                   drv_with_ctxt  = Hid.create 1;
-                   drv_env        = env;
-  } in
-  List.iter (load_rules env driver) f.f_rules;
-  driver
+  { drv_printer    = !printer;
+    drv_context    = Context.init_context env;
+    drv_call_stdin = !call_stdin;
+    drv_call_file  = !call_file;
+    drv_regexps    = !regexps;
+    drv_prelude    = !prelude;
+    drv_rules      = f.f_rules;
+    drv_thprelude  = Hid.create 1;
+    drv_theory     = Hid.create 1;
+    drv_with_ctxt  = Hid.create 1;
+  }
 
 (** querying drivers *)
 
@@ -329,8 +327,12 @@ let syntax_arguments s print fmt l =
 
 let print_context drv fmt ctxt = match drv.drv_printer with
   | None -> errorm "no printer"
-  | Some f -> f {drv with drv_context = ctxt;
-                   drv_with_ctxt  = Hid.create 17} fmt ctxt 
+  | Some f -> let drv = {drv with drv_context = ctxt;
+                   drv_thprelude  = Hid.create 17;
+                   drv_theory     = Hid.create 17;
+                   drv_with_ctxt  = Hid.create 17} in
+    List.iter (load_rules drv) drv.drv_rules;
+    f drv fmt ctxt 
 
 let call_prover drv ctx = assert false (*TODO*)
 let call_prover_on_file drv filename = assert false (*TODO*)
