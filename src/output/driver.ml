@@ -28,9 +28,6 @@ open Ident
 
 (* From global_substitute of str *)
 open Str
-let string_after s n fmt = pp_print_string fmt
-  (String.sub s n (String.length s - n))
-
 let opt_search_forward re s pos =
   try Some(search_forward re s pos) with Not_found -> None
 
@@ -38,11 +35,11 @@ let global_substitute expr repl_fun text fmt =
   let rec replace start last_was_empty =
     let startpos = if last_was_empty then start + 1 else start in
     if startpos > String.length text then
-      string_after text start fmt
+      pp_print_string fmt (string_after text start)
     else
       match opt_search_forward expr text startpos with
       | None ->
-          string_after text start fmt
+          pp_print_string fmt (string_after text start)
       | Some pos ->
           let end_pos = match_end() in
           pp_print_string fmt (String.sub text start (pos-start));

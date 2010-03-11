@@ -125,3 +125,13 @@ let print_in_file ?(margin=78) p f =
   close_out cout
 
 
+
+(* With optional separation *)
+let rec print_list_opt sep print fmt = function
+  | [] -> false
+  | [x] -> print fmt x
+  | x :: r -> 
+      let notempty1 = print fmt x in
+      if notempty1 then sep fmt ();
+      let notempty2 = print_list_opt sep print fmt r in
+      notempty1 || notempty2

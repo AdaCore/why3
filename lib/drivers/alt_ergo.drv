@@ -37,8 +37,15 @@ theory prelude.Int
   syntax logic (_>=_) "(%1 >= %2)"
   syntax logic (_> _) "(%1 >  %2)"
 
-  remove prop Mul_comm
   remove prop One_neutral
+  remove prop Add_assoc
+  remove prop Add_comm
+  remove prop Zero_neutral
+  remove prop Neg
+  remove prop Mul_comm
+  remove prop Mul_assoc
+  remove prop Mul_distr
+
 end
 
 theory algebra.AC

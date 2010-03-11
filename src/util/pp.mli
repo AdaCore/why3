@@ -93,3 +93,8 @@ val open_file_and_formatter : ?margin:int -> string -> out_channel * formatter
 val close_file_and_formatter : out_channel * formatter -> unit
 val print_in_file_no_close : ?margin:int -> (Format.formatter -> unit) -> string -> out_channel
 val print_in_file : ?margin:int -> (Format.formatter -> unit) -> string -> unit
+
+
+val print_list_opt : 
+  (formatter -> unit -> unit) -> 
+  (formatter -> 'a -> bool) -> formatter -> 'a list -> bool
