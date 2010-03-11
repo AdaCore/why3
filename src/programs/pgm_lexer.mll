@@ -18,73 +18,50 @@
 (**************************************************************************)
 
 {
-  open Format
   open Lexing
+  open Lexer
   open Term
-  open Ptree
-  open Parser
-
-  (* lexical errors *)
-
-  type error = 
-    | IllegalCharacter of char
-    | UnterminatedComment
-    | UnterminatedString
-
-  exception Error of error
-
-  let report fmt = function
-    | IllegalCharacter c -> fprintf fmt "illegal character %c" c
-    | UnterminatedComment -> fprintf fmt "unterminated comment"
-    | UnterminatedString -> fprintf fmt "unterminated string"
+  open Pgm_parser
 
   let keywords = Hashtbl.create 97
   let () = 
     List.iter 
       (fun (x,y) -> Hashtbl.add keywords x y)
-      [ 
+      [ "absurd", ABSURD;
 	"and", AND;
 	"as", AS;
-	"axiom", AXIOM;
-	"clone", CLONE;
-	"else", ELSE;
+	"assert", ASSERT;
+	"begin", BEGIN;
+        "check", CHECK;
+	"do", DO;
+	"done", DONE;
+        "else", ELSE;
 	"end", END;
-	"exists", EXISTS;
-	"export", EXPORT;
-        "false", FALSE;
-	"forall", FORALL;
-	"goal", GOAL;
+	"exception", EXCEPTION; 
+	"for", FOR;
+	"fun", FUN;
 	"if", IF;
-	"import", IMPORT;
 	"in", IN;
-	"inductive", INDUCTIVE;
-	"lemma", LEMMA;
+	"invariant", INVARIANT;
 	"let", LET;
-	"logic", LOGIC;
 	"match", MATCH;
-	"namespace", NAMESPACE;
 	"not", NOT;
-	"or", OR;
+	"raise", RAISE;
+	"raises", RAISES;
+	"reads", READS;
+	"rec", REC;
+	"ref", REF;
+	"returns", RETURNS;
 	"then", THEN;
-	"theory", THEORY;
-	"true", TRUE;
+	"try", TRY;
 	"type", TYPE;
-	"use", USE;
+	"variant", VARIANT;
+	"void", VOID;
+	"while", WHILE;
 	"with", WITH;
+        "writes", WRITES;
       ]
-	       
-  let newline lexbuf =
-    let pos = lexbuf.lex_curr_p in
-    lexbuf.lex_curr_p <- 
-      { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
-
-  let string_buf = Buffer.create 1024
-
-  let char_for_backslash = function
-    | 'n' -> '\n'
-    | 't' -> '\t'
-    | c -> c
-
+	
   let update_loc lexbuf file line chars =
     let pos = lexbuf.lex_curr_p in
     let new_file = match file with None -> pos.pos_fname | Some s -> s in
@@ -94,10 +71,6 @@
 	  pos_lnum = int_of_string line;
 	  pos_bol = pos.pos_cnum - int_of_string chars;
       }
-
-  let remove_leading_plus s =
-    let n = String.length s in 
-    if n > 0 && s.[0] = '+' then String.sub s 1 (n-1) else s
 
 }
 
@@ -166,8 +139,6 @@ rule token = parse
       { COLONEQUAL }
   | "->"
       { ARROW }
-  | "<->"
-      { LRARROW }
   | "="
       { EQUAL }
   | "<>" | "<" | "<=" | ">" | ">=" as s
@@ -188,8 +159,18 @@ rule token = parse
       { LEFTB }
   | "}"
       { RIGHTB }
+  | "{{"
+      { LEFTBLEFTB }
+  | "}}"
+      { RIGHTBRIGHTB }
   | "|"
       { BAR }
+  | "||"
+      { BARBAR }
+  | "&&" 
+      { AMPAMP }
+  | "=>"
+      { BIGARROW }
   | "\""
       { STRING (string lexbuf) }
   | eof 
@@ -197,31 +178,19 @@ rule token = parse
   | _ as c
       { raise (Error (IllegalCharacter c)) }
 
-and comment = parse
-  | "*)" 
-      { () }
-  | "(*" 
-      { comment lexbuf; comment lexbuf }
-  | newline 
-      { newline lexbuf; comment lexbuf }
-  | eof
-      { raise (Error UnterminatedComment) }
-  | _ 
-      { comment lexbuf }
-
-and string = parse
-  | "\""
-      { let s = Buffer.contents string_buf in
-	Buffer.clear string_buf; 
-	s }
-  | "\\" (_ as c)
-      { Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
-  | newline 
-      { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
-  | eof
-      { raise (Error UnterminatedString) }
-  | _ as c
-      { Buffer.add_char string_buf c; string lexbuf }
+(* and logic = parse *)
+(*   | "\"" *)
+(*       { let s = Buffer.contents string_buf in *)
+(* 	Buffer.clear string_buf;  *)
+(* 	s } *)
+(*   | "\\" (_ as c) *)
+(*       { Buffer.add_char string_buf (char_for_backslash c); string lexbuf } *)
+(*   | newline  *)
+(*       { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf } *)
+(*   | eof *)
+(*       { raise (Error UnterminatedString) } *)
+(*   | _ as c *)
+(*       { Buffer.add_char string_buf c; string lexbuf } *)
 
 
 
@@ -232,10 +201,8 @@ and string = parse
   let with_location f lb =
     try f lb with e -> raise (Loc.Located (loc lb, e))
 
-  let parse_lexpr = with_location (lexpr token)
-  let parse_logic_file = with_location (logic_file token)
+  let parse_file = with_location (file token)
 
-  let lexpr_of_string s = parse_lexpr (from_string s)
 }
 
 (*
