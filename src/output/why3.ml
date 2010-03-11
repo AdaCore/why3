@@ -17,5 +17,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let () = Driver.register_printer "why3" (fun _ -> Pretty.print_context)
+let () = Driver.register_printer "why3" 
+  (fun _ -> Pretty.print_context ~printer:(Pretty.printer ()))
 
