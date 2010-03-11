@@ -148,6 +148,9 @@ test: bin/why.byte
 	bin/why.byte --driver lib/drivers/alt_ergo.drv -I lib/prelude/ src/test.why > ergo.why
 	timeout 3 alt-ergo ergo.why
 
+testl: bin/whyl.byte
+	ocamlrun -bt bin/whyl.byte src/programs/test.mlw
+
 # programs
 ##########
 

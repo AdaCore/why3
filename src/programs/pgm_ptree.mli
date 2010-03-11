@@ -1,5 +1,8 @@
 
 type ident = Ptree.ident
 
-type file = unit list
+type decl =
+  | LogicDecl of Ptree.decl list
+
+type file = decl list
 

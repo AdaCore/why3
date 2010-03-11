@@ -81,17 +81,12 @@
 
 /* Precedences */
 
-%nonassoc prec_recfun
-%nonassoc prec_fun
-%left LEFTB LEFTBLEFTB
-%left prec_simple
+%left LEFTB 
 
 %left COLON 
 
-%left prec_letrec
 %left IN
 
-%left prec_no_else
 %left ELSE
 
 %right prec_named
@@ -106,8 +101,6 @@
 %left OP2
 %left OP3
 %right unary_op
-%left prec_app
-%left prec_ident
 %left LEFTSQ
 
 %nonassoc prec_decls
