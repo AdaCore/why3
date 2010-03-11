@@ -115,6 +115,9 @@ let forget_id (indices,values,_) id =
     Hashtbl.remove values id.id_tag
   with Not_found -> ()
 
+let forget_all (indices,values,_) =
+  Hashtbl.clear indices; Hashtbl.clear values
+
 (** Sanitizers *)
 
 exception Unsanitizable

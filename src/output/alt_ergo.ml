@@ -211,7 +211,10 @@ let print_context drv fmt ctxt =
   let decls = Context.get_decls ctxt in
   ignore (print_list_opt newline2 (print_decl drv ctxt) fmt decls)
 
-let () = Driver.register_printer "alt-ergo" print_context
+let () = Driver.register_printer "alt-ergo" 
+  (fun drv fmt ctxt -> 
+     forget_all ident_printer;
+     print_context drv fmt ctxt)
 
 let print_goal drv fmt (id, f, ctxt) =
   print_context drv fmt ctxt;
