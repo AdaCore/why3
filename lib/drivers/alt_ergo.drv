@@ -6,7 +6,12 @@ prelude "(* this is a prelude for Alt-Ergo*)"
 printer "alt-ergo"
 
 call_on_file  "alt-ergo %s"
-
+(*
+tranformations
+  "simplify_recursive_definition"      
+  "inlining" ("trivial")
+end
+*)
 
 theory BuiltIn
   syntax type int "int"
