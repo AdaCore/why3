@@ -68,13 +68,12 @@
 
 %token ARROW AT
 %token BANG BAR 
-%token COLON COLONEQUAL COMMA  
+%token COLON COMMA  
 %token DOT EQUAL
 %token LEFTB LEFTPAR LEFTSQ 
 %token LRARROW
 %token QUOTE RIGHTB 
 %token RIGHTPAR RIGHTSQ 
-%token SEMICOLON 
 %token UNDERSCORE
 
 %token EOF
@@ -92,13 +91,10 @@
 %left prec_letrec
 %left IN
 
-%right SEMICOLON
-
 %left prec_no_else
 %left ELSE
 
 %right prec_named
-%left COLONEQUAL
 %right prec_quant
 %right ARROW LRARROW
 %right OR 

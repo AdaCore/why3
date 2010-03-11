@@ -160,10 +160,6 @@ rule token = parse
       { BANG }
   | ":"
       { COLON }
-  | ";"
-      { SEMICOLON }
-  | ":="
-      { COLONEQUAL }
   | "->"
       { ARROW }
   | "<->"
