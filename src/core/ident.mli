@@ -59,6 +59,11 @@ val id_clone : ident -> preid
 (* create a duplicate pre-ident *)
 val id_dup : ident -> preid
 
+(* Utils *)
+val derived_from : ident -> ident -> bool
+
+(* derived_from i1 i2 is true if i1 is derived from i2 *)
+
 (** Unique persistent names for pretty printing *)
 
 type ident_printer

@@ -31,7 +31,7 @@ open Str
 let opt_search_forward re s pos =
   try Some(search_forward re s pos) with Not_found -> None
 
-let global_substitute expr repl_fun text fmt =
+let global_substitute_fmt expr repl_fun text fmt =
   let rec replace start last_was_empty =
     let startpos = if last_was_empty then start + 1 else start in
     if startpos > String.length text then
@@ -125,6 +125,7 @@ and driver = {
   drv_call_file  : string option;
   drv_regexps    : (string * prover_answer) list;
   drv_prelude    : string option;
+  drv_filename   : string option;
   drv_rules      : theory_rules list;
   drv_thprelude  : string Hid.t;
   (* the first is the translation only for this ident, the second is also for representant *)
@@ -263,6 +264,7 @@ let load_driver file env =
   let printer = ref None in
   let call_stdin = ref None in
   let call_file = ref None in
+  let filename = ref None in
   let regexps = ref [] in
   let set_or_raise loc r v error =
     if !r <> None then errorm ~loc "duplicate %s" error
@@ -281,6 +283,7 @@ let load_driver file env =
     | RegexpInvalid s -> regexps:=(s,Invalid)::!regexps
     | RegexpUnknown (s1,s2) -> regexps:=(s1,Unknown s2)::!regexps
     | RegexpFailure (s1,s2) -> regexps:=(s1,Failure s2)::!regexps
+    | Filename s -> set_or_raise loc filename s "filename"
   in
   List.iter add f.f_global;
   { drv_printer    = !printer;
@@ -289,6 +292,7 @@ let load_driver file env =
     drv_call_file  = !call_file;
     drv_regexps    = !regexps;
     drv_prelude    = !prelude;
+    drv_filename   = !filename;
     drv_rules      = f.f_rules;
     drv_thprelude  = Hid.create 1;
     drv_theory     = Hid.create 1;
@@ -318,7 +322,7 @@ let syntax_arguments s print fmt l =
   let repl_fun s fmt = 
     let i = int_of_string (matched_group 1 s) in
     print fmt args.(i-1) in
-  global_substitute regexp_arg_pos repl_fun s fmt
+  global_substitute_fmt regexp_arg_pos repl_fun s fmt
  
 (** using drivers *)
 
@@ -331,9 +335,30 @@ let print_context drv fmt ctxt = match drv.drv_printer with
     List.iter (load_rules drv) drv.drv_rules;
     f drv fmt ctxt 
 
+let regexp_filename = Str.regexp "%\\([a-z]\\)"
+
+let filename_of_goal drv ident_printer filename theory_name ctxt =
+  match drv.drv_filename with
+    | None -> errorm "no filename syntax given"
+    | Some f -> 
+        let pr_name = match ctxt.ctxt_decl.d_node with
+          | Dprop (Pgoal,{pr_name=pr_name}) -> pr_name
+          | _ -> errorm "the bottom of this context is not a goal" in
+        let repl_fun s = 
+          let i = matched_group 1 s in
+          match i with
+            | "f" -> filename
+            | "t" -> theory_name
+            | "s" -> id_unique ident_printer pr_name
+            | _ -> errorm "substitution variable are only %%f %%t and %%s" in
+        global_substitute regexp_filename repl_fun f
+
+
 let call_prover drv ctx = assert false (*TODO*)
 let call_prover_on_file drv filename = assert false (*TODO*)
 let call_prover_on_channel drv filename ic = assert false (*TODO*)
+
+
 
 (*
 Local Variables: 

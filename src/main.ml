@@ -21,15 +21,20 @@ open Format
 open Theory
 open Driver
 
-let files = ref []
+let files = Queue.create ()
 let parse_only = ref false
 let type_only = ref false
 let debug = ref false
 let loadpath = ref []
-let print_stdout = ref false
-let simplify_recursive = ref false
-let inlining = ref false
 let driver = ref None
+type which_goals =
+  | Gall
+  | Gtheory of string
+  | Ggoal of string
+let which_goals = ref Gall
+let timeout = ref 10
+let call = ref false
+let output = ref None
 
 let () = 
   Arg.parse 
@@ -37,19 +42,31 @@ let () =
      "--type-only", Arg.Set type_only, "stops after type-checking";
      "--debug", Arg.Set debug, "sets the debug flag";
      "-I", Arg.String (fun s -> loadpath := s :: !loadpath), 
-       "<dir>  adds dir to the loadpath";
-     "--print-stdout", Arg.Set print_stdout, "print the results to stdout";
-     "--simplify-recursive", Arg.Set simplify_recursive, 
-       "simplify recursive definition";
-     "--inline", Arg.Set inlining, "inline the definition not recursive";
+     "<dir>  adds dir to the loadpath";
+     "--all_goals", Arg.Unit (fun () -> which_goals := Gall), 
+     "apply on all the goals of the file";
+     "--goals_of", Arg.String (fun s -> which_goals := Gtheory s), 
+     "apply on all the goals of the theory given (ex. --goal T)";
+     "--goal", Arg.String (fun s -> which_goals := Ggoal s), 
+     "apply only on the goal given (ex. --goal T.g)";
+     "--output", Arg.String (fun s -> output := Some s), 
+     "choose to output each goals in the directory given.\
+ Can't be used with --call";
+     "--call", Arg.Set call, 
+     "choose to call the prover on each goals.\
+ Can't be used with --output"; (* Why not? *)
      "--driver", Arg.String (fun s -> driver := Some s),
-       "<file>  set the driver file";
+     "<file>  set the driver file";
     ]
-    (fun f -> files := f :: !files)
+    (fun f -> Queue.push f files)
     "usage: why [options] files..."
 
-let in_emacs = Sys.getenv "TERM" = "dumb"
+let () = 
+  match !output with
+    | None when not !call -> type_only := true
+    | _ -> ()
 
+(*
 let transformation l = 
   let t1 = Simplify_recursive_definition.t in
   let t2 = Inlining.all in
@@ -60,7 +77,7 @@ let transformation l =
               let c = if !inlining then Transform.apply t2 c
               else c in
               (t,c)) l
-
+*)
 let rec report fmt = function
   | Lexer.Error e ->
       fprintf fmt "lexical error: %a" Lexer.report e;
@@ -76,16 +93,14 @@ let rec report fmt = function
       Driver.report fmt e
   | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
-let extract_goals ctxt =
-  Transform.apply Transform.split_goals ctxt
-
+(*
 let transform env l =
   let l = 
     List.map 
       (fun t -> t, Context.use_export (Context.init_context env) t) 
       l
   in
-  let l = transformation l in
+  (*let l = transformation l in*)
   if !print_stdout then 
     List.iter 
       (fun (t,ctxt) -> Pretty.print_named_context
@@ -94,7 +109,7 @@ let transform env l =
     | None ->
 	()
     | Some file ->
-	let drv = load_driver file env in
+
 	begin match l with
 	  | (_,ctxt) :: _ -> begin match extract_goals ctxt with
 	      | g :: _ -> 
@@ -104,8 +119,18 @@ let transform env l =
 	    end
 	  | [] -> ()
 	end
+*)
 
-let type_file env file =
+
+let extract_goals env acc th =
+  let ctxt = Context.use_export (Context.init_context env) th in
+  let l = Transform.apply Transform.split_goals ctxt in
+  let l = List.rev_map (fun ctxt -> (th,ctxt)) l in
+  List.rev_append l acc
+
+let file_sanitizer = Ident.sanitizer Ident.char_to_alnumus Ident.char_to_alnumus
+
+let do_file env drv filename_printer file =
   if !parse_only then begin
     let c = open_in file in
     let lb = Lexing.from_channel c in
@@ -114,14 +139,78 @@ let type_file env file =
     close_in c
   end else begin
     let m = Typing.read_file env file in
-    let l = Mnm.fold (fun _ th acc -> th :: acc) m [] in
-    transform env l
+    if not !type_only then
+      let drv =  
+        match drv with
+          | None -> eprintf "a driver is needed@."; exit 1
+          | Some drv -> drv in
+      let goals = 
+        match !which_goals with
+          | Gall ->  Mnm.fold (fun _ th acc -> extract_goals env acc th) m []
+          | Gtheory s ->  
+              begin
+                try 
+                  extract_goals env [] (Mnm.find s m)
+                with Not_found -> 
+                  eprintf "File %s : --goals_of : Unknown theory %s@." file s; exit 1
+              end
+          | Ggoal s ->
+              let l = Str.split (Str.regexp "\\.") s in
+              let tname, l = 
+                match l with
+                  | [] | [_] -> 
+                      eprintf "--goal : Must be a qualified name (%s)@." s;
+                      exit 1
+                  | a::l -> a,l in
+              let rec find_pr ns = function
+                | [] -> assert false
+                | [a] -> Mnm.find a ns.ns_pr
+                | a::l -> find_pr (Mnm.find a ns.ns_ns) l in
+              let th =try Mnm.find tname m with Not_found -> 
+                eprintf "File %s : --goal : Unknown theory %s@." file tname; exit 1 in
+              let pr = try find_pr th.th_export l with Not_found ->
+                eprintf "File %s : --goal : Unknown goal %s@." file s ; exit 1 in
+              let goals = extract_goals env [] th in
+              List.filter (fun (_,ctxt) ->
+                             match ctxt.ctxt_decl.d_node with
+                               | Dprop (_,{pr_name = pr_name}) -> 
+                                   Ident.derived_from pr_name pr.pr_name
+                               | _ -> assert false) goals in
+      let file = 
+        let file = Filename.basename file in
+        let file = Filename.chop_extension file in
+        Ident.id_unique filename_printer 
+          (Ident.id_register (Ident.id_fresh file)) in
+      match !output with
+        | None -> ()
+        | Some dir -> 
+            let ident_printer = Ident.create_ident_printer 
+              ~sanitizer:file_sanitizer [] in
+            List.iter 
+              (fun (th,ctxt) ->
+                 let cout = 
+                   if dir = "-" 
+                   then stdout
+                   else
+                     let filename = 
+                       Driver.filename_of_goal drv ident_printer 
+                         file th.th_name.Ident.id_short ctxt in
+                     let filename = Filename.concat dir filename in
+                     open_out filename in
+                 let fmt = formatter_of_out_channel cout in
+                 fprintf fmt "%a@?" (Driver.print_context drv) ctxt;
+                 close_out cout) goals
   end
 
 let () =
   try
     let env = create_env (Typing.retrieve !loadpath) in
-    List.iter (type_file env) !files
+    let drv = match !driver with
+      | None -> None
+      | Some file -> Some (load_driver file env) in
+    let filename_printer = Ident.create_ident_printer 
+      ~sanitizer:file_sanitizer [] in
+    Queue.iter (do_file env drv filename_printer) files
   with e when not !debug ->
     eprintf "%a@." report e;
     exit 1

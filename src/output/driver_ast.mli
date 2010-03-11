@@ -46,6 +46,7 @@ type global =
   | RegexpInvalid of string
   | RegexpUnknown of string * string
   | RegexpFailure of string * string
+  | Filename of string
 
 type file = {
   f_global : (loc * global) list;

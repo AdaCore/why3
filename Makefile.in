@@ -144,8 +144,11 @@ bin/top: $(CMO)
 	ocamlmktop $(BFLAGS) -o $@ nums.cma $^
 
 test: bin/why.byte
-	ocamlrun -bt bin/why.byte --print-stdout -I lib/prelude/ src/test.why
-	bin/why.byte --driver lib/drivers/alt_ergo.drv -I lib/prelude/ src/test.why > ergo.why
+	mkdir -p output_why3
+	ocamlrun -bt bin/why.byte --debug -I lib/prelude/ --driver lib/drivers/why3.drv \
+	--output output_why3 src/test.why
+	bin/why.byte --driver lib/drivers/alt_ergo.drv -I lib/prelude/ \
+	--output - --goal Test.G src/test.why > ergo.why
 	timeout 3 alt-ergo ergo.why
 
 testl: bin/whyl.byte
@@ -597,6 +600,8 @@ clean::
 	rm -f bin/why-cpulimit
 	rm -f lib/coq*/*.vo lib/coq*/*~
 	rm -f $(GENERATED)
+	rm -rf output_why3
+	rm -f ergo.why
 #	make -C atp clean
 #	make -C doc clean
 #	if test -d examples-v7; then \

@@ -48,6 +48,10 @@ val register_printer : string -> printer -> unit
 
 val print_context : printer
 
+val filename_of_goal : driver -> Ident.ident_printer ->
+  string -> string -> context -> string
+(* filename_of_goal printer file_ident theory_ident ctxt *)
+
 type prover_answer =
   | Valid
   | Invalid

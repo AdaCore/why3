@@ -32,7 +32,7 @@
 %token THEORY END SYNTAX REMOVE TAG PRELUDE PRINTER CALL_ON_FILE CALL_ON_STDIN
 %token VALID INVALID UNKNOWN FAIL
 %token UNDERSCORE LEFTPAR RIGHTPAR CLONED DOT EOF
-%token LOGIC TYPE PROP
+%token LOGIC TYPE PROP FILENAME
 
 %type <Driver_ast.file> file
 %start file
@@ -58,6 +58,7 @@ global:
 | INVALID STRING { RegexpInvalid $2 }
 | UNKNOWN STRING STRING { RegexpUnknown ($2, $3) }
 | FAIL STRING STRING { RegexpFailure ($2, $3) }
+| FILENAME STRING { Filename $2 }
 ;
 
 list0_theory:

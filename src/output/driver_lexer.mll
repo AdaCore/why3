@@ -44,6 +44,7 @@
         "logic", LOGIC;
         "type", TYPE;
         "prop", PROP;
+        "filename", FILENAME;
       ]
 
 }
