@@ -54,7 +54,7 @@ PSVIEWER = @PSVIEWER@
 PDFVIEWER = @PDFVIEWER@
 
 INCLUDES = -I src/core -I src/util -I src/parser -I src/output \
-           -I src/transform -I src 
+           -I src/transform -I src/programs -I src 
 BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cma
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
 OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cmxa
@@ -73,14 +73,15 @@ GENERATED = src/version.ml src/parser/parser.mli src/parser/parser.ml \
 ##############
 
 BINARY=bin/why.$(OCAMLBEST)
+BINARYL=bin/whyl.$(OCAMLBEST)
 
-all: .depend $(BINARY) 
+all: .depend $(BINARY) $(BINARYL)
 
 # refrain parallel make (-j nn) from starting ocaml compilation too early 
 *.cm*: .depend
 
-opt: bin/why.opt
-byte: bin/why.byte
+opt: bin/why.opt bin/whyl.opt
+byte: bin/why.byte bin/whyl.byte
 
 .PHONY: check
 
@@ -144,6 +145,23 @@ test: bin/why.byte
 	ocamlrun -bt bin/why.byte --print-stdout -I lib/prelude/ src/test.why
 	bin/why.byte --driver lib/drivers/alt_ergo.drv -I lib/prelude/ src/test.why > ergo.why
 	timeout 3 alt-ergo ergo.why
+
+# programs
+##########
+
+PGM_CMO := pgm_main.cmo
+PGM_CMO := $(addprefix src/programs/, $(PGM_CMO))
+
+WHYL_CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) \
+           $(TRANSFORM_CMO) $(OUTPUT_CMO) $(PGM_CMO)
+WHYL_CMX = $(WHYL_CMO:.cmo=.cmx)
+
+bin/whyl.opt: $(WHYL_CMX) 
+	$(if $(QUIET), @echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ nums.cmxa $^
+	$(STRIP) $@
+
+bin/whyl.byte: $(WHYL_CMO) 
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ nums.cma $^
 
 # graphical interface
 #####################
