@@ -24,6 +24,14 @@ type error =
 
 exception Error of error
 
+(** parsing entry points *)
+
+val parse_list0_decl : Lexing.lexbuf -> Ptree.decl list
+
+val parse_logic_file : Lexing.lexbuf -> Ptree.logic_file
+
+(** other functions to be re-used in other lexers/parsers *)
+
 val newline : Lexing.lexbuf -> unit
 
 val comment : Lexing.lexbuf -> unit
@@ -31,8 +39,6 @@ val comment : Lexing.lexbuf -> unit
 val string : Lexing.lexbuf -> string
 
 val report : Format.formatter -> error -> unit
-
-val parse_logic_file : Lexing.lexbuf -> Ptree.logic_file
 
 val remove_leading_plus : string -> string
 

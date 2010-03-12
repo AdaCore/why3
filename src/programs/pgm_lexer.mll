@@ -170,7 +170,9 @@ rule token = parse
   | "]"
       { RIGHTSQ }
   | "{"
-      { logic_start_loc := loc lexbuf; LOGIC (logic lexbuf) }
+      { logic_start_loc := loc lexbuf; 
+	let s = logic lexbuf in
+	LOGIC (snd !logic_start_loc, s) }
   | "{{"
       { LEFTBLEFTB }
   | "}}"

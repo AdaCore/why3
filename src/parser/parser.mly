@@ -110,6 +110,8 @@
 
 %type <Ptree.lexpr> lexpr
 %start lexpr
+%type <Ptree.decl list> list0_decl
+%start list0_decl
 %type <Ptree.logic_file> logic_file
 %start logic_file
 %%

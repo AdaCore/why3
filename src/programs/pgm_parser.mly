@@ -76,6 +76,13 @@
        in
        { e with pdesc = Spost (e, (q, []), Transparent) }
 ***)
+
+  let parse_string f loc s =
+    let lb = Lexing.from_string s in
+    f lb
+    
+  let logic_list0_decl = parse_string Lexer.parse_list0_decl
+
 %}
 
 /* Tokens */ 
@@ -85,7 +92,7 @@
 %token <string> OP0 OP1 OP2 OP3
 %token <Ptree.real_constant> FLOAT
 %token <string> STRING
-%token <string> LOGIC
+%token <Lexing.position * string> LOGIC
 
 /* keywords */
 
@@ -160,8 +167,9 @@ list1_decl:
 ;
 
 decl:
-| LIDENT
-   { LogicDecl [] }
+| LOGIC
+    { let l, s = $1 in
+      LogicDecl (logic_list0_decl l s) }
 ;
 
 /*****
