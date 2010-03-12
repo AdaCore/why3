@@ -61,9 +61,29 @@ type prover_answer =
   | Timeout
   | HighFailure
 
-val call_prover : driver -> context -> prover_answer
-val call_prover_on_file : driver -> string -> prover_answer
-val call_prover_on_channel : driver -> string -> in_channel -> prover_answer
+val call_prover : 
+  ?debug:bool -> (* if on print on stderr the commandline 
+                    and the output of the prover *)
+  ?timeout:int -> (* specify the time limit given to the prover,
+                     if not set unlimited time *)
+  driver ->       (* the driver to use *)
+  context ->      (* the context to prove with a goal as the last declaration *)
+  Call_provers.prover_result
+
+val call_prover_on_file : 
+  ?debug:bool -> 
+  ?timeout:int -> 
+  driver -> 
+  string -> 
+    Call_provers.prover_result
+
+val call_prover_on_buffer : 
+  ?debug:bool -> 
+  ?timeout:int -> 
+  ?filename:string -> 
+  driver -> 
+  Buffer.t -> 
+  Call_provers.prover_result
 
 (* error reporting *)
 

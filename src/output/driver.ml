@@ -123,9 +123,7 @@ type printer = driver -> formatter -> context -> unit
 and driver = {
   drv_printer    : printer option;
   drv_context    : context;
-  drv_call_stdin : string option;
-  drv_call_file  : string option;
-  drv_regexps    : (string * prover_answer) list;
+  drv_prover     : Call_provers.prover;
   drv_prelude    : string option;
   drv_filename   : string option;
   drv_rules      : theory_rules list;
@@ -287,12 +285,13 @@ let load_driver file env =
     | RegexpFailure (s1,s2) -> regexps:=(s1,Failure s2)::!regexps
     | Filename s -> set_or_raise loc filename s "filename"
   in
+  let regexps = List.map (fun (s,a) -> (Str.regexp s,a)) !regexps in
   List.iter add f.f_global;
   { drv_printer    = !printer;
     drv_context    = Context.init_context env;
-    drv_call_stdin = !call_stdin;
-    drv_call_file  = !call_file;
-    drv_regexps    = !regexps;
+    drv_prover     = {Call_provers.pr_call_stdin = !call_stdin;
+                      pr_call_file               = !call_file;
+                      pr_regexps                 = regexps};
     drv_prelude    = !prelude;
     drv_filename   = !filename;
     drv_rules      = f.f_rules;
@@ -343,9 +342,7 @@ let filename_of_goal drv ident_printer filename theory_name ctxt =
   match drv.drv_filename with
     | None -> errorm "no filename syntax given"
     | Some f -> 
-        let pr_name = match ctxt.ctxt_decl.d_node with
-          | Dprop (Pgoal,{pr_name=pr_name}) -> pr_name
-          | _ -> errorm "the bottom of this context is not a goal" in
+        let pr_name = (goal_of_ctxt ctxt).pr_name in
         let repl_fun s = 
           let i = matched_group 1 s in
           match i with
@@ -355,10 +352,24 @@ let filename_of_goal drv ident_printer filename theory_name ctxt =
             | _ -> errorm "substitution variable are only %%f %%t and %%s" in
         global_substitute regexp_filename repl_fun f
 
+let file_printer = 
+  create_ident_printer ~sanitizer:(sanitizer char_to_alnumus char_to_alnumus)
+    []
 
-let call_prover drv ctx = assert false (*TODO*)
-let call_prover_on_file drv filename = assert false (*TODO*)
-let call_prover_on_channel drv filename ic = assert false (*TODO*)
+let call_prover_on_file ?debug ?timeout drv filename =
+  Call_provers.on_file drv.drv_prover filename 
+let call_prover_on_buffer ?debug ?timeout ?filename drv ib = 
+  Call_provers.on_buffer ?debug ?timeout ?filename drv.drv_prover ib 
+
+
+let call_prover ?debug ?timeout drv ctx =
+  let filename = 
+    match drv.drv_filename with
+      | None -> None
+      | Some _ -> Some (filename_of_goal drv file_printer "" "" ctx) in
+  let buffer = Buffer.create 128 in
+  bprintf buffer "%a@?" (print_context drv) ctx;
+  call_prover_on_buffer ?debug ?timeout ?filename drv buffer
 
 
 

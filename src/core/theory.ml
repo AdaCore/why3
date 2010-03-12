@@ -956,3 +956,10 @@ let print_ctxt fmt ctxt =
 
 let print_th fmt th = fprintf fmt "<theory (TODO>"
 
+(* Utils *)
+exception NotGoalContext
+
+let goal_of_ctxt ctxt =
+  match ctxt.ctxt_decl.d_node with
+    | Dprop (Pgoal,pr) -> pr
+    | _ -> raise NotGoalContext

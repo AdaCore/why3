@@ -16,6 +16,7 @@
 (*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
 (*                                                                        *)
 (**************************************************************************)
+open Format
 
 type prover_answer = 
   | Valid
@@ -25,11 +26,15 @@ type prover_answer =
   | Timeout
   | HighFailure
 
+val print_prover_answer : formatter -> prover_answer -> unit
+
 type prover_result =
     { pr_time   : float;
       pr_answer : prover_answer;
       pr_stderr : string;
       pr_stdout : string}
+
+val print_prover_result : formatter -> prover_result -> unit
 
 type prover =
     { pr_call_stdin : string option; (* %f pour le nom du fichier *)

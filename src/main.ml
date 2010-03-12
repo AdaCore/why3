@@ -64,7 +64,12 @@ let () =
 let () = 
   match !output with
     | None when not !call -> type_only := true
+    | Some _ when !call -> 
+        eprintf "--output and --call can't be use at the same time.(Whynot?)@.";
+        exit 1
     | _ -> ()
+
+let timeout = if !timeout <= 0 then None else Some !timeout
 
 (*
 let transformation l = 
@@ -176,14 +181,21 @@ let do_file env drv filename_printer file =
                                | Dprop (_,{pr_name = pr_name}) -> 
                                    Ident.derived_from pr_name pr.pr_name
                                | _ -> assert false) goals in
-      let file = 
-        let file = Filename.basename file in
-        let file = Filename.chop_extension file in
-        Ident.id_unique filename_printer 
-          (Ident.id_register (Ident.id_fresh file)) in
       match !output with
-        | None -> ()
+        | None (* we are in the call mode *) -> 
+            let call (th,ctxt) = 
+              let res = Driver.call_prover ~debug:!debug ?timeout drv ctxt in
+              printf "%s %s %s : %a@." 
+                file th.th_name.Ident.id_short 
+                (goal_of_ctxt ctxt).pr_name.Ident.id_long
+                Call_provers.print_prover_result res in
+            List.iter call goals
         | Some dir -> 
+            let file = 
+              let file = Filename.basename file in
+              let file = Filename.chop_extension file in
+              Ident.id_unique filename_printer 
+                (Ident.id_register (Ident.id_fresh file)) in
             let ident_printer = Ident.create_ident_printer 
               ~sanitizer:file_sanitizer [] in
             List.iter 

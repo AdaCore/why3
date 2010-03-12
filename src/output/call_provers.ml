@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Format
+
 type prover_answer = 
   | Valid
   | Invalid
@@ -25,11 +27,22 @@ type prover_answer =
   | Timeout
   | HighFailure
 
+let print_prover_answer fmt = function
+  | Valid -> fprintf fmt "Valid"
+  | Invalid -> fprintf fmt "Invalid"
+  | Unknown s -> pp_print_string fmt s
+  | Failure s -> pp_print_string fmt s
+  | Timeout -> fprintf fmt "Timeout"
+  | HighFailure -> fprintf fmt "HighFailure"
+
 type prover_result =
     { pr_time   : float;
       pr_answer : prover_answer;
       pr_stderr : string;
       pr_stdout : string}
+
+let print_prover_result fmt pr = 
+  fprintf fmt "%a (%.2fs)" print_prover_answer pr.pr_answer pr.pr_time
 
 type prover =
     { pr_call_stdin : string option; (* %f pour le nom du fichier *)
@@ -67,7 +80,7 @@ let timed_sys_command ?stdin ?(debug=false) ?timeout cmd =
   let ret = Unix.close_process p in
   let t1 = Unix.times () in
   let cpu_time = t1.Unix.tms_cutime -. t0.Unix.tms_cutime in
-  if debug then Format.eprintf "Calldp : Command output : %s@." out;
+  if debug then Format.eprintf "Call_provers : Command output : %s@." out;
   (cpu_time,ret,out)
 
 let grep re str =
