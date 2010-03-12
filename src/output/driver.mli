@@ -44,8 +44,14 @@ type printer = driver -> formatter -> context -> unit
 
 val register_printer : string -> printer -> unit
 
+val register_transform : string -> (unit -> Transform.ctxt_t) -> unit
+
 (** using drivers *)
 
+(** transform context *)
+val transform_context : driver -> context -> context
+
+(** print_context *)
 val print_context : printer
 
 val filename_of_goal : driver -> Ident.ident_printer ->

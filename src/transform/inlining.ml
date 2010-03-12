@@ -96,7 +96,7 @@ let fold isnotinlinedt isnotinlinedf ctxt0 (env, ctxt) =
     | Dind dl ->
         env, add_decl ctxt (create_ind_decl 
           (List.map (fun (ps,fmlal) -> ps, List.map (fun pr ->
-            create_prop (id_dup pr.pr_name) (replacep env pr.pr_fmla)) 
+            create_prop (id_clone pr.pr_name) (replacep env pr.pr_fmla)) 
           fmlal) dl))
     | Dlogic dl -> env,
         add_decl ctxt (create_logic_decl 
@@ -114,20 +114,33 @@ let fold isnotinlinedt isnotinlinedf ctxt0 (env, ctxt) =
                      Lpredicate (ps,Some (make_ps_defn ps vs t))
               ) dl))
     | Dtype dl -> env,add_decl ctxt d
-    | Dprop (k,pr) -> env,add_decl ctxt (create_prop_decl k
-        (create_prop (id_dup pr.pr_name) (replacep env pr.pr_fmla)))
+    | Dprop (k,pr) -> 
+        let prop = shortcut_for_discussion_dont_be_mad_andrei_please 
+          pr.pr_name (replacep env pr.pr_fmla) in
+        env,add_decl ctxt (create_prop_decl k prop)
     | Duse _ | Dclone _ -> env,add_decl ctxt d
         
 let t ~isnotinlinedt ~isnotinlinedf = 
   Transform.fold_map (fold isnotinlinedt isnotinlinedf) empty_env
 
-let all = t ~isnotinlinedt:(fun _ -> false) ~isnotinlinedf:(fun _ -> false)
+let all () = t ~isnotinlinedt:(fun _ -> false) ~isnotinlinedf:(fun _ -> false)
 
-let trivial = t 
+let trivial () = t 
   ~isnotinlinedt:(fun m -> match m.t_node with
                     | Tconst _ | Tvar _ -> false
                     | Tapp (ls,tl) when List.for_all 
-                        (fun m -> match m.t_node with Tvar _ -> true | _ -> false) tl -> true
+                        (fun m -> match m.t_node with 
+                           | Tvar _ -> true 
+                           | _ -> false) tl -> false
                     | _ -> true )
-  ~isnotinlinedf:(fun m -> match m.f_node with Ftrue | Ffalse | Fapp _ -> false
+  ~isnotinlinedf:(fun m -> match m.f_node with 
+                    | Ftrue | Ffalse -> false
+                    | Fapp (ls,tl) when List.for_all 
+                        (fun m -> match m.t_node with 
+                           | Tvar _ -> true 
+                           | _ -> false) tl -> false
                     | _ -> true)
+
+let () =
+  Driver.register_transform "inline_all" all;
+  Driver.register_transform "inline_trivial" trivial

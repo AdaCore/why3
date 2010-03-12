@@ -28,12 +28,12 @@ val t :
 
 (* Inline them all *)
 
-val all : Transform.ctxt_t
+val all : unit -> Transform.ctxt_t
 
 (* Inline only the trivial definition :
    logic c : t = a
    logic f(x : t,...., ) : t = g(y : t2,...) *)
-val trivial : Transform.ctxt_t
+val trivial : unit -> Transform.ctxt_t
 
 
 (* Function to use in other transformations if inlining is needed *)

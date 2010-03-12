@@ -10,13 +10,14 @@ call_on_file  "alt-ergo %s"
 valid "Valid"
 invalid "Invalid"
 unknown "I don't know" "Unknown"
+fail "typing error:\\(.*\\)$" "Failure : File generation error : \\1"
 
-(*
-tranformations
+(* À discuter *)
+transformations
   "simplify_recursive_definition"      
-  "inlining" ("trivial")
+  "inline_trivial"
 end
-*)
+
 
 theory BuiltIn
   syntax type int "int"

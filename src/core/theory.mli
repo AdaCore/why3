@@ -34,6 +34,8 @@ module Hpr : Hashtbl.S with type key = prop
 
 val create_prop : preid -> fmla -> prop
 
+val shortcut_for_discussion_dont_be_mad_andrei_please : ident -> fmla -> prop
+
 (** Declarations *)
 
 (* type declaration *)

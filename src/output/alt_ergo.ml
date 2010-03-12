@@ -59,7 +59,7 @@ let rec print_term drv fmt t = match t.t_node with
       assert false
   | Tconst c ->
       Pretty.print_const fmt c
-  | Tvar { vs_name = id } | Tapp ({ ls_name = id }, []) ->
+  | Tvar { vs_name = id } ->
       print_ident fmt id
   | Tapp (ls, tl) ->
       begin      
@@ -67,7 +67,10 @@ let rec print_term drv fmt t = match t.t_node with
           | Driver.Remove -> assert false (* Mettre une erreur *)
           | Driver.Syntax s ->
               Driver.syntax_arguments s (print_term drv) fmt tl
-          | Driver.Tag _ -> 
+          | Driver.Tag _ ->
+              match tl with
+                | [] -> print_ident fmt ls.ls_name
+                | tl ->
               fprintf fmt "%a(%a)" 
 	        print_ident ls.ls_name (print_list comma (print_term drv)) tl
       end

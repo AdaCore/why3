@@ -140,5 +140,6 @@ let elt d =
     | Dind _ -> [d] (* TODO *)
     | Dprop _ | Dclone _ | Duse _ -> [d]
 
-let t = Transform.elt elt
+let t () = Transform.elt elt
 
+let () = Driver.register_transform "simplify_recursive_definition" t

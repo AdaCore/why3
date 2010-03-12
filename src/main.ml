@@ -97,6 +97,8 @@ let rec report fmt = function
       fprintf fmt "anomaly: unknownident %s" i.Ident.id_short
   | Driver.Error e ->
       Driver.report fmt e
+  | Dynlink.Error e ->
+      fprintf fmt "Dynlink : %s" (Dynlink.error_message e)
   | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
 (*
@@ -150,6 +152,7 @@ let do_file env drv filename_printer file =
         match drv with
           | None -> eprintf "a driver is needed@."; exit 1
           | Some drv -> drv in
+      (* Extract the goal(s) *)
       let goals = 
         match !which_goals with
           | Gall ->  Mnm.fold (fun _ th acc -> extract_goals env acc th) m []
@@ -182,6 +185,11 @@ let do_file env drv filename_printer file =
                                | Dprop (_,{pr_name = pr_name}) -> 
                                    Ident.derived_from pr_name pr.pr_name
                                | _ -> assert false) goals in
+      (* Apply transformations *)
+      let goals = List.map 
+        (fun (th,ctxt) -> (th,Driver.transform_context drv ctxt))
+        goals in
+      (* Pretty-print the goals or call the prover *)
       match !output with
         | None (* we are in the call mode *) -> 
             let call (th,ctxt) = 
@@ -191,7 +199,7 @@ let do_file env drv filename_printer file =
                 (goal_of_ctxt ctxt).pr_name.Ident.id_long
                 Call_provers.print_prover_result res in
             List.iter call goals
-        | Some dir -> 
+        | Some dir (* we are in the output mode *) -> 
             let file = 
               let file = Filename.basename file in
               let file = Filename.chop_extension file in

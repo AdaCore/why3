@@ -42,7 +42,9 @@ type prover_result =
       pr_stdout : string}
 
 let print_prover_result fmt pr = 
-  fprintf fmt "%a (%.2fs)" print_prover_answer pr.pr_answer pr.pr_time
+  fprintf fmt "%a (%.2fs)" print_prover_answer pr.pr_answer pr.pr_time;
+  if pr.pr_answer == HighFailure 
+  then fprintf fmt "@\nstdout-stderr : \"%s\"" pr.pr_stdout;
 
 type prover =
     { pr_call_stdin : string option; (* %f pour le nom du fichier *)

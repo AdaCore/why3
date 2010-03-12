@@ -20,7 +20,7 @@
 
 (* Simplify the recursive type and logic definition *)
 
-val t : Transform.ctxt_t
+val t : unit -> Transform.ctxt_t
 
 
 (* ungroup recursive definition *)

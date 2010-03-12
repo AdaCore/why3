@@ -45,6 +45,8 @@
         "type", TYPE;
         "prop", PROP;
         "filename", FILENAME;
+        "transformations", TRANSFORMATIONS;
+        "plugin", PLUGIN
       ]
 
 }

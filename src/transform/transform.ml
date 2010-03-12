@@ -147,7 +147,7 @@ let split_goals =
   let g = fold_env f (fun env -> init_context env, []) in
   conv_res g snd
 
-let extract_goals =
+let extract_goals () =
   let f ctxt0 (ctxt,l) =
     let decl = ctxt0.ctxt_decl in    
     match decl.d_node with

@@ -126,6 +126,7 @@ and driver = {
   drv_prover     : Call_provers.prover;
   drv_prelude    : string option;
   drv_filename   : string option;
+  drv_transformations : Transform.ctxt_t list;
   drv_rules      : theory_rules list;
   drv_thprelude  : string Hid.t;
   (* the first is the translation only for this ident, the second is also for representant *)
@@ -140,12 +141,28 @@ let print_driver fmt driver =
        (Pp.print_pair print_translation print_translation))
     driver.drv_theory
 
+(** registering transformation *)
+
+let (transforms : (string, unit -> Transform.ctxt_t) Hashtbl.t) = Hashtbl.create 17
+
+let register_transform name transform = Hashtbl.replace transforms name transform
 
 (** registering printers *)
 
 let (printers : (string, printer) Hashtbl.t) = Hashtbl.create 17
 
 let register_printer name printer = Hashtbl.replace printers name printer
+
+
+let () = 
+  Dynlink.allow_only ["Theory";"Term";"Ident";"Transform";"Driver";
+                     "Pervasives";"Format";"List";"Sys";"Unix"]
+
+
+let load_plugin dir (byte,nat) =
+  let file = if Dynlink.is_native then nat else byte in
+  let file = Filename.concat dir file in
+  Dynlink.loadfile_private file
 
 let load_file file =
   let c = open_in file in
@@ -265,6 +282,7 @@ let load_driver file env =
   let call_stdin = ref None in
   let call_file = ref None in
   let filename = ref None in
+  let transformations = ref None in
   let regexps = ref [] in
   let set_or_raise loc r v error =
     if !r <> None then errorm ~loc "duplicate %s" error
@@ -284,9 +302,17 @@ let load_driver file env =
     | RegexpUnknown (s1,s2) -> regexps:=(s1,Unknown s2)::!regexps
     | RegexpFailure (s1,s2) -> regexps:=(s1,Failure s2)::!regexps
     | Filename s -> set_or_raise loc filename s "filename"
+    | Transformations s -> set_or_raise loc transformations  s "transformations"
+    | Plugin files -> load_plugin (Filename.dirname file) files
   in
   List.iter add f.f_global;
   let regexps = List.map (fun (s,a) -> (Str.regexp s,a)) !regexps in
+  let transformations = match !transformations with
+    | None -> [] | Some l -> l in
+  let transformations = 
+    List.map (fun (loc,s) -> try (Hashtbl.find transforms s) () 
+              with Not_found -> errorm ~loc "unknown transformation %s" s)
+      transformations in
   { drv_printer    = !printer;
     drv_context    = Context.init_context env;
     drv_prover     = {Call_provers.pr_call_stdin = !call_stdin;
@@ -294,6 +320,7 @@ let load_driver file env =
                       pr_regexps                 = regexps};
     drv_prelude    = !prelude;
     drv_filename   = !filename;
+    drv_transformations = transformations;
     drv_rules      = f.f_rules;
     drv_thprelude  = Hid.create 1;
     drv_theory     = Hid.create 1;
@@ -326,6 +353,10 @@ let syntax_arguments s print fmt l =
   global_substitute_fmt regexp_arg_pos repl_fun s fmt
  
 (** using drivers *)
+
+let transform_context drv ctxt =
+  List.fold_left (fun ctxt t -> Transform.apply t ctxt) 
+    ctxt drv.drv_transformations
 
 let print_context drv fmt ctxt = match drv.drv_printer with
   | None -> errorm "no printer"

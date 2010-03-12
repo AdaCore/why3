@@ -55,9 +55,9 @@ PDFVIEWER = @PDFVIEWER@
 
 INCLUDES = -I src/core -I src/util -I src/parser -I src/output \
            -I src/transform -I src/programs -I src 
-BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cma unix.cma
+BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cma unix.cma dynlink.cma
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
-OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cmxa unix.cmxa
+OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cmxa unix.cmxa dynlink.cmxa
 
 COQC7  = @COQC7@
 COQC8  = @COQC8@
@@ -116,15 +116,18 @@ UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
 PARSER_CMO := parser.cmo lexer.cmo typing.cmo 
 PARSER_CMO := $(addprefix src/parser/,$(PARSER_CMO))
 
-TRANSFORM_CMO := transform.cmo simplify_recursive_definition.cmo	\
-	inlining.cmo 
+TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo 
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
+
+DRIVER_CMO := call_provers.cmo driver_parser.cmo driver_lexer.cmo driver.cmo
+DRIVER_CMO := $(addprefix src/output/,$(DRIVER_CMO))
 
 OUTPUT_CMO := call_provers.cmo driver_parser.cmo driver_lexer.cmo driver.cmo \
               print_real.cmo alt_ergo.cmo why3.cmo
 OUTPUT_CMO := $(addprefix src/output/,$(OUTPUT_CMO))
 
 CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) \
+      src/transform/transform.cmo $(DRIVER_CMO)\
       $(TRANSFORM_CMO) $(OUTPUT_CMO) src/main.cmo
 CMX = $(CMO:.cmo=.cmx)
 
@@ -160,6 +163,7 @@ PGM_CMO := pgm_parser.cmo pgm_lexer.cmo pgm_main.cmo
 PGM_CMO := $(addprefix src/programs/, $(PGM_CMO))
 
 WHYL_CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) \
+	   src/transform/transform.cmo $(DRIVER_CMO)\
            $(TRANSFORM_CMO) $(OUTPUT_CMO) $(PGM_CMO)
 WHYL_CMX = $(WHYL_CMO:.cmo=.cmx)
 
@@ -203,6 +207,17 @@ WHYVO=lib/coq/Why.vo
 
 bench:: $(BINARY) 
 	sh bench/bench "$(BINARY) -I lib/prelude/"
+
+BENCH_PLUGINS_CMO := helloworld.cmo
+BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))
+BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
+
+
+bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) $(BINARY) byte
+	bin/why.$(OCAMLBEST) --driver bench/plugins/helloworld.drv -I lib/prelude/ \
+        --output - --goal Test.G src/test.why
+	bin/why.byte --driver bench/plugins/helloworld.drv -I lib/prelude/ \
+        --output - --goal Test.G src/test.why
 
 # installation
 ##############
@@ -367,7 +382,7 @@ apidoc: $(OCAMLDOCSRC)
 # generic rules
 ###############
 
-.SUFFIXES: .mli .ml .cmi .cmo .cmx .mll .mly .v .vo .ml4
+.SUFFIXES: .mli .ml .cmi .cmo .cmx .mll .mly .v .vo .ml4 .cmxs
 
 .mli.cmi:
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) $(APRONLIB) $(ATPLIB) -c $(BFLAGS) $<
@@ -383,6 +398,9 @@ apidoc: $(OCAMLDOCSRC)
 
 .ml.cmx:
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) $(APRONLIB) $(ATPLIB) -c $(OFLAGS) $<
+
+.ml.cmxs:
+	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) $(APRONLIB) $(ATPLIB) -shared $(OFLAGS) -o $@ $<
 
 .mll.ml:
 	$(OCAMLLEX) $<
@@ -601,6 +619,7 @@ clean::
 	rm -f $(GENERATED)
 	rm -rf output_why3
 	rm -f ergo.why
+	rm -rf bench/plugins/*.cm[iox]* bench/plugins/*.annot
 #	make -C atp clean
 #	make -C doc clean
 #	if test -d examples-v7; then \
@@ -618,7 +637,7 @@ coq-clean::
 .PHONY: depend
 .depend depend: $(GENERATED)
 	rm -f .depend
-	$(OCAMLDEP) -slash $(INCLUDES) src/*/*.ml src/*/*.mli src/*.ml src/*.mli > .depend
+	$(OCAMLDEP) -slash $(INCLUDES) src/*/*.ml src/*/*.mli src/*.ml src/*.mli bench/plugins/*.ml > .depend
 ifeq ($(FRAMAC),yes)
 #	$(MAKE) -C $(JESSIE_PLUGIN_PATH) depend
 endif

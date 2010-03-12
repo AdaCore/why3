@@ -53,6 +53,12 @@ let create_prop n f = {
   pr_fmla = check_fvs f;
 }
 
+let shortcut_for_discussion_dont_be_mad_andrei_please n f =
+{
+  pr_name = n;
+  pr_fmla = check_fvs f;
+}
+
 (** Declarations *)
 
 (* type declaration *)
