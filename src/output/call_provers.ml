@@ -69,7 +69,7 @@ let timed_sys_command ?stdin ?(debug=false) ?timeout cmd =
   let t0 = Unix.times () in
   let cmd = match timeout with
     | None -> Format.sprintf "%s 2>&1" cmd
-    | Some timeout -> Format.sprintf "%s" (*!cpulimit timeout*) cmd in
+    | Some timeout -> Format.sprintf "%s %d %s 2>&1" !cpulimit timeout cmd in
   if debug then Format.eprintf "command line: %s@." cmd;
   let (cin,cout) as p = Unix.open_process cmd in
   (match stdin with
