@@ -57,6 +57,7 @@ let () =
  Can't be used with --output"; (* Why not? *)
      "--driver", Arg.String (fun s -> driver := Some s),
      "<file>  set the driver file";
+     "--timeout", Arg.Set_int timeout, "set the timeout used when calling provers (0 unlimited, default 10)";
     ]
     (fun f -> Queue.push f files)
     "usage: why [options] files..."
