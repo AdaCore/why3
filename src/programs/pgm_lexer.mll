@@ -18,10 +18,19 @@
 (**************************************************************************)
 
 {
+  open Format
   open Lexing
   open Lexer
   open Term
   open Pgm_parser
+
+  type error = 
+    | UnterminatedLogic
+
+  exception Error of error
+
+  let report fmt = function
+    | UnterminatedLogic -> fprintf fmt "unterminated logic block"
 
   let keywords = Hashtbl.create 97
   let () = 
@@ -71,6 +80,11 @@
 	  pos_lnum = int_of_string line;
 	  pos_bol = pos.pos_cnum - int_of_string chars;
       }
+
+  let logic_start_loc = ref Loc.dummy_position
+  let logic_buffer = Buffer.create 1024
+
+  let loc lb = (lexeme_start_p lb, lexeme_end_p lb)
 
 }
 
@@ -156,9 +170,7 @@ rule token = parse
   | "]"
       { RIGHTSQ }
   | "{"
-      { LEFTB }
-  | "}"
-      { RIGHTB }
+      { logic_start_loc := loc lexbuf; LOGIC (logic lexbuf) }
   | "{{"
       { LEFTBLEFTB }
   | "}}"
@@ -176,30 +188,22 @@ rule token = parse
   | eof 
       { EOF }
   | _ as c
-      { raise (Error (IllegalCharacter c)) }
+      { raise (Lexer.Error (IllegalCharacter c)) }
 
-(* and logic = parse *)
-(*   | "\"" *)
-(*       { let s = Buffer.contents string_buf in *)
-(* 	Buffer.clear string_buf;  *)
-(* 	s } *)
-(*   | "\\" (_ as c) *)
-(*       { Buffer.add_char string_buf (char_for_backslash c); string lexbuf } *)
-(*   | newline  *)
-(*       { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf } *)
-(*   | eof *)
-(*       { raise (Error UnterminatedString) } *)
-(*   | _ as c *)
-(*       { Buffer.add_char string_buf c; string lexbuf } *)
-
+and logic = parse
+  | "}"
+      { let s = Buffer.contents logic_buffer in
+	Buffer.clear logic_buffer;
+	s }
+  | newline
+      { newline lexbuf; Buffer.add_char logic_buffer '\n'; logic lexbuf }
+  | eof
+      { raise (Loc.Located (!logic_start_loc, Error UnterminatedLogic)) }
+  | _ as c
+      { Buffer.add_char logic_buffer c; logic lexbuf }
 
 
 {
-
-  let loc lb = (lexeme_start_p lb, lexeme_end_p lb)
-
-  let with_location f lb =
-    try f lb with e -> raise (Loc.Located (loc lb, e))
 
   let parse_file = with_location (file token)
 

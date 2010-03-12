@@ -23,6 +23,8 @@ let () =
 let rec report fmt = function
   | Lexer.Error e ->
       fprintf fmt "lexical error: %a" Lexer.report e;
+  | Pgm_lexer.Error e ->
+      fprintf fmt "lexical error: %a" Pgm_lexer.report e;
   | Loc.Located (loc, e) ->
       fprintf fmt "%a%a" Loc.report_position loc report e
   | Parsing.Parse_error ->

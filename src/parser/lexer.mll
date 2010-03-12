@@ -78,7 +78,10 @@
     lexbuf.lex_curr_p <- 
       { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
 
+  let string_start_loc = ref Loc.dummy_position
   let string_buf = Buffer.create 1024
+
+  let comment_start_loc = ref Loc.dummy_position
 
   let char_for_backslash = function
     | 'n' -> '\n'
@@ -98,6 +101,8 @@
   let remove_leading_plus s =
     let n = String.length s in 
     if n > 0 && s.[0] = '+' then String.sub s 1 (n-1) else s
+
+  let loc lb = (lexeme_start_p lb, lexeme_end_p lb)
 
 }
 
@@ -147,7 +152,7 @@ rule token = parse
     ['p' 'P'] (['-' '+']? digit+ as e)
       { FLOAT (RConstHexa (i, f, remove_leading_plus e)) }
   | "(*"
-      { comment lexbuf; token lexbuf }
+      { comment_start_loc := loc lexbuf; comment lexbuf; token lexbuf }
   | "'"
       { QUOTE }
   | ","
@@ -187,7 +192,7 @@ rule token = parse
   | "|"
       { BAR }
   | "\""
-      { STRING (string lexbuf) }
+      { string_start_loc := loc lexbuf; STRING (string lexbuf) }
   | eof 
       { EOF }
   | _ as c
@@ -201,7 +206,7 @@ and comment = parse
   | newline 
       { newline lexbuf; comment lexbuf }
   | eof
-      { raise (Error UnterminatedComment) }
+      { raise (Loc.Located (!comment_start_loc, Error UnterminatedComment)) }
   | _ 
       { comment lexbuf }
 
@@ -215,7 +220,7 @@ and string = parse
   | newline 
       { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
   | eof
-      { raise (Error UnterminatedString) }
+      { raise (Loc.Located (!string_start_loc, Error UnterminatedString)) }
   | _ as c
       { Buffer.add_char string_buf c; string lexbuf }
 
@@ -223,10 +228,12 @@ and string = parse
 
 {
 
-  let loc lb = (lexeme_start_p lb, lexeme_end_p lb)
-
   let with_location f lb =
-    try f lb with e -> raise (Loc.Located (loc lb, e))
+    try 
+      f lb 
+    with 
+      | Loc.Located _ as e -> raise e
+      | e -> raise (Loc.Located (loc lb, e))
 
   let parse_lexpr = with_location (lexpr token)
   let parse_logic_file = with_location (logic_file token)

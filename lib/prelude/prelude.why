@@ -22,7 +22,7 @@ theory Int
      type t = int, logic zero = zero, 
      logic (_+_) = (_+_), logic (_*_) = (_*_), logic (-_) = (-_)
 
-  (* int is a unitary, communtative ring *)
+  (* int is a unitary, commutative ring *)
   axiom Mul_comm:     forall x,y:int. x * y = y * x
   axiom One_neutral:  forall x:int. 1 * x = x
 

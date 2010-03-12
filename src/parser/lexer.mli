@@ -35,3 +35,5 @@ val report : Format.formatter -> error -> unit
 val parse_logic_file : Lexing.lexbuf -> Ptree.logic_file
 
 val remove_leading_plus : string -> string
+
+val with_location : (Lexing.lexbuf -> 'a) -> Lexing.lexbuf -> 'a
