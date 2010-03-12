@@ -4,8 +4,12 @@
 prelude "(* this is a prelude for Alt-Ergo*)"
 
 printer "alt-ergo"
-filename "%f-%t-%s.why"
+filename "%f-%t-%s.mlw"
 call_on_file  "alt-ergo %s"
+
+valid "Valid"
+invalid "Invalid"
+unknown "I don't know" "Unknown"
 
 (*
 tranformations
@@ -18,10 +22,9 @@ theory BuiltIn
   syntax type int "int"
   syntax type real "real"
 
-  syntax logic (_=_) "(%1 = %1)"
+  syntax logic (_=_) "(%1 = %2)"
 
- (* inutile car  "<>" devient "not =" *)
-  syntax logic (_<>_) "(%1 = %1)"
+  syntax logic (_<>_) "(%1 = %2)"
 
 end
 

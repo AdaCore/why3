@@ -285,8 +285,8 @@ let load_driver file env =
     | RegexpFailure (s1,s2) -> regexps:=(s1,Failure s2)::!regexps
     | Filename s -> set_or_raise loc filename s "filename"
   in
-  let regexps = List.map (fun (s,a) -> (Str.regexp s,a)) !regexps in
   List.iter add f.f_global;
+  let regexps = List.map (fun (s,a) -> (Str.regexp s,a)) !regexps in
   { drv_printer    = !printer;
     drv_context    = Context.init_context env;
     drv_prover     = {Call_provers.pr_call_stdin = !call_stdin;

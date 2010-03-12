@@ -67,10 +67,10 @@ let remove_file ?(debug=false) f =
 
 let timed_sys_command ?stdin ?(debug=false) ?timeout cmd =
   let t0 = Unix.times () in
-  if debug then Format.eprintf "command line: %s@." cmd;
   let cmd = match timeout with
     | None -> Format.sprintf "%s 2>&1" cmd
-    | Some timeout -> Format.sprintf "%s %d %s 2>&1" !cpulimit timeout cmd in
+    | Some timeout -> Format.sprintf "%s" (*!cpulimit timeout*) cmd in
+  if debug then Format.eprintf "command line: %s@." cmd;
   let (cin,cout) as p = Unix.open_process cmd in
   (match stdin with
     | None -> ()
@@ -144,7 +144,7 @@ let check_prover prover =
   if prover.pr_call_file = None && prover.pr_call_stdin = None then
     raise NoCommandlineProvided
 
-let regexp_call_file = Str.regexp "%\\([a-f]\\)"
+let regexp_call_file = Str.regexp "%\\([a-z]\\)"
 
 let rec on_file ?debug ?timeout pr filename = 
   check_prover pr;
@@ -153,7 +153,7 @@ let rec on_file ?debug ?timeout pr filename =
         let cmd = 
           let repl_fun s = 
             match Str.matched_group 1 s with
-              | "f" -> filename
+              | "s" -> filename
               | _ -> assert false in (*TODO mettre une belle exception*)
           Str.global_substitute regexp_call_file repl_fun cmd in
         let res = timed_sys_command ?debug ?timeout cmd in
@@ -164,14 +164,15 @@ let rec on_file ?debug ?timeout pr filename =
 
 and on_buffer ?debug ?timeout ?filename pr buf =
   check_prover pr;
-  match pr.pr_call_file with
+  match pr.pr_call_stdin with
     | Some cmd -> 
         let res = timed_sys_command ?debug ?timeout ~stdin:buf cmd in
         treat_result pr res
     | None -> 
         match filename with
           | None -> raise NoCommandlineProvided
-          | Some filename -> Sysutil.open_temp_file filename
+          | Some filename -> Sysutil.open_temp_file ?debug filename
               (fun file cout ->
                  Buffer.output_buffer cout buf;
+                 flush cout;
                  on_file ?timeout ?debug pr file)

@@ -40,15 +40,15 @@ let file_contents_buf f =
 
 let file_contents f = Buffer.contents (file_contents_buf f)
 
-let open_temp_file filesuffix usefile =
+let open_temp_file ?(debug=false) filesuffix usefile =
   let file,cout = Filename.open_temp_file "why" filesuffix in
   try
     let res = usefile file cout in
-    Sys.remove file;
+    if not debug then Sys.remove file;
     close_out cout;
     res
   with
     | e ->    
-        Sys.remove file;
+        if not debug then Sys.remove file;
         close_out cout;
         raise e

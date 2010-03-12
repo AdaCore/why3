@@ -26,7 +26,9 @@ val file_contents : string -> string
 (* return the content of a file *)
 val file_contents_buf : string -> Buffer.t
 
-val open_temp_file : string -> (string -> out_channel -> 'a) -> 'a
+val open_temp_file : 
+  ?debug:bool -> (* don't remove the file *)
+  string -> (string -> out_channel -> 'a) -> 'a
 (* open_temp_file suffix usefile 
    Create a temporary file with suffix suffix,
    and call usefile on this file (filename and open_out).
