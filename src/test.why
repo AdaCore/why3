@@ -1,6 +1,12 @@
 
 (* test file *)
 
+theory ThA
+  type test
+  logic test (test : test) : test
+  goal Test : forall test : test . forall test : test . test(test) <> test
+end
+
 theory Test
   use import prelude.Int
   logic id(x: int) : int = x

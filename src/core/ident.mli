@@ -59,10 +59,8 @@ val id_clone : ident -> preid
 (* create a duplicate pre-ident *)
 val id_dup : ident -> preid
 
-(* Utils *)
-val derived_from : ident -> ident -> bool
-
-(* derived_from i1 i2 is true if i1 is derived from i2 *)
+(* id_derived_from i1 i2 <=> i1 is derived from i2 *)
+val id_derived_from : ident -> ident -> bool
 
 (** Unique persistent names for pretty printing *)
 
@@ -79,7 +77,8 @@ val id_unique :
 
 (* forget an ident *)
 val forget_id : ident_printer -> ident -> unit
-(* forget all the idents *)
+
+(* forget all idents *)
 val forget_all : ident_printer -> unit
 
 (* generic sanitizer taking a separate encoder for the first letter *)

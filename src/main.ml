@@ -20,6 +20,7 @@
 open Format
 open Theory
 open Driver
+open Transform
 
 let files = Queue.create ()
 let parse_only = ref false
@@ -183,7 +184,7 @@ let do_file env drv filename_printer file =
               List.filter (fun (_,ctxt) ->
                              match ctxt.ctxt_decl.d_node with
                                | Dprop (_,{pr_name = pr_name}) -> 
-                                   Ident.derived_from pr_name pr.pr_name
+                                   Ident.id_derived_from pr_name pr.pr_name
                                | _ -> assert false) goals in
       (* Apply transformations *)
       let goals = List.map 

@@ -33,8 +33,6 @@ let conv_res f c =
   { all = (fun x -> c (f.all x));
     clear = f.clear; }
 
-exception CompositionOfIncompatibleTranformation
-
 let compose f g =
   { all = (fun x -> g.all (f.all x));
     clear = (fun () -> f.clear (); g.clear ()); }
@@ -147,6 +145,14 @@ let split_goals =
   let g = fold_env f (fun env -> init_context env, []) in
   conv_res g snd
 
+exception NotGoalContext
+
+let goal_of_ctxt ctxt =
+  match ctxt.ctxt_decl.d_node with
+    | Dprop (Pgoal,pr) -> pr
+    | _ -> raise NotGoalContext
+
+(*
 let extract_goals () =
   let f ctxt0 (ctxt,l) =
     let decl = ctxt0.ctxt_decl in    
@@ -161,11 +167,13 @@ let extract_goals () =
   in
   let g = fold_env f (fun env -> init_context env, []) in
   conv_res g snd
+*)
 
 let identity = 
   { all = (fun x -> x);
     clear = (fun () -> ()); }
 
+(*
 let cloned_from_ts env ctxt l s ls1 =
   assert false (*TODO*)
 (*   try *)
@@ -190,4 +198,4 @@ let cloned_from_pr env ctxt l s pr1 =
 (*     let pr2 = Mnm.find s th.th_export.ns_pr in *)
 (*     Context_utils.cloned_from ctxt pr1.pr_name pr2.pr_name *)
 (*   with Loc.Located _ -> assert false *)
-
+*)

@@ -28,7 +28,6 @@ open Theory
 type 'a t
 type ctxt_t = context t
 
-exception CompositionOfIncompatibleTranformation
 (* compose two transformations, the underlying datastructures for
    the memoisation are shared *)
 val compose : context t -> 'a t -> 'a t
@@ -85,5 +84,10 @@ val fold_context_of_decl:
 (* Utils *)
 
 val split_goals : context list t
+
+exception NotGoalContext
+val goal_of_ctxt : context -> prop
+(* goal_of_ctxt ctxts return the goal of a goal context
+   the ctxt must end with a goal.*)
 
 val identity : context t

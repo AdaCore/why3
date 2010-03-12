@@ -212,6 +212,7 @@ end
 
 val builtin_name : string
 
+(*
 (** Debugging *)
 
 val print_ident : Format.formatter -> ident -> unit
@@ -222,6 +223,7 @@ val print_th : Format.formatter -> theory -> unit
 (* Utils *)
 
 exception NotGoalContext
-val goal_of_ctxt : context -> prop 
+val goal_of_ctxt : context -> prop
 (* goal_of_ctxt ctxt return the goal of a goal context
    the ctxt must end with a goal.*)
+*)

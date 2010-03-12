@@ -25,7 +25,7 @@ open Ty
 open Term
 open Theory
 
-let printer () =
+let iprinter,tprinter,lprinter,cprinter,pprinter =
   let bl = ["theory"; "type"; "logic"; "inductive";
             "axiom"; "lemma"; "goal"; "use"; "clone";
             "namespace"; "import"; "export"; "end";
@@ -33,58 +33,79 @@ let printer () =
             "true"; "false"; "if"; "then"; "else";
             "let"; "in"; "match"; "with"; "as"; "epsilon" ]
   in
-  let sanitize = sanitizer char_to_alpha char_to_alnumus in
-  create_ident_printer bl ~sanitizer:sanitize
+  let isanitize = sanitizer char_to_alpha char_to_alnumus in
+  let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
+  let usanitize = sanitizer char_to_ualpha char_to_alnumus in
+  create_ident_printer bl ~sanitizer:isanitize,
+  create_ident_printer bl ~sanitizer:lsanitize,
+  create_ident_printer bl ~sanitizer:lsanitize,
+  create_ident_printer bl ~sanitizer:usanitize,
+  create_ident_printer bl ~sanitizer:usanitize
 
-let printer_debug = printer ()
+let thash = Hid.create 63
+let lhash = Hid.create 63
+let phash = Hid.create 63
 
-let print_id ?(printer=printer_debug) fmt id = 
-  Format.fprintf fmt "%s" (id_unique printer id)
-
-(* some idents must be put in upper case *)
-let print_uc ?(printer=printer_debug) fmt id =
-  let sanitize = String.capitalize in
-  let n = id_unique printer ~sanitizer:sanitize id in
-  fprintf fmt "%s" n
-
-(* and some in lower *)
-let print_lc ?(printer=printer_debug) fmt id =
-  let sanitize = String.uncapitalize in
-  let n = id_unique printer ~sanitizer:sanitize id in
-  fprintf fmt "%s" n
+let forget_all () =
+  forget_all iprinter;
+  forget_all tprinter;
+  forget_all lprinter;
+  forget_all cprinter;
+  forget_all pprinter;
+  Hid.clear thash;
+  Hid.clear lhash;
+  Hid.clear phash
 
 let tv_set = ref Sid.empty
 
-let forget_tvs ?(printer=printer_debug) () =
-  Sid.iter (forget_id printer) !tv_set;
-  tv_set := Sid.empty
-
 (* type variables always start with a quote *)
-let print_tv ?(printer=printer_debug) fmt v =
-  tv_set := Sid.add v !tv_set;
+let print_tv fmt tv =
+  tv_set := Sid.add tv !tv_set;
   let sanitize n = String.concat "" ["'"; n] in
-  let n = id_unique printer ~sanitizer:sanitize v in
+  let n = id_unique iprinter ~sanitizer:sanitize tv in
   fprintf fmt "%s" n
 
-let print_ts ?printer fmt ts = print_lc ?printer fmt ts.ts_name
-let print_vs ?printer fmt vs = print_lc ?printer fmt vs.vs_name
+let forget_tvs () =
+  Sid.iter (forget_id iprinter) !tv_set;
+  tv_set := Sid.empty
 
-let print_ls ?printer fmt ls =
-  if ls.ls_constr then print_uc ?printer fmt ls.ls_name
-                  else print_lc ?printer fmt ls.ls_name
+(* logic variables always start with a lower case letter *)
+let print_vs fmt vs =
+  let sanitize = String.uncapitalize in
+  let n = id_unique iprinter ~sanitizer:sanitize vs.vs_name in
+  fprintf fmt "%s" n
 
-let forget_var ?(printer=printer_debug) v = forget_id printer v.vs_name
+let forget_var vs = forget_id iprinter vs.vs_name
+
+(* theory names always start with an upper case letter *)
+let print_th fmt th =
+  let sanitize = String.capitalize in
+  let n = id_unique iprinter ~sanitizer:sanitize th.th_name in
+  fprintf fmt "%s" n
+
+let print_ts fmt ts =
+  Hid.replace thash ts.ts_name ts;
+  fprintf fmt "%s" (id_unique tprinter ts.ts_name)
+
+let print_ls fmt ls =
+  Hid.replace lhash ls.ls_name ls;
+  if ls.ls_constr then fprintf fmt "%s" (id_unique lprinter ls.ls_name)
+                  else fprintf fmt "%s" (id_unique cprinter ls.ls_name)
+
+let print_pr fmt pr =
+  Hid.replace phash pr.pr_name pr;
+  fprintf fmt "%s" (id_unique pprinter pr.pr_name)
 
 (** Types *)
 
 let rec ns_comma fmt () = fprintf fmt ",@,"
 
-let rec print_ty ?printer fmt ty = match ty.ty_node with
-  | Tyvar v -> print_tv ?printer fmt v
-  | Tyapp (ts, []) -> print_ts ?printer fmt ts
-  | Tyapp (ts, [t]) -> fprintf fmt "%a@ %a" (print_ty ?printer) t (print_ts ?printer) ts
+let rec print_ty fmt ty = match ty.ty_node with
+  | Tyvar v -> print_tv fmt v
+  | Tyapp (ts, []) -> print_ts fmt ts
+  | Tyapp (ts, [t]) -> fprintf fmt "%a@ %a" print_ty t print_ts ts
   | Tyapp (ts, l) -> fprintf fmt "(%a)@ %a"
-      (print_list ns_comma (print_ty ?printer)) l (print_ts ?printer) ts
+      (print_list ns_comma print_ty) l print_ts ts
 
 let print_const fmt = function
   | ConstInt s -> fprintf fmt "%s" s
@@ -112,15 +133,15 @@ let lparen_r fmt () = fprintf fmt "(@,"
 let print_paren_l fmt x = print_list_delim lparen_l rparen comma fmt x
 let print_paren_r fmt x = print_list_delim lparen_r rparen comma fmt x
 
-let rec print_pat ?printer fmt p = match p.pat_node with
+let rec print_pat fmt p = match p.pat_node with
   | Pwild -> fprintf fmt "_"
-  | Pvar v -> print_vs ?printer fmt v
-  | Pas (p,v) -> fprintf fmt "%a as %a" (print_pat ?printer) p (print_vs ?printer) v
+  | Pvar v -> print_vs fmt v
+  | Pas (p,v) -> fprintf fmt "%a as %a" print_pat p print_vs v
   | Papp (cs,pl) -> fprintf fmt "%a%a"
-      (print_ls ?printer) cs (print_paren_r (print_pat ?printer)) pl
+      print_ls cs (print_paren_r print_pat) pl
 
-let print_vsty ?printer fmt v =
-  fprintf fmt "%a:@,%a" (print_vs ?printer) v (print_ty ?printer) v.vs_ty
+let print_vsty fmt v =
+  fprintf fmt "%a:@,%a" print_vs v print_ty v.vs_ty
 
 let print_quant fmt = function
   | Fforall -> fprintf fmt "forall"
@@ -136,202 +157,200 @@ let print_label fmt l = fprintf fmt "\"%s\"" l
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
-let rec print_term ?printer fmt t = print_lrterm ?printer false false fmt t
-and     print_fmla ?printer fmt f = print_lrfmla ?printer false false fmt f
-and print_opl_term ?printer fmt t = print_lrterm ?printer true  false fmt t
-and print_opl_fmla ?printer fmt f = print_lrfmla ?printer true  false fmt f
-and print_opr_term ?printer fmt t = print_lrterm ?printer false true  fmt t
-and print_opr_fmla ?printer fmt f = print_lrfmla ?printer false true  fmt f
+let rec print_term fmt t = print_lrterm false false fmt t
+and     print_fmla fmt f = print_lrfmla false false fmt f
+and print_opl_term fmt t = print_lrterm true  false fmt t
+and print_opl_fmla fmt f = print_lrfmla true  false fmt f
+and print_opr_term fmt t = print_lrterm false true  fmt t
+and print_opr_fmla fmt f = print_lrfmla false true  fmt f
 
-and print_lrterm ?printer opl opr fmt t = match t.t_label with
-  | [] -> print_tnode ?printer opl opr fmt t
+and print_lrterm opl opr fmt t = match t.t_label with
+  | [] -> print_tnode opl opr fmt t
   | ll -> fprintf fmt "(%a %a)"
-      (print_list space print_label) ll (print_tnode ?printer false false) t
+      (print_list space print_label) ll (print_tnode false false) t
 
-and print_lrfmla ?printer opl opr fmt f = match f.f_label with
-  | [] -> print_fnode ?printer opl opr fmt f
+and print_lrfmla opl opr fmt f = match f.f_label with
+  | [] -> print_fnode opl opr fmt f
   | ll -> fprintf fmt "(%a %a)"
-      (print_list space print_label) ll (print_fnode ?printer false false) f
+      (print_list space print_label) ll (print_fnode false false) f
 
-and print_tnode ?printer opl opr fmt t = match t.t_node with
+and print_tnode opl opr fmt t = match t.t_node with
   | Tbvar _ ->
       assert false
   | Tvar v ->
-      print_vs ?printer fmt v
+      print_vs fmt v
   | Tconst c ->
       print_const fmt c
   | Tapp (fs, tl) when unambig_fs fs ->
-      fprintf fmt "%a%a" (print_ls ?printer) fs (print_paren_r 
-                                                   (print_term ?printer)) tl
+      fprintf fmt "%a%a" print_ls fs (print_paren_r print_term) tl
   | Tapp (fs, tl) ->
       fprintf fmt (protect_on opl "%a%a:%a")
-        (print_ls ?printer) fs (print_paren_r (print_term ?printer)) tl 
-        (print_ty ?printer) t.t_ty
+        print_ls fs (print_paren_r print_term) tl print_ty t.t_ty
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
-        (print_vs ?printer) v (print_opl_term ?printer) t1 
-        (print_opl_term ?printer) t2;
-      (forget_var ?printer) v
+        print_vs v print_opl_term t1 print_opl_term t2;
+      forget_var v
   | Tcase (t1,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
-        (print_term ?printer) t1 (print_list newline (print_tbranch ?printer)) bl
+        print_term t1 (print_list newline print_tbranch) bl
   | Teps fb ->
       let v,f = f_open_bound fb in
       fprintf fmt (protect_on opr "epsilon %a in@ %a")
-        (print_vsty ?printer) v (print_opl_fmla ?printer) f;
-      (forget_var ?printer) v
+        print_vsty v print_opl_fmla f;
+      forget_var v
 
-and print_fnode ?printer opl opr fmt f = match f.f_node with
+and print_fnode opl opr fmt f = match f.f_node with
   | Fapp (ps,[t1;t2]) when ps = ps_equ ->
       fprintf fmt (protect_on (opl || opr) "%a =@ %a")
-        (print_opr_term ?printer) t1 (print_opl_term ?printer) t2
+        print_opr_term t1 print_opl_term t2
   | Fapp (ps,tl) ->
-      fprintf fmt "%a%a" (print_ls ?printer) ps
-        (print_paren_r (print_term ?printer)) tl
+      fprintf fmt "%a%a" print_ls ps
+        (print_paren_r print_term) tl
   | Fquant (q,fq) ->
       let vl,tl,f = f_open_quant fq in
       fprintf fmt (protect_on opr "%a %a%a.@ %a") print_quant q
-        (print_list comma (print_vsty ?printer)) vl (print_tl ?printer) tl 
-        (print_fmla ?printer) f;
-      List.iter (forget_var ?printer) vl
+        (print_list comma print_vsty) vl print_tl tl print_fmla f;
+      List.iter forget_var vl
   | Ftrue ->
       fprintf fmt "true"
   | Ffalse ->
       fprintf fmt "false"
   | Fbinop (b,f1,f2) ->
       fprintf fmt (protect_on (opl || opr) "%a %a@ %a")
-        (print_opr_fmla ?printer) f1 print_binop b (print_opl_fmla ?printer) f2
+        print_opr_fmla f1 print_binop b print_opl_fmla f2
   | Fnot f ->
-      fprintf fmt (protect_on opr "not %a") (print_opl_fmla ?printer) f
+      fprintf fmt (protect_on opr "not %a") print_opl_fmla f
   | Flet (t,f) ->
       let v,f = f_open_bound f in
       fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
-        (print_vs ?printer) v (print_opl_term ?printer) t 
-        (print_opl_fmla ?printer) f;
-      forget_var ?printer v
+        print_vs v print_opl_term t print_opl_fmla f;
+      forget_var v
   | Fcase (t,bl) ->
-      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend" (print_term ?printer) t
-        (print_list newline (print_fbranch ?printer)) bl
+      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend" print_term t
+        (print_list newline print_fbranch) bl
   | Fif (f1,f2,f3) ->
       fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
-        (print_fmla ?printer) f1 (print_fmla ?printer) f2 (print_opl_fmla ?printer) f3
+        print_fmla f1 print_fmla f2 print_opl_fmla f3
 
-and print_tbranch ?printer fmt br =
+and print_tbranch fmt br =
   let pat,svs,t = t_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_pat ?printer) pat (print_term ?printer) t;
-  Svs.iter (forget_var ?printer) svs
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat pat print_term t;
+  Svs.iter forget_var svs
 
-and print_fbranch ?printer fmt br =
+and print_fbranch fmt br =
   let pat,svs,f = f_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_pat ?printer) pat (print_fmla ?printer) f;
-  Svs.iter (forget_var ?printer) svs
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat pat print_fmla f;
+  Svs.iter forget_var svs
 
-and print_tl ?printer fmt tl =
+and print_tl fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
-    (print_list alt (print_list comma (print_tr ?printer))) tl
+    (print_list alt (print_list comma print_tr)) tl
 
-and print_tr  ?printer fmt = function
-  | TrTerm t -> print_term ?printer fmt t
-  | TrFmla f -> print_fmla ?printer fmt f
+and print_tr fmt = function
+  | TrTerm t -> print_term fmt t
+  | TrFmla f -> print_fmla fmt f
 
 (** Declarations *)
 
-let print_constr ?printer fmt cs =
-  fprintf fmt "@[<hov 4>| %a%a@]" (print_ls ?printer) cs
-    (print_paren_l (print_ty ?printer)) cs.ls_args
+let print_constr fmt cs =
+  fprintf fmt "@[<hov 4>| %a%a@]" print_ls cs
+    (print_paren_l print_ty) cs.ls_args
 
-let print_ty_args ?printer fmt = function
+let print_ty_args fmt = function
   | [] -> ()
-  | [tv] -> fprintf fmt " %a" (print_tv ?printer) tv
-  | l -> fprintf fmt " (%a)" (print_list ns_comma (print_tv ?printer)) l
+  | [tv] -> fprintf fmt " %a" print_tv tv
+  | l -> fprintf fmt " (%a)" (print_list ns_comma print_tv) l
 
-let print_type_decl ?printer fmt (ts,def) = match def with
+let print_type_decl fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
       | None ->
           fprintf fmt "@[<hov 2>type%a %a@]"
-            (print_ty_args ?printer) ts.ts_args (print_ts ?printer) ts
+            print_ty_args ts.ts_args print_ts ts
       | Some ty ->
           fprintf fmt "@[<hov 2>type%a %a =@ %a@]"
-            (print_ty_args ?printer) ts.ts_args (print_ts ?printer) ts (print_ty ?printer) ty
+            print_ty_args ts.ts_args print_ts ts print_ty ty
       end
   | Talgebraic csl ->
       fprintf fmt "@[<hov 2>type%a %a =@\n@[<hov>%a@]@]"
-        (print_ty_args ?printer) ts.ts_args (print_ts ?printer) ts
-        (print_list newline (print_constr ?printer)) csl
+        print_ty_args ts.ts_args print_ts ts
+        (print_list newline print_constr) csl
 
-let print_type_decl ?printer fmt d = print_type_decl ?printer fmt d; 
-  forget_tvs  ?printer ()
+let print_type_decl fmt d = print_type_decl fmt d; forget_tvs ()
 
-let print_logic_decl ?printer fmt = function
+let print_logic_decl fmt = function
   | Lfunction (fs,None) ->
       fprintf fmt "@[<hov 2>logic %a%a :@ %a@]"
-        (print_ls ?printer) fs (print_paren_l (print_ty ?printer)) fs.ls_args
-          (print_ty ?printer)(of_option fs.ls_value)
+        print_ls fs (print_paren_l print_ty) fs.ls_args
+          print_ty (of_option fs.ls_value)
   | Lpredicate (ps,None) ->
       fprintf fmt "@[<hov 2>logic %a%a@]"
-        (print_ls ?printer) ps (print_paren_l (print_ty ?printer)) ps.ls_args
+        print_ls ps (print_paren_l print_ty) ps.ls_args
   | Lfunction (fs,Some fd) ->
       let _,vl,t = open_fs_defn fd in
       fprintf fmt "@[<hov 2>logic %a%a :@ %a =@ %a@]"
-        (print_ls ?printer) fs (print_paren_l (print_vsty ?printer)) vl
-        (print_ty ?printer) t.t_ty (print_term ?printer) t;
-      List.iter (forget_var ?printer) vl
+        print_ls fs (print_paren_l print_vsty) vl
+        print_ty t.t_ty print_term t;
+      List.iter forget_var vl
   | Lpredicate (ps,Some fd) ->
       let _,vl,f = open_ps_defn fd in
       fprintf fmt "@[<hov 2>logic %a%a =@ %a@]"
-        (print_ls ?printer) ps (print_paren_l (print_vsty ?printer)) vl (print_fmla ?printer) f;
-      List.iter (forget_var ?printer) vl
+        print_ls ps (print_paren_l print_vsty) vl print_fmla f;
+      List.iter forget_var vl
 
-let print_logic_decl ?printer fmt d = print_logic_decl ?printer fmt d; 
-  forget_tvs ?printer ()
+let print_logic_decl fmt d = print_logic_decl fmt d; forget_tvs ()
 
-let print_prop ?printer fmt pr =
-  fprintf fmt "%a : %a" (print_uc ?printer) pr.pr_name (print_fmla ?printer)
-    pr.pr_fmla
+let print_prop fmt pr =
+  fprintf fmt "%a : %a" print_pr pr print_fmla pr.pr_fmla
 
-let print_ind ?printer fmt pr = 
-  fprintf fmt "@[<hov 4>| %a@]" (print_prop ?printer) pr
+let print_ind fmt pr = fprintf fmt "@[<hov 4>| %a@]" print_prop pr
 
-let print_ind_decl ?printer fmt (ps,bl) =
+let print_ind_decl fmt (ps,bl) =
   fprintf fmt "@[<hov 2>inductive %a%a =@ @[<hov>%a@]@]"
-     (print_ls ?printer) ps (print_paren_l (print_ty ?printer)) ps.ls_args
-     (print_list newline (print_ind ?printer)) bl;
-  forget_tvs ?printer ()
+     print_ls ps (print_paren_l print_ty) ps.ls_args
+     (print_list newline print_ind) bl;
+  forget_tvs ()
 
 let print_pkind fmt = function
   | Paxiom -> fprintf fmt "axiom"
   | Plemma -> fprintf fmt "lemma"
   | Pgoal  -> fprintf fmt "goal"
 
-let print_inst ?printer fmt (id1,id2) =
-  fprintf fmt "%a = %a" (print_id ?printer) id1 (print_id ?printer) id2
+let print_inst fmt (id1,id2) =
+  if Hid.mem thash id2 then
+    let n = id_unique tprinter id1 in
+    fprintf fmt "%s = %a" n print_ts (Hid.find thash id2)
+  else if Hid.mem lhash id2 then
+    let n = id_unique lprinter id1 in
+    fprintf fmt "%s = %a" n print_ls (Hid.find lhash id2)
+  else if Hid.mem phash id2 then
+    let n = id_unique pprinter id1 in
+    fprintf fmt "%s = %a" n print_pr (Hid.find phash id2)
+  else assert false
 
-let print_th fmt th = fprintf fmt "%s" th.th_name.id_long
-
-let print_decl ?printer fmt d = match d.d_node with
-  | Dtype tl  -> print_list newline2 (print_type_decl ?printer) fmt tl
-  | Dlogic ll -> print_list newline2 (print_logic_decl ?printer) fmt ll
-  | Dind il   -> print_list newline2 (print_ind_decl ?printer) fmt il
+let print_decl fmt d = match d.d_node with
+  | Dtype tl  -> print_list newline2 print_type_decl fmt tl
+  | Dlogic ll -> print_list newline2 print_logic_decl fmt ll
+  | Dind il   -> print_list newline2 print_ind_decl fmt il
   | Dprop (k,pr) ->
-      fprintf fmt "@[<hov 2>%a %a@]" print_pkind k (print_prop ?printer) pr;
-      forget_tvs ?printer ()
+      fprintf fmt "@[<hov 2>%a %a@]" print_pkind k print_prop pr;
+      forget_tvs ()
   | Duse th ->
       fprintf fmt "@[<hov 2>(* use %a *)@]" print_th th
   | Dclone (th,inst) ->
       fprintf fmt "@[<hov 2>(* clone %a with %a *)@]"
-        print_th th (print_list comma (print_inst ?printer)) inst
+        print_th th (print_list comma print_inst) inst
 
-let print_decls ?printer fmt dl =
-  fprintf fmt "@[<hov>%a@]" (print_list newline2 (print_decl ?printer)) dl
+let print_decls fmt dl =
+  fprintf fmt "@[<hov>%a@]" (print_list newline2 print_decl) dl
 
-let print_context ?printer fmt ctxt = print_decls ?printer fmt (Context.get_decls ctxt)
+let print_context fmt ctxt = print_decls fmt (Context.get_decls ctxt)
 
-let print_theory ?printer fmt th =
+let print_theory fmt th =
   fprintf fmt "@[<hov 2>theory %a@\n%a@]@\nend@\n@."
-    print_th th (print_context ?printer) th.th_ctxt
+    print_th th print_context th.th_ctxt
 
-let print_named_context ?printer fmt name ctxt =
+let print_named_context fmt name ctxt =
   fprintf fmt "@[<hov 2>context %s@\n%a@]@\nend@\n@."
-    name (print_context ?printer) ctxt
+    name print_context ctxt
 

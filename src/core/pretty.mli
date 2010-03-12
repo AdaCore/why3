@@ -23,55 +23,36 @@ open Ty
 open Term
 open Theory
 
-val printer : unit -> ident_printer
+val forget_all : unit -> unit     (* flush id_unique *)
+val forget_tvs : unit -> unit     (* flush id_unique for type vars *)
+val forget_var : vsymbol -> unit  (* flush id_unique for a variable *)
 
-val forget_tvs : ?printer:ident_printer -> unit -> unit     
-  (* flush id_unique for type vars *)
-val forget_var : ?printer:ident_printer -> vsymbol -> unit 
-  (* flush id_unique for a variable *)
+val print_tv : formatter -> tvsymbol -> unit      (* type variable *)
+val print_vs : formatter -> vsymbol -> unit       (* variable *)
 
-val print_id : ?printer:ident_printer ->          (* ident *)
-  formatter -> ident -> unit         
-val print_tv : ?printer:ident_printer ->          (* type variable *)
-formatter -> tvsymbol -> unit
-val print_ts : ?printer:ident_printer ->          (* type symbol *)
-  formatter -> tysymbol -> unit
-val print_ty : ?printer:ident_printer ->          (* type *)
-  formatter -> ty -> unit
-val print_vs : ?printer:ident_printer ->          (* variable *)
-  formatter -> vsymbol -> unit
-val print_vsty : ?printer:ident_printer ->        (* variable : type *)
-  formatter -> vsymbol -> unit
-val print_ls : ?printer:ident_printer ->          (* logic symbol *)
-  formatter -> lsymbol -> unit
+val print_ts : formatter -> tysymbol -> unit      (* type symbol *)
+val print_ls : formatter -> lsymbol -> unit       (* logic symbol *)
+val print_pr : formatter -> prop -> unit          (* proposition name *)
+
+val print_ty : formatter -> ty -> unit            (* type *)
+val print_vsty : formatter -> vsymbol -> unit     (* variable : type *)
+
 val print_const : formatter -> constant -> unit   (* int/real constant *)
-val print_pat : ?printer:ident_printer ->         (* pattern *)
-  formatter -> pattern -> unit
-val print_term : ?printer:ident_printer ->        (* term *)
-  formatter -> term -> unit
-val print_fmla : ?printer:ident_printer ->        (* formula *)
-  formatter -> fmla -> unit
+val print_pat : formatter -> pattern -> unit      (* pattern *)
+val print_term : formatter -> term -> unit        (* term *)
+val print_fmla : formatter -> fmla -> unit        (* formula *)
 
-val print_type_decl : ?printer:ident_printer ->
-  formatter -> ty_decl -> unit
-val print_logic_decl : ?printer:ident_printer ->
-  formatter -> logic_decl -> unit
-val print_ind_decl : ?printer:ident_printer ->
-  formatter -> ind_decl -> unit
+val print_type_decl : formatter -> ty_decl -> unit
+val print_logic_decl : formatter -> logic_decl -> unit
+val print_ind_decl : formatter -> ind_decl -> unit
 
 val print_pkind : formatter -> prop_kind -> unit
-val print_prop : ?printer:ident_printer ->
-  formatter -> prop -> unit
+val print_prop : formatter -> prop -> unit
 
-val print_decl : ?printer:ident_printer ->
-  formatter -> decl -> unit
-val print_decls : ?printer:ident_printer ->
-  formatter -> decl list -> unit
-val print_context : ?printer:ident_printer ->
-  formatter -> context -> unit
-val print_theory : ?printer:ident_printer ->
-  formatter -> theory -> unit
+val print_decl : formatter -> decl -> unit
+val print_decls : formatter -> decl list -> unit
+val print_context : formatter -> context -> unit
+val print_theory : formatter -> theory -> unit
 
-val print_named_context : ?printer:ident_printer ->
-  formatter -> string -> context -> unit
+val print_named_context : formatter -> string -> context -> unit
 

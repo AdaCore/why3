@@ -314,7 +314,7 @@ let create_logic_decl ldl =
 module Ctxt = struct
   type t = context
 
-  let equal a b = 
+  let equal a b =
     a.ctxt_env  == b.ctxt_env  &&
     a.ctxt_decl == b.ctxt_decl &&
     match a.ctxt_prev, b.ctxt_prev with
@@ -376,14 +376,14 @@ let builtin_theory env =
 
 (** Environments *)
 
-let create_env = 
+let create_env =
   let r = ref 0 in
   fun retrieve ->
     incr r;
-    let env = 
-      { env_retrieve = retrieve;
-	env_memo     = Hashtbl.create 17;
-	env_tag      = !r; }
+    let env = {
+      env_retrieve = retrieve;
+      env_memo     = Hashtbl.create 17;
+      env_tag      = !r }
     in
     let builtin = builtin_theory env in
     let m = Mnm.add builtin.th_name.id_short builtin Mnm.empty in
@@ -393,7 +393,7 @@ let create_env =
 exception TheoryNotFound of string list * string
 
 let find_theory env sl s =
-  let m = 
+  let m =
     try
       Hashtbl.find env.env_memo sl
     with Not_found ->
@@ -402,8 +402,8 @@ let find_theory env sl s =
       Hashtbl.replace env.env_memo sl m;
       m
   in
-  try Mnm.find s m 
-  with Not_found -> raise (TheoryNotFound (sl, s)) 
+  try Mnm.find s m
+  with Not_found -> raise (TheoryNotFound (sl, s))
 
 
 (** Context constructors and utilities *)
@@ -564,8 +564,7 @@ module Context = struct
   let rec use_export hide ctxt th =
     let d = create_use_decl th in
     try
-      let kn = add_known th.th_name d ctxt.ctxt_known in
-      let ctxt = push_decl ctxt kn d in
+      ignore (add_known th.th_name d ctxt.ctxt_known);
       let add_decl ctxt d = match d.d_node with
         | Duse th -> use_export true ctxt th
         | Dprop (Pgoal,_) when hide -> ctxt
@@ -574,7 +573,9 @@ module Context = struct
         | _ -> add_decl ctxt d
       in
       let decls = get_decls th.th_ctxt in
-      List.fold_left add_decl ctxt decls
+      let ctxt = List.fold_left add_decl ctxt decls in
+      let kn = add_known th.th_name d ctxt.ctxt_known in
+      push_decl ctxt kn d
     with DejaVu ->
       ctxt
 
@@ -819,7 +820,7 @@ module TheoryUC = struct
 
   (* Manage theories *)
 
-  let create_theory env n = 
+  let create_theory env n =
     let builtin = find_theory env [] builtin_name in
     { uc_name   = n;
       uc_ctxt   = builtin.th_ctxt;
@@ -933,6 +934,7 @@ module TheoryUC = struct
 
 end
 
+(*
 (** Debugging *)
 
 let print_ident =
@@ -969,3 +971,4 @@ let goal_of_ctxt ctxt =
   match ctxt.ctxt_decl.d_node with
     | Dprop (Pgoal,pr) -> pr
     | _ -> raise NotGoalContext
+*)

@@ -68,9 +68,10 @@ let id_derive_long sh ln id = create_ident sh ln (Derived id)
 let id_clone id = create_ident id.id_short id.id_long (Derived id)
 let id_dup id = { id with id_tag = -1 }
 
-(* Utils *)
-let rec derived_from i1 i2 = 
-  i1 == i2 || (match i1.id_origin with Derived i3 -> derived_from i1 i2 | _ -> false)
+let rec id_derived_from i1 i2 = i1 == i2 ||
+  (match i1.id_origin with
+    | Derived i3 -> id_derived_from i3 i2
+    | _ -> false)
 
 (** Unique names for pretty printing *)
 

@@ -134,12 +134,13 @@ and driver = {
   drv_with_ctxt  : translation Hid.t;
 }
 
-
+(*
 let print_driver fmt driver =
   printf "drv_theory %a@\n" 
     (Pp.print_iter2 Hid.iter Pp.semi Pp.comma print_ident
        (Pp.print_pair print_translation print_translation))
     driver.drv_theory
+*)
 
 (** registering transformation *)
 
@@ -373,7 +374,7 @@ let filename_of_goal drv ident_printer filename theory_name ctxt =
   match drv.drv_filename with
     | None -> errorm "no filename syntax given"
     | Some f -> 
-        let pr_name = (goal_of_ctxt ctxt).pr_name in
+        let pr_name = (Transform.goal_of_ctxt ctxt).pr_name in
         let repl_fun s = 
           let i = matched_group 1 s in
           match i with
