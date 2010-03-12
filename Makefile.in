@@ -55,9 +55,9 @@ PDFVIEWER = @PDFVIEWER@
 
 INCLUDES = -I src/core -I src/util -I src/parser -I src/output \
            -I src/transform -I src/programs -I src 
-BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cma
+BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cma unix.cma
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
-OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cmxa
+OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cmxa unix.cmxa
 
 COQC7  = @COQC7@
 COQC8  = @COQC8@
@@ -110,7 +110,7 @@ doc/version.tex src/version.ml: Version version.sh config.status
 CORE_CMO := ident.cmo ty.cmo term.cmo theory.cmo pretty.cmo 
 CORE_CMO := $(addprefix src/core/,$(CORE_CMO))
 
-UTIL_CMO := pp.cmo loc.cmo util.cmo hashcons.cmo 
+UTIL_CMO := pp.cmo loc.cmo util.cmo hashcons.cmo sysutil.cmo
 UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
 
 PARSER_CMO := parser.cmo lexer.cmo typing.cmo 
@@ -120,7 +120,7 @@ TRANSFORM_CMO := transform.cmo simplify_recursive_definition.cmo	\
 	inlining.cmo 
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
-OUTPUT_CMO := driver_parser.cmo driver_lexer.cmo driver.cmo \
+OUTPUT_CMO := call_provers.cmo driver_parser.cmo driver_lexer.cmo driver.cmo \
               print_real.cmo alt_ergo.cmo why3.cmo
 OUTPUT_CMO := $(addprefix src/output/,$(OUTPUT_CMO))
 

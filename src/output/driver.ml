@@ -86,12 +86,14 @@ let errorm ?loc f =
 
 (** creating drivers *)
 
-type prover_answer =
+type prover_answer = 
+    Call_provers.prover_answer =
   | Valid
   | Invalid
   | Unknown of string
   | Failure of string
   | Timeout
+  | HighFailure
 
 type theory_driver = {
   thd_prelude : string option;

@@ -17,58 +17,43 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Format
-open Ident
-open Theory
-
-(** creating drivers *)
-
-type driver 
-
-val load_driver : string -> env -> driver
-
-(** querying drivers *)
-
-type translation = 
-  | Remove
-  | Syntax of string
-  | Tag of Snm.t
-
-val query_ident : driver -> ident -> translation
-val syntax_arguments : string -> (formatter -> 'a -> unit) -> formatter -> 'a list -> unit
-  (* syntax_argument templ print_arg fmt l print in the formatter fmt
-     the list l using the template templ and the printer print_arg *)
-  (** registering printers *)
-
-type printer = driver -> formatter -> context -> unit
-
-val register_printer : string -> printer -> unit
-
-(** using drivers *)
-
-val print_context : printer
-
-val filename_of_goal : driver -> Ident.ident_printer ->
-  string -> string -> context -> string
-(* filename_of_goal printer file_ident theory_ident ctxt *)
-
-type prover_answer =
-    Call_provers.prover_answer =
+type prover_answer = 
   | Valid
   | Invalid
-  | Unknown of string
-  | Failure of string
+  | Unknown of string  
+  | Failure of string        
   | Timeout
   | HighFailure
 
-val call_prover : driver -> context -> prover_answer
-val call_prover_on_file : driver -> string -> prover_answer
-val call_prover_on_channel : driver -> string -> in_channel -> prover_answer
+type prover_result =
+    { pr_time   : float;
+      pr_answer : prover_answer;
+      pr_stderr : string;
+      pr_stdout : string}
 
-(* error reporting *)
+type prover =
+    { pr_call_stdin : string option; (* %f pour le nom du fichier *)
+      pr_call_file  : string option;
+      pr_regexps    : (Str.regexp * prover_answer) list; (* \1,... sont remplacés *)
+    }
 
-type error
+exception CommandError
+exception NoCommandlineProvided      
 
-exception Error of error
+val cpulimit : string ref
 
-val report : formatter -> error -> unit
+val on_file : 
+  ?debug:bool -> 
+  ?timeout:int -> 
+  prover -> 
+  string -> 
+  prover_result
+
+val on_buffer : 
+  ?debug:bool ->
+  ?timeout:int -> 
+  ?filename:string -> (* used as the suffix of a tempfile if the prover can't 
+                         deal with stdin *)
+  prover -> 
+  Buffer.t -> 
+  prover_result
