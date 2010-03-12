@@ -213,6 +213,7 @@ BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))
 BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
 
 
+
 bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) $(BINARY) byte
 	bin/why.$(OCAMLBEST) --driver bench/plugins/helloworld.drv -I lib/prelude/ \
         --output - --goal Test.G src/test.why
@@ -399,8 +400,8 @@ apidoc: $(OCAMLDOCSRC)
 .ml.cmx:
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) $(APRONLIB) $(ATPLIB) -c $(OFLAGS) $<
 
-.ml.cmxs:
-	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) $(APRONLIB) $(ATPLIB) -shared $(OFLAGS) -o $@ $<
+.ml.cmxs: $*.cmo
+	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -shared $(INCLUDES) -o $@ $<
 
 .mll.ml:
 	$(OCAMLLEX) $<

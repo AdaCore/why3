@@ -154,11 +154,11 @@ let (printers : (string, printer) Hashtbl.t) = Hashtbl.create 17
 
 let register_printer name printer = Hashtbl.replace printers name printer
 
-
+(*
 let () = 
   Dynlink.allow_only ["Theory";"Term";"Ident";"Transform";"Driver";
                      "Pervasives";"Format";"List";"Sys";"Unix"]
-
+*)
 
 let load_plugin dir (byte,nat) =
   let file = if Dynlink.is_native then nat else byte in

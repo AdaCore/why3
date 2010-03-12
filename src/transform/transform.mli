@@ -59,27 +59,6 @@ val elt : (decl -> decl list) -> context t
 
 
 (** Utils *)
-(*type odecl =
-  | Otype of ty_decl
-  | Ologic of logic_decl
-  | Oprop of prop_decl
-  | Ouse   of theory
-  | Oclone of (ident * ident) list
-*)
-(*
-val elt_of_oelt :
-  ty:(ty_decl -> ty_decl) ->
-  logic:(logic_decl -> logic_decl) ->
-  ind:(ind_decl list -> decl list) ->
-  prop:(prop_decl -> decl list) ->
-  use:(theory -> decl list) ->
-  clone:(theory -> (ident * ident) list -> decl list) ->
-  (decl -> decl list)
-
-val fold_context_of_decl:
-  (context -> 'a -> decl -> 'a * decl list) ->
-  context -> 'a -> context -> decl -> ('a * context)
-*)
 
 (* Utils *)
 
