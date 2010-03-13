@@ -320,13 +320,13 @@ let print_pkind fmt = function
 let print_inst fmt (id1,id2) =
   if Hid.mem thash id2 then
     let n = id_unique tprinter id1 in
-    fprintf fmt "%s = %a" n print_ts (Hid.find thash id2)
+    fprintf fmt "type %s = %a" n print_ts (Hid.find thash id2)
   else if Hid.mem lhash id2 then
     let n = id_unique lprinter id1 in
-    fprintf fmt "%s = %a" n print_ls (Hid.find lhash id2)
+    fprintf fmt "logic %s = %a" n print_ls (Hid.find lhash id2)
   else if Hid.mem phash id2 then
     let n = id_unique pprinter id1 in
-    fprintf fmt "%s = %a" n print_pr (Hid.find phash id2)
+    fprintf fmt "prop %s = %a" n print_pr (Hid.find phash id2)
   else assert false
 
 let print_decl fmt d = match d.d_node with
@@ -343,7 +343,7 @@ let print_decl fmt d = match d.d_node with
         print_th th (print_list comma print_inst) inst
 
 let print_decls fmt dl =
-  fprintf fmt "@[<hov>%a@]" (print_list newline2 print_decl) dl
+  fprintf fmt "@[<hov>%a@\n@]" (print_list newline2 print_decl) dl
 
 let print_context drv fmt ctxt =
   forget_all ();
