@@ -273,9 +273,13 @@ exception ClashIdent of ident
 exception BadDecl of ident
 exception EmptyDecl
 
+let add_id s id =
+  if Sid.mem id s then raise (ClashIdent id);
+  Sid.add id s
+
 let create_ty_decl tdl =
   if tdl = [] then raise EmptyDecl;
-  let check_constructor ty fs =
+  let check_constr ty acc fs =
     if not fs.ls_constr then raise (ConstructorExpected fs);
     let vty = of_option fs.ls_value in
     ignore (Ty.matching Mid.empty vty ty);
@@ -288,33 +292,41 @@ let create_ty_decl tdl =
       | Tyvar v -> if not (Sid.mem v vs) then raise (UnboundTypeVar v)
       | _ -> ty_fold check () ty
     in
-    List.iter (check ()) fs.ls_args
+    List.iter (check ()) fs.ls_args;
+    add_id acc fs.ls_name
   in
-  let check_decl (ts,td) = match td with
-    | Tabstract -> ()
-    | Talgebraic fsl ->
+  let check_decl acc (ts,td) = match td with
+    | Tabstract -> add_id acc ts.ts_name
+    | Talgebraic cl ->
         if ts.ts_def != None then raise (IllegalTypeAlias ts);
         let ty = ty_app ts (List.map ty_var ts.ts_args) in
-        List.iter (check_constructor ty) fsl
+        List.fold_left (check_constr ty) (add_id acc ts.ts_name) cl
   in
-  List.iter check_decl tdl;
+  ignore (List.fold_left check_decl Sid.empty tdl);
   create_ty_decl tdl
 
 let create_logic_decl ldl =
   if ldl = [] then raise EmptyDecl;
-  let check_decl = function
-    | Lfunction (fs, Some (s,_,_,_)) when s != fs ->
+  let check_decl acc = function
+    | Lfunction  (fs, Some (s,_,_,_)) when s != fs ->
         raise (BadDecl fs.ls_name)
     | Lpredicate (ps, Some (s,_,_,_)) when s != ps ->
         raise (BadDecl ps.ls_name)
-    | _ -> ()
+    | Lfunction  (fs, _) -> add_id acc fs.ls_name
+    | Lpredicate (ps, _) -> add_id acc ps.ls_name
   in
-  List.iter check_decl ldl;
+  ignore (List.fold_left check_decl Sid.empty ldl);
   create_logic_decl ldl
 
 let create_ind_decl idl =
   if idl = [] then raise EmptyDecl;
-  (* TODO *)
+  let check_ax ps acc pr =
+    add_id acc pr.pr_name
+  in
+  let check_decl acc (ps,al) =
+    List.fold_left (check_ax ps) (add_id acc ps.ls_name) al
+  in
+  ignore (List.fold_left check_decl Sid.empty idl);
   create_ind_decl idl
 
 (** Split declarations *)
@@ -344,12 +356,15 @@ let get_ty_id (ts,_) = ts.ts_name
 let get_ty_dep next loan (ts,td) =
   let dep acc ts = if Sid.mem ts.ts_name next
     then Sid.add ts.ts_name acc else acc in
+  let loan = match ts.ts_def with
+    | Some ty -> ty_s_fold dep loan ty
+    | None    -> loan
+  in
   let cns acc ls =
     List.fold_left (ty_s_fold dep) acc ls.ls_args in
-  match td, ts.ts_def with
-    | Tabstract, Some ty -> ty_s_fold dep loan ty
-    | Talgebraic fdl, _  -> List.fold_left cns loan fdl
-    | _                  -> loan
+  match td with
+    | Tabstract      -> loan
+    | Talgebraic fdl -> List.fold_left cns loan fdl
 
 let get_logic_id = function
   | Lfunction (fs,_)  -> fs.ls_name
