@@ -755,7 +755,7 @@ let add_types dl th =
 	     i)
 	  d.td_params 
       in
-      let id = id_user id d.td_ident.id_loc in
+      let id = id_user id d.td_loc in
       let ts = match d.td_def with
 	| TDalias ty -> 
 	    let rec apply = function
@@ -811,7 +811,7 @@ let add_types dl th =
 	  let constructor (loc, id, pl) = 
 	    let param (_, t) = ty_of_dty (dty th' t) in
 	    let tyl = List.map param pl in
-	    create_fconstr (id_user id.id id.id_loc) tyl ty
+	    create_fconstr (id_user id.id loc) tyl ty
 	  in
 	  Talgebraic (List.map constructor cl)
     in
@@ -833,7 +833,7 @@ let add_logics dl th =
     let id = d.ld_ident.id in
     if Hashtbl.mem denvs id || Mnm.mem id ns.ns_ls 
       then error ~loc:d.ld_loc (Clash id);
-    let v = id_user id d.ld_ident.id_loc in
+    let v = id_user id d.ld_loc in
     let denv = create_denv th in
     Hashtbl.add denvs id denv;
     let type_ty (_,t) = ty_of_dty (dty denv t) in
@@ -921,6 +921,7 @@ let add_prop k loc s f th =
   with ClashSymbol _ ->
     error ~loc (Clash s.id)
 
+(*
 (** [check_clausal_form loc ps f] checks whether the formula [f] 
     has a valid clausal form 
       \forall x_1,.., x_k. P1 -> ... -> P_n -> P
@@ -987,6 +988,11 @@ let rec check_clausal_form loc ps f = match f.f_node with
       check_clausal_form loc ps f
   | _ -> 
       check_unquantified_clausal_form loc ps f
+*)
+
+let loc_of_id id = match id.id_origin with
+  | User loc -> loc
+  | _ -> assert false
 
 let add_inductives dl th =
   let ns = get_namespace th in
@@ -996,7 +1002,7 @@ let add_inductives dl th =
     let id = d.in_ident.id in
     if Hashtbl.mem psymbols id || Mnm.mem id ns.ns_ls 
       then error ~loc:d.in_loc (Clash id);
-    let v = id_user id d.in_ident.id_loc in
+    let v = id_user id d.in_loc in
     let denv = create_denv th in
     let type_ty t = ty_of_dty (dty denv t) in
     let pl = List.map type_ty d.in_params in
@@ -1009,16 +1015,21 @@ let add_inductives dl th =
   let type_decl d = 
     let id = d.in_ident.id in
     let ps = Hashtbl.find psymbols id in
-    let clause (id, f) = 
-      let loc = f.pp_loc in
-      let f' = fmla th' f in
-      check_clausal_form loc ps f';
-      create_prop (id_user id.id id.id_loc) f'
+    let clause (loc, id, f) = 
+      create_prop (id_user id.id loc) (fmla th' f)
     in
     ps, List.map clause d.in_def
   in
   let dl = List.map type_decl dl in
-  List.fold_left add_decl th (create_ind_decls dl)
+  try
+    List.fold_left add_decl th (create_ind_decls dl)
+  with
+  | InvalidIndDecl (_,prid) -> errorm ~loc:(loc_of_id prid)
+      "not a clausal form"
+  | NonPositiveIndDecl (_,prid,s) -> errorm ~loc:(loc_of_id prid)
+      "non-positive occurrence of %a" Pretty.print_ls s
+  | TooSpecificIndDecl (_,prid,t) -> errorm ~loc:(loc_of_id prid)
+      "term @[%a@] is too specific" Pretty.print_term t
 
 (* parse file and store all theories into parsed_theories *)
 

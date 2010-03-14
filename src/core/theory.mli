@@ -141,10 +141,14 @@ exception ConstructorExpected of lsymbol
 exception IllegalTypeAlias of tysymbol
 exception UnboundTypeVar of ident
 
+exception InvalidIndDecl of ident * ident
+exception TooSpecificIndDecl of ident * ident * term
+exception NonPositiveIndDecl of ident * ident * lsymbol
+
 exception IllegalConstructor of lsymbol
+exception BadLogicDecl of ident
 exception UnboundVars of Svs.t
 exception ClashIdent of ident
-exception BadDecl of ident
 exception EmptyDecl
 
 (** Environements *)

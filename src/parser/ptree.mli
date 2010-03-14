@@ -123,7 +123,7 @@ type ind_decl = {
   in_loc    : loc;
   in_ident  : ident;
   in_params : pty list;
-  in_def    : (ident * lexpr) list;
+  in_def    : (loc * ident * lexpr) list;
 }
 
 type prop_kind =

@@ -270,7 +270,7 @@ exception ConstructorExpected of lsymbol
 exception UnboundTypeVar of ident
 exception IllegalTypeAlias of tysymbol
 exception ClashIdent of ident
-exception BadDecl of ident
+exception BadLogicDecl of ident
 exception EmptyDecl
 
 let add_id s id =
@@ -309,19 +309,59 @@ let create_logic_decl ldl =
   if ldl = [] then raise EmptyDecl;
   let check_decl acc = function
     | Lfunction  (fs, Some (s,_,_,_)) when s != fs ->
-        raise (BadDecl fs.ls_name)
+        raise (BadLogicDecl fs.ls_name)
     | Lpredicate (ps, Some (s,_,_,_)) when s != ps ->
-        raise (BadDecl ps.ls_name)
+        raise (BadLogicDecl ps.ls_name)
     | Lfunction  (fs, _) -> add_id acc fs.ls_name
     | Lpredicate (ps, _) -> add_id acc ps.ls_name
   in
   ignore (List.fold_left check_decl Sid.empty ldl);
   create_logic_decl ldl
 
+exception InvalidIndDecl of ident * ident
+exception TooSpecificIndDecl of ident * ident * term
+exception NonPositiveIndDecl of ident * ident * lsymbol
+
+exception Found of lsymbol
+let ls_mem s sps = if Sls.mem s sps then raise (Found s) else false
+let t_pos_ps sps = t_s_all (fun _ -> true) (fun s -> not (ls_mem s sps))
+
+let rec f_pos_ps sps pol f = match f.f_node, pol with
+  | Fapp (s, _), Some false when ls_mem s sps -> false
+  | Fapp (s, _), None when ls_mem s sps -> false
+  | Fbinop (Fiff, f, g), _ ->
+      f_pos_ps sps None f && f_pos_ps sps None g
+  | Fbinop (Fimplies, f, g), _ ->
+      f_pos_ps sps (option_map not pol) f && f_pos_ps sps pol g
+  | Fnot f, _ ->
+      f_pos_ps sps (option_map not pol) f
+  | Fif (f,g,h), _ ->
+      f_pos_ps sps None f && f_pos_ps sps pol g && f_pos_ps sps pol h
+  | _ -> f_all (t_pos_ps sps) (f_pos_ps sps pol) f
+
 let create_ind_decl idl =
   if idl = [] then raise EmptyDecl;
+  let add acc (ps,_) = Sls.add ps acc in
+  let sps = List.fold_left add Sls.empty idl in
   let check_ax ps acc pr =
-    add_id acc pr.pr_name
+    let _, f = f_open_forall pr.pr_fmla in
+    let rec clause acc f = match f.f_node with
+      | Fbinop (Fimplies, g, f) -> clause (g::acc) f
+      | _ -> (acc, f)
+    in
+    let cls, f = clause [] f in
+    match f.f_node with
+      | Fapp (s, tl) when s == ps ->
+          let tymatch sb t ty =
+            try Ty.matching sb (t.t_ty) ty with TypeMismatch ->
+              raise (TooSpecificIndDecl (ps.ls_name, pr.pr_name, t))
+          in
+          ignore (List.fold_left2 tymatch Mid.empty tl ps.ls_args);
+          (try ignore (List.for_all (f_pos_ps sps (Some true)) cls)
+          with Found ls ->
+            raise (NonPositiveIndDecl (ps.ls_name, pr.pr_name, ls)));
+          add_id acc pr.pr_name
+      | _ -> raise (InvalidIndDecl (ps.ls_name, pr.pr_name))
   in
   let check_decl acc (ps,al) =
     List.fold_left (check_ax ps) (add_id acc ps.ls_name) al

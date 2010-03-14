@@ -340,7 +340,7 @@ indcases:
 ;
 
 indcase:
-| uident COLON lexpr { ($1,$3) }
+| uident COLON lexpr { (loc (),$1,$3) }
 ;
 
 primitive_type:
