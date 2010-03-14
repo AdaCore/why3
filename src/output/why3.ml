@@ -101,12 +101,12 @@ let print_pr fmt pr =
 
 let rec ns_comma fmt () = fprintf fmt ",@,"
 
-let rec print_ty fmt ty = match ty.ty_node with
+let rec print_ty drv fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
   | Tyapp (ts, []) -> print_ts fmt ts
-  | Tyapp (ts, [t]) -> fprintf fmt "%a@ %a" print_ty t print_ts ts
+  | Tyapp (ts, [t]) -> fprintf fmt "%a@ %a" (print_ty drv) t print_ts ts
   | Tyapp (ts, l) -> fprintf fmt "(%a)@ %a"
-      (print_list ns_comma print_ty) l print_ts ts
+      (print_list ns_comma (print_ty drv)) l print_ts ts
 
 let print_const fmt = function
   | ConstInt s -> fprintf fmt "%s" s
@@ -134,15 +134,15 @@ let lparen_r fmt () = fprintf fmt "(@,"
 let print_paren_l fmt x = print_list_delim lparen_l rparen comma fmt x
 let print_paren_r fmt x = print_list_delim lparen_r rparen comma fmt x
 
-let rec print_pat fmt p = match p.pat_node with
+let rec print_pat drv fmt p = match p.pat_node with
   | Pwild -> fprintf fmt "_"
   | Pvar v -> print_vs fmt v
-  | Pas (p,v) -> fprintf fmt "%a as %a" print_pat p print_vs v
+  | Pas (p,v) -> fprintf fmt "%a as %a" (print_pat drv) p print_vs v
   | Papp (cs,pl) -> fprintf fmt "%a%a"
-      print_ls cs (print_paren_r print_pat) pl
+      print_ls cs (print_paren_r (print_pat drv)) pl
 
-let print_vsty fmt v =
-  fprintf fmt "%a:@,%a" print_vs v print_ty v.vs_ty
+let print_vsty drv fmt v =
+  fprintf fmt "%a:@,%a" print_vs v (print_ty drv) v.vs_ty
 
 let print_quant fmt = function
   | Fforall -> fprintf fmt "forall"
@@ -158,24 +158,24 @@ let print_label fmt l = fprintf fmt "\"%s\"" l
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
-let rec print_term fmt t = print_lrterm false false fmt t
-and     print_fmla fmt f = print_lrfmla false false fmt f
-and print_opl_term fmt t = print_lrterm true  false fmt t
-and print_opl_fmla fmt f = print_lrfmla true  false fmt f
-and print_opr_term fmt t = print_lrterm false true  fmt t
-and print_opr_fmla fmt f = print_lrfmla false true  fmt f
+let rec print_term drv fmt t = print_lrterm false false drv fmt t
+and     print_fmla drv fmt f = print_lrfmla false false drv fmt f
+and print_opl_term drv fmt t = print_lrterm true  false drv fmt t
+and print_opl_fmla drv fmt f = print_lrfmla true  false drv fmt f
+and print_opr_term drv fmt t = print_lrterm false true  drv fmt t
+and print_opr_fmla drv fmt f = print_lrfmla false true  drv fmt f
 
-and print_lrterm opl opr fmt t = match t.t_label with
-  | [] -> print_tnode opl opr fmt t
+and print_lrterm opl opr drv fmt t = match t.t_label with
+  | [] -> print_tnode opl opr drv fmt t
   | ll -> fprintf fmt "(%a %a)"
-      (print_list space print_label) ll (print_tnode false false) t
+      (print_list space print_label) ll (print_tnode false false drv) t
 
-and print_lrfmla opl opr fmt f = match f.f_label with
-  | [] -> print_fnode opl opr fmt f
+and print_lrfmla opl opr drv fmt f = match f.f_label with
+  | [] -> print_fnode opl opr drv fmt f
   | ll -> fprintf fmt "(%a %a)"
-      (print_list space print_label) ll (print_fnode false false) f
+      (print_list space print_label) ll (print_fnode false false drv) f
 
-and print_tnode opl opr fmt t = match t.t_node with
+and print_tnode opl opr drv fmt t = match t.t_node with
   | Tbvar _ ->
       assert false
   | Tvar v ->
@@ -183,35 +183,36 @@ and print_tnode opl opr fmt t = match t.t_node with
   | Tconst c ->
       print_const fmt c
   | Tapp (fs, tl) when unambig_fs fs ->
-      fprintf fmt "%a%a" print_ls fs (print_paren_r print_term) tl
+      fprintf fmt "%a%a" print_ls fs (print_paren_r (print_term drv)) tl
   | Tapp (fs, tl) ->
       fprintf fmt (protect_on opl "%a%a:%a")
-        print_ls fs (print_paren_r print_term) tl print_ty t.t_ty
+        print_ls fs (print_paren_r (print_term drv)) tl (print_ty drv) t.t_ty
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
-        print_vs v print_opl_term t1 print_opl_term t2;
+        print_vs v (print_opl_term drv) t1 (print_opl_term drv) t2;
       forget_var v
   | Tcase (t1,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
-        print_term t1 (print_list newline print_tbranch) bl
+        (print_term drv) t1 (print_list newline (print_tbranch drv)) bl
   | Teps fb ->
       let v,f = f_open_bound fb in
       fprintf fmt (protect_on opr "epsilon %a.@ %a")
-        print_vsty v print_opl_fmla f;
+        (print_vsty drv) v (print_opl_fmla drv) f;
       forget_var v
 
-and print_fnode opl opr fmt f = match f.f_node with
+and print_fnode opl opr drv fmt f = match f.f_node with
   | Fapp (ps,[t1;t2]) when ps = ps_equ ->
       fprintf fmt (protect_on (opl || opr) "%a =@ %a")
-        print_opr_term t1 print_opl_term t2
+        (print_opr_term drv) t1 (print_opl_term drv) t2
   | Fapp (ps,tl) ->
       fprintf fmt "%a%a" print_ls ps
-        (print_paren_r print_term) tl
+        (print_paren_r (print_term drv)) tl
   | Fquant (q,fq) ->
       let vl,tl,f = f_open_quant fq in
       fprintf fmt (protect_on opr "%a %a%a.@ %a") print_quant q
-        (print_list comma print_vsty) vl print_tl tl print_fmla f;
+        (print_list comma (print_vsty drv)) vl
+        (print_tl drv) tl (print_fmla drv) f;
       List.iter forget_var vl
   | Ftrue ->
       fprintf fmt "true"
@@ -219,97 +220,98 @@ and print_fnode opl opr fmt f = match f.f_node with
       fprintf fmt "false"
   | Fbinop (b,f1,f2) ->
       fprintf fmt (protect_on (opl || opr) "%a %a@ %a")
-        print_opr_fmla f1 print_binop b print_opl_fmla f2
+        (print_opr_fmla drv) f1 print_binop b (print_opl_fmla drv) f2
   | Fnot f ->
-      fprintf fmt (protect_on opr "not %a") print_opl_fmla f
+      fprintf fmt (protect_on opr "not %a") (print_opl_fmla drv) f
   | Flet (t,f) ->
       let v,f = f_open_bound f in
       fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
-        print_vs v print_opl_term t print_opl_fmla f;
+        print_vs v (print_opl_term drv) t (print_opl_fmla drv) f;
       forget_var v
   | Fcase (t,bl) ->
-      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend" print_term t
-        (print_list newline print_fbranch) bl
+      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend" (print_term drv) t
+        (print_list newline (print_fbranch drv)) bl
   | Fif (f1,f2,f3) ->
       fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
-        print_fmla f1 print_fmla f2 print_opl_fmla f3
+        (print_fmla drv) f1 (print_fmla drv) f2 (print_opl_fmla drv) f3
 
-and print_tbranch fmt br =
+and print_tbranch drv fmt br =
   let pat,svs,t = t_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat pat print_term t;
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_pat drv) pat (print_term drv) t;
   Svs.iter forget_var svs
 
-and print_fbranch fmt br =
+and print_fbranch drv fmt br =
   let pat,svs,f = f_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat pat print_fmla f;
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_pat drv) pat (print_fmla drv) f;
   Svs.iter forget_var svs
 
-and print_tl fmt tl =
+and print_tl drv fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
-    (print_list alt (print_list comma print_tr)) tl
+    (print_list alt (print_list comma (print_tr drv))) tl
 
-and print_tr fmt = function
-  | TrTerm t -> print_term fmt t
-  | TrFmla f -> print_fmla fmt f
+and print_tr drv fmt = function
+  | TrTerm t -> print_term drv fmt t
+  | TrFmla f -> print_fmla drv fmt f
 
 (** Declarations *)
 
-let print_constr fmt cs =
+let print_constr drv fmt cs =
   fprintf fmt "@[<hov 4>| %a%a@]" print_ls cs
-    (print_paren_l print_ty) cs.ls_args
+    (print_paren_l (print_ty drv)) cs.ls_args
 
 let print_ty_args fmt = function
   | [] -> ()
   | [tv] -> fprintf fmt " %a" print_tv tv
   | l -> fprintf fmt " (%a)" (print_list ns_comma print_tv) l
 
-let print_type_decl fmt (ts,def) = match def with
+let print_type_decl drv fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
       | None ->
           fprintf fmt "@[<hov 2>type%a %a@]"
             print_ty_args ts.ts_args print_ts ts
       | Some ty ->
           fprintf fmt "@[<hov 2>type%a %a =@ %a@]"
-            print_ty_args ts.ts_args print_ts ts print_ty ty
+            print_ty_args ts.ts_args print_ts ts (print_ty drv) ty
       end
   | Talgebraic csl ->
       fprintf fmt "@[<hov 2>type%a %a =@\n@[<hov>%a@]@]"
         print_ty_args ts.ts_args print_ts ts
-        (print_list newline print_constr) csl
+        (print_list newline (print_constr drv)) csl
 
-let print_type_decl fmt d = print_type_decl fmt d; forget_tvs ()
+let print_type_decl drv fmt d = print_type_decl drv fmt d; forget_tvs ()
 
-let print_logic_decl fmt = function
+let print_logic_decl drv fmt = function
   | Lfunction (fs,None) ->
       fprintf fmt "@[<hov 2>logic %a%a :@ %a@]"
-        print_ls fs (print_paren_l print_ty) fs.ls_args
-          print_ty (of_option fs.ls_value)
+        print_ls fs (print_paren_l (print_ty drv)) fs.ls_args
+          (print_ty drv) (of_option fs.ls_value)
   | Lpredicate (ps,None) ->
       fprintf fmt "@[<hov 2>logic %a%a@]"
-        print_ls ps (print_paren_l print_ty) ps.ls_args
+        print_ls ps (print_paren_l (print_ty drv)) ps.ls_args
   | Lfunction (fs,Some fd) ->
       let _,vl,t = open_fs_defn fd in
       fprintf fmt "@[<hov 2>logic %a%a :@ %a =@ %a@]"
-        print_ls fs (print_paren_l print_vsty) vl
-        print_ty t.t_ty print_term t;
+        print_ls fs (print_paren_l (print_vsty drv)) vl
+        (print_ty drv) t.t_ty (print_term drv) t;
       List.iter forget_var vl
   | Lpredicate (ps,Some fd) ->
       let _,vl,f = open_ps_defn fd in
       fprintf fmt "@[<hov 2>logic %a%a =@ %a@]"
-        print_ls ps (print_paren_l print_vsty) vl print_fmla f;
+        print_ls ps (print_paren_l (print_vsty drv)) vl
+        (print_fmla drv) f;
       List.iter forget_var vl
 
-let print_logic_decl fmt d = print_logic_decl fmt d; forget_tvs ()
+let print_logic_decl drv fmt d = print_logic_decl drv fmt d; forget_tvs ()
 
-let print_prop fmt pr =
-  fprintf fmt "%a : %a" print_pr pr print_fmla pr.pr_fmla
+let print_prop drv fmt pr =
+  fprintf fmt "%a : %a" print_pr pr (print_fmla drv) pr.pr_fmla
 
-let print_ind fmt pr = fprintf fmt "@[<hov 4>| %a@]" print_prop pr
+let print_ind drv fmt pr = fprintf fmt "@[<hov 4>| %a@]" (print_prop drv) pr
 
-let print_ind_decl fmt (ps,bl) =
+let print_ind_decl drv fmt (ps,bl) =
   fprintf fmt "@[<hov 2>inductive %a%a =@ @[<hov>%a@]@]"
-     print_ls ps (print_paren_l print_ty) ps.ls_args
-     (print_list newline print_ind) bl;
+     print_ls ps (print_paren_l (print_ty drv)) ps.ls_args
+     (print_list newline (print_ind drv)) bl;
   forget_tvs ()
 
 let print_pkind fmt = function
@@ -329,12 +331,14 @@ let print_inst fmt (id1,id2) =
     fprintf fmt "prop %s = %a" n print_pr (Hid.find phash id2)
   else assert false
 
-let print_decl fmt d = match d.d_node with
-  | Dtype tl  -> print_list newline print_type_decl fmt tl
-  | Dlogic ll -> print_list newline print_logic_decl fmt ll
-  | Dind il   -> print_list newline print_ind_decl fmt il
+let print_decl drv fmt d = match d.d_node with
+  | Dtype tl  -> print_list newline (print_type_decl drv) fmt tl
+  | Dlogic ll -> print_list newline (print_logic_decl drv) fmt ll
+  | Dind il   -> print_list newline (print_ind_decl drv) fmt il
+  | Dprop (Paxiom, pr) when query_ident drv pr.pr_name == Remove ->
+      ()
   | Dprop (k,pr) ->
-      fprintf fmt "@[<hov 2>%a %a@]" print_pkind k print_prop pr;
+      fprintf fmt "@[<hov 2>%a %a@]" print_pkind k (print_prop drv) pr;
       forget_tvs ()
   | Duse th ->
       fprintf fmt "@[<hov 2>(* use %a *)@]" print_th th
@@ -342,12 +346,12 @@ let print_decl fmt d = match d.d_node with
       fprintf fmt "@[<hov 2>(* clone %a with %a *)@]"
         print_th th (print_list comma print_inst) inst
 
-let print_decls fmt dl =
-  fprintf fmt "@[<hov>%a@\n@]" (print_list newline2 print_decl) dl
+let print_decls drv fmt dl =
+  fprintf fmt "@[<hov>%a@\n@]" (print_list newline2 (print_decl drv)) dl
 
 let print_context drv fmt ctxt =
   forget_all ();
-  print_decls fmt (Context.get_decls ctxt)
+  print_decls drv fmt (Context.get_decls ctxt)
 
 let () = register_printer "why3" print_context
 
