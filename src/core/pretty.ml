@@ -89,8 +89,8 @@ let print_ts fmt ts =
 
 let print_ls fmt ls =
   Hid.replace lhash ls.ls_name ls;
-  if ls.ls_constr then fprintf fmt "%s" (id_unique lprinter ls.ls_name)
-                  else fprintf fmt "%s" (id_unique cprinter ls.ls_name)
+  if ls.ls_constr then fprintf fmt "%s" (id_unique cprinter ls.ls_name)
+                  else fprintf fmt "%s" (id_unique lprinter ls.ls_name)
 
 let print_pr fmt pr =
   Hid.replace phash pr.pr_name pr;
@@ -196,7 +196,7 @@ and print_tnode opl opr fmt t = match t.t_node with
         print_term t1 (print_list newline print_tbranch) bl
   | Teps fb ->
       let v,f = f_open_bound fb in
-      fprintf fmt (protect_on opr "epsilon %a in@ %a")
+      fprintf fmt (protect_on opr "epsilon %a.@ %a")
         print_vsty v print_opl_fmla f;
       forget_var v
 

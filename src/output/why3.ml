@@ -197,7 +197,7 @@ and print_tnode opl opr fmt t = match t.t_node with
         print_term t1 (print_list newline print_tbranch) bl
   | Teps fb ->
       let v,f = f_open_bound fb in
-      fprintf fmt (protect_on opr "epsilon %a in@ %a")
+      fprintf fmt (protect_on opr "epsilon %a.@ %a")
         print_vsty v print_opl_fmla f;
       forget_var v
 

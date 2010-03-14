@@ -461,6 +461,22 @@ let f_label     l f = Hfmla.hashcons { f with f_label = l }
 let f_label_add l f = Hfmla.hashcons { f with f_label = l :: f.f_label }
 let f_label_copy { f_label = l } f = if l == [] then f else f_label l f
 
+(* built-in symbols *)
+
+let ps_equ =
+  let v = ty_var (create_tvsymbol (id_fresh "a")) in
+  create_psymbol (id_fresh "infix =") [v; v]
+
+let ps_neq =
+  let v = ty_var (create_tvsymbol (id_fresh "a")) in
+  create_psymbol (id_fresh "infix <>") [v; v]
+
+let f_equ t1 t2 = f_app ps_equ [t1; t2]
+let f_neq t1 t2 = f_app ps_neq [t1; t2]
+
+let f_app p tl =
+  if p == ps_neq then f_not (f_app ps_equ tl) else f_app p tl
+
 let f_app_unsafe = f_app
 
 (* unsafe map with level *)
@@ -828,22 +844,6 @@ let t_open_branch (pat, _, t) =
 let f_open_branch (pat, _, f) =
   let vars, s, ns = pat_substs pat in
   (pat_rename ns pat, vars, f_inst s 0 f)
-
-(* built-in symbols *)
-
-let ps_equ =
-  let v = ty_var (create_tvsymbol (id_fresh "a")) in
-  create_psymbol (id_fresh "infix =") [v; v]
-
-let ps_neq =
-  let v = ty_var (create_tvsymbol (id_fresh "a")) in
-  create_psymbol (id_fresh "infix <>") [v; v]
-
-let f_app p tl =
-  if p == ps_neq then f_not (f_app ps_equ tl) else f_app p tl
-
-let f_equ t1 t2 = f_app ps_equ [t1; t2]
-let f_neq t1 t2 = f_app ps_neq [t1; t2]
 
 (** Term library *)
 

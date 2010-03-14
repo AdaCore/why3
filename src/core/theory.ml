@@ -694,10 +694,13 @@ module Context = struct
         create_ind_decl (List.map add indl) :: acc
     | Dprop (Pgoal, _) ->
         acc
-    | Dprop (_, pr) ->
-        let k = if Spr.mem pr inst.inst_lemma then Plemma
-          else if Spr.mem pr inst.inst_goal then Pgoal
-          else Paxiom
+    | Dprop (Plemma, pr) when Spr.mem pr inst.inst_goal ->
+        acc
+    | Dprop (k, pr) ->
+        let k = match k with
+          | Paxiom when Spr.mem pr inst.inst_lemma -> Plemma
+          | Paxiom when Spr.mem pr inst.inst_goal  -> Pgoal
+          | _                                      -> Paxiom
         in
         create_prop_decl k (cl_find_pr cl pr) :: acc
     | Duse _ | Dclone _ ->
@@ -884,7 +887,8 @@ module TheoryUC = struct
       then Hpr.find cl.Context.pr_table pr else pr in
     let f_ts n ts ns = add_ts true n (find_ts ts) ns in
     let f_ls n ls ns = add_ls true n (find_ls ls) ns in
-    let f_pr n pr ns = add_pr true n (find_pr pr) ns in
+    let f_pr n pr ns = try add_pr true n (find_pr pr) ns
+      with Not_found -> ns (* goals are not cloned *) in
     let rec f_ns n s = add_ns true n (merge_namespace empty_ns s)
     and merge_namespace acc ns =
       let acc = Mnm.fold f_ts ns.ns_ts acc in
