@@ -129,6 +129,12 @@ val create_prop_decl : prop_kind -> prop -> decl
 
 val prop_decl_of_fmla : prop_kind -> preid -> fmla -> decl
 
+(* separate independent groups of declarations *)
+
+val create_ty_decls : ty_decl list -> decl list
+val create_logic_decls : logic_decl list -> decl list
+val create_ind_decls : ind_decl list -> decl list
+
 (* exceptions *)
 
 exception ConstructorExpected of lsymbol
@@ -137,7 +143,9 @@ exception UnboundTypeVar of ident
 
 exception IllegalConstructor of lsymbol
 exception UnboundVars of Svs.t
+exception ClashIdent of ident
 exception BadDecl of ident
+exception EmptyDecl
 
 (** Environements *)
 

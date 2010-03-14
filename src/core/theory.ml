@@ -259,7 +259,7 @@ let mk_decl n = { d_node = n; d_tag = -1 }
 
 let create_ty_decl tdl = Hdecl.hashcons (mk_decl (Dtype tdl))
 let create_logic_decl ldl = Hdecl.hashcons (mk_decl (Dlogic ldl))
-let create_ind_decl indl = Hdecl.hashcons (mk_decl (Dind indl))
+let create_ind_decl idl = Hdecl.hashcons (mk_decl (Dind idl))
 let create_prop_decl k p = Hdecl.hashcons (mk_decl (Dprop (k, p)))
 let create_use_decl th = Hdecl.hashcons (mk_decl (Duse th))
 let create_clone_decl th sl = Hdecl.hashcons (mk_decl (Dclone (th,sl)))
@@ -269,8 +269,12 @@ let prop_decl_of_fmla k n f = create_prop_decl k (create_prop n f)
 exception ConstructorExpected of lsymbol
 exception UnboundTypeVar of ident
 exception IllegalTypeAlias of tysymbol
+exception ClashIdent of ident
+exception BadDecl of ident
+exception EmptyDecl
 
 let create_ty_decl tdl =
+  if tdl = [] then raise EmptyDecl;
   let check_constructor ty fs =
     if not fs.ls_constr then raise (ConstructorExpected fs);
     let vty = of_option fs.ls_value in
@@ -296,9 +300,8 @@ let create_ty_decl tdl =
   List.iter check_decl tdl;
   create_ty_decl tdl
 
-exception BadDecl of ident
-
 let create_logic_decl ldl =
+  if ldl = [] then raise EmptyDecl;
   let check_decl = function
     | Lfunction (fs, Some (s,_,_,_)) when s != fs ->
         raise (BadDecl fs.ls_name)
@@ -308,6 +311,85 @@ let create_logic_decl ldl =
   in
   List.iter check_decl ldl;
   create_logic_decl ldl
+
+let create_ind_decl idl =
+  if idl = [] then raise EmptyDecl;
+  (* TODO *)
+  create_ind_decl idl
+
+(** Split declarations *)
+
+let build_dls get_id get_dep dl =
+  let add_id acc d = Sid.add (get_id d) acc in
+  let s = List.fold_left add_id Sid.empty dl in
+  let add_dl (next,loan,dls,dl) d =
+    let dl = d :: dl in
+    let id = get_id d in
+    let next = Sid.remove id next in
+    let loan = Sid.remove id loan in
+    let loan = get_dep next loan d in
+    if Sid.is_empty loan
+      then next, loan, List.rev dl :: dls, []
+      else next, loan,                dls, dl
+  in
+  let init = (s, Sid.empty, [], []) in
+  let next,loan,dls,dl = List.fold_left add_dl init dl in
+  assert (Sid.is_empty next);
+  assert (Sid.is_empty loan);
+  assert (dl = []);
+  dls
+
+let get_ty_id (ts,_) = ts.ts_name
+
+let get_ty_dep next loan (ts,td) =
+  let dep acc ts = if Sid.mem ts.ts_name next
+    then Sid.add ts.ts_name acc else acc in
+  let cns acc ls =
+    List.fold_left (ty_s_fold dep) acc ls.ls_args in
+  match td, ts.ts_def with
+    | Tabstract, Some ty -> ty_s_fold dep loan ty
+    | Talgebraic fdl, _  -> List.fold_left cns loan fdl
+    | _                  -> loan
+
+let get_logic_id = function
+  | Lfunction (fs,_)  -> fs.ls_name
+  | Lpredicate (ps,_) -> ps.ls_name
+
+let get_logic_dep next loan ld =
+  let dts acc _  = acc in
+  let dep acc ls = if Sid.mem ls.ls_name next
+    then Sid.add ls.ls_name acc else acc in
+  match ld with
+    | Lfunction  (_, Some (_,_,t,_)) -> t_s_fold dts dep loan t
+    | Lpredicate (_, Some (_,_,f,_)) -> f_s_fold dts dep loan f
+    | _ -> loan
+
+let get_ind_id (ps,_) = ps.ls_name
+
+let get_ind_dep next loan (_,al) =
+  let dts acc _  = acc in
+  let dep acc ls = if Sid.mem ls.ls_name next
+    then Sid.add ls.ls_name acc else acc in
+  let prp acc pr = f_s_fold dts dep acc pr.pr_fmla in
+  List.fold_left prp loan al
+
+let create_ty_decls tdl =
+  let build = build_dls get_ty_id get_ty_dep in
+  match tdl with
+  | [_] -> [create_ty_decl tdl]
+  | _   -> List.rev_map create_ty_decl (build tdl)
+
+let create_logic_decls ldl =
+  let build = build_dls get_logic_id get_logic_dep in
+  match ldl with
+  | [_] -> [create_logic_decl ldl]
+  | _   -> List.rev_map create_logic_decl (build ldl)
+
+let create_ind_decls idl =
+  let build = build_dls get_ind_id get_ind_dep in
+  match idl with
+  | [_] -> [create_ind_decl idl]
+  | _   -> List.rev_map create_ind_decl (build idl)
 
 (** Built-in theory *)
 

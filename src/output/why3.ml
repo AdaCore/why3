@@ -330,9 +330,9 @@ let print_inst fmt (id1,id2) =
   else assert false
 
 let print_decl fmt d = match d.d_node with
-  | Dtype tl  -> print_list newline2 print_type_decl fmt tl
-  | Dlogic ll -> print_list newline2 print_logic_decl fmt ll
-  | Dind il   -> print_list newline2 print_ind_decl fmt il
+  | Dtype tl  -> print_list newline print_type_decl fmt tl
+  | Dlogic ll -> print_list newline print_logic_decl fmt ll
+  | Dind il   -> print_list newline print_ind_decl fmt il
   | Dprop (k,pr) ->
       fprintf fmt "@[<hov 2>%a %a@]" print_pkind k print_prop pr;
       forget_tvs ()

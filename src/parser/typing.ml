@@ -818,7 +818,7 @@ let add_types dl th =
     ts, d
   in
   let dl = List.map decl dl in
-  add_decl th (create_ty_decl dl)
+  List.fold_left add_decl th (create_ty_decls dl)
 
 let env_of_vsymbol_list vl =
   List.fold_left (fun env v -> M.add v.vs_name.id_short v env) M.empty vl
@@ -901,7 +901,7 @@ let add_logics dl th =
         Lfunction (fs, defn)
   in
   let dl = List.map type_decl dl in
-  add_decl th (create_logic_decl dl)
+  List.fold_left add_decl th (create_logic_decls dl)
 
 
 let term env t =
@@ -1018,7 +1018,7 @@ let add_inductives dl th =
     ps, List.map clause d.in_def
   in
   let dl = List.map type_decl dl in
-  add_decl th (create_ind_decl dl)
+  List.fold_left add_decl th (create_ind_decls dl)
 
 (* parse file and store all theories into parsed_theories *)
 
