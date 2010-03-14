@@ -45,7 +45,8 @@
         "type", TYPE;
         "prop", PROP;
         "filename", FILENAME;
-        "transformations", TRANSFORMATIONS;
+        "apply_before_split_goals", BEFORE_SPLIT;
+        "apply_after_split_goals", AFTER_SPLIT;
         "plugin", PLUGIN
       ]
 

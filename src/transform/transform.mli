@@ -49,7 +49,6 @@ val fold_map : (context -> 'a * context -> 'a * context) -> 'a -> context t
 
 val map : (context -> context -> context) -> context t
 
-
 val map_concat : (context -> decl list) -> context t
 
 
@@ -64,9 +63,27 @@ val elt : (decl -> decl list) -> context t
 
 val split_goals : context list t
 
+val remove_lemma : context t
+
 exception NotGoalContext
 val goal_of_ctxt : context -> prop
 (* goal_of_ctxt ctxts return the goal of a goal context
    the ctxt must end with a goal.*)
 
 val identity : context t
+
+
+val rewrite_elt : 
+  (Term.term -> Term.term) -> 
+  (Term.fmla -> Term.fmla) -> context t
+
+val rewrite_map : 
+  (context -> Term.term -> Term.term) -> 
+  (context -> Term.fmla -> Term.fmla) -> context t
+
+
+val cloned_from : context -> ident -> ident -> bool 
+
+val find_ty : namespace -> string list -> Ty.tysymbol
+val find_l : namespace -> string list -> Term.lsymbol
+val find_pr : namespace -> string list -> prop

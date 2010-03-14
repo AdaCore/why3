@@ -47,7 +47,8 @@ type global =
   | RegexpUnknown of string * string
   | RegexpFailure of string * string
   | Filename of string
-  | Transformations of (loc * string) list
+  | Beforesplit of (loc * string) list
+  | Aftersplit of (loc * string) list
   | Plugin of (string * string)
 
 type file = {

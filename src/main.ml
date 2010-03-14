@@ -36,6 +36,8 @@ let which_goals = ref Gall
 let timeout = ref 10
 let call = ref false
 let output = ref None
+let list_printers = ref false
+let list_transforms = ref false
 
 let () = 
   Arg.parse 
@@ -59,6 +61,8 @@ let () =
      "--driver", Arg.String (fun s -> driver := Some s),
      "<file>  set the driver file";
      "--timeout", Arg.Set_int timeout, "set the timeout used when calling provers (0 unlimited, default 10)";
+     "--list-printers", Arg.Set list_printers, "list the printers registered";
+     "--list-transforms", Arg.Set list_transforms, "list the transformation registered";
     ]
     (fun f -> Queue.push f files)
     "usage: why [options] files..."
@@ -131,8 +135,9 @@ let transform env l =
 *)
 
 
-let extract_goals env acc th =
+let extract_goals env drv acc th =
   let ctxt = Context.use_export (Context.init_context env) th in
+  let ctxt = Driver.apply_before_split drv ctxt in
   let l = Transform.apply Transform.split_goals ctxt in
   let l = List.rev_map (fun ctxt -> (th,ctxt)) l in
   List.rev_append l acc
@@ -156,11 +161,11 @@ let do_file env drv filename_printer file =
       (* Extract the goal(s) *)
       let goals = 
         match !which_goals with
-          | Gall ->  Mnm.fold (fun _ th acc -> extract_goals env acc th) m []
+          | Gall ->  Mnm.fold (fun _ th acc -> extract_goals env drv acc th) m []
           | Gtheory s ->  
               begin
                 try 
-                  extract_goals env [] (Mnm.find s m)
+                  extract_goals env drv [] (Mnm.find s m)
                 with Not_found -> 
                   eprintf "File %s : --goals_of : Unknown theory %s@." file s; exit 1
               end
@@ -180,7 +185,7 @@ let do_file env drv filename_printer file =
                 eprintf "File %s : --goal : Unknown theory %s@." file tname; exit 1 in
               let pr = try find_pr th.th_export l with Not_found ->
                 eprintf "File %s : --goal : Unknown goal %s@." file s ; exit 1 in
-              let goals = extract_goals env [] th in
+              let goals = extract_goals env drv [] th in
               List.filter (fun (_,ctxt) ->
                              match ctxt.ctxt_decl.d_node with
                                | Dprop (_,{pr_name = pr_name}) -> 
@@ -188,7 +193,7 @@ let do_file env drv filename_printer file =
                                | _ -> assert false) goals in
       (* Apply transformations *)
       let goals = List.map 
-        (fun (th,ctxt) -> (th,Driver.transform_context drv ctxt))
+        (fun (th,ctxt) -> (th,Driver.apply_after_split drv ctxt))
         goals in
       (* Pretty-print the goals or call the prover *)
       match !output with
@@ -230,6 +235,18 @@ let () =
     let drv = match !driver with
       | None -> None
       | Some file -> Some (load_driver file env) in
+    if !list_printers then 
+      begin
+        printf "@[<hov 2>printers :@\n%a@]@."
+          (Pp.print_list Pp.newline Pp.string) (Driver.list_printers ());
+        exit 0
+      end;
+    if !list_transforms then 
+      begin
+        printf "@[<hov 2>transforms :@\n%a@]@."
+          (Pp.print_list Pp.newline Pp.string) (Driver.list_transforms ());
+        exit 0          
+      end;
     let filename_printer = Ident.create_ident_printer 
       ~sanitizer:file_sanitizer [] in
     Queue.iter (do_file env drv filename_printer) files

@@ -1,0 +1,9 @@
+plugin "simplify_array.cmo" "simplify_array.cmxs"
+
+printer "why3"
+
+filename "%f-%t-%s.why"
+
+apply_after_split_goals
+        "simplify_array"
+end

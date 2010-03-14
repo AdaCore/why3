@@ -121,17 +121,18 @@ let print_translation fmt = function
 type printer = driver -> formatter -> context -> unit
 
 and driver = {
-  drv_printer    : printer option;
-  drv_context    : context;
-  drv_prover     : Call_provers.prover;
-  drv_prelude    : string option;
-  drv_filename   : string option;
-  drv_transformations : Transform.ctxt_t list;
-  drv_rules      : theory_rules list;
-  drv_thprelude  : string Hid.t;
+  drv_printer     : printer option;
+  drv_context     : context;
+  drv_prover      : Call_provers.prover;
+  drv_prelude     : string option;
+  drv_filename    : string option;
+  drv_beforesplit : Transform.ctxt_t list;
+  drv_aftersplit  : Transform.ctxt_t list;
+  drv_rules       : theory_rules list;
+  drv_thprelude   : string Hid.t;
   (* the first is the translation only for this ident, the second is also for representant *)
-  drv_theory     : (translation * translation) Hid.t;
-  drv_with_ctxt  : translation Hid.t;
+  drv_theory      : (translation * translation) Hid.t;
+  drv_with_ctxt   : translation Hid.t;
 }
 
 (*
@@ -148,11 +149,15 @@ let (transforms : (string, unit -> Transform.ctxt_t) Hashtbl.t) = Hashtbl.create
 
 let register_transform name transform = Hashtbl.replace transforms name transform
 
+let list_transforms () = Hashtbl.fold (fun k _ acc -> k::acc) transforms []
+
 (** registering printers *)
 
 let (printers : (string, printer) Hashtbl.t) = Hashtbl.create 17
 
 let register_printer name printer = Hashtbl.replace printers name printer
+
+let list_printers () = Hashtbl.fold (fun k _ acc -> k::acc) printers []
 
 (*
 let () = 
@@ -209,30 +214,18 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     with Not_found ->
       let t23 = if cloned then (Tag Snm.empty),t else t,(Tag Snm.empty) in
       Hid.add driver.drv_theory id t23 in
-  let rec find_l ns = function
-    | [] -> assert false
-    | [a] -> Mnm.find a ns.ns_ls
-    | a::l -> find_l (Mnm.find a ns.ns_ns) l in
-  let rec find_ty ns = function
-    | [] -> assert false
-    | [a] -> Mnm.find a ns.ns_ts
-    | a::l -> find_ty (Mnm.find a ns.ns_ns) l in
-  let rec find_pr ns = function
-    | [] -> assert false
-    | [a] -> Mnm.find a ns.ns_pr
-    | a::l -> find_pr (Mnm.find a ns.ns_ns) l in
   let add = function
     | Rremove (c,(loc,q)) -> 
         begin
           try
-            add_htheory c (find_pr th.th_export q).pr_name Remove
+            add_htheory c (Transform.find_pr th.th_export q).pr_name Remove
           with Not_found -> errorm ~loc "Unknown axioms %s" 
             (string_of_qualid qualid q)
         end 
     | Rsyntaxls ((loc,q),s) -> 
         begin
           try
-            let ls = (find_l th.th_export q) in
+            let ls = (Transform.find_l th.th_export q) in
             check_syntax loc s (List.length ls.ls_args);
             add_htheory false ls.ls_name (Syntax s)
           with Not_found -> errorm ~loc "Unknown logic %s" 
@@ -241,7 +234,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rsyntaxty ((loc,q),s) -> 
         begin
           try
-            let ts = find_ty th.th_export q in
+            let ts = Transform.find_ty th.th_export q in
             check_syntax loc s (List.length ts.ts_args);
             add_htheory false ts.ts_name (Syntax s)
           with Not_found -> errorm ~loc "Unknown type %s" 
@@ -250,7 +243,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rtagls (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (find_l th.th_export q).ls_name 
+            add_htheory c (Transform.find_l th.th_export q).ls_name 
               (Tag (Snm.singleton s))
           with Not_found -> errorm ~loc "Unknown logic %s" 
             (string_of_qualid qualid q)
@@ -258,7 +251,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rtagty (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (find_ty th.th_export q).ts_name 
+            add_htheory c (Transform.find_ty th.th_export q).ts_name 
               (Tag (Snm.singleton s))
           with Not_found -> errorm ~loc "Unknown type %s" 
             (string_of_qualid qualid q)
@@ -266,7 +259,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rtagpr (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (find_pr th.th_export q).pr_name 
+            add_htheory c (Transform.find_pr th.th_export q).pr_name 
               (Tag (Snm.singleton s))
           with Not_found -> errorm ~loc "Unknown proposition %s" 
             (string_of_qualid qualid q)
@@ -278,13 +271,14 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
 
 let load_driver file env =
   let f = load_file file in
-  let prelude = ref None in
-  let printer = ref None in
-  let call_stdin = ref None in
-  let call_file = ref None in
-  let filename = ref None in
-  let transformations = ref None in
-  let regexps = ref [] in
+  let prelude     = ref None in
+  let printer     = ref None in
+  let call_stdin  = ref None in
+  let call_file   = ref None in
+  let filename    = ref None in
+  let beforesplit = ref None in
+  let aftersplit  = ref None in
+  let regexps     = ref [] in
   let set_or_raise loc r v error =
     if !r <> None then errorm ~loc "duplicate %s" error
     else r := Some v in 
@@ -303,29 +297,33 @@ let load_driver file env =
     | RegexpUnknown (s1,s2) -> regexps:=(s1,Unknown s2)::!regexps
     | RegexpFailure (s1,s2) -> regexps:=(s1,Failure s2)::!regexps
     | Filename s -> set_or_raise loc filename s "filename"
-    | Transformations s -> set_or_raise loc transformations  s "transformations"
+    | Beforesplit s -> set_or_raise loc beforesplit s "beforesplit"
+    | Aftersplit s -> set_or_raise loc aftersplit s "aftersplit"
     | Plugin files -> load_plugin (Filename.dirname file) files
   in
   List.iter add f.f_global;
   let regexps = List.map (fun (s,a) -> (Str.regexp s,a)) !regexps in
-  let transformations = match !transformations with
-    | None -> [] | Some l -> l in
-  let transformations = 
+  let trans r =
+    let transformations = match !r with
+      | None -> [] | Some l -> l in
     List.map (fun (loc,s) -> try (Hashtbl.find transforms s) () 
               with Not_found -> errorm ~loc "unknown transformation %s" s)
       transformations in
-  { drv_printer    = !printer;
-    drv_context    = Context.init_context env;
-    drv_prover     = {Call_provers.pr_call_stdin = !call_stdin;
-                      pr_call_file               = !call_file;
-                      pr_regexps                 = regexps};
-    drv_prelude    = !prelude;
-    drv_filename   = !filename;
-    drv_transformations = transformations;
-    drv_rules      = f.f_rules;
-    drv_thprelude  = Hid.create 1;
-    drv_theory     = Hid.create 1;
-    drv_with_ctxt  = Hid.create 1;
+    let beforesplit = trans beforesplit in
+    let aftersplit = trans aftersplit in
+  { drv_printer     = !printer;
+    drv_context     = Context.init_context env;
+    drv_prover      = {Call_provers.pr_call_stdin = !call_stdin;
+                       pr_call_file               = !call_file;
+                       pr_regexps                 = regexps};
+    drv_prelude     = !prelude;
+    drv_filename    = !filename;
+    drv_beforesplit = beforesplit;
+    drv_aftersplit  = aftersplit;
+    drv_rules       = f.f_rules;
+    drv_thprelude   = Hid.create 1;
+    drv_theory      = Hid.create 1;
+    drv_with_ctxt   = Hid.create 1;
   }
 
 (** querying drivers *)
@@ -355,9 +353,12 @@ let syntax_arguments s print fmt l =
  
 (** using drivers *)
 
-let transform_context drv ctxt =
+let transform_context list ctxt =
   List.fold_left (fun ctxt t -> Transform.apply t ctxt) 
-    ctxt drv.drv_transformations
+    ctxt list
+
+let apply_before_split drv = transform_context drv.drv_beforesplit
+let apply_after_split drv = transform_context drv.drv_aftersplit
 
 let print_context drv fmt ctxt = match drv.drv_printer with
   | None -> errorm "no printer"

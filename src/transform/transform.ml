@@ -17,6 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Term
 open Ident
 open Theory
 open Context
@@ -145,6 +146,19 @@ let split_goals =
   let g = fold_env f (fun env -> init_context env, []) in
   conv_res g snd
 
+let remove_lemma =
+  let f d =
+    match d.d_node with
+      | Dprop (Plemma, f) ->
+          let da = create_prop_decl Paxiom 
+            (create_prop (id_clone f.pr_name) f.pr_fmla) in
+          let dg = create_prop_decl Pgoal
+            (create_prop (id_clone f.pr_name) f.pr_fmla) in
+          [dg;da]
+      | _ ->  [d]
+  in
+  elt f
+
 exception NotGoalContext
 
 let goal_of_ctxt ctxt =
@@ -152,50 +166,104 @@ let goal_of_ctxt ctxt =
     | Dprop (Pgoal,pr) -> pr
     | _ -> raise NotGoalContext
 
-(*
-let extract_goals () =
-  let f ctxt0 (ctxt,l) =
-    let decl = ctxt0.ctxt_decl in    
-    match decl.d_node with
-      | Dprop (Pgoal, f) -> 
-	  ctxt, (f.pr_name,f.pr_fmla,ctxt) :: l
-      | Dprop (Plemma, f) ->
-          let d = create_prop_decl Paxiom f in
-          add_decl ctxt d, (f.pr_name, f.pr_fmla,ctxt) :: l
-      | _ -> 
-	  add_decl ctxt decl, l
-  in
-  let g = fold_env f (fun env -> init_context env, []) in
-  conv_res g snd
-*)
-
 let identity = 
   { all = (fun x -> x);
     clear = (fun () -> ()); }
 
-(*
-let cloned_from_ts env ctxt l s ls1 =
-  assert false (*TODO*)
+let rewrite_elt rt rf d =
+  match d.d_node with
+    | Dtype _ -> [d]
+    | Dlogic l -> [create_logic_decl (List.map 
+        (function 
+           | Lfunction(ls,Some def) -> 
+               let (ls,vsl,term) = open_fs_defn def in
+               let term = rt term in
+               Lfunction (ls,Some (make_fs_defn ls vsl term))
+           | Lpredicate(ls,Some def) ->
+               let (ls,vsl,fmla) = open_ps_defn def in
+               let fmla = rf fmla in
+               Lpredicate (ls,Some (make_ps_defn ls vsl fmla))
+           | l -> l) l)]
+    | Dind indl -> [create_ind_decl 
+        (List.map (fun (ls,pl) -> ls, 
+        (List.map
+           (fun pr -> shortcut_for_discussion_dont_be_mad_andrei_please
+              pr.pr_name (rf pr.pr_fmla)) pl)) indl)]
+    |Dprop (k,pr) -> [create_prop_decl k
+       (shortcut_for_discussion_dont_be_mad_andrei_please
+          pr.pr_name (rf pr.pr_fmla))]
+    |Duse _ |Dclone _ -> [d]
+
+let rewrite_elt rt rf = elt (rewrite_elt rt rf)
+
+let rewrite_map rt rf ctxt1 ctxt2 =
+  let d = ctxt1.ctxt_decl in
+  match d.d_node with
+    | Dtype _ -> add_decl ctxt2 d
+    | Dlogic l -> add_decl ctxt2 (create_logic_decl (List.map 
+        (function 
+           | Lfunction(ls,Some def) -> 
+               let (ls,vsl,term) = open_fs_defn def in
+               let term = rt ctxt1 term in
+               Lfunction (ls,Some (make_fs_defn ls vsl term))
+           | Lpredicate(ls,Some def) ->
+               let (ls,vsl,fmla) = open_ps_defn def in
+               let fmla = rf ctxt1 fmla in
+               Lpredicate (ls,Some (make_ps_defn ls vsl fmla))
+           | l -> l) l))
+    | Dind indl -> add_decl ctxt2 (create_ind_decl 
+        (List.map (fun (ls,pl) -> ls, 
+        (List.map
+           (fun pr -> shortcut_for_discussion_dont_be_mad_andrei_please
+              pr.pr_name (rf ctxt1 pr.pr_fmla)) pl)) indl))
+    |Dprop (k,pr) -> add_decl ctxt2 (create_prop_decl k
+       (shortcut_for_discussion_dont_be_mad_andrei_please
+          pr.pr_name (rf ctxt1 pr.pr_fmla)))
+    |Duse _ |Dclone _ -> add_decl ctxt2 d
+
+let rewrite_map rt rf = map (rewrite_map rt rf)
+  
+let rec find_l ns = function
+  | [] -> assert false
+  | [a] -> Mnm.find a ns.ns_ls
+  | a::l -> find_l (Mnm.find a ns.ns_ns) l
+      
+let rec find_ty ns = function
+  | [] -> assert false
+  | [a] -> Mnm.find a ns.ns_ts
+  | a::l -> find_ty (Mnm.find a ns.ns_ns) l
+  
+let rec find_pr ns = function
+  | [] -> assert false
+  | [a] -> Mnm.find a ns.ns_pr
+  | a::l -> find_pr (Mnm.find a ns.ns_ns) l
+
+
+let cloned_from ctxt i1 i2 = 
+  try
+    i1 = i2 || Sid.mem i2 (Mid.find i1 ctxt.ctxt_cloned)
+  with Not_found -> false
+
+(* let find_theory *)
+
+(* let cloned_from_ts ctxt slth sth sil ls1 = *)
 (*   try *)
-(*     let th = Typing.find_theory env l in *)
-(*     let ls2 = Mnm.find s th.th_export.ns_ts in *)
+(*     let th = find_theory ctxt.ctxt_env slth sth in *)
+(*     let ls2 = find_ty th.th_export sil in *)
 (*     Context_utils.cloned_from ctxt ls1.ts_name ls2.ts_name *)
+(*   with Loc.Located _ -> raise Not_found *)
+    
+(* let cloned_from_ls ctxt slth sth sil ls1 = *)
+(*   try *)
+(*     let th = find_theory ctxt.ctxt_env l in *)
+(*     let ls2 = find_l th.th_export sil in *)
+(*       Context_utils.cloned_from ctxt ls1.ls_name ls2.ls_name *)
 (*   with Loc.Located _ -> assert false *)
     
-    
-let cloned_from_ls env ctxt l s ls1 =
-  assert false (*TODO*)
+(* let cloned_from_pr ctxt l s pr1 = *)
 (*   try *)
-(*     let th = Typing.find_theory env l in *)
-(*     let ls2 = Mnm.find s th.th_export.ns_ls in *)
-(*     Context_utils.cloned_from ctxt ls1.ls_name ls2.ls_name *)
-(*   with Loc.Located _ -> assert false *)
-    
-let cloned_from_pr env ctxt l s pr1 =
-  assert false (*TODO*)
-(*   try *)
-(*     let th = Typing.find_theory env l in *)
-(*     let pr2 = Mnm.find s th.th_export.ns_pr in *)
+(*     let th = Typing.find_theory ctxt.ctxt_env l in *)
+(*     let pr2 = find_l th.th_export sil in *)
 (*     Context_utils.cloned_from ctxt pr1.pr_name pr2.pr_name *)
 (*   with Loc.Located _ -> assert false *)
-*)
+

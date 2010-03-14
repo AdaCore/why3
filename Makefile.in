@@ -116,7 +116,8 @@ UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
 PARSER_CMO := parser.cmo lexer.cmo typing.cmo 
 PARSER_CMO := $(addprefix src/parser/,$(PARSER_CMO))
 
-TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo 
+TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
+	split_conjunction.cmo 
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
 DRIVER_CMO := call_provers.cmo driver_parser.cmo driver_lexer.cmo driver.cmo
@@ -208,16 +209,16 @@ WHYVO=lib/coq/Why.vo
 bench:: $(BINARY) 
 	sh bench/bench "$(BINARY) -I lib/prelude/"
 
-BENCH_PLUGINS_CMO := helloworld.cmo
+BENCH_PLUGINS_CMO := helloworld.cmo simplify_array.cmo
 BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))
 BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
 
 
 
 bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) $(BINARY) byte
-	bin/why.$(OCAMLBEST) --driver bench/plugins/helloworld.drv -I lib/prelude/ \
-        --output - --goal Test.G src/test.why
 	bin/why.byte --driver bench/plugins/helloworld.drv -I lib/prelude/ \
+        --output - --goal Test.G src/test.why
+	bin/why.$(OCAMLBEST) --driver bench/plugins/helloworld.drv -I lib/prelude/ \
         --output - --goal Test.G src/test.why
 
 # installation
@@ -400,7 +401,7 @@ apidoc: $(OCAMLDOCSRC)
 .ml.cmx:
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) $(APRONLIB) $(ATPLIB) -c $(OFLAGS) $<
 
-.ml.cmxs: $*.cmo
+%.cmxs: %.ml %.cmx
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -shared $(INCLUDES) -o $@ $<
 
 .mll.ml:
