@@ -603,8 +603,7 @@ and dfmla env e = match e.pp_desc with
       let f1 = dfmla env f1 in
       Fnamed (x, f1)
   | PPvar x -> 
-      assert false (* FIXME *)
-      (* Fvar (find_prop x env.th).pr_fmla *)
+      Fvar (snd (find_prop x env.th))
   | PPconst _ | PPcast _ ->
       error ~loc:e.pp_loc PredicateExpected
 
@@ -1102,12 +1101,12 @@ and add_decl env lenv th = function
                   then error ~loc (Clash ls1.ls_name.id_short);
                   { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
               | CSlemma p ->
-                  let pr = find_prop_ns p t.th_export in
+                  let pr,_ = find_prop_ns p t.th_export in
                   if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
                   then error ~loc (Clash (pr_name pr).id_short);
                   { s with inst_lemma = Spr.add pr s.inst_lemma }
               | CSgoal p ->
-                  let pr = find_prop_ns p t.th_export in
+                  let pr,_ = find_prop_ns p t.th_export in
                   if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
                   then error ~loc (Clash (pr_name pr).id_short);
                   { s with inst_goal = Spr.add pr s.inst_goal }

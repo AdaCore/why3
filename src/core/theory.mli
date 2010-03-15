@@ -21,17 +21,6 @@ open Ident
 open Ty
 open Term
 
-(** Named propositions *)
-
-type prop
-
-module Spr : Set.S with type elt = prop
-module Mpr : Map.S with type key = prop
-module Hpr : Hashtbl.S with type key = prop
-
-val create_prop : preid -> prop
-val pr_name     : prop -> ident
-
 (** Declarations *)
 
 (* type declaration *)
@@ -46,8 +35,6 @@ type ty_decl = tysymbol * ty_def
 
 type ls_defn
 
-type logic_decl = lsymbol * ls_defn option
-
 val make_ls_defn : lsymbol -> vsymbol list -> expr -> ls_defn
 val make_fs_defn : lsymbol -> vsymbol list -> term -> ls_defn
 val make_ps_defn : lsymbol -> vsymbol list -> fmla -> ls_defn
@@ -58,9 +45,22 @@ val open_ps_defn : ls_defn -> lsymbol * vsymbol list * fmla
 
 val ls_defn_axiom : ls_defn -> fmla
 
+type logic_decl = lsymbol * ls_defn option
+
 (* inductive predicate declaration *)
 
-type ind_decl = lsymbol * (prop * fmla) list
+type prop
+
+module Spr : Set.S with type elt = prop
+module Mpr : Map.S with type key = prop
+module Hpr : Hashtbl.S with type key = prop
+
+val create_prop : preid -> prop
+val pr_name     : prop -> ident
+
+type prop_fmla = prop * fmla
+
+type ind_decl  = lsymbol * prop_fmla list
 
 (* proposition declaration *)
 
@@ -86,7 +86,7 @@ type theory = private {
 and namespace = private {
   ns_ts : tysymbol Mnm.t;   (* type symbols *)
   ns_ls : lsymbol Mnm.t;    (* logic symbols *)
-  ns_pr : prop Mnm.t;       (* propositions *)
+  ns_pr : prop_fmla Mnm.t;  (* propositions *)
   ns_ns : namespace Mnm.t;  (* inner namespaces *)
 }
 

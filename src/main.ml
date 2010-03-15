@@ -185,7 +185,7 @@ let do_file env drv filename_printer file =
                 | a::l -> find_pr (Mnm.find a ns.ns_ns) l in
               let th =try Mnm.find tname m with Not_found -> 
                 eprintf "File %s : --goal : Unknown theory %s@." file tname; exit 1 in
-              let pr = try find_pr th.th_export l with Not_found ->
+              let pr = try fst (find_pr th.th_export l) with Not_found ->
                 eprintf "File %s : --goal : Unknown goal %s@." file s ; exit 1 in
               let goals = extract_goals env drv [] th in
               List.filter (fun (_,ctxt) ->

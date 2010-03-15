@@ -117,4 +117,4 @@ val cloned_from : context -> ident -> ident -> bool
 
 val find_ts : namespace -> string list -> Ty.tysymbol
 val find_ls : namespace -> string list -> Term.lsymbol
-val find_pr : namespace -> string list -> prop
+val find_pr : namespace -> string list -> prop_fmla

@@ -24,19 +24,6 @@ open Ty
 open Term
 open Termlib
 
-(** Named propositions *)
-
-type prop = ident
-
-module Spr = Sid
-module Mpr = Mid
-module Hpr = Hid
-
-let create_prop = id_register
-let pr_name x = x
-
-exception UnboundVars of Svs.t
-
 (** Declarations *)
 
 (* type declaration *)
@@ -53,6 +40,7 @@ type ls_defn = lsymbol * vsymbol list * expr * fmla
 
 type logic_decl = lsymbol * ls_defn option
 
+exception UnboundVars of Svs.t
 exception IllegalConstructor of lsymbol
 
 let check_fvs f =
@@ -102,7 +90,18 @@ let ls_defn_axiom (_,_,_,f) = f
 
 (* inductive predicate declaration *)
 
-type ind_decl = lsymbol * (prop * fmla) list
+type prop = ident
+
+module Spr = Sid
+module Mpr = Mid
+module Hpr = Hid
+
+let create_prop = id_register
+let pr_name x = x
+
+type prop_fmla = prop * fmla
+
+type ind_decl  = lsymbol * prop_fmla list
 
 (* proposition declaration *)
 
@@ -128,7 +127,7 @@ type theory = {
 and namespace = {
   ns_ts : tysymbol Mnm.t;   (* type symbols *)
   ns_ls : lsymbol Mnm.t;    (* logic symbols *)
-  ns_pr : prop Mnm.t;       (* propositions *)
+  ns_pr : prop_fmla Mnm.t;  (* propositions *)
   ns_ns : namespace Mnm.t;  (* inner namespaces *)
 }
 
@@ -692,7 +691,7 @@ module Context = struct
   type clones = {
     ts_table : tysymbol Hts.t;
     ls_table : lsymbol Hls.t;
-    pr_table : prop Hpr.t;
+    pr_table : prop_fmla Hpr.t;
     id_table : ident Hid.t;
     id_local : Sid.t;
   }
@@ -712,10 +711,6 @@ module Context = struct
   let cl_add_ls cl ls ls' =
     Hls.add cl.ls_table ls ls';
     Hid.add cl.id_table ls.ls_name ls'.ls_name
-
-  let cl_add_pr cl pr pr' =
-    Hpr.add cl.pr_table pr pr';
-    Hid.add cl.id_table pr pr'
 
   let rec cl_find_ts cl ts =
     if not (Sid.mem ts.ts_name cl.id_local) then ts
@@ -740,13 +735,12 @@ module Context = struct
 
   let cl_trans_fmla cl f = f_s_map (cl_find_ts cl) (cl_find_ls cl) f
 
-  let cl_find_pr cl pr =
-    if not (Sid.mem pr cl.id_local) then pr
-    else try Hpr.find cl.pr_table pr
-    with Not_found ->
-      let pr' = create_prop (id_dup pr) in
-      cl_add_pr cl pr pr';
-      pr'
+  let cl_add_pr cl pr f =
+    let pr' = create_prop (id_dup pr) in
+    let f' = cl_trans_fmla cl f in
+    Hpr.add cl.pr_table pr (pr',f');
+    Hid.add cl.id_table pr pr';
+    pr',f'
 
   let cl_add_type cl inst_ts acc (ts, def) =
     if Mts.mem ts inst_ts then begin
@@ -769,7 +763,7 @@ module Context = struct
 
   let cl_add_ind cl inst_ls (ps,la) =
     if Mls.mem ps inst_ls then raise (CannotInstantiate ps.ls_name);
-    let find (pr,f) = (cl_find_pr cl pr, cl_trans_fmla cl f) in
+    let find (pr,f) = cl_add_pr cl pr f in
     cl_find_ls cl ps, List.map find la
 
   let cl_add_decl cl inst acc d = match d.d_node with
@@ -794,7 +788,8 @@ module Context = struct
           | Paxiom when Spr.mem pr inst.inst_goal  -> Pgoal
           | _                                      -> Paxiom
         in
-        create_prop_decl k (cl_find_pr cl pr) (cl_trans_fmla cl f) :: acc
+        let pr', f' = cl_add_pr cl pr f in
+        create_prop_decl k pr' f' :: acc
     | Duse _ | Dclone _ ->
         d :: acc
 
@@ -975,8 +970,8 @@ module TheoryUC = struct
       then Hts.find cl.Context.ts_table ts else ts in
     let find_ls ls = if Sid.mem ls.ls_name th.th_local
       then Hls.find cl.Context.ls_table ls else ls in
-    let find_pr pr = if Sid.mem pr th.th_local
-      then Hpr.find cl.Context.pr_table pr else pr in
+    let find_pr (p,f) = if Sid.mem p th.th_local
+      then Hpr.find cl.Context.pr_table p else (p,f) in
     let f_ts n ts ns = add_ts true n (find_ts ts) ns in
     let f_ls n ls ns = add_ls true n (find_ls ls) ns in
     let f_pr n pr ns = try add_pr true n (find_pr pr) ns
@@ -1011,7 +1006,7 @@ module TheoryUC = struct
 
   let add_ind uc (ps,la) =
     let uc = add_symbol add_ls ps.ls_name ps uc in
-    let add uc (pr,_) = add_symbol add_pr pr pr uc in
+    let add uc (pr,f) = add_symbol add_pr pr (pr,f) uc in
     List.fold_left add uc la
 
   let add_decl uc d =
@@ -1019,7 +1014,7 @@ module TheoryUC = struct
       | Dtype dl  -> List.fold_left add_type uc dl
       | Dlogic dl -> List.fold_left add_logic uc dl
       | Dind dl   -> List.fold_left add_ind uc dl
-      | Dprop (_,pr,_) -> add_symbol add_pr pr pr uc
+      | Dprop (_,pr,f) -> add_symbol add_pr pr (pr,f) uc
       | Dclone _ | Duse _ -> uc
     in
     { uc with uc_ctxt = Context.add_decl uc.uc_ctxt d }
