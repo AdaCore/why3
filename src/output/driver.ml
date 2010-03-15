@@ -176,11 +176,11 @@ struct
   let is_native_not_defined = is_native1 <> is_native2
 end
 
-
-exception Cantloadplugin
-
 let load_plugin dir (byte,nat) =
-  if Dynlink.is_native_not_defined then raise Cantloadplugin;
+  if Dynlink.is_native_not_defined then 
+    errorm 
+"Why has been compiled with a version of caml which doesn't allow\
+ native dynlink. So Why chooses to refuse plugin.";
   let file = if Dynlink.is_native then nat else byte in
   let file = Filename.concat dir file in
   Dynlink.loadfile_private file
