@@ -165,7 +165,22 @@ let () =
                      "Pervasives";"Format";"List";"Sys";"Unix"]
 *)
 
+module Dynlink =
+struct
+  let is_native = true
+  open Dynlink
+  let is_native1 = is_native
+  let is_native = false
+  include Dynlink
+  let is_native2 = is_native
+  let is_native_not_defined = is_native1 <> is_native2
+end
+
+
+exception Cantloadplugin
+
 let load_plugin dir (byte,nat) =
+  if Dynlink.is_native_not_defined then raise Cantloadplugin;
   let file = if Dynlink.is_native then nat else byte in
   let file = Filename.concat dir file in
   Dynlink.loadfile_private file

@@ -481,7 +481,8 @@ AC_SUBST(PSVIEWER)
 AC_SUBST(PDFVIEWER)
 # Finally create the Makefile from Makefile.in
 dnl AC_OUTPUT(Makefile)
-AC_OUTPUT(Makefile bench/bench)
+AC_CONFIG_FILES(Makefile bench/bench src/output/dynlink_compat.ml)
+AC_OUTPUT
 chmod a-w Makefile
 chmod a-w bench/bench
 chmod a+x bench/bench
