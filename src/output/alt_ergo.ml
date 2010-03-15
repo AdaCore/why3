@@ -189,7 +189,7 @@ let print_logic_decl drv ctxt fmt = function
                     fprintf fmt "@[<hov 2>predicate %a(%a) = %a@]"
 	              print_ident ls.ls_name 
                       (print_list comma (print_logic_binder drv)) vl (print_fmla drv) f;
-                    true
+                    List.iter forget_var vl;true
       end
 
 let print_decl drv ctxt fmt d = match d.d_node with

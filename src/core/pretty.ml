@@ -61,7 +61,7 @@ let tv_set = ref Sid.empty
 (* type variables always start with a quote *)
 let print_tv fmt tv =
   tv_set := Sid.add tv !tv_set;
-  let sanitize n = String.concat "" ["'"; n] in
+  let sanitize n = "'" ^ n in
   let n = id_unique iprinter ~sanitizer:sanitize tv in
   fprintf fmt "%s" n
 
