@@ -57,6 +57,8 @@ exception CommandError
 exception NoCommandlineProvided      
 
 
+(* this should be changeable by an option
+   (otherwise: The program 'timeout' is currently not installed) *)
 let cpulimit = ref "timeout" (*"why-cpulimit"*)
 
 

@@ -4,7 +4,7 @@
 prelude "(* this is a prelude for Alt-Ergo*)"
 
 printer "alt-ergo"
-filename "%f-%t-%s.mlw"
+filename "%f-%t-%s.why"
 call_on_file  "alt-ergo %s"
 
 valid "Valid"
@@ -28,7 +28,7 @@ theory BuiltIn
 
   syntax logic (_=_) "(%1 = %2)"
 
-  syntax logic (_<>_) "(%1 = %2)"
+  syntax logic (_<>_) "(%1 <> %2)"
 
 end
 
