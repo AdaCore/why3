@@ -188,8 +188,7 @@ let do_file env drv filename_printer file =
               let goals = extract_goals env drv [] th in
               List.filter (fun (_,ctxt) ->
                              match ctxt.ctxt_decl.d_node with
-                               | Dprop (_,{pr_name = pr_name}) -> 
-                                   Ident.id_derived_from pr_name pr.pr_name
+                               | Dprop (_,pr',_) -> pr == pr'
                                | _ -> assert false) goals in
       (* Apply transformations *)
       let goals = List.map 
@@ -202,7 +201,7 @@ let do_file env drv filename_printer file =
               let res = Driver.call_prover ~debug:!debug ?timeout drv ctxt in
               printf "%s %s %s : %a@." 
                 file th.th_name.Ident.id_short 
-                (goal_of_ctxt ctxt).pr_name.Ident.id_long
+                (pr_name (goal_of_ctxt ctxt)).Ident.id_long
                 Call_provers.print_prover_result res in
             List.iter call goals
         | Some dir (* we are in the output mode *) -> 

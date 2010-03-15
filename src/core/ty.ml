@@ -24,6 +24,13 @@ open Ident
 
 type tvsymbol = ident
 
+module Stv = Sid
+module Mtv = Mid
+module Htv = Hid
+
+let create_tvsymbol = id_register
+let tv_name v = v
+
 (* type symbols and types *)
 
 type tysymbol = {
@@ -58,7 +65,6 @@ let mk_ts name args def = {
   ts_def  = def;
 }
 
-let create_tvsymbol = id_register
 let create_tysymbol name args def = mk_ts (id_register name) args def
 
 module Ty = struct
@@ -107,15 +113,15 @@ exception NonLinear
 exception UnboundTypeVariable
 
 let rec tv_known vs ty = match ty.ty_node with
-  | Tyvar n -> Sid.mem n vs
+  | Tyvar n -> Stv.mem n vs
   | _ -> ty_all (tv_known vs) ty
 
 let create_tysymbol name args def =
   let add s v =
-    if Sid.mem v s then raise NonLinear;
-    Sid.add v s
+    if Stv.mem v s then raise NonLinear;
+    Stv.add v s
   in
-  let s = List.fold_left add Sid.empty args in
+  let s = List.fold_left add Stv.empty args in
   let _ = match def with
     | Some ty -> tv_known s ty || raise UnboundTypeVariable
     | _ -> true
@@ -125,15 +131,15 @@ let create_tysymbol name args def =
 exception BadTypeArity
 
 let rec tv_inst m ty = match ty.ty_node with
-  | Tyvar n -> Mid.find n m
+  | Tyvar n -> Mtv.find n m
   | _ -> ty_map (tv_inst m) ty
 
 let ty_app s tl =
   if List.length tl != List.length s.ts_args then raise BadTypeArity;
   match s.ts_def with
     | Some ty ->
-        let add m v t = Mid.add v t m in
-        tv_inst (List.fold_left2 add Mid.empty s.ts_args tl) ty
+        let add m v t = Mtv.add v t m in
+        tv_inst (List.fold_left2 add Mtv.empty s.ts_args tl) ty
     | _ ->
         ty_app s tl
 
@@ -161,8 +167,8 @@ let rec matching s ty1 ty2 =
   if ty1 == ty2 then s
   else match ty1.ty_node, ty2.ty_node with
     | Tyvar n1, _ ->
-        (try if Mid.find n1 s == ty2 then s else raise TypeMismatch
-         with Not_found -> Mid.add n1 ty2 s)
+        (try if Mtv.find n1 s == ty2 then s else raise TypeMismatch
+         with Not_found -> Mtv.add n1 ty2 s)
     | Tyapp (f1, l1), Tyapp (f2, l2) when f1 == f2 ->
         List.fold_left2 matching s l1 l2
     | _ ->

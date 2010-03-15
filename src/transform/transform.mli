@@ -77,10 +77,6 @@ val rewrite_elt :
   (Term.term -> Term.term) -> 
   (Term.fmla -> Term.fmla) -> context t
 
-val rewrite_map : 
-  (context -> Term.term -> Term.term) -> 
-  (context -> Term.fmla -> Term.fmla) -> context t
-
 
 val cloned_from : context -> ident -> ident -> bool 
 

@@ -152,11 +152,11 @@ and term_branch
 
 and fmla_branch
 
-and trigger_elt =
-  | TrTerm of term
-  | TrFmla of fmla
+and expr =
+  | Term of term
+  | Fmla of fmla
 
-and trigger = trigger_elt list
+and trigger = expr list
 
 module Mterm : Map.S with type key = term
 module Sterm : Set.S with type elt = term

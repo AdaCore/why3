@@ -156,7 +156,7 @@ let rec print_dty fmt = function
   | Tyvar { type_val = Some t } ->
       print_dty fmt t
   | Tyvar { type_val = None; tvsymbol = v } ->
-      fprintf fmt "'%s" v.id_short
+      fprintf fmt "'%s" (tv_name v).id_short
   | Tyapp (s, []) ->
       fprintf fmt "%s" s.ts_name.id_short
   | Tyapp (s, [t]) -> 
@@ -231,8 +231,6 @@ let find_user_type_var x env =
     v
  
 (* Specialize *)
-
-module Htv = Hid
 
 let find_type_var ~loc env tv =
   try
@@ -334,7 +332,7 @@ let split_qualid = function
 (* parsed types -> intermediate types *)
 
 let rec type_inst s ty = match ty.ty_node with
-  | Ty.Tyvar n -> Mid.find n s
+  | Ty.Tyvar n -> Mtv.find n s
   | Ty.Tyapp (ts, tyl) -> Tyapp (ts, List.map (type_inst s) tyl)
 
 let rec dty env = function
@@ -351,8 +349,8 @@ let rec dty env = function
 	| None -> 
 	    Tyapp (ts, tyl)
 	| Some ty -> 
-	    let add m v t = Mid.add v t m in
-            let s = List.fold_left2 add Mid.empty ts.ts_args tyl in
+	    let add m v t = Mtv.add v t m in
+            let s = List.fold_left2 add Mtv.empty ts.ts_args tyl in
 	    type_inst s ty
 
 (* intermediate types -> types *)
@@ -605,7 +603,8 @@ and dfmla env e = match e.pp_desc with
       let f1 = dfmla env f1 in
       Fnamed (x, f1)
   | PPvar x -> 
-      Fvar (find_prop x env.th).pr_fmla 
+      assert false (* FIXME *)
+      (* Fvar (find_prop x env.th).pr_fmla *)
   | PPconst _ | PPcast _ ->
       error ~loc:e.pp_loc PredicateExpected
 
@@ -693,8 +692,8 @@ and fmla env = function
       in
       let env, vl = map_fold_left uquant env uqu in
       let trigger = function
-	| TRterm t -> TrTerm (term env t) 
-	| TRfmla f -> TrFmla (fmla env f) 
+	| TRterm t -> Term (term env t) 
+	| TRfmla f -> Fmla (fmla env f) 
       in
       let trl = List.map (List.map trigger) trl in
       f_quant q (List.concat vl) trl (fmla env f1)
@@ -799,7 +798,8 @@ let add_types dl th =
 	  let vars = th'.utyvars in
 	  List.iter 
 	    (fun v -> 
-	       Hashtbl.add vars v.id_short (create_ty_decl_var ~user:true v)) 
+	       Hashtbl.add vars (tv_name v).id_short 
+                  (create_ty_decl_var ~user:true v)) 
 	    ts.ts_args;
 	  ts, th'
     in
@@ -842,12 +842,12 @@ let add_logics dl th =
       | None -> (* predicate *)
 	  let ps = create_psymbol v pl in
 	  Hashtbl.add psymbols id ps;
-	  add_decl th (create_logic_decl [Lpredicate (ps, None)])
+	  add_decl th (create_logic_decl [ps, None])
       | Some t -> (* function *)
 	  let t = type_ty (None, t) in
 	  let fs = create_fsymbol v pl t in
 	  Hashtbl.add fsymbols id fs;
-	  add_decl th (create_logic_decl [Lfunction (fs, None)])
+	  add_decl th (create_logic_decl [fs, None])
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
@@ -882,7 +882,7 @@ let add_logics dl th =
 	      let env = env_of_vsymbol_list vl in
               Some (make_ps_defn ps vl (fmla env f))
         in
-        Lpredicate (ps, defn)
+        ps, defn
     | Some ty -> (* function *)
 	let fs = Hashtbl.find fsymbols id in
         let defn = match d.ld_def with
@@ -898,7 +898,7 @@ let add_logics dl th =
               try Some (make_fs_defn fs vl (term env t))
 	      with _ -> term_expected_type ~loc t.dt_ty (dty denv ty)
         in
-        Lfunction (fs, defn)
+        fs, defn
   in
   let dl = List.map type_decl dl in
   List.fold_left add_decl th (create_logic_decls dl)
@@ -917,7 +917,7 @@ let fmla env f =
 let add_prop k loc s f th =
   let f = fmla th f in
   try
-    add_decl th (create_prop_decl k (create_prop (id_user s.id loc) f))
+    add_decl th (create_prop_decl k (create_prop (id_user s.id loc)) f)
   with ClashSymbol _ ->
     error ~loc (Clash s.id)
 
@@ -1008,7 +1008,7 @@ let add_inductives dl th =
     let pl = List.map type_ty d.in_params in
     let ps = create_psymbol v pl in
     Hashtbl.add psymbols id ps;
-    add_decl th (create_logic_decl [Lpredicate (ps, None)])
+    add_decl th (create_logic_decl [ps, None])
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
@@ -1016,7 +1016,7 @@ let add_inductives dl th =
     let id = d.in_ident.id in
     let ps = Hashtbl.find psymbols id in
     let clause (loc, id, f) = 
-      create_prop (id_user id.id loc) (fmla th' f)
+      create_prop (id_user id.id loc), fmla th' f
     in
     ps, List.map clause d.in_def
   in
@@ -1024,11 +1024,11 @@ let add_inductives dl th =
   try
     List.fold_left add_decl th (create_ind_decls dl)
   with
-  | InvalidIndDecl (_,prid) -> errorm ~loc:(loc_of_id prid)
+  | InvalidIndDecl (_,pr) -> errorm ~loc:(loc_of_id (pr_name pr))
       "not a clausal form"
-  | NonPositiveIndDecl (_,prid,s) -> errorm ~loc:(loc_of_id prid)
+  | NonPositiveIndDecl (_,pr,s) -> errorm ~loc:(loc_of_id (pr_name pr))
       "non-positive occurrence of %a" Pretty.print_ls s
-  | TooSpecificIndDecl (_,prid,t) -> errorm ~loc:(loc_of_id prid)
+  | TooSpecificIndDecl (_,pr,t) -> errorm ~loc:(loc_of_id (pr_name pr))
       "term @[%a@] is too specific" Pretty.print_term t
 
 (* parse file and store all theories into parsed_theories *)
@@ -1104,12 +1104,12 @@ and add_decl env lenv th = function
               | CSlemma p ->
                   let pr = find_prop_ns p t.th_export in
                   if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
-                  then error ~loc (Clash pr.pr_name.id_short);
+                  then error ~loc (Clash (pr_name pr).id_short);
                   { s with inst_lemma = Spr.add pr s.inst_lemma }
               | CSgoal p ->
                   let pr = find_prop_ns p t.th_export in
                   if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
-                  then error ~loc (Clash pr.pr_name.id_short);
+                  then error ~loc (Clash (pr_name pr).id_short);
                   { s with inst_goal = Spr.add pr s.inst_goal }
 	    in
             let s = List.fold_left add_inst empty_inst s in

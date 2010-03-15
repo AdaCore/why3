@@ -36,7 +36,7 @@ let forget_var v = forget_id ident_printer v.vs_name
 
 let rec print_type drv fmt ty = match ty.ty_node with
   | Tyvar id -> 
-      fprintf fmt "'%a" print_ident id
+      fprintf fmt "'%a" print_ident (tv_name id)
   | Tyapp (ts, tl) -> 
       match Driver.query_ident drv ts.ts_name with
         | Driver.Remove -> assert false (* Mettre une erreur *)
@@ -129,8 +129,8 @@ let rec print_fmla drv fmt f = match f.f_node with
       assert false
 
 and print_trigger drv fmt = function
-  | TrTerm t -> (print_term drv) fmt t
-  | TrFmla f -> (print_fmla drv) fmt f
+  | Term t -> (print_term drv) fmt t
+  | Fmla f -> (print_fmla drv) fmt f
 
 and print_triggers drv fmt tl = print_list comma (print_trigger drv) fmt tl
 
@@ -150,63 +150,68 @@ let print_type_decl drv fmt = function
 
 let ac_th = ["algebra";"AC"]
 
-let print_logic_decl drv ctxt fmt = function
-  | Lfunction (ls, def) ->
-      begin
-        match Driver.query_ident drv ls.ls_name with
-          | Driver.Remove | Driver.Syntax _ -> false
-          | Driver.Tag s ->
+
+let print_ld drv fmt ld =
+  let _,vl,e = open_ls_defn ld in
+  begin match e with
+    | Term t -> print_term drv fmt t
+    | Fmla f -> print_fmla drv fmt f
+  end;
+  List.iter forget_var vl
+
+let print_ls_defn drv fmt = 
+  Util.option_iter (fprintf fmt " =@ %a" (print_ld drv))
+
+let print_ls_type drv fmt = function
+  | Some ty -> print_type drv fmt ty
+  | None -> fprintf fmt "prop"
+
+let print_logic_decl drv ctxt fmt (ls,ld) =
+  match Driver.query_ident drv ls.ls_name with
+    | Driver.Remove | Driver.Syntax _ -> false
+    | Driver.Tag s ->
+        begin match ld with
+          | None ->
               let sac = if Snm.mem "AC" s then "ac " else "" in
-              let ty = match ls.ls_value with None -> assert false | Some ty -> ty in
-              match def with
-                | None ->
-                    let tyl = ls.ls_args in
-                    fprintf fmt "@[<hov 2>logic %s%a : %a -> %a@]@\n"
-                      sac
-                      print_ident ls.ls_name
-	              (print_list comma (print_type drv)) tyl (print_type drv) ty;
-                    true
-                | Some defn ->
-                    let id = ls.ls_name in
-                    let _, vl, t = open_fs_defn defn in
+              fprintf fmt "@[<hov 2>logic %s%a : %a -> %a@]@\n"
+                sac print_ident ls.ls_name
+                (print_list comma (print_type drv)) ls.ls_args 
+                (print_ls_type drv) ls.ls_value
+          | Some ld ->
+              let _,vl,e = open_ls_defn ld in
+              begin match e with
+                | Term t ->
                     (* TODO AC? *)
-                    fprintf fmt "@[<hov 2>function %a(%a) : %a =@ %a@]@\n" print_ident id
-                      (print_list comma (print_logic_binder drv)) vl (print_type drv) ty (print_term drv) t;
-                    List.iter forget_var vl;true
-      end
-  | Lpredicate (ls, def) ->
-      begin
-        match Driver.query_ident drv ls.ls_name with
-          | Driver.Remove | Driver.Syntax _ -> false
-          | Driver.Tag _ -> 
-              match def with
-                | None ->
-                    fprintf fmt "@[<hov 2>logic %a : %a -> prop@]"
-	              print_ident ls.ls_name (print_list comma (print_type drv)) ls.ls_args;
-                    true
-                | Some fd -> 
-                    let _,vl,f = open_ps_defn fd in
+                    fprintf fmt "@[<hov 2>function %a(%a) : %a =@ %a@]@\n" 
+                      print_ident ls.ls_name
+                      (print_list comma (print_logic_binder drv)) vl 
+                      (print_type drv) (Util.of_option ls.ls_value) 
+                      (print_term drv) t
+                | Fmla f ->
                     fprintf fmt "@[<hov 2>predicate %a(%a) = %a@]"
 	              print_ident ls.ls_name 
-                      (print_list comma (print_logic_binder drv)) vl (print_fmla drv) f;
-                    List.iter forget_var vl;true
-      end
-
+                      (print_list comma (print_logic_binder drv)) vl 
+                      (print_fmla drv) f
+              end;
+              List.iter forget_var vl
+        end;
+        true
+  
 let print_decl drv ctxt fmt d = match d.d_node with
   | Dtype dl ->
       print_list_opt newline (print_type_decl drv) fmt dl
   | Dlogic dl ->
       print_list_opt newline (print_logic_decl drv ctxt) fmt dl
   | Dind _ -> assert false (* TODO *)
-  | Dprop (Paxiom, pr) when
-      Driver.query_ident drv pr.pr_name = Driver.Remove -> false
-  | Dprop (Paxiom, pr) ->
+  | Dprop (Paxiom, pr, _) when
+      Driver.query_ident drv (pr_name pr) = Driver.Remove -> false
+  | Dprop (Paxiom, pr, f) ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n" 
-        print_ident pr.pr_name (print_fmla drv) pr.pr_fmla; true
-  | Dprop (Pgoal, pr) ->
+        print_ident (pr_name pr) (print_fmla drv) f; true
+  | Dprop (Pgoal, pr, f) ->
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
-        print_ident pr.pr_name (print_fmla drv) pr.pr_fmla; true
-  | Dprop (Plemma, _) ->
+        print_ident (pr_name pr) (print_fmla drv) f; true
+  | Dprop (Plemma, _, _) ->
       assert false
   | Duse _ | Dclone _ -> false
 

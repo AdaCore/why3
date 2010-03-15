@@ -164,7 +164,7 @@ exception PredicateSymbolExpected of lsymbol
 let pat_app fs pl ty =
   if not fs.ls_constr then raise (ConstructorExpected fs);
   let s = match fs.ls_value with
-    | Some vty -> Ty.matching Mid.empty vty ty
+    | Some vty -> Ty.matching Mtv.empty vty ty
     | None -> raise (FunctionSymbolExpected fs)
   in
   let mtch s ty p = Ty.matching s ty p.pat_ty in
@@ -260,20 +260,20 @@ and term_branch = pattern * int * term
 
 and fmla_branch = pattern * int * fmla
 
-and trigger_elt =
-  | TrTerm of term
-  | TrFmla of fmla
+and expr =
+  | Term of term
+  | Fmla of fmla
 
-and trigger = trigger_elt list
+and trigger = expr list
 
 (* trigger traversal *)
 
 let tr_map fnT fnF =
-  let fn = function TrTerm t -> TrTerm (fnT t) | TrFmla f -> TrFmla (fnF f) in
+  let fn = function Term t -> Term (fnT t) | Fmla f -> Fmla (fnF f) in
   List.map (List.map fn)
 
 let tr_fold fnT fnF =
-  let fn acc = function TrTerm t -> fnT acc t | TrFmla f -> fnF acc f in
+  let fn acc = function Term t -> fnT acc t | Fmla f -> fnF acc f in
   List.fold_left (List.fold_left fn)
 
 module T = struct
@@ -344,8 +344,8 @@ module F = struct
   let f_eq_bound (v1, f1) (v2, f2) = v1 == v2 && f1 == f2
 
   let tr_eq tr1 tr2 = match tr1,tr2 with
-    | TrTerm t1, TrTerm t2 -> t1 == t2
-    | TrFmla f1, TrFmla f2 -> f1 == f2
+    | Term t1, Term t2 -> t1 == t2
+    | Fmla f1, Fmla f2 -> f1 == f2
     | _ -> false
 
   let f_eq_quant (vl1, n1, tl1, f1) (vl2, n2, tl2, f2) =
@@ -391,7 +391,7 @@ module F = struct
 
   let f_hash_bound (v, f) = Hashcons.combine v.vs_name.id_tag f.f_tag
 
-  let tr_hash = function TrTerm t -> t.t_tag | TrFmla f -> f.f_tag
+  let tr_hash = function Term t -> t.t_tag | Fmla f -> f.f_tag
 
   let f_hash_quant (vl, _, tl, f) =
     let h = Hashcons.combine_list v_hash f.f_tag vl in
@@ -560,7 +560,7 @@ let f_any_unsafe prT prF lvl f =
 
 let t_app fs tl ty =
   let s = match fs.ls_value with
-    | Some vty -> Ty.matching Mid.empty vty ty
+    | Some vty -> Ty.matching Mtv.empty vty ty
     | _ -> raise (FunctionSymbolExpected fs)
   in
   let mtch s ty t = Ty.matching s ty t.t_ty in
@@ -570,7 +570,7 @@ let t_app fs tl ty =
 
 let f_app ps tl =
   let s = match ps.ls_value with
-    | None -> Mid.empty
+    | None -> Mtv.empty
     | _ -> raise (PredicateSymbolExpected ps)
   in
   let mtch s ty t = Ty.matching s ty t.t_ty in

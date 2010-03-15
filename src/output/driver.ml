@@ -233,7 +233,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rremove (c,(loc,q)) -> 
         begin
           try
-            add_htheory c (Transform.find_pr th.th_export q).pr_name Remove
+            add_htheory c (pr_name (Transform.find_pr th.th_export q)) Remove
           with Not_found -> errorm ~loc "Unknown axioms %s" 
             (string_of_qualid qualid q)
         end 
@@ -274,7 +274,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rtagpr (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (Transform.find_pr th.th_export q).pr_name 
+            add_htheory c (pr_name (Transform.find_pr th.th_export q))
               (Tag (Snm.singleton s))
           with Not_found -> errorm ~loc "Unknown proposition %s" 
             (string_of_qualid qualid q)
@@ -390,7 +390,7 @@ let filename_of_goal drv ident_printer filename theory_name ctxt =
   match drv.drv_filename with
     | None -> errorm "no filename syntax given"
     | Some f -> 
-        let pr_name = (Transform.goal_of_ctxt ctxt).pr_name in
+        let pr_name = pr_name (Transform.goal_of_ctxt ctxt) in
         let repl_fun s = 
           let i = matched_group 1 s in
           match i with

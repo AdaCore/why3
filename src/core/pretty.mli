@@ -42,12 +42,12 @@ val print_pat : formatter -> pattern -> unit      (* pattern *)
 val print_term : formatter -> term -> unit        (* term *)
 val print_fmla : formatter -> fmla -> unit        (* formula *)
 
+val print_pkind : formatter -> prop_kind -> unit
+
 val print_type_decl : formatter -> ty_decl -> unit
 val print_logic_decl : formatter -> logic_decl -> unit
 val print_ind_decl : formatter -> ind_decl -> unit
-
-val print_pkind : formatter -> prop_kind -> unit
-val print_prop : formatter -> prop -> unit
+val print_prop_decl : formatter -> prop_decl -> unit
 
 val print_decl : formatter -> decl -> unit
 val print_decls : formatter -> decl list -> unit

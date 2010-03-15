@@ -87,28 +87,17 @@ let elt d =
   match d.d_node with
     | Dlogic l -> 
         let mem = Hid.create 16 in
-        List.iter (function
-                     | Lfunction  (fs,_) as a -> Hid.add mem fs.ls_name a
-                     | Lpredicate (ps,_) as a -> Hid.add mem ps.ls_name a) l;
+        List.iter (fun a -> Hid.add mem (fst a).ls_name a) l;
         let tyoccurences acc _ = acc in
         let loccurences acc ls = 
           if Hid.mem mem ls.ls_name then Sid.add ls.ls_name acc else acc in
         let m = List.fold_left 
-          (fun acc a -> match a with 
-             | Lfunction (fs,l) -> 
-                let s = match l with
-                  | None -> Sid.empty
-                  | Some fd -> 
-                      let fd = fs_defn_axiom fd in
-                      f_s_fold tyoccurences loccurences Sid.empty fd in
-                Mid.add fs.ls_name s acc
-             | Lpredicate (ps,l) -> 
-                let s = match l with
-                  | None -> Sid.empty
-                  | Some fd -> 
-                      let fd = ps_defn_axiom fd in
-                      f_s_fold tyoccurences loccurences Sid.empty fd in
-                Mid.add ps.ls_name s acc) Mid.empty l in
+          (fun acc (ls,ld) -> match ld with 
+             | None -> Mid.add ls.ls_name Sid.empty acc
+             | Some ld -> 
+                 let fd = ls_defn_axiom ld in
+                 let s = f_s_fold tyoccurences loccurences Sid.empty fd in
+                 Mid.add ls.ls_name s acc) Mid.empty l in
           let l = connexe m in
           List.map (fun e -> create_logic_decl (List.map (Hid.find mem) e)) l
     | Dtype l -> 

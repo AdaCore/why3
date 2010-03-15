@@ -23,18 +23,14 @@ open Term
 
 (** Named propositions *)
 
-type prop = private {
-  pr_name : ident;
-  pr_fmla : fmla;
-}
+type prop
 
 module Spr : Set.S with type elt = prop
 module Mpr : Map.S with type key = prop
 module Hpr : Hashtbl.S with type key = prop
 
-val create_prop : preid -> fmla -> prop
-
-val shortcut_for_discussion_dont_be_mad_andrei_please : ident -> fmla -> prop
+val create_prop : preid -> prop
+val pr_name     : prop -> ident
 
 (** Declarations *)
 
@@ -48,25 +44,23 @@ type ty_decl = tysymbol * ty_def
 
 (* logic declaration *)
 
-type fs_defn
-type ps_defn
+type ls_defn
 
-type logic_decl =
-  | Lfunction  of lsymbol * fs_defn option
-  | Lpredicate of lsymbol * ps_defn option
+type logic_decl = lsymbol * ls_defn option
 
-val make_fs_defn : lsymbol -> vsymbol list -> term -> fs_defn
-val make_ps_defn : lsymbol -> vsymbol list -> fmla -> ps_defn
+val make_ls_defn : lsymbol -> vsymbol list -> expr -> ls_defn
+val make_fs_defn : lsymbol -> vsymbol list -> term -> ls_defn
+val make_ps_defn : lsymbol -> vsymbol list -> fmla -> ls_defn
 
-val open_fs_defn : fs_defn -> lsymbol * vsymbol list * term
-val open_ps_defn : ps_defn -> lsymbol * vsymbol list * fmla
+val open_ls_defn : ls_defn -> lsymbol * vsymbol list * expr
+val open_fs_defn : ls_defn -> lsymbol * vsymbol list * term
+val open_ps_defn : ls_defn -> lsymbol * vsymbol list * fmla
 
-val fs_defn_axiom : fs_defn -> fmla
-val ps_defn_axiom : ps_defn -> fmla
+val ls_defn_axiom : ls_defn -> fmla
 
 (* inductive predicate declaration *)
 
-type ind_decl = lsymbol * prop list
+type ind_decl = lsymbol * (prop * fmla) list
 
 (* proposition declaration *)
 
@@ -75,7 +69,7 @@ type prop_kind =
   | Plemma
   | Pgoal
 
-type prop_decl = prop_kind * prop
+type prop_decl = prop_kind * prop * fmla
 
 (** Context and Theory *)
 
@@ -125,9 +119,7 @@ and decl_node =
 val create_ty_decl : ty_decl list -> decl
 val create_logic_decl : logic_decl list -> decl
 val create_ind_decl : ind_decl list -> decl
-val create_prop_decl : prop_kind -> prop -> decl
-
-val prop_decl_of_fmla : prop_kind -> preid -> fmla -> decl
+val create_prop_decl : prop_kind -> prop -> fmla -> decl
 
 (* separate independent groups of declarations *)
 
@@ -139,11 +131,11 @@ val create_ind_decls : ind_decl list -> decl list
 
 exception ConstructorExpected of lsymbol
 exception IllegalTypeAlias of tysymbol
-exception UnboundTypeVar of ident
+exception UnboundTypeVar of tvsymbol
 
-exception InvalidIndDecl of ident * ident
-exception TooSpecificIndDecl of ident * ident * term
-exception NonPositiveIndDecl of ident * ident * lsymbol
+exception InvalidIndDecl of lsymbol * prop
+exception TooSpecificIndDecl of lsymbol * prop * term
+exception NonPositiveIndDecl of lsymbol * prop * lsymbol
 
 exception IllegalConstructor of lsymbol
 exception BadLogicDecl of ident

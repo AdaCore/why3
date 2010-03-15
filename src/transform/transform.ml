@@ -135,10 +135,10 @@ let split_goals =
   let f ctxt0 (ctxt,l) =
     let decl = ctxt0.ctxt_decl in
     match decl.d_node with
-      | Dprop (Pgoal, _) -> (ctxt, add_decl ctxt decl :: l)
-      | Dprop (Plemma, f) ->
-          let d1 = create_prop_decl Paxiom f in
-          let d2 = create_prop_decl Pgoal f in
+      | Dprop (Pgoal, _, _) -> (ctxt, add_decl ctxt decl :: l)
+      | Dprop (Plemma, pr, f) ->
+          let d1 = create_prop_decl Paxiom pr f in
+          let d2 = create_prop_decl Pgoal  pr f in
           (add_decl ctxt d1,
            add_decl ctxt d2 :: l)
       | _ -> (add_decl ctxt decl, l) 
@@ -149,11 +149,9 @@ let split_goals =
 let remove_lemma =
   let f d =
     match d.d_node with
-      | Dprop (Plemma, f) ->
-          let da = create_prop_decl Paxiom 
-            (create_prop (id_clone f.pr_name) f.pr_fmla) in
-          let dg = create_prop_decl Pgoal
-            (create_prop (id_clone f.pr_name) f.pr_fmla) in
+      | Dprop (Plemma, pr, f) ->
+          let da = create_prop_decl Paxiom pr f in
+          let dg = create_prop_decl Pgoal  pr f in
           [dg;da]
       | _ ->  [d]
   in
@@ -163,7 +161,7 @@ exception NotGoalContext
 
 let goal_of_ctxt ctxt =
   match ctxt.ctxt_decl.d_node with
-    | Dprop (Pgoal,pr) -> pr
+    | Dprop (Pgoal,pr,_) -> pr
     | _ -> raise NotGoalContext
 
 let identity = 
@@ -171,58 +169,26 @@ let identity =
     clear = (fun () -> ()); }
 
 let rewrite_elt rt rf d =
+  let re = function
+    | Term t -> Term (rt t)
+    | Fmla f -> Fmla (rf f)
+  in
   match d.d_node with
     | Dtype _ -> [d]
     | Dlogic l -> [create_logic_decl (List.map 
         (function 
-           | Lfunction(ls,Some def) -> 
-               let (ls,vsl,term) = open_fs_defn def in
-               let term = rt term in
-               Lfunction (ls,Some (make_fs_defn ls vsl term))
-           | Lpredicate(ls,Some def) ->
-               let (ls,vsl,fmla) = open_ps_defn def in
-               let fmla = rf fmla in
-               Lpredicate (ls,Some (make_ps_defn ls vsl fmla))
+           | (ls,Some def) -> 
+               let (ls,vsl,expr) = open_ls_defn def in
+               (ls,Some (make_ls_defn ls vsl (re expr)))
            | l -> l) l)]
     | Dind indl -> [create_ind_decl 
         (List.map (fun (ls,pl) -> ls, 
-        (List.map
-           (fun pr -> shortcut_for_discussion_dont_be_mad_andrei_please
-              pr.pr_name (rf pr.pr_fmla)) pl)) indl)]
-    |Dprop (k,pr) -> [create_prop_decl k
-       (shortcut_for_discussion_dont_be_mad_andrei_please
-          pr.pr_name (rf pr.pr_fmla))]
+        (List.map (fun (pr,f) -> (pr, rf f)) pl)) indl)]
+    |Dprop (k,pr,f) -> [create_prop_decl k pr (rf f)]
     |Duse _ |Dclone _ -> [d]
 
 let rewrite_elt rt rf = elt (rewrite_elt rt rf)
 
-let rewrite_map rt rf ctxt1 ctxt2 =
-  let d = ctxt1.ctxt_decl in
-  match d.d_node with
-    | Dtype _ -> add_decl ctxt2 d
-    | Dlogic l -> add_decl ctxt2 (create_logic_decl (List.map 
-        (function 
-           | Lfunction(ls,Some def) -> 
-               let (ls,vsl,term) = open_fs_defn def in
-               let term = rt ctxt1 term in
-               Lfunction (ls,Some (make_fs_defn ls vsl term))
-           | Lpredicate(ls,Some def) ->
-               let (ls,vsl,fmla) = open_ps_defn def in
-               let fmla = rf ctxt1 fmla in
-               Lpredicate (ls,Some (make_ps_defn ls vsl fmla))
-           | l -> l) l))
-    | Dind indl -> add_decl ctxt2 (create_ind_decl 
-        (List.map (fun (ls,pl) -> ls, 
-        (List.map
-           (fun pr -> shortcut_for_discussion_dont_be_mad_andrei_please
-              pr.pr_name (rf ctxt1 pr.pr_fmla)) pl)) indl))
-    |Dprop (k,pr) -> add_decl ctxt2 (create_prop_decl k
-       (shortcut_for_discussion_dont_be_mad_andrei_please
-          pr.pr_name (rf ctxt1 pr.pr_fmla)))
-    |Duse _ |Dclone _ -> add_decl ctxt2 d
-
-let rewrite_map rt rf = map (rewrite_map rt rf)
-  
 let rec find_l ns = function
   | [] -> assert false
   | [a] -> Mnm.find a ns.ns_ls

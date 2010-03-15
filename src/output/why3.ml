@@ -26,7 +26,7 @@ open Term
 open Theory
 open Driver
 
-let iprinter,tprinter,lprinter,cprinter,pprinter =
+let iprinter,tprinter,lprinter,pprinter =
   let bl = ["theory"; "type"; "logic"; "inductive";
             "axiom"; "lemma"; "goal"; "use"; "clone";
             "namespace"; "import"; "export"; "end";
@@ -40,7 +40,6 @@ let iprinter,tprinter,lprinter,cprinter,pprinter =
   create_ident_printer bl ~sanitizer:isanitize,
   create_ident_printer bl ~sanitizer:lsanitize,
   create_ident_printer bl ~sanitizer:lsanitize,
-  create_ident_printer bl ~sanitizer:usanitize,
   create_ident_printer bl ~sanitizer:usanitize
 
 let thash = Hid.create 63
@@ -51,7 +50,6 @@ let forget_all () =
   forget_all iprinter;
   forget_all tprinter;
   forget_all lprinter;
-  forget_all cprinter;
   forget_all pprinter;
   Hid.clear thash;
   Hid.clear lhash;
@@ -61,9 +59,9 @@ let tv_set = ref Sid.empty
 
 (* type variables always start with a quote *)
 let print_tv fmt tv =
-  tv_set := Sid.add tv !tv_set;
+  tv_set := Sid.add (tv_name tv) !tv_set;
   let sanitize n = "'" ^ n in
-  let n = id_unique iprinter ~sanitizer:sanitize tv in
+  let n = id_unique iprinter ~sanitizer:sanitize (tv_name tv) in
   fprintf fmt "%s" n
 
 let forget_tvs () =
@@ -90,12 +88,15 @@ let print_ts fmt ts =
 
 let print_ls fmt ls =
   Hid.replace lhash ls.ls_name ls;
-  if ls.ls_constr then fprintf fmt "%s" (id_unique cprinter ls.ls_name)
-                  else fprintf fmt "%s" (id_unique lprinter ls.ls_name)
+  let n = if ls.ls_constr
+    then id_unique lprinter ~sanitizer:String.capitalize ls.ls_name
+    else id_unique lprinter ls.ls_name
+  in
+  fprintf fmt "%s" n
 
 let print_pr fmt pr =
-  Hid.replace phash pr.pr_name pr;
-  fprintf fmt "%s" (id_unique pprinter pr.pr_name)
+  Hid.replace phash (pr_name pr) pr;
+  fprintf fmt "%s" (id_unique pprinter (pr_name pr))
 
 (** Types *)
 
@@ -250,8 +251,8 @@ and print_tl drv fmt tl =
     (print_list alt (print_list comma (print_tr drv))) tl
 
 and print_tr drv fmt = function
-  | TrTerm t -> print_term drv fmt t
-  | TrFmla f -> print_fmla drv fmt f
+  | Term t -> print_term drv fmt t
+  | Fmla f -> print_fmla drv fmt f
 
 (** Declarations *)
 
@@ -280,33 +281,25 @@ let print_type_decl drv fmt (ts,def) = match def with
 
 let print_type_decl drv fmt d = print_type_decl drv fmt d; forget_tvs ()
 
-let print_logic_decl drv fmt = function
-  | Lfunction (fs,None) ->
-      fprintf fmt "@[<hov 2>logic %a%a :@ %a@]"
-        print_ls fs (print_paren_l (print_ty drv)) fs.ls_args
-          (print_ty drv) (of_option fs.ls_value)
-  | Lpredicate (ps,None) ->
-      fprintf fmt "@[<hov 2>logic %a%a@]"
-        print_ls ps (print_paren_l (print_ty drv)) ps.ls_args
-  | Lfunction (fs,Some fd) ->
-      let _,vl,t = open_fs_defn fd in
-      fprintf fmt "@[<hov 2>logic %a%a :@ %a =@ %a@]"
-        print_ls fs (print_paren_l (print_vsty drv)) vl
-        (print_ty drv) t.t_ty (print_term drv) t;
-      List.iter forget_var vl
-  | Lpredicate (ps,Some fd) ->
-      let _,vl,f = open_ps_defn fd in
-      fprintf fmt "@[<hov 2>logic %a%a =@ %a@]"
-        print_ls ps (print_paren_l (print_vsty drv)) vl
-        (print_fmla drv) f;
-      List.iter forget_var vl
+let print_ld drv fmt ld =
+  let _,vl,e = open_ls_defn ld in
+  begin match e with
+    | Term t -> print_term drv fmt t
+    | Fmla f -> print_fmla drv fmt f
+  end;
+  List.iter forget_var vl
 
-let print_logic_decl drv fmt d = print_logic_decl drv fmt d; forget_tvs ()
+let print_ls_defn drv fmt = option_iter (fprintf fmt " =@ %a" (print_ld drv))
+let print_ls_type drv fmt = option_iter (fprintf fmt " :@ %a" (print_ty drv))
 
-let print_prop drv fmt pr =
-  fprintf fmt "%a : %a" print_pr pr (print_fmla drv) pr.pr_fmla
+let print_logic_decl drv fmt (ls,ld) =
+  fprintf fmt "@[<hov 2>logic %a%a%a%a@]"
+    print_ls ls (print_paren_l (print_ty drv)) ls.ls_args
+    (print_ls_type drv) ls.ls_value (print_ls_defn drv) ld;
+  forget_tvs ()
 
-let print_ind drv fmt pr = fprintf fmt "@[<hov 4>| %a@]" (print_prop drv) pr
+let print_ind drv fmt (pr,f) =
+  fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr (print_fmla drv) f
 
 let print_ind_decl drv fmt (ps,bl) =
   fprintf fmt "@[<hov 2>inductive %a%a =@ @[<hov>%a@]@]"
@@ -318,6 +311,11 @@ let print_pkind fmt = function
   | Paxiom -> fprintf fmt "axiom"
   | Plemma -> fprintf fmt "lemma"
   | Pgoal  -> fprintf fmt "goal"
+
+let print_prop_decl drv fmt (k,pr,f) =
+  fprintf fmt "@[<hov 2>%a %a : %a@]" print_pkind k
+    print_pr pr (print_fmla drv) f;
+  forget_tvs ()
 
 let print_inst fmt (id1,id2) =
   if Hid.mem thash id2 then
@@ -335,11 +333,8 @@ let print_decl drv fmt d = match d.d_node with
   | Dtype tl  -> print_list newline (print_type_decl drv) fmt tl
   | Dlogic ll -> print_list newline (print_logic_decl drv) fmt ll
   | Dind il   -> print_list newline (print_ind_decl drv) fmt il
-  | Dprop (Paxiom, pr) when query_ident drv pr.pr_name == Remove ->
-      ()
-  | Dprop (k,pr) ->
-      fprintf fmt "@[<hov 2>%a %a@]" print_pkind k (print_prop drv) pr;
-      forget_tvs ()
+  | Dprop (Paxiom,pr,_) when query_ident drv (pr_name pr) == Remove -> ()
+  | Dprop p -> print_prop_decl drv fmt p
   | Duse th ->
       fprintf fmt "@[<hov 2>(* use %a *)@]" print_th th
   | Dclone (th,inst) ->

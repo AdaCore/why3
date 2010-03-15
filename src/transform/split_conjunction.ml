@@ -33,13 +33,11 @@ let split_pos =
 
 let elt d =
   match d.d_node with
-    | Dprop (Pgoal,pr) ->
+    | Dprop (Pgoal,pr,f) ->
         begin
           try
-            let l = split_pos pr.pr_fmla in
-            List.map (fun p ->
-                        create_prop_decl Pgoal
-                          (create_prop (Ident.id_clone pr.pr_name) p)) l
+            let l = split_pos f in
+            List.map (fun p -> create_prop_decl Pgoal pr p) l
           with Exit -> [d]
         end
     | _ -> [d]

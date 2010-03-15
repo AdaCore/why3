@@ -21,7 +21,14 @@ open Ident
 
 (** Types *)
 
-type tvsymbol = ident
+type tvsymbol
+
+module Stv : Set.S with type elt = tvsymbol
+module Mtv : Map.S with type key = tvsymbol
+module Htv : Hashtbl.S with type key = tvsymbol
+
+val create_tvsymbol : preid -> tvsymbol
+val tv_name         : tvsymbol -> ident
 
 (* type symbols and types *)
 
@@ -40,17 +47,15 @@ and ty_node = private
   | Tyvar of tvsymbol
   | Tyapp of tysymbol * ty list
 
-exception NonLinear
-exception UnboundTypeVariable
-
-val create_tvsymbol : preid -> tvsymbol
-val create_tysymbol : preid -> tvsymbol list -> ty option -> tysymbol
-
 module Sts : Set.S with type elt = tysymbol
 module Mts : Map.S with type key = tysymbol
 module Hts : Hashtbl.S with type key = tysymbol
 
 exception BadTypeArity
+exception NonLinear
+exception UnboundTypeVariable
+
+val create_tysymbol : preid -> tvsymbol list -> ty option -> tysymbol
 
 val ty_var : tvsymbol -> ty
 val ty_app : tysymbol -> ty list -> ty
@@ -67,8 +72,8 @@ val ty_s_any : (tysymbol -> bool) -> ty -> bool
 
 exception TypeMismatch
 
-val matching : ty Mid.t -> ty -> ty -> ty Mid.t
-val ty_match : ty -> ty -> ty Mid.t -> ty Mid.t option
+val matching : ty Mtv.t -> ty -> ty -> ty Mtv.t
+val ty_match : ty -> ty -> ty Mtv.t -> ty Mtv.t option
 
 (* built-in symbols *)
 

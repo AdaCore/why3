@@ -26,38 +26,16 @@ open Termlib
 
 (** Named propositions *)
 
-type prop = {
-  pr_name : ident;
-  pr_fmla : fmla;
-}
+type prop = ident
 
-module Prop = struct
-  type t = prop
-  let equal = (==)
-  let hash pr = pr.pr_name.id_tag
-  let compare pr1 pr2 =
-    Pervasives.compare pr1.pr_name.id_tag pr2.pr_name.id_tag
-end
-module Mpr = Map.Make(Prop)
-module Spr = Set.Make(Prop)
-module Hpr = Hashtbl.Make(Prop)
+module Spr = Sid
+module Mpr = Mid
+module Hpr = Hid
+
+let create_prop = id_register
+let pr_name x = x
 
 exception UnboundVars of Svs.t
-
-let check_fvs f =
-  let fvs = f_freevars Svs.empty f in
-  if Svs.is_empty fvs then f else raise (UnboundVars fvs)
-
-let create_prop n f = {
-  pr_name = id_register n;
-  pr_fmla = check_fvs f;
-}
-
-let shortcut_for_discussion_dont_be_mad_andrei_please n f =
-{
-  pr_name = n;
-  pr_fmla = check_fvs f;
-}
 
 (** Declarations *)
 
@@ -71,55 +49,61 @@ type ty_decl = tysymbol * ty_def
 
 (* logic declaration *)
 
-type fs_defn = lsymbol * vsymbol list * term * fmla
-type ps_defn = lsymbol * vsymbol list * fmla * fmla
+type ls_defn = lsymbol * vsymbol list * expr * fmla
 
-type logic_decl =
-  | Lfunction  of lsymbol * fs_defn option
-  | Lpredicate of lsymbol * ps_defn option
+type logic_decl = lsymbol * ls_defn option
 
 exception IllegalConstructor of lsymbol
+
+let check_fvs f =
+  let fvs = f_freevars Svs.empty f in
+  if Svs.is_empty fvs then f else raise (UnboundVars fvs)
 
 let make_fs_defn fs vl t =
   if fs.ls_constr then raise (IllegalConstructor fs);
   let hd = t_app fs (List.map t_var vl) t.t_ty in
   let fd = f_forall vl [] (f_equ hd t) in
-  fs, vl, t, check_fvs fd
+  fs, vl, Term t, check_fvs fd
 
 let make_ps_defn ps vl f =
   let hd = f_app ps (List.map t_var vl) in
   let pd = f_forall vl [] (f_iff hd f) in
-  ps, vl, f, check_fvs pd
+  ps, vl, Fmla f, check_fvs pd
 
-let extract_fs_defn f =
+let make_ls_defn ls vl = function
+  | Term t -> make_fs_defn ls vl t
+  | Fmla f -> make_ps_defn ls vl f
+
+let extract_ls_defn f =
   let vl, ef = f_open_forall f in
   match ef.f_node with
     | Fapp (s, [t1; t2]) when s == ps_equ ->
         begin match t1.t_node with
-          | Tapp (fs, _) -> fs, (fs, vl, t2, f)
+          | Tapp (fs, _) -> fs, Some (fs, vl, Term t2, f)
           | _ -> assert false
         end
-    | _ -> assert false
-
-let extract_ps_defn f =
-  let vl, ef = f_open_forall f in
-  match ef.f_node with
     | Fbinop (Fiff, f1, f2) ->
         begin match f1.f_node with
-          | Fapp (ps, _) -> ps, (ps, vl, f2, f)
+          | Fapp (ps, _) -> ps, Some (ps, vl, Fmla f2, f)
           | _ -> assert false
         end
     | _ -> assert false
 
-let open_fs_defn (fs,vl,t,_) = (fs,vl,t)
-let open_ps_defn (ps,vl,f,_) = (ps,vl,f)
+let open_ls_defn (ls,vl,e,_) = (ls,vl,e)
 
-let fs_defn_axiom (_,_,_,fd) = fd
-let ps_defn_axiom (_,_,_,pd) = pd
+let open_fs_defn = function
+  | (fs,vl,Term t,_) -> (fs,vl,t)
+  | _ -> assert false
+
+let open_ps_defn = function
+  | (ps,vl,Fmla f,_) -> (ps,vl,f)
+  | _ -> assert false
+
+let ls_defn_axiom (_,_,_,f) = f
 
 (* inductive predicate declaration *)
 
-type ind_decl = lsymbol * prop list
+type ind_decl = lsymbol * (prop * fmla) list
 
 (* proposition declaration *)
 
@@ -128,7 +112,7 @@ type prop_kind =
   | Plemma
   | Pgoal
 
-type prop_decl = prop_kind * prop
+type prop_decl = prop_kind * prop * fmla
 
 (** Context and Theory *)
 
@@ -193,23 +177,21 @@ module Decl = struct
     | Talgebraic l1, Talgebraic l2 -> for_all2 (==) l1 l2
     | _ -> false
 
-  let eq_fd fs1 fd1 fs2 fd2 = fs1 == fs2 && match fd1,fd2 with
-    | Some (_,_,_,fd1), Some (_,_,_,fd2) -> fd1 == fd2
+  let eq_ld (ls1,ld1) (ls2,ld2) = ls1 == ls2 && match ld1,ld2 with
+    | Some (_,_,_,f1), Some (_,_,_,f2) -> f1 == f2
     | None, None -> true
     | _ -> false
 
-  let eq_ld ld1 ld2 = match ld1,ld2 with
-    | Lfunction  (fs1,fd1), Lfunction  (fs2,fd2) -> eq_fd fs1 fd1 fs2 fd2
-    | Lpredicate (ps1,pd1), Lpredicate (ps2,pd2) -> eq_fd ps1 pd1 ps2 pd2
-    | _ -> false
+  let eq_iax (pr1,fr1) (pr2,fr2) = pr1 == pr1 && fr1 == fr2
 
-  let eq_ind (ps1,al1) (ps2,al2) = ps1 == ps2 && for_all2 (==) al1 al2
+  let eq_ind (ps1,al1) (ps2,al2) = ps1 == ps2 && for_all2 eq_iax al1 al2
 
   let equal d1 d2 = match d1.d_node, d2.d_node with
     | Dtype  l1, Dtype  l2 -> for_all2 eq_td l1 l2
     | Dlogic l1, Dlogic l2 -> for_all2 eq_ld l1 l2
     | Dind   l1, Dind   l2 -> for_all2 eq_ind l1 l2
-    | Dprop (k1,pr1), Dprop (k2,pr2) -> k1 == k2 && pr1 == pr2
+    | Dprop (k1,pr1,f1), Dprop (k2,pr2,f2) ->
+        k1 == k2 && pr1 == pr2 && f1 == f2
     | Duse th1, Duse th2 -> th1.th_name == th2.th_name
     | Dclone (th1,sl1), Dclone (th2,sl2) -> th1.th_name == th2.th_name
         && for_all2 (fun (i,i') (j,j') -> i == j && i' == j') sl1 sl2
@@ -221,23 +203,23 @@ module Decl = struct
         let tag fs = fs.ls_name.id_tag in
         1 + Hashcons.combine_list tag ts.ts_name.id_tag l
 
-  let hs_fd fd = Hashcons.combine_option (fun (_,_,_,f) -> f.f_tag) fd
-
-  let hs_ld ld = match ld with
-    | Lfunction  (fs,fd) -> Hashcons.combine fs.ls_name.id_tag (hs_fd fd)
-    | Lpredicate (ps,pd) -> Hashcons.combine ps.ls_name.id_tag (hs_fd pd)
+  let hs_ld (ls,ld) = Hashcons.combine ls.ls_name.id_tag
+    (Hashcons.combine_option (fun (_,_,_,f) -> f.f_tag) ld)
 
   let hs_ind (ps,al) =
-      let hs_pair pr = pr.pr_name.id_tag in
+    let hs_pair (pr,f) = Hashcons.combine pr.id_tag f.f_tag in
       Hashcons.combine_list hs_pair ps.ls_name.id_tag al
+
+  let hs_kind = function
+    | Paxiom -> 7
+    | Plemma -> 11
+    | Pgoal  -> 13
 
   let hash d = match d.d_node with
     | Dtype  l -> Hashcons.combine_list hs_td 0 l
     | Dlogic l -> Hashcons.combine_list hs_ld 3 l
     | Dind   l -> Hashcons.combine_list hs_ind 5 l
-    | Dprop (Paxiom,pr) -> Hashcons.combine 7  pr.pr_name.id_tag
-    | Dprop (Plemma,pr) -> Hashcons.combine 11 pr.pr_name.id_tag
-    | Dprop (Pgoal, pr) -> Hashcons.combine 13 pr.pr_name.id_tag
+    | Dprop (k,pr,f) -> Hashcons.combine2 (hs_kind k) pr.id_tag f.f_tag
     | Duse th -> Hashcons.combine 17 th.th_name.id_tag
     | Dclone (th,sl) ->
         let tag = Hashcons.combine 19 th.th_name.id_tag in
@@ -260,14 +242,12 @@ let mk_decl n = { d_node = n; d_tag = -1 }
 let create_ty_decl tdl = Hdecl.hashcons (mk_decl (Dtype tdl))
 let create_logic_decl ldl = Hdecl.hashcons (mk_decl (Dlogic ldl))
 let create_ind_decl idl = Hdecl.hashcons (mk_decl (Dind idl))
-let create_prop_decl k p = Hdecl.hashcons (mk_decl (Dprop (k, p)))
+let create_prop_decl k p f = Hdecl.hashcons (mk_decl (Dprop (k,p,f)))
 let create_use_decl th = Hdecl.hashcons (mk_decl (Duse th))
 let create_clone_decl th sl = Hdecl.hashcons (mk_decl (Dclone (th,sl)))
 
-let prop_decl_of_fmla k n f = create_prop_decl k (create_prop n f)
-
 exception ConstructorExpected of lsymbol
-exception UnboundTypeVar of ident
+exception UnboundTypeVar of tvsymbol
 exception IllegalTypeAlias of tysymbol
 exception ClashIdent of ident
 exception BadLogicDecl of ident
@@ -282,14 +262,14 @@ let create_ty_decl tdl =
   let check_constr ty acc fs =
     if not fs.ls_constr then raise (ConstructorExpected fs);
     let vty = of_option fs.ls_value in
-    ignore (Ty.matching Mid.empty vty ty);
+    ignore (Ty.matching Mtv.empty vty ty);
     let add s ty = match ty.ty_node with
-      | Tyvar v -> Sid.add v s
+      | Tyvar v -> Stv.add v s
       | _ -> assert false
     in
-    let vs = ty_fold add Sid.empty vty in
+    let vs = ty_fold add Stv.empty vty in
     let rec check () ty = match ty.ty_node with
-      | Tyvar v -> if not (Sid.mem v vs) then raise (UnboundTypeVar v)
+      | Tyvar v -> if not (Stv.mem v vs) then raise (UnboundTypeVar v)
       | _ -> ty_fold check () ty
     in
     List.iter (check ()) fs.ls_args;
@@ -307,20 +287,16 @@ let create_ty_decl tdl =
 
 let create_logic_decl ldl =
   if ldl = [] then raise EmptyDecl;
-  let check_decl acc = function
-    | Lfunction  (fs, Some (s,_,_,_)) when s != fs ->
-        raise (BadLogicDecl fs.ls_name)
-    | Lpredicate (ps, Some (s,_,_,_)) when s != ps ->
-        raise (BadLogicDecl ps.ls_name)
-    | Lfunction  (fs, _) -> add_id acc fs.ls_name
-    | Lpredicate (ps, _) -> add_id acc ps.ls_name
+  let check_decl acc (ls,ld) = match ld with
+    | Some (s,_,_,_) when s != ls -> raise (BadLogicDecl ls.ls_name)
+    | _ -> add_id acc ls.ls_name
   in
   ignore (List.fold_left check_decl Sid.empty ldl);
   create_logic_decl ldl
 
-exception InvalidIndDecl of ident * ident
-exception TooSpecificIndDecl of ident * ident * term
-exception NonPositiveIndDecl of ident * ident * lsymbol
+exception InvalidIndDecl of lsymbol * prop
+exception TooSpecificIndDecl of lsymbol * prop * term
+exception NonPositiveIndDecl of lsymbol * prop * lsymbol
 
 exception Found of lsymbol
 let ls_mem s sps = if Sls.mem s sps then raise (Found s) else false
@@ -343,8 +319,8 @@ let create_ind_decl idl =
   if idl = [] then raise EmptyDecl;
   let add acc (ps,_) = Sls.add ps acc in
   let sps = List.fold_left add Sls.empty idl in
-  let check_ax ps acc pr =
-    let _, f = f_open_forall pr.pr_fmla in
+  let check_ax ps acc (pr,f) =
+    let _, f = f_open_forall f in
     let rec clause acc f = match f.f_node with
       | Fbinop (Fimplies, g, f) -> clause (g::acc) f
       | _ -> (acc, f)
@@ -354,14 +330,14 @@ let create_ind_decl idl =
       | Fapp (s, tl) when s == ps ->
           let tymatch sb t ty =
             try Ty.matching sb (t.t_ty) ty with TypeMismatch ->
-              raise (TooSpecificIndDecl (ps.ls_name, pr.pr_name, t))
+              raise (TooSpecificIndDecl (ps, pr, t))
           in
-          ignore (List.fold_left2 tymatch Mid.empty tl ps.ls_args);
+          ignore (List.fold_left2 tymatch Mtv.empty tl ps.ls_args);
           (try ignore (List.for_all (f_pos_ps sps (Some true)) cls)
           with Found ls ->
-            raise (NonPositiveIndDecl (ps.ls_name, pr.pr_name, ls)));
-          add_id acc pr.pr_name
-      | _ -> raise (InvalidIndDecl (ps.ls_name, pr.pr_name))
+            raise (NonPositiveIndDecl (ps, pr, ls)));
+          add_id acc (pr_name pr)
+      | _ -> raise (InvalidIndDecl (ps, pr))
   in
   let check_decl acc (ps,al) =
     List.fold_left (check_ax ps) (add_id acc ps.ls_name) al
@@ -406,18 +382,16 @@ let get_ty_dep next loan (ts,td) =
     | Tabstract      -> loan
     | Talgebraic fdl -> List.fold_left cns loan fdl
 
-let get_logic_id = function
-  | Lfunction (fs,_)  -> fs.ls_name
-  | Lpredicate (ps,_) -> ps.ls_name
+let get_logic_id (ls,_) = ls.ls_name
 
-let get_logic_dep next loan ld =
+let get_logic_dep next loan (_,ld) =
   let dts acc _  = acc in
   let dep acc ls = if Sid.mem ls.ls_name next
     then Sid.add ls.ls_name acc else acc in
   match ld with
-    | Lfunction  (_, Some (_,_,t,_)) -> t_s_fold dts dep loan t
-    | Lpredicate (_, Some (_,_,f,_)) -> f_s_fold dts dep loan f
-    | _ -> loan
+    | Some (_,_,Term t,_) -> t_s_fold dts dep loan t
+    | Some (_,_,Fmla f,_) -> f_s_fold dts dep loan f
+    | None                -> loan
 
 let get_ind_id (ps,_) = ps.ls_name
 
@@ -425,7 +399,7 @@ let get_ind_dep next loan (_,al) =
   let dts acc _  = acc in
   let dep acc ls = if Sid.mem ls.ls_name next
     then Sid.add ls.ls_name acc else acc in
-  let prp acc pr = f_s_fold dts dep acc pr.pr_fmla in
+  let prp acc (_,f) = f_s_fold dts dep acc f in
   List.fold_left prp loan al
 
 let create_ty_decls tdl =
@@ -484,8 +458,8 @@ let builtin_name = "BuiltIn"
 let builtin_theory env =
   let decl_int  = create_ty_decl [ts_int, Tabstract] in
   let decl_real = create_ty_decl [ts_real, Tabstract] in
-  let decl_equ  = create_logic_decl [Lpredicate (ps_equ, None)] in
-  let decl_neq  = create_logic_decl [Lpredicate (ps_neq, None)] in
+  let decl_equ  = create_logic_decl [ps_equ, None] in
+  let decl_neq  = create_logic_decl [ps_neq, None] in
 
   let kn_int    = Mid.add ts_int.ts_name decl_int Mid.empty in
   let kn_real   = Mid.add ts_real.ts_name decl_real kn_int in
@@ -624,29 +598,24 @@ module Context = struct
       | Tabstract -> option_iter (known_ty kn) ts.ts_def
       | Talgebraic lfs -> List.iter check_constr lfs
 
-  let add_logic d kn = function
-    | Lfunction  (fs, df) -> add_known fs.ls_name d kn
-    | Lpredicate (ps, dp) -> add_known ps.ls_name d kn
+  let add_logic d kn (ls,_) = add_known ls.ls_name d kn
 
-  let check_logic kn d =
-    let check chk (_,_,e,_) = chk e in
-    match d with
-      | Lfunction (fs, df) ->
-          known_ty kn (of_option fs.ls_value);
-          List.iter (known_ty kn) fs.ls_args;
-          option_iter (check (known_term kn)) df
-      | Lpredicate (ps, dp) ->
-          List.iter (known_ty kn) ps.ls_args;
-          option_iter (check (known_fmla kn)) dp
+  let check_logic kn (ls,ld) =
+    List.iter (known_ty kn) ls.ls_args;
+    option_iter (known_ty kn) ls.ls_value;
+    match ld with
+      | Some (_,_,Term t,_) -> known_term kn t
+      | Some (_,_,Fmla f,_) -> known_fmla kn f
+      | None                -> ()
 
   let add_ind d kn (ps,la) =
       let kn = add_known ps.ls_name d kn in
-      let add kn pr = add_known pr.pr_name d kn in
+      let add kn (pr,_) = add_known pr d kn in
       List.fold_left add kn la
 
   let check_ind kn (ps,la) =
       List.iter (known_ty kn) ps.ls_args;
-      let check pr = known_fmla kn pr.pr_fmla in
+      let check (_,f) = known_fmla kn f in
       List.iter check la
 
   let add_decl ctxt d =
@@ -656,7 +625,7 @@ module Context = struct
         | Dtype dl  -> List.fold_left (add_type d) kn dl
         | Dlogic dl -> List.fold_left (add_logic d) kn dl
         | Dind dl   -> List.fold_left (add_ind d) kn dl
-        | Dprop (k,pr) -> add_known pr.pr_name d kn
+        | Dprop (_,pr,_) -> add_known pr d kn
         | Duse th -> add_known th.th_name d kn
         | Dclone _ -> kn
       in
@@ -664,7 +633,7 @@ module Context = struct
         | Dtype dl  -> List.iter (check_type kn) dl
         | Dlogic dl -> List.iter (check_logic kn) dl
         | Dind dl   -> List.iter (check_ind kn) dl
-        | Dprop (_,pr) -> known_fmla kn pr.pr_fmla
+        | Dprop (_,_,f) -> known_fmla kn f
         | Duse _ | Dclone _ -> ()
       in
       push_decl ctxt kn d
@@ -704,9 +673,9 @@ module Context = struct
       ignore (add_known th.th_name d ctxt.ctxt_known);
       let add_decl ctxt d = match d.d_node with
         | Duse th -> use_export true ctxt th
-        | Dprop (Pgoal,_) when hide -> ctxt
-        | Dprop (Plemma,pr) when hide ->
-            add_decl ctxt (create_prop_decl Paxiom pr)
+        | Dprop (Pgoal,_,_) when hide -> ctxt
+        | Dprop (Plemma,pr,f) when hide ->
+            add_decl ctxt (create_prop_decl Paxiom pr f)
         | _ -> add_decl ctxt d
       in
       let decls = get_decls th.th_ctxt in
@@ -746,7 +715,7 @@ module Context = struct
 
   let cl_add_pr cl pr pr' =
     Hpr.add cl.pr_table pr pr';
-    Hid.add cl.id_table pr.pr_name pr'.pr_name
+    Hid.add cl.id_table pr pr'
 
   let rec cl_find_ts cl ts =
     if not (Sid.mem ts.ts_name cl.id_local) then ts
@@ -772,11 +741,10 @@ module Context = struct
   let cl_trans_fmla cl f = f_s_map (cl_find_ts cl) (cl_find_ls cl) f
 
   let cl_find_pr cl pr =
-    if not (Sid.mem pr.pr_name cl.id_local) then pr
+    if not (Sid.mem pr cl.id_local) then pr
     else try Hpr.find cl.pr_table pr
     with Not_found ->
-      let f' = cl_trans_fmla cl pr.pr_fmla in
-      let pr' = create_prop (id_dup pr.pr_name) f' in
+      let pr' = create_prop (id_dup pr) in
       cl_add_pr cl pr pr';
       pr'
 
@@ -793,29 +761,16 @@ module Context = struct
       in
       (ts', def') :: acc
 
-  let cl_add_logic cl inst_ls acc = function
-    | Lfunction (ls, Some _) | Lpredicate (ls, Some _)
-      when Mls.mem ls inst_ls ->
-        raise (CannotInstantiate ls.ls_name)
-    | Lfunction (ls, Some (_,_,_,f)) ->
-        let f' = cl_trans_fmla cl f in
-        let ls', def' = extract_fs_defn f' in
-        Lfunction (ls', Some def') :: acc
-    | Lpredicate (_, Some (_,_,_,f)) ->
-        let f' = cl_trans_fmla cl f in
-        let ls', def' = extract_ps_defn f' in
-        Lpredicate (ls', Some def') :: acc
-    | Lfunction (ls, None) | Lpredicate (ls, None)
-      when Mls.mem ls inst_ls ->
-        acc
-    | Lfunction (ls, None) ->
-        Lfunction (cl_find_ls cl ls, None) :: acc
-    | Lpredicate (ls, None) ->
-        Lpredicate (cl_find_ls cl ls, None) :: acc
+  let cl_add_logic cl inst_ls acc (ls,ld) = match ld with
+    | Some _ when Mls.mem ls inst_ls -> raise (CannotInstantiate ls.ls_name)
+    | Some (_,_,_,f) -> extract_ls_defn (cl_trans_fmla cl f) :: acc
+    | None when Mls.mem ls inst_ls -> acc
+    | None -> (cl_find_ls cl ls, None) :: acc
 
   let cl_add_ind cl inst_ls (ps,la) =
     if Mls.mem ps inst_ls then raise (CannotInstantiate ps.ls_name);
-    cl_find_ls cl ps, List.map (cl_find_pr cl) la
+    let find (pr,f) = (cl_find_pr cl pr, cl_trans_fmla cl f) in
+    cl_find_ls cl ps, List.map find la
 
   let cl_add_decl cl inst acc d = match d.d_node with
     | Dtype tyl ->
@@ -829,17 +784,17 @@ module Context = struct
     | Dind indl ->
         let add = cl_add_ind cl inst.inst_ls in
         create_ind_decl (List.map add indl) :: acc
-    | Dprop (Pgoal, _) ->
+    | Dprop (Pgoal, _, _) ->
         acc
-    | Dprop (Plemma, pr) when Spr.mem pr inst.inst_goal ->
+    | Dprop (Plemma, pr, _) when Spr.mem pr inst.inst_goal ->
         acc
-    | Dprop (k, pr) ->
+    | Dprop (k, pr, f) ->
         let k = match k with
           | Paxiom when Spr.mem pr inst.inst_lemma -> Plemma
           | Paxiom when Spr.mem pr inst.inst_goal  -> Pgoal
           | _                                      -> Paxiom
         in
-        create_prop_decl k (cl_find_pr cl pr) :: acc
+        create_prop_decl k (cl_find_pr cl pr) (cl_trans_fmla cl f) :: acc
     | Duse _ | Dclone _ ->
         d :: acc
 
@@ -861,16 +816,16 @@ module Context = struct
         with TypeMismatch -> raise (BadInstance (id, ls'.ls_name))
       in
       let sb = match ls.ls_value,ls'.ls_value with
-        | Some ty, Some ty' -> tymatch Mid.empty ty ty'
-        | None, None -> Mid.empty
+        | Some ty, Some ty' -> tymatch Mtv.empty ty ty'
+        | None, None -> Mtv.empty
         | _ -> raise (BadInstance (id, ls'.ls_name))
       in
       ignore (try List.fold_left2 tymatch sb ls.ls_args ls'.ls_args
       with Invalid_argument _ -> raise (BadInstance (id, ls'.ls_name)));
       cl_add_ls cl ls ls'
     in
-    let check_pr pr = let id = pr.pr_name in
-      if not (Sid.mem id th.th_local) then raise (NonLocal id);
+    let check_pr pr =
+      if not (Sid.mem pr th.th_local) then raise (NonLocal pr);
     in
     Mts.iter check_ts inst.inst_ts;
     Mls.iter check_ls inst.inst_ls;
@@ -1020,7 +975,7 @@ module TheoryUC = struct
       then Hts.find cl.Context.ts_table ts else ts in
     let find_ls ls = if Sid.mem ls.ls_name th.th_local
       then Hls.find cl.Context.ls_table ls else ls in
-    let find_pr pr = if Sid.mem pr.pr_name th.th_local
+    let find_pr pr = if Sid.mem pr th.th_local
       then Hpr.find cl.Context.pr_table pr else pr in
     let f_ts n ts ns = add_ts true n (find_ts ts) ns in
     let f_ls n ls ns = add_ls true n (find_ls ls) ns in
@@ -1052,13 +1007,11 @@ module TheoryUC = struct
       | Tabstract -> uc
       | Talgebraic lfs -> List.fold_left add_constr uc lfs
 
-  let add_logic uc = function
-    | Lfunction  (fs,_) -> add_symbol add_ls fs.ls_name fs uc
-    | Lpredicate (ps,_) -> add_symbol add_ls ps.ls_name ps uc
+  let add_logic uc (ls,_) = add_symbol add_ls ls.ls_name ls uc
 
   let add_ind uc (ps,la) =
     let uc = add_symbol add_ls ps.ls_name ps uc in
-    let add uc pr = add_symbol add_pr pr.pr_name pr uc in
+    let add uc (pr,_) = add_symbol add_pr pr pr uc in
     List.fold_left add uc la
 
   let add_decl uc d =
@@ -1066,7 +1019,7 @@ module TheoryUC = struct
       | Dtype dl  -> List.fold_left add_type uc dl
       | Dlogic dl -> List.fold_left add_logic uc dl
       | Dind dl   -> List.fold_left add_ind uc dl
-      | Dprop (_, pr) -> add_symbol add_pr pr.pr_name pr uc
+      | Dprop (_,pr,_) -> add_symbol add_pr pr pr uc
       | Dclone _ | Duse _ -> uc
     in
     { uc with uc_ctxt = Context.add_decl uc.uc_ctxt d }
