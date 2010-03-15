@@ -135,12 +135,14 @@ let transform env l =
 *)
 
 
-let extract_goals env drv acc th =
-  let ctxt = Context.use_export (Context.init_context env) th in
-  let ctxt = Driver.apply_before_split drv ctxt in
-  let l = Transform.apply Transform.split_goals ctxt in
-  let l = List.rev_map (fun ctxt -> (th,ctxt)) l in
-  List.rev_append l acc
+let extract_goals = 
+  let split_goals = Transform.split_goals () in
+  fun env drv acc th ->
+    let ctxt = Context.use_export (Context.init_context env) th in
+    let ctxt = Driver.apply_before_split drv ctxt in
+    let l = Transform.apply split_goals ctxt in
+    let l = List.rev_map (fun ctxt -> (th,ctxt)) l in
+    List.rev_append l acc
 
 let file_sanitizer = Ident.sanitizer Ident.char_to_alnumus Ident.char_to_alnumus
 

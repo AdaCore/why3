@@ -29,6 +29,7 @@ type 'a t = {
 }
 
 type ctxt_t = context t
+type ctxt_list_t = context list t
 
 let conv_res f c = 
   { all = (fun x -> c (f.all x));
@@ -37,6 +38,15 @@ let conv_res f c =
 let compose f g =
   { all = (fun x -> g.all (f.all x));
     clear = (fun () -> f.clear (); g.clear ()); }
+
+let compose' f g =
+  { all = (fun x -> List.fold_left (fun acc l -> List.rev_append (g.all l) acc)
+             [] (f.all x));
+    clear = (fun () -> f.clear (); g.clear ()); }
+
+let singleton f =
+  { all = (fun x -> [f.all x]);
+    clear = f.clear}
 
 let apply f x = f.all x
 
@@ -66,7 +76,7 @@ let register f =
   let memo_t = Hashtbl.create 17 in
   t (memo f ctxt_tag memo_t) (fun () -> Hashtbl.clear memo_t)
 
-let fold_env f_fold v_empty =
+let fold f_fold v_empty =
   let memo_t = Hashtbl.create 64 in
   let rewind env todo =
     List.fold_left
@@ -89,18 +99,51 @@ let fold_env f_fold v_empty =
   in
   t (f []) (fun () -> Hashtbl.clear memo_t)
 
-let fold f acc = fold_env f (fun _ -> acc)
+let fold' (f_fold:context -> 'a -> 'a list) v_empty =
+  let memo_t = Hashtbl.create 64 in
+  let rewind env todo =
+    List.fold_left
+      (fun env ctxt ->
+         let env = List.fold_left 
+           (fun acc e -> List.rev_append (f_fold ctxt e) acc) [] env in
+         Hashtbl.add memo_t ctxt.ctxt_tag env;
+         env) 
+      env todo 
+  in
+  let rec f todo ctxt = 
+    match ctxt.ctxt_prev with
+      | None -> 
+	  rewind [v_empty ctxt.ctxt_env] todo
+      | Some ctxt2 ->
+          try
+            let env = Hashtbl.find memo_t ctxt2.ctxt_tag in
+            rewind env (ctxt :: todo)
+          with Not_found -> 
+	    f (ctxt :: todo) ctxt2
+  in
+  t (f []) (fun () -> Hashtbl.clear memo_t)
 
 let fold_map f_fold v_empty =
-  let v_empty env = v_empty, init_context env in
-  conv_res (fold_env f_fold v_empty) snd
+  let v_empty env = v_empty env, init_context env in
+  conv_res (fold f_fold v_empty) snd
+
+let fold_map' f_fold v_empty =
+  let v_empty env = v_empty env, init_context env in
+  conv_res (fold' f_fold v_empty) (List.map snd)
 
 let map f_map =
-  fold_map (fun ctxt1 ctxt2 -> (), f_map ctxt1 (snd ctxt2)) ()
+  fold (fun ctxt1 ctxt2 -> f_map ctxt1 ctxt2) init_context
+
+let map' f_map =
+  fold' (fun ctxt1 ctxt2 -> f_map ctxt1 ctxt2) init_context
 
 let map_concat f_elt = 
   let f_elt ctxt0 ctxt = List.fold_left add_decl ctxt (f_elt ctxt0) in
   map f_elt
+
+let map_concat' f_elt = 
+  let f_elt ctxt0 ctxt = List.map (List.fold_left add_decl ctxt) (f_elt ctxt0) in
+  map' f_elt
 
 
 let elt f_elt = 
@@ -108,6 +151,30 @@ let elt f_elt =
   let f_elt ctxt0 = memo f_elt d_tag memo_elt ctxt0.ctxt_decl in
   let f = map_concat f_elt in
   { f with clear = fun () -> Hashtbl.clear memo_elt; f.clear () }
+
+let elt' f_elt = 
+  let memo_elt = Hashtbl.create 64 in
+  let f_elt ctxt0 = memo f_elt d_tag memo_elt ctxt0.ctxt_decl in
+  let f = map_concat' f_elt in
+  { f with clear = fun () -> Hashtbl.clear memo_elt; f.clear () }
+    
+let elt_env f_elt = 
+  let f_elt env = 
+    let memo_elt = Hashtbl.create 64 in
+    memo (f_elt env) d_tag memo_elt in
+  let memo_env = Hashtbl.create 2 in
+  let f_elt ctxt = (memo f_elt env_tag memo_env ctxt.ctxt_env) ctxt.ctxt_decl in
+  let f = map_concat f_elt in
+  { f with clear = fun () -> Hashtbl.clear memo_env; f.clear () }
+
+let elt_env' f_elt = 
+  let f_elt env = 
+    let memo_elt = Hashtbl.create 64 in
+    memo (f_elt env) d_tag memo_elt in
+  let memo_env = Hashtbl.create 2 in
+  let f_elt ctxt = (memo f_elt env_tag memo_env ctxt.ctxt_env) ctxt.ctxt_decl in
+  let f = map_concat' f_elt in
+  { f with clear = fun () -> Hashtbl.clear memo_env; f.clear () }
     
 (* Utils *)
 
@@ -131,7 +198,7 @@ let fold_context_of_decl f ctxt env ctxt_done d =
   let env,decls = f ctxt env d in
   env,List.fold_left add_decl ctxt_done decls
   
-let split_goals =
+let split_goals () =
   let f ctxt0 (ctxt,l) =
     let decl = ctxt0.ctxt_decl in
     match decl.d_node with
@@ -143,7 +210,7 @@ let split_goals =
            add_decl ctxt d2 :: l)
       | _ -> (add_decl ctxt decl, l) 
   in
-  let g = fold_env f (fun env -> init_context env, []) in
+  let g = fold f (fun env -> init_context env, []) in
   conv_res g snd
 
 let remove_lemma =
@@ -184,17 +251,25 @@ let rewrite_elt rt rf d =
     |Dprop (k,pr,f) -> [create_prop_decl k pr (rf f)]
     |Duse _ |Dclone _ -> [d]
 
+let rewrite_env rt rf env =
+  let rt =  rt env in
+  let rf = rf env in
+  rewrite_elt rt rf
+
 let rewrite_elt rt rf = elt (rewrite_elt rt rf)
 
-let rec find_l ns = function
+let rewrite_env rt rf =
+  elt_env (rewrite_env rt rf)
+  
+let rec find_ls ns = function
   | [] -> assert false
   | [a] -> Mnm.find a ns.ns_ls
-  | a::l -> find_l (Mnm.find a ns.ns_ns) l
+  | a::l -> find_ls (Mnm.find a ns.ns_ns) l
       
-let rec find_ty ns = function
+let rec find_ts ns = function
   | [] -> assert false
   | [a] -> Mnm.find a ns.ns_ts
-  | a::l -> find_ty (Mnm.find a ns.ns_ns) l
+  | a::l -> find_ts (Mnm.find a ns.ns_ns) l
   
 let rec find_pr ns = function
   | [] -> assert false

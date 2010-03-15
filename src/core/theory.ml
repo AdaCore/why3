@@ -515,6 +515,7 @@ let find_theory env sl s =
   try Mnm.find s m
   with Not_found -> raise (TheoryNotFound (sl, s))
 
+let env_tag env = env.env_tag
 
 (** Context constructors and utilities *)
 

@@ -153,6 +153,8 @@ exception TheoryNotFound of string list * string
 
 val find_theory : env -> string list -> string -> theory
 
+val env_tag : env -> int
+
 (** Context constructors and utilities *)
 
 type th_inst = {

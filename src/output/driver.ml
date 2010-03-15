@@ -240,7 +240,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rsyntaxls ((loc,q),s) -> 
         begin
           try
-            let ls = (Transform.find_l th.th_export q) in
+            let ls = (Transform.find_ls th.th_export q) in
             check_syntax loc s (List.length ls.ls_args);
             add_htheory false ls.ls_name (Syntax s)
           with Not_found -> errorm ~loc "Unknown logic %s" 
@@ -249,7 +249,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rsyntaxty ((loc,q),s) -> 
         begin
           try
-            let ts = Transform.find_ty th.th_export q in
+            let ts = Transform.find_ts th.th_export q in
             check_syntax loc s (List.length ts.ts_args);
             add_htheory false ts.ts_name (Syntax s)
           with Not_found -> errorm ~loc "Unknown type %s" 
@@ -258,7 +258,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rtagls (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (Transform.find_l th.th_export q).ls_name 
+            add_htheory c (Transform.find_ls th.th_export q).ls_name 
               (Tag (Snm.singleton s))
           with Not_found -> errorm ~loc "Unknown logic %s" 
             (string_of_qualid qualid q)
@@ -266,7 +266,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rtagty (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (Transform.find_ty th.th_export q).ts_name 
+            add_htheory c (Transform.find_ts th.th_export q).ts_name 
               (Tag (Snm.singleton s))
           with Not_found -> errorm ~loc "Unknown type %s" 
             (string_of_qualid qualid q)
