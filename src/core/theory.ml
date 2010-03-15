@@ -516,6 +516,7 @@ let find_theory env sl s =
 
 let env_tag env = env.env_tag
 
+
 (** Context constructors and utilities *)
 
 type th_inst = {
@@ -854,6 +855,21 @@ module Context = struct
   let use_export ctxt th = use_export false ctxt th
 
 end
+
+
+(** Namespace search tools *)
+
+let rec ns_find get_map ns = function
+  | []   -> assert false
+  | [a]  -> Mnm.find a (get_map ns)
+  | a::l -> ns_find get_map (Mnm.find a ns.ns_ns) l
+
+let ns_find_ts = ns_find (fun ns -> ns.ns_ts)
+let ns_find_ls = ns_find (fun ns -> ns.ns_ls)
+let ns_find_pr = ns_find (fun ns -> ns.ns_pr)
+
+let ns_find_prop ns sl = fst (ns_find_pr ns sl)
+let ns_find_fmla ns sl = snd (ns_find_pr ns sl)
 
 
 (** Theory constructors and utilities *)

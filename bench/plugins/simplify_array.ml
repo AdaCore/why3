@@ -13,8 +13,8 @@ let make_rt_rf h =
   let rec rt env t =
     let t = t_map (rt env) (rf env) t in
     let array  = find_theory env prelude array in
-    let store  = (find_ls array.th_export store).ls_name in
-    let select = (find_ls array.th_export select).ls_name in
+    let store  = (ns_find_ls array.th_export store).ls_name in
+    let select = (ns_find_ls array.th_export select).ls_name in
     match t.t_node with
       | Tapp (lselect,[{t_node=Tapp(lstore,[_;a1;b])};a2])
           when lselect.ls_name == select &&

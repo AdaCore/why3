@@ -234,14 +234,14 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
         begin
           try
             add_htheory c 
-              (pr_name (fst (Transform.find_pr th.th_export q))) Remove
+              (pr_name (ns_find_prop th.th_export q)) Remove
           with Not_found -> errorm ~loc "Unknown axioms %s" 
             (string_of_qualid qualid q)
         end 
     | Rsyntaxls ((loc,q),s) -> 
         begin
           try
-            let ls = (Transform.find_ls th.th_export q) in
+            let ls = ns_find_ls th.th_export q in
             check_syntax loc s (List.length ls.ls_args);
             add_htheory false ls.ls_name (Syntax s)
           with Not_found -> errorm ~loc "Unknown logic %s" 
@@ -250,7 +250,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rsyntaxty ((loc,q),s) -> 
         begin
           try
-            let ts = Transform.find_ts th.th_export q in
+            let ts = ns_find_ts th.th_export q in
             check_syntax loc s (List.length ts.ts_args);
             add_htheory false ts.ts_name (Syntax s)
           with Not_found -> errorm ~loc "Unknown type %s" 
@@ -259,7 +259,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rtagls (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (Transform.find_ls th.th_export q).ls_name 
+            add_htheory c (ns_find_ls th.th_export q).ls_name 
               (Tag (Snm.singleton s))
           with Not_found -> errorm ~loc "Unknown logic %s" 
             (string_of_qualid qualid q)
@@ -267,7 +267,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rtagty (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (Transform.find_ts th.th_export q).ts_name 
+            add_htheory c (ns_find_ts th.th_export q).ts_name 
               (Tag (Snm.singleton s))
           with Not_found -> errorm ~loc "Unknown type %s" 
             (string_of_qualid qualid q)
@@ -275,7 +275,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rtagpr (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (pr_name (fst (Transform.find_pr th.th_export q)))
+            add_htheory c (pr_name (ns_find_prop th.th_export q))
               (Tag (Snm.singleton s))
           with Not_found -> errorm ~loc "Unknown proposition %s" 
             (string_of_qualid qualid q)

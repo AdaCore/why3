@@ -191,6 +191,15 @@ module Context : sig
 
 end
 
+(** Namespace search tools *)
+
+val ns_find_ts   : namespace -> string list -> tysymbol
+val ns_find_ls   : namespace -> string list -> lsymbol
+val ns_find_pr   : namespace -> string list -> prop_fmla
+
+val ns_find_prop : namespace -> string list -> prop
+val ns_find_fmla : namespace -> string list -> fmla
+
 (** Theory constructors and utilities *)
 
 type theory_uc  (* a theory under construction *)

@@ -261,22 +261,6 @@ let rewrite_elt rt rf = elt (rewrite_elt rt rf)
 let rewrite_env rt rf =
   elt_env (rewrite_env rt rf)
   
-let rec find_ls ns = function
-  | [] -> assert false
-  | [a] -> Mnm.find a ns.ns_ls
-  | a::l -> find_ls (Mnm.find a ns.ns_ns) l
-      
-let rec find_ts ns = function
-  | [] -> assert false
-  | [a] -> Mnm.find a ns.ns_ts
-  | a::l -> find_ts (Mnm.find a ns.ns_ns) l
-  
-let rec find_pr ns = function
-  | [] -> assert false
-  | [a] -> Mnm.find a ns.ns_pr
-  | a::l -> find_pr (Mnm.find a ns.ns_ns) l
-
-
 let cloned_from ctxt i1 i2 = 
   try
     i1 = i2 || Sid.mem i2 (Mid.find i1 ctxt.ctxt_cloned)
