@@ -169,17 +169,14 @@ let identity =
     clear = (fun () -> ()); }
 
 let rewrite_elt rt rf d =
-  let re = function
-    | Term t -> Term (rt t)
-    | Fmla f -> Fmla (rf f)
-  in
   match d.d_node with
     | Dtype _ -> [d]
     | Dlogic l -> [create_logic_decl (List.map 
         (function 
            | (ls,Some def) -> 
                let (ls,vsl,expr) = open_ls_defn def in
-               (ls,Some (make_ls_defn ls vsl (re expr)))
+               let expr = e_map rt rf expr in
+               (ls,Some (make_ls_defn ls vsl expr))
            | l -> l) l)]
     | Dind indl -> [create_ind_decl 
         (List.map (fun (ls,pl) -> ls, 

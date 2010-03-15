@@ -266,15 +266,14 @@ and expr =
 
 and trigger = expr list
 
-(* trigger traversal *)
+(* expr and trigger traversal *)
 
-let tr_map fnT fnF =
-  let fn = function Term t -> Term (fnT t) | Fmla f -> Fmla (fnF f) in
-  List.map (List.map fn)
+let e_map fnT fnF = function Term t -> Term (fnT t) | Fmla f -> Fmla (fnF f)
+let e_fold fnT fnF acc = function Term t -> fnT acc t | Fmla f -> fnF acc f
+let e_apply fnT fnF = function Term t -> fnT t | Fmla f -> fnF f
 
-let tr_fold fnT fnF =
-  let fn acc = function Term t -> fnT acc t | Fmla f -> fnF acc f in
-  List.fold_left (List.fold_left fn)
+let tr_map fnT fnF = List.map (List.map (e_map fnT fnF))
+let tr_fold fnT fnF = List.fold_left (List.fold_left (e_fold fnT fnF))
 
 module T = struct
 

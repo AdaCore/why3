@@ -70,9 +70,8 @@ let make_ps_defn ps vl f =
   let pd = f_forall vl [] (f_iff hd f) in
   ps, vl, Fmla f, check_fvs pd
 
-let make_ls_defn ls vl = function
-  | Term t -> make_fs_defn ls vl t
-  | Fmla f -> make_ps_defn ls vl f
+let make_ls_defn ls vl =
+  e_apply (make_fs_defn ls vl) (make_ps_defn ls vl)
 
 let extract_ls_defn f =
   let vl, ef = f_open_forall f in

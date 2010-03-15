@@ -128,11 +128,9 @@ let rec print_fmla drv fmt f = match f.f_node with
   | Fcase _ ->
       assert false
 
-and print_trigger drv fmt = function
-  | Term t -> (print_term drv) fmt t
-  | Fmla f -> (print_fmla drv) fmt f
+and print_expr drv fmt = e_apply (print_term drv fmt) (print_fmla drv fmt)
 
-and print_triggers drv fmt tl = print_list comma (print_trigger drv) fmt tl
+and print_triggers drv fmt tl = print_list comma (print_expr drv) fmt tl
 
 
 let print_logic_binder drv fmt v =
@@ -150,22 +148,6 @@ let print_type_decl drv fmt = function
 
 let ac_th = ["algebra";"AC"]
 
-
-let print_ld drv fmt ld =
-  let _,vl,e = open_ls_defn ld in
-  begin match e with
-    | Term t -> print_term drv fmt t
-    | Fmla f -> print_fmla drv fmt f
-  end;
-  List.iter forget_var vl
-
-let print_ls_defn drv fmt = 
-  Util.option_iter (fprintf fmt " =@ %a" (print_ld drv))
-
-let print_ls_type drv fmt = function
-  | Some ty -> print_type drv fmt ty
-  | None -> fprintf fmt "prop"
-
 let print_logic_decl drv ctxt fmt (ls,ld) =
   match Driver.query_ident drv ls.ls_name with
     | Driver.Remove | Driver.Syntax _ -> false
@@ -176,7 +158,7 @@ let print_logic_decl drv ctxt fmt (ls,ld) =
               fprintf fmt "@[<hov 2>logic %s%a : %a -> %a@]@\n"
                 sac print_ident ls.ls_name
                 (print_list comma (print_type drv)) ls.ls_args 
-                (print_ls_type drv) ls.ls_value
+                (print_option_or_default "prop" (print_type drv)) ls.ls_value
           | Some ld ->
               let _,vl,e = open_ls_defn ld in
               begin match e with
@@ -188,7 +170,7 @@ let print_logic_decl drv ctxt fmt (ls,ld) =
                       (print_type drv) (Util.of_option ls.ls_value) 
                       (print_term drv) t
                 | Fmla f ->
-                    fprintf fmt "@[<hov 2>predicate %a(%a) = %a@]"
+                    fprintf fmt "@[<hov 2>predicate %a(%a) =@ %a@]"
 	              print_ident ls.ls_name 
                       (print_list comma (print_logic_binder drv)) vl 
                       (print_fmla drv) f

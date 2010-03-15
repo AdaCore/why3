@@ -248,11 +248,9 @@ and print_fbranch drv fmt br =
 
 and print_tl drv fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
-    (print_list alt (print_list comma (print_tr drv))) tl
+    (print_list alt (print_list comma (print_expr drv))) tl
 
-and print_tr drv fmt = function
-  | Term t -> print_term drv fmt t
-  | Fmla f -> print_fmla drv fmt f
+and print_expr drv fmt = e_apply (print_term drv fmt) (print_fmla drv fmt)
 
 (** Declarations *)
 
@@ -281,21 +279,18 @@ let print_type_decl drv fmt (ts,def) = match def with
 
 let print_type_decl drv fmt d = print_type_decl drv fmt d; forget_tvs ()
 
-let print_ld drv fmt ld =
+let print_ls_defn drv fmt ld =
   let _,vl,e = open_ls_defn ld in
-  begin match e with
-    | Term t -> print_term drv fmt t
-    | Fmla f -> print_fmla drv fmt f
-  end;
+  fprintf fmt " =@ %a" (print_expr drv) e;
   List.iter forget_var vl
 
-let print_ls_defn drv fmt = option_iter (fprintf fmt " =@ %a" (print_ld drv))
-let print_ls_type drv fmt = option_iter (fprintf fmt " :@ %a" (print_ty drv))
+let print_ls_type drv fmt = fprintf fmt " :@ %a" (print_ty drv)
 
 let print_logic_decl drv fmt (ls,ld) =
   fprintf fmt "@[<hov 2>logic %a%a%a%a@]"
     print_ls ls (print_paren_l (print_ty drv)) ls.ls_args
-    (print_ls_type drv) ls.ls_value (print_ls_defn drv) ld;
+    (print_option (print_ls_type drv)) ls.ls_value
+    (print_option (print_ls_defn drv)) ld;
   forget_tvs ()
 
 let print_ind drv fmt (pr,f) =

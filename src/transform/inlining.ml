@@ -95,15 +95,12 @@ let fold isnotinlinedt isnotinlinedf ctxt0 (env, ctxt) =
           (List.map (fun (ps,fmlal) -> ps, List.map 
             (fun (pr,f) -> pr, replacep env f) fmlal) dl))
     | Dlogic dl -> 
-        let replacee = function
-          | Term t -> Term (replacet env t)
-          | Fmla f -> Fmla (replacep env f)
-        in
         env,
         add_decl ctxt (create_logic_decl 
            (List.map (fun (ls,ld) -> ls, Util.option_map (fun ld ->
               let _,vs,e = open_ls_defn ld in
-              make_ls_defn ls vs (replacee e)) ld) dl))
+              let e = e_map (replacet env) (replacep env) e in
+              make_ls_defn ls vs e) ld) dl))
     | Dtype dl -> env,add_decl ctxt d
     | Dprop (k,pr,f) -> 
         env,add_decl ctxt (create_prop_decl k pr (replacep env f))

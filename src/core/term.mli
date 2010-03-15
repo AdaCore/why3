@@ -211,7 +211,11 @@ val f_open_quant : fmla_quant -> vsymbol list * trigger list * fmla
 val f_open_forall : fmla -> vsymbol list * fmla
 val f_open_exists : fmla -> vsymbol list * fmla
 
-(* trigger traversal *)
+(* expr and trigger traversal *)
+
+val e_map : (term -> term) -> (fmla -> fmla) -> expr -> expr
+val e_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> expr -> 'a
+val e_apply : (term -> 'a) -> (fmla -> 'a) -> expr -> 'a
 
 val tr_map : (term -> term) ->
              (fmla -> fmla) -> trigger list -> trigger list
