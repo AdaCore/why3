@@ -28,11 +28,26 @@ let type_only = ref false
 let debug = ref false
 let loadpath = ref []
 let driver = ref None
-type which_goals =
-  | Gall
-  | Gtheory of string
-  | Ggoal of string
-let which_goals = ref []
+let set_all_goals = ref false
+let which_theories = Hashtbl.create 8
+let add_which_theories s = Hashtbl.replace which_theories s None 
+let add_which_goals s = 
+  let l = Str.split (Str.regexp "\\.") s in
+  let tname, l = 
+    match l with
+      | [] | [_] -> 
+          eprintf "--goal : Must be a qualified name (%s)@." s;
+          exit 1
+      | a::l -> a,l in
+  try
+    match Hashtbl.find which_theories tname with
+      | None -> ()
+      | Some goals -> Hashtbl.replace goals s l
+  with Not_found ->   
+    let goals = Hashtbl.create 4 in
+    Hashtbl.replace goals s l;
+    Hashtbl.replace which_theories tname (Some goals)
+
 let timeout = ref 10
 let call = ref false
 let output = ref None
@@ -47,11 +62,11 @@ let () =
      "--debug", Arg.Set debug, "sets the debug flag";
      "-I", Arg.String (fun s -> loadpath := s :: !loadpath), 
      "<dir>  adds dir to the loadpath";
-     "--all_goals", Arg.Unit (fun () -> which_goals := Gall::!which_goals), 
+     "--all_goals", Arg.Set set_all_goals,
      "apply on all the goals of the file";
-     "--goals_of", Arg.String (fun s -> which_goals := Gtheory s::!which_goals), 
+     "--goals_of", Arg.String (fun s -> add_which_theories s), 
      "apply on all the goals of the theory given (ex. --goal T)";
-     "--goal", Arg.String (fun s -> which_goals := Ggoal s::!which_goals), 
+     "--goal", Arg.String (fun s -> add_which_goals s), 
      "apply only on the goal given (ex. --goal T.g)";
      "--output", Arg.String (fun s -> output := Some s), 
      "choose to output each goals in the directory given.\
@@ -166,38 +181,25 @@ let do_file env drv filename_printer file =
           | None -> eprintf "a driver is needed@."; exit 1
           | Some drv -> drv in
       (* Extract the goal(s) *)
-      let goals = List.fold_left 
-        (fun acc wg -> match wg with
-           | Gall ->  Mnm.fold (fun _ th acc -> extract_goals env drv acc th) m acc
-           | Gtheory s ->  
-               begin
-                 try 
-                     extract_goals env drv acc (Mnm.find s m)
-                 with Not_found -> 
-                   eprintf "File %s : --goals_of : Unknown theory %s@." file s; exit 1
-               end
-           | Ggoal s ->
-               let l = Str.split (Str.regexp "\\.") s in
-               let tname, l = 
-                 match l with
-                   | [] | [_] -> 
-                       eprintf "--goal : Must be a qualified name (%s)@." s;
-                       exit 1
-                   | a::l -> a,l in
-               let rec find_pr ns = function
-                 | [] -> assert false
-                 | [a] -> Mnm.find a ns.ns_pr
-                 | a::l -> find_pr (Mnm.find a ns.ns_ns) l in
-               let th =try Mnm.find tname m with Not_found -> 
-                 eprintf "File %s : --goal : Unknown theory %s@." file tname; exit 1 in
-               let pr = try fst (find_pr th.th_export l) with Not_found ->
-                 eprintf "File %s : --goal : Unknown goal %s@." file s ; exit 1 in
-               let goals = extract_goals env drv acc th in
-               List.filter (fun (_,ctxt) ->
-                              match ctxt.ctxt_decl.d_node with
-                                | Dprop (_,pr',_) -> pr == pr'
-                                | _ -> assert false) goals)
-      [] !which_goals in
+      let goals = 
+        if !set_all_goals 
+        then Mnm.fold (fun _ th acc -> extract_goals env drv acc th) m []
+        else
+          Hashtbl.fold
+            (fun tname goals acc ->
+               let th = try Mnm.find tname m with Not_found -> 
+                 eprintf "File %s : --goal : Unknown theory %s@." file tname; exit 1 in                
+               let filter = match goals with
+                 | None -> None
+                 | Some s -> Some 
+                     (Hashtbl.fold 
+                        (fun s l acc ->
+                           let pr = try fst (Theory.ns_find_pr th.th_export l) with Not_found ->
+                             eprintf "File %s : --goal : Unknown goal %s@." file s ; exit 1 in
+                           Ident.Sid.add (Theory.pr_name pr) acc
+                        ) s Ident.Sid.empty) in
+               extract_goals ?filter env drv acc th
+            ) which_theories [] in
         (* Apply transformations *)
       let goals = List.fold_left 
         (fun acc (th,ctxt) -> 
