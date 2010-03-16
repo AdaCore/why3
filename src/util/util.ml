@@ -25,11 +25,14 @@ let map_fold_left f acc l =
   in
   acc, List.rev rev
 
-let of_option = function Some v -> v | None -> assert false
+let of_option = function None -> assert false | Some x -> x
 
 let option_map f = function None -> None | Some x -> Some (f x)
 
+let option_apply d f = function None -> d | Some x -> f x
+
 let option_iter f = function None -> () | Some x -> f x
+
 
 exception FoldSkip
 
