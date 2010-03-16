@@ -146,8 +146,11 @@ exception EmptyDecl
 (** Environements *)
 
 type retrieve_theory = env -> string list -> theory Mnm.t
+  (* a function of type retrieve_theory is a partial function it can
+     raise Not_found if it can't retrieve this theory*)
 
 val create_env : retrieve_theory -> env
+
 
 exception TheoryNotFound of string list * string
 

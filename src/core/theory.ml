@@ -497,16 +497,17 @@ let create_env =
 exception TheoryNotFound of string list * string
 
 let find_theory env sl s =
-  let m =
-    try
-      Hashtbl.find env.env_memo sl
-    with Not_found ->
-      Hashtbl.add env.env_memo sl Mnm.empty;
-      let m = env.env_retrieve env sl in
-      Hashtbl.replace env.env_memo sl m;
-      m
-  in
-  try Mnm.find s m
+  try  
+    let m =
+      try
+        Hashtbl.find env.env_memo sl
+      with Not_found ->
+        Hashtbl.add env.env_memo sl Mnm.empty;
+        let m = env.env_retrieve env sl in
+        Hashtbl.replace env.env_memo sl m;
+        m
+    in
+    Mnm.find s m
   with Not_found -> raise (TheoryNotFound (sl, s))
 
 let env_tag env = env.env_tag
