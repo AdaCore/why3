@@ -38,6 +38,7 @@ let call = ref false
 let output = ref None
 let list_printers = ref false
 let list_transforms = ref false
+let print_debug = ref false
 
 let () = 
   Arg.parse 
@@ -63,6 +64,7 @@ let () =
      "--timeout", Arg.Set_int timeout, "set the timeout used when calling provers (0 unlimited, default 10)";
      "--list-printers", Arg.Set list_printers, "list the printers registered";
      "--list-transforms", Arg.Set list_transforms, "list the transformation registered";
+     "--print-debug", Arg.Set print_debug, "print on stderr the theories of the files given on the commandline" 
     ]
     (fun f -> Queue.push f files)
     "usage: why [options] files..."
@@ -154,6 +156,10 @@ let do_file env drv filename_printer file =
     close_in c
   end else begin
     let m = Typing.read_file env file in
+    if !print_debug then
+      eprintf "%a"
+        (Pp.print_iter2 Mnm.iter Pp.newline Pp.nothing Pp.nothing Pretty.print_theory)
+        m;
     if not !type_only then
       let drv =  
         match drv with
