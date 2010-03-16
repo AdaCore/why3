@@ -52,12 +52,22 @@ OCAMLVERSION = @OCAMLVERSION@
 CAMLP4   = @CAMLP4O@
 PSVIEWER = @PSVIEWER@
 PDFVIEWER = @PDFVIEWER@
+DYNLINK = @DYNLINK@
+
+ifeq ($(DYNLINK),Dynlink)
+DYNLINKBFLAGS = dynlink.cma
+DYNLINKOFLAGS = dynlink.cmxa
+else
+DYNLINKBFLAGS = 
+DYNLINKOFLAGS = 
+endif
+
 
 INCLUDES = -I src/core -I src/util -I src/parser -I src/output \
            -I src/transform -I src/programs -I src 
-BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cma unix.cma dynlink.cma
+BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cma unix.cma $(DYNLINKBFLAGS)
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
-OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cmxa unix.cmxa dynlink.cmxa
+OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cmxa unix.cmxa $(DYNLINKOFLAGS)
 
 COQC7  = @COQC7@
 COQC8  = @COQC8@
@@ -69,7 +79,7 @@ GENERATED = src/version.ml src/parser/parser.mli src/parser/parser.ml \
             src/parser/lexer.ml src/output/driver_lexer.ml \
             src/output/driver_parser.mli src/output/driver_parser.ml \
 	    src/programs/pgm_lexer.ml src/programs/pgm_parser.mli \
-	    src/programs/pgm_parser.ml
+	    src/programs/pgm_parser.ml src/util/dynlink_compat.ml
 
 # main targets
 ##############
@@ -110,7 +120,8 @@ doc/version.tex src/version.ml: Version version.sh config.status
 CORE_CMO := ident.cmo ty.cmo term.cmo theory.cmo pretty.cmo 
 CORE_CMO := $(addprefix src/core/,$(CORE_CMO))
 
-UTIL_CMO := pp.cmo loc.cmo util.cmo hashcons.cmo sysutil.cmo
+UTIL_CMO := pp.cmo loc.cmo util.cmo hashcons.cmo sysutil.cmo\
+	dynlink_compat.cmo
 UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
 
 PARSER_CMO := parser.cmo lexer.cmo typing.cmo 
@@ -589,6 +600,9 @@ config.status: configure
 
 configure: configure.in
 	autoconf 
+
+src/util/dynlink_compat.ml: src/util/dynlink_compat.ml.in config.status
+	./config.status
 
 # clean and depend
 ##################

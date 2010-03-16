@@ -102,6 +102,18 @@ case $OCAMLVERSION in
 	FORPACK="-for-pack Graph";;
 esac
 
+#Dynlink is native?
+case $OCAMLVERSION in
+  3.08*|3.09*|3.10*)
+        DYNLINK="Dynlink_"
+        enable_dynlink=no;; 
+        #Dynlink_ is used for compatibility in /src/util/dynlink_compat.ml.in
+  *)
+        DYNLINK="Dynlink"
+        enable_dynlink=yes 
+esac
+
+
 # Ocaml library path
 # old way: OCAMLLIB=`$OCAMLC -v | tail -1 | cut -f 4 -d ' ' | tr -d '\\r'`
 OCAMLLIB=`$OCAMLC -where | tr -d '\\r'`
@@ -446,6 +458,7 @@ AC_SUBST(OCAMLGRAPHLIB)
 AC_SUBST(LABLGTK2)
 AC_SUBST(INCLUDEGTK2)
 AC_SUBST(OCAMLWEB)
+AC_SUBST(DYNLINK)
 # AC_SUBST(CAMLP4O)
 # AC_SUBST(CAMLP4LIB)
 
@@ -481,7 +494,7 @@ AC_SUBST(PSVIEWER)
 AC_SUBST(PDFVIEWER)
 # Finally create the Makefile from Makefile.in
 dnl AC_OUTPUT(Makefile)
-AC_CONFIG_FILES(Makefile bench/bench)
+AC_CONFIG_FILES(Makefile bench/bench src/util/dynlink_compat.ml)
 AC_OUTPUT
 chmod a-w Makefile
 chmod a-w bench/bench
@@ -496,6 +509,7 @@ echo "OCaml version           : $OCAMLVERSION"
 echo "OCaml library path      : $OCAMLLIB"
 echo "OcamlGraph lib          : $OCAMLGRAPHVER"
 echo "Verbose make            : $VERBOSEMAKE"
+echo "Why plugin enabled      : $enable_dynlink"
 echo "Abstract interpretation : $enable_apron"
 echo "Frama-C plugin          : $FRAMAC"
 if test "$enable_apron" = "yes" ; then
