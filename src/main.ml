@@ -32,7 +32,7 @@ type which_goals =
   | Gall
   | Gtheory of string
   | Ggoal of string
-let which_goals = ref Gall
+let which_goals = ref []
 let timeout = ref 10
 let call = ref false
 let output = ref None
@@ -47,11 +47,11 @@ let () =
      "--debug", Arg.Set debug, "sets the debug flag";
      "-I", Arg.String (fun s -> loadpath := s :: !loadpath), 
      "<dir>  adds dir to the loadpath";
-     "--all_goals", Arg.Unit (fun () -> which_goals := Gall), 
+     "--all_goals", Arg.Unit (fun () -> which_goals := Gall::!which_goals), 
      "apply on all the goals of the file";
-     "--goals_of", Arg.String (fun s -> which_goals := Gtheory s), 
+     "--goals_of", Arg.String (fun s -> which_goals := Gtheory s::!which_goals), 
      "apply on all the goals of the theory given (ex. --goal T)";
-     "--goal", Arg.String (fun s -> which_goals := Ggoal s), 
+     "--goal", Arg.String (fun s -> which_goals := Ggoal s::!which_goals), 
      "apply only on the goal given (ex. --goal T.g)";
      "--output", Arg.String (fun s -> output := Some s), 
      "choose to output each goals in the directory given.\
@@ -137,8 +137,8 @@ let transform env l =
 *)
 
 
-let extract_goals = 
-  let split_goals = Split_goals.t () in
+let extract_goals ?filter = 
+  let split_goals = Split_goals.t ?filter () in
   fun env drv acc th ->
     let ctxt = Context.use_export (Context.init_context env) th in
     let l = Transform.apply split_goals ctxt in
@@ -166,38 +166,39 @@ let do_file env drv filename_printer file =
           | None -> eprintf "a driver is needed@."; exit 1
           | Some drv -> drv in
       (* Extract the goal(s) *)
-      let goals = 
-        match !which_goals with
-          | Gall ->  Mnm.fold (fun _ th acc -> extract_goals env drv acc th) m []
-          | Gtheory s ->  
-              begin
-                try 
-                  extract_goals env drv [] (Mnm.find s m)
-                with Not_found -> 
-                  eprintf "File %s : --goals_of : Unknown theory %s@." file s; exit 1
-              end
-          | Ggoal s ->
-              let l = Str.split (Str.regexp "\\.") s in
-              let tname, l = 
-                match l with
-                  | [] | [_] -> 
-                      eprintf "--goal : Must be a qualified name (%s)@." s;
-                      exit 1
-                  | a::l -> a,l in
-              let rec find_pr ns = function
-                | [] -> assert false
-                | [a] -> Mnm.find a ns.ns_pr
-                | a::l -> find_pr (Mnm.find a ns.ns_ns) l in
-              let th =try Mnm.find tname m with Not_found -> 
-                eprintf "File %s : --goal : Unknown theory %s@." file tname; exit 1 in
-              let pr = try fst (find_pr th.th_export l) with Not_found ->
-                eprintf "File %s : --goal : Unknown goal %s@." file s ; exit 1 in
-              let goals = extract_goals env drv [] th in
-              List.filter (fun (_,ctxt) ->
-                             match ctxt.ctxt_decl.d_node with
-                               | Dprop (_,pr',_) -> pr == pr'
-                               | _ -> assert false) goals in
-      (* Apply transformations *)
+      let goals = List.fold_left 
+        (fun acc wg -> match wg with
+           | Gall ->  Mnm.fold (fun _ th acc -> extract_goals env drv acc th) m acc
+           | Gtheory s ->  
+               begin
+                 try 
+                     extract_goals env drv acc (Mnm.find s m)
+                 with Not_found -> 
+                   eprintf "File %s : --goals_of : Unknown theory %s@." file s; exit 1
+               end
+           | Ggoal s ->
+               let l = Str.split (Str.regexp "\\.") s in
+               let tname, l = 
+                 match l with
+                   | [] | [_] -> 
+                       eprintf "--goal : Must be a qualified name (%s)@." s;
+                       exit 1
+                   | a::l -> a,l in
+               let rec find_pr ns = function
+                 | [] -> assert false
+                 | [a] -> Mnm.find a ns.ns_pr
+                 | a::l -> find_pr (Mnm.find a ns.ns_ns) l in
+               let th =try Mnm.find tname m with Not_found -> 
+                 eprintf "File %s : --goal : Unknown theory %s@." file tname; exit 1 in
+               let pr = try fst (find_pr th.th_export l) with Not_found ->
+                 eprintf "File %s : --goal : Unknown goal %s@." file s ; exit 1 in
+               let goals = extract_goals env drv acc th in
+               List.filter (fun (_,ctxt) ->
+                              match ctxt.ctxt_decl.d_node with
+                                | Dprop (_,pr',_) -> pr == pr'
+                                | _ -> assert false) goals)
+      [] !which_goals in
+        (* Apply transformations *)
       let goals = List.fold_left 
         (fun acc (th,ctxt) -> 
            List.rev_append 

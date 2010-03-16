@@ -32,11 +32,14 @@ let ident_printer =
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
+let print_tvsymbols fmt id =
+  fprintf fmt "'%s" (id_unique ident_printer (tv_name id))
+
 let forget_var v = forget_id ident_printer v.vs_name
 
 let rec print_type drv fmt ty = match ty.ty_node with
   | Tyvar id -> 
-      fprintf fmt "'%a" print_ident (tv_name id)
+      print_tvsymbols fmt id
   | Tyapp (ts, tl) -> 
       match Driver.query_ident drv ts.ts_name with
         | Driver.Remove -> assert false (* Mettre une erreur *)
@@ -141,7 +144,12 @@ let print_type_decl drv fmt = function
       begin
         match Driver.query_ident drv ts.ts_name with
           | Driver.Remove | Driver.Syntax _ -> false
-          | Driver.Tag _ -> fprintf fmt "type %a" print_ident ts.ts_name; true
+          | Driver.Tag _ -> 
+              match ts.ts_args with
+                | [] -> fprintf fmt "type %a" print_ident ts.ts_name; true
+                | _  -> fprintf fmt "type (%a)%a" 
+                    (print_list comma print_tvsymbols) ts.ts_args  
+                      print_ident ts.ts_name; true
       end
   | _, Talgebraic _ ->
       assert false
