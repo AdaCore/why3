@@ -1,0 +1,367 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (C) 2010-                                                   *)
+(*    Francois Bobot                                                      *)
+(*    Jean-Christophe Filliatre                                           *)
+(*    Johannes Kanig                                                      *)
+(*    Andrei Paskevich                                                    *)
+(*                                                                        *)
+(*  This software is free software; you can redistribute it and/or        *)
+(*  modify it under the terms of the GNU Library General Public           *)
+(*  License version 2.1, with the special exception on linking            *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(*  This software is distributed in the hope that it will be useful,      *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
+(*                                                                        *)
+(**************************************************************************)
+
+open Format
+open Util
+open Ident
+open Ty
+open Term
+open Termlib
+
+(** Type declaration *)
+
+type ty_def =
+  | Tabstract
+  | Talgebraic of lsymbol list
+
+type ty_decl = tysymbol * ty_def
+
+(** Logic declaration *)
+
+type ls_defn = lsymbol * vsymbol list * expr * fmla
+
+type logic_decl = lsymbol * ls_defn option
+
+exception UnboundVars of Svs.t
+exception IllegalConstructor of lsymbol
+
+let extract_ls_defn f =
+  let vl, ef = f_open_forall f in
+  match ef.f_node with
+    | Fapp (s, [t1; t2]) when s == ps_equ ->
+        begin match t1.t_node with
+          | Tapp (fs, _) -> fs, Some (fs, vl, Term t2, f)
+          | _ -> assert false
+        end
+    | Fbinop (Fiff, f1, f2) ->
+        begin match f1.f_node with
+          | Fapp (ps, _) -> ps, Some (ps, vl, Fmla f2, f)
+          | _ -> assert false
+        end
+    | _ -> assert false
+
+let check_fvs f =
+  let fvs = f_freevars Svs.empty f in
+  if Svs.is_empty fvs then f else raise (UnboundVars fvs)
+
+let make_fs_defn fs vl t =
+  if fs.ls_constr then raise (IllegalConstructor fs);
+  let hd = t_app fs (List.map t_var vl) t.t_ty in
+  let fd = f_forall vl [] (f_equ hd t) in
+  extract_ls_defn fd
+
+let make_ps_defn ps vl f =
+  let hd = f_app ps (List.map t_var vl) in
+  let pd = f_forall vl [] (f_iff hd f) in
+  extract_ls_defn pd
+
+let make_ls_defn ls vl = e_apply (make_fs_defn ls vl) (make_ps_defn ls vl)
+
+let open_fs_defn = function (_,vl,Term t,_) -> (vl,t) | _ -> assert false
+
+let open_ps_defn = function (_,vl,Fmla f,_) -> (vl,f) | _ -> assert false
+
+let open_ls_defn (_,vl,e,_) = (vl,e)
+
+let ls_defn_axiom (_,_,_,f) = f
+
+(** Inductive predicate declaration *)
+
+type prop = ident
+
+module Spr = Sid
+module Mpr = Mid
+module Hpr = Hid
+
+let create_prop = id_register
+let pr_name x = x
+
+type prop_fmla = prop * fmla
+
+type ind_decl  = lsymbol * prop_fmla list
+
+(** Proposition declaration *)
+
+type prop_kind =
+  | Paxiom
+  | Plemma
+  | Pgoal
+
+type prop_decl = prop_kind * prop * fmla
+
+(** Declaration type *)
+
+type decl = {
+  d_node : decl_node;
+  d_tag  : int;
+}
+
+and decl_node =
+  | Dtype  of ty_decl list      (* recursive types *)
+  | Dlogic of logic_decl list   (* recursive functions/predicates *)
+  | Dind   of ind_decl list     (* inductive predicates *)
+  | Dprop  of prop_decl         (* axiom / lemma / goal *)
+
+(** Declarations *)
+
+module Decl = struct
+
+  type t = decl
+
+  let for_all2 pr l1 l2 =
+    try List.for_all2 pr l1 l2 with Invalid_argument _ -> false
+
+  let eq_td (ts1,td1) (ts2,td2) = ts1 == ts2 && match td1,td2 with
+    | Tabstract, Tabstract -> true
+    | Talgebraic l1, Talgebraic l2 -> for_all2 (==) l1 l2
+    | _ -> false
+
+  let eq_ld (ls1,ld1) (ls2,ld2) = ls1 == ls2 && match ld1,ld2 with
+    | Some (_,_,_,f1), Some (_,_,_,f2) -> f1 == f2
+    | None, None -> true
+    | _ -> false
+
+  let eq_iax (pr1,fr1) (pr2,fr2) = pr1 == pr1 && fr1 == fr2
+
+  let eq_ind (ps1,al1) (ps2,al2) = ps1 == ps2 && for_all2 eq_iax al1 al2
+
+  let equal d1 d2 = match d1.d_node, d2.d_node with
+    | Dtype  l1, Dtype  l2 -> for_all2 eq_td l1 l2
+    | Dlogic l1, Dlogic l2 -> for_all2 eq_ld l1 l2
+    | Dind   l1, Dind   l2 -> for_all2 eq_ind l1 l2
+    | Dprop (k1,pr1,f1), Dprop (k2,pr2,f2) ->
+        k1 == k2 && pr1 == pr2 && f1 == f2
+    | _,_ -> false
+
+  let hs_td (ts,td) = match td with
+    | Tabstract -> ts.ts_name.id_tag
+    | Talgebraic l ->
+        let tag fs = fs.ls_name.id_tag in
+        1 + Hashcons.combine_list tag ts.ts_name.id_tag l
+
+  let hs_ld (ls,ld) = Hashcons.combine ls.ls_name.id_tag
+    (Hashcons.combine_option (fun (_,_,_,f) -> f.f_tag) ld)
+
+  let hs_ind (ps,al) =
+    let hs_pair (pr,f) = Hashcons.combine pr.id_tag f.f_tag in
+      Hashcons.combine_list hs_pair ps.ls_name.id_tag al
+
+  let hs_kind = function
+    | Paxiom -> 7
+    | Plemma -> 11
+    | Pgoal  -> 13
+
+  let hash d = match d.d_node with
+    | Dtype  l -> Hashcons.combine_list hs_td 0 l
+    | Dlogic l -> Hashcons.combine_list hs_ld 3 l
+    | Dind   l -> Hashcons.combine_list hs_ind 5 l
+    | Dprop (k,pr,f) -> Hashcons.combine2 (hs_kind k) pr.id_tag f.f_tag
+
+  let tag n d = { d with d_tag = n }
+
+  let compare d1 d2 = Pervasives.compare d1.d_tag d2.d_tag
+
+end
+module Hdecl = Hashcons.Make(Decl)
+module Mdecl = Map.Make(Decl)
+module Sdecl = Set.Make(Decl)
+
+(** Declaration constructors *)
+
+let mk_decl n = { d_node = n; d_tag = -1 }
+
+let create_ty_decl tdl = Hdecl.hashcons (mk_decl (Dtype tdl))
+let create_logic_decl ldl = Hdecl.hashcons (mk_decl (Dlogic ldl))
+let create_ind_decl idl = Hdecl.hashcons (mk_decl (Dind idl))
+let create_prop_decl k p f = Hdecl.hashcons (mk_decl (Dprop (k,p,f)))
+
+exception ConstructorExpected of lsymbol
+exception UnboundTypeVar of tvsymbol
+exception IllegalTypeAlias of tysymbol
+exception ClashIdent of ident
+exception BadLogicDecl of ident
+exception EmptyDecl
+
+let add_id s id =
+  if Sid.mem id s then raise (ClashIdent id);
+  Sid.add id s
+
+let create_ty_decl tdl =
+  if tdl = [] then raise EmptyDecl;
+  let check_constr ty acc fs =
+    if not fs.ls_constr then raise (ConstructorExpected fs);
+    let vty = of_option fs.ls_value in
+    ignore (Ty.matching Mtv.empty vty ty);
+    let add s ty = match ty.ty_node with
+      | Tyvar v -> Stv.add v s
+      | _ -> assert false
+    in
+    let vs = ty_fold add Stv.empty vty in
+    let rec check () ty = match ty.ty_node with
+      | Tyvar v -> if not (Stv.mem v vs) then raise (UnboundTypeVar v)
+      | _ -> ty_fold check () ty
+    in
+    List.iter (check ()) fs.ls_args;
+    add_id acc fs.ls_name
+  in
+  let check_decl acc (ts,td) = match td with
+    | Tabstract -> add_id acc ts.ts_name
+    | Talgebraic cl ->
+        if ts.ts_def != None then raise (IllegalTypeAlias ts);
+        let ty = ty_app ts (List.map ty_var ts.ts_args) in
+        List.fold_left (check_constr ty) (add_id acc ts.ts_name) cl
+  in
+  ignore (List.fold_left check_decl Sid.empty tdl);
+  create_ty_decl tdl
+
+let create_logic_decl ldl =
+  if ldl = [] then raise EmptyDecl;
+  let check_decl acc (ls,ld) = match ld with
+    | Some (s,_,_,_) when s != ls -> raise (BadLogicDecl ls.ls_name)
+    | _ -> add_id acc ls.ls_name
+  in
+  ignore (List.fold_left check_decl Sid.empty ldl);
+  create_logic_decl ldl
+
+exception InvalidIndDecl of lsymbol * prop
+exception TooSpecificIndDecl of lsymbol * prop * term
+exception NonPositiveIndDecl of lsymbol * prop * lsymbol
+
+exception Found of lsymbol
+let ls_mem s sps = if Sls.mem s sps then raise (Found s) else false
+let t_pos_ps sps = t_s_all (fun _ -> true) (fun s -> not (ls_mem s sps))
+
+let rec f_pos_ps sps pol f = match f.f_node, pol with
+  | Fapp (s, _), Some false when ls_mem s sps -> false
+  | Fapp (s, _), None when ls_mem s sps -> false
+  | Fbinop (Fiff, f, g), _ ->
+      f_pos_ps sps None f && f_pos_ps sps None g
+  | Fbinop (Fimplies, f, g), _ ->
+      f_pos_ps sps (option_map not pol) f && f_pos_ps sps pol g
+  | Fnot f, _ ->
+      f_pos_ps sps (option_map not pol) f
+  | Fif (f,g,h), _ ->
+      f_pos_ps sps None f && f_pos_ps sps pol g && f_pos_ps sps pol h
+  | _ -> f_all (t_pos_ps sps) (f_pos_ps sps pol) f
+
+let create_ind_decl idl =
+  if idl = [] then raise EmptyDecl;
+  let add acc (ps,_) = Sls.add ps acc in
+  let sps = List.fold_left add Sls.empty idl in
+  let check_ax ps acc (pr,f) =
+    let _, f = f_open_forall f in
+    let rec clause acc f = match f.f_node with
+      | Fbinop (Fimplies, g, f) -> clause (g::acc) f
+      | _ -> (acc, f)
+    in
+    let cls, f = clause [] f in
+    match f.f_node with
+      | Fapp (s, tl) when s == ps ->
+          let tymatch sb t ty =
+            try Ty.matching sb (t.t_ty) ty with TypeMismatch ->
+              raise (TooSpecificIndDecl (ps, pr, t))
+          in
+          ignore (List.fold_left2 tymatch Mtv.empty tl ps.ls_args);
+          (try ignore (List.for_all (f_pos_ps sps (Some true)) cls)
+          with Found ls ->
+            raise (NonPositiveIndDecl (ps, pr, ls)));
+          add_id acc (pr_name pr)
+      | _ -> raise (InvalidIndDecl (ps, pr))
+  in
+  let check_decl acc (ps,al) =
+    List.fold_left (check_ax ps) (add_id acc ps.ls_name) al
+  in
+  ignore (List.fold_left check_decl Sid.empty idl);
+  create_ind_decl idl
+
+(** Split declarations *)
+
+let build_dls get_id get_dep dl =
+  let add_id acc d = Sid.add (get_id d) acc in
+  let s = List.fold_left add_id Sid.empty dl in
+  let add_dl (next,loan,dls,dl) d =
+    let dl = d :: dl in
+    let id = get_id d in
+    let next = Sid.remove id next in
+    let loan = Sid.remove id loan in
+    let loan = get_dep next loan d in
+    if Sid.is_empty loan
+      then next, loan, List.rev dl :: dls, []
+      else next, loan,                dls, dl
+  in
+  let init = (s, Sid.empty, [], []) in
+  let next,loan,dls,dl = List.fold_left add_dl init dl in
+  assert (Sid.is_empty next);
+  assert (Sid.is_empty loan);
+  assert (dl = []);
+  dls
+
+let get_ty_id (ts,_) = ts.ts_name
+
+let get_ty_dep next loan (ts,td) =
+  let dep acc ts = if Sid.mem ts.ts_name next
+    then Sid.add ts.ts_name acc else acc in
+  let loan = match ts.ts_def with
+    | Some ty -> ty_s_fold dep loan ty
+    | None    -> loan
+  in
+  let cns acc ls =
+    List.fold_left (ty_s_fold dep) acc ls.ls_args in
+  match td with
+    | Tabstract      -> loan
+    | Talgebraic fdl -> List.fold_left cns loan fdl
+
+let get_logic_id (ls,_) = ls.ls_name
+
+let get_logic_dep next loan (_,ld) =
+  let dts acc _  = acc in
+  let dep acc ls = if Sid.mem ls.ls_name next
+    then Sid.add ls.ls_name acc else acc in
+  match ld with
+    | Some (_,_,Term t,_) -> t_s_fold dts dep loan t
+    | Some (_,_,Fmla f,_) -> f_s_fold dts dep loan f
+    | None                -> loan
+
+let get_ind_id (ps,_) = ps.ls_name
+
+let get_ind_dep next loan (_,al) =
+  let dts acc _  = acc in
+  let dep acc ls = if Sid.mem ls.ls_name next
+    then Sid.add ls.ls_name acc else acc in
+  let prp acc (_,f) = f_s_fold dts dep acc f in
+  List.fold_left prp loan al
+
+let create_ty_decls tdl =
+  let build = build_dls get_ty_id get_ty_dep in
+  match tdl with
+  | [_] -> [create_ty_decl tdl]
+  | _   -> List.rev_map create_ty_decl (build tdl)
+
+let create_logic_decls ldl =
+  let build = build_dls get_logic_id get_logic_dep in
+  match ldl with
+  | [_] -> [create_logic_decl ldl]
+  | _   -> List.rev_map create_logic_decl (build ldl)
+
+let create_ind_decls idl =
+  let build = build_dls get_ind_id get_ind_dep in
+  match idl with
+  | [_] -> [create_ind_decl idl]
+  | _   -> List.rev_map create_ind_decl (build idl)
+
