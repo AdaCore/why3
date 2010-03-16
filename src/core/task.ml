@@ -26,46 +26,29 @@ open Termlib
 open Decl
 open Theory2
 
-(** Environment *)
+(** Cloning map *)
 
-type env = {
-  env_retrieve : retrieve_theory;
-  env_memo     : (string list, theory Mnm.t) Hashtbl.t;
-  env_tag      : int;
+type clone = {
+  cl_map : clone_map;
+  cl_tag : int
 }
 
-and retrieve_theory = env -> string list -> theory Mnm.t
+let empty_clone = {
+  cl_map = Mid.empty;
+  cl_tag = 0;
+}
 
-let create_env =
+let cloned_from cl i1 i2 =
+  try i1 = i2 || Sid.mem i2 (Mid.find i1 cl.cl_map)
+  with Not_found -> false
+
+let add_clone =
   let r = ref 0 in
-  fun retrieve ->
+  fun cl th sl ->
     incr r;
-    let env = {
-      env_retrieve = retrieve;
-      env_memo     = Hashtbl.create 17;
-      env_tag      = !r }
-    in
-    let th = builtin_theory in
-    let m = Mnm.add th.th_name.id_short th Mnm.empty in
-    Hashtbl.add env.env_memo [] m;
-    env
+    { cl_map = merge_clone cl.cl_map th sl; cl_tag = !r }
 
-exception TheoryNotFound of string list * string
-
-let find_theory env sl s =
-  let m =
-    try
-      Hashtbl.find env.env_memo sl
-    with Not_found ->
-      Hashtbl.add env.env_memo sl Mnm.empty;
-      let m = env.env_retrieve env sl in
-      Hashtbl.replace env.env_memo sl m;
-      m
-  in
-  try Mnm.find s m
-  with Not_found -> raise (TheoryNotFound (sl, s))
-
-let env_tag env = env.env_tag
+let clone_tag cl = cl.cl_tag
 
 
 (** Known identifiers *)
@@ -99,68 +82,6 @@ let add_known id decl kn =
     if Mid.find id kn != decl then raise (RedeclaredIdent id);
     raise DejaVu
   with Not_found -> Mid.add id decl kn
-
-
-(** Cloning map *)
-
-type clone = {
-  cl_map : Sid.t Mid.t;
-  cl_tag : int
-}
-
-let cloned_from cl i1 i2 =
-  try i1 = i2 || Sid.mem i2 (Mid.find i1 cl.cl_map)
-  with Not_found -> false
-
-
-(** Task *)
-
-type task = {
-  task_decl  : decl;
-  task_prev  : task option;
-  task_known : decl Mid.t;
-  task_clone : clone;
-  task_env   : env;
-  task_tag   : int;
-}
-
-module Task = struct
-  type t = task
-
-  let equal a b =
-    a.task_decl  == b.task_decl  &&
-    a.task_clone == b.task_clone &&
-    a.task_env   == b.task_env   &&
-    match a.task_prev, b.task_prev with
-      | Some na, Some nb -> na == nb
-      | None, None -> true
-      | _ -> false
-
-  let hash task =
-    let prev = match task.task_prev with
-      | Some task -> 1 + task.task_tag
-      | None -> 0
-    in
-    let hs = Hashcons.combine task.task_decl.d_tag prev in
-    Hashcons.combine2 hs task.task_env.env_tag task.task_clone.cl_tag
-
-  let tag i task = { task with task_tag = i }
-end
-module Htask = Hashcons.Make(Task)
-
-let mk_task decl prev known clone env = Htask.hashcons {
-  task_decl  = decl;
-  task_prev  = prev;
-  task_known = known;
-  task_clone = clone;
-  task_env   = env;
-  task_tag   = -1;
-}
-
-let push_decl task kn d =
-  mk_task d (Some task) kn task.task_clone task.task_env
-
-(* Add declarations to a task *)
 
 let add_constr d kn fs = add_known fs.ls_name d kn
 
@@ -197,24 +118,122 @@ let check_ind kn (ps,la) =
     let check (_,f) = known_fmla kn f in
     List.iter check la
 
+let add_decl kn d = match d.d_node with
+  | Dtype dl  -> List.fold_left (add_type d) kn dl
+  | Dlogic dl -> List.fold_left (add_logic d) kn dl
+  | Dind dl   -> List.fold_left (add_ind d) kn dl
+  | Dprop (_,pr,_) -> add_known (pr_name pr) d kn
+
+let check_decl kn d = match d.d_node with
+  | Dtype dl  -> List.iter (check_type kn) dl
+  | Dlogic dl -> List.iter (check_logic kn) dl
+  | Dind dl   -> List.iter (check_ind kn) dl
+  | Dprop (_,_,f) -> known_fmla kn f
+
+
+(** Task *)
+
+type task = {
+  task_decl  : decl;
+  task_prev  : task option;
+  task_known : decl Mid.t;
+  task_tag   : int;
+}
+
+module Task = struct
+  type t = task
+
+  let equal a b =
+    a.task_decl == b.task_decl &&
+    match a.task_prev, b.task_prev with
+      | Some na, Some nb -> na == nb
+      | None, None -> true
+      | _ -> false
+
+  let hash task =
+    let prev = match task.task_prev with
+      | Some task -> 1 + task.task_tag
+      | None -> 0
+    in
+    Hashcons.combine task.task_decl.d_tag prev
+
+  let tag i task = { task with task_tag = i }
+end
+module Htask = Hashcons.Make(Task)
+
+let mk_task decl prev known = Htask.hashcons {
+  task_decl  = decl;
+  task_prev  = prev;
+  task_known = known;
+  task_tag   = -1;
+}
+
+let init_task =
+  let add opt td =
+    let known task = task.task_known in
+    let kn = option_apply Mid.empty known opt in
+    match td with
+      | Decl d -> Some (mk_task d opt (add_decl kn d))
+      | _      -> opt
+  in
+  List.fold_left add None builtin_theory.th_decls
+
+let init_task = of_option init_task
+
 let add_decl task d =
   try
     let kn = task.task_known in
-    let kn = match d.d_node with
-      | Dtype dl  -> List.fold_left (add_type d) kn dl
-      | Dlogic dl -> List.fold_left (add_logic d) kn dl
-      | Dind dl   -> List.fold_left (add_ind d) kn dl
-      | Dprop (_,pr,_) -> add_known (pr_name pr) d kn
-    in
-    let () = match d.d_node with
-      | Dtype dl  -> List.iter (check_type kn) dl
-      | Dlogic dl -> List.iter (check_logic kn) dl
-      | Dind dl   -> List.iter (check_ind kn) dl
-      | Dprop (_,_,f) -> known_fmla kn f
-    in
-    push_decl task kn d
+    let kn = add_decl kn d in
+    ignore (check_decl kn d);
+    mk_task d (Some task) kn
   with DejaVu ->
     task
+
+let rec use_export names acc td =
+  let used, cl, res, task = acc in
+  match td with
+    | Use th when Sid.mem th.th_name used ->
+        acc
+    | Use th ->
+        let used = Sid.add th.th_name used in
+        let acc = used, cl, res, task in
+        let names = Some Spr.empty in
+        List.fold_left (use_export names) acc th.th_decls
+    | Clone (th,sl) ->
+        let cl = add_clone cl th sl in
+        used, cl, res, task
+    | Decl d ->
+        begin match d.d_node with
+          | Dprop (Pgoal,pr,_)
+            when option_apply true (Spr.mem pr) names ->
+              let res = (add_decl task d, cl) :: res in
+              used, cl, res, task
+          | Dprop (Pgoal,_,_) ->
+              acc
+          | Dprop (Plemma,pr,f)
+            when option_apply true (Spr.mem pr) names ->
+              let d = create_prop_decl Pgoal pr f in
+              let res = (add_decl task d, cl) :: res in
+              let d = create_prop_decl Paxiom pr f in
+              used, cl, res, add_decl task d
+          | Dprop (Plemma,pr,f) ->
+              let d = create_prop_decl Paxiom pr f in
+              used, cl, res, add_decl task d
+          | Dprop (Paxiom,_,_) ->
+              used, cl, res, add_decl task d
+          | Dtype _ | Dlogic _ | Dind _  ->
+              used, cl, res, add_decl task d
+        end
+
+let split_theory_opt th names =
+  let acc = Sid.empty, empty_clone, [], init_task in
+  let _, _, res, _ =
+    List.fold_left (use_export names) acc th.th_decls
+  in
+  res
+
+let split_theory th names = split_theory_opt th (Some names)
+let split_theory_full th  = split_theory_opt th  None
 
 (* Generic utilities *)
 

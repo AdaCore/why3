@@ -47,6 +47,7 @@ type theory = private {
   th_name   : ident;        (* theory name *)
   th_decls  : tdecl list;   (* theory declarations *)
   th_export : namespace;    (* exported namespace *)
+  th_clone  : clone_map;    (* cloning history *)
   th_local  : Sid.t;        (* locally declared idents *)
 }
 
@@ -54,6 +55,8 @@ and tdecl = private
   | Decl  of decl
   | Use   of theory
   | Clone of theory * (ident * ident) list
+
+and clone_map = Sid.t Mid.t
 
 val builtin_theory : theory
 
@@ -84,6 +87,8 @@ val empty_inst : th_inst
 
 val use_export   : theory_uc -> theory -> theory_uc
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc
+
+val merge_clone  : clone_map -> theory -> (ident * ident) list -> clone_map
 
 (* exceptions *)
 

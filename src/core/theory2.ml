@@ -83,6 +83,7 @@ type theory = {
   th_name   : ident;        (* theory name *)
   th_decls  : tdecl list;   (* theory declarations *)
   th_export : namespace;    (* exported namespace *)
+  th_clone  : clone_map;    (* cloning history *)
   th_local  : Sid.t;        (* locally declared idents *)
 }
 
@@ -91,19 +92,13 @@ and tdecl =
   | Use   of theory
   | Clone of theory * (ident * ident) list
 
+and clone_map = Sid.t Mid.t
 
 let builtin_theory =
   let decl_int  = create_ty_decl [ts_int, Tabstract] in
   let decl_real = create_ty_decl [ts_real, Tabstract] in
   let decl_equ  = create_logic_decl [ps_equ, None] in
   let decl_neq  = create_logic_decl [ps_neq, None] in
-
-(*
-  let kn_int  = Mid.add ts_int.ts_name decl_int Mid.empty in
-  let kn_real = Mid.add ts_real.ts_name decl_real kn_int in
-  let kn_equ  = Mid.add ps_equ.ls_name decl_equ kn_real in
-  let kn_neq  = Mid.add ps_neq.ls_name decl_neq kn_equ in
-*)
 
   let decls   = [ Decl decl_int; Decl decl_real;
                   Decl decl_equ; Decl decl_neq ] in
@@ -119,6 +114,7 @@ let builtin_theory =
   { th_name   = id_register (id_fresh "BuiltIn");
     th_decls  = decls;
     th_export = export;
+    th_clone  = Mid.empty;
     th_local  = Sid.empty }
 
 
@@ -129,6 +125,7 @@ type theory_uc = {
   uc_decls  : tdecl list;
   uc_import : namespace list;
   uc_export : namespace list;
+  uc_clone  : Sid.t Mid.t;
   uc_local  : Sid.t;
 }
 
@@ -140,6 +137,7 @@ let create_theory n =
     uc_decls  = [Use builtin_theory];
     uc_import = [builtin_theory.th_export];
     uc_export = [builtin_theory.th_export];
+    uc_clone  = Mid.empty;
     uc_local  = Sid.empty; }
 
 let close_theory uc = match uc.uc_export with
@@ -147,6 +145,7 @@ let close_theory uc = match uc.uc_export with
       { th_name   = uc.uc_name;
         th_decls  = List.rev uc.uc_decls;
         th_export = e;
+        th_clone  = uc.uc_clone;
         th_local  = uc.uc_local; }
   | _ ->
       raise CloseTheory
@@ -216,6 +215,18 @@ let add_decl uc d =
     | Dprop p   -> add_prop uc p
   in
   { uc with uc_decls = Decl d :: uc.uc_decls }
+
+let merge_clone cl th sl =
+  let get m id = try Mid.find id m with Not_found -> Sid.empty in
+  let add m m' (id,id') =
+    Mid.add id' (Sid.add id (Sid.union (get m id) (get m' id'))) m'
+  in
+  List.fold_left (add th.th_clone) cl sl
+
+let add_clone uc th sl =
+  let decls = Clone (th,sl) :: uc.uc_decls in
+  let clone = merge_clone uc.uc_clone th sl in
+  { uc with uc_decls = decls; uc_clone = clone }
 
 
 (** Clone *)
@@ -420,32 +431,30 @@ let cl_add_decl cl inst d = match d.d_node with
       let pr',f' = cl_new_prop cl (pr,f) in
       Some (create_prop_decl k' pr' f')
 
-let cl_add_tdecl add_tdecl cl inst acc td = match td with
+let cl_add_tdecl cl inst uc td = match td with
   | Decl d ->
-      let od = cl_add_decl cl inst d in
-      let td = option_map (fun d -> Decl d) od in
-      option_apply acc (add_tdecl acc) td
-  | Use _ | Clone _ ->
-      add_tdecl acc td
-
-let clone_theory add_tdecl acc th inst =
-  let cl = cl_init th inst in
-  let clone = cl_add_tdecl add_tdecl cl inst in
-  let acc = List.fold_left clone acc th.th_decls in
-  let add_idid id id' acc = (id,id') :: acc in
-  let d = Clone (th, Hid.fold add_idid cl.id_table []) in
-  add_tdecl acc d
+      let decls = match cl_add_decl cl inst d with
+        | Some d -> Decl d :: uc.uc_decls
+        | None   -> uc.uc_decls
+      in
+      { uc with uc_decls = decls }
+  | Use _ ->
+      { uc with uc_decls = td :: uc.uc_decls }
+  | Clone (th,sl) ->
+      add_clone uc th sl
 
 let clone_export uc th inst =
   let cl = cl_init th inst in
-  let add_tdecl acc td = td :: acc in
-  let clone = cl_add_tdecl add_tdecl cl inst in
-  let decls = List.fold_left clone uc.uc_decls th.th_decls in
+  let add_tdecl = cl_add_tdecl cl inst in
+  let uc = List.fold_left add_tdecl uc th.th_decls in
+
   let add_idid id id' acc = (id,id') :: acc in
-  let decls = Clone (th, Hid.fold add_idid cl.id_table []) :: decls in
+  let sl = Hid.fold add_idid cl.id_table [] in
+  let uc = add_clone uc th sl in
 
   let add_local id' () acc = Sid.add id' acc in
-  let local = Hid.fold add_local cl.nw_local uc.uc_local in
+  let lc = Hid.fold add_local cl.nw_local uc.uc_local in
+  let uc = { uc with uc_local = lc } in
 
   let find_ts ts =
     if Sid.mem ts.ts_name th.th_local
@@ -476,9 +485,7 @@ let clone_export uc th inst =
   match uc.uc_import, uc.uc_export with
     | i0 :: sti, e0 :: ste -> { uc with
         uc_import = merge_ns false ns i0 :: sti;
-        uc_export = merge_ns true  ns e0 :: ste;
-        uc_local  = local;
-        uc_decls  = decls }
+        uc_export = merge_ns true  ns e0 :: ste; }
     | _ ->
         assert false
 

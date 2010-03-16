@@ -17,49 +17,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Ident
-open Ty
-open Term
-open Decl
 open Theory2
 
-(** Cloning map *)
+(** Environment *)
 
-type clone
+type env
 
-val cloned_from : clone -> ident -> ident -> bool
+type retrieve_theory = env -> string list -> theory Mnm.t
 
-val clone_tag : clone -> int
+val create_env : retrieve_theory -> env
 
-(** Task *)
+val find_theory : env -> string list -> string -> theory
 
-type task = private {
-  task_decl  : decl;
-  task_prev  : task option;
-  task_known : decl Mid.t;
-  task_tag   : int;
-}
+val env_tag : env -> int
 
-(* constructors *)
-
-val init_task : task
-
-val add_decl : task -> decl -> task
-
-val split_theory : theory -> Spr.t -> (task * clone) list
-
-val split_theory_full : theory -> (task * clone) list
-
-(* bottom-up, tail-recursive traversal functions *)
-
-val task_fold : ('a -> decl -> 'a) -> 'a -> task -> 'a
-
-val task_iter : (decl -> unit) -> task -> unit
-
-val task_decls : task -> decl list
-
-(* exceptions *)
-
-exception UnknownIdent of ident
-exception RedeclaredIdent of ident
+exception TheoryNotFound of string list * string
 

@@ -18,48 +18,46 @@
 (**************************************************************************)
 
 open Ident
-open Ty
-open Term
-open Decl
 open Theory2
 
-(** Cloning map *)
+(** Environment *)
 
-type clone
-
-val cloned_from : clone -> ident -> ident -> bool
-
-val clone_tag : clone -> int
-
-(** Task *)
-
-type task = private {
-  task_decl  : decl;
-  task_prev  : task option;
-  task_known : decl Mid.t;
-  task_tag   : int;
+type env = {
+  env_retrieve : retrieve_theory;
+  env_memo     : (string list, theory Mnm.t) Hashtbl.t;
+  env_tag      : int;
 }
 
-(* constructors *)
+and retrieve_theory = env -> string list -> theory Mnm.t
 
-val init_task : task
+let create_env =
+  let r = ref 0 in
+  fun retrieve ->
+    incr r;
+    let env = {
+      env_retrieve = retrieve;
+      env_memo     = Hashtbl.create 17;
+      env_tag      = !r }
+    in
+    let th = builtin_theory in
+    let m = Mnm.add th.th_name.id_short th Mnm.empty in
+    Hashtbl.add env.env_memo [] m;
+    env
 
-val add_decl : task -> decl -> task
+exception TheoryNotFound of string list * string
 
-val split_theory : theory -> Spr.t -> (task * clone) list
+let find_theory env sl s =
+  let m =
+    try
+      Hashtbl.find env.env_memo sl
+    with Not_found ->
+      Hashtbl.add env.env_memo sl Mnm.empty;
+      let m = env.env_retrieve env sl in
+      Hashtbl.replace env.env_memo sl m;
+      m
+  in
+  try Mnm.find s m
+  with Not_found -> raise (TheoryNotFound (sl, s))
 
-val split_theory_full : theory -> (task * clone) list
-
-(* bottom-up, tail-recursive traversal functions *)
-
-val task_fold : ('a -> decl -> 'a) -> 'a -> task -> 'a
-
-val task_iter : (decl -> unit) -> task -> unit
-
-val task_decls : task -> decl list
-
-(* exceptions *)
-
-exception UnknownIdent of ident
-exception RedeclaredIdent of ident
+let env_tag env = env.env_tag
 
