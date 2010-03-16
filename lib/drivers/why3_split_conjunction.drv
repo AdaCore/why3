@@ -5,3 +5,10 @@ filename "%f-%t-%s.why"
 apply_before_split_goals
      "split_conjunction"
 end
+
+theory BuiltIn
+  syntax type   int     "int"
+  syntax type   real    "real"
+  syntax logic  (_=_)   "(%1 = %2)"
+  syntax logic  (_<>_)  "(%1 <> %2)"
+end
