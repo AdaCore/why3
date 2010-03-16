@@ -43,24 +43,6 @@ type logic_decl = lsymbol * ls_defn option
 exception UnboundVars of Svs.t
 exception IllegalConstructor of lsymbol
 
-let check_fvs f =
-  let fvs = f_freevars Svs.empty f in
-  if Svs.is_empty fvs then f else raise (UnboundVars fvs)
-
-let make_fs_defn fs vl t =
-  if fs.ls_constr then raise (IllegalConstructor fs);
-  let hd = t_app fs (List.map t_var vl) t.t_ty in
-  let fd = f_forall vl [] (f_equ hd t) in
-  fs, vl, Term t, check_fvs fd
-
-let make_ps_defn ps vl f =
-  let hd = f_app ps (List.map t_var vl) in
-  let pd = f_forall vl [] (f_iff hd f) in
-  ps, vl, Fmla f, check_fvs pd
-
-let make_ls_defn ls vl =
-  e_apply (make_fs_defn ls vl) (make_ps_defn ls vl)
-
 let extract_ls_defn f =
   let vl, ef = f_open_forall f in
   match ef.f_node with
@@ -76,15 +58,28 @@ let extract_ls_defn f =
         end
     | _ -> assert false
 
-let open_ls_defn (ls,vl,e,_) = (ls,vl,e)
+let check_fvs f =
+  let fvs = f_freevars Svs.empty f in
+  if Svs.is_empty fvs then f else raise (UnboundVars fvs)
 
-let open_fs_defn = function
-  | (fs,vl,Term t,_) -> (fs,vl,t)
-  | _ -> assert false
+let make_fs_defn fs vl t =
+  if fs.ls_constr then raise (IllegalConstructor fs);
+  let hd = t_app fs (List.map t_var vl) t.t_ty in
+  let fd = f_forall vl [] (f_equ hd t) in
+  extract_ls_defn fd
 
-let open_ps_defn = function
-  | (ps,vl,Fmla f,_) -> (ps,vl,f)
-  | _ -> assert false
+let make_ps_defn ps vl f =
+  let hd = f_app ps (List.map t_var vl) in
+  let pd = f_forall vl [] (f_iff hd f) in
+  extract_ls_defn pd
+
+let make_ls_defn ls vl = e_apply (make_fs_defn ls vl) (make_ps_defn ls vl)
+
+let open_fs_defn = function (_,vl,Term t,_) -> (vl,t) | _ -> assert false
+
+let open_ps_defn = function (_,vl,Fmla f,_) -> (vl,f) | _ -> assert false
+
+let open_ls_defn (_,vl,e,_) = (vl,e)
 
 let ls_defn_axiom (_,_,_,f) = f
 

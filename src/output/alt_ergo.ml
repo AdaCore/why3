@@ -160,7 +160,7 @@ let print_logic_decl drv ctxt fmt (ls,ld) =
                 (print_list comma (print_type drv)) ls.ls_args 
                 (print_option_or_default "prop" (print_type drv)) ls.ls_value
           | Some ld ->
-              let _,vl,e = open_ls_defn ld in
+              let vl,e = open_ls_defn ld in
               begin match e with
                 | Term t ->
                     (* TODO AC? *)

@@ -870,8 +870,8 @@ let add_logics dl th =
     match d.ld_type with
     | None -> (* predicate *)
 	let ps = Hashtbl.find psymbols id in
-        let defn = match d.ld_def with
-	  | None -> None
+        begin match d.ld_def with
+	  | None -> ps,None
 	  | Some f -> 
 	      let f = dfmla denv f in
               let vl = match ps.ls_value with
@@ -879,13 +879,12 @@ let add_logics dl th =
                 | _ -> assert false
               in
 	      let env = env_of_vsymbol_list vl in
-              Some (make_ps_defn ps vl (fmla env f))
-        in
-        ps, defn
+              make_ps_defn ps vl (fmla env f)
+        end
     | Some ty -> (* function *)
 	let fs = Hashtbl.find fsymbols id in
-        let defn = match d.ld_def with
-	  | None -> None
+        begin match d.ld_def with
+	  | None -> fs,None
 	  | Some t -> 
 	      let loc = t.pp_loc in
 	      let t = dterm denv t in
@@ -894,14 +893,12 @@ let add_logics dl th =
                 | _ -> assert false
               in
 	      let env = env_of_vsymbol_list vl in
-              try Some (make_fs_defn fs vl (term env t))
+              try make_fs_defn fs vl (term env t)
 	      with _ -> term_expected_type ~loc t.dt_ty (dty denv ty)
-        in
-        fs, defn
+        end
   in
   let dl = List.map type_decl dl in
   List.fold_left add_decl th (create_logic_decls dl)
-
 
 let term env t =
   let denv = create_denv env in

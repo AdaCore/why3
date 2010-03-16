@@ -292,7 +292,7 @@ let print_type_decl drv fmt d =
     | _ -> print_type_decl drv fmt d; forget_tvs ()
 
 let print_ls_defn drv fmt ld =
-  let _,vl,e = open_ls_defn ld in
+  let vl,e = open_ls_defn ld in
   fprintf fmt " =@ %a" (print_expr drv) e;
   List.iter forget_var vl
 

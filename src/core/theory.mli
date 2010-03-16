@@ -35,17 +35,17 @@ type ty_decl = tysymbol * ty_def
 
 type ls_defn
 
-val make_ls_defn : lsymbol -> vsymbol list -> expr -> ls_defn
-val make_fs_defn : lsymbol -> vsymbol list -> term -> ls_defn
-val make_ps_defn : lsymbol -> vsymbol list -> fmla -> ls_defn
+type logic_decl = lsymbol * ls_defn option
 
-val open_ls_defn : ls_defn -> lsymbol * vsymbol list * expr
-val open_fs_defn : ls_defn -> lsymbol * vsymbol list * term
-val open_ps_defn : ls_defn -> lsymbol * vsymbol list * fmla
+val make_ls_defn : lsymbol -> vsymbol list -> expr -> logic_decl
+val make_fs_defn : lsymbol -> vsymbol list -> term -> logic_decl
+val make_ps_defn : lsymbol -> vsymbol list -> fmla -> logic_decl
+
+val open_ls_defn : ls_defn -> vsymbol list * expr
+val open_fs_defn : ls_defn -> vsymbol list * term
+val open_ps_defn : ls_defn -> vsymbol list * fmla
 
 val ls_defn_axiom : ls_defn -> fmla
-
-type logic_decl = lsymbol * ls_defn option
 
 (* inductive predicate declaration *)
 

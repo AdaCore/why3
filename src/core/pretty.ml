@@ -278,7 +278,7 @@ let print_type_decl fmt (ts,def) = match def with
 let print_type_decl fmt d = print_type_decl fmt d; forget_tvs ()
 
 let print_ls_defn fmt ld =
-  let _,vl,e = open_ls_defn ld in
+  let vl,e = open_ls_defn ld in
   fprintf fmt " =@ %a" print_expr e;
   List.iter forget_var vl
 
