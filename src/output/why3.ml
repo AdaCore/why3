@@ -116,12 +116,6 @@ let rec print_ty drv fmt ty = match ty.ty_node with
         end
     end
 
-let print_const fmt = function
-  | ConstInt s -> fprintf fmt "%s" s
-  | ConstReal (RConstDecimal (i,f,None)) -> fprintf fmt "%s.%s" i f
-  | ConstReal (RConstDecimal (i,f,Some e)) -> fprintf fmt "%s.%se%s" i f e
-  | ConstReal (RConstHexa (i,f,e)) -> fprintf fmt "0x%s.%sp%s" i f e
-
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
   let rec lookup v ty = match ty.ty_node with
@@ -193,7 +187,7 @@ and print_tnode opl opr drv fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      print_const fmt c
+      Pretty.print_const fmt c
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
