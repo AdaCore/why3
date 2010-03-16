@@ -17,40 +17,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type loc = Loc.position
-
-type qualid = loc * string list
-
-type cloned = bool
-
-type trule =
-  | Rremove of cloned * qualid
-  | Rsyntaxty of qualid * string
-  | Rsyntaxls of qualid * string
-  | Rtagty    of cloned * qualid * string
-  | Rtagls    of cloned * qualid * string
-  | Rtagpr    of cloned * qualid * string
-  | Rprelude of loc * string
-
-type theory_rules = {
-  thr_name    : qualid;
-  thr_rules   : trule list;
-}
-
-type global =
-  | Prelude of string
-  | Printer of string
-  | CallStdin of string
-  | CallFile of string
-  | RegexpValid of string
-  | RegexpInvalid of string
-  | RegexpUnknown of string * string
-  | RegexpFailure of string * string
-  | Filename of string
-  | Transforms of (loc * string) list
-  | Plugin of (string * string)
-
-type file = {
-  f_global : (loc * global) list;
-  f_rules  : theory_rules list;
-}
+val t : unit -> Transform.ctxt_list_t

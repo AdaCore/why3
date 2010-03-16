@@ -45,6 +45,7 @@ type printer = driver -> formatter -> context -> unit
 val register_printer : string -> printer -> unit
 
 val register_transform : string -> (unit -> Transform.ctxt_t) -> unit
+val register_transform' : string -> (unit -> Transform.ctxt_list_t) -> unit
 
 val list_printers : unit -> string list
 val list_transforms : unit -> string list
@@ -52,8 +53,7 @@ val list_transforms : unit -> string list
 (** using drivers *)
 
 (** transform context *)
-val apply_before_split : driver -> context -> context
-val apply_after_split : driver -> context -> context
+val apply_transforms : driver -> context -> context list
 
 (** print_context *)
 val print_context : printer

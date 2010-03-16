@@ -136,10 +136,9 @@ let transform env l =
 
 
 let extract_goals = 
-  let split_goals = Transform.split_goals () in
+  let split_goals = Split_goals.t () in
   fun env drv acc th ->
     let ctxt = Context.use_export (Context.init_context env) th in
-    let ctxt = Driver.apply_before_split drv ctxt in
     let l = Transform.apply split_goals ctxt in
     let l = List.rev_map (fun ctxt -> (th,ctxt)) l in
     List.rev_append l acc
@@ -193,9 +192,11 @@ let do_file env drv filename_printer file =
                                | Dprop (_,pr',_) -> pr == pr'
                                | _ -> assert false) goals in
       (* Apply transformations *)
-      let goals = List.map 
-        (fun (th,ctxt) -> (th,Driver.apply_after_split drv ctxt))
-        goals in
+      let goals = List.fold_left 
+        (fun acc (th,ctxt) -> 
+           List.rev_append 
+             (List.map (fun e -> (th,e)) (Driver.apply_transforms drv ctxt)
+             ) acc) [] goals in
       (* Pretty-print the goals or call the prover *)
       match !output with
         | None (* we are in the call mode *) -> 

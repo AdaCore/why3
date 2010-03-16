@@ -197,21 +197,6 @@ let elt_of_oelt ~ty ~logic ~ind ~prop ~use ~clone d =
 let fold_context_of_decl f ctxt env ctxt_done d =
   let env,decls = f ctxt env d in
   env,List.fold_left add_decl ctxt_done decls
-  
-let split_goals () =
-  let f ctxt0 (ctxt,l) =
-    let decl = ctxt0.ctxt_decl in
-    match decl.d_node with
-      | Dprop (Pgoal, _, _) -> (ctxt, add_decl ctxt decl :: l)
-      | Dprop (Plemma, pr, f) ->
-          let d1 = create_prop_decl Paxiom pr f in
-          let d2 = create_prop_decl Pgoal  pr f in
-          (add_decl ctxt d1,
-           add_decl ctxt d2 :: l)
-      | _ -> (add_decl ctxt decl, l) 
-  in
-  let g = fold f (fun env -> init_context env, []) in
-  conv_res g snd
 
 let remove_lemma =
   let f d =
@@ -234,6 +219,8 @@ let goal_of_ctxt ctxt =
 let identity = 
   { all = (fun x -> x);
     clear = (fun () -> ()); }
+
+let identity' = singleton identity
 
 let rewrite_elt rt rf d =
   match d.d_node with

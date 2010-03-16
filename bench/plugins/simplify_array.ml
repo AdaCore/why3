@@ -2,8 +2,6 @@ open Term
 open Termlib
 open Theory
 
-open Transform
-
 let prelude = ["prelude"]
 let array = "Array"
 let store = ["store"]

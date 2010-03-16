@@ -1,3 +1,4 @@
+open Ident
 open Term
 open Theory
 
@@ -6,11 +7,18 @@ let list_fold_product f acc l1 l2 =
     (fun acc e1 ->
        List.fold_left 
          (fun acc e2 -> f acc e1 e2) 
-         l2 acc) 
+         acc l2) 
     acc l1
 
 let rec split_pos split_neg acc f =
-  let split_pos = split_pos split_neg in
+  let split_pos acc f = 
+    let p = split_pos split_neg acc f in
+(*    Format.printf "@[<hov 2>f : %a@\n acc : %a :@\n %a@]@." 
+      Pretty.print_fmla f
+      (Pp.print_list Pp.semi Pretty.print_fmla) acc
+      (Pp.print_list Pp.semi Pretty.print_fmla) p;*)
+    p in
+
   match f.f_node with
     | Ftrue -> acc
     | Ffalse -> f::acc
@@ -79,14 +87,11 @@ let split_pos = split_pos (fun acc x -> x::acc)
 let elt d =
   match d.d_node with
     | Dprop (Pgoal,pr,f) ->
-        begin
-          try
-            let l = split_pos [] f in
-            List.map (fun p -> create_prop_decl Pgoal pr p) l
-          with Exit -> [d]
-        end
-    | _ -> [d]
+        let l = split_pos [] f in
+        List.map (fun p -> [create_prop_decl Pgoal 
+                              (create_prop (id_clone (pr_name pr))) p]) l
+    | _ -> [[d]]
 
-let t () = Transform.elt elt
+let t () = Transform.elt' elt
 
-let () = Driver.register_transform "split_conjunction" t
+let () = Driver.register_transform' "split_conjunction" t

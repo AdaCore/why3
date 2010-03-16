@@ -32,7 +32,7 @@
 %token THEORY END SYNTAX REMOVE TAG PRELUDE PRINTER CALL_ON_FILE CALL_ON_STDIN
 %token VALID INVALID UNKNOWN FAIL
 %token UNDERSCORE LEFTPAR RIGHTPAR CLONED DOT EOF
-%token LOGIC TYPE PROP FILENAME BEFORE_SPLIT AFTER_SPLIT PLUGIN
+%token LOGIC TYPE PROP FILENAME TRANSFORMS PLUGIN
 
 %type <Driver_ast.file> file
 %start file
@@ -59,8 +59,7 @@ global:
 | UNKNOWN STRING STRING { RegexpUnknown ($2, $3) }
 | FAIL STRING STRING { RegexpFailure ($2, $3) }
 | FILENAME STRING { Filename $2 }
-| BEFORE_SPLIT list0_string END { Beforesplit $2 }
-| AFTER_SPLIT list0_string END { Aftersplit $2 }
+| TRANSFORMS list0_string END { Transforms $2 }
 | PLUGIN STRING STRING { Plugin ($2,$3) }
 ;
 

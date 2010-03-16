@@ -126,8 +126,7 @@ and driver = {
   drv_prover      : Call_provers.prover;
   drv_prelude     : string option;
   drv_filename    : string option;
-  drv_beforesplit : Transform.ctxt_t list;
-  drv_aftersplit  : Transform.ctxt_t list;
+  drv_transforms  : Transform.ctxt_list_t;
   drv_rules       : theory_rules list;
   drv_thprelude   : string Hid.t;
   (* the first is the translation only for this ident, the second is also for representant *)
@@ -145,10 +144,12 @@ let print_driver fmt driver =
 
 (** registering transformation *)
 
-let (transforms : (string, unit -> Transform.ctxt_t) Hashtbl.t) = Hashtbl.create 17
+let (transforms : (string, unit -> Transform.ctxt_list_t) Hashtbl.t) 
+    = Hashtbl.create 17
 
-let register_transform name transform = Hashtbl.replace transforms name transform
-
+let register_transform' name transform = Hashtbl.replace transforms name transform
+let register_transform name t = register_transform' name 
+  (fun () -> Transform.singleton (t ()))
 let list_transforms () = Hashtbl.fold (fun k _ acc -> k::acc) transforms []
 
 (** registering printers *)
@@ -283,8 +284,7 @@ let load_driver file env =
   let call_stdin  = ref None in
   let call_file   = ref None in
   let filename    = ref None in
-  let beforesplit = ref None in
-  let aftersplit  = ref None in
+  let ltransforms = ref None in
   let regexps     = ref [] in
   let set_or_raise loc r v error =
     if !r <> None then errorm ~loc "duplicate %s" error
@@ -304,8 +304,7 @@ let load_driver file env =
     | RegexpUnknown (s1,s2) -> regexps:=(s1,Unknown s2)::!regexps
     | RegexpFailure (s1,s2) -> regexps:=(s1,Failure s2)::!regexps
     | Filename s -> set_or_raise loc filename s "filename"
-    | Beforesplit s -> set_or_raise loc beforesplit s "beforesplit"
-    | Aftersplit s -> set_or_raise loc aftersplit s "aftersplit"
+    | Transforms s -> set_or_raise loc ltransforms s "transform"
     | Plugin files -> load_plugin (Filename.dirname file) files
   in
   List.iter add f.f_global;
@@ -313,11 +312,15 @@ let load_driver file env =
   let trans r =
     let transformations = match !r with
       | None -> [] | Some l -> l in
-    List.map (fun (loc,s) -> try (Hashtbl.find transforms s) () 
-              with Not_found -> errorm ~loc "unknown transformation %s" s)
-      transformations in
-    let beforesplit = trans beforesplit in
-    let aftersplit = trans aftersplit in
+    List.fold_left 
+      (fun acc (loc,s) -> 
+         let t = 
+           try (Hashtbl.find transforms s) () 
+           with Not_found -> errorm ~loc "unknown transformation %s" s in
+         Transform.compose' acc t
+      )
+      Transform.identity' transformations in
+    let transforms = trans ltransforms in
   { drv_printer     = !printer;
     drv_context     = Context.init_context env;
     drv_prover      = {Call_provers.pr_call_stdin = !call_stdin;
@@ -325,8 +328,7 @@ let load_driver file env =
                        pr_regexps                 = regexps};
     drv_prelude     = !prelude;
     drv_filename    = !filename;
-    drv_beforesplit = beforesplit;
-    drv_aftersplit  = aftersplit;
+    drv_transforms  = transforms;
     drv_rules       = f.f_rules;
     drv_thprelude   = Hid.create 1;
     drv_theory      = Hid.create 1;
@@ -360,12 +362,7 @@ let syntax_arguments s print fmt l =
  
 (** using drivers *)
 
-let transform_context list ctxt =
-  List.fold_left (fun ctxt t -> Transform.apply t ctxt) 
-    ctxt list
-
-let apply_before_split drv = transform_context drv.drv_beforesplit
-let apply_after_split drv = transform_context drv.drv_aftersplit
+let apply_transforms drv = Transform.apply drv.drv_transforms
 
 let print_context drv fmt ctxt = match drv.drv_printer with
   | None -> errorm "no printer"

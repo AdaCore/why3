@@ -37,6 +37,9 @@ val compose' : context list t -> 'a list t -> 'a list t
 
 val singleton : 'a t -> 'a list t 
 
+val conv_res : 'a t -> ('a -> 'b) -> 'b t
+(* There is no memoisation is this only for constant 
+   modification of the result *)
 
 (* apply a transformation and memoise *)
 val apply : 'a t -> context -> 'a
@@ -87,14 +90,13 @@ val elt_env' : (env -> (decl -> decl list list)) -> context list t
 
 (* Utils *)
 
-val split_goals : unit -> context list t
-
 exception NotGoalContext
 val goal_of_ctxt : context -> prop
 (* goal_of_ctxt ctxts return the goal of a goal context
    the ctxt must end with a goal.*)
 
 val identity : context t
+val identity' : context list t
 
 
 val rewrite_elt : 

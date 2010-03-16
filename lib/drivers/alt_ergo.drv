@@ -13,11 +13,9 @@ unknown "I don't know" "Unknown"
 fail "typing error:\\(.*\\)$" "Failure : File generation error : \\1"
 
 (* À discuter *)
-apply_before_split_goals
-  "split_conjunction"
-end
-apply_after_split_goals
+transformations
   "simplify_recursive_definition"      
+  "split_conjunction"
   "inline_trivial"
 end
 

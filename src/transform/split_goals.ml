@@ -16,41 +16,20 @@
 (*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
 (*                                                                        *)
 (**************************************************************************)
+open Theory  
+open Context
 
-type loc = Loc.position
-
-type qualid = loc * string list
-
-type cloned = bool
-
-type trule =
-  | Rremove of cloned * qualid
-  | Rsyntaxty of qualid * string
-  | Rsyntaxls of qualid * string
-  | Rtagty    of cloned * qualid * string
-  | Rtagls    of cloned * qualid * string
-  | Rtagpr    of cloned * qualid * string
-  | Rprelude of loc * string
-
-type theory_rules = {
-  thr_name    : qualid;
-  thr_rules   : trule list;
-}
-
-type global =
-  | Prelude of string
-  | Printer of string
-  | CallStdin of string
-  | CallFile of string
-  | RegexpValid of string
-  | RegexpInvalid of string
-  | RegexpUnknown of string * string
-  | RegexpFailure of string * string
-  | Filename of string
-  | Transforms of (loc * string) list
-  | Plugin of (string * string)
-
-type file = {
-  f_global : (loc * global) list;
-  f_rules  : theory_rules list;
-}
+let t () =
+  let f ctxt0 (ctxt,l) =
+    let decl = ctxt0.ctxt_decl in
+    match decl.d_node with
+      | Dprop (Pgoal, _, _) -> (ctxt, add_decl ctxt decl :: l)
+      | Dprop (Plemma, pr, f) ->
+          let d1 = create_prop_decl Paxiom pr f in
+          let d2 = create_prop_decl Pgoal  pr f in
+          (add_decl ctxt d1,
+           add_decl ctxt d2 :: l)
+      | _ -> (add_decl ctxt decl, l) 
+  in
+  let g = Transform.fold f (fun env -> init_context env, []) in
+  Transform.conv_res g snd
