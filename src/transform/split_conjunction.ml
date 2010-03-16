@@ -34,7 +34,7 @@ let rec split_pos split_neg acc f =
         list_fold_product 
           (fun acc f1 f2 ->  (f_or f1 f2)::acc) 
           acc (split_pos [] f1) (split_pos [] f2)
-    | Fnot _ -> List.fold_left (fun acc f -> f_not f::acc) acc (split_neg acc f)
+    | Fnot f -> List.fold_left (fun acc f -> f_not f::acc) acc (split_neg acc f)
     | Fif (fif,fthen,felse) -> 
         split_pos 
           (split_pos acc (f_implies fif fthen)) 
@@ -60,13 +60,11 @@ let rec split_neg split_pos acc f =
         list_fold_product 
           (fun acc f1 f2 ->  (f_and f1 f2)::acc) 
           acc (split_neg [] f1) (split_neg [] f2)
-    | Fbinop (Fimplies,f1,f2) ->
-        split_pos (split_neg acc f2) f1
+    | Fbinop (Fimplies,f1,f2) -> split_pos (split_neg acc f2) f1
     | Fbinop (Fiff,f1,f2) -> 
-        (* TODO plus directe? *)
-        split_neg acc (f_and (f_implies f1 f2) (f_implies f2 f1))
+        split_neg (split_neg acc (f_and (f_not f1) f2)) (f_and (f_not f2) f1)
     | Fbinop (For,f1,f2) -> split_neg (split_neg acc f2) f1
-    | Fnot _ -> split_neg acc f
+    | Fnot f -> List.fold_left (fun acc f -> f_not f::acc) acc (split_pos acc f)
     | Fif (fif,fthen,felse) -> 
           (split_neg acc 
              (f_and (f_implies fif fthen) 
@@ -82,9 +80,8 @@ let rec split_neg split_pos acc f =
                           (f_exists vsl trl f)::acc) acc (split_neg [] fmla)
     | Fquant (Fforall,_) -> f::acc
 
-let split_pos = split_pos (fun acc x -> x::acc)
 
-let elt d =
+let elt split_pos d =
   match d.d_node with
     | Dprop (Pgoal,pr,f) ->
         let l = split_pos [] f in
@@ -92,6 +89,15 @@ let elt d =
                               (create_prop (id_clone (pr_name pr))) p]) l
     | _ -> [[d]]
 
-let t () = Transform.elt' elt
 
-let () = Driver.register_transform' "split_conjunction" t
+let split_pos1 = split_pos (fun acc x -> x::acc)
+
+let split_conjunction () = Transform.elt' (elt split_pos1)
+
+let rec split_pos2 acc d = split_pos split_neg2 acc d
+and split_neg2 acc d = split_neg split_pos2 acc d
+
+let split_to_cnf () = Transform.elt' (elt split_pos2)
+
+let () = Driver.register_transform' "split_conjunction" split_conjunction
+let () = Driver.register_transform' "split_to_cnf" split_to_cnf

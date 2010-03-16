@@ -250,7 +250,7 @@ let do_file env drv filename_printer file =
                    let fmt = if file = "-" 
                    then std_formatter
                    else formatter_of_out_channel (open_out file) in
-                   fprintf fmt "%a@?" (Driver.print_context drv) ctxt) goals
+                   fprintf fmt "%a\000@?" (Driver.print_context drv) ctxt) goals
       end;
       if !call then
         (* we are in the call mode *)
