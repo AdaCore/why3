@@ -50,9 +50,11 @@ let add_which_goals s =
 
 let timeout = ref 10
 let call = ref false
-let output = ref None
+let output_dir = ref None
+let output_file = ref None
 let list_printers = ref false
 let list_transforms = ref false
+(*let list_goals = ref false*)
 let print_debug = ref false
 
 let () = 
@@ -68,31 +70,35 @@ let () =
      "apply on all the goals of the theory given (ex. --goal T)";
      "--goal", Arg.String (fun s -> add_which_goals s), 
      "apply only on the goal given (ex. --goal T.g)";
-     "--output", Arg.String (fun s -> output := Some s), 
-     "choose to output each goals in the directory given.\
- Can't be used with --call";
+     "--output-dir", Arg.String (fun s -> output_dir := Some s), 
+     "choose to output each goals in the given directory.";
+     "--output-file", Arg.String (fun s -> output_file := Some s), 
+     "choose to output the goals in the given file.\
+(- for stdout) can't be used with --call";
      "--call", Arg.Set call, 
      "choose to call the prover on each goals.\
- Can't be used with --output"; (* Why not? *)
+can't be used with --output-file";
      "--driver", Arg.String (fun s -> driver := Some s),
      "<file>  set the driver file";
      "--timeout", Arg.Set_int timeout, "set the timeout used when calling provers (0 unlimited, default 10)";
      "--list-printers", Arg.Set list_printers, "list the printers registered";
      "--list-transforms", Arg.Set list_transforms, "list the transformation registered";
+(*     "--list-goals", Arg.Set list_goals, "list the goals of the files";*)
      "--print-debug", Arg.Set print_debug, "print on stderr the theories of the files given on the commandline" 
     ]
     (fun f -> Queue.push f files)
     "usage: why [options] files..."
 
+let timeout = if !timeout <= 0 then None else Some !timeout
+
 let () = 
-  match !output with
-    | None when not !call -> type_only := true
-    | Some _ when !call -> 
-        eprintf "--output and --call can't be use at the same time.(Whynot?)@.";
+  match !output_dir,!output_file,!call with
+    | None,None,false -> type_only := true
+    | _,Some _,true -> 
+        eprintf "--output-file and --call can't be use at the same time.@.";
         exit 1
     | _ -> ()
 
-let timeout = if !timeout <= 0 then None else Some !timeout
 
 (*
 let transformation l = 
@@ -164,11 +170,13 @@ let file_sanitizer = Ident.sanitizer Ident.char_to_alnumus Ident.char_to_alnumus
 
 let do_file env drv filename_printer file =
   if !parse_only then begin
-    let c = open_in file in
+    let filename,c = if file = "-" 
+    then "stdin",stdin
+    else file, open_in file in
     let lb = Lexing.from_channel c in
-    Loc.set_file file lb;
+    Loc.set_file filename lb;
     let _ = Lexer.parse_logic_file lb in 
-    close_in c
+    if file <> "-" then close_in c
   end else begin
     let m = Typing.read_file env file in
     if !print_debug then
@@ -200,44 +208,59 @@ let do_file env drv filename_printer file =
                         ) s Ident.Sid.empty) in
                extract_goals ?filter env drv acc th
             ) which_theories [] in
-        (* Apply transformations *)
+      (* Apply transformations *)
       let goals = List.fold_left 
         (fun acc (th,ctxt) -> 
            List.rev_append 
              (List.map (fun e -> (th,e)) (Driver.apply_transforms drv ctxt)
              ) acc) [] goals in
       (* Pretty-print the goals or call the prover *)
-      match !output with
-        | None (* we are in the call mode *) -> 
-            let call (th,ctxt) = 
-              let res = Driver.call_prover ~debug:!debug ?timeout drv ctxt in
-              printf "%s %s %s : %a@." 
-                file th.th_name.Ident.id_short 
-                (pr_name (goal_of_ctxt ctxt)).Ident.id_long
-                Call_provers.print_prover_result res in
-            List.iter call goals
-        | Some dir (* we are in the output mode *) -> 
-            let file = 
-              let file = Filename.basename file in
-              let file = Filename.chop_extension file in
-              Ident.id_unique filename_printer 
-                (Ident.id_register (Ident.id_fresh file)) in
-            let ident_printer = Ident.create_ident_printer 
-              ~sanitizer:file_sanitizer [] in
-            List.iter 
-              (fun (th,ctxt) ->
-                 let cout = 
-                   if dir = "-" 
-                   then stdout
-                   else
-                     let filename = 
-                       Driver.filename_of_goal drv ident_printer 
-                         file th.th_name.Ident.id_short ctxt in
-                     let filename = Filename.concat dir filename in
-                     open_out filename in
-                 let fmt = formatter_of_out_channel cout in
-                 fprintf fmt "%a@?" (Driver.print_context drv) ctxt;
-                 close_out cout) goals
+      begin
+        match !output_dir with
+          | None -> ()
+          | Some dir (* we are in the output dir mode *) -> 
+              let file = 
+                let file = Filename.basename file in
+                let file = Filename.chop_extension file in
+                Ident.id_unique filename_printer 
+                  (Ident.id_register (Ident.id_fresh file)) in
+              let ident_printer = Ident.create_ident_printer 
+                ~sanitizer:file_sanitizer [] in
+              List.iter 
+                (fun (th,ctxt) ->
+                   let cout = 
+                     if dir = "-" 
+                     then stdout
+                     else
+                       let filename = 
+                         Driver.filename_of_goal drv ident_printer 
+                           file th.th_name.Ident.id_short ctxt in
+                       let filename = Filename.concat dir filename in
+                       open_out filename in
+                   let fmt = formatter_of_out_channel cout in
+                   fprintf fmt "%a@?" (Driver.print_context drv) ctxt;
+                   close_out cout) goals
+      end;
+      begin
+        match !output_file with
+          | None -> ()
+          | Some file (* we are in the output file mode *) -> 
+              List.iter 
+                (fun (th,ctxt) ->
+                   let fmt = if file = "-" 
+                   then std_formatter
+                   else formatter_of_out_channel (open_out file) in
+                   fprintf fmt "%a@?" (Driver.print_context drv) ctxt) goals
+      end;
+      if !call then
+        (* we are in the call mode *)
+        let call (th,ctxt) = 
+          let res = Driver.call_prover ~debug:!debug ?timeout drv ctxt in
+          printf "%s %s %s : %a@." 
+            file th.th_name.Ident.id_short 
+            (pr_name (goal_of_ctxt ctxt)).Ident.id_long
+            Call_provers.print_prover_result res in
+        List.iter call goals
   end
 
 let () =
