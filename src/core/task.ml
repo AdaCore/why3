@@ -126,6 +126,10 @@ let check_decl kn d = match d.d_node with
   | Dind dl   -> List.iter (check_ind kn) dl
   | Dprop (_,_,f) -> known_fmla kn f
 
+let add_decl kn d =
+  let kn = add_decl kn d in
+  ignore (check_decl kn d);
+  kn
 
 (** Task *)
 
@@ -170,28 +174,22 @@ exception LemmaFound
 exception GoalFound
 
 let push_decl task d =
-  begin match d.d_node with
-    | Dprop (Plemma,_,_) -> raise LemmaFound
-    | _ -> ()
-  end;
   begin match task.task_decl.d_node with
     | Dprop (Pgoal,_,_) -> raise GoalFound
     | _ -> ()
   end;
-  try
-    let kn = add_decl task.task_known d in
-    ignore (check_decl kn d);
-    mk_task d (Some task) kn
+  try mk_task d (Some task) (add_decl task.task_known d)
   with DejaVu -> task
 
 let init_decl d =
-  try
-    let kn = add_decl Mid.empty d in
-    ignore (check_decl kn d);
-    mk_task d None kn
+  try mk_task d None (add_decl Mid.empty d)
   with DejaVu -> assert false
 
 let add_decl opt d =
+  begin match d.d_node with
+    | Dprop (Plemma,_,_) -> raise LemmaFound
+    | _ -> ()
+  end;
   match opt with
     | Some task -> Some (push_decl task d)
     | None      -> Some (init_decl d)
