@@ -860,27 +860,48 @@ let rec pat_equal_alpha p1 p2 =
 
 (* safe opening map *)
 
-let t_branch fn b = let pat,_,t = t_open_branch b in (pat, fn t)
-let f_branch fn b = let pat,_,f = f_open_branch b in (pat, fn f)
+let e_equal e1 e2 = match e1, e2 with
+  | Term t1, Term t2 -> t1 == t2
+  | Fmla f1, Fmla f2 -> f1 == f2
+  | _ -> false
+
+let tr_equal = List.for_all2 (List.for_all2 e_equal)
+
+let t_branch fn acc b =
+  let pat,_,t = t_open_branch b in let t' = fn t in acc && t' == t, (pat, t')
+
+let f_branch fn acc b =
+  let pat,_,f = f_open_branch b in let f' = fn f in acc && f' == f, (pat, f')
 
 let t_map fnT fnF t = t_label_copy t (match t.t_node with
   | Tbvar _ -> raise UnboundIndex
   | Tvar _ | Tconst _ -> t
   | Tapp (f, tl) -> t_app_unsafe f (List.map fnT tl) t.t_ty
-  | Tlet (t1, b) -> let u,t2 = t_open_bound b in t_let u (fnT t1) (fnT t2)
-  | Tcase (t1, bl) -> t_case (fnT t1) (List.map (t_branch fnT) bl) t.t_ty
-  | Teps b -> let u,f = f_open_bound b in t_eps u (fnF f))
+  | Tlet (t1, b) -> let u,t2 = t_open_bound b in
+      let t1' = fnT t1 in let t2' = fnT t2 in
+      if t1' == t1 && t2' == t2 then t else t_let u t1' t2'
+  | Tcase (t1, bl) -> let t1' = fnT t1 in
+      let same, bl' = map_fold_left (t_branch fnT) true bl in
+      if t1' == t1 && same then t else t_case t1' bl' t.t_ty
+  | Teps b -> let u,f = f_open_bound b in let f' = fnF f in
+      if f' == f then t else t_eps u f')
 
 let f_map fnT fnF f = f_label_copy f (match f.f_node with
   | Fapp (p, tl) -> f_app_unsafe p (List.map fnT tl)
   | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
-      f_quant q vl (tr_map fnT fnF tl) (fnF f1)
+      let f1' = fnF f1 in let tl' = tr_map fnT fnF tl in
+      if f1' == f1 && tr_equal tl' tl then f
+      else f_quant q vl tl' f1'
   | Fbinop (op, f1, f2) -> f_binary op (fnF f1) (fnF f2)
   | Fnot f1 -> f_not (fnF f1)
   | Ftrue | Ffalse -> f
   | Fif (f1, f2, f3) -> f_if (fnF f1) (fnF f2) (fnF f3)
-  | Flet (t, b) -> let u,f1 = f_open_bound b in f_let u (fnT t) (fnF f1)
-  | Fcase (t, bl) -> f_case (fnT t) (List.map (f_branch fnF) bl))
+  | Flet (t, b) -> let u,f1 = f_open_bound b in
+      let t' = fnT t in let f1' = fnF f1 in
+      if t' == t && f1' == f1 then f else f_let u t' f1'
+  | Fcase (t, bl) -> let t' = fnT t in
+      let same, bl' = map_fold_left (f_branch fnF) true bl in
+      if t' == t && same then f else f_case t' bl')
 
 let protect fn t =
   let res = fn t in
