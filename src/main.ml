@@ -220,7 +220,10 @@ let do_file env drv filename_printer file =
           | Some dir (* we are in the output dir mode *) -> 
               let file = 
                 let file = Filename.basename file in
-                let file = Filename.chop_extension file in
+                let file = 
+                  try
+                    Filename.chop_extension file 
+                  with Invalid_argument _ -> file in
                 Ident.id_unique filename_printer 
                   (Ident.id_register (Ident.id_fresh file)) in
               let ident_printer = Ident.create_ident_printer 

@@ -13,10 +13,10 @@ let list_fold_product f acc l1 l2 =
 let rec split_pos split_neg acc f =
   let split_pos acc f = 
     let p = split_pos split_neg acc f in
-    Format.printf "@[<hov 2>f : %a@\n acc : %a :@\n %a@]@." 
+    (*Format.printf "@[<hov 2>f : %a@\n acc : %a :@\n %a@]@." 
       Pretty.print_fmla f
       (Pp.print_list Pp.semi Pretty.print_fmla) acc
-      (Pp.print_list Pp.semi Pretty.print_fmla) p;
+      (Pp.print_list Pp.semi Pretty.print_fmla) p;*)
     p in
 
   match f.f_node with
