@@ -65,4 +65,5 @@ exception UnknownIdent of ident
 exception RedeclaredIdent of ident
 exception GoalNotFound
 exception GoalFound
+exception LemmaFound
 

@@ -166,16 +166,21 @@ let mk_task decl prev known = Htask.hashcons {
   task_tag   = -1;
 }
 
+exception LemmaFound
 exception GoalFound
 
 let push_decl task d =
+  begin match d.d_node with
+    | Dprop (Plemma,_,_) -> raise LemmaFound
+    | _ -> ()
+  end;
+  begin match task.task_decl.d_node with
+    | Dprop (Pgoal,_,_) -> raise GoalFound
+    | _ -> ()
+  end;
   try
     let kn = add_decl task.task_known d in
     ignore (check_decl kn d);
-    begin match task.task_decl.d_node with
-      | Dprop (Pgoal,_,_) -> raise GoalFound
-      | _ -> ()
-    end;
     mk_task d (Some task) kn
   with DejaVu -> task
 
