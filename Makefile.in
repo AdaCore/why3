@@ -601,7 +601,7 @@ config.status: configure
 configure: configure.in
 	autoconf 
 
-src/util/dynlink_compat.ml: src/util/dynlink_compat.ml.in config.status
+src/driver/dynlink_compat.ml: src/driver/dynlink_compat.ml.in config.status
 	./config.status
 
 # clean and depend

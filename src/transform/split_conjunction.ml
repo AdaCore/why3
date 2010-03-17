@@ -13,10 +13,10 @@ let list_fold_product f acc l1 l2 =
 let rec split_pos split_neg acc f =
   let split_pos acc f = 
     let p = split_pos split_neg acc f in
-(*    Format.printf "@[<hov 2>f : %a@\n acc : %a :@\n %a@]@." 
+    Format.printf "@[<hov 2>f : %a@\n acc : %a :@\n %a@]@." 
       Pretty.print_fmla f
       (Pp.print_list Pp.semi Pretty.print_fmla) acc
-      (Pp.print_list Pp.semi Pretty.print_fmla) p;*)
+      (Pp.print_list Pp.semi Pretty.print_fmla) p;
     p in
 
   match f.f_node with
@@ -34,7 +34,7 @@ let rec split_pos split_neg acc f =
         list_fold_product 
           (fun acc f1 f2 ->  (f_or f1 f2)::acc) 
           acc (split_pos [] f1) (split_pos [] f2)
-    | Fnot f -> List.fold_left (fun acc f -> f_not f::acc) acc (split_neg acc f)
+    | Fnot f -> List.fold_left (fun acc f -> f_not f::acc) acc (split_neg [] f)
     | Fif (fif,fthen,felse) -> 
         split_pos 
           (split_pos acc (f_implies fif fthen)) 
@@ -60,15 +60,14 @@ let rec split_neg split_pos acc f =
         list_fold_product 
           (fun acc f1 f2 ->  (f_and f1 f2)::acc) 
           acc (split_neg [] f1) (split_neg [] f2)
-    | Fbinop (Fimplies,f1,f2) -> split_pos (split_neg acc f2) f1
+    | Fbinop (Fimplies,f1,f2) -> split_pos (split_neg acc f2) (f_not f1)
     | Fbinop (Fiff,f1,f2) -> 
-        split_neg (split_neg acc (f_and (f_not f1) f2)) (f_and (f_not f2) f1)
+        split_neg (split_neg acc (f_and (f_not f1) (f_not f2))) (f_and f2 f1)
     | Fbinop (For,f1,f2) -> split_neg (split_neg acc f2) f1
-    | Fnot f -> List.fold_left (fun acc f -> f_not f::acc) acc (split_pos acc f)
+    | Fnot f -> List.fold_left (fun acc f -> f_not f::acc) acc (split_pos [] f)
     | Fif (fif,fthen,felse) -> 
-          (split_neg acc 
-             (f_and (f_implies fif fthen) 
-                (f_implies (f_not fif) felse)))
+        split_neg (split_neg acc (f_and fif fthen))
+          (f_and (f_not fif) felse)
     | Flet (t,fb) ->
         let vs,f = f_open_bound fb in
         List.fold_left (fun acc f -> (f_let vs t f)::acc) acc (split_neg [] f)
@@ -92,12 +91,11 @@ let elt split_pos d =
 
 let split_pos1 = split_pos (fun acc x -> x::acc)
 
-let split_conjunction () = Trans.decl_l (elt split_pos1)
-
 let rec split_pos2 acc d = split_pos split_neg2 acc d
 and split_neg2 acc d = split_neg split_pos2 acc d
 
-let split_to_cnf () = Trans.decl_l (elt split_pos2)
+let split_pos () = Trans.decl_l (elt split_pos1)
+let split_pos_neg () = Trans.decl_l (elt split_pos2)
 
-let () = Driver.register_transform_l "split_conjunction" split_conjunction
-let () = Driver.register_transform_l "split_to_cnf" split_to_cnf
+let () = Driver.register_transform_l "split_goal_pos" split_pos
+let () = Driver.register_transform_l "split_goal_pos_neg" split_pos_neg

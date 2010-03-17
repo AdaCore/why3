@@ -30,6 +30,16 @@ theory Test_conjunction
        goal G2 : forall x:int. (x+x=4 or x*x=4) -> ((x*x*x=8 or x*x*x=-8) and x*x*2 = 8)
 end
 
+theory Split_conj
+       logic p(x:int)
+       (*goal G : forall x,y,z:int. ((p(x) -> p(y)) and ((not p(x)) -> p(z))) -> ((p(x) and p(y)) or ((not p(x)) and p(z)))*)
+       (*goal G : forall x,y,z:int. (if p(x) then p(y) else p(z)) <-> ((p(x) and p(y)) or ((not p(x)) and p(z)))*)
+       (*goal G : forall x,y,z:int. (if p(x) then p(y) else p(z)) -> (if p(x) then p(y) else p(z))*)
+       goal G : forall x,y,z:int. (p(x) <-> p(z)) -> (p(x) <-> p(z))
+       (*goal G : forall x,y,z:int. (p(z) <-> p(x)) -> (((not p(z)) and (not p(x))  or  ((p(z)) and (p(x))))) *)
+       (*goal G : forall x,y,z:int. (p(x) or p(y)) -> p(z)*)
+end
+
 
 (*
 Local Variables: 

@@ -95,9 +95,9 @@ let timeout = if !timeout <= 0 then None else Some !timeout
 let () = 
   match !output_dir,!output_file,!call with
     | None,None,false -> type_only := true
-    | _,Some _,true -> 
+(*    | _,Some _,true -> 
         eprintf "--output-file and --call can't be use at the same time.@.";
-        exit 1
+        exit 1*)
     | _ -> ()
 
 
@@ -195,7 +195,7 @@ let do_file env drv filename_printer file =
           Hashtbl.fold
             (fun tname goals acc ->
                let th = try Mnm.find tname m with Not_found -> 
-                 eprintf "File %s : --goal : Unknown theory %s@." file tname; exit 1 in                
+                 eprintf "File %s : --goal/--goals_of : Unknown theory %s@." file tname; exit 1 in                
                let filter = match goals with
                  | None -> None
                  | Some s -> Some 
