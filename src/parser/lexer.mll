@@ -235,9 +235,10 @@ and string = parse
       | Loc.Located _ as e -> raise e
       | e -> raise (Loc.Located (loc lb, e))
 
+  let parse_logic_file = with_location (logic_file token)
+
   let parse_lexpr = with_location (lexpr token)
   let parse_list0_decl = with_location (list0_decl token)
-  let parse_logic_file = with_location (logic_file token)
 
 }
 

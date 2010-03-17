@@ -77,8 +77,16 @@
        { e with pdesc = Spost (e, (q, []), Transparent) }
 ***)
 
+
+  open Lexing
+
+  let reloc loc lb =
+    lb.lex_curr_p <- loc;
+    lb.lex_abs_pos <- loc.pos_cnum
+
   let parse_string f loc s =
     let lb = Lexing.from_string s in
+    reloc loc lb;
     f lb
     
   let logic_list0_decl = parse_string Lexer.parse_list0_decl
