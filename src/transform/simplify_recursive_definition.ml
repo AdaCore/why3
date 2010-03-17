@@ -22,7 +22,6 @@ open Ident
 open Ty
 open Term
 open Decl
-open Theory2
 
 type seen =
   | SNot

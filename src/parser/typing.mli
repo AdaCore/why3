@@ -19,7 +19,7 @@
 
 (** Typing environments *)
 
-open Theory2
+open Theory
 open Env
 
 val retrieve : string list -> retrieve_theory

@@ -24,7 +24,7 @@ open Ident
 open Ty
 open Term
 open Decl
-open Theory2
+open Theory
 open Task
 
 let iprinter,tprinter,lprinter,pprinter =

@@ -21,9 +21,8 @@ open Util
 open Ident
 open Ty
 open Term
-open Termlib
 open Decl
-open Theory2
+open Theory
 
 (** Cloning map *)
 

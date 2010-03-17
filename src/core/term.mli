@@ -249,8 +249,6 @@ val f_neq : term -> term -> fmla
 
 (** Term library *)
 
-module Termlib : sig
-
 (* generic term/fmla traversal *)
 
 val t_map : (term -> term) -> (fmla -> fmla) -> term -> term
@@ -332,4 +330,3 @@ val f_subst_fmla_alpha : fmla -> fmla -> fmla -> fmla
 val t_match : term -> term -> term Mvs.t -> term Mvs.t option
 val f_match : fmla -> fmla -> term Mvs.t -> term Mvs.t option
 
-end

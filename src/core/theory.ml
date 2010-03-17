@@ -22,7 +22,6 @@ open Util
 open Ident
 open Ty
 open Term
-open Termlib
 open Decl
 
 (** Namespace *)

@@ -19,9 +19,7 @@
 
 open Ident
 open Term
-open Termlib
 open Decl
-open Theory2
 open Task
 
 let ttrue _ = true

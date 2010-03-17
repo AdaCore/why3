@@ -22,7 +22,7 @@ open Ident
 open Ty
 open Term
 open Decl
-open Theory2
+open Theory
 open Task
 
 val forget_all : unit -> unit     (* flush id_unique *)

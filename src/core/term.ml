@@ -846,8 +846,6 @@ let f_open_branch (pat, _, f) =
 
 (** Term library *)
 
-module Termlib = struct
-
 (* alpha-equality on patterns *)
 
 let rec pat_equal_alpha p1 p2 =
@@ -1232,4 +1230,3 @@ and f_subst_fmla_alpha f1 f2 lvl f =
 let t_subst_fmla_alpha f1 f2 t = t_subst_fmla_alpha f1 f2 0 t
 let f_subst_fmla_alpha f1 f2 f = f_subst_fmla_alpha f1 f2 0 f
 
-end
