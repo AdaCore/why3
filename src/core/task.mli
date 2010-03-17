@@ -33,9 +33,11 @@ val clone_tag : clone -> int
 
 (** Task *)
 
-type task = private {
+type task = task_hd option
+
+and task_hd = private {
   task_decl  : decl;
-  task_prev  : task option;
+  task_prev  : task;
   task_known : decl Mid.t;
   task_tag   : int;
 }
@@ -45,7 +47,7 @@ type task = private {
 (* val init_task : task *)
 (* val add_decl : task -> decl -> task *)
 
-val add_decl : task option -> decl -> task
+val add_decl : task -> decl -> task
 
 val split_theory : theory -> Spr.t -> (task * clone) list
 
@@ -87,17 +89,17 @@ val compose_l : task tlist -> 'a tlist -> 'a tlist
 
 (* val conv_res : 'a trans -> ('a -> 'b) -> 'b trans *)
 
-val fold   : (task -> 'a -> 'a     ) -> 'a -> 'a trans
-val fold_l : (task -> 'a -> 'a list) -> 'a -> 'a tlist
+val fold   : (task_hd -> 'a -> 'a     ) -> 'a -> 'a trans
+val fold_l : (task_hd -> 'a -> 'a list) -> 'a -> 'a tlist
 
-val fold_map : 
-  (task -> 'a * task option -> ('a * task)     ) -> 'a -> task trans
+val fold_map :
+  (task_hd -> 'a * task -> ('a * task)     ) -> 'a -> task trans
 
-val fold_map_l : 
-  (task -> 'a * task option -> ('a * task) list) -> 'a -> task tlist
+val fold_map_l :
+  (task_hd -> 'a * task -> ('a * task) list) -> 'a -> task tlist
 
-val map   : (task -> task option -> task     ) -> task trans
-val map_l : (task -> task option -> task list) -> task tlist
+val map   : (task_hd -> task -> task     ) -> task trans
+val map_l : (task_hd -> task -> task list) -> task tlist
 
 val decl   : (decl -> decl list     ) -> task trans
 val decl_l : (decl -> decl list list) -> task tlist
