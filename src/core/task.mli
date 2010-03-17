@@ -58,8 +58,47 @@ val task_iter : (decl -> unit) -> task -> unit
 
 val task_decls : task -> decl list
 
+val task_goal : task -> prop
+
 (* exceptions *)
 
 exception UnknownIdent of ident
 exception RedeclaredIdent of ident
+exception GoalNotFound
+
+(** Task transformation *)
+
+module Tr : sig
+
+type 'a trans
+type 'a tlist = 'a list trans
+
+val identity   : task trans
+val identity_l : task tlist
+
+val apply : 'a trans -> (task -> 'a)
+val store : (task -> 'a) -> 'a trans
+
+val singleton : 'a trans -> 'a tlist
+
+val compose   : task trans -> 'a trans -> 'a trans
+val compose_l : task tlist -> 'a tlist -> 'a tlist
+
+(* val conv_res : 'a trans -> ('a -> 'b) -> 'b trans *)
+
+val fold   : (task -> 'a -> 'a     ) -> 'a -> 'a trans
+val fold_l : (task -> 'a -> 'a list) -> 'a -> 'a tlist
+
+val fold_map   : (task -> 'a * task -> ('a * task)     ) -> 'a -> task trans
+val fold_map_l : (task -> 'a * task -> ('a * task) list) -> 'a -> task tlist
+
+val map   : (task -> task -> task     ) -> task trans
+val map_l : (task -> task -> task list) -> task tlist
+
+val decl   : (decl -> decl list     ) -> task trans
+val decl_l : (decl -> decl list list) -> task tlist
+
+val expr : (term -> term) -> (fmla -> fmla) -> task trans
+
+end
 

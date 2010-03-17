@@ -251,3 +251,66 @@ let rec task_iter fn task =
 
 let task_decls = task_fold (fun acc d -> d::acc) []
 
+exception GoalNotFound
+
+let task_goal task = match task.task_decl.d_node with
+  | Dprop (Pgoal,pr,_) -> pr
+  | _ -> raise GoalNotFound
+
+
+(** Task transformation *)
+
+module Tr = struct
+
+type 'a trans = task -> 'a
+type 'a tlist = 'a list trans
+
+let identity   x = x
+let identity_l x = [x]
+
+let conv_res f c x = c (f x)
+
+let singleton f x = [f x]
+
+let compose f g x = g (f x)
+
+let compose_l f g x =
+  List.fold_left (fun acc l -> List.rev_append (g l) acc) [] (f x)
+
+let apply f x = f x
+
+let ymemo f tag h =
+  let rec aux x =
+    let t = tag x in
+    try
+      Hashtbl.find h t
+    with Not_found ->
+      let r = f aux x in
+      Hashtbl.add h t r;
+      r in
+  aux
+
+let memo f tag h = ymemo (fun _ -> f) tag h
+
+let term_tag t = t.t_tag
+let fmla_tag f = f.f_tag
+let decl_tag d = d.d_tag
+let task_tag t = t.task_tag
+
+let store f = memo f task_tag (Hashtbl.create 63)
+
+let fold   fn v = assert false (* TODO *)
+let fold_l fn v = assert false (* TODO *)
+
+let fold_map   fn v = conv_res (fold   fn (v, init_task)) snd
+let fold_map_l fn v = conv_res (fold_l fn (v, init_task)) (List.rev_map snd)
+
+let map   fn = fold   (fun t1 t2 -> fn t1 t2) init_task
+let map_l fn = fold_l (fun t1 t2 -> fn t1 t2) init_task
+
+let decl   fn = assert false (* TODO *)
+let decl_l fn = assert false (* TODO *)
+
+let expr fnT fnF d = assert false (* TODO *)
+
+end
