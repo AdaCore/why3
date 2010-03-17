@@ -235,8 +235,9 @@ let rec use_export names acc td =
         end
 
 let split_theory th names =
-  let acc = Sid.empty, empty_clone, [], of_option init_task in
-  let _, _, res, _ = List.fold_left (use_export names) acc th.th_decls in
+  let use = Sid.add builtin_theory.th_name Sid.empty in
+  let acc = use, empty_clone, [], of_option init_task in
+  let _,_,res,_ = List.fold_left (use_export names) acc th.th_decls in
   res
 
 (* Generic utilities *)
