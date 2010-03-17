@@ -23,7 +23,9 @@ open Util
 open Ident
 open Ty
 open Term
-open Theory
+open Decl
+open Theory2
+open Task
 
 let iprinter,tprinter,lprinter,pprinter =
   let bl = ["theory"; "type"; "logic"; "inductive";
@@ -327,22 +329,26 @@ let print_decl fmt d = match d.d_node with
   | Dlogic ll -> print_list newline print_logic_decl fmt ll
   | Dind il   -> print_list newline print_ind_decl fmt il
   | Dprop p   -> print_prop_decl fmt p
-  | Duse th ->
+
+let print_tdecl fmt = function
+  | Decl d ->
+      print_decl fmt d
+  | Use th ->
       fprintf fmt "@[<hov 2>(* use %a *)@]" print_th th
-  | Dclone (th,inst) ->
+  | Clone (th,inst) ->
       fprintf fmt "@[<hov 2>(* clone %a with %a *)@]"
         print_th th (print_list comma print_inst) inst
 
 let print_decls fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list newline2 print_decl) dl
 
-let print_context fmt ctxt = print_decls fmt (Context.get_decls ctxt)
+let print_task fmt task = print_decls fmt (task_decls task)
 
 let print_theory fmt th =
   fprintf fmt "@[<hov 2>theory %a@\n%a@]@\nend@\n@."
-    print_th th print_context th.th_ctxt
+    print_th th (print_list newline2 print_tdecl) th.th_decls
 
-let print_named_context fmt name ctxt =
-  fprintf fmt "@[<hov 2>context %s@\n%a@]@\nend@\n@."
-    name print_context ctxt
+let print_named_task fmt name task =
+  fprintf fmt "@[<hov 2>task %s@\n%a@]@\nend@\n@."
+    name print_task task
 

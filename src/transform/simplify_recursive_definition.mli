@@ -20,9 +20,9 @@
 
 (* Simplify the recursive type and logic definition *)
 
-val t : unit -> Trans.ctxt_t
-
+val t : unit -> Task.task Trans.trans
 
 (* ungroup recursive definition *)
 
-val elt : Theory.decl -> Theory.decl list
+val elt : Decl.decl -> Decl.decl list
+

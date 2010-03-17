@@ -27,8 +27,8 @@ open Decl
 
 (** Namespace *)
 
-module Snm = Set.Make(String)
-module Mnm = Map.Make(String)
+module Snm = Sstr
+module Mnm = Mstr
 
 type namespace = {
   ns_ts : tysymbol Mnm.t;   (* type symbols *)

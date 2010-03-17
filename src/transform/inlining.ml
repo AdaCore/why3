@@ -20,8 +20,9 @@
 open Ident
 open Term
 open Termlib
-open Theory
-open Context
+open Decl
+open Theory2
+open Task
 
 let ttrue _ = true
 let ffalse _ = false
@@ -67,49 +68,48 @@ and replacep env f =
 and substt env d = t_map (replacet env) (replacep env) d
 and substp env d = f_map (replacet env) (replacep env) d
 
-let fold isnotinlinedt isnotinlinedf ctxt0 (env, ctxt) = 
+let fold isnotinlinedt isnotinlinedf task0 (env, task) = 
 (*  Format.printf "I see : %a@\n%a@\n" Pretty.print_decl d print_env env;*)
-  let d = ctxt0.ctxt_decl in
+  let d = task0.task_decl in
   match d.d_node with
     | Dlogic [ls,ld] -> begin
         match ld with
-          | None -> env,add_decl ctxt d
+          | None -> env,add_decl task d
           | Some ld ->
               let vs,e = open_ls_defn ld in
               match e with
                 | Term t ->
                     let t = replacet env t in
                     if t_s_any ffalse ((==) ls) t || isnotinlinedt t
-                    then env, add_decl ctxt 
+                    then env, add_decl task 
                       (create_logic_decl [make_fs_defn ls vs t])
-                    else {env with fs = Mls.add ls (vs,t) env.fs},ctxt
+                    else {env with fs = Mls.add ls (vs,t) env.fs},task
                 | Fmla f -> 
                     let f = replacep env f in
                     if f_s_any ffalse ((==) ls) f || isnotinlinedf f
-                    then env, add_decl ctxt 
+                    then env, add_decl task 
                       (create_logic_decl [make_ps_defn ls vs f])
-                    else {env with ps = Mls.add ls (vs,f) env.ps},ctxt
+                    else {env with ps = Mls.add ls (vs,f) env.ps},task
       end
     | Dind dl ->
-        env, add_decl ctxt (create_ind_decl 
+        env, add_decl task (create_ind_decl 
           (List.map (fun (ps,fmlal) -> ps, List.map 
             (fun (pr,f) -> pr, replacep env f) fmlal) dl))
     | Dlogic dl -> 
         env,
-        add_decl ctxt (create_logic_decl 
+        add_decl task (create_logic_decl 
            (List.map (fun (ls,ld) -> match ld with 
               | None -> ls, None
               | Some ld ->
                 let vs,e = open_ls_defn ld in
                 let e = e_map (replacet env) (replacep env) e in
                 make_ls_defn ls vs e) dl))
-    | Dtype dl -> env,add_decl ctxt d
+    | Dtype dl -> env,add_decl task d
     | Dprop (k,pr,f) -> 
-        env,add_decl ctxt (create_prop_decl k pr (replacep env f))
-    | Duse _ | Dclone _ -> env,add_decl ctxt d
+        env,add_decl task (create_prop_decl k pr (replacep env f))
         
 let t ~isnotinlinedt ~isnotinlinedf = 
-  Trans.fold_map (fold isnotinlinedt isnotinlinedf) (fun _ -> empty_env)
+  Trans.fold_map (fold isnotinlinedt isnotinlinedf) empty_env
 
 let all () = t ~isnotinlinedt:(fun _ -> false) ~isnotinlinedf:(fun _ -> false)
 

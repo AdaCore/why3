@@ -23,7 +23,7 @@ open Util
 open Ident
 open Ty
 open Term
-open Theory
+open Decl
 open Driver
 
 let iprinter,tprinter,lprinter,pprinter =
@@ -42,18 +42,11 @@ let iprinter,tprinter,lprinter,pprinter =
   create_ident_printer bl ~sanitizer:lsanitize,
   create_ident_printer bl ~sanitizer:usanitize
 
-let thash = Hid.create 63
-let lhash = Hid.create 63
-let phash = Hid.create 63
-
 let forget_all () =
   forget_all iprinter;
   forget_all tprinter;
   forget_all lprinter;
-  forget_all pprinter;
-  Hid.clear thash;
-  Hid.clear lhash;
-  Hid.clear phash
+  forget_all pprinter
 
 let tv_set = ref Sid.empty
 
@@ -76,18 +69,10 @@ let print_vs fmt vs =
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
-(* theory names always start with an upper case letter *)
-let print_th fmt th =
-  let sanitize = String.capitalize in
-  let n = id_unique iprinter ~sanitizer:sanitize th.th_name in
-  fprintf fmt "%s" n
-
 let print_ts fmt ts =
-  Hid.replace thash ts.ts_name ts;
   fprintf fmt "%s" (id_unique tprinter ts.ts_name)
 
 let print_ls fmt ls =
-  Hid.replace lhash ls.ls_name ls;
   let n = if ls.ls_constr
     then id_unique lprinter ~sanitizer:String.capitalize ls.ls_name
     else id_unique lprinter ls.ls_name
@@ -95,7 +80,6 @@ let print_ls fmt ls =
   fprintf fmt "%s" n
 
 let print_pr fmt pr =
-  Hid.replace phash (pr_name pr) pr;
   fprintf fmt "%s" (id_unique pprinter (pr_name pr))
 
 (** Types *)
@@ -336,35 +320,17 @@ let print_prop_decl drv fmt (k,pr,f) =
     | Paxiom, Remove -> ()
     | _ -> print_prop_decl drv fmt (k,pr,f); forget_tvs ()
 
-let print_inst fmt (id1,id2) =
-  if Hid.mem thash id2 then
-    let n = id_unique tprinter id1 in
-    fprintf fmt "type %s = %a" n print_ts (Hid.find thash id2)
-  else if Hid.mem lhash id2 then
-    let n = id_unique lprinter id1 in
-    fprintf fmt "logic %s = %a" n print_ls (Hid.find lhash id2)
-  else if Hid.mem phash id2 then
-    let n = id_unique pprinter id1 in
-    fprintf fmt "prop %s = %a" n print_pr (Hid.find phash id2)
-  else
-    fprintf fmt "ident %s = %s" id1.id_long id2.id_long
-
 let print_decl drv fmt d = match d.d_node with
   | Dtype tl  -> print_list nothing (print_type_decl drv) fmt tl
   | Dlogic ll -> print_list nothing (print_logic_decl drv) fmt ll
   | Dind il   -> print_list nothing (print_ind_decl drv) fmt il
   | Dprop p -> print_prop_decl drv fmt p
-  | Duse th ->
-      fprintf fmt "@[<hov 2>(* use %a *)@]@\n@\n" print_th th
-  | Dclone (th,inst) ->
-      fprintf fmt "@[<hov 2>(* clone %a with %a *)@]@\n@\n"
-        print_th th (print_list comma print_inst) inst
 
 let print_decls drv fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl drv)) dl
 
-let print_context drv fmt ctxt =
-  forget_all (); print_decls drv fmt (Context.get_decls ctxt)
+let print_context drv fmt task =
+  forget_all (); print_decls drv fmt (Task.task_decls task)
 
 let () = register_printer "why3" print_context
 

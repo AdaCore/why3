@@ -18,11 +18,16 @@
 (**************************************************************************)
 
 open Format
+open Util
+open Ident
 open Ty
 open Term
-open Theory
+open Decl
+open Theory2
+open Task
+open Trans
+open Env
 open Driver_ast
-open Ident
 
 (* Utils from Str *)
 
@@ -104,34 +109,35 @@ type theory_driver = {
 type translation = 
   | Remove
   | Syntax of string
-  | Tag of Snm.t
+  | Tag of Sstr.t
 
 let translation_union t1 t2 =
   match t1, t2 with
     | Remove, _ | _, Remove -> Remove
     | ((Syntax _ as s), _) | (_,(Syntax _ as s)) -> s
-    | Tag s1, Tag s2 -> Tag (Snm.union s1 s2)
+    | Tag s1, Tag s2 -> Tag (Sstr.union s1 s2)
 
 let print_translation fmt = function
   | Remove -> fprintf fmt "remove" 
   | Syntax s -> fprintf fmt "syntax %s" s
   | Tag s -> fprintf fmt "tag %a" 
-      (Pp.print_iter1 Snm.iter Pp.comma Pp.string) s
+      (Pp.print_iter1 Sstr.iter Pp.comma Pp.string) s
 
-type printer = driver -> formatter -> context -> unit
+type printer = driver -> formatter -> task -> unit
 
 and driver = {
   drv_printer     : printer option;
-  drv_context     : context;
+  drv_task        : task;
+  drv_clone       : clone option;
   drv_prover      : Call_provers.prover;
   drv_prelude     : string option;
   drv_filename    : string option;
-  drv_transforms  : Trans.ctxt_list_t;
+  drv_transforms  : task tlist;
   drv_rules       : theory_rules list;
   drv_thprelude   : string Hid.t;
   (* the first is the translation only for this ident, the second is also for representant *)
   drv_theory      : (translation * translation) Hid.t;
-  drv_with_ctxt   : translation Hid.t;
+  drv_with_task   : translation Hid.t;
 }
 
 (*
@@ -144,11 +150,11 @@ let print_driver fmt driver =
 
 (** registering transformation *)
 
-let (transforms : (string, unit -> Trans.ctxt_list_t) Hashtbl.t) 
+let (transforms : (string, unit -> task tlist) Hashtbl.t) 
     = Hashtbl.create 17
 
-let register_transform' name transform = Hashtbl.replace transforms name transform
-let register_transform name t = register_transform' name 
+let register_transform_l name transform = Hashtbl.replace transforms name transform
+let register_transform name t = register_transform_l name 
   (fun () -> Trans.singleton (t ()))
 let list_transforms () = Hashtbl.fold (fun k _ acc -> k::acc) transforms []
 
@@ -205,10 +211,10 @@ let check_syntax loc s len =
        if i>len then errorm ~loc "invalid indice of argument \"%%%i\" this logic has only %i argument" i len) s
 
 
-let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
+let load_rules env clone driver {thr_name = loc,qualid; thr_rules = trl} =
   let id,qfile = qualid_to_slist qualid in
   let th = try
-    find_theory driver.drv_context.ctxt_env qfile id 
+    find_theory env qfile id 
   with Not_found -> errorm ~loc "theory %s not found" 
     (String.concat "." qualid) in
   let add_htheory cloned id t =
@@ -219,7 +225,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
         else t2,(translation_union t t3) in
       Hid.replace driver.drv_theory id t23 
     with Not_found ->
-      let t23 = if cloned then (Tag Snm.empty),t else t,(Tag Snm.empty) in
+      let t23 = if cloned then (Tag Sstr.empty),t else t,(Tag Sstr.empty) in
       Hid.add driver.drv_theory id t23 in
   let add = function
     | Rremove (c,(loc,q)) -> 
@@ -252,7 +258,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
         begin
           try
             add_htheory c (ns_find_ls th.th_export q).ls_name 
-              (Tag (Snm.singleton s))
+              (Tag (Sstr.singleton s))
           with Not_found -> errorm ~loc "Unknown logic %s" 
             (string_of_qualid qualid q)
         end
@@ -260,7 +266,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
         begin
           try
             add_htheory c (ns_find_ts th.th_export q).ts_name 
-              (Tag (Snm.singleton s))
+              (Tag (Sstr.singleton s))
           with Not_found -> errorm ~loc "Unknown type %s" 
             (string_of_qualid qualid q)
         end
@@ -268,7 +274,7 @@ let load_rules driver {thr_name = loc,qualid; thr_rules = trl} =
         begin
           try
             add_htheory c (pr_name (ns_find_prop th.th_export q))
-              (Tag (Snm.singleton s))
+              (Tag (Sstr.singleton s))
           with Not_found -> errorm ~loc "Unknown proposition %s" 
             (string_of_qualid qualid q)
         end
@@ -317,12 +323,13 @@ let load_driver file env =
          let t = 
            try (Hashtbl.find transforms s) () 
            with Not_found -> errorm ~loc "unknown transformation %s" s in
-         Trans.compose' acc t
+         Trans.compose_l acc t
       )
-      Trans.identity' transformations in
+      Trans.identity_l transformations in
     let transforms = trans ltransforms in
   { drv_printer     = !printer;
-    drv_context     = Context.init_context env;
+    drv_task        = None;
+    drv_clone       = None;
     drv_prover      = {Call_provers.pr_call_stdin = !call_stdin;
                        pr_call_file               = !call_file;
                        pr_regexps                 = regexps};
@@ -332,25 +339,25 @@ let load_driver file env =
     drv_rules       = f.f_rules;
     drv_thprelude   = Hid.create 1;
     drv_theory      = Hid.create 1;
-    drv_with_ctxt   = Hid.create 1;
+    drv_with_task   = Hid.create 1;
   }
 
 (** querying drivers *)
 
 let query_ident drv id =
   try
-    Hid.find drv.drv_with_ctxt id
+    Hid.find drv.drv_with_task id
   with Not_found ->
     let r = try
-      Mid.find id drv.drv_context.ctxt_cloned
+      Mid.find id (Util.of_option drv.drv_clone).cl_map
     with Not_found -> Sid.empty in
     let tr = try fst (Hid.find drv.drv_theory id) 
-    with Not_found -> Tag Snm.empty in 
+    with Not_found -> Tag Sstr.empty in 
     let tr = Sid.fold 
       (fun id acc -> try translation_union acc 
          (snd (Hid.find drv.drv_theory id)) 
        with Not_found -> acc) r tr in
-    Hid.add drv.drv_with_ctxt id tr;
+    Hid.add drv.drv_with_task id tr;
     tr
 
 let syntax_arguments s print fmt l =
@@ -364,22 +371,23 @@ let syntax_arguments s print fmt l =
 
 let apply_transforms drv = Trans.apply drv.drv_transforms
 
-let print_context drv fmt ctxt = match drv.drv_printer with
+let print_task env clone drv fmt task = match drv.drv_printer with
   | None -> errorm "no printer"
-  | Some f -> let drv = {drv with drv_context = ctxt;
+  | Some f -> let drv = {drv with drv_task = task;
+                   drv_clone      = Some clone;
                    drv_thprelude  = Hid.create 17;
                    drv_theory     = Hid.create 17;
-                   drv_with_ctxt  = Hid.create 17} in
-    List.iter (load_rules drv) drv.drv_rules;
-    f drv fmt ctxt 
+                   drv_with_task  = Hid.create 17} in
+    List.iter (load_rules env clone drv) drv.drv_rules;
+    f drv fmt task 
 
 let regexp_filename = Str.regexp "%\\([a-z]\\)"
 
-let filename_of_goal drv ident_printer filename theory_name ctxt =
+let filename_of_goal drv ident_printer filename theory_name task =
   match drv.drv_filename with
     | None -> errorm "no filename syntax given"
     | Some f -> 
-        let pr_name = pr_name (Trans.goal_of_ctxt ctxt) in
+        let pr_name = pr_name (task_goal task) in
         let repl_fun s = 
           let i = matched_group 1 s in
           match i with
@@ -399,13 +407,13 @@ let call_prover_on_buffer ?debug ?timeout ?filename drv ib =
   Call_provers.on_buffer ?debug ?timeout ?filename drv.drv_prover ib 
 
 
-let call_prover ?debug ?timeout drv ctx =
+let call_prover ?debug ?timeout env clone drv task =
   let filename = 
     match drv.drv_filename with
       | None -> None
-      | Some _ -> Some (filename_of_goal drv file_printer "" "" ctx) in
+      | Some _ -> Some (filename_of_goal drv file_printer "" "" task) in
   let buffer = Buffer.create 128 in
-  bprintf buffer "%a@?" (print_context drv) ctx;
+  bprintf buffer "%a@?" (print_task env clone drv) task;
   call_prover_on_buffer ?debug ?timeout ?filename drv buffer
 
 

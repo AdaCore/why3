@@ -17,7 +17,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Format
 open Util
 open Ident
 open Ty
@@ -47,8 +46,6 @@ let add_clone =
   fun cl th sl ->
     incr r;
     { cl_map = merge_clone cl.cl_map th sl; cl_tag = !r }
-
-let clone_tag cl = cl.cl_tag
 
 
 (** Known identifiers *)
@@ -170,10 +167,16 @@ let mk_task decl prev known = Htask.hashcons {
   task_tag   = -1;
 }
 
+exception GoalFound
+
 let push_decl task d =
   try
     let kn = add_decl task.task_known d in
     ignore (check_decl kn d);
+    begin match task.task_decl.d_node with
+      | Dprop (Pgoal,_,_) -> raise GoalFound
+      | _ -> ()
+    end;
     mk_task d (Some task) kn
   with DejaVu -> task
 
@@ -232,13 +235,10 @@ let rec use_export names acc td =
               used, cl, res, push_decl task d
         end
 
-let split_theory_opt th names =
+let split_theory th names =
   let acc = Sid.empty, empty_clone, [], of_option init_task in
   let _, _, res, _ = List.fold_left (use_export names) acc th.th_decls in
   res
-
-let split_theory th names = split_theory_opt th (Some names)
-let split_theory_full th  = split_theory_opt th  None
 
 (* Generic utilities *)
 
@@ -258,116 +258,3 @@ let task_goal = function
   | Some { task_decl = { d_node = Dprop (Pgoal,pr,_) }} -> pr
   | _ -> raise GoalNotFound
 
-(** Task transformation *)
-
-module Tr = struct
-
-type 'a trans = task -> 'a
-type 'a tlist = 'a list trans
-
-let identity   x = x
-let identity_l x = [x]
-
-let conv_res f c x = c (f x)
-
-let singleton f x = [f x]
-
-let compose f g x = g (f x)
-
-let list_apply f = List.fold_left (fun acc x -> List.rev_append (f x) acc) []
-
-let compose_l f g x = list_apply g (f x)
-
-let apply f x = f x
-
-let ymemo f tag h =
-  let rec aux x =
-    let t = tag x in
-    try
-      Hashtbl.find h t
-    with Not_found ->
-      let r = f aux x in
-      Hashtbl.add h t r;
-      r in
-  aux
-
-let memo f tag h = ymemo (fun _ -> f) tag h
-
-let term_tag t = t.t_tag
-let fmla_tag f = f.f_tag
-let decl_tag d = d.d_tag
-
-let task_tag = function
-  | Some t -> t.task_tag
-  | None   -> -1
-
-let store f = memo f task_tag (Hashtbl.create 63)
-
-let accum memo_t rewind v =
-  let rec accum todo = function
-    | Some task ->
-        let curr =
-          try Some (Hashtbl.find memo_t task.task_tag)
-          with Not_found -> None
-        in
-        begin match curr with
-          | Some curr -> rewind curr todo
-          | None      -> accum (task::todo) task.task_prev
-        end
-    | None -> rewind v todo
-  in
-  accum
-
-let save memo_t task v = Hashtbl.add memo_t task.task_tag v; v
-
-let fold fn v =
-  let memo_t = Hashtbl.create 63 in
-  let rewind x task = save memo_t task (fn task x) in
-  let rewind = List.fold_left rewind in
-  accum memo_t rewind v []
-
-let fold_l fn v =
-  let memo_t = Hashtbl.create 63 in
-  let rewind x task = save memo_t task (list_apply (fn task) x) in
-  let rewind = List.fold_left rewind in
-  accum memo_t rewind [v] []
-
-let fold_map   fn v = conv_res (fold   fn (v, None)) snd
-let fold_map_l fn v = conv_res (fold_l fn (v, None)) (List.rev_map snd)
-
-let map   fn = fold   (fun t1 t2 -> fn t1 t2) None
-let map_l fn = fold_l (fun t1 t2 -> fn t1 t2) None
-
-let decl fn =
-  let memo_t = Hashtbl.create 63 in
-  let fn task = memo fn decl_tag memo_t task.task_decl in
-  let fn task acc = List.fold_left add_decl acc (fn task) in
-  map fn
-
-let decl_l fn =
-  let memo_t = Hashtbl.create 63 in
-  let fn task = memo fn decl_tag memo_t task.task_decl in
-  let fn task acc = List.rev_map (List.fold_left add_decl acc) (fn task) in
-  map_l fn
-
-let rewrite fnT fnF d = match d.d_node with
-  | Dtype _ ->
-      d
-  | Dlogic l ->
-      let fn = function
-        | ls, Some ld ->
-            let vl,e = open_ls_defn ld in
-            make_ls_defn ls vl (e_map fnT fnF e)
-        | ld -> ld
-      in
-      create_logic_decl (List.map fn l)
-  | Dind l ->
-      let fn (pr,f) = pr, fnF f in
-      let fn (ps,l) = ps, List.map fn l in
-      create_ind_decl (List.map fn l)
-  | Dprop (k,pr,f) ->
-      create_prop_decl k pr (fnF f)
-
-let expr fnT fnF = decl (fun d -> [rewrite fnT fnF d])
-
-end

@@ -18,7 +18,8 @@
 (**************************************************************************)
 
 open Format
-open Theory
+open Theory2
+open Task
 open Driver
 open Trans
 
@@ -121,7 +122,7 @@ let rec report fmt = function
       fprintf fmt "syntax error"
   | Typing.Error e ->
       Typing.report fmt e
-  | Context.UnknownIdent i ->
+  | UnknownIdent i ->
       fprintf fmt "anomaly: unknownident %s" i.Ident.id_short
   | Driver.Error e ->
       Driver.report fmt e
@@ -133,23 +134,23 @@ let rec report fmt = function
 let transform env l =
   let l = 
     List.map 
-      (fun t -> t, Context.use_export (Context.init_context env) t) 
+      (fun t -> t, use_export (init_task env) t) 
       l
   in
   (*let l = transformation l in*)
   if !print_stdout then 
     List.iter 
-      (fun (t,ctxt) -> Pretty.print_named_context
-        std_formatter t.th_name.Ident.id_long ctxt) l
+      (fun (t,task) -> Pretty.print_named_task
+        std_formatter t.th_name.Ident.id_long task) l
   else match !driver with
     | None ->
 	()
     | Some file ->
 
 	begin match l with
-	  | (_,ctxt) :: _ -> begin match extract_goals ctxt with
+	  | (_,task) :: _ -> begin match extract_goals task with
 	      | g :: _ -> 
-		  Driver.print_context drv std_formatter g
+		  Driver.print_task drv std_formatter g
 	      | [] -> 
 		  eprintf "no goal@."
 	    end
@@ -159,11 +160,9 @@ let transform env l =
 
 
 let extract_goals ?filter = 
-  let split_goals = Split_goals.t ?filter () in
   fun env drv acc th ->
-    let ctxt = Context.use_export (Context.init_context env) th in
-    let l = Trans.apply split_goals ctxt in
-    let l = List.rev_map (fun ctxt -> (th,ctxt)) l in
+    let l = split_theory th filter in
+    let l = List.rev_map (fun task -> (th,task)) l in
     List.rev_append l acc
 
 let file_sanitizer = Ident.sanitizer Ident.char_to_alnumus Ident.char_to_alnumus
@@ -202,17 +201,17 @@ let do_file env drv filename_printer file =
                  | Some s -> Some 
                      (Hashtbl.fold 
                         (fun s l acc ->
-                           let pr = try fst (Theory.ns_find_pr th.th_export l) with Not_found ->
+                           let pr = try fst (Theory2.ns_find_pr th.th_export l) with Not_found ->
                              eprintf "File %s : --goal : Unknown goal %s@." file s ; exit 1 in
-                           Ident.Sid.add (Theory.pr_name pr) acc
-                        ) s Ident.Sid.empty) in
+                           Decl.Spr.add pr acc
+                        ) s Decl.Spr.empty) in
                extract_goals ?filter env drv acc th
             ) which_theories [] in
       (* Apply transformations *)
       let goals = List.fold_left 
-        (fun acc (th,ctxt) -> 
+        (fun acc (th,(task,cl)) -> 
            List.rev_append 
-             (List.map (fun e -> (th,e)) (Driver.apply_transforms drv ctxt)
+             (List.map (fun e -> (th,e,cl)) (Driver.apply_transforms drv task)
              ) acc) [] goals in
       (* Pretty-print the goals or call the prover *)
       begin
@@ -227,18 +226,18 @@ let do_file env drv filename_printer file =
               let ident_printer = Ident.create_ident_printer 
                 ~sanitizer:file_sanitizer [] in
               List.iter 
-                (fun (th,ctxt) ->
+                (fun (th,task,cl) ->
                    let cout = 
                      if dir = "-" 
                      then stdout
                      else
                        let filename = 
                          Driver.filename_of_goal drv ident_printer 
-                           file th.th_name.Ident.id_short ctxt in
+                           file th.th_name.Ident.id_short task in
                        let filename = Filename.concat dir filename in
                        open_out filename in
                    let fmt = formatter_of_out_channel cout in
-                   fprintf fmt "%a@?" (Driver.print_context drv) ctxt;
+                   fprintf fmt "%a@?" (Driver.print_task env cl drv) task;
                    close_out cout) goals
       end;
       begin
@@ -246,26 +245,26 @@ let do_file env drv filename_printer file =
           | None -> ()
           | Some file (* we are in the output file mode *) -> 
               List.iter 
-                (fun (th,ctxt) ->
+                (fun (th,task,cl) ->
                    let fmt = if file = "-" 
                    then std_formatter
                    else formatter_of_out_channel (open_out file) in
-                   fprintf fmt "%a\000@?" (Driver.print_context drv) ctxt) goals
+                   fprintf fmt "%a\000@?" (Driver.print_task env cl drv) task) goals
       end;
       if !call then
         (* we are in the call mode *)
-        let call (th,ctxt) = 
-          let res = Driver.call_prover ~debug:!debug ?timeout drv ctxt in
+        let call (th,task,cl) = 
+          let res = Driver.call_prover ~debug:!debug ?timeout env cl drv task in
           printf "%s %s %s : %a@." 
             file th.th_name.Ident.id_short 
-            (pr_name (goal_of_ctxt ctxt)).Ident.id_long
+            (Decl.pr_name (task_goal task)).Ident.id_long
             Call_provers.print_prover_result res in
         List.iter call goals
   end
 
 let () =
   try
-    let env = create_env (Typing.retrieve !loadpath) in
+    let env = Env.create_env (Typing.retrieve !loadpath) in
     let drv = match !driver with
       | None -> None
       | Some file -> Some (load_driver file env) in

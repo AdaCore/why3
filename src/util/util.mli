@@ -33,3 +33,6 @@ exception FoldSkip
 val all_fn : ('a -> bool) -> 'b -> 'a -> bool
 val any_fn : ('a -> bool) -> 'b -> 'a -> bool
 
+module Sstr : Set.S with type elt = string
+module Mstr : Map.S with type key = string
+

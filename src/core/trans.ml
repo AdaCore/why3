@@ -17,47 +17,41 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Term
+open Util
 open Ident
-open Theory
-open Context
+open Ty
+open Term
+open Termlib
+open Decl
+open Theory2
+open Task
 
-(* the memoisation is inside the function *)
-type 'a t = { 
-  all : context -> 'a;
-  clear : unit -> unit;
-}
+(** Task transformation *)
 
-type ctxt_t = context t
-type ctxt_list_t = context list t
+type 'a trans = task -> 'a
+type 'a tlist = 'a list trans
 
-let conv_res f c = 
-  { all = (fun x -> c (f.all x));
-    clear = f.clear; }
+let identity   x = x
+let identity_l x = [x]
 
-let compose f g =
-  { all = (fun x -> g.all (f.all x));
-    clear = (fun () -> f.clear (); g.clear ()); }
+let conv_res f c x = c (f x)
 
-let compose' f g =
-  { all = (fun x -> List.fold_left (fun acc l -> List.rev_append (g.all l) acc)
-             [] (f.all x));
-    clear = (fun () -> f.clear (); g.clear ()); }
+let singleton f x = [f x]
 
-let singleton f =
-  { all = (fun x -> [f.all x]);
-    clear = f.clear}
+let compose f g x = g (f x)
 
-let apply f x = f.all x
+let list_apply f = List.fold_left (fun acc x -> List.rev_append (f x) acc) []
 
-let clear f = f.clear ()
+let compose_l f g x = list_apply g (f x)
+
+let apply f x = f x
 
 let ymemo f tag h =
   let rec aux x =
     let t = tag x in
-    try 
+    try
       Hashtbl.find h t
-    with Not_found -> 
+    with Not_found ->
       let r = f aux x in
       Hashtbl.add h t r;
       r in
@@ -65,214 +59,83 @@ let ymemo f tag h =
 
 let memo f tag h = ymemo (fun _ -> f) tag h
 
-let d_tag d = d.d_tag
-let ctxt_tag c = c.ctxt_tag
+let term_tag t = t.t_tag
+let fmla_tag f = f.f_tag
+let decl_tag d = d.d_tag
 
-let t all clear_all =
-  { all = all;
-    clear = clear_all; }
+let task_tag = function
+  | Some t -> t.task_tag
+  | None   -> -1
 
-let register f =
-  let memo_t = Hashtbl.create 17 in
-  t (memo f ctxt_tag memo_t) (fun () -> Hashtbl.clear memo_t)
+let store f = memo f task_tag (Hashtbl.create 63)
 
-let fold f_fold v_empty =
-  let memo_t = Hashtbl.create 64 in
-  let rewind env todo =
-    List.fold_left
-      (fun env ctxt ->
-         let env = f_fold ctxt env in
-         Hashtbl.add memo_t ctxt.ctxt_tag env;
-         env) 
-      env todo 
+let accum memo_t rewind v =
+  let rec accum todo = function
+    | Some task ->
+        let curr =
+          try Some (Hashtbl.find memo_t task.task_tag)
+          with Not_found -> None
+        in
+        begin match curr with
+          | Some curr -> rewind curr todo
+          | None      -> accum (task::todo) task.task_prev
+        end
+    | None -> rewind v todo
   in
-  let rec f todo ctxt = 
-    match ctxt.ctxt_prev with
-      | None -> 
-	  rewind (v_empty ctxt.ctxt_env) todo
-      | Some ctxt2 ->
-          try
-            let env = Hashtbl.find memo_t ctxt2.ctxt_tag in
-            rewind env (ctxt :: todo)
-          with Not_found -> 
-	    f (ctxt :: todo) ctxt2
-  in
-  t (f []) (fun () -> Hashtbl.clear memo_t)
+  accum
 
-let fold' (f_fold:context -> 'a -> 'a list) v_empty =
-  let memo_t = Hashtbl.create 64 in
-  let rewind env todo =
-    List.fold_left
-      (fun env ctxt ->
-         let env = List.fold_left 
-           (fun acc e -> List.rev_append (f_fold ctxt e) acc) [] env in
-         Hashtbl.add memo_t ctxt.ctxt_tag env;
-         env) 
-      env todo 
-  in
-  let rec f todo ctxt = 
-    match ctxt.ctxt_prev with
-      | None -> 
-	  rewind [v_empty ctxt.ctxt_env] todo
-      | Some ctxt2 ->
-          try
-            let env = Hashtbl.find memo_t ctxt2.ctxt_tag in
-            rewind env (ctxt :: todo)
-          with Not_found -> 
-	    f (ctxt :: todo) ctxt2
-  in
-  t (f []) (fun () -> Hashtbl.clear memo_t)
+let save memo_t task v = Hashtbl.add memo_t task.task_tag v; v
 
-let fold_map f_fold v_empty =
-  let v_empty env = v_empty env, init_context env in
-  conv_res (fold f_fold v_empty) snd
+let fold fn v =
+  let memo_t = Hashtbl.create 63 in
+  let rewind x task = save memo_t task (fn task x) in
+  let rewind = List.fold_left rewind in
+  accum memo_t rewind v []
 
-let fold_map' f_fold v_empty =
-  let v_empty env = v_empty env, init_context env in
-  conv_res (fold' f_fold v_empty) (List.map snd)
+let fold_l fn v =
+  let memo_t = Hashtbl.create 63 in
+  let rewind x task = save memo_t task (list_apply (fn task) x) in
+  let rewind = List.fold_left rewind in
+  accum memo_t rewind [v] []
 
-let map f_map =
-  fold (fun ctxt1 ctxt2 -> f_map ctxt1 ctxt2) init_context
+let fold_map   fn v = conv_res (fold   fn (v, None)) snd
+let fold_map_l fn v = conv_res (fold_l fn (v, None)) (List.rev_map snd)
 
-let map' f_map =
-  fold' (fun ctxt1 ctxt2 -> f_map ctxt1 ctxt2) init_context
+let map   fn = fold   (fun t1 t2 -> fn t1 t2) None
+let map_l fn = fold_l (fun t1 t2 -> fn t1 t2) None
 
-let map_concat f_elt = 
-  let f_elt ctxt0 ctxt = List.fold_left add_decl ctxt (f_elt ctxt0) in
-  map f_elt
+let decl fn =
+  let memo_t = Hashtbl.create 63 in
+  let fn task = memo fn decl_tag memo_t task.task_decl in
+  let fn task acc = List.fold_left add_decl acc (fn task) in
+  map fn
 
-let map_concat' f_elt = 
-  let f_elt ctxt0 ctxt = List.map (List.fold_left add_decl ctxt) (f_elt ctxt0) in
-  map' f_elt
+let decl_l fn =
+  let memo_t = Hashtbl.create 63 in
+  let fn task = memo fn decl_tag memo_t task.task_decl in
+  let fn task acc = List.rev_map (List.fold_left add_decl acc) (fn task) in
+  map_l fn
+
+let rewrite fnT fnF d = match d.d_node with
+  | Dtype _ ->
+      d
+  | Dlogic l ->
+      let fn = function
+        | ls, Some ld ->
+            let vl,e = open_ls_defn ld in
+            make_ls_defn ls vl (e_map fnT fnF e)
+        | ld -> ld
+      in
+      create_logic_decl (List.map fn l)
+  | Dind l ->
+      let fn (pr,f) = pr, fnF f in
+      let fn (ps,l) = ps, List.map fn l in
+      create_ind_decl (List.map fn l)
+  | Dprop (k,pr,f) ->
+      create_prop_decl k pr (fnF f)
+
+let expr fnT fnF = decl (fun d -> [rewrite fnT fnF d])
 
 
-let elt f_elt = 
-  let memo_elt = Hashtbl.create 64 in
-  let f_elt ctxt0 = memo f_elt d_tag memo_elt ctxt0.ctxt_decl in
-  let f = map_concat f_elt in
-  { f with clear = fun () -> Hashtbl.clear memo_elt; f.clear () }
 
-let elt' f_elt = 
-  let memo_elt = Hashtbl.create 64 in
-  let f_elt ctxt0 = memo f_elt d_tag memo_elt ctxt0.ctxt_decl in
-  let f = map_concat' f_elt in
-  { f with clear = fun () -> Hashtbl.clear memo_elt; f.clear () }
-    
-let elt_env f_elt = 
-  let f_elt env = 
-    let memo_elt = Hashtbl.create 64 in
-    memo (f_elt env) d_tag memo_elt in
-  let memo_env = Hashtbl.create 2 in
-  let f_elt ctxt = (memo f_elt env_tag memo_env ctxt.ctxt_env) ctxt.ctxt_decl in
-  let f = map_concat f_elt in
-  { f with clear = fun () -> Hashtbl.clear memo_env; f.clear () }
-
-let elt_env' f_elt = 
-  let f_elt env = 
-    let memo_elt = Hashtbl.create 64 in
-    memo (f_elt env) d_tag memo_elt in
-  let memo_env = Hashtbl.create 2 in
-  let f_elt ctxt = (memo f_elt env_tag memo_env ctxt.ctxt_env) ctxt.ctxt_decl in
-  let f = map_concat' f_elt in
-  { f with clear = fun () -> Hashtbl.clear memo_env; f.clear () }
-    
-(* Utils *)
-
-(*type odecl =
-  | Otype of ty_decl
-  | Ologic of logic_decl
-  | Oprop of prop_decl
-  | Ouse   of theory
-  | Oclone of (ident * ident) list*)
-
-let elt_of_oelt ~ty ~logic ~ind ~prop ~use ~clone d = 
-  match d.d_node with
-    | Dtype l -> [create_ty_decl (List.map ty l)]
-    | Dlogic l -> [create_logic_decl (List.map logic l)]
-    | Dind l -> ind l 
-    | Dprop p -> prop p
-    | Duse th -> use th
-    | Dclone (th,c) -> clone th c
-
-let fold_context_of_decl f ctxt env ctxt_done d =
-  let env,decls = f ctxt env d in
-  env,List.fold_left add_decl ctxt_done decls
-
-let remove_lemma =
-  let f d =
-    match d.d_node with
-      | Dprop (Plemma, pr, f) ->
-          let da = create_prop_decl Paxiom pr f in
-          let dg = create_prop_decl Pgoal  pr f in
-          [dg;da]
-      | _ ->  [d]
-  in
-  elt f
-
-exception NotGoalContext
-
-let goal_of_ctxt ctxt =
-  match ctxt.ctxt_decl.d_node with
-    | Dprop (Pgoal,pr,_) -> pr
-    | _ -> raise NotGoalContext
-
-let identity = 
-  { all = (fun x -> x);
-    clear = (fun () -> ()); }
-
-let identity' = singleton identity
-
-let rewrite_elt rt rf d =
-  match d.d_node with
-    | Dtype _ -> [d]
-    | Dlogic l -> [create_logic_decl (List.map 
-        (function 
-           | (ls,Some def) -> 
-               let vsl,expr = open_ls_defn def in
-               let expr = e_map rt rf expr in
-               make_ls_defn ls vsl expr
-           | l -> l) l)]
-    | Dind indl -> [create_ind_decl 
-        (List.map (fun (ls,pl) -> ls, 
-        (List.map (fun (pr,f) -> (pr, rf f)) pl)) indl)]
-    |Dprop (k,pr,f) -> [create_prop_decl k pr (rf f)]
-    |Duse _ |Dclone _ -> [d]
-
-let rewrite_env rt rf env =
-  let rt =  rt env in
-  let rf = rf env in
-  rewrite_elt rt rf
-
-let rewrite_elt rt rf = elt (rewrite_elt rt rf)
-
-let rewrite_env rt rf =
-  elt_env (rewrite_env rt rf)
-  
-let cloned_from ctxt i1 i2 = 
-  try
-    i1 = i2 || Sid.mem i2 (Mid.find i1 ctxt.ctxt_cloned)
-  with Not_found -> false
-
-(* let find_theory *)
-
-(* let cloned_from_ts ctxt slth sth sil ls1 = *)
-(*   try *)
-(*     let th = find_theory ctxt.ctxt_env slth sth in *)
-(*     let ls2 = find_ty th.th_export sil in *)
-(*     Context_utils.cloned_from ctxt ls1.ts_name ls2.ts_name *)
-(*   with Loc.Located _ -> raise Not_found *)
-    
-(* let cloned_from_ls ctxt slth sth sil ls1 = *)
-(*   try *)
-(*     let th = find_theory ctxt.ctxt_env l in *)
-(*     let ls2 = find_l th.th_export sil in *)
-(*       Context_utils.cloned_from ctxt ls1.ls_name ls2.ls_name *)
-(*   with Loc.Located _ -> assert false *)
-    
-(* let cloned_from_pr ctxt l s pr1 = *)
-(*   try *)
-(*     let th = Typing.find_theory ctxt.ctxt_env l in *)
-(*     let pr2 = find_l th.th_export sil in *)
-(*     Context_utils.cloned_from ctxt pr1.pr_name pr2.pr_name *)
-(*   with Loc.Located _ -> assert false *)
 

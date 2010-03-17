@@ -21,8 +21,8 @@ open Util
 open Ident
 open Ty
 open Term
-open Theory
-
+open Decl
+open Theory2
 
 type seen =
   | SNot
@@ -127,8 +127,8 @@ let elt d =
         let l = connexe m in
         List.map (fun e -> create_ty_decl (List.map (Hid.find mem) e)) l
     | Dind _ -> [d] (* TODO *)
-    | Dprop _ | Dclone _ | Duse _ -> [d]
+    | Dprop _ -> [d]
 
-let t () = Trans.elt elt
+let t () = Trans.decl elt
 
 let () = Driver.register_transform "simplify_recursive_definition" t

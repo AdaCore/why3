@@ -19,20 +19,22 @@
 
 open Format
 open Ident
-open Theory
+open Task
+open Trans
+open Env
 
 (** creating drivers *)
 
-type driver 
+type driver
 
 val load_driver : string -> env -> driver
 
 (** querying drivers *)
 
-type translation = 
+type translation =
   | Remove
   | Syntax of string
-  | Tag of Snm.t
+  | Tag of Util.Sstr.t
 
 val query_ident : driver -> ident -> translation
 val syntax_arguments : string -> (formatter -> 'a -> unit) -> formatter -> 'a list -> unit
@@ -40,26 +42,26 @@ val syntax_arguments : string -> (formatter -> 'a -> unit) -> formatter -> 'a li
      the list l using the template templ and the printer print_arg *)
   (** registering printers *)
 
-type printer = driver -> formatter -> context -> unit
+type printer = driver -> formatter -> task -> unit
 
 val register_printer : string -> printer -> unit
 
-val register_transform : string -> (unit -> Trans.ctxt_t) -> unit
-val register_transform' : string -> (unit -> Trans.ctxt_list_t) -> unit
+val register_transform   : string -> (unit -> task trans) -> unit
+val register_transform_l : string -> (unit -> task tlist) -> unit
 
-val list_printers : unit -> string list
+val list_printers   : unit -> string list
 val list_transforms : unit -> string list
 
 (** using drivers *)
 
-(** transform context *)
-val apply_transforms : driver -> context -> context list
+(** transform task *)
+val apply_transforms : driver -> task -> task list
 
-(** print_context *)
-val print_context : printer
+(** print_task *)
+val print_task : env -> clone -> printer
 
 val filename_of_goal : driver -> Ident.ident_printer ->
-  string -> string -> context -> string
+  string -> string -> task -> string
 (* filename_of_goal printer file_ident theory_ident ctxt *)
 
 type prover_answer =
@@ -71,28 +73,30 @@ type prover_answer =
   | Timeout
   | HighFailure
 
-val call_prover : 
-  ?debug:bool -> (* if on print on stderr the commandline 
+val call_prover :
+  ?debug:bool -> (* if on print on stderr the commandline
                     and the output of the prover *)
   ?timeout:int -> (* specify the time limit given to the prover,
                      if not set unlimited time *)
+  env ->
+  clone ->
   driver ->       (* the driver to use *)
-  context ->      (* the context to prove with a goal as the last declaration *)
+  task ->      (* the task to prove with a goal as the last declaration *)
   Call_provers.prover_result
 
-val call_prover_on_file : 
-  ?debug:bool -> 
-  ?timeout:int -> 
-  driver -> 
-  string -> 
+val call_prover_on_file :
+  ?debug:bool ->
+  ?timeout:int ->
+  driver ->
+  string ->
     Call_provers.prover_result
 
-val call_prover_on_buffer : 
-  ?debug:bool -> 
-  ?timeout:int -> 
-  ?filename:string -> 
-  driver -> 
-  Buffer.t -> 
+val call_prover_on_buffer :
+  ?debug:bool ->
+  ?timeout:int ->
+  ?filename:string ->
+  driver ->
+  Buffer.t ->
   Call_provers.prover_result
 
 (* error reporting *)

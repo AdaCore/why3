@@ -21,7 +21,9 @@ open Format
 open Ident
 open Ty
 open Term
-open Theory
+open Decl
+open Theory2
+open Task
 
 val forget_all : unit -> unit     (* flush id_unique *)
 val forget_tvs : unit -> unit     (* flush id_unique for type vars *)
@@ -52,8 +54,8 @@ val print_prop_decl : formatter -> prop_decl -> unit
 
 val print_decl : formatter -> decl -> unit
 val print_decls : formatter -> decl list -> unit
-val print_context : formatter -> context -> unit
+val print_task : formatter -> task -> unit
 val print_theory : formatter -> theory -> unit
 
-val print_named_context : formatter -> string -> context -> unit
+val print_named_task : formatter -> string -> task -> unit
 

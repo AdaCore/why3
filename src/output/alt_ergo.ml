@@ -22,7 +22,8 @@ open Pp
 open Ident
 open Ty
 open Term
-open Theory
+open Decl
+open Task
 
 let ident_printer = 
   let bls = ["let"; "forall"; "exists"; "and"; "or"] in
@@ -156,13 +157,13 @@ let print_type_decl drv fmt = function
 
 let ac_th = ["algebra";"AC"]
 
-let print_logic_decl drv ctxt fmt (ls,ld) =
+let print_logic_decl drv task fmt (ls,ld) =
   match Driver.query_ident drv ls.ls_name with
     | Driver.Remove | Driver.Syntax _ -> false
     | Driver.Tag s ->
         begin match ld with
           | None ->
-              let sac = if Snm.mem "AC" s then "ac " else "" in
+              let sac = if Util.Sstr.mem "AC" s then "ac " else "" in
               fprintf fmt "@[<hov 2>logic %s%a : %a -> %a@]@\n"
                 sac print_ident ls.ls_name
                 (print_list comma (print_type drv)) ls.ls_args 
@@ -187,11 +188,11 @@ let print_logic_decl drv ctxt fmt (ls,ld) =
         end;
         true
   
-let print_decl drv ctxt fmt d = match d.d_node with
+let print_decl drv task fmt d = match d.d_node with
   | Dtype dl ->
       print_list_opt newline (print_type_decl drv) fmt dl
   | Dlogic dl ->
-      print_list_opt newline (print_logic_decl drv ctxt) fmt dl
+      print_list_opt newline (print_logic_decl drv task) fmt dl
   | Dind _ -> assert false (* TODO *)
   | Dprop (Paxiom, pr, _) when
       Driver.query_ident drv (pr_name pr) = Driver.Remove -> false
@@ -203,17 +204,16 @@ let print_decl drv ctxt fmt d = match d.d_node with
         print_ident (pr_name pr) (print_fmla drv) f; true
   | Dprop (Plemma, _, _) ->
       assert false
-  | Duse _ | Dclone _ -> false
 
-let print_context drv fmt ctxt = 
-  let decls = Context.get_decls ctxt in
-  ignore (print_list_opt newline2 (print_decl drv ctxt) fmt decls)
+let print_context drv fmt task = 
+  let decls = Task.task_decls task in
+  ignore (print_list_opt newline2 (print_decl drv task) fmt decls)
 
 let () = Driver.register_printer "alt-ergo" 
-  (fun drv fmt ctxt -> 
+  (fun drv fmt task -> 
      forget_all ident_printer;
-     print_context drv fmt ctxt)
+     print_context drv fmt task)
 
-let print_goal drv fmt (id, f, ctxt) =
-  print_context drv fmt ctxt;
+let print_goal drv fmt (id, f, task) =
+  print_context drv fmt task;
   fprintf fmt "@\n@[<hov 2>goal %a : %a@]@\n" print_ident id (print_fmla drv) f

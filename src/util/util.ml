@@ -38,3 +38,8 @@ exception FoldSkip
 
 let all_fn pr _ t = pr t || raise FoldSkip
 let any_fn pr _ t = pr t && raise FoldSkip
+
+
+module Sstr = Set.Make(String)
+module Mstr = Map.Make(String)
+

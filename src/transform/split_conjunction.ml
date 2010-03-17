@@ -1,6 +1,6 @@
 open Ident
 open Term
-open Theory
+open Decl
 
 let list_fold_product f acc l1 l2 =
   List.fold_left 
@@ -92,12 +92,12 @@ let elt split_pos d =
 
 let split_pos1 = split_pos (fun acc x -> x::acc)
 
-let split_conjunction () = Trans.elt' (elt split_pos1)
+let split_conjunction () = Trans.decl_l (elt split_pos1)
 
 let rec split_pos2 acc d = split_pos split_neg2 acc d
 and split_neg2 acc d = split_neg split_pos2 acc d
 
-let split_to_cnf () = Trans.elt' (elt split_pos2)
+let split_to_cnf () = Trans.decl_l (elt split_pos2)
 
-let () = Driver.register_transform' "split_conjunction" split_conjunction
-let () = Driver.register_transform' "split_to_cnf" split_to_cnf
+let () = Driver.register_transform_l "split_conjunction" split_conjunction
+let () = Driver.register_transform_l "split_to_cnf" split_to_cnf

@@ -19,7 +19,8 @@
 
 (** Typing environments *)
 
-open Theory
+open Theory2
+open Env
 
 val retrieve : string list -> retrieve_theory
   (** creates a new typing environment for a given loadpath *)
