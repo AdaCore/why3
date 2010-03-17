@@ -94,8 +94,8 @@ let split_pos1 = split_pos (fun acc x -> x::acc)
 let rec split_pos2 acc d = split_pos split_neg2 acc d
 and split_neg2 acc d = split_neg split_pos2 acc d
 
-let split_pos () = Trans.decl_l (elt split_pos1)
-let split_pos_neg () = Trans.decl_l (elt split_pos2)
+let split_pos () = Trans.decl_l (elt split_pos1) None
+let split_pos_neg () = Trans.decl_l (elt split_pos2) None
 
 let () = Driver.register_transform_l "split_goal_pos" split_pos
 let () = Driver.register_transform_l "split_goal_pos_neg" split_pos_neg

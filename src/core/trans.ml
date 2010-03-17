@@ -96,11 +96,11 @@ let fold_l fn v =
   let rewind = List.fold_left rewind in
   accum memo_t rewind [v] []
 
-let fold_map   fn v = conv_res (fold   fn (v, None)) snd
-let fold_map_l fn v = conv_res (fold_l fn (v, None)) (List.rev_map snd)
+let fold_map   fn v t = conv_res (fold   fn (v, t)) snd
+let fold_map_l fn v t = conv_res (fold_l fn (v, t)) (List.rev_map snd)
 
-let map   fn = fold   (fun t1 t2 -> fn t1 t2) None
-let map_l fn = fold_l (fun t1 t2 -> fn t1 t2) None
+let map   fn = fold   (fun t1 t2 -> fn t1 t2)
+let map_l fn = fold_l (fun t1 t2 -> fn t1 t2)
 
 let decl fn =
   let memo_t = Hashtbl.create 63 in
@@ -133,7 +133,4 @@ let rewrite fnT fnF d = match d.d_node with
       create_prop_decl k pr (fnF f)
 
 let expr fnT fnF = decl (fun d -> [rewrite fnT fnF d])
-
-
-
 

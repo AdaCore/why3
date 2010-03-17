@@ -42,17 +42,17 @@ val compose_l : task tlist -> 'a tlist -> 'a tlist
 val fold   : (task_hd -> 'a -> 'a     ) -> 'a -> 'a trans
 val fold_l : (task_hd -> 'a -> 'a list) -> 'a -> 'a tlist
 
-val fold_map :
-  (task_hd -> 'a * task -> ('a * task)     ) -> 'a -> task trans
+val fold_map   : (task_hd -> 'a * task -> ('a * task)) ->
+                                      'a -> task -> task trans
 
-val fold_map_l :
-  (task_hd -> 'a * task -> ('a * task) list) -> 'a -> task tlist
+val fold_map_l : (task_hd -> 'a * task -> ('a * task) list) ->
+                                      'a -> task -> task tlist
 
-val map   : (task_hd -> task -> task     ) -> task trans
-val map_l : (task_hd -> task -> task list) -> task tlist
+val map   : (task_hd -> task -> task     ) -> task -> task trans
+val map_l : (task_hd -> task -> task list) -> task -> task tlist
 
-val decl   : (decl -> decl list     ) -> task trans
-val decl_l : (decl -> decl list list) -> task tlist
+val decl   : (decl -> decl list     ) -> task -> task trans
+val decl_l : (decl -> decl list list) -> task -> task tlist
 
-val expr : (term -> term) -> (fmla -> fmla) -> task trans
+val expr : (term -> term) -> (fmla -> fmla) -> task -> task trans
 

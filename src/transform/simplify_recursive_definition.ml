@@ -128,6 +128,6 @@ let elt d =
     | Dind _ -> [d] (* TODO *)
     | Dprop _ -> [d]
 
-let t () = Trans.decl elt
+let t () = Trans.decl elt None
 
 let () = Driver.register_transform "simplify_recursive_definition" t
