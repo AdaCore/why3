@@ -118,7 +118,7 @@ doc/version.tex src/version.ml: Version version.sh config.status
 #####
 
 CORE_CMO := ident.cmo ty.cmo term.cmo decl.cmo theory.cmo\
-	task.cmo pretty.cmo trans.cmo env.cmo
+	task.cmo pretty.cmo trans.cmo env.cmo register.cmo
 CORE_CMO := $(addprefix src/core/,$(CORE_CMO))
 
 UTIL_CMO := pp.cmo loc.cmo util.cmo hashcons.cmo sysutil.cmo
