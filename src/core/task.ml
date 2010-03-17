@@ -168,26 +168,33 @@ let mk_task decl prev known = Htask.hashcons {
   task_tag   = -1;
 }
 
+let push_decl task d =
+  try 
+    let kn = add_decl task.task_known d in
+    ignore (check_decl kn d);
+    mk_task d (Some task) kn
+  with DejaVu -> task
+
+let init_decl d =  
+  try
+    let kn = add_decl Mid.empty d in
+    ignore (check_decl kn d);
+    mk_task d None kn
+  with DejaVu -> assert false
+
+let add_decl opt d =
+  match opt with
+    | Some task -> push_decl task d
+    | None -> init_decl d
+
 let init_task =
-  let add opt td =
-    let known task = task.task_known in
-    let kn = option_apply Mid.empty known opt in
-    match td with
-      | Decl d -> Some (mk_task d opt (add_decl kn d))
-      | _      -> opt
+  let add opt = function
+    | Decl d -> Some (add_decl opt d)
+    | _      -> opt
   in
   List.fold_left add None builtin_theory.th_decls
 
-let init_task = of_option init_task
-
-let add_decl task d =
-  try
-    let kn = task.task_known in
-    let kn = add_decl kn d in
-    ignore (check_decl kn d);
-    mk_task d (Some task) kn
-  with DejaVu ->
-    task
+(* let init_task = of_option init_task *)
 
 let rec use_export names acc td =
   let used, cl, res, task = acc in
@@ -206,27 +213,27 @@ let rec use_export names acc td =
         begin match d.d_node with
           | Dprop (Pgoal,pr,_)
             when option_apply true (Spr.mem pr) names ->
-              let res = (add_decl task d, cl) :: res in
+              let res = (push_decl task d, cl) :: res in
               used, cl, res, task
           | Dprop (Pgoal,_,_) ->
               acc
           | Dprop (Plemma,pr,f)
             when option_apply true (Spr.mem pr) names ->
               let d = create_prop_decl Pgoal pr f in
-              let res = (add_decl task d, cl) :: res in
+              let res = (push_decl task d, cl) :: res in
               let d = create_prop_decl Paxiom pr f in
-              used, cl, res, add_decl task d
+              used, cl, res, push_decl task d
           | Dprop (Plemma,pr,f) ->
               let d = create_prop_decl Paxiom pr f in
-              used, cl, res, add_decl task d
+              used, cl, res, push_decl task d
           | Dprop (Paxiom,_,_) ->
-              used, cl, res, add_decl task d
+              used, cl, res, push_decl task d
           | Dtype _ | Dlogic _ | Dind _  ->
-              used, cl, res, add_decl task d
+              used, cl, res, push_decl task d
         end
 
 let split_theory_opt th names =
-  let acc = Sid.empty, empty_clone, [], init_task in
+  let acc = Sid.empty, empty_clone, [], of_option init_task in
   let _, _, res, _ =
     List.fold_left (use_export names) acc th.th_decls
   in

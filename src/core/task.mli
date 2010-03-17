@@ -42,9 +42,10 @@ type task = private {
 
 (* constructors *)
 
-val init_task : task
+(* val init_task : task *)
+(* val add_decl : task -> decl -> task *)
 
-val add_decl : task -> decl -> task
+val add_decl : task option -> decl -> task
 
 val split_theory : theory -> Spr.t -> (task * clone) list
 
@@ -89,11 +90,14 @@ val compose_l : task tlist -> 'a tlist -> 'a tlist
 val fold   : (task -> 'a -> 'a     ) -> 'a -> 'a trans
 val fold_l : (task -> 'a -> 'a list) -> 'a -> 'a tlist
 
-val fold_map   : (task -> 'a * task -> ('a * task)     ) -> 'a -> task trans
-val fold_map_l : (task -> 'a * task -> ('a * task) list) -> 'a -> task tlist
+val fold_map : 
+  (task -> 'a * task option -> ('a * task)     ) -> 'a -> task trans
 
-val map   : (task -> task -> task     ) -> task trans
-val map_l : (task -> task -> task list) -> task tlist
+val fold_map_l : 
+  (task -> 'a * task option -> ('a * task) list) -> 'a -> task tlist
+
+val map   : (task -> task option -> task     ) -> task trans
+val map_l : (task -> task option -> task list) -> task tlist
 
 val decl   : (decl -> decl list     ) -> task trans
 val decl_l : (decl -> decl list list) -> task tlist
