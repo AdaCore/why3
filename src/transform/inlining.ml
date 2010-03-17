@@ -109,7 +109,7 @@ let fold isnotinlinedt isnotinlinedf ctxt0 (env, ctxt) =
     | Duse _ | Dclone _ -> env,add_decl ctxt d
         
 let t ~isnotinlinedt ~isnotinlinedf = 
-  Transform.fold_map (fold isnotinlinedt isnotinlinedf) (fun _ -> empty_env)
+  Trans.fold_map (fold isnotinlinedt isnotinlinedf) (fun _ -> empty_env)
 
 let all () = t ~isnotinlinedt:(fun _ -> false) ~isnotinlinedf:(fun _ -> false)
 

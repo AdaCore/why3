@@ -23,17 +23,17 @@
 val t :
   isnotinlinedt:(Term.term -> bool) ->
   isnotinlinedf:(Term.fmla -> bool) -> 
-  Transform.ctxt_t
+  Trans.ctxt_t
 
 
 (* Inline them all *)
 
-val all : unit -> Transform.ctxt_t
+val all : unit -> Trans.ctxt_t
 
 (* Inline only the trivial definition :
    logic c : t = a
    logic f(x : t,...., ) : t = g(y : t2,...) *)
-val trivial : unit -> Transform.ctxt_t
+val trivial : unit -> Trans.ctxt_t
 
 
 (* Function to use in other transformations if inlining is needed *)

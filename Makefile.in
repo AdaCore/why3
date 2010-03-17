@@ -63,7 +63,7 @@ DYNLINKOFLAGS =
 endif
 
 
-INCLUDES = -I src/core -I src/util -I src/parser -I src/output \
+INCLUDES = -I src/core -I src/util -I src/driver -I src/parser -I src/output \
            -I src/transform -I src/programs -I src 
 BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cma unix.cma $(DYNLINKBFLAGS)
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
@@ -76,10 +76,10 @@ COQLIB = "@COQLIB@"
 COQVER = @COQVER@
 
 GENERATED = src/version.ml src/parser/parser.mli src/parser/parser.ml \
-            src/parser/lexer.ml src/output/driver_lexer.ml \
-            src/output/driver_parser.mli src/output/driver_parser.ml \
+            src/parser/lexer.ml src/driver/driver_lexer.ml \
+            src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	    src/programs/pgm_lexer.ml src/programs/pgm_parser.mli \
-	    src/programs/pgm_parser.ml src/util/dynlink_compat.ml
+	    src/programs/pgm_parser.ml src/driver/dynlink_compat.ml
 
 # main targets
 ##############
@@ -117,30 +117,28 @@ doc/version.tex src/version.ml: Version version.sh config.status
 # why
 #####
 
-CORE_CMO := ident.cmo ty.cmo term.cmo decl.cmo theory2.cmo\
-	task.cmo env.cmo theory.cmo pretty.cmo
+CORE_CMO := ident.cmo ty.cmo term.cmo decl.cmo theory.cmo theory2.cmo\
+	task.cmo trans.cmo env.cmo pretty.cmo
 CORE_CMO := $(addprefix src/core/,$(CORE_CMO))
 
-UTIL_CMO := pp.cmo loc.cmo util.cmo hashcons.cmo sysutil.cmo\
-	dynlink_compat.cmo
+UTIL_CMO := pp.cmo loc.cmo util.cmo hashcons.cmo sysutil.cmo
 UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
 
 PARSER_CMO := parser.cmo lexer.cmo typing.cmo 
 PARSER_CMO := $(addprefix src/parser/,$(PARSER_CMO))
 
 TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
-	split_conjunction.cmo split_goals.cmo 
+	split_conjunction.cmo split_goals.cmo
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
-DRIVER_CMO := call_provers.cmo driver_parser.cmo driver_lexer.cmo driver.cmo
-DRIVER_CMO := $(addprefix src/output/,$(DRIVER_CMO))
+DRIVER_CMO := call_provers.cmo dynlink_compat.cmo driver_parser.cmo\
+	driver_lexer.cmo driver.cmo
+DRIVER_CMO := $(addprefix src/driver/,$(DRIVER_CMO))
 
-OUTPUT_CMO := call_provers.cmo driver_parser.cmo driver_lexer.cmo driver.cmo \
-              print_real.cmo alt_ergo.cmo why3.cmo
+OUTPUT_CMO := print_real.cmo alt_ergo.cmo why3.cmo
 OUTPUT_CMO := $(addprefix src/output/,$(OUTPUT_CMO))
 
-CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) \
-      src/transform/transform.cmo $(DRIVER_CMO)\
+CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
       $(TRANSFORM_CMO) $(OUTPUT_CMO) src/main.cmo
 CMX = $(CMO:.cmo=.cmx)
 
@@ -177,8 +175,7 @@ testl: bin/whyl.byte
 PGM_CMO := pgm_parser.cmo pgm_lexer.cmo pgm_main.cmo
 PGM_CMO := $(addprefix src/programs/, $(PGM_CMO))
 
-WHYL_CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) \
-	   src/transform/transform.cmo $(DRIVER_CMO)\
+WHYL_CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
            $(TRANSFORM_CMO) $(OUTPUT_CMO) $(PGM_CMO)
 WHYL_CMX = $(WHYL_CMO:.cmo=.cmx)
 

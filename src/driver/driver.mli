@@ -44,8 +44,8 @@ type printer = driver -> formatter -> context -> unit
 
 val register_printer : string -> printer -> unit
 
-val register_transform : string -> (unit -> Transform.ctxt_t) -> unit
-val register_transform' : string -> (unit -> Transform.ctxt_list_t) -> unit
+val register_transform : string -> (unit -> Trans.ctxt_t) -> unit
+val register_transform' : string -> (unit -> Trans.ctxt_list_t) -> unit
 
 val list_printers : unit -> string list
 val list_transforms : unit -> string list

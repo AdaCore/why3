@@ -20,7 +20,7 @@
 open Format
 open Theory
 open Driver
-open Transform
+open Trans
 
 let files = Queue.create ()
 let parse_only = ref false
@@ -106,9 +106,9 @@ let transformation l =
   let t2 = Inlining.all in
   List.map (fun (t,c) ->
               let c = if !simplify_recursive 
-              then Transform.apply t1 c
+              then Trans.apply t1 c
               else c in
-              let c = if !inlining then Transform.apply t2 c
+              let c = if !inlining then Trans.apply t2 c
               else c in
               (t,c)) l
 *)
@@ -162,7 +162,7 @@ let extract_goals ?filter =
   let split_goals = Split_goals.t ?filter () in
   fun env drv acc th ->
     let ctxt = Context.use_export (Context.init_context env) th in
-    let l = Transform.apply split_goals ctxt in
+    let l = Trans.apply split_goals ctxt in
     let l = List.rev_map (fun ctxt -> (th,ctxt)) l in
     List.rev_append l acc
 

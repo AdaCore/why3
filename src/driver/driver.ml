@@ -126,7 +126,7 @@ and driver = {
   drv_prover      : Call_provers.prover;
   drv_prelude     : string option;
   drv_filename    : string option;
-  drv_transforms  : Transform.ctxt_list_t;
+  drv_transforms  : Trans.ctxt_list_t;
   drv_rules       : theory_rules list;
   drv_thprelude   : string Hid.t;
   (* the first is the translation only for this ident, the second is also for representant *)
@@ -144,12 +144,12 @@ let print_driver fmt driver =
 
 (** registering transformation *)
 
-let (transforms : (string, unit -> Transform.ctxt_list_t) Hashtbl.t) 
+let (transforms : (string, unit -> Trans.ctxt_list_t) Hashtbl.t) 
     = Hashtbl.create 17
 
 let register_transform' name transform = Hashtbl.replace transforms name transform
 let register_transform name t = register_transform' name 
-  (fun () -> Transform.singleton (t ()))
+  (fun () -> Trans.singleton (t ()))
 let list_transforms () = Hashtbl.fold (fun k _ acc -> k::acc) transforms []
 
 (** registering printers *)
@@ -317,9 +317,9 @@ let load_driver file env =
          let t = 
            try (Hashtbl.find transforms s) () 
            with Not_found -> errorm ~loc "unknown transformation %s" s in
-         Transform.compose' acc t
+         Trans.compose' acc t
       )
-      Transform.identity' transformations in
+      Trans.identity' transformations in
     let transforms = trans ltransforms in
   { drv_printer     = !printer;
     drv_context     = Context.init_context env;
@@ -362,7 +362,7 @@ let syntax_arguments s print fmt l =
  
 (** using drivers *)
 
-let apply_transforms drv = Transform.apply drv.drv_transforms
+let apply_transforms drv = Trans.apply drv.drv_transforms
 
 let print_context drv fmt ctxt = match drv.drv_printer with
   | None -> errorm "no printer"
@@ -379,7 +379,7 @@ let filename_of_goal drv ident_printer filename theory_name ctxt =
   match drv.drv_filename with
     | None -> errorm "no filename syntax given"
     | Some f -> 
-        let pr_name = pr_name (Transform.goal_of_ctxt ctxt) in
+        let pr_name = pr_name (Trans.goal_of_ctxt ctxt) in
         let repl_fun s = 
           let i = matched_group 1 s in
           match i with

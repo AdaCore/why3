@@ -39,5 +39,5 @@ let t ?filter () =
           (add_decl ctxt d1,l)
       | _ -> (add_decl ctxt decl, l) 
   in
-  let g = Transform.fold f (fun env -> init_context env, []) in
-  Transform.conv_res g snd
+  let g = Trans.fold f (fun env -> init_context env, []) in
+  Trans.conv_res g snd
