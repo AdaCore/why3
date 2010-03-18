@@ -16,12 +16,16 @@
 (*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
 (*                                                                        *)
 (**************************************************************************)
-# 19 "src/util/dynlink_compat.ml.in"
+# 19 "src/driver/dynlink_compat.ml.in"
 
 module Dynlink_ =
 struct
   let is_native = true (* Dumb value *)
   let loadfile_private _ = assert false (* Shouldn't be used *)
+
+  type error
+  exception Error of error
+  let error_message : error -> string = fun _ -> assert false
 end
 
 module Dynlink = 

@@ -126,8 +126,8 @@ let rec report fmt = function
       fprintf fmt "anomaly: unknownident %s" i.Ident.id_short
   | Driver.Error e ->
       Driver.report fmt e
-(*   | Dynlink.Error e -> *)
-(*       fprintf fmt "Dynlink : %s" (Dynlink.error_message e) *)
+  | Dynlink_compat.Dynlink.Error e -> 
+      fprintf fmt "Dynlink : %s" (Dynlink_compat.Dynlink.error_message e)
   | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
 (*
