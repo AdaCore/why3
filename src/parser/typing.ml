@@ -911,7 +911,7 @@ let fmla env f =
 let add_prop k loc s f th =
   let f = fmla th f in
   try
-    add_decl th (create_prop_decl k (create_prop (id_user s.id loc)) f)
+    add_decl th (create_prop_decl k (create_prsymbol (id_user s.id loc)) f)
   with ClashSymbol _ ->
     error ~loc (Clash s.id)
 
@@ -1010,7 +1010,7 @@ let add_inductives dl th =
     let id = d.in_ident.id in
     let ps = Hashtbl.find psymbols id in
     let clause (loc, id, f) = 
-      create_prop (id_user id.id loc), fmla th' f
+      create_prsymbol (id_user id.id loc), fmla th' f
     in
     ps, List.map clause d.in_def
   in

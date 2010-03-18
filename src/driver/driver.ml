@@ -231,7 +231,7 @@ let load_rules env clone driver {thr_name = loc,qualid; thr_rules = trl} =
         begin
           try
             add_htheory c 
-              (ns_find_prop th.th_export q).pr_name Remove
+              (ns_find_pr th.th_export q).pr_name Remove
           with Not_found -> errorm ~loc "Unknown axioms %s" 
             (string_of_qualid qualid q)
         end 
@@ -272,7 +272,7 @@ let load_rules env clone driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rtagpr (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (ns_find_prop th.th_export q).pr_name
+            add_htheory c (ns_find_pr th.th_export q).pr_name
               (Tag (Sstr.singleton s))
           with Not_found -> errorm ~loc "Unknown proposition %s" 
             (string_of_qualid qualid q)

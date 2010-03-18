@@ -30,13 +30,13 @@ module Mnm : Map.S with type key = string
 type namespace = private {
   ns_ts : tysymbol Mnm.t;   (* type symbols *)
   ns_ls : lsymbol Mnm.t;    (* logic symbols *)
-  ns_pr : prop_fmla Mnm.t;  (* propositions *)
+  ns_pr : prop Mnm.t;       (* propositions *)
   ns_ns : namespace Mnm.t;  (* inner namespaces *)
 }
 
 val ns_find_ts   : namespace -> string list -> tysymbol
 val ns_find_ls   : namespace -> string list -> lsymbol
-val ns_find_pr   : namespace -> string list -> prop_fmla
+val ns_find_pr   : namespace -> string list -> prsymbol
 
 val ns_find_prop : namespace -> string list -> prop
 val ns_find_fmla : namespace -> string list -> fmla

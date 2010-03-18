@@ -57,7 +57,7 @@ val task_iter : (decl -> unit) -> task -> unit
 
 val task_decls : task -> decl list
 
-val task_goal : task -> prop
+val task_goal : task -> prsymbol
 
 (* exceptions *)
 

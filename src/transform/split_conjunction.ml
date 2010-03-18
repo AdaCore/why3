@@ -85,7 +85,7 @@ let elt split_pos d =
     | Dprop (Pgoal,pr,f) ->
         let l = split_pos [] f in
         List.map (fun p -> [create_prop_decl Pgoal 
-                              (create_prop (id_clone pr.pr_name)) p]) l
+                              (create_prsymbol (id_clone pr.pr_name)) p]) l
     | _ -> [[d]]
 
 let t fsp = Register.store (fun () -> Trans.decl_l (elt fsp) None)

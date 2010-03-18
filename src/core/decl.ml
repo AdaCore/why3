@@ -82,12 +82,12 @@ let ls_defn_axiom (_,_,_,f) = f
 
 (** Inductive predicate declaration *)
 
-type prop = {
+type prsymbol = {
   pr_name : ident;
 }
 
 module Prop = struct
-  type t = prop
+  type t = prsymbol
   let equal = (==)
   let hash pr = pr.pr_name.id_tag
   let compare pr1 pr2 =
@@ -97,11 +97,11 @@ module Spr = Set.Make(Prop)
 module Mpr = Map.Make(Prop)
 module Hpr = Hashtbl.Make(Prop)
 
-let create_prop n = { pr_name = id_register n }
+let create_prsymbol n = { pr_name = id_register n }
 
-type prop_fmla = prop * fmla
+type prop = prsymbol * fmla
 
-type ind_decl  = lsymbol * prop_fmla list
+type ind_decl = lsymbol * prop list
 
 (** Proposition declaration *)
 
@@ -110,7 +110,7 @@ type prop_kind =
   | Plemma
   | Pgoal
 
-type prop_decl = prop_kind * prop * fmla
+type prop_decl = prop_kind * prsymbol * fmla
 
 (** Declaration type *)
 
@@ -246,9 +246,9 @@ let create_logic_decl ldl =
   ignore (List.fold_left check_decl Sid.empty ldl);
   create_logic_decl ldl
 
-exception InvalidIndDecl of lsymbol * prop
-exception TooSpecificIndDecl of lsymbol * prop * term
-exception NonPositiveIndDecl of lsymbol * prop * lsymbol
+exception InvalidIndDecl of lsymbol * prsymbol
+exception TooSpecificIndDecl of lsymbol * prsymbol * term
+exception NonPositiveIndDecl of lsymbol * prsymbol * lsymbol
 
 exception Found of lsymbol
 let ls_mem s sps = if Sls.mem s sps then raise (Found s) else false

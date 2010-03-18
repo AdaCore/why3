@@ -32,7 +32,7 @@ module Mnm = Mstr
 type namespace = {
   ns_ts : tysymbol Mnm.t;   (* type symbols *)
   ns_ls : lsymbol Mnm.t;    (* logic symbols *)
-  ns_pr : prop_fmla Mnm.t;  (* propositions *)
+  ns_pr : prop Mnm.t;       (* propositions *)
   ns_ns : namespace Mnm.t;  (* inner namespaces *)
 }
 
@@ -70,10 +70,10 @@ let rec ns_find get_map ns = function
 
 let ns_find_ts = ns_find (fun ns -> ns.ns_ts)
 let ns_find_ls = ns_find (fun ns -> ns.ns_ls)
-let ns_find_pr = ns_find (fun ns -> ns.ns_pr)
 
-let ns_find_prop ns sl = fst (ns_find_pr ns sl)
-let ns_find_fmla ns sl = snd (ns_find_pr ns sl)
+let ns_find_prop = ns_find (fun ns -> ns.ns_pr)
+let ns_find_pr   ns sl = fst (ns_find_prop ns sl)
+let ns_find_fmla ns sl = snd (ns_find_prop ns sl)
 
 
 (** Theory *)
@@ -249,7 +249,7 @@ exception CannotInstantiate of ident
 type clones = {
   ts_table : tysymbol Hts.t;
   ls_table : lsymbol Hls.t;
-  pr_table : prop_fmla Hpr.t;
+  pr_table : prop Hpr.t;
   id_table : ident Hid.t;
   nw_local : unit Hid.t;
   id_local : Sid.t;
@@ -298,7 +298,7 @@ let cl_find_ls cl ls =
 let cl_trans_fmla cl f = f_s_map (cl_find_ts cl) (cl_find_ls cl) f
 
 let cl_trans_prop cl (pr,f) =
-  let pr' = create_prop (id_dup pr.pr_name) in
+  let pr' = create_prsymbol (id_dup pr.pr_name) in
   let f' = cl_trans_fmla cl f in
   Hid.add cl.id_table pr.pr_name pr'.pr_name;
   Hpr.add cl.pr_table pr (pr',f');

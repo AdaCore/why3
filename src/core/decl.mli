@@ -47,19 +47,19 @@ val ls_defn_axiom : ls_defn -> fmla
 
 (** Inductive predicate declaration *)
 
-type prop = private {
+type prsymbol = private {
   pr_name : ident;
 }
 
-module Spr : Set.S with type elt = prop
-module Mpr : Map.S with type key = prop
-module Hpr : Hashtbl.S with type key = prop
+module Spr : Set.S with type elt = prsymbol
+module Mpr : Map.S with type key = prsymbol
+module Hpr : Hashtbl.S with type key = prsymbol
 
-val create_prop : preid -> prop
+val create_prsymbol : preid -> prsymbol
 
-type prop_fmla = prop * fmla
+type prop = prsymbol * fmla
 
-type ind_decl  = lsymbol * prop_fmla list
+type ind_decl = lsymbol * prop list
 
 (* Proposition declaration *)
 
@@ -68,7 +68,7 @@ type prop_kind =
   | Plemma
   | Pgoal
 
-type prop_decl = prop_kind * prop * fmla
+type prop_decl = prop_kind * prsymbol * fmla
 
 (** Declaration type *)
 
@@ -88,7 +88,7 @@ and decl_node =
 val create_ty_decl : ty_decl list -> decl
 val create_logic_decl : logic_decl list -> decl
 val create_ind_decl : ind_decl list -> decl
-val create_prop_decl : prop_kind -> prop -> fmla -> decl
+val create_prop_decl : prop_kind -> prsymbol -> fmla -> decl
 
 (* separate independent groups of declarations *)
 
@@ -102,9 +102,9 @@ exception ConstructorExpected of lsymbol
 exception IllegalTypeAlias of tysymbol
 exception UnboundTypeVar of tvsymbol
 
-exception InvalidIndDecl of lsymbol * prop
-exception TooSpecificIndDecl of lsymbol * prop * term
-exception NonPositiveIndDecl of lsymbol * prop * lsymbol
+exception InvalidIndDecl of lsymbol * prsymbol
+exception TooSpecificIndDecl of lsymbol * prsymbol * term
+exception NonPositiveIndDecl of lsymbol * prsymbol * lsymbol
 
 exception IllegalConstructor of lsymbol
 exception BadLogicDecl of ident

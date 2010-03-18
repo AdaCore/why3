@@ -201,7 +201,7 @@ let do_file env drv filename_printer file =
                  | Some s -> Some 
                      (Hashtbl.fold 
                         (fun s l acc ->
-                           let pr = try fst (ns_find_pr th.th_export l) with Not_found ->
+                           let pr = try ns_find_pr th.th_export l with Not_found ->
                              eprintf "File %s : --goal : Unknown goal %s@." file s ; exit 1 in
                            Decl.Spr.add pr acc
                         ) s Decl.Spr.empty) in
