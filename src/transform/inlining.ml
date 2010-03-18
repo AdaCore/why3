@@ -107,7 +107,8 @@ let fold isnotinlinedt isnotinlinedf task0 (env, task) =
         env,add_decl task (create_prop_decl k pr (replacep env f))
         
 let t ~isnotinlinedt ~isnotinlinedf = 
-  Register.store (fun () -> Trans.fold_map (fold isnotinlinedt isnotinlinedf) empty_env None)
+  Register.store 
+    (fun () -> Trans.fold_map (fold isnotinlinedt isnotinlinedf) empty_env None)
 
 let all = t ~isnotinlinedt:(fun _ -> false) ~isnotinlinedf:(fun _ -> false)
 

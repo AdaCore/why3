@@ -167,7 +167,7 @@ test: bin/why.byte
 	--call --goal Test.G src/test.why --timeout 3
 
 testl: bin/whyl.byte
-	ocamlrun -bt bin/whyl.byte src/programs/test.mlw
+	ocamlrun -bt bin/whyl.byte -I lib/prelude/ src/programs/test.mlw
 
 # programs
 ##########

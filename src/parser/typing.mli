@@ -29,6 +29,11 @@ val read_file : env -> string -> theory Mnm.t
 
 val read_channel : env -> string -> in_channel -> theory Mnm.t
 
+(** incremental parsing *)
+
+val add_decl : env -> theory Mnm.t -> theory_uc -> Ptree.decl -> theory_uc
+val fmla : theory_uc -> Ptree.lexpr -> Term.fmla
+
 (** error reporting *)
 
 type error

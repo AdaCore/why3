@@ -14,7 +14,8 @@ theory Test
   logic succ(x:int) : int = id(x+1)
   logic even(x: int) = 2*(x/2) = x
   clone ThA with type test = int, logic test = (-_)
-  goal G : forall x:int. 1 = succ(id2(zero))
+  goal G : (forall x:int. x=x) or
+           (forall x:int. x=x+1)
   goal G2 : forall x:int. 0 = 1
 end
 

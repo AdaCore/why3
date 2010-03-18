@@ -1,9 +1,16 @@
 
 (* test file for ML-why *)
 
-{ logic f(int) : int  }
+{ 
+use import prelude.Int
+logic f(int) : int 
+logic g(x : int) : int = f(x+1)
+}
 
-{  }
+{ 
+axiom A : forall x:int. f(x) = g(x-1)
+}
+
 
 (*
 Local Variables: 
