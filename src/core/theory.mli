@@ -90,8 +90,6 @@ val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 val clone_fold   : (('a * clone_map) -> tdecl -> ('a * clone_map)) ->
         ('a * clone_map) -> theory -> th_inst -> ('a * clone_map)
 
-val merge_clone  : clone_map -> theory -> (ident * ident) list -> clone_map
-
 (* exceptions *)
 
 exception NonLocal of ident

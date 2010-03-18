@@ -40,11 +40,19 @@ let cloned_from cl i1 i2 =
   try i1 = i2 || Sid.mem i2 (Mid.find i1 cl.cl_map)
   with Not_found -> false
 
-let add_clone =
+let merge_clone =
+  let add m id s acc =
+    let s =
+      try Sid.union s (Mid.find id m)
+      with Not_found -> s
+    in
+    Mid.add id s acc
+  in
   let r = ref 0 in
-  fun cl th sl ->
-    incr r;
-    { cl_map = merge_clone cl.cl_map th sl; cl_tag = !r }
+  fun cl th ->
+    if Mid.is_empty th.th_clone then cl else
+    { cl_map = Mid.fold (add cl.cl_map) th.th_clone cl.cl_map;
+      cl_tag = (incr r; !r) }
 
 
 (** Known identifiers *)
@@ -207,9 +215,10 @@ let rec use_export names acc td =
     | Use th when Sid.mem th.th_name used ->
         acc
     | Use th ->
-        let used = Sid.add th.th_name used in
-        let acc = used, cl, res, task in
         let names = Some Spr.empty in
+        let used = Sid.add th.th_name used in
+        let cl = merge_clone cl th in
+        let acc = used, cl, res, task in
         List.fold_left (use_export names) acc th.th_decls
     | Decl d ->
         begin match d.d_node with
