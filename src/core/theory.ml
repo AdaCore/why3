@@ -89,6 +89,7 @@ type theory = {
 and tdecl =
   | Decl  of decl
   | Use   of theory
+  | Clone of theory * (ident * ident) list
 
 and clone_map = Sid.t Mid.t
 
@@ -220,6 +221,11 @@ let merge_clone cl th sl =
     Mid.add id' (Sid.add id (Sid.union (get m id) (get m' id'))) m'
   in
   List.fold_left (add th.th_clone) cl sl
+
+let add_clone uc th sl =
+  let decls = Clone (th,sl) :: uc.uc_decls in
+  let clone = merge_clone uc.uc_clone th sl in
+  { uc with uc_decls = decls; uc_clone = clone }
 
 
 (** Clone *)
@@ -423,22 +429,6 @@ let cl_add_decl cl inst d = match d.d_node with
       let pr',f' = cl_new_prop cl (pr,f) in
       Some (create_prop_decl k' pr' f')
 
-let clone_fold add_tdecl v th inst =
-  let cl = cl_init th inst in
-  let add acc td = match td with
-    | Decl d ->
-        begin match cl_add_decl cl inst d with
-          | Some d -> add_tdecl acc (Decl d)
-          | None   -> acc
-        end
-    | Use _ ->
-        add_tdecl acc td
-  in
-  let (res,clmap) = List.fold_left add v th.th_decls in
-  let add_idid id id' acc = (id,id') :: acc in
-  let sl = Hid.fold add_idid cl.id_table [] in
-  res, merge_clone clmap th sl
-
 let cl_add_tdecl cl inst uc td = match td with
   | Decl d ->
       let decls = match cl_add_decl cl inst d with
@@ -448,6 +438,8 @@ let cl_add_tdecl cl inst uc td = match td with
       { uc with uc_decls = decls }
   | Use _ ->
       { uc with uc_decls = td :: uc.uc_decls }
+  | Clone (th,sl) ->
+      add_clone uc th sl
 
 let clone_export uc th inst =
   let cl = cl_init th inst in
@@ -456,8 +448,7 @@ let clone_export uc th inst =
 
   let add_idid id id' acc = (id,id') :: acc in
   let sl = Hid.fold add_idid cl.id_table [] in
-  let cm = merge_clone uc.uc_clone th sl in
-  let uc = { uc with uc_clone = cm } in
+  let uc = add_clone uc th sl in
 
   let add_local id' () acc = Sid.add id' acc in
   let lc = Hid.fold add_local cl.nw_local uc.uc_local in

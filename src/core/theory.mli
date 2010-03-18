@@ -54,6 +54,7 @@ type theory = private {
 and tdecl = private
   | Decl  of decl
   | Use   of theory
+  | Clone of theory * (ident * ident) list
 
 and clone_map = Sid.t Mid.t
 
@@ -87,8 +88,7 @@ val empty_inst : th_inst
 val use_export   : theory_uc -> theory -> theory_uc
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 
-val clone_fold   : (('a * clone_map) -> tdecl -> ('a * clone_map)) ->
-        ('a * clone_map) -> theory -> th_inst -> ('a * clone_map)
+val merge_clone  : clone_map -> theory -> (ident * ident) list -> clone_map
 
 (* exceptions *)
 
