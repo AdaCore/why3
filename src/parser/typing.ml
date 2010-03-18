@@ -50,6 +50,8 @@ type error =
   | NotInLoadpath of string
   | CyclicTypeDef
   | UnboundTypeVar of string
+  | UnboundType of string list
+  | UnboundSymbol of string list
   | AnyMessage of string
 
 exception Error of error
@@ -112,6 +114,10 @@ let report fmt = function
       fprintf fmt "cyclic type definition"
   | UnboundTypeVar s ->
       fprintf fmt "unbound type variable '%s" s
+  | UnboundType sl ->
+       fprintf fmt "Unbound type '%a'" (print_list dot pp_print_string) sl
+  | UnboundSymbol sl ->
+       fprintf fmt "Unbound symbol '%a'" (print_list dot pp_print_string) sl
   | AnyMessage s ->
       fprintf fmt "%s" s
 
@@ -133,20 +139,33 @@ let term_expected_type ~loc ty1 ty2 =
     "@[This term has type %a@ but is expected to have type@ %a@]"
     print_dty ty1 print_dty ty2
 
-let specialize_fsymbol ~loc s = 
-  let s, tl, ty = specialize_lsymbol ~loc s in
-  match ty with
-    | None -> error ~loc TermExpected
-    | Some ty -> s, tl, ty
+(** Destructive typing environment, that is
+    environment + local variables.
+    It is only local to this module and created with [create_denv] below. *)
 
-let specialize_psymbol ~loc s = 
-  let s, tl, ty = specialize_lsymbol ~loc s in
-  match ty with
-    | None -> s, tl
-    | Some _ -> error ~loc PredicateExpected
+type denv = { 
+  uc : theory_uc; (* the theory under construction *)
+  utyvars : (string, type_var) Hashtbl.t; (* user type variables *)
+  dvars : dty Mstr.t; (* local variables, to be bound later *)
+}
 
+let create_denv uc = { 
+  uc = uc; 
+  utyvars = Hashtbl.create 17; 
+  dvars = Mstr.empty;
+}
 
-(** Typing types *)
+let find_user_type_var x env =
+  try
+    Hashtbl.find env.utyvars x
+  with Not_found ->
+    (* TODO: shouldn't we localize this ident? *)
+    let v = create_tvsymbol (id_fresh x) in
+    let v = create_ty_decl_var ~user:true v in
+    Hashtbl.add env.utyvars x v;
+    v
+ 
+(* parsed types -> intermediate types *)
 
 let rec qloc = function
   | Qident x -> x.id_loc
@@ -155,6 +174,72 @@ let rec qloc = function
 let rec string_list_of_qualid acc = function
   | Qident id -> id.id :: acc
   | Qdot (p, id) -> string_list_of_qualid (id.id :: acc) p
+
+let specialize_tysymbol loc p uc =
+  let sl = string_list_of_qualid [] p in
+  let ts = 
+    try ns_find_ts (get_namespace uc) sl
+    with Not_found -> error ~loc (UnboundType sl)
+  in
+  ts, specialize_tysymbol ~loc ts
+
+let rec type_inst s ty = match ty.ty_node with
+  | Ty.Tyvar n -> Mtv.find n s
+  | Ty.Tyapp (ts, tyl) -> Tyapp (ts, List.map (type_inst s) tyl)
+
+let rec dty env = function
+  | PPTtyvar {id=x} -> 
+      Tyvar (find_user_type_var x env)
+  | PPTtyapp (p, x) ->
+      let loc = qloc x in
+      let ts, tv = specialize_tysymbol loc x env.uc in
+      let np = List.length p in
+      let a = List.length tv in
+      if np <> a then error ~loc (TypeArity (x, a, np));
+      let tyl = List.map (dty env) p in
+      match ts.ts_def with
+	| None -> 
+	    Tyapp (ts, tyl)
+	| Some ty -> 
+	    let add m v t = Mtv.add v t m in
+            let s = List.fold_left2 add Mtv.empty ts.ts_args tyl in
+	    type_inst s ty
+
+let find_ns find p ns =
+  let loc = qloc p in
+  let sl = string_list_of_qualid [] p in
+  try find ns sl 
+  with Not_found -> error ~loc (UnboundSymbol sl)
+
+let find_prop_ns = find_ns ns_find_prop
+let find_prop p uc = find_prop_ns p (get_namespace uc)
+
+let find_tysymbol_ns = find_ns ns_find_ts
+let find_tysymbol q uc = find_tysymbol_ns q (get_namespace uc)
+
+let find_lsymbol_ns = find_ns ns_find_ls
+let find_lsymbol q uc = find_lsymbol_ns q (get_namespace uc)
+
+let specialize_lsymbol p uc =
+  let s = find_lsymbol p uc in
+  s, specialize_lsymbol (qloc p) s
+
+let specialize_fsymbol p uc = 
+  let loc = qloc p in
+  let s, (tl, ty) = specialize_lsymbol p uc in
+  match ty with
+    | None -> error ~loc TermExpected
+    | Some ty -> s, tl, ty
+
+let specialize_psymbol p uc = 
+  let loc = qloc p in
+  let s, (tl, ty) = specialize_lsymbol p uc in
+  match ty with
+    | None -> s, tl
+    | Some _ -> error ~loc PredicateExpected
+
+
+(** Typing types *)
 
 let split_qualid = function
   | Qident id -> [], id.id
@@ -209,7 +294,8 @@ let binop = function
 let check_pat_linearity pat =
   let s = ref Sstr.empty in
   let add id =
-    if Sstr.mem id.id !s then errorm ~loc:id.id_loc "duplicate variable %s" id.id;
+    if Sstr.mem id.id !s then 
+      errorm ~loc:id.id_loc "duplicate variable %s" id.id;
     s := Sstr.add id.id !s
   in
   let rec check p = match p.pat_desc with
@@ -235,8 +321,7 @@ and dpat_node loc env = function
       let env = { env with dvars = Mstr.add x ty env.dvars } in
       env, Pvar x, ty
   | PPpapp (x, pl) ->
-      let s = find_lsymbol x env.th in
-      let s, tyl, ty = specialize_fsymbol ~loc s in
+      let s, tyl, ty = specialize_fsymbol x env.uc in
       let env, pl = dpat_args s.ls_name loc env tyl pl in
       env, Papp (s, pl), ty
   | PPpas (p, {id=x}) ->
@@ -285,14 +370,12 @@ and dterm_node loc env = function
       Tvar x, ty
   | PPvar x -> 
       (* 0-arity symbol (constant) *)
-      let s = find_lsymbol x env.th in
-      let s, tyl, ty = specialize_fsymbol ~loc s in
+      let s, tyl, ty = specialize_fsymbol x env.uc in
       let n = List.length tyl in
       if n > 0 then error ~loc (BadNumberOfArguments (s.ls_name, 0, n));
       Tapp (s, []), ty
   | PPapp (x, tl) ->
-      let s = find_lsymbol x env.th in
-      let s, tyl, ty = specialize_fsymbol ~loc s in
+      let s, tyl, ty = specialize_fsymbol x env.uc in
       let tl = dtype_args s.ls_name loc env tyl tl in
       Tapp (s, tl), ty
   | PPconst (ConstInt _ as c) ->
@@ -374,8 +457,7 @@ and dfmla env e = match e.pp_desc with
       in
       Fquant (q, uqu, trl, dfmla env a)
   | PPapp (x, tl) ->
-      let s = find_lsymbol x env.th in
-      let s, tyl = specialize_psymbol ~loc:e.pp_loc s in
+      let s, tyl = specialize_psymbol x env.uc in
       let tl = dtype_args s.ls_name e.pp_loc env tyl tl in
       Fapp (s, tl)
   | PPlet ({id=x}, e1, e2) ->
@@ -399,7 +481,7 @@ and dfmla env e = match e.pp_desc with
       let f1 = dfmla env f1 in
       Fnamed (x, f1)
   | PPvar x -> 
-      Fvar (snd (find_prop x env.th))
+      Fvar (snd (find_prop x env.uc))
   | PPconst _ | PPcast _ ->
       error ~loc:e.pp_loc PredicateExpected
 
@@ -653,7 +735,7 @@ let add_logics dl th =
       | Some id -> { denv with dvars = Mstr.add id.id (dty denv ty) denv.dvars }
     in
     let denv = Hashtbl.find denvs id in
-    let denv = { denv with th = th' } in
+    let denv = { denv with uc = th' } in
     let denv = List.fold_left dadd_var denv d.ld_params in
     let create_var (x, _) ty = 
       let id = match x with 
