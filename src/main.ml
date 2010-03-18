@@ -120,6 +120,8 @@ let rec report fmt = function
       fprintf fmt "%a%a" Loc.report_position loc report e
   | Parsing.Parse_error ->
       fprintf fmt "syntax error"
+  | Denv.Error e ->
+      Denv.report fmt e
   | Typing.Error e ->
       Typing.report fmt e
   | UnknownIdent i ->

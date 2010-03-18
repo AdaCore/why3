@@ -124,7 +124,7 @@ CORE_CMO := $(addprefix src/core/,$(CORE_CMO))
 UTIL_CMO := pp.cmo loc.cmo util.cmo hashcons.cmo sysutil.cmo
 UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
 
-PARSER_CMO := parser.cmo lexer.cmo typing.cmo 
+PARSER_CMO := parser.cmo lexer.cmo denv.cmo typing.cmo 
 PARSER_CMO := $(addprefix src/parser/,$(PARSER_CMO))
 
 TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
@@ -159,7 +159,7 @@ bin/top: $(CMO)
 
 test: bin/why.byte
 	mkdir -p output_why3
-	ocamlrun -bt bin/why.byte --debug -I lib/prelude/ --driver lib/drivers/why3.drv \
+	ocamlrun -bt bin/why.byte -I lib/prelude/ --driver lib/drivers/why3.drv \
 	--output-dir output_why3 src/test.why
 	bin/why.byte --driver lib/drivers/alt_ergo.drv -I lib/prelude/ \
 	--output-file - --goal Test.G src/test.why --timeout 3
