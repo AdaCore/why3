@@ -194,23 +194,20 @@ let add_decl opt d =
     | Some task -> Some (push_decl task d)
     | None      -> Some (init_decl d)
 
-let rec flat_theory acc th =
-  let used, cl, task = acc in
-  if Sid.mem th.th_name used then acc else
+let rec flat_theory used cl task th =
+  if Sid.mem th.th_name used then used,cl,task else
   let acc = Sid.add th.th_name used, cl, task in
   List.fold_left flat_tdecl acc th.th_decls
 
-and flat_tdecl acc = function
+and flat_tdecl (used, cl, task) = function
   | Use th ->
-      flat_theory acc th
+      flat_theory used cl task th
   | Clone (th,sl) ->
-      let used, cl, task = acc in
       used, add_clone cl th sl, task
   | Decl d ->
-      let used, cl, task = acc in
       begin match d.d_node with
         | Dprop (Pgoal,_,_) ->
-            acc
+            used, cl, task
         | Dprop (Plemma,pr,f) ->
             let d = create_prop_decl Paxiom pr f in
             used, cl, add_decl task d
@@ -222,7 +219,7 @@ and flat_tdecl acc = function
 
 let split_tdecl names (res, used, cl, task) = function
   | Use th ->
-      let used, cl, task = flat_theory (used, cl, task) th in
+      let used, cl, task = flat_theory used cl task th in
       res, used, cl, task
   | Clone (th,sl) ->
       res, used, add_clone cl th sl, task
@@ -255,7 +252,7 @@ let split_theory th names =
   res
 
 let flat_theory task th =
-  let _,_,task = flat_theory (Sid.empty, empty_clone, task) th in
+  let _,_,task = flat_theory Sid.empty empty_clone task th in
   task
 
 (* Generic utilities *)
