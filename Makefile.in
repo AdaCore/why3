@@ -63,7 +63,7 @@ DYNLINKOFLAGS =
 endif
 
 
-INCLUDES = -I src/core -I src/util -I src/driver -I src/parser -I src/output \
+INCLUDES = -I src/core -I src/util -I src/driver -I src/parser -I src/printer \
            -I src/transform -I src/programs -I src 
 BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cma unix.cma $(DYNLINKBFLAGS)
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
@@ -135,11 +135,11 @@ DRIVER_CMO := call_provers.cmo dynlink_compat.cmo driver_parser.cmo\
 	driver_lexer.cmo driver.cmo
 DRIVER_CMO := $(addprefix src/driver/,$(DRIVER_CMO))
 
-OUTPUT_CMO := print_real.cmo alt_ergo.cmo why3.cmo
-OUTPUT_CMO := $(addprefix src/output/,$(OUTPUT_CMO))
+PRINTER_CMO := print_real.cmo alt_ergo.cmo why3.cmo
+PRINTER_CMO := $(addprefix src/printer/,$(PRINTER_CMO))
 
 CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
-      $(TRANSFORM_CMO) $(OUTPUT_CMO) src/main.cmo
+      $(TRANSFORM_CMO) $(PRINTER_CMO) src/main.cmo
 CMX = $(CMO:.cmo=.cmx)
 
 bin/why.opt: $(CMX) 
@@ -176,7 +176,7 @@ PGM_CMO := pgm_parser.cmo pgm_lexer.cmo pgm_main.cmo
 PGM_CMO := $(addprefix src/programs/, $(PGM_CMO))
 
 WHYL_CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
-           $(TRANSFORM_CMO) $(OUTPUT_CMO) $(PGM_CMO)
+           $(TRANSFORM_CMO) $(PRINTER_CMO) $(PGM_CMO)
 WHYL_CMX = $(WHYL_CMO:.cmo=.cmx)
 
 bin/whyl.opt: $(WHYL_CMX) 
