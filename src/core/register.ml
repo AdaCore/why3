@@ -26,18 +26,29 @@ type 'a value = env option -> clone option -> 'a
 type 'a registered = {mutable value : 'a value;
                       generate : unit -> 'a value;
                       tag : int}
+(*
+module HSreg = 
+struct
+  type t = 'a registered
+  let equal a b = a.tag = b.tag
+  let hash a = a.tag
+end
+
+module WeakReg = Weak.Make(HSreg)
+
+let registers = WeakReg.create 17
+*)
+let c = ref (-1)
+let create gen =
+  let reg = {value = gen ();
+             generate = gen;
+             tag = (incr c; !c)} in
+(*  WeakRef.add registers reg;*)
+  reg
 
 let cl_tag cl = cl.cl_tag
 
-let c = ref (-1)
-
-let create gen =
-  {value = gen ();
-   generate = gen;
-   tag = (incr c; !c)}
-
 exception ArgumentNeeded
-
 
 let memo f tag h  = function
   | None -> raise ArgumentNeeded
@@ -78,6 +89,10 @@ let apply_trans reg = apply_trans0 reg None None
 
 
 let clear reg = reg.value<-reg.generate ()
+(*
+(* We change reg here but that doesnt change the hash and equality*)
+let clear_all () = WeakReg.iter clear registers
+*)
 let clear_all () = assert false
 
 let compose0 comp reg1 reg2 = 
