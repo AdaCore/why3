@@ -71,8 +71,16 @@ let store_clone f =
     memo f env_tag memo_t in
   create f
       
-let apply reg = reg.value
-let apply_trans reg env clone = Trans.apply (reg.value env clone)
+let apply0 reg = reg.value
+let apply_clone reg env clone = apply0 reg (Some env) (Some clone)
+let apply_env reg env = apply0 reg (Some env) None
+let apply reg = apply0 reg None None
+
+let apply_trans0 reg env clone = Trans.apply (reg.value env clone)
+let apply_trans_clone reg env clone = apply_trans0 reg (Some env) (Some clone)
+let apply_trans_env reg env = apply_trans0 reg (Some env) None
+let apply_trans reg = apply_trans0 reg None None
+
 
 let clear reg = reg.value<-reg.generate ()
 let clear_all () = assert false

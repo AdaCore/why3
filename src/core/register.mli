@@ -27,10 +27,22 @@ val store_env : (env -> 'a) -> 'a registered
 val store_clone : (env -> clone -> 'a) -> 'a registered
 
 exception ArgumentNeeded
-val apply : 'a registered -> env option -> clone option -> 'a
-val apply_trans : 
-  'a trans registered -> env option -> clone option -> task -> 'a
+val apply0 : 'a registered -> env option -> clone option -> 'a
+val apply_clone : 'a registered -> env -> clone -> 'a
+val apply_env : 'a registered -> env -> 'a
+val apply : 'a registered -> 'a
 
+val apply_trans0 : 
+  'a trans registered -> env option -> clone option -> task -> 'a
+val apply_trans_clone : 
+  'a trans registered -> env -> clone -> task -> 'a
+val apply_trans_env : 
+  'a trans registered -> env -> task -> 'a
+val apply_trans : 
+  'a trans registered -> task -> 'a
+
+val compose0 : 
+  ('a -> 'b -> 'c) -> 'a registered -> 'b registered -> 'c registered
 val compose : 
   ('a -> 'b) registered -> ('b -> 'c) registered -> ('a -> 'c) registered 
 val compose_trans : 
