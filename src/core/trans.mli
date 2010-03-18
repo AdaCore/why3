@@ -54,5 +54,5 @@ val map_l : (task_hd -> task -> task list) -> task -> task tlist
 val decl   : (decl -> decl list     ) -> task -> task trans
 val decl_l : (decl -> decl list list) -> task -> task tlist
 
-val expr : (term -> term) -> (fmla -> fmla) -> task -> task trans
+val rewrite : (term -> term) -> (fmla -> fmla) -> task -> task trans
 

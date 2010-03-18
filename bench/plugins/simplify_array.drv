@@ -4,6 +4,13 @@ printer "why3"
 
 filename "%f-%t-%s.why"
 
-apply_after_split_goals
+transformations
         "simplify_array"
+end
+
+theory BuiltIn
+  syntax type   int     "int"
+  syntax type   real    "real"
+  syntax logic  (_=_)   "(%1 = %2)"
+  syntax logic  (_<>_)  "(%1 <> %2)"
 end

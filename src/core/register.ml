@@ -107,3 +107,12 @@ let compose_trans reg1 reg2 = compose0 (fun f g -> Trans.compose f g) reg1 reg2
 let compose_trans_l reg1 reg2 = compose0 (fun f g -> Trans.compose_l f g) 
   reg1 reg2
   
+let conv_res conv reg1 = 
+  let gen () =
+    let reg1 = reg1.generate () in
+    fun env cl -> conv (reg1 env cl) in
+  create gen
+
+
+let identity_trans = store (fun () -> identity)
+let identity_trans_l = store (fun () -> identity_l)

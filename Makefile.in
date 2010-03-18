@@ -231,6 +231,8 @@ bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) $(BINARY) byte
         --output-dir - --goal Test.G src/test.why
 	bin/why.$(OCAMLBEST) --driver bench/plugins/helloworld.drv -I lib/prelude/ \
         --output-dir - --goal Test.G src/test.why
+	bin/why.$(OCAMLBEST) --driver bench/plugins/simplify_array.drv -I lib/prelude/ \
+        --output-file - --goal  Test_simplify_array.G src/test.why
 
 # installation
 ##############

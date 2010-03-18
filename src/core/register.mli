@@ -50,5 +50,11 @@ val compose_trans :
 val compose_trans_l : 
   task tlist registered -> 'a tlist registered -> 'a tlist registered 
 
+val conv_res : ('a -> 'b) -> 'a registered -> 'b registered
+(* Sould be used only with function working in constant time*)
+
 val clear_all : unit -> unit
 val clear : 'a registered -> unit
+
+val identity_trans : task trans registered
+val identity_trans_l : task tlist registered

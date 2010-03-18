@@ -132,5 +132,5 @@ let rewrite fnT fnF d = match d.d_node with
   | Dprop (k,pr,f) ->
       create_prop_decl k pr (fnF f)
 
-let expr fnT fnF = decl (fun d -> [rewrite fnT fnF d])
+let rewrite fnT fnF = decl (fun d -> [rewrite fnT fnF d])
 

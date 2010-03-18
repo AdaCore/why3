@@ -211,7 +211,7 @@ let do_file env drv filename_printer file =
       let goals = List.fold_left 
         (fun acc (th,(task,cl)) -> 
            List.rev_append 
-             (List.map (fun e -> (th,e,cl)) (Driver.apply_transforms drv task)
+             (List.map (fun e -> (th,e,cl)) (Driver.apply_transforms env cl drv task)
              ) acc) [] goals in
       (* Pretty-print the goals or call the prover *)
       begin

@@ -46,8 +46,8 @@ type printer = driver -> formatter -> task -> unit
 
 val register_printer : string -> printer -> unit
 
-val register_transform   : string -> (unit -> task trans) -> unit
-val register_transform_l : string -> (unit -> task tlist) -> unit
+val register_transform   : string -> task trans Register.registered -> unit
+val register_transform_l : string -> task tlist Register.registered  -> unit
 
 val list_printers   : unit -> string list
 val list_transforms : unit -> string list
@@ -55,7 +55,7 @@ val list_transforms : unit -> string list
 (** using drivers *)
 
 (** transform task *)
-val apply_transforms : driver -> task -> task list
+val apply_transforms : env -> clone -> driver -> task -> task list
 
 (** print_task *)
 val print_task : env -> clone -> printer
