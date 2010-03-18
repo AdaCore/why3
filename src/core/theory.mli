@@ -54,7 +54,6 @@ type theory = private {
 and tdecl = private
   | Decl  of decl
   | Use   of theory
-  | Clone of theory * (ident * ident) list
 
 and clone_map = Sid.t Mid.t
 
