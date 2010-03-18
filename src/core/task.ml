@@ -211,9 +211,6 @@ let rec use_export names acc td =
         let acc = used, cl, res, task in
         let names = Some Spr.empty in
         List.fold_left (use_export names) acc th.th_decls
-    | Clone (th,sl) ->
-        let cl = add_clone cl th sl in
-        used, cl, res, task
     | Decl d ->
         begin match d.d_node with
           | Dprop (Pgoal,pr,_)

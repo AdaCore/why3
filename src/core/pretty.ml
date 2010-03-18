@@ -43,18 +43,11 @@ let iprinter,tprinter,lprinter,pprinter =
   create_ident_printer bl ~sanitizer:lsanitize,
   create_ident_printer bl ~sanitizer:usanitize
 
-let thash = Hid.create 63
-let lhash = Hid.create 63
-let phash = Hid.create 63
-
 let forget_all () =
   forget_all iprinter;
   forget_all tprinter;
   forget_all lprinter;
-  forget_all pprinter;
-  Hid.clear thash;
-  Hid.clear lhash;
-  Hid.clear phash
+  forget_all pprinter
 
 let tv_set = ref Sid.empty
 
@@ -84,11 +77,9 @@ let print_th fmt th =
   fprintf fmt "%s" n
 
 let print_ts fmt ts =
-  Hid.replace thash ts.ts_name ts;
   fprintf fmt "%s" (id_unique tprinter ts.ts_name)
 
 let print_ls fmt ls =
-  Hid.replace lhash ls.ls_name ls;
   let n = if ls.ls_constr
     then id_unique lprinter ~sanitizer:String.capitalize ls.ls_name
     else id_unique lprinter ls.ls_name
@@ -96,7 +87,6 @@ let print_ls fmt ls =
   fprintf fmt "%s" n
 
 let print_pr fmt pr =
-  Hid.replace phash pr.pr_name pr;
   fprintf fmt "%s" (id_unique pprinter pr.pr_name)
 
 (** Types *)
@@ -312,18 +302,6 @@ let print_prop_decl fmt (k,pr,f) =
     print_pr pr print_fmla f;
   forget_tvs ()
 
-let print_inst fmt (id1,id2) =
-  if Hid.mem thash id2 then
-    let n = id_unique tprinter id1 in
-    fprintf fmt "type %s = %a" n print_ts (Hid.find thash id2)
-  else if Hid.mem lhash id2 then
-    let n = id_unique lprinter id1 in
-    fprintf fmt "logic %s = %a" n print_ls (Hid.find lhash id2)
-  else if Hid.mem phash id2 then
-    let n = id_unique pprinter id1 in
-    fprintf fmt "prop %s = %a" n print_pr (Hid.find phash id2)
-  else assert false
-
 let print_decl fmt d = match d.d_node with
   | Dtype tl  -> print_list newline print_type_decl fmt tl
   | Dlogic ll -> print_list newline print_logic_decl fmt ll
@@ -335,9 +313,6 @@ let print_tdecl fmt = function
       print_decl fmt d
   | Use th ->
       fprintf fmt "@[<hov 2>(* use %a *)@]" print_th th
-  | Clone (th,inst) ->
-      fprintf fmt "@[<hov 2>(* clone %a with %a *)@]"
-        print_th th (print_list comma print_inst) inst
 
 let print_decls fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list newline2 print_decl) dl

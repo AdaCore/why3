@@ -456,7 +456,8 @@ let clone_export uc th inst =
 
   let add_idid id id' acc = (id,id') :: acc in
   let sl = Hid.fold add_idid cl.id_table [] in
-  let uc = merge_clone uc.uc_clone th sl in
+  let cm = merge_clone uc.uc_clone th sl in
+  let uc = { uc with uc_clone = cm } in
 
   let add_local id' () acc = Sid.add id' acc in
   let lc = Hid.fold add_local cl.nw_local uc.uc_local in
