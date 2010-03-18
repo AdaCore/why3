@@ -49,6 +49,8 @@ val add_decl : task -> decl -> task
 
 val split_theory : theory -> Spr.t option -> (task * clone) list
 
+val flat_theory : task -> theory -> task
+
 (* bottom-up, tail-recursive traversal functions *)
 
 val task_fold : ('a -> decl -> 'a) -> 'a -> task -> 'a

@@ -194,54 +194,69 @@ let add_decl opt d =
     | Some task -> Some (push_decl task d)
     | None      -> Some (init_decl d)
 
-let init_task =
-  let add opt = function
-    | Decl d -> add_decl opt d
-    | _      -> opt
-  in
-  List.fold_left add None builtin_theory.th_decls
+let rec flat_theory acc th =
+  let used, cl, task = acc in
+  if Sid.mem th.th_name used then acc else
+  let acc = Sid.add th.th_name used, cl, task in
+  List.fold_left flat_tdecl acc th.th_decls
 
-let rec use_export names acc td =
-  let used, cl, res, task = acc in
-  match td with
-    | Use th when Sid.mem th.th_name used ->
-        acc
-    | Use th ->
-        let used = Sid.add th.th_name used in
-        let acc = used, cl, res, task in
-        let names = Some Spr.empty in
-        List.fold_left (use_export names) acc th.th_decls
-    | Clone (th,sl) ->
-        let cl = add_clone cl th sl in
-        used, cl, res, task
-    | Decl d ->
-        begin match d.d_node with
-          | Dprop (Pgoal,pr,_)
-            when option_apply true (Spr.mem pr) names ->
-              let res = (Some (push_decl task d), cl) :: res in
-              used, cl, res, task
-          | Dprop (Pgoal,_,_) ->
-              acc
-          | Dprop (Plemma,pr,f)
-            when option_apply true (Spr.mem pr) names ->
-              let d = create_prop_decl Pgoal pr f in
-              let res = (Some (push_decl task d), cl) :: res in
-              let d = create_prop_decl Paxiom pr f in
-              used, cl, res, push_decl task d
-          | Dprop (Plemma,pr,f) ->
-              let d = create_prop_decl Paxiom pr f in
-              used, cl, res, push_decl task d
-          | Dprop (Paxiom,_,_) ->
-              used, cl, res, push_decl task d
-          | Dtype _ | Dlogic _ | Dind _  ->
-              used, cl, res, push_decl task d
-        end
+and flat_tdecl acc = function
+  | Use th ->
+      flat_theory acc th
+  | Clone (th,sl) ->
+      let used, cl, task = acc in
+      used, add_clone cl th sl, task
+  | Decl d ->
+      let used, cl, task = acc in
+      begin match d.d_node with
+        | Dprop (Pgoal,_,_) ->
+            acc
+        | Dprop (Plemma,pr,f) ->
+            let d = create_prop_decl Paxiom pr f in
+            used, cl, add_decl task d
+        | Dprop (Paxiom,_,_) ->
+            used, cl, add_decl task d
+        | Dtype _ | Dlogic _ | Dind _  ->
+            used, cl, add_decl task d
+      end
+
+let split_tdecl names (res, used, cl, task) = function
+  | Use th ->
+      let used, cl, task = flat_theory (used, cl, task) th in
+      res, used, cl, task
+  | Clone (th,sl) ->
+      res, used, add_clone cl th sl, task
+  | Decl d ->
+      begin match d.d_node with
+        | Dprop (Pgoal,pr,_)
+          when option_apply true (Spr.mem pr) names ->
+            let t = add_decl task d, cl in
+            t :: res, used, cl, task
+        | Dprop (Pgoal,_,_) ->
+            res, used, cl, task
+        | Dprop (Plemma,pr,f)
+          when option_apply true (Spr.mem pr) names ->
+            let d = create_prop_decl Pgoal pr f in
+            let t = add_decl task d, cl in
+            let d = create_prop_decl Paxiom pr f in
+            t :: res, used, cl, add_decl task d
+        | Dprop (Plemma,pr,f) ->
+            let d = create_prop_decl Paxiom pr f in
+            res, used, cl, add_decl task d
+        | Dprop (Paxiom,_,_) ->
+            res, used, cl, add_decl task d
+        | Dtype _ | Dlogic _ | Dind _  ->
+            res, used, cl, add_decl task d
+      end
 
 let split_theory th names =
-  let use = Sid.add builtin_theory.th_name Sid.empty in
-  let acc = use, empty_clone, [], of_option init_task in
-  let _,_,res,_ = List.fold_left (use_export names) acc th.th_decls in
+  let acc = [], Sid.empty, empty_clone, None in
+  let res,_,_,_ = List.fold_left (split_tdecl names) acc th.th_decls in
   res
+
+let flat_theory task th =
+  let _,_,task = flat_theory (Sid.empty, empty_clone, task) th in
+  task
 
 (* Generic utilities *)
 
