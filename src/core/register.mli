@@ -23,8 +23,8 @@ open Trans
 type 'a registered
 
 val store : (unit -> 'a) -> 'a registered
-val store_env : (env -> 'a) -> 'a registered
-val store_clone : (env -> clone -> 'a) -> 'a registered
+val store_env : (unit -> env -> 'a) -> 'a registered
+val store_clone : (unit -> env -> clone -> 'a) -> 'a registered
 
 exception ArgumentNeeded
 val apply0 : 'a registered -> env option -> clone option -> 'a

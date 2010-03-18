@@ -26,6 +26,9 @@ type 'a value = env option -> clone option -> 'a
 type 'a registered = {mutable value : 'a value;
                       generate : unit -> 'a value;
                       tag : int}
+
+let cl_tag cl = cl.cl_tag
+
 let c = ref (-1)
 
 let create gen =
@@ -46,30 +49,22 @@ let memo f tag h  = function
         let r = f x in
         Hashtbl.add h t r;
         r
-      
-let store f = create (fun () -> 
-                        let value = f () in
-                        fun _ _ -> value)
 
-let store_env f = 
-  let f env = 
-    let v = f env in
-    fun cl -> v in
-  let f () =
-    let memo_t = Hashtbl.create 7 in
-    memo f env_tag memo_t in
-  create f
+let memo0 tag f =
+  let memo_t = Hashtbl.create 7 in
+  memo f tag memo_t
+
+let unused0 f = fun _ -> f
+
+let store0 memo_env memo_cl f =
+  let gen () = 
+    let f2 = memo_env (f ()) in
+    fun env -> memo_cl (f2 env) in
+  create gen
     
-let cl_tag cl = cl.cl_tag
-
-let store_clone f = 
-  let f env =
-    let memo_t = Hashtbl.create 7 in
-    memo (f env) cl_tag memo_t in
-  let f () =
-    let memo_t = Hashtbl.create 7 in
-    memo f env_tag memo_t in
-  create f
+let store f = store0 unused0 unused0 f
+let store_env f = store0 (memo0 env_tag) unused0 f
+let store_clone f = store0 (memo0 env_tag) (memo0 cl_tag) f
       
 let apply0 reg = reg.value
 let apply_clone reg env clone = apply0 reg (Some env) (Some clone)
