@@ -154,7 +154,7 @@ let rec print_dty fmt = function
   | Tyvar { type_val = Some t } ->
       print_dty fmt t
   | Tyvar { type_val = None; tvsymbol = v } ->
-      fprintf fmt "'%s" (tv_name v).id_short
+      fprintf fmt "'%s" v.tv_name.id_short
   | Tyapp (s, []) ->
       fprintf fmt "%s" s.ts_name.id_short
   | Tyapp (s, [t]) -> 
@@ -795,7 +795,7 @@ let add_types dl th =
 	  let vars = th'.utyvars in
 	  List.iter 
 	    (fun v -> 
-	       Hashtbl.add vars (tv_name v).id_short 
+	       Hashtbl.add vars v.tv_name.id_short 
                   (create_ty_decl_var ~user:true v)) 
 	    ts.ts_args;
 	  ts, th'
@@ -1018,11 +1018,11 @@ let add_inductives dl th =
   try
     List.fold_left add_decl th (create_ind_decls dl)
   with
-  | InvalidIndDecl (_,pr) -> errorm ~loc:(loc_of_id (pr_name pr))
+  | InvalidIndDecl (_,pr) -> errorm ~loc:(loc_of_id pr.pr_name)
       "not a clausal form"
-  | NonPositiveIndDecl (_,pr,s) -> errorm ~loc:(loc_of_id (pr_name pr))
+  | NonPositiveIndDecl (_,pr,s) -> errorm ~loc:(loc_of_id pr.pr_name)
       "non-positive occurrence of %a" Pretty.print_ls s
-  | TooSpecificIndDecl (_,pr,t) -> errorm ~loc:(loc_of_id (pr_name pr))
+  | TooSpecificIndDecl (_,pr,t) -> errorm ~loc:(loc_of_id pr.pr_name)
       "term @[%a@] is too specific" Pretty.print_term t
 
 (* parse file and store all theories into parsed_theories *)
@@ -1098,12 +1098,12 @@ and add_decl env lenv th = function
               | CSlemma p ->
                   let pr,_ = find_prop_ns p t.th_export in
                   if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
-                  then error ~loc (Clash (pr_name pr).id_short);
+                  then error ~loc (Clash pr.pr_name.id_short);
                   { s with inst_lemma = Spr.add pr s.inst_lemma }
               | CSgoal p ->
                   let pr,_ = find_prop_ns p t.th_export in
                   if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
-                  then error ~loc (Clash (pr_name pr).id_short);
+                  then error ~loc (Clash pr.pr_name.id_short);
                   { s with inst_goal = Spr.add pr s.inst_goal }
 	    in
             let s = List.fold_left add_inst empty_inst s in

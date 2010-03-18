@@ -60,9 +60,9 @@ let tv_set = ref Sid.empty
 
 (* type variables always start with a quote *)
 let print_tv fmt tv =
-  tv_set := Sid.add (tv_name tv) !tv_set;
+  tv_set := Sid.add tv.tv_name !tv_set;
   let sanitize n = "'" ^ n in
-  let n = id_unique iprinter ~sanitizer:sanitize (tv_name tv) in
+  let n = id_unique iprinter ~sanitizer:sanitize tv.tv_name in
   fprintf fmt "%s" n
 
 let forget_tvs () =
@@ -96,8 +96,8 @@ let print_ls fmt ls =
   fprintf fmt "%s" n
 
 let print_pr fmt pr =
-  Hid.replace phash (pr_name pr) pr;
-  fprintf fmt "%s" (id_unique pprinter (pr_name pr))
+  Hid.replace phash pr.pr_name pr;
+  fprintf fmt "%s" (id_unique pprinter pr.pr_name)
 
 (** Types *)
 

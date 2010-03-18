@@ -106,7 +106,7 @@ let check_logic kn (ls,ld) =
 
 let add_ind d kn (ps,la) =
     let kn = add_known ps.ls_name d kn in
-    let add kn (pr,_) = add_known (pr_name pr) d kn in
+    let add kn (pr,_) = add_known pr.pr_name d kn in
     List.fold_left add kn la
 
 let check_ind kn (ps,la) =
@@ -118,7 +118,7 @@ let add_decl kn d = match d.d_node with
   | Dtype dl  -> List.fold_left (add_type d) kn dl
   | Dlogic dl -> List.fold_left (add_logic d) kn dl
   | Dind dl   -> List.fold_left (add_ind d) kn dl
-  | Dprop (_,pr,_) -> add_known (pr_name pr) d kn
+  | Dprop (_,pr,_) -> add_known pr.pr_name d kn
 
 let check_decl kn d = match d.d_node with
   | Dtype dl  -> List.iter (check_type kn) dl

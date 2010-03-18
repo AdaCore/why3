@@ -22,14 +22,22 @@ open Ident
 
 (** Types *)
 
-type tvsymbol = ident
+type tvsymbol = {
+  tv_name : ident;
+}
 
-module Stv = Sid
-module Mtv = Mid
-module Htv = Hid
+module Tvar = struct
+  type t = tvsymbol
+  let equal = (==)
+  let hash tv = tv.tv_name.id_tag
+  let compare tv1 tv2 =
+    Pervasives.compare tv1.tv_name.id_tag tv2.tv_name.id_tag
+end
+module Stv = Set.Make(Tvar)
+module Mtv = Map.Make(Tvar)
+module Htv = Hashtbl.Make(Tvar)
 
-let create_tvsymbol = id_register
-let tv_name v = v
+let create_tvsymbol n = { tv_name = id_register n }
 
 (* type symbols and types *)
 
@@ -79,7 +87,7 @@ module Ty = struct
   let hash_ty ty = ty.ty_tag
 
   let hash ty = match ty.ty_node with
-    | Tyvar v -> v.id_tag
+    | Tyvar v -> v.tv_name.id_tag
     | Tyapp (s, tl) -> Hashcons.combine_list hash_ty s.ts_name.id_tag tl
 
   let tag n ty = { ty with ty_tag = n }

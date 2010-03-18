@@ -47,14 +47,15 @@ val ls_defn_axiom : ls_defn -> fmla
 
 (** Inductive predicate declaration *)
 
-type prop
+type prop = private {
+  pr_name : ident;
+}
 
 module Spr : Set.S with type elt = prop
 module Mpr : Map.S with type key = prop
 module Hpr : Hashtbl.S with type key = prop
 
 val create_prop : preid -> prop
-val pr_name     : prop -> ident
 
 type prop_fmla = prop * fmla
 

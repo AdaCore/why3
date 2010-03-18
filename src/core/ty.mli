@@ -21,14 +21,15 @@ open Ident
 
 (** Types *)
 
-type tvsymbol
+type tvsymbol = private {
+  tv_name : ident;
+}
 
 module Stv : Set.S with type elt = tvsymbol
 module Mtv : Map.S with type key = tvsymbol
 module Htv : Hashtbl.S with type key = tvsymbol
 
 val create_tvsymbol : preid -> tvsymbol
-val tv_name         : tvsymbol -> ident
 
 (* type symbols and types *)
 

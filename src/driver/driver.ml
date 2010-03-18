@@ -231,7 +231,7 @@ let load_rules env clone driver {thr_name = loc,qualid; thr_rules = trl} =
         begin
           try
             add_htheory c 
-              (pr_name (ns_find_prop th.th_export q)) Remove
+              (ns_find_prop th.th_export q).pr_name Remove
           with Not_found -> errorm ~loc "Unknown axioms %s" 
             (string_of_qualid qualid q)
         end 
@@ -272,7 +272,7 @@ let load_rules env clone driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rtagpr (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (pr_name (ns_find_prop th.th_export q))
+            add_htheory c (ns_find_prop th.th_export q).pr_name
               (Tag (Sstr.singleton s))
           with Not_found -> errorm ~loc "Unknown proposition %s" 
             (string_of_qualid qualid q)
@@ -386,7 +386,7 @@ let filename_of_goal drv ident_printer filename theory_name task =
   match drv.drv_filename with
     | None -> errorm "no filename syntax given"
     | Some f -> 
-        let pr_name = pr_name (task_goal task) in
+        let pr_name = (task_goal task).pr_name in
         let repl_fun s = 
           let i = matched_group 1 s in
           match i with

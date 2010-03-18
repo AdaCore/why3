@@ -34,7 +34,7 @@ let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
 let print_tvsymbols fmt id =
-  fprintf fmt "'%s" (id_unique ident_printer (tv_name id))
+  fprintf fmt "'%s" (id_unique ident_printer id.tv_name)
 
 let forget_var v = forget_id ident_printer v.vs_name
 
@@ -195,13 +195,13 @@ let print_decl drv task fmt d = match d.d_node with
       print_list_opt newline (print_logic_decl drv task) fmt dl
   | Dind _ -> assert false (* TODO *)
   | Dprop (Paxiom, pr, _) when
-      Driver.query_ident drv (pr_name pr) = Driver.Remove -> false
+      Driver.query_ident drv pr.pr_name = Driver.Remove -> false
   | Dprop (Paxiom, pr, f) ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n" 
-        print_ident (pr_name pr) (print_fmla drv) f; true
+        print_ident pr.pr_name (print_fmla drv) f; true
   | Dprop (Pgoal, pr, f) ->
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
-        print_ident (pr_name pr) (print_fmla drv) f; true
+        print_ident pr.pr_name (print_fmla drv) f; true
   | Dprop (Plemma, _, _) ->
       assert false
 

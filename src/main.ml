@@ -260,7 +260,7 @@ let do_file env drv filename_printer file =
           let res = Driver.call_prover ~debug:!debug ?timeout env cl drv task in
           printf "%s %s %s : %a@." 
             file th.th_name.Ident.id_short 
-            (Decl.pr_name (task_goal task)).Ident.id_long
+            ((task_goal task).Decl.pr_name).Ident.id_long
             Call_provers.print_prover_result res in
         List.iter call goals
   end

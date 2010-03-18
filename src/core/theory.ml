@@ -201,10 +201,10 @@ let add_logic uc (ls,_) = add_symbol add_ls ls.ls_name ls uc
 
 let add_ind uc (ps,la) =
   let uc = add_symbol add_ls ps.ls_name ps uc in
-  let add uc (pr,f) = add_symbol add_pr (pr_name pr) (pr,f) uc in
+  let add uc (pr,f) = add_symbol add_pr pr.pr_name (pr,f) uc in
   List.fold_left add uc la
 
-let add_prop uc (_,pr,f) = add_symbol add_pr (pr_name pr) (pr,f) uc
+let add_prop uc (_,pr,f) = add_symbol add_pr pr.pr_name (pr,f) uc
 
 let add_decl uc d =
   let uc = match d.d_node with
@@ -298,9 +298,9 @@ let cl_find_ls cl ls =
 let cl_trans_fmla cl f = f_s_map (cl_find_ts cl) (cl_find_ls cl) f
 
 let cl_trans_prop cl (pr,f) =
-  let pr' = create_prop (id_dup (pr_name pr)) in
+  let pr' = create_prop (id_dup pr.pr_name) in
   let f' = cl_trans_fmla cl f in
-  Hid.add cl.id_table (pr_name pr) (pr_name pr');
+  Hid.add cl.id_table pr.pr_name pr'.pr_name;
   Hpr.add cl.pr_table pr (pr',f');
   pr', f'
 
@@ -333,8 +333,7 @@ let cl_init_ls cl ls ls' =
   cl_add_ls cl ls ls'
 
 let cl_init_pr cl pr =
-  let id = pr_name pr in
-  if not (Sid.mem id cl.id_local) then raise (NonLocal id)
+  if not (Sid.mem pr.pr_name cl.id_local) then raise (NonLocal pr.pr_name)
 
 let cl_init th inst =
   let cl = empty_clones th.th_local in
@@ -358,7 +357,7 @@ let cl_new_ls cl ls =
 
 let cl_new_prop cl pf =
   let pf' = cl_trans_prop cl pf in
-  Hid.add cl.nw_local (pr_name (fst pf')) ();
+  Hid.add cl.nw_local (fst pf').pr_name ();
   pf'
 
 let cl_add_type cl inst_ts acc (ts, def) =
@@ -464,7 +463,7 @@ let clone_export uc th inst =
     then Hls.find cl.ls_table ls else ls in
 
   let find_pr (pr,f) =
-    if Sid.mem (pr_name pr) th.th_local
+    if Sid.mem pr.pr_name th.th_local
     then Hpr.find cl.pr_table pr else (pr,f) in
 
   let f_ts n ts ns = add_ts true n (find_ts ts) ns in

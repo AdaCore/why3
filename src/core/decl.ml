@@ -82,14 +82,22 @@ let ls_defn_axiom (_,_,_,f) = f
 
 (** Inductive predicate declaration *)
 
-type prop = ident
+type prop = {
+  pr_name : ident;
+}
 
-module Spr = Sid
-module Mpr = Mid
-module Hpr = Hid
+module Prop = struct
+  type t = prop
+  let equal = (==)
+  let hash pr = pr.pr_name.id_tag
+  let compare pr1 pr2 =
+    Pervasives.compare pr1.pr_name.id_tag pr2.pr_name.id_tag
+end
+module Spr = Set.Make(Prop)
+module Mpr = Map.Make(Prop)
+module Hpr = Hashtbl.Make(Prop)
 
-let create_prop = id_register
-let pr_name x = x
+let create_prop n = { pr_name = id_register n }
 
 type prop_fmla = prop * fmla
 
@@ -157,9 +165,9 @@ module Decl = struct
   let hs_ld (ls,ld) = Hashcons.combine ls.ls_name.id_tag
     (Hashcons.combine_option (fun (_,_,_,f) -> f.f_tag) ld)
 
-  let hs_ind (ps,al) =
-    let hs_pair (pr,f) = Hashcons.combine pr.id_tag f.f_tag in
-      Hashcons.combine_list hs_pair ps.ls_name.id_tag al
+  let hs_prop (pr,f) = Hashcons.combine pr.pr_name.id_tag f.f_tag
+
+  let hs_ind (ps,al) = Hashcons.combine_list hs_prop ps.ls_name.id_tag al
 
   let hs_kind = function
     | Paxiom -> 7
@@ -170,7 +178,7 @@ module Decl = struct
     | Dtype  l -> Hashcons.combine_list hs_td 0 l
     | Dlogic l -> Hashcons.combine_list hs_ld 3 l
     | Dind   l -> Hashcons.combine_list hs_ind 5 l
-    | Dprop (k,pr,f) -> Hashcons.combine2 (hs_kind k) pr.id_tag f.f_tag
+    | Dprop (k,pr,f) -> Hashcons.combine (hs_kind k) (hs_prop (pr,f))
 
   let tag n d = { d with d_tag = n }
 
@@ -280,7 +288,7 @@ let create_ind_decl idl =
           (try ignore (List.for_all (f_pos_ps sps (Some true)) cls)
           with Found ls ->
             raise (NonPositiveIndDecl (ps, pr, ls)));
-          add_id acc (pr_name pr)
+          add_id acc pr.pr_name
       | _ -> raise (InvalidIndDecl (ps, pr))
   in
   let check_decl acc (ps,al) =

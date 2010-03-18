@@ -52,9 +52,9 @@ let tv_set = ref Sid.empty
 
 (* type variables always start with a quote *)
 let print_tv fmt tv =
-  tv_set := Sid.add (tv_name tv) !tv_set;
+  tv_set := Sid.add tv.tv_name !tv_set;
   let sanitize n = "'" ^ n in
-  let n = id_unique iprinter ~sanitizer:sanitize (tv_name tv) in
+  let n = id_unique iprinter ~sanitizer:sanitize tv.tv_name in
   fprintf fmt "%s" n
 
 let forget_tvs () =
@@ -80,7 +80,7 @@ let print_ls fmt ls =
   fprintf fmt "%s" n
 
 let print_pr fmt pr =
-  fprintf fmt "%s" (id_unique pprinter (pr_name pr))
+  fprintf fmt "%s" (id_unique pprinter pr.pr_name)
 
 (** Types *)
 
@@ -316,7 +316,7 @@ let print_prop_decl drv fmt (k,pr,f) =
     print_pr pr (print_fmla drv) f
 
 let print_prop_decl drv fmt (k,pr,f) =
-  match k, query_ident drv (pr_name pr) with
+  match k, query_ident drv pr.pr_name with
     | Paxiom, Remove -> ()
     | _ -> print_prop_decl drv fmt (k,pr,f); forget_tvs ()
 
