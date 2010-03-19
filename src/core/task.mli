@@ -39,7 +39,7 @@ type task = task_hd option
 and task_hd = private {
   task_decl  : decl;
   task_prev  : task;
-  task_known : known;
+  task_known : known_map;
   task_tag   : int;
 }
 

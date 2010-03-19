@@ -48,6 +48,7 @@ type theory = private {
   th_decls  : tdecl list;   (* theory declarations *)
   th_export : namespace;    (* exported namespace *)
   th_clone  : clone_map;    (* cloning history *)
+  th_known  : known_map;    (* known identifiers *)
   th_local  : Sid.t;        (* locally declared idents *)
 }
 

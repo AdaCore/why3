@@ -114,9 +114,10 @@ exception EmptyDecl
 
 (** Known identifiers *)
 
-type known = decl Mid.t
+type known_map = decl Mid.t
 
-val kn_add_decl : known -> decl -> known
+val known_add_decl : known_map -> decl -> known_map
+val merge_known : known_map -> known_map -> known_map
 
 exception KnownIdent of ident
 exception UnknownIdent of ident

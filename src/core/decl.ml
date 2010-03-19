@@ -378,7 +378,7 @@ exception KnownIdent of ident
 exception UnknownIdent of ident
 exception RedeclaredIdent of ident
 
-type known = decl Mid.t
+type known_map = decl Mid.t
 
 let known_id kn id =
   if not (Mid.mem id kn) then raise (UnknownIdent id)
@@ -452,7 +452,7 @@ let check_decl kn d = match d.d_node with
   | Dind dl   -> List.iter (check_ind kn) dl
   | Dprop (_,_,f) -> known_fmla kn f
 
-let kn_add_decl kn d =
+let known_add_decl kn d =
   let kn = add_decl kn d in
   ignore (check_decl kn d);
   kn

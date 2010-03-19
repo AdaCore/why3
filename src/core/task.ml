@@ -54,7 +54,7 @@ type task = task_hd option
 and task_hd = {
   task_decl  : decl;
   task_prev  : task;
-  task_known : known;
+  task_known : known_map;
   task_tag   : int;
 }
 
@@ -94,11 +94,11 @@ let push_decl task d =
     | Dprop (Pgoal,_,_) -> raise GoalFound
     | _ -> ()
   end;
-  try mk_task d (Some task) (kn_add_decl task.task_known d)
+  try mk_task d (Some task) (known_add_decl task.task_known d)
   with KnownIdent _ -> task
 
 let init_decl d =
-  try mk_task d None (kn_add_decl Mid.empty d)
+  try mk_task d None (known_add_decl Mid.empty d)
   with KnownIdent _ -> assert false
 
 let add_decl opt d =
