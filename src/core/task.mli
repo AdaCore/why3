@@ -39,7 +39,7 @@ type task = task_hd option
 and task_hd = private {
   task_decl  : decl;
   task_prev  : task;
-  task_known : decl Mid.t;
+  task_known : known;
   task_tag   : int;
 }
 
@@ -63,8 +63,6 @@ val task_goal : task -> prsymbol
 
 (* exceptions *)
 
-exception UnknownIdent of ident
-exception RedeclaredIdent of ident
 exception GoalNotFound
 exception GoalFound
 exception LemmaFound

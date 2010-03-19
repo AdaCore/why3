@@ -127,8 +127,8 @@ let rec report fmt = function
       Denv.report fmt e
   | Typing.Error e ->
       Typing.report fmt e
-  | UnknownIdent i ->
-      fprintf fmt "anomaly: unknownident %s" i.Ident.id_short
+  | Decl.UnknownIdent i ->
+      fprintf fmt "anomaly: unknown ident %s" i.Ident.id_short
   | Driver.Error e ->
       Driver.report fmt e
   | Dynlink_compat.Dynlink.Error e -> 

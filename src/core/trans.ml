@@ -32,7 +32,7 @@ type 'a tlist = 'a list trans
 let identity   x = x
 let identity_l x = [x]
 
-let conv_res f c x = c (f x)
+let conv_res c f x = c (f x)
 
 let singleton f x = [f x]
 
@@ -96,8 +96,8 @@ let fold_l fn v =
   let rewind = List.fold_left rewind in
   accum memo_t rewind [v] []
 
-let fold_map   fn v t = conv_res (fold   fn (v, t)) snd
-let fold_map_l fn v t = conv_res (fold_l fn (v, t)) (List.rev_map snd)
+let fold_map   fn v t = conv_res snd                (fold   fn (v, t))
+let fold_map_l fn v t = conv_res (List.rev_map snd) (fold_l fn (v, t))
 
 let map   fn = fold   (fun t1 t2 -> fn t1 t2)
 let map_l fn = fold_l (fun t1 t2 -> fn t1 t2)

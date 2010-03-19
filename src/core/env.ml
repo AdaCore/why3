@@ -47,7 +47,7 @@ let create_env =
 exception TheoryNotFound of string list * string
 
 let find_theory env sl s =
-  try 
+  try
     let m =
       try
 	Hashtbl.find env.env_memo sl
@@ -58,7 +58,7 @@ let find_theory env sl s =
 	m
     in
     Mnm.find s m
-  with Not_found -> 
+  with Not_found ->
     raise (TheoryNotFound (sl, s))
 
 let env_tag env = env.env_tag

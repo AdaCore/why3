@@ -47,90 +47,6 @@ let add_clone =
     { cl_map = merge_clone cl.cl_map th sl; cl_tag = !r }
 
 
-(** Known identifiers *)
-
-exception UnknownIdent of ident
-exception RedeclaredIdent of ident
-
-let known_id kn id =
-  if not (Mid.mem id kn) then raise (UnknownIdent id)
-
-let known_ts kn () ts = known_id kn ts.ts_name
-let known_ls kn () ls = known_id kn ls.ls_name
-
-let known_ty kn ty = ty_s_fold (known_ts kn) () ty
-let known_term kn t = t_s_fold (known_ts kn) (known_ls kn) () t
-let known_fmla kn f = f_s_fold (known_ts kn) (known_ls kn) () f
-
-let merge_known kn1 kn2 =
-  let add_known id decl kn =
-    try
-      if Mid.find id kn2 != decl then raise (RedeclaredIdent id);
-      kn
-    with Not_found -> Mid.add id decl kn
-  in
-  Mid.fold add_known kn1 kn2
-
-exception DejaVu
-
-let add_known id decl kn =
-  try
-    if Mid.find id kn != decl then raise (RedeclaredIdent id);
-    raise DejaVu
-  with Not_found -> Mid.add id decl kn
-
-let add_constr d kn fs = add_known fs.ls_name d kn
-
-let add_type d kn (ts,def) =
-  let kn = add_known ts.ts_name d kn in
-  match def with
-    | Tabstract -> kn
-    | Talgebraic lfs -> List.fold_left (add_constr d) kn lfs
-
-let check_type kn (ts,def) =
-  let check_constr fs = List.iter (known_ty kn) fs.ls_args in
-  match def with
-    | Tabstract -> option_iter (known_ty kn) ts.ts_def
-    | Talgebraic lfs -> List.iter check_constr lfs
-
-let add_logic d kn (ls,_) = add_known ls.ls_name d kn
-
-let check_ls_defn kn ld =
-  let _,e = open_ls_defn ld in
-  e_apply (known_term kn) (known_fmla kn) e
-
-let check_logic kn (ls,ld) =
-  List.iter (known_ty kn) ls.ls_args;
-  option_iter (known_ty kn) ls.ls_value;
-  option_iter (check_ls_defn kn) ld
-
-let add_ind d kn (ps,la) =
-    let kn = add_known ps.ls_name d kn in
-    let add kn (pr,_) = add_known pr.pr_name d kn in
-    List.fold_left add kn la
-
-let check_ind kn (ps,la) =
-    List.iter (known_ty kn) ps.ls_args;
-    let check (_,f) = known_fmla kn f in
-    List.iter check la
-
-let add_decl kn d = match d.d_node with
-  | Dtype dl  -> List.fold_left (add_type d) kn dl
-  | Dlogic dl -> List.fold_left (add_logic d) kn dl
-  | Dind dl   -> List.fold_left (add_ind d) kn dl
-  | Dprop (_,pr,_) -> add_known pr.pr_name d kn
-
-let check_decl kn d = match d.d_node with
-  | Dtype dl  -> List.iter (check_type kn) dl
-  | Dlogic dl -> List.iter (check_logic kn) dl
-  | Dind dl   -> List.iter (check_ind kn) dl
-  | Dprop (_,_,f) -> known_fmla kn f
-
-let add_decl kn d =
-  let kn = add_decl kn d in
-  ignore (check_decl kn d);
-  kn
-
 (** Task *)
 
 type task = task_hd option
@@ -138,7 +54,7 @@ type task = task_hd option
 and task_hd = {
   task_decl  : decl;
   task_prev  : task;
-  task_known : decl Mid.t;
+  task_known : known;
   task_tag   : int;
 }
 
@@ -178,12 +94,12 @@ let push_decl task d =
     | Dprop (Pgoal,_,_) -> raise GoalFound
     | _ -> ()
   end;
-  try mk_task d (Some task) (add_decl task.task_known d)
-  with DejaVu -> task
+  try mk_task d (Some task) (kn_add_decl task.task_known d)
+  with KnownIdent _ -> task
 
 let init_decl d =
-  try mk_task d None (add_decl Mid.empty d)
-  with DejaVu -> assert false
+  try mk_task d None (kn_add_decl Mid.empty d)
+  with KnownIdent _ -> assert false
 
 let add_decl opt d =
   begin match d.d_node with

@@ -37,7 +37,8 @@ val singleton : 'a trans -> 'a tlist
 val compose   : task trans -> 'a trans -> 'a trans
 val compose_l : task tlist -> 'a tlist -> 'a tlist
 
-(* val conv_res : 'a trans -> ('a -> 'b) -> 'b trans *)
+(* Should be only used with functions working in constant time *)
+(* val conv_res : ('a -> 'b) -> 'a trans -> 'b trans *)
 
 val fold   : (task_hd -> 'a -> 'a     ) -> 'a -> 'a trans
 val fold_l : (task_hd -> 'a -> 'a list) -> 'a -> 'a tlist

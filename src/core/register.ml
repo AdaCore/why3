@@ -16,102 +16,81 @@
 (*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
 (*                                                                        *)
 (**************************************************************************)
-  
+
 open Env
 open Task
 open Trans
 
 type 'a value = env option -> clone option -> 'a
 
-type 'a registered = {mutable value : 'a value;
-                      generate : unit -> 'a value;
-                      tag : int}
+type 'a registered = {
+  mutable value    : 'a value;
+          generate : unit -> 'a value;
+}
 
 type 'a trans_reg = 'a trans registered
 type 'a tlist_reg = 'a tlist registered
 
-(*
-module HSreg = 
-struct
-  type t = 'a registered
-  let equal a b = a.tag = b.tag
-  let hash a = a.tag
-end
-
-module WeakReg = Weak.Make(HSreg)
-
-let registers = WeakReg.create 17
-*)
-let c = ref (-1)
-let create gen =
-  let reg = {value = gen ();
-             generate = gen;
-             tag = (incr c; !c)} in
-(*  WeakRef.add registers reg;*)
-  reg
-
-let cl_tag cl = cl.cl_tag
+let create gen = {
+  value    = gen ();
+  generate = gen;
+}
 
 exception ArgumentNeeded
 
-let memo f tag h  = function
+let memo f tag h = function
   | None -> raise ArgumentNeeded
   | Some x ->
       let t = tag x in
-      try
-        Hashtbl.find h t
+      try Hashtbl.find h t
       with Not_found ->
         let r = f x in
         Hashtbl.add h t r;
         r
 
-let memo0 tag f =
-  let memo_t = Hashtbl.create 7 in
-  memo f tag memo_t
+let memo0 tag f = memo f tag (Hashtbl.create 7)
 
 let unused0 f = fun _ -> f
 
+let cl_tag cl = cl.cl_tag
+
 let store0 memo_env memo_cl f =
-  let gen () = 
+  let gen () =
     let f2 = memo_env (f ()) in
-    fun env -> memo_cl (f2 env) in
+    fun env -> memo_cl (f2 env)
+  in
   create gen
-    
-let store f = store0 unused0 unused0 f
-let store_env f = store0 (memo0 env_tag) unused0 f
+
+let store       f = store0 unused0         unused0        f
+let store_env   f = store0 (memo0 env_tag) unused0        f
 let store_clone f = store0 (memo0 env_tag) (memo0 cl_tag) f
-      
+
 let apply0 reg env clone = Trans.apply (reg.value env clone)
+
 let apply_clone reg env clone = apply0 reg (Some env) (Some clone)
-let apply_env reg env = apply0 reg (Some env) None
-let apply reg = apply0 reg None None
+let apply_env   reg env       = apply0 reg (Some env) None
+let apply       reg           = apply0 reg None       None
 
+let clear reg = reg.value <- reg.generate ()
 
-let clear reg = reg.value<-reg.generate ()
-(*
-(* We change reg here but that doesnt change the hash and equality*)
-let clear_all () = WeakReg.iter clear registers
-*)
-let clear_all () = assert false
-
-let compose0 comp reg1 reg2 = 
+let combine comb reg1 reg2 =
   let gen () =
     let reg1 = reg1.generate () in
     let reg2 = reg2.generate () in
-    fun env cl -> comp (reg1 env cl) (reg2 env cl) in
+    fun env cl -> comb (reg1 env cl) (reg2 env cl) in
   create gen
 
-let compose reg1 reg2 = compose0 (fun f g -> Trans.compose f g) reg1 reg2
-let compose_l reg1 reg2 = compose0 (fun f g -> Trans.compose_l f g) 
-  reg1 reg2
-  
-let conv_res conv reg1 = 
+let compose   r1 r2 = combine (fun t1 t2 -> Trans.compose   t1 t2) r1 r2
+let compose_l r1 r2 = combine (fun t1 t2 -> Trans.compose_l t1 t2) r1 r2
+
+let conv_res conv reg1 =
   let gen () =
     let reg1 = reg1.generate () in
     fun env cl -> conv (reg1 env cl) in
   create gen
 
-let singleton reg = conv_res singleton reg
+let singleton reg = conv_res Trans.singleton reg
 
-let identity_trans = store (fun () -> identity)
-let identity_trans_l = store (fun () -> identity_l)
+let identity   = store (fun () -> Trans.identity)
+let identity_l = store (fun () -> Trans.identity_l)
+

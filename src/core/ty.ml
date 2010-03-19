@@ -56,9 +56,9 @@ and ty_node =
   | Tyvar of tvsymbol
   | Tyapp of tysymbol * ty list
 
-module Structts = Util.StructMake(struct 
-                                    type t = tysymbol 
-                                    let tag x =  x.ts_name.id_tag 
+module Structts = Util.StructMake(struct
+                                    type t = tysymbol
+                                    let tag x =  x.ts_name.id_tag
                                   end)
 module Sts = Structts.S
 module Mts = Structts.M
@@ -190,9 +190,9 @@ let ts_real = create_tysymbol (id_fresh "real") [] None
 let ty_int  = ty_app ts_int  []
 let ty_real = ty_app ts_real []
 
-module Structty = Util.StructMake(struct 
-                                    type t = ty 
-                                    let tag x =  x.ty_tag 
+module Structty = Util.StructMake(struct
+                                    type t = ty
+                                    let tag x =  x.ty_tag
                                   end)
 module Sty = Structty.S
 module Mty = Structty.M

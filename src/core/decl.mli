@@ -112,3 +112,13 @@ exception UnboundVars of Svs.t
 exception ClashIdent of ident
 exception EmptyDecl
 
+(** Known identifiers *)
+
+type known = decl Mid.t
+
+val kn_add_decl : known -> decl -> known
+
+exception KnownIdent of ident
+exception UnknownIdent of ident
+exception RedeclaredIdent of ident
+

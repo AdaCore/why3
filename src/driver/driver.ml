@@ -331,7 +331,7 @@ let load_driver file env =
            with Not_found -> errorm ~loc "unknown transformation %s" s in
          compose_l acc t
       )
-      identity_trans_l transformations in
+      identity_l transformations in
     let transforms = trans ltransforms in
   { drv_printer     = !printer;
     drv_task        = None;
