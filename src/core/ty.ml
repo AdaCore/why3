@@ -26,16 +26,14 @@ type tvsymbol = {
   tv_name : ident;
 }
 
-module Tvar = struct
+module Tvar = StructMake (struct
   type t = tvsymbol
-  let equal = (==)
-  let hash tv = tv.tv_name.id_tag
-  let compare tv1 tv2 =
-    Pervasives.compare tv1.tv_name.id_tag tv2.tv_name.id_tag
-end
-module Stv = Set.Make(Tvar)
-module Mtv = Map.Make(Tvar)
-module Htv = Hashtbl.Make(Tvar)
+  let tag tv = tv.tv_name.id_tag
+end)
+
+module Stv = Tvar.S
+module Mtv = Tvar.M
+module Htv = Tvar.H
 
 let create_tvsymbol n = { tv_name = id_register n }
 
@@ -56,13 +54,14 @@ and ty_node =
   | Tyvar of tvsymbol
   | Tyapp of tysymbol * ty list
 
-module Structts = Util.StructMake(struct
-                                    type t = tysymbol
-                                    let tag x =  x.ts_name.id_tag
-                                  end)
-module Sts = Structts.S
-module Mts = Structts.M
-module Hts = Structts.H
+module Tsym = StructMake (struct
+  type t = tysymbol
+  let tag ts = ts.ts_name.id_tag
+end)
+
+module Sts = Tsym.S
+module Mts = Tsym.M
+module Hts = Tsym.H
 
 let mk_ts name args def = {
   ts_name = name;
@@ -72,8 +71,7 @@ let mk_ts name args def = {
 
 let create_tysymbol name args def = mk_ts (id_register name) args def
 
-module Ty = struct
-
+module Hsty = Hashcons.Make (struct
   type t = ty
 
   let equal ty1 ty2 = match ty1.ty_node, ty2.ty_node with
@@ -88,9 +86,16 @@ module Ty = struct
     | Tyapp (s, tl) -> Hashcons.combine_list hash_ty s.ts_name.id_tag tl
 
   let tag n ty = { ty with ty_tag = n }
+end)
 
-end
-module Hsty = Hashcons.Make(Ty)
+module Ty = StructMake (struct
+  type t = ty
+  let tag ty = ty.ty_tag
+end)
+
+module Sty = Ty.S
+module Mty = Ty.M
+module Hty = Ty.H
 
 let mk_ty n = { ty_node = n; ty_tag = -1 }
 let ty_var n = Hsty.hashcons (mk_ty (Tyvar n))
@@ -190,10 +195,3 @@ let ts_real = create_tysymbol (id_fresh "real") [] None
 let ty_int  = ty_app ts_int  []
 let ty_real = ty_app ts_real []
 
-module Structty = Util.StructMake(struct
-                                    type t = ty
-                                    let tag x =  x.ty_tag
-                                  end)
-module Sty = Structty.S
-module Mty = Structty.M
-module Hty = Structty.H
