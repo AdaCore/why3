@@ -20,41 +20,30 @@ open Env
 open Task
 open Trans
 
-type 'a registered
+type 'a trans_reg
+type 'a tlist_reg = 'a list trans_reg
 
-val store : (unit -> 'a) -> 'a registered
-val store_env : (unit -> env -> 'a) -> 'a registered
-val store_clone : (unit -> env -> clone -> 'a) -> 'a registered
+val store : (unit -> 'a trans) -> 'a trans_reg
+val store_env : (unit -> env -> 'a trans) -> 'a trans_reg
+val store_clone : (unit -> env -> clone -> 'a trans) -> 'a trans_reg
 
 exception ArgumentNeeded
-val apply0 : 'a registered -> env option -> clone option -> 'a
-val apply_clone : 'a registered -> env -> clone -> 'a
-val apply_env : 'a registered -> env -> 'a
-val apply : 'a registered -> 'a
 
-val apply_trans0 : 
-  'a trans registered -> env option -> clone option -> task -> 'a
-val apply_trans_clone : 
-  'a trans registered -> env -> clone -> task -> 'a
-val apply_trans_env : 
-  'a trans registered -> env -> task -> 'a
-val apply_trans : 
-  'a trans registered -> task -> 'a
+val apply_clone : 'a trans_reg -> env -> clone -> task -> 'a
+val apply_env : 'a trans_reg -> env -> task -> 'a
+val apply : 'a trans_reg -> task -> 'a
 
-val compose0 : 
-  ('a -> 'b -> 'c) -> 'a registered -> 'b registered -> 'c registered
-val compose : 
-  ('a -> 'b) registered -> ('b -> 'c) registered -> ('a -> 'c) registered 
-val compose_trans : 
-  task trans registered -> 'a trans registered -> 'a trans registered 
-val compose_trans_l : 
-  task tlist registered -> 'a tlist registered -> 'a tlist registered 
+val compose : task trans_reg -> 'a trans_reg -> 'a trans_reg 
+val compose_l : task tlist_reg -> 'a tlist_reg -> 'a tlist_reg 
 
-val conv_res : ('a -> 'b) -> 'a registered -> 'b registered
+(*val conv_res : ('a -> 'b) -> 'a registered -> 'b registered
 (* Sould be used only with function working in constant time*)
+*)
+
+val singleton : 'a trans_reg -> 'a tlist_reg
 
 val clear_all : unit -> unit
-val clear : 'a registered -> unit
+val clear : 'a trans_reg -> unit
 
-val identity_trans : task trans registered
-val identity_trans_l : task tlist registered
+val identity_trans : task trans_reg
+val identity_trans_l : task tlist_reg

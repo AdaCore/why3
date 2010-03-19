@@ -23,17 +23,17 @@
 val t :
   isnotinlinedt:(Term.term -> bool) ->
   isnotinlinedf:(Term.fmla -> bool) -> 
-  Task.task Trans.trans Register.registered
+  Task.task Register.trans_reg
 
 
 (* Inline them all *)
 
-val all : Task.task Trans.trans Register.registered
+val all : Task.task Register.trans_reg
 
 (* Inline only the trivial definition :
    logic c : t = a
    logic f(x : t,...., ) : t = g(y : t2,...) *)
-val trivial : Task.task Trans.trans Register.registered
+val trivial : Task.task Register.trans_reg
 
 
 (* Function to use in other transformations if inlining is needed *)

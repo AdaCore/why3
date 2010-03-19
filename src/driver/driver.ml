@@ -132,29 +132,31 @@ and driver = {
   drv_prover      : Call_provers.prover;
   drv_prelude     : string option;
   drv_filename    : string option;
-  drv_transforms  : task Trans.tlist registered;
+  drv_transforms  : task tlist_reg;
   drv_rules       : theory_rules list;
   drv_thprelude   : string Hid.t;
-  (* the first is the translation only for this ident, the second is also for representant *)
+  (* the first is the translation only for this ident, the second is
+     also for representant *)
   drv_theory      : (translation * translation) Hid.t;
   drv_with_task   : translation Hid.t;
 }
 
 (*
-let print_driver fmt driver =
+  let print_driver fmt driver =
   printf "drv_theory %a@\n" 
-    (Pp.print_iter2 Hid.iter Pp.semi Pp.comma print_ident
-       (Pp.print_pair print_translation print_translation))
-    driver.drv_theory
+  (Pp.print_iter2 Hid.iter Pp.semi Pp.comma print_ident
+  (Pp.print_pair print_translation print_translation))
+  driver.drv_theory
 *)
 
 (** registering transformation *)
 
-let (transforms : (string, task Trans.tlist registered) Hashtbl.t) 
+let (transforms : (string, task tlist_reg) Hashtbl.t) 
     = Hashtbl.create 17
 
-let register_transform_l name transform = Hashtbl.replace transforms name transform
-let register_transform name t = register_transform_l name (conv_res Trans.singleton t)
+let register_transform_l name transform = 
+  Hashtbl.replace transforms name transform
+let register_transform name t = register_transform_l name (singleton t)
 let list_transforms () = Hashtbl.fold (fun k _ acc -> k::acc) transforms []
 
 (** registering printers *)
@@ -206,8 +208,13 @@ let check_syntax loc s len =
   iter_group regexp_arg_pos 
     (fun s ->
        let i = int_of_string (matched_group 1 s) in
-       if i=0 then errorm ~loc "invalid indice of argument : the first one is %%1 and not %%0";
-       if i>len then errorm ~loc "invalid indice of argument \"%%%i\" this logic has only %i argument" i len) s
+       if i=0 
+       then errorm ~loc 
+         "invalid indice of argument : the first one is %%1 and not %%0";
+       if i>len 
+       then errorm ~loc 
+         "invalid indice of argument \"%%%i\" this logic has only %i argument" 
+         i len) s
 
 
 let load_rules env clone driver {thr_name = loc,qualid; thr_rules = trl} =
@@ -322,7 +329,7 @@ let load_driver file env =
          let t = 
            try Hashtbl.find transforms s
            with Not_found -> errorm ~loc "unknown transformation %s" s in
-         compose_trans_l acc t
+         compose_l acc t
       )
       identity_trans_l transformations in
     let transforms = trans ltransforms in
@@ -368,7 +375,8 @@ let syntax_arguments s print fmt l =
  
 (** using drivers *)
 
-let apply_transforms env clone drv = apply_trans_clone drv.drv_transforms env clone
+let apply_transforms env clone drv = 
+  apply_clone drv.drv_transforms env clone
 
 let print_task env clone drv fmt task = match drv.drv_printer with
   | None -> errorm "no printer"

@@ -57,6 +57,7 @@ exception NonLinear
 exception UnboundTypeVariable
 
 val create_tysymbol : preid -> tvsymbol list -> ty option -> tysymbol
+(* create_tysymbol preid param def *)
 
 val ty_var : tvsymbol -> ty
 val ty_app : tysymbol -> ty list -> ty
@@ -84,3 +85,6 @@ val ts_real : tysymbol
 val ty_int  : ty
 val ty_real : ty
 
+module Sty : Set.S with type elt = ty
+module Mty : Map.S with type key = ty
+module Hty : Hashtbl.S with type key = ty

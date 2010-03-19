@@ -26,6 +26,10 @@ type 'a value = env option -> clone option -> 'a
 type 'a registered = {mutable value : 'a value;
                       generate : unit -> 'a value;
                       tag : int}
+
+type 'a trans_reg = 'a trans registered
+type 'a tlist_reg = 'a tlist registered
+
 (*
 module HSreg = 
 struct
@@ -77,15 +81,10 @@ let store f = store0 unused0 unused0 f
 let store_env f = store0 (memo0 env_tag) unused0 f
 let store_clone f = store0 (memo0 env_tag) (memo0 cl_tag) f
       
-let apply0 reg = reg.value
+let apply0 reg env clone = Trans.apply (reg.value env clone)
 let apply_clone reg env clone = apply0 reg (Some env) (Some clone)
 let apply_env reg env = apply0 reg (Some env) None
 let apply reg = apply0 reg None None
-
-let apply_trans0 reg env clone = Trans.apply (reg.value env clone)
-let apply_trans_clone reg env clone = apply_trans0 reg (Some env) (Some clone)
-let apply_trans_env reg env = apply_trans0 reg (Some env) None
-let apply_trans reg = apply_trans0 reg None None
 
 
 let clear reg = reg.value<-reg.generate ()
@@ -102,9 +101,8 @@ let compose0 comp reg1 reg2 =
     fun env cl -> comp (reg1 env cl) (reg2 env cl) in
   create gen
 
-let compose reg1 reg2 = compose0 (fun f g x -> g (f x)) reg1 reg2
-let compose_trans reg1 reg2 = compose0 (fun f g -> Trans.compose f g) reg1 reg2
-let compose_trans_l reg1 reg2 = compose0 (fun f g -> Trans.compose_l f g) 
+let compose reg1 reg2 = compose0 (fun f g -> Trans.compose f g) reg1 reg2
+let compose_l reg1 reg2 = compose0 (fun f g -> Trans.compose_l f g) 
   reg1 reg2
   
 let conv_res conv reg1 = 
@@ -113,6 +111,7 @@ let conv_res conv reg1 =
     fun env cl -> conv (reg1 env cl) in
   create gen
 
+let singleton reg = conv_res singleton reg
 
 let identity_trans = store (fun () -> identity)
 let identity_trans_l = store (fun () -> identity_l)

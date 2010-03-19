@@ -77,13 +77,17 @@ val get_namespace : theory_uc -> namespace
 (** Use and clone *)
 
 type th_inst = {
-  inst_ts    : tysymbol Mts.t;
+  inst_ts    : tysymbol Mts.t; (* old to new *)
   inst_ls    : lsymbol  Mls.t;
   inst_lemma : Spr.t;
   inst_goal  : Spr.t;
 }
 
 val empty_inst : th_inst
+val create_inst : 
+  ts:(tysymbol * tysymbol) list ->
+  ls:(lsymbol * lsymbol) list ->
+  lemma:prsymbol list -> goal:prsymbol list -> th_inst
 
 val use_export   : theory_uc -> theory -> theory_uc
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc

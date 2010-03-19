@@ -43,6 +43,7 @@ type lsymbol = private {
 }
 
 val create_lsymbol : preid -> ty list -> ty option -> bool -> lsymbol
+(* create_lsymbols preid tyargs tyres is_constr *)
 val create_fsymbol : preid -> ty list -> ty -> lsymbol
 val create_fconstr : preid -> ty list -> ty -> lsymbol
 val create_psymbol : preid -> ty list -> lsymbol

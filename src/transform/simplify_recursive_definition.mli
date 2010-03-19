@@ -20,7 +20,7 @@
 
 (* Simplify the recursive type and logic definition *)
 
-val t : Task.task Trans.trans Register.registered
+val t : Task.task Register.trans_reg
 
 (* ungroup recursive definition *)
 

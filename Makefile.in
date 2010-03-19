@@ -121,14 +121,14 @@ CORE_CMO := ident.cmo ty.cmo term.cmo decl.cmo theory.cmo\
 	task.cmo pretty.cmo trans.cmo env.cmo register.cmo
 CORE_CMO := $(addprefix src/core/,$(CORE_CMO))
 
-UTIL_CMO := pp.cmo loc.cmo util.cmo hashcons.cmo sysutil.cmo
+UTIL_CMO := pp.cmo loc.cmo util.cmo hashcons.cmo sysutil.cmo hashweak.cmo
 UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
 
 PARSER_CMO := parser.cmo lexer.cmo denv.cmo typing.cmo 
 PARSER_CMO := $(addprefix src/parser/,$(PARSER_CMO))
 
 TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
-	split_conjunction.cmo 
+	split_conjunction.cmo encoding_decorate.cmo 
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
 DRIVER_CMO := call_provers.cmo dynlink_compat.cmo driver_parser.cmo\
@@ -454,7 +454,7 @@ jc/jc_ai.ml: jc/jc_annot_inference.ml jc/jc_annot_fail.ml Makefile
 ############
 
 tags:
-	find src -name "*.ml*" | grep -v ".svn" | sort -r | xargs \
+	find src -regex ".*\.ml[^#]*" | grep -v ".svn" | sort -r | xargs \
 	etags "--regex=/let[ \t]+\([^ \t]+\)/\1/" \
 	      "--regex=/let[ \t]+rec[ \t]+\([^ \t]+\)/\1/" \
 	      "--regex=/and[ \t]+\([^ \t]+\)/\1/" \

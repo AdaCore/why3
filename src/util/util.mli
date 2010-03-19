@@ -36,3 +36,25 @@ val any_fn : ('a -> bool) -> 'b -> 'a -> bool
 module Sstr : Set.S with type elt = string
 module Mstr : Map.S with type key = string
 
+module type Sstruct =
+sig
+  type t
+  val tag : t -> int
+end
+
+module OrderedHash (X:Sstruct) :
+sig
+  type t = X.t
+  val equal : t -> t -> bool
+  val hash : t -> int
+  val compare : t -> t -> int
+end
+
+
+(* Use physical equality on X.t *)
+module StructMake(X : Sstruct) :
+sig
+  module S : Set.S with type elt = X.t
+  module M : Map.S with type key = X.t
+  module H : Hashtbl.S with type key = X.t
+end

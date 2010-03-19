@@ -244,6 +244,23 @@ let empty_inst = {
   inst_goal  = Spr.empty;
 }
 
+let create_inst ~ts ~ls ~lemma ~goal =
+  let ts = 
+    List.fold_left (fun acc (tso,tsn) -> Mts.add tso tsn acc) Mts.empty ts in
+  let ls = 
+    List.fold_left (fun acc (lso,lsn) -> Mls.add lso lsn acc) Mls.empty ls in
+  let make_list = List.fold_left (fun acc lem -> Spr.add lem acc) Spr.empty in
+  let lemma = make_list lemma in
+  let goal = make_list goal in
+  {
+    inst_ts    = ts;
+    inst_ls    = ls;
+    inst_lemma = lemma;
+    inst_goal  = goal;
+  }
+
+
+
 exception CannotInstantiate of ident
 
 type clones = {

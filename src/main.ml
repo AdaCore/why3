@@ -81,11 +81,14 @@ let () =
 can't be used with --output-file";
      "--driver", Arg.String (fun s -> driver := Some s),
      "<file>  set the driver file";
-     "--timeout", Arg.Set_int timeout, "set the timeout used when calling provers (0 unlimited, default 10)";
+     "--timeout", Arg.Set_int timeout, "set the timeout used when calling \
+provers (0 unlimited, default 10)";
      "--list-printers", Arg.Set list_printers, "list the printers registered";
-     "--list-transforms", Arg.Set list_transforms, "list the transformation registered";
+     "--list-transforms", Arg.Set list_transforms, "list the transformation \
+registered";
 (*     "--list-goals", Arg.Set list_goals, "list the goals of the files";*)
-     "--print-debug", Arg.Set print_debug, "print on stderr the theories of the files given on the commandline" 
+     "--print-debug", Arg.Set print_debug, "print on stderr the theories of \
+the files given on the commandline" 
     ]
     (fun f -> Queue.push f files)
     "usage: why [options] files..."
@@ -167,7 +170,8 @@ let extract_goals ?filter =
     let l = List.rev_map (fun task -> (th,task)) l in
     List.rev_append l acc
 
-let file_sanitizer = Ident.sanitizer Ident.char_to_alnumus Ident.char_to_alnumus
+let file_sanitizer = 
+  Ident.sanitizer Ident.char_to_alnumus Ident.char_to_alnumus
 
 let do_file env drv filename_printer file =
   if !parse_only then begin
@@ -182,7 +186,8 @@ let do_file env drv filename_printer file =
     let m = Typing.read_file env file in
     if !print_debug then
       eprintf "%a"
-        (Pp.print_iter2 Mnm.iter Pp.newline Pp.nothing Pp.nothing Pretty.print_theory)
+        (Pp.print_iter2 Mnm.iter Pp.newline Pp.nothing Pp.nothing 
+           Pretty.print_theory)
         m;
     if not !type_only then
       let drv =  
@@ -197,7 +202,8 @@ let do_file env drv filename_printer file =
           Hashtbl.fold
             (fun tname goals acc ->
                let th = try Mnm.find tname m with Not_found -> 
-                 eprintf "File %s : --goal/--goals_of : Unknown theory %s@." file tname; exit 1 in                
+                 eprintf "File %s : --goal/--goals_of : Unknown theory %s@." 
+                   file tname; exit 1 in                
                let filter = match goals with
                  | None -> None
                  | Some s -> Some 
@@ -213,7 +219,8 @@ let do_file env drv filename_printer file =
       let goals = List.fold_left 
         (fun acc (th,(task,cl)) -> 
            List.rev_append 
-             (List.map (fun e -> (th,e,cl)) (Driver.apply_transforms env cl drv task)
+             (List.map (fun e -> (th,e,cl)) (Driver.apply_transforms env cl drv
+                                               task)
              ) acc) [] goals in
       (* Pretty-print the goals or call the prover *)
       begin
@@ -254,12 +261,14 @@ let do_file env drv filename_printer file =
                    let fmt = if file = "-" 
                    then std_formatter
                    else formatter_of_out_channel (open_out file) in
-                   fprintf fmt "%a\000@?" (Driver.print_task env cl drv) task) goals
+                   fprintf fmt "%a\000@?" (Driver.print_task env cl drv) task) 
+                goals
       end;
       if !call then
         (* we are in the call mode *)
         let call (th,task,cl) = 
-          let res = Driver.call_prover ~debug:!debug ?timeout env cl drv task in
+          let res = 
+            Driver.call_prover ~debug:!debug ?timeout env cl drv task in
           printf "%s %s %s : %a@." 
             file th.th_name.Ident.id_short 
             ((task_goal task).Decl.pr_name).Ident.id_long
