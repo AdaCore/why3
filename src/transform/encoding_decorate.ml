@@ -75,15 +75,20 @@ let load_prelude env =
     let name = ts.ts_name.id_short in
     let th_uc = create_theory (id_fresh ("encoding_decorate_for_"^name)) in
     let ty = (ty_app ts []) in
+    let add_fsymbol fs task =
+      let decl = Decl.create_logic_decl [fs,None] in
+      add_decl task decl in
     let d2ty = create_fsymbol (id_fresh ("d2"^name)) [deco]  ty in
     let ty2u = create_fsymbol (id_fresh (name^"2u")) [ty] undeco in
+    let th_uc = add_fsymbol d2ty (add_fsymbol ty2u th_uc) in
     let th_inst = create_inst 
       ~ts:[type_t,ts]
       ~ls:[logic_d2t,d2ty;logic_t2u,ty2u]
       ~lemma:[] ~goal:[] in
     let lconv = { d2t = d2ty; t2u = ty2u} in
     let th_uc = clone_export th_uc builtin th_inst in
-    let task = flat_theory task (close_theory th_uc) in
+    let th = close_theory th_uc in
+    let task = flat_theory task th in
       task,Mts.add ts lconv spmap
   in
   let task,specials = 
