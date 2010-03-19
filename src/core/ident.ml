@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Util
+
 (** Identifiers *)
 
 type ident = {
@@ -31,15 +33,15 @@ and origin =
   | Derived of ident
   | Fresh
 
-module Id = struct
+
+module Id = StructMake (struct
   type t = ident
-  let equal = (==)
-  let hash id1 = id1.id_tag
-  let compare id1 id2 = Pervasives.compare id1.id_tag id2.id_tag
-end
-module Mid = Map.Make(Id)
-module Sid = Set.Make(Id)
-module Hid = Hashtbl.Make(Id)
+  let tag id = id.id_tag
+end)
+
+module Sid = Id.S
+module Mid = Id.M
+module Hid = Id.H
 
 type preid = ident
 

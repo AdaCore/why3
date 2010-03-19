@@ -86,16 +86,14 @@ type prsymbol = {
   pr_name : ident;
 }
 
-module Prop = struct
+module Prop = StructMake (struct
   type t = prsymbol
-  let equal = (==)
-  let hash pr = pr.pr_name.id_tag
-  let compare pr1 pr2 =
-    Pervasives.compare pr1.pr_name.id_tag pr2.pr_name.id_tag
-end
-module Spr = Set.Make(Prop)
-module Mpr = Map.Make(Prop)
-module Hpr = Hashtbl.Make(Prop)
+  let tag pr = pr.pr_name.id_tag
+end)
+
+module Spr = Prop.S
+module Mpr = Prop.M
+module Hpr = Prop.H
 
 let create_prsymbol n = { pr_name = id_register n }
 
@@ -127,7 +125,7 @@ and decl_node =
 
 (** Declarations *)
 
-module Decl = struct
+module Hsdecl = Hashcons.Make (struct
 
   type t = decl
 
@@ -182,21 +180,25 @@ module Decl = struct
 
   let tag n d = { d with d_tag = n }
 
-  let compare d1 d2 = Pervasives.compare d1.d_tag d2.d_tag
+end)
 
-end
-module Hdecl = Hashcons.Make(Decl)
-module Mdecl = Map.Make(Decl)
-module Sdecl = Set.Make(Decl)
+module Decl = StructMake (struct
+  type t = decl
+  let tag d = d.d_tag
+end)
+
+module Sdecl = Decl.S
+module Mdecl = Decl.M
+module Hdecl = Decl.H
 
 (** Declaration constructors *)
 
 let mk_decl n = { d_node = n; d_tag = -1 }
 
-let create_ty_decl tdl = Hdecl.hashcons (mk_decl (Dtype tdl))
-let create_logic_decl ldl = Hdecl.hashcons (mk_decl (Dlogic ldl))
-let create_ind_decl idl = Hdecl.hashcons (mk_decl (Dind idl))
-let create_prop_decl k p f = Hdecl.hashcons (mk_decl (Dprop (k,p,f)))
+let create_ty_decl tdl = Hsdecl.hashcons (mk_decl (Dtype tdl))
+let create_logic_decl ldl = Hsdecl.hashcons (mk_decl (Dlogic ldl))
+let create_ind_decl idl = Hsdecl.hashcons (mk_decl (Dind idl))
+let create_prop_decl k p f = Hsdecl.hashcons (mk_decl (Dprop (k,p,f)))
 
 exception ConstructorExpected of lsymbol
 exception UnboundTypeVar of tvsymbol

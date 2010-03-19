@@ -28,17 +28,14 @@ type vsymbol = {
   vs_ty   : ty;
 }
 
-module Vsym = struct
+module Vsym = StructMake (struct
   type t = vsymbol
-  let equal = (==)
-  let hash vs = vs.vs_name.id_tag
-  let compare vs1 vs2 =
-    Pervasives.compare vs1.vs_name.id_tag vs2.vs_name.id_tag
-end
+  let tag vs = vs.vs_name.id_tag
+end)
 
-module Mvs = Map.Make(Vsym)
-module Svs = Set.Make(Vsym)
-module Hvs = Hashtbl.Make(Vsym)
+module Svs = Vsym.S
+module Mvs = Vsym.M
+module Hvs = Vsym.H
 
 let create_vsymbol name ty = {
   vs_name = id_register name;
@@ -56,16 +53,14 @@ type lsymbol = {
   ls_constr : bool;
 }
 
-module Lsym = struct
+module Lsym = StructMake (struct
   type t = lsymbol
-  let equal = (==)
-  let hash fs = fs.ls_name.id_tag
-  let compare fs1 fs2 =
-    Pervasives.compare fs1.ls_name.id_tag fs2.ls_name.id_tag
-end
-module Sls = Set.Make(Lsym)
-module Mls = Map.Make(Lsym)
-module Hls = Hashtbl.Make(Lsym)
+  let tag ls = ls.ls_name.id_tag
+end)
+
+module Sls = Lsym.S
+module Mls = Lsym.M
+module Hls = Lsym.H
 
 let create_lsymbol name args value constr = {
   ls_name   = id_register name;
@@ -92,8 +87,7 @@ and pattern_node =
   | Papp of lsymbol * pattern list
   | Pas of pattern * vsymbol
 
-module Hpat = struct
-
+module Hspat = Hashcons.Make (struct
   type t = pattern
 
   let equal_node p1 p2 = match p1, p2 with
@@ -117,17 +111,24 @@ module Hpat = struct
   let hash p = Hashcons.combine (hash_node p.pat_node) p.pat_ty.ty_tag
 
   let tag n p = { p with pat_tag = n }
+end)
 
-end
-module Hp = Hashcons.Make(Hpat)
+module Pat = StructMake (struct
+  type t = pattern
+  let tag pat = pat.pat_tag
+end)
+
+module Spat = Pat.S
+module Mpat = Pat.M
+module Hpat = Pat.H
 
 (* h-consing constructors for patterns *)
 
 let mk_pattern n ty = { pat_node = n; pat_ty = ty; pat_tag = -1 }
-let pat_wild ty = Hp.hashcons (mk_pattern Pwild ty)
-let pat_var v = Hp.hashcons (mk_pattern (Pvar v) v.vs_ty)
-let pat_app f pl ty = Hp.hashcons (mk_pattern (Papp (f, pl)) ty)
-let pat_as p v = Hp.hashcons (mk_pattern (Pas (p, v)) p.pat_ty)
+let pat_wild ty = Hspat.hashcons (mk_pattern Pwild ty)
+let pat_var v = Hspat.hashcons (mk_pattern (Pvar v) v.vs_ty)
+let pat_app f pl ty = Hspat.hashcons (mk_pattern (Papp (f, pl)) ty)
+let pat_as p v = Hspat.hashcons (mk_pattern (Pas (p, v)) p.pat_ty)
 
 (* generic traversal functions *)
 
@@ -275,7 +276,7 @@ let e_apply fnT fnF = function Term t -> fnT t | Fmla f -> fnF f
 let tr_map fnT fnF = List.map (List.map (e_map fnT fnF))
 let tr_fold fnT fnF = List.fold_left (List.fold_left (e_fold fnT fnF))
 
-module T = struct
+module Hsterm = Hashcons.Make (struct
 
   type t = term
 
@@ -327,14 +328,18 @@ module T = struct
 
   let tag n t = { t with t_tag = n }
 
-  let compare t1 t2 = Pervasives.compare t1.t_tag t2.t_tag
+end)
 
-end
-module Hterm = Hashcons.Make(T)
-module Mterm = Map.Make(T)
-module Sterm = Set.Make(T)
+module Term = StructMake (struct
+  type t = term
+  let tag term = term.t_tag
+end)
 
-module F = struct
+module Sterm = Term.S
+module Mterm = Term.M
+module Hterm = Term.H
+
+module Hsfmla = Hashcons.Make (struct
 
   type t = fmla
 
@@ -413,26 +418,30 @@ module F = struct
 
   let tag n f = { f with f_tag = n }
 
-  let compare f1 f2 = Pervasives.compare f1.f_tag f2.f_tag
+end)
 
-end
-module Hfmla = Hashcons.Make(F)
-module Mfmla = Map.Make(F)
-module Sfmla = Set.Make(F)
+module Fmla = StructMake (struct
+  type t = fmla
+  let tag fmla = fmla.f_tag
+end)
+
+module Sfmla = Fmla.S
+module Mfmla = Fmla.M
+module Hfmla = Fmla.H
 
 (* hash-consing constructors for terms *)
 
 let mk_term n ty = { t_node = n; t_label = []; t_ty = ty; t_tag = -1 }
-let t_bvar n ty = Hterm.hashcons (mk_term (Tbvar n) ty)
-let t_var v = Hterm.hashcons (mk_term (Tvar v) v.vs_ty)
-let t_const c ty = Hterm.hashcons (mk_term (Tconst c) ty)
-let t_app f tl ty = Hterm.hashcons (mk_term (Tapp (f, tl)) ty)
-let t_let v t1 t2 = Hterm.hashcons (mk_term (Tlet (t1, (v, t2))) t2.t_ty)
-let t_case t bl ty = Hterm.hashcons (mk_term (Tcase (t, bl)) ty)
-let t_eps u f = Hterm.hashcons (mk_term (Teps (u, f)) u.vs_ty)
+let t_bvar n ty = Hsterm.hashcons (mk_term (Tbvar n) ty)
+let t_var v = Hsterm.hashcons (mk_term (Tvar v) v.vs_ty)
+let t_const c ty = Hsterm.hashcons (mk_term (Tconst c) ty)
+let t_app f tl ty = Hsterm.hashcons (mk_term (Tapp (f, tl)) ty)
+let t_let v t1 t2 = Hsterm.hashcons (mk_term (Tlet (t1, (v, t2))) t2.t_ty)
+let t_case t bl ty = Hsterm.hashcons (mk_term (Tcase (t, bl)) ty)
+let t_eps u f = Hsterm.hashcons (mk_term (Teps (u, f)) u.vs_ty)
 
-let t_label     l t = Hterm.hashcons { t with t_label = l }
-let t_label_add l t = Hterm.hashcons { t with t_label = l :: t.t_label }
+let t_label     l t = Hsterm.hashcons { t with t_label = l }
+let t_label_add l t = Hsterm.hashcons { t with t_label = l :: t.t_label }
 let t_label_copy { t_label = l } t = if l == [] then t else t_label l t
 
 let t_app_unsafe = t_app
@@ -440,24 +449,24 @@ let t_app_unsafe = t_app
 (* hash-consing constructors for formulas *)
 
 let mk_fmla n = { f_node = n; f_label = []; f_tag = -1 }
-let f_app f tl = Hfmla.hashcons (mk_fmla (Fapp (f, tl)))
-let f_quant q ul n tl f = Hfmla.hashcons (mk_fmla (Fquant (q, (ul,n,tl,f))))
+let f_app f tl = Hsfmla.hashcons (mk_fmla (Fapp (f, tl)))
+let f_quant q ul n tl f = Hsfmla.hashcons (mk_fmla (Fquant (q, (ul,n,tl,f))))
 
-let f_binary op f1 f2 = Hfmla.hashcons (mk_fmla (Fbinop (op, f1, f2)))
+let f_binary op f1 f2 = Hsfmla.hashcons (mk_fmla (Fbinop (op, f1, f2)))
 let f_and = f_binary Fand
 let f_or = f_binary For
 let f_implies = f_binary Fimplies
 let f_iff = f_binary Fiff
 
-let f_not f = Hfmla.hashcons (mk_fmla (Fnot f))
-let f_true = Hfmla.hashcons (mk_fmla Ftrue)
-let f_false = Hfmla.hashcons (mk_fmla Ffalse)
-let f_if f1 f2 f3 = Hfmla.hashcons (mk_fmla (Fif (f1, f2, f3)))
-let f_let v t f = Hfmla.hashcons (mk_fmla (Flet (t, (v, f))))
-let f_case t bl = Hfmla.hashcons (mk_fmla (Fcase (t, bl)))
+let f_not f = Hsfmla.hashcons (mk_fmla (Fnot f))
+let f_true = Hsfmla.hashcons (mk_fmla Ftrue)
+let f_false = Hsfmla.hashcons (mk_fmla Ffalse)
+let f_if f1 f2 f3 = Hsfmla.hashcons (mk_fmla (Fif (f1, f2, f3)))
+let f_let v t f = Hsfmla.hashcons (mk_fmla (Flet (t, (v, f))))
+let f_case t bl = Hsfmla.hashcons (mk_fmla (Fcase (t, bl)))
 
-let f_label     l f = Hfmla.hashcons { f with f_label = l }
-let f_label_add l f = Hfmla.hashcons { f with f_label = l :: f.f_label }
+let f_label     l f = Hsfmla.hashcons { f with f_label = l }
+let f_label_add l f = Hsfmla.hashcons { f with f_label = l :: f.f_label }
 let f_label_copy { f_label = l } f = if l == [] then f else f_label l f
 
 (* built-in symbols *)
