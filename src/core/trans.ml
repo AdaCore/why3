@@ -114,23 +114,5 @@ let decl_l fn =
   let fn task acc = List.rev_map (List.fold_left add_decl acc) (fn task) in
   map_l fn
 
-let rewrite fnT fnF d = match d.d_node with
-  | Dtype _ ->
-      d
-  | Dlogic l ->
-      let fn = function
-        | ls, Some ld ->
-            let vl,e = open_ls_defn ld in
-            make_ls_defn ls vl (e_map fnT fnF e)
-        | ld -> ld
-      in
-      create_logic_decl (List.map fn l)
-  | Dind l ->
-      let fn (pr,f) = pr, fnF f in
-      let fn (ps,l) = ps, List.map fn l in
-      create_ind_decl (List.map fn l)
-  | Dprop (k,pr,f) ->
-      create_prop_decl k pr (fnF f)
-
-let rewrite fnT fnF = decl (fun d -> [rewrite fnT fnF d])
+let rewrite fnT fnF = decl (fun d -> [decl_map fnT fnF d])
 

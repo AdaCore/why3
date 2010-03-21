@@ -371,6 +371,28 @@ let create_ind_decls idl =
   | [_] -> [create_ind_decl idl]
   | _   -> List.rev_map create_ind_decl (build idl)
 
+
+(** Utilities *)
+
+let decl_map fnT fnF d = match d.d_node with
+  | Dtype _ ->
+      d
+  | Dlogic l ->
+      let fn = function
+        | ls, Some ld ->
+            let vl,e = open_ls_defn ld in
+            make_ls_defn ls vl (e_map fnT fnF e)
+        | ld -> ld
+      in
+      create_logic_decl (List.map fn l)
+  | Dind l ->
+      let fn (pr,f) = pr, fnF f in
+      let fn (ps,l) = ps, List.map fn l in
+      create_ind_decl (List.map fn l)
+  | Dprop (k,pr,f) ->
+      create_prop_decl k pr (fnF f)
+
+
 (** Known identifiers *)
 
 exception KnownIdent of ident

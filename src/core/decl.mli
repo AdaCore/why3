@@ -116,6 +116,10 @@ exception UnboundVars of Svs.t
 exception ClashIdent of ident
 exception EmptyDecl
 
+(** Utilities *)
+
+val decl_map : (term -> term) -> (fmla -> fmla) -> decl -> decl
+
 (** Known identifiers *)
 
 type known_map = decl Mid.t
