@@ -49,6 +49,7 @@
 	"clone", CLONE;
 	"else", ELSE;
 	"end", END;
+	"epsilon", EPSILON;
 	"exists", EXISTS;
 	"export", EXPORT;
         "false", FALSE;
@@ -161,8 +162,6 @@ rule token = parse
       { LEFTPAR }
   | ")"
       { RIGHTPAR }
-  | "!"
-      { BANG }
   | ":"
       { COLON }
   | "->"
@@ -177,18 +176,12 @@ rule token = parse
       { OP2 (String.make 1 c) }
   | "*" | "/" | "%" as c
       { OP3 (String.make 1 c) }
-  | "@"
-      { AT }
   | "."
       { DOT }
   | "["
       { LEFTSQ }
   | "]"
       { RIGHTSQ }
-  | "{"
-      { LEFTB }
-  | "}"
-      { RIGHTB }
   | "|"
       { BAR }
   | "\""

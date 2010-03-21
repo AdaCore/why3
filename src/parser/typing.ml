@@ -266,7 +266,7 @@ and dterm_node =
   | Tlet of dterm * string * dterm
   | Tmatch of dterm list * (dpattern list * dterm) list
   | Tnamed of string * dterm
-  | Teps of string * dfmla
+  | Teps of string * dty * dfmla
 
 and dfmla =
   | Fapp of lsymbol * dterm list
@@ -413,6 +413,11 @@ and dterm_node loc env = function
       let ty = dty env ty in
       if not (unify e1.dt_ty ty) then term_expected_type ~loc e1.dt_ty ty;
       e1.dt_node, ty
+  | PPeps ({id=x}, ty, e1) ->
+      let ty = dty env ty in
+      let env = { env with dvars = Mstr.add x ty env.dvars } in
+      let e1 = dfmla env e1 in
+      Teps (x, ty, e1), ty
   | PPquant _ | PPif _
   | PPprefix _ | PPinfix _ | PPfalse | PPtrue ->
       error ~loc TermExpected
@@ -474,7 +479,7 @@ and dfmla env e = match e.pp_desc with
       Fnamed (x, f1)
   | PPvar x ->
       Fvar (snd (find_prop x env.uc))
-  | PPconst _ | PPcast _ ->
+  | PPeps _ | PPconst _ | PPcast _ ->
       error ~loc:e.pp_loc PredicateExpected
 
 and dpat_list env tl pl =
@@ -551,8 +556,12 @@ let rec term env t = match t.dt_node with
   | Tnamed (x, e1) ->
       let e1 = term env e1 in
       t_label_add x e1
-  | Teps _ ->
-      assert false (*TODO*)
+  | Teps (x, ty, e1) ->
+      let ty = ty_of_dty ty in
+      let v = create_vsymbol (id_fresh x) ty in
+      let env = Mstr.add x v env in
+      let e1 = fmla env e1 in
+      t_eps v e1
 
 and fmla env = function
   | Ftrue ->

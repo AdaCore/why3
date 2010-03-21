@@ -54,25 +54,21 @@
 
 /* keywords */
 
-%token AND AS AXIOM 
-%token CLONE 
-%token ELSE END EXISTS EXPORT FALSE FORALL  
-%token GOAL
-%token IF IMPORT IN INDUCTIVE LEMMA 
-%token LET LOGIC MATCH 
-%token NAMESPACE NOT OR  
-%token THEN THEORY TRUE TYPE
-%token USE WITH
+%token AND AS AXIOM CLONE 
+%token ELSE END EPSILON EXISTS EXPORT FALSE FORALL  
+%token GOAL IF IMPORT IN INDUCTIVE LEMMA 
+%token LET LOGIC MATCH NAMESPACE NOT OR  
+%token THEN THEORY TRUE TYPE USE WITH
 
 /* symbols */
 
-%token ARROW AT
-%token BANG BAR 
+%token ARROW
+%token BAR 
 %token COLON COMMA  
 %token DOT EQUAL
-%token LEFTB LEFTPAR LEFTSQ 
+%token LEFTPAR LEFTSQ 
 %token LRARROW
-%token QUOTE RIGHTB 
+%token QUOTE
 %token RIGHTPAR RIGHTSQ 
 %token UNDERSCORE
 
@@ -81,30 +77,25 @@
 
 /* Precedences */
 
-%left LEFTB 
+%nonassoc prec_decls
+%nonassoc LOGIC TYPE INDUCTIVE
 
-%left COLON 
+%nonassoc COLON 
+%nonassoc ELSE
+%nonassoc IN
+%nonassoc DOT
 
-%left IN
-
-%left ELSE
-
-%right prec_named
-%right prec_quant
+%nonassoc prec_named
 %right ARROW LRARROW
 %right OR 
 %right AND 
-%right NOT
-%right prec_if
+%nonassoc NOT
 %left EQUAL OP0
 %left OP1
 %left OP2
 %left OP3
-%right unary_op
-%left LEFTSQ
-
-%nonassoc prec_decls
-%nonassoc LOGIC TYPE INDUCTIVE
+%nonassoc prefix_op
+%nonassoc postfix_op
 
 /* Entry points */
 
@@ -385,11 +376,11 @@ lexpr:
 | lexpr OP3 lexpr 
    { let id = { id = infix $2; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$1; $3])) }
-| any_op lexpr %prec unary_op
+| any_op lexpr %prec prefix_op
    { let id = { id = prefix $1; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$2])) }
 /*
-| lexpr any_op %prec unary_op
+| lexpr any_op %prec postfix_op
    { let id = { id = postfix $2; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$1])) }
 */
@@ -397,11 +388,11 @@ lexpr:
    { mk_pp (PPvar $1) }
 | qualid LEFTPAR list1_lexpr_sep_comma RIGHTPAR
    { mk_pp (PPapp ($1, $3)) }
-| IF lexpr THEN lexpr ELSE lexpr %prec prec_if 
+| IF lexpr THEN lexpr ELSE lexpr
    { mk_pp (PPif ($2, $4, $6)) }
-| FORALL list1_uquant_sep_comma triggers DOT lexpr %prec prec_quant
+| FORALL list1_uquant_sep_comma triggers DOT lexpr
    { mk_pp (PPquant (PPforall, $2, $3, $5)) }
-| EXISTS list1_uquant_sep_comma triggers DOT lexpr %prec prec_quant
+| EXISTS list1_uquant_sep_comma triggers DOT lexpr
    { mk_pp (PPquant (PPexists, $2, $3, $5)) }
 | INTEGER
    { mk_pp (PPconst (Term.ConstInt $1)) }
@@ -419,6 +410,8 @@ lexpr:
    { mk_pp (PPlet ($2, $4, $6)) }
 | MATCH list1_lexpr_sep_comma WITH bar_ match_cases END
    { mk_pp (PPmatch ($2, $5)) }
+| EPSILON lident COLON primitive_type DOT lexpr
+   { mk_pp (PPeps ($2, $4, $6)) }
 | lexpr COLON primitive_type
    { mk_pp (PPcast ($1, $3)) }
 ;
@@ -449,6 +442,7 @@ pattern:
 | uqualid                                       { mk_pat (PPpapp ($1, [])) }
 | uqualid LEFTPAR list1_pat_sep_comma RIGHTPAR  { mk_pat (PPpapp ($1, $3)) }
 | pattern AS lident                             { mk_pat (PPpas ($1,$3)) }
+| LEFTPAR pattern RIGHTPAR                      { $2 }
 ;
 
 triggers:

@@ -72,7 +72,7 @@ and pp_desc =
   | PPquant of pp_quant * uquant list * lexpr list list * lexpr
   | PPnamed of string * lexpr
   | PPlet of ident * lexpr * lexpr
-(*  | PPeps of ident * lexpr *)
+  | PPeps of ident * pty * lexpr
   | PPmatch of lexpr list * (pattern list * lexpr) list
   | PPcast of lexpr * pty
 
