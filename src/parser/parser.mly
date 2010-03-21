@@ -80,10 +80,8 @@
 %nonassoc prec_decls
 %nonassoc LOGIC TYPE INDUCTIVE
 
+%nonassoc DOT ELSE IN
 %nonassoc COLON 
-%nonassoc ELSE
-%nonassoc IN
-%nonassoc DOT
 
 %nonassoc prec_named
 %right ARROW LRARROW
