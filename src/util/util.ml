@@ -17,13 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let map_fold_left f acc l =
-  let acc, rev =
-    List.fold_left
-      (fun (acc, rev) e -> let acc, e = f acc e in acc, e :: rev)
-      (acc, []) l
-  in
-  acc, List.rev rev
+(* useful option combinators *)
 
 let of_option = function None -> assert false | Some x -> x
 
@@ -33,32 +27,48 @@ let option_apply d f = function None -> d | Some x -> f x
 
 let option_iter f = function None -> () | Some x -> f x
 
+(* useful list combinators *)
+
+let map_fold_left f acc l =
+  let acc, rev =
+    List.fold_left
+      (fun (acc, rev) e -> let acc, e = f acc e in acc, e :: rev)
+      (acc, []) l
+  in
+  acc, List.rev rev
+
+let list_all2 pr l1 l2 =
+  try List.for_all2 pr l1 l2 with Invalid_argument _ -> false
+
+(* boolean fold accumulators *)
 
 exception FoldSkip
 
 let all_fn pr _ t = pr t || raise FoldSkip
 let any_fn pr _ t = pr t && raise FoldSkip
 
+(* Set and Map on strings *)
+
 module Sstr = Set.Make(String)
 module Mstr = Map.Make(String)
 
-module type Sstruct =
+(* Set, Map, Hashtbl on structures with a unique tag and physical equality *)
+
+module type Tagged =
 sig
   type t
   val tag : t -> int
 end
 
-module OrderedHash (X:Sstruct) = 
+module OrderedHash (X : Tagged) =
 struct
   type t = X.t
   let equal = (==)
   let hash = X.tag
-  let compare ts1 ts2 =
-    Pervasives.compare (X.tag ts1) (X.tag ts2)
+  let compare ts1 ts2 = Pervasives.compare (X.tag ts1) (X.tag ts2)
 end
 
-
-module StructMake(X : Sstruct) =
+module StructMake (X : Tagged) =
 struct
   module T = OrderedHash(X)
   module S = Set.Make(T)

@@ -129,12 +129,9 @@ module Hsdecl = Hashcons.Make (struct
 
   type t = decl
 
-  let for_all2 pr l1 l2 =
-    try List.for_all2 pr l1 l2 with Invalid_argument _ -> false
-
   let eq_td (ts1,td1) (ts2,td2) = ts1 == ts2 && match td1,td2 with
     | Tabstract, Tabstract -> true
-    | Talgebraic l1, Talgebraic l2 -> for_all2 (==) l1 l2
+    | Talgebraic l1, Talgebraic l2 -> list_all2 (==) l1 l2
     | _ -> false
 
   let eq_ld (ls1,ld1) (ls2,ld2) = ls1 == ls2 && match ld1,ld2 with
@@ -144,12 +141,12 @@ module Hsdecl = Hashcons.Make (struct
 
   let eq_iax (pr1,fr1) (pr2,fr2) = pr1 == pr1 && fr1 == fr2
 
-  let eq_ind (ps1,al1) (ps2,al2) = ps1 == ps2 && for_all2 eq_iax al1 al2
+  let eq_ind (ps1,al1) (ps2,al2) = ps1 == ps2 && list_all2 eq_iax al1 al2
 
   let equal d1 d2 = match d1.d_node, d2.d_node with
-    | Dtype  l1, Dtype  l2 -> for_all2 eq_td l1 l2
-    | Dlogic l1, Dlogic l2 -> for_all2 eq_ld l1 l2
-    | Dind   l1, Dind   l2 -> for_all2 eq_ind l1 l2
+    | Dtype  l1, Dtype  l2 -> list_all2 eq_td l1 l2
+    | Dlogic l1, Dlogic l2 -> list_all2 eq_ld l1 l2
+    | Dind   l1, Dind   l2 -> list_all2 eq_ind l1 l2
     | Dprop (k1,pr1,f1), Dprop (k2,pr2,f2) ->
         k1 == k2 && pr1 == pr2 && f1 == f2
     | _,_ -> false

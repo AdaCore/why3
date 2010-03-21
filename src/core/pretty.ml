@@ -194,9 +194,10 @@ and print_tnode opl opr fmt t = match t.t_node with
       fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
         print_vs v print_opl_term t1 print_opl_term t2;
       forget_var v
-  | Tcase (t1,bl) ->
+  | Tcase (tl,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
-        print_term t1 (print_list newline print_tbranch) bl
+        (print_list comma print_term) tl
+        (print_list newline print_tbranch) bl
   | Teps fb ->
       let v,f = f_open_bound fb in
       fprintf fmt (protect_on opr "epsilon %a.@ %a")
@@ -229,21 +230,24 @@ and print_fnode opl opr fmt f = match f.f_node with
       fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
         print_vs v print_opl_term t print_opl_fmla f;
       forget_var v
-  | Fcase (t,bl) ->
-      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend" print_term t
+  | Fcase (tl,bl) ->
+      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
+        (print_list comma print_term) tl
         (print_list newline print_fbranch) bl
   | Fif (f1,f2,f3) ->
       fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
         print_fmla f1 print_fmla f2 print_opl_fmla f3
 
 and print_tbranch fmt br =
-  let pat,svs,t = t_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat pat print_term t;
+  let pl,svs,t = t_open_branch br in
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]"
+    (print_list comma print_pat) pl print_term t;
   Svs.iter forget_var svs
 
 and print_fbranch fmt br =
-  let pat,svs,f = f_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat pat print_fmla f;
+  let pl,svs,f = f_open_branch br in
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]"
+    (print_list comma print_pat) pl print_fmla f;
   Svs.iter forget_var svs
 
 and print_tl fmt tl =

@@ -536,11 +536,11 @@ let rec term env t = match t.dt_node with
   | Tmatch (e1, bl) ->
       let branch (pat,e) =
         let env, pat = pattern env pat in
-        (pat, term env e)
+        ([pat], term env e)
       in
       let bl = List.map branch bl in
       let ty = (snd (List.hd bl)).t_ty in
-      t_case (term env e1) bl ty
+      t_case [term env e1] bl ty
   | Tnamed (x, e1) ->
       let e1 = term env e1 in
       t_label_add x e1
@@ -586,9 +586,9 @@ and fmla env = function
   | Fmatch (e1, bl) ->
       let branch (pat,e) =
         let env, pat = pattern env pat in
-        (pat, fmla env e)
+        ([pat], fmla env e)
       in
-      f_case (term env e1) (List.map branch bl)
+      f_case [term env e1] (List.map branch bl)
   | Fnamed (x, f1) ->
       let f1 = fmla env f1 in
       f_label_add x f1

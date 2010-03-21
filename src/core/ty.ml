@@ -76,14 +76,14 @@ module Hsty = Hashcons.Make (struct
 
   let equal ty1 ty2 = match ty1.ty_node, ty2.ty_node with
     | Tyvar n1, Tyvar n2 -> n1 == n2
-    | Tyapp (s1, l1), Tyapp (s2, l2) -> s1 == s2 && List.for_all2 (==) l1 l2
+    | Tyapp (s1,l1), Tyapp (s2,l2) -> s1 == s2 && List.for_all2 (==) l1 l2
     | _ -> false
 
   let hash_ty ty = ty.ty_tag
 
   let hash ty = match ty.ty_node with
     | Tyvar v -> v.tv_name.id_tag
-    | Tyapp (s, tl) -> Hashcons.combine_list hash_ty s.ts_name.id_tag tl
+    | Tyapp (s,tl) -> Hashcons.combine_list hash_ty s.ts_name.id_tag tl
 
   let tag n ty = { ty with ty_tag = n }
 end)

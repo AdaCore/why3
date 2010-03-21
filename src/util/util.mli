@@ -17,8 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val map_fold_left :
-  ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a list -> 'acc * 'b list
+(* useful option combinators *)
 
 val of_option : 'a option -> 'a
 
@@ -28,21 +27,34 @@ val option_iter : ('a -> unit) -> 'a option -> unit
 
 val option_apply : 'b -> ('a -> 'b) -> 'a option -> 'b
 
+(* useful list combinators *)
+
+val map_fold_left :
+  ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a list -> 'acc * 'b list
+
+val list_all2 : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool
+
+(* boolean fold accumulators *)
+
 exception FoldSkip
 
 val all_fn : ('a -> bool) -> 'b -> 'a -> bool
 val any_fn : ('a -> bool) -> 'b -> 'a -> bool
 
+(* Set and Map on strings *)
+
 module Sstr : Set.S with type elt = string
 module Mstr : Map.S with type key = string
 
-module type Sstruct =
+(* Set, Map, Hashtbl on structures with a unique tag and physical equality *)
+
+module type Tagged =
 sig
   type t
   val tag : t -> int
 end
 
-module OrderedHash (X:Sstruct) :
+module OrderedHash (X : Tagged) :
 sig
   type t = X.t
   val equal : t -> t -> bool
@@ -50,11 +62,10 @@ sig
   val compare : t -> t -> int
 end
 
-
-(* Use physical equality on X.t *)
-module StructMake(X : Sstruct) :
+module StructMake (X : Tagged) :
 sig
   module S : Set.S with type elt = X.t
   module M : Map.S with type key = X.t
   module H : Hashtbl.S with type key = X.t
 end
+

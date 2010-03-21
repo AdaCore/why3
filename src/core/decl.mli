@@ -83,6 +83,10 @@ and decl_node =
   | Dind   of ind_decl list     (* inductive predicates *)
   | Dprop  of prop_decl         (* axiom / lemma / goal *)
 
+module Sdecl : Set.S with type elt = decl
+module Mdecl : Map.S with type key = decl
+module Hdecl : Hashtbl.S with type key = decl
+
 (** Declaration constructors *)
 
 val create_ty_decl : ty_decl list -> decl

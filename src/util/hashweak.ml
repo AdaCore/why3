@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Make (S:Util.Sstruct) =
+module Make (S : Util.Tagged) =
 struct
 
   type 'a t = { ht : (int,'a) Hashtbl.t;

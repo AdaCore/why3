@@ -129,7 +129,7 @@ and term_node = private
   | Tconst of constant
   | Tapp of lsymbol * term list
   | Tlet of term * term_bound
-  | Tcase of term * term_branch list
+  | Tcase of term list * term_branch list
   | Teps of fmla_bound
 
 and fmla_node = private
@@ -141,7 +141,7 @@ and fmla_node = private
   | Ffalse
   | Fif of fmla * fmla * fmla
   | Flet of term * fmla_bound
-  | Fcase of term * fmla_branch list
+  | Fcase of term list * fmla_branch list
 
 and term_bound
 
@@ -170,7 +170,7 @@ val t_var : vsymbol -> term
 val t_const : constant -> ty -> term
 val t_app : lsymbol -> term list -> ty -> term
 val t_let : vsymbol -> term -> term -> term
-val t_case : term -> (pattern * term) list -> ty -> term
+val t_case : term list -> (pattern list * term) list -> ty -> term
 val t_eps : vsymbol -> fmla -> term
 
 val t_label : label list -> term -> term
@@ -193,7 +193,7 @@ val f_true : fmla
 val f_false : fmla
 val f_if : fmla -> fmla -> fmla -> fmla
 val f_let : vsymbol -> term -> fmla -> fmla
-val f_case :  term -> (pattern * fmla) list -> fmla
+val f_case : term list -> (pattern list * fmla) list -> fmla
 
 val f_label : label list -> fmla -> fmla
 val f_label_add : label -> fmla -> fmla
@@ -204,8 +204,8 @@ val f_label_copy : fmla -> fmla -> fmla
 val t_open_bound : term_bound -> vsymbol * term
 val f_open_bound : fmla_bound -> vsymbol * fmla
 
-val t_open_branch : term_branch -> pattern * Svs.t * term
-val f_open_branch : fmla_branch -> pattern * Svs.t * fmla
+val t_open_branch : term_branch -> pattern list * Svs.t * term
+val f_open_branch : fmla_branch -> pattern list * Svs.t * fmla
 
 val f_open_quant : fmla_quant -> vsymbol list * trigger list * fmla
 

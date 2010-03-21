@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Make (X:Util.Sstruct) :
+module Make (X : Util.Tagged) :
 sig
 
   type 'a t
