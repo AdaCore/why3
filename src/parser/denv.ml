@@ -17,10 +17,6 @@ let error ?loc e = match loc with
   | None -> raise (Error e)
   | Some loc -> raise (Loc.Located (loc, Error e))
 
-let rec print_qualid fmt = function
-  | Qident s -> fprintf fmt "%s" s.id
-  | Qdot (m, s) -> fprintf fmt "%a.%s" print_qualid m s.id
-
 let report fmt = function
   | AnyMessage s ->
       fprintf fmt "%s" s
