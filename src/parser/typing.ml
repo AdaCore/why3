@@ -515,14 +515,12 @@ let rec pattern env p =
   match p.dp_node with
   | Pwild -> env, pat_wild ty
   | Pvar x ->
-      if Mstr.mem x env then assert false;
       let v = create_vsymbol (id_fresh x) ty in
       Mstr.add x v env, pat_var v
   | Papp (s, pl) ->
       let env, pl = map_fold_left pattern env pl in
       env, pat_app s pl ty
   | Pas (p, x) ->
-      if Mstr.mem x env then assert false;
       let v = create_vsymbol (id_fresh x) ty in
       let env, p = pattern (Mstr.add x v env) p in
       env, pat_as p v
