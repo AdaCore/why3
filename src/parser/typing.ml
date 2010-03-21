@@ -31,7 +31,7 @@ open Denv
 
 (** errors *)
 
-type error = 
+type error =
   | Message of string
   | ClashType of string
   | DuplicateTypeVar of string
@@ -39,7 +39,7 @@ type error =
   | Clash of string
   | PredicateExpected
   | TermExpected
-  | BadNumberOfArguments of Ident.ident * int * int 
+  | BadNumberOfArguments of Ident.ident * int * int
   | ClashTheory of string
   | ClashNamespace of string
   | UnboundTheory of qualid
@@ -63,8 +63,8 @@ let error ?loc e = match loc with
 let errorm ?loc f =
   let buf = Buffer.create 512 in
   let fmt = Format.formatter_of_buffer buf in
-  Format.kfprintf 
-    (fun _ -> 
+  Format.kfprintf
+    (fun _ ->
        Format.pp_print_flush fmt ();
        let s = Buffer.contents buf in
        Buffer.clear buf;
@@ -123,7 +123,7 @@ let report fmt = function
 
 (** Environments *)
 
-(** typing using destructive type variables 
+(** typing using destructive type variables
 
     parsed trees        intermediate trees       typed trees
       (Ptree)               (D below)               (Term)
@@ -143,15 +143,15 @@ let term_expected_type ~loc ty1 ty2 =
     environment + local variables.
     It is only local to this module and created with [create_denv] below. *)
 
-type denv = { 
+type denv = {
   uc : theory_uc; (* the theory under construction *)
   utyvars : (string, type_var) Hashtbl.t; (* user type variables *)
   dvars : dty Mstr.t; (* local variables, to be bound later *)
 }
 
-let create_denv uc = { 
-  uc = uc; 
-  utyvars = Hashtbl.create 17; 
+let create_denv uc = {
+  uc = uc;
+  utyvars = Hashtbl.create 17;
   dvars = Mstr.empty;
 }
 
@@ -164,7 +164,7 @@ let find_user_type_var x env =
     let v = create_ty_decl_var ~user:true v in
     Hashtbl.add env.utyvars x v;
     v
- 
+
 (* parsed types -> intermediate types *)
 
 let rec qloc = function
@@ -177,7 +177,7 @@ let rec string_list_of_qualid acc = function
 
 let specialize_tysymbol loc p uc =
   let sl = string_list_of_qualid [] p in
-  let ts = 
+  let ts =
     try ns_find_ts (get_namespace uc) sl
     with Not_found -> error ~loc (UnboundType sl)
   in
@@ -188,7 +188,7 @@ let rec type_inst s ty = match ty.ty_node with
   | Ty.Tyapp (ts, tyl) -> Tyapp (ts, List.map (type_inst s) tyl)
 
 let rec dty env = function
-  | PPTtyvar {id=x} -> 
+  | PPTtyvar {id=x} ->
       Tyvar (find_user_type_var x env)
   | PPTtyapp (p, x) ->
       let loc = qloc x in
@@ -198,9 +198,9 @@ let rec dty env = function
       if np <> a then error ~loc (TypeArity (x, a, np));
       let tyl = List.map (dty env) p in
       match ts.ts_def with
-	| None -> 
+	| None ->
 	    Tyapp (ts, tyl)
-	| Some ty -> 
+	| Some ty ->
 	    let add m v t = Mtv.add v t m in
             let s = List.fold_left2 add Mtv.empty ts.ts_args tyl in
 	    type_inst s ty
@@ -208,7 +208,7 @@ let rec dty env = function
 let find_ns find p ns =
   let loc = qloc p in
   let sl = string_list_of_qualid [] p in
-  try find ns sl 
+  try find ns sl
   with Not_found -> error ~loc (UnboundSymbol sl)
 
 let find_prop_ns = find_ns ns_find_prop
@@ -224,14 +224,14 @@ let specialize_lsymbol p uc =
   let s = find_lsymbol p uc in
   s, specialize_lsymbol (qloc p) s
 
-let specialize_fsymbol p uc = 
+let specialize_fsymbol p uc =
   let loc = qloc p in
   let s, (tl, ty) = specialize_lsymbol p uc in
   match ty with
     | None -> error ~loc TermExpected
     | Some ty -> s, tl, ty
 
-let specialize_psymbol p uc = 
+let specialize_psymbol p uc =
   let loc = qloc p in
   let s, (tl, ty) = specialize_lsymbol p uc in
   match ty with
@@ -264,11 +264,11 @@ and dterm_node =
   | Tconst of constant
   | Tapp of lsymbol * dterm list
   | Tlet of dterm * string * dterm
-  | Tmatch of dterm * (dpattern * dterm) list
+  | Tmatch of dterm list * (dpattern list * dterm) list
   | Tnamed of string * dterm
   | Teps of string * dfmla
 
-and dfmla = 
+and dfmla =
   | Fapp of lsymbol * dterm list
   | Fquant of quant * uquant list * dtrigger list list * dfmla
   | Fbinop of binop * dfmla * dfmla
@@ -277,7 +277,7 @@ and dfmla =
   | Ffalse
   | Fif of dfmla * dfmla * dfmla
   | Flet of dterm * string * dfmla
-  | Fmatch of dterm * (dpattern * dfmla) list
+  | Fmatch of dterm list * (dpattern list * dfmla) list
   | Fnamed of string * dfmla
   | Fvar of fmla
 
@@ -291,10 +291,10 @@ let binop = function
   | PPimplies -> Fimplies
   | PPiff -> Fiff
 
-let check_pat_linearity pat =
+let check_pat_linearity pl =
   let s = ref Sstr.empty in
   let add id =
-    if Sstr.mem id.id !s then 
+    if Sstr.mem id.id !s then
       errorm ~loc:id.id_loc "duplicate variable %s" id.id;
     s := Sstr.add id.id !s
   in
@@ -304,14 +304,14 @@ let check_pat_linearity pat =
     | PPpapp (_, pl) -> List.iter check pl
     | PPpas (p, id) -> check p; add id
   in
-  check pat
+  List.iter check pl
 
 let rec dpat env pat =
   let env, n, ty = dpat_node pat.pat_loc env pat.pat_desc in
   env, { dp_node = n; dp_ty = ty }
 
 and dpat_node loc env = function
-  | PPpwild -> 
+  | PPpwild ->
       let tv = create_tvsymbol (id_user "a" loc) in
       let ty = Tyvar (create_ty_decl_var ~loc ~user:false tv) in
       env, Pwild, ty
@@ -329,11 +329,11 @@ and dpat_node loc env = function
       let env = { env with dvars = Mstr.add x p.dp_ty env.dvars } in
       env, Pas (p,x), p.dp_ty
 
-and dpat_args s loc env el pl = 
+and dpat_args s loc env el pl =
   let n = List.length el and m = List.length pl in
   if n <> m then error ~loc (BadNumberOfArguments (s, m, n));
   let rec check_arg env = function
-    | [], [] -> 
+    | [], [] ->
 	env, []
     | a :: al, p :: pl ->
 	let loc = p.pat_loc in
@@ -353,13 +353,13 @@ let rec trigger_not_a_term_exn = function
 
 let check_quant_linearity uqu =
   let s = ref Sstr.empty in
-  let check id = 
+  let check id =
     if Sstr.mem id.id !s then errorm ~loc:id.id_loc "duplicate variable %s" id.id;
     s := Sstr.add id.id !s
   in
   List.iter (fun (idl, _) -> List.iter check idl) uqu
 
-let rec dterm env t = 
+let rec dterm env t =
   let n, ty = dterm_node t.pp_loc env t.pp_desc in
   { dt_node = n; dt_ty = ty }
 
@@ -368,7 +368,7 @@ and dterm_node loc env = function
       (* local variable *)
       let ty = Mstr.find x env.dvars in
       Tvar x, ty
-  | PPvar x -> 
+  | PPvar x ->
       (* 0-arity symbol (constant) *)
       let s, tyl, ty = specialize_fsymbol x env.uc in
       let n = List.length tyl in
@@ -388,26 +388,22 @@ and dterm_node loc env = function
       let env = { env with dvars = Mstr.add x ty env.dvars } in
       let e2 = dterm env e2 in
       Tlet (e1, x, e2), e2.dt_ty
-  | PPmatch (e1, bl) ->
-      let e1 = dterm env e1 in
-      let ty = e1.dt_ty in
+  | PPmatch (el, bl) ->
+      let tl = List.map (dterm env) el in
       let tb = (* the type of all branches *)
 	let tv = create_tvsymbol (id_user "a" loc) in
-	Tyvar (create_ty_decl_var ~loc ~user:false tv) 
+	Tyvar (create_ty_decl_var ~loc ~user:false tv)
       in
-      let branch (pat, e) =
-	let loc = pat.pat_loc in
-	check_pat_linearity pat;
-        let env, pat = dpat env pat in
-	if not (unify pat.dp_ty ty) then term_expected_type ~loc pat.dp_ty ty;
-	let loc = e.pp_loc in
+      let branch (pl, e) =
+        let env, pl = dpat_list env tl pl in
+        let loc = e.pp_loc in
 	let e = dterm env e in
 	if not (unify e.dt_ty tb) then term_expected_type ~loc e.dt_ty tb;
-        pat, e
+        pl, e
       in
       let bl = List.map branch bl in
       let ty = (snd (List.hd bl)).dt_ty in
-      Tmatch (e1, bl), ty
+      Tmatch (tl, bl), ty
   | PPnamed (x, e1) ->
       let e1 = dterm env e1 in
       Tnamed (x, e1), e1.dt_ty
@@ -417,7 +413,7 @@ and dterm_node loc env = function
       let ty = dty env ty in
       if not (unify e1.dt_ty ty) then term_expected_type ~loc e1.dt_ty ty;
       e1.dt_node, ty
-  | PPquant _ | PPif _ 
+  | PPquant _ | PPif _
   | PPprefix _ | PPinfix _ | PPfalse | PPtrue ->
       error ~loc TermExpected
 
@@ -431,12 +427,12 @@ and dfmla env e = match e.pp_desc with
   | PPinfix (a, (PPand | PPor | PPimplies | PPiff as op), b) ->
       Fbinop (binop op, dfmla env a, dfmla env b)
   | PPif (a, b, c) ->
-      Fif (dfmla env a, dfmla env b, dfmla env c)  
+      Fif (dfmla env a, dfmla env b, dfmla env c)
   | PPquant (q, uqu, trl, a) ->
       check_quant_linearity uqu;
       let uquant env (idl,ty) =
         let ty = dty env ty in
-        let env, idl = 
+        let env, idl =
           map_fold_left
             (fun env {id=x} -> { env with dvars = Mstr.add x ty env.dvars }, x)
             env idl
@@ -445,14 +441,14 @@ and dfmla env e = match e.pp_desc with
       in
       let env, uqu = map_fold_left uquant env uqu in
       let trigger e =
-	try 
-	  TRterm (dterm env e) 
+	try
+	  TRterm (dterm env e)
 	with exn when trigger_not_a_term_exn exn ->
-	  TRfmla (dfmla env e) 
+	  TRfmla (dfmla env e)
       in
       let trl = List.map (List.map trigger) trl in
-      let q = match q with 
-        | PPforall -> Fforall 
+      let q = match q with
+        | PPforall -> Fforall
         | PPexists -> Fexists
       in
       Fquant (q, uqu, trl, dfmla env a)
@@ -466,30 +462,43 @@ and dfmla env e = match e.pp_desc with
       let env = { env with dvars = Mstr.add x ty env.dvars } in
       let e2 = dfmla env e2 in
       Flet (e1, x, e2)
-  | PPmatch (e1, bl) ->
-      let e1 = dterm env e1 in
-      let ty = e1.dt_ty in
-      let branch (pat, e) =
-	let loc = pat.pat_loc in
-	check_pat_linearity pat;
-        let env, pat = dpat env pat in
-	if not (unify pat.dp_ty ty) then term_expected_type ~loc pat.dp_ty ty;
-        pat, dfmla env e
+  | PPmatch (el, bl) ->
+      let tl = List.map (dterm env) el in
+      let branch (pl, e) =
+        let env, pl = dpat_list env tl pl in
+        pl, dfmla env e
       in
-      Fmatch (e1, List.map branch bl)
+      Fmatch (tl, List.map branch bl)
   | PPnamed (x, f1) ->
       let f1 = dfmla env f1 in
       Fnamed (x, f1)
-  | PPvar x -> 
+  | PPvar x ->
       Fvar (snd (find_prop x env.uc))
   | PPconst _ | PPcast _ ->
       error ~loc:e.pp_loc PredicateExpected
+
+and dpat_list env tl pl =
+  check_pat_linearity pl;
+  let pattern (env,pl) pat t =
+    let loc = pat.pat_loc in
+    let env, pat = dpat env pat in
+    if not (unify pat.dp_ty t.dt_ty)
+      then term_expected_type ~loc pat.dp_ty t.dt_ty;
+    env, pat::pl
+  in
+  let loc = (List.hd pl).pat_loc in
+  let env, pl = try List.fold_left2 pattern (env,[]) pl tl
+    with Invalid_argument _ -> errorm ~loc
+      "This pattern has length %d but is expected to have length %d"
+      (List.length pl) (List.length tl)
+  in
+  env, List.rev pl
 
 and dtype_args s loc env el tl =
   let n = List.length el and m = List.length tl in
   if n <> m then error ~loc (BadNumberOfArguments (s, m, n));
   let rec check_arg = function
-    | [], [] -> 
+    | [], [] ->
 	[]
     | a :: al, t :: bl ->
 	let loc = t.pp_loc in
@@ -501,19 +510,19 @@ and dtype_args s loc env el tl =
   in
   check_arg (el, tl)
 
-let rec pattern env p = 
+let rec pattern env p =
   let ty = ty_of_dty p.dp_ty in
   match p.dp_node with
   | Pwild -> env, pat_wild ty
-  | Pvar x -> 
-      if Mstr.mem x env then assert false; (* FIXME? *)
+  | Pvar x ->
+      if Mstr.mem x env then assert false;
       let v = create_vsymbol (id_fresh x) ty in
       Mstr.add x v env, pat_var v
-  | Papp (s, pl) -> 
+  | Papp (s, pl) ->
       let env, pl = map_fold_left pattern env pl in
       env, pat_app s pl ty
   | Pas (p, x) ->
-      if Mstr.mem x env then assert false; (* FIXME? *)
+      if Mstr.mem x env then assert false;
       let v = create_vsymbol (id_fresh x) ty in
       let env, p = pattern (Mstr.add x v env) p in
       env, pat_as p v
@@ -528,19 +537,19 @@ let rec term env t = match t.dt_node with
       t_app s (List.map (term env) tl) (ty_of_dty t.dt_ty)
   | Tlet (e1, x, e2) ->
       let ty = ty_of_dty e1.dt_ty in
-      let e1 = term env e1 in 
+      let e1 = term env e1 in
       let v = create_vsymbol (id_fresh x) ty in
       let env = Mstr.add x v env in
       let e2 = term env e2 in
       t_let v e1 e2
-  | Tmatch (e1, bl) ->
-      let branch (pat,e) =
-        let env, pat = pattern env pat in
-        ([pat], term env e)
+  | Tmatch (tl, bl) ->
+      let branch (pl,e) =
+        let env, pl = map_fold_left pattern env pl in
+        (pl, term env e)
       in
       let bl = List.map branch bl in
       let ty = (snd (List.hd bl)).t_ty in
-      t_case [term env e1] bl ty
+      t_case (List.map (term env) tl) bl ty
   | Tnamed (x, e1) ->
       let e1 = term env e1 in
       t_label_add x e1
@@ -551,7 +560,7 @@ and fmla env = function
   | Ftrue ->
       f_true
   | Ffalse ->
-      f_false 
+      f_false
   | Fnot f ->
       f_not (fmla env f)
   | Fbinop (op, f1, f2) ->
@@ -563,14 +572,14 @@ and fmla env = function
       let uquant env (xl,ty) =
         let ty = ty_of_dty ty in
         map_fold_left
-          (fun env x -> 
-             let v = create_vsymbol (id_fresh x) ty in Mstr.add x v env, v) 
-          env xl 
+          (fun env x ->
+             let v = create_vsymbol (id_fresh x) ty in Mstr.add x v env, v)
+          env xl
       in
       let env, vl = map_fold_left uquant env uqu in
       let trigger = function
-	| TRterm t -> Term (term env t) 
-	| TRfmla f -> Fmla (fmla env f) 
+	| TRterm t -> Term (term env t)
+	| TRfmla f -> Fmla (fmla env f)
       in
       let trl = List.map (List.map trigger) trl in
       f_quant q (List.concat vl) trl (fmla env f1)
@@ -578,17 +587,17 @@ and fmla env = function
       f_app s (List.map (term env) tl)
   | Flet (e1, x, f2) ->
       let ty = ty_of_dty e1.dt_ty in
-      let e1 = term env e1 in 
+      let e1 = term env e1 in
       let v = create_vsymbol (id_fresh x) ty in
       let env = Mstr.add x v env in
       let f2 = fmla env f2 in
       f_let v e1 f2
-  | Fmatch (e1, bl) ->
-      let branch (pat,e) =
-        let env, pat = pattern env pat in
-        ([pat], fmla env e)
+  | Fmatch (tl, bl) ->
+      let branch (pl,e) =
+        let env, pl = map_fold_left pattern env pl in
+        (pl, fmla env e)
       in
-      f_case [term env e1] (List.map branch bl)
+      f_case (List.map (term env) tl) (List.map branch bl)
   | Fnamed (x, f1) ->
       let f1 = fmla env f1 in
       f_label_add x f1
@@ -601,17 +610,17 @@ open Ptree
 
 let add_types dl th =
   let ns = get_namespace th in
-  let def = 
-    List.fold_left 
-      (fun def d -> 
+  let def =
+    List.fold_left
+      (fun def d ->
 	 let id = d.td_ident in
-	 if Mstr.mem id.id def || Mnm.mem id.id ns.ns_ts then 
+	 if Mstr.mem id.id def || Mnm.mem id.id ns.ns_ts then
 	   error ~loc:id.id_loc (ClashType id.id);
-	 Mstr.add id.id d def) 
-      Mstr.empty dl 
+	 Mstr.add id.id d def)
+      Mstr.empty dl
   in
   let tysymbols = Hashtbl.create 17 in
-  let rec visit x = 
+  let rec visit x =
     try
       match Hashtbl.find tysymbols x with
 	| None -> error CyclicTypeDef
@@ -621,22 +630,22 @@ let add_types dl th =
       let d = Mstr.find x def in
       let id = d.td_ident.id in
       let vars = Hashtbl.create 17 in
-      let vl = 
-	List.map 
-	  (fun v -> 
-	     if Hashtbl.mem vars v.id then 
+      let vl =
+	List.map
+	  (fun v ->
+	     if Hashtbl.mem vars v.id then
 	       error ~loc:v.id_loc (DuplicateTypeVar v.id);
 	     let i = create_tvsymbol (id_user v.id v.id_loc) in
 	     Hashtbl.add vars v.id i;
 	     i)
-	  d.td_params 
+	  d.td_params
       in
       let id = id_user id d.td_loc in
       let ts = match d.td_def with
-	| TDalias ty -> 
+	| TDalias ty ->
 	    let rec apply = function
-	      | PPTtyvar v -> 
-		  begin 
+	      | PPTtyvar v ->
+		  begin
 		    try ty_var (Hashtbl.find vars v.id)
 		    with Not_found -> error ~loc:v.id_loc (UnboundTypeVar v.id)
 		  end
@@ -654,38 +663,38 @@ let add_types dl th =
 						    List.length tyl))
 	    in
 	    create_tysymbol id vl (Some (apply ty))
-	| TDabstract | TDalgebraic _ -> 
+	| TDabstract | TDalgebraic _ ->
 	    create_tysymbol id vl None
       in
       Hashtbl.add tysymbols x (Some ts);
       ts
   in
-  let th' = 
-    let tsl = 
+  let th' =
+    let tsl =
       Mstr.fold (fun x _ tsl -> let ts = visit x in (ts, Tabstract) :: tsl) def []
     in
     add_decl th (create_ty_decl tsl)
   in
-  let decl d = 
+  let decl d =
     let ts, th' = match Hashtbl.find tysymbols d.td_ident.id with
-      | None -> 
+      | None ->
 	  assert false
-      | Some ts -> 
+      | Some ts ->
 	  let th' = create_denv th' in
 	  let vars = th'.utyvars in
-	  List.iter 
-	    (fun v -> 
-	       Hashtbl.add vars v.tv_name.id_short 
-                  (create_ty_decl_var ~user:true v)) 
+	  List.iter
+	    (fun v ->
+	       Hashtbl.add vars v.tv_name.id_short
+                  (create_ty_decl_var ~user:true v))
 	    ts.ts_args;
 	  ts, th'
     in
     let d = match d.td_def with
-      | TDabstract | TDalias _ -> 
+      | TDabstract | TDalias _ ->
 	  Tabstract
-      | TDalgebraic cl -> 
+      | TDalgebraic cl ->
 	  let ty = ty_app ts (List.map ty_var ts.ts_args) in
-	  let constructor (loc, id, pl) = 
+	  let constructor (loc, id, pl) =
 	    let param (_, t) = ty_of_dty (dty th' t) in
 	    let tyl = List.map param pl in
 	    create_fconstr (id_user id.id loc) tyl ty
@@ -706,9 +715,9 @@ let add_logics dl th =
   let psymbols = Hashtbl.create 17 in
   let denvs = Hashtbl.create 17 in
   (* 1. create all symbols and make an environment with these symbols *)
-  let create_symbol th d = 
+  let create_symbol th d =
     let id = d.ld_ident.id in
-    if Hashtbl.mem denvs id || Mnm.mem id ns.ns_ls 
+    if Hashtbl.mem denvs id || Mnm.mem id ns.ns_ls
       then error ~loc:d.ld_loc (Clash id);
     let v = id_user id d.ld_loc in
     let denv = create_denv th in
@@ -728,7 +737,7 @@ let add_logics dl th =
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
-  let type_decl d = 
+  let type_decl d =
     let id = d.ld_ident.id in
     let dadd_var denv (x, ty) = match x with
       | None -> denv
@@ -737,8 +746,8 @@ let add_logics dl th =
     let denv = Hashtbl.find denvs id in
     let denv = { denv with uc = th' } in
     let denv = List.fold_left dadd_var denv d.ld_params in
-    let create_var (x, _) ty = 
-      let id = match x with 
+    let create_var (x, _) ty =
+      let id = match x with
 	| None -> id_fresh "%x"
 	| Some id -> id_user id.id id.id_loc
       in
@@ -750,7 +759,7 @@ let add_logics dl th =
 	let ps = Hashtbl.find psymbols id in
         begin match d.ld_def with
 	  | None -> ps,None
-	  | Some f -> 
+	  | Some f ->
 	      let f = dfmla denv f in
               let vl = match ps.ls_value with
                 | None -> mk_vlist ps.ls_args
@@ -763,7 +772,7 @@ let add_logics dl th =
 	let fs = Hashtbl.find fsymbols id in
         begin match d.ld_def with
 	  | None -> fs,None
-	  | Some t -> 
+	  | Some t ->
 	      let loc = t.pp_loc in
 	      let t = dterm denv t in
               let vl = match fs.ls_value with
@@ -795,75 +804,6 @@ let add_prop k loc s f th =
   with ClashSymbol _ ->
     error ~loc (Clash s.id)
 
-(*
-(** [check_clausal_form loc ps f] checks whether the formula [f] 
-    has a valid clausal form 
-      \forall x_1,.., x_k. P1 -> ... -> P_n -> P
-    where P is headed by ps and ps has only positive occurrences in P1 .. Pn *)
-
-let rec occurrences ps f = match f.f_node with
-  | Term.Ftrue | Term.Ffalse -> 
-      0, 0
-  | Term.Fapp (ps', _) -> 
-      (if ps'.ls_name == ps.ls_name then 1 else 0), 0
-  | Term.Fbinop (Fimplies, f1, f2) -> 
-      let pos1, neg1 = occurrences ps f1 in
-      let pos2, neg2 = occurrences ps f2 in
-      neg1+pos2, pos1+neg2
-  | Term.Fbinop ((Fand | For), f1, f2) -> 
-      let pos1, neg1 = occurrences ps f1 in
-      let pos2, neg2 = occurrences ps f2 in
-      pos1+pos2, neg1+neg2
-  | Term.Fbinop (Fiff, f1, f2) -> 
-      let pos1, neg1 = occurrences ps f1 in
-      let pos2, neg2 = occurrences ps f2 in
-      let n = pos1+pos2+neg1+neg2 in
-      n, n
-  | Term.Fnot p1 -> 
-      let pos1, neg1 = occurrences ps p1 in neg1, pos1
-  | Term.Fquant (_, qf) ->
-      assert false (* TODO *)
-      (* occurrences pi p *)
-  | Term.Flet (t, bf) ->
-      let _, f = f_open_bound bf in
-      occurrences ps f
-  | Term.Fif (f1, f2, f3) ->
-      let pos1, neg1 = occurrences ps f1 in
-      let pos2, neg2 = occurrences ps f2 in
-      let pos3, neg3 = occurrences ps f3 in
-      pos1+pos2+pos3, neg1+neg2+neg3
-  | Term.Fcase (_, bl) ->
-      List.fold_left
-	(fun (pos, neg) br ->
-	   let _, _, f1 = f_open_branch br in
-	   let pos1, neg1 = occurrences ps f1 in
-	   pos+pos1, neg+neg1)
-	(0, 0) bl
-      
-let rec check_unquantified_clausal_form loc ps f = match f.f_node with
-  | Term.Fbinop (Fimplies, f1, f2) -> 
-      check_unquantified_clausal_form loc ps f2;
-      let _, neg1 = occurrences ps f1 in
-      if neg1 > 0 then 
-	errorm ~loc 
-	  "inductive predicate has a negative occurrence in this case"
-  | Term.Fapp (ps', _) -> 
-      (* TODO: vérifier également que les arguments de ps' ont exactement
-	 les mêmes types que ceux de la déclaration de ps (et non plus 
-	 précis) *)
-      if ps'.ls_name != ps.ls_name then
-	errorm ~loc "head of clause does not contain the inductive predicate"
-  | _ -> 
-      errorm ~loc "this case is not in clausal form"
-
-let rec check_clausal_form loc ps f = match f.f_node with
-  | Term.Fquant (Fforall, qf) ->
-      let vl, _, f = f_open_quant qf in
-      check_clausal_form loc ps f
-  | _ -> 
-      check_unquantified_clausal_form loc ps f
-*)
-
 let loc_of_id id = match id.id_origin with
   | User loc -> loc
   | _ -> assert false
@@ -872,9 +812,9 @@ let add_inductives dl th =
   let ns = get_namespace th in
   let psymbols = Hashtbl.create 17 in
   (* 1. create all symbols and make an environment with these symbols *)
-  let create_symbol th d = 
+  let create_symbol th d =
     let id = d.in_ident.id in
-    if Hashtbl.mem psymbols id || Mnm.mem id ns.ns_ls 
+    if Hashtbl.mem psymbols id || Mnm.mem id ns.ns_ls
       then error ~loc:d.in_loc (Clash id);
     let v = id_user id d.in_loc in
     let denv = create_denv th in
@@ -886,10 +826,10 @@ let add_inductives dl th =
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
-  let type_decl d = 
+  let type_decl d =
     let id = d.in_ident.id in
     let ps = Hashtbl.find psymbols id in
-    let clause (loc, id, f) = 
+    let clause (loc, id, f) =
       create_prsymbol (id_user id.id loc), fmla th' f
     in
     ps, List.map clause d.in_def
@@ -924,9 +864,9 @@ let prop_kind = function
   | Klemma -> Plemma
 
 let find_theory env lenv q id = match q with
-  | [] -> 
+  | [] ->
       (* local theory *)
-      begin try Mnm.find id lenv 
+      begin try Mnm.find id lenv
       with Not_found -> find_theory env [] id end
   | _ :: _ ->
       (* theory in file f *)
@@ -951,17 +891,17 @@ and add_decl env lenv th = function
       add_prop (prop_kind k) loc s f th
   | UseClone (loc, use, subst) ->
       let q, id = split_qualid use.use_theory in
-      let t = 
+      let t =
 	try
 	  find_theory env lenv q id
-	with 
+	with
 	  | TheoryNotFound _ -> error ~loc (UnboundTheory use.use_theory)
 	  | Error (AmbiguousPath _ as e) -> error ~loc e
       in
       let use_or_clone th = match subst with
-	| None -> 
+	| None ->
 	    use_export th t
-	| Some s -> 
+	| Some s ->
             let add_inst s = function
               | CStsym (p,q) ->
                   let ts1 = find_tysymbol_ns p t.th_export in
@@ -989,7 +929,7 @@ and add_decl env lenv th = function
             let s = List.fold_left add_inst empty_inst s in
 	    clone_export th t s
       in
-      let n = match use.use_as with 
+      let n = match use.use_as with
 	| None -> Some t.th_name.id_short
 	| Some (Some x) -> Some x.id
 	| Some None -> None
@@ -1006,7 +946,7 @@ and add_decl env lenv th = function
 	    let th = use_or_clone th in
 	    close_namespace th true n
 	| Export ->
-	    use_or_clone th 
+	    use_or_clone th
       with ClashSymbol s ->
 	error ~loc (Clash s)
       end
@@ -1025,11 +965,11 @@ and add_decl env lenv th = function
 
 and type_and_add_theory env lenv pt =
   let id = pt.pt_name in
-  if Mnm.mem id.id lenv || id.id = builtin_theory.th_name.id_short 
+  if Mnm.mem id.id lenv || id.id = builtin_theory.th_name.id_short
     then error (ClashTheory id.id);
   let th = type_theory env lenv id pt in
   Mnm.add id.id th lenv
-   
+
 let type_theories env tl =
   List.fold_left (type_and_add_theory env) Mnm.empty tl
 
@@ -1054,7 +994,7 @@ let retrieve lp env sl =
   read_file env file
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "make -C ../.. test"
-End: 
+End:
 *)
