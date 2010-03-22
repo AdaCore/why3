@@ -1264,3 +1264,62 @@ and f_subst_fmla_alpha f1 f2 lvl f =
 let t_subst_fmla_alpha f1 f2 t = t_subst_fmla_alpha f1 f2 0 t
 let f_subst_fmla_alpha f1 f2 f = f_subst_fmla_alpha f1 f2 0 f
 
+(* constructors with propositional simplification *)
+
+let f_quant_simp q vl tl f = match f.f_node with
+  | Ftrue | Ffalse -> f | _ -> f_quant q vl tl f
+
+let f_forall_simp = f_quant_simp Fforall
+let f_exists_simp = f_quant_simp Fexists
+
+let f_not_simp f = match f.f_node with
+  | Ftrue  -> f_false
+  | Ffalse -> f_true
+  | _      -> f_not f
+
+let f_and_simp f1 f2 = match f1.f_node, f2.f_node with
+  | Ftrue, _  -> f2
+  | _, Ftrue  -> f1
+  | Ffalse, _ -> f1
+  | _, Ffalse -> f2
+  | _, _      -> f_and f1 f2
+
+let f_or_simp f1 f2 = match f1.f_node, f2.f_node with
+  | Ftrue, _  -> f1
+  | _, Ftrue  -> f2
+  | Ffalse, _ -> f2
+  | _, Ffalse -> f1
+  | _, _      -> f_or f1 f2
+
+let f_implies_simp f1 f2 = match f1.f_node, f2.f_node with
+  | Ftrue, _  -> f2
+  | _, Ftrue  -> f2
+  | Ffalse, _ -> f_not_simp f1
+  | _, Ffalse -> f_not_simp f1
+  | _, _      -> f_implies f1 f2
+
+let f_iff_simp f1 f2 = match f1.f_node, f2.f_node with
+  | Ftrue, _  -> f2
+  | _, Ftrue  -> f1
+  | Ffalse, _ -> f_not_simp f2
+  | _, Ffalse -> f_not_simp f1
+  | _, _      -> f_iff f1 f2
+
+let f_binary_simp op = match op with
+  | Fand     -> f_and_simp
+  | For      -> f_or_simp
+  | Fimplies -> f_implies_simp
+  | Fiff     -> f_iff_simp
+
+let f_if_simp f1 f2 f3 = match f1.f_node, f2.f_node, f3.f_node with
+  | Ftrue, _, _  -> f2
+  | Ffalse, _, _ -> f3
+  | _, Ftrue, _  -> f_or_simp f1 f3
+  | _, Ffalse, _ -> f_and_simp (f_not f1) f3
+  | _, _, Ftrue  -> f_or_simp  (f_not f1) f2
+  | _, _, Ffalse -> f_and_simp f1 f2
+  | _, _, _      -> f_if f1 f2 f3
+
+let f_let_simp v t f = match f.f_node with
+  | Ftrue | Ffalse -> f | _ -> f_let v t f
+

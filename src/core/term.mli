@@ -199,6 +199,20 @@ val f_label : label list -> fmla -> fmla
 val f_label_add : label -> fmla -> fmla
 val f_label_copy : fmla -> fmla -> fmla
 
+(* constructors with propositional simplification *)
+
+val f_forall_simp : vsymbol list -> trigger list -> fmla -> fmla
+val f_exists_simp : vsymbol list -> trigger list -> fmla -> fmla
+val f_quant_simp : quant -> vsymbol list -> trigger list -> fmla -> fmla
+val f_and_simp : fmla -> fmla -> fmla
+val f_or_simp : fmla -> fmla -> fmla
+val f_implies_simp : fmla -> fmla -> fmla
+val f_iff_simp : fmla -> fmla -> fmla
+val f_binary_simp : binop -> fmla -> fmla -> fmla
+val f_not_simp : fmla -> fmla
+val f_if_simp : fmla -> fmla -> fmla -> fmla
+val f_let_simp : vsymbol -> term -> fmla -> fmla
+
 (* open bindings *)
 
 val t_open_bound : term_bound -> vsymbol * term
