@@ -136,7 +136,7 @@ DRIVER_CMO := call_provers.cmo dynlink_compat.cmo driver_parser.cmo\
 	driver_lexer.cmo driver.cmo
 DRIVER_CMO := $(addprefix src/driver/,$(DRIVER_CMO))
 
-PRINTER_CMO := print_real.cmo alt_ergo.cmo why3.cmo
+PRINTER_CMO := print_real.cmo alt_ergo.cmo why3.cmo smt.cmo
 PRINTER_CMO := $(addprefix src/printer/,$(PRINTER_CMO))
 
 CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\

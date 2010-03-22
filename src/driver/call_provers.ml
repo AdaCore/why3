@@ -70,6 +70,8 @@ let remove_file ?(debug=false) f =
 
 (*let environment = Unix.environment ()*)
 
+let () = Sys.set_signal Sys.sigpipe Sys.Signal_ignore
+
 let timed_sys_command ?formatter ?(debug=false) ?timeout cmd =
   let t0 = Unix.times () in
   let cmd = match timeout with
@@ -77,12 +79,16 @@ let timed_sys_command ?formatter ?(debug=false) ?timeout cmd =
     | Some timeout -> Format.sprintf "%s %d %s 2>&1" !cpulimit timeout cmd in
   if debug then Format.eprintf "command line: %s@." cmd;
   let (cin,cout) as p = Unix.open_process cmd in
-  (match formatter with
-    | None -> ()
-    | Some formatter -> 
-        let fmt = formatter_of_out_channel cout in
-        formatter fmt);
-  close_out cout;
+  begin try
+    (match formatter with
+       | None -> ()
+       | Some formatter -> 
+           let fmt = formatter_of_out_channel cout in
+           formatter fmt);
+    close_out cout;
+  with Sys_error s -> 
+    if debug then Format.eprintf "Sys_error : %s@." s
+  end;
   let out = Sysutil.channel_contents cin in
   let ret = Unix.close_process p in
   let t1 = Unix.times () in

@@ -62,6 +62,9 @@ val id_dup : ident -> preid
 (* id_derived_from i1 i2 <=> i1 is derived from i2 *)
 val id_derived_from : ident -> ident -> bool
 
+(* id_derived_from i1 i2 <=> i1 is derived from i2 *)
+val id_from_user : ident -> Loc.position option
+
 (** Unique persistent names for pretty printing *)
 
 type ident_printer

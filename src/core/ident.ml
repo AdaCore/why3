@@ -75,6 +75,12 @@ let rec id_derived_from i1 i2 = i1 == i2 ||
     | Derived i3 -> id_derived_from i3 i2
     | _ -> false)
 
+let rec id_from_user i = 
+  match i.id_origin with
+    | Derived i -> id_from_user i
+    | User l -> Some l
+    | Fresh -> None
+
 (** Unique names for pretty printing *)
 
 type ident_printer =
