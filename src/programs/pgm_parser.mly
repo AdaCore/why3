@@ -198,6 +198,8 @@ expr:
    { $1 }
 | expr EQUAL expr 
    { mk_infix $1 "=" $3 }
+| expr COLONEQUAL expr 
+   { mk_infix $1 ":=" $3 }
 | expr OP0 expr 
    { mk_infix $1 $2 $3 }
 | expr OP1 expr 

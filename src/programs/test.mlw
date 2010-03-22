@@ -17,8 +17,9 @@ let p =
   assume { true -> old(!z) = 2 }; 
   while !x >= 0 do
     invariant { true } variant { t }
-    ()
+    x := 2
   done;
+  (* for x in s do () done; *)
   f !x
 
 { 
