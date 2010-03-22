@@ -65,9 +65,9 @@ let () =
      "--debug", Arg.Set debug, "sets the debug flag";
      "-I", Arg.String (fun s -> loadpath := s :: !loadpath), 
      "<dir>  adds dir to the loadpath";
-     "--all_goals", Arg.Set set_all_goals,
+     "--all-goals", Arg.Set set_all_goals,
      "apply on all the goals of the file";
-     "--goals_of", Arg.String (fun s -> add_which_theories s), 
+     "--goals-of", Arg.String (fun s -> add_which_theories s), 
      "apply on all the goals of the theory given (ex. --goal T)";
      "--goal", Arg.String (fun s -> add_which_goals s), 
      "apply only on the goal given (ex. --goal T.g)";
