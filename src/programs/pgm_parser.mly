@@ -20,11 +20,36 @@
 %{
 
   open Parsing
+  open Ptree
   open Pgm_ptree
 
   let loc () = (symbol_start_pos (), symbol_end_pos ())
   let loc_i i = (rhs_start_pos i, rhs_end_pos i)
   let loc_ij i j = (rhs_start_pos i, rhs_end_pos j)
+
+  let mk_expr d = { expr_loc = loc (); expr_desc = d }
+  let mk_expr_i i d = { expr_loc = loc_i i; expr_desc = d }
+ 
+  (* FIXME: factorize with parser/parser.mly *)
+  let infix s = "infix " ^ s
+  let prefix s = "prefix " ^ s
+  let postfix s = "postfix " ^ s
+
+  let join (b,_) (_,e) = (b,e)
+
+  let rec mk_apply f = function
+    | [] -> 
+	assert false
+    | [a] -> 
+	Eapply (f, a)
+    | a :: l -> 
+	let loc = join f.expr_loc a.expr_loc in 
+	mk_apply { expr_loc = loc; expr_desc = Eapply (f, a) } l
+
+  let mk_apply_id id = 
+    let e = { expr_desc = Eident (Qident id); expr_loc = id.id_loc } in
+    mk_apply e
+
 
 (***
   let with_loc loc d = { pdesc = d; ploc = loc }
@@ -32,17 +57,6 @@
   let locate_i i d = with_loc (loc_i i) d
 
   let rec_name = function Srec (x,_,_,_,_,_) -> x | _ -> assert false
-
-  let join (b,_) (_,e) = (b,e)
-
-  let rec app f = function
-    | [] -> 
-	assert false
-    | [a] -> 
-	Sapp (f, a)
-    | a :: l -> 
-	let loc = join f.ploc a.ploc in 
-	app (with_loc loc (Sapp (f, a))) l
 
   let bin_op (loc_op,op) e1 e2 =
     let f = with_loc loc_op (Svar op) in
@@ -89,7 +103,9 @@
     reloc loc lb;
     f lb
     
-  let logic_list0_decl = parse_string Lexer.parse_list0_decl
+  let logic_list0_decl (loc, s) = parse_string Lexer.parse_list0_decl loc s
+
+  let lexpr (loc, s) = parse_string Lexer.parse_lexpr loc s
 
 %}
 
@@ -98,7 +114,7 @@
 %token <string> LIDENT UIDENT
 %token <string> INTEGER
 %token <string> OP0 OP1 OP2 OP3
-%token <Ptree.real_constant> FLOAT
+%token <Ptree.real_constant> REAL
 %token <string> STRING
 %token <Lexing.position * string> LOGIC
 
@@ -110,7 +126,7 @@
 
 /* symbols */
 
-%token UNDERSCORE QUOTE COMMA LEFTPAR RIGHTPAR BANG COLON SEMICOLON
+%token UNDERSCORE QUOTE COMMA LEFTPAR RIGHTPAR COLON SEMICOLON
 %token COLONEQUAL ARROW EQUAL AT DOT LEFTSQ RIGHTSQ 
 %token LEFTBLEFTB RIGHTBRIGHTB BAR BARBAR AMPAMP BIGARROW 
 %token EOF
@@ -141,6 +157,7 @@
 %left OP1
 %left OP2
 %left OP3
+%nonassoc prefix_op
 %right unary_op
 %left prec_app
 %left prec_ident
@@ -176,8 +193,74 @@ list1_decl:
 
 decl:
 | LOGIC
-    { let l, s = $1 in
-      LogicDecl (logic_list0_decl l s) }
+    { Dlogic (logic_list0_decl $1) }
+| LET lident EQUAL expr
+    { Dcode ($2, $4) }
+;
+
+lident:
+| LIDENT
+    { { id = $1; id_loc = loc () } }
+;
+
+any_op:
+| OP0   { $1 }
+| OP2   { $1 }
+| OP3   { $1 }
+;
+
+uident:
+| UIDENT { { id = $1; id_loc = loc () } }
+;
+
+lqualid:
+| lident             { Qident $1 }
+| uqualid DOT lident { Qdot ($1, $3) }
+;
+
+uqualid:
+| uident             { Qident $1 }
+| uqualid DOT uident { Qdot ($1, $3) }
+;
+
+expr:
+| constant
+    { mk_expr (Econstant $1) }
+| lqualid 
+    { mk_expr (Eident $1) }
+| expr EQUAL expr 
+   { let id = { id = infix "="; id_loc = loc_i 2 } in
+     mk_expr (mk_apply_id id [$1; $3]) }
+| expr OP0 expr 
+   { let id = { id = infix $2; id_loc = loc_i 2 } in
+     mk_expr (mk_apply_id id [$1; $3]) }
+| expr OP1 expr 
+   { let id = { id = infix $2; id_loc = loc_i 2 } in
+     mk_expr (mk_apply_id id [$1; $3]) }
+| expr OP2 expr 
+   { let id = { id = infix $2; id_loc = loc_i 2 } in
+     mk_expr (mk_apply_id id [$1; $3]) }
+| expr OP3 expr 
+   { let id = { id = infix $2; id_loc = loc_i 2 } in
+     mk_expr (mk_apply_id id [$1; $3]) }
+| any_op expr %prec prefix_op
+   { let id = { id = prefix $1; id_loc = loc_i 2 } in
+     mk_expr (mk_apply_id id [$2]) }
+| IF expr THEN expr ELSE expr
+   { mk_expr (Eif ($2, $4, $6)) }
+| IF expr THEN expr %prec prec_no_else
+   { mk_expr (Eif ($2, $4, mk_expr Eskip)) }
+| expr SEMICOLON expr
+   { mk_expr (Esequence ($1, $3)) }
+| ASSERT LOGIC
+   { mk_expr (Eassert (Aassert, lexpr $2)) }
+;
+
+constant:
+| INTEGER
+   { Term.ConstInt $1 }
+| REAL
+   { Term.ConstReal $1 }
 ;
 
 /*****
@@ -190,11 +273,6 @@ ident:
 ident_rich:
 | uident      { $1 }
 | lident_rich { $1 }
-;
-
-lident:
-| LIDENT
-    { { id = $1; id_loc = loc () } }
 ;
 
 lident_rich:
@@ -221,20 +299,6 @@ any_op:
 | OP0   { $1 }
 | OP2   { $1 }
 | OP3   { $1 }
-;
-
-uident:
-| UIDENT { { id = $1; id_loc = loc () } }
-;
-
-lqualid:
-| lident             { Qident $1 }
-| uqualid DOT lident { Qdot ($1, $3) }
-;
-
-uqualid:
-| uident             { Qident $1 }
-| uqualid DOT uident { Qdot ($1, $3) }
 ;
 
 any_qualid:

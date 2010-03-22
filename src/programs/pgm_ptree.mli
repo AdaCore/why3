@@ -17,10 +17,33 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type loc = Loc.position
+
 type ident = Ptree.ident
 
+type qualid = Ptree.qualid
+
+type constant = Term.constant
+
+type assertion_kind = Aassert | Aassume | Acheck
+
+type expr = {
+  expr_desc : expr_desc;
+  expr_loc  : loc;
+}
+
+and expr_desc =
+  | Econstant of constant
+  | Eident of qualid
+  | Eapply of expr * expr
+  | Esequence of expr * expr
+  | Eif of expr * expr * expr
+  | Eskip 
+  | Eassert of assertion_kind * Ptree.lexpr
+
 type decl =
-  | LogicDecl of Ptree.decl list
+  | Dcode  of ident * expr
+  | Dlogic of Ptree.decl list
 
 type file = decl list
 

@@ -7,6 +7,10 @@ logic f(int) : int
 logic g(x : int) : int = f(x+1)
 }
 
+let p = 
+  if !x = 1 then 1 else !x;
+  assert { !x = 0 }
+
 { 
 axiom A : forall x:int. f(x) = g(x-1)
 }

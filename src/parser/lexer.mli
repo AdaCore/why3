@@ -27,6 +27,7 @@ exception Error of error
 (** parsing entry points *)
 
 val parse_list0_decl : Lexing.lexbuf -> Ptree.decl list
+val parse_lexpr      : Lexing.lexbuf -> Ptree.lexpr
 
 val parse_logic_file : Lexing.lexbuf -> Ptree.logic_file
 

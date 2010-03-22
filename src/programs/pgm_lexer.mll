@@ -127,12 +127,12 @@ rule token = parse
   | (digit+ as i) ("" as f) ['e' 'E'] (['-' '+']? digit+ as e)
   | (digit+ as i) '.' (digit* as f) (['e' 'E'] (['-' '+']? digit+ as e))?
   | (digit* as i) '.' (digit+ as f) (['e' 'E'] (['-' '+']? digit+ as e))?
-      { FLOAT (RConstDecimal (i, f, Util.option_map remove_leading_plus e)) }
+      { REAL (RConstDecimal (i, f, Util.option_map remove_leading_plus e)) }
   | '0' ['x' 'X'] ((hexadigit* as i) '.' (hexadigit+ as f) 
                   |(hexadigit+ as i) '.' (hexadigit* as f)
 		  |(hexadigit+ as i) ("" as f))
     ['p' 'P'] (['-' '+']? digit+ as e)
-      { FLOAT (RConstHexa (i, f, remove_leading_plus e)) }
+      { REAL (RConstHexa (i, f, remove_leading_plus e)) }
   | "(*"
       { comment lexbuf; token lexbuf }
   | "'"
@@ -143,8 +143,6 @@ rule token = parse
       { LEFTPAR }
   | ")"
       { RIGHTPAR }
-  | "!"
-      { BANG }
   | ":"
       { COLON }
   | ";"
@@ -159,7 +157,7 @@ rule token = parse
       { OP0 s }
   | "+" | "-" as c
       { OP2 (String.make 1 c) }
-  | "*" | "/" | "%" as c
+  | "*" | "/" | "%" | "!" as c
       { OP3 (String.make 1 c) }
   | "@"
       { AT }

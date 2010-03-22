@@ -68,7 +68,8 @@ let type_file file =
   let _uc = 
     List.fold_left
       (fun uc d -> match d with
-	 | LogicDecl dl -> List.fold_left (Typing.add_decl env Mnm.empty) uc dl)
+	 | Dlogic dl -> List.fold_left (Typing.add_decl env Mnm.empty) uc dl
+	 | Dcode _ -> uc)
       uc p
   in
   ()
