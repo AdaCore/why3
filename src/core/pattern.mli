@@ -17,10 +17,25 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let print_context _ fmt _ = Format.fprintf fmt "helloworld@\n"
+(* Compilation of pattern-matching *)
 
-let transform_context = Register.identity_trans
+open Ty
+open Term
 
-let () = 
-  Driver.register_printer "helloworld" print_context;
-  Driver.register_transform "helloworld" transform_context
+module Compile
+  (X : sig
+     type action
+     val mk_let : vsymbol -> term -> action -> action
+     val mk_case : term -> (pattern * action) list -> action
+     val constructors : tysymbol -> lsymbol list
+   end) :
+sig
+
+  exception NonExhaustive of pattern list
+  exception Unused of X.action
+
+  val compile : 
+    term list -> (pattern list * X.action) list -> X.action
+    
+end
+
