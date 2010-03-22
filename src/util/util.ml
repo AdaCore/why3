@@ -40,6 +40,10 @@ let map_fold_left f acc l =
 let list_all2 pr l1 l2 =
   try List.for_all2 pr l1 l2 with Invalid_argument _ -> false
 
+let map_join_left map join = function
+  | x :: xl -> List.fold_left (fun acc x -> join acc (map x)) (map x) xl
+  | xl -> raise (Failure "map_join_left")
+
 (* boolean fold accumulators *)
 
 exception FoldSkip

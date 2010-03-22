@@ -34,6 +34,8 @@ val map_fold_left :
 
 val list_all2 : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool
 
+val map_join_left : ('a -> 'b) -> ('b -> 'b -> 'b) -> 'a list -> 'b
+
 (* boolean fold accumulators *)
 
 exception FoldSkip
