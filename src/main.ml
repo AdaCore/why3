@@ -167,7 +167,9 @@ let transform env l =
 let extract_goals ?filter = 
   fun env drv acc th ->
     let l = split_theory th filter in
-    let l = List.rev_map (fun task -> (th,task)) l in
+    let l = List.rev_map (fun (task,cl) -> 
+                            let drv = Driver.cook_driver env cl drv in
+                            (th,task,drv)) l in
     List.rev_append l acc
 
 let file_sanitizer = 
@@ -209,18 +211,20 @@ let do_file env drv filename_printer file =
                  | Some s -> Some 
                      (Hashtbl.fold 
                         (fun s l acc ->
-                           let pr = try ns_find_pr th.th_export l with Not_found ->
-                             eprintf "File %s : --goal : Unknown goal %s@." file s ; exit 1 in
+                           let pr = try ns_find_pr th.th_export l 
+                           with Not_found ->
+                             eprintf "File %s : --goal : Unknown goal %s@." 
+                               file s ; exit 1 in
                            Decl.Spr.add pr acc
                         ) s Decl.Spr.empty) in
                extract_goals ?filter env drv acc th
             ) which_theories [] in
       (* Apply transformations *)
       let goals = List.fold_left 
-        (fun acc (th,(task,cl)) -> 
+        (fun acc (th,task,drv) -> 
            List.rev_append 
-             (List.map (fun e -> (th,e,cl)) (Driver.apply_transforms env cl drv
-                                               task)
+             (List.map (fun e -> (th,e,drv)) 
+                (Driver.apply_transforms drv task)
              ) acc) [] goals in
       (* Pretty-print the goals or call the prover *)
       begin
@@ -238,7 +242,7 @@ let do_file env drv filename_printer file =
               let ident_printer = Ident.create_ident_printer 
                 ~sanitizer:file_sanitizer [] in
               List.iter 
-                (fun (th,task,cl) ->
+                (fun (th,task,drv) ->
                    let cout = 
                      if dir = "-" 
                      then stdout
@@ -249,7 +253,7 @@ let do_file env drv filename_printer file =
                        let filename = Filename.concat dir filename in
                        open_out filename in
                    let fmt = formatter_of_out_channel cout in
-                   fprintf fmt "%a@?" (Driver.print_task env cl drv) task;
+                   fprintf fmt "%a@?" (Driver.print_task drv) task;
                    close_out cout) goals
       end;
       begin
@@ -257,18 +261,18 @@ let do_file env drv filename_printer file =
           | None -> ()
           | Some file (* we are in the output file mode *) -> 
               List.iter 
-                (fun (th,task,cl) ->
+                (fun (th,task,drv) ->
                    let fmt = if file = "-" 
                    then std_formatter
                    else formatter_of_out_channel (open_out file) in
-                   fprintf fmt "%a\000@?" (Driver.print_task env cl drv) task) 
+                   fprintf fmt "%a\000@?" (Driver.print_task drv) task) 
                 goals
       end;
       if !call then
         (* we are in the call mode *)
-        let call (th,task,cl) = 
+        let call (th,task,drv) = 
           let res = 
-            Driver.call_prover ~debug:!debug ?timeout env cl drv task in
+            Driver.call_prover ~debug:!debug ?timeout drv task in
           printf "%s %s %s : %a@." 
             file th.th_name.Ident.id_short 
             ((task_goal task).Decl.pr_name).Ident.id_long

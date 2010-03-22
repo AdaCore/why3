@@ -125,21 +125,26 @@ let print_translation fmt = function
 
 type printer = driver -> formatter -> task -> unit
 
-and driver = {
+and raw_driver = {
   drv_printer     : printer option;
-  drv_task        : task;
-  drv_clone       : clone option;
   drv_prover      : Call_provers.prover;
   drv_prelude     : string option;
   drv_filename    : string option;
   drv_transforms  : task tlist_reg;
   drv_rules       : theory_rules list;
+}
+
+and driver = {
+  drv_raw : raw_driver;
+  drv_clone : clone;
+  drv_env : env;
   drv_thprelude   : string Hid.t;
   (* the first is the translation only for this ident, the second is
      also for representant *)
   drv_theory      : (translation * translation) Hid.t;
   drv_with_task   : translation Hid.t;
 }
+
 
 (*
   let print_driver fmt driver =
@@ -334,8 +339,6 @@ let load_driver file env =
       identity_l transformations in
     let transforms = trans ltransforms in
   { drv_printer     = !printer;
-    drv_task        = None;
-    drv_clone       = None;
     drv_prover      = {Call_provers.pr_call_stdin = !call_stdin;
                        pr_call_file               = !call_file;
                        pr_regexps                 = regexps};
@@ -343,9 +346,6 @@ let load_driver file env =
     drv_filename    = !filename;
     drv_transforms  = transforms;
     drv_rules       = f.f_rules;
-    drv_thprelude   = Hid.create 1;
-    drv_theory      = Hid.create 1;
-    drv_with_task   = Hid.create 1;
   }
 
 (** querying drivers *)
@@ -355,7 +355,7 @@ let query_ident drv id =
     Hid.find drv.drv_with_task id
   with Not_found ->
     let r = try
-      Mid.find id (Util.of_option drv.drv_clone).cl_map
+      Mid.find id drv.drv_clone.cl_map
     with Not_found -> Sid.empty in
     let tr = try fst (Hid.find drv.drv_theory id) 
     with Not_found -> Tag Sstr.empty in 
@@ -375,23 +375,28 @@ let syntax_arguments s print fmt l =
  
 (** using drivers *)
 
-let apply_transforms env clone drv = 
-  apply_clone drv.drv_transforms env clone
+let apply_transforms drv = 
+  apply_clone drv.drv_raw.drv_transforms drv.drv_env drv.drv_clone
 
-let print_task env clone drv fmt task = match drv.drv_printer with
+let cook_driver env clone drv = 
+  let drv = { drv_raw = drv;
+              drv_clone      = clone;
+              drv_env      = env;
+              drv_thprelude  = Hid.create 17;
+              drv_theory     = Hid.create 17;
+              drv_with_task  = Hid.create 17} in
+  List.iter (load_rules env clone drv) drv.drv_raw.drv_rules;
+  drv
+
+
+let print_task drv fmt task = match drv.drv_raw.drv_printer with
   | None -> errorm "no printer"
-  | Some f -> let drv = {drv with drv_task = task;
-                   drv_clone      = Some clone;
-                   drv_thprelude  = Hid.create 17;
-                   drv_theory     = Hid.create 17;
-                   drv_with_task  = Hid.create 17} in
-    List.iter (load_rules env clone drv) drv.drv_rules;
-    f drv fmt task 
+  | Some f -> f drv fmt task 
 
 let regexp_filename = Str.regexp "%\\([a-z]\\)"
 
 let filename_of_goal drv ident_printer filename theory_name task =
-  match drv.drv_filename with
+  match drv.drv_raw.drv_filename with
     | None -> errorm "no filename syntax given"
     | Some f -> 
         let pr_name = (task_goal task).pr_name in
@@ -409,18 +414,18 @@ let file_printer =
     []
 
 let call_prover_on_file ?debug ?timeout drv filename =
-  Call_provers.on_file drv.drv_prover filename 
+  Call_provers.on_file drv.drv_raw.drv_prover filename 
 let call_prover_on_buffer ?debug ?timeout ?filename drv ib = 
-  Call_provers.on_buffer ?debug ?timeout ?filename drv.drv_prover ib 
+  Call_provers.on_buffer ?debug ?timeout ?filename drv.drv_raw.drv_prover ib 
 
 
-let call_prover ?debug ?timeout env clone drv task =
+let call_prover ?debug ?timeout drv task =
   let filename = 
-    match drv.drv_filename with
+    match drv.drv_raw.drv_filename with
       | None -> None
       | Some _ -> Some (filename_of_goal drv file_printer "" "" task) in
   let buffer = Buffer.create 128 in
-  bprintf buffer "%a@?" (print_task env clone drv) task;
+  bprintf buffer "%a@?" (print_task drv) task;
   call_prover_on_buffer ?debug ?timeout ?filename drv buffer
 
 

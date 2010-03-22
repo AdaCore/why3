@@ -25,9 +25,14 @@ open Env
 
 (** creating drivers *)
 
+type raw_driver
+
+val load_driver : string -> env -> raw_driver
+
+(** cooked driver *)
 type driver
 
-val load_driver : string -> env -> driver
+val cook_driver : env -> clone -> raw_driver -> driver
 
 (** querying drivers *)
 
@@ -56,10 +61,10 @@ val list_transforms : unit -> string list
 (** using drivers *)
 
 (** transform task *)
-val apply_transforms : env -> clone -> driver -> task -> task list
+val apply_transforms : driver -> task -> task list
 
 (** print_task *)
-val print_task : env -> clone -> printer
+val print_task : printer
 
 val filename_of_goal : driver -> Ident.ident_printer ->
   string -> string -> task -> string
@@ -79,8 +84,6 @@ val call_prover :
                     and the output of the prover *)
   ?timeout:int -> (* specify the time limit given to the prover,
                      if not set unlimited time *)
-  env ->
-  clone ->
   driver ->       (* the driver to use *)
   task ->      (* the task to prove with a goal as the last declaration *)
   Call_provers.prover_result
