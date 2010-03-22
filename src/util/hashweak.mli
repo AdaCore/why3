@@ -29,7 +29,13 @@ sig
     (* find the value binded to a key.
        raise Not_found if there is no binding *)
 
+  val mem : 'a t -> X.t -> bool
+    (* test if a key bind to something.*)
+
+  exception AlreadyBounded
+
   val add : 'a t -> X.t -> 'a -> unit
     (* bind the key with the value given.
-       It replace previous binding *)
+       It raises AlreadyBounded if a bound exists
+    *)
 end

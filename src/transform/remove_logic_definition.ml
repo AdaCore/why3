@@ -16,46 +16,29 @@
 (*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
 (*                                                                        *)
 (**************************************************************************)
+open Ident
+open Term
+open Decl
 
-module Make (S : Util.Tagged) =
-struct
-
-  type 'a t = { ht : (int,'a) Hashtbl.t;
-                final : S.t -> unit}
-
-  let wget w = Weak.get w 0
-  let wref v =
-    let w = Weak.create 1 in
-    Weak.set w 0 (Some v);
-    w
-
-  let create i =
-    let ht = Hashtbl.create i in
-    let w = wref ht in
-    let final x =
-      match wget w with
-        | None -> ()
-        | Some h -> Hashtbl.remove h (S.tag x) in
-    { ht = ht; final = final }
-
-  let find h e = Hashtbl.find h.ht (S.tag e)
-
-  let mem h e = Hashtbl.mem h.ht (S.tag e)
+let decl d =
+  match d.d_node with
+    | Dtype _ -> [d]
+    | Dlogic l -> 
+        let f (accls,accdef) (ls,def) =
+          let accls =(create_logic_decl [ls,None])::accls in
+          match def with
+            | None -> accls,accdef
+            | Some ls_defn ->
+                let fmla = ls_defn_axiom ls_defn in
+                let prsymbol = create_prsymbol (id_clone ls.ls_name) in
+                accls,(create_prop_decl Paxiom prsymbol fmla)::accdef in
+        let accls,accdef = (List.fold_left f ([],[]) l) in
+        (List.rev_append accls) accdef
+    | Dind _ -> [d]
+    | Dprop _ -> [d]
 
 
-  exception AlreadyBounded
+let t = Register.store (fun () -> Trans.decl decl None)
 
-  let add h e v =
-    let tag = S.tag e in
-    if Hashtbl.mem h.ht tag
-    then raise AlreadyBounded
-    else begin
-      Gc.finalise h.final e;
-      Hashtbl.replace h.ht tag v
-    end
-
-
-
-
-end
+let () = Driver.register_transform "remove_logic_definition" t
 
