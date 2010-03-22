@@ -8,8 +8,18 @@ logic g(x : int) : int = f(x+1)
 }
 
 let p = 
-  if !x = 1 then 1 else !x;
-  assert { !x = 0 }
+  if !x = 1 then begin end else ghost begin !x end;
+  L:
+  assert { !x = 0 };
+  check { false };
+  let z = !x + !x in
+  let t = ghost (ref 2) in
+  assume { true -> old(!z) = 2 }; 
+  while !x >= 0 do
+    invariant { true } variant { t }
+    ()
+  done;
+  f !x
 
 { 
 axiom A : forall x:int. f(x) = g(x-1)

@@ -20,6 +20,7 @@
 %{
 
   open Parsing
+  open Lexing
   open Ptree
   open Pgm_ptree
 
@@ -49,50 +50,18 @@
   let mk_apply_id id = 
     let e = { expr_desc = Eident (Qident id); expr_loc = id.id_loc } in
     mk_apply e
-
-
-(***
-  let with_loc loc d = { pdesc = d; ploc = loc }
-  let locate d = with_loc (loc ()) d
-  let locate_i i d = with_loc (loc_i i) d
-
-  let rec_name = function Srec (x,_,_,_,_,_) -> x | _ -> assert false
-
-  let bin_op (loc_op,op) e1 e2 =
-    let f = with_loc loc_op (Svar op) in
-    let f_e1 = with_loc (join e1.ploc loc_op) (Sapp (f, e1)) in
-    locate (Sapp (f_e1, e2))
       
-  let un_op (loc_op,op) e =
-    locate (app (with_loc loc_op (Svar op)) [e])
+  let mk_infix e1 op e2 =
+    let id = { id = infix op; id_loc = loc_i 2 } in
+    mk_expr (mk_apply_id id [e1; e2])
+     
+  let mk_prefix op e1 =
+    let id = { id = prefix op; id_loc = loc_i 1 } in
+    mk_expr (mk_apply_id id [e1])
+     
 
-  let ptype_c_of_v v =
-    { pc_result_name = Ident.result;
-      pc_result_type = v;
-      pc_effect = { pe_reads = []; pe_writes = []; pe_raises = [] };
-      pc_pre = []; 
-      pc_post = None }
-
-  let list_of_some = function None -> [] | Some x -> [x]
-
-  (*s ensures a postcondition for a function body *)
-
-  let force_function_post ?(warn=false) e = match e.pdesc with
-    | Spost _ -> 
-	e
-    | _ -> 
-       if warn then 
-	 Format.eprintf 
-	   "%ano postcondition for this function; true inserted@\n"
-	   Loc.report_position e.ploc; 
-       let q = 
-	 { pa_name = Anonymous; pa_value = mk_pp PPtrue; pa_loc = loc () }
-       in
-       { e with pdesc = Spost (e, (q, []), Transparent) }
-***)
-
-
-  open Lexing
+  (* parsing LOGIC strings using functions from src/parser/
+     requires proper relocation *)
 
   let reloc loc lb =
     lb.lex_curr_p <- loc;
@@ -120,8 +89,8 @@
 
 /* keywords */
 
-%token ABSURD AND AS ASSERT BEGIN CHECK DO DONE ELSE END EXCEPTION FOR
-%token FUN IF IN INVARIANT LET MATCH NOT RAISE RAISES READS REC REF
+%token ABSURD AND AS ASSERT ASSUME BEGIN CHECK DO DONE ELSE END EXCEPTION FOR
+%token FUN GHOST IF IN INVARIANT LET MATCH NOT RAISE RAISES READS REC 
 %token RETURNS THEN TRY TYPE VARIANT VOID WHILE WITH WRITES
 
 /* symbols */
@@ -142,6 +111,7 @@
 
 %left prec_letrec
 %left IN
+%nonassoc GHOST
 
 %right SEMICOLON
 
@@ -224,36 +194,85 @@ uqualid:
 ;
 
 expr:
-| constant
-    { mk_expr (Econstant $1) }
-| lqualid 
-    { mk_expr (Eident $1) }
+| simple_expr %prec prec_simple 
+   { $1 }
 | expr EQUAL expr 
-   { let id = { id = infix "="; id_loc = loc_i 2 } in
-     mk_expr (mk_apply_id id [$1; $3]) }
+   { mk_infix $1 "=" $3 }
 | expr OP0 expr 
-   { let id = { id = infix $2; id_loc = loc_i 2 } in
-     mk_expr (mk_apply_id id [$1; $3]) }
+   { mk_infix $1 $2 $3 }
 | expr OP1 expr 
-   { let id = { id = infix $2; id_loc = loc_i 2 } in
-     mk_expr (mk_apply_id id [$1; $3]) }
+   { mk_infix $1 $2 $3 }
 | expr OP2 expr 
-   { let id = { id = infix $2; id_loc = loc_i 2 } in
-     mk_expr (mk_apply_id id [$1; $3]) }
+   { mk_infix $1 $2 $3 }
 | expr OP3 expr 
-   { let id = { id = infix $2; id_loc = loc_i 2 } in
-     mk_expr (mk_apply_id id [$1; $3]) }
+   { mk_infix $1 $2 $3 }
 | any_op expr %prec prefix_op
-   { let id = { id = prefix $1; id_loc = loc_i 2 } in
-     mk_expr (mk_apply_id id [$2]) }
+   { mk_prefix $1 $2 }
+| simple_expr list1_simple_expr %prec prec_app
+   { mk_expr (mk_apply $1 $2) }
 | IF expr THEN expr ELSE expr
    { mk_expr (Eif ($2, $4, $6)) }
 | IF expr THEN expr %prec prec_no_else
    { mk_expr (Eif ($2, $4, mk_expr Eskip)) }
 | expr SEMICOLON expr
    { mk_expr (Esequence ($1, $3)) }
-| ASSERT LOGIC
-   { mk_expr (Eassert (Aassert, lexpr $2)) }
+| assertion_kind LOGIC
+   { mk_expr (Eassert ($1, lexpr $2)) }
+| expr AMPAMP expr
+   { mk_expr (Elazy_and ($1, $3)) }
+| expr BARBAR expr
+   { mk_expr (Elazy_or ($1, $3)) }
+| LET lident EQUAL expr IN expr
+   { mk_expr (Elet ($2, $4, $6)) }
+| GHOST expr
+   { mk_expr (Eghost $2) }
+| uident COLON expr
+   { mk_expr (Elabel ($1, $3)) }
+| WHILE expr DO loop_annotation expr DONE
+   { mk_expr (Ewhile ($2, $4, $5)) }
+;
+
+/* FIXME: prefix operators should be part of simple_expr
+   otherwise we can't parse "f !x" */
+
+simple_expr:
+| constant
+    { mk_expr (Econstant $1) }
+| lqualid 
+    { mk_expr (Eident $1) }
+| LEFTPAR expr RIGHTPAR
+    { $2 }
+| BEGIN expr END
+    { $2 }
+| LEFTPAR RIGHTPAR
+    { mk_expr Eskip }
+| BEGIN END
+    { mk_expr Eskip }
+;
+
+list1_simple_expr:
+| simple_expr %prec prec_simple { [$1] }
+| simple_expr list1_simple_expr { $1 :: $2 }
+;
+
+assertion_kind:
+| ASSERT { Aassert }
+| ASSUME { Aassume }
+| CHECK  { Acheck  }
+;
+
+loop_annotation:
+| loop_invariant loop_variant { { loop_invariant = $1; loop_variant = $2 } }
+;
+
+loop_invariant:
+| INVARIANT LOGIC { Some (lexpr $2) }
+| /* epsilon */   { None            }
+;
+
+loop_variant:
+| VARIANT LOGIC { Some (lexpr $2) }
+| /* epsilon */ { None            }
 ;
 
 constant:

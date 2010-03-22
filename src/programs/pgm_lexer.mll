@@ -40,6 +40,7 @@
 	"and", AND;
 	"as", AS;
 	"assert", ASSERT;
+	"assume", ASSUME;
 	"begin", BEGIN;
         "check", CHECK;
 	"do", DO;
@@ -49,6 +50,7 @@
 	"exception", EXCEPTION; 
 	"for", FOR;
 	"fun", FUN;
+	"ghost", GHOST;
 	"if", IF;
 	"in", IN;
 	"invariant", INVARIANT;
@@ -59,7 +61,6 @@
 	"raises", RAISES;
 	"reads", READS;
 	"rec", REC;
-	"ref", REF;
 	"returns", RETURNS;
 	"then", THEN;
 	"try", TRY;
