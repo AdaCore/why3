@@ -87,13 +87,13 @@ struct
 	let t1 = List.hd m.values in
 	let ty = t1.t_ty in
 	let vars_for = Hls.create 17 in
-	let empty c pl =
-	  let new_var p = create_vsymbol (id_fresh "x") p.pat_ty in
-	  let vars = List.map new_var pl in
-	  Hls.add vars_for c vars;
-	  { values = List.map t_var vars @ List.tl m.values; rows = [] }
-	in
 	let cm0 = 
+	  let empty c pl =
+	    let new_var p = create_vsymbol (id_fresh "x") p.pat_ty in
+	    let vars = List.map new_var pl in
+	    Hls.add vars_for c vars;
+	    { values = List.map t_var vars @ List.tl m.values; rows = [] }
+	  in
 	  let rec add_matrix_from_p cm p = match p.pat_node with
 	    | Papp (c, pl) when not (Mls.mem c cm) -> 
 		Mls.add c (empty c pl) cm
@@ -108,14 +108,15 @@ struct
 	  in
 	  List.fold_left add_matrix_for_c Mls.empty m.rows
 	in
-	let rec dispatch r cm = match r.elements with
+	let rec dispatch t1 r cm = match r.elements with
 	  | [] -> 
 	      assert false
 	  | { pat_node = Pwild | Pvar _ } :: rr ->
 	      (* une variable => on doit la reprendre pour chaque constr. *)
 	      Mls.fold
 		(fun c m cm -> 
-		   let h = List.map pat_wild c.ls_args in
+		   let vars = Hls.find vars_for c in
+		   let h = List.map (fun v -> pat_wild v.vs_ty) vars in 
 		   let r' = 
 		     { elements = h @ rr; action = update_action t1 r } 
 		   in
@@ -126,11 +127,11 @@ struct
 	      let r' = { elements = pl @ rr; action = r.action } in
 	      Mls.add c { m with rows = r' :: m.rows } cm
 	  | { pat_node = Pas (p, x) } :: rr ->
-	      (* FIXME: don't duplicate t1 *)
 	      let r = { r with action = mk_let x t1 r.action } in
-	      dispatch r cm
+	      dispatch (t_var x) r cm
 	in
-	let cm = List.fold_right dispatch m.rows cm0 in
+	(* FIXME: turn this into tail-calls using fold_left + rev *)
+	let cm = List.fold_right (dispatch t1) m.rows cm0 in
 	let nbc = ref 0 in
 	let cases = 
 	  Mls.fold 
