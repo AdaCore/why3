@@ -95,12 +95,12 @@ val call_prover_on_file :
   string ->
     Call_provers.prover_result
 
-val call_prover_on_buffer :
+val call_prover_on_formatter :
   ?debug:bool ->
   ?timeout:int ->
   ?filename:string ->
   driver ->
-  Buffer.t ->
+  (formatter -> unit) ->
   Call_provers.prover_result
 
 (* error reporting *)

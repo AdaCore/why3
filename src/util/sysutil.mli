@@ -20,11 +20,17 @@
 (* return the content of an in-channel *)
 val channel_contents : in_channel -> string
 
+(* Put the content of an in_channel in a formatter *)
+val channel_contents_fmt : in_channel -> Format.formatter -> unit
+
 (* return the content of a file *)
 val file_contents : string -> string
 
 (* return the content of a file *)
 val file_contents_buf : string -> Buffer.t
+
+(* Put the content of a file in a formatter *)
+val file_contents_fmt : string -> Format.formatter -> unit
 
 val open_temp_file : 
   ?debug:bool -> (* don't remove the file *)

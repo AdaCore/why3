@@ -415,8 +415,8 @@ let file_printer =
 
 let call_prover_on_file ?debug ?timeout drv filename =
   Call_provers.on_file drv.drv_raw.drv_prover filename 
-let call_prover_on_buffer ?debug ?timeout ?filename drv ib = 
-  Call_provers.on_buffer ?debug ?timeout ?filename drv.drv_raw.drv_prover ib 
+let call_prover_on_formatter ?debug ?timeout ?filename drv ib = 
+  Call_provers.on_formatter ?debug ?timeout ?filename drv.drv_raw.drv_prover ib
 
 
 let call_prover ?debug ?timeout drv task =
@@ -424,9 +424,8 @@ let call_prover ?debug ?timeout drv task =
     match drv.drv_raw.drv_filename with
       | None -> None
       | Some _ -> Some (filename_of_goal drv file_printer "" "" task) in
-  let buffer = Buffer.create 128 in
-  bprintf buffer "%a@?" (print_task drv) task;
-  call_prover_on_buffer ?debug ?timeout ?filename drv buffer
+  let formatter fmt = print_task drv fmt task in
+  call_prover_on_formatter ?debug ?timeout ?filename drv formatter
 
 
 

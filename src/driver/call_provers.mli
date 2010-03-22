@@ -40,7 +40,8 @@ val print_prover_result : formatter -> prover_result -> unit
 type prover =
     { pr_call_stdin : string option; (* %f pour le nom du fichier *)
       pr_call_file  : string option;
-      pr_regexps    : (Str.regexp * prover_answer) list; (* \1,... sont remplacés *)
+      pr_regexps    : (Str.regexp * prover_answer) list; 
+      (* \1,... sont remplacés *)
     }
 
 exception CommandError
@@ -55,11 +56,11 @@ val on_file :
   string -> 
   prover_result
 
-val on_buffer : 
+val on_formatter : 
   ?debug:bool ->
   ?timeout:int -> 
   ?filename:string -> (* used as the suffix of a tempfile if the prover can't 
                          deal with stdin *)
   prover -> 
-  Buffer.t -> 
+  (formatter -> unit) -> 
   prover_result

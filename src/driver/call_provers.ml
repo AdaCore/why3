@@ -49,7 +49,8 @@ let print_prover_result fmt pr =
 type prover =
     { pr_call_stdin : string option; (* %f pour le nom du fichier *)
       pr_call_file  : string option;
-      pr_regexps    : (Str.regexp * prover_answer) list; (* \1,... sont remplacés *)
+      pr_regexps    : (Str.regexp * prover_answer) list; 
+      (* \1,... sont remplacés *)
     }
       
 
@@ -69,16 +70,18 @@ let remove_file ?(debug=false) f =
 
 (*let environment = Unix.environment ()*)
 
-let timed_sys_command ?stdin ?(debug=false) ?timeout cmd =
+let timed_sys_command ?formatter ?(debug=false) ?timeout cmd =
   let t0 = Unix.times () in
   let cmd = match timeout with
     | None -> Format.sprintf "%s 2>&1" cmd
     | Some timeout -> Format.sprintf "%s %d %s 2>&1" !cpulimit timeout cmd in
   if debug then Format.eprintf "command line: %s@." cmd;
   let (cin,cout) as p = Unix.open_process cmd in
-  (match stdin with
+  (match formatter with
     | None -> ()
-    | Some stdin -> Buffer.output_buffer cout stdin);
+    | Some formatter -> 
+        let fmt = formatter_of_out_channel cout in
+        formatter fmt);
   close_out cout;
   let out = Sysutil.channel_contents cin in
   let ret = Unix.close_process p in
@@ -113,7 +116,8 @@ let grep re str =
   (*         in *)
   (*         cmd,timed_sys_command ~debug timeout cmd *)
   (*     | _ -> invalid_arg  *)
-  (*         "Calldp.gen_prover_call : filename must be given if the prover can't use stdin."  *)
+  (*         "Calldp.gen_prover_call : filename must be given if the prover 
+             can't use stdin."  *)
   (* in *)
 
 
@@ -163,20 +167,21 @@ let rec on_file ?debug ?timeout pr filename =
         let res = timed_sys_command ?debug ?timeout cmd in
         treat_result pr res
     | None -> 
-        let buf = Sysutil.file_contents_buf filename in
-        on_buffer ?timeout ?debug pr buf
+        let formatter = Sysutil.file_contents_fmt filename in
+        on_formatter ?timeout ?debug pr formatter
 
-and on_buffer ?debug ?timeout ?filename pr buf =
+and on_formatter ?debug ?timeout ?filename pr formatter =
   check_prover pr;
   match pr.pr_call_stdin with
     | Some cmd -> 
-        let res = timed_sys_command ?debug ?timeout ~stdin:buf cmd in
+        let res = timed_sys_command ?debug ?timeout ~formatter:formatter cmd in
         treat_result pr res
     | None -> 
         match filename with
           | None -> raise NoCommandlineProvided
           | Some filename -> Sysutil.open_temp_file ?debug filename
               (fun file cout ->
-                 Buffer.output_buffer cout buf;
-                 flush cout;
+                 let fmt = formatter_of_out_channel cout in
+                 formatter fmt;
+                 pp_print_flush fmt ();
                  on_file ?timeout ?debug pr file)

@@ -17,6 +17,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let channel_contents_fmt cin fmt =
+  let buff = String.make 1024 ' ' in
+  let n = ref 0 in
+  while n := input cin buff 0 1024; !n <> 0 do
+    Format.pp_print_string fmt
+      (if !n = 1024 then
+         buff
+       else
+         String.sub buff 0 !n)
+  done
+
+
 let channel_contents_buf cin =
   let buf = Buffer.create 1024
   and buff = String.make 1024 ' ' in
@@ -27,6 +39,14 @@ let channel_contents_buf cin =
   buf
 
 let channel_contents cin = Buffer.contents (channel_contents_buf cin)
+
+let file_contents_fmt f fmt =
+  try
+    let cin = open_in f in
+    channel_contents_fmt cin fmt;
+    close_in cin
+  with _ -> 
+    invalid_arg (Printf.sprintf "(cannot open %s)" f)
 
 let file_contents_buf f =
   try 
