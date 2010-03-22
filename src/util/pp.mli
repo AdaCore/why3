@@ -86,12 +86,15 @@ val nothing : formatter -> 'a -> unit
 val string : formatter -> string -> unit
 val constant_string : string -> formatter -> unit -> unit
 val hov : int -> formatter -> ('a -> unit) -> 'a -> unit
+val add_flush : (formatter -> 'a -> unit) -> formatter -> 'a -> unit
+
 
 val open_formatter : ?margin:int -> out_channel -> formatter
 val close_formatter : formatter -> unit
 val open_file_and_formatter : ?margin:int -> string -> out_channel * formatter
 val close_file_and_formatter : out_channel * formatter -> unit
-val print_in_file_no_close : ?margin:int -> (Format.formatter -> unit) -> string -> out_channel
+val print_in_file_no_close : 
+  ?margin:int -> (Format.formatter -> unit) -> string -> out_channel
 val print_in_file : ?margin:int -> (Format.formatter -> unit) -> string -> unit
 
 

@@ -53,10 +53,12 @@ let rec print_type drv fmt ty = match ty.ty_node with
                 | Tyapp (ts,[]) -> 
                     print_ident fmt ts.ts_name
                 | Tyapp (ts, [ty]) -> 
-                    fprintf fmt "%a %a" (print_type drv) ty print_ident ts.ts_name
+                    fprintf fmt "%a %a" (print_type drv) 
+                      ty print_ident ts.ts_name
                 | Tyapp (ts, tyl) ->
                     fprintf fmt "(%a) %a" 
-	              (print_list comma (print_type drv)) tyl print_ident ts.ts_name
+	              (print_list comma (print_type drv)) 
+                      tyl print_ident ts.ts_name
             end
 let rec print_term drv fmt t = match t.t_node with
   | Tbvar _ -> 
@@ -126,7 +128,8 @@ let rec print_fmla drv fmt f = match f.f_node with
       fprintf fmt "false"
   | Fif (f1, f2, f3) ->
       fprintf fmt "((%a and %a) or (not %a and %a))"
-	(print_fmla drv) f1 (print_fmla drv) f2 (print_fmla drv) f1 (print_fmla drv) f3
+	(print_fmla drv) f1 (print_fmla drv) f2 (print_fmla drv)
+        f1 (print_fmla drv) f3
   | Flet _ ->
       assert false
   | Fcase _ ->
@@ -207,7 +210,7 @@ let print_decl drv task fmt d = match d.d_node with
 
 let print_context drv fmt task = 
   let decls = Task.task_decls task in
-  ignore (print_list_opt newline2 (print_decl drv task) fmt decls)
+  ignore (print_list_opt (add_flush newline2) (print_decl drv task) fmt decls)
 
 let () = Driver.register_printer "alt-ergo" 
   (fun drv fmt task -> 
