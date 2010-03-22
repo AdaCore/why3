@@ -57,27 +57,25 @@ let make_ps_defn ps vl f =
 
 let make_ls_defn ls vl = e_apply (make_fs_defn ls vl) (make_ps_defn ls vl)
 
-let extract_ls_defn (_,f) =
+let open_ls_defn (_,f) =
   let vl, ef = f_open_forall f in
   match ef.f_node with
     | Fapp (s, [t1; t2]) when s == ps_equ ->
         begin match t1.t_node with
-          | Tapp (fs, _) -> fs, vl, Term t2
+          | Tapp (fs, _) -> vl, Term t2
           | _ -> assert false
         end
     | Fbinop (Fiff, f1, f2) ->
         begin match f1.f_node with
-          | Fapp (ps, _) -> ps, vl, Fmla f2
+          | Fapp (ps, _) -> vl, Fmla f2
           | _ -> assert false
         end
     | _ -> assert false
 
-let open_ls_defn ld = let _,vl,e = extract_ls_defn ld in vl,e
-
-let open_fs_defn ld = let _,vl,e = extract_ls_defn ld in
+let open_fs_defn ld = let vl,e = open_ls_defn ld in
   match e with Term t -> vl,t | _ -> assert false
 
-let open_ps_defn ld = let _,vl,e = extract_ls_defn ld in
+let open_ps_defn ld = let vl,e = open_ls_defn ld in
   match e with Fmla f -> vl,f | _ -> assert false
 
 let ls_defn_axiom (_,f) = f
