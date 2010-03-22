@@ -61,7 +61,7 @@ struct
     | Papp _ -> false
 
   let not_enough_for n ty = match ty.ty_node with
-    | Tyvar _ -> assert false (* FIXME *)
+    | Tyvar _ -> assert (n = 0); false
     | Tyapp (ts, _) -> n < List.length (constructors ts)
 
   let rec matrix m = match m.rows with
