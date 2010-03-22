@@ -33,27 +33,12 @@ type ty_decl = tysymbol * ty_def
 
 (** Logic declaration *)
 
-type ls_defn = lsymbol * vsymbol list * expr * fmla
+type ls_defn = lsymbol * fmla
 
 type logic_decl = lsymbol * ls_defn option
 
 exception UnboundVars of Svs.t
 exception IllegalConstructor of lsymbol
-
-let extract_ls_defn f =
-  let vl, ef = f_open_forall f in
-  match ef.f_node with
-    | Fapp (s, [t1; t2]) when s == ps_equ ->
-        begin match t1.t_node with
-          | Tapp (fs, _) -> fs, Some (fs, vl, Term t2, f)
-          | _ -> assert false
-        end
-    | Fbinop (Fiff, f1, f2) ->
-        begin match f1.f_node with
-          | Fapp (ps, _) -> ps, Some (ps, vl, Fmla f2, f)
-          | _ -> assert false
-        end
-    | _ -> assert false
 
 let check_fvs f =
   let fvs = f_freevars Svs.empty f in
@@ -63,22 +48,39 @@ let make_fs_defn fs vl t =
   if fs.ls_constr then raise (IllegalConstructor fs);
   let hd = t_app fs (List.map t_var vl) t.t_ty in
   let fd = f_forall vl [] (f_equ hd t) in
-  extract_ls_defn fd
+  fs, Some (fs, check_fvs fd)
 
 let make_ps_defn ps vl f =
   let hd = f_app ps (List.map t_var vl) in
   let pd = f_forall vl [] (f_iff hd f) in
-  extract_ls_defn pd
+  ps, Some (ps, check_fvs pd)
 
 let make_ls_defn ls vl = e_apply (make_fs_defn ls vl) (make_ps_defn ls vl)
 
-let open_fs_defn = function (_,vl,Term t,_) -> (vl,t) | _ -> assert false
+let extract_ls_defn (_,f) =
+  let vl, ef = f_open_forall f in
+  match ef.f_node with
+    | Fapp (s, [t1; t2]) when s == ps_equ ->
+        begin match t1.t_node with
+          | Tapp (fs, _) -> fs, vl, Term t2
+          | _ -> assert false
+        end
+    | Fbinop (Fiff, f1, f2) ->
+        begin match f1.f_node with
+          | Fapp (ps, _) -> ps, vl, Fmla f2
+          | _ -> assert false
+        end
+    | _ -> assert false
 
-let open_ps_defn = function (_,vl,Fmla f,_) -> (vl,f) | _ -> assert false
+let open_ls_defn ld = let _,vl,e = extract_ls_defn ld in vl,e
 
-let open_ls_defn (_,vl,e,_) = (vl,e)
+let open_fs_defn ld = let _,vl,e = extract_ls_defn ld in
+  match e with Term t -> vl,t | _ -> assert false
 
-let ls_defn_axiom (_,_,_,f) = f
+let open_ps_defn ld = let _,vl,e = extract_ls_defn ld in
+  match e with Fmla f -> vl,f | _ -> assert false
+
+let ls_defn_axiom (_,f) = f
 
 (** Inductive predicate declaration *)
 
@@ -135,7 +137,7 @@ module Hsdecl = Hashcons.Make (struct
     | _ -> false
 
   let eq_ld (ls1,ld1) (ls2,ld2) = ls1 == ls2 && match ld1,ld2 with
-    | Some (_,_,_,f1), Some (_,_,_,f2) -> f1 == f2
+    | Some (_,f1), Some (_,f2) -> f1 == f2
     | None, None -> true
     | _ -> false
 
@@ -158,7 +160,7 @@ module Hsdecl = Hashcons.Make (struct
         1 + Hashcons.combine_list tag ts.ts_name.id_tag l
 
   let hs_ld (ls,ld) = Hashcons.combine ls.ls_name.id_tag
-    (Hashcons.combine_option (fun (_,_,_,f) -> f.f_tag) ld)
+    (Hashcons.combine_option (fun (_,f) -> f.f_tag) ld)
 
   let hs_prop (pr,f) = Hashcons.combine pr.pr_name.id_tag f.f_tag
 
@@ -239,7 +241,7 @@ let create_ty_decl tdl =
 let create_logic_decl ldl =
   if ldl = [] then raise EmptyDecl;
   let check_decl acc (ls,ld) = match ld with
-    | Some (s,_,_,_) when s != ls -> raise (BadLogicDecl ls.ls_name)
+    | Some (s,_) when s != ls -> raise (BadLogicDecl ls.ls_name)
     | _ -> add_id acc ls.ls_name
   in
   ignore (List.fold_left check_decl Sid.empty ldl);
@@ -271,12 +273,13 @@ let create_ind_decl idl =
   let add acc (ps,_) = Sls.add ps acc in
   let sps = List.fold_left add Sls.empty idl in
   let check_ax ps acc (pr,f) =
-    let _, f = f_open_forall f in
     let rec clause acc f = match f.f_node with
+      | Fquant (Fforall, f) ->
+          let _,_,f = f_open_quant f in clause acc f
       | Fbinop (Fimplies, g, f) -> clause (g::acc) f
       | _ -> (acc, f)
     in
-    let cls, f = clause [] f in
+    let cls, f = clause [] (check_fvs f) in
     match f.f_node with
       | Fapp (s, tl) when s == ps ->
           let tymatch sb t ty =
@@ -295,6 +298,8 @@ let create_ind_decl idl =
   in
   ignore (List.fold_left check_decl Sid.empty idl);
   create_ind_decl idl
+
+let create_prop_decl k p f = create_prop_decl k p (check_fvs f)
 
 (** Split declarations *)
 
@@ -340,9 +345,8 @@ let get_logic_dep next loan (_,ld) =
   let dep acc ls = if Sid.mem ls.ls_name next
     then Sid.add ls.ls_name acc else acc in
   match ld with
-    | Some (_,_,Term t,_) -> t_s_fold dts dep loan t
-    | Some (_,_,Fmla f,_) -> f_s_fold dts dep loan f
-    | None                -> loan
+    | Some (_,f) -> f_s_fold dts dep loan f
+    | None       -> loan
 
 let get_ind_id (ps,_) = ps.ls_name
 
