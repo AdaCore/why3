@@ -129,7 +129,7 @@ PARSER_CMO := $(addprefix src/parser/,$(PARSER_CMO))
 
 TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
 	split_conjunction.cmo encoding_decorate.cmo\
-	remove_logic_definition.cmo
+	remove_logic_definition.cmo eliminate_inductive.cmo
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
 DRIVER_CMO := call_provers.cmo dynlink_compat.cmo driver_parser.cmo\
