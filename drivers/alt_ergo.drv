@@ -31,7 +31,7 @@ theory BuiltIn
 end
 
 
-theory prelude.Int
+theory int.Int
 
   prelude "(* this is a prelude for Alt-Ergo arithmetic *)"
 
@@ -40,7 +40,6 @@ theory prelude.Int
   syntax logic (_+_) "(%1 + %2)"
   syntax logic (_-_) "(%1 - %2)"
   syntax logic (_*_) "(%1 * %2)"
-  syntax logic (_/_) "(%1 / %2)"
   syntax logic (-_)  "(-%1)"
 
   syntax logic (_<=_) "(%1 <= %2)"
@@ -48,21 +47,21 @@ theory prelude.Int
   syntax logic (_>=_) "(%1 >= %2)"
   syntax logic (_> _) "(%1 >  %2)"
 
-  remove prop One_neutral
-  remove prop Add_assoc
-  remove prop Add_comm
-  remove prop Zero_neutral
-  remove prop Neg
-  remove prop Mul_comm
-  remove prop Mul_assoc
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc.Assoc
+  remove prop CommutativeGroup.Unit_def
+  remove prop CommutativeGroup.Inv_def
+  remove prop Assoc.Assoc
   remove prop Mul_distr
+  remove prop Comm.Comm
+  remove prop Unitary
 
 end
 
 theory algebra.AC
   tag cloned logic op "AC"
-  remove cloned prop Comm
-  remove cloned prop Assoc
+  remove cloned prop Comm.Comm
+  remove cloned prop Assoc.Assoc
 end
 
 (*

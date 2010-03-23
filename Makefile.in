@@ -161,11 +161,11 @@ bin/top: $(CMO)
 
 test: bin/why.byte
 	mkdir -p output_why3
-	ocamlrun -bt bin/why.byte -I theories/ --driver lib/drivers/why3.drv \
+	ocamlrun -bt bin/why.byte -I theories/ --driver drivers/why3.drv \
 	--output-dir output_why3 src/test.why
-	bin/why.byte --driver lib/drivers/alt_ergo.drv -I theories/ \
+	bin/why.byte --driver drivers/alt_ergo.drv -I theories/ \
 	--output-file - --goal Test.G src/test.why --timeout 3
-	bin/why.byte --driver lib/drivers/alt_ergo.drv -I theories/ \
+	bin/why.byte --driver drivers/alt_ergo.drv -I theories/ \
 	--call --goal Test.G src/test.why --timeout 3
 
 testl: bin/whyl.byte
