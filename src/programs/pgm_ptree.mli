@@ -27,33 +27,36 @@ type constant = Term.constant
 
 type assertion_kind = Aassert | Aassume | Acheck
 
+type lexpr = Ptree.lexpr
+
 type loop_annotation = {
-  loop_invariant : Ptree.lexpr option;
-  loop_variant   : Ptree.lexpr option;
+  loop_invariant : lexpr option;
+  loop_variant   : lexpr option;
 }
 
-type expr = {
-  expr_desc : expr_desc;
+type 'info expr = {
+  expr_desc : 'info expr_desc;
   expr_loc  : loc;
+  expr_info : 'info;
 }
 
-and expr_desc =
+and 'info expr_desc =
   | Econstant of constant
   | Eident of qualid
-  | Eapply of expr * expr
-  | Esequence of expr * expr
-  | Eif of expr * expr * expr
+  | Eapply of 'info expr * 'info expr
+  | Esequence of 'info expr * 'info expr
+  | Eif of 'info expr * 'info expr * 'info expr
   | Eskip 
-  | Eassert of assertion_kind * Ptree.lexpr
-  | Elazy_and of expr * expr
-  | Elazy_or of expr * expr
-  | Elet of ident * expr * expr
-  | Eghost of expr
-  | Elabel of ident * expr
-  | Ewhile of expr * loop_annotation * expr
+  | Eassert of assertion_kind * lexpr
+  | Elazy_and of 'info expr * 'info expr
+  | Elazy_or of 'info expr * 'info expr
+  | Elet of ident * 'info expr * 'info expr
+  | Eghost of 'info expr
+  | Elabel of ident * 'info expr
+  | Ewhile of 'info expr * loop_annotation * 'info expr
 
 type decl =
-  | Dcode  of ident * expr
+  | Dcode  of ident * unit expr
   | Dlogic of Ptree.decl list
 
 type file = decl list

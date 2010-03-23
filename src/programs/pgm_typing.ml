@@ -17,8 +17,38 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let code id e =
-  assert false (*TODO*)
+open Theory
+open Pgm_ptree
+
+type env = {
+  env_uc : theory_uc;
+}
+
+let create_env uc = assert false (*TODO*)
+
+let rec expr env e = 
+  let d, ty = expr_desc env e.expr_loc e.expr_desc in
+  { expr_desc = d; expr_info = ty; expr_loc = e.expr_loc }
+
+and expr_desc env loc = function
+_ -> assert false (*TODO*)
+(*   | Econstant of constant *)
+(*   | Eident of qualid *)
+(*   | Eapply of 'info expr * 'info expr *)
+(*   | Esequence of 'info expr * 'info expr *)
+(*   | Eif of 'info expr * 'info expr * 'info expr *)
+(*   | Eskip  *)
+(*   | Eassert of assertion_kind * lexpr *)
+(*   | Elazy_and of 'info expr * 'info expr *)
+(*   | Elazy_or of 'info expr * 'info expr *)
+(*   | Elet of ident * 'info expr * 'info expr *)
+(*   | Eghost of 'info expr *)
+(*   | Elabel of ident * 'info expr *)
+(*   | Ewhile of 'info expr * loop_annotation * 'info expr *)
+
+let code uc id e =
+  let env = create_env uc in
+  ignore (expr env e)
 
 (*
 Local Variables: 

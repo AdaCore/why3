@@ -127,6 +127,14 @@ let int_literal =
   decimal_literal | hex_literal | oct_literal | bin_literal
 let hexadigit = ['0'-'9' 'a'-'f' 'A'-'F']
 
+let op_char_1 = ['=' '<' '>']
+let op_char_2 = ['+' '-']
+let op_char_3 = ['*' '/' '%']
+let op_char_4 = ['!' '$' '&' '?' '@' '^' '~' '.' ':' '|' '#']
+let op_char_34 = op_char_3 | op_char_4
+let op_char_234 = op_char_2 | op_char_34
+let op_char_1234 = op_char_1 | op_char_234
+
 rule token = parse
   | "#" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
     space* (digit+ as line) space* (digit+ as char) space* "#"
@@ -168,22 +176,24 @@ rule token = parse
       { ARROW }
   | "<->"
       { LRARROW }
-  | "="
-      { EQUAL }
-  | "<>" | "<" | "<=" | ">" | ">=" as s
-      { OP0 s }
-  | "+" | "-" as c
-      { OP2 (String.make 1 c) }
-  | "*" | "/" | "%" | "!" as c
-      { OP3 (String.make 1 c) }
   | "."
       { DOT }
+  | "|"
+      { BAR }
+  | "="
+      { EQUAL }
   | "["
       { LEFTSQ }
   | "]"
       { RIGHTSQ }
-  | "|"
-      { BAR }
+  | op_char_1234* op_char_1 op_char_1234* as s
+      { OP1 s }
+  | op_char_234*  op_char_2 op_char_234*  as s
+      { OP2 s }
+  | op_char_34*   op_char_3 op_char_34*  as s
+      { OP3 s }
+  | op_char_4+ as s
+      { OP4 s }
   | "\""
       { string_start_loc := loc lexbuf; STRING (string lexbuf) }
   | eof 

@@ -69,7 +69,7 @@ let type_file file =
     List.fold_left
       (fun uc d -> match d with
 	 | Dlogic dl -> List.fold_left (Typing.add_decl env Mnm.empty) uc dl
-	 | Dcode (id, e) -> ignore (Pgm_typing.code id e); uc)
+	 | Dcode (id, e) -> ignore (Pgm_typing.code uc id e); uc)
       uc p
   in
   ()

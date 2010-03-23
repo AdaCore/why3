@@ -40,7 +40,6 @@
 
   let infix s = "infix " ^ s
   let prefix s = "prefix " ^ s
-  let postfix s = "postfix " ^ s
 
 %}
 
@@ -48,7 +47,7 @@
 
 %token <string> LIDENT UIDENT
 %token <string> INTEGER
-%token <string> OP0 OP1 OP2 OP3
+%token <string> OP1 OP2 OP3 OP4
 %token <Ptree.real_constant> FLOAT
 %token <string> STRING
 
@@ -88,12 +87,11 @@
 %right OR 
 %right AND 
 %nonassoc NOT
-%left EQUAL OP0
-%left OP1
+%left EQUAL OP1
 %left OP2
 %left OP3
+%left OP4
 %nonassoc prefix_op
-%nonassoc postfix_op
 
 /* Entry points */
 
@@ -148,23 +146,21 @@ lident_rich:
     { { id = infix $3; id_loc = loc () } }
 | LEFTPAR lident_op UNDERSCORE RIGHTPAR 
     { { id = prefix $2; id_loc = loc () } }
-/*
-| LEFTPAR UNDERSCORE lident_op RIGHTPAR 
-    { { id = postfix $3; id_loc = loc () } }
-*/
 ;
 
 lident_op:
-| OP0   { $1 }
+| OP1   { $1 }
 | OP2   { $1 }
 | OP3   { $1 }
+| OP4   { $1 }
 | EQUAL { "=" }
 ;
 
 any_op:
-| OP0   { $1 }
+| OP1   { $1 }
 | OP2   { $1 }
 | OP3   { $1 }
+| OP4   { $1 }
 ;
 
 uident:
@@ -362,9 +358,6 @@ lexpr:
 | lexpr EQUAL lexpr 
    { let id = { id = infix "="; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$1; $3])) }
-| lexpr OP0 lexpr 
-   { let id = { id = infix $2; id_loc = loc_i 2 } in
-     mk_pp (PPapp (Qident id, [$1; $3])) }
 | lexpr OP1 lexpr 
    { let id = { id = infix $2; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$1; $3])) }
@@ -374,14 +367,12 @@ lexpr:
 | lexpr OP3 lexpr 
    { let id = { id = infix $2; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$1; $3])) }
+| lexpr OP4 lexpr 
+   { let id = { id = infix $2; id_loc = loc_i 2 } in
+     mk_pp (PPapp (Qident id, [$1; $3])) }
 | any_op lexpr %prec prefix_op
    { let id = { id = prefix $1; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$2])) }
-/*
-| lexpr any_op %prec postfix_op
-   { let id = { id = postfix $2; id_loc = loc_i 2 } in
-     mk_pp (PPapp (Qident id, [$1])) }
-*/
 | qualid
    { mk_pp (PPvar $1) }
 | qualid LEFTPAR list1_lexpr_sep_comma RIGHTPAR

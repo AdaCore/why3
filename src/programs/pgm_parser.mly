@@ -28,8 +28,8 @@
   let loc_i i = (rhs_start_pos i, rhs_end_pos i)
   let loc_ij i j = (rhs_start_pos i, rhs_end_pos j)
 
-  let mk_expr d = { expr_loc = loc (); expr_desc = d }
-  let mk_expr_i i d = { expr_loc = loc_i i; expr_desc = d }
+  let mk_expr d = { expr_loc = loc (); expr_info = (); expr_desc = d }
+  let mk_expr_i i d = { expr_loc = loc_i i; expr_info = (); expr_desc = d }
  
   (* FIXME: factorize with parser/parser.mly *)
   let infix s = "infix " ^ s
@@ -45,10 +45,12 @@
 	Eapply (f, a)
     | a :: l -> 
 	let loc = join f.expr_loc a.expr_loc in 
-	mk_apply { expr_loc = loc; expr_desc = Eapply (f, a) } l
+	mk_apply { expr_loc = loc; expr_info = (); expr_desc = Eapply (f, a) } l
 
   let mk_apply_id id = 
-    let e = { expr_desc = Eident (Qident id); expr_loc = id.id_loc } in
+    let e = 
+      { expr_desc = Eident (Qident id); expr_info = (); expr_loc = id.id_loc } 
+    in
     mk_apply e
       
   let mk_infix e1 op e2 =
