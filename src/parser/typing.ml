@@ -781,14 +781,16 @@ let add_logics dl th =
 	  | None -> fs,None
 	  | Some t ->
 	      let loc = t.pp_loc in
+	      let ty = dty denv ty in
 	      let t = dterm denv t in
+	      if not (unify t.dt_ty ty) then 
+		term_expected_type ~loc t.dt_ty ty;
               let vl = match fs.ls_value with
                 | Some _ -> mk_vlist fs.ls_args
                 | _ -> assert false
               in
 	      let env = env_of_vsymbol_list vl in
-              try make_fs_defn fs vl (term env t)
-	      with _ -> term_expected_type ~loc t.dt_ty (dty denv ty)
+	      make_fs_defn fs vl (term env t)
         end
   in
   let dl = List.map type_decl dl in
