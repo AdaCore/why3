@@ -22,20 +22,16 @@
 open Ty
 open Term
 
-module Compile
-  (X : sig
-     type action
-     val mk_let : vsymbol -> term -> action -> action
-     val mk_case : term -> (pattern * action) list -> action
-     val constructors : tysymbol -> lsymbol list
-   end) :
-sig
+module type Action = sig
+  type action
+  val mk_let : vsymbol -> term -> action -> action
+  val mk_case : term -> (pattern * action) list -> action
+end
 
-  exception NonExhaustive of pattern list
-  exception Unused of X.action
+exception NonExhaustive of pattern list
 
-  val compile : 
+module Compile (X : Action) : sig
+  val compile : (tysymbol -> lsymbol list) ->
     term list -> (pattern list * X.action) list -> X.action
-    
 end
 

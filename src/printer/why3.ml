@@ -279,18 +279,20 @@ let print_type_decl drv fmt d =
     | Syntax _ -> ()
     | _ -> print_type_decl drv fmt d; forget_tvs ()
 
-let print_ls_defn drv fmt ld =
-  let vl,e = open_ls_defn ld in
-  fprintf fmt " =@ %a" (print_expr drv) e;
-  List.iter forget_var vl
-
 let print_ls_type drv fmt = fprintf fmt " :@ %a" (print_ty drv)
 
-let print_logic_decl drv fmt (ls,ld) =
-  fprintf fmt "@[<hov 2>logic %a%a%a%a@]@\n@\n"
-    print_ls ls (print_paren_l (print_ty drv)) ls.ls_args
-    (print_option (print_ls_type drv)) ls.ls_value
-    (print_option (print_ls_defn drv)) ld
+let print_logic_decl drv fmt (ls,ld) = match ld with
+  | Some ld ->
+      let vl,e = open_ls_defn ld in
+      fprintf fmt "@[<hov 2>logic %a%a%a =@ %a@]@\n@\n"
+        print_ls ls (print_paren_l (print_vsty drv)) vl
+        (print_option (print_ls_type drv)) ls.ls_value
+        (print_expr drv) e;
+      List.iter forget_var vl
+  | None ->
+      fprintf fmt "@[<hov 2>logic %a%a%a@]@\n@\n"
+        print_ls ls (print_paren_l (print_ty drv)) ls.ls_args
+        (print_option (print_ls_type drv)) ls.ls_value
 
 let print_logic_decl drv fmt d =
   match query_ident drv (fst d).ls_name with

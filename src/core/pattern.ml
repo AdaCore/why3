@@ -17,157 +17,101 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Util
 open Ident
 open Ty
 open Term
 
-module Compile
-  (X : sig
-     type action
-     val mk_let : vsymbol -> term -> action -> action
-     val mk_case : term -> (pattern * action) list -> action
-     val constructors : tysymbol -> lsymbol list
-   end) =
-struct
+module type Action = sig
+  type action
+  val mk_let : vsymbol -> term -> action -> action
+  val mk_case : term -> (pattern * action) list -> action
+end
 
+exception NonExhaustive of pattern list
+
+module Compile (X : Action) = struct
   open X
 
-  exception NonExhaustive of pattern list
-  exception Unused of action
+  let rec compile css pat_cont tl rl = match tl,rl with
+    | _, [] -> (* no actions *)
+        let pl = List.map (fun t -> pat_wild t.t_ty) tl in
+        raise (NonExhaustive (pat_cont pl))
+    | [], (_,a) :: _ -> (* no terms, at least one action *)
+        a
+    | t :: tl, _ -> (* process the leftmost column *)
+        (* map constructors to argument types *)
+        let rec populate types p = match p.pat_node with
+          | Pwild | Pvar _ -> types
+          | Pas (p,_) -> populate types p
+          | Papp (fs,pl) -> Mls.add fs pl types
+        in
+        let populate types (pl,_) = populate types (List.hd pl) in
+        let types = List.fold_left populate Mls.empty rl in
+        (* map constructors to subordinate matrices *)
+        let add_case fs pl a cases =
+          let rl = try Mls.find fs cases with Not_found -> [] in
+          Mls.add fs ((pl,a)::rl) cases
+        in
+        let add_wild pl a fs ql cases =
+          let add pl q = pat_wild q.pat_ty :: pl in
+          add_case fs (List.fold_left add pl ql) a cases
+        in
+        let rec dispatch (pl,a) (cases,wilds) =
+          let p = List.hd pl in let pl = List.tl pl in
+          match p.pat_node with
+            | Papp (fs,pl') ->
+                add_case fs (List.rev_append pl' pl) a cases, wilds
+            | Pas (p,x) ->
+                dispatch (p::pl, mk_let x t a) (cases,wilds)
+            | Pvar x ->
+                let a = mk_let x t a in
+                Mls.fold (add_wild pl a) types cases, (pl,a)::wilds
+            | Pwild ->
+                Mls.fold (add_wild pl a) types cases, (pl,a)::wilds
+        in
+        let cases,wilds = List.fold_right dispatch rl (Mls.empty,[]) in
+        (* assemble the primitive case statement *)
+        let ty = t.t_ty in
+        let pw = pat_wild ty in
+        let exhaustive, nopat = match ty.ty_node with
+          | Tyapp (ts,_) ->
+              begin match css ts with
+              | [] -> false, pw
+              | cl ->
+                  let test cs = not (Mls.mem cs types) in
+                  begin match List.filter test cl with
+                  | cs :: _ ->
+                      (* FIXME? specialize types to t.t_ty *)
+                      let pl = List.map pat_wild cs.ls_args in
+                      false, pat_app cs pl (of_option cs.ls_value)
+                  | _ -> true, pw
+                  end
+              end
+          | Tyvar _ -> false, pw
+        in
+        let base = if exhaustive then [] else
+          let pat_cont pl = pat_cont (nopat::pl) in
+          [pw, compile css pat_cont tl wilds]
+        in
+        let add fs ql acc =
+          let id = id_fresh "x" in
+          let vl = List.map (fun q -> create_vsymbol id q.pat_ty) ql in
+          let tl = List.fold_left (fun tl v -> t_var v :: tl) tl vl in
+          let pat = pat_app fs (List.map pat_var vl) ty in
+          let rec cont acc vl pl = match vl,pl with
+            | (_::vl), (p::pl) -> cont (p::acc) vl pl
+            | [], pl -> pat_cont (pat_app fs acc ty :: pl)
+            | _, _ -> assert false
+          in
+          let pat_cont pl = cont [] vl pl in
+          (pat, compile css pat_cont tl (Mls.find fs cases)) :: acc
+        in
+        match Mls.fold add types base with
+        | [{ pat_node = Pwild }, a] -> a
+        | bl -> mk_case t bl
 
-  type row = {
-    elements : pattern list;
-    action : action;
-  }
+  let compile css tl rl = compile css (fun p -> p) tl rl
 
-  type matrix = {
-    values : term list;
-    rows : row list;
-  }
-
-  let rec update_action t r = match r.elements with
-    | { pat_node = Pvar x } :: _ -> 
-	mk_let x t r.action
-    | { pat_node = Pwild } :: _ -> 
-	r.action
-    | { pat_node = Pas (p, x) } :: l -> 
-	mk_let x t (update_action (t_var x) { r with elements = p :: l })
-    | [] | { pat_node = Papp _ } :: _ -> 
-	assert false 
-	
-  let rec is_var p = match p.pat_node with
-    | Pwild | Pvar _ -> true
-    | Pas (p, _) -> is_var p
-    | Papp _ -> false
-
-  let not_enough_for n ty = match ty.ty_node with
-    | Tyvar _ -> assert (n = 0); false
-    | Tyapp (ts, _) -> n < List.length (constructors ts)
-
-  let rec matrix m = match m.rows with
-    | [] -> 
-	(* no line *)
-	let pl = List.map (fun t -> pat_wild t.t_ty) m.values in
-	raise (NonExhaustive pl)
-    | { elements = []; action = a } :: _ -> 
-	(* at least one action *)
-	a
-	  (* note : s'il y en a plus, cela ne signifie pas nécessairement
-	     que la clause est inutile car l'algo duplique des actions *)
-    | _ when List.for_all (fun r -> is_var (List.hd r.elements)) m.rows ->
-	(* first column contains only vars -> remove it *)
-	let t1 = List.hd m.values in
-	let update_row r =
-	  { elements = List.tl r.elements; action = update_action t1 r }
-	in
-	matrix { values = List.tl m.values;
-		 rows = List.map update_row m.rows }
-    | _ ->
-	(* first column contains constructor(s) *)
-	let t1 = List.hd m.values in
-	let ty = t1.t_ty in
-	let vars_for = Hls.create 17 in
-	let cm0 = 
-	  let empty c pl =
-	    let new_var p = create_vsymbol (id_fresh "x") p.pat_ty in
-	    let vars = List.map new_var pl in
-	    Hls.add vars_for c vars;
-	    { values = List.map t_var vars @ List.tl m.values; rows = [] }
-	  in
-	  let rec add_matrix_from_p cm p = match p.pat_node with
-	    | Papp (c, pl) when not (Mls.mem c cm) -> 
-		Mls.add c (empty c pl) cm
-	    | Pas (p, _) -> 
-		add_matrix_from_p cm p
-	    | Papp _ | Pwild | Pvar _ -> 
-		cm
-	  in
-	  let add_matrix_for_c cm r = match r.elements with
-	    | [] -> assert false
-	    | p :: _ -> add_matrix_from_p cm p
-	  in
-	  List.fold_left add_matrix_for_c Mls.empty m.rows
-	in
-	let rec dispatch t1 r cm = match r.elements with
-	  | [] -> 
-	      assert false
-	  | { pat_node = Pwild | Pvar _ } :: rr ->
-	      (* une variable => on doit la reprendre pour chaque constr. *)
-	      Mls.fold
-		(fun c m cm -> 
-		   let vars = Hls.find vars_for c in
-		   let h = List.map (fun v -> pat_wild v.vs_ty) vars in 
-		   let r' = 
-		     { elements = h @ rr; action = update_action t1 r } 
-		   in
-		   Mls.add c { m with rows = r' :: m.rows } cm)
-		cm cm
-	  | { pat_node = Papp (c, pl) } :: rr ->
-	      let m = Mls.find c cm in
-	      let r' = { elements = pl @ rr; action = r.action } in
-	      Mls.add c { m with rows = r' :: m.rows } cm
-	  | { pat_node = Pas (p, x) } :: rr ->
-	      let r = { r with action = mk_let x t1 r.action } in
-	      dispatch (t_var x) r cm
-	in
-	(* FIXME: turn this into tail-calls using fold_left + rev *)
-	let cm = List.fold_right (dispatch t1) m.rows cm0 in
-	let nbc = ref 0 in
-	let cases = 
-	  Mls.fold 
-	    (fun c m acc -> 
-	       incr nbc; 
-	       let pat_vars = List.map pat_var (Hls.find vars_for c) in
-	       let pat_c = pat_app c pat_vars ty in
-	       (pat_c, matrix m) :: acc) 
-	    cm []
-	in
-	let otherwise = matrix_variables m t1 (not_enough_for !nbc ty) in
-	mk_case t1 (cases @ otherwise)
-
-  and matrix_variables m t1 exhaustive = 
-    let variable r mr = match r.elements with
-      | [] -> 
-	  assert false
-      | p :: rr when is_var p -> 
-	  let r' = { elements = rr; action = update_action t1 r } in
-	  r' :: mr
-      | _ -> 
-	  mr
-    in
-    let mr = { values = List.tl m.values;
-	       rows = List.fold_right variable m.rows [] } in
-    if not exhaustive then
-      [pat_wild t1.t_ty, matrix mr]
-    else match mr.rows with
-      | [] -> []
-      | { action = a } :: _ -> raise (Unused a)
-
-  let compile tl bl =
-    matrix 
-      { values = tl;
-	rows = List.map (fun (pl, a) -> { elements = pl; action = a }) bl }
-
-    
 end
 

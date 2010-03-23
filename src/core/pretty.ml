@@ -283,19 +283,21 @@ let print_type_decl fmt (ts,def) = match def with
 
 let print_type_decl fmt d = print_type_decl fmt d; forget_tvs ()
 
-let print_ls_defn fmt ld =
-  let vl,e = open_ls_defn ld in
-  fprintf fmt " =@ %a" print_expr e;
-  List.iter forget_var vl
-
 let print_ls_type fmt = fprintf fmt " :@ %a" print_ty
 
-let print_logic_decl fmt (ls,ld) =
-  fprintf fmt "@[<hov 2>logic %a%a%a%a@]"
-    print_ls ls (print_paren_l print_ty) ls.ls_args
-    (print_option print_ls_type) ls.ls_value
-    (print_option print_ls_defn) ld;
-  forget_tvs ()
+let print_logic_decl fmt (ls,ld) = match ld with
+  | Some ld ->
+      let vl,e = open_ls_defn ld in
+      fprintf fmt "@[<hov 2>logic %a%a%a =@ %a@]"
+        print_ls ls (print_paren_l print_vsty) vl
+        (print_option print_ls_type) ls.ls_value print_expr e;
+      List.iter forget_var vl
+  | None ->
+      fprintf fmt "@[<hov 2>logic %a%a%a@]"
+        print_ls ls (print_paren_l print_ty) ls.ls_args
+        (print_option print_ls_type) ls.ls_value
+
+let print_logic_decl fmt d = print_logic_decl fmt d; forget_tvs ()
 
 let print_ind fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr print_fmla f
