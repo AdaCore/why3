@@ -223,9 +223,9 @@ expr:
 | assertion_kind LOGIC
    { mk_expr (Eassert ($1, lexpr $2)) }
 | expr AMPAMP expr
-   { mk_expr (Elazy_and ($1, $3)) }
+   { mk_expr (Elazy (LazyAnd, $1, $3)) }
 | expr BARBAR expr
-   { mk_expr (Elazy_or ($1, $3)) }
+   { mk_expr (Elazy (LazyOr, $1, $3)) }
 | LET lident EQUAL expr IN expr
    { mk_expr (Elet ($2, $4, $6)) }
 | GHOST expr

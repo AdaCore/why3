@@ -55,6 +55,7 @@ type denv = {
   utyvars : (string, type_var) Hashtbl.t;
   dvars : dty Mstr.t;
   (* predefined symbols, from theory programs.Prelude *)
+  ts_bool  : Ty.tysymbol;
   ts_unit  : Ty.tysymbol;
   ts_arrow : Ty.tysymbol;
 }
@@ -64,6 +65,7 @@ let create_denv uc =
   { uc = uc;
     utyvars = Hashtbl.create 17;
     dvars = Mstr.empty;
+    ts_bool  = ns_find_ts ns ["Prelude"; "bool"];
     ts_unit  = ns_find_ts ns ["Prelude"; "unit"];
     ts_arrow = ns_find_ts ns ["Prelude"; "arrow"];
   }
@@ -123,14 +125,29 @@ and expr_desc env loc = function
       let e1 = expr env e1 in
       Elabel (l, e1), e1.expr_type
   | Pgm_ptree.Eif (e1, e2, e3) ->
-      assert false (*TODO*)
-  | _ -> 
-      assert false (*TODO*)
-(*   | Eassert of assertion_kind * lexpr *)
-(*   | Elazy_and of 'info expr * 'info expr *)
-(*   | Elazy_or of 'info expr * 'info expr *)
-(*   | Eghost of 'info expr *)
-(*   | Ewhile of 'info expr * loop_annotation * 'info expr *)
+      let e1 = expr env e1 in
+      expected_type e1 (Tyapp (env.ts_bool, []));
+      let e2 = expr env e2 in
+      let e3 = expr env e3 in
+      expected_type e3 e2.expr_type;
+      Eif (e1, e2, e3), e2.expr_type
+  | Pgm_ptree.Eassert (k, le) ->
+      Eassert (k, le), Tyapp (env.ts_unit, [])
+  | Pgm_ptree.Eghost e1 ->
+      let e1 = expr env e1 in
+      Eghost e1, e1.expr_type
+  | Pgm_ptree.Ewhile (e1, a, e2) ->
+      let e1 = expr env e1 in
+      expected_type e1 (Tyapp (env.ts_bool, []));
+      let e2 = expr env e2 in
+      expected_type e1 (Tyapp (env.ts_unit, []));
+      Ewhile (e1, a, e2), Tyapp (env.ts_unit, [])
+  | Pgm_ptree.Elazy (op, e1, e2) ->
+      let e1 = expr env e1 in
+      expected_type e1 (Tyapp (env.ts_bool, []));
+      let e2 = expr env e2 in
+      expected_type e2 (Tyapp (env.ts_bool, []));
+      Elazy (op, e1, e2), Tyapp (env.ts_bool, [])
 
 let code uc id e =
   let env = create_denv uc in

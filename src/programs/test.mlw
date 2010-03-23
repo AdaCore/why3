@@ -11,7 +11,12 @@
 
 let p = 
   let x = ref 1 in 
-  begin ignore(1); ignore(3); 2 end
+  L:
+  begin 
+    assert { !x = f(1) };
+    ignore (!x + f 1);
+    g 2
+  end
 
 { 
   axiom A : forall x:int. f(x) = g(x-1)

@@ -29,6 +29,8 @@ type assertion_kind = Aassert | Aassume | Acheck
 
 type lexpr = Ptree.lexpr
 
+type lazy_op = LazyAnd | LazyOr
+
 type loop_annotation = {
   loop_invariant : lexpr option;
   loop_variant   : lexpr option;
@@ -47,8 +49,7 @@ and expr_desc =
   | Eif of expr * expr * expr
   | Eskip 
   | Eassert of assertion_kind * lexpr
-  | Elazy_and of expr * expr
-  | Elazy_or of expr * expr
+  | Elazy of lazy_op * expr * expr
   | Elet of ident * expr * expr
   | Eghost of expr
   | Elabel of ident * expr

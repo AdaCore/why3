@@ -31,6 +31,8 @@ type lexpr = Ptree.lexpr
 
 type loop_annotation = Pgm_ptree.loop_annotation
 
+type lazy_op = Pgm_ptree.lazy_op
+
 type expr = {
   expr_desc : expr_desc;
   expr_type : Denv.dty;
@@ -46,8 +48,7 @@ and expr_desc =
   | Eif of expr * expr * expr
   | Eskip 
   | Eassert of assertion_kind * lexpr
-  | Elazy_and of expr * expr
-  | Elazy_or of expr * expr
+  | Elazy of lazy_op * expr * expr
   | Elet of string * expr * expr
   | Eghost of expr
   | Elabel of ident * expr
