@@ -1,0 +1,15 @@
+theory Prelude
+       type deco
+       type undeco
+       type ty
+       logic sort(ty,undeco) : deco
+end
+
+theory Builtin
+       use import Prelude
+       type t
+       logic tty : ty
+       logic d2t(deco) : t
+       logic t2u(t) : undeco
+       axiom Conv : forall x:t[t2u(x)]. d2t(sort(tty,t2u(x)))=x
+end
