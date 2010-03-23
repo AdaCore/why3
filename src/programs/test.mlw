@@ -3,7 +3,6 @@
 
 { 
   use import programs.Prelude
-  use import int.Int
   type foo
   logic foo : foo
   logic f(int) : int 
@@ -11,9 +10,8 @@
 }
 
 let p = 
-   !(ref 1)
-   +  
-   2
+  let x = ref 1 in 
+  begin ignore(1); ignore(3); 2 end
 
 { 
   axiom A : forall x:int. f(x) = g(x-1)

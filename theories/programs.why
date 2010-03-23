@@ -1,10 +1,16 @@
 
 theory Prelude
+  use export int.Int
+  use export bool.Bool
+
   type ('a, 'b) arrow
 
   type  'a ref
   logic ref ('a)     : 'a ref
   logic (!_)('a ref) : 'a
+
+  type  unit
+  logic ignore('a) : unit
 
   type  label
   logic at  ('a, label) : 'a

@@ -51,23 +51,33 @@ let report fmt = function
 
 (*** from Typing *************************************************************)
 type denv = {
-  uc : theory_uc; (* the theory under construction *)
-  utyvars : (string, type_var) Hashtbl.t; (* user type variables *)
-  dvars : dty Mstr.t; (* local variables, to be bound later *)
+  uc : theory_uc;
+  utyvars : (string, type_var) Hashtbl.t;
+  dvars : dty Mstr.t;
+  (* predefined symbols, from theory programs.Prelude *)
+  ts_unit  : Ty.tysymbol;
   ts_arrow : Ty.tysymbol;
 }
 
-let create_denv uc = {
-  uc = uc;
-  utyvars = Hashtbl.create 17;
-  dvars = Mstr.empty;
-  ts_arrow = ns_find_ts (get_namespace uc) ["Prelude"; "arrow"];
-}
+let create_denv uc = 
+  let ns = get_namespace uc in
+  { uc = uc;
+    utyvars = Hashtbl.create 17;
+    dvars = Mstr.empty;
+    ts_unit  = ns_find_ts ns ["Prelude"; "unit"];
+    ts_arrow = ns_find_ts ns ["Prelude"; "arrow"];
+  }
 (*****************************************************************************)
 
 let currying env tyl ty =
   let make_arrow_type ty1 ty2 = Tyapp (env.ts_arrow, [ty1; ty2]) in
   List.fold_right make_arrow_type tyl ty
+
+let expected_type e ty =
+  if not (Denv.unify e.expr_type ty) then
+    errorm ~loc:e.expr_loc 
+      "this expression has type %a, but is expected to have type %a"
+      print_dty e.expr_type print_dty ty
 
 let rec expr env e = 
   let d, ty = expr_desc env e.Pgm_ptree.expr_loc e.Pgm_ptree.expr_desc in
@@ -90,27 +100,36 @@ and expr_desc env loc = function
       let e2 = expr env e2 in
       begin match e1.expr_type with
 	| Tyapp (ts, [ty2; ty]) when ts == env.ts_arrow ->
-	    if not (Denv.unify ty2 e2.expr_type) then
-	      errorm ~loc:e2.expr_loc 
-		"this expression has type %a, but is expected to have type %a"
-		print_dty e2.expr_type print_dty ty2;
+	    expected_type e2 ty2;
 	    Eapply (e1, e2), ty
 	| _ ->
 	    errorm ~loc:e1.expr_loc "this expression is not a function"
       end
+  | Pgm_ptree.Elet ({id=x}, e1, e2) ->
+      let e1 = expr env e1 in
+      let ty1 = e1.expr_type in
+      let env = { env with dvars = Mstr.add x ty1 env.dvars } in
+      let e2 = expr env e2 in
+      Elet (x, e1, e2), e2.expr_type
+  | Pgm_ptree.Esequence (e1, e2) ->
+      let e1 = expr env e1 in
+      expected_type e1 (Tyapp (env.ts_unit, []));
+      let e2 = expr env e2 in
+      Esequence (e1, e2), e2.expr_type
+  | Pgm_ptree.Eskip ->
+      Eskip, Tyapp (env.ts_unit, [])
+  | Pgm_ptree.Elabel (l, e1) ->
+      (* TODO: add label to env *)
+      let e1 = expr env e1 in
+      Elabel (l, e1), e1.expr_type
+  | Pgm_ptree.Eif (e1, e2, e3) ->
+      assert false (*TODO*)
   | _ -> 
       assert false (*TODO*)
-(*   | Eident of qualid *)
-(*   | Eapply of 'info expr * 'info expr *)
-(*   | Esequence of 'info expr * 'info expr *)
-(*   | Eif of 'info expr * 'info expr * 'info expr *)
-(*   | Eskip  *)
 (*   | Eassert of assertion_kind * lexpr *)
 (*   | Elazy_and of 'info expr * 'info expr *)
 (*   | Elazy_or of 'info expr * 'info expr *)
-(*   | Elet of ident * 'info expr * 'info expr *)
 (*   | Eghost of 'info expr *)
-(*   | Elabel of ident * 'info expr *)
 (*   | Ewhile of 'info expr * loop_annotation * 'info expr *)
 
 let code uc id e =

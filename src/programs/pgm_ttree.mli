@@ -48,7 +48,7 @@ and expr_desc =
   | Eassert of assertion_kind * lexpr
   | Elazy_and of expr * expr
   | Elazy_or of expr * expr
-  | Elet of ident * expr * expr
+  | Elet of string * expr * expr
   | Eghost of expr
   | Elabel of ident * expr
   | Ewhile of expr * loop_annotation * expr

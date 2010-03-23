@@ -1,5 +1,5 @@
 
-theory Base
+theory Bool
 
   type bool = True | False
 
@@ -32,7 +32,7 @@ end
 
 theory Ite
 
-  use import Base
+  use import Bool
 
   logic ite(b:bool, x:'a, y:'a) : 'a = 
     match b with
