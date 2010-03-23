@@ -161,15 +161,15 @@ bin/top: $(CMO)
 
 test: bin/why.byte
 	mkdir -p output_why3
-	ocamlrun -bt bin/why.byte -I lib/prelude/ --driver lib/drivers/why3.drv \
+	ocamlrun -bt bin/why.byte -I theories/ --driver lib/drivers/why3.drv \
 	--output-dir output_why3 src/test.why
-	bin/why.byte --driver lib/drivers/alt_ergo.drv -I lib/prelude/ \
+	bin/why.byte --driver lib/drivers/alt_ergo.drv -I theories/ \
 	--output-file - --goal Test.G src/test.why --timeout 3
-	bin/why.byte --driver lib/drivers/alt_ergo.drv -I lib/prelude/ \
+	bin/why.byte --driver lib/drivers/alt_ergo.drv -I theories/ \
 	--call --goal Test.G src/test.why --timeout 3
 
 testl: bin/whyl.byte
-	ocamlrun -bt bin/whyl.byte -I lib/prelude/ src/programs/test.mlw
+	ocamlrun -bt bin/whyl.byte -I theories/ src/programs/test.mlw
 
 # programs
 ##########
@@ -220,7 +220,7 @@ bin/gwhy.byte: $(GCMO)
 WHYVO=lib/coq/Why.vo
 
 bench:: $(BINARY) 
-	sh bench/bench "$(BINARY) -I lib/prelude/"
+	sh bench/bench "$(BINARY) -I theories/"
 
 BENCH_PLUGINS_CMO := helloworld.cmo simplify_array.cmo
 BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))
@@ -229,11 +229,11 @@ BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
 
 
 bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) $(BINARY) byte
-	bin/why.byte --driver bench/plugins/helloworld.drv -I lib/prelude/ \
+	bin/why.byte --driver bench/plugins/helloworld.drv -I theories/ \
         --output-dir - --goal Test.G src/test.why
-	bin/why.$(OCAMLBEST) --driver bench/plugins/helloworld.drv -I lib/prelude/ \
+	bin/why.$(OCAMLBEST) --driver bench/plugins/helloworld.drv -I theories/ \
         --output-dir - --goal Test.G src/test.why
-	bin/why.$(OCAMLBEST) --driver bench/plugins/simplify_array.drv -I lib/prelude/ \
+	bin/why.$(OCAMLBEST) --driver bench/plugins/simplify_array.drv -I theories/ \
         --output-file - --goal  Test_simplify_array.G src/test.why
 
 # installation
