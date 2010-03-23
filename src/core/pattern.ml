@@ -33,10 +33,10 @@ exception NonExhaustive of pattern list
 module Compile (X : Action) = struct
   open X
 
-  let rec compile css pat_cont tl rl = match tl,rl with
+  let rec compile css tl rl = match tl,rl with
     | _, [] -> (* no actions *)
         let pl = List.map (fun t -> pat_wild t.t_ty) tl in
-        raise (NonExhaustive (pat_cont pl))
+        raise (NonExhaustive pl)
     | [], (_,a) :: _ -> (* no terms, at least one action *)
         a
     | t :: tl, _ -> (* process the leftmost column *)
@@ -91,27 +91,25 @@ module Compile (X : Action) = struct
           | Tyvar _ -> false, pw
         in
         let base = if exhaustive then [] else
-          let pat_cont pl = pat_cont (nopat::pl) in
-          [pw, compile css pat_cont tl wilds]
+          try [pw, compile css tl wilds]
+          with NonExhaustive pl -> raise (NonExhaustive (nopat::pl))
         in
         let add fs ql acc =
           let id = id_fresh "x" in
           let vl = List.map (fun q -> create_vsymbol id q.pat_ty) ql in
           let tl = List.fold_left (fun tl v -> t_var v :: tl) tl vl in
           let pat = pat_app fs (List.map pat_var vl) ty in
-          let rec cont acc vl pl = match vl,pl with
-            | (_::vl), (p::pl) -> cont (p::acc) vl pl
-            | [], pl -> pat_cont (pat_app fs acc ty :: pl)
+          let rec pat_cont acc vl pl = match vl,pl with
+            | (_::vl), (p::pl) -> pat_cont (p::acc) vl pl
+            | [], pl -> pat_app fs acc ty :: pl
             | _, _ -> assert false
           in
-          let pat_cont pl = cont [] vl pl in
-          (pat, compile css pat_cont tl (Mls.find fs cases)) :: acc
+          try (pat, compile css tl (Mls.find fs cases)) :: acc
+          with NonExhaustive pl -> raise (NonExhaustive (pat_cont [] vl pl))
         in
         match Mls.fold add types base with
         | [{ pat_node = Pwild }, a] -> a
         | bl -> mk_case t bl
-
-  let compile css tl rl = compile css (fun p -> p) tl rl
 
 end
 
