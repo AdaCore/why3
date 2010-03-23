@@ -113,3 +113,18 @@ module Compile (X : Action) = struct
 
 end
 
+module CompileTerm = Compile (struct
+  type action = term
+  let mk_let v s t = t_let v s t
+  let mk_case t bl =
+    let ty = (snd (List.hd bl)).t_ty in
+    t_case [t] (List.map (fun (p,a) -> [p],a) bl) ty
+end)
+
+module CompileFmla = Compile (struct
+  type action = fmla
+  let mk_let v t f = f_let v t f
+  let mk_case t bl =
+    f_case [t] (List.map (fun (p,a) -> [p],a) bl)
+end)
+

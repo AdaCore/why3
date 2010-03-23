@@ -119,6 +119,7 @@ exception EmptyDecl
 (** Utilities *)
 
 val decl_map : (term -> term) -> (fmla -> fmla) -> decl -> decl
+val decl_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> decl -> 'a
 
 (** Known identifiers *)
 
@@ -130,4 +131,8 @@ val merge_known : known_map -> known_map -> known_map
 exception KnownIdent of ident
 exception UnknownIdent of ident
 exception RedeclaredIdent of ident
+exception NonExhaustiveExpr of (pattern list * expr)
+
+val find_constructors : known_map -> tysymbol -> lsymbol list
+val find_inductive_cases : known_map -> lsymbol -> prop list
 

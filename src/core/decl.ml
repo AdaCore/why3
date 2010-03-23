@@ -394,6 +394,22 @@ let decl_map fnT fnF d = match d.d_node with
   | Dprop (k,pr,f) ->
       create_prop_decl k pr (fnF f)
 
+let decl_fold fnT fnF acc d = match d.d_node with
+  | Dtype _ -> acc
+  | Dlogic l ->
+      let fn acc = function
+        | _, Some ld ->
+            let _,e = open_ls_defn ld in
+            e_fold fnT fnF acc e
+        | _ -> acc
+      in
+      List.fold_left fn acc l
+  | Dind l ->
+      let fn acc (_,f) = fnF acc f in
+      let fn acc (_,l) = List.fold_left fn acc l in
+      List.fold_left fn acc l
+  | Dprop (_,_,f) -> fnF acc f
+
 
 (** Known identifiers *)
 
@@ -454,14 +470,14 @@ let check_logic kn (ls,ld) =
   option_iter (check_ls_defn kn) ld
 
 let add_ind d kn (ps,la) =
-    let kn = add_known ps.ls_name d kn in
-    let add kn (pr,_) = add_known pr.pr_name d kn in
-    List.fold_left add kn la
+  let kn = add_known ps.ls_name d kn in
+  let add kn (pr,_) = add_known pr.pr_name d kn in
+  List.fold_left add kn la
 
 let check_ind kn (ps,la) =
-    List.iter (known_ty kn) ps.ls_args;
-    let check (_,f) = known_fmla kn f in
-    List.iter check la
+  List.iter (known_ty kn) ps.ls_args;
+  let check (_,f) = known_fmla kn f in
+  List.iter check la
 
 let add_decl kn d = match d.d_node with
   | Dtype dl  -> List.fold_left (add_type d) kn dl
@@ -475,8 +491,44 @@ let check_decl kn d = match d.d_node with
   | Dind dl   -> List.iter (check_ind kn) dl
   | Dprop (_,_,f) -> known_fmla kn f
 
+let find_constructors kn ts =
+  match (Mid.find ts.ts_name kn).d_node with
+  | Dtype dl ->
+      begin match List.assoc ts dl with
+        | Talgebraic cl -> cl
+        | Tabstract -> []
+      end
+  | _ -> assert false
+
+let find_inductive_cases kn ps =
+  match (Mid.find ps.ls_name kn).d_node with
+  | Dind dl -> List.assoc ps dl
+  | Dlogic _ -> []
+  | _ -> assert false
+
+exception NonExhaustiveExpr of (pattern list * expr)
+
+let rec check_matchT kn () t = match t.t_node with
+  | Tcase (tl,bl) ->
+      let mk_b (pl,_,t) = (pl,t) in
+      let bl = List.map (fun b -> mk_b (t_open_branch b)) bl in
+      ignore (try Pattern.CompileTerm.compile (find_constructors kn) tl bl
+      with Pattern.NonExhaustive pl -> raise (NonExhaustiveExpr (pl, Term t)))
+  | _ -> t_fold (check_matchT kn) (check_matchF kn) () t
+
+and check_matchF kn () f = match f.f_node with
+  | Fcase (tl,bl) ->
+      let mk_b (pl,_,f) = (pl,f) in
+      let bl = List.map (fun b -> mk_b (f_open_branch b)) bl in
+      ignore (try Pattern.CompileFmla.compile (find_constructors kn) tl bl
+      with Pattern.NonExhaustive pl -> raise (NonExhaustiveExpr (pl, Fmla f)))
+  | _ -> f_fold (check_matchT kn) (check_matchF kn) () f
+
+let check_match kn d = decl_fold (check_matchT kn) (check_matchF kn) () d
+
 let known_add_decl kn d =
   let kn = add_decl kn d in
   ignore (check_decl kn d);
+  ignore (check_match kn d);
   kn
 
