@@ -17,33 +17,39 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Typing environments *)
+type loc = Loc.position
 
-open Theory
-open Env
+type ident = Ptree.ident
 
-val retrieve : string list -> retrieve_theory
-  (** creates a new typing environment for a given loadpath *)
+type qualid = Ptree.qualid
 
-val read_file : env -> string -> theory Mnm.t
+type constant = Term.constant
 
-val read_channel : env -> string -> in_channel -> theory Mnm.t
+type assertion_kind = Pgm_ptree.assertion_kind
 
-(** incremental parsing *)
+type lexpr = Ptree.lexpr
 
-val add_decl : env -> theory Mnm.t -> theory_uc -> Ptree.decl -> theory_uc
-val fmla : theory_uc -> Ptree.lexpr -> Term.fmla
+type loop_annotation = Pgm_ptree.loop_annotation
 
-(** error reporting *)
+type expr = {
+  expr_desc : expr_desc;
+  expr_type : Denv.dty;
+  expr_loc  : loc;
+}
 
-type error
-
-exception Error of error
-
-val report : Format.formatter -> error -> unit
-
-(** export for program typing *)
-
-val specialize_fsymbol : 
-  Ptree.qualid -> Theory.theory_uc -> Term.lsymbol * Denv.dty list * Denv.dty
+and expr_desc =
+  | Econstant of constant
+  | Elocal of string
+  | Eglobal of Term.lsymbol
+  | Eapply of expr * expr
+  | Esequence of expr * expr
+  | Eif of expr * expr * expr
+  | Eskip 
+  | Eassert of assertion_kind * lexpr
+  | Elazy_and of expr * expr
+  | Elazy_or of expr * expr
+  | Elet of ident * expr * expr
+  | Eghost of expr
+  | Elabel of ident * expr
+  | Ewhile of expr * loop_annotation * expr
 

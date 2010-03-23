@@ -1,0 +1,12 @@
+
+theory Prelude
+  type ('a, 'b) arrow
+
+  type  'a ref
+  logic ref ('a)     : 'a ref
+  logic (!_)('a ref) : 'a
+
+  type  label
+  logic at  ('a, label) : 'a
+  logic old ('a)        : 'a
+end

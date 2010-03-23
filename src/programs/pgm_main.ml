@@ -49,6 +49,8 @@ let rec report fmt = function
       fprintf fmt "syntax error"
   | Typing.Error e ->
       Typing.report fmt e
+  | Pgm_typing.Error e ->
+      Pgm_typing.report fmt e
   | e ->
       fprintf fmt "anomaly: %s" (Printexc.to_string e)
 

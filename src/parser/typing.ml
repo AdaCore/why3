@@ -52,7 +52,6 @@ type error =
   | UnboundTypeVar of string
   | UnboundType of string list
   | UnboundSymbol of string list
-  | AnyMessage of string
 
 exception Error of error
 
@@ -68,7 +67,7 @@ let errorm ?loc f =
        Format.pp_print_flush fmt ();
        let s = Buffer.contents buf in
        Buffer.clear buf;
-       error ?loc (AnyMessage s))
+       error ?loc (Message s))
     fmt f
 
 let rec print_qualid fmt = function
@@ -118,8 +117,6 @@ let report fmt = function
        fprintf fmt "Unbound type '%a'" (print_list dot pp_print_string) sl
   | UnboundSymbol sl ->
        fprintf fmt "Unbound symbol '%a'" (print_list dot pp_print_string) sl
-  | AnyMessage s ->
-      fprintf fmt "%s" s
 
 (** Environments *)
 
