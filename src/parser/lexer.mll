@@ -160,6 +160,8 @@ rule token = parse
 		  |(hexadigit+ as i) ("" as f))
     ['p' 'P'] (['-' '+']? digit+ as e)
       { FLOAT (RConstHexa (i, f, remove_leading_plus e)) }
+  | "(*)"
+      { LEFTPAR_STAR_RIGHTPAR }
   | "(*"
       { comment_start_loc := loc lexbuf; comment lexbuf; token lexbuf }
   | "'"

@@ -1,32 +1,25 @@
 
 (* test file *)
 
-theory ThA
-  type test
-  logic test (test : test) : test
-  goal Test : forall test : test . forall test : test . test(test) <> test
-end
-
 theory Test
-  use import prelude.Int
+  use import int.Int
   logic id(x: int) : int = x
   logic id2(x: int) : int = id(x)
   logic succ(x:int) : int = id(x+1)
-  logic even(x: int) = 2*(x/2) = x
-  clone ThA with type test = int, logic test = (-_)
+
   goal G : (forall x:int. x=x) or
            (forall x:int. x=x+1)
   goal G2 : forall x:int. 0 = 1
 end
 
 theory Test_simplify_array
-       use import prelude.Array
+       use import array.Array
        goal G : forall x,y:int. forall m: (int,int) t. 
        select(store(m,y,x),y) = x
 end 
 
 theory Test_conjunction
-       use import prelude.Int
+       use import int.Int
        goal G : forall x:int. x*x=4 -> ((x*x*x=8 or x*x*x = -8) and x*x*2 = 8)
        goal G2 : forall x:int. (x+x=4 or x*x=4) -> ((x*x*x=8 or x*x*x = -8) and x*x*2 = 8)
 end
@@ -44,13 +37,12 @@ end
 
 
 theory TestEnco
-  use import prelude.Int
+  use import int.Int
   type 'a mytype
   logic id(x: int) : int = x
   logic id2(x: int) : int = id(x)
   logic succ(x:int) : int = id(x+1)
-  logic even(x: int) = 2*(x/2) = x
-  clone ThA with type test = int, logic test = (-_)
+
   goal G : (forall x:int. x=x) or
            (forall x:int. x=x+1)
   logic p('a ) : 'a mytype

@@ -65,7 +65,7 @@
 %token BAR 
 %token COLON COMMA  
 %token DOT EQUAL
-%token LEFTPAR LEFTSQ 
+%token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ 
 %token LRARROW
 %token QUOTE
 %token RIGHTPAR RIGHTSQ 
@@ -142,8 +142,10 @@ lident:
 lident_rich:
 | lident
     { $1 }
-| LEFTPAR UNDERSCORE lident_op UNDERSCORE RIGHTPAR 
-    { { id = infix $3; id_loc = loc () } }
+| LEFTPAR lident_op RIGHTPAR 
+    { { id = infix $2; id_loc = loc () } }
+| LEFTPAR_STAR_RIGHTPAR
+    { { id = infix "*"; id_loc = loc () } }
 | LEFTPAR lident_op UNDERSCORE RIGHTPAR 
     { { id = prefix $2; id_loc = loc () } }
 ;
