@@ -24,7 +24,7 @@ open Task
 open Theory
 open Decl
 
-let why_filename = "encoding_decorate"
+let why_filename = ["transform" ; "encoding_decorate"]
 
 (* From Encoding Polymorphism CADE07*)
 
@@ -66,14 +66,14 @@ type tenv = {specials : lconv Mty.t;
 
 let load_prelude env =
   let specials_type = [ts_int;ts_real] in
-  let prelude = Env.find_theory env [why_filename] "Prelude" in
+  let prelude = Env.find_theory env why_filename "Prelude" in
   let sort = Theory.ns_find_ls prelude.th_export ["sort"] in
   let tyty = ty_app (Theory.ns_find_ts prelude.th_export ["ty"]) [] in
   let deco = ty_app (Theory.ns_find_ts prelude.th_export ["deco"]) [] in
   let undeco = ty_app (Theory.ns_find_ts prelude.th_export ["undeco"]) [] in
   let task = None in
   let task = flat_theory task prelude in
-  let builtin = Env.find_theory env [why_filename] "Builtin" in
+  let builtin = Env.find_theory env why_filename "Builtin" in
   let type_t = Theory.ns_find_ts builtin.th_export ["t"] in
   let logic_d2t = Theory.ns_find_ls builtin.th_export ["d2t"] in
   let logic_t2u = Theory.ns_find_ls builtin.th_export ["t2u"] in
