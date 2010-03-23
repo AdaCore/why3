@@ -17,3 +17,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let code id e =
+  assert false (*TODO*)
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. testl"
+End: 
+*)

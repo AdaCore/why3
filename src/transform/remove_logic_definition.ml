@@ -16,6 +16,7 @@
 (*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
 (*                                                                        *)
 (**************************************************************************)
+
 open Ident
 open Term
 open Decl

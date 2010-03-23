@@ -136,7 +136,21 @@ theory Set
 
 end
 
+theory Programs
 
+  logic old('a) : 'a
+
+  type label
+
+  logic at('a, label) : 'a
+
+  type 'a ref
+
+  logic (!_)('a ref) : 'a
+
+  logic ref('a) : 'a ref
+
+end
 
 (*
 Local Variables: 

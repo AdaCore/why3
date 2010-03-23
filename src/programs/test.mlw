@@ -2,25 +2,19 @@
 (* test file for ML-why *)
 
 { 
+use import prelude.Programs
 use import prelude.Int
 logic f(int) : int 
 logic g(x : int) : int = f(x+1)
 }
 
 let p = 
-  if !x = 1 then begin end else ghost begin !x end;
+  let x = ref 0 in 
   L:
   assert { !x = 0 };
-  check { false };
-  let z = !x + !x in
-  let t = ghost (ref 2) in
-  assume { true -> old(!z) = 2 }; 
-  while !x >= 0 do
-    invariant { true } variant { t }
-    x := 2
-  done;
-  (* for x in s do () done; *)
-  f !x
+  x := 1;
+  assert { at(!x, L) = 0 };
+  !x
 
 { 
 axiom A : forall x:int. f(x) = g(x-1)

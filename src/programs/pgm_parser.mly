@@ -96,7 +96,7 @@
 /* symbols */
 
 %token UNDERSCORE QUOTE COMMA LEFTPAR RIGHTPAR COLON SEMICOLON
-%token COLONEQUAL ARROW EQUAL AT DOT LEFTSQ RIGHTSQ 
+%token COLONEQUAL ARROW EQUAL AT DOT LEFTSQ RIGHTSQ BANG
 %token LEFTBLEFTB RIGHTBRIGHTB BAR BARBAR AMPAMP BIGARROW 
 %token EOF
 
@@ -234,12 +234,11 @@ expr:
    { mk_expr (Ewhile ($2, $4, $5)) }
 ;
 
-/* FIXME: prefix operators should be part of simple_expr
-   otherwise we can't parse "f !x" */
-
 simple_expr:
 | constant
     { mk_expr (Econstant $1) }
+| BANG expr
+    { mk_prefix "!" $2 }
 | lqualid 
     { mk_expr (Eident $1) }
 | LEFTPAR expr RIGHTPAR

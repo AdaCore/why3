@@ -148,6 +148,8 @@ rule token = parse
       { COLON }
   | ";"
       { SEMICOLON }
+  | "!"
+      { BANG }
   | ":="
       { COLONEQUAL }
   | "->"
@@ -158,7 +160,7 @@ rule token = parse
       { OP0 s }
   | "+" | "-" as c
       { OP2 (String.make 1 c) }
-  | "*" | "/" | "%" | "!" as c
+  | "*" | "/" | "%" as c
       { OP3 (String.make 1 c) }
   | "@"
       { AT }

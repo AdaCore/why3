@@ -174,7 +174,7 @@ testl: bin/whyl.byte
 # programs
 ##########
 
-PGM_CMO := pgm_parser.cmo pgm_lexer.cmo pgm_main.cmo
+PGM_CMO := pgm_parser.cmo pgm_lexer.cmo pgm_typing.cmo pgm_main.cmo
 PGM_CMO := $(addprefix src/programs/, $(PGM_CMO))
 
 WHYL_CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
