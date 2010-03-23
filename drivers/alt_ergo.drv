@@ -1,0 +1,73 @@
+
+(* Why driver for Alt-Ergo *)
+
+prelude "(* this is a prelude for Alt-Ergo*)"
+
+printer "alt-ergo"
+filename "%f-%t-%s.why"
+call_on_file  "alt-ergo %s"
+
+valid "Valid"
+invalid "Invalid"
+unknown "I don't know" "Unknown"
+fail "typing error:\\(.*\\)$" "Failure : File generation error : \\1"
+
+(* À discuter *)
+transformations
+  "simplify_recursive_definition"      
+  (*"split_goal_pos"*) "split_goal_pos_neg"
+  "inline_trivial"
+end
+
+
+theory BuiltIn
+  syntax type int "int"
+  syntax type real "real"
+
+  syntax logic (_=_) "(%1 = %2)"
+
+  syntax logic (_<>_) "(%1 <> %2)"
+
+end
+
+
+theory prelude.Int
+
+  prelude "(* this is a prelude for Alt-Ergo arithmetic *)"
+
+  syntax logic zero "0"
+
+  syntax logic (_+_) "(%1 + %2)"
+  syntax logic (_-_) "(%1 - %2)"
+  syntax logic (_*_) "(%1 * %2)"
+  syntax logic (_/_) "(%1 / %2)"
+  syntax logic (-_)  "(-%1)"
+
+  syntax logic (_<=_) "(%1 <= %2)"
+  syntax logic (_< _) "(%1 <  %2)"
+  syntax logic (_>=_) "(%1 >= %2)"
+  syntax logic (_> _) "(%1 >  %2)"
+
+  remove prop One_neutral
+  remove prop Add_assoc
+  remove prop Add_comm
+  remove prop Zero_neutral
+  remove prop Neg
+  remove prop Mul_comm
+  remove prop Mul_assoc
+  remove prop Mul_distr
+
+end
+
+theory algebra.AC
+  tag cloned logic op "AC"
+  remove cloned prop Comm
+  remove cloned prop Assoc
+end
+
+(*
+Local Variables: 
+mode: why
+compile-command: "make -C ../.. bench"
+End: 
+*)

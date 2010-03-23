@@ -1,0 +1,14 @@
+printer "why3"
+filename "%f-%t-%s.why"
+
+transformations
+        "remove_logic_definition"
+        "encoding_decorate"
+end
+
+theory BuiltIn
+  syntax type   int     "int"
+  syntax type   real    "real"
+  syntax logic  (_=_)   "(%1 = %2)"
+  syntax logic  (_<>_)  "(%1 <> %2)"
+end
