@@ -1,0 +1,43 @@
+
+theory Base
+
+  type bool = True | False
+
+  logic andb(x:bool, y:bool) : bool = 
+    match x, y with
+    | True, True -> True
+    | _   , _    -> False
+    end
+
+  logic orb(x:bool, y:bool) : bool = 
+    match x, y with
+    | False, False -> False
+    | _    , _     -> True
+    end
+
+  logic xorb(x:bool, y:bool) : bool = 
+    match x, y with
+    | True,  False -> True
+    | False, True  -> True
+    | _    , _     -> False
+    end
+
+  logic notb(x:bool) : bool = 
+    match x with
+    | False -> True
+    | True  -> False
+    end
+
+end
+
+theory Ite
+
+  use import Base
+
+  logic ite(b:bool, x:'a, y:'a) : 'a = 
+    match b with
+    | True  -> x
+    | False -> y
+    end
+
+end

@@ -1,0 +1,101 @@
+
+
+theory Real 
+  logic (< ) (real, real)
+  logic (<=)(real, real)
+  logic (> ) (real, real)
+  logic (>=)(real, real)
+  
+  (* TODO : < is a total order relation *)
+
+  logic zero : real = 0.0
+  logic one  : real = 1.0
+  
+  clone export algebra.Field with 
+     type t = real, logic zero = zero, logic one = one
+end 
+
+theory Abs
+
+  use import Real
+
+  logic abs(real) : real
+
+  axiom Pos: forall x:real. x >= 0.0 -> abs(x) = x
+  axiom Neg: forall x:real. x <= 0.0 -> abs(x) = -x
+
+end
+
+theory MinMax
+
+  use import Real
+
+  logic min(real,real) : real
+  logic max(real,real) : real
+
+  axiom Max_is_ge   : forall x,y:real. max(x,y) >= x and max(x,y) >= y
+  axiom Max_is_some : forall x,y:real. max(x,y) = x or max(x,y) = y
+  axiom Min_is_le   : forall x,y:real. min(x,y) <= x and min(x,y) <= y
+  axiom Min_is_some : forall x,y:real. min(x,y) = x or min(x,y) = y
+
+end
+
+theory FromInt
+
+  use int.Int
+  use import Real
+
+  logic from_int(int) : real
+
+  axiom Zero: from_int(0) = 0.0
+  axiom One: from_int(1) = 1.0
+
+  axiom Add: 
+    forall x,y:int. from_int(Int.(+)(x,y)) = from_int(x) + from_int(y)
+  axiom Sub: 
+    forall x,y:int. from_int(Int.(-)(x,y)) = from_int(x) - from_int(y)
+  axiom Mul: 
+    forall x,y:int. from_int(Int.(*)(x,y)) = from_int(x) * from_int(y)
+  axiom Neg: 
+    forall x,y:int. from_int(Int.(-_)(x)) = - from_int(x)
+
+end
+
+theory Truncate
+
+  (* TODO: truncate, floor, ceil *)
+
+end
+
+theory Sqrt
+
+end
+
+theory ExpLog
+
+ (* exp, log *)
+
+end
+
+theory Power 
+
+end
+
+theory Trigonometry
+
+  (* sin, cos, tan, atan *)
+
+end
+
+theory Hyperbolic
+
+ (* cosh, sinh, tanh *)
+
+end
+
+theory Polar
+
+  (* atan2, hypot *)
+ 
+end
+

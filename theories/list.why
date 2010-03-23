@@ -1,0 +1,65 @@
+
+theory List
+
+  type 'a list = Nil | Cons('a, 'a list)
+
+end
+
+theory Length
+  use import int.Int
+  use import List
+
+  logic length(l : 'a list) : int = 
+    match l with
+    | Nil        -> 0
+    | Cons(_, r) -> 1 + length(r)
+    end
+
+  lemma Length_nonnegative : forall l:'a list. length(l) >= 0
+
+end
+
+theory Mem
+  use export List
+ 
+  logic mem(x: 'a, l : 'a list) = match l with
+    | Nil -> false
+    | Cons(y, r) -> x = y or mem(x, r)
+    end
+
+end
+
+theory Permut
+  (* TODO *)
+end
+
+theory Induction
+  use import List
+
+  logic p ('a list)
+
+  axiom Induction : 
+    p(Nil : 'a list) -> 
+    (forall x:'a. forall l:'a list. p(l) -> p(Cons(x,l))) ->
+    forall l:'a list. p(l)
+
+end
+
+theory Map
+  use import List
+ 
+  type a
+  type b 
+  logic f (a) : b
+
+  logic map(l : a list) : b list = 
+    match l with
+    | Nil        -> Nil
+    | Cons(x, r) -> Cons(f(x), map(r))
+    end
+
+end
+
+theory Fold
+  (* TODO (a la Map) *)
+end

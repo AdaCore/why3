@@ -1,0 +1,57 @@
+
+theory Base
+
+  type 'a t 
+
+  logic mem('a, 'a t)
+
+  logic empty : 'a t
+
+  axiom Empty_def1 : forall x : 'a. not mem(x, empty)
+
+  logic add('a, 'a t) : 'a t
+
+  axiom Add_def1 : 
+    forall x, y : 'a. forall s : 'a t.
+    mem(x, add(y, s)) <-> (x = y or mem(x, s))
+
+  logic add'(x:'a, s:'a t) : 'a t = 
+    epsilon res:'a t. forall y:'a. mem(y, res) <-> (y = x or mem(y, s))
+
+  logic union('a t, 'a t) : 'a t
+
+  axiom Union_def1 : 
+    forall s1, s2 : 'a t. forall x : 'a.
+    mem(x, union(s1, s2)) <-> (mem(x, s1) or mem(x, s2))
+
+  logic inter('a t, 'a t) : 'a t
+
+  axiom Inter_def1 : 
+    forall s1, s2 : 'a t. forall x : 'a.
+    mem(x, inter(s1, s2)) <-> (mem(x, s1) and mem(x, s2))
+
+  logic diff('a t, 'a t) : 'a t
+
+  axiom Diff_def1 : 
+    forall s1, s2 : 'a t. forall x : 'a.
+    mem(x, diff(s1, s2)) <-> (mem(x, s1) and not mem(x, s2))
+
+  logic equal(s1 : 'a t, s2 : 'a t) = forall x : 'a. mem(x, s1) <-> mem(x, s2)
+
+  logic subset(s1 : 'a t, s2 : 'a t) = forall x : 'a. mem(x, s1) -> mem(x, s2)
+
+end
+
+(* finite sets *)
+theory Fset
+  use import int.Int
+  clone export Base
+  
+  logic cardinal('a t) : int
+  axiom Cardinal_empty : cardinal(empty : 'a t) = 0
+  (* TODO other axioms for cardinal *)
+end
+
+theory Set
+  clone export Base
+end

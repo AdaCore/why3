@@ -1,0 +1,52 @@
+
+theory Int 
+
+  logic (< ) (int, int)
+  logic (<=) (int, int)
+  logic (> ) (int, int)
+  logic (>=) (int, int)
+  
+  (* TODO : < is a total order relation *)
+
+  logic zero : int = 0
+  logic one  : int = 1
+  
+  clone export algebra.UnitaryCommutativeRing with 
+     type t = int, logic zero = zero, logic one = one
+end 
+
+
+theory Abs
+
+  use import Int
+
+  logic abs(int) : int
+
+  axiom Pos: forall x:int. x >= 0 -> abs(x) = x
+  axiom Neg: forall x:int. x <= 0 -> abs(x) = -x
+
+end
+
+theory MinMax
+
+  use import Int
+
+  logic min(int,int) : int
+  logic max(int,int) : int
+
+  axiom Max_is_ge   : forall x,y:int. max(x,y) >= x and max(x,y) >= y
+  axiom Max_is_some : forall x,y:int. max(x,y) = x or max(x,y) = y
+  axiom Min_is_le   : forall x,y:int. min(x,y) <= x and min(x,y) <= y
+  axiom Min_is_some : forall x,y:int. min(x,y) = x or min(x,y) = y
+
+end
+
+
+theory EuclideanDivision
+  (* TODO *)
+end
+
+theory ComputerDivision
+  (* TODO *)
+end
+
