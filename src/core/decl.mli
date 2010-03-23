@@ -135,4 +135,5 @@ exception NonExhaustiveExpr of (pattern list * expr)
 
 val find_constructors : known_map -> tysymbol -> lsymbol list
 val find_inductive_cases : known_map -> lsymbol -> prop list
+val find_prop : known_map -> prsymbol -> fmla
 

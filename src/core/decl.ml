@@ -494,7 +494,7 @@ let check_decl kn d = match d.d_node with
 let find_constructors kn ts =
   match (Mid.find ts.ts_name kn).d_node with
   | Dtype dl ->
-      begin match List.assoc ts dl with
+      begin match List.assq ts dl with
         | Talgebraic cl -> cl
         | Tabstract -> []
       end
@@ -502,8 +502,16 @@ let find_constructors kn ts =
 
 let find_inductive_cases kn ps =
   match (Mid.find ps.ls_name kn).d_node with
-  | Dind dl -> List.assoc ps dl
+  | Dind dl -> List.assq ps dl
   | Dlogic _ -> []
+  | _ -> assert false
+
+let find_prop kn pr =
+  match (Mid.find pr.pr_name kn).d_node with
+  | Dind dl ->
+      let test (_,l) = List.mem_assq pr l in
+      List.assq pr (snd (List.find test dl))
+  | Dprop (_,pr,f) -> f
   | _ -> assert false
 
 exception NonExhaustiveExpr of (pattern list * expr)
