@@ -181,26 +181,7 @@ let file_sanitizer = None (* We should remove which character? *)
 (*  Ident.sanitizer Ident.char_to_alnumus Ident.char_to_alnumus*)
 
 let print_theory_namespace fmt th =
-  let module T = struct
-    type t = 
-      | Namespace of string * namespace
-      | Leaf of string
-    let contents ns =
-      let acc = 
-	Mnm.fold (fun s ns acc -> (Namespace (s, ns)) :: acc) ns.ns_ns [] 
-      in
-      let add prefix = Mnm.fold (fun s _ acc -> (Leaf (prefix^s)) :: acc) in
-      let acc = add "type " ns.ns_ts acc in
-      let acc = add "logic " ns.ns_ls acc in
-      let acc = add "prop "  ns.ns_pr acc in
-      acc
-    let decomp = function
-      | Namespace (s, ns) -> s, contents ns
-      | Leaf s -> s, [] 
-  end
-  in
-  let module P = Prtree.Make(T) in
-  P.print fmt (T.Namespace (th.th_name.Ident.id_short, th.th_export))
+  Pretty.print_namespace fmt th.th_name.Ident.id_short th.th_export
 
 let do_file env drv src_filename_printer dest_filename_printer file =
   let file,cin = if file = "-" 

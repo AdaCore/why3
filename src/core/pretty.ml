@@ -328,7 +328,7 @@ let print_inst fmt (id1,id2) =
   else if Hid.mem phash id2 then
     let n = id_unique pprinter id1 in
     fprintf fmt "prop %s = %a" n print_pr (Hid.find phash id2)
-  else 
+  else
     fprintf fmt "ident %s = %s" id1.id_long id2.id_long
 
 let print_decl fmt d = match d.d_node with
@@ -358,4 +358,26 @@ let print_theory fmt th =
 let print_named_task fmt name task =
   fprintf fmt "@[<hov 2>task %s@\n%a@]@\nend@\n@."
     name print_task task
+
+module NsTree = struct
+  type t =
+    | Namespace of string * namespace
+    | Leaf      of string
+
+  let contents ns =
+    let add_ns s ns acc = Namespace (s, ns) :: acc in
+    let add_s k s _ acc = Leaf (k ^ s) :: acc in
+    let acc = Mnm.fold add_ns           ns.ns_ns []  in
+    let acc = Mnm.fold (add_s "type ")  ns.ns_ts acc in
+    let acc = Mnm.fold (add_s "logic ") ns.ns_ls acc in
+    let acc = Mnm.fold (add_s "prop ")  ns.ns_pr acc in acc
+
+  let decomp = function
+    | Namespace (s,ns) -> s, contents ns
+    | Leaf s           -> s, []
+end
+
+let print_namespace fmt name ns =
+  let module P = Prtree.Make(NsTree) in
+  P.print fmt (NsTree.Namespace (name, ns))
 

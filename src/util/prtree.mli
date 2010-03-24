@@ -40,6 +40,6 @@ end
     single function [print: formatter -> T.t -> unit] to print a tree on a
     given formatter. *)
 
-module Make : functor (T : Tree) -> sig
+module Make (T : Tree) : sig
   val print : Format.formatter -> T.t -> unit
 end
