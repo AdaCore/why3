@@ -175,8 +175,8 @@ let extract_goals ?filter =
                             (th,task,drv)) l in
     List.rev_append l acc
 
-let file_sanitizer = 
-  Ident.sanitizer Ident.char_to_alnumus Ident.char_to_alnumus
+let file_sanitizer = None (* We should remove which character? *)
+(*  Ident.sanitizer Ident.char_to_alnumus Ident.char_to_alnumus*)
 
 let print_theory_namespace fmt th =
   let module T = struct
@@ -329,9 +329,9 @@ let () =
         exit 0          
       end;
     let src_filename_printer = Ident.create_ident_printer 
-      ~sanitizer:file_sanitizer [] in
+      ?sanitizer:file_sanitizer [] in
     let dest_filename_printer = Ident.create_ident_printer 
-      ~sanitizer:file_sanitizer [] in
+      ?sanitizer:file_sanitizer [] in
     Queue.iter (do_file env drv src_filename_printer dest_filename_printer)
       files
   with e when not !debug ->
