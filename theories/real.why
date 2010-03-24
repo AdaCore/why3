@@ -134,7 +134,7 @@ theory Power
     forall x:real. x > 0.0 -> pow(x,0.5) = sqrt(x)  
 
   axiom Pow_exp_log:
-    forall x:real. x > 0.0 -> pow(x,y) = exp(y*log(x))
+    forall x,y:real. x > 0.0 -> pow(x,y) = exp(y*log(x))
 
 end
 
