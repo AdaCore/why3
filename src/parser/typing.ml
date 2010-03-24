@@ -607,8 +607,12 @@ and fmla env = function
 open Ptree
 
 let add_types dl th =
-  let def =
-    List.fold_left (fun def d -> Mstr.add d.td_ident.id d def) Mstr.empty dl
+  let def = List.fold_left 
+    (fun def d ->
+      let id = d.td_ident.id in 
+      if Mstr.mem id def then error ~loc:d.td_loc (Clash id);
+      Mstr.add id d def) 
+    Mstr.empty dl 
   in
   let tysymbols = Hashtbl.create 17 in
   let rec visit x =
@@ -660,12 +664,11 @@ let add_types dl th =
       Hashtbl.add tysymbols x (Some ts);
       ts
   in
-  let th' =
-    let tsl =
-      Mstr.fold (fun x _ tsl -> let ts = visit x in (ts, Tabstract) :: tsl) def []
-    in
-    add_decl th (create_ty_decl tsl)
+  let tsl = List.rev_map (fun d -> visit d.td_ident.id, Tabstract) dl in 
+  let th' = try add_decl th (create_ty_decl tsl) 
+    with ClashSymbol s -> error ~loc:(Mstr.find s def).td_loc (Clash s)
   in
+  let csymbols = Hashtbl.create 17 in
   let decl d =
     let ts, th' = match Hashtbl.find tysymbols d.td_ident.id with
       | None ->
@@ -688,6 +691,7 @@ let add_types dl th =
 	  let constructor (loc, id, pl) =
 	    let param (_, t) = ty_of_dty (dty th' t) in
 	    let tyl = List.map param pl in
+	    Hashtbl.replace csymbols id.id loc;
 	    create_fconstr (id_user id.id loc) tyl ty
 	  in
 	  Talgebraic (List.map constructor cl)
@@ -695,7 +699,8 @@ let add_types dl th =
     ts, d
   in
   let dl = List.map decl dl in
-  List.fold_left add_decl th (create_ty_decls dl)
+  try List.fold_left add_decl th (create_ty_decls dl)
+  with ClashSymbol s -> error ~loc:(Hashtbl.find csymbols s) (Clash s)
 
 let env_of_vsymbol_list vl =
   List.fold_left (fun env v -> Mstr.add v.vs_name.id_short v env) Mstr.empty vl
@@ -799,18 +804,6 @@ let loc_of_id id = match id.id_origin with
   | _ -> assert false
 
 let add_inductives dl th =
-  (* 0. create all propositional symbols *)
-  let propsyms = Hashtbl.create 17 in
-  let create_prsyms th (loc, id, _) =
-    let ps = create_prsymbol (id_user id.id loc) in
-    Hashtbl.add propsyms id.id ps;
-    try add_decl th (create_prop_decl Paxiom ps f_true)
-    with ClashSymbol s -> error ~loc (Clash s)
-  in
-  let create_prsyms th d = 
-    List.fold_left create_prsyms th d.in_def 
-  in
-  ignore (List.fold_left create_prsyms th dl);
   (* 1. create all symbols and make an environment with these symbols *)
   let psymbols = Hashtbl.create 17 in
   let create_symbol th d =
@@ -826,11 +819,13 @@ let add_inductives dl th =
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
+  let propsyms = Hashtbl.create 17 in
   let type_decl d =
     let id = d.in_ident.id in
     let ps = Hashtbl.find psymbols id in
     let clause (loc, id, f) =
-      Hashtbl.find propsyms id.id, fmla th' f
+      Hashtbl.replace propsyms id.id loc;
+      create_prsymbol (id_user id.id loc), fmla th' f
     in
     ps, List.map clause d.in_def
   in
@@ -838,6 +833,7 @@ let add_inductives dl th =
   try
     List.fold_left add_decl th (create_ind_decls dl)
   with
+  | ClashSymbol s -> error ~loc:(Hashtbl.find propsyms s) (Clash s)
   | InvalidIndDecl (_,pr) -> errorm ~loc:(loc_of_id pr.pr_name)
       "not a clausal form"
   | NonPositiveIndDecl (_,pr,s) -> errorm ~loc:(loc_of_id pr.pr_name)
