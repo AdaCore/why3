@@ -99,23 +99,41 @@ let rec split_neg split_pos acc f =
     | Fquant (Fforall,_) -> f::acc
 
 
-let elt split_pos d =
+let elt is_split_kind split_pos d =
   match d.d_node with
-    | Dprop (Pgoal,pr,f) ->
+    | Dprop (k,pr,f) when is_split_kind k ->
         let l = split_pos [] f in
-        List.map (fun p -> [create_prop_decl Pgoal 
+        List.map (fun p -> [create_prop_decl k 
                               (create_prsymbol (id_clone pr.pr_name)) p]) l
     | _ -> [[d]]
 
-let t fsp = Register.store (fun () -> Trans.decl_l (elt fsp) None)
+let is_split_goal = function Pgoal -> true | _ -> false
+let is_split_axiom = function Paxiom -> true | _ -> false
+let is_split_all = function _ -> true
+
+let t isk fsp = Register.store (fun () -> Trans.decl_l (elt isk fsp) None)
 
 let split_pos1 = split_pos (fun acc x -> x::acc)
 
 let rec split_pos2 acc d = split_pos split_neg2 acc d
 and split_neg2 acc d = split_neg split_pos2 acc d
 
-let split_pos = t split_pos1
-let split_pos_neg = t split_pos2
+let split_pos_goal = t is_split_goal split_pos1
+let split_pos_neg_goal = t is_split_goal split_pos2
+let split_pos_axiom = t is_split_axiom split_pos1
+let split_pos_neg_axiom = t is_split_axiom split_pos2
+let split_pos_all = t is_split_all split_pos1
+let split_pos_neg_all = t is_split_all split_pos2
 
-let () = Driver.register_transform_l "split_goal_pos" split_pos
-let () = Driver.register_transform_l "split_goal_pos_neg" split_pos_neg
+let () = Driver.register_transform_l 
+  "split_goal_pos_goal" split_pos_goal
+let () = Driver.register_transform_l 
+  "split_goal_pos_neg_goal" split_pos_neg_goal
+let () = Driver.register_transform_l 
+  "split_goal_pos_axiom" split_pos_axiom
+let () = Driver.register_transform_l 
+  "split_goal_pos_neg_axiom" split_pos_neg_axiom
+let () = Driver.register_transform_l 
+  "split_goal_pos_all" split_pos_all
+let () = Driver.register_transform_l 
+  "split_goal_pos_neg_all" split_pos_neg_all
