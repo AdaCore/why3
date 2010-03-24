@@ -22,7 +22,7 @@ theory MinMax
   type t
   logic ge(t,t)
 
-  logic min(tty,t) : t
+  logic min(t,t) : t
   logic max(t,t) : t
 
   axiom Max_is_ge   : forall x,y:t. ge(max(x,y),x) and ge(max(x,y),y)
