@@ -58,10 +58,24 @@ exception CommandError
 exception NoCommandlineProvided      
 
 
-(* this should be changeable by an option
-   (otherwise: The program 'timeout' is currently not installed) *)
-let cpulimit = ref "timeout" (*"why-cpulimit"*)
-
+(* this should be replaced by a proper use of fork/waitpid() *)
+let cpulimit_commands = ["why-cpulimit"; "timeout"]
+let cpulimit = ref (
+  let tmp = ref "" in
+  try
+    List.iter
+      (fun s ->
+         let r = Sys.command (s^" 1 echo") in
+         if r=0 then (tmp:=s; raise Exit))
+    cpulimit_commands;
+    failwith 
+      (List.fold_left
+         (fun acc s -> acc^" "^s^",")
+         "need shell command among:"
+         cpulimit_commands)
+  with Exit -> !tmp)
+     
+    
 
 (* Utils *)
 

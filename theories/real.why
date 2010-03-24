@@ -1,12 +1,12 @@
 
 
 theory Real 
-  logic (< ) (real, real)
+  logic (< )(real, real)
   logic (<=)(real, real)
-  logic (> ) (real, real)
+  logic (> )(real, real)
   logic (>=)(real, real)
   
-  (* TODO : < is a total order relation *)
+  (* TODO : they are total order relations *)
 
   logic zero : real = 0.0
   logic one  : real = 1.0
@@ -67,17 +67,74 @@ theory Truncate
 
 end
 
-theory Sqrt
+theory Square
+
+  use import Real
+
+  logic sqr(x:real):real = x * x
+
+  logic sqrt(real):real
+
+  axiom Sqrt_positive: 
+    forall x:real. x >= 0.0 -> sqrt(x) >= 0.0
+
+  axiom Sqrt_square:  
+    forall x:real. x >= 0.0 -> sqr(sqrt(x)) = x
+
+  axiom Square_sqrt: 
+    forall x:real. x >= 0.0 -> sqrt(x*x) = x
 
 end
 
 theory ExpLog
 
- (* exp, log *)
+  use import Real
+
+  logic exp(real) : real
+  axiom Exp_zero : exp(0.0) = 1.0
+  axiom Exp_sum : forall x,y:real. exp(x+y) = exp(x)*exp(y)
+
+  logic log(real) : real
+  axiom Log_one : log(1.0) = 0.0
+  axiom Log_mul : 
+    forall x,y:real. x > 0.0 and y > 0.0 -> log(x*y) = log(x)+log(y)
+
+  axiom Log_exp: forall x:real. log(exp(x)) = x
+
+  axiom Exp_log: forall x:real. x > 0.0 -> exp(log(x)) = x
+
+  logic log10(x:real) : real = log(x)/log(10.0)
 
 end
 
 theory Power 
+
+  use import Real
+  use import Square
+  use import ExpLog
+
+  logic pow(real,real) : real
+
+  axiom Pow_zero_y:
+    forall y:real. y <> 0.0 -> pow(0.0,y) = 0.0
+
+  axiom Pow_x_zero:
+    forall x:real. x <> 0.0 -> pow(x,0.0) = 1.0
+
+  axiom Pow_x_one:
+    forall x:real. pow(x,1.0) = x
+
+  axiom Pow_one_y:
+    forall y:real. pow(1.0,y) = 1.0
+
+  axiom Pow_x_two:
+    forall x:real. pow(x,2.0) = sqr(x)
+
+  axiom Pow_half:
+    forall x:real. x > 0.0 -> pow(x,0.5) = sqrt(x)  
+
+  axiom Pow_exp_log:
+    forall x:real. x > 0.0 -> pow(x,y) = exp(y*log(x))
 
 end
 

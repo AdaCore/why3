@@ -71,6 +71,6 @@ end
 theory Field
   clone export UnitaryCommutativeRing 
   logic inv(t) : t
-  axiom Inverse : forall x:t. x * inv(x) = one
+  axiom Inverse : forall x:t. x <> zero -> x * inv(x) = one
   logic (/) (x:t, y:t) : t = x * inv(y)
 end
