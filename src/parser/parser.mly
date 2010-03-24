@@ -273,9 +273,9 @@ decl:
 | NAMESPACE UNDERSCORE list0_decl END
     { Namespace (loc (), false, None, $3) }
 | NAMESPACE IMPORT uident list0_decl END
-    { Namespace (loc (), false, Some $3, $4) }
+    { Namespace (loc (), true, Some $3, $4) }
 | NAMESPACE IMPORT UNDERSCORE list0_decl END
-    { Namespace (loc (), false, None, $4) }
+    { Namespace (loc (), true, None, $4) }
 ;
 
 list1_theory:
