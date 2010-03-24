@@ -15,8 +15,9 @@ fail "typing error:\\(.*\\)$" "Failure : File generation error : \\1"
 (* À discuter *)
 transformations
   "simplify_recursive_definition"      
-  (*"split_goal_pos_neg_goal"*) "split_goal_pos_neg_all"
+  "inline_let"
   "inline_trivial"
+  (*"split_goal_pos_neg_goal"*) "split_goal_pos_neg_all"
 end
 
 

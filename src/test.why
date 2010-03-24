@@ -9,7 +9,7 @@ theory Test
 
   goal G : (forall x:int. x=x) or
            (forall x:int. x=x+1)
-  goal G2 : forall x:int. 0 = 1
+  goal G2 : forall x:int. let x = 0 + 1 in x = 1
 end
 
 theory Test_simplify_array
