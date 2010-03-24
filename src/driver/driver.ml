@@ -395,7 +395,7 @@ let print_task drv fmt task = match drv.drv_raw.drv_printer with
 
 let regexp_filename = Str.regexp "%\\([a-z]\\)"
 
-let filename_of_goal drv ident_printer filename theory_name task =
+let filename_of_goal drv filename theory_name task =
   match drv.drv_raw.drv_filename with
     | None -> errorm "no filename syntax given"
     | Some f -> 
@@ -405,7 +405,7 @@ let filename_of_goal drv ident_printer filename theory_name task =
           match i with
             | "f" -> filename
             | "t" -> theory_name
-            | "s" -> id_unique ident_printer pr_name
+            | "s" -> pr_name.id_short
             | _ -> errorm "substitution variable are only %%f %%t and %%s" in
         global_substitute regexp_filename repl_fun f
 
@@ -423,7 +423,7 @@ let call_prover ?debug ?timeout drv task =
   let filename = 
     match drv.drv_raw.drv_filename with
       | None -> None
-      | Some _ -> Some (filename_of_goal drv file_printer "" "" task) in
+      | Some _ -> Some (filename_of_goal drv "why" "call_prover" task) in
   let formatter fmt = print_task drv fmt task in
   call_prover_on_formatter ?debug ?timeout ?filename drv formatter
 

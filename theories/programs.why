@@ -9,7 +9,7 @@ theory Prelude
   logic ref ('a)     : 'a ref
   logic (!_)('a ref) : 'a
 
-  type  unit
+  use export unit.Unit
   logic ignore('a) : unit
 
   type  label

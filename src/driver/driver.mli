@@ -66,9 +66,8 @@ val apply_transforms : driver -> task -> task list
 (** print_task *)
 val print_task : printer
 
-val filename_of_goal : driver -> Ident.ident_printer ->
-  string -> string -> task -> string
-(* filename_of_goal printer file_ident theory_ident ctxt *)
+val filename_of_goal : driver -> string -> string -> task -> string
+(* filename_of_goal filename theory_name ctxt *)
 
 type prover_answer =
     Call_provers.prover_answer =

@@ -78,6 +78,9 @@ val create_ident_printer :
 val id_unique :
   ident_printer -> ?sanitizer : (string -> string) -> ident -> string
 
+(* Uniquify string *)
+val string_unique : ident_printer -> string -> string
+
 (* forget an ident *)
 val forget_id : ident_printer -> ident -> unit
 

@@ -117,6 +117,9 @@ let id_unique (indices,values,san0) ?(sanitizer = same) id =
     Hashtbl.replace values id.id_tag name;
     name
 
+let string_unique printer s =
+  id_unique printer (id_register (id_fresh s))
+
 let forget_id (indices,values,_) id =
   try
     let name = Hashtbl.find values id.id_tag in

@@ -199,7 +199,7 @@ let print_theory_namespace fmt th =
   let module P = Prtree.Make(T) in
   P.print fmt (T.Namespace (th.th_name.Ident.id_short, th.th_export))
 
-let do_file env drv filename_printer file =
+let do_file env drv src_filename_printer dest_filename_printer file =
   if !parse_only then begin
     let filename,c = if file = "-" 
     then "stdin",stdin
@@ -266,21 +266,22 @@ let do_file env drv filename_printer file =
                   try
                     Filename.chop_extension file 
                   with Invalid_argument _ -> file in
-                Ident.id_unique filename_printer 
-                  (Ident.id_register (Ident.id_fresh file)) in
-              let ident_printer = Ident.create_ident_printer 
-                ~sanitizer:file_sanitizer [] in
+                Ident.string_unique src_filename_printer file in
               List.iter 
                 (fun (th,task,drv) ->
-                   let cout = 
-                     if dir = "-" 
-                     then stdout
-                     else
-                       let filename = 
-                         Driver.filename_of_goal drv ident_printer 
-                           file th.th_name.Ident.id_short task in
-                       let filename = Filename.concat dir filename in
-                       open_out filename in
+                   let dest = 
+                     Driver.filename_of_goal drv 
+                       file th.th_name.Ident.id_short task in
+                   (* Uniquify the filename before the extension if it exists*)
+                   let i = 
+                     try String.rindex dest '.' 
+                     with Not_found -> String.length dest in
+                   let name,ext = String.sub dest 0 i, 
+                     String.sub dest i (String.length dest- i) in
+                   let name = Ident.string_unique dest_filename_printer name in
+                   let filename = name^ext in
+                   let filename = Filename.concat dir filename in
+                   let cout = open_out filename in
                    let fmt = formatter_of_out_channel cout in
                    fprintf fmt "%a@?" (Driver.print_task drv) task;
                    close_out cout) goals
@@ -327,9 +328,12 @@ let () =
           (Pp.print_list Pp.newline Pp.string) (Driver.list_transforms ());
         exit 0          
       end;
-    let filename_printer = Ident.create_ident_printer 
+    let src_filename_printer = Ident.create_ident_printer 
       ~sanitizer:file_sanitizer [] in
-    Queue.iter (do_file env drv filename_printer) files
+    let dest_filename_printer = Ident.create_ident_printer 
+      ~sanitizer:file_sanitizer [] in
+    Queue.iter (do_file env drv src_filename_printer dest_filename_printer)
+      files
   with e when not !debug ->
     eprintf "%a@." report e;
     exit 1
