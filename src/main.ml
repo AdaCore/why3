@@ -187,9 +187,10 @@ let print_theory_namespace fmt th =
       let acc = 
 	Mnm.fold (fun s ns acc -> (Namespace (s, ns)) :: acc) ns.ns_ns [] 
       in
-      let acc = Mnm.fold (fun s _ acc -> (Leaf s) :: acc) ns.ns_ts acc in
-      let acc = Mnm.fold (fun s _ acc -> (Leaf s) :: acc) ns.ns_ls acc in
-      let acc = Mnm.fold (fun s _ acc -> (Leaf s) :: acc) ns.ns_pr acc in
+      let add prefix = Mnm.fold (fun s _ acc -> (Leaf (prefix^s)) :: acc) in
+      let acc = add "type " ns.ns_ts acc in
+      let acc = add "logic " ns.ns_ls acc in
+      let acc = add "prop "  ns.ns_pr acc in
       acc
     let decomp = function
       | Namespace (s, ns) -> s, contents ns
