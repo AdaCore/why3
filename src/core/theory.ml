@@ -52,16 +52,20 @@ let ns_add chk x v m =
     m
   with Not_found -> Mnm.add x v m
 
-let merge_ns chk ns1 ns2 =
+let rec merge_ns chk ns1 ns2 =
   { ns_ts = Mnm.fold (ns_add chk) ns1.ns_ts ns2.ns_ts;
     ns_ls = Mnm.fold (ns_add chk) ns1.ns_ls ns2.ns_ls;
-    ns_ns = Mnm.fold (ns_add chk) ns1.ns_ns ns2.ns_ns;
-    ns_pr = Mnm.fold (ns_add chk) ns1.ns_pr ns2.ns_pr; }
+    ns_pr = Mnm.fold (ns_add chk) ns1.ns_pr ns2.ns_pr;
+    ns_ns = Mnm.fold (fusion chk) ns1.ns_ns ns2.ns_ns; }
+
+and fusion chk x ns m =
+  let os = try Mnm.find x m with Not_found -> empty_ns in
+  Mnm.add x (merge_ns chk os ns) m
 
 let add_ts chk x ts ns = { ns with ns_ts = ns_add chk x ts ns.ns_ts }
 let add_ls chk x ls ns = { ns with ns_ls = ns_add chk x ls ns.ns_ls }
 let add_pr chk x pf ns = { ns with ns_pr = ns_add chk x pf ns.ns_pr }
-let add_ns chk x nn ns = { ns with ns_ns = ns_add chk x nn ns.ns_ns }
+let add_ns chk x nn ns = { ns with ns_ns = fusion chk x nn ns.ns_ns }
 
 let rec ns_find get_map ns = function
   | []   -> assert false
@@ -481,22 +485,29 @@ let clone_export uc th inst =
   let lc = Hid.fold add_local cl.nw_local uc.uc_local in
   let uc = { uc with uc_local = lc } in
 
-  let find_ts ts =
-    if Sid.mem ts.ts_name th.th_local
-    then Hts.find cl.ts_table ts else ts in
+  let f_ts n ts ns =
+    if Sid.mem ts.ts_name th.th_local then
+      let ts' = Hts.find cl.ts_table ts in
+      if Hid.mem cl.nw_local ts'.ts_name
+      then add_ts true n ts' ns else ns
+    else add_ts true n ts ns in
 
-  let find_ls ls =
-    if Sid.mem ls.ls_name th.th_local
-    then Hls.find cl.ls_table ls else ls in
+  let f_ls n ls ns =
+    if Sid.mem ls.ls_name th.th_local then
+      let ls' = Hls.find cl.ls_table ls in
+      if Hid.mem cl.nw_local ls'.ls_name
+      then add_ls true n ls' ns else ns
+    else add_ls true n ls ns in
 
-  let find_pr (pr,f) =
-    if Sid.mem pr.pr_name th.th_local
-    then Hpr.find cl.pr_table pr else (pr,f) in
+  let f_pr n (pr,f) ns =
+    if Sid.mem pr.pr_name th.th_local then
+      if Hpr.mem cl.pr_table pr then
+        let (pr',f') = Hpr.find cl.pr_table pr in
+        if Hid.mem cl.nw_local pr'.pr_name
+        then add_pr true n (pr',f') ns else ns
+      else ns
+    else add_pr true n (pr,f) ns in
 
-  let f_ts n ts ns = add_ts true n (find_ts ts) ns in
-  let f_ls n ls ns = add_ls true n (find_ls ls) ns in
-  let f_pr n pr ns = try add_pr true n (find_pr pr) ns
-    with Not_found -> ns (* goals are not cloned *) in
   let rec f_ns n s = add_ns true n (merge_namespace empty_ns s)
 
   and merge_namespace acc ns =

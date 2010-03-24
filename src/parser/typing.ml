@@ -33,7 +33,6 @@ open Denv
 
 type error =
   | Message of string
-  | ClashType of string
   | DuplicateTypeVar of string
   | TypeArity of qualid * int * int
   | Clash of string
@@ -41,7 +40,6 @@ type error =
   | TermExpected
   | BadNumberOfArguments of Ident.ident * int * int
   | ClashTheory of string
-  | ClashNamespace of string
   | UnboundTheory of qualid
   | AlreadyTheory of string
   | UnboundFile of string
@@ -77,8 +75,6 @@ let rec print_qualid fmt = function
 let report fmt = function
   | Message s ->
       fprintf fmt "%s" s
-  | ClashType s ->
-      fprintf fmt "clash with previous type %s" s
   | DuplicateTypeVar s ->
       fprintf fmt "duplicate type parameter %s" s
   | TypeArity (id, a, n) ->
@@ -95,8 +91,6 @@ let report fmt = function
       fprintf fmt "but is expecting %d arguments@]" m
   | ClashTheory s ->
       fprintf fmt "clash with previous theory %s" s
-  | ClashNamespace s ->
-      fprintf fmt "clash with previous namespace %s" s
   | UnboundTheory q ->
       fprintf fmt "unbound theory %a" print_qualid q
   | AlreadyTheory s ->
@@ -613,15 +607,8 @@ and fmla env = function
 open Ptree
 
 let add_types dl th =
-  let ns = get_namespace th in
   let def =
-    List.fold_left
-      (fun def d ->
-	 let id = d.td_ident in
-	 if Mstr.mem id.id def || Mnm.mem id.id ns.ns_ts then
-	   error ~loc:id.id_loc (ClashType id.id);
-	 Mstr.add id.id d def)
-      Mstr.empty dl
+    List.fold_left (fun def d -> Mstr.add d.td_ident.id d def) Mstr.empty dl
   in
   let tysymbols = Hashtbl.create 17 in
   let rec visit x =
@@ -714,21 +701,18 @@ let env_of_vsymbol_list vl =
   List.fold_left (fun env v -> Mstr.add v.vs_name.id_short v env) Mstr.empty vl
 
 let add_logics dl th =
-  let ns = get_namespace th in
   let fsymbols = Hashtbl.create 17 in
   let psymbols = Hashtbl.create 17 in
   let denvs = Hashtbl.create 17 in
   (* 1. create all symbols and make an environment with these symbols *)
   let create_symbol th d =
     let id = d.ld_ident.id in
-    if Hashtbl.mem denvs id || Mnm.mem id ns.ns_ls
-      then error ~loc:d.ld_loc (Clash id);
     let v = id_user id d.ld_loc in
     let denv = create_denv th in
     Hashtbl.add denvs id denv;
     let type_ty (_,t) = ty_of_dty (dty denv t) in
     let pl = List.map type_ty d.ld_params in
-    match d.ld_type with
+    try match d.ld_type with
       | None -> (* predicate *)
 	  let ps = create_psymbol v pl in
 	  Hashtbl.add psymbols id ps;
@@ -738,6 +722,7 @@ let add_logics dl th =
 	  let fs = create_fsymbol v pl t in
 	  Hashtbl.add fsymbols id fs;
 	  add_decl th (create_logic_decl [fs, None])
+    with ClashSymbol s -> error ~loc:d.ld_loc (Clash s)
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
@@ -807,28 +792,37 @@ let add_prop k loc s f th =
   let f = fmla th f in
   try
     add_decl th (create_prop_decl k (create_prsymbol (id_user s.id loc)) f)
-  with ClashSymbol _ ->
-    error ~loc (Clash s.id)
+  with ClashSymbol s -> error ~loc (Clash s)
 
 let loc_of_id id = match id.id_origin with
   | User loc -> loc
   | _ -> assert false
 
 let add_inductives dl th =
-  let ns = get_namespace th in
-  let psymbols = Hashtbl.create 17 in
+  (* 0. create all propositional symbols *)
+  let propsyms = Hashtbl.create 17 in
+  let create_prsyms th (loc, id, _) =
+    let ps = create_prsymbol (id_user id.id loc) in
+    Hashtbl.add propsyms id.id ps;
+    try add_decl th (create_prop_decl Paxiom ps f_true)
+    with ClashSymbol s -> error ~loc (Clash s)
+  in
+  let create_prsyms th d = 
+    List.fold_left create_prsyms th d.in_def 
+  in
+  ignore (List.fold_left create_prsyms th dl);
   (* 1. create all symbols and make an environment with these symbols *)
+  let psymbols = Hashtbl.create 17 in
   let create_symbol th d =
     let id = d.in_ident.id in
-    if Hashtbl.mem psymbols id || Mnm.mem id ns.ns_ls
-      then error ~loc:d.in_loc (Clash id);
     let v = id_user id d.in_loc in
     let denv = create_denv th in
     let type_ty t = ty_of_dty (dty denv t) in
     let pl = List.map type_ty d.in_params in
     let ps = create_psymbol v pl in
     Hashtbl.add psymbols id ps;
-    add_decl th (create_logic_decl [ps, None])
+    try add_decl th (create_logic_decl [ps, None])
+    with ClashSymbol s -> error ~loc:d.in_loc (Clash s)
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
@@ -836,7 +830,7 @@ let add_inductives dl th =
     let id = d.in_ident.id in
     let ps = Hashtbl.find psymbols id in
     let clause (loc, id, f) =
-      create_prsymbol (id_user id.id loc), fmla th' f
+      Hashtbl.find propsyms id.id, fmla th' f
     in
     ps, List.map clause d.in_def
   in
@@ -953,21 +947,14 @@ and add_decl env lenv th = function
 	    close_namespace th true n
 	| Export ->
 	    use_or_clone th
-      with ClashSymbol s ->
-	error ~loc (Clash s)
+      with ClashSymbol s -> error ~loc (Clash s)
       end
-  | Namespace (_, import, name, dl) ->
-      let ns = get_namespace th in
-      let id = match name with
-        | Some { id=id; id_loc=loc } ->
-            if Mnm.mem id ns.ns_ns then error ~loc (ClashNamespace id);
-            Some id
-        | None ->
-            None
-      in
+  | Namespace (loc, import, name, dl) ->
       let th = open_namespace th in
       let th = add_decls env lenv th dl in
-      close_namespace th import id
+      let id = option_map (fun id -> id.id) name in
+      try close_namespace th import id
+      with ClashSymbol s -> error ~loc (Clash s)
 
 and type_and_add_theory env lenv pt =
   let id = pt.pt_name in
