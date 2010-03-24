@@ -52,7 +52,8 @@ let rec report fmt = function
   | Pgm_typing.Error e ->
       Pgm_typing.report fmt e
   | e ->
-      fprintf fmt "anomaly: %s" (Printexc.to_string e)
+      raise e
+(*       fprintf fmt "anomaly: %s" (Printexc.to_string e) *)
 
 open Pgm_ptree
 open Theory
@@ -67,6 +68,8 @@ let type_file file =
   close_in c;
   if !parse_only then raise Exit;
   let uc = Theory.create_theory (Ident.id_fresh "Pgm") in
+  let th = Env.find_theory env ["programs"] "Prelude" in
+  let uc = Theory.use_export uc th in
   let _uc = 
     List.fold_left
       (fun uc d -> match d with

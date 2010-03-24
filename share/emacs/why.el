@@ -26,7 +26,7 @@
 
 (defconst why-font-lock-keywords-1
   (list
-   '("(\\*\\([^*]\\|\\*[^)]\\)*\\*)" . font-lock-comment-face)
+   '("(\\*\\([^*)]\\([^*]\\|\\*[^)]\\)*\\)?\\*)" . font-lock-comment-face)
    '("{\\([^}]*\\)}" . font-lock-type-face)
    `(,(why-regexp-opt '("use" "clone" "namespace" "import" "export" "inductive" "external" "logic" "parameter" "exception" "axiom" "lemma" "goal" "type")) . font-lock-builtin-face)
    `(,(why-regexp-opt '("match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "invariant" "variant" "do" "done" "assert" "assume" "check" "ghost" "try" "with" "theory" "uses")) . font-lock-keyword-face)

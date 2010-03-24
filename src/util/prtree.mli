@@ -17,50 +17,29 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type loc = Loc.position
+(*s This module provides a generic ASCII pretty-printing function for trees,
+    in a way similar to what the Unix command pstree does:
 
-type ident = Ptree.ident
+bash-+-emacs-+-emacsserver
+     |       `-ispell
+     |-pstree
+     `-xdvi.bin
+*)
 
-type qualid = Ptree.qualid
+(*s A tree structure is given as an abstract type [t] together with a
+    decomposition function [decomp] returning the label of the node and
+    the list of the children trees. Leaves are nodes with no child (i.e.
+    an empty list). *)
 
-type constant = Term.constant
+module type Tree = sig
+  type t
+  val decomp : t -> string * t list
+end
 
-type assertion_kind = Aassert | Aassume | Acheck
+(*s The functor [Make] takes a tree structure [T] as argument and provides a
+    single function [print: formatter -> T.t -> unit] to print a tree on a
+    given formatter. *)
 
-type lexpr = Ptree.lexpr
-
-type lazy_op = LazyAnd | LazyOr
-
-type loop_annotation = {
-  loop_invariant : lexpr option;
-  loop_variant   : lexpr option;
-}
-
-type expr = {
-  expr_desc : expr_desc;
-  expr_loc  : loc;
-}
-
-and expr_desc =
-  (* lambda-calculus *)
-  | Econstant of constant
-  | Eident of qualid
-  | Eapply of expr * expr
-  | Elet of ident * expr * expr
-  (* control *)
-  | Esequence of expr * expr
-  | Eif of expr * expr * expr
-  | Ewhile of expr * loop_annotation * expr
-  | Elazy of lazy_op * expr * expr
-  | Eskip 
-  (* annotations *)
-  | Eassert of assertion_kind * lexpr
-  | Eghost of expr
-  | Elabel of ident * expr
-
-type decl =
-  | Dcode  of ident * expr
-  | Dlogic of Ptree.decl list
-
-type file = decl list
-
+module Make : functor (T : Tree) -> sig
+  val print : Format.formatter -> T.t -> unit
+end

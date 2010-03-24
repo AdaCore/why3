@@ -57,6 +57,7 @@ let list_printers = ref false
 let list_transforms = ref false
 (*let list_goals = ref false*)
 let print_debug = ref false
+let print_namespace = ref false
 
 let () = 
   Arg.parse 
@@ -88,7 +89,9 @@ provers (0 unlimited, default 10)";
 registered";
 (*     "--list-goals", Arg.Set list_goals, "list the goals of the files";*)
      "--print-debug", Arg.Set print_debug, "print on stderr the theories of \
-the files given on the commandline" 
+the files given on the commandline"; 
+     "--print-namespace", Arg.Set print_namespace, "print on stderr the \
+namespaces for the files given on the command line";
     ]
     (fun f -> Queue.push f files)
     "usage: why [options] files..."
@@ -175,6 +178,27 @@ let extract_goals ?filter =
 let file_sanitizer = 
   Ident.sanitizer Ident.char_to_alnumus Ident.char_to_alnumus
 
+let print_theory_namespace fmt th =
+  let module T = struct
+    type t = 
+      | Namespace of string * namespace
+      | Leaf of string
+    let contents ns =
+      let acc = 
+	Mnm.fold (fun s ns acc -> (Namespace (s, ns)) :: acc) ns.ns_ns [] 
+      in
+      let acc = Mnm.fold (fun s _ acc -> (Leaf s) :: acc) ns.ns_ts acc in
+      let acc = Mnm.fold (fun s _ acc -> (Leaf s) :: acc) ns.ns_ls acc in
+      let acc = Mnm.fold (fun s _ acc -> (Leaf s) :: acc) ns.ns_pr acc in
+      acc
+    let decomp = function
+      | Namespace (s, ns) -> s, contents ns
+      | Leaf s -> s, [] 
+  end
+  in
+  let module P = Prtree.Make(T) in
+  P.print fmt (T.Namespace (th.th_name.Ident.id_short, th.th_export))
+
 let do_file env drv filename_printer file =
   if !parse_only then begin
     let filename,c = if file = "-" 
@@ -187,9 +211,14 @@ let do_file env drv filename_printer file =
   end else begin
     let m = Typing.read_file env file in
     if !print_debug then
-      eprintf "%a"
+      eprintf "%a@."
         (Pp.print_iter2 Mnm.iter Pp.newline Pp.nothing Pp.nothing 
            Pretty.print_theory)
+        m;
+    if !print_namespace then
+      eprintf "%a@."
+        (Pp.print_iter2 Mnm.iter Pp.newline Pp.nothing Pp.nothing 
+           print_theory_namespace)
         m;
     if not !type_only then
       let drv =  

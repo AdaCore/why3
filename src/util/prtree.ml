@@ -17,50 +17,46 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type loc = Loc.position
+(*s Tree structures. *)
 
-type ident = Ptree.ident
+module type Tree = sig
+  type t
+  val decomp : t -> string * t list
+end
 
-type qualid = Ptree.qualid
+(*s Pretty-print functor. *)
 
-type constant = Term.constant
+module Make(T : Tree) = struct
 
-type assertion_kind = Aassert | Aassume | Acheck
+  open Format
 
-type lexpr = Ptree.lexpr
+  (* [print_node] prints one node and [print_sons] its children.
+     [pref] is the prefix to output at the beginning of line
+     and [start] is the branching drawing (["+-"] the first time, 
+     and then ["|-"]). *)
 
-type lazy_op = LazyAnd | LazyOr
+  let print fmt t =
+    let rec print_node pref t = 
+      let (s, sons) = T.decomp t in
+      pp_print_string fmt s;
+      if sons <> [] then 
+        let w = String.length s in
+        let pref' = pref ^ String.make (w + 1) ' ' in
+        match sons with
+          | [t'] -> pp_print_string fmt "---"; print_node (pref' ^ "  ") t'
+          | _ -> pp_print_string fmt "-"; print_sons pref' "+-" sons
 
-type loop_annotation = {
-  loop_invariant : lexpr option;
-  loop_variant   : lexpr option;
-}
+    and print_sons pref start = function
+      | [] -> 
+          assert false
+      | [s] -> 
+          pp_print_string fmt "`-"; print_node (pref ^ "  ") s
+      | s :: sons -> 
+          pp_print_string fmt start; print_node (pref ^ "| ") s;
+          pp_force_newline fmt (); pp_print_string fmt pref;
+          print_sons pref "|-" sons
 
-type expr = {
-  expr_desc : expr_desc;
-  expr_loc  : loc;
-}
-
-and expr_desc =
-  (* lambda-calculus *)
-  | Econstant of constant
-  | Eident of qualid
-  | Eapply of expr * expr
-  | Elet of ident * expr * expr
-  (* control *)
-  | Esequence of expr * expr
-  | Eif of expr * expr * expr
-  | Ewhile of expr * loop_annotation * expr
-  | Elazy of lazy_op * expr * expr
-  | Eskip 
-  (* annotations *)
-  | Eassert of assertion_kind * lexpr
-  | Eghost of expr
-  | Elabel of ident * expr
-
-type decl =
-  | Dcode  of ident * expr
-  | Dlogic of Ptree.decl list
-
-type file = decl list
-
+    in
+    print_node "" t
+        
+end

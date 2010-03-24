@@ -2,9 +2,8 @@
 (* test file for ML-why *)
 
 { 
-  use import programs.Prelude
-  type foo
-  logic foo : foo
+  type t
+  logic foo : t
   logic f(int) : int 
   logic g(x : int) : int = f(x+1)
 }
@@ -17,6 +16,8 @@ let p =
     ignore (!x + f 1);
     g 2
   end
+
+let q = f(1)
 
 { 
   axiom A : forall x:int. f(x) = g(x-1)

@@ -121,7 +121,8 @@ CORE_CMO := ident.cmo ty.cmo term.cmo pattern.cmo decl.cmo theory.cmo\
 	task.cmo pretty.cmo trans.cmo env.cmo register.cmo
 CORE_CMO := $(addprefix src/core/,$(CORE_CMO))
 
-UTIL_CMO := pp.cmo loc.cmo util.cmo hashcons.cmo sysutil.cmo hashweak.cmo
+UTIL_CMO := pp.cmo loc.cmo prtree.cmo util.cmo hashcons.cmo \
+            sysutil.cmo hashweak.cmo
 UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
 
 PARSER_CMO := parser.cmo lexer.cmo denv.cmo typing.cmo 
