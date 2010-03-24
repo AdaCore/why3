@@ -12,6 +12,8 @@ theory GenFloat
   use import Rounding
   use import real.Real
   use import real.Abs
+  use import real.FromInt
+  use int.Int
 
   type t
 
@@ -39,8 +41,9 @@ theory GenFloat
 
   axiom Exact_rounding_for_integers:
     forall m:mode,i:int.
-     - max_representable_integer <= i <= max_representable_integer ->
-       round(m,from_int(i)) = from_int(i)
+      Int.(<=)(Int.(-_)(max_representable_integer), i) and 
+      Int.(<=)(i, max_representable_integer) ->
+        round(m,from_int(i)) = from_int(i)
 
   (* rounding up and down *)
   axiom Round_down_le: 
@@ -73,7 +76,7 @@ theory Double
   type double
 
   logic max_double : real = 0x1.FFFFFFFFFFFFFp1023
-  logic max_int = 9007199254740992 (* 2^23 *)
+  logic max_int : int = 9007199254740992 (* 2^23 *)
 
   clone export GenFloat with 
     type t = double, 
