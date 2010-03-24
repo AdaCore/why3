@@ -59,7 +59,9 @@ exception NoCommandlineProvided
 
 
 (* this should be replaced by a proper use of fork/waitpid() *)
-let cpulimit_commands = ["why-cpulimit"; "timeout"]
+let dirname = Filename.dirname Sys.argv.(0)
+let cpulimit_local = Filename.concat dirname "why-cpulimit"
+let cpulimit_commands = ["why-cpulimit"; cpulimit_local(* ; "timeout"*)]
 let cpulimit = ref (
   let tmp = ref "" in
   try
