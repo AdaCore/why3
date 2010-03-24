@@ -1,32 +1,33 @@
 
-(* Why driver for Alt-Ergo *)
+(* Why driver for SMT syntax *)
 
-prelude "(* this is a prelude for Alt-Ergo*)"
+prelude "(* this is a prelude for smtlib*)"
 
-printer "alt-ergo"
-filename "%f-%t-%s.why"
-call_on_file  "alt-ergo %s"
+printer "smtv1"
+filename "%f-%t-%s.smt"
+call_on_file  "z3 -smt %s"
+call_on_stdin  "z3 -smt -in"
 
-valid "Valid"
-invalid "Invalid"
-unknown "I don't know" "Unknown"
-fail "typing error:\\(.*\\)$" "Failure : File generation error : \\1"
+valid "unsat"
+unknown "unknown\\|sat|Fail" "Unknown"
 
 (* À discuter *)
 transformations
   "simplify_recursive_definition"      
   (*"split_goal_pos_neg_goal"*) "split_goal_pos_neg_all"
   "inline_trivial"
+  "remove_logic_definition"
+  "encoding_decorate"
 end
 
 
 theory BuiltIn
-  syntax type int "int"
-  syntax type real "real"
+  syntax type int "Int"
+  syntax type real "Real"
 
-  syntax logic (_=_) "(%1 = %2)"
+  syntax logic (_=_) "(= %1 %2)"
 
-  syntax logic (_<>_) "(%1 <> %2)"
+  syntax logic (_<>_) "(not (= %1 %2))"
 
 end
 
@@ -37,15 +38,15 @@ theory int.Int
 
   syntax logic zero "0"
 
-  syntax logic (_+_) "(%1 + %2)"
-  syntax logic (_-_) "(%1 - %2)"
-  syntax logic (_*_) "(%1 * %2)"
+  syntax logic (_+_) "(+ %1 %2)"
+  syntax logic (_-_) "(- %1 %2)"
+  syntax logic (_*_) "(* %1 %2)"
   syntax logic (-_)  "(-%1)"
 
-  syntax logic (_<=_) "(%1 <= %2)"
-  syntax logic (_<_) "(%1 <  %2)"
-  syntax logic (_>=_) "(%1 >= %2)"
-  syntax logic (_>_) "(%1 >  %2)"
+  syntax logic (_<=_) "(<= %1 %2)"
+  syntax logic (_< _) "(< %1 %2)"
+  syntax logic (_>=_) "(>= %1 %2)"
+  syntax logic (_> _) "(> %1 %2)"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc

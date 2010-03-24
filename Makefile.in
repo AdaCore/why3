@@ -220,7 +220,10 @@ bin/gwhy.byte: $(GCMO)
 
 WHYVO=lib/coq/Why.vo
 
-bench:: $(BINARY) 
+bench/bench : bench/bench.in
+	./config.status
+
+bench:: $(BINARY) bench/bench
 	sh bench/bench "$(BINARY) -I theories/"
 
 BENCH_PLUGINS_CMO := helloworld.cmo simplify_array.cmo
@@ -596,7 +599,6 @@ headers:
 
 # myself
 ########
-
 Makefile: Makefile.in config.status
 	./config.status
 

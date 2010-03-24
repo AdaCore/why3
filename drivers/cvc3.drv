@@ -31,7 +31,7 @@ theory BuiltIn
 end
 
 
-theory prelude.Int
+theory int.Int
 
   prelude "(* this is a prelude for Alt-Ergo arithmetic *)"
 
@@ -40,7 +40,6 @@ theory prelude.Int
   syntax logic (_+_) "(+ %1 %2)"
   syntax logic (_-_) "(- %1 %2)"
   syntax logic (_*_) "(* %1 %2)"
-  syntax logic (_/_) "(div_int %1 %2)"
   syntax logic (-_)  "(-%1)"
 
   syntax logic (_<=_) "(<= %1 %2)"

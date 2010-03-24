@@ -37,11 +37,10 @@ bads () {
 drivers () {
     for f in $1/*.drv; do
 	echo -n "  "$f"... "
-	base=$1/`basename $f .why`
 	# running Why
-	if ! $pgm $2 $f > /dev/null 2>&1; then
+	if ! echo "theory Test goal G : 1=2 end" | $pgm --driver $f --all-goals --output-file - - > /dev/null 2>&1; then
 	    echo "why FAILED"
-	    $pgm $2 $f
+            echo "theory Test goal G : 1=2 end" | $pgm --driver $f --all-goals --output-file - -
 	    exit 1
 	fi
 	echo "why ok... "
@@ -67,6 +66,6 @@ goods theories --type-only
 echo ""
 
 echo "=== Checking drivers ==="
-drivers drivers --driver
+drivers drivers
 echo ""
 

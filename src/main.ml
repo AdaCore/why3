@@ -92,6 +92,8 @@ registered";
 the files given on the commandline"; 
      "--print-namespace", Arg.Set print_namespace, "print on stderr the \
 namespaces for the files given on the command line";
+     "-", Arg.Unit (fun () -> Queue.push "-" files), 
+     "parse the file from stdin"
     ]
     (fun f -> Queue.push f files)
     "usage: why [options] files..."
@@ -201,16 +203,17 @@ let print_theory_namespace fmt th =
   P.print fmt (T.Namespace (th.th_name.Ident.id_short, th.th_export))
 
 let do_file env drv src_filename_printer dest_filename_printer file =
+  let file,cin = if file = "-" 
+  then "stdin",stdin
+  else file, open_in file in
   if !parse_only then begin
-    let filename,c = if file = "-" 
-    then "stdin",stdin
-    else file, open_in file in
-    let lb = Lexing.from_channel c in
-    Loc.set_file filename lb;
+    let lb = Lexing.from_channel cin in
+    Loc.set_file file lb;
     let _ = Lexer.parse_logic_file lb in 
-    if file <> "-" then close_in c
+    close_in cin
   end else begin
-    let m = Typing.read_file env file in
+    let m = Typing.read_channel env file cin in
+    close_in cin;
     if !print_debug then
       eprintf "%a@."
         (Pp.print_iter2 Mnm.iter Pp.newline Pp.nothing Pp.nothing 
