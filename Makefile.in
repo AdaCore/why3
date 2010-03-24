@@ -220,8 +220,8 @@ bin/gwhy.byte: $(GCMO)
 
 WHYVO=lib/coq/Why.vo
 
-bench/bench : bench/bench.in
-	./config.status
+bench/bench : bench/bench.in config.status
+	./config.status --file bench/bench
 
 bench:: $(BINARY) bench/bench
 	sh bench/bench "$(BINARY) -I theories/"
@@ -600,7 +600,7 @@ headers:
 # myself
 ########
 Makefile: Makefile.in config.status
-	./config.status
+	./config.status --file Makefile
 
 config.status: configure
 	./config.status --recheck
@@ -609,7 +609,7 @@ configure: configure.in
 	autoconf 
 
 src/driver/dynlink_compat.ml: src/driver/dynlink_compat.ml.in config.status
-	./config.status
+	./config.status --file src/driver/dynlink_compat.ml
 
 # clean and depend
 ##################
