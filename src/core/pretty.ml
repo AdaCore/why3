@@ -347,16 +347,16 @@ let print_tdecl fmt = function
         print_th th (print_list comma print_inst) inst
 
 let print_decls fmt dl =
-  fprintf fmt "@[<hov>%a@\n@]" (print_list newline2 print_decl) dl
+  fprintf fmt "@[<hov>%a@]@." (print_list newline2 print_decl) dl
 
 let print_task fmt task = print_decls fmt (task_decls task)
 
 let print_theory fmt th =
-  fprintf fmt "@[<hov 2>theory %a@\n%a@]@\nend@\n@."
+  fprintf fmt "@[<hov 2>theory %a@\n%a@]@\nend@."
     print_th th (print_list newline2 print_tdecl) th.th_decls
 
 let print_named_task fmt name task =
-  fprintf fmt "@[<hov 2>task %s@\n%a@]@\nend@\n@."
+  fprintf fmt "@[<hov 2>task %s@\n%a@]@\nend@."
     name print_task task
 
 module NsTree = struct
@@ -379,5 +379,5 @@ end
 
 let print_namespace fmt name ns =
   let module P = Prtree.Make(NsTree) in
-  P.print fmt (NsTree.Namespace (name, ns))
+  fprintf fmt "@[<hov>%a@]@." P.print (NsTree.Namespace (name, ns))
 
