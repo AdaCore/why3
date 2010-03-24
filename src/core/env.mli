@@ -33,3 +33,4 @@ val env_tag : env -> int
 
 exception TheoryNotFound of string list * string
 
+val print_theorynotfound : Format.formatter -> string list * string -> unit

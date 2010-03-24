@@ -21,13 +21,18 @@ open Term
 open Theory
 open Env
 
-let prelude = ["prelude"]
+let prelude = ["array"]
 let array = "Array"
 let store = ["store"]
 let select = ["select"]
 
 let make_rt_rf env =
-  let array  = find_theory env prelude array in
+  let array  = 
+    try
+      find_theory env prelude array
+    with TheoryNotFound (l,s) -> 
+      Format.eprintf "The theory %a is unknown" print_theorynotfound (l,s); 
+      exit 1 in 
   let store  = (ns_find_ls array.th_export store).ls_name in
   let select = (ns_find_ls array.th_export select).ls_name in
   let rec rt t =
