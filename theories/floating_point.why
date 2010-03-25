@@ -1,9 +1,26 @@
 
 
+(* definition of IEEE-754 rounding modes *)
 theory Rounding
 
   type mode = Near | Zero | Up | Down | NearTiesToAway
     (** nearest ties to even, to zero, upward, downward, nearest ties to away *)
+
+end
+
+
+(* handling of IEEE-754 special values +\infty, -\infty, NaN, +0, -0 *)
+theory SpecialValues
+ 
+  type class = Finite | Infinite | NaN 
+
+  type sign = Neg | Pos
+
+  use import real.Real
+
+  inductive same_sign_real(sign,real) =
+    | Neg_case: forall x:real. x < 0.0 -> same_sign_real(Neg,x)
+    | Pos_case: forall x:real. x > 0.0 -> same_sign_real(Pos,x)
 
 end
 
@@ -57,6 +74,17 @@ theory GenFloat
 
 end
 
+theory GenFloatFull
+
+  use import GenFloat
+  use import SpecialValues
+
+  (* special values *)
+  logic class(t) : class
+  logic sign(t)  : sign
+
+end
+
 theory Single
 
   type single
@@ -70,6 +98,8 @@ theory Single
     logic max_representable_integer = max_int
 
 end
+
+
 
 theory Double
 

@@ -19,3 +19,52 @@ theory Array
   axiom Const : forall b:'b. forall a:'a. select(const(b),a) = b
 
 end
+
+
+theory BitVector
+
+  use export bool.Bool
+  use import int.Int
+
+  logic size : int 
+
+  type bv
+
+  logic nth(bv,int): bool
+  
+  logic bvzero : bv
+  axiom Nth_zero: 
+    forall n:int. 0 <= n and n < size -> nth(bvzero,n) = False
+
+  logic bvone : bv
+  axiom Nth_one: 
+    forall n:int. 0 <= n and n < size -> nth(bvone,n)  = True
+
+  logic eq(v1:bv,v2:bv) =
+    forall n:int. 0 <= n and n < size -> nth(v1,n) = nth(v2,n)
+
+  logic bw_and(v1:bv,v2:bv) : bv
+  axiom Nth_bw_and: 
+    forall v1,v2:bv,n:int. 0 <= n and n < size -> 
+      nth(bw_and(v1,v2),n)  = andb(nth(v1,n),nth(v2,n))
+
+
+end
+
+
+theory BV32
+
+  logic size : int = 32
+
+  clone export BitVector with logic size = size
+
+end
+
+theory TestBv32
+
+  use import BV32
+
+  lemma Test1:
+    let b = bw_and(bvzero,bvone) in nth(b,1) = False
+
+end 
