@@ -88,7 +88,7 @@ type theory = {
   th_export : namespace;    (* exported namespace *)
   th_clone  : clone_map;    (* cloning history *)
   th_known  : known_map;    (* known identifiers *)
-  th_used   : Sid.t;        (* referenced theories *)
+  th_used   : use_map;      (* referenced theories *)
   th_local  : Sid.t;        (* locally declared idents *)
 }
 
@@ -96,6 +96,8 @@ and tdecl =
   | Decl  of decl
   | Use   of theory
   | Clone of theory * (ident * ident) list
+
+and use_map = theory Mid.t
 
 and clone_map = Sid.t Mid.t
 
@@ -126,7 +128,7 @@ let builtin_theory =
     th_export = export;
     th_clone  = Mid.empty;
     th_known  = kn_neq;
-    th_used   = Sid.empty;
+    th_used   = Mid.empty;
     th_local  = Sid.empty }
 
 
@@ -139,21 +141,21 @@ type theory_uc = {
   uc_export : namespace list;
   uc_clone  : clone_map;
   uc_known  : known_map;
-  uc_used   : Sid.t;
+  uc_used   : use_map;
   uc_local  : Sid.t;
 }
 
 exception CloseTheory
 exception NoOpenedNamespace
 
-let create_theory n =
+let empty_theory n =
   { uc_name   = id_register n;
-    uc_decls  = [Use builtin_theory];
-    uc_import = [builtin_theory.th_export];
-    uc_export = [builtin_theory.th_export];
+    uc_decls  = [];
+    uc_import = [empty_ns];
+    uc_export = [empty_ns];
     uc_clone  = Mid.empty;
-    uc_known  = builtin_theory.th_known;
-    uc_used   = Sid.singleton builtin_theory.th_name;
+    uc_known  = Mid.empty;
+    uc_used   = Mid.empty;
     uc_local  = Sid.empty; }
 
 let close_theory uc = match uc.uc_export with
@@ -191,9 +193,13 @@ let close_namespace uc import s =
   | _ ->
       assert false
 
+let merge_used m th =
+  Mid.add th.th_name th (Mid.fold Mid.add th.th_used m)
+
 let use_export uc th =
-  let uc = if Sid.mem th.th_name uc.uc_used then uc else { uc with
-      uc_used   = Sid.add th.th_name (Sid.union uc.uc_used th.th_used);
+  let uc = if Mid.mem th.th_name uc.uc_used then uc else
+    { uc with
+      uc_used   = merge_used uc.uc_used th;
       uc_known  = merge_known uc.uc_known th.th_known;
       uc_decls  = Use th :: uc.uc_decls }
   in
@@ -203,6 +209,8 @@ let use_export uc th =
       uc_export = merge_ns true  th.th_export e0 :: ste }
   | _ ->
       assert false
+
+let create_theory n = use_export (empty_theory n) builtin_theory
 
 let add_symbol add id v uc =
   match uc.uc_import, uc.uc_export with
@@ -474,8 +482,8 @@ let cl_add_tdecl cl inst uc td = match td with
             uc_known = known_add_decl uc.uc_known d }
         | None -> uc
       end
-  | Use th -> if Sid.mem th.th_name uc.uc_used then uc else { uc with
-      uc_used  = Sid.add th.th_name (Sid.union uc.uc_used th.th_used);
+  | Use th -> if Mid.mem th.th_name uc.uc_used then uc else { uc with
+      uc_used  = merge_used uc.uc_used th;
       uc_known = merge_known uc.uc_known th.th_known;
       uc_decls = td :: uc.uc_decls }
   | Clone (th,sl) ->

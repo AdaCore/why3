@@ -135,9 +135,10 @@ and raw_driver = {
 }
 
 and driver = {
-  drv_raw : raw_driver;
-  drv_clone : clone;
-  drv_env : env;
+  drv_raw         : raw_driver;
+  drv_clone       : clone;
+  drv_used        : theory Mid.t;
+  drv_env         : env;
   drv_thprelude   : string list Hid.t;
   (* the first is the translation only for this ident, the second is
      also for representant *)
@@ -222,7 +223,7 @@ let check_syntax loc s len =
          i len) s
 
 
-let load_rules env clone driver {thr_name = loc,qualid; thr_rules = trl} =
+let load_rules env driver {thr_name = loc,qualid; thr_rules = trl} =
   let id,qfile = qualid_to_slist qualid in
   let th = try
     find_theory env qfile id 
@@ -382,20 +383,40 @@ let syntax_arguments s print fmt l =
 let apply_transforms drv = 
   apply_clone drv.drv_raw.drv_transforms drv.drv_env drv.drv_clone
 
-let cook_driver env clone drv = 
-  let drv = { drv_raw = drv;
+let cook_driver env clone used drv = 
+  let drv = { drv_raw        = drv;
               drv_clone      = clone;
-              drv_env      = env;
+              drv_used       = used;
+              drv_env        = env;
               drv_thprelude  = Hid.create 17;
               drv_theory     = Hid.create 17;
               drv_with_task  = Hid.create 17} in
-  List.iter (load_rules env clone drv) drv.drv_raw.drv_rules;
+  List.iter (load_rules env drv) drv.drv_raw.drv_rules;
   drv
 
 
+let print_prelude drv fmt =
+  let pr_pr s () = fprintf fmt "%s@\n" s in
+  List.fold_right pr_pr drv.drv_raw.drv_prelude ();
+  let seen = Hid.create 17 in
+  let rec print_prel th_name th =
+    if Hid.mem seen th_name then () else
+      Hid.add seen th_name ();
+      Mid.iter print_prel th.th_used;
+      let prel = 
+        try Hid.find drv.drv_thprelude th_name 
+        with Not_found -> []
+      in
+      List.fold_right pr_pr prel ()
+  in
+  Mid.iter print_prel drv.drv_used;
+  fprintf fmt "@."
+
 let print_task drv fmt task = match drv.drv_raw.drv_printer with
   | None -> errorm "no printer"
-  | Some f -> f drv fmt task 
+  | Some f -> 
+      print_prelude drv fmt;
+      f drv fmt task 
 
 let regexp_filename = Str.regexp "%\\([a-z]\\)"
 

@@ -49,7 +49,7 @@ type theory = private {
   th_export : namespace;    (* exported namespace *)
   th_clone  : clone_map;    (* cloning history *)
   th_known  : known_map;    (* known identifiers *)
-  th_used   : Sid.t;        (* referenced theories *)
+  th_used   : use_map;      (* referenced theories *)
   th_local  : Sid.t;        (* locally declared idents *)
 }
 
@@ -57,6 +57,8 @@ and tdecl = private
   | Decl  of decl
   | Use   of theory
   | Clone of theory * (ident * ident) list
+
+and use_map = theory Mid.t
 
 and clone_map = Sid.t Mid.t
 

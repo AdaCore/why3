@@ -172,9 +172,9 @@ let transform env l =
 let extract_goals ?filter = 
   fun env drv acc th ->
     let l = split_theory th filter in
-    let l = List.rev_map (fun (task,cl) -> 
-                            let drv = Driver.cook_driver env cl drv in
-                            (th,task,drv)) l in
+    let l = List.rev_map (fun (task,cl,used) -> 
+      let drv = Driver.cook_driver env cl used drv in
+      (th,task,drv)) l in
     List.rev_append l acc
 
 let file_sanitizer = None (* We should remove which character? *)

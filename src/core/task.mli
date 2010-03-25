@@ -47,7 +47,7 @@ and task_hd = private {
 
 val add_decl : task -> decl -> task
 
-val split_theory : theory -> Spr.t option -> (task * clone) list
+val split_theory : theory -> Spr.t option -> (task * clone * use_map) list
 
 val flat_theory : task -> theory -> task
 
