@@ -138,7 +138,7 @@ theory Power
     forall x:real. pow(x,2.0) = sqr(x)
 
   axiom Pow_half:
-    forall x:real. x > 0.0 -> pow(x,0.5) = sqrt(x)  
+    forall x:real. x >= 0.0 -> pow(x,0.5) = sqrt(x)  
 
   axiom Pow_exp_log:
     forall x,y:real. x > 0.0 -> pow(x,y) = exp(y*log(x))
@@ -220,14 +220,22 @@ theory Hyperbolic
 
 end
 
-(** polar coordinates: atan2, hypot *)
+(** polar coordinates: atan2, hypot 
+    [http://en.wikipedia.org/wiki/Atan2]
+*)
 theory Polar
 
   use import Real
   use import Square
+  use import Trigonometric
 
   logic hypot(x:real,y:real) : real = sqrt(sqr(x)+sqr(y))
   logic atan2(real,real) : real
  
+  axiom X_from_polar:
+    forall x,y:real. x = hypot(x,y)*cos(atan2(y,x))
+
+  axiom Y_from_polar:
+    forall x,y:real. y = hypot(x,y)*sin(atan2(y,x))
 end
 
