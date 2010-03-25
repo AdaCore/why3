@@ -68,3 +68,10 @@ theory TestBv32
     let b = bw_and(bvzero,bvone) in nth(b,1) = False
 
 end 
+
+
+(*
+Local Variables: 
+compile-command: "../bin/why.opt --output-file test.txt --goals-of TestBv32 --driver ../drivers/alt_ergo.drv -I ../theories/ array.why"
+End: 
+*)
