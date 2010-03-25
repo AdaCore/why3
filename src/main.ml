@@ -275,13 +275,14 @@ let do_file env drv src_filename_printer dest_filename_printer file =
         match !output_file with
           | None -> ()
           | Some file (* we are in the output file mode *) -> 
-              List.iter 
-                (fun (th,task,drv) ->
-                   let fmt = if file = "-" 
-                   then std_formatter
-                   else formatter_of_out_channel (open_out file) in
-                   fprintf fmt "%a\000@?" (Driver.print_task drv) task) 
-                goals
+              let fmt = if file = "-" then std_formatter
+                else formatter_of_out_channel (open_out file) 
+              in
+              let print_task fmt (th,task,drv) =
+                fprintf fmt "@[%a@]" (Driver.print_task drv) task
+              in
+              let print_zero fmt () = fprintf fmt "\000@?" in
+              fprintf fmt "%a@?" (Pp.print_list print_zero print_task) goals
       end;
       if !call then
         (* we are in the call mode *)

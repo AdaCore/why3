@@ -153,7 +153,7 @@ let print_type_decl drv fmt = function
           | Driver.Tag _ -> 
               match ts.ts_args with
                 | [] -> fprintf fmt "type %a" print_ident ts.ts_name; true
-                | _  -> fprintf fmt "type (%a)%a" 
+                | _  -> fprintf fmt "type (%a) %a" 
                     (print_list comma print_tvsymbols) ts.ts_args  
                       print_ident ts.ts_name; true
       end
