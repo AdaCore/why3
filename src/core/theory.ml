@@ -88,6 +88,7 @@ type theory = {
   th_export : namespace;    (* exported namespace *)
   th_clone  : clone_map;    (* cloning history *)
   th_known  : known_map;    (* known identifiers *)
+  th_used   : Sid.t;        (* referenced theories *)
   th_local  : Sid.t;        (* locally declared idents *)
 }
 
@@ -125,6 +126,7 @@ let builtin_theory =
     th_export = export;
     th_clone  = Mid.empty;
     th_known  = kn_neq;
+    th_used   = Sid.empty;
     th_local  = Sid.empty }
 
 
@@ -137,6 +139,7 @@ type theory_uc = {
   uc_export : namespace list;
   uc_clone  : clone_map;
   uc_known  : known_map;
+  uc_used   : Sid.t;
   uc_local  : Sid.t;
 }
 
@@ -150,6 +153,7 @@ let create_theory n =
     uc_export = [builtin_theory.th_export];
     uc_clone  = Mid.empty;
     uc_known  = builtin_theory.th_known;
+    uc_used   = Sid.singleton builtin_theory.th_name;
     uc_local  = Sid.empty; }
 
 let close_theory uc = match uc.uc_export with
@@ -159,6 +163,7 @@ let close_theory uc = match uc.uc_export with
         th_export = e;
         th_clone  = uc.uc_clone;
         th_known  = uc.uc_known;
+        th_used   = uc.uc_used;
         th_local  = uc.uc_local; }
   | _ ->
       raise CloseTheory
@@ -187,12 +192,15 @@ let close_namespace uc import s =
       assert false
 
 let use_export uc th =
+  let uc = if Sid.mem th.th_name uc.uc_used then uc else { uc with
+      uc_used   = Sid.add th.th_name (Sid.union uc.uc_used th.th_used);
+      uc_known  = merge_known uc.uc_known th.th_known;
+      uc_decls  = Use th :: uc.uc_decls }
+  in
   match uc.uc_import, uc.uc_export with
   | i0 :: sti, e0 :: ste -> { uc with
       uc_import = merge_ns false th.th_export i0 :: sti;
-      uc_export = merge_ns true  th.th_export e0 :: ste;
-      uc_known  = merge_known uc.uc_known th.th_known;
-      uc_decls  = Use th :: uc.uc_decls }
+      uc_export = merge_ns true  th.th_export e0 :: ste }
   | _ ->
       assert false
 
@@ -466,9 +474,10 @@ let cl_add_tdecl cl inst uc td = match td with
             uc_known = known_add_decl uc.uc_known d }
         | None -> uc
       end
-  | Use th -> { uc with
-      uc_decls = td :: uc.uc_decls;
-      uc_known = merge_known uc.uc_known th.th_known }
+  | Use th -> if Sid.mem th.th_name uc.uc_used then uc else { uc with
+      uc_used  = Sid.add th.th_name (Sid.union uc.uc_used th.th_used);
+      uc_known = merge_known uc.uc_known th.th_known;
+      uc_decls = td :: uc.uc_decls }
   | Clone (th,sl) ->
       add_clone uc th sl
 
