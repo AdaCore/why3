@@ -101,7 +101,7 @@ type prover_answer =
   | HighFailure
 
 type theory_driver = {
-  thd_prelude : string option;
+  thd_prelude : string list;
   thd_tsymbol : unit ;
 }
 
@@ -128,7 +128,7 @@ type printer = driver -> formatter -> task -> unit
 and raw_driver = {
   drv_printer     : printer option;
   drv_prover      : Call_provers.prover;
-  drv_prelude     : string option;
+  drv_prelude     : string list;
   drv_filename    : string option;
   drv_transforms  : task tlist_reg;
   drv_rules       : theory_rules list;
@@ -138,7 +138,7 @@ and driver = {
   drv_raw : raw_driver;
   drv_clone : clone;
   drv_env : env;
-  drv_thprelude   : string Hid.t;
+  drv_thprelude   : string list Hid.t;
   (* the first is the translation only for this ident, the second is
      also for representant *)
   drv_theory      : (translation * translation) Hid.t;
@@ -289,14 +289,18 @@ let load_rules env clone driver {thr_name = loc,qualid; thr_rules = trl} =
           with Not_found -> errorm ~loc "Unknown proposition %s" 
             (string_of_qualid qualid q)
         end
-    | Rprelude (loc,s) -> if Hid.mem driver.drv_thprelude th.th_name
-      then errorm ~loc "duplicate prelude"
-      else Hid.add driver.drv_thprelude th.th_name s in
+    | Rprelude (loc,s) -> 
+        let l = 
+          try Hid.find driver.drv_thprelude th.th_name 
+          with Not_found -> []
+        in
+        Hid.replace driver.drv_thprelude th.th_name (s::l) 
+  in
   List.iter add trl
 
 let load_driver file env =
   let f = load_file file in
-  let prelude     = ref None in
+  let prelude     = ref [] in
   let printer     = ref None in
   let call_stdin  = ref None in
   let call_file   = ref None in
@@ -313,7 +317,7 @@ let load_driver file env =
 	printer := Some (Hashtbl.find printers s)
     | Printer s -> 
 	errorm ~loc "unknown printer %s" s 
-    | Prelude s -> set_or_raise loc prelude s "prelude"
+    | Prelude s -> prelude := s :: !prelude
     | CallStdin s -> set_or_raise loc call_stdin s "callstdin"
     | CallFile s -> set_or_raise loc call_file s "callfile"
     | RegexpValid s -> regexps:=(s,Valid)::!regexps

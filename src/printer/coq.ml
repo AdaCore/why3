@@ -165,8 +165,10 @@ and print_tnode opl opr drv fmt t = match t.t_node with
       assert false
   | Tvar v ->
       print_vs fmt v
-  | Tconst c ->
-      Pretty.print_const fmt c
+  | Tconst (ConstInt n) -> fprintf fmt "%s%%Z" n
+  | Tconst (ConstReal c) -> 
+      Print_real.print_with_integers
+	"(%s)%%R" "(%s * %s)%%R" "(%s / %s)%%R" fmt c
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
@@ -333,6 +335,7 @@ let print_decls drv fmt dl =
 let print_context drv fmt task =
   forget_all (); 
   fprintf fmt "(* beginning of generated file *)@\n@\n";
+  fprintf fmt "Require Import ZArith.@\n@\n";
   print_decls drv fmt (Task.task_decls task);
   fprintf fmt "(* end of generated file *)@."
 
