@@ -162,6 +162,9 @@ bin/why.static: $(CMX) src/why.cmx
 bin/top: $(CMO)
 	ocamlmktop $(BFLAGS) -o $@ nums.cma $^
 
+# test targets
+##############
+
 test: bin/why.byte  $(TOOLS)
 	mkdir -p output_why3
 	ocamlrun -bt bin/why.byte -I theories/ --driver drivers/why3.drv \
@@ -180,6 +183,9 @@ test: bin/why.byte  $(TOOLS)
 
 testl: bin/whyl.byte
 	ocamlrun -bt bin/whyl.byte -I theories/ src/programs/test.mlw
+
+examples/programs/%: bin/whyl.byte
+	bin/whyl.byte -I theories examples/programs/$*.mlw
 
 # programs
 ##########

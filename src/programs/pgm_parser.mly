@@ -57,6 +57,10 @@
     let id = { id = infix op; id_loc = loc_i 2 } in
     mk_expr (mk_apply_id id [e1; e2])
      
+  let mk_binop e1 op e2 =
+    let id = { id = op; id_loc = loc_i 2 } in
+    mk_expr (mk_apply_id id [e1; e2])
+     
   let mk_prefix op e1 =
     let id = { id = prefix op; id_loc = loc_i 1 } in
     mk_expr (mk_apply_id id [e1])
@@ -171,8 +175,16 @@ decl:
 ;
 
 lident:
-| LIDENT
-    { { id = $1; id_loc = loc () } }
+| LIDENT { { id = $1; id_loc = loc () } }
+;
+
+uident:
+| UIDENT { { id = $1; id_loc = loc () } }
+;
+
+ident:
+| uident { $1 }
+| lident { $1 }
 ;
 
 any_op:
@@ -181,8 +193,9 @@ any_op:
 | OP3   { $1 }
 ;
 
-uident:
-| UIDENT { { id = $1; id_loc = loc () } }
+qualid:
+| ident             { Qident $1 }
+| uqualid DOT ident { Qdot ($1, $3) }
 ;
 
 lqualid:
@@ -199,11 +212,9 @@ expr:
 | simple_expr %prec prec_simple 
    { $1 }
 | expr EQUAL expr 
-   { mk_infix $1 "=" $3 }
-| expr COLONEQUAL expr 
-   { mk_infix $1 ":=" $3 }
+   { mk_binop $1 "eq_bool" $3 }
 | expr OP0 expr 
-   { mk_infix $1 $2 $3 }
+   { mk_binop $1 ($2 ^ "_bool") $3 }
 | expr OP1 expr 
    { mk_infix $1 $2 $3 }
 | expr OP2 expr 
@@ -212,6 +223,8 @@ expr:
    { mk_infix $1 $2 $3 }
 | any_op expr %prec prefix_op
    { mk_prefix $1 $2 }
+| expr COLONEQUAL expr 
+   { mk_infix $1 ":=" $3 }
 | simple_expr list1_simple_expr %prec prec_app
    { mk_expr (mk_apply $1 $2) }
 | IF expr THEN expr ELSE expr
@@ -241,7 +254,7 @@ simple_expr:
     { mk_expr (Econstant $1) }
 | BANG simple_expr
     { mk_prefix "!" $2 }
-| lqualid 
+| qualid 
     { mk_expr (Eident $1) }
 | LEFTPAR expr RIGHTPAR
     { $2 }
@@ -286,11 +299,6 @@ constant:
 ;
 
 /*****
-
-ident:
-| uident { $1 }
-| lident { $1 }
-;
 
 ident_rich:
 | uident      { $1 }

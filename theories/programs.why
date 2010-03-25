@@ -3,14 +3,22 @@ theory Prelude
   use export int.Int
   use export bool.Bool
 
+  logic eq_bool('a, 'a) : bool
+  logic ne_bool('a, 'a) : bool
+  logic le_bool('a, 'a) : bool
+  logic lt_bool('a, 'a) : bool
+  logic ge_bool('a, 'a) : bool
+  logic gt_bool('a, 'a) : bool
+
+  use export unit.Unit
+  logic ignore('a) : unit
+
   type ('a, 'b) arrow
 
   type  'a ref
   logic ref ('a)     : 'a ref
   logic (!_)('a ref) : 'a
-
-  use export unit.Unit
-  logic ignore('a) : unit
+  logic (:=)('a ref, 'a) : unit
 
   type  label
   logic at  ('a, label) : 'a

@@ -156,8 +156,16 @@ rule token = parse
       { ARROW }
   | "="
       { EQUAL }
-  | "<>" | "<" | "<=" | ">" | ">=" as s
-      { OP0 s }
+  | "<>"
+      { OP0 "ne" }
+  | "<"
+      { OP0 "lt" }
+  | "<="
+      { OP0 "le" }
+  | ">"
+      { OP0 "gt" }
+  | ">="
+      { OP0 "ge" }
   | "+" | "-" as c
       { OP2 (String.make 1 c) }
   | "*" | "/" | "%" as c

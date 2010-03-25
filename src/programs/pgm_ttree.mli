@@ -29,6 +29,7 @@ type lazy_op = Pgm_ptree.lazy_op
 
 type dexpr = {
   dexpr_desc : dexpr_desc;
+  dexpr_denv : Typing.denv;
   dexpr_type : Denv.dty;
   dexpr_loc  : loc;
 }

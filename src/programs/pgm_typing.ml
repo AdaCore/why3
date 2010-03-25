@@ -83,7 +83,8 @@ let expected_type e ty =
 
 let rec dexpr env e = 
   let d, ty = expr_desc env e.Pgm_ptree.expr_loc e.Pgm_ptree.expr_desc in
-  { dexpr_desc = d; dexpr_type = ty; dexpr_loc = e.Pgm_ptree.expr_loc }
+  { dexpr_desc = d; dexpr_loc = e.Pgm_ptree.expr_loc;
+    dexpr_denv = env.denv; dexpr_type = ty;  }
 
 and expr_desc env loc = function
   | Pgm_ptree.Econstant (ConstInt _ as c) ->
@@ -130,7 +131,7 @@ and expr_desc env loc = function
       let e1 = dexpr env e1 in
       expected_type e1 env.ty_bool;
       let e2 = dexpr env e2 in
-      expected_type e1 env.ty_unit;
+      expected_type e2 env.ty_unit;
       DEwhile (e1, a, e2), env.ty_unit
   | Pgm_ptree.Elazy (op, e1, e2) ->
       let e1 = dexpr env e1 in
@@ -153,12 +154,12 @@ and expr_desc env loc = function
 
 (* phase 2: typing annotations *)
 
-let rec expr env e =
-  let d = expr_desc env e.dexpr_desc in
+let rec expr e =
+  let d = expr_desc e.dexpr_denv e.dexpr_desc in
   let ty = Denv.ty_of_dty e.dexpr_type in
   { expr_desc = d; expr_type = ty; expr_loc = e.dexpr_loc }
 
-and expr_desc env = function
+and expr_desc denv = function
   | DEconstant c ->
       Econstant c
   | DElocal x ->
@@ -166,32 +167,39 @@ and expr_desc env = function
   | DEglobal ls ->
       Eglobal ls
   | DEapply (e1, e2) ->
-      Eapply (expr env e1, expr env e2)
+      Eapply (expr e1, expr e2)
   | DElet (x, e1, e2) ->
-      Elet (x, expr env e1, expr env e2)
+      Elet (x, expr e1, expr e2)
 
   | DEsequence (e1, e2) ->
-      Esequence (expr env e1, expr env e2)
+      Esequence (expr e1, expr e2)
   | DEif (e1, e2, e3) ->
-      Eif (expr env e1, expr env e2, expr env e3)
+      Eif (expr e1, expr e2, expr e3)
   | DEwhile (e1, la, e2) ->
-      assert false (*TODO*)
+      let la = 
+	{ loop_invariant = 
+	    option_map (Typing.type_fmla denv) la.Pgm_ptree.loop_invariant;
+	  loop_variant   = 
+	    option_map (Typing.type_term denv) la.Pgm_ptree.loop_variant; }
+      in
+      Ewhile (expr e1, la, expr e2)
   | DElazy (op, e1, e2) ->
-      Elazy (op, expr env e1, expr env e2)
+      Elazy (op, expr e1, expr e2)
   | DEskip ->
       Eskip
 
   | DEassert (k, f) ->
-      assert false (*TODO*)
+      let f = Typing.type_fmla denv f in
+      Eassert (k, f)
   | DEghost e1 -> 
-      Eghost (expr env e1)
+      Eghost (expr e1)
   | DElabel (s, e1) ->
-      Elabel (s, expr env e1)
+      Elabel (s, expr e1)
 
 let code uc id e =
   let env = create_denv uc in
   let e = dexpr env e in
-  ignore (expr env e)
+  ignore (expr e)
 
 (*
 Local Variables: 
