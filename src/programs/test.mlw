@@ -17,7 +17,7 @@ let p =
     g 2
   end
 
-let q = f(1)
+let q = let x = 1 in x+2
 
 { 
   axiom A : forall x:int. f(x) = g(x-1)

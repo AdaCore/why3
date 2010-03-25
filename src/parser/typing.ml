@@ -156,6 +156,10 @@ let find_user_type_var x env =
     Hashtbl.add env.utyvars x v;
     v
 
+let mem_var x denv = Mstr.mem x denv.dvars
+let find_var x denv = Mstr.find x denv.dvars
+let add_var x ty denv = { denv with dvars = Mstr.add x ty denv.dvars }
+
 (* parsed types -> intermediate types *)
 
 let rec qloc = function
@@ -783,15 +787,17 @@ let add_logics dl th =
   let dl = List.map type_decl dl in
   List.fold_left add_decl th (create_logic_decls dl)
 
-let term env t =
-  let denv = create_denv env in
+let type_term denv t =
   let t = dterm denv t in
   term Mstr.empty t
 
-let fmla env f =
-  let denv = create_denv env in
+let term uc = type_term (create_denv uc)
+
+let type_fmla denv f =
   let f = dfmla denv f in
   fmla Mstr.empty f
+
+let fmla uc = type_fmla (create_denv uc)
 
 let add_prop k loc s f th =
   let f = fmla th f in

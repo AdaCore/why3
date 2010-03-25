@@ -52,8 +52,7 @@ let report fmt = function
 (*** from Typing *************************************************************)
 type denv = {
   uc : theory_uc;
-  utyvars : (string, type_var) Hashtbl.t;
-  dvars : dty Mstr.t;
+  denv : Typing.denv;
   (* predefined symbols from theory programs.Prelude *)
   ty_bool  : dty;
   ty_unit  : dty;
@@ -63,8 +62,7 @@ type denv = {
 let create_denv uc = 
   let ns = get_namespace uc in
   { uc = uc;
-    utyvars = Hashtbl.create 17;
-    dvars = Mstr.empty;
+    denv = Typing.create_denv uc;
     ty_bool  = Tyapp (ns_find_ts ns ["bool"], []);
     ty_unit  = Tyapp (ns_find_ts ns ["unit"], []);
     ts_arrow = ns_find_ts ns ["arrow"];
@@ -76,81 +74,123 @@ let currying env tyl ty =
   List.fold_right make_arrow_type tyl ty
 
 let expected_type e ty =
-  if not (Denv.unify e.expr_type ty) then
-    errorm ~loc:e.expr_loc 
+  if not (Denv.unify e.dexpr_type ty) then
+    errorm ~loc:e.dexpr_loc 
       "this expression has type %a, but is expected to have type %a"
-      print_dty e.expr_type print_dty ty
+      print_dty e.dexpr_type print_dty ty
 
-let rec expr env e = 
+(* phase 1: typing programs (using destructive type inference) *)
+
+let rec dexpr env e = 
   let d, ty = expr_desc env e.Pgm_ptree.expr_loc e.Pgm_ptree.expr_desc in
-  { expr_desc = d; expr_type = ty; expr_loc = e.Pgm_ptree.expr_loc }
+  { dexpr_desc = d; dexpr_type = ty; dexpr_loc = e.Pgm_ptree.expr_loc }
 
 and expr_desc env loc = function
   | Pgm_ptree.Econstant (ConstInt _ as c) ->
-      Econstant c, Tyapp (Ty.ts_int, [])
+      DEconstant c, Tyapp (Ty.ts_int, [])
   | Pgm_ptree.Econstant (ConstReal _ as c) ->
-      Econstant c, Tyapp (Ty.ts_real, [])
-  | Pgm_ptree.Eident (Qident {id=x}) when Mstr.mem x env.dvars ->
+      DEconstant c, Tyapp (Ty.ts_real, [])
+  | Pgm_ptree.Eident (Qident {id=x}) when Typing.mem_var x env.denv ->
       (* local variable *)
-      let ty = Mstr.find x env.dvars in
-      Elocal x, ty
+      let ty = Typing.find_var x env.denv in
+      DElocal x, ty
   | Pgm_ptree.Eident p ->
       let s, tyl, ty = Typing.specialize_fsymbol p env.uc in
-      Eglobal s, currying env tyl ty
+      DEglobal s, currying env tyl ty
   | Pgm_ptree.Eapply (e1, e2) ->
-      let e1 = expr env e1 in
-      let e2 = expr env e2 in
-      begin match e1.expr_type with
+      let e1 = dexpr env e1 in
+      let e2 = dexpr env e2 in
+      begin match e1.dexpr_type with
 	| Tyapp (ts, [ty2; ty]) when ts == env.ts_arrow ->
 	    expected_type e2 ty2;
-	    Eapply (e1, e2), ty
+	    DEapply (e1, e2), ty
 	| _ ->
-	    errorm ~loc:e1.expr_loc "this expression is not a function"
+	    errorm ~loc:e1.dexpr_loc "this expression is not a function"
       end
   | Pgm_ptree.Elet ({id=x}, e1, e2) ->
-      let e1 = expr env e1 in
-      let ty1 = e1.expr_type in
-      let env = { env with dvars = Mstr.add x ty1 env.dvars } in
-      let e2 = expr env e2 in
-      Elet (x, e1, e2), e2.expr_type
+      let e1 = dexpr env e1 in
+      let ty1 = e1.dexpr_type in
+      let env = { env with denv = Typing.add_var x ty1 env.denv } in
+      let e2 = dexpr env e2 in
+      DElet (x, e1, e2), e2.dexpr_type
+
   | Pgm_ptree.Esequence (e1, e2) ->
-      let e1 = expr env e1 in
+      let e1 = dexpr env e1 in
       expected_type e1 env.ty_unit;
-      let e2 = expr env e2 in
-      Esequence (e1, e2), e2.expr_type
-  | Pgm_ptree.Eskip ->
-      Eskip, env.ty_unit
-  | Pgm_ptree.Elabel (l, e1) ->
-      (* TODO: add label to env *)
-      let e1 = expr env e1 in
-      Elabel (l, e1), e1.expr_type
+      let e2 = dexpr env e2 in
+      DEsequence (e1, e2), e2.dexpr_type
   | Pgm_ptree.Eif (e1, e2, e3) ->
-      let e1 = expr env e1 in
+      let e1 = dexpr env e1 in
       expected_type e1 env.ty_bool;
-      let e2 = expr env e2 in
-      let e3 = expr env e3 in
-      expected_type e3 e2.expr_type;
-      Eif (e1, e2, e3), e2.expr_type
-  | Pgm_ptree.Eassert (k, le) ->
-      Eassert (k, le), env.ty_unit
-  | Pgm_ptree.Eghost e1 ->
-      let e1 = expr env e1 in
-      Eghost e1, e1.expr_type
+      let e2 = dexpr env e2 in
+      let e3 = dexpr env e3 in
+      expected_type e3 e2.dexpr_type;
+      DEif (e1, e2, e3), e2.dexpr_type
   | Pgm_ptree.Ewhile (e1, a, e2) ->
-      let e1 = expr env e1 in
+      let e1 = dexpr env e1 in
       expected_type e1 env.ty_bool;
-      let e2 = expr env e2 in
+      let e2 = dexpr env e2 in
       expected_type e1 env.ty_unit;
-      Ewhile (e1, a, e2), env.ty_unit
+      DEwhile (e1, a, e2), env.ty_unit
   | Pgm_ptree.Elazy (op, e1, e2) ->
-      let e1 = expr env e1 in
+      let e1 = dexpr env e1 in
       expected_type e1 env.ty_bool;
-      let e2 = expr env e2 in
+      let e2 = dexpr env e2 in
       expected_type e2 env.ty_bool;
-      Elazy (op, e1, e2), env.ty_bool
+      DElazy (op, e1, e2), env.ty_bool
+  | Pgm_ptree.Eskip ->
+      DEskip, env.ty_unit
+
+  | Pgm_ptree.Eassert (k, le) ->
+      DEassert (k, le), env.ty_unit
+  | Pgm_ptree.Eghost e1 ->
+      let e1 = dexpr env e1 in
+      DEghost e1, e1.dexpr_type
+  | Pgm_ptree.Elabel ({id=l}, e1) ->
+      (* TODO: add label to env *)
+      let e1 = dexpr env e1 in
+      DElabel (l, e1), e1.dexpr_type
+
+(* phase 2: typing annotations *)
+
+let rec expr env e =
+  let d = expr_desc env e.dexpr_desc in
+  let ty = Denv.ty_of_dty e.dexpr_type in
+  { expr_desc = d; expr_type = ty; expr_loc = e.dexpr_loc }
+
+and expr_desc env = function
+  | DEconstant c ->
+      Econstant c
+  | DElocal x ->
+      Elocal x
+  | DEglobal ls ->
+      Eglobal ls
+  | DEapply (e1, e2) ->
+      Eapply (expr env e1, expr env e2)
+  | DElet (x, e1, e2) ->
+      Elet (x, expr env e1, expr env e2)
+
+  | DEsequence (e1, e2) ->
+      Esequence (expr env e1, expr env e2)
+  | DEif (e1, e2, e3) ->
+      Eif (expr env e1, expr env e2, expr env e3)
+  | DEwhile (e1, la, e2) ->
+      assert false (*TODO*)
+  | DElazy (op, e1, e2) ->
+      Elazy (op, expr env e1, expr env e2)
+  | DEskip ->
+      Eskip
+
+  | DEassert (k, f) ->
+      assert false (*TODO*)
+  | DEghost e1 -> 
+      Eghost (expr env e1)
+  | DElabel (s, e1) ->
+      Elabel (s, expr env e1)
 
 let code uc id e =
   let env = create_denv uc in
+  let e = dexpr env e in
   ignore (expr env e)
 
 (*
