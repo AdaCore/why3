@@ -1,18 +1,19 @@
 
+(* Bresenham line drawing algorithm. *)
+
 (*  Parameters. 
     Without loss of generality, we can take [x1=0] and [y1=0]. 
     Thus the line to draw joins [(0,0)] to [(x2,y2)]
     and we have [deltax = x2] and [deltay = y2]. 
     Moreover we assume being in the first octant, i.e.
-    [0 <= y2 <= x2] (see the Coq file). The seven other cases can be easily
+    [0 <= y2 <= x2]. The seven other cases can be easily
     deduced by symmetry. *)
+
 {
 logic x2 : int
 logic y2 : int
 axiom First_octant : 0 <= y2 and y2 <= x2
 }
-
-(* Global variables of the program. *)
 
 (* The code.
     [(best x y)] expresses that the point [(x,y)] is the best
@@ -40,7 +41,7 @@ let bresenham =
   while !x <= x2 do
     invariant {0 <= !x and !x <= x2 + 1 and invariant(!x, !y, !e) }
     variant   { x2 + 1 - !x }
-    (* here we would do (plot x y) *) 
+    (* here we would plot (x, y) *) 
     assert { best(!x, !y) };
     if !e < 0 then
       e := !e + 2 * y2
@@ -52,9 +53,8 @@ let bresenham =
   done
 
 
-
 (*
 Local Variables: 
-compile-command: "unset LANG; make -C ../.. testl"
+compile-command: "unset LANG; make -C ../.. examples/programs/bresenham"
 End: 
 *)
