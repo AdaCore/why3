@@ -140,7 +140,7 @@ DRIVER_CMO := call_provers.cmo dynlink_compat.cmo driver_parser.cmo\
 	driver_lexer.cmo driver.cmo
 DRIVER_CMO := $(addprefix src/driver/,$(DRIVER_CMO))
 
-PRINTER_CMO := print_real.cmo alt_ergo.cmo why3.cmo smt.cmo
+PRINTER_CMO := print_real.cmo alt_ergo.cmo why3.cmo smt.cmo coq.cmo
 PRINTER_CMO := $(addprefix src/printer/,$(PRINTER_CMO))
 
 CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
@@ -170,6 +170,9 @@ test: bin/why.byte  $(TOOLS)
 		--output-file - --goal Test.G src/test.why --timeout 3
 	bin/why.byte --driver drivers/alt_ergo.drv -I theories/ \
 		--call --goal Test.G src/test.why --timeout 3
+	bin/why.byte --driver drivers/coq.drv -I theories/ \
+		--output-file tmp.v --goal Test.G src/test.why 
+	coqc -require ZArith tmp.v
 
 testl: bin/whyl.byte
 	ocamlrun -bt bin/whyl.byte -I theories/ src/programs/test.mlw
