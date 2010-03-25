@@ -787,22 +787,17 @@ let add_logics dl th =
   let dl = List.map type_decl dl in
   List.fold_left add_decl th (create_logic_decls dl)
 
-let env_of_denv denv =
-  Mstr.mapi 
-    (fun x dty -> create_vsymbol (id_fresh x) (ty_of_dty dty))
-    denv.dvars
-
-let type_term denv t =
+let type_term denv env t =
   let t = dterm denv t in
-  term (env_of_denv denv) t
+  term env t
 
-let term uc = type_term (create_denv uc)
+let term uc = type_term (create_denv uc) Mstr.empty
 
-let type_fmla denv f =
+let type_fmla denv env f =
   let f = dfmla denv f in
-  fmla (env_of_denv denv) f
+  fmla env f
 
-let fmla uc = type_fmla (create_denv uc)
+let fmla uc = type_fmla (create_denv uc) Mstr.empty
 
 let add_prop k loc s f th =
   let f = fmla th f in

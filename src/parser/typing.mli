@@ -19,6 +19,7 @@
 
 (** Typing environments *)
 
+open Util
 open Ty
 open Term
 open Theory
@@ -35,19 +36,6 @@ val read_channel : env -> string -> in_channel -> theory Mnm.t
 
 val add_decl : env -> theory Mnm.t -> theory_uc -> Ptree.decl -> theory_uc
 
-type denv
-
-val create_denv : theory_uc -> denv
-
-val find_user_type_var : string -> denv -> Denv.type_var
-
-val mem_var : string -> denv -> bool
-val find_var : string -> denv -> Denv.dty
-val add_var : string -> Denv.dty -> denv -> denv
-
-val type_term : denv -> Ptree.lexpr -> term
-val type_fmla : denv -> Ptree.lexpr -> fmla
-
 (** error reporting *)
 
 type error
@@ -60,4 +48,17 @@ val report : Format.formatter -> error -> unit
 
 val specialize_fsymbol : 
   Ptree.qualid -> theory_uc -> lsymbol * Denv.dty list * Denv.dty
+
+type denv
+
+val create_denv : theory_uc -> denv
+
+val find_user_type_var : string -> denv -> Denv.type_var
+
+val mem_var : string -> denv -> bool
+val find_var : string -> denv -> Denv.dty
+val add_var : string -> Denv.dty -> denv -> denv
+
+val type_term : denv -> vsymbol Mstr.t -> Ptree.lexpr -> term
+val type_fmla : denv -> vsymbol Mstr.t -> Ptree.lexpr -> fmla
 

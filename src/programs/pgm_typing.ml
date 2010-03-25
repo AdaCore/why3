@@ -19,6 +19,7 @@
 
 open Format
 open Util
+open Ident
 open Term
 open Theory
 open Denv
@@ -154,52 +155,55 @@ and expr_desc env loc = function
 
 (* phase 2: typing annotations *)
 
-let rec expr e =
-  let d = expr_desc e.dexpr_denv e.dexpr_desc in
+let rec expr env e =
+  let d = expr_desc env e.dexpr_denv e.dexpr_desc in
   let ty = Denv.ty_of_dty e.dexpr_type in
   { expr_desc = d; expr_type = ty; expr_loc = e.dexpr_loc }
 
-and expr_desc denv = function
+and expr_desc env denv = function
   | DEconstant c ->
       Econstant c
   | DElocal x ->
-      Elocal x
+      Elocal (Mstr.find x env)
   | DEglobal ls ->
       Eglobal ls
   | DEapply (e1, e2) ->
-      Eapply (expr e1, expr e2)
+      Eapply (expr env e1, expr env e2)
   | DElet (x, e1, e2) ->
-      Elet (x, expr e1, expr e2)
+      let e1 = expr env e1 in
+      let v = create_vsymbol (id_fresh x) e1.expr_type in
+      let env = Mstr.add x v env in
+      Elet (v, e1, expr env e2)
 
   | DEsequence (e1, e2) ->
-      Esequence (expr e1, expr e2)
+      Esequence (expr env e1, expr env e2)
   | DEif (e1, e2, e3) ->
-      Eif (expr e1, expr e2, expr e3)
+      Eif (expr env e1, expr env e2, expr env e3)
   | DEwhile (e1, la, e2) ->
       let la = 
 	{ loop_invariant = 
-	    option_map (Typing.type_fmla denv) la.Pgm_ptree.loop_invariant;
+	    option_map (Typing.type_fmla denv env) la.Pgm_ptree.loop_invariant;
 	  loop_variant   = 
-	    option_map (Typing.type_term denv) la.Pgm_ptree.loop_variant; }
+	    option_map (Typing.type_term denv env) la.Pgm_ptree.loop_variant; }
       in
-      Ewhile (expr e1, la, expr e2)
+      Ewhile (expr env e1, la, expr env e2)
   | DElazy (op, e1, e2) ->
-      Elazy (op, expr e1, expr e2)
+      Elazy (op, expr env e1, expr env e2)
   | DEskip ->
       Eskip
 
   | DEassert (k, f) ->
-      let f = Typing.type_fmla denv f in
+      let f = Typing.type_fmla denv env f in
       Eassert (k, f)
   | DEghost e1 -> 
-      Eghost (expr e1)
+      Eghost (expr env e1)
   | DElabel (s, e1) ->
-      Elabel (s, expr e1)
+      Elabel (s, expr env e1)
 
 let code uc id e =
   let env = create_denv uc in
   let e = dexpr env e in
-  ignore (expr e)
+  ignore (expr Mstr.empty e)
 
 (*
 Local Variables: 

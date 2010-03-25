@@ -66,10 +66,10 @@ type expr = {
 
 and expr_desc =
   | Econstant of constant
-  | Elocal of string
+  | Elocal of Term.vsymbol
   | Eglobal of Term.lsymbol
   | Eapply of expr * expr
-  | Elet of string * expr * expr
+  | Elet of Term.vsymbol * expr * expr
 
   | Esequence of expr * expr
   | Eif of expr * expr * expr

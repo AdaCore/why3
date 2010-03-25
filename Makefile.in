@@ -244,8 +244,8 @@ WHYVO=lib/coq/Why.vo
 bench/bench : bench/bench.in config.status
 	./config.status --file bench/bench
 
-bench:: $(BINARY) bench/bench $(TOOLS)
-	sh bench/bench "$(BINARY) -I theories/"
+bench:: $(BINARY) $(BINARYL) bench/bench $(TOOLS)
+	sh bench/bench "$(BINARY) -I theories/" "$(BINARYL) -I theories"
 
 BENCH_PLUGINS_CMO := helloworld.cmo simplify_array.cmo
 BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))

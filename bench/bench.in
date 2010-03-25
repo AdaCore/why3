@@ -5,7 +5,7 @@
 export WHYLIB=../lib
 
 pgm=$1
-option=$2
+pgml=$2
 
 goods () {
     for f in $1/*.why; do
@@ -47,6 +47,19 @@ drivers () {
     done
 }
 
+programs () {
+    for f in $1/*.mlw; do
+	echo -n "  "$f"... "
+	if ! $pgml $f > /dev/null 2>&1; then 
+	    echo "$pgml $2 $f"
+	    echo "FAILED!"
+	    exit 1 
+        else 
+	    echo "ok"
+	fi
+    done
+}
+
 # 1. Syntax
 echo "=== Parsing good files  ==="
 goods bench/typing/bad --parse-only
@@ -67,5 +80,9 @@ echo ""
 
 echo "=== Checking drivers ==="
 drivers drivers
+echo ""
+
+echo "=== Type-checking programs ==="
+programs examples/programs
 echo ""
 
