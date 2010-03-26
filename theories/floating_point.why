@@ -115,4 +115,12 @@ theory Double
 
 end
 
+theory Test
+
+  use import Rounding
+  use import Single
+
+  lemma Round_01: round(Near,0.1) = 0x0.199999Ap0
+
+end
 

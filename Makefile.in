@@ -179,6 +179,10 @@ test: bin/why.byte  $(TOOLS)
 		--all-goals theories/real.why 
 	mkdir -p theories/coq
 	bin/why.byte --driver drivers/coq.drv -I theories/ \
+		--output-dir theories/coq --goals-of int.Abs 
+	bin/why.byte --driver drivers/coq.drv -I theories/ \
+		--output-dir theories/coq --goals-of int.EuclideanDivision --goals-of int.ComputerDivision 
+	bin/why.byte --driver drivers/coq.drv -I theories/ \
 		--output-dir theories/coq --goals-of real.Abs 
 	bin/why.byte --driver drivers/coq.drv -I theories/ \
 		--output-dir theories/coq --goals-of real.FromInt
@@ -186,6 +190,8 @@ test: bin/why.byte  $(TOOLS)
 		--output-dir theories/coq --goals-of real.ExpLog
 	bin/why.byte --driver drivers/coq.drv -I theories/ \
 		--output-dir theories/coq --goals-of real.Trigonometric
+	bin/why.byte --driver drivers/coq.drv -I theories/ \
+		--output-dir theories/coq --goals-of floating_point.Test
 	for i in theories/coq/*.v; do echo coq $$i; (coqc $$i || true) done
 
 testl: bin/whyl.byte
