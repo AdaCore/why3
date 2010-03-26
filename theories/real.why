@@ -1,6 +1,7 @@
 
 
 theory Real 
+
   logic (< )(real, real)
   logic (<=)(real, real)
   logic (> )(real, real)
@@ -25,6 +26,8 @@ theory Abs
   axiom Neg: forall x:real. x <= 0.0 -> abs(x) = -x
 
   lemma Abs_le: forall x,y:real. abs(x) <= y <-> -y <= x and x <= y
+
+  lemma Abs_pos: forall x:real. abs(x) >= 0.0
 
 end
 
@@ -60,6 +63,8 @@ theory FromInt
     forall x,y:int. from_int(Int.(*)(x,y)) = from_int(x) * from_int(y)
   axiom Neg: 
     forall x,y:int. from_int(Int.(-_)(x)) = - from_int(x)
+
+  lemma Test: from_int(2) = 2.0
 
 end
 

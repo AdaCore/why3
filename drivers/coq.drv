@@ -13,7 +13,7 @@ theory BuiltIn
 
   syntax type   int     "Z"
   syntax type   real    "R"
-  syntax logic  (_=_)   "(%1 = %2)"
+  syntax logic  (_=_)   "(%1 = %2)" 
   syntax logic  (_<>_)  "(%1 <> %2)"
 end
 
@@ -41,6 +41,50 @@ theory int.Int
   remove prop Mul_distr
   remove prop Comm.Comm
   remove prop Unitary
+
+end
+
+theory int.Abs
+
+  syntax logic abs "(Zabs %1)"
+
+end
+
+theory real.Real
+
+  syntax logic zero "0%R"
+  syntax logic one "1%R"
+
+  syntax logic (_+_) "(%1 + %2)%R"
+  syntax logic (_-_) "(%1 - %2)%R"
+  syntax logic (-_)  "(-%1)%R"
+  syntax logic (_*_) "(%1 * %2)%R"
+  syntax logic (_/_) "(Rdiv %1 %2)%R"
+  syntax logic inv  "(Rinv %1)"
+
+  syntax logic (_<=_) "(%1 <= %2)%R"
+  syntax logic (_<_) "(%1 <  %2)%R"
+  syntax logic (_>=_) "(%1 >= %2)%R"
+  syntax logic (_>_) "(%1 >  %2)%R"
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc.Assoc
+  remove prop CommutativeGroup.Unit_def
+  remove prop CommutativeGroup.Inv_def
+  remove prop Assoc.Assoc
+  remove prop Mul_distr
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Inverse
+
+end
+
+
+theory real.Abs
+
+  prelude "Require Import Rbasic_fun."
+
+  syntax logic abs "(Rabs %1)"
 
 end
 

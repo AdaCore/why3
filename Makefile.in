@@ -175,11 +175,17 @@ test: bin/why.byte  $(TOOLS)
 		--call --goal Test.G src/test.why --timeout 3
 	bin/why.byte --driver drivers/coq.drv -I theories/ \
 		--output-file tmp.v --goal Test.G src/test.why 
-	bin/why.byte --call --driver drivers/alt_ergo.drv -I theories/ \
-		--goal ExpLog.Log_e theories/real.why 
+	echo bin/why.byte --call --timeout 1 --driver drivers/alt_ergo.drv -I theories/ \
+		--all-goals theories/real.why 
 	mkdir -p theories/coq
 	bin/why.byte --driver drivers/coq.drv -I theories/ \
-		--output-dir theories/coq --all-goals theories/real.why 
+		--output-dir theories/coq --goals-of real.Abs 
+	bin/why.byte --driver drivers/coq.drv -I theories/ \
+		--output-dir theories/coq --goals-of real.FromInt
+	bin/why.byte --driver drivers/coq.drv -I theories/ \
+		--output-dir theories/coq --goals-of real.ExpLog
+	bin/why.byte --driver drivers/coq.drv -I theories/ \
+		--output-dir theories/coq --goals-of real.Trigonometric
 	for i in theories/coq/*.v; do echo coq $$i; (coqc $$i || true) done
 
 testl: bin/whyl.byte

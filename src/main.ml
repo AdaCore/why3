@@ -173,7 +173,7 @@ let extract_goals ?filter =
   fun env drv acc th ->
     let l = split_theory th filter in
     let l = List.rev_map (fun (task,cl,used) -> 
-      let drv = Driver.cook_driver env cl used drv in
+      let drv = Driver.cook_driver env cl (Ident.Mid.add th.th_name th used) drv in
       (th,task,drv)) l in
     List.rev_append l acc
 
@@ -183,10 +183,112 @@ let file_sanitizer = None (* We should remove which character? *)
 let print_theory_namespace fmt th =
   Pretty.print_namespace fmt th.th_name.Ident.id_short th.th_export
 
+
+
+
+let do_goals env drv src_filename_printer dest_filename_printer file goals = 
+  (* Apply transformations *)
+  let goals = List.fold_left 
+    (fun acc (th,task,drv) -> 
+       List.rev_append 
+         (List.map (fun e -> (th,e,drv)) 
+            (Driver.apply_transforms drv task)
+         ) acc) [] goals 
+  in
+  (* Pretty-print the goals or call the prover *)
+  begin
+    match !output_dir with
+      | None -> ()
+      | Some dir (* we are in the output dir mode *) -> 
+          let file = 
+            let file = Filename.basename file in
+            let file = 
+              try
+                Filename.chop_extension file 
+              with Invalid_argument _ -> file in
+            Ident.string_unique src_filename_printer file in
+          List.iter 
+            (fun (th,task,drv) ->
+               let dest = 
+                 Driver.filename_of_goal drv 
+                   file th.th_name.Ident.id_short task in
+               (* Uniquify the filename before the extension if it exists*)
+               let i = 
+                 try String.rindex dest '.' 
+                 with Not_found -> String.length dest in
+               let name,ext = String.sub dest 0 i, 
+                 String.sub dest i (String.length dest- i) in
+               let name = Ident.string_unique dest_filename_printer name in
+               let filename = name^ext in
+               let filename = Filename.concat dir filename in
+               let cout = open_out filename in
+               let fmt = formatter_of_out_channel cout in
+               fprintf fmt "%a@?" (Driver.print_task drv) task;
+               close_out cout) goals
+  end;
+  begin
+    match !output_file with
+      | None -> ()
+      | Some file (* we are in the output file mode *) -> 
+          let fmt = if file = "-" then std_formatter
+          else formatter_of_out_channel (open_out file) 
+          in
+          let print_task fmt (th,task,drv) =
+            fprintf fmt "@[%a@]" (Driver.print_task drv) task
+          in
+          let print_zero fmt () = fprintf fmt "\000@?" in
+          fprintf fmt "%a@?" (Pp.print_list print_zero print_task) goals
+  end;
+  if !call then
+    (* we are in the call mode *)
+    let call (th,task,drv) = 
+      let res = 
+        Driver.call_prover ~debug:!debug ?timeout drv task in
+      printf "%s %s %s : %a@." 
+        file th.th_name.Ident.id_short 
+        ((task_goal task).Decl.pr_name).Ident.id_long
+        Call_provers.print_prover_result res in
+    List.iter call goals
+
+
+
+let do_no_file env drv src_filename_printer dest_filename_printer =
+  let drv =  
+    match drv with
+      | None -> eprintf "a driver is needed@."; exit 1
+      | Some drv -> drv in
+  (* Extract the goal(s) *)
+  Hashtbl.iter
+    (fun tname goals ->
+       let dir,file,th = match List.rev (Str.split (Str.regexp "\\.") tname) with
+         | t::p -> List.rev p, List.hd p, t
+         | _ -> assert false
+       in
+       let th = try Env.find_theory env dir th with Not_found -> 
+         eprintf "--goal/--goals_of : Unknown theory %s@." 
+           tname; exit 1 
+       in                
+       let filter = match goals with
+         | None -> None
+         | Some s -> Some 
+             (Hashtbl.fold 
+                (fun s l acc ->
+                   let pr = try ns_find_pr th.th_export l 
+                   with Not_found ->
+                     eprintf "--goal : Unknown goal %s@." s ; exit 1 in
+                   Decl.Spr.add pr acc
+                ) s Decl.Spr.empty) in
+       let goals = extract_goals ?filter env drv [] th in
+       do_goals env drv src_filename_printer dest_filename_printer file goals) 
+    which_theories 
+  
+
 let do_file env drv src_filename_printer dest_filename_printer file =
-  let file,cin = if file = "-" 
-  then "stdin",stdin
-  else file, open_in file in
+  let file,cin = 
+    if file = "-" 
+    then "stdin",stdin
+    else file, open_in file 
+  in
   if !parse_only then begin
     let lb = Lexing.from_channel cin in
     Loc.set_file file lb;
@@ -233,68 +335,9 @@ let do_file env drv src_filename_printer dest_filename_printer file =
                         ) s Decl.Spr.empty) in
                extract_goals ?filter env drv acc th
             ) which_theories [] in
-      (* Apply transformations *)
-      let goals = List.fold_left 
-        (fun acc (th,task,drv) -> 
-           List.rev_append 
-             (List.map (fun e -> (th,e,drv)) 
-                (Driver.apply_transforms drv task)
-             ) acc) [] goals in
-      (* Pretty-print the goals or call the prover *)
-      begin
-        match !output_dir with
-          | None -> ()
-          | Some dir (* we are in the output dir mode *) -> 
-              let file = 
-                let file = Filename.basename file in
-                let file = 
-                  try
-                    Filename.chop_extension file 
-                  with Invalid_argument _ -> file in
-                Ident.string_unique src_filename_printer file in
-              List.iter 
-                (fun (th,task,drv) ->
-                   let dest = 
-                     Driver.filename_of_goal drv 
-                       file th.th_name.Ident.id_short task in
-                   (* Uniquify the filename before the extension if it exists*)
-                   let i = 
-                     try String.rindex dest '.' 
-                     with Not_found -> String.length dest in
-                   let name,ext = String.sub dest 0 i, 
-                     String.sub dest i (String.length dest- i) in
-                   let name = Ident.string_unique dest_filename_printer name in
-                   let filename = name^ext in
-                   let filename = Filename.concat dir filename in
-                   let cout = open_out filename in
-                   let fmt = formatter_of_out_channel cout in
-                   fprintf fmt "%a@?" (Driver.print_task drv) task;
-                   close_out cout) goals
-      end;
-      begin
-        match !output_file with
-          | None -> ()
-          | Some file (* we are in the output file mode *) -> 
-              let fmt = if file = "-" then std_formatter
-                else formatter_of_out_channel (open_out file) 
-              in
-              let print_task fmt (th,task,drv) =
-                fprintf fmt "@[%a@]" (Driver.print_task drv) task
-              in
-              let print_zero fmt () = fprintf fmt "\000@?" in
-              fprintf fmt "%a@?" (Pp.print_list print_zero print_task) goals
-      end;
-      if !call then
-        (* we are in the call mode *)
-        let call (th,task,drv) = 
-          let res = 
-            Driver.call_prover ~debug:!debug ?timeout drv task in
-          printf "%s %s %s : %a@." 
-            file th.th_name.Ident.id_short 
-            ((task_goal task).Decl.pr_name).Ident.id_long
-            Call_provers.print_prover_result res in
-        List.iter call goals
+      do_goals env drv src_filename_printer dest_filename_printer file goals
   end
+
 
 let () =
   try
@@ -318,7 +361,10 @@ let () =
       ?sanitizer:file_sanitizer [] in
     let dest_filename_printer = Ident.create_ident_printer 
       ?sanitizer:file_sanitizer [] in
-    Queue.iter (do_file env drv src_filename_printer dest_filename_printer)
+    if Queue.is_empty files then
+      do_no_file env drv src_filename_printer dest_filename_printer
+    else
+      Queue.iter (do_file env drv src_filename_printer dest_filename_printer)
       files
   with e when not !debug ->
     eprintf "%a@." report e;
@@ -326,7 +372,7 @@ let () =
 
 (*
 Local Variables: 
-compile-command: "unset LANG; make -C .. test"
+compile-command: "unset LANG; make -C .. byte"
 End: 
 *)
 

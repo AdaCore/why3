@@ -25,6 +25,8 @@ theory Abs
   axiom Pos: forall x:int. x >= 0 -> abs(x) = x
   axiom Neg: forall x:int. x <= 0 -> abs(x) = -x
 
+  lemma Abs_pos: forall x:int. abs(x) >= 0
+
 end
 
 theory MinMax

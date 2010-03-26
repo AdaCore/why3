@@ -189,7 +189,8 @@ and print_tnode opl opr drv fmt t = match t.t_node with
       forget_var v
   | Tapp (fs, tl) ->
     begin match query_ident drv fs.ls_name with
-      | Syntax s -> syntax_arguments s (print_term drv) fmt tl
+      | Syntax s ->           
+          syntax_arguments s (print_term drv) fmt tl
       | _ -> if unambig_fs fs
           then fprintf fmt "(%a %a)" print_ls fs
             (print_space_list (print_term drv)) tl

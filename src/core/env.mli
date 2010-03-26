@@ -27,6 +27,7 @@ type retrieve_theory = env -> string list -> theory Mnm.t
 
 val create_env : retrieve_theory -> env
 
+(** ??? *)
 val find_theory : env -> string list -> string -> theory
 
 val env_tag : env -> int
