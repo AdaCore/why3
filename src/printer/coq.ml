@@ -170,7 +170,7 @@ and print_tnode opl opr drv fmt t = match t.t_node with
 	"(%s)%%R" "(%s * %s)%%R" "(%s / %s)%%R" fmt c
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
+      fprintf fmt (protect_on opr "let %a :=@ %a in@ %a")
         print_vs v (print_opl_term drv) t1 (print_opl_term drv) t2;
       forget_var v
   | Tcase (tl,bl) ->
@@ -211,7 +211,7 @@ and print_fnode opl opr drv fmt f = match f.f_node with
       fprintf fmt (protect_on opr "~ %a") (print_opl_fmla drv) f
   | Flet (t,f) ->
       let v,f = f_open_bound f in
-      fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
+      fprintf fmt (protect_on opr "let %a :=@ %a in@ %a")
         print_vs v (print_opl_term drv) t (print_opl_fmla drv) f;
       forget_var v
   | Fcase (tl,bl) ->
@@ -272,7 +272,9 @@ let print_type_decl drv fmt d =
     | Syntax _ -> ()
     | _ -> print_type_decl drv fmt d; forget_tvs ()
 
-let print_ls_type drv fmt ls = match ls with
+let print_ls_type ?(arrow=false) drv fmt ls = 
+  if arrow then fprintf fmt " ->@ ";
+  match ls with
   | None -> fprintf fmt "Prop"
   | Some ty -> print_ty drv fmt ty
 
@@ -285,9 +287,9 @@ let print_logic_decl drv fmt (ls,ld) = match ld with
         (print_expr drv) e;
       List.iter forget_var vl
   | None ->
-      fprintf fmt "@[<hov 2>Parameter %a: %a@ -> %a.@]@\n@\n"
+      fprintf fmt "@[<hov 2>Parameter %a: %a@ %a.@]@\n@\n"
         print_ls ls (print_arrow_list (print_ty drv)) ls.ls_args
-        (print_ls_type drv) ls.ls_value
+        (print_ls_type ~arrow:(List.length ls.ls_args > 0) drv) ls.ls_value
 
 let print_logic_decl drv fmt d =
   match query_ident drv (fst d).ls_name with

@@ -17,6 +17,20 @@ theory BuiltIn
   syntax logic  (_<>_)  "(%1 <> %2)"
 end
 
+theory bool.Bool
+
+  syntax type bool "bool"
+
+  syntax logic True "true"
+  syntax logic False "false"
+
+  syntax logic andb "(andb %1 %2)"
+  syntax logic orb "(orb %1 %2)"
+  syntax logic xorb "(xorb %1 %2)"
+  syntax logic notb "(negb %1)"
+
+end
+
 
 theory int.Int
 
