@@ -63,5 +63,3 @@ let find_theory env sl s =
 
 let env_tag env = env.env_tag
 
-let print_theorynotfound fmt (l,s) =
-  Format.fprintf fmt "%s.%s" (String.concat "." l) s

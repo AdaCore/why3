@@ -227,8 +227,9 @@ let load_rules env driver {thr_name = loc,qualid; thr_rules = trl} =
   let id,qfile = qualid_to_slist qualid in
   let th = try
     find_theory env qfile id 
-  with Env.TheoryNotFound (l,s) -> errorm ~loc "theory %a not found" 
-    Env.print_theorynotfound (l,s) in
+  with Env.TheoryNotFound (l,s) -> 
+    errorm ~loc "theory %s.%s not found" (String.concat "." l) s
+  in
   let add_htheory cloned id t =
     try
       let t2,t3 = Hid.find driver.drv_theory id in
