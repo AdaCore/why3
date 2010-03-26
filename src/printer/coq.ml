@@ -49,8 +49,7 @@ let tv_set = ref Sid.empty
 (* type variables *)
 let print_tv fmt tv =
   tv_set := Sid.add tv.tv_name !tv_set;
-  let sanitize n = n in
-  let n = id_unique iprinter ~sanitizer:sanitize tv.tv_name in
+  let n = id_unique iprinter tv.tv_name in
   fprintf fmt "%s" n
 
 let forget_tvs () =
@@ -59,8 +58,7 @@ let forget_tvs () =
 
 (* logic variables *)
 let print_vs fmt vs =
-  let sanitize n = n in
-  let n = id_unique iprinter ~sanitizer:sanitize vs.vs_name in
+  let n = id_unique iprinter vs.vs_name in
   fprintf fmt "%s" n
 
 let forget_var vs = forget_id iprinter vs.vs_name
@@ -69,18 +67,15 @@ let print_ts fmt ts =
   fprintf fmt "%s" (id_unique tprinter ts.ts_name)
 
 let print_ls fmt ls =
-  let n = if ls.ls_constr
-    then id_unique lprinter ~sanitizer:String.capitalize ls.ls_name
-    else id_unique lprinter ls.ls_name
-  in
+  let n = id_unique lprinter ls.ls_name in
+(*  if ls.ls_name = "mod" then *)
+    eprintf "Coq.print_ls: %s -> %s@." ls.ls_name.id_long n;
   fprintf fmt "%s" n
 
 let print_pr fmt pr =
   fprintf fmt "%s" (id_unique pprinter pr.pr_name)
 
 (** Types *)
-
-let rec ns_comma fmt () = fprintf fmt ",@,"
 
 let rec print_ty drv fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
@@ -257,23 +252,19 @@ let print_constr drv fmt cs =
   fprintf fmt "@[<hov 4>| %a%a@]" print_ls cs
     (print_paren_l (print_ty drv)) cs.ls_args
 
-let print_ty_args fmt = function
-  | [] -> ()
-  | [tv] -> fprintf fmt " %a" print_tv tv
-  | l -> fprintf fmt " (%a)" (print_list ns_comma print_tv) l
-
 let print_type_decl drv fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
       | None ->
-          fprintf fmt "@[<hov 2>Parameter %a : %a -> Type.@]@\n@\n"
-            print_ts ts print_ty_args ts.ts_args 
+          fprintf fmt "@[<hov 2>Parameter %a : %aType.@]@\n@\n"
+            print_ts ts (print_arrow_list print_tv) ts.ts_args 
       | Some ty ->
           fprintf fmt "@[<hov 2>Definition %a %a :=@ %a@]@\n@\n"
-            print_ts ts print_ty_args ts.ts_args (print_ty drv) ty
+            print_ts ts (print_arrow_list print_tv) ts.ts_args 
+	    (print_ty drv) ty
       end
   | Talgebraic csl ->
-      fprintf fmt "@[<hov 2>Inductive %a %a :=@\n@[<hov>%a@]@]@\n@\n"
-        print_ts ts print_ty_args ts.ts_args 
+      fprintf fmt "@[<hov 2>Inductive %a %a :=@\n@[<hov>%a@].@]@\n@\n"
+        print_ts ts (print_arrow_list print_tv) ts.ts_args 
         (print_list newline (print_constr drv)) csl
 
 let print_type_decl drv fmt d =
@@ -321,9 +312,13 @@ let print_pkind fmt = function
   | Plemma -> fprintf fmt "Lemma"
   | Pgoal  -> fprintf fmt "Theorem"
 
+let print_proof fmt = function
+  | Paxiom -> ()
+  | Plemma | Pgoal  -> fprintf fmt "Admitted.@\n"
+
 let print_prop_decl drv fmt (k,pr,f) =
-  fprintf fmt "@[<hov 2>%a %a : %a.@]@\n@\n" print_pkind k
-    print_pr pr (print_fmla drv) f
+  fprintf fmt "@[<hov 2>%a %a : %a.@]@\n%a@\n" print_pkind k
+    print_pr pr (print_fmla drv) f print_proof k
 
 let print_prop_decl drv fmt (k,pr,f) =
   match k, query_ident drv pr.pr_name with

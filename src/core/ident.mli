@@ -69,28 +69,29 @@ val id_from_user : ident -> Loc.position option
 
 type ident_printer
 
-(* start a new printer with a sanitizing function and a blacklist *)
 val create_ident_printer :
   ?sanitizer : (string -> string) -> string list -> ident_printer
+(** start a new printer with a sanitizing function and a blacklist *)
 
-(* use ident_printer to generate a unique name for ident *)
-(* an optional sanitizer is applied over the printer's sanitizer *)
 val id_unique :
   ident_printer -> ?sanitizer : (string -> string) -> ident -> string
+(** use ident_printer to generate a unique name for ident 
+    an optional sanitizer is applied over the printer's sanitizer *)
 
-(* Uniquify string *)
 val string_unique : ident_printer -> string -> string
+(** Uniquify string *)
 
-(* forget an ident *)
 val forget_id : ident_printer -> ident -> unit
+(** forget an ident *)
 
-(* forget all idents *)
 val forget_all : ident_printer -> unit
+(** forget all idents *)
 
-(* generic sanitizer taking a separate encoder for the first letter *)
 val sanitizer : (char -> string) -> (char -> string) -> string -> string
+(** generic sanitizer taking a separate encoder for the first letter *)
 
-(* various character encoders *)
+(** various character encoders *)
+
 val char_to_alpha : char -> string
 val char_to_lalpha : char -> string
 val char_to_ualpha : char -> string
