@@ -25,7 +25,7 @@ theory Abs
   axiom Pos: forall x:real. x >= 0.0 -> abs(x) = x
   axiom Neg: forall x:real. x <= 0.0 -> abs(x) = -x
 
-  lemma Abs_le: forall x,y:real. abs(x) <= y <-> -y <= x and x <= y
+  lemma Abs_le: forall x,y:real. abs(x) <= y <-> -y <= x <= y
 
   lemma Abs_pos: forall x:real. abs(x) >= 0.0
 
@@ -221,7 +221,7 @@ theory Hyperbolic
     forall x:real. x >= 1.0 -> arcosh(x) = log(x+sqrt(sqr(x)-1.0))
   logic artanh(x:real) : real
   axiom Artanh_def:
-    forall x:real. -1.0 < x and x < 1.0 -> artanh(x) = 0.5*log((1.0+x)/(1.0-x))
+    forall x:real. -1.0 < x < 1.0 -> artanh(x) = 0.5*log((1.0+x)/(1.0-x))
 
 end
 

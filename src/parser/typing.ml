@@ -220,18 +220,20 @@ let specialize_lsymbol p uc =
   s, specialize_lsymbol (qloc p) s
 
 let specialize_fsymbol p uc =
-  let loc = qloc p in
   let s, (tl, ty) = specialize_lsymbol p uc in
   match ty with
-    | None -> error ~loc TermExpected
+    | None -> let loc = qloc p in error ~loc TermExpected
     | Some ty -> s, tl, ty
 
 let specialize_psymbol p uc =
-  let loc = qloc p in
   let s, (tl, ty) = specialize_lsymbol p uc in
   match ty with
     | None -> s, tl
-    | Some _ -> error ~loc PredicateExpected
+    | Some _ -> let loc = qloc p in error ~loc PredicateExpected
+
+let is_psymbol p uc = 
+  let s = find_lsymbol p uc in
+  s.ls_value = None
 
 
 (** Typing types *)
@@ -373,6 +375,10 @@ and dterm_node loc env = function
       let s, tyl, ty = specialize_fsymbol x env.uc in
       let tl = dtype_args s.ls_name loc env tyl tl in
       Tapp (s, tl), ty
+  | PPinfix (e1, x, e2) ->
+      let s, tyl, ty = specialize_fsymbol (Qident x) env.uc in
+      let tl = dtype_args s.ls_name loc env tyl [e1; e2] in
+      Tapp (s, tl), ty
   | PPconst (ConstInt _ as c) ->
       Tconst c, Tyapp (Ty.ts_int, [])
   | PPconst (ConstReal _ as c) ->
@@ -414,7 +420,7 @@ and dterm_node loc env = function
       let e1 = dfmla env e1 in
       Teps (x, ty, e1), ty
   | PPquant _ | PPif _
-  | PPprefix _ | PPinfix _ | PPfalse | PPtrue ->
+  | PPbinop _ | PPunop _ | PPfalse | PPtrue ->
       error ~loc TermExpected
 
 and dfmla env e = match e.pp_desc with
@@ -422,9 +428,9 @@ and dfmla env e = match e.pp_desc with
       Ftrue
   | PPfalse ->
       Ffalse
-  | PPprefix (PPnot, a) ->
+  | PPunop (PPnot, a) ->
       Fnot (dfmla env a)
-  | PPinfix (a, (PPand | PPor | PPimplies | PPiff as op), b) ->
+  | PPbinop (a, (PPand | PPor | PPimplies | PPiff as op), b) ->
       Fbinop (binop op, dfmla env a, dfmla env b)
   | PPif (a, b, c) ->
       Fif (dfmla env a, dfmla env b, dfmla env c)
@@ -456,6 +462,16 @@ and dfmla env e = match e.pp_desc with
       let s, tyl = specialize_psymbol x env.uc in
       let tl = dtype_args s.ls_name e.pp_loc env tyl tl in
       Fapp (s, tl)
+  | PPinfix (e12, op2, e3) ->
+      begin match e12.pp_desc with
+	| PPinfix (_, op1, e2) when is_psymbol (Qident op1) env.uc ->
+	    let e23 = { e with pp_desc = PPinfix (e2, op2, e3) } in
+	    Fbinop (Fand, dfmla env e12, dfmla env e23)
+	| _ ->
+	    let s, tyl = specialize_psymbol (Qident op2) env.uc in
+	    let tl = dtype_args s.ls_name e.pp_loc env tyl [e12; e3] in
+	    Fapp (s, tl)
+      end
   | PPlet ({id=x}, e1, e2) ->
       let e1 = dterm env e1 in
       let ty = e1.dt_ty in

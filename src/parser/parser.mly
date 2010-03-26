@@ -32,10 +32,10 @@
 		    
   let mk_pat p = { pat_loc = loc (); pat_desc = p }
 
-  let infix_ppl loc a i b = mk_ppl loc (PPinfix (a, i, b))
+  let infix_ppl loc a i b = mk_ppl loc (PPbinop (a, i, b))
   let infix_pp a i b = infix_ppl (loc ()) a i b
 
-  let prefix_ppl loc p a = mk_ppl loc (PPprefix (p, a))
+  let prefix_ppl loc p a = mk_ppl loc (PPunop (p, a))
   let prefix_pp p a = prefix_ppl (loc ()) p a
 
   let infix s = "infix " ^ s
@@ -359,19 +359,19 @@ lexpr:
    { prefix_pp PPnot $2 }
 | lexpr EQUAL lexpr 
    { let id = { id = infix "="; id_loc = loc_i 2 } in
-     mk_pp (PPapp (Qident id, [$1; $3])) }
+     mk_pp (PPinfix ($1, id, $3)) }
 | lexpr OP1 lexpr 
    { let id = { id = infix $2; id_loc = loc_i 2 } in
-     mk_pp (PPapp (Qident id, [$1; $3])) }
+     mk_pp (PPinfix ($1, id, $3)) }
 | lexpr OP2 lexpr 
    { let id = { id = infix $2; id_loc = loc_i 2 } in
-     mk_pp (PPapp (Qident id, [$1; $3])) }
+     mk_pp (PPinfix ($1, id, $3)) }
 | lexpr OP3 lexpr 
    { let id = { id = infix $2; id_loc = loc_i 2 } in
-     mk_pp (PPapp (Qident id, [$1; $3])) }
+     mk_pp (PPinfix ($1, id, $3)) }
 | lexpr OP4 lexpr 
    { let id = { id = infix $2; id_loc = loc_i 2 } in
-     mk_pp (PPapp (Qident id, [$1; $3])) }
+     mk_pp (PPinfix ($1, id, $3)) }
 | any_op lexpr %prec prefix_op
    { let id = { id = prefix $1; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$2])) }

@@ -12,7 +12,7 @@
 {
 logic x2 : int
 logic y2 : int
-axiom First_octant : 0 <= y2 and y2 <= x2
+axiom First_octant : 0 <= y2 <= x2
 }
 
 (* The code.
@@ -29,7 +29,7 @@ logic best(x:int, y:int) =
 
 logic invariant(x:int, y:int, e:int) =
   e = 2 * (x + 1) * y2 - (2 * y + 1) * x2 and
-  2 * (y2 - x2) <= e and e <= 2 * y2
+  2 * (y2 - x2) <= e <= 2 * y2
 
 lemma Invariant_is_ok : forall x,y,e:int. invariant(x,y,e) -> best(x,y)
 }

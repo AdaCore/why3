@@ -56,7 +56,7 @@ theory EuclideanDivision
     forall x,y:int. y <> 0 -> x = y * div(x,y) + mod(x,y)
 
   axiom Mod_bound: 
-    forall x,y:int. y <> 0 -> 0 <= mod(x,y) and mod(x,y) < abs(y)
+    forall x,y:int. y <> 0 -> 0 <= mod(x,y) < abs(y)
 
   lemma Mod_1: forall x:int. mod(x,1) = 0
 
@@ -76,7 +76,7 @@ theory ComputerDivision
     forall x,y:int. y <> 0 -> x = y * div(x,y) + mod(x,y)
 
   axiom Mod_bound: 
-    forall x,y:int. y <> 0 -> -abs(y) < mod(x,y) and mod(x,y) < abs(y)
+    forall x,y:int. y <> 0 -> -abs(y) < mod(x,y) < abs(y)
 
   lemma Mod_1: forall x:int. mod(x,1) = 0
 

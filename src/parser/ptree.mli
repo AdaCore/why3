@@ -29,10 +29,10 @@ type constant = Term.constant
 type pp_quant =
   | PPforall | PPexists
 
-type pp_infix = 
+type pp_binop = 
   | PPand | PPor | PPimplies | PPiff 
 
-type pp_prefix = 
+type pp_unop = 
   | PPnot
 
 type ident = { id : string; id_loc : loc }
@@ -66,8 +66,9 @@ and pp_desc =
   | PPtrue
   | PPfalse
   | PPconst of constant
-  | PPinfix of lexpr * pp_infix * lexpr
-  | PPprefix of pp_prefix * lexpr
+  | PPinfix of lexpr * ident * lexpr
+  | PPbinop of lexpr * pp_binop * lexpr
+  | PPunop of pp_unop * lexpr
   | PPif of lexpr * lexpr * lexpr
   | PPquant of pp_quant * uquant list * lexpr list list * lexpr
   | PPnamed of string * lexpr
