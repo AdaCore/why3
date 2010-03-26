@@ -83,8 +83,12 @@ let rec id_from_user i =
 
 (** Unique names for pretty printing *)
 
-type ident_printer =
-  (string, int) Hashtbl.t * (int, string) Hashtbl.t * (string -> string)
+type ident_printer = {
+  indices   : (string, int) Hashtbl.t;
+  values    : (int, string) Hashtbl.t;
+  sanitizer : string -> string;
+  blacklist : string list;
+}
 
 let rec find_index indices name ind =
   if Hashtbl.mem indices (name ^ string_of_int ind)
@@ -100,35 +104,40 @@ let find_unique indices name =
   Hashtbl.replace indices name 0;
   name
 
+let reserve indices name = ignore (find_unique indices name)
+
 let same x = x
 
 let create_ident_printer ?(sanitizer = same) sl =
   let indices = Hashtbl.create 1997 in
-  let block n = ignore (find_unique indices n) in
-  List.iter block sl;
-  indices, Hashtbl.create 1997, sanitizer
+  List.iter (reserve indices) sl;
+  { indices   = indices;
+    values    = Hashtbl.create 1997;
+    sanitizer = sanitizer;
+    blacklist = sl }
 
-let id_unique (indices,values,san0) ?(sanitizer = same) id =
+let id_unique printer ?(sanitizer = same) id =
   try
-    Hashtbl.find values id.id_tag
+    Hashtbl.find printer.values id.id_tag
   with Not_found ->
-    let name = sanitizer (san0 id.id_long) in
-    let name = find_unique indices name in
-    Hashtbl.replace values id.id_tag name;
+    let name = sanitizer (printer.sanitizer id.id_long) in
+    let name = find_unique printer.indices name in
+    Hashtbl.replace printer.values id.id_tag name;
     name
 
-let string_unique printer s =
-  id_unique printer (id_register (id_fresh s))
+let string_unique printer s = find_unique printer.indices s
 
-let forget_id (indices,values,_) id =
+let forget_id printer id =
   try
-    let name = Hashtbl.find values id.id_tag in
-    Hashtbl.remove indices name;
-    Hashtbl.remove values id.id_tag
+    let name = Hashtbl.find printer.values id.id_tag in
+    Hashtbl.remove printer.indices name;
+    Hashtbl.remove printer.values id.id_tag
   with Not_found -> ()
 
-let forget_all (indices,values,_) =
-  Hashtbl.clear indices; Hashtbl.clear values
+let forget_all printer =
+  Hashtbl.clear printer.indices;
+  Hashtbl.clear printer.values;
+  List.iter (reserve printer.indices) printer.blacklist
 
 (** Sanitizers *)
 
