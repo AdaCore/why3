@@ -34,20 +34,46 @@ theory BitVector
   
   logic bvzero : bv
   axiom Nth_zero: 
-    forall n:int. 0 <= n and n < size -> nth(bvzero,n) = False
+    forall n:int. 0 <= n < size -> nth(bvzero,n) = False
 
   logic bvone : bv
   axiom Nth_one: 
-    forall n:int. 0 <= n and n < size -> nth(bvone,n)  = True
+    forall n:int. 0 <= n < size -> nth(bvone,n)  = True
 
   logic eq(v1:bv,v2:bv) =
-    forall n:int. 0 <= n and n < size -> nth(v1,n) = nth(v2,n)
+    forall n:int. 0 <= n < size -> nth(v1,n) = nth(v2,n)
 
   logic bw_and(v1:bv,v2:bv) : bv
   axiom Nth_bw_and: 
-    forall v1,v2:bv,n:int. 0 <= n and n < size -> 
+    forall v1,v2:bv,n:int. 0 <= n < size -> 
       nth(bw_and(v1,v2),n)  = andb(nth(v1,n),nth(v2,n))
 
+  (* logical shift right *)
+  logic lsr(bv,int) : bv
+
+  axiom Lsr_nth_low:
+    forall b:bv,n,s:int. 0 <= n+s < size -> nth(lsr(b,s),n) = nth(b,n+s)
+
+  axiom Lsr_nth_high:
+    forall b:bv,n,s:int. n+s >= size -> nth(lsr(b,s),n) = False
+
+  (* arithmetic shift left *)
+  logic asr(bv,int) : bv
+
+  axiom Asr_nth_low:
+    forall b:bv,n,s:int. 0 <= n+s < size -> nth(asr(b,s),n) = nth(b,n+s)
+
+  axiom Asr_nth_high:
+    forall b:bv,n,s:int. n+s >= size -> nth(asr(b,s),n) = nth(b,size-1)
+
+  (* logical shift left *)
+  logic lsl(bv,int) : bv
+
+  axiom Lsl_nth_high:
+    forall b:bv,n,s:int. 0 <= n-s < size -> nth(lsl(b,s),n) = nth(b,n-s)
+
+  axiom Lsl_nth_low:
+    forall b:bv,n,s:int. n-s < 0 -> nth(lsl(b,s),n) = False
 
 end
 
@@ -67,6 +93,21 @@ theory TestBv32
   lemma Test1:
     let b = bw_and(bvzero,bvone) in nth(b,1) = False
 
+  lemma Test2:
+    let b = lsr(bvone,16) in nth(b,15) = True
+     
+  lemma Test3:
+    let b = lsr(bvone,16) in nth(b,16) = False
+
+  lemma Test4:
+    let b = asr(bvone,16) in nth(b,15) = True
+     
+  lemma Test5:
+    let b = asr(bvone,16) in nth(b,16) = True
+
+  lemma Test6:
+    let b = asr(lsr(bvone,1),16) in nth(b,16) = False
+     
 end 
 
 
