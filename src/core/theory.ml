@@ -364,16 +364,16 @@ let cl_init_ts cl ts ts' =
 let cl_init_ls cl ls ls' =
   let id = ls.ls_name in
   if not (Sid.mem id cl.id_local) then raise (NonLocal id);
-  let tymatch sb ty ty' =
-    try Ty.matching sb ty' (cl_trans_ty cl ty)
+  let mtch sb ty ty' =
+    try ty_match sb ty' (cl_trans_ty cl ty)
     with TypeMismatch -> raise (BadInstance (id, ls'.ls_name))
   in
   let sb = match ls.ls_value,ls'.ls_value with
-    | Some ty, Some ty' -> tymatch Mtv.empty ty ty'
+    | Some ty, Some ty' -> mtch Mtv.empty ty ty'
     | None, None -> Mtv.empty
     | _ -> raise (BadInstance (id, ls'.ls_name))
   in
-  ignore (try List.fold_left2 tymatch sb ls.ls_args ls'.ls_args
+  ignore (try List.fold_left2 mtch sb ls.ls_args ls'.ls_args
   with Invalid_argument _ -> raise (BadInstance (id, ls'.ls_name)));
   cl_add_ls cl ls ls'
 

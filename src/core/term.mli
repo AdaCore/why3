@@ -173,6 +173,8 @@ val t_let : vsymbol -> term -> term -> term
 val t_case : term list -> (pattern list * term) list -> ty -> term
 val t_eps : vsymbol -> fmla -> term
 
+val t_app_infer : lsymbol -> term list -> term
+
 val t_label : label list -> term -> term
 val t_label_add : label -> term -> term
 val t_label_copy : term -> term -> term
@@ -342,6 +344,8 @@ val f_subst_fmla_alpha : fmla -> fmla -> fmla -> fmla
 
 (* term/fmla matching modulo alpha in the pattern *)
 
-val t_match : term -> term -> term Mvs.t -> term Mvs.t option
-val f_match : fmla -> fmla -> term Mvs.t -> term Mvs.t option
+exception NoMatch
+
+val t_match : term Mvs.t -> term -> term -> term Mvs.t
+val f_match : term Mvs.t -> fmla -> fmla -> term Mvs.t
 

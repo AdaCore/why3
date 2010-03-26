@@ -165,10 +165,10 @@ exception PredicateSymbolExpected of lsymbol
 let pat_app fs pl ty =
   if not fs.ls_constr then raise (ConstructorExpected fs);
   let s = match fs.ls_value with
-    | Some vty -> Ty.matching Mtv.empty vty ty
+    | Some vty -> ty_match Mtv.empty vty ty
     | None -> raise (FunctionSymbolExpected fs)
   in
-  let mtch s ty p = Ty.matching s ty p.pat_ty in
+  let mtch s ty p = ty_match s ty p.pat_ty in
   ignore (try List.fold_left2 mtch s fs.ls_args pl
           with Invalid_argument _ -> raise BadArity);
   pat_app fs pl ty
@@ -567,20 +567,32 @@ let f_any_unsafe prT prF lvl f =
 
 let t_app fs tl ty =
   let s = match fs.ls_value with
-    | Some vty -> Ty.matching Mtv.empty vty ty
+    | Some vty -> ty_match Mtv.empty vty ty
     | _ -> raise (FunctionSymbolExpected fs)
   in
-  let mtch s ty t = Ty.matching s ty t.t_ty in
+  let mtch s ty t = ty_match s ty t.t_ty in
   ignore (try List.fold_left2 mtch s fs.ls_args tl
           with Invalid_argument _ -> raise BadArity);
   t_app fs tl ty
+
+let t_app_infer fs tl =
+  let mtch s ty t = ty_match s ty t.t_ty in
+  let s =
+    try List.fold_left2 mtch Mtv.empty fs.ls_args tl
+    with Invalid_argument _ -> raise BadArity
+  in
+  let ty = match fs.ls_value with
+    | Some ty -> ty_inst s ty
+    | _ -> raise (FunctionSymbolExpected fs)
+  in
+  t_app_unsafe fs tl ty
 
 let f_app ps tl =
   let s = match ps.ls_value with
     | None -> Mtv.empty
     | _ -> raise (PredicateSymbolExpected ps)
   in
-  let mtch s ty t = Ty.matching s ty t.t_ty in
+  let mtch s ty t = ty_match s ty t.t_ty in
   ignore (try List.fold_left2 mtch s ps.ls_args tl
           with Invalid_argument _ -> raise BadArity);
   f_app ps tl
@@ -1162,9 +1174,6 @@ and f_match_quant s qf1 qf2 =
   let cmp v1 v2 = v1.vs_ty == v2.vs_ty in
   if list_all2 cmp vl1 vl2
   then f_match s f1 f2 else raise NoMatch
-
-let t_match t1 t2 s = try Some (t_match s t1 t2) with NoMatch -> None
-let f_match f1 f2 s = try Some (f_match s f1 f2) with NoMatch -> None
 
 (* occurrence check *)
 

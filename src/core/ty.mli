@@ -77,8 +77,8 @@ val ty_s_any : (tysymbol -> bool) -> ty -> bool
 
 exception TypeMismatch
 
-val matching : ty Mtv.t -> ty -> ty -> ty Mtv.t
-val ty_match : ty -> ty -> ty Mtv.t -> ty Mtv.t option
+val ty_match : ty Mtv.t -> ty -> ty -> ty Mtv.t
+val ty_inst  : ty Mtv.t -> ty -> ty
 
 (* built-in symbols *)
 
