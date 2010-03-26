@@ -177,9 +177,10 @@ test: bin/why.byte  $(TOOLS)
 		--output-file tmp.v --goal Test.G src/test.why 
 	bin/why.byte --call --driver drivers/alt_ergo.drv -I theories/ \
 		--goal ExpLog.Log_e theories/real.why 
+	mkdir -p theories/coq
 	bin/why.byte --driver drivers/coq.drv -I theories/ \
-		--output-file tmp.v --goal ExpLog.Log_e theories/real.why 
-	coqc tmp.v
+		--output-dir theories/coq --all-goals theories/real.why 
+	for i in theories/coq/*.v; do echo coq $$i; (coqc $$i || true) done
 
 testl: bin/whyl.byte
 	ocamlrun -bt bin/whyl.byte -I theories/ src/programs/test.mlw

@@ -115,6 +115,10 @@ let lparen_r fmt () = fprintf fmt "(@,"
 let print_paren_l fmt x = print_list_delim lparen_l rparen comma fmt x
 let print_paren_r fmt x = print_list_delim lparen_r rparen comma fmt x
 
+let arrow fmt () = fprintf fmt "@ -> "
+let print_arrow_list fmt x = print_list arrow fmt x
+let print_space_list fmt x = print_list space fmt x
+
 let rec print_pat drv fmt p = match p.pat_node with
   | Pwild -> fprintf fmt "_"
   | Pvar v -> print_vs fmt v
@@ -127,7 +131,7 @@ let rec print_pat drv fmt p = match p.pat_node with
     end
 
 let print_vsty drv fmt v =
-  fprintf fmt "%a:@,%a" print_vs v (print_ty drv) v.vs_ty
+  fprintf fmt "(%a:%a)" print_vs v (print_ty drv) v.vs_ty
 
 let print_quant fmt = function
   | Fforall -> fprintf fmt "forall"
@@ -187,8 +191,8 @@ and print_tnode opl opr drv fmt t = match t.t_node with
     begin match query_ident drv fs.ls_name with
       | Syntax s -> syntax_arguments s (print_term drv) fmt tl
       | _ -> if unambig_fs fs
-          then fprintf fmt "%a%a" print_ls fs
-            (print_paren_r (print_term drv)) tl
+          then fprintf fmt "(%a %a)" print_ls fs
+            (print_space_list (print_term drv)) tl
           else fprintf fmt (protect_on opl "%a%a:%a") print_ls fs
             (print_paren_r (print_term drv)) tl (print_ty drv) t.t_ty
     end
@@ -197,7 +201,7 @@ and print_fnode opl opr drv fmt f = match f.f_node with
   | Fquant (q,fq) ->
       let vl,tl,f = f_open_quant fq in
       fprintf fmt (protect_on opr "%a %a%a,@ %a") print_quant q
-        (print_list comma (print_vsty drv)) vl
+        (print_space_list (print_vsty drv)) vl
         (print_tl drv) tl (print_fmla drv) f;
       List.iter forget_var vl
   | Ftrue ->
@@ -224,8 +228,8 @@ and print_fnode opl opr drv fmt f = match f.f_node with
   | Fapp (ps, tl) ->
     begin match query_ident drv ps.ls_name with
       | Syntax s -> syntax_arguments s (print_term drv) fmt tl
-      | _ -> fprintf fmt "%a%a" print_ls ps
-            (print_paren_r (print_term drv)) tl
+      | _ -> fprintf fmt "(%a %a)" print_ls ps
+          (print_space_list (print_term drv)) tl
     end
 
 and print_tbranch drv fmt br =
@@ -276,20 +280,22 @@ let print_type_decl drv fmt d =
     | Syntax _ -> ()
     | _ -> print_type_decl drv fmt d; forget_tvs ()
 
-let print_ls_type drv fmt = fprintf fmt " :@ %a" (print_ty drv)
+let print_ls_type drv fmt ls = match ls with
+  | None -> fprintf fmt "Prop"
+  | Some ty -> print_ty drv fmt ty
 
 let print_logic_decl drv fmt (ls,ld) = match ld with
   | Some ld ->
       let vl,e = open_ls_defn ld in
-      fprintf fmt "@[<hov 2>Definition %a%a%a :=@ %a.@]@\n@\n"
-        print_ls ls (print_paren_l (print_vsty drv)) vl
-        (print_option (print_ls_type drv)) ls.ls_value
+      fprintf fmt "@[<hov 2>Definition %a%a: %a :=@ %a.@]@\n@\n"
+        print_ls ls (print_space_list (print_vsty drv)) vl
+        (print_ls_type drv) ls.ls_value
         (print_expr drv) e;
       List.iter forget_var vl
   | None ->
-      fprintf fmt "@[<hov 2>Parameter %a%a%a.@]@\n@\n"
-        print_ls ls (print_paren_l (print_ty drv)) ls.ls_args
-        (print_option (print_ls_type drv)) ls.ls_value
+      fprintf fmt "@[<hov 2>Parameter %a: %a@ -> %a.@]@\n@\n"
+        print_ls ls (print_arrow_list (print_ty drv)) ls.ls_args
+        (print_ls_type drv) ls.ls_value
 
 let print_logic_decl drv fmt d =
   match query_ident drv (fst d).ls_name with
@@ -334,10 +340,7 @@ let print_decls drv fmt dl =
 
 let print_context drv fmt task =
   forget_all (); 
-  fprintf fmt "(* beginning of generated file *)@\n@\n";
-  fprintf fmt "Require Import ZArith.@\n@\n";
-  print_decls drv fmt (Task.task_decls task);
-  fprintf fmt "(* end of generated file *)@."
+  print_decls drv fmt (Task.task_decls task)
 
 let () = register_printer "coq" print_context
 
