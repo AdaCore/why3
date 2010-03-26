@@ -68,8 +68,8 @@ let print_ts fmt ts =
 
 let print_ls fmt ls =
   let n = id_unique lprinter ls.ls_name in
-(*  if ls.ls_name = "mod" then *)
-    eprintf "Coq.print_ls: %s -> %s@." ls.ls_name.id_long n;
+  (* temporary workaround *)
+  let n = if n = "mod" then "bmod" else n in
   fprintf fmt "%s" n
 
 let print_pr fmt pr =

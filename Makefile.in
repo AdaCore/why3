@@ -177,22 +177,17 @@ test: bin/why.byte  $(TOOLS)
 		--output-file tmp.v --goal Test.G src/test.why 
 	echo bin/why.byte --call --timeout 1 --driver drivers/alt_ergo.drv -I theories/ \
 		--all-goals theories/real.why 
-	mkdir -p theories/coq
-	bin/why.byte --driver drivers/coq.drv -I theories/ \
-		--output-dir theories/coq --goals-of int.Abs 
-	bin/why.byte --driver drivers/coq.drv -I theories/ \
-		--output-dir theories/coq --goals-of int.EuclideanDivision --goals-of int.ComputerDivision 
-	bin/why.byte --driver drivers/coq.drv -I theories/ \
-		--output-dir theories/coq --goals-of real.Abs 
-	bin/why.byte --driver drivers/coq.drv -I theories/ \
-		--output-dir theories/coq --goals-of real.FromInt
-	bin/why.byte --driver drivers/coq.drv -I theories/ \
-		--output-dir theories/coq --goals-of real.ExpLog
-	bin/why.byte --driver drivers/coq.drv -I theories/ \
-		--output-dir theories/coq --goals-of real.Trigonometric
-	bin/why.byte --driver drivers/coq.drv -I theories/ \
-		--output-dir theories/coq --goals-of floating_point.Test
-	for i in theories/coq/*.v; do echo coq $$i; (coqc $$i || true) done
+	@mkdir -p theories/coq
+	@printf "*** Checking Coq file generation ***\\n"
+	@for i in int.Abs int.EuclideanDivision int.ComputerDivision  \
+		real.Abs real.FromInt real.ExpLog real.Trigonometric \
+		floating_point.Test \
+		; do \
+	  printf "Generate Coq file for $$i" && bin/why.byte \
+		--driver drivers/coq.drv -I theories/ \
+		--output-dir theories/coq --goals-of $$i ; done
+	@printf "*** Checking Coq compilation ***\\n"
+	@for i in theories/coq/*.v; do printf "coq $$i\\n" && coqc $$i ; done
 
 testl: bin/whyl.byte
 	ocamlrun -bt bin/whyl.byte -I theories/ src/programs/test.mlw
