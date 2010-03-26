@@ -400,7 +400,7 @@ let print_prelude drv fmt =
   List.fold_right pr_pr drv.drv_raw.drv_prelude ();
   let seen = Hid.create 17 in
   let rec print_prel th_name th =
-    if Hid.mem seen th_name then () else
+    if Hid.mem seen th_name then () else begin
       Hid.add seen th_name ();
       Mid.iter print_prel th.th_used;
       let prel = 
@@ -408,6 +408,7 @@ let print_prelude drv fmt =
         with Not_found -> []
       in
       List.fold_right pr_pr prel ()
+    end
   in
   Mid.iter print_prel drv.drv_used;
   fprintf fmt "@."
