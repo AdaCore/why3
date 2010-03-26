@@ -180,7 +180,7 @@ test: bin/why.byte  $(TOOLS)
 	@mkdir -p theories/coq
 	@printf "*** Checking Coq file generation ***\\n"
 	@for i in int.Abs int.EuclideanDivision int.ComputerDivision  \
-		real.Abs real.FromInt real.ExpLog real.Trigonometric \
+		real.Abs real.FromIntTest real.ExpLog real.Trigonometric \
 		floating_point.Test array.TestBv32 \
 		; do \
 	  printf "Generate Coq file for $$i" && bin/why.byte \

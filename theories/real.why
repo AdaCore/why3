@@ -64,15 +64,73 @@ theory FromInt
   axiom Neg: 
     forall x,y:int. from_int(Int.(-_)(x)) = - from_int(x)
 
-  lemma Test: from_int(2) = 2.0
+end
+
+theory FromIntTest
+
+  use import FromInt
+
+  lemma Test1: from_int(2) = 2.0
 
 end
 
 theory Truncate
 
-  (* TODO: truncate, floor, ceil *)
+  use import Real
+  use import FromInt
+
+  (* truncate: rounds towards zero *)
+
+  logic truncate(real) : int
+
+  axiom Truncate_int :
+    forall i:int. truncate(from_int(i)) = i
+
+  axiom Truncate_down_pos:
+    forall x:real. x >= 0.0 -> 
+      from_int(truncate(x)) <= x < from_int(Int.(+)(truncate(x),1))
+
+  axiom Truncate_up_neg:
+    forall x:real. x <= 0.0 -> 
+      from_int(Int.(-)(truncate(x),1)) < x <= from_int(truncate(x))
+
+  axiom Real_of_truncate:
+    forall x:real. x - 1.0 <= from_int(truncate(x)) <= x + 1.0
+
+  axiom Truncate_monotonic:
+    forall x,y:real. x <= y -> Int.(<=)(truncate(x),truncate(y))
+
+  axiom Truncate_monotonic_int1:
+    forall x:real, i:int. x <= from_int(i) -> Int.(<=)(truncate(x),i)
+
+  axiom Truncate_monotonic_int2:
+    forall x:real, i:int. from_int(i) <= x -> Int.(<=)(i,truncate(x))
+
+  (* roundings up and down *)
+
+  logic floor(real) : int
+  logic ceil(real) : int
+
+  axiom Floor_int :
+    forall i:int. floor(from_int(i)) = i
+
+  axiom Ceil_int :
+    forall i:int. floor(from_int(i)) = i
+
+  axiom Floor_down:
+    forall x:real. from_int(floor(x)) <= x < from_int(Int.(+)(floor(x),1))
+
+  axiom Ceil_up:
+    forall x:real. from_int(Int.(-)(ceil(x),1)) < x <= from_int(ceil(x))
+
+  axiom Floor_monotonic:
+    forall x,y:real. x <= y -> Int.(<=)(floor(x),floor(y))
+
+  axiom Ceil_monotonic:
+    forall x,y:real. x <= y -> Int.(<=)(ceil(x),ceil(y))
 
 end
+
 
 theory Square
 
