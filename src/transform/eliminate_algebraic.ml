@@ -34,6 +34,8 @@ let empty_state = {
   pj_map = Mls.empty;
 }
 
+let uncompiled = "eliminate_algebraic: compile_match required"
+
 let rec rewriteT kn state t = match t.t_node with
   | Tcase ([t1],bl) ->
       let mk_br (w,m) br =
@@ -42,24 +44,24 @@ let rec rewriteT kn state t = match t.t_node with
         | [{ pat_node = Papp (cs,pl) }] ->
             let add_var e p pj = match p.pat_node with
               | Pvar v -> t_let v (t_app pj [t1] v.vs_ty) e
-              | _ -> assert false
+              | _ -> failwith uncompiled
             in
             let pjl = Mls.find cs state.pj_map in
             let e = List.fold_left2 add_var e pl pjl in
             w, Mls.add cs e m
         | [{ pat_node = Pwild }] ->
             Some e, m
-        | _ -> assert false
+        | _ -> failwith uncompiled
       in
       let w,m = List.fold_left mk_br (None,Mls.empty) bl in
       let find cs = try Mls.find cs m with Not_found -> of_option w in
       let ts = match t1.t_ty.ty_node with
         | Tyapp (ts,_) -> ts
-        | _ -> assert false
+        | _ -> failwith uncompiled
       in
       let tl = List.map find (find_constructors kn ts) in
       t_app (Mts.find ts state.mt_map) (t1::tl) t.t_ty
-  | Tcase _ -> assert false
+  | Tcase _ -> failwith uncompiled
   | _ -> t_map (rewriteT kn state) (rewriteF kn state) t
 
 and rewriteF kn state f = match f.f_node with
@@ -70,14 +72,14 @@ and rewriteF kn state f = match f.f_node with
         | [{ pat_node = Papp (cs,pl) }] ->
             let add_var e p pj = match p.pat_node with
               | Pvar v -> f_let v (t_app pj [t1] v.vs_ty) e
-              | _ -> assert false
+              | _ -> failwith uncompiled
             in
             let pjl = Mls.find cs state.pj_map in
             let e = List.fold_left2 add_var e pl pjl in
             w, Mls.add cs e m
         | [{ pat_node = Pwild }] ->
             Some e, m
-        | _ -> assert false
+        | _ -> failwith uncompiled
       in
       let w,m = List.fold_left mk_br (None,Mls.empty) bl in
       let find cs =
@@ -85,14 +87,14 @@ and rewriteF kn state f = match f.f_node with
         let pjl = Mls.find cs state.pj_map in
         let hd = f_equ t1 (t_app cs (List.map arg pjl) t1.t_ty) in
         let f  = try Mls.find cs m with Not_found -> of_option w in
-        f_implies hd f
+        f_implies_simp hd f
       in
       let ts = match t1.t_ty.ty_node with
         | Tyapp (ts,_) -> ts
-        | _ -> assert false
+        | _ -> failwith uncompiled
       in
-      map_join_left find f_and (find_constructors kn ts)
-  | Fcase _ -> assert false
+      map_join_left find f_and_simp (find_constructors kn ts)
+  | Fcase _ -> failwith uncompiled
   | _ -> f_map (rewriteT kn state) (rewriteF kn state) f
 
 let add_type (state, task) ts csl =
