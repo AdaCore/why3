@@ -37,6 +37,10 @@
 (defvar why-font-lock-keywords why-font-lock-keywords-1
   "Default highlighting for Why mode")
 
+(defvar why-indent 2
+  "How many spaces to indent in why mode.")
+(make-variable-buffer-local 'why-indent)
+
 ;; syntax
 
 (defvar why-mode-syntax-table nil
@@ -147,6 +151,80 @@
      ))
   (easy-menu-add why-mode-menu))
 
+;indentation
+
+;http://www.emacswiki.org/emacs/ModeTutorial
+(defun why-indent-line ()
+  "Indent current line as why logic"
+  (interactive)
+  (save-excursion
+    (beginning-of-line)
+    ;(debug)
+    (if (bobp)  ; Check for rule 1
+        (indent-line-to 0)
+      (let ((not-indented t) cur-indent)
+        (if (looking-at "^[ \t]*end") ; Check for rule 2
+            (progn
+              (save-excursion
+                (forward-line -1)
+                (setq cur-indent (- (current-indentation) why-indent)))
+              (if (< cur-indent 0)
+                  (setq cur-indent 0)))
+          (progn
+            (if (looking-at "^[ \t]*\\(logic\\|type\\|prop\\)") ; check for clone 
+                (progn
+                  (save-excursion
+                    (forward-line -1)
+                    (if (looking-at "^[ \t]*\\(logic\\|type\\|prop\\).*,[ \t]*$")
+                        (progn 
+                          (setq cur-indent (current-indentation))
+                          (setq not-indented nil))
+                      (if (looking-at "^[ \t]*clone.*with ")
+                          (progn 
+                            (setq cur-indent (+ (current-indentation) why-indent))
+                            (setq not-indented nil)
+                            ))))))
+        ;For the definition its very badly done...
+          (if (looking-at "^[ \t]*$")
+              (progn
+                (setq cur-indent 0)
+                (setq not-indented nil))
+            (if (not 
+                 (looking-at "^[ \t]*\\(logic\\|type\\|axiom\\|goal\\|lemma\\|inductive\\|use\\|theory\\|clone\\)"))
+                (save-excursion
+                  (condition-case nil
+                      (save-excursion 
+                        (backward-up-list)
+                        (setq cur-indent (+ (current-column) 1))
+                        (setq not-indented nil))
+                    (error 
+                     (forward-line -1)
+                     (if (looking-at  
+                          "^[ \t]*\\(logic\\|type\\|axiom\\|goal\\|lemma\\|inductive\\)")
+                         (setq cur-indent (+ (current-indentation) why-indent))
+                       (setq cur-indent (current-indentation)))
+                     (setq not-indented nil))))))
+          ;For inside theory or namespace
+          (save-excursion 
+            (while not-indented
+              (forward-line -1)
+              (if (looking-at "^[ \t]*end") ; Check for rule 3
+                  (progn
+                    (setq cur-indent (current-indentation))
+                    (setq not-indented nil))
+                                        ; Check for rule 4
+                (if (looking-at "^[ \t]*\\(theory\\|namespace\\)")
+                    (progn
+                      (setq cur-indent (+ (current-indentation) why-indent))
+                      (setq not-indented nil))
+                  (if (bobp) ; Check for rule 5
+                      (setq not-indented nil)))))))
+        (if cur-indent
+            (indent-line-to cur-indent)
+          (indent-line-to 0)))))))
+
+
+
 ;; setting the mode
 
 (defun why-mode ()
@@ -160,8 +238,8 @@
   (make-local-variable 'font-lock-defaults)
   (setq font-lock-defaults '(why-font-lock-keywords))
   ; indentation
-  ; (make-local-variable 'indent-line-function)
-  ; (setq indent-line-function 'why-indent-line)
+  (make-local-variable 'indent-line-function)
+  (setq indent-line-function 'why-indent-line)
   ; menu
   ; providing the mode
   (setq major-mode 'why-mode)
