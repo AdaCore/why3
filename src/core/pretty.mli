@@ -34,6 +34,7 @@ val print_vs : formatter -> vsymbol -> unit       (* variable *)
 
 val print_ts : formatter -> tysymbol -> unit      (* type symbol *)
 val print_ls : formatter -> lsymbol -> unit       (* logic symbol *)
+val print_cs : formatter -> lsymbol -> unit       (* constructor symbol *)
 val print_pr : formatter -> prsymbol -> unit      (* proposition name *)
 
 val print_ty : formatter -> ty -> unit            (* type *)

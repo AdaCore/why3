@@ -119,33 +119,36 @@ let ty_any pr ty =
 
 (* smart constructors *)
 
-exception NonLinear
-exception UnboundTypeVariable
+exception BadTypeArity of int * int
+exception DuplicateTypeVar of tvsymbol
+exception UnboundTypeVars of Stv.t
 
-let rec tv_known vs ty = match ty.ty_node with
-  | Tyvar n -> Stv.mem n vs
-  | _ -> ty_all (tv_known vs) ty
+let rec tv_known s acc ty = match ty.ty_node with
+  | Tyvar n when not (Stv.mem n s) -> Stv.add n acc
+  | _ -> ty_fold (tv_known s) acc ty
 
 let create_tysymbol name args def =
   let add s v =
-    if Stv.mem v s then raise NonLinear;
+    if Stv.mem v s then raise (DuplicateTypeVar v);
     Stv.add v s
   in
   let s = List.fold_left add Stv.empty args in
-  let _ = match def with
-    | Some ty -> tv_known s ty || raise UnboundTypeVariable
-    | _ -> true
-  in
+  begin match def with
+    | Some ty ->
+        let ts = tv_known s Stv.empty ty in
+        if not (Stv.is_empty ts) then raise (UnboundTypeVars ts)
+    | _ -> ()
+  end;
   create_tysymbol name args def
-
-exception BadTypeArity
 
 let rec tv_inst m ty = match ty.ty_node with
   | Tyvar n -> Mtv.find n m
   | _ -> ty_map (tv_inst m) ty
 
 let ty_app s tl =
-  if List.length tl != List.length s.ts_args then raise BadTypeArity;
+  let tll = List.length tl in
+  let stl = List.length s.ts_args in
+  if tll != stl then raise (BadTypeArity (stl,tll));
   match s.ts_def with
     | Some ty ->
         let add m v t = Mtv.add v t m in

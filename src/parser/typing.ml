@@ -673,9 +673,8 @@ let add_types dl th =
 		  in
 		  try
 		    ty_app ts (List.map apply tyl)
-		  with Ty.BadTypeArity ->
-		    error ~loc:(qloc q) (TypeArity (q, List.length ts.ts_args,
-						    List.length tyl))
+		  with Ty.BadTypeArity (tsal, tyll) ->
+		    error ~loc:(qloc q) (TypeArity (q, tsal, tyll))
 	    in
 	    create_tysymbol id vl (Some (apply ty))
 	| TDabstract | TDalgebraic _ ->
@@ -712,7 +711,7 @@ let add_types dl th =
 	    let param (_, t) = ty_of_dty (dty th' t) in
 	    let tyl = List.map param pl in
 	    Hashtbl.replace csymbols id.id loc;
-	    create_fconstr (id_user id.id loc) tyl ty
+	    create_fsymbol (id_user id.id loc) tyl ty
 	  in
 	  Talgebraic (List.map constructor cl)
     in

@@ -102,15 +102,12 @@ val create_ind_decls : ind_decl list -> decl list
 
 (* exceptions *)
 
-exception ConstructorExpected of lsymbol
 exception IllegalTypeAlias of tysymbol
-exception UnboundTypeVar of tvsymbol
 
 exception InvalidIndDecl of lsymbol * prsymbol
 exception TooSpecificIndDecl of lsymbol * prsymbol * term
 exception NonPositiveIndDecl of lsymbol * prsymbol * lsymbol
 
-exception IllegalConstructor of lsymbol
 exception BadLogicDecl of ident
 exception UnboundVars of Svs.t
 exception ClashIdent of ident

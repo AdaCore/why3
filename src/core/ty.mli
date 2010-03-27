@@ -56,9 +56,9 @@ module Sty : Set.S with type elt = ty
 module Mty : Map.S with type key = ty
 module Hty : Hashtbl.S with type key = ty
 
-exception BadTypeArity
-exception NonLinear
-exception UnboundTypeVariable
+exception BadTypeArity of int * int
+exception DuplicateTypeVar of tvsymbol
+exception UnboundTypeVars of Stv.t
 
 val create_tysymbol : preid -> tvsymbol list -> ty option -> tysymbol
 

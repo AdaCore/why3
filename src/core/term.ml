@@ -50,7 +50,6 @@ type lsymbol = {
   ls_name   : ident;
   ls_args   : ty list;
   ls_value  : ty option;
-  ls_constr : bool;
 }
 
 module Lsym = StructMake (struct
@@ -62,16 +61,14 @@ module Sls = Lsym.S
 module Mls = Lsym.M
 module Hls = Lsym.H
 
-let create_lsymbol name args value constr = {
+let create_lsymbol name args value = {
   ls_name   = id_register name;
   ls_args   = args;
   ls_value  = value;
-  ls_constr = constr;
 }
 
-let create_fsymbol nm al vl = create_lsymbol nm al (Some vl) false
-let create_fconstr nm al vl = create_lsymbol nm al (Some vl) true
-let create_psymbol nm al    = create_lsymbol nm al None false
+let create_fsymbol nm al vl = create_lsymbol nm al (Some vl)
+let create_psymbol nm al    = create_lsymbol nm al (None)
 
 (** Patterns *)
 
@@ -157,20 +154,19 @@ let pat_any pr pat =
 
 (* smart constructors for patterns *)
 
-exception BadArity
-exception ConstructorExpected of lsymbol
+exception BadArity of int * int
 exception FunctionSymbolExpected of lsymbol
 exception PredicateSymbolExpected of lsymbol
 
 let pat_app fs pl ty =
-  if not fs.ls_constr then raise (ConstructorExpected fs);
   let s = match fs.ls_value with
     | Some vty -> ty_match Mtv.empty vty ty
     | None -> raise (FunctionSymbolExpected fs)
   in
   let mtch s ty p = ty_match s ty p.pat_ty in
   ignore (try List.fold_left2 mtch s fs.ls_args pl
-          with Invalid_argument _ -> raise BadArity);
+    with Invalid_argument _ -> raise (BadArity
+      (List.length fs.ls_args, List.length pl)));
   pat_app fs pl ty
 
 let pat_as p v =
@@ -572,14 +568,16 @@ let t_app fs tl ty =
   in
   let mtch s ty t = ty_match s ty t.t_ty in
   ignore (try List.fold_left2 mtch s fs.ls_args tl
-          with Invalid_argument _ -> raise BadArity);
+    with Invalid_argument _ -> raise (BadArity
+      (List.length fs.ls_args, List.length tl)));
   t_app fs tl ty
 
 let t_app_infer fs tl =
   let mtch s ty t = ty_match s ty t.t_ty in
   let s =
     try List.fold_left2 mtch Mtv.empty fs.ls_args tl
-    with Invalid_argument _ -> raise BadArity
+    with Invalid_argument _ -> raise (BadArity
+      (List.length fs.ls_args, List.length tl))
   in
   let ty = match fs.ls_value with
     | Some ty -> ty_inst s ty
@@ -594,7 +592,8 @@ let f_app ps tl =
   in
   let mtch s ty t = ty_match s ty t.t_ty in
   ignore (try List.fold_left2 mtch s ps.ls_args tl
-          with Invalid_argument _ -> raise BadArity);
+    with Invalid_argument _ -> raise (BadArity
+      (List.length ps.ls_args, List.length tl)));
   f_app ps tl
 
 let p_check t p =
@@ -767,12 +766,12 @@ let f_inst_single v f = f_inst (Im.add 0 v Im.empty) 0 f
 
 (* safe smart constructors *)
 
-exception NonLinear of vsymbol
+exception DuplicateVar of vsymbol
 
 let f_quant q vl tl f = if vl = [] then f else
   let i = ref (-1) in
   let add m v =
-    if Mvs.mem v m then raise (NonLinear v);
+    if Mvs.mem v m then raise (DuplicateVar v);
     incr i; Mvs.add v !i m
   in
   let m = List.fold_left add Mvs.empty vl in
@@ -786,10 +785,10 @@ let pat_varmap pl =
   let i = ref (-1) in
   let rec mk_map acc p = match p.pat_node with
     | Pvar n ->
-        if Mvs.mem n acc then raise (NonLinear n);
+        if Mvs.mem n acc then raise (DuplicateVar n);
         incr i; Mvs.add n !i acc
     | Pas (p, n) ->
-        if Mvs.mem n acc then raise (NonLinear n);
+        if Mvs.mem n acc then raise (DuplicateVar n);
         incr i; mk_map (Mvs.add n !i acc) p
     | _ -> pat_fold mk_map acc p
   in

@@ -53,9 +53,8 @@ let tv_set = ref Sid.empty
 (* type variables always start with a quote *)
 let print_tv fmt tv =
   tv_set := Sid.add tv.tv_name !tv_set;
-  let sanitize n = "'" ^ n in
-  let n = id_unique iprinter ~sanitizer:sanitize tv.tv_name in
-  fprintf fmt "%s" n
+  let sanitizer n = "'" ^ n in
+  fprintf fmt "%s" (id_unique iprinter ~sanitizer tv.tv_name)
 
 let forget_tvs () =
   Sid.iter (forget_id iprinter) !tv_set;
@@ -63,9 +62,8 @@ let forget_tvs () =
 
 (* logic variables always start with a lower case letter *)
 let print_vs fmt vs =
-  let sanitize = String.uncapitalize in
-  let n = id_unique iprinter ~sanitizer:sanitize vs.vs_name in
-  fprintf fmt "%s" n
+  let sanitizer = String.uncapitalize in
+  fprintf fmt "%s" (id_unique iprinter ~sanitizer vs.vs_name)
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
@@ -73,11 +71,11 @@ let print_ts fmt ts =
   fprintf fmt "%s" (id_unique tprinter ts.ts_name)
 
 let print_ls fmt ls =
-  let n = if ls.ls_constr
-    then id_unique lprinter ~sanitizer:String.capitalize ls.ls_name
-    else id_unique lprinter ls.ls_name
-  in
-  fprintf fmt "%s" n
+  fprintf fmt "%s" (id_unique lprinter ls.ls_name)
+
+let print_cs fmt ls =
+  let sanitizer = String.capitalize in
+  fprintf fmt "%s" (id_unique lprinter ~sanitizer ls.ls_name)
 
 let print_pr fmt pr =
   fprintf fmt "%s" (id_unique pprinter pr.pr_name)
@@ -128,7 +126,7 @@ let rec print_pat drv fmt p = match p.pat_node with
     begin match query_ident drv cs.ls_name with
       | Syntax s -> syntax_arguments s (print_pat drv) fmt pl
       | _ -> fprintf fmt "%a%a"
-          print_ls cs (print_paren_r (print_pat drv)) pl
+          print_cs cs (print_paren_r (print_pat drv)) pl
     end
 
 let print_vsty drv fmt v =
@@ -252,7 +250,7 @@ and print_expr drv fmt = e_apply (print_term drv fmt) (print_fmla drv fmt)
 (** Declarations *)
 
 let print_constr drv fmt cs =
-  fprintf fmt "@[<hov 4>| %a%a@]" print_ls cs
+  fprintf fmt "@[<hov 4>| %a%a@]" print_cs cs
     (print_paren_l (print_ty drv)) cs.ls_args
 
 let print_ty_args fmt = function

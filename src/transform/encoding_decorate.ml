@@ -153,12 +153,8 @@ let conv_ls tenv ls =
   else
     let preid = id_clone ls.ls_name in
     let tyl = List.map (conv_ty_neg tenv) ls.ls_args in
-    let ty_res = 
-      match ls.ls_value with
-        | None -> None
-        | Some ty ->
-            Some (conv_ty_pos tenv ty) in
-    create_lsymbol preid tyl ty_res false
+    let ty_res = Util.option_map (conv_ty_pos tenv) ls.ls_value in
+    create_lsymbol preid tyl ty_res
 
 
 let conv_ts tenv ts =

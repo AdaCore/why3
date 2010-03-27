@@ -28,6 +28,7 @@ module type Action = sig
   val mk_case : term -> (pattern * action) list -> action
 end
 
+exception ConstructorExpected of lsymbol
 exception NonExhaustive of pattern list
 
 module Compile (X : Action) : sig

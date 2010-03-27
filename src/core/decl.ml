@@ -38,14 +38,12 @@ type ls_defn = lsymbol * fmla
 type logic_decl = lsymbol * ls_defn option
 
 exception UnboundVars of Svs.t
-exception IllegalConstructor of lsymbol
 
 let check_fvs f =
   let fvs = f_freevars Svs.empty f in
   if Svs.is_empty fvs then f else raise (UnboundVars fvs)
 
 let make_fs_defn fs vl t =
-  if fs.ls_constr then raise (IllegalConstructor fs);
   let hd = t_app fs (List.map t_var vl) t.t_ty in
   let fd = f_forall vl [] (f_equ hd t) in
   fs, Some (fs, check_fvs fd)
@@ -197,8 +195,6 @@ let create_logic_decl ldl = Hsdecl.hashcons (mk_decl (Dlogic ldl))
 let create_ind_decl idl = Hsdecl.hashcons (mk_decl (Dind idl))
 let create_prop_decl k p f = Hsdecl.hashcons (mk_decl (Dprop (k,p,f)))
 
-exception ConstructorExpected of lsymbol
-exception UnboundTypeVar of tvsymbol
 exception IllegalTypeAlias of tysymbol
 exception ClashIdent of ident
 exception BadLogicDecl of ident
@@ -211,7 +207,6 @@ let add_id s id =
 let create_ty_decl tdl =
   if tdl = [] then raise EmptyDecl;
   let check_constr ty acc fs =
-    if not fs.ls_constr then raise (ConstructorExpected fs);
     let vty = of_option fs.ls_value in
     ignore (ty_match Mtv.empty vty ty);
     let add s ty = match ty.ty_node with
@@ -219,11 +214,12 @@ let create_ty_decl tdl =
       | _ -> assert false
     in
     let vs = ty_fold add Stv.empty vty in
-    let rec check () ty = match ty.ty_node with
-      | Tyvar v -> if not (Stv.mem v vs) then raise (UnboundTypeVar v)
-      | _ -> ty_fold check () ty
+    let rec check s ty = match ty.ty_node with
+      | Tyvar v when not (Stv.mem v vs) -> Stv.add v s
+      | _ -> ty_fold check s ty
     in
-    List.iter (check ()) fs.ls_args;
+    let ts = List.fold_left check Stv.empty fs.ls_args in
+    if not (Stv.is_empty ts) then raise (UnboundTypeVars ts);
     add_id acc fs.ls_name
   in
   let check_decl acc (ts,td) = match td with

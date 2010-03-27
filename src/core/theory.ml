@@ -336,7 +336,7 @@ let cl_find_ls cl ls =
   with Not_found ->
     let ta' = List.map (cl_trans_ty cl) ls.ls_args in
     let vt' = option_map (cl_trans_ty cl) ls.ls_value in
-    let ls' = create_lsymbol (id_dup ls.ls_name) ta' vt' ls.ls_constr in
+    let ls' = create_lsymbol (id_dup ls.ls_name) ta' vt' in
     cl_add_ls cl ls ls';
     ls'
 

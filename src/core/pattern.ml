@@ -28,23 +28,34 @@ module type Action = sig
   val mk_case : term -> (pattern * action) list -> action
 end
 
+exception ConstructorExpected of lsymbol
 exception NonExhaustive of pattern list
 
 module Compile (X : Action) = struct
   open X
 
-  let rec compile css tl rl = match tl,rl with
+  let rec compile constructors tl rl = match tl,rl with
     | _, [] -> (* no actions *)
         let pl = List.map (fun t -> pat_wild t.t_ty) tl in
         raise (NonExhaustive pl)
     | [], (_,a) :: _ -> (* no terms, at least one action *)
         a
     | t :: tl, _ -> (* process the leftmost column *)
+        (* extract the set of constructors *)
+        let ty = t.t_ty in
+        let css = match ty.ty_node with
+          | Tyapp (ts,_) ->
+              let s_add s cs = Sls.add cs s in
+              List.fold_left s_add Sls.empty (constructors ts)
+          | Tyvar _ -> Sls.empty
+        in
         (* map constructors to argument types *)
         let rec populate types p = match p.pat_node with
           | Pwild | Pvar _ -> types
           | Pas (p,_) -> populate types p
-          | Papp (fs,pl) -> Mls.add fs pl types
+          | Papp (fs,pl) ->
+              if Sls.mem fs css then Mls.add fs pl types
+              else raise (ConstructorExpected fs)
         in
         let populate types (pl,_) = populate types (List.hd pl) in
         let types = List.fold_left populate Mls.empty rl in
@@ -72,27 +83,21 @@ module Compile (X : Action) = struct
         in
         let cases,wilds = List.fold_right dispatch rl (Mls.empty,[]) in
         (* assemble the primitive case statement *)
-        let ty = t.t_ty in
         let pw = pat_wild ty in
-        let exhaustive, nopat = match ty.ty_node with
-          | Tyapp (ts,_) ->
-              begin match css ts with
-              | [] -> false, pw
-              | cl ->
-                  let test cs = not (Mls.mem cs types) in
-                  begin match List.filter test cl with
-                  | cs :: _ ->
-                      (* FIXME? specialize types to t.t_ty *)
-                      let pl = List.map pat_wild cs.ls_args in
-                      false, pat_app cs pl (of_option cs.ls_value)
-                  | _ -> true, pw
-                  end
-              end
-          | Tyvar _ -> false, pw
+        let nopat =
+          if Sls.is_empty css then Some pw else
+          let test cs = not (Mls.mem cs types) in
+          let unused = Sls.filter test css in
+          if Sls.is_empty unused then None else
+          let cs = Sls.choose unused in
+          let pl = List.map pat_wild cs.ls_args in
+          Some (pat_app cs pl (of_option cs.ls_value))
         in
-        let base = if exhaustive then [] else
-          try [pw, compile css tl wilds]
-          with NonExhaustive pl -> raise (NonExhaustive (nopat::pl))
+        let base = match nopat with
+          | None -> []
+          | Some pat ->
+              (try [pw, compile constructors tl wilds]
+              with NonExhaustive pl -> raise (NonExhaustive (pat::pl)))
         in
         let add fs ql acc =
           let id = id_fresh "x" in
@@ -104,7 +109,7 @@ module Compile (X : Action) = struct
             | [], pl -> pat_app fs acc ty :: pl
             | _, _ -> assert false
           in
-          try (pat, compile css tl (Mls.find fs cases)) :: acc
+          try (pat, compile constructors tl (Mls.find fs cases)) :: acc
           with NonExhaustive pl -> raise (NonExhaustive (pat_cont [] vl pl))
         in
         match Mls.fold add types base with

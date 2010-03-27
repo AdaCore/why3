@@ -39,13 +39,10 @@ type lsymbol = private {
   ls_name   : ident;
   ls_args   : ty list;
   ls_value  : ty option;
-  ls_constr : bool;
 }
 
-val create_lsymbol : preid -> ty list -> ty option -> bool -> lsymbol
-
+val create_lsymbol : preid -> ty list -> ty option -> lsymbol
 val create_fsymbol : preid -> ty list -> ty -> lsymbol
-val create_fconstr : preid -> ty list -> ty -> lsymbol
 val create_psymbol : preid -> ty list -> lsymbol
 
 module Sls : Set.S with type elt = lsymbol
@@ -54,9 +51,8 @@ module Hls : Hashtbl.S with type key = lsymbol
 
 (** Exceptions *)
 
-exception BadArity
-exception NonLinear of vsymbol
-exception ConstructorExpected of lsymbol
+exception BadArity of int * int
+exception DuplicateVar of vsymbol
 exception FunctionSymbolExpected of lsymbol
 exception PredicateSymbolExpected of lsymbol
 

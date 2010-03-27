@@ -40,7 +40,7 @@ let iprinter,tprinter,lprinter,pprinter =
   let usanitize = sanitizer char_to_ualpha char_to_alnumus in
   create_ident_printer bl ~sanitizer:isanitize,
   create_ident_printer bl ~sanitizer:lsanitize,
-  create_ident_printer bl ~sanitizer:lsanitize,
+  create_ident_printer bl ~sanitizer:isanitize,
   create_ident_printer bl ~sanitizer:usanitize
 
 let thash = Hid.create 63
@@ -61,9 +61,8 @@ let tv_set = ref Sid.empty
 (* type variables always start with a quote *)
 let print_tv fmt tv =
   tv_set := Sid.add tv.tv_name !tv_set;
-  let sanitize n = "'" ^ n in
-  let n = id_unique iprinter ~sanitizer:sanitize tv.tv_name in
-  fprintf fmt "%s" n
+  let sanitizer n = "'" ^ n in
+  fprintf fmt "%s" (id_unique iprinter ~sanitizer tv.tv_name)
 
 let forget_tvs () =
   Sid.iter (forget_id iprinter) !tv_set;
@@ -71,17 +70,15 @@ let forget_tvs () =
 
 (* logic variables always start with a lower case letter *)
 let print_vs fmt vs =
-  let sanitize = String.uncapitalize in
-  let n = id_unique iprinter ~sanitizer:sanitize vs.vs_name in
-  fprintf fmt "%s" n
+  let sanitizer = String.uncapitalize in
+  fprintf fmt "%s" (id_unique iprinter ~sanitizer vs.vs_name)
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
 (* theory names always start with an upper case letter *)
 let print_th fmt th =
-  let sanitize = String.capitalize in
-  let n = id_unique iprinter ~sanitizer:sanitize th.th_name in
-  fprintf fmt "%s" n
+  let sanitizer = String.capitalize in
+  fprintf fmt "%s" (id_unique iprinter ~sanitizer th.th_name)
 
 let print_ts fmt ts =
   Hid.replace thash ts.ts_name ts;
@@ -89,11 +86,12 @@ let print_ts fmt ts =
 
 let print_ls fmt ls =
   Hid.replace lhash ls.ls_name ls;
-  let n = if ls.ls_constr
-    then id_unique lprinter ~sanitizer:String.capitalize ls.ls_name
-    else id_unique lprinter ls.ls_name
-  in
-  fprintf fmt "%s" n
+  fprintf fmt "%s" (id_unique lprinter ls.ls_name)
+
+let print_cs fmt ls =
+  Hid.replace lhash ls.ls_name ls;
+  let sanitizer = String.capitalize in
+  fprintf fmt "%s" (id_unique lprinter ~sanitizer ls.ls_name)
 
 let print_pr fmt pr =
   Hid.replace phash pr.pr_name pr;
@@ -141,7 +139,7 @@ let rec print_pat fmt p = match p.pat_node with
   | Pvar v -> print_vs fmt v
   | Pas (p,v) -> fprintf fmt "%a as %a" print_pat p print_vs v
   | Papp (cs,pl) -> fprintf fmt "%a%a"
-      print_ls cs (print_paren_r print_pat) pl
+      print_cs cs (print_paren_r print_pat) pl
 
 let print_vsty fmt v =
   fprintf fmt "%a:@,%a" print_vs v print_ty v.vs_ty
@@ -259,7 +257,7 @@ and print_expr fmt = e_apply (print_term fmt) (print_fmla fmt)
 (** Declarations *)
 
 let print_constr fmt cs =
-  fprintf fmt "@[<hov 4>| %a%a@]" print_ls cs
+  fprintf fmt "@[<hov 4>| %a%a@]" print_cs cs
     (print_paren_l print_ty) cs.ls_args
 
 let print_ty_args fmt = function
