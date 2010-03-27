@@ -17,33 +17,29 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Ident
 open Term
+open Decl
 
-let rec rewrite_t map t =
-  match t.t_node with
-    | Tlet (t1,tb) ->
-        let t1 = rewrite_t map t1 in
-        let vs,t2 = t_open_bound tb in
-        rewrite_t (Mvs.add vs t1 map) t2
-    | Tvar vs ->
-        begin try
-          Mvs.find vs map
-        with Not_found -> t end
-    | _ -> t_map (rewrite_t map) (rewrite_f map) t
+let add_ls acc (ls,_) = create_logic_decl [ls,None] :: acc
 
-and rewrite_f map f =
-  match f.f_node with
-    | Flet (t1,fb) ->
-        let t1 = rewrite_t map t1 in
-        let vs,f2 = f_open_bound fb in
-        rewrite_f (Mvs.add vs t1 map) f2
-    | _ -> f_map (rewrite_t map) (rewrite_f map) f
+let add_ld acc ls ld =
+  let id = ls.ls_name.id_long ^ "_def" in
+  let pr = create_prsymbol (id_derive id ls.ls_name) in
+  create_prop_decl Paxiom pr (ls_defn_axiom ld) :: acc
 
-let remove_let_t = rewrite_t Mvs.empty
-let remove_let_f = rewrite_f Mvs.empty
+let add_ld acc (ls,ld) = match ld with
+  | None    -> acc
+  | Some ld -> add_ld acc ls ld
 
-let eliminate_let =
-  Register.store (fun () -> Trans.rewrite remove_let_t remove_let_f None)
+let elim d = match d.d_node with
+  | Dlogic ll ->
+      let dl = List.fold_left add_ls [] ll in
+      let dl = List.fold_left add_ld dl ll in
+      List.rev dl
+  | _ -> [d]
 
-let () = Driver.register_transform "eliminate_let" eliminate_let
+let elim = Register.store (fun () -> Trans.decl elim None)
+
+let () = Driver.register_transform "eliminate_definition" elim
 

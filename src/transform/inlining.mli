@@ -36,11 +36,6 @@ val all : Task.task Register.trans_reg
 val trivial : Task.task Register.trans_reg
 
 
-(* Inline let *)
-val remove_let_t : Term.term -> Term.term
-val remove_let_f : Term.fmla -> Term.fmla
-val inline_let : Task.task Register.trans_reg
-
 (* Function to use in other transformations if inlining is needed *)
 
 type env

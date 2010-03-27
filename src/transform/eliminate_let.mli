@@ -17,3 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+val remove_let_t : Term.term -> Term.term
+val remove_let_f : Term.fmla -> Term.fmla
+
+val eliminate_let : Task.task Register.trans_reg
+

@@ -2,8 +2,9 @@ printer "why3"
 filename "%f-%t-%s.why"
 
 transformations
-    "eliminate_inductive"
     "compile_match"
+    "eliminate_definition"
+    "eliminate_inductive"
     "eliminate_algebraic"
     "eliminate_let"
 end
