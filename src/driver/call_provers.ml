@@ -61,21 +61,24 @@ exception NoCommandlineProvided
 (* this should be replaced by a proper use of fork/waitpid() *)
 let dirname = Filename.dirname Sys.argv.(0)
 let cpulimit_local = Filename.concat dirname "why-cpulimit"
-let cpulimit_commands = ["why-cpulimit"; cpulimit_local(* ; "timeout"*)]
-let cpulimit = ref (
+let cpulimit_commands = ["why-cpulimit"; cpulimit_local ; "timeout"]
+let cpulimit = (
   let tmp = ref "" in
   try
     List.iter
       (fun s ->
-         let r = Sys.command (s^" 1 echo") in
-         if r=0 then (tmp:=s; raise Exit))
+         (*let r = Sys.command (s^" 1 echo") in
+         if r=0 then (tmp:=s; raise Exit)*)
+         let pid = Unix.create_process s [|s;"1";"true"|] 
+           Unix.stdin Unix.stdout Unix.stderr in
+         match Unix.waitpid [] pid with
+           | _,Unix.WEXITED 0 -> (tmp:=s; raise Exit)
+           | _ -> ()
+      )
     cpulimit_commands;
-    failwith 
-      (List.fold_left
-         (fun acc s -> acc^" "^s^",")
-         "need shell command among:"
-         cpulimit_commands)
-  with Exit -> !tmp)
+    failwith ("need shell command among: "^
+                (String.concat " ," cpulimit_commands))
+  with Exit -> tmp)
      
     
 
