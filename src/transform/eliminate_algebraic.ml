@@ -39,7 +39,7 @@ let uncompiled = "eliminate_algebraic: compile_match required"
 let rec rewriteT kn state t = match t.t_node with
   | Tcase ([t1],bl) ->
       let mk_br (w,m) br =
-        let (pl,_,e) = t_open_branch br in
+        let (pl,e) = t_open_branch br in
         match pl with
         | [{ pat_node = Papp (cs,pl) }] ->
             let add_var e p pj = match p.pat_node with
@@ -67,7 +67,7 @@ let rec rewriteT kn state t = match t.t_node with
 and rewriteF kn state f = match f.f_node with
   | Fcase ([t1],bl) ->
       let mk_br (w,m) br =
-        let (pl,_,e) = f_open_branch br in
+        let (pl,e) = f_open_branch br in
         match pl with
         | [{ pat_node = Papp (cs,pl) }] ->
             let add_var e p pj = match p.pat_node with

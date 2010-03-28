@@ -152,6 +152,12 @@ let pat_all pr pat =
 let pat_any pr pat =
   try pat_fold (any_fn pr) false pat with FoldSkip -> true
 
+let rec pat_freevars s pat = match pat.pat_node with
+  | Pwild -> s
+  | Pvar v -> Svs.add v s
+  | Pas (p, v) -> pat_freevars (Svs.add v s) p
+  | Papp (_,pl) -> List.fold_left pat_freevars s pl
+
 (* smart constructors for patterns *)
 
 exception BadArity of int * int
@@ -850,19 +856,19 @@ let rec pat_rename ns p = match p.pat_node with
 let pat_substs pl =
   let m, _ = pat_varmap pl in
   Mvs.fold
-    (fun x i (vars, s, ns) ->
+    (fun x i (s, ns) ->
        let x' = fresh_vsymbol x in
-       Svs.add x' vars, Im.add i (t_var x') s, Mvs.add x x' ns)
+       Im.add i (t_var x') s, Mvs.add x x' ns)
     m
-    (Svs.empty, Im.empty, Mvs.empty)
+    (Im.empty, Mvs.empty)
 
 let t_open_branch (pl, _, t) =
-  let vars, s, ns = pat_substs pl in
-  (List.map (pat_rename ns) pl, vars, t_inst s 0 t)
+  let s, ns = pat_substs pl in
+  (List.map (pat_rename ns) pl, t_inst s 0 t)
 
 let f_open_branch (pl, _, f) =
-  let vars, s, ns = pat_substs pl in
-  (List.map (pat_rename ns) pl, vars, f_inst s 0 f)
+  let s, ns = pat_substs pl in
+  (List.map (pat_rename ns) pl, f_inst s 0 f)
 
 (** Term library *)
 
@@ -888,10 +894,10 @@ let e_equal e1 e2 = match e1, e2 with
 let tr_equal = List.for_all2 (List.for_all2 e_equal)
 
 let t_branch fn acc b =
-  let pl,_,t = t_open_branch b in let t' = fn t in acc && t' == t, (pl, t')
+  let pl,t = t_open_branch b in let t' = fn t in acc && t' == t, (pl, t')
 
 let f_branch fn acc b =
-  let pl,_,f = f_open_branch b in let f' = fn f in acc && f' == f, (pl, f')
+  let pl,f = f_open_branch b in let f' = fn f in acc && f' == f, (pl, f')
 
 let t_map fnT fnF t = t_label_copy t (match t.t_node with
   | Tbvar _ -> raise UnboundIndex
@@ -934,8 +940,8 @@ let t_map fnT = t_map (protect fnT)
 
 (* safe opening fold *)
 
-let t_branch fn acc b = let _,_,t = t_open_branch b in fn acc t
-let f_branch fn acc b = let _,_,f = f_open_branch b in fn acc f
+let t_branch fn acc b = let _,t = t_open_branch b in fn acc t
+let f_branch fn acc b = let _,f = f_open_branch b in fn acc f
 
 let t_fold fnT fnF acc t = match t.t_node with
   | Tbvar _ -> raise UnboundIndex
@@ -998,8 +1004,8 @@ let f_v_fold fn = f_v_fold fn 0
 
 (* looks for occurrence of a variable from set [s] in a term [t] *)
 
-let t_occurs s t = t_v_any (fun u -> Svs.mem u s) t
-let f_occurs s f = f_v_any (fun u -> Svs.mem u s) f
+let t_occurs s t = not (Svs.is_empty s) && t_v_any (fun u -> Svs.mem u s) t
+let f_occurs s f = not (Svs.is_empty s) && f_v_any (fun u -> Svs.mem u s) f
 
 let t_occurs_single v t = t_v_any (fun u -> u == v) t
 let f_occurs_single v f = f_v_any (fun u -> u == v) f
@@ -1008,8 +1014,8 @@ let f_occurs_single v f = f_v_any (fun u -> u == v) f
 
 let find_vs m u = try Mvs.find u m with Not_found -> t_var u
 
-let t_subst m t = t_v_map (find_vs m) t
-let f_subst m f = f_v_map (find_vs m) f
+let t_subst m t = if Mvs.is_empty m then t else t_v_map (find_vs m) t
+let f_subst m f = if Mvs.is_empty m then f else f_v_map (find_vs m) f
 
 let eq_vs v t u = if u == v then t else t_var u
 

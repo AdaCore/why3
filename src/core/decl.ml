@@ -514,18 +514,18 @@ exception NonExhaustiveExpr of (pattern list * expr)
 
 let rec check_matchT kn () t = match t.t_node with
   | Tcase (tl,bl) ->
-      let mk_b (pl,_,t) = (pl,t) in
-      let bl = List.map (fun b -> mk_b (t_open_branch b)) bl in
+      let bl = List.map t_open_branch bl in
       ignore (try Pattern.CompileTerm.compile (find_constructors kn) tl bl
-      with Pattern.NonExhaustive pl -> raise (NonExhaustiveExpr (pl, Term t)))
+      with Pattern.NonExhaustive p -> raise (NonExhaustiveExpr (p,Term t)));
+      t_fold (check_matchT kn) (check_matchF kn) () t
   | _ -> t_fold (check_matchT kn) (check_matchF kn) () t
 
 and check_matchF kn () f = match f.f_node with
   | Fcase (tl,bl) ->
-      let mk_b (pl,_,f) = (pl,f) in
-      let bl = List.map (fun b -> mk_b (f_open_branch b)) bl in
+      let bl = List.map f_open_branch bl in
       ignore (try Pattern.CompileFmla.compile (find_constructors kn) tl bl
-      with Pattern.NonExhaustive pl -> raise (NonExhaustiveExpr (pl, Fmla f)))
+      with Pattern.NonExhaustive p -> raise (NonExhaustiveExpr (p,Fmla f)));
+      f_fold (check_matchT kn) (check_matchF kn) () f
   | _ -> f_fold (check_matchT kn) (check_matchF kn) () f
 
 let check_match kn d = decl_fold (check_matchT kn) (check_matchF kn) () d

@@ -230,16 +230,16 @@ and print_fnode opl opr drv fmt f = match f.f_node with
     end
 
 and print_tbranch drv fmt br =
-  let pl,svs,t = t_open_branch br in
+  let pl,t = t_open_branch br in
   fprintf fmt "@[<hov 4>| %a ->@ %a@]"
     (print_list comma (print_pat drv)) pl (print_term drv) t;
-  Svs.iter forget_var svs
+  Svs.iter forget_var (List.fold_left pat_freevars Svs.empty pl)
 
 and print_fbranch drv fmt br =
-  let pl,svs,f = f_open_branch br in
+  let pl,f = f_open_branch br in
   fprintf fmt "@[<hov 4>| %a ->@ %a@]"
     (print_list comma (print_pat drv)) pl (print_fmla drv) f;
-  Svs.iter forget_var svs
+  Svs.iter forget_var (List.fold_left pat_freevars Svs.empty pl)
 
 and print_tl drv fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"

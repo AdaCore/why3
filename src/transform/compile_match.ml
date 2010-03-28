@@ -23,14 +23,16 @@ open Task
 
 let rec rewriteT kn t = match t.t_node with
   | Tcase (tl,bl) ->
-      let mk_b (pl,_,t) = (pl,t) in
+      let tl = List.map (rewriteT kn) tl in
+      let mk_b (pl,t) = (pl, rewriteT kn t) in
       let bl = List.map (fun b -> mk_b (t_open_branch b)) bl in
       Pattern.CompileTerm.compile (find_constructors kn) tl bl
   | _ -> t_map (rewriteT kn) (rewriteF kn) t
 
 and rewriteF kn f = match f.f_node with
   | Fcase (tl,bl) ->
-      let mk_b (pl,_,f) = (pl,f) in
+      let tl = List.map (rewriteT kn) tl in
+      let mk_b (pl,f) = (pl, rewriteF kn f) in
       let bl = List.map (fun b -> mk_b (f_open_branch b)) bl in
       Pattern.CompileFmla.compile (find_constructors kn) tl bl
   | _ -> f_map (rewriteT kn) (rewriteF kn) f

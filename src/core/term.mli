@@ -84,6 +84,8 @@ val pat_fold : ('a -> pattern -> 'a) -> 'a -> pattern -> 'a
 val pat_all : (pattern -> bool) -> pattern -> bool
 val pat_any : (pattern -> bool) -> pattern -> bool
 
+val pat_freevars : Svs.t -> pattern -> Svs.t
+
 (** Terms and formulas *)
 
 type label = string
@@ -216,8 +218,8 @@ val f_let_simp : vsymbol -> term -> fmla -> fmla
 val t_open_bound : term_bound -> vsymbol * term
 val f_open_bound : fmla_bound -> vsymbol * fmla
 
-val t_open_branch : term_branch -> pattern list * Svs.t * term
-val f_open_branch : fmla_branch -> pattern list * Svs.t * fmla
+val t_open_branch : term_branch -> pattern list * term
+val f_open_branch : fmla_branch -> pattern list * fmla
 
 val f_open_quant : fmla_quant -> vsymbol list * trigger list * fmla
 
