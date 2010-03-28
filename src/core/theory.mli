@@ -47,8 +47,8 @@ type theory = private {
   th_name   : ident;        (* theory name *)
   th_decls  : tdecl list;   (* theory declarations *)
   th_export : namespace;    (* exported namespace *)
-  th_clone  : clone_map;    (* cloning history *)
   th_known  : known_map;    (* known identifiers *)
+  th_clone  : clone_map;    (* cloning history *)
   th_used   : use_map;      (* referenced theories *)
   th_local  : Sid.t;        (* locally declared idents *)
 }
@@ -78,6 +78,17 @@ val open_namespace  : theory_uc -> theory_uc
 val close_namespace : theory_uc -> bool -> string option -> theory_uc
 
 val get_namespace : theory_uc -> namespace
+
+(** Declaration constructors + add_decl *)
+
+val add_ty_decl : theory_uc -> ty_decl list -> theory_uc
+val add_logic_decl : theory_uc -> logic_decl list -> theory_uc
+val add_ind_decl : theory_uc -> ind_decl list -> theory_uc
+val add_prop_decl : theory_uc -> prop_kind -> prsymbol -> fmla -> theory_uc
+
+val add_ty_decls : theory_uc -> ty_decl list -> theory_uc
+val add_logic_decls : theory_uc -> logic_decl list -> theory_uc
+val add_ind_decls : theory_uc -> ind_decl list -> theory_uc
 
 (** Clone *)
 

@@ -684,7 +684,7 @@ let add_types dl th =
       ts
   in
   let tsl = List.rev_map (fun d -> visit d.td_ident.id, Tabstract) dl in 
-  let th' = try add_decl th (create_ty_decl tsl) 
+  let th' = try add_ty_decl th tsl
     with ClashSymbol s -> error ~loc:(Mstr.find s def).td_loc (Clash s)
   in
   let csymbols = Hashtbl.create 17 in
@@ -717,8 +717,7 @@ let add_types dl th =
     in
     ts, d
   in
-  let dl = List.map decl dl in
-  try List.fold_left add_decl th (create_ty_decls dl)
+  try add_ty_decls th (List.map decl dl)
   with ClashSymbol s -> error ~loc:(Hashtbl.find csymbols s) (Clash s)
 
 let env_of_vsymbol_list vl =
@@ -740,12 +739,12 @@ let add_logics dl th =
       | None -> (* predicate *)
 	  let ps = create_psymbol v pl in
 	  Hashtbl.add psymbols id ps;
-	  add_decl th (create_logic_decl [ps, None])
+	  add_logic_decl th [ps, None]
       | Some t -> (* function *)
 	  let t = type_ty (None, t) in
 	  let fs = create_fsymbol v pl t in
 	  Hashtbl.add fsymbols id fs;
-	  add_decl th (create_logic_decl [fs, None])
+	  add_logic_decl th [fs, None]
     with ClashSymbol s -> error ~loc:d.ld_loc (Clash s)
   in
   let th' = List.fold_left create_symbol th dl in
@@ -799,8 +798,7 @@ let add_logics dl th =
 	      make_fs_defn fs vl (term env t)
         end
   in
-  let dl = List.map type_decl dl in
-  List.fold_left add_decl th (create_logic_decls dl)
+  add_logic_decls th (List.map type_decl dl)
 
 let type_term denv env t =
   let t = dterm denv t in
@@ -815,9 +813,8 @@ let type_fmla denv env f =
 let fmla uc = type_fmla (create_denv uc) Mstr.empty
 
 let add_prop k loc s f th =
-  let f = fmla th f in
-  try
-    add_decl th (create_prop_decl k (create_prsymbol (id_user s.id loc)) f)
+  let pr = create_prsymbol (id_user s.id loc) in
+  try add_prop_decl th k pr (fmla th f)
   with ClashSymbol s -> error ~loc (Clash s)
 
 let loc_of_id id = match id.id_origin with
@@ -835,7 +832,7 @@ let add_inductives dl th =
     let pl = List.map type_ty d.in_params in
     let ps = create_psymbol v pl in
     Hashtbl.add psymbols id ps;
-    try add_decl th (create_logic_decl [ps, None])
+    try add_logic_decl th [ps, None]
     with ClashSymbol s -> error ~loc:d.in_loc (Clash s)
   in
   let th' = List.fold_left create_symbol th dl in
@@ -850,9 +847,7 @@ let add_inductives dl th =
     in
     ps, List.map clause d.in_def
   in
-  let dl = List.map type_decl dl in
-  try
-    List.fold_left add_decl th (create_ind_decls dl)
+  try add_ind_decls th (List.map type_decl dl)
   with
   | ClashSymbol s -> error ~loc:(Hashtbl.find propsyms s) (Clash s)
   | InvalidIndDecl (_,pr) -> errorm ~loc:(loc_of_id pr.pr_name)

@@ -86,8 +86,8 @@ type theory = {
   th_name   : ident;        (* theory name *)
   th_decls  : tdecl list;   (* theory declarations *)
   th_export : namespace;    (* exported namespace *)
-  th_clone  : clone_map;    (* cloning history *)
   th_known  : known_map;    (* known identifiers *)
+  th_clone  : clone_map;    (* cloning history *)
   th_used   : use_map;      (* referenced theories *)
   th_local  : Sid.t;        (* locally declared idents *)
 }
@@ -126,8 +126,8 @@ let builtin_theory =
   { th_name   = id_register (id_fresh "BuiltIn");
     th_decls  = decls;
     th_export = export;
-    th_clone  = Mid.empty;
     th_known  = kn_neq;
+    th_clone  = Mid.empty;
     th_used   = Mid.empty;
     th_local  = Sid.empty }
 
@@ -139,8 +139,8 @@ type theory_uc = {
   uc_decls  : tdecl list;
   uc_import : namespace list;
   uc_export : namespace list;
-  uc_clone  : clone_map;
   uc_known  : known_map;
+  uc_clone  : clone_map;
   uc_used   : use_map;
   uc_local  : Sid.t;
 }
@@ -153,8 +153,8 @@ let empty_theory n =
     uc_decls  = [];
     uc_import = [empty_ns];
     uc_export = [empty_ns];
-    uc_clone  = Mid.empty;
     uc_known  = Mid.empty;
+    uc_clone  = Mid.empty;
     uc_used   = Mid.empty;
     uc_local  = Sid.empty; }
 
@@ -163,8 +163,8 @@ let close_theory uc = match uc.uc_export with
       { th_name   = uc.uc_name;
         th_decls  = List.rev uc.uc_decls;
         th_export = e;
-        th_clone  = uc.uc_clone;
         th_known  = uc.uc_known;
+        th_clone  = uc.uc_clone;
         th_used   = uc.uc_used;
         th_local  = uc.uc_local; }
   | _ ->
@@ -247,17 +247,16 @@ let add_decl uc d =
   { uc with uc_decls = Decl d :: uc.uc_decls;
             uc_known = known_add_decl uc.uc_known d }
 
-let merge_clone cl th sl =
-  let get m id = try Mid.find id m with Not_found -> Sid.empty in
-  let add m m' (id,id') =
-    Mid.add id' (Sid.add id (Sid.union (get m id) (get m' id'))) m'
-  in
-  List.fold_left (add th.th_clone) cl sl
+(** Declaration constructors + add_decl *)
 
-let add_clone uc th sl =
-  let decls = Clone (th,sl) :: uc.uc_decls in
-  let clone = merge_clone uc.uc_clone th sl in
-  { uc with uc_decls = decls; uc_clone = clone }
+let add_ty_decl uc dl = add_decl uc (create_ty_decl dl)
+let add_logic_decl uc dl = add_decl uc (create_logic_decl dl)
+let add_ind_decl uc dl = add_decl uc (create_ind_decl dl)
+let add_prop_decl uc k p f = add_decl uc (create_prop_decl k p f)
+
+let add_ty_decls uc dl = List.fold_left add_decl uc (create_ty_decls dl)
+let add_logic_decls uc dl = List.fold_left add_decl uc (create_logic_decls dl)
+let add_ind_decls uc dl = List.fold_left add_decl uc (create_ind_decls dl)
 
 
 (** Clone *)
@@ -473,6 +472,18 @@ let cl_add_decl cl inst d = match d.d_node with
       in
       let pr',f' = cl_new_prop cl (pr,f) in
       Some (create_prop_decl k' pr' f')
+
+let merge_clone cl th sl =
+  let get m id = try Mid.find id m with Not_found -> Sid.empty in
+  let add m m' (id,id') =
+    Mid.add id' (Sid.add id (Sid.union (get m id) (get m' id'))) m'
+  in
+  List.fold_left (add th.th_clone) cl sl
+
+let add_clone uc th sl =
+  let decls = Clone (th,sl) :: uc.uc_decls in
+  let clone = merge_clone uc.uc_clone th sl in
+  { uc with uc_decls = decls; uc_clone = clone }
 
 let cl_add_tdecl cl inst uc td = match td with
   | Decl d ->
