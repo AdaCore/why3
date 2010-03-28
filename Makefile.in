@@ -134,7 +134,7 @@ TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
 	split_conjunction.cmo encoding_decorate.cmo\
 	remove_logic_definition.cmo eliminate_inductive.cmo\
 	compile_match.cmo eliminate_algebraic.cmo\
-	eliminate_definition.cmo eliminate_let.cmo
+	eliminate_let.cmo eliminate_definition.cmo
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
 DRIVER_CMO := call_provers.cmo dynlink_compat.cmo driver_parser.cmo\
