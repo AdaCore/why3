@@ -31,11 +31,7 @@ let add_t_ax task nm ls hd e =
   let vl = Svs.elements (t_freevars Svs.empty hd) in
   let ax = f_forall vl [[Term hd]] (f_equ hd e) in
   let id = id_derive (nm ^ "_def") ls.ls_name in
-try
   add_decl task (create_prop_decl Paxiom (create_prsymbol id) ax)
-with
-UnboundVars vs ->
-  Format.printf "@[%a@\n@]" Pretty.print_fmla ax; assert false
 
 let add_f_ax task nm ls hd e =
   let vl = Svs.elements (f_freevars Svs.empty hd) in
