@@ -178,10 +178,12 @@ test: bin/why.byte  $(TOOLS)
 		--output-file tmp.v --goal Test.G src/test.why 
 	echo bin/why.byte --call --timeout 1 --driver drivers/alt_ergo.drv -I theories/ \
 		--all-goals theories/real.why 
+	@rm -rf theories/coq
 	@mkdir -p theories/coq
 	@printf "*** Checking Coq file generation ***\\n"
 	@for i in int.Abs int.EuclideanDivision int.ComputerDivision  \
-		real.Abs real.FromIntTest real.ExpLog real.Trigonometric \
+		real.Abs real.FromIntTest real.SquareTest \
+		real.ExpLogTest real.PowerTest real.TrigonometryTest \
 		floating_point.Test array.TestBv32 \
 		; do \
 	  printf "Generating Coq file for $$i\\n" && bin/why.byte \

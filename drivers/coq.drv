@@ -108,3 +108,47 @@ theory real.FromInt
 
 end
 
+theory real.Square
+
+  prelude "Require Import R_sqrt."
+
+  syntax logic sqr "(Rsqr %1)"
+
+  syntax logic sqrt "(sqrt %1)"  (* and not Rsqrt *)
+
+end
+
+
+theory real.ExpLog
+
+  prelude "Require Import Rtrigo_def."
+  prelude "Require Import Rpower."
+
+  syntax logic exp "(exp %1)"
+
+  syntax logic log "(ln %1)"
+
+end
+
+
+theory real.Power 
+
+  prelude "Require Import Rpower."
+
+  (* no power: R -> R -> R in Coq ? (only powerRZ: R -> Z -> R) *)
+end
+
+theory real.Trigonometry
+
+  prelude "Require Import Rtrigo." 
+  prelude "Require Import AltSeries." (* for def of pi *)
+
+  syntax logic cos "(cos %1)"
+  syntax logic sin "(sin %1)"
+
+  syntax logic pi "PI"
+
+  syntax logic tan "(tan %1)"
+  (* syntax logic atan "atan not defined in Coq ?" *)
+
+end

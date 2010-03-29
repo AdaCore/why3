@@ -151,6 +151,16 @@ theory Square
 
 end
 
+theory SquareTest
+
+  use import Square
+
+  lemma Sqrt_zero: sqrt(0.0) = 0.0
+  lemma Sqrt_one: sqrt(1.0) = 1.0
+  lemma Sqrt_four: sqrt(4.0) = 2.0
+
+end
+
 theory ExpLog
 
   use import Real
@@ -168,14 +178,21 @@ theory ExpLog
 
   axiom Log_exp: forall x:real. log(exp(x)) = x
 
-  lemma Log_e : log(e) = 1.0
-
   axiom Exp_log: forall x:real. x > 0.0 -> exp(log(x)) = x
 
   logic log2(x:real) : real = log(x)/log(2.0)
   logic log10(x:real) : real = log(x)/log(10.0)
 
 end
+
+theory ExpLogTest
+
+  use import ExpLog
+
+  lemma Log_e : log(e) = 1.0
+
+end
+
 
 theory Power 
 
@@ -208,10 +225,20 @@ theory Power
 
 end
 
+theory PowerTest
+
+  use import Power
+
+  lemma Pow_2_2 : pow(2.0,2.0) = 4.0
+
+end
+
+
+
 (** Trigonometric functions 
     [http://en.wikipedia.org/wiki/Trigonometric_function]
 *)
-theory Trigonometric
+theory Trigonometry
 
   use import Real
   use import Square
@@ -260,6 +287,19 @@ theory Trigonometric
 
 end
 
+theory TrigonometryTest
+
+  use import Real
+  use import Trigonometry
+  use import Square
+
+  lemma Cos_2_pi : cos(2.0 * pi) = 1.0
+  lemma Sin_2_pi : cos(2.0 * pi) = 0.
+  lemma Tan_pi_3 : tan(pi / 2.0) = sqrt(3.0)
+  lemma Atan_1 : atan(1.0) = pi / 4.0
+
+end
+
 (** hyperbolic functions 
     [http://en.wikipedia.org/wiki/Hyperbolic_function]
 *)
@@ -290,7 +330,7 @@ theory Polar
 
   use import Real
   use import Square
-  use import Trigonometric
+  use import Trigonometry
 
   logic hypot(x:real,y:real) : real = sqrt(sqr(x)+sqr(y))
   logic atan2(real,real) : real
