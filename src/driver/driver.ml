@@ -123,17 +123,20 @@ let print_translation fmt = function
   | Tag s -> fprintf fmt "tag %a" 
       (Pp.print_iter1 Sstr.iter Pp.comma Pp.string) s
 
-type printer = driver -> formatter -> task -> unit
+type printer = (ident -> translation) -> formatter -> task -> unit
 
-and raw_driver = {
-  drv_printer     : printer option;
-  drv_prover      : Call_provers.prover;
-  drv_prelude     : string list;
-  drv_filename    : string option;
-  drv_transforms  : task tlist_reg;
-  drv_rules       : theory_rules list;
+and driver = {
+  drv_env          : env;
+  drv_printer      : printer option;
+  drv_prover       : Call_provers.prover;
+  drv_prelude      : string list;
+  drv_filename     : string option;
+  drv_transforms   : task tlist_reg;
+  drv_thprelude    : string list Mid.t;
+  drv_translations : (translation * translation) Mid.t
 }
 
+(*
 and driver = {
   drv_raw         : raw_driver;
   drv_clone       : Theory.clone_map;
@@ -145,7 +148,7 @@ and driver = {
   drv_theory      : (translation * translation) Hid.t;
   drv_with_task   : translation Hid.t;
 }
-
+*)
 
 (*
   let print_driver fmt driver =
@@ -223,28 +226,28 @@ let check_syntax loc s len =
          i len) s
 
 
-let load_rules env driver {thr_name = loc,qualid; thr_rules = trl} =
+let load_rules env (premap,tmap) {thr_name = loc,qualid; thr_rules = trl} =
   let id,qfile = qualid_to_slist qualid in
   let th = try
     find_theory env qfile id 
   with Env.TheoryNotFound (l,s) -> 
     errorm ~loc "theory %s.%s not found" (String.concat "." l) s
   in
-  let add_htheory cloned id t =
+  let add_htheory tmap cloned id t =
     try
-      let t2,t3 = Hid.find driver.drv_theory id in
+      let t2,t3 = Mid.find id tmap in
       let t23 = 
         if cloned then (translation_union t t2),t3
         else t2,(translation_union t t3) in
-      Hid.replace driver.drv_theory id t23 
+      Mid.add id t23 tmap 
     with Not_found ->
       let t23 = if cloned then (Tag Sstr.empty),t else t,(Tag Sstr.empty) in
-      Hid.add driver.drv_theory id t23 in
-  let add = function
+      Mid.add id t23 tmap in
+  let add (premap,tmap) = function
     | Rremove (c,(loc,q)) -> 
         begin
           try
-            add_htheory c 
+            premap,add_htheory tmap c 
               (ns_find_pr th.th_export q).pr_name Remove
           with Not_found -> errorm ~loc "Unknown axioms %s" 
             (string_of_qualid qualid q)
@@ -254,7 +257,7 @@ let load_rules env driver {thr_name = loc,qualid; thr_rules = trl} =
           try
             let ls = ns_find_ls th.th_export q in
             check_syntax loc s (List.length ls.ls_args);
-            add_htheory false ls.ls_name (Syntax s)
+            premap,add_htheory tmap false ls.ls_name (Syntax s)
           with Not_found -> errorm ~loc "Unknown logic %s" 
             (string_of_qualid qualid q)
         end 
@@ -263,14 +266,14 @@ let load_rules env driver {thr_name = loc,qualid; thr_rules = trl} =
           try
             let ts = ns_find_ts th.th_export q in
             check_syntax loc s (List.length ts.ts_args);
-            add_htheory false ts.ts_name (Syntax s)
+            premap,add_htheory tmap false ts.ts_name (Syntax s)
           with Not_found -> errorm ~loc "Unknown type %s" 
             (string_of_qualid qualid q)
         end
     | Rtagls (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (ns_find_ls th.th_export q).ls_name 
+            premap,add_htheory tmap c (ns_find_ls th.th_export q).ls_name 
               (Tag (Sstr.singleton s))
           with Not_found -> errorm ~loc "Unknown logic %s" 
             (string_of_qualid qualid q)
@@ -278,7 +281,7 @@ let load_rules env driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rtagty (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (ns_find_ts th.th_export q).ts_name 
+            premap,add_htheory tmap c (ns_find_ts th.th_export q).ts_name 
               (Tag (Sstr.singleton s))
           with Not_found -> errorm ~loc "Unknown type %s" 
             (string_of_qualid qualid q)
@@ -286,19 +289,19 @@ let load_rules env driver {thr_name = loc,qualid; thr_rules = trl} =
     | Rtagpr (c,(loc,q),s) ->
         begin
           try
-            add_htheory c (ns_find_pr th.th_export q).pr_name
+            premap,add_htheory tmap c (ns_find_pr th.th_export q).pr_name
               (Tag (Sstr.singleton s))
           with Not_found -> errorm ~loc "Unknown proposition %s" 
             (string_of_qualid qualid q)
         end
     | Rprelude (loc,s) -> 
         let l = 
-          try Hid.find driver.drv_thprelude th.th_name 
+          try Mid.find th.th_name premap 
           with Not_found -> []
         in
-        Hid.replace driver.drv_thprelude th.th_name (s::l) 
+        Mid.add th.th_name (s::l) premap,tmap 
   in
-  List.iter add trl
+  List.fold_left add (premap,tmap) trl
 
 let load_driver file env =
   let f = load_file file in
@@ -344,33 +347,40 @@ let load_driver file env =
       )
       identity_l transformations in
     let transforms = trans ltransforms in
-  { drv_printer     = !printer;
-    drv_prover      = {Call_provers.pr_call_stdin = !call_stdin;
+    let (premap,tmap) = 
+      List.fold_left (load_rules env) (Mid.empty,Mid.empty) f.f_rules in
+  { 
+    drv_env          = env;
+    drv_printer      = !printer;
+    drv_prover       = {Call_provers.pr_call_stdin = !call_stdin;
                        pr_call_file               = !call_file;
                        pr_regexps                 = regexps};
-    drv_prelude     = !prelude;
-    drv_filename    = !filename;
-    drv_transforms  = transforms;
-    drv_rules       = f.f_rules;
+    drv_prelude      = !prelude;
+    drv_filename     = !filename;
+    drv_transforms   = transforms;
+    drv_thprelude    = premap;
+    drv_translations = tmap
   }
 
 (** querying drivers *)
 
-let query_ident drv id =
-  try
-    Hid.find drv.drv_with_task id
-  with Not_found ->
-    let r = try
-      Mid.find id drv.drv_clone
-    with Not_found -> Sid.empty in
-    let tr = try fst (Hid.find drv.drv_theory id) 
-    with Not_found -> Tag Sstr.empty in 
-    let tr = Sid.fold 
-      (fun id acc -> try translation_union acc 
-         (snd (Hid.find drv.drv_theory id)) 
-       with Not_found -> acc) r tr in
-    Hid.add drv.drv_with_task id tr;
-    tr
+let query_ident drv clone =
+  let h = Hid.create 7 in
+  fun id -> 
+    try
+      Hid.find h id
+    with Not_found ->
+      let r = try
+        Mid.find id clone
+      with Not_found -> Sid.empty in
+      let tr = try fst (Mid.find id drv.drv_translations) 
+      with Not_found -> Tag Sstr.empty in 
+      let tr = Sid.fold 
+        (fun id acc -> try translation_union acc 
+           (snd (Mid.find id drv.drv_translations)) 
+         with Not_found -> acc) r tr in
+      Hid.add h id tr;
+      tr
 
 let syntax_arguments s print fmt l =
   let args = Array.of_list l in
@@ -383,48 +393,36 @@ let syntax_arguments s print fmt l =
 
 let apply_transforms drv = 
 (*  apply_clone drv.drv_raw.drv_transforms drv.drv_env drv.drv_clone *)
-  apply_env drv.drv_raw.drv_transforms drv.drv_env
+  apply_env drv.drv_transforms drv.drv_env
 
-let cook_driver env clone used drv = 
-  let drv = { drv_raw        = drv;
-              drv_clone      = clone;
-              drv_used       = used;
-              drv_env        = env;
-              drv_thprelude  = Hid.create 17;
-              drv_theory     = Hid.create 17;
-              drv_with_task  = Hid.create 17} in
-  List.iter (load_rules env drv) drv.drv_raw.drv_rules;
-  drv
-
-
-let print_prelude drv fmt =
+let print_prelude drv used fmt =
   let pr_pr s () = fprintf fmt "%s@\n" s in
-  List.fold_right pr_pr drv.drv_raw.drv_prelude ();
+  List.fold_right pr_pr drv.drv_prelude ();
   let seen = Hid.create 17 in
   let rec print_prel th_name th =
     if Hid.mem seen th_name then () else begin
       Hid.add seen th_name ();
       Mid.iter print_prel th.th_used;
       let prel = 
-        try Hid.find drv.drv_thprelude th_name 
+        try Mid.find th_name drv.drv_thprelude 
         with Not_found -> []
       in
       List.fold_right pr_pr prel ()
     end
   in
-  Mid.iter print_prel drv.drv_used;
+  Mid.iter print_prel used;
   fprintf fmt "@."
 
-let print_task drv fmt task = match drv.drv_raw.drv_printer with
+let print_task drv fmt task = match drv.drv_printer with
   | None -> errorm "no printer"
   | Some f -> 
-      print_prelude drv fmt;
-      f drv fmt task 
+      print_prelude drv (task_used task) fmt;
+      f (query_ident drv (task_clone task)) fmt task 
 
 let regexp_filename = Str.regexp "%\\([a-z]\\)"
 
 let filename_of_goal drv filename theory_name task =
-  match drv.drv_raw.drv_filename with
+  match drv.drv_filename with
     | None -> errorm "no filename syntax given"
     | Some f -> 
         let pr_name = (task_goal task).pr_name in
@@ -442,14 +440,14 @@ let file_printer =
     []
 
 let call_prover_on_file ?debug ?timeout drv filename =
-  Call_provers.on_file drv.drv_raw.drv_prover filename 
+  Call_provers.on_file drv.drv_prover filename 
 let call_prover_on_formatter ?debug ?timeout ?filename drv ib = 
-  Call_provers.on_formatter ?debug ?timeout ?filename drv.drv_raw.drv_prover ib
+  Call_provers.on_formatter ?debug ?timeout ?filename drv.drv_prover ib
 
 
 let call_prover ?debug ?timeout drv task =
   let filename = 
-    match drv.drv_raw.drv_filename with
+    match drv.drv_filename with
       | None -> None
       | Some _ -> Some (filename_of_goal drv "why" "call_prover" task) in
   let formatter fmt = print_task drv fmt task in

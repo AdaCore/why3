@@ -25,15 +25,9 @@ open Env
 
 (** creating drivers *)
 
-type raw_driver
-
-val load_driver : string -> env -> raw_driver
-
-(** cooked driver *)
 type driver
 
-val cook_driver : 
-  env -> Theory.clone_map -> Theory.use_map -> raw_driver -> driver
+val load_driver : string -> env -> driver
 
 (** querying drivers *)
 
@@ -42,14 +36,13 @@ type translation =
   | Syntax of string
   | Tag of Util.Sstr.t
 
-val query_ident : driver -> ident -> translation
 val syntax_arguments : string -> (formatter -> 'a -> unit) -> 
   formatter -> 'a list -> unit
   (* syntax_argument templ print_arg fmt l print in the formatter fmt
      the list l using the template templ and the printer print_arg *)
   (** registering printers *)
 
-type printer = driver -> formatter -> task -> unit
+type printer = (ident -> translation) -> formatter -> task -> unit
 
 val register_printer : string -> printer -> unit
 
@@ -65,7 +58,7 @@ val list_transforms : unit -> string list
 val apply_transforms : driver -> task -> task list
 
 (** print_task *)
-val print_task : printer
+val print_task : driver -> formatter -> task -> unit
 
 val filename_of_goal : driver -> string -> string -> task -> string
 (* filename_of_goal filename theory_name ctxt *)

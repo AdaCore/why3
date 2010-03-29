@@ -42,6 +42,10 @@ and tdecl =
   | Use   of theory
   | Clone of theory * (ident * ident) list
 
+let task_clone = option_apply Mid.empty (fun t -> t.task_clone)
+let task_used = option_apply Mid.empty (fun t -> t.task_used)
+let task_tag = option_apply (-1) (fun t -> t.task_tag)
+
 module Task = struct
   type t = task_hd
 

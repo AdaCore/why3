@@ -170,13 +170,17 @@ let transform env l =
 
 
 let extract_goals ?filter = 
-  fun env drv acc th ->
+  fun env acc th ->
     let l = split_theory th filter in
-    let l = List.rev_map (fun task -> 
-      let cl = Util.option_apply Ident.Mid.empty (fun t -> t.task_clone) task in
-      let us = Util.option_apply Ident.Mid.empty (fun t -> t.task_used) task in
-      let us = Ident.Mid.add th.th_name th us in
-      let drv = Driver.cook_driver env cl us drv in (th,task,drv)) l in
+    let l = List.rev_map 
+      (fun task -> 
+        (* let cl = 
+           Util.option_apply Ident.Mid.empty (fun t -> t.task_clone) task in *)
+        (* let us = 
+           Util.option_apply Ident.Mid.empty (fun t -> t.task_used) task in *)
+        (* let us = Ident.Mid.add th.th_name th us in *)
+        (* let drv = Driver.cook_driver env cl us drv in *) 
+        (th,task)) l in
     List.rev_append l acc
 
 let file_sanitizer = None (* We should remove which character? *)
@@ -191,9 +195,9 @@ let print_theory_namespace fmt th =
 let do_goals env drv src_filename_printer dest_filename_printer file goals = 
   (* Apply transformations *)
   let goals = List.fold_left 
-    (fun acc (th,task,drv) -> 
+    (fun acc (th,task) -> 
        List.rev_append 
-         (List.map (fun e -> (th,e,drv)) 
+         (List.map (fun e -> (th,e)) 
             (Driver.apply_transforms drv task)
          ) acc) [] goals 
   in
@@ -210,7 +214,7 @@ let do_goals env drv src_filename_printer dest_filename_printer file goals =
               with Invalid_argument _ -> file in
             Ident.string_unique src_filename_printer file in
           List.iter 
-            (fun (th,task,drv) ->
+            (fun (th,task) ->
                let dest = 
                  Driver.filename_of_goal drv 
                    file th.th_name.Ident.id_short task in
@@ -235,7 +239,7 @@ let do_goals env drv src_filename_printer dest_filename_printer file goals =
           let fmt = if file = "-" then std_formatter
           else formatter_of_out_channel (open_out file) 
           in
-          let print_task fmt (th,task,drv) =
+          let print_task fmt (th,task) =
             fprintf fmt "@[%a@]" (Driver.print_task drv) task
           in
           let print_zero fmt () = fprintf fmt "\000@?" in
@@ -243,7 +247,7 @@ let do_goals env drv src_filename_printer dest_filename_printer file goals =
   end;
   if !call then
     (* we are in the call mode *)
-    let call (th,task,drv) = 
+    let call (th,task) = 
       let res = 
         Driver.call_prover ~debug:!debug ?timeout drv task in
       printf "%s %s %s : %a@." 
@@ -262,7 +266,8 @@ let do_no_file env drv src_filename_printer dest_filename_printer =
   (* Extract the goal(s) *)
   Hashtbl.iter
     (fun tname goals ->
-       let dir,file,th = match List.rev (Str.split (Str.regexp "\\.") tname) with
+       let dir,file,th = 
+         match List.rev (Str.split (Str.regexp "\\.") tname) with
          | t::p -> List.rev p, List.hd p, t
          | _ -> assert false
        in
@@ -280,7 +285,7 @@ let do_no_file env drv src_filename_printer dest_filename_printer =
                      eprintf "--goal : Unknown goal %s@." s ; exit 1 in
                    Decl.Spr.add pr acc
                 ) s Decl.Spr.empty) in
-       let goals = extract_goals ?filter env drv [] th in
+       let goals = extract_goals ?filter env [] th in
        do_goals env drv src_filename_printer dest_filename_printer file goals) 
     which_theories 
   
@@ -317,7 +322,7 @@ let do_file env drv src_filename_printer dest_filename_printer file =
       (* Extract the goal(s) *)
       let goals = 
         if !set_all_goals 
-        then Mnm.fold (fun _ th acc -> extract_goals env drv acc th) m []
+        then Mnm.fold (fun _ th acc -> extract_goals env acc th) m []
         else
           Hashtbl.fold
             (fun tname goals acc ->
@@ -335,7 +340,7 @@ let do_file env drv src_filename_printer dest_filename_printer file =
                                file s ; exit 1 in
                            Decl.Spr.add pr acc
                         ) s Decl.Spr.empty) in
-               extract_goals ?filter env drv acc th
+               extract_goals ?filter env acc th
             ) which_theories [] in
       do_goals env drv src_filename_printer dest_filename_printer file goals
   end

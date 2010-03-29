@@ -53,7 +53,7 @@ let rec print_type drv fmt ty = match ty.ty_node with
   | Tyvar id -> 
       print_tvsymbols fmt id
   | Tyapp (ts, tl) -> 
-      match Driver.query_ident drv ts.ts_name with
+      match drv ts.ts_name with
         | Driver.Remove -> assert false (* Mettre une erreur *)
         | Driver.Syntax s ->
             Driver.syntax_arguments s (print_type drv) fmt tl
@@ -79,7 +79,7 @@ let rec print_term drv fmt t = match t.t_node with
   | Tvar v -> print_var fmt v
   | Tapp (ls, tl) ->
       begin      
-        match Driver.query_ident drv ls.ls_name with
+        match drv ls.ls_name with
           | Driver.Remove -> assert false (* Mettre une erreur *)
           | Driver.Syntax s ->
               Driver.syntax_arguments s (print_term drv) fmt tl
@@ -105,7 +105,7 @@ let rec print_fmla drv fmt f = match f.f_node with
       print_ident fmt id
   | Fapp (ls, tl) ->
       begin      
-        match Driver.query_ident drv ls.ls_name with
+        match drv ls.ls_name with
           | Driver.Remove -> assert false (* Mettre une erreur *)
           | Driver.Syntax s ->
               Driver.syntax_arguments s (print_term drv) fmt tl
@@ -159,7 +159,7 @@ let print_logic_binder drv fmt v =
 let print_type_decl drv fmt = function
   | ts, Tabstract ->
       begin
-        match Driver.query_ident drv ts.ts_name with
+        match drv ts.ts_name with
           | Driver.Remove | Driver.Syntax _ -> false
           | Driver.Tag _ -> 
               match ts.ts_args with
@@ -171,7 +171,7 @@ let print_type_decl drv fmt = function
       assert false
 
 let print_logic_decl drv task fmt (ls,ld) =
-  match Driver.query_ident drv ls.ls_name with
+  match drv ls.ls_name with
     | Driver.Remove | Driver.Syntax _ -> false
     | Driver.Tag s ->
         begin match ld with
@@ -198,7 +198,7 @@ let print_decl drv task fmt d = match d.d_node with
       print_list_opt newline (print_logic_decl drv task) fmt dl
   | Dind _ -> assert false (* TODO *)
   | Dprop (Paxiom, pr, _) when
-      Driver.query_ident drv pr.pr_name = Driver.Remove -> false
+      drv pr.pr_name = Driver.Remove -> false
   | Dprop (Paxiom, pr, f) ->
       fprintf fmt "@[<hov 2>:assumption@ %a@]@\n" 
         (print_fmla drv) f; true

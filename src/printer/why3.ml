@@ -87,7 +87,7 @@ let rec ns_comma fmt () = fprintf fmt ",@,"
 let rec print_ty drv fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
   | Tyapp (ts, tl) ->
-    begin match query_ident drv ts.ts_name with
+    begin match drv ts.ts_name with
       | Syntax s -> syntax_arguments s (print_ty drv) fmt tl
       | _ ->
         begin match tl with
@@ -123,7 +123,7 @@ let rec print_pat drv fmt p = match p.pat_node with
   | Pvar v -> print_vs fmt v
   | Pas (p,v) -> fprintf fmt "%a as %a" (print_pat drv) p print_vs v
   | Papp (cs,pl) ->
-    begin match query_ident drv cs.ls_name with
+    begin match drv cs.ls_name with
       | Syntax s -> syntax_arguments s (print_pat drv) fmt pl
       | _ -> fprintf fmt "%a%a"
           print_cs cs (print_paren_r (print_pat drv)) pl
@@ -185,7 +185,7 @@ and print_tnode opl opr drv fmt t = match t.t_node with
         (print_vsty drv) v (print_opl_fmla drv) f;
       forget_var v
   | Tapp (fs, tl) ->
-    begin match query_ident drv fs.ls_name with
+    begin match drv fs.ls_name with
       | Syntax s -> syntax_arguments s (print_term drv) fmt tl
       | _ -> if unambig_fs fs
           then fprintf fmt "%a%a" print_ls fs
@@ -223,7 +223,7 @@ and print_fnode opl opr drv fmt f = match f.f_node with
       fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
         (print_fmla drv) f1 (print_fmla drv) f2 (print_opl_fmla drv) f3
   | Fapp (ps, tl) ->
-    begin match query_ident drv ps.ls_name with
+    begin match drv ps.ls_name with
       | Syntax s -> syntax_arguments s (print_term drv) fmt tl
       | _ -> fprintf fmt "%a%a" print_ls ps
             (print_paren_r (print_term drv)) tl
@@ -273,7 +273,7 @@ let print_type_decl drv fmt (ts,def) = match def with
         (print_list newline (print_constr drv)) csl
 
 let print_type_decl drv fmt d =
-  match query_ident drv (fst d).ts_name with
+  match drv (fst d).ts_name with
     | Syntax _ -> ()
     | _ -> print_type_decl drv fmt d; forget_tvs ()
 
@@ -293,7 +293,7 @@ let print_logic_decl drv fmt (ls,ld) = match ld with
         (print_option (print_ls_type drv)) ls.ls_value
 
 let print_logic_decl drv fmt d =
-  match query_ident drv (fst d).ls_name with
+  match drv (fst d).ls_name with
     | Syntax _ -> ()
     | _ -> print_logic_decl drv fmt d; forget_tvs ()
 
@@ -306,7 +306,7 @@ let print_ind_decl drv fmt (ps,bl) =
      (print_list newline (print_ind drv)) bl
 
 let print_ind_decl drv fmt d =
-  match query_ident drv (fst d).ls_name with
+  match drv (fst d).ls_name with
     | Syntax _ -> ()
     | _ -> print_ind_decl drv fmt d; forget_tvs ()
 
@@ -320,7 +320,7 @@ let print_prop_decl drv fmt (k,pr,f) =
     print_pr pr (print_fmla drv) f
 
 let print_prop_decl drv fmt (k,pr,f) =
-  match k, query_ident drv pr.pr_name with
+  match k, drv pr.pr_name with
     | Paxiom, Remove -> ()
     | _ -> print_prop_decl drv fmt (k,pr,f); forget_tvs ()
 
