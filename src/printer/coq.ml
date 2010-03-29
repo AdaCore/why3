@@ -67,10 +67,7 @@ let print_ts fmt ts =
   fprintf fmt "%s" (id_unique tprinter ts.ts_name)
 
 let print_ls fmt ls =
-  let n = id_unique lprinter ls.ls_name in
-  (* temporary workaround *)
-  let n = if n = "mod" then "bmod" else n in
-  fprintf fmt "%s" n
+  fprintf fmt "%s" (id_unique lprinter ls.ls_name)
 
 let print_pr fmt pr =
   fprintf fmt "%s" (id_unique pprinter pr.pr_name)
@@ -270,6 +267,7 @@ let print_type_decl drv fmt (ts,def) = match def with
 let print_type_decl drv fmt d =
   match query_ident drv (fst d).ts_name with
     | Syntax _ -> ()
+    | Remove -> ()
     | _ -> print_type_decl drv fmt d; forget_tvs ()
 
 let print_ls_type ?(arrow=false) drv fmt ls = 
@@ -294,7 +292,8 @@ let print_logic_decl drv fmt (ls,ld) = match ld with
 let print_logic_decl drv fmt d =
   match query_ident drv (fst d).ls_name with
     | Syntax _ -> ()
-    | _ -> print_logic_decl drv fmt d; forget_tvs ()
+    | Remove -> ()
+    | Tag _ -> print_logic_decl drv fmt d; forget_tvs ()
 
 let print_ind drv fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr (print_fmla drv) f
@@ -307,7 +306,8 @@ let print_ind_decl drv fmt (ps,bl) =
 let print_ind_decl drv fmt d =
   match query_ident drv (fst d).ls_name with
     | Syntax _ -> ()
-    | _ -> print_ind_decl drv fmt d; forget_tvs ()
+    | Remove -> ()
+    | Tag _ -> print_ind_decl drv fmt d; forget_tvs ()
 
 let print_pkind fmt = function
   | Paxiom -> fprintf fmt "Axiom"
@@ -318,20 +318,18 @@ let print_proof fmt = function
   | Paxiom -> ()
   | Plemma | Pgoal  -> fprintf fmt "Admitted.@\n"
 
-let print_prop_decl drv fmt (k,pr,f) =
-  fprintf fmt "@[<hov 2>%a %a : %a.@]@\n%a@\n" print_pkind k
-    print_pr pr (print_fmla drv) f print_proof k
-
-let print_prop_decl drv fmt (k,pr,f) =
-  match k, query_ident drv pr.pr_name with
-    | Paxiom, Remove -> ()
-    | _ -> print_prop_decl drv fmt (k,pr,f); forget_tvs ()
-
 let print_decl drv fmt d = match d.d_node with
   | Dtype tl  -> print_list nothing (print_type_decl drv) fmt tl
   | Dlogic ll -> print_list nothing (print_logic_decl drv) fmt ll
   | Dind il   -> print_list nothing (print_ind_decl drv) fmt il
-  | Dprop p   -> print_prop_decl drv fmt p
+  | Dprop (k,pr,f) ->
+      match query_ident drv pr.pr_name with
+	| Remove -> ()
+	| Syntax _ -> assert false (* cannot happen *)
+	| Tag _ -> 
+	    fprintf fmt "@[<hov 2>%a %a : %a.@]@\n%a@\n" print_pkind k
+	      print_pr pr (print_fmla drv) f print_proof k;
+	    forget_tvs ()
 
 let print_decls drv fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl drv)) dl

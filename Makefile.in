@@ -184,7 +184,7 @@ test: bin/why.byte  $(TOOLS)
 		real.Abs real.FromIntTest real.ExpLog real.Trigonometric \
 		floating_point.Test array.TestBv32 \
 		; do \
-	  printf "Generate Coq file for $$i" && bin/why.byte \
+	  printf "Generating Coq file for $$i\\n" && bin/why.byte \
 		--driver drivers/coq.drv -I theories/ \
 		--output-dir theories/coq --goals-of $$i ; done
 	@printf "*** Checking Coq compilation ***\\n"
