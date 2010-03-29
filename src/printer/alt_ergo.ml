@@ -111,17 +111,17 @@ let rec print_fmla drv fmt f = match f.f_node with
       let forall fmt v = 
 	fprintf fmt "%s %a:%a" q print_ident v.vs_name (print_type drv) v.vs_ty
       in
-      fprintf fmt "@[<hov2>(%a%a.@ %a)@]" (print_list dot forall) vl
-        (print_list alt (print_triggers drv)) tl (print_fmla drv) f;
+      fprintf fmt "@[(%a%a.@ %a)@]" (print_list dot forall) vl
+        (print_triggers drv) tl (print_fmla drv) f;
       List.iter forget_var vl
   | Fbinop (Fand, f1, f2) ->
-      fprintf fmt "(%a and %a)" (print_fmla drv) f1 (print_fmla drv) f2
+      fprintf fmt "(%a and@ %a)" (print_fmla drv) f1 (print_fmla drv) f2
   | Fbinop (For, f1, f2) ->
-      fprintf fmt "(%a or %a)" (print_fmla drv) f1 (print_fmla drv) f2
+      fprintf fmt "(%a or@ %a)" (print_fmla drv) f1 (print_fmla drv) f2
   | Fbinop (Fimplies, f1, f2) ->
-      fprintf fmt "(%a -> %a)" (print_fmla drv) f1 (print_fmla drv) f2
+      fprintf fmt "(%a ->@ %a)" (print_fmla drv) f1 (print_fmla drv) f2
   | Fbinop (Fiff, f1, f2) ->
-      fprintf fmt "(%a <-> %a)" (print_fmla drv) f1 (print_fmla drv) f2
+      fprintf fmt "(%a <->@ %a)" (print_fmla drv) f1 (print_fmla drv) f2
   | Fnot f ->
       fprintf fmt "(not %a)" (print_fmla drv) f
   | Ftrue ->
@@ -139,8 +139,9 @@ let rec print_fmla drv fmt f = match f.f_node with
 
 and print_expr drv fmt = e_apply (print_term drv fmt) (print_fmla drv fmt)
 
-and print_triggers drv fmt tl = print_list comma (print_expr drv) fmt tl
-
+and print_triggers drv fmt tl =
+  if tl = [] then () else fprintf fmt "@ [%a]"
+    (print_list alt (print_list comma (print_expr drv))) tl
 
 let print_logic_binder drv fmt v =
   fprintf fmt "%a: %a" print_ident v.vs_name (print_type drv) v.vs_ty
@@ -169,9 +170,10 @@ let print_logic_decl drv task fmt (ls,ld) =
         begin match ld with
           | None ->
               let sac = if Util.Sstr.mem "AC" s then "ac " else "" in
-              fprintf fmt "@[<hov 2>logic %s%a : %a -> %a@]@\n"
+              fprintf fmt "@[<hov 2>logic %s%a : %a%s%a@]@\n"
                 sac print_ident ls.ls_name
                 (print_list comma (print_type drv)) ls.ls_args 
+		(if ls.ls_args = [] then "" else " -> ")
                 (print_option_or_default "prop" (print_type drv)) ls.ls_value
           | Some ld ->
               let vl,e = open_ls_defn ld in
