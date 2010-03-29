@@ -473,6 +473,20 @@ let cl_add_decl cl inst d = match d.d_node with
       let pr',f' = cl_new_prop cl (pr,f) in
       Some (create_prop_decl k' pr' f')
 
+let clone_theory cl add_tdecl acc th inst =
+  let add acc = function
+    | Decl d ->
+        begin match cl_add_decl cl inst d with
+          | Some d -> add_tdecl acc (Decl d)
+          | None -> acc
+        end
+    | td -> add_tdecl acc td
+  in
+  let acc = List.fold_left add acc th.th_decls in
+  let add_idid id id' acc = (id,id') :: acc in
+  let sl = Hid.fold add_idid cl.id_table [] in
+  add_tdecl acc (Clone (th,sl))
+
 let merge_clone cl th sl =
   let get m id = try Mid.find id m with Not_found -> Sid.empty in
   let add m m' (id,id') =
@@ -480,34 +494,26 @@ let merge_clone cl th sl =
   in
   List.fold_left (add th.th_clone) cl sl
 
-let add_clone uc th sl =
-  let decls = Clone (th,sl) :: uc.uc_decls in
-  let clone = merge_clone uc.uc_clone th sl in
-  { uc with uc_decls = decls; uc_clone = clone }
+let cloned_from cl i1 i2 =
+  try i1 = i2 || Sid.mem i2 (Mid.find i1 cl)
+  with Not_found -> false
 
-let cl_add_tdecl cl inst uc td = match td with
-  | Decl d ->
-      begin match cl_add_decl cl inst d with
-        | Some d -> { uc with
-            uc_decls = Decl d :: uc.uc_decls;
-            uc_known = known_add_decl uc.uc_known d }
-        | None -> uc
-      end
-  | Use th -> if Mid.mem th.th_name uc.uc_used then uc else { uc with
-      uc_used  = merge_used uc.uc_used th;
+let cl_add_tdecl uc td = match td with
+  | Decl d -> { uc with
+      uc_decls = td :: uc.uc_decls;
+      uc_known = known_add_decl uc.uc_known d }
+  | Use th when Mid.mem th.th_name uc.uc_used -> uc
+  | Use th -> { uc with
+      uc_decls = td :: uc.uc_decls;
       uc_known = merge_known uc.uc_known th.th_known;
-      uc_decls = td :: uc.uc_decls }
-  | Clone (th,sl) ->
-      add_clone uc th sl
+      uc_used  = merge_used uc.uc_used th }
+  | Clone (th,sl) -> { uc with
+      uc_decls = td :: uc.uc_decls;
+      uc_clone = merge_clone uc.uc_clone th sl }
 
 let clone_export uc th inst =
   let cl = cl_init th inst in
-  let add_tdecl = cl_add_tdecl cl inst in
-  let uc = List.fold_left add_tdecl uc th.th_decls in
-
-  let add_idid id id' acc = (id,id') :: acc in
-  let sl = Hid.fold add_idid cl.id_table [] in
-  let uc = add_clone uc th sl in
+  let uc = clone_theory cl cl_add_tdecl uc th inst in
 
   let add_local id' () acc = Sid.add id' acc in
   let lc = Hid.fold add_local cl.nw_local uc.uc_local in
@@ -552,4 +558,7 @@ let clone_export uc th inst =
         uc_export = merge_ns true  ns e0 :: ste; }
     | _ ->
         assert false
+
+let clone_theory add_tdecl acc th inst =
+  clone_theory (cl_init th inst) add_tdecl acc th inst
 

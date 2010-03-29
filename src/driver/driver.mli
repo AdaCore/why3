@@ -32,7 +32,8 @@ val load_driver : string -> env -> raw_driver
 (** cooked driver *)
 type driver
 
-val cook_driver : env -> clone -> Theory.use_map -> raw_driver -> driver
+val cook_driver : 
+  env -> Theory.clone_map -> Theory.use_map -> raw_driver -> driver
 
 (** querying drivers *)
 

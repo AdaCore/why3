@@ -148,13 +148,13 @@ let add_ld kn task (ls,ld) = match ld with
 
 let add_ls task (ls,_) = add_decl task (create_logic_decl [ls,None])
 
-let elim t task = match t.task_decl.d_node with
-  | Dlogic ll ->
+let elim t task = match t.task_decl with
+  | Theory.Decl { d_node = Dlogic ll } ->
       let task = List.fold_left add_ls task ll in
       let task = List.fold_left (add_ld t.task_known) task ll in
       task
-  | _ ->
-      add_decl task t.task_decl
+  | td ->
+      add_tdecl task td
 
 let elim = Register.store (fun () -> Trans.map elim None)
 

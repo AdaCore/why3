@@ -26,11 +26,15 @@ type 'a tlist_reg = 'a list trans_reg
 
 val store       : (unit ->                 'a trans) -> 'a trans_reg
 val store_env   : (unit -> env ->          'a trans) -> 'a trans_reg
+(*
 val store_clone : (unit -> env -> clone -> 'a trans) -> 'a trans_reg
+*)
 
 exception ArgumentNeeded
 
+(*
 val apply_clone : 'a trans_reg -> env -> clone -> task -> 'a
+*)
 val apply_env   : 'a trans_reg -> env ->          task -> 'a
 val apply       : 'a trans_reg ->                 task -> 'a
 

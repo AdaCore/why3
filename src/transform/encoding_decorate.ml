@@ -72,7 +72,7 @@ let load_prelude env =
   let deco = ty_app (Theory.ns_find_ts prelude.th_export ["deco"]) [] in
   let undeco = ty_app (Theory.ns_find_ts prelude.th_export ["undeco"]) [] in
   let task = None in
-  let task = flat_theory task prelude in
+  let task = Task.use_export task prelude in
   let builtin = Env.find_theory env why_filename "Builtin" in
   let type_t = Theory.ns_find_ts builtin.th_export ["t"] in
   let logic_d2t = Theory.ns_find_ls builtin.th_export ["d2t"] in
@@ -96,9 +96,9 @@ let load_prelude env =
       ~ls:[logic_d2t,d2ty;logic_t2u,ty2u;logic_tty,tty]
       ~lemma:[] ~goal:[] in
     let lconv = { d2t = d2ty; t2u = ty2u; tty = t_app tty [] tyty} in
-    let th_uc = clone_export th_uc builtin th_inst in
+    let th_uc = Theory.clone_export th_uc builtin th_inst in
     let th = close_theory th_uc in
-    let task = flat_theory task th in
+    let task = Task.use_export task th in
     Hts.add trans_tsymbol ts tty;
       task,Mty.add (ty_app ts []) lconv spmap
   in

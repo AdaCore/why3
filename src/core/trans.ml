@@ -22,6 +22,7 @@ open Ident
 open Ty
 open Term
 open Decl
+open Theory
 open Task
 
 (** Task transformation *)
@@ -104,14 +105,20 @@ let map_l fn = fold_l (fun t1 t2 -> fn t1 t2)
 
 let decl fn =
   let memo_t = Hashtbl.create 63 in
-  let fn task = memo fn decl_tag memo_t task.task_decl in
-  let fn task acc = List.fold_left add_decl acc (fn task) in
+  let fn d = memo fn decl_tag memo_t d in
+  let fn task acc = match task.task_decl with
+    | Decl d -> List.fold_left add_decl acc (fn d)
+    | td -> add_tdecl acc td
+  in
   map fn
 
 let decl_l fn =
   let memo_t = Hashtbl.create 63 in
-  let fn task = memo fn decl_tag memo_t task.task_decl in
-  let fn task acc = List.rev_map (List.fold_left add_decl acc) (fn task) in
+  let fn d = memo fn decl_tag memo_t d in
+  let fn task acc = match task.task_decl with
+    | Decl d -> List.rev_map (List.fold_left add_decl acc) (fn d)
+    | td -> [add_tdecl acc td]
+  in
   map_l fn
 
 let rewrite fnT fnF = decl (fun d -> [decl_map fnT fnF d])

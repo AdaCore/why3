@@ -136,8 +136,8 @@ and raw_driver = {
 
 and driver = {
   drv_raw         : raw_driver;
-  drv_clone       : clone;
-  drv_used        : theory Mid.t;
+  drv_clone       : Theory.clone_map;
+  drv_used        : Theory.use_map;
   drv_env         : env;
   drv_thprelude   : string list Hid.t;
   (* the first is the translation only for this ident, the second is
@@ -361,7 +361,7 @@ let query_ident drv id =
     Hid.find drv.drv_with_task id
   with Not_found ->
     let r = try
-      Mid.find id drv.drv_clone.cl_map
+      Mid.find id drv.drv_clone
     with Not_found -> Sid.empty in
     let tr = try fst (Hid.find drv.drv_theory id) 
     with Not_found -> Tag Sstr.empty in 
@@ -382,7 +382,8 @@ let syntax_arguments s print fmt l =
 (** using drivers *)
 
 let apply_transforms drv = 
-  apply_clone drv.drv_raw.drv_transforms drv.drv_env drv.drv_clone
+(*  apply_clone drv.drv_raw.drv_transforms drv.drv_env drv.drv_clone *)
+  apply_env drv.drv_raw.drv_transforms drv.drv_env
 
 let cook_driver env clone used drv = 
   let drv = { drv_raw        = drv;

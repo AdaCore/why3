@@ -19,6 +19,7 @@
 
 open Term
 open Decl
+open Theory
 open Task
 
 let rec rewriteT kn t = match t.t_node with
@@ -40,7 +41,9 @@ and rewriteF kn f = match f.f_node with
 let comp t task =
   let fnT = rewriteT t.task_known in
   let fnF = rewriteF t.task_known in
-  add_decl task (decl_map fnT fnF t.task_decl)
+  match t.task_decl with
+  | Decl d -> add_decl task (decl_map fnT fnF d)
+  | td -> add_tdecl task td
 
 let comp = Register.store (fun () -> Trans.map comp None)
 

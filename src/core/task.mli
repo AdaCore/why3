@@ -23,42 +23,48 @@ open Term
 open Decl
 open Theory
 
-(** Cloning map *)
-
-type clone = private {
-  cl_map : clone_map;
-  cl_tag : int
-}
-
-val cloned_from : clone -> ident -> ident -> bool
-
 (** Task *)
 
 type task = task_hd option
 
 and task_hd = private {
-  task_decl  : decl;
-  task_prev  : task;
-  task_known : known_map;
-  task_tag   : int;
+  task_decl  : tdecl;       (* last declaration *)
+  task_prev  : task;        (* context *)
+  task_known : known_map;   (* known identifiers *)
+  task_clone : clone_map;   (* cloning history *)
+  task_used  : use_map;     (* referenced theories *)
+  task_tag   : int;         (* unique task tag *)
 }
 
 (* constructors *)
 
+val add_tdecl : task -> tdecl -> task
 val add_decl : task -> decl -> task
 
-val split_theory : theory -> Spr.t option -> (task * clone * use_map) list
+val use_export : task -> theory -> task
+val clone_export : task -> theory -> th_inst -> task
 
-val flat_theory : task -> theory -> task
+(* declaration constructors + add_decl *)
+
+val add_ty_decl : task -> ty_decl list -> task
+val add_logic_decl : task -> logic_decl list -> task
+val add_ind_decl : task -> ind_decl list -> task
+val add_prop_decl : task -> prop_kind -> prsymbol -> fmla -> task
+
+val add_ty_decls : task -> ty_decl list -> task
+val add_logic_decls : task -> logic_decl list -> task
+val add_ind_decls : task -> ind_decl list -> task
+
+(* utilities *)
+
+val split_theory : theory -> Spr.t option -> task list
 
 (* bottom-up, tail-recursive traversal functions *)
 
-val task_fold : ('a -> decl -> 'a) -> 'a -> task -> 'a
-
-val task_iter : (decl -> unit) -> task -> unit
-
+val task_fold : ('a -> tdecl -> 'a) -> 'a -> task -> 'a
+val task_iter : (tdecl -> unit) -> task -> unit
+val task_tdecls : task -> tdecl list
 val task_decls : task -> decl list
-
 val task_goal : task -> prsymbol
 
 (* exceptions *)

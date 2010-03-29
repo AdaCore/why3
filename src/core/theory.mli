@@ -53,7 +53,7 @@ type theory = private {
   th_local  : Sid.t;        (* locally declared idents *)
 }
 
-and tdecl = private
+and tdecl =
   | Decl  of decl
   | Use   of theory
   | Clone of theory * (ident * ident) list
@@ -73,6 +73,7 @@ val close_theory  : theory_uc -> theory
 
 val add_decl : theory_uc -> decl -> theory_uc
 val use_export : theory_uc -> theory -> theory_uc
+val merge_used : use_map -> theory -> use_map
 
 val open_namespace  : theory_uc -> theory_uc
 val close_namespace : theory_uc -> bool -> string option -> theory_uc
@@ -107,9 +108,10 @@ val create_inst :
   lemma : prsymbol list ->
   goal  : prsymbol list -> th_inst
 
+val clone_theory : ('a -> tdecl -> 'a) -> 'a -> theory -> th_inst -> 'a
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc
-
 val merge_clone  : clone_map -> theory -> (ident * ident) list -> clone_map
+val cloned_from  : clone_map -> ident -> ident -> bool
 
 (* exceptions *)
 

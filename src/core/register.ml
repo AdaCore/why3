@@ -21,7 +21,7 @@ open Env
 open Task
 open Trans
 
-type 'a value = env option -> clone option -> 'a
+type 'a value = env option -> (*clone option ->*) 'a
 
 type 'a registered = {
   mutable value    : 'a value;
@@ -52,24 +52,29 @@ let memo0 tag f = memo f tag (Hashtbl.create 7)
 
 let unused0 f = fun _ -> f
 
+(*
 let cl_tag cl = cl.cl_tag
+*)
 
-let store0 memo_env memo_cl f =
+let store0 memo_env (*memo_cl*) f =
   let gen () =
+(*
     let f2 = memo_env (f ()) in
     fun env -> memo_cl (f2 env)
+*)
+    memo_env (f ())
   in
   create gen
 
-let store       f = store0 unused0         unused0        f
-let store_env   f = store0 (memo0 env_tag) unused0        f
-let store_clone f = store0 (memo0 env_tag) (memo0 cl_tag) f
+let store       f = store0 unused0         (*unused0       *) f
+let store_env   f = store0 (memo0 env_tag) (*unused0       *) f
+let store_clone f = store0 (memo0 env_tag) (*(memo0 cl_tag)*) f
 
-let apply0 reg env clone = Trans.apply (reg.value env clone)
+let apply0 reg env (*clone*) = Trans.apply (reg.value env (*clone*))
 
-let apply_clone reg env clone = apply0 reg (Some env) (Some clone)
-let apply_env   reg env       = apply0 reg (Some env) None
-let apply       reg           = apply0 reg None       None
+(*let apply_clone reg env clone = apply0 reg (Some env) (Some clone)*)
+let apply_env   reg env       = apply0 reg (Some env) (*None*)
+let apply       reg           = apply0 reg None       (*None*)
 
 let clear reg = reg.value <- reg.generate ()
 
@@ -77,7 +82,7 @@ let combine comb reg1 reg2 =
   let gen () =
     let reg1 = reg1.generate () in
     let reg2 = reg2.generate () in
-    fun env cl -> comb (reg1 env cl) (reg2 env cl) in
+    fun env (*cl*) -> comb (reg1 env (*cl*)) (reg2 env (*cl*)) in
   create gen
 
 let compose   r1 r2 = combine (fun t1 t2 -> Trans.compose   t1 t2) r1 r2
@@ -86,7 +91,7 @@ let compose_l r1 r2 = combine (fun t1 t2 -> Trans.compose_l t1 t2) r1 r2
 let conv_res conv reg1 =
   let gen () =
     let reg1 = reg1.generate () in
-    fun env cl -> conv (reg1 env cl) in
+    fun env (*cl*) -> conv (reg1 env (*cl*)) in
   create gen
 
 let singleton reg = conv_res Trans.singleton reg

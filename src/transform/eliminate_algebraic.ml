@@ -22,6 +22,7 @@ open Ident
 open Ty
 open Term
 open Decl
+open Theory
 open Task
 
 type state = {
@@ -160,8 +161,8 @@ let add_type (state, task) ts csl =
   (* return the updated state and task *)
   { mt_map = mtmap; pj_map = pjmap }, task
 
-let comp t (state,task) = match t.task_decl.d_node with
-  | Dtype dl ->
+let comp t (state,task) = match t.task_decl with
+  | Decl { d_node = Dtype dl } ->
       (* add abstract type declarations *)
       let tydl = List.rev_map (fun (ts,_) -> (ts,Tabstract)) dl in
       let task = add_decl task (create_ty_decl tydl) in
@@ -171,10 +172,12 @@ let comp t (state,task) = match t.task_decl.d_node with
         | Talgebraic csl -> add_type acc ts csl
       in
       List.fold_left add (state,task) dl
-  | d ->
+  | Decl d ->
       let fnT = rewriteT t.task_known state in
       let fnF = rewriteF t.task_known state in
-      state, add_decl task (decl_map fnT fnF t.task_decl)
+      state, add_decl task (decl_map fnT fnF d)
+  | td ->
+      state, add_tdecl task td
 
 let comp = Register.store (fun () -> Trans.fold_map comp empty_state None)
 

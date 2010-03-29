@@ -66,9 +66,8 @@ and replacep env f =
 and substt env d = t_map (replacet env) (replacep env) d
 and substp env d = f_map (replacet env) (replacep env) d
 
-let fold isnotinlinedt isnotinlinedf task0 (env, task) = 
+let fold isnotinlinedt isnotinlinedf d (env, task) = 
 (*  Format.printf "I see : %a@\n%a@\n" Pretty.print_decl d print_env env;*)
-  let d = task0.task_decl in
   match d.d_node with
     | Dlogic [ls,ld] -> begin
         match ld with
@@ -106,6 +105,11 @@ let fold isnotinlinedt isnotinlinedf task0 (env, task) =
     | Dprop (k,pr,f) -> 
         env,add_decl task (create_prop_decl k pr (replacep env f))
         
+let fold isnotinlinedt isnotinlinedf task0 (env, task) = 
+  match task0.task_decl with
+    | Theory.Decl d -> fold isnotinlinedt isnotinlinedf d (env, task)
+    | td -> env, add_tdecl task td
+
 let t ~isnotinlinedt ~isnotinlinedf = 
   Register.store 
     (fun () -> Trans.fold_map 
