@@ -344,18 +344,26 @@ let print_tdecl fmt = function
       fprintf fmt "@[<hov 2>(* clone %a with %a *)@]"
         print_th th (print_list comma print_inst) inst
 
-let print_decls fmt dl =
-  fprintf fmt "@[<hov>%a@]@." (print_list newline2 print_decl) dl
-
-let print_task fmt task = print_decls fmt (task_decls task)
-
-let print_theory fmt th =
-  fprintf fmt "@[<hov 2>theory %a@\n%a@]@\nend@."
-    print_th th (print_list newline2 print_tdecl) th.th_decls
+let print_task fmt task =
+  fprintf fmt "@[<hov>%a@]@."
+    (print_list newline2 print_decl) (task_decls task)
 
 let print_named_task fmt name task =
   fprintf fmt "@[<hov 2>task %s@\n%a@]@\nend@."
-    name print_task task
+    name (print_list newline2 print_tdecl) (task_tdecls task)
+
+let print_th_tdecl fmt = function
+  | Theory.Decl d ->
+      print_decl fmt d
+  | Theory.Use th ->
+      fprintf fmt "@[<hov 2>(* use %a *)@]" print_th th
+  | Theory.Clone (th,inst) ->
+      fprintf fmt "@[<hov 2>(* clone %a with %a *)@]"
+        print_th th (print_list comma print_inst) inst
+
+let print_theory fmt th =
+  fprintf fmt "@[<hov 2>theory %a@\n%a@]@\nend@."
+    print_th th (print_list newline2 print_th_tdecl) th.th_decls
 
 module NsTree = struct
   type t =

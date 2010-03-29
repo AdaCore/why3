@@ -107,7 +107,7 @@ let fold isnotinlinedt isnotinlinedf d (env, task) =
         
 let fold isnotinlinedt isnotinlinedf task0 (env, task) = 
   match task0.task_decl with
-    | Theory.Decl d -> fold isnotinlinedt isnotinlinedf d (env, task)
+    | Decl d -> fold isnotinlinedt isnotinlinedf d (env, task)
     | td -> env, add_tdecl task td
 
 let t ~isnotinlinedt ~isnotinlinedf = 

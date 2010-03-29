@@ -53,7 +53,7 @@ type theory = private {
   th_local  : Sid.t;        (* locally declared idents *)
 }
 
-and tdecl =
+and tdecl = private
   | Decl  of decl
   | Use   of theory
   | Clone of theory * (ident * ident) list

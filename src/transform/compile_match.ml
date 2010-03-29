@@ -19,7 +19,6 @@
 
 open Term
 open Decl
-open Theory
 open Task
 
 let rec rewriteT kn t = match t.t_node with

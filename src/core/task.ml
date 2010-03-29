@@ -37,6 +37,11 @@ and task_hd = {
   task_tag   : int;         (* unique task tag *)
 }
 
+and tdecl =
+  | Decl  of decl
+  | Use   of theory
+  | Clone of theory * (ident * ident) list
+
 module Task = struct
   type t = task_hd
 
@@ -124,30 +129,32 @@ let rec use_export task th = match task with
   | Some task_hd when Mid.mem th.th_name task_hd.task_used -> task
   | _ -> add_tdecl (List.fold_left flat_tdecl task th.th_decls) (Use th)
 
-and flat_tdecl task td = match td with
-  | Decl { d_node = Dprop (Pgoal,_,_) } -> task
-  | Decl { d_node = Dprop (Plemma,pr,f) } -> add_prop_decl task Paxiom pr f
-  | Decl _  -> add_tdecl task td
-  | Clone _ -> add_tdecl task td
-  | Use th -> use_export task th
+and flat_tdecl task = function
+  | Theory.Decl { d_node = Dprop (Pgoal,_,_) } ->
+      task
+  | Theory.Decl { d_node = Dprop (Plemma,pr,f) } ->
+      add_prop_decl task Paxiom pr f
+  | Theory.Decl d  -> add_tdecl task (Decl d)
+  | Theory.Clone (th,sl) -> add_tdecl task (Clone (th,sl))
+  | Theory.Use th -> use_export task th
 
 let clone_export = clone_theory flat_tdecl
 
-let split_tdecl names (res,task) td = match td with
-  | Decl { d_node = Dprop (Pgoal,pr,_) }
+let split_tdecl names (res,task) = function
+  | Theory.Decl { d_node = Dprop (Pgoal,pr,f) }
     when option_apply true (Spr.mem pr) names ->
-      add_tdecl task td :: res, task
-  | Decl { d_node = Dprop (Pgoal,_,_) } ->
+      add_prop_decl task Pgoal pr f :: res, task
+  | Theory.Decl { d_node = Dprop (Pgoal,_,_) } ->
       res, task
-  | Decl { d_node = Dprop (Plemma,pr,f) }
+  | Theory.Decl { d_node = Dprop (Plemma,pr,f) }
     when option_apply true (Spr.mem pr) names ->
       add_prop_decl task Pgoal pr f :: res,
       add_prop_decl task Paxiom pr f
-  | Decl { d_node = Dprop (Plemma,pr,f) } ->
+  | Theory.Decl { d_node = Dprop (Plemma,pr,f) } ->
       res, add_prop_decl task Paxiom pr f
-  | Decl _  -> res, add_tdecl task td
-  | Clone _ -> res, add_tdecl task td
-  | Use th -> res, use_export task th
+  | Theory.Decl d  -> res, add_tdecl task (Decl d)
+  | Theory.Clone (th,sl) -> res, add_tdecl task (Clone (th,sl))
+  | Theory.Use th -> res, use_export task th
 
 let split_theory th names =
   fst (List.fold_left (split_tdecl names) ([],None) th.th_decls)
@@ -166,6 +173,20 @@ let task_tdecls = task_fold (fun acc d -> d::acc) []
 
 let task_decls =
   task_fold (fun acc -> function Decl d -> d::acc | _ -> acc) []
+
+let rec last_use task = match task with
+  | Some { task_decl = Use _ } -> task
+  | Some { task_prev = task } -> last_use task
+  | None -> None
+
+let rec last_clone task = match task with
+  | Some { task_decl = Clone _ } -> task
+  | Some { task_prev = task } -> last_clone task
+  | None -> None
+
+let get_known = option_apply Mid.empty (fun t -> t.task_known)
+let get_clone = option_apply Mid.empty (fun t -> t.task_clone)
+let get_used  = option_apply Mid.empty (fun t -> t.task_used)
 
 exception GoalNotFound
 

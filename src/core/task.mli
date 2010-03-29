@@ -36,6 +36,11 @@ and task_hd = private {
   task_tag   : int;         (* unique task tag *)
 }
 
+and tdecl = private
+  | Decl  of decl
+  | Use   of theory
+  | Clone of theory * (ident * ident) list
+
 (* constructors *)
 
 val add_tdecl : task -> tdecl -> task
@@ -65,7 +70,15 @@ val task_fold : ('a -> tdecl -> 'a) -> 'a -> task -> 'a
 val task_iter : (tdecl -> unit) -> task -> unit
 val task_tdecls : task -> tdecl list
 val task_decls : task -> decl list
-val task_goal : task -> prsymbol
+
+val task_goal  : task -> prsymbol
+
+val last_clone : task -> task
+val last_use   : task -> task
+
+val get_known : task -> known_map
+val get_clone : task -> clone_map
+val get_used  : task -> use_map
 
 (* exceptions *)
 
