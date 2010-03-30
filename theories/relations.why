@@ -1,51 +1,56 @@
 
-theory Equiv
-       type t
+theory PreOrder
 
-       logic eq(t,t)
-       axiom Refl : forall x:t. eq(x,x)
-       axiom Symm : forall x,y:t. eq(x,y) -> eq(y,x)
-       axiom Trans : forall x,y,z:t. eq(x,y) and eq(y,z) -> eq(x,z)
+  type t	
+  logic le(t,t)
+  axiom Refl : forall x:t. le(x,x)
+  axiom Trans : forall x,y,z:t. le(x,y) and le(y,z) -> le(x,z)
+
+end	
+
+theory Equiv
+
+  type t
+
+  logic eq(t,t)
+
+  clone export PreOrder with type t = t, logic le = eq
+
+  axiom Symm : forall x,y:t. eq(x,y) -> eq(y,x)
+
 end
 
+theory TotalOrder
 
-theory Order
-       clone export Equiv 
+  type t
 
-       logic le(t,t)
-       
-       axiom Le_refl : forall x:t. le(x,x)
-       axiom Le_trans : forall x,y,z:t. le(x,y) and le(y,z) -> le(x,z)
+  clone import Equiv with type t = t
+  clone import PreOrder with type t = t
 
-       logic lt(x:t,y:t) = le(x,y) and not eq(x,y)
+  axiom Totality: forall x,y:t. eq(x,y) or le(x,y) or le(y,x)
 
-       lemma Lt_antirefl: forall x:t. not lt(x,x)
-       lemma Lt_trans: forall x,y,z:t. lt(x,y) and lt(y,z) -> lt(x,z)
-       lemma Le_lt_trans: forall x,y,z:t. le(x,y) and lt(y,z) -> lt(x,z)
-       lemma Lt_le_trans: forall x,y,z:t. lt(x,y) and le(y,z) -> lt(x,z)
+  logic lt(x:t,y:t) = le(x,y) and not eq(x,y)
+
+  lemma Lt_antirefl: forall x:t. not lt(x,x)
+  lemma Lt_trans: forall x,y,z:t. lt(x,y) and lt(y,z) -> lt(x,z)
+  lemma Le_lt_trans: forall x,y,z:t. le(x,y) and lt(y,z) -> lt(x,z)
+  lemma Lt_le_trans: forall x,y,z:t. lt(x,y) and le(y,z) -> lt(x,z)
+
 end    
 
-theory StrictOrder
-       clone export Equiv 
+theory MinMax
+ 
+  clone export TotalOrder
 
-       logic lt(t,t)
-       
-       axiom AntiRefl : forall x:t. not lt(x,x)
-       axiom Lt_trans : forall x,y,z:t. lt(x,y) and lt(y,z) -> lt(x,z)
+  logic min(t,t) : t
+  logic max(t,t) : t
 
-       logic le(x:t,y:t) = lt(x,y) or eq(x,y)
-
-       lemma Le_refl: forall x:t. le(x,x)
-       lemma Le_trans: forall x,y,z:t. le(x,y) and le(y,z) -> le(x,z)
-       lemma Le_lt_trans: forall x,y,z:t. le(x,y) and lt(y,z) -> lt(x,z)
-       lemma Lt_le_trans: forall x,y,z:t. lt(x,y) and le(y,z) -> lt(x,z)
-end    
-
+end	
 
 
 (*
 Local Variables: 
-compile-command: "../bin/why.opt --output-dir goals --driver ../drivers/alt_ergo.drv -I ../theories/ relations.why"
+compile-command: "make -C .. test"
 End: 
 *)
 
