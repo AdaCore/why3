@@ -2,15 +2,12 @@
 theory Int 
 
   logic (< ) (int, int)
-  logic (<=) (int, int)
-  logic (> ) (int, int)
-  logic (>=) (int, int)
+  logic (<=) (x:int, y:int) = x < y or x = y
+  logic (> ) (x:int, y:int) = y < x
+  logic (>=) (x:int, y:int) = y <= x
   
-  clone import relations.TotalOrder with type t = int, 
-    logic Equiv.eq = (=), logic PreOrder.le = (<=), logic lt = (<)
-
-  clone import relations.TotalOrder with type t = int, 
-    logic eq = (=), logic le = (>=), logic lt = (>)
+  clone relations.TotalPreOrder as T1 with type t = int, 
+    logic le = (<=)
 
   logic zero : int = 0
   logic one  : int = 1

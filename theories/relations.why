@@ -14,19 +14,35 @@ theory Equiv
 
   logic eq(t,t)
 
-  clone export PreOrder with type t = t, logic le = eq
+  clone PreOrder with type t = t, logic le = eq
 
   axiom Symm : forall x,y:t. eq(x,y) -> eq(y,x)
 
 end
 
+theory TotalPreOrder
+
+  type t	
+  logic le(t,t)
+
+  clone export PreOrder with type t = t, logic le = le
+
+  axiom Totality: forall x,y:t. le(x,y) or le(y,x)
+
+end
+
+(*
 theory TotalOrder
 
   type t
 
-  clone import Equiv with type t = t
-  clone import PreOrder with type t = t
+  logic eq (t,t)
+  clone Equiv with type t = t, logic eq = eq
 
+  logic le (t,t)
+  clone PreOrder with type t = t, logic le = le
+
+  
   axiom Totality: forall x,y:t. eq(x,y) or le(x,y) or le(y,x)
 
   logic lt(x:t,y:t) = le(x,y) and not eq(x,y)
@@ -37,7 +53,9 @@ theory TotalOrder
   lemma Lt_le_trans: forall x,y,z:t. lt(x,y) and le(y,z) -> lt(x,z)
 
 end    
+*)
 
+(*
 theory MinMax
  
   clone export TotalOrder
@@ -46,6 +64,7 @@ theory MinMax
   logic max(t,t) : t
 
 end	
+*)
 
 
 (*
