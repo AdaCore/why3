@@ -89,7 +89,7 @@ BINARYL=bin/whyl.$(OCAMLBEST)
 
 TOOLS=bin/why-cpulimit
 
-all: .depend $(BINARY) $(BINARYL) $(TOOLS)
+all: .depend $(BINARY) $(BINARYL) $(TOOLS) apidoc
 
 # refrain parallel make (-j nn) from starting ocaml compilation too early 
 *.cm*: .depend
@@ -407,16 +407,21 @@ doc/main.html: doc/main.tex doc/version.tex
 	make -C doc main.html
 
 
-# API HTML DOC
+# API DOC
 ##############
 
-OCAMLDOCSRC = intf/model.mli $(WHYCONFIGCMO:.cmo=.ml) $(WHYCONFIGCMI:.cmi=.mli)
-	# $(JCCMO:.cmo=.ml) $(JCCMI:.cmi=.mli) 
+APIDOCSRC = $(UTIL_CMO:.cmo=.mli) $(CORE_CMO:.cmo=.mli) \
+	src/driver/call_provers.mli \
+	src/driver/driver.mli \
+	manager/db.mli
 
-apidoc: $(OCAMLDOCSRC)
-	mkdir -p ocamldoc
-	rm -f ocamldoc/* 
-	$(OCAMLDOC) -d ocamldoc -html $(INCLUDES) @INCLUDEGTK2@ $(OCAMLDOCSRC)
+.PHONY: apidoc
+
+apidoc: $(APIDOCSRC)
+	rm -f apidoc/* 
+	mkdir -p apidoc
+	$(OCAMLDOC) -d apidoc -html -I src/util -I src/core -I src/driver \
+		$(APIDOCSRC)
 
 
 # special rules
