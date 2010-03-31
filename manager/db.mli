@@ -36,7 +36,6 @@ type attempt =
 
 (** {2 proof goals in a proof project} *)
 
-type theory_lemma_identifier
 
 type loc
 
@@ -45,38 +44,75 @@ type explain
 type identifier
 
 type goal_origin =
-  | Lemma of theory_lemma_identifier
+  | Goal of Decl.prsymbol
   | VCfun of loc * explain * identifier
   | Subgoal of goal
 
 and goal =
     {
+      task : Task.task;
+      task_checksum: string;
       origin : goal_origin;
-      attempts : attempt list;
-      proved : bool;
+      mutable attempts : attempt list;
+      mutable proved : bool;
       (** invariant: g.proved == true iff
-             exists attempts a in g.attempts, 
-      (a = External e and e.result == Valid and a.obsolete == false) or
-      (a = Transf(gl) and forall g in gl, g.proved
+             exists attempts a in g.attempts, a.obsolete == false and
+             (a = External e and e.result == Valid or
+              a = Transf(gl) and forall g in gl, g.proved)
       *)
-      observers: (bool -> unit) list;
+      mutable observers: (bool -> unit) list;
       (** observers that wants to be notified by any changes of the proved status *)
     }
 
 
 (** {2 database for a proof project} *)
 
-type proof_db
+type loc_record_in_db =
+  { file : string;
+    line : int;
+    cbegin : int;
+    cend : int;
+  }
 
-val get_goals : proof_db -> goal list
+type goal_record_in_db =
+  { 
+    task_checksum : string; 
+    parent : transf_in_db option;
+    name : string; (* qualified proposition name *)
+    origin : loc_record_in_db option;
+    external_proofs : external_proof_in_db list;
+    transformations : transf_in_db list;
+    proved : bool;
+  }
 
-val get_subtask : proof_db -> string -> proof_db list
+and external_proof_in_db =
+  {
+    prover : string; (** prover identifier *)
+    timelimit : int; (** CPU limit given in seconds *)
+    memlimit : int; (** VM limit given in megabytes *)
+    status : int; (** enum{proof_attempt_status}; the current state *)
+    result_time : float ; (** CPU time for that run in seconds *)
+    trace : string option; 
+      (** any kind of trace returned by an automatic prover,
+          or any kind of proof script for an interactive prover *)
+    obsolete : bool;
+  }
+
+and transf_in_db =
+  {
+    name : string; (** transformation name *)
+    obsolete : bool;
+  }
+
+val read_db_from_file : unit -> goal list
+(** returns the set of root goals *)
 
 (** {2 attempts to solve goals} *)
 
 exception AlreadyAttempted
 
-val try_prover : goal -> Driver.driver -> timelimit:int -> proof_db -> unit
+val try_prover : 
+  timelimit:int -> ?memlimit:int -> goal -> Driver.driver -> unit 
   (** attempts to prove goal with the given prover. This function adds
       a new corresponding attempt for that goal, sets its current
       status to Running, launches the prover in a separate process and
@@ -84,44 +120,60 @@ val try_prover : goal -> Driver.driver -> timelimit:int -> proof_db -> unit
 
       Upon termination of the external process, the prover's answer is
       retrieved and database is updated. The [proved] field of the
-      goal is updated, and also these of any goal affected, according
+      database is updated, and also these of any goal affected, according
       to invariant above. Goal observers are notified of any change
       of goal statuses.
 
-      @param timelimit CPU time limit given for that attempt
+      @param timelimit CPU time limit given for that attempt, must be positive
 
-      @raise AlreadyAttempted if there already exists an external proof
-      attempt with the same driver and time limit, or with a different
-      time limit and a result different from Timeout
+      @raise AlreadyAttempted if there already exists a non-obsolete
+      external proof attempt with the same driver and time limit, or
+      with a different time limit and a result different from Timeout
 
 
   *)
 
-val add_transformation: goal -> transf -> proof_db -> unit
+val add_transformation: goal -> transf -> unit
   (** adds a transformation on the goal. This function adds a new
       corresponding attempt for that goal, computes the subgoals and
       and them in the database. In the case where no subgoal is
       genereated, the [proved] field is updated, and those of parent
       goals.
 
+      if this transformation has already been attempted but is markes
+      as obsolete, it is retried, and the new lists of goals is
+      carefully matched with the older subgoals, so that if some
+      subgoals are identical to older ones, then the proof is kept.
+      Notice that no old proof attempts should be lost in this
+      process, e.g if the old trans formation produced 3 subgoals
+      A,B,C, C was proved interactively, and the new transformations
+      produces only 2 goals, the interactive proof of C is keep in an
+      extra dummy goal "true"
+      
       @raise AlreadyAttempted if this transformation has already been attempted
+      and is not obsolete
 
   *)
+
 
 
 (** TODO: removal of attempts *)
 
 (* {2 goal updates} *)
 
-val add_or_replace_goal: proof_db -> goal -> unit 
+val add_or_replace_goal: goal -> unit 
   (** updates the database with the new goal.  If a goal with the same
       origin already exists, it is checked whether the task to
       prove is different or not. If it is the same, proof attempts are
       preserved. If not the same, former proof attempts are marked as
       obsolete.
+
+
+      IMPORTANT: this kills every running prover tasks
+
   *)
 
-(** TODO: full update, removing goals that are not pertinetn anymore *)
+(** TODO: full update, removing goals that are not pertinent anymore *)
 
 
   
