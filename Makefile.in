@@ -64,8 +64,8 @@ endif
 
 
 INCLUDES = -I src/core -I src/util -I src/driver -I src/parser -I src/printer \
-           -I src/transform -I src/programs -I src 
-BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cma unix.cma $(DYNLINKBFLAGS)
+           -I src/transform -I src/programs -I src/manager -I src 
+BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -I +threads -I +sqlite3 @OCAMLGRAPHLIB@ str.cma unix.cma $(DYNLINKBFLAGS)
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
 OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -I +threads @OCAMLGRAPHLIB@ str.cmxa unix.cmxa $(DYNLINKOFLAGS)
 
@@ -116,6 +116,21 @@ include Version
 doc/version.tex src/version.ml: Version version.sh config.status
 	BINDIR=$(BINDIR) LIBDIR=$(LIBDIR) COQVER=$(COQVER) ./version.sh
 
+src/orm/sql_orm_header.ml: src/orm/sql_access.ml src/orm/convert.ml 
+	ocaml src/orm/convert.ml $< $@
+
+
+ORM_CMO := printer_utils.cmo sql_orm_header.cmo sql_orm.cmo
+ORM_CMO := $(addprefix src/orm/,$(ORM_CMO))
+
+src/manager/db.ml: $(ORM_CMO) src/manager/orm_schema.ml
+	ocaml -I src/orm src/manager/orm_schema.ml 
+
+src/orm/%.cmo: src/orm/%.ml
+	ocamlc -c -I src/orm -I +sqlite3 $<
+
+src/manager/orm_schema.ml: $(ORM_CMO)
+
 # why
 #####
 
@@ -162,6 +177,13 @@ bin/why.static: $(CMX) src/why.cmx
 
 bin/top: $(CMO)
 	ocamlmktop $(BFLAGS) -o $@ nums.cma $^
+
+MANAGER_CMO := db.cmo 
+MANAGER_CMO := $(addprefix src/manager/,$(MANAGER_CMO))
+
+bin/manager.byte: $(MANAGER_CMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) \
+		sqlite3.cma -o $@ $^
 
 # test targets
 ##############
@@ -413,7 +435,7 @@ doc/main.html: doc/main.tex doc/version.tex
 APIDOCSRC = $(UTIL_CMO:.cmo=.mli) $(CORE_CMO:.cmo=.mli) \
 	src/driver/call_provers.mli \
 	src/driver/driver.mli \
-	manager/db.mli
+	src/manager/state.mli
 
 .PHONY: apidoc
 
