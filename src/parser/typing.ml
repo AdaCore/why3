@@ -260,6 +260,7 @@ and dterm_node =
   | Tvar of string
   | Tconst of constant
   | Tapp of lsymbol * dterm list
+  | Tif of dfmla * dterm * dterm
   | Tlet of dterm * string * dterm
   | Tmatch of dterm list * (dpattern list * dterm) list
   | Tnamed of string * dterm
@@ -414,12 +415,19 @@ and dterm_node loc env = function
       let ty = dty env ty in
       if not (unify e1.dt_ty ty) then term_expected_type ~loc e1.dt_ty ty;
       e1.dt_node, ty
+  | PPif (e1, e2, e3) ->
+      let loc = e3.pp_loc in
+      let e2 = dterm env e2 in
+      let e3 = dterm env e3 in
+      if not (unify e2.dt_ty e3.dt_ty) then
+        term_expected_type ~loc e3.dt_ty e2.dt_ty;
+      Tif (dfmla env e1, e2, e3), e2.dt_ty
   | PPeps ({id=x}, ty, e1) ->
       let ty = dty env ty in
       let env = { env with dvars = Mstr.add x ty env.dvars } in
       let e1 = dfmla env e1 in
       Teps (x, ty, e1), ty
-  | PPquant _ | PPif _
+  | PPquant _
   | PPbinop _ | PPunop _ | PPfalse | PPtrue ->
       error ~loc TermExpected
 
@@ -549,6 +557,8 @@ let rec term env t = match t.dt_node with
       t_const c (ty_of_dty t.dt_ty)
   | Tapp (s, tl) ->
       t_app s (List.map (term env) tl) (ty_of_dty t.dt_ty)
+  | Tif (f, t1, t2) ->
+      t_if (fmla env f) (term env t1) (term env t2)
   | Tlet (e1, x, e2) ->
       let ty = ty_of_dty e1.dt_ty in
       let e1 = term env e1 in
