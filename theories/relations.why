@@ -1,12 +1,117 @@
+theory EndoRelation
+  type t
+  logic rel(t,t)
+end
+
+theory Reflexive
+  clone export EndoRelation
+  axiom Refl : forall x:t. rel(x,x)
+end
+
+theory Irreflexive
+  clone export EndoRelation
+  axiom Strict : forall x:t. not rel(x,x)
+end
+
+theory Transitive
+  clone export EndoRelation
+  axiom Trans : forall x,y,z:t. rel(x,y) -> rel(y,z) -> rel(x,z)
+end
+
+theory Symmetric
+  clone export EndoRelation
+  axiom Symm : forall x,y:t. rel(x,y) -> rel(y,x)
+end
+
+theory Asymmetric
+  clone export EndoRelation
+  axiom Asymm : forall x,y:t. rel(x,y) -> not rel(y,x)
+end
+
+theory Antisymmetric
+  clone export EndoRelation
+  axiom Antisymm : forall x,y:t. rel(x,y) -> rel(y,x) -> x = y
+end
+
+theory Total
+  clone export EndoRelation
+  axiom Total : forall x,y:t. rel(x,y) or rel(y,x)
+end
 
 theory PreOrder
+  clone export Reflexive
+  clone export Transitive with type t = t, logic rel = rel
+end
 
-  type t	
+theory Equivalence
+  clone export PreOrder
+  clone export Asymmetric with type t = t, logic rel = rel
+end
+
+theory TotalPreOrder
+  clone export PreOrder
+  clone export Total with type t = t, logic rel = rel
+end
+
+theory PartialOrder
+  clone export PreOrder
+  clone export Antisymmetric with type t = t, logic rel = rel
+end
+
+theory TotalOrder
+  clone export PartialOrder
+  clone export Total with type t = t, logic rel = rel
+end
+
+theory PartialStrictOrder
+  clone export Transitive
+  clone export Asymmetric with type t = t, logic rel = rel
+end
+
+theory TotalStrictOrder
+  clone export PartialStrictOrder
+  axiom Trichotomy : forall x,y:t. rel(x,y) or rel(y,x) or x = y
+end
+
+theory Inverse
+  clone export EndoRelation
+
+  logic inv_rel(x:t,y:t) = rel(y,x)
+end
+
+theory ReflClosure
+  clone export EndoRelation
+
+  inductive relR(t,t) =
+  | BaseRefl : forall x:t. relR(x,x)
+  | StepRefl : forall x,y:t. rel(x,y) -> relR(x,y)
+end
+
+theory TransClosure
+  clone export EndoRelation
+
+  inductive relT(t,t) =
+  | BaseTrans : forall x,y:t. rel(x,y) -> relT(x,y)
+  | StepTrans : forall x,y,z:t. relT(x,y) -> rel(y,z) -> relT(x,z)
+end
+
+theory ReflTransClosure
+  clone export EndoRelation
+
+  inductive relTR(t,t) =
+  | BaseTransRefl : forall x:t. relTR(x,x)
+  | StepTransRefl : forall x,y,z:t. relTR(x,y) -> rel(y,z) -> relTR(x,z)
+end
+
+(*
+theory PreOrder
+
+  type t
   logic le(t,t)
   axiom Refl : forall x:t. le(x,x)
   axiom Trans : forall x,y,z:t. le(x,y) and le(y,z) -> le(x,z)
 
-end	
+end
 
 theory Equiv
 
@@ -22,7 +127,7 @@ end
 
 theory TotalPreOrder
 
-  type t	
+  type t
   logic le(t,t)
 
   clone export PreOrder with type t = t, logic le = le
@@ -30,6 +135,8 @@ theory TotalPreOrder
   axiom Totality: forall x,y:t. le(x,y) or le(y,x)
 
 end
+*)
+
 
 (*
 theory TotalOrder
@@ -42,7 +149,7 @@ theory TotalOrder
   logic le (t,t)
   clone PreOrder with type t = t, logic le = le
 
-  
+
   axiom Totality: forall x,y:t. eq(x,y) or le(x,y) or le(y,x)
 
   logic lt(x:t,y:t) = le(x,y) and not eq(x,y)
@@ -52,25 +159,25 @@ theory TotalOrder
   lemma Le_lt_trans: forall x,y,z:t. le(x,y) and lt(y,z) -> lt(x,z)
   lemma Lt_le_trans: forall x,y,z:t. lt(x,y) and le(y,z) -> lt(x,z)
 
-end    
+end
 *)
 
 (*
 theory MinMax
- 
+
   clone export TotalOrder
 
   logic min(t,t) : t
   logic max(t,t) : t
 
-end	
+end
 *)
 
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "make -C .. test"
-End: 
+End:
 *)
 
 
