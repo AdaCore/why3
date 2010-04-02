@@ -170,6 +170,9 @@ and print_tnode opl opr drv fmt t = match t.t_node with
       print_vs fmt v
   | Tconst c ->
       Pretty.print_const fmt c
+  | Tif (f,t1,t2) ->
+      fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
+        (print_fmla drv) f (print_term drv) t1 (print_opl_term drv) t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
@@ -210,6 +213,9 @@ and print_fnode opl opr drv fmt f = match f.f_node with
         (print_opr_fmla drv) f1 print_binop b (print_opl_fmla drv) f2
   | Fnot f ->
       fprintf fmt (protect_on opr "not %a") (print_opl_fmla drv) f
+  | Fif (f1,f2,f3) ->
+      fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
+        (print_fmla drv) f1 (print_fmla drv) f2 (print_opl_fmla drv) f3
   | Flet (t,f) ->
       let v,f = f_open_bound f in
       fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
@@ -219,9 +225,6 @@ and print_fnode opl opr drv fmt f = match f.f_node with
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
         (print_list comma (print_term drv)) tl
         (print_list newline (print_fbranch drv)) bl
-  | Fif (f1,f2,f3) ->
-      fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
-        (print_fmla drv) f1 (print_fmla drv) f2 (print_opl_fmla drv) f3
   | Fapp (ps, tl) ->
     begin match drv ps.ls_name with
       | Syntax s -> syntax_arguments s (print_term drv) fmt tl

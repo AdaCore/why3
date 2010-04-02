@@ -87,6 +87,8 @@ let rec print_term drv fmt t = match t.t_node with
       fprintf fmt "@[(let %a = %a@ in %a)@]" print_ident v.vs_name
         (print_term drv) t1 (print_term drv) t2;
       forget_var v
+  | Tif _ ->
+      assert false
   | Tcase _ ->
       assert false
   | Teps _ ->

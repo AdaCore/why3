@@ -187,6 +187,9 @@ and print_tnode opl opr fmt t = match t.t_node with
   | Tapp (fs, tl) ->
       fprintf fmt (protect_on opl "%a%a:%a")
         print_ls fs (print_paren_r print_term) tl print_ty t.t_ty
+  | Tif (f,t1,t2) ->
+      fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
+        print_fmla f print_term t1 print_opl_term t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
@@ -223,6 +226,9 @@ and print_fnode opl opr fmt f = match f.f_node with
         print_opr_fmla f1 print_binop b print_opl_fmla f2
   | Fnot f ->
       fprintf fmt (protect_on opr "not %a") print_opl_fmla f
+  | Fif (f1,f2,f3) ->
+      fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
+        print_fmla f1 print_fmla f2 print_opl_fmla f3
   | Flet (t,f) ->
       let v,f = f_open_bound f in
       fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
@@ -232,9 +238,6 @@ and print_fnode opl opr fmt f = match f.f_node with
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
         (print_list comma print_term) tl
         (print_list newline print_fbranch) bl
-  | Fif (f1,f2,f3) ->
-      fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
-        print_fmla f1 print_fmla f2 print_opl_fmla f3
 
 and print_tbranch fmt br =
   let pl,t = t_open_branch br in

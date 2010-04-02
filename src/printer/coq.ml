@@ -165,6 +165,9 @@ and print_tnode opl opr drv fmt t = match t.t_node with
   | Tconst (ConstReal c) -> 
       Print_real.print_with_integers
 	"(%s)%%R" "(%s * %s)%%R" "(%s / %s)%%R" fmt c
+  | Tif (f,t1,t2) ->
+      fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
+        (print_fmla drv) f (print_term drv) t1 (print_opl_term drv) t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on opr "let %a :=@ %a in@ %a")

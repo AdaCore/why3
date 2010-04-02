@@ -126,6 +126,7 @@ and term_node = private
   | Tvar of vsymbol
   | Tconst of constant
   | Tapp of lsymbol * term list
+  | Tif of fmla * term * term
   | Tlet of term * term_bound
   | Tcase of term list * term_branch list
   | Teps of fmla_bound
@@ -167,6 +168,7 @@ module Sfmla : Set.S with type elt = fmla
 val t_var : vsymbol -> term
 val t_const : constant -> ty -> term
 val t_app : lsymbol -> term list -> ty -> term
+val t_if : fmla -> term -> term -> term
 val t_let : vsymbol -> term -> term -> term
 val t_case : term list -> (pattern list * term) list -> ty -> term
 val t_eps : vsymbol -> fmla -> term
@@ -210,6 +212,7 @@ val f_implies_simp : fmla -> fmla -> fmla
 val f_iff_simp : fmla -> fmla -> fmla
 val f_binary_simp : binop -> fmla -> fmla -> fmla
 val f_not_simp : fmla -> fmla
+val t_if_simp : fmla -> term -> term -> term
 val f_if_simp : fmla -> fmla -> fmla -> fmla
 val f_let_simp : vsymbol -> term -> fmla -> fmla
 

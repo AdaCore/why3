@@ -238,6 +238,7 @@ and term_node =
   | Tvar of vsymbol
   | Tconst of constant
   | Tapp of lsymbol * term list
+  | Tif of fmla * term * term
   | Tlet of term * term_bound
   | Tcase of term list * term_branch list
   | Teps of fmla_bound
@@ -293,6 +294,7 @@ module Hsterm = Hashcons.Make (struct
     | Tvar v1, Tvar v2 -> v1 == v2
     | Tconst c1, Tconst c2 -> c1 = c2
     | Tapp (s1, l1), Tapp (s2, l2) -> s1 == s2 && List.for_all2 (==) l1 l2
+    | Tif (f1, t1, e1), Tif (f2, t2, e2) -> f1 == f2 && t1 == t2 && e2 == e2
     | Tlet (t1, b1), Tlet (t2, b2) -> t1 == t2 && t_eq_bound b1 b2
     | Tcase (tl1, bl1), Tcase (tl2, bl2) ->
         list_all2 (==) tl1 tl2 && list_all2 t_eq_branch bl1 bl2
@@ -318,6 +320,7 @@ module Hsterm = Hashcons.Make (struct
     | Tvar v -> v.vs_name.id_tag
     | Tconst c -> Hashtbl.hash c
     | Tapp (f, tl) -> Hashcons.combine_list t_hash (f.ls_name.id_tag) tl
+    | Tif (f, t, e) -> Hashcons.combine2 f.f_tag t.t_tag e.t_tag
     | Tlet (t, bt) -> Hashcons.combine t.t_tag (t_hash_bound bt)
     | Tcase (tl, bl) -> let ht = Hashcons.combine_list t_hash 17 tl in
         Hashcons.combine_list t_hash_branch ht bl
@@ -433,6 +436,7 @@ let t_bvar n ty = Hsterm.hashcons (mk_term (Tbvar n) ty)
 let t_var v = Hsterm.hashcons (mk_term (Tvar v) v.vs_ty)
 let t_const c ty = Hsterm.hashcons (mk_term (Tconst c) ty)
 let t_app f tl ty = Hsterm.hashcons (mk_term (Tapp (f, tl)) ty)
+let t_if f t1 t2 = Hsterm.hashcons (mk_term (Tif (f, t1, t2)) t2.t_ty)
 let t_let v t1 t2 = Hsterm.hashcons (mk_term (Tlet (t1, (v, t2))) t2.t_ty)
 let t_case tl bl ty = Hsterm.hashcons (mk_term (Tcase (tl, bl)) ty)
 let t_eps u f = Hsterm.hashcons (mk_term (Teps (u, f)) u.vs_ty)
@@ -494,6 +498,7 @@ let t_map_unsafe fnT fnF lvl t = t_label_copy t (match t.t_node with
   | Tbvar n when n >= lvl -> raise UnboundIndex
   | Tbvar _ | Tvar _ | Tconst _ -> t
   | Tapp (f, tl) -> t_app f (List.map (fnT lvl) tl) t.t_ty
+  | Tif (f, t1, t2) -> t_if (fnF lvl f) (fnT lvl t1) (fnT lvl t2)
   | Tlet (t1, (u, t2)) -> t_let u (fnT lvl t1) (fnT (lvl + 1) t2)
   | Tcase (tl, bl) ->
       t_case (List.map (fnT lvl) tl) (List.map (brlvl fnT lvl) bl) t.t_ty
@@ -527,6 +532,7 @@ let t_fold_unsafe fnT fnF lvl acc t = match t.t_node with
   | Tbvar n when n >= lvl -> raise UnboundIndex
   | Tbvar _ | Tvar _ | Tconst _ -> acc
   | Tapp (f, tl) -> List.fold_left (fnT lvl) acc tl
+  | Tif (f, t1, t2) -> fnT lvl (fnT lvl (fnF lvl acc f) t1) t2
   | Tlet (t1, (u, t2)) -> fnT (lvl + 1) (fnT lvl acc t1) t2
   | Tcase (tl, bl) ->
       List.fold_left (brlvl fnT lvl) (List.fold_left (fnT lvl) acc tl) bl
@@ -620,6 +626,10 @@ let f_case tl bl =
   List.iter f_check_branch bl;
   f_case tl bl
 
+let t_if f t1 t2 =
+  if t1.t_ty != t2.t_ty then raise TypeMismatch;
+  t_if f t1 t2
+
 let t_let v t1 t2 =
   if v.vs_ty != t1.t_ty then raise TypeMismatch;
   t_let v t1 t2
@@ -639,6 +649,7 @@ let rec t_s_map fnT fnV fnL t =
     | Tvar v -> t_var (fnV v ty)
     | Tconst _ -> t
     | Tapp (f, tl) -> t_app (fnL f) (List.map fn_t tl) ty
+    | Tif (f, t1, t2) -> t_if (fn_f f) (fn_t t1) (fn_t t2)
     | Tlet (t1, (u, t2)) ->
         let t1 = fn_t t1 in t_let (fnV u t1.t_ty) t1 (fn_t t2)
     | Tcase (tl, bl) ->
@@ -704,6 +715,7 @@ let rec t_s_fold fnT fnL acc t =
   match t.t_node with
     | Tbvar _ | Tvar _ | Tconst _ -> acc
     | Tapp (f, tl) -> List.fold_left fn_t (fnL acc f) tl
+    | Tif (f, t1, t2) -> fn_t (fn_t (fn_f acc f) t1) t2
     | Tlet (t1, (_,t2)) -> fn_t (fn_t acc t1) t2
     | Tcase (tl, bl) ->
         List.fold_left (t_branch fnT fnL) (List.fold_left fn_t acc tl) bl
@@ -903,6 +915,7 @@ let t_map fnT fnF t = t_label_copy t (match t.t_node with
   | Tbvar _ -> raise UnboundIndex
   | Tvar _ | Tconst _ -> t
   | Tapp (f, tl) -> t_app_unsafe f (List.map fnT tl) t.t_ty
+  | Tif (f, t1, t2) -> t_if (fnF f) (fnT t1) (fnT t2)
   | Tlet (t1, b) -> let u,t2 = t_open_bound b in
       let t1' = fnT t1 in let t2' = fnT t2 in
       if t1' == t1 && t2' == t2 then t else t_let u t1' t2'
@@ -947,6 +960,7 @@ let t_fold fnT fnF acc t = match t.t_node with
   | Tbvar _ -> raise UnboundIndex
   | Tvar _ | Tconst _ -> acc
   | Tapp (f, tl) -> List.fold_left fnT acc tl
+  | Tif (f, t1, t2) -> fnT (fnT (fnF acc f) t1) t2
   | Tlet (t1, b) -> let _,t2 = t_open_bound b in fnT (fnT acc t1) t2
   | Tcase (tl, bl) ->
       List.fold_left (t_branch fnT) (List.fold_left fnT acc tl) bl
@@ -1041,6 +1055,8 @@ let rec t_equal_alpha t1 t2 =
         c1 = c2
     | Tapp (s1, l1), Tapp (s2, l2) ->
         s1 == s2 && List.for_all2 t_equal_alpha l1 l2
+    | Tif (f1, t1, e1), Tif (f2, t2, e2) ->
+        f_equal_alpha f1 f2 && t_equal_alpha t1 t2 && t_equal_alpha e1 e2
     | Tlet (t1, tb1), Tlet (t2, tb2) ->
         let v1, b1 = tb1 in
         let v2, b2 = tb2 in
@@ -1121,6 +1137,8 @@ let rec t_match s t1 t2 =
           then Mvs.add v1 t2 s else raise NoMatch)
     | Tapp (s1, l1), Tapp (s2, l2) when s1 == s2 ->
         List.fold_left2 t_match s l1 l2
+    | Tif (f1, t1, e1), Tif (f2, t2, e2) ->
+        t_match (t_match (f_match s f1 f2) t1 t2) e1 e2
     | Tlet (t1, tb1), Tlet (t2, tb2) ->
         let v1, b1 = tb1 in
         let v2, b2 = tb2 in
@@ -1324,6 +1342,11 @@ let f_binary_simp op = match op with
   | For      -> f_or_simp
   | Fimplies -> f_implies_simp
   | Fiff     -> f_iff_simp
+
+let t_if_simp f t1 t2 = match f.f_node with
+  | Ftrue -> t1
+  | Ffalse -> t2
+  | _ -> t_if f t1 t2
 
 let f_if_simp f1 f2 f3 = match f1.f_node, f2.f_node, f3.f_node with
   | Ftrue, _, _  -> f2

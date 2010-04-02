@@ -190,6 +190,7 @@ let conv_res_app tenv tvar p tl ty =
 
 let rec rewrite_term tenv tvar vsvar t =
   let fnT = rewrite_term tenv tvar vsvar in
+  let fnF = rewrite_fmla tenv tvar vsvar in
   match t.t_node with
     | Tconst _ -> t
     | Tvar x -> Mvs.find x vsvar
@@ -198,6 +199,8 @@ let rec rewrite_term tenv tvar vsvar t =
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv tvar) tl p.ls_args in
         conv_res_app tenv tvar p tl t.t_ty
+    | Tif (f, t1, t2) -> 
+        t_if (fnF f) (fnT t1) (fnT t2)
     | Tlet (t1, b) -> let u,t2 = t_open_bound b in
       let t1' = fnT t1 in let t2' = fnT t2 in
       if t1' == t1 && t2' == t2 then t else t_let u t1' t2'
