@@ -16,20 +16,18 @@ module Init : sig
   (** [db handle] @return the underlying Sqlite3 database handle for the connection, for advanced queries.
     *)
 end
-module Challenge : sig
+module Loc : sig
   type t = <
     id : int64 option;
     set_id : int64 option -> unit;
-    log : int64;
-    set_log : int64 -> unit;
-    input : string;
-    set_input : string -> unit;
-    answer : string option;
-    set_answer : string option -> unit;
-    time : float;
-    set_time : float -> unit;
-    correct : int64;
-    set_correct : int64 -> unit;
+    file : string;
+    set_file : string -> unit;
+    line : int64;
+    set_line : int64 -> unit;
+    start : int64;
+    set_start : int64 -> unit;
+    stop : int64;
+    set_stop : int64 -> unit;
     save: int64; delete: unit
   >
 
@@ -38,11 +36,10 @@ module Challenge : sig
 
   val t :
     ?id:int64 option ->
-    log:int64 ->
-    input:string ->
-    ?answer:string option ->
-    time:float ->
-    correct:int64 ->
+    file:string ->
+    line:int64 ->
+    start:int64 ->
+    stop:int64 ->
     Init.t -> t
   (** Can be used to construct a new object.  If [id] is not specified, it will be automatically assigned the first time [save] is called on the object.  The object is not committed to the database until [save] is invoked.  The [save] method will also return the [id] assigned to the object.
    @raise Sql_error if a database error is encountered
@@ -50,31 +47,34 @@ module Challenge : sig
 
   val get :
     ?id:int64 option ->
-    ?log:int64 option ->
-    ?input:string option ->
-    ?answer:string option ->
-    ?time:float option ->
-    ?correct:int64 option ->
+    ?file:string option ->
+    ?line:int64 option ->
+    ?start:int64 option ->
+    ?stop:int64 option ->
     ?custom_where:string * Sqlite3.Data.t list -> Init.t -> t list
   (** Used to retrieve objects from the database.  If an argument is specified, it is included in the search criteria (all fields are ANDed together).
    @raise Sql_error if a database error is encountered
     *)
 
 end
-module Log_entry : sig
+module External_proof : sig
   type t = <
     id : int64 option;
     set_id : int64 option -> unit;
-    attempt : int64;
-    set_attempt : int64 -> unit;
-    successful : int64;
-    set_successful : int64 -> unit;
-    starting_date : float;
-    set_starting_date : float -> unit;
-    end_date : float;
-    set_end_date : float -> unit;
-    challenges : Challenge.t list;
-    set_challenges : Challenge.t list -> unit;
+    prover : string;
+    set_prover : string -> unit;
+    timelimit : int64;
+    set_timelimit : int64 -> unit;
+    memlimit : int64;
+    set_memlimit : int64 -> unit;
+    status : int64;
+    set_status : int64 -> unit;
+    result_time : float;
+    set_result_time : float -> unit;
+    trace : string;
+    set_trace : string -> unit;
+    obsolete : int64;
+    set_obsolete : int64 -> unit;
     save: int64; delete: unit
   >
 
@@ -83,11 +83,13 @@ module Log_entry : sig
 
   val t :
     ?id:int64 option ->
-    attempt:int64 ->
-    successful:int64 ->
-    starting_date:float ->
-    end_date:float ->
-    challenges:Challenge.t list ->
+    prover:string ->
+    timelimit:int64 ->
+    memlimit:int64 ->
+    status:int64 ->
+    result_time:float ->
+    trace:string ->
+    obsolete:int64 ->
     Init.t -> t
   (** Can be used to construct a new object.  If [id] is not specified, it will be automatically assigned the first time [save] is called on the object.  The object is not committed to the database until [save] is invoked.  The [save] method will also return the [id] assigned to the object.
    @raise Sql_error if a database error is encountered
@@ -95,24 +97,37 @@ module Log_entry : sig
 
   val get :
     ?id:int64 option ->
-    ?attempt:int64 option ->
-    ?successful:int64 option ->
-    ?starting_date:float option ->
-    ?end_date:float option ->
+    ?prover:string option ->
+    ?timelimit:int64 option ->
+    ?memlimit:int64 option ->
+    ?status:int64 option ->
+    ?result_time:float option ->
+    ?trace:string option ->
+    ?obsolete:int64 option ->
     ?custom_where:string * Sqlite3.Data.t list -> Init.t -> t list
   (** Used to retrieve objects from the database.  If an argument is specified, it is included in the search criteria (all fields are ANDed together).
    @raise Sql_error if a database error is encountered
     *)
 
 end
-module Attempts : sig
+module rec Goal : sig
   type t = <
     id : int64 option;
     set_id : int64 option -> unit;
-    solution : int64;
-    set_solution : int64 -> unit;
-    log_entries : Log_entry.t list;
-    set_log_entries : Log_entry.t list -> unit;
+    task_checksum : string;
+    set_task_checksum : string -> unit;
+    parent : Transf.t;
+    set_parent : Transf.t -> unit;
+    name : string;
+    set_name : string -> unit;
+    pos : Loc.t;
+    set_pos : Loc.t -> unit;
+    external_proofs : External_proof.t list;
+    set_external_proofs : External_proof.t list -> unit;
+    transformations : Transf.t list;
+    set_transformations : Transf.t list -> unit;
+    proved : int64;
+    set_proved : int64 -> unit;
     save: int64; delete: unit
   >
 
@@ -121,8 +136,13 @@ module Attempts : sig
 
   val t :
     ?id:int64 option ->
-    solution:int64 ->
-    log_entries:Log_entry.t list ->
+    task_checksum:string ->
+    parent:Transf.t ->
+    name:string ->
+    pos:Loc.t ->
+    external_proofs:External_proof.t list ->
+    transformations:Transf.t list ->
+    proved:int64 ->
     Init.t -> t
   (** Can be used to construct a new object.  If [id] is not specified, it will be automatically assigned the first time [save] is called on the object.  The object is not committed to the database until [save] is invoked.  The [save] method will also return the [id] assigned to the object.
    @raise Sql_error if a database error is encountered
@@ -130,25 +150,25 @@ module Attempts : sig
 
   val get :
     ?id:int64 option ->
-    ?solution:int64 option ->
+    ?task_checksum:string option ->
+    ?name:string option ->
+    ?proved:int64 option ->
     ?custom_where:string * Sqlite3.Data.t list -> Init.t -> t list
   (** Used to retrieve objects from the database.  If an argument is specified, it is included in the search criteria (all fields are ANDed together).
    @raise Sql_error if a database error is encountered
     *)
 
 end
-module Solution : sig
+and Transf : sig
   type t = <
     id : int64 option;
     set_id : int64 option -> unit;
-    user : string;
-    set_user : string -> unit;
-    problem_id : int64;
-    set_problem_id : int64 -> unit;
-    solved : int64;
-    set_solved : int64 -> unit;
-    attempts : Attempts.t list;
-    set_attempts : Attempts.t list -> unit;
+    name : string;
+    set_name : string -> unit;
+    obsolete : int64;
+    set_obsolete : int64 -> unit;
+    subgoals : Goal.t list;
+    set_subgoals : Goal.t list -> unit;
     save: int64; delete: unit
   >
 
@@ -157,10 +177,9 @@ module Solution : sig
 
   val t :
     ?id:int64 option ->
-    user:string ->
-    problem_id:int64 ->
-    solved:int64 ->
-    attempts:Attempts.t list ->
+    name:string ->
+    obsolete:int64 ->
+    subgoals:Goal.t list ->
     Init.t -> t
   (** Can be used to construct a new object.  If [id] is not specified, it will be automatically assigned the first time [save] is called on the object.  The object is not committed to the database until [save] is invoked.  The [save] method will also return the [id] assigned to the object.
    @raise Sql_error if a database error is encountered
@@ -168,106 +187,8 @@ module Solution : sig
 
   val get :
     ?id:int64 option ->
-    ?user:string option ->
-    ?problem_id:int64 option ->
-    ?solved:int64 option ->
-    ?custom_where:string * Sqlite3.Data.t list -> Init.t -> t list
-  (** Used to retrieve objects from the database.  If an argument is specified, it is included in the search criteria (all fields are ANDed together).
-   @raise Sql_error if a database error is encountered
-    *)
-
-end
-module Problems : sig
-  type t = <
-    id : int64 option;
-    set_id : int64 option -> unit;
-    number : int64;
-    set_number : int64 -> unit;
-    short_descr : string;
-    set_short_descr : string -> unit;
-    description : string;
-    set_description : string -> unit;
-    solved_by : int64;
-    set_solved_by : int64 -> unit;
-    save: int64; delete: unit
-  >
-
-  (** An object which can be stored in the database with the [save] method call, or removed by calling [delete].  Fields can be accessed via the approriate named method and set via the [set_] methods.  Changes are not committed to the database until [save] is invoked.
-    *)
-
-  val t :
-    ?id:int64 option ->
-    number:int64 ->
-    short_descr:string ->
-    description:string ->
-    solved_by:int64 ->
-    Init.t -> t
-  (** Can be used to construct a new object.  If [id] is not specified, it will be automatically assigned the first time [save] is called on the object.  The object is not committed to the database until [save] is invoked.  The [save] method will also return the [id] assigned to the object.
-   @raise Sql_error if a database error is encountered
-    *)
-
-  val get :
-    ?id:int64 option ->
-    ?number:int64 option ->
-    ?short_descr:string option ->
-    ?description:string option ->
-    ?solved_by:int64 option ->
-    ?custom_where:string * Sqlite3.Data.t list -> Init.t -> t list
-  (** Used to retrieve objects from the database.  If an argument is specified, it is included in the search criteria (all fields are ANDed together).
-   @raise Sql_error if a database error is encountered
-    *)
-
-end
-module User : sig
-  type t = <
-    id : int64 option;
-    set_id : int64 option -> unit;
-    username : string;
-    set_username : string -> unit;
-    password : string;
-    set_password : string -> unit;
-    email : string;
-    set_email : string -> unit;
-    allow_contact : int64;
-    set_allow_contact : int64 -> unit;
-    nationality : string option;
-    set_nationality : string option -> unit;
-    preferred_language : string option;
-    set_preferred_language : string option -> unit;
-    score : int64;
-    set_score : int64 -> unit;
-    solutions : Solution.t list;
-    set_solutions : Solution.t list -> unit;
-    save: int64; delete: unit
-  >
-
-  (** An object which can be stored in the database with the [save] method call, or removed by calling [delete].  Fields can be accessed via the approriate named method and set via the [set_] methods.  Changes are not committed to the database until [save] is invoked.
-    *)
-
-  val t :
-    ?id:int64 option ->
-    username:string ->
-    password:string ->
-    email:string ->
-    allow_contact:int64 ->
-    ?nationality:string option ->
-    ?preferred_language:string option ->
-    score:int64 ->
-    solutions:Solution.t list ->
-    Init.t -> t
-  (** Can be used to construct a new object.  If [id] is not specified, it will be automatically assigned the first time [save] is called on the object.  The object is not committed to the database until [save] is invoked.  The [save] method will also return the [id] assigned to the object.
-   @raise Sql_error if a database error is encountered
-    *)
-
-  val get :
-    ?id:int64 option ->
-    ?username:string option ->
-    ?password:string option ->
-    ?email:string option ->
-    ?allow_contact:int64 option ->
-    ?nationality:string option ->
-    ?preferred_language:string option ->
-    ?score:int64 option ->
+    ?name:string option ->
+    ?obsolete:int64 option ->
     ?custom_where:string * Sqlite3.Data.t list -> Init.t -> t list
   (** Used to retrieve objects from the database.  If an argument is specified, it is included in the search criteria (all fields are ANDed together).
    @raise Sql_error if a database error is encountered

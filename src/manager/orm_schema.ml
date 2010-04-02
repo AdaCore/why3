@@ -10,69 +10,48 @@ let boolean = integer
 
 let all_tables = make 
   [
-    (* table of challenges *)
-    ("challenge",
-     [ integer "log"; (* ref to log it belongs to *)
-       text "input"; (* input of the problem *)
-       text ~flags:[`Optional] "answer";
-       (* no answer means "timeout" *)
-       real "time"; (* time to answer *)
-       boolean "correct"; 
+    (* table of locs *)
+    ("loc",
+     [ text "file";
+       integer "line";
+       integer "start";
+       integer "stop";
      ],
      [], default_opts);
 
-    (* log entries *)
-    ("log_entry",
-     [ integer "attempt"; (* ref to attempt it belongs to *)
-       boolean "successful";
-       date "starting_date";
-       date "end_date";
-       foreign_many "challenge" "challenges";
+    (* external proofs *)
+    ("external_proof",
+     [ text "prover"; (* prover identifier *)
+       integer "timelimit"; (* CPU limit given in seconds *)
+       integer "memlimit"; (* VM limit given in megabytes *)
+       integer "status"; (* enum{proof_attempt_status}; the current state *)
+       real "result_time"; (* CPU time for that run in seconds *)
+       text "trace"; (* any kind of trace returned by an automatic prover,
+			or any kind of proof script for an interactive prover *)
+       boolean "obsolete";
      ],
      [], default_opts);
 
-    (* table of attempts *)
-    ("attempts",
-     [ integer "solution"; (* ref to solution it belongs to *)
-       foreign_many "log_entry" "log_entries";
-     ],
-     [], default_opts);
-       
-    (* table of submitted solutions, successful or not *)
-    ("solution",
-     [ text "user";
-       integer "problem_id";
-       boolean "solved";
-       foreign_many "attempts" "attempts"; (* list of attempts *)
+    (* goal *)
+    ("goal",
+     [ text "task_checksum";
+       foreign "transf" "parent"; (* parent transf if any *)
+       text "name"; (* qualified proposition name *)
+       foreign "loc" "pos"; 
+       foreign_many "external_proof" "external_proofs";
+       foreign_many "transf" "transformations";
+       boolean "proved";
      ],
      [], default_opts);
 
-    (* table of problems *)
-    ("problems",
-     [ integer ~flags:[`Unique; `Index] "number";
-       text "short_descr";
-       text "description";
-       integer "solved_by" ;
+    (* transformations *)
+    ("transf",
+     [ text "name"; (* transformation name *)
+       boolean "obsolete";
+       foreign_many "goal" "subgoals";
      ],
-     [],
-     default_opts);
+     [], default_opts);
     
-    
-    (* table of user profiles *)
-    ("user" ,
-     [ text ~flags:[`Unique ; `Index] "username";
-       text "password";       
-       text "email";
-       boolean "allow_contact"; (* if allows to make email public *)
-       text ~flags:[`Optional; `Index] "nationality";
-       text ~flags:[`Optional; `Index] "preferred_language";
-       integer "score";
-       foreign_many "solution" "solutions"; (* list of submitted solutions *)
-     ],
-     [], default_opts) ;
-    
-
-
   ]       
 
 let () = generate ~debug:false all_tables "src/manager/db"
