@@ -89,7 +89,7 @@ BINARYL=bin/whyl.$(OCAMLBEST)
 
 TOOLS=bin/why-cpulimit
 
-all: .depend $(BINARY) $(BINARYL) $(TOOLS) apidoc
+all: .depend $(BINARY) $(BINARYL) $(TOOLS) apidoc why-ide-@LABLGTK2@
 
 # refrain parallel make (-j nn) from starting ocaml compilation too early 
 *.cm*: .depend
@@ -159,8 +159,10 @@ DRIVER_CMO := $(addprefix src/driver/,$(DRIVER_CMO))
 PRINTER_CMO := print_real.cmo alt_ergo.cmo why3.cmo smt.cmo coq.cmo
 PRINTER_CMO := $(addprefix src/printer/,$(PRINTER_CMO))
 
-CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
-      $(TRANSFORM_CMO) $(PRINTER_CMO) src/main.cmo
+LIBCMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
+         $(TRANSFORM_CMO) $(PRINTER_CMO)
+
+CMO = $(LIBCMO) src/main.cmo
 CMX = $(CMO:.cmo=.cmx)
 
 bin/why.opt: $(CMX) 
@@ -246,26 +248,26 @@ bin/why-cpulimit: src/tools/@CPULIMIT@.c
 # graphical interface
 #####################
 
-GCMO = $(CMO) intf/colors.cmo intf/tags.cmo intf/tools.cmo intf/tagsplit.cmo\
-	      intf/astprinter.cmo intf/astnprinter.cmo intf/astpprinter.cmo\
-	      intf/model.cmo intf/cache.cmo intf/gConfig.cmo intf/hilight.cmo\
-	      intf/whyhilight.cmo intf/pprinter.cmo intf/preferences.cmo intf/stat.cmo
+IDE_CMO := ide_main.cmo
+IDE_CMO := $(addprefix src/ide/,$(IDE_CMO))
+
+GCMO = $(LIBCMO) $(IDE_CMO)
 GCMX = $(GCMO:.cmo=.cmx)
 
-gwhy-yes: bin/gwhy.$(OCAMLBEST)
-gwhy-no:
-gwhy: bin/gwhy.$(OCAMLBEST)
+why-ide-yes: bin/why-ide.$(OCAMLBEST)
+why-ide-no:
+why-ide: bin/why-ide.$(OCAMLBEST)
 
-bin/gwhy.opt: $(GCMX)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ unix.cmxa threads.cmxa nums.cmxa str.cmxa graph.cmxa lablgtk.cmxa gtkThread.cmx $^
+bin/why-ide.opt: $(GCMX)
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ threads.cmxa nums.cmxa lablgtk.cmxa gtkThread.cmx $^
 	$(STRIP)    $@
 
-bin/gwhy.static: $(GCMX)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) -cclib -static $(OFLAGS) -o $@ unix.cmxa threads.cmxa nums.cmxa str.cmxa graph.cmxa lablgtk.cmxa gtkThread.cmx $^
+bin/why-ide.static: $(GCMX)
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) -cclib -static $(OFLAGS) -o $@ threads.cmxa nums.cmxa lablgtk.cmxa gtkThread.cmx $^
 	$(STRIP)    $@
 
-bin/gwhy.byte: $(GCMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ unix.cma str.cma nums.cma graph.cma lablgtk.cma threads.cma gtkThread.cmo $^
+bin/why-ide.byte: $(GCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ nums.cma lablgtk.cma threads.cma gtkThread.cmo $^
 
 # bench
 #######
@@ -300,15 +302,15 @@ bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) $(BINARY) byte \
 
 install: install-binary install-lib install-man 
 
-BINARYFILES = $(BINARY) bin/gwhy.$(OCAMLBEST) 
+BINARYFILES = $(BINARY) bin/why-ide.$(OCAMLBEST) 
 
 # install-binary should not depend on $(BINARYFILES); otherwise it
-# enforces the compilation of gwhy, even when lablgtk2 is not installed
+# enforces the compilation of why-ide, even when lablgtk2 is not installed
 install-binary: 
 	mkdir -p $(BINDIR)
 	cp -f $(BINARY) $(BINDIR)/why$(EXE)
-	if test -f bin/gwhy.$(OCAMLBEST); then \
-		cp -f bin/gwhy.$(OCAMLBEST) $(BINDIR)/gwhy-bin$(EXE); \
+	if test -f bin/why-ide.$(OCAMLBEST); then \
+		cp -f bin/why-ide.$(OCAMLBEST) $(BINDIR)/why-ide-bin$(EXE); \
 	fi
 
 install-lib: 
@@ -351,13 +353,13 @@ install-mizar-yes:
 	cp lib/mizar/why.miz @MIZARLIB@/mml
 	cp lib/mizar/dict/why.voc @MIZARLIB@/mml/dict
 
-local-install: $(BINARY) $(WHYCONFIG) $(CADUCEUS) $(JESSIE) bin/gwhy.$(OCAMLBEST) byte bin/gwhy.byte 
+local-install: $(BINARY) $(WHYCONFIG) $(CADUCEUS) $(JESSIE) bin/why-ide.$(OCAMLBEST) byte bin/why-ide.byte 
 	cp $(BINARY) $$HOME/bin/why
 	cp $(WHYCONFIG) $$HOME/bin/why
 	cp $(CADUCEUS) $$HOME/bin/caduceus
 	cp $(JESSIE) $$HOME/bin/jessie
-	if test -f bin/gwhy.$(OCAMLBEST); then \
-	  cp -f bin/gwhy.$(OCAMLBEST) $$HOME/bin/gwhy; \
+	if test -f bin/why-ide.$(OCAMLBEST); then \
+	  cp -f bin/why-ide.$(OCAMLBEST) $$HOME/bin/why-ide; \
 	fi
 
 local: install
@@ -550,7 +552,7 @@ WWW = /users/www-perso/projets/why
 FTP = $(WWW)/download
 WWWKRAKATOA = /users/www-perso/projets/krakatoa
 
-FILES =src/*.ml* c/*.ml* jc/*.ml* java/*.ml* ml/*.ml* ml/*/*.ml* intf/*.ml* tools/*.ml* tools/*.c bin/gwhy.sh \
+FILES =src/*.ml* c/*.ml* jc/*.ml* java/*.ml* ml/*.ml* ml/*/*.ml* intf/*.ml* tools/*.ml* tools/*.c bin/why-ide.sh \
        mix/*.ml* \
        version.sh Version Makefile.in configure.in configure .depend .depend.coq \
        config/check_ocamlgraph.ml \
