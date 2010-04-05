@@ -191,19 +191,16 @@ bin/manager.byte: $(MANAGER_CMO)
 ##############
 
 test: bin/why.byte  $(TOOLS)
-	mkdir -p output_why3
-	ocamlrun -bt bin/why.byte -I theories/ --driver drivers/why3.drv \
-		--output-dir output_why3 --all-goals src/test.why
-	bin/why.byte --driver drivers/alt_ergo.drv -I theories/ \
-		--output-file - --goal Test.G src/test.why --timeout 3
-	bin/why.byte --driver drivers/alt_ergo.drv -I theories/ \
-		--call --goal Test.G src/test.why --timeout 3
-	bin/why.byte --driver drivers/coq.drv -I theories/ \
-		--output-file tmp.v --goal Test.G src/test.why 
-	echo bin/why.byte --call --timeout 1 --driver drivers/alt_ergo.drv -I theories/ \
-		--all-goals theories/real.why 
-	@rm -rf theories/coq
-	@mkdir -p theories/coq
+	ocamlrun -bt bin/why.byte -I theories/ -D drivers/why3.drv \
+		-o output_why3 src/test.why
+	bin/why.byte -D drivers/alt_ergo.drv -I theories/ \
+		src/test.why -t Test -g G
+	bin/why.byte -D drivers/alt_ergo.drv -I theories/ \
+		--timeout 3 --prove src/test.why -t Test -g G
+	bin/why.byte -D drivers/coq.drv -I theories/ \
+		src/test.why -t Test -g G 
+	echo bin/why.byte -D drivers/alt_ergo.drv -I theories/ \
+		--timeout 1 --prove theories/real.why 
 	@printf "*** Checking Coq file generation ***\\n"
 	@for i in int.Abs int.EuclideanDivision int.ComputerDivision  \
 		real.Abs real.FromIntTest real.SquareTest \
@@ -211,10 +208,10 @@ test: bin/why.byte  $(TOOLS)
 		floating_point.Test array.TestBv32 \
 		; do \
 	  printf "Generating Coq file for $$i\\n" && bin/why.byte \
-		--driver drivers/coq.drv -I theories/ \
-		--output-dir theories/coq --goals-of $$i ; done
+		-D drivers/coq.drv -I theories/ \
+		-o output_coq -t $$i ; done
 	@printf "*** Checking Coq compilation ***\\n"
-	@for i in theories/coq/*.v; do printf "coq $$i\\n" && coqc $$i ; done
+	@for i in output_coq/*.v; do printf "coq $$i\\n" && coqc $$i ; done
 
 testl: bin/whyl.byte
 	ocamlrun -bt bin/whyl.byte -I theories/ src/programs/test.mlw
@@ -290,12 +287,12 @@ BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
 
 bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) $(BINARY) byte \
 	$(TOOLS)
-	bin/why.byte --driver bench/plugins/helloworld.drv -I theories/ \
-        --output-file - --goal Test.G src/test.why
-	bin/why.$(OCAMLBEST) --driver bench/plugins/helloworld.drv -I theories/ \
-        --output-file - --goal Test.G src/test.why
-	bin/why.$(OCAMLBEST) --driver bench/plugins/simplify_array.drv -I theories/ \
-        --output-file - --goal  Test_simplify_array.G src/test.why
+	bin/why.byte -D bench/plugins/helloworld.drv -I theories/ \
+        src/test.why -t Test -g G
+	bin/why.$(OCAMLBEST) -D bench/plugins/helloworld.drv -I theories/ \
+        src/test.why -t Test -g G
+	bin/why.$(OCAMLBEST) -D bench/plugins/simplify_array.drv -I theories/ \
+        src/test.why -t Test_simplify_array -g G
 
 # installation
 ##############

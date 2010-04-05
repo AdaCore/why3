@@ -215,7 +215,7 @@ let print_decl drv task fmt d = match d.d_node with
   | Dprop (Plemma, _, _) ->
       assert false
 
-let print_context drv fmt task = 
+let print_task drv fmt task = 
   fprintf fmt "(benchmark toto@\n" 
     (*print_ident (Task.task_goal task).pr_name*);
   fprintf fmt "  :status unknown@\n";
@@ -226,4 +226,4 @@ let print_context drv fmt task =
 let () = Driver.register_printer "smtv1" 
   (fun drv fmt task -> 
      forget_all ident_printer;
-     print_context drv fmt task)
+     print_task drv fmt task)

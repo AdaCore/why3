@@ -214,15 +214,16 @@ let print_decl drv task fmt d = match d.d_node with
   | Dprop (Plemma, _, _) ->
       assert false
 
-let print_context drv fmt task = 
+let print_task drv fmt task = 
   let decls = Task.task_decls task in
   ignore (print_list_opt (add_flush newline2) (print_decl drv task) fmt decls)
 
 let () = Driver.register_printer "alt-ergo" 
   (fun drv fmt task -> 
      forget_all ident_printer;
-     print_context drv fmt task)
+     print_task drv fmt task)
 
 let print_goal drv fmt (id, f, task) =
-  print_context drv fmt task;
+  print_task drv fmt task;
   fprintf fmt "@\n@[<hov 2>goal %a : %a@]@\n" print_ident id (print_fmla drv) f
+

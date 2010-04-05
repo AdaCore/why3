@@ -38,9 +38,9 @@ drivers () {
     for f in $1/*.drv; do
 	echo -n "  "$f"... "
 	# running Why
-	if ! echo "theory Test goal G : 1=2 end" | $pgm --driver $f --all-goals --output-file - - > /dev/null 2>&1; then
+	if ! echo "theory Test goal G : 1=2 end" | $pgm --driver $f - > /dev/null 2>&1; then
 	    echo "why FAILED"
-            echo "theory Test goal G : 1=2 end" | $pgm --driver $f --all-goals --output-file - -
+            echo "theory Test goal G : 1=2 end" | $pgm --driver $f -
 	    exit 1
 	fi
 	echo "why ok... "

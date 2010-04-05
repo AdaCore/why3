@@ -336,8 +336,8 @@ let print_decl drv fmt d = match d.d_node with
 let print_decls drv fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl drv)) dl
 
-let print_context drv fmt task =
+let print_task drv fmt task =
   forget_all (); print_decls drv fmt (Task.task_decls task)
 
-let () = register_printer "why3" print_context
+let () = register_printer "why3" print_task
 
