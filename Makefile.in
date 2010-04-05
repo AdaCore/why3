@@ -191,6 +191,7 @@ bin/manager.byte: $(MANAGER_CMO)
 ##############
 
 test: bin/why.byte  $(TOOLS)
+	mkdir -p output_why3
 	ocamlrun -bt bin/why.byte -I theories/ -D drivers/why3.drv \
 		-o output_why3 src/test.why
 	bin/why.byte -D drivers/alt_ergo.drv -I theories/ \
@@ -202,6 +203,7 @@ test: bin/why.byte  $(TOOLS)
 	echo bin/why.byte -D drivers/alt_ergo.drv -I theories/ \
 		--timeout 1 --prove theories/real.why 
 	@printf "*** Checking Coq file generation ***\\n"
+	@mkdir -p output_coq
 	@for i in int.Abs int.EuclideanDivision int.ComputerDivision  \
 		real.Abs real.FromIntTest real.SquareTest \
 		real.ExpLogTest real.PowerTest real.TrigonometryTest \

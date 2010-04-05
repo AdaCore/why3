@@ -206,8 +206,6 @@ let do_task env drv fname tname th task =
     | None ->
         printf "@[%a@]@?" (Driver.print_task drv) task
     | Some dir ->
-        try Unix.mkdir dir 0o755
-        with Unix.Unix_error (Unix.EEXIST,_,_) -> ();
         let file =
           let file = Filename.basename fname in
           try Filename.chop_extension file
