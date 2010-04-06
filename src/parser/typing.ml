@@ -718,7 +718,7 @@ let add_types dl th =
       | TDalgebraic cl ->
 	  let ty = ty_app ts (List.map ty_var ts.ts_args) in
 	  let constructor (loc, id, pl) =
-	    let param (_, t) = ty_of_dty (dty th' t) in
+	    let param t = ty_of_dty (dty th' t) in
 	    let tyl = List.map param pl in
 	    Hashtbl.replace csymbols id.id loc;
 	    create_fsymbol (id_user id.id loc) tyl ty

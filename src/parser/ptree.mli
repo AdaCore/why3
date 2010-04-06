@@ -103,7 +103,7 @@ type param = ident option * pty
 type type_def = 
   | TDabstract
   | TDalias     of pty
-  | TDalgebraic of (loc * ident * param list) list
+  | TDalgebraic of (loc * ident * pty list) list
 
 type type_decl = {
   td_loc    : loc;

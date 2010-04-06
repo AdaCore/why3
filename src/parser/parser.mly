@@ -313,7 +313,7 @@ typecases:
 ;
 
 typecase:
-| uident params { (loc_i 1,$1,$2) }
+| uident primitive_types { (loc_i 1,$1,$2) }
 ;
 
 inddefn:
