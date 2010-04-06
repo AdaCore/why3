@@ -258,7 +258,7 @@ why-ide-no:
 why-ide: bin/why-ide.$(OCAMLBEST)
 
 bin/why-ide.opt: $(GCMX)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ threads.cmxa nums.cmxa lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx $^
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -I +threads -o $@ threads.cmxa nums.cmxa lablgtk.cmxa lablgtksourceview.cmxa gtkThread.cmx $^
 	$(STRIP)    $@
 
 bin/why-ide.static: $(GCMX)
@@ -266,7 +266,7 @@ bin/why-ide.static: $(GCMX)
 	$(STRIP)    $@
 
 bin/why-ide.byte: $(GCMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ nums.cma lablgtk.cma lablgtksourceview.cma threads.cma gtkThread.cmo $^
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -I +threads -o $@ nums.cma lablgtk.cma lablgtksourceview.cma threads.cma gtkThread.cmo $^
 
 # bench
 #######

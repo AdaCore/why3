@@ -1,4 +1,11 @@
 
+(* POUR L'INSTANT, CE NE SONT ICI QUE DES EXPÉRIENCES 
+   MERCI DE NE PAS CONSIDÉRER CE CODE COMME DÉFINITIF
+   -- jcf
+*)
+
+open Theory
+
 let () = ignore (GtkMain.Main.init ())
 
 (* config *)
@@ -21,9 +28,86 @@ let set_file f = match !file with
 	Format.eprintf "why-ide: %s: no such file@." f; exit 1
       end;
       file := Some f
+let loadpath = ref []
 
-let spec = []
-let () = Arg.parse spec set_file "why-ide [options] file.why"
+let spec = 
+  [
+    "-I", Arg.String (fun s -> loadpath := s :: !loadpath), 
+    "<dir> Add <dir> to the library search path";
+  ]
+let usage_str = "why-ide [options] file.why"
+let () = Arg.parse spec set_file usage_str
+
+let fname = match !file with
+  | None -> 
+      Arg.usage spec usage_str; exit 1
+  | Some f -> 
+      f
+
+let text = 
+  let ic = open_in fname in
+  let size = in_channel_length ic in
+  let buf = String.create size in
+  really_input ic buf 0 size;
+  close_in ic;
+  buf
+
+let env = Env.create_env (Typing.retrieve !loadpath)
+
+let theories = 
+  let cin = open_in fname in
+  let m = Typing.read_channel env fname cin in
+  close_in cin;
+  m
+
+(* namespace widget *)
+module Ide_namespace = struct
+
+  let cols = new GTree.column_list
+  let column = cols#add Gobject.Data.string
+
+  let renderer = GTree.cell_renderer_text [`XALIGN 0.] 
+  let vcolumn = 
+    GTree.view_column ~title:"theories" 
+      ~renderer:(renderer, ["text", column]) () 
+
+  let () = 
+    vcolumn#set_resizable true;
+    vcolumn#set_max_width 400
+
+  let create ~packing () =
+    let model = GTree.tree_store cols in
+    let view = GTree.view ~model ~packing () in
+    let _ = view#selection#set_mode `SINGLE in
+    let _ = view#set_rules_hint true in
+    ignore (view#append_column vcolumn);
+    model
+
+  let clear model = 
+    model#clear ()
+
+  let add_theory (model : GTree.tree_store) th =
+    let rec fill parent ns =
+      let add_s k s _ = 
+	let row = model#append ~parent () in
+	model#set ~row ~column (k ^ s)
+      in
+      Mnm.iter (add_s "type ")  ns.ns_ts;
+      Mnm.iter (add_s "logic ") ns.ns_ls;
+      Mnm.iter (add_s "prop ")  ns.ns_pr;
+      let add_ns s ns =
+	let row = model#append ~parent () in
+	model#set ~row ~column s;
+	fill row ns
+      in
+      Mnm.iter add_ns ns.ns_ns
+    in
+    let row = model#append () in
+    model#set ~row ~column (th.th_name.Ident.id_short : string);
+    fill row th.th_export
+
+end
+
 
 (* windows, etc *)
 
@@ -57,10 +141,23 @@ let main () =
   ignore (button#connect#clicked
 	    (fun () -> Format.printf "Andrei, tu es trop fort !@."));
 
+  (* horizontal paned *)
+  let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:vbox#add () in
+
+  (* left tree of namespace *)
+  let scrollview = 
+    GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC 
+    ~width:(window_width / 3) ~packing:hp#add () 
+  in
+  let _ = scrollview#set_shadow_type `ETCHED_OUT in
+
+  let namespace_view = Ide_namespace.create ~packing:scrollview#add () in
+  Mnm.iter (fun _ th -> Ide_namespace.add_theory namespace_view th) theories;
+
   (* source view *)
   let scrolled_win = GBin.scrolled_window
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~packing:vbox#add ()
+    ~packing:hp#add ()
   in
   let source_view =
     GSourceView.source_view
@@ -73,6 +170,7 @@ let main () =
       ()
   in
   source_view#misc#modify_font_by_name font_name;
+  source_view#source_buffer#set_text text;
  
   w#add_accel_group accel_group;
   w#show ()
