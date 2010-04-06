@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language _name="Objective Caml" version="1.0" _section="Sources" mimetypes="text/x-ocaml">
+
+	<escape-char>\</escape-char>
+
+	<block-comment _name = "Comment" style= "Comment" end-at-line-end = "FALSE">
+		<start-regex>\(\*[^)]</start-regex>
+		<end-regex>\*\)</end-regex>
+	</block-comment>
+
+	<pattern-item _name = "Decimal" style = "Decimal">
+		<regex>\b[-]?[0-9][0-9_]*[lL]?\b</regex>
+	</pattern-item>
+
+	<pattern-item _name = "Hex Number" style = "Base-N Integer">
+		<regex>\b[-]?0[xX][0-9A-Fa-f][0-9A-Fa-f_]*[lL]?\b</regex>
+	</pattern-item>
+
+	<pattern-item _name = "Octal Number" style = "Base-N Integer">
+		<regex>\b[-]?0[oO][0-7][0-7_]*[lL]?\b</regex>
+	</pattern-item>
+
+	<pattern-item _name = "Binary Number" style = "Base-N Integer">
+		<regex>\b[-]?0[bB][01][01_]*[lL]?\b</regex>
+	</pattern-item>
+
+	<pattern-item _name = "Floating Point Number" style = "Floating Point">
+		<regex>\b[-]?[0-9][0-9_]*(\.[0-9_]*)?([Ee][+-]?[0-9][0-9_]*)?</regex>
+	</pattern-item>
+
+	<string _name = "Character Constant" style = "String" end-at-line-end = "TRUE">
+		<start-regex>&apos;</start-regex>
+		<end-regex>&apos;</end-regex>
+	</string>
+
+	<string _name = "String" style = "String" end-at-line-end = "FALSE">
+		<start-regex>&quot;</start-regex>
+		<end-regex>&quot;</end-regex>
+	</string>
+
+	<pattern-item _name = "Modules" style = "Data Type" case-sensitive="TRUE">
+		<regex>\b[A-Z][A-Za-z0-9_']*</regex>
+	</pattern-item>
+
+	<keyword-list _name = "Definition keyword" style = "Keyword" case-sensitive="TRUE">
+		<keyword>theory</keyword>
+		<keyword>end</keyword>
+		<keyword>use</keyword>
+		<keyword>clone</keyword>
+		<keyword>namespace</keyword>
+		<keyword>import</keyword>
+		<keyword>export</keyword>
+		<keyword>inductive</keyword>
+		<keyword>logic</keyword>
+		<keyword>axiom</keyword>
+		<keyword>lemma</keyword>
+		<keyword>goal</keyword>
+		<keyword>type</keyword>
+	</keyword-list>
+
+	<keyword-list _name = "Expression keyword" style = "Keyword" case-sensitive="TRUE">
+		<keyword>match</keyword>
+		<keyword>let</keyword>
+      		<keyword>in</keyword>
+		<keyword>if</keyword>
+		<keyword>then</keyword>
+		<keyword>else</keyword>
+	</keyword-list>
+
+	<keyword-list _name = "Types" style = "Data Type" case-sensitive="TRUE">
+		<keyword>int</keyword>
+		<keyword>real</keyword>
+	</keyword-list>
+</language>

@@ -44,6 +44,19 @@ let fname = match !file with
   | Some f -> 
       f
 
+let lang =
+  let file = 
+    List.fold_right Filename.concat 
+      [Filename.dirname Sys.argv.(0); ".."; "share"; "lang"] "why.lang" 
+  in
+  if Sys.file_exists file then 
+    let languages_manager = GSourceView.source_languages_manager () in
+    GSourceView.source_language_from_file ~languages_manager file
+  else begin
+    Format.eprintf "could not find lang file (%S)@.";
+    None
+  end
+
 let text = 
   let ic = open_in fname in
   let size = in_channel_length ic in
@@ -170,6 +183,11 @@ let main () =
       ()
   in
   source_view#misc#modify_font_by_name font_name;
+  begin match lang with
+    | Some lang -> source_view#source_buffer#set_language lang
+    | None -> () 
+  end;
+  source_view#source_buffer#set_highlight true;
   source_view#source_buffer#set_text text;
  
   w#add_accel_group accel_group;
