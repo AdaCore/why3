@@ -65,9 +65,9 @@ endif
 
 INCLUDES = -I src/core -I src/util -I src/driver -I src/parser -I src/printer \
            -I src/transform -I src/programs -I src/manager -I src 
-BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ -thread -I +threads -I +sqlite3 @OCAMLGRAPHLIB@ str.cma unix.cma $(DYNLINKBFLAGS)
+BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ @OCAMLGRAPHLIB@ str.cma unix.cma $(DYNLINKBFLAGS)
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
-OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ -thread -I +threads -I +sqlite3 @OCAMLGRAPHLIB@ str.cmxa unix.cmxa $(DYNLINKOFLAGS)
+OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ @OCAMLGRAPHLIB@ str.cmxa unix.cmxa $(DYNLINKOFLAGS)
 
 COQC7  = @COQC7@
 COQC8  = @COQC8@
@@ -185,7 +185,7 @@ MANAGER_CMO := $(addprefix src/manager/,$(MANAGER_CMO))
 
 bin/manager.byte: $(MANAGER_CMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) \
-		-thread threads.cma sqlite3.cma -o $@ $^
+		-thread -I +threads threads.cma sqlite3.cma -o $@ $^
 
 # test targets
 ##############
@@ -258,7 +258,7 @@ why-ide-no:
 why-ide: bin/why-ide.$(OCAMLBEST)
 
 bin/why-ide.opt: $(GCMX)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ threads.cmxa nums.cmxa lablgtk.cmxa lablgtksourceview.cmxa gtkThread.cmx $^
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ threads.cmxa nums.cmxa lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx $^
 	$(STRIP)    $@
 
 bin/why-ide.static: $(GCMX)

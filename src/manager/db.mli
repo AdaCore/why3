@@ -110,7 +110,7 @@ module External_proof : sig
     *)
 
 end
-module rec Goal : sig
+module Goal : sig
   type t = <
     id : int64 option;
     set_id : int64 option -> unit;
@@ -159,7 +159,7 @@ module rec Goal : sig
     *)
 
 end
-and Transf : sig
+module Transf : sig
   type t = <
     id : int64 option;
     set_id : int64 option -> unit;

@@ -482,7 +482,7 @@ module External_proof = struct
 
 end
 
-module rec Goal = struct
+module Goal = struct
   type t = <
     id : int64 option;
     set_id : int64 option -> unit;
@@ -770,7 +770,7 @@ module rec Goal = struct
 
 end
 
-and Transf = struct
+module Transf = struct
   type t = <
     id : int64 option;
     set_id : int64 option -> unit;
