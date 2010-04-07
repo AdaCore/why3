@@ -361,37 +361,15 @@ install-mizar-yes:
 	cp lib/mizar/why.miz @MIZARLIB@/mml
 	cp lib/mizar/dict/why.voc @MIZARLIB@/mml/dict
 
-local-install: $(BINARY) $(WHYCONFIG) $(CADUCEUS) $(JESSIE) bin/why-ide.$(OCAMLBEST) byte bin/why-ide.byte 
+local-install: $(BINARY) $(WHYCONFIG) $(JESSIE) bin/why-ide.$(OCAMLBEST) byte bin/why-ide.byte 
 	cp $(BINARY) $$HOME/bin/why
 	cp $(WHYCONFIG) $$HOME/bin/why
-	cp $(CADUCEUS) $$HOME/bin/caduceus
 	cp $(JESSIE) $$HOME/bin/jessie
 	if test -f bin/why-ide.$(OCAMLBEST); then \
 	  cp -f bin/why-ide.$(OCAMLBEST) $$HOME/bin/why-ide; \
 	fi
 
 local: install
-# local: bin/why.opt $(CADUCEUS) $(WHY2HTML) $(DP) $(RVMERGE) coq-@COQ@
-# 	cp -f bin/why.opt $$HOME/bin/$$OSTYPE/why
-# 	cp -f $(CADUCEUS) $$HOME/bin/$$OSTYPE/caduceus
-# 	cp -f $(WHY2HTML) $$HOME/bin/$$OSTYPE/why2html
-# 	cp -f $(DP) $$HOME/bin/$$OSTYPE/dp
-# 	cp -f $(RVMERGE) $$HOME/bin/$$OSTYPE/rv_merge
-# #	mkdir -p $(COQLIB)/contrib7/why
-# #	cp -f $(VO7) $(VFILES) $(COQLIB)/contrib7/why
-# #	mkdir -p $(COQLIB)/contrib/why
-# #	cp -f $(VO8) $(VFILES) $(COQLIB)/contrib/why
-# 	mkdir -p $(PVSLIB)/why
-# 	cp $(PVSFILES) $(PVSLIB)/why
-# 	mkdir -p $(MIZFILES)/mml/dict
-# 	cp lib/mizar/why.miz $(MIZFILES)/mml
-# 	cp lib/mizar/dict/why.voc $(MIZFILES)/mml/dict
-# 	mkdir -p $$HOME/man/man1
-# 	cp -f doc/*.1 $$HOME/man/man1
-
-demons: $(STATICBINARY) doc/manual.ps
-	cp -f $(STATICBINARY) /users/demons/demons/bin/$$OSTYPE/why
-	cp doc/manual.ps /users/demons/demons/docs/why.ps
 
 win: why.nsi
 	"/cygdrive/c/Program Files (x86)/NSIS/makensis" /DVERSION=$(VERSION) why.nsi
@@ -688,8 +666,6 @@ clean::
 	rm -f *.cm*
 	rm -f src/*.cm[iox] src/*.o src/*~ src/*.annot src/*.output
 	rm -f src/*/*.cm[iox] src/*/*.o src/*/*~ src/*/*.annot src/*/*.output
-	rm -f c/*.cm[iox] c/*.o c/*~ c/*.annot c/*.output
-	rm -f intf/*.cm[iox] intf/*.o intf/*~ intf/*.annot
 	rm -f tools/*.cm[iox] tools/*.o tools/*~ tools/*.annot
 	rm -f jc/*.cm[iox] jc/*.o jc/*~ jc/*.annot jc/*.output
 	rm -f java/*.cm[iox] java/*.o java/*~ java/*.annot java/*.output
@@ -698,8 +674,7 @@ clean::
 		ml/parsing/*.annot ml/parsing/*.output
 	rm -f ml/utils/*.cm[iox] ml/utils/*.o ml/utils/*~ ml/utils/*.annot
 	rm -f ml/typing/*.cm[iox] ml/typing/*.o ml/typing/*~ ml/typing/*.annot
-	rm -f bin/why.opt bin/why.byte bin/why.static bin/top
-	rm -f bin/caduceus.opt bin/caduceus.byte
+	rm -f bin/why.opt bin/why.byte
 	rm -f bin/jessie.opt bin/jessie.byte
 	rm -f bin/jessica.opt bin/jessica.byte
 	rm -f bin/why-obfuscator.opt bin/why-obfuscator.byte
