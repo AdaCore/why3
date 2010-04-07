@@ -62,74 +62,49 @@ DYNLINKCMA =
 DYNLINKCMXA = 
 endif
 
-
-INCLUDES = -I src/core -I src/util -I src/driver -I src/parser -I src/printer \
-           -I src/transform -I src/manager -I src 
 BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ 
-# no -warn-error because some do not compile all files (e.g. those linked to APRON)
 OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ 
 
-COQC7  = @COQC7@
-COQC8  = @COQC8@
-COQDEP = @COQDEP@
-COQLIB = "@COQLIB@"
-COQVER = @COQVER@
+# external libraries common to all binaries
 
-GENERATED = src/config.ml src/parser/parser.mli src/parser/parser.ml \
+EXTCMA = str.cma unix.cma nums.cma $(DYNLINKCMA)
+EXTCMXA = $(EXTCMA:.cma=.cmxa)
+
+###############
+# main target
+###############
+
+all: @OCAMLBEST@
+
+.PHONY: byte opt clean depend all
+
+#############
+# Why library 
+#############
+
+LIBGENERATED = src/config.ml \
+          src/parser/parser.mli src/parser/parser.ml src/parser/parser.output \
             src/parser/lexer.ml src/driver/driver_lexer.ml \
             src/driver/driver_parser.mli src/driver/driver_parser.ml \
-	    src/programs/pgm_lexer.ml src/programs/pgm_parser.mli \
-	    src/programs/pgm_parser.ml src/driver/dynlink_compat.ml
+	    src/driver/driver_parser.output \
+	    src/driver/dynlink_compat.ml
 
-# main targets
-##############
+depend: $(LIBGENERATED)
 
-BINARY=bin/why.$(OCAMLBEST)
-BINARYL=bin/whyl.$(OCAMLBEST)
+LIBDIRS=core util parser transform driver printer
+LIBCLEAN=$(addprefix src/, $(LIBDIRS))
+LIBCLEAN:=$(addsuffix /*.cm[iox], $(LIBCLEAN)) \
+          $(addsuffix /*.annot, $(LIBCLEAN)) \
+          $(addsuffix /*.o, $(LIBCLEAN)) 
 
-TOOLS=bin/why-cpulimit
-
-all: .depend $(BINARY) $(BINARYL) $(TOOLS) apidoc why-ide-@LABLGTK2@
-
-opt: bin/why.opt bin/whyl.opt
-byte: bin/why.byte bin/whyl.byte
-
-.PHONY: check
-
-PRELUDE=lib/why/prelude.why $(WHYLIBS)
-
-# sanity check: the prelude files do typecheck
-check: $(BINARY) $(PRELUDE)
-	WHYLIB=lib $(BINARY) --no-pervasives -tc lib/why/prelude.why
-	for f in $(WHYLIBS) ; do \
-		WHYLIB=lib $(BINARY) -tc $$f; \
-	done
-
-# version number
-################
+clean::
+	rm -f $(LIBCLEAN) $(LIBGENERATED) 
+	rm -f why.cm[iox] why.a why.o $(LIBCMA) $(LIBCMXA)
 
 include Version
 
 doc/version.tex src/config.ml: Version version.sh config.status
-	BINDIR=$(BINDIR) LIBDIR=$(LIBDIR) COQVER=$(COQVER) ./version.sh
-
-src/orm/sql_orm_header.ml: src/orm/sql_access.ml src/orm/convert.ml 
-	ocaml src/orm/convert.ml $< $@
-
-
-ORM_CMO := printer_utils.cmo sql_orm_header.cmo sql_orm.cmo
-ORM_CMO := $(addprefix src/orm/,$(ORM_CMO))
-
-src/manager/db.ml: $(ORM_CMO) src/manager/orm_schema.ml
-	ocaml -I src/orm src/manager/orm_schema.ml 
-
-src/orm/%.cmo: src/orm/%.ml
-	ocamlc -c -I src/orm -I +sqlite3 $<
-
-src/manager/orm_schema.ml: $(ORM_CMO)
-
-# why
-#####
+	BINDIR=$(BINDIR) LIBDIR=$(LIBDIR) COQVER=@COQVER@ ./version.sh
 
 CORE_CMO := ident.cmo ty.cmo term.cmo pattern.cmo decl.cmo theory.cmo\
 	task.cmo pretty.cmo trans.cmo env.cmo register.cmo
@@ -161,15 +136,20 @@ LIBCMO = src/config.cmo $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
          $(TRANSFORM_CMO) $(PRINTER_CMO)
 LIBCMX = $(LIBCMO:.cmo=.cmx)
 
+LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
+$(LIBCMO) $(LIBCMX): INCLUDES=$(LIBINCLUDES)
 $(LIBCMX): OFLAGS+=-for-pack Why
 
-CMA  = why.cma
-CMXA = why.cmxa
+LIBCMA  = why.cma
+LIBCMXA = why.cmxa
 
-$(CMA): why.cmo
+byte: $(LIBCMA)
+opt: $(LIBCMA) $(LIBCMXA)
+
+$(LIBCMA): why.cmo
 	$(OCAMLC) -a $(BFLAGS) -o $@ $^
 
-$(CMXA): why.cmx
+$(LIBCMXA): why.cmx
 	$(OCAMLOPT) -a $(OFLAGS) -o $@ $^
 
 why.cmo: $(LIBCMO)
@@ -178,28 +158,126 @@ why.cmo: $(LIBCMO)
 why.cmx: $(LIBCMX)
 	$(OCAMLOPT) $(INCLUDES) -pack -o $@ $(LIBCMX)
 
+include .depend.lib
 
-# bin/why
+.depend.lib: $(LIBGENERATED)
+	$(OCAMLDEP) -slash $(LIBINCLUDES) $(LIBCMO:.cmo=.ml) $(LIBCMO:.cmo=.mli) > $@
 
-CMO = src/main.cmo
-CMX = $(CMO:.cmo=.cmx)
+depend: .depend.lib
 
-bin/why.opt: $(CMXA) $(CMX) 
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ str.cmxa unix.cmxa nums.cmxa $(DYNLINKCMXA) $^
+##################
+# why binary
+##################
+
+byte: bin/why.byte
+opt:  bin/why.opt
+
+bin/why.opt: $(LIBCMXA) src/main.cmx
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why.byte: $(CMA) $(CMO) 
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ str.cma unix.cma nums.cma $(DYNLINKCMA) $^
+bin/why.byte: $(LIBCMA) src/main.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
+clean::
+	rm -f src/main.cm[iox] src/main.annot
+	rm -f bin/why.byte bin/why.opt
 
+##########
+# whyml
+##########
+
+PGM_GENERATED = src/programs/pgm_lexer.ml src/programs/pgm_parser.mli \
+	        src/programs/pgm_parser.output src/programs/pgm_parser.ml 
+
+PGM_CMO := pgm_parser.cmo pgm_lexer.cmo pgm_typing.cmo pgm_main.cmo
+PGM_CMO := $(addprefix src/programs/, $(PGM_CMO))
+PGM_CMX = $(PGM_CMO:.cmo=.cmx)
+
+$(PGM_CMO) $(PGM_CMX): INCLUDES=-I src/programs/
+
+opt:  bin/whyml.opt
+byte: bin/whyml.byte
+
+bin/whyml.opt: $(LIBCMXA) $(PGM_CMX) 
+	$(if $(QUIET), @echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	$(STRIP) $@
+
+bin/whyml.byte: $(LIBCMA) $(PGM_CMO) 
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+include .depend.programs
+
+.depend.programs: $(PGM_GENERATED)
+	$(OCAMLDEP) -slash -I src/programs/ $(PGM_CMO:.cmo=.ml) $(PGM_CMO:.cmo=.mli) > $@
+
+depend: .depend.programs
+
+clean::
+	rm -f $(PGM_GENERATED)
+	rm -f src/programs/*.cm[iox] src/programs/*.o src/programs/*.annot
+	rm -f bin/whyml.byte bin/whyml.opt
+
+###############
 # proof manager
+###############
+
+src/orm/sql_orm_header.ml: src/orm/sql_access.ml src/orm/convert.ml 
+	ocaml src/orm/convert.ml $< $@
+
+ORM_CMO := printer_utils.cmo sql_orm_header.cmo sql_orm.cmo
+ORM_CMO := $(addprefix src/orm/,$(ORM_CMO))
+
+$(ORM_CMO): INCLUDES=-I src/orm -I +sqlite3
+
+src/manager/db.ml: $(ORM_CMO) src/manager/orm_schema.ml
+	ocaml -I src/orm src/manager/orm_schema.ml 
+
+src/manager/orm_schema.ml: $(ORM_CMO)
 
 MANAGER_CMO := db.cmo 
 MANAGER_CMO := $(addprefix src/manager/,$(MANAGER_CMO))
 
-bin/manager.byte: $(MANAGER_CMO)
+$(MANAGER_CMO): INCLUDES=-I src/manager -I +sqlite3 -I +threads
+
+bin/manager.byte: $(LIBCMA) $(MANAGER_CMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) \
-		-thread -I +threads threads.cma sqlite3.cma -o $@ $^
+		-thread -I +sqlite3 -I +threads $(EXTCMA) threads.cma sqlite3.cma -o $@ $^
+
+# graphical interface
+#####################
+
+IDE_CMO := ide_main.cmo
+IDE_CMO := $(addprefix src/ide/,$(IDE_CMO))
+IDE_CMX = $(IDE_CMO:.cmo=.cmx)
+
+$(IDE_CMO) $(IDE_CMX): INCLUDES=-I src/ide/
+
+byte: ide-byte-@LABLGTK2@
+opt:  ide-opt-@LABLGTK2@
+
+ide-byte-yes: bin/whyide.byte
+ide-byte-no:
+ide-opt-yes: bin/whyide.opt
+ide-opt-no:
+
+bin/whyide.opt: $(LIBCMXA) $(IDE_CMX)
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -I +threads -o $@ $(EXTCMXA) threads.cmxa lablgtk.cmxa lablgtksourceview.cmxa gtkThread.cmx $^
+	$(STRIP)    $@
+
+bin/whyide.byte: $(GCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -I +threads -o $@ $(EXTCMA) lablgtk.cma lablgtksourceview.cma threads.cma gtkThread.cmo $^
+
+include .depend.ide
+
+.depend.ide:
+	$(OCAMLDEP) -slash -I src/ide/ $(IDE_CMO:.cmo=.ml) $(IDE_CMO:.cmo=.mli) > $@
+
+depend: .depend.ide
+
+clean::
+	rm -f bin/whyide.byte bin/whyide.opt
+	rm -f src/ide/*.cm[iox] src/ide/*.o src/ide/*.annot
 
 # test targets
 ##############
@@ -235,47 +313,11 @@ testl: bin/whyl.byte
 examples/programs/%: bin/whyl.byte
 	bin/whyl.byte -I theories examples/programs/$*.mlw
 
-# programs
-##########
-
-PGM_CMO := pgm_parser.cmo pgm_lexer.cmo pgm_typing.cmo pgm_main.cmo
-PGM_CMO := $(addprefix src/programs/, $(PGM_CMO))
-PGM_CMX = $(PGM_CMO:.cmo=.cmx)
-
-$(PGM_CMO) $(PGM_CMX): INCLUDES=-I src/programs/
-
-bin/whyl.opt: $(CMXA) $(PGM_CMX) 
-	$(if $(QUIET), @echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ str.cmxa unix.cmxa nums.cmxa $^
-	$(STRIP) $@
-
-bin/whyl.byte: $(CMA) $(PGM_CMO) 
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ str.cma unix.cma nums.cma $^
-
 #tools
 ######
 
 bin/why-cpulimit: src/tools/@CPULIMIT@.c
 	$(CC) -o $@ $^
-
-# graphical interface
-#####################
-
-IDE_CMO := ide_main.cmo
-IDE_CMO := $(addprefix src/ide/,$(IDE_CMO))
-IDE_CMX = $(IDE_CMO:.cmo=.cmx)
-
-$(IDE_CMO) $(IDE_CMX): INCLUDES=-I src/ide/
-
-why-ide-yes: bin/why-ide.$(OCAMLBEST)
-why-ide-no:
-why-ide: bin/why-ide.$(OCAMLBEST)
-
-bin/why-ide.opt: $(CMXA) $(IDE_CMX)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -I +threads -o $@ str.cmxa nums.cmxa unix.cmxa threads.cmxa lablgtk.cmxa lablgtksourceview.cmxa gtkThread.cmx $^
-	$(STRIP)    $@
-
-bin/why-ide.byte: $(GCMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -I +threads -o $@ str.cma nums.cma unix.cma lablgtk.cma lablgtksourceview.cma threads.cma gtkThread.cmo $^
 
 # bench
 #######
@@ -323,7 +365,6 @@ install-binary:
 
 install-lib: 
 	mkdir -p $(LIBDIR)/why/why
-#	cp -f $(PRELUDE) $(LIBDIR)/why/why
 
 install-man:
 	mkdir -p $(MANDIR)/man1
@@ -663,68 +704,10 @@ src/driver/dynlink_compat.ml: src/driver/dynlink_compat.ml.in config.status
 ##################
 
 clean::
-	rm -f *.cm*
-	rm -f src/*.cm[iox] src/*.o src/*~ src/*.annot src/*.output
-	rm -f src/*/*.cm[iox] src/*/*.o src/*/*~ src/*/*.annot src/*/*.output
-	rm -f tools/*.cm[iox] tools/*.o tools/*~ tools/*.annot
-	rm -f jc/*.cm[iox] jc/*.o jc/*~ jc/*.annot jc/*.output
-	rm -f java/*.cm[iox] java/*.o java/*~ java/*.annot java/*.output
-	rm -f ml/*.cm[iox] ml/*.o ml/*~ ml/*.annot
-	rm -f ml/parsing/*.cm[iox] ml/parsing/*.o ml/parsing/*~ \
-		ml/parsing/*.annot ml/parsing/*.output
-	rm -f ml/utils/*.cm[iox] ml/utils/*.o ml/utils/*~ ml/utils/*.annot
-	rm -f ml/typing/*.cm[iox] ml/typing/*.o ml/typing/*~ ml/typing/*.annot
-	rm -f bin/why.opt bin/why.byte
-	rm -f bin/jessie.opt bin/jessie.byte
-	rm -f bin/jessica.opt bin/jessica.byte
-	rm -f bin/why-obfuscator.opt bin/why-obfuscator.byte
-	rm -f bin/rv_merge.opt bin/rv_merge.byte
-	rm -f bin/why-stat.opt bin/why-stat.byte
-	rm -f bin/tool-stat.opt bin/tool-stat.byte
-	rm -f bin/why2html.opt bin/why2html.byte
-	rm -f bin/why-dp.opt bin/why-dp.byte
-	rm -f bin/why-cpulimit
-	rm -f lib/coq*/*.vo lib/coq*/*~
-	rm -f $(GENERATED)
-	rm -rf output_why3
-	rm -f ergo.why
-	rm -rf bench/plugins/*.cm[iox]* bench/plugins/*.annot
-#	make -C atp clean
-#	make -C doc clean
-#	if test -d examples-v7; then \
-#		make -C examples-v7 clean ; \
-#	fi
-#	make -C examples clean
+	rm -f *~ */*~ */*/*~
 
-dist-clean:: clean
+distclean:: clean
 	rm -f Makefile config.status config.cache config.log
-
-coq-clean::
-	rm -f lib/coq*/*.vo examples/*/*.vo
-	rm .depend.coq
-
-.PHONY: depend
-.depend depend: $(GENERATED)
-	rm -f .depend
-	$(OCAMLDEP) -slash $(INCLUDES) -I src/programs/ -I src/ide/ src/*/*.ml src/*/*.mli src/*.ml src/*.mli bench/plugins/*.ml > .depend
-ifeq ($(FRAMAC),yes)
-#	$(MAKE) -C $(JESSIE_PLUGIN_PATH) depend
-endif
-
-.depend.coq: #lib/coq*/*.v
-	if test @COQ@ = yes; then \
-	  rm -f .depend.coq; \
-	  $(COQDEP) -I lib/coq lib/coq/*.v > .depend.coq; \
-	  $(COQDEP) -I lib/coq-v7 lib/coq-v7/*.v >> .depend.coq; \
-	else touch .depend.coq; \
-	fi
-
-alldepend:
-	make -C examples-v7 depend
-	make -C examples depend
-
-include .depend
-include .depend.coq
 
 #################################################################
 # Building the Why platform with ocamlbuild (OCaml 3.10 needed) #
