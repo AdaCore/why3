@@ -282,7 +282,9 @@ let do_input env drv = function
         if !opt_type_only then ()
         else if Queue.is_empty tlist then
           let glist = Queue.create () in
-          Mnm.iter (fun t th -> do_theory env drv fname t th glist) m
+          let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
+          let do_th _ (t,th) = do_theory env drv fname t th glist in
+          Ident.Mid.iter do_th (Mnm.fold add_th m Ident.Mid.empty)
         else
           Queue.iter (do_local_theory env drv fname m) tlist
       end
