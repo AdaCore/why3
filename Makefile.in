@@ -230,8 +230,8 @@ ORM_CMO := $(addprefix src/orm/,$(ORM_CMO))
 
 $(ORM_CMO): INCLUDES=-I src/orm -I +sqlite3
 
-src/manager/db.ml: $(ORM_CMO) src/manager/orm_schema.ml
-	ocaml -I src/orm src/manager/orm_schema.ml 
+# src/manager/db.ml: $(ORM_CMO) src/manager/orm_schema.ml
+# 	ocaml -I src/orm src/manager/orm_schema.ml 
 
 src/manager/orm_schema.ml: $(ORM_CMO)
 
