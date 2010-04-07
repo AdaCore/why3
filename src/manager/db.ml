@@ -1,19 +1,23 @@
 
 open Sqlite3
-open Printf
-  
+
 type transaction_mode = | Deferred | Immediate | Exclusive
   
-type state = {
-  db : db;
+type handle = {
+  raw_db : Sqlite3.db;
   mutable in_transaction: int;
-  busyfn: db -> unit;
+  busyfn: Sqlite3.db -> unit;
   mode: transaction_mode;
 }
+
+(*
+let raw db = db.raw_db
+*)
   
 let default_busyfn (db:Sqlite3.db) =
   print_endline "WARNING: busy";
-  Thread.delay (Random.float 1.)
+  (* Thread.delay (Random.float 1.) *)
+  ignore (Unix.select [] [] [] (Random.float 1.))
   
 let raise_sql_error x = raise (Sqlite3.Error (Rc.to_string x))
   
@@ -23,15 +27,15 @@ let try_finally fn finalfn =
     finalfn ();
     r
   with e -> begin
-    print_endline (sprintf "WARNING: exception: %s" (Printexc.to_string e));
+    Format.eprintf "WARNING: exception: %s@." (Printexc.to_string e);
     finalfn ();
     raise e
   end
-    
+  
 (* retry until a non-BUSY error code is returned *)
 let rec db_busy_retry db fn =
   match fn () with
-    | Rc.BUSY -> db.busyfn db.db; db_busy_retry db fn
+    | Rc.BUSY -> db.busyfn db.raw_db; db_busy_retry db fn
     | x -> x
        
 (* make sure an OK is returned from the database *)
@@ -58,7 +62,7 @@ let transaction db fn =
        if db.in_transaction = 0 then 
          begin
            db_must_ok db 
-             (fun () -> exec db.db (sprintf "BEGIN %s TRANSACTION" m))
+             (fun () -> exec db.raw_db ("BEGIN " ^ m ^ " TRANSACTION"))
          end;
        db.in_transaction <- db.in_transaction + 1;
        fn ();
@@ -66,7 +70,7 @@ let transaction db fn =
     (fun () ->
        if db.in_transaction = 1 then 
          begin
-           db_must_ok db (fun () -> exec db.db "END TRANSACTION")
+           db_must_ok db (fun () -> exec db.raw_db "END TRANSACTION")
          end;
        db.in_transaction <- db.in_transaction - 1
     )
@@ -94,11 +98,11 @@ module Loc = struct
 
   let init db =
     let sql = "create table if not exists loc (id integer primary key autoincrement,file text,line integer,start integer,stop integer);" in
-    db_must_ok db (fun () -> Sqlite3.exec db.db sql);
+    db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
     ()
 
   (* object definition *)
-  let t ?id ~file ~line ~start ~stop db : t = 
+  let create ?id ~file ~line ~start ~stop : t = 
     { 
       id = id;
       file = file;
@@ -113,7 +117,7 @@ module Loc = struct
       | None -> ()
       | Some id ->
           let sql = "DELETE FROM loc WHERE id=?" in
-          let stmt = Sqlite3.prepare db.db sql in
+          let stmt = Sqlite3.prepare db.raw_db sql in
           db_must_ok db (fun () -> Sqlite3.bind stmt 1 (Sqlite3.Data.INT id));
           ignore (step_fold db stmt (fun _ -> ()));
           loc.id <- None
@@ -126,7 +130,7 @@ module Loc = struct
            | None -> 
                (* insert new record *)
                let sql = "INSERT INTO loc VALUES(NULL,?,?,?,?)" in
-               let stmt = Sqlite3.prepare db.db sql in
+               let stmt = Sqlite3.prepare db.raw_db sql in
                db_must_ok db 
                  (fun () -> Sqlite3.bind stmt 1 
                     (let v = loc.file in Sqlite3.Data.TEXT v));
@@ -140,7 +144,7 @@ module Loc = struct
                  (fun () -> Sqlite3.bind stmt 4 
                     (let v = loc.stop in Sqlite3.Data.INT v));
                db_must_done db (fun () -> Sqlite3.step stmt);
-               let new_id = Sqlite3.last_insert_rowid db.db in
+               let new_id = Sqlite3.last_insert_rowid db.raw_db in
                loc.id <- Some new_id;
                new_id
            | Some id -> 
@@ -148,7 +152,7 @@ module Loc = struct
                let sql = 
                  "UPDATE loc SET file=?,line=?,start=?,stop=? WHERE id=?" 
                in
-               let stmt = Sqlite3.prepare db.db sql in
+               let stmt = Sqlite3.prepare db.raw_db sql in
                db_must_ok db 
                  (fun () -> Sqlite3.bind stmt 1 
                     (let v = loc.file in Sqlite3.Data.TEXT v));
@@ -191,7 +195,7 @@ module Loc = struct
     let sql =
       "SELECT loc.id, loc.file, loc.line, loc.start, loc.stop FROM loc " ^ q 
     in
-    let stmt=Sqlite3.prepare db.db sql in
+    let stmt=Sqlite3.prepare db.raw_db sql in
     (* bind the position variables to the statement *)
     let bindpos = ref 1 in
     begin
@@ -245,7 +249,7 @@ module Loc = struct
     end;
   (* convert statement into an ocaml object *)
     let of_stmt stmt =
-    t
+      create
       (* native fields *)
       ?id:(
       (match Sqlite3.column stmt 0 with
@@ -273,7 +277,6 @@ module Loc = struct
         |x -> match x with |Sqlite3.Data.INT i -> i |x -> (try Int64.of_string (Sqlite3.Data.to_string x) with _ -> failwith "error: loc stop"))
       )
       (* foreign fields *)
-    db
     in 
     (* execute the SQL query *)
     step_fold db stmt of_stmt
@@ -949,11 +952,9 @@ end
 *)
 
 
-type handle = state
-
 let create ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
   let db = {
-    db = Sqlite3.db_open db_name; 
+    raw_db = Sqlite3.db_open db_name; 
     in_transaction = 0; 
     mode = mode; 
     busyfn = busyfn } 
@@ -965,6 +966,4 @@ let create ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
     Transf.init db;
   *)
   db
-
-let raw db = db.db
 

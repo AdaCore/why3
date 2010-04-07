@@ -242,7 +242,18 @@ $(MANAGER_CMO): INCLUDES=-I src/manager -I +sqlite3 -I +threads
 
 bin/manager.byte: $(LIBCMA) $(MANAGER_CMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) \
-		-thread -I +sqlite3 -I +threads $(EXTCMA) threads.cma sqlite3.cma -o $@ $^
+		-I +sqlite3 $(EXTCMA) sqlite3.cma -o $@ $^
+
+include .depend.manager
+
+.depend.manager: 
+	$(OCAMLDEP) -slash -I src/manager/ $(MANAGER_CMO:.cmo=.ml) $(MANAGER_CMO:.cmo=.mli) > $@
+
+depend: .depend.programs
+
+clean::
+	rm -f src/manager/*.cm[iox] src/manager/*.o src/manager/*.annot
+	rm -f bin/manager.byte bin/manager.opt
 
 # graphical interface
 #####################

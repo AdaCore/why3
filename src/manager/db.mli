@@ -1,9 +1,5 @@
 
 
-(** Use the [[Init]] module to open a new database handle.  Each
-    object type has its own module with functions to create, modify, save
-    and destroy objects of that type into the SQLite database *)
-
 type transaction_mode = | Deferred | Immediate | Exclusive
 
 type handle
@@ -19,9 +15,11 @@ val create :
       the database.  @raise Sql_error if a database error is
       encountered *)
 
+(*
 val raw: handle -> Sqlite3.db
   (** [raw db] @return the underlying Sqlite3 database for the
       connection, for advanced queries.  *)
+*)
 
 module Loc : sig
 
@@ -36,12 +34,12 @@ module Loc : sig
           function, or removed by calling [delete]. Changes are not
           committed to the database until [save] is invoked.  *)
 
-  val save: t -> int64 
+  val save: handle -> t -> int64 
 
-  val delete: t -> unit
+  val delete: handle -> t -> unit
 
 
-  val t :
+  val create :
     ?id:int64 ->
     file:string ->
     line:int64 ->
