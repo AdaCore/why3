@@ -316,27 +316,30 @@ examples/programs/%: bin/whyl.byte
 #tools
 ######
 
+TOOLS = bin/why-cpulimit
+
+byte opt: $(TOOLS)
+
 bin/why-cpulimit: src/tools/@CPULIMIT@.c
 	$(CC) -o $@ $^
+
+clean::
+	rm -f bin/why-cpulimit
 
 # bench
 #######
 
 .PHONY: bench test
 
-WHYVO=lib/coq/Why.vo
-
-bench/bench : bench/bench.in config.status
+bench/bench: bench/bench.in config.status
 	./config.status --file bench/bench
 
-bench:: $(BINARY) $(BINARYL) bench/bench $(TOOLS)
-	sh bench/bench "$(BINARY) -I theories/" "$(BINARYL) -I theories"
+bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@ bench/bench 
+	sh bench/bench "bin/why.@OCAMLBEST@ -I theories/" "bin/whyml.@OCAMLBEST@ -I theories"
 
 BENCH_PLUGINS_CMO := helloworld.cmo simplify_array.cmo
 BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))
 BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
-
-
 
 bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) $(BINARY) byte \
 	$(TOOLS)
@@ -418,45 +421,22 @@ win: why.nsi
 zip:
 	zip -A -r why-$(VERSION).zip c:/why/bin c:/why/lib c:/coq/lib/contrib/why c:/coq/lib/contrib7/why
 
-# doc
+################
+# documentation
+################
 
-DOC=doc/manual.ps doc/manual.html doc/caduceus.ps doc/caduceus.html \
-	doc/krakatoa.pdf doc/krakatoa.html \
-	doc/main.pdf doc/main.html
+DOC=doc/manual.pdf doc/manual.html 
 
 doc:: $(DOC)
 
-
-doc/manual.ps: doc/manual.tex doc/version.tex
-	make -C doc manual.ps
-
-# doc/version.tex: Version Makefile.in
-#	echo '\newcommand{\whyversion}'"{$(VERSION)}" > $@
-#	echo '\newcommand{\caduceusversion}'"{$(CVERSION)}" >> $@
-#	echo '\newcommand{\jessieversion}'"{$(JCVERSION)}" >> $@
-#	echo '\newcommand{\krakatoaversion}'"{$(KVERSION)}" >> $@
+doc/manual.pdf: doc/manual.tex doc/version.tex
+	make -C doc manual.pdf
 
 doc/manual.html: doc/manual.tex doc/version.tex
 	make -C doc manual.html
 
-doc/caduceus.ps: doc/caduceus.tex doc/version.tex
-	make -C doc caduceus.ps
-
-doc/caduceus.html: doc/caduceus.tex doc/version.tex
-	make -C doc caduceus.html
-
-doc/krakatoa.pdf: doc/krakatoa.tex doc/version.tex
-	make -C doc krakatoa.pdf
-
-doc/krakatoa.html: doc/krakatoa.tex doc/version.tex
-	make -C doc krakatoa.html
-
-doc/main.pdf: doc/main.tex doc/version.tex
-	make -C doc main.pdf
-
-doc/main.html: doc/main.tex doc/version.tex
-	make -C doc main.html
-
+clean::
+	make -C doc clean
 
 # API DOC
 ##############
