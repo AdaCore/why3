@@ -4,6 +4,7 @@
    -- jcf
 *)
 
+open Why
 open Theory
 
 let () = ignore (GtkMain.Main.init ())

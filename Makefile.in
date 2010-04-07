@@ -242,14 +242,14 @@ PGM_CMO := pgm_parser.cmo pgm_lexer.cmo pgm_typing.cmo pgm_main.cmo
 PGM_CMO := $(addprefix src/programs/, $(PGM_CMO))
 PGM_CMX = $(PGM_CMO:.cmo=.cmx)
 
-$(PGM_CMX): INCLUDES=-I src/programs/
+$(PGM_CMO) $(PGM_CMX): INCLUDES=-I src/programs/
 
 bin/whyl.opt: $(CMXA) $(PGM_CMX) 
 	$(if $(QUIET), @echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ str.cmxa unix.cmxa nums.cmxa $^
 	$(STRIP) $@
 
 bin/whyl.byte: $(CMA) $(PGM_CMO) 
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ nums.cma $^
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ str.cma unix.cma nums.cma $^
 
 #tools
 ######
@@ -262,24 +262,20 @@ bin/why-cpulimit: src/tools/@CPULIMIT@.c
 
 IDE_CMO := ide_main.cmo
 IDE_CMO := $(addprefix src/ide/,$(IDE_CMO))
+IDE_CMX = $(IDE_CMO:.cmo=.cmx)
 
-GCMO = $(LIBCMO) $(IDE_CMO)
-GCMX = $(GCMO:.cmo=.cmx)
+$(IDE_CMO) $(IDE_CMX): INCLUDES=-I src/ide/
 
 why-ide-yes: bin/why-ide.$(OCAMLBEST)
 why-ide-no:
 why-ide: bin/why-ide.$(OCAMLBEST)
 
-bin/why-ide.opt: $(GCMX)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -I +threads -o $@ threads.cmxa nums.cmxa lablgtk.cmxa lablgtksourceview.cmxa gtkThread.cmx $^
-	$(STRIP)    $@
-
-bin/why-ide.static: $(GCMX)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) -cclib -static $(OFLAGS) -o $@ threads.cmxa nums.cmxa lablgtk.cmxa lablgtksourceview.cmxa gtkThread.cmx $^
+bin/why-ide.opt: $(CMXA) $(IDE_CMX)
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -I +threads -o $@ str.cmxa nums.cmxa unix.cmxa threads.cmxa lablgtk.cmxa lablgtksourceview.cmxa gtkThread.cmx $^
 	$(STRIP)    $@
 
 bin/why-ide.byte: $(GCMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -I +threads -o $@ nums.cma lablgtk.cma lablgtksourceview.cma threads.cma gtkThread.cmo $^
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -I +threads -o $@ str.cma nums.cma unix.cma lablgtk.cma lablgtksourceview.cma threads.cma gtkThread.cmo $^
 
 # bench
 #######
@@ -735,7 +731,7 @@ coq-clean::
 .PHONY: depend
 .depend depend: $(GENERATED)
 	rm -f .depend
-	$(OCAMLDEP) -slash $(INCLUDES) src/*/*.ml src/*/*.mli src/*.ml src/*.mli bench/plugins/*.ml > .depend
+	$(OCAMLDEP) -slash $(INCLUDES) -I src/programs/ -I src/ide/ src/*/*.ml src/*/*.mli src/*.ml src/*.mli bench/plugins/*.ml > .depend
 ifeq ($(FRAMAC),yes)
 #	$(MAKE) -C $(JESSIE_PLUGIN_PATH) depend
 endif
