@@ -20,6 +20,7 @@
 (* main module for whyl *)
 
 open Format
+open Why
 
 let files = ref []
 let parse_only = ref false

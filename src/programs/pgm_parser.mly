@@ -21,6 +21,7 @@
 
   open Parsing
   open Lexing
+  open Why
   open Ptree
   open Pgm_ptree
 
@@ -89,7 +90,7 @@
 %token <string> LIDENT UIDENT
 %token <string> INTEGER
 %token <string> OP0 OP1 OP2 OP3
-%token <Ptree.real_constant> REAL
+%token <Why.Ptree.real_constant> REAL
 %token <string> STRING
 %token <Lexing.position * string> LOGIC
 

@@ -8,7 +8,7 @@
 . ./Version
 
 # Why
-WHYVF=src/version.ml
+WHYVF=src/config.ml
 mkdir -p src
 echo "let coqversion = \"$COQVER\"" > $WHYVF
 echo "let version = \"$VERSION\"" >> $WHYVF

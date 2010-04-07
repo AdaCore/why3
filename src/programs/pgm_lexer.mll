@@ -20,6 +20,7 @@
 {
   open Format
   open Lexing
+  open Why
   open Lexer
   open Term
   open Pgm_parser

@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Why
+
 type loc = Loc.position
 
 type constant = Term.constant

@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Why
+
 type loc = Loc.position
 
 type ident = Ptree.ident
@@ -57,6 +59,9 @@ and expr_desc =
   | Eassert of assertion_kind * lexpr
   | Eghost of expr
   | Elabel of ident * expr
+
+
+  (* TODO: fun, rec, raise, try, absurd, any, post? *)
 
 type decl =
   | Dcode  of ident * expr

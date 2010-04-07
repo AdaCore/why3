@@ -18,6 +18,7 @@
 (**************************************************************************)
 
 open Format
+open Why
 open Theory
 open Task
 open Driver

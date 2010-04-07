@@ -18,6 +18,7 @@
 (**************************************************************************)
 
 open Format
+open Why
 open Util
 open Ident
 open Term

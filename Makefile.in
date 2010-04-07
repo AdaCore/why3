@@ -55,19 +55,19 @@ PDFVIEWER = @PDFVIEWER@
 DYNLINK = @DYNLINK@
 
 ifeq ($(DYNLINK),Dynlink)
-DYNLINKBFLAGS = dynlink.cma
-DYNLINKOFLAGS = dynlink.cmxa
+DYNLINKCMA  = dynlink.cma
+DYNLINKCMXA = dynlink.cmxa
 else
-DYNLINKBFLAGS = 
-DYNLINKOFLAGS = 
+DYNLINKCMA = 
+DYNLINKCMXA = 
 endif
 
 
 INCLUDES = -I src/core -I src/util -I src/driver -I src/parser -I src/printer \
-           -I src/transform -I src/programs -I src/manager -I src 
-BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ @OCAMLGRAPHLIB@ str.cma unix.cma $(DYNLINKBFLAGS)
+           -I src/transform -I src/manager -I src 
+BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ 
 # no -warn-error because some do not compile all files (e.g. those linked to APRON)
-OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ @OCAMLGRAPHLIB@ str.cmxa unix.cmxa $(DYNLINKOFLAGS)
+OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ 
 
 COQC7  = @COQC7@
 COQC8  = @COQC8@
@@ -75,7 +75,7 @@ COQDEP = @COQDEP@
 COQLIB = "@COQLIB@"
 COQVER = @COQVER@
 
-GENERATED = src/version.ml src/parser/parser.mli src/parser/parser.ml \
+GENERATED = src/config.ml src/parser/parser.mli src/parser/parser.ml \
             src/parser/lexer.ml src/driver/driver_lexer.ml \
             src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	    src/programs/pgm_lexer.ml src/programs/pgm_parser.mli \
@@ -90,9 +90,6 @@ BINARYL=bin/whyl.$(OCAMLBEST)
 TOOLS=bin/why-cpulimit
 
 all: .depend $(BINARY) $(BINARYL) $(TOOLS) apidoc why-ide-@LABLGTK2@
-
-# refrain parallel make (-j nn) from starting ocaml compilation too early 
-*.cm*: .depend
 
 opt: bin/why.opt bin/whyl.opt
 byte: bin/why.byte bin/whyl.byte
@@ -113,7 +110,7 @@ check: $(BINARY) $(PRELUDE)
 
 include Version
 
-doc/version.tex src/version.ml: Version version.sh config.status
+doc/version.tex src/config.ml: Version version.sh config.status
 	BINDIR=$(BINDIR) LIBDIR=$(LIBDIR) COQVER=$(COQVER) ./version.sh
 
 src/orm/sql_orm_header.ml: src/orm/sql_access.ml src/orm/convert.ml 
@@ -142,7 +139,7 @@ UTIL_CMO := pp.cmo loc.cmo prtree.cmo util.cmo hashcons.cmo \
             sysutil.cmo hashweak.cmo
 UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
 
-PARSER_CMO := parser.cmo lexer.cmo denv.cmo typing.cmo 
+PARSER_CMO := ptree.cmo parser.cmo lexer.cmo denv.cmo typing.cmo 
 PARSER_CMO := $(addprefix src/parser/,$(PARSER_CMO))
 
 TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
@@ -152,33 +149,50 @@ TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
 	eliminate_let.cmo eliminate_definition.cmo
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
-DRIVER_CMO := call_provers.cmo dynlink_compat.cmo driver_parser.cmo\
+DRIVER_CMO := driver_ast.cmo call_provers.cmo dynlink_compat.cmo \
+              driver_parser.cmo\
 	driver_lexer.cmo driver.cmo
 DRIVER_CMO := $(addprefix src/driver/,$(DRIVER_CMO))
 
 PRINTER_CMO := print_real.cmo alt_ergo.cmo why3.cmo smt.cmo coq.cmo
 PRINTER_CMO := $(addprefix src/printer/,$(PRINTER_CMO))
 
-LIBCMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
+LIBCMO = src/config.cmo $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
          $(TRANSFORM_CMO) $(PRINTER_CMO)
+LIBCMX = $(LIBCMO:.cmo=.cmx)
 
-CMO = $(LIBCMO) src/main.cmo
+$(LIBCMX): OFLAGS+=-for-pack Why
+
+CMA  = why.cma
+CMXA = why.cmxa
+
+$(CMA): why.cmo
+	$(OCAMLC) -a $(BFLAGS) -o $@ $^
+
+$(CMXA): why.cmx
+	$(OCAMLOPT) -a $(OFLAGS) -o $@ $^
+
+why.cmo: $(LIBCMO)
+	$(OCAMLC) $(BFLAGS) -pack -o $@ $(LIBCMO)
+
+why.cmx: $(LIBCMX)
+	$(OCAMLOPT) $(INCLUDES) -pack -o $@ $(LIBCMX)
+
+
+# bin/why
+
+CMO = src/main.cmo
 CMX = $(CMO:.cmo=.cmx)
 
-bin/why.opt: $(CMX) 
-	echo $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(TRANSFORM_CMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ nums.cmxa $^
+bin/why.opt: $(CMXA) $(CMX) 
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ str.cmxa unix.cmxa nums.cmxa $(DYNLINKCMXA) $^
 	$(STRIP) $@
 
-bin/why.byte: $(CMO) 
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ nums.cma $^
+bin/why.byte: $(CMA) $(CMO) 
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ str.cma unix.cma nums.cma $(DYNLINKCMA) $^
 
-bin/why.static: $(CMX) src/why.cmx 
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) -cclib -static $(OFLAGS) -o $@ nums.cmxa $^ 
-	$(STRIP) $@
 
-bin/top: $(CMO)
-	ocamlmktop $(BFLAGS) -o $@ nums.cma $^
+# proof manager
 
 MANAGER_CMO := db.cmo 
 MANAGER_CMO := $(addprefix src/manager/,$(MANAGER_CMO))
@@ -226,16 +240,15 @@ examples/programs/%: bin/whyl.byte
 
 PGM_CMO := pgm_parser.cmo pgm_lexer.cmo pgm_typing.cmo pgm_main.cmo
 PGM_CMO := $(addprefix src/programs/, $(PGM_CMO))
+PGM_CMX = $(PGM_CMO:.cmo=.cmx)
 
-WHYL_CMO = $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
-           $(TRANSFORM_CMO) $(PRINTER_CMO) $(PGM_CMO)
-WHYL_CMX = $(WHYL_CMO:.cmo=.cmx)
+$(PGM_CMX): INCLUDES=-I src/programs/
 
-bin/whyl.opt: $(WHYL_CMX) 
-	$(if $(QUIET), @echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ nums.cmxa $^
+bin/whyl.opt: $(CMXA) $(PGM_CMX) 
+	$(if $(QUIET), @echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ str.cmxa unix.cmxa nums.cmxa $^
 	$(STRIP) $@
 
-bin/whyl.byte: $(WHYL_CMO) 
+bin/whyl.byte: $(CMA) $(PGM_CMO) 
 	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ nums.cma $^
 
 #tools
@@ -676,6 +689,7 @@ src/driver/dynlink_compat.ml: src/driver/dynlink_compat.ml.in config.status
 ##################
 
 clean::
+	rm -f *.cm*
 	rm -f src/*.cm[iox] src/*.o src/*~ src/*.annot src/*.output
 	rm -f src/*/*.cm[iox] src/*/*.o src/*/*~ src/*/*.annot src/*/*.output
 	rm -f c/*.cm[iox] c/*.o c/*~ c/*.annot c/*.output
@@ -748,7 +762,7 @@ include .depend.coq
 # There used to be targets here but they are no longer useful.
 
 # To build using Ocamlbuild:
-# 1) Run "make Makefile" to ensure that the generated files (version.ml, ...)
+# 1) Run "make Makefile" to ensure that the generated files (config.ml, ...)
 # are generated.
 # 2) Run Ocamlbuild with any target to generate the sanitization script.
 # 3) Run ./sanitize to delete the generated files that shouldn't be generated
