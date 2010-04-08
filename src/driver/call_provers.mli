@@ -64,3 +64,12 @@ val on_formatter :
   prover -> 
   (formatter -> unit) -> 
   prover_result
+
+val on_buffer : 
+  ?debug:bool ->
+  ?timeout:int -> 
+  ?filename:string -> (* used as the suffix of a tempfile if the prover can't 
+                         deal with stdin *)
+  prover -> 
+  Buffer.t -> 
+  prover_result

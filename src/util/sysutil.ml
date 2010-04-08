@@ -72,3 +72,6 @@ let open_temp_file ?(debug=false) filesuffix usefile =
         if not debug then Sys.remove file;
         close_out cout;
         raise e
+
+
+let call_asynchronous f = assert false

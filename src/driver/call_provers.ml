@@ -91,23 +91,33 @@ let remove_file ?(debug=false) f =
 
 let () = Sys.set_signal Sys.sigpipe Sys.Signal_ignore
 
-let timed_sys_command ?formatter ?(debug=false) ?timeout cmd =
+let timed_sys_command ?formatter ?buffer ?(debug=false) ?timeout cmd =
   let t0 = Unix.times () in
   let cmd = match timeout with
     | None -> Format.sprintf "%s 2>&1" cmd
     | Some timeout -> Format.sprintf "%s %d %s 2>&1" !cpulimit timeout cmd in
   if debug then Format.eprintf "command line: %s@." cmd;
   let (cin,cout) as p = Unix.open_process cmd in
+  (* Write the formatter to the stdin of the prover *)
   begin try
     (match formatter with
        | None -> ()
        | Some formatter -> 
            let fmt = formatter_of_out_channel cout in
            formatter fmt);
-    close_out cout;
   with Sys_error s -> 
     if debug then Format.eprintf "Sys_error : %s@." s
   end;
+  (* Write the buffer to the stdin of the prover *)
+  begin try
+    (match buffer with
+       | None -> ()
+       | Some buffer -> 
+           Buffer.output_buffer cout buffer);
+  with Sys_error s -> 
+    if debug then Format.eprintf "Sys_error : %s@." s
+  end;
+  close_out cout;
   let out = Sysutil.channel_contents cin in
   let ret = Unix.close_process p in
   let t1 = Unix.times () in
@@ -152,19 +162,25 @@ let treat_result pr (t,c,outerr) =
       | Unix.WSTOPPED 24 | Unix.WSIGNALED 24 | Unix.WEXITED 124 
       | Unix.WEXITED 152 -> 
           (* (*128 +*) SIGXCPU signal (i.e. 24, /usr/include/bits/signum.h) *) 
+          (* TODO : if somebody use why_cpulimit to call "why -timeout
+             0", Why will think that he called why_cpulimit (WEXITED
+             152) and will return Timeout instead of exit 152. In fact
+             in this case Why will receive a SIGXCPU in less than 1
+             sec (soft limit) (ie man setrlimit ). The problem can be
+             here or in the use of why_cpulimit *)
           Timeout
       | Unix.WSTOPPED _ | Unix.WSIGNALED _ -> HighFailure
       | Unix.WEXITED c ->
           let rec greps res = function
             | [] -> HighFailure
             | (r,pa)::l ->
-               if grep r res 
-               then match pa with
-                 | Valid | Invalid -> pa
-                 | Unknown s -> Unknown (Str.replace_matched s res)
-                 | Failure s -> Failure (Str.replace_matched s res)
-                 | Timeout | HighFailure -> assert false
-               else greps outerr l in
+                if grep r res 
+                then match pa with
+                  | Valid | Invalid -> pa
+                  | Unknown s -> Unknown (Str.replace_matched s res)
+                  | Failure s -> Failure (Str.replace_matched s res)
+                  | Timeout | HighFailure -> assert false
+                else greps outerr l in
           greps outerr pr.pr_regexps in
   { pr_time = t;
     pr_answer = answer;
@@ -199,7 +215,7 @@ and on_formatter ?debug ?timeout ?filename pr formatter =
   check_prover pr;
   match pr.pr_call_stdin with
     | Some cmd -> 
-        let res = timed_sys_command ?debug ?timeout ~formatter:formatter cmd in
+        let res = timed_sys_command ?debug ?timeout ~formatter cmd in
         treat_result pr res
     | None -> 
         match filename with
@@ -209,4 +225,19 @@ and on_formatter ?debug ?timeout ?filename pr formatter =
                  let fmt = formatter_of_out_channel cout in
                  formatter fmt;
                  pp_print_flush fmt ();
+                 on_file ?timeout ?debug pr file)
+
+
+let on_buffer ?debug ?timeout ?filename pr buffer =
+  check_prover pr;
+  match pr.pr_call_stdin with
+    | Some cmd -> 
+        let res = timed_sys_command ?debug ?timeout ~buffer cmd in
+        treat_result pr res
+    | None -> 
+        match filename with
+          | None -> raise NoCommandlineProvided
+          | Some filename -> Sysutil.open_temp_file ?debug filename
+              (fun file cout ->
+                 Buffer.output_buffer cout buffer;
                  on_file ?timeout ?debug pr file)

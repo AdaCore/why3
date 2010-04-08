@@ -443,6 +443,8 @@ let call_prover_on_file ?debug ?timeout drv filename =
   Call_provers.on_file drv.drv_prover filename 
 let call_prover_on_formatter ?debug ?timeout ?filename drv ib = 
   Call_provers.on_formatter ?debug ?timeout ?filename drv.drv_prover ib
+let call_prover_on_buffer ?debug ?timeout ?filename drv ib = 
+  Call_provers.on_buffer ?debug ?timeout ?filename drv.drv_prover ib
 
 
 let call_prover ?debug ?timeout drv task =
@@ -452,6 +454,17 @@ let call_prover ?debug ?timeout drv task =
       | Some _ -> Some (filename_of_goal drv "why" "call_prover" task) in
   let formatter fmt = print_task drv fmt task in
   call_prover_on_formatter ?debug ?timeout ?filename drv formatter
+
+let call_prover_ext ?debug ?timeout drv task =
+  let filename = 
+    match drv.drv_filename with
+      | None -> None
+      | Some _ -> Some (filename_of_goal drv "why" "call_prover" task) in
+  let formatter fmt = print_task drv fmt task in
+  let buf = Buffer.create 64 in
+  let fmt = formatter_of_buffer buf in
+  formatter fmt;
+  (fun () -> call_prover_on_buffer ?debug ?timeout ?filename drv buf)
 
 
 

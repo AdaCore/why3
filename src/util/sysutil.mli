@@ -39,3 +39,16 @@ val open_temp_file :
    Create a temporary file with suffix suffix,
    and call usefile on this file (filename and open_out).
    usefile can close the file *)
+
+val call_asynchronous : (unit -> 'a) -> (unit -> 'a)
+  (* Transform a synchronous call to an 
+     asynchronous in a separate memory.
+     call_asynchronous f forks and run the 
+     function in the child process. In the parent 
+     process the function returned will wait the end 
+     of the child process*)
+
+(* With this function we can make fork in a thread 
+   it is not as bad as it can be in 3.11.0 :
+   http://caml.inria.fr/mantis/view.php?id=4577
+*)

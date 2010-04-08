@@ -83,12 +83,22 @@ type prover_answer = Call_provers.prover_answer =
 val call_prover : ?debug:bool -> ?timeout:int -> driver -> task -> 
   Call_provers.prover_result
 (** calls a prover on a given task
-    @param debug if on, prints on stderr the command line and the output of the prover 
+    @param debug if on, prints on stderr the command line 
+                 and the output of the prover 
     @param timeout specifies the CPU time limit given to the prover,
                      if not set: unlimited time
     @param driver the driver to use
     @param task the task to prove with a goal as the last declaration
     @return the prover's answer
+  *)
+
+val call_prover_ext : ?debug:bool -> ?timeout:int -> driver -> task -> 
+  (unit -> Call_provers.prover_result)
+(** same as {!Driver.call_prover} but split the function between 
+    thread unsafe and thread safe operation.
+    call_prover_ext ~debug ~timeout driver task prepares the goal 
+    and return a function which actually call the prover on the goal.
+    The returned function is thread safe.
   *)
 
 val call_prover_on_file :
