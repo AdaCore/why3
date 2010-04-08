@@ -103,8 +103,13 @@ let elt is_split_kind split_pos d =
   match d.d_node with
     | Dprop (k,pr,f) when is_split_kind k ->
         let l = split_pos [] f in
-        List.map (fun p -> [create_prop_decl k 
-                              (create_prsymbol (id_clone pr.pr_name)) p]) l
+        let l = List.map (fun p -> create_prop_decl k 
+                            (create_prsymbol (id_clone pr.pr_name)) p) l in
+        begin match k with
+          | Pgoal -> List.map (fun p -> [p]) l
+          | Paxiom -> [l]
+          | _ -> assert false
+        end
     | _ -> [[d]]
 
 let is_split_goal = function Pgoal -> true | _ -> false
