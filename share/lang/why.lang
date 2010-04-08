@@ -23,7 +23,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 -->
 <language id="why" _name="Objective Caml" version="2.0" _section="Sources">
   <metadata>
-    <property name="mimetypes">text/x-ocaml</property>
+    <property name="mimetypes">text/x-why</property>
     <property name="globs">*.ml;*.mli;*.mll;*.mly</property>
     <property name="block-comment-start">(*</property>
     <property name="block-comment-end">*)</property>
@@ -31,7 +31,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
   <styles>
     <style id="comment" _name="Comment" map-to="def:comment"/>
-    <style id="ocamldoc" _name="Ocamldoc Comments" map-to="def:note"/>
     <style id="base-n-integer" _name="Base-N Integer" map-to="def:base-n-integer"/>
     <style id="floating-point" _name="Floating Point number" map-to="def:floating-point"/>
     <style id="decimal" _name="Decimal number" map-to="def:decimal"/>
@@ -54,14 +53,18 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     <define-regex id="cap-ident">\b[A-Z][A-Za-z0-9_']*</define-regex>
     <define-regex id="low-ident">\b[a-z][A-Za-z0-9_']*</define-regex>
     <define-regex id="char-esc">\\((\\|"|'|n|t|b|r)|[0-9]{3}|x[0-9a-fA-F]{2})</define-regex>
+    <!-- " -->
     <context id="escape-seq" style-ref="escape">
       <match>\%{char-esc}</match>
     </context>
     <!-- here's the main context -->
     <context id="why">
       <include>
-	<context id="ocamldoc" style-ref="ocamldoc">
-	  <start>\(\*\*</start>
+	<context id="symbol-star" style-ref="decimal">
+	  <match>\(\*\)</match>
+	</context>
+	<context id="comment" style-ref="comment">
+	  <start>\(\*</start>
 	  <end>\*\)</end>
 	  <include>
 	    <context id="comment-in-comment" style-ref="comment">
@@ -74,18 +77,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 	      </include>
 	    </context>
 	    <context ref="string"/>
-	    <context ref="def:in-comment:*"/>
-	  </include>
-	</context>
-	<context id="symbol-star" style-ref="decimal">
-	  <match>\(\*\)</match>
-	</context>
-	<context id="comment" style-ref="comment">
-	  <start>\(\*</start>
-	  <end>\*\)</end>
-	  <include>
-	    <context ref="string"/>
-	    <context ref="comment-in-comment"/>
 	    <context ref="def:in-comment:*"/>
 	  </include>
 	</context>
@@ -150,39 +141,36 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 	<context id="badlist" style-ref="error" extend-parent="false">
 	  <match>\]</match>
 	</context>
-	<context id="boolean-constant" style-ref="boolean">
-	  <keyword>true</keyword>
-	  <keyword>false</keyword>
+	<context id="keywords" style-ref="meta-keyword">
+	  <keyword>theory</keyword>
+	  <keyword>end</keyword>
+	  <keyword>use</keyword>
+	  <keyword>clone</keyword>
+	  <keyword>namespace</keyword>
+	  <keyword>import</keyword>
+	  <keyword>export</keyword>
+	  <keyword>inductive</keyword>
+	  <keyword>logic</keyword>
+	  <keyword>axiom</keyword>
+	  <keyword>lemma</keyword>
+	  <keyword>goal</keyword>
+	  <keyword>type</keyword>
+	  <keyword>with</keyword>
 	</context>
-	<!-- Flow control & common keywords -->
-	<context id="keywords" style-ref="keyword">
-		<keyword>theory</keyword>
-		<keyword>end</keyword>
-		<keyword>use</keyword>
-		<keyword>clone</keyword>
-		<keyword>namespace</keyword>
-		<keyword>import</keyword>
-		<keyword>export</keyword>
-		<keyword>inductive</keyword>
-		<keyword>logic</keyword>
-		<keyword>axiom</keyword>
-		<keyword>lemma</keyword>
-		<keyword>goal</keyword>
-		<keyword>type</keyword>
-	</context>
-	<!-- types, objects and modules -->
-	<context id="meta-words" style-ref="meta-keyword">
-		<keyword>match</keyword>
-		<keyword>let</keyword>
-      		<keyword>in</keyword>
-		<keyword>if</keyword>
-		<keyword>then</keyword>
-		<keyword>else</keyword>
+	<context id="meta-words" style-ref="keyword">
+	  <keyword>match</keyword>
+	  <keyword>let</keyword>
+      	  <keyword>in</keyword>
+	  <keyword>if</keyword>
+	  <keyword>then</keyword>
+	  <keyword>else</keyword>
+	  <keyword>forall</keyword>
+	  <keyword>-&gt;</keyword>
 	</context>
 	<context id="types" style-ref="type">
 	  <!-- pervasives types -->
-		<keyword>int</keyword>
-		<keyword>real</keyword>
+	  <keyword>int</keyword>
+ 	  <keyword>real</keyword>
 	</context>
       </include>
     </context>
