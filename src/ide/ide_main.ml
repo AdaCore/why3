@@ -46,17 +46,18 @@ let fname = match !file with
       f
 
 let lang =
-  let file = 
+  let load_path = 
     List.fold_right Filename.concat 
-      [Filename.dirname Sys.argv.(0); ".."; "share"; "lang"] "why.lang" 
+      [Filename.dirname Sys.argv.(0); ".."; "share"] "lang" 
   in
-  if Sys.file_exists file then 
-    let languages_manager = GSourceView.source_languages_manager () in
-    GSourceView.source_language_from_file ~languages_manager file
-  else begin
-    Format.eprintf "could not find lang file (%S)@.";
-    None
-  end
+  let languages_manager = 
+    GSourceView2.source_language_manager ~default:true 
+  in
+  languages_manager#set_search_path 
+    (load_path :: languages_manager#search_path);
+  match languages_manager#language "why" with
+    | None -> Format.eprintf "pas trouvé@;"; None
+    | Some _ as l -> l
 
 let text = 
   let ic = open_in fname in
@@ -174,21 +175,18 @@ let main () =
     ~packing:hp#add ()
   in
   let source_view =
-    GSourceView.source_view
+    GSourceView2.source_view
       ~auto_indent:true
-      ~insert_spaces_instead_of_tabs:true ~tabs_width:2
+      ~insert_spaces_instead_of_tabs:true ~tab_width:2
       ~show_line_numbers:true
-      ~margin:80 ~show_margin:true
-      ~smart_home_end:true
+      ~right_margin_position:80 ~show_right_margin:true
+      (* ~smart_home_end:true *)
       ~packing:scrolled_win#add ~height:500 ~width:650
       ()
   in
   source_view#misc#modify_font_by_name font_name;
-  begin match lang with
-    | Some lang -> source_view#source_buffer#set_language lang
-    | None -> () 
-  end;
-  source_view#source_buffer#set_highlight true;
+  source_view#source_buffer#set_language lang;
+  source_view#set_highlight_current_line true;
   source_view#source_buffer#set_text text;
  
   w#add_accel_group accel_group;
@@ -200,6 +198,6 @@ let () =
 
 (*
 Local Variables: 
-compile-command: "unset LANG; make -C ../.. why-ide-yes"
+compile-command: "unset LANG; make -C ../.. ide-opt-yes"
 End: 
 *)

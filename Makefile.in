@@ -273,11 +273,11 @@ ide-opt-yes: bin/whyide.opt
 ide-opt-no:
 
 bin/whyide.opt: $(LIBCMXA) $(IDE_CMX)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -I +threads -o $@ $(EXTCMXA) threads.cmxa lablgtk.cmxa lablgtksourceview.cmxa gtkThread.cmx $^
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -I +threads -o $@ $(EXTCMXA) threads.cmxa lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx $^
 	$(STRIP)    $@
 
 bin/whyide.byte: $(GCMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -I +threads -o $@ $(EXTCMA) lablgtk.cma lablgtksourceview.cma threads.cma gtkThread.cmo $^
+	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -I +threads -o $@ $(EXTCMA) lablgtk.cma lablgtksourceview2.cma threads.cma gtkThread.cmo $^
 
 include .depend.ide
 
