@@ -1,9 +1,13 @@
 
 
-type transaction_mode = | Deferred | Immediate | Exclusive
+(** {1 Proof manager database} *)
+
+(** {2 The persistent database} *)
 
 type handle
   (** Database handle which can be used to create and retrieve objects *)
+
+type transaction_mode = | Deferred | Immediate | Exclusive
 
 val create :
   ?busyfn:(Sqlite3.db -> unit) -> ?mode:transaction_mode ->
@@ -21,34 +25,50 @@ val raw: handle -> Sqlite3.db
       connection, for advanced queries.  *)
 *)
 
+
+(** {2 data} *)
+
+(** The following define records which can be stored in the database
+    with the respective [save] functions, or removed by calling
+    [delete]. Changes are not committed to the database until
+    [save] is invoked.  *)
+
+type db_ident (* = int64 *)
+(** hidden type for record unique identifiers *)
+
+type loc_record = private
+    { mutable id : db_ident option;
+      (** when None, the record has never been stored in database yet *)
+      mutable file : string;
+      mutable line : int;
+      mutable start : int;
+      mutable stop : int;
+    }
+
+
+
 module Loc : sig
+  
+  val save: handle -> loc_record -> db_ident
+    (** [save db loc] saves [loc] in database [db]. The record is created
+        if it does not exist yet. {!save}
 
-  type t = {
-    mutable id : int64 option;
-    mutable file : string;
-    mutable line : int64;
-    mutable start : int64;
-    mutable stop : int64;
-  }
-      (** A record which can be stored in the database with the [save]
-          function, or removed by calling [delete]. Changes are not
-          committed to the database until [save] is invoked.  *)
-
-  val save: handle -> t -> int64 
-
-  val delete: handle -> t -> unit
-
+        @return the index of the saved record, which is also equal to loc.id 
+    *)
+        
+  val delete: handle -> loc_record -> unit
+    (** [delete db loc] removes the record from database {!delete} *)
 
   val create :
-    ?id:int64 ->
+ (*   ?id:int64 -> *)
     file:string ->
-    line:int64 ->
-    start:int64 ->
-    stop:int64 ->
-    t
-    (** Can be used to construct a new object.  If [id] is not specified, it will be automatically assigned the first time [save] is called on the object.  The object is not committed to the database until [save] is invoked.  The [save] method will also return the [id] assigned to the object.
-        @raise Sql_error if a database error is encountered
-    *)
+    line:int ->
+    start:int ->
+    stop:int ->
+    loc_record
+      (** Can be used to construct a new object.  If [id] is not specified, it will be automatically assigned the first time [save] is called on the object.  The object is not committed to the database until [save] is invoked.  The [save] method will also return the [id] assigned to the object.
+          @raise Sql_error if a database error is encountered
+      *)
 
   val get :
     ?id:int64 ->
@@ -56,12 +76,24 @@ module Loc : sig
     ?line:int64 ->
     ?start:int64 ->
     ?stop:int64 ->
-    ?custom_where:string * Sqlite3.Data.t list -> handle -> t list
+    ?custom_where:string * Sqlite3.Data.t list -> handle -> loc_record list
   (** Used to retrieve objects from the database.  If an argument is specified, it is included in the search criteria (all fields are ANDed together).
    @raise Sql_error if a database error is encountered
     *)
 
 end
+
+
+(** {2 proof attempts and transformations} *)
+
+(** status of an external proof attempt *)
+type proof_attempt_status =
+  | Running (** external proof attempt is in progress *)
+  | Success (** external proof attempt succeeded *)
+  | Timeout (** external proof attempt was interrupted *)
+  | Unknown (** external prover answered ``don't know'' or equivalent *)
+  | HighFailure (** external prover call failed *)
+
 
 (*
 module External_proof : sig
@@ -203,3 +235,5 @@ module Transf : sig
 
 end
 *)
+
+

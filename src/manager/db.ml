@@ -82,24 +82,30 @@ let step_fold db stmt iterfn =
   fn []
 
 
-module Loc = struct
+(** Data *)
 
-  type t = {
-    mutable id : int64 option;
-    mutable file : string;
-    mutable line : int64;
-    mutable start : int64;
-    mutable stop : int64;
-  }
+type db_ident = int64 
+
+type loc_record = 
+    { mutable id : db_ident option;
+      (** when None, the record has never been stored in database yet *)
+      mutable file : string;
+      mutable line : int;
+      mutable start : int;
+      mutable stop : int;
+    }
+
+
+module Loc = struct
 
   let init db =
     let sql = "create table if not exists loc (id integer primary key autoincrement,file text,line integer,start integer,stop integer);" in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 
   (* object definition *)
-  let create ?id ~file ~line ~start ~stop : t = 
+  let create (* ?id *) ~file ~line ~start ~stop : loc_record = 
     { 
-      id = id;
+      id = None (* id *);
       file = file;
       line = line;
       start = start;
@@ -131,13 +137,13 @@ module Loc = struct
                     (let v = loc.file in Sqlite3.Data.TEXT v));
                db_must_ok db 
                  (fun () -> Sqlite3.bind stmt 2 
-                    (let v = loc.line in Sqlite3.Data.INT v));
+                    (let v = Int64.of_int loc.line in Sqlite3.Data.INT v));
                db_must_ok db 
                  (fun () -> Sqlite3.bind stmt 3 
-                    (let v = loc.start in Sqlite3.Data.INT v));
+                    (let v = Int64.of_int loc.start in Sqlite3.Data.INT v));
                db_must_ok db 
                  (fun () -> Sqlite3.bind stmt 4 
-                    (let v = loc.stop in Sqlite3.Data.INT v));
+                    (let v = Int64.of_int loc.stop in Sqlite3.Data.INT v));
                db_must_done db (fun () -> Sqlite3.step stmt);
                let new_id = Sqlite3.last_insert_rowid db.raw_db in
                loc.id <- Some new_id;
@@ -153,13 +159,13 @@ module Loc = struct
                     (let v = loc.file in Sqlite3.Data.TEXT v));
                db_must_ok db 
                  (fun () -> Sqlite3.bind stmt 2 
-                    (let v = loc.line in Sqlite3.Data.INT v));
+                    (let v = Int64.of_int loc.line in Sqlite3.Data.INT v));
                db_must_ok db 
                  (fun () -> Sqlite3.bind stmt 3 
-                    (let v = loc.start in Sqlite3.Data.INT v));
+                    (let v = Int64.of_int loc.start in Sqlite3.Data.INT v));
                db_must_ok db 
                  (fun () -> Sqlite3.bind stmt 4 
-                    (let v = loc.stop in Sqlite3.Data.INT v));
+                    (let v = Int64.of_int loc.stop in Sqlite3.Data.INT v));
                db_must_ok db 
                  (fun () -> Sqlite3.bind stmt 5 (Sqlite3.Data.INT id));
                db_must_done db (fun () -> Sqlite3.step stmt);
@@ -244,36 +250,36 @@ module Loc = struct
     end;
   (* convert statement into an ocaml object *)
     let of_stmt stmt =
-      create
-	(* native fields *)
-	?id:(match Sqlite3.column stmt 0 with
+      { (* native fields *)
+	id = (match Sqlite3.column stmt 0 with
                | Sqlite3.Data.NULL -> None
                | Sqlite3.Data.INT i -> Some i 
 	       | x -> 
 		   try Some (Int64.of_string (Sqlite3.Data.to_string x))
-		   with _ -> failwith "error: loc id")
-	~file:(match Sqlite3.column stmt 1 with
+		   with _ -> failwith "error: loc id") ;
+	file = (match Sqlite3.column stmt 1 with
 		 | Sqlite3.Data.NULL -> failwith "null of_stmt"
-		 | x -> Sqlite3.Data.to_string x)
-	~line:(match Sqlite3.column stmt 2 with
+		 | x -> Sqlite3.Data.to_string x) ;
+	line = (match Sqlite3.column stmt 2 with
 		 | Sqlite3.Data.NULL -> failwith "null of_stmt"
-		 | Sqlite3.Data.INT i -> i 
+		 | Sqlite3.Data.INT i -> Int64.to_int i 
 		 | x -> 
-		     try Int64.of_string (Sqlite3.Data.to_string x) 
-		     with _ -> failwith "error: loc line")
-	~start:(match Sqlite3.column stmt 3 with
+		     try int_of_string (Sqlite3.Data.to_string x) 
+		     with _ -> failwith "error: loc line") ;
+	start = (match Sqlite3.column stmt 3 with
 		  | Sqlite3.Data.NULL -> failwith "null of_stmt"
-		  | Sqlite3.Data.INT i -> i 
+		  | Sqlite3.Data.INT i -> Int64.to_int i 
 		  | x -> 
-		      try Int64.of_string (Sqlite3.Data.to_string x) 
-		      with _ -> failwith "error: loc start")
-	~stop:(match Sqlite3.column stmt 4 with
+		      try int_of_string (Sqlite3.Data.to_string x) 
+		      with _ -> failwith "error: loc start") ;
+	stop = (match Sqlite3.column stmt 4 with
 		 | Sqlite3.Data.NULL -> failwith "null of_stmt"
-		 | Sqlite3.Data.INT i -> i 
+		 | Sqlite3.Data.INT i -> Int64.to_int i 
 		 | x -> 
-		     try Int64.of_string (Sqlite3.Data.to_string x) 
+		     try int_of_string (Sqlite3.Data.to_string x) 
 		     with _ -> failwith "error: loc stop")
 	(* foreign fields *)
+      }
     in 
     (* execute the SQL query *)
     step_fold db stmt of_stmt
@@ -516,12 +522,20 @@ module External_proof = struct
 *)
 end
 
+
+type proof_attempt_status =
+  | Running (** external proof attempt is in progress *)
+  | Success (** external proof attempt succeeded *)
+  | Timeout (** external proof attempt was interrupted *)
+  | Unknown (** external prover answered ``don't know'' or equivalent *)
+  | HighFailure (** external prover call failed *)
+
 type goal = {
   mutable id : int64 option;
   mutable task_checksum : string;
   mutable parent : transf option;
   mutable name : string;
-  mutable pos : Loc.t;
+  mutable pos : loc_record;
   mutable external_proofs : External_proof.t list;
   mutable transformations : transf list;
   mutable proved : int64;

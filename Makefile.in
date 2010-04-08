@@ -464,7 +464,7 @@ clean::
 APIDOCSRC = $(UTIL_CMO:.cmo=.mli) $(CORE_CMO:.cmo=.mli) \
 	src/driver/call_provers.mli \
 	src/driver/driver.mli \
-	src/manager/state.mli
+	src/manager/db.mli
 
 .PHONY: apidoc
 
@@ -472,7 +472,7 @@ apidoc: $(APIDOCSRC)
 	rm -f apidoc/* 
 	mkdir -p apidoc
 	$(OCAMLDOC) -d apidoc -html -I src/util -I src/core -I src/driver \
-		$(APIDOCSRC)
+			-I +sqlite3 $(APIDOCSRC)
 
 
 # special rules
