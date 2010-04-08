@@ -140,6 +140,7 @@ LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 $(LIBCMO) $(LIBCMX): INCLUDES=$(LIBINCLUDES)
 $(LIBCMX): OFLAGS+=-for-pack Why
 
+LIBCMI  = why.cmi
 LIBCMA  = why.cma
 LIBCMXA = why.cmxa
 
@@ -154,6 +155,8 @@ $(LIBCMXA): why.cmx
 
 why.cmo: $(LIBCMO)
 	$(OCAMLC) $(BFLAGS) -pack -o $@ $(LIBCMO)
+
+$(LIBCMI) : why.cmo
 
 why.cmx: $(LIBCMX)
 	$(OCAMLOPT) $(INCLUDES) -pack -o $@ $(LIBCMX)
@@ -172,6 +175,8 @@ depend: .depend.lib
 byte: bin/why.byte
 opt:  bin/why.opt
 
+src/main.cmx : $(LIBCMI)
+
 bin/why.opt: $(LIBCMXA) src/main.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
@@ -188,13 +193,16 @@ clean::
 ##########
 
 PGM_GENERATED = src/programs/pgm_lexer.ml src/programs/pgm_parser.mli \
-	        src/programs/pgm_parser.output src/programs/pgm_parser.ml 
+	        src/programs/pgm_parser.output src/programs/pgm_parser.ml
 
-PGM_CMO := pgm_parser.cmo pgm_lexer.cmo pgm_typing.cmo pgm_main.cmo
+PGM_CMO := pgm_parser.cmo pgm_lexer.cmo pgm_typing.cmo pgm_main.cmo\
+	   pgm_ttree.cmo pgm_ptree.cmo
+
 PGM_CMO := $(addprefix src/programs/, $(PGM_CMO))
 PGM_CMX = $(PGM_CMO:.cmo=.cmx)
 
 $(PGM_CMO) $(PGM_CMX): INCLUDES=-I src/programs/
+$(PGM_CMO) $(PGM_CMX): $(LIBCMI)
 
 opt:  bin/whyml.opt
 byte: bin/whyml.byte
@@ -239,6 +247,7 @@ MANAGER_CMO := db.cmo
 MANAGER_CMO := $(addprefix src/manager/,$(MANAGER_CMO))
 
 $(MANAGER_CMO): INCLUDES=-I src/manager -I +sqlite3 -I +threads
+$(MANAGER_CMO): $(LIBCMI)
 
 bin/manager.byte: $(LIBCMA) $(MANAGER_CMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) \
@@ -483,7 +492,7 @@ apidoc: $(APIDOCSRC)
 # generic rules
 ###############
 
-.SUFFIXES: .mli .ml .cmi .cmo .cmx .mll .mly .v .vo .ml4 .cmxs
+.SUFFIXES: .mli .ml .cmi .cmo .cmx .mll .mly .v .vo .ml4 .cmxs .output
 
 .mli.cmi:
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) $(APRONLIB) $(ATPLIB) -c $(BFLAGS) $<
@@ -511,6 +520,10 @@ apidoc: $(APIDOCSRC)
 
 .mly.mli:
 	$(OCAMLYACC) -v $<
+
+#Pour make -j :
+.ml.output:
+	@echo .output.ml : $<
 
 .ml4.ml:
 	$(CAMLP4) pr_o.cmo -impl $< > $@
