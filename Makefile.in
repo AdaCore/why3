@@ -156,7 +156,8 @@ $(LIBCMXA): why.cmx
 why.cmo: $(LIBCMO)
 	$(OCAMLC) $(BFLAGS) -pack -o $@ $(LIBCMO)
 
-$(LIBCMI) : why.cmo
+$(LIBCMI) : why.cmo why.cmx
+	@echo -n
 
 why.cmx: $(LIBCMX)
 	$(OCAMLOPT) $(INCLUDES) -pack -o $@ $(LIBCMX)
@@ -515,15 +516,11 @@ apidoc: $(APIDOCSRC)
 .mll.ml:
 	$(OCAMLLEX) $<
 
-.mly.ml:
+.mly.output :
 	$(OCAMLYACC) -v $<
 
-.mly.mli:
-	$(OCAMLYACC) -v $<
-
-#Pour make -j :
-.ml.output:
-	@echo .output.ml : $<
+%.ml %.mli : %.output %.mly
+	@echo -n
 
 .ml4.ml:
 	$(CAMLP4) pr_o.cmo -impl $< > $@
