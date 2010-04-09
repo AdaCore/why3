@@ -111,7 +111,7 @@ type proof_attempt_status =
 
 type prover_data =
     { prover_name : string;
-      driver : Driver.driver;
+      driver : Why.Driver.driver;
     }
 
 type external_proof = {
@@ -134,7 +134,7 @@ let trace e = e.trace
 let proof_obsolete e = e.proof_obsolete
 
 type goal_origin =
-  | Goal of Decl.prsymbol
+  | Goal of Why.Decl.prsymbol
 (*
   | VCfun of loc * explain * ...
   | Subgoal of goal
@@ -142,13 +142,13 @@ type goal_origin =
 
 type transf_data =
     { transf_name : string;
-      transf_action : Task.task Register.tlist_reg
+      transf_action : Why.Task.task Why.Register.tlist_reg
     }
 
 
 type goal = {
-  mutable id : db_ident option;
-  mutable task : Task.task;
+  mutable goal_id : db_ident option;
+  mutable task : Why.Task.task;
   mutable task_checksum: string;
 (*
   mutable parent : transf option;
@@ -588,6 +588,13 @@ end
 module Goal = struct
   
   type t = goal
+      
+  let hash g = Hashtbl.hash g.goal_id
+
+  let equal g1 g2 = g1.goal_id = g2.goal_id
+
+  let compare g1 g2 = Pervasives.compare g1.goal_id g2.goal_id
+
 
 (*
   let init db =
@@ -1019,19 +1026,27 @@ end
 let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
   match !current_db with
     | None ->
-	current_db <- Some {
+        let db = {
 	  raw_db = Sqlite3.db_open db_name; 
 	  in_transaction = 0; 
 	  mode = mode; 
-	  busyfn = busyfn } 
+	  busyfn = busyfn;
+        } 
 	in
+	current_db := Some db;
 	Loc.init db;
 	(*
 	  External_proof.init db;
 	  Goal.init db;
 	  Transf.init db;
 	*)
-	db
+
+    | Some _ -> failwith "database already opened"
+
+let init_base f = init_db f
+
+let root_goals () = assert false (* TODO *)
+
 
 
 exception AlreadyAttempted
@@ -1042,7 +1057,7 @@ let try_prover ~timelimit:int ?memlimit:int (g : goal) (d: prover_data) : unit =
 let add_transformation (g : goal) (t : transf) :  unit =
   assert false (* TODO *)
 
-let add_or_replace_goal (g : goal) :  unit =
+let add_or_replace_task (name : string) (t : Why.Task.task) :  unit =
   assert false (* TODO *)
 
 let read_db_from_file (file : string) : goal list =

@@ -64,7 +64,7 @@ type proof_attempt_status =
 
 type prover_data =
     { prover_name : string;
-      driver : Driver.driver;
+      driver : Why.Driver.driver;
     }
 
 type external_proof
@@ -86,16 +86,30 @@ type goal_origin =
 *)
 *)
 
+type goal
+
+module Goal : sig
+  
+  type t = goal
+      
+  val hash : t -> int
+
+  val equal : t -> t -> bool
+
+  val compare : t -> t -> int
+
+end
+
 type transf_data =
     { transf_name : string;
-      transf_action : Task.task Register.tlist_reg
+      transf_action : Why.Task.task Why.Register.tlist_reg
     }
 
 type transf
 
-type goal
+(** goal accessors *)
 
-val goal_task : goal -> Task.task
+val goal_task : goal -> Why.Task.task
 val goal_task_checksum: goal -> string
 (*
   val parent : goal -> transf option
@@ -115,9 +129,12 @@ val goal_proved : goal -> bool
 
 
 
+(** transf accessors *)
+
 val transf_data : transf -> transf_data
 val transf_obsolete :  transf -> bool
 val subgoals : transf -> goal list
+
 
 
 (** {2 The persistent database} *)
@@ -127,6 +144,7 @@ val init_base : string -> unit
 
 val root_goals : unit -> goal list
 (** returns the current set of root goals *)
+
 
 
 
@@ -184,7 +202,7 @@ val add_transformation: goal -> transf -> unit
 
 (* {2 goal updates} *)
 
-val add_or_replace_goal: goal -> unit 
+val add_or_replace_task: string -> Why.Task.task -> unit 
   (** updates the database with the new goal.  If a goal with the same
       origin already exists, it is checked whether the task to
       prove is different or not. If it is the same, proof attempts are

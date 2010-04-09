@@ -197,7 +197,7 @@ let print_th_namespace fmt th =
 
 let fname_printer = ref (Ident.create_ident_printer [])
 
-let do_task env drv fname tname th task =
+let do_task env drv fname tname (th : Why.Theory.theory) (task : Task.task) =
   if !opt_prove then begin
     let res = Driver.call_prover ~debug:!opt_debug ?timeout drv task in
     printf "%s %s %s : %a@." fname tname

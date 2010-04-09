@@ -125,8 +125,7 @@ TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
 DRIVER_CMO := driver_ast.cmo call_provers.cmo dynlink_compat.cmo \
-              driver_parser.cmo\
-	driver_lexer.cmo driver.cmo
+              driver_parser.cmo driver_lexer.cmo whyrc.cmo driver.cmo
 DRIVER_CMO := $(addprefix src/driver/,$(DRIVER_CMO))
 
 PRINTER_CMO := print_real.cmo alt_ergo.cmo why3.cmo smt.cmo coq.cmo
@@ -244,10 +243,10 @@ $(ORM_CMO): INCLUDES=-I src/orm -I +sqlite3
 
 src/manager/orm_schema.ml: $(ORM_CMO)
 
-MANAGER_CMO := db.cmo 
+MANAGER_CMO := db.cmo test.cmo
 MANAGER_CMO := $(addprefix src/manager/,$(MANAGER_CMO))
 
-$(MANAGER_CMO): INCLUDES=-I src/core -I src/driver -I src/manager -I +sqlite3 -I +threads
+$(MANAGER_CMO): INCLUDES=-I src/manager -I +sqlite3 -I +threads
 $(MANAGER_CMO): $(LIBCMI)
 
 bin/manager.byte: $(LIBCMA) $(MANAGER_CMO)
