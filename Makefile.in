@@ -246,7 +246,7 @@ src/manager/orm_schema.ml: $(ORM_CMO)
 MANAGER_CMO := db.cmo 
 MANAGER_CMO := $(addprefix src/manager/,$(MANAGER_CMO))
 
-$(MANAGER_CMO): INCLUDES=-I src/manager -I +sqlite3 -I +threads
+$(MANAGER_CMO): INCLUDES=-I src/core -I src/driver -I src/manager -I +sqlite3 -I +threads
 $(MANAGER_CMO): $(LIBCMI)
 
 bin/manager.byte: $(LIBCMA) $(MANAGER_CMO)

@@ -26,17 +26,25 @@ val raw: handle -> Sqlite3.db
 *)
 
 
-(** {2 data} *)
 
-(** The following define records which can be stored in the database
-    with the respective [save] functions, or removed by calling
-    [delete]. Changes are not committed to the database until
-    [save] is invoked.  *)
 
+
+
+(* {2 proof attempts and transformations} *)
+
+
+(** {2 Current proof state} *)
+
+
+(*
 type db_ident (* = int64 *)
 (** hidden type for record unique identifiers *)
+*)
 
-type loc_record = private
+(*
+type loc_record 
+*)
+(*= private
     { mutable id : db_ident option;
       (** when None, the record has never been stored in database yet *)
       mutable file : string;
@@ -44,196 +52,144 @@ type loc_record = private
       mutable start : int;
       mutable stop : int;
     }
-
-
-
-module Loc : sig
-  
-  val save: handle -> loc_record -> db_ident
-    (** [save db loc] saves [loc] in database [db]. The record is created
-        if it does not exist yet. {!save}
-
-        @return the index of the saved record, which is also equal to loc.id 
-    *)
-        
-  val delete: handle -> loc_record -> unit
-    (** [delete db loc] removes the record from database {!delete} *)
-
-  val create :
- (*   ?id:int64 -> *)
-    file:string ->
-    line:int ->
-    start:int ->
-    stop:int ->
-    loc_record
-      (** Can be used to construct a new object.  If [id] is not specified, it will be automatically assigned the first time [save] is called on the object.  The object is not committed to the database until [save] is invoked.  The [save] method will also return the [id] assigned to the object.
-          @raise Sql_error if a database error is encountered
-      *)
-
-  val get :
-    ?id:int64 ->
-    ?file:string ->
-    ?line:int64 ->
-    ?start:int64 ->
-    ?stop:int64 ->
-    ?custom_where:string * Sqlite3.Data.t list -> handle -> loc_record list
-  (** Used to retrieve objects from the database.  If an argument is specified, it is included in the search criteria (all fields are ANDed together).
-   @raise Sql_error if a database error is encountered
-    *)
-
-end
-
-
-(** {2 proof attempts and transformations} *)
+*)
 
 (** status of an external proof attempt *)
 type proof_attempt_status =
+  | Scheduled (** external proof attempt is scheduled *)
   | Running (** external proof attempt is in progress *)
   | Success (** external proof attempt succeeded *)
   | Timeout (** external proof attempt was interrupted *)
   | Unknown (** external prover answered ``don't know'' or equivalent *)
   | HighFailure (** external prover call failed *)
 
+type prover_data =
+    { prover_name : string;
+      driver : Driver.driver;
+    }
+
+type external_proof
+
+val prover : external_proof -> prover_data
+val timelimit : external_proof -> int
+val memlimit : external_proof -> int
+val status : external_proof -> proof_attempt_status
+val result_time : external_proof -> float
+val trace : external_proof -> string
+val proof_obsolete : external_proof -> bool
 
 (*
-module External_proof : sig
-  type t = <
-    id : int64 option;
-    set_id : int64 option -> unit;
-    prover : string;
-    set_prover : string -> unit;
-    timelimit : int64;
-    set_timelimit : int64 -> unit;
-    memlimit : int64;
-    set_memlimit : int64 -> unit;
-    status : int64;
-    set_status : int64 -> unit;
-    result_time : float;
-    set_result_time : float -> unit;
-    trace : string;
-    set_trace : string -> unit;
-    obsolete : int64;
-    set_obsolete : int64 -> unit;
-    save: int64; delete: unit
-  >
-
-  (** An object which can be stored in the database with the [save] method call, or removed by calling [delete].  Fields can be accessed via the approriate named method and set via the [set_] methods.  Changes are not committed to the database until [save] is invoked.
-    *)
-
-  val t :
-    ?id:int64 option ->
-    prover:string ->
-    timelimit:int64 ->
-    memlimit:int64 ->
-    status:int64 ->
-    result_time:float ->
-    trace:string ->
-    obsolete:int64 ->
-    Init.t -> t
-  (** Can be used to construct a new object.  If [id] is not specified, it will be automatically assigned the first time [save] is called on the object.  The object is not committed to the database until [save] is invoked.  The [save] method will also return the [id] assigned to the object.
-   @raise Sql_error if a database error is encountered
-    *)
-
-  val get :
-    ?id:int64 option ->
-    ?prover:string option ->
-    ?timelimit:int64 option ->
-    ?memlimit:int64 option ->
-    ?status:int64 option ->
-    ?result_time:float option ->
-    ?trace:string option ->
-    ?obsolete:int64 option ->
-    ?custom_where:string * Sqlite3.Data.t list -> Init.t -> t list
-  (** Used to retrieve objects from the database.  If an argument is specified, it is included in the search criteria (all fields are ANDed together).
-   @raise Sql_error if a database error is encountered
-    *)
-
-end
-module Goal : sig
-  type t = <
-    id : int64 option;
-    set_id : int64 option -> unit;
-    task_checksum : string;
-    set_task_checksum : string -> unit;
-    parent : Transf.t;
-    set_parent : Transf.t -> unit;
-    name : string;
-    set_name : string -> unit;
-    pos : Loc.t;
-    set_pos : Loc.t -> unit;
-    external_proofs : External_proof.t list;
-    set_external_proofs : External_proof.t list -> unit;
-    transformations : Transf.t list;
-    set_transformations : Transf.t list -> unit;
-    proved : int64;
-    set_proved : int64 -> unit;
-    save: int64; delete: unit
-  >
-
-  (** An object which can be stored in the database with the [save] method call, or removed by calling [delete].  Fields can be accessed via the approriate named method and set via the [set_] methods.  Changes are not committed to the database until [save] is invoked.
-    *)
-
-  val t :
-    ?id:int64 option ->
-    task_checksum:string ->
-    parent:Transf.t ->
-    name:string ->
-    pos:Loc.t ->
-    external_proofs:External_proof.t list ->
-    transformations:Transf.t list ->
-    proved:int64 ->
-    Init.t -> t
-  (** Can be used to construct a new object.  If [id] is not specified, it will be automatically assigned the first time [save] is called on the object.  The object is not committed to the database until [save] is invoked.  The [save] method will also return the [id] assigned to the object.
-   @raise Sql_error if a database error is encountered
-    *)
-
-  val get :
-    ?id:int64 option ->
-    ?task_checksum:string option ->
-    ?name:string option ->
-    ?proved:int64 option ->
-    ?custom_where:string * Sqlite3.Data.t list -> Init.t -> t list
-  (** Used to retrieve objects from the database.  If an argument is specified, it is included in the search criteria (all fields are ANDed together).
-   @raise Sql_error if a database error is encountered
-    *)
-
-end
-module Transf : sig
-  type t = <
-    id : int64 option;
-    set_id : int64 option -> unit;
-    name : string;
-    set_name : string -> unit;
-    obsolete : int64;
-    set_obsolete : int64 -> unit;
-    subgoals : Goal.t list;
-    set_subgoals : Goal.t list -> unit;
-    save: int64; delete: unit
-  >
-
-  (** An object which can be stored in the database with the [save] method call, or removed by calling [delete].  Fields can be accessed via the approriate named method and set via the [set_] methods.  Changes are not committed to the database until [save] is invoked.
-    *)
-
-  val t :
-    ?id:int64 option ->
-    name:string ->
-    obsolete:int64 ->
-    subgoals:Goal.t list ->
-    Init.t -> t
-  (** Can be used to construct a new object.  If [id] is not specified, it will be automatically assigned the first time [save] is called on the object.  The object is not committed to the database until [save] is invoked.  The [save] method will also return the [id] assigned to the object.
-   @raise Sql_error if a database error is encountered
-    *)
-
-  val get :
-    ?id:int64 option ->
-    ?name:string option ->
-    ?obsolete:int64 option ->
-    ?custom_where:string * Sqlite3.Data.t list -> Init.t -> t list
-  (** Used to retrieve objects from the database.  If an argument is specified, it is included in the search criteria (all fields are ANDed together).
-   @raise Sql_error if a database error is encountered
-    *)
-
-end
+type goal_origin =
+  | Goal of Decl.prsymbol
+(*
+  | VCfun of loc * explain * ...
+  | Subgoal of goal
+*)
 *)
 
+type transf_data =
+    { transf_name : string;
+      transf_action : Task.task Register.tlist_reg
+    }
 
+type transf
+
+type goal
+
+val goal_task : goal -> Task.task
+val goal_task_checksum: goal -> string
+(*
+  val parent : goal -> transf option
+*)
+val external_proofs : goal -> external_proof list
+val transformations : goal -> transf list
+
+val goal_proved : goal -> bool
+  (** [goal_proved g] returns true iff either
+      exists proof p in [external_proofs g] s.t.
+          proof_obsolete p == false and status p = Valid
+      or
+      exists transf t in [transformations g] s.t.
+            transf_obsolete t == false and
+            forall g in [subgoals t], [goal_proved g]
+  *)
+
+
+
+val transf_data : transf -> transf_data
+val transf_obsolete :  transf -> bool
+val subgoals : transf -> goal list
+
+
+val read_db_from_file : string -> goal list
+(** returns the set of root goals *)
+
+(** {2 attempts to solve goals} *)
+
+exception AlreadyAttempted
+
+val try_prover : 
+  timelimit:int -> ?memlimit:int -> goal -> prover_data -> unit 
+  (** attempts to prove goal with the given prover. This function adds
+      a new corresponding attempt for that goal, sets its current
+      status to Running, launches the prover in a separate process and
+      returns immediately.
+
+      Upon termination of the external process, the prover's answer is
+      retrieved and database is updated. The [proved] field of the
+      database is updated, and also these of any goal affected, according
+      to invariant above. Goal observers are notified of any change
+      of goal statuses.
+
+      @param timelimit CPU time limit given for that attempt, must be positive
+
+      @raise AlreadyAttempted if there already exists a non-obsolete
+      external proof attempt with the same driver and time limit, or
+      with a different time limit and a result different from Timeout
+
+
+  *)
+
+val add_transformation: goal -> transf -> unit
+  (** adds a transformation on the goal. This function adds a new
+      corresponding attempt for that goal, computes the subgoals and
+      and them in the database. In the case where no subgoal is
+      genereated, the [proved] field is updated, and those of parent
+      goals.
+
+      if this transformation has already been attempted but is markes
+      as obsolete, it is retried, and the new lists of goals is
+      carefully matched with the older subgoals, so that if some
+      subgoals are identical to older ones, then the proof is kept.
+      Notice that no old proof attempts should be lost in this
+      process, e.g if the old trans formation produced 3 subgoals
+      A,B,C, C was proved interactively, and the new transformations
+      produces only 2 goals, the interactive proof of C is keep in an
+      extra dummy goal "true"
+      
+      @raise AlreadyAttempted if this transformation has already been attempted
+      and is not obsolete
+
+  *)
+
+
+
+(** TODO: removal of attempts *)
+
+(* {2 goal updates} *)
+
+val add_or_replace_goal: goal -> unit 
+  (** updates the database with the new goal.  If a goal with the same
+      origin already exists, it is checked whether the task to
+      prove is different or not. If it is the same, proof attempts are
+      preserved. If not the same, former proof attempts are marked as
+      obsolete.
+
+      IMPORTANT: this kills every running prover tasks
+
+  *)
+
+(** TODO: full update, removing goals that are not pertinent anymore *)
+
+
+  

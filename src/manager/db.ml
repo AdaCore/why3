@@ -87,13 +87,100 @@ let step_fold db stmt iterfn =
 type db_ident = int64 
 
 type loc_record = 
-    { mutable id : db_ident option;
+    { mutable loc_id : db_ident option;
       (** when None, the record has never been stored in database yet *)
       mutable file : string;
       mutable line : int;
       mutable start : int;
       mutable stop : int;
     }
+
+
+type proof_attempt_status =
+  | Scheduled (** external proof attempt is scheduled *)
+  | Running (** external proof attempt is in progress *)
+  | Success (** external proof attempt succeeded *)
+  | Timeout (** external proof attempt was interrupted *)
+  | Unknown (** external prover answered ``don't know'' or equivalent *)
+  | HighFailure (** external prover call failed *)
+
+type prover_data =
+    { prover_name : string;
+      driver : Driver.driver;
+    }
+
+type external_proof = {
+    mutable external_proof_id : db_ident option;
+    mutable prover : prover_data;
+    mutable timelimit : int;
+    mutable memlimit : int;
+    mutable status : proof_attempt_status;
+    mutable result_time : float;
+    mutable trace : string;
+    mutable proof_obsolete : bool;
+}
+
+let prover e = e.prover
+let timelimit e = e.timelimit
+let memlimit e = e.memlimit
+let status e = e.status
+let result_time e = e.result_time
+let trace e = e.trace
+let proof_obsolete e = e.proof_obsolete
+
+type goal_origin =
+  | Goal of Decl.prsymbol
+(*
+  | VCfun of loc * explain * ...
+  | Subgoal of goal
+*)
+
+type transf_data =
+    { transf_name : string;
+      transf_action : Task.task Register.tlist_reg
+    }
+
+
+type goal = {
+  mutable id : db_ident option;
+  mutable task : Task.task;
+  mutable task_checksum: string;
+(*
+  mutable parent : transf option;
+*)
+  mutable proved : bool;
+  (** invariant: g.proved == true iff
+      exists attempts a in g.attempts, a.obsolete == false and
+      (a = External e and e.result == Valid or
+      a = Transf(gl) and forall g in gl, g.proved)
+  *)
+  mutable observers: (bool -> unit) list;
+  (** observers that wants to be notified by any changes of the proved status *)
+(*
+  mutable name : string;
+*)
+  mutable external_proofs : external_proof list;
+  mutable transformations : transf list;
+}
+
+and transf = {
+    mutable id : int64 option;
+    mutable transf_data : transf_data;
+    mutable transf_obsolete : bool;
+    mutable subgoals : goal list;
+}
+
+
+let goal_task g = g.task
+let goal_task_checksum g = g.task_checksum
+let external_proofs g = g.external_proofs
+let transformations g = g.transformations
+let goal_proved g = g.proved
+
+let transf_data t = t.transf_data
+let transf_obsolete t = t.transf_obsolete
+let subgoals t = t.subgoals
+
 
 
 module Loc = struct
@@ -105,7 +192,7 @@ module Loc = struct
   (* object definition *)
   let create (* ?id *) ~file ~line ~start ~stop : loc_record = 
     { 
-      id = None (* id *);
+      loc_id = None (* id *);
       file = file;
       line = line;
       start = start;
@@ -114,20 +201,20 @@ module Loc = struct
 
   (* admin functions *)
   let delete db loc =
-    match loc.id with
+    match loc.loc_id with
       | None -> ()
       | Some id ->
           let sql = "DELETE FROM loc WHERE id=?" in
           let stmt = Sqlite3.prepare db.raw_db sql in
           db_must_ok db (fun () -> Sqlite3.bind stmt 1 (Sqlite3.Data.INT id));
           ignore (step_fold db stmt (fun _ -> ()));
-          loc.id <- None
+          loc.loc_id <- None
 
-  let save db loc = 
+  let save db (loc : loc_record) = 
     transaction db 
       (fun () ->
          (* insert any foreign-one fields into their table and get id *)
-         let curobj_id = match loc.id with
+         let curobj_id = match loc.loc_id with
            | None -> 
                (* insert new record *)
                let sql = "INSERT INTO loc VALUES(NULL,?,?,?,?)" in
@@ -146,7 +233,7 @@ module Loc = struct
                     (let v = Int64.of_int loc.stop in Sqlite3.Data.INT v));
                db_must_done db (fun () -> Sqlite3.step stmt);
                let new_id = Sqlite3.last_insert_rowid db.raw_db in
-               loc.id <- Some new_id;
+               loc.loc_id <- Some new_id;
                new_id
            | Some id -> 
                (* update *)
@@ -251,7 +338,7 @@ module Loc = struct
   (* convert statement into an ocaml object *)
     let of_stmt stmt =
       { (* native fields *)
-	id = (match Sqlite3.column stmt 0 with
+	loc_id = (match Sqlite3.column stmt 0 with
                | Sqlite3.Data.NULL -> None
                | Sqlite3.Data.INT i -> Some i 
 	       | x -> 
@@ -286,55 +373,26 @@ module Loc = struct
 
 end
 
+let int64_from_bool b =
+  if b then 1L else 0L
+
+let int64_from_pas = function
+  | Scheduled -> 1L
+  | Running -> 2L
+  | Success -> 3L
+  | Timeout -> 4L
+  | Unknown -> 5L
+  | HighFailure -> 6L
+
 module External_proof = struct
 
-
-  type t = {
-    mutable id : int64 option;
-    mutable prover : string;
-    mutable timelimit : int64;
-    mutable memlimit : int64;
-    mutable status : int64;
-    mutable result_time : float;
-    mutable trace : string;
-    mutable obsolete : int64;
-  }
-
-  let save db t : int64 =
-    assert false
-
-  let delete db t : unit =
-    assert false
 
   let init db =
     let sql = "create table if not exists external_proof (id integer primary key autoincrement,prover text,timelimit integer,memlimit integer,status integer,result_time real,trace text,obsolete integer);" in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 
-(*
-  (* object definition *)
-  let t ?(id=None) ~prover ~timelimit ~memlimit ~status ~result_time ~trace ~obsolete db : t = object
-    (* get functions *)
-    val mutable _id = id
-    method id : int64 option = _id
-    val mutable _prover = prover
-    method prover : string = _prover
-    val mutable _timelimit = timelimit
-    method timelimit : int64 = _timelimit
-    val mutable _memlimit = memlimit
-    method memlimit : int64 = _memlimit
-    val mutable _status = status
-    method status : int64 = _status
-    val mutable _result_time = result_time
-    method result_time : float = _result_time
-    val mutable _trace = trace
-    method trace : string = _trace
-    val mutable _obsolete = obsolete
-    method obsolete : int64 = _obsolete
-*)
-
-    (* admin functions *)
-    let delete db e =
-      match e.id with
+  let delete db e =
+    match e.id with
       | None -> ()
       | Some id ->
           let sql = "DELETE FROM external_proof WHERE id=?" in
@@ -343,59 +401,58 @@ module External_proof = struct
           ignore(step_fold db stmt (fun _ -> ()));
           e.id <- None
 
-    let save db e = 
-      transaction db 
-	(fun () ->
-	   (* insert any foreign-one fields into their table and get id *)
-	   let curobj_id = match e.id with
-	     | None -> (* insert new record *)
-		 let sql = 
-		   "INSERT INTO external_proof VALUES(NULL,?,?,?,?,?,?,?)" 
-		 in
-		 let stmt = Sqlite3.prepare db.raw_db sql in
-		 db_must_ok db 
-		   (fun () -> Sqlite3.bind stmt 1 
-		      (let v = e.prover in Sqlite3.Data.TEXT v));
-		 db_must_ok db 
-		   (fun () -> Sqlite3.bind stmt 2 
-		      (let v = e.timelimit in Sqlite3.Data.INT v));
-		 db_must_ok db 
-		   (fun () -> Sqlite3.bind stmt 3 
-		      (let v = e.memlimit in Sqlite3.Data.INT v));
-		 db_must_ok db 
-		   (fun () -> Sqlite3.bind stmt 4 
-		      (let v = e.status in Sqlite3.Data.INT v));
-		 db_must_ok db 
-		   (fun () -> Sqlite3.bind stmt 5 
-		      (let v = e.result_time in Sqlite3.Data.FLOAT v));
-		 db_must_ok db 
-		   (fun () -> Sqlite3.bind stmt 6 
-		      (let v = e.trace in Sqlite3.Data.TEXT v));
-		 db_must_ok db 
-		   (fun () -> Sqlite3.bind stmt 7 
-		      (let v = e.obsolete in Sqlite3.Data.INT v));
-		 db_must_done db 
-		   (fun () -> Sqlite3.step stmt);
-		 let new_id = Sqlite3.last_insert_rowid db.raw_db in
-		 e.id <- Some new_id;
-		 new_id
-	     | Some id -> (* update *)
+  let save db (e : external_proof) = 
+    transaction db 
+      (fun () ->
+	 let curobj_id = match e.external_proof_id with
+	   | None -> (* insert new record *)
+	       let sql = 
+		 "INSERT INTO external_proof VALUES(NULL,?,?,?,?,?,?,?)" 
+	       in
+	       let stmt = Sqlite3.prepare db.raw_db sql in
+	       db_must_ok db 
+		 (fun () -> Sqlite3.bind stmt 1 
+		    (let v = e.prover.prover_name in Sqlite3.Data.TEXT v));
+	       db_must_ok db 
+		 (fun () -> Sqlite3.bind stmt 2 
+		    (let v = Int64.of_int e.timelimit in Sqlite3.Data.INT v));
+	       db_must_ok db 
+		 (fun () -> Sqlite3.bind stmt 3 
+		    (let v = Int64.of_int e.memlimit in Sqlite3.Data.INT v));
+	       db_must_ok db 
+		 (fun () -> Sqlite3.bind stmt 4 
+		    (let v = int64_from_pas e.status in Sqlite3.Data.INT v));
+	       db_must_ok db 
+		 (fun () -> Sqlite3.bind stmt 5 
+		    (let v = e.result_time in Sqlite3.Data.FLOAT v));
+	       db_must_ok db 
+		 (fun () -> Sqlite3.bind stmt 6 
+		    (let v = e.trace in Sqlite3.Data.TEXT v));
+	       db_must_ok db 
+		 (fun () -> Sqlite3.bind stmt 7 
+		    (let v = int64_from_bool e.proof_obsolete in Sqlite3.Data.INT v));
+	       db_must_done db 
+		 (fun () -> Sqlite3.step stmt);
+	       let new_id = Sqlite3.last_insert_rowid db.raw_db in
+	       e.external_proof_id <- Some new_id;
+	       new_id
+	   | Some id -> (* update *)
 		 let sql = 
 		   "UPDATE external_proof SET prover=?,timelimit=?,memlimit=?,status=?,result_time=?,trace=?,obsolete=? WHERE id=?" 
 		 in
 		 let stmt = Sqlite3.prepare db.raw_db sql in
 		 db_must_ok db 
 		   (fun () -> Sqlite3.bind stmt 1 
-		      (let v = e.prover in Sqlite3.Data.TEXT v));
+		      (let v = e.prover.prover_name in Sqlite3.Data.TEXT v));
 		 db_must_ok db 
 		   (fun () -> Sqlite3.bind stmt 2 
-		      (let v = e.timelimit in Sqlite3.Data.INT v));
+		      (let v = Int64.of_int e.timelimit in Sqlite3.Data.INT v));
 		 db_must_ok db 
 		   (fun () -> Sqlite3.bind stmt 3 
-		      (let v = e.memlimit in Sqlite3.Data.INT v));
+		      (let v = Int64.of_int e.memlimit in Sqlite3.Data.INT v));
 		 db_must_ok db 
 		   (fun () -> Sqlite3.bind stmt 4 
-		      (let v = e.status in Sqlite3.Data.INT v));
+		      (let v = int64_from_pas e.status in Sqlite3.Data.INT v));
 		 db_must_ok db 
 		   (fun () -> Sqlite3.bind stmt 5 
 		      (let v = e.result_time in Sqlite3.Data.FLOAT v));
@@ -404,7 +461,7 @@ module External_proof = struct
 		      (let v = e.trace in Sqlite3.Data.TEXT v));
 		 db_must_ok db 
 		   (fun () -> Sqlite3.bind stmt 7 
-		      (let v = e.obsolete in Sqlite3.Data.INT v));
+		      (let v = int64_from_bool e.proof_obsolete in Sqlite3.Data.INT v));
 		 db_must_ok db 
 		   (fun () -> Sqlite3.bind stmt 8 (Sqlite3.Data.INT id));
 		 db_must_done db (fun () -> Sqlite3.step stmt);
@@ -521,32 +578,6 @@ module External_proof = struct
 	
 *)
 end
-
-
-type proof_attempt_status =
-  | Running (** external proof attempt is in progress *)
-  | Success (** external proof attempt succeeded *)
-  | Timeout (** external proof attempt was interrupted *)
-  | Unknown (** external prover answered ``don't know'' or equivalent *)
-  | HighFailure (** external prover call failed *)
-
-type goal = {
-  mutable id : int64 option;
-  mutable task_checksum : string;
-  mutable parent : transf option;
-  mutable name : string;
-  mutable pos : loc_record;
-  mutable external_proofs : External_proof.t list;
-  mutable transformations : transf list;
-  mutable proved : int64;
-}
-
-and transf = {
-    mutable id : int64 option;
-    mutable name : string;
-    mutable obsolete : int64;
-    mutable subgoals : goal list;
-}
 
 
 module Goal = struct
@@ -829,7 +860,6 @@ end
 
 module Transf = struct
 
-  type t = transf
 
 (*
   let init db =
@@ -997,4 +1027,19 @@ let create ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
     Transf.init db;
   *)
   db
+
+
+exception AlreadyAttempted
+
+let try_prover ~timelimit:int ?memlimit:int (g : goal) (d: prover_data) : unit =
+  assert false (* TODO *)
+
+let add_transformation (g : goal) (t : transf) :  unit =
+  assert false (* TODO *)
+
+let add_or_replace_goal (g : goal) :  unit =
+  assert false (* TODO *)
+
+let read_db_from_file (file : string) : goal list =
+  assert false (* TODO *)
 
