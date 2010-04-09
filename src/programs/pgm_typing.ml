@@ -151,6 +151,8 @@ and expr_desc env loc = function
       let e2 = dexpr env e2 in
       expected_type e2 env.ty_bool;
       DElazy (op, e1, e2), env.ty_bool
+  | Pgm_ptree.Ematch (el, bl) ->
+      assert false (*TODO*)
   | Pgm_ptree.Eskip ->
       DEskip, env.ty_unit
   | Pgm_ptree.Eabsurd ->

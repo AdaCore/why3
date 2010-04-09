@@ -1,9 +1,16 @@
 
+{ 
+use import list.List
+}
+
 let p =
   let x = ref 0 in
   x := 1;
   assert { !x = 1 };
-  absurd : int
+  label L:
+  assume { !x = 2 };
+  absurd : int list
+
 
 
 (*

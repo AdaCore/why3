@@ -67,6 +67,7 @@ and expr_desc =
   | Eif of expr * expr * expr
   | Ewhile of expr * loop_annotation * expr
   | Elazy of lazy_op * expr * expr
+  | Ematch of expr list * (Ptree.pattern list * expr) list
   | Eskip 
   | Eabsurd
   (* annotations *)
@@ -76,7 +77,8 @@ and expr_desc =
   | Ecast of expr * Ptree.pty
 
 
-  (* TODO: fun, rec, raise, try, absurd, any, post? *)
+  (* TODO: fun, rec, raise, try, any, post?, match 
+           ghost *)
 
 type decl =
   | Dcode  of ident * expr

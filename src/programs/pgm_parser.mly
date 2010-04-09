@@ -31,7 +31,9 @@
 
   let mk_expr d = { expr_loc = loc (); expr_desc = d }
   let mk_expr_i i d = { expr_loc = loc_i i; expr_desc = d }
- 
+
+  let mk_pat p = { pat_loc = loc (); pat_desc = p }
+
   (* FIXME: factorize with parser/parser.mly *)
   let infix s = "infix " ^ s
   let prefix s = "prefix " ^ s
@@ -242,6 +244,8 @@ expr:
    { mk_expr (Elazy (LazyOr, $1, $3)) }
 | LET lident EQUAL expr IN expr
    { mk_expr (Elet ($2, $4, $6)) }
+| MATCH list1_expr_sep_comma WITH option_bar match_cases END
+   { mk_expr (Ematch ($2, $5)) }
 | GHOST expr
    { mk_expr (Eghost $2) }
 | LABEL uident COLON expr
@@ -274,6 +278,38 @@ simple_expr:
 list1_simple_expr:
 | simple_expr %prec prec_simple { [$1] }
 | simple_expr list1_simple_expr { $1 :: $2 }
+;
+
+list1_expr_sep_comma:
+| expr                            { [$1] }
+| expr COMMA list1_expr_sep_comma { $1 :: $3 }
+;
+
+option_bar:
+| /* epsilon */ { () }
+| BAR           { () }
+;
+
+match_cases:
+| match_case                  { [$1] }
+| match_case BAR match_cases  { $1::$3 }
+;
+
+match_case:
+| list1_pat_sep_comma ARROW expr { ($1,$3) }
+;
+
+list1_pat_sep_comma:
+| pattern                           { [$1] }
+| pattern COMMA list1_pat_sep_comma { $1::$3 }
+
+pattern:
+| UNDERSCORE                                    { mk_pat (PPpwild) }
+| lident                                        { mk_pat (PPpvar $1) }
+| uqualid                                       { mk_pat (PPpapp ($1, [])) }
+| uqualid LEFTPAR list1_pat_sep_comma RIGHTPAR  { mk_pat (PPpapp ($1, $3)) }
+| pattern AS lident                             { mk_pat (PPpas ($1,$3)) }
+| LEFTPAR pattern RIGHTPAR                      { $2 }
 ;
 
 assertion_kind:
