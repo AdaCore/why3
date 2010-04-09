@@ -516,11 +516,8 @@ apidoc: $(APIDOCSRC)
 .mll.ml:
 	$(OCAMLLEX) $<
 
-.mly.output :
+%.ml %.mli %.output : %.mly
 	$(OCAMLYACC) -v $<
-
-%.ml %.mli : %.output %.mly
-	@echo -n
 
 .ml4.ml:
 	$(CAMLP4) pr_o.cmo -impl $< > $@
