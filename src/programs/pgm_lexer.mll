@@ -55,6 +55,7 @@
 	"if", IF;
 	"in", IN;
 	"invariant", INVARIANT;
+	"label", LABEL;
 	"let", LET;
 	"match", MATCH;
 	"not", NOT;

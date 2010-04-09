@@ -29,6 +29,9 @@ type lazy_op = Pgm_ptree.lazy_op
 
 (* phase 1: destructive typing *)
 
+type dtype_v = 
+  | DTpure of Denv.dty
+
 type dexpr = {
   dexpr_desc : dexpr_desc;
   dexpr_denv : Typing.denv;
@@ -47,7 +50,8 @@ and dexpr_desc =
   | DEif of dexpr * dexpr * dexpr
   | DEwhile of dexpr *  Pgm_ptree.loop_annotation * dexpr
   | DElazy of lazy_op * dexpr * dexpr
-  | DEskip 
+  | DEskip
+  | DEabsurd 
 
   | DEassert of assertion_kind * Ptree.lexpr
   | DEghost of dexpr
@@ -78,6 +82,7 @@ and expr_desc =
   | Ewhile of expr * loop_annotation * expr
   | Elazy of lazy_op * expr * expr
   | Eskip 
+  | Eabsurd
 
   | Eassert of assertion_kind * Term.fmla
   | Eghost of expr

@@ -49,6 +49,9 @@ val report : Format.formatter -> error -> unit
 val specialize_fsymbol : 
   Ptree.qualid -> theory_uc -> lsymbol * Denv.dty list * Denv.dty
 
+val specialize_tysymbol : 
+  Loc.position -> Ptree.qualid -> theory_uc -> Ty.tysymbol * Denv.type_var list
+
 type denv
 
 val create_denv : theory_uc -> denv
@@ -61,4 +64,7 @@ val add_var : string -> Denv.dty -> denv -> denv
 
 val type_term : denv -> vsymbol Mstr.t -> Ptree.lexpr -> term
 val type_fmla : denv -> vsymbol Mstr.t -> Ptree.lexpr -> fmla
+
+val dty : denv -> Ptree.pty -> Denv.dty
+
 

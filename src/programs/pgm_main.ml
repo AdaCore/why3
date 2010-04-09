@@ -52,6 +52,8 @@ let rec report fmt = function
       Typing.report fmt e
   | Pgm_typing.Error e ->
       Pgm_typing.report fmt e
+  | Denv.Error e ->
+      Denv.report fmt e
   | e ->
       raise e
 (*       fprintf fmt "anomaly: %s" (Printexc.to_string e) *)

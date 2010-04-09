@@ -97,7 +97,7 @@
 /* keywords */
 
 %token ABSURD AND AS ASSERT ASSUME BEGIN CHECK DO DONE ELSE END EXCEPTION FOR
-%token FUN GHOST IF IN INVARIANT LET MATCH NOT RAISE RAISES READS REC 
+%token FUN GHOST IF IN INVARIANT LABEL LET MATCH NOT RAISE RAISES READS REC 
 %token RETURNS THEN TRY TYPE VARIANT VOID WHILE WITH WRITES
 
 /* symbols */
@@ -244,10 +244,14 @@ expr:
    { mk_expr (Elet ($2, $4, $6)) }
 | GHOST expr
    { mk_expr (Eghost $2) }
-| uident COLON expr
-   { mk_expr (Elabel ($1, $3)) }
+| LABEL uident COLON expr
+   { mk_expr (Elabel ($2, $4)) }
 | WHILE expr DO loop_annotation expr DONE
    { mk_expr (Ewhile ($2, $4, $5)) }
+| ABSURD
+   { mk_expr Eabsurd }
+| expr COLON pure_type
+   { mk_expr (Ecast ($1, $3)) }
 ;
 
 simple_expr:
@@ -299,7 +303,27 @@ constant:
    { Term.ConstReal $1 }
 ;
 
-/*****
+type_var:
+| QUOTE ident { $2 }
+;
+
+pure_type:
+| type_var 
+   { PPTtyvar $1 }
+| lqualid
+   { PPTtyapp ([], $1) }
+| pure_type lqualid
+   { PPTtyapp ([$1], $2) }
+| LEFTPAR pure_type COMMA list1_pure_type_sep_comma RIGHTPAR lqualid
+   { PPTtyapp ($2 :: $4, $6) }
+;
+
+list1_pure_type_sep_comma:
+| pure_type                                      { [$1] }
+| pure_type COMMA list1_pure_type_sep_comma { $1 :: $3 }
+;
+
+/***********************************************************************
 
 ident_rich:
 | uident      { $1 }

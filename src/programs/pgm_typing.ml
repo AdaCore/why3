@@ -68,8 +68,13 @@ let create_denv uc =
     ty_bool  = Tyapp (ns_find_ts ns ["bool"], []);
     ty_unit  = Tyapp (ns_find_ts ns ["unit"], []);
     ts_arrow = ns_find_ts ns ["arrow"];
+
   }
 (*****************************************************************************)
+
+let create_type_var loc =
+  let tv = Ty.create_tvsymbol (id_user "a" loc) in
+  Tyvar (create_ty_decl_var ~loc ~user:false tv)
 
 let currying env tyl ty =
   let make_arrow_type ty1 ty2 = Tyapp (env.ts_arrow, [ty1; ty2]) in
@@ -82,6 +87,11 @@ let expected_type e ty =
       print_dty e.dexpr_type print_dty ty
 
 (* phase 1: typing programs (using destructive type inference) *)
+
+let pure_type env = Typing.dty env.denv
+
+let rec dtype_v env = function
+  | Pgm_ptree.Tpure pt -> DTpure (pure_type env pt)
 
 let rec dexpr env e = 
   let d, ty = expr_desc env e.Pgm_ptree.expr_loc e.Pgm_ptree.expr_desc in
@@ -143,6 +153,8 @@ and expr_desc env loc = function
       DElazy (op, e1, e2), env.ty_bool
   | Pgm_ptree.Eskip ->
       DEskip, env.ty_unit
+  | Pgm_ptree.Eabsurd ->
+      DEabsurd, create_type_var loc
 
   | Pgm_ptree.Eassert (k, le) ->
       DEassert (k, le), env.ty_unit
@@ -153,6 +165,11 @@ and expr_desc env loc = function
       (* TODO: add label to env *)
       let e1 = dexpr env e1 in
       DElabel (l, e1), e1.dexpr_type
+  | Pgm_ptree.Ecast (e1, ty) ->
+      let e1 = dexpr env e1 in
+      let ty = pure_type env ty in
+      expected_type e1 ty;
+      e1.dexpr_desc, ty
 
 (* phase 2: typing annotations *)
 
@@ -192,6 +209,8 @@ and expr_desc env denv = function
       Elazy (op, expr env e1, expr env e2)
   | DEskip ->
       Eskip
+  | DEabsurd ->
+      Eabsurd
 
   | DEassert (k, f) ->
       let f = Typing.type_fmla denv env f in
