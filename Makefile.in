@@ -300,6 +300,26 @@ clean::
 	rm -f bin/whyide.byte bin/whyide.opt
 	rm -f src/ide/*.cm[iox] src/ide/*.o src/ide/*.annot
 
+##############
+# Coq plugin
+##############
+
+byte: coq-plugin-byte-@COQ@
+opt:  coq-plugin-opt-@COQ@
+
+coq-plugin-byte-yes: src/coq-plugin/whytac.cmo
+coq-plugin-byte-no:
+coq-plugin-opt-yes: src/coq-plugin/whytac.cmxs
+coq-plugin-opt-no:
+
+COQSUBTREES = kernel lib interp parsing proofs pretyping tactics library
+src/coq-plugin/whytac.cmo src/coq-plugin/whytac.cmxs: INCLUDES=$(COQSUBTREES:%=-I @COQLIB@/%) 
+src/coq-plugin/whytac.cmo: BFLAGS+=-rectypes
+src/coq-plugin/whytac.cmxs: OFLAGS+=-rectypes
+
+src/coq-plugin/whytac.cmxs: $(LIBCMXA) src/coq-plugin/whytac.ml
+	$(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
+
 # test targets
 ##############
 
@@ -476,42 +496,28 @@ apidoc: $(APIDOCSRC)
 			-I +sqlite3 $(APIDOCSRC)
 
 
-# special rules
-###############
-
-# CAMLP4=@CAMLP4O@ pa_extend.cmo pa_macro.cmo
-
-# src/%.cmo: src/%.ml4
-# 	$(OCAMLC) -c $(BFLAGS) -pp "$(CAMLP4) -DOCAML@OCAMLV@ -impl" -impl $<
-
-# src/%.cmx: src/%.ml4
-# 	$(OCAMLOPT) -c $(OFLAGS) -pp "$(CAMLP4) -DOCAML@OCAMLV@ -impl" -impl $<
-
-# src/%.ml: src/%.ml4
-# 	$(CAMLP4) pr_o.cmo -DOCAML@OCAMLV@ -impl $< > $@
-
 # generic rules
 ###############
 
 .SUFFIXES: .mli .ml .cmi .cmo .cmx .mll .mly .v .vo .ml4 .cmxs .output
 
 .mli.cmi:
-	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) $(APRONLIB) $(ATPLIB) -c $(BFLAGS) $<
+	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
 
 .ml.cmi:
-	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) $(APRONLIB) $(ATPLIB) -c $(BFLAGS) $<
+	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
 
 .ml.cmo:
-	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) $(APRONLIB) $(ATPLIB) -c $(BFLAGS) $<
+	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
 
 .ml.o:
-	$(OCAMLOPT) $(APRONLIB) $(ATPLIB) -c $(OFLAGS) $<
+	$(OCAMLOPT) -c $(OFLAGS) $<
 
 .ml.cmx:
-	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) $(APRONLIB) $(ATPLIB) -c $(OFLAGS) $<
+	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -c $(OFLAGS) $<
 
 %.cmxs: %.ml %.cmx
-	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -shared $(INCLUDES) -o $@ $<
+	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -shared $(OFLAGS) -o $@ $<
 
 .mll.ml:
 	$(OCAMLLEX) $<
