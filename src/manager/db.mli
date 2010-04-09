@@ -2,8 +2,7 @@
 
 (** {1 Proof manager database} *)
 
-(** {2 The persistent database} *)
-
+(*
 type handle
   (** Database handle which can be used to create and retrieve objects *)
 
@@ -24,7 +23,7 @@ val raw: handle -> Sqlite3.db
   (** [raw db] @return the underlying Sqlite3 database for the
       connection, for advanced queries.  *)
 *)
-
+*)
 
 
 
@@ -121,8 +120,15 @@ val transf_obsolete :  transf -> bool
 val subgoals : transf -> goal list
 
 
-val read_db_from_file : string -> goal list
-(** returns the set of root goals *)
+(** {2 The persistent database} *)
+
+val init_base : string -> unit
+(** opens or creates the current database, from given file name *)
+
+val root_goals : unit -> goal list
+(** returns the current set of root goals *)
+
+
 
 (** {2 attempts to solve goals} *)
 

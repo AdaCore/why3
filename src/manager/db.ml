@@ -10,10 +10,15 @@ type handle = {
   mode: transaction_mode;
 }
 
-(*
-let raw db = db.raw_db
-*)
-  
+let current_db = ref None
+ 
+let current () = 
+  match !current_db with
+    | None -> failwith "Db.current: database not yet initialized"
+    | Some x -> x
+
+	      
+
 let default_busyfn (db:Sqlite3.db) =
   print_endline "WARNING: busy";
   (* Thread.delay (Random.float 1.) *)
@@ -1011,22 +1016,22 @@ module Transf = struct
 end
 
 
-
-
-let create ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
-  let db = {
-    raw_db = Sqlite3.db_open db_name; 
-    in_transaction = 0; 
-    mode = mode; 
-    busyfn = busyfn } 
-  in
-  Loc.init db;
-  (*
-    External_proof.init db;
-    Goal.init db;
-    Transf.init db;
-  *)
-  db
+let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
+  match !current_db with
+    | None ->
+	current_db <- Some {
+	  raw_db = Sqlite3.db_open db_name; 
+	  in_transaction = 0; 
+	  mode = mode; 
+	  busyfn = busyfn } 
+	in
+	Loc.init db;
+	(*
+	  External_proof.init db;
+	  Goal.init db;
+	  Transf.init db;
+	*)
+	db
 
 
 exception AlreadyAttempted
