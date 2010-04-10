@@ -3,7 +3,7 @@
 
 (** {2 access to user configuration and drivers} *)
 
-val read_config_file: ?name:string -> unit
+val read_config_file: ?name:string -> unit -> unit
   (** reads the config file from file [name]. The
       default rc file name is "$HOME/.why/why3rc" if HOME is set, or
       "$USERPROFILE/.why/why3rc" if USERPROFILE is set, or "./.why/why3rc"
@@ -13,7 +13,8 @@ val known_provers: unit -> string list
   (** returns the list of known prover ids. *)
 
 val get_driver: string -> Env.env -> Driver.driver
-  (** returns the driver associated to the given prover id *)
+  (** returns the driver associated to the given prover id 
+      @raises Not_found if no driver of this name exist *)
 
 
 (** {2 configuration update} *)

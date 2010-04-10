@@ -82,7 +82,7 @@ all: @OCAMLBEST@
 # Why library 
 #############
 
-LIBGENERATED = src/config.ml \
+LIBGENERATED = src/config.ml src/util/rc.ml \
           src/parser/parser.mli src/parser/parser.ml src/parser/parser.output \
             src/parser/lexer.ml src/driver/driver_lexer.ml \
             src/driver/driver_parser.mli src/driver/driver_parser.ml \
@@ -111,7 +111,7 @@ CORE_CMO := ident.cmo ty.cmo term.cmo pattern.cmo decl.cmo theory.cmo\
 CORE_CMO := $(addprefix src/core/,$(CORE_CMO))
 
 UTIL_CMO := pp.cmo loc.cmo prtree.cmo util.cmo hashcons.cmo \
-            sysutil.cmo hashweak.cmo
+            sysutil.cmo hashweak.cmo rc.cmo
 UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
 
 PARSER_CMO := ptree.cmo parser.cmo lexer.cmo denv.cmo typing.cmo 
@@ -125,7 +125,7 @@ TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
 DRIVER_CMO := driver_ast.cmo call_provers.cmo dynlink_compat.cmo \
-              driver_parser.cmo driver_lexer.cmo whyrc.cmo driver.cmo
+              driver_parser.cmo driver_lexer.cmo driver.cmo whyrc.cmo 
 DRIVER_CMO := $(addprefix src/driver/,$(DRIVER_CMO))
 
 PRINTER_CMO := print_real.cmo alt_ergo.cmo why3.cmo smt.cmo coq.cmo
@@ -229,19 +229,6 @@ clean::
 ###############
 # proof manager
 ###############
-
-src/orm/sql_orm_header.ml: src/orm/sql_access.ml src/orm/convert.ml 
-	ocaml src/orm/convert.ml $< $@
-
-ORM_CMO := printer_utils.cmo sql_orm_header.cmo sql_orm.cmo
-ORM_CMO := $(addprefix src/orm/,$(ORM_CMO))
-
-$(ORM_CMO): INCLUDES=-I src/orm -I +sqlite3
-
-# src/manager/db.ml: $(ORM_CMO) src/manager/orm_schema.ml
-# 	ocaml -I src/orm src/manager/orm_schema.ml 
-
-src/manager/orm_schema.ml: $(ORM_CMO)
 
 MANAGER_CMO := db.cmo test.cmo
 MANAGER_CMO := $(addprefix src/manager/,$(MANAGER_CMO))
