@@ -167,6 +167,8 @@ module Sfmla : Set.S with type elt = fmla
 
 val t_var : vsymbol -> term
 val t_const : constant -> ty -> term
+val t_int_const : string -> term
+val t_real_const : real_constant -> term
 val t_app : lsymbol -> term list -> ty -> term
 val t_if : fmla -> term -> term -> term
 val t_let : vsymbol -> term -> term -> term

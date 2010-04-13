@@ -435,6 +435,8 @@ let mk_term n ty = { t_node = n; t_label = []; t_ty = ty; t_tag = -1 }
 let t_bvar n ty = Hsterm.hashcons (mk_term (Tbvar n) ty)
 let t_var v = Hsterm.hashcons (mk_term (Tvar v) v.vs_ty)
 let t_const c ty = Hsterm.hashcons (mk_term (Tconst c) ty)
+let t_int_const s = Hsterm.hashcons (mk_term (Tconst (ConstInt s)) Ty.ty_int)
+let t_real_const r = Hsterm.hashcons (mk_term (Tconst (ConstReal r)) Ty.ty_real)
 let t_app f tl ty = Hsterm.hashcons (mk_term (Tapp (f, tl)) ty)
 let t_if f t1 t2 = Hsterm.hashcons (mk_term (Tif (f, t1, t2)) t2.t_ty)
 let t_let v t1 t2 = Hsterm.hashcons (mk_term (Tlet (t1, (v, t2))) t2.t_ty)

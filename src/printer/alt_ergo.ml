@@ -26,7 +26,13 @@ open Decl
 open Task
 
 let ident_printer = 
-  let bls = ["let"; "forall"; "exists"; "and"; "or"] in
+  let bls = [
+    "ac"; "and"; "array"; "as"; "axiom"; "bool"; "else"; "exists";
+    "false"; "forall"; "function"; "goal"; "if"; "int"; "bitv";
+    "logic"; "not"; "or"; "parameter"; "predicate";
+    "prop"; "real"; "then"; "true"; "type"; "unit"; "void";
+  ] 
+  in
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
 
