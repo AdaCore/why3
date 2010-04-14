@@ -256,7 +256,7 @@ and tr_global_ts env r =
 		let b = force b in
 		let (tv, vars), env, t = decomp_type_lambdas env b in
 		let def = Some (tr_type tv env t) in
-		Ty.create_tysymbol id vars def
+		Ty.create_tysymbol id vars None
 		(* FIXME: is it correct to use None when NotFO? *)
 	    | None -> 
 		let tv = 
