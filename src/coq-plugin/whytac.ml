@@ -8,6 +8,8 @@ open Util
 open Coqlib
 open Hipattern
 open Typing
+open Libnames
+open Declarations
 
 open Why
 open Call_provers
@@ -45,7 +47,7 @@ let coq_modules =
        ["Coq"; "Reals"; "Rfunctions";]]
     @ [["Coq"; "omega"; "OmegaLemmas"]]
 
-let constant = gen_constant_in_modules "dp" coq_modules
+let constant = gen_constant_in_modules "why" coq_modules
 
 let coq_Z = lazy (constant "Z")
 let coq_Zplus = lazy (constant "Zplus")
@@ -107,6 +109,48 @@ let coq_rename_vars env vars =
        id :: newvars, Environ.push_named (id, None, t) newenv)
     vars ([],env)
 
+(* extract the prenex type quantifications i.e.
+   type_quantifiers env (A1:Set)...(Ak:Set)t = A1...An, (env+Ai), t *)
+let decomp_type_quantifiers env t =
+  let rec loop vars t = match kind_of_term t with
+    | Prod (n, a, t) when is_Set a || is_Type a -> 
+	loop ((n,a) :: vars) t
+    | _ -> 
+	let vars, env = coq_rename_vars env vars in
+	let t = substl (List.map mkVar vars) t in
+	List.rev vars, env, t
+  in
+  loop [] t
+
+let preid_of_id id = Ident.id_fresh (string_of_id id)
+
+(* same thing with lambda binders (for axiomatize body) *)
+let decomp_type_lambdas env t =
+  let rec loop vars t = match kind_of_term t with
+    | Lambda (n, a, t) when is_Set a || is_Type a ->
+	loop ((n,a) :: vars) t
+    | _ ->
+	let vars, env = coq_rename_vars env vars in
+	let t = substl (List.map mkVar vars) t in
+	let add m id = 
+	  let tv = Ty.create_tvsymbol (preid_of_id id) in
+	  Idmap.add id tv m, tv 
+	in
+	Util.map_fold_left add Idmap.empty vars, env, t
+  in
+  loop [] t
+
+(* Coq globals *)
+
+let global_ts = ref Refmap.empty 
+(* let global_ls = ref Refmap.empty  *)
+
+let lookup_global table r = match Refmap.find r !table with
+  | None -> raise NotFO
+  | Some d -> d
+
+let add_global table r v = table := Refmap.add r v !table
+
 (* Arithmetic constants *)
 
 exception NotArithConstant
@@ -116,14 +160,14 @@ exception NotArithConstant
 let big_two = Big_int.succ_big_int Big_int.unit_big_int
 
 let rec tr_positive p = match kind_of_term p with
-  | Construct _ when p = Lazy.force coq_xH ->
+  | Construct _ when is_constant p coq_xH ->
       Big_int.unit_big_int
-  | App (f, [|a|]) when f = Lazy.force coq_xI ->
+  | App (f, [|a|]) when is_constant f coq_xI ->
 (*
       Plus (Mult (Cst 2, tr_positive a), Cst 1)
 *)
       Big_int.succ_big_int (Big_int.mult_big_int big_two (tr_positive a))
-  | App (f, [|a|]) when f = Lazy.force coq_xO ->
+  | App (f, [|a|]) when is_constant f coq_xO ->
 (*
       Mult (Cst 2, tr_positive a)
 *)
@@ -137,15 +181,15 @@ let const_of_big_int b = Term.t_int_const (Big_int.string_of_big_int b)
   
 (* translates a closed Coq term t:Z or R into a FOL term of type int or real *)
 let rec tr_arith_constant t = match kind_of_term t with
-  | Construct _ when t = Lazy.force coq_Z0 ->
+  | Construct _ when is_constant t coq_Z0 ->
       Term.t_int_const "0"
-  | App (f, [|a|]) when f = Lazy.force coq_Zpos ->
+  | App (f, [|a|]) when is_constant f coq_Zpos ->
       const_of_big_int (tr_positive a)
-  | App (f, [|a|]) when f = Lazy.force coq_Zneg ->
+  | App (f, [|a|]) when is_constant f coq_Zneg ->
       const_of_big_int (Big_int.minus_big_int (tr_positive a))
-  | Const _ when t = Lazy.force coq_R0 ->
+  | Const _ when is_constant t coq_R0 ->
       Term.t_real_const (Term.RConstDecimal ("0", "0", None))
-  | Const _ when t = Lazy.force coq_R1 ->
+  | Const _ when is_constant t coq_R1 ->
       Term.t_real_const (Term.RConstDecimal ("1", "0", None))
 (*   | App (f, [|a;b|]) when f = Lazy.force coq_Rplus -> *)
 (*       let ta = tr_arith_constant a in *)
@@ -170,39 +214,68 @@ let rec tr_arith_constant t = match kind_of_term t with
 
 let rec tr_type tv env t =
   let t = Reductionops.nf_betadeltaiota env Evd.empty t in
-  if t = Lazy.force coq_Z then
+  if is_constant t coq_Z then
     Ty.ty_int
-  else if t = Lazy.force coq_R then
+  else if is_constant t coq_R then
     Ty.ty_real
   else match kind_of_term t with
     | Var x when Idmap.mem x tv ->
 	Ty.ty_var (Idmap.find x tv)
     | _ ->
-	assert false (*TODO*)
-	(* let f, cl = decompose_app t in *)
-(* 	begin try *)
-(* 	  let r = global_of_constr f in *)
-(* 	  match tr_global env r with *)
-(* 	    | DeclType (id, k) -> *)
-(* 		assert (k = List.length cl); (\* since t:Set *\) *)
-(* 		Tid (id, List.map (tr_type tv env) cl) *)
-(* 	    | _ -> *)
-(* 		raise NotFO *)
-(* 	with *)
-(* 	  | Not_found -> *)
-(* 	      raise NotFO *)
-(* 	  | NotFO -> *)
-(* 	      (\* we need to abstract some part of (f cl) *\) *)
-(* 	      (\*TODO*\) *)
-(* 	      raise NotFO *)
-(* 	end *)
+	let f, cl = decompose_app t in
+	begin try
+	  let r = global_of_constr f in
+	  let ts = tr_global_ts env r in
+	  assert (List.length ts.Ty.ts_args = List.length cl); (* since t:Set *)
+	  Ty.ty_app ts (List.map (tr_type tv env) cl)
+	with
+	  | Not_found ->
+	      assert false (* raise NotFO ??? *)
+	  | NotFO ->
+	      (* TODO: we need to abstract some part of (f cl) *)
+	      raise NotFO
+	end
+
+and tr_global_ts env r = 
+  try
+    lookup_global global_ts r
+  with Not_found -> 
+    add_global global_ts r None;
+    match r with
+      | VarRef id ->
+	  assert false (*TODO*)
+      | ConstructRef _ ->
+	  assert false
+      | ConstRef c -> 
+	  let ty = Global.type_of_global r in
+	  let tv, _, t = decomp_type_quantifiers env ty in
+	  if not (is_Set t) && not (is_Type t) then raise NotFO;
+	  let id = preid_of_id (Nametab.id_of_global r) in
+	  let ts = match (Global.lookup_constant c).const_body with
+	    | Some b ->
+		let b = force b in
+		let (tv, vars), env, t = decomp_type_lambdas env b in
+		let def = Some (tr_type tv env t) in
+		Ty.create_tysymbol id vars def
+		(* FIXME: is it correct to use None when NotFO? *)
+	    | None -> 
+		let tv = 
+		  List.map (fun x -> Ty.create_tvsymbol (preid_of_id x)) tv 
+		in
+		Ty.create_tysymbol id tv None
+	  in
+	  add_global global_ts r (Some ts);
+	  task := Task.add_ty_decl !task [ts, Decl.Tabstract];
+	  ts
+      | IndRef i ->
+	  assert false (*TODO*)
 
 (* assumption: t:T:Set *)
 and tr_term tv bv env t =
   try
     tr_arith_constant t
   with NotArithConstant -> match kind_of_term t with
-    (* binary operations on integers *)
+      (* binary operations on integers *)
     | App (c, [|a;b|]) when is_constant c coq_Zplus ->
 	let ls = why_constant ["int"] "Int" ["infix +"] in
 	Term.t_app ls [tr_term tv bv env a; tr_term tv bv env b] Ty.ty_int
@@ -218,7 +291,7 @@ and tr_term tv bv env t =
     | App (c, [|a|]) when is_constant c coq_Zopp ->
 	let ls = why_constant ["int"] "Int" ["prefix -"] in
 	Term.t_app ls [tr_term tv bv env a] Ty.ty_int
-    (* binary operations on reals *)
+	  (* binary operations on reals *)
     | App (c, [|a;b|]) when is_constant c coq_Rplus ->
 	let ls = why_constant ["real"] "Real" ["infix +"] in
 	Term.t_app ls [tr_term tv bv env a; tr_term tv bv env b] Ty.ty_real
@@ -237,57 +310,57 @@ and tr_term tv bv env t =
     | App (c, [|a|]) when is_constant c coq_Rinv ->
 	let ls = why_constant ["real"] "Real" ["inv"] in
 	Term.t_app ls [tr_term tv bv env a] Ty.ty_real
-    (* first-order terms *)
+	  (* first-order terms *)
     | Var id when Idmap.mem id bv ->
 	Term.t_var (Idmap.find id bv)
     | _ ->
 	assert false (*TODO*)
-(* 	let f, cl = decompose_app t in *)
-(* 	begin try *)
-(* 	  let r = global_of_constr f in *)
-(* 	  match tr_global env r with *)
-(* 	    | DeclFun (s, k, _, _) -> *)
-(* 		let cl = skip_k_args k cl in *)
-(* 		Fol.App (s, List.map (tr_term tv bv env) cl) *)
-(* 	    | _ -> *)
-(* 		raise NotFO *)
-(* 	with *)
-(* 	  | Not_found -> *)
-(* 	      raise NotFO *)
-(* 	  | NotFO -> (\* we need to abstract some part of (f cl) *\) *)
-(* 	      let rec abstract app = function *)
-(* 		| [] -> *)
-(* 		    Fol.App (make_term_abstraction tv env app, []) *)
-(* 		| x :: l as args -> *)
-(* 		    begin try *)
-(* 		      let s = make_term_abstraction tv env app in *)
-(* 		      Fol.App (s, List.map (tr_term tv bv env) args) *)
-(* 		    with NotFO -> *)
-(* 		      abstract (applist (app, [x])) l *)
-(* 		    end *)
-(* 	      in *)
-(* 	      let app,l = match cl with *)
-(* 		| x :: l -> applist (f, [x]), l | [] -> raise NotFO *)
-(* 	      in *)
-(* 	      abstract app l *)
-(* 	end *)
+	  (* 	let f, cl = decompose_app t in *)
+	  (* 	begin try *)
+	  (* 	  let r = global_of_constr f in *)
+	  (* 	  match tr_global env r with *)
+	  (* 	    | DeclFun (s, k, _, _) -> *)
+	  (* 		let cl = skip_k_args k cl in *)
+	  (* 		Fol.App (s, List.map (tr_term tv bv env) cl) *)
+	  (* 	    | _ -> *)
+	  (* 		raise NotFO *)
+	  (* 	with *)
+	  (* 	  | Not_found -> *)
+	  (* 	      raise NotFO *)
+	  (* 	  | NotFO -> (\* we need to abstract some part of (f cl) *\) *)
+	  (* 	      let rec abstract app = function *)
+	  (* 		| [] -> *)
+	  (* 		    Fol.App (make_term_abstraction tv env app, []) *)
+	  (* 		| x :: l as args -> *)
+	  (* 		    begin try *)
+	  (* 		      let s = make_term_abstraction tv env app in *)
+	  (* 		      Fol.App (s, List.map (tr_term tv bv env) args) *)
+	  (* 		    with NotFO -> *)
+	  (* 		      abstract (applist (app, [x])) l *)
+	  (* 		    end *)
+	  (* 	      in *)
+	  (* 	      let app,l = match cl with *)
+	  (* 		| x :: l -> applist (f, [x]), l | [] -> raise NotFO *)
+	  (* 	      in *)
+	  (* 	      abstract app l *)
+	  (* 	end *)
 
 and quantifiers n a b tv bv env =
   let vars, env = coq_rename_vars env [n,a] in
   let id = match vars with [x] -> x | _ -> assert false in
   let b = subst1 (mkVar id) b in
   let t = tr_type tv env a in
-  let vs = Term.create_vsymbol (Ident.id_fresh (string_of_id id)) t in
+  let vs = Term.create_vsymbol (preid_of_id id) t in
   let bv = Idmap.add id vs bv in
   vs, t, bv, env, b
 
 and tr_formula tv bv env f =
   let c, args = decompose_app f in
   match kind_of_term c, args with
-(*
-    | Var id, [] ->
+      (*
+	| Var id, [] ->
 	Fatom (Pred (rename_global (VarRef id), []))
-*)
+      *)
     | _, [t;a;b] when c = build_coq_eq () ->
 	let ty = type_of env Evd.empty t in
 	if is_Set ty || is_Type ty then
@@ -295,7 +368,7 @@ and tr_formula tv bv env f =
 	  Term.f_equ (tr_term tv bv env a) (tr_term tv bv env b)
 	else
 	  raise NotFO
-    (* comparisons on integers *)
+	    (* comparisons on integers *)
     | _, [a;b] when is_constant c coq_Zle ->
 	let ls = why_constant ["int"] "Int" ["infix <="] in
 	Term.f_app ls [tr_term tv bv env a; tr_term tv bv env b]
@@ -308,7 +381,7 @@ and tr_formula tv bv env f =
     | _, [a;b] when is_constant c coq_Zgt ->
 	let ls = why_constant ["int"] "Int" ["infix >"] in
 	Term.f_app ls [tr_term tv bv env a; tr_term tv bv env b]
-    (* comparisons on reals *)
+	  (* comparisons on reals *)
     | _, [a;b] when is_constant c coq_Rle ->
 	let ls = why_constant ["real"] "Real" ["infix <="] in
 	Term.f_app ls [tr_term tv bv env a; tr_term tv bv env b]
@@ -321,7 +394,7 @@ and tr_formula tv bv env f =
     | _, [a;b] when is_constant c coq_Rgt ->
 	let ls = why_constant ["real"] "Real" ["infix >"] in
 	Term.f_app ls [tr_term tv bv env a; tr_term tv bv env b]
-    (* propositional logic *)
+	  (* propositional logic *)
     | _, [] when c = build_coq_False () ->
 	Term.f_false
     | _, [] when c = build_coq_True () ->
@@ -349,20 +422,20 @@ and tr_formula tv bv env f =
 	      (* unusual case of the shape (ex p) *)
 	      raise NotFO (* TODO: we could eta-expanse *)
 	end
-(*
-    | _ ->
-	begin try
-	  let r = global_of_constr c in
-	  match tr_global env r with
-	    | DeclPred (s, k, _) ->
-		let args = skip_k_args k args in
-		Fatom (Pred (s, List.map (tr_term tv bv env) args))
+	  (*
 	    | _ ->
-		raise NotFO
-	with Not_found ->
-	  raise NotFO
-	end
-*)
+	    begin try
+	    let r = global_of_constr c in
+	    match tr_global env r with
+	    | DeclPred (s, k, _) ->
+	    let args = skip_k_args k args in
+	    Fatom (Pred (s, List.map (tr_term tv bv env) args))
+	    | _ ->
+	    raise NotFO
+	    with Not_found ->
+	    raise NotFO
+	    end
+	  *)
     | _ -> assert false (*TODO*)
 
 let tr_goal gl =
@@ -377,6 +450,7 @@ let whytac gl =
   task := Task.use_export None Theory.builtin_theory;
   try
     tr_goal gl;
+    if debug then Format.printf "@[%a@]@\n---@." Pretty.print_task !task;
     if debug then Format.printf "@[%a@]@\n---@." (Driver.print_task drv) !task;
     let res = Driver.call_prover ~debug ~timeout drv !task in
     match res.pr_answer with
