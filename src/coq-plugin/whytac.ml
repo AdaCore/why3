@@ -256,7 +256,7 @@ and tr_global_ts env r =
 		let b = force b in
 		let (tv, vars), env, t = decomp_type_lambdas env b in
 		let def = Some (tr_type tv env t) in
-		Ty.create_tysymbol id vars None
+		Ty.create_tysymbol id vars def
 		(* FIXME: is it correct to use None when NotFO? *)
 	    | None -> 
 		let tv = 
@@ -268,7 +268,31 @@ and tr_global_ts env r =
 	  task := Task.add_ty_decl !task [ts, Decl.Tabstract];
 	  ts
       | IndRef i ->
-	  assert false (*TODO*)
+	  Format.eprintf "ici@.";
+	  let mib, _ = Global.lookup_inductive i in
+	  let make_one_ts j _ =
+	    let r = IndRef (ith_mutual_inductive i j) in
+	    let ty = Global.type_of_global r in
+	    let tv, _, t = decomp_type_quantifiers env ty in
+	    if not (is_Set t) && not (is_Type t) then raise NotFO;
+	    let id = preid_of_id (Nametab.id_of_global r) in
+	    let tv = 
+	      List.map (fun x -> Ty.create_tvsymbol (preid_of_id x)) tv 
+	    in
+	    let ts = Ty.create_tysymbol id tv None in
+	    add_global global_ts r (Some ts)
+	  in
+	  Array.iteri make_one_ts mib.mind_packets;
+	  let make_one j ib = 
+	    let ls = [] in
+	    let r = IndRef (ith_mutual_inductive i j) in
+	    let ts = lookup_global global_ts r in
+	    ts, Decl.Talgebraic ls
+	  in
+	  let decl = Array.mapi make_one mib.mind_packets in
+	  let decl = Array.to_list decl in
+	  task := Task.add_ty_decl !task decl;
+	  lookup_global global_ts r
 
 (* assumption: t:T:Set *)
 and tr_term tv bv env t =

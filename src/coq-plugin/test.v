@@ -6,5 +6,5 @@ Parameter foo : Set -> Set.
 Definition t : Set := foo Z.
 Definition u : Set := foo t.
 
-Goal  forall x:u, x=x.
+Goal  forall x:nat, x=x.
 why.
