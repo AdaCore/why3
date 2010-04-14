@@ -75,17 +75,25 @@ let coq_Rlt = lazy (constant "Rlt")
 let coq_Rplus = lazy (constant "Rplus")
 let coq_Rmult = lazy (constant "Rmult")
 let coq_Ropp = lazy (constant "Ropp")
+let coq_Rinv = lazy (constant "Rinv")
 let coq_Rminus = lazy (constant "Rminus")
 let coq_Rdiv = lazy (constant "Rdiv")
 let coq_powerRZ = lazy (constant "powerRZ")
 
 let coq_iff = lazy (constant "iff")
 
+let is_constant t c = try t = Lazy.force c with _ -> false
+
 (* not first-order expressions *)
 exception NotFO
 
 (* the task under construction *)
 let task = ref None 
+
+let why_constant path t s =
+  let th = Env.find_theory env path t in
+  task := Task.use_export !task th;
+  Theory.ns_find_ls th.Theory.th_export s
 
 (* coq_rename_vars env [(x1,t1);...;(xn,tn)] renames the xi outside of
    env names, and returns the new variables together with the new
@@ -195,29 +203,45 @@ and tr_term tv bv env t =
     tr_arith_constant t
   with NotArithConstant -> match kind_of_term t with
     (* binary operations on integers *)
-(*   | App (f, [|a;b|]) when f = Lazy.force coq_Zplus -> *)
-(*       Plus (tr_term tv bv env a, tr_term tv bv env b) *)
-(*   | App (f, [|a;b|]) when f = Lazy.force coq_Zminus -> *)
-(*       Moins (tr_term tv bv env a, tr_term tv bv env b) *)
-(*   | App (f, [|a;b|]) when f = Lazy.force coq_Zmult -> *)
-(*       Mult (tr_term tv bv env a, tr_term tv bv env b) *)
-(*   | App (f, [|a;b|]) when f = Lazy.force coq_Zdiv -> *)
-(*       Div (tr_term tv bv env a, tr_term tv bv env b) *)
-(*   | App (f, [|a|]) when f = Lazy.force coq_Zopp -> *)
-(*       Opp (tr_term tv bv env a) *)
+    | App (c, [|a;b|]) when is_constant c coq_Zplus ->
+	let ls = why_constant ["int"] "Int" ["infix +"] in
+	Term.t_app ls [tr_term tv bv env a; tr_term tv bv env b] Ty.ty_int
+    | App (c, [|a;b|]) when is_constant c coq_Zminus ->
+	let ls = why_constant ["int"] "Int" ["infix -"] in
+	Term.t_app ls [tr_term tv bv env a; tr_term tv bv env b] Ty.ty_int
+    | App (c, [|a;b|]) when is_constant c coq_Zmult ->
+	let ls = why_constant ["int"] "Int" ["infix *"] in
+	Term.t_app ls [tr_term tv bv env a; tr_term tv bv env b] Ty.ty_int
+    | App (c, [|a;b|]) when is_constant c coq_Zdiv ->
+	let ls = why_constant ["int"] "EuclideanDivision" ["div"] in
+	Term.t_app ls [tr_term tv bv env a; tr_term tv bv env b] Ty.ty_int
+    | App (c, [|a|]) when is_constant c coq_Zopp ->
+	let ls = why_constant ["int"] "Int" ["prefix -"] in
+	Term.t_app ls [tr_term tv bv env a] Ty.ty_int
     (* binary operations on reals *)
-(*   | App (f, [|a;b|]) when f = Lazy.force coq_Rplus -> *)
-(*       Plus (tr_term tv bv env a, tr_term tv bv env b) *)
-(*   | App (f, [|a;b|]) when f = Lazy.force coq_Rminus -> *)
-(*       Moins (tr_term tv bv env a, tr_term tv bv env b) *)
-(*   | App (f, [|a;b|]) when f = Lazy.force coq_Rmult -> *)
-(*       Mult (tr_term tv bv env a, tr_term tv bv env b) *)
-(*   | App (f, [|a;b|]) when f = Lazy.force coq_Rdiv -> *)
-(*       Div (tr_term tv bv env a, tr_term tv bv env b) *)
-  | Var id when Idmap.mem id bv ->
-      Term.t_var (Idmap.find id bv)
-  | _ ->
-      assert false (*TODO*)
+    | App (c, [|a;b|]) when is_constant c coq_Rplus ->
+	let ls = why_constant ["real"] "Real" ["infix +"] in
+	Term.t_app ls [tr_term tv bv env a; tr_term tv bv env b] Ty.ty_real
+    | App (c, [|a;b|]) when is_constant c coq_Rminus ->
+	let ls = why_constant ["real"] "Real" ["infix -"] in
+	Term.t_app ls [tr_term tv bv env a; tr_term tv bv env b] Ty.ty_real
+    | App (c, [|a;b|]) when is_constant c coq_Rmult ->
+	let ls = why_constant ["real"] "Real" ["infix *"] in
+	Term.t_app ls [tr_term tv bv env a; tr_term tv bv env b] Ty.ty_real
+    | App (c, [|a;b|]) when is_constant c coq_Rdiv ->
+	let ls = why_constant ["real"] "Real" ["infix /"] in
+	Term.t_app ls [tr_term tv bv env a; tr_term tv bv env b] Ty.ty_real
+    | App (c, [|a|]) when is_constant c coq_Ropp ->
+	let ls = why_constant ["real"] "Real" ["prefix -"] in
+	Term.t_app ls [tr_term tv bv env a] Ty.ty_real
+    | App (c, [|a|]) when is_constant c coq_Rinv ->
+	let ls = why_constant ["real"] "Real" ["inv"] in
+	Term.t_app ls [tr_term tv bv env a] Ty.ty_real
+    (* first-order terms *)
+    | Var id when Idmap.mem id bv ->
+	Term.t_var (Idmap.find id bv)
+    | _ ->
+	assert false (*TODO*)
 (* 	let f, cl = decompose_app t in *)
 (* 	begin try *)
 (* 	  let r = global_of_constr f in *)
@@ -271,26 +295,33 @@ and tr_formula tv bv env f =
 	  Term.f_equ (tr_term tv bv env a) (tr_term tv bv env b)
 	else
 	  raise NotFO
-          (* comparisons on integers *)
-(*
-    | _, [a;b] when c = Lazy.force coq_Zle ->
-	Fatom (Le (tr_term tv bv env a, tr_term tv bv env b))
-    | _, [a;b] when c = Lazy.force coq_Zlt ->
-	Fatom (Lt (tr_term tv bv env a, tr_term tv bv env b))
-    | _, [a;b] when c = Lazy.force coq_Zge ->
-	Fatom (Ge (tr_term tv bv env a, tr_term tv bv env b))
-    | _, [a;b] when c = Lazy.force coq_Zgt ->
-	Fatom (Gt (tr_term tv bv env a, tr_term tv bv env b))
-          (* comparisons on reals *)
-    | _, [a;b] when c = Lazy.force coq_Rle ->
-	Fatom (Le (tr_term tv bv env a, tr_term tv bv env b))
-    | _, [a;b] when c = Lazy.force coq_Rlt ->
-	Fatom (Lt (tr_term tv bv env a, tr_term tv bv env b))
-    | _, [a;b] when c = Lazy.force coq_Rge ->
-	Fatom (Ge (tr_term tv bv env a, tr_term tv bv env b))
-    | _, [a;b] when c = Lazy.force coq_Rgt ->
-	Fatom (Gt (tr_term tv bv env a, tr_term tv bv env b))
-*)
+    (* comparisons on integers *)
+    | _, [a;b] when is_constant c coq_Zle ->
+	let ls = why_constant ["int"] "Int" ["infix <="] in
+	Term.f_app ls [tr_term tv bv env a; tr_term tv bv env b]
+    | _, [a;b] when is_constant c coq_Zlt ->
+	let ls = why_constant ["int"] "Int" ["infix <"] in
+	Term.f_app ls [tr_term tv bv env a; tr_term tv bv env b]
+    | _, [a;b] when is_constant c coq_Zge ->
+	let ls = why_constant ["int"] "Int" ["infix >="] in
+	Term.f_app ls [tr_term tv bv env a; tr_term tv bv env b]
+    | _, [a;b] when is_constant c coq_Zgt ->
+	let ls = why_constant ["int"] "Int" ["infix >"] in
+	Term.f_app ls [tr_term tv bv env a; tr_term tv bv env b]
+    (* comparisons on reals *)
+    | _, [a;b] when is_constant c coq_Rle ->
+	let ls = why_constant ["real"] "Real" ["infix <="] in
+	Term.f_app ls [tr_term tv bv env a; tr_term tv bv env b]
+    | _, [a;b] when is_constant c coq_Rlt ->
+	let ls = why_constant ["real"] "Real" ["infix <"] in
+	Term.f_app ls [tr_term tv bv env a; tr_term tv bv env b]
+    | _, [a;b] when is_constant c coq_Rge ->
+	let ls = why_constant ["real"] "Real" ["infix >="] in
+	Term.f_app ls [tr_term tv bv env a; tr_term tv bv env b]
+    | _, [a;b] when is_constant c coq_Rgt ->
+	let ls = why_constant ["real"] "Real" ["infix >"] in
+	Term.f_app ls [tr_term tv bv env a; tr_term tv bv env b]
+    (* propositional logic *)
     | _, [] when c = build_coq_False () ->
 	Term.f_false
     | _, [] when c = build_coq_True () ->
@@ -337,7 +368,7 @@ and tr_formula tv bv env f =
 let tr_goal gl =
   let f = tr_formula Idmap.empty Idmap.empty (pf_env gl) (pf_concl gl) in
   let pr = Decl.create_prsymbol (Ident.id_fresh "goal") in
-  if debug then Format.printf "%a@." Pretty.print_fmla f;
+  if debug then Format.printf "---@\n%a@\n---@." Pretty.print_fmla f;
   task := Task.add_prop_decl !task Decl.Pgoal pr f
 
 let whytac gl =
@@ -346,7 +377,7 @@ let whytac gl =
   task := Task.use_export None Theory.builtin_theory;
   try
     tr_goal gl;
-    Format.printf "@[%a@]@?" (Driver.print_task drv) !task;
+    if debug then Format.printf "@[%a@]@\n---@." (Driver.print_task drv) !task;
     let res = Driver.call_prover ~debug ~timeout drv !task in
     match res.pr_answer with
       | Valid -> Tactics.admit_as_an_axiom gl

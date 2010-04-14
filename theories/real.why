@@ -3,11 +3,12 @@
 theory Real 
 
   logic (< )(real, real)
-  logic (<=)(real, real)
-  logic (> )(real, real)
-  logic (>=)(real, real)
+  logic (<=)(x:real, y:real) = x < y or x = y
+  logic (> )(x:real, y:real) = y < x
+  logic (>=)(x:real, y:real) = y <= x
   
-  (* TODO : they are total order relations *)
+  clone export relations.TotalOrder with
+    type t = real, logic rel = (<=)
 
   logic zero : real = 0.0
   logic one  : real = 1.0
