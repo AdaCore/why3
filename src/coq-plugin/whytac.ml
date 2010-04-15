@@ -151,7 +151,20 @@ let decompose_arrows =
 (* Coq globals *)
 
 let global_ts = ref Refmap.empty 
-(* let global_ls = ref Refmap.empty  *)
+let global_ls = ref Refmap.empty
+
+(* synchronization *)
+let () =
+  Summary.declare_summary "Why globals"
+    { Summary.freeze_function = 
+	(fun () -> !global_ts, !global_ls);
+      Summary.unfreeze_function = 
+	(fun (ts,ls) -> global_ts := ts; global_ls := ls);
+      Summary.init_function = 
+	(fun () -> ());
+      Summary.survive_module = true;
+      Summary.survive_section = true;
+    }
 
 let lookup_global table r = match Refmap.find r !table with
   | None -> raise NotFO
@@ -306,7 +319,9 @@ and tr_global_ts env r =
 	      let l, _ = decompose_arrows t in
 	      let l = List.map (tr_type tv env) l in
 	      let id = preid_of_id (Nametab.id_of_global r) in
-	      Term.create_lsymbol id l (Some tyj)
+	      let ls = Term.create_lsymbol id l (Some tyj) in
+	      add_global global_ls r (Some ls);
+	      ls
 	    in
 	    let ls = Array.to_list (Array.mapi mk_constructor oib.mind_nf_lc) in
 	    ts, Decl.Talgebraic ls
