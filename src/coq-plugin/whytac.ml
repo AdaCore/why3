@@ -500,10 +500,16 @@ and tr_formula tv bv env f =
     | _ -> assert false (*TODO*)
 
 let tr_goal gl =
-  let f = tr_formula Idmap.empty Idmap.empty (pf_env gl) (pf_concl gl) in
-  let pr = Decl.create_prsymbol (Ident.id_fresh "goal") in
-  if debug then Format.printf "---@\n%a@\n---@." Pretty.print_fmla f;
-  task := Task.add_prop_decl !task Decl.Pgoal pr f
+  let rec tr_ctxt tv bv = function
+    | [] ->
+	let f = tr_formula tv bv (pf_env gl) (pf_concl gl) in
+	let pr = Decl.create_prsymbol (Ident.id_fresh "goal") in
+	if debug then Format.printf "---@\n%a@\n---@." Pretty.print_fmla f;
+	task := Task.add_prop_decl !task Decl.Pgoal pr f
+    | _ ->
+	assert false (*TODO*)
+  in
+  tr_ctxt Idmap.empty Idmap.empty (pf_hyps gl)
 
 let whytac gl =
   let concl_type = pf_type_of gl (pf_concl gl) in
