@@ -140,6 +140,14 @@ let decomp_type_lambdas env t =
   in
   loop [] t
 
+let decompose_arrows =
+  let rec arrows_rec l c = match kind_of_term c with
+    | Prod (_,t,c) when not (dependent (mkRel 1) c) -> arrows_rec (t :: l) c
+    | Cast (c,_,_) -> arrows_rec l c
+    | _ -> List.rev l, c
+  in
+  arrows_rec []
+
 (* Coq globals *)
 
 let global_ts = ref Refmap.empty 
@@ -268,9 +276,9 @@ and tr_global_ts env r =
 	  task := Task.add_ty_decl !task [ts, Decl.Tabstract];
 	  ts
       | IndRef i ->
-	  Format.eprintf "ici@.";
 	  let mib, _ = Global.lookup_inductive i in
-	  let make_one_ts j _ =
+	  (* first, the inductive types *)
+	  let make_one_ts j _ = (* j-th inductive *)
 	    let r = IndRef (ith_mutual_inductive i j) in
 	    let ty = Global.type_of_global r in
 	    let tv, _, t = decomp_type_quantifiers env ty in
@@ -283,10 +291,24 @@ and tr_global_ts env r =
 	    add_global global_ts r (Some ts)
 	  in
 	  Array.iteri make_one_ts mib.mind_packets;
-	  let make_one j ib = 
-	    let ls = [] in
-	    let r = IndRef (ith_mutual_inductive i j) in
-	    let ts = lookup_global global_ts r in
+	  (* second, the declarations with constructors *)
+	  let make_one j oib = (* j-th inductive *)
+	    let j = ith_mutual_inductive i j in
+	    let ts = lookup_global global_ts (IndRef j) in
+	    let tyj = Ty.ty_app ts (List.map Ty.ty_var ts.Ty.ts_args) in
+	    let mk_constructor k tyk = (* k-th constructor *)
+	      let r = ConstructRef (j, k+1) in
+	      let ty = Global.type_of_global r in
+	      let vars, env, t = decomp_type_quantifiers env ty in
+	      let tv = 
+		List.fold_right2 Idmap.add vars ts.Ty.ts_args Idmap.empty 
+	      in
+	      let l, _ = decompose_arrows t in
+	      let l = List.map (tr_type tv env) l in
+	      let id = preid_of_id (Nametab.id_of_global r) in
+	      Term.create_lsymbol id l (Some tyj)
+	    in
+	    let ls = Array.to_list (Array.mapi mk_constructor oib.mind_nf_lc) in
 	    ts, Decl.Talgebraic ls
 	  in
 	  let decl = Array.mapi make_one mib.mind_packets in
