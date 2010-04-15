@@ -10,6 +10,7 @@ open Hipattern
 open Typing
 open Libnames
 open Declarations
+open Pp
 
 open Why
 open Call_provers
@@ -148,6 +149,11 @@ let decompose_arrows =
   in
   arrows_rec []
 
+let rec skip_k_args k cl = match k, cl with
+  | 0, _ -> cl
+  | _, _ :: cl -> skip_k_args (k-1) cl
+  | _, [] -> raise NotFO
+
 (* Coq globals *)
 
 let global_ts = ref Refmap.empty 
@@ -251,7 +257,9 @@ let rec tr_type tv env t =
 	  Ty.ty_app ts (List.map (tr_type tv env) cl)
 	with
 	  | Not_found ->
-	      assert false (* raise NotFO ??? *)
+	      Format.printf "ICI : %a@." msg_with (Printer.pr_constr f);
+	      flush stderr;
+	      raise NotFO
 	  | NotFO ->
 	      (* TODO: we need to abstract some part of (f cl) *)
 	      raise NotFO
@@ -278,7 +286,7 @@ and tr_global_ts env r =
 		let (tv, vars), env, t = decomp_type_lambdas env b in
 		let def = Some (tr_type tv env t) in
 		Ty.create_tysymbol id vars def
-		(* FIXME: is it correct to use None when NotFO? *)
+		  (* FIXME: is it correct to use None when NotFO? *)
 	    | None -> 
 		let tv = 
 		  List.map (fun x -> Ty.create_tvsymbol (preid_of_id x)) tv 
@@ -375,37 +383,41 @@ and tr_term tv bv env t =
     | Var id when Idmap.mem id bv ->
 	Term.t_var (Idmap.find id bv)
     | _ ->
-	assert false (*TODO*)
-	  (* 	let f, cl = decompose_app t in *)
-	  (* 	begin try *)
-	  (* 	  let r = global_of_constr f in *)
-	  (* 	  match tr_global env r with *)
-	  (* 	    | DeclFun (s, k, _, _) -> *)
-	  (* 		let cl = skip_k_args k cl in *)
-	  (* 		Fol.App (s, List.map (tr_term tv bv env) cl) *)
-	  (* 	    | _ -> *)
-	  (* 		raise NotFO *)
-	  (* 	with *)
-	  (* 	  | Not_found -> *)
-	  (* 	      raise NotFO *)
-	  (* 	  | NotFO -> (\* we need to abstract some part of (f cl) *\) *)
-	  (* 	      let rec abstract app = function *)
-	  (* 		| [] -> *)
-	  (* 		    Fol.App (make_term_abstraction tv env app, []) *)
-	  (* 		| x :: l as args -> *)
-	  (* 		    begin try *)
-	  (* 		      let s = make_term_abstraction tv env app in *)
-	  (* 		      Fol.App (s, List.map (tr_term tv bv env) args) *)
-	  (* 		    with NotFO -> *)
-	  (* 		      abstract (applist (app, [x])) l *)
-	  (* 		    end *)
-	  (* 	      in *)
-	  (* 	      let app,l = match cl with *)
-	  (* 		| x :: l -> applist (f, [x]), l | [] -> raise NotFO *)
-	  (* 	      in *)
-	  (* 	      abstract app l *)
-	  (* 	end *)
-
+	let f, cl = decompose_app t in
+	begin try
+	  let r = global_of_constr f in
+	  let ls = lookup_global global_ls r in
+	  begin match ls.Term.ls_value with
+	    | Some ty ->
+		let k = 0 (* TODO: polymorphic arity *) in
+	  	let cl = skip_k_args k cl in
+		Term.t_app ls (List.map (tr_term tv bv env) cl) ty
+	    | None  ->
+		raise NotFO
+	  end
+	with
+	  | Not_found ->
+	      raise NotFO
+	  | NotFO -> 
+	      (* we need to abstract some part of (f cl) *)
+	      assert false (*TODO*)
+(* 	      let rec abstract app = function *)
+(* 	  	| [] -> *)
+(* 	  	    Fol.App (make_term_abstraction tv env app, []) *)
+(* 	  	| x :: l as args -> *)
+(* 	  	    begin try *)
+(* 	  	      let s = make_term_abstraction tv env app in *)
+(* 	  	      Fol.App (s, List.map (tr_term tv bv env) args) *)
+(* 	  	    with NotFO -> *)
+(* 	  	      abstract (applist (app, [x])) l *)
+(* 	  	    end *)
+(* 	      in *)
+(* 	      let app,l = match cl with *)
+(* 	  	| x :: l -> applist (f, [x]), l | [] -> raise NotFO *)
+(* 	      in *)
+(* 	      abstract app l *)
+	end
+	  
 and quantifiers n a b tv bv env =
   let vars, env = coq_rename_vars env [n,a] in
   let id = match vars with [x] -> x | _ -> assert false in
@@ -497,19 +509,52 @@ and tr_formula tv bv env f =
 	    raise NotFO
 	    end
 	  *)
-    | _ -> assert false (*TODO*)
+    | _ -> raise NotFO (*TODO*)
 
 let tr_goal gl =
+  let env = pf_env gl in
   let rec tr_ctxt tv bv = function
     | [] ->
-	let f = tr_formula tv bv (pf_env gl) (pf_concl gl) in
-	let pr = Decl.create_prsymbol (Ident.id_fresh "goal") in
-	if debug then Format.printf "---@\n%a@\n---@." Pretty.print_fmla f;
-	task := Task.add_prop_decl !task Decl.Pgoal pr f
-    | _ ->
-	assert false (*TODO*)
+	tr_formula tv bv env (pf_concl gl) 
+    | (id, None, ty) :: ctxt when is_Set ty || is_Type ty ->
+	let v = Ty.create_tvsymbol (preid_of_id id) in
+	let tv = Idmap.add id v tv in
+	tr_ctxt tv bv ctxt
+    | (id, None, ty) :: ctxt ->
+	let t = type_of env Evd.empty ty in
+	begin try
+	  if is_Set t || is_Type t then
+	    let ty = tr_type tv env ty in (* DO NOT INLINE! *)
+	    let vs = Term.create_vsymbol (preid_of_id id) ty in
+	    let bv = Idmap.add id vs bv in
+	    Term.f_forall [vs] [] (tr_ctxt tv bv ctxt)
+	  else if is_Prop t then 
+	    let h = tr_formula tv bv env ty in (* DO NOT INLINE! *)
+	    Term.f_implies h (tr_ctxt tv bv ctxt)
+	  else 
+	    raise NotFO
+	with NotFO -> 
+	  tr_ctxt tv bv ctxt
+	end
+    | (id, Some d, ty) :: ctxt -> 
+	(* local definition -> let or skip *)
+	let t = type_of env Evd.empty ty in
+	begin try
+	  if not (is_Set t || is_Type t) then raise NotFO;
+	  let d = tr_term tv bv env d in
+	  let ty = tr_type tv env ty in
+	  let vs = Term.create_vsymbol (preid_of_id id) ty in
+	  let bv = Idmap.add id vs bv in
+	  Term.f_let vs d (tr_ctxt tv bv ctxt)
+	with NotFO -> 
+	  tr_ctxt tv bv ctxt
+	end
   in
-  tr_ctxt Idmap.empty Idmap.empty (pf_hyps gl)
+  let f = tr_ctxt Idmap.empty Idmap.empty (List.rev (pf_hyps gl)) in
+  let pr = Decl.create_prsymbol (Ident.id_fresh "goal") in
+  if debug then Format.printf "---@\n%a@\n---@." Pretty.print_fmla f;
+  task := Task.add_prop_decl !task Decl.Pgoal pr f
+
 
 let whytac gl =
   let concl_type = pf_type_of gl (pf_concl gl) in
@@ -518,8 +563,11 @@ let whytac gl =
   try
     tr_goal gl;
     if debug then Format.printf "@[%a@]@\n---@." Pretty.print_task !task;
-    if debug then Format.printf "@[%a@]@\n---@." (Driver.print_task drv) !task;
-    let res = Driver.call_prover ~debug ~timeout drv !task in
+    let tasks = Driver.apply_transforms drv !task in
+    assert (List.length tasks = 1);
+    let task = List.hd tasks in
+    if debug then Format.printf "@[%a@]@\n---@." (Driver.print_task drv) task;
+    let res = Driver.call_prover ~debug ~timeout drv task in
     match res.pr_answer with
       | Valid -> Tactics.admit_as_an_axiom gl
       | Invalid -> error "Invalid"

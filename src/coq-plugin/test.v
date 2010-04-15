@@ -3,9 +3,24 @@ Require Export ZArith.
 Open Scope Z_scope.
 Require Export List.
 
+
+Parameter P : (nat -> nat) -> Prop.
+
+Goal forall (a:Set), forall x:nat, x=S O -> P S -> 
+  let y := (S (S O)) in S x=y.
+intros.
+why.
+
+Goal  forall (a:Set), forall x:Z, x=1 -> P S -> let y := 2 in x+1=y.
+intros.
+why.
+
 (* Inductive types *)
 
 Goal  forall x: list nat, x=x.
+intros.
+
+why.
 
 (* Mutually inductive types *)
 
