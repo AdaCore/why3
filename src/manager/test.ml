@@ -13,17 +13,27 @@ let autodetection () =
   Whyconf.save ()
 
 let () = 
-  try Whyconf.read_config_file ()
+  try 
+    Whyconf.read_config_file ()
   with Not_found -> 
     Format.eprintf "No .why.conf file found. Running autodetection of provers.@.";
-    autodetection ()
+    autodetection ();
+    exit 0
 
 
 
-    
+let provers = Whyconf.known_provers ()
 
+open Format
 
-(*
+let () =
+  printf "Provers: ";
+  List.iter
+    (fun name ->
+       printf " %s, " name) provers;
+  printf "@."
+   
+
 
 let fname = "test"
 
@@ -89,5 +99,5 @@ let () =
   Why.Ident.Mid.iter do_th (Why.Theory.Mnm.fold add_th m Why.Ident.Mid.empty)
 
 
-*)
+
 
