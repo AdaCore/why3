@@ -1,7 +1,8 @@
 /**************************************************************************/
 /*                                                                        */
-/*  Copyright (C) 2008                                                    */
-/*    Dillon PARIENTE                                                     */
+/*  Copyright (C) 2008-2010                                               */
+/*    Dillon PARIENTE 2008                                                */
+/*    Claude MARCHE 2010                                                  */
 /*                                                                        */
 /*  This software is free software; you can redistribute it and/or        */
 /*  modify it under the terms of the GNU Library General Public           */
@@ -47,6 +48,7 @@ int main(int argc, char *argv[]) {
     printf("%s: Error: when allocating %d bytes in memory\n", argv[0], (int) s);
     return -1;
   }
+  *p = '\0';
   for (i = 2; i < argc; i++) {
     strncat(p, argv[i], strlen(argv[i])); 
     if (i < argc - 1) strcat(p, " ");

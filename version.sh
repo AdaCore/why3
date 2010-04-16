@@ -15,6 +15,7 @@ echo "let version = \"$VERSION\"" >> $WHYVF
 echo "let date = \""`date`"\"" >> $WHYVF
 echo "let bindir = \"$BINDIR\"" >> $WHYVF
 echo "let libdir = \"$LIBDIR/why\"" >> $WHYVF
+echo "let datadir = \"$DATADIR/why\"" >> $WHYVF
 
 
 # Doc

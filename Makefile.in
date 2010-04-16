@@ -32,6 +32,7 @@ datarootdir=@datarootdir@
 exec_prefix=@exec_prefix@
 BINDIR=$(DESTDIR)@bindir@
 LIBDIR=$(DESTDIR)@libdir@
+DATADIR=$(DESTDIR)@datarootdir@
 
 EXE=@EXE@
 STRIP=@STRIP@
@@ -82,7 +83,7 @@ all: @OCAMLBEST@
 # Why library 
 #############
 
-LIBGENERATED = src/config.ml src/util/rc.ml \
+LIBGENERATED = src/config.ml src/userconf/rc.ml \
           src/parser/parser.mli src/parser/parser.ml src/parser/parser.output \
             src/parser/lexer.ml src/driver/driver_lexer.ml \
             src/driver/driver_parser.mli src/driver/driver_parser.ml \
@@ -91,7 +92,7 @@ LIBGENERATED = src/config.ml src/util/rc.ml \
 
 depend: $(LIBGENERATED)
 
-LIBDIRS=core util parser transform driver printer
+LIBDIRS=core util parser transform driver printer userconf
 LIBCLEAN=$(addprefix src/, $(LIBDIRS))
 LIBCLEAN:=$(addsuffix /*.cm[iox], $(LIBCLEAN)) \
           $(addsuffix /*.annot, $(LIBCLEAN)) \
@@ -104,14 +105,14 @@ clean::
 include Version
 
 doc/version.tex src/config.ml: Version version.sh config.status
-	BINDIR=$(BINDIR) LIBDIR=$(LIBDIR) COQVER=@COQVER@ ./version.sh
+	BINDIR=$(BINDIR) LIBDIR=$(LIBDIR) DATADIR=$(DATADIR) COQVER=@COQVER@ ./version.sh
 
 CORE_CMO := ident.cmo ty.cmo term.cmo pattern.cmo decl.cmo theory.cmo\
 	task.cmo pretty.cmo trans.cmo env.cmo register.cmo
 CORE_CMO := $(addprefix src/core/,$(CORE_CMO))
 
 UTIL_CMO := pp.cmo loc.cmo prtree.cmo util.cmo hashcons.cmo \
-            sysutil.cmo hashweak.cmo rc.cmo
+            sysutil.cmo hashweak.cmo 
 UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
 
 PARSER_CMO := ptree.cmo parser.cmo lexer.cmo denv.cmo typing.cmo 
@@ -125,14 +126,17 @@ TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
 DRIVER_CMO := driver_ast.cmo call_provers.cmo dynlink_compat.cmo \
-              driver_parser.cmo driver_lexer.cmo driver.cmo whyrc.cmo 
+              driver_parser.cmo driver_lexer.cmo driver.cmo  
 DRIVER_CMO := $(addprefix src/driver/,$(DRIVER_CMO))
 
 PRINTER_CMO := print_real.cmo alt_ergo.cmo why3.cmo smt.cmo coq.cmo
 PRINTER_CMO := $(addprefix src/printer/,$(PRINTER_CMO))
 
+USERCONF_CMO := rc.cmo whyconf.cmo
+USERCONF_CMO := $(addprefix src/userconf/,$(USERCONF_CMO))
+
 LIBCMO = src/config.cmo $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
-         $(TRANSFORM_CMO) $(PRINTER_CMO)
+         $(TRANSFORM_CMO) $(PRINTER_CMO) $(USERCONF_CMO)
 LIBCMX = $(LIBCMO:.cmo=.cmx)
 
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
