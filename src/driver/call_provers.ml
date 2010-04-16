@@ -57,6 +57,7 @@ type prover =
 exception CommandError
 exception NoCommandlineProvided      
 
+let is_true_cygwin = Sys.os_type = "Cygwin"
 
 (* this should be replaced by a proper use of fork/waitpid() *)
 let dirname = Filename.dirname Sys.argv.(0)
@@ -199,6 +200,13 @@ let rec on_file ?debug ?timeout pr filename =
   check_prover pr;
   match pr.pr_call_file with
     | Some cmd -> 
+        let filename = if is_true_cygwin 
+        then 
+          let cin = Unix.open_process_in 
+            (sprintf "cygpath -am \"%s\"" filename) in
+          let f = input_line cin in
+          close_in cin; f
+        else filename in
         let cmd = 
           let repl_fun s = 
             match Str.matched_group 1 s with
