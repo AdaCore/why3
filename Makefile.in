@@ -86,19 +86,19 @@ all: @OCAMLBEST@
 # Why library
 #############
 
-LIBGENERATED = src/userconf/rc.ml \
+LIBGENERATED = src/util/rc.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
 	       src/parser/parser.output src/parser/lexer.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_parser.output src/driver/driver_lexer.ml
 
-LIB_UTIL = pp loc prtree util hashcons sysutil hashweak
+LIB_UTIL = pp loc prtree util hashcons sysutil hashweak rc
 
 LIB_CORE = ident ty term pattern decl theory task pretty trans env register
 
 LIB_PARSER = ptree parser lexer denv typing
 
-LIB_DRIVER = driver_ast call_provers driver_parser driver_lexer driver
+LIB_DRIVER = call_provers driver_ast driver_parser driver_lexer driver whyconf
 
 LIB_TRANSFORM = simplify_recursive_definition inlining \
 		split_conjunction encoding_decorate \
@@ -108,18 +108,15 @@ LIB_TRANSFORM = simplify_recursive_definition inlining \
 
 LIB_PRINTER = print_real alt_ergo why3 smt coq
 
-LIB_USERCONF = rc whyconf
-
 LIBMODULES = src/config \
 	      $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
 	      $(addprefix src/parser/, $(LIB_PARSER)) \
 	      $(addprefix src/driver/, $(LIB_DRIVER)) \
 	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
-	      $(addprefix src/printer/, $(LIB_PRINTER)) \
-	      $(addprefix src/userconf/, $(LIB_USERCONF))
+	      $(addprefix src/printer/, $(LIB_PRINTER))
 
-LIBDIRS = util core parser driver transform printer userconf
+LIBDIRS = util core parser driver transform printer
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
 LIBML  = $(addsuffix .ml,  $(LIBMODULES))
