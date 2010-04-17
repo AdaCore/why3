@@ -19,55 +19,60 @@
 
 include Version
 
-ifeq (@enable_verbose_make@,yes)
- QUIET = 
-else    
- QUIET = yes
+VERBOSEMAKE ?= @enable_verbose_make@
+
+ifeq ($(VERBOSEMAKE),yes)
+  QUIET =
+else
+  QUIET = yes
 endif
 
-# where to install the binaries
+# install the binaries
 DESTDIR =
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-datarootdir=@datarootdir@
-BINDIR=$(DESTDIR)@bindir@
-LIBDIR=$(DESTDIR)@libdir@
-DATADIR=$(DESTDIR)@datadir@
-MANDIR=$(DESTDIR)@mandir@
+
+prefix 	    = @prefix@
+exec_prefix = @exec_prefix@
+datarootdir = @datarootdir@
+
+BINDIR  = $(DESTDIR)@bindir@
+LIBDIR  = $(DESTDIR)@libdir@
+DATADIR = $(DESTDIR)@datadir@
+MANDIR  = $(DESTDIR)@mandir@
 
 # OS specific stuff
-EXE=@EXE@
-STRIP=@STRIP@
+EXE   = @EXE@
+STRIP = @STRIP@
 
 # other variables
-OCAMLC   = @OCAMLC@ 
-OCAMLOPT = @OCAMLOPT@ 
-OCAMLDEP = @OCAMLDEP@
-OCAMLLEX = @OCAMLLEX@
-OCAMLYACC= @OCAMLYACC@
-OCAMLDOC = @OCAMLDOC@
-OCAMLLIB = @OCAMLLIB@
-OCAMLBEST= @OCAMLBEST@
-OCAMLVERSION = @OCAMLVERSION@
+OCAMLC    = @OCAMLC@
+OCAMLOPT  = @OCAMLOPT@
+OCAMLDEP  = @OCAMLDEP@
+OCAMLLEX  = @OCAMLLEX@
+OCAMLYACC = @OCAMLYACC@
+OCAMLDOC  = @OCAMLDOC@
+OCAMLLIB  = @OCAMLLIB@
+OCAMLBEST = @OCAMLBEST@
 #CAMLP4   = @CAMLP4O@
-#PSVIEWER = @PSVIEWER@
+
+OCAMLVERSION = @OCAMLVERSION@
+
+#PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-ifeq (@enable_plugins@,yes)
-DYNLINKCMA  = dynlink.cma
-DYNLINKCMXA = dynlink.cmxa
-else
-DYNLINKCMA  = 
-DYNLINKCMXA = 
-endif
-
-BFLAGS = -w Aelz -dtypes -g $(INCLUDES)
-OFLAGS = -w Aelz -dtypes    $(INCLUDES)
+BFLAGS = -w Aelz -dtypes -g -I src $(INCLUDES)
+OFLAGS = -w Aelz -dtypes    -I src $(INCLUDES)
 
 # external libraries common to all binaries
 
-EXTCMA = str.cma unix.cma nums.cma $(DYNLINKCMA)
-EXTCMXA = $(EXTCMA:.cma=.cmxa)
+ifeq (@enable_plugins@,yes)
+  DYNLINK = dynlink
+else
+  DYNLINK =
+endif
+
+EXTLIBS = str unix nums $(DYNLINK)
+EXTCMA	= $(addsuffix .cma,$(EXTLIBS))
+EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS))
 
 ###############
 # main target
@@ -78,235 +83,316 @@ all: @OCAMLBEST@
 .PHONY: byte opt clean depend all
 
 #############
-# Why library 
+# Why library
 #############
 
 LIBGENERATED = src/config.ml src/userconf/rc.ml \
-          src/parser/parser.mli src/parser/parser.ml src/parser/parser.output \
-            src/parser/lexer.ml src/driver/driver_lexer.ml \
-            src/driver/driver_parser.mli src/driver/driver_parser.ml \
-	    src/driver/driver_parser.output
+	       src/parser/parser.mli src/parser/parser.ml \
+	       src/parser/parser.output src/parser/lexer.ml \
+	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
+	       src/driver/driver_parser.output src/driver/driver_lexer.ml
 
-depend: $(LIBGENERATED)
+LIB_UTIL = pp loc prtree util hashcons sysutil hashweak
 
-LIBDIRS=core util parser transform driver printer userconf
-LIBCLEAN=$(addprefix src/, $(LIBDIRS))
-LIBCLEAN:=$(addsuffix /*.cm[iox], $(LIBCLEAN)) \
-          $(addsuffix /*.annot, $(LIBCLEAN)) \
-          $(addsuffix /*.o, $(LIBCLEAN)) 
+LIB_CORE = ident ty term pattern decl theory task pretty trans env register
 
-clean::
-	rm -f $(LIBCLEAN) $(LIBGENERATED) 
-	rm -f why.cm[iox] why.a why.o $(LIBCMA) $(LIBCMXA)
+LIB_PARSER = ptree parser lexer denv typing
 
-CORE_CMO := ident.cmo ty.cmo term.cmo pattern.cmo decl.cmo theory.cmo\
-	task.cmo pretty.cmo trans.cmo env.cmo register.cmo
-CORE_CMO := $(addprefix src/core/,$(CORE_CMO))
+LIB_DRIVER = driver_ast call_provers driver_parser driver_lexer driver
 
-UTIL_CMO := pp.cmo loc.cmo prtree.cmo util.cmo hashcons.cmo \
-            sysutil.cmo hashweak.cmo 
-UTIL_CMO := $(addprefix src/util/,$(UTIL_CMO))
+LIB_TRANSFORM = simplify_recursive_definition inlining \
+		split_conjunction encoding_decorate \
+		remove_logic_definition eliminate_inductive \
+		compile_match eliminate_algebraic \
+		eliminate_let eliminate_definition
 
-PARSER_CMO := ptree.cmo parser.cmo lexer.cmo denv.cmo typing.cmo 
-PARSER_CMO := $(addprefix src/parser/,$(PARSER_CMO))
+LIB_PRINTER = print_real alt_ergo why3 smt coq
 
-TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
-	split_conjunction.cmo encoding_decorate.cmo\
-	remove_logic_definition.cmo eliminate_inductive.cmo\
-	compile_match.cmo eliminate_algebraic.cmo\
-	eliminate_let.cmo eliminate_definition.cmo
-TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
+LIB_USERCONF = rc whyconf
 
-DRIVER_CMO := driver_ast.cmo call_provers.cmo \
-              driver_parser.cmo driver_lexer.cmo driver.cmo  
-DRIVER_CMO := $(addprefix src/driver/,$(DRIVER_CMO))
+LIBMODULES = src/config \
+	      $(addprefix src/util/, $(LIB_UTIL)) \
+	      $(addprefix src/core/, $(LIB_CORE)) \
+	      $(addprefix src/parser/, $(LIB_PARSER)) \
+	      $(addprefix src/driver/, $(LIB_DRIVER)) \
+	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
+	      $(addprefix src/printer/, $(LIB_PRINTER)) \
+	      $(addprefix src/userconf/, $(LIB_USERCONF))
 
-PRINTER_CMO := print_real.cmo alt_ergo.cmo why3.cmo smt.cmo coq.cmo
-PRINTER_CMO := $(addprefix src/printer/,$(PRINTER_CMO))
+LIBDIRS = util core parser driver transform printer userconf
+LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
-USERCONF_CMO := rc.cmo whyconf.cmo
-USERCONF_CMO := $(addprefix src/userconf/,$(USERCONF_CMO))
+LIBML  = $(addsuffix .ml,  $(LIBMODULES))
+LIBMLI = $(addsuffix .mli, $(LIBMODULES))
+LIBCMO = $(addsuffix .cmo, $(LIBMODULES))
+LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
 
-LIBCMO = src/config.cmo $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
-         $(TRANSFORM_CMO) $(PRINTER_CMO) $(USERCONF_CMO)
-LIBCMX = $(LIBCMO:.cmo=.cmx)
+$(LIBCMO) $(LIBCMX): INCLUDES = $(LIBINCLUDES)
+$(LIBCMX): OFLAGS += -for-pack Why
 
-LIBINCLUDES = -I src $(addprefix -I src/, $(LIBDIRS))
-$(LIBCMO) $(LIBCMX): INCLUDES=$(LIBINCLUDES)
-$(LIBCMX): OFLAGS+=-for-pack Why
+# build targets
 
-LIBCMI  = why.cmi
-LIBCMA  = why.cma
-LIBCMXA = why.cmxa
+byte: src/why.cma
+opt:  src/why.cmxa
 
-byte: $(LIBCMA)
-opt: $(LIBCMA) $(LIBCMXA)
-
-$(LIBCMA): why.cmo
+src/why.cma: src/why.cmo
 	$(OCAMLC) -a $(BFLAGS) -o $@ $^
 
-$(LIBCMXA): why.cmx
+src/why.cmxa: src/why.cmx
 	$(OCAMLOPT) -a $(OFLAGS) -o $@ $^
 
-why.cmo: $(LIBCMO)
-	$(OCAMLC) $(BFLAGS) -pack -o $@ $(LIBCMO)
+src/why.cmo: $(LIBCMO)
+	$(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
-$(LIBCMI) : why.cmo why.cmx
+src/why.cmx: $(LIBCMX)
+	$(OCAMLOPT) $(OFLAGS) -pack -o $@ $^
+
+src/why.cmi: src/why.cmo src/why.cmx
 	@echo -n
 
-why.cmx: $(LIBCMX)
-	$(OCAMLOPT) $(INCLUDES) -pack -o $@ $(LIBCMX)
+# depend target
 
 include .depend.lib
 
 .depend.lib: $(LIBGENERATED)
-	$(OCAMLDEP) -slash $(LIBINCLUDES) $(LIBCMO:.cmo=.ml) $(LIBCMO:.cmo=.mli) > $@
+	$(OCAMLDEP) -slash $(LIBINCLUDES) $(LIBML) $(LIBMLI) > $@
 
 depend: .depend.lib
 
+# clean target
+
+LIBSDIRS = $(addprefix src/, $(LIBDIRS))
+LIBCLEAN = $(addsuffix /*.cm[iox], $(LIBSDIRS)) \
+	   $(addsuffix /*.annot, $(LIBSDIRS)) \
+	   $(addsuffix /*.o, $(LIBSDIRS)) \
+	   $(addsuffix /*~, $(LIBSDIRS))
+
+clean::
+	rm -f $(LIBCLEAN) $(LIBGENERATED)
+	rm -f src/why.cm[iox] src/why.[ao] src/why.cma src/why.cmxa
+
 ##################
-# why binary
+# Why binary
 ##################
 
 byte: bin/why.byte
 opt:  bin/why.opt
 
-src/main.cmx : $(LIBCMI)
-
-bin/why.opt: $(LIBCMXA) src/main.cmx
+bin/why.opt: src/why.cmxa src/main.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why.byte: $(LIBCMA) src/main.cmo
+bin/why.byte: src/why.cma src/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+src/main.cmo src/main.cmx: src/why.cmi
 
 clean::
 	rm -f src/main.cm[iox] src/main.annot
 	rm -f bin/why.byte bin/why.opt
 
-##########
-# whyml
-##########
+########
+# Whyml
+########
 
-PGM_GENERATED = src/programs/pgm_lexer.ml src/programs/pgm_parser.mli \
-	        src/programs/pgm_parser.output src/programs/pgm_parser.ml
+PGMGENERATED = src/programs/pgm_parser.mli src/programs/pgm_parser.ml \
+	       src/programs/pgm_parser.output src/programs/pgm_lexer.ml
 
-PGM_CMO := pgm_parser.cmo pgm_lexer.cmo pgm_typing.cmo pgm_main.cmo\
-	   pgm_ttree.cmo pgm_ptree.cmo
+PGM_FILES = pgm_ttree pgm_ptree pgm_parser pgm_lexer pgm_typing pgm_main
 
-PGM_CMO := $(addprefix src/programs/, $(PGM_CMO))
-PGM_CMX = $(PGM_CMO:.cmo=.cmx)
+PGMMODULES = $(addprefix src/programs/, $(PGM_FILES))
 
-$(PGM_CMO) $(PGM_CMX): INCLUDES=-I src/programs/
-$(PGM_CMO) $(PGM_CMX): $(LIBCMI)
+PGMML  = $(addsuffix .ml,  $(PGMMODULES))
+PGMMLI = $(addsuffix .mli, $(PGMMODULES))
+PGMCMO = $(addsuffix .cmo, $(PGMMODULES))
+PGMCMX = $(addsuffix .cmx, $(PGMMODULES))
 
-opt:  bin/whyml.opt
+$(PGMCMO) $(PGMCMX): INCLUDES = -I src/programs
+$(PGMCMO) $(PGMCMX): src/why.cmi
+
+# build targets
+
 byte: bin/whyml.byte
+opt:  bin/whyml.opt
 
-bin/whyml.opt: $(LIBCMXA) $(PGM_CMX) 
-	$(if $(QUIET), @echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+bin/whyml.opt: src/why.cmxa $(PGMCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/whyml.byte: $(LIBCMA) $(PGM_CMO) 
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+bin/whyml.byte: src/why.cma $(PGMCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+# depend and clean targets
 
 include .depend.programs
 
-.depend.programs: $(PGM_GENERATED)
-	$(OCAMLDEP) -slash -I src/programs/ $(PGM_CMO:.cmo=.ml) $(PGM_CMO:.cmo=.mli) > $@
+.depend.programs: $(PGMGENERATED)
+	$(OCAMLDEP) -slash -I src/programs $(PGMML) $(PGMMLI) > $@
 
 depend: .depend.programs
 
 clean::
-	rm -f $(PGM_GENERATED)
-	rm -f src/programs/*.cm[iox] src/programs/*.o src/programs/*.annot
+	rm -f $(PGMGENERATED)
+	rm -f src/programs/*.cm[iox] src/programs/*.o
+	rm -f src/programs/*.annot src/programs/*~
 	rm -f bin/whyml.byte bin/whyml.opt
 
 ###############
 # proof manager
 ###############
 
-MANAGER_CMO := db.cmo test.cmo
-MANAGER_CMO := $(addprefix src/manager/,$(MANAGER_CMO))
+MNG_FILES = db test
 
-$(MANAGER_CMO): INCLUDES=-I src/manager -I +sqlite3 -I +threads
-$(MANAGER_CMO): $(LIBCMI)
+MNGMODULES = $(addprefix src/manager/, $(MNG_FILES))
 
-bin/manager.byte: $(LIBCMA) $(MANAGER_CMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) \
-		-I +sqlite3 $(EXTCMA) sqlite3.cma -o $@ $^
+MNGML  = $(addsuffix .ml,  $(MNGMODULES))
+MNGMLI = $(addsuffix .mli, $(MNGMODULES))
+MNGCMO = $(addsuffix .cmo, $(MNGMODULES))
+MNGCMX = $(addsuffix .cmx, $(MNGMODULES))
+
+$(MNGCMO) $(MNGCMX): INCLUDES = -I src/manager -I +sqlite3
+$(MNGCMO) $(MNGCMX): src/why.cmi
+
+#byte: bin/manager.byte
+#opt:  bin/manager.opt
+
+bin/manager.opt: src/why.cmxa $(MNGCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) sqlite3.cma $^
+	$(STRIP) $@
+
+bin/manager.byte: src/why.cma $(MNGCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) sqlite3.cma $^
+
+# depend and clean targets
 
 include .depend.manager
 
-.depend.manager: 
-	$(OCAMLDEP) -slash -I src/manager/ $(MANAGER_CMO:.cmo=.ml) $(MANAGER_CMO:.cmo=.mli) > $@
+.depend.manager:
+	$(OCAMLDEP) -slash -I src/manager/ $(MNGML) $(MNGMLI) > $@
 
-depend: .depend.programs
+depend: .depend.manager
 
 clean::
-	rm -f src/manager/*.cm[iox] src/manager/*.o src/manager/*.annot
+	rm -f src/manager/*.cm[iox] src/manager/*.o
+	rm -f src/manager/*.annot src/manager/*~
 	rm -f bin/manager.byte bin/manager.opt
 
+#####################
 # graphical interface
 #####################
 
-IDE_CMO := ide_main.cmo
-IDE_CMO := $(addprefix src/ide/,$(IDE_CMO))
-IDE_CMX = $(IDE_CMO:.cmo=.cmx)
+IDE_FILES = ide_main
 
-$(IDE_CMO) $(IDE_CMX): INCLUDES=-I src/ide/ -I +lablgtk2 -I +threads
+IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
+
+IDEML  = $(addsuffix .ml,  $(IDEMODULES))
+IDEMLI = $(addsuffix .mli, $(IDEMODULES))
+IDECMO = $(addsuffix .cmo, $(IDEMODULES))
+IDECMX = $(addsuffix .cmx, $(IDEMODULES))
+
+$(IDECMO) $(IDECMX): INCLUDES = -I src/ide -I +lablgtk2 -I +threads
+$(IDECMO) $(IDECMX): src/why.cmi
+
+# build targets
 
 ifeq (@enable_ide@,yes)
 byte: bin/whyide.byte
 opt:  bin/whyide.opt
 endif
 
-bin/whyide.opt: $(LIBCMXA) $(IDE_CMX)
+bin/whyide.opt: src/why.cmxa $(IDE_CMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) threads.cmxa \
 	    lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx $^
 	$(STRIP) $@
 
-bin/whyide.byte: $(GCMO)
+bin/whyide.byte: src/why.cma $(IDE_CMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma \
 	    lablgtk.cma lablgtksourceview2.cma gtkThread.cmo $^
 
+# depend and clean targets
+
 include .depend.ide
 
 .depend.ide:
-	$(OCAMLDEP) -slash -I src/ide/ $(IDE_CMO:.cmo=.ml) $(IDE_CMO:.cmo=.mli) > $@
+	$(OCAMLDEP) -slash -I src/ide $(IDEML) $(IDEMLI) > $@
 
 depend: .depend.ide
 
 clean::
+	rm -f src/ide/*.cm[iox] src/ide/*.o
+	rm -f src/ide/*.annot src/ide/*~
 	rm -f bin/whyide.byte bin/whyide.opt
-	rm -f src/ide/*.cm[iox] src/ide/*.o src/ide/*.annot
 
 ##############
 # Coq plugin
 ##############
 
 ifeq (@enable_coq_support@,yes)
-byte: src/coq-plugin/whytac.cmo
+#byte: src/coq-plugin/whytac.cmo
 opt:  src/coq-plugin/whytac.cmxs
 endif
 
-COQSUBTREES = kernel lib interp parsing proofs pretyping tactics library
+COQTREES = kernel lib interp parsing proofs pretyping tactics library
 
-src/coq-plugin/whytac.cmo src/coq-plugin/whytac.cmxs: INCLUDES=$(COQSUBTREES:%=-I @COQLIB@/%) 
-src/coq-plugin/whytac.cmo: BFLAGS+=-rectypes
+#src/coq-plugin/whytac.cmo:  INCLUDES = $(addprefix -I @COQLIB@/, $(COQTREES))
+src/coq-plugin/whytac.cmxs: INCLUDES = $(addprefix -I @COQLIB@/, $(COQTREES))
+
+#src/coq-plugin/whytac.cmo:  BFLAGS+=-rectypes
 src/coq-plugin/whytac.cmxs: OFLAGS+=-rectypes
 
-src/coq-plugin/whytac.cmxs: $(LIBCMXA) src/coq-plugin/whytac.ml
+src/coq-plugin/whytac.cmxs: src/why.cmxa src/coq-plugin/whytac.ml
 	$(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
 
-# test targets
-##############
+#######
+# tools
+#######
 
-test: bin/why.byte  $(TOOLS)
+TOOLS = bin/why-cpulimit
+
+byte opt: $(TOOLS)
+
+bin/why-cpulimit: src/tools/@CPULIMIT@.c
+	$(CC) -o $@ $^
+
+clean::
+	rm -f bin/why-cpulimit src/tools/*~
+
+########
+# bench
+########
+
+.PHONY: bench test
+
+bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@
+	sh bench/bench \
+	    "bin/why.@OCAMLBEST@ -I theories" \
+	    "bin/whyml.@OCAMLBEST@ -I theories"
+
+BENCH_PLUGINS_CMO := helloworld.cmo simplify_array.cmo
+BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))
+BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
+
+bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) byte $(TOOLS)
+	bin/why.byte -D bench/plugins/helloworld.drv -I theories/ \
+	src/test.why -t Test -g G
+	bin/why.$(OCAMLBEST) -D bench/plugins/helloworld.drv -I theories/ \
+	src/test.why -t Test -g G
+	bin/why.$(OCAMLBEST) -D bench/plugins/simplify_array.drv -I theories/ \
+	src/test.why -t Test_simplify_array -g G
+
+###############
+# test targets
+###############
+
+test: bin/why.byte $(TOOLS)
 	mkdir -p output_why3
 	ocamlrun -bt bin/why.byte -I theories/ -D drivers/why3.drv \
 		-o output_why3 src/test.why
@@ -315,9 +401,9 @@ test: bin/why.byte  $(TOOLS)
 	bin/why.byte -D drivers/alt_ergo.drv -I theories/ \
 		--timeout 3 --prove src/test.why -t Test -g G
 	bin/why.byte -D drivers/coq.drv -I theories/ \
-		src/test.why -t Test -g G 
+		src/test.why -t Test -g G
 	echo bin/why.byte -D drivers/alt_ergo.drv -I theories/ \
-		--timeout 1 --prove theories/real.why 
+		--timeout 1 --prove theories/real.why
 	@printf "*** Checking Coq file generation ***\\n"
 	@mkdir -p output_coq
 	@for i in int.Abs int.EuclideanDivision int.ComputerDivision  \
@@ -337,63 +423,30 @@ testl: bin/whyml.byte
 examples/programs/%: bin/whyml.byte
 	bin/whyml.byte -I theories examples/programs/$*.mlw
 
-#tools
-######
-
-TOOLS = bin/why-cpulimit
-
-byte opt: $(TOOLS)
-
-bin/why-cpulimit: src/tools/@CPULIMIT@.c
-	$(CC) -o $@ $^
-
-clean::
-	rm -f bin/why-cpulimit
-
-# bench
-#######
-
-.PHONY: bench test
-
-bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@
-	sh bench/bench "bin/why.@OCAMLBEST@ -I theories/" "bin/whyml.@OCAMLBEST@ -I theories"
-
-BENCH_PLUGINS_CMO := helloworld.cmo simplify_array.cmo
-BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))
-BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
-
-bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) $(BINARY) byte \
-	$(TOOLS)
-	bin/why.byte -D bench/plugins/helloworld.drv -I theories/ \
-        src/test.why -t Test -g G
-	bin/why.$(OCAMLBEST) -D bench/plugins/helloworld.drv -I theories/ \
-        src/test.why -t Test -g G
-	bin/why.$(OCAMLBEST) -D bench/plugins/simplify_array.drv -I theories/ \
-        src/test.why -t Test_simplify_array -g G
-
+###############
 # installation
-##############
+###############
 
-## install: install-binary install-lib install-man 
-## 
-## BINARYFILES = $(BINARY) bin/why-ide.$(OCAMLBEST) 
-## 
+## install: install-binary install-lib install-man
+##
+## BINARYFILES = $(BINARY) bin/why-ide.$(OCAMLBEST)
+##
 ## # install-binary should not depend on $(BINARYFILES); otherwise it
 ## # enforces the compilation of why-ide, even when lablgtk2 is not installed
-## install-binary: 
+## install-binary:
 ## 	mkdir -p $(BINDIR)
 ## 	cp -f $(BINARY) $(BINDIR)/why$(EXE)
 ## 	if test -f bin/why-ide.$(OCAMLBEST); then \
 ## 		cp -f bin/why-ide.$(OCAMLBEST) $(BINDIR)/why-ide-bin$(EXE); \
 ## 	fi
-## 
-## install-lib: 
+##
+## install-lib:
 ## 	mkdir -p $(LIBDIR)/why/why
-## 
+##
 ## install-man:
 ## 	mkdir -p $(MANDIR)/man1
 ## 	cp -f doc/*.1 $(MANDIR)/man1
-## 
+##
 ## install-coq-no:
 ## install-coq-yes: install-coq-@COQVER@
 ## install-coq-v7:
@@ -410,7 +463,7 @@ bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) $(BINARY) byte \
 ## 	mkdir -p $(LIBDIR)/why/coq ;\
 ## 	cp -f $(VO8) $(V8FILES) $(LIBDIR)/why/coq ;\
 ## 	fi
-## 
+##
 ## install-pvs-no:
 ## install-pvs-yes: $(PVSFILES)
 ## 	mkdir -p $(PVSLIB)/why
@@ -419,26 +472,26 @@ bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) $(BINARY) byte \
 ## 	@echo "======  Compiling PVS theories, this may take some time ======"
 ## 	(cd $(PVSLIB)/why ; @PVSC@ -batch -l pvscontext.el -q -v 2 > top.out)
 ## 	@echo "======  Done compiling PVS theories ======"
-## 
+##
 ## install-mizar-no:
 ## install-mizar-yes:
 ## 	mkdir -p @MIZARLIB@/mml/dict
 ## 	cp lib/mizar/why.miz @MIZARLIB@/mml
 ## 	cp lib/mizar/dict/why.voc @MIZARLIB@/mml/dict
-## 
-## local-install: $(BINARY) $(WHYCONFIG) $(JESSIE) bin/why-ide.$(OCAMLBEST) byte bin/why-ide.byte 
+##
+## local-install: $(BINARY) $(WHYCONFIG) $(JESSIE) bin/why-ide.$(OCAMLBEST) byte bin/why-ide.byte
 ## 	cp $(BINARY) $$HOME/bin/why
 ## 	cp $(WHYCONFIG) $$HOME/bin/why
 ## 	cp $(JESSIE) $$HOME/bin/jessie
 ## 	if test -f bin/why-ide.$(OCAMLBEST); then \
 ## 	  cp -f bin/why-ide.$(OCAMLBEST) $$HOME/bin/why-ide; \
 ## 	fi
-## 
+##
 ## local: install
-## 
+##
 ## win: why.nsi
 ## 	"/cygdrive/c/Program Files (x86)/NSIS/makensis" /DVERSION=$(VERSION) why.nsi
-## 
+##
 ## zip:
 ## 	zip -A -r why-$(VERSION).zip c:/why/bin c:/why/lib c:/coq/lib/contrib/why c:/coq/lib/contrib7/why
 
@@ -446,9 +499,9 @@ bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) $(BINARY) byte \
 # documentation
 ################
 
-DOC=doc/manual.pdf doc/manual.html 
+DOC = doc/manual.pdf doc/manual.html
 
-doc:: $(DOC)
+doc: $(DOC)
 
 doc/manual.pdf: doc/manual.tex doc/version.tex
 	make -C doc manual.pdf
@@ -459,38 +512,34 @@ doc/manual.html: doc/manual.tex doc/version.tex
 clean::
 	make -C doc clean
 
+##########
 # API DOC
-##############
-
-APIDOCSRC = $(UTIL_CMO:.cmo=.mli) $(CORE_CMO:.cmo=.mli) \
-	src/driver/call_provers.mli \
-	src/driver/driver.mli \
-	src/manager/db.mli
+##########
 
 .PHONY: apidoc
 
-apidoc: $(APIDOCSRC)
-	rm -f apidoc/* 
+apidoc:
 	mkdir -p apidoc
-	$(OCAMLDOC) -d apidoc -html -I src/util -I src/core -I src/driver \
-			-I +sqlite3 $(APIDOCSRC)
+	$(OCAMLDOC) -d apidoc -html -I src $(LIBINCLUDES) -I +sqlite3 \
+	    $(LIBML) $(LIBMLI) $(MNGML) $(MNGMLI)
 
+clean::
+	rm -f apidoc/*
 
+################
 # generic rules
-###############
-
-.SUFFIXES: .mli .ml .cmi .cmo .cmx .mll .mly .v .vo .ml4 .cmxs .output
+################
 
 %.cmi: %.mli
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
 
-%.cmo %.cmi: %.ml
+%.cmo %cmi: %.ml
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
 
-%.cmx %.o: %.ml
+%.cmx: %.ml
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -c $(OFLAGS) $<
 
-%.cmxs: %.ml %.cmx
+%.cmxs: %.ml
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -shared $(OFLAGS) -o $@ $<
 
 %.ml: %.mll
@@ -532,7 +581,7 @@ tags:
 	      "--regex=/let[ \t]+rec[ \t]+\([^ \t]+\)/\1/" \
 	      "--regex=/and[ \t]+\([^ \t]+\)/\1/" \
 	      "--regex=/type[ \t]+\([^ \t]+\)/\1/" \
-              "--regex=/exception[ \t]+\([^ \t]+\)/\1/" \
+	      "--regex=/exception[ \t]+\([^ \t]+\)/\1/" \
 	      "--regex=/val[ \t]+\([^ \t]+\)/\1/" \
 	      "--regex=/module[ \t]+\([^ \t]+\)/\1/"
 
@@ -542,9 +591,9 @@ otags:
 wc:
 	ocamlwc -p src/*.ml* src/*/*.ml*
 
-dep: 
+dep:
 	$(MAKE) depend
-	cat .depend | ocamldot | dot -Tpdf > dep.pdf
+	cat .depend* | ocamldot | dot -Tpdf > dep.pdf
 #	$(PDFVIEWER) dep.pdf
 
 # distrib
@@ -552,17 +601,17 @@ dep:
 
 # NAME=why-$(VERSION)
 # EXPORT=export/$(NAME)
-# 
+#
 # WWW = /users/www-perso/projets/why
 # FTP = $(WWW)/download
 # WWWKRAKATOA = /users/www-perso/projets/krakatoa
-# 
+#
 # FILES =src/*.ml* c/*.ml* jc/*.ml* java/*.ml* ml/*.ml* ml/*/*.ml* intf/*.ml* tools/*.ml* tools/*.c bin/why-ide.sh \
-#        mix/*.ml* \
-#        version.sh Version Makefile.in configure.in configure .depend .depend.coq \
-#        config/check_ocamlgraph.ml \
-#        README INSTALL COPYING LICENSE CHANGES \
-#        doc/Makefile doc/manual.ps doc/why.1 \
+#       mix/*.ml* \
+#       version.sh Version Makefile.in configure.in configure .depend .depend.coq \
+#       config/check_ocamlgraph.ml \
+#       README INSTALL COPYING LICENSE CHANGES \
+#       doc/Makefile doc/manual.ps doc/why.1 \
 # 	examples-c/*/*.h examples-c/*/*.c \
 # 	examples-c/Makefile examples-c/*/Makefile \
 # 	examples-c/*/coq/*.v \
@@ -570,7 +619,7 @@ dep:
 # 	examples/*/*.mlw examples/*/*.why examples/*/*.v examples/*/*.sx \
 # 	examples/*/.depend examples/*/Makefile \
 # 	bench/bench.in bench/good*/*.mlw bench/good*/*.v \
-#         bench/c/bench bench/c/bench-files bench/c/*/*.c bench/c/*/*/*.c \
+#	bench/c/bench bench/c/bench-files bench/c/*/*.c bench/c/*/*/*.c \
 # 	bench/jc/bench bench/jc/good/*.jc \
 # 	bench/java/bench bench/java/*/*.java bench/provers/*.mlw \
 # 	tests/regtest.sh tests/java/*.java \
@@ -589,51 +638,51 @@ dep:
 # 	atp/*.ml atp/LICENSE.txt atp/Makefile atp/Mk_ml_file \
 # 	ocamlgraph/configure.in ocamlgraph/configure ocamlgraph/.depend \
 # 	ocamlgraph/Makefile.in ocamlgraph/META.in ocamlgraph/*/*.ml* \
-#         frama-c-plugin/Makefile frama-c-plugin/configure \
-# 	frama-c-plugin/*.ml* frama-c-plugin/share/jessie/*.h 
-# 
+#	frama-c-plugin/Makefile frama-c-plugin/configure \
+# 	frama-c-plugin/*.ml* frama-c-plugin/share/jessie/*.h
+#
 # # ne pas distribuer ces tests-la	frama-c-plugin/tests/jessie/*.c
-# 
+#
 # distrib export: source export-doc export-www export-examples export-examples-c linux
-# 
+#
 # export-www:
 # 	echo "<#def version>$(VERSION)</#def>" > /users/demons/filliatr/www/why/version.prehtml
 # 	echo "<#def cversion>$(CVERSION)</#def>" >> /users/demons/filliatr/www/why/version.prehtml
 # 	make -C /users/demons/filliatr/www/why install
-# 
+#
 # source: export/$(NAME).tar.gz
 # 	cp CHANGES CHANGES.caduceus export/$(NAME).tar.gz $(FTP)
-# 
+#
 # export/$(NAME).tar.gz: $(FILES)
 # 	rm -rf $(EXPORT)
 # 	mkdir -p $(EXPORT)/bin
 # 	cp --parents $(FILES) $(EXPORT)
 # 	cd $(EXPORT); rm -f $(GENERATED)
 # 	cd export; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
-# 
-# tarball-for-framac: 
+#
+# tarball-for-framac:
 # 	make tarball
 # 	cp export/$(NAME).tar.gz export/why-for-framac.tar.gz
-# 
-# tarball: 
+#
+# tarball:
 # 	mkdir -p export
 # 	cd export; rm -rf $(NAME) $(NAME).tar.gz
 # 	make export/$(NAME).tar.gz
-# 
+#
 # EXFILES = lib/coq*/*.v examples/*/*.v examples/*/*.mlw
-# 
+#
 # export-examples:
 # 	cp --parents $(EXFILES) $(WWW)
 # 	make -C $(WWW)/examples clean depend
 # 	echo "*** faire make all dans $(WWW)/examples ***"
-# 
+#
 # export-examples-c:
 # 	mkdir -p $(WWW)/caduceus/examples
 # 	cd examples-c; cp --parents */*.c */*.h $(WWW)/caduceus/examples
 # 	mkdir -p $(WWW)/caduceus/examples/bench
 # 	cp bench/c/good/*.c $(WWW)/caduceus/examples/bench
 # 	rm -f $(WWW)/caduceus/examples/bench/test.c
-# 
+#
 # export-doc: $(DOC)
 # 	cp doc/manual.ps doc/manual.html $(WWW)/manual
 # 	cp doc/logic_syntax.bnf $(WWW)/manual
@@ -642,29 +691,32 @@ dep:
 # 	(cd $(WWW)/caduceus/manual; hacha caduceus.html)
 # 	cp doc/krakatoa.pdf doc/krakatoa.html $(WWWKRAKATOA)/manual
 # 	(cd $(WWWKRAKATOA)/manual; hacha krakatoa.html)
-# 
+#
 # OSTYPE  ?= linux
-# 
+#
 # BINARYNAME = $(NAME)-$(OSTYPE)
-# 
+#
 # linux: binary
-# 
-# ALLBINARYFILES = $(FILES) $(BINARYFILES) 
-# 
+#
+# ALLBINARYFILES = $(FILES) $(BINARYFILES)
+#
 # binary: $(ALLBINARYFILES)
 # 	mkdir -p export/$(BINARYNAME)
 # 	cp --parents $(ALLBINARYFILES) export/$(BINARYNAME)
 # 	(cd export; tar czf $(BINARYNAME).tar.gz $(BINARYNAME))
 # 	cp export/$(BINARYNAME).tar.gz $(FTP)
 
+###############
 # file headers
-##############
+###############
+
 headers:
 	headache -c misc/headache_config.txt -h misc/header.txt \
 	    Makefile.in configure.in */*.ml */*/*.ml */*/*.ml[ily4]
 
+#########
 # myself
-########
+#########
 
 Makefile: Makefile.in config.status
 	./config.status --file $@
@@ -679,15 +731,15 @@ config.status: configure Version
 	./config.status --recheck
 
 configure: configure.in
-	autoconf 
+	autoconf
 
+###################
 # clean and depend
-##################
+###################
 
-clean::
-	rm -f *~ */*~ */*/*~
+.PHONY: distclean
 
-distclean:: clean
+distclean: clean
 	rm -f config.status config.cache config.log \
 	    Makefile src/config.ml doc/version.tex
 
