@@ -183,8 +183,7 @@ let () =
 *)
 
 let load_plugin dir (byte,nat) =
-  if Config.Dynlink.is_native_not_defined then 
-    errorm "Plugins are not supported";
+  if not Config.why_plugins then errorm "Plugins not supported";
   let file = if Config.Dynlink.is_native then nat else byte in
   let file = Filename.concat dir file in
   Config.Dynlink.loadfile_private file

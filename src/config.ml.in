@@ -19,11 +19,9 @@
 
 let why_version   = "@VERSION@"
 let why_builddate = "@BUILDDATE@"
-let coq_version   = "@COQVERSION@"
+let why_plugins   = ("@enable_plugins@" = "yes")
 
 module Dynlink_ = struct
-  let is_native_not_defined = true
-
   let is_native = true
   let loadfile_private _ = assert false
 
@@ -33,8 +31,6 @@ module Dynlink_ = struct
 end
 
 module Dynlink = struct
-  let is_native_not_defined = false
-
   include @DYNLINK@
 end
 

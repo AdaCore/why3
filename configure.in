@@ -211,9 +211,6 @@ AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtk.cma,,enable_ide=no)
 AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtksourceview2.cma,,enable_ide=no)
 fi
 dnl AC_CHECK_PROG(enable_ide,lablgtk2,yes,no) not always available (Win32)
-if test "$enable_ide" = yes ; then
-      INCLUDEGTK2="-I +lablgtk2"
-fi
 
 dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
 
@@ -273,14 +270,15 @@ AC_SUBST(OCAMLYACC)
 AC_SUBST(OCAMLDOC)
 AC_SUBST(OCAMLBEST)
 AC_SUBST(OCAMLVERSION)
-AC_SUBST(OCAMLV)
 AC_SUBST(OCAMLLIB)
-dnl AC_SUBST(OCAMLGRAPHLIB)
-AC_SUBST(enable_ide)
-AC_SUBST(INCLUDEGTK2)
-dnl AC_SUBST(OCAMLWEB)
-AC_SUBST(DYNLINK)
+dnl AC_SUBST(OCAMLV)
 dnl AC_SUBST(FORPACK)
+dnl AC_SUBST(OCAMLGRAPHLIB)
+dnl AC_SUBST(OCAMLWEB)
+
+AC_SUBST(enable_ide)
+AC_SUBST(enable_plugins)
+AC_SUBST(DYNLINK)
 
 AC_SUBST(enable_coq_support)
 AC_SUBST(COQC)

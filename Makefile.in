@@ -52,18 +52,17 @@ OCAMLVERSION = @OCAMLVERSION@
 #CAMLP4   = @CAMLP4O@
 #PSVIEWER = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
-DYNLINK = @DYNLINK@
 
-ifeq ($(DYNLINK),Dynlink)
+ifeq (@enable_plugins@,yes)
 DYNLINKCMA  = dynlink.cma
 DYNLINKCMXA = dynlink.cmxa
 else
-DYNLINKCMA = 
+DYNLINKCMA  = 
 DYNLINKCMXA = 
 endif
 
-BFLAGS   = -w Aelz -dtypes -g $(INCLUDES) @INCLUDEGTK2@ 
-OFLAGS   = -w Aelz -dtypes $(INCLUDES) @INCLUDEGTK2@ 
+BFLAGS = -w Aelz -dtypes -g $(INCLUDES)
+OFLAGS = -w Aelz -dtypes    $(INCLUDES)
 
 # external libraries common to all binaries
 
@@ -175,11 +174,13 @@ opt:  bin/why.opt
 src/main.cmx : $(LIBCMI)
 
 bin/why.opt: $(LIBCMXA) src/main.cmx
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
 bin/why.byte: $(LIBCMA) src/main.cmo
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
 clean::
 	rm -f src/main.cm[iox] src/main.annot
@@ -255,7 +256,7 @@ IDE_CMO := ide_main.cmo
 IDE_CMO := $(addprefix src/ide/,$(IDE_CMO))
 IDE_CMX = $(IDE_CMO:.cmo=.cmx)
 
-$(IDE_CMO) $(IDE_CMX): INCLUDES=-I src/ide/
+$(IDE_CMO) $(IDE_CMX): INCLUDES=-I src/ide/ -I +lablgtk2 -I +threads
 
 ifeq (@enable_ide@,yes)
 byte: bin/whyide.byte
@@ -263,11 +264,15 @@ opt:  bin/whyide.opt
 endif
 
 bin/whyide.opt: $(LIBCMXA) $(IDE_CMX)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -I +threads -o $@ $(EXTCMXA) threads.cmxa lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx $^
-	$(STRIP)    $@
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) threads.cmxa \
+	    lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx $^
+	$(STRIP) $@
 
 bin/whyide.byte: $(GCMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLC) $(BFLAGS) -I +threads -o $@ $(EXTCMA) lablgtk.cma lablgtksourceview2.cma threads.cma gtkThread.cmo $^
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma \
+	    lablgtk.cma lablgtksourceview2.cma gtkThread.cmo $^
 
 include .depend.ide
 
