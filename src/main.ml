@@ -188,8 +188,8 @@ let rec report fmt = function
       fprintf fmt "anomaly: unknown ident '%s'" i.Ident.id_short
   | Driver.Error e ->
       Driver.report fmt e
-  | Dynlink_compat.Dynlink.Error e ->
-      fprintf fmt "Dynlink : %s" (Dynlink_compat.Dynlink.error_message e)
+  | Config.Dynlink.Error e ->
+      fprintf fmt "Dynlink : %s" (Config.Dynlink.error_message e)
   | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
 let print_th_namespace fmt th =

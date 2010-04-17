@@ -17,6 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Why
 open Term
 open Theory
 open Env
@@ -31,7 +32,7 @@ let make_rt_rf env =
     try
       find_theory env prelude array
     with TheoryNotFound (l,s) -> 
-      Format.eprintf "The theory %a is unknown" print_theorynotfound (l,s); 
+      Format.eprintf "The theory %s is unknown" s; 
       exit 1 in 
   let store  = (ns_find_ls array.th_export store).ls_name in
   let select = (ns_find_ls array.th_export select).ls_name in

@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Why
+
 let print_context _ fmt _ = Format.fprintf fmt "helloworld@\n"
 
 let transform_context = Register.identity

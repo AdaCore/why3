@@ -17,9 +17,9 @@
 #                                                                        #
 ##########################################################################
 
-VERBOSEMAKE ?= @VERBOSEMAKE@
+include Version
 
-ifeq ($(VERBOSEMAKE),yes)
+ifeq (@enable_verbose_make@,yes)
  QUIET = 
 else    
  QUIET = yes
@@ -28,17 +28,16 @@ endif
 # where to install the binaries
 DESTDIR =
 prefix=@prefix@
-datarootdir=@datarootdir@
 exec_prefix=@exec_prefix@
+datarootdir=@datarootdir@
 BINDIR=$(DESTDIR)@bindir@
 LIBDIR=$(DESTDIR)@libdir@
-DATADIR=$(DESTDIR)@datarootdir@
+DATADIR=$(DESTDIR)@datadir@
+MANDIR=$(DESTDIR)@mandir@
 
+# OS specific stuff
 EXE=@EXE@
 STRIP=@STRIP@
-
-# where to install the man page
-MANDIR=$(DESTDIR)@mandir@
 
 # other variables
 OCAMLC   = @OCAMLC@ 
@@ -50,9 +49,9 @@ OCAMLDOC = @OCAMLDOC@
 OCAMLLIB = @OCAMLLIB@
 OCAMLBEST= @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
-CAMLP4   = @CAMLP4O@
-PSVIEWER = @PSVIEWER@
-PDFVIEWER = @PDFVIEWER@
+#CAMLP4   = @CAMLP4O@
+#PSVIEWER = @PSVIEWER@
+#PDFVIEWER = @PDFVIEWER@
 DYNLINK = @DYNLINK@
 
 ifeq ($(DYNLINK),Dynlink)
@@ -87,8 +86,7 @@ LIBGENERATED = src/config.ml src/userconf/rc.ml \
           src/parser/parser.mli src/parser/parser.ml src/parser/parser.output \
             src/parser/lexer.ml src/driver/driver_lexer.ml \
             src/driver/driver_parser.mli src/driver/driver_parser.ml \
-	    src/driver/driver_parser.output \
-	    src/driver/dynlink_compat.ml
+	    src/driver/driver_parser.output
 
 depend: $(LIBGENERATED)
 
@@ -101,11 +99,6 @@ LIBCLEAN:=$(addsuffix /*.cm[iox], $(LIBCLEAN)) \
 clean::
 	rm -f $(LIBCLEAN) $(LIBGENERATED) 
 	rm -f why.cm[iox] why.a why.o $(LIBCMA) $(LIBCMXA)
-
-include Version
-
-doc/version.tex src/config.ml: Version version.sh config.status
-	BINDIR=$(BINDIR) LIBDIR=$(LIBDIR) DATADIR=$(DATADIR) COQVER=@COQVER@ ./version.sh
 
 CORE_CMO := ident.cmo ty.cmo term.cmo pattern.cmo decl.cmo theory.cmo\
 	task.cmo pretty.cmo trans.cmo env.cmo register.cmo
@@ -125,7 +118,7 @@ TRANSFORM_CMO := simplify_recursive_definition.cmo inlining.cmo\
 	eliminate_let.cmo eliminate_definition.cmo
 TRANSFORM_CMO := $(addprefix src/transform/,$(TRANSFORM_CMO))
 
-DRIVER_CMO := driver_ast.cmo call_provers.cmo dynlink_compat.cmo \
+DRIVER_CMO := driver_ast.cmo call_provers.cmo \
               driver_parser.cmo driver_lexer.cmo driver.cmo  
 DRIVER_CMO := $(addprefix src/driver/,$(DRIVER_CMO))
 
@@ -139,7 +132,7 @@ LIBCMO = src/config.cmo $(UTIL_CMO) $(CORE_CMO) $(PARSER_CMO) $(DRIVER_CMO)\
          $(TRANSFORM_CMO) $(PRINTER_CMO) $(USERCONF_CMO)
 LIBCMX = $(LIBCMO:.cmo=.cmx)
 
-LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
+LIBINCLUDES = -I src $(addprefix -I src/, $(LIBDIRS))
 $(LIBCMO) $(LIBCMX): INCLUDES=$(LIBINCLUDES)
 $(LIBCMX): OFLAGS+=-for-pack Why
 
@@ -264,13 +257,10 @@ IDE_CMX = $(IDE_CMO:.cmo=.cmx)
 
 $(IDE_CMO) $(IDE_CMX): INCLUDES=-I src/ide/
 
-byte: ide-byte-@LABLGTK2@
-opt:  ide-opt-@LABLGTK2@
-
-ide-byte-yes: bin/whyide.byte
-ide-byte-no:
-ide-opt-yes: bin/whyide.opt
-ide-opt-no:
+ifeq (@enable_ide@,yes)
+byte: bin/whyide.byte
+opt:  bin/whyide.opt
+endif
 
 bin/whyide.opt: $(LIBCMXA) $(IDE_CMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) $(OCAMLOPT) $(OFLAGS) -I +threads -o $@ $(EXTCMXA) threads.cmxa lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx $^
@@ -294,15 +284,13 @@ clean::
 # Coq plugin
 ##############
 
-byte: coq-plugin-byte-@COQ@
-opt:  coq-plugin-opt-@COQ@
-
-coq-plugin-byte-yes: src/coq-plugin/whytac.cmo
-coq-plugin-byte-no:
-coq-plugin-opt-yes: src/coq-plugin/whytac.cmxs
-coq-plugin-opt-no:
+ifeq (@enable_coq_support@,yes)
+byte: src/coq-plugin/whytac.cmo
+opt:  src/coq-plugin/whytac.cmxs
+endif
 
 COQSUBTREES = kernel lib interp parsing proofs pretyping tactics library
+
 src/coq-plugin/whytac.cmo src/coq-plugin/whytac.cmxs: INCLUDES=$(COQSUBTREES:%=-I @COQLIB@/%) 
 src/coq-plugin/whytac.cmo: BFLAGS+=-rectypes
 src/coq-plugin/whytac.cmxs: OFLAGS+=-rectypes
@@ -362,10 +350,7 @@ clean::
 
 .PHONY: bench test
 
-bench/bench: bench/bench.in config.status
-	./config.status --file bench/bench
-
-bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@ bench/bench 
+bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@
 	sh bench/bench "bin/why.@OCAMLBEST@ -I theories/" "bin/whyml.@OCAMLBEST@ -I theories"
 
 BENCH_PLUGINS_CMO := helloworld.cmo simplify_array.cmo
@@ -384,73 +369,73 @@ bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) $(BINARY) byte \
 # installation
 ##############
 
-install: install-binary install-lib install-man 
-
-BINARYFILES = $(BINARY) bin/why-ide.$(OCAMLBEST) 
-
-# install-binary should not depend on $(BINARYFILES); otherwise it
-# enforces the compilation of why-ide, even when lablgtk2 is not installed
-install-binary: 
-	mkdir -p $(BINDIR)
-	cp -f $(BINARY) $(BINDIR)/why$(EXE)
-	if test -f bin/why-ide.$(OCAMLBEST); then \
-		cp -f bin/why-ide.$(OCAMLBEST) $(BINDIR)/why-ide-bin$(EXE); \
-	fi
-
-install-lib: 
-	mkdir -p $(LIBDIR)/why/why
-
-install-man:
-	mkdir -p $(MANDIR)/man1
-	cp -f doc/*.1 $(MANDIR)/man1
-
-install-coq-no:
-install-coq-yes: install-coq-@COQVER@
-install-coq-v7:
-	mkdir -p $(LIBDIR)/why/coq7
-	cp -f $(V7FILES) $(LIBDIR)/why/coq7
-	cp -f $(VO7) $(LIBDIR)/why/coq7
-install-coq-v8 install-coq-v8.1:
-	if test -w $(COQLIB) ; then \
-	 mkdir -p $(COQLIB)/user-contrib ; \
-	 cp -f $(V8FILES) $(COQLIB)/user-contrib ; \
-	 cp -f $(VO8) $(COQLIB)/user-contrib ; \
-	else \
-	echo "Cannot copy to Coq standard library. Add $(LIBDIR)/why/coq to Coq include path." ;\
-	mkdir -p $(LIBDIR)/why/coq ;\
-	cp -f $(VO8) $(V8FILES) $(LIBDIR)/why/coq ;\
-	fi
-
-install-pvs-no:
-install-pvs-yes: $(PVSFILES)
-	mkdir -p $(PVSLIB)/why
-	cp $(PVSFILES) $(PVSFILES:.pvs=.prf) $(PVSLIB)/why
-	cp lib/pvs/top.pvs lib/pvs/pvscontext.el $(PVSLIB)/why
-	@echo "======  Compiling PVS theories, this may take some time ======"
-	(cd $(PVSLIB)/why ; @PVSC@ -batch -l pvscontext.el -q -v 2 > top.out)
-	@echo "======  Done compiling PVS theories ======"
-
-install-mizar-no:
-install-mizar-yes:
-	mkdir -p @MIZARLIB@/mml/dict
-	cp lib/mizar/why.miz @MIZARLIB@/mml
-	cp lib/mizar/dict/why.voc @MIZARLIB@/mml/dict
-
-local-install: $(BINARY) $(WHYCONFIG) $(JESSIE) bin/why-ide.$(OCAMLBEST) byte bin/why-ide.byte 
-	cp $(BINARY) $$HOME/bin/why
-	cp $(WHYCONFIG) $$HOME/bin/why
-	cp $(JESSIE) $$HOME/bin/jessie
-	if test -f bin/why-ide.$(OCAMLBEST); then \
-	  cp -f bin/why-ide.$(OCAMLBEST) $$HOME/bin/why-ide; \
-	fi
-
-local: install
-
-win: why.nsi
-	"/cygdrive/c/Program Files (x86)/NSIS/makensis" /DVERSION=$(VERSION) why.nsi
-
-zip:
-	zip -A -r why-$(VERSION).zip c:/why/bin c:/why/lib c:/coq/lib/contrib/why c:/coq/lib/contrib7/why
+## install: install-binary install-lib install-man 
+## 
+## BINARYFILES = $(BINARY) bin/why-ide.$(OCAMLBEST) 
+## 
+## # install-binary should not depend on $(BINARYFILES); otherwise it
+## # enforces the compilation of why-ide, even when lablgtk2 is not installed
+## install-binary: 
+## 	mkdir -p $(BINDIR)
+## 	cp -f $(BINARY) $(BINDIR)/why$(EXE)
+## 	if test -f bin/why-ide.$(OCAMLBEST); then \
+## 		cp -f bin/why-ide.$(OCAMLBEST) $(BINDIR)/why-ide-bin$(EXE); \
+## 	fi
+## 
+## install-lib: 
+## 	mkdir -p $(LIBDIR)/why/why
+## 
+## install-man:
+## 	mkdir -p $(MANDIR)/man1
+## 	cp -f doc/*.1 $(MANDIR)/man1
+## 
+## install-coq-no:
+## install-coq-yes: install-coq-@COQVER@
+## install-coq-v7:
+## 	mkdir -p $(LIBDIR)/why/coq7
+## 	cp -f $(V7FILES) $(LIBDIR)/why/coq7
+## 	cp -f $(VO7) $(LIBDIR)/why/coq7
+## install-coq-v8 install-coq-v8.1:
+## 	if test -w $(COQLIB) ; then \
+## 	 mkdir -p $(COQLIB)/user-contrib ; \
+## 	 cp -f $(V8FILES) $(COQLIB)/user-contrib ; \
+## 	 cp -f $(VO8) $(COQLIB)/user-contrib ; \
+## 	else \
+## 	echo "Cannot copy to Coq standard library. Add $(LIBDIR)/why/coq to Coq include path." ;\
+## 	mkdir -p $(LIBDIR)/why/coq ;\
+## 	cp -f $(VO8) $(V8FILES) $(LIBDIR)/why/coq ;\
+## 	fi
+## 
+## install-pvs-no:
+## install-pvs-yes: $(PVSFILES)
+## 	mkdir -p $(PVSLIB)/why
+## 	cp $(PVSFILES) $(PVSFILES:.pvs=.prf) $(PVSLIB)/why
+## 	cp lib/pvs/top.pvs lib/pvs/pvscontext.el $(PVSLIB)/why
+## 	@echo "======  Compiling PVS theories, this may take some time ======"
+## 	(cd $(PVSLIB)/why ; @PVSC@ -batch -l pvscontext.el -q -v 2 > top.out)
+## 	@echo "======  Done compiling PVS theories ======"
+## 
+## install-mizar-no:
+## install-mizar-yes:
+## 	mkdir -p @MIZARLIB@/mml/dict
+## 	cp lib/mizar/why.miz @MIZARLIB@/mml
+## 	cp lib/mizar/dict/why.voc @MIZARLIB@/mml/dict
+## 
+## local-install: $(BINARY) $(WHYCONFIG) $(JESSIE) bin/why-ide.$(OCAMLBEST) byte bin/why-ide.byte 
+## 	cp $(BINARY) $$HOME/bin/why
+## 	cp $(WHYCONFIG) $$HOME/bin/why
+## 	cp $(JESSIE) $$HOME/bin/jessie
+## 	if test -f bin/why-ide.$(OCAMLBEST); then \
+## 	  cp -f bin/why-ide.$(OCAMLBEST) $$HOME/bin/why-ide; \
+## 	fi
+## 
+## local: install
+## 
+## win: why.nsi
+## 	"/cygdrive/c/Program Files (x86)/NSIS/makensis" /DVERSION=$(VERSION) why.nsi
+## 
+## zip:
+## 	zip -A -r why-$(VERSION).zip c:/why/bin c:/why/lib c:/coq/lib/contrib/why c:/coq/lib/contrib7/why
 
 ################
 # documentation
@@ -491,47 +476,41 @@ apidoc: $(APIDOCSRC)
 
 .SUFFIXES: .mli .ml .cmi .cmo .cmx .mll .mly .v .vo .ml4 .cmxs .output
 
-.mli.cmi:
+%.cmi: %.mli
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
 
-.ml.cmi:
+%.cmo %.cmi: %.ml
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
 
-.ml.cmo:
-	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
-
-.ml.o:
-	$(OCAMLOPT) -c $(OFLAGS) $<
-
-.ml.cmx:
+%.cmx %.o: %.ml
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -c $(OFLAGS) $<
 
 %.cmxs: %.ml %.cmx
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -shared $(OFLAGS) -o $@ $<
 
-.mll.ml:
+%.ml: %.mll
 	$(OCAMLLEX) $<
 
-%.ml %.mli %.output : %.mly
+%.ml %.mli %.output: %.mly
 	$(OCAMLYACC) -v $<
 
-.ml4.ml:
-	$(CAMLP4) pr_o.cmo -impl $< > $@
+# .ml4.ml:
+# 	$(CAMLP4) pr_o.cmo -impl $< > $@
 
-lib/coq/%.vo: lib/coq/%.v
-	$(COQC8) -I lib/coq $<
+# lib/coq/%.vo: lib/coq/%.v
+# 	$(COQC8) -I lib/coq $<
 
-lib/coq-v7/%.vo: lib/coq-v7/%.v
-	$(COQC7) -I lib/coq-v7 $<
+# lib/coq-v7/%.vo: lib/coq-v7/%.v
+# 	$(COQC7) -I lib/coq-v7 $<
 
-jc/jc_ai.ml: jc/jc_annot_inference.ml jc/jc_annot_fail.ml Makefile
-	if test "@enable_apron@" = "yes" ; then \
-	  echo "# 1 \"jc/jc_annot_inference.ml\"" > jc/jc_ai.ml; \
-	  cat jc/jc_annot_inference.ml >> jc/jc_ai.ml; \
-	else \
-	  echo "# 1 \"jc/jc_annot_fail.ml\"" > jc/jc_ai.ml; \
-	  cat jc/jc_annot_fail.ml >> jc/jc_ai.ml; \
-	fi
+# jc/jc_ai.ml: jc/jc_annot_inference.ml jc/jc_annot_fail.ml Makefile
+# 	if test "@enable_apron@" = "yes" ; then \
+# 	  echo "# 1 \"jc/jc_annot_inference.ml\"" > jc/jc_ai.ml; \
+# 	  cat jc/jc_annot_inference.ml >> jc/jc_ai.ml; \
+# 	else \
+# 	  echo "# 1 \"jc/jc_annot_fail.ml\"" > jc/jc_ai.ml; \
+# 	  cat jc/jc_annot_fail.ml >> jc/jc_ai.ml; \
+# 	fi
 
 # %_why.v: %.mlw $(BINARY)
 # 	$(BINARY) -coq $*.mlw
@@ -561,138 +540,141 @@ wc:
 dep: 
 	$(MAKE) depend
 	cat .depend | ocamldot | dot -Tpdf > dep.pdf
-	$(PDFVIEWER) dep.pdf
+#	$(PDFVIEWER) dep.pdf
 
 # distrib
 #########
 
-NAME=why-$(VERSION)
-EXPORT=export/$(NAME)
-
-WWW = /users/www-perso/projets/why
-FTP = $(WWW)/download
-WWWKRAKATOA = /users/www-perso/projets/krakatoa
-
-FILES =src/*.ml* c/*.ml* jc/*.ml* java/*.ml* ml/*.ml* ml/*/*.ml* intf/*.ml* tools/*.ml* tools/*.c bin/why-ide.sh \
-       mix/*.ml* \
-       version.sh Version Makefile.in configure.in configure .depend .depend.coq \
-       config/check_ocamlgraph.ml \
-       README INSTALL COPYING LICENSE CHANGES \
-       doc/Makefile doc/manual.ps doc/why.1 \
-	examples-c/*/*.h examples-c/*/*.c \
-	examples-c/Makefile examples-c/*/Makefile \
-	examples-c/*/coq/*.v \
-	examples/Makefile* \
-	examples/*/*.mlw examples/*/*.why examples/*/*.v examples/*/*.sx \
-	examples/*/.depend examples/*/Makefile \
-	bench/bench.in bench/good*/*.mlw bench/good*/*.v \
-        bench/c/bench bench/c/bench-files bench/c/*/*.c bench/c/*/*/*.c \
-	bench/jc/bench bench/jc/good/*.jc \
-	bench/java/bench bench/java/*/*.java bench/provers/*.mlw \
-	tests/regtest.sh tests/java/*.java \
-	tests/java/coq/*.v \
-	tests/java/result/README tests/java/oracle/*.oracle \
-	lib/coq*/*.v \
-	lib/pvs/pvscontext.el lib/pvs/*.pvs lib/pvs/*.prf \
-	lib/mizar/why.miz lib/mizar/dict/why.voc \
-	lib/why/*.why lib/isabelle/*.thy lib/hol4/*.ml lib/harvey/*.rv \
-	lib/java_api/java/*/*.java \
-	lib/javacard_api/java/lang/*.java \
-	lib/javacard_api/javacard/*/*.java \
-	lib/javacard_api/javacardx/crypto/*.java \
-	lib/javacard_api/com/sun/javacard/impl/*.java \
-	lib/images/*.png \
-	atp/*.ml atp/LICENSE.txt atp/Makefile atp/Mk_ml_file \
-	ocamlgraph/configure.in ocamlgraph/configure ocamlgraph/.depend \
-	ocamlgraph/Makefile.in ocamlgraph/META.in ocamlgraph/*/*.ml* \
-        frama-c-plugin/Makefile frama-c-plugin/configure \
-	frama-c-plugin/*.ml* frama-c-plugin/share/jessie/*.h 
-
-# ne pas distribuer ces tests-la	frama-c-plugin/tests/jessie/*.c
-
-distrib export: source export-doc export-www export-examples export-examples-c linux
-
-export-www:
-	echo "<#def version>$(VERSION)</#def>" > /users/demons/filliatr/www/why/version.prehtml
-	echo "<#def cversion>$(CVERSION)</#def>" >> /users/demons/filliatr/www/why/version.prehtml
-	make -C /users/demons/filliatr/www/why install
-
-source: export/$(NAME).tar.gz
-	cp CHANGES CHANGES.caduceus export/$(NAME).tar.gz $(FTP)
-
-export/$(NAME).tar.gz: $(FILES)
-	rm -rf $(EXPORT)
-	mkdir -p $(EXPORT)/bin
-	cp --parents $(FILES) $(EXPORT)
-	cd $(EXPORT); rm -f $(GENERATED)
-	cd export; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
-
-tarball-for-framac: 
-	make tarball
-	cp export/$(NAME).tar.gz export/why-for-framac.tar.gz
-
-tarball: 
-	mkdir -p export
-	cd export; rm -rf $(NAME) $(NAME).tar.gz
-	make export/$(NAME).tar.gz
-
-EXFILES = lib/coq*/*.v examples/*/*.v examples/*/*.mlw
-
-export-examples:
-	cp --parents $(EXFILES) $(WWW)
-	make -C $(WWW)/examples clean depend
-	echo "*** faire make all dans $(WWW)/examples ***"
-
-export-examples-c:
-	mkdir -p $(WWW)/caduceus/examples
-	cd examples-c; cp --parents */*.c */*.h $(WWW)/caduceus/examples
-	mkdir -p $(WWW)/caduceus/examples/bench
-	cp bench/c/good/*.c $(WWW)/caduceus/examples/bench
-	rm -f $(WWW)/caduceus/examples/bench/test.c
-
-export-doc: $(DOC)
-	cp doc/manual.ps doc/manual.html $(WWW)/manual
-	cp doc/logic_syntax.bnf $(WWW)/manual
-	(cd $(WWW)/manual; hacha manual.html)
-	cp doc/caduceus.ps doc/caduceus.html $(WWW)/caduceus/manual
-	(cd $(WWW)/caduceus/manual; hacha caduceus.html)
-	cp doc/krakatoa.pdf doc/krakatoa.html $(WWWKRAKATOA)/manual
-	(cd $(WWWKRAKATOA)/manual; hacha krakatoa.html)
-
-OSTYPE  ?= linux
-
-BINARYNAME = $(NAME)-$(OSTYPE)
-
-linux: binary
-
-ALLBINARYFILES = $(FILES) $(BINARYFILES) 
-
-binary: $(ALLBINARYFILES)
-	mkdir -p export/$(BINARYNAME)
-	cp --parents $(ALLBINARYFILES) export/$(BINARYNAME)
-	(cd export; tar czf $(BINARYNAME).tar.gz $(BINARYNAME))
-	cp export/$(BINARYNAME).tar.gz $(FTP)
+# NAME=why-$(VERSION)
+# EXPORT=export/$(NAME)
+# 
+# WWW = /users/www-perso/projets/why
+# FTP = $(WWW)/download
+# WWWKRAKATOA = /users/www-perso/projets/krakatoa
+# 
+# FILES =src/*.ml* c/*.ml* jc/*.ml* java/*.ml* ml/*.ml* ml/*/*.ml* intf/*.ml* tools/*.ml* tools/*.c bin/why-ide.sh \
+#        mix/*.ml* \
+#        version.sh Version Makefile.in configure.in configure .depend .depend.coq \
+#        config/check_ocamlgraph.ml \
+#        README INSTALL COPYING LICENSE CHANGES \
+#        doc/Makefile doc/manual.ps doc/why.1 \
+# 	examples-c/*/*.h examples-c/*/*.c \
+# 	examples-c/Makefile examples-c/*/Makefile \
+# 	examples-c/*/coq/*.v \
+# 	examples/Makefile* \
+# 	examples/*/*.mlw examples/*/*.why examples/*/*.v examples/*/*.sx \
+# 	examples/*/.depend examples/*/Makefile \
+# 	bench/bench.in bench/good*/*.mlw bench/good*/*.v \
+#         bench/c/bench bench/c/bench-files bench/c/*/*.c bench/c/*/*/*.c \
+# 	bench/jc/bench bench/jc/good/*.jc \
+# 	bench/java/bench bench/java/*/*.java bench/provers/*.mlw \
+# 	tests/regtest.sh tests/java/*.java \
+# 	tests/java/coq/*.v \
+# 	tests/java/result/README tests/java/oracle/*.oracle \
+# 	lib/coq*/*.v \
+# 	lib/pvs/pvscontext.el lib/pvs/*.pvs lib/pvs/*.prf \
+# 	lib/mizar/why.miz lib/mizar/dict/why.voc \
+# 	lib/why/*.why lib/isabelle/*.thy lib/hol4/*.ml lib/harvey/*.rv \
+# 	lib/java_api/java/*/*.java \
+# 	lib/javacard_api/java/lang/*.java \
+# 	lib/javacard_api/javacard/*/*.java \
+# 	lib/javacard_api/javacardx/crypto/*.java \
+# 	lib/javacard_api/com/sun/javacard/impl/*.java \
+# 	lib/images/*.png \
+# 	atp/*.ml atp/LICENSE.txt atp/Makefile atp/Mk_ml_file \
+# 	ocamlgraph/configure.in ocamlgraph/configure ocamlgraph/.depend \
+# 	ocamlgraph/Makefile.in ocamlgraph/META.in ocamlgraph/*/*.ml* \
+#         frama-c-plugin/Makefile frama-c-plugin/configure \
+# 	frama-c-plugin/*.ml* frama-c-plugin/share/jessie/*.h 
+# 
+# # ne pas distribuer ces tests-la	frama-c-plugin/tests/jessie/*.c
+# 
+# distrib export: source export-doc export-www export-examples export-examples-c linux
+# 
+# export-www:
+# 	echo "<#def version>$(VERSION)</#def>" > /users/demons/filliatr/www/why/version.prehtml
+# 	echo "<#def cversion>$(CVERSION)</#def>" >> /users/demons/filliatr/www/why/version.prehtml
+# 	make -C /users/demons/filliatr/www/why install
+# 
+# source: export/$(NAME).tar.gz
+# 	cp CHANGES CHANGES.caduceus export/$(NAME).tar.gz $(FTP)
+# 
+# export/$(NAME).tar.gz: $(FILES)
+# 	rm -rf $(EXPORT)
+# 	mkdir -p $(EXPORT)/bin
+# 	cp --parents $(FILES) $(EXPORT)
+# 	cd $(EXPORT); rm -f $(GENERATED)
+# 	cd export; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
+# 
+# tarball-for-framac: 
+# 	make tarball
+# 	cp export/$(NAME).tar.gz export/why-for-framac.tar.gz
+# 
+# tarball: 
+# 	mkdir -p export
+# 	cd export; rm -rf $(NAME) $(NAME).tar.gz
+# 	make export/$(NAME).tar.gz
+# 
+# EXFILES = lib/coq*/*.v examples/*/*.v examples/*/*.mlw
+# 
+# export-examples:
+# 	cp --parents $(EXFILES) $(WWW)
+# 	make -C $(WWW)/examples clean depend
+# 	echo "*** faire make all dans $(WWW)/examples ***"
+# 
+# export-examples-c:
+# 	mkdir -p $(WWW)/caduceus/examples
+# 	cd examples-c; cp --parents */*.c */*.h $(WWW)/caduceus/examples
+# 	mkdir -p $(WWW)/caduceus/examples/bench
+# 	cp bench/c/good/*.c $(WWW)/caduceus/examples/bench
+# 	rm -f $(WWW)/caduceus/examples/bench/test.c
+# 
+# export-doc: $(DOC)
+# 	cp doc/manual.ps doc/manual.html $(WWW)/manual
+# 	cp doc/logic_syntax.bnf $(WWW)/manual
+# 	(cd $(WWW)/manual; hacha manual.html)
+# 	cp doc/caduceus.ps doc/caduceus.html $(WWW)/caduceus/manual
+# 	(cd $(WWW)/caduceus/manual; hacha caduceus.html)
+# 	cp doc/krakatoa.pdf doc/krakatoa.html $(WWWKRAKATOA)/manual
+# 	(cd $(WWWKRAKATOA)/manual; hacha krakatoa.html)
+# 
+# OSTYPE  ?= linux
+# 
+# BINARYNAME = $(NAME)-$(OSTYPE)
+# 
+# linux: binary
+# 
+# ALLBINARYFILES = $(FILES) $(BINARYFILES) 
+# 
+# binary: $(ALLBINARYFILES)
+# 	mkdir -p export/$(BINARYNAME)
+# 	cp --parents $(ALLBINARYFILES) export/$(BINARYNAME)
+# 	(cd export; tar czf $(BINARYNAME).tar.gz $(BINARYNAME))
+# 	cp export/$(BINARYNAME).tar.gz $(FTP)
 
 # file headers
 ##############
 headers:
 	headache -c misc/headache_config.txt -h misc/header.txt \
-		Makefile.in configure.in \
-		*/*.ml */*/*.ml */*/*.ml[ily4] 
+	    Makefile.in configure.in */*.ml */*/*.ml */*/*.ml[ily4]
 
 # myself
 ########
-Makefile: Makefile.in config.status
-	./config.status --file Makefile
 
-config.status: configure
+Makefile: Makefile.in config.status
+	./config.status --file $@
+
+src/config.ml: src/config.ml.in config.status
+	./config.status --file $@
+
+doc/version.tex: doc/version.tex.in config.status
+	./config.status --file $@
+
+config.status: configure Version
 	./config.status --recheck
 
 configure: configure.in
 	autoconf 
-
-src/driver/dynlink_compat.ml: src/driver/dynlink_compat.ml.in config.status
-	./config.status --file src/driver/dynlink_compat.ml
 
 # clean and depend
 ##################
@@ -701,7 +683,8 @@ clean::
 	rm -f *~ */*~ */*/*~
 
 distclean:: clean
-	rm -f Makefile config.status config.cache config.log
+	rm -f config.status config.cache config.log \
+	    Makefile src/config.ml doc/version.tex
 
 #################################################################
 # Building the Why platform with ocamlbuild (OCaml 3.10 needed) #

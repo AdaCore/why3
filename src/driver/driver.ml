@@ -182,16 +182,12 @@ let () =
                      "Pervasives";"Format";"List";"Sys";"Unix"]
 *)
 
-open Dynlink_compat
-
 let load_plugin dir (byte,nat) =
-  if Dynlink.is_native_not_defined then 
-    errorm 
-"Why has been compiled with a version of caml which doesn't allow\
- native dynlink. So Why chooses to refuse plugin.";
-  let file = if Dynlink.is_native then nat else byte in
+  if Config.Dynlink.is_native_not_defined then 
+    errorm "Plugins are not supported";
+  let file = if Config.Dynlink.is_native then nat else byte in
   let file = Filename.concat dir file in
-  Dynlink.loadfile_private file
+  Config.Dynlink.loadfile_private file
 
 let load_file file =
   let c = open_in file in

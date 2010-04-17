@@ -17,13 +17,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Dynlink :
-  sig
-    val is_native_not_defined : bool
-    val is_native : bool
-    val loadfile_private : string -> unit
+let why_version   = "@VERSION@"
+let why_builddate = "@BUILDDATE@"
+let coq_version   = "@COQVERSION@"
 
-    type error
-    exception Error of error
-    val error_message : error -> string
-  end
+module Dynlink_ = struct
+  let is_native_not_defined = true
+
+  let is_native = true
+  let loadfile_private _ = assert false
+
+  type error
+  exception Error of error
+  let error_message _ = (assert false : string)
+end
+
+module Dynlink = struct
+  let is_native_not_defined = false
+
+  include @DYNLINK@
+end
+
