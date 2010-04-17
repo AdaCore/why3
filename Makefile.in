@@ -86,7 +86,7 @@ all: @OCAMLBEST@
 # Why library
 #############
 
-LIBGENERATED = src/config.ml src/userconf/rc.ml \
+LIBGENERATED = src/userconf/rc.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
 	       src/parser/parser.output src/parser/lexer.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
@@ -154,14 +154,14 @@ src/why.cmi: src/why.cmo src/why.cmx
 
 include .depend.lib
 
-.depend.lib: $(LIBGENERATED)
+.depend.lib: src/config.ml $(LIBGENERATED)
 	$(OCAMLDEP) -slash $(LIBINCLUDES) $(LIBML) $(LIBMLI) > $@
 
 depend: .depend.lib
 
 # clean target
 
-LIBSDIRS = $(addprefix src/, $(LIBDIRS))
+LIBSDIRS = src $(addprefix src/, $(LIBDIRS))
 LIBCLEAN = $(addsuffix /*.cm[iox], $(LIBSDIRS)) \
 	   $(addsuffix /*.annot, $(LIBSDIRS)) \
 	   $(addsuffix /*.o, $(LIBSDIRS)) \
@@ -190,7 +190,7 @@ bin/why.byte: src/why.cma src/main.cmo
 src/main.cmo src/main.cmx: src/why.cmi
 
 clean::
-	rm -f src/main.cm[iox] src/main.annot
+	rm -f src/main.cm[iox] src/main.annot src/main.o
 	rm -f bin/why.byte bin/why.opt
 
 ########
