@@ -294,6 +294,9 @@ module Hsterm = Hashcons.Make (struct
     | Tvar v1, Tvar v2 -> v1 == v2
     | Tconst c1, Tconst c2 -> c1 = c2
     | Tapp (s1, l1), Tapp (s2, l2) -> s1 == s2 && List.for_all2 (==) l1 l2
+	(* Claude: en voila un beau bug
+	   j'espere que cela convaincra les developpeurs
+	   de Why3 de compiler avec l'option -w Z !!! *) 
     | Tif (f1, t1, e1), Tif (f2, t2, e2) -> f1 == f2 && t1 == t2 && e2 == e2
     | Tlet (t1, b1), Tlet (t2, b2) -> t1 == t2 && t_eq_bound b1 b2
     | Tcase (tl1, bl1), Tcase (tl2, bl2) ->

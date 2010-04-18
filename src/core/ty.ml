@@ -109,7 +109,7 @@ let ty_map fn ty = match ty.ty_node with
 
 let ty_fold fn acc ty = match ty.ty_node with
   | Tyvar _ -> acc
-  | Tyapp (f, tl) -> List.fold_left fn acc tl
+  | Tyapp (_, tl) -> List.fold_left fn acc tl
 
 let ty_all pr ty =
   try ty_fold (all_fn pr) true ty with FoldSkip -> false

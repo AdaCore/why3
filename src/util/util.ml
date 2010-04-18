@@ -42,7 +42,7 @@ let list_all2 pr l1 l2 =
 
 let map_join_left map join = function
   | x :: xl -> List.fold_left (fun acc x -> join acc (map x)) (map x) xl
-  | xl -> raise (Failure "map_join_left")
+  | _ -> raise (Failure "map_join_left")
 
 (* boolean fold accumulators *)
 

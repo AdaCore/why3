@@ -59,8 +59,8 @@ OCAMLVERSION = @OCAMLVERSION@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-BFLAGS = -w Aelz -dtypes -g -I src $(INCLUDES)
-OFLAGS = -w Aelz -dtypes    -I src $(INCLUDES)
+BFLAGS = -w Ae -warn-error Z -dtypes -g -I src $(INCLUDES)
+OFLAGS = -w Ae -warn-error Z -dtypes    -I src $(INCLUDES)
 
 # external libraries common to all binaries
 
