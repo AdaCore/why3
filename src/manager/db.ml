@@ -717,6 +717,12 @@ module Goal = struct
   end
 *)
 
+  let from_id db id : goal =
+    assert false
+      (*
+	let sql="SELECT goal.id, goal.task_checksum, goal.parent_id, goal.name, goal.pos_id, goal.proved, goal_pos.id, goal_pos.file, goal_pos.line, goal_pos.start, goal_pos.stop, goal_parent.id, goal_parent.name, goal_parent.obsolete FROM goal LEFT JOIN transf AS goal_parent ON (goal_parent.id = goal.parent_id) LEFT JOIN loc AS goal_pos ON (goal_pos.id = goal.pos_id) " ^ q in
+	let stmt=Sqlite3.prepare db.db sql in
+      *)
 
   (* General get function for any of the columns *)
 (*
@@ -1022,6 +1028,26 @@ module Transf = struct
 
 end
 
+module Main = struct
+
+  let init db =
+    let sql = "create table if not exists rootgoals (goal_id integer);" in
+    db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
+    ()
+
+  let all_root_goals db =
+    let sql="SELECT goal_id FROM rootgoals" in
+    let stmt=Sqlite3.prepare db.raw_db sql in
+    let of_stmt stmt =
+      match Sqlite3.column stmt 0 with
+        | Sqlite3.Data.INT i -> i 
+	| x -> (try Int64.of_string (Sqlite3.Data.to_string x) 
+		with _ -> failwith "Db.all_root_goals")
+    in
+    let goals_ids = step_fold db stmt of_stmt in
+    goals_ids
+
+end
 
 let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
   match !current_db with
@@ -1035,17 +1061,23 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
 	in
 	current_db := Some db;
 	Loc.init db;
+	External_proof.init db;
 	(*
-	  External_proof.init db;
 	  Goal.init db;
 	  Transf.init db;
 	*)
+	Main.init db
 
     | Some _ -> failwith "database already opened"
 
 let init_base f = init_db f
 
-let root_goals () = assert false (* TODO *)
+let root_goals () = 
+  let db = current () in
+  let l = Main.all_root_goals db in
+  List.rev_map (Goal.from_id db) l
+    
+  
 
 
 

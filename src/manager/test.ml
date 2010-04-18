@@ -1,4 +1,5 @@
 
+open Format
 open Why
 
 let autodetection () = 
@@ -16,15 +17,13 @@ let () =
   try 
     Whyconf.read_config_file ()
   with Not_found -> 
-    Format.eprintf "No .why.conf file found. Running autodetection of provers.@.";
+    eprintf "No .why.conf file found. Running autodetection of provers.@.";
     autodetection ();
     exit 0
 
 
 
 let provers = Whyconf.known_provers ()
-
-open Format
 
 let () =
   printf "Provers: ";
@@ -41,14 +40,46 @@ let loadpath = ["../theories"]
 
 let env = Why.Env.create_env (Why.Typing.retrieve loadpath)
 
-let m =
-  let cin = open_in (fname ^ ".why") in
-  let m = Why.Typing.read_channel env fname cin in
-  close_in cin;
-  m
-
 
 let () = Db.init_base (fname ^ ".prm")
+
+let () = 
+  printf "previously known goals:@\n";
+  List.iter (fun s -> printf "%s@\n" (Db.goal_task_checksum s)) (Db.root_goals ());
+  printf "@."
+   
+let rec report fmt = function
+  | Lexer.Error e ->
+      fprintf fmt "lexical error: %a" Lexer.report e;
+  | Loc.Located (loc, e) ->
+      fprintf fmt "%a%a" Loc.report_position loc report e
+  | Parsing.Parse_error ->
+      fprintf fmt "syntax error"
+  | Denv.Error e ->
+      Denv.report fmt e
+  | Typing.Error e ->
+      Typing.report fmt e
+  | Decl.UnknownIdent i ->
+      fprintf fmt "anomaly: unknown ident '%s'" i.Ident.id_short
+  | Driver.Error e ->
+      Driver.report fmt e
+  | Dynlink_compat.Dynlink.Error e ->
+      fprintf fmt "Dynlink : %s" (Dynlink_compat.Dynlink.error_message e)
+  | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
+
+
+let m : Why.Theory.theory Why.Theory.Mnm.t =
+  try
+    let cin = open_in (fname ^ ".why") in
+    let m = Why.Typing.read_channel env fname cin in
+    close_in cin;
+    eprintf "Parsing/Typing Ok@.";
+    m
+  with e -> 
+    eprintf "%a@." report e;
+    exit 1
+
+
 
 let do_task tname (th : Why.Theory.theory) (task : Why.Task.task) : unit =
 (*
@@ -93,10 +124,25 @@ let do_theory tname th glist =
   List.iter (do_task tname th) tasks
 
 let () =
+  eprintf "looking for goals@.";
   let glist = Queue.create () in
-  let add_th t th mi = Why.Ident.Mid.add th.Why.Theory.th_name (t,th) mi in
-  let do_th _ (t,th) = do_theory t th glist in
-  Why.Ident.Mid.iter do_th (Why.Theory.Mnm.fold add_th m Why.Ident.Mid.empty)
+  let add_th t th mi = 
+    eprintf "adding theory %s, %s@." th.Why.Theory.th_name.Why.Ident.id_long t;
+    Why.Ident.Mid.add th.Why.Theory.th_name (t,th) mi 
+  in
+  let do_th _ (t,th) = 
+    eprintf "doing theory %s, %s@." th.Why.Theory.th_name.Why.Ident.id_long t;
+    do_theory t th glist 
+  in
+  Why.Ident.Mid.iter do_th (Why.Theory.Mnm.fold add_th m Why.Ident.Mid.empty);
+  eprintf "Done@."
+
+
+(*
+Local Variables: 
+compile-command: "make -C ../.. bin/manager.byte"
+End: 
+*)
 
 
 
