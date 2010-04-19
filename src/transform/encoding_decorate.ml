@@ -230,7 +230,7 @@ and rewrite_fmla tenv tvar vsvar f =
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv tvar) tl p.ls_args in
         f_app p tl
-    | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
+    | Fquant (q, b) -> let vl, _tl, f1 = f_open_quant b in
       let conv_vs (vsvar,acc) vs =
         let tres,vsres =
           let ty_res = conv_ty_pos tenv vs.vs_ty in
@@ -268,7 +268,7 @@ let decl (tenv:tenv) d =
                             type which are not in recursive bloc")
     | Dlogic l ->
         let fn = function
-          | ls, Some _ -> assert false (* TODO or not 
+          | _ls, Some _ -> assert false (* TODO or not 
                                           (remove_logic_definition*)
           | ls, None ->              
               try
@@ -279,7 +279,7 @@ let decl (tenv:tenv) d =
                 Hls.add tenv.trans_lsymbol ls ls_conv;
                 ls_conv,None in
         [create_logic_decl (List.map fn l)]
-    | Dind l -> failwith ("Encoding_decorate : I can't work on inductive")
+    | Dind _ -> failwith ("Encoding_decorate : I can't work on inductive")
         (* let fn (pr,f) = pr, fnF f in *)
         (* let fn (ps,l) = ps, List.map fn l in *)
         (* [create_ind_decl (List.map fn l)] *)

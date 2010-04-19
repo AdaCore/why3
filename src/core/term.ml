@@ -294,10 +294,7 @@ module Hsterm = Hashcons.Make (struct
     | Tvar v1, Tvar v2 -> v1 == v2
     | Tconst c1, Tconst c2 -> c1 = c2
     | Tapp (s1, l1), Tapp (s2, l2) -> s1 == s2 && List.for_all2 (==) l1 l2
-	(* Claude: en voila un beau bug
-	   j'espere que cela convaincra les developpeurs
-	   de Why3 de compiler avec l'option -w Z !!! *) 
-    | Tif (f1, t1, e1), Tif (f2, t2, e2) -> f1 == f2 && t1 == t2 && e2 == e2
+    | Tif (f1, t1, e1), Tif (f2, t2, e2) -> f1 == f2 && t1 == t2 && e1 == e2
     | Tlet (t1, b1), Tlet (t2, b2) -> t1 == t2 && t_eq_bound b1 b2
     | Tcase (tl1, bl1), Tcase (tl2, bl2) ->
         list_all2 (==) tl1 tl2 && list_all2 t_eq_branch bl1 bl2
@@ -536,22 +533,22 @@ let brlvl fn lvl acc (_, nv, t) = fn (lvl + nv) acc t
 let t_fold_unsafe fnT fnF lvl acc t = match t.t_node with
   | Tbvar n when n >= lvl -> raise UnboundIndex
   | Tbvar _ | Tvar _ | Tconst _ -> acc
-  | Tapp (f, tl) -> List.fold_left (fnT lvl) acc tl
+  | Tapp (_, tl) -> List.fold_left (fnT lvl) acc tl
   | Tif (f, t1, t2) -> fnT lvl (fnT lvl (fnF lvl acc f) t1) t2
-  | Tlet (t1, (u, t2)) -> fnT (lvl + 1) (fnT lvl acc t1) t2
+  | Tlet (t1, (_, t2)) -> fnT (lvl + 1) (fnT lvl acc t1) t2
   | Tcase (tl, bl) ->
       List.fold_left (brlvl fnT lvl) (List.fold_left (fnT lvl) acc tl) bl
-  | Teps (u, f) -> fnF (lvl + 1) acc f
+  | Teps (_, f) -> fnF (lvl + 1) acc f
 
 let f_fold_unsafe fnT fnF lvl acc f = match f.f_node with
-  | Fapp (p, tl) -> List.fold_left (fnT lvl) acc tl
-  | Fquant (q, (vl, nv, tl, f1)) -> let lvl = lvl + nv in
+  | Fapp (_, tl) -> List.fold_left (fnT lvl) acc tl
+  | Fquant (_, (_, nv, tl, f1)) -> let lvl = lvl + nv in
       tr_fold (fnT lvl) (fnF lvl) (fnF lvl acc f1) tl
-  | Fbinop (op, f1, f2) -> fnF lvl (fnF lvl acc f1) f2
+  | Fbinop (_, f1, f2) -> fnF lvl (fnF lvl acc f1) f2
   | Fnot f1 -> fnF lvl acc f1
   | Ftrue | Ffalse -> acc
   | Fif (f1, f2, f3) -> fnF lvl (fnF lvl (fnF lvl acc f1) f2) f3
-  | Flet (t, (u, f1)) -> fnF (lvl + 1) (fnT lvl acc t) f1
+  | Flet (t, (_, f1)) -> fnF (lvl + 1) (fnT lvl acc t) f1
   | Fcase (tl, bl) ->
       List.fold_left (brlvl fnF lvl) (List.fold_left (fnT lvl) acc tl) bl
 
@@ -732,10 +729,10 @@ and f_s_fold fnT fnL acc f =
   let fn_v acc u = ty_s_fold fnT acc u.vs_ty in
   match f.f_node with
     | Fapp (p, tl) -> List.fold_left fn_t (fnL acc p) tl
-    | Fquant (q, (vl,_,tl,f1)) ->
+    | Fquant (_, (vl,_,tl,f1)) ->
         let acc = List.fold_left fn_v acc vl in
         fn_f (tr_fold fn_t fn_f acc tl) f1
-    | Fbinop (op, f1, f2) -> fn_f (fn_f acc f1) f2
+    | Fbinop (_, f1, f2) -> fn_f (fn_f acc f1) f2
     | Fnot f1 -> fn_f acc f1
     | Ftrue | Ffalse -> acc
     | Fif (f1, f2, f3) -> fn_f (fn_f (fn_f acc f1) f2) f3
@@ -964,7 +961,7 @@ let f_branch fn acc b = let _,f = f_open_branch b in fn acc f
 let t_fold fnT fnF acc t = match t.t_node with
   | Tbvar _ -> raise UnboundIndex
   | Tvar _ | Tconst _ -> acc
-  | Tapp (f, tl) -> List.fold_left fnT acc tl
+  | Tapp (_, tl) -> List.fold_left fnT acc tl
   | Tif (f, t1, t2) -> fnT (fnT (fnF acc f) t1) t2
   | Tlet (t1, b) -> let _,t2 = t_open_bound b in fnT (fnT acc t1) t2
   | Tcase (tl, bl) ->
@@ -972,10 +969,10 @@ let t_fold fnT fnF acc t = match t.t_node with
   | Teps b -> let _,f = f_open_bound b in fnF acc f
 
 let f_fold fnT fnF acc f = match f.f_node with
-  | Fapp (p, tl) -> List.fold_left fnT acc tl
-  | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
+  | Fapp (_, tl) -> List.fold_left fnT acc tl
+  | Fquant (_, b) -> let _, tl, f1 = f_open_quant b in
       tr_fold fnT fnF (fnF acc f1) tl
-  | Fbinop (op, f1, f2) -> fnF (fnF acc f1) f2
+  | Fbinop (_, f1, f2) -> fnF (fnF acc f1) f2
   | Fnot f1 -> fnF acc f1
   | Ftrue | Ffalse -> acc
   | Fif (f1, f2, f3) -> fnF (fnF (fnF acc f1) f2) f3
@@ -1043,8 +1040,8 @@ let f_subst_single v t1 f = f_v_map (eq_vs v t1) f
 
 (* set of free variables *)
 
-let t_freevars s t = t_v_fold (fun s u -> Svs.add u s) Svs.empty t
-let f_freevars s f = f_v_fold (fun s u -> Svs.add u s) Svs.empty f
+let t_freevars s t = t_v_fold (fun s u -> Svs.add u s) s t
+let f_freevars s f = f_v_fold (fun s u -> Svs.add u s) s f
 
 (* equality modulo alpha *)
 
@@ -1063,15 +1060,15 @@ let rec t_equal_alpha t1 t2 =
     | Tif (f1, t1, e1), Tif (f2, t2, e2) ->
         f_equal_alpha f1 f2 && t_equal_alpha t1 t2 && t_equal_alpha e1 e2
     | Tlet (t1, tb1), Tlet (t2, tb2) ->
-        let v1, b1 = tb1 in
-        let v2, b2 = tb2 in
+        let _, b1 = tb1 in
+        let _, b2 = tb2 in
         t_equal_alpha t1 t2 && t_equal_alpha b1 b2
     | Tcase (tl1, bl1), Tcase (tl2, bl2) ->
         list_all2 t_equal_alpha tl1 tl2 &&
         list_all2 t_equal_branch_alpha bl1 bl2
     | Teps fb1, Teps fb2 ->
-        let v1, f1 = fb1 in
-        let v2, f2 = fb2 in
+        let _, f1 = fb1 in
+        let _, f2 = fb2 in
         f_equal_alpha f1 f2
     | _ -> false
 
@@ -1092,8 +1089,8 @@ and f_equal_alpha f1 f2 =
     | Fif (f1, g1, h1), Fif (f2, g2, h2) ->
         f_equal_alpha f1 f2 && f_equal_alpha g1 g2 && f_equal_alpha h1 h2
     | Flet (t1, fb1), Flet (t2, fb2) ->
-        let v1, f1 = fb1 in
-        let v2, f2 = fb2 in
+        let _, f1 = fb1 in
+        let _, f2 = fb2 in
         t_equal_alpha t1 t2 && f_equal_alpha f1 f2
     | Fcase (tl1, bl1), Fcase (tl2, bl2) ->
         list_all2 t_equal_alpha tl1 tl2 &&
@@ -1145,16 +1142,16 @@ let rec t_match s t1 t2 =
     | Tif (f1, t1, e1), Tif (f2, t2, e2) ->
         t_match (t_match (f_match s f1 f2) t1 t2) e1 e2
     | Tlet (t1, tb1), Tlet (t2, tb2) ->
-        let v1, b1 = tb1 in
-        let v2, b2 = tb2 in
+        let _, b1 = tb1 in
+        let _, b2 = tb2 in
         t_match (t_match s t1 t2) b1 b2
     | Tcase (tl1, bl1), Tcase (tl2, bl2) ->
         (try List.fold_left2 t_match_branch
           (List.fold_left2 t_match s tl1 tl2) bl1 bl2
         with Invalid_argument _ -> raise NoMatch)
     | Teps fb1, Teps fb2 ->
-        let v1, f1 = fb1 in
-        let v2, f2 = fb2 in
+        let _, f1 = fb1 in
+        let _, f2 = fb2 in
         f_match s f1 f2
     | _ -> raise NoMatch
 
@@ -1175,8 +1172,8 @@ and f_match s f1 f2 =
     | Fif (f1, g1, h1), Fif (f2, g2, h2) ->
         f_match (f_match (f_match s f1 f2) g1 g2) h1 h2
     | Flet (t1, fb1), Flet (t2, fb2) ->
-        let v1, f1 = fb1 in
-        let v2, f2 = fb2 in
+        let _, f1 = fb1 in
+        let _, f2 = fb2 in
         f_match (t_match s t1 t2) f1 f2
     | Fcase (tl1, bl1), Fcase (tl2, bl2) ->
         (try List.fold_left2 f_match_branch

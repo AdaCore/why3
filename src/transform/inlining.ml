@@ -56,7 +56,7 @@ and replacep env f =
   match f.f_node with
     | Fapp (ps,tl) ->
         begin try 
-          let (vs,t) = Mls.find ps env.ps in
+          let (vs,f) = Mls.find ps env.ps in
           let m = List.fold_left2 (fun acc x y -> Mvs.add x y acc) 
             Mvs.empty vs tl in
           f_subst m f
@@ -101,7 +101,7 @@ let fold isnotinlinedt isnotinlinedf d (env, task) =
                 let vs,e = open_ls_defn ld in
                 let e = e_map (replacet env) (replacep env) e in
                 make_ls_defn ls vs e) dl))
-    | Dtype dl -> env,add_decl task d
+    | Dtype _ -> env,add_decl task d
     | Dprop (k,pr,f) -> 
         env,add_decl task (create_prop_decl k pr (replacep env f))
         
@@ -121,14 +121,14 @@ let all = t ~isnotinlinedt:(fun _ -> false) ~isnotinlinedf:(fun _ -> false)
 let trivial = t 
   ~isnotinlinedt:(fun m -> match m.t_node with
                     | Tconst _ | Tvar _ -> false
-                    | Tapp (ls,tl) when List.for_all 
+                    | Tapp (_,tl) when List.for_all 
                         (fun m -> match m.t_node with 
                            | Tvar _ -> true 
                            | _ -> false) tl -> false
                     | _ -> true )
   ~isnotinlinedf:(fun m -> match m.f_node with 
                     | Ftrue | Ffalse -> false
-                    | Fapp (ls,tl) when List.for_all 
+                    | Fapp (_,tl) when List.for_all 
                         (fun m -> match m.t_node with 
                            | Tvar _ -> true 
                            | _ -> false) tl -> false

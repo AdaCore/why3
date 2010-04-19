@@ -151,7 +151,7 @@ and expr_desc env loc = function
       let e2 = dexpr env e2 in
       expected_type e2 env.ty_bool;
       DElazy (op, e1, e2), env.ty_bool
-  | Pgm_ptree.Ematch (el, bl) ->
+  | Pgm_ptree.Ematch (_el, _bl) ->
       assert false (*TODO*)
   | Pgm_ptree.Eskip ->
       DEskip, env.ty_unit
@@ -222,7 +222,7 @@ and expr_desc env denv = function
   | DElabel (s, e1) ->
       Elabel (s, expr env e1)
 
-let code uc id e =
+let code uc _id e =
   let env = create_denv uc in
   let e = dexpr env e in
   ignore (expr Mstr.empty e)

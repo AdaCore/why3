@@ -289,7 +289,7 @@ let load_rules env (premap,tmap) {thr_name = loc,qualid; thr_rules = trl} =
           with Not_found -> errorm ~loc "Unknown proposition %s" 
             (string_of_qualid qualid q)
         end
-    | Rprelude (loc,s) -> 
+    | Rprelude (_loc,s) -> 
         let l = 
           try Mid.find th.th_name premap 
           with Not_found -> []
@@ -435,7 +435,7 @@ let file_printer =
     []
 
 let call_prover_on_file ?debug ?timeout drv filename =
-  Call_provers.on_file drv.drv_prover filename 
+  Call_provers.on_file ?debug ?timeout drv.drv_prover filename 
 let call_prover_on_formatter ?debug ?timeout ?filename drv ib = 
   Call_provers.on_formatter ?debug ?timeout ?filename drv.drv_prover ib
 let call_prover_on_buffer ?debug ?timeout ?filename drv ib = 

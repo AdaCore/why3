@@ -58,16 +58,8 @@ let make_ls_defn ls vl = e_apply (make_fs_defn ls vl) (make_ps_defn ls vl)
 let open_ls_defn (_,f) =
   let vl, ef = f_open_forall f in
   match ef.f_node with
-    | Fapp (s, [t1; t2]) when s == ps_equ ->
-        begin match t1.t_node with
-          | Tapp (fs, _) -> vl, Term t2
-          | _ -> assert false
-        end
-    | Fbinop (Fiff, f1, f2) ->
-        begin match f1.f_node with
-          | Fapp (ps, _) -> vl, Fmla f2
-          | _ -> assert false
-        end
+    | Fapp (_, [_; t2]) -> vl, Term t2
+    | Fbinop (_, _, f2) -> vl, Fmla f2
     | _ -> assert false
 
 let open_fs_defn ld = let vl,e = open_ls_defn ld in
@@ -137,7 +129,7 @@ module Hsdecl = Hashcons.Make (struct
     | None, None -> true
     | _ -> false
 
-  let eq_iax (pr1,fr1) (pr2,fr2) = pr1 == pr1 && fr1 == fr2
+  let eq_iax (pr1,fr1) (pr2,fr2) = pr1 == pr2 && fr1 == fr2
 
   let eq_ind (ps1,al1) (ps2,al2) = ps1 == ps2 && list_all2 eq_iax al1 al2
 
@@ -507,7 +499,7 @@ let find_prop kn pr =
   | Dind dl ->
       let test (_,l) = List.mem_assq pr l in
       List.assq pr (snd (List.find test dl))
-  | Dprop (_,pr,f) -> f
+  | Dprop (_,_,f) -> f
   | _ -> assert false
 
 exception NonExhaustiveExpr of (pattern list * expr)

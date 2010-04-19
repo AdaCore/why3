@@ -171,7 +171,7 @@ let print_type_decl drv fmt = function
 
 let ac_th = ["algebra";"AC"]
 
-let print_logic_decl drv task fmt (ls,ld) =
+let print_logic_decl drv _task fmt (ls,ld) =
   match drv ls.ls_name with
     | Driver.Remove | Driver.Syntax _ -> false
     | Driver.Tag s ->

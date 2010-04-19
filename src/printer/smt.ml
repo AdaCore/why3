@@ -39,7 +39,7 @@ let ident_printer =
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
-let print_tvsymbols fmt id = assert false
+let print_tvsymbols _fmt _id = assert false
 
 let forget_var v = forget_id ident_printer v.vs_name
 
@@ -117,7 +117,7 @@ let rec print_fmla drv fmt f = match f.f_node with
       end
   | Fquant (q, fq) ->
       let q = match q with Fforall -> "forall" | Fexists -> "exists" in
-      let vl, tl, f = f_open_quant fq in
+      let vl, _tl, f = f_open_quant fq in
       (* TODO trigger *)
       let rec forall fmt = function
         | [] -> print_fmla drv fmt f
@@ -172,10 +172,10 @@ let print_type_decl drv fmt = function
   | _, Talgebraic _ ->
       assert false
 
-let print_logic_decl drv task fmt (ls,ld) =
+let print_logic_decl drv _task fmt (ls,ld) =
   match drv ls.ls_name with
     | Driver.Remove | Driver.Syntax _ -> false
-    | Driver.Tag s ->
+    | Driver.Tag _s ->
         begin match ld with
           | None ->
               begin match ls.ls_value with
@@ -189,7 +189,7 @@ let print_logic_decl drv task fmt (ls,ld) =
                       (print_list space (print_type drv)) ls.ls_args 
                       (print_type drv) value
               end
-          | Some ld -> assert false (* Dealt in Encoding *)
+          | Some _ -> assert false (* Dealt in Encoding *)
         end;
         true
   
@@ -201,7 +201,7 @@ let print_decl drv task fmt d = match d.d_node with
   | Dind _ -> assert false (* TODO *)
   | Dprop (Paxiom, pr, _) when
       drv pr.pr_name = Driver.Remove -> false
-  | Dprop (Paxiom, pr, f) ->
+  | Dprop (Paxiom, _pr, f) ->
       fprintf fmt "@[<hov 2>:assumption@ %a@]@\n" 
         (print_fmla drv) f; true
   | Dprop (Pgoal, pr, f) ->

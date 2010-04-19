@@ -171,7 +171,7 @@ let treat_result pr (t,c,outerr) =
              here or in the use of why_cpulimit *)
           Timeout
       | Unix.WSTOPPED _ | Unix.WSIGNALED _ -> HighFailure
-      | Unix.WEXITED c ->
+      | Unix.WEXITED _ ->
           let rec greps res = function
             | [] -> HighFailure
             | (r,pa)::l ->

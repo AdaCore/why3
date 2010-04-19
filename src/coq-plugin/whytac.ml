@@ -271,7 +271,7 @@ and tr_global_ts env r =
   with Not_found -> 
     add_global global_ts r None;
     match r with
-      | VarRef id ->
+      | VarRef _id ->
 	  assert false (*TODO*)
       | ConstructRef _ ->
 	  assert false
