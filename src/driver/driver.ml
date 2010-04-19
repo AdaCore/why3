@@ -438,6 +438,7 @@ let call_prover_on_file ?debug ?timeout drv filename =
   Call_provers.on_file ?debug ?timeout drv.drv_prover filename 
 let call_prover_on_formatter ?debug ?timeout ?filename drv ib = 
   Call_provers.on_formatter ?debug ?timeout ?filename drv.drv_prover ib
+
 let call_prover_on_buffer ?debug ?timeout ?filename drv ib = 
   Call_provers.on_buffer ?debug ?timeout ?filename drv.drv_prover ib
 

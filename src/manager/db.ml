@@ -19,7 +19,7 @@ let current () =
 
 	      
 
-let default_busyfn (db:Sqlite3.db) =
+let default_busyfn (_db:Sqlite3.db) =
   print_endline "WARNING: busy";
   (* Thread.delay (Random.float 1.) *)
   ignore (Unix.select [] [] [] (Random.float 1.))
@@ -274,15 +274,15 @@ module Loc = struct
     let f () = if !first then (first := false; " WHERE ") else " AND " 
     in
     let q = match id with 
-      | None -> q | Some b -> q ^ (f()) ^ "loc.id=?" in
+      | None -> q | Some _b -> q ^ (f()) ^ "loc.id=?" in
     let q = match file with 
-      | None -> q | Some b -> q ^ (f()) ^ "loc.file=?" in
+      | None -> q | Some _b -> q ^ (f()) ^ "loc.file=?" in
     let q = match line with 
-      | None -> q | Some b -> q ^ (f()) ^ "loc.line=?" in
+      | None -> q | Some _b -> q ^ (f()) ^ "loc.line=?" in
     let q = match start with 
-      | None -> q | Some b -> q ^ (f()) ^ "loc.start=?" in
+      | None -> q | Some _b -> q ^ (f()) ^ "loc.start=?" in
     let q = match stop with 
-      | None -> q | Some b -> q ^ (f()) ^ "loc.stop=?" in
+      | None -> q | Some _b -> q ^ (f()) ^ "loc.stop=?" in
     let q = match custom_where with 
       | "",_ -> q | w,_ -> q ^ (f()) ^ "(" ^ w ^ ")" in
     let sql =
@@ -717,7 +717,7 @@ module Goal = struct
   end
 *)
 
-  let from_id db id : goal =
+  let from_id _db _id : goal =
     assert false
       (*
 	let sql="SELECT goal.id, goal.task_checksum, goal.parent_id, goal.name, goal.pos_id, goal.proved, goal_pos.id, goal_pos.file, goal_pos.line, goal_pos.start, goal_pos.stop, goal_parent.id, goal_parent.name, goal_parent.obsolete FROM goal LEFT JOIN transf AS goal_parent ON (goal_parent.id = goal.parent_id) LEFT JOIN loc AS goal_pos ON (goal_pos.id = goal.pos_id) " ^ q in
@@ -1083,15 +1083,15 @@ let root_goals () =
 
 exception AlreadyAttempted
 
-let try_prover ~timelimit:int ?memlimit:int (g : goal) (d: prover_data) : unit =
+let try_prover ~timelimit:_int ?memlimit:_int (_g : goal) (_d: prover_data) : unit =
   assert false (* TODO *)
 
-let add_transformation (g : goal) (t : transf) :  unit =
+let add_transformation (_g : goal) (_t : transf) :  unit =
   assert false (* TODO *)
 
-let add_or_replace_task (name : string) (t : Why.Task.task) :  unit =
+let add_or_replace_task (_name : string) (_t : Why.Task.task) :  unit =
   assert false (* TODO *)
 
-let read_db_from_file (file : string) : goal list =
+let read_db_from_file (_file : string) : goal list =
   assert false (* TODO *)
 

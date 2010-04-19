@@ -3,8 +3,8 @@ open Format
 open Why
 
 let autodetection () = 
-  Whyconf.set_loadpath [Filename.concat Config.datadir "theories"];
 (*
+  Whyconf.set_loadpath [Filename.concat Config.datadir "theories"];
   Whyconf.set_driverpath (Filename.concat Config.datadir "drivers");
 *)
   Whyconf.add_driver_config "Alt-Ergo 0.9" "alt_ergo.drv" "alt-ergo";
@@ -63,8 +63,8 @@ let rec report fmt = function
       fprintf fmt "anomaly: unknown ident '%s'" i.Ident.id_short
   | Driver.Error e ->
       Driver.report fmt e
-  | Dynlink_compat.Dynlink.Error e ->
-      fprintf fmt "Dynlink : %s" (Dynlink_compat.Dynlink.error_message e)
+  | Config.Dynlink.Error e ->
+      fprintf fmt "Dynlink : %s" (Config.Dynlink.error_message e)
   | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
 
@@ -81,7 +81,7 @@ let m : Why.Theory.theory Why.Theory.Mnm.t =
 
 
 
-let do_task tname (th : Why.Theory.theory) (task : Why.Task.task) : unit =
+let do_task tname (_th : Why.Theory.theory) (task : Why.Task.task) : unit =
 (*
   if !opt_prove then begin
     let res = Driver.call_prover ~debug:!opt_debug ?timeout drv task in
