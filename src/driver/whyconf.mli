@@ -37,7 +37,7 @@ type config = {
    "$WHY_CONFIG"; "./why.conf"; "./.why.conf";
    "$HOME/.why.conf"; "$USERPROFILE/.why.conf" *)
 
-val read_config : ?conf_file:string -> unit -> config
+val read_config : string option -> config
 
 val save_config : config -> unit
 

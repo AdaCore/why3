@@ -19,6 +19,8 @@
 
 open Format
 open Why
+open Util
+open Whyconf
 open Theory
 open Task
 open Driver
@@ -68,16 +70,19 @@ let add_opt_goal x = match !opt_theory with
       let l = Str.split (Str.regexp "\\.") x in
       Queue.push (x, l) glist
 
+let opt_config = ref None
+let opt_prover = ref None
 let opt_loadpath = ref []
 let opt_driver = ref None
 let opt_output = ref None
-let opt_prove = ref false
-let opt_timeout = ref None
+let opt_timelimit = ref None
+let opt_memlimit = ref None
 
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
 let opt_list_transforms = ref false
 let opt_list_printers = ref false
+let opt_list_provers = ref false
 
 let opt_parse_only = ref false
 let opt_type_only = ref false
@@ -94,26 +99,36 @@ let option_list = Arg.align [
       "<goal> Select <goal> in the last selected theory";
   "--goal", Arg.String add_opt_goal,
       " same as -g";
-  "-I", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
+  "-C", Arg.String (fun s -> opt_config := Some s),
+      "<file> Read configuration from <file>";
+  "--config", Arg.String (fun s -> opt_config := Some s),
+      " same as -C";
+  "-L", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
       "<dir> Add <dir> to the library search path";
-  "--includes", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-      " same as -I";
+  "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
+      " same as -L";
+  "-I", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
+      " same as -L (obsolete)";
+  "-P", Arg.String (fun s -> opt_prover := Some s),
+      "<prover> Prove or print (with -o) the selected goals";
+  "--prover", Arg.String (fun s -> opt_prover := Some s),
+      " same as -P";
+  "-T", Arg.Int (fun i -> opt_timelimit := Some i),
+      "<sec> Set the prover's time limit (default=10, no limit=0)";
+  "--timelimit", Arg.Int (fun i -> opt_timelimit := Some i),
+      " same as -T";
+  "-M", Arg.Int (fun i -> opt_memlimit := Some i),
+      "<MiB> Set the prover's memory limit (default: no limit)";
+  "--memlimit", Arg.Int (fun i -> opt_timelimit := Some i),
+      " same as -M";
   "-D", Arg.String (fun s -> opt_driver := Some s),
-      "<file> Specify the prover's driver file";
+      "<file> Specify a prover's driver (conflicts with -P)";
   "--driver", Arg.String (fun s -> opt_driver := Some s),
       " same as -D";
   "-o", Arg.String (fun s -> opt_output := Some s),
       "<dir> Print the selected goals to separate files in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),
       " same as -o";
-  "-p", Arg.Set opt_prove,
-      " Prove the selected goals";
-  "--prove", Arg.Set opt_prove,
-      " same as -p";
-  "-T", Arg.Int (fun i -> opt_timeout := Some i),
-      "<sec> Set the prover's time limit (default=10, no limit=0)";
-  "--timeout", Arg.Int (fun i -> opt_timeout := Some i),
-      " same as -T";
   "--print-theory", Arg.Set opt_print_theory,
       " Print the selected theories";
   "--print-namespace", Arg.Set opt_print_namespace,
@@ -122,6 +137,8 @@ let option_list = Arg.align [
       " List the registered transformations";
   "--list-printers", Arg.Set opt_list_printers,
       " List the registered printers";
+  "--list-provers", Arg.Set opt_list_provers,
+      " List the known provers";
   "--parse-only", Arg.Set opt_parse_only,
       " Stop after parsing";
   "--type-only", Arg.Set opt_type_only,
@@ -140,36 +157,75 @@ let () =
     printf "@[<hov 2>Registered printers:@\n%a@]@."
       (Pp.print_list Pp.newline Pp.string)
       (List.sort String.compare (Driver.list_printers ()));
-  if !opt_list_transforms || !opt_list_printers then exit 0;
+  if !opt_list_provers then begin
+    let config = read_config !opt_config in
+    let print fmt s prover = fprintf fmt "%s (%s)@\n" s prover.name in
+    let print fmt m = Mstr.iter (print fmt) m in
+    printf "@[<hov 2>Known provers:@\n%a@]@." print config.provers
+  end;
+
+  if !opt_list_transforms || !opt_list_printers || !opt_list_provers
+  then exit 0;
 
   if Queue.is_empty opt_queue then begin
     Arg.usage option_list usage_msg;
     exit 1
   end;
 
-  if !opt_driver = None && not !opt_print_namespace then
-    opt_print_theory := true;
+  if !opt_prover <> None && !opt_driver <> None then begin
+    eprintf "Options '-P'/'--prover' and \
+      '-D'/'--driver' cannot be used together.@.";
+    exit 1
+  end;
 
-  if !opt_driver = None && !opt_output <> None then begin
-    eprintf "Option '-o'/'--output' requires a driver.@.";
-    exit 1
+  if !opt_prover = None then begin
+    if !opt_driver = None && !opt_output <> None then begin
+      eprintf "Option '-o'/'--output' requires a prover or a driver.@.";
+      exit 1
+    end;
+    if !opt_timelimit <> None then begin
+      eprintf "Option '-T'/'--timelimit' requires a prover.@.";
+      exit 1
+    end;
+    if !opt_memlimit <> None then begin
+      eprintf "Option '-M'/'--memlimit' requires a prover.@.";
+      exit 1
+    end;
+    if !opt_driver = None && not !opt_print_namespace then
+      opt_print_theory := true
   end;
-  if !opt_driver = None && !opt_prove then begin
-    eprintf "Option '-p'/'--prove' requires a driver.@.";
-    exit 1
-  end;
-  if not !opt_prove && !opt_timeout <> None then begin
-    eprintf "Option '-T'/'--timeout' requires '-p'/'--prove'.@.";
-    exit 1
-  end;
-  if !opt_output <> None && !opt_prove then begin
-    eprintf "Options '-o'/'--output' and \
-      '-p'/'--prove' cannot be used together.@.";
-    exit 1
-  end
 
-let timeout = match !opt_timeout with
+  let config = try read_config !opt_config with Not_found ->
+    option_iter (eprintf "Config file '%s' not found.@.") !opt_config;
+    option_iter
+      (eprintf "No config file found (required by '-P %s').@.") !opt_prover;
+    if !opt_config <> None || !opt_prover <> None then exit 1;
+    { conf_file = "";
+      loadpath  = [];
+      timelimit = None;
+      memlimit  = None;
+      provers   = Mstr.empty }
+  in
+
+  opt_loadpath := List.rev_append !opt_loadpath config.loadpath;
+  if !opt_timelimit = None then opt_timelimit := config.timelimit;
+  if !opt_memlimit  = None then opt_memlimit  := config.memlimit;
+  match !opt_prover with
+  | Some s ->
+      let prover = try Mstr.find s config.provers with
+        | Not_found -> eprintf "Prover %s not found.@." s; exit 1
+      in
+      opt_driver := Some prover.driver
+  | None ->
+      ()
+
+let timelimit = match !opt_timelimit with
   | None -> Some 10
+  | Some i when i <= 0 -> None
+  | Some i -> Some i
+
+let memlimit = match !opt_memlimit with
+  | None -> None
   | Some i when i <= 0 -> None
   | Some i -> Some i
 
@@ -189,7 +245,9 @@ let rec report fmt = function
   | Driver.Error e ->
       Driver.report fmt e
   | Config.Dynlink.Error e ->
-      fprintf fmt "Dynlink : %s" (Config.Dynlink.error_message e)
+      fprintf fmt "Dynlink: %s" (Config.Dynlink.error_message e)
+  | Whyconf.Error e ->
+      fprintf fmt "Why config: %a" Whyconf.report e
   | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
 let print_th_namespace fmt th =
@@ -198,8 +256,8 @@ let print_th_namespace fmt th =
 let fname_printer = ref (Ident.create_ident_printer [])
 
 let do_task _env drv fname tname (th : Why.Theory.theory) (task : Task.task) =
-  if !opt_prove then begin
-    let res = Driver.call_prover ~debug:!opt_debug ?timeout drv task in
+  if !opt_prover <> None && !opt_output = None then begin
+    let res = Driver.call_prover ~debug:!opt_debug ?timeout:timelimit drv task in
     printf "%s %s %s : %a@." fname tname
       ((task_goal task).Decl.pr_name).Ident.id_long
       Call_provers.print_prover_result res

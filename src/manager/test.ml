@@ -40,7 +40,7 @@ let autodetection () =
 
 let config = 
   try 
-    Whyconf.read_config ()
+    Whyconf.read_config None
   with Not_found -> 
     eprintf "No config file found. Running autodetection of provers.@.";
     autodetection ();

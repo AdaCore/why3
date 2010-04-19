@@ -146,7 +146,7 @@ let load_main main al =
   let tl = ref None in
   let ml = ref None in
   let load (key, value) = match key with
-    | "loadpath"  -> lp := (to_string key value) :: !lp
+    | "library"   -> lp := (to_string key value) :: !lp
     | "timelimit" -> set_int key tl value
     | "memlimit"  -> set_int key ml value
     | _           -> error (UnknownField key)
@@ -158,7 +158,7 @@ let load_main main al =
     memlimit  = !ml;
     provers   = Mstr.empty }
 
-let read_config ?conf_file () =
+let read_config conf_file =
   let filename = match conf_file with
     | Some filename -> filename
     | None -> begin try Sys.getenv "WHY_CONFIG" with Not_found ->
@@ -199,7 +199,7 @@ let save_config config =
   let ch = open_out config.conf_file in
   let fmt = Format.formatter_of_out_channel ch in
   fprintf fmt "[main]@\n";
-  List.iter (fprintf fmt "loadpath = \"%s\"@\n") config.loadpath;
+  List.iter (fprintf fmt "library = \"%s\"@\n") config.loadpath;
   Util.option_iter (fprintf fmt "timelimit = %d@\n") config.timelimit;
   Util.option_iter (fprintf fmt "memlimit = %d@\n") config.memlimit;
   fprintf fmt "@.";
