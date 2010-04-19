@@ -1,40 +1,51 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (C) 2010-                                                   *)
+(*    Francois Bobot                                                      *)
+(*    Jean-Christophe Filliatre                                           *)
+(*    Johannes Kanig                                                      *)
+(*    Andrei Paskevich                                                    *)
+(*                                                                        *)
+(*  This software is free software; you can redistribute it and/or        *)
+(*  modify it under the terms of the GNU Library General Public           *)
+(*  License version 2.1, with the special exception on linking            *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(*  This software is distributed in the hope that it will be useful,      *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
+(*                                                                        *)
+(**************************************************************************)
 
+open Util
 
+type config_prover = {
+  description : string;     (* "Alt-Ergo v2.95 (special)" *)
+  command     : string;     (* "exec why-limit %t %m alt-ergo %f" *)
+  driver_file : string;     (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
+}
 
-(** {2 access to user configuration and drivers} *)
+type config = {
+  conf_file : string;       (* "/home/innocent_user/.why.conf" *)
+  loadpath  : string list;  (* "/usr/local/share/why/theories" *)
+  timelimit : int option;   (* default prover time limit in seconds *)
+  memlimit  : int option;   (* default prover memory limit in megabytes *)
+  provers   : config_prover Mstr.t;   (* indexed by short identifiers *)
+}
 
-val read_config_file: ?name:string -> unit -> unit
-  (** reads the config file from file [name]. The
-      default conf file name is "$HOME/.why.conf" if HOME is set, or
-      "$USERPROFILE/.why.conf" if USERPROFILE is set, or "./.why3.conf"
-      otherwise *)
+(* if conf_file is not given, tries the following:
+   "$WHY_CONFIG"; "./why.conf"; "./.why.conf";
+   "$HOME/.why.conf"; "$USERPROFILE/.why.conf" *)
 
-val known_provers: unit -> string list
-  (** returns the list of known prover ids. *)
+val read_config : ?conf_file:string -> unit -> config
 
-val get_driver: string -> Env.env -> Driver.driver
-  (** returns the driver associated to the given prover id 
-      @raises Not_found if no driver of this name exist *)
+val save_config : config -> unit
 
-val get_loadpath : unit -> string list
+(** error reporting *)
 
-val get_timelimit : unit -> int
+type error
 
-(** {2 configuration update} *)
+exception Error of error
 
-val add_loadpath : string -> unit
+val report : Format.formatter -> error -> unit
 
-val set_loadpath : string list -> unit
-
-val set_timelimit : int -> unit
-
-val add_driver_config: string -> string -> string -> unit
-  (** [add_driver_config id file cmd] adds in the current configuration
-      a new prover named [id], associated to a new driver description
-      file built from the template [file] and the command line [cmd].
-      This new setting is recorded in the user's rc file when [save] is called.
-      {!add_driver_config} *)
-
-val save : unit -> unit
-(** saves the current configuration into the same file as given in
-[read_config_file] *)

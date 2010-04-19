@@ -1,29 +1,62 @@
 
 open Format
 open Why
+open Whyconf
 
 let autodetection () = 
+  let alt_ergo = {
+    description = "Alt-Ergo";
+    command     = "alt-ergo %s";
+    driver_file = "drivers/alt_ergo.drv" }
+  in
+  let z3 = {
+    description = "Z3";
+    command     = "z3 -smt -in";
+    driver_file = "drivers/z3.drv" }
+  in
+  let cvc3 = {
+    description = "CVC3";
+    command     = "cvc3 -lang smt";
+    driver_file = "drivers/cvc3.drv" }
+  in
+  let coq = {
+    description = "Coq";
+    command     = "coqc %s";
+    driver_file = "drivers/coq.drv" }
+  in
+  let provers = Util.Mstr.empty in
+  let provers = Util.Mstr.add "alt-ergo" alt_ergo provers in
+  let provers = Util.Mstr.add "z3" z3 provers in
+  let provers = Util.Mstr.add "cvc3" cvc3 provers in
+  let provers = Util.Mstr.add "coq" coq provers in
+  let config = {
+    conf_file = "why.conf.test";
+    loadpath  = ["theories"];
+    timelimit = Some 10;
+    memlimit  = None;
+    provers   = provers }
+  in
+  save_config config
+
 (*
   Whyconf.set_loadpath [Filename.concat Config.datadir "theories"];
   Whyconf.set_driverpath (Filename.concat Config.datadir "drivers");
-*)
   Whyconf.add_driver_config "Alt-Ergo 0.9" "alt_ergo.drv" "alt-ergo";
   Whyconf.add_driver_config "Z3 2.2" "z3.drv" "z3";
   Whyconf.add_driver_config "CVC3 2.1" "cvc3.drv" "cvc3";
   Whyconf.add_driver_config "Coq 8.3" "coq.drv" "coqc";
   Whyconf.save ()
+*)
 
-let () = 
+let config = 
   try 
-    Whyconf.read_config_file ()
+    Whyconf.read_config ()
   with Not_found -> 
-    eprintf "No .why.conf file found. Running autodetection of provers.@.";
+    eprintf "No config file found. Running autodetection of provers.@.";
     autodetection ();
     exit 0
 
-
-
-let provers = Whyconf.known_provers ()
+let provers = Util.Mstr.fold (fun name _ acc -> name :: acc) config.provers []
 
 let () =
   printf "Provers: ";
