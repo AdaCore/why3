@@ -5,24 +5,24 @@ open Whyconf
 
 let autodetection () = 
   let alt_ergo = {
-    description = "Alt-Ergo";
-    command     = "alt-ergo %s";
-    driver_file = "drivers/alt_ergo.drv" }
+    name    = "Alt-Ergo";
+    command = "alt-ergo %s";
+    driver  = "drivers/alt_ergo.drv" }
   in
   let z3 = {
-    description = "Z3";
-    command     = "z3 -smt -in";
-    driver_file = "drivers/z3.drv" }
+    name    = "Z3";
+    command = "z3 -smt -in";
+    driver  = "drivers/z3.drv" }
   in
   let cvc3 = {
-    description = "CVC3";
-    command     = "cvc3 -lang smt";
-    driver_file = "drivers/cvc3.drv" }
+    name    = "CVC3";
+    command = "cvc3 -lang smt";
+    driver  = "drivers/cvc3.drv" }
   in
   let coq = {
-    description = "Coq";
-    command     = "coqc %s";
-    driver_file = "drivers/coq.drv" }
+    name    = "Coq";
+    command = "coqc %s";
+    driver  = "drivers/coq.drv" }
   in
   let provers = Util.Mstr.empty in
   let provers = Util.Mstr.add "alt-ergo" alt_ergo provers in

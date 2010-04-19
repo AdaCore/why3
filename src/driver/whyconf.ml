@@ -24,6 +24,8 @@ open Util
 
 type error =
   | SyntaxError
+  | ExtraParameters of string
+  | MissingParameters of string
   | UnknownSection of string
   | UnknownField of string
   | MissingSection of string
@@ -51,6 +53,10 @@ let print_rc_value fmt = function
 let report fmt = function
   | SyntaxError ->
       fprintf fmt "syntax error"
+  | ExtraParameters s ->
+      fprintf fmt "section '%s': header too long" s
+  | MissingParameters s ->
+      fprintf fmt "section '%s': header too short" s
   | UnknownSection s ->
       fprintf fmt "unknown section '%s'" s
   | UnknownField s ->
@@ -79,9 +85,9 @@ let report fmt = function
 (* Configuration file *)
 
 type config_prover = {
-  description : string;     (* "Alt-Ergo v2.95 (special)" *)
-  command     : string;     (* "exec why-limit %t %m alt-ergo %f" *)
-  driver_file : string;     (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
+  name    : string;   (* "Alt-Ergo v2.95 (special)" *)
+  command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
+  driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
 }
 
 type config = {
@@ -120,27 +126,20 @@ let get_field f = function
   | None -> error (MissingField f)
   | Some v -> v
 
-let load_prover provers al =
+let load_prover al =
   let nam = ref None in
-  let dsc = ref None in
   let cmd = ref None in
   let drv = ref None in
   let load (key, value) = match key with
-    | "name"        -> set_ident key nam value
-    | "description" -> set_string key dsc value
+    | "name"        -> set_string key nam value
     | "command"     -> set_string key cmd value
     | "driver"      -> set_string key drv value
     | _             -> error (UnknownField key)
   in
   List.iter load al;
-  let prover = {
-    description = get_field "description" !dsc;
-    command     = get_field "command"     !cmd;
-    driver_file = get_field "driver"      !drv }
-  in
-  let n = get_field "name" !nam in
-  if Mstr.mem n provers then error (DuplicateProver n);
-  Mstr.add n prover provers
+  { name    = get_field "name" !nam;
+    command = get_field "command" !cmd;
+    driver  = get_field "driver" !drv }
 
 let load_main main al =
   let lp = ref [] in
@@ -181,10 +180,17 @@ let read_config ?conf_file () =
   let provers = ref Mstr.empty in
   let have_main = ref false in
   let load (key, al) = match key with
-    | "main" when !have_main -> error (DuplicateSection key)
-    | "main" -> main := load_main !main al
-    | "prover" -> provers := load_prover !provers al
-    | _ -> error (UnknownSection key)
+    | "main" :: rest ->
+        if rest <> [] then error (ExtraParameters "main");
+        if !have_main then error (DuplicateSection "main");
+        main := load_main !main al
+    | "prover" :: name :: rest ->
+        if rest <> [] then error (ExtraParameters ("prover " ^ name));
+        if Mstr.mem name !provers then error (DuplicateProver name);
+        provers := Mstr.add name (load_prover al) !provers
+    | "prover" :: [] -> error (MissingParameters "prover")
+    | s :: _ -> error (UnknownSection s)
+    | [] -> assert false
   in
   List.iter load rc;
   { !main with provers = !provers }
@@ -198,11 +204,10 @@ let save_config config =
   Util.option_iter (fprintf fmt "memlimit = %d@\n") config.memlimit;
   fprintf fmt "@.";
   let print_prover name prover =
-    fprintf fmt "[prover]@\n";
-    fprintf fmt "name = %s@\n" name;
-    fprintf fmt "description = \"%s\"@\n" prover.description;
+    fprintf fmt "[prover %s]@\n" name;
+    fprintf fmt "name = \"%s\"@\n" prover.name;
     fprintf fmt "command = \"%s\"@\n" prover.command;
-    fprintf fmt "driver = \"%s\"@\n@." prover.driver_file;
+    fprintf fmt "driver = \"%s\"@\n@." prover.driver;
   in
   Mstr.iter print_prover config.provers;
   close_out ch

@@ -20,9 +20,9 @@
 open Util
 
 type config_prover = {
-  description : string;     (* "Alt-Ergo v2.95 (special)" *)
-  command     : string;     (* "exec why-limit %t %m alt-ergo %f" *)
-  driver_file : string;     (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
+  name    : string;   (* "Alt-Ergo v2.95 (special)" *)
+  command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
+  driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
 }
 
 type config = {

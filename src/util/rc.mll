@@ -57,7 +57,7 @@ let string = function
 
 let buf = Buffer.create 17
 
-let current_rec = ref ""
+let current_rec = ref []
 let current_list = ref []
 let current = ref []
 
@@ -67,7 +67,7 @@ let push_field key value =
 let push_record () =
   if !current_list <> [] then
     current := (!current_rec,List.rev !current_list) :: !current;
-  current_rec := "";
+  current_rec := [];
   current_list := []
 
 }
@@ -85,17 +85,26 @@ let escape = ['\\''"''n''t''r']
 rule record = parse
   | space 
       { record lexbuf }
-  | '[' (ident as key) ']'  
-      { push_record();
-	current_rec := key;
-	record lexbuf 
-      }
+  | '[' (ident as key) space*
+      { header [key] lexbuf }
   | eof 
       { push_record () }
   | (ident as key) space* '=' space* 
       { value key lexbuf }
   | _ as c
       { failwith ("Rc: invalid keyval pair starting with " ^ String.make 1 c) }
+
+and header keylist = parse
+  | (ident as key) space*
+      { header (key::keylist) lexbuf }
+  | ']'
+      { push_record ();
+        current_rec := List.rev keylist;
+        record lexbuf }
+  | eof
+      { failwith "Rc: unterminated header" }
+  | _ as c
+      { failwith ("Rc: invalid header starting with " ^ String.make 1 c) }
 
 and value key = parse
   | integer as i
@@ -116,10 +125,10 @@ and value key = parse
   | ident as id
       { push_field key (RCident (*kind_of_ident*) id);
         record lexbuf }
-  | _ as c
-      { failwith ("Rc: invalid value starting with " ^ String.make 1 c) }
   | eof
       { failwith "Rc: unterminated keyval pair" }
+  | _ as c
+      { failwith ("Rc: invalid value starting with " ^ String.make 1 c) }
 
 and string_val key = parse 
   | '"' 

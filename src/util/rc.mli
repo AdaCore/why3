@@ -42,7 +42,7 @@ val bool : rc_value -> bool
 val string : rc_value -> string
   (** raise Failure "Rc.string" if not a string or an ident value *)
 
-val from_file : string -> (string * (string * rc_value) list) list
+val from_file : string -> (string list * (string * rc_value) list) list
   (** returns the records of the file [f]
       @raises Not_found is f does not exists 
       @raises Failure "lexing" in case of incorrect syntax *)
