@@ -375,7 +375,7 @@ clean::
 
 bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@
 	sh bench/bench \
-	    "bin/why.@OCAMLBEST@ -I theories" \
+	    "bin/why.@OCAMLBEST@" \
 	    "bin/whyml.@OCAMLBEST@ -I theories"
 
 BENCH_PLUGINS_CMO := helloworld.cmo simplify_array.cmo
@@ -383,12 +383,12 @@ BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))
 BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
 
 bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) byte $(TOOLS)
-	bin/why.byte -D bench/plugins/helloworld.drv -I theories/ \
-	src/test.why -t Test -g G
-	bin/why.$(OCAMLBEST) -D bench/plugins/helloworld.drv -I theories/ \
-	src/test.why -t Test -g G
-	bin/why.$(OCAMLBEST) -D bench/plugins/simplify_array.drv -I theories/ \
-	src/test.why -t Test_simplify_array -g G
+	bin/why.byte -D bench/plugins/helloworld.drv \
+	tests/test-jcf.why -t Test -g G
+	bin/why.$(OCAMLBEST) -D bench/plugins/helloworld.drv  \
+	tests/test-jcf.why -t Test -g G
+	bin/why.$(OCAMLBEST) -D bench/plugins/simplify_array.drv \
+	tests/test-jcf.why -t Test_simplify_array -g G
 
 ###############
 # test targets
@@ -396,16 +396,11 @@ bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) byte $(TOOLS)
 
 test: bin/why.byte $(TOOLS)
 	mkdir -p output_why3
-	ocamlrun -bt bin/why.byte -I theories/ -D drivers/why3.drv \
-		-o output_why3 src/test.why
-	bin/why.byte -D drivers/alt_ergo.drv -I theories/ \
-		src/test.why -t Test -g G
-	bin/why.byte -D drivers/alt_ergo.drv -I theories/ \
-		--timeout 3 --prove src/test.why -t Test -g G
-	bin/why.byte -D drivers/coq.drv -I theories/ \
-		src/test.why -t Test -g G
-	echo bin/why.byte -D drivers/alt_ergo.drv -I theories/ \
-		--timeout 1 --prove theories/real.why
+	bin/why.byte -D drivers/why3.drv -o output_why3 tests/test-jcf.why
+	bin/why.byte -D drivers/alt_ergo.drv tests/test-jcf.why -t Test -g G
+	bin/why.byte -P alt-ergo --timelimit 3 tests/test-jcf.why -t Test -g G
+	bin/why.byte -D drivers/coq.drv tests/test-jcf.why -t Test -g G
+	echo bin/why.byte -P alt-ergo --timelimit 1 --prove theories/real.why
 	@printf "*** Checking Coq file generation ***\\n"
 	@mkdir -p output_coq
 	@for i in int.Abs int.EuclideanDivision int.ComputerDivision  \
@@ -413,14 +408,13 @@ test: bin/why.byte $(TOOLS)
 		real.ExpLogTest real.PowerTest real.TrigonometryTest \
 		floating_point.Test array.TestBv32 \
 		; do \
-	  printf "Generating Coq file for $$i\\n" && bin/why.byte \
-		-D drivers/coq.drv -I theories/ \
-		-o output_coq -t $$i ; done
+	  printf "Generating Coq file for $$i\\n" && \
+	  	bin/why.byte -P coq -o output_coq -t $$i ; done
 	@printf "*** Checking Coq compilation ***\\n"
 	@for i in output_coq/*.v; do printf "coq $$i\\n" && coqc $$i ; done
 
 testl: bin/whyml.byte
-	ocamlrun -bt bin/whyml.byte -I theories/ src/programs/test.mlw
+	ocamlrun -bt bin/whyml.byte -I theories/ tests/test-pgm-jcf.mlw
 
 examples/programs/%: bin/whyml.byte
 	bin/whyml.byte -I theories examples/programs/$*.mlw
