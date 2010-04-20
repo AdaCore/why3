@@ -53,6 +53,14 @@ type loc_record
     }
 *)
 
+(** prover data *)
+
+type prover 
+
+val prover_name : prover -> string
+
+val get_prover : string -> prover
+
 (** status of an external proof attempt *)
 type proof_attempt_status =
   | Scheduled (** external proof attempt is scheduled *)
@@ -62,15 +70,9 @@ type proof_attempt_status =
   | Unknown (** external prover answered ``don't know'' or equivalent *)
   | HighFailure (** external prover call failed *)
 
-type prover_data =
-    { prover_name : string;
-      command : string;
-      driver : Why.Driver.driver;
-    }
-
 type external_proof
 
-val prover : external_proof -> prover_data
+val prover : external_proof -> prover
 val timelimit : external_proof -> int
 val memlimit : external_proof -> int
 val status : external_proof -> proof_attempt_status
@@ -157,7 +159,8 @@ val root_goals : unit -> goal list
 exception AlreadyAttempted
 
 val try_prover : 
-  timelimit:int -> ?memlimit:int -> goal -> prover_data -> (unit -> unit)
+  timelimit:int -> ?memlimit:int -> prover:prover -> command:string -> 
+  driver:Why.Driver.driver -> goal -> (unit -> unit)
   (** attempts to prove goal with the given prover.  This function
       prepares the goal for that prover, adds it as an new
       external_proof attempt, setting its current status to Running,

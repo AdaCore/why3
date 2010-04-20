@@ -109,15 +109,16 @@ type proof_attempt_status =
   | Unknown (** external prover answered ``don't know'' or equivalent *)
   | HighFailure (** external prover call failed *)
 
-type prover_data =
-    { prover_name : string;
-      command : string;
-      driver : Why.Driver.driver;
+type prover =
+    { prover_id : int64;
+      prover_name : string;
     }
+
+let prover_name p = p.prover_name
 
 type external_proof = {
     mutable external_proof_id : db_ident;
-    mutable prover : prover_data;
+    mutable prover : prover;
     mutable timelimit : int;
     mutable memlimit : int;
     mutable status : proof_attempt_status;
@@ -189,7 +190,73 @@ let rec string_from_origin o =
 let goal_name g = string_from_origin g.goal_origin
   
 
+module Prover = struct
 
+  let init db =
+    let sql = 
+      "CREATE TABLE IF NOT EXISTS prover (prover_id INTEGER PRIMARY KEY AUTOINCREMENT,prover_name TEXT);" 
+    in
+    db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
+    let sql = 
+      "CREATE UNIQUE INDEX IF NOT EXISTS prover_name_idx ON prover (prover_name)" 
+    in
+    db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
+
+(*
+  let delete db pr =
+    let id =  pr.prover_id in
+    let sql = "DELETE FROM prover WHERE id=?" in
+    let stmt = Sqlite3.prepare db.raw_db sql in
+    db_must_ok db (fun () -> Sqlite3.bind stmt 1 (Sqlite3.Data.INT id));
+    ignore (step_fold db stmt (fun _ -> ()));
+    pr.prover_id <- 0L
+*)
+
+  let add db name = 
+    transaction db 
+      (fun () ->
+         let sql = "INSERT INTO prover VALUES(NULL,?)" in
+         let stmt = Sqlite3.prepare db.raw_db sql in
+         db_must_ok db 
+           (fun () -> Sqlite3.bind stmt 1 (Sqlite3.Data.TEXT name));
+         db_must_done db (fun () -> Sqlite3.step stmt);
+         let new_id = Sqlite3.last_insert_rowid db.raw_db in
+         { prover_id = new_id ; prover_name = name })
+
+  let get db name =
+    let sql =
+      "SELECT prover.prover_id, prover.prover_name FROM prover WHERE prover.prover_name=?" 
+    in
+    let stmt=Sqlite3.prepare db.raw_db sql in
+    (* bind the position variables to the statement *)
+    db_must_ok db 
+      (fun () -> Sqlite3.bind stmt 1 (Sqlite3.Data.TEXT name));
+    (* convert statement into record *)
+    let of_stmt stmt =
+      { prover_id =
+	  (match Sqlite3.column stmt 0 with
+            | Sqlite3.Data.INT i -> i 
+	    | x -> 
+		try Int64.of_string (Sqlite3.Data.to_string x)
+		with _ -> failwith "Db.Prover.get") ;
+	prover_name =
+	  (match Sqlite3.column stmt 1 with
+	    | x -> Sqlite3.Data.to_string x)
+      }
+    in 
+    (* execute the SQL query *)
+    match step_fold db stmt of_stmt with
+      | [] -> raise Not_found
+      | [x] -> x
+      | _ -> assert false
+
+end
+
+let get_prover n = 
+  let db = current () in
+  try Prover.get db n
+  with Not_found -> Prover.add db n
+	
 module Loc = struct
 
   let init db =
@@ -197,6 +264,7 @@ module Loc = struct
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 
   (* object definition *)
+(*
   let create (* ?id *) ~file ~line ~start ~stop : loc_record = 
     { 
       loc_id = None (* id *);
@@ -205,6 +273,7 @@ module Loc = struct
       start = start;
       stop = stop;
     }
+*)
 
   (* admin functions *)
   let delete db loc =
@@ -392,7 +461,6 @@ let int64_from_pas = function
   | HighFailure -> 6L
 
 module External_proof = struct
-
 
   let init db =
     let sql = "create table if not exists external_proof (id integer primary key autoincrement,prover text,timelimit integer,memlimit integer,status integer,result_time real,trace text,obsolete integer);" in
@@ -1158,6 +1226,7 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
         } 
 	in
 	current_db := Some db;
+	Prover.init db;
 	Loc.init db;
 	External_proof.init db;
 	Goal.init db;
@@ -1191,7 +1260,8 @@ let string_from_result = function
 
 exception AlreadyAttempted
 
-let try_prover ~timelimit ?memlimit (g : goal) (d: prover_data) : unit -> unit =
+let try_prover ~timelimit ?memlimit ~prover:_prover ~command ~driver 
+    (g : goal) : unit -> unit =
   (* TODO: check if attempt already present *)
   (* TODO: add attempt as "Running" *)
   begin
@@ -1199,22 +1269,25 @@ let try_prover ~timelimit ?memlimit (g : goal) (d: prover_data) : unit -> unit =
       | Some _ -> Format.eprintf "Db.try_prover warning: memlimit is ignored@."
   end;
   Format.eprintf "Task : %a@." Why.Pretty.print_task g.task;
-  let [task] = Why.Driver.apply_transforms d.driver g.task in
-  Format.eprintf "Task for prover: %a@." (Why.Driver.print_task d.driver) task;
+  let task = match Why.Driver.apply_transforms driver g.task with
+    | [t] -> t
+    | _ -> assert false
+  in
+  Format.eprintf "Task for prover: %a@." (Why.Driver.print_task driver) task;
 (*
-  let callback = Why.Driver.call_prover_ext ~debug:true ~timeout:timelimit d.driver g.task
+  let callback = Why.Driver.call_prover_ext ~debug:true ~timeout:timelimit d g.task
   in 
 *)
   let callback = 
     let dest =
-      Why.Driver.file_of_task d.driver "" "" task
+      Why.Driver.file_of_task driver "" "" task
     in
     let print_task fmt =
-      Format.fprintf fmt "@[%a@]@?" (Why.Driver.print_task d.driver) task
+      Format.fprintf fmt "@[%a@]@?" (Why.Driver.print_task driver) task
     in
-    let regexps = Why.Driver.get_regexps d.driver in
+    let regexps = Why.Driver.get_regexps driver in
     Why.Call_provers.call_on_formatter ~debug:true ~suffix:dest
-      ~command:d.command ~timelimit ~memlimit:0 ~regexps print_task
+      ~command ~timelimit ~memlimit:0 ~regexps print_task
   in
   fun () ->
     let r = callback () in

@@ -33,10 +33,9 @@ type config = {
   provers   : config_prover Mstr.t;   (* indexed by short identifiers *)
 }
 
-(* if conf_file is not given, tries the following:
+(** if conf_file is not given, tries the following:
    "$WHY_CONFIG"; "./why.conf"; "./.why.conf";
    "$HOME/.why.conf"; "$USERPROFILE/.why.conf" *)
-
 val read_config : string option -> config
 
 val save_config : config -> unit

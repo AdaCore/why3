@@ -58,10 +58,19 @@ let () = printf "Load path is: %a@." (Pp.print_list Pp.comma Pp.string) config.l
 
 let env = Why.Env.create_env (Why.Typing.retrieve config.loadpath)
 
+let fname = "tests/test-claude"
+
+let () = Db.init_base (fname ^ ".db")
 
 let get_driver name = 
   let pi = Util.Mstr.find name config.provers in
   Why.Driver.load_driver pi.Whyconf.driver env
+
+type prover_data =
+    { prover : Db.prover;
+      command : string;
+      driver : Why.Driver.driver;
+    }
 
 let provers_data =
   printf "Provers: ";
@@ -70,20 +79,15 @@ let provers_data =
     (fun id conf acc ->
        let name = conf.Whyconf.name in
        printf " %s, " name;
-       { Db.prover_name = name;
-         Db.command = conf.Whyconf.command;
-         Db.driver = get_driver id; } :: acc
+       { prover = Db.get_prover name;
+         command = conf.Whyconf.command;
+         driver = get_driver id; } :: acc
     ) config.provers []
   in
   printf "@.";
   l
    
 
-
-let fname = "tests/test-claude"
-
-
-let () = Db.init_base (fname ^ ".prm")
 
 let () = 
   printf "previously known goals:@\n";
@@ -190,7 +194,7 @@ let goal_menu g =
       let _,menu = List.fold_left
         (fun (i,acc) p -> 
            let i = succ i in
-           printf "%2d: try %s@." i p.Db.prover_name;
+           printf "%2d: try %s@." i (Db.prover_name p.prover);
            (i,(i,p)::acc)) (0,[]) provers_data
       in
       printf "Select a choice:@.";
@@ -199,7 +203,7 @@ let goal_menu g =
          let i = int_of_string s in
          if i=0 then raise Exit; 
          let p = List.assoc i menu in
-         let call = Db.try_prover ~timelimit:10 g p in
+         let call = Db.try_prover ~timelimit:config.timelimit ~prover:p.prover ~command:p.command ~driver:p.driver g in
          call ()
        with Not_found | Failure _ -> 
          printf "unknown choice@.");
