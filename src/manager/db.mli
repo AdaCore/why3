@@ -202,15 +202,18 @@ val add_transformation: goal -> transf -> unit
 
 (* {2 goal updates} *)
 
-val add_or_replace_task: string -> Why.Task.task -> unit 
+val add_or_replace_task: string -> Why.Task.task -> goal
   (** updates the database with the new goal.  If a goal with the same
       origin already exists, it is checked whether the task to
       prove is different or not. If it is the same, proof attempts are
       preserved. If not the same, former proof attempts are marked as
       obsolete.
 
+      WARNING: the current implementation always adds a new task, without checling if it already exists
+
       IMPORTANT: this kills every running prover tasks
 
+      
   *)
 
 (** TODO: full update, removing goals that are not pertinent anymore *)

@@ -3,6 +3,7 @@ open Format
 open Why
 open Whyconf
 
+(*
 let autodetection () = 
   let alt_ergo = {
     name    = "Alt-Ergo";
@@ -30,21 +31,28 @@ let autodetection () =
   let provers = Util.Mstr.add "cvc3" cvc3 provers in
   let provers = Util.Mstr.add "coq" coq provers in
   let config = {
-    conf_file = "why.conf.test";
+    conf_file = "why.conf";
     loadpath  = ["theories"];
     timelimit = Some 10;
     memlimit  = None;
     provers   = provers }
   in
   save_config config
+*)
 
 let config = 
   try 
     Whyconf.read_config None
-  with Not_found -> 
-    eprintf "No config file found. Running autodetection of provers.@.";
-    autodetection ();
-    exit 0
+  with 
+      Not_found -> 
+        eprintf "No config file found.@.";
+(* "Running autodetection of provers.@.";
+        autodetection ();
+*)
+        exit 1
+    | Whyconf.Error e ->
+        eprintf "Error while reading config file: %a@." Whyconf.report e;
+        exit 1
 
 let provers = Util.Mstr.fold (fun name _ acc -> name :: acc) config.provers []
 
@@ -106,7 +114,7 @@ let m : Why.Theory.theory Why.Theory.Mnm.t =
 
 
 
-let do_task tname (_th : Why.Theory.theory) (task : Why.Task.task) : unit =
+let do_task (tname : string) (_th : Why.Theory.theory) (task : Why.Task.task) : unit =
 (*
   if !opt_prove then begin
     let res = Driver.call_prover ~debug:!opt_debug ?timeout drv task in
@@ -133,7 +141,19 @@ let do_task tname (_th : Why.Theory.theory) (task : Why.Task.task) : unit =
         fprintf fmt "@[%a@]@?" (Driver.print_task drv) task;
         close_out cout
 *)
-  Db.add_or_replace_task tname task
+  match task with
+    | None -> assert false
+    | Some t ->
+        match t.Why.Task.task_decl with
+          | Why.Task.Use _ | Why.Task.Clone _ -> assert false
+          | Why.Task.Decl d ->
+              match d.Why.Decl.d_node with
+                | Why.Decl.Dtype _ | Why.Decl.Dlogic _ | Why.Decl.Dind _ -> assert false
+                | Why.Decl.Dprop (_kind,name,_f) ->
+                    eprintf "doing task: tname=%s, name=%s@." tname
+                      name.Why.Decl.pr_name.Why.Ident.id_long;
+                    let _g = Db.add_or_replace_task tname task in
+                    ()
 
 let do_theory tname th glist =
   let add acc (x,l) =

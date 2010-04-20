@@ -115,7 +115,7 @@ type prover_data =
     }
 
 type external_proof = {
-    mutable external_proof_id : db_ident option;
+    mutable external_proof_id : db_ident;
     mutable prover : prover_data;
     mutable timelimit : int;
     mutable memlimit : int;
@@ -147,12 +147,9 @@ type transf_data =
 
 
 type goal = {
-  mutable goal_id : db_ident option;
+  mutable goal_id : db_ident;
   mutable task : Why.Task.task;
   mutable task_checksum: string;
-(*
-  mutable parent : transf option;
-*)
   mutable proved : bool;
   (** invariant: g.proved == true iff
       exists attempts a in g.attempts, a.obsolete == false and
@@ -161,15 +158,12 @@ type goal = {
   *)
   mutable observers: (bool -> unit) list;
   (** observers that wants to be notified by any changes of the proved status *)
-(*
-  mutable name : string;
-*)
   mutable external_proofs : external_proof list;
   mutable transformations : transf list;
 }
 
 and transf = {
-    mutable id : int64 option;
+    mutable transf_id : db_ident;
     mutable transf_data : transf_data;
     mutable transf_obsolete : bool;
     mutable subgoals : goal list;
@@ -397,51 +391,54 @@ module External_proof = struct
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 
   let delete db e =
-    match e.id with
-      | None -> ()
-      | Some id ->
-          let sql = "DELETE FROM external_proof WHERE id=?" in
-          let stmt = Sqlite3.prepare db.raw_db sql in
-          db_must_ok db (fun () -> Sqlite3.bind stmt 1 (Sqlite3.Data.INT id));
-          ignore(step_fold db stmt (fun _ -> ()));
-          e.id <- None
+    let id = e.external_proof_id in
+    assert (id <> 0L);
+    let sql = "DELETE FROM external_proof WHERE id=?" in
+    let stmt = Sqlite3.prepare db.raw_db sql in
+    db_must_ok db (fun () -> Sqlite3.bind stmt 1 (Sqlite3.Data.INT id));
+    ignore(step_fold db stmt (fun _ -> ()));
+    e.external_proof_id <- 0L
 
-  let save db (e : external_proof) = 
+  let add db (e : external_proof) = 
     transaction db 
       (fun () ->
-	 let curobj_id = match e.external_proof_id with
-	   | None -> (* insert new record *)
-	       let sql = 
-		 "INSERT INTO external_proof VALUES(NULL,?,?,?,?,?,?,?)" 
-	       in
-	       let stmt = Sqlite3.prepare db.raw_db sql in
-	       db_must_ok db 
-		 (fun () -> Sqlite3.bind stmt 1 
-		    (let v = e.prover.prover_name in Sqlite3.Data.TEXT v));
-	       db_must_ok db 
-		 (fun () -> Sqlite3.bind stmt 2 
-		    (let v = Int64.of_int e.timelimit in Sqlite3.Data.INT v));
-	       db_must_ok db 
-		 (fun () -> Sqlite3.bind stmt 3 
-		    (let v = Int64.of_int e.memlimit in Sqlite3.Data.INT v));
-	       db_must_ok db 
-		 (fun () -> Sqlite3.bind stmt 4 
-		    (let v = int64_from_pas e.status in Sqlite3.Data.INT v));
-	       db_must_ok db 
-		 (fun () -> Sqlite3.bind stmt 5 
-		    (let v = e.result_time in Sqlite3.Data.FLOAT v));
-	       db_must_ok db 
-		 (fun () -> Sqlite3.bind stmt 6 
-		    (let v = e.trace in Sqlite3.Data.TEXT v));
-	       db_must_ok db 
-		 (fun () -> Sqlite3.bind stmt 7 
-		    (let v = int64_from_bool e.proof_obsolete in Sqlite3.Data.INT v));
-	       db_must_done db 
-		 (fun () -> Sqlite3.step stmt);
-	       let new_id = Sqlite3.last_insert_rowid db.raw_db in
-	       e.external_proof_id <- Some new_id;
-	       new_id
-	   | Some id -> (* update *)
+	 assert (e.external_proof_id = 0L);
+	 let sql = 
+	   "INSERT INTO external_proof VALUES(NULL,?,?,?,?,?,?,?)" 
+	 in
+	 let stmt = Sqlite3.prepare db.raw_db sql in
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 1 
+	      (let v = e.prover.prover_name in Sqlite3.Data.TEXT v));
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 2 
+	      (let v = Int64.of_int e.timelimit in Sqlite3.Data.INT v));
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 3 
+	      (let v = Int64.of_int e.memlimit in Sqlite3.Data.INT v));
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 4 
+	      (let v = int64_from_pas e.status in Sqlite3.Data.INT v));
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 5 
+	      (let v = e.result_time in Sqlite3.Data.FLOAT v));
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 6 
+	      (let v = e.trace in Sqlite3.Data.TEXT v));
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 7 
+	      (let v = int64_from_bool e.proof_obsolete in Sqlite3.Data.INT v));
+	 db_must_done db 
+	   (fun () -> Sqlite3.step stmt);
+	 let new_id = Sqlite3.last_insert_rowid db.raw_db in
+	 e.external_proof_id <- new_id)
+
+
+(* TODO: update functions for each field
+    let update db (e : external_proof) = 
+      transaction db 
+        (fun () ->
+	 | Some id -> (* update *)
 		 let sql = 
 		   "UPDATE external_proof SET prover=?,timelimit=?,memlimit=?,status=?,result_time=?,trace=?,obsolete=? WHERE id=?" 
 		 in
@@ -473,6 +470,7 @@ module External_proof = struct
 		 id
 	   in
 	   curobj_id)
+*)
 
     (* General get function for any of the columns *)
 (*
@@ -589,11 +587,102 @@ module Goal = struct
   
   type t = goal
       
-  let hash g = Hashtbl.hash g.goal_id
+  let hash g = Hashtbl.hash g.goal_id 
 
   let equal g1 g2 = g1.goal_id = g2.goal_id
 
   let compare g1 g2 = Pervasives.compare g1.goal_id g2.goal_id
+
+  let init db =
+(*
+  mutable goal_id : db_ident;
+  mutable task : Why.Task.task;
+  mutable task_checksum: string;
+  mutable proved : bool;
+  (** invariant: g.proved == true iff
+      exists attempts a in g.attempts, a.obsolete == false and
+      (a = External e and e.result == Valid or
+      a = Transf(gl) and forall g in gl, g.proved)
+  *)
+  mutable observers: (bool -> unit) list;
+  (** observers that wants to be notified by any changes of the proved status *)
+  mutable external_proofs : external_proof list;
+  mutable transformations : transf list;
+*)
+    let sql = "create table if not exists goal (goal_id integer primary key autoincrement,task_checksum text,proved integer);" 
+    in
+    db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
+
+
+(*
+  let init db =
+    let sql = "create table if not exists goal (id integer primary key autoincrement,task_checksum text,parent_id integer,name text,pos_id integer,proved integer);" in
+    db_must_ok db (fun () -> Sqlite3.exec db.db sql);
+    let sql = "create table if not exists map_external_proofs_goal_external_proof (goal_id integer, external_proof_id integer, primary key(goal_id, external_proof_id));" in
+    db_must_ok db (fun () -> Sqlite3.exec db.db sql);
+    let sql = "create table if not exists map_transformations_goal_transf (goal_id integer, transf_id integer, primary key(goal_id, transf_id));" in
+    db_must_ok db (fun () -> Sqlite3.exec db.db sql);
+    ()
+*)
+
+  let add db (g : goal) = 
+    transaction db 
+      (fun () ->
+	 assert (g.goal_id = 0L);
+         assert (g.external_proofs = []);
+         assert (g.transformations = []);
+	 let sql = 
+	   "INSERT INTO goal VALUES(NULL,?,?)" 
+	 in
+	 let stmt = Sqlite3.prepare db.raw_db sql in
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 1 
+	      (let v = g.task_checksum in Sqlite3.Data.TEXT v));
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 2 
+	      (let v = int64_from_bool g.proved in Sqlite3.Data.INT v));
+	 db_must_done db 
+	   (fun () -> Sqlite3.step stmt);
+	 let new_id = Sqlite3.last_insert_rowid db.raw_db in         
+         Format.eprintf "Db.Goal.add: add a new goal with id=%Ld@." new_id;
+	 g.goal_id <- new_id)
+
+(* TODO make specific update functions for each field ! *)
+(*
+  let update db (g : goal) =
+    transaction db 
+      (fun () ->
+	 assert (g.goal_id <> 0L);
+	 let sql = 
+	   "UPDATE goal SET task_checksum=?,timelimit=?,memlimit=?,status=?,result_time=?,trace=?,obsolete=? WHERE id=?" 
+	 in
+	 let stmt = Sqlite3.prepare db.raw_db sql in
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 1 
+	      (let v = e.prover.prover_name in Sqlite3.Data.TEXT v));
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 2 
+	      (let v = Int64.of_int e.timelimit in Sqlite3.Data.INT v));
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 3 
+	      (let v = Int64.of_int e.memlimit in Sqlite3.Data.INT v));
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 4 
+	      (let v = int64_from_pas e.status in Sqlite3.Data.INT v));
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 5 
+	      (let v = e.result_time in Sqlite3.Data.FLOAT v));
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 6 
+	      (let v = e.trace in Sqlite3.Data.TEXT v));
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 7 
+	      (let v = int64_from_bool e.proof_obsolete in Sqlite3.Data.INT v));
+	 db_must_ok db 
+	   (fun () -> Sqlite3.bind stmt 8 (Sqlite3.Data.INT id));
+	 db_must_done db (fun () -> Sqlite3.step stmt);
+	 id)
+*)
 
 
 (*
@@ -1062,9 +1151,9 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
 	current_db := Some db;
 	Loc.init db;
 	External_proof.init db;
+	Goal.init db;
 	(*
-	  Goal.init db;
-	  Transf.init db;
+          Transf.init db;
 	*)
 	Main.init db
 
@@ -1089,8 +1178,22 @@ let try_prover ~timelimit:_int ?memlimit:_int (_g : goal) (_d: prover_data) : un
 let add_transformation (_g : goal) (_t : transf) :  unit =
   assert false (* TODO *)
 
-let add_or_replace_task (_name : string) (_t : Why.Task.task) :  unit =
-  assert false (* TODO *)
+let add_or_replace_task (_name : string) (t : Why.Task.task) : goal =
+  (* TODO: replace if already exists *)
+  let g = {
+    goal_id = 0L;
+    task = t;
+    task_checksum = ""; (* TODO: md5sum (marshall ?) *)
+    proved = false;
+    observers = [];
+    external_proofs = [];
+    transformations = [];
+  }
+  in
+  Goal.add (current()) g;
+  g
+
+
 
 let read_db_from_file (_file : string) : goal list =
   assert false (* TODO *)
