@@ -64,6 +64,7 @@ type proof_attempt_status =
 
 type prover_data =
     { prover_name : string;
+      command : string;
       driver : Why.Driver.driver;
     }
 

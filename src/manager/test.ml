@@ -71,6 +71,7 @@ let provers_data =
        let name = conf.Whyconf.name in
        printf " %s, " name;
        { Db.prover_name = name;
+         Db.command = conf.Whyconf.command;
          Db.driver = get_driver id; } :: acc
     ) config.provers []
   in

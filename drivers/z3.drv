@@ -1,7 +1,7 @@
 
 (* Why driver for SMT syntax *)
 
-prelude "(* this is a prelude for smtlib*)"
+prelude ";;; this is a prelude for Z3"
 
 printer "smtv1"
 filename "%f-%t-%g.smt"
@@ -32,7 +32,7 @@ end
 
 theory int.Int
 
-  prelude "(* this is a prelude for Alt-Ergo arithmetic *)"
+  prelude ";;; this is a prelude for Z3, Arithmetic"
 
   syntax logic zero "0"
 

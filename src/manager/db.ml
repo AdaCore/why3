@@ -111,6 +111,7 @@ type proof_attempt_status =
 
 type prover_data =
     { prover_name : string;
+      command : string;
       driver : Why.Driver.driver;
     }
 
@@ -1176,6 +1177,7 @@ let root_goals () =
   
 
 
+(*
 let string_from_result = function
   | Why.Driver.Valid -> "Valid"
   | Why.Driver.Invalid -> "Invalid"
@@ -1183,6 +1185,7 @@ let string_from_result = function
   | Why.Driver.Failure s -> "Failure " ^ s
   | Why.Driver.Timeout -> "Timeout"
   | Why.Driver.HighFailure -> "HighFailure"
+*)
 
 
 exception AlreadyAttempted
@@ -1194,15 +1197,31 @@ let try_prover ~timelimit ?memlimit (g : goal) (d: prover_data) : unit -> unit =
     match memlimit with None -> ()
       | Some _ -> Format.eprintf "Db.try_prover warning: memlimit is ignored@."
   end;
+  Format.eprintf "Task : %a@." Why.Pretty.print_task g.task;
+  let [task] = Why.Driver.apply_transforms d.driver g.task in
+  Format.eprintf "Task for prover: %a@." (Why.Driver.print_task d.driver) task;
+(*
   let callback = Why.Driver.call_prover_ext ~debug:true ~timeout:timelimit d.driver g.task
   in 
+*)
+  let callback = 
+    let dest =
+      Why.Driver.file_of_task d.driver "" "" task
+    in
+    let print_task fmt =
+      Format.fprintf fmt "@[%a@]@?" (Why.Driver.print_task d.driver) task
+    in
+    let regexps = Why.Driver.get_regexps d.driver in
+    Why.Call_provers.call_on_formatter ~debug:true ~suffix:dest
+      ~command:d.command ~timelimit ~memlimit:0 ~regexps print_task
+  in
   fun () ->
     let r = callback () in
-    Format.eprintf "prover returned %s in %f seconds@." 
-      (string_from_result r.Why.Call_provers.pr_answer) 
-      r.Why.Call_provers.pr_time;
+    Format.eprintf "prover result: %a@." Why.Call_provers.print_prover_result r;
+(*
     Format.eprintf "stdout: %s@." r.Why.Call_provers.pr_stdout;
     Format.eprintf "stderr: %s@." r.Why.Call_provers.pr_stderr;
+*)
     (* TODO : update attempt depending on r = Valid *)
     ()
       

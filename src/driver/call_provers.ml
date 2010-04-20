@@ -40,14 +40,14 @@ let print_prover_answer fmt = function
   | Valid -> fprintf fmt "Valid"
   | Invalid -> fprintf fmt "Invalid"
   | Timeout -> fprintf fmt "Timeout"
-  | Unknown s -> pp_print_string fmt s
-  | Failure s -> pp_print_string fmt s
+  | Unknown s -> fprintf fmt "Unknown: %s" s
+  | Failure s -> fprintf fmt "Failure: %s" s
   | HighFailure -> fprintf fmt "HighFailure"
 
 let print_prover_result fmt pr =
   fprintf fmt "%a (%.2fs)" print_prover_answer pr.pr_answer pr.pr_time;
   if pr.pr_answer == HighFailure then
-    fprintf fmt "@\n@stdout-stderr:@\n%s@." pr.pr_output
+    fprintf fmt "@\nstdout-stderr:@\n%s@." pr.pr_output
 
 let rec grep out l = match l with
   | [] -> HighFailure
@@ -72,13 +72,16 @@ let call_prover debug command regexps opt_cout buffer =
   if debug then Format.eprintf "Call_provers: Command output:@\n%s@." out;
   let ans = match ret with
     | Unix.WSTOPPED n ->
-        if debug then Format.eprintf "Call_provers: stopped on signal %d" n;
+        if debug then Format.eprintf "Call_provers: stopped on signal %d@." n;
         HighFailure
+    | Unix.WSIGNALED 24 (* SIGXCPU signal cf. /usr/include/bits/signum.h *) ->
+        if debug then Format.eprintf "Call_provers: killed by signal SIGXCPU@.";
+        Timeout
     | Unix.WSIGNALED n ->
-        if debug then Format.eprintf "Call_provers: killed by signal %d" n;
+        if debug then Format.eprintf "Call_provers: killed by signal %d@." n;
         HighFailure
     | Unix.WEXITED n ->
-        if debug then Format.eprintf "Call_provers: exited with status %d" n;
+        if debug then Format.eprintf "Call_provers: exited with status %d@." n;
         grep out regexps
   in
   { pr_answer = ans;
