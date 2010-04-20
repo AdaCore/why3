@@ -28,6 +28,7 @@ open Task
 open Register
 open Env
 open Driver_ast
+open Call_provers
 
 (* Utils from Str *)
 
@@ -91,31 +92,20 @@ let errorm ?loc f =
 
 (** creating drivers *)
 
-type prover_answer = 
-    Call_provers.prover_answer =
-  | Valid
-  | Invalid
-  | Unknown of string
-  | Failure of string
-  | Timeout
-  | HighFailure
-
 type theory_driver = {
   thd_prelude : string list;
   thd_tsymbol : unit ;
 }
-
 
 type translation = 
   | Remove
   | Syntax of string
   | Tag of Sstr.t
 
-let translation_union t1 t2 =
-  match t1, t2 with
-    | Remove, _ | _, Remove -> Remove
-    | ((Syntax _ as s), _) | (_,(Syntax _ as s)) -> s
-    | Tag s1, Tag s2 -> Tag (Sstr.union s1 s2)
+let translation_union t1 t2 = match t1, t2 with
+  | Remove, _ | _, Remove -> Remove
+  | ((Syntax _ as s), _) | (_,(Syntax _ as s)) -> s
+  | Tag s1, Tag s2 -> Tag (Sstr.union s1 s2)
 
 let print_translation fmt = function
   | Remove -> fprintf fmt "remove" 
@@ -125,62 +115,29 @@ let print_translation fmt = function
 
 type printer = (ident -> translation) -> formatter -> task -> unit
 
-and driver = {
+type driver = {
   drv_env          : env;
   drv_printer      : printer option;
-  drv_prover       : Call_provers.prover;
   drv_prelude      : string list;
   drv_filename     : string option;
   drv_transforms   : task tlist_reg;
   drv_thprelude    : string list Mid.t;
-  drv_translations : (translation * translation) Mid.t
+  drv_translations : (translation * translation) Mid.t;
+  drv_regexps      : Call_provers.prover_regexp list; 
 }
-
-(*
-and driver = {
-  drv_raw         : raw_driver;
-  drv_clone       : Theory.clone_map;
-  drv_used        : Theory.use_map;
-  drv_env         : env;
-  drv_thprelude   : string list Hid.t;
-  (* the first is the translation only for this ident, the second is
-     also for representant *)
-  drv_theory      : (translation * translation) Hid.t;
-  drv_with_task   : translation Hid.t;
-}
-*)
-
-(*
-  let print_driver fmt driver =
-  printf "drv_theory %a@\n" 
-  (Pp.print_iter2 Hid.iter Pp.semi Pp.comma print_ident
-  (Pp.print_pair print_translation print_translation))
-  driver.drv_theory
-*)
 
 (** registering transformation *)
 
-let (transforms : (string, task tlist_reg) Hashtbl.t) 
-    = Hashtbl.create 17
-
-let register_transform_l name transform = 
-  Hashtbl.replace transforms name transform
+let (transforms : (string, task tlist_reg) Hashtbl.t) = Hashtbl.create 17
+let register_transform_l name trans = Hashtbl.replace transforms name trans
 let register_transform name t = register_transform_l name (singleton t)
 let list_transforms () = Hashtbl.fold (fun k _ acc -> k::acc) transforms []
 
 (** registering printers *)
 
 let (printers : (string, printer) Hashtbl.t) = Hashtbl.create 17
-
 let register_printer name printer = Hashtbl.replace printers name printer
-
 let list_printers () = Hashtbl.fold (fun k _ acc -> k::acc) printers []
-
-(*
-let () = 
-  Dynlink.allow_only ["Theory";"Term";"Ident";"Transform";"Driver";
-                     "Pervasives";"Format";"List";"Sys";"Unix"]
-*)
 
 let load_plugin dir (byte,nat) =
   if not Config.why_plugins then errorm "Plugins not supported";
@@ -220,7 +177,6 @@ let check_syntax loc s len =
          "invalid indice of argument \"%%%i\" this logic has only %i argument" 
          i len) s
 
-
 let load_rules env (premap,tmap) {thr_name = loc,qualid; thr_rules = trl} =
   let id,qfile = qualid_to_slist qualid in
   let th = try
@@ -244,7 +200,7 @@ let load_rules env (premap,tmap) {thr_name = loc,qualid; thr_rules = trl} =
           try
             premap,add_htheory tmap c 
               (ns_find_pr th.th_export q).pr_name Remove
-          with Not_found -> errorm ~loc "Unknown axioms %s" 
+          with Not_found -> errorm ~loc "Unknown proposition %s"
             (string_of_qualid qualid q)
         end 
     | Rsyntaxls ((loc,q),s) -> 
@@ -302,14 +258,13 @@ let load_driver file env =
   let f = load_file file in
   let prelude     = ref [] in
   let printer     = ref None in
-  let call_stdin  = ref None in
-  let call_file   = ref None in
   let filename    = ref None in
   let ltransforms = ref None in
   let regexps     = ref [] in
   let set_or_raise loc r v error =
     if !r <> None then errorm ~loc "duplicate %s" error
-    else r := Some v in 
+    else r := Some v 
+  in 
   let add (loc, g) = match g with
     | Printer _ when !printer <> None -> 
 	errorm ~loc "duplicate printer"
@@ -318,10 +273,9 @@ let load_driver file env =
     | Printer s -> 
 	errorm ~loc "unknown printer %s" s 
     | Prelude s -> prelude := s :: !prelude
-    | CallStdin s -> set_or_raise loc call_stdin s "callstdin"
-    | CallFile s -> set_or_raise loc call_file s "callfile"
     | RegexpValid s -> regexps:=(s,Valid)::!regexps
     | RegexpInvalid s -> regexps:=(s,Invalid)::!regexps
+    | RegexpTimeout s -> regexps:=(s,Timeout)::!regexps
     | RegexpUnknown (s1,s2) -> regexps:=(s1,Unknown s2)::!regexps
     | RegexpFailure (s1,s2) -> regexps:=(s1,Failure s2)::!regexps
     | Filename s -> set_or_raise loc filename s "filename"
@@ -332,7 +286,9 @@ let load_driver file env =
   let regexps = List.map (fun (s,a) -> (Str.regexp s,a)) !regexps in
   let trans r =
     let transformations = match !r with
-      | None -> [] | Some l -> l in
+      | Some l -> l
+      | None -> [] 
+    in
     List.fold_left 
       (fun acc (loc,s) -> 
          let t = 
@@ -340,21 +296,21 @@ let load_driver file env =
            with Not_found -> errorm ~loc "unknown transformation %s" s in
          compose_l acc t
       )
-      identity_l transformations in
-    let transforms = trans ltransforms in
-    let (premap,tmap) = 
-      List.fold_left (load_rules env) (Mid.empty,Mid.empty) f.f_rules in
+      identity_l transformations
+  in
+  let transforms = trans ltransforms in
+  let (premap,tmap) = 
+      List.fold_left (load_rules env) (Mid.empty,Mid.empty) f.f_rules 
+  in
   { 
     drv_env          = env;
     drv_printer      = !printer;
-    drv_prover       = {Call_provers.pr_call_stdin = !call_stdin;
-                       pr_call_file               = !call_file;
-                       pr_regexps                 = regexps};
     drv_prelude      = !prelude;
     drv_filename     = !filename;
     drv_transforms   = transforms;
     drv_thprelude    = premap;
-    drv_translations = tmap
+    drv_translations = tmap;
+    drv_regexps      = regexps;
   }
 
 (** querying drivers *)
@@ -384,6 +340,8 @@ let syntax_arguments s print fmt l =
     print fmt args.(i-1) in
   global_substitute_fmt regexp_arg_pos repl_fun s fmt
  
+let get_regexps drv = drv.drv_regexps
+
 (** using drivers *)
 
 let apply_transforms drv = 
@@ -409,60 +367,26 @@ let print_prelude drv used fmt =
   fprintf fmt "@."
 
 let print_task drv fmt task = match drv.drv_printer with
-  | None -> errorm "no printer"
+  | None -> 
+      errorm "no printer"
   | Some f -> 
       print_prelude drv (task_used task) fmt;
       f (query_ident drv (task_clone task)) fmt task 
 
-let regexp_filename = Str.regexp "%\\([a-z]\\)"
-
-let filename_of_goal drv filename theory_name task =
-  match drv.drv_filename with
-    | None -> errorm "no filename syntax given"
-    | Some f -> 
-        let pr_name = (task_goal task).pr_name in
-        let repl_fun s = 
-          let i = matched_group 1 s in
-          match i with
-            | "f" -> filename
-            | "t" -> theory_name
-            | "s" -> pr_name.id_short
-            | _ -> errorm "substitution variable are only %%f %%t and %%s" in
-        global_substitute regexp_filename repl_fun f
-
-let file_printer = 
-  create_ident_printer ~sanitizer:(sanitizer char_to_alnumus char_to_alnumus)
-    []
-
-let call_prover_on_file ?debug ?timeout drv filename =
-  Call_provers.on_file ?debug ?timeout drv.drv_prover filename 
-let call_prover_on_formatter ?debug ?timeout ?filename drv ib = 
-  Call_provers.on_formatter ?debug ?timeout ?filename drv.drv_prover ib
-
-let call_prover_on_buffer ?debug ?timeout ?filename drv ib = 
-  Call_provers.on_buffer ?debug ?timeout ?filename drv.drv_prover ib
-
-
-let call_prover ?debug ?timeout drv task =
-  let filename = 
-    match drv.drv_filename with
-      | None -> None
-      | Some _ -> Some (filename_of_goal drv "why" "call_prover" task) in
-  let formatter fmt = print_task drv fmt task in
-  call_prover_on_formatter ?debug ?timeout ?filename drv formatter
-
-let call_prover_ext ?debug ?timeout drv task =
-  let filename = 
-    match drv.drv_filename with
-      | None -> None
-      | Some _ -> Some (filename_of_goal drv "why" "call_prover" task) in
-  let formatter fmt = print_task drv fmt task in
-  let buf = Buffer.create 64 in
-  let fmt = formatter_of_buffer buf in
-  formatter fmt;
-  (fun () -> call_prover_on_buffer ?debug ?timeout ?filename drv buf)
-
-
+let file_of_task drv input_file theory_name task =
+  let filename_regexp = Str.regexp "%\\(.\\)" in
+  let replace s = match matched_group 1 s with
+    | "%" -> "%"
+    | "f" -> input_file
+    | "t" -> theory_name
+    | "g" -> (task_goal task).pr_name.id_short
+    | _ -> errorm "unknown format specifier, use %%f, %%t or %%g"
+  in
+  let file = match drv.drv_filename with
+    | Some f -> f
+    | None -> "%f_%t_%g.dump"
+  in
+  global_substitute filename_regexp replace file
 
 (*
 Local Variables: 

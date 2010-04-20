@@ -40,10 +40,9 @@ type theory_rules = {
 type global =
   | Prelude of string
   | Printer of string
-  | CallStdin of string
-  | CallFile of string
   | RegexpValid of string
   | RegexpInvalid of string
+  | RegexpTimeout of string
   | RegexpUnknown of string * string
   | RegexpFailure of string * string
   | Filename of string

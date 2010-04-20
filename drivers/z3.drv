@@ -4,9 +4,7 @@
 prelude "(* this is a prelude for smtlib*)"
 
 printer "smtv1"
-filename "%f-%t-%s.smt"
-call_on_file  "z3 -smt %s"
-call_on_stdin  "z3 -smt -in"
+filename "%f-%t-%g.smt"
 
 valid "unsat"
 unknown "unknown\\|sat|Fail" "Unknown"

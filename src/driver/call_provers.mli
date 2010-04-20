@@ -17,59 +17,52 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Format
-
-type prover_answer = 
+type prover_answer =
   | Valid
   | Invalid
-  | Unknown of string  
-  | Failure of string        
   | Timeout
+  | Unknown of string
+  | Failure of string
   | HighFailure
 
-val print_prover_answer : formatter -> prover_answer -> unit
+type prover_result = {
+  pr_answer : prover_answer;
+  pr_output : string;
+  pr_time   : float;
+}
 
-type prover_result =
-    { pr_time   : float;
-      pr_answer : prover_answer;
-      pr_stderr : string;
-      pr_stdout : string}
+type prover_regexp = Str.regexp * prover_answer
 
-val print_prover_result : formatter -> prover_result -> unit
+val print_prover_answer : Format.formatter -> prover_answer -> unit
+val print_prover_result : Format.formatter -> prover_result -> unit
 
-type prover =
-    { pr_call_stdin : string option; (* %f pour le nom du fichier *)
-      pr_call_file  : string option;
-      pr_regexps    : (Str.regexp * prover_answer) list; 
-      (* \1,... sont remplacés *)
-    }
+val call_on_buffer :
+  ?debug : bool ->
+  ?suffix : string ->
+  command : string ->
+  timelimit : int ->
+  memlimit : int ->
+  regexps : prover_regexp list ->
+  Buffer.t ->
+  (unit -> prover_result)
 
-exception CommandError
-exception NoCommandlineProvided      
+val call_on_formatter :
+  ?debug : bool ->
+  ?suffix : string ->
+  command : string ->
+  timelimit : int ->
+  memlimit : int ->
+  regexps : prover_regexp list ->
+  (Format.formatter -> unit) ->
+  (unit -> prover_result)
 
-val cpulimit : string ref
+val call_on_file :
+  ?debug : bool ->
+  ?suffix : string ->
+  command : string ->
+  timelimit : int ->
+  memlimit : int ->
+  regexps : prover_regexp list ->
+  string ->
+  (unit -> prover_result)
 
-val on_file : 
-  ?debug:bool -> 
-  ?timeout:int -> 
-  prover -> 
-  string -> 
-  prover_result
-
-val on_formatter : 
-  ?debug:bool ->
-  ?timeout:int -> 
-  ?filename:string -> (* used as the suffix of a tempfile if the prover can't 
-                         deal with stdin *)
-  prover -> 
-  (formatter -> unit) -> 
-  prover_result
-
-val on_buffer : 
-  ?debug:bool ->
-  ?timeout:int -> 
-  ?filename:string -> (* used as the suffix of a tempfile if the prover can't 
-                         deal with stdin *)
-  prover -> 
-  Buffer.t -> 
-  prover_result

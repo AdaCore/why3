@@ -77,6 +77,7 @@ let opt_driver = ref None
 let opt_output = ref None
 let opt_timelimit = ref None
 let opt_memlimit = ref None
+let opt_command = ref None
 
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
@@ -215,19 +216,22 @@ let () =
       let prover = try Mstr.find s config.provers with
         | Not_found -> eprintf "Prover %s not found.@." s; exit 1
       in
+      opt_command := Some prover.command;
       opt_driver := Some prover.driver
   | None ->
       ()
 
 let timelimit = match !opt_timelimit with
-  | None -> Some 10
-  | Some i when i <= 0 -> None
-  | Some i -> Some i
+  | None -> 10
+  | Some i when i <= 0 -> 0
+  | Some i -> i
 
 let memlimit = match !opt_memlimit with
-  | None -> None
-  | Some i when i <= 0 -> None
-  | Some i -> Some i
+  | None -> 0
+  | Some i when i <= 0 -> 0
+  | Some i -> i
+
+let debug = !opt_debug
 
 let rec report fmt = function
   | Lexer.Error e ->
@@ -256,29 +260,36 @@ let print_th_namespace fmt th =
 let fname_printer = ref (Ident.create_ident_printer [])
 
 let do_task _env drv fname tname (th : Why.Theory.theory) (task : Task.task) =
-  if !opt_prover <> None && !opt_output = None then begin
-    let res = Driver.call_prover ~debug:!opt_debug ?timeout:timelimit drv task in
-    printf "%s %s %s : %a@." fname tname
-      ((task_goal task).Decl.pr_name).Ident.id_long
-      Call_provers.print_prover_result res
-  end else match !opt_output with
-    | None ->
-        printf "@[%a@]@?" (Driver.print_task drv) task
-    | Some dir ->
-        let file =
-          let file = Filename.basename fname in
-          try Filename.chop_extension file
-          with Invalid_argument _ -> file
+  let dest =
+    let fname =
+      let fname = Filename.basename fname in
+      try Filename.chop_extension fname
+      with Invalid_argument _ -> fname
+    in
+    let tname = th.th_name.Ident.id_short in
+    Driver.file_of_task drv fname tname task
+  in
+  let print_task fmt =
+    fprintf fmt "@[%a@]@?" (Driver.print_task drv) task
+  in
+  match !opt_output, !opt_command with
+    | None, Some command ->
+        let regexps = Driver.get_regexps drv in
+        let res = Call_provers.call_on_formatter ~debug ~suffix:dest
+                ~command ~timelimit ~memlimit ~regexps print_task ()
         in
-        let tname = th.th_name.Ident.id_short in
-        let dest = Driver.filename_of_goal drv file tname task in
+        printf "%s %s %s : %a@." fname tname
+          (task_goal task).Decl.pr_name.Ident.id_long
+          Call_provers.print_prover_result res
+    | None, None ->
+        print_task std_formatter
+    | Some dir, _ ->
         (* Uniquify the filename before the extension if it exists*)
         let i = try String.rindex dest '.' with _ -> String.length dest in
         let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
         let ext = String.sub dest i (String.length dest - i) in
         let cout = open_out (Filename.concat dir (name ^ ext)) in
-        let fmt = formatter_of_out_channel cout in
-        fprintf fmt "@[%a@]@?" (Driver.print_task drv) task;
+        print_task (formatter_of_out_channel cout);
         close_out cout
 
 let do_task env drv fname tname th task =
@@ -352,7 +363,7 @@ let () =
     let env = Env.create_env (Typing.retrieve !opt_loadpath) in
     let drv = Util.option_map (fun f -> load_driver f env) !opt_driver in
     Queue.iter (do_input env drv) opt_queue
-  with e when not !opt_debug ->
+  with e when not debug ->
     eprintf "%a@." report e;
     exit 1
 

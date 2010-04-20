@@ -4,8 +4,7 @@
 prelude "(* this is a prelude for smtlib*)"
 
 printer "smtv1"
-filename "%f-%t-%s.smt"
-call_on_stdin  "cvc3 -lang smt"
+filename "%f-%t-%g.smt"
 
 valid "unsat"
 unknown "\\bunknown\\b\\|\\bsat\\b" "Unknown"
