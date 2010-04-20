@@ -148,6 +148,7 @@ type transf_data =
 
 type goal = {
   mutable goal_id : db_ident;
+  mutable goal_origin : goal_origin;
   mutable task : Why.Task.task;
   mutable task_checksum: string;
   mutable proved : bool;
@@ -180,6 +181,12 @@ let transf_data t = t.transf_data
 let transf_obsolete t = t.transf_obsolete
 let subgoals t = t.subgoals
 
+let rec string_from_origin o =
+  match o with
+    | Goal p -> p.Why.Decl.pr_name.Why.Ident.id_long
+    
+let goal_name g = string_from_origin g.goal_origin
+  
 
 
 module Loc = struct
@@ -1169,19 +1176,45 @@ let root_goals () =
   
 
 
+let string_from_result = function
+  | Why.Driver.Valid -> "Valid"
+  | Why.Driver.Invalid -> "Invalid"
+  | Why.Driver.Unknown s -> "Unknown " ^ s
+  | Why.Driver.Failure s -> "Failure " ^ s
+  | Why.Driver.Timeout -> "Timeout"
+  | Why.Driver.HighFailure -> "HighFailure"
+
 
 exception AlreadyAttempted
 
-let try_prover ~timelimit:_int ?memlimit:_int (_g : goal) (_d: prover_data) : unit =
-  assert false (* TODO *)
+let try_prover ~timelimit ?memlimit (g : goal) (d: prover_data) : unit -> unit =
+  (* TODO: check if attempt already present *)
+  (* TODO: add attempt as "Running" *)
+  begin
+    match memlimit with None -> ()
+      | Some _ -> Format.eprintf "Db.try_prover warning: memlimit is ignored@."
+  end;
+  let callback = Why.Driver.call_prover_ext ~debug:true ~timeout:timelimit d.driver g.task
+  in 
+  fun () ->
+    let r = callback () in
+    Format.eprintf "prover returned %s in %f seconds@." 
+      (string_from_result r.Why.Call_provers.pr_answer) 
+      r.Why.Call_provers.pr_time;
+    Format.eprintf "stdout: %s@." r.Why.Call_provers.pr_stdout;
+    Format.eprintf "stderr: %s@." r.Why.Call_provers.pr_stderr;
+    (* TODO : update attempt depending on r = Valid *)
+    ()
+      
 
 let add_transformation (_g : goal) (_t : transf) :  unit =
   assert false (* TODO *)
 
-let add_or_replace_task (_name : string) (t : Why.Task.task) : goal =
+let add_or_replace_task (name : Why.Decl.prsymbol) (t : Why.Task.task) : goal =
   (* TODO: replace if already exists *)
   let g = {
     goal_id = 0L;
+    goal_origin = Goal name;
     task = t;
     task_checksum = ""; (* TODO: md5sum (marshall ?) *)
     proved = false;

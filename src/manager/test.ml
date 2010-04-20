@@ -54,24 +54,32 @@ let config =
         eprintf "Error while reading config file: %a@." Whyconf.report e;
         exit 1
 
-let provers = Util.Mstr.fold (fun name _ acc -> name :: acc) config.provers []
+let () = printf "Load path is: %a@." (Pp.print_list Pp.comma Pp.string) config.loadpath
 
-let () =
+let env = Why.Env.create_env (Why.Typing.retrieve config.loadpath)
+
+
+let get_driver name = 
+  let pi = Util.Mstr.find name config.provers in
+  Why.Driver.load_driver pi.Whyconf.driver env
+
+let provers_data =
   printf "Provers: ";
-  List.iter
-    (fun name ->
-       printf " %s, " name) provers;
-  printf "@."
+  let l = 
+    Util.Mstr.fold
+    (fun id conf acc ->
+       let name = conf.Whyconf.name in
+       printf " %s, " name;
+       { Db.prover_name = name;
+         Db.driver = get_driver id; } :: acc
+    ) config.provers []
+  in
+  printf "@.";
+  l
    
 
 
 let fname = "tests/test-claude"
-
-let loadpath = config.loadpath
-
-let () = printf "Load path is: %a@." (Pp.print_list Pp.comma Pp.string) loadpath
-
-let env = Why.Env.create_env (Why.Typing.retrieve loadpath)
 
 
 let () = Db.init_base (fname ^ ".prm")
@@ -114,7 +122,38 @@ let m : Why.Theory.theory Why.Theory.Mnm.t =
 
 
 
-let do_task (tname : string) (_th : Why.Theory.theory) (task : Why.Task.task) : unit =
+let add_task (tname : string) (task : Why.Task.task) acc =
+  match task with
+    | None -> assert false
+    | Some t ->
+        match t.Why.Task.task_decl with
+          | Why.Task.Use _ | Why.Task.Clone _ -> assert false
+          | Why.Task.Decl d ->
+              match d.Why.Decl.d_node with
+                | Why.Decl.Dtype _ | Why.Decl.Dlogic _ | Why.Decl.Dind _ -> assert false
+                | Why.Decl.Dprop (_kind,name,_f) ->
+                    eprintf "doing task: tname=%s, name=%s@." tname
+                      name.Why.Decl.pr_name.Why.Ident.id_long;
+                    Db.add_or_replace_task name task :: acc
+
+let do_theory tname th glist =
+(*
+  let add acc (x,l) =
+    let pr = try Why.Theory.ns_find_pr th.Why.Theory.th_export l with Not_found ->
+      Format.eprintf "Goal '%s' not found in theory '%s'.@." x tname;
+      exit 1
+    in
+    Why.Decl.Spr.add pr acc
+  in
+*)
+(*
+  let prs = Some (Queue.fold add Why.Decl.Spr.empty glist) in
+  let prs = if Queue.is_empty glist then None else prs in
+*)
+  let tasks = Why.Task.split_theory th None in
+  List.fold_right (add_task tname) tasks glist
+
+
 (*
   if !opt_prove then begin
     let res = Driver.call_prover ~debug:!opt_debug ?timeout drv task in
@@ -141,46 +180,75 @@ let do_task (tname : string) (_th : Why.Theory.theory) (task : Why.Task.task) : 
         fprintf fmt "@[%a@]@?" (Driver.print_task drv) task;
         close_out cout
 *)
-  match task with
-    | None -> assert false
-    | Some t ->
-        match t.Why.Task.task_decl with
-          | Why.Task.Use _ | Why.Task.Clone _ -> assert false
-          | Why.Task.Decl d ->
-              match d.Why.Decl.d_node with
-                | Why.Decl.Dtype _ | Why.Decl.Dlogic _ | Why.Decl.Dind _ -> assert false
-                | Why.Decl.Dprop (_kind,name,_f) ->
-                    eprintf "doing task: tname=%s, name=%s@." tname
-                      name.Why.Decl.pr_name.Why.Ident.id_long;
-                    let _g = Db.add_or_replace_task tname task in
-                    ()
 
-let do_theory tname th glist =
-  let add acc (x,l) =
-    let pr = try Why.Theory.ns_find_pr th.Why.Theory.th_export l with Not_found ->
-      Format.eprintf "Goal '%s' not found in theory '%s'.@." x tname;
-      exit 1
-    in
-    Why.Decl.Spr.add pr acc
-  in
-  let prs = Some (Queue.fold add Why.Decl.Spr.empty glist) in
-  let prs = if Queue.is_empty glist then None else prs in
-  let tasks = Why.Task.split_theory th prs in
-  List.iter (do_task tname th) tasks
-
+let goal_menu g = 
+  try
+    while true do 
+      printf "Menu:@.";
+      printf " 0: exit@.";
+      let _,menu = List.fold_left
+        (fun (i,acc) p -> 
+           let i = succ i in
+           printf "%2d: try %s@." i p.Db.prover_name;
+           (i,(i,p)::acc)) (0,[]) provers_data
+      in
+      printf "Select a choice:@.";
+      let s = read_line () in
+      (try 
+         let i = int_of_string s in
+         if i=0 then raise Exit; 
+         let p = List.assoc i menu in
+         let call = Db.try_prover ~timelimit:10 g p in
+         call ()
+       with Not_found | Failure _ -> 
+         printf "unknown choice@.");
+    done
+  with Exit -> ()
+    
+let main_loop goals =
+  try
+    while true do
+      printf "Menu:@.";
+      printf " 0: exit@.";
+      let _,menu = List.fold_left
+        (fun (i,acc) g -> 
+           let i = succ i in
+           printf "%2d: name='%s', proved=%b@." i (Db.goal_name g) (Db.goal_proved g);
+           (i,(i,g)::acc)) (0,[]) goals
+      in
+      printf "Select a choice:@.";
+      let s = read_line () in
+      (try 
+         let i = int_of_string s in
+         if i=0 then raise Exit; 
+         goal_menu (List.assoc i menu)
+       with Not_found | Failure _ -> 
+         printf "unknown choice@.");
+    done
+  with Exit -> ()
+  
 let () =
   eprintf "looking for goals@.";
+(*
   let glist = Queue.create () in
+*)
   let add_th t th mi = 
     eprintf "adding theory %s, %s@." th.Why.Theory.th_name.Why.Ident.id_long t;
     Why.Ident.Mid.add th.Why.Theory.th_name (t,th) mi 
   in
-  let do_th _ (t,th) = 
+  let do_th _ (t,th) glist = 
     eprintf "doing theory %s, %s@." th.Why.Theory.th_name.Why.Ident.id_long t;
-    do_theory t th glist 
+    do_theory t th glist  
   in
-  Why.Ident.Mid.iter do_th (Why.Theory.Mnm.fold add_th m Why.Ident.Mid.empty);
-  eprintf "Done@."
+  let goals = 
+    Why.Ident.Mid.fold do_th (Why.Theory.Mnm.fold add_th m Why.Ident.Mid.empty) []
+  in
+  eprintf "Production of goals done@.";
+  try
+    main_loop goals
+  with Exit -> eprintf "Exiting...@."
+
+
 
 
 (*

@@ -88,6 +88,9 @@ type goal_origin =
 
 type goal
 
+val goal_proved : goal -> bool
+val goal_name : goal -> string
+
 module Goal : sig
   
   type t = goal
@@ -153,19 +156,27 @@ val root_goals : unit -> goal list
 exception AlreadyAttempted
 
 val try_prover : 
-  timelimit:int -> ?memlimit:int -> goal -> prover_data -> unit 
-  (** attempts to prove goal with the given prover. This function adds
-      a new corresponding attempt for that goal, sets its current
-      status to Running, launches the prover in a separate process and
-      returns immediately.
+  timelimit:int -> ?memlimit:int -> goal -> prover_data -> (unit -> unit)
+  (** attempts to prove goal with the given prover.  This function
+      prepares the goal for that prover, adds it as an new
+      external_proof attempt, setting its current status to Running,
+      and returns immmediately a function.  When called, this function
+      actually launches the prover, and waits for its
+      termination. Upon termination of the external process, the
+      prover's answer is retrieved and database is updated. The
+      [proved] field of the database is updated, and also these of any
+      goal affected, according to invariant above. 
 
-      Upon termination of the external process, the prover's answer is
-      retrieved and database is updated. The [proved] field of the
-      database is updated, and also these of any goal affected, according
-      to invariant above. Goal observers are notified of any change
-      of goal statuses.
+      Although goal preparation is not re-entrant, the function
+      returned initially is re-entrant, thus is suitable for being executed
+      in a thread, in contexts where background execution of provers is wanted.
+      
+      @param timelimit CPU time limit given for that attempt, in
+      seconds, must be positive. (unlimited attempts are not allowed
+      with this function)
 
-      @param timelimit CPU time limit given for that attempt, must be positive
+      @param memlimit memory limit given for that attempt, must be
+      positive. If not given, does not limit memory consumption
 
       @raise AlreadyAttempted if there already exists a non-obsolete
       external proof attempt with the same driver and time limit, or
@@ -202,7 +213,7 @@ val add_transformation: goal -> transf -> unit
 
 (* {2 goal updates} *)
 
-val add_or_replace_task: string -> Why.Task.task -> goal
+val add_or_replace_task: Why.Decl.prsymbol -> Why.Task.task -> goal
   (** updates the database with the new goal.  If a goal with the same
       origin already exists, it is checked whether the task to
       prove is different or not. If it is the same, proof attempts are
