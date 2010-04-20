@@ -602,6 +602,7 @@ module Goal = struct
   let compare g1 g2 = Pervasives.compare g1.goal_id g2.goal_id
 
   let init db =
+    (* TODO: store the goal origin too *)
 (*
   mutable goal_id : db_ident;
   mutable task : Why.Task.task;
@@ -1218,10 +1219,6 @@ let try_prover ~timelimit ?memlimit (g : goal) (d: prover_data) : unit -> unit =
   fun () ->
     let r = callback () in
     Format.eprintf "prover result: %a@." Why.Call_provers.print_prover_result r;
-(*
-    Format.eprintf "stdout: %s@." r.Why.Call_provers.pr_stdout;
-    Format.eprintf "stderr: %s@." r.Why.Call_provers.pr_stderr;
-*)
     (* TODO : update attempt depending on r = Valid *)
     ()
       
