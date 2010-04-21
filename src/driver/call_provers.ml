@@ -71,7 +71,7 @@ let call_prover debug command opt_cout buffer =
 
 let call_on_buffer ?(debug=false) ~command ~timelimit ~memlimit
                                   ~regexps ~exitcodes ~filename buffer () =
-  let on_stdin = ref false in
+  let on_stdin = ref true in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
   let replace file s = match Str.matched_group 1 s with
     | "%" -> "%"
