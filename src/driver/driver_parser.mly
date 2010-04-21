@@ -33,7 +33,7 @@
 %token THEORY END SYNTAX REMOVE TAG PRELUDE PRINTER
 %token VALID INVALID TIMEOUT UNKNOWN FAIL
 %token UNDERSCORE LEFTPAR RIGHTPAR CLONED DOT EOF
-%token LOGIC TYPE PROP FILENAME TRANSFORMS PLUGIN
+%token LOGIC TYPE PROP FILENAME TRANSFORM PLUGIN
 
 %type <Driver_ast.file> file
 %start file
@@ -64,15 +64,9 @@ global:
 | UNKNOWN INTEGER STRING { ExitCodeUnknown ($2, $3) }
 | FAIL INTEGER STRING { ExitCodeFailure ($2, $3) }
 | FILENAME STRING { Filename $2 }
-| TRANSFORMS list0_string END { Transforms $2 }
+| TRANSFORM STRING { Transform $2 }
 | PLUGIN STRING STRING { Plugin ($2,$3) }
 ;
-
-list0_string:
-| /* epsilon */       { [] }
-| STRING list0_string { (loc_i 1, $1) :: $2 }
-;
-
 
 list0_theory:
 | /* epsilon */       { [] }
@@ -86,11 +80,11 @@ theory:
 
 list0_trule:
 | /* epsilon */     { [] }
-| trule list0_trule { $1 :: $2 }
+| trule list0_trule { (loc_i 1, $1) :: $2 }
 ;
 
 trule:
-| PRELUDE STRING                      { Rprelude  (loc (),$2) }
+| PRELUDE STRING                      { Rprelude  ($2) }
 | REMOVE cloned PROP qualid           { Rremove   ($2, $4) }
 | SYNTAX TYPE qualid STRING           { Rsyntaxty ($3, $4) }
 | SYNTAX LOGIC qualid STRING          { Rsyntaxls ($3, $4) }
@@ -105,21 +99,21 @@ cloned:
 ;
 
 qualid:
-| ident            { loc(), [$1] }
-| ident DOT qualid { loc(), ($1 :: snd $3) }
+| ident            { loc (), [$1] }
+| ident DOT qualid { loc (), ($1 :: snd $3) }
 ;
 
 ident:
-| IDENT  
+| IDENT
     { $1 }
-| STRING 
+| STRING
     { $1 }
-| LEFTPAR UNDERSCORE OPERATOR UNDERSCORE RIGHTPAR 
+| LEFTPAR UNDERSCORE OPERATOR UNDERSCORE RIGHTPAR
     { infix $3 }
-| LEFTPAR OPERATOR UNDERSCORE RIGHTPAR 
+| LEFTPAR OPERATOR UNDERSCORE RIGHTPAR
     { prefix $2 }
 /*
-| LEFTPAR UNDERSCORE lident_op RIGHTPAR 
+| LEFTPAR UNDERSCORE lident_op RIGHTPAR
     { { id = postfix $3; id_loc = loc () } }
 */
 | PRELUDE

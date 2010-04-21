@@ -10,23 +10,18 @@ valid "unsat"
 unknown "unknown\\|sat\\|Fail" "Unknown"
 
 (* À discuter *)
-transformations
-  "simplify_recursive_definition"      
-  (*"split_goal_pos_neg_goal"*) "split_goal_pos_neg_all"
-  "inline_trivial"
-  "remove_logic_definition"
-  "encoding_decorate"
-end
+transformation "simplify_recursive_definition"      
+transformation (*"split_goal_pos_neg_goal"*) "split_goal_pos_neg_all"
+transformation "inline_trivial"
+transformation "remove_logic_definition"
+transformation "encoding_decorate"
 
 
 theory BuiltIn
   syntax type int "Int"
   syntax type real "Real"
-
   syntax logic (_=_) "(= %1 %2)"
-
   syntax logic (_<>_) "(not (= %1 %2))"
-
 end
 
 

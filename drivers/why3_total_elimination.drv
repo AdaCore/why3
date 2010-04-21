@@ -1,13 +1,11 @@
 printer "why3"
 filename "%f-%t-%g.why"
 
-transformations
-    "compile_match"
-    "eliminate_definition"
-    "eliminate_inductive"
-    "eliminate_algebraic"
-    "eliminate_let"
-end
+transformation "compile_match"
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic"
+transformation "eliminate_let"
 
 theory BuiltIn
   syntax type   int     "int"

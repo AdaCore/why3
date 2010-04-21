@@ -1,10 +1,8 @@
 printer "why3"
 filename "%f-%t-%g.why"
 
-transformations
-        "remove_logic_definition"
-        "encoding_decorate"
-end
+transformation "remove_logic_definition"
+transformation "encoding_decorate"
 
 theory BuiltIn
   syntax type   int     "int"

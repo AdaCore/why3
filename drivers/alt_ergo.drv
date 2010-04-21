@@ -12,28 +12,21 @@ unknown "I don't know" "Unknown"
 fail "typing error:\\(.*\\)$" "Failure : File generation error : \\1"
 
 (* À discuter *)
-transformations
-  "simplify_recursive_definition"
-  "compile_match"
-  "eliminate_definition"
-  "eliminate_algebraic"
-  "eliminate_let"
-  "inline_trivial"
-(*  "split_goal_pos_neg_goal"*)
-(*"split_goal_pos_neg_all"*)
-end
-
+transformation "simplify_recursive_definition"
+transformation "compile_match"
+transformation "eliminate_definition"
+transformation "eliminate_algebraic"
+transformation "eliminate_let"
+transformation "inline_trivial"
+(* transformation "split_goal_pos_neg_goal" *)
+(* transformation "split_goal_pos_neg_all" *)
 
 theory BuiltIn
   syntax type int "int"
   syntax type real "real"
-
   syntax logic (_=_) "(%1 = %2)"
-
   syntax logic (_<>_) "(%1 <> %2)"
-
 end
-
 
 theory int.Int
 

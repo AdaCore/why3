@@ -24,17 +24,17 @@ type qualid = loc * string list
 type cloned = bool
 
 type trule =
-  | Rremove of cloned * qualid
+  | Rremove   of cloned * qualid
   | Rsyntaxty of qualid * string
   | Rsyntaxls of qualid * string
   | Rtagty    of cloned * qualid * string
   | Rtagls    of cloned * qualid * string
   | Rtagpr    of cloned * qualid * string
-  | Rprelude of loc * string
+  | Rprelude  of string
 
 type theory_rules = {
-  thr_name    : qualid;
-  thr_rules   : trule list;
+  thr_name  : qualid;
+  thr_rules : (loc * trule) list;
 }
 
 type global =
@@ -51,10 +51,11 @@ type global =
   | ExitCodeUnknown of int * string
   | ExitCodeFailure of int * string
   | Filename of string
-  | Transforms of (loc * string) list
+  | Transform of string
   | Plugin of (string * string)
 
 type file = {
   f_global : (loc * global) list;
   f_rules  : theory_rules list;
 }
+
