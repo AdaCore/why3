@@ -159,8 +159,8 @@ val root_goals : unit -> goal list
 exception AlreadyAttempted
 
 val try_prover : 
-  timelimit:int -> ?memlimit:int -> prover:prover -> command:string -> 
-  driver:Why.Driver.driver -> goal -> (unit -> unit)
+  debug:bool -> timelimit:int -> memlimit:int -> prover:prover -> 
+  command:string -> driver:Why.Driver.driver -> goal -> (unit -> unit)
   (** attempts to prove goal with the given prover.  This function
       prepares the goal for that prover, adds it as an new
       external_proof attempt, setting its current status to Running,

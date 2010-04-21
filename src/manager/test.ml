@@ -33,7 +33,7 @@ let autodetection () =
   let config = {
     conf_file = "why.conf";
     loadpath  = ["theories"];
-    timelimit = Some 10;
+    timelimit = Some 2;
     memlimit  = None;
     provers   = provers }
   in
@@ -88,6 +88,10 @@ let provers_data =
   l
    
 
+let timelimit = 
+match config.timelimit with
+| None -> 2
+| Some n -> n
 
 let () = 
   printf "previously known goals:@\n";
@@ -203,7 +207,10 @@ let goal_menu g =
          let i = int_of_string s in
          if i=0 then raise Exit; 
          let p = List.assoc i menu in
-         let call = Db.try_prover ~timelimit:config.timelimit ~prover:p.prover ~command:p.command ~driver:p.driver g in
+         let call = 
+	   Db.try_prover ~debug:true ~timelimit ~memlimit:0 
+~prover:p.prover ~command:p.command ~driver:p.driver g 
+	 in
          call ()
        with Not_found | Failure _ -> 
          printf "unknown choice@.");
