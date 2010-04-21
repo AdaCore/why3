@@ -28,7 +28,6 @@ let channel_contents_fmt cin fmt =
          String.sub buff 0 !n)
   done
 
-
 let channel_contents_buf cin =
   let buf = Buffer.create 1024
   and buff = String.make 1024 ' ' in
@@ -57,7 +56,6 @@ let file_contents_buf f =
   with _ -> 
     invalid_arg (Printf.sprintf "(cannot open %s)" f)
 
-
 let file_contents f = Buffer.contents (file_contents_buf f)
 
 let open_temp_file ?(debug=false) filesuffix usefile =
@@ -72,7 +70,6 @@ let open_temp_file ?(debug=false) filesuffix usefile =
         if not debug then Sys.remove file;
         close_out cout;
         raise e
-
 
 type 'a result =
   | Result of 'a
@@ -108,3 +105,4 @@ let call_asynchronous (f : unit -> 'a) =
                 end
             | _ -> raise (Bad_execution ps) in
         f
+

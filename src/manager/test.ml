@@ -64,7 +64,7 @@ let () = Db.init_base (fname ^ ".db")
 
 let get_driver name = 
   let pi = Util.Mstr.find name config.provers in
-  Why.Driver.load_driver pi.Whyconf.driver env
+  Why.Driver.load_driver env pi.Whyconf.driver
 
 type prover_data =
     { prover : Db.prover;

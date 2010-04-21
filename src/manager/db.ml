@@ -1481,15 +1481,7 @@ let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver
   in
   if debug then Format.eprintf "Task for prover: %a@." (Why.Driver.print_task driver) task;
   let callback = 
-    let dest =
-      Why.Driver.file_of_task driver "" "" task
-    in
-    let print_task fmt =
-      Format.fprintf fmt "@[%a@]@?" (Why.Driver.print_task driver) task
-    in
-    let regexps = Why.Driver.get_regexps driver in
-    Why.Call_provers.call_on_formatter ~debug ~suffix:dest
-      ~command ~timelimit ~memlimit ~regexps print_task
+    Why.Driver.prove_task ~debug ~command ~timelimit ~memlimit driver task
   in
   fun () ->
     if debug then Format.printf "setting attempt status to Running@.";

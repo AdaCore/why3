@@ -34,8 +34,6 @@ type prover_result = {
   pr_time   : float;
 }
 
-type prover_regexp = Str.regexp * prover_answer
-
 let print_prover_answer fmt = function
   | Valid -> fprintf fmt "Valid"
   | Invalid -> fprintf fmt "Invalid"
@@ -44,10 +42,9 @@ let print_prover_answer fmt = function
   | Failure s -> fprintf fmt "Failure: %s" s
   | HighFailure -> fprintf fmt "HighFailure"
 
-let print_prover_result fmt pr =
-  fprintf fmt "%a (%.2fs)" print_prover_answer pr.pr_answer pr.pr_time;
-  if pr.pr_answer == HighFailure then
-    fprintf fmt "@\nstdout-stderr:@\n%s@." pr.pr_output
+let print_prover_result fmt {pr_answer=ans; pr_output=out; pr_time=t} =
+  fprintf fmt "%a (%.2fs)" print_prover_answer ans t;
+  if ans == HighFailure then fprintf fmt "@\nProver output:@\n%s@." out
 
 let rec grep out l = match l with
   | [] -> HighFailure
@@ -55,75 +52,82 @@ let rec grep out l = match l with
       begin try
         ignore (Str.search_forward re out 0);
         match pa with
-          | Valid | Invalid | Timeout -> pa
-          | Unknown s -> Unknown (Str.replace_matched s out)
-          | Failure s -> Failure (Str.replace_matched s out)
-          | HighFailure -> assert false
+        | Valid | Invalid | Timeout -> pa
+        | Unknown s -> Unknown (Str.replace_matched s out)
+        | Failure s -> Failure (Str.replace_matched s out)
+        | HighFailure -> assert false
       with Not_found -> grep out l end
 
-let call_prover debug command regexps opt_cout buffer =
-  let t0 = Unix.time () in
+let call_prover debug command opt_cout buffer =
+  let time = Unix.time () in
   let (cin,cout) as p = Unix.open_process command in
   let cout = match opt_cout with Some c -> c | _ -> cout in
   Buffer.output_buffer cout buffer; close_out cout;
   let out = channel_contents cin in
   let ret = Unix.close_process p in
-  let t1 = Unix.time () in
-  if debug then Format.eprintf "Call_provers: Command output:@\n%s@." out;
-  let ans = match ret with
-    | Unix.WSTOPPED n ->
-        if debug then Format.eprintf "Call_provers: stopped on signal %d@." n;
-        HighFailure
-    | Unix.WSIGNALED 24 (* SIGXCPU signal cf. /usr/include/bits/signum.h *) ->
-        if debug then Format.eprintf "Call_provers: killed by signal SIGXCPU@.";
-        Timeout
-    | Unix.WSIGNALED n ->
-        if debug then Format.eprintf "Call_provers: killed by signal %d@." n;
-        HighFailure
-    | Unix.WEXITED n ->
-        if debug then Format.eprintf "Call_provers: exited with status %d@." n;
-        grep out regexps
-  in
-  { pr_answer = ans;
-    pr_output = out;
-    pr_time   = t1 -. t0 }
+  let time = Unix.time () -. time in
+  if debug then eprintf "Call_provers: prover output:@\n%s@." out;
+  ret, out, time
 
-let call_on_buffer ?(debug=false) ?(suffix=".dump")
-      ~command ~timelimit ~memlimit ~regexps buffer () =
+let call_on_buffer ?(debug=false) ~command ~timelimit ~memlimit
+                                  ~regexps ~exitcodes ~filename buffer () =
   let on_stdin = ref false in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
-  let replace filename s = match Str.matched_group 1 s with
+  let replace file s = match Str.matched_group 1 s with
     | "%" -> "%"
-    | "f" -> on_stdin := false; filename
+    | "f" -> on_stdin := false; file
     | "t" -> string_of_int timelimit
     | "m" -> string_of_int memlimit
     | _ -> failwith "unknown format specifier, use %%f, %%t or %%m"
   in
-  let cmd_stdin = Str.global_substitute cmd_regexp (replace "") command in
-  if !on_stdin then call_prover debug cmd_stdin regexps None buffer
-  else
-    let fout,cout = Filename.open_temp_file "why" suffix in
-    try
-      let cmd = Str.global_substitute cmd_regexp (replace fout) command in
-      let res = call_prover debug cmd regexps (Some cout) buffer in
-      if not debug then Sys.remove fout;
-      res
-    with e ->
-      close_out cout;
-      if not debug then Sys.remove fout;
-      raise e
+  let cmd = Str.global_substitute cmd_regexp (replace "") command in
+  let ret, out, time =
+    if !on_stdin then call_prover debug cmd None buffer else begin
+      let fout,cout = Filename.open_temp_file "why_" ("_" ^ filename) in
+      try
+        let cmd = Str.global_substitute cmd_regexp (replace fout) command in
+        let res = call_prover debug cmd (Some cout) buffer in
+        if not debug then Sys.remove fout;
+        res
+      with e ->
+        close_out cout;
+        if not debug then Sys.remove fout;
+        raise e
+    end
+  in
+  let ans = match ret with
+    | Unix.WSTOPPED n ->
+        if debug then eprintf "Call_provers: stopped by signal %d@." n;
+        HighFailure
+    | Unix.WSIGNALED n ->
+        if debug then eprintf "Call_provers: killed by signal %d@." n;
+        HighFailure
+    | Unix.WEXITED n ->
+        if debug then eprintf "Call_provers: exited with status %d@." n;
+        (try List.assoc n exitcodes with Not_found -> grep out regexps)
+  in
+  let ans = match ans with
+    | HighFailure when time >= (0.9 *. float timelimit) -> Timeout
+    | _ -> ans
+  in
+  { pr_answer = ans;
+    pr_output = out;
+    pr_time   = time }
 
-let call_on_formatter ?debug ?suffix
+
+(*
+let call_on_formatter ?debug ?filename
       ~command ~timelimit ~memlimit ~regexps formatter =
   let buffer = Buffer.create 1024 in
   let fmt = formatter_of_buffer buffer in
   formatter fmt; pp_print_flush fmt ();
-  call_on_buffer ?debug ?suffix ~command ~timelimit ~memlimit ~regexps buffer
+  call_on_buffer ?debug ?filename ~command ~timelimit ~memlimit ~regexps buffer
 
-let call_on_file ?debug ?suffix
+let call_on_file ?debug ?filename
       ~command ~timelimit ~memlimit ~regexps filename =
   let buffer = file_contents_buf filename in
-  call_on_buffer ?debug ?suffix ~command ~timelimit ~memlimit ~regexps buffer
+  call_on_buffer ?debug ?filename ~command ~timelimit ~memlimit ~regexps buffer
+*)
 
 (*
 let is_true_cygwin = Sys.os_type = "Cygwin"
@@ -164,9 +168,9 @@ let () = Sys.set_signal Sys.sigpipe Sys.Signal_ignore
 let timed_sys_command ?formatter ?buffer ?(debug=false) ?timeout cmd =
   let t0 = Unix.times () in
   let cmd = match timeout with
-    | None -> Format.sprintf "%s 2>&1" cmd
-    | Some timeout -> Format.sprintf "%s %d %s 2>&1" !cpulimit timeout cmd in
-  if debug then Format.eprintf "command line: %s@." cmd;
+    | None -> sprintf "%s 2>&1" cmd
+    | Some timeout -> sprintf "%s %d %s 2>&1" !cpulimit timeout cmd in
+  if debug then eprintf "command line: %s@." cmd;
   let (cin,cout) as p = Unix.open_process cmd in
   (* Write the formatter to the stdin of the prover *)
   begin try
@@ -176,7 +180,7 @@ let timed_sys_command ?formatter ?buffer ?(debug=false) ?timeout cmd =
            let fmt = formatter_of_out_channel cout in
            formatter fmt);
   with Sys_error s ->
-    if debug then Format.eprintf "Sys_error : %s@." s
+    if debug then eprintf "Sys_error : %s@." s
   end;
   (* Write the buffer to the stdin of the prover *)
   begin try
@@ -185,14 +189,14 @@ let timed_sys_command ?formatter ?buffer ?(debug=false) ?timeout cmd =
        | Some buffer ->
            Buffer.output_buffer cout buffer);
   with Sys_error s ->
-    if debug then Format.eprintf "Sys_error : %s@." s
+    if debug then eprintf "Sys_error : %s@." s
   end;
   close_out cout;
   let out = Sysutil.channel_contents cin in
   let ret = Unix.close_process p in
   let t1 = Unix.times () in
   let cpu_time = t1.Unix.tms_cutime -. t0.Unix.tms_cutime in
-  if debug then Format.eprintf "Call_provers : Command output : %s@." out;
+  if debug then eprintf "Call_provers : Command output : %s@." out;
   (cpu_time,ret,out)
 
 let grep re str =

@@ -260,36 +260,29 @@ let print_th_namespace fmt th =
 let fname_printer = ref (Ident.create_ident_printer [])
 
 let do_task _env drv fname tname (th : Why.Theory.theory) (task : Task.task) =
-  let dest =
-    let fname =
-      let fname = Filename.basename fname in
-      try Filename.chop_extension fname
-      with Invalid_argument _ -> fname
-    in
-    let tname = th.th_name.Ident.id_short in
-    Driver.file_of_task drv fname tname task
-  in
-  let print_task fmt =
-    fprintf fmt "@[%a@]@?" (Driver.print_task drv) task
-  in
   match !opt_output, !opt_command with
     | None, Some command ->
-        let regexps = Driver.get_regexps drv in
-        let res = Call_provers.call_on_formatter ~debug ~suffix:dest
-                ~command ~timelimit ~memlimit ~regexps print_task ()
+        let res =
+          Driver.prove_task ~debug ~command ~timelimit ~memlimit drv task ()
         in
         printf "%s %s %s : %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_long
           Call_provers.print_prover_result res
     | None, None ->
-        print_task std_formatter
+        Driver.print_task drv std_formatter task
     | Some dir, _ ->
+        let fname = Filename.basename fname in
+        let fname =
+          try Filename.chop_extension fname with _ -> fname
+        in
+        let tname = th.th_name.Ident.id_short in
+        let dest = Driver.file_of_task drv fname tname task in
         (* Uniquify the filename before the extension if it exists*)
         let i = try String.rindex dest '.' with _ -> String.length dest in
         let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
         let ext = String.sub dest i (String.length dest - i) in
         let cout = open_out (Filename.concat dir (name ^ ext)) in
-        print_task (formatter_of_out_channel cout);
+        Driver.print_task drv (formatter_of_out_channel cout) task;
         close_out cout
 
 let do_task env drv fname tname th task =
@@ -361,7 +354,7 @@ let do_input env drv = function
 let () =
   try
     let env = Env.create_env (Typing.retrieve !opt_loadpath) in
-    let drv = Util.option_map (fun f -> load_driver f env) !opt_driver in
+    let drv = Util.option_map (load_driver env) !opt_driver in
     Queue.iter (do_input env drv) opt_queue
   with e when not debug ->
     eprintf "%a@." report e;

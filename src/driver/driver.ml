@@ -166,9 +166,7 @@ let load_file file =
   f
 
 let string_of_qualid thl idl =
-  let thl = String.concat "." thl in
-  let idl = String.concat "." idl in
-  thl^"."^idl
+  String.concat "." thl ^ "." ^ String.concat "." idl
 
 let add_htheory tmap cloned id t =
   try
@@ -220,7 +218,7 @@ let load_rules env (pmap,tmap) { thr_name = (loc,qualid); thr_rules = trl } =
   in
   List.fold_left add (pmap,tmap) trl
 
-let load_driver file env =
+let load_driver env file =
   let prelude   = ref [] in
   let regexps   = ref [] in
   let exitcodes = ref [] in
@@ -245,7 +243,7 @@ let load_driver file env =
     | ExitCodeUnknown (s,t) -> add_to_list exitcodes (s, Unknown t)
     | ExitCodeFailure (s,t) -> add_to_list exitcodes (s, Failure t)
     | Filename s -> set_or_raise loc filename s "filename"
-    | Printer s -> begin 
+    | Printer s -> begin
         try set_or_raise loc printer (Hashtbl.find printers s) "printer"
         with Not_found -> errorm ~loc "unknown printer %s" s end
     | Transform s -> begin
@@ -290,8 +288,6 @@ let query_ident drv clone =
       Hid.add h id tr;
       tr
 
-let get_regexps drv = drv.drv_regexps
-
 (** using drivers *)
 
 let apply_transforms drv =
@@ -324,20 +320,37 @@ let print_task drv fmt task =
   print_prelude drv (task_used task) fmt;
   Format.fprintf fmt "@[%a@]@?" printer task
 
-let file_of_task drv input_file theory_name task =
-  let filename_regexp = Str.regexp "%\\(.\\)" in
+let filename_regexp = Str.regexp "%\\(.\\)"
+
+let get_filename drv input_file theory_name goal_name =
+  let file = match drv.drv_filename with
+    | Some f -> f
+    | None -> "%f-%t-%g.dump"
+  in
   let replace s = match Str.matched_group 1 s with
     | "%" -> "%"
     | "f" -> input_file
     | "t" -> theory_name
-    | "g" -> (task_goal task).pr_name.id_short
+    | "g" -> goal_name
     | _ -> errorm "unknown format specifier, use %%f, %%t or %%g"
   in
-  let file = match drv.drv_filename with
-    | Some f -> f
-    | None -> "%f_%t_%g.dump"
-  in
   Str.global_substitute filename_regexp replace file
+
+let file_of_task drv input_file theory_name task =
+  get_filename drv input_file theory_name (task_goal task).pr_name.id_short
+
+let call_on_buffer ?debug ~command ~timelimit ~memlimit drv buffer =
+  let regexps = drv.drv_regexps in
+  let exitcodes = drv.drv_exitcodes in
+  let filename = get_filename drv "" "" "" in
+  Call_provers.call_on_buffer
+    ?debug ~command ~timelimit ~memlimit ~regexps ~exitcodes ~filename buffer
+
+let prove_task ?debug ~command ~timelimit ~memlimit drv task =
+  let buf = Buffer.create 1024 in
+  let fmt = Format.formatter_of_buffer buf in
+  print_task drv fmt task; Format.pp_print_flush fmt ();
+  call_on_buffer ?debug ~command ~timelimit ~memlimit drv buf
 
 (*
 Local Variables:

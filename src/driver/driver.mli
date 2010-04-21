@@ -29,10 +29,10 @@ open Env
 
 type driver
 
-val load_driver : string -> env -> driver
+val load_driver : env -> string -> driver
 (** loads a driver from a file
-    @param string driver file name
     @param env TODO
+    @param string driver file name
 *)
 
 (** {2 query a driver} *)
@@ -46,9 +46,6 @@ val syntax_arguments : string -> (formatter -> 'a -> unit) ->
   formatter -> 'a list -> unit
   (** (syntax_argument templ print_arg fmt l) prints in the formatter fmt
      the list l using the template templ and the printer print_arg *)
-
-val get_regexps : driver -> Call_provers.prover_regexp list
-(** fetch the regular expressions to parse the prover's output *)
 
 (** {2 register printers and transformations} *)
 
@@ -72,6 +69,20 @@ val print_task : driver -> formatter -> task -> unit
 
 val file_of_task : driver -> string -> string -> task -> string
 (** file_of_task input_file theory_name task *)
+
+val prove_task :
+  ?debug    : bool ->
+  command   : string ->
+  timelimit : int ->
+  memlimit  : int ->
+  driver -> task -> unit -> Call_provers.prover_result
+
+val call_on_buffer :
+  ?debug    : bool ->
+  command   : string ->
+  timelimit : int ->
+  memlimit  : int ->
+  driver -> Buffer.t -> unit -> Call_provers.prover_result
 
 (** {2 error reporting} *)
 

@@ -31,38 +31,17 @@ type prover_result = {
   pr_time   : float;
 }
 
-type prover_regexp = Str.regexp * prover_answer
-
 val print_prover_answer : Format.formatter -> prover_answer -> unit
 val print_prover_result : Format.formatter -> prover_result -> unit
 
 val call_on_buffer :
-  ?debug : bool ->
-  ?suffix : string ->
-  command : string ->
+  ?debug    : bool ->
+  command   : string ->
   timelimit : int ->
-  memlimit : int ->
-  regexps : prover_regexp list ->
+  memlimit  : int ->
+  regexps   : (Str.regexp * prover_answer) list ->
+  exitcodes : (int * prover_answer) list ->
+  filename  : string ->
   Buffer.t ->
-  (unit -> prover_result)
-
-val call_on_formatter :
-  ?debug : bool ->
-  ?suffix : string ->
-  command : string ->
-  timelimit : int ->
-  memlimit : int ->
-  regexps : prover_regexp list ->
-  (Format.formatter -> unit) ->
-  (unit -> prover_result)
-
-val call_on_file :
-  ?debug : bool ->
-  ?suffix : string ->
-  command : string ->
-  timelimit : int ->
-  memlimit : int ->
-  regexps : prover_regexp list ->
-  string ->
-  (unit -> prover_result)
+  unit -> prover_result
 
