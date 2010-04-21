@@ -229,6 +229,12 @@ let main_loop goals =
         (fun (i,acc) g -> 
            let i = succ i in
            printf "%2d: name='%s', proved=%b@." i (Db.goal_name g) (Db.goal_proved g);
+           let e = Db.external_proofs g in
+           List.iter (fun e ->
+                        let p = Db.prover e in
+                        printf "    external proof: prover=%s, result=%a@."
+                          (Db.prover_name p) Db.print_status (Db.status e))
+             e;
            (i,(i,g)::acc)) (0,[]) goals
       in
       printf "Select a choice:@.";

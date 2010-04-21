@@ -2,64 +2,19 @@
 
 (** {1 Proof manager database} *)
 
-(*
-type handle
-  (** Database handle which can be used to create and retrieve objects *)
-
-type transaction_mode = | Deferred | Immediate | Exclusive
-
-val create :
-  ?busyfn:(Sqlite3.db -> unit) -> ?mode:transaction_mode ->
-  string -> handle
-  (** [create db_name] opens a Sqlite3 database with filename
-      [db_name] and create any tables if they are missing. 
-      @return a
-      database handle which can be used to create and retrieve objects in
-      the database.  @raise Sql_error if a database error is
-      encountered *)
-
-(*
-val raw: handle -> Sqlite3.db
-  (** [raw db] @return the underlying Sqlite3 database for the
-      connection, for advanced queries.  *)
-*)
-*)
-
-
-
-
-
-(* {2 proof attempts and transformations} *)
-
-
 (** {2 Current proof state} *)
-
-
-(*
-type db_ident (* = int64 *)
-(** hidden type for record unique identifiers *)
-*)
-
-(*
-type loc_record 
-*)
-(*= private
-    { mutable id : db_ident option;
-      (** when None, the record has never been stored in database yet *)
-      mutable file : string;
-      mutable line : int;
-      mutable start : int;
-      mutable stop : int;
-    }
-*)
 
 (** prover data *)
 
 type prover 
+  (** abstract type for the set of provers of the database *)
 
 val prover_name : prover -> string
+  (** name of a prover *)
 
 val get_prover : string -> prover
+  (** retrieves prover from its unique name.  creates a new prover if
+      needed. *)
 
 (** status of an external proof attempt *)
 type proof_attempt_status =
@@ -70,30 +25,37 @@ type proof_attempt_status =
   | Unknown (** external prover answered ``don't know'' or equivalent *)
   | HighFailure (** external prover call failed *)
 
+val print_status : Format.formatter -> proof_attempt_status -> unit
+
 type external_proof
+  (** abstract type for a proof attempt with an external prover *)
 
 val prover : external_proof -> prover
-val timelimit : external_proof -> int
-val memlimit : external_proof -> int
-val status : external_proof -> proof_attempt_status
-val result_time : external_proof -> float
-val trace : external_proof -> string
-val proof_obsolete : external_proof -> bool
+  (** the prover used for this attempt *)
 
-(*
-type goal_origin =
-  | Goal of Decl.prsymbol
-(*
-  | VCfun of loc * explain * ...
-  | Subgoal of goal
-*)
-*)
+val timelimit : external_proof -> int
+  (** the time limit chosen for this attempt *)
+
+val memlimit : external_proof -> int
+  (** the memory limit chosen for this attempt *)
+
+val status : external_proof -> proof_attempt_status
+  (** the current status for this attempt *)
+
+val result_time : external_proof -> float
+  (** the time taken for this attempt. Only meaningfull for attempts
+      that are not Scheduled or Running. *)
+
+val trace : external_proof -> string
+  (** a trace of execution of this attempt. Not used yet. *)
+
+val proof_obsolete : external_proof -> bool
+  (** this attempt became obsolete because goal has changed. *)
 
 type goal
+  (** abstract type for goals *)
 
-val goal_proved : goal -> bool
-val goal_name : goal -> string
-
+(** module Goal to allow use of goals in Hashtables or Map or Set *)
 module Goal : sig
   
   type t = goal
@@ -115,20 +77,29 @@ type transf
 
 (** goal accessors *)
 
-val goal_task : goal -> Why.Task.task
-val goal_task_checksum: goal -> string
+
+val goal_name : goal -> string
+  (** returns a goal's name, if any *)
 (*
   val parent : goal -> transf option
 *)
+
+(*
+val goal_task : goal -> Why.Task.task
+*)
+val goal_task_checksum: goal -> string
 val external_proofs : goal -> external_proof list
+  (** returns the set of external proof attempt for that goal *)
+
 val transformations : goal -> transf list
 
 val goal_proved : goal -> bool
-  (** [goal_proved g] returns true iff either
-      exists proof p in [external_proofs g] s.t.
+  (** tells if the goal is proved valid or not.
+      It returns true iff either
+      <li>exists proof p in [external_proofs g] s.t.
           proof_obsolete p == false and status p = Valid
       or
-      exists transf t in [transformations g] s.t.
+      <li>exists transf t in [transformations g] s.t.
             transf_obsolete t == false and
             forall g in [subgoals t], [goal_proved g]
   *)
