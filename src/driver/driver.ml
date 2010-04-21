@@ -26,7 +26,6 @@ open Decl
 open Theory
 open Task
 open Register
-open Env
 open Driver_ast
 open Call_provers
 
@@ -116,14 +115,15 @@ let print_translation fmt = function
 type printer = (ident -> translation) -> formatter -> task -> unit
 
 type driver = {
-  drv_env          : env;
+  drv_env          : Env.env;
   drv_printer      : printer option;
   drv_prelude      : string list;
   drv_filename     : string option;
   drv_transforms   : task tlist_reg;
   drv_thprelude    : string list Mid.t;
   drv_translations : (translation * translation) Mid.t;
-  drv_regexps      : Call_provers.prover_regexp list; 
+  drv_regexps      : (Str.regexp * Call_provers.prover_answer) list;
+  drv_exitcodes    : (int * Call_provers.prover_answer) list; 
 }
 
 (** registering transformation *)
@@ -153,11 +153,6 @@ let load_file file =
   close_in c;
   f
 
-let rec qualid_to_slist = function
-  | [] -> assert false
-  | [a] -> a,[]
-  | a::l -> let id,l = qualid_to_slist l in (id,a::l)
-
 let string_of_qualid thl idl = 
   let thl = String.concat "." thl in
   let idl = String.concat "." idl in
@@ -165,94 +160,64 @@ let string_of_qualid thl idl =
 
 let regexp_arg_pos = Str.regexp "%\\([0-9]+\\)"
 
-let check_syntax loc s len = 
-  iter_group regexp_arg_pos 
-    (fun s ->
-       let i = int_of_string (matched_group 1 s) in
-       if i=0 
-       then errorm ~loc 
-         "invalid indice of argument : the first one is %%1 and not %%0";
-       if i>len 
-       then errorm ~loc 
-         "invalid indice of argument \"%%%i\" this logic has only %i argument" 
-         i len) s
+let check_syntax loc s len =
+  let arg s =
+    let i = int_of_string (matched_group 1 s) in
+    if i = 0 then errorm ~loc "bad index '%%0': start with '%%1'";
+    if i > len then 
+      errorm ~loc "bad index '%%%i': the symbol has %i arguments" i len
+  in
+  iter_group regexp_arg_pos arg s 
 
-let load_rules env (premap,tmap) {thr_name = loc,qualid; thr_rules = trl} =
-  let id,qfile = qualid_to_slist qualid in
-  let th = try
-    find_theory env qfile id 
-  with Env.TheoryNotFound (l,s) -> 
+let add_htheory tmap cloned id t =
+  try
+    let t2,t3 = Mid.find id tmap in
+    let t23 = if cloned
+      then translation_union t t2, t3
+      else t2, translation_union t t3 
+    in
+    Mid.add id t23 tmap 
+  with Not_found ->
+    let t23 = if cloned 
+      then Tag Sstr.empty, t 
+      else t, Tag Sstr.empty 
+    in
+    Mid.add id t23 tmap 
+
+let load_rules env (pmap,tmap) {thr_name = loc,qualid; thr_rules = trl} =
+  let qfile,id = let l = List.rev qualid in List.rev (List.tl l),List.hd l in
+  let th = try Env.find_theory env qfile id with Env.TheoryNotFound (l,s) ->
     errorm ~loc "theory %s.%s not found" (String.concat "." l) s
   in
-  let add_htheory tmap cloned id t =
-    try
-      let t2,t3 = Mid.find id tmap in
-      let t23 = 
-        if cloned then (translation_union t t2),t3
-        else t2,(translation_union t t3) in
-      Mid.add id t23 tmap 
-    with Not_found ->
-      let t23 = if cloned then (Tag Sstr.empty),t else t,(Tag Sstr.empty) in
-      Mid.add id t23 tmap in
-  let add (premap,tmap) = function
-    | Rremove (c,(loc,q)) -> 
-        begin
-          try
-            premap,add_htheory tmap c 
-              (ns_find_pr th.th_export q).pr_name Remove
-          with Not_found -> errorm ~loc "Unknown proposition %s"
-            (string_of_qualid qualid q)
-        end 
-    | Rsyntaxls ((loc,q),s) -> 
-        begin
-          try
-            let ls = ns_find_ls th.th_export q in
-            check_syntax loc s (List.length ls.ls_args);
-            premap,add_htheory tmap false ls.ls_name (Syntax s)
-          with Not_found -> errorm ~loc "Unknown logic %s" 
-            (string_of_qualid qualid q)
-        end 
-    | Rsyntaxty ((loc,q),s) -> 
-        begin
-          try
-            let ts = ns_find_ts th.th_export q in
-            check_syntax loc s (List.length ts.ts_args);
-            premap,add_htheory tmap false ts.ts_name (Syntax s)
-          with Not_found -> errorm ~loc "Unknown type %s" 
-            (string_of_qualid qualid q)
-        end
-    | Rtagls (c,(loc,q),s) ->
-        begin
-          try
-            premap,add_htheory tmap c (ns_find_ls th.th_export q).ls_name 
-              (Tag (Sstr.singleton s))
-          with Not_found -> errorm ~loc "Unknown logic %s" 
-            (string_of_qualid qualid q)
-        end
-    | Rtagty (c,(loc,q),s) ->
-        begin
-          try
-            premap,add_htheory tmap c (ns_find_ts th.th_export q).ts_name 
-              (Tag (Sstr.singleton s))
-          with Not_found -> errorm ~loc "Unknown type %s" 
-            (string_of_qualid qualid q)
-        end
-    | Rtagpr (c,(loc,q),s) ->
-        begin
-          try
-            premap,add_htheory tmap c (ns_find_pr th.th_export q).pr_name
-              (Tag (Sstr.singleton s))
-          with Not_found -> errorm ~loc "Unknown proposition %s" 
-            (string_of_qualid qualid q)
-        end
-    | Rprelude (_loc,s) -> 
-        let l = 
-          try Mid.find th.th_name premap 
-          with Not_found -> []
-        in
-        Mid.add th.th_name (s::l) premap,tmap 
+  let find_pr (loc,q) = try ns_find_pr th.th_export q with Not_found ->
+    errorm ~loc "Unknown proposition %s" (string_of_qualid qualid q)
   in
-  List.fold_left add (premap,tmap) trl
+  let find_ls (loc,q) = try ns_find_ls th.th_export q with Not_found ->
+    errorm ~loc "Unknown logic symbol %s" (string_of_qualid qualid q)
+  in
+  let find_ts (loc,q) = try ns_find_ts th.th_export q with Not_found ->
+    errorm ~loc "Unknown type symbol %s" (string_of_qualid qualid q)
+  in
+  let add (pmap,tmap) = function
+    | Rremove (c,q) -> 
+        pmap, add_htheory tmap c (find_pr q).pr_name Remove
+    | Rsyntaxls (q,s) -> let ls = find_ls q in
+        check_syntax loc s (List.length ls.ls_args);
+        pmap, add_htheory tmap false ls.ls_name (Syntax s)
+    | Rsyntaxty (q,s) -> let ts = find_ts q in
+        check_syntax loc s (List.length ts.ts_args);
+        pmap, add_htheory tmap false ts.ts_name (Syntax s)
+    | Rtagls (c,q,s) ->
+        pmap, add_htheory tmap c (find_ls q).ls_name (Tag (Sstr.singleton s))
+    | Rtagty (c,q,s) ->
+        pmap, add_htheory tmap c (find_ts q).ts_name (Tag (Sstr.singleton s))
+    | Rtagpr (c,q,s) ->
+        pmap, add_htheory tmap c (find_pr q).pr_name (Tag (Sstr.singleton s))
+    | Rprelude (_loc,s) -> 
+        let l = try Mid.find th.th_name pmap with Not_found -> [] in
+        Mid.add th.th_name (s::l) pmap, tmap
+  in
+  List.fold_left add (pmap,tmap) trl
 
 let load_driver file env =
   let f = load_file file in
@@ -261,6 +226,7 @@ let load_driver file env =
   let filename    = ref None in
   let ltransforms = ref None in
   let regexps     = ref [] in
+  let exitcodes   = ref [] in
   let set_or_raise loc r v error =
     if !r <> None then errorm ~loc "duplicate %s" error
     else r := Some v 
@@ -278,6 +244,11 @@ let load_driver file env =
     | RegexpTimeout s -> regexps:=(s,Timeout)::!regexps
     | RegexpUnknown (s1,s2) -> regexps:=(s1,Unknown s2)::!regexps
     | RegexpFailure (s1,s2) -> regexps:=(s1,Failure s2)::!regexps
+    | ExitCodeValid s -> exitcodes:=(s,Valid)::!exitcodes
+    | ExitCodeInvalid s -> exitcodes:=(s,Invalid)::!exitcodes
+    | ExitCodeTimeout s -> exitcodes:=(s,Timeout)::!exitcodes
+    | ExitCodeUnknown (s1,s2) -> exitcodes:=(s1,Unknown s2)::!exitcodes
+    | ExitCodeFailure (s1,s2) -> exitcodes:=(s1,Failure s2)::!exitcodes
     | Filename s -> set_or_raise loc filename s "filename"
     | Transforms s -> set_or_raise loc ltransforms s "transform"
     | Plugin files -> load_plugin (Filename.dirname file) files
@@ -299,7 +270,7 @@ let load_driver file env =
       identity_l transformations
   in
   let transforms = trans ltransforms in
-  let (premap,tmap) = 
+  let (pmap,tmap) = 
       List.fold_left (load_rules env) (Mid.empty,Mid.empty) f.f_rules 
   in
   { 
@@ -308,9 +279,10 @@ let load_driver file env =
     drv_prelude      = !prelude;
     drv_filename     = !filename;
     drv_transforms   = transforms;
-    drv_thprelude    = premap;
+    drv_thprelude    = pmap;
     drv_translations = tmap;
     drv_regexps      = regexps;
+    drv_exitcodes    = !exitcodes;
   }
 
 (** querying drivers *)

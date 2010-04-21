@@ -66,6 +66,8 @@ rule token = parse
       { UNDERSCORE }
   | ident as id
       { try Hashtbl.find keywords id with Not_found -> IDENT id }
+  | digit+ as i
+      { INTEGER (int_of_string i) }
   | "<>" | "<" | "<=" | ">" | ">=" 
   | "="
   | "+" | "-"

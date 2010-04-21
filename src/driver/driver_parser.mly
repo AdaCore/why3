@@ -26,6 +26,7 @@
   let prefix s = "prefix " ^ s
 %}
 
+%token <int> INTEGER
 %token <string> IDENT
 %token <string> STRING
 %token <string> OPERATOR
@@ -57,6 +58,11 @@ global:
 | TIMEOUT STRING { RegexpTimeout $2 }
 | UNKNOWN STRING STRING { RegexpUnknown ($2, $3) }
 | FAIL STRING STRING { RegexpFailure ($2, $3) }
+| VALID INTEGER { ExitCodeValid $2 }
+| INVALID INTEGER { ExitCodeInvalid $2 }
+| TIMEOUT INTEGER { ExitCodeTimeout $2 }
+| UNKNOWN INTEGER STRING { ExitCodeUnknown ($2, $3) }
+| FAIL INTEGER STRING { ExitCodeFailure ($2, $3) }
 | FILENAME STRING { Filename $2 }
 | TRANSFORMS list0_string END { Transforms $2 }
 | PLUGIN STRING STRING { Plugin ($2,$3) }

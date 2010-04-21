@@ -45,6 +45,11 @@ type global =
   | RegexpTimeout of string
   | RegexpUnknown of string * string
   | RegexpFailure of string * string
+  | ExitCodeValid of int
+  | ExitCodeInvalid of int
+  | ExitCodeTimeout of int
+  | ExitCodeUnknown of int * string
+  | ExitCodeFailure of int * string
   | Filename of string
   | Transforms of (loc * string) list
   | Plugin of (string * string)
