@@ -107,27 +107,13 @@ let call_on_buffer ?(debug=false) ~command ~timelimit ~memlimit
         (try List.assoc n exitcodes with Not_found -> grep out regexps)
   in
   let ans = match ans with
-    | HighFailure when time >= (0.9 *. float timelimit) -> Timeout
+    | HighFailure 
+      when timelimit > 0 && time >= (0.9 *. float timelimit) -> Timeout
     | _ -> ans
   in
   { pr_answer = ans;
     pr_output = out;
     pr_time   = time }
-
-
-(*
-let call_on_formatter ?debug ?filename
-      ~command ~timelimit ~memlimit ~regexps formatter =
-  let buffer = Buffer.create 1024 in
-  let fmt = formatter_of_buffer buffer in
-  formatter fmt; pp_print_flush fmt ();
-  call_on_buffer ?debug ?filename ~command ~timelimit ~memlimit ~regexps buffer
-
-let call_on_file ?debug ?filename
-      ~command ~timelimit ~memlimit ~regexps filename =
-  let buffer = file_contents_buf filename in
-  call_on_buffer ?debug ?filename ~command ~timelimit ~memlimit ~regexps buffer
-*)
 
 (*
 let is_true_cygwin = Sys.os_type = "Cygwin"

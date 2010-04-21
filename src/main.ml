@@ -285,10 +285,6 @@ let do_task _env drv fname tname (th : Why.Theory.theory) (task : Task.task) =
         Driver.print_task drv (formatter_of_out_channel cout) task;
         close_out cout
 
-let do_task env drv fname tname th task =
-  let tasks = Driver.apply_transforms drv task in
-  List.iter (do_task env drv fname tname th) tasks
-
 let do_theory env drv fname tname th glist =
   if !opt_print_theory then
     printf "%a@." Pretty.print_theory th

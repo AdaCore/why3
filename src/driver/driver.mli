@@ -56,19 +56,17 @@ val register_printer : string -> printer -> unit
 val register_transform   : string -> task Register.trans_reg -> unit
 val register_transform_l : string -> task Register.tlist_reg -> unit
 
-val list_printers   : unit -> string list
-val list_transforms : unit -> string list
+val list_printers     : unit -> string list
+val list_transforms   : unit -> string list
+val list_transforms_l : unit -> string list
 
 (** {2 use a driver} *)
 
-val apply_transforms : driver -> task -> task list
-(** transform task *)
+val file_of_task : driver -> string -> string -> task -> string
+(** file_of_task input_file theory_name task *)
 
 val print_task : driver -> formatter -> task -> unit
 (** print a task *)
-
-val file_of_task : driver -> string -> string -> task -> string
-(** file_of_task input_file theory_name task *)
 
 val prove_task :
   ?debug    : bool ->

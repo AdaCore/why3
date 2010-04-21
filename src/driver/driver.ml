@@ -129,25 +129,26 @@ type driver = {
   drv_printer      : printer option;
   drv_prelude      : string list;
   drv_filename     : string option;
-  drv_transform    : task tlist_reg;
+  drv_transform    : task trans_reg;
   drv_thprelude    : string list Mid.t;
   drv_translations : (translation * translation) Mid.t;
   drv_regexps      : (Str.regexp * Call_provers.prover_answer) list;
   drv_exitcodes    : (int * Call_provers.prover_answer) list;
 }
 
-(** register transformations *)
+(** register printers and transformations *)
 
-let (transforms : (string, task tlist_reg) Hashtbl.t) = Hashtbl.create 17
-let register_transform_l name trans = Hashtbl.replace transforms name trans
-let register_transform name t = register_transform_l name (singleton t)
-let list_transforms () = Hashtbl.fold (fun k _ acc -> k::acc) transforms []
-
-(** register printers *)
-
-let (printers : (string, printer) Hashtbl.t) = Hashtbl.create 17
+let printers : (string, printer) Hashtbl.t = Hashtbl.create 17
 let register_printer name printer = Hashtbl.replace printers name printer
 let list_printers () = Hashtbl.fold (fun k _ acc -> k::acc) printers []
+
+let transforms : (string, task trans_reg) Hashtbl.t = Hashtbl.create 17
+let register_transform name trans = Hashtbl.replace transforms name trans
+let list_transforms () = Hashtbl.fold (fun k _ acc -> k::acc) transforms []
+
+let transforms_l : (string, task tlist_reg) Hashtbl.t = Hashtbl.create 17
+let register_transform_l name trans = Hashtbl.replace transforms_l name trans
+let list_transforms_l () = Hashtbl.fold (fun k _ ac -> k::ac) transforms_l []
 
 (** parse a driver file *)
 
@@ -224,7 +225,7 @@ let load_driver env file =
   let exitcodes = ref [] in
   let filename  = ref None in
   let printer   = ref None in
-  let transform = ref identity_l in
+  let transform = ref identity in
   let set_or_raise loc r v error = match !r with
     | Some _ -> errorm ~loc "duplicate %s" error
     | None   -> r := Some v
@@ -247,7 +248,7 @@ let load_driver env file =
         try set_or_raise loc printer (Hashtbl.find printers s) "printer"
         with Not_found -> errorm ~loc "unknown printer %s" s end
     | Transform s -> begin
-        try transform := compose_l (Hashtbl.find transforms s) !transform
+        try transform := compose (Hashtbl.find transforms s) !transform
         with Not_found -> errorm ~loc "unknown transformation %s" s end
     | Plugin files -> load_plugin (Filename.dirname file) files
   in
@@ -290,10 +291,6 @@ let query_ident drv clone =
 
 (** using drivers *)
 
-let apply_transforms drv =
-(*  apply_clone drv.drv_raw.drv_transforms drv.drv_env drv.drv_clone *)
-  apply_env drv.drv_transform drv.drv_env
-
 let print_prelude drv used fmt =
   let pr_pr s () = Format.fprintf fmt "%s@\n" s in
   List.fold_right pr_pr drv.drv_prelude ();
@@ -313,6 +310,7 @@ let print_prelude drv used fmt =
   Format.fprintf fmt "@."
 
 let print_task drv fmt task =
+  let task = apply_env drv.drv_transform drv.drv_env task in
   let printer = match drv.drv_printer with
     | None -> errorm "no printer specified in the driver file"
     | Some p -> p (query_ident drv (task_clone task))

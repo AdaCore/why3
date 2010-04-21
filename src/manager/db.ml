@@ -1466,22 +1466,19 @@ let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver
   if debug then Format.printf "setting attempt status to Scheduled@.";
   External_proof.set_status db attempt Scheduled;
   if debug then Format.eprintf "Task : %a@." Why.Pretty.print_task g.task;
-  let task = 
-    try
-      match Why.Driver.apply_transforms driver g.task with
-        | [t] -> t
-        | _ -> assert false
-    with Why.Driver.Error e -> 
-      Format.eprintf "Db.try_prover: apply_transforms reports %a@." Why.Driver.report e;
-      raise Exit
-      | e ->
-          try 
-            Printexc.print (fun () -> raise e) ()
-          with _ -> raise Exit
-  in
-  if debug then Format.eprintf "Task for prover: %a@." (Why.Driver.print_task driver) task;
+  if debug then Format.eprintf "Task for prover: %a@." (Why.Driver.print_task driver) g.task;
   let callback = 
-    Why.Driver.prove_task ~debug ~command ~timelimit ~memlimit driver task
+    try 
+      Why.Driver.prove_task ~debug ~command ~timelimit ~memlimit driver g.task
+    with 
+    | Why.Driver.Error e ->
+        Format.eprintf "Db.try_prover: prove_task reports %a@." 
+          Why.Driver.report e;
+        raise Exit
+    | e ->
+        try
+          Printexc.print (fun () -> raise e) ()
+        with _ -> raise Exit
   in
   fun () ->
     if debug then Format.printf "setting attempt status to Running@.";

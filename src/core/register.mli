@@ -34,17 +34,10 @@ val store_use   : (unit -> env -> use          -> 'a trans) -> 'a trans_reg
 val store_both  : (unit -> env -> use -> clone -> 'a trans) -> 'a trans_reg
 val store_task  : (unit -> env -> task         -> 'a trans) -> 'a trans_reg
 
-(*
-val store_clone : (unit -> env -> clone -> 'a trans) -> 'a trans_reg
-*)
-
 exception ArgumentNeeded
 
-(*
-val apply_clone : 'a trans_reg -> env -> clone -> task -> 'a
-*)
-val apply_env   : 'a trans_reg -> env ->          task -> 'a
-val apply       : 'a trans_reg ->                 task -> 'a
+val apply_env : 'a trans_reg -> env -> task -> 'a
+val apply     : 'a trans_reg ->        task -> 'a
 
 val compose   : task trans_reg -> 'a trans_reg -> 'a trans_reg
 val compose_l : task tlist_reg -> 'a tlist_reg -> 'a tlist_reg
