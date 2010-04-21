@@ -3,6 +3,10 @@ open Format
 open Why
 open Whyconf
 
+(******************************)
+(* loading user configuration *)
+(******************************)
+
 (*
 let autodetection () = 
   let alt_ergo = {
@@ -58,6 +62,15 @@ let () = printf "Load path is: %a@." (Pp.print_list Pp.comma Pp.string) config.l
 
 let env = Why.Env.create_env (Why.Typing.retrieve config.loadpath)
 
+let timelimit = 
+  match config.timelimit with
+    | None -> 2
+    | Some n -> n
+
+(********************)
+(* opening database *)
+(********************)
+
 let fname = "tests/test-claude"
 
 let () = Db.init_base (fname ^ ".db")
@@ -73,7 +86,7 @@ type prover_data =
     }
 
 let provers_data =
-  printf "Provers: ";
+  printf "===============================@\nProvers: ";
   let l = 
     Util.Mstr.fold
     (fun id conf acc ->
@@ -84,19 +97,17 @@ let provers_data =
          driver = get_driver id; } :: acc
     ) config.provers []
   in
-  printf "@.";
-  l
+  printf "@\n===============================@.";
+  l 
    
-
-let timelimit = 
-match config.timelimit with
-| None -> 2
-| Some n -> n
-
 let () = 
   printf "previously known goals:@\n";
   List.iter (fun s -> printf "%s@\n" (Db.goal_task_checksum s)) (Db.root_goals ());
   printf "@."
+
+(***********************)
+(* Parsing input file  *)
+(***********************)
    
 let rec report fmt = function
   | Lexer.Error e ->
@@ -129,7 +140,10 @@ let m : Why.Theory.theory Why.Theory.Mnm.t =
     eprintf "%a@." report e;
     exit 1
 
-
+(***************************)
+(* Process input theories  *)
+(* add corresponding tasks *)
+(***************************)
 
 let add_task (tname : string) (task : Why.Task.task) acc =
   match task with
@@ -146,61 +160,25 @@ let add_task (tname : string) (task : Why.Task.task) acc =
                     Db.add_or_replace_task name task :: acc
 
 let do_theory tname th glist =
-(*
-  let add acc (x,l) =
-    let pr = try Why.Theory.ns_find_pr th.Why.Theory.th_export l with Not_found ->
-      Format.eprintf "Goal '%s' not found in theory '%s'.@." x tname;
-      exit 1
-    in
-    Why.Decl.Spr.add pr acc
-  in
-*)
-(*
-  let prs = Some (Queue.fold add Why.Decl.Spr.empty glist) in
-  let prs = if Queue.is_empty glist then None else prs in
-*)
   let tasks = Why.Task.split_theory th None in
   List.fold_right (add_task tname) tasks glist
 
 
-(*
-  if !opt_prove then begin
-    let res = Driver.call_prover ~debug:!opt_debug ?timeout drv task in
-    printf "%s %s %s : %a@." fname tname
-      ((task_goal task).Decl.pr_name).Ident.id_long
-      Call_provers.print_prover_result res
-  end else match !opt_output with
-    | None ->
-        printf "@[%a@]@?" (Driver.print_task drv) task
-    | Some dir ->
-        let file =
-          let file = Filename.basename fname in
-          try Filename.chop_extension file
-          with Invalid_argument _ -> file
-        in
-        let tname = th.th_name.Ident.id_short in
-        let dest = Driver.filename_of_goal drv file tname task in
-        (* Uniquify the filename before the extension if it exists*)
-        let i = try String.rindex dest '.' with _ -> String.length dest in
-        let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
-        let ext = String.sub dest i (String.length dest - i) in
-        let cout = open_out (Filename.concat dir (name ^ ext)) in
-        let fmt = formatter_of_out_channel cout in
-        fprintf fmt "@[%a@]@?" (Driver.print_task drv) task;
-        close_out cout
-*)
+(***********************************)
+(* back to the eighties:           *)
+(* A good-old text-based interface *)
+(***********************************)
 
 let goal_menu g = 
   try
     while true do 
-      printf "Menu:@.";
+      printf "Choose a prover:@.";
       let _,menu = List.fold_left
         (fun (i,acc) p -> 
            let i = succ i in
            printf "%2d: try %s@." i (Db.prover_name p.prover);
            (i,(i,p)::acc)) (0,[]) provers_data
       in
-      printf "Select a choice:@.";
       let s = read_line () in
       (try 
          let i = try int_of_string s with Failure _ -> raise Not_found in
@@ -223,7 +201,7 @@ let goal_menu g =
 let main_loop goals =
   try
     while true do
-      printf "Menu:@.";
+      printf "======================@\nMenu:@.";
       printf " 0: exit@.";
       let _,menu = List.fold_left
         (fun (i,acc) g -> 
@@ -232,12 +210,14 @@ let main_loop goals =
            let e = Db.external_proofs g in
            List.iter (fun e ->
                         let p = Db.prover e in
-                        printf "    external proof: prover=%s, result=%a@."
-                          (Db.prover_name p) Db.print_status (Db.status e))
+                        printf "    external proof: prover=%s, obsolete=%b, result=%a, time=%f@."
+                          (Db.prover_name p) (Db.proof_obsolete e) 
+                          Db.print_status (Db.status e)
+                          (Db.result_time e))
+             
              e;
            (i,(i,g)::acc)) (0,[]) goals
       in
-      printf "Select a choice:@.";
       let s = read_line () in
       (try 
          let i = int_of_string s in
@@ -248,11 +228,13 @@ let main_loop goals =
     done
   with Exit -> ()
   
+
+(****************)
+(* Main program *)
+(****************)
+
 let () =
   eprintf "looking for goals@.";
-(*
-  let glist = Queue.create () in
-*)
   let add_th t th mi = 
     eprintf "adding theory %s, %s@." th.Why.Theory.th_name.Why.Ident.id_long t;
     Why.Ident.Mid.add th.Why.Theory.th_name (t,th) mi 

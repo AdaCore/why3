@@ -120,8 +120,14 @@ let string_of_status = function
 let print_status fmt s = Format.fprintf fmt "%s" (string_of_status s)
 
 type prover =
-    { prover_id : int64;
+    { prover_id : db_ident;
       prover_name : string;
+(*
+      prover_short : string;
+      prover_long : string;
+      prover_command : string;
+      prover_driver_checksum : string;
+*)
     }
 
 let prover_name p = p.prover_name
@@ -300,11 +306,14 @@ let get_prover_from_id id =
 
 let prover e = get_prover_from_id e.prover
 
-let get_prover n =
+let get_prover name (* ~short ~long ~command ~driver *) =
   let db = current () in
-  try Prover.get db n
+(*
+  let checksum = Digest.file driver in
+*)
+  try Prover.get db name (* ~short ~long ~command ~checksum *)
   with Not_found -> 
-    Prover.add db n
+    Prover.add db name (* ~short ~long ~command ~checksum *)
  
 	
 
@@ -587,6 +596,20 @@ module External_proof = struct
 	   db_must_ok db 
 	     (fun () -> Sqlite3.bind stmt 1
 		(let v = int64_from_status stat in Sqlite3.Data.INT v));
+	   db_must_ok db 
+	     (fun () -> Sqlite3.bind stmt 2 (Sqlite3.Data.INT id));
+	   db_must_done db (fun () -> Sqlite3.step stmt))
+    
+  let set_result_time db e t =
+      transaction db 
+        (fun () ->
+	   let id = e.external_proof_id in
+	   let sql = 
+	     "UPDATE external_proof SET result_time=? WHERE external_proof_id=?" 
+	   in
+	   let stmt = Sqlite3.prepare db.raw_db sql in
+	   db_must_ok db 
+	     (fun () -> Sqlite3.bind stmt 1 (Sqlite3.Data.FLOAT t));
 	   db_must_ok db 
 	     (fun () -> Sqlite3.bind stmt 2 (Sqlite3.Data.INT id));
 	   db_must_done db (fun () -> Sqlite3.step stmt))
@@ -966,6 +989,21 @@ module Goal = struct
         );
       e
 
+
+  let set_proved db g b =
+      transaction db 
+        (fun () ->
+	   let id = g.goal_id in
+	   let sql = 
+	     "UPDATE goal SET proved=? WHERE goal_id=?" 
+	   in
+	   let stmt = Sqlite3.prepare db.raw_db sql in
+	   db_must_ok db 
+	     (fun () -> Sqlite3.bind stmt 1 (Sqlite3.Data.INT (int64_from_bool b)));
+	   db_must_ok db 
+	     (fun () -> Sqlite3.bind stmt 2 (Sqlite3.Data.INT id));
+	   db_must_done db (fun () -> Sqlite3.step stmt))
+    
 
 (* TODO make specific update functions for each field ! *)
 (*
@@ -1546,28 +1584,37 @@ let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver
     | Why.Driver.Error e ->
         Format.eprintf "Db.try_prover: prove_task reports %a@." 
           Why.Driver.report e;
-        raise Exit
+        fun () -> raise Exit
     | e ->
         try
           Printexc.print (fun () -> raise e) ()
-        with _ -> raise Exit
+        with _ -> fun () -> raise Exit
   in
   fun () ->
     if debug then Format.printf "setting attempt status to Running@.";
     External_proof.set_status db attempt Running;
-    let r = callback () in
-    if debug then Format.eprintf "prover result: %a@." Why.Call_provers.print_prover_result r;
-    match r.Why.Call_provers.pr_answer with
-      | Why.Call_provers.Valid ->
-          External_proof.set_status db attempt Success;
-          (* TODO: update "proved" status of goal and its parents *)
-          ()         
-      | Why.Call_provers.Timeout ->
-          External_proof.set_status db attempt Timeout
-      | Why.Call_provers.Invalid | Why.Call_provers.Unknown _ ->
-          External_proof.set_status db attempt Unknown
-      | Why.Call_provers.Failure _ | Why.Call_provers.HighFailure ->
-          External_proof.set_status db attempt HighFailure
+    try
+      let r = callback () in
+      if debug then Format.eprintf "prover result: %a@." Why.Call_provers.print_prover_result r;
+      External_proof.set_result_time db attempt r.Why.Call_provers.pr_time;
+      match r.Why.Call_provers.pr_answer with
+        | Why.Call_provers.Valid ->
+            External_proof.set_status db attempt Success;
+            g.proved <- true;
+            Goal.set_proved db g true;
+            (* TODO: update "proved" status of goal parents if any *)
+            ()         
+        | Why.Call_provers.Timeout ->
+            External_proof.set_status db attempt Timeout
+        | Why.Call_provers.Invalid | Why.Call_provers.Unknown _ ->
+            External_proof.set_status db attempt Unknown
+        | Why.Call_provers.Failure _ | Why.Call_provers.HighFailure ->
+            External_proof.set_status db attempt HighFailure
+    with Exit ->
+      if debug then Format.eprintf "prover callback aborted because of an exception raised during elaboration@.";
+      External_proof.set_status db attempt HighFailure
+      
+      
       
 
 let add_transformation (_g : goal) (_t : transf) :  unit =
@@ -1579,7 +1626,7 @@ let add_or_replace_task (name : Why.Decl.prsymbol) (t : Why.Task.task) : goal =
     goal_id = 0L;
     goal_origin = Goal name;
     task = t;
-    task_checksum = ""; (* TODO: md5sum (marshall ?) *)
+    task_checksum = Digest.string (Marshal.to_string t []);
     proved = false;
     observers = [];
   }
