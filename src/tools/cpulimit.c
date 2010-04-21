@@ -33,25 +33,28 @@
 #include <unistd.h>
 #include <errno.h>
 
-
 int main(int argc, char *argv[]) {
-  int limit;
+  int timelimit;
   struct rlimit res;
 
   if (argc < 3) {
-    fprintf(stderr,"usage: %s <time limit in seconds> <command>\n",argv[0]);
+    fprintf(stderr, "usage: %s <time limit in seconds> <command>\n", argv[0]);
     return 1;
   }
-  /* get time limit in seconds from command line */
-  limit = atoi(argv[1]);
 
-  /* set the CPU limit */
-  getrlimit(RLIMIT_CPU,&res);
-  res.rlim_cur = limit;
-  setrlimit(RLIMIT_CPU,&res);
-    
-  /* exec the command */
+  /* get time limit in seconds from command line */
+  timelimit = atoi(argv[1]);
+
+  if (timelimit > 0) {
+    /* set the CPU time limit */
+    getrlimit(RLIMIT_CPU,&res);
+    res.rlim_cur = timelimit;
+    setrlimit(RLIMIT_CPU,&res);
+  }
+
+  /* execute the command */
   execvp(argv[2],argv+2);
-  fprintf(stderr,"%s: %s:command not found",argv[0],argv[2]);
-  return errno;
+  perror("why-cpulimit exec error");
+  return 1;
 }
+
