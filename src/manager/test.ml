@@ -194,7 +194,6 @@ let goal_menu g =
   try
     while true do 
       printf "Menu:@.";
-      printf " 0: exit@.";
       let _,menu = List.fold_left
         (fun (i,acc) p -> 
            let i = succ i in
@@ -204,15 +203,19 @@ let goal_menu g =
       printf "Select a choice:@.";
       let s = read_line () in
       (try 
-         let i = int_of_string s in
-         if i=0 then raise Exit; 
+         let i = try int_of_string s with Failure _ -> raise Not_found in
          let p = List.assoc i menu in
          let call = 
-	   Db.try_prover ~debug:true ~timelimit ~memlimit:0 
-~prover:p.prover ~command:p.command ~driver:p.driver g 
+	   try
+             Db.try_prover ~debug:true ~timelimit ~memlimit:0 
+               ~prover:p.prover ~command:p.command ~driver:p.driver g 
+           with Db.AlreadyAttempted ->
+             printf "Proof already attempted, no need to rerun@.";
+             raise Exit
 	 in
-         call ()
-       with Not_found | Failure _ -> 
+         call ();
+         raise Exit
+       with Not_found -> 
          printf "unknown choice@.");
     done
   with Exit -> ()

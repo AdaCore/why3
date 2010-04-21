@@ -109,6 +109,16 @@ type proof_attempt_status =
   | Unknown (** external prover answered ``don't know'' or equivalent *)
   | HighFailure (** external prover call failed *)
 
+let string_of_status = function
+  | Scheduled -> "Scheduled"
+  | Running -> "Running"
+  | Success -> "Success"
+  | Timeout -> "Timeout"
+  | Unknown -> "Unknown"
+  | HighFailure -> "HighFailure"
+
+let print_status fmt s = Format.fprintf fmt "%s" (string_of_status s)
+
 type prover =
     { prover_id : int64;
       prover_name : string;
@@ -118,7 +128,7 @@ let prover_name p = p.prover_name
 
 type external_proof = {
     mutable external_proof_id : db_ident;
-    mutable prover : prover;
+    mutable prover : db_ident;
     mutable timelimit : int;
     mutable memlimit : int;
     mutable status : proof_attempt_status;
@@ -127,7 +137,6 @@ type external_proof = {
     mutable proof_obsolete : bool;
 }
 
-let prover e = e.prover
 let timelimit e = e.timelimit
 let memlimit e = e.memlimit
 let status e = e.status
@@ -250,13 +259,56 @@ module Prover = struct
       | [x] -> x
       | _ -> assert false
 
+  let from_id db id =
+    let sql =
+      "SELECT prover.prover_id, prover.prover_name FROM prover WHERE prover.prover_id=?" 
+    in
+    let stmt=Sqlite3.prepare db.raw_db sql in
+    (* bind the position variables to the statement *)
+    db_must_ok db 
+      (fun () -> Sqlite3.bind stmt 1 (Sqlite3.Data.INT id));
+    (* convert statement into record *)
+    let of_stmt stmt =
+      { prover_id = id ;
+	prover_name =
+	  (match Sqlite3.column stmt 1 with
+	    | Sqlite3.Data.TEXT t -> t
+            | _ -> failwith "Prover.from_id: bad prover_name");
+      }
+    in 
+    (* execute the SQL query *)
+    match step_fold db stmt of_stmt with
+      | [] -> raise Not_found
+      | [x] -> x
+      | _ -> assert false
+
 end
 
-let get_prover n = 
+let prover_memo = Hashtbl.create 7
+
+let get_prover_from_id id =
+  try
+    Hashtbl.find prover_memo id
+  with Not_found ->
+    let p =
+      let db = current () in
+      try Prover.from_id db id
+      with Not_found -> assert false
+    in
+    Hashtbl.add prover_memo id p;
+    p
+
+let prover e = get_prover_from_id e.prover
+
+let get_prover n =
   let db = current () in
   try Prover.get db n
-  with Not_found -> Prover.add db n
+  with Not_found -> 
+    Prover.add db n
+ 
 	
+
+
 module Loc = struct
 
   let init db =
@@ -452,7 +504,12 @@ end
 let int64_from_bool b =
   if b then 1L else 0L
 
-let int64_from_pas = function
+let bool_from_int64 i =
+  if i=0L then false else
+    if i=1L then true else
+      failwith "Db.bool_from_int64"
+
+let int64_from_status = function
   | Scheduled -> 1L
   | Running -> 2L
   | Success -> 3L
@@ -460,10 +517,19 @@ let int64_from_pas = function
   | Unknown -> 5L
   | HighFailure -> 6L
 
+let status_from_int64 i = 
+  if i=1L then Scheduled else
+    if i=2L then Running else
+      if i=3L then Success else
+        if i=4L then Timeout else
+          if i=5L then Unknown else
+            if i=6L then HighFailure else
+              failwith "Db.status_from_int64"
+
 module External_proof = struct
 
   let init db =
-    let sql = "create table if not exists external_proof (id integer primary key autoincrement,prover text,timelimit integer,memlimit integer,status integer,result_time real,trace text,obsolete integer);" in
+    let sql = "CREATE TABLE IF NOT EXISTS external_proof (id INTEGER PRIMARY KEY AUTOINCREMENT,prover INTEGER,timelimit INTEGER,memlimit INTEGER,status INTEGER,result_time REAL,trace TEXT,obsolete INTEGER);" in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 
   let delete db e =
@@ -485,7 +551,7 @@ module External_proof = struct
 	 let stmt = Sqlite3.prepare db.raw_db sql in
 	 db_must_ok db 
 	   (fun () -> Sqlite3.bind stmt 1 
-	      (let v = e.prover.prover_name in Sqlite3.Data.TEXT v));
+	      (let v = e.prover in Sqlite3.Data.INT v));
 	 db_must_ok db 
 	   (fun () -> Sqlite3.bind stmt 2 
 	      (let v = Int64.of_int e.timelimit in Sqlite3.Data.INT v));
@@ -494,7 +560,7 @@ module External_proof = struct
 	      (let v = Int64.of_int e.memlimit in Sqlite3.Data.INT v));
 	 db_must_ok db 
 	   (fun () -> Sqlite3.bind stmt 4 
-	      (let v = int64_from_pas e.status in Sqlite3.Data.INT v));
+	      (let v = int64_from_status e.status in Sqlite3.Data.INT v));
 	 db_must_ok db 
 	   (fun () -> Sqlite3.bind stmt 5 
 	      (let v = e.result_time in Sqlite3.Data.FLOAT v));
@@ -510,6 +576,65 @@ module External_proof = struct
 	 e.external_proof_id <- new_id)
 
 
+  let set_status db e stat =
+      transaction db 
+        (fun () ->
+	   let id = e.external_proof_id in
+	   let sql = 
+	     "UPDATE external_proof SET status=? WHERE id=?" 
+	   in
+	   let stmt = Sqlite3.prepare db.raw_db sql in
+	   db_must_ok db 
+	     (fun () -> Sqlite3.bind stmt 1
+		(let v = int64_from_status stat in Sqlite3.Data.INT v));
+	   db_must_ok db 
+	     (fun () -> Sqlite3.bind stmt 2 (Sqlite3.Data.INT id));
+	   db_must_done db (fun () -> Sqlite3.step stmt))
+    
+  let from_id db id =
+      let sql="SELECT external_proof.prover, external_proof.timelimit, external_proof.memlimit, external_proof.status, external_proof.result_time, external_proof.trace, external_proof.obsolete FROM external_proof WHERE external_proof.id=?"
+      in
+      let stmt=Sqlite3.prepare db.raw_db sql in
+      db_must_ok db (fun () -> Sqlite3.bind stmt 1 (Sqlite3.Data.INT id));
+      let l = step_fold db stmt 
+        (fun stmt ->
+           { external_proof_id = id;
+	     prover = 
+	       (match Sqlite3.column stmt 0 with
+                  | Sqlite3.Data.INT i -> i
+                  | _ -> failwith "External_Proof.fromid: bad prover id");
+             timelimit =
+	       (match Sqlite3.column stmt 1 with
+                  | Sqlite3.Data.INT i -> Int64.to_int i 
+                  | _ -> failwith "External_Proof.fromid: bad timelimit");
+	     memlimit = 
+	       (match Sqlite3.column stmt 2 with
+                  | Sqlite3.Data.INT i -> Int64.to_int i 
+                  | _ -> failwith "External_Proof.fromid: bad memlimit");
+	     status =
+	       (match Sqlite3.column stmt 3 with
+                  | Sqlite3.Data.INT i -> status_from_int64 i
+                  | _ -> failwith "External_Proof.fromid: bad status");
+	     result_time =
+	       (match Sqlite3.column stmt 4 with
+                  | Sqlite3.Data.FLOAT f -> f
+                  | _ -> failwith "External_Proof.fromid: bad result_time");
+	     trace =
+	       (match Sqlite3.column stmt 5 with
+                  | Sqlite3.Data.TEXT t -> t
+                  | _ -> failwith "External_Proof.fromid: bad trace");
+	     proof_obsolete =
+	       (match Sqlite3.column stmt 6 with
+                  | Sqlite3.Data.INT i -> bool_from_int64 i
+                  | _ -> failwith "External_Proof.fromid: bad proof_obsolete");
+	   })
+    in
+    match l with
+      | [] -> raise Not_found
+      | [x] -> x
+      | _ -> assert false   
+
+    
 (* TODO: update functions for each field
     let update db (e : external_proof) = 
       transaction db 
@@ -688,6 +813,8 @@ module Goal = struct
 *)
     let sql = "create table if not exists goal (goal_id integer primary key autoincrement,task_checksum text,proved integer);" 
     in
+    db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
+    let sql = "create table if not exists map_goal_prover_external_proof (goal_id integer, prover_id integer, external_proof_id integer, primary key(goal_id, prover_id));" in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 
 
@@ -723,6 +850,58 @@ module Goal = struct
 	 let new_id = Sqlite3.last_insert_rowid db.raw_db in         
          Format.eprintf "Db.Goal.add: add a new goal with id=%Ld@." new_id;
 	 g.goal_id <- new_id)
+
+
+  let get_external_proof db ~prover g =
+    let sql="SELECT map_goal_prover_external_proof.external_proof_id FROM map_goal_prover_external_proof WHERE goal_id=? AND prover_id=?" in
+    let stmt = Sqlite3.prepare db.raw_db sql in
+    db_must_ok db 
+      (fun () -> Sqlite3.bind stmt 1 (Sqlite3.Data.INT g.goal_id));
+    db_must_ok db 
+      (fun () -> Sqlite3.bind stmt 2 (Sqlite3.Data.INT prover.prover_id));
+    let l = step_fold db stmt 
+      (fun stmt ->  
+         match Sqlite3.column stmt 0 with
+           | Sqlite3.Data.INT i -> i 
+              | x -> (try Int64.of_string (Sqlite3.Data.to_string x) 
+                      with _ -> failwith "Db.get_external_proof"))
+    in
+    match l with
+      | [] -> raise Not_found
+      | [x] -> External_proof.from_id db x
+      | _ -> assert false   
+
+    let add_external_proof db ~prover g =
+      let e = {
+        external_proof_id = 0L;
+        prover = prover.prover_id;
+        timelimit = 0;
+        memlimit = 0;
+        status = Scheduled;
+        result_time = 0.0;
+        trace = "";
+        proof_obsolete = false;
+      }
+      in
+      External_proof.add db e;
+      let id = e.external_proof_id in
+      transaction db 
+        (fun () ->
+	   let sql = 
+	     "INSERT INTO map_goal_prover_external_proof VALUES(?,?,?)" 
+	   in
+	   let stmt = Sqlite3.prepare db.raw_db sql in
+	   db_must_ok db 
+	     (fun () -> Sqlite3.bind stmt 1 (Sqlite3.Data.INT g.goal_id));
+	   db_must_ok db 
+	     (fun () -> Sqlite3.bind stmt 2 (Sqlite3.Data.INT prover.prover_id));
+	   db_must_ok db 
+	     (fun () -> Sqlite3.bind stmt 3 (Sqlite3.Data.INT id));
+	   db_must_done db 
+	     (fun () -> Sqlite3.step stmt);
+        );
+      e
+
 
 (* TODO make specific update functions for each field ! *)
 (*
@@ -1260,14 +1439,45 @@ let string_from_result = function
 
 exception AlreadyAttempted
 
-let try_prover ~debug ~timelimit ~memlimit ~prover:_prover ~command ~driver 
+let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver 
     (g : goal) : unit -> unit =
-  (* TODO: check if attempt already present *)
-  (* TODO: add attempt as "Running" *)
+  let db = current () in
+  let attempt =
+    try
+      if debug then Format.printf "looking for an attempt with same prover@.";
+      let a = Goal.get_external_proof db ~prover g in
+      if debug then Format.printf "attempt found, status=%a@." print_status a.status;
+      match a.status with
+          (* if already in progress, do not try again *)
+        | Scheduled | Running -> raise AlreadyAttempted
+          (* if already non-obsolete result within the timelimit, do not try again *)
+        | Success | Unknown | HighFailure ->
+            if a.proof_obsolete then a else raise AlreadyAttempted
+          (* if already non-obsolete timeout with a higher or equal timelimit,
+             do not try again *)
+        | Timeout -> 
+            if a.proof_obsolete then a else
+              if a.timelimit < timelimit then a 
+              else raise AlreadyAttempted
+    with Not_found ->
+      if debug then Format.printf "no attempt found, adding one@.";
+      Goal.add_external_proof db ~prover g
+  in
+  if debug then Format.printf "setting attempt status to Scheduled@.";
+  External_proof.set_status db attempt Scheduled;
   if debug then Format.eprintf "Task : %a@." Why.Pretty.print_task g.task;
-  let task = match Why.Driver.apply_transforms driver g.task with
-    | [t] -> t
-    | _ -> assert false
+  let task = 
+    try
+      match Why.Driver.apply_transforms driver g.task with
+        | [t] -> t
+        | _ -> assert false
+    with Why.Driver.Error e -> 
+      Format.eprintf "Db.try_prover: apply_transforms reports %a@." Why.Driver.report e;
+      raise Exit
+      | e ->
+          try 
+            Printexc.print (fun () -> raise e) ()
+          with _ -> raise Exit
   in
   if debug then Format.eprintf "Task for prover: %a@." (Why.Driver.print_task driver) task;
   let callback = 
@@ -1282,10 +1492,21 @@ let try_prover ~debug ~timelimit ~memlimit ~prover:_prover ~command ~driver
       ~command ~timelimit ~memlimit ~regexps print_task
   in
   fun () ->
+    if debug then Format.printf "setting attempt status to Running@.";
+    External_proof.set_status db attempt Running;
     let r = callback () in
     if debug then Format.eprintf "prover result: %a@." Why.Call_provers.print_prover_result r;
-    (* TODO : update attempt depending on r = Valid *)
-    ()
+    match r.Why.Call_provers.pr_answer with
+      | Why.Call_provers.Valid ->
+          External_proof.set_status db attempt Success;
+          (* TODO: update "proved" status of goal and its parents *)
+          ()         
+      | Why.Call_provers.Timeout ->
+          External_proof.set_status db attempt Timeout
+      | Why.Call_provers.Invalid | Why.Call_provers.Unknown _ ->
+          External_proof.set_status db attempt Unknown
+      | Why.Call_provers.Failure _ | Why.Call_provers.HighFailure ->
+          External_proof.set_status db attempt HighFailure
       
 
 let add_transformation (_g : goal) (_t : transf) :  unit =

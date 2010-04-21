@@ -183,8 +183,8 @@ val try_prover :
       positive. If not given, does not limit memory consumption
 
       @raise AlreadyAttempted if there already exists a non-obsolete
-      external proof attempt with the same driver and time limit, or
-      with a different time limit and a result different from Timeout
+      external proof attempt with the same prover and time limit, or
+      with a lower or equal time limit and a result different from Timeout
 
 
   *)
