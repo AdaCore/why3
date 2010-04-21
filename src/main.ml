@@ -150,12 +150,16 @@ let option_list = Arg.align [
 let () =
   Arg.parse option_list add_opt_file usage_msg;
 
-  if !opt_list_transforms then
-    printf "@[<hov 2>Registered transformations:@\n%a@]@."
+  if !opt_list_transforms then begin
+    printf "@[<hov 2>Registered non-splitting transformations:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
       (List.sort String.compare (Driver.list_transforms ()));
+    printf "@[<hov 2>Registered splitting transformations:@\n%a@]@\n@."
+      (Pp.print_list Pp.newline Pp.string)
+      (List.sort String.compare (Driver.list_transforms_l ()));
+  end;
   if !opt_list_printers then
-    printf "@[<hov 2>Registered printers:@\n%a@]@."
+    printf "@[<hov 2>Registered printers:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
       (List.sort String.compare (Driver.list_printers ()));
   if !opt_list_provers then begin
