@@ -72,11 +72,12 @@ let call_prover debug command opt_cout buffer =
 let call_on_buffer ?(debug=false) ~command ~timelimit ~memlimit
                                   ~regexps ~exitcodes ~filename buffer () =
   let on_stdin = ref true in
+  let on_timelimit = ref false in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
   let replace file s = match Str.matched_group 1 s with
     | "%" -> "%"
     | "f" -> on_stdin := false; file
-    | "t" -> string_of_int timelimit
+    | "t" -> on_timelimit := true; string_of_int timelimit
     | "m" -> string_of_int memlimit
     | _ -> failwith "unknown format specifier, use %%f, %%t or %%m"
   in
@@ -107,8 +108,8 @@ let call_on_buffer ?(debug=false) ~command ~timelimit ~memlimit
         (try List.assoc n exitcodes with Not_found -> grep out regexps)
   in
   let ans = match ans with
-    | HighFailure
-      when timelimit > 0 && time >= (0.9 *. float timelimit) -> Timeout
+    | HighFailure when !on_timelimit && timelimit > 0 
+      && time >= (0.9 *. float timelimit) -> Timeout
     | _ -> ans
   in
   { pr_answer = ans;
