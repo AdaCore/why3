@@ -152,8 +152,9 @@ let conv_ls tenv ls =
   then ls
   else
     let tyl = List.map (conv_ty_neg tenv) ls.ls_args in
-    let ty_res = Util.option_maq (conv_ty_pos tenv) ls.ls_value in
-    if ty_res == ls.ls_value && List.for_all2 (==) tyl ls.ls_args 
+    let ty_res = Util.option_map (conv_ty_pos tenv) ls.ls_value in
+    if Util.option_eq (==) ty_res ls.ls_value 
+      && List.for_all2 (==) tyl ls.ls_args 
     then ls
     else
       let preid = id_clone ls.ls_name in
