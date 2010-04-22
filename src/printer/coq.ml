@@ -76,14 +76,12 @@ let print_pr fmt pr =
 
 let rec print_ty drv fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
-  | Tyapp (ts, tl) ->
-    begin match drv ts.ts_name with
-      | Syntax s -> syntax_arguments s (print_ty drv) fmt tl
-      | _ ->
-        begin match tl with
+  | Tyapp (ts, tl) -> begin match drv.Driver.query_syntax ts.ts_name with
+      | Some s -> syntax_arguments s (print_ty drv) fmt tl
+      | None -> begin match tl with
           | []  -> print_ts fmt ts
           | l   -> fprintf fmt "(%a@ %a)" print_ts ts
-                     (print_list space (print_ty drv)) l 
+                     (print_list space (print_ty drv)) l
         end
     end
 
@@ -115,9 +113,8 @@ let rec print_pat drv fmt p = match p.pat_node with
   | Pwild -> fprintf fmt "_"
   | Pvar v -> print_vs fmt v
   | Pas (p,v) -> fprintf fmt "%a as %a" (print_pat drv) p print_vs v
-  | Papp (cs,pl) ->
-    begin match drv cs.ls_name with
-      | Syntax s -> syntax_arguments s (print_pat drv) fmt pl
+  | Papp (cs,pl) -> begin match drv.query_syntax cs.ls_name with
+      | Some s -> syntax_arguments s (print_pat drv) fmt pl
       | _ -> fprintf fmt "%a%a"
           print_ls cs (print_paren_r (print_pat drv)) pl
     end
@@ -162,7 +159,7 @@ and print_tnode opl opr drv fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst (ConstInt n) -> fprintf fmt "%s%%Z" n
-  | Tconst (ConstReal c) -> 
+  | Tconst (ConstReal c) ->
       Print_real.print_with_integers
 	"(%s)%%R" "(%s * %s)%%R" "(%s / %s)%%R" fmt c
   | Tif (f,t1,t2) ->
@@ -183,8 +180,8 @@ and print_tnode opl opr drv fmt t = match t.t_node with
         (print_vsty drv) v (print_opl_fmla drv) f;
       forget_var v
   | Tapp (fs, tl) ->
-    begin match drv fs.ls_name with
-      | Syntax s ->           
+    begin match drv.query_syntax fs.ls_name with
+      | Some s ->
           syntax_arguments s (print_term drv) fmt tl
       | _ -> if unambig_fs fs
           then fprintf fmt "(%a %a)" print_ls fs
@@ -222,8 +219,8 @@ and print_fnode opl opr drv fmt f = match f.f_node with
       fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
         (print_fmla drv) f1 (print_fmla drv) f2 (print_opl_fmla drv) f3
   | Fapp (ps, tl) ->
-    begin match drv ps.ls_name with
-      | Syntax s -> syntax_arguments s (print_term drv) fmt tl
+    begin match drv.query_syntax ps.ls_name with
+      | Some s -> syntax_arguments s (print_term drv) fmt tl
       | _ -> fprintf fmt "(%a %a)" print_ls ps
           (print_space_list (print_term drv)) tl
     end
@@ -256,24 +253,23 @@ let print_type_decl drv fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
       | None ->
           fprintf fmt "@[<hov 2>Parameter %a : %aType.@]@\n@\n"
-            print_ts ts (print_arrow_list print_tv) ts.ts_args 
+            print_ts ts (print_arrow_list print_tv) ts.ts_args
       | Some ty ->
           fprintf fmt "@[<hov 2>Definition %a %a :=@ %a@]@\n@\n"
-            print_ts ts (print_arrow_list print_tv) ts.ts_args 
+            print_ts ts (print_arrow_list print_tv) ts.ts_args
 	    (print_ty drv) ty
       end
   | Talgebraic csl ->
       fprintf fmt "@[<hov 2>Inductive %a %a :=@\n@[<hov>%a@].@]@\n@\n"
-        print_ts ts (print_arrow_list print_tv) ts.ts_args 
+        print_ts ts (print_arrow_list print_tv) ts.ts_args
         (print_list newline (print_constr drv)) csl
 
 let print_type_decl drv fmt d =
-  match drv (fst d).ts_name with
-    | Syntax _ -> ()
-    | Remove -> ()
-    | _ -> print_type_decl drv fmt d; forget_tvs ()
+  match drv.query_syntax (fst d).ts_name with
+    | Some _ -> ()
+    | None -> print_type_decl drv fmt d; forget_tvs ()
 
-let print_ls_type ?(arrow=false) drv fmt ls = 
+let print_ls_type ?(arrow=false) drv fmt ls =
   if arrow then fprintf fmt " ->@ ";
   match ls with
   | None -> fprintf fmt "Prop"
@@ -293,10 +289,9 @@ let print_logic_decl drv fmt (ls,ld) = match ld with
         (print_ls_type ~arrow:(List.length ls.ls_args > 0) drv) ls.ls_value
 
 let print_logic_decl drv fmt d =
-  match drv (fst d).ls_name with
-    | Syntax _ -> ()
-    | Remove -> ()
-    | Tag _ -> print_logic_decl drv fmt d; forget_tvs ()
+  match drv.query_syntax (fst d).ls_name with
+    | Some _ -> ()
+    | None -> print_logic_decl drv fmt d; forget_tvs ()
 
 let print_ind drv fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr (print_fmla drv) f
@@ -307,10 +302,9 @@ let print_ind_decl drv fmt (ps,bl) =
      (print_list newline (print_ind drv)) bl
 
 let print_ind_decl drv fmt d =
-  match drv (fst d).ls_name with
-    | Syntax _ -> ()
-    | Remove -> ()
-    | Tag _ -> print_ind_decl drv fmt d; forget_tvs ()
+  match drv.query_syntax (fst d).ls_name with
+    | Some _ -> ()
+    | None -> print_ind_decl drv fmt d; forget_tvs ()
 
 let print_pkind fmt = function
   | Paxiom -> fprintf fmt "Axiom"
@@ -325,20 +319,17 @@ let print_decl drv fmt d = match d.d_node with
   | Dtype tl  -> print_list nothing (print_type_decl drv) fmt tl
   | Dlogic ll -> print_list nothing (print_logic_decl drv) fmt ll
   | Dind il   -> print_list nothing (print_ind_decl drv) fmt il
+  | Dprop (_,pr,_) when drv.query_remove pr.pr_name -> ()
   | Dprop (k,pr,f) ->
-      match drv pr.pr_name with
-	| Remove -> ()
-	| Syntax _ -> assert false (* cannot happen *)
-	| Tag _ -> 
-	    fprintf fmt "@[<hov 2>%a %a : %a.@]@\n%a@\n" print_pkind k
-	      print_pr pr (print_fmla drv) f print_proof k;
-	    forget_tvs ()
+      fprintf fmt "@[<hov 2>%a %a : %a.@]@\n%a@\n" print_pkind k
+        print_pr pr (print_fmla drv) f print_proof k;
+      forget_tvs ()
 
 let print_decls drv fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl drv)) dl
 
 let print_task drv fmt task =
-  forget_all (); 
+  forget_all ();
   print_decls drv fmt (Task.task_decls task)
 
 let () = register_printer "coq" print_task

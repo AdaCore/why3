@@ -86,17 +86,15 @@ let rec ns_comma fmt () = fprintf fmt ",@,"
 
 let rec print_ty drv fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
-  | Tyapp (ts, tl) ->
-    begin match drv ts.ts_name with
-      | Syntax s -> syntax_arguments s (print_ty drv) fmt tl
-      | _ ->
-        begin match tl with
-          | []  -> print_ts fmt ts
-          | [t] -> fprintf fmt "%a@ %a" (print_ty drv) t print_ts ts
-          | l   -> fprintf fmt "(%a)@ %a"
-                     (print_list ns_comma (print_ty drv)) l print_ts ts
-        end
+  | Tyapp (ts, tl) -> begin match drv.query_syntax ts.ts_name with
+      | Some s -> syntax_arguments s (print_ty drv) fmt tl
+      | None -> fprintf fmt "%a%a" (print_tyapp drv) tl print_ts ts
     end
+
+and print_tyapp drv fmt = function
+  | []  -> ()
+  | [t] -> fprintf fmt "%a@ " (print_ty drv) t
+  | l   -> fprintf fmt "(%a)@ " (print_list ns_comma (print_ty drv)) l
 
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
@@ -122,10 +120,9 @@ let rec print_pat drv fmt p = match p.pat_node with
   | Pwild -> fprintf fmt "_"
   | Pvar v -> print_vs fmt v
   | Pas (p,v) -> fprintf fmt "%a as %a" (print_pat drv) p print_vs v
-  | Papp (cs,pl) ->
-    begin match drv cs.ls_name with
-      | Syntax s -> syntax_arguments s (print_pat drv) fmt pl
-      | _ -> fprintf fmt "%a%a"
+  | Papp (cs,pl) -> begin match drv.query_syntax cs.ls_name with
+      | Some s -> syntax_arguments s (print_pat drv) fmt pl
+      | None -> fprintf fmt "%a%a"
           print_cs cs (print_paren_r (print_pat drv)) pl
     end
 
@@ -187,10 +184,9 @@ and print_tnode opl opr drv fmt t = match t.t_node with
       fprintf fmt (protect_on opr "epsilon %a.@ %a")
         (print_vsty drv) v (print_opl_fmla drv) f;
       forget_var v
-  | Tapp (fs, tl) ->
-    begin match drv fs.ls_name with
-      | Syntax s -> syntax_arguments s (print_term drv) fmt tl
-      | _ -> if unambig_fs fs
+  | Tapp (fs, tl) -> begin match drv.query_syntax fs.ls_name with
+      | Some s -> syntax_arguments s (print_term drv) fmt tl
+      | None -> if unambig_fs fs
           then fprintf fmt "%a%a" print_ls fs
             (print_paren_r (print_term drv)) tl
           else fprintf fmt (protect_on opl "%a%a:%a") print_ls fs
@@ -225,10 +221,9 @@ and print_fnode opl opr drv fmt f = match f.f_node with
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
         (print_list comma (print_term drv)) tl
         (print_list newline (print_fbranch drv)) bl
-  | Fapp (ps, tl) ->
-    begin match drv ps.ls_name with
-      | Syntax s -> syntax_arguments s (print_term drv) fmt tl
-      | _ -> fprintf fmt "%a%a" print_ls ps
+  | Fapp (ps, tl) -> begin match drv.query_syntax ps.ls_name with
+      | Some s -> syntax_arguments s (print_term drv) fmt tl
+      | None -> fprintf fmt "%a%a" print_ls ps
             (print_paren_r (print_term drv)) tl
     end
 
@@ -276,9 +271,9 @@ let print_type_decl drv fmt (ts,def) = match def with
         (print_list newline (print_constr drv)) csl
 
 let print_type_decl drv fmt d =
-  match drv (fst d).ts_name with
-    | Syntax _ -> ()
-    | _ -> print_type_decl drv fmt d; forget_tvs ()
+  match drv.query_syntax (fst d).ts_name with
+    | Some _ -> ()
+    | None -> print_type_decl drv fmt d; forget_tvs ()
 
 let print_ls_type drv fmt = fprintf fmt " :@ %a" (print_ty drv)
 
@@ -296,9 +291,9 @@ let print_logic_decl drv fmt (ls,ld) = match ld with
         (print_option (print_ls_type drv)) ls.ls_value
 
 let print_logic_decl drv fmt d =
-  match drv (fst d).ls_name with
-    | Syntax _ -> ()
-    | _ -> print_logic_decl drv fmt d; forget_tvs ()
+  match drv.query_syntax (fst d).ls_name with
+    | Some _ -> ()
+    | None -> print_logic_decl drv fmt d; forget_tvs ()
 
 let print_ind drv fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr (print_fmla drv) f
@@ -309,9 +304,9 @@ let print_ind_decl drv fmt (ps,bl) =
      (print_list newline (print_ind drv)) bl
 
 let print_ind_decl drv fmt d =
-  match drv (fst d).ls_name with
-    | Syntax _ -> ()
-    | _ -> print_ind_decl drv fmt d; forget_tvs ()
+  match drv.query_syntax (fst d).ls_name with
+    | Some _ -> ()
+    | None -> print_ind_decl drv fmt d; forget_tvs ()
 
 let print_pkind fmt = function
   | Paxiom -> fprintf fmt "axiom"
@@ -322,10 +317,9 @@ let print_prop_decl drv fmt (k,pr,f) =
   fprintf fmt "@[<hov 2>%a %a : %a@]@\n@\n" print_pkind k
     print_pr pr (print_fmla drv) f
 
-let print_prop_decl drv fmt (k,pr,f) =
-  match k, drv pr.pr_name with
-    | Paxiom, Remove -> ()
-    | _ -> print_prop_decl drv fmt (k,pr,f); forget_tvs ()
+let print_prop_decl drv fmt (k,pr,f) = match k with
+  | Paxiom when drv.query_remove pr.pr_name -> ()
+  | _ -> print_prop_decl drv fmt (k,pr,f); forget_tvs ()
 
 let print_decl drv fmt d = match d.d_node with
   | Dtype tl  -> print_list nothing (print_type_decl drv) fmt tl

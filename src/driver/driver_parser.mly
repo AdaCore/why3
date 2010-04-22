@@ -85,10 +85,10 @@ list0_trule:
 
 trule:
 | PRELUDE STRING                      { Rprelude  ($2) }
-| REMOVE cloned PROP qualid           { Rremove   ($2, $4) }
-| SYNTAX TYPE qualid STRING           { Rsyntaxty ($3, $4) }
+| SYNTAX TYPE qualid STRING           { Rsyntaxts ($3, $4) }
 | SYNTAX LOGIC qualid STRING          { Rsyntaxls ($3, $4) }
-| TAG cloned TYPE qualid STRING       { Rtagty    ($2, $4, $5) }
+| REMOVE cloned PROP qualid           { Rremovepr ($2, $4) }
+| TAG cloned TYPE qualid STRING       { Rtagts    ($2, $4, $5) }
 | TAG cloned LOGIC qualid STRING      { Rtagls    ($2, $4, $5) }
 | TAG cloned PROP qualid STRING       { Rtagpr    ($2, $4, $5) }
 ;

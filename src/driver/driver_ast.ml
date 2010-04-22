@@ -23,18 +23,18 @@ type qualid = loc * string list
 
 type cloned = bool
 
-type trule =
-  | Rremove   of cloned * qualid
-  | Rsyntaxty of qualid * string
+type th_rule =
+  | Rprelude  of string
+  | Rsyntaxts of qualid * string
   | Rsyntaxls of qualid * string
-  | Rtagty    of cloned * qualid * string
+  | Rremovepr of cloned * qualid
+  | Rtagts    of cloned * qualid * string
   | Rtagls    of cloned * qualid * string
   | Rtagpr    of cloned * qualid * string
-  | Rprelude  of string
 
 type theory_rules = {
   thr_name  : qualid;
-  thr_rules : (loc * trule) list;
+  thr_rules : (loc * th_rule) list;
 }
 
 type global =

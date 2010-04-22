@@ -106,34 +106,28 @@ let syntax_arguments s print fmt l =
 
 (** drivers *)
 
-type translation =
-  | Remove
-  | Syntax of string
-  | Tag of Sstr.t
+type driver_query = {
+  query_syntax : ident -> string option;
+  query_remove : ident -> bool;
+  query_tags   : ident -> Sstr.t;
+}
 
-let translation_union t1 t2 = match t1, t2 with
-  | Remove, _ | _, Remove -> Remove
-  | ((Syntax _ as s), _) | (_,(Syntax _ as s)) -> s
-  | Tag s1, Tag s2 -> Tag (Sstr.union s1 s2)
-
-let print_translation fmt = function
-  | Remove -> Format.fprintf fmt "remove"
-  | Syntax s -> Format.fprintf fmt "syntax %s" s
-  | Tag s -> Format.fprintf fmt "tag %a"
-      (Pp.print_iter1 Sstr.iter Pp.comma Pp.string) s
-
-type printer = (ident -> translation) -> Format.formatter -> task -> unit
+type printer = driver_query -> Format.formatter -> task -> unit
 
 type driver = {
-  drv_env          : Env.env;
-  drv_printer      : printer option;
-  drv_prelude      : string list;
-  drv_filename     : string option;
-  drv_transform    : task trans_reg;
-  drv_thprelude    : string list Mid.t;
-  drv_translations : (translation * translation) Mid.t;
-  drv_regexps      : (Str.regexp * Call_provers.prover_answer) list;
-  drv_exitcodes    : (int * Call_provers.prover_answer) list;
+  drv_env       : Env.env;
+  drv_printer   : printer option;
+  drv_prelude   : string list;
+  drv_filename  : string option;
+  drv_transform : task trans_reg;
+  drv_thprelude : string list Mid.t;
+  drv_tags      : Sstr.t Mid.t;
+  drv_tags_cl   : Sstr.t Mid.t;
+  drv_syntax    : string Mid.t;
+  drv_remove    : Sid.t;
+  drv_remove_cl : Sid.t;
+  drv_regexps   : (Str.regexp * Call_provers.prover_answer) list;
+  drv_exitcodes : (int * Call_provers.prover_answer) list;
 }
 
 (** register printers and transformations *)
@@ -169,56 +163,6 @@ let load_file file =
 let string_of_qualid thl idl =
   String.concat "." thl ^ "." ^ String.concat "." idl
 
-let add_htheory tmap cloned id t =
-  try
-    let t2,t3 = Mid.find id tmap in
-    let t23 = if cloned
-      then translation_union t t2, t3
-      else t2, translation_union t t3
-    in
-    Mid.add id t23 tmap
-  with Not_found ->
-    let t23 = if cloned
-      then Tag Sstr.empty, t
-      else t, Tag Sstr.empty
-    in
-    Mid.add id t23 tmap
-
-let load_rules env (pmap,tmap) { thr_name = (loc,qualid); thr_rules = trl } =
-  let qfile,id = let l = List.rev qualid in List.rev (List.tl l),List.hd l in
-  let th = try Env.find_theory env qfile id with Env.TheoryNotFound (l,s) ->
-    errorm ~loc "theory %s.%s not found" (String.concat "." l) s
-  in
-  let find_pr (loc,q) = try ns_find_pr th.th_export q with Not_found ->
-    errorm ~loc "Unknown proposition %s" (string_of_qualid qualid q)
-  in
-  let find_ls (loc,q) = try ns_find_ls th.th_export q with Not_found ->
-    errorm ~loc "Unknown logic symbol %s" (string_of_qualid qualid q)
-  in
-  let find_ts (loc,q) = try ns_find_ts th.th_export q with Not_found ->
-    errorm ~loc "Unknown type symbol %s" (string_of_qualid qualid q)
-  in
-  let add (pmap,tmap) (loc,rule) = match rule with
-    | Rremove (c,q) ->
-        pmap, add_htheory tmap c (find_pr q).pr_name Remove
-    | Rsyntaxls (q,s) -> let ls = find_ls q in
-        check_syntax loc s (List.length ls.ls_args);
-        pmap, add_htheory tmap false ls.ls_name (Syntax s)
-    | Rsyntaxty (q,s) -> let ts = find_ts q in
-        check_syntax loc s (List.length ts.ts_args);
-        pmap, add_htheory tmap false ts.ts_name (Syntax s)
-    | Rtagls (c,q,s) ->
-        pmap, add_htheory tmap c (find_ls q).ls_name (Tag (Sstr.singleton s))
-    | Rtagty (c,q,s) ->
-        pmap, add_htheory tmap c (find_ts q).ts_name (Tag (Sstr.singleton s))
-    | Rtagpr (c,q,s) ->
-        pmap, add_htheory tmap c (find_pr q).pr_name (Tag (Sstr.singleton s))
-    | Rprelude s ->
-        let l = try Mid.find th.th_name pmap with Not_found -> [] in
-        Mid.add th.th_name (s::l) pmap, tmap
-  in
-  List.fold_left add (pmap,tmap) trl
-
 let load_driver env file =
   let prelude   = ref [] in
   let regexps   = ref [] in
@@ -226,12 +170,13 @@ let load_driver env file =
   let filename  = ref None in
   let printer   = ref None in
   let transform = ref identity in
+
   let set_or_raise loc r v error = match !r with
     | Some _ -> errorm ~loc "duplicate %s" error
     | None   -> r := Some v
   in
   let add_to_list r v = (r := v :: !r) in
-  let add (loc, g) = match g with
+  let add_global (loc, g) = match g with
     | Prelude s -> add_to_list prelude s
     | RegexpValid s -> add_to_list regexps (Str.regexp s, Valid)
     | RegexpInvalid s -> add_to_list regexps (Str.regexp s, Invalid)
@@ -253,43 +198,106 @@ let load_driver env file =
     | Plugin files -> load_plugin (Filename.dirname file) files
   in
   let f = load_file file in
-  List.iter add f.f_global;
-  let (pmap,tmap) =
-      List.fold_left (load_rules env) (Mid.empty,Mid.empty) f.f_rules
+  List.iter add_global f.f_global;
+
+  let thprelude = ref Mid.empty in
+  let tags      = ref Mid.empty in
+  let tags_cl   = ref Mid.empty in
+  let syntax    = ref Mid.empty in
+  let remove    = ref Sid.empty in
+  let remove_cl = ref Sid.empty in
+  let qualid    = ref [] in
+
+  let find_pr th (loc,q) = try ns_find_pr th.th_export q with Not_found ->
+    errorm ~loc "unknown proposition %s" (string_of_qualid !qualid q)
   in
+  let find_ls th (loc,q) = try ns_find_ls th.th_export q with Not_found ->
+    errorm ~loc "unknown logic symbol %s" (string_of_qualid !qualid q)
+  in
+  let find_ts th (loc,q) = try ns_find_ts th.th_export q with Not_found ->
+    errorm ~loc "unknown type symbol %s" (string_of_qualid !qualid q)
+  in
+  let add_syntax loc k (_,q) id n s =
+    check_syntax loc s n;
+    if Mid.mem id !syntax then
+      errorm ~loc "duplicate syntax rule for %s symbol %s"
+        k (string_of_qualid !qualid q);
+    syntax := Mid.add id s !syntax
+  in
+  let add_tag c id s =
+    let mr = if c then tags_cl else tags in
+    let im = try Mid.find id !mr with Not_found -> Sstr.empty in
+    mr := Mid.add id (Sstr.add s im) !mr
+  in
+  let add_local th (loc,rule) = match rule with
+    | Rprelude s ->
+        let l = try Mid.find th.th_name !thprelude with Not_found -> [] in
+        thprelude := Mid.add th.th_name (s::l) !thprelude
+    | Rsyntaxls (q,s) ->
+        let ls = find_ls th q in
+        add_syntax loc "logic" q ls.ls_name (List.length ls.ls_args) s
+    | Rsyntaxts (q,s) ->
+        let ts = find_ts th q in
+        add_syntax loc "type"  q ts.ts_name (List.length ts.ts_args) s
+    | Rremovepr (c,q) ->
+        let sr = if c then remove_cl else remove in
+        sr := Sid.add (find_pr th q).pr_name !sr
+    | Rtagts (c,q,s) -> add_tag c (find_ts th q).ts_name s
+    | Rtagls (c,q,s) -> add_tag c (find_ls th q).ls_name s
+    | Rtagpr (c,q,s) -> add_tag c (find_pr th q).pr_name s
+  in
+  let add_theory { thr_name = (loc,q); thr_rules = trl } =
+    let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
+    let th = try Env.find_theory env f id with Env.TheoryNotFound (l,s) ->
+      errorm ~loc "theory %s.%s not found" (String.concat "." l) s
+    in
+    qualid := q;
+    List.iter (add_local th) trl
+  in
+  List.iter add_theory f.f_rules;
   {
-    drv_env          = env;
-    drv_printer      = !printer;
-    drv_prelude      = !prelude;
-    drv_filename     = !filename;
-    drv_transform    = !transform;
-    drv_thprelude    = pmap;
-    drv_translations = tmap;
-    drv_regexps      = !regexps;
-    drv_exitcodes    = !exitcodes;
+    drv_env       = env;
+    drv_printer   = !printer;
+    drv_prelude   = !prelude;
+    drv_filename  = !filename;
+    drv_transform = !transform;
+    drv_thprelude = !thprelude;
+    drv_tags      = !tags;
+    drv_tags_cl   = !tags_cl;
+    drv_syntax    = !syntax;
+    drv_remove    = !remove;
+    drv_remove_cl = !remove_cl;
+    drv_regexps   = !regexps;
+    drv_exitcodes = !exitcodes;
   }
 
-(** querying drivers *)
+(** query drivers *)
 
-let query_ident drv clone =
-  let h = Hid.create 7 in
-  fun id ->
-    try
-      Hid.find h id
-    with Not_found ->
-      let r = try
-        Mid.find id clone
-      with Not_found -> Sid.empty in
-      let tr = try fst (Mid.find id drv.drv_translations)
-      with Not_found -> Tag Sstr.empty in
-      let tr = Sid.fold
-        (fun id acc -> try translation_union acc
-           (snd (Mid.find id drv.drv_translations))
-         with Not_found -> acc) r tr in
-      Hid.add h id tr;
-      tr
+let get_tags map id = try Mid.find id map with Not_found -> Sstr.empty
+let add_tags drv id acc = Sstr.union (get_tags drv.drv_tags_cl id) acc
+let add_remove drv id acc = acc || Sid.mem id drv.drv_remove_cl
 
-(** using drivers *)
+let query_driver drv clone =
+  let htags = Hid.create 7 in
+  let query_tags id = try Hid.find htags id with Not_found ->
+    let r = try Mid.find id clone with Not_found -> Sid.empty in
+    let s = Sid.fold (add_tags drv) r (get_tags drv.drv_tags id) in
+    Hid.replace htags id s; s
+  in
+  let hremove = Hid.create 7 in
+  let query_remove id = try Hid.find hremove id with Not_found ->
+    let r = try Mid.find id clone with Not_found -> Sid.empty in
+    let s = Sid.fold (add_remove drv) r (Sid.mem id drv.drv_remove) in
+    Hid.replace hremove id s; s
+  in
+  let query_syntax id =
+    try Some (Mid.find id drv.drv_syntax) with Not_found -> None
+  in
+  { query_syntax = query_syntax;
+    query_remove = query_remove;
+    query_tags   = query_tags }
+
+(** apply drivers *)
 
 let print_prelude drv used fmt =
   let pr_pr s () = Format.fprintf fmt "%s@\n" s in
@@ -313,7 +321,7 @@ let print_task drv fmt task =
   let task = apply_env drv.drv_transform drv.drv_env task in
   let printer = match drv.drv_printer with
     | None -> errorm "no printer specified in the driver file"
-    | Some p -> p (query_ident drv (task_clone task))
+    | Some p -> p (query_driver drv (task_clone task))
   in
   print_prelude drv (task_used task) fmt;
   Format.fprintf fmt "@[%a@]@?" printer task

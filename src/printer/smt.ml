@@ -52,44 +52,27 @@ let print_var fmt {vs_name = id} =
 let rec print_type drv fmt ty = match ty.ty_node with
   | Tyvar id -> 
       print_tvsymbols fmt id
-  | Tyapp (ts, tl) -> 
-      match drv ts.ts_name with
-        | Driver.Remove -> assert false (* Mettre une erreur *)
-        | Driver.Syntax s ->
-            Driver.syntax_arguments s (print_type drv) fmt tl
-        | Driver.Tag _ -> 
-            begin
-              match ty.ty_node with
-                | Tyvar _ -> assert false
-                | Tyapp (ts,[]) -> 
-                    print_ident fmt ts.ts_name
-                | Tyapp (ts, [ty]) -> 
-                    fprintf fmt "%a %a" (print_type drv) 
-                      ty print_ident ts.ts_name
-                | Tyapp (ts, tyl) ->
-                    fprintf fmt "(%a) %a" 
-	              (print_list comma (print_type drv)) 
-                      tyl print_ident ts.ts_name
-            end
+  | Tyapp (ts, tl) -> begin match drv.Driver.query_syntax ts.ts_name with 
+      | Some s -> Driver.syntax_arguments s (print_type drv) fmt tl
+      | None -> fprintf fmt "%a%a" (print_tyapp drv) tl print_ident ts.ts_name
+    end
+
+and print_tyapp drv fmt = function
+  | [] -> ()
+  | [ty] -> fprintf fmt "%a " (print_type drv) ty
+  | tl -> fprintf fmt "(%a) " (print_list comma (print_type drv)) tl
+
 let rec print_term drv fmt t = match t.t_node with
   | Tbvar _ -> 
       assert false
   | Tconst c ->
       Pretty.print_const fmt c
   | Tvar v -> print_var fmt v
-  | Tapp (ls, tl) ->
-      begin      
-        match drv ls.ls_name with
-          | Driver.Remove -> assert false (* Mettre une erreur *)
-          | Driver.Syntax s ->
-              Driver.syntax_arguments s (print_term drv) fmt tl
-          | Driver.Tag _ ->
-              match tl with
-                | [] -> print_ident fmt ls.ls_name
-                | tl ->
-              fprintf fmt "@[(%a %a)@]" 
-	        print_ident ls.ls_name (print_list space (print_term drv)) tl
-      end
+  | Tapp (ls, tl) -> begin match drv.Driver.query_syntax ls.ls_name with
+      | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl
+      | None -> fprintf fmt "@[(%a %a)@]" 
+	  print_ident ls.ls_name (print_list space (print_term drv)) tl
+    end
   | Tlet (t1, tb) ->
       let v, t2 = t_open_bound tb in
       fprintf fmt "@[(let %a = %a@ in %a)@]" print_ident v.vs_name
@@ -105,15 +88,10 @@ let rec print_term drv fmt t = match t.t_node with
 let rec print_fmla drv fmt f = match f.f_node with
   | Fapp ({ ls_name = id }, []) ->
       print_ident fmt id
-  | Fapp (ls, tl) ->
-      begin      
-        match drv ls.ls_name with
-          | Driver.Remove -> assert false (* Mettre une erreur *)
-          | Driver.Syntax s ->
-              Driver.syntax_arguments s (print_term drv) fmt tl
-          | Driver.Tag _ -> 
-              fprintf fmt "(%a %a)" 
-	        print_ident ls.ls_name (print_list space (print_term drv)) tl
+  | Fapp (ls, tl) -> begin match drv.Driver.query_syntax ls.ls_name with
+      | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl
+      | None -> fprintf fmt "(%a %a)" 
+	  print_ident ls.ls_name (print_list space (print_term drv)) tl
       end
   | Fquant (q, fq) ->
       let q = match q with Fforall -> "forall" | Fexists -> "exists" in
@@ -159,48 +137,39 @@ let print_logic_binder drv fmt v =
   fprintf fmt "%a: %a" print_ident v.vs_name (print_type drv) v.vs_ty
 
 let print_type_decl drv fmt = function
-  | ts, Tabstract ->
-      begin
-        match drv ts.ts_name with
-          | Driver.Remove | Driver.Syntax _ -> false
-          | Driver.Tag _ -> 
-              match ts.ts_args with
-                | [] -> fprintf fmt ":extrasorts (%a)" print_ident ts.ts_name;
-                    true
-                | _  -> assert false
-      end
-  | _, Talgebraic _ ->
-      assert false
+  | ts, Tabstract when drv.Driver.query_syntax ts.ts_name <> None -> false
+  | ts, Tabstract when ts.ts_args = [] ->
+      fprintf fmt ":extrasorts (%a)" print_ident ts.ts_name; true
+  | _, Tabstract -> assert false
+  | _, Talgebraic _ -> assert false
 
-let print_logic_decl drv _task fmt (ls,ld) =
-  match drv ls.ls_name with
-    | Driver.Remove | Driver.Syntax _ -> false
-    | Driver.Tag _s ->
-        begin match ld with
-          | None ->
-              begin match ls.ls_value with
-                | None ->
-                    fprintf fmt "@[<hov 2>:extrapreds ((%a %a))@]@\n"
-                      print_ident ls.ls_name
-                      (print_list space (print_type drv)) ls.ls_args
-                | Some value ->
-                    fprintf fmt "@[<hov 2>:extrafuns ((%a %a %a))@]@\n"
-                      print_ident ls.ls_name
-                      (print_list space (print_type drv)) ls.ls_args 
-                      (print_type drv) value
-              end
-          | Some _ -> assert false (* Dealt in Encoding *)
-        end;
-        true
+let print_logic_decl drv fmt (ls,ld) = match ld with
+  | None ->
+      begin match ls.ls_value with
+        | None ->
+            fprintf fmt "@[<hov 2>:extrapreds ((%a %a))@]@\n"
+              print_ident ls.ls_name
+              (print_list space (print_type drv)) ls.ls_args
+        | Some value ->
+            fprintf fmt "@[<hov 2>:extrafuns ((%a %a %a))@]@\n"
+              print_ident ls.ls_name
+              (print_list space (print_type drv)) ls.ls_args 
+              (print_type drv) value
+      end
+  | Some _ -> assert false (* Dealt in Encoding *)
+
+let print_logic_decl drv fmt d = 
+  match drv.Driver.query_syntax (fst d).ls_name with
+  | Some _ -> false
+  | None -> print_logic_decl drv fmt d; true
   
-let print_decl drv task fmt d = match d.d_node with
+let print_decl drv fmt d = match d.d_node with
   | Dtype dl ->
       print_list_opt newline (print_type_decl drv) fmt dl
   | Dlogic dl ->
-      print_list_opt newline (print_logic_decl drv task) fmt dl
+      print_list_opt newline (print_logic_decl drv) fmt dl
   | Dind _ -> assert false (* TODO *)
-  | Dprop (Paxiom, pr, _) when
-      drv pr.pr_name = Driver.Remove -> false
+  | Dprop (Paxiom, pr, _) when drv.Driver.query_remove pr.pr_name -> false
   | Dprop (Paxiom, _pr, f) ->
       fprintf fmt "@[<hov 2>:assumption@ %a@]@\n" 
         (print_fmla drv) f; true
@@ -220,7 +189,7 @@ let print_task drv fmt task =
     (*print_ident (Task.task_goal task).pr_name*);
   fprintf fmt "  :status unknown@\n";
   let decls = Task.task_decls task in
-  ignore (print_list_opt (add_flush newline2) (print_decl drv task) fmt decls);
+  ignore (print_list_opt (add_flush newline2) (print_decl drv) fmt decls);
   fprintf fmt "@\n)@."
 
 let () = Driver.register_printer "smtv1" 

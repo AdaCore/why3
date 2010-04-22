@@ -20,6 +20,7 @@
 (** Drivers for calling external provers *)
 
 open Format
+open Util
 open Ident
 open Task
 open Trans
@@ -37,11 +38,6 @@ val load_driver : env -> string -> driver
 
 (** {2 query a driver} *)
 
-type translation =
-  | Remove
-  | Syntax of string
-  | Tag of Util.Sstr.t
-
 val syntax_arguments : string -> (formatter -> 'a -> unit) ->
   formatter -> 'a list -> unit
   (** (syntax_argument templ print_arg fmt l) prints in the formatter fmt
@@ -49,7 +45,13 @@ val syntax_arguments : string -> (formatter -> 'a -> unit) ->
 
 (** {2 register printers and transformations} *)
 
-type printer = (ident -> translation) -> formatter -> task -> unit
+type driver_query = {
+  query_syntax : ident -> string option;
+  query_remove : ident -> bool;
+  query_tags   : ident -> Sstr.t;
+}
+
+type printer = driver_query -> formatter -> task -> unit
 
 val register_printer : string -> printer -> unit
 
