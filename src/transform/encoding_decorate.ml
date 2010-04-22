@@ -151,10 +151,13 @@ let conv_ls tenv ls =
   if ls == ps_equ
   then ls
   else
-    let preid = id_clone ls.ls_name in
     let tyl = List.map (conv_ty_neg tenv) ls.ls_args in
-    let ty_res = Util.option_map (conv_ty_pos tenv) ls.ls_value in
-    create_lsymbol preid tyl ty_res
+    let ty_res = Util.option_maq (conv_ty_pos tenv) ls.ls_value in
+    if ty_res == ls.ls_value && List.for_all2 (==) tyl ls.ls_args 
+    then ls
+    else
+      let preid = id_clone ls.ls_name in
+      create_lsymbol preid tyl ty_res
 
 
 let conv_ts tenv ts =
@@ -268,8 +271,11 @@ let decl (tenv:tenv) d =
                             type which are not in recursive bloc")
     | Dlogic l ->
         let fn = function
-          | _ls, Some _ -> assert false (* TODO or not 
-                                          (remove_logic_definition*)
+          | _ls, Some _ -> 
+              Format.eprintf "@[<hov 3>Encoding_decorate :@\n\
+I can't encode definition such as %a@\n\
+Perhaps you could use eliminate_definition@\n@]@." Pretty.print_decl d;
+              assert false 
           | ls, None ->              
               try
                 let ls = Hls.find tenv.trans_lsymbol ls in

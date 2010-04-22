@@ -41,6 +41,9 @@ val apply     : 'a trans_reg ->        task -> 'a
 
 val compose   : task trans_reg -> 'a trans_reg -> 'a trans_reg
 val compose_l : task tlist_reg -> 'a tlist_reg -> 'a tlist_reg
+  (** Composition of transformations [compose f g] is the transformation
+      which applies f before applying g *)
+
 
 (* Should be only used with functions working in constant time *)
 (* val conv_res : ('a -> 'b) -> 'a trans_reg -> 'b trans_reg *)

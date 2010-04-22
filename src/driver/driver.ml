@@ -248,7 +248,7 @@ let load_driver env file =
         try set_or_raise loc printer (Hashtbl.find printers s) "printer"
         with Not_found -> errorm ~loc "unknown printer %s" s end
     | Transform s -> begin
-        try transform := compose (Hashtbl.find transforms s) !transform
+        try transform := compose !transform (Hashtbl.find transforms s)
         with Not_found -> errorm ~loc "unknown transformation %s" s end
     | Plugin files -> load_plugin (Filename.dirname file) files
   in

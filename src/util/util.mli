@@ -23,6 +23,11 @@ val of_option : 'a option -> 'a
 
 val option_map : ('a -> 'b) -> 'a option -> 'b option
 
+val option_maq : ('a -> 'a) -> 'a option -> 'a option
+  (** same as {! option_map} but [option_maq f o] return o if o is
+      None or f is the identity (according to (==)) on the argument
+      given *)
+
 val option_iter : ('a -> unit) -> 'a option -> unit
 
 val option_apply : 'b -> ('a -> 'b) -> 'a option -> 'b

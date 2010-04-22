@@ -23,9 +23,17 @@ let of_option = function None -> assert false | Some x -> x
 
 let option_map f = function None -> None | Some x -> Some (f x)
 
+let option_maq f = function None as o -> o | Some x as o ->  
+  let r = (f x) in if r == x then o else Some r
+
 let option_apply d f = function None -> d | Some x -> f x
 
 let option_iter f = function None -> () | Some x -> f x
+
+let option_eq eq  = function 
+  | None, None -> true 
+  | None, _ | _, None -> false
+  | Some x, Some y -> eq x y
 
 (* useful list combinators *)
 
