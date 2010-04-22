@@ -28,7 +28,7 @@ let option_apply d f = function None -> d | Some x -> f x
 let option_iter f = function None -> () | Some x -> f x
 
 let option_eq eq a b = match a,b with
-  | None, None -> true 
+  | None, None -> true
   | None, _ | _, None -> false
   | Some x, Some y -> eq x y
 
@@ -48,6 +48,8 @@ let list_all2 pr l1 l2 =
 let map_join_left map join = function
   | x :: xl -> List.fold_left (fun acc x -> join acc (map x)) (map x) xl
   | _ -> raise (Failure "map_join_left")
+
+let list_apply f = List.fold_left (fun acc x -> List.rev_append (f x) acc) []
 
 (* boolean fold accumulators *)
 

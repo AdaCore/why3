@@ -41,9 +41,10 @@ and tdecl = private
   | Use   of theory
   | Clone of theory * (ident * ident) list
 
+val task_known : task -> known_map
 val task_clone : task -> clone_map
-val task_used : task -> use_map
-val task_tag : task -> int
+val task_used  : task -> use_map
+val task_tag   : task -> int
 
 (* constructors *)
 
@@ -79,10 +80,6 @@ val task_goal  : task -> prsymbol
 
 val last_clone : task -> task
 val last_use   : task -> task
-
-val get_known : task -> known_map
-val get_clone : task -> clone_map
-val get_used  : task -> use_map
 
 (* exceptions *)
 

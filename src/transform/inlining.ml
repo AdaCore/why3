@@ -135,6 +135,6 @@ let trivial = t
                     | _ -> true)
 
 let () =
-  Driver.register_transform "inline_all" all;
-  Driver.register_transform "inline_trivial" trivial
+  Register.register_transform "inline_all" all;
+  Register.register_transform "inline_trivial" trivial
 

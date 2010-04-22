@@ -39,8 +39,6 @@ let singleton f x = [f x]
 
 let compose f g x = g (f x)
 
-let list_apply f = List.fold_left (fun acc x -> List.rev_append (f x) acc) []
-
 let compose_l f g x = list_apply g (f x)
 
 let apply f x = f x

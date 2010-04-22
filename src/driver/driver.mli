@@ -38,44 +38,28 @@ val load_driver : env -> string -> driver
 
 (** {2 query a driver} *)
 
-val syntax_arguments : string -> (formatter -> 'a -> unit) ->
-  formatter -> 'a list -> unit
-  (** (syntax_argument templ print_arg fmt l) prints in the formatter fmt
-     the list l using the template templ and the printer print_arg *)
+type driver_query
 
-(** {2 register printers and transformations} *)
+val driver_query : driver -> task -> driver_query
 
-type driver_query = {
-  query_syntax : ident -> string option;
-  query_remove : ident -> bool;
-  query_tags   : ident -> Sstr.t;
-}
-
-type printer = driver_query -> formatter -> task -> unit
-
-val register_printer : string -> printer -> unit
-
-val register_transform   : string -> task Register.trans_reg -> unit
-val register_transform_l : string -> task Register.tlist_reg -> unit
-
-val list_printers     : unit -> string list
-val list_transforms   : unit -> string list
-val list_transforms_l : unit -> string list
+val query_syntax : driver_query -> ident -> string option 
+val query_remove : driver_query -> ident -> bool
+val query_tags   : driver_query -> ident -> Sstr.t
+val query_clone  : driver_query -> Theory.clone_map
+val query_driver : driver_query -> driver
+val query_env    : driver_query -> env
+val query_tag    : driver_query -> int
 
 (** {2 use a driver} *)
 
-val file_of_task : driver -> string -> string -> task -> string
+val get_env : driver -> env
+val get_printer : driver -> string option
+val get_transform : driver -> string list
+
 (** file_of_task input_file theory_name task *)
+val file_of_task : driver -> string -> string -> task -> string
 
-val print_task : driver -> formatter -> task -> unit
-(** print a task *)
-
-val prove_task :
-  ?debug    : bool ->
-  command   : string ->
-  timelimit : int ->
-  memlimit  : int ->
-  driver -> task -> unit -> Call_provers.prover_result
+val print_prelude : driver -> task -> formatter -> unit
 
 val call_on_buffer :
   ?debug    : bool ->
@@ -83,6 +67,13 @@ val call_on_buffer :
   timelimit : int ->
   memlimit  : int ->
   driver -> Buffer.t -> unit -> Call_provers.prover_result
+
+(** {2 syntax arguments} *)
+
+val syntax_arguments : string -> (formatter -> 'a -> unit) ->
+  formatter -> 'a list -> unit
+  (** (syntax_argument templ print_arg fmt l) prints in the formatter fmt
+     the list l using the template templ and the printer print_arg *)
 
 (** {2 error reporting} *)
 

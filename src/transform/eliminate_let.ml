@@ -45,5 +45,5 @@ let remove_let_f = rewrite_f Mvs.empty
 let eliminate_let =
   Register.store (fun () -> Trans.rewrite remove_let_t remove_let_f None)
 
-let () = Driver.register_transform "eliminate_let" eliminate_let
+let () = Register.register_transform "eliminate_let" eliminate_let
 

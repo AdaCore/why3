@@ -17,6 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Format
 open Util
 open Ident
 open Ty
@@ -24,7 +25,6 @@ open Term
 open Decl
 open Theory
 open Task
-open Register
 open Driver_ast
 open Call_provers
 
@@ -32,9 +32,9 @@ open Call_provers
 
 type error = string
 
-exception Error of string
+exception Error of error
 
-let report = Format.pp_print_string
+let report = pp_print_string
 
 let error ?loc e = match loc with
   | None -> raise (Error e)
@@ -42,10 +42,10 @@ let error ?loc e = match loc with
 
 let errorm ?loc f =
   let buf = Buffer.create 512 in
-  let fmt = Format.formatter_of_buffer buf in
-  Format.kfprintf
+  let fmt = formatter_of_buffer buf in
+  kfprintf
     (fun _ ->
-       Format.pp_print_flush fmt ();
+       pp_print_flush fmt ();
        let s = Buffer.contents buf in
        Buffer.clear buf;
        error ?loc s)
@@ -60,14 +60,14 @@ let global_substitute_fmt expr repl_fun text fmt =
   let rec replace start last_was_empty =
     let startpos = if last_was_empty then start + 1 else start in
     if startpos > String.length text then
-      Format.pp_print_string fmt (Str.string_after text start)
+      pp_print_string fmt (Str.string_after text start)
     else
       match opt_search_forward expr text startpos with
       | None ->
-          Format.pp_print_string fmt (Str.string_after text start)
+          pp_print_string fmt (Str.string_after text start)
       | Some pos ->
           let end_pos = Str.match_end () in
-          Format.pp_print_string fmt (String.sub text start (pos - start));
+          pp_print_string fmt (String.sub text start (pos - start));
           repl_fun text fmt;
           replace end_pos (end_pos = pos)
   in
@@ -106,20 +106,12 @@ let syntax_arguments s print fmt l =
 
 (** drivers *)
 
-type driver_query = {
-  query_syntax : ident -> string option;
-  query_remove : ident -> bool;
-  query_tags   : ident -> Sstr.t;
-}
-
-type printer = driver_query -> Format.formatter -> task -> unit
-
 type driver = {
   drv_env       : Env.env;
-  drv_printer   : printer option;
+  drv_printer   : string option;
   drv_prelude   : string list;
   drv_filename  : string option;
-  drv_transform : task trans_reg;
+  drv_transform : string list;
   drv_thprelude : string list Mid.t;
   drv_tags      : Sstr.t Mid.t;
   drv_tags_cl   : Sstr.t Mid.t;
@@ -128,21 +120,8 @@ type driver = {
   drv_remove_cl : Sid.t;
   drv_regexps   : (Str.regexp * Call_provers.prover_answer) list;
   drv_exitcodes : (int * Call_provers.prover_answer) list;
+  drv_tag       : int
 }
-
-(** register printers and transformations *)
-
-let printers : (string, printer) Hashtbl.t = Hashtbl.create 17
-let register_printer name printer = Hashtbl.replace printers name printer
-let list_printers () = Hashtbl.fold (fun k _ acc -> k::acc) printers []
-
-let transforms : (string, task trans_reg) Hashtbl.t = Hashtbl.create 17
-let register_transform name trans = Hashtbl.replace transforms name trans
-let list_transforms () = Hashtbl.fold (fun k _ acc -> k::acc) transforms []
-
-let transforms_l : (string, task tlist_reg) Hashtbl.t = Hashtbl.create 17
-let register_transform_l name trans = Hashtbl.replace transforms_l name trans
-let list_transforms_l () = Hashtbl.fold (fun k _ ac -> k::ac) transforms_l []
 
 (** parse a driver file *)
 
@@ -163,13 +142,13 @@ let load_file file =
 let string_of_qualid thl idl =
   String.concat "." thl ^ "." ^ String.concat "." idl
 
-let load_driver env file =
+let load_driver = let driver_tag = ref (-1) in fun env file ->
   let prelude   = ref [] in
   let regexps   = ref [] in
   let exitcodes = ref [] in
   let filename  = ref None in
   let printer   = ref None in
-  let transform = ref identity in
+  let transform = ref [] in
 
   let set_or_raise loc r v error = match !r with
     | Some _ -> errorm ~loc "duplicate %s" error
@@ -189,12 +168,8 @@ let load_driver env file =
     | ExitCodeUnknown (s,t) -> add_to_list exitcodes (s, Unknown t)
     | ExitCodeFailure (s,t) -> add_to_list exitcodes (s, Failure t)
     | Filename s -> set_or_raise loc filename s "filename"
-    | Printer s -> begin
-        try set_or_raise loc printer (Hashtbl.find printers s) "printer"
-        with Not_found -> errorm ~loc "unknown printer %s" s end
-    | Transform s -> begin
-        try transform := compose !transform (Hashtbl.find transforms s)
-        with Not_found -> errorm ~loc "unknown transformation %s" s end
+    | Printer s -> set_or_raise loc printer s "printer"
+    | Transform s -> add_to_list transform s
     | Plugin files -> load_plugin (Filename.dirname file) files
   in
   let f = load_file file in
@@ -222,7 +197,8 @@ let load_driver env file =
     if Mid.mem id !syntax then
       errorm ~loc "duplicate syntax rule for %s symbol %s"
         k (string_of_qualid !qualid q);
-    syntax := Mid.add id s !syntax
+    syntax := Mid.add id s !syntax;
+    remove := Sid.add id !remove
   in
   let add_tag c id s =
     let mr = if c then tags_cl else tags in
@@ -255,6 +231,8 @@ let load_driver env file =
     List.iter (add_local th) trl
   in
   List.iter add_theory f.f_rules;
+  transform := List.rev !transform;
+  incr driver_tag;
   {
     drv_env       = env;
     drv_printer   = !printer;
@@ -269,15 +247,46 @@ let load_driver env file =
     drv_remove_cl = !remove_cl;
     drv_regexps   = !regexps;
     drv_exitcodes = !exitcodes;
+    drv_tag       = !driver_tag;
   }
 
 (** query drivers *)
+
+type driver_query = {
+  query_syntax : ident -> string option;
+  query_remove : ident -> bool;
+  query_tags   : ident -> Sstr.t;
+  query_driver : driver;
+  query_lclone : task;
+  query_tag    : int;
+}
+
+module Hsdq = Hashcons.Make (struct
+  type t = driver_query
+
+  let equal q1 q2 = q1.query_driver == q2.query_driver &&
+                    q1.query_lclone == q2.query_lclone
+
+  let hash q = Hashcons.combine q.query_driver.drv_tag (task_tag q.query_lclone)
+
+  let tag n q = { q with query_tag = n }
+end)
+
+module Dq = StructMake (struct
+  type t = driver_query
+  let tag q = q.query_tag
+end)
+
+module Sdq = Dq.S
+module Mdq = Dq.M
+module Hdq = Dq.H
 
 let get_tags map id = try Mid.find id map with Not_found -> Sstr.empty
 let add_tags drv id acc = Sstr.union (get_tags drv.drv_tags_cl id) acc
 let add_remove drv id acc = acc || Sid.mem id drv.drv_remove_cl
 
-let query_driver drv clone =
+let driver_query drv task =
+  let clone = task_clone task in
   let htags = Hid.create 7 in
   let query_tags id = try Hid.find htags id with Not_found ->
     let r = try Mid.find id clone with Not_found -> Sid.empty in
@@ -293,14 +302,30 @@ let query_driver drv clone =
   let query_syntax id =
     try Some (Mid.find id drv.drv_syntax) with Not_found -> None
   in
-  { query_syntax = query_syntax;
+  Hsdq.hashcons {
+    query_syntax = query_syntax;
     query_remove = query_remove;
-    query_tags   = query_tags }
+    query_tags   = query_tags;
+    query_driver = drv;
+    query_lclone = last_clone task;
+    query_tag    = -1 }
+
+let query_syntax dq = dq.query_syntax
+let query_remove dq = dq.query_remove
+let query_tags   dq = dq.query_tags
+let query_driver dq = dq.query_driver
+let query_env    dq = dq.query_driver.drv_env
+let query_clone  dq = task_clone (dq.query_lclone)
+let query_tag    dq = dq.query_tag
 
 (** apply drivers *)
 
-let print_prelude drv used fmt =
-  let pr_pr s () = Format.fprintf fmt "%s@\n" s in
+let get_transform drv = drv.drv_transform
+let get_printer drv = drv.drv_printer
+let get_env drv = drv.drv_env
+
+let print_prelude drv task fmt =
+  let pr_pr s () = fprintf fmt "%s@\n" s in
   List.fold_right pr_pr drv.drv_prelude ();
   let seen = Hid.create 17 in
   let rec print_prel th_name th =
@@ -314,17 +339,8 @@ let print_prelude drv used fmt =
       List.fold_right pr_pr prel ()
     end
   in
-  Mid.iter print_prel used;
-  Format.fprintf fmt "@."
-
-let print_task drv fmt task =
-  let task = apply_env drv.drv_transform drv.drv_env task in
-  let printer = match drv.drv_printer with
-    | None -> errorm "no printer specified in the driver file"
-    | Some p -> p (query_driver drv (task_clone task))
-  in
-  print_prelude drv (task_used task) fmt;
-  Format.fprintf fmt "@[%a@]@?" printer task
+  Mid.iter print_prel (task_used task);
+  fprintf fmt "@."
 
 let filename_regexp = Str.regexp "%\\(.\\)"
 
@@ -351,12 +367,6 @@ let call_on_buffer ?debug ~command ~timelimit ~memlimit drv buffer =
   let filename = get_filename drv "" "" "" in
   Call_provers.call_on_buffer
     ?debug ~command ~timelimit ~memlimit ~regexps ~exitcodes ~filename buffer
-
-let prove_task ?debug ~command ~timelimit ~memlimit drv task =
-  let buf = Buffer.create 1024 in
-  let fmt = Format.formatter_of_buffer buf in
-  print_task drv fmt task; Format.pp_print_flush fmt ();
-  call_on_buffer ?debug ~command ~timelimit ~memlimit drv buf
 
 (*
 Local Variables:

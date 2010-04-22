@@ -1085,9 +1085,13 @@ let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver
     try 
       if debug then 
         Format.eprintf "Task for prover: %a@." 
-          (Why.Driver.print_task driver) g.task;
-      Why.Driver.prove_task ~debug ~command ~timelimit ~memlimit driver g.task
+          (Why.Prover.print_task driver) g.task;
+      Why.Prover.prove_task ~debug ~command ~timelimit ~memlimit driver g.task
     with 
+    | Why.Prover.Error e ->
+        Format.eprintf "Db.try_prover: prove_task reports %a@." 
+          Why.Prover.report e;
+        fun () -> raise Exit
     | Why.Driver.Error e ->
         Format.eprintf "Db.try_prover: prove_task reports %a@." 
           Why.Driver.report e;

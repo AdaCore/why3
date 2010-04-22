@@ -306,8 +306,8 @@ let decl tenv d =
 *)
 
 let t = Register.store_env 
-  (fun () env -> 
+  (fun env -> 
      let init_task,tenv = load_prelude env in
      Trans.decl (decl tenv) init_task)
 
-let () = Driver.register_transform "encoding_decorate" t
+let () = Register.register_transform "encoding_decorate" t

@@ -130,4 +130,4 @@ let elt d =
 
 let t = Register.store (fun () -> Trans.decl elt None)
 
-let () = Driver.register_transform "simplify_recursive_definition" t
+let () = Register.register_transform "simplify_recursive_definition" t

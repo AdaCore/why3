@@ -17,47 +17,58 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Ident
-open Term
-open Decl
-open Task
+open Format
+open Driver
+open Register
 
-let log acc (ps,_) = create_logic_decl [ps, None] :: acc
-let axm acc (pr,f) = create_prop_decl Paxiom pr f :: acc
-let imp acc (_,al) = List.fold_left axm acc al
+(** error handling *)
 
-let exi vl (_,f) =
-  let rec descend f = match f.f_node with
-    | Fquant (Fforall,f) ->
-        let vl,tl,f = f_open_quant f in
-        f_exists vl tl (descend f)
-    | Fbinop (Fimplies,g,f) ->
-        f_and g (descend f)
-    | Fapp (_,tl) ->
-        let marry acc v t = f_and_simp acc (f_equ v t) in
-        List.fold_left2 marry f_true vl tl
-    | _ -> assert false
+type error = string
+
+exception Error of error
+
+let report = pp_print_string
+
+let error e = raise (Error e)
+
+let errorm f =
+  let buf = Buffer.create 512 in
+  let fmt = formatter_of_buffer buf in
+  kfprintf
+    (fun _ ->
+       pp_print_flush fmt ();
+       let s = Buffer.contents buf in
+       Buffer.clear buf;
+       error s)
+    fmt f
+
+(** print'n'prove *)
+
+exception NoPrinter
+exception UnknownPrinter of string
+exception UnknownTransform of string
+
+let print_task drv fmt task =
+  let p = match get_printer drv with
+    | None -> errorm "no printer specified in the driver file"
+    | Some p -> p
   in
-  descend f
+  let printer = try lookup_printer p with
+    Not_found -> errorm "unknown printer %s" p
+  in
+  let lookup t = try lookup_transform t with
+    Not_found -> errorm "unknown transformation %s" t
+  in
+  let transl = List.map lookup (get_transform drv) in
+  let apply task tr = Register.apply_driver tr drv task in
+  let task = List.fold_left apply task transl in
+  let printer = printer (driver_query drv task) in
+  print_prelude drv task fmt;
+  fprintf fmt "@[%a@]@?" printer task
 
-let inv acc (ps,al) =
-  let vl = List.map (create_vsymbol (id_fresh "z")) ps.ls_args in
-  let tl = List.map t_var vl in
-  let hd = f_app ps tl in
-  let dj = Util.map_join_left (exi tl) f_or al in
-  let ax = f_forall vl [[Fmla hd]] (f_implies hd dj) in
-  let nm = id_derive (ps.ls_name.id_long ^ "_inversion") ps.ls_name in
-  create_prop_decl Paxiom (create_prsymbol nm) ax :: acc
-
-let elim d = match d.d_node with
-  | Dind il ->
-      let dl = List.fold_left log [] il in
-      let dl = List.fold_left imp dl il in
-      let dl = List.fold_left inv dl il in
-      List.rev dl
-  | _ -> [d]
-
-let elim = Register.store (fun () -> Trans.decl elim None)
-
-let () = Register.register_transform "eliminate_inductive" elim
+let prove_task ?debug ~command ~timelimit ~memlimit drv task =
+  let buf = Buffer.create 1024 in
+  let fmt = formatter_of_buffer buf in
+  print_task drv fmt task; pp_print_flush fmt ();
+  call_on_buffer ?debug ~command ~timelimit ~memlimit drv buf
 

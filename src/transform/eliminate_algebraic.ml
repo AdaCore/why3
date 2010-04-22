@@ -184,5 +184,5 @@ let comp t (state,task) = match t.task_decl with
 
 let comp = Register.store (fun () -> Trans.fold_map comp empty_state None)
 
-let () = Driver.register_transform "eliminate_algebraic" comp
+let () = Register.register_transform "eliminate_algebraic" comp
 

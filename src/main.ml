@@ -153,15 +153,15 @@ let () =
   if !opt_list_transforms then begin
     printf "@[<hov 2>Registered non-splitting transformations:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Driver.list_transforms ()));
+      (List.sort String.compare (Register.list_transforms ()));
     printf "@[<hov 2>Registered splitting transformations:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Driver.list_transforms_l ()));
+      (List.sort String.compare (Register.list_transforms_l ()));
   end;
   if !opt_list_printers then
     printf "@[<hov 2>Registered printers:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Driver.list_printers ()));
+      (List.sort String.compare (Register.list_printers ()));
   if !opt_list_provers then begin
     let config = read_config !opt_config in
     let print fmt s prover = fprintf fmt "%s (%s)@\n" s prover.name in
@@ -256,6 +256,8 @@ let rec report fmt = function
       fprintf fmt "Dynlink: %s" (Config.Dynlink.error_message e)
   | Whyconf.Error e ->
       fprintf fmt "Why config: %a" Whyconf.report e
+  | Prover.Error e ->
+      Prover.report fmt e
   | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
 let print_th_namespace fmt th =
@@ -267,13 +269,13 @@ let do_task _env drv fname tname (th : Why.Theory.theory) (task : Task.task) =
   match !opt_output, !opt_command with
     | None, Some command ->
         let res =
-          Driver.prove_task ~debug ~command ~timelimit ~memlimit drv task ()
+          Prover.prove_task ~debug ~command ~timelimit ~memlimit drv task ()
         in
         printf "%s %s %s : %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_long
           Call_provers.print_prover_result res
     | None, None ->
-        Driver.print_task drv std_formatter task
+        Prover.print_task drv std_formatter task
     | Some dir, _ ->
         let fname = Filename.basename fname in
         let fname =
@@ -286,7 +288,7 @@ let do_task _env drv fname tname (th : Why.Theory.theory) (task : Task.task) =
         let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
         let ext = String.sub dest i (String.length dest - i) in
         let cout = open_out (Filename.concat dir (name ^ ext)) in
-        Driver.print_task drv (formatter_of_out_channel cout) task;
+        Prover.print_task drv (formatter_of_out_channel cout) task;
         close_out cout
 
 let do_theory env drv fname tname th glist =

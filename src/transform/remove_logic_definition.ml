@@ -41,5 +41,5 @@ let decl d =
 
 let t = Register.store (fun () -> Trans.decl decl None)
 
-let () = Driver.register_transform "remove_logic_definition" t
+let () = Register.register_transform "remove_logic_definition" t
 

@@ -49,7 +49,7 @@ let forget_var v = forget_id ident_printer v.vs_name
 let rec print_type drv fmt ty = match ty.ty_node with
   | Tyvar id -> 
       print_tvsymbols fmt id
-  | Tyapp (ts, tl) -> begin match drv.Driver.query_syntax ts.ts_name with
+  | Tyapp (ts, tl) -> begin match Driver.query_syntax drv ts.ts_name with
       | Some s -> Driver.syntax_arguments s (print_type drv) fmt tl
       | None -> fprintf fmt "%a%a" (print_tyapp drv) tl print_ident ts.ts_name
     end
@@ -66,7 +66,7 @@ let rec print_term drv fmt t = match t.t_node with
       Pretty.print_const fmt c
   | Tvar { vs_name = id } ->
       print_ident fmt id
-  | Tapp (ls, tl) -> begin match drv.Driver.query_syntax ls.ls_name with
+  | Tapp (ls, tl) -> begin match Driver.query_syntax drv ls.ls_name with
       | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl
       | None -> fprintf fmt "%a%a" print_ident ls.ls_name (print_tapp drv) tl
     end
@@ -89,7 +89,7 @@ and print_tapp drv fmt = function
 let rec print_fmla drv fmt f = match f.f_node with
   | Fapp ({ ls_name = id }, []) ->
       print_ident fmt id
-  | Fapp (ls, tl) -> begin match drv.Driver.query_syntax ls.ls_name with
+  | Fapp (ls, tl) -> begin match Driver.query_syntax drv ls.ls_name with
       | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl
       | None -> fprintf fmt "%a(%a)" print_ident ls.ls_name 
                     (print_list comma (print_term drv)) tl
@@ -143,14 +143,14 @@ let print_type_decl fmt ts = match ts.ts_args with
       (print_list comma print_tvsymbols) tl print_ident ts.ts_name
 
 let print_type_decl drv fmt = function
-  | ts, Tabstract when drv.Driver.query_syntax ts.ts_name <> None -> false
+  | ts, Tabstract when Driver.query_remove drv ts.ts_name -> false
   | ts, Tabstract -> print_type_decl fmt ts; true
   | _, Talgebraic _ -> assert false
 
 let ac_th = ["algebra";"AC"]
 
 let print_logic_decl drv fmt (ls,ld) =
-  let tags = drv.Driver.query_tags ls.ls_name in
+  let tags = Driver.query_tags drv ls.ls_name in
   match ld with
     | None ->
         let sac = if Util.Sstr.mem "AC" tags then "ac " else "" in
@@ -178,9 +178,8 @@ let print_logic_decl drv fmt (ls,ld) =
         List.iter forget_var vl
 
 let print_logic_decl drv fmt d =
-  match drv.Driver.query_syntax (fst d).ls_name with
-  | Some _ -> false
-  | None -> print_logic_decl drv fmt d; true
+  if Driver.query_remove drv (fst d).ls_name then
+    false else (print_logic_decl drv fmt d; true)
 
 let print_decl drv fmt d = match d.d_node with
   | Dtype dl ->
@@ -188,7 +187,7 @@ let print_decl drv fmt d = match d.d_node with
   | Dlogic dl ->
       print_list_opt newline (print_logic_decl drv) fmt dl
   | Dind _ -> assert false (* TODO *)
-  | Dprop (Paxiom, pr, _) when drv.Driver.query_remove pr.pr_name -> false
+  | Dprop (Paxiom, pr, _) when Driver.query_remove drv pr.pr_name -> false
   | Dprop (Paxiom, pr, f) ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n" 
         print_ident pr.pr_name (print_fmla drv) f; true
@@ -202,7 +201,7 @@ let print_task drv fmt task =
   let decls = Task.task_decls task in
   ignore (print_list_opt (add_flush newline2) (print_decl drv) fmt decls)
 
-let () = Driver.register_printer "alt-ergo" 
+let () = Register.register_printer "alt-ergo" 
   (fun drv fmt task -> 
      forget_all ident_printer;
      print_task drv fmt task)

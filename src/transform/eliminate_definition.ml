@@ -154,5 +154,5 @@ let elim t task = match t.task_decl with
 
 let elim = Register.store (fun () -> Trans.map elim None)
 
-let () = Driver.register_transform "eliminate_definition" elim
+let () = Register.register_transform "eliminate_definition" elim
 

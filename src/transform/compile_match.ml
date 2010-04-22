@@ -46,5 +46,5 @@ let comp t task =
 
 let comp = Register.store (fun () -> Trans.map comp None)
 
-let () = Driver.register_transform "compile_match" comp
+let () = Register.register_transform "compile_match" comp
 
