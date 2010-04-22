@@ -254,8 +254,8 @@ MNGCMX = $(addsuffix .cmx, $(MNGMODULES))
 $(MNGCMO) $(MNGCMX): INCLUDES = -I src/manager -I +sqlite3
 $(MNGCMO) $(MNGCMX): src/why.cmi
 
-#byte: bin/manager.byte
-#opt:  bin/manager.opt
+byte: bin/manager.byte
+opt:  bin/manager.opt
 
 bin/manager.opt bin/manager.byte: INCLUDES = -I +sqlite3
 
@@ -339,7 +339,7 @@ clean::
 
 ifeq (@enable_coq_support@,yes)
 #byte: src/coq-plugin/whytac.cmo
-opt:  src/coq-plugin/whytac.cmxs
+#opt:  src/coq-plugin/whytac.cmxs
 endif
 
 COQTREES = kernel lib interp parsing proofs pretyping tactics library

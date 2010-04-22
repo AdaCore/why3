@@ -153,7 +153,8 @@ let add_task (tname : string) (task : Why.Task.task) acc =
           | Why.Task.Use _ | Why.Task.Clone _ -> assert false
           | Why.Task.Decl d ->
               match d.Why.Decl.d_node with
-                | Why.Decl.Dtype _ | Why.Decl.Dlogic _ | Why.Decl.Dind _ -> assert false
+                | Why.Decl.Dtype _ | Why.Decl.Dlogic _ | Why.Decl.Dind _ 
+                    -> assert false
                 | Why.Decl.Dprop (_kind,name,_f) ->
                     eprintf "doing task: tname=%s, name=%s@." tname
                       name.Why.Decl.pr_name.Why.Ident.id_long;
@@ -185,7 +186,7 @@ let goal_menu g =
          let p = List.assoc i menu in
          let call = 
 	   try
-             Db.try_prover ~debug:true ~timelimit ~memlimit:0 
+             Db.try_prover ~debug:false ~timelimit ~memlimit:0 
                ~prover:p.prover ~command:p.command ~driver:p.driver g 
            with Db.AlreadyAttempted ->
              printf "Proof already attempted, no need to rerun@.";
@@ -206,14 +207,18 @@ let main_loop goals =
       let _,menu = List.fold_left
         (fun (i,acc) g -> 
            let i = succ i in
-           printf "%2d: name='%s', proved=%b@." i (Db.goal_name g) (Db.goal_proved g);
+           printf "%2d: name='%s', proved=%b@." i 
+             (Db.goal_name g) (Db.goal_proved g);
            let e = Db.external_proofs g in
-           List.iter (fun e ->
-                        let p = Db.prover e in
-                        printf "    external proof: prover=%s, obsolete=%b, result=%a, time=%f@."
-                          (Db.prover_name p) (Db.proof_obsolete e) 
-                          Db.print_status (Db.status e)
-                          (Db.result_time e))
+           List.iter 
+             (fun e ->
+                let p = Db.prover e in
+                printf 
+                  "    external proof: prover=%s, obsolete=%b\
+                       , result=%a, time=%.2f@."
+                  (Db.prover_name p) (Db.proof_obsolete e) 
+                  Db.print_status (Db.status e)
+                  (Db.result_time e))
              
              e;
            (i,(i,g)::acc)) (0,[]) goals

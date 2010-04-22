@@ -33,7 +33,7 @@ let drv =
   let filename = 
     try Sys.getenv "WHYDRIVER" with Not_found -> "drivers/alt_ergo.drv"
   in
-  Driver.load_driver filename env
+  Driver.load_driver env filename
 
 (* Coq constants *)
 let logic_dir = ["Coq";"Logic";"Decidable"]
@@ -317,7 +317,7 @@ and tr_global_ts env r =
 	    let j = ith_mutual_inductive i j in
 	    let ts = lookup_global global_ts (IndRef j) in
 	    let tyj = Ty.ty_app ts (List.map Ty.ty_var ts.Ty.ts_args) in
-	    let mk_constructor k tyk = (* k-th constructor *)
+	    let mk_constructor k _tyk = (* k-th constructor *)
 	      let r = ConstructRef (j, k+1) in
 	      let ty = Global.type_of_global r in
 	      let vars, env, t = decomp_type_quantifiers env ty in
@@ -484,12 +484,12 @@ and tr_formula tv bv env f =
 	if is_imp_term f && is_Prop (type_of env Evd.empty a) then
 	  Term.f_implies (tr_formula tv bv env a) (tr_formula tv bv env b)
 	else
-	  let vs, t, bv, env, b = quantifiers n a b tv bv env in
+	  let vs, _t, bv, env, b = quantifiers n a b tv bv env in
 	  Term.f_forall [vs] [] (tr_formula tv bv env b)
     | _, [_; a] when c = build_coq_ex () ->
 	begin match kind_of_term a with
 	  | Lambda(n, a, b) ->
-	      let vs, t, bv, env, b = quantifiers n a b tv bv env in
+	      let vs, _t, bv, env, b = quantifiers n a b tv bv env in
 	      Term.f_exists [vs] [] (tr_formula tv bv env b)
 	  | _ ->
 	      (* unusual case of the shape (ex p) *)
