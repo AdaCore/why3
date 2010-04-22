@@ -59,13 +59,13 @@ let rec grep out l = match l with
       with Not_found -> grep out l end
 
 let call_prover debug command opt_cout buffer =
-  let time = Unix.time () in
+  let time = Unix.gettimeofday () in
   let (cin,cout) as p = Unix.open_process command in
   let cout = match opt_cout with Some c -> c | _ -> cout in
   Buffer.output_buffer cout buffer; close_out cout;
   let out = channel_contents cin in
   let ret = Unix.close_process p in
-  let time = Unix.time () -. time in
+  let time = Unix.gettimeofday () -. time in
   if debug then eprintf "Call_provers: prover output:@\n%s@." out;
   ret, out, time
 
@@ -107,7 +107,7 @@ let call_on_buffer ?(debug=false) ~command ~timelimit ~memlimit
         (try List.assoc n exitcodes with Not_found -> grep out regexps)
   in
   let ans = match ans with
-    | HighFailure 
+    | HighFailure
       when timelimit > 0 && time >= (0.9 *. float timelimit) -> Timeout
     | _ -> ans
   in
