@@ -43,57 +43,42 @@ let compose_l f g x = list_apply g (f x)
 
 let apply f x = f x
 
-let ymemo f tag h =
-  let rec aux x =
+let memo tag f =
+  let h = Hashtbl.create 63 in fun x ->
     let t = tag x in
-    try
-      Hashtbl.find h t
+    try Hashtbl.find h t
     with Not_found ->
-      let r = f aux x in
+      let r = f x in
       Hashtbl.add h t r;
-      r in
-  aux
-
-let memo f tag h = ymemo (fun _ -> f) tag h
+      r
 
 let term_tag t = t.t_tag
 let fmla_tag f = f.f_tag
 let decl_tag d = d.d_tag
 
-let task_tag = function
-  | Some t -> t.task_tag
-  | None   -> -1
-
-let store f = memo f task_tag (Hashtbl.create 63)
-
-let accum memo_t rewind v =
-  let rec accum todo = function
-    | Some task ->
-        let curr =
-          try Some (Hashtbl.find memo_t task.task_tag)
-          with Not_found -> None
-        in
-        begin match curr with
-          | Some curr -> rewind curr todo
-          | None      -> accum (task::todo) task.task_prev
-        end
-    | None -> rewind v todo
-  in
-  accum
-
-let save memo_t task v = Hashtbl.add memo_t task.task_tag v; v
+let store f = memo task_tag f
 
 let fold fn v =
-  let memo_t = Hashtbl.create 63 in
-  let rewind x task = save memo_t task (fn task x) in
-  let rewind = List.fold_left rewind in
-  accum memo_t rewind v []
+  let h = Hashtbl.create 63 in
+  let rewind acc task =
+    let acc = fn task acc in
+    Hashtbl.add h task.task_tag acc;
+    acc
+  in
+  let curr task =
+    try Some (Hashtbl.find h task.task_tag)
+    with Not_found -> None
+  in
+  let rec accum todo = function
+    | None -> List.fold_left rewind v todo
+    | Some task -> begin match curr task with
+        | Some v -> List.fold_left rewind v todo
+        | None   -> accum (task::todo) task.task_prev
+      end
+  in
+  accum []
 
-let fold_l fn v =
-  let memo_t = Hashtbl.create 63 in
-  let rewind x task = save memo_t task (list_apply (fn task) x) in
-  let rewind = List.fold_left rewind in
-  accum memo_t rewind [v] []
+let fold_l fn v = fold (fun task -> list_apply (fn task)) [v]
 
 let fold_map   fn v t = conv_res snd                (fold   fn (v, t))
 let fold_map_l fn v t = conv_res (List.rev_map snd) (fold_l fn (v, t))
@@ -102,8 +87,7 @@ let map   fn = fold   (fun t1 t2 -> fn t1 t2)
 let map_l fn = fold_l (fun t1 t2 -> fn t1 t2)
 
 let decl fn =
-  let memo_t = Hashtbl.create 63 in
-  let fn d = memo fn decl_tag memo_t d in
+  let fn = memo decl_tag fn in
   let fn task acc = match task.task_decl with
     | Decl d -> List.fold_left add_decl acc (fn d)
     | td -> add_tdecl acc td
@@ -111,8 +95,7 @@ let decl fn =
   map fn
 
 let decl_l fn =
-  let memo_t = Hashtbl.create 63 in
-  let fn d = memo fn decl_tag memo_t d in
+  let fn = memo decl_tag fn in
   let fn task acc = match task.task_decl with
     | Decl d -> List.rev_map (List.fold_left add_decl acc) (fn d)
     | td -> [add_tdecl acc td]
