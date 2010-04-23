@@ -59,8 +59,10 @@ OCAMLVERSION = @OCAMLVERSION@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-BFLAGS = -w Ae -dtypes -g -I src $(INCLUDES)
-OFLAGS = -w Ae -dtypes    -I src $(INCLUDES)
+BFLAGS = -w Ae -dtypes -g -I lib $(INCLUDES)
+OFLAGS = -w Ae -dtypes    -I lib $(INCLUDES)
+DEPFLAGS = -I lib
+
 
 # external libraries common to all binaries
 
@@ -81,6 +83,10 @@ EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS))
 all: @OCAMLBEST@
 
 .PHONY: byte opt clean depend all
+
+depend:
+	rm -f $^
+	make $^
 
 #############
 # Why library
@@ -118,7 +124,7 @@ LIBMODULES = src/config \
 	      $(addprefix src/printer/, $(LIB_PRINTER))
 
 LIBDIRS = util core parser driver transform printer
-LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
+LIBINCLUDES = -I src/ $(addprefix -I src/, $(LIBDIRS))
 
 LIBML  = $(addsuffix .ml,  $(LIBMODULES))
 LIBMLI = $(addsuffix .mli, $(LIBMODULES))
@@ -130,8 +136,8 @@ $(LIBCMX): OFLAGS += -for-pack Why
 
 # build targets
 
-byte: src/why.cma
-opt:  src/why.cmxa
+byte: lib/why.cma
+opt:  lib/why.cmxa
 
 src/why.cma: src/why.cmo
 	$(OCAMLC) -a $(BFLAGS) -o $@ $^
@@ -145,15 +151,23 @@ src/why.cmo: $(LIBCMO)
 src/why.cmx: $(LIBCMX)
 	$(OCAMLOPT) $(OFLAGS) -pack -o $@ $^
 
-src/why.cmi: src/why.cmo src/why.cmx
-	@echo -n
+lib/why.cma: src/why.cma
+	cp -f src/why.o lib/why.o
+	cp -f $^ $@
+
+lib/why.cmxa: src/why.cmxa
+	cp -f src/why.a lib/why.a
+	cp -f $^ $@
+
+lib/why.cmi: src/why.cmo src/why.cmx
+	cp -f src/why.cmi lib/why.cmi
 
 # depend target
 
 include .depend.lib
 
 .depend.lib: src/config.ml $(LIBGENERATED)
-	$(OCAMLDEP) -slash $(LIBINCLUDES) $(LIBML) $(LIBMLI) > $@
+	$(OCAMLDEP) $(DEPFLAGS) -slash $(LIBINCLUDES) $(LIBML) $(LIBMLI) > $@
 
 depend: .depend.lib
 
@@ -168,6 +182,7 @@ LIBCLEAN = $(addsuffix /*.cm[iox], $(LIBSDIRS)) \
 clean::
 	rm -f $(LIBCLEAN) $(LIBGENERATED)
 	rm -f src/why.cm[iox] src/why.[ao] src/why.cma src/why.cmxa
+	rm -f .depend.lib
 
 ##################
 # Why binary
@@ -176,16 +191,16 @@ clean::
 byte: bin/why.byte
 opt:  bin/why.opt
 
-bin/why.opt: src/why.cmxa src/main.cmx
+bin/why.opt: lib/why.cmxa src/main.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why.byte: src/why.cma src/main.cmo
+bin/why.byte: lib/why.cma src/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
-src/main.cmo src/main.cmx: src/why.cmi
+src/main.cmo src/main.cmx: lib/why.cmi
 
 clean::
 	rm -f src/main.cm[iox] src/main.annot src/main.o
@@ -208,19 +223,18 @@ PGMCMO = $(addsuffix .cmo, $(PGMMODULES))
 PGMCMX = $(addsuffix .cmx, $(PGMMODULES))
 
 $(PGMCMO) $(PGMCMX): INCLUDES = -I src/programs
-$(PGMCMO) $(PGMCMX): src/why.cmi
 
 # build targets
 
 byte: bin/whyml.byte
 opt:  bin/whyml.opt
 
-bin/whyml.opt: src/why.cmxa $(PGMCMX)
+bin/whyml.opt: lib/why.cmxa $(PGMCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/whyml.byte: src/why.cma $(PGMCMO)
+bin/whyml.byte: lib/why.cma $(PGMCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
@@ -229,7 +243,7 @@ bin/whyml.byte: src/why.cma $(PGMCMO)
 include .depend.programs
 
 .depend.programs: $(PGMGENERATED)
-	$(OCAMLDEP) -slash -I src/programs $(PGMML) $(PGMMLI) > $@
+	$(OCAMLDEP) $(DEPFLAGS) -slash -I src/programs $(PGMML) $(PGMMLI) > $@
 
 depend: .depend.programs
 
@@ -238,6 +252,7 @@ clean::
 	rm -f src/programs/*.cm[iox] src/programs/*.o
 	rm -f src/programs/*.annot src/programs/*~
 	rm -f bin/whyml.byte bin/whyml.opt
+	rm -f .depend.programs
 
 ###############
 # proof manager
@@ -253,19 +268,18 @@ MNGCMO = $(addsuffix .cmo, $(MNGMODULES))
 MNGCMX = $(addsuffix .cmx, $(MNGMODULES))
 
 $(MNGCMO) $(MNGCMX): INCLUDES = -I src/manager -I +sqlite3
-$(MNGCMO) $(MNGCMX): src/why.cmi
 
 byte: bin/manager.byte
 opt:  bin/manager.opt
 
 bin/manager.opt bin/manager.byte: INCLUDES = -I +sqlite3
 
-bin/manager.opt: src/why.cmxa $(MNGCMX)
+bin/manager.opt: lib/why.cmxa $(MNGCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) sqlite3.cmxa $^
 	$(STRIP) $@
 
-bin/manager.byte: src/why.cma $(MNGCMO)
+bin/manager.byte: lib/why.cma $(MNGCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) sqlite3.cma $^
 
@@ -274,7 +288,7 @@ bin/manager.byte: src/why.cma $(MNGCMO)
 include .depend.manager
 
 .depend.manager:
-	$(OCAMLDEP) -slash -I src/manager/ $(MNGML) $(MNGMLI) > $@
+	$(OCAMLDEP) $(DEPFLAGS) -slash -I src/manager/ $(MNGML) $(MNGMLI) > $@
 
 depend: .depend.manager
 
@@ -282,6 +296,7 @@ clean::
 	rm -f src/manager/*.cm[iox] src/manager/*.o
 	rm -f src/manager/*.annot src/manager/*~
 	rm -f bin/manager.byte bin/manager.opt
+	rm -f .depend.manager
 
 #####################
 # graphical interface
@@ -297,7 +312,6 @@ IDECMO = $(addsuffix .cmo, $(IDEMODULES))
 IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
 $(IDECMO) $(IDECMX): INCLUDES = -I src/ide -I +lablgtk2 -I +threads
-$(IDECMO) $(IDECMX): src/why.cmi
 
 # build targets
 
@@ -308,14 +322,14 @@ endif
 
 bin/whyide.opt bin/whyide.byte: INCLUDES = -I +lablgtk2 -I +threads
 
-bin/whyide.opt: src/why.cmxa $(IDE_CMX)
+bin/whyide.opt: lib/why.cmxa $(IDE_CMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) threads.cmxa \
 	    lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx $^
 	$(STRIP) $@
 
 
-bin/whyide.byte: src/why.cma $(IDE_CMO)
+bin/whyide.byte: lib/why.cma $(IDE_CMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma \
 	    lablgtk.cma lablgtksourceview2.cma gtkThread.cmo $^
@@ -325,7 +339,7 @@ bin/whyide.byte: src/why.cma $(IDE_CMO)
 include .depend.ide
 
 .depend.ide:
-	$(OCAMLDEP) -slash -I src/ide $(IDEML) $(IDEMLI) > $@
+	$(OCAMLDEP) $(DEPFLAGS) -slash -I src/ide $(IDEML) $(IDEMLI) > $@
 
 depend: .depend.ide
 
@@ -333,6 +347,7 @@ clean::
 	rm -f src/ide/*.cm[iox] src/ide/*.o
 	rm -f src/ide/*.annot src/ide/*~
 	rm -f bin/whyide.byte bin/whyide.opt
+	rm -f .depend.ide
 
 ##############
 # Coq plugin
@@ -351,7 +366,7 @@ src/coq-plugin/whytac.cmxs: INCLUDES = $(addprefix -I @COQLIB@/, $(COQTREES))
 #src/coq-plugin/whytac.cmo:  BFLAGS+=-rectypes
 src/coq-plugin/whytac.cmxs: OFLAGS+=-rectypes
 
-src/coq-plugin/whytac.cmxs: src/why.cmxa src/coq-plugin/whytac.ml
+src/coq-plugin/whytac.cmxs: lib/why.cmxa src/coq-plugin/whytac.ml
 	$(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
 
 #######
