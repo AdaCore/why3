@@ -29,8 +29,8 @@ module Make (S : Util.Tagged) = struct
     let w = Weak.create 1 in
     Weak.set w 0 (Some table);
     let final x = match Weak.get w 0 with
-      | None -> ()
       | Some h -> Hashtbl.remove h (S.tag x)
+      | None -> ()
     in
     { table = table; final = final }
 
@@ -39,7 +39,9 @@ module Make (S : Util.Tagged) = struct
   let find_tag h = Hashtbl.find h.table
 
   let add_tag h t e v =
-    Gc.finalise h.final e; add_tag h t v
+    assert (not (mem_tag h t));
+    Gc.finalise h.final e;
+    add_tag h t v
 
   let add  h e = add_tag  h (S.tag e) e
   let mem  h e = mem_tag  h (S.tag e)
@@ -55,12 +57,12 @@ module Make (S : Util.Tagged) = struct
         v
 
   let memoize_option n fn =
-    let v = fn None in
+    let v = lazy (fn None) in
     let fn e = fn (Some e) in 
     let fn = memoize n fn in
     function
       | Some e -> fn e
-      | None -> v
+      | None -> Lazy.force v
 
 end
 
