@@ -36,7 +36,7 @@ let exi vl (_,f) =
     | Fapp (_,tl) ->
         let marry acc v t = f_and_simp acc (f_equ v t) in
         List.fold_left2 marry f_true vl tl
-    | _ -> Trans.unsupportedExpression (Fmla f) "eliminate_inductive"
+    | _ -> assert false
   in
   descend f
 

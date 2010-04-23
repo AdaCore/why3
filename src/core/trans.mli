@@ -57,9 +57,7 @@ val decl_l : (decl -> decl list list) -> task -> task tlist
 
 val rewrite : (term -> term) -> (fmla -> fmla) -> task -> task trans
 
-
 (** exception to use in a transformation *)
-
 
 type error =
   | UnsupportedExpression of expr * string
@@ -70,7 +68,7 @@ exception Error of error
 
 val unsupportedExpression : expr -> string -> 'a
 val unsupportedDeclaration : decl -> string -> 'a
-(** - [expr] is the problematic formula 
+(** - [expr] is the problematic formula
     - [string] explain the problem and
       possibly a way to solve it (such as applying another
       transforamtion) *)
@@ -78,5 +76,5 @@ val unsupportedDeclaration : decl -> string -> 'a
 val notImplemented : string -> 'a
 (** [string] explain what is not implemented *)
 
-
 val report : Format.formatter -> error -> unit
+

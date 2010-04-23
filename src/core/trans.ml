@@ -118,15 +118,13 @@ let notImplemented s = error (NotImplemented s)
 
 let report fmt = function
   | UnsupportedExpression (e,s) ->
+      let msg = "The transformation doesn't support this expression" in
       Format.fprintf fmt
-        "@[<hov 3> The transformation doesn't support this expression :@\n\
-%a@\n\
-%s@]@\n" Pretty.print_expr e s
+        "@[<hov 3> %s:@\n%a@\n%s@]@\n" msg Pretty.print_expr e s
   | UnsupportedDeclaration (d,s) ->
+      let msg = "The transformation doesn't support this declaration" in
       Format.fprintf fmt
-        "@[<hov 3> The transformation doesn't support this declaration :@\n\
-%a@\n\
-%s@]@\n" Pretty.print_decl d s
+        "@[<hov 3> %s:@\n%a@\n%s@]@\n" msg Pretty.print_decl d s
   | NotImplemented (s) ->
-      Format.fprintf fmt
-        "@[<hov 3> Unimplemented features :@\n%s@]@\n" s
+      Format.fprintf fmt "@[<hov 3> Unimplemented feature:@\n%s@]@\n" s
+
