@@ -66,7 +66,7 @@ and replacep env f =
 and substt env d = t_map (replacet env) (replacep env) d
 and substp env d = f_map (replacet env) (replacep env) d
 
-let fold isnotinlinedt isnotinlinedf d (env, task) = 
+let fold q isnotinlinedt isnotinlinedf d (env, task) = 
 (*  Format.printf "I see : %a@\n%a@\n" Pretty.print_decl d print_env env;*)
   match d.d_node with
     | Dlogic [ls,ld] -> begin
@@ -77,13 +77,15 @@ let fold isnotinlinedt isnotinlinedf d (env, task) =
               match e with
                 | Term t ->
                     let t = replacet env t in
-                    if t_s_any ffalse ((==) ls) t || isnotinlinedt t
+                    if isnotinlinedt t || Driver.query_remove q ls.ls_name
+                      || t_s_any ffalse ((==) ls) t
                     then env, add_decl task 
                       (create_logic_decl [make_fs_defn ls vs t])
                     else {env with fs = Mls.add ls (vs,t) env.fs},task
                 | Fmla f -> 
                     let f = replacep env f in
-                    if f_s_any ffalse ((==) ls) f || isnotinlinedf f
+                    if isnotinlinedf f || Driver.query_remove q ls.ls_name ||
+                      f_s_any ffalse ((==) ls) f
                     then env, add_decl task 
                       (create_logic_decl [make_ps_defn ls vs f])
                     else {env with ps = Mls.add ls (vs,f) env.ps},task
@@ -105,15 +107,15 @@ let fold isnotinlinedt isnotinlinedf d (env, task) =
     | Dprop (k,pr,f) -> 
         env,add_decl task (create_prop_decl k pr (replacep env f))
         
-let fold isnotinlinedt isnotinlinedf task0 (env, task) = 
+let fold q isnotinlinedt isnotinlinedf task0 (env, task) = 
   match task0.task_decl with
-    | Decl d -> fold isnotinlinedt isnotinlinedf d (env, task)
+    | Decl d -> fold q isnotinlinedt isnotinlinedf d (env, task)
     | td -> env, add_tdecl task td
 
 let t ~isnotinlinedt ~isnotinlinedf = 
-  Register.store 
-    (fun () -> Trans.fold_map 
-       (fold isnotinlinedt isnotinlinedf) 
+  Register.store_query 
+    (fun query -> Trans.fold_map 
+       (fold query isnotinlinedt isnotinlinedf) 
        empty_env None)
 
 let all = t ~isnotinlinedt:(fun _ -> false) ~isnotinlinedf:(fun _ -> false)
