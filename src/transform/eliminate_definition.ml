@@ -55,12 +55,12 @@ let rec add_fd kn task nm ls hd lm e = match e.t_node with
               | [{ pat_node = Papp (cs,pl) }] ->
                   let mk_var p = match p.pat_node with
                     | Pvar v -> t_var v
-                    | _ -> failwith uncompiled
+                    | _ -> Trans.unsupportedExpression (Term t) uncompiled
                   in
                   w, Mls.add cs (t_app cs (List.map mk_var pl) v.vs_ty, e) m
               | [{ pat_node = Pwild }] ->
                   Some e, m
-              | _ -> failwith uncompiled
+              | _ -> Trans.unsupportedExpression (Term t) uncompiled
             in
             let w,m = List.fold_left mk_br (None,Mls.empty) bl in
             let find cs = try Mls.find cs m with Not_found ->
@@ -71,7 +71,7 @@ let rec add_fd kn task nm ls hd lm e = match e.t_node with
             in
             let ts = match v.vs_ty.ty_node with
               | Tyapp (ts,_) -> ts
-              | _ -> failwith uncompiled
+              | _ -> Trans.unsupportedExpression (Term t) uncompiled
             in
             let add_cs tsk cs =
               let t,e = find cs in
@@ -99,12 +99,12 @@ let rec add_pd kn task nm ls hd lm e = match e.f_node with
               | [{ pat_node = Papp (cs,pl) }] ->
                   let mk_var p = match p.pat_node with
                     | Pvar v -> t_var v
-                    | _ -> failwith uncompiled
+                    | _ -> Trans.unsupportedExpression (Fmla e) uncompiled
                   in
                   w, Mls.add cs (t_app cs (List.map mk_var pl) v.vs_ty, e) m
               | [{ pat_node = Pwild }] ->
                   Some e, m
-              | _ -> failwith uncompiled
+              | _ -> Trans.unsupportedExpression (Fmla e) uncompiled
             in
             let w,m = List.fold_left mk_br (None,Mls.empty) bl in
             let find cs = try Mls.find cs m with Not_found ->
@@ -115,7 +115,7 @@ let rec add_pd kn task nm ls hd lm e = match e.f_node with
             in
             let ts = match v.vs_ty.ty_node with
               | Tyapp (ts,_) -> ts
-              | _ -> failwith uncompiled
+              | _ -> Trans.unsupportedExpression (Term t) uncompiled
             in
             let add_cs tsk cs =
               let t,e = find cs in

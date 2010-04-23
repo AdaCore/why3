@@ -70,9 +70,11 @@ let rec print_term drv fmt t = match t.t_node with
   | Tvar v -> print_var fmt v
   | Tapp (ls, tl) -> begin match Driver.query_syntax drv ls.ls_name with
       | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl
-      | None -> fprintf fmt "@[(%a %a)@]" 
-	  print_ident ls.ls_name (print_list space (print_term drv)) tl
-    end
+      | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
+          | [] -> fprintf fmt "@[%a@]" print_ident ls.ls_name
+          | _ -> fprintf fmt "@[(%a %a)@]" 
+	      print_ident ls.ls_name (print_list space (print_term drv)) tl
+        end end
   | Tlet (t1, tb) ->
       let v, t2 = t_open_bound tb in
       fprintf fmt "@[(let %a = %a@ in %a)@]" print_ident v.vs_name
@@ -90,9 +92,11 @@ let rec print_fmla drv fmt f = match f.f_node with
       print_ident fmt id
   | Fapp (ls, tl) -> begin match Driver.query_syntax drv ls.ls_name with
       | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl
-      | None -> fprintf fmt "(%a %a)" 
-	  print_ident ls.ls_name (print_list space (print_term drv)) tl
-      end
+      | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
+          | [] -> fprintf fmt "%a" print_ident ls.ls_name
+          | _ -> fprintf fmt "(%a %a)" 
+	      print_ident ls.ls_name (print_list space (print_term drv)) tl 
+        end end
   | Fquant (q, fq) ->
       let q = match q with Fforall -> "forall" | Fexists -> "exists" in
       let vl, _tl, f = f_open_quant fq in

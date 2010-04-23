@@ -46,24 +46,24 @@ let rec rewriteT kn state t = match t.t_node with
         | [{ pat_node = Papp (cs,pl) }] ->
             let add_var e p pj = match p.pat_node with
               | Pvar v -> t_let v (t_app pj [t1] v.vs_ty) e
-              | _ -> failwith uncompiled
+              | _ -> Trans.unsupportedExpression (Term t) uncompiled
             in
             let pjl = Mls.find cs state.pj_map in
             let e = List.fold_left2 add_var e pl pjl in
             w, Mls.add cs e m
         | [{ pat_node = Pwild }] ->
             Some e, m
-        | _ -> failwith uncompiled
+        | _ -> Trans.unsupportedExpression (Term t) uncompiled
       in
       let w,m = List.fold_left mk_br (None,Mls.empty) bl in
       let find cs = try Mls.find cs m with Not_found -> of_option w in
       let ts = match t1.t_ty.ty_node with
         | Tyapp (ts,_) -> ts
-        | _ -> failwith uncompiled
+        | _ -> Trans.unsupportedExpression (Term t) uncompiled
       in
       let tl = List.map find (find_constructors kn ts) in
       t_app (Mts.find ts state.mt_map) (t1::tl) t.t_ty
-  | Tcase _ -> failwith uncompiled
+  | Tcase _ -> Trans.unsupportedExpression (Term t) uncompiled
   | _ -> t_map (rewriteT kn state) (rewriteF kn state) t
 
 and rewriteF kn state f = match f.f_node with
@@ -76,14 +76,14 @@ and rewriteF kn state f = match f.f_node with
         | [{ pat_node = Papp (cs,pl) }] ->
             let add_var e p pj = match p.pat_node with
               | Pvar v -> f_let v (t_app pj [t1] v.vs_ty) e
-              | _ -> failwith uncompiled
+              | _ -> Trans.unsupportedExpression (Fmla f) uncompiled
             in
             let pjl = Mls.find cs state.pj_map in
             let e = List.fold_left2 add_var e pl pjl in
             w, Mls.add cs e m
         | [{ pat_node = Pwild }] ->
             Some e, m
-        | _ -> failwith uncompiled
+        | _ -> Trans.unsupportedExpression (Fmla f) uncompiled
       in
       let w,m = List.fold_left mk_br (None,Mls.empty) bl in
       let find cs =
@@ -95,10 +95,10 @@ and rewriteF kn state f = match f.f_node with
       in
       let ts = match t1.t_ty.ty_node with
         | Tyapp (ts,_) -> ts
-        | _ -> failwith uncompiled
+        | _ -> Trans.unsupportedExpression (Fmla f) uncompiled
       in
       map_join_left find f_and_simp (find_constructors kn ts)
-  | Fcase _ -> failwith uncompiled
+  | Fcase _ -> Trans.unsupportedExpression (Fmla f) uncompiled
   | _ -> f_map (rewriteT kn state) (rewriteF kn state) f
 
 let add_type (state, task) ts csl =

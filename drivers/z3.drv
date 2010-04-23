@@ -6,8 +6,8 @@ prelude ";;; this is a prelude for Z3"
 printer "smtv1"
 filename "%f-%t-%g.smt"
 
-valid "unsat"
-unknown "unknown\\|sat\\|Fail" "Unknown"
+valid "^unsat"
+unknown "^\\(unknown\\|sat\\|Fail\\)" "Unknown"
 
 (* À discuter *)
 transformation "simplify_recursive_definition"      
@@ -34,7 +34,7 @@ theory int.Int
   syntax logic (_+_) "(+ %1 %2)"
   syntax logic (_-_) "(- %1 %2)"
   syntax logic (_*_) "(* %1 %2)"
-  syntax logic (-_)  "(-%1)"
+  syntax logic (-_)  "(- %1)"
 
   syntax logic (_<=_) "(<= %1 %2)"
   syntax logic (_< _) "(< %1 %2)"

@@ -101,3 +101,32 @@ let decl_l fn =
 
 let rewrite fnT fnF = decl (fun d -> [decl_map fnT fnF d])
 
+(** exception to use in a transformation *)
+
+type error =
+  | UnsupportedExpression of expr * string
+  | UnsupportedDeclaration of decl * string
+  | NotImplemented of string
+
+exception Error of error
+
+let error e = raise (Error e)
+
+let unsupportedExpression e s = error (UnsupportedExpression (e,s))
+let unsupportedDeclaration e s = error (UnsupportedDeclaration (e,s))
+let notImplemented s = error (NotImplemented s)
+
+let report fmt = function
+  | UnsupportedExpression (e,s) ->
+      Format.fprintf fmt
+        "@[<hov 3> The transformation doesn't support this expression :@\n\
+%a@\n\
+%s@]@\n" Pretty.print_expr e s
+  | UnsupportedDeclaration (d,s) ->
+      Format.fprintf fmt
+        "@[<hov 3> The transformation doesn't support this declaration :@\n\
+%a@\n\
+%s@]@\n" Pretty.print_decl d s
+  | NotImplemented (s) ->
+      Format.fprintf fmt
+        "@[<hov 3> Unimplemented features :@\n%s@]@\n" s

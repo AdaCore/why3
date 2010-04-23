@@ -208,9 +208,9 @@ let rec rewrite_term tenv tvar vsvar t =
     | Tlet (t1, b) -> let u,t2 = t_open_bound b in
       let t1' = fnT t1 in let t2' = fnT t2 in
       if t1' == t1 && t2' == t2 then t else t_let u t1' t2'
-    | Tcase _ -> assert false
-    | Teps _ -> assert false
-    | Tbvar _ -> assert false
+    | Tcase _ | Teps _ | Tbvar _ ->
+        Trans.unsupportedExpression
+                 (Term t) "Encoding decorate : I can't encode this term"
 
 and rewrite_fmla tenv tvar vsvar f =
   let fnT = rewrite_term tenv tvar vsvar in
@@ -268,15 +268,15 @@ let decl (tenv:tenv) d =
             Hts.add tenv.trans_tsymbol ts tty;
             tty in
         [create_logic_decl [(tty,None)]]
-    | Dtype _ -> failwith ("Encoding_decorate : I can work only on abstract\
-                            type which are not in recursive bloc")
+    | Dtype _ -> Trans.unsupportedDeclaration 
+        d "encoding_decorate : I can work only on abstract\
+            type which are not in recursive bloc."
     | Dlogic l ->
         let fn = function
           | _ls, Some _ -> 
-              Format.eprintf "@[<hov 3>Encoding_decorate :@\n\
-I can't encode definition such as %a@\n\
-Perhaps you could use eliminate_definition@\n@]@." Pretty.print_decl d;
-              assert false 
+              Trans.unsupportedDeclaration 
+                d "encoding_decorate : I can't encode definition. \
+Perhaps you could use eliminate_definition"
           | ls, None ->              
               try
                 let ls = Hls.find tenv.trans_lsymbol ls in
@@ -286,7 +286,8 @@ Perhaps you could use eliminate_definition@\n@]@." Pretty.print_decl d;
                 Hls.add tenv.trans_lsymbol ls ls_conv;
                 ls_conv,None in
         [create_logic_decl (List.map fn l)]
-    | Dind _ -> failwith ("Encoding_decorate : I can't work on inductive")
+    | Dind _ -> Trans.unsupportedDeclaration
+        d "encoding_decorate : I can't work on inductive"
         (* let fn (pr,f) = pr, fnF f in *)
         (* let fn (ps,l) = ps, List.map fn l in *)
         (* [create_ind_decl (List.map fn l)] *)
