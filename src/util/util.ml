@@ -58,6 +58,10 @@ exception FoldSkip
 let all_fn pr _ t = pr t || raise FoldSkip
 let any_fn pr _ t = pr t && raise FoldSkip
 
+(* constant boolean function *)
+let ttrue _ = true
+let ffalse _ = false
+
 (* Set and Map on strings *)
 
 module Sstr = Set.Make(String)

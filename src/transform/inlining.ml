@@ -17,13 +17,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Util
 open Ident
 open Term
 open Decl
 open Task
-
-let ttrue _ = true
-let ffalse _ = false
 
 type env = { fs : (vsymbol list * term) Mls.t;
              ps : (vsymbol list * fmla) Mls.t}

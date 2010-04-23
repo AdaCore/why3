@@ -47,6 +47,11 @@ exception FoldSkip
 val all_fn : ('a -> bool) -> 'b -> 'a -> bool
 val any_fn : ('a -> bool) -> 'b -> 'a -> bool
 
+val ffalse : 'a -> bool
+(** [ffalse] constant function [false] *)
+val ttrue : 'a -> bool
+(** [ttrue] constant function [true] *)
+
 (* Set and Map on strings *)
 
 module Sstr : Set.S with type elt = string
