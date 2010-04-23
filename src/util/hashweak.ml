@@ -38,12 +38,12 @@ module Make (S : Util.Tagged) = struct
   let mem_tag  h = Hashtbl.mem  h.table
   let find_tag h = Hashtbl.find h.table
 
-  let add_tag h t e v =
+  let set_tag h t e v =
     assert (not (mem_tag h t));
     Gc.finalise h.final e;
     add_tag h t v
 
-  let add  h e = add_tag  h (S.tag e) e
+  let set  h e = set_tag  h (S.tag e) e
   let mem  h e = mem_tag  h (S.tag e)
   let find h e = find_tag h (S.tag e)
 
@@ -53,7 +53,7 @@ module Make (S : Util.Tagged) = struct
       try find_tag h t
       with Not_found ->
         let v = fn e in
-        add_tag h t e v;
+        set_tag h t e v;
         v
 
   let memoize_option n fn =

@@ -31,8 +31,8 @@ module Make (S : Util.Tagged) : sig
   val mem : 'a t -> S.t -> bool
     (* test if a key is bound *)
 
-  val add : 'a t -> S.t -> 'a -> unit
-    (* bind the key with the value given *)
+  val set : 'a t -> S.t -> 'a -> unit
+    (* bind the key _once_ with the given value *)
 
   val memoize : int -> (S.t -> 'a) -> (S.t -> 'a)
     (* create a memoizing function *)

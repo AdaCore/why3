@@ -54,7 +54,7 @@ let fold fn v =
   let h = WHtask.create 63 in
   let rewind acc task =
     let acc = fn task acc in
-    WHtask.add h task acc;
+    WHtask.set h task acc;
     acc
   in
   let current task =
