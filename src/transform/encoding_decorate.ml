@@ -17,11 +17,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Util
 open Ident
 open Ty
 open Term
 open Task
 open Theory
+open Task
 open Decl
 
 let why_filename = ["transform" ; "encoding_decorate"]
@@ -53,7 +55,9 @@ type lconv = {d2t : lsymbol;
               t2u : lsymbol;
               tty : term}
 
-type tenv = {specials : lconv Mty.t;
+type tenv = {query : Driver.driver_query option;
+             clone_builtin : tysymbol -> Task.tdecl list;
+             specials : lconv Hty.t;
              deco : ty;
              undeco : ty;
              sort : lsymbol;
@@ -64,8 +68,7 @@ type tenv = {specials : lconv Mty.t;
        comme specials_type ne depend pas*)
     
 
-let load_prelude env =
-  let specials_type = [ts_int;ts_real] in
+let load_prelude query env =
   let prelude = Env.find_theory env why_filename "Prelude" in
   let sort = Theory.ns_find_ls prelude.th_export ["sort"] in
   let tyty = ty_app (Theory.ns_find_ts prelude.th_export ["ty"]) [] in
@@ -73,20 +76,24 @@ let load_prelude env =
   let undeco = ty_app (Theory.ns_find_ts prelude.th_export ["undeco"]) [] in
   let task = None in
   let task = Task.use_export task prelude in
+  let trans_tsymbol = Hts.create 17 in
+  let specials = Hty.create 17 in
   let builtin = Env.find_theory env why_filename "Builtin" in
   let type_t = Theory.ns_find_ts builtin.th_export ["t"] in
   let logic_d2t = Theory.ns_find_ls builtin.th_export ["d2t"] in
   let logic_t2u = Theory.ns_find_ls builtin.th_export ["t2u"] in
   let logic_tty = Theory.ns_find_ls builtin.th_export ["tty"] in
-  let trans_tsymbol = Hts.create 17 in
-  let clone_builtin (task,spmap) ts =
+  let clone_builtin ts =
+    let task = None in
     let name = ts.ts_name.id_short in
     let th_uc = create_theory (id_fresh ("encoding_decorate_for_"^name)) in
-    let th_uc = use_export th_uc prelude in
-    let ty = (ty_app ts []) in
-    let add_fsymbol fs task =
-      let decl = create_logic_decl [fs,None] in
-      add_decl task decl in
+    let th_uc = Theory.use_export th_uc prelude in
+    let th_uc = 
+      if ts == ts_int || ts = ts_real then th_uc
+      else Theory.add_ty_decl th_uc [ts,Tabstract] in
+    let ty = ty_app ts [] in
+    let add_fsymbol fs th_uc =
+      Theory.add_logic_decl th_uc [fs,None] in
     let tty = create_fsymbol (id_clone ts.ts_name) [] tyty in
     let d2ty = create_fsymbol (id_fresh ("d2"^name)) [deco]  ty in
     let ty2u = create_fsymbol (id_fresh (name^"2u")) [ty] undeco in
@@ -100,12 +107,12 @@ let load_prelude env =
     let th = close_theory th_uc in
     let task = Task.use_export task th in
     Hts.add trans_tsymbol ts tty;
-      task,Mty.add (ty_app ts []) lconv spmap
-  in
-  let task,specials = 
-    List.fold_left clone_builtin (task,Mty.empty) specials_type in
+    Hty.add specials (ty_app ts []) lconv;
+    task_tdecls task in
   task,
-  { specials = specials;
+  { query = query;
+    clone_builtin = clone_builtin;
+    specials = specials;
     deco = deco;
     undeco = undeco;
     ty = tyty;
@@ -113,6 +120,16 @@ let load_prelude env =
     trans_lsymbol = Hls.create 17;
     trans_tsymbol = trans_tsymbol}
 
+let is_kept tenv ts = 
+  ts.ts_args = [] &&  
+    begin
+      ts == ts_int || ts == ts_real  (* for the constant *)
+      || match tenv.query with
+        | None -> true (* every_simple *)
+        | Some query ->
+            let tags = Driver.query_tags query ts.ts_name in
+            Sstr.mem "encoding_decorate : kept" tags
+    end
 
 (* Translate a type to a term *)
 let rec term_of_ty tenv tvar ty =
@@ -134,14 +151,14 @@ let sort_app tenv tvar t ty =
 
 (* Convert a type at the right of an arrow *)
 let conv_ty_neg tenv ty =
-  if Mty.mem ty tenv.specials then
+  if Hty.mem tenv.specials ty then
     ty
   else
     tenv.deco
 
 (* Convert a type at the left of an arrow *)
 let conv_ty_pos tenv ty =
-  if Mty.mem ty tenv.specials then
+  if Hty.mem tenv.specials ty then
     ty
   else
     tenv.undeco
@@ -172,13 +189,13 @@ let conv_arg tenv tvar t ty =
   let tty = t.t_ty in
   if tty == ty then t else
     if ty == tenv.deco then
-      let tylconv = Mty.find tty tenv.specials in
+      let tylconv = Hty.find tenv.specials tty in
       let t = (t_app tylconv.t2u [t] tenv.undeco) in
       sort_app tenv tvar t tty
     else (* tty is tenv.deco *)
       begin
         assert (tty == tenv.deco);
-        let tylconv = Mty.find ty tenv.specials in       
+        let tylconv = Hty.find tenv.specials ty in       
         t_app tylconv.d2t [t] ty
       end
 
@@ -220,10 +237,10 @@ and rewrite_fmla tenv tvar vsvar f =
         let tl = List.map fnT tl in
         begin
           match tl with
-            | [a1;a2] ->
+            | [a1;_] ->
                 let ty = 
-                  if a1.t_ty == ty_int || a2.t_ty == ty_int 
-                  then ty_int 
+                  if Hty.mem tenv.specials a1.t_ty
+                  then a1.t_ty
                   else tenv.deco in
                 let tl = List.map2 (conv_arg tenv tvar) tl [ty;ty] in
                 f_app p tl
@@ -259,6 +276,8 @@ let decl (tenv:tenv) d =
   (* let fnT = rewrite_term tenv in *)
   let fnF = rewrite_fmla tenv in
   match d.d_node with
+    | Dtype [ts,Tabstract] when is_kept tenv ts -> 
+        tenv.clone_builtin ts
     | Dtype [ts,Tabstract] -> 
         let tty = 
           try 
@@ -267,7 +286,7 @@ let decl (tenv:tenv) d =
             let tty = conv_ts tenv ts in
             Hts.add tenv.trans_tsymbol ts tty;
             tty in
-        [create_logic_decl [(tty,None)]]
+        [create_decl (create_logic_decl [(tty,None)])]
     | Dtype _ -> Trans.unsupportedDeclaration 
         d "encoding_decorate : I can work only on abstract\
             type which are not in recursive bloc."
@@ -285,7 +304,7 @@ Perhaps you could use eliminate_definition"
                 let ls_conv = conv_ls tenv ls in
                 Hls.add tenv.trans_lsymbol ls ls_conv;
                 ls_conv,None in
-        [create_logic_decl (List.map fn l)]
+        [create_decl (create_logic_decl (List.map fn l))]
     | Dind _ -> Trans.unsupportedDeclaration
         d "encoding_decorate : I can't work on inductive"
         (* let fn (pr,f) = pr, fnF f in *)
@@ -296,19 +315,29 @@ Perhaps you could use eliminate_definition"
         let f = fnF tvar Mvs.empty f in
         let tvl = Htv.fold (fun _ tv acc -> tv::acc) tvar [] in
         let f = f_forall tvl [] f in
-        [create_prop_decl k pr f]
+        [create_decl (create_prop_decl k pr f)]
 
 (*
 let decl tenv d =
-  Format.printf "@[<hov 2>Decl : %a =>@\n" Pretty.print_decl d;
+  Format.eprintf "@[<hov 2>Decl : %a =>@\n" Pretty.print_decl d;
   let res = decl tenv d in
-  Format.printf "%a@]@." (Pp.print_list Pp.newline Pretty.print_decl) res;
+  Format.eprintf "%a@]@." (Pp.print_list Pp.newline Pretty.print_task_tdecl)
+    res;
   res
 *)
 
-let t = Register.store_env 
-  (fun env -> 
-     let init_task,tenv = load_prelude env in
-     Trans.decl (decl tenv) init_task)
+let t = Register.store_query 
+  (fun query -> 
+     let env = Driver.query_env query in
+     let init_task,tenv = load_prelude (Some query) env in
+     Trans.tdecl (decl tenv) init_task)
 
 let () = Register.register_transform "encoding_decorate" t
+
+
+let t_all = Register.store_env 
+  (fun env -> 
+     let init_task,tenv = load_prelude None env in
+     Trans.tdecl (decl tenv) init_task)
+
+let () = Register.register_transform "encoding_decorate_every_simple" t_all

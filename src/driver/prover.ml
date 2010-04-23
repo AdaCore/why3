@@ -63,7 +63,6 @@ let print_task drv fmt task =
   let apply task tr = Register.apply_driver tr drv task in
   let task = List.fold_left apply task transl in
   let printer = printer (driver_query drv task) in
-  print_prelude drv task fmt;
   fprintf fmt "@[%a@]@?" printer task
 
 let prove_task ?debug ~command ~timelimit ~memlimit drv task =

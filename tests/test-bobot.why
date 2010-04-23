@@ -1,0 +1,75 @@
+
+(* test file *)
+
+theory Test_encoding
+  use import int.Int
+  logic id(x: int) : int = x
+  logic id2(x: int) : int = id(x)
+  logic succ(x:int) : int = id(x+1)
+
+  type myt
+  logic f (int) : myt
+  clone transform.encoding_decorate.Kept with type t = myt
+
+  goal G : (forall x:int.f(x)=f(x)) or
+    (forall x:int. x=x+1)
+  goal G2 : forall x:int. let x = 0 + 1 in x = 1
+end
+
+theory Test_simplify_array
+  use import array.Array
+  goal G : forall x,y:int. forall m: (int,int) t. 
+    select(store(m,y,x),y) = x
+end 
+
+theory Test_conjunction
+  use import int.Int
+  goal G : 
+    forall x:int. x*x=4 -> ((x*x*x=8 or x*x*x = -8) and x*x*2 = 8)
+  goal G2 : 
+    forall x:int. 
+    (x+x=4 or x*x=4) -> ((x*x*x=8 or x*x*x = -8) and x*x*2 = 8)
+end
+
+theory Split_conj
+  logic p(x:int)
+    (*goal G : forall x,y,z:int. ((p(x) -> p(y)) and ((not p(x)) -> p(z))) -> ((p(x) and p(y)) or ((not p(x)) and p(z)))*)
+    (*goal G : forall x,y,z:int. (if p(x) then p(y) else p(z)) <-> ((p(x) and p(y)) or ((not p(x)) and p(z)))*)
+    (*goal G : forall x,y,z:int. (if p(x) then p(y) else p(z)) -> (if p(x) then p(y) else p(z))*)
+  goal G : forall x,y,z:int. (p(x) <-> p(z)) -> (p(x) <-> p(z))
+    (*goal G : forall x,y,z:int. (p(z) <-> p(x)) -> (((not p(z)) and (not p(x))  or  ((p(z)) and (p(x))))) *)
+    (*goal G : forall x,y,z:int. (p(x) or p(y)) -> p(z)*)
+end
+
+
+
+
+theory TestEnco
+  use import int.Int
+  type 'a mytype
+  logic id(x: int) : int = x
+  logic id2(x: int) : int = id(x)
+  logic succ(x:int) : int = id(x+1)
+
+  goal G : (forall x:int. x=x) or
+    (forall x:int. x=x+1)
+  logic p('a ) : 'a mytype
+  logic p2('a mytype) : 'a
+  type toto
+  logic f (toto) : toto mytype
+  logic g (int mytype) : toto
+  logic h (int) : toto mytype
+  axiom A1 : forall x : 'a mytype. p(p2(x)) = x
+  goal G2 : forall x:int. f(g(p(x))) = h(x)
+
+
+end
+
+
+
+(*
+Local Variables: 
+compile-command: "make -C .. test"
+End: 
+*)
+

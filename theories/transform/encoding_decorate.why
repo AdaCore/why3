@@ -13,3 +13,8 @@ theory Builtin
        logic t2u(t) : undeco
        axiom Conv : forall x:t[t2u(x)]. d2t(sort(tty,t2u(x)))=x
 end
+
+theory Kept
+(* If a driver tags this type by "encoding decorate : kept", all the type which clone this one will be kept by the encoding*)
+       type t
+end

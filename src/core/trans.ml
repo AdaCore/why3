@@ -99,6 +99,23 @@ let decl_l fn =
   in
   map_l fn
 
+
+let tdecl fn =
+  let fn = WHdecl.memoize 63 fn in
+  let fn task acc = match task.task_decl with
+    | Decl d -> List.fold_left add_tdecl acc (fn d)
+    | td -> add_tdecl acc td
+  in
+  map fn
+
+let tdecl_l fn =
+  let fn = WHdecl.memoize 63 fn in
+  let fn task acc = match task.task_decl with
+    | Decl d -> List.rev_map (List.fold_left add_tdecl acc) (fn d)
+    | td -> [add_tdecl acc td]
+  in
+  map_l fn
+
 let rewrite fnT fnF = decl (fun d -> [decl_map fnT fnF d])
 
 (** exception to use in a transformation *)

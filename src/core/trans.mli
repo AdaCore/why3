@@ -55,6 +55,9 @@ val map_l : (task_hd -> task -> task list) -> task -> task tlist
 val decl   : (decl -> decl list     ) -> task -> task trans
 val decl_l : (decl -> decl list list) -> task -> task tlist
 
+val tdecl   : (decl -> tdecl list     ) -> task -> task trans
+val tdecl_l : (decl -> tdecl list list) -> task -> task tlist
+
 val rewrite : (term -> term) -> (fmla -> fmla) -> task -> task trans
 
 (** exception to use in a transformation *)

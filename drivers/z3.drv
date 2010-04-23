@@ -11,10 +11,10 @@ unknown "^\\(unknown\\|sat\\|Fail\\)" "Unknown"
 
 (* À discuter *)
 transformation "simplify_recursive_definition"      
-(*transformation (*"split_goal_pos_neg_goal"*) "split_goal_pos_neg_all"*)
 transformation "inline_trivial"
-transformation "remove_logic_definition"
+transformation "eliminate_definition"
 transformation "encoding_decorate"
+(* transformation "encoding_decorate_every_simple" *)
 
 
 theory BuiltIn
@@ -58,9 +58,13 @@ theory algebra.AC
   remove cloned prop Assoc.Assoc
 end
 
+theory transform.encoding_decorate.Kept
+  tag cloned type t "encoding_decorate : kept"
+end
+
 (*
 Local Variables: 
 mode: why
-compile-command: "make -C ../.. bench"
+compile-command: "unset LANG; make -C .. bench"
 End: 
 *)

@@ -42,6 +42,8 @@ and tdecl =
   | Use   of theory
   | Clone of theory * (ident * ident) list
 
+let create_decl d = Decl d
+
 let task_known = option_apply Mid.empty (fun t -> t.task_known)
 let task_clone = option_apply Mid.empty (fun t -> t.task_clone)
 let task_used  = option_apply Mid.empty (fun t -> t.task_used)

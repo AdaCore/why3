@@ -328,7 +328,9 @@ let print_decls drv fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl drv)) dl
 
 let print_task drv fmt task =
-  forget_all (); print_decls drv fmt (Task.task_decls task)
+  forget_all (); 
+  Driver.print_prelude (Driver.query_driver drv) task fmt;
+  print_decls drv fmt (Task.task_decls task)
 
 let () = Register.register_printer "why3" print_task
 

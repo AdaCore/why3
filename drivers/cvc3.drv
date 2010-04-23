@@ -13,7 +13,7 @@ unknown "\\bunknown\\b\\|\\bsat\\b" "Unknown"
 transformation "simplify_recursive_definition"      
 (* transformation (*"split_goal_pos_neg_goal"*) "split_goal_pos_neg_all"*)
 transformation "inline_trivial"
-transformation "remove_logic_definition"
+transformation "eliminate_definition"
 transformation "encoding_decorate"
 
 theory BuiltIn
@@ -54,6 +54,10 @@ theory algebra.AC
   tag cloned logic op "AC"
   remove cloned prop Comm.Comm
   remove cloned prop Assoc.Assoc
+end
+
+theory transform.encoding_decorate.Kept
+  tag cloned type t "encoding_decorate : kept"
 end
 
 (*

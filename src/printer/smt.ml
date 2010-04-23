@@ -191,6 +191,7 @@ let print_task drv fmt task =
   fprintf fmt "(benchmark toto@\n" 
     (*print_ident (Task.task_goal task).pr_name*);
   fprintf fmt "  :status unknown@\n";
+  Driver.print_prelude (Driver.query_driver drv) task fmt;
   let decls = Task.task_decls task in
   ignore (print_list_opt (add_flush newline2) (print_decl drv) fmt decls);
   fprintf fmt "@\n)@."

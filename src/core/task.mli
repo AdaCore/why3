@@ -41,6 +41,8 @@ and tdecl = private
   | Use   of theory
   | Clone of theory * (ident * ident) list
 
+val create_decl : decl -> tdecl
+
 val task_known : task -> known_map
 val task_clone : task -> clone_map
 val task_used  : task -> use_map
