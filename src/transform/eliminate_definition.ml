@@ -138,21 +138,22 @@ let add_ld kn task ls ld =
   | Fmla f ->
       add_pd kn task ls.ls_name.id_long ls (f_app ls tl) [] f
 
-let add_ld kn task (ls,ld) = match ld with
-  | None    -> task
+let add_ld q kn task (ls,ld) = match ld with
+  | None -> task
+  | Some _ when Driver.query_remove q ls.ls_name -> task
   | Some ld -> add_ld kn task ls ld
 
 let add_ls task (ls,_) = add_decl task (create_logic_decl [ls,None])
 
-let elim t task = match t.task_decl with
+let elim q t task = match t.task_decl with
   | Decl { d_node = Dlogic ll } ->
       let task = List.fold_left add_ls task ll in
-      let task = List.fold_left (add_ld t.task_known) task ll in
+      let task = List.fold_left (add_ld q t.task_known) task ll in
       task
   | td ->
       add_tdecl task td
 
-let elim = Register.store (fun () -> Trans.map elim None)
+let elim = Register.store_query (fun q -> Trans.map (elim q) None)
 
 let () = Register.register_transform "eliminate_definition" elim
 
