@@ -17,25 +17,27 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Make (X : Util.Tagged) :
-sig
+module Make (S : Util.Tagged) : sig
 
   type 'a t
 
   val create : int -> 'a t
-    (* create a hashtbl with weak key*)
+    (* create a hashtbl with weak keys *)
 
-  val find : 'a t -> X.t -> 'a
-    (* find the value binded to a key.
-       raise Not_found if there is no binding *)
+  val find : 'a t -> S.t -> 'a
+    (* find the value bound to a key.
+       Raises Not_found if there is no binding *)
 
-  val mem : 'a t -> X.t -> bool
-    (* test if a key bind to something.*)
+  val mem : 'a t -> S.t -> bool
+    (* test if a key is bound *)
 
-  exception AlreadyBounded
+  val add : 'a t -> S.t -> 'a -> unit
+    (* bind the key with the value given *)
 
-  val add : 'a t -> X.t -> 'a -> unit
-    (* bind the key with the value given.
-       It raises AlreadyBounded if a bound exists
-    *)
+  val memoize : int -> (S.t -> 'a) -> (S.t -> 'a)
+    (* create a memoizing function *)
+
+  val memoize_option : int -> (S.t option -> 'a) -> (S.t option -> 'a)
+    (* memoizing functions on option types *)
+
 end

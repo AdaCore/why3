@@ -44,7 +44,6 @@ and tdecl = private
 val task_known : task -> known_map
 val task_clone : task -> clone_map
 val task_used  : task -> use_map
-val task_tag   : task -> int
 
 (* constructors *)
 

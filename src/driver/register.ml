@@ -39,34 +39,48 @@ let create gen = {
   generate = gen;
 }
 
+module WHenv = Hashweak.Make (struct
+  type t = Env.env
+  let tag = Env.env_tag
+end)
+
+module WHquery = Hashweak.Make (struct
+  type t = driver_query
+  let tag = query_tag
+end)
+
+module WHtask = Hashweak.Make (struct
+  type t = task_hd
+  let tag t = t.task_tag
+end)
+
 exception ArgumentNeeded
 
-let memo tag ext f =
-  let h = Hashtbl.create 7 in fun x ->
-    let t = tag x in
-    try Hashtbl.find h t
-    with Not_found ->
-      let r = f (ext x) in
-      Hashtbl.add h t r;
-      r
-
-let memo_env f =
-  let f = memo Env.env_tag (fun e -> e) f in function
+let memo_env fn =
+  let fn = WHenv.memoize 7 fn in function
     | None -> raise ArgumentNeeded
-    | Some env -> f env
+    | Some env -> fn env
 
-let memo_query f =
-  let f = memo query_tag (fun q -> q) f in function
+let memo_query fn =
+  let fn = WHquery.memoize 7 fn in function
     | None -> raise ArgumentNeeded
-    | Some drv -> fun task -> f (driver_query drv task) task
+    | Some drv -> fun task -> fn (driver_query drv task)
 
-let memo_use   f = memo (fun t -> task_tag (last_use   t)) task_used  f
-let memo_clone f = memo (fun t -> task_tag (last_clone t)) task_clone f
-let memo_goal  f = memo task_tag (fun t -> t) f
+let memo_use fn =
+  let fn task = fn (task_used task) in
+  let fn = WHtask.memoize_option 63 fn in
+  fun task -> fn (last_use task)
 
-let gen_gen f () =
+let memo_clone fn =
+  let fn task = fn (task_clone task) in
+  let fn = WHtask.memoize_option 63 fn in
+  fun task -> fn (last_clone task)
+
+let memo_goal fn = WHtask.memoize_option 7 fn
+
+let gen_task f () =
   let f0 = Trans.apply (f ()) in
-  fun _ _ -> f0
+  fun _ _ task -> f0 task
 
 let gen_env f () =
   let f0 env = Trans.apply (f env) in
@@ -76,7 +90,7 @@ let gen_env f () =
 let gen_query f () =
   let f0 query = Trans.apply (f query) in
   let f1 = memo_query f0 in
-  fun _ drv task -> f1 drv task
+  fun _ drv task -> f1 drv task task
 
 let gen_arg memo_arg f () =
   let f0 env arg = Trans.apply (f env arg) in
@@ -88,7 +102,7 @@ let gen_full f () =
   let f0 query goal = Trans.apply (f query goal) in
   let f1 query = memo_goal (f0 query) in
   let f2 = memo_query f1 in
-  fun _ drv task -> f2 drv task task
+  fun _ drv task -> f2 drv task task task
 
 let gen_both f () =
   let f0 env use clone = Trans.apply (f env use clone) in
@@ -97,7 +111,7 @@ let gen_both f () =
   let f3 = memo_env f2 in
   fun env _ task -> f3 env task task task
 
-let store       f = create (gen_gen f)
+let store       f = create (gen_task f)
 let store_env   f = create (gen_env f)
 let store_goal  f = create (gen_arg memo_goal f)
 let store_clone f = create (gen_arg memo_clone f)

@@ -43,35 +43,27 @@ let compose_l f g x = list_apply g (f x)
 
 let apply f x = f x
 
-let memo tag f =
-  let h = Hashtbl.create 63 in fun x ->
-    let t = tag x in
-    try Hashtbl.find h t
-    with Not_found ->
-      let r = f x in
-      Hashtbl.add h t r;
-      r
+module WHtask = Hashweak.Make (struct
+  type t = task_hd
+  let tag t = t.task_tag
+end)
 
-let term_tag t = t.t_tag
-let fmla_tag f = f.f_tag
-let decl_tag d = d.d_tag
-
-let store f = memo task_tag f
+let store fn = WHtask.memoize_option 63 fn
 
 let fold fn v =
-  let h = Hashtbl.create 63 in
+  let h = WHtask.create 63 in
   let rewind acc task =
     let acc = fn task acc in
-    Hashtbl.add h task.task_tag acc;
+    WHtask.add h task acc;
     acc
   in
-  let curr task =
-    try Some (Hashtbl.find h task.task_tag)
+  let current task =
+    try Some (WHtask.find h task)
     with Not_found -> None
   in
   let rec accum todo = function
     | None -> List.fold_left rewind v todo
-    | Some task -> begin match curr task with
+    | Some task -> begin match current task with
         | Some v -> List.fold_left rewind v todo
         | None   -> accum (task::todo) task.task_prev
       end
@@ -86,8 +78,13 @@ let fold_map_l fn v t = conv_res (List.rev_map snd) (fold_l fn (v, t))
 let map   fn = fold   (fun t1 t2 -> fn t1 t2)
 let map_l fn = fold_l (fun t1 t2 -> fn t1 t2)
 
+module WHdecl = Hashweak.Make (struct
+  type t = decl
+  let tag d = d.d_tag
+end)
+
 let decl fn =
-  let fn = memo decl_tag fn in
+  let fn = WHdecl.memoize 63 fn in
   let fn task acc = match task.task_decl with
     | Decl d -> List.fold_left add_decl acc (fn d)
     | td -> add_tdecl acc td
@@ -95,7 +92,7 @@ let decl fn =
   map fn
 
 let decl_l fn =
-  let fn = memo decl_tag fn in
+  let fn = WHdecl.memoize 63 fn in
   let fn task acc = match task.task_decl with
     | Decl d -> List.rev_map (List.fold_left add_decl acc) (fn d)
     | td -> [add_tdecl acc td]

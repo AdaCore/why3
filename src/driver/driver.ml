@@ -265,9 +265,10 @@ module Hsdq = Hashcons.Make (struct
   type t = driver_query
 
   let equal q1 q2 = q1.query_driver == q2.query_driver &&
-                    q1.query_lclone == q2.query_lclone
+    option_eq (==) q1.query_lclone q2.query_lclone
 
-  let hash q = Hashcons.combine q.query_driver.drv_tag (task_tag q.query_lclone)
+  let hash q = Hashcons.combine q.query_driver.drv_tag
+    (option_apply 0 (fun t -> 1 + t.task_tag) q.query_lclone)
 
   let tag n q = { q with query_tag = n }
 end)
