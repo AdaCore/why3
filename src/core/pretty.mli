@@ -52,9 +52,11 @@ val print_type_decl : formatter -> ty_decl -> unit
 val print_logic_decl : formatter -> logic_decl -> unit
 val print_ind_decl : formatter -> ind_decl -> unit
 val print_prop_decl : formatter -> prop_decl -> unit
-
 val print_decl : formatter -> decl -> unit
+
 val print_task_tdecl : formatter -> Task.tdecl -> unit
+val print_theory_tdecl : formatter -> Theory.tdecl -> unit
+
 val print_task : formatter -> task -> unit
 val print_theory : formatter -> theory -> unit
 

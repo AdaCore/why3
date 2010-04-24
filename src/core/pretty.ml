@@ -355,7 +355,7 @@ let print_named_task fmt name task =
   fprintf fmt "@[<hov 2>task %s@\n%a@]@\nend@."
     name (print_list newline2 print_task_tdecl) (task_tdecls task)
 
-let print_th_tdecl fmt = function
+let print_theory_tdecl fmt = function
   | Theory.Decl d ->
       print_decl fmt d
   | Theory.Use th ->
@@ -366,7 +366,7 @@ let print_th_tdecl fmt = function
 
 let print_theory fmt th =
   fprintf fmt "@[<hov 2>theory %a@\n%a@]@\nend@."
-    print_th th (print_list newline2 print_th_tdecl) th.th_decls
+    print_th th (print_list newline2 print_theory_tdecl) th.th_decls
 
 module NsTree = struct
   type t =
