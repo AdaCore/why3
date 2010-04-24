@@ -17,6 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Printer_utils
 open Format
 open Pp
 open Ident
@@ -39,8 +40,6 @@ let ident_printer =
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
-let print_tvsymbols _fmt _id = assert false
-
 let forget_var v = forget_id ident_printer v.vs_name
 
 let print_var fmt {vs_name = id} =
@@ -50,8 +49,7 @@ let print_var fmt {vs_name = id} =
 
 
 let rec print_type drv fmt ty = match ty.ty_node with
-  | Tyvar id -> 
-      print_tvsymbols fmt id
+  | Tyvar _ -> unsupported "smt : you must encode the polymorphism"
   | Tyapp (ts, tl) -> begin match Driver.query_syntax drv ts.ts_name with 
       | Some s -> Driver.syntax_arguments s (print_type drv) fmt tl
       | None -> fprintf fmt "%a%a" (print_tyapp drv) tl print_ident ts.ts_name
@@ -62,9 +60,10 @@ and print_tyapp drv fmt = function
   | [ty] -> fprintf fmt "%a " (print_type drv) ty
   | tl -> fprintf fmt "(%a) " (print_list comma (print_type drv)) tl
 
+let print_type drv fmt = catch_unsupportedtype (print_type drv fmt)
+
 let rec print_term drv fmt t = match t.t_node with
-  | Tbvar _ -> 
-      assert false
+  | Tbvar _ -> assert false
   | Tconst c ->
       Pretty.print_const fmt c
   | Tvar v -> print_var fmt v
@@ -77,17 +76,18 @@ let rec print_term drv fmt t = match t.t_node with
         end end
   | Tlet (t1, tb) ->
       let v, t2 = t_open_bound tb in
-      fprintf fmt "@[(let %a = %a@ in %a)@]" print_ident v.vs_name
+      fprintf fmt "@[(let (%a %a)@ %a)@]" print_var v
         (print_term drv) t1 (print_term drv) t2;
       forget_var v
-  | Tif _ ->
-      assert false
-  | Tcase _ ->
-      assert false
-  | Teps _ ->
-      assert false
+  | Tif (f1,t1,t2) -> 
+      fprintf fmt "@[(if_then_else %a@ %a@ %a)@]"
+        (print_fmla drv) f1 (print_term drv) t1 (print_term drv) t2
+  | Tcase _ -> unsupportedExpression (Term t) 
+      "smtv1 : you must eliminate match"
+  | Teps _ -> unsupportedExpression (Term t) 
+      "smtv1 : you must eliminate epsilon"
 
-let rec print_fmla drv fmt f = match f.f_node with
+and print_fmla drv fmt f = match f.f_node with
   | Fapp ({ ls_name = id }, []) ->
       print_ident fmt id
   | Fapp (ls, tl) -> begin match Driver.query_syntax drv ls.ls_name with
@@ -125,13 +125,16 @@ let rec print_fmla drv fmt f = match f.f_node with
   | Ffalse ->
       fprintf fmt "false"
   | Fif (f1, f2, f3) ->
-      fprintf fmt "@[(if_then_else %a %a %a@]" (* TODO Not sure *)
+      fprintf fmt "@[(if_then_else %a@ %a@ %a@]"
 	(print_fmla drv) f1 (print_fmla drv) f2 (print_fmla drv) f3
-  | Flet _ -> (* TODO *)
-      assert false
-  | Fcase _ ->
-      assert false
-
+  | Flet (t1, tb) ->
+      let v, f2 = f_open_bound tb in
+      fprintf fmt "@[(flet (%a %a)@ %a)@]" print_var v
+        (print_term drv) t1 (print_fmla drv) f2;
+      forget_var v
+  | Fcase _ -> unsupportedExpression (Fmla f) 
+      "smtv1 : you must eliminate match"
+      
 and print_expr drv fmt = e_apply (print_term drv fmt) (print_fmla drv fmt)
 
 and print_triggers drv fmt tl = print_list comma (print_expr drv) fmt tl
@@ -144,8 +147,8 @@ let print_type_decl drv fmt = function
   | ts, Tabstract when Driver.query_remove drv ts.ts_name -> false
   | ts, Tabstract when ts.ts_args = [] ->
       fprintf fmt ":extrasorts (%a)" print_ident ts.ts_name; true
-  | _, Tabstract -> assert false
-  | _, Talgebraic _ -> assert false
+  | _, Tabstract -> unsupported "smtv1 : type with argument are not supported"
+  | _, Talgebraic _ -> unsupported "smtv1 : algebraic type are not supported"
 
 let print_logic_decl drv fmt (ls,ld) = match ld with
   | None ->
@@ -160,7 +163,7 @@ let print_logic_decl drv fmt (ls,ld) = match ld with
               (print_list space (print_type drv)) ls.ls_args 
               (print_type drv) value
       end
-  | Some _ -> assert false (* Dealt in Encoding *)
+  | Some _ -> unsupported "Predicate and function definition aren't supported"
 
 let print_logic_decl drv fmt d = 
   if Driver.query_remove drv (fst d).ls_name then
@@ -171,7 +174,8 @@ let print_decl drv fmt d = match d.d_node with
       print_list_opt newline (print_type_decl drv) fmt dl
   | Dlogic dl ->
       print_list_opt newline (print_logic_decl drv) fmt dl
-  | Dind _ -> assert false (* TODO *)
+  | Dind _ -> unsupportedDeclaration d 
+      "smt : inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Driver.query_remove drv pr.pr_name -> false
   | Dprop (Paxiom, _pr, f) ->
       fprintf fmt "@[<hov 2>:assumption@ %a@]@\n" 
@@ -184,8 +188,9 @@ let print_decl drv fmt d = match d.d_node with
         | Some loc -> fprintf fmt " @[;; %a@]@\n" 
             Loc.gen_report_position loc);
       fprintf fmt "  @[(not@ %a)@]" (print_fmla drv) f;true
-  | Dprop (Plemma, _, _) ->
-      assert false
+  | Dprop (Plemma, _, _) -> assert false
+
+let print_decl drv fmt = catch_unsupportedDeclaration (print_decl drv fmt)
 
 let print_task drv fmt task = 
   fprintf fmt "(benchmark toto@\n" 

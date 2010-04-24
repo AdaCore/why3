@@ -58,12 +58,7 @@ module Sstr : Set.S with type elt = string
 module Mstr : Map.S with type key = string
 
 (* Set, Map, Hashtbl on structures with a unique tag and physical equality *)
-
-module type Tagged =
-sig
-  type t
-  val tag : t -> int
-end
+open Hashweak
 
 module OrderedHash (X : Tagged) :
 sig
@@ -78,5 +73,6 @@ sig
   module S : Set.S with type elt = X.t
   module M : Map.S with type key = X.t
   module H : Hashtbl.S with type key = X.t
+  module W : Hashweak.S with type key = X.t
 end
 

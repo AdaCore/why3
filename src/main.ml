@@ -260,6 +260,8 @@ let rec report fmt = function
       Prover.report fmt e
   | Trans.Error e ->
       Trans.report fmt e
+  | Printer_utils.Error e ->
+      Printer_utils.report fmt e
   | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
 let print_th_namespace fmt th =

@@ -62,6 +62,7 @@ end)
 module Sts = Tsym.S
 module Mts = Tsym.M
 module Hts = Tsym.H
+module Wts = Tsym.W
 
 let mk_ts name args def = {
   ts_name = name;
@@ -96,6 +97,7 @@ end)
 module Sty = Ty.S
 module Mty = Ty.M
 module Hty = Ty.H
+module Wty = Ty.W
 
 let mk_ty n = { ty_node = n; ty_tag = -1 }
 let ty_var n = Hsty.hashcons (mk_ty (Tyvar n))

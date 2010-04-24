@@ -51,10 +51,12 @@ and ty_node = private
 module Sts : Set.S with type elt = tysymbol
 module Mts : Map.S with type key = tysymbol
 module Hts : Hashtbl.S with type key = tysymbol
+module Wts : Hashweak.S with type key = tysymbol
 
 module Sty : Set.S with type elt = ty
 module Mty : Map.S with type key = ty
 module Hty : Hashtbl.S with type key = ty
+module Wty : Hashweak.S with type key = ty
 
 exception BadTypeArity of int * int
 exception DuplicateTypeVar of tvsymbol

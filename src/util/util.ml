@@ -69,13 +69,7 @@ module Mstr = Map.Make(String)
 
 (* Set, Map, Hashtbl on structures with a unique tag and physical equality *)
 
-module type Tagged =
-sig
-  type t
-  val tag : t -> int
-end
-
-module OrderedHash (X : Tagged) =
+module OrderedHash (X : Hashweak.Tagged) =
 struct
   type t = X.t
   let equal = (==)
@@ -83,11 +77,12 @@ struct
   let compare ts1 ts2 = Pervasives.compare (X.tag ts1) (X.tag ts2)
 end
 
-module StructMake (X : Tagged) =
+module StructMake (X : Hashweak.Tagged) =
 struct
   module T = OrderedHash(X)
   module S = Set.Make(T)
   module M = Map.Make(T)
   module H = Hashtbl.Make(T)
+  module W = Hashweak.Make(X)
 end
 

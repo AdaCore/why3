@@ -17,37 +17,40 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module type S = sig
+(** Useful functions for printer *)
 
-  type key
+(** {2 exception to use in a transformation } *)
 
-  type 'a t
+type error =
+  | UnsupportedType        of Ty.ty     * string
+  | UnsupportedExpression  of Term.expr * string
+  | UnsupportedDeclaration of Decl.decl * string
+  | NotImplemented         of             string
 
-  val create : int -> 'a t
-    (* create a hashtbl with weak keys *)
+exception Error of error
 
-  val find : 'a t -> key -> 'a
-    (* find the value bound to a key.
-       Raises Not_found if there is no binding *)
+val unsupportedType        : Ty.ty     -> string -> 'a
+val unsupportedExpression  : Term.expr -> string -> 'a
+val unsupportedDeclaration : Decl.decl -> string -> 'a
+(** - [expr] is the problematic formula
+    - [string] explain the problem and
+      possibly a way to solve it (such as applying another
+      transforamtion) *)
 
-  val mem : 'a t -> key -> bool
-    (* test if a key is bound *)
+val notImplemented : string -> 'a
+(** [string] explain what is not implemented *)
 
-  val set : 'a t -> key -> 'a -> unit
-    (* bind the key _once_ with the given value *)
+val report : Format.formatter -> error -> unit
 
-  val memoize : int -> (key -> 'a) -> (key -> 'a)
-    (* create a memoizing function *)
+(** function which cath inner error *)
+exception Unsupported of string
 
-  val memoize_option : int -> (key option -> 'a) -> (key option -> 'a)
-    (* memoizing functions on option types *)
+val unsupported : string -> 'a
 
-end
+val catch_unsupportedtype        : (Ty.ty     -> 'a) -> (Ty.ty     -> 'a)
 
-module type Tagged =
-sig
-  type t
-  val tag : t -> int
-end
+val catch_unsupportedterm        : (Term.term -> 'a) -> (Term.term -> 'a)
 
-module Make (S : Tagged) : S with type key = S.t
+val catch_unsupportedfmla        : (Term.fmla -> 'a) -> (Term.fmla -> 'a)
+
+val catch_unsupportedDeclaration : (Decl.decl -> 'a) -> (Decl.decl -> 'a)

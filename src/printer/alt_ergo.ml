@@ -16,7 +16,7 @@
 (*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
 (*                                                                        *)
 (**************************************************************************)
-
+open Printer_utils
 open Format
 open Pp
 open Ident
@@ -70,17 +70,14 @@ let rec print_term drv fmt t = match t.t_node with
       | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl
       | None -> fprintf fmt "%a%a" print_ident ls.ls_name (print_tapp drv) tl
     end
-  | Tlet (t1, tb) ->
-      let v, t2 = t_open_bound tb in
-      fprintf fmt "@[(let %a = %a@ in %a)@]" print_ident v.vs_name
-        (print_term drv) t1 (print_term drv) t2;
-      forget_var v
-  | Tif _ ->
-      assert false
-  | Tcase _ ->
-      assert false
-  | Teps _ ->
-      assert false
+  | Tlet _ -> unsupportedExpression (Term t)
+      "alt-ergo : you must eliminate let in term"
+  | Tif _ -> unsupportedExpression (Term t) 
+      "alt-ergo : you must eliminate if_then_else"
+  | Tcase _ -> unsupportedExpression (Term t) 
+      "alt-ergo : you must eliminate match"
+  | Teps _ -> unsupportedExpression (Term t) 
+      "alt-ergo : you must eliminate epsilon"
 
 and print_tapp drv fmt = function
   | [] -> ()
@@ -121,10 +118,11 @@ let rec print_fmla drv fmt f = match f.f_node with
       fprintf fmt "((%a and %a) or (not %a and %a))"
 	(print_fmla drv) f1 (print_fmla drv) f2 (print_fmla drv)
         f1 (print_fmla drv) f3
-  | Flet _ ->
-      assert false
-  | Fcase _ ->
-      assert false
+  | Flet _ -> unsupportedExpression (Fmla f)
+      "alt-ergo : you must eliminate let in formula"
+  | Fcase _ -> unsupportedExpression (Fmla f) 
+      "alt-ergo : you must eliminate match"
+  
 
 and print_expr drv fmt = e_apply (print_term drv fmt) (print_fmla drv fmt)
 
@@ -146,7 +144,8 @@ let print_type_decl fmt ts = match ts.ts_args with
 let print_type_decl drv fmt = function
   | ts, Tabstract when Driver.query_remove drv ts.ts_name -> false
   | ts, Tabstract -> print_type_decl fmt ts; true
-  | _, Talgebraic _ -> assert false
+  | _, Talgebraic _ -> unsupported 
+      "alt-ergo : algebraic datatype are not supported"
 
 let ac_th = ["algebra";"AC"]
 
@@ -187,7 +186,8 @@ let print_decl drv fmt d = match d.d_node with
       print_list_opt newline (print_type_decl drv) fmt dl
   | Dlogic dl ->
       print_list_opt newline (print_logic_decl drv) fmt dl
-  | Dind _ -> assert false (* TODO *)
+  | Dind _ -> unsupportedDeclaration d 
+      "alt-ergo : inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Driver.query_remove drv pr.pr_name -> false
   | Dprop (Paxiom, pr, f) ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n" 
@@ -197,6 +197,8 @@ let print_decl drv fmt d = match d.d_node with
         print_ident pr.pr_name (print_fmla drv) f; true
   | Dprop (Plemma, _, _) ->
       assert false
+
+let print_decl drv fmt = catch_unsupportedDeclaration (print_decl drv fmt)
 
 let print_task drv fmt task = 
   let decls = Task.task_decls task in

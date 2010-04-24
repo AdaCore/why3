@@ -209,21 +209,36 @@ let conv_res_app tenv tvar p tl ty =
       sort_app tenv tvar t ty
     end
 
+let conv_vs tenv tvar (vsvar,acc) vs =
+  let tres,vsres =
+    let ty_res = conv_ty_pos tenv vs.vs_ty in
+    if ty_res == vs.vs_ty then
+      t_var vs,vs
+    else 
+      let tty = term_of_ty tenv tvar vs.vs_ty in
+      let vsres = (create_vsymbol (id_clone vs.vs_name) ty_res) in
+      let t = t_var vsres in 
+      t_app tenv.sort [tty;t] tenv.deco, vsres in              
+  (Mvs.add vs tres vsvar,vsres::acc)
+
+
 let rec rewrite_term tenv tvar vsvar t =
-  let fnT = rewrite_term tenv tvar vsvar in
+  let fnT = rewrite_term tenv tvar in
   let fnF = rewrite_fmla tenv tvar vsvar in
   match t.t_node with
     | Tconst _ -> t
     | Tvar x -> Mvs.find x vsvar
     | Tapp(p,tl) ->
-        let tl = List.map fnT tl in
+        let tl = List.map (fnT vsvar) tl in
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv tvar) tl p.ls_args in
         conv_res_app tenv tvar p tl t.t_ty
     | Tif (f, t1, t2) -> 
-        t_if (fnF f) (fnT t1) (fnT t2)
+        t_if (fnF f) (fnT vsvar t1) (fnT vsvar t2)
     | Tlet (t1, b) -> let u,t2 = t_open_bound b in
-      let t1' = fnT t1 in let t2' = fnT t2 in
+      let (vsvar,u) = conv_vs tenv tvar (vsvar,[]) u in
+      let u = List.hd u in
+      let t1' = fnT vsvar t1 in let t2' = fnT vsvar t2 in
       if t1' == t1 && t2' == t2 then t else t_let u t1' t2'
     | Tcase _ | Teps _ | Tbvar _ ->
         Trans.unsupportedExpression
@@ -252,24 +267,18 @@ and rewrite_fmla tenv tvar vsvar f =
         let tl = List.map2 (conv_arg tenv tvar) tl p.ls_args in
         f_app p tl
     | Fquant (q, b) -> let vl, _tl, f1 = f_open_quant b in
-      let conv_vs (vsvar,acc) vs =
-        let tres,vsres =
-          let ty_res = conv_ty_pos tenv vs.vs_ty in
-          if ty_res == vs.vs_ty then
-            t_var vs,vs
-          else 
-            let tty = term_of_ty tenv tvar vs.vs_ty in
-            let vsres = (create_vsymbol (id_clone vs.vs_name) ty_res) in
-            let t = t_var vsres in 
-            t_app tenv.sort [tty;t] tenv.deco, vsres in              
-        (Mvs.add vs tres vsvar,vsres::acc) in
-      let (vsvar,vl) = List.fold_left conv_vs (vsvar,[]) vl in
+      let (vsvar,vl) = List.fold_left (conv_vs tenv tvar) (vsvar,[]) vl in
       let f1' = fnF vsvar f1 in 
       let tl' = [] (* TODO *) in
         if f1' == f1 (*&& tr_equal tl' tl*) then f
         else 
           let vl = List.rev vl in
           f_quant q vl tl' f1'
+    | Flet (t1, b) -> let u,f2 = f_open_bound b in
+      let (vsvar,u) = conv_vs tenv tvar (vsvar,[]) u in
+      let u = List.hd u in
+      let t1' = fnT t1 in let f2' = fnF vsvar f2 in
+      if t1' == t1 && f2' == f2 then f else f_let u t1' f2'
     | _ -> f_map fnT (fnF vsvar) f
 
 let decl (tenv:tenv) d =
@@ -319,7 +328,7 @@ Perhaps you could use eliminate_definition"
 
 (*
 let decl tenv d =
-  Format.eprintf "@[<hov 2>Decl : %a =>@\n" Pretty.print_decl d;
+  Format.eprintf "@[<hov 2>Decl : %a =>@\n@?" Pretty.print_decl d;
   let res = decl tenv d in
   Format.eprintf "%a@]@." (Pp.print_list Pp.newline Pretty.print_task_tdecl)
     res;
