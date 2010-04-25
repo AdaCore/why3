@@ -1474,14 +1474,14 @@ let f_implies_simp f1 f2 = match f1.f_node, f2.f_node with
   | _, Ftrue  -> f2
   | Ffalse, _ -> f_not_simp f1
   | _, Ffalse -> f_not_simp f1
-  | _, _      -> if f1 == f2 then Ftrue else f_implies f1 f2
+  | _, _      -> if f1 == f2 then f_true else f_implies f1 f2
 
 let f_iff_simp f1 f2 = match f1.f_node, f2.f_node with
   | Ftrue, _  -> f2
   | _, Ftrue  -> f1
   | Ffalse, _ -> f_not_simp f2
   | _, Ffalse -> f_not_simp f1
-  | _, _      -> if f1 == f2 then Ftrue else f_iff f1 f2
+  | _, _      -> if f1 == f2 then f_true else f_iff f1 f2
 
 let f_binary_simp op = match op with
   | Fand     -> f_and_simp
@@ -1506,6 +1506,6 @@ let f_if_simp f1 f2 f3 = match f1.f_node, f2.f_node, f3.f_node with
 let f_let_simp v t f = match f.f_node with
   | Ftrue | Ffalse -> f | _ -> f_let v t f
 
-let f_equ_simp t1 t2 = if t1 == t2 then Ftrue  else f_equ t1 t2
-let f_neq_simp t1 t2 = if t1 == t2 then Ffalse else f_neq t1 t2
+let f_equ_simp t1 t2 = if t1 == t2 then f_true  else f_equ t1 t2
+let f_neq_simp t1 t2 = if t1 == t2 then f_false else f_neq t1 t2
 
