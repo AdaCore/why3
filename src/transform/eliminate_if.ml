@@ -73,7 +73,7 @@ let add_ld axl d = match d with
             axl, make_ls_defn ls vl (e_map elim_t elim_f e)
       end
 
-let remove_if_decl d = match d.d_node with
+let elim d = match d.d_node with
   | Dlogic l ->
       let axl, l = map_fold_left add_ld [] l in
       let d = create_logic_decl l in
@@ -82,7 +82,7 @@ let remove_if_decl d = match d.d_node with
       [decl_map (fun _ -> assert false) elim_f d]
 
 let eliminate_if_term =
-  Register.store (fun () -> Trans.decl remove_if_decl None)
+  Register.store (fun () -> Trans.decl elim None)
 
 let () = Register.register_transform "eliminate_if_term" eliminate_if_term
 

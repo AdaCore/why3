@@ -284,9 +284,6 @@ val f_map_sign : (term -> term) -> (bool -> fmla -> fmla) ->
 
     nb: if-then-else and iff are translated if needed *)
 
-val f_map_pos : (term -> term) -> (bool -> fmla -> fmla) -> fmla -> fmla
-val f_map_neg : (term -> term) -> (bool -> fmla -> fmla) -> fmla -> fmla
-
 val t_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> term -> 'a
 val f_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> fmla -> 'a
 

@@ -975,9 +975,6 @@ let f_map_sign fnT fnF sign f = f_label_copy f (match f.f_node with
         else f_or (f_and f1p f2) (f_and (f_not f1n) f3)
   | _ -> f_map fnT (fnF sign) f)
 
-let f_map_pos fnT fnF f = f_map_sign fnT fnF true f
-let f_map_neg fnT fnF f = f_map_sign fnT fnF false f
-
 (* safe opening fold *)
 
 let t_branch fn acc b = let _,t = t_open_branch b in fn acc t
