@@ -26,7 +26,8 @@ val eliminate_let : Task.task Register.trans_reg
 
 (** eliminate ite, ie if then else in term *)
 val remove_ite_t : Term.term -> (Term.fmla * Term.term) list
-val remove_ite_f : Term.fmla -> Term.fmla
+val remove_ite_f : bool -> Term.fmla -> Term.fmla
+(* [remove_ite_f sign f] *)
 val remove_ite_decl : Decl.decl -> Decl.decl list
 
 val eliminate_ite : Task.task Register.trans_reg

@@ -276,6 +276,16 @@ val f_neq : term -> term -> fmla
 val t_map : (term -> term) -> (fmla -> fmla) -> term -> term
 val f_map : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
 
+val f_map_sign : 
+  (term -> term) -> (bool -> fmla -> fmla) -> bool -> fmla -> fmla
+(** give the sign of the sub_formula :
+    - true positive 
+    - false negative
+
+    nb : if_then_else, implies, iff are translated if needed *)
+val f_map_pos : 
+  (term -> term) -> (bool -> fmla -> fmla) -> fmla -> fmla
+
 val t_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> term -> 'a
 val f_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> fmla -> 'a
 

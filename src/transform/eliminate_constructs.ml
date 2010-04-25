@@ -65,11 +65,13 @@ let merge_l f tl =
     (f_and_simp_l cond, f l)::acc in
   list_fold_product_l f [] tl
 
-let and_impl_f l =
-  (* TODO :
-     Use polarity in order to choose the most efficient translation of ite *)
-  List.fold_left (fun acc (c,f) -> f_and_simp acc (f_implies_simp c f)) 
+let and_impl_f sign l =
+  if sign 
+  then List.fold_left (fun acc (c,f) -> f_and_simp acc (f_implies_simp c f))
     f_true l
+  else  List.fold_left (fun acc (c,f) -> f_or_simp acc (f_and_simp c f))
+    f_false l
+    
 
 let rec remove_ite_t t =
   match t.t_node with
@@ -92,25 +94,25 @@ let rec remove_ite_t t =
         let tbl = merge_l (fun x -> x) tbl in
         merge (fun tl tbl -> t_case tl tbl t.t_ty) tl tbl
     | Teps fb ->
-        let vs,f = f_open_bound fb in [f_true,t_eps vs (remove_ite_f f)]
-and remove_ite_f f = 
+        let vs,f = f_open_bound fb in [f_true,t_eps vs (remove_ite_f true f)]
+and remove_ite_f sign f = 
   match f.f_node with
     | Fapp (ls,tl) ->
         let l = merge_l (f_app ls) (List.map remove_ite_t tl) in
-        and_impl_f l
+        and_impl_f sign l
     | Flet (t,fb) ->
         let vs,f' = f_open_bound fb in
-        let f'' = remove_ite_f f' in
+        let f'' = remove_ite_f sign f' in
         let tl = remove_ite_t t in
         begin match tl with
           | [c,_] when f' == f'' -> assert (c == f_true); f
           | _ -> 
               let tl = List.map (fun (c,t) -> c,f_let vs t f) tl in
-              and_impl_f tl
+              and_impl_f sign tl
         end
     | Fquant (q, b) -> 
         let vl, tl, f1 = f_open_quant b in
-        let f1' = remove_ite_f f1 in
+        let f1' = remove_ite_f sign f1 in
         let tr_map (changed,acc) = function
           | Term t as e -> 
               let tl = remove_ite_t t in
@@ -121,13 +123,13 @@ and remove_ite_f f =
                     List.fold_left (fun acc (_,t) -> Term t::acc) acc tl
               end
           | Fmla f as e ->
-              let f' = remove_ite_f f in
+              let f' = remove_ite_f true f in (*TODO trigger sign *)
               if f == f' then changed,e::acc else true,(Fmla f'::acc) in
         let changed,tl' = rev_map_fold_left 
           (fun acc -> List.fold_left tr_map (acc,[])) false tl in
         if f1' == f1 && (not changed) then f
         else f_quant q vl tl' f1'
-    | _ -> f_map (fun _ -> assert false) remove_ite_f f
+    | _ -> f_map_sign (fun _ -> assert false) remove_ite_f sign f
 
 let remove_ite_decl d =
   match d.d_node with
@@ -152,13 +154,13 @@ let remove_ite_decl d =
                             (create_prop_decl Paxiom pr f)::acc in
                             List.fold_left fax acc tl,d
                     end
-                | Fmla f -> acc,make_ls_defn ls vl (Fmla (remove_ite_f f))
+                | Fmla f -> acc,make_ls_defn ls vl (Fmla (remove_ite_f true f))
               end
           | ld -> acc,ld
         in
         let axs,l = (map_fold_left fn [] l) in
         (create_logic_decl l)::axs
-    | _ -> [decl_map (fun _ -> assert false) remove_ite_f d]
+    | _ -> [decl_map (fun _ -> assert false) (remove_ite_f true) d]
 
 let eliminate_ite = Register.store (fun () -> Trans.decl remove_ite_decl None)
 

@@ -436,7 +436,8 @@ let t_bvar n ty = Hsterm.hashcons (mk_term (Tbvar n) ty)
 let t_var v = Hsterm.hashcons (mk_term (Tvar v) v.vs_ty)
 let t_const c ty = Hsterm.hashcons (mk_term (Tconst c) ty)
 let t_int_const s = Hsterm.hashcons (mk_term (Tconst (ConstInt s)) Ty.ty_int)
-let t_real_const r = Hsterm.hashcons (mk_term (Tconst (ConstReal r)) Ty.ty_real)
+let t_real_const r = 
+  Hsterm.hashcons (mk_term (Tconst (ConstReal r)) Ty.ty_real)
 let t_app f tl ty = Hsterm.hashcons (mk_term (Tapp (f, tl)) ty)
 let t_if f t1 t2 = Hsterm.hashcons (mk_term (Tif (f, t1, t2)) t2.t_ty)
 let t_let v t1 t2 = Hsterm.hashcons (mk_term (Tlet (t1, (v, t2))) t2.t_ty)
@@ -945,6 +946,46 @@ let f_map fnT fnF f = f_label_copy f (match f.f_node with
       let tltl = List.for_all2 (==) tl tl' in
       let blbl,bl' = map_fold_left (f_branch fnF) true bl in
       if tltl && blbl then f else f_case tl' bl')
+
+(* true pos, false neg *)
+let f_map_sign fnT fnF sign f = f_label_copy f (match f.f_node with
+  | Fapp (p, tl) -> f_app_unsafe p (List.map fnT tl)
+  | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
+    (* TODO : the sign in a trigger ? *)
+      let f1' = fnF sign f1 in let tl' = tr_map fnT (fnF true) tl in
+      if f1' == f1 && tr_equal tl' tl then f
+      else f_quant q vl tl' f1'
+  | Fbinop (Fimplies, f1, f2) -> f_implies (fnF (not sign) f1) (fnF sign f2)
+  | Fbinop (Fiff, f1, f2) -> 
+      let f1p = fnF sign f1 in
+      let f1n = fnF (not sign) f1 in
+      let f2p = fnF sign f2 in
+      let f2n = fnF (not sign) f2 in
+      if f1p == f1n && f2p == f2n then f_iff f1p f2p else
+        if sign 
+        then f_and (f_implies f1n f2p) (f_implies f2n f1p)
+        else f_or  (f_and     f1p f2p) (f_and     f1n f2n)
+  | Fbinop (op, f1, f2) -> f_binary op (fnF sign f1) (fnF sign f2)
+  | Fnot f1 -> f_not (fnF (not sign) f1)
+  | Ftrue | Ffalse -> f
+  | Fif (f1, f2, f3) -> 
+      let f1p = fnF sign f1 in
+      let f1n = fnF (not sign) f1 in
+      let f2 = fnF sign f2 in
+      let f3 = fnF sign f3 in
+      if f1p == f1n then f_if f1p f2 f3
+      else if sign
+      then f_and (f_implies f1p f2) (f_implies (f_not f1n) f3)
+      else f_or (f_and (fnF sign f1) f2) (f_and (f_not f1n) f3)
+  | Flet (t, b) -> let u,f1 = f_open_bound b in
+      let t' = fnT t in let f1' = fnF sign f1 in
+      if t' == t && f1' == f1 then f else f_let u t' f1'
+  | Fcase (tl, bl) -> let tl' = List.map fnT tl in
+      let tltl = List.for_all2 (==) tl tl' in
+      let blbl,bl' = map_fold_left (f_branch (fnF sign)) true bl in
+      if tltl && blbl then f else f_case tl' bl')
+
+let f_map_pos fnT fnF f = f_map_sign fnT fnF true f
 
 let protect fn t =
   let res = fn t in

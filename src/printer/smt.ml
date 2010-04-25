@@ -125,11 +125,11 @@ and print_fmla drv fmt f = match f.f_node with
   | Ffalse ->
       fprintf fmt "false"
   | Fif (f1, f2, f3) ->
-      fprintf fmt "@[(if_then_else %a@ %a@ %a@]"
+      fprintf fmt "@[(if_then_else %a@ %a@ %a)@]"
 	(print_fmla drv) f1 (print_fmla drv) f2 (print_fmla drv) f3
   | Flet (t1, tb) ->
       let v, f2 = f_open_bound tb in
-      fprintf fmt "@[(flet (%a %a)@ %a)@]" print_var v
+      fprintf fmt "@[(let (%a %a)@ %a)@]" print_var v
         (print_term drv) t1 (print_fmla drv) f2;
       forget_var v
   | Fcase _ -> unsupportedExpression (Fmla f) 
