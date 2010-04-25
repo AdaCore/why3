@@ -295,6 +295,16 @@ val f_all : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 val t_any : (term -> bool) -> (fmla -> bool) -> term -> bool
 val f_any : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 
+(* continuation-passing map *)
+
+val t_map_cont : ((term -> 'a) -> term -> 'a) ->
+                 ((fmla -> 'a) -> fmla -> 'a) ->
+                  (term -> 'a) -> term -> 'a
+
+val f_map_cont : ((term -> 'a) -> term -> 'a) ->
+                 ((fmla -> 'a) -> fmla -> 'a) ->
+                  (fmla -> 'a) -> fmla -> 'a
+
 (* map/fold over free variables *)
 
 val t_v_map : (vsymbol -> term) -> term -> term

@@ -930,13 +930,6 @@ let t_map fnT fnF t = t_label_copy t (match t.t_node with
   | Teps b -> let u,f = f_open_bound b in let f' = fnF f in
       if f' == f then t else t_eps u f')
 
-let protect fn t =
-  let res = fn t in
-  if res.t_ty != t.t_ty then raise TypeMismatch;
-  res
-
-let t_map fnT = t_map (protect fnT)
-
 let f_map fnT fnF f = f_label_copy f (match f.f_node with
   | Fapp (p, tl) -> f_app_unsafe p (List.map fnT tl)
   | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
@@ -954,6 +947,14 @@ let f_map fnT fnF f = f_label_copy f (match f.f_node with
       let tltl = List.for_all2 (==) tl tl' in
       let blbl,bl' = map_fold_left (f_branch fnF) true bl in
       if tltl && blbl then f else f_case tl' bl')
+
+let protect fn t =
+  let res = fn t in
+  if res.t_ty != t.t_ty then raise TypeMismatch;
+  res
+
+let t_map fnT = t_map (protect fnT)
+let f_map fnT = f_map (protect fnT)
 
 let f_map_sign fnT fnF sign f = f_label_copy f (match f.f_node with
   | Fbinop (Fimplies, f1, f2) ->
@@ -1015,6 +1016,124 @@ let t_any prT prF t =
 
 let f_any prT prF f =
   try f_fold (any_fn prT) (any_fn prF) false f with FoldSkip -> true
+
+(* continuation-passing traversal *)
+
+let rec t_branch_cont fnT contB = function
+  | b::bl ->
+      let pl,t = t_open_branch b in
+      let cont_l e same bl = contB (same && e == t) ((pl,e)::bl) in
+      let cont_t t = t_branch_cont fnT (cont_l t) bl in
+      fnT cont_t t
+  | [] ->
+      contB true []
+
+let rec f_branch_cont fnF contB = function
+  | b::bl ->
+      let pl,f = f_open_branch b in
+      let cont_l e same bl = contB (same && e == f) ((pl,e)::bl) in
+      let cont_f f = f_branch_cont fnF (cont_l f) bl in
+      fnF cont_f f
+  | [] ->
+      contB true []
+
+let rec list_map_cont fnL contL = function
+  | e::el ->
+      let cont_l e el = contL (e::el) in
+      let cont_e e = list_map_cont fnL (cont_l e) el in
+      fnL cont_e e
+  | [] ->
+      contL []
+
+let expr_map_cont fnT fnF contE = function
+  | Term t -> fnT (fun t -> contE (Term t)) t
+  | Fmla f -> fnF (fun f -> contE (Fmla f)) f
+
+let tr_map_cont fnT fnF =
+  list_map_cont (list_map_cont (expr_map_cont fnT fnF))
+
+let t_map_cont fnT fnF contT t =
+  let contT e = contT (t_label_copy t e) in
+  match t.t_node with
+  | Tbvar _ -> raise UnboundIndex
+  | Tvar _ | Tconst _ -> contT t
+  | Tapp (fs, tl) ->
+      let cont_app tl = contT (t_app_unsafe fs tl t.t_ty) in
+      list_map_cont fnT cont_app tl
+  | Tif (f, t1, t2) ->
+      let cont_else f t1 t2 = contT (t_if f t1 t2) in
+      let cont_then f t1 = fnT (cont_else f t1) t2 in
+      let cont_if f = fnT (cont_then f) t1 in
+      fnF cont_if f
+  | Tlet (t1, b) ->
+      let u,t2 = t_open_bound b in
+      let t_let e1 e2 =
+        if e1 == t1 && e2 == t2 then t else t_let u e1 e2
+      in
+      let cont_in t1 t2 = contT (t_let t1 t2) in
+      let cont_let t1 = fnT (cont_in t1) t2 in
+      fnT cont_let t1
+  | Tcase (tl, bl) ->
+      let t_case el same bl =
+        if same && List.for_all2 (==) el tl then t else t_case el bl t.t_ty
+      in
+      let cont_with tl same bl = contT (t_case tl same bl) in
+      let cont_case tl = t_branch_cont fnT (cont_with tl) bl in
+      list_map_cont fnT cont_case tl
+  | Teps b -> let u,f = f_open_bound b in
+      let t_eps e = if e == f then t else t_eps u e in
+      let cont_eps f = contT (t_eps f) in
+      fnF cont_eps f
+
+let f_map_cont fnT fnF contF f =
+  let contF e = contF (f_label_copy f e) in
+  match f.f_node with
+  | Fapp (ps, tl) ->
+      let cont_app tl = contF (f_app_unsafe ps tl) in
+      list_map_cont fnT cont_app tl
+  | Fquant (q, b) ->
+      let vl, tl, f1 = f_open_quant b in
+      let f_quant el e1 =
+        if e1 == f1 && tr_equal el tl then f else f_quant q vl el e1
+      in
+      let cont_dot tl f1 = contF (f_quant tl f1) in
+      let cont_quant tl = fnF (cont_dot tl) f1 in
+      tr_map_cont fnT fnF cont_quant tl
+  | Fbinop (op, f1, f2) ->
+      let cont_r f1 f2 = contF (f_binary op f1 f2) in
+      let cont_l f1 = fnF (cont_r f1) f2 in
+      fnF cont_l f1
+  | Fnot f1 ->
+      let cont_not f1 = contF (f_not f1) in
+      fnF cont_not f1
+  | Ftrue | Ffalse -> contF f
+  | Fif (f1, f2, f3) ->
+      let cont_else f1 f2 f3 = contF (f_if f1 f2 f3) in
+      let cont_then f1 f2 = fnF (cont_else f1 f2) f3 in
+      let cont_if f1 = fnF (cont_then f1) f2 in
+      fnF cont_if f1
+  | Flet (t1, b) ->
+      let u,f2 = f_open_bound b in
+      let f_let e1 e2 =
+        if e1 == t1 && e2 == f2 then f else f_let u e1 e2
+      in
+      let cont_in t1 f2 = contF (f_let t1 f2) in
+      let cont_let t1 = fnF (cont_in t1) f2 in
+      fnT cont_let t1
+  | Fcase (tl, bl) ->
+      let f_case el same bl =
+        if same && List.for_all2 (==) el tl then f else f_case el bl
+      in
+      let cont_with tl same bl = contF (f_case tl same bl) in
+      let cont_case tl = f_branch_cont fnF (cont_with tl) bl in
+      list_map_cont fnT cont_case tl
+
+let protect_cont t contT e =
+  if e.t_ty != t.t_ty then raise TypeMismatch;
+  contT e
+
+let t_map_cont fnT = t_map_cont (fun c t -> fnT (protect_cont t c) t)
+let f_map_cont fnT = f_map_cont (fun c t -> fnT (protect_cont t c) t)
 
 (* map/fold over free variables *)
 
