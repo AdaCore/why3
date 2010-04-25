@@ -169,16 +169,19 @@ let () = Register.register_transform "eliminate_ite" eliminate_ite
 (* eliminate if_then_else *)
 
 let rec remove_if_then_else_t t = 
-  t_map remove_if_then_else_t remove_if_then_else_f t
+  t_map remove_if_then_else_t (remove_if_then_else_f true) t
 
-and remove_if_then_else_f f =
+and remove_if_then_else_f sign f =
   match f.f_node with
-    | Fif (f1,f2,f3) -> f_and (f_implies f1 f2) (f_implies (f_not f1) f3)
-    | _ -> f_map remove_if_then_else_t remove_if_then_else_f f
+    | Fif (f1,f2,f3) -> 
+        if sign 
+        then f_and (f_implies f1 f2) (f_implies (f_not f1) f3)
+        else f_or (f_and f1 f2) (f_and (f_not f1) f3)
+    | _ -> f_map_sign remove_if_then_else_t remove_if_then_else_f sign f
 
 let eliminate_if_then_else =
   Register.store (fun () -> Trans.rewrite remove_if_then_else_t 
-                    remove_if_then_else_f None)
+                    (remove_if_then_else_f true) None)
 
 let () = Register.register_transform
   "eliminate_if_then_else" eliminate_if_then_else

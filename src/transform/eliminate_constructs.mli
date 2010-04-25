@@ -34,7 +34,7 @@ val eliminate_ite : Task.task Register.trans_reg
 
 (** eliminate ite, ie if then else in term *)
 val remove_if_then_else_t : Term.term -> Term.term
-val remove_if_then_else_f : Term.fmla -> Term.fmla
-
+val remove_if_then_else_f : bool -> Term.fmla -> Term.fmla
+(* [remove_if_then_else_f sign f] *)
 val eliminate_if_then_else : Task.task Register.trans_reg
 
