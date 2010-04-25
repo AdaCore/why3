@@ -65,7 +65,7 @@ let add_ld axl d = match d with
       let vl,e = open_ls_defn ld in
       begin match e with
         | Term t when has_if t ->
-            let f = ls_defn_axiom ld in
+            let f = elim_f (ls_defn_axiom ld) in
             let nm = ls.ls_name.id_short ^ "_def" in
             let pr = create_prsymbol (id_derive nm ls.ls_name) in
             create_prop_decl Paxiom pr f :: axl, (ls, None)
