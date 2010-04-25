@@ -269,6 +269,9 @@ val ps_neq : lsymbol
 val f_equ : term -> term -> fmla
 val f_neq : term -> term -> fmla
 
+val f_equ_simp : term -> term -> fmla
+val f_neq_simp : term -> term -> fmla
+
 (** Term library *)
 
 (* generic term/fmla traversal *)

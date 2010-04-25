@@ -1456,7 +1456,7 @@ let f_and_simp f1 f2 = match f1.f_node, f2.f_node with
   | _, Ftrue  -> f1
   | Ffalse, _ -> f1
   | _, Ffalse -> f2
-  | _, _      -> f_and f1 f2
+  | _, _      -> if f1 == f2 then f1 else f_and f1 f2
 
 let f_and_simp_l l = List.fold_left f_and_simp f_true l
 
@@ -1465,7 +1465,7 @@ let f_or_simp f1 f2 = match f1.f_node, f2.f_node with
   | _, Ftrue  -> f2
   | Ffalse, _ -> f2
   | _, Ffalse -> f1
-  | _, _      -> f_or f1 f2
+  | _, _      -> if f1 == f2 then f1 else f_or f1 f2
 
 let f_or_simp_l l = List.fold_left f_or_simp f_false l
 
@@ -1474,14 +1474,14 @@ let f_implies_simp f1 f2 = match f1.f_node, f2.f_node with
   | _, Ftrue  -> f2
   | Ffalse, _ -> f_not_simp f1
   | _, Ffalse -> f_not_simp f1
-  | _, _      -> f_implies f1 f2
+  | _, _      -> if f1 == f2 then Ftrue else f_implies f1 f2
 
 let f_iff_simp f1 f2 = match f1.f_node, f2.f_node with
   | Ftrue, _  -> f2
   | _, Ftrue  -> f1
   | Ffalse, _ -> f_not_simp f2
   | _, Ffalse -> f_not_simp f1
-  | _, _      -> f_iff f1 f2
+  | _, _      -> if f1 == f2 then Ftrue else f_iff f1 f2
 
 let f_binary_simp op = match op with
   | Fand     -> f_and_simp
@@ -1492,7 +1492,7 @@ let f_binary_simp op = match op with
 let t_if_simp f t1 t2 = match f.f_node with
   | Ftrue -> t1
   | Ffalse -> t2
-  | _ -> t_if f t1 t2
+  | _ -> if t1 == t2 then t1 else t_if f t1 t2
 
 let f_if_simp f1 f2 f3 = match f1.f_node, f2.f_node, f3.f_node with
   | Ftrue, _, _  -> f2
@@ -1501,8 +1501,11 @@ let f_if_simp f1 f2 f3 = match f1.f_node, f2.f_node, f3.f_node with
   | _, Ffalse, _ -> f_and_simp (f_not f1) f3
   | _, _, Ftrue  -> f_or_simp  (f_not f1) f2
   | _, _, Ffalse -> f_and_simp f1 f2
-  | _, _, _      -> f_if f1 f2 f3
+  | _, _, _      -> if f2 == f3 then f2 else f_if f1 f2 f3
 
 let f_let_simp v t f = match f.f_node with
   | Ftrue | Ffalse -> f | _ -> f_let v t f
+
+let f_equ_simp t1 t2 = if t1 == t2 then Ftrue  else f_equ t1 t2
+let f_neq_simp t1 t2 = if t1 == t2 then Ffalse else f_neq t1 t2
 
