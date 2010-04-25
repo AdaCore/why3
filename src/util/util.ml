@@ -34,13 +34,18 @@ let option_eq eq a b = match a,b with
 
 (* useful list combinators *)
 
-let map_fold_left f acc l =
+let rev_map_fold_left f acc l =
   let acc, rev =
     List.fold_left
       (fun (acc, rev) e -> let acc, e = f acc e in acc, e :: rev)
       (acc, []) l
   in
+  acc, rev
+
+let map_fold_left f acc l =
+  let acc, rev = rev_map_fold_left f acc l in
   acc, List.rev rev
+
 
 let list_all2 pr l1 l2 =
   try List.for_all2 pr l1 l2 with Invalid_argument _ -> false
@@ -50,6 +55,22 @@ let map_join_left map join = function
   | _ -> raise (Failure "map_join_left")
 
 let list_apply f = List.fold_left (fun acc x -> List.rev_append (f x) acc) []
+
+
+let list_fold_product f acc l1 l2 =
+  List.fold_left 
+    (fun acc e1 ->
+       List.fold_left 
+         (fun acc e2 -> f acc e1 e2) 
+         acc l2) 
+    acc l1
+
+let list_fold_product_l f acc ll =
+  let ll = List.rev ll in
+  let rec aux acc le = function
+    | [] -> f acc le
+    | l::ll -> List.fold_left (fun acc e -> aux acc (e::le) ll) acc l in
+  aux acc [] ll
 
 (* boolean fold accumulators *)
 

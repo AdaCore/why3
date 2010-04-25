@@ -20,14 +20,7 @@
 open Ident
 open Term
 open Decl
-
-let list_fold_product f acc l1 l2 =
-  List.fold_left 
-    (fun acc e1 ->
-       List.fold_left 
-         (fun acc e2 -> f acc e1 e2) 
-         acc l2) 
-    acc l1
+open Util
 
 let rec split_pos split_neg acc f =
   let split_pos acc f = 

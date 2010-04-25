@@ -1318,12 +1318,16 @@ let f_and_simp f1 f2 = match f1.f_node, f2.f_node with
   | _, Ffalse -> f2
   | _, _      -> f_and f1 f2
 
+let f_and_simp_l l = List.fold_left f_and_simp f_true l
+
 let f_or_simp f1 f2 = match f1.f_node, f2.f_node with
   | Ftrue, _  -> f1
   | _, Ftrue  -> f2
   | Ffalse, _ -> f2
   | _, Ffalse -> f1
   | _, _      -> f_or f1 f2
+
+let f_or_simp_l l = List.fold_left f_or_simp f_false l
 
 let f_implies_simp f1 f2 = match f1.f_node, f2.f_node with
   | Ftrue, _  -> f2

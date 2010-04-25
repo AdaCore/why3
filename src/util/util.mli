@@ -31,6 +31,9 @@ val option_eq : ('a -> 'b -> bool) -> 'a option -> 'b option -> bool
 
 (* useful list combinators *)
 
+val rev_map_fold_left :
+  ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a list -> 'acc * 'b list
+
 val map_fold_left :
   ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a list -> 'acc * 'b list
 
@@ -40,7 +43,20 @@ val map_join_left : ('a -> 'b) -> ('b -> 'b -> 'b) -> 'a list -> 'b
 
 val list_apply : ('a -> 'b list) -> 'a list -> 'b list
 
-(* boolean fold accumulators *)
+val list_fold_product : 
+  ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
+  (** [list_fold_product f acc l1 l2] apply the function [f] with the
+      accumulator [acc] on all the pair of elements of [l1] and [l2]
+      tail-reccursive
+  *)
+
+val list_fold_product_l : 
+  ('a -> 'b list -> 'a) -> 'a -> 'b list list -> 'a
+  (** generalisation of {! list_fold_product} 
+      not tail-reccursive
+  *)
+  
+  (* boolean fold accumulators *)
 
 exception FoldSkip
 

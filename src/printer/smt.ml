@@ -80,7 +80,7 @@ let rec print_term drv fmt t = match t.t_node with
         (print_term drv) t1 (print_term drv) t2;
       forget_var v
   | Tif (f1,t1,t2) -> 
-      fprintf fmt "@[(if_then_else %a@ %a@ %a)@]"
+      fprintf fmt "@[(ite %a@ %a@ %a)@]"
         (print_fmla drv) f1 (print_term drv) t1 (print_term drv) t2
   | Tcase _ -> unsupportedExpression (Term t) 
       "smtv1 : you must eliminate match"

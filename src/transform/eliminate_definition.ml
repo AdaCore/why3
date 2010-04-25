@@ -46,7 +46,7 @@ let rec add_fd kn task nm ls hd lm e = match e.t_node with
       let v,e = t_open_bound b in
       add_fd kn task nm ls hd ((v,t)::lm) e
   | Tcase ([t],bl) ->
-      let t = Eliminate_let.remove_let_t (unfold_t lm t) in
+      let t = Eliminate_constructs.remove_let_t (unfold_t lm t) in
       begin match t.t_node with
         | Tvar v ->
             let mk_br (w,m) br =
@@ -90,7 +90,7 @@ let rec add_pd kn task nm ls hd lm e = match e.f_node with
       let v,e = f_open_bound b in
       add_pd kn task nm ls hd ((v,t)::lm) e
   | Fcase ([t],bl) ->
-      let t = Eliminate_let.remove_let_t (unfold_t lm t) in
+      let t = Eliminate_constructs.remove_let_t (unfold_t lm t) in
       begin match t.t_node with
         | Tvar v ->
             let mk_br (w,m) br =
