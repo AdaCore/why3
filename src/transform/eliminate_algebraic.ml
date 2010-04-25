@@ -64,42 +64,47 @@ let rec rewriteT kn state t = match t.t_node with
       let tl = List.map find (find_constructors kn ts) in
       t_app (Mts.find ts state.mt_map) (t1::tl) t.t_ty
   | Tcase _ -> Trans.unsupportedExpression (Term t) uncompiled
-  | _ -> t_map (rewriteT kn state) (rewriteF kn state) t
+  | _ -> t_map (rewriteT kn state) (rewriteF kn state true) t
 
-and rewriteF kn state f = match f.f_node with
+and rewriteF kn state sign f = match f.f_node with
   | Fcase ([t1],bl) ->
       let t1 = rewriteT kn state t1 in
       let mk_br (w,m) br =
         let (pl,e) = f_open_branch br in
-        let e = rewriteF kn state e in
+        let e = rewriteF kn state sign e in
         match pl with
         | [{ pat_node = Papp (cs,pl) }] ->
-            let add_var e p pj = match p.pat_node with
-              | Pvar v -> f_let v (t_app pj [t1] v.vs_ty) e
+            let get_var p = match p.pat_node with
+              | Pvar v -> v
               | _ -> Trans.unsupportedExpression (Fmla f) uncompiled
             in
-            let pjl = Mls.find cs state.pj_map in
-            let e = List.fold_left2 add_var e pl pjl in
-            w, Mls.add cs e m
+            w, Mls.add cs (List.map get_var pl, e) m
         | [{ pat_node = Pwild }] ->
             Some e, m
         | _ -> Trans.unsupportedExpression (Fmla f) uncompiled
       in
       let w,m = List.fold_left mk_br (None,Mls.empty) bl in
       let find cs =
-        let arg pj = t_app_infer pj [t1] in
-        let pjl = Mls.find cs state.pj_map in
-        let hd = f_equ t1 (t_app cs (List.map arg pjl) t1.t_ty) in
-        let f  = try Mls.find cs m with Not_found -> of_option w in
-        f_implies_simp hd f
+        let vl,e = try Mls.find cs m with Not_found ->
+          let var = create_vsymbol (id_fresh "w") in
+          let get_var pj = var (t_app_infer pj [t1]).t_ty in
+          List.map get_var (Mls.find cs state.pj_map), of_option w
+        in
+        let hd = t_app cs (List.map t_var vl) t1.t_ty in
+        let tr = [] (* FIXME? [[Term hd]] *) in
+        let hd = f_equ t1 hd in
+        if sign
+          then f_forall_simp vl tr (f_implies_simp hd e)
+          else f_exists_simp vl tr (f_and_simp     hd e)
       in
       let ts = match t1.t_ty.ty_node with
         | Tyapp (ts,_) -> ts
         | _ -> Trans.unsupportedExpression (Fmla f) uncompiled
       in
-      map_join_left find f_and_simp (find_constructors kn ts)
+      let op = if sign then f_and_simp else f_or_simp in
+      map_join_left find op (find_constructors kn ts)
   | Fcase _ -> Trans.unsupportedExpression (Fmla f) uncompiled
-  | _ -> f_map (rewriteT kn state) (rewriteF kn state) f
+  | _ -> f_map_sign (rewriteT kn state) (rewriteF kn state) sign f
 
 let add_type (state, task) ts csl =
   (* declare constructors as abstract functions *)
@@ -177,7 +182,7 @@ let comp t (state,task) = match t.task_decl with
       List.fold_left add (state,task) dl
   | Decl d ->
       let fnT = rewriteT t.task_known state in
-      let fnF = rewriteF t.task_known state in
+      let fnF = rewriteF t.task_known state true in
       state, add_decl task (decl_map fnT fnF d)
   | td ->
       state, add_tdecl task td

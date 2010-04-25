@@ -31,7 +31,7 @@ let rec t_insert hd t = match t.t_node with
   | Tcase (tl,bl) ->
       let br b = let pl,t1 = t_open_branch b in pl, t_insert hd t1 in
       f_case tl (List.map br bl)
-  | _ -> f_equ hd t
+  | _ -> f_equ_simp hd t
 
 let rec f_insert hd f = match f.f_node with
   | Fif (f1,f2,f3) ->
@@ -42,7 +42,7 @@ let rec f_insert hd f = match f.f_node with
   | Fcase (tl,bl) ->
       let br b = let pl,f1 = f_open_branch b in pl, f_insert hd f1 in
       f_case tl (List.map br bl)
-  | _ -> f_iff hd f
+  | _ -> f_iff_simp hd f
 
 let add_ld q axl d = match d with
   | _, None -> axl, d
