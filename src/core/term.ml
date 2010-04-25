@@ -431,18 +431,19 @@ module Hfmla = Fmla.H
 
 (* hash-consing constructors for terms *)
 
-let mk_term n ty = { t_node = n; t_label = []; t_ty = ty; t_tag = -1 }
-let t_bvar n ty = Hsterm.hashcons (mk_term (Tbvar n) ty)
-let t_var v = Hsterm.hashcons (mk_term (Tvar v) v.vs_ty)
-let t_const c ty = Hsterm.hashcons (mk_term (Tconst c) ty)
-let t_int_const s = Hsterm.hashcons (mk_term (Tconst (ConstInt s)) Ty.ty_int)
-let t_real_const r = 
-  Hsterm.hashcons (mk_term (Tconst (ConstReal r)) Ty.ty_real)
-let t_app f tl ty = Hsterm.hashcons (mk_term (Tapp (f, tl)) ty)
-let t_if f t1 t2 = Hsterm.hashcons (mk_term (Tif (f, t1, t2)) t2.t_ty)
-let t_let v t1 t2 = Hsterm.hashcons (mk_term (Tlet (t1, (v, t2))) t2.t_ty)
-let t_case tl bl ty = Hsterm.hashcons (mk_term (Tcase (tl, bl)) ty)
-let t_eps u f = Hsterm.hashcons (mk_term (Teps (u, f)) u.vs_ty)
+let mk_term n ty = Hsterm.hashcons
+  { t_node = n; t_label = []; t_ty = ty; t_tag = -1 }
+
+let t_bvar n ty     = mk_term (Tbvar n) ty
+let t_var v         = mk_term (Tvar v) v.vs_ty
+let t_const c ty    = mk_term (Tconst c) ty
+let t_int_const s   = mk_term (Tconst (ConstInt s)) Ty.ty_int
+let t_real_const r  = mk_term (Tconst (ConstReal r)) Ty.ty_real
+let t_app f tl ty   = mk_term (Tapp (f, tl)) ty
+let t_if f t1 t2    = mk_term (Tif (f, t1, t2)) t2.t_ty
+let t_let v t1 t2   = mk_term (Tlet (t1, (v, t2))) t2.t_ty
+let t_case tl bl ty = mk_term (Tcase (tl, bl)) ty
+let t_eps u f       = mk_term (Teps (u, f)) u.vs_ty
 
 let t_label     l t = Hsterm.hashcons { t with t_label = l }
 let t_label_add l t = Hsterm.hashcons { t with t_label = l :: t.t_label }
@@ -452,26 +453,26 @@ let t_app_unsafe = t_app
 
 (* hash-consing constructors for formulas *)
 
-let mk_fmla n = { f_node = n; f_label = []; f_tag = -1 }
-let f_app f tl = Hsfmla.hashcons (mk_fmla (Fapp (f, tl)))
-let f_quant q ul n tl f = Hsfmla.hashcons (mk_fmla (Fquant (q, (ul,n,tl,f))))
+let mk_fmla n = Hsfmla.hashcons { f_node = n; f_label = []; f_tag = -1 }
 
-let f_binary op f1 f2 = Hsfmla.hashcons (mk_fmla (Fbinop (op, f1, f2)))
-let f_and = f_binary Fand
-let f_or = f_binary For
-let f_implies = f_binary Fimplies
-let f_iff = f_binary Fiff
-
-let f_not f = Hsfmla.hashcons (mk_fmla (Fnot f))
-let f_true = Hsfmla.hashcons (mk_fmla Ftrue)
-let f_false = Hsfmla.hashcons (mk_fmla Ffalse)
-let f_if f1 f2 f3 = Hsfmla.hashcons (mk_fmla (Fif (f1, f2, f3)))
-let f_let v t f = Hsfmla.hashcons (mk_fmla (Flet (t, (v, f))))
-let f_case tl bl = Hsfmla.hashcons (mk_fmla (Fcase (tl, bl)))
+let f_app f tl          = mk_fmla (Fapp (f, tl))
+let f_quant q ul n tl f = mk_fmla (Fquant (q, (ul,n,tl,f)))
+let f_binary op f1 f2   = mk_fmla (Fbinop (op, f1, f2))
+let f_not f             = mk_fmla (Fnot f)
+let f_true              = mk_fmla (Ftrue)
+let f_false             = mk_fmla (Ffalse)
+let f_if f1 f2 f3       = mk_fmla (Fif (f1, f2, f3))
+let f_let v t f         = mk_fmla (Flet (t, (v, f)))
+let f_case tl bl        = mk_fmla (Fcase (tl, bl))
 
 let f_label     l f = Hsfmla.hashcons { f with f_label = l }
 let f_label_add l f = Hsfmla.hashcons { f with f_label = l :: f.f_label }
 let f_label_copy { f_label = l } f = if l == [] then f else f_label l f
+
+let f_and     = f_binary Fand
+let f_or      = f_binary For
+let f_implies = f_binary Fimplies
+let f_iff     = f_binary Fiff
 
 (* built-in symbols *)
 
@@ -929,6 +930,13 @@ let t_map fnT fnF t = t_label_copy t (match t.t_node with
   | Teps b -> let u,f = f_open_bound b in let f' = fnF f in
       if f' == f then t else t_eps u f')
 
+let protect fn t =
+  let res = fn t in
+  if res.t_ty != t.t_ty then raise TypeMismatch;
+  res
+
+let t_map fnT = t_map (protect fnT)
+
 let f_map fnT fnF f = f_label_copy f (match f.f_node with
   | Fapp (p, tl) -> f_app_unsafe p (List.map fnT tl)
   | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
@@ -947,52 +955,27 @@ let f_map fnT fnF f = f_label_copy f (match f.f_node with
       let blbl,bl' = map_fold_left (f_branch fnF) true bl in
       if tltl && blbl then f else f_case tl' bl')
 
-(* true pos, false neg *)
 let f_map_sign fnT fnF sign f = f_label_copy f (match f.f_node with
-  | Fapp (p, tl) -> f_app_unsafe p (List.map fnT tl)
-  | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
-    (* TODO : the sign in a trigger ? *)
-      let f1' = fnF sign f1 in let tl' = tr_map fnT (fnF true) tl in
-      if f1' == f1 && tr_equal tl' tl then f
-      else f_quant q vl tl' f1'
-  | Fbinop (Fimplies, f1, f2) -> f_implies (fnF (not sign) f1) (fnF sign f2)
-  | Fbinop (Fiff, f1, f2) -> 
-      let f1p = fnF sign f1 in
-      let f1n = fnF (not sign) f1 in
-      let f2p = fnF sign f2 in
-      let f2n = fnF (not sign) f2 in
-      if f1p == f1n && f2p == f2n then f_iff f1p f2p else
-        if sign 
+  | Fbinop (Fimplies, f1, f2) ->
+      f_implies (fnF (not sign) f1) (fnF sign f2)
+  | Fbinop (Fiff, f1, f2) ->
+      let f1p = fnF sign f1 in let f1n = fnF (not sign) f1 in
+      let f2p = fnF sign f2 in let f2n = fnF (not sign) f2 in
+      if f1p == f1n && f2p == f2n then f_iff f1p f2p else if sign
         then f_and (f_implies f1n f2p) (f_implies f2n f1p)
-        else f_or  (f_and     f1p f2p) (f_and     f1n f2n)
-  | Fbinop (op, f1, f2) -> f_binary op (fnF sign f1) (fnF sign f2)
-  | Fnot f1 -> f_not (fnF (not sign) f1)
-  | Ftrue | Ffalse -> f
-  | Fif (f1, f2, f3) -> 
-      let f1p = fnF sign f1 in
-      let f1n = fnF (not sign) f1 in
-      let f2 = fnF sign f2 in
-      let f3 = fnF sign f3 in
-      if f1p == f1n then f_if f1p f2 f3
-      else if sign
-      then f_and (f_implies f1p f2) (f_implies (f_not f1n) f3)
-      else f_or (f_and (fnF sign f1) f2) (f_and (f_not f1n) f3)
-  | Flet (t, b) -> let u,f1 = f_open_bound b in
-      let t' = fnT t in let f1' = fnF sign f1 in
-      if t' == t && f1' == f1 then f else f_let u t' f1'
-  | Fcase (tl, bl) -> let tl' = List.map fnT tl in
-      let tltl = List.for_all2 (==) tl tl' in
-      let blbl,bl' = map_fold_left (f_branch (fnF sign)) true bl in
-      if tltl && blbl then f else f_case tl' bl')
+        else f_implies (f_or f1n f2n) (f_and f1p f2p)
+  | Fnot f1 ->
+      f_not (fnF (not sign) f1)
+  | Fif (f1, f2, f3) ->
+      let f1p = fnF sign f1 in let f1n = fnF (not sign) f1 in
+      let f2 = fnF sign f2 in let f3 = fnF sign f3 in
+      if f1p == f1n then f_if f1p f2 f3 else if sign
+        then f_and (f_implies f1n f2) (f_or f1p f3)
+        else f_or (f_and f1p f2) (f_and (f_not f1n) f3)
+  | _ -> f_map fnT (fnF sign) f)
 
 let f_map_pos fnT fnF f = f_map_sign fnT fnF true f
-
-let protect fn t =
-  let res = fn t in
-  if res.t_ty != t.t_ty then raise TypeMismatch;
-  res
-
-let t_map fnT = t_map (protect fnT)
+let f_map_neg fnT fnF f = f_map_sign fnT fnF false f
 
 (* safe opening fold *)
 
