@@ -19,141 +19,58 @@
 
 open Util
 open Ident
-open Ty
 open Term
 open Decl
-open Task
 
-let unfold_t lm e = List.fold_left (fun e (v,t) -> t_let v t e) e lm
-let unfold_f lm e = List.fold_left (fun e (v,t) -> f_let v t e) e lm
+let rec t_insert hd t = match t.t_node with
+  | Tif (f1,t2,t3) ->
+      f_if f1 (t_insert hd t2) (t_insert hd t3)
+  | Tlet (t1,bt) ->
+      let v,t2 = t_open_bound bt in
+      f_let v t1 (t_insert hd t2)
+  | Tcase (tl,bl) ->
+      let br b = let pl,t1 = t_open_branch b in pl, t_insert hd t1 in
+      f_case tl (List.map br bl)
+  | _ -> f_equ hd t
 
-let add_t_ax task nm ls hd e =
-  let vl = Svs.elements (t_freevars Svs.empty hd) in
-  let ax = f_forall vl [[Term hd]] (f_equ hd e) in
-  let id = id_derive (nm ^ "_def") ls.ls_name in
-  add_decl task (create_prop_decl Paxiom (create_prsymbol id) ax)
+let rec f_insert hd f = match f.f_node with
+  | Fif (f1,f2,f3) ->
+      f_if f1 (f_insert hd f2) (f_insert hd f3)
+  | Flet (t1,bf) ->
+      let v,f2 = f_open_bound bf in
+      f_let v t1 (f_insert hd f2)
+  | Fcase (tl,bl) ->
+      let br b = let pl,f1 = f_open_branch b in pl, f_insert hd f1 in
+      f_case tl (List.map br bl)
+  | _ -> f_iff hd f
 
-let add_f_ax task nm ls hd e =
-  let vl = Svs.elements (f_freevars Svs.empty hd) in
-  let ax = f_forall vl [[Fmla hd]] (f_iff_simp hd e) in
-  let id = id_derive (nm ^ "_def") ls.ls_name in
-  add_decl task (create_prop_decl Paxiom (create_prsymbol id) ax)
-
-let uncompiled = "eliminate_algebraic: compile_match required"
-
-let rec add_fd kn task nm ls hd lm e = match e.t_node with
-  | Tlet (t,b) ->
-      let v,e = t_open_bound b in
-      add_fd kn task nm ls hd ((v,t)::lm) e
-  | Tcase ([t],bl) ->
-      let t = Eliminate_constructs.remove_let_t (unfold_t lm t) in
-      begin match t.t_node with
-        | Tvar v ->
-            let mk_br (w,m) br =
-              let (pl,e) = t_open_branch br in
-              match pl with
-              | [{ pat_node = Papp (cs,pl) }] ->
-                  let mk_var p = match p.pat_node with
-                    | Pvar v -> t_var v
-                    | _ -> Trans.unsupportedExpression (Term t) uncompiled
-                  in
-                  w, Mls.add cs (t_app cs (List.map mk_var pl) v.vs_ty, e) m
-              | [{ pat_node = Pwild }] ->
-                  Some e, m
-              | _ -> Trans.unsupportedExpression (Term t) uncompiled
-            in
-            let w,m = List.fold_left mk_br (None,Mls.empty) bl in
-            let find cs = try Mls.find cs m with Not_found ->
-              let u = id_fresh "u" in
-              let s = ty_match Mtv.empty (of_option cs.ls_value) v.vs_ty in
-              let mk_v ty = t_var (create_vsymbol u (ty_inst s ty)) in
-              t_app cs (List.map mk_v cs.ls_args) v.vs_ty, of_option w
-            in
-            let ts = match v.vs_ty.ty_node with
-              | Tyapp (ts,_) -> ts
-              | _ -> Trans.unsupportedExpression (Term t) uncompiled
-            in
-            let add_cs tsk cs =
-              let t,e = find cs in
-              let lm = lm @ [v,t] in
-              let hd = t_subst_single v t hd in
-              add_fd kn tsk (nm ^ "_" ^ cs.ls_name.id_long) ls hd lm e
-            in
-            List.fold_left add_cs task (find_constructors kn ts)
-        | _ ->
-            add_t_ax task nm ls hd (unfold_t lm e)
+let add_ld q axl d = match d with
+  | _, None -> axl, d
+  | ls, _ when Driver.query_remove q ls.ls_name -> axl, (ls, None)
+  | ls, Some ld ->
+      let nm = ls.ls_name.id_short ^ "_def" in
+      let pr = create_prsymbol (id_derive nm ls.ls_name) in
+      let vl,e = open_ls_defn ld in
+      let tl = List.map t_var vl in
+      begin match e with
+        | Term t ->
+            let hd = t_app ls tl t.t_ty in
+            let ax = f_forall vl [[Term hd]] (t_insert hd t) in
+            create_prop_decl Paxiom pr ax :: axl, (ls, None)
+        | Fmla f ->
+            let hd = f_app ls tl in
+            let ax = f_forall vl [[Fmla hd]] (f_insert hd f) in
+            create_prop_decl Paxiom pr ax :: axl, (ls, None)
       end
-  | _ -> add_t_ax task nm ls hd (unfold_t lm e)
 
-let rec add_pd kn task nm ls hd lm e = match e.f_node with
-  | Flet (t,b) ->
-      let v,e = f_open_bound b in
-      add_pd kn task nm ls hd ((v,t)::lm) e
-  | Fcase ([t],bl) ->
-      let t = Eliminate_constructs.remove_let_t (unfold_t lm t) in
-      begin match t.t_node with
-        | Tvar v ->
-            let mk_br (w,m) br =
-              let (pl,e) = f_open_branch br in
-              match pl with
-              | [{ pat_node = Papp (cs,pl) }] ->
-                  let mk_var p = match p.pat_node with
-                    | Pvar v -> t_var v
-                    | _ -> Trans.unsupportedExpression (Fmla e) uncompiled
-                  in
-                  w, Mls.add cs (t_app cs (List.map mk_var pl) v.vs_ty, e) m
-              | [{ pat_node = Pwild }] ->
-                  Some e, m
-              | _ -> Trans.unsupportedExpression (Fmla e) uncompiled
-            in
-            let w,m = List.fold_left mk_br (None,Mls.empty) bl in
-            let find cs = try Mls.find cs m with Not_found ->
-              let u = id_fresh "u" in
-              let s = ty_match Mtv.empty (of_option cs.ls_value) v.vs_ty in
-              let mk_v ty = t_var (create_vsymbol u (ty_inst s ty)) in
-              t_app cs (List.map mk_v cs.ls_args) v.vs_ty, of_option w
-            in
-            let ts = match v.vs_ty.ty_node with
-              | Tyapp (ts,_) -> ts
-              | _ -> Trans.unsupportedExpression (Term t) uncompiled
-            in
-            let add_cs tsk cs =
-              let t,e = find cs in
-              let lm = lm @ [v,t] in
-              let hd = f_subst_single v t hd in
-              add_pd kn tsk (nm ^ "_" ^ cs.ls_name.id_long) ls hd lm e
-            in
-            List.fold_left add_cs task (find_constructors kn ts)
-        | _ ->
-            add_f_ax task nm ls hd (unfold_f lm e)
-      end
-  | _ -> add_f_ax task nm ls hd (unfold_f lm e)
+let elim q d = match d.d_node with
+  | Dlogic l ->
+      let axl, l = map_fold_left (add_ld q) [] l in
+      let d = create_logic_decl l in
+      d :: List.rev axl
+  | _ -> [d]
 
-let add_ld kn task ls ld =
-  let vl,e = open_ls_defn ld in
-  let tl = List.map t_var vl in
-  match e with
-  | Term t ->
-      add_fd kn task ls.ls_name.id_long ls (t_app ls tl t.t_ty) [] t
-  | Fmla f ->
-      add_pd kn task ls.ls_name.id_long ls (f_app ls tl) [] f
-
-let add_ld q kn task (ls,ld) = match ld with
-  | None -> task
-  | Some _ when Driver.query_remove q ls.ls_name -> task
-  | Some ld -> add_ld kn task ls ld
-
-let add_ls task (ls,_) = add_decl task (create_logic_decl [ls,None])
-
-let elim q t task = match t.task_decl with
-  | Decl { d_node = Dlogic ll } ->
-      let task = List.fold_left add_ls task ll in
-      let task = List.fold_left (add_ld q t.task_known) task ll in
-      task
-  | td ->
-      add_tdecl task td
-
-let elim = Register.store_query (fun q -> Trans.map (elim q) None)
+let elim = Register.store_query (fun q -> Trans.decl (elim q) None)
 
 let () = Register.register_transform "eliminate_definition" elim
 
