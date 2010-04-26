@@ -12,7 +12,12 @@ unknown "^\\(unknown\\|sat\\|Fail\\)" "Unknown"
 (* À discuter *)
 transformation "simplify_recursive_definition"      
 transformation "inline_trivial"
-transformation "remove_logic_definition"
+
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "compile_match"
+transformation "eliminate_algebraic"
+
 transformation "encoding_decorate"
 (* transformation "encoding_decorate_every_simple" *)
 

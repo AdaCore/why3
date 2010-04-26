@@ -18,23 +18,11 @@
 (**************************************************************************)
 
 (** eliminate let *)
-val remove_let_t : Term.term -> Term.term
-val remove_let_f : Term.fmla -> Term.fmla
 
-val eliminate_let : Task.task Register.trans_reg
+val elim_let_t : Term.term -> Term.term
+val elim_let_f : Term.fmla -> Term.fmla
 
-
-(** eliminate ite, ie if then else in term *)
-val remove_ite_t : Term.term -> (Term.fmla * Term.term) list
-val remove_ite_f : bool -> Term.fmla -> Term.fmla
-(* [remove_ite_f sign f] *)
-val remove_ite_decl : Decl.decl -> Decl.decl list
-
-val eliminate_ite : Task.task Register.trans_reg
-
-(** eliminate ite, ie if then else in term *)
-val remove_if_then_else_t : Term.term -> Term.term
-val remove_if_then_else_f : bool -> Term.fmla -> Term.fmla
-(* [remove_if_then_else_f sign f] *)
-val eliminate_if_then_else : Task.task Register.trans_reg
+val eliminate_let_term : Task.task Register.trans_reg
+val eliminate_let_fmla : Task.task Register.trans_reg
+val eliminate_let      : Task.task Register.trans_reg
 

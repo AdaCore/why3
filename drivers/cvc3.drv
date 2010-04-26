@@ -11,9 +11,13 @@ unknown "\\bunknown\\b\\|\\bsat\\b" "Unknown"
 
 (* À discuter *)
 transformation "simplify_recursive_definition"      
-(* transformation (*"split_goal_pos_neg_goal"*) "split_goal_pos_neg_all"*)
 transformation "inline_trivial"
+
 transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "compile_match"
+transformation "eliminate_algebraic"
+
 transformation "encoding_decorate"
 
 theory BuiltIn

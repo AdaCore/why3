@@ -48,13 +48,11 @@ and elim_f contF f = match f.f_node with
       contF (f_map_cont (elim_t []) elim_f (fun f -> f) f)
   | _ -> f_map_cont elim_tr elim_f contF f
 
-  (* the only terms we can still meet in a formula are the terms
-   * in triggers. Since we cannot eliminate 'if' in a trigger term
-   * (and we shouldn't have one in the first place), we will simply
-   * replace it with a fresh variable and let the prover sort it out. *)
-
+(* the only terms we can still meet are the terms in triggers *)
 and elim_tr contT t = match t.t_node with
-  | Tif _ -> contT (t_var (create_vsymbol (id_fresh "if") t.t_ty))
+  | Tif _ ->
+      Register.unsupportedExpression (Term t)
+        "cannot eliminate 'if-then-else' in trigger terms"
   | _ -> t_map_cont elim_tr elim_f contT t
 
 let elim_f f = elim_f (fun f -> f) f
@@ -79,18 +77,13 @@ let add_ld axl d = match d with
             axl, make_ls_defn ls vl (e_map elim_t elim_f e)
       end
 
-let elim d = match d.d_node with
+let elim_d d = match d.d_node with
   | Dlogic l ->
       let axl, l = map_fold_left add_ld [] l in
       let d = create_logic_decl l in
       d :: List.rev axl
   | _ ->
       [decl_map (fun _ -> assert false) elim_f d]
-
-let eliminate_if_term =
-  Register.store (fun () -> Trans.decl elim None)
-
-let () = Register.register_transform "eliminate_if_term" eliminate_if_term
 
 (* eliminate if-then-else in formulas *)
 
@@ -107,8 +100,19 @@ and elim_f sign f = match f.f_node with
   | _ ->
       f_map_sign elim_t elim_f sign f
 
+(* registration *)
+
+let eliminate_if_term =
+  Register.store (fun () -> Trans.decl elim_d None)
+
 let eliminate_if_fmla =
   Register.store (fun () -> Trans.rewrite elim_t (elim_f true) None)
 
-let () = Register.register_transform "eliminate_if_fmla" eliminate_if_fmla
+let eliminate_if =
+  Register.compose eliminate_if_term eliminate_if_fmla
+
+let () =
+  Register.register_transform "eliminate_if_term" eliminate_if_term;
+  Register.register_transform "eliminate_if_fmla" eliminate_if_fmla;
+  Register.register_transform "eliminate_if" eliminate_if
 
