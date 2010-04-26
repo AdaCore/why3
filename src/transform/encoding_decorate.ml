@@ -111,7 +111,7 @@ let load_prelude query env =
     task_tdecls task in
   task,
   { query = query;
-    clone_builtin = clone_builtin;
+    clone_builtin = Wts.memoize 7 clone_builtin;
     specials = specials;
     deco = deco;
     undeco = undeco;
