@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Useful functions *) 
+
 (* useful option combinators *)
 
 val of_option : 'a option -> 'a

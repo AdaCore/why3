@@ -17,39 +17,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Hashtable with weak key used for memoization *)
+(** Move the conjunctions to top level and split the axiom or goal *)
 
-module type S = sig
 
-  type key
+val split_pos_goal      : Task.task Register.tlist_reg
+val split_pos_neg_goal  : Task.task Register.tlist_reg
+val split_pos_axiom     : Task.task Register.tlist_reg
+val split_pos_neg_axiom : Task.task Register.tlist_reg
+val split_pos_all       : Task.task Register.tlist_reg
+val split_pos_neg_all   : Task.task Register.tlist_reg
 
-  type 'a t
-
-  val create : int -> 'a t
-    (* create a hashtbl with weak keys *)
-
-  val find : 'a t -> key -> 'a
-    (* find the value bound to a key.
-       Raises Not_found if there is no binding *)
-
-  val mem : 'a t -> key -> bool
-    (* test if a key is bound *)
-
-  val set : 'a t -> key -> 'a -> unit
-    (* bind the key _once_ with the given value *)
-
-  val memoize : int -> (key -> 'a) -> (key -> 'a)
-    (* create a memoizing function *)
-
-  val memoize_option : int -> (key option -> 'a) -> (key option -> 'a)
-    (* memoizing functions on option types *)
-
-end
-
-module type Tagged =
-sig
-  type t
-  val tag : t -> int
-end
-
-module Make (S : Tagged) : S with type key = S.t
+(**  naming convention :
+     - pos : move the conjuctions in positive sub-formula to top level
+     - pos : move the conjuctions in negative sub-formula to top level
+     - goal : apply the transformation only to goal
+     - axiom : apply the transformation only to axioms
+     - all : apply the transformation to goal and axioms *)

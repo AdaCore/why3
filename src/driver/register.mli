@@ -119,16 +119,17 @@ val catch_unsupportedtype        : (Ty.ty     -> 'a) -> (Ty.ty     -> 'a)
 (** [catch_unsupportedtype f] return a function which applied on [arg] : 
     - return [f arg] if [f arg] doesn't raise the {!
 Unsupported} exception.
-    -  raise [unsupportedType (arg,s)] if [f arg] raises [Unsupported s]*)
+    -  raise [Error (unsupportedType (arg,s))] if [f arg] 
+    raises [Unsupported s]*)
 
 val catch_unsupportedterm        : (Term.term -> 'a) -> (Term.term -> 'a)
-(** same as {! catch_unsupportedtype} but raise {!
-UnsupportedExpression} instead of {! UnsupportedType}*)
+  (** same as {! catch_unsupportedtype} but use [UnsupportedExpression]
+      instead of [UnsupportedType]*)
 
 val catch_unsupportedfmla        : (Term.fmla -> 'a) -> (Term.fmla -> 'a)
-(** same as {! catch_unsupportedtype} but raise {!
-UnsupportedExpression} instead of {! UnsupportedType}*)
+  (** same as {! catch_unsupportedtype} but use [UnsupportedExpression] 
+      instead of [UnsupportedType]*)
 
 val catch_unsupportedDeclaration : (Decl.decl -> 'a) -> (Decl.decl -> 'a)
-(** same as {! catch_unsupportedtype} but raise {!
-UnsupportedDeclaration} instead of {! UnsupportedType}*)
+(** same as {! catch_unsupportedtype} but use
+    [UnsupportedDeclaration] instead of [UnsupportedType] *)

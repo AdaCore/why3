@@ -25,6 +25,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Parse rc files *)
 
 type rc_value =
   | RCint of int
@@ -44,8 +45,8 @@ val string : rc_value -> string
 
 val from_file : string -> (string list * (string * rc_value) list) list
   (** returns the records of the file [f]
-      @raises Not_found is f does not exists 
-      @raises Failure "lexing" in case of incorrect syntax *)
+      @raise Not_found is f does not exists 
+      @raise Failure "lexing" in case of incorrect syntax *)
 
 val get_home_dir : unit -> string
   (** returns the home dir of the user *)

@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Manage the config file of Why *)
+
 open Util
 
 type config_prover = {

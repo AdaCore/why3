@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Apply printers and registered transformations mentionned in drivers *)
+
 val print_task : Driver.driver -> Format.formatter -> Task.task -> unit
 
 val prove_task :

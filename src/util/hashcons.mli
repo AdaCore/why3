@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Hash tables for hash consing *)
+
 (*s Hash tables for hash consing. 
 
     Hash consed values are of the

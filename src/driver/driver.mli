@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Drivers for calling external provers *)
+(** Manage Why drivers *)
 
 open Format
 open Util
