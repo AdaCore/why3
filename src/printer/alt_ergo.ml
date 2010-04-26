@@ -201,6 +201,7 @@ let print_decl drv fmt d = match d.d_node with
 let print_decl drv fmt = catch_unsupportedDeclaration (print_decl drv fmt)
 
 let print_task drv fmt task = 
+  Driver.print_full_prelude drv task fmt;
   let decls = Task.task_decls task in
   ignore (print_list_opt (add_flush newline2) (print_decl drv) fmt decls)
 
@@ -210,7 +211,6 @@ let () = register_printer "alt-ergo"
      print_task drv fmt task)
 
 let print_goal drv fmt (id, f, task) =
-  Driver.print_prelude (Driver.query_driver drv) task fmt;
   print_task drv fmt task;
   fprintf fmt "@\n@[<hov 2>goal %a : %a@]@\n" print_ident id (print_fmla drv) f
 

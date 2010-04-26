@@ -329,7 +329,7 @@ let print_decls drv fmt dl =
 
 let print_task drv fmt task =
   forget_all (); 
-  Driver.print_prelude (Driver.query_driver drv) task fmt;
+  Driver.print_full_prelude drv task fmt;
   print_decls drv fmt (Task.task_decls task)
 
 let () = Register.register_printer "why3" print_task

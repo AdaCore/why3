@@ -42,13 +42,17 @@ type driver_query
 
 val driver_query : driver -> task -> driver_query
 
-val query_syntax : driver_query -> ident -> string option 
+val query_syntax : driver_query -> ident -> string option
 val query_remove : driver_query -> ident -> bool
 val query_tags   : driver_query -> ident -> Sstr.t
 val query_clone  : driver_query -> Theory.clone_map
 val query_driver : driver_query -> driver
 val query_env    : driver_query -> env
 val query_tag    : driver_query -> int
+
+val print_global_prelude : driver_query -> formatter -> unit
+val print_theory_prelude : driver_query -> ident -> formatter -> unit
+val print_full_prelude   : driver_query -> task -> formatter -> unit
 
 (** {2 use a driver} *)
 
@@ -58,8 +62,6 @@ val get_transform : driver -> string list
 
 (** file_of_task input_file theory_name task *)
 val file_of_task : driver -> string -> string -> task -> string
-
-val print_prelude : driver -> task -> formatter -> unit
 
 val call_on_buffer :
   ?debug    : bool ->

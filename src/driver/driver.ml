@@ -325,9 +325,12 @@ let get_transform drv = drv.drv_transform
 let get_printer drv = drv.drv_printer
 let get_env drv = drv.drv_env
 
-let print_prelude drv task fmt =
+let print_prelude_list fmt prel =
   let pr_pr s () = fprintf fmt "%s@\n" s in
-  List.fold_right pr_pr drv.drv_prelude ();
+  List.fold_right pr_pr prel ()
+
+let print_prelude drv task fmt =
+  print_prelude_list fmt drv.drv_prelude;
   let seen = Hid.create 17 in
   let rec print_prel th_name th =
     if Hid.mem seen th_name then () else begin
@@ -337,11 +340,23 @@ let print_prelude drv task fmt =
         try Mid.find th_name drv.drv_thprelude
         with Not_found -> []
       in
-      List.fold_right pr_pr prel ()
+      print_prelude_list fmt prel
     end
   in
   Mid.iter print_prel (task_used task);
   fprintf fmt "@."
+
+let print_full_prelude dq = print_prelude dq.query_driver
+
+let print_global_prelude dq fmt =
+  print_prelude_list fmt dq.query_driver.drv_prelude
+
+let print_theory_prelude dq th_name fmt =
+  let prel =
+    try Mid.find th_name dq.query_driver.drv_thprelude
+    with Not_found -> []
+  in
+  print_prelude_list fmt prel
 
 let filename_regexp = Str.regexp "%\\(.\\)"
 
