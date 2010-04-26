@@ -24,32 +24,38 @@ open Decl
 
 (* eliminate if-then-else in terms *)
 
-let rec elim_t case letl contT t = match t.t_node with
+let rec elim_t letl contT t = match t.t_node with
   | Tlet (t1,tb) ->
       let u,t2 = t_open_bound tb in
       let t_let e1 e2 =
         if e1 == t1 && e2 == t2 then t else t_let u e1 e2
       in
       let cont_in t1 t2 = contT (t_let t1 t2) in
-      let cont_let t1 = elim_t case ((u,t1)::letl) (cont_in t1) t2 in
-      elim_t case letl cont_let t1
-  | Tcase _ ->
-      t_map_cont (elim_t (Some t) letl) elim_f contT t
-  | Tif _ when case <> None ->
-      Register.unsupportedExpression (Term (of_option case))
-        "cannot eliminate 'if-then-else' under 'match' in terms"
+      let cont_let t1 = elim_t ((u,t1)::letl) (cont_in t1) t2 in
+      elim_t letl cont_let t1
   | Tif (f,t1,t2) ->
       let f = elim_f (fun f -> f) f in
       let f = List.fold_left (fun f (v,t) -> f_let v t f) f letl in
-      f_if f (elim_t case letl contT t1) (elim_t case letl contT t2)
+      f_if f (elim_t letl contT t1) (elim_t letl contT t2)
+  | Tcase _ ->
+      Register.unsupportedExpression (Term t)
+        "cannot eliminate 'if-then-else' under 'match' in terms"
   | _ ->
-      t_map_cont (elim_t case letl) elim_f contT t
+      t_map_cont (elim_t letl) elim_f contT t
 
 and elim_f contF f = match f.f_node with
   | Fapp _ | Flet _ | Fcase _ ->
-      contF (f_map_cont (elim_t None []) elim_f (fun f -> f) f)
-  | _ ->
-      f_map_cont (fun _ _ -> assert false) elim_f contF f
+      contF (f_map_cont (elim_t []) elim_f (fun f -> f) f)
+  | _ -> f_map_cont elim_tr elim_f contF f
+
+  (* the only terms we can still meet in a formula are the terms
+   * in triggers. Since we cannot eliminate 'if' in a trigger term
+   * (and we shouldn't have one in the first place), we will simply
+   * replace it with a fresh variable and let the prover sort it out. *)
+
+and elim_tr contT t = match t.t_node with
+  | Tif _ -> contT (t_var (create_vsymbol (id_fresh "if") t.t_ty))
+  | _ -> t_map_cont elim_tr elim_f contT t
 
 let elim_f f = elim_f (fun f -> f) f
 
