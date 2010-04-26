@@ -241,7 +241,7 @@ let rec rewrite_term tenv tvar vsvar t =
       let t1' = fnT vsvar t1 in let t2' = fnT vsvar t2 in
       if t1' == t1 && t2' == t2 then t else t_let u t1' t2'
     | Tcase _ | Teps _ | Tbvar _ ->
-        Trans.unsupportedExpression
+        Register.unsupportedExpression
                  (Term t) "Encoding decorate : I can't encode this term"
 
 and rewrite_fmla tenv tvar vsvar f =
@@ -296,13 +296,13 @@ let decl (tenv:tenv) d =
             Hts.add tenv.trans_tsymbol ts tty;
             tty in
         [create_decl (create_logic_decl [(tty,None)])]
-    | Dtype _ -> Trans.unsupportedDeclaration 
+    | Dtype _ -> Register.unsupportedDeclaration 
         d "encoding_decorate : I can work only on abstract\
             type which are not in recursive bloc."
     | Dlogic l ->
         let fn = function
           | _ls, Some _ -> 
-              Trans.unsupportedDeclaration 
+              Register.unsupportedDeclaration 
                 d "encoding_decorate : I can't encode definition. \
 Perhaps you could use eliminate_definition"
           | ls, None ->              
@@ -314,7 +314,7 @@ Perhaps you could use eliminate_definition"
                 Hls.add tenv.trans_lsymbol ls ls_conv;
                 ls_conv,None in
         [create_decl (create_logic_decl (List.map fn l))]
-    | Dind _ -> Trans.unsupportedDeclaration
+    | Dind _ -> Register.unsupportedDeclaration
         d "encoding_decorate : I can't work on inductive"
         (* let fn (pr,f) = pr, fnF f in *)
         (* let fn (ps,l) = ps, List.map fn l in *)

@@ -258,10 +258,8 @@ let rec report fmt = function
       fprintf fmt "Why config: %a" Whyconf.report e
   | Prover.Error e ->
       Prover.report fmt e
-  | Trans.Error e ->
-      Trans.report fmt e
-  | Printer_utils.Error e ->
-      Printer_utils.report fmt e
+  | Register.Error e ->
+      Register.report fmt e
   | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
 let print_th_namespace fmt th =

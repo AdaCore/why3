@@ -17,6 +17,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Register printers and registered transformations, and create
+    registered transformations *)
+
 open Env
 open Task
 open Trans
@@ -38,7 +41,7 @@ val conv_res : ('a -> 'b) -> 'a trans_reg -> 'b trans_reg
 
 val clear : 'a trans_reg -> unit
 
-(** Store and apply *)
+(** {2 Store and apply} *)
 
 type query = Driver.driver_query
 type clone = Theory.clone_map
@@ -60,7 +63,7 @@ val apply_driver : 'a trans_reg -> Driver.driver -> task -> 'a
 val apply_env : 'a trans_reg -> env -> task -> 'a
 val apply : 'a trans_reg -> task -> 'a
 
-(** Registration *)
+(** {2 Registration} *)
 
 type printer = query -> Format.formatter -> task -> unit
 
@@ -76,3 +79,56 @@ val list_printers     : unit -> string list
 val list_transforms   : unit -> string list
 val list_transforms_l : unit -> string list
 
+(** {2 exceptions to use in transformations and printers } *)
+
+type error =
+  | UnsupportedType        of Ty.ty     * string
+  | UnsupportedExpression  of Term.expr * string
+  | UnsupportedDeclaration of Decl.decl * string
+  | NotImplemented         of             string
+
+exception Error of error
+
+val unsupportedType        : Ty.ty     -> string -> 'a
+(** [unsupportedType ty s] 
+    - [ty] is the problematic formula
+    - [s] explain the problem and
+      possibly a way to solve it (such as applying another
+      transforamtion) *)
+
+val unsupportedExpression  : Term.expr -> string -> 'a
+
+val unsupportedDeclaration : Decl.decl -> string -> 'a
+
+val notImplemented : string -> 'a
+(** [notImplemented s]. [s] explains what is not implemented *)
+
+val report : Format.formatter -> error -> unit
+(** Pretty print an error *)
+
+(** {3 functions which catch inner error} *)
+
+exception Unsupported of string
+(** This exception must be raised only in a inside call of one of the above
+    catch_* function *)
+
+val unsupported : string -> 'a
+(** convenient function to raise the {! Unsupported} exception *)
+
+val catch_unsupportedtype        : (Ty.ty     -> 'a) -> (Ty.ty     -> 'a)
+(** [catch_unsupportedtype f] return a function which applied on [arg] : 
+    - return [f arg] if [f arg] doesn't raise the {!
+Unsupported} exception.
+    -  raise [unsupportedType (arg,s)] if [f arg] raises [Unsupported s]*)
+
+val catch_unsupportedterm        : (Term.term -> 'a) -> (Term.term -> 'a)
+(** same as {! catch_unsupportedtype} but raise {!
+UnsupportedExpression} instead of {! UnsupportedType}*)
+
+val catch_unsupportedfmla        : (Term.fmla -> 'a) -> (Term.fmla -> 'a)
+(** same as {! catch_unsupportedtype} but raise {!
+UnsupportedExpression} instead of {! UnsupportedType}*)
+
+val catch_unsupportedDeclaration : (Decl.decl -> 'a) -> (Decl.decl -> 'a)
+(** same as {! catch_unsupportedtype} but raise {!
+UnsupportedDeclaration} instead of {! UnsupportedType}*)

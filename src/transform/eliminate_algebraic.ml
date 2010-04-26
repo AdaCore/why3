@@ -46,24 +46,24 @@ let rec rewriteT kn state t = match t.t_node with
         | [{ pat_node = Papp (cs,pl) }] ->
             let add_var e p pj = match p.pat_node with
               | Pvar v -> t_let v (t_app pj [t1] v.vs_ty) e
-              | _ -> Trans.unsupportedExpression (Term t) uncompiled
+              | _ -> Register.unsupportedExpression (Term t) uncompiled
             in
             let pjl = Mls.find cs state.pj_map in
             let e = List.fold_left2 add_var e pl pjl in
             w, Mls.add cs e m
         | [{ pat_node = Pwild }] ->
             Some e, m
-        | _ -> Trans.unsupportedExpression (Term t) uncompiled
+        | _ -> Register.unsupportedExpression (Term t) uncompiled
       in
       let w,m = List.fold_left mk_br (None,Mls.empty) bl in
       let find cs = try Mls.find cs m with Not_found -> of_option w in
       let ts = match t1.t_ty.ty_node with
         | Tyapp (ts,_) -> ts
-        | _ -> Trans.unsupportedExpression (Term t) uncompiled
+        | _ -> Register.unsupportedExpression (Term t) uncompiled
       in
       let tl = List.map find (find_constructors kn ts) in
       t_app (Mts.find ts state.mt_map) (t1::tl) t.t_ty
-  | Tcase _ -> Trans.unsupportedExpression (Term t) uncompiled
+  | Tcase _ -> Register.unsupportedExpression (Term t) uncompiled
   | _ -> t_map (rewriteT kn state) (rewriteF kn state true) t
 
 and rewriteF kn state sign f = match f.f_node with
@@ -76,12 +76,12 @@ and rewriteF kn state sign f = match f.f_node with
         | [{ pat_node = Papp (cs,pl) }] ->
             let get_var p = match p.pat_node with
               | Pvar v -> v
-              | _ -> Trans.unsupportedExpression (Fmla f) uncompiled
+              | _ -> Register.unsupportedExpression (Fmla f) uncompiled
             in
             w, Mls.add cs (List.map get_var pl, e) m
         | [{ pat_node = Pwild }] ->
             Some e, m
-        | _ -> Trans.unsupportedExpression (Fmla f) uncompiled
+        | _ -> Register.unsupportedExpression (Fmla f) uncompiled
       in
       let w,m = List.fold_left mk_br (None,Mls.empty) bl in
       let find cs =
@@ -99,11 +99,11 @@ and rewriteF kn state sign f = match f.f_node with
       in
       let ts = match t1.t_ty.ty_node with
         | Tyapp (ts,_) -> ts
-        | _ -> Trans.unsupportedExpression (Fmla f) uncompiled
+        | _ -> Register.unsupportedExpression (Fmla f) uncompiled
       in
       let op = if sign then f_and_simp else f_or_simp in
       map_join_left find op (find_constructors kn ts)
-  | Fcase _ -> Trans.unsupportedExpression (Fmla f) uncompiled
+  | Fcase _ -> Register.unsupportedExpression (Fmla f) uncompiled
   | _ -> f_map_sign (rewriteT kn state) (rewriteF kn state) sign f
 
 let add_type (state, task) ts csl =

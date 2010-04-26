@@ -36,7 +36,7 @@ let rec elim_t case letl contT t = match t.t_node with
   | Tcase _ ->
       t_map_cont (elim_t (Some t) letl) elim_f contT t
   | Tif _ when case <> None ->
-      Trans.unsupportedExpression (Term (of_option case))
+      Register.unsupportedExpression (Term (of_option case))
         "cannot eliminate 'if-then-else' under 'match' in terms"
   | Tif (f,t1,t2) ->
       let f = elim_f (fun f -> f) f in

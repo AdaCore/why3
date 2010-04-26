@@ -16,7 +16,7 @@
 (*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
 (*                                                                        *)
 (**************************************************************************)
-open Printer_utils
+open Register
 open Format
 open Pp
 open Ident
@@ -204,7 +204,7 @@ let print_task drv fmt task =
   let decls = Task.task_decls task in
   ignore (print_list_opt (add_flush newline2) (print_decl drv) fmt decls)
 
-let () = Register.register_printer "alt-ergo" 
+let () = register_printer "alt-ergo" 
   (fun drv fmt task -> 
      forget_all ident_printer;
      print_task drv fmt task)
