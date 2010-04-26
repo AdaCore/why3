@@ -44,7 +44,7 @@ let comp t task =
   | Decl d -> add_decl task (decl_map fnT fnF d)
   | td -> add_tdecl task td
 
-let comp = Register.store (fun () -> Trans.map comp None)
+let compile_match = Register.store (fun () -> Trans.map comp None)
 
-let () = Register.register_transform "compile_match" comp
+let () = Register.register_transform "compile_match" compile_match
 
