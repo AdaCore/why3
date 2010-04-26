@@ -15,6 +15,7 @@ fail "typing error:\\(.*\\)$" "Failure : File generation error : \\1"
 transformation "simplify_recursive_definition"
 transformation "inline_trivial"
 
+transformation "eliminate_builtin"
 transformation "eliminate_definition"
 transformation "eliminate_inductive"
 transformation "compile_match"

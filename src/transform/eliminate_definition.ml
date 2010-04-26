@@ -44,9 +44,8 @@ let rec f_insert hd f = match f.f_node with
       f_case tl (List.map br bl)
   | _ -> f_iff_simp hd f
 
-let add_ld q func pred axl d = match d with
+let add_ld func pred axl d = match d with
   | _, None -> axl, d
-  | ls, _ when Driver.query_remove q ls.ls_name -> axl, (ls, None)
   | ls, Some ld ->
       let vl,e = open_ls_defn ld in begin match e with
         | Term t when func ->
@@ -64,21 +63,21 @@ let add_ld q func pred axl d = match d with
         | _ -> axl, d
       end
 
-let elim q func pred d = match d.d_node with
+let elim func pred d = match d.d_node with
   | Dlogic l ->
-      let axl, l = map_fold_left (add_ld q func pred) [] l in
+      let axl, l = map_fold_left (add_ld func pred) [] l in
       let d = create_logic_decl l in
       d :: List.rev axl
   | _ -> [d]
 
 let eliminate_definition_func =
-  Register.store_query (fun q -> Trans.decl (elim q true false) None)
+  Register.store (fun () -> Trans.decl (elim true false) None)
 
 let eliminate_definition_pred =
-  Register.store_query (fun q -> Trans.decl (elim q false true) None)
+  Register.store (fun () -> Trans.decl (elim false true) None)
 
 let eliminate_definition =
-  Register.store_query (fun q -> Trans.decl (elim q true true) None)
+  Register.store (fun () -> Trans.decl (elim true true) None)
 
 let () =
   Register.register_transform "eliminate_definition_func"
