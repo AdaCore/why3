@@ -38,7 +38,7 @@ let rec elim_t letl contT t = match t.t_node with
       let f = List.fold_left (fun f (v,t) -> f_let v t f) f letl in
       f_if f (elim_t letl contT t1) (elim_t letl contT t2)
   | Tcase _ ->
-      Register.unsupportedExpression (Term t)
+      Register.unsupportedTerm t
         "cannot eliminate 'if-then-else' under 'match' in terms"
   | _ ->
       t_map_cont (elim_t letl) elim_f contT t
@@ -51,7 +51,7 @@ and elim_f contF f = match f.f_node with
 (* the only terms we can still meet are the terms in triggers *)
 and elim_tr contT t = match t.t_node with
   | Tif _ ->
-      Register.unsupportedExpression (Term t)
+      Register.unsupportedTerm t
         "cannot eliminate 'if-then-else' in trigger terms"
   | _ -> t_map_cont elim_tr elim_f contT t
 

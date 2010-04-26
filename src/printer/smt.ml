@@ -59,7 +59,7 @@ and print_tyapp drv fmt = function
   | [ty] -> fprintf fmt "%a " (print_type drv) ty
   | tl -> fprintf fmt "(%a) " (print_list comma (print_type drv)) tl
 
-let print_type drv fmt = catch_unsupportedtype (print_type drv fmt)
+let print_type drv fmt = catch_unsupportedType (print_type drv fmt)
 
 let rec print_term drv fmt t = match t.t_node with
   | Tbvar _ -> assert false
@@ -81,9 +81,9 @@ let rec print_term drv fmt t = match t.t_node with
   | Tif (f1,t1,t2) -> 
       fprintf fmt "@[(ite %a@ %a@ %a)@]"
         (print_fmla drv) f1 (print_term drv) t1 (print_term drv) t2
-  | Tcase _ -> unsupportedExpression (Term t) 
+  | Tcase _ -> unsupportedTerm t 
       "smtv1 : you must eliminate match"
-  | Teps _ -> unsupportedExpression (Term t) 
+  | Teps _ -> unsupportedTerm t 
       "smtv1 : you must eliminate epsilon"
 
 and print_fmla drv fmt f = match f.f_node with
@@ -131,7 +131,7 @@ and print_fmla drv fmt f = match f.f_node with
       fprintf fmt "@[(let (%a %a)@ %a)@]" print_var v
         (print_term drv) t1 (print_fmla drv) f2;
       forget_var v
-  | Fcase _ -> unsupportedExpression (Fmla f) 
+  | Fcase _ -> unsupportedFmla f 
       "smtv1 : you must eliminate match"
       
 and print_expr drv fmt = e_apply (print_term drv fmt) (print_fmla drv fmt)
@@ -173,7 +173,7 @@ let print_decl drv fmt d = match d.d_node with
       print_list_opt newline (print_type_decl drv) fmt dl
   | Dlogic dl ->
       print_list_opt newline (print_logic_decl drv) fmt dl
-  | Dind _ -> unsupportedDeclaration d 
+  | Dind _ -> unsupportedDecl d 
       "smt : inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Driver.query_remove drv pr.pr_name -> false
   | Dprop (Paxiom, _pr, f) ->
@@ -189,7 +189,7 @@ let print_decl drv fmt d = match d.d_node with
       fprintf fmt "  @[(not@ %a)@]" (print_fmla drv) f;true
   | Dprop (Plemma, _, _) -> assert false
 
-let print_decl drv fmt = catch_unsupportedDeclaration (print_decl drv fmt)
+let print_decl drv fmt = catch_unsupportedDecl (print_decl drv fmt)
 
 let print_task drv fmt task = 
   fprintf fmt "(benchmark toto@\n" 

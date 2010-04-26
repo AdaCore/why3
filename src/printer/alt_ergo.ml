@@ -70,13 +70,13 @@ let rec print_term drv fmt t = match t.t_node with
       | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl
       | None -> fprintf fmt "%a%a" print_ident ls.ls_name (print_tapp drv) tl
     end
-  | Tlet _ -> unsupportedExpression (Term t)
+  | Tlet _ -> unsupportedTerm t
       "alt-ergo : you must eliminate let in term"
-  | Tif _ -> unsupportedExpression (Term t) 
+  | Tif _ -> unsupportedTerm t 
       "alt-ergo : you must eliminate if_then_else"
-  | Tcase _ -> unsupportedExpression (Term t) 
+  | Tcase _ -> unsupportedTerm t 
       "alt-ergo : you must eliminate match"
-  | Teps _ -> unsupportedExpression (Term t) 
+  | Teps _ -> unsupportedTerm t 
       "alt-ergo : you must eliminate epsilon"
 
 and print_tapp drv fmt = function
@@ -118,9 +118,9 @@ let rec print_fmla drv fmt f = match f.f_node with
       fprintf fmt "((%a and %a) or (not %a and %a))"
 	(print_fmla drv) f1 (print_fmla drv) f2 (print_fmla drv)
         f1 (print_fmla drv) f3
-  | Flet _ -> unsupportedExpression (Fmla f)
+  | Flet _ -> unsupportedFmla f
       "alt-ergo : you must eliminate let in formula"
-  | Fcase _ -> unsupportedExpression (Fmla f) 
+  | Fcase _ -> unsupportedFmla f 
       "alt-ergo : you must eliminate match"
   
 
@@ -186,7 +186,7 @@ let print_decl drv fmt d = match d.d_node with
       print_list_opt newline (print_type_decl drv) fmt dl
   | Dlogic dl ->
       print_list_opt newline (print_logic_decl drv) fmt dl
-  | Dind _ -> unsupportedDeclaration d 
+  | Dind _ -> unsupportedDecl d 
       "alt-ergo : inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Driver.query_remove drv pr.pr_name -> false
   | Dprop (Paxiom, pr, f) ->
@@ -198,7 +198,7 @@ let print_decl drv fmt d = match d.d_node with
   | Dprop (Plemma, _, _) ->
       assert false
 
-let print_decl drv fmt = catch_unsupportedDeclaration (print_decl drv fmt)
+let print_decl drv fmt = catch_unsupportedDecl (print_decl drv fmt)
 
 let print_task drv fmt task = 
   Driver.print_full_prelude drv task fmt;

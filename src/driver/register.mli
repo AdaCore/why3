@@ -82,25 +82,25 @@ val list_transforms_l : unit -> string list
 (** {2 exceptions to use in transformations and printers } *)
 
 type error =
-  | UnsupportedType        of Ty.ty     * string
-  | UnsupportedExpression  of Term.expr * string
-  | UnsupportedDeclaration of Decl.decl * string
-  | NotImplemented         of             string
+  | UnsupportedType of Ty.ty     * string
+  | UnsupportedExpr of Term.expr * string
+  | UnsupportedDecl of Decl.decl * string
+  | NotImplemented  of             string
 
 exception Error of error
 
-val unsupportedType        : Ty.ty     -> string -> 'a
-(** [unsupportedType ty s] 
-    - [ty] is the problematic formula
+val unsupportedType : Ty.ty -> string -> 'a
+(** [unsupportedType ty s]
+    - [ty] is the problematic type
     - [s] explain the problem and
       possibly a way to solve it (such as applying another
       transforamtion) *)
 
-val unsupportedExpression  : Term.expr -> string -> 'a
-
-val unsupportedDeclaration : Decl.decl -> string -> 'a
-
-val notImplemented : string -> 'a
+val unsupportedTerm : Term.term -> string -> 'a
+val unsupportedFmla : Term.fmla -> string -> 'a
+val unsupportedExpr : Term.expr -> string -> 'a
+val unsupportedDecl : Decl.decl -> string -> 'a
+val notImplemented  : string -> 'a
 (** [notImplemented s]. [s] explains what is not implemented *)
 
 val report : Format.formatter -> error -> unit
@@ -109,27 +109,31 @@ val report : Format.formatter -> error -> unit
 (** {3 functions which catch inner error} *)
 
 exception Unsupported of string
-(** This exception must be raised only in a inside call of one of the above
-    catch_* function *)
+(** This exception must be raised only inside a call
+    of one of the catch_* functions below *)
 
 val unsupported : string -> 'a
 (** convenient function to raise the {! Unsupported} exception *)
 
-val catch_unsupportedtype        : (Ty.ty     -> 'a) -> (Ty.ty     -> 'a)
-(** [catch_unsupportedtype f] return a function which applied on [arg] : 
-    - return [f arg] if [f arg] doesn't raise the {!
-Unsupported} exception.
-    -  raise [Error (unsupportedType (arg,s))] if [f arg] 
+val catch_unsupportedType : (Ty.ty -> 'a) -> (Ty.ty -> 'a)
+(** [catch_unsupportedType f] return a function which applied on [arg]:
+    - return [f arg] if [f arg] does not raise {!Unsupported} exception
+    - raise [Error (unsupportedType (arg,s))] if [f arg]
     raises [Unsupported s]*)
 
-val catch_unsupportedterm        : (Term.term -> 'a) -> (Term.term -> 'a)
-  (** same as {! catch_unsupportedtype} but use [UnsupportedExpression]
-      instead of [UnsupportedType]*)
+val catch_unsupportedTerm : (Term.term -> 'a) -> (Term.term -> 'a)
+(** same as {! catch_unsupportedType} but use [UnsupportedExpr]
+    instead of [UnsupportedType]*)
 
-val catch_unsupportedfmla        : (Term.fmla -> 'a) -> (Term.fmla -> 'a)
-  (** same as {! catch_unsupportedtype} but use [UnsupportedExpression] 
-      instead of [UnsupportedType]*)
+val catch_unsupportedFmla : (Term.fmla -> 'a) -> (Term.fmla -> 'a)
+(** same as {! catch_unsupportedType} but use [UnsupportedExpr]
+    instead of [UnsupportedType]*)
 
-val catch_unsupportedDeclaration : (Decl.decl -> 'a) -> (Decl.decl -> 'a)
-(** same as {! catch_unsupportedtype} but use
-    [UnsupportedDeclaration] instead of [UnsupportedType] *)
+val catch_unsupportedExpr : (Term.expr -> 'a) -> (Term.expr -> 'a)
+(** same as {! catch_unsupportedType} but use [UnsupportedExpr]
+    instead of [UnsupportedType]*)
+
+val catch_unsupportedDecl : (Decl.decl -> 'a) -> (Decl.decl -> 'a)
+(** same as {! catch_unsupportedType} but use [UnsupportedDecl]
+    instead of [UnsupportedType] *)
+

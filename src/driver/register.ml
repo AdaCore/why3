@@ -164,41 +164,39 @@ let list_printers ()     = Hashtbl.fold (fun k _ acc -> k::acc) printers []
 let list_transforms ()   = Hashtbl.fold (fun k _ acc -> k::acc) transforms []
 let list_transforms_l () = Hashtbl.fold (fun k _ acc -> k::acc) transforms_l []
 
-
-
 (** exception to use in a printer and transformation *)
 
-
+open Ty
 open Term
 open Decl
-open Ty
-
 
 type error =
-  | UnsupportedType        of ty    * string
-  | UnsupportedExpression  of expr  * string
-  | UnsupportedDeclaration of decl  * string
-  | NotImplemented         of         string
+  | UnsupportedType of ty   * string
+  | UnsupportedExpr of expr * string
+  | UnsupportedDecl of decl * string
+  | NotImplemented  of        string
 
 exception Error of error
 
 let error e = raise (Error e)
 
 let unsupportedType e s = error (UnsupportedType (e,s))
-let unsupportedExpression e s = error (UnsupportedExpression (e,s))
-let unsupportedDeclaration e s = error (UnsupportedDeclaration (e,s))
-let notImplemented s = error (NotImplemented s)
+let unsupportedTerm e s = error (UnsupportedExpr (Term e,s))
+let unsupportedFmla e s = error (UnsupportedExpr (Fmla e,s))
+let unsupportedExpr e s = error (UnsupportedExpr (e,s))
+let unsupportedDecl e s = error (UnsupportedDecl (e,s))
+let notImplemented    s = error (NotImplemented s)
 
 let report fmt = function
   | UnsupportedType (e,s) ->
       let msg = "This type isn't supported" in
       Format.fprintf fmt
         "@[<hov 3> %s:@\n%a@\n%s@]@\n" msg Pretty.print_ty e s
-  | UnsupportedExpression (e,s) ->
+  | UnsupportedExpr (e,s) ->
       let msg = "This expression isn't supported" in
       Format.fprintf fmt
         "@[<hov 3> %s:@\n%a@\n%s@]@\n" msg Pretty.print_expr e s
-  | UnsupportedDeclaration (d,s) ->
+  | UnsupportedDecl (d,s) ->
       let msg = "This declaration isn't supproted" in
       Format.fprintf fmt
         "@[<hov 3> %s:@\n%a@\n%s@]@\n" msg Pretty.print_decl d s
@@ -210,14 +208,18 @@ exception Unsupported of string
 
 let unsupported s = raise (Unsupported s)
 
-let catch_unsupportedtype f ty =
-  try f ty with Unsupported s -> unsupportedType ty s 
+let catch_unsupportedType f e =
+  try f e with Unsupported s -> unsupportedType e s
 
-let catch_unsupportedterm f t =
-  try f t with Unsupported s -> unsupportedExpression (Term t) s 
+let catch_unsupportedTerm f e =
+  try f e with Unsupported s -> unsupportedTerm e s
 
-let catch_unsupportedfmla f t =
-  try f t with Unsupported s -> unsupportedExpression (Fmla t) s 
+let catch_unsupportedFmla f e =
+  try f e with Unsupported s -> unsupportedFmla e s
 
-let catch_unsupportedDeclaration f d =
-  try f d with Unsupported s -> unsupportedDeclaration d s 
+let catch_unsupportedExpr f e =
+  try f e with Unsupported s -> unsupportedExpr e s
+
+let catch_unsupportedDecl f e =
+  try f e with Unsupported s -> unsupportedDecl e s
+
