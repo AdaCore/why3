@@ -206,7 +206,8 @@ let comp t (state,task) = match t.task_decl with
   | td ->
       state, add_tdecl task td
 
-let comp = Register.store (fun () -> Trans.fold_map comp empty_state None)
+let eliminate_algebraic =
+  Register.store (fun () -> Trans.fold_map comp empty_state None)
 
-let () = Register.register_transform "eliminate_algebraic" comp
+let () = Register.register_transform "eliminate_algebraic" eliminate_algebraic
 

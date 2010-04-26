@@ -44,33 +44,47 @@ let rec f_insert hd f = match f.f_node with
       f_case tl (List.map br bl)
   | _ -> f_iff_simp hd f
 
-let add_ld q axl d = match d with
+let add_ld q func pred axl d = match d with
   | _, None -> axl, d
   | ls, _ when Driver.query_remove q ls.ls_name -> axl, (ls, None)
   | ls, Some ld ->
-      let nm = ls.ls_name.id_short ^ "_def" in
-      let pr = create_prsymbol (id_derive nm ls.ls_name) in
-      let vl,e = open_ls_defn ld in
-      let tl = List.map t_var vl in
-      begin match e with
-        | Term t ->
-            let hd = t_app ls tl t.t_ty in
+      let vl,e = open_ls_defn ld in begin match e with
+        | Term t when func ->
+            let nm = ls.ls_name.id_short ^ "_def" in
+            let hd = t_app ls (List.map t_var vl) t.t_ty in
             let ax = f_forall vl [[Term hd]] (t_insert hd t) in
+            let pr = create_prsymbol (id_derive nm ls.ls_name) in
             create_prop_decl Paxiom pr ax :: axl, (ls, None)
-        | Fmla f ->
-            let hd = f_app ls tl in
+        | Fmla f when pred ->
+            let nm = ls.ls_name.id_short ^ "_def" in
+            let hd = f_app ls (List.map t_var vl) in
             let ax = f_forall vl [[Fmla hd]] (f_insert hd f) in
+            let pr = create_prsymbol (id_derive nm ls.ls_name) in
             create_prop_decl Paxiom pr ax :: axl, (ls, None)
+        | _ -> axl, d
       end
 
-let elim q d = match d.d_node with
+let elim q func pred d = match d.d_node with
   | Dlogic l ->
-      let axl, l = map_fold_left (add_ld q) [] l in
+      let axl, l = map_fold_left (add_ld q func pred) [] l in
       let d = create_logic_decl l in
       d :: List.rev axl
   | _ -> [d]
 
-let elim = Register.store_query (fun q -> Trans.decl (elim q) None)
+let eliminate_definition_func =
+  Register.store_query (fun q -> Trans.decl (elim q true false) None)
 
-let () = Register.register_transform "eliminate_definition" elim
+let eliminate_definition_pred =
+  Register.store_query (fun q -> Trans.decl (elim q false true) None)
+
+let eliminate_definition =
+  Register.store_query (fun q -> Trans.decl (elim q true true) None)
+
+let () =
+  Register.register_transform "eliminate_definition_func"
+                               eliminate_definition_func;
+  Register.register_transform "eliminate_definition_pred"
+                               eliminate_definition_pred;
+  Register.register_transform "eliminate_definition"
+                               eliminate_definition
 

@@ -57,7 +57,7 @@ let elim d = match d.d_node with
       List.rev dl
   | _ -> [d]
 
-let elim = Register.store (fun () -> Trans.decl elim None)
+let eliminate_inductive = Register.store (fun () -> Trans.decl elim None)
 
-let () = Register.register_transform "eliminate_inductive" elim
+let () = Register.register_transform "eliminate_inductive" eliminate_inductive
 
