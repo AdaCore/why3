@@ -238,12 +238,15 @@ val f_open_exists : fmla -> vsymbol list * fmla
 val e_map : (term -> term) -> (fmla -> fmla) -> expr -> expr
 val e_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> expr -> 'a
 val e_apply : (term -> 'a) -> (fmla -> 'a) -> expr -> 'a
+val e_equal : expr -> expr -> bool
 
 val tr_map : (term -> term) ->
              (fmla -> fmla) -> trigger list -> trigger list
 
 val tr_fold : ('a -> term -> 'a) ->
               ('a -> fmla -> 'a) -> 'a -> trigger list -> 'a
+
+val tr_equal : trigger list -> trigger list -> bool
 
 (* map/fold over symbols *)
 
