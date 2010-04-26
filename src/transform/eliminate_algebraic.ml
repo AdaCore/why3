@@ -92,16 +92,15 @@ and rewriteF kn state av sign f = match f.f_node with
           List.map get_var (Mls.find cs state.pj_map), of_option w
         in
         let hd = t_app cs (List.map t_var vl) t1.t_ty in
-        let tr = [] (* FIXME? [[Term hd]] *) in
         match t1.t_node with
         | Tvar v when Svs.mem v av ->
             let hd = f_let v hd e in if sign
-              then f_forall_simp vl tr hd
-              else f_exists_simp vl tr hd
+            then f_forall_simp vl [] hd
+            else f_exists_simp vl [] hd
         | _ ->
             let hd = f_equ t1 hd in if sign
-              then f_forall_simp vl tr (f_implies_simp hd e)
-              else f_exists_simp vl tr (f_and_simp     hd e)
+            then f_forall_simp vl [] (f_implies_simp hd e)
+            else f_exists_simp vl [] (f_and_simp     hd e)
       in
       let ts = match t1.t_ty.ty_node with
         | Tyapp (ts,_) -> ts
@@ -206,8 +205,11 @@ let comp t (state,task) = match t.task_decl with
   | td ->
       state, add_tdecl task td
 
-let eliminate_algebraic =
+let eliminate_compiled_algebraic =
   Register.store (fun () -> Trans.fold_map comp empty_state None)
+
+let eliminate_algebraic =
+  Register.compose Compile_match.compile_match eliminate_compiled_algebraic
 
 let () = Register.register_transform "eliminate_algebraic" eliminate_algebraic
 

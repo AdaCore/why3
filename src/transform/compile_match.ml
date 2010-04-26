@@ -46,5 +46,3 @@ let comp t task =
 
 let compile_match = Register.store (fun () -> Trans.map comp None)
 
-let () = Register.register_transform "compile_match" compile_match
-
