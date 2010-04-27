@@ -21,10 +21,7 @@ theory Abs
 
   use import Int
 
-  logic abs(int) : int
-
-  axiom Pos: forall x:int. x >= 0 -> abs(x) = x
-  axiom Neg: forall x:int. x <= 0 -> abs(x) = -x
+  logic abs(x:int) : int = if x >= 0 then x else -x
 
   lemma Abs_pos: forall x:int. abs(x) >= 0
 
@@ -35,13 +32,13 @@ theory MinMax
 
   use import Int
 
-  logic min(int,int) : int
-  logic max(int,int) : int
+  logic min(x:int,y:int) : int = if x <= y then x else y
+  logic max(x:int,y:int) : int = if x <= y then y else x
 
-  axiom Max_is_ge   : forall x,y:int. max(x,y) >= x and max(x,y) >= y
-  axiom Max_is_some : forall x,y:int. max(x,y) = x or max(x,y) = y
-  axiom Min_is_le   : forall x,y:int. min(x,y) <= x and min(x,y) <= y
-  axiom Min_is_some : forall x,y:int. min(x,y) = x or min(x,y) = y
+  lemma Max_is_ge   : forall x,y:int. max(x,y) >= x and max(x,y) >= y
+  lemma Max_is_some : forall x,y:int. max(x,y) = x or max(x,y) = y
+  lemma Min_is_le   : forall x,y:int. min(x,y) <= x and min(x,y) <= y
+  lemma Min_is_some : forall x,y:int. min(x,y) = x or min(x,y) = y
 
 end
 *)
