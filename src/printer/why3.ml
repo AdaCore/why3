@@ -99,7 +99,7 @@ and print_tyapp drv fmt = function
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
   let rec lookup v ty = match ty.ty_node with
-    | Tyvar u when u == v -> true
+    | Tyvar u when tv_equal u v -> true
     | _ -> ty_any (lookup v) ty
   in
   let lookup v = List.exists (lookup v) fs.ls_args in

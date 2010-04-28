@@ -58,11 +58,11 @@ let list_apply f = List.fold_left (fun acc x -> List.rev_append (f x) acc) []
 
 
 let list_fold_product f acc l1 l2 =
-  List.fold_left 
+  List.fold_left
     (fun acc e1 ->
-       List.fold_left 
-         (fun acc e2 -> f acc e1 e2) 
-         acc l2) 
+       List.fold_left
+         (fun acc e2 -> f acc e1 e2)
+         acc l2)
     acc l1
 
 let list_fold_product_l f acc ll =
@@ -88,13 +88,13 @@ let ffalse _ = false
 module Sstr = Set.Make(String)
 module Mstr = Map.Make(String)
 
-(* Set, Map, Hashtbl on structures with a unique tag and physical equality *)
+(* Set, Map, Hashtbl on structures with a unique tag *)
 
 module OrderedHash (X : Hashweak.Tagged) =
 struct
   type t = X.t
-  let equal = (==)
   let hash = X.tag
+  let equal ts1 ts2 = X.tag ts1 == X.tag ts2
   let compare ts1 ts2 = Pervasives.compare (X.tag ts1) (X.tag ts2)
 end
 

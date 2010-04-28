@@ -89,7 +89,7 @@ let load_prelude query env =
     let th_uc = create_theory (id_fresh ("encoding_decorate_for_"^name)) in
     let th_uc = Theory.use_export th_uc prelude in
     let th_uc = 
-      if ts == ts_int || ts = ts_real then th_uc
+      if ts_equal ts ts_int || ts_equal ts ts_real then th_uc
       else Theory.add_ty_decl th_uc [ts,Tabstract] in
     let ty = ty_app ts [] in
     let add_fsymbol fs th_uc =
@@ -123,7 +123,7 @@ let load_prelude query env =
 let is_kept tenv ts = 
   ts.ts_args = [] &&  
     begin
-      ts == ts_int || ts == ts_real  (* for the constant *)
+      ts_equal ts ts_int || ts_equal ts ts_real  (* for the constant *)
       || match tenv.query with
         | None -> true (* every_simple *)
         | Some query ->
@@ -165,13 +165,13 @@ let conv_ty_pos tenv ty =
 
 (* Convert a logic symbols to the encoded one *)
 let conv_ls tenv ls = 
-  if ls == ps_equ
+  if ls_equal ls ps_equ
   then ls
   else
     let tyl = List.map (conv_ty_neg tenv) ls.ls_args in
     let ty_res = Util.option_map (conv_ty_pos tenv) ls.ls_value in
-    if Util.option_eq (==) ty_res ls.ls_value 
-      && List.for_all2 (==) tyl ls.ls_args 
+    if Util.option_eq ty_equal ty_res ls.ls_value 
+      && List.for_all2 ty_equal tyl ls.ls_args 
     then ls
     else
       let preid = id_clone ls.ls_name in
@@ -187,14 +187,14 @@ let conv_ts tenv ts =
    specials if needed*)
 let conv_arg tenv tvar t ty = 
   let tty = t.t_ty in
-  if tty == ty then t else
-    if ty == tenv.deco then
+  if ty_equal tty ty then t else
+    if ty_equal ty tenv.deco then
       let tylconv = Hty.find tenv.specials tty in
       let t = (t_app tylconv.t2u [t] tenv.undeco) in
       sort_app tenv tvar t tty
     else (* tty is tenv.deco *)
       begin
-        assert (tty == tenv.deco);
+        assert (ty_equal tty tenv.deco);
         let tylconv = Hty.find tenv.specials ty in       
         t_app tylconv.d2t [t] ty
       end
@@ -202,9 +202,9 @@ let conv_arg tenv tvar t ty =
 (* Convert to undeco or to a specials an application *)
 let conv_res_app tenv tvar p tl ty = 
   let tty = Util.of_option p.ls_value in
-  if tty == ty then t_app p tl tty else
+  if ty_equal tty ty then t_app p tl tty else
     begin
-      assert (tty == tenv.undeco);
+      assert (ty_equal tty tenv.undeco);
       let t = t_app p tl tenv.undeco in
       sort_app tenv tvar t ty
     end
@@ -212,7 +212,7 @@ let conv_res_app tenv tvar p tl ty =
 let conv_vs tenv tvar (vsvar,acc) vs =
   let tres,vsres =
     let ty_res = conv_ty_pos tenv vs.vs_ty in
-    if ty_res == vs.vs_ty then
+    if ty_equal ty_res vs.vs_ty then
       t_var vs,vs
     else 
       let tty = term_of_ty tenv tvar vs.vs_ty in
@@ -239,7 +239,7 @@ let rec rewrite_term tenv tvar vsvar t =
       let (vsvar,u) = conv_vs tenv tvar (vsvar,[]) u in
       let u = List.hd u in
       let t1' = fnT vsvar t1 in let t2' = fnT vsvar t2 in
-      if t1' == t1 && t2' == t2 then t else t_let u t1' t2'
+      if t_equal t1' t1 && t_equal t2' t2 then t else t_let u t1' t2'
     | Tcase _ | Teps _ | Tbvar _ ->
         Register.unsupportedTerm t
           "Encoding decorate : I can't encode this term"
@@ -248,7 +248,7 @@ and rewrite_fmla tenv tvar vsvar f =
   let fnT = rewrite_term tenv tvar vsvar in
   let fnF = rewrite_fmla tenv tvar in
   match f.f_node with
-    | Fapp(p, tl) when p == ps_equ ->
+    | Fapp(p, tl) when ls_equal p ps_equ ->
         let tl = List.map fnT tl in
         begin
           match tl with
@@ -270,7 +270,7 @@ and rewrite_fmla tenv tvar vsvar f =
       let (vsvar,vl) = List.fold_left (conv_vs tenv tvar) (vsvar,[]) vl in
       let f1' = fnF vsvar f1 in 
       let tl' = [] (* TODO *) in
-        if f1' == f1 (*&& tr_equal tl' tl*) then f
+        if f_equal f1' f1 (*&& tr_equal tl' tl*) then f
         else 
           let vl = List.rev vl in
           f_quant q vl tl' f1'
@@ -278,7 +278,7 @@ and rewrite_fmla tenv tvar vsvar f =
       let (vsvar,u) = conv_vs tenv tvar (vsvar,[]) u in
       let u = List.hd u in
       let t1' = fnT t1 in let f2' = fnF vsvar f2 in
-      if t1' == t1 && f2' == f2 then f else f_let u t1' f2'
+      if t_equal t1' t1 && f_equal f2' f2 then f else f_let u t1' f2'
     | _ -> f_map fnT (fnF vsvar) f
 
 let decl (tenv:tenv) d =

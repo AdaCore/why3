@@ -93,7 +93,7 @@ let rec unify t1 t2 = match t1, t2 with
       not (occurs v t) && (v.type_val <- Some t; true)
 	(* recursive types *)
   | Tyapp (s1, l1), Tyapp (s2, l2) ->
-      s1 == s2 && List.length l1 = List.length l2 &&
+      ts_equal s1 s2 && List.length l1 = List.length l2 &&
 	  List.for_all2 unify l1 l2
   | Tyapp _, _ | _, Tyapp _ ->
       false

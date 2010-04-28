@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Useful functions *) 
+(** Useful functions *)
 
 (* useful option combinators *)
 
@@ -45,19 +45,19 @@ val map_join_left : ('a -> 'b) -> ('b -> 'b -> 'b) -> 'a list -> 'b
 
 val list_apply : ('a -> 'b list) -> 'a list -> 'b list
 
-val list_fold_product : 
+val list_fold_product :
   ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
   (** [list_fold_product f acc l1 l2] apply the function [f] with the
       accumulator [acc] on all the pair of elements of [l1] and [l2]
       tail-reccursive
   *)
 
-val list_fold_product_l : 
+val list_fold_product_l :
   ('a -> 'b list -> 'a) -> 'a -> 'b list list -> 'a
-  (** generalisation of {! list_fold_product} 
+  (** generalisation of {! list_fold_product}
       not tail-reccursive
   *)
-  
+
   (* boolean fold accumulators *)
 
 exception FoldSkip
@@ -75,14 +75,14 @@ val ttrue : 'a -> bool
 module Sstr : Set.S with type elt = string
 module Mstr : Map.S with type key = string
 
-(* Set, Map, Hashtbl on structures with a unique tag and physical equality *)
+(* Set, Map, Hashtbl on structures with a unique tag *)
 open Hashweak
 
 module OrderedHash (X : Tagged) :
 sig
   type t = X.t
-  val equal : t -> t -> bool
   val hash : t -> int
+  val equal : t -> t -> bool
   val compare : t -> t -> int
 end
 

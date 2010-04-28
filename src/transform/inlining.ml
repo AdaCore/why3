@@ -75,13 +75,13 @@ let fold isnotinlinedt isnotinlinedf d (env, task) =
               match e with
                 | Term t ->
                     let t = replacet env t in
-                    if isnotinlinedt t || t_s_any ffalse ((==) ls) t
+                    if isnotinlinedt t || t_s_any ffalse (ls_equal ls) t
                     then env, add_decl task 
                       (create_logic_decl [make_fs_defn ls vs t])
                     else {env with fs = Mls.add ls (vs,t) env.fs},task
                 | Fmla f -> 
                     let f = replacep env f in
-                    if isnotinlinedf f || f_s_any ffalse ((==) ls) f
+                    if isnotinlinedf f || f_s_any ffalse (ls_equal ls) f
                     then env, add_decl task 
                       (create_logic_decl [make_ps_defn ls vs f])
                     else {env with ps = Mls.add ls (vs,f) env.ps},task

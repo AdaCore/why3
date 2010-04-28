@@ -28,7 +28,7 @@ let rec elim_t letl contT t = match t.t_node with
   | Tlet (t1,tb) ->
       let u,t2 = t_open_bound tb in
       let t_let e1 e2 =
-        if e1 == t1 && e2 == t2 then t else t_let u e1 e2
+        if t_equal e1 t1 && t_equal e2 t2 then t else t_let u e1 e2
       in
       let cont_in t1 t2 = contT (t_let t1 t2) in
       let cont_let t1 = elim_t ((u,t1)::letl) (cont_in t1) t2 in

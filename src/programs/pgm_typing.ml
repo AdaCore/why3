@@ -114,7 +114,7 @@ and expr_desc env loc = function
       let e1 = dexpr env e1 in
       let e2 = dexpr env e2 in
       begin match e1.dexpr_type with
-	| Tyapp (ts, [ty2; ty]) when ts == env.ts_arrow ->
+	| Tyapp (ts, [ty2; ty]) when Ty.ts_equal ts env.ts_arrow ->
 	    expected_type e2 ty2;
 	    DEapply (e1, e2), ty
 	| _ ->
