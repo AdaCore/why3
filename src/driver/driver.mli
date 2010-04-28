@@ -64,8 +64,8 @@ val get_transform : driver -> string list
 val file_of_task : driver -> string -> string -> task -> string
 
 val call_on_buffer :
-  ?debug    : bool ->
-  command   : string ->
+  ?debug     : bool ->
+  command    : string ->
   ?timelimit : int ->
   ?memlimit  : int ->
   driver -> Buffer.t -> unit -> Call_provers.prover_result

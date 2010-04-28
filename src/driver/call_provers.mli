@@ -20,23 +20,23 @@
 (** Call provers and parse there outputs *)
 
 type prover_answer =
-  | Valid 
+  | Valid
       (** The task is valid according to the prover *)
-  | Invalid 
+  | Invalid
       (** The task is invalid *)
-  | Timeout 
-      (** the task timeout, ie it takes more time than specified*)
-  | Unknown of string 
-      (** The prover can't determined the validity or not of the task *)
+  | Timeout
+      (** the task timeout, ie it takes more time than specified *)
+  | Unknown of string
+      (** The prover can't determine if the task is valid *)
   | Failure of string
-      (** The prover report a failure *)
-  | HighFailure 
-      (** An error occured during the call to the prover or none of
-      the given regexp match the output of the prover *)
+      (** The prover reports a failure *)
+  | HighFailure
+      (** An error occured during the call to the prover or none
+          of the given regexps match the output of the prover *)
 
 type prover_result = {
   pr_answer : prover_answer;
-  (* The answer of the prover on the given task*)
+  (* The answer of the prover on the given task *)
   pr_output : string;
   (* The output of the prover currently stderr and stdout *)
   pr_time   : float;
@@ -48,19 +48,19 @@ val print_prover_answer : Format.formatter -> prover_answer -> unit
 
 val print_prover_result : Format.formatter -> prover_result -> unit
 (** Pretty-print a prover_result. The answer and the time are output.
-    The output of the prover is printed if and only if the answer is an 
-    [HighFailure] *)
+    The output of the prover is printed if and only if the answer is
+    a [HighFailure] *)
 
 val call_on_buffer :
-  ?debug    : bool ->
-  command   : string ->
+  ?debug     : bool ->
+  command    : string ->
   ?timelimit : int ->
   ?memlimit  : int ->
-  regexps   : (Str.regexp * prover_answer) list ->
-  exitcodes : (int * prover_answer) list ->
-  filename  : string ->
-  Buffer.t ->
-  unit -> prover_result
+  regexps    : (Str.regexp * prover_answer) list ->
+  exitcodes  : (int * prover_answer) list ->
+  filename   : string ->
+  Buffer.t -> unit -> prover_result
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
-    @param debug : set the debug flag. 
+    @param debug : set the debug flag.
     Print on stderr the commandline called and the output of the prover. *)
+
