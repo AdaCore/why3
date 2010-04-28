@@ -42,11 +42,15 @@ and tdecl =
   | Use   of theory
   | Clone of theory * (ident * ident) list
 
-let create_decl d = Decl d
-
 let task_known = option_apply Mid.empty (fun t -> t.task_known)
 let task_clone = option_apply Mid.empty (fun t -> t.task_clone)
 let task_used  = option_apply Mid.empty (fun t -> t.task_used)
+
+let task_equal t1 t2 = match t1, t2 with
+  | Some t1, Some t2 -> t1 == t2
+  | Some _, None -> false
+  | None, Some _ -> false
+  | None, None -> true
 
 module Task = struct
   type t = task_hd
@@ -117,6 +121,8 @@ let add_tdecl task td =
         mk_task td task kn (merge_clone cl th sl) us
 
 let add_decl task d = add_tdecl task (Decl d)
+
+let create_decl d = Decl d
 
 (* declaration constructors + add_decl *)
 
