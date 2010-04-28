@@ -14,26 +14,25 @@ open Pp
 
 open Why
 open Call_provers
+open Whyconf
 
 let debug = 
   try let _ = Sys.getenv "WHYDEBUG" in true
   with Not_found -> false
 
-let loadpath = 
-  try Str.split (Str.regexp ":") (Sys.getenv "WHYLOADPATH")
-  with Not_found -> ["theories"]
+let config = Whyconf.read_config None
 
-let env = Env.create_env (Typing.retrieve loadpath)
+let env = Env.create_env (Typing.retrieve config.loadpath)
     
-let timeout = 
-  try int_of_string (Sys.getenv "WHYTIMEOUT")
-  with Not_found -> 2
+let config_prover = 
+  try Util.Mstr.find "alt-ergo" config.provers 
+  with Not_found -> assert false
 
-let drv =
-  let filename = 
-    try Sys.getenv "WHYDRIVER" with Not_found -> "drivers/alt_ergo.drv"
-  in
-  Driver.load_driver env filename
+let drv = Driver.load_driver env config_prover.driver
+let command = config_prover.command
+let timelimit = match config.timelimit with
+  | None -> 3
+  | Some t -> t
 
 (* Coq constants *)
 let logic_dir = ["Coq";"Logic";"Decidable"]
@@ -336,7 +335,9 @@ and tr_global_ts env r =
 	  in
 	  let decl = Array.mapi make_one mib.mind_packets in
 	  let decl = Array.to_list decl in
-	  task := Task.add_ty_decl !task decl;
+	  let decl = Decl.create_ty_decl decl in
+	  Format.printf "decl = %a@." Pretty.print_decl decl;
+	  task := Task.add_decl !task decl;
 	  lookup_global global_ts r
 
 (* assumption: t:T:Set *)
@@ -563,11 +564,8 @@ let whytac gl =
   try
     tr_goal gl;
     if debug then Format.printf "@[%a@]@\n---@." Pretty.print_task !task;
-    let tasks = Driver.apply_transforms drv !task in
-    assert (List.length tasks = 1);
-    let task = List.hd tasks in
-    if debug then Format.printf "@[%a@]@\n---@." (Driver.print_task drv) task;
-    let res = Driver.call_prover ~debug ~timeout drv task in
+    if debug then Format.printf "@[%a@]@\n---@." (Prover.print_task drv) !task;
+    let res = Prover.prove_task ~debug ~command ~timelimit drv !task () in
     match res.pr_answer with
       | Valid -> Tactics.admit_as_an_axiom gl
       | Invalid -> error "Invalid"
@@ -575,7 +573,7 @@ let whytac gl =
       | Failure s -> error ("Failure: " ^ s)
       | Timeout -> error "Timeout"
       | HighFailure -> 
-	  error ("Prover failure\n" ^ res.pr_stdout ^ "\n" ^ res.pr_stderr)
+	  error ("Prover failure\n" ^ res.pr_output ^ "\n")
   with NotFO ->
     error "Not a first order goal"
 

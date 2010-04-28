@@ -24,8 +24,8 @@ val print_task : Driver.driver -> Format.formatter -> Task.task -> unit
 val prove_task :
   ?debug    : bool ->
   command   : string ->
-  timelimit : int ->
-  memlimit  : int ->
+  ?timelimit : int ->
+  ?memlimit  : int ->
   Driver.driver -> Task.task -> unit -> Call_provers.prover_result
 
 (** {2 error reporting} *)

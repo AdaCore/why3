@@ -338,20 +338,23 @@ clean::
 ##############
 
 ifeq (@enable_coq_support@,yes)
-#byte: src/coq-plugin/whytac.cmo
-#opt:  src/coq-plugin/whytac.cmxs
+byte: src/coq-plugin/whytac.cma
+opt:  src/coq-plugin/whytac.cmxs
 endif
 
 COQTREES = kernel lib interp parsing proofs pretyping tactics library
 
-#src/coq-plugin/whytac.cmo:  INCLUDES = $(addprefix -I @COQLIB@/, $(COQTREES))
+src/coq-plugin/whytac.cma:  INCLUDES = $(addprefix -I @COQLIB@/, $(COQTREES))
 src/coq-plugin/whytac.cmxs: INCLUDES = $(addprefix -I @COQLIB@/, $(COQTREES))
 
-#src/coq-plugin/whytac.cmo:  BFLAGS+=-rectypes
+src/coq-plugin/whytac.cma:  BFLAGS+=-rectypes
 src/coq-plugin/whytac.cmxs: OFLAGS+=-rectypes
 
 src/coq-plugin/whytac.cmxs: src/why.cmxa src/coq-plugin/whytac.ml
 	$(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
+
+src/coq-plugin/whytac.cma: src/why.cma src/coq-plugin/whytac.ml
+	$(OCAMLC) -a $(BFLAGS) -o $@ $^
 
 #######
 # tools

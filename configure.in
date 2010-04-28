@@ -225,23 +225,22 @@ else
         enable_coq_support=no
         AC_MSG_WARN(Cannot find coqc.)
     else
-        enable_coq_support=yes
-        AC_CHECK_PROG(COQDEP,coqdep,coqdep,true)
-        if test "$COQDEP" = true ; then
-	   AC_MSG_ERROR(Cannot find coqdep.)
-        fi
         COQLIB=`$COQC -where | sed -e 's|\\\|/|g' -e 's| |\\ |g'`
         AC_MSG_CHECKING(Coq version)
         COQVERSION=`$COQC -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
 
         case $COQVERSION in
           8.*|trunk)
+	        enable_coq_support=yes
                 AC_MSG_RESULT($COQVERSION);;
           *)
                 enable_coq_support=no
 	        AC_MSG_WARN(You need Coq 8.x or later; Coq discarded);;
         esac
     fi
+fi
+if test "$enable_coq_support" = yes; then
+   AC_CHECK_FILE($COQLIB/kernel/term.cmi,,enable_coq_support=no)
 fi
 
 #Viewer for ps and pdf

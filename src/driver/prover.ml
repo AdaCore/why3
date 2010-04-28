@@ -65,9 +65,9 @@ let print_task drv fmt task =
   let printer = printer (driver_query drv task) in
   fprintf fmt "@[%a@]@?" printer task
 
-let prove_task ?debug ~command ~timelimit ~memlimit drv task =
+let prove_task ?debug ~command ?timelimit ?memlimit drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
   print_task drv fmt task; pp_print_flush fmt ();
-  call_on_buffer ?debug ~command ~timelimit ~memlimit drv buf
+  call_on_buffer ?debug ~command ?timelimit ?memlimit drv buf
 

@@ -377,12 +377,12 @@ let get_filename drv input_file theory_name goal_name =
 let file_of_task drv input_file theory_name task =
   get_filename drv input_file theory_name (task_goal task).pr_name.id_short
 
-let call_on_buffer ?debug ~command ~timelimit ~memlimit drv buffer =
+let call_on_buffer ?debug ~command ?timelimit ?memlimit drv buffer =
   let regexps = drv.drv_regexps in
   let exitcodes = drv.drv_exitcodes in
   let filename = get_filename drv "" "" "" in
   Call_provers.call_on_buffer
-    ?debug ~command ~timelimit ~memlimit ~regexps ~exitcodes ~filename buffer
+    ?debug ~command ?timelimit ?memlimit ~regexps ~exitcodes ~filename buffer
 
 (*
 Local Variables:

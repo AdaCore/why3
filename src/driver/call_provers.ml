@@ -69,7 +69,7 @@ let call_prover debug command opt_cout buffer =
   if debug then eprintf "Call_provers: prover output:@\n%s@." out;
   ret, out, time
 
-let call_on_buffer ?(debug=false) ~command ~timelimit ~memlimit
+let call_on_buffer ?(debug=false) ~command ?(timelimit=0) ?(memlimit=0)
                                   ~regexps ~exitcodes ~filename buffer () =
   let on_stdin = ref true in
   let on_timelimit = ref false in

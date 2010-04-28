@@ -54,8 +54,8 @@ val print_prover_result : Format.formatter -> prover_result -> unit
 val call_on_buffer :
   ?debug    : bool ->
   command   : string ->
-  timelimit : int ->
-  memlimit  : int ->
+  ?timelimit : int ->
+  ?memlimit  : int ->
   regexps   : (Str.regexp * prover_answer) list ->
   exitcodes : (int * prover_answer) list ->
   filename  : string ->
