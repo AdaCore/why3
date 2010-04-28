@@ -253,8 +253,10 @@ MNGCMX = $(addsuffix .cmx, $(MNGMODULES))
 
 $(MNGCMO) $(MNGCMX): INCLUDES = -I src/manager -I +sqlite3
 
+ifeq (@enable_proof_manager@,yes)
 byte: bin/manager.byte
 opt:  bin/manager.opt
+endif
 
 bin/manager.opt bin/manager.byte: INCLUDES = -I +sqlite3
 
@@ -503,13 +505,13 @@ DOC = doc/manual.pdf doc/manual.html
 doc: $(DOC)
 
 doc/manual.pdf: doc/manual.tex doc/version.tex
-	make -C doc manual.pdf
+	$(MAKE) -C doc manual.pdf
 
 doc/manual.html: doc/manual.tex doc/version.tex
-	make -C doc manual.html
+	$(MAKE) -C doc manual.html
 
 clean::
-	make -C doc clean
+	$(MAKE) -C doc clean
 
 ##########
 # API DOC
@@ -646,7 +648,7 @@ dep: depend
 # export-www:
 # 	echo "<#def version>$(VERSION)</#def>" > /users/demons/filliatr/www/why/version.prehtml
 # 	echo "<#def cversion>$(CVERSION)</#def>" >> /users/demons/filliatr/www/why/version.prehtml
-# 	make -C /users/demons/filliatr/www/why install
+# 	$(MAKE) -C /users/demons/filliatr/www/why install
 #
 # source: export/$(NAME).tar.gz
 # 	cp CHANGES CHANGES.caduceus export/$(NAME).tar.gz $(FTP)
@@ -659,19 +661,19 @@ dep: depend
 # 	cd export; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
 #
 # tarball-for-framac:
-# 	make tarball
+# 	$(MAKE) tarball
 # 	cp export/$(NAME).tar.gz export/why-for-framac.tar.gz
 #
 # tarball:
 # 	mkdir -p export
 # 	cd export; rm -rf $(NAME) $(NAME).tar.gz
-# 	make export/$(NAME).tar.gz
+# 	$(MAKE) export/$(NAME).tar.gz
 #
 # EXFILES = lib/coq*/*.v examples/*/*.v examples/*/*.mlw
 #
 # export-examples:
 # 	cp --parents $(EXFILES) $(WWW)
-# 	make -C $(WWW)/examples clean depend
+# 	$(MAKE) -C $(WWW)/examples clean depend
 # 	echo "*** faire make all dans $(WWW)/examples ***"
 #
 # export-examples-c:
