@@ -387,6 +387,6 @@ module NsTree = struct
 end
 
 let print_namespace fmt name ns =
-  let module P = Prtree.Make(NsTree) in
+  let module P = Print_tree.Make(NsTree) in
   fprintf fmt "@[<hov>%a@]@." P.print (NsTree.Namespace (name, ns))
 
