@@ -24,6 +24,35 @@ open Term
 open Decl
 open Task
 
+(** Compile match patterns *)
+
+let rec rewriteT kn t = match t.t_node with
+  | Tcase (tl,bl) ->
+      let tl = List.map (rewriteT kn) tl in
+      let mk_b (pl,t) = (pl, rewriteT kn t) in
+      let bl = List.map (fun b -> mk_b (t_open_branch b)) bl in
+      Pattern.CompileTerm.compile (find_constructors kn) tl bl
+  | _ -> t_map (rewriteT kn) (rewriteF kn) t
+
+and rewriteF kn f = match f.f_node with
+  | Fcase (tl,bl) ->
+      let tl = List.map (rewriteT kn) tl in
+      let mk_b (pl,f) = (pl, rewriteF kn f) in
+      let bl = List.map (fun b -> mk_b (f_open_branch b)) bl in
+      Pattern.CompileFmla.compile (find_constructors kn) tl bl
+  | _ -> f_map (rewriteT kn) (rewriteF kn) f
+
+let comp t task =
+  let fnT = rewriteT t.task_known in
+  let fnF = rewriteF t.task_known in
+  match t.task_decl with
+  | Decl d -> add_decl task (decl_map fnT fnF d)
+  | td -> add_tdecl task td
+
+let compile_match = Register.store (fun () -> Trans.map comp None)
+
+(** Eliminate algebraic types and match statements *)
+
 type state = {
   mt_map : lsymbol Mts.t;       (* from type symbols to selector functions *)
   pj_map : lsymbol list Mls.t;  (* from constructors to projections *)
@@ -209,7 +238,7 @@ let eliminate_compiled_algebraic =
   Register.store (fun () -> Trans.fold_map comp empty_state None)
 
 let eliminate_algebraic =
-  Register.compose Compile_match.compile_match eliminate_compiled_algebraic
+  Register.compose compile_match eliminate_compiled_algebraic
 
 let () = Register.register_transform "eliminate_algebraic" eliminate_algebraic
 

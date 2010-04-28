@@ -19,9 +19,6 @@
 
 (** eliminate let *)
 
-val elim_let_t : Term.term -> Term.term
-val elim_let_f : Term.fmla -> Term.fmla
-
 val eliminate_let_term : Task.task Register.trans_reg
 val eliminate_let_fmla : Task.task Register.trans_reg
 val eliminate_let      : Task.task Register.trans_reg

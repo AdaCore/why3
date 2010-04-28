@@ -22,6 +22,31 @@ open Ident
 open Term
 open Decl
 
+(** Discard defintions of built-in symbols *)
+
+let add_ld q = function
+  | ls, Some _ when Driver.query_remove q ls.ls_name -> (ls, None)
+  | d -> d
+
+let add_id q (ld,id) = function
+  | ls, _ when Driver.query_remove q ls.ls_name -> (ls, None)::ld, id
+  | d -> ld, d::id
+
+let elim q d = match d.d_node with
+  | Dlogic l ->
+      create_logic_decls (List.map (add_ld q) l)
+  | Dind l ->
+      let ld, id = List.fold_left (add_id q) ([],[]) l in
+      create_logic_decls (List.rev ld) @ create_ind_decls (List.rev id)
+  | _ -> [d]
+
+let eliminate_builtin =
+  Register.store_query (fun q -> Trans.decl (elim q) None)
+
+let () = Register.register_transform "eliminate_builtin" eliminate_builtin
+
+(** Eliminate definitions of functions and predicates *)
+
 let rec t_insert hd t = match t.t_node with
   | Tif (f1,t2,t3) ->
       f_if f1 (t_insert hd t2) (t_insert hd t3)

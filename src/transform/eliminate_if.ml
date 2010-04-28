@@ -22,7 +22,7 @@ open Ident
 open Term
 open Decl
 
-(* eliminate if-then-else in terms *)
+(** Eliminate if-then-else in terms *)
 
 let rec elim_t letl contT t = match t.t_node with
   | Tlet (t1,tb) ->
@@ -86,7 +86,9 @@ let elim_d d = match d.d_node with
   | _ ->
       [decl_map (fun _ -> assert false) elim_f d]
 
-(* eliminate if-then-else in formulas *)
+let eliminate_if_term = Register.store (fun () -> Trans.decl elim_d None)
+
+(** Eliminate if-then-else in formulas *)
 
 let rec elim_t t = t_map elim_t (elim_f true) t
 
@@ -100,11 +102,6 @@ and elim_f sign f = match f.f_node with
               else f_or (f_and f1p f2) (f_and (f_not f1n) f3)
   | _ ->
       f_map_sign elim_t elim_f sign f
-
-(* registration *)
-
-let eliminate_if_term =
-  Register.store (fun () -> Trans.decl elim_d None)
 
 let eliminate_if_fmla =
   Register.store (fun () -> Trans.rewrite elim_t (elim_f true) None)

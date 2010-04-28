@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+val eliminate_builtin         : Task.task Register.trans_reg
+
 val eliminate_definition_func : Task.task Register.trans_reg
 val eliminate_definition_pred : Task.task Register.trans_reg
 val eliminate_definition      : Task.task Register.trans_reg

@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+val compile_match : Task.task Register.trans_reg
+
 val eliminate_compiled_algebraic : Task.task Register.trans_reg
 
 val eliminate_algebraic : Task.task Register.trans_reg

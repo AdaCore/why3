@@ -24,44 +24,32 @@ open Decl
 
 (* eliminate let *)
 
-let rec remove_let_t fnF map t = match t.t_node with
+let rec elim_t func pred map t = match t.t_node with
   | Tvar vs ->
       (try Mvs.find vs map with Not_found -> t)
-  | Tlet (t1,tb) ->
-      let t1 = remove_let_t fnF map t1 in
+  | Tlet (t1,tb) when func ->
       let vs,t2 = t_open_bound tb in
-      remove_let_t fnF (Mvs.add vs t1 map) t2
+      let t1 = elim_t func pred map t1 in
+      elim_t func pred (Mvs.add vs t1 map) t2
   | _ ->
-      t_map (remove_let_t fnF map) (fnF map) t
+      t_map (elim_t func pred map) (elim_f func pred map) t
 
-and remove_let_f fnT map f = match f.f_node with
-  | Flet (t1,fb) ->
-      let t1 = fnT map t1 in
+and elim_f func pred map f = match f.f_node with
+  | Flet (t1,fb) when pred ->
       let vs,f2 = f_open_bound fb in
-      remove_let_f fnT (Mvs.add vs t1 map) f2
+      let t1 = elim_t func pred map t1 in
+      elim_f func pred (Mvs.add vs t1 map) f2
   | _ ->
-      f_map (fnT map) (remove_let_f fnT map) f
+      f_map (elim_t func pred map) (elim_f func pred map) f
 
-let rec elim_let_t map t = remove_let_t elim_let_f map t
-and     elim_let_f map f = remove_let_f elim_let_t map f
+let eliminate_let_term = Register.store (fun () -> Trans.rewrite
+  (elim_t true false Mvs.empty) (elim_f true false Mvs.empty) None)
 
-let elim_let_t = elim_let_t Mvs.empty
-let elim_let_f = elim_let_f Mvs.empty
+let eliminate_let_fmla = Register.store (fun () -> Trans.rewrite
+  (elim_t false true Mvs.empty) (elim_f false true Mvs.empty) None)
 
-let rec skip_t map t = t_map (skip_t map) (remove_let_f skip_t map) t
-let rec skip_f map f = f_map (remove_let_t skip_f map) (skip_f map) f
-
-let skip_t = skip_t Mvs.empty
-let skip_f = skip_f Mvs.empty
-
-let eliminate_let_term =
-  Register.store (fun () -> Trans.rewrite elim_let_t skip_f None)
-
-let eliminate_let_fmla =
-  Register.store (fun () -> Trans.rewrite skip_t elim_let_f None)
-
-let eliminate_let =
-  Register.store (fun () -> Trans.rewrite elim_let_t elim_let_f None)
+let eliminate_let = Register.store (fun () -> Trans.rewrite
+  (elim_t true true Mvs.empty) (elim_f true true Mvs.empty) None)
 
 let () =
   Register.register_transform "eliminate_let_term" eliminate_let_term;
