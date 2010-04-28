@@ -1,0 +1,38 @@
+
+(* Why driver for tptp first-order logic solvers *)
+
+prelude "% this is a prelude for tptp solvers"
+
+printer "tptp"
+filename "%f-%t-%g.p"
+
+valid "Proof found"
+invalid "Failure"
+
+(* to be improved *)
+
+transformation "simplify_recursive_definition"
+transformation "inline_trivial"
+
+transformation "eliminate_builtin"
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic"
+transformation "eliminate_if"
+transformation "eliminate_let"
+
+
+theory BuiltIn
+  syntax type int "Int"
+  syntax type real "Real"
+  syntax logic (_=_) "(%1 = %2)"
+  syntax logic (_<>_) "(%1 != %2)"
+end
+
+
+(*
+Local Variables:
+mode: why
+compile-command: "unset LANG; make -C .. bench"
+End:
+*)
