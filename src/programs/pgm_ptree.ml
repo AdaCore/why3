@@ -38,18 +38,20 @@ type loop_annotation = {
   loop_variant   : lexpr option;
 }
 
+type effect = ident list
+
 type type_v =
   | Tpure of Ptree.pty
-  (* | Tarrow of (ident * type_v) list * type_c *)
+  | Tarrow of (ident * type_v option) list * type_c
 
-(*
 and type_c =
-  { pc_result_name : Ident.t;
-    pc_result_type : ptype_v;
-    pc_effect : peffect;
-    pc_pre    : assertion list;
-    pc_post   : postcondition option }
-*)
+  { pc_result_name : ident;
+    pc_result_type : type_v;
+    pc_effect      : effect;
+    pc_pre         : lexpr;
+    pc_post        : lexpr; }
+
+type variant = lexpr 
 
 type expr = {
   expr_desc : expr_desc;
@@ -62,6 +64,9 @@ and expr_desc =
   | Eident of qualid
   | Eapply of expr * expr
   | Elet of ident * expr * expr
+  | Efun of (ident * type_v option) list * lexpr * expr * lexpr
+  | Erec of ident * 
+      (ident * type_v option) list * variant option * lexpr * expr * lexpr
   (* control *)
   | Esequence of expr * expr
   | Eif of expr * expr * expr
@@ -76,8 +81,7 @@ and expr_desc =
   | Elabel of ident * expr
   | Ecast of expr * Ptree.pty
 
-
-  (* TODO: fun, rec, raise, try, any, post?, match 
+  (* TODO: raise, try, any, post?, 
            ghost *)
 
 type decl =

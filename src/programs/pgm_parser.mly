@@ -67,7 +67,11 @@
   let mk_prefix op e1 =
     let id = { id = prefix op; id_loc = loc_i 1 } in
     mk_expr (mk_apply_id id [e1])
-     
+
+  let id_result () = { id = "result"; id_loc = loc () }
+
+  let lexpr_true () = { Ptree.pp_loc = loc (); Ptree.pp_desc = PPtrue }
+  let lexpr_false () = { Ptree.pp_loc = loc (); Ptree.pp_desc = PPfalse }
 
   (* parsing LOGIC strings using functions from src/parser/
      requires proper relocation *)
@@ -98,9 +102,10 @@
 
 /* keywords */
 
-%token ABSURD AND AS ASSERT ASSUME BEGIN CHECK DO DONE ELSE END EXCEPTION FOR
+%token ABSURD AND AS ASSERT ASSUME BEGIN CHECK DO DONE ELSE END ENSURES 
+%token EXCEPTION FOR
 %token FUN GHOST IF IN INVARIANT LABEL LET MATCH NOT RAISE RAISES READS REC 
-%token RETURNS THEN TRY TYPE VARIANT VOID WHILE WITH WRITES
+%token REQUIRES RETURNS THEN TRY TYPE VARIANT VOID WHILE WITH WRITES
 
 /* symbols */
 
@@ -175,6 +180,10 @@ decl:
     { Dlogic (logic_list0_decl $1) }
 | LET lident EQUAL expr
     { Dcode ($2, $4) }
+| LET lident list1_type_v_binder EQUAL triple
+    { Dcode ($2, let p,e,q = $5 in mk_expr_i 3 (Efun ($3, p, e, q))) }
+| LET REC lident list1_type_v_binder opt_variant EQUAL triple
+    { Dcode ($3, let p,e,q = $7 in mk_expr_i 3 (Erec ($3, $4, $5, p, e, q))) }
 ;
 
 lident:
@@ -244,6 +253,14 @@ expr:
    { mk_expr (Elazy (LazyOr, $1, $3)) }
 | LET lident EQUAL expr IN expr
    { mk_expr (Elet ($2, $4, $6)) }
+| LET lident list1_type_v_binder EQUAL triple IN expr
+   { let p,e,q = $5 in 
+     mk_expr (Elet ($2, mk_expr_i 3 (Efun ($3, p, e, q)), $7)) }
+| LET REC lident list1_type_v_binder opt_variant EQUAL triple IN expr
+   { let p,e,q = $7 in 
+     mk_expr (Elet ($3, mk_expr_i 3 (Erec ($3, $4, $5, p, e, q)), $9)) }
+| FUN list1_type_v_binder ARROW triple
+   { let p,e,q = $4 in mk_expr (Efun ($2, p, e, q)) }
 | MATCH list1_expr_sep_comma WITH option_bar match_cases END
    { mk_expr (Ematch ($2, $5)) }
 | GHOST expr
@@ -256,6 +273,11 @@ expr:
    { mk_expr Eabsurd }
 | expr COLON pure_type
    { mk_expr (Ecast ($1, $3)) }
+;
+
+triple:
+| LOGIC expr LOGIC
+  { lexpr $1, $2, lexpr $3 }
 ;
 
 simple_expr:
@@ -358,6 +380,47 @@ list1_pure_type_sep_comma:
 | pure_type                                      { [$1] }
 | pure_type COMMA list1_pure_type_sep_comma { $1 :: $3 }
 ;
+
+type_v:
+| pure_type
+   { Tpure $1 }
+;
+
+list1_type_v_binder:
+| type_v_binder                     { [$1] }
+| type_v_binder list1_type_v_binder { $1 :: $2 }
+;
+
+type_v_binder:
+| lident                               { $1, None }
+| LEFTPAR lident COLON type_v RIGHTPAR { $2, Some $4 }
+;
+
+opt_colon_spec:
+| /* epsilon */ { None }
+| COLON type_c  { Some $2 }
+;
+
+type_c:
+| type_v 
+  { { pc_result_name = id_result ();
+      pc_result_type = $1;
+      pc_effect      = [];
+      pc_pre         = lexpr_true ();
+      pc_post        = lexpr_true (); } }
+| REQUIRES LOGIC RETURNS lident COLON type_v ENSURES LOGIC
+  { { pc_result_name = $4;
+      pc_result_type = $6;
+      pc_effect      = [];
+      pc_pre         = lexpr $2;
+      pc_post        = lexpr $8; } }
+;
+
+opt_variant:
+| /* epsilon */ { None }
+| VARIANT LOGIC  { Some (lexpr $2) }
+;
+
 
 /***********************************************************************
 

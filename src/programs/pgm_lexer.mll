@@ -48,6 +48,7 @@
 	"done", DONE;
         "else", ELSE;
 	"end", END;
+	"ensures", ENSURES;
 	"exception", EXCEPTION; 
 	"for", FOR;
 	"fun", FUN;
@@ -63,6 +64,7 @@
 	"raises", RAISES;
 	"reads", READS;
 	"rec", REC;
+	"requires", REQUIRES;
 	"returns", RETURNS;
 	"then", THEN;
 	"try", TRY;
