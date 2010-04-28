@@ -73,13 +73,10 @@ let rec print_term drv fmt t = match t.t_node with
           | _ -> fprintf fmt "@[(%a %a)@]"
 	      print_ident ls.ls_name (print_list space (print_term drv)) tl
         end end
-  | Tlet (t1, tb) ->
-      let v, t2 = t_open_bound tb in
-      fprintf fmt "@[(let (%a %a)@ %a)@]" print_var v
-        (print_term drv) t1 (print_term drv) t2;
-      forget_var v
+  | Tlet (t1, tb) -> unsupportedTerm t
+      "tptp : you must eliminate let"
   | Tif (f1,t1,t2) ->
-      fprintf fmt "@[(ite %a@ %a@ %a)@]"
+      fprintf fmt "@[itef(%a@, %a@, %a)@]"
         (print_fmla drv) f1 (print_term drv) t1 (print_term drv) t2
   | Tcase _ -> unsupportedTerm t
       "tptp : you must eliminate match"
