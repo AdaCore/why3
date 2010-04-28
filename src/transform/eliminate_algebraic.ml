@@ -144,7 +144,7 @@ and rewriteF kn state av sign f = match f.f_node with
                        (rewriteF kn state Svs.empty sign) tr in
       let av = List.fold_left (fun s v -> Svs.add v s) av vl in
       let f1' = rewriteF kn state av sign f1 in
-      if f1' == f1 && tr_equal tr' tr then f else f_quant q vl tr' f1'
+      if f1' == f1 && trl_equal tr' tr then f else f_quant q vl tr' f1'
   | Fbinop (o, _, _) when (o = Fand && sign) || (o = For && not sign) ->
       f_map_sign (rewriteT kn state) (rewriteF kn state av) sign f
   | Flet (t1, _) ->

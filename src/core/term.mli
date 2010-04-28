@@ -31,6 +31,8 @@ module Svs : Set.S with type elt = vsymbol
 module Mvs : Map.S with type key = vsymbol
 module Hvs : Hashtbl.S with type key = vsymbol
 
+val vs_equal : vsymbol -> vsymbol -> bool
+
 val create_vsymbol : preid -> ty -> vsymbol
 
 (** Function and predicate symbols *)
@@ -41,13 +43,15 @@ type lsymbol = private {
   ls_value  : ty option;
 }
 
-val create_lsymbol : preid -> ty list -> ty option -> lsymbol
-val create_fsymbol : preid -> ty list -> ty -> lsymbol
-val create_psymbol : preid -> ty list -> lsymbol
-
 module Sls : Set.S with type elt = lsymbol
 module Mls : Map.S with type key = lsymbol
 module Hls : Hashtbl.S with type key = lsymbol
+
+val ls_equal : lsymbol -> lsymbol -> bool
+
+val create_lsymbol : preid -> ty list -> ty option -> lsymbol
+val create_fsymbol : preid -> ty list -> ty -> lsymbol
+val create_psymbol : preid -> ty list -> lsymbol
 
 (** Exceptions *)
 
@@ -69,6 +73,8 @@ and pattern_node = private
   | Pvar of vsymbol
   | Papp of lsymbol * pattern list
   | Pas  of pattern * vsymbol
+
+val pat_equal : pattern -> pattern -> bool
 
 (* smart constructors for patterns *)
 
@@ -163,6 +169,13 @@ module Sterm : Set.S with type elt = term
 module Mfmla : Map.S with type key = fmla
 module Sfmla : Set.S with type elt = fmla
 
+val t_equal : term -> term -> bool
+val f_equal : fmla -> fmla -> bool
+val e_equal : expr -> expr -> bool
+
+val tr_equal : trigger -> trigger -> bool
+val trl_equal : trigger list -> trigger list -> bool
+
 (* smart constructors for term *)
 
 val t_var : vsymbol -> term
@@ -238,15 +251,12 @@ val f_open_exists : fmla -> vsymbol list * fmla
 val e_map : (term -> term) -> (fmla -> fmla) -> expr -> expr
 val e_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> expr -> 'a
 val e_apply : (term -> 'a) -> (fmla -> 'a) -> expr -> 'a
-val e_equal : expr -> expr -> bool
 
 val tr_map : (term -> term) ->
              (fmla -> fmla) -> trigger list -> trigger list
 
 val tr_fold : ('a -> term -> 'a) ->
               ('a -> fmla -> 'a) -> 'a -> trigger list -> 'a
-
-val tr_equal : trigger list -> trigger list -> bool
 
 (* map/fold over symbols *)
 

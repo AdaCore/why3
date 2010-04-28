@@ -46,30 +46,28 @@ let task_known = option_apply Mid.empty (fun t -> t.task_known)
 let task_clone = option_apply Mid.empty (fun t -> t.task_clone)
 let task_used  = option_apply Mid.empty (fun t -> t.task_used)
 
+let task_hd_equal = (==)
+
 let task_equal t1 t2 = match t1, t2 with
-  | Some t1, Some t2 -> t1 == t2
-  | Some _, None -> false
-  | None, Some _ -> false
+  | Some t1, Some t2 -> task_hd_equal t1 t2
   | None, None -> true
+  | _ -> false
 
 module Task = struct
   type t = task_hd
 
-  let equal_pair (il1,ir1) (il2,ir2) = il1 == il2 && ir1 == ir2
+  let equal_pair (il1,ir1) (il2,ir2) =
+    id_equal il1 il2 && id_equal ir1 ir2
 
   let equal_tdecl td1 td2 = match td1,td2 with
-    | Decl d1, Decl d2 -> d1 == d2
-    | Use th1, Use th2 -> th1.th_name == th2.th_name
+    | Decl d1, Decl d2 -> d_equal d1 d2
+    | Use th1, Use th2 -> id_equal th1.th_name th2.th_name
     | Clone (th1,sl1), Clone (th2,sl2) ->
-        th1.th_name == th2.th_name && list_all2 equal_pair sl1 sl2
+        id_equal th1.th_name th2.th_name && list_all2 equal_pair sl1 sl2
     | _,_ -> false
 
-  let equal a b =
-    equal_tdecl a.task_decl b.task_decl &&
-    match a.task_prev, b.task_prev with
-      | Some na, Some nb -> na == nb
-      | None, None -> true
-      | _ -> false
+  let equal a b = equal_tdecl a.task_decl b.task_decl &&
+                  task_equal  a.task_prev b.task_prev
 
   let hash_pair (il,ir) = Hashcons.combine il.id_tag ir.id_tag
 

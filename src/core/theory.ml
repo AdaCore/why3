@@ -420,7 +420,7 @@ let cl_add_type cl inst_ts acc (ts, def) =
 let extract_ls_defn f =
   let vl, ef = f_open_forall f in
   match ef.f_node with
-    | Fapp (s, [t1; t2]) when s == ps_equ ->
+    | Fapp (s, [t1; t2]) when ls_equal s ps_equ ->
         begin match t1.t_node with
           | Tapp (fs, _) -> make_fs_defn fs vl t2
           | _ -> assert false

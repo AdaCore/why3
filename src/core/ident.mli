@@ -35,6 +35,8 @@ module Sid : Set.S with type elt = ident
 module Mid : Map.S with type key = ident
 module Hid : Hashtbl.S with type key = ident
 
+val id_equal : ident -> ident -> bool
+
 (* a user-created type of unregistered identifiers *)
 type preid
 
@@ -75,7 +77,7 @@ val create_ident_printer :
 
 val id_unique :
   ident_printer -> ?sanitizer : (string -> string) -> ident -> string
-(** use ident_printer to generate a unique name for ident 
+(** use ident_printer to generate a unique name for ident
     an optional sanitizer is applied over the printer's sanitizer *)
 
 val string_unique : ident_printer -> string -> string

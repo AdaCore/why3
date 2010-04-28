@@ -35,6 +35,8 @@ module Stv = Tvar.S
 module Mtv = Tvar.M
 module Htv = Tvar.H
 
+let tv_equal = (==)
+
 let create_tvsymbol n = { tv_name = id_register n }
 
 (* type symbols and types *)
@@ -64,6 +66,9 @@ module Mts = Tsym.M
 module Hts = Tsym.H
 module Wts = Tsym.W
 
+let ts_equal = (==)
+let ty_equal = (==)
+
 let mk_ts name args def = {
   ts_name = name;
   ts_args = args;
@@ -76,8 +81,9 @@ module Hsty = Hashcons.Make (struct
   type t = ty
 
   let equal ty1 ty2 = match ty1.ty_node, ty2.ty_node with
-    | Tyvar n1, Tyvar n2 -> n1 == n2
-    | Tyapp (s1,l1), Tyapp (s2,l2) -> s1 == s2 && List.for_all2 (==) l1 l2
+    | Tyvar n1, Tyvar n2 -> tv_equal n1 n2
+    | Tyapp (s1,l1), Tyapp (s2,l2) ->
+        ts_equal s1 s2 && List.for_all2 ty_equal l1 l2
     | _ -> false
 
   let hash_ty ty = ty.ty_tag
@@ -150,7 +156,7 @@ let rec tv_inst m ty = match ty.ty_node with
 let ty_app s tl =
   let tll = List.length tl in
   let stl = List.length s.ts_args in
-  if tll != stl then raise (BadTypeArity (stl,tll));
+  if tll <> stl then raise (BadTypeArity (stl,tll));
   match s.ts_def with
     | Some ty ->
         let add m v t = Mtv.add v t m in
@@ -179,12 +185,13 @@ let ty_s_any pr ty =
 exception TypeMismatch
 
 let rec ty_match s ty1 ty2 =
-  if ty1 == ty2 then s
+  if ty_equal ty1 ty2 then s
   else match ty1.ty_node, ty2.ty_node with
     | Tyvar n1, _ ->
-        (try if Mtv.find n1 s == ty2 then s else raise TypeMismatch
+        (try if ty_equal (Mtv.find n1 s) ty2
+              then s else raise TypeMismatch
          with Not_found -> Mtv.add n1 ty2 s)
-    | Tyapp (f1, l1), Tyapp (f2, l2) when f1 == f2 ->
+    | Tyapp (f1, l1), Tyapp (f2, l2) when ts_equal f1 f2 ->
         List.fold_left2 ty_match s l1 l2
     | _ ->
         raise TypeMismatch

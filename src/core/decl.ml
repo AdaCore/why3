@@ -85,6 +85,8 @@ module Spr = Prop.S
 module Mpr = Prop.M
 module Hpr = Prop.H
 
+let pr_equal = (==)
+
 let create_prsymbol n = { pr_name = id_register n }
 
 type prop = prsymbol * fmla
@@ -119,26 +121,28 @@ module Hsdecl = Hashcons.Make (struct
 
   type t = decl
 
-  let eq_td (ts1,td1) (ts2,td2) = ts1 == ts2 && match td1,td2 with
+  let eq_td (ts1,td1) (ts2,td2) = ts_equal ts1 ts2 && match td1,td2 with
     | Tabstract, Tabstract -> true
-    | Talgebraic l1, Talgebraic l2 -> list_all2 (==) l1 l2
+    | Talgebraic l1, Talgebraic l2 -> list_all2 ls_equal l1 l2
     | _ -> false
 
-  let eq_ld (ls1,ld1) (ls2,ld2) = ls1 == ls2 && match ld1,ld2 with
-    | Some (_,f1), Some (_,f2) -> f1 == f2
+  let eq_ld (ls1,ld1) (ls2,ld2) = ls_equal ls1 ls2 && match ld1,ld2 with
+    | Some (_,f1), Some (_,f2) -> f_equal f1 f2
     | None, None -> true
     | _ -> false
 
-  let eq_iax (pr1,fr1) (pr2,fr2) = pr1 == pr2 && fr1 == fr2
+  let eq_iax (pr1,fr1) (pr2,fr2) =
+    pr_equal pr1 pr2 && f_equal fr1 fr2
 
-  let eq_ind (ps1,al1) (ps2,al2) = ps1 == ps2 && list_all2 eq_iax al1 al2
+  let eq_ind (ps1,al1) (ps2,al2) =
+    ls_equal ps1 ps2 && list_all2 eq_iax al1 al2
 
   let equal d1 d2 = match d1.d_node, d2.d_node with
     | Dtype  l1, Dtype  l2 -> list_all2 eq_td l1 l2
     | Dlogic l1, Dlogic l2 -> list_all2 eq_ld l1 l2
     | Dind   l1, Dind   l2 -> list_all2 eq_ind l1 l2
     | Dprop (k1,pr1,f1), Dprop (k2,pr2,f2) ->
-        k1 == k2 && pr1 == pr2 && f1 == f2
+        k1 = k2 && pr_equal pr1 pr2 && f_equal f1 f2
     | _,_ -> false
 
   let hs_td (ts,td) = match td with
@@ -177,6 +181,8 @@ end)
 module Sdecl = Decl.S
 module Mdecl = Decl.M
 module Hdecl = Decl.H
+
+let d_equal = (==)
 
 (** Declaration constructors *)
 
@@ -217,7 +223,7 @@ let create_ty_decl tdl =
   let check_decl acc (ts,td) = match td with
     | Tabstract -> add_id acc ts.ts_name
     | Talgebraic cl ->
-        if ts.ts_def != None then raise (IllegalTypeAlias ts);
+        if ts.ts_def <> None then raise (IllegalTypeAlias ts);
         let ty = ty_app ts (List.map ty_var ts.ts_args) in
         List.fold_left (check_constr ty) (add_id acc ts.ts_name) cl
   in
@@ -227,7 +233,7 @@ let create_ty_decl tdl =
 let create_logic_decl ldl =
   if ldl = [] then raise EmptyDecl;
   let check_decl acc (ls,ld) = match ld with
-    | Some (s,_) when s != ls -> raise (BadLogicDecl ls.ls_name)
+    | Some (s,_) when not (ls_equal s ls) -> raise (BadLogicDecl ls.ls_name)
     | _ -> add_id acc ls.ls_name
   in
   ignore (List.fold_left check_decl Sid.empty ldl);
@@ -267,7 +273,7 @@ let create_ind_decl idl =
     in
     let cls, f = clause [] (check_fvs f) in
     match f.f_node with
-      | Fapp (s, tl) when s == ps ->
+      | Fapp (s, tl) when ls_equal s ps ->
           let mtch sb t ty =
             try ty_match sb (t.t_ty) ty with TypeMismatch ->
               raise (TooSpecificIndDecl (ps, pr, t))
@@ -420,7 +426,7 @@ let known_fmla kn f = f_s_fold (known_ts kn) (known_ls kn) () f
 let merge_known kn1 kn2 =
   let add_known id decl kn =
     try
-      if Mid.find id kn2 != decl then raise (RedeclaredIdent id);
+      if not (d_equal (Mid.find id kn2) decl) then raise (RedeclaredIdent id);
       kn
     with Not_found -> Mid.add id decl kn
   in
@@ -428,7 +434,7 @@ let merge_known kn1 kn2 =
 
 let add_known id decl kn =
   try
-    if Mid.find id kn != decl then raise (RedeclaredIdent id);
+    if not (d_equal (Mid.find id kn) decl) then raise (RedeclaredIdent id);
     raise (KnownIdent id)
   with Not_found -> Mid.add id decl kn
 

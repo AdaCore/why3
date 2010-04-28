@@ -87,6 +87,8 @@ module Sdecl : Set.S with type elt = decl
 module Mdecl : Map.S with type key = decl
 module Hdecl : Hashtbl.S with type key = decl
 
+val d_equal : decl -> decl -> bool
+
 (** Declaration constructors *)
 
 val create_ty_decl : ty_decl list -> decl

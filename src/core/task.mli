@@ -42,6 +42,7 @@ and tdecl = private
   | Clone of theory * (ident * ident) list
 
 val task_equal : task -> task -> bool
+val task_hd_equal : task_hd -> task_hd -> bool
 
 val task_known : task -> known_map
 val task_clone : task -> clone_map

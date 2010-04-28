@@ -29,6 +29,8 @@ module Stv : Set.S with type elt = tvsymbol
 module Mtv : Map.S with type key = tvsymbol
 module Htv : Hashtbl.S with type key = tvsymbol
 
+val tv_equal : tvsymbol -> tvsymbol -> bool
+
 val create_tvsymbol : preid -> tvsymbol
 
 (* type symbols and types *)
@@ -57,6 +59,9 @@ module Sty : Set.S with type elt = ty
 module Mty : Map.S with type key = ty
 module Hty : Hashtbl.S with type key = ty
 module Wty : Hashweak.S with type key = ty
+
+val ts_equal : tysymbol -> tysymbol -> bool
+val ty_equal : ty -> ty -> bool
 
 exception BadTypeArity of int * int
 exception DuplicateTypeVar of tvsymbol
