@@ -22,7 +22,7 @@ open Ident
 open Term
 open Decl
 
-(** Discard defintions of built-in symbols *)
+(** Discard definitions of built-in symbols *)
 
 let add_ld q = function
   | ls, Some _ when Driver.query_remove q ls.ls_name -> (ls, None)
