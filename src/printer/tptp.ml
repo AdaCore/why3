@@ -41,6 +41,10 @@ let ident_printer =
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
+let print_functor fmt id =
+  let san= Some String.uncapitalize in
+  fprintf fmt "%s" (id_unique ?sanitizer:san ident_printer id)
+
 let forget_var v = forget_id ident_printer v.vs_name
 
 let print_var fmt {vs_name = id} =
@@ -71,8 +75,11 @@ let rec print_term drv fmt t = match t.t_node with
   | Tvar v -> print_var fmt v
   | Tapp (ls, tl) -> begin match Driver.query_syntax drv ls.ls_name with
       | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl
-      | None ->fprintf fmt "@[%a(%a)@]"
-	      print_ident ls.ls_name (print_list comma (print_term drv)) tl
+      | None -> begin match tl with (* toto() is not accepted *)
+          | [] -> fprintf fmt "@[%a@]" print_functor ls.ls_name
+          | _ -> fprintf fmt "@[%a(%a)@]"  print_functor ls.ls_name
+                (print_list comma (print_term drv)) tl
+          end
       end
   | Tlet (_,_) -> unsupportedTerm t
       "tptp : you must eliminate let"
@@ -141,8 +148,9 @@ let print_type_decl drv fmt = function
   | ts, Tabstract when Driver.query_remove drv ts.ts_name -> false
   | ts, Tabstract when ts.ts_args = [] ->
       fprintf fmt ":extrasorts (%a)" print_ident ts.ts_name; true
-  | _, Tabstract -> unsupported "tptp : type with argument are not supported"
-  | _, Talgebraic _ -> unsupported "tptp : algebraic type are not supported"
+  | _, Tabstract -> true (*unsupported "tptp : type with argument are not supported" *)
+  | _, Talgebraic _ -> true (* unsupported "tptp : algebraic type are not supported" *)
+  (* FIXME : types are currently just ignored, which is unsafe *)
 
 let print_logic_decl drv fmt (ls,ld) = match ld with
   | None -> ()

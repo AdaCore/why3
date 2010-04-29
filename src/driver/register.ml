@@ -197,7 +197,7 @@ let report fmt = function
       Format.fprintf fmt
         "@[<hov 3> %s:@\n%a@\n%s@]@\n" msg Pretty.print_expr e s
   | UnsupportedDecl (d,s) ->
-      let msg = "This declaration isn't supproted" in
+      let msg = "This declaration isn't supported" in
       Format.fprintf fmt
         "@[<hov 3> %s:@\n%a@\n%s@]@\n" msg Pretty.print_decl d s
   | NotImplemented (s) ->
