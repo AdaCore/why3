@@ -1,6 +1,16 @@
 
 (* test file *)
 
+theory TestMutual
+  type tree = 
+  | Leaf
+  | Node (int, forest)
+  type forest =
+  | Nil
+  | Cons (tree, forest)
+  goal G : forall x:tree. x=x
+end
+
 theory Test
   use import int.Int
   logic id(x: int) : int = x

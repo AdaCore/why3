@@ -99,30 +99,31 @@ let elt d =
                  Mid.add ls.ls_name s acc) Mid.empty l in
           let l = connexe m in
           List.map (fun e -> create_logic_decl (List.map (Hid.find mem) e)) l
-    | Dtype l -> 
+    | Dtype l ->
         let mem = Hid.create 16 in
         List.iter (fun ((ts,_) as a) -> Hid.add mem ts.ts_name a) l;
-        let tyoccurences acc t = 
-          match t.ty_node with
-            | Tyapp (ts,_) when Hid.mem mem ts.ts_name ->
-                Sid.add ts.ts_name acc
-            | _ -> acc in
+        let tyoccurences acc ts = 
+	  if Hid.mem mem ts.ts_name then Sid.add ts.ts_name acc else acc
+	in
         let m = List.fold_left 
-          (fun acc (ts,def) -> 
+          (fun m (ts,def) -> 
              let s = match def with
                | Tabstract -> 
                    begin match ts.ts_def with
                      | None -> Sid.empty
-                     | Some ty -> ty_fold tyoccurences Sid.empty ty
+                     | Some ty -> ty_s_fold tyoccurences Sid.empty ty
                    end
                | Talgebraic l -> 
                    List.fold_left 
                      (fun acc {ls_args = tyl; ls_value = ty} ->
                         let ty = of_option ty in
                         List.fold_left 
-                          (fun acc ty-> ty_fold tyoccurences acc ty) acc (ty::tyl)
-                     ) Sid.empty l in
-             Mid.add ts.ts_name s acc) Mid.empty l in
+                          (fun acc ty -> ty_s_fold tyoccurences acc ty) 
+			  acc (ty::tyl)
+                     ) Sid.empty l 
+	     in
+             Mid.add ts.ts_name s m) Mid.empty l 
+	in
         let l = connexe m in
         List.map (fun e -> create_ty_decl (List.map (Hid.find mem) e)) l
     | Dind _ -> [d] (* TODO *)

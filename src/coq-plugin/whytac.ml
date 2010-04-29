@@ -15,6 +15,8 @@ open Pp
 open Why
 open Call_provers
 open Whyconf
+open Ty
+open Term
 
 let debug = 
   try let _ = Sys.getenv "WHYDEBUG" in true
@@ -155,19 +157,28 @@ let rec skip_k_args k cl = match k, cl with
 
 (* Coq globals *)
 
-type dependency = 
-  | Dep_ts of global_reference
-  | Dep_ls of global_reference
-
-(* Coq reference -> symbol + declaration + dependencies *)
+(* Coq reference -> symbol *)
 let global_ts = ref Refmap.empty 
 let global_ls = ref Refmap.empty
 
-(* Coq reference -> symbol *)
-let task_ts = ref Refmap.empty 
-let task_ls = ref Refmap.empty
+(* ident -> decl *)
+let global_decl = ref Ident.Mid.empty
 
-let add_dep_stack r v = r := v :: !r
+(* dependencies: decl -> decl list *)
+let global_dep = ref Decl.Mdecl.empty
+
+let local_decl = ref Decl.Sdecl.empty
+
+let rec add_local_decls d =
+  if not (Decl.Sdecl.mem d !local_decl) then begin
+    local_decl := Decl.Sdecl.add d !local_decl;
+    let dep = Decl.Mdecl.find d !global_dep in
+    Decl.Sdecl.iter add_local_decls dep;
+    task := Task.add_decl !task d
+  end
+
+let empty_dep () = ref Decl.Sdecl.empty
+let add_dep r v = r := Decl.Sdecl.add v !r
 
 (* synchronization *)
 let () =
@@ -275,21 +286,13 @@ let rec tr_type dep tv env t =
 	      raise NotFO
 	end
 
-and make_dependency dep env = function
-  | Dep_ts r -> ignore (tr_task_ts dep env r)
-  | Dep_ls r -> ignore (tr_task_ls dep env r)
-
 (* the type symbol for r *)
 and tr_task_ts dep env r = 
-  try
-    lookup_table task_ts r
-  with Not_found ->
-    add_table task_ts r None;
-    let ts, decl, dep = tr_global_ts dep env r in
-    List.iter (make_dependency (ref []) env) dep;
-    add_table task_ts r (Some ts);
-    task := Task.add_decl !task decl;
-    ts
+  let ts = tr_global_ts dep env r in
+  assert (Ident.Mid.mem ts.ts_name !global_decl);
+  let d = Ident.Mid.find ts.ts_name !global_decl in
+  add_local_decls d;
+  ts
 
 (* the type declaration for r *)
 and tr_global_ts dep env r =   
@@ -297,8 +300,7 @@ and tr_global_ts dep env r =
     lookup_table global_ts r
   with Not_found ->
     add_table global_ts r None;
-    add_dep_stack dep (Dep_ts r);
-    let dep = ref [] in
+    let dep' = empty_dep () in
     match r with
       | VarRef _id ->
 	  assert false (*TODO*)
@@ -313,7 +315,7 @@ and tr_global_ts dep env r =
 	    | Some b ->
 		let b = force b in
 		let (tv, vars), env, t = decomp_type_lambdas env b in
-		let def = Some (tr_type dep tv env t) in
+		let def = Some (tr_type dep' tv env t) in
 		Ty.create_tysymbol id vars def
 		  (* FIXME: is it correct to use None when NotFO? *)
 	    | None -> 
@@ -323,11 +325,13 @@ and tr_global_ts dep env r =
 		Ty.create_tysymbol id tv None
 	  in
 	  let decl = Decl.create_ty_decl [ts, Decl.Tabstract] in
-	  add_table global_ts r (Some (ts, decl, !dep));
-	  ts, decl, !dep
+	  add_dep dep decl;
+	  add_table global_ts r (Some ts);
+	  global_decl := Ident.Mid.add ts.ts_name decl !global_decl;
+	  global_dep := Decl.Mdecl.add decl !dep' !global_dep;
+	  ts
       | IndRef i ->
-	  let all_ts = ref [] in
-	  let all_ls = ref [] in
+	  let all_ids = ref [] in
 	  let mib, _ = Global.lookup_inductive i in
 	  (* first, the inductive types *)
 	  let make_one_ts j _ = (* j-th inductive *)
@@ -340,14 +344,18 @@ and tr_global_ts dep env r =
 	      List.map (fun x -> Ty.create_tvsymbol (preid_of_id x)) tv 
 	    in
 	    let ts = Ty.create_tysymbol id tv None in
-	    all_ts := (r, ts) :: !all_ts;
-	    add_table task_ts r (Some ts)
+	    let d = Decl.create_ty_decl [ts, Decl.Tabstract] in
+	    all_ids := ts.ts_name :: !all_ids;
+	    add_table global_ts r (Some ts);
+	    global_decl := Ident.Mid.add ts.ts_name d !global_decl;
+	    global_dep := Decl.Mdecl.add d Decl.Sdecl.empty !global_dep;
+	    local_decl := Decl.Sdecl.add d !local_decl
 	  in
 	  Array.iteri make_one_ts mib.mind_packets;
 	  (* second, the declarations with constructors *)
 	  let make_one j oib = (* j-th inductive *)
 	    let j = ith_mutual_inductive i j in
-	    let ts = lookup_table task_ts (IndRef j) in
+	    let ts = lookup_table global_ts (IndRef j) in
 	    let tyj = Ty.ty_app ts (List.map Ty.ty_var ts.Ty.ts_args) in
 	    let mk_constructor k _tyk = (* k-th constructor *)
 	      let r = ConstructRef (j, k+1) in
@@ -357,11 +365,11 @@ and tr_global_ts dep env r =
 		List.fold_right2 Idmap.add vars ts.Ty.ts_args Idmap.empty 
 	      in
 	      let l, _ = decompose_arrows t in
-	      let l = List.map (tr_type dep tv env) l in
+	      let l = List.map (tr_type dep' tv env) l in
 	      let id = preid_of_id (Nametab.id_of_global r) in
 	      let ls = Term.create_lsymbol id l (Some tyj) in
-	      all_ls := (r, ls) :: !all_ls;
-	      add_table task_ls r (Some ls);
+	      all_ids := ls.Term.ls_name :: !all_ids;
+	      add_table global_ls r (Some ls);
 	      ls
 	    in
 	    let ls = Array.to_list (Array.mapi mk_constructor oib.mind_nf_lc) in
@@ -370,28 +378,29 @@ and tr_global_ts dep env r =
 	  let decl = Array.mapi make_one mib.mind_packets in
 	  let decl = Array.to_list decl in
 	  let decl = Decl.create_ty_decl decl in
-	  Format.printf "decl = %a@." Pretty.print_decl decl;
+	  (* Format.printf "decl = %a@." Pretty.print_decl decl; *)
+	  add_dep dep decl;
 	  List.iter 
-	    (fun (r, ts) -> add_table global_ts r (Some (ts, decl, !dep)));
-	    !all_ts;
-	  List.iter 
-	    (fun (r, ls) -> add_table global_ls r (Some (ls, decl, !dep)))
-	    !all_ls;
-	  lookup_table task_ts r, decl, !dep
+	    (fun id -> 
+	       global_decl := Ident.Mid.add id decl !global_decl)
+	    !all_ids;
+	  global_dep := Decl.Mdecl.add decl !dep' !global_dep;
+	  lookup_table global_ts r
 
 and tr_task_ls dep env r = 
-  try
-    lookup_table task_ls r
-  with Not_found ->
-    add_table task_ls r None;
-    let ls, decl, dep = tr_global_ls dep env r in
-    List.iter (make_dependency (ref []) env) dep;
-    add_table task_ls r (Some ls);
-    task := Task.add_decl !task decl;
-    ls
+  let ls = tr_global_ls dep env r in
+  assert (Ident.Mid.mem ls.ls_name !global_decl);
+  let d = Ident.Mid.find ls.ls_name !global_decl in
+  add_local_decls d;
+  ls
 
 and tr_global_ls dep env r =
-  assert false (*TODO*)
+  try
+    lookup_table global_ls r
+  with Not_found ->
+    add_table global_ls r None;
+    let dep' = empty_dep in
+    assert false (*TODO*)
 
 (* assumption: t:T:Set *)
 and tr_term dep tv bv env t =
@@ -564,10 +573,9 @@ and tr_formula dep tv bv env f =
     | _ -> raise NotFO (*TODO*)
 
 let tr_goal gl =
-  task_ts := Refmap.empty;
-  task_ls := Refmap.empty;
+  local_decl := Decl.Sdecl.empty;
   let env = pf_env gl in
-  let dep = ref [] in
+  let dep = empty_dep () in
   let rec tr_ctxt tv bv = function
     | [] ->
 	tr_formula dep tv bv env (pf_concl gl) 

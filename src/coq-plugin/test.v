@@ -3,7 +3,6 @@ Require Export ZArith.
 Open Scope Z_scope.
 Require Export List.
 
-
 Parameter P : (nat -> nat) -> Prop.
 
 Goal forall (a:Set), forall x:nat, x=S O -> P S -> 
@@ -19,7 +18,6 @@ why.
 
 Goal  forall x: list nat, x=x.
 intros.
-
 why.
 
 (* Mutually inductive types *)
@@ -33,6 +31,7 @@ with forest : Set :=
   | Cons : tree -> forest -> forest.
 
 Goal forall x : tree, x=x.
+why.
 
 (* Polymorphic, Mutually inductive types *)
 
@@ -45,6 +44,7 @@ with pforest (a:Set) : Set :=
   | PCons : ptree a -> pforest a -> pforest a.
 
 Goal forall x : ptree Z, x=x.
+why.
 
 (* the same, without parameters *)
 
