@@ -92,6 +92,7 @@ let pure_type env = Typing.dty env.denv
 
 let rec dtype_v env = function
   | Pgm_ptree.Tpure pt -> DTpure (pure_type env pt)
+  | Pgm_ptree.Tarrow _ -> assert false (*TODO*)
 
 let rec dexpr env e = 
   let d, ty = expr_desc env e.Pgm_ptree.expr_loc e.Pgm_ptree.expr_desc in
@@ -126,6 +127,10 @@ and expr_desc env loc = function
       let env = { env with denv = Typing.add_var x ty1 env.denv } in
       let e2 = dexpr env e2 in
       DElet (x, e1, e2), e2.dexpr_type
+  | Pgm_ptree.Efun _ (*(bl, p, e, q)*) ->
+      assert false (*TODO*)
+  | Pgm_ptree.Erec _ (*(id, bl, v, p, e, q)*) ->
+      assert false (*TODO*)
 
   | Pgm_ptree.Esequence (e1, e2) ->
       let e1 = dexpr env e1 in
