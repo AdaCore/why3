@@ -38,35 +38,15 @@ let ident_printer =
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
 
-let print_ident fmt id =
-  fprintf fmt "%s" (id_unique ident_printer id)
-
-let print_functor fmt id =
-  let san= Some String.uncapitalize in
-  fprintf fmt "%s" (id_unique ?sanitizer:san ident_printer id)
-
-let forget_var v = forget_id ident_printer v.vs_name
+let print_symbol fmt id =
+  let san = String.uncapitalize in
+  fprintf fmt "%s" (id_unique ~sanitizer:san ident_printer id)
 
 let print_var fmt {vs_name = id} =
-  let sanitize n = String.capitalize n in
-  let n = id_unique ident_printer ~sanitizer:sanitize id in
-  fprintf fmt "%s" n
+  let san = String.capitalize in
+  fprintf fmt "%s" (id_unique ~sanitizer:san ident_printer id)
 
-
-let rec print_type drv fmt ty = match ty.ty_node with
-  | Tyvar _ -> unsupported "tptp : you must encode the polymorphism"
-  | Tyapp (ts, tl) -> begin match Driver.query_syntax drv ts.ts_name with
-      | Some s -> Driver.syntax_arguments s (print_type drv) fmt tl
-      | None -> fprintf fmt "%a%a" (print_tyapp drv) tl print_ident ts.ts_name
-    end
-
-(* TODO : remove *)
-and print_tyapp drv fmt = function
-  | [] -> ()
-  | [ty] -> fprintf fmt "%a " (print_type drv) ty
-  | tl -> fprintf fmt "(%a) " (print_list comma (print_type drv)) tl
-
-let print_type drv fmt = catch_unsupportedType (print_type drv fmt)
+let forget_var v = forget_id ident_printer v.vs_name
 
 let rec print_term drv fmt t = match t.t_node with
   | Tbvar _ -> assert false
@@ -76,8 +56,8 @@ let rec print_term drv fmt t = match t.t_node with
   | Tapp (ls, tl) -> begin match Driver.query_syntax drv ls.ls_name with
       | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl
       | None -> begin match tl with (* toto() is not accepted *)
-          | [] -> fprintf fmt "@[%a@]" print_functor ls.ls_name
-          | _ -> fprintf fmt "@[%a(%a)@]"  print_functor ls.ls_name
+          | [] -> fprintf fmt "@[%a@]" print_symbol ls.ls_name
+          | _ -> fprintf fmt "@[%a(%a)@]"  print_symbol ls.ls_name
                 (print_list comma (print_term drv)) tl
           end
       end
@@ -93,11 +73,11 @@ let rec print_term drv fmt t = match t.t_node with
 
 and print_fmla drv fmt f = match f.f_node with
   | Fapp ({ ls_name = id }, []) ->
-      print_ident fmt id
+      print_symbol fmt id
   | Fapp (ls, tl) -> begin match Driver.query_syntax drv ls.ls_name with
       | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl
       | None -> fprintf fmt "%a(%a)"
-	      print_ident ls.ls_name (print_list comma (print_term drv)) tl
+	      print_symbol ls.ls_name (print_list comma (print_term drv)) tl
       end
   | Fquant (q, fq) ->
       let q = match q with Fforall -> "!" | Fexists -> "?" in
@@ -141,17 +121,6 @@ and print_expr drv fmt = e_apply (print_term drv fmt) (print_fmla drv fmt)
 and print_triggers drv fmt tl = print_list comma (print_expr drv) fmt tl
 
 
-let print_logic_binder drv fmt v =
-  fprintf fmt "%a: %a" print_ident v.vs_name (print_type drv) v.vs_ty
-
-let print_type_decl drv fmt = function
-  | ts, Tabstract when Driver.query_remove drv ts.ts_name -> false
-  | ts, Tabstract when ts.ts_args = [] ->
-      fprintf fmt ":extrasorts (%a)" print_ident ts.ts_name; true
-  | _, Tabstract -> true (*unsupported "tptp : type with argument are not supported" *)
-  | _, Talgebraic _ -> true (* unsupported "tptp : algebraic type are not supported" *)
-  (* FIXME : types are currently just ignored, which is unsafe *)
-
 let print_logic_decl drv fmt (ls,ld) = match ld with
   | None -> ()
   | Some _ -> unsupported "Predicate and function definition aren't supported"
@@ -161,8 +130,8 @@ let print_logic_decl drv fmt d =
     false else (print_logic_decl drv fmt d; true)
 
 let print_decl drv fmt d = match d.d_node with
-  | Dtype dl ->
-      print_list_opt newline (print_type_decl drv) fmt dl
+  | Dtype dl -> false
+      (* print_list_opt newline (print_type_decl drv) fmt dl *)
   | Dlogic dl ->
       print_list_opt newline (print_logic_decl drv) fmt dl
   | Dind _ -> unsupportedDecl d
