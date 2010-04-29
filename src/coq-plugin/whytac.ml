@@ -278,8 +278,6 @@ let rec tr_type dep tv env t =
 	  Ty.ty_app ts (List.map (tr_type dep tv env) cl)
 	with
 	  | Not_found ->
-	      Format.printf "ICI : %a@." msg_with (Printer.pr_constr f);
-	      flush stderr;
 	      raise NotFO
 	  | NotFO ->
 	      (* TODO: we need to abstract some part of (f cl) *)
@@ -399,8 +397,53 @@ and tr_global_ls dep env r =
     lookup_table global_ls r
   with Not_found ->
     add_table global_ls r None;
-    let dep' = empty_dep in
+    let dep' = empty_dep () in
     assert false (*TODO*)
+    (****
+    let ty = Global.type_of_global r in
+    let tv, env, t = decomp_type_quantifiers env ty in
+    if is_Set t || is_Type t then raise NotFO;
+    let id = preid_of_id (Nametab.id_of_global r) in
+    let l, t = decompose_arrows t in
+    let l = List.map (tr_type dep' tv env) l in
+    if is_Prop t then begin (* predicate *)
+      let ls = create_lsymbol id l None in
+      add_table global_ls r (Some ls);
+      begin match r with
+	| ConstRef c -> begin match (Global.lookup_constant c).const_body with
+	    | Some b ->
+		let b = force b in
+		let (tv, _), env, b = decomp_type_lambdas env b in
+		let (bv, vars), env, b = decomp_lambdas dep tv env b in
+		assert false (*TODO*)
+	  end
+      end;
+      ls
+    end else
+      let s = Typing.type_of env Evd.empty t in
+      if is_Set s || is_Type s then begin (* function *)
+	
+      end else 
+	raise NotFO
+    ****)
+
+and decomp_lambdas dep tv env t =
+  let rec loop vars t = match kind_of_term t with
+    | Lambda (n, a, t) ->
+	loop ((n,a) :: vars) t
+    | _ ->
+	let vars', env = coq_rename_vars env vars in
+	let t = substl (List.map mkVar vars') t in
+	let vars = List.combine vars' vars in
+	let add m (id,(_,t)) = 
+	  let ty = tr_type dep tv env t in
+	  let v = Term.create_vsymbol (preid_of_id id) ty in
+	  Idmap.add id v m, v 
+	in
+	Util.map_fold_left add Idmap.empty vars, env, t
+  in
+  loop [] t
+
 
 (* assumption: t:T:Set *)
 and tr_term dep tv bv env t =
@@ -410,32 +453,40 @@ and tr_term dep tv bv env t =
       (* binary operations on integers *)
     | App (c, [|a;b|]) when is_constant c coq_Zplus ->
 	let ls = why_constant ["int"] "Int" ["infix +"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] Ty.ty_int
+	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	  Ty.ty_int
     | App (c, [|a;b|]) when is_constant c coq_Zminus ->
 	let ls = why_constant ["int"] "Int" ["infix -"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] Ty.ty_int
+	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	  Ty.ty_int
     | App (c, [|a;b|]) when is_constant c coq_Zmult ->
 	let ls = why_constant ["int"] "Int" ["infix *"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] Ty.ty_int
+	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	  Ty.ty_int
     | App (c, [|a;b|]) when is_constant c coq_Zdiv ->
 	let ls = why_constant ["int"] "EuclideanDivision" ["div"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] Ty.ty_int
+	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	  Ty.ty_int
     | App (c, [|a|]) when is_constant c coq_Zopp ->
 	let ls = why_constant ["int"] "Int" ["prefix -"] in
 	Term.t_app ls [tr_term dep tv bv env a] Ty.ty_int
 	  (* binary operations on reals *)
     | App (c, [|a;b|]) when is_constant c coq_Rplus ->
 	let ls = why_constant ["real"] "Real" ["infix +"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] Ty.ty_real
+	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	  Ty.ty_real
     | App (c, [|a;b|]) when is_constant c coq_Rminus ->
 	let ls = why_constant ["real"] "Real" ["infix -"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] Ty.ty_real
+	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	  Ty.ty_real
     | App (c, [|a;b|]) when is_constant c coq_Rmult ->
 	let ls = why_constant ["real"] "Real" ["infix *"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] Ty.ty_real
+	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	  Ty.ty_real
     | App (c, [|a;b|]) when is_constant c coq_Rdiv ->
 	let ls = why_constant ["real"] "Real" ["infix /"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] Ty.ty_real
+	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	  Ty.ty_real
     | App (c, [|a|]) when is_constant c coq_Ropp ->
 	let ls = why_constant ["real"] "Real" ["prefix -"] in
 	Term.t_app ls [tr_term dep tv bv env a] Ty.ty_real
@@ -543,7 +594,8 @@ and tr_formula dep tv bv env f =
 	Term.f_iff (tr_formula dep tv bv env a) (tr_formula dep tv bv env b)
     | Prod (n, a, b), _ ->
 	if is_imp_term f && is_Prop (type_of env Evd.empty a) then
-	  Term.f_implies (tr_formula dep tv bv env a) (tr_formula dep tv bv env b)
+	  Term.f_implies 
+	    (tr_formula dep tv bv env a) (tr_formula dep tv bv env b)
 	else
 	  let vs, _t, bv, env, b = quantifiers n a b dep tv bv env in
 	  Term.f_forall [vs] [] (tr_formula dep tv bv env b)
