@@ -371,8 +371,9 @@ src/coq-plugin/g_whytac.ml: src/coq-plugin/g_whytac.ml4
 	$(CAMLP5O) pr_o.cmo @COQLIB@/parsing/grammar.cma -impl $^ -o $@
 
 # depend and clean targets
-
+ifeq (@enable_coq_support@,yes)
 include .depend.coq
+endif
 
 .depend.coq: $(COQGENERATED)
 	$(OCAMLDEP) -slash -I src -I src/coq-plugin $(COQML) > $@
