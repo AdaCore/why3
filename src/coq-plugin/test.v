@@ -3,22 +3,45 @@ Require Export ZArith.
 Open Scope Z_scope.
 Require Export List.
 
+(* type definitions *)
+
+Definition t := list.
+
+Inductive foo : Set :=
+  C : t nat -> foo.
+
+Goal forall x:foo, x=x.
+intros.
+why.
+Qed.
+
+
+Definition id A (x:A) := x.
+
+(*
+Goal id nat O = O.
+why.
+*)
+
 Parameter P : (nat -> nat) -> Prop.
 
 Goal forall (a:Set), forall x:nat, x=S O -> P S -> 
   let y := (S (S O)) in S x=y.
 intros.
 why.
+Qed.
 
 Goal  forall (a:Set), forall x:Z, x=1 -> P S -> let y := 2 in x+1=y.
 intros.
 why.
+Qed.
 
 (* Inductive types *)
 
 Goal  forall x: list nat, x=x.
 intros.
 why.
+Qed.
 
 (* Mutually inductive types *)
 
@@ -32,6 +55,7 @@ with forest : Set :=
 
 Goal forall x : tree, x=x.
 why.
+Qed.
 
 (* Polymorphic, Mutually inductive types *)
 
@@ -45,6 +69,7 @@ with pforest (a:Set) : Set :=
 
 Goal forall x : ptree Z, x=x.
 why.
+Qed.
 
 (* the same, without parameters *)
 
@@ -58,3 +83,5 @@ with pforest' : Type -> Type :=
 
 Goal forall x : ptree' Z, x=x.
 why.
+Qed.
+

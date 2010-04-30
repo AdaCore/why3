@@ -111,6 +111,13 @@ let coq_rename_vars env vars =
        id :: newvars, Environ.push_named (id, None, t) newenv)
     vars ([],env)
 
+let coq_rename_var env (na,t) =
+  let avoid = ids_of_named_context (Environ.named_context env) in
+  let id = next_name_away na avoid in
+  id, Environ.push_named (id, None, t) env
+
+let preid_of_id id = Ident.id_fresh (string_of_id id)
+
 (* extract the prenex type quantifications i.e.
    type_quantifiers env (A1:Set)...(Ak:Set)t = A1...An, (env+Ai), t *)
 let decomp_type_quantifiers env t =
@@ -120,20 +127,6 @@ let decomp_type_quantifiers env t =
     | _ -> 
 	let vars, env = coq_rename_vars env vars in
 	let t = substl (List.map mkVar vars) t in
-	List.rev vars, env, t
-  in
-  loop [] t
-
-let preid_of_id id = Ident.id_fresh (string_of_id id)
-
-(* same thing with lambda binders (for axiomatize body) *)
-let decomp_type_lambdas env t =
-  let rec loop vars t = match kind_of_term t with
-    | Lambda (n, a, t) when is_Set a || is_Type a ->
-	loop ((n,a) :: vars) t
-    | _ ->
-	let vars, env = coq_rename_vars env vars in
-	let t = substl (List.map mkVar vars) t in
 	let add m id = 
 	  let tv = Ty.create_tvsymbol (preid_of_id id) in
 	  Idmap.add id tv m, tv 
@@ -141,6 +134,22 @@ let decomp_type_lambdas env t =
 	Util.map_fold_left add Idmap.empty vars, env, t
   in
   loop [] t
+
+(* decomposes the first n type lambda abstractions correspondings to
+   the list of type variables vars *)
+let decomp_type_lambdas env vars t =
+  let rec loop tvm env vars t = match vars, kind_of_term t with
+    | [], _ -> 
+	tvm, env, t
+    | tv :: vars, Lambda (n, a, t) when is_Set a || is_Type a ->
+	let id, env = coq_rename_var env (n, a) in
+	let t = subst1 (mkVar id) t in
+	let tvm = Idmap.add id tv tvm in
+	loop tvm env vars t
+    | _ ->
+	assert false (*TODO: eta-expansion*)
+  in
+  loop Idmap.empty env vars t
 
 let decompose_arrows =
   let rec arrows_rec l c = match kind_of_term c with
@@ -211,14 +220,10 @@ let rec tr_positive p = match kind_of_term p with
   | Construct _ when is_constant p coq_xH ->
       Big_int.unit_big_int
   | App (f, [|a|]) when is_constant f coq_xI ->
-(*
-      Plus (Mult (Cst 2, tr_positive a), Cst 1)
-*)
+      (* Plus (Mult (Cst 2, tr_positive a), Cst 1) *)
       Big_int.succ_big_int (Big_int.mult_big_int big_two (tr_positive a))
   | App (f, [|a|]) when is_constant f coq_xO ->
-(*
-      Mult (Cst 2, tr_positive a)
-*)
+      (* Mult (Cst 2, tr_positive a) *)
       Big_int.mult_big_int big_two (tr_positive a)
   | Cast (p, _, _) ->
       tr_positive p
@@ -260,22 +265,22 @@ let rec tr_arith_constant t = match kind_of_term t with
   | _ ->
       raise NotArithConstant
 
-let rec tr_type dep tv env t =
+let rec tr_type dep tvm env t =
   let t = Reductionops.nf_betadeltaiota env Evd.empty t in
   if is_constant t coq_Z then
     Ty.ty_int
   else if is_constant t coq_R then
     Ty.ty_real
   else match kind_of_term t with
-    | Var x when Idmap.mem x tv ->
-	Ty.ty_var (Idmap.find x tv)
+    | Var x when Idmap.mem x tvm ->
+	Ty.ty_var (Idmap.find x tvm)
     | _ ->
 	let f, cl = decompose_app t in
 	begin try
 	  let r = global_of_constr f in
 	  let ts = tr_task_ts dep env r in
 	  assert (List.length ts.Ty.ts_args = List.length cl); (* since t:Set *)
-	  Ty.ty_app ts (List.map (tr_type dep tv env) cl)
+	  Ty.ty_app ts (List.map (tr_type dep tvm env) cl)
 	with
 	  | Not_found ->
 	      raise NotFO
@@ -306,21 +311,18 @@ and tr_global_ts dep env r =
 	  assert false
       | ConstRef c -> 
 	  let ty = Global.type_of_global r in
-	  let tv, _, t = decomp_type_quantifiers env ty in
+	  let (_,vars), _, t = decomp_type_quantifiers env ty in
 	  if not (is_Set t) && not (is_Type t) then raise NotFO;
 	  let id = preid_of_id (Nametab.id_of_global r) in
 	  let ts = match (Global.lookup_constant c).const_body with
 	    | Some b ->
 		let b = force b in
-		let (tv, vars), env, t = decomp_type_lambdas env b in
-		let def = Some (tr_type dep' tv env t) in
+		let tvm, env, t = decomp_type_lambdas env vars b in
+		let def = Some (tr_type dep' tvm env t) in
 		Ty.create_tysymbol id vars def
 		  (* FIXME: is it correct to use None when NotFO? *)
 	    | None -> 
-		let tv = 
-		  List.map (fun x -> Ty.create_tvsymbol (preid_of_id x)) tv 
-		in
-		Ty.create_tysymbol id tv None
+		Ty.create_tysymbol id vars None
 	  in
 	  let decl = Decl.create_ty_decl [ts, Decl.Tabstract] in
 	  add_dep dep decl;
@@ -335,13 +337,10 @@ and tr_global_ts dep env r =
 	  let make_one_ts j _ = (* j-th inductive *)
 	    let r = IndRef (ith_mutual_inductive i j) in
 	    let ty = Global.type_of_global r in
-	    let tv, _, t = decomp_type_quantifiers env ty in
+	    let (_,vars), _, t = decomp_type_quantifiers env ty in
 	    if not (is_Set t) && not (is_Type t) then raise NotFO;
 	    let id = preid_of_id (Nametab.id_of_global r) in
-	    let tv = 
-	      List.map (fun x -> Ty.create_tvsymbol (preid_of_id x)) tv 
-	    in
-	    let ts = Ty.create_tysymbol id tv None in
+	    let ts = Ty.create_tysymbol id vars None in
 	    let d = Decl.create_ty_decl [ts, Decl.Tabstract] in
 	    all_ids := ts.ts_name :: !all_ids;
 	    add_table global_ts r (Some ts);
@@ -358,12 +357,15 @@ and tr_global_ts dep env r =
 	    let mk_constructor k _tyk = (* k-th constructor *)
 	      let r = ConstructRef (j, k+1) in
 	      let ty = Global.type_of_global r in
-	      let vars, env, t = decomp_type_quantifiers env ty in
-	      let tv = 
-		List.fold_right2 Idmap.add vars ts.Ty.ts_args Idmap.empty 
+	      let (_,vars), env, t = decomp_type_quantifiers env ty in
+	      let tvm =
+		let add v1 v2 tvm = 
+		  Idmap.add (id_of_string v1.tv_name.Ident.id_short) v2 tvm
+		in
+		List.fold_right2 add vars ts.Ty.ts_args Idmap.empty
 	      in
 	      let l, _ = decompose_arrows t in
-	      let l = List.map (tr_type dep' tv env) l in
+	      let l = List.map (tr_type dep' tvm env) l in
 	      let id = preid_of_id (Nametab.id_of_global r) in
 	      let ls = Term.create_lsymbol id l (Some tyj) in
 	      all_ids := ls.Term.ls_name :: !all_ids;
@@ -427,7 +429,7 @@ and tr_global_ls dep env r =
 	raise NotFO
     ****)
 
-and decomp_lambdas dep tv env t =
+and decomp_lambdas dep tvm env t =
   let rec loop vars t = match kind_of_term t with
     | Lambda (n, a, t) ->
 	loop ((n,a) :: vars) t
@@ -436,7 +438,7 @@ and decomp_lambdas dep tv env t =
 	let t = substl (List.map mkVar vars') t in
 	let vars = List.combine vars' vars in
 	let add m (id,(_,t)) = 
-	  let ty = tr_type dep tv env t in
+	  let ty = tr_type dep tvm env t in
 	  let v = Term.create_vsymbol (preid_of_id id) ty in
 	  Idmap.add id v m, v 
 	in
@@ -446,53 +448,53 @@ and decomp_lambdas dep tv env t =
 
 
 (* assumption: t:T:Set *)
-and tr_term dep tv bv env t =
+and tr_term dep tvm bv env t =
   try
     tr_arith_constant t
   with NotArithConstant -> match kind_of_term t with
-      (* binary operations on integers *)
+    (* binary operations on integers *)
     | App (c, [|a;b|]) when is_constant c coq_Zplus ->
 	let ls = why_constant ["int"] "Int" ["infix +"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	Term.t_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b] 
 	  Ty.ty_int
     | App (c, [|a;b|]) when is_constant c coq_Zminus ->
 	let ls = why_constant ["int"] "Int" ["infix -"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	Term.t_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b] 
 	  Ty.ty_int
     | App (c, [|a;b|]) when is_constant c coq_Zmult ->
 	let ls = why_constant ["int"] "Int" ["infix *"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	Term.t_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b] 
 	  Ty.ty_int
     | App (c, [|a;b|]) when is_constant c coq_Zdiv ->
 	let ls = why_constant ["int"] "EuclideanDivision" ["div"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	Term.t_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b] 
 	  Ty.ty_int
     | App (c, [|a|]) when is_constant c coq_Zopp ->
 	let ls = why_constant ["int"] "Int" ["prefix -"] in
-	Term.t_app ls [tr_term dep tv bv env a] Ty.ty_int
-	  (* binary operations on reals *)
+	Term.t_app ls [tr_term dep tvm bv env a] Ty.ty_int
+    (* binary operations on reals *)
     | App (c, [|a;b|]) when is_constant c coq_Rplus ->
 	let ls = why_constant ["real"] "Real" ["infix +"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	Term.t_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b] 
 	  Ty.ty_real
     | App (c, [|a;b|]) when is_constant c coq_Rminus ->
 	let ls = why_constant ["real"] "Real" ["infix -"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	Term.t_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b] 
 	  Ty.ty_real
     | App (c, [|a;b|]) when is_constant c coq_Rmult ->
 	let ls = why_constant ["real"] "Real" ["infix *"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	Term.t_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b] 
 	  Ty.ty_real
     | App (c, [|a;b|]) when is_constant c coq_Rdiv ->
 	let ls = why_constant ["real"] "Real" ["infix /"] in
-	Term.t_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b] 
+	Term.t_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b] 
 	  Ty.ty_real
     | App (c, [|a|]) when is_constant c coq_Ropp ->
 	let ls = why_constant ["real"] "Real" ["prefix -"] in
-	Term.t_app ls [tr_term dep tv bv env a] Ty.ty_real
+	Term.t_app ls [tr_term dep tvm bv env a] Ty.ty_real
     | App (c, [|a|]) when is_constant c coq_Rinv ->
 	let ls = why_constant ["real"] "Real" ["inv"] in
-	Term.t_app ls [tr_term dep tv bv env a] Ty.ty_real
+	Term.t_app ls [tr_term dep tvm bv env a] Ty.ty_real
 	  (* first-order terms *)
     | Var id when Idmap.mem id bv ->
 	Term.t_var (Idmap.find id bv)
@@ -505,7 +507,7 @@ and tr_term dep tv bv env t =
 	    | Some ty ->
 		let k = 0 (* TODO: polymorphic arity *) in
 	  	let cl = skip_k_args k cl in
-		Term.t_app ls (List.map (tr_term dep tv bv env) cl) ty
+		Term.t_app ls (List.map (tr_term dep tvm bv env) cl) ty
 	    | None  ->
 		raise NotFO
 	  end
@@ -519,7 +521,7 @@ and tr_term dep tv bv env t =
 (* 	  	| x :: l as args -> *)
 (* 	  	    begin try *)
 (* 	  	      let s = make_term_abstraction tv env app in *)
-(* 	  	      Fol.App (s, List.map (tr_term dep tv bv env) args) *)
+(* 	  	      Fol.App (s, List.map (tr_term dep tvm bv env) args) *)
 (* 	  	    with NotFO -> *)
 (* 	  	      abstract (applist (app, [x])) l *)
 (* 	  	    end *)
@@ -530,16 +532,16 @@ and tr_term dep tv bv env t =
 (* 	      abstract app l *)
 	end
 	  
-and quantifiers n a b dep tv bv env =
+and quantifiers n a b dep tvm bv env =
   let vars, env = coq_rename_vars env [n,a] in
   let id = match vars with [x] -> x | _ -> assert false in
   let b = subst1 (mkVar id) b in
-  let t = tr_type dep tv env a in
+  let t = tr_type dep tvm env a in
   let vs = Term.create_vsymbol (preid_of_id id) t in
   let bv = Idmap.add id vs bv in
   vs, t, bv, env, b
 
-and tr_formula dep tv bv env f =
+and tr_formula dep tvm bv env f =
   let c, args = decompose_app f in
   match kind_of_term c, args with
       (*
@@ -549,61 +551,61 @@ and tr_formula dep tv bv env f =
     | _, [t;a;b] when c = build_coq_eq () ->
 	let ty = type_of env Evd.empty t in
 	if is_Set ty || is_Type ty then
-	  let _ = tr_type dep tv env t in
-	  Term.f_equ (tr_term dep tv bv env a) (tr_term dep tv bv env b)
+	  let _ = tr_type dep tvm env t in
+	  Term.f_equ (tr_term dep tvm bv env a) (tr_term dep tvm bv env b)
 	else
 	  raise NotFO
-	    (* comparisons on integers *)
+    (* comparisons on integers *)
     | _, [a;b] when is_constant c coq_Zle ->
 	let ls = why_constant ["int"] "Int" ["infix <="] in
-	Term.f_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b]
+	Term.f_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
     | _, [a;b] when is_constant c coq_Zlt ->
 	let ls = why_constant ["int"] "Int" ["infix <"] in
-	Term.f_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b]
+	Term.f_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
     | _, [a;b] when is_constant c coq_Zge ->
 	let ls = why_constant ["int"] "Int" ["infix >="] in
-	Term.f_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b]
+	Term.f_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
     | _, [a;b] when is_constant c coq_Zgt ->
 	let ls = why_constant ["int"] "Int" ["infix >"] in
-	Term.f_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b]
-	  (* comparisons on reals *)
+	Term.f_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
+    (* comparisons on reals *)
     | _, [a;b] when is_constant c coq_Rle ->
 	let ls = why_constant ["real"] "Real" ["infix <="] in
-	Term.f_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b]
+	Term.f_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
     | _, [a;b] when is_constant c coq_Rlt ->
 	let ls = why_constant ["real"] "Real" ["infix <"] in
-	Term.f_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b]
+	Term.f_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
     | _, [a;b] when is_constant c coq_Rge ->
 	let ls = why_constant ["real"] "Real" ["infix >="] in
-	Term.f_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b]
+	Term.f_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
     | _, [a;b] when is_constant c coq_Rgt ->
 	let ls = why_constant ["real"] "Real" ["infix >"] in
-	Term.f_app ls [tr_term dep tv bv env a; tr_term dep tv bv env b]
-	  (* propositional logic *)
+	Term.f_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
+    (* propositional logic *)
     | _, [] when c = build_coq_False () ->
 	Term.f_false
     | _, [] when c = build_coq_True () ->
 	Term.f_true
     | _, [a] when c = build_coq_not () ->
-	Term.f_not (tr_formula dep tv bv env a)
+	Term.f_not (tr_formula dep tvm bv env a)
     | _, [a;b] when c = build_coq_and () ->
-	Term.f_and (tr_formula dep tv bv env a) (tr_formula dep tv bv env b)
+	Term.f_and (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
     | _, [a;b] when c = build_coq_or () ->
-	Term.f_or (tr_formula dep tv bv env a) (tr_formula dep tv bv env b)
+	Term.f_or (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
     | _, [a;b] when c = Lazy.force coq_iff ->
-	Term.f_iff (tr_formula dep tv bv env a) (tr_formula dep tv bv env b)
+	Term.f_iff (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
     | Prod (n, a, b), _ ->
 	if is_imp_term f && is_Prop (type_of env Evd.empty a) then
 	  Term.f_implies 
-	    (tr_formula dep tv bv env a) (tr_formula dep tv bv env b)
+	    (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
 	else
-	  let vs, _t, bv, env, b = quantifiers n a b dep tv bv env in
-	  Term.f_forall [vs] [] (tr_formula dep tv bv env b)
+	  let vs, _t, bv, env, b = quantifiers n a b dep tvm bv env in
+	  Term.f_forall [vs] [] (tr_formula dep tvm bv env b)
     | _, [_; a] when c = build_coq_ex () ->
 	begin match kind_of_term a with
 	  | Lambda(n, a, b) ->
-	      let vs, _t, bv, env, b = quantifiers n a b dep tv bv env in
-	      Term.f_exists [vs] [] (tr_formula dep tv bv env b)
+	      let vs, _t, bv, env, b = quantifiers n a b dep tvm bv env in
+	      Term.f_exists [vs] [] (tr_formula dep tvm bv env b)
 	  | _ ->
 	      (* unusual case of the shape (ex p) *)
 	      raise NotFO (* TODO: we could eta-expanse *)
@@ -615,54 +617,55 @@ and tr_formula dep tv bv env f =
 	    match tr_global env r with
 	    | DeclPred (s, k, _) ->
 	    let args = skip_k_args k args in
-	    Fatom (Pred (s, List.map (tr_term dep tv bv env) args))
+	    Fatom (Pred (s, List.map (tr_term dep tvm bv env) args))
 	    | _ ->
 	    raise NotFO
 	    with Not_found ->
 	    raise NotFO
 	    end
 	  *)
-    | _ -> raise NotFO (*TODO*)
+    | _ -> 
+	raise NotFO (*TODO*)
 
 let tr_goal gl =
   local_decl := Decl.Sdecl.empty;
   let env = pf_env gl in
   let dep = empty_dep () in
-  let rec tr_ctxt tv bv = function
+  let rec tr_ctxt tvm bv = function
     | [] ->
-	tr_formula dep tv bv env (pf_concl gl) 
+	tr_formula dep tvm bv env (pf_concl gl) 
     | (id, None, ty) :: ctxt when is_Set ty || is_Type ty ->
 	let v = Ty.create_tvsymbol (preid_of_id id) in
-	let tv = Idmap.add id v tv in
-	tr_ctxt tv bv ctxt
+	let tvm = Idmap.add id v tvm in
+	tr_ctxt tvm bv ctxt
     | (id, None, ty) :: ctxt ->
 	let t = type_of env Evd.empty ty in
 	begin try
 	  if is_Set t || is_Type t then
-	    let ty = tr_type dep tv env ty in (* DO NOT INLINE! *)
+	    let ty = tr_type dep tvm env ty in (* DO NOT INLINE! *)
 	    let vs = Term.create_vsymbol (preid_of_id id) ty in
 	    let bv = Idmap.add id vs bv in
-	    Term.f_forall [vs] [] (tr_ctxt tv bv ctxt)
+	    Term.f_forall [vs] [] (tr_ctxt tvm bv ctxt)
 	  else if is_Prop t then 
-	    let h = tr_formula dep tv bv env ty in (* DO NOT INLINE! *)
-	    Term.f_implies h (tr_ctxt tv bv ctxt)
+	    let h = tr_formula dep tvm bv env ty in (* DO NOT INLINE! *)
+	    Term.f_implies h (tr_ctxt tvm bv ctxt)
 	  else 
 	    raise NotFO
 	with NotFO -> 
-	  tr_ctxt tv bv ctxt
+	  tr_ctxt tvm bv ctxt
 	end
     | (id, Some d, ty) :: ctxt -> 
 	(* local definition -> let or skip *)
 	let t = type_of env Evd.empty ty in
 	begin try
 	  if not (is_Set t || is_Type t) then raise NotFO;
-	  let d = tr_term dep tv bv env d in
-	  let ty = tr_type dep tv env ty in
+	  let d = tr_term dep tvm bv env d in
+	  let ty = tr_type dep tvm env ty in
 	  let vs = Term.create_vsymbol (preid_of_id id) ty in
 	  let bv = Idmap.add id vs bv in
-	  Term.f_let vs d (tr_ctxt tv bv ctxt)
+	  Term.f_let vs d (tr_ctxt tvm bv ctxt)
 	with NotFO -> 
-	  tr_ctxt tv bv ctxt
+	  tr_ctxt tvm bv ctxt
 	end
   in
   let f = tr_ctxt Idmap.empty Idmap.empty (List.rev (pf_hyps gl)) in
@@ -699,6 +702,6 @@ let _ =
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. coq-plugin-opt-yes"
+compile-command: "unset LANG; make -C ../.. src/coq-plugin/whytac.cmxs"
 End:
 *)
