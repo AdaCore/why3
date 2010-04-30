@@ -23,6 +23,19 @@ Goal p O.
 why.
 Qed.
 
+Definition eq (A:Set) (x y : A) := x=y.
+
+Goal eq nat O O.
+why.
+Admitted.
+
+Parameter mem : forall (A:Set), A -> list A -> Prop.
+
+Definition q (A:Set) (x:A) (y:list A) := mem A x y.
+
+Goal q nat O (cons O nil).
+(*why.*)
+Admitted.
 
 (* function definition *)
 
@@ -36,6 +49,9 @@ Definition id A (x:A) := x.
 
 Goal id nat O = O.
 why.
+Qed.
+
+(* inductive types *)
 
 Parameter P : (nat -> nat) -> Prop.
 
@@ -49,8 +65,6 @@ Goal  forall (a:Set), forall x:Z, x=1 -> P S -> let y := 2 in x+1=y.
 intros.
 why.
 Qed.
-
-(* Inductive types *)
 
 Goal  forall x: list nat, x=x.
 intros.

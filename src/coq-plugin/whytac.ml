@@ -170,6 +170,11 @@ let rec skip_k_args k cl = match k, cl with
 let global_ts = ref Refmap.empty 
 let global_ls = ref Refmap.empty
 
+(* polymorphic arity (i.e. number of type variables) *)
+let poly_arity = ref Mls.empty
+let add_poly_arith ls n = poly_arity := Mls.add ls n !poly_arity
+let get_poly_arity ls = assert (Mls.mem ls !poly_arity); Mls.find ls !poly_arity
+
 (* ident -> decl *)
 let global_decl = ref Ident.Mid.empty
 
@@ -193,9 +198,12 @@ let add_dep r v = r := Decl.Sdecl.add v !r
 let () =
   Summary.declare_summary "Why globals"
     { Summary.freeze_function = 
-	(fun () -> !global_ts, !global_ls);
+	(fun () -> 
+	   !global_ts, !global_ls, !poly_arity, !global_decl, !global_dep);
       Summary.unfreeze_function = 
-	(fun (ts,ls) -> global_ts := ts; global_ls := ls);
+	(fun (ts,ls,pa,gdecl,gdep) -> 
+	   global_ts := ts; global_ls := ls; poly_arity := pa;
+	   global_decl := gdecl; global_dep := gdep);
       Summary.init_function = 
 	(fun () -> ());
       Summary.survive_module = true;
@@ -370,6 +378,7 @@ and tr_global_ts dep env r =
 	      let ls = Term.create_lsymbol id l (Some tyj) in
 	      all_ids := ls.Term.ls_name :: !all_ids;
 	      add_table global_ls r (Some ls);
+	      add_poly_arith ls (List.length vars);
 	      ls
 	    in
 	    let ls = Array.to_list (Array.mapi mk_constructor oib.mind_nf_lc) in
@@ -387,6 +396,7 @@ and tr_global_ts dep env r =
 	  global_dep := Decl.Mdecl.add decl !dep' !global_dep;
 	  lookup_table global_ts r
 
+(* the function/predicate symbol for r *)
 and tr_task_ls dep env r = 
   let ls = tr_global_ls dep env r in
   assert (Ident.Mid.mem ls.ls_name !global_decl);
@@ -394,6 +404,7 @@ and tr_task_ls dep env r =
   add_local_decls d;
   ls
 
+(* the function/predicate symbol declaration for r *)
 and tr_global_ls dep env r =
   try
     lookup_table global_ls r
@@ -420,6 +431,7 @@ and tr_global_ls dep env r =
 	  raise NotFO
     in
     add_table global_ls r (Some ls);
+    add_poly_arith ls (List.length vars);
     (* is it defined? *)
     let ld = match r with
       | ConstRef c -> begin match (Global.lookup_constant c).const_body with
@@ -463,7 +475,8 @@ and decomp_lambdas _dep _tvm env vars t =
   in
   loop Idmap.empty [] env vars t
 
-(* assumption: t:T:Set *)
+(* translation of a Coq term
+   assumption: t:T:Set *)
 and tr_term dep tvm bv env t =
   try
     tr_arith_constant t
@@ -519,9 +532,11 @@ and tr_term dep tvm bv env t =
 	let r = global_of_constr f in
 	let ls = tr_task_ls dep env r in
 	begin match ls.Term.ls_value with
-	  | Some ty ->
-	      let k = 0 (* TODO: polymorphic arity *) in
+	  | Some _ ->
+	      let k = get_poly_arity ls in
 	      let cl = skip_k_args k cl in
+	      let ty = type_of env Evd.empty t in
+	      let ty = tr_type dep tvm env ty in
 	      Term.t_app ls (List.map (tr_term dep tvm bv env) cl) ty
 	  | None  ->
 	      raise NotFO
@@ -552,6 +567,8 @@ and quantifiers n a b dep tvm bv env =
   let bv = Idmap.add id vs bv in
   vs, t, bv, env, b
 
+(* translation of a Coq formula
+   assumption f:Prop *)
 and tr_formula dep tvm bv env f =
   let c, args = decompose_app f in
   match kind_of_term c, args with
@@ -619,14 +636,15 @@ and tr_formula dep tvm bv env f =
 	      Term.f_exists [vs] [] (tr_formula dep tvm bv env b)
 	  | _ ->
 	      (* unusual case of the shape (ex p) *)
-	      raise NotFO (* TODO: we could eta-expanse *)
+	      (* TODO: we could eta-expanse *)
+	      raise NotFO 
 	end
     | _ ->
-	let r = global_of_constr c in
+	let r = global_of_constr c in (*TODO: may fail *)
 	let ls = tr_task_ls dep env r in
 	begin match ls.Term.ls_value with
 	  | None ->
-	      let k = 0 (*TODO: polymorphic arity*) in
+	      let k = get_poly_arity ls in
 	      let args = skip_k_args k args in
 	      Term.f_app ls (List.map (tr_term dep tvm bv env) args)
 	  | Some _ ->
