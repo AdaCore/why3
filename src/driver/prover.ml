@@ -56,11 +56,18 @@ let print_task drv fmt task =
   let printer = try lookup_printer p with
     Not_found -> errorm "unknown printer %s" p
   in
-  let lookup t = try lookup_transform t with
+  let lookup t = try t, lookup_transform t with
     Not_found -> errorm "unknown transformation %s" t
   in
   let transl = List.map lookup (get_transform drv) in
-  let apply task tr = Register.apply_driver tr drv task in
+  let apply task (s, tr) = 
+    try
+      Register.apply_driver tr drv task 
+    with e ->
+      Format.eprintf "failure in transformation %s: %s@." 
+	s (Printexc.to_string e);
+      raise e
+  in
   let task = List.fold_left apply task transl in
   let printer = printer (driver_query drv task) in
   fprintf fmt "@[%a@]@?" printer task

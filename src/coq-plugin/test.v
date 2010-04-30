@@ -30,8 +30,10 @@ Qed.
 Definition eq (A:Set) (x y : A) := x=y.
 
 Goal eq nat O O.
+why "z3".
+ae.
 (*
-why "z3".  (* BUG transformation ici ? *)
+why "z3".  (* BUG encoding decorate ici ? *)
 Qed.
 *)
 Admitted.

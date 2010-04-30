@@ -70,7 +70,7 @@ let rec print_term drv fmt t = match t.t_node with
       | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] -> fprintf fmt "@[%a@]" print_ident ls.ls_name
-          | _ -> fprintf fmt "@[(%a %a)@]" 
+          | _ -> fprintf fmt "@[(%a@ %a)@]" 
 	      print_ident ls.ls_name (print_list space (print_term drv)) tl
         end end
   | Tlet (t1, tb) ->
@@ -93,7 +93,7 @@ and print_fmla drv fmt f = match f.f_node with
       | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] -> fprintf fmt "%a" print_ident ls.ls_name
-          | _ -> fprintf fmt "(%a %a)" 
+          | _ -> fprintf fmt "(%a@ %a)" 
 	      print_ident ls.ls_name (print_list space (print_term drv)) tl 
         end end
   | Fquant (q, fq) ->
@@ -109,14 +109,14 @@ and print_fmla drv fmt f = match f.f_node with
       forall fmt vl;
       List.iter forget_var vl
   | Fbinop (Fand, f1, f2) ->
-      fprintf fmt "@[(and@ %a %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
+      fprintf fmt "@[(and@ %a@ %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
   | Fbinop (For, f1, f2) ->
-      fprintf fmt "@[(or@ %a %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
+      fprintf fmt "@[(or@ %a@ %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
   | Fbinop (Fimplies, f1, f2) ->
-      fprintf fmt "@[(implies@ %a %a)@]" 
+      fprintf fmt "@[(implies@ %a@ %a)@]" 
         (print_fmla drv) f1 (print_fmla drv) f2
   | Fbinop (Fiff, f1, f2) ->
-      fprintf fmt "@[(iff@ %a %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
+      fprintf fmt "@[(iff@ %a@ %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
   | Fnot f ->
       fprintf fmt "@[(not@ %a)@]" (print_fmla drv) f
   | Ftrue ->
@@ -192,7 +192,7 @@ let print_decl drv fmt d = match d.d_node with
 let print_decl drv fmt = catch_unsupportedDecl (print_decl drv fmt)
 
 let print_task drv fmt task = 
-  fprintf fmt "(benchmark toto@\n" 
+  fprintf fmt "(benchmark why3@\n" 
     (*print_ident (Task.task_goal task).pr_name*);
   fprintf fmt "  :status unknown@\n";
   Driver.print_full_prelude drv task fmt;

@@ -1,6 +1,13 @@
 
 (* test file *)
 
+theory Test_inline_trivial
+  type t
+  logic c : t
+  logic eq(x:'a, y:'a) = x=y
+  goal G : eq(c,c)
+end
+
 theory Test_encoding
   use import int.Int
   logic id(x: int) : int = x
