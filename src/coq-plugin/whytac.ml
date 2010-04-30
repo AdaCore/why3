@@ -414,51 +414,58 @@ and tr_global_ls dep env r =
     let ty = Global.type_of_global r in
     let (tvm, vars), env, t = decomp_type_quantifiers env ty in
     if is_Set t || is_Type t then raise NotFO;
-    let id = preid_of_id (Nametab.id_of_global r) in
     let l, t = decompose_arrows t in
-    let args = List.map (tr_type dep' tvm env) l in
-    let ls = 
-      if is_Prop t then 
-	(* predicate definition *)
-	create_lsymbol id args None
-      else
-	let s = type_of env Evd.empty t in
-	if is_Set s || is_Type s then 
-	  (* function definition *)
-	  let ty = tr_type dep' tvm env t in
-	  create_lsymbol id args (Some ty)
-	else
+    match r with
+      | ConstructRef _ ->
+	  if is_Prop t then raise NotFO; (*TODO? *)
+	  let s = type_of env Evd.empty t in
+	  if not (is_Set s || is_Type s) then raise NotFO;
+	  ignore (tr_type dep' tvm env t);
+	  lookup_table global_ls r
+      | ConstRef c ->
+	  let id = preid_of_id (Nametab.id_of_global r) in
+	  let args = List.map (tr_type dep' tvm env) l in
+	  let ls = 
+	    if is_Prop t then 
+	      (* predicate definition *)
+	      create_lsymbol id args None
+	    else
+	      let s = type_of env Evd.empty t in
+	      if is_Set s || is_Type s then 
+		(* function definition *)
+		let ty = tr_type dep' tvm env t in
+		create_lsymbol id args (Some ty)
+	      else
+		raise NotFO
+	  in
+	  add_table global_ls r (Some ls);
+	  add_poly_arith ls (List.length vars);
+	  (* is it defined? *)
+	  let ld = match (Global.lookup_constant c).const_body with
+	    | Some b ->
+		let b = force b in
+		let tvm, env, b = decomp_type_lambdas env vars b in
+		let (bv, vsl), env, b = decomp_lambdas dep' tvm env args b in
+		begin match ls.ls_value with
+		  | None -> 
+		      let b = tr_formula dep' tvm bv env b in
+		      Decl.make_ps_defn ls vsl b
+		  | Some _ ->
+		      let b = tr_term dep' tvm bv env b in
+		      Decl.make_fs_defn ls vsl b
+		end
+	    | None ->
+		ls, None
+	  in
+	  let decl = Decl.create_logic_decl [ld] in
+	  add_dep dep decl;
+	  add_table global_ls r (Some ls);
+	  global_decl := Ident.Mid.add ls.ls_name decl !global_decl;
+	  global_dep := Decl.Mdecl.add decl !dep' !global_dep;
+	  ls
+      | VarRef _ | IndRef _ ->
 	  raise NotFO
-    in
-    add_table global_ls r (Some ls);
-    add_poly_arith ls (List.length vars);
-    (* is it defined? *)
-    let ld = match r with
-      | ConstRef c -> begin match (Global.lookup_constant c).const_body with
-	  | Some b ->
-	      let b = force b in
-	      let tvm, env, b = decomp_type_lambdas env vars b in
-	      let (bv, vsl), env, b = decomp_lambdas dep' tvm env args b in
-	      begin match ls.ls_value with
-		| None -> 
-		    let b = tr_formula dep' tvm bv env b in
-		    Decl.make_ps_defn ls vsl b
-		| Some _ ->
-		    let b = tr_term dep' tvm bv env b in
-		    Decl.make_fs_defn ls vsl b
-	      end
-	  | None ->
-	      ls, None
-	end
-      | _ ->
-	  ls, None
-    in
-    let decl = Decl.create_logic_decl [ld] in
-    add_dep dep decl;
-    add_table global_ls r (Some ls);
-    global_decl := Ident.Mid.add ls.ls_name decl !global_decl;
-    global_dep := Decl.Mdecl.add decl !dep' !global_dep;
-    ls
+
 
 and decomp_lambdas _dep _tvm env vars t =
   let rec loop bv vsl env vars t = match vars, kind_of_term t with

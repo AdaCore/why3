@@ -10,24 +10,28 @@ Definition t := list.
 Inductive foo : Set :=
   C : t nat -> foo.
 
+(*
 Goal forall x:foo, x=x.
 intros.
 why.
 Qed.
+*)
 
 (* predicate definition *)
 
 Definition p (x:nat) := x=O.
 
+(*
 Goal p O.
 why.
 Qed.
+*)
 
 Definition eq (A:Set) (x y : A) := x=y.
 
 Goal eq nat O O.
-why.
-Admitted.
+why. (* BUG transformations ? *)
+Qed.
 
 Parameter mem : forall (A:Set), A -> list A -> Prop.
 
