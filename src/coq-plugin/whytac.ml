@@ -400,52 +400,60 @@ and tr_global_ls dep env r =
   with Not_found ->
     add_table global_ls r None;
     let dep' = empty_dep () in
-    assert false (*TODO*)
-    (****
     let ty = Global.type_of_global r in
-    let tv, env, t = decomp_type_quantifiers env ty in
+    let (tvm, vars), env, t = decomp_type_quantifiers env ty in
     if is_Set t || is_Type t then raise NotFO;
     let id = preid_of_id (Nametab.id_of_global r) in
     let l, t = decompose_arrows t in
-    let l = List.map (tr_type dep' tv env) l in
-    if is_Prop t then begin (* predicate *)
-      let ls = create_lsymbol id l None in
-      add_table global_ls r (Some ls);
-      begin match r with
-	| ConstRef c -> begin match (Global.lookup_constant c).const_body with
-	    | Some b ->
-		let b = force b in
-		let (tv, _), env, b = decomp_type_lambdas env b in
-		let (bv, vars), env, b = decomp_lambdas dep tv env b in
-		assert false (*TODO*)
-	  end
-      end;
-      ls
-    end else
-      let s = Typing.type_of env Evd.empty t in
-      if is_Set s || is_Type s then begin (* function *)
-	
-      end else 
-	raise NotFO
-    ****)
-
-and decomp_lambdas dep tvm env t =
-  let rec loop vars t = match kind_of_term t with
-    | Lambda (n, a, t) ->
-	loop ((n,a) :: vars) t
-    | _ ->
-	let vars', env = coq_rename_vars env vars in
-	let t = substl (List.map mkVar vars') t in
-	let vars = List.combine vars' vars in
-	let add m (id,(_,t)) = 
-	  let ty = tr_type dep tvm env t in
-	  let v = Term.create_vsymbol (preid_of_id id) ty in
-	  Idmap.add id v m, v 
+    let args = List.map (tr_type dep' tvm env) l in
+    let ls, decl = 
+      if is_Prop t then begin 
+	(* predicate definition *)
+	let ls = create_lsymbol id args None in
+	add_table global_ls r (Some ls);
+	let ld = match r with
+	  | ConstRef c -> begin match (Global.lookup_constant c).const_body with
+	      | Some b ->
+		  let b = force b in
+		  let tvm, env, b = decomp_type_lambdas env vars b in
+		  let (bv, vsl), env, b = decomp_lambdas dep' tvm env args b in
+		  let b = tr_formula dep' tvm bv env b in
+		  Decl.make_ps_defn ls vsl b
+	      | None ->
+		  ls, None
+	    end
+	  | _ ->
+	      ls, None
 	in
-	Util.map_fold_left add Idmap.empty vars, env, t
-  in
-  loop [] t
+	ls, Decl.create_logic_decl [ld]
+      end else
+	let s = type_of env Evd.empty t in
+	if is_Set s || is_Type s then begin 
+	  (* function definition *)
+	  assert false (*TODO*)
+	end else 
+	  raise NotFO
+    in
+    add_dep dep decl;
+    add_table global_ls r (Some ls);
+    global_decl := Ident.Mid.add ls.ls_name decl !global_decl;
+    global_dep := Decl.Mdecl.add decl !dep' !global_dep;
+    ls
 
+and decomp_lambdas _dep _tvm env vars t =
+  let rec loop bv vsl env vars t = match vars, kind_of_term t with
+    | [], _ -> 
+	(bv, List.rev vsl), env, t
+    | ty :: vars, Lambda (n, a, t) ->
+	let id, env = coq_rename_var env (n, a) in
+	let t = subst1 (mkVar id) t in
+	let vs = create_vsymbol (preid_of_id id) ty in
+	let bv = Idmap.add id vs bv in
+	loop bv (vs :: vsl) env vars t
+    | _ ->
+	assert false (*TODO: eta-expansion*)
+  in
+  loop Idmap.empty [] env vars t
 
 (* assumption: t:T:Set *)
 and tr_term dep tvm bv env t =
@@ -500,21 +508,17 @@ and tr_term dep tvm bv env t =
 	Term.t_var (Idmap.find id bv)
     | _ ->
 	let f, cl = decompose_app t in
-	begin try
-	  let r = global_of_constr f in
-	  let ls = tr_task_ls dep env r in
-	  begin match ls.Term.ls_value with
-	    | Some ty ->
-		let k = 0 (* TODO: polymorphic arity *) in
-	  	let cl = skip_k_args k cl in
-		Term.t_app ls (List.map (tr_term dep tvm bv env) cl) ty
-	    | None  ->
-		raise NotFO
-	  end
-	with
-	  | NotFO -> 
-	      (* we need to abstract some part of (f cl) *)
-	      assert false (*TODO*)
+	let r = global_of_constr f in
+	let ls = tr_task_ls dep env r in
+	begin match ls.Term.ls_value with
+	  | Some ty ->
+	      let k = 0 (* TODO: polymorphic arity *) in
+	      let cl = skip_k_args k cl in
+	      Term.t_app ls (List.map (tr_term dep tvm bv env) cl) ty
+	  | None  ->
+	      raise NotFO
+	end
+        (* TODO: we could abstract some part of (f cl) when not FO *)
 (* 	      let rec abstract app = function *)
 (* 	  	| [] -> *)
 (* 	  	    Fol.App (make_term_abstraction tv env app, []) *)
@@ -530,7 +534,6 @@ and tr_term dep tvm bv env t =
 (* 	  	| x :: l -> applist (f, [x]), l | [] -> raise NotFO *)
 (* 	      in *)
 (* 	      abstract app l *)
-	end
 	  
 and quantifiers n a b dep tvm bv env =
   let vars, env = coq_rename_vars env [n,a] in
@@ -610,22 +613,17 @@ and tr_formula dep tvm bv env f =
 	      (* unusual case of the shape (ex p) *)
 	      raise NotFO (* TODO: we could eta-expanse *)
 	end
-	  (*
-	    | _ ->
-	    begin try
-	    let r = global_of_constr c in
-	    match tr_global env r with
-	    | DeclPred (s, k, _) ->
-	    let args = skip_k_args k args in
-	    Fatom (Pred (s, List.map (tr_term dep tvm bv env) args))
-	    | _ ->
-	    raise NotFO
-	    with Not_found ->
-	    raise NotFO
-	    end
-	  *)
-    | _ -> 
-	raise NotFO (*TODO*)
+    | _ ->
+	let r = global_of_constr c in
+	let ls = tr_task_ls dep env r in
+	begin match ls.Term.ls_value with
+	  | None ->
+	      let k = 0 (*TODO: polymorphic arity*) in
+	      let args = skip_k_args k args in
+	      Term.f_app ls (List.map (tr_term dep tvm bv env) args)
+	  | Some _ ->
+	      raise NotFO
+	end
 
 let tr_goal gl =
   local_decl := Decl.Sdecl.empty;

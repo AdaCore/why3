@@ -15,13 +15,21 @@ intros.
 why.
 Qed.
 
+(* predicate definition *)
+
+Definition p (x:nat) := x=O.
+
+Goal p O.
+why.
+Qed.
+
+
+(* function definition *)
 
 Definition id A (x:A) := x.
 
-(*
 Goal id nat O = O.
 why.
-*)
 
 Parameter P : (nat -> nat) -> Prop.
 
