@@ -732,43 +732,6 @@ let whytac s gl =
   with NotFO ->
     error "Not a first order goal"
 
-(***
-let _ =
-  Tacinterp.overwriting_add_tactic "Why" (fun s -> whytac s);
-  Egrammar.extend_tactic_grammar "Why" [[Egrammar.TacTerm "why"]]
-***)
-
-open Pcoq
-let h_Why s =
-  Refiner.abstract_extended_tactic "Why"
-    [Genarg.in_gen Genarg.wit_string s] (whytac s)
-let _ =
-  try
-    let _ =
-      Tacinterp.add_tactic "Why"
-        (function
-           [s] when Genarg.genarg_tag s = Genarg.StringArgType && true ->
-             let s = Genarg.out_gen Genarg.wit_string s in whytac s
-         | _ -> failwith "Tactic extension: cannot occur")
-    in
-    List.iter
-      (fun s ->
-         Tacinterp.add_primitive_tactic s
-           (Tacexpr.TacAtom
-              (dummy_loc, Tacexpr.TacExtend (dummy_loc, s, []))))
-      []
-  with e -> pp (Cerrors.explain_exn e)
-let _ =
-  Egrammar.extend_tactic_grammar "Why"
-    [[Egrammar.TacTerm "why";
-      Egrammar.TacNonTerm
-        (dummy_loc,
-         (Gramext.Snterm (Pcoq.Gram.Entry.obj Prim.string),
-          Genarg.StringArgType),
-         Some "s")]]
-let _ =
-  List.iter Pptactic.declare_extra_tactic_pprule
-    ["Why", [Genarg.StringArgType], (0, [Some "why"; None])]
 
 (*
 Local Variables:
