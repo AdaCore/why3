@@ -430,7 +430,13 @@ and tr_global_ls dep env r =
 	let s = type_of env Evd.empty t in
 	if is_Set s || is_Type s then begin 
 	  (* function definition *)
-	  assert false (*TODO*)
+	  let ty = tr_type dep' tvm env t in
+	  let ls = create_lsymbol id args (Some ty) in
+	  add_table global_ls r (Some ls);
+	  let ld = match r with
+	    | _ -> ls, None (*TODO*) 
+	  in
+	  ls, Decl.create_logic_decl [ld]
 	end else 
 	  raise NotFO
     in
