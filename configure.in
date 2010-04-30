@@ -211,6 +211,8 @@ else
     fi
 fi
 
+AC_CHECK_PROG(CAMLP5O,camlp5o,camlp5o,no)
+
 # checking for sqlite3
 if test "$enable_proof_manager" = yes ; then
 AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_proof_manager=no)
@@ -253,8 +255,8 @@ fi
 if test "$enable_coq_support" = yes; then
    AC_CHECK_FILE($COQLIB/kernel/term.cmi,,enable_coq_support=no)
 fi
-if test "$enable_coq_support" = yes; then
-   AC_CHECK_FILE($OCAMLLIB/camlp5/gramext.cmi,,enable_coq_support=no)
+if test "$CAMLP5O" = no; then
+   enable_coq_support=no
 fi
 
 #Viewer for ps and pdf
@@ -288,6 +290,8 @@ dnl AC_SUBST(OCAMLV)
 dnl AC_SUBST(FORPACK)
 dnl AC_SUBST(OCAMLGRAPHLIB)
 dnl AC_SUBST(OCAMLWEB)
+
+AC_SUBST(CAMLP5O)
 
 AC_SUBST(enable_ide)
 AC_SUBST(enable_plugins)

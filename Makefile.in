@@ -52,9 +52,9 @@ OCAMLYACC = @OCAMLYACC@
 OCAMLDOC  = @OCAMLDOC@
 OCAMLLIB  = @OCAMLLIB@
 OCAMLBEST = @OCAMLBEST@
-#CAMLP4   = @CAMLP4O@
-
 OCAMLVERSION = @OCAMLVERSION@
+
+CAMLP5O   = @CAMLP5O@
 
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
@@ -338,24 +338,53 @@ clean::
 # Coq plugin
 ##############
 
+COQGENERATED = src/coq-plugin/g_whytac.ml
+
+COQ_FILES = whytac g_whytac
+
+COQMODULES = $(addprefix src/coq-plugin/, $(COQ_FILES))
+
+COQML  = $(addsuffix .ml,  $(COQMODULES))
+COQCMO = $(addsuffix .cmo, $(COQMODULES))
+COQCMX = $(addsuffix .cmx, $(COQMODULES))
+
+COQTREES = kernel lib interp parsing proofs pretyping tactics library toplevel
+COQINCLUDES = -I src/coq-plugin $(addprefix -I @COQLIB@/, $(COQTREES))
+
+$(COQCMO) $(COQCMX): INCLUDES = $(COQINCLUDES)
+
 ifeq (@enable_coq_support@,yes)
 byte: src/coq-plugin/whytac.cma
 opt:  src/coq-plugin/whytac.cmxs
 endif
 
-COQTREES = kernel lib interp parsing proofs pretyping tactics library toplevel
-
-src/coq-plugin/whytac.cma:  INCLUDES = $(addprefix -I @COQLIB@/, $(COQTREES))
-src/coq-plugin/whytac.cmxs: INCLUDES = $(addprefix -I @COQLIB@/, $(COQTREES))
-
 src/coq-plugin/whytac.cma:  BFLAGS+=-rectypes -I +camlp5
 src/coq-plugin/whytac.cmxs: OFLAGS+=-rectypes -I +camlp5
 
-src/coq-plugin/whytac.cmxs: src/why.cmxa src/coq-plugin/whytac.ml
+src/coq-plugin/whytac.cmxs: src/why.cmxa $(COQCMX)
 	$(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
 
-src/coq-plugin/whytac.cma: src/why.cma src/coq-plugin/whytac.ml
+src/coq-plugin/whytac.cma: src/why.cma $(COQCMO)
 	$(OCAMLC) -a $(BFLAGS) -o $@ $^
+
+src/coq-plugin/g_whytac.ml: src/coq-plugin/g_whytac.ml4
+	$(CAMLP5O) pr_o.cmo @COQLIB@/parsing/grammar.cma -impl $^ -o $@
+
+# depend and clean targets
+
+include .depend.coq
+
+.depend.coq: $(COQGENERATED)
+	$(OCAMLDEP) -slash -I src -I src/coq-plugin $(COQML) > $@
+
+depend: .depend.coq
+
+clean::
+	rm -f src/coq-plugin/*.cm[iox] src/coq-plugin/*.o
+	rm -f src/coq-plugin/*.cma src/coq-plugin/*.cmxs
+	rm -f src/coq-plugin/*.annot src/coq-plugin/*~
+	rm -f $(COQGENERATED)
+	rm -f .depend.coq
 
 #######
 # tools
