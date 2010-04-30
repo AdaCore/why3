@@ -406,40 +406,42 @@ and tr_global_ls dep env r =
     let id = preid_of_id (Nametab.id_of_global r) in
     let l, t = decompose_arrows t in
     let args = List.map (tr_type dep' tvm env) l in
-    let ls, decl = 
-      if is_Prop t then begin 
+    let ls = 
+      if is_Prop t then 
 	(* predicate definition *)
-	let ls = create_lsymbol id args None in
-	add_table global_ls r (Some ls);
-	let ld = match r with
-	  | ConstRef c -> begin match (Global.lookup_constant c).const_body with
-	      | Some b ->
-		  let b = force b in
-		  let tvm, env, b = decomp_type_lambdas env vars b in
-		  let (bv, vsl), env, b = decomp_lambdas dep' tvm env args b in
-		  let b = tr_formula dep' tvm bv env b in
-		  Decl.make_ps_defn ls vsl b
-	      | None ->
-		  ls, None
-	    end
-	  | _ ->
-	      ls, None
-	in
-	ls, Decl.create_logic_decl [ld]
-      end else
+	create_lsymbol id args None
+      else
 	let s = type_of env Evd.empty t in
-	if is_Set s || is_Type s then begin 
+	if is_Set s || is_Type s then 
 	  (* function definition *)
 	  let ty = tr_type dep' tvm env t in
-	  let ls = create_lsymbol id args (Some ty) in
-	  add_table global_ls r (Some ls);
-	  let ld = match r with
-	    | _ -> ls, None (*TODO*) 
-	  in
-	  ls, Decl.create_logic_decl [ld]
-	end else 
+	  create_lsymbol id args (Some ty)
+	else
 	  raise NotFO
     in
+    add_table global_ls r (Some ls);
+    (* is it defined? *)
+    let ld = match r with
+      | ConstRef c -> begin match (Global.lookup_constant c).const_body with
+	  | Some b ->
+	      let b = force b in
+	      let tvm, env, b = decomp_type_lambdas env vars b in
+	      let (bv, vsl), env, b = decomp_lambdas dep' tvm env args b in
+	      begin match ls.ls_value with
+		| None -> 
+		    let b = tr_formula dep' tvm bv env b in
+		    Decl.make_ps_defn ls vsl b
+		| Some _ ->
+		    let b = tr_term dep' tvm bv env b in
+		    Decl.make_fs_defn ls vsl b
+	      end
+	  | None ->
+	      ls, None
+	end
+      | _ ->
+	  ls, None
+    in
+    let decl = Decl.create_logic_decl [ld] in
     add_dep dep decl;
     add_table global_ls r (Some ls);
     global_decl := Ident.Mid.add ls.ls_name decl !global_decl;

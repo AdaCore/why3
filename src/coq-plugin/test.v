@@ -26,6 +26,12 @@ Qed.
 
 (* function definition *)
 
+Definition f (x:Z) (y:Z) := x+y.
+
+Goal f 1 2 = 3.
+why.
+Qed.
+
 Definition id A (x:A) := x.
 
 Goal id nat O = O.
