@@ -3,6 +3,8 @@ Require Export ZArith.
 Open Scope Z_scope.
 Require Export List.
 
+Ltac ae := why "alt-ergo".
+
 (* type definitions *)
 
 Definition t := list.
@@ -10,28 +12,27 @@ Definition t := list.
 Inductive foo : Set :=
   C : t nat -> foo.
 
-(*
 Goal forall x:foo, x=x.
 intros.
-why.
+ae.
 Qed.
-*)
 
 (* predicate definition *)
 
 Definition p (x:nat) := x=O.
 
-(*
 Goal p O.
-why.
+ae.
 Qed.
-*)
 
 Definition eq (A:Set) (x y : A) := x=y.
 
 Goal eq nat O O.
-why. (* BUG transformations ? *)
+(*
+why "z3".  (* BUG transformation ici ? *)
 Qed.
+*)
+Admitted.
 
 Parameter mem : forall (A:Set), A -> list A -> Prop.
 
@@ -46,13 +47,13 @@ Admitted.
 Definition f (x:Z) (y:Z) := x+y.
 
 Goal f 1 2 = 3.
-why.
+ae.
 Qed.
 
 Definition id A (x:A) := x.
 
 Goal id nat O = O.
-why.
+ae.
 Qed.
 
 (* inductive types *)
@@ -62,17 +63,17 @@ Parameter P : (nat -> nat) -> Prop.
 Goal forall (a:Set), forall x:nat, x=S O -> P S -> 
   let y := (S (S O)) in S x=y.
 intros.
-why.
+ae.
 Qed.
 
 Goal  forall (a:Set), forall x:Z, x=1 -> P S -> let y := 2 in x+1=y.
 intros.
-why.
+ae.
 Qed.
 
 Goal  forall x: list nat, x=x.
 intros.
-why.
+ae.
 Qed.
 
 (* Mutually inductive types *)
@@ -86,7 +87,7 @@ with forest : Set :=
   | Cons : tree -> forest -> forest.
 
 Goal forall x : tree, x=x.
-why.
+ae.
 Qed.
 
 (* Polymorphic, Mutually inductive types *)
@@ -100,7 +101,7 @@ with pforest (a:Set) : Set :=
   | PCons : ptree a -> pforest a -> pforest a.
 
 Goal forall x : ptree Z, x=x.
-why.
+ae.
 Qed.
 
 (* the same, without parameters *)
@@ -114,6 +115,6 @@ with pforest' : Type -> Type :=
   | PCons' : forall (a:Type), ptree' a -> pforest' a -> pforest' a.
 
 Goal forall x : ptree' Z, x=x.
-why.
+ae.
 Qed.
 

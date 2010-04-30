@@ -253,6 +253,9 @@ fi
 if test "$enable_coq_support" = yes; then
    AC_CHECK_FILE($COQLIB/kernel/term.cmi,,enable_coq_support=no)
 fi
+if test "$enable_coq_support" = yes; then
+   AC_CHECK_FILE($OCAMLLIB/camlp5/gramext.cmi,,enable_coq_support=no)
+fi
 
 #Viewer for ps and pdf
 dnl AC_CHECK_PROGS(PSVIEWER,gv evince)

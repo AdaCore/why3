@@ -343,13 +343,13 @@ byte: src/coq-plugin/whytac.cma
 opt:  src/coq-plugin/whytac.cmxs
 endif
 
-COQTREES = kernel lib interp parsing proofs pretyping tactics library
+COQTREES = kernel lib interp parsing proofs pretyping tactics library toplevel
 
 src/coq-plugin/whytac.cma:  INCLUDES = $(addprefix -I @COQLIB@/, $(COQTREES))
 src/coq-plugin/whytac.cmxs: INCLUDES = $(addprefix -I @COQLIB@/, $(COQTREES))
 
-src/coq-plugin/whytac.cma:  BFLAGS+=-rectypes
-src/coq-plugin/whytac.cmxs: OFLAGS+=-rectypes
+src/coq-plugin/whytac.cma:  BFLAGS+=-rectypes -I +camlp5
+src/coq-plugin/whytac.cmxs: OFLAGS+=-rectypes -I +camlp5
 
 src/coq-plugin/whytac.cmxs: src/why.cmxa src/coq-plugin/whytac.ml
 	$(OCAMLOPT) $(OFLAGS) -o $@ -shared $^

@@ -24,17 +24,22 @@ let debug =
 
 let config = Whyconf.read_config None
 
-let env = Env.create_env (Typing.retrieve config.loadpath)
-    
-let config_prover = 
-  try Util.Mstr.find "alt-ergo" config.provers 
-  with Not_found -> assert false
-
-let drv = Driver.load_driver env config_prover.driver
-let command = config_prover.command
 let timelimit = match config.timelimit with
   | None -> 3
   | Some t -> t
+
+let env = Env.create_env (Typing.retrieve config.loadpath)
+    
+let provers = Hashtbl.create 17
+
+let get_prover s = 
+  try 
+    Hashtbl.find provers s 
+  with Not_found -> 
+    let cp = Util.Mstr.find s config.provers in
+    let drv = Driver.load_driver env cp.driver in
+    Hashtbl.add provers s (cp, drv);
+    cp, drv
 
 (* Coq constants *)
 let logic_dir = ["Coq";"Logic";"Decidable"]
@@ -705,12 +710,14 @@ let tr_goal gl =
   task := Task.add_prop_decl !task Decl.Pgoal pr f
 
 
-let whytac gl =
+let whytac s gl =
   let concl_type = pf_type_of gl (pf_concl gl) in
   if not (is_Prop concl_type) then error "Conclusion is not a Prop";
   task := Task.use_export None Theory.builtin_theory;
   try
     tr_goal gl;
+    let cp, drv = get_prover s in
+    let command = cp.command in
     if debug then Format.printf "@[%a@]@\n---@." Pretty.print_task !task;
     if debug then Format.printf "@[%a@]@\n---@." (Prover.print_task drv) !task;
     let res = Prover.prove_task ~debug ~command ~timelimit drv !task () in
@@ -725,11 +732,43 @@ let whytac gl =
   with NotFO ->
     error "Not a first order goal"
 
-
+(***
 let _ =
-  Tacinterp.overwriting_add_tactic "Why" (fun _ -> whytac);
+  Tacinterp.overwriting_add_tactic "Why" (fun s -> whytac s);
   Egrammar.extend_tactic_grammar "Why" [[Egrammar.TacTerm "why"]]
+***)
 
+open Pcoq
+let h_Why s =
+  Refiner.abstract_extended_tactic "Why"
+    [Genarg.in_gen Genarg.wit_string s] (whytac s)
+let _ =
+  try
+    let _ =
+      Tacinterp.add_tactic "Why"
+        (function
+           [s] when Genarg.genarg_tag s = Genarg.StringArgType && true ->
+             let s = Genarg.out_gen Genarg.wit_string s in whytac s
+         | _ -> failwith "Tactic extension: cannot occur")
+    in
+    List.iter
+      (fun s ->
+         Tacinterp.add_primitive_tactic s
+           (Tacexpr.TacAtom
+              (dummy_loc, Tacexpr.TacExtend (dummy_loc, s, []))))
+      []
+  with e -> pp (Cerrors.explain_exn e)
+let _ =
+  Egrammar.extend_tactic_grammar "Why"
+    [[Egrammar.TacTerm "why";
+      Egrammar.TacNonTerm
+        (dummy_loc,
+         (Gramext.Snterm (Pcoq.Gram.Entry.obj Prim.string),
+          Genarg.StringArgType),
+         Some "s")]]
+let _ =
+  List.iter Pptactic.declare_extra_tactic_pprule
+    ["Why", [Genarg.StringArgType], (0, [Some "why"; None])]
 
 (*
 Local Variables:
