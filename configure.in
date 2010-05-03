@@ -259,6 +259,18 @@ if test "$CAMLP5O" = no; then
    enable_coq_support=no
 fi
 
+# tptp2why
+
+AC_CHECK_PROG(MENHIR,menhir,menhir,no)
+
+if test "$MENHIR" = no; then
+  enable_tptp2why_support=no
+else
+  enable_tptp2why_support=yes
+fi
+
+
+
 #Viewer for ps and pdf
 dnl AC_CHECK_PROGS(PSVIEWER,gv evince)
 dnl AC_CHECK_PROGS(PDFVIEWER,xpdf acroread evince)
@@ -303,6 +315,9 @@ AC_SUBST(COQDEP)
 AC_SUBST(COQLIB)
 AC_SUBST(COQVERSION)
 
+AC_SUBST(MENHIR)
+AC_SUBST(enable_tptp2why_support)
+
 dnl AC_SUBST(PSVIEWER)
 dnl AC_SUBST(PDFVIEWER)
 
@@ -324,6 +339,7 @@ echo "Why IDE                 : $enable_ide"
 echo "Why plugins             : $enable_plugins"
 echo "Why proof manager       : $enable_proof_manager"
 echo "Coq support             : $enable_coq_support"
+echo "tptp2why support        : $enable_tptp2why_support"
 if test "$enable_coq_support" = "yes" ; then
    echo "    Version             : $COQVERSION"
    echo "    Lib                 : $COQLIB"
