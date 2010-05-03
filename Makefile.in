@@ -387,6 +387,61 @@ clean::
 	rm -f $(COQGENERATED)
 	rm -f .depend.coq
 
+########
+# Tptp2why
+########
+
+# TODO : autoconf
+MENHIR=/usr/bin/menhir
+
+TPTPGENERATED = src/tptp2why/tptp_parser.ml src/tptp2why/tptp_parser.mli \
+				src/tptp2why/tptp_parser.output src/tptp2why/tptp_lexer.ml
+
+TPTP_FILES = tptpTree tptp_parser tptp_lexer tptp2why
+TPTP_DIR=src/tptp2why/
+
+TPTPMODULES = $(addprefix $(TPTP_DIR), $(TPTP_FILES))
+
+TPTPML  = $(addsuffix .ml,  $(TPTPMODULES))
+TPTPMLI = $(addsuffix .mli, $(TPTPMODULES))
+TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
+TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
+
+$(TPTPCMO) $(TPTPCMX): INCLUDES = -I $(TPTP_DIR)
+
+# build targets
+
+byte: bin/tptp2why.byte
+opt:  bin/tptp2why.opt
+
+src/tptp2why/tptp_parser.ml src/tptp2why/tptp_parser.mli: src/tptp2why/tptpTree.cmi src/tptp2why/tptp_parser.mly
+	cd $(TPTP_DIR) && $(MENHIR) --infer tptp_parser.mly
+
+bin/tptp2why.opt: $(TPTPCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $^
+	$(STRIP) $@
+
+bin/tptp2why.byte: $(TPTPCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $^
+
+# depend and clean targets
+
+include .depend.tptp2why
+
+.depend.tptp2why: $(TPTPGENERATED)
+	$(OCAMLDEP) -slash -I src -I src/tptp2why $(TPTPML) $(TPTPMLI) > $@
+
+depend: .depend.tptp2why
+
+clean::
+	rm -f $(TPTPGENERATED)
+	rm -f src/tptp2why/*.cm[iox] src/tptp2why/*.o
+	rm -f src/tptp2why/*.annot src/tptp2why/*~
+	rm -f bin/tptp2why.byte bin/tptp2why.opt
+	rm -f .depend.tptp2why
+
 #######
 # tools
 #######

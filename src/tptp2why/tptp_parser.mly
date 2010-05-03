@@ -2,39 +2,38 @@
 %{
 
   open TptpTree
-  open Tptp_lexer
 
 %}
 
 
 (** set of tokens *)
 
-
-%token<int> INT
+%token<string> INT
 %token LPAREN RPAREN LBRACKET RBRACKET
 %token DOT COMMA COLON
 %token PIPE AND ARROW LRARROW EQUAL NEQUAL NOT
 %token BANG QUESTION
 %token QUOTE
 
-%token FOF AXIOM CONJECTURE UIDENT LIDENT
+%token<string> UIDENT
+%token<string> LIDENT
+%token FOF AXIOM CONJECTURE
+%token EOL EOF
 
-%token EOL
 
 
-
-%start<tptp> tptp
-%start<fmla> fmla
+%start<TptpTree.decl list> tptp
+%start<TptpTree.decl> decl
 
 %%
 
 tptp:
-| e = decl EOL es = decl*
+| e = decl EOL es = decl* EOF
   { e :: es }
 
 decl:
 | FOF LPAREN name = lident COMMA ty = decl_type COMMA f = fmla RPAREN DOT
-  { FOF (name, ty, f) }
+  { Fof (name, ty, f) }
 
 decl_type:
 | AXIOM { Axiom }
@@ -60,8 +59,8 @@ fmla:
 term:
 | atom = lident
   { TAtom atom }
-| atom = INT
-  { TAtom atom }
+| c = INT
+  { TConst c }
 | var = uident
   { TVar var }
 | funct = lident LPAREN terms = separated_list(COMMA, term) RPAREN

@@ -1,6 +1,7 @@
 
 {
-  type tok = FOF | CONJECTURE | AXIOM 
+  open Lexing
+  open Tptp_parser
 
   let keywords = Hashtbl.create 97
   let () =
@@ -45,26 +46,22 @@ rule token = parse
       { newline lexbuf; token lexbuf }
   | space+
       { token lexbuf }
-  | '_'
-      { UNDERSCORE }
   | lident as id
       { try Hashtbl.find keywords id with Not_found -> LIDENT id }
   | uident as id
       { UIDENT id }
   | int_literal as s
-      { INTEGER s }
+      { INT s }
   | "%"
-      { COMMENT; comment lexbuf }
+      { comment lexbuf }
   | "'"
-      { QUOTE }
-  | "\""
       { QUOTE }
   | ","
       { COMMA }
   | "("
-      { LEFTPAR }
+      { LPAREN }
   | ")"
-      { RIGHTPAR }
+      { RPAREN }
   | ":"
       { COLON }
   | "=>"
