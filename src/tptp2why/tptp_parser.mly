@@ -28,8 +28,10 @@
 %%
 
 tptp:
-| e = decl EOL es = decl* EOF
+| e = decl es = decl* EOF
   { e :: es }
+(*| error
+  { Printf.printf "%i\n" $endpos.Lexing.pos_lnum; assert false } *)
 
 decl:
 | FOF LPAREN name = lident COMMA ty = decl_type COMMA f = fmla RPAREN DOT

@@ -1,5 +1,6 @@
 
 {
+  open Format
   open Lexing
   open Tptp_parser
 
@@ -8,9 +9,9 @@
     List.iter
       (fun (x,y) -> Hashtbl.add keywords x y)
       [
-  "fof", FOF;
-  "conjecture", CONJECTURE;
-  "axiom", AXIOM
+        "fof", FOF;
+        "conjecture", CONJECTURE;
+        "axiom", AXIOM
       ]
 
   let newline lexbuf =
@@ -80,8 +81,18 @@ rule token = parse
       { LBRACKET }
   | "]"
       { RBRACKET }
+  | "!"
+      { BANG }
+  | "?"
+      { QUESTION }
+  | "&"
+      { AND }
+  | "~"
+      { NOT }
   | eof
       { EOF }
+  | _ as c
+      { eprintf "illegal character: %c@." c; exit 1 }
 and comment = parse (* read until newline *)
   | newline
     { token lexbuf }
