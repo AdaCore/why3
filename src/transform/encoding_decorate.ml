@@ -218,11 +218,23 @@ let conv_vs tenv tvar (vsvar,acc) vs =
       let tty = term_of_ty tenv tvar vs.vs_ty in
       let vsres = (create_vsymbol (id_clone vs.vs_name) ty_res) in
       let t = t_var vsres in 
-      t_app tenv.sort [tty;t] tenv.deco, vsres in              
+      t_app tenv.sort [tty;t] tenv.deco, vsres in
   (Mvs.add vs tres vsvar,vsres::acc)
+
+let conv_vs_let tenv vsvar vs =
+  let tres,vsres =
+    let ty_res = conv_ty_neg tenv vs.vs_ty in
+    if ty_equal ty_res vs.vs_ty then
+      t_var vs,vs
+    else 
+      let vsres = (create_vsymbol (id_clone vs.vs_name) ty_res) in
+      let t = t_var vsres in 
+      t, vsres in              
+  (Mvs.add vs tres vsvar,vsres)
 
 
 let rec rewrite_term tenv tvar vsvar t =
+  (*Format.eprintf "@[<hov 2>Term : %a =>@\n@?" Pretty.print_term t;*)
   let fnT = rewrite_term tenv tvar in
   let fnF = rewrite_fmla tenv tvar vsvar in
   match t.t_node with
@@ -236,8 +248,7 @@ let rec rewrite_term tenv tvar vsvar t =
     | Tif (f, t1, t2) -> 
         t_if (fnF f) (fnT vsvar t1) (fnT vsvar t2)
     | Tlet (t1, b) -> let u,t2 = t_open_bound b in
-      let (vsvar,u) = conv_vs tenv tvar (vsvar,[]) u in
-      let u = List.hd u in
+      let (vsvar,u) = conv_vs_let tenv vsvar u in
       let t1' = fnT vsvar t1 in let t2' = fnT vsvar t2 in
       if t_equal t1' t1 && t_equal t2' t2 then t else t_let u t1' t2'
     | Tcase _ | Teps _ | Tbvar _ ->
@@ -245,6 +256,7 @@ let rec rewrite_term tenv tvar vsvar t =
           "Encoding decorate : I can't encode this term"
 
 and rewrite_fmla tenv tvar vsvar f =
+(*  Format.eprintf "@[<hov 2>Fmla : %a =>@\n@?" Pretty.print_fmla f;*)
   let fnT = rewrite_term tenv tvar vsvar in
   let fnF = rewrite_fmla tenv tvar in
   match f.f_node with
@@ -267,18 +279,19 @@ and rewrite_fmla tenv tvar vsvar f =
         let tl = List.map2 (conv_arg tenv tvar) tl p.ls_args in
         f_app p tl
     | Fquant (q, b) -> let vl, _tl, f1 = f_open_quant b in
-      let (vsvar,vl) = List.fold_left (conv_vs tenv tvar) (vsvar,[]) vl in
-      let f1' = fnF vsvar f1 in 
+      let (vsvar',vl) = List.fold_left (conv_vs tenv tvar) (vsvar,[]) vl in
+      let f1' = fnF vsvar' f1 in 
       let tl' = [] (* TODO *) in
-        if f_equal f1' f1 (*&& tr_equal tl' tl*) then f
-        else 
+        (*if f_equal f1' f1 &&  vsvar' == vsvar (*&& tr_equal tl' tl*) then f
+        else *)
           let vl = List.rev vl in
           f_quant q vl tl' f1'
     | Flet (t1, b) -> let u,f2 = f_open_bound b in
-      let (vsvar,u) = conv_vs tenv tvar (vsvar,[]) u in
-      let u = List.hd u in
+      let (vsvar,u) = conv_vs_let tenv vsvar u in
       let t1' = fnT t1 in let f2' = fnF vsvar f2 in
-      if t_equal t1' t1 && f_equal f2' f2 then f else f_let u t1' f2'
+      assert (u.vs_ty == t1'.t_ty);
+      (*if t_equal t1' t1 && f_equal f2' f2 then f else *)
+        f_let u t1' f2'
     | _ -> f_map fnT (fnF vsvar) f
 
 let decl (tenv:tenv) d =
@@ -305,7 +318,7 @@ let decl (tenv:tenv) d =
               Register.unsupportedDecl 
                 d "encoding_decorate : I can't encode definition. \
 Perhaps you could use eliminate_definition"
-          | ls, None ->              
+          | ls, None ->
               try
                 let ls = Hls.find tenv.trans_lsymbol ls in
                 ls,None

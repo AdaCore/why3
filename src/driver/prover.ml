@@ -48,7 +48,7 @@ exception NoPrinter
 exception UnknownPrinter of string
 exception UnknownTransform of string
 
-let print_task drv fmt task =
+let print_task ?(debug=false) drv fmt task =
   let p = match get_printer drv with
     | None -> errorm "no printer specified in the driver file"
     | Some p -> p
@@ -63,7 +63,7 @@ let print_task drv fmt task =
   let apply task (s, tr) = 
     try
       Register.apply_driver tr drv task 
-    with e ->
+    with e when not debug ->
       Format.eprintf "failure in transformation %s: %s@." 
 	s (Printexc.to_string e);
       raise e
@@ -75,6 +75,6 @@ let print_task drv fmt task =
 let prove_task ?debug ~command ?timelimit ?memlimit drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
-  print_task drv fmt task; pp_print_flush fmt ();
+  print_task ?debug drv fmt task; pp_print_flush fmt ();
   call_on_buffer ?debug ~command ?timelimit ?memlimit drv buf
 
