@@ -416,7 +416,7 @@ byte: bin/tptp2why.byte
 opt:  bin/tptp2why.opt
 endif
 
-src/tptp2why/tptp_parser.ml src/tptp2why/tptp_parser.mli: src/tptp2why/tptpTree.cmi src/tptp2why/tptp_parser.mly
+src/tptp2why/tptp_parser.ml src/tptp2why/tptp_parser.mli src/tptp2why/tptp_parser.output: src/tptp2why/tptpTree.cmi src/tptp2why/tptp_parser.mly
 	cd $(TPTP_DIR) && $(MENHIR) --infer tptp_parser.mly
 
 bin/tptp2why.opt: $(TPTPCMX)
