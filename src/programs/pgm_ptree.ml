@@ -82,8 +82,7 @@ and expr_desc =
   | Elabel of ident * expr
   | Ecast of expr * Ptree.pty
 
-  (* TODO: raise, try, any, post?, 
-           ghost *)
+  (* TODO: raise, try, any, post?, ghost *)
 
 and triple = lexpr * expr * lexpr
 

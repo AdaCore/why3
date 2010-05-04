@@ -4,7 +4,13 @@ use import list.List
 logic c : int
 }
 
-let p = c
+let test (n:int) = 
+  let rec is_even (x:int) = 
+    {x>=0} 
+    if x=0 then True else if x=1 then False else is_even (x-2)
+    {true}
+  in
+  is_even n
 
 (*
 let rec mem (x:int) (l:int list) = 

@@ -290,6 +290,8 @@ expr:
 triple:
 | LOGIC expr LOGIC
   { lexpr $1, $2, lexpr $3 }
+| expr
+  { lexpr_true (), $1, lexpr_true () }
 ;
 
 simple_expr:

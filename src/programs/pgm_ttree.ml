@@ -62,7 +62,7 @@ and dexpr_desc =
   | DEapply of dexpr * dexpr
   | DEfun of dbinder list * dtriple
   | DElet of string * dexpr * dexpr
-  | DEletrec of (string * dbinder list * dvariant option * dtriple) * dexpr
+  | DEletrec of (string * dbinder list * dvariant option * dtriple) list * dexpr
 
   | DEsequence of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
@@ -114,6 +114,8 @@ and expr_desc =
   | Eapply of expr * expr
   | Efun of binder list * triple
   | Elet of Term.vsymbol * expr * expr
+  | Eletrec of 
+      (Term.vsymbol * Term.vsymbol list * variant option * triple) list * expr
 
   | Esequence of expr * expr
   | Eif of expr * expr * expr

@@ -151,13 +151,11 @@ and expr_desc env loc = function
   | Pgm_ptree.Eapply (e1, e2) ->
       let e1 = dexpr env e1 in
       let e2 = dexpr env e2 in
-      begin match e1.dexpr_type with
-	| Tyapp (ts, [ty2; ty]) when Ty.ts_equal ts (ts_arrow env.uc) ->
-	    expected_type e2 ty2;
-	    DEapply (e1, e2), ty
-	| _ ->
-	    errorm ~loc:e1.dexpr_loc "this expression is not a function"
-      end
+      let ty2 = create_type_var loc and ty = create_type_var loc in
+      if not (Denv.unify e1.dexpr_type (Tyapp (ts_arrow env.uc, [ty2; ty]))) then
+	errorm ~loc:e1.dexpr_loc "this expression is not a function";
+      expected_type e2 ty2;
+      DEapply (e1, e2), ty
   | Pgm_ptree.Efun (bl, t) ->
       let env, bl = map_fold_left dbinder env bl in
       let (_,e,_) as t = dtriple env t in
@@ -170,8 +168,10 @@ and expr_desc env loc = function
       let env = { env with denv = Typing.add_var x ty1 env.denv } in
       let e2 = dexpr env e2 in
       DElet (x, e1, e2), e2.dexpr_type
-  | Pgm_ptree.Eletrec _ (*(id, bl, v, p, e, q)*) ->
-      assert false (*TODO*)
+  | Pgm_ptree.Eletrec (dl, e1) ->
+      let env, dl = dletrec env dl in
+      let e1 = dexpr env e1 in
+      DEletrec (dl, e1), e1.dexpr_type
 
   | Pgm_ptree.Esequence (e1, e2) ->
       let e1 = dexpr env e1 in
@@ -219,6 +219,28 @@ and expr_desc env loc = function
       let ty = pure_type env ty in
       expected_type e1 ty;
       e1.dexpr_desc, ty
+
+and dletrec env dl =
+  (* add all functions into environment *)
+  let add_one env (id,_,_,_) = 
+    let ty = create_type_var id.id_loc in
+    { env with denv = Typing.add_var id.id ty env.denv }
+  in
+  let env = List.fold_left add_one env dl in
+  (* then type-check all of them and unify *)
+  let type_one (id, bl, v, t) = 
+    let tyres = Typing.find_var id.id env.denv in
+    let env, bl = map_fold_left dbinder env bl in
+    let (_,e,_) as t = dtriple env t in
+    let tyl = List.map (fun (x,_) -> Typing.find_var x env.denv) bl in
+    let ty = dcurrying env.uc tyl e.dexpr_type in
+    if not (Denv.unify ty tyres) then 
+      errorm ~loc:id.id_loc
+	"this expression has type %a, but is expected to have type %a"
+	print_dty ty print_dty tyres;
+    (id.id, bl, v, t)
+  in
+  env, List.map type_one dl
 
 and dtriple env (p, e, q) =     
   let p = env.denv, p in
