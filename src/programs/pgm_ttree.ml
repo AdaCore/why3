@@ -70,6 +70,7 @@ and dexpr_desc =
   | DEif of dexpr * dexpr * dexpr
   | DEwhile of dexpr *  Pgm_ptree.loop_annotation * dexpr
   | DElazy of lazy_op * dexpr * dexpr
+  | DEmatch of dexpr list * (Typing.dpattern list * dexpr) list
   | DEskip
   | DEabsurd 
 
@@ -122,6 +123,7 @@ and expr_desc =
   | Eif of expr * expr * expr
   | Ewhile of expr * loop_annotation * expr
   | Elazy of lazy_op * expr * expr
+  | Ematch of expr list * (Term.pattern list * expr) list
   | Eskip 
   | Eabsurd
 

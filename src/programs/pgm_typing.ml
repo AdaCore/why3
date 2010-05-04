@@ -197,8 +197,19 @@ and expr_desc env loc = function
       let e2 = dexpr env e2 in
       expected_type e2 (dty_bool env.uc);
       DElazy (op, e1, e2), (dty_bool env.uc)
-  | Pgm_ptree.Ematch (_el, _bl) ->
-      assert false (*TODO*)
+  | Pgm_ptree.Ematch (el, bl) ->
+      let el = List.map (dexpr env) el in
+      let tyl = List.map (fun e -> e.dexpr_type) el in
+      let ty = create_type_var loc in (* the type of all branches *)
+      let branch (pl, e) =
+	let denv, pl = Typing.dpat_list env.denv tyl pl in
+	let env = { env with denv = denv } in
+	let e = dexpr env e in
+	expected_type e ty;
+	pl, e
+      in
+      let bl = List.map branch bl in
+      DEmatch (el, bl), ty
   | Pgm_ptree.Eskip ->
       DEskip, (dty_unit env.uc)
   | Pgm_ptree.Eabsurd ->
@@ -332,6 +343,14 @@ and expr_desc uc env denv = function
       Ewhile (expr uc env e1, la, expr uc env e2)
   | DElazy (op, e1, e2) ->
       Elazy (op, expr uc env e1, expr uc env e2)
+  | DEmatch (el, bl) ->
+      let el = List.map (expr uc env) el in
+      let branch (pl, e) = 
+        let env, pl = map_fold_left Typing.pattern env pl in
+        (pl, expr uc env e)
+      in
+      let bl = List.map branch bl in
+      Ematch (el, bl)
   | DEskip ->
       Eskip
   | DEabsurd ->
@@ -421,4 +440,13 @@ let file env uc dl =
 Local Variables: 
 compile-command: "unset LANG; make -C ../.. testl"
 End: 
+*)
+
+(* 
+
+TODO:
+- mutually recursive functions: check variants are all present or all absent
+- variant: check type int or relation order specified
+- typing effects
+
 *)

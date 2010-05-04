@@ -67,4 +67,13 @@ val type_fmla : denv -> vsymbol Mstr.t -> Ptree.lexpr -> fmla
 
 val dty : denv -> Ptree.pty -> Denv.dty
 
+type dpattern
+
+val dpat : denv -> Ptree.pattern -> denv * dpattern
+val dpat_list : 
+  denv -> Denv.dty list -> Ptree.pattern list -> denv * dpattern list
+
+val pattern : vsymbol Mstr.t -> dpattern -> vsymbol Mstr.t * pattern
+
+
 

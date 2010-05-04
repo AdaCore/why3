@@ -392,12 +392,13 @@ and dterm_node loc env = function
       Tlet (e1, x, e2), e2.dt_ty
   | PPmatch (el, bl) ->
       let tl = List.map (dterm env) el in
+      let tyl = List.map (fun t -> t.dt_ty) tl in
       let tb = (* the type of all branches *)
 	let tv = create_tvsymbol (id_user "a" loc) in
 	Tyvar (create_ty_decl_var ~loc ~user:false tv)
       in
       let branch (pl, e) =
-        let env, pl = dpat_list env tl pl in
+        let env, pl = dpat_list env tyl pl in
         let loc = e.pp_loc in
 	let e = dterm env e in
 	if not (unify e.dt_ty tb) then term_expected_type ~loc e.dt_ty tb;
@@ -488,8 +489,9 @@ and dfmla env e = match e.pp_desc with
       Flet (e1, x, e2)
   | PPmatch (el, bl) ->
       let tl = List.map (dterm env) el in
+      let tyl = List.map (fun t -> t.dt_ty) tl in
       let branch (pl, e) =
-        let env, pl = dpat_list env tl pl in
+        let env, pl = dpat_list env tyl pl in
         pl, dfmla env e
       in
       Fmatch (tl, List.map branch bl)
@@ -501,20 +503,20 @@ and dfmla env e = match e.pp_desc with
   | PPeps _ | PPconst _ | PPcast _ ->
       error ~loc:e.pp_loc PredicateExpected
 
-and dpat_list env tl pl =
+and dpat_list env tyl pl =
   check_pat_linearity pl;
-  let pattern (env,pl) pat t =
+  let pattern (env,pl) pat ty =
     let loc = pat.pat_loc in
     let env, pat = dpat env pat in
-    if not (unify pat.dp_ty t.dt_ty)
-      then term_expected_type ~loc pat.dp_ty t.dt_ty;
+    if not (unify pat.dp_ty ty)
+      then term_expected_type ~loc pat.dp_ty ty;
     env, pat::pl
   in
   let loc = (List.hd pl).pat_loc in
-  let env, pl = try List.fold_left2 pattern (env,[]) pl tl
+  let env, pl = try List.fold_left2 pattern (env,[]) pl tyl
     with Invalid_argument _ -> errorm ~loc
       "This pattern has length %d but is expected to have length %d"
-      (List.length pl) (List.length tl)
+      (List.length pl) (List.length tyl)
   in
   env, List.rev pl
 
@@ -1010,6 +1012,6 @@ let retrieve lp env sl =
 
 (*
 Local Variables:
-compile-command: "make -C ../.. test"
+compile-command: "unset LANG; make -C ../.. test"
 End:
 *)
