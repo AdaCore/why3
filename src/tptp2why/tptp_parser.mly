@@ -17,8 +17,9 @@
 
 %token<string> UIDENT
 %token<string> LIDENT
-%token FOF AXIOM CONJECTURE
-%token EOL EOF
+%token<string> SINGLEQUOTED
+%token FOF AXIOM CONJECTURE INCLUDE
+%token EOF
 
 
 
@@ -30,12 +31,14 @@
 tptp:
 | e = decl es = decl* EOF
   { e :: es }
-(*| error
-  { Printf.printf "%i\n" $endpos.Lexing.pos_lnum; assert false } *)
+| error
+  { Printf.printf "error at lexing pos %i\n" $endpos.Lexing.pos_lnum; assert false }
 
 decl:
 | FOF LPAREN name = lident COMMA ty = decl_type COMMA f = fmla RPAREN DOT
   { Fof (name, ty, f) }
+| INCLUDE LPAREN p = SINGLEQUOTED RPAREN DOT
+  { Include p }
 
 decl_type:
 | AXIOM { Axiom }
@@ -70,7 +73,7 @@ term:
 
 
 lident:
-| QUOTE i=LIDENT QUOTE { "'" ^ i ^ "'" }
+| i = SINGLEQUOTED { i }
 | i = LIDENT { i }
 uident:
 | i = UIDENT { i }

@@ -23,7 +23,9 @@ and term =
 and predicate = string
 
 
-type decl = Fof of string * declType * fmla
+type decl =
+| Fof of string * declType * fmla
+| Include of string
 and declType = Axiom | Conjecture
 
 type tptp = decl list

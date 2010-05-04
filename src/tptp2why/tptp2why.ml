@@ -28,6 +28,7 @@ module Summary : sig
         TptpTree.fmla -> (indic * int) M.t
   val findAllAtoms : decl list -> S.t
   val findAllFunctors : TptpTree.decl list -> (indic * int) M.t
+  val findAllIncludes : TptpTree.decl list -> string list
 end = struct
   type indic = Pred | Term
 
@@ -60,22 +61,27 @@ end = struct
       union_map (findFunctors_t m t1) (findFunctors_t m t2)
 
   let findAllAtoms decls =
-    let helper m = function Fof(_, _, f) -> findAtoms m f in
+    let helper m = function Fof(_, _, f) -> findAtoms m f | _ -> assert false in
     List.fold_left helper S.empty decls
 
   let findAllFunctors decls =
-    let helper s = function Fof(_, _, f) -> findFunctors s f in
+    let helper s = function Fof(_, _, f) -> findFunctors s f | _ -> assert false in
     List.fold_left helper M.empty decls
+
+  let rec findAllIncludes = function
+  | ((Include x)::xs) -> x :: findAllIncludes xs
+  | (_::xs) -> findAllIncludes xs
+  | [] -> []
 
 end
 
-(** ugly basic printer for trees *)
+(** basic printer to .why *)
 module Print : sig
 
   val printDecl : Format.formatter -> decl -> unit
   val printFmla : Format.formatter -> fmla -> unit
   val printTheory : Format.formatter -> string -> decl list -> unit
-  val printFile : Format.formatter -> string -> string -> unit
+  val printFile : Format.formatter -> string -> string -> string -> unit
 
 end = struct
 
@@ -108,6 +114,7 @@ end = struct
       (print_list ~sep:sep printer) xs
   | x::[] -> fprintf fmter "%a" printer x
   | [] -> ()
+  | _ -> assert false
 
   let printVar fmter v = pp_print_string fmter (String.uncapitalize v)
   let printAtom fmter a = pp_print_string fmter (String.uncapitalize a)
@@ -137,6 +144,7 @@ end = struct
   | Fof (name, ty, fmla) ->
     fprintf fmter "%s %s :@\n @[%a@]\n" (show_type ty)
       (sanitize (String.capitalize name)) printFmla fmla
+  | Include _ -> failwith "no include should remain here !"
 
   (** prints the declaration of a functor : logic f(t, t, t... t) *)
   let printFunctorDecl fmter (f,(ty,arity)) =
@@ -167,10 +175,28 @@ end = struct
     fprintf fmter "theory %s@\n@[<hov 2>%a %a@]@\nend\n\n"
         name printPreambule decls (print_list ~sep:"\n" printDecl) decls
 
-  let printFile fmter theoryName filename =
-    let input = open_in filename in
-    let decls = Tptp_parser.tptp Tptp_lexer.token (Lexing.from_channel input) in
-    close_in input;
+  let fromInclude = function | Include x -> x | _ -> assert false
+  (** for a given file, returns the list of declarations
+  for this file and all the files it includes, recursively *)
+  let rec getAllDecls include_dir filename =
+    try
+      let filename = include_dir^"/"^filename in
+      let input = open_in filename in
+      let decls = Tptp_parser.tptp Tptp_lexer.token (Lexing.from_channel input) in
+      let isInclude = function | Include _ -> true | _ -> false in
+      close_in input;
+      let (to_include, real_decl) = List.partition isInclude decls in
+      let to_include = List.map fromInclude to_include in (* remove Include *)
+      let all_decls = List.concat (List.map (getAllDecls include_dir) to_include) in
+      all_decls @ real_decl
+    with (Sys_error _) as e ->
+      print_endline ("error : unable to open "^filename);
+      raise e
+
+
+  (** process a single file and all includes inside *)
+  let printFile fmter include_dir theoryName filename =
+    let decls = getAllDecls include_dir filename in
     printTheory fmter theoryName decls
 
 end
@@ -181,20 +207,30 @@ end
 
 open Arg
 
-let input_files = ref []
-let output_chan = ref (Format.formatter_of_out_channel stdout)
+module Init = struct
 
-let output_updater filename = if filename <> "-"
-  then output_chan := Format.formatter_of_out_channel (open_out filename)
-  else ()
+  let input_files = ref []
+  let output_chan = ref (Format.formatter_of_out_channel stdout)
+  let include_dir = ref "."
 
-let options = [
-  ("-o", String output_updater, "outputs to a file")
-]
+  let output_updater filename = if filename <> "-"
+    then output_chan := Format.formatter_of_out_channel (open_out filename)
+    else ()
 
-let usage = "tptp2why file1 [file2...] [-o file]
-It parses tptp files (fof format) and prints a why file
-with one theory per input file."
+  let include_updater s = include_dir := s
+
+  let options = [
+    ("-o", String output_updater, "outputs to a file");
+    ("-I", String include_updater, "search for included files in this dir")
+  ]
+
+  let usage = "tptp2why file1 [file2...] [-o file]
+  It parses tptp files (fof format) and prints a why file
+  with one theory per input file."
+
+end
+
+open Init
 
 let _ =
   parse options (fun file -> input_files := file :: (!input_files)) usage;
@@ -203,5 +239,5 @@ let _ =
   List.iter
     (fun x -> let theoryName = "Theory"^(string_of_int !theoryCounter) in
               incr theoryCounter;
-              Print.printFile !output_chan theoryName x)
+              Print.printFile !output_chan !include_dir theoryName x)
     !input_files

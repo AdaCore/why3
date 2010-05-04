@@ -11,13 +11,16 @@
       [
         "fof", FOF;
         "conjecture", CONJECTURE;
-        "axiom", AXIOM
+        "axiom", AXIOM;
+        "include", INCLUDE
       ]
 
   let newline lexbuf =
     let pos = lexbuf.lex_curr_p in
     lexbuf.lex_curr_p <-
       { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
+
+  let stringBuf = Buffer.create 256
 
 }
 
@@ -56,7 +59,7 @@ rule token = parse
   | "%"
       { comment lexbuf }
   | "'"
-      { QUOTE }
+      { Buffer.clear stringBuf; let s = string lexbuf in SINGLEQUOTED s }
   | ","
       { COMMA }
   | "("
@@ -98,3 +101,14 @@ and comment = parse (* read until newline *)
     { token lexbuf }
   | _
     { comment lexbuf }
+and string = parse
+  | "'"
+    { Buffer.contents stringBuf }
+  | "\\\\"
+    { Buffer.add_char stringBuf '\\'; string lexbuf }
+  | "\\'"
+    { Buffer.add_char stringBuf '\''; string lexbuf }
+  | eof
+    { eprintf "unterminated single quoted\n"; exit 1 }
+  | _ as c
+    { Buffer.add_char stringBuf c; string lexbuf }
