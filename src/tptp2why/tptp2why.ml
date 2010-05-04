@@ -121,7 +121,7 @@ end = struct
 
   let rec printFmla fmter = function
   | FBinop (op, f1, f2) ->
-    fprintf fmter "@[%a@ %s@ %a@]" printFmla f1 (show_fbinop op) printFmla f2
+    fprintf fmter "(@[%a@ %s@ %a@])" printFmla f1 (show_fbinop op) printFmla f2
   | FUnop (op, f) ->
     fprintf fmter "@[(%s %a)@]" (show_funop op) printFmla f
   | FQuant (quant, vars, f) ->
@@ -130,7 +130,7 @@ end = struct
   | FPred (pred, terms) ->
     fprintf fmter "%s(@[%a@])" pred (print_list printTerm) terms
   | FTermBinop (op, t1, t2) ->
-    fprintf fmter "@[%a %s %a@]" printTerm t1 (show_tbinop op) printTerm t2
+    fprintf fmter "(@[%a %s %a@])" printTerm t1 (show_tbinop op) printTerm t2
 
 
   let printDecl fmter = function
