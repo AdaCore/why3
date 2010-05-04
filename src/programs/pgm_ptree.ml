@@ -42,7 +42,7 @@ type effect = ident list
 
 type type_v =
   | Tpure of Ptree.pty
-  | Tarrow of (ident * type_v option) list * type_c
+  | Tarrow of binder list * type_c
 
 and type_c =
   { pc_result_name : ident;
@@ -51,9 +51,9 @@ and type_c =
     pc_pre         : lexpr;
     pc_post        : lexpr; }
 
-type variant = lexpr 
+and binder = ident * type_v option
 
-type binder = ident * type_v option
+type variant = lexpr 
 
 type expr = {
   expr_desc : expr_desc;
@@ -91,6 +91,7 @@ type decl =
   | Dlet    of ident * expr
   | Dletrec of (ident * binder list * variant option * triple) list
   | Dlogic  of Ptree.decl list
+  | Dparam  of ident * type_v
 
 type file = decl list
 

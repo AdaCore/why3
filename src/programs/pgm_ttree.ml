@@ -31,22 +31,22 @@ type lazy_op = Pgm_ptree.lazy_op
 
 type deffect = string list
 
+type dlexpr = Typing.denv * Ptree.lexpr
+
 type dtype_v = 
   | DTpure of Denv.dty
-  | DTarrow of (string * dtype_v) list * dtype_c
+  | DTarrow of dbinder list * dtype_c
 
 and dtype_c = 
-  { dc_result_name : Term.vsymbol;
+  { dc_result_name : string;
     dc_result_type : dtype_v;
     dc_effect      : deffect;
-    dc_pre         : Ptree.lexpr;
-    dc_post        : Ptree.lexpr; }
+    dc_pre         : dlexpr;
+    dc_post        : dlexpr; }
+
+and dbinder = string * dtype_v
 
 type dvariant = Pgm_ptree.lexpr 
-
-type dbinder = string * dtype_v
-
-type dlexpr = Typing.denv * Ptree.lexpr
 
 type dexpr = {
   dexpr_desc : dexpr_desc;
@@ -85,16 +85,16 @@ type effect = Term.vsymbol list
 
 type type_v = 
   | Tpure of Ty.ty
-  | Tarrow of Term.vsymbol list * type_c
+  | Tarrow of binder list * type_c
 
 and type_c = 
-  { pc_result_name : Term.vsymbol;
-    pc_result_type : type_v;
-    pc_effect      : effect;
-    pc_pre         : Term.fmla;
-    pc_post        : Term.fmla; }
+  { c_result_name : Term.vsymbol;
+    c_result_type : type_v;
+    c_effect      : effect;
+    c_pre         : Term.fmla;
+    c_post        : Term.fmla; }
 
-type binder = Term.vsymbol * type_v
+and binder = Term.vsymbol * type_v
 
 type loop_annotation = {
   loop_invariant : Term.fmla option;
@@ -129,9 +129,9 @@ and expr_desc =
 and triple = Term.fmla * expr * Term.fmla
 
 type decl =
-  | Dlet of Term.lsymbol * expr
+  | Dlet    of Term.lsymbol * expr
   | Dletrec of (Term.lsymbol * Term.vsymbol list * variant option * triple) list
-
+  | Dparam  of Term.lsymbol * type_v
 (*
 Local Variables: 
 compile-command: "unset LANG; make -C ../.. testl"

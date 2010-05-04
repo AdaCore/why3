@@ -1,7 +1,10 @@
 
 { 
 use import list.List
+logic c : int
 }
+
+let p = c
 
 (*
 let rec mem (x:int) (l:int list) = 
@@ -25,6 +28,8 @@ let f (x : int ref) =
   { !x >= 0 }
   (fun y -> { y >= 0 } y+1 { result > y }) 2
   { result > 0 and old(!x)>=0 }
+
+parameter g : x:int -> y:int ref -> { true } int { result = x + old(!y) }
 
 (*
 Local Variables: 
