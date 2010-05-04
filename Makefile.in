@@ -394,7 +394,7 @@ clean::
 # TODO : autoconf
 MENHIR=/usr/bin/menhir
 
-TPTPGENERATED =  src/tptp2why/tptp_parser.output src/tptp2why/tptp_lexer.ml \
+TPTPGENERATED = src/tptp2why/tptp_lexer.ml \
 	src/tptp2why/tptp_parser.ml src/tptp2why/tptp_parser.mli
 
 TPTP_FILES = tptpTree tptp_parser tptp_lexer tptp2why
@@ -416,7 +416,7 @@ byte: bin/tptp2why.byte
 opt:  bin/tptp2why.opt
 endif
 
-src/tptp2why/tptp_parser.ml src/tptp2why/tptp_parser.mli src/tptp2why/tptp_parser.output: src/tptp2why/tptpTree.cmi src/tptp2why/tptp_parser.mly
+src/tptp2why/tptp_parser.ml src/tptp2why/tptp_parser.mli: src/tptp2why/tptpTree.cmi src/tptp2why/tptp_parser.mly
 	cd $(TPTP_DIR) && $(MENHIR) --infer tptp_parser.mly
 
 bin/tptp2why.opt: $(TPTPCMX)
@@ -676,6 +676,11 @@ tags:
 
 otags:
 	otags src/*.mli src/*.ml c/*.mli c/*.ml intf/*.mli intf/*.ml
+
+# the previous seems broken. This one is intented for vi(m) users, but could
+# be adapted for emacs (remove the -vi option ?)
+otags-vi:
+	find \( -name '*.ml' -or -name '*.mli' \) -print0 | xargs -0 otags -vi
 
 wc:
 	ocamlwc -p src/*.ml* src/*/*.ml*
