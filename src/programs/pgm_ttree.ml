@@ -62,7 +62,9 @@ and dexpr_desc =
   | DEapply of dexpr * dexpr
   | DEfun of dbinder list * dtriple
   | DElet of string * dexpr * dexpr
-  | DEletrec of (string * dbinder list * dvariant option * dtriple) list * dexpr
+  | DEletrec of 
+      ((string * Denv.dty) * dbinder list * dvariant option * dtriple) list * 
+      dexpr
 
   | DEsequence of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
@@ -114,8 +116,7 @@ and expr_desc =
   | Eapply of expr * expr
   | Efun of binder list * triple
   | Elet of Term.vsymbol * expr * expr
-  | Eletrec of 
-      (Term.vsymbol * Term.vsymbol list * variant option * triple) list * expr
+  | Eletrec of recfun list * expr
 
   | Esequence of expr * expr
   | Eif of expr * expr * expr
@@ -128,12 +129,15 @@ and expr_desc =
   | Eghost of expr
   | Elabel of string * expr
 
+and recfun = Term.vsymbol * binder list * variant option * triple
+
 and triple = Term.fmla * expr * Term.fmla
 
 type decl =
   | Dlet    of Term.lsymbol * expr
-  | Dletrec of (Term.lsymbol * Term.vsymbol list * variant option * triple) list
+  | Dletrec of (Term.lsymbol * recfun) list
   | Dparam  of Term.lsymbol * type_v
+
 (*
 Local Variables: 
 compile-command: "unset LANG; make -C ../.. testl"

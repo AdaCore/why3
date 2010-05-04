@@ -119,8 +119,8 @@
 /* Precedences */
 
 %nonassoc prec_recfun
-%nonassoc prec_fun
-%left LEFTB LEFTBLEFTB
+%nonassoc prec_triple
+%left LEFTBLEFTB
 %left prec_simple
 
 %left COLON 
@@ -135,7 +135,6 @@
 %left ELSE
 
 %left COLONEQUAL
-%right ARROW LRARROW
 %right BARBAR
 %right AMPAMP
 %right prec_if
@@ -247,6 +246,8 @@ expr:
    { mk_infix $1 $2 $3 }
 | expr OP3 expr 
    { mk_infix $1 $2 $3 }
+| NOT expr %prec prefix_op
+   { mk_expr (mk_apply_id { id = "notb"; id_loc = loc () } [$2]) }
 | any_op expr %prec prefix_op
    { mk_prefix $1 $2 }
 | expr COLONEQUAL expr 
@@ -290,7 +291,7 @@ expr:
 triple:
 | LOGIC expr LOGIC
   { lexpr $1, $2, lexpr $3 }
-| expr
+| expr %prec prec_triple
   { lexpr_true (), $1, lexpr_true () }
 ;
 

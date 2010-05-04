@@ -222,14 +222,14 @@ and expr_desc env loc = function
 
 and dletrec env dl =
   (* add all functions into environment *)
-  let add_one env (id,_,_,_) = 
+  let add_one env (id, bl, var, t) = 
     let ty = create_type_var id.id_loc in
-    { env with denv = Typing.add_var id.id ty env.denv }
+    let env = { env with denv = Typing.add_var id.id ty env.denv } in
+    env, ((id, ty), bl, var, t)
   in
-  let env = List.fold_left add_one env dl in
+  let env, dl = map_fold_left add_one env dl in
   (* then type-check all of them and unify *)
-  let type_one (id, bl, v, t) = 
-    let tyres = Typing.find_var id.id env.denv in
+  let type_one ((id, tyres), bl, v, t) = 
     let env, bl = map_fold_left dbinder env bl in
     let (_,e,_) as t = dtriple env t in
     let tyl = List.map (fun (x,_) -> Typing.find_var x env.denv) bl in
@@ -238,7 +238,7 @@ and dletrec env dl =
       errorm ~loc:id.id_loc
 	"this expression has type %a, but is expected to have type %a"
 	print_dty ty print_dty tyres;
-    (id.id, bl, v, t)
+    ((id.id, tyres), bl, v, t)
   in
   env, List.map type_one dl
 
@@ -260,8 +260,7 @@ let purify uc = function
   | Tpure ty -> 
       ty
   | Tarrow (bl, c) -> 
-      currying uc (List.map (fun (v,_) -> v.vs_ty) bl)
-	c.c_result_name.vs_ty
+      currying uc (List.map (fun (v,_) -> v.vs_ty) bl) c.c_result_name.vs_ty
 
 let rec type_v uc env = function
   | DTpure ty -> 
@@ -314,8 +313,10 @@ and expr_desc uc env denv = function
       let v = create_vsymbol (id_fresh x) e1.expr_type in
       let env = Mstr.add x v env in
       Elet (v, e1, expr uc env e2)
-  | DEletrec _ ->
-      assert false (*TODO*)
+  | DEletrec (dl, e1) ->
+      let env, dl = letrec uc env dl in
+      let e1 = expr uc env e1 in
+      Eletrec (dl, e1)
 
   | DEsequence (e1, e2) ->
       Esequence (expr uc env e1, expr uc env e2)
@@ -347,6 +348,25 @@ and expr_desc uc env denv = function
       let env = Mstr.add s v env in 
       Elabel (s, expr uc env e1)
 
+and letrec uc env dl =
+  (* add all functions into env, and compute local env *)
+  let step1 env ((x, dty), bl, var, t) = 
+    let ty = Denv.ty_of_dty dty in
+    let v = create_vsymbol (id_fresh x) ty in
+    let env = Mstr.add x v env in
+    env, (v, bl, var, t)
+  in
+  let env, dl = map_fold_left step1 env dl in
+  (* then translate variants and bodies *)
+  let step2 (v, bl, var, (_,e,_ as t)) =
+    let env, bl = map_fold_left (binder uc) env bl in
+    let denv = e.dexpr_denv in
+    let var = option_map (Typing.type_term denv env) var in
+    let t = triple uc env t in
+    (v, bl, var, t)
+  in
+  env, List.map step2 dl
+
 and triple uc env ((denvp, p), e, (denvq, q)) =
   let p = Typing.type_fmla denvp env p in
   let e = expr uc env e in
@@ -370,15 +390,27 @@ let file env uc dl =
 	     let e = type_expr uc e in
 	     let tyl, ty = uncurrying uc e.expr_type in
 	     let ls = create_lsymbol (id_user id.id id.id_loc) tyl (Some ty) in
+	     let uc = Theory.add_decl uc (Decl.create_logic_decl [ls, None]) in
 	     uc, Dlet (ls, e) :: acc
-	 | Pgm_ptree.Dletrec _ -> 
-	     assert false (*TODO*)
+	 | Pgm_ptree.Dletrec dl -> 
+	     let denv = create_denv uc in
+	     let _, dl = dletrec denv dl in
+	     let _, dl = letrec uc Mstr.empty dl in
+	     let one uc (v,_,_,_ as r) =
+	       let tyl, ty = uncurrying uc v.vs_ty in
+	       let id = id_fresh v.vs_name.id_short in
+	       let ls = create_lsymbol id tyl (Some ty) in
+	       Theory.add_decl uc (Decl.create_logic_decl [ls, None]), (ls, r)
+	     in
+	     let uc, dl = map_fold_left one uc dl in
+	     uc, Dletrec dl :: acc
 	 | Pgm_ptree.Dparam (id, tyv) ->
 	     let denv = create_denv uc in
 	     let tyv = dtype_v denv tyv in
 	     let tyv = type_v uc Mstr.empty tyv in
 	     let tyl, ty = uncurrying uc (purify uc tyv) in
 	     let ls = create_lsymbol (id_user id.id id.id_loc) tyl (Some ty) in
+	     let uc = Theory.add_decl uc (Decl.create_logic_decl [ls, None]) in
 	     uc, Dparam (ls, tyv) :: acc
       )
       (uc, []) dl
