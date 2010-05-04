@@ -53,6 +53,8 @@ and type_c =
 
 type variant = lexpr 
 
+type binder = ident * type_v option
+
 type expr = {
   expr_desc : expr_desc;
   expr_loc  : loc;
@@ -63,10 +65,9 @@ and expr_desc =
   | Econstant of constant
   | Eident of qualid
   | Eapply of expr * expr
+  | Efun of binder list * triple
   | Elet of ident * expr * expr
-  | Efun of (ident * type_v option) list * lexpr * expr * lexpr
-  | Erec of ident * 
-      (ident * type_v option) list * variant option * lexpr * expr * lexpr
+  | Eletrec of (ident * binder list * variant option * triple) list * expr
   (* control *)
   | Esequence of expr * expr
   | Eif of expr * expr * expr
@@ -84,9 +85,12 @@ and expr_desc =
   (* TODO: raise, try, any, post?, 
            ghost *)
 
+and triple = lexpr * expr * lexpr
+
 type decl =
-  | Dcode  of ident * expr
-  | Dlogic of Ptree.decl list
+  | Dlet    of ident * expr
+  | Dletrec of (ident * binder list * variant option * triple) list
+  | Dlogic  of Ptree.decl list
 
 type file = decl list
 

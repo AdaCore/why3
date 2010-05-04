@@ -73,13 +73,7 @@ let type_file file =
   let uc = Theory.create_theory (Ident.id_fresh "Pgm") in
   let th = Env.find_theory env ["programs"] "Prelude" in
   let uc = Theory.use_export uc th in
-  let _uc = 
-    List.fold_left
-      (fun uc d -> match d with
-	 | Dlogic dl -> List.fold_left (Typing.add_decl env Mnm.empty) uc dl
-	 | Dcode (id, e) -> ignore (Pgm_typing.code uc id e); uc)
-      uc p
-  in
+  let _uc, _dl = Pgm_typing.file env uc p in
   ()
 
 let handle_file file =

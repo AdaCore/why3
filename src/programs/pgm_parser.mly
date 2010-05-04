@@ -179,11 +179,21 @@ decl:
 | LOGIC
     { Dlogic (logic_list0_decl $1) }
 | LET lident EQUAL expr
-    { Dcode ($2, $4) }
+    { Dlet ($2, $4) }
 | LET lident list1_type_v_binder EQUAL triple
-    { Dcode ($2, let p,e,q = $5 in mk_expr_i 3 (Efun ($3, p, e, q))) }
-| LET REC lident list1_type_v_binder opt_variant EQUAL triple
-    { Dcode ($3, let p,e,q = $7 in mk_expr_i 3 (Erec ($3, $4, $5, p, e, q))) }
+    { Dlet ($2, mk_expr_i 3 (Efun ($3, $5))) }
+| LET REC list1_recfun_sep_and 
+    { Dletrec $3 }
+;
+
+list1_recfun_sep_and:
+| recfun                          { [ $1 ] }
+| recfun AND list1_recfun_sep_and { $1 :: $3 }
+;
+
+recfun:
+| lident list1_type_v_binder opt_variant EQUAL triple
+   { $1, $2, $3, $5 }
 ;
 
 lident:
@@ -254,13 +264,11 @@ expr:
 | LET lident EQUAL expr IN expr
    { mk_expr (Elet ($2, $4, $6)) }
 | LET lident list1_type_v_binder EQUAL triple IN expr
-   { let p,e,q = $5 in 
-     mk_expr (Elet ($2, mk_expr_i 3 (Efun ($3, p, e, q)), $7)) }
-| LET REC lident list1_type_v_binder opt_variant EQUAL triple IN expr
-   { let p,e,q = $7 in 
-     mk_expr (Elet ($3, mk_expr_i 3 (Erec ($3, $4, $5, p, e, q)), $9)) }
+   { mk_expr (Elet ($2, mk_expr_i 3 (Efun ($3, $5)), $7)) }
+| LET REC list1_recfun_sep_and IN expr
+   { mk_expr (Eletrec ($3, $5)) }
 | FUN list1_type_v_binder ARROW triple
-   { let p,e,q = $4 in mk_expr (Efun ($2, p, e, q)) }
+   { mk_expr (Efun ($2, $4)) }
 | MATCH list1_expr_sep_comma WITH option_bar match_cases END
    { mk_expr (Ematch ($2, $5)) }
 | GHOST expr
