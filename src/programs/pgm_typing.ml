@@ -59,6 +59,7 @@ let id_result = "result"
 let dty_bool uc = Tyapp (ns_find_ts (get_namespace uc) ["bool"], [])
 let dty_unit uc = Tyapp (ns_find_ts (get_namespace uc) ["unit"], [])
 let dty_label uc = Tyapp (ns_find_ts (get_namespace uc) ["label"], [])
+let ts_ref uc = ns_find_ts (get_namespace uc) ["ref"]
 let ts_arrow uc = ns_find_ts (get_namespace uc) ["arrow"]
 
 type denv = {
@@ -103,6 +104,29 @@ let rec dpurify env = function
       dcurrying env.uc (List.map (fun (_,ty) -> dpurify env ty) bl)
 	(dpurify env c.dc_result_type)
 
+let check_reference _loc _ty =
+  () (*TODO*)
+  
+let dreference env id =
+  if Typing.mem_var id.id env.denv then
+    (* local variable *)
+    let ty = Typing.find_var id.id env.denv in
+    check_reference id.id_loc ty;
+    DRlocal id.id
+  else 
+    let p = Qident id in
+    let s, _tyl, ty = Typing.specialize_fsymbol p env.uc in
+    check_reference id.id_loc ty;
+    DRglobal s
+
+let dexception _env _id =
+  assert false (*TODO*)
+
+let deffect env e =
+  { de_reads  = List.map (dreference env) e.Pgm_ptree.pe_reads;
+    de_writes = List.map (dreference env) e.Pgm_ptree.pe_writes;
+    de_raises = List.map (dexception env) e.Pgm_ptree.pe_raises; }
+
 let rec dtype_v env = function
   | Pgm_ptree.Tpure pt -> 
       DTpure (pure_type env pt)
@@ -115,7 +139,7 @@ and dtype_c env c =
   let ty = dtype_v env c.Pgm_ptree.pc_result_type in
   { dc_result_name = c.Pgm_ptree.pc_result_name.id;
     dc_result_type = ty;
-    dc_effect      = List.map (fun x -> x.id) c.Pgm_ptree.pc_effect;
+    dc_effect      = deffect env c.Pgm_ptree.pc_effect;
     dc_pre         = env.denv, c.Pgm_ptree.pc_pre;
     dc_post        =   
       let denv = Typing.add_var id_result (dpurify env ty) env.denv in
@@ -132,11 +156,11 @@ and dbinder env ({id=x; id_loc=loc}, v) =
   env, (x, v)
 
 let rec dexpr env e = 
-  let d, ty = expr_desc env e.Pgm_ptree.expr_loc e.Pgm_ptree.expr_desc in
+  let d, ty = dexpr_desc env e.Pgm_ptree.expr_loc e.Pgm_ptree.expr_desc in
   { dexpr_desc = d; dexpr_loc = e.Pgm_ptree.expr_loc;
     dexpr_denv = env.denv; dexpr_type = ty;  }
 
-and expr_desc env loc = function
+and dexpr_desc env loc = function
   | Pgm_ptree.Econstant (ConstInt _ as c) ->
       DEconstant c, Tyapp (Ty.ts_int, [])
   | Pgm_ptree.Econstant (ConstReal _ as c) ->
@@ -152,7 +176,8 @@ and expr_desc env loc = function
       let e1 = dexpr env e1 in
       let e2 = dexpr env e2 in
       let ty2 = create_type_var loc and ty = create_type_var loc in
-      if not (Denv.unify e1.dexpr_type (Tyapp (ts_arrow env.uc, [ty2; ty]))) then
+      if not (Denv.unify e1.dexpr_type (Tyapp (ts_arrow env.uc, [ty2; ty]))) 
+      then
 	errorm ~loc:e1.dexpr_loc "this expression is not a function";
       expected_type e2 ty2;
       DEapply (e1, e2), ty
@@ -273,6 +298,15 @@ let purify uc = function
   | Tarrow (bl, c) -> 
       currying uc (List.map (fun (v,_) -> v.vs_ty) bl) c.c_result_name.vs_ty
 
+let reference _uc env = function
+  | DRlocal x -> Rlocal (Mstr.find x env)
+  | DRglobal ls -> Rglobal ls
+
+let effect uc env e =
+  { e_reads  = List.map (reference uc env) e.de_reads;
+    e_writes = List.map (reference uc env) e.de_writes;
+    e_raises = e.de_raises; }
+
 let rec type_v uc env = function
   | DTpure ty -> 
       Tpure (Denv.ty_of_dty ty)
@@ -286,7 +320,7 @@ and type_c uc env c =
   let v = create_vsymbol (id_fresh c.dc_result_name) ty in
   { c_result_name = v;
     c_result_type = tyv;
-    c_effect      = []; (* TODO *)
+    c_effect      = effect uc env c.dc_effect;
     c_pre         = 
       (let denv, l = c.dc_pre in Typing.type_fmla denv env l);
     c_post        =
@@ -447,6 +481,6 @@ End:
 TODO:
 - mutually recursive functions: check variants are all present or all absent
 - variant: check type int or relation order specified
-- typing effects
+- typing exceptions in effects (raises)
 
 *)

@@ -38,7 +38,11 @@ type loop_annotation = {
   loop_variant   : lexpr option;
 }
 
-type effect = ident list
+type effect = {
+  pe_reads  : ident list;
+  pe_writes : ident list;
+  pe_raises : ident list;
+}
 
 type type_v =
   | Tpure of Ptree.pty

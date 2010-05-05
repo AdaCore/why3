@@ -90,6 +90,8 @@
 
   let lexpr (loc, s) = parse_string Lexer.parse_lexpr loc s
 
+  let empty_effect = { pe_reads = []; pe_writes = []; pe_raises = [] }
+
 %}
 
 /* Tokens */ 
@@ -431,20 +433,66 @@ type_c:
 | type_v 
   { { pc_result_name = id_result ();
       pc_result_type = $1;
-      pc_effect      = [];
+      pc_effect      = empty_effect;
       pc_pre         = lexpr_true ();
       pc_post        = lexpr_true (); } }
-| LOGIC type_v LOGIC
+| LOGIC type_v effects LOGIC
   { { pc_result_name = id_result ();
       pc_result_type = $2;
-      pc_effect      = [];
+      pc_effect      = $3;
       pc_pre         = lexpr $1;
-      pc_post        = lexpr $3; } }
+      pc_post        = lexpr $4; } }
+;
+
+effects:
+| opt_reads opt_writes opt_raises
+    { { pe_reads = $1; pe_writes = $2; pe_raises = $3 } }
+;
+
+opt_reads:
+| /* epsilon */               { [] }
+| READS list0_lident_sep_comma { $2 }
+;
+
+opt_writes:
+| /* epsilon */                { [] }
+| WRITES list0_lident_sep_comma { $2 }
+;
+
+opt_raises:
+| /* epsilon */                { [] }
+| RAISES list0_uident_sep_comma { $2 }
 ;
 
 opt_variant:
 | /* epsilon */ { None }
 | VARIANT LOGIC  { Some (lexpr $2) }
 ;
+
+list0_lident_sep_comma:
+| /* epsilon */          { [] }
+| list1_lident_sep_comma { $1 }
+;
+
+list1_lident_sep_comma:
+| lident                              { [$1] }
+| lident COMMA list1_lident_sep_comma { $1 :: $3 }
+;
+
+list0_uident_sep_comma:
+| /* epsilon */          { [] }
+| list1_uident_sep_comma { $1 }
+;
+
+list1_uident_sep_comma:
+| uident                              { [$1] }
+| uident COMMA list1_uident_sep_comma { $1 :: $3 }
+;
+
+/*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. testl"
+End: 
+*/
 
 

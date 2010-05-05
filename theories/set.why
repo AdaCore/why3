@@ -7,7 +7,9 @@ theory Base
 
   logic empty : 'a t
 
-  axiom Empty_def1 : forall x : 'a. not mem(x, empty)
+  logic is_empty(s : 'a t) = forall x : 'a. not mem(x, s)
+
+  axiom Empty_def1 : is_empty(empty : 'a t)
 
   logic add('a, 'a t) : 'a t
 
@@ -17,6 +19,12 @@ theory Base
 
   logic add'(x:'a, s:'a t) : 'a t = 
     epsilon res:'a t. forall y:'a. mem(y, res) <-> (y = x or mem(y, s))
+
+  logic remove('a, 'a t) : 'a t
+
+  axiom Remove_def1 :
+    forall x, y : 'a. forall s : 'a t.
+    mem(x, remove(y, s)) <-> (x <> y and mem(x, s))
 
   logic union('a t, 'a t) : 'a t
 
@@ -48,8 +56,22 @@ theory Fset
   clone export Base
   
   logic cardinal('a t) : int
+
+  axiom Cardinal_nonneg : forall s : 'a t. cardinal(s) >= 0
+
   axiom Cardinal_empty : cardinal(empty : 'a t) = 0
-  (* TODO other axioms for cardinal *)
+
+  axiom Cardinal_add : 
+    forall x : 'a. forall s : 'a t. 
+    not mem(x, s) -> cardinal(add(x, s)) = 1 + cardinal(s)
+
+  axiom Cardinal_remove : 
+    forall x : 'a. forall s : 'a t. 
+    mem(x, s) -> cardinal(s) = 1 + cardinal(remove(x, s))
+
+  axiom Cardinal_subset :
+    forall s1, s2 : 'a t. subset(s1, s2) -> cardinal(s1) <= cardinal(s2)
+
 end
 
 theory Set

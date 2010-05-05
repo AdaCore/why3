@@ -29,7 +29,15 @@ type lazy_op = Pgm_ptree.lazy_op
 
 (* phase 1: destructive typing *)
 
-type deffect = string list
+type dreference = 
+  | DRlocal  of string
+  | DRglobal of Term.lsymbol
+
+type deffect = {
+  de_reads  : dreference list;
+  de_writes : dreference list;
+  de_raises : Term.lsymbol list;
+}
 
 type dlexpr = Typing.denv * Ptree.lexpr
 
@@ -84,7 +92,15 @@ and dtriple = dlexpr * dexpr * dlexpr
 
 type variant = Term.term
 
-type effect = Term.vsymbol list
+type reference = 
+  | Rlocal  of Term.vsymbol
+  | Rglobal of Term.lsymbol
+
+type effect = {
+  e_reads  : reference list;
+  e_writes : reference list;
+  e_raises : Term.lsymbol list;
+}
 
 type type_v = 
   | Tpure of Ty.ty

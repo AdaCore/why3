@@ -1,0 +1,36 @@
+
+{
+  use set.Fset as S
+  use array.Array as M
+
+  (* the graph *)
+
+  type vertex
+
+  logic v : vertex S.t
+
+  logic g_succ(vertex) : vertex S.t
+
+  axiom G_succ_sound : 
+    forall x:vertex. S.subset(g_succ(x), v)
+
+  logic weight(vertex, vertex) : int (* edge weight, if there is an edge *)
+
+  axiom Weight_nonneg : forall x,y:vertex. weight(x,y) >= 0
+}
+
+parameter eq_vertex : 
+  x:vertex -> y:vertex -> {} bool { if result=True then x=y else x<>y }
+
+(* visited vertices *)
+
+parameter visited : vertex S.t ref
+
+parameter visited_add : 
+  x:vertex -> {} unit writes visited { !visited = S.add(x, old(!visited)) }
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/dijkstra"
+End: 
+*)

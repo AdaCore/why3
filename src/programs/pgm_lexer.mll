@@ -184,6 +184,9 @@ rule token = parse
       { logic_start_loc := loc lexbuf; 
 	let s = logic lexbuf in
 	LOGIC (fst !logic_start_loc, s) }
+  (* FIXME: allow newlines as well *)
+  | "{" space* "}"
+      { LOGIC (lexeme_start_p lexbuf, "true") }
   | "{{"
       { LEFTBLEFTB }
   | "}}"
@@ -224,7 +227,7 @@ and logic = parse
 
 (*
 Local Variables: 
-compile-command: "unset LANG; make -C ../.. test"
+compile-command: "unset LANG; make -C ../.. testl"
 End: 
 *)
 
