@@ -6,6 +6,7 @@ export WHYLIB=../lib
 
 pgm=$1
 pgml=$2
+pgml_options=
 
 goods () {
     for f in $1/*.why; do
@@ -50,9 +51,24 @@ drivers () {
 programs () {
     for f in $1/*.mlw; do
 	echo -n "  "$f"... "
-	if ! $pgml $f > /dev/null 2>&1; then 
-	    echo "$pgml $2 $f"
+	if ! $pgml $pgml_options $f > /dev/null 2>&1; then 
+	    echo 
+	    echo "$pgml $pgml_options $f"
 	    echo "FAILED!"
+	    exit 1 
+        else 
+	    echo "ok"
+	fi
+    done
+}
+
+bad_programs () {
+    for f in $1/*.mlw; do
+	echo -n "  "$f"... "
+	if $pgml $pgml_options $f > /dev/null 2>&1; then 
+	    echo 
+	    echo "$pgml $pgml_options $f"
+	    echo "SHOULD FAIL!"
 	    exit 1 
         else 
 	    echo "ok"
@@ -82,7 +98,19 @@ echo "=== Checking drivers ==="
 drivers drivers
 echo ""
 
-echo "=== Type-checking programs ==="
+echo "=== Parsing programs ==="
+pgml_options=--parse-only
+programs bench/programs/bad-typing
+programs examples/programs
+echo ""
+
+echo "=== Type-checking bad programs ==="
+pgml_options=--type-only
+bad_programs bench/programs/bad-typing
+echo ""
+
+echo "=== Type-checking good programs ==="
+pgml_options=--type-only
 programs examples/programs
 echo ""
 
