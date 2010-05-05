@@ -3,6 +3,17 @@
 
   open TptpTree
 
+
+  let translateSpecial t = let module M =
+      Map.Make(struct type t=string let compare=String.compare end) in
+    let known = List.fold_left (fun acc (x, y) -> M.add x y acc) M.empty [
+      ("true", "true");
+      ("false", "false")
+    ] in
+    try
+      M.find t known
+    with _ -> t
+
 %}
 
 
@@ -12,7 +23,7 @@
 %token LPAREN RPAREN LBRACKET RBRACKET
 %token DOT COMMA COLON
 %token PIPE AND ARROW LRARROW EQUAL NEQUAL NOT
-%token BANG QUESTION
+%token BANG QUESTION DOLLAR
 %token QUOTE
 
 %token<string> UIDENT
@@ -29,8 +40,8 @@
 %%
 
 tptp:
-| e = decl es = decl* EOF
-  { e :: es }
+| e = decl* EOF
+  { e }
 | error
   { Printf.printf "error at lexing pos %i\n" $endpos.Lexing.pos_lnum; assert false }
 
@@ -62,6 +73,8 @@ fmla:
 
 
 term:
+| DOLLAR atom = lident
+  { TAtom (translateSpecial atom) }
 | atom = lident
   { TAtom atom }
 | c = INT

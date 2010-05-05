@@ -128,11 +128,11 @@ end = struct
 
   let rec printFmla fmter = function
   | FBinop (op, f1, f2) ->
-    fprintf fmter "(@[%a@ %s@ %a@])" printFmla f1 (show_fbinop op) printFmla f2
+    fprintf fmter "(@[%a@ %s %a@])" printFmla f1 (show_fbinop op) printFmla f2
   | FUnop (op, f) ->
     fprintf fmter "@[(%s %a)@]" (show_funop op) printFmla f
   | FQuant (quant, vars, f) ->
-    fprintf fmter "@[%s@ %a:t.@] %a" (show_quantifier quant)
+    fprintf fmter "%s@ %a : t.@ %a" (show_quantifier quant)
       (print_list printVar) vars printFmla f
   | FPred (pred, terms) ->
     fprintf fmter "%s(@[%a@])" pred (print_list printTerm) terms
@@ -178,9 +178,9 @@ end = struct
   let fromInclude = function | Include x -> x | _ -> assert false
   (** for a given file, returns the list of declarations
   for this file and all the files it includes, recursively *)
-  let rec getAllDecls include_dir filename =
+  let rec getAllDecls ?first:(first=false) include_dir filename =
     try
-      let filename = include_dir^"/"^filename in
+      let filename = if first then filename else include_dir^"/"^filename in
       let input = open_in filename in
       let decls = Tptp_parser.tptp Tptp_lexer.token (Lexing.from_channel input) in
       let isInclude = function | Include _ -> true | _ -> false in
@@ -196,7 +196,7 @@ end = struct
 
   (** process a single file and all includes inside *)
   let printFile fmter include_dir theoryName filename =
-    let decls = getAllDecls include_dir filename in
+    let decls = getAllDecls ~first:true include_dir filename in
     printTheory fmter theoryName decls
 
 end
@@ -224,7 +224,7 @@ module Init = struct
     ("-I", String include_updater, "search for included files in this dir")
   ]
 
-  let usage = "tptp2why file1 [file2...] [-o file]
+  let usage = "tptp2why file1 [file2...] [-o file] [-I dir]
   It parses tptp files (fof format) and prints a why file
   with one theory per input file."
 

@@ -64,7 +64,7 @@ let rec print_term drv fmt t = match t.t_node with
   | Tlet (_,_) -> unsupportedTerm t
       "tptp : you must eliminate let"
   | Tif (f1,t1,t2) ->
-      fprintf fmt "@[itef(%a@, %a@, %a)@]"
+      fprintf fmt "@[itef(%a,@ %a,@ %a)@]"
         (print_fmla drv) f1 (print_term drv) t1 (print_term drv) t2
   | Tcase _ -> unsupportedTerm t
       "tptp : you must eliminate match"
@@ -76,7 +76,7 @@ and print_fmla drv fmt f = match f.f_node with
       print_symbol fmt id
   | Fapp (ls, tl) -> begin match Driver.query_syntax drv ls.ls_name with
       | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl
-      | None -> fprintf fmt "%a(%a)"
+      | None -> fprintf fmt "@[%a(%a)@]"
 	      print_symbol ls.ls_name (print_list comma (print_term drv)) tl
       end
   | Fquant (q, fq) ->
@@ -86,25 +86,25 @@ and print_fmla drv fmt f = match f.f_node with
       let rec forall fmt = function
         | [] -> print_fmla drv fmt f
         | v::l ->
-	    fprintf fmt "@[(%s [%a]@ : (%a))@]" q print_var v forall l
+	    fprintf fmt "%s [%a] :@ %a" q print_var v forall l
       in
       forall fmt vl;
       List.iter forget_var vl
   | Fbinop (Fand, f1, f2) ->
-      fprintf fmt "@[(%a &@ %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
+      fprintf fmt "@[(%a@ & %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
   | Fbinop (For, f1, f2) ->
-      fprintf fmt "@[(%a |@ %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
+      fprintf fmt "@[(%a@ | %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
   | Fbinop (Fimplies, f1, f2) ->
-      fprintf fmt "@[(%a =>@ %a)@]"
+      fprintf fmt "@[(%a@ => %a)@]"
         (print_fmla drv) f1 (print_fmla drv) f2
   | Fbinop (Fiff, f1, f2) ->
-      fprintf fmt "@[(%a <=> %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
+      fprintf fmt "@[(%a@ <=> %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
   | Fnot f ->
       fprintf fmt "@[(~@ %a)@]" (print_fmla drv) f
   | Ftrue ->
-      fprintf fmt "true"
+      fprintf fmt "$true"
   | Ffalse ->
-      fprintf fmt "false"
+      fprintf fmt "$false"
   | Fif (_,_,_) -> unsupportedFmla f "Fif not supported"
       (* fprintf fmt "@[(if_then_else %a@ %a@ %a)@]"
 	(print_fmla drv) f1 (print_fmla drv) f2 (print_fmla drv) f3 *)

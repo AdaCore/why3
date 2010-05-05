@@ -12,6 +12,8 @@
         "fof", FOF;
         "conjecture", CONJECTURE;
         "axiom", AXIOM;
+        "definition", AXIOM; (* TODO : what's the difference ? *)
+        "hypothesis", AXIOM;
         "include", INCLUDE
       ]
 
@@ -86,6 +88,8 @@ rule token = parse
       { RBRACKET }
   | "!"
       { BANG }
+  | "$"
+      { DOLLAR }
   | "?"
       { QUESTION }
   | "&"
