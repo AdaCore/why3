@@ -1,22 +1,38 @@
 
 {
-  use set.Fset as S
-  use array.Array as M
+use set.Fset as S
+use array.Array as M
+}
 
-  (* the graph *)
+(* iteration on a set *)
 
-  type vertex
+parameter set_has_next : 
+  s:'a S.t ref -> 
+    {} 
+    bool reads s 
+    { if result=True then S.is_empty(!s) else not S.is_empty(!s) }
 
-  logic v : vertex S.t
+parameter set_next :
+  s:'a S.t ref -> 
+    { not S.is_empty(!s) } 
+    'a writes s 
+    { S.mem(result, old(!s)) and !s = S.remove(result, old(!s)) }
 
-  logic g_succ(vertex) : vertex S.t
+{
+(* the graph *)
 
-  axiom G_succ_sound : 
-    forall x:vertex. S.subset(g_succ(x), v)
+type vertex
 
-  logic weight(vertex, vertex) : int (* edge weight, if there is an edge *)
+logic v : vertex S.t
 
-  axiom Weight_nonneg : forall x,y:vertex. weight(x,y) >= 0
+logic g_succ(vertex) : vertex S.t
+
+axiom G_succ_sound : 
+  forall x:vertex. S.subset(g_succ(x), v)
+
+logic weight(vertex, vertex) : int (* edge weight, if there is an edge *)
+
+axiom Weight_nonneg : forall x,y:vertex. weight(x,y) >= 0
 }
 
 parameter eq_vertex : 
@@ -28,6 +44,167 @@ parameter visited : vertex S.t ref
 
 parameter visited_add : 
   x:vertex -> {} unit writes visited { !visited = S.add(x, old(!visited)) }
+
+(* current distances *)
+
+parameter d : (vertex, int) M.t ref
+
+(* priority queue *)
+
+parameter q : vertex S.t ref
+
+parameter q_is_empty : 
+  unit -> 
+    {} 
+    bool reads q 
+    { if result=True then S.is_empty(!q) else not S.is_empty(!q) }
+
+parameter init :
+  src:vertex ->
+    {} 
+    unit writes visited, q, d 
+    { S.is_empty(!visited) and 
+      !q = S.add(src, S.empty) and 
+      !d = M.store(old(!d), src, 0)  }
+
+parameter relax :
+  u:vertex -> v:vertex -> 
+    {} 
+    unit reads visited writes d,q 
+    { (S.mem(v, !visited) and !q = old(!q) and !d = old(!d)) 
+      or
+      (S.mem(v,!q) and M.select(!d,u) + weight(u,v) >= M.select(!d,v) and 
+        !q = old(!q) and !d = old(!d)) 
+      or	
+      (S.mem(v,!q) and M.select(!d,u) + weight(u,v) < M.select(!d,v) and 
+        !q = old(!q) and !d = M.store(old(!d), v, M.select(!d,u) + weight(u,v)))
+      or
+      (not S.mem(v, !visited) and not S.mem(v,!q) and !q = S.add(v,old(!q)) and
+        !d = M.store(old(!d), v, M.select(!d,u) + weight(u,v))) }	
+
+{
+logic min(m:vertex, q:vertex S.t, d:(vertex, int) M.t) =
+  S.mem(m, q) and 
+  forall x:vertex. S.mem(x, q) -> M.select(d,x) <= M.select(d,m)
+}
+
+parameter q_extract_min :
+  unit ->
+    { not S.is_empty(!q) } 
+    vertex reads d writes q 
+    { min(result, old(!q), !d) and !q = S.remove(result, old(!q)) }
+
+(* paths and shortest paths 
+   path(x,y,d) = 
+	there is a path from x to y of length d
+   shortest_path(x,y,d) = 
+	there is a path from x to y of length d, and no shorter path *)
+
+{ 
+inductive path(vertex, vertex, int) = 
+  | Path_nil  : 
+      forall x:vertex. path(x, x, 0)
+  | Path_cons :   
+      forall x,y,z:vertex. forall d:int. 
+      path(x, y, d) -> S.mem(z, g_succ(y)) -> path(x, z, d+weight(y,z))
+
+lemma Length_nonneg : forall x,y:vertex. forall d:int. path(x,y,d) -> d >= 0
+
+logic shortest_path(x:vertex, y:vertex, d:int) =
+  path(x,y,d) and forall d':int. path(x,y,d') -> d <= d'
+
+lemma Path_inversion :
+  forall src,v:vertex. forall d:int. path(src,v,d) ->
+  (v = src and d = 0) or
+  (exists v':vertex. path(src,v',d - weight(v',v)) and S.mem(v, g_succ(v')))
+
+lemma Path_shortest_path :
+  forall src,v:vertex. forall d:int. path(src,v,d) ->
+  exists d':int. shortest_path(src,v,d') and d' <= d
+
+(* lemmas (those requiring induction) *)
+
+lemma Main_lemma :
+  forall src,v:vertex. forall d:int. 
+  path(src,v,d) -> not shortest_path(src,v,d) ->
+  exists v':vertex. exists d':int. 
+    shortest_path(src,v',d') and S.mem(v,g_succ(v')) and d' + weight(v',v) < d
+
+lemma Completeness_lemma :
+  forall s:vertex S.t. forall src:vertex. forall dst:vertex. forall d:int. 
+  (* if s is closed under g_succ *)
+  (forall v:vertex. 
+     S.mem(v,s) -> forall w:vertex. S.mem(w,g_succ(v)) -> S.mem(w,s)) ->
+  (* and if s contains src *)
+  S.mem(src, s) -> 
+  (* then any vertex reachable from s is also in s *)
+  path(src, dst, d) -> S.mem(dst, s)
+
+(* definitions used in loop invariants *)
+
+logic inv_src(src:vertex, s:vertex S.t, q:vertex S.t) =
+  S.mem(src,s) or S.mem(src,q)
+
+logic inv(src:vertex, s:vertex S.t, q:vertex S.t, d:(vertex,int) M.t) =
+  inv_src(src, s, q)
+  (* S,Q are contained in V *)
+  and S.subset(s,v) and S.subset(q,v)
+  (* S and Q are disjoint *)
+  and 
+  (forall v:vertex. S.mem(v,q) -> S.mem(v,s) -> false)
+  (* we already found the shortest paths for vertices in S *)
+  and
+  (forall v:vertex. S.mem(v,s) -> shortest_path(src,v,M.select(d,v)))
+  (* there are paths for vertices in Q *)
+  and
+  (forall v:vertex. S.mem(v,q) -> path(src,v,M.select(d,v)))
+  (* vertices at distance < min(Q) are already in S *)
+  and
+  (forall m:vertex. min(m,q,d) -> 
+     forall x:vertex. forall dx:int. shortest_path(src,x,dx) -> 
+       dx < M.select(d,m) -> S.mem(x,s)) 
+
+logic inv_succ(src:vertex, s:vertex S.t, q: vertex S.t) =
+  (* successors of vertices in S are either in S or in Q *)
+  (forall x:vertex. S.mem(x, s) -> 
+     forall y:vertex. S.mem(y,g_succ(x)) -> S.mem(y, s) or S.mem(y, q))
+
+logic inv_succ2(src:vertex, s:vertex S.t, q: vertex S.t,
+	        u:vertex, su:vertex S.t) =
+  (* successors of vertices in S are either in S or in Q,
+     unless they are successors of u still in su *)
+  (forall x:vertex. S.mem(x, s) -> 
+     forall y:vertex. S.mem(y,g_succ(x)) -> 
+       (x<>u or (x=u and not S.mem(y,su))) -> S.mem(y, s) or S.mem(y, q))
+}
+
+(* code *)
+
+let shortest_path_code (src:vertex) (dst:vertex) =
+  { S.mem(src,v) and S.mem(dst,v) }
+  init src;
+  while not (q_is_empty Unit) do
+    invariant { inv(src, !visited, !q, !d) and inv_succ(src, !visited, !q) }
+    variant   { S.cardinal(v) - S.cardinal(!visited) }
+    let u = q_extract_min () in
+    assert { shortest_path(src, u, M.select(!d,u)) };
+    visited_add u;
+    let su = ref (g_succ u) in
+    while not (set_has_next su) do 
+      invariant 
+	{  S.subset(!su, g_succ(u)) and 
+ 	   inv(src, !visited, !q, !d) and inv_succ2(src, !visited, !q, u, !su) }
+      variant { S.cardinal(!su) }
+      let v = set_next su in
+      relax u v
+    done
+  done
+  { (forall v:vertex. 
+       S.mem(v, !visited) -> shortest_path(src, v, M.select(!d,v))) 
+    and
+    (forall v:vertex. 
+       not S.mem(v, !visited) -> forall dv:int. not path(src, v, dv)) }
+
 
 (*
 Local Variables: 

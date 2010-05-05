@@ -68,7 +68,6 @@
 	"try", TRY;
 	"type", TYPE;
 	"variant", VARIANT;
-	"void", VOID;
 	"while", WHILE;
 	"with", WITH;
         "writes", WRITES;
@@ -146,6 +145,8 @@ rule token = parse
       { LEFTPAR }
   | ")"
       { RIGHTPAR }
+  | "()"
+      { UIDENT "Unit" }
   | ":"
       { COLON }
   | ";"

@@ -433,6 +433,16 @@ let type_expr uc e =
   let e = dexpr denv e in
   expr uc Mstr.empty e
 
+let add_decl uc ls =
+  try
+    Theory.add_decl uc (Decl.create_logic_decl [ls, None])
+  with Theory.ClashSymbol _ ->
+    let loc = match ls.ls_name.id_origin with
+      | User loc -> Some loc
+      | _ -> None (* FIXME: loc for recursive functions *)
+    in
+    errorm ?loc "clash with previous symbol %s" ls.ls_name.id_short
+    
 let file env uc dl =
   let uc, dl =
     List.fold_left
@@ -443,7 +453,7 @@ let file env uc dl =
 	     let e = type_expr uc e in
 	     let tyl, ty = uncurrying uc e.expr_type in
 	     let ls = create_lsymbol (id_user id.id id.id_loc) tyl (Some ty) in
-	     let uc = Theory.add_decl uc (Decl.create_logic_decl [ls, None]) in
+	     let uc = add_decl uc ls in
 	     uc, Dlet (ls, e) :: acc
 	 | Pgm_ptree.Dletrec dl -> 
 	     let denv = create_denv uc in
@@ -453,7 +463,7 @@ let file env uc dl =
 	       let tyl, ty = uncurrying uc v.vs_ty in
 	       let id = id_fresh v.vs_name.id_short in
 	       let ls = create_lsymbol id tyl (Some ty) in
-	       Theory.add_decl uc (Decl.create_logic_decl [ls, None]), (ls, r)
+	       add_decl uc ls, (ls, r)
 	     in
 	     let uc, dl = map_fold_left one uc dl in
 	     uc, Dletrec dl :: acc
@@ -463,7 +473,7 @@ let file env uc dl =
 	     let tyv = type_v uc Mstr.empty tyv in
 	     let tyl, ty = uncurrying uc (purify uc tyv) in
 	     let ls = create_lsymbol (id_user id.id id.id_loc) tyl (Some ty) in
-	     let uc = Theory.add_decl uc (Decl.create_logic_decl [ls, None]) in
+	     let uc = add_decl uc ls in
 	     uc, Dparam (ls, tyv) :: acc
       )
       (uc, []) dl
