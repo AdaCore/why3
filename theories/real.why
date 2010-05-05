@@ -1,6 +1,11 @@
 
-
 theory Real 
+
+  logic zero : real = 0.0
+  logic one  : real = 1.0
+  
+  clone export algebra.Field with 
+     type t = real, logic zero = zero, logic one = one
 
   logic (< )(real, real)
   logic (<=)(x:real, y:real) = x < y or x = y
@@ -10,21 +15,13 @@ theory Real
   clone export relations.TotalOrder with
     type t = real, logic rel = (<=)
 
-  logic zero : real = 0.0
-  logic one  : real = 1.0
-  
-  clone export algebra.Field with 
-     type t = real, logic zero = zero, logic one = one
 end 
 
 theory Abs
 
   use import Real
 
-  logic abs(real) : real
-
-  axiom Pos: forall x:real. x >= 0.0 -> abs(x) = x
-  axiom Neg: forall x:real. x <= 0.0 -> abs(x) = -x
+  logic abs(real) : real = if x >= 0.0 then x else -x
 
   lemma Abs_le: forall x,y:real. abs(x) <= y <-> -y <= x <= y
 

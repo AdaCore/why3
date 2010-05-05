@@ -1,6 +1,12 @@
 
 theory Int 
 
+  logic zero : int = 0
+  logic one  : int = 1
+  
+  clone export algebra.UnitaryCommutativeRing with 
+     type t = int, logic zero = zero, logic one = one
+
   logic (< ) (int, int)
   logic (<=) (x:int, y:int) = x < y or x = y
   logic (> ) (x:int, y:int) = y < x
@@ -9,11 +15,6 @@ theory Int
   clone export relations.TotalOrder with
     type t = int, logic rel = (<=)
 
-  logic zero : int = 0
-  logic one  : int = 1
-  
-  clone export algebra.UnitaryCommutativeRing with 
-     type t = int, logic zero = zero, logic one = one
 end 
 
 
