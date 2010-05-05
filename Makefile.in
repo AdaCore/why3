@@ -371,14 +371,15 @@ src/coq-plugin/g_whytac.ml: src/coq-plugin/g_whytac.ml4
 	$(CAMLP5O) pr_o.cmo @COQLIB@/parsing/grammar.cma -impl $^ -o $@
 
 # depend and clean targets
+
 ifeq (@enable_coq_support@,yes)
 include .depend.coq
-endif
 
 .depend.coq: $(COQGENERATED)
 	$(OCAMLDEP) -slash -I src -I src/coq-plugin $(COQML) > $@
 
 depend: .depend.coq
+endif
 
 clean::
 	rm -f src/coq-plugin/*.cm[iox] src/coq-plugin/*.o
@@ -432,12 +433,12 @@ bin/tptp2why.byte: $(TPTPCMO)
 
 ifeq (@enable_tptp2why_support@,yes)
 include .depend.tptp2why
-endif
 
 .depend.tptp2why: $(TPTPGENERATED)
 	$(OCAMLDEP) -slash -I src -I src/tptp2why $(TPTPML) $(TPTPMLI) > $@
 
 depend: .depend.tptp2why
+endif
 
 clean::
 	rm -f $(TPTPGENERATED)
