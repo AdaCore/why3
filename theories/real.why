@@ -21,7 +21,7 @@ theory Abs
 
   use import Real
 
-  logic abs(real) : real = if x >= 0.0 then x else -x
+  logic abs(x : real) : real = if x >= 0.0 then x else -x
 
   lemma Abs_le: forall x,y:real. abs(x) <= y <-> -y <= x <= y
 
