@@ -308,14 +308,14 @@ endif
 
 bin/whyide.opt bin/whyide.byte: INCLUDES = -I +lablgtk2 -I +threads
 
-bin/whyide.opt: src/why.cmxa $(IDE_CMX)
+bin/whyide.opt: src/why.cmxa $(IDECMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) threads.cmxa \
 	    lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx $^
 	$(STRIP) $@
 
 
-bin/whyide.byte: src/why.cma $(IDE_CMO)
+bin/whyide.byte: src/why.cma $(IDECMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma \
 	    lablgtk.cma lablgtksourceview2.cma gtkThread.cmo $^
