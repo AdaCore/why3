@@ -277,7 +277,7 @@ let do_task _env drv fname tname (th : Why.Theory.theory) (task : Task.task) =
           (task_goal task).Decl.pr_name.Ident.id_long
           Call_provers.print_prover_result res
     | None, None ->
-        Prover.print_task drv std_formatter task
+        Prover.print_task ~debug drv std_formatter task
     | Some dir, _ ->
         let fname = Filename.basename fname in
         let fname =
@@ -290,7 +290,7 @@ let do_task _env drv fname tname (th : Why.Theory.theory) (task : Task.task) =
         let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
         let ext = String.sub dest i (String.length dest - i) in
         let cout = open_out (Filename.concat dir (name ^ ext)) in
-        Prover.print_task drv (formatter_of_out_channel cout) task;
+        Prover.print_task ~debug drv (formatter_of_out_channel cout) task;
         close_out cout
 
 let do_theory env drv fname tname th glist =
