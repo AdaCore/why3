@@ -6,6 +6,59 @@ open TptpTree
 open Why
 open Why.Ident
 
+module S = Set.Make(String)
+module M = Map.Make(String)
+
+(** exploratory module, to find atoms and functors to be declared first *)
+module Summary : sig
+  type indic = Pred | Term
+  val findAtoms : S.t -> fmla -> S.t
+  val findFunctors : (indic * int) M.t ->
+        TptpTree.fmla -> (indic * int) M.t
+  val findAllAtoms : decl list -> S.t
+  val findAllFunctors : TptpTree.decl list -> (indic * int) M.t
+end = struct
+  type indic = Pred | Term
+
+  let rec findAtoms_t s = function
+  | TAtom a -> S.add a s
+  | TConst _ | TVar _ -> s
+  | TFunctor (_, terms) ->
+    List.fold_left findAtoms_t s terms
+
+  let rec findAtoms s = function
+  | FBinop (_, f1, f2) -> S.union (findAtoms s f1) (findAtoms s f2)
+  | FUnop (_, f) -> findAtoms s f
+  | FQuant (_, _, f) -> findAtoms s f
+  | FPred (_, terms) -> List.fold_left findAtoms_t s terms
+  | FTermBinop (_, t1, t2) -> S.union (findAtoms_t s t1) (findAtoms_t s t2)
+
+  let union_map = M.fold M.add
+
+  let rec findFunctors_t m = function
+  | TAtom _ | TConst _ | TVar _ -> m
+  | TFunctor (f, terms) -> M.add f (Term, List.length terms) m
+
+  let rec findFunctors m = function
+  | FBinop (_, f1, f2) -> union_map (findFunctors m f1) (findFunctors m f2)
+  | FUnop (_, f) -> findFunctors m f
+  | FQuant (_, _, f) -> findFunctors m f
+  | FPred (p, terms) -> let new_m = M.add p (Pred, List.length terms) m in
+      List.fold_left findFunctors_t new_m terms
+  | FTermBinop (_, t1, t2) ->
+      union_map (findFunctors_t m t1) (findFunctors_t m t2)
+
+  let findAllAtoms decls =
+    let helper m = function Fof(_, _, f) -> findAtoms m f | _ -> assert false in
+    List.fold_left helper S.empty decls
+
+  let findAllFunctors decls =
+    let helper s = function Fof(_, _, f) -> findFunctors s f | _ -> assert false in
+    List.fold_left helper M.empty decls
+
+
+end
+
 (*s this module manages scoping of vars using a stack of
 variables bindings *)
 module Scope
@@ -15,6 +68,7 @@ module Scope
     val create : key -> value
   end) = struct
 
+  (* TODO : write a more efficient implementation, for example with maps *)
   let scope = ref []
 
   let is_empty () = !scope = []
@@ -117,7 +171,24 @@ module Translate = struct
         | NotEqual -> EnvFunctor.find ("<>", [t;t]) )
       [term2term t1; term2term t2]
 
-  let theory_of_decls theoryName decls = assert false;
+  let translatePropKind = function
+  | Axiom -> Decl.Paxiom
+  | Conjecture -> Decl.Pgoal
+
+  (** add a declaration to a theory, after translation *)
+  let addDecl theory = function
+  | Fof(name, ty, f) ->
+      let fmla = fmla2fmla f in
+      Theory.add_prop_decl theory (translatePropKind ty)
+        (Decl.create_prsymbol (id_fresh name)) fmla
+  | Include _ -> assert false
+
+
+  (** from a list of untyped declarations, translates them into a why theory *)
+  let theory_of_decls theoryName decls =
+    let theorident = Theory.create_theory (Ident.id_fresh theoryName) in
+    let theory = List.fold_left addDecl theorident decls in
+    Theory.close_theory theory
 
 end
 
