@@ -41,7 +41,7 @@ struct
 
      
 (*  let spec_conv ts =
-    let name = ts.ts_name.id_short in
+    let name = ts.ts_name.id_string in
     let d2ty = create_fsymbol (id_fresh ("d2"^name)) [deco] (ty_app ts []) in
     let ty2u = create_fsymbol (id_fresh (name^"2u")) [(ty_app ts [])] undeco in
     let axiom = 
@@ -85,7 +85,7 @@ let load_prelude query env =
   let logic_tty = Theory.ns_find_ls builtin.th_export ["tty"] in
   let clone_builtin ts =
     let task = None in
-    let name = ts.ts_name.id_short in
+    let name = ts.ts_name.id_string in
     let th_uc = create_theory (id_fresh ("encoding_decorate_for_"^name)) in
     let th_uc = Theory.use_export th_uc prelude in
     let th_uc = 
@@ -140,7 +140,7 @@ let rec term_of_ty tenv tvar ty =
     | Tyvar tv -> 
         t_var (try Htv.find tvar tv
               with Not_found -> 
-                (let var = create_vsymbol (id_fresh ("tv"^tv.tv_name.id_short))
+                (let var = create_vsymbol (id_fresh ("tv"^tv.tv_name.id_string))
                   tenv.ty in
                  Htv.add tvar tv var;
                  var))

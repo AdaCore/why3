@@ -330,7 +330,7 @@ let print_inst fmt (id1,id2) =
     let n = id_unique pprinter id1 in
     fprintf fmt "prop %s = %a" n print_pr (Hid.find phash id2)
   else
-    fprintf fmt "ident %s = %s" id1.id_long id2.id_long
+    fprintf fmt "ident %s = %s" id1.id_string id2.id_string
 
 let print_decl fmt d = match d.d_node with
   | Dtype tl  -> print_list newline print_type_decl fmt tl

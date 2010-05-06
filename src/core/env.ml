@@ -40,7 +40,7 @@ let create_env =
       env_tag      = !r }
     in
     let th = builtin_theory in
-    let m = Mnm.add th.th_name.id_short th Mnm.empty in
+    let m = Mnm.add th.th_name.id_string th Mnm.empty in
     Hashtbl.add env.env_memo [] m;
     env
 

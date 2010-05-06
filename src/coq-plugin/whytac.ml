@@ -373,7 +373,7 @@ and tr_global_ts dep env r =
 	      let (_,vars), env, t = decomp_type_quantifiers env ty in
 	      let tvm =
 		let add v1 v2 tvm = 
-		  Idmap.add (id_of_string v1.tv_name.Ident.id_short) v2 tvm
+		  Idmap.add (id_of_string v1.tv_name.Ident.id_string) v2 tvm
 		in
 		List.fold_right2 add vars ts.Ty.ts_args Idmap.empty
 	      in

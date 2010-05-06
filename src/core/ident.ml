@@ -22,10 +22,9 @@ open Util
 (** Identifiers *)
 
 type ident = {
-  id_short : string;    (* non-unique name for string-based lookup *)
-  id_long : string;     (* non-unique name for pretty printing *)
+  id_string : string;   (* non-unique name *)
   id_origin : origin;   (* origin of the ident *)
-  id_tag : int;         (* unique numeric tag *)
+  id_tag    : int;      (* unique numeric tag *)
 }
 
 and origin =
@@ -52,23 +51,16 @@ let gentag = let r = ref 0 in fun () -> incr r; !r
 
 let id_register id = { id with id_tag = gentag () }
 
-let create_ident short long origin = {
-  id_short  = short;
-  id_long   = long;
+let create_ident name origin = {
+  id_string = name;
   id_origin = origin;
   id_tag    = -1
 }
 
-let id_fresh sh = create_ident sh sh Fresh
-let id_fresh_long sh ln = create_ident sh ln Fresh
-
-let id_user sh loc = create_ident sh sh (User loc)
-let id_user_long sh ln loc = create_ident sh ln (User loc)
-
-let id_derive sh id = create_ident sh sh (Derived id)
-let id_derive_long sh ln id = create_ident sh ln (Derived id)
-
-let id_clone id = create_ident id.id_short id.id_long (Derived id)
+let id_fresh nm = create_ident nm Fresh
+let id_user nm loc = create_ident nm (User loc)
+let id_derive nm id = create_ident nm (Derived id)
+let id_clone id = create_ident id.id_string (Derived id)
 let id_dup id = { id with id_tag = -1 }
 
 let rec id_derived_from i1 i2 = id_equal i1 i2 ||
@@ -121,7 +113,7 @@ let id_unique printer ?(sanitizer = same) id =
   try
     Hashtbl.find printer.values id.id_tag
   with Not_found ->
-    let name = sanitizer (printer.sanitizer id.id_long) in
+    let name = sanitizer (printer.sanitizer id.id_string) in
     let name = find_unique printer.indices name in
     Hashtbl.replace printer.values id.id_tag name;
     name

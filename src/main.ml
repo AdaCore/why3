@@ -249,7 +249,7 @@ let rec report fmt = function
   | Typing.Error e ->
       Typing.report fmt e
   | Decl.UnknownIdent i ->
-      fprintf fmt "anomaly: unknown ident '%s'" i.Ident.id_short
+      fprintf fmt "anomaly: unknown ident '%s'" i.Ident.id_string
   | Driver.Error e ->
       Driver.report fmt e
   | Config.Dynlink.Error e ->
@@ -263,7 +263,7 @@ let rec report fmt = function
   | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
 let print_th_namespace fmt th =
-  Pretty.print_namespace fmt th.th_name.Ident.id_short th.th_export
+  Pretty.print_namespace fmt th.th_name.Ident.id_string th.th_export
 
 let fname_printer = ref (Ident.create_ident_printer [])
 
@@ -274,7 +274,7 @@ let do_task _env drv fname tname (th : Why.Theory.theory) (task : Task.task) =
           Prover.prove_task ~debug ~command ~timelimit ~memlimit drv task ()
         in
         printf "%s %s %s : %a@." fname tname
-          (task_goal task).Decl.pr_name.Ident.id_long
+          (task_goal task).Decl.pr_name.Ident.id_string
           Call_provers.print_prover_result res
     | None, None ->
         Prover.print_task ~debug drv std_formatter task
@@ -283,7 +283,7 @@ let do_task _env drv fname tname (th : Why.Theory.theory) (task : Task.task) =
         let fname =
           try Filename.chop_extension fname with _ -> fname
         in
-        let tname = th.th_name.Ident.id_short in
+        let tname = th.th_name.Ident.id_string in
         let dest = Driver.file_of_task drv fname tname task in
         (* Uniquify the filename before the extension if it exists*)
         let i = try String.rindex dest '.' with _ -> String.length dest in

@@ -118,7 +118,7 @@ module Ide_namespace = struct
       Mnm.iter add_ns ns.ns_ns
     in
     let row = model#append () in
-    model#set ~row ~column (th.th_name.Ident.id_short : string);
+    model#set ~row ~column (th.th_name.Ident.id_string : string);
     fill row th.th_export
 
 end

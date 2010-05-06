@@ -115,10 +115,10 @@ let builtin_theory =
   let kn_equ  = known_add_decl kn_real decl_equ in
   let kn_neq  = known_add_decl kn_equ decl_neq in
 
-  let ns_int  = Mnm.add ts_int.ts_name.id_short ts_int Mnm.empty in
-  let ns_real = Mnm.add ts_real.ts_name.id_short ts_real ns_int in
-  let ns_equ  = Mnm.add ps_equ.ls_name.id_short ps_equ Mnm.empty in
-  let ns_neq  = Mnm.add ps_neq.ls_name.id_short ps_neq ns_equ in
+  let ns_int  = Mnm.add ts_int.ts_name.id_string ts_int Mnm.empty in
+  let ns_real = Mnm.add ts_real.ts_name.id_string ts_real ns_int in
+  let ns_equ  = Mnm.add ps_equ.ls_name.id_string ps_equ Mnm.empty in
+  let ns_neq  = Mnm.add ps_neq.ls_name.id_string ps_neq ns_equ in
 
   let export  = { ns_ts = ns_real;   ns_ls = ns_neq;
                   ns_pr = Mnm.empty; ns_ns = Mnm.empty } in
@@ -215,8 +215,8 @@ let create_theory n = use_export (empty_theory n) builtin_theory
 let add_symbol add id v uc =
   match uc.uc_import, uc.uc_export with
   | i0 :: sti, e0 :: ste -> { uc with
-      uc_import = add false id.id_short v i0 :: sti;
-      uc_export = add true  id.id_short v e0 :: ste;
+      uc_import = add false id.id_string v i0 :: sti;
+      uc_export = add true  id.id_string v e0 :: ste;
       uc_local  = Sid.add id uc.uc_local }
   | _ ->
       assert false

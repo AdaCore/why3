@@ -20,10 +20,9 @@
 (** Identifiers *)
 
 type ident = private {
-  id_short : string;    (* non-unique name for string-based lookup *)
-  id_long : string;     (* non-unique name for pretty printing *)
+  id_string : string;   (* non-unique name *)
   id_origin : origin;   (* origin of the ident *)
-  id_tag : int;         (* unique numeric tag *)
+  id_tag    : int;      (* unique numeric tag *)
 }
 
 and origin =
@@ -45,15 +44,12 @@ val id_register : preid -> ident
 
 (* create a fresh pre-ident *)
 val id_fresh : string -> preid
-val id_fresh_long : string -> string -> preid
 
 (* create a localized pre-ident *)
 val id_user : string -> Loc.position -> preid
-val id_user_long : string -> string -> Loc.position -> preid
 
 (* create a derived pre-ident *)
 val id_derive : string -> ident -> preid
-val id_derive_long : string -> string -> ident -> preid
 
 (* create a derived pre-ident with the same name *)
 val id_clone : ident -> preid

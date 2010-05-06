@@ -483,7 +483,7 @@ let add_decl uc ls =
       | User loc -> Some loc
       | _ -> None (* FIXME: loc for recursive functions *)
     in
-    errorm ?loc "clash with previous symbol %s" ls.ls_name.id_short
+    errorm ?loc "clash with previous symbol %s" ls.ls_name.id_string
     
 let file env uc dl =
   let uc, dl =
@@ -503,7 +503,7 @@ let file env uc dl =
 	     let _, dl = letrec uc Mstr.empty dl in
 	     let one uc (v,_,_,_ as r) =
 	       let tyl, ty = uncurrying uc v.vs_ty in
-	       let id = id_fresh v.vs_name.id_short in
+	       let id = id_fresh v.vs_name.id_string in
 	       let ls = create_lsymbol id tyl (Some ty) in
 	       add_decl uc ls, (ls, r)
 	     in

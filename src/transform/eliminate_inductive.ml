@@ -46,7 +46,7 @@ let inv acc (ps,al) =
   let hd = f_app ps tl in
   let dj = Util.map_join_left (exi tl) f_or al in
   let ax = f_forall vl [[Fmla hd]] (f_implies hd dj) in
-  let nm = id_derive (ps.ls_name.id_long ^ "_inversion") ps.ls_name in
+  let nm = id_derive (ps.ls_name.id_string ^ "_inversion") ps.ls_name in
   create_prop_decl Paxiom (create_prsymbol nm) ax :: acc
 
 let elim d = match d.d_node with

@@ -121,7 +121,7 @@ let rec report fmt = function
   | Typing.Error e ->
       Typing.report fmt e
   | Decl.UnknownIdent i ->
-      fprintf fmt "anomaly: unknown ident '%s'" i.Ident.id_short
+      fprintf fmt "anomaly: unknown ident '%s'" i.Ident.id_string
   | Driver.Error e ->
       Driver.report fmt e
   | Config.Dynlink.Error e ->
@@ -146,7 +146,7 @@ let m : Why.Theory.theory Why.Theory.Mnm.t =
 (***************************)
 
 let add_task (tname : string) (task : Why.Task.task) acc =
-  let name = (Why.Task.task_goal task).Why.Decl.pr_name.Why.Ident.id_long in
+  let name = (Why.Task.task_goal task).Why.Decl.pr_name.Why.Ident.id_string in
   eprintf "doing task: tname=%s, name=%s@." tname name;
   Db.add_or_replace_task ~tname ~name task :: acc
 
@@ -231,11 +231,11 @@ let main_loop goals =
 let () =
   eprintf "looking for goals@.";
   let add_th t th mi = 
-    eprintf "adding theory %s, %s@." th.Why.Theory.th_name.Why.Ident.id_long t;
+    eprintf "adding theory %s, %s@." th.Why.Theory.th_name.Why.Ident.id_string t;
     Why.Ident.Mid.add th.Why.Theory.th_name (t,th) mi 
   in
   let do_th _ (t,th) glist = 
-    eprintf "doing theory %s, %s@." th.Why.Theory.th_name.Why.Ident.id_long t;
+    eprintf "doing theory %s, %s@." th.Why.Theory.th_name.Why.Ident.id_string t;
     do_theory t th glist  
   in
   let goals = 

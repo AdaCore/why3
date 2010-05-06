@@ -58,14 +58,14 @@ let rec print_dty fmt = function
   | Tyvar { type_val = Some t } ->
       print_dty fmt t
   | Tyvar { type_val = None; tvsymbol = v } ->
-      fprintf fmt "'%s" v.tv_name.id_short
+      fprintf fmt "'%s" v.tv_name.id_string
   | Tyapp (s, []) ->
-      fprintf fmt "%s" s.ts_name.id_short
+      fprintf fmt "%s" s.ts_name.id_string
   | Tyapp (s, [t]) -> 
-      fprintf fmt "%a %s" print_dty t s.ts_name.id_short
+      fprintf fmt "%a %s" print_dty t s.ts_name.id_string
   | Tyapp (s, l) -> 
       fprintf fmt "(%a) %s" 
-	(print_list comma print_dty) l s.ts_name.id_short
+	(print_list comma print_dty) l s.ts_name.id_string
 
 let create_ty_decl_var =
   let t = ref 0 in

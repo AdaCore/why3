@@ -375,7 +375,7 @@ let get_filename drv input_file theory_name goal_name =
   Str.global_substitute filename_regexp replace file
 
 let file_of_task drv input_file theory_name task =
-  get_filename drv input_file theory_name (task_goal task).pr_name.id_short
+  get_filename drv input_file theory_name (task_goal task).pr_name.id_string
 
 let call_on_buffer ?debug ~command ?timelimit ?memlimit drv buffer =
   let regexps = drv.drv_regexps in

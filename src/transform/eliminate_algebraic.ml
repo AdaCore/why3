@@ -158,7 +158,7 @@ let add_type (state, task) ts csl =
   let cs_add tsk cs = add_decl tsk (create_logic_decl [cs, None]) in
   let task = List.fold_left cs_add task csl in
   (* declare the selector function *)
-  let mt_id = id_derive ("match_" ^ ts.ts_name.id_long) ts.ts_name in
+  let mt_id = id_derive ("match_" ^ ts.ts_name.id_string) ts.ts_name in
   let mt_hd = ty_app ts (List.map ty_var ts.ts_args) in
   let mt_ty = ty_var (create_tvsymbol (id_fresh "a")) in
   let mt_al = mt_hd :: List.rev_map (fun _ -> mt_ty) csl in
@@ -170,7 +170,7 @@ let add_type (state, task) ts csl =
   let mt_vl = List.rev_map mt_vs csl in
   let mt_tl = List.rev_map t_var mt_vl in
   let mt_add tsk cs t =
-    let id = mt_ls.ls_name.id_long ^ "_" ^ cs.ls_name.id_long in
+    let id = mt_ls.ls_name.id_string ^ "_" ^ cs.ls_name.id_string in
     let pr = create_prsymbol (id_derive id cs.ls_name) in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
     let hd = t_app cs (List.rev_map t_var vl) (of_option cs.ls_value) in
@@ -182,7 +182,7 @@ let add_type (state, task) ts csl =
   let task = List.fold_left2 mt_add task csl mt_tl in
   (* declare and define the projection functions *)
   let pj_add (m,tsk) cs =
-    let id = cs.ls_name.id_long ^ "_proj_" in
+    let id = cs.ls_name.id_string ^ "_proj_" in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
     let tl = List.rev_map t_var vl in
     let hd = t_app cs tl (of_option cs.ls_value) in
@@ -191,7 +191,7 @@ let add_type (state, task) ts csl =
       let id = id_derive (id ^ (incr c; string_of_int !c)) cs.ls_name in
       let ls = create_fsymbol id [of_option cs.ls_value] t.t_ty in
       let tsk = add_decl tsk (create_logic_decl [ls, None]) in
-      let id = id_derive (ls.ls_name.id_long ^ "_def") ls.ls_name in
+      let id = id_derive (ls.ls_name.id_string ^ "_def") ls.ls_name in
       let pr = create_prsymbol id in
       let hh = t_app ls [hd] t.t_ty in
       let ax = f_forall (List.rev vl) [[Term hd]] (f_equ hh t) in
@@ -202,7 +202,7 @@ let add_type (state, task) ts csl =
   in
   let pjmap, task = List.fold_left pj_add (state.pj_map, task) csl in
   (* add the inversion axiom *)
-  let ax_id = ts.ts_name.id_long ^ "_inversion" in
+  let ax_id = ts.ts_name.id_string ^ "_inversion" in
   let ax_pr = create_prsymbol (id_derive ax_id ts.ts_name) in
   let ax_vs = create_vsymbol (id_fresh "u") mt_hd in
   let ax_hd = t_var ax_vs in

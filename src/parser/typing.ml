@@ -87,7 +87,7 @@ let report fmt = function
   | TermExpected ->
       fprintf fmt "syntax error: term expected"
   | BadNumberOfArguments (s, n, m) ->
-      fprintf fmt "@[Symbol `%s' is applied to %d terms,@ " s.id_short n;
+      fprintf fmt "@[Symbol `%s' is applied to %d terms,@ " s.id_string n;
       fprintf fmt "but is expecting %d arguments@]" m
   | ClashTheory s ->
       fprintf fmt "clash with previous theory %s" s
@@ -709,7 +709,7 @@ let add_types dl th =
 	  let vars = th'.utyvars in
 	  List.iter
 	    (fun v ->
-	       Hashtbl.add vars v.tv_name.id_short
+	       Hashtbl.add vars v.tv_name.id_string
                   (create_ty_decl_var ~user:true v))
 	    ts.ts_args;
 	  ts, th'
@@ -733,7 +733,7 @@ let add_types dl th =
   with ClashSymbol s -> error ~loc:(Hashtbl.find csymbols s) (Clash s)
 
 let env_of_vsymbol_list vl =
-  List.fold_left (fun env v -> Mstr.add v.vs_name.id_short v env) Mstr.empty vl
+  List.fold_left (fun env v -> Mstr.add v.vs_name.id_string v env) Mstr.empty vl
 
 let add_logics dl th =
   let fsymbols = Hashtbl.create 17 in
@@ -931,30 +931,30 @@ and add_decl env lenv th = function
                   let ts1 = find_tysymbol_ns p t.th_export in
                   let ts2 = find_tysymbol q th in
                   if Mts.mem ts1 s.inst_ts
-                  then error ~loc (Clash ts1.ts_name.id_short);
+                  then error ~loc (Clash ts1.ts_name.id_string);
                   { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
               | CSlsym (p,q) ->
                   let ls1 = find_lsymbol_ns p t.th_export in
                   let ls2 = find_lsymbol q th in
                   if Mls.mem ls1 s.inst_ls
-                  then error ~loc (Clash ls1.ls_name.id_short);
+                  then error ~loc (Clash ls1.ls_name.id_string);
                   { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
               | CSlemma p ->
                   let pr,_ = find_prop_ns p t.th_export in
                   if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
-                  then error ~loc (Clash pr.pr_name.id_short);
+                  then error ~loc (Clash pr.pr_name.id_string);
                   { s with inst_lemma = Spr.add pr s.inst_lemma }
               | CSgoal p ->
                   let pr,_ = find_prop_ns p t.th_export in
                   if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
-                  then error ~loc (Clash pr.pr_name.id_short);
+                  then error ~loc (Clash pr.pr_name.id_string);
                   { s with inst_goal = Spr.add pr s.inst_goal }
 	    in
             let s = List.fold_left add_inst empty_inst s in
 	    clone_export th t s
       in
       let n = match use.use_as with
-	| None -> Some t.th_name.id_short
+	| None -> Some t.th_name.id_string
 	| Some (Some x) -> Some x.id
 	| Some None -> None
       in
@@ -982,7 +982,7 @@ and add_decl env lenv th = function
 
 and type_and_add_theory env lenv pt =
   let id = pt.pt_name in
-  if Mnm.mem id.id lenv || id.id = builtin_theory.th_name.id_short
+  if Mnm.mem id.id lenv || id.id = builtin_theory.th_name.id_string
     then error (ClashTheory id.id);
   let th = type_theory env lenv id pt in
   Mnm.add id.id th lenv
