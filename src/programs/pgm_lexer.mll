@@ -59,6 +59,7 @@
 	"let", LET;
 	"match", MATCH;
 	"not", NOT;
+	"of", OF;
 	"parameter", PARAMETER;
 	"raise", RAISE;
 	"raises", RAISES;

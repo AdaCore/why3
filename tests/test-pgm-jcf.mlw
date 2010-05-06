@@ -4,6 +4,11 @@ use import list.List
 logic c : int
 }
 
+exception Not_found
+exception Found of int
+
+let test_raise (x:bool) = raise Not_found : int 
+
 let test (n:int) = 
   let rec is_even (x:int) = 
     {true} 

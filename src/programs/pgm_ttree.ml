@@ -81,6 +81,7 @@ and dexpr_desc =
   | DEmatch of dexpr list * (Typing.dpattern list * dexpr) list
   | DEskip
   | DEabsurd 
+  | DEraise of Term.lsymbol * dexpr option
 
   | DEassert of assertion_kind * Ptree.lexpr
   | DEghost of dexpr
@@ -142,6 +143,7 @@ and expr_desc =
   | Ematch of expr list * (Term.pattern list * expr) list
   | Eskip 
   | Eabsurd
+  | Eraise of Term.lsymbol * expr option
 
   | Eassert of assertion_kind * Term.fmla
   | Eghost of expr

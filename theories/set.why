@@ -1,5 +1,5 @@
 
-theory Base
+theory Set
 
   type 'a t 
 
@@ -16,9 +16,6 @@ theory Base
   axiom Add_def1 : 
     forall x, y : 'a. forall s : 'a t.
     mem(x, add(y, s)) <-> (x = y or mem(x, s))
-
-  logic add'(x:'a, s:'a t) : 'a t = 
-    epsilon res:'a t. forall y:'a. mem(y, res) <-> (y = x or mem(y, s))
 
   logic remove('a, 'a t) : 'a t
 
@@ -53,7 +50,7 @@ end
 (* finite sets *)
 theory Fset
   use import int.Int
-  clone export Base
+  clone export Set
   
   logic cardinal('a t) : int
 
@@ -74,6 +71,3 @@ theory Fset
 
 end
 
-theory Set
-  clone export Base
-end

@@ -183,7 +183,7 @@ logic inv_succ2(src:vertex, s:vertex S.t, q: vertex S.t,
 let shortest_path_code (src:vertex) (dst:vertex) =
   { S.mem(src,v) and S.mem(dst,v) }
   init src;
-  while not (q_is_empty Unit) do
+  while not (q_is_empty ()) do
     invariant { inv(src, !visited, !q, !d) and inv_succ(src, !visited, !q) }
     variant   { S.cardinal(v) - S.cardinal(!visited) }
     let u = q_extract_min () in

@@ -80,13 +80,14 @@ and expr_desc =
   | Ematch of expr list * (Ptree.pattern list * expr) list
   | Eskip 
   | Eabsurd
+  | Eraise of ident * expr option
   (* annotations *)
   | Eassert of assertion_kind * lexpr
   | Eghost of expr
   | Elabel of ident * expr
   | Ecast of expr * Ptree.pty
 
-  (* TODO: raise, try, any, post?, ghost *)
+  (* TODO: try, any, post?, ghost *)
 
 and triple = lexpr * expr * lexpr
 
@@ -95,6 +96,7 @@ type decl =
   | Dletrec of (ident * binder list * variant option * triple) list
   | Dlogic  of Ptree.decl list
   | Dparam  of ident * type_v
+  | Dexn    of ident * Ptree.pty option
 
 type file = decl list
 

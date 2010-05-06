@@ -56,11 +56,16 @@ let id_result = "result"
 
 (* environments *)
 
-let dty_bool uc = Tyapp (ns_find_ts (get_namespace uc) ["bool"], [])
-let dty_unit uc = Tyapp (ns_find_ts (get_namespace uc) ["unit"], [])
-let dty_label uc = Tyapp (ns_find_ts (get_namespace uc) ["label"], [])
+let ts_unit uc = ns_find_ts (get_namespace uc) ["unit"]
 let ts_ref uc = ns_find_ts (get_namespace uc) ["ref"]
 let ts_arrow uc = ns_find_ts (get_namespace uc) ["arrow"]
+let ts_exn uc = ns_find_ts (get_namespace uc) ["exn"]
+
+let ls_Unit uc = ns_find_ls (get_namespace uc) ["Unit"]
+
+let dty_bool uc = Tyapp (ns_find_ts (get_namespace uc) ["bool"], [])
+let dty_unit uc = Tyapp (ts_unit uc, [])
+let dty_label uc = Tyapp (ns_find_ts (get_namespace uc) ["label"], [])
 
 type denv = {
   uc   : theory_uc;
@@ -104,28 +109,40 @@ let rec dpurify env = function
       dcurrying env.uc (List.map (fun (_,ty) -> dpurify env ty) bl)
 	(dpurify env c.dc_result_type)
 
-let check_reference _loc _ty =
-  () (*TODO*)
+let check_reference_type uc loc ty =
+  let ty_ref =Tyapp (ts_ref uc, [create_type_var loc]) in
+  if not (Denv.unify ty ty_ref) then
+    errorm ~loc "this expression has type %a, but is expected to be a reference"
+      print_dty ty
   
 let dreference env id =
   if Typing.mem_var id.id env.denv then
     (* local variable *)
     let ty = Typing.find_var id.id env.denv in
-    check_reference id.id_loc ty;
+    check_reference_type env.uc id.id_loc ty;
     DRlocal id.id
   else 
     let p = Qident id in
-    let s, _tyl, ty = Typing.specialize_fsymbol p env.uc in
-    check_reference id.id_loc ty;
+    let s, _, ty = Typing.specialize_fsymbol p env.uc in
+    check_reference_type env.uc id.id_loc ty;
     DRglobal s
 
-let dexception _env _id =
-  assert false (*TODO*)
+let dexception env id =
+  let p = Qident id in
+  let _, _, ty as r = Typing.specialize_fsymbol p env.uc in
+  let ty_exn = Tyapp (ts_exn env.uc, []) in
+  if not (Denv.unify ty ty_exn) then
+    errorm ~loc:id.id_loc
+      "this expression has type %a, but is expected to be an exception"
+      print_dty ty;
+  r
 
 let deffect env e =
   { de_reads  = List.map (dreference env) e.Pgm_ptree.pe_reads;
     de_writes = List.map (dreference env) e.Pgm_ptree.pe_writes;
-    de_raises = List.map (dexception env) e.Pgm_ptree.pe_raises; }
+    de_raises = 
+      List.map (fun id -> let ls,_,_ = dexception env id in ls) 
+	e.Pgm_ptree.pe_raises; }
 
 let rec dtype_v env = function
   | Pgm_ptree.Tpure pt -> 
@@ -239,6 +256,24 @@ and dexpr_desc env loc = function
       DEskip, (dty_unit env.uc)
   | Pgm_ptree.Eabsurd ->
       DEabsurd, create_type_var loc
+  | Pgm_ptree.Eraise (id, e) ->
+      let ls, tyl, _ = dexception env id in
+      let e = match e, tyl with
+	| None, [] ->  
+	    None
+	| Some _, [] ->
+	    errorm ~loc "expection %s has no argument" id.id
+	| None, [ty] ->
+	    errorm ~loc "exception %s is expecting an argument of type %a"
+	      id.id print_dty ty;
+	| Some e, [ty] -> 
+	    let e = dexpr env e in
+	    expected_type e ty;
+	    Some e
+	| _ -> 
+	    assert false
+      in
+      DEraise (ls, e), create_type_var loc
 
   | Pgm_ptree.Eassert (k, le) ->
       DEassert (k, le), (dty_unit env.uc) 
@@ -389,6 +424,8 @@ and expr_desc uc env denv = function
       Eskip
   | DEabsurd ->
       Eabsurd
+  | DEraise (ls, e) ->
+      Eraise (ls, option_map (expr uc env) e)
 
   | DEassert (k, f) ->
       let f = Typing.type_fmla denv env f in
@@ -433,6 +470,11 @@ let type_expr uc e =
   let e = dexpr denv e in
   expr uc Mstr.empty e
 
+let type_type uc ty =
+  let denv = create_denv uc in
+  let dty = Typing.dty denv.denv ty in
+  Denv.ty_of_dty dty
+
 let add_decl uc ls =
   try
     Theory.add_decl uc (Decl.create_logic_decl [ls, None])
@@ -475,6 +517,15 @@ let file env uc dl =
 	     let ls = create_lsymbol (id_user id.id id.id_loc) tyl (Some ty) in
 	     let uc = add_decl uc ls in
 	     uc, Dparam (ls, tyv) :: acc
+	 | Pgm_ptree.Dexn (id, ty) ->
+	     let tyl = match ty with
+	       | None -> []
+	       | Some ty -> [type_type uc ty]
+	     in
+	     let exn = ty_app (ts_exn uc) [] in
+	     let ls = create_lsymbol (id_user id.id id.id_loc) tyl (Some exn) in
+	     let uc = add_decl uc ls in
+	     uc, acc
       )
       (uc, []) dl
   in
@@ -491,6 +542,5 @@ End:
 TODO:
 - mutually recursive functions: check variants are all present or all absent
 - variant: check type int or relation order specified
-- typing exceptions in effects (raises)
 
 *)

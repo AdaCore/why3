@@ -68,6 +68,7 @@
     let id = { id = prefix op; id_loc = loc_i 1 } in
     mk_expr (mk_apply_id id [e1])
 
+  let id_unit () = { id = "Unit"; id_loc = loc () }
   let id_result () = { id = "result"; id_loc = loc () }
   let id_anonymous () = { id = "_"; id_loc = loc () }
 
@@ -107,7 +108,7 @@
 
 %token ABSURD AND AS ASSERT ASSUME BEGIN CHECK DO DONE ELSE END
 %token EXCEPTION FOR
-%token FUN GHOST IF IN INVARIANT LABEL LET MATCH NOT PARAMETER
+%token FUN GHOST IF IN INVARIANT LABEL LET MATCH NOT OF PARAMETER
 %token RAISE RAISES READS REC 
 %token THEN TRY TYPE VARIANT WHILE WITH WRITES
 
@@ -189,6 +190,10 @@ decl:
     { Dletrec $3 }
 | PARAMETER lident COLON type_v
     { Dparam ($2, $4) }
+| EXCEPTION uident 
+    { Dexn ($2, None) }
+| EXCEPTION uident OF pure_type
+    { Dexn ($2, Some $4) }
 ;
 
 list1_recfun_sep_and:
@@ -288,6 +293,10 @@ expr:
    { mk_expr Eabsurd }
 | expr COLON pure_type
    { mk_expr (Ecast ($1, $3)) }
+| RAISE uident
+   { mk_expr (Eraise ($2, None)) }
+| RAISE LEFTPAR uident expr RIGHTPAR
+   { mk_expr (Eraise ($3, Some $4)) }
 ;
 
 triple:
