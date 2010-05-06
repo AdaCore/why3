@@ -8,6 +8,12 @@ theory Test_inline_trivial
   goal G : eq(c,c)
 end
 
+theory Test_ind
+  use graph.Path
+
+  goal G : true
+end
+
 theory Test_encoding
   use import int.Int
   logic id(x: int) : int = x
