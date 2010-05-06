@@ -193,7 +193,7 @@ let trace e = e.trace
 let proof_obsolete e = e.proof_obsolete
 
 type goal_origin =
-  | Goal of Why.Decl.prsymbol
+  | Goal of string * string
 (*
   | VCfun of loc * explain * ...
   | Subgoal of goal
@@ -242,7 +242,7 @@ let subgoals t = t.subgoals
 
 let rec string_from_origin o =
   match o with
-    | Goal p -> p.Why.Decl.pr_name.Why.Ident.id_long
+    | Goal(t,n) -> t ^ "." ^ n
     
 let goal_name g = string_from_origin g.goal_origin
   
@@ -1131,11 +1131,11 @@ let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver
 let add_transformation (_g : goal) (_t : transf) :  unit =
   assert false (* TODO *)
 
-let add_or_replace_task (name : Why.Decl.prsymbol) (t : Why.Task.task) : goal =
+let add_or_replace_task ~tname ~name (t : Why.Task.task) : goal =
   (* TODO: replace if already exists *)
   let g = {
     goal_id = 0L;
-    goal_origin = Goal name;
+    goal_origin = Goal (tname,name);
     task = t;
     task_checksum = Digest.string (Marshal.to_string t []);
     proved = false;

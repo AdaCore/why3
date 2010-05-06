@@ -146,19 +146,9 @@ let m : Why.Theory.theory Why.Theory.Mnm.t =
 (***************************)
 
 let add_task (tname : string) (task : Why.Task.task) acc =
-  match task with
-    | None -> assert false
-    | Some t ->
-        match t.Why.Task.task_decl with
-          | Why.Task.Use _ | Why.Task.Clone _ -> assert false
-          | Why.Task.Decl d ->
-              match d.Why.Decl.d_node with
-                | Why.Decl.Dtype _ | Why.Decl.Dlogic _ | Why.Decl.Dind _ 
-                    -> assert false
-                | Why.Decl.Dprop (_kind,name,_f) ->
-                    eprintf "doing task: tname=%s, name=%s@." tname
-                      name.Why.Decl.pr_name.Why.Ident.id_long;
-                    Db.add_or_replace_task name task :: acc
+  let name = (Why.Task.task_goal task).Why.Decl.pr_name.Why.Ident.id_long in
+  eprintf "doing task: tname=%s, name=%s@." tname name;
+  Db.add_or_replace_task ~tname ~name task :: acc
 
 let do_theory tname th glist =
   let tasks = Why.Task.split_theory th None in
