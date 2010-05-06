@@ -2,7 +2,7 @@
 {
   open Format
   open Lexing
-  open Tptp_parser
+  open TptpParser
 
   let keywords = Hashtbl.create 97
   let () =

@@ -19,7 +19,7 @@ end= struct
     try
       let filename = if first then filename else include_dir^"/"^filename in
       let input = open_in filename in
-      let decls = Tptp_parser.tptp Tptp_lexer.token (Lexing.from_channel input) in
+      let decls = TptpParser.tptp TptpLexer.token (Lexing.from_channel input) in
       let isInclude = function | Include _ -> true | _ -> false in
       close_in input;
       let (to_include, real_decl) = List.partition isInclude decls in

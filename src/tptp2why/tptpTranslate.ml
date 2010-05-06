@@ -120,19 +120,21 @@ module Translate = struct
     end)
   module EnvFunctor = Scope(
     struct
-      type key = (atom * Ty.ty list)
+      type key = (atom * Ty.ty list * Summary.indic)
       type value = Term.lsymbol
-      let create (v,l)  = Term.create_fsymbol (id_fresh (String.uncapitalize v)) l t
+      let create (v,l,ty) = match ty with
+      | Summary.Term -> Term.create_fsymbol (id_fresh (String.uncapitalize v)) l t
+      | Summary.Pred -> Term.create_psymbol (id_fresh (String.uncapitalize v)) l
     end)
 
   (** translation for terms *)
   let rec term2term = function
-  | TAtom x -> Term.t_app (EnvFunctor.find (x, [])) [] t
-  | TConst x -> Term.t_app (EnvFunctor.find (x, [])) [] t
+  | TAtom x -> Term.t_app (EnvFunctor.find (x, [], Summary.Term)) [] t
+  | TConst x -> Term.t_app (EnvFunctor.find (x, [], Summary.Term)) [] t
   | TVar x -> Term.t_var (EnvVar.find x)
   | TFunctor (f, terms) ->
       Term.t_app
-        (EnvFunctor.find (f, List.map (const t) terms))
+        (EnvFunctor.find (f, List.map (const t) terms, Summary.Term))
         (List.map term2term terms)
         t
 
@@ -162,13 +164,13 @@ module Translate = struct
   end
   | FPred (p, terms) ->
     Term.f_app
-      (EnvFunctor.find (p, List.map (const t) terms))
+      (EnvFunctor.find (p, List.map (const t) terms, Summary.Pred))
       (List.map term2term terms)
   | FTermBinop (op, t1, t2) ->
     Term.f_app
       ( match op with
-        | Equal -> EnvFunctor.find ("=", [t;t])
-        | NotEqual -> EnvFunctor.find ("<>", [t;t]) )
+        | Equal -> EnvFunctor.find ("=", [t;t], Summary.Pred)
+        | NotEqual -> EnvFunctor.find ("<>", [t;t], Summary.Pred) )
       [term2term t1; term2term t2]
 
   let translatePropKind = function
@@ -179,6 +181,7 @@ module Translate = struct
   let addDecl theory = function
   | Fof(name, ty, f) ->
       let fmla = fmla2fmla f in
+      print_endline ("adds declaration of "^name);
       Theory.add_prop_decl theory (translatePropKind ty)
         (Decl.create_prsymbol (id_fresh name)) fmla
   | Include _ -> assert false

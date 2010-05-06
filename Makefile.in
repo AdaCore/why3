@@ -395,10 +395,10 @@ clean::
 
 MENHIR=@MENHIR@
 
-TPTPGENERATED = src/tptp2why/tptp_lexer.ml \
-	src/tptp2why/tptp_parser.ml src/tptp2why/tptp_parser.mli
+TPTPGENERATED = src/tptp2why/tptpLexer.ml \
+	src/tptp2why/tptpParser.ml src/tptp2why/tptpParser.mli
 
-TPTP_FILES = tptpTree tptp_parser tptp_lexer tptpTranslate tptp2why
+TPTP_FILES = tptpTree tptpParser tptpLexer tptpTranslate tptp2why
 TPTP_DIR=src/tptp2why/
 
 TPTPMODULES = $(addprefix $(TPTP_DIR), $(TPTP_FILES))
@@ -417,7 +417,7 @@ byte: bin/tptp2why.byte
 opt:  bin/tptp2why.opt
 endif
 
-src/tptp2why/tptp_parser.ml src/tptp2why/tptp_parser.mli: OCAMLYACC = $(MENHIR)
+src/tptp2why/tptpParser.ml src/tptp2why/tptpParser.mli: OCAMLYACC = $(MENHIR)
 
 bin/tptp2why.opt: src/why.cmxa $(TPTPCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
