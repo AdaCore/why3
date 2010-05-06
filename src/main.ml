@@ -250,6 +250,9 @@ let rec report fmt = function
       Typing.report fmt e
   | Decl.UnknownIdent i ->
       fprintf fmt "anomaly: unknown ident '%s'" i.Ident.id_string
+  | Decl.UnboundVars vs ->
+      fprintf fmt "anomaly: unknown vars  [%a]" 
+        (Pp.print_iter1 Term.Svs.iter Pp.semi Pretty.print_vs) vs
   | Driver.Error e ->
       Driver.report fmt e
   | Config.Dynlink.Error e ->

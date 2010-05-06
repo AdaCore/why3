@@ -64,8 +64,7 @@ let print_task ?(debug=false) drv fmt task =
     try
       Register.apply_driver tr drv task 
     with e when not debug ->
-      Format.eprintf "failure in transformation %s: %s@." 
-	s (Printexc.to_string e);
+      Format.eprintf "failure in transformation %s@." s;
       raise e
   in
   let task = List.fold_left apply task transl in
