@@ -318,6 +318,10 @@ val f_map_cont : ((term -> 'a) -> term -> 'a) ->
                  ((fmla -> 'a) -> fmla -> 'a) ->
                   (fmla -> 'a) -> fmla -> 'a
 
+(* simplification map *)
+val f_map_simp : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
+
+
 (* map/fold over free variables *)
 
 val t_v_map : (vsymbol -> term) -> term -> term

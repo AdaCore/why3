@@ -104,7 +104,8 @@ LIB_DRIVER = call_provers driver_ast driver_parser driver_lexer driver \
 LIB_TRANSFORM = simplify_recursive_definition inlining \
 		split_conjunction encoding_decorate \
 		eliminate_definition eliminate_algebraic \
-		eliminate_inductive eliminate_let eliminate_if
+		eliminate_inductive eliminate_let eliminate_if\
+		simplify_formula
 
 LIB_PRINTER = print_real alt_ergo why3 smt coq tptp
 
