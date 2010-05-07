@@ -15,7 +15,7 @@ module Summary : sig
   val findAtoms : S.t -> fmla -> S.t
   val findFunctors : (indic * int) M.t ->
         TptpTree.fmla -> (indic * int) M.t
-  val findAllAtoms : decl list -> S.t
+  val findAllAtoms : TptpTree.decl list -> S.t
   val findAllFunctors : TptpTree.decl list -> (indic * int) M.t
 end = struct
   type indic = Pred | Term
@@ -100,18 +100,24 @@ module Scope
       v
     end
 
+  let depth () = List.length !scope
+
 end
 
 let const x _ = x;;
+
+let rec range n obj = match n with
+| 0 -> []
+| n -> obj::range (n-1) obj
 
 (*s module to translate a basic tptp originated tree into a why AST tree *)
 module Translate = struct
 
   (** an abstract type for the whole theory *)
-  let t =
-    let tv = Ty.create_tvsymbol (Ident.id_fresh "t") in
-    Ty.ty_var tv
+  let ts = Ty.create_tysymbol (Ident.id_fresh "t") [] None
+  let t = Ty.ty_app ts []
 
+  (* TODO : replace it by a simple Map *)
   module EnvVar = Scope(
     struct
       type key = variable
@@ -153,7 +159,8 @@ module Translate = struct
     assert (op = Not);
     Term.f_not (fmla2fmla f)
   | FQuant (quant, vars, f) -> begin
-    EnvVar.push_scope []; (* new scope *)
+    (* Format.printf "@[<hov 2>quantifier %s %s (depth %d)@]\n" (if quant=Forall then "forall" else "exists") (String.concat ", " vars) (EnvVar.depth ()); *)
+    EnvVar.push_scope vars; (* new scope *)
     let answer = Term.f_quant
       (translate_quant quant)
       (List.map EnvVar.find vars)
@@ -167,11 +174,10 @@ module Translate = struct
       (EnvFunctor.find (p, List.map (const t) terms, Summary.Pred))
       (List.map term2term terms)
   | FTermBinop (op, t1, t2) ->
-    Term.f_app
       ( match op with
-        | Equal -> EnvFunctor.find ("=", [t;t], Summary.Pred)
-        | NotEqual -> EnvFunctor.find ("<>", [t;t], Summary.Pred) )
-      [term2term t1; term2term t2]
+        | Equal -> Term.f_equ_simp
+        | NotEqual -> Term.f_neq_simp)
+      (term2term t1) (term2term t2)
 
   let translatePropKind = function
   | Axiom -> Decl.Paxiom
@@ -181,16 +187,32 @@ module Translate = struct
   let addDecl theory = function
   | Fof(name, ty, f) ->
       let fmla = fmla2fmla f in
-      print_endline ("adds declaration of "^name);
+      (* print_endline ("adds declaration of "^name); *)
       Theory.add_prop_decl theory (translatePropKind ty)
         (Decl.create_prsymbol (id_fresh name)) fmla
   | Include _ -> assert false
 
 
+  (** forward declaration of atoms and functors *)
+  let addAtomForwardDecl name theory =
+    (* Format.printf "declares %s\n (depth %d)" name (EnvVar.depth ()); *)
+    let logic_decl = Decl.create_logic_decl
+      [(EnvFunctor.find (name, [], Summary.Term)), None] in
+    Theory.add_decl theory logic_decl
+
+  let addFunctorsForwardDecl name obj theory =
+    (* Format.printf "declares functor %s (type %s) (depth %d)\n" name (if fst obj = Summary.Pred then "pred" else "term"); *) 
+    let logic_decl = Decl.create_logic_decl
+      [(EnvFunctor.find (name, range (snd obj) t, (fst obj))), None] in
+    Theory.add_decl theory logic_decl
+
   (** from a list of untyped declarations, translates them into a why theory *)
   let theory_of_decls theoryName decls =
-    let theorident = Theory.create_theory (Ident.id_fresh theoryName) in
-    let theory = List.fold_left addDecl theorident decls in
+    let theory = Theory.create_theory (Ident.id_fresh theoryName) in
+    let theory = Theory.add_ty_decl theory [ts, Decl.Tabstract] in
+    let theory = S.fold addAtomForwardDecl (Summary.findAllAtoms decls) theory in
+    let theory = M.fold addFunctorsForwardDecl (Summary.findAllFunctors decls) theory in
+    let theory = List.fold_left addDecl theory decls in
     Theory.close_theory theory
 
 end

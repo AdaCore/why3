@@ -86,7 +86,7 @@ and print_fmla drv fmt f = match f.f_node with
       let rec forall fmt = function
         | [] -> print_fmla drv fmt f
         | v::l ->
-	    fprintf fmt "%s [%a] :@ %a" q print_var v forall l
+        fprintf fmt "%s [%a] :@ %a" q print_var v forall l
       in
       forall fmt vl;
       List.iter forget_var vl
@@ -139,7 +139,7 @@ let print_decl drv fmt d = match d.d_node with
   | Dprop (Paxiom, pr, _) when Driver.query_remove drv pr.pr_name -> false
   | Dprop (Paxiom, _pr, f) ->
       fprintf fmt "fof(%s, axiom,@ %a).\n"
-         (string_unique ident_printer "axiom") (print_fmla drv) f; true
+        (string_unique ident_printer "axiom") (print_fmla drv) f; true
   | Dprop (Pgoal, pr, f) -> (* TODO : what is pr ? *)
       fprintf fmt "fof(%s, conjecture,@ %a ).\n"
         (string_unique ident_printer "goal") (print_fmla drv) f; true
