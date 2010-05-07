@@ -97,3 +97,5 @@ val ty_real : ty
 
 val ts_tuple : int -> tysymbol
 val ty_tuple : ty list -> ty
+
+val is_ts_tuple : tysymbol -> bool

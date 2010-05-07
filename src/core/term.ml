@@ -521,6 +521,8 @@ let fs_tuple n =
 
 let fs_tuple = Util.memo fs_tuple
 
+let is_fs_tuple fs = fs == fs_tuple (List.length fs.ls_args)
+
 let t_tuple tl =
   let ty = ty_tuple (List.map (fun t -> t.t_ty) tl) in
   t_app (fs_tuple (List.length tl)) tl ty

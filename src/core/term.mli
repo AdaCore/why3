@@ -288,6 +288,8 @@ val f_neq_simp : term -> term -> fmla
 val fs_tuple : int -> lsymbol
 val t_tuple : term list -> term
 
+val is_fs_tuple : lsymbol -> bool
+
 (** Term library *)
 
 (* generic term/fmla traversal *)

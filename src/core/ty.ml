@@ -218,3 +218,4 @@ let ts_tuple = Util.memo ts_tuple
 let ty_tuple tyl =
   ty_app (ts_tuple (List.length tyl)) tyl
 
+let is_ts_tuple ts = ts == ts_tuple (List.length ts.ts_args)
