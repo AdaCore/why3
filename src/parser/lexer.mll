@@ -192,6 +192,8 @@ rule token = parse
       { OP1 s }
   | op_char_234*  op_char_2 op_char_234*  as s
       { OP2 s }
+  | "*"
+      { STAR }
   | op_char_34*   op_char_3 op_char_34*  as s
       { OP3 s }
   | op_char_4+ as s

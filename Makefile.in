@@ -486,6 +486,9 @@ bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) byte $(TOOLS)
 # test targets
 ###############
 
+test2: bin/why.byte $(TOOLS)
+	bin/why.byte tests/test-jcf.why
+
 test: bin/why.byte $(TOOLS)
 	mkdir -p output_why3
 	bin/why.byte -D drivers/why3.drv -o output_why3 tests/test-jcf.why

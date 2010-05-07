@@ -129,10 +129,6 @@ let rec specialize ~loc env t = match t.ty_node with
   | Ty.Tyapp (s, tl) ->
       Tyapp (s, List.map (specialize ~loc env) tl)
 
-let specialize_tysymbol ~loc s =
-  let env = Htv.create 17 in
-  List.map (find_type_var ~loc env) s.ts_args
-	
 let specialize_lsymbol ~loc s =
   let tl = s.ls_args in
   let t = s.ls_value in

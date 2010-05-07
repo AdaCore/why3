@@ -176,7 +176,32 @@ let specialize_tysymbol loc p uc =
     try ns_find_ts (get_namespace uc) sl
     with Not_found -> error ~loc (UnboundType sl)
   in
-  ts, specialize_tysymbol ~loc ts
+  ts, List.length ts.ts_args
+
+(* lazy declaration of tuples *)
+
+let tuples_needed = Hashtbl.create 17
+
+let ts_tuple n = Hashtbl.replace tuples_needed n (); ts_tuple n
+let fs_tuple n = Hashtbl.replace tuples_needed n (); fs_tuple n
+
+let add_tuple_decls uc =
+  Hashtbl.fold (fun n _ uc -> Theory.use_export uc (tuple_theory n)) 
+    tuples_needed uc
+
+let with_tuples ?(reset=false) f uc x =
+  let uc = f (add_tuple_decls uc) x in
+  if reset then Hashtbl.clear tuples_needed;
+  uc
+
+let add_ty_decl  = with_tuples add_ty_decl
+let add_ty_decls = with_tuples ~reset:true add_ty_decls
+
+let add_logic_decl  = with_tuples add_logic_decl
+let add_logic_decls = with_tuples ~reset:true add_logic_decls
+
+let add_ind_decl  = with_tuples add_ind_decl
+let add_ind_decls = with_tuples ~reset:true add_ind_decls
 
 let rec type_inst s ty = match ty.ty_node with
   | Ty.Tyvar n -> Mtv.find n s
@@ -187,18 +212,21 @@ let rec dty env = function
       Tyvar (find_user_type_var x env)
   | PPTtyapp (p, x) ->
       let loc = qloc x in
-      let ts, tv = specialize_tysymbol loc x env.uc in
+      let ts, a = specialize_tysymbol loc x env.uc in
       let np = List.length p in
-      let a = List.length tv in
       if np <> a then error ~loc (TypeArity (x, a, np));
       let tyl = List.map (dty env) p in
-      match ts.ts_def with
+      begin match ts.ts_def with
 	| None ->
 	    Tyapp (ts, tyl)
 	| Some ty ->
 	    let add m v t = Mtv.add v t m in
             let s = List.fold_left2 add Mtv.empty ts.ts_args tyl in
 	    type_inst s ty
+      end
+  | PPTtuple tyl ->
+      let ts = ts_tuple (List.length tyl) in
+      Tyapp (ts, List.map (dty env) tyl)
 
 let find_ns find p ns =
   let loc = qloc p in
@@ -299,10 +327,14 @@ let check_pat_linearity pl =
   let rec check p = match p.pat_desc with
     | PPpwild -> ()
     | PPpvar id -> add id
-    | PPpapp (_, pl) -> List.iter check pl
+    | PPpapp (_, pl) | PPptuple pl -> List.iter check pl
     | PPpas (p, id) -> check p; add id
   in
   List.iter check pl
+
+let fresh_type_var loc =
+  let tv = create_tvsymbol (id_user "a" loc) in
+  Tyvar (create_ty_decl_var ~loc ~user:false tv)
 
 let rec dpat env pat =
   let env, n, ty = dpat_node pat.pat_loc env pat.pat_desc in
@@ -310,17 +342,22 @@ let rec dpat env pat =
 
 and dpat_node loc env = function
   | PPpwild ->
-      let tv = create_tvsymbol (id_user "a" loc) in
-      let ty = Tyvar (create_ty_decl_var ~loc ~user:false tv) in
+      let ty = fresh_type_var loc in
       env, Pwild, ty
   | PPpvar {id=x} ->
-      let tv = create_tvsymbol (id_user "a" loc) in
-      let ty = Tyvar (create_ty_decl_var ~loc ~user:false tv) in
+      let ty = fresh_type_var loc in
       let env = { env with dvars = Mstr.add x ty env.dvars } in
       env, Pvar x, ty
   | PPpapp (x, pl) ->
       let s, tyl, ty = specialize_fsymbol x env.uc in
       let env, pl = dpat_args s.ls_name loc env tyl pl in
+      env, Papp (s, pl), ty
+  | PPptuple pl ->
+      let n = List.length pl in
+      let s = fs_tuple n in
+      let tyl = List.map (fun _ -> fresh_type_var loc) pl in
+      let env, pl = dpat_args s.ls_name loc env tyl pl in
+      let ty = Tyapp (ts_tuple n, tyl) in
       env, Papp (s, pl), ty
   | PPpas (p, {id=x}) ->
       let env, p = dpat env p in
@@ -376,6 +413,13 @@ and dterm_node loc env = function
       let s, tyl, ty = specialize_fsymbol x env.uc in
       let tl = dtype_args s.ls_name loc env tyl tl in
       Tapp (s, tl), ty
+  | PPtuple tl ->
+      let n = List.length tl in
+      let s = fs_tuple n in
+      let tyl = List.map (fun _ -> fresh_type_var loc) tl in
+      let tl = dtype_args s.ls_name loc env tyl tl in
+      let ty = Tyapp (ts_tuple n, tyl) in
+      Tapp (s, tl), ty
   | PPinfix (e1, x, e2) ->
       let s, tyl, ty = specialize_fsymbol (Qident x) env.uc in
       let tl = dtype_args s.ls_name loc env tyl [e1; e2] in
@@ -393,10 +437,7 @@ and dterm_node loc env = function
   | PPmatch (el, bl) ->
       let tl = List.map (dterm env) el in
       let tyl = List.map (fun t -> t.dt_ty) tl in
-      let tb = (* the type of all branches *)
-	let tv = create_tvsymbol (id_user "a" loc) in
-	Tyvar (create_ty_decl_var ~loc ~user:false tv)
-      in
+      let tb = fresh_type_var loc in (* the type of all branches *)
       let branch (pl, e) =
         let env, pl = dpat_list env tyl pl in
         let loc = e.pp_loc in
@@ -500,7 +541,7 @@ and dfmla env e = match e.pp_desc with
       Fnamed (x, f1)
   | PPvar x ->
       Fvar (snd (find_prop x env.uc))
-  | PPeps _ | PPconst _ | PPcast _ ->
+  | PPeps _ | PPconst _ | PPcast _ | PPtuple _ ->
       error ~loc:e.pp_loc PredicateExpected
 
 and dpat_list env tyl pl =
@@ -683,10 +724,14 @@ let add_types dl th =
 		    | Qident _ | Qdot _ ->
 			find_tysymbol q th
 		  in
-		  try
+		  begin try
 		    ty_app ts (List.map apply tyl)
 		  with Ty.BadTypeArity (tsal, tyll) ->
 		    error ~loc:(qloc q) (TypeArity (q, tsal, tyll))
+		  end
+	      | PPTtuple tyl ->
+		  let ts = ts_tuple (List.length tyl) in
+		  ty_app ts (List.map apply tyl)
 	    in
 	    create_tysymbol id vl (Some (apply ty))
 	| TDabstract | TDalgebraic _ ->

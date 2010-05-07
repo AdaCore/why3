@@ -107,3 +107,11 @@ struct
   module W = Hashweak.Make(X)
 end
 
+(* memoization *)
+
+let memo ?(size=17) f =
+  let h = Hashtbl.create size in
+  fun x -> try Hashtbl.find h x
+  with Not_found -> let y = f x in Hashtbl.add h x y; y
+
+

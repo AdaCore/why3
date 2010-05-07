@@ -64,6 +64,8 @@ and clone_map = Sid.t Mid.t
 
 val builtin_theory : theory
 
+val tuple_theory : int -> theory
+
 (** Constructors and utilities *)
 
 type theory_uc  (* a theory under construction *)

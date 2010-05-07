@@ -285,6 +285,9 @@ val f_neq : term -> term -> fmla
 val f_equ_simp : term -> term -> fmla
 val f_neq_simp : term -> term -> fmla
 
+val fs_tuple : int -> lsymbol
+val t_tuple : term list -> term
+
 (** Term library *)
 
 (* generic term/fmla traversal *)

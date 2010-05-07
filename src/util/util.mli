@@ -94,3 +94,6 @@ sig
   module W : Hashweak.S with type key = X.t
 end
 
+(* memoization *)
+
+val memo : ?size:int -> ('a -> 'b) -> 'a -> 'b

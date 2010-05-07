@@ -95,3 +95,5 @@ val ts_real : tysymbol
 val ty_int  : ty
 val ty_real : ty
 
+val ts_tuple : int -> tysymbol
+val ty_tuple : ty list -> ty

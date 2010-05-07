@@ -513,6 +513,19 @@ let f_app p tl =
 
 let f_app_unsafe = f_app
 
+let fs_tuple n =
+  let tyl = ref [] in
+  for i = 1 to n do tyl := ty_var (create_tvsymbol (id_fresh "a")) :: !tyl done;
+  let ty = ty_tuple !tyl in
+  create_fsymbol (id_fresh ("Tuple" ^ string_of_int n)) !tyl ty
+
+let fs_tuple = Util.memo fs_tuple
+
+let t_tuple tl =
+  let ty = ty_tuple (List.map (fun t -> t.t_ty) tl) in
+  t_app (fs_tuple (List.length tl)) tl ty
+
+
 (* unsafe map with level *)
 
 exception UnboundIndex

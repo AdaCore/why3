@@ -50,7 +50,7 @@ val specialize_fsymbol :
   Ptree.qualid -> theory_uc -> lsymbol * Denv.dty list * Denv.dty
 
 val specialize_tysymbol : 
-  Loc.position -> Ptree.qualid -> theory_uc -> Ty.tysymbol * Denv.type_var list
+  Loc.position -> Ptree.qualid -> theory_uc -> Ty.tysymbol * int
 
 type denv
 

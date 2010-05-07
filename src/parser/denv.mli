@@ -40,9 +40,6 @@ val ty_of_dty : dty -> ty
 
 (** Specialization *)
 
-val specialize_tysymbol : 
-  loc:Ptree.loc -> tysymbol -> type_var list
-
 val specialize_lsymbol  : 
   loc:Ptree.loc -> lsymbol -> dty list * dty option
 

@@ -131,7 +131,6 @@ let builtin_theory =
     th_used   = Mid.empty;
     th_local  = Sid.empty }
 
-
 (** Constructors and utilities *)
 
 type theory_uc = {
@@ -561,4 +560,13 @@ let clone_export uc th inst =
 
 let clone_theory add_tdecl acc th inst =
   clone_theory (cl_init th inst) add_tdecl acc th inst
+
+(* Tuple theories *)
+
+let tuple_theory n =
+  let uc = create_theory (id_fresh ("Tuple" ^ string_of_int n)) in
+  let uc = add_ty_decl uc [ts_tuple n, Talgebraic [fs_tuple n]] in
+  close_theory uc
+
+let tuple_theory = Util.memo tuple_theory
 

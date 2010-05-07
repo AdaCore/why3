@@ -73,8 +73,10 @@ let type_file file =
   let uc = Theory.create_theory (Ident.id_fresh "Pgm") in
   let th = Env.find_theory env ["programs"] "Prelude" in
   let uc = Theory.use_export uc th in
-  let _uc, _dl = Pgm_typing.file env uc p in
+  let uc, _dl = Pgm_typing.file env uc p in
   if !type_only then raise Exit;
+  let th = Theory.close_theory uc in
+  printf "%a@." Pretty.print_theory th;
   ()
 
 let handle_file file =

@@ -44,6 +44,7 @@ type qualid =
 type pty =
   | PPTtyvar of ident
   | PPTtyapp of pty list * qualid
+  | PPTtuple of pty list
 
 type pattern =
   { pat_loc : loc; pat_desc : pat_desc }
@@ -52,6 +53,7 @@ and pat_desc =
   | PPpwild
   | PPpvar of ident
   | PPpapp of qualid * pattern list
+  | PPptuple of pattern list
   | PPpas of pattern * ident
 
 type uquant =
@@ -76,6 +78,7 @@ and pp_desc =
   | PPeps of ident * pty * lexpr
   | PPmatch of lexpr list * (pattern list * lexpr) list
   | PPcast of lexpr * pty
+  | PPtuple of lexpr list
 
 (*s Declarations. *)
 
@@ -97,7 +100,7 @@ type clone_subst =
   | CSlsym  of qualid * qualid
   | CSlemma of qualid
   | CSgoal  of qualid
-
+      
 type param = ident option * pty
 
 type type_def = 

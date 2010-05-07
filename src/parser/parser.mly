@@ -68,7 +68,7 @@
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ 
 %token LRARROW
 %token QUOTE
-%token RIGHTPAR RIGHTSQ 
+%token RIGHTPAR RIGHTSQ STAR
 %token UNDERSCORE
 
 %token EOF
@@ -89,7 +89,7 @@
 %nonassoc NOT
 %left EQUAL OP1
 %left OP2
-%left OP3
+%left OP3 STAR
 %left OP4
 %nonassoc prefix_op
 
@@ -154,6 +154,7 @@ lident_op:
 | OP1   { $1 }
 | OP2   { $1 }
 | OP3   { $1 }
+| STAR  { "*" }
 | OP4   { $1 }
 | EQUAL { "=" }
 ;
@@ -162,6 +163,7 @@ any_op:
 | OP1   { $1 }
 | OP2   { $1 }
 | OP3   { $1 }
+| STAR  { "*" }
 | OP4   { $1 }
 ;
 
@@ -330,20 +332,36 @@ indcase:
 | uident COLON lexpr { (loc (),$1,$3) }
 ;
 
-primitive_type:
+simple_primitive_type:
 | type_var 
    { PPTtyvar $1 }
 | lqualid
    { PPTtyapp ([], $1) }
-| primitive_type lqualid
+| simple_primitive_type lqualid
    { PPTtyapp ([$1], $2) }
 | LEFTPAR primitive_type COMMA list1_primitive_type_sep_comma RIGHTPAR lqualid
    { PPTtyapp ($2 :: $4, $6) }
+| LEFTPAR RIGHTPAR
+   { PPTtuple [] }
+| LEFTPAR primitive_type RIGHTPAR
+   { $2 }
+;
+
+primitive_type:
+| simple_primitive_type 
+    { $1 }
+| simple_primitive_type STAR list1_simple_primitive_type_sep_star 
+   { PPTtuple ($1 :: $3) }
 ;
 
 list1_primitive_type_sep_comma:
 | primitive_type                                      { [$1] }
 | primitive_type COMMA list1_primitive_type_sep_comma { $1 :: $3 }
+;
+
+list1_simple_primitive_type_sep_star:
+| simple_primitive_type                                           { [$1] }
+| simple_primitive_type STAR list1_simple_primitive_type_sep_star { $1 :: $3 }
 ;
 
 lexpr:
@@ -368,6 +386,9 @@ lexpr:
      mk_pp (PPinfix ($1, id, $3)) }
 | lexpr OP3 lexpr 
    { let id = { id = infix $2; id_loc = loc_i 2 } in
+     mk_pp (PPinfix ($1, id, $3)) }
+| lexpr STAR lexpr 
+   { let id = { id = infix "*"; id_loc = loc_i 2 } in
      mk_pp (PPinfix ($1, id, $3)) }
 | lexpr OP4 lexpr 
    { let id = { id = infix $2; id_loc = loc_i 2 } in
@@ -395,15 +416,21 @@ lexpr:
    { mk_pp PPfalse }    
 | LEFTPAR lexpr RIGHTPAR
    { $2 }
+| LEFTPAR RIGHTPAR
+   { mk_pp (PPtuple []) }
+| LEFTPAR lexpr COMMA list1_lexpr_sep_comma RIGHTPAR
+   { mk_pp (PPtuple ($2 :: $4)) }
 | STRING lexpr %prec prec_named
    { mk_pp (PPnamed ($1, $2)) }
-| LET lident EQUAL lexpr IN lexpr 
-   { mk_pp (PPlet ($2, $4, $6)) }
+| LET pattern EQUAL lexpr IN lexpr 
+   { match $2.pat_desc with
+       | PPpvar id -> mk_pp (PPlet (id, $4, $6))
+       | _ -> mk_pp (PPmatch ([$4], [[$2], $6])) }
 | MATCH list1_lexpr_sep_comma WITH bar_ match_cases END
    { mk_pp (PPmatch ($2, $5)) }
 | EPSILON lident COLON primitive_type DOT lexpr
    { mk_pp (PPeps ($2, $4, $6)) }
-| lexpr COLON primitive_type
+| lexpr COLON simple_primitive_type
    { mk_pp (PPcast ($1, $3)) }
 ;
 
@@ -434,6 +461,9 @@ pattern:
 | uqualid LEFTPAR list1_pat_sep_comma RIGHTPAR  { mk_pat (PPpapp ($1, $3)) }
 | pattern AS lident                             { mk_pat (PPpas ($1,$3)) }
 | LEFTPAR pattern RIGHTPAR                      { $2 }
+| LEFTPAR RIGHTPAR                              { mk_pat (PPptuple []) }
+| LEFTPAR pattern COMMA list1_pat_sep_comma RIGHTPAR 
+    { mk_pat (PPptuple ($2 :: $4)) }
 ;
 
 triggers:
