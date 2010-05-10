@@ -505,11 +505,11 @@ let ps_neq =
   let v = ty_var (create_tvsymbol (id_fresh "a")) in
   create_psymbol (id_fresh "infix <>") [v; v]
 
-let f_equ t1 t2 = f_app ps_equ [t1; t2]
-let f_neq t1 t2 = f_app ps_neq [t1; t2]
-
 let f_app p tl =
   if ls_equal p ps_neq then f_not (f_app ps_equ tl) else f_app p tl
+
+let f_equ t1 t2 = f_app ps_equ [t1; t2]
+let f_neq t1 t2 = f_app ps_neq [t1; t2]
 
 let f_app_unsafe = f_app
 
