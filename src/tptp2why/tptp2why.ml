@@ -18,7 +18,7 @@ end= struct
   let rec getAllDecls ?first:(first=false) include_dir filename =
     try
       let filename = if first then filename else include_dir^"/"^filename in
-      let input = open_in filename in
+      let input = if filename = "-" then stdin else open_in filename in
       let decls = TptpParser.tptp TptpLexer.token (Lexing.from_channel input) in
       let isInclude = function | Include _ -> true | _ -> false in
       close_in input;
@@ -61,10 +61,11 @@ module Init = struct
 
   let options = [
     ("-o", String output_updater, "outputs to a file");
-    ("-I", String include_updater, "search for included files in this dir")
+    ("-I", String include_updater, "search for included files in this dir");
+    ("-", Unit (fun () -> input_files := "-" :: !input_files), "reads from stdin")
   ]
 
-  let usage = "tptp2why file1 [file2...] [-o file] [-I dir]
+  let usage = "tptp2why [file1|-] [file2...] [-o file] [-I dir]
   It parses tptp files (fof or cnf format) and prints a why file
   with one theory per input file."
 
