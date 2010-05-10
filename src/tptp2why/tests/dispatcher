@@ -63,17 +63,12 @@ output's lines"
   if useWhy:
     left = subprocess.Popen("tptp2why -", shell=True, \
       stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+    problem = left.communicate(problem)[0]
     prover = "why - -P "+prover
-    right = subprocess.Popen(prover, shell=True, \
-      stdin=left.stdout, stdout=subprocess.PIPE)
-  else:
-    left = right = subprocess.Popen(prover, shell=True, \
-      stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-  left.stdin.write(problem)
-  left.stdin.flush()
-  left.stdin.close()
-  print "data sent to prover"
-  return (right.wait(), right.stdout.readlines())
+  s = subprocess.Popen(prover, shell=True, \
+    stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+  print "send data to prover"
+  return (s.returncode, s.communicate(problem)[0].split("\n"))
 
 
 def main():
