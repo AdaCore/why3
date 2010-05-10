@@ -1,0 +1,96 @@
+#!/usr/bin/env python
+
+# launches some provers on a bunch of tptp problems, after conversion
+# with tptp2why
+
+import sys
+import getopt
+
+import time
+import subprocess
+
+
+#------------------------------------------------------------------------------
+# parsing options
+
+usage = """usage : dispatcher [-P prover [-P prover...]] [-I dir] [-o file] \
+[-p prover [-p prover...]] [--help] [--] file1 [file2...]
+
+It tries to solve the given files with given provers.
+-P prover   : adds a why prover
+-p prover   : adds a prover to be called directly on tptp problem"""
+
+
+class Options:
+  "contains all options parsed on the command line"
+
+  optstring = "P:p:I:o:h"
+  long_optstring = ["help"]
+
+  provers = []
+  tptpProvers = []
+
+  def parse(self):
+    self.options, self.args = \
+      getopt.getopt(sys.argv[1:], self.optstring, self.long_optstring)
+# add each prover to self.provers
+    for opt,prover in self.options:
+      if opt == "-P":
+        self.provers.append(prover)
+      elif opt == "-p":
+        self.tptpProvers.append(prover)
+    self.options = dict(self.options)
+# those options are now useless
+    self.options.pop("-P", None)
+    self.options.pop("-p", None)
+
+  def __init__(self):
+    self.parse()
+
+options = Options()
+
+if "--help" in options.options or "-h" in options.options:
+  print usage
+  sys.exit(0)
+
+
+#------------------------------------------------------------------------------
+# finding provers
+
+def sendTo(problem, prover, useWhy = True):
+  "calls the prover on the problem, and return its return value and\
+output's lines"
+  if useWhy:
+    left = subprocess.Popen("tptp2why -", shell=True, \
+      stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+    prover = "why - -P "+prover
+    right = subprocess.Popen(prover, shell=True, \
+      stdin=left.stdout, stdout=subprocess.PIPE)
+  else:
+    left = right = subprocess.Popen(prover, shell=True, \
+      stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+  left.stdin.write(problem)
+  left.stdin.flush()
+  left.stdin.close()
+  print "data sent to prover"
+  return (right.wait(), right.stdout.readlines())
+
+
+def main():
+  for f in options.args:
+    print "file %s\n" % f
+    try:
+      fd = open(f, 'r')
+      problem = fd.read()
+      fd.close()
+      for prover in options.tptpProvers:
+        for line in sendTo(problem, prover, useWhy = False)[1]:
+          print line.strip()
+      for prover in options.provers:
+        for line in sendTo(problem, prover)[1]:
+          print line.strip()
+    except Exception, e:
+      print "exception :", e, e.args
+
+if __name__=="__main__":
+  main()
