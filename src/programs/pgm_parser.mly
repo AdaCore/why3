@@ -72,6 +72,8 @@
   let id_result () = { id = "result"; id_loc = loc () }
   let id_anonymous () = { id = "_"; id_loc = loc () }
 
+  let id_wf_lt_int () = Qident { id = "wf_lt_int"; id_loc = loc () }
+
   let ty_unit () = Tpure (PPTtyapp ([], Qident (id_unit ())))
 
   let lexpr_true () = symbol_start_pos (), "true"
@@ -380,17 +382,12 @@ assertion_kind:
 ;
 
 loop_annotation:
-| loop_invariant loop_variant { { loop_invariant = $1; loop_variant = $2 } }
+| loop_invariant opt_variant { { loop_invariant = $1; loop_variant = $2 } }
 ;
 
 loop_invariant:
 | INVARIANT LOGIC { Some $2 }
 | /* epsilon */   { None    }
-;
-
-loop_variant:
-| VARIANT LOGIC { Some $2 }
-| /* epsilon */ { None    }
 ;
 
 constant:
@@ -504,8 +501,9 @@ opt_raises:
 ;
 
 opt_variant:
-| /* epsilon */ { None }
-| VARIANT LOGIC  { Some $2 }
+| /* epsilon */             { None }
+| VARIANT LOGIC             { Some ($2, id_wf_lt_int ()) }
+| VARIANT LOGIC FOR lqualid { Some ($2, $4) }
 ;
 
 list0_lident_sep_comma:

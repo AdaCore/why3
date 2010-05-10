@@ -25,4 +25,7 @@ theory Prelude
   logic old ('a)        : 'a
 
   type exn
+
+  logic wf_lt_int(x:int, y:int) = 0 <= y and x < y
+
 end

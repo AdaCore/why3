@@ -199,9 +199,22 @@ and dbinder env ({id=x; id_loc=loc}, v) =
   let env = { env with denv = Typing.add_var x ty env.denv } in
   env, (x, v)
 
-let dloop_annotation a =
+let dvariant uc (l, p) =
+  let l = lexpr l in
+  let s, _ = Typing.specialize_psymbol p uc in
+  let loc = Typing.qloc p in
+  begin match s.ls_args with
+    | [t1; t2] when Ty.ty_equal t1 t2 -> 
+	()
+    | _ -> 
+	errorm ~loc "predicate %s should be a binary relation" 
+	  s.ls_name.id_string
+  end;
+  l, s
+
+let dloop_annotation uc a =
   { dloop_invariant = option_map lexpr a.Pgm_ptree.loop_invariant;
-    dloop_variant   = option_map lexpr a.Pgm_ptree.loop_variant; }
+    dloop_variant   = option_map (dvariant uc) a.Pgm_ptree.loop_variant; }
 
 let rec dexpr env e = 
   let d, ty = dexpr_desc env e.Pgm_ptree.expr_loc e.Pgm_ptree.expr_desc in
@@ -263,7 +276,7 @@ and dexpr_desc env loc = function
       expected_type e1 (dty_bool env.uc);
       let e2 = dexpr env e2 in
       expected_type e2 (dty_unit env.uc);
-      DEwhile (e1, dloop_annotation a, e2), (dty_unit env.uc)
+      DEwhile (e1, dloop_annotation env.uc a, e2), (dty_unit env.uc)
   | Pgm_ptree.Elazy (op, e1, e2) ->
       let e1 = dexpr env e1 in
       expected_type e1 (dty_bool env.uc);
@@ -352,7 +365,7 @@ and dletrec env dl =
   let add_one env (id, bl, var, t) = 
     let ty = create_type_var id.id_loc in
     let env = { env with denv = Typing.add_var id.id ty env.denv } in
-    env, ((id, ty), bl, option_map lexpr var, t)
+    env, ((id, ty), bl, option_map (dvariant env.uc) var, t)
   in
   let env, dl = map_fold_left add_one env dl in
   (* then type-check all of them and unify *)
@@ -417,6 +430,18 @@ let post env ty (q, ql) =
   let env = Mstr.add id_result v_result env in
   Typing.type_fmla denv env l, List.map exn ql
 
+let variant denv env (t, ps) =
+  let loc = t.pp_loc in
+  let t = Typing.type_term denv env t in
+  match ps.ls_args with
+    | [t1; _] when Ty.ty_equal t1 t.t_ty -> 
+	t, ps
+    | [t1; _] -> 
+	errorm ~loc "variant has type %a, but is expected to have type %a"
+	  Pretty.print_ty t.t_ty Pretty.print_ty t1
+    | _ -> 
+	assert false
+
 let rec type_v uc env = function
   | DTpure ty -> 
       Tpure (Denv.ty_of_dty ty)
@@ -477,7 +502,7 @@ and expr_desc uc env denv = function
 	{ loop_invariant = 
 	    option_map (Typing.type_fmla denv env) la.dloop_invariant;
 	  loop_variant   = 
-	    option_map (Typing.type_term denv env) la.dloop_variant; }
+	    option_map (variant denv env) la.dloop_variant; }
       in
       Ewhile (expr uc env e1, la, expr uc env e2)
   | DElazy (op, e1, e2) ->
@@ -537,7 +562,7 @@ and letrec uc env dl =
   let step2 (v, bl, var, (_,e,_ as t)) =
     let env, bl = map_fold_left (binder uc) env bl in
     let denv = e.dexpr_denv in
-    let var = option_map (Typing.type_term denv env) var in
+    let var = option_map (variant denv env) var in
     let t = triple uc env t in
     (v, bl, var, t)
   in

@@ -49,6 +49,9 @@ val report : Format.formatter -> error -> unit
 val specialize_fsymbol : 
   Ptree.qualid -> theory_uc -> lsymbol * Denv.dty list * Denv.dty
 
+val specialize_psymbol : 
+  Ptree.qualid -> theory_uc -> lsymbol * Denv.dty list
+
 val specialize_tysymbol : 
   Loc.position -> Ptree.qualid -> theory_uc -> Ty.tysymbol * int
 
@@ -75,5 +78,6 @@ val dpat_list :
 
 val pattern : vsymbol Mstr.t -> dpattern -> vsymbol Mstr.t * pattern
 
+val qloc : Ptree.qualid -> Loc.position
 
 

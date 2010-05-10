@@ -35,9 +35,11 @@ type logic = Lexing.position * string
 
 type lexpr = logic
 
+type variant = lexpr * qualid
+
 type loop_annotation = {
   loop_invariant : lexpr option;
-  loop_variant   : lexpr option;
+  loop_variant   : variant option;
 }
 
 type effect = {
@@ -62,8 +64,6 @@ and type_c =
     pc_post        : post; }
 
 and binder = ident * type_v option
-
-type variant = lexpr 
 
 type expr = {
   expr_desc : expr_desc;

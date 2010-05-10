@@ -58,12 +58,12 @@ and dtype_c =
 
 and dbinder = string * dtype_v
 
+type dvariant = Ptree.lexpr * Term.lsymbol
+
 type dloop_annotation = {
   dloop_invariant : Ptree.lexpr option;
-  dloop_variant   : Ptree.lexpr option;
+  dloop_variant   : dvariant option;
 }
-
-type dvariant = Ptree.lexpr 
 
 type dexpr = {
   dexpr_desc : dexpr_desc;
@@ -102,7 +102,7 @@ and dtriple = dpre * dexpr * dpost
 
 (* phase 2: typing annotations *)
 
-type variant = Term.term
+type variant = Term.term * Term.lsymbol
 
 type reference = 
   | Rlocal  of Term.vsymbol
