@@ -165,6 +165,10 @@ module Translate = struct
       | Summary.Pred -> Term.create_psymbol (id_fresh (String.uncapitalize name)) l
     end)
 
+  (** used when a cnf declaration is met, to remember you have to add a
+  goal : false at the end of the problem *)
+  exception CnfProblem
+
   (** for cnf declarations, add quantifiers for free vars *)
   let rec cnfAddQuantifiers f =
     let freeVars = Summary.findFreeVars f in
@@ -224,8 +228,8 @@ module Translate = struct
 
   (** add a declaration to a theory, after translation *)
   let rec addDecl theory = function
-  | Cnf(name, NegatedConjecture, f) ->
-      addDecl theory (Fof(name, Conjecture, cnfAddQuantifiers (FUnop(Not, f))))
+  | Cnf(_, NegatedConjecture, _) ->
+      raise CnfProblem
   | Cnf(name, ty, f) -> (* just add quantifiers and process it as a fof *)
       addDecl theory (Fof(name, ty, cnfAddQuantifiers f))
   | Fof(name, ty, f) ->
@@ -252,14 +256,24 @@ module Translate = struct
       [(EnvFunctor.find (name, range (snd obj) t, (fst obj))), None] in
     Theory.add_decl theory logic_decl
 
-  (** puts the conjectures or negated conjectures at the end *)
-  let putGoalsAtTheEnd =
-    let compare a b = match (a,b) with
-    | Cnf(_,NegatedConjecture,_), _ -> 1
-    | Cnf(_,Conjecture,_),_ -> 1
-    | Fof(_,Conjecture,_),_ -> 1
-    | _,_ -> 0 in
-    List.sort compare
+  let rec buildFofTheory theory decls =
+    try
+      List.fold_left addDecl theory decls
+    with CnfProblem -> (* raised if a cnf NegatedConjecture is found *)
+      buildCnfTheory theory decls
+  (* if this problem is about cnf NegatedConjecture, just transform
+  every NegatedConjecture to an axiom, and add False as a goal *)
+  and buildCnfTheory theory decls =
+    let hideNegatedConjecture = function
+      | Cnf(name, NegatedConjecture, f) -> Cnf(name,Axiom, f)
+      | blah -> blah in
+    let theory = List.fold_left addDecl theory
+      (List.map hideNegatedConjecture decls) in
+    Theory.add_decl theory (Decl.create_prop_decl Decl.Pgoal
+      (Decl.create_prsymbol (id_fresh "negated_goal")) Term.f_false)
+
+
+
 
   (** from a list of untyped declarations, translates them into a why theory *)
   let theory_of_decls theoryName decls =
@@ -267,8 +281,7 @@ module Translate = struct
     let theory = Theory.add_ty_decl theory [ts, Decl.Tabstract] in
     let theory = S.fold addAtomForwardDecl (Summary.findAllAtoms decls) theory in
     let theory = M.fold addFunctorsForwardDecl (Summary.findAllFunctors decls) theory in
-    let decls = putGoalsAtTheEnd decls in
-    let theory = List.fold_left addDecl theory decls in
+    let theory = buildFofTheory theory decls in
     Theory.close_theory theory
 
 
