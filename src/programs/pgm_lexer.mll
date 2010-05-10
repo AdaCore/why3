@@ -39,6 +39,7 @@
       (fun (x,y) -> Hashtbl.add keywords x y)
       [ "absurd", ABSURD;
 	"and", AND;
+	"any", ANY;
 	"as", AS;
 	"assert", ASSERT;
 	"assume", ASSUME;
@@ -146,8 +147,6 @@ rule token = parse
       { LEFTPAR }
   | ")"
       { RIGHTPAR }
-  | "()"
-      { UIDENT "Unit" }
   | ":"
       { COLON }
   | ";"

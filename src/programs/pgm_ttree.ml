@@ -41,6 +41,10 @@ type deffect = {
 
 type dlexpr = Typing.denv * Ptree.lexpr
 
+type dpre = dlexpr
+
+type dpost = dlexpr * (Term.lsymbol * dlexpr) list
+
 type dtype_v = 
   | DTpure of Denv.dty
   | DTarrow of dbinder list * dtype_c
@@ -49,12 +53,17 @@ and dtype_c =
   { dc_result_name : string;
     dc_result_type : dtype_v;
     dc_effect      : deffect;
-    dc_pre         : dlexpr;
-    dc_post        : dlexpr; }
+    dc_pre         : dpre;
+    dc_post        : dpost; }
 
 and dbinder = string * dtype_v
 
-type dvariant = Pgm_ptree.lexpr 
+type dloop_annotation = {
+  dloop_invariant : Ptree.lexpr option;
+  dloop_variant   : Ptree.lexpr option;
+}
+
+type dvariant = Ptree.lexpr 
 
 type dexpr = {
   dexpr_desc : dexpr_desc;
@@ -76,18 +85,19 @@ and dexpr_desc =
 
   | DEsequence of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
-  | DEwhile of dexpr *  Pgm_ptree.loop_annotation * dexpr
+  | DEwhile of dexpr *  dloop_annotation * dexpr
   | DElazy of lazy_op * dexpr * dexpr
   | DEmatch of dexpr list * (Typing.dpattern list * dexpr) list
   | DEskip
   | DEabsurd 
   | DEraise of Term.lsymbol * dexpr option
+  | DEtry of dexpr * (Term.lsymbol * string option * dexpr) list
 
   | DEassert of assertion_kind * Ptree.lexpr
   | DEghost of dexpr
   | DElabel of string * dexpr
 
-and dtriple = dlexpr * dexpr * dlexpr
+and dtriple = dpre * dexpr * dpost
 
 (* phase 2: typing annotations *)
 
@@ -103,6 +113,10 @@ type effect = {
   e_raises : Term.lsymbol list;
 }
 
+type pre = Term.fmla
+
+type post = Term.fmla * (Term.lsymbol * Term.fmla) list
+
 type type_v = 
   | Tpure of Ty.ty
   | Tarrow of binder list * type_c
@@ -111,8 +125,8 @@ and type_c =
   { c_result_name : Term.vsymbol;
     c_result_type : type_v;
     c_effect      : effect;
-    c_pre         : Term.fmla;
-    c_post        : Term.fmla; }
+    c_pre         : pre;
+    c_post        : post; }
 
 and binder = Term.vsymbol * type_v
 
@@ -144,6 +158,7 @@ and expr_desc =
   | Eskip 
   | Eabsurd
   | Eraise of Term.lsymbol * expr option
+  | Etry of expr * (Term.lsymbol * Term.vsymbol option * expr) list
 
   | Eassert of assertion_kind * Term.fmla
   | Eghost of expr
@@ -151,7 +166,7 @@ and expr_desc =
 
 and recfun = Term.vsymbol * binder list * variant option * triple
 
-and triple = Term.fmla * expr * Term.fmla
+and triple = pre * expr * post
 
 type decl =
   | Dlet    of Term.lsymbol * expr

@@ -68,30 +68,23 @@
     let id = { id = prefix op; id_loc = loc_i 1 } in
     mk_expr (mk_apply_id id [e1])
 
-  let id_unit () = { id = "Unit"; id_loc = loc () }
+  let id_unit () = { id = "unit"; id_loc = loc () }
   let id_result () = { id = "result"; id_loc = loc () }
   let id_anonymous () = { id = "_"; id_loc = loc () }
 
-  let lexpr_true () = { Ptree.pp_loc = loc (); Ptree.pp_desc = PPtrue }
-  let lexpr_false () = { Ptree.pp_loc = loc (); Ptree.pp_desc = PPfalse }
+  let ty_unit () = Tpure (PPTtyapp ([], Qident (id_unit ())))
 
-  (* parsing LOGIC strings using functions from src/parser/
-     requires proper relocation *)
-
-  let reloc loc lb =
-    lb.lex_curr_p <- loc;
-    lb.lex_abs_pos <- loc.pos_cnum
-
-  let parse_string f loc s =
-    let lb = Lexing.from_string s in
-    reloc loc lb;
-    f lb
-    
-  let logic_list0_decl (loc, s) = parse_string Lexer.parse_list0_decl loc s
-
-  let lexpr (loc, s) = parse_string Lexer.parse_lexpr loc s
+  let lexpr_true () = symbol_start_pos (), "true"
+  let lexpr_false () = symbol_start_pos (), "false"
 
   let empty_effect = { pe_reads = []; pe_writes = []; pe_raises = [] }
+
+  let type_c p ty ef q =
+    { pc_result_name = id_result ();
+      pc_result_type = ty;
+      pc_effect      = ef;
+      pc_pre         = p;
+      pc_post        = q; }
 
 %}
 
@@ -106,7 +99,7 @@
 
 /* keywords */
 
-%token ABSURD AND AS ASSERT ASSUME BEGIN CHECK DO DONE ELSE END
+%token ABSURD AND ANY AS ASSERT ASSUME BEGIN CHECK DO DONE ELSE END
 %token EXCEPTION FOR
 %token FUN GHOST IF IN INVARIANT LABEL LET MATCH NOT OF PARAMETER
 %token RAISE RAISES READS REC 
@@ -120,6 +113,9 @@
 %token EOF
 
 /* Precedences */
+
+%nonassoc prec_post
+%nonassoc BAR
 
 %nonassoc prec_recfun
 %nonassoc prec_triple
@@ -154,6 +150,8 @@
 %nonassoc prec_decls
 %nonassoc LOGIC TYPE INDUCTIVE
 
+
+
 /* Entry points */
 
 %type <Pgm_ptree.file> file
@@ -181,7 +179,7 @@ list1_decl:
 
 decl:
 | LOGIC
-    { Dlogic (logic_list0_decl $1) }
+    { Dlogic $1 (*(logic_list0_decl $1)*) }
 | LET lident EQUAL expr
     { Dlet ($2, $4) }
 | LET lident list1_type_v_binder EQUAL triple
@@ -268,7 +266,7 @@ expr:
 | expr SEMICOLON expr
    { mk_expr (Esequence ($1, $3)) }
 | assertion_kind LOGIC
-   { mk_expr (Eassert ($1, lexpr $2)) }
+   { mk_expr (Eassert ($1, $2)) }
 | expr AMPAMP expr
    { mk_expr (Elazy (LazyAnd, $1, $3)) }
 | expr BARBAR expr
@@ -297,13 +295,17 @@ expr:
    { mk_expr (Eraise ($2, None)) }
 | RAISE LEFTPAR uident expr RIGHTPAR
    { mk_expr (Eraise ($3, Some $4)) }
+| TRY expr WITH option_bar list1_handler_sep_bar END
+   { mk_expr (Etry ($2, $5)) }
+| ANY simple_type_c
+   { mk_expr (Eany $2) }
 ;
 
 triple:
-| LOGIC expr LOGIC
-  { lexpr $1, $2, lexpr $3 }
+| pre expr post
+  { $1, $2, $3 }
 | expr %prec prec_triple
-  { lexpr_true (), $1, lexpr_true () }
+  { lexpr_true (), $1, (lexpr_true (), []) }
 ;
 
 simple_expr:
@@ -336,6 +338,17 @@ list1_expr_sep_comma:
 option_bar:
 | /* epsilon */ { () }
 | BAR           { () }
+;
+
+list1_handler_sep_bar:
+| handler                           { [$1] }
+| handler BAR list1_handler_sep_bar { $1 :: $3 }
+;
+
+handler:
+| ident ARROW expr            { ($1, None, $3) }
+| ident ident ARROW expr      { ($1, Some $2, $4) }
+| ident UNDERSCORE ARROW expr { ($1, Some (id_anonymous ()), $4) }
 ;
 
 match_cases:
@@ -371,13 +384,13 @@ loop_annotation:
 ;
 
 loop_invariant:
-| INVARIANT LOGIC { Some (lexpr $2) }
-| /* epsilon */   { None            }
+| INVARIANT LOGIC { Some $2 }
+| /* epsilon */   { None    }
 ;
 
 loop_variant:
-| VARIANT LOGIC { Some (lexpr $2) }
-| /* epsilon */ { None            }
+| VARIANT LOGIC { Some $2 }
+| /* epsilon */ { None    }
 ;
 
 constant:
@@ -414,12 +427,8 @@ list1_type_v_binder:
 
 type_v_binder:
 | lident                               { $1, None }
+| LEFTPAR RIGHTPAR                     { id_anonymous (), Some (ty_unit ()) }
 | LEFTPAR lident COLON type_v RIGHTPAR { $2, Some $4 }
-;
-
-opt_colon_spec:
-| /* epsilon */ { None }
-| COLON type_c  { Some $2 }
 ;
 
 type_v:
@@ -440,17 +449,38 @@ simple_type_v:
 
 type_c:
 | type_v 
-  { { pc_result_name = id_result ();
-      pc_result_type = $1;
-      pc_effect      = empty_effect;
-      pc_pre         = lexpr_true ();
-      pc_post        = lexpr_true (); } }
-| LOGIC type_v effects LOGIC
-  { { pc_result_name = id_result ();
-      pc_result_type = $2;
-      pc_effect      = $3;
-      pc_pre         = lexpr $1;
-      pc_post        = lexpr $4; } }
+    { type_c (lexpr_true ()) $1 empty_effect (lexpr_true (), []) }
+| pre type_v effects post
+    { type_c $1 $2 $3 $4 }
+;
+
+simple_type_c:
+| simple_type_v 
+    { type_c (lexpr_true ()) $1 empty_effect (lexpr_true (), []) }
+| pre type_v effects post
+    { type_c $1 $2 $3 $4 }
+;
+
+pre:
+| LOGIC { $1 }
+;
+
+post:
+| LOGIC list0_post_exn { $1, $2 }
+;
+
+list0_post_exn:
+| /* epsilon */  %prec prec_post { [] }
+| list1_post_exn                 { $1 }
+;
+
+list1_post_exn:
+| post_exn                %prec prec_post { [$1] }
+| post_exn list1_post_exn                 { $1 :: $2 }
+;
+
+post_exn:
+| BAR uident ARROW LOGIC { $2, $4 }
 ;
 
 effects:
@@ -475,7 +505,7 @@ opt_raises:
 
 opt_variant:
 | /* epsilon */ { None }
-| VARIANT LOGIC  { Some (lexpr $2) }
+| VARIANT LOGIC  { Some $2 }
 ;
 
 list0_lident_sep_comma:

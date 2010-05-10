@@ -54,6 +54,22 @@ let report fmt = function
 
 let id_result = "result"
 
+(* parsing LOGIC strings using functions from src/parser/
+   requires proper relocation *)
+
+let reloc loc lb =
+  lb.Lexing.lex_curr_p <- loc;
+  lb.Lexing.lex_abs_pos <- loc.Lexing.pos_cnum
+    
+let parse_string f loc s =
+  let lb = Lexing.from_string s in
+  reloc loc lb;
+  f lb
+    
+let logic_list0_decl (loc, s) = parse_string Lexer.parse_list0_decl loc s
+  
+let lexpr (loc, s) = parse_string Lexer.parse_lexpr loc s
+
 (* environments *)
 
 let ts_unit uc = ns_find_ts (get_namespace uc) ["unit"]
@@ -144,6 +160,19 @@ let deffect env e =
       List.map (fun id -> let ls,_,_ = dexception env id in ls) 
 	e.Pgm_ptree.pe_raises; }
 
+let dpost env ty (q, ql) =
+  let dexn (id, l) =
+    let s, tyl, _ = dexception env id in
+    let denv = match tyl with
+      | [] -> env.denv
+      | [ty] -> Typing.add_var id_result ty env.denv
+      | _ -> assert false
+    in
+    s, (denv, lexpr l)
+  in
+  let denv = Typing.add_var id_result ty env.denv in
+  (denv, lexpr q), List.map dexn ql
+
 let rec dtype_v env = function
   | Pgm_ptree.Tpure pt -> 
       DTpure (pure_type env pt)
@@ -157,10 +186,8 @@ and dtype_c env c =
   { dc_result_name = c.Pgm_ptree.pc_result_name.id;
     dc_result_type = ty;
     dc_effect      = deffect env c.Pgm_ptree.pc_effect;
-    dc_pre         = env.denv, c.Pgm_ptree.pc_pre;
-    dc_post        =   
-      let denv = Typing.add_var id_result (dpurify env ty) env.denv in
-      denv, c.Pgm_ptree.pc_post;
+    dc_pre         = env.denv, lexpr c.Pgm_ptree.pc_pre;
+    dc_post        = dpost env (dpurify env ty) c.Pgm_ptree.pc_post;
   }
 
 and dbinder env ({id=x; id_loc=loc}, v) =
@@ -171,6 +198,10 @@ and dbinder env ({id=x; id_loc=loc}, v) =
   let ty = dpurify env v in
   let env = { env with denv = Typing.add_var x ty env.denv } in
   env, (x, v)
+
+let dloop_annotation a =
+  { dloop_invariant = option_map lexpr a.Pgm_ptree.loop_invariant;
+    dloop_variant   = option_map lexpr a.Pgm_ptree.loop_variant; }
 
 let rec dexpr env e = 
   let d, ty = dexpr_desc env e.Pgm_ptree.expr_loc e.Pgm_ptree.expr_desc in
@@ -232,7 +263,7 @@ and dexpr_desc env loc = function
       expected_type e1 (dty_bool env.uc);
       let e2 = dexpr env e2 in
       expected_type e2 (dty_unit env.uc);
-      DEwhile (e1, a, e2), (dty_unit env.uc)
+      DEwhile (e1, dloop_annotation a, e2), (dty_unit env.uc)
   | Pgm_ptree.Elazy (op, e1, e2) ->
       let e1 = dexpr env e1 in
       expected_type e1 (dty_bool env.uc);
@@ -274,9 +305,31 @@ and dexpr_desc env loc = function
 	    assert false
       in
       DEraise (ls, e), create_type_var loc
+  | Pgm_ptree.Etry (e1, hl) ->
+      let e1 = dexpr env e1 in
+      let handler (id, x, h) =
+	let ls, tyl, _ = dexception env id in
+	let x, env = match x, tyl with
+	  | Some _, [] -> 
+	      errorm ~loc "expection %s has no argument" id.id
+	  | None, [] -> 
+	      None, env
+	  | None, [ty] ->
+	      errorm ~loc "exception %s is expecting an argument of type %a"
+		id.id print_dty ty;
+	  | Some x, [ty] -> 
+	      Some x.id, { env with denv = Typing.add_var x.id ty env.denv } 
+	  | _ ->
+	      assert false
+	in
+	let h = dexpr env h in
+	expected_type h e1.dexpr_type;
+	(ls, x, h)
+      in
+      DEtry (e1, List.map handler hl), e1.dexpr_type
 
   | Pgm_ptree.Eassert (k, le) ->
-      DEassert (k, le), (dty_unit env.uc) 
+      DEassert (k, lexpr le), (dty_unit env.uc) 
   | Pgm_ptree.Eghost e1 ->
       let e1 = dexpr env e1 in
       DEghost e1, e1.dexpr_type
@@ -290,13 +343,16 @@ and dexpr_desc env loc = function
       let ty = pure_type env ty in
       expected_type e1 ty;
       e1.dexpr_desc, ty
+  | Pgm_ptree.Eany _c ->
+      (* let c = dtype_c env c in *)
+(*       DEany c, c.dc_result_type *)assert false (*TODO*)
 
 and dletrec env dl =
   (* add all functions into environment *)
   let add_one env (id, bl, var, t) = 
     let ty = create_type_var id.id_loc in
     let env = { env with denv = Typing.add_var id.id ty env.denv } in
-    env, ((id, ty), bl, var, t)
+    env, ((id, ty), bl, option_map lexpr var, t)
   in
   let env, dl = map_fold_left add_one env dl in
   (* then type-check all of them and unify *)
@@ -314,11 +370,10 @@ and dletrec env dl =
   env, List.map type_one dl
 
 and dtriple env (p, e, q) =     
-  let p = env.denv, p in
+  let p = env.denv, lexpr p in
   let e = dexpr env e in
   let ty = e.dexpr_type in
-  let denvq = Typing.add_var id_result ty env.denv in
-  let q = denvq, q in
+  let q = dpost env ty q in
   (p, e, q)
 
 (* phase 2: typing annotations *)
@@ -342,6 +397,26 @@ let effect uc env e =
     e_writes = List.map (reference uc env) e.de_writes;
     e_raises = e.de_raises; }
 
+let pre env (denv, l) = Typing.type_fmla denv env l
+
+let post env ty (q, ql) =
+  let exn (ls, (denv, l)) =
+    let env = match ls.ls_args with
+      | [] -> 
+	  env
+      | [ty] -> 
+	  let v_result = create_vsymbol (id_fresh id_result) ty in
+	  Mstr.add id_result v_result env
+      | _ -> 
+	  assert false
+    in
+    (ls, Typing.type_fmla denv env l)
+  in
+  let denv, l = q in 
+  let v_result = create_vsymbol (id_fresh id_result) ty in
+  let env = Mstr.add id_result v_result env in
+  Typing.type_fmla denv env l, List.map exn ql
+
 let rec type_v uc env = function
   | DTpure ty -> 
       Tpure (Denv.ty_of_dty ty)
@@ -356,13 +431,8 @@ and type_c uc env c =
   { c_result_name = v;
     c_result_type = tyv;
     c_effect      = effect uc env c.dc_effect;
-    c_pre         = 
-      (let denv, l = c.dc_pre in Typing.type_fmla denv env l);
-    c_post        =
-	  let denv, l = c.dc_post in 
-	  let v_result = create_vsymbol (id_fresh id_result) ty in
-	  let env = Mstr.add id_result v_result env in
- 	  Typing.type_fmla denv env l;
+    c_pre         = pre env c.dc_pre;
+    c_post        = post env ty c.dc_post;
   }
     
 and binder uc env (x, tyv) = 
@@ -405,9 +475,9 @@ and expr_desc uc env denv = function
   | DEwhile (e1, la, e2) ->
       let la = 
 	{ loop_invariant = 
-	    option_map (Typing.type_fmla denv env) la.Pgm_ptree.loop_invariant;
+	    option_map (Typing.type_fmla denv env) la.dloop_invariant;
 	  loop_variant   = 
-	    option_map (Typing.type_term denv env) la.Pgm_ptree.loop_variant; }
+	    option_map (Typing.type_term denv env) la.dloop_variant; }
       in
       Ewhile (expr uc env e1, la, expr uc env e2)
   | DElazy (op, e1, e2) ->
@@ -426,6 +496,19 @@ and expr_desc uc env denv = function
       Eabsurd
   | DEraise (ls, e) ->
       Eraise (ls, option_map (expr uc env) e)
+  | DEtry (e, hl) ->
+      let handler (ls, x, h) =
+	let x, env = match x with
+	  | Some x -> 
+	      let ty = match ls.ls_args with [ty] -> ty | _ -> assert false in
+	      let v = create_vsymbol (id_fresh x) ty in
+	      Some v, Mstr.add x v env 
+	  | None ->
+	      None, env
+	in
+	(ls, x, expr uc env h)
+      in
+      Etry (expr uc env e, List.map handler hl)
 
   | DEassert (k, f) ->
       let f = Typing.type_fmla denv env f in
@@ -457,12 +540,10 @@ and letrec uc env dl =
   in
   env, List.map step2 dl
 
-and triple uc env ((denvp, p), e, (denvq, q)) =
+and triple uc env ((denvp, p), e, q) =
   let p = Typing.type_fmla denvp env p in
   let e = expr uc env e in
-  let v_result = create_vsymbol (id_fresh id_result) e.expr_type in
-  let envq = Mstr.add id_result v_result env in
-  let q = Typing.type_fmla denvq envq q in
+  let q = post env e.expr_type q in
   (p, e, q)
 
 let type_expr uc e =
@@ -490,6 +571,7 @@ let file env uc dl =
     List.fold_left
       (fun (uc, acc) d -> match d with
 	 | Pgm_ptree.Dlogic dl -> 
+	     let dl = logic_list0_decl dl in
 	     List.fold_left (Typing.add_decl env Mnm.empty) uc dl, acc
 	 | Pgm_ptree.Dlet (id, e) -> 
 	     let e = type_expr uc e in

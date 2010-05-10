@@ -1,4 +1,3 @@
-
 {
 use set.Fset as S
 use array.Array as M
@@ -204,7 +203,6 @@ let shortest_path_code (src:vertex) (dst:vertex) =
     and
     (forall v:vertex. 
        not S.mem(v, !visited) -> forall dv:int. not path(src, v, dv)) }
-
 
 (*
 Local Variables: 

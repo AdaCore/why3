@@ -29,9 +29,11 @@ type constant = Term.constant
 
 type assertion_kind = Aassert | Aassume | Acheck
 
-type lexpr = Ptree.lexpr
-
 type lazy_op = LazyAnd | LazyOr
+
+type logic = Lexing.position * string
+
+type lexpr = logic
 
 type loop_annotation = {
   loop_invariant : lexpr option;
@@ -44,6 +46,10 @@ type effect = {
   pe_raises : ident list;
 }
 
+type pre = lexpr
+
+type post = lexpr * (ident * lexpr) list
+
 type type_v =
   | Tpure of Ptree.pty
   | Tarrow of binder list * type_c
@@ -52,8 +58,8 @@ and type_c =
   { pc_result_name : ident;
     pc_result_type : type_v;
     pc_effect      : effect;
-    pc_pre         : lexpr;
-    pc_post        : lexpr; }
+    pc_pre         : pre;
+    pc_post        : post; }
 
 and binder = ident * type_v option
 
@@ -81,20 +87,22 @@ and expr_desc =
   | Eskip 
   | Eabsurd
   | Eraise of ident * expr option
+  | Etry of expr * (ident * ident option * expr) list
   (* annotations *)
   | Eassert of assertion_kind * lexpr
   | Eghost of expr
   | Elabel of ident * expr
   | Ecast of expr * Ptree.pty
+  | Eany of type_c
 
-  (* TODO: try, any, post?, ghost *)
+  (* TODO: post?, ghost *)
 
-and triple = lexpr * expr * lexpr
+and triple = pre * expr * post
 
 type decl =
   | Dlet    of ident * expr
   | Dletrec of (ident * binder list * variant option * triple) list
-  | Dlogic  of Ptree.decl list
+  | Dlogic  of logic
   | Dparam  of ident * type_v
   | Dexn    of ident * Ptree.pty option
 
