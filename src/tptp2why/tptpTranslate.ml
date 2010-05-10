@@ -117,7 +117,8 @@ module Translate = struct
   let ts = Ty.create_tysymbol (Ident.id_fresh "t") [] None
   let t = Ty.ty_app ts []
 
-  (* TODO : replace it by a simple Map *)
+  let ident_sanitizer = Ident.create_ident_printer []
+
   module EnvVar = Scope(
     struct
       type key = variable
@@ -175,8 +176,8 @@ module Translate = struct
       (List.map term2term terms)
   | FTermBinop (op, t1, t2) ->
       ( match op with
-        | Equal -> Term.f_equ_simp
-        | NotEqual -> Term.f_neq_simp)
+        | Equal -> Term.f_equ
+        | NotEqual -> (*Term.f_neq*) (fun x y -> Term.f_not (Term.f_equ x y)))
       (term2term t1) (term2term t2)
 
   let translatePropKind = function
@@ -187,10 +188,12 @@ module Translate = struct
   let addDecl theory = function
   | Fof(name, ty, f) ->
       let fmla = fmla2fmla f in
-      (* print_endline ("adds declaration of "^name); *)
+      let name = Ident.string_unique ident_sanitizer name in (* fresh name *)
+      (*print_endline ("adds declaration of "^name); *)
       Theory.add_prop_decl theory (translatePropKind ty)
         (Decl.create_prsymbol (id_fresh name)) fmla
-  | Include _ -> assert false
+  | Include _ ->
+    failwith "There should not be includes when adding declarations"
 
 
   (** forward declaration of atoms and functors *)
@@ -201,7 +204,8 @@ module Translate = struct
     Theory.add_decl theory logic_decl
 
   let addFunctorsForwardDecl name obj theory =
-    (* Format.printf "declares functor %s (type %s) (depth %d)\n" name (if fst obj = Summary.Pred then "pred" else "term"); *) 
+    (* Format.printf "declares functor %s (type %s) (depth %d)\n" name
+    (if fst obj = Summary.Pred then "pred" else "term"); *)
     let logic_decl = Decl.create_logic_decl
       [(EnvFunctor.find (name, range (snd obj) t, (fst obj))), None] in
     Theory.add_decl theory logic_decl
@@ -217,4 +221,5 @@ module Translate = struct
 
 end
 
+(** exported symbol *)
 let theory_of_decls = Translate.theory_of_decls
