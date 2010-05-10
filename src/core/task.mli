@@ -72,6 +72,8 @@ val add_ind_decls : task -> ind_decl list -> task
 (* utilities *)
 
 val split_theory : theory -> Spr.t option -> task list
+  (** [split_theory th s] returns the tasks of [th] which end by one
+      of [s]. They are in the opposite order than in the theory *)
 
 (* bottom-up, tail-recursive traversal functions *)
 

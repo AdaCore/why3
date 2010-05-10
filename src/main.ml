@@ -306,31 +306,24 @@ let do_task drv fname tname (th : Why.Theory.theory) (task : Task.task) =
         close_out cout
 
 let do_tasks drv fname tname th trans task =
-  let transs =
-    match trans with
-      | `All trans -> [trans] | `Map map -> 
-          Decl.Mpr.find (Task.task_goal task) map in
-  let transs = List.rev transs in
-  let apply_one_transs trans =
-    let lookup acc t = 
-      (try t, Register.singleton (Register.lookup_transform t) with
-           Not_found -> try t, Register.lookup_transform_l t with
-               Not_found -> (eprintf  "unknown transformation %s.@." t;exit 1))
-      ::acc
-    in
-    let transl = List.fold_left lookup [] (List.rev trans) in
-    let apply tasks (s, tr) = 
-      try
-        List.fold_left 
-          (fun acc task -> 
-             List.rev_append (Register.apply_driver tr drv task) acc) [] tasks
-      with e when not debug ->
-        Format.eprintf "failure in transformation %s@." s;
-        raise e
-    in
-    let tasks = List.fold_left apply [task] transl in
-    List.iter (do_task drv fname tname th) tasks in
-  List.iter apply_one_transs transs
+  let lookup acc t = 
+    (try t, Register.singleton (Register.lookup_transform t) with
+         Not_found -> try t, Register.lookup_transform_l t with
+             Not_found -> (eprintf  "unknown transformation %s.@." t;exit 1))
+    ::acc
+  in
+  let transl = List.fold_left lookup [] (List.rev trans) in
+  let apply tasks (s, tr) = 
+    try
+      List.fold_left 
+        (fun acc task -> 
+           List.rev_append (Register.apply_driver tr drv task) acc) [] tasks
+    with e when not debug ->
+      Format.eprintf "failure in transformation %s@." s;
+      raise e
+  in
+  let tasks = List.fold_left apply [task] transl in
+  List.iter (do_task drv fname tname th) tasks
 
 let do_theory drv fname tname th trans glist =
   if !opt_print_theory then
@@ -344,19 +337,25 @@ let do_theory drv fname tname th trans glist =
         exit 1
       in
       let accs = Decl.Spr.add pr accs in
-      let transs = try trans::(Decl.Mpr.find pr accm) 
-      with Not_found -> [trans] in
-      Decl.Mpr.add pr transs accm,accs
+      (pr,trans)::accm,accs
     in
-    let prm,prs = 
-      if Queue.is_empty glist 
-      then `All trans,None 
-      else 
-        let prm,prs = Queue.fold add (Decl.Mpr.empty,Decl.Spr.empty) glist in
-        `Map prm, Some prs in
-    let tasks = split_theory th prs in
     let drv = Util.of_option drv in
-    List.iter (do_tasks drv fname tname th prm) tasks
+    if Queue.is_empty glist 
+    then 
+      let tasks = List.rev (split_theory th None) in
+      let do_tasks = do_tasks drv fname tname th trans in
+      List.iter do_tasks tasks
+    else 
+      let prtrans,prs = Queue.fold add ([],Decl.Spr.empty) glist in
+      let tasks = split_theory th (Some prs) in
+      let recover_pr mpr task =
+        let pr = task_goal task in
+        Decl.Mpr.add pr task mpr in
+      let mpr = List.fold_left recover_pr Decl.Mpr.empty tasks in
+      let do_tasks (pr,trans) =
+        let task = Decl.Mpr.find pr mpr in
+        do_tasks drv fname tname th trans task in
+      List.iter do_tasks (List.rev prtrans)
   end
 
 let do_global_theory env drv (tname,p,t,glist,trans) =
