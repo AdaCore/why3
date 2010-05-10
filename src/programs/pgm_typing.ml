@@ -343,9 +343,9 @@ and dexpr_desc env loc = function
       let ty = pure_type env ty in
       expected_type e1 ty;
       e1.dexpr_desc, ty
-  | Pgm_ptree.Eany _c ->
-      (* let c = dtype_c env c in *)
-(*       DEany c, c.dc_result_type *)assert false (*TODO*)
+  | Pgm_ptree.Eany c ->
+      let c = dtype_c env c in
+      DEany c, dpurify env c.dc_result_type
 
 and dletrec env dl =
   (* add all functions into environment *)
@@ -520,6 +520,9 @@ and expr_desc uc env denv = function
       let v = create_vsymbol (id_fresh s) ty in
       let env = Mstr.add s v env in 
       Elabel (s, expr uc env e1)
+  | DEany c ->
+      let c = type_c uc env c in
+      Eany c
 
 and letrec uc env dl =
   (* add all functions into env, and compute local env *)
@@ -620,9 +623,11 @@ End:
 *)
 
 (* 
-
 TODO:
+- tuples
+
 - mutually recursive functions: check variants are all present or all absent
 - variant: check type int or relation order specified
 
+- ghost / effects
 *)

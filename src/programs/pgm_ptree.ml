@@ -95,7 +95,7 @@ and expr_desc =
   | Ecast of expr * Ptree.pty
   | Eany of type_c
 
-  (* TODO: post?, ghost *)
+  (* TODO: ghost *)
 
 and triple = pre * expr * post
 

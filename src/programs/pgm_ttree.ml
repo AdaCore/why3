@@ -96,6 +96,7 @@ and dexpr_desc =
   | DEassert of assertion_kind * Ptree.lexpr
   | DEghost of dexpr
   | DElabel of string * dexpr
+  | DEany of dtype_c
 
 and dtriple = dpre * dexpr * dpost
 
@@ -163,6 +164,7 @@ and expr_desc =
   | Eassert of assertion_kind * Term.fmla
   | Eghost of expr
   | Elabel of string * expr
+  | Eany of type_c
 
 and recfun = Term.vsymbol * binder list * variant option * triple
 
