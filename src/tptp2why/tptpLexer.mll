@@ -10,7 +10,12 @@
       (fun (x,y) -> Hashtbl.add keywords x y)
       [
         "fof", FOF;
+        "cnf", CNF;
+        "lemma", CONJECTURE;
+        "assumption", AXIOM;
+        "theorem", CONJECTURE;
         "conjecture", CONJECTURE;
+        "negated_conjecture", NEGATED_CONJECTURE;
         "axiom", AXIOM;
         "definition", AXIOM; (* TODO : what's the difference ? *)
         "hypothesis", AXIOM;

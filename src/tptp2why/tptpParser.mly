@@ -24,12 +24,11 @@
 %token DOT COMMA COLON
 %token PIPE AND ARROW LRARROW EQUAL NEQUAL NOT
 %token BANG QUESTION DOLLAR
-%token QUOTE
 
 %token<string> UIDENT
 %token<string> LIDENT
 %token<string> SINGLEQUOTED
-%token FOF AXIOM CONJECTURE INCLUDE
+%token FOF CNF AXIOM CONJECTURE INCLUDE NEGATED_CONJECTURE
 %token EOF
 
 
@@ -46,6 +45,8 @@ tptp:
   { Printf.printf "error at lexing pos %i\n" $endpos.Lexing.pos_lnum; assert false }
 
 decl:
+| CNF LPAREN name = lident COMMA ty = decl_type COMMA f = fmla RPAREN DOT
+  { Cnf (name, ty, f) }
 | FOF LPAREN name = lident COMMA ty = decl_type COMMA f = fmla RPAREN DOT
   { Fof (name, ty, f) }
 | INCLUDE LPAREN p = SINGLEQUOTED RPAREN DOT
@@ -54,6 +55,7 @@ decl:
 decl_type:
 | AXIOM { Axiom }
 | CONJECTURE { Conjecture }
+| NEGATED_CONJECTURE { NegatedConjecture }
 
 
 fmla:

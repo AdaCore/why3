@@ -9,16 +9,38 @@ open Why.Ident
 module S = Set.Make(String)
 module M = Map.Make(String)
 
-(** exploratory module, to find atoms and functors to be declared first *)
+(*s exploratory module, to find atoms and functors in order to declare them
+as a header *)
 module Summary : sig
   type indic = Pred | Term
+  val findFreeVars : fmla -> S.t
   val findAtoms : S.t -> fmla -> S.t
   val findFunctors : (indic * int) M.t ->
         TptpTree.fmla -> (indic * int) M.t
   val findAllAtoms : TptpTree.decl list -> S.t
   val findAllFunctors : TptpTree.decl list -> (indic * int) M.t
 end = struct
+
+  (** type used to differentiate predicates from functions *)
   type indic = Pred | Term
+
+
+  (** find free vars in the formula *)
+  let findFreeVars f =
+    let rec find_f = function
+      | FBinop(_,f1,f2) -> S.union (find_f f1) (find_f f2)
+      | FUnop(_,f) -> find_f f
+      | FQuant(_,vars,f) -> List.fold_right S.remove vars (find_f f)
+      | FPred(_, terms) -> List.fold_left S.union S.empty
+          (List.map find_t terms)
+      | FTermBinop(_,t1,t2) -> S.union (find_t t1) (find_t t2)
+    and find_t = function
+      | TAtom _ -> S.empty
+      | TConst _ -> S.empty
+      | TFunctor(_, terms) -> List.fold_left S.union S.empty
+          (List.map find_t terms)
+      | TVar x -> S.singleton x
+    in find_f f
 
   let rec findAtoms_t s = function
   | TAtom a -> S.add a s
@@ -33,11 +55,13 @@ end = struct
   | FPred (_, terms) -> List.fold_left findAtoms_t s terms
   | FTermBinop (_, t1, t2) -> S.union (findAtoms_t s t1) (findAtoms_t s t2)
 
+  (** union of two maps *)
   let union_map = M.fold M.add
 
   let rec findFunctors_t m = function
   | TAtom _ | TConst _ | TVar _ -> m
-  | TFunctor (f, terms) -> M.add f (Term, List.length terms) m
+  | TFunctor (f, terms) -> let new_m = M.add f (Term, List.length terms) m in
+      List.fold_left findFunctors_t new_m terms
 
   let rec findFunctors m = function
   | FBinop (_, f1, f2) -> union_map (findFunctors m f1) (findFunctors m f2)
@@ -48,14 +72,21 @@ end = struct
   | FTermBinop (_, t1, t2) ->
       union_map (findFunctors_t m t1) (findFunctors_t m t2)
 
+  (** find all atoms used in declarations *)
   let findAllAtoms decls =
-    let helper m = function Fof(_, _, f) -> findAtoms m f | _ -> assert false in
+    let helper m = function
+      | Fof(_, _, f)
+      | Cnf(_, _, f) -> findAtoms m f
+      | _ -> assert false in
     List.fold_left helper S.empty decls
 
+  (** find all functors in all declarations, with their arity *)
   let findAllFunctors decls =
-    let helper s = function Fof(_, _, f) -> findFunctors s f | _ -> assert false in
+    let helper s = function
+      | Fof(_, _, f)
+      | Cnf(_, _, f) -> findFunctors s f
+      | _ -> assert false in
     List.fold_left helper M.empty decls
-
 
 end
 
@@ -123,16 +154,22 @@ module Translate = struct
     struct
       type key = variable
       type value = Term.vsymbol
-      let create v = Term.create_vsymbol (id_fresh (String.uncapitalize v)) t
+      let create name = Term.create_vsymbol (id_fresh (String.uncapitalize name)) t
     end)
   module EnvFunctor = Scope(
     struct
       type key = (atom * Ty.ty list * Summary.indic)
       type value = Term.lsymbol
-      let create (v,l,ty) = match ty with
-      | Summary.Term -> Term.create_fsymbol (id_fresh (String.uncapitalize v)) l t
-      | Summary.Pred -> Term.create_psymbol (id_fresh (String.uncapitalize v)) l
+      let create (name,l,ty) = match ty with
+      | Summary.Term -> Term.create_fsymbol (id_fresh (String.uncapitalize name)) l t
+      | Summary.Pred -> Term.create_psymbol (id_fresh (String.uncapitalize name)) l
     end)
+
+  (** for cnf declarations, add quantifiers for free vars *)
+  let rec cnfAddQuantifiers f =
+    let freeVars = Summary.findFreeVars f in
+    FQuant(Forall, S.fold (fun x y -> x::y) freeVars [], f)
+
 
   (** translation for terms *)
   let rec term2term = function
@@ -158,7 +195,7 @@ module Translate = struct
       (fmla2fmla f2)
   | FUnop (op, f) ->
     assert (op = Not);
-    Term.f_not (fmla2fmla f)
+    Term.f_not_simp (fmla2fmla f)
   | FQuant (quant, vars, f) -> begin
     (* Format.printf "@[<hov 2>quantifier %s %s (depth %d)@]\n" (if quant=Forall then "forall" else "exists") (String.concat ", " vars) (EnvVar.depth ()); *)
     EnvVar.push_scope vars; (* new scope *)
@@ -177,15 +214,20 @@ module Translate = struct
   | FTermBinop (op, t1, t2) ->
       ( match op with
         | Equal -> Term.f_equ
-        | NotEqual -> (*Term.f_neq*) (fun x y -> Term.f_not (Term.f_equ x y)))
+        | NotEqual -> Term.f_neq)
       (term2term t1) (term2term t2)
 
   let translatePropKind = function
   | Axiom -> Decl.Paxiom
   | Conjecture -> Decl.Pgoal
+  | NegatedConjecture -> Decl.Pgoal
 
   (** add a declaration to a theory, after translation *)
-  let addDecl theory = function
+  let rec addDecl theory = function
+  | Cnf(name, NegatedConjecture, f) ->
+      addDecl theory (Fof(name, Conjecture, cnfAddQuantifiers (FUnop(Not, f))))
+  | Cnf(name, ty, f) -> (* just add quantifiers and process it as a fof *)
+      addDecl theory (Fof(name, ty, cnfAddQuantifiers f))
   | Fof(name, ty, f) ->
       let fmla = fmla2fmla f in
       let name = Ident.string_unique ident_sanitizer name in (* fresh name *)
@@ -210,14 +252,25 @@ module Translate = struct
       [(EnvFunctor.find (name, range (snd obj) t, (fst obj))), None] in
     Theory.add_decl theory logic_decl
 
+  (** puts the conjectures or negated conjectures at the end *)
+  let putGoalsAtTheEnd =
+    let compare a b = match (a,b) with
+    | Cnf(_,NegatedConjecture,_), _ -> 1
+    | Cnf(_,Conjecture,_),_ -> 1
+    | Fof(_,Conjecture,_),_ -> 1
+    | _,_ -> 0 in
+    List.sort compare
+
   (** from a list of untyped declarations, translates them into a why theory *)
   let theory_of_decls theoryName decls =
     let theory = Theory.create_theory (Ident.id_fresh theoryName) in
     let theory = Theory.add_ty_decl theory [ts, Decl.Tabstract] in
     let theory = S.fold addAtomForwardDecl (Summary.findAllAtoms decls) theory in
     let theory = M.fold addFunctorsForwardDecl (Summary.findAllFunctors decls) theory in
+    let decls = putGoalsAtTheEnd decls in
     let theory = List.fold_left addDecl theory decls in
     Theory.close_theory theory
+
 
 end
 

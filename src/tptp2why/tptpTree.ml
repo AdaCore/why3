@@ -23,9 +23,11 @@ and term =
 and predicate = string
 
 
+(** a tptp declaration *)
 type decl =
 | Fof of string * declType * fmla
+| Cnf of string * declType * fmla
 | Include of string
-and declType = Axiom | Conjecture
+and declType = Axiom | Conjecture | NegatedConjecture
 
 type tptp = decl list

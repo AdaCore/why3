@@ -24,7 +24,8 @@ end= struct
       close_in input;
       let (to_include, real_decl) = List.partition isInclude decls in
       let to_include = List.map fromInclude to_include in (* remove Include *)
-      let all_decls = List.concat (List.map (getAllDecls include_dir) to_include) in
+      let all_decls = List.concat
+        (List.map (getAllDecls include_dir) to_include) in
       all_decls @ real_decl
     with (Sys_error _) as e ->
       print_endline ("error : unable to open "^filename);
@@ -41,10 +42,11 @@ end
 
 
 
-(** main function and arg parsing *)
+(*s main function and arg parsing *)
 
 open Arg
 
+(** module for options processing *)
 module Init = struct
 
   let input_files = ref []
@@ -63,13 +65,14 @@ module Init = struct
   ]
 
   let usage = "tptp2why file1 [file2...] [-o file] [-I dir]
-  It parses tptp files (fof format) and prints a why file
+  It parses tptp files (fof or cnf format) and prints a why file
   with one theory per input file."
 
 end
 
 open Init
 
+(** read options, and process each input file accordingly *)
 let _ =
   parse options (fun file -> input_files := file :: (!input_files)) usage;
   input_files := List.rev !input_files;
