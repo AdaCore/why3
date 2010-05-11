@@ -24,7 +24,8 @@ directly. Every prover is called on every problem.
 
 options :
 -P prover   : adds a why prover
--p prover   : adds a prover to be called directly on tptp problem"""
+-p prover   : adds a prover to be called directly on tptp problem
+-I dir      : use this dir to search for included files"""
 
 
 class Options:
@@ -70,10 +71,17 @@ def sendTo(problem, prover, useWhy = True):
   "calls the prover on the problem, and return its return value and output's \
   lines"
   if useWhy:
-    left = subprocess.Popen("tptp2why -", shell=True, \
+    if "-I" in options.options: 
+      command = "tptp2why - -I "+options.options["-I"]
+    else: 
+      command = "tptp2why -"
+    left = subprocess.Popen(command, shell=True, \
       stdout=subprocess.PIPE, stdin=subprocess.PIPE)
     problem = left.communicate(problem)[0]
     prover = "why - -P "+prover
+  else:
+    if "-I" in options.options: 
+      prover = prover + " -I "+options.options["-I"]
   s = subprocess.Popen(prover, shell=True, \
     stdin=subprocess.PIPE, stdout=subprocess.PIPE)
   print "\n"+ansi.inBlue("*", pos="background"), "send data to prover "+ prover
@@ -85,7 +93,7 @@ def sendTo(problem, prover, useWhy = True):
 
 def isValid(retcode, output):
   "returns True in case of success"
-  for pattern in ["Valid","valid", "[Pp]roof found"]:
+  for pattern in ["Valid","valid", "[Pp]roof found", "[cC]ompletion [fF]ound"]:
     if any( [ re.search(pattern, line) for line in output ] ):
       return True
   return False
