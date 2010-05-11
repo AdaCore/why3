@@ -83,12 +83,7 @@ and print_fmla drv fmt f = match f.f_node with
       let q = match q with Fforall -> "!" | Fexists -> "?" in
       let vl, _tl, f = f_open_quant fq in
       (* TODO trigger *)
-      let rec forall fmt = function
-        | [] -> print_fmla drv fmt f
-        | v::l ->
-        fprintf fmt "%s [%a] :@ %a" q print_var v forall l
-      in
-      forall fmt vl;
+      fprintf fmt "%s [%a] :@ %a" q (print_list comma print_var) vl (print_fmla drv) f;
       List.iter forget_var vl
   | Fbinop (Fand, f1, f2) ->
       fprintf fmt "@[(%a@ & %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
@@ -100,7 +95,7 @@ and print_fmla drv fmt f = match f.f_node with
   | Fbinop (Fiff, f1, f2) ->
       fprintf fmt "@[(%a@ <=> %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
   | Fnot f ->
-      fprintf fmt "@[(~@ %a)@]" (print_fmla drv) f
+      fprintf fmt "@[~@ (%a)@]" (print_fmla drv) f
   | Ftrue ->
       fprintf fmt "$true"
   | Ffalse ->
@@ -121,7 +116,7 @@ and print_expr drv fmt = e_apply (print_term drv fmt) (print_fmla drv fmt)
 and print_triggers drv fmt tl = print_list comma (print_expr drv) fmt tl
 
 
-let print_logic_decl drv fmt (ls,ld) = match ld with
+let print_logic_decl _ _ (_,ld) = match ld with
   | None -> ()
   | Some _ -> unsupported "Predicate and function definition aren't supported"
 
@@ -130,19 +125,21 @@ let print_logic_decl drv fmt d =
     false else (print_logic_decl drv fmt d; true)
 
 let print_decl drv fmt d = match d.d_node with
-  | Dtype dl -> false
+  | Dtype _ -> false
       (* print_list_opt newline (print_type_decl drv) fmt dl *)
   | Dlogic dl ->
       print_list_opt newline (print_logic_decl drv) fmt dl
   | Dind _ -> unsupportedDecl d
       "tptp : inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Driver.query_remove drv pr.pr_name -> false
-  | Dprop (Paxiom, _pr, f) ->
+  | Dprop (Paxiom, pr, f) ->
       fprintf fmt "fof(%s, axiom,@ %a).\n"
-        (string_unique ident_printer "axiom") (print_fmla drv) f; true
+        (id_unique ~sanitizer:String.uncapitalize ident_printer pr.pr_name)
+        (print_fmla drv) f; true
   | Dprop (Pgoal, pr, f) -> (* TODO : what is pr ? *)
       fprintf fmt "fof(%s, conjecture,@ %a ).\n"
-        (string_unique ident_printer "goal") (print_fmla drv) f; true
+        (id_unique ~sanitizer:String.uncapitalize ident_printer pr.pr_name)
+        (print_fmla drv) f; true
       (* fprintf fmt "@[;; %a@]@\n" print_ident pr.pr_name; *)
   | Dprop (Plemma, _, _) -> assert false
 

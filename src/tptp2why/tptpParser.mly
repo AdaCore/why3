@@ -31,7 +31,8 @@
 %token FOF CNF AXIOM CONJECTURE INCLUDE NEGATED_CONJECTURE
 %token EOF
 
-
+%right PIPE AND ARROW LRARROW EQUAL NEQUAL
+%left NOT
 
 %start<TptpTree.decl list> tptp
 %start<TptpTree.decl> decl
