@@ -72,6 +72,16 @@ let lexpr (loc, s) = parse_string Lexer.parse_lexpr loc s
 
 (* environments *)
 
+let globals = Hashtbl.create 17
+
+let mem_global = Hashtbl.mem globals
+
+let specialize_global loc x =
+  let s = Hashtbl.find globals x in
+  match Denv.specialize_lsymbol ~loc s with
+    | tyl, Some ty -> s, tyl, ty
+    | _, None -> assert false
+
 let ts_unit uc = ns_find_ts (get_namespace uc) ["unit"]
 let ts_ref uc = ns_find_ts (get_namespace uc) ["ref"]
 let ts_arrow uc = ns_find_ts (get_namespace uc) ["arrow"]
@@ -230,9 +240,13 @@ and dexpr_desc env loc = function
       (* local variable *)
       let ty = Typing.find_var x env.denv in
       DElocal x, ty
+  | Pgm_ptree.Eident (Qident {id=x}) when mem_global x ->
+      (* global variable *)
+      let s, tyl, ty = specialize_global loc x in
+      DEglobal s, dcurrying env.uc tyl ty
   | Pgm_ptree.Eident p ->
       let s, tyl, ty = Typing.specialize_fsymbol p env.uc in
-      DEglobal s, dcurrying env.uc tyl ty
+      DElogic s, dcurrying env.uc tyl ty
   | Pgm_ptree.Eapply (e1, e2) ->
       let e1 = dexpr env e1 in
       let e2 = dexpr env e2 in
@@ -497,6 +511,8 @@ and expr_desc uc env denv = function
       Elocal (Mstr.find x env)
   | DEglobal ls ->
       Eglobal ls
+  | DElogic ls ->
+      Elogic ls
   | DEapply (e1, e2) ->
       Eapply (expr uc env e1, expr uc env e2)
   | DEfun (bl, e1) ->
@@ -623,17 +639,29 @@ let type_type uc ty =
   let dty = Typing.dty denv.denv ty in
   Denv.ty_of_dty dty
 
+let loc_of_ls ls = match ls.ls_name.id_origin with
+  | User loc -> Some loc
+  | _ -> None (* FIXME: loc for recursive functions *)
+
 let add_decl uc ls =
   try
     Theory.add_decl uc (Decl.create_logic_decl [ls, None])
   with Theory.ClashSymbol _ ->
-    let loc = match ls.ls_name.id_origin with
-      | User loc -> Some loc
-      | _ -> None (* FIXME: loc for recursive functions *)
-    in
+    let loc = loc_of_ls ls in
     errorm ?loc "clash with previous symbol %s" ls.ls_name.id_string
     
 let add_decl = Typing.with_tuples add_decl
+
+let add_global ls =
+  let x = ls.ls_name.id_string in
+  let loc = loc_of_ls ls in
+  if mem_global x then errorm ?loc "clash with previous symbol %s" x;
+  Hashtbl.add globals x ls
+
+let add_global_if_pure uc ls = match ls.ls_args, ls.ls_value with
+  | [], Some { ty_node = Ty.Tyapp (ts, _) } when ts_equal ts (ts_arrow uc) -> uc
+  | [], Some _ -> add_decl uc ls
+  | _ -> uc
 
 let file env uc dl =
   let uc, dl =
@@ -646,19 +674,20 @@ let file env uc dl =
 	     let e = type_expr uc e in
 	     let tyl, ty = uncurrying uc e.expr_type in
 	     let ls = create_lsymbol (id_user id.id id.id_loc) tyl (Some ty) in
-	     let uc = add_decl uc ls in
+	     add_global ls;
 	     uc, Dlet (ls, e) :: acc
 	 | Pgm_ptree.Dletrec dl -> 
 	     let denv = create_denv uc in
 	     let _, dl = dletrec denv dl in
 	     let _, dl = letrec uc Mstr.empty dl in
-	     let one uc (v,_,_,_ as r) =
+	     let one (v,_,_,_ as r) =
 	       let tyl, ty = uncurrying uc v.vs_ty in
 	       let id = id_fresh v.vs_name.id_string in
 	       let ls = create_lsymbol id tyl (Some ty) in
-	       add_decl uc ls, (ls, r)
+	       add_global ls;
+	       (ls, r)
 	     in
-	     let uc, dl = map_fold_left one uc dl in
+	     let dl = List.map one dl in
 	     uc, Dletrec dl :: acc
 	 | Pgm_ptree.Dparam (id, tyv) ->
 	     let denv = create_denv uc in
@@ -666,7 +695,8 @@ let file env uc dl =
 	     let tyv = type_v uc Mstr.empty tyv in
 	     let tyl, ty = uncurrying uc (purify uc tyv) in
 	     let ls = create_lsymbol (id_user id.id id.id_loc) tyl (Some ty) in
-	     let uc = add_decl uc ls in
+	     add_global ls;
+	     let uc = add_global_if_pure uc ls in
 	     uc, Dparam (ls, tyv) :: acc
 	 | Pgm_ptree.Dexn (id, ty) ->
 	     let tyl = match ty with
@@ -691,11 +721,11 @@ End:
 (* 
 TODO:
 
-- mutually recursive functions: allow only one order relation specified
+- mutually recursive functions: allow order relation to be specified only once
 
 - program symbol table outside of the theory
 
-- exhaustivity of pattern-matching
+- exhaustivity of pattern-matching (in WP?)
 
 - ghost / effects
 *)

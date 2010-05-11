@@ -76,6 +76,7 @@ and dexpr_desc =
   | DEconstant of constant
   | DElocal of string
   | DEglobal of Term.lsymbol
+  | DElogic of Term.lsymbol
   | DEapply of dexpr * dexpr
   | DEfun of dbinder list * dtriple
   | DElet of string * dexpr * dexpr
@@ -146,6 +147,7 @@ and expr_desc =
   | Econstant of constant
   | Elocal of Term.vsymbol
   | Eglobal of Term.lsymbol
+  | Elogic of Term.lsymbol
   | Eapply of expr * expr
   | Efun of binder list * triple
   | Elet of Term.vsymbol * expr * expr
