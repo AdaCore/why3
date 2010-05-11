@@ -566,7 +566,27 @@ and letrec uc env dl =
     let t = triple uc env t in
     (v, bl, var, t)
   in
-  env, List.map step2 dl
+  let dl = List.map step2 dl in
+  (* finally, check variants are all absent or all present and consistent *)
+  let error e = 
+    errorm ~loc:e.expr_loc "variants must be all present or all absent"
+  in
+  begin match dl with
+    | [] -> 
+	assert false
+    | (_, _, None, _) :: r ->
+	let check_no_variant (_,_,var,(_,e,_)) = if var <> None then error e in
+	List.iter check_no_variant r
+    | (_, _, Some (_, ps), _) :: r ->
+	let check_variant (_,_,var,(_,e,_)) = match var with
+	  | None -> error e
+	  | Some (_, ps') -> if not (ls_equal ps ps') then 
+	      errorm ~loc:e.expr_loc 
+		"variants must share the same order relation"
+	in
+	List.iter check_variant r
+  end;
+  env, dl
 
 and triple uc env ((denvp, p), e, q) =
   let p = Typing.type_fmla denvp env p in
@@ -652,7 +672,8 @@ TODO:
 - tuples
 
 - mutually recursive functions: check variants are all present or all absent
-- variant: check type int or relation order specified
+
+- program symbol table outside of the theory
 
 - ghost / effects
 *)

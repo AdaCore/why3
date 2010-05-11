@@ -237,6 +237,11 @@ clean::
 	rm -f bin/whyml.byte bin/whyml.opt
 	rm -f .depend.programs
 
+# test target
+
+%: %.mlw bin/whyml.byte
+	bin/whyml.byte -I theories $*.mlw
+
 ###############
 # proof manager
 ###############
@@ -510,12 +515,6 @@ test: bin/why.byte $(TOOLS)
 
 testl: bin/whyml.byte
 	ocamlrun -bt bin/whyml.byte -I theories/ tests/test-pgm-jcf.mlw
-
-bench/programs/good/%: bin/whyml.byte
-	bin/whyml.byte -I theories bench/programs/good/$*.mlw
-
-examples/programs/%: bin/whyml.byte
-	bin/whyml.byte -I theories examples/programs/$*.mlw
 
 ###############
 # installation

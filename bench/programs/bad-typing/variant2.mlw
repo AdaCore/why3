@@ -1,0 +1,12 @@
+
+(* different relations *)
+
+{ 
+logic rel(int, int)
+}
+
+let rec even (x:int) variant {x} for rel =
+  odd (x-1) : int
+and odd (x:int) variant {x} =
+  even (x-1) : int
+
