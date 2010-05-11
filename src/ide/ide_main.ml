@@ -154,7 +154,7 @@ let main () =
       ~packing:top_box#add ()
   in
   ignore (button#connect#clicked
-	    (fun () -> Format.printf "Andrei, tu es trop fort !@."));
+	    ~callback:(fun () -> Format.printf "Andrei, tu es trop fort !@."));
 
   (* horizontal paned *)
   let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:vbox#add () in
@@ -198,6 +198,6 @@ let () =
 
 (*
 Local Variables: 
-compile-command: "unset LANG; make -C ../.. ide-opt-yes"
+compile-command: "unset LANG; make -C ../.. bin/whyide.opt"
 End: 
 *)

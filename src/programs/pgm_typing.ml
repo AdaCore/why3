@@ -671,7 +671,7 @@ End:
 TODO:
 - tuples
 
-- mutually recursive functions: check variants are all present or all absent
+- mutually recursive functions: allow only one order relation specified
 
 - program symbol table outside of the theory
 

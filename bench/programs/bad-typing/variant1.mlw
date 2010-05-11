@@ -1,8 +1,8 @@
 
 (* missing variant *)
 
-let rec even (x:int) variant {x} =
-  odd (x-1) : int
-and odd (x:int) =
-  even (x-1) : int
+let rec even (x:int) : int variant {x} =
+  odd (x-1) 
+and odd (x:int) : int =
+  even (x-1)
 

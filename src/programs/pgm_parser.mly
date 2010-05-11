@@ -88,6 +88,10 @@
       pc_pre         = p;
       pc_post        = q; }
 
+  let cast_body c ((p,e,q) as t) = match c with
+    | None -> t
+    | Some pt -> p, { e with expr_desc = Ecast (e, pt) }, q
+
 %}
 
 /* Tokens */ 
@@ -181,11 +185,9 @@ list1_decl:
 
 decl:
 | LOGIC
-    { Dlogic $1 (*(logic_list0_decl $1)*) }
-| LET lident EQUAL expr
-    { Dlet ($2, $4) }
-| LET lident list1_type_v_binder EQUAL triple
-    { Dlet ($2, mk_expr_i 3 (Efun ($3, $5))) }
+    { Dlogic $1 }
+| LET lident list1_type_v_binder opt_cast EQUAL triple
+    { Dlet ($2, mk_expr_i 3 (Efun ($3, cast_body $4 $6))) }
 | LET REC list1_recfun_sep_and 
     { Dletrec $3 }
 | PARAMETER lident COLON type_v
@@ -202,8 +204,8 @@ list1_recfun_sep_and:
 ;
 
 recfun:
-| lident list1_type_v_binder opt_variant EQUAL triple
-   { $1, $2, $3, $5 }
+| lident list1_type_v_binder opt_cast opt_variant EQUAL triple
+   { $1, $2, $4, cast_body $3 $6 }
 ;
 
 lident:
@@ -504,6 +506,11 @@ opt_variant:
 | /* epsilon */             { None }
 | VARIANT LOGIC             { Some ($2, id_wf_lt_int ()) }
 | VARIANT LOGIC FOR lqualid { Some ($2, $4) }
+;
+
+opt_cast:
+| /* epsilon */   { None }
+| COLON pure_type { Some $2 }
 ;
 
 list0_lident_sep_comma:

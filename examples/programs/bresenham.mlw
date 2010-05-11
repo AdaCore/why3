@@ -34,7 +34,7 @@ logic invariant(x:int, y:int, e:int) =
 lemma Invariant_is_ok : forall x,y,e:int. invariant(x,y,e) -> best(x,y)
 }
 
-let bresenham =
+let bresenham () =
   let x = ref 0 in
   let y = ref 0 in
   let e = ref (2 * y2 - x2) in
