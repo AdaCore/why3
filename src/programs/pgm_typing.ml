@@ -258,6 +258,25 @@ and dexpr_desc env loc = function
       let env, dl = dletrec env dl in
       let e1 = dexpr env e1 in
       DEletrec (dl, e1), e1.dexpr_type
+  | Pgm_ptree.Etuple el ->
+      let n = List.length el in
+      let s = Typing.fs_tuple n in
+      let tyl = List.map (fun _ -> create_type_var loc) el in
+      let ty = Tyapp (Typing.ts_tuple n, tyl) in
+      let create d ty = 
+	{ dexpr_desc = d; dexpr_denv = env.denv;
+	  dexpr_type = ty; dexpr_loc = loc }
+      in
+      let apply e1 e2 ty2 = 
+	let e2 = dexpr env e2 in
+	assert (Denv.unify e2.dexpr_type ty2);
+	let ty = create_type_var loc in
+	assert (Denv.unify e1.dexpr_type (Tyapp (ts_arrow env.uc, [ty2; ty])));
+	create (DEapply (e1, e2)) ty
+      in
+      let e = create (DEglobal s) (dcurrying env.uc tyl ty) in
+      let e = List.fold_left2 apply e el tyl in
+      e.dexpr_desc, ty
 
   | Pgm_ptree.Esequence (e1, e2) ->
       let e1 = dexpr env e1 in
@@ -614,6 +633,8 @@ let add_decl uc ls =
     in
     errorm ?loc "clash with previous symbol %s" ls.ls_name.id_string
     
+let add_decl = Typing.with_tuples add_decl
+
 let file env uc dl =
   let uc, dl =
     List.fold_left
@@ -669,11 +690,12 @@ End:
 
 (* 
 TODO:
-- tuples
 
 - mutually recursive functions: allow only one order relation specified
 
 - program symbol table outside of the theory
+
+- exhaustivity of pattern-matching
 
 - ghost / effects
 *)

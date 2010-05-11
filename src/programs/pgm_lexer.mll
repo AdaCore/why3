@@ -171,7 +171,9 @@ rule token = parse
       { OP0 "ge" }
   | "+" | "-" as c
       { OP2 (String.make 1 c) }
-  | "*" | "/" | "%" as c
+  | "*"
+      { STAR }
+  | "/" | "%" as c
       { OP3 (String.make 1 c) }
   | "@"
       { AT }
@@ -198,8 +200,6 @@ rule token = parse
       { BARBAR }
   | "&&" 
       { AMPAMP }
-  | "=>"
-      { BIGARROW }
   | "\""
       { STRING (string lexbuf) }
   | eof 

@@ -80,4 +80,11 @@ val pattern : vsymbol Mstr.t -> dpattern -> vsymbol Mstr.t * pattern
 
 val qloc : Ptree.qualid -> Loc.position
 
+val ts_tuple : int -> Ty.tysymbol
+val fs_tuple : int -> Term.lsymbol
+
+val with_tuples : 
+  ?reset:bool -> (theory_uc -> 'a -> 'b) -> theory_uc -> 'a -> 'b
+
+
 

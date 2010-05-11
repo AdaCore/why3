@@ -115,7 +115,7 @@
 
 %token UNDERSCORE QUOTE COMMA LEFTPAR RIGHTPAR COLON SEMICOLON
 %token COLONEQUAL ARROW EQUAL AT DOT LEFTSQ RIGHTSQ BANG
-%token LEFTBLEFTB RIGHTBRIGHTB BAR BARBAR AMPAMP BIGARROW 
+%token LEFTBLEFTB RIGHTBRIGHTB BAR BARBAR AMPAMP STAR
 %token EOF
 
 /* Precedences */
@@ -146,7 +146,7 @@
 %left EQUAL OP0
 %left OP1
 %left OP2
-%left OP3
+%left OP3 STAR
 %nonassoc prefix_op
 %right unary_op
 %left prec_app
@@ -225,6 +225,7 @@ any_op:
 | OP0   { $1 }
 | OP2   { $1 }
 | OP3   { $1 }
+| STAR  { "*" }
 ;
 
 qualid:
@@ -255,6 +256,8 @@ expr:
    { mk_infix $1 $2 $3 }
 | expr OP3 expr 
    { mk_infix $1 $2 $3 }
+| expr STAR expr 
+   { mk_infix $1 "*" $3 }
 | NOT expr %prec prefix_op
    { mk_expr (mk_apply_id { id = "notb"; id_loc = loc () } [$2]) }
 | any_op expr %prec prefix_op
@@ -293,7 +296,7 @@ expr:
    { mk_expr (Ewhile ($2, $4, $5)) }
 | ABSURD
    { mk_expr Eabsurd }
-| expr COLON pure_type
+| expr COLON simple_pure_type
    { mk_expr (Ecast ($1, $3)) }
 | RAISE uident
    { mk_expr (Eraise ($2, None)) }
@@ -303,6 +306,8 @@ expr:
    { mk_expr (Etry ($2, $5)) }
 | ANY simple_type_c
    { mk_expr (Eany $2) }
+| LEFTPAR expr COMMA list1_expr_sep_comma RIGHTPAR
+   { mk_expr (Etuple ($2 :: $4)) }
 ;
 
 triple:
@@ -373,6 +378,8 @@ pattern:
 | lident                                        { mk_pat (PPpvar $1) }
 | uqualid                                       { mk_pat (PPpapp ($1, [])) }
 | uqualid LEFTPAR list1_pat_sep_comma RIGHTPAR  { mk_pat (PPpapp ($1, $3)) }
+| LEFTPAR pattern COMMA list1_pat_sep_comma RIGHTPAR          
+                                                { mk_pat (PPptuple ($2 :: $4)) }
 | pattern AS lident                             { mk_pat (PPpas ($1,$3)) }
 | LEFTPAR pattern RIGHTPAR                      { $2 }
 ;
@@ -403,15 +410,27 @@ type_var:
 | QUOTE ident { $2 }
 ;
 
-pure_type:
+simple_pure_type:
 | type_var 
    { PPTtyvar $1 }
 | lqualid
    { PPTtyapp ([], $1) }
-| pure_type lqualid
+| simple_pure_type lqualid
    { PPTtyapp ([$1], $2) }
 | LEFTPAR pure_type COMMA list1_pure_type_sep_comma RIGHTPAR lqualid
    { PPTtyapp ($2 :: $4, $6) }
+;
+
+pure_type:
+| simple_pure_type 
+    { $1 }
+| simple_pure_type STAR list1_simple_pure_type_sep_star
+    { PPTtuple ($1 :: $3) }
+;
+
+list1_simple_pure_type_sep_star:
+| simple_pure_type                                      { [$1] }
+| simple_pure_type STAR list1_simple_pure_type_sep_star { $1 :: $3 }
 ;
 
 list1_pure_type_sep_comma:
@@ -453,9 +472,12 @@ type_c:
     { type_c $1 $2 $3 $4 }
 ;
 
+/* for ANY */
 simple_type_c:
-| simple_type_v 
-    { type_c (lexpr_true ()) $1 empty_effect (lexpr_true (), []) }
+| simple_pure_type
+    { type_c (lexpr_true ()) (Tpure $1) empty_effect (lexpr_true (), []) }
+| LEFTPAR type_v RIGHTPAR
+    { type_c (lexpr_true ()) $2 empty_effect (lexpr_true (), []) }
 | pre type_v effects post
     { type_c $1 $2 $3 $4 }
 ;
