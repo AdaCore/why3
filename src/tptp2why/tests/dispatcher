@@ -8,21 +8,28 @@ import getopt
 
 import time
 import subprocess
+from os import path
+import re
 
+import ansi
 
 #------------------------------------------------------------------------------
 # parsing options
 
-usage = """usage : dispatcher [-P prover [-P prover...]] [-I dir] [-o file] \
-[-p prover [-p prover...]] [--help] [--] file1 [file2...]
+usage = """usage : dispatcher [--help] [-P prover [-P prover...]] \
+[-p prover [-p prover...]] [-I dir] [-o file][--] file1 [file2...]
 
-It tries to solve the given files with given provers.
+Tries to solve the given tptp files (*.p) with given provers, through why or \
+directly. Every prover is called on every problem.
+
+options :
 -P prover   : adds a why prover
 -p prover   : adds a prover to be called directly on tptp problem"""
 
 
 class Options:
   "contains all options parsed on the command line"
+
 
   optstring = "P:p:I:o:h"
   long_optstring = ["help"]
@@ -31,6 +38,7 @@ class Options:
   tptpProvers = []
 
   def parse(self):
+    self.path = path.dirname(sys.argv[0])
     self.options, self.args = \
       getopt.getopt(sys.argv[1:], self.optstring, self.long_optstring)
 # add each prover to self.provers
@@ -46,6 +54,7 @@ class Options:
 
   def __init__(self):
     self.parse()
+    print "search for files in", self.path
 
 options = Options()
 
@@ -67,23 +76,63 @@ output's lines"
     prover = "why - -P "+prover
   s = subprocess.Popen(prover, shell=True, \
     stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-  print "send data to prover"
-  return (s.returncode, s.communicate(problem)[0].split("\n"))
+  print "\n"+ansi.inBlue("*", pos="background"), "send data to prover "+ prover
+  output = s.communicate(problem)[0].splitlines()
+  return (s.returncode, output)
+
+#-----------------------------------------------------------------------------
+# interpreting provers output
+
+def isValid(retcode, output):
+  "returns True in case of success"
+  for pattern in ["Valid","valid", "[Pp]roof found"]:
+    if any( [ re.search(pattern, line) for line in output ] ):
+      return True
+  return False
+
+def isFailure(retcode, output):
+  "returns True in case of failure"
+  if retcode != 0:
+    return True
+  for pattern in ["[fF]ailure","[fF]alse", "[nN]o [Pp]roof found"]:
+    if any( [ re.search(pattern, line) for line in output ] ):
+      return True
+  return False
+
+def handleOutput(retcode, output):
+  """if we can find it is a failure or a success, print it.
+  Else, print the output."""
+  print "retcode :",(ansi.inGreen(`retcode`) if retcode==0 else ansi.inRed(`retcode`))
+  if isFailure(retcode, output):
+    print ansi.inRed("Failure")
+    return
+  elif isValid(retcode, output):
+    print ansi.inGreen("Valid")
+    return
+  else:
+    for line in output:
+      print line
 
 
 def main():
   for f in options.args:
-    print "file %s\n" % f
+    print "\n\n"+ ansi.inBlue("file "+f, pos="background") + "\n"
     try:
       fd = open(f, 'r')
       problem = fd.read()
       fd.close()
+# tptp provers
       for prover in options.tptpProvers:
-        for line in sendTo(problem, prover, useWhy = False)[1]:
-          print line.strip()
+        try:
+          retcode, output = sendTo(problem, prover, useWhy = False)
+          handleOutput(retcode, output)
+        except: pass
+# why-driven provers
       for prover in options.provers:
-        for line in sendTo(problem, prover)[1]:
-          print line.strip()
+        try:
+          retcode, output = sendTo(problem, prover)
+          handleOutput(retcode, output)
+        except: pass
     except Exception, e:
       print "exception :", e, e.args
 
