@@ -82,6 +82,15 @@ let specialize_global loc x =
     | tyl, Some ty -> s, tyl, ty
     | _, None -> assert false
 
+let exceptions = Hashtbl.create 17
+
+let specialize_exception loc x =
+  if not (Hashtbl.mem exceptions x) then errorm ~loc "unbound exception %s" x;
+  let s = Hashtbl.find exceptions x in
+  match Denv.specialize_lsymbol ~loc s with
+    | tyl, Some ty -> s, tyl, ty
+    | _, None -> assert false
+
 let ts_unit uc = ns_find_ts (get_namespace uc) ["unit"]
 let ts_ref uc = ns_find_ts (get_namespace uc) ["ref"]
 let ts_arrow uc = ns_find_ts (get_namespace uc) ["arrow"]
@@ -154,8 +163,7 @@ let dreference env id =
     DRglobal s
 
 let dexception env id =
-  let p = Qident id in
-  let _, _, ty as r = Typing.specialize_fsymbol p env.uc in
+  let _, _, ty as r = specialize_exception id.id_loc id.id in
   let ty_exn = Tyapp (ts_exn env.uc, []) in
   if not (Denv.unify ty ty_exn) then
     errorm ~loc:id.id_loc
@@ -663,6 +671,12 @@ let add_global_if_pure uc ls = match ls.ls_args, ls.ls_value with
   | [], Some _ -> add_decl uc ls
   | _ -> uc
 
+let add_exception loc ls =
+  let x = ls.ls_name.id_string in
+  if Hashtbl.mem exceptions x then 
+    errorm ~loc "clash with previous exception %s" x;
+  Hashtbl.add exceptions x ls
+
 let file env uc dl =
   let uc, dl =
     List.fold_left
@@ -705,7 +719,7 @@ let file env uc dl =
 	     in
 	     let exn = ty_app (ts_exn uc) [] in
 	     let ls = create_lsymbol (id_user id.id id.id_loc) tyl (Some exn) in
-	     let uc = add_decl uc ls in
+	     add_exception id.id_loc ls;
 	     uc, acc
       )
       (uc, []) dl
@@ -723,9 +737,9 @@ TODO:
 
 - mutually recursive functions: allow order relation to be specified only once
 
-- program symbol table outside of the theory
-
 - exhaustivity of pattern-matching (in WP?)
+
+- do not add global references into the theory (add_global_if_pure)
 
 - ghost / effects
 *)
