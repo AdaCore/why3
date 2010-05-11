@@ -34,11 +34,13 @@
 #include <errno.h>
 
 int main(int argc, char *argv[]) {
-  int timelimit;
+  int timelimit, memlimit;
   struct rlimit res;
 
-  if (argc < 3) {
-    fprintf(stderr, "usage: %s <time limit in seconds> <command>\n", argv[0]);
+  if (argc < 4) {
+    fprintf(stderr, "usage: %s <time limit in seconds> \
+<virtual memory limit in MiB> <command>\n\
+a null value sets no limit (keeps the actual limit)\n", argv[0]);
     return 1;
   }
 
@@ -52,8 +54,18 @@ int main(int argc, char *argv[]) {
     setrlimit(RLIMIT_CPU,&res);
   }
 
+  /* get virtual memory limit in MiB from command line */
+  memlimit = atol(argv[2]);
+
+  if (memlimit > 0) {
+    /* set the CPU time limit */
+    getrlimit(RLIMIT_AS,&res);
+    res.rlim_cur = memlimit * 1024 * 1024;
+    setrlimit(RLIMIT_AS,&res);
+  }
+
   /* execute the command */
-  execvp(argv[2],argv+2);
+  execvp(argv[3],argv+3);
   perror("why-cpulimit exec error");
   return 1;
 }
