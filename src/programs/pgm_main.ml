@@ -27,14 +27,17 @@ let parse_only = ref false
 let type_only = ref false
 let debug = ref false
 let loadpath = ref []
+let prover = ref None
 
 let () = 
   Arg.parse 
     ["--parse-only", Arg.Set parse_only, "stops after parsing";
      "--type-only", Arg.Set type_only, "stops after type-checking";
      "--debug", Arg.Set debug, "sets the debug flag";
-     "-I", Arg.String (fun s -> loadpath := s :: !loadpath), 
+     "-L", Arg.String (fun s -> loadpath := s :: !loadpath), 
        "<dir>  adds dir to the loadpath";
+     "-P", Arg.String (fun s -> prover := Some s),
+       "<prover> proves the verification conditions";
     ]
     (fun f -> files := f :: !files)
     "usage: whyl [options] files..."
