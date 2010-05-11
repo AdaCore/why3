@@ -28,6 +28,6 @@ type decl =
 | Fof of string * declType * fmla
 | Cnf of string * declType * fmla
 | Include of string
-and declType = Axiom | Conjecture | NegatedConjecture
+and declType = Axiom | Conjecture | NegatedConjecture | Lemma
 
 type tptp = decl list

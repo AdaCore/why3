@@ -11,7 +11,7 @@
       [
         "fof", FOF;
         "cnf", CNF;
-        "lemma", CONJECTURE;
+        "lemma", LEMMA;
         "assumption", AXIOM;
         "theorem", CONJECTURE;
         "conjecture", CONJECTURE;

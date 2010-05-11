@@ -225,6 +225,7 @@ module Translate = struct
   | Axiom -> Decl.Paxiom
   | Conjecture -> Decl.Pgoal
   | NegatedConjecture -> Decl.Pgoal
+  | Lemma -> Decl.Plemma
 
   (** add a declaration to a theory, after translation *)
   let rec addDecl theory = function

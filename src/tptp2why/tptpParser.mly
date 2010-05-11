@@ -28,7 +28,7 @@
 %token<string> UIDENT
 %token<string> LIDENT
 %token<string> SINGLEQUOTED
-%token FOF CNF AXIOM CONJECTURE INCLUDE NEGATED_CONJECTURE
+%token FOF CNF AXIOM CONJECTURE INCLUDE NEGATED_CONJECTURE LEMMA
 %token EOF
 
 %right PIPE AND ARROW LRARROW
@@ -57,6 +57,7 @@ decl_type:
 | AXIOM { Axiom }
 | CONJECTURE { Conjecture }
 | NEGATED_CONJECTURE { NegatedConjecture }
+| LEMMA { Lemma }
 
 
 fmla:
