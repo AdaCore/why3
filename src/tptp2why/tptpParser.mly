@@ -32,6 +32,7 @@
 %token EOF
 
 %right PIPE AND ARROW LRARROW
+%nonassoc COLON
 %nonassoc NOT
 
 %start<TptpTree.decl list> tptp
@@ -61,7 +62,8 @@ decl_type:
 
 
 fmla:
-| quant = quantifier LBRACKET vars = separated_nonempty_list(COMMA, variable) RBRACKET
+| quant = quantifier LBRACKET vars = separated_nonempty_list(COMMA, variable)
+    RBRACKET
   COLON f = fmla
   { FQuant (quant, vars, f) }
 | LPAREN f = fmla RPAREN
