@@ -74,7 +74,6 @@ let type_file file =
   let th = Env.find_theory env ["programs"] "Prelude" in
   let uc = Theory.use_export uc th in
   let uc, dl = Pgm_typing.file env uc p in
-  let dl = Pgm_effect.file dl in
   if !type_only then raise Exit;
   let th = Pgm_wp.file uc dl in
   printf "%a@." Pretty.print_theory th;

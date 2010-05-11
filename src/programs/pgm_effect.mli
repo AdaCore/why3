@@ -1,5 +1,17 @@
 
 open Why
+open Term
+open Pgm_ttree
 
-val file : Pgm_ttree.file -> Pgm_itree.file
+module R : Set.S with type elt = reference
+
+type t = private {
+  reads  : R.t;
+  writes : R.t;
+  raises : Sls.t;
+}
+
+val empty : t
+
+
 
