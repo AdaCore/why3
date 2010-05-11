@@ -67,8 +67,8 @@ if "--help" in options.options or "-h" in options.options:
 # finding provers
 
 def sendTo(problem, prover, useWhy = True):
-  "calls the prover on the problem, and return its return value and\
-output's lines"
+  "calls the prover on the problem, and return its return value and output's \
+  lines"
   if useWhy:
     left = subprocess.Popen("tptp2why -", shell=True, \
       stdout=subprocess.PIPE, stdin=subprocess.PIPE)
@@ -102,7 +102,8 @@ def isFailure(retcode, output):
 def handleOutput(retcode, output):
   """if we can find it is a failure or a success, print it.
   Else, print the output."""
-  print "retcode :",(ansi.inGreen(`retcode`) if retcode==0 else ansi.inRed(`retcode`))
+  print "retcode :",(ansi.inGreen(`retcode`)
+    if retcode==0 else ansi.inRed(`retcode`))
   if isFailure(retcode, output):
     print ansi.inRed("Failure")
     return
