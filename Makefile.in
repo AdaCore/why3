@@ -196,7 +196,8 @@ clean::
 PGMGENERATED = src/programs/pgm_parser.mli src/programs/pgm_parser.ml \
 	       src/programs/pgm_parser.output src/programs/pgm_lexer.ml
 
-PGM_FILES = pgm_ttree pgm_ptree pgm_parser pgm_lexer pgm_typing pgm_main
+PGM_FILES = pgm_ttree pgm_ptree pgm_parser pgm_lexer pgm_typing \
+            pgm_itree pgm_effect pgm_wp pgm_main
 
 PGMMODULES = $(addprefix src/programs/, $(PGM_FILES))
 

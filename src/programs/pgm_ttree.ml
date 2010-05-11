@@ -177,6 +177,8 @@ type decl =
   | Dletrec of (Term.lsymbol * recfun) list
   | Dparam  of Term.lsymbol * type_v
 
+type file = decl list
+
 (*
 Local Variables: 
 compile-command: "unset LANG; make -C ../.. testl"
