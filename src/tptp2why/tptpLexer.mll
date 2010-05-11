@@ -17,7 +17,6 @@
         "conjecture", CONJECTURE;
         "negated_conjecture", NEGATED_CONJECTURE;
         "axiom", AXIOM;
-        "definition", AXIOM; (* TODO : what's the difference ? *)
         "hypothesis", AXIOM;
         "include", INCLUDE
       ]
@@ -28,6 +27,8 @@
       { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
 
   let stringBuf = Buffer.create 256
+
+  exception LexicalError of string
 
 }
 
@@ -104,10 +105,10 @@ rule token = parse
   | eof
       { EOF }
   | _ as c
-      { eprintf "illegal character: %c@." c; exit 1 }
+      { raise (LexicalError (Format.sprintf "illegal character: %c" c)) }
 and comment = parse (* read until newline *)
   | newline
-    { token lexbuf }
+    { newline lexbuf; token lexbuf }
   | _
     { comment lexbuf }
 and string = parse
@@ -118,6 +119,6 @@ and string = parse
   | "\\'"
     { Buffer.add_char stringBuf '\''; string lexbuf }
   | eof
-    { eprintf "unterminated single quoted\n"; exit 1 }
+    { raise (LexicalError "unterminated single quoted") }
   | _ as c
     { Buffer.add_char stringBuf c; string lexbuf }

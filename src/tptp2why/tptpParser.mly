@@ -42,8 +42,8 @@
 tptp:
 | e = decl* EOF
   { e }
-| error
-  { Printf.printf "error at lexing pos %i\n" $endpos.Lexing.pos_lnum; assert false }
+(* | error
+  { Printf.printf "error at lexing pos %i\n" $endpos.Lexing.pos_lnum; assert false } *)
 
 decl:
 | CNF LPAREN name = lident COMMA ty = decl_type COMMA f = fmla RPAREN DOT

@@ -4,6 +4,8 @@ open TptpTree
 
 open Why
 
+open Lexing
+
 open TptpTranslate
 
 
@@ -16,10 +18,20 @@ end= struct
   (** for a given file, returns the list of declarations
   for this file and all the files it includes, recursively *)
   let rec getAllDecls ?first:(first=false) include_dir filename =
+    let rec myparse chan =
+      let lb = Lexing.from_channel chan in
+      try TptpParser.tptp TptpLexer.token lb
+      with
+      | TptpLexer.LexicalError s -> report lb;
+        Format.eprintf "lexical error: %s@." s; exit 1
+      | TptpParser.Error -> report lb; Format.eprintf "syntax error@."; exit 1
+    and report lb = let pos = lexeme_start_p lb in
+      Format.eprintf "file %s, line %d, char %d@."
+      filename (pos.pos_lnum) (pos.pos_cnum-pos.pos_bol) in
     try
       let filename = if first then filename else include_dir^"/"^filename in
       let input = if filename = "-" then stdin else open_in filename in
-      let decls = TptpParser.tptp TptpLexer.token (Lexing.from_channel input) in
+      let decls = myparse input in
       let isInclude = function | Include _ -> true | _ -> false in
       close_in input;
       let (to_include, real_decl) = List.partition isInclude decls in
