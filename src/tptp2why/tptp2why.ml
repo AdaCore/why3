@@ -32,6 +32,7 @@ end= struct
       let filename = if first then filename else include_dir^"/"^filename in
       let input = if filename = "-" then stdin else open_in filename in
       let decls = myparse input in
+      (* Format.eprintf "parsing done (%d decls)@." (List.length decls); *)
       let isInclude = function | Include _ -> true | _ -> false in
       close_in input;
       let (to_include, real_decl) = List.partition isInclude decls in
@@ -48,6 +49,7 @@ end= struct
   let printFile fmter include_dir theoryName filename =
     let decls = getAllDecls ~first:true include_dir filename in
     let theory = TptpTranslate.theory_of_decls theoryName decls in
+    (* Format.eprintf "translation done@."; *)
     Pretty.print_theory fmter theory
 
 end

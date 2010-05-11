@@ -49,14 +49,11 @@ end = struct
     List.fold_left findAtoms_t s terms
 
   let rec findAtoms s = function
-  | FBinop (_, f1, f2) -> S.union (findAtoms s f1) (findAtoms s f2)
+  | FBinop (_, f1, f2) -> findAtoms (findAtoms s f2) f1
   | FUnop (_, f) -> findAtoms s f
   | FQuant (_, _, f) -> findAtoms s f
   | FPred (_, terms) -> List.fold_left findAtoms_t s terms
-  | FTermBinop (_, t1, t2) -> S.union (findAtoms_t s t1) (findAtoms_t s t2)
-
-  (** union of two maps *)
-  let union_map = M.fold M.add
+  | FTermBinop (_, t1, t2) -> findAtoms_t (findAtoms_t s t2) t1
 
   let rec findFunctors_t m = function
   | TAtom _ | TConst _ | TVar _ -> m
@@ -64,13 +61,13 @@ end = struct
       List.fold_left findFunctors_t new_m terms
 
   let rec findFunctors m = function
-  | FBinop (_, f1, f2) -> union_map (findFunctors m f1) (findFunctors m f2)
+  | FBinop (_, f1, f2) -> findFunctors (findFunctors m f2) f1
   | FUnop (_, f) -> findFunctors m f
   | FQuant (_, _, f) -> findFunctors m f
   | FPred (p, terms) -> let new_m = M.add p (Pred, List.length terms) m in
       List.fold_left findFunctors_t new_m terms
   | FTermBinop (_, t1, t2) ->
-      union_map (findFunctors_t m t1) (findFunctors_t m t2)
+      findFunctors_t (findFunctors_t m t2) t1
 
   (** find all atoms used in declarations *)
   let findAllAtoms decls =
@@ -98,36 +95,36 @@ module Scope
     type value
     val create : key -> value
   end) = struct
+  module M = Map.Make(struct type t=T.key let compare=Pervasives.compare end)
 
-  (* TODO : write a more efficient implementation, for example with maps *)
   let scope = ref []
 
   let is_empty () = !scope = []
 
   (** adds a new scope with fresh vars *)
-  let push_scope vars =
-    let bindings = List.map (fun x -> (x, T.create x)) vars in
-    scope := bindings :: !scope
-
+  let push_scope vars = let cur = match !scope with
+    | (hd::_) -> hd
+    | [] -> M.empty in
+    let new_m = List.fold_left
+      (fun acc x -> M.add x (T.create x) acc) cur vars in
+    scope := new_m::(!scope)
   (** exits the outermost scope and forgets all bindings inside *)
-  let pop_scope () = begin
-      assert (not (is_empty ()));
-      scope := List.tl !scope
-    end
+  let pop_scope () =
+    assert (not (is_empty ()));
+    scope := List.tl !scope
 
   (** finds a symbol in any scope, including deeper ones.
   If the symbol cannot be found, a new binding is created. *)
   let find symbol =
     let rec helper = function
     | [] -> raise Not_found
-    | (x::_) when List.mem_assoc symbol x -> List.assoc symbol x
-    | (_::xs) -> helper xs in
+    | (x::xs) -> try M.find symbol x with Not_found -> helper xs in
     try helper !scope
     with Not_found -> begin
       let v = T.create symbol in
       scope := ( match !scope with
-        | [] -> [[symbol, v]]
-        | (hd::tl) -> ((symbol,v)::hd)::tl );
+        | [] -> let new_m = M.empty in [M.add symbol v new_m]
+        | (hd::tl) -> (M.add symbol v hd)::tl );
       v
     end
 
@@ -281,7 +278,9 @@ module Translate = struct
     let theory = Theory.create_theory (Ident.id_fresh theoryName) in
     let theory = Theory.add_ty_decl theory [ts, Decl.Tabstract] in
     let theory = S.fold addAtomForwardDecl (Summary.findAllAtoms decls) theory in
+    (* Format.eprintf "atoms forward decls finished.@."; *)
     let theory = M.fold addFunctorsForwardDecl (Summary.findAllFunctors decls) theory in
+    (* Format.eprintf "functors forward decls finished.@."; *)
     let theory = buildFofTheory theory decls in
     Theory.close_theory theory
 

@@ -11,13 +11,6 @@
       [
         "fof", FOF;
         "cnf", CNF;
-        "lemma", LEMMA;
-        "assumption", AXIOM;
-        "theorem", CONJECTURE;
-        "conjecture", CONJECTURE;
-        "negated_conjecture", NEGATED_CONJECTURE;
-        "axiom", AXIOM;
-        "hypothesis", AXIOM;
         "include", INCLUDE
       ]
 

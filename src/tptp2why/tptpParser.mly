@@ -24,11 +24,12 @@
 %token DOT COMMA COLON
 %token PIPE AND ARROW LRARROW EQUAL NEQUAL NOT
 %token BANG QUESTION DOLLAR
+%token INCLUDE
 
 %token<string> UIDENT
 %token<string> LIDENT
 %token<string> SINGLEQUOTED
-%token FOF CNF AXIOM CONJECTURE INCLUDE NEGATED_CONJECTURE LEMMA
+%token FOF CNF
 %token EOF
 
 %right PIPE AND ARROW LRARROW
@@ -55,10 +56,13 @@ decl:
   { Include p }
 
 decl_type:
-| AXIOM { Axiom }
-| CONJECTURE { Conjecture }
-| NEGATED_CONJECTURE { NegatedConjecture }
-| LEMMA { Lemma }
+| x=lident
+{ match x with
+  | "axiom" -> Axiom
+  | "conjecture" -> Conjecture
+  | "negated_conjecture" -> NegatedConjecture
+  | "lemma" -> Lemma
+  | _ -> raise Error }
 
 
 fmla:
