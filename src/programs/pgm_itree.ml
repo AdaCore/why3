@@ -52,6 +52,8 @@ type expr = {
 
 and expr_desc =
   | Elogic of Term.term
+  | Elocal of Term.vsymbol
+  | Eglobal of Term.lsymbol
   | Efun of binder list * triple
   | Elet of Term.vsymbol * expr * expr
   | Eletrec of recfun list * expr

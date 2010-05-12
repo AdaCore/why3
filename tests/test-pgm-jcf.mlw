@@ -1,10 +1,11 @@
 
 { 
 use import list.List
+logic f(int, int) : int
 logic c : int
 }
 
-let ff () = { } 1+2 { result = 3 }
+let ff () = { } f 1 2 { result = result }
 
 
 (*

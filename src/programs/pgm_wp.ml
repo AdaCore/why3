@@ -26,6 +26,8 @@ open Pgm_itree
 
 module E = Pgm_effect
 
+let errorm = Pgm_typing.errorm
+
 (* translation to intermediate trees and effect inference *)
 
 let rec expr e =
@@ -34,9 +36,22 @@ let rec expr e =
   let d, ef = expr_desc loc ty e.Pgm_ttree.expr_desc in
   { expr_desc = d; expr_type = ty; expr_effect = ef; expr_loc = loc }
 
-and expr_desc _loc ty = function
+and expr_desc loc ty = function
   | Pgm_ttree.Econstant c ->
       Elogic (t_const c ty), E.empty
+  | Pgm_ttree.Elogic ls ->
+      begin match ls.ls_args with
+	| [] -> 
+	    Elogic (t_app ls [] ty), E.empty
+	| al -> 
+	    errorm ~loc "function symbol %s is expecting %d arguments"
+	      ls.ls_name.id_string (List.length al)
+      end
+  | Pgm_ttree.Eapply _ as e ->
+      assert false (*TODO*)
+  | Pgm_ttree.Efun (_bl, (p, e, q)) ->
+      let e = expr e in
+      assert false (*TODO*)
   | _ -> 
       assert false (*TODO*)
 
