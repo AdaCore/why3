@@ -1072,6 +1072,33 @@ axiom Axiom_ft_node_tlilistnil:
 logic ilistnode_tl_notin (node pointer, node alloc_table, (node,
 node pointer) memory) : node pointer mybag
 
+axiom Axiom_no_update_ftn_ilistilistnode_tl_at_L1:
+  (forall elt_tmp_name:node pointer.
+    (forall elt_val_tmp_name:node pointer.
+      (forall _JC_ft_p:node pointer.
+        (forall node_alloc_table_at_L:node alloc_table.
+          (forall node_tl_at_L:(node, node pointer) memory.
+            (forall p:node pointer [ilistnode_tl_ft((ilistnode_tl_notin(p,
+              node_alloc_table_at_L, (store(node_tl_at_L, elt_tmp_name,
+              elt_val_tmp_name) : (node,
+              node pointer) memory)) : node pointer mybag), _JC_ft_p,
+              node_alloc_table_at_L, (store(node_tl_at_L, elt_tmp_name,
+              elt_val_tmp_name) : (node, node pointer) memory))].
+              (in_mybag(elt_tmp_name, (ilistnode_tl_notin(p,
+               node_alloc_table_at_L, node_tl_at_L) : node pointer mybag)) ->
+               (in_mybag(elt_tmp_name, (ilistnode_tl_notin(_JC_ft_p,
+                node_alloc_table_at_L,
+                node_tl_at_L) : node pointer mybag)) ->
+                (ilistnode_tl_ft((ilistnode_tl_notin(p,
+                 node_alloc_table_at_L, node_tl_at_L) : node pointer mybag),
+                 _JC_ft_p, node_alloc_table_at_L, node_tl_at_L) ->
+                 ilistnode_tl_ft((ilistnode_tl_notin(p,
+                 node_alloc_table_at_L, (store(node_tl_at_L, elt_tmp_name,
+                 elt_val_tmp_name) : (node,
+                 node pointer) memory)) : node pointer mybag), _JC_ft_p,
+                 node_alloc_table_at_L, (store(node_tl_at_L, elt_tmp_name,
+                 elt_val_tmp_name) : (node, node pointer) memory)))))))))))
+
 axiom Axiom_no_update_ilistnode_tl_at_L:
   (forall elt_tmp_name:node pointer.
     (forall elt_val_tmp_name:node pointer.
@@ -1100,23 +1127,6 @@ axiom Axiom_no_update_ilistnode_tl_elt_ftnode_tl_at_L:
                node_alloc_table_at_L, node_tl_at_L) : node pointer mybag)) ->
                (ilistnode_tl_elt_ft(p_tmp_name, p, node_alloc_table_at_L,
                 node_tl_at_L) -> ilistnode_tl_elt_ft(p_tmp_name, p,
-                node_alloc_table_at_L, (store(node_tl_at_L, elt_tmp_name,
-                elt_val_tmp_name) : (node, node pointer) memory))))))))))
-
-axiom Axiom_no_update_ilistnode_tl_ftnode_tl_at_L:
-  (forall elt_tmp_name:node pointer.
-    (forall elt_val_tmp_name:node pointer.
-      (forall node_tl_at_L_notin:node pointer mybag.
-        (forall p:node pointer.
-          (forall node_alloc_table_at_L:node alloc_table.
-            (forall node_tl_at_L:(node,
-              node pointer) memory [ilistnode_tl_ft(node_tl_at_L_notin, p,
-              node_alloc_table_at_L, (store(node_tl_at_L, elt_tmp_name,
-              elt_val_tmp_name) : (node, node pointer) memory))].
-              (in_mybag(elt_tmp_name, (ilistnode_tl_notin(p,
-               node_alloc_table_at_L, node_tl_at_L) : node pointer mybag)) ->
-               (ilistnode_tl_ft(node_tl_at_L_notin, p, node_alloc_table_at_L,
-                node_tl_at_L) -> ilistnode_tl_ft(node_tl_at_L_notin, p,
                 node_alloc_table_at_L, (store(node_tl_at_L, elt_tmp_name,
                 elt_val_tmp_name) : (node, node pointer) memory))))))))))
 
@@ -1168,7 +1178,10 @@ axiom Axiom_notin_node_tlilist:
   (forall _JC_ft_p:node pointer.
     (forall _JC_p:node pointer.
       (forall _JC_node_alloc_table_at_L:node alloc_table.
-        (forall _JC_node_tl_at_L:(node, node pointer) memory.
+        (forall _JC_node_tl_at_L:(node,
+          node pointer) memory [ilistnode_tl_ft((ilistnode_tl_notin(_JC_p,
+          _JC_node_alloc_table_at_L, _JC_node_tl_at_L) : node pointer mybag),
+          _JC_ft_p, _JC_node_alloc_table_at_L, _JC_node_tl_at_L)].
           (((forall node_alloc_table_at_L:node alloc_table.
               (forall node_tl_at_L:(node, node pointer) memory. true)) and
             (forall node_alloc_table_at_L:node alloc_table.
