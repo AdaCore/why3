@@ -312,12 +312,14 @@ let do_tasks drv fname tname th trans task =
              Not_found -> (eprintf  "unknown transformation %s.@." t;exit 1))
     ::acc
   in
-  let transl = List.fold_left lookup [] (List.rev trans) in
+  let transl = List.fold_left lookup [] trans in
   let apply tasks (s, tr) = 
     try
-      List.fold_left 
+      if debug then Format.eprintf "apply transformation %s@." s;
+      let l = List.fold_left 
         (fun acc task -> 
-           List.rev_append (Register.apply_driver tr drv task) acc) [] tasks
+           List.rev_append (Register.apply_driver tr drv task) acc) [] tasks in
+      List.rev l (* In order to keep the order for 1-1 transformation *)
     with e when not debug ->
       Format.eprintf "failure in transformation %s@." s;
       raise e
