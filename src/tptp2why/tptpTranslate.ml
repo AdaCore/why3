@@ -108,6 +108,7 @@ end
 
 (*s this module manages scoping of vars using a stack of
 variables bindings *)
+(* TODO : use a hashtable and a stack of key lists instead *)
 module Scope
   (T : sig
     type key

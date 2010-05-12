@@ -17,4 +17,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val eliminate_polymorphism : Task.task Register.trans_reg
+val polymorphic_to_untyped : Task.task Register.trans_reg

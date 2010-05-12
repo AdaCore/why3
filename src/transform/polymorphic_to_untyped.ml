@@ -25,8 +25,6 @@ open Decl
 open Task
 
 
-let eliminate_polymorphism = Register.store (fun () -> Trans.identity)
-
 let polymorphic_to_untyped = Register.store (fun () -> Trans.identity)
 
 let () = Register.register_transform "polymorphic_to_untyped" polymorphic_to_untyped
