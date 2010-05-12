@@ -128,7 +128,10 @@ let rec print_fmla drv fmt f = match f.f_node with
 and print_expr drv fmt = e_apply (print_term drv fmt) (print_fmla drv fmt)
 
 and print_triggers drv fmt tl =
-  let tl = List.map (List.filter (function Term _ -> true | Fmla _ -> false))
+  let filter = function 
+    | Term _ | Fmla {f_node = Fapp _} -> true
+    | _ -> false in
+  let tl = List.map (List.filter filter)
     tl in
   let tl = List.filter (function [] -> false | _::_ -> true) tl in
   if tl = [] then () else fprintf fmt "@ [%a]"
