@@ -177,8 +177,9 @@ let print_decl drv fmt d = match d.d_node with
   | Dind _ -> unsupportedDecl d 
       "smt : inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Driver.query_remove drv pr.pr_name -> false
-  | Dprop (Paxiom, _pr, f) ->
-      fprintf fmt "@[<hov 2>:assumption@ %a@]@\n" 
+  | Dprop (Paxiom, pr, f) ->
+      fprintf fmt "@[<hov 2>;; %s@\n:assumption@ %a@]@\n"
+        pr.pr_name.id_string
         (print_fmla drv) f; true
   | Dprop (Pgoal, pr, f) ->
       fprintf fmt "@[:formula@\n";
