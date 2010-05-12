@@ -63,6 +63,14 @@ theory int.Int
 
 end
 
+theory int.EuclideanDivision
+   syntax logic div "(div %1 %2)"
+   syntax logic mod "(mod %1 %2)"
+   remove prop Mod_bound
+   remove prop Div_mod
+   remove prop Mod_1
+   remove prop Div_1
+end
 
 theory transform.encoding_decorate.Kept
   tag cloned type t "encoding_decorate : kept"
