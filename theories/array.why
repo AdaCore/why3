@@ -7,11 +7,11 @@ theory Array
   logic store (('a,'b) t, 'a, 'b) : ('a,'b) t
   
   axiom Select_eq : 
-    forall m : ('a,'b) t. forall a1,a2 : 'a. forall b : 'b.
+    forall m : ('a,'b) t. forall a1,a2 : 'a. forall b : 'b[select(store(m,a1,b),a2)].
     a1 = a2 -> select(store(m,a1,b),a2) = b
 
   axiom Select_neq : 
-    forall m : ('a,'b) t. forall a1,a2 : 'a. forall b : 'b.
+    forall m : ('a,'b) t. forall a1,a2 : 'a. forall b : 'b[select(store(m,a1,b),a2)].
     a1 <> a2 -> select(store(m,a1,b),a2) = select(m,a2)
 
   logic const('b) : ('a,'b) t
