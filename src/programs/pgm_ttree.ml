@@ -95,7 +95,6 @@ and dexpr_desc =
   | DEtry of dexpr * (Term.lsymbol * string option * dexpr) list
 
   | DEassert of assertion_kind * Ptree.lexpr
-  | DEghost of dexpr
   | DElabel of string * dexpr
   | DEany of dtype_c
 
@@ -164,7 +163,6 @@ and expr_desc =
   | Etry of expr * (Term.lsymbol * Term.vsymbol option * expr) list
 
   | Eassert of assertion_kind * Term.fmla
-  | Eghost of expr
   | Elabel of string * expr
   | Eany of type_c
 

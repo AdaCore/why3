@@ -1,3 +1,21 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (C) 2010-                                                   *)
+(*    Francois Bobot                                                      *)
+(*    Jean-Christophe Filliatre                                           *)
+(*    Johannes Kanig                                                      *)
+(*    Andrei Paskevich                                                    *)
+(*                                                                        *)
+(*  This software is free software; you can redistribute it and/or        *)
+(*  modify it under the terms of the GNU Library General Public           *)
+(*  License version 2.1, with the special exception on linking            *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(*  This software is distributed in the hope that it will be useful,      *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
+(*                                                                        *)
+(**************************************************************************)
 
 open Why
 open Util
@@ -39,5 +57,8 @@ type t = {
 
 let empty = { reads = R.empty; writes = R.empty; raises = E.empty }
 
+let add_read  r t = { t with reads  = R.add r t.reads  }
+let add_write r t = { t with writes = R.add r t.writes }
+let add_raise e t = { t with raises = E.add e t.raises }
 
 

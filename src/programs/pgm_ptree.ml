@@ -91,7 +91,6 @@ and expr_desc =
   | Etry of expr * (ident * ident option * expr) list
   (* annotations *)
   | Eassert of assertion_kind * lexpr
-  | Eghost of expr
   | Elabel of ident * expr
   | Ecast of expr * Ptree.pty
   | Eany of type_c

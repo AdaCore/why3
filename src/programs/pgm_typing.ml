@@ -384,9 +384,6 @@ and dexpr_desc env loc = function
 
   | Pgm_ptree.Eassert (k, le) ->
       DEassert (k, lexpr le), (dty_unit env.uc) 
-  | Pgm_ptree.Eghost e1 ->
-      let e1 = dexpr env e1 in
-      DEghost e1, e1.dexpr_type
   | Pgm_ptree.Elabel ({id=l}, e1) ->
       let ty = dty_label env.uc in
       let env = { env with denv = Typing.add_var l ty env.denv } in
@@ -581,8 +578,6 @@ and expr_desc uc env denv = function
   | DEassert (k, f) ->
       let f = Typing.type_fmla denv env f in
       Eassert (k, f)
-  | DEghost e1 -> 
-      Eghost (expr uc env e1)
   | DElabel (s, e1) ->
       let ty = Denv.ty_of_dty (Typing.find_var s e1.dexpr_denv) in
       let v = create_vsymbol (id_fresh s) ty in

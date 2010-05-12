@@ -288,8 +288,6 @@ expr:
    { mk_expr (Efun ($2, $4)) }
 | MATCH list1_expr_sep_comma WITH option_bar match_cases END
    { mk_expr (Ematch ($2, $5)) }
-| GHOST expr
-   { mk_expr (Eghost $2) }
 | LABEL uident COLON expr
    { mk_expr (Elabel ($2, $4)) }
 | WHILE expr DO loop_annotation expr DONE
