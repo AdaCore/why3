@@ -59,9 +59,13 @@ decl_type:
 | x=lident
 { match x with
   | "axiom" -> Axiom
+  | "hypothesis" -> Axiom
+  | "assumption" -> Axiom
+  | "definition" -> Axiom
   | "conjecture" -> Conjecture
   | "negated_conjecture" -> NegatedConjecture
   | "lemma" -> Lemma
+  | "theorem" -> Lemma
   | _ -> raise Error }
 
 
