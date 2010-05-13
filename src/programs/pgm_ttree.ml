@@ -143,11 +143,11 @@ type expr = {
 }
 
 and expr_desc =
-  | Econstant of constant
+  | Elogic of Term.term
   | Elocal of Term.vsymbol
   | Eglobal of Term.lsymbol
-  | Elogic of Term.lsymbol
-  | Eapply of expr * expr
+  | Eapply of expr * Term.vsymbol
+  | Eapply_ref of expr * reference
   | Efun of binder list * triple
   | Elet of Term.vsymbol * expr * expr
   | Eletrec of recfun list * expr

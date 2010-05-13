@@ -518,6 +518,9 @@ test: bin/why.byte $(TOOLS)
 testl: bin/whyml.byte
 	ocamlrun -bt bin/whyml.byte -L theories/ tests/test-pgm-jcf.mlw
 
+testl-type: bin/whyml.byte
+	ocamlrun -bt bin/whyml.byte --type-only -L theories/ tests/test-pgm-jcf.mlw
+
 ###############
 # installation
 ###############

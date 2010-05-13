@@ -145,7 +145,7 @@ let rec dpurify env = function
 	(dpurify env c.dc_result_type)
 
 let check_reference_type uc loc ty =
-  let ty_ref =Tyapp (ts_ref uc, [create_type_var loc]) in
+  let ty_ref = Tyapp (ts_ref uc, [create_type_var loc]) in
   if not (Denv.unify ty ty_ref) then
     errorm ~loc "this expression has type %a, but is expected to be a reference"
       print_dty ty
@@ -296,7 +296,7 @@ and dexpr_desc env loc = function
 	assert (Denv.unify e1.dexpr_type (Tyapp (ts_arrow env.uc, [ty2; ty])));
 	create (DEapply (e1, e2)) ty
       in
-      let e = create (DEglobal s) (dcurrying env.uc tyl ty) in
+      let e = create (DElogic s) (dcurrying env.uc tyl ty) in
       let e = List.fold_left2 apply e el tyl in
       e.dexpr_desc, ty
 
@@ -504,22 +504,82 @@ and binder uc env (x, tyv) =
   let env = Mstr.add x v env in
   env, (v, tyv)
 
+let mk_expr loc ty d = { expr_desc = d; expr_loc = loc; expr_type = ty }
+
+(* apply ls to a list of expressions, introducing let's if necessary
+
+  ls [e1; e2; ...; en]
+->
+  let x1 = e1 in
+  let x2 = e2 in
+  ...
+  let xn = en in
+  ls(x1,x2,...,xn)
+*)
+let make_logic_app loc ty ls el =
+  let rec make args = function
+    | [] -> 
+	Elogic (t_app ls (List.rev args) ty)
+    | ({ expr_desc = Elogic t }, _) :: r ->
+	make (t :: args) r
+    | (e, _) :: r ->
+	let v = create_vsymbol (id_fresh "x") e.expr_type in
+	let d = mk_expr loc ty (make (t_var v :: args) r) in
+	Elet (v, e, d)
+  in
+  make [] el
+
+(* same thing, but for an abritrary expression f (not an application)
+   f [e1; e2; ...; en]
+-> let x1 = e1 in ... let xn = en in (...((f x1) x2)... xn)
+*)
+(* TODO?: check for references -> Eapply_ref instead of Eapply *)
+let make_app loc ty f el =
+  let rec make k = function
+    | [] ->
+	k f
+    | ({ expr_desc = Elocal v }, tye) :: r ->
+	make (fun f -> k (mk_expr loc tye (Eapply (f, v)))) r
+    | (e, tye) :: r ->
+	let v = create_vsymbol (id_fresh "x") e.expr_type in
+	let d = make (fun f -> k (mk_expr loc tye (Eapply (f, v)))) r in
+	mk_expr loc ty (Elet (v, e, d))
+  in
+  make (fun f -> f) el
+
 let rec expr uc env e =
-  let d = expr_desc uc env e.dexpr_denv e.dexpr_desc in
   let ty = Denv.ty_of_dty e.dexpr_type in
+  let d = expr_desc uc env e.dexpr_denv e.dexpr_loc ty e.dexpr_desc in
   { expr_desc = d; expr_type = ty; expr_loc = e.dexpr_loc }
 
-and expr_desc uc env denv = function
+and expr_desc uc env denv loc ty = function
   | DEconstant c ->
-      Econstant c
+      Elogic (t_const c ty)
   | DElocal x ->
       Elocal (Mstr.find x env)
   | DEglobal ls ->
       Eglobal ls
   | DElogic ls ->
-      Elogic ls
+      begin match ls.ls_args with
+	| [] -> 
+	    Elogic (t_app ls [] ty)
+	| al -> 
+	    errorm ~loc "function symbol %s is expecting %d arguments"
+	      ls.ls_name.id_string (List.length al)
+      end
   | DEapply (e1, e2) ->
-      Eapply (expr uc env e1, expr uc env e2)
+      let f, args = decompose_app uc env e1 [expr uc env e2, ty] in
+      begin match f.dexpr_desc with
+	| DElogic ls ->
+	    let n = List.length ls.ls_args in
+	    if List.length args <> n then 
+	      errorm ~loc "function symbol %s is expecting %d arguments"
+		ls.ls_name.id_string n;
+	    make_logic_app loc ty ls args
+	| _ ->
+	    let f = expr uc env f in
+	    (make_app loc ty f args).expr_desc
+      end
   | DEfun (bl, e1) ->
       let env, bl = map_fold_left (binder uc) env bl in
       Efun (bl, triple uc env e1)
@@ -586,6 +646,13 @@ and expr_desc uc env denv = function
   | DEany c ->
       let c = type_c uc env c in
       Eany c
+
+and decompose_app uc env e args = match e.dexpr_desc with
+  | DEapply (e1, e2) ->
+      let ty = Denv.ty_of_dty e.dexpr_type in
+      decompose_app uc env e1 ((expr uc env e2, ty) :: args)
+  | _ ->
+      e, args
 
 and letrec uc env dl =
   (* add all functions into env, and compute local env *)
