@@ -17,10 +17,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** terms module *)
+
 open Ident
 open Ty
 
-(** Variable symbols *)
+(** {2 Variable symbols} *)
 
 type vsymbol = private {
   vs_name : ident;
@@ -35,7 +37,7 @@ val vs_equal : vsymbol -> vsymbol -> bool
 
 val create_vsymbol : preid -> ty -> vsymbol
 
-(** Function and predicate symbols *)
+(** {2 Function and predicate symbols} *)
 
 type lsymbol = private {
   ls_name   : ident;
@@ -53,14 +55,14 @@ val create_lsymbol : preid -> ty list -> ty option -> lsymbol
 val create_fsymbol : preid -> ty list -> ty -> lsymbol
 val create_psymbol : preid -> ty list -> lsymbol
 
-(** Exceptions *)
+(** {2 Exceptions} *)
 
 exception BadArity of int * int
 exception DuplicateVar of vsymbol
 exception FunctionSymbolExpected of lsymbol
 exception PredicateSymbolExpected of lsymbol
 
-(** Patterns *)
+(** {2 Patterns} *)
 
 type pattern = private {
   pat_node : pattern_node;
@@ -76,14 +78,14 @@ and pattern_node = private
 
 val pat_equal : pattern -> pattern -> bool
 
-(* smart constructors for patterns *)
+(** smart constructors for patterns *)
 
 val pat_wild : ty -> pattern
 val pat_var : vsymbol -> pattern
 val pat_app : lsymbol -> pattern list -> ty -> pattern
 val pat_as  : pattern -> vsymbol -> pattern
 
-(* generic traversal functions *)
+(** generic traversal functions *)
 
 val pat_map : (pattern -> pattern) -> pattern -> pattern
 val pat_fold : ('a -> pattern -> 'a) -> 'a -> pattern -> 'a
@@ -92,7 +94,7 @@ val pat_any : (pattern -> bool) -> pattern -> bool
 
 val pat_freevars : Svs.t -> pattern -> Svs.t
 
-(** Terms and formulas *)
+(** {2 Terms and formulas} *)
 
 type label = string
 
@@ -176,7 +178,7 @@ val e_equal : expr -> expr -> bool
 val tr_equal : trigger -> trigger -> bool
 val trl_equal : trigger list -> trigger list -> bool
 
-(* smart constructors for term *)
+(** smart constructors for term *)
 
 val t_var : vsymbol -> term
 val t_const : constant -> ty -> term
@@ -194,7 +196,7 @@ val t_label : label list -> term -> term
 val t_label_add : label -> term -> term
 val t_label_copy : term -> term -> term
 
-(* smart constructors for fmla *)
+(** smart constructors for fmla *)
 
 val f_app : lsymbol -> term list -> fmla
 val f_forall : vsymbol list -> trigger list -> fmla -> fmla
@@ -216,7 +218,7 @@ val f_label : label list -> fmla -> fmla
 val f_label_add : label -> fmla -> fmla
 val f_label_copy : fmla -> fmla -> fmla
 
-(* constructors with propositional simplification *)
+(** constructors with propositional simplification *)
 
 val f_forall_simp : vsymbol list -> trigger list -> fmla -> fmla
 val f_exists_simp : vsymbol list -> trigger list -> fmla -> fmla
@@ -233,7 +235,7 @@ val t_if_simp : fmla -> term -> term -> term
 val f_if_simp : fmla -> fmla -> fmla -> fmla
 val f_let_simp : vsymbol -> term -> fmla -> fmla
 
-(* open bindings *)
+(** open bindings *)
 
 val t_open_bound : term_bound -> vsymbol * term
 val f_open_bound : fmla_bound -> vsymbol * fmla
@@ -246,7 +248,7 @@ val f_open_quant : fmla_quant -> vsymbol list * trigger list * fmla
 val f_open_forall : fmla -> vsymbol list * fmla
 val f_open_exists : fmla -> vsymbol list * fmla
 
-(* expr and trigger traversal *)
+(** expr and trigger traversal *)
 
 val e_map : (term -> term) -> (fmla -> fmla) -> expr -> expr
 val e_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> expr -> 'a
@@ -258,7 +260,7 @@ val tr_map : (term -> term) ->
 val tr_fold : ('a -> term -> 'a) ->
               ('a -> fmla -> 'a) -> 'a -> trigger list -> 'a
 
-(* map/fold over symbols *)
+(** map/fold over symbols *)
 
 val t_s_map : (tysymbol -> tysymbol) -> (lsymbol -> lsymbol) -> term -> term
 val f_s_map : (tysymbol -> tysymbol) -> (lsymbol -> lsymbol) -> fmla -> fmla
@@ -274,7 +276,7 @@ val f_s_all : (tysymbol -> bool) -> (lsymbol -> bool) -> fmla -> bool
 val t_s_any : (tysymbol -> bool) -> (lsymbol -> bool) -> term -> bool
 val f_s_any : (tysymbol -> bool) -> (lsymbol -> bool) -> fmla -> bool
 
-(* built-in symbols *)
+(** built-in symbols *)
 
 val ps_equ : lsymbol
 val ps_neq : lsymbol
@@ -290,9 +292,9 @@ val t_tuple : term list -> term
 
 val is_fs_tuple : lsymbol -> bool
 
-(** Term library *)
+(** {2 Term library} *)
 
-(* generic term/fmla traversal *)
+(** generic term/fmla traversal *)
 
 val t_map : (term -> term) -> (fmla -> fmla) -> term -> term
 val f_map : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
@@ -313,7 +315,7 @@ val f_all : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 val t_any : (term -> bool) -> (fmla -> bool) -> term -> bool
 val f_any : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 
-(* continuation-passing map *)
+(** continuation-passing map *)
 
 val t_map_cont : ((term -> 'a) -> term -> 'a) ->
                  ((fmla -> 'a) -> fmla -> 'a) ->
@@ -323,11 +325,11 @@ val f_map_cont : ((term -> 'a) -> term -> 'a) ->
                  ((fmla -> 'a) -> fmla -> 'a) ->
                   (fmla -> 'a) -> fmla -> 'a
 
-(* simplification map *)
+(** simplification map *)
 val f_map_simp : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
 
 
-(* map/fold over free variables *)
+(** map/fold over free variables *)
 
 val t_v_map : (vsymbol -> term) -> term -> term
 val f_v_map : (vsymbol -> term) -> fmla -> fmla
@@ -340,7 +342,7 @@ val f_v_all : (vsymbol -> bool) -> fmla -> bool
 val t_v_any : (vsymbol -> bool) -> term -> bool
 val f_v_any : (vsymbol -> bool) -> fmla -> bool
 
-(* variable occurrence check *)
+(** variable occurrence check *)
 
 val t_occurs : Svs.t -> term -> bool
 val f_occurs : Svs.t -> fmla -> bool
@@ -348,7 +350,7 @@ val f_occurs : Svs.t -> fmla -> bool
 val t_occurs_single : vsymbol -> term -> bool
 val f_occurs_single : vsymbol -> fmla -> bool
 
-(* substitution for variables *)
+(** substitution for variables *)
 
 val t_subst : term Mvs.t -> term -> term
 val f_subst : term Mvs.t -> fmla -> fmla
@@ -356,17 +358,17 @@ val f_subst : term Mvs.t -> fmla -> fmla
 val t_subst_single : vsymbol -> term -> term -> term
 val f_subst_single : vsymbol -> term -> fmla -> fmla
 
-(* set of free variables *)
+(** set of free variables *)
 
 val t_freevars : Svs.t -> term -> Svs.t
 val f_freevars : Svs.t -> fmla -> Svs.t
 
-(* equality modulo alpha *)
+(** equality modulo alpha *)
 
 val t_equal_alpha : term -> term -> bool
 val f_equal_alpha : fmla -> fmla -> bool
 
-(* occurrence check *)
+(** occurrence check *)
 
 val t_occurs_term : term -> term -> bool
 val f_occurs_term : term -> fmla -> bool
@@ -378,7 +380,7 @@ val f_occurs_term_alpha : term -> fmla -> bool
 val t_occurs_fmla_alpha : fmla -> term -> bool
 val f_occurs_fmla_alpha : fmla -> fmla -> bool
 
-(* term/fmla replacement *)
+(** term/fmla replacement *)
 
 val t_subst_term : term -> term -> term -> term
 val f_subst_term : term -> term -> fmla -> fmla
@@ -390,7 +392,7 @@ val f_subst_term_alpha : term -> term -> fmla -> fmla
 val t_subst_fmla_alpha : fmla -> fmla -> term -> term
 val f_subst_fmla_alpha : fmla -> fmla -> fmla -> fmla
 
-(* term/fmla matching modulo alpha in the pattern *)
+(** term/fmla matching modulo alpha in the pattern *)
 
 exception NoMatch
 

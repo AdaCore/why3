@@ -21,7 +21,9 @@ open Ident
 open Ty
 open Term
 
-(** Type declaration *)
+(** declarations module *)
+
+(** {2 Type declaration} *)
 
 type ty_def =
   | Tabstract
@@ -29,7 +31,7 @@ type ty_def =
 
 type ty_decl = tysymbol * ty_def
 
-(** Logic declaration *)
+(** {2 Logic declaration} *)
 
 type ls_defn
 
@@ -45,7 +47,7 @@ val open_ps_defn : ls_defn -> vsymbol list * fmla
 
 val ls_defn_axiom : ls_defn -> fmla
 
-(** Inductive predicate declaration *)
+(** {2 Inductive predicate declaration} *)
 
 type prsymbol = private {
   pr_name : ident;
@@ -70,7 +72,7 @@ type prop_kind =
 
 type prop_decl = prop_kind * prsymbol * fmla
 
-(** Declaration type *)
+(** {2 Declaration type} *)
 
 type decl = private {
   d_node : decl_node;
@@ -89,7 +91,7 @@ module Hdecl : Hashtbl.S with type key = decl
 
 val d_equal : decl -> decl -> bool
 
-(** Declaration constructors *)
+(** {2 Declaration constructors} *)
 
 val create_ty_decl : ty_decl list -> decl
 val create_logic_decl : logic_decl list -> decl
@@ -115,12 +117,12 @@ exception UnboundVars of Svs.t
 exception ClashIdent of ident
 exception EmptyDecl
 
-(** Utilities *)
+(** {2 Utilities} *)
 
 val decl_map : (term -> term) -> (fmla -> fmla) -> decl -> decl
 val decl_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> decl -> 'a
 
-(** Known identifiers *)
+(** {2 Known identifiers} *)
 
 type known_map = decl Mid.t
 
