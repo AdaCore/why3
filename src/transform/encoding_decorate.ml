@@ -140,7 +140,8 @@ let rec term_of_ty tenv tvar ty =
     | Tyvar tv -> 
         t_var (try Htv.find tvar tv
               with Not_found -> 
-                (let var = create_vsymbol (id_fresh ("tv"^tv.tv_name.id_string))
+                (let var = create_vsymbol 
+                   (id_fresh ("tv"^tv.tv_name.id_string))
                   tenv.ty in
                  Htv.add tvar tv var;
                  var))
@@ -278,14 +279,16 @@ and rewrite_fmla tenv tvar vsvar f =
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv tvar) tl p.ls_args in
         f_app p tl
-    | Fquant (q, b) -> let vl, _tl, f1 = f_open_quant b in
+    | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
       let (vsvar',vl) = List.fold_left (conv_vs tenv tvar) (vsvar,[]) vl in
       let f1' = fnF vsvar' f1 in 
-      let tl' = [] (* TODO *) in
+      (* Ici un trigger qui ne match pas assez de variables 
+         peut être généré *)
+      let tl = tr_map (rewrite_term tenv tvar vsvar') (fnF vsvar') tl in
         (*if f_equal f1' f1 &&  vsvar' == vsvar (*&& tr_equal tl' tl*) then f
         else *)
           let vl = List.rev vl in
-          f_quant q vl tl' f1'
+          f_quant q vl tl f1'
     | Flet (t1, b) -> let u,f2 = f_open_bound b in
       let (vsvar,u) = conv_vs_let tenv vsvar u in
       let t1' = fnT t1 in let f2' = fnF vsvar f2 in

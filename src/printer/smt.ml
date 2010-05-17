@@ -100,7 +100,8 @@ and print_fmla drv fmt f = match f.f_node with
   | Fquant (q, fq) ->
       let q = match q with Fforall -> "forall" | Fexists -> "exists" in
       let vl, _tl, f = f_open_quant fq in
-      (* TODO trigger *)
+      (* TODO trigger dépend des capacités du prover : 2 printers?
+      smtwithtriggers/smtstrict *)
       let rec forall fmt = function
         | [] -> print_fmla drv fmt f
         | v::l -> 
