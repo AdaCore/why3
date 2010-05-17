@@ -71,13 +71,6 @@ def sendTo(problem, prover, useWhy = True):
   "calls the prover on the problem, and return its return value and output's \
   lines"
   if useWhy:
-    if "-I" in options.options: 
-      command = "tptp2why - -I "+options.options["-I"]
-    else: 
-      command = "tptp2why -"
-    left = subprocess.Popen(command, shell=True, \
-      stdout=subprocess.PIPE, stdin=subprocess.PIPE)
-    problem = left.communicate(problem)[0]
     prover = "why - -P "+prover
   else:
     if "-I" in options.options: 
@@ -135,13 +128,23 @@ def main():
         try:
           retcode, output = sendTo(problem, prover, useWhy = False)
           handleOutput(retcode, output)
-        except: pass
+        except:
+          pass
 # why-driven provers
+# first, transform the problem
+      if "-I" in options.options: 
+        command = "tptp2why - -I "+options.options["-I"]
+      else: 
+        command = "tptp2why -"
+      preprocess = subprocess.Popen(command, shell=True, \
+        stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+      problem = preprocess.communicate(problem)[0]
+# then give it to provers
       for prover in options.provers:
         try:
           retcode, output = sendTo(problem, prover)
           handleOutput(retcode, output)
-        except: pass
+        except e: print "exception :",e
     except Exception, e:
       print "exception :", e, e.args
 
