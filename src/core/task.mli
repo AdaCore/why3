@@ -48,7 +48,7 @@ val task_known : task -> known_map
 val task_clone : task -> clone_map
 val task_used  : task -> use_map
 
-(* constructors *)
+(** {2 constructors} *)
 
 val create_decl : decl -> tdecl
 
@@ -58,7 +58,7 @@ val add_tdecl : task -> tdecl -> task
 val use_export : task -> theory -> task
 val clone_export : task -> theory -> th_inst -> task
 
-(* declaration constructors + add_decl *)
+(** {2 declaration constructors + add_decl} *)
 
 val add_ty_decl : task -> ty_decl list -> task
 val add_logic_decl : task -> logic_decl list -> task
@@ -69,13 +69,13 @@ val add_ty_decls : task -> ty_decl list -> task
 val add_logic_decls : task -> logic_decl list -> task
 val add_ind_decls : task -> ind_decl list -> task
 
-(* utilities *)
+(** {2 utilities} *)
 
 val split_theory : theory -> Spr.t option -> task list
   (** [split_theory th s] returns the tasks of [th] which end by one
       of [s]. They are in the opposite order than in the theory *)
 
-(* bottom-up, tail-recursive traversal functions *)
+(** {2 bottom-up, tail-recursive traversal functions} *)
 
 val task_fold : ('a -> tdecl -> 'a) -> 'a -> task -> 'a
 val task_iter : (tdecl -> unit) -> task -> unit
