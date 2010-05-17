@@ -17,14 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Util
-open Ident
-open Ty
-open Term
-open Decl
-open Task
+(** transformation from polymorphic logic to untyped logic. The polymorphic
+logic must not have finite support types. *)
+val explicit_polymorphism : Task.task Register.trans_reg
 
-
-let polymorphic_to_untyped = Register.store (fun () -> Trans.identity)
-
-let () = Register.register_transform "polymorphic_to_untyped" polymorphic_to_untyped
