@@ -96,6 +96,7 @@ let ts_unit uc = ns_find_ts (get_namespace uc) ["unit"]
 let ts_ref uc = ns_find_ts (get_namespace uc) ["ref"]
 let ts_arrow uc = ns_find_ts (get_namespace uc) ["arrow"]
 let ts_exn uc = ns_find_ts (get_namespace uc) ["exn"]
+let ts_label uc = ns_find_ts (get_namespace uc) ["label"]
 
 let ls_Unit uc = ns_find_ls (get_namespace uc) ["Unit"]
 
@@ -103,7 +104,7 @@ let ls_Unit uc = ns_find_ls (get_namespace uc) ["Unit"]
 
 let dty_bool uc = Tyapp (ns_find_ts (get_namespace uc) ["bool"], [])
 let dty_unit uc = Tyapp (ts_unit uc, [])
-let dty_label uc = Tyapp (ns_find_ts (get_namespace uc) ["label"], [])
+let dty_label uc = Tyapp (ts_label uc, [])
 
 type denv = {
   uc   : theory_uc;
@@ -385,10 +386,13 @@ and dexpr_desc env loc = function
   | Pgm_ptree.Eassert (k, le) ->
       DEassert (k, lexpr le), (dty_unit env.uc) 
   | Pgm_ptree.Elabel ({id=l}, e1) ->
+      let s = "label " ^ l in
+      if Typing.mem_var s env.denv then 
+	errorm ~loc "clash with previous label %s" l;
       let ty = dty_label env.uc in
-      let env = { env with denv = Typing.add_var l ty env.denv } in
+      let env = { env with denv = Typing.add_var s ty env.denv } in
       let e1 = dexpr env e1 in
-      DElabel (l, e1), e1.dexpr_type
+      DElabel (s, e1), e1.dexpr_type
   | Pgm_ptree.Ecast (e1, ty) ->
       let e1 = dexpr env e1 in
       let ty = pure_type env ty in
@@ -524,9 +528,10 @@ let make_logic_app loc ty ls el =
 	Elogic (t_app ls (List.rev args) ty)
     | ({ expr_desc = Elogic t }, _) :: r ->
 	make (t :: args) r
-    | ({ expr_desc = Elocal v }, _) :: r ->
-	(* TODO: assert v is not a reference *)
-	make (t_var v :: args) r
+    | ({ expr_desc = Elocal vs }, _) :: r ->
+	make (t_var vs :: args) r
+    | ({ expr_desc = Eglobal ls; expr_type = ty }, _) :: r ->
+	make (t_app ls [] ty :: args) r
     | (e, _) :: r ->
 	let v = create_vsymbol (id_fresh "x") e.expr_type in
 	let d = mk_expr loc ty (make (t_var v :: args) r) in
@@ -542,7 +547,6 @@ let is_reference_type uc ty  = match ty.ty_node with
    f [e1; e2; ...; en]
 -> let x1 = e1 in ... let xn = en in (...((f x1) x2)... xn)
 *)
-(* TODO?: check for references -> Eapply_ref instead of Eapply *)
 let make_app uc loc ty f el =
   let rec make k = function
     | [] ->
@@ -661,10 +665,10 @@ and expr_desc uc env denv loc ty = function
       let f = Typing.type_fmla denv env f in
       Eassert (k, f)
   | DElabel (s, e1) ->
-      let ty = Denv.ty_of_dty (Typing.find_var s e1.dexpr_denv) in
+      let ty = Ty.ty_app (ts_label uc) [] in
       let v = create_vsymbol (id_fresh s) ty in
       let env = Mstr.add s v env in 
-      Elabel (s, expr uc env e1)
+      Elabel (v, expr uc env e1)
   | DEany c ->
       let c = type_c uc env c in
       Eany c
@@ -736,11 +740,11 @@ let rec print_type_v fmt = function
   | Tpure ty -> 
       print_ty fmt ty
   | Tarrow (bl, c) ->
-      fprintf fmt "@[%a ->@ %a@]" 
+      fprintf fmt "@[<hov 2>%a ->@ %a@]" 
 	(print_list arrow print_binder) bl print_type_c c
 
 and print_type_c fmt c =
-  fprintf fmt "@[{%a} %a%a %a@]" print_fmla c.c_pre
+  fprintf fmt "@[{%a}@ %a%a@ %a@]" print_fmla c.c_pre
     print_type_v c.c_result_type Pgm_effect.print c.c_effect
     print_post c.c_post
 
@@ -869,6 +873,8 @@ End:
 
 (* 
 TODO:
+
+- use a pure structure for globals
 
 - mutually recursive functions: allow order relation to be specified only once
 

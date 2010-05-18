@@ -131,6 +131,8 @@ type loop_annotation = {
   loop_variant   : variant option;
 }
 
+type label = Term.vsymbol
+
 type expr = {
   expr_desc : expr_desc;
   expr_type : Ty.ty;
@@ -158,7 +160,7 @@ and expr_desc =
   | Etry of expr * (Term.lsymbol * Term.vsymbol option * expr) list
 
   | Eassert of assertion_kind * Term.fmla
-  | Elabel of string * expr
+  | Elabel of label * expr
   | Eany of type_c
 
 and recfun = Term.vsymbol * binder list * variant option * triple

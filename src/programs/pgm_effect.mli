@@ -24,11 +24,12 @@ type reference =
   | Rlocal  of Term.vsymbol
   | Rglobal of Term.lsymbol
 
-module R : Set.S with type elt = reference
+module Sref : Set.S with type elt = reference
+module Mref : Map.S with type key = reference
 
 type t = private {
-  reads  : R.t;
-  writes : R.t;
+  reads  : Sref.t;
+  writes : Sref.t;
   raises : Sls.t;
 }
 

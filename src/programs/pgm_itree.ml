@@ -43,6 +43,8 @@ type binder = Pgm_ttree.binder
 
 type loop_annotation = Pgm_ttree.loop_annotation
 
+type label = Pgm_ttree.label
+
 type expr = {
   expr_desc  : expr_desc;
   expr_type_v: type_v;
@@ -70,7 +72,7 @@ and expr_desc =
 
   | Eassert of assertion_kind * Term.fmla
   | Eghost of expr
-  | Elabel of string * expr
+  | Elabel of label * expr
   | Eany of type_c
 
 and recfun = Term.vsymbol * binder list * variant option * triple
