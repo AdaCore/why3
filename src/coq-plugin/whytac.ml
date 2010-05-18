@@ -160,7 +160,7 @@ let decomp_type_quantifiers env t =
 
 (* decomposes the first n type lambda abstractions correspondings to
    the list of type variables vars *)
-let decomp_type_lambdas env vars t =
+let decomp_type_lambdas tvm env vars t =
   let rec loop tvm env vars t = match vars, kind_of_term t with
     | [], _ -> 
 	tvm, env, t
@@ -172,7 +172,7 @@ let decomp_type_lambdas env vars t =
     | _ ->
 	assert false (*TODO: eta-expansion*)
   in
-  loop Idmap.empty env vars t
+  loop tvm env vars t
 
 let decompose_arrows =
   let rec arrows_rec l c = match kind_of_term c with
@@ -181,6 +181,23 @@ let decompose_arrows =
     | _ -> List.rev l, c
   in
   arrows_rec []
+
+let decomp_lambdas _dep _tvm env vars t =
+  let rec loop bv vsl env vars t = match vars, kind_of_term t with
+    | [], _ -> 
+	(bv, List.rev vsl), env, t
+    | ty :: vars, Lambda (n, a, t) ->
+	let id, env = coq_rename_var env (n, a) in
+	let t = subst1 (mkVar id) t in
+	let vs = create_vsymbol (preid_of_id id) ty in
+	let bv = Idmap.add id vs bv in
+	loop bv (vs :: vsl) env vars t
+    | _ ->
+	assert false (*TODO: eta-expansion*)
+  in
+  loop Idmap.empty [] env vars t
+
+
 
 let rec skip_k_args k cl = match k, cl with
   | 0, _ -> cl
@@ -348,7 +365,7 @@ and tr_global_ts dep env r =
 	  let ts = match (Global.lookup_constant c).const_body with
 	    | Some b ->
 		let b = force b in
-		let tvm, env, t = decomp_type_lambdas env vars b in
+		let tvm, env, t = decomp_type_lambdas Idmap.empty env vars b in
 		let def = Some (tr_type dep' tvm env t) in
 		Ty.create_tysymbol id vars def
 		  (* FIXME: is it correct to use None when NotFO? *)
@@ -467,7 +484,7 @@ and tr_global_ls dep env r =
 	  let ld = match (Global.lookup_constant c).const_body with
 	    | Some b ->
 		let b = force b in
-		let tvm, env, b = decomp_type_lambdas env vars b in
+		let tvm, env, b = decomp_type_lambdas Idmap.empty env vars b in
 		let (bv, vsl), env, b = decomp_lambdas dep' tvm env args b in
 		begin match ls.ls_value with
 		  | None -> 
@@ -489,21 +506,6 @@ and tr_global_ls dep env r =
       | VarRef _ | IndRef _ ->
 	  raise NotFO
 
-
-and decomp_lambdas _dep _tvm env vars t =
-  let rec loop bv vsl env vars t = match vars, kind_of_term t with
-    | [], _ -> 
-	(bv, List.rev vsl), env, t
-    | ty :: vars, Lambda (n, a, t) ->
-	let id, env = coq_rename_var env (n, a) in
-	let t = subst1 (mkVar id) t in
-	let vs = create_vsymbol (preid_of_id id) ty in
-	let bv = Idmap.add id vs bv in
-	loop bv (vs :: vsl) env vars t
-    | _ ->
-	assert false (*TODO: eta-expansion*)
-  in
-  loop Idmap.empty [] env vars t
 
 (* translation of a Coq term
    assumption: t:T:Set *)
@@ -557,6 +559,26 @@ and tr_term dep tvm bv env t =
 	  (* first-order terms *)
     | Var id when Idmap.mem id bv ->
 	Term.t_var (Idmap.find id bv)
+    | Case (ci, _, e, br) ->
+	let ty = type_of env Evd.empty e in
+	let ty = tr_type dep tvm env ty in
+	let e = tr_term dep tvm bv env e in
+	let branch j bj =
+	  let tj = type_of env Evd.empty bj in
+	  let (_,tvars), _, tj = decomp_type_quantifiers env tj in
+	  let tyl, _ = decompose_arrows tj in
+	  let tyl = List.map (tr_type dep tvm env) tyl in
+	  let tvm, env, bj = decomp_type_lambdas tvm env tvars bj in
+	  let (bv, vars), env, bj = decomp_lambdas dep tvm env tyl bj in
+	  let cj = ith_constructor_of_inductive ci.ci_ind (j+1) in
+	  let ls = tr_global_ls dep env (ConstructRef cj) in
+	  if List.length vars <> List.length ls.ls_args then raise NotFO;
+	  let pat = pat_app ls (List.map pat_var vars) ty in
+	  [pat], tr_term dep tvm bv env bj
+	in
+	let ty = type_of env Evd.empty t in
+	let ty = tr_type dep tvm env ty in
+	t_case [e] (Array.to_list (Array.mapi branch br)) ty
     | _ ->
 	let f, cl = decompose_app t in
 	let r = global_of_constr f in
@@ -669,6 +691,26 @@ and tr_formula dep tvm bv env f =
 	      (* TODO: we could eta-expanse *)
 	      raise NotFO 
 	end
+    | Case (ci, _, e, br), [] ->
+	let ty = type_of env Evd.empty e in
+	let ty = tr_type dep tvm env ty in
+	let t = tr_term dep tvm bv env e in
+	let branch j bj =
+	  let tj = type_of env Evd.empty bj in
+	  let (_,tvars), _, tj = decomp_type_quantifiers env tj in
+	  let tyl, _ = decompose_arrows tj in
+	  let tyl = List.map (tr_type dep tvm env) tyl in
+	  let tvm, env, bj = decomp_type_lambdas tvm env tvars bj in
+	  let (bv, vars), env, bj = decomp_lambdas dep tvm env tyl bj in
+	  let cj = ith_constructor_of_inductive ci.ci_ind (j+1) in
+	  let ls = tr_global_ls dep env (ConstructRef cj) in
+	  if List.length vars <> List.length ls.ls_args then raise NotFO;
+	  let pat = pat_app ls (List.map pat_var vars) ty in
+	  [pat], tr_formula dep tvm bv env bj
+	in
+	f_case [t] (Array.to_list (Array.mapi branch br))
+    | Case _, _ :: _ ->
+	raise NotFO (* TODO: we could possibly swap case and application *)
     | _ ->
 	let r = global_of_constr c in (*TODO: may fail *)
 	let ls = tr_task_ls dep env r in

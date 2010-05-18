@@ -24,13 +24,12 @@ Qed.
 Definition p (x:nat) := x=O.
 
 Goal p O.
-spass.
+ae.
 Qed.
 
 Definition eq (A:Set) (x y : A) := x=y.
 
 Goal eq nat O O.
-why "z3".
 ae.
 (*
 why "z3".  (* BUG encoding decorate ici ? *)
@@ -38,12 +37,13 @@ Qed.
 *)
 Admitted.
 
-Parameter mem : forall (A:Set), A -> list A -> Prop.
+Definition pred (n:nat) := match n with 
+  | O => O
+  | S p => p
+  end.
 
-Definition q (A:Set) (x:A) (y:list A) := mem A x y.
-
-Goal q nat O (cons O nil).
-(*why.*)
+Goal pred (S O) = O.
+ae.
 Admitted.
 
 (* function definition *)
@@ -57,7 +57,7 @@ Qed.
 Definition id A (x:A) := x.
 
 Goal id nat O = O.
-spass.
+ae.
 Qed.
 
 (* inductive types *)
@@ -67,7 +67,7 @@ Parameter P : (nat -> nat) -> Prop.
 Goal forall (a:Set), forall x:nat, x=S O -> P S -> 
   let y := (S (S O)) in S x=y.
 intros.
-spass.
+ae.
 Qed.
 
 Goal  forall (a:Set), forall x:Z, x=1 -> P S -> let y := 2 in x+1=y.
@@ -77,8 +77,19 @@ Qed.
 
 Goal  forall x: list nat, x=x.
 intros.
-spass.
+ae.
 Qed.
+
+Goal forall x, (match x with (S (S _)) => True | _ => False end).
+(* BUG *)
+Admitted.
+
+
+Goal forall a, forall (x: list (list a)), match x with nil => 1 | x :: r => 2 end <= 2.
+intros.
+try ae.
+Admitted.
+
 
 (* Mutually inductive types *)
 
@@ -91,7 +102,11 @@ with forest : Set :=
   | Cons : tree -> forest -> forest.
 
 Goal forall x : tree, x=x.
-spass.
+ae.
+Qed.
+
+Goal (match Leaf with Leaf => 1 | Node z f => 2 end)=1.
+ae.
 Qed.
 
 (* Polymorphic, Mutually inductive types *)
