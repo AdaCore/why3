@@ -5,7 +5,17 @@ logic f(int, int) : int
 logic c : int
 }
 
-let ff () = { } f 2 3 { true }
+parameter sub : x:int -> y:int -> {x>=y} int {result=x-y}
+
+parameter imp_sub : 
+  x:int ref -> y:int ref -> {!x >= !y} unit writes x {!x = old(!x) - !y}
+
+let ff () = 
+  { } 
+  let x = ref (2+3) in 
+  let y = ref (3+4) in
+  imp_sub x y
+  { true }
 
 
 (*

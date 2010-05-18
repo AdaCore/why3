@@ -70,7 +70,7 @@ let logic_list0_decl (loc, s) = parse_string Lexer.parse_list0_decl loc s
   
 let lexpr (loc, s) = parse_string Lexer.parse_lexpr loc s
 
-(* environments *)
+(* global environment *******************************************************)
 
 let globals = Hashtbl.create 17
 
@@ -97,6 +97,8 @@ let ts_arrow uc = ns_find_ts (get_namespace uc) ["arrow"]
 let ts_exn uc = ns_find_ts (get_namespace uc) ["exn"]
 
 let ls_Unit uc = ns_find_ls (get_namespace uc) ["Unit"]
+
+(* phase 1: typing programs (using destructive type inference) **************)
 
 let dty_bool uc = Tyapp (ns_find_ts (get_namespace uc) ["bool"], [])
 let dty_unit uc = Tyapp (ts_unit uc, [])
@@ -132,8 +134,6 @@ let expected_type e ty =
     errorm ~loc:e.dexpr_loc 
       "this expression has type %a, but is expected to have type %a"
       print_dty e.dexpr_type print_dty ty
-
-(* phase 1: typing programs (using destructive type inference) *)
 
 let pure_type env = Typing.dty env.denv
 
@@ -427,7 +427,7 @@ and dtriple env (p, e, q) =
   let q = dpost env ty q in
   (p, e, q)
 
-(* phase 2: typing annotations *)
+(* phase 2: remove destructive types and type annotations *****************)
 
 let currying uc tyl ty =
   let make_arrow_type ty1 ty2 = Ty.ty_app (ts_arrow uc) [ty1; ty2] in
@@ -522,6 +522,9 @@ let make_logic_app loc ty ls el =
 	Elogic (t_app ls (List.rev args) ty)
     | ({ expr_desc = Elogic t }, _) :: r ->
 	make (t :: args) r
+    | ({ expr_desc = Elocal v }, _) :: r ->
+	(* TODO: assert v is not a reference *)
+	make (t_var v :: args) r
     | (e, _) :: r ->
 	let v = create_vsymbol (id_fresh "x") e.expr_type in
 	let d = mk_expr loc ty (make (t_var v :: args) r) in
@@ -529,20 +532,37 @@ let make_logic_app loc ty ls el =
   in
   make [] el
 
+let is_reference_type uc ty  = match ty.ty_node with
+  | Ty.Tyapp (ts, _) -> Ty.ts_equal ts (ts_ref uc)
+  | _ -> false
+
 (* same thing, but for an abritrary expression f (not an application)
    f [e1; e2; ...; en]
 -> let x1 = e1 in ... let xn = en in (...((f x1) x2)... xn)
 *)
 (* TODO?: check for references -> Eapply_ref instead of Eapply *)
-let make_app loc ty f el =
+let make_app uc loc ty f el =
   let rec make k = function
     | [] ->
 	k f
+    | ({ expr_type = ty } as e, tye) :: r when is_reference_type uc ty ->
+	begin match e.expr_desc with
+	  | Elocal v -> 
+	      make (fun f -> mk_expr loc tye (Eapply_ref (k f, Rlocal v))) r
+	  | Eglobal v ->
+	      make (fun f -> mk_expr loc tye (Eapply_ref (k f, Rglobal v))) r
+	  | _ ->
+	      let v = create_vsymbol (id_fresh "x") e.expr_type in
+	      let d = 
+		make (fun f -> mk_expr loc tye (Eapply_ref (k f, Rlocal v))) r
+	      in
+	      mk_expr loc ty (Elet (v, e, d))
+	end
     | ({ expr_desc = Elocal v }, tye) :: r ->
-	make (fun f -> k (mk_expr loc tye (Eapply (f, v)))) r
+	make (fun f -> mk_expr loc tye (Eapply (k f, v))) r
     | (e, tye) :: r ->
 	let v = create_vsymbol (id_fresh "x") e.expr_type in
-	let d = make (fun f -> k (mk_expr loc tye (Eapply (f, v)))) r in
+	let d = make (fun f -> mk_expr loc tye (Eapply (k f, v))) r in
 	mk_expr loc ty (Elet (v, e, d))
   in
   make (fun f -> f) el
@@ -578,7 +598,7 @@ and expr_desc uc env denv loc ty = function
 	    make_logic_app loc ty ls args
 	| _ ->
 	    let f = expr uc env f in
-	    (make_app loc ty f args).expr_desc
+	    (make_app uc loc ty f args).expr_desc
       end
   | DEfun (bl, e1) ->
       let env, bl = map_fold_left (binder uc) env bl in
@@ -699,6 +719,35 @@ and triple uc env ((denvp, p), e, q) =
   let q = post env e.expr_type q in
   (p, e, q)
 
+(* pretty-printing (for debugging) *)
+
+open Pretty 
+
+let print_reference fmt = function
+  | Rlocal vs -> print_vs fmt vs
+  | Rglobal ls -> print_ls fmt ls
+
+let rec print_expr fmt e = match e.expr_desc with
+  | Elogic t ->
+      print_term fmt t
+  | Elocal vs ->
+      fprintf fmt "<local %a>" print_vs vs
+  | Eglobal ls ->
+      fprintf fmt "<global %a>" print_ls ls
+  | Eapply (e, vs) ->
+      fprintf fmt "@[(%a %a)@]" print_expr e print_vs vs
+  | Eapply_ref (e, r) ->
+      fprintf fmt "@[(%a <ref %a>)@]" print_expr e print_reference r
+  | Efun (_, (_,e,_)) ->
+      fprintf fmt "@[fun _ ->@ %a@]" print_expr e
+  | Elet (v, e1, e2) ->
+      fprintf fmt "@[let %a = %a in@ %a@]" print_vs v
+	print_expr e1 print_expr e2
+  | _ ->
+      fprintf fmt "<other>"
+
+(* typing declarations *)
+
 let type_expr uc e =
   let denv = create_denv uc in
   let e = dexpr denv e in
@@ -748,6 +797,7 @@ let file env uc dl =
 	     List.fold_left (Typing.add_decl env Mnm.empty) uc dl, acc
 	 | Pgm_ptree.Dlet (id, e) -> 
 	     let e = type_expr uc e in
+	     (* printf "@[%s:@\n  %a@]@." id.id print_expr e; exit 42; *)
 	     let tyl, ty = uncurrying uc e.expr_type in
 	     let ls = create_lsymbol (id_user id.id id.id_loc) tyl (Some ty) in
 	     add_global ls;
