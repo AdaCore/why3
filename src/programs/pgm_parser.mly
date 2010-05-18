@@ -82,8 +82,7 @@
   let empty_effect = { pe_reads = []; pe_writes = []; pe_raises = [] }
 
   let type_c p ty ef q =
-    { pc_result_name = id_result ();
-      pc_result_type = ty;
+    { pc_result_type = ty;
       pc_effect      = ef;
       pc_pre         = p;
       pc_post        = q; }

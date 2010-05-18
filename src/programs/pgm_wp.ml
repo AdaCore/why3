@@ -17,35 +17,60 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Format
 open Why
 open Ident
 open Term
 open Decl
 open Theory
+open Pgm_ttree
 open Pgm_itree
+open Pgm_typing
 
 module E = Pgm_effect
 
-let errorm = Pgm_typing.errorm
-
 (* translation to intermediate trees and effect inference *)
+
+let logic_effect _t =
+  Pgm_effect.empty (* TODO *)
 
 let rec expr e =
   let ty = e.Pgm_ttree.expr_type in
   let loc = e.Pgm_ttree.expr_loc in
-  let d, ef = expr_desc loc ty e.Pgm_ttree.expr_desc in
-  { expr_desc = d; expr_type = ty; expr_effect = ef; expr_loc = loc }
+  let d, v, ef = expr_desc loc ty e.Pgm_ttree.expr_desc in
+  { expr_desc = d; expr_type_v = v; expr_effect = ef; expr_loc = loc }
 
-and expr_desc _loc _ty = function
-  | Pgm_ttree.Elogic _t ->
+and expr_desc _loc ty = function
+  | Pgm_ttree.Elogic t ->
+      Elogic t, Tpure ty, logic_effect t
+  | Pgm_ttree.Elocal _ ->
       assert false (*TODO*)
-  | Pgm_ttree.Eapply _ as _e ->
+  | Pgm_ttree.Eglobal _ ->
       assert false (*TODO*)
-  | Pgm_ttree.Efun (_bl, (_p, e, _q)) ->
-      let _e = expr e in
+  | Pgm_ttree.Eapply _ ->
       assert false (*TODO*)
+  | Pgm_ttree.Eapply_ref _ ->
+      assert false (*TODO*)
+  | Pgm_ttree.Efun (bl, t) ->
+      let t, c = triple t in
+      Efun (bl, t), Tarrow (bl, c), Pgm_effect.empty
+  | Pgm_ttree.Elet (v, e1, e2) ->
+      let e1 = expr e1 in
+      let e2 = expr e2 in
+      let ef = Pgm_effect.union e1.expr_effect e2.expr_effect in
+      Elet (v, e1, e2), e2.expr_type_v, ef
   | _ -> 
       assert false (*TODO*)
+
+and triple (p, e, q) =
+  let e = expr e in
+  let c = 
+    { c_result_type = e.expr_type_v;
+      c_effect      = e.expr_effect;
+      c_pre         = p;
+      c_post        = q }
+  in
+  (p, e, q), c
 
 and recfun _ =
   assert false (*TODO*)
@@ -64,6 +89,9 @@ let add_wp_decl uc l f =
 let decl uc = function
   | Pgm_ttree.Dlet (l, e) ->
       let e = expr e in
+      (* DEBUG *)
+      printf "@[--effect %a-----@\n  %a@]@\n---------@." 
+	Pretty.print_ls l print_type_v e.expr_type_v;
       let f = wp l e in
       add_wp_decl uc l f
   | Pgm_ttree.Dletrec dl ->

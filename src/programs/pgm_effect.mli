@@ -19,7 +19,10 @@
 
 open Why
 open Term
-open Pgm_ttree
+
+type reference = 
+  | Rlocal  of Term.vsymbol
+  | Rglobal of Term.lsymbol
 
 module R : Set.S with type elt = reference
 
@@ -35,4 +38,7 @@ val add_read  : reference -> t -> t
 val add_write : reference -> t -> t
 val add_raise : lsymbol -> t -> t
 
+val union : t -> t -> t
 
+val print_reference : Format.formatter -> reference -> unit
+val print           : Format.formatter -> t         -> unit

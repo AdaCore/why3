@@ -57,8 +57,7 @@ type type_v =
   | Tarrow of binder list * type_c
 
 and type_c =
-  { pc_result_name : ident;
-    pc_result_type : type_v;
+  { pc_result_type : type_v;
     pc_effect      : effect;
     pc_pre         : pre;
     pc_post        : post; }

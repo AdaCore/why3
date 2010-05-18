@@ -29,3 +29,5 @@ val errorm : ?loc:Loc.position -> ('a, Format.formatter, unit, 'b) format4 -> 'a
 val report : Format.formatter -> error -> unit
 
 val file : Env.env -> theory_uc -> Pgm_ptree.file -> theory_uc * Pgm_ttree.file
+
+val print_type_v : Format.formatter -> Pgm_ttree.type_v -> unit

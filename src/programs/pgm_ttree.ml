@@ -50,8 +50,7 @@ type dtype_v =
   | DTarrow of dbinder list * dtype_c
 
 and dtype_c = 
-  { dc_result_name : string;
-    dc_result_type : dtype_v;
+  { dc_result_type : dtype_v;
     dc_effect      : deffect;
     dc_pre         : dpre;
     dc_post        : dpost; }
@@ -104,27 +103,23 @@ and dtriple = dpre * dexpr * dpost
 
 type variant = Term.term * Term.lsymbol
 
-type reference = 
-  | Rlocal  of Term.vsymbol
-  | Rglobal of Term.lsymbol
+type reference = Pgm_effect.reference
 
-type effect = {
-  e_reads  : reference list;
-  e_writes : reference list;
-  e_raises : Term.lsymbol list;
-}
+type effect = Pgm_effect.t
 
 type pre = Term.fmla
 
-type post = Term.fmla * (Term.lsymbol * Term.fmla) list
+type post_fmla = Term.vsymbol (* result *) * Term.fmla
+type exn_post_fmla = Term.vsymbol (* result *) option * Term.fmla
+
+type post = post_fmla * (Term.lsymbol * exn_post_fmla) list
 
 type type_v = 
   | Tpure of Ty.ty
   | Tarrow of binder list * type_c
 
 and type_c = 
-  { c_result_name : Term.vsymbol;
-    c_result_type : type_v;
+  { c_result_type : type_v;
     c_effect      : effect;
     c_pre         : pre;
     c_post        : post; }

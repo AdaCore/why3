@@ -21,7 +21,10 @@ open Why
 open Util
 open Ident
 open Term
-open Pgm_ttree
+
+type reference = 
+  | Rlocal  of Term.vsymbol
+  | Rglobal of Term.lsymbol
 
 module Reference = struct
   
@@ -60,5 +63,29 @@ let empty = { reads = R.empty; writes = R.empty; raises = E.empty }
 let add_read  r t = { t with reads  = R.add r t.reads  }
 let add_write r t = { t with writes = R.add r t.writes }
 let add_raise e t = { t with raises = E.add e t.raises }
+
+let union t1 t2 =
+  { reads  = R.union t1.reads  t2.reads;
+    writes = R.union t1.writes t2.writes;
+    raises = E.union t1.raises t2.raises; }
+
+open Format
+open Pp
+open Pretty
+
+let print_reference fmt = function
+  | Rlocal vs -> print_vs fmt vs
+  | Rglobal ls -> print_ls fmt ls
+
+let print_rset fmt s = print_list comma print_reference fmt (R.elements s)
+let print_eset fmt s = print_list comma print_ls        fmt (E.elements s)
+
+let print fmt e =
+  if not (R.is_empty e.reads) then 
+    fprintf fmt "@ reads %a" print_rset e.reads;
+  if not (R.is_empty e.writes) then 
+    fprintf fmt "@ writes %a" print_rset e.writes;
+  if not (E.is_empty e.raises) then 
+    fprintf fmt "@ raises %a" print_eset e.raises
 
 

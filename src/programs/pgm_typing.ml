@@ -26,6 +26,7 @@ open Term
 open Theory
 open Denv
 open Ptree
+open Pgm_effect
 open Pgm_ttree
 
 type error =
@@ -201,8 +202,7 @@ let rec dtype_v env = function
 
 and dtype_c env c = 
   let ty = dtype_v env c.Pgm_ptree.pc_result_type in
-  { dc_result_name = c.Pgm_ptree.pc_result_name.id;
-    dc_result_type = ty;
+  { dc_result_type = ty;
     dc_effect      = deffect env c.Pgm_ptree.pc_effect;
     dc_pre         = env.denv, lexpr c.Pgm_ptree.pc_pre;
     dc_post        = dpost env (dpurify env ty) c.Pgm_ptree.pc_post;
@@ -433,40 +433,44 @@ let currying uc tyl ty =
   let make_arrow_type ty1 ty2 = Ty.ty_app (ts_arrow uc) [ty1; ty2] in
   List.fold_right make_arrow_type tyl ty
 
-let purify uc = function
+let rec purify uc = function
   | Tpure ty -> 
       ty
   | Tarrow (bl, c) -> 
-      currying uc (List.map (fun (v,_) -> v.vs_ty) bl) c.c_result_name.vs_ty
+      currying uc (List.map (fun (v,_) -> v.vs_ty) bl) 
+	(purify uc c.c_result_type)
 
 let reference _uc env = function
   | DRlocal x -> Rlocal (Mstr.find x env)
   | DRglobal ls -> Rglobal ls
 
 let effect uc env e =
-  { e_reads  = List.map (reference uc env) e.de_reads;
-    e_writes = List.map (reference uc env) e.de_writes;
-    e_raises = e.de_raises; }
+  let reads ef r = add_read (reference uc env r) ef in
+  let writes ef r = add_write (reference uc env r) ef in
+  let raises ef l = add_raise l ef in
+  let ef = List.fold_left reads Pgm_effect.empty e.de_reads in
+  let ef = List.fold_left writes ef e.de_writes in
+  List.fold_left raises ef e.de_raises
 
 let pre env (denv, l) = Typing.type_fmla denv env l
 
 let post env ty (q, ql) =
   let exn (ls, (denv, l)) =
-    let env = match ls.ls_args with
+    let v, env = match ls.ls_args with
       | [] -> 
-	  env
+	  None, env
       | [ty] -> 
 	  let v_result = create_vsymbol (id_fresh id_result) ty in
-	  Mstr.add id_result v_result env
+	  Some v_result, Mstr.add id_result v_result env
       | _ -> 
 	  assert false
     in
-    (ls, Typing.type_fmla denv env l)
+    (ls, (v, Typing.type_fmla denv env l))
   in
   let denv, l = q in 
   let v_result = create_vsymbol (id_fresh id_result) ty in
   let env = Mstr.add id_result v_result env in
-  Typing.type_fmla denv env l, List.map exn ql
+  (v_result, Typing.type_fmla denv env l), List.map exn ql
 
 let variant denv env (t, ps) =
   let loc = t.pp_loc in
@@ -490,9 +494,7 @@ let rec type_v uc env = function
 and type_c uc env c = 
   let tyv = type_v uc env c.dc_result_type in
   let ty = purify uc tyv in
-  let v = create_vsymbol (id_fresh c.dc_result_name) ty in
-  { c_result_name = v;
-    c_result_type = tyv;
+  { c_result_type = tyv;
     c_effect      = effect uc env c.dc_effect;
     c_pre         = pre env c.dc_pre;
     c_post        = post env ty c.dc_post;
@@ -721,11 +723,30 @@ and triple uc env ((denvp, p), e, q) =
 
 (* pretty-printing (for debugging) *)
 
+open Pp
 open Pretty 
 
-let print_reference fmt = function
-  | Rlocal vs -> print_vs fmt vs
-  | Rglobal ls -> print_ls fmt ls
+let print_post fmt ((_,q), el) =
+  let print_exn_post fmt (l,(_,q)) = 
+    fprintf fmt "| %a -> {%a}" print_ls l print_fmla q 
+  in
+  fprintf fmt "{%a} %a" print_fmla q (print_list space print_exn_post) el
+
+let rec print_type_v fmt = function
+  | Tpure ty -> 
+      print_ty fmt ty
+  | Tarrow (bl, c) ->
+      fprintf fmt "@[%a ->@ %a@]" 
+	(print_list arrow print_binder) bl print_type_c c
+
+and print_type_c fmt c =
+  fprintf fmt "@[{%a} %a%a %a@]" print_fmla c.c_pre
+    print_type_v c.c_result_type Pgm_effect.print c.c_effect
+    print_post c.c_post
+
+and print_binder fmt (x, v) =
+  fprintf fmt "(%a:%a)" print_vs x print_type_v v
+
 
 let rec print_expr fmt e = match e.expr_desc with
   | Elogic t ->
@@ -797,7 +818,9 @@ let file env uc dl =
 	     List.fold_left (Typing.add_decl env Mnm.empty) uc dl, acc
 	 | Pgm_ptree.Dlet (id, e) -> 
 	     let e = type_expr uc e in
-	     (* printf "@[%s:@\n  %a@]@." id.id print_expr e; exit 42; *)
+	     (*DEBUG*)
+	     printf "@[--typing %s-----@\n  %a@]@." 
+	       id.id print_expr e;
 	     let tyl, ty = uncurrying uc e.expr_type in
 	     let ls = create_lsymbol (id_user id.id id.id_loc) tyl (Some ty) in
 	     add_global ls;

@@ -45,7 +45,7 @@ type loop_annotation = Pgm_ttree.loop_annotation
 
 type expr = {
   expr_desc  : expr_desc;
-  expr_type  : Ty.ty;
+  expr_type_v: type_v;
   expr_effect: Pgm_effect.t;
   expr_loc   : loc;
 }
