@@ -17,7 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*s transformation from polymorphic logic to untyped logic. The polymorphic
+(** transformation from polymorphic logic to untyped logic. The polymorphic
 logic must not have finite support types. *)
+
 val explicit_polymorphism : Task.task Register.trans_reg
 
