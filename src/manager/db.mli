@@ -114,12 +114,12 @@ val transformations : goal -> transf list
 val goal_proved : goal -> bool
   (** tells if the goal is proved valid or not.
       It returns true iff either
-      <li>exists proof p in [external_proofs g] s.t.
-          proof_obsolete p == false and status p = Valid
+      {ul {li exists proof p in [external_proofs g] s.t.
+          proof_obsolete p == false and status p = Valid}}
       or
-      <li>exists transf t in [transformations g] s.t.
+      {ul {li exists transf t in [transformations g] s.t.
             transf_obsolete t == false and
-            forall g in [subgoals t], [goal_proved g]
+            forall g in [subgoals t], [goal_proved g]}}
   *)
 
 
