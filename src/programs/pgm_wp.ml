@@ -114,6 +114,7 @@ and recfun _env _def =
 module State : sig
   type t
   val create     : E.t -> t
+  val fresh_label: env -> label
   val push_label : env -> label -> t -> t
   val havoc      : env -> ?pre:label -> E.t   -> t -> t
   val term       : env ->               t -> term -> term
@@ -186,13 +187,34 @@ end = struct
 
 end
 
-let rec wprec env s e = match e.expr_desc with
+let wp_binder (x, tv) f = match tv with
+  | Tpure _ -> f_forall [x] [] f
+  | Tarrow _ -> f
+
+let wp_binders = List.fold_right wp_binder 
+
+let rec wp_expr env s e q = match e.expr_desc with
   | Elogic t ->
-      assert false (*TODO*)
+      let t = State.term env s t in
+      begin match q with
+	| Some ((v,q),_) -> f_let v t q
+	| None -> f_true
+      end
+  | Efun (bl, t) ->
+      let f = wp_triple env s t in
+      wp_binders bl f
   | _ -> 
       f_true (* TODO *)
 
-let wp env _ls e = wprec env (State.create e.expr_effect) e
+and wp_triple env s (p,e,q) =
+  let s = State.create e.expr_effect in
+  let old = State.fresh_label env in
+  let s = State.push_label env old s in
+  (* FIXME: replace old(t) by at(t,old) in q *)
+  let f = wp_expr env s e (Some q) in
+  f_implies (State.fmla env s p) f
+
+let wp env e = wp_expr env (State.create e.expr_effect) e None
 
 let wp_recfun _env _l _def = f_true (* TODO *)
 
@@ -207,7 +229,7 @@ let decl env = function
       (* DEBUG *)
       printf "@[--effect %a-----@\n  %a@]@\n---------@." 
 	Pretty.print_ls ls print_type_v e.expr_type_v;
-      let f = wp env ls e in
+      let f = wp env e in
       let env = add_wp_decl ls f env in
       let env = add_global ls e.expr_type_v env in
       env
@@ -228,3 +250,9 @@ let decl env = function
 let file uc dl =
   let env = List.fold_left decl (empty_env uc) dl in
   Theory.close_theory env.uc
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. testl"
+End: 
+*)
