@@ -182,7 +182,7 @@ let decompose_arrows =
   in
   arrows_rec []
 
-let decomp_lambdas _dep _tvm env vars t =
+let decomp_lambdas _dep _tvm bv env vars t =
   let rec loop bv vsl env vars t = match vars, kind_of_term t with
     | [], _ -> 
 	(bv, List.rev vsl), env, t
@@ -195,7 +195,7 @@ let decomp_lambdas _dep _tvm env vars t =
     | _ ->
 	assert false (*TODO: eta-expansion*)
   in
-  loop Idmap.empty [] env vars t
+  loop bv [] env vars t
 
 
 
@@ -226,6 +226,7 @@ let local_decl = ref Decl.Sdecl.empty
 let rec add_local_decls d =
   if not (Decl.Sdecl.mem d !local_decl) then begin
     local_decl := Decl.Sdecl.add d !local_decl;
+    assert (Decl.Mdecl.mem d !global_dep);
     let dep = Decl.Mdecl.find d !global_dep in
     Decl.Sdecl.iter add_local_decls dep;
     task := Task.add_decl !task d
@@ -340,9 +341,10 @@ let rec tr_type dep tvm env t =
 (* the type symbol for r *)
 and tr_task_ts dep env r = 
   let ts = tr_global_ts dep env r in
-  assert (Ident.Mid.mem ts.ts_name !global_decl);
-  let d = Ident.Mid.find ts.ts_name !global_decl in
-  add_local_decls d;
+  if Ident.Mid.mem ts.ts_name !global_decl then begin
+    let d = Ident.Mid.find ts.ts_name !global_decl in
+    add_local_decls d
+  end;
   ts
 
 (* the type declaration for r *)
@@ -389,12 +391,8 @@ and tr_global_ts dep env r =
 	    if not (is_Set t) && not (is_Type t) then raise NotFO;
 	    let id = preid_of_id (Nametab.id_of_global r) in
 	    let ts = Ty.create_tysymbol id vars None in
-	    let d = Decl.create_ty_decl [ts, Decl.Tabstract] in
 	    all_ids := ts.ts_name :: !all_ids;
-	    add_table global_ts r (Some ts);
-	    global_decl := Ident.Mid.add ts.ts_name d !global_decl;
-	    global_dep := Decl.Mdecl.add d Decl.Sdecl.empty !global_dep;
-	    local_decl := Decl.Sdecl.add d !local_decl
+	    add_table global_ts r (Some ts)
 	  in
 	  Array.iteri make_one_ts mib.mind_packets;
 	  (* second, the declarations with constructors *)
@@ -439,9 +437,10 @@ and tr_global_ts dep env r =
 (* the function/predicate symbol for r *)
 and tr_task_ls dep env r = 
   let ls = tr_global_ls dep env r in
-  assert (Ident.Mid.mem ls.ls_name !global_decl);
-  let d = Ident.Mid.find ls.ls_name !global_decl in
-  add_local_decls d;
+  if Ident.Mid.mem ls.ls_name !global_decl then begin
+    let d = Ident.Mid.find ls.ls_name !global_decl in
+    add_local_decls d
+  end;
   ls
 
 (* the function/predicate symbol declaration for r *)
@@ -484,8 +483,19 @@ and tr_global_ls dep env r =
 	  let ld = match (Global.lookup_constant c).const_body with
 	    | Some b ->
 		let b = force b in
+		let b = match kind_of_term b with
+		  (* a single recursive function *)
+		  | Fix (_, (_,_,[|b|])) -> 
+		      subst1 (mkConst c) b
+		  | Fix ((_,_i), (_names,_,_bodies)) ->
+		      assert false (*TODO*)
+		  | _ -> 
+		      b
+		in
 		let tvm, env, b = decomp_type_lambdas Idmap.empty env vars b in
-		let (bv, vsl), env, b = decomp_lambdas dep' tvm env args b in
+		let (bv, vsl), env, b = 
+		  decomp_lambdas dep' tvm Idmap.empty env args b 
+		in
 		begin match ls.ls_value with
 		  | None -> 
 		      let b = tr_formula dep' tvm bv env b in
@@ -559,6 +569,9 @@ and tr_term dep tvm bv env t =
 	  (* first-order terms *)
     | Var id when Idmap.mem id bv ->
 	Term.t_var (Idmap.find id bv)
+    | Var id ->
+	Format.eprintf "tr_term: unbound variable %s@." (string_of_id id);
+	exit 1
     | Case (ci, _, e, br) ->
 	let ty = type_of env Evd.empty e in
 	let ty = tr_type dep tvm env ty in
@@ -569,7 +582,7 @@ and tr_term dep tvm bv env t =
 	  let tyl, _ = decompose_arrows tj in
 	  let tyl = List.map (tr_type dep tvm env) tyl in
 	  let tvm, env, bj = decomp_type_lambdas tvm env tvars bj in
-	  let (bv, vars), env, bj = decomp_lambdas dep tvm env tyl bj in
+	  let (bv, vars), env, bj = decomp_lambdas dep tvm bv env tyl bj in
 	  let cj = ith_constructor_of_inductive ci.ci_ind (j+1) in
 	  let ls = tr_global_ls dep env (ConstructRef cj) in
 	  if List.length vars <> List.length ls.ls_args then raise NotFO;
@@ -701,7 +714,7 @@ and tr_formula dep tvm bv env f =
 	  let tyl, _ = decompose_arrows tj in
 	  let tyl = List.map (tr_type dep tvm env) tyl in
 	  let tvm, env, bj = decomp_type_lambdas tvm env tvars bj in
-	  let (bv, vars), env, bj = decomp_lambdas dep tvm env tyl bj in
+	  let (bv, vars), env, bj = decomp_lambdas dep tvm bv env tyl bj in
 	  let cj = ith_constructor_of_inductive ci.ci_ind (j+1) in
 	  let ls = tr_global_ls dep env (ConstructRef cj) in
 	  if List.length vars <> List.length ls.ls_args then raise NotFO;
@@ -769,6 +782,7 @@ let tr_goal gl =
   if debug then Format.printf "---@\n%a@\n---@." Pretty.print_fmla f;
   task := Task.add_prop_decl !task Decl.Pgoal pr f
 
+let () = Printexc.record_backtrace true
 
 let whytac s gl =
   let concl_type = pf_type_of gl (pf_concl gl) in
@@ -789,8 +803,13 @@ let whytac s gl =
       | Timeout -> error "Timeout"
       | HighFailure -> 
 	  error ("Prover failure\n" ^ res.pr_output ^ "\n")
-  with NotFO ->
-    error "Not a first order goal"
+  with 
+    | NotFO ->
+	error "Not a first order goal"
+    | e ->
+	Printexc.print_backtrace stderr;
+	raise e
+	
 
 
 (*

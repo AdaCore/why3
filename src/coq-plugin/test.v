@@ -3,6 +3,7 @@ Require Export ZArith.
 Open Scope Z_scope.
 Require Export List.
 
+
 Ltac ae := why "alt-ergo".
 Ltac z3 := why "z3".
 Ltac spass := why "spass".
@@ -27,6 +28,13 @@ Goal p O.
 ae.
 Qed.
 
+
+Print plus.
+
+Goal plus O O = O.
+ae.
+Qed.
+
 Definition eq (A:Set) (x y : A) := x=y.
 
 Goal eq nat O O.
@@ -44,7 +52,7 @@ Definition pred (n:nat) := match n with
 
 Goal pred (S O) = O.
 ae.
-Admitted.
+Qed.
 
 (* function definition *)
 
@@ -59,6 +67,14 @@ Definition id A (x:A) := x.
 Goal id nat O = O.
 ae.
 Qed.
+
+(* recursive predicate definition *)
+
+Print In.
+
+Goal In 0 (cons 1 (cons 0 nil)).
+(* ICI *)
+Admitted.
 
 (* inductive types *)
 
@@ -81,7 +97,7 @@ ae.
 Qed.
 
 Goal forall x, (match x with (S (S _)) => True | _ => False end).
-(* BUG *)
+
 Admitted.
 
 
@@ -100,6 +116,17 @@ Inductive tree : Set :=
 with forest : Set :=
   | Nil : forest
   | Cons : tree -> forest -> forest.
+
+Fixpoint tree_size (t:tree) : Z := match t with
+  | Leaf => 0
+  | Node _ f => 1 + forest_size f end
+with forest_size (f:forest) : Z := match f with
+  | Nil => 0
+  | Cons t f => tree_size t + forest_size f end.
+
+Print tree_size.
+
+Definition forest_size (x:Z) : Z := x.
 
 Goal forall x : tree, x=x.
 ae.
@@ -120,7 +147,7 @@ with pforest (a:Set) : Set :=
   | PCons : ptree a -> pforest a -> pforest a.
 
 Goal forall x : ptree Z, x=x.
-spass.
+ae.
 Qed.
 
 (* the same, without parameters *)
@@ -134,6 +161,6 @@ with pforest' : Type -> Type :=
   | PCons' : forall (a:Type), ptree' a -> pforest' a -> pforest' a.
 
 Goal forall x : ptree' Z, x=x.
-spass.
+ae.
 Qed.
 
