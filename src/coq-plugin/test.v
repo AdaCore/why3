@@ -28,7 +28,6 @@ Goal p O.
 ae.
 Qed.
 
-
 Print plus.
 
 Goal plus O O = O.
@@ -73,6 +72,7 @@ Qed.
 Print In.
 
 Goal In 0 (cons 1 (cons 0 nil)).
+ae.
 (* ICI *)
 Admitted.
 
@@ -125,8 +125,6 @@ with forest_size (f:forest) : Z := match f with
   | Cons t f => tree_size t + forest_size f end.
 
 Print tree_size.
-
-Definition forest_size (x:Z) : Z := x.
 
 Goal forall x : tree, x=x.
 ae.

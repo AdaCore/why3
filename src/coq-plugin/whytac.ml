@@ -141,6 +141,21 @@ let coq_rename_var env (na,t) =
 
 let preid_of_id id = Ident.id_fresh (string_of_id id)
 
+(* rec_names_for c [|n1;...;nk|] builds the list of constant names for 
+   identifiers n1...nk with the same path as c, if they exist; otherwise
+   raises Not_found *)
+let rec_names_for c =
+  let mp,dp,_ = Names.repr_con c in
+  array_map_to_list
+    (function 
+       | Name id -> 
+	   let c' = Names.make_con mp dp (label_of_id id) in
+	   ignore (Global.lookup_constant c');
+	   msgnl (Printer.pr_constr (mkConst c'));
+	   c'
+       | Anonymous ->
+	   raise Not_found)
+
 (* extract the prenex type quantifications i.e.
    type_quantifiers env (A1:Set)...(Ak:Set)t = A1...An, (env+Ai), t *)
 let decomp_type_quantifiers env t =
@@ -451,9 +466,9 @@ and tr_global_ls dep env r =
     add_table global_ls r None;
     let dep' = empty_dep () in
     let ty = Global.type_of_global r in
-    let (tvm, vars), env, t = decomp_type_quantifiers env ty in
+    let (tvm, _), env, t = decomp_type_quantifiers env ty in
     if is_Set t || is_Type t then raise NotFO;
-    let l, t = decompose_arrows t in
+    let _, t = decompose_arrows t in
     match r with
       | ConstructRef _ ->
 	  if is_Prop t then raise NotFO; (*TODO? *)
@@ -462,23 +477,100 @@ and tr_global_ls dep env r =
 	  ignore (tr_type dep' tvm env t);
 	  lookup_table global_ls r
       | ConstRef c ->
-	  let id = preid_of_id (Nametab.id_of_global r) in
-	  let args = List.map (tr_type dep' tvm env) l in
-	  let ls = 
-	    if is_Prop t then 
-	      (* predicate definition *)
-	      create_lsymbol id args None
-	    else
-	      let s = type_of env Evd.empty t in
-	      if is_Set s || is_Type s then 
-		(* function definition *)
-		let ty = tr_type dep' tvm env t in
-		create_lsymbol id args (Some ty)
-	      else
-		raise NotFO
+	  let ld = decompose_definition dep' env c in
+(* 	  let ld = match defl with *)
+(* 	    | [] -> *)
+(* 		[make_def_decl dep env r None] *)
+(* 	    | _ -> *)
+(* 		List.map (fun (r, t) -> make_def_decl dep env r (Some t)) defl *)
+(* 	  in *)
+	  let decl = Decl.create_logic_decl ld in
+	  add_dep dep decl;
+	  List.iter
+	    (fun (ls, _) -> 
+	       global_decl := Ident.Mid.add ls.ls_name decl !global_decl)
+	    ld;
+	  global_dep := Decl.Mdecl.add decl !dep' !global_dep;
+	  lookup_table global_ls r
+      | VarRef _ | IndRef _ ->
+	  raise NotFO
+
+and decompose_definition dep env c = 
+  let dl = match (Global.lookup_constant c).const_body with
+    | None ->
+	[ConstRef c, None]
+    | Some b ->
+	let b = force b in
+	let rec decomp vars t = match kind_of_term t with
+	  | Lambda (n, a, t) ->
+	      decomp ((n, a) :: vars) t
+	  | Fix (_, (names, _, bodies)) ->
+	      let lc = rec_names_for c names in
+	      let l = List.rev_map mkConst lc in
+	      let n = List.length vars in
+	      let db_vars = Array.init n (fun i -> mkRel (n - i)) in
+	      let l = List.map (fun t -> appvect (t, db_vars)) l in
+	      let bodies = Array.to_list bodies in
+	      let bodies = List.map (substl l) bodies in
+	      let add_lambdas b = 
+		List.fold_left (fun t (n,a) -> mkLambda (n,a,t)) b vars 
+	      in
+	      let bodies = List.map add_lambdas bodies in
+	      List.fold_right2 
+		(fun c b acc -> (ConstRef c, Some b) :: acc) lc bodies []
+	  | _ ->
+	      [ConstRef c, Some b]
+	in
+	decomp [] b
+  in
+  let make_one_ls r =
+    let ty = Global.type_of_global r in
+    let (tvm, vars), env, t = decomp_type_quantifiers env ty in
+    if is_Set t || is_Type t then raise NotFO;
+    let l, t = decompose_arrows t in
+    let args = List.map (tr_type dep tvm env) l in
+    let ls = 
+      let id = preid_of_id (Nametab.id_of_global r) in
+      if is_Prop t then 
+	(* predicate definition *)
+	create_lsymbol id args None
+      else
+	let s = type_of env Evd.empty t in
+	if is_Set s || is_Type s then 
+	  (* function definition *)
+	  let ty = tr_type dep tvm env t in
+	  create_lsymbol id args (Some ty)
+	else
+	  raise NotFO
+    in
+    add_table global_ls r (Some ls);
+    add_poly_arith ls (List.length vars)
+  in
+  List.iter (fun (r, _) -> make_one_ls r) dl;
+  let make_one_decl (r, b) = 
+    let ls = lookup_table global_ls r in
+    match b with
+      | None ->
+	  ls, None
+      | Some b ->
+	  let ty = Global.type_of_global r in
+	  let (_, vars), env, _ = decomp_type_quantifiers env ty in
+	  let tvm, env, b = decomp_type_lambdas Idmap.empty env vars b in
+	  let (bv, vsl), env, b = 
+	    decomp_lambdas dep tvm Idmap.empty env ls.ls_args b 
 	  in
-	  add_table global_ls r (Some ls);
-	  add_poly_arith ls (List.length vars);
+	  begin match ls.ls_value with
+	    | None -> 
+		let b = tr_formula dep tvm bv env b in
+		Decl.make_ps_defn ls vsl b
+	    | Some _ ->
+		let b = tr_term dep tvm bv env b in
+		Decl.make_fs_defn ls vsl b
+	  end
+  in
+  List.map make_one_decl dl
+
+(***
 	  (* is it defined? *)
 	  let ld = match (Global.lookup_constant c).const_body with
 	    | Some b ->
@@ -492,30 +584,7 @@ and tr_global_ls dep env r =
 		  | _ -> 
 		      b
 		in
-		let tvm, env, b = decomp_type_lambdas Idmap.empty env vars b in
-		let (bv, vsl), env, b = 
-		  decomp_lambdas dep' tvm Idmap.empty env args b 
-		in
-		begin match ls.ls_value with
-		  | None -> 
-		      let b = tr_formula dep' tvm bv env b in
-		      Decl.make_ps_defn ls vsl b
-		  | Some _ ->
-		      let b = tr_term dep' tvm bv env b in
-		      Decl.make_fs_defn ls vsl b
-		end
-	    | None ->
-		ls, None
-	  in
-	  let decl = Decl.create_logic_decl [ld] in
-	  add_dep dep decl;
-	  add_table global_ls r (Some ls);
-	  global_decl := Ident.Mid.add ls.ls_name decl !global_decl;
-	  global_dep := Decl.Mdecl.add decl !dep' !global_dep;
-	  ls
-      | VarRef _ | IndRef _ ->
-	  raise NotFO
-
+***)
 
 (* translation of a Coq term
    assumption: t:T:Set *)
