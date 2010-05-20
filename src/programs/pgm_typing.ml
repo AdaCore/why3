@@ -384,7 +384,7 @@ and dexpr_desc env loc = function
       DEtry (e1, List.map handler hl), e1.dexpr_type
 
   | Pgm_ptree.Eassert (k, le) ->
-      DEassert (k, lexpr le), (dty_unit env.uc) 
+      DEassert (k, lexpr le), dty_unit env.uc 
   | Pgm_ptree.Elabel ({id=l}, e1) ->
       let s = "label " ^ l in
       if Typing.mem_var s env.denv then 

@@ -24,6 +24,10 @@ type reference =
   | Rlocal  of Term.vsymbol
   | Rglobal of Term.lsymbol
 
+val name_of_reference : reference -> Ident.ident
+val type_of_reference : reference -> Ty.ty
+val ref_equal : reference -> reference -> bool
+
 module Sref : Set.S with type elt = reference
 module Mref : Map.S with type key = reference
 

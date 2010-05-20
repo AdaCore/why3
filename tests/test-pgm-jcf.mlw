@@ -14,6 +14,7 @@ parameter r : int ref
 
 let ff () = 
   { !r = 1 } 
+  assert { !r = 1 };
   !r + 2
   { result = 3 }
 

@@ -26,6 +26,20 @@ type reference =
   | Rlocal  of Term.vsymbol
   | Rglobal of Term.lsymbol
 
+let name_of_reference = function
+  | Rlocal vs -> vs.vs_name
+  | Rglobal ls -> ls.ls_name
+
+let type_of_reference = function
+  | Rlocal vs -> vs.vs_ty
+  | Rglobal { ls_value = Some ty } -> ty
+  | Rglobal { ls_value = None } -> assert false
+
+let ref_equal r1 r2 = match r1, r2 with
+  | Rlocal vs1, Rlocal vs2 -> vs_equal vs1 vs2
+  | Rglobal ls1, Rglobal ls2 -> ls_equal ls1 ls2
+  | _ -> false
+
 module Reference = struct
   
   type t = reference
