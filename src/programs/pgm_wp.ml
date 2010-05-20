@@ -113,6 +113,9 @@ and expr_desc env _loc ty = function
   | Pgm_ttree.Eassert (k, f) ->
       let ef = fmla_effect env E.empty f in
       Eassert (k, f), Tpure ty, ef
+  | Pgm_ttree.Elabel (lab, e1) ->
+      let e1 = expr env e1 in
+      Elabel (lab, e1), e1.expr_type_v, e1.expr_effect
 
   | _ -> 
       assert false (*TODO*)
@@ -165,7 +168,7 @@ and old_label_term env lab t = match t.t_node with
 
 (* replace at(t,lab) with t everywhere in formula f *)
 let rec erase_label env lab f =
-  f_map (old_label_term env lab) (old_label env lab) f
+  f_map (erase_label_term env lab) (erase_label env lab) f
 
 and erase_label_term env lab t = match t.t_node with
   | Tapp (ls, [t; {t_node = Tvar l}]) 
@@ -240,7 +243,8 @@ let rec wp_expr env e q =
   let lab = fresh_label env in
   let q = post_map (old_label env lab) q in
   let f = wp_desc env e q in
-  erase_label env lab f
+  let f = erase_label env lab f in
+  f
 
 and wp_desc env e q = match e.expr_desc with
   | Elogic t ->
@@ -259,6 +263,15 @@ and wp_desc env e q = match e.expr_desc with
   | Eassert (Pgm_ptree.Aassert, f) ->
       let (_, q), _ = q in
       wp_and f q
+  | Eassert (Pgm_ptree.Acheck, f) ->
+      let (_, q), _ = q in
+      f_and f q (* symetric conjunction instead *)
+  | Eassert (Pgm_ptree.Aassume, f) ->
+      let (_, q), _ = q in
+      wp_implies f q
+  | Elabel (lab, e1) ->
+      let w1 = wp_expr env e1 q in
+      erase_label env lab w1
 
   | _ -> 
       f_true (* TODO *)
@@ -282,9 +295,10 @@ let decl env = function
   | Pgm_ttree.Dlet (ls, e) ->
       let e = expr env e in
       (* DEBUG *)
-      eprintf "@[--effect %a-----@\n  %a@]@\n---------@." 
+      eprintf "@[--effect %a-----@\n  %a@]@\n----------------@." 
 	Pretty.print_ls ls print_type_v e.expr_type_v;
       let f = wp env e in
+      eprintf "wp = %a@\n----------------@." Pretty.print_fmla f;
       let env = add_wp_decl ls f env in
       let env = add_global ls e.expr_type_v env in
       env
