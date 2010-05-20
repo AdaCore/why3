@@ -20,6 +20,7 @@
 open Format
 open Why
 open Ident
+open Ty
 open Term
 open Decl
 open Theory
@@ -39,6 +40,7 @@ let empty_env uc = { uc = uc; globals = Mls.empty; locals = Mvs.empty }
 let add_local x v env = { env with locals = Mvs.add x v env.locals }
 let add_global x v env = { env with globals = Mls.add x v env.globals }
 
+let ts_ref   env = ns_find_ts (get_namespace env.uc) ["ref"]
 let ts_label env = ns_find_ts (get_namespace env.uc) ["label"]
 
 let ls_bang env = ns_find_ls (get_namespace env.uc) ["prefix !"]
@@ -111,11 +113,15 @@ and recfun _env _def =
 
 (* phase 4: weakest preconditions *******************************************)
 
+(* TODO: use simp forms / tag with label "WP" *)
+let wp_and     = f_and
+let wp_implies = f_implies
+let wp_forall  = f_forall
+
 module State : sig
   type t
-  val create     : E.t -> t
-  val fresh_label: env -> label
-  val push_label : env -> label -> t -> t
+  val create     : env -> E.t -> t
+  val push_label : env -> ?label:label -> t -> label * t
   val havoc      : env -> ?pre:label -> E.t   -> t -> t
   val term       : env ->               t -> term -> term
   val fmla       : env -> ?old:label -> t -> fmla -> fmla
@@ -127,24 +133,28 @@ end = struct
     old     : vsymbol E.Mref.t Mvs.t;
   }
 
-  let havoc1 r m =
-    let v = match r with
-      | E.Rlocal vs -> 
-	  create_vsymbol (id_fresh vs.vs_name.id_string) vs.vs_ty
-      | E.Rglobal { ls_name = id; ls_value = Some ty } -> 
-	  create_vsymbol (id_fresh id.id_string) ty
-      | E.Rglobal { ls_value = None } ->
-	  assert false
-    in
+  let unref_ty env ty = match ty.ty_node with
+    | Tyapp (ts, [ty]) when ts_equal ts (ts_ref env) -> ty
+    | _ -> assert false
+
+  let var_of_reference env = function
+    | E.Rlocal vs -> 
+	create_vsymbol (id_fresh vs.vs_name.id_string) (unref_ty env vs.vs_ty)
+    | E.Rglobal { ls_name = id; ls_value = Some ty } -> 
+	create_vsymbol (id_fresh id.id_string) (unref_ty env ty)
+    | E.Rglobal { ls_value = None } ->
+	assert false
+
+  let havoc1 env r m =
+    let v = var_of_reference env r in
     E.Mref.add r v m
 
-  let create ef = 
+  let create env ef = 
     let s = E.Sref.union ef.E.reads ef.E.writes in
-    { current = E.Sref.fold havoc1 s E.Mref.empty;
-      old = Mvs.empty; }
+    { current = E.Sref.fold (havoc1 env) s E.Mref.empty; old = Mvs.empty; }
 
   let fresh_label env =
-    let ty = Ty.ty_app (ts_label env) [] in
+    let ty = ty_app (ts_label env) [] in
     create_vsymbol (id_fresh "label") ty
 
   let havoc env ?pre ef s = 
@@ -152,10 +162,12 @@ end = struct
       | None -> fresh_label env
       | Some l -> l
     in
-    { current = E.Sref.fold havoc1 ef.E.writes s.current;
+    { current = E.Sref.fold (havoc1 env) ef.E.writes s.current;
       old = Mvs.add l s.current s.old; }
 
-  let push_label env l s = havoc env ~pre:l E.empty s
+  let push_label env ?label s = 
+    let l = match label with None -> fresh_label env | Some l -> l in
+    l, havoc env ~pre:l E.empty s
 
   let ref_at cur s r = 
     let m = match cur with
@@ -179,42 +191,55 @@ end = struct
     f_map (term_at env old cur s) (fmla_at env old cur s) f
 
   let term env      s t = term_at env None None s t
-  let fmla env ?old s f = fmla_at env old None s f
+  let fmla env ?old s f = fmla_at env old  None s f
 
-  let quantify _env _s _ef _f = assert false (*TODO*)
+  let quantify _env s ef f = 
+    let quant r f = wp_forall [ref_at None s r] [] f in
+    let s = E.Sref.union ef.E.reads ef.E.writes in
+    E.Sref.fold quant s f
 
   let print _fmt _s = assert false (*TODO*)
 
 end
 
 let wp_binder (x, tv) f = match tv with
-  | Tpure _ -> f_forall [x] [] f
+  | Tpure _ -> wp_forall [x] [] f
   | Tarrow _ -> f
 
 let wp_binders = List.fold_right wp_binder 
+
+let get_normal_post env s = function
+  | _, None -> f_true 
+  | old, Some ((_,q),_) -> State.fmla env ~old s q
 
 let rec wp_expr env s e q = match e.expr_desc with
   | Elogic t ->
       let t = State.term env s t in
       begin match q with
-	| Some ((v,q),_) -> f_let v t q
-	| None -> f_true
+	| old, Some ((v,q),_) ->
+	    let q = State.fmla env ~old s q in
+	    f_let v t q
+	| _, None -> 
+	    f_true
       end
   | Efun (bl, t) ->
-      let f = wp_triple env s t in
-      wp_binders bl f
+      let q = get_normal_post env s q in
+      let f = wp_triple env t in
+      wp_and q (wp_binders bl f)
   | _ -> 
       f_true (* TODO *)
 
-and wp_triple env s (p,e,q) =
-  let s = State.create e.expr_effect in
-  let old = State.fresh_label env in
-  let s = State.push_label env old s in
-  (* FIXME: replace old(t) by at(t,old) in q *)
-  let f = wp_expr env s e (Some q) in
-  f_implies (State.fmla env s p) f
+and wp_triple env (p,e,q) =
+  let s = State.create env e.expr_effect in
+  let old, s = State.push_label env s in
+  let f = wp_expr env s e (old, Some q) in
+  let f = wp_implies (State.fmla env s p) f in
+  State.quantify env s e.expr_effect f
 
-let wp env e = wp_expr env (State.create e.expr_effect) e None
+let wp env e = 
+  let s = State.create env e.expr_effect in
+  let old, s = State.push_label env s in
+  wp_expr env s e (old, None)
 
 let wp_recfun _env _l _def = f_true (* TODO *)
 
@@ -227,7 +252,7 @@ let decl env = function
   | Pgm_ttree.Dlet (ls, e) ->
       let e = expr env e in
       (* DEBUG *)
-      printf "@[--effect %a-----@\n  %a@]@\n---------@." 
+      eprintf "@[--effect %a-----@\n  %a@]@\n---------@." 
 	Pretty.print_ls ls print_type_v e.expr_type_v;
       let f = wp env e in
       let env = add_wp_decl ls f env in

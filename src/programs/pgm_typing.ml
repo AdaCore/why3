@@ -823,7 +823,7 @@ let file env uc dl =
 	 | Pgm_ptree.Dlet (id, e) -> 
 	     let e = type_expr uc e in
 	     (*DEBUG*)
-	     printf "@[--typing %s-----@\n  %a@]@." 
+	     eprintf "@[--typing %s-----@\n  %a@]@." 
 	       id.id print_expr e;
 	     let tyl, ty = uncurrying uc e.expr_type in
 	     let ls = create_lsymbol (id_user id.id id.id_loc) tyl (Some ty) in
