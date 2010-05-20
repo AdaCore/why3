@@ -194,7 +194,7 @@ let goal_menu g =
          let p = List.assoc i menu in
          let call = 
 	   try
-             Db.try_prover ~debug:false ~timelimit ~memlimit:0 
+             Db.try_prover ~debug:true ~timelimit ~memlimit:0 
                ~prover:p.prover ~command:p.command ~driver:p.driver g 
            with Db.AlreadyAttempted ->
              printf "Proof already attempted, no need to rerun@.";

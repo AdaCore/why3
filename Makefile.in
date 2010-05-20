@@ -107,7 +107,7 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula inlining \
 		eliminate_inductive eliminate_let eliminate_if \
 		explicit_polymorphism
 
-LIB_PRINTER = print_real alt_ergo why3 smt coq tptp simplify
+LIB_PRINTER = print_real alt_ergo why3 smt coq tptp simplify gappa
 
 LIBMODULES = src/config \
 	      $(addprefix src/util/, $(LIB_UTIL)) \
@@ -456,15 +456,15 @@ clean::
 # tools
 #######
 
-TOOLS = bin/why-cpulimit
+TOOLS = bin/why3-cpulimit
 
 byte opt: $(TOOLS)
 
-bin/why-cpulimit: src/tools/@CPULIMIT@.c
+bin/why3-cpulimit: src/tools/@CPULIMIT@.c
 	$(CC) -o $@ $^
 
 clean::
-	rm -f bin/why-cpulimit src/tools/*~
+	rm -f bin/why3-cpulimit src/tools/*~
 
 ########
 # bench
