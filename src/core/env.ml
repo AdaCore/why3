@@ -68,14 +68,17 @@ let env_tag env = env.env_tag
 
 type parse_only   = env -> string -> in_channel -> unit
 type read_channel = env -> string -> in_channel -> theory Mnm.t
+type error_report = Format.formatter -> exn -> unit
 
 let parse_only_table   = Hashtbl.create 17 (* parser name -> parse_only *)
 let read_channel_table = Hashtbl.create 17 (* parser name -> read_channel *)
+let error_report_table = Hashtbl.create 17 (* parser name -> error_report *)
 let suffixes_table     = Hashtbl.create 17 (* suffix -> parser name *)
 
-let register_parser name suffixes po rc =
+let register_parser name suffixes po rc er =
   Hashtbl.add parse_only_table   name po;
   Hashtbl.add read_channel_table name rc;
+  Hashtbl.add error_report_table name er;
   List.iter (fun s -> Hashtbl.add suffixes_table ("." ^ s) name) suffixes
 
 exception UnknownParser of string (* parser name *)
@@ -108,4 +111,18 @@ let read_channel ?name env file ic =
   let n = parser_for_file ?name file in 
   let rc = find_parser read_channel_table n in
   rc env file ic
+
+let report ?name file fmt e =
+  let n = parser_for_file ?name file in 
+  let er = find_parser error_report_table n in
+  er fmt e
+
+let list_formats () =
+  let h = Hashtbl.create 17 in
+  let add s p = 
+    let l = try Hashtbl.find h p with Not_found -> [] in
+    Hashtbl.replace h p (s :: l)
+  in
+  Hashtbl.iter add suffixes_table;
+  Hashtbl.fold (fun p l acc -> (p, l) :: acc) h []
 

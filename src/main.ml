@@ -76,6 +76,7 @@ let add_opt_goal x = match !opt_theory with
 let add_opt_trans x = opt_trans := x::!opt_trans
 
 let opt_config = ref None
+let opt_parser = ref None
 let opt_prover = ref None
 let opt_loadpath = ref []
 let opt_driver = ref None
@@ -89,6 +90,7 @@ let opt_print_namespace = ref false
 let opt_list_transforms = ref false
 let opt_list_printers = ref false
 let opt_list_provers = ref false
+let opt_list_formats = ref false
 
 let opt_parse_only = ref false
 let opt_type_only = ref false
@@ -119,6 +121,10 @@ let option_list = Arg.align [
       "<prover> Prove or print (with -o) the selected goals";
   "--prover", Arg.String (fun s -> opt_prover := Some s),
       " same as -P";
+  "-F", Arg.String (fun s -> opt_parser := Some s),
+      "<format> Input format (default: \"why\")";
+  "--format", Arg.String (fun s -> opt_parser := Some s),
+      " same as -F";
   "-T", Arg.Int (fun i -> opt_timelimit := Some i),
       "<sec> Set the prover's time limit (default=10, no limit=0)";
   "--timelimit", Arg.Int (fun i -> opt_timelimit := Some i),
@@ -145,6 +151,8 @@ let option_list = Arg.align [
       " List the registered printers";
   "--list-provers", Arg.Set opt_list_provers,
       " List the known provers";
+  "--list-formats", Arg.Set opt_list_formats,
+      " List the known input formats";
   "--parse-only", Arg.Set opt_parse_only,
       " Stop after parsing";
   "--type-only", Arg.Set opt_type_only,
@@ -167,10 +175,20 @@ let () =
       (Pp.print_list Pp.newline Pp.string)
       (List.sort String.compare (Register.list_transforms_l ()));
   end;
-  if !opt_list_printers then
+  if !opt_list_printers then begin
     printf "@[<hov 2>Registered printers:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Register.list_printers ()));
+      (List.sort String.compare (Register.list_printers ()))
+  end;
+  if !opt_list_formats then begin
+    let print1 fmt s = fprintf fmt "%S" s in
+    let print fmt (p, l) = 
+      fprintf fmt "%s [%a]" p (Pp.print_list Pp.comma print1) l
+    in
+    printf "@[<hov 2>Known input formats:@\n%a@]@." 
+      (Pp.print_list Pp.newline print)
+      (List.sort Pervasives.compare (Env.list_formats ()))
+  end;
   if !opt_list_provers then begin
     let config = read_config !opt_config in
     let print fmt s prover = fprintf fmt "%s (%s)@\n" s prover.name in
@@ -178,7 +196,8 @@ let () =
     printf "@[<hov 2>Known provers:@\n%a@]@." print config.provers
   end;
 
-  if !opt_list_transforms || !opt_list_printers || !opt_list_provers
+  if !opt_list_transforms || !opt_list_printers || !opt_list_provers ||
+     !opt_list_formats
   then exit 0;
 
   if Queue.is_empty opt_queue then begin
@@ -247,10 +266,10 @@ let memlimit = match !opt_memlimit with
 let debug = !opt_debug
 
 let rec report fmt = function
-  | Lexer.Error e ->
-      fprintf fmt "lexical error: %a" Lexer.report e;
   | Loc.Located (loc, e) ->
       fprintf fmt "%a%a" Loc.report_position loc report e
+  | Lexer.Error e ->
+      fprintf fmt "lexical error: %a" Lexer.report e;
   | Parsing.Parse_error ->
       fprintf fmt "syntax error"
   | Denv.Error e ->
@@ -272,7 +291,10 @@ let rec report fmt = function
       Prover.report fmt e
   | Register.Error e ->
       Register.report fmt e
-  | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
+  | Env.UnknownParser p ->
+      fprintf fmt "unknown format '%s'" p
+  | e -> 
+      fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
 let print_th_namespace fmt th =
   Pretty.print_namespace fmt th.th_name.Ident.id_string th.th_export
@@ -384,21 +406,28 @@ let do_input env drv = function
         | "-" -> "stdin", stdin
         | f   -> f, open_in f
       in
-      if !opt_parse_only then begin
-	Env.parse_only env fname cin;
-        close_in cin
-      end else begin
-        let m = Env.read_channel env fname cin in
-        close_in cin;
-        if !opt_type_only then ()
-        else if Queue.is_empty tlist then
-          let glist = Queue.create () in
-          let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-          let do_th _ (t,th) = do_theory drv fname t th trans glist in
-          Ident.Mid.iter do_th (Mnm.fold add_th m Ident.Mid.empty)
-        else
-          Queue.iter (do_local_theory drv fname m) tlist
-      end
+      let report = Env.report ?name:!opt_parser fname in
+      try
+	if !opt_parse_only then begin
+	  Env.parse_only ?name:!opt_parser env fname cin;
+          close_in cin
+	end else begin
+          let m = Env.read_channel ?name:!opt_parser env fname cin in
+          close_in cin;
+          if !opt_type_only then ()
+          else if Queue.is_empty tlist then
+            let glist = Queue.create () in
+            let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
+            let do_th _ (t,th) = do_theory drv fname t th trans glist in
+            Ident.Mid.iter do_th (Mnm.fold add_th m Ident.Mid.empty)
+          else
+            Queue.iter (do_local_theory drv fname m) tlist
+	end
+      with 
+	| Loc.Located (loc, e) ->
+	    eprintf "%a%a" Loc.report_position loc report e; exit 1
+	| e ->
+	    report err_formatter e; exit 1
 
 let () =
   try

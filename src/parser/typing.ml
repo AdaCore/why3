@@ -1064,7 +1064,19 @@ let parse_only _env fname cin =
   ignore (Lexer.parse_logic_file lb);
   close_in cin
 
-let () = Env.register_parser "why" ["why"] parse_only read_channel
+let error_report fmt = function
+  | Lexer.Error e ->
+      fprintf fmt "lexical error: %a" Lexer.report e;
+  | Parsing.Parse_error ->
+      fprintf fmt "syntax error"
+  | Denv.Error e ->
+      Denv.report fmt e
+  | Error e ->
+      report fmt e
+  | e -> 
+      raise e
+
+let () = Env.register_parser "why" ["why"] parse_only read_channel error_report
 
 (*
 Local Variables:
