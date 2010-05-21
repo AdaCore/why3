@@ -59,6 +59,14 @@ let get_prover s =
     Hashtbl.add provers s (cp, drv);
     cp, drv
 
+let print_constr fmt c = pp_with fmt (Termops.print_constr c)
+let print_tvm fmt m = 
+  Idmap.iter (fun id tv -> Format.fprintf fmt "%s->%a@ " 
+		 (string_of_id id) Why.Pretty.print_tv tv) m
+let print_bv fmt m = 
+  Idmap.iter (fun id vs -> Format.fprintf fmt "%s->%a@ " 
+		 (string_of_id id) Why.Pretty.print_vsty vs) m
+
 (* Coq constants *)
 let logic_dir = ["Coq";"Logic";"Decidable"]
 
@@ -554,10 +562,12 @@ and decompose_definition dep env c =
 	  ls, None
       | Some b ->
 	  let ty = Global.type_of_global r in
-	  let (_, vars), env, _ = decomp_type_quantifiers env ty in
+	  let (tvm, vars), env, ty = decomp_type_quantifiers env ty in
+	  let tyl, _ = decompose_arrows ty in
+	  let tyl = List.map (tr_type dep tvm env) tyl in
 	  let tvm, env, b = decomp_type_lambdas Idmap.empty env vars b in
 	  let (bv, vsl), env, b = 
-	    decomp_lambdas dep tvm Idmap.empty env ls.ls_args b 
+	    decomp_lambdas dep tvm Idmap.empty env tyl b 
 	  in
 	  begin match ls.ls_value with
 	    | None -> 

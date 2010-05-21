@@ -3,10 +3,12 @@ Require Export ZArith.
 Open Scope Z_scope.
 Require Export List.
 
-
 Ltac ae := why "alt-ergo".
 Ltac z3 := why "z3".
 Ltac spass := why "spass".
+
+Print length.
+
 
 (* type definitions *)
 
@@ -67,12 +69,18 @@ Goal id nat O = O.
 ae.
 Qed.
 
+(* recursive function definition *)
+
+Goal length (cons 1 (cons 2 nil)) = S (S O).
+ae.
+Qed.
+
 (* recursive predicate definition *)
 
 Print In.
 
 Goal In 0 (cons 1 (cons 0 nil)).
-ae.
+try ae.
 (* ICI *)
 Admitted.
 
@@ -124,9 +132,8 @@ with forest_size (f:forest) : Z := match f with
   | Nil => 0
   | Cons t f => tree_size t + forest_size f end.
 
-Print tree_size.
 
-Goal forall x : tree, x=x.
+Goal tree_size Leaf = 0.
 ae.
 Qed.
 
@@ -147,6 +154,21 @@ with pforest (a:Set) : Set :=
 Goal forall x : ptree Z, x=x.
 ae.
 Qed.
+
+Fixpoint ptree_size (a:Set) (t:ptree a) : Z := match t with
+  | PLeaf => 0
+  | PNode _ f => 1 + pforest_size _ f end
+with pforest_size (a:Set) (f:pforest a) : Z := match f with
+  | PNil => 0
+  | PCons t f => ptree_size _ t + pforest_size _ f end.
+
+Goal ptree_size _ (@PLeaf Z) = 0.
+ae.
+Qed.
+
+Goal forall (a:Set), ptree_size a (PLeaf _) = 0.
+(* TODO: intro context *)
+Admitted.
 
 (* the same, without parameters *)
 

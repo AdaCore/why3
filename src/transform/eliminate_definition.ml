@@ -70,7 +70,8 @@ let rec f_insert hd f = match f.f_node with
   | _ -> f_iff_simp hd f
 
 let add_ld func pred axl d = match d with
-  | _, None -> axl, d
+  | _, None -> 
+      axl, d
   | ls, Some ld ->
       let vl,e = open_ls_defn ld in begin match e with
         | Term t when func ->
@@ -88,21 +89,24 @@ let add_ld func pred axl d = match d with
         | _ -> axl, d
       end
 
-let elim func pred d = match d.d_node with
-  | Dlogic l ->
+let elim func pred mutual d = match d.d_node with
+  | Dlogic l when not mutual || List.length l > 1 ->
       let axl, l = map_fold_left (add_ld func pred) [] l in
       let d = create_logic_decl l in
       d :: List.rev axl
   | _ -> [d]
 
 let eliminate_definition_func =
-  Register.store (fun () -> Trans.decl (elim true false) None)
+  Register.store (fun () -> Trans.decl (elim true false false) None)
 
 let eliminate_definition_pred =
-  Register.store (fun () -> Trans.decl (elim false true) None)
+  Register.store (fun () -> Trans.decl (elim false true false) None)
 
 let eliminate_definition =
-  Register.store (fun () -> Trans.decl (elim true true) None)
+  Register.store (fun () -> Trans.decl (elim true true false) None)
+
+let eliminate_mutual_recursion =
+  Register.store (fun () -> Trans.decl (elim true true true) None)
 
 let () =
   Register.register_transform "eliminate_definition_func"
@@ -110,5 +114,8 @@ let () =
   Register.register_transform "eliminate_definition_pred"
                                eliminate_definition_pred;
   Register.register_transform "eliminate_definition"
-                               eliminate_definition
+                               eliminate_definition;
+  Register.register_transform "eliminate_mutual_recursion"
+                               eliminate_mutual_recursion
+
 
