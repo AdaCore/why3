@@ -214,12 +214,12 @@ $(PGMCMO) $(PGMCMX): INCLUDES = -I src/programs
 byte: bin/whyml.byte
 opt:  bin/whyml.opt
 
-bin/whyml.opt: src/why.cmxa $(PGMCMX)
+bin/whyml.opt: src/why.cmxa $(PGMCMX) src/main.cmx
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/whyml.byte: src/why.cma $(PGMCMO)
+bin/whyml.byte: src/why.cma $(PGMCMO) src/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
@@ -242,7 +242,7 @@ clean::
 # test target
 
 %: %.mlw bin/whyml.byte
-	bin/whyml.byte -L theories $*.mlw
+	bin/whyml.byte $*.mlw
 
 ###############
 # proof manager
@@ -475,7 +475,7 @@ clean::
 bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@
 	sh bench/bench \
 	    "bin/why.@OCAMLBEST@" \
-	    "bin/whyml.@OCAMLBEST@ -L theories"
+	    "bin/whyml.@OCAMLBEST@"
 
 BENCH_PLUGINS_CMO := helloworld.cmo simplify_array.cmo
 BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))
@@ -516,10 +516,10 @@ test: bin/why.byte $(TOOLS)
 	@for i in output_coq/*.v; do printf "coq $$i\\n" && coqc $$i ; done
 
 testl: bin/whyml.byte
-	ocamlrun -bt bin/whyml.byte -L theories/ tests/test-pgm-jcf.mlw
+	ocamlrun -bt bin/whyml.byte tests/test-pgm-jcf.mlw
 
 testl-type: bin/whyml.byte
-	ocamlrun -bt bin/whyml.byte --type-only -L theories/ tests/test-pgm-jcf.mlw
+	ocamlrun -bt bin/whyml.byte --type-only tests/test-pgm-jcf.mlw
 
 ###############
 # installation

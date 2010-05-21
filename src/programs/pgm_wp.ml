@@ -336,10 +336,10 @@ let decl env = function
   | Pgm_ttree.Dlet (ls, e) ->
       let e = expr env e in
       (* DEBUG *)
-      eprintf "@[--effect %a-----@\n  %a@]@\n----------------@." 
-	Pretty.print_ls ls print_type_v e.expr_type_v;
+      (* eprintf "@[--effect %a-----@\n  %a@]@\n----------------@."  *)
+	(* Pretty.print_ls ls print_type_v e.expr_type_v; *)
       let f = wp env e in
-      eprintf "wp = %a@\n----------------@." Pretty.print_fmla f;
+      (* eprintf "wp = %a@\n----------------@." Pretty.print_fmla f; *)
       let env = add_wp_decl ls f env in
       let env = add_global ls e.expr_type_v env in
       env

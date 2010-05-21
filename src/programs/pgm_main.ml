@@ -22,6 +22,7 @@
 open Format
 open Why
 
+(****
 let files = ref []
 let parse_only = ref false
 let type_only = ref false
@@ -41,6 +42,7 @@ let () =
     ]
     (fun f -> files := f :: !files)
     "usage: whyl [options] files..."
+***)
 
 let rec report fmt = function
   | Lexer.Error e ->
@@ -59,41 +61,37 @@ let rec report fmt = function
       Denv.report fmt e
   | e ->
       raise e
-(*       fprintf fmt "anomaly: %s" (Printexc.to_string e) *)
 
 open Pgm_ptree
-open Theory
 
-let env = Env.create_env (Typing.retrieve !loadpath)
+let parse_only _env file c =
+  let lb = Lexing.from_channel c in
+  Loc.set_file file lb;
+  ignore (Pgm_lexer.parse_file lb)
 
-let type_file file =
-  let c = open_in file in
+let read_channel 
+    ?(debug=false) ?(parse_only=false) ?(type_only=false) env file c =
+  ignore (debug);
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
   let p = Pgm_lexer.parse_file lb in 
-  close_in c;
-  if !parse_only then raise Exit;
-  let uc = Theory.create_theory (Ident.id_fresh "Pgm") in
-  let th = Env.find_theory env ["programs"] "Prelude" in
-  let uc = Theory.use_export uc th in
-  let uc, dl = Pgm_typing.file env uc p in
-  if !type_only then raise Exit;
-  let th = Pgm_wp.file uc dl in
-  printf "%a@." Pretty.print_theory th;
-  ()
-
-let handle_file file =
-  try
-    type_file file
-  with Exit -> 
-    ()
+  if parse_only then 
+    Theory.Mnm.empty
+  else begin
+    let uc = Theory.create_theory (Ident.id_fresh "Pgm") in
+    let th = Env.find_theory env ["programs"] "Prelude" in
+    let uc = Theory.use_export uc th in
+    let uc, dl = Pgm_typing.file env uc p in
+    if type_only then 
+      Theory.Mnm.empty
+    else begin
+      let th = Pgm_wp.file uc dl in
+      Theory.Mnm.add "Pgm" th Theory.Mnm.empty
+    end
+  end
 
 let () =
-  try
-    List.iter handle_file !files
-  with e when not !debug ->
-    eprintf "%a@." report e;
-    exit 1
+  Env.register_format "whyml" ["mlw"] read_channel report
 
 (*
 Local Variables: 

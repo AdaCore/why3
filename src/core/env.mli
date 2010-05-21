@@ -37,24 +37,24 @@ exception TheoryNotFound of string list * string
 
 (** Parsers *)
 
-type parse_only   = env -> string -> in_channel -> unit
-type read_channel = env -> string -> in_channel -> theory Mnm.t
+type read_channel = 
+  ?debug:bool -> ?parse_only:bool -> ?type_only:bool ->
+  env -> string -> in_channel -> theory Mnm.t
+
 type error_report = Format.formatter -> exn -> unit
 
-val register_parser :
-  string -> string list -> parse_only -> read_channel -> error_report -> unit
-  (** [register_parser name extensions f1 f2] registers a new parser
+val register_format :
+  string -> string list -> read_channel -> error_report -> unit
+  (** [register_format name extensions f1 f2] registers a new format
       under name [name], for files with extensions in list [extensions];
-      [f1] is the function to perform parsing only;
-      [f2] is the function to retrieve a list of theories from a channel *)
-
-val parse_only   : ?name:string -> parse_only
+      [f1] is the function to perform parsing;
+      [f2] is the function to report errors *)
 
 val read_channel : ?name:string -> read_channel
 
 val report : ?name:string -> string -> error_report
 
-exception UnknownParser of string (* parser name *)
+exception UnknownFormat of string (* format name *)
 
 val list_formats : unit -> (string * string list) list
 

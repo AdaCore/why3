@@ -27,8 +27,10 @@ open Driver
 open Trans
 
 let usage_msg =
-  "Usage: why [options] [[file|-] \
+  sprintf
+  "Usage: %s [options] [[file|-] \
    [-a <transform> -t <theory> [-g <goal>]...]...]..."
+  (Filename.basename Sys.argv.(0))
 
 let opt_queue = Queue.create ()
 
@@ -291,7 +293,7 @@ let rec report fmt = function
       Prover.report fmt e
   | Register.Error e ->
       Register.report fmt e
-  | Env.UnknownParser p ->
+  | Env.UnknownFormat p ->
       fprintf fmt "unknown format '%s'" p
   | e -> 
       fprintf fmt "anomaly: %s" (Printexc.to_string e)
@@ -408,21 +410,21 @@ let do_input env drv = function
       in
       let report = Env.report ?name:!opt_parser fname in
       try
-	if !opt_parse_only then begin
-	  Env.parse_only ?name:!opt_parser env fname cin;
-          close_in cin
-	end else begin
-          let m = Env.read_channel ?name:!opt_parser env fname cin in
-          close_in cin;
-          if !opt_type_only then ()
-          else if Queue.is_empty tlist then
-            let glist = Queue.create () in
-            let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-            let do_th _ (t,th) = do_theory drv fname t th trans glist in
-            Ident.Mid.iter do_th (Mnm.fold add_th m Ident.Mid.empty)
-          else
-            Queue.iter (do_local_theory drv fname m) tlist
-	end
+	let m = 
+	  Env.read_channel ?name:!opt_parser ~debug:!opt_debug 
+	    ~parse_only:!opt_parse_only ~type_only:!opt_type_only
+	    env fname cin 
+	in
+        close_in cin;
+        if !opt_type_only then 
+	  ()
+        else if Queue.is_empty tlist then
+          let glist = Queue.create () in
+          let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
+          let do_th _ (t,th) = do_theory drv fname t th trans glist in
+          Ident.Mid.iter do_th (Mnm.fold add_th m Ident.Mid.empty)
+        else
+          Queue.iter (do_local_theory drv fname m) tlist
       with 
 	| Loc.Located (loc, e) ->
 	    eprintf "%a%a" Loc.report_position loc report e; exit 1

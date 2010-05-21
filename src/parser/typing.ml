@@ -1039,9 +1039,11 @@ let read_file env file =
   let tl = load_file file in
   type_theories env tl
 
-let read_channel env file ic =
+let read_channel 
+    ?(debug=false) ?(parse_only=false) ?(type_only=false) env file ic =
+  ignore (debug, type_only);
   let tl = load_channel file ic in
-  type_theories env tl
+  if parse_only then Mnm.empty else type_theories env tl
 
 let locate_file lp sl =
   let f = List.fold_left Filename.concat "" sl ^ ".why" in
@@ -1058,12 +1060,6 @@ let retrieve lp env sl =
 
 (** register Why parser *)
 
-let parse_only _env fname cin =
-  let lb = Lexing.from_channel cin in
-  Loc.set_file fname lb;
-  ignore (Lexer.parse_logic_file lb);
-  close_in cin
-
 let error_report fmt = function
   | Lexer.Error e ->
       fprintf fmt "lexical error: %a" Lexer.report e;
@@ -1076,7 +1072,7 @@ let error_report fmt = function
   | e -> 
       raise e
 
-let () = Env.register_parser "why" ["why"] parse_only read_channel error_report
+let () = Env.register_format "why" ["why"] read_channel error_report
 
 (*
 Local Variables:
