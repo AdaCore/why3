@@ -28,10 +28,6 @@ open Env
 val retrieve : string list -> retrieve_theory
   (** creates a new typing environment for a given loadpath *)
 
-val read_file : env -> string -> theory Mnm.t
-
-val read_channel : env -> string -> in_channel -> theory Mnm.t
-
 (** incremental parsing *)
 
 val add_decl : env -> theory Mnm.t -> theory_uc -> Ptree.decl -> theory_uc

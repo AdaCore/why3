@@ -385,12 +385,10 @@ let do_input env drv = function
         | f   -> f, open_in f
       in
       if !opt_parse_only then begin
-        let lb = Lexing.from_channel cin in
-        Loc.set_file fname lb;
-        ignore (Lexer.parse_logic_file lb);
-        close_in cin;
+	Env.parse_only env fname cin;
+        close_in cin
       end else begin
-        let m = Typing.read_channel env fname cin in
+        let m = Env.read_channel env fname cin in
         close_in cin;
         if !opt_type_only then ()
         else if Queue.is_empty tlist then

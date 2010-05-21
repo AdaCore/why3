@@ -12,12 +12,12 @@ parameter imp_sub :
 
 parameter r : int ref
 
+parameter write : v:int -> {} unit writes r { !r = v }
+
 let ff () = 
-  { !r = 1 } 
-  label L:
-  assume { !r = 42 };
-  !r + 2
-  { old(!r) = 1 and result=3 }
+  { true } 
+  1+2
+  { result = 3 }
 
 
 (*

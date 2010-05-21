@@ -63,3 +63,49 @@ let find_theory env sl s =
 
 let env_tag env = env.env_tag
 
+
+(** Parsers *)
+
+type parse_only   = env -> string -> in_channel -> unit
+type read_channel = env -> string -> in_channel -> theory Mnm.t
+
+let parse_only_table   = Hashtbl.create 17 (* parser name -> parse_only *)
+let read_channel_table = Hashtbl.create 17 (* parser name -> read_channel *)
+let suffixes_table     = Hashtbl.create 17 (* suffix -> parser name *)
+
+let register_parser name suffixes po rc =
+  Hashtbl.add parse_only_table   name po;
+  Hashtbl.add read_channel_table name rc;
+  List.iter (fun s -> Hashtbl.add suffixes_table ("." ^ s) name) suffixes
+
+exception UnknownParser of string (* parser name *)
+
+let parser_for_file ?name file = match name with
+  | None -> 
+      begin try 
+	let ext = 
+	  let s = Filename.chop_extension file in
+	  let n = String.length s in
+	  String.sub file n (String.length file - n)
+	in
+	Hashtbl.find suffixes_table ext
+      with Invalid_argument _ | Not_found -> 
+	"why"
+      end
+  | Some n -> 
+      n
+
+let find_parser table n =
+  try Hashtbl.find table n
+  with Not_found -> raise (UnknownParser n)
+
+let parse_only ?name env file ic =
+  let n = parser_for_file ?name file in 
+  let po = find_parser parse_only_table n in
+  po env file ic
+
+let read_channel ?name env file ic =
+  let n = parser_for_file ?name file in 
+  let rc = find_parser read_channel_table n in
+  rc env file ic
+

@@ -41,6 +41,7 @@ let empty_env uc = { uc = uc; globals = Mls.empty; locals = Mvs.empty }
 let add_local x v env = { env with locals = Mvs.add x v env.locals }
 let add_global x v env = { env with globals = Mls.add x v env.globals }
 
+let ts_arrow uc = ns_find_ts (get_namespace uc) ["arrow"]
 let ts_ref   env = ns_find_ts (get_namespace env.uc) ["ref"]
 let ts_label env = ns_find_ts (get_namespace env.uc) ["label"]
 
@@ -72,6 +73,40 @@ let post_effect env ef ((_,q),ql) =
 let add_binder env (x, v) = add_local x v env
 let add_binders = List.fold_left add_binder
 
+let v_result ty = create_vsymbol (id_fresh "result") ty
+
+let post_map f ((v, q), ql) = 
+  (v, f q), List.map (fun (e,(v,q)) -> e, (v, f q)) ql
+
+let type_c_of_type_v env = function
+  | Tarrow ([], c) ->
+      c
+  | v ->
+      let ty = purify env.uc v in
+      { c_result_type = v;
+	c_effect      = E.empty;
+	c_pre         = f_true;
+	c_post        = (v_result ty, f_true), []; }
+
+let subst1 vs1 vs2 = Mvs.add vs1 (t_var vs2) Mvs.empty
+
+let rec subst_type_c s c = 
+  { c_result_type = subst_type_v s c.c_result_type;
+    c_effect      = c.c_effect;
+    c_pre         = f_subst s c.c_pre;
+    c_post        = post_map (f_subst s) c.c_post; }
+
+and subst_type_v s = function
+  | Tpure _ as v -> v
+  | Tarrow (bl, c) -> Tarrow (bl, subst_type_c s c)
+
+let apply_type_v env v vs = match v with
+  | Tarrow ((x, _) :: bl, c) ->
+      let c = type_c_of_type_v env (Tarrow (bl, c)) in
+      subst_type_c (subst1 x vs) c
+  | Tarrow ([], _) | Tpure _ -> 
+      assert false
+
 let rec expr env e =
   let ty = e.Pgm_ttree.expr_type in
   let loc = e.Pgm_ttree.expr_loc in
@@ -89,8 +124,10 @@ and expr_desc env _loc ty = function
   | Pgm_ttree.Eglobal ls ->
       assert (Mls.mem ls env.globals);
       Eglobal ls, Mls.find ls env.globals, E.empty
-  | Pgm_ttree.Eapply _ ->
-      assert false (*TODO*)
+  | Pgm_ttree.Eapply (e1, vs) ->
+      let e1 = expr env e1 in
+      let c = apply_type_v env e1.expr_type_v vs in
+      Eany c, c.c_result_type, c.c_effect
   | Pgm_ttree.Eapply_ref _ ->
       assert false (*TODO*)
   | Pgm_ttree.Efun (bl, t) ->
@@ -137,10 +174,17 @@ and recfun _env _def =
 
 (* phase 4: weakest preconditions *******************************************)
 
-(* TODO: use simp forms / tag with label "WP" *)
-let wp_and     = f_and
-let wp_implies = f_implies
-let wp_forall  = f_forall
+(* smart constructors for building WPs
+   TODO: use simp forms / tag with label "WP" *)
+
+let wp_and ?(sym=false) f1 f2 = 
+  (* TODO: tag instead? *)
+  if sym then f_and_simp f1 f2 else f_and_simp f1 (f_implies_simp f1 f2) 
+
+let wp_implies = f_implies_simp
+let wp_forall  = f_forall_simp
+
+(* utility functions for building WPs *)
 
 let fresh_label env =
   let ty = ty_app (ts_label env) [] in
@@ -151,9 +195,6 @@ let wp_binder (x, tv) f = match tv with
   | Tarrow _ -> f
 
 let wp_binders = List.fold_right wp_binder 
-
-let post_map f ((v, q), ql) = 
-  (v, f q), List.map (fun (e,(v,q)) -> e, (v, f q)) ql
 
 (* replace old(t) with at(t,lab) everywhere in formula f *)
 let rec old_label env lab f =
@@ -218,8 +259,6 @@ let rec ls_assoc ls = function
   | (ls', x) :: _ when ls_equal ls ls' -> x
   | _ :: r -> ls_assoc ls r
 
-let v_result ty = create_vsymbol (id_fresh "result") ty
-
 let exn_v_result ls = match ls.ls_args with
   | [] -> None
   | [ty] -> Some (v_result ty)
@@ -238,6 +277,8 @@ let saturate_post ty ef f (_, ql) =
   let set_post x = try x, ls_assoc x ql with Not_found -> default_exn_post x in
   let xs = Sls.elements ef.E.raises in
   ((v_result ty, f), List.map set_post xs)
+
+(* Recursive computation of the weakest precondition *)
 
 let rec wp_expr env e q = 
   let lab = fresh_label env in
@@ -265,7 +306,7 @@ and wp_desc env e q = match e.expr_desc with
       wp_and f q
   | Eassert (Pgm_ptree.Acheck, f) ->
       let (_, q), _ = q in
-      f_and f q (* symetric conjunction instead *)
+      wp_and ~sym:true f q
   | Eassert (Pgm_ptree.Aassume, f) ->
       let (_, q), _ = q in
       wp_implies f q

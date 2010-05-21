@@ -1055,6 +1055,17 @@ let retrieve lp env sl =
   let file = locate_file lp sl in
   read_file env file
 
+
+(** register Why parser *)
+
+let parse_only _env fname cin =
+  let lb = Lexing.from_channel cin in
+  Loc.set_file fname lb;
+  ignore (Lexer.parse_logic_file lb);
+  close_in cin
+
+let () = Env.register_parser "why" ["why"] parse_only read_channel
+
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.. test"

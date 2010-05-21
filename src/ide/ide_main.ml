@@ -89,7 +89,7 @@ let env = Env.create_env (Typing.retrieve !loadpath)
 
 let theories = 
   let cin = open_in fname in
-  let m = Typing.read_channel env fname cin in
+  let m = Env.read_channel env fname cin in
   close_in cin;
   m
 

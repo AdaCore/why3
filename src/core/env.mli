@@ -34,3 +34,22 @@ val env_tag : env -> int
 
 exception TheoryNotFound of string list * string
 
+
+(** Parsers *)
+
+type parse_only   = env -> string -> in_channel -> unit
+type read_channel = env -> string -> in_channel -> theory Mnm.t
+
+val register_parser :
+  string -> string list -> parse_only -> read_channel -> unit
+  (** [register_parser name extensions f1 f2] registers a new parser
+      under name [name], for files with extensions in list [extensions];
+      [f1] is the function to perform parsing only;
+      [f2] is the function to retrieve a list of theories from a channel *)
+
+val parse_only   : ?name:string -> parse_only
+
+val read_channel : ?name:string -> read_channel
+
+exception UnknownParser of string (* parser name *)
+
