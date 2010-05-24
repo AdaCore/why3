@@ -164,7 +164,7 @@ let option_list = Arg.align [
   "-a", Arg.String add_opt_trans, 
   "<transformation> Add a transformation to apply to the task" ;
   "--apply-transform", Arg.String add_opt_trans, 
-  " same as -o" ]
+  " same as -a" ]
 
 let () =
   Arg.parse option_list add_opt_file usage_msg;
