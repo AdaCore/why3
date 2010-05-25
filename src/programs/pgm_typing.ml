@@ -89,7 +89,10 @@ type genv = {
 
 let create_genv uc = {
   uc      = uc;
-  globals = Mstr.empty;
+  globals = 
+    Mstr.add "ref" (ls_ref uc)
+    (Mstr.add "infix :=" (ls_assign uc) 
+    Mstr.empty);
   exceptions = Mstr.empty;
   ts_bool = ns_find_ts (get_namespace uc) ["bool"];
   ts_unit = ns_find_ts (get_namespace uc) ["unit"];

@@ -4,9 +4,9 @@ open Ident
 open Theory
 open Term
 open Ty
-open Pgm_typing
+module E = Pgm_effect
 
-type effect = Pgm_effect.t
+type effect = E.t
 
 type pre = Term.fmla
 
@@ -40,17 +40,75 @@ type env = {
   ls_old : lsymbol;
 }
 
+let find_ts uc = ns_find_ts (get_namespace uc)
+let find_ls uc = ns_find_ls (get_namespace uc)
+
+(* predefined lsymbols are memoized wrt the lsymbol for type "ref" *)
+let memo_ls f =
+  let h = Hts.create 17 in
+  fun uc ->
+    let ts_ref = find_ts uc ["ref"] in
+    try Hts.find h ts_ref
+    with Not_found -> let s = f uc ts_ref in Hts.add h ts_ref s; s
+
+(* logic ref ('a) : 'a ref *)
+let ls_ref = memo_ls 
+  (fun _uc ts_ref ->
+     let a = ty_var (create_tvsymbol (id_fresh "a")) in
+     create_lsymbol (id_fresh "ref") [a] (Some (ty_app ts_ref [a])))
+
+(* logic (:=)('a ref, 'a) : unit *)
+let ls_assign = memo_ls
+  (fun uc ts_ref ->
+     let ty_unit = ty_app (find_ts uc ["unit"]) [] in
+     let a = ty_var (create_tvsymbol (id_fresh "a")) in
+     create_lsymbol (id_fresh "infix :=") [ty_app ts_ref [a]; a] (Some ty_unit))
+
+let v_result ty = create_vsymbol (id_fresh "result") ty
+
+let add_type_v_ref uc m =
+  let ts_ref = find_ts uc ["ref"] in
+  let a = ty_var (create_tvsymbol (id_fresh "a")) in
+  let x = create_vsymbol (id_fresh "x") a in
+  let ty = ty_app ts_ref [a] in
+  let result = v_result ty in
+  let q = f_equ (t_app (find_ls uc ["prefix !"]) [t_var result] a) (t_var x) in
+  let c = { c_result_type = Tpure ty;
+	    c_effect      = Pgm_effect.empty;
+	    c_pre         = f_true;
+	    c_post        = (result, q), []; } in
+  let v = Tarrow ([x, Tpure a], c) in
+  Mls.add (ls_ref uc) v m
+
+let add_type_v_assign uc m =
+  let ts_ref = find_ts uc ["ref"] in
+  let a = ty_var (create_tvsymbol (id_fresh "a")) in
+  let a_ref = ty_app ts_ref [a] in
+  let x = create_vsymbol (id_fresh "x") a_ref in
+  let y = create_vsymbol (id_fresh "y") a in
+  let ty = ty_app (find_ts uc ["unit"]) [] in
+  let result = v_result ty in
+  let q = f_equ (t_app (find_ls uc ["prefix !"]) [t_var x] a) (t_var y) in
+  let c = { c_result_type = Tpure ty;
+	    c_effect      = E.add_write (E.Rlocal x) E.empty;
+	    c_pre         = f_true;
+	    c_post        = (result, q), []; } in
+  let v = Tarrow ([x, Tpure a_ref; y, Tpure a], c) in
+  Mls.add (ls_assign uc) v m
+
 let empty_env uc = { 
-  uc = uc; globals = Mls.empty; locals = Mvs.empty;
+  uc = uc; 
+  globals = add_type_v_ref uc (add_type_v_assign uc Mls.empty);
+  locals = Mvs.empty;
   (* types *)
-  ts_arrow = ns_find_ts (get_namespace uc) ["arrow"];
-  ts_label = ns_find_ts (get_namespace uc) ["label"];
-  ts_ref   = ns_find_ts (get_namespace uc) ["ref"];
+  ts_arrow = find_ts uc ["arrow"];
+  ts_label = find_ts uc ["label"];
+  ts_ref   = find_ts uc ["ref"];
   (* functions *)
-  ls_at = ns_find_ls (get_namespace uc) ["at"];
-  ls_bang = ns_find_ls (get_namespace uc) ["prefix !"];
-  ls_old = ns_find_ls (get_namespace uc) ["old"];
-}
+  ls_at    = find_ls uc ["at"];
+  ls_bang  = find_ls uc ["prefix !"];
+  ls_old   = find_ls uc ["old"];
+}    
 
 let add_local x v env = { env with locals = Mvs.add x v env.locals }
 
@@ -73,8 +131,6 @@ let rec purify uc = function
 
 let post_map f ((v, q), ql) = 
   (v, f q), List.map (fun (e,(v,q)) -> e, (v, f q)) ql
-
-let v_result ty = create_vsymbol (id_fresh "result") ty
 
 let type_c_of_type_v env = function
   | Tarrow ([], c) ->

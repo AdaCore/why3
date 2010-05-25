@@ -16,9 +16,7 @@ theory Prelude
   type ('a, 'b) arrow
 
   type  'a ref
-  logic ref ('a)     : 'a ref
   logic (!_)('a ref) : 'a
-  logic (:=)('a ref, 'a) : unit
 
   type  label
   logic at  ('a, label) : 'a

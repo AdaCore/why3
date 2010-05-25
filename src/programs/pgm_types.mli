@@ -41,6 +41,9 @@ type env = private {
   ls_old  : lsymbol;
 }
 
+val ls_ref    : theory_uc -> lsymbol (* ref: 'a -> 'a ref *)
+val ls_assign : theory_uc -> lsymbol (* := : 'a ref -> 'a -> unit *)
+
 val purify : theory_uc -> type_v -> ty
 
 val apply_type_v : env -> type_v -> vsymbol -> type_c
