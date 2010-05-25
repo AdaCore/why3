@@ -210,8 +210,74 @@ let bnd_list = ref []
 
 *)
 
-let rec term _t = 
-  assert false
+let prelude_to_load = ref true
+
+let dummy_symbol = (Obj.magic 0 : Term.lsymbol)
+
+let symbol_le_int = ref dummy_symbol
+let symbol_le_real = ref dummy_symbol
+let symbol_ge_int = ref dummy_symbol
+let symbol_ge_real = ref dummy_symbol
+
+let symbol_add_int = ref dummy_symbol
+
+let load_prelude (drv : Driver.driver_query) =
+  if !prelude_to_load then
+    begin
+      let env = Driver.query_env drv in
+      let int_theory = Env.find_theory env ["int"] "Int" in
+      let real_theory = Env.find_theory env ["real"] "Real" in
+      symbol_le_int := 
+        Theory.ns_find_ls int_theory.Theory.th_export ["infix <="];
+      symbol_le_real := 
+        Theory.ns_find_ls real_theory.Theory.th_export ["infix <="];
+      symbol_ge_int := 
+        Theory.ns_find_ls int_theory.Theory.th_export ["infix >="];
+      symbol_ge_real := 
+        Theory.ns_find_ls real_theory.Theory.th_export ["infix >="];
+      symbol_add_int := 
+        Theory.ns_find_ls int_theory.Theory.th_export ["infix +"];
+      prelude_to_load := false;
+    end
+
+
+(* true when id is <= on R or Z *)
+let is_le_num id = 
+  ls_equal id !symbol_le_int
+  || ls_equal id !symbol_le_real
+
+(* true when id is >= on R or Z *)
+let is_ge_num id = 
+  ls_equal id !symbol_ge_int
+  || ls_equal id !symbol_ge_real
+
+(* true when id is = *)
+let is_eq id = ls_equal id Term.ps_equ
+
+(* true when id is <> *)
+let is_neq id = ls_equal id Term.ps_neq
+
+
+let eval_constant c = 
+  match c with
+    | ConstInt s -> s
+    | ConstReal(RConstDecimal(_e,_f,_exp)) -> assert false 
+    | ConstReal(RConstHexa(_e,_f,_exp)) -> assert false
+
+let rec term t = 
+  match t.t_node with
+    | Tconst c -> Gcst (eval_constant c)
+    | Tbvar _n -> assert false
+    | Tvar _v -> assert false
+    | Tapp(f,[t1;t2]) when ls_equal f !symbol_add_int -> 
+        Gadd (term t1, term t2)
+          (* TODO: neg, abs, + real, - , * , /, real_of_int,
+             etc. *)
+    | Tapp(_,_) -> raise NotGappa        
+    | Tif(_f,_t1,_t2) -> assert false
+    | Tlet(_t,_tb) -> assert false
+    | Tcase(_tl,_tbl) -> assert false
+    | Teps _fb -> assert false
 (*
 function
   | t when is_constant t ->
@@ -480,41 +546,6 @@ let gando = function
 
 (* recognition of a Gappa predicate *)
 
-let prelude_to_load = ref true
-
-let dummy_symbol = (Obj.magic 0 : Term.lsymbol)
-
-let symbol_le_int = ref dummy_symbol
-let symbol_le_real = ref dummy_symbol
-
-let load_prelude (drv : Driver.driver_query) =
-  if !prelude_to_load then
-    begin
-      let env = Driver.query_env drv in
-      let int_theory = Env.find_theory env ["int"] "Int" in
-      let real_theory = Env.find_theory env ["real"] "Real" in
-      symbol_le_int := 
-        Theory.ns_find_ls int_theory.Theory.th_export ["infix <="];
-      symbol_le_real := 
-        Theory.ns_find_ls real_theory.Theory.th_export ["infix <="];
-      prelude_to_load := false;
-    end
-
-
-(* true when id is <= on R or Z *)
-let is_le_num id = 
-  ls_equal id !symbol_le_int
-  || ls_equal id !symbol_le_real
-
-let is_ge_num _id = assert false
- (* true when id is >= on R or Z *)
-
-let is_eq _id = assert false
- (* true when id is = *)
-
-let is_neq _id = assert false
- (* true when id is <> *)
-
 let rec gpred def f =
   match f.f_node with
   | Fapp (id, [t1; t2]) when is_le_num id ->
@@ -661,13 +692,17 @@ let rec intros ctx = function
       ctx, c
 *)
 
-let process_goal _g = assert false 
+let rec intros g =
+  match g.f_node with
+    | Fquant(Fforall,fq) ->
+        let  _,_,f = f_open_quant fq in
+        intros f
+    | Fbinop(Fimplies,_f1,_f2) ->
+        assert false (* TODO *)
+    | _ -> g
 (*
- (ctx, concl) =
-  let ctx,concl = intros ctx concl in
-    let el, pl =
-      List.fold_left
-        (fun ((el, pl) as acc) h ->
+    List.fold_left
+      (fun ((el, pl) as acc) h ->
           match h with
             | Svar _ -> acc
             | Spred (_, p) -> 
@@ -680,16 +715,25 @@ let process_goal _g = assert false
                 ep :: el, pl)
         ([],[]) ctx
 	in
-  match gpred false concl with
+*)
+
+let process_goal fmt g = 
+  let (*el,*)pl = intros g in
+  let concl = gpred false pl in
+(*
     | None -> (* goal is not a gappa prop *)
 	if debug then Format.eprintf "not a gappa prop; skipped@."
     | Some p ->
+*)
+(*
         let gconcl = List.fold_right (fun p acc -> Gimplies (p, acc)) pl p in
         let el = List.rev (List.flatten el) in
 	Queue.add (el, gconcl) queue
 *)
+  print_obligation fmt ([],concl) 
 
-let print_decl drv _fmt d = match d.d_node with
+
+let print_decl drv fmt d = match d.d_node with
   | Dtype _dl -> false
   | Dlogic _dl -> false
   | Dind _ -> unsupportedDecl d 
@@ -702,7 +746,7 @@ let print_decl drv _fmt d = match d.d_node with
         print_ident pr.pr_name (print_fmla drv) f; true
 *)
   | Dprop (Pgoal, _pr, f) ->
-      process_goal f
+      process_goal fmt f; true
 	(*
       assert false
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
