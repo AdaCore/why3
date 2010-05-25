@@ -29,6 +29,7 @@ open Term
 open Decl
 open Task
 
+
 (** module with printing functions *)
 module Debug = struct
   let print_mtv vprinter fmter m =
@@ -47,8 +48,10 @@ module Debug = struct
         else Format.fprintf fmter "@[%a@], %a" printer e (print_list printer) es
 
   let debug x = Format.eprintf "%s@." x
-
 end
+
+
+
 
 (** {2 small functions} *)
 
@@ -107,10 +110,14 @@ module Utils = struct
   (** returns all type vars (free) in given fmla [f] *)
   let rec f_find_type_vars acc f = match f.f_node with
     | Fapp (p, terms) ->
-      List.fold_left t_find_type_vars acc terms
+      let new_acc = if isSome p.ls_value 
+        then find_tyvars acc (fromSome p.ls_value) else acc in
+      List.fold_left t_find_type_vars new_acc terms
     | _ -> f_fold t_find_type_vars f_find_type_vars acc f
   (** returns all type vars in given term *)
-  and t_find_type_vars acc t = match t.t_node with
+  and t_find_type_vars acc t =
+    let acc = find_tyvars acc t.t_ty in
+    match t.t_node with
     | Tvar x -> find_tyvars acc x.vs_ty
     | _ -> t_fold t_find_type_vars f_find_type_vars acc t
   (** returns all type vars in given lsymbol *)
@@ -135,12 +142,13 @@ module Utils = struct
   It must be compliant with the unification between [left] and [right] *)
   let rec find_matching_vars tv_to_ty left right =
     assert (List.length left = List.length right);
-    Format.eprintf "matching @[%a@] with @[%a@]@."
+    (* Format.eprintf "matching @[%a@] with @[%a@]@."
       (Debug.print_list Pretty.print_ty) left
-      (Debug.print_list Pretty.print_ty) right;
+      (Debug.print_list Pretty.print_ty) right; *)
     let tv_to_ty = List.fold_left2 ty_match tv_to_ty left right in
-    Format.eprintf "gives @[%a@]@." (Debug.print_mtv Pretty.print_ty) tv_to_ty;
-    flush stderr;
+    (* Format.eprintf "gives @[%a@]@."
+      (Debug.print_mtv Pretty.print_ty) tv_to_ty; *)
+    flush stderr;   
     tv_to_ty
 
   module Mint = Map.Make(struct
@@ -238,7 +246,7 @@ module Transform = struct
       let new_f = findL tblL f in
       (* first, remember an order for type vars of new_f *)
       let type_vars = l_find_type_vars new_f in
-      Debug.print_list Pretty.print_ty Format.std_formatter type_vars;
+      (* Debug.print_list Pretty.print_ty Format.std_formatter type_vars; *)
       let int_to_tyvars = bind_nums_to_type_vars new_f in
       (* match types *)
       let result_to_match = fromSome new_f.ls_value in
@@ -246,7 +254,7 @@ module Transform = struct
       let concrete_ty = List.map (fun x-> x.t_ty) terms in
       let tv_to_ty = find_matching_vars tv_to_ty
         (result_to_match :: args_to_match) (t.t_ty :: concrete_ty) in
-      Debug.print_mtv Pretty.print_ty Format.err_formatter tv_to_ty;
+      (* Debug.print_mtv Pretty.print_ty Format.err_formatter tv_to_ty; *)
       (* fresh terms to be added at the beginning of the list of arguments *)
       let new_ty_int = range (List.length type_vars) in
       let new_ty = List.map (fun x -> Mint.find x int_to_tyvars) new_ty_int in
@@ -302,8 +310,8 @@ module Transform = struct
     let varM = List.fold_left (* create a vsymbol for each type var *)
       (fun m x -> Mty.add x (create_vsymbol (id_fresh "v") my_t) m)
       Mty.empty type_vars in
-    Debug.print_mty Pretty.print_vs Format.err_formatter varM;
-    Format.eprintf "-----------@.";
+    (* Debug.print_mty Pretty.print_vs Format.err_formatter varM;
+    Format.eprintf "-----------@."; *)
     (*universal quantification over ty vars*)
     let new_fmla = (fmla_transform tblT tblL varM Mtv.empty fmla) in
     let quantified_fmla = f_forall (map_values varM) [] new_fmla in
@@ -317,14 +325,14 @@ end
 symbols) and a declaration, and returns the corresponding declaration in
 explicit polymorphism logic. *)
 let decl_transform tblT tblL d =
-  Format.eprintf "%a@." Pretty.print_decl d;
+  (* Format.eprintf "%a@." Pretty.print_decl d; *)
   let result = match d.d_node with
     | Dind _inds ->
     failwith "Dind : should not have inductives declarations at this point !"
     | Dtype tys -> Transform.type_transform tblT tys
     | Dlogic decls -> Transform.logic_transform tblL decls
     | Dprop prop -> Transform.prop_transform tblT tblL prop in
-  Format.eprintf "===@.%a@.@." (Debug.print_list Pretty.print_decl) result;
+  (* Format.eprintf "===@.%a@.@." (Debug.print_list Pretty.print_decl) result;*)
   result
 
 
