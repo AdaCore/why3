@@ -208,9 +208,12 @@ let bnd_list = ref []
 
 
 
+*)
 
-
-let rec term = function
+let rec term _t = 
+  assert false
+(*
+function
   | t when is_constant t ->
       Gcst (eval_constant t)
   | Tconst _ ->
@@ -304,14 +307,10 @@ let rec term = function
   (* anything else is generalized as a fresh variable *)
   | Tapp _ as t ->
       Gvar (create_var t)
-
-let termo t = try Some (term (subst_var t)) with NotGappa -> None
-
+*)
 
 
-
-
-
+(*
 
 let ident_printer = 
   let bls = [
@@ -472,34 +471,237 @@ let print_logic_decl drv fmt d =
   if Driver.query_remove drv (fst d).ls_name then
     false else (print_logic_decl drv fmt d; true)
 
-let print_decl drv fmt d = match d.d_node with
-  | Dtype dl ->
+*)
+
+let gando = function
+  | Some p1, Some p2 -> Some (Gand (p1, p2))
+  | (Some _ as v), None | None, (Some _ as v) -> v
+  | None, None -> None
+
+(* recognition of a Gappa predicate *)
+
+let is_le_num _id = assert false
+ (* true when id is <= on R or Z *)
+
+let is_ge_num _id = assert false
+ (* true when id is >= on R or Z *)
+
+let is_eq _id = assert false
+ (* true when id is = *)
+
+let is_neq _id = assert false
+ (* true when id is <> *)
+
+let rec gpred def f =
+  match f.f_node with
+  | Fapp (id, [t1; t2]) when is_le_num id ->
+      begin 
+	match term t1, term t2 with
+	  | (Gcst c1), t2 -> Gge (t2, c1)
+	  | t1, (Gcst c2) -> Gle (t1, c2)
+          | t1, t2 -> Gle (Gsub (t1, t2), "0")
+      end
+  | Fapp (id, [t1; t2]) when is_ge_num id ->
+      begin 
+	match term t1, term t2 with
+	| (Gcst c1), t2 -> Gle (t2, c1)
+	| t1, (Gcst c2) -> Gge (t1, c2)
+        | t1, t2 -> Gge (Gsub (t1, t2), "0")
+      end
+(*
+  | Fbinop(Fand, ...(_, _, Papp (id1, [f1; t1], _), Papp (id2, [t2; f2], _))
+    when (id1 == t_le_real || id1 == t_le_int) && (id2 == t_le_real || id2 == t_le_int)
+    && t1 = t2 && is_constant f1 && is_constant f2 ->
+    begin 
+      try Some (Gin (term t1, eval_constant f1, eval_constant f2))
+      with NotGappa -> None
+    end
+*)
+  | Fapp (id, [t1; t2]) when is_eq id ->
+      begin 
+	match term t1, term t2 with
+          | (Gcst c1), t2 -> Gin (t2, c1, c1)
+          | t1, (Gcst c2) -> Gin (t1, c2, c2)
+          | t1, t2 -> Gin (Gsub (t1, t2), "0", "0")
+      end
+  | Fapp (id, [t1; t2]) when is_neq id ->
+      begin 
+	match term t1, term t2 with
+        | (Gcst c1), t2 -> Gnot (Gin (t2, c1, c1))
+        | t1, (Gcst c2) -> Gnot (Gin (t1, c2, c2))
+        | t1, t2 -> Gnot (Gin (Gsub (t1, t2), "0", "0"))
+      end
+  | Fbinop(Fand, p1, p2) ->
+      begin 
+	try
+	  let p1 = gpred def p1 in
+	    try
+	      let p2 = gpred def p2 in
+		Gand (p1, p2)
+	    with NotGappa -> if def then p1 else raise NotGappa
+	with NotGappa ->
+	  if def then gpred def p2 else raise NotGappa
+      end
+(*
+  | Fbinop(For, p1, p2) ->
+      begin match gpred def p1, gpred def p2 with
+        | Some p1, Some p2 -> Some (Gor (p1, p2))
+        | (Some _ as p1), None when def = false -> p1
+        | None, (Some _ as p2) when def = false -> p2
+        | _ -> None
+      end
+  | Fbinop(Fimplies, p1, p2) ->
+      begin match gpred (not def) p1, gpred def p2 with
+        | Some p1, Some p2 -> Some (Gimplies (p1, p2))
+        | Some p1, None        when def = false -> Some (Gnot p1)
+        | None, (Some _ as p2) when def = false -> p2
+        | _ -> None
+      end
+*)
+  | Fnot p -> Gnot (gpred (not def) p)
+  | Fquant _ 
+  | Fapp _
+  | Fif _
+  | Fbinop _
+  | Ftrue | Ffalse | Flet _ | Fcase _-> (* discarded *)
+      raise NotGappa
+
+let gpred p =
+  (*Format.printf "gpred %a@." Util.print_predicate p;*)
+  gpred p
+
+(* extraction of a list of equalities and possibly a Gappa predicate *)
+
+(*
+let rec ghyp = function
+  | Papp (id, [Tvar x; t], _) when is_eq id ->
+    begin
+      match termo t with
+      | Some t' ->
+          Hashtbl.replace var_table x t';
+          [], None
+      | None -> [], None
+    end
+  | Papp (id, [Tapp (id', [Tvar x], _); t], _) as p
+      when is_eq id && (id' == float_value || id' == exact_value || id' == model_value) ->
+    begin
+      match termo t with
+      | Some t ->
+          let f = field_of_id id' in
+          if Hashtbl.mem def_table (f, x) then
+           (Hashtbl.add def_table (f, x) ();
+            [f, Ident.string x, t], None)
+          else
+            [], gpred true p
+      | None ->
+          [], gpred true p
+    end
+  | Pand (_, _, p1, p2) as p ->
+      begin match ghyp p1, ghyp p2 with
+        | ([], _), ([], _) -> [], gpred true p
+        | (e1,p1), (e2, p2) -> e1 @ e2, gando (p1, p2)
+      end
+  | Pnamed (_, p) ->
+      ghyp p
+  | p ->
+      [], gpred true p
+*)
+
+(* Processing obligations.
+   One Why obligation can be split into several Gappa obligations *)
+
+(*
+let queue = Queue.create ()
+
+let reset () =
+  Queue.clear queue;
+  Hashtbl.clear gen_table;
+  Hashtbl.clear var_table;
+  Hashtbl.clear rnd_table;
+  Hashtbl.clear def_table
+
+let add_ctx_vars =
+  List.fold_left 
+    (fun acc -> function Svar (id,_) -> Idset.add id acc | _ -> acc)
+
+let rec intros ctx = function
+  | Forall (_, id, n, t, _, p) ->
+      let id' = next_away id (add_ctx_vars (predicate_vars p) ctx) in
+      let p' = subst_in_predicate (subst_onev n id') p in
+      intros (Svar (id', t) :: ctx) p'
+  | Pimplies (_, a, b) -> 
+      let h = fresh_hyp () in 
+      intros (Spred (h, a) :: ctx) b
+  | Pnamed (_, p) ->
+      intros ctx p
+  | c -> 
+      ctx, c
+*)
+
+let process_goal _g = assert false 
+(*
+ (ctx, concl) =
+  let ctx,concl = intros ctx concl in
+    let el, pl =
+      List.fold_left
+        (fun ((el, pl) as acc) h ->
+          match h with
+            | Svar _ -> acc
+            | Spred (_, p) -> 
+                let ep, pp = ghyp p in
+                let pl =
+                  match pp with
+                    | None -> pl
+                    | Some pp -> pp :: pl
+                  in
+                ep :: el, pl)
+        ([],[]) ctx
+	in
+  match gpred false concl with
+    | None -> (* goal is not a gappa prop *)
+	if debug then Format.eprintf "not a gappa prop; skipped@."
+    | Some p ->
+        let gconcl = List.fold_right (fun p acc -> Gimplies (p, acc)) pl p in
+        let el = List.rev (List.flatten el) in
+	Queue.add (el, gconcl) queue
+*)
+
+let print_decl drv _fmt d = match d.d_node with
+  | Dtype _dl ->
+      assert false
+(*
       print_list_opt newline (print_type_decl drv) fmt dl
-  | Dlogic dl ->
+*)
+  | Dlogic _dl ->
+      assert false
+(*
       print_list_opt newline (print_logic_decl drv) fmt dl
+*)
   | Dind _ -> unsupportedDecl d 
-      "alt-ergo : inductive definition are not supported"
+      "gappa: inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Driver.query_remove drv pr.pr_name -> false
-  | Dprop (Paxiom, pr, f) ->
+  | Dprop (Paxiom, _pr, _f) ->
+      assert false
+(*
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n" 
         print_ident pr.pr_name (print_fmla drv) f; true
-  | Dprop (Pgoal, pr, f) ->
+*)
+  | Dprop (Pgoal, _pr, f) ->
+      process_goal f
+	(*
+      assert false
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         print_ident pr.pr_name (print_fmla drv) f; true
+	*)
   | Dprop (Plemma, _, _) ->
       assert false
 
 let print_decl drv fmt = catch_unsupportedDecl (print_decl drv fmt)
 
-*)
-
 let print_task drv fmt task = 
   Driver.print_full_prelude drv task fmt;
-  let _decls = Task.task_decls task in
-  assert false (* TODO *)
-(*
+  let decls = Task.task_decls task in
   ignore (print_list_opt (add_flush newline2) (print_decl drv) fmt decls)
-*)
 
 let () = register_printer "gappa" 
   (fun drv fmt task -> 
@@ -509,9 +711,9 @@ let () = register_printer "gappa"
      print_task drv fmt task)
 
 
+(*
 let print_goal drv fmt (_id, _f, task) =  
   print_task drv fmt task;
-(*
   fprintf fmt "@\n@[<hov 2>goal %a : %a@]@\n" print_ident id (print_fmla drv) f
 *)
 

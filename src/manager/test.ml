@@ -150,7 +150,7 @@ let rec report fmt = function
 let m : Why.Theory.theory Why.Theory.Mnm.t =
   try
     let cin = open_in (fname ^ ".why") in
-    let m = Why.Typing.read_channel env fname cin in
+    let m = Why.Env.read_channel env fname cin in
     close_in cin;
     eprintf "Parsing/Typing Ok@.";
     m
