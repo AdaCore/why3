@@ -31,7 +31,7 @@ type variant = Pgm_ttree.variant
 
 type reference = Pgm_ttree.reference
 
-type effect = Pgm_ttree.effect
+type effect = Pgm_effect.t
 
 type pre = Pgm_ttree.pre
 

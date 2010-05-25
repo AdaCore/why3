@@ -105,26 +105,15 @@ type variant = Term.term * Term.lsymbol
 
 type reference = Pgm_effect.reference
 
-type effect = Pgm_effect.t
+type pre = Pgm_types.pre
 
-type pre = Term.fmla
+type post = Pgm_types.post
 
-type post_fmla = Term.vsymbol (* result *) * Term.fmla
-type exn_post_fmla = Term.vsymbol (* result *) option * Term.fmla
+type type_v = Pgm_types.type_v
 
-type post = post_fmla * (Term.lsymbol * exn_post_fmla) list
+type type_c = Pgm_types.type_c
 
-type type_v = 
-  | Tpure of Ty.ty
-  | Tarrow of binder list * type_c
-
-and type_c = 
-  { c_result_type : type_v;
-    c_effect      : effect;
-    c_pre         : pre;
-    c_post        : post; }
-
-and binder = Term.vsymbol * type_v
+type binder = Pgm_types.binder
 
 type loop_annotation = {
   loop_invariant : Term.fmla option;

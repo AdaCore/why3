@@ -28,26 +28,9 @@ open Theory
 open Pgm_ttree
 open Pgm_itree
 open Pgm_typing
+open Pgm_types
 
 module E = Pgm_effect
-
-type env = {
-  uc      : theory_uc;
-  globals : type_v Mls.t;
-  locals  : type_v Mvs.t;
-}
-
-let empty_env uc = { uc = uc; globals = Mls.empty; locals = Mvs.empty }
-let add_local x v env = { env with locals = Mvs.add x v env.locals }
-let add_global x v env = { env with globals = Mls.add x v env.globals }
-
-let ts_arrow uc = ns_find_ts (get_namespace uc) ["arrow"]
-let ts_ref   env = ns_find_ts (get_namespace env.uc) ["ref"]
-let ts_label env = ns_find_ts (get_namespace env.uc) ["label"]
-
-let ls_old  env = ns_find_ls (get_namespace env.uc) ["old"]
-let ls_at   env = ns_find_ls (get_namespace env.uc) ["at"]
-let ls_bang env = ns_find_ls (get_namespace env.uc) ["prefix !"]
 
 (* phase 3: translation to intermediate trees and effect inference **********)
 
@@ -57,7 +40,7 @@ let reference_of_term t = match t.t_node with
   | _ -> assert false
 
 let rec term_effect env ef t = match t.t_node with
-  | Tapp (ls, [t]) when ls_equal ls (ls_bang env) ->
+  | Tapp (ls, [t]) when ls_equal ls env.ls_bang ->
       let r = reference_of_term t in
       E.add_read r ef
   | _ ->
@@ -72,40 +55,6 @@ let post_effect env ef ((_,q),ql) =
 
 let add_binder env (x, v) = add_local x v env
 let add_binders = List.fold_left add_binder
-
-let v_result ty = create_vsymbol (id_fresh "result") ty
-
-let post_map f ((v, q), ql) = 
-  (v, f q), List.map (fun (e,(v,q)) -> e, (v, f q)) ql
-
-let type_c_of_type_v env = function
-  | Tarrow ([], c) ->
-      c
-  | v ->
-      let ty = purify env.uc v in
-      { c_result_type = v;
-	c_effect      = E.empty;
-	c_pre         = f_true;
-	c_post        = (v_result ty, f_true), []; }
-
-let subst1 vs1 vs2 = Mvs.add vs1 (t_var vs2) Mvs.empty
-
-let rec subst_type_c s c = 
-  { c_result_type = subst_type_v s c.c_result_type;
-    c_effect      = c.c_effect;
-    c_pre         = f_subst s c.c_pre;
-    c_post        = post_map (f_subst s) c.c_post; }
-
-and subst_type_v s = function
-  | Tpure _ as v -> v
-  | Tarrow (bl, c) -> Tarrow (bl, subst_type_c s c)
-
-let apply_type_v env v vs = match v with
-  | Tarrow ((x, _) :: bl, c) ->
-      let c = type_c_of_type_v env (Tarrow (bl, c)) in
-      subst_type_c (subst1 x vs) c
-  | Tarrow ([], _) | Tpure _ -> 
-      assert false
 
 let rec expr env e =
   let ty = e.Pgm_ttree.expr_type in
@@ -136,7 +85,7 @@ and expr_desc env _loc ty = function
       Efun (bl, t), Tarrow (bl, c), E.empty
   | Pgm_ttree.Elet (v, e1, e2) ->
       let e1 = expr env e1 in
-      let env = { env with locals = Mvs.add v e1.expr_type_v env.locals } in
+      let env = add_local v e1.expr_type_v env in
       let e2 = expr env e2 in
       let ef = E.union e1.expr_effect e2.expr_effect in
       Elet (v, e1, e2), e2.expr_type_v, ef
@@ -187,7 +136,7 @@ let wp_forall  = f_forall_simp
 (* utility functions for building WPs *)
 
 let fresh_label env =
-  let ty = ty_app (ts_label env) [] in
+  let ty = ty_app env.ts_label [] in
   create_vsymbol (id_fresh "label") ty
 
 let wp_binder (x, tv) f = match tv with
@@ -201,9 +150,9 @@ let rec old_label env lab f =
   f_map (old_label_term env lab) (old_label env lab) f
 
 and old_label_term env lab t = match t.t_node with
-  | Tapp (ls, [t]) when ls_equal ls (ls_old env) ->
+  | Tapp (ls, [t]) when ls_equal ls env.ls_old ->
       let t = old_label_term env lab t in (* NECESSARY? *)
-      t_app (ls_at env) [t; t_var lab] t.t_ty
+      t_app env.ls_at [t; t_var lab] t.t_ty
   | _ ->
       t_map (old_label_term env lab) (old_label env lab) t
 
@@ -213,13 +162,13 @@ let rec erase_label env lab f =
 
 and erase_label_term env lab t = match t.t_node with
   | Tapp (ls, [t; {t_node = Tvar l}]) 
-    when ls_equal ls (ls_at env) && vs_equal l lab ->
+    when ls_equal ls env.ls_at && vs_equal l lab ->
       erase_label_term env lab t
   | _ ->
       t_map (erase_label_term env lab) (erase_label env lab) t
 
 let unref_ty env ty = match ty.ty_node with
-  | Tyapp (ts, [ty]) when ts_equal ts (ts_ref env) -> ty
+  | Tyapp (ts, [ty]) when ts_equal ts env.ts_ref -> ty
   | _ -> assert false
 
 (* replace !r by v everywhere in formula f *)
@@ -227,12 +176,12 @@ let rec unref env r v f =
   f_map (unref_term env r v) (unref env r v) f
 
 and unref_term env r v t = match t.t_node with
-  | Tapp (ls, [t]) when ls_equal ls (ls_bang env) ->
+  | Tapp (ls, [t]) when ls_equal ls env.ls_bang ->
       let rt = reference_of_term t in
       if E.ref_equal rt r then t_var v else t
-  | Tapp (ls, _) when ls_equal ls (ls_old env) ->
+  | Tapp (ls, _) when ls_equal ls env.ls_old ->
       assert false
-  | Tapp (ls, _) when ls_equal ls (ls_at env) -> (* do not recurse in at(...) *)
+  | Tapp (ls, _) when ls_equal ls env.ls_at -> (* do not recurse in at(...) *)
       t 
   | _ ->
       t_map (unref_term env r v) (unref env r v) t
@@ -330,7 +279,7 @@ let wp_recfun _env _l _def = f_true (* TODO *)
 let add_wp_decl l f env =
   let pr = create_prsymbol (id_fresh ("WP_" ^ l.ls_name.id_string)) in
   let d = create_prop_decl Pgoal pr f in
-  { env with uc = add_decl env.uc d }
+  add_decl d env
 
 let decl env = function
   | Pgm_ttree.Dlet (ls, e) ->

@@ -194,11 +194,11 @@ clean::
 # Whyml
 ########
 
-PGMGENERATED = src/programs/pgm_parser.mli src/programs/pgm_parser.ml \
+PGMGENERATED = src/programs/pgm_parser.mli    src/programs/pgm_parser.ml \
 	       src/programs/pgm_parser.output src/programs/pgm_lexer.ml
 
-PGM_FILES = pgm_ttree pgm_ptree pgm_parser pgm_lexer pgm_effect pgm_typing \
-            pgm_itree pgm_wp pgm_main
+PGM_FILES = pgm_ttree pgm_ptree  pgm_parser pgm_lexer pgm_effect \
+	    pgm_types pgm_typing pgm_itree  pgm_wp    pgm_main
 
 PGMMODULES = $(addprefix src/programs/, $(PGM_FILES))
 
@@ -517,6 +517,7 @@ test: bin/why.byte $(TOOLS)
 
 testl: bin/whyml.byte
 	ocamlrun -bt bin/whyml.byte tests/test-pgm-jcf.mlw
+	ocamlrun -bt bin/whyml.byte -P alt-ergo tests/test-pgm-jcf.mlw
 
 testl-type: bin/whyml.byte
 	ocamlrun -bt bin/whyml.byte --type-only tests/test-pgm-jcf.mlw

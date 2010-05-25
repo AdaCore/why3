@@ -16,13 +16,9 @@ parameter write : v:int -> {} unit writes r { !r = v }
 
 let ff () = 
   { true } 
-  1+2
-  { result = 3 }
+  write 3
+  { !r = 3 }
 
-let gg () =
-  { true } 
-  3-1
-  { result = 2 }
 
 
 (*
