@@ -83,8 +83,8 @@ module Utils = struct
 
   let const x _ = x
 
-  let map_keys m = Mty.fold (fun key value acc -> key::acc) m []
-  let map_values m = Mty.fold (fun key value acc -> value::acc) m []
+  let map_keys m = Mty.fold (fun key _value acc -> key::acc) m []
+  let map_values m = Mty.fold (fun _key value acc -> value::acc) m []
 
 end
 
@@ -132,7 +132,7 @@ module Prelude = struct
   (** [find_matching_vars tblT varM args_ty args_vars] matches [args_ty]
   against [args_vars] to deduce a mapping from [args_vars] to lsymbols
   through [tblT] and [varM] *)
-  let find_matching_vars tblT varM args_ty args_vars =
+  let find_matching_vars _tblT varM args_ty args_vars =
     let tv_to_ty = Mtv.empty in
     let mapping = List.fold_left2 ty_match tv_to_ty args_ty args_vars in
     let tv_to_lsymbol = Mtv.empty in (* result mapping *)

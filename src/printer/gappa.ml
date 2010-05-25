@@ -480,8 +480,31 @@ let gando = function
 
 (* recognition of a Gappa predicate *)
 
-let is_le_num _id = assert false
- (* true when id is <= on R or Z *)
+let prelude_to_load = ref true
+
+let dummy_symbol = (Obj.magic 0 : Term.lsymbol)
+
+let symbol_le_int = ref dummy_symbol
+let symbol_le_real = ref dummy_symbol
+
+let load_prelude (drv : Driver.driver_query) =
+  if !prelude_to_load then
+    begin
+      let env = Driver.query_env drv in
+      let int_theory = Env.find_theory env ["int"] "Int" in
+      let real_theory = Env.find_theory env ["real"] "Real" in
+      symbol_le_int := 
+        Theory.ns_find_ls int_theory.Theory.th_export ["infix <="];
+      symbol_le_real := 
+        Theory.ns_find_ls real_theory.Theory.th_export ["infix <="];
+      prelude_to_load := false;
+    end
+
+
+(* true when id is <= on R or Z *)
+let is_le_num id = 
+  ls_equal id !symbol_le_int
+  || ls_equal id !symbol_le_real
 
 let is_ge_num _id = assert false
  (* true when id is >= on R or Z *)
@@ -667,16 +690,8 @@ let process_goal _g = assert false
 *)
 
 let print_decl drv _fmt d = match d.d_node with
-  | Dtype _dl ->
-      assert false
-(*
-      print_list_opt newline (print_type_decl drv) fmt dl
-*)
-  | Dlogic _dl ->
-      assert false
-(*
-      print_list_opt newline (print_logic_decl drv) fmt dl
-*)
+  | Dtype _dl -> false
+  | Dlogic _dl -> false
   | Dind _ -> unsupportedDecl d 
       "gappa: inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Driver.query_remove drv pr.pr_name -> false
@@ -705,6 +720,7 @@ let print_task drv fmt task =
 
 let () = register_printer "gappa" 
   (fun drv fmt task -> 
+     load_prelude drv;
 (*
      forget_all ident_printer;
 *)
