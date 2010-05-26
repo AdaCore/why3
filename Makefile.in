@@ -461,7 +461,7 @@ TOOLS = bin/why3-cpulimit
 byte opt: $(TOOLS)
 
 bin/why3-cpulimit: src/tools/@CPULIMIT@.c
-	$(CC) -o $@ $^
+	$(CC) -Wall -o $@ $^
 
 clean::
 	rm -f bin/why3-cpulimit src/tools/*~

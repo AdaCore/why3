@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <string.h>
 
 int main(int argc, char *argv[]) {
   int timelimit, memlimit;
@@ -66,7 +67,7 @@ a null value sets no limit (keeps the actual limit)\n", argv[0]);
 
   /* execute the command */
   execvp(argv[3],argv+3);
-  perror("why-cpulimit exec error");
+  fprintf(stderr, "%s: exec of '%s' failed (%s)\n",argv[0],argv[3],strerror(errno));
   return 1;
 }
 
