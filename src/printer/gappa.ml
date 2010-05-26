@@ -719,10 +719,10 @@ let rec intros g =
 
 let process_goal fmt g = 
   let (*el,*)pl = intros g in
-  let concl = gpred false pl in
+  try
+    let concl = gpred false pl in
 (*
-    | None -> (* goal is not a gappa prop *)
-	if debug then Format.eprintf "not a gappa prop; skipped@."
+    | None -> 
     | Some p ->
 *)
 (*
@@ -730,7 +730,13 @@ let process_goal fmt g =
         let el = List.rev (List.flatten el) in
 	Queue.add (el, gconcl) queue
 *)
-  print_obligation fmt ([],concl) 
+    print_obligation fmt ([],concl) ;
+    true
+  with NotGappa ->
+    (* goal is not a gappa prop *)
+    (* if debug then Format.eprintf "not a gappa prop; skipped@."; *)
+    print_obligation fmt ([],Gle(Gcst "1","0")) ;
+    true
 
 
 let print_decl drv fmt d = match d.d_node with
@@ -746,7 +752,7 @@ let print_decl drv fmt d = match d.d_node with
         print_ident pr.pr_name (print_fmla drv) f; true
 *)
   | Dprop (Pgoal, _pr, f) ->
-      process_goal fmt f; true
+      process_goal fmt f
 	(*
       assert false
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
