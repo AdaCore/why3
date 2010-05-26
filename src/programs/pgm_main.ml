@@ -71,7 +71,8 @@ let parse_only _env file c =
 
 let read_channel 
     ?(debug=false) ?(parse_only=false) ?(type_only=false) env file c =
-  ignore (debug);
+  Pgm_typing.debug := debug;
+  Pgm_wp.debug := debug;
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
   let p = Pgm_lexer.parse_file lb in 

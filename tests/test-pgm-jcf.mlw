@@ -5,10 +5,10 @@ logic f(int, int) : int
 logic c : int
 }
 
-parameter sub : x:int -> y:int -> {x>=y} int {result=x-y}
+parameter sub : x:int -> y:int -> { x>=y } int { result=x-y }
 
 parameter imp_sub : 
-  x:int ref -> y:int ref -> {!x >= !y} unit writes x {!x = old(!x) - !y}
+  x:int ref -> y:int ref -> { !x >= !y } unit writes x { !x = old(!x) - !y }
 
 parameter r : int ref
 
@@ -16,8 +16,15 @@ parameter write : v:int -> {} unit writes r { !r = v }
 
 let ff () = 
   { true } 
-  write 3
-  { !r = 3 }
+  write 42
+  { !r = 42 }
+
+(* TODO
+let ff () = 
+  { true } 
+  let x = ref 0 in !x
+  { result = 0 }
+*)
 
 
 

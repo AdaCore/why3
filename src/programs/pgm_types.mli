@@ -60,6 +60,8 @@ val v_result : ty -> vsymbol
 
 val post_map : (fmla -> fmla) -> post -> post
 
+val subst1 : vsymbol -> vsymbol -> term Mvs.t
+
 (* pretty-printers *)
 
 val print_type_v : Format.formatter -> type_v -> unit

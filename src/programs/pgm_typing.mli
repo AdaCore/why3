@@ -20,6 +20,8 @@
 open Why
 open Theory
 
+val debug : bool ref
+
 type error
 
 exception Error of error

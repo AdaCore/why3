@@ -30,6 +30,8 @@ open Pgm_effect
 open Pgm_ttree
 open Pgm_types
 
+let debug = ref false
+
 type error =
   | Message of string
 
@@ -814,8 +816,8 @@ let file env uc dl =
 	     { gl with uc = uc }, acc
 	 | Pgm_ptree.Dlet (id, e) -> 
 	     let e = type_expr gl e in
-	     (*DEBUG*)
-	     (* eprintf "@[--typing %s-----@\n  %a@]@." id.id print_expr e; *)
+	     if !debug then
+	       eprintf "@[--typing %s-----@\n  %a@]@." id.id print_expr e;
 	     let tyl, ty = uncurrying gl e.expr_type in
 	     let ls = create_lsymbol (id_user id.id id.id_loc) tyl (Some ty) in
 	     let gl = add_global ls gl in

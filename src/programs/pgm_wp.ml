@@ -32,6 +32,8 @@ open Pgm_types
 
 module E = Pgm_effect
 
+let debug = ref false
+
 (* phase 3: translation to intermediate trees and effect inference **********)
 
 let reference_of_term t = match t.t_node with
@@ -130,6 +132,9 @@ let wp_and ?(sym=false) f1 f2 =
   (* TODO: tag instead? *)
   if sym then f_and_simp f1 f2 else f_and_simp f1 (f_implies_simp f1 f2) 
 
+let wp_ands ?(sym=false) fl =
+  List.fold_left (wp_and ~sym) f_true fl
+
 let wp_implies = f_implies_simp
 let wp_forall  = f_forall_simp
 
@@ -196,6 +201,35 @@ let quantify env ef f =
   let s = E.Sref.union ef.E.reads ef.E.writes in
   E.Sref.fold quantify1 s f
 
+let abstract_wp env ef (q',ql') (q,ql) =
+  assert (List.length ql' = List.length ql);
+  let quantify_r f' f res =
+    let f = wp_implies f' f in
+    let f = match res with Some v -> wp_forall [v] [] f | None -> f in
+    quantify env ef f
+  in
+  let quantify_h (e',(x',f')) (e,(x,f)) =
+    assert (ls_equal e' e);
+    let res, f' = match x', x with
+      | Some v', Some v -> Some v, f_subst (subst1 v' v) f'
+      | None, None -> None, f'
+      | _ -> assert false
+    in
+    quantify_r f' f res
+  in
+  let f = 
+    let res, f = q and res', f' = q' in
+    let f' = f_subst (subst1 res' res) f' in
+    quantify_r f' f (Some res)
+  in
+  wp_ands (f :: List.map2 quantify_h ql' ql)
+
+let opaque_wp env ef q' q = 
+  let lab = fresh_label env in
+  let q' = post_map (old_label env lab) q' in
+  let f = abstract_wp env ef q' q in
+  erase_label env lab f
+
 (*s [filter_post k q] removes exc. postconditions from [q] which do not
     appear in effect [ef] *)
 
@@ -222,10 +256,10 @@ let default_post ty ef =
 (*s [saturate_post ef f q] makes a postcondition for a program of effect [ef]
     out of a normal postcondition [f] and the exc. postconditions from [q] *)
 
-let saturate_post ty ef f (_, ql) = 
+let saturate_post ef q (_, ql) = 
   let set_post x = try x, ls_assoc x ql with Not_found -> default_exn_post x in
   let xs = Sls.elements ef.E.raises in
-  ((v_result ty, f), List.map set_post xs)
+  (q, List.map set_post xs)
 
 (* Recursive computation of the weakest precondition *)
 
@@ -244,10 +278,16 @@ and wp_desc env e q = match e.expr_desc with
       let (_, q), _ = q in
       let f = wp_triple env t in
       wp_and q (wp_binders bl f)
+  | Elet (x, e1, e2) ->
+      let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
+      let result = v_result e1.expr_type in
+      let q1 = result, f_subst (subst1 x result) w2 in
+      let q1 = saturate_post e1.expr_effect q1 q in
+      wp_expr env e1 q1
 
   | Esequence (e1, e2) ->
       let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
-      let q1 = saturate_post e1.expr_type e1.expr_effect w2 q in
+      let q1 = saturate_post e1.expr_effect (v_result e1.expr_type, w2) q in
       wp_expr env e1 q1
 
   | Eassert (Pgm_ptree.Aassert, f) ->
@@ -262,6 +302,9 @@ and wp_desc env e q = match e.expr_desc with
   | Elabel (lab, e1) ->
       let w1 = wp_expr env e1 q in
       erase_label env lab w1
+  | Eany c ->
+      let w = opaque_wp env c.c_effect c.c_post q in
+      wp_and c.c_pre w
 
   | _ -> 
       f_true (* TODO *)
@@ -284,12 +327,13 @@ let add_wp_decl l f env =
 let decl env = function
   | Pgm_ttree.Dlet (ls, e) ->
       let e = expr env e in
-      (* DEBUG *)
-      (* eprintf "@[--effect %a-----@\n  %a@]@\n----------------@."  *)
-	(* Pretty.print_ls ls print_type_v e.expr_type_v; *)
+      if !debug then
+	eprintf "@[--effect %a-----@\n  %a@]@\n----------------@."
+	  Pretty.print_ls ls print_type_v e.expr_type_v;
       let f = wp env e in
-      (* eprintf "wp = %a@\n----------------@." Pretty.print_fmla f; *)
-      let env = add_wp_decl ls f env in
+      if !debug then
+	eprintf "wp = %a@\n----------------@." Pretty.print_fmla f;
+      let env = add_wp_decl ls f env in	
       let env = add_global ls e.expr_type_v env in
       env
   | Pgm_ttree.Dletrec dl ->
