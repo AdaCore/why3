@@ -619,7 +619,7 @@ clean::
 
 apidoc:
 	mkdir -p apidoc
-	$(OCAMLDOC) -d apidoc -html -I src $(LIBINCLUDES) -I +sqlite3 \
+	$(OCAMLDOC) -d apidoc -html -keep-code -I src $(LIBINCLUDES) -I +sqlite3 \
 	    $(LIBML) $(LIBMLI) $(MNGML) $(MNGMLI)
 
 clean::

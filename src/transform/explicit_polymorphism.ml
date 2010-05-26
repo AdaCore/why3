@@ -141,14 +141,13 @@ module Utils = struct
   to types in [right]. [tv_to_ty] is a mapping given in argument.
   It must be compliant with the unification between [left] and [right] *)
   let rec find_matching_vars tv_to_ty left right =
-    assert (List.length left = List.length right);
-    (* Format.eprintf "matching @[%a@] with @[%a@]@."
+    Format.eprintf "matching @[%a@] with @[%a@]@."
       (Debug.print_list Pretty.print_ty) left
-      (Debug.print_list Pretty.print_ty) right; *)
+      (Debug.print_list Pretty.print_ty) right;
+    assert (List.length left = List.length right);
     let tv_to_ty = List.fold_left2 ty_match tv_to_ty left right in
     (* Format.eprintf "gives @[%a@]@."
-      (Debug.print_mtv Pretty.print_ty) tv_to_ty; *)
-    flush stderr;   
+      (Debug.print_mtv Pretty.print_ty) tv_to_ty; flush stderr; *)
     tv_to_ty
 
   module Mint = Map.Make(struct
@@ -249,11 +248,12 @@ module Transform = struct
       (* Debug.print_list Pretty.print_ty Format.std_formatter type_vars; *)
       let int_to_tyvars = bind_nums_to_type_vars new_f in
       (* match types *)
-      let result_to_match = fromSome new_f.ls_value in
       let args_to_match = drop (List.length type_vars) new_f.ls_args in
       let concrete_ty = List.map (fun x-> x.t_ty) terms in
+      let result_to_match = fromSome new_f.ls_value in
+      let result_ty = t.t_ty in
       let tv_to_ty = find_matching_vars tv_to_ty
-        (result_to_match :: args_to_match) (t.t_ty :: concrete_ty) in
+        (result_to_match :: args_to_match) (result_ty :: concrete_ty) in
       (* Debug.print_mtv Pretty.print_ty Format.err_formatter tv_to_ty; *)
       (* fresh terms to be added at the beginning of the list of arguments *)
       let new_ty_int = range (List.length type_vars) in
@@ -263,13 +263,34 @@ module Transform = struct
         (term_transform tblT tblL varM tv_to_ty) terms in
       let transformed_result = ty_to_ty tv_to_ty (fromSome new_f.ls_value) in
       t_app new_f (new_terms @ transformed_terms) transformed_result
-    | _ -> (* default case : traverse *)
-      t_map (term_transform tblT tblL varM tv_to_ty)
-        (fmla_transform tblT tblL varM tv_to_ty) t
+      | _ -> (* default case : traverse *)
+        t_map (term_transform tblT tblL varM tv_to_ty)
+          (fmla_transform tblT tblL varM tv_to_ty) t
   (** (trivial) translation of formulae *)
-  and fmla_transform tblT tblL varM tv_to_ty f = f_map
-    (term_transform tblT tblL varM tv_to_ty)
-    (fmla_transform tblT tblL varM tv_to_ty) f
+  and fmla_transform tblT tblL varM tv_to_ty f = match f.f_node with
+    | Fapp(p,terms) when (not (ls_equal p ps_equ)) && not(ls_equal p ps_neq) ->
+      let new_p = findL tblL p in
+      (* first, remember an order for type vars of new_f *)
+      let type_vars = l_find_type_vars new_p in
+      (* Debug.print_list Pretty.print_ty Format.std_formatter type_vars; *)
+      let int_to_tyvars = bind_nums_to_type_vars new_p in
+      (* match types *)
+      let args_to_match = drop (List.length type_vars) new_p.ls_args in
+      let concrete_ty = List.map (fun x-> x.t_ty) terms in
+      let tv_to_ty = find_matching_vars tv_to_ty
+         args_to_match concrete_ty in
+      (* Debug.print_mtv Pretty.print_ty Format.err_formatter tv_to_ty; *)
+      (* fresh terms to be added at the beginning of the list of arguments *)
+      let new_ty_int = range (List.length type_vars) in
+      let new_ty = List.map (fun x -> Mint.find x int_to_tyvars) new_ty_int in
+      let new_terms = List.map (ty_to_term tblT varM tv_to_ty) new_ty in
+      let transformed_terms = List.map
+        (term_transform tblT tblL varM tv_to_ty) terms in
+      f_app new_p (new_terms @ transformed_terms)
+    | _ ->
+      f_map (term_transform tblT tblL varM tv_to_ty)
+        (fmla_transform tblT tblL varM tv_to_ty) f
+  
 
 
   (** transforms a list of logic declarations into another.
@@ -325,14 +346,14 @@ end
 symbols) and a declaration, and returns the corresponding declaration in
 explicit polymorphism logic. *)
 let decl_transform tblT tblL d =
-  (* Format.eprintf "%a@." Pretty.print_decl d; *)
+ Format.eprintf "%a@." Pretty.print_decl d;
   let result = match d.d_node with
     | Dind _inds ->
     failwith "Dind : should not have inductives declarations at this point !"
     | Dtype tys -> Transform.type_transform tblT tys
     | Dlogic decls -> Transform.logic_transform tblL decls
     | Dprop prop -> Transform.prop_transform tblT tblL prop in
-  (* Format.eprintf "===@.%a@.@." (Debug.print_list Pretty.print_decl) result;*)
+  Format.eprintf "===@.%a@.@." (Debug.print_list Pretty.print_decl) result;
   result
 
 
