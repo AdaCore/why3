@@ -1,0 +1,42 @@
+theory Induction2
+  use import list.List
+  use import list.Length
+
+  logic p ('a list, 'b list)
+
+  axiom Induction : 
+    p(Nil : 'a list, Nil : 'b list) -> 
+    (forall x1:'a, x2:'b, l1:'a list, l2:'b list. 
+       p(l1, l2) -> p(Cons(x1,l1), Cons(x2,l2))) ->
+    forall l1:'a list, l2:'b list. length(l1)=length(l2) -> p(l1, l2)
+
+end
+
+theory Test1
+  use export int.Int
+  use export list.List
+  use export list.Length
+
+  goal G1 : length(Cons(1, Nil)) = 1
+  goal G2 : length(Cons(1, Cons (2, Nil))) = 1 + 1
+
+  logic zip(l1 : 'a list, l2 : 'b list) : ('a * 'b) list =
+    match l1, l2 with
+    | Cons (x1, r1), Cons (x2, r2) -> Cons ((x1, x2), zip (r1, r2))
+    | _, _ -> Nil (* to make it total *)
+    end
+
+  logic foo(l1 : 'a list, l2 : 'b list) =
+    length(zip(l1, l2)) = length(l1)
+
+  clone Induction2 with logic p = foo
+
+  goal G3 : forall l1: 'a list, l2 : 'b list. 
+    length(l1) = length(l2) ->
+    length(zip(l1, l2)) = length(l1)
+
+  goal G4 : zip(Cons(1, Cons(2, Nil)), 
+                Cons(1., Cons(2., Nil))) = 
+                Cons ((1, 1.), Cons((2, 2.), Nil))
+
+end
