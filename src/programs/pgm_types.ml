@@ -143,25 +143,7 @@ let type_c_of_type_v env = function
 	c_pre         = f_true;
 	c_post        = (v_result ty, f_true), []; }
 
-let rec subst_type_c ts s c = 
-  { c_result_type = subst_type_v ts s c.c_result_type;
-    c_effect      = c.c_effect;
-    c_pre         = f_ty_subst ts s c.c_pre;
-    c_post        = subst_post ts s c.c_post; }
-
-and subst_type_v ts s = function
-  | Tpure ty -> 
-      Tpure (ty_inst ts ty)
-  | Tarrow (bl, c) -> 
-      let s, bl = Util.map_fold_left (binder ts) s bl in
-      Tarrow (bl, subst_type_c ts s c)
-
-and binder ts s (vs, v) =
-  let v = subst_type_v ts s v in
-  let s, vs = subst_var ts s vs in
-  s, (vs, v)
-
-and subst_var ts s vs =
+let rec subst_var ts s vs =
   let ty' = ty_inst ts vs.vs_ty in
   if ty_equal ty' vs.vs_ty then
     s, vs
@@ -177,18 +159,44 @@ and subst_post ts s ((v, q), ql) =
   in
   vq, List.map handler ql
   
+let rec subst_type_c ef ts s c = 
+  { c_result_type = subst_type_v ef ts s c.c_result_type;
+    c_effect      = ef c.c_effect;
+    c_pre         = f_ty_subst ts s c.c_pre;
+    c_post        = subst_post ts s c.c_post; }
+
+and subst_type_v ef ts s = function
+  | Tpure ty -> 
+      Tpure (ty_inst ts ty)
+  | Tarrow (bl, c) -> 
+      let s, bl = Util.map_fold_left (binder ef ts) s bl in
+      Tarrow (bl, subst_type_c ef ts s c)
+
+and binder ef ts s (vs, v) =
+  let v = subst_type_v ef ts s v in
+  let s, vs = subst_var ts s vs in
+  s, (vs, v)
+
 let subst1 vs1 vs2 = Mvs.add vs1 (t_var vs2) Mvs.empty
 
 let apply_type_v env v vs = match v with
   | Tarrow ((x, tyx) :: bl, c) ->
       let ts = ty_match Mtv.empty (purify env.uc tyx) vs.vs_ty in
       let c = type_c_of_type_v env (Tarrow (bl, c)) in
-      subst_type_c ts (subst1 x vs) c
+      subst_type_c (fun e -> e) ts (subst1 x vs) c
   | Tarrow ([], _) | Tpure _ -> 
       assert false
 
-let apply_type_v_ref env v r = 
-  assert false (*TODO*)
+let apply_type_v_ref env v r = match r, v with
+  | E.Rlocal vs as r, Tarrow ((x, tyx) :: bl, c) ->
+      let ts = ty_match Mtv.empty (purify env.uc tyx) vs.vs_ty in
+      let c = type_c_of_type_v env (Tarrow (bl, c)) in
+      let ef = E.subst x r in
+      subst_type_c ef ts (subst1 x vs) c
+  | E.Rglobal _, Tarrow ((_x, _tyx) :: _bl, _c) -> 
+      assert false (*TODO*)
+  | _ ->
+      assert false
 
 (* pretty-printers *)
 
@@ -217,8 +225,13 @@ and print_type_c fmt c =
 and print_binder fmt (x, v) =
   fprintf fmt "(%a:%a)" print_vs x print_type_v v
 
-let apply_type_v env v vs =
-  eprintf "apply_type_v: v=%a vs=%a@." print_type_v v print_vs vs;
-  apply_type_v env v vs
+(* let apply_type_v env v vs = *)
+(*   eprintf "apply_type_v: v=%a vs=%a@." print_type_v v print_vs vs; *)
+(*   apply_type_v env v vs *)
 
 
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. testl"
+End: 
+*)

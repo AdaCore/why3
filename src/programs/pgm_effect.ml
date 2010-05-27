@@ -60,6 +60,8 @@ module Reference = struct
     | Rlocal _, Rglobal _ -> -1
     | Rglobal _, Rlocal _ -> 1
 
+  let equal r1 r2 = compare r1 r2 = 0
+
 end
 
 module Sref = Set.Make(Reference)
@@ -83,6 +85,14 @@ let union t1 t2 =
   { reads  = Sref.union t1.reads  t2.reads;
     writes = Sref.union t1.writes t2.writes;
     raises = E.union t1.raises t2.raises; }
+
+let subst vs r t =
+  let add1 r' s = match r' with
+    | Rlocal vs' when vs_equal vs' vs -> Sref.add r s
+    | _ -> Sref.add r' s
+  in
+  let apply s = Sref.fold add1 s Sref.empty in
+  { reads = apply t.reads; writes = apply t.writes; raises = t.raises }
 
 open Format
 open Pp

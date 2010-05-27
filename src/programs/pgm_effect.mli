@@ -45,5 +45,7 @@ val add_raise : lsymbol -> t -> t
 
 val union : t -> t -> t
 
+val subst : vsymbol -> reference -> t -> t
+
 val print_reference : Format.formatter -> reference -> unit
 val print           : Format.formatter -> t         -> unit

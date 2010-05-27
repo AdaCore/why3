@@ -58,6 +58,13 @@ let post_effect env ef ((_,q),ql) =
 let add_binder env (x, v) = add_local x v env
 let add_binders = List.fold_left add_binder
 
+let make_apply loc e1 ty c =
+  let x = create_vsymbol (id_fresh "f") e1.expr_type in
+  let v = c.c_result_type and ef = c.c_effect in
+  let any_c = { expr_desc = Eany c; expr_type = ty;
+		expr_type_v = v; expr_effect = ef; expr_loc = loc } in
+  Elet (x, e1, any_c), v, ef
+
 let rec expr env e =
   let ty = e.Pgm_ttree.expr_type in
   let loc = e.Pgm_ttree.expr_loc in
@@ -65,7 +72,7 @@ let rec expr env e =
   { expr_desc = d; expr_type = ty; 
     expr_type_v = v; expr_effect = ef; expr_loc = loc }
 
-and expr_desc env _loc ty = function
+and expr_desc env loc ty = function
   | Pgm_ttree.Elogic t ->
       let ef = term_effect env E.empty t in
       Elogic t, Tpure ty, ef
@@ -78,12 +85,11 @@ and expr_desc env _loc ty = function
   | Pgm_ttree.Eapply (e1, vs) ->
       let e1 = expr env e1 in
       let c = apply_type_v env e1.expr_type_v vs in
-      Eany c, c.c_result_type, c.c_effect
-      (* TODO: do not forget about e1 *)
+      make_apply loc e1 ty c
   | Pgm_ttree.Eapply_ref (e1, r) ->
       let e1 = expr env e1 in
       let c = apply_type_v_ref env e1.expr_type_v r in
-      Eany c, c.c_result_type, c.c_effect
+      make_apply loc e1 ty c
   | Pgm_ttree.Efun (bl, t) ->
       let env = add_binders env bl in
       let t, c = triple env t in
@@ -200,6 +206,7 @@ and unref_term env r v t = match t.t_node with
 
 (* quantify over all references in ef *)
 let quantify env ef f =
+  (* eprintf "quantify: ef=%a f=%a@." E.print ef Pretty.print_fmla f; *)
   let quantify1 r f = 
     let ty = unref_ty env (E.type_of_reference r) in
     let v = create_vsymbol (id_clone (E.name_of_reference r)) ty in
@@ -289,6 +296,10 @@ and wp_desc env e q = match e.expr_desc with
   | Elogic t ->
       let (v, q), _ = q in
       f_let v t q
+  | Elocal _ ->
+      assert false (*TODO*)
+  | Eglobal _ ->
+      assert false (*TODO*)
   | Efun (bl, t) ->
       let (_, q), _ = q in
       let f = wp_triple env t in
@@ -299,6 +310,8 @@ and wp_desc env e q = match e.expr_desc with
       let q1 = result, f_subst (subst1 x result) w2 in
       let q1 = saturate_post e1.expr_effect q1 q in
       wp_expr env e1 q1
+  | Eletrec _ ->
+      assert false (*TODO*)
 
   | Esequence (e1, e2) ->
       let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in

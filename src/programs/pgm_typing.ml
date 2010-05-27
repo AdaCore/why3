@@ -408,10 +408,9 @@ and dexpr_desc env loc = function
 
   | Pgm_ptree.Eassert (k, le) ->
       DEassert (k, lexpr le), dty_unit env.genv
-  | Pgm_ptree.Elabel ({id=l}, e1) ->
-      let s = "label " ^ l in
+  | Pgm_ptree.Elabel ({id=s}, e1) ->
       if Typing.mem_var s env.denv then 
-	errorm ~loc "clash with previous label %s" l;
+	errorm ~loc "clash with previous label %s" s;
       let ty = dty_label env.genv in
       let env = { env with denv = Typing.add_var s ty env.denv } in
       let e1 = dexpr env e1 in
@@ -750,9 +749,9 @@ let rec print_expr fmt e = match e.expr_desc with
   | Eglobal ls ->
       fprintf fmt "<global %a>" print_ls ls
   | Eapply (e, vs) ->
-      fprintf fmt "@[(%a %a)@]" print_expr e print_vs vs
+      fprintf fmt "@[((%a) %a)@]" print_expr e print_vs vs
   | Eapply_ref (e, r) ->
-      fprintf fmt "@[(%a <ref %a>)@]" print_expr e print_reference r
+      fprintf fmt "@[((%a) <ref %a>)@]" print_expr e print_reference r
   | Efun (_, (_,e,_)) ->
       fprintf fmt "@[fun _ ->@ %a@]" print_expr e
   | Elet (v, e1, e2) ->

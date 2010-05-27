@@ -14,11 +14,19 @@ parameter r : int ref
 
 parameter write : v:int -> {} unit writes r { !r = v }
 
-let ff () = 
-  { !r >= 0 } 
-  !r + 2
-  { result = 42 }
+let ff () =
+  { true } 
+  (fun x -> {x=0} x+42 { result=42 }) 0
+  { result=40+2 }
 
+(*
+let ff () = 
+  { !r = 44 } 
+  let x = ref 2 in
+  imp_sub r x;
+  !r
+  { result = 42 }
+*)
 
 (*
 Local Variables: 
