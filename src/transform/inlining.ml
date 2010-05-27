@@ -43,9 +43,11 @@ let rec replacet env t =
     | Tapp (fs,tl) ->
         begin try 
           let (vs,t) = Mls.find fs env.fs in
-          let m = List.fold_left2 (fun acc x y -> Mvs.add x y acc)
-            Mvs.empty vs tl in
-          t_subst m t
+          let add (mt,mv) x y =
+            (Ty.ty_match mt x.vs_ty y.t_ty, Mvs.add x y mv)
+          in
+          let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vs tl in
+          t_ty_subst mt mv t
         with Not_found -> t end
     | _ -> t
 
@@ -55,9 +57,11 @@ and replacep env f =
     | Fapp (ps,tl) ->
         begin try 
           let (vs,f) = Mls.find ps env.ps in
-          let m = List.fold_left2 (fun acc x y -> Mvs.add x y acc) 
-            Mvs.empty vs tl in
-          f_subst m f
+          let add (mt,mv) x y =
+            (Ty.ty_match mt x.vs_ty y.t_ty, Mvs.add x y mv)
+          in
+          let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vs tl in
+          f_ty_subst mt mv f
         with Not_found -> f end
     | _ -> f
 
