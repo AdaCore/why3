@@ -4,9 +4,9 @@ theory Induction2
 
   logic p ('a list, 'b list)
 
-  axiom Induction : 
-    p(Nil : 'a list, Nil : 'b list) -> 
-    (forall x1:'a, x2:'b, l1:'a list, l2:'b list. 
+  axiom Induction :
+    p(Nil : 'a list, Nil : 'b list) ->
+    (forall x1:'a, x2:'b, l1:'a list, l2:'b list.
        p(l1, l2) -> p(Cons(x1,l1), Cons(x2,l2))) ->
     forall l1:'a list, l2:'b list. length(l1)=length(l2) -> p(l1, l2)
 
@@ -31,12 +31,17 @@ theory Test1
 
   clone Induction2 with logic p = foo
 
-  goal G3 : forall l1: 'a list, l2 : 'b list. 
+  lemma G3 : forall l1: 'a list, l2 : 'b list.
     length(l1) = length(l2) ->
     length(zip(l1, l2)) = length(l1)
 
-  goal G4 : zip(Cons(1, Cons(2, Nil)), 
-                Cons(1., Cons(2., Nil))) = 
+  goal G4 : zip(Cons(1, Cons(2, Nil)),
+                Cons(1., Cons(2., Nil))) =
                 Cons ((1, 1.), Cons((2, 2.), Nil))
+
+  goal G5 : forall l1: 'a list, l2 : 'b list, l3: 'c list, l4: 'd list.
+    length(l1) = length(l2) and length(l2) = length(l3) and
+      length(l3) = length(l4) ->
+    length(zip(zip(l1,l2), zip(l3, l4))) = length(l3)
 
 end
