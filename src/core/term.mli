@@ -360,6 +360,9 @@ val f_subst : term Mvs.t -> fmla -> fmla
 val t_subst_single : vsymbol -> term -> term -> term
 val f_subst_single : vsymbol -> term -> fmla -> fmla
 
+val t_ty_subst : ty Mtv.t -> term Mvs.t -> term -> term
+val f_ty_subst : ty Mtv.t -> term Mvs.t -> fmla -> fmla
+
 (** set of free variables *)
 
 val t_freevars : Svs.t -> term -> Svs.t

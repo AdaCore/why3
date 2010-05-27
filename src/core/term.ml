@@ -678,49 +678,49 @@ let f_let v t1 f2 =
   if not (ty_equal v.vs_ty t1.t_ty) then raise TypeMismatch;
   f_let v t1 f2
 
-(* map over symbols *)
+(* generic map over types, symbols and variables *)
 
-let rec t_s_map fnT fnV fnL t =
-  let fn_t = t_s_map fnT fnV fnL in
-  let fn_f = f_s_map fnT fnV fnL in
+let rec t_gen_map fnT fnB fnV fnL t =
+  let fn_t = t_gen_map fnT fnB fnV fnL in
+  let fn_f = f_gen_map fnT fnB fnV fnL in
   let ty = fnT t.t_ty in
   t_label_copy t (match t.t_node with
     | Tbvar n -> t_bvar n ty
-    | Tvar v -> t_var (fnV v ty)
+    | Tvar v -> fnV v ty
     | Tconst _ -> t
     | Tapp (f, tl) -> t_app (fnL f) (List.map fn_t tl) ty
     | Tif (f, t1, t2) -> t_if (fn_f f) (fn_t t1) (fn_t t2)
     | Tlet (t1, (u, t2)) ->
-        let t1 = fn_t t1 in t_let (fnV u t1.t_ty) t1 (fn_t t2)
+        let t1 = fn_t t1 in t_let (fnB u t1.t_ty) t1 (fn_t t2)
     | Tcase (tl, bl) ->
-        let fn_b = t_branch fnT fnV fnL in
+        let fn_b = t_branch fnT fnB fnV fnL in
         t_case (List.map fn_t tl) (List.map fn_b bl) ty
-    | Teps (u, f) -> t_eps (fnV u ty) (fn_f f))
+    | Teps (u, f) -> t_eps (fnB u ty) (fn_f f))
 
-and f_s_map fnT fnV fnL f =
-  let fn_t = t_s_map fnT fnV fnL in
-  let fn_f = f_s_map fnT fnV fnL in
+and f_gen_map fnT fnB fnV fnL f =
+  let fn_t = t_gen_map fnT fnB fnV fnL in
+  let fn_f = f_gen_map fnT fnB fnV fnL in
   f_label_copy f (match f.f_node with
     | Fapp (p, tl) -> f_app (fnL p) (List.map fn_t tl)
     | Fquant (q, (vl, nv, tl, f1)) ->
         let tl = tr_map fn_t fn_f tl in
-        let fn_v u = fnV u (fnT u.vs_ty) in
+        let fn_v u = fnB u (fnT u.vs_ty) in
         f_quant q (List.map fn_v vl) nv tl (fn_f f1)
     | Fbinop (op, f1, f2) -> f_binary op (fn_f f1) (fn_f f2)
     | Fnot f1 -> f_not (fn_f f1)
     | Ftrue | Ffalse -> f
     | Fif (f1, f2, f3) -> f_if (fn_f f1) (fn_f f2) (fn_f f3)
     | Flet (t, (u, f1)) ->
-        let t1 = fn_t t in f_let (fnV u t1.t_ty) t1 (fn_f f1)
+        let t1 = fn_t t in f_let (fnB u t1.t_ty) t1 (fn_f f1)
     | Fcase (tl, bl) ->
-        let fn_b = f_branch fnT fnV fnL in
+        let fn_b = f_branch fnT fnB fnV fnL in
         f_case (List.map fn_t tl) (List.map fn_b bl))
 
-and t_branch fnT fnV fnL (pl, nv, t) =
-  (List.map (pat_s_map fnT fnV fnL) pl, nv, t_s_map fnT fnV fnL t)
+and t_branch fnT fnB fnV fnL (pl, nv, t) =
+  (List.map (pat_s_map fnT fnB fnL) pl, nv, t_gen_map fnT fnB fnV fnL t)
 
-and f_branch fnT fnV fnL (pl, nv, f) =
-  (List.map (pat_s_map fnT fnV fnL) pl, nv, f_s_map fnT fnV fnL f)
+and f_branch fnT fnB fnV fnL (pl, nv, f) =
+  (List.map (pat_s_map fnT fnB fnL) pl, nv, f_gen_map fnT fnB fnV fnL f)
 
 let get_fnT fn =
   let ht = Hashtbl.create 17 in
@@ -732,7 +732,7 @@ let get_fnT fn =
   in
   fnT
 
-let get_fnV () =
+let get_fnB () =
   let ht = Hid.create 17 in
   let fnV vs ty =
     if ty_equal vs.vs_ty ty then vs else
@@ -743,8 +743,22 @@ let get_fnV () =
   in
   fnV
 
-let t_s_map fnT fnL t = t_s_map (get_fnT fnT) (get_fnV ()) fnL t
-let f_s_map fnT fnL f = f_s_map (get_fnT fnT) (get_fnV ()) fnL f
+let get_fnV () =
+  let fnB = get_fnB () in
+  fun vs ty -> t_var (fnB vs ty)
+
+let t_s_map fnT fnL t = t_gen_map (get_fnT fnT) (get_fnB ()) (get_fnV ()) fnL t
+let f_s_map fnT fnL f = f_gen_map (get_fnT fnT) (get_fnB ()) (get_fnV ()) fnL f
+
+(* simultaneous substitution into types and terms *)
+
+let t_ty_subst mapT mapV t =
+  let fnV vs _ty = try Mvs.find vs mapV with Not_found -> t_var vs in
+  t_gen_map (ty_inst mapT) (get_fnB ()) fnV (fun ls -> ls) t
+
+let f_ty_subst mapT mapV f =
+  let fnV vs _ty = try Mvs.find vs mapV with Not_found -> t_var vs in
+  f_gen_map (ty_inst mapT) (get_fnB ()) fnV (fun ls -> ls) f
 
 (* fold over symbols *)
 
@@ -1537,35 +1551,33 @@ let f_let_simp v t f = match f.f_node with
 let f_equ_simp t1 t2 = if t_equal t1 t2 then f_true  else f_equ t1 t2
 let f_neq_simp t1 t2 = if t_equal t1 t2 then f_false else f_neq t1 t2
 
-let is_true_false f = match f.f_node with 
+let is_true_false f = match f.f_node with
   | Ftrue | Ffalse -> true | _  -> false
 
-(* Could we add an optional argument which toggle 
+(* Could we add an optional argument which toggle
    the simplification to the other map? *)
-let f_map_simp fnT fnF f = 
-  f_label_copy f 
-    (match f.f_node with
-       | Fapp (p, [t1;t2]) when ls_equal p ps_equ -> 
-           f_equ_simp (fnT t1) (fnT t2)
-       | Fapp (p, [t1;t2]) when ls_equal p ps_neq -> 
-           f_neq_simp (fnT t1) (fnT t2)
-       | Fapp (p, tl) -> f_app_unsafe p (List.map fnT tl)
-       | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
-         let f1' = fnF f1 in let tl' = tr_map fnT fnF tl in
-         if f_equal f1' f1 && trl_equal tl' tl && not (is_true_false f1) then f
-         else f_quant_simp q vl tl' f1'
-       | Fbinop (op, f1, f2) -> f_binary_simp op (fnF f1) (fnF f2)
-       | Fnot f1 -> f_not_simp (fnF f1)
-       | Ftrue | Ffalse -> f
-       | Fif (f1, f2, f3) -> f_if_simp (fnF f1) (fnF f2) (fnF f3)
-       | Flet (t, b) -> let u,f1 = f_open_bound b in
-         let t' = fnT t in let f1' = fnF f1 in
-         if t_equal t' t && f_equal f1' f1  && not (is_true_false f1) then f
-         else f_let_simp u t' f1'
-       | Fcase (tl, bl) -> let tl' = List.map fnT tl in
-         let tltl = List.for_all2 t_equal tl tl' in
-         let blbl,bl' = map_fold_left (f_branch' fnF) true bl in
-         if tltl && blbl then f else f_case tl' bl')
-  
-  
+let f_map_simp fnT fnF f = f_label_copy f (match f.f_node with
+  | Fapp (p, [t1;t2]) when ls_equal p ps_equ ->
+      f_equ_simp (fnT t1) (fnT t2)
+  | Fapp (p, [t1;t2]) when ls_equal p ps_neq ->
+      f_neq_simp (fnT t1) (fnT t2)
+  | Fapp (p, tl) -> f_app_unsafe p (List.map fnT tl)
+  | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
+      let f1' = fnF f1 in let tl' = tr_map fnT fnF tl in
+      if f_equal f1' f1 && trl_equal tl' tl && not (is_true_false f1) then f
+      else f_quant_simp q vl tl' f1'
+  | Fbinop (op, f1, f2) -> f_binary_simp op (fnF f1) (fnF f2)
+  | Fnot f1 -> f_not_simp (fnF f1)
+  | Ftrue | Ffalse -> f
+  | Fif (f1, f2, f3) -> f_if_simp (fnF f1) (fnF f2) (fnF f3)
+  | Flet (t, b) -> let u,f1 = f_open_bound b in
+      let t' = fnT t in let f1' = fnF f1 in
+      if t_equal t' t && f_equal f1' f1 && not (is_true_false f1) then f
+      else f_let_simp u t' f1'
+  | Fcase (tl, bl) -> let tl' = List.map fnT tl in
+      let tltl = List.for_all2 t_equal tl tl' in
+      let blbl,bl' = map_fold_left (f_branch' fnF) true bl in
+      if tltl && blbl then f else f_case tl' bl')
+
 let f_map_simp fnT = f_map_simp (protect fnT)
+
