@@ -79,8 +79,11 @@ and expr_desc env _loc ty = function
       let e1 = expr env e1 in
       let c = apply_type_v env e1.expr_type_v vs in
       Eany c, c.c_result_type, c.c_effect
-  | Pgm_ttree.Eapply_ref _ ->
-      assert false (*TODO*)
+      (* TODO: do not forget about e1 *)
+  | Pgm_ttree.Eapply_ref (e1, r) ->
+      let e1 = expr env e1 in
+      let c = apply_type_v_ref env e1.expr_type_v r in
+      Eany c, c.c_result_type, c.c_effect
   | Pgm_ttree.Efun (bl, t) ->
       let env = add_binders env bl in
       let t, c = triple env t in
@@ -176,6 +179,10 @@ let unref_ty env ty = match ty.ty_node with
   | Tyapp (ts, [ty]) when ts_equal ts env.ts_ref -> ty
   | _ -> assert false
 
+let is_ref_ty env ty = match ty.ty_node with
+  | Tyapp (ts, [_]) -> ts_equal ts env.ts_ref
+  | _ -> false
+
 (* replace !r by v everywhere in formula f *)
 let rec unref env r v f =
   f_map (unref_term env r v) (unref env r v) f
@@ -203,9 +210,17 @@ let quantify env ef f =
 
 let abstract_wp env ef (q',ql') (q,ql) =
   assert (List.length ql' = List.length ql);
-  let quantify_r f' f res =
+  let quantify_res f' f res =
     let f = wp_implies f' f in
-    let f = match res with Some v -> wp_forall [v] [] f | None -> f in
+    let f = match res with 
+      | Some v when is_ref_ty env v.vs_ty -> 
+	  let v' = create_vsymbol (id_clone v.vs_name) (unref_ty env v.vs_ty) in
+	  wp_forall [v'] [] (unref env (E.Rlocal v) v' f)
+      | Some v -> 
+	  wp_forall [v] [] f 
+      | None -> 
+	  f 
+    in
     quantify env ef f
   in
   let quantify_h (e',(x',f')) (e,(x,f)) =
@@ -215,12 +230,12 @@ let abstract_wp env ef (q',ql') (q,ql) =
       | None, None -> None, f'
       | _ -> assert false
     in
-    quantify_r f' f res
+    quantify_res f' f res
   in
   let f = 
     let res, f = q and res', f' = q' in
     let f' = f_subst (subst1 res' res) f' in
-    quantify_r f' f (Some res)
+    quantify_res f' f (Some res)
   in
   wp_ands (f :: List.map2 quantify_h ql' ql)
 

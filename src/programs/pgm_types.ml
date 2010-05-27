@@ -7,6 +7,7 @@ open Ty
 module E = Pgm_effect
 
 type effect = E.t
+type reference = Pgm_effect.reference
 
 type pre = Term.fmla
 
@@ -142,24 +143,52 @@ let type_c_of_type_v env = function
 	c_pre         = f_true;
 	c_post        = (v_result ty, f_true), []; }
 
+let rec subst_type_c ts s c = 
+  { c_result_type = subst_type_v ts s c.c_result_type;
+    c_effect      = c.c_effect;
+    c_pre         = f_ty_subst ts s c.c_pre;
+    c_post        = subst_post ts s c.c_post; }
+
+and subst_type_v ts s = function
+  | Tpure ty -> 
+      Tpure (ty_inst ts ty)
+  | Tarrow (bl, c) -> 
+      let s, bl = Util.map_fold_left (binder ts) s bl in
+      Tarrow (bl, subst_type_c ts s c)
+
+and binder ts s (vs, v) =
+  let v = subst_type_v ts s v in
+  let s, vs = subst_var ts s vs in
+  s, (vs, v)
+
+and subst_var ts s vs =
+  let ty' = ty_inst ts vs.vs_ty in
+  if ty_equal ty' vs.vs_ty then
+    s, vs
+  else
+    let vs' = create_vsymbol (id_clone vs.vs_name) ty' in
+    Mvs.add vs (t_var vs') s, vs'
+
+and subst_post ts s ((v, q), ql) =
+  let vq = let s, v = subst_var ts s v in v, f_ty_subst ts s q in
+  let handler (e, (v, q)) = match v with
+    | None -> e, (v, f_ty_subst ts s q)
+    | Some v -> let s, v = subst_var ts s v in e, (Some v, f_ty_subst ts s q)
+  in
+  vq, List.map handler ql
+  
 let subst1 vs1 vs2 = Mvs.add vs1 (t_var vs2) Mvs.empty
 
-let rec subst_type_c s c = 
-  { c_result_type = subst_type_v s c.c_result_type;
-    c_effect      = c.c_effect;
-    c_pre         = f_subst s c.c_pre;
-    c_post        = post_map (f_subst s) c.c_post; }
-
-and subst_type_v s = function
-  | Tpure _ as v -> v
-  | Tarrow (bl, c) -> Tarrow (bl, subst_type_c s c)
-
 let apply_type_v env v vs = match v with
-  | Tarrow ((x, _) :: bl, c) ->
+  | Tarrow ((x, tyx) :: bl, c) ->
+      let ts = ty_match Mtv.empty (purify env.uc tyx) vs.vs_ty in
       let c = type_c_of_type_v env (Tarrow (bl, c)) in
-      subst_type_c (subst1 x vs) c
+      subst_type_c ts (subst1 x vs) c
   | Tarrow ([], _) | Tpure _ -> 
       assert false
+
+let apply_type_v_ref env v r = 
+  assert false (*TODO*)
 
 (* pretty-printers *)
 
@@ -187,5 +216,9 @@ and print_type_c fmt c =
 
 and print_binder fmt (x, v) =
   fprintf fmt "(%a:%a)" print_vs x print_type_v v
+
+let apply_type_v env v vs =
+  eprintf "apply_type_v: v=%a vs=%a@." print_type_v v print_vs vs;
+  apply_type_v env v vs
 
 

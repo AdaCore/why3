@@ -134,11 +134,11 @@ let print_decl drv fmt d = match d.d_node with
       "tptp : inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Driver.query_remove drv pr.pr_name -> false
   | Dprop (Paxiom, pr, f) ->
-      fprintf fmt "fof(%s, axiom,@ %a).\n"
+      fprintf fmt "@[<hov 2>fof(%s, axiom,@ %a).@]@\n"
         (id_unique ~sanitizer:String.uncapitalize ident_printer pr.pr_name)
         (print_fmla drv) f; true
   | Dprop (Pgoal, pr, f) -> (* TODO : what is pr ? *)
-      fprintf fmt "fof(%s, conjecture,@ %a ).\n"
+      fprintf fmt "@[<hov 2>fof(%s, conjecture,@ %a ).@]@\n"
         (id_unique ~sanitizer:String.uncapitalize ident_printer pr.pr_name)
         (print_fmla drv) f; true
       (* fprintf fmt "@[;; %a@]@\n" print_ident pr.pr_name; *)

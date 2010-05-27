@@ -8,6 +8,7 @@ open Decl
 (* types *)
 
 type effect = Pgm_effect.t
+type reference = Pgm_effect.reference
 
 type pre = Term.fmla
 
@@ -46,7 +47,8 @@ val ls_assign : theory_uc -> lsymbol (* := : 'a ref -> 'a -> unit *)
 
 val purify : theory_uc -> type_v -> ty
 
-val apply_type_v : env -> type_v -> vsymbol -> type_c
+val apply_type_v     : env -> type_v -> vsymbol   -> type_c
+val apply_type_v_ref : env -> type_v -> reference -> type_c
 
 val empty_env : theory_uc -> env
 

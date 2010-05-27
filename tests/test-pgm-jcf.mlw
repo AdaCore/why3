@@ -15,17 +15,9 @@ parameter r : int ref
 parameter write : v:int -> {} unit writes r { !r = v }
 
 let ff () = 
-  { true } 
-  write 42
-  { !r = 42 }
-
-(* TODO
-let ff () = 
-  { true } 
-  let x = ref 0 in !x
-  { result = 0 }
-*)
-
+  { !r >= 0 } 
+  !r + 2
+  { result = 42 }
 
 
 (*
