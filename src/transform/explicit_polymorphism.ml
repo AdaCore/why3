@@ -141,9 +141,9 @@ module Utils = struct
   to types in [right]. [tv_to_ty] is a mapping given in argument.
   It must be compliant with the unification between [left] and [right] *)
   let rec find_matching_vars tv_to_ty left right =
-    Format.eprintf "matching @[%a@] with @[%a@]@."
+    (* Format.eprintf "matching @[%a@] with @[%a@]@."
       (Debug.print_list Pretty.print_ty) left
-      (Debug.print_list Pretty.print_ty) right;
+      (Debug.print_list Pretty.print_ty) right; *)
     assert (List.length left = List.length right);
     let tv_to_ty = List.fold_left2 ty_match tv_to_ty left right in
     (* Format.eprintf "gives @[%a@]@."
@@ -346,14 +346,14 @@ end
 symbols) and a declaration, and returns the corresponding declaration in
 explicit polymorphism logic. *)
 let decl_transform tblT tblL d =
- Format.eprintf "%a@." Pretty.print_decl d;
+  (*Format.eprintf "%a@." Pretty.print_decl d; *)
   let result = match d.d_node with
     | Dind _inds ->
     failwith "Dind : should not have inductives declarations at this point !"
     | Dtype tys -> Transform.type_transform tblT tys
     | Dlogic decls -> Transform.logic_transform tblL decls
     | Dprop prop -> Transform.prop_transform tblT tblL prop in
-  Format.eprintf "===@.%a@.@." (Debug.print_list Pretty.print_decl) result;
+  (* Format.eprintf "===@.%a@.@." (Debug.print_list Pretty.print_decl) result;*)
   result
 
 

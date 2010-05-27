@@ -1,7 +1,7 @@
 
 (* Why driver for tptp first-order logic solvers *)
 
-prelude "% this is a prelude for tptp solvers"
+prelude "% this is a why prelude for tptp solvers"
 
 printer "tptp"
 filename "%f-%t-%g.p"
@@ -26,8 +26,6 @@ transformation "eliminate_if"
 transformation "eliminate_let"
 
 transformation "explicit_polymorphism"
-
-(* TODO : transformation to eliminate types *)
 
 
 theory BuiltIn
