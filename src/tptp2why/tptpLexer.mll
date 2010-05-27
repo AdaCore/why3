@@ -39,7 +39,11 @@
 
   let stringBuf = Buffer.create 256
 
-  exception LexicalError of string
+  exception LexicalError of string * Lexing.position
+
+  let report fmter (s, pos) =
+    fprintf fmter "file %s, line %d, char %d"
+      s (pos.pos_lnum) (pos.pos_cnum-pos.pos_bol)
 
 }
 
@@ -116,7 +120,8 @@ rule token = parse
   | eof
       { EOF }
   | _ as c
-      { raise (LexicalError (Format.sprintf "illegal character: %c" c)) }
+      { raise (LexicalError (Format.sprintf "illegal character: %c" c,
+          lexeme_start_p lexbuf)) }
 and comment = parse (* read until newline *)
   | newline
     { newline lexbuf; token lexbuf }
@@ -130,6 +135,7 @@ and string = parse
   | "\\'"
     { Buffer.add_char stringBuf '\''; string lexbuf }
   | eof
-    { raise (LexicalError "unterminated single quoted") }
+    { raise (LexicalError ("unterminated single quoted",
+                            lexeme_start_p lexbuf)) }
   | _ as c
     { Buffer.add_char stringBuf c; string lexbuf }

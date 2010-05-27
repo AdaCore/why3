@@ -30,38 +30,64 @@ open TptpTranslate
 
 (** module to process a single file *)
 module Process : sig
+
+  (** deprecated *)
   val printFile : Format.formatter -> string -> string -> string -> unit
-end= struct
+
+  val read_channel : Env.read_channel
+  val report : Env.error_report
+end = struct
 
   let fromInclude = function | Include x -> x | _ -> assert false
+  let isInclude = function | Include _ -> true | _ -> false
+
+  (** report errors *)
+  let report fmt = function
+    | TptpLexer.LexicalError (s, pos) ->
+      Format.fprintf fmt "lexical error: %a@." TptpLexer.report (s, pos)
+    | TptpParser.Error ->
+      Format.fprintf fmt "syntax error.@." (*TODO : find how to report pos*)
+    | e -> 
+      Format.fprintf fmt "exception uncaught : %s@." (Printexc.to_string e);
+      raise e
+
+
   (** for a given file, returns the list of declarations
   for this file and all the files it includes, recursively *)
   let rec getAllDecls ?first:(first=false) include_dir filename =
-    let rec myparse chan =
-      let lb = Lexing.from_channel chan in
-      try TptpParser.tptp TptpLexer.token lb
-      with
-      | TptpLexer.LexicalError s -> report lb;
-        Format.eprintf "lexical error: %s@." s; exit 1
-      | TptpParser.Error -> report lb; Format.eprintf "syntax error@."; exit 1
-    and report lb = let pos = lexeme_start_p lb in
-      Format.eprintf "file %s, line %d, char %d@."
-      filename (pos.pos_lnum) (pos.pos_cnum-pos.pos_bol) in
     try
       let filename = if first then filename else include_dir^"/"^filename in
       let input = if filename = "-" then stdin else open_in filename in
       let decls = myparse input in
-      (* Format.eprintf "parsing done (%d decls)@." (List.length decls); *)
-      let isInclude = function | Include _ -> true | _ -> false in
       close_in input;
-      let (to_include, real_decl) = List.partition isInclude decls in
-      let to_include = List.map fromInclude to_include in (* remove Include *)
-      let all_decls = List.concat
-        (List.map (getAllDecls include_dir) to_include) in
-      all_decls @ real_decl
+      process_recursively ~include_dir:include_dir decls
     with (Sys_error _) as e ->
       print_endline ("error : unable to open "^filename);
       raise e
+  (** read completely a channel *)
+  and getDeclsFromChan input =
+    let decls = myparse input in
+    process_recursively decls
+  (** search a list of declarations for include statements *)
+  and process_recursively ?(include_dir=".") decls =
+    let (to_include, real_decl) = List.partition isInclude decls in
+    let to_include = List.map fromInclude to_include in (* remove Include *)
+    let all_decls = List.concat
+      (List.map (getAllDecls include_dir) to_include) in
+    all_decls @ real_decl
+    
+  (** parses a single file *)
+  and myparse chan =
+    let lb = Lexing.from_channel chan in
+    TptpParser.tptp TptpLexer.token lb
+
+
+  let read_channel
+      ?(debug=false) ?(parse_only=false) ?(type_only=false) env file c =
+    let decls = getDeclsFromChan c in
+    if parse_only then Theory.Mnm.empty else
+      let my_theory = theory_of_decls file decls in
+      Theory.Mnm.add "Tptp" my_theory Theory.Mnm.empty
 
 
   (** process a single file and all includes inside *)
@@ -77,10 +103,10 @@ end
 
 (*s main function and arg parsing *)
 
-open Arg
+
 
 (** module for options processing *)
-module Init = struct
+(*module Init = struct
 
   let input_files = ref []
   let output_chan = ref (Format.formatter_of_out_channel stdout)
@@ -104,10 +130,10 @@ module Init = struct
 
 end
 
-open Init
+open Init *)
 
 (** read options, and process each input file accordingly *)
-let _ =
+(* let () =
   parse options (fun file -> input_files := file :: (!input_files)) usage;
   input_files := List.rev !input_files;
   let theoryCounter = ref 0 in
@@ -115,4 +141,9 @@ let _ =
     (fun x -> let theoryName = "Theory"^(string_of_int !theoryCounter) in
               incr theoryCounter;
               Process.printFile !output_chan !include_dir theoryName x)
-    !input_files
+    !input_files *)
+
+
+(** register as a .p/.ax file parser *)
+let () =
+  Env.register_format "tptp" ["p"] Process.read_channel Process.report
