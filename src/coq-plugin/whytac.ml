@@ -159,7 +159,7 @@ let rec_names_for c =
        | Name id -> 
 	   let c' = Names.make_con mp dp (label_of_id id) in
 	   ignore (Global.lookup_constant c');
-	   msgnl (Printer.pr_constr (mkConst c'));
+	   (* msgnl (Printer.pr_constr (mkConst c')); *)
 	   c'
        | Anonymous ->
 	   raise Not_found)
@@ -252,11 +252,21 @@ let rec add_local_decls d =
     assert (Decl.Mdecl.mem d !global_dep);
     let dep = Decl.Mdecl.find d !global_dep in
     Decl.Sdecl.iter add_local_decls dep;
-    task := Task.add_decl !task d
+    try
+      task := Task.add_decl !task d
+    with Decl.UnknownIdent id ->
+      Format.eprintf "unknown ident %s@." id.Ident.id_string; exit 42
   end
 
 let empty_dep () = ref Decl.Sdecl.empty
 let add_dep r v = r := Decl.Sdecl.add v !r
+
+let print_dep fmt =
+  let print1 d dl = 
+    Format.fprintf fmt "@[%a -> @[%a@]@]@\n" Pretty.print_decl d
+      (Pp.print_list Pp.newline Pretty.print_decl) (Decl.Sdecl.elements dl)
+  in
+  Decl.Mdecl.iter print1 !global_dep
 
 (* synchronization *)
 let () =
@@ -269,7 +279,12 @@ let () =
 	   global_ts := ts; global_ls := ls; poly_arity := pa;
 	   global_decl := gdecl; global_dep := gdep);
       Summary.init_function = 
-	(fun () -> ());
+	(fun () -> 
+	   global_ts := Refmap.empty;
+	   global_ls := Refmap.empty;
+	   poly_arity := Mls.empty;
+	   global_decl := Ident.Mid.empty;
+	   global_dep := Decl.Mdecl.empty);
       Summary.survive_module = true;
       Summary.survive_section = true;
     }
@@ -373,7 +388,11 @@ and tr_task_ts dep env r =
 (* the type declaration for r *)
 and tr_global_ts dep env r =   
   try
-    lookup_table global_ts r
+    let ts = lookup_table global_ts r in
+    begin try
+      let d = Ident.Mid.find ts.ts_name !global_decl in add_dep dep d
+    with Not_found -> () end;
+    ts
   with Not_found ->
     add_table global_ts r None;
     let dep' = empty_dep () in
@@ -469,7 +488,11 @@ and tr_task_ls dep env r =
 (* the function/predicate symbol declaration for r *)
 and tr_global_ls dep env r =
   try
-    lookup_table global_ls r
+    let ls = lookup_table global_ls r in
+    begin try
+      let d = Ident.Mid.find ls.ls_name !global_decl in add_dep dep d
+    with Not_found -> () end;
+    ls
   with Not_found ->
     add_table global_ls r None;
     let dep' = empty_dep () in
@@ -864,6 +887,7 @@ let tr_goal gl =
 let () = Printexc.record_backtrace true
 
 let whytac s gl =
+  (* print_dep Format.err_formatter; *)
   let concl_type = pf_type_of gl (pf_concl gl) in
   if not (is_Prop concl_type) then error "Conclusion is not a Prop";
   task := Task.use_export None Theory.builtin_theory;

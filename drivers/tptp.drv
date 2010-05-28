@@ -1,13 +1,15 @@
 
 (* Why driver for tptp first-order logic solvers *)
 
-prelude "% this is a why prelude for tptp solvers"
+prelude "% this is a why prelude for tptp solvers
+fof(two_constants, axiom, ~ ('0' = '1')).
+"
 
 printer "tptp"
 filename "%f-%t-%g.p"
 
 valid "Proof found"
-valid "Completion found"
+invalid "Completion found"
 fail "Failure" "Failure"
 unknown "No Proof Found" "Unknown"
 timeout "Resource limit exceeded"

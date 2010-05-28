@@ -80,9 +80,10 @@ Qed.
 Print In.
 
 Goal In 0 (cons 1 (cons 0 nil)).
-try ae.
+spass.
+(*ae.*)
 (* ICI *)
-Admitted.
+Qed.
 
 (* inductive types *)
 
@@ -104,15 +105,15 @@ intros.
 ae.
 Qed.
 
-Goal forall x, (match x with (S (S _)) => True | _ => False end).
+Goal (match (S (S (S O))) with (S (S _)) => True | _ => False end).
+spass.
+Qed.
 
-Admitted.
 
-
-Goal forall a, forall (x: list (list a)), match x with nil => 1 | x :: r => 2 end <= 2.
-intros.
-try ae.
-Admitted.
+Goal forall a, forall (x: list (list a)), 1<=2 -> match x with nil => 1 | x :: r => 2 end <= 2.
+intros a x.
+spass.
+Qed.
 
 
 (* Mutually inductive types *)
@@ -167,6 +168,9 @@ ae.
 Qed.
 
 Goal forall (a:Set), ptree_size a (PLeaf _) = 0.
+intros.
+(* BUG ICI *)
+spass.
 (* TODO: intro context *)
 Admitted.
 
