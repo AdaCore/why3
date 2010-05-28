@@ -82,7 +82,7 @@ val ty_s_fold : ('a -> tysymbol -> 'a) -> 'a -> ty -> 'a
 val ty_s_all : (tysymbol -> bool) -> ty -> bool
 val ty_s_any : (tysymbol -> bool) -> ty -> bool
 
-exception TypeMismatch
+exception TypeMismatch of ty * ty
 
 val ty_match : ty Mtv.t -> ty -> ty -> ty Mtv.t
 val ty_inst  : ty Mtv.t -> ty -> ty

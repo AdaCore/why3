@@ -364,7 +364,7 @@ let cl_init_ls cl ls ls' =
   if not (Sid.mem id cl.id_local) then raise (NonLocal id);
   let mtch sb ty ty' =
     try ty_match sb ty' (cl_trans_ty cl ty)
-    with TypeMismatch -> raise (BadInstance (id, ls'.ls_name))
+    with TypeMismatch _ -> raise (BadInstance (id, ls'.ls_name))
   in
   let sb = match ls.ls_value,ls'.ls_value with
     | Some ty, Some ty' -> mtch Mtv.empty ty ty'

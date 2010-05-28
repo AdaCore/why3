@@ -182,23 +182,27 @@ let ty_s_any pr ty =
 
 (* type matching *)
 
-exception TypeMismatch
+let rec ty_inst s ty = match ty.ty_node with
+  | Tyvar n -> (try Mtv.find n s with Not_found -> ty)
+  | _ -> ty_map (ty_inst s) ty
 
 let rec ty_match s ty1 ty2 =
   if ty_equal ty1 ty2 then s
   else match ty1.ty_node, ty2.ty_node with
     | Tyvar n1, _ ->
         (try if ty_equal (Mtv.find n1 s) ty2
-              then s else raise TypeMismatch
+              then s else raise Exit
          with Not_found -> Mtv.add n1 ty2 s)
     | Tyapp (f1, l1), Tyapp (f2, l2) when ts_equal f1 f2 ->
         List.fold_left2 ty_match s l1 l2
     | _ ->
-        raise TypeMismatch
+        raise Exit
 
-let rec ty_inst s ty = match ty.ty_node with
-  | Tyvar n -> (try Mtv.find n s with Not_found -> ty)
-  | _ -> ty_map (ty_inst s) ty
+exception TypeMismatch of ty * ty
+
+let ty_match s ty1 ty2 =
+  try ty_match s ty1 ty2
+  with Exit -> raise (TypeMismatch (ty_inst s ty1, ty2))
 
 (* built-in symbols *)
 

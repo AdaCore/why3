@@ -275,7 +275,7 @@ let create_ind_decl idl =
     match f.f_node with
       | Fapp (s, tl) when ls_equal s ps ->
           let mtch sb t ty =
-            try ty_match sb (t.t_ty) ty with TypeMismatch ->
+            try ty_match sb (t.t_ty) ty with TypeMismatch _ ->
               raise (TooSpecificIndDecl (ps, pr, t))
           in
           ignore (List.fold_left2 mtch Mtv.empty tl ps.ls_args);

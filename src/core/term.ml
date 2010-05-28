@@ -142,9 +142,12 @@ let pat_map fn pat = match pat.pat_node with
   | Papp (s, pl) -> pat_app s (List.map fn pl) pat.pat_ty
   | Pas (p, v) -> pat_as (fn p) v
 
+let check_ty_equal ty1 ty2 =
+  if not (ty_equal ty1 ty2) then raise (TypeMismatch (ty1, ty2))
+
 let protect fn pat =
   let res = fn pat in
-  if not (ty_equal res.pat_ty pat.pat_ty) then raise TypeMismatch;
+  check_ty_equal pat.pat_ty res.pat_ty;
   res
 
 let pat_map fn = pat_map (protect fn)
@@ -184,7 +187,7 @@ let pat_app fs pl ty =
   pat_app fs pl ty
 
 let pat_as p v =
-  if not (ty_equal p.pat_ty v.vs_ty) then raise TypeMismatch;
+  check_ty_equal p.pat_ty v.vs_ty;
   pat_as p v
 
 (* symbol-wise map/fold *)
@@ -558,7 +561,7 @@ let f_map_unsafe fnT fnF lvl f = f_label_copy f (match f.f_node with
 
 let protect fn lvl t =
   let res = fn lvl t in
-  if not (ty_equal res.t_ty t.t_ty) then raise TypeMismatch;
+  check_ty_equal t.t_ty res.t_ty;
   res
 
 let t_map_unsafe fnT = t_map_unsafe (protect fnT)
@@ -649,11 +652,11 @@ let f_app ps tl =
   f_app ps tl
 
 let p_check t p =
-  if not (ty_equal p.pat_ty t.t_ty) then raise TypeMismatch
+  check_ty_equal p.pat_ty t.t_ty
 
 let t_case tl bl ty =
   let t_check_branch (pl,_,tbr) =
-    if not (ty_equal tbr.t_ty ty) then raise TypeMismatch;
+    check_ty_equal ty tbr.t_ty;
     List.iter2 p_check tl pl
   in
   List.iter t_check_branch bl;
@@ -667,15 +670,15 @@ let f_case tl bl =
   f_case tl bl
 
 let t_if f t1 t2 =
-  if not (ty_equal t1.t_ty t2.t_ty) then raise TypeMismatch;
+  check_ty_equal t1.t_ty t2.t_ty;
   t_if f t1 t2
 
 let t_let v t1 t2 =
-  if not (ty_equal v.vs_ty t1.t_ty) then raise TypeMismatch;
+  check_ty_equal v.vs_ty t1.t_ty;
   t_let v t1 t2
 
 let f_let v t1 f2 =
-  if not (ty_equal v.vs_ty t1.t_ty) then raise TypeMismatch;
+  check_ty_equal v.vs_ty t1.t_ty;
   f_let v t1 f2
 
 (* generic map over types, symbols and variables *)
@@ -993,7 +996,7 @@ let f_map fnT fnF f = f_label_copy f (match f.f_node with
 
 let protect fn t =
   let res = fn t in
-  if not (ty_equal res.t_ty t.t_ty) then raise TypeMismatch;
+  check_ty_equal t.t_ty res.t_ty;
   res
 
 let t_map fnT = t_map (protect fnT)
@@ -1175,7 +1178,7 @@ let f_map_cont fnT fnF contF f =
       list_map_cont fnT cont_case tl
 
 let protect_cont t contT e =
-  if not (ty_equal e.t_ty t.t_ty) then raise TypeMismatch;
+  check_ty_equal t.t_ty e.t_ty;
   contT e
 
 let t_map_cont fnT = t_map_cont (fun c t -> fnT (protect_cont t c) t)
@@ -1438,11 +1441,13 @@ let rec t_subst_term t1 t2 lvl t = if t_equal t t1 then t2 else
 and f_subst_term t1 t2 lvl f =
   f_map_unsafe (t_subst_term t1 t2) (f_subst_term t1 t2) lvl f
 
-let t_subst_term t1 t2 t = if ty_equal t1.t_ty t2.t_ty
-  then t_subst_term t1 t2 0 t else raise TypeMismatch
+let t_subst_term t1 t2 t = 
+  check_ty_equal t1.t_ty t2.t_ty;
+  t_subst_term t1 t2 0 t
 
-let f_subst_term t1 t2 f = if ty_equal t1.t_ty t2.t_ty
-  then f_subst_term t1 t2 0 f else raise TypeMismatch
+let f_subst_term t1 t2 f = 
+  check_ty_equal t1.t_ty t2.t_ty;
+  f_subst_term t1 t2 0 f
 
 (* substitutes fmla [f2] for fmla [f1] in term [t] *)
 
@@ -1463,11 +1468,13 @@ let rec t_subst_term_alpha t1 t2 lvl t = if t_equal t t1 then t2 else
 and f_subst_term_alpha t1 t2 lvl f =
   f_map_unsafe (t_subst_term_alpha t1 t2) (f_subst_term_alpha t1 t2) lvl f
 
-let t_subst_term_alpha t1 t2 t = if ty_equal t1.t_ty t2.t_ty
-  then t_subst_term_alpha t1 t2 0 t else raise TypeMismatch
+let t_subst_term_alpha t1 t2 t = 
+  check_ty_equal t1.t_ty t2.t_ty;
+  t_subst_term_alpha t1 t2 0 t
 
-let f_subst_term_alpha t1 t2 f = if ty_equal t1.t_ty t2.t_ty
-  then f_subst_term_alpha t1 t2 0 f else raise TypeMismatch
+let f_subst_term_alpha t1 t2 f =
+  check_ty_equal t1.t_ty t2.t_ty;
+  f_subst_term_alpha t1 t2 0 f
 
 (* substitutes fmla [f2] for fmla [f1] in term [t] modulo alpha *)
 
