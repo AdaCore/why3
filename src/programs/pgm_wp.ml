@@ -101,12 +101,30 @@ and expr_desc env loc ty = function
       let e2 = expr env e2 in
       let ef = E.union e1.expr_effect e2.expr_effect in
       Elet (v, e1, e2), e2.expr_type_v, ef
+  | Pgm_ttree.Eletrec _ ->
+      assert false (*TODO*)
 
   | Pgm_ttree.Esequence (e1, e2) ->
       let e1 = expr env e1 in
       let e2 = expr env e2 in
       let ef = E.union e1.expr_effect e2.expr_effect in
       Esequence (e1, e2), e2.expr_type_v, ef
+  | Pgm_ttree.Eif _ ->
+      assert false (*TODO*)
+  | Pgm_ttree.Ewhile _ ->
+      assert false (*TODO*)
+  | Pgm_ttree.Elazy _ ->
+      assert false (*TODO*)
+  | Pgm_ttree.Ematch _ ->
+      assert false (*TODO*)
+  | Pgm_ttree.Eskip ->
+      Eskip, Tpure ty, E.empty
+  | Pgm_ttree.Eabsurd ->
+      assert false (*TODO*)
+  | Pgm_ttree.Eraise _ ->
+      assert false (*TODO*)
+  | Pgm_ttree.Etry _ ->
+      assert false (*TODO*)
 
   | Pgm_ttree.Eassert (k, f) ->
       let ef = fmla_effect env E.empty f in
@@ -114,8 +132,7 @@ and expr_desc env loc ty = function
   | Pgm_ttree.Elabel (lab, e1) ->
       let e1 = expr env e1 in
       Elabel (lab, e1), e1.expr_type_v, e1.expr_effect
-
-  | _ -> 
+  | Pgm_ttree.Eany _ ->
       assert false (*TODO*)
 
 and triple env (p, e, q) =
@@ -303,8 +320,7 @@ and wp_desc env e q = match e.expr_desc with
   | Elocal _ ->
       assert false (*TODO*)
   | Eglobal _ ->
-      let (_, q), _ = q in 
-      q
+      let (_, q), _ = q in q
   | Efun (bl, t) ->
       let (_, q), _ = q in
       let f = wp_triple env t in
@@ -322,6 +338,22 @@ and wp_desc env e q = match e.expr_desc with
       let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
       let q1 = saturate_post e1.expr_effect (v_result e1.expr_type, w2) q in
       wp_expr env e1 q1
+  | Eif _ ->
+      assert false (*TODO*)
+  | Ewhile _ ->
+      assert false (*TODO*)
+  | Elazy _ ->
+      assert false (*TODO*)
+  | Ematch _ ->
+      assert false (*TODO*)
+  | Eskip ->
+      let (_, q), _ = q in q
+  | Eabsurd ->
+      assert false (*TODO*)
+  | Eraise _ ->
+      assert false (*TODO*)
+  | Etry _ ->
+      assert false (*TODO*)
 
   | Eassert (Pgm_ptree.Aassert, f) ->
       let (_, q), _ = q in
@@ -340,7 +372,7 @@ and wp_desc env e q = match e.expr_desc with
       wp_and c.c_pre w
 
   | _ -> 
-      f_true (* TODO *)
+      assert false (*TODO*)
 
 and wp_triple env (p, e, q) =
   let f = wp_expr env e q in

@@ -242,7 +242,7 @@ clean::
 # test target
 
 %: %.mlw bin/whyml.byte
-	bin/whyml.byte $*.mlw
+	bin/whyml.byte -P alt-ergo $*.mlw
 
 ###############
 # proof manager
