@@ -25,6 +25,7 @@ open Ty
 open Term
 open Decl
 open Theory
+open Pretty
 open Pgm_ttree
 open Pgm_itree
 open Pgm_typing
@@ -194,8 +195,8 @@ let rec unref env r v f =
   f_map (unref_term env r v) (unref env r v) f
 
 and unref_term env r v t = match t.t_node with
-  | Tapp (ls, [t]) when ls_equal ls env.ls_bang ->
-      let rt = reference_of_term t in
+  | Tapp (ls, [u]) when ls_equal ls env.ls_bang ->
+      let rt = reference_of_term u in
       if E.ref_equal rt r then t_var v else t
   | Tapp (ls, _) when ls_equal ls env.ls_old ->
       assert false
@@ -210,7 +211,8 @@ let quantify env ef f =
   let quantify1 r f = 
     let ty = unref_ty env (E.type_of_reference r) in
     let v = create_vsymbol (id_clone (E.name_of_reference r)) ty in
-    wp_forall [v] [] (unref env r v f)
+    let f = unref env r v f in
+    wp_forall [v] [] f
   in
   let s = E.Sref.union ef.E.reads ef.E.writes in
   E.Sref.fold quantify1 s f
@@ -224,7 +226,7 @@ let abstract_wp env ef (q',ql') (q,ql) =
 	  let v' = create_vsymbol (id_clone v.vs_name) (unref_ty env v.vs_ty) in
 	  wp_forall [v'] [] (unref env (E.Rlocal v) v' f)
       | Some v -> 
-	  wp_forall [v] [] f 
+	  wp_forall [v] [] f
       | None -> 
 	  f 
     in
@@ -233,7 +235,7 @@ let abstract_wp env ef (q',ql') (q,ql) =
   let quantify_h (e',(x',f')) (e,(x,f)) =
     assert (ls_equal e' e);
     let res, f' = match x', x with
-      | Some v', Some v -> Some v, f_subst (subst1 v' v) f'
+      | Some v', Some v -> Some v, f_subst (subst1 v' (t_var v)) f'
       | None, None -> None, f'
       | _ -> assert false
     in
@@ -241,7 +243,7 @@ let abstract_wp env ef (q',ql') (q,ql) =
   in
   let f = 
     let res, f = q and res', f' = q' in
-    let f' = f_subst (subst1 res' res) f' in
+    let f' = f_subst (subst1 res' (t_var res)) f' in
     quantify_res f' f (Some res)
   in
   wp_ands (f :: List.map2 quantify_h ql' ql)
@@ -286,6 +288,8 @@ let saturate_post ef q (_, ql) =
 (* Recursive computation of the weakest precondition *)
 
 let rec wp_expr env e q = 
+(*   if !debug then  *)
+(*     eprintf "@[wp_expr: q=%a@]@." Pretty.print_fmla (snd (fst q)); *)
   let lab = fresh_label env in
   let q = post_map (old_label env lab) q in
   let f = wp_desc env e q in
@@ -299,7 +303,8 @@ and wp_desc env e q = match e.expr_desc with
   | Elocal _ ->
       assert false (*TODO*)
   | Eglobal _ ->
-      assert false (*TODO*)
+      let (_, q), _ = q in 
+      q
   | Efun (bl, t) ->
       let (_, q), _ = q in
       let f = wp_triple env t in
@@ -307,7 +312,7 @@ and wp_desc env e q = match e.expr_desc with
   | Elet (x, e1, e2) ->
       let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
       let result = v_result e1.expr_type in
-      let q1 = result, f_subst (subst1 x result) w2 in
+      let q1 = result, f_subst (subst1 x (t_var result)) w2 in
       let q1 = saturate_post e1.expr_effect q1 q in
       wp_expr env e1 q1
   | Eletrec _ ->

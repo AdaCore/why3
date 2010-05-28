@@ -177,13 +177,13 @@ and binder ef ts s (vs, v) =
   let s, vs = subst_var ts s vs in
   s, (vs, v)
 
-let subst1 vs1 vs2 = Mvs.add vs1 (t_var vs2) Mvs.empty
+let subst1 vs1 t2 = Mvs.add vs1 t2 Mvs.empty
 
 let apply_type_v env v vs = match v with
   | Tarrow ((x, tyx) :: bl, c) ->
       let ts = ty_match Mtv.empty (purify env.uc tyx) vs.vs_ty in
       let c = type_c_of_type_v env (Tarrow (bl, c)) in
-      subst_type_c (fun e -> e) ts (subst1 x vs) c
+      subst_type_c (fun e -> e) ts (subst1 x (t_var vs)) c
   | Tarrow ([], _) | Tpure _ -> 
       assert false
 
@@ -192,9 +192,13 @@ let apply_type_v_ref env v r = match r, v with
       let ts = ty_match Mtv.empty (purify env.uc tyx) vs.vs_ty in
       let c = type_c_of_type_v env (Tarrow (bl, c)) in
       let ef = E.subst x r in
-      subst_type_c ef ts (subst1 x vs) c
-  | E.Rglobal _, Tarrow ((_x, _tyx) :: _bl, _c) -> 
-      assert false (*TODO*)
+      subst_type_c ef ts (subst1 x (t_var vs)) c
+  | E.Rglobal ls as r, Tarrow ((x, tyx) :: bl, c) -> 
+      let ty = match ls.ls_value with None -> assert false | Some ty -> ty in
+      let ts = ty_match Mtv.empty (purify env.uc tyx) ty in
+      let c = type_c_of_type_v env (Tarrow (bl, c)) in
+      let ef = E.subst x r in
+      subst_type_c ef ts (subst1 x (t_app ls [] ty)) c
   | _ ->
       assert false
 

@@ -757,6 +757,10 @@ let rec print_expr fmt e = match e.expr_desc with
   | Elet (v, e1, e2) ->
       fprintf fmt "@[let %a = %a in@ %a@]" print_vs v
 	print_expr e1 print_expr e2
+
+  | Esequence (e1, e2) ->
+      fprintf fmt "@[%a;@\n%a@]" print_expr e1 print_expr e2
+
   | _ ->
       fprintf fmt "<other>"
 
@@ -866,13 +870,13 @@ End:
 (* 
 TODO:
 
-- use a pure structure for globals
-
 - mutually recursive functions: allow order relation to be specified only once
 
 - exhaustivity of pattern-matching (in WP?)
 
 - do not add global references into the theory (add_global_if_pure)
+
+- ML-like polymorphism
 
 - ghost / effects
 *)

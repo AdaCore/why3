@@ -60,8 +60,6 @@ module Reference = struct
     | Rlocal _, Rglobal _ -> -1
     | Rglobal _, Rlocal _ -> 1
 
-  let equal r1 r2 = compare r1 r2 = 0
-
 end
 
 module Sref = Set.Make(Reference)

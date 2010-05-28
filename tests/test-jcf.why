@@ -9,6 +9,11 @@ theory Test
   goal G : 3.14 = 3.15
 end
 
+theory Test2
+  use export list.List
+  goal G : let x = Nil in let t = (Cons(1, x), Cons(3.14, x)) in t=t
+end
+
 
 (*
 Local Variables: 
