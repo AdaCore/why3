@@ -35,15 +35,23 @@ type env = private {
   locals  : type_v Mvs.t;
   (* predefined symbols *)
   ts_arrow: tysymbol;
+  ts_bool : tysymbol;
   ts_label: tysymbol;
   ts_ref  : tysymbol;
+  ts_unit : tysymbol;
   ls_at   : lsymbol;
   ls_bang : lsymbol;
   ls_old  : lsymbol;
+  ls_True : lsymbol;
 }
 
 val ls_ref    : theory_uc -> lsymbol (* ref: 'a -> 'a ref *)
 val ls_assign : theory_uc -> lsymbol (* := : 'a ref -> 'a -> unit *)
+val ls_Exit   : theory_uc -> lsymbol
+
+val t_True : env -> term
+
+val type_v_unit : env -> type_v
 
 val purify : theory_uc -> type_v -> ty
 
@@ -63,6 +71,8 @@ val v_result : ty -> vsymbol
 val post_map : (fmla -> fmla) -> post -> post
 
 val subst1 : vsymbol -> term -> term Mvs.t
+
+val eq_type_v : type_v -> type_v -> bool
 
 (* pretty-printers *)
 

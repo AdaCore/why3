@@ -109,10 +109,27 @@ and expr_desc env loc ty = function
       let e2 = expr env e2 in
       let ef = E.union e1.expr_effect e2.expr_effect in
       Esequence (e1, e2), e2.expr_type_v, ef
-  | Pgm_ttree.Eif _ ->
-      assert false (*TODO*)
-  | Pgm_ttree.Ewhile _ ->
-      assert false (*TODO*)
+  | Pgm_ttree.Eif (e1, e2, e3) ->
+      let e1 = expr env e1 in
+      let e2 = expr env e2 in
+      let e3 = expr env e3 in
+      let ef = E.union e1.expr_effect e2.expr_effect in
+      let ef = E.union ef             e3.expr_effect in
+      if not (eq_type_v e2.expr_type_v e3.expr_type_v) then
+	errorm ~loc "cannot branch on functions";
+      Eif (e1, e2, e3), e2.expr_type_v, ef
+  | Pgm_ttree.Eloop (a, e1) ->
+      let e1 = expr env e1 in
+      let ef = e1.expr_effect in
+      let ef = match a.loop_invariant with
+	| Some f -> fmla_effect env ef f
+	| None -> ef
+      in
+      let ef = match a.loop_variant with
+	| Some (t, _) -> term_effect env ef t
+	| None -> ef
+      in
+      Eloop (a, e1), type_v_unit env, ef
   | Pgm_ttree.Elazy _ ->
       assert false (*TODO*)
   | Pgm_ttree.Ematch _ ->
@@ -121,10 +138,14 @@ and expr_desc env loc ty = function
       Eskip, Tpure ty, E.empty
   | Pgm_ttree.Eabsurd ->
       assert false (*TODO*)
-  | Pgm_ttree.Eraise _ ->
-      assert false (*TODO*)
-  | Pgm_ttree.Etry _ ->
-      assert false (*TODO*)
+  | Pgm_ttree.Eraise (x, e1) ->
+      let e1 = option_map (expr env) e1 in
+      let ef = match e1 with Some e1 -> e1.expr_effect | None -> E.empty in
+      let ef = E.add_raise x ef in
+      Eraise (x, e1), Tpure ty, ef
+  | Pgm_ttree.Etry (_e1, _hl) ->
+      assert false (* TODO *)
+      (*Etry (e1, hl), Tpure ty, ef*)
 
   | Pgm_ttree.Eassert (k, f) ->
       let ef = fmla_effect env E.empty f in
@@ -338,9 +359,17 @@ and wp_desc env e q = match e.expr_desc with
       let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
       let q1 = saturate_post e1.expr_effect (v_result e1.expr_type, w2) q in
       wp_expr env e1 q1
-  | Eif _ ->
-      assert false (*TODO*)
-  | Ewhile _ ->
+  | Eif (e1, e2, e3) ->
+      let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
+      let w3 = wp_expr env e3 (filter_post e3.expr_effect q) in
+      let q1 = (* if result=True then w2 else w3 *)
+	let res = v_result e1.expr_type in
+	let test = f_equ (t_var res) (t_True env) in
+	let q1 = f_if test w2 w3 in
+	saturate_post e1.expr_effect (res, q1) q
+      in
+      wp_expr env e1 q1
+  | Eloop _ ->
       assert false (*TODO*)
   | Elazy _ ->
       assert false (*TODO*)

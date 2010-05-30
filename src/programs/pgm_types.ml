@@ -34,11 +34,14 @@ type env = {
   globals : type_v Mls.t;
   locals  : type_v Mvs.t;
   ts_arrow: tysymbol;
+  ts_bool : tysymbol;
   ts_label: tysymbol;
   ts_ref: tysymbol;
+  ts_unit : tysymbol;
   ls_at : lsymbol;
   ls_bang : lsymbol;
   ls_old : lsymbol;
+  ls_True : lsymbol;
 }
 
 let find_ts uc = ns_find_ts (get_namespace uc)
@@ -64,6 +67,12 @@ let ls_assign = memo_ls
      let ty_unit = ty_app (find_ts uc ["unit"]) [] in
      let a = ty_var (create_tvsymbol (id_fresh "a")) in
      create_lsymbol (id_fresh "infix :=") [ty_app ts_ref [a]; a] (Some ty_unit))
+
+let ls_Exit = memo_ls
+  (fun uc _ ->
+     let ty_exn = ty_app (find_ts uc ["exn"]) [] in
+     create_lsymbol (id_fresh "%Exit") [] (Some ty_exn))
+     
 
 let v_result ty = create_vsymbol (id_fresh "result") ty
 
@@ -103,12 +112,15 @@ let empty_env uc = {
   locals = Mvs.empty;
   (* types *)
   ts_arrow = find_ts uc ["arrow"];
+  ts_bool  = find_ts uc ["bool"];
   ts_label = find_ts uc ["label"];
   ts_ref   = find_ts uc ["ref"];
+  ts_unit  = find_ts uc ["unit"];
   (* functions *)
   ls_at    = find_ls uc ["at"];
   ls_bang  = find_ls uc ["prefix !"];
   ls_old   = find_ls uc ["old"];
+  ls_True  = find_ls uc ["True"];
 }    
 
 let add_local x v env = { env with locals = Mvs.add x v env.locals }
@@ -201,6 +213,20 @@ let apply_type_v_ref env v r = match r, v with
       subst_type_c ef ts (subst1 x (t_app ls [] ty)) c
   | _ ->
       assert false
+
+let rec eq_type_v v1 v2 = match v1, v2 with
+  | Tpure ty1, Tpure ty2 ->
+      ty_equal ty1 ty2
+  | Tarrow _, Tarrow _ ->
+      false (* TODO? *)
+  | _ ->
+      assert false
+
+let t_True env =
+  t_app env.ls_True [] (ty_app env.ts_bool [])
+
+let type_v_unit env =
+  Tpure (ty_app env.ts_unit [])
 
 (* pretty-printers *)
 

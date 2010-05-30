@@ -71,6 +71,7 @@
   let id_unit () = { id = "unit"; id_loc = loc () }
   let id_result () = { id = "result"; id_loc = loc () }
   let id_anonymous () = { id = "_"; id_loc = loc () }
+  let exit_exn () = { id = "%Exit"; id_loc = loc () }
 
   let id_wf_lt_int () = Qident { id = "wf_lt_int"; id_loc = loc () }
 
@@ -290,7 +291,13 @@ expr:
 | LABEL uident COLON expr
    { mk_expr (Elabel ($2, $4)) }
 | WHILE expr DO loop_annotation expr DONE
-   { mk_expr (Ewhile ($2, $4, $5)) }
+   { mk_expr 
+       (Etry 
+	  (mk_expr
+	     (Eloop ($4, 
+		     mk_expr (Eif ($2, $5,
+				   mk_expr (Eraise (exit_exn (), None)))))),
+	   [exit_exn (), None, mk_expr Eskip])) }
 | ABSURD
    { mk_expr Eabsurd }
 | expr COLON simple_pure_type

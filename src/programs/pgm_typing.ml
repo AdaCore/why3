@@ -95,7 +95,9 @@ let create_genv uc = {
     Mstr.add "ref" (ls_ref uc)
     (Mstr.add "infix :=" (ls_assign uc) 
     Mstr.empty);
-  exceptions = Mstr.empty;
+  exceptions = 
+    Mstr.add "%Exit" (ls_Exit uc)
+    Mstr.empty;
   ts_bool = ns_find_ts (get_namespace uc) ["bool"];
   ts_unit = ns_find_ts (get_namespace uc) ["unit"];
   ts_ref  = ns_find_ts (get_namespace uc) ["ref"];
@@ -336,12 +338,10 @@ and dexpr_desc env loc = function
       let e3 = dexpr env e3 in
       expected_type e3 e2.dexpr_type;
       DEif (e1, e2, e3), e2.dexpr_type
-  | Pgm_ptree.Ewhile (e1, a, e2) ->
+  | Pgm_ptree.Eloop (a, e1) ->
       let e1 = dexpr env e1 in
-      expected_type e1 (dty_bool env.genv);
-      let e2 = dexpr env e2 in
-      expected_type e2 (dty_unit env.genv);
-      DEwhile (e1, dloop_annotation env.genv.uc a, e2), (dty_unit env.genv)
+      expected_type e1 (dty_unit env.genv);
+      DEloop (dloop_annotation env.genv.uc a, e1), (dty_unit env.genv)
   | Pgm_ptree.Elazy (op, e1, e2) ->
       let e1 = dexpr env e1 in
       expected_type e1 (dty_bool env.genv);
@@ -634,14 +634,14 @@ and expr_desc gl env denv loc ty = function
       Esequence (expr gl env e1, expr gl env e2)
   | DEif (e1, e2, e3) ->
       Eif (expr gl env e1, expr gl env e2, expr gl env e3)
-  | DEwhile (e1, la, e2) ->
+  | DEloop (la, e1) ->
       let la = 
 	{ loop_invariant = 
 	    option_map (Typing.type_fmla denv env) la.dloop_invariant;
 	  loop_variant   = 
 	    option_map (variant denv env) la.dloop_variant; }
       in
-      Ewhile (expr gl env e1, la, expr gl env e2)
+      Eloop (la, expr gl env e1)
   | DElazy (op, e1, e2) ->
       Elazy (op, expr gl env e1, expr gl env e2)
   | DEmatch (el, bl) ->
@@ -876,7 +876,9 @@ TODO:
 
 - do not add global references into the theory (add_global_if_pure)
 
-- ML-like polymorphism
+- polymorphic let?
 
-- ghost / effects
+- ghost
+
+- move effect inference here (from pgm_wp), as phase 3
 *)

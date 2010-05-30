@@ -81,7 +81,7 @@ and expr_desc =
   (* control *)
   | Esequence of expr * expr
   | Eif of expr * expr * expr
-  | Ewhile of expr * loop_annotation * expr
+  | Eloop of loop_annotation * expr
   | Elazy of lazy_op * expr * expr
   | Ematch of expr list * (Ptree.pattern list * expr) list
   | Eskip 

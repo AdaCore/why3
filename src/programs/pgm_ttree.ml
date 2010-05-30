@@ -85,7 +85,7 @@ and dexpr_desc =
 
   | DEsequence of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
-  | DEwhile of dexpr *  dloop_annotation * dexpr
+  | DEloop of dloop_annotation * dexpr
   | DElazy of lazy_op * dexpr * dexpr
   | DEmatch of dexpr list * (Typing.dpattern list * dexpr) list
   | DEskip
@@ -140,7 +140,7 @@ and expr_desc =
 
   | Esequence of expr * expr
   | Eif of expr * expr * expr
-  | Ewhile of expr * loop_annotation * expr
+  | Eloop of loop_annotation * expr
   | Elazy of lazy_op * expr * expr
   | Ematch of expr list * (Term.pattern list * expr) list
   | Eskip 
