@@ -43,6 +43,8 @@ val add_read  : reference -> t -> t
 val add_write : reference -> t -> t
 val add_raise : lsymbol -> t -> t
 
+val remove_raise : lsymbol -> t -> t
+
 val union : t -> t -> t
 
 val subst : vsymbol -> reference -> t -> t

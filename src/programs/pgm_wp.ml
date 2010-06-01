@@ -66,6 +66,15 @@ let make_apply loc e1 ty c =
 		expr_type_v = v; expr_effect = ef; expr_loc = loc } in
   Elet (x, e1, any_c), v, ef
 
+let exn_check = ref true
+let without_exn_check f x =
+  if !exn_check then begin
+    exn_check := false; 
+    try let y = f x in exn_check := true; y 
+    with e -> exn_check := true; raise e
+  end else
+    f x
+
 let rec expr env e =
   let ty = e.Pgm_ttree.expr_type in
   let loc = e.Pgm_ttree.expr_loc in
@@ -137,15 +146,28 @@ and expr_desc env loc ty = function
   | Pgm_ttree.Eskip ->
       Eskip, Tpure ty, E.empty
   | Pgm_ttree.Eabsurd ->
-      assert false (*TODO*)
+      Eabsurd, Tpure ty, E.empty
   | Pgm_ttree.Eraise (x, e1) ->
       let e1 = option_map (expr env) e1 in
       let ef = match e1 with Some e1 -> e1.expr_effect | None -> E.empty in
       let ef = E.add_raise x ef in
       Eraise (x, e1), Tpure ty, ef
-  | Pgm_ttree.Etry (_e1, _hl) ->
-      assert false (* TODO *)
-      (*Etry (e1, hl), Tpure ty, ef*)
+  | Pgm_ttree.Etry (e1, hl) ->
+      let e1 = expr env e1 in
+      let ef = e1.expr_effect in
+      let handler (x, v, h) =
+	if not (Sls.mem x ef.E.raises) && !exn_check then
+	  errorm ~loc "exception %a cannot be raised" print_ls x;
+	let env = match x.ls_args, v with
+	  | [ty], Some v -> add_local v (Tpure ty) env
+	  | [], None -> env
+	  | _ -> assert false
+	in
+	x, v, expr env h
+      in
+      let hl = List.map handler hl in
+      let ef = List.fold_left (fun e (x,_,_) -> E.remove_raise x e) ef hl in
+      Etry (e1, hl), Tpure ty, ef
 
   | Pgm_ttree.Eassert (k, f) ->
       let ef = fmla_effect env E.empty f in
@@ -315,6 +337,11 @@ let default_post ty ef =
   (v_result ty, f_true), 
   List.map default_exn_post (Sls.elements ef.E.raises)
 
+let rec assoc_handler x = function
+  | [] -> assert false
+  | (y, h) :: _ when ls_equal x y -> h
+  | _ :: hl -> assoc_handler x hl
+
 (*s [saturate_post ef f q] makes a postcondition for a program of effect [ef]
     out of a normal postcondition [f] and the exc. postconditions from [q] *)
 
@@ -326,20 +353,20 @@ let saturate_post ef q (_, ql) =
 (* Recursive computation of the weakest precondition *)
 
 let rec wp_expr env e q = 
-(*   if !debug then  *)
-(*     eprintf "@[wp_expr: q=%a@]@." Pretty.print_fmla (snd (fst q)); *)
+  (* if !debug then  *)
+  (*   eprintf "@[wp_expr: q=%a@]@." Pretty.print_fmla (snd (fst q)); *)
   let lab = fresh_label env in
   let q = post_map (old_label env lab) q in
   let f = wp_desc env e q in
-  let f = erase_label env lab f in
-  f
+  erase_label env lab f
 
 and wp_desc env e q = match e.expr_desc with
   | Elogic t ->
       let (v, q), _ = q in
       f_let v t q
-  | Elocal _ ->
-      assert false (*TODO*)
+  | Elocal v ->
+      let (res, q), _ = q in
+      f_subst (subst1 res (t_var v)) q
   | Eglobal _ ->
       let (_, q), _ = q in q
   | Efun (bl, t) ->
@@ -378,11 +405,38 @@ and wp_desc env e q = match e.expr_desc with
   | Eskip ->
       let (_, q), _ = q in q
   | Eabsurd ->
-      assert false (*TODO*)
-  | Eraise _ ->
-      assert false (*TODO*)
-  | Etry _ ->
-      assert false (*TODO*)
+      f_false
+  | Eraise (x, None) ->
+      (* $wp(raise E, _, R) = R$ *)
+      let _, ql = q in
+      let _, f = assoc_handler x ql in f
+  | Eraise (x, Some e1) ->
+      (* $wp(raise (E e1), _, R) = wp(e1, R, R)$ *)
+      let _, ql = q in
+      let q1 = match assoc_handler x ql with
+	| Some v, r -> (v, r), ql 
+	| None, _ -> assert false
+      in
+      let q1 = filter_post e1.expr_effect q1 in
+      wp_expr env e1 q1
+  | Etry (e1, hl) ->
+      (* $wp(try e1 with E -> e2, Q, R) = wp(e1, Q, wp(e2, Q, R))$ *)
+      let hwl = 
+	List.map 
+	  (fun (x, v, h) -> 
+	     let w = wp_expr env h (filter_post h.expr_effect q) in
+	     x, (v, w))
+	  hl 
+      in
+      let make_post (q, ql) =
+	let hpost (x, r) =
+	  x, try assoc_handler x hwl with Not_found -> r
+	in
+	q, List.map hpost ql
+      in
+      let q1 = saturate_post e1.expr_effect (fst q) q in
+      let q1 = filter_post e1.expr_effect (make_post q1) in
+      wp_expr env e1 q1
 
   | Eassert (Pgm_ptree.Aassert, f) ->
       let (_, q), _ = q in

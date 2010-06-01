@@ -47,8 +47,9 @@ let print_prover_result fmt {pr_answer=ans; pr_output=out; pr_time=t} =
   if ans == HighFailure then fprintf fmt "@\nProver output:@\n%s@." out
 
 let rec grep out l = match l with
-  | [] -> HighFailure
-  | (re,pa)::l ->
+  | [] -> 
+      HighFailure
+  | (re,pa) :: l ->
       begin try
         ignore (Str.search_forward re out 0);
         match pa with
@@ -61,7 +62,7 @@ let rec grep out l = match l with
 let call_prover debug command opt_cout buffer =
   let time = Unix.gettimeofday () in
   let (cin,cout) as p = Unix.open_process command in
-  let cout = match opt_cout with Some c -> c | _ -> cout in
+  let cout = match opt_cout with Some c -> close_out cout; c | _ -> cout in
   Buffer.output_buffer cout buffer; close_out cout;
   let out = channel_contents cin in
   let ret = Unix.close_process p in

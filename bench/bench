@@ -76,6 +76,18 @@ bad_programs () {
     done
 }
 
+valid_goals () {
+    for f in $1/*.mlw; do
+	echo -n "  "$f"... "
+	if $pgml -P alt-ergo $f | grep -q -v Valid; then
+	    echo "valid test $f failed!"
+	    exit 1
+       else 
+	    echo "ok"
+	fi
+    done
+}
+
 # 1. Syntax
 echo "=== Parsing good files  ==="
 goods bench/typing/bad --parse-only
@@ -115,4 +127,9 @@ echo ""
 echo "=== Checking drivers ==="
 drivers drivers
 echo ""
+
+echo "=== Checking valid goals ==="
+valid_goals bench/valid
+echo ""
+
 

@@ -79,6 +79,8 @@ let add_read  r t = { t with reads  = Sref.add r t.reads  }
 let add_write r t = { t with writes = Sref.add r t.writes }
 let add_raise e t = { t with raises = E.add e t.raises }
 
+let remove_raise e t = { t with raises = E.remove e t.raises }
+
 let union t1 t2 =
   { reads  = Sref.union t1.reads  t2.reads;
     writes = Sref.union t1.writes t2.writes;
