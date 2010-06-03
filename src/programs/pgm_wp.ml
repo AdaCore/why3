@@ -446,10 +446,6 @@ and wp_desc env e q = match e.expr_desc with
       let we = erase_label env lab we in
       let w = match inv with
 	| None ->
-	    wfr
-	| Some i ->
-	    wp_and wfr i
-	| None ->
 	    wp_and wfr (quantify env e.expr_effect we)
 	| Some i ->
 	    wp_and wfr
