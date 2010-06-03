@@ -1,0 +1,20 @@
+exception Exception of int
+
+parameter t : int ref
+
+parameter m : a:int -> b:int ->
+    { }
+    unit reads t raises Exception
+    { true } | Exception -> { true }
+
+let test () =
+  { }
+  (m ( assert { true } ; 0) 0)
+  { true } | Exception -> { true }
+
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../../.. bench/programs/good/complex_arg_2"
+End: 
+*)

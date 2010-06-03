@@ -1,0 +1,24 @@
+
+(* Side effect in expressions (Bart Jacobs' tricky example) *)
+
+parameter b  : int ref
+parameter b1 : int ref
+parameter b2 : int ref
+
+let f () = 
+  {} b := 1 - !b; !b { result = !b and !b = 1 - old(!b) }
+
+let k () = 
+  {} 
+  begin
+    b := 0;
+    b1 := (1 - (f ())) + (f ());
+    b2 := (f ()) * (1 - (f ())) 
+  end
+  { !b1 = 0 and !b2 = 1 }
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../../.. bench/programs/good/see"
+End: 
+*)

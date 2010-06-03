@@ -1,0 +1,23 @@
+exception Exception
+
+parameter f0 : tt:unit ->
+   { }
+   unit
+   { true }
+
+parameter f1 : tt:unit ->
+  { }
+  unit
+  raises Exception
+  { true } | Exception -> { true }
+
+let f () =
+  { }
+  f0 (f1 ())
+  { true } | Exception -> { true }
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../../.. bench/programs/good/complex_arg_1"
+End: 
+*)
