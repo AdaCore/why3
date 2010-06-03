@@ -17,35 +17,13 @@ parameter write : v:int -> {} unit writes r { !r = v }
 exception E of int
 exception F
 
-let p13a () =
-  {}
-  try
-    if !r = 1 then raise F
-  with F -> 
-    r := 0
-  end
-  { !r <> 1 }
-
-(*
 let test () =
-  {} 
-  while !r <= 100 do
+  { !r = 0 } 
+  while !r < 100 do
+    invariant { !r <= 100 }
     r := !r + 1
   done
   { !r = 100 }
-*)
-
-let apply_fun () =
-  { true } 
-  (fun x -> {x=0} x+42 { result=42 }) 0
-  { result=40+2 }
-
-let ff () = 
-  { !r = 44 }
-  let x = ref 2 in 
-  imp_sub r x;
-  !r
-  { result = 42 }
 
 (*
 Local Variables: 

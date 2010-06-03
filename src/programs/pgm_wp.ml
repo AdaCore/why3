@@ -350,6 +350,47 @@ let saturate_post ef q (_, ql) =
   let xs = Sls.elements ef.E.raises in
   (q, List.map set_post xs)
 
+(* maximum *)
+
+let is_default_post = f_equal f_true
+
+let sup ((q, ql) : post) (_, ql') =
+  assert (List.length ql = List.length ql');
+  let supx (x, (_,fa) as a) (x', _ as a') =
+    assert (ls_equal x x');
+    if is_default_post fa then a' else a
+  in
+  q, List.map2 supx ql ql' 
+
+(* post-condition for a loop body *)
+
+let default_exns_post ef =
+  let xs = Sls.elements ef.E.raises in
+  List.map default_exn_post xs
+ 
+let term_at env lab t =
+  t_app env.ls_at [t; t_var lab] t.t_ty
+
+let while_post_block env inv var lab e = 
+  let decphi = match var with
+    | None -> 
+	f_true
+    | Some (phi, r) -> 
+	f_app r [phi; term_at env lab phi]
+  in
+  let ql = default_exns_post e.expr_effect in
+  let res = v_result e.expr_type in
+  match inv with
+    | None -> 
+	(res, decphi), ql
+    | Some i -> 
+	(res, wp_and i decphi), ql
+
+let well_founded_rel = function
+  | None -> f_true
+  | Some (_,_r) -> f_true (* TODO: Papp (well_founded, [Tvar r], []) *)
+
+
 (* Recursive computation of the weakest precondition *)
 
 let rec wp_expr env e q = 
@@ -396,8 +437,27 @@ and wp_desc env e q = match e.expr_desc with
 	saturate_post e1.expr_effect (res, q1) q
       in
       wp_expr env e1 q1
-  | Eloop _ ->
-      assert false (*TODO*)
+  | Eloop ({ loop_invariant = inv; loop_variant = var }, e1) ->
+      let wfr = well_founded_rel var in
+      let lab = fresh_label env in
+      let q1 = while_post_block env inv var lab e1 in
+      let q1 = sup q1 q in (* exc. posts taken from [q] *)
+      let we = wp_expr env e1 q1 in
+      let we = erase_label env lab we in
+      let w = match inv with
+	| None ->
+	    wfr
+	| Some i ->
+	    wp_and wfr i
+	| None ->
+	    wp_and wfr (quantify env e.expr_effect we)
+	| Some i ->
+	    wp_and wfr
+	      (wp_and ~sym:true
+		 i
+		 (quantify env e.expr_effect (wp_implies i we)))
+	in
+	w
   | Elazy _ ->
       assert false (*TODO*)
   | Ematch _ ->

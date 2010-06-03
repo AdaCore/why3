@@ -1,0 +1,20 @@
+
+parameter x : int ref
+
+parameter f : unit -> { } unit writes x { !x = 1 - old(!x) }
+
+let p () =
+  begin
+    label Init:
+    let t = () in ();
+    (f ());
+    (f ());
+    assert { !x = at(!x, Init) };
+    ()
+  end
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../../.. bench/programs/good/wpcalls"
+End: 
+*)
