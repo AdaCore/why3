@@ -34,3 +34,15 @@ theory Prelude
   logic wf_lt_int(x:int, y:int) = 0 <= y and x < y
 
 end
+
+theory Array
+
+  clone array.ArrayKeyLength with type key = int
+
+end
+
+(*
+Local Variables: 
+compile-command: "cd ..; bin/why.opt theories/programs.why"
+End: 
+*)

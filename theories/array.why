@@ -7,11 +7,13 @@ theory Array
   logic store (('a,'b) t, 'a, 'b) : ('a,'b) t
   
   axiom Select_eq : 
-    forall m : ('a,'b) t. forall a1,a2 : 'a. forall b : 'b[select(store(m,a1,b),a2)].
+    forall m : ('a,'b) t. forall a1,a2 : 'a. 
+    forall b : 'b [select(store(m,a1,b),a2)].
     a1 = a2 -> select(store(m,a1,b),a2) = b
 
   axiom Select_neq : 
-    forall m : ('a,'b) t. forall a1,a2 : 'a. forall b : 'b[select(store(m,a1,b),a2)].
+    forall m : ('a,'b) t. forall a1,a2 : 'a. 
+    forall b : 'b [select(store(m,a1,b),a2)].
     a1 <> a2 -> select(store(m,a1,b),a2) = select(m,a2)
 
   logic const('b) : ('a,'b) t
@@ -20,6 +22,44 @@ theory Array
 
 end
 
+theory ArrayKey
+
+  type key
+
+  type 'a t
+
+  logic select ('a t, key) : 'a
+  logic store ('a t, key, 'a) : 'a t
+  
+  axiom Select_eq : 
+    forall m : 'a t. forall a1,a2 : key. 
+    forall b : 'a [select(store(m,a1,b),a2)].
+    a1 = a2 -> select(store(m,a1,b),a2) = b
+
+  axiom Select_neq : 
+    forall m : 'a t. forall a1,a2 : key. 
+    forall b : 'a [select(store(m,a1,b),a2)].
+    a1 <> a2 -> select(store(m,a1,b),a2) = select(m,a2)
+
+  logic const('a) : 'a t
+
+  axiom Const : forall b:'a. forall a:key. select(const(b),a) = b
+
+end
+
+theory ArrayKeyLength
+
+  type key
+
+  clone export ArrayKey with type key = key
+
+  logic length('a t) : int
+
+  axiom Length_store : 
+    forall a : 'a t. forall k : key. forall v : 'a.
+    length(store(a, k, v)) = length(a)
+
+end
 
 theory BitVector
 
@@ -114,6 +154,6 @@ end
 
 (*
 Local Variables: 
-compile-command: "../bin/why.opt --output-file test.txt --goals-of TestBv32 --driver ../drivers/alt_ergo.drv -I ../theories/ array.why"
+compile-command: "cd ..; bin/why.opt theories/array.why"
 End: 
 *)
