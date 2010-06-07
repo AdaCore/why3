@@ -269,7 +269,15 @@ else
   enable_tptp2why_support=yes
 fi
 
+# hypothesis_selection
 
+AC_CHECK_FILE($OCAMLLIB/ocamlgraph/,enable_hypothesis_selection=yes)
+
+if test "$enable_hypothesis_selection" = no; then
+  enable_hypothesis_selection=no
+else
+  enable_hypothesis_selection=yes
+fi
 
 #Viewer for ps and pdf
 dnl AC_CHECK_PROGS(PSVIEWER,gv evince)
@@ -319,6 +327,8 @@ AC_SUBST(COQVERSION)
 AC_SUBST(MENHIR)
 AC_SUBST(enable_tptp2why_support)
 
+AC_SUBST(enable_hypothesis_selection)
+
 dnl AC_SUBST(PSVIEWER)
 dnl AC_SUBST(PDFVIEWER)
 
@@ -345,3 +355,4 @@ if test "$enable_coq_support" = "yes" ; then
    echo "    Lib                 : $COQLIB"
 fi
 echo "tptp2why support        : $enable_tptp2why_support"
+echo "hypothesis selection    : $enable_hypothesis_selection"

@@ -70,6 +70,7 @@ else
   DYNLINK =
 endif
 
+
 EXTLIBS = str unix nums $(DYNLINK)
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS))
 EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS))
@@ -107,6 +108,7 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula inlining \
 		eliminate_inductive eliminate_let eliminate_if \
 		explicit_polymorphism
 
+
 LIB_PRINTER = print_real alt_ergo why3 smt coq tptp simplify gappa
 
 LIBMODULES = src/config \
@@ -119,6 +121,14 @@ LIBMODULES = src/config \
 
 LIBDIRS = util core parser driver transform printer
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
+
+ifeq (@enable_hypothesis_selection@,yes)
+	LIB_TRANSFORM += hypothesis_selection
+	LIBINCLUDES += -I +ocamlgraph
+	INCLUDES += -I +ocamlgraph
+	EXTLIBS += ocamlgraph/graph
+endif
+
 
 LIBML  = $(addsuffix .ml,  $(LIBMODULES))
 LIBMLI = $(addsuffix .mli, $(LIBMODULES))
