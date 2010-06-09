@@ -75,7 +75,7 @@ end = struct
     let all_decls = List.concat
       (List.map (getAllDecls include_dir) to_include) in
     all_decls @ real_decl
-    
+
   (** parses a single file *)
   and myparse chan =
     let lb = Lexing.from_channel chan in
@@ -83,9 +83,10 @@ end = struct
 
 
   let read_channel
-      ?(debug=false) ?(parse_only=false) ?(type_only=false) env file c =
+  ?(debug=false) ?(parse_only=false) ?(type_only=false) _env file c =
+    if debug then Format.eprintf "tptp2why : starts parsing %s@." file;
     let decls = getDeclsFromChan c in
-    if parse_only then Theory.Mnm.empty else
+    if parse_only || type_only then Theory.Mnm.empty else
       let my_theory = theory_of_decls file decls in
       Theory.Mnm.add "Tptp" my_theory Theory.Mnm.empty
 
@@ -147,3 +148,10 @@ open Init *)
 (** register as a .p/.ax file parser *)
 let () =
   Env.register_format "tptp" ["p"] Process.read_channel Process.report
+
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.."
+End: 
+*)

@@ -17,10 +17,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*s transformation from polymorphic logic to untyped logic. The polymorphic
+(**s transformation from polymorphic logic to untyped logic. The polymorphic
 logic must not have finite support types. *)
 
-(* TODO : preserve builtin types *)
 
 open Util
 open Ident
@@ -36,7 +35,7 @@ module Debug = struct
     Mtv.iter (fun key value -> Format.fprintf fmter "@[%a@] -> @[%a@]@."
       Pretty.print_tv key vprinter value) m
 
-  let print_mty vprinter  fmter m =
+  let print_mty vprinter fmter m =
     Mty.iter (fun key value -> Format.fprintf fmter "@[%a@] -> @[%a@]@."
       Pretty.print_ty key vprinter value) m
 
@@ -92,8 +91,8 @@ module Utils = struct
   (** [drop n l] is [l], without its [n] first elements *)
   let rec drop n l = match (n,l) with
     | (0, _) -> l
-    | (n, []) -> failwith "dropping items from empty list"
-    | (_, x::xs) -> drop (n-1) xs
+    | (_, []) -> failwith "dropping items from empty list"
+    | (_, _::xs) -> drop (n-1) xs
 
   (** explore a type to seek all type vars *)
   let rec find_tyvars tyvars ty = match ty.ty_node with
@@ -126,14 +125,6 @@ module Utils = struct
       | None -> []
       | Some ty -> find_tyvars [] ty in
     List.fold_left find_tyvars acc l.ls_args
-
-
-  (** kind of composition of filter and map *)
-  let rec mapSome f = function
-    | e::es -> (match f e with
-      | Some x -> x :: mapSome f es
-      | None -> mapSome f es)
-    | [] -> []
 
 
   (** [find_matching_vars tv_to_ty left right] matches [left]
@@ -222,7 +213,7 @@ module Transform = struct
   (** transforms a type into a term (new args of polymorphic symbols) *)
   let rec ty_to_term tblT varM tv_to_ty ty =
     match ty.ty_node with
-    | Tyvar x ->
+    | Tyvar _ ->
       let new_ty = ty_to_ty tv_to_ty ty in
       begin match new_ty.ty_node with
         | Tyvar _ -> (* var -> var, stop there *)
@@ -266,7 +257,7 @@ module Transform = struct
       | _ -> (* default case : traverse *)
         t_map (term_transform tblT tblL varM)
           (fmla_transform tblT tblL varM) t
-  (** (trivial) translation of formulae *)
+  (** translation of formulae *)
   and fmla_transform tblT tblL varM f = match f.f_node with
     | Fapp(p,terms) when (not (ls_equal p ps_equ)) && not(ls_equal p ps_neq) ->
       let new_p = findL tblL p in
