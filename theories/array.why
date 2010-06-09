@@ -47,16 +47,19 @@ theory ArrayKey
 
 end
 
-theory ArrayKeyLength
+theory ArrayLength
 
-  type key
-
-  clone export ArrayKey with type key = key
+  clone export ArrayKey with type key = int
 
   logic length('a t) : int
 
+  logic const_length('a, int) : 'a t
+
+  axiom Length_const : 
+    forall a : 'a. forall n : int. length(const_length(a, n)) = n
+
   axiom Length_store : 
-    forall a : 'a t. forall k : key. forall v : 'a.
+    forall a : 'a t. forall k : int. forall v : 'a.
     length(store(a, k, v)) = length(a)
 
 end

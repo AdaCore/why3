@@ -266,7 +266,7 @@ and unref_term env r v t = match t.t_node with
       t_map (unref_term env r v) (unref env r v) t
 
 (* quantify over all references in ef *)
-let quantify env ef f =
+let quantify ?(all=false) env ef f =
   (* eprintf "quantify: ef=%a f=%a@." E.print ef Pretty.print_fmla f; *)
   let quantify1 r f = 
     let ty = unref_ty env (E.type_of_reference r) in
@@ -274,7 +274,8 @@ let quantify env ef f =
     let f = unref env r v f in
     wp_forall [v] [] f
   in
-  let s = E.Sref.union ef.E.reads ef.E.writes in
+  let s = ef.E.writes in
+  let s = if all then E.Sref.union ef.E.reads s else s in
   E.Sref.fold quantify1 s f
 
 let abstract_wp env ef (q',ql') (q,ql) =
@@ -516,7 +517,7 @@ and wp_desc env e q = match e.expr_desc with
 and wp_triple env (p, e, q) =
   let f = wp_expr env e q in
   let f = wp_implies p f in
-  quantify env e.expr_effect f
+  quantify ~all:true env e.expr_effect f
 
 let wp env e = 
   wp_expr env e (default_post e.expr_type e.expr_effect)

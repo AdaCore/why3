@@ -59,12 +59,10 @@ let rec report fmt = function
       Pgm_typing.report fmt e
   | Denv.Error e ->
       Denv.report fmt e
-(*
   | Ty.TypeMismatch (ty1, ty2) as e ->
       eprintf "@[type mismatch: %a, %a@]@." 
 	Pretty.print_ty ty1 Pretty.print_ty ty2;
       raise e
-*)
   | e ->
       raise e
 

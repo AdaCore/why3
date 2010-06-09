@@ -1,0 +1,142 @@
+
+{
+  use array.ArrayLength as A
+
+  logic maxlen : int = 1000
+
+  type elt
+  logic default : elt
+  logic c1 : elt
+  logic c2 : elt
+
+  type 'a array = 'a A.t
+
+  logic (#)(a : 'a array, i : int) : 'a = A.select(a, i)
+
+  type sparse_array = 
+    elt array * int array * int array * int (*sz*) * int (*n*)
+
+  logic sa_val (a : sparse_array) : elt array = let (val, _, _, _, _) = a in val
+  logic sa_idx (a : sparse_array) : int array = let (_, idx, _, _, _) = a in idx
+  logic sa_back(a : sparse_array) : int array = let (_, _, b, _, _)   = a in b
+  logic sa_sz  (a : sparse_array) : int       = let (_, _, _, sz, _)  = a in sz
+  logic sa_n   (a : sparse_array) : int       = let (_, _, _, _, n)   = a in n
+
+  logic model(a : sparse_array, i : int) : elt =
+    let (val, idx, back, _, n) = a in
+    if 0 <= idx#i < n and back#(idx#i) = i then
+      val#i
+    else
+      default
+
+  logic invariant(a : sparse_array) = 
+    let (val, idx, back, sz, n) = a in
+    0 <= n <= sz <= maxlen and
+    forall i : int. 0 <= i < n ->
+      0 <= back#i < sz and
+      idx#(back#i) = i
+
+}
+
+
+(*
+parameter create :
+  sz:int -> 
+  { 0 <= sz <= maxlen } 
+  sparse_array ref
+  { sa_sz(!result) = sz and forall i:int. model(!result, i) = default }
+*)
+
+(* BUG
+parameter malloc : n:int -> {} 'a array { A.length(result) = n }
+*)
+parameter malloc_elt : n:int -> {} elt array { A.length(result) = n }
+parameter malloc_int : n:int -> {} int array { A.length(result) = n }
+
+let create sz =
+  { 0 <= sz <= maxlen } 
+  ref ((malloc_elt sz, malloc_int sz, malloc_int sz, sz, 0) : sparse_array)
+  { invariant(!result) and 
+    sa_sz(!result) = sz and forall i:int. model(!result, i) = default }
+
+let test a i =
+  { 0 <= i < sa_sz(!a) }
+  let idx = sa_idx !a in
+  let back = sa_back !a in
+  let n = sa_n !a in
+  if 0 <= A.select idx i then 
+    if A.select idx i < n then 
+      A.select back (A.select idx i) = i
+    else
+      False
+  else
+    False
+  { let (val, idx, back, sz, n) = !a in 
+    result=True <-> (0 <= idx#i < n and back#(idx#i)=i) }
+
+(*
+parameter get : 
+  a:sparse_array ref -> i:int -> 
+    { 0 <= i < sa_sz(!a) } 
+    elt reads a
+    { result = model(!a, i) }
+*)
+let get a i =
+  { 0 <= i < sa_sz(!a) and invariant(!a) } 
+  let val = sa_val !a in
+  if test a i then
+    A.select val i 
+  else
+    default
+  { result = model(!a, i) }
+
+(*
+parameter set :
+  a:sparse_array ref -> i:int -> v:elt -> 
+    { 0 <= i < sa_sz(!a) and invariant(!a) } 
+    unit writes a 
+    { invariant(!a) and 
+      sa_sz(!a) = sa_sz(old(!a)) and
+      model(!a, i) = v and
+      forall j:int. j <> i -> model(!a, j) = model(old(!a), j) }
+*)
+let set a i v =
+  { 0 <= i < sa_sz(!a) and invariant(!a) } 
+  let val = sa_val !a in
+  let idx = sa_idx !a in
+  let back = sa_back !a in
+  let sz= sa_sz !a in
+  let n = sa_n !a in
+  let val = A.store val i v in
+  if test a i then
+    a := (val, idx, back, sz, n)
+  else begin
+    assert { n < sz };
+    let idx = A.store idx i n in 
+    let back = A.store back n i in
+    a := (val, idx, back, sz, n+1)
+  end
+  { invariant(!a) and 
+    sa_sz(!a) = sa_sz(old(!a)) and
+    model(!a, i) = v and
+    forall j:int. j <> i -> model(!a, j) = model(old(!a), j) }
+
+let harness () =
+  let a = create 10 in
+  let b = create 20 in
+  let get_a_5 = get a 5 in assert { get_a_5 = default };
+  let get_b_7 = get b 7 in assert { get_b_7 = default };
+  set a 5 c1;
+  set b 7 c2;
+  let get_a_5 = get a 5 in assert { get_a_5 = c1 };
+  let get_b_7 = get b 7 in assert { get_b_7 = c2 };
+  let get_a_0 = get a 0 in assert { get_a_0 = default };
+  let get_b_0 = get b 0 in assert { get_b_0 = default };
+  ()
+
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/vacid_0_sparse_array"
+End: 
+*)
