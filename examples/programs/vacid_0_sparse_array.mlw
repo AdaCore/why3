@@ -1,4 +1,24 @@
 
+(*
+      If the sparse array contains three elements x y z, at index
+      a b c respectively, then the three arrays look like this:
+
+             b     a      c 
+val   +-----+-+---+-+----+-+----+
+      |     |y|   |x|    |z|    |
+      +-----+-+---+-+----+-+----+
+
+idx   +-----+-+---+-+----+-+----+
+      |     |1|   |0|    |2|    |  
+      +-----+-+---+-+----+-+----+
+
+       0 1 2  n=3
+back  +-+-+-+-------------------+
+      |a|b|c|                   |
+      +-+-+-+-------------------+
+
+*)
+
 {
   use array.ArrayLength as A
 
