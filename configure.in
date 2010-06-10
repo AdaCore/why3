@@ -271,13 +271,8 @@ fi
 
 # hypothesis_selection
 
-AC_CHECK_FILE($OCAMLLIB/ocamlgraph/,enable_hypothesis_selection=yes)
+AC_CHECK_FILE($OCAMLLIB/ocamlgraph/,enable_hypothesis_selection=yes,enable_hypothesis_selection=no)
 
-if test "$enable_hypothesis_selection" = no; then
-  enable_hypothesis_selection=no
-else
-  enable_hypothesis_selection=yes
-fi
 
 #Viewer for ps and pdf
 dnl AC_CHECK_PROGS(PSVIEWER,gv evince)
