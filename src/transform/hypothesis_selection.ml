@@ -52,10 +52,16 @@ module SymbHashtbl =
 let err = Format.err_formatter
 
 module Util = struct
-  let print_clauses fmt = Format.fprintf fmt "[%a]@."
-    (Pp.print_list Pp.comma (Pp.print_list Pp.comma Pretty.print_fmla))
-  let print_clause fmt = Format.fprintf fmt "[%a]@."
+  let print_clause fmt = Format.fprintf fmt "@[[%a]@]"
     (Pp.print_list Pp.comma Pretty.print_fmla)
+  let print_clauses fmt = Format.fprintf fmt "[%a]@."
+    (Pp.print_list Pp.comma print_clause)
+  
+  (** all combinations of elements of left and right *)
+  let map_complete combinator left right =
+    let explorer left_elt =
+      List.map (fun right_elt -> combinator left_elt right_elt) right in
+    List.flatten (List.map explorer left)
 end
 
 
@@ -86,8 +92,16 @@ module NF = struct (* add memoization, one day ? *)
     | Fbinop (_,_,_) ->
 	let clauses = split fmla in
 	Format.fprintf err "split : %a@." Util.print_clause clauses;
-	if clauses = [fmla] then [[fmla]] else
-	  List.concat (List.map (transform fmlaTable) clauses)
+	begin match clauses with
+	  | [f] -> begin match f.f_node with
+	      | Fbinop (For,f1,f2) ->
+		  let left = transform fmlaTable f1 in
+		  let right = transform fmlaTable f2 in
+		  Util.map_complete List.append left right
+	      | _ -> [[f]]
+	    end
+	  | _ -> List.concat (List.map (transform fmlaTable) clauses)
+	end
     | Fnot f -> handle_not fmlaTable f
     | Fapp (_,_) -> [[fmla]]
     | Ftrue | Ffalse -> [[fmla]]
@@ -107,19 +121,19 @@ module NF = struct (* add memoization, one day ? *)
 	  [[new_fmla]]
   and skipPrenex fmlaTable fmla = match fmla.f_node with
     | Fquant (_,f_bound) ->
-	let var,_,f = f_open_quant f_bound in
+	let _,_,f = f_open_quant f_bound in
 	skipPrenex fmlaTable f
     | _ -> transform fmlaTable fmla
   and split f = match f.f_node with
-    | Fbinop(Fimplies,{f_node = Fbinop (For, h1, h2)},f2) ->
-	split (f_binary Fimplies h1 f2) @ split (f_binary Fimplies h2 f2)
-    | Fbinop(Fimplies,f1,f2) ->
+    | Fbinop (Fimplies,{f_node = Fbinop (For, h1, h2)},f2) ->
+	(split (f_binary Fimplies h1 f2)) @ (split (f_binary Fimplies h2 f2))
+    | Fbinop (Fimplies,f1,f2) ->
 	let clauses = split f2 in
 	if List.length clauses >= 2 then
 	  List.concat
 	    (List.map (fun f -> split (f_binary Fimplies f1 f)) clauses)
-	else [f]
-    | Fbinop(Fand,f1,f2) -> [f1; f2]
+	else split (f_or (f_not f1) f2)
+    | Fbinop (Fand,f1,f2) -> [f1; f2]
     | _ -> [f]
   and handle_not fmlaTable f = match f.f_node with
     | Fnot f1 -> transform fmlaTable f1
@@ -139,7 +153,7 @@ end
 (** module used to compute the graph of constants *)
 module GraphConstant = struct
 
-  let update gc task_head = gc (* TODO *)
+  let update gc _task_head = gc (* TODO *)
 
 end
 
@@ -156,7 +170,7 @@ module GraphPredicate = struct
     let rec search = function
       | { f_node = Fapp(p,_) } -> raise (Exit p)
       | f -> f_map (fun t->t) search f in
-    try search fmla;
+    try ignore (search fmla);
       Format.eprintf "invalid formula : ";
       Pretty.print_fmla Format.err_formatter fmla; assert false
     with Exit p -> p
@@ -211,7 +225,17 @@ end
 (** module that makes the final selection *)
 module Select = struct
 
-  let filter (gc,gp) decl = assert false
+  let is_pertinent (_gc,_gp) _fmla = true (* TODO *)
+
+  let filter (gc,gp) decl =
+     match decl.d_node with
+    | Dtype _ | Dlogic _ | Dind _ -> [decl]
+    | Dprop (_,_,fmla) ->
+	Format.eprintf "filter : @[%a@]@." Pretty.print_fmla fmla;
+	let return_value = if is_pertinent (gc,gp) fmla then
+	  [decl] else [] in
+	if return_value = [] then Format.eprintf "NO@.@." else Format.eprintf "YES@.@.";
+	return_value
 
 end
 
