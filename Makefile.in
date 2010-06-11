@@ -493,11 +493,11 @@ BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
 
 bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) byte $(TOOLS)
 	bin/why.byte -D bench/plugins/helloworld.drv \
-	tests/test-jcf.why -t Test -g G
+	tests/test-jcf.why -T Test -G G
 	bin/why.$(OCAMLBEST) -D bench/plugins/helloworld.drv  \
-	tests/test-jcf.why -t Test -g G
+	tests/test-jcf.why -T Test -G G
 	bin/why.$(OCAMLBEST) -D bench/plugins/simplify_array.drv \
-	tests/test-jcf.why -t Test_simplify_array -g G
+	tests/test-jcf.why -T Test_simplify_array -G G
 
 ###############
 # test targets
@@ -509,9 +509,9 @@ test2: bin/why.byte $(TOOLS)
 test: bin/why.byte $(TOOLS)
 	mkdir -p output_why3
 	bin/why.byte -D drivers/why3.drv -o output_why3 tests/test-jcf.why
-	bin/why.byte -D drivers/alt_ergo.drv tests/test-jcf.why -t Test -g G
-	bin/why.byte -P alt-ergo --timelimit 3 tests/test-jcf.why -t Test -g G
-	bin/why.byte -D drivers/coq.drv tests/test-jcf.why -t Test -g G
+	bin/why.byte -D drivers/alt_ergo.drv tests/test-jcf.why -T Test -G G
+	bin/why.byte -P alt-ergo --timelimit 3 tests/test-jcf.why -T Test -G G
+	bin/why.byte -D drivers/coq.drv tests/test-jcf.why -T Test -G G
 	echo bin/why.byte -P alt-ergo --timelimit 1 --prove theories/real.why
 	@printf "*** Checking Coq file generation ***\\n"
 	@mkdir -p output_coq
@@ -521,7 +521,7 @@ test: bin/why.byte $(TOOLS)
 		floating_point.Test array.TestBv32 \
 		; do \
 	  printf "Generating Coq file for $$i\\n" && \
-	  	bin/why.byte -P coq -o output_coq -t $$i ; done
+	  	bin/why.byte -P coq -o output_coq -T $$i ; done
 	@printf "*** Checking Coq compilation ***\\n"
 	@for i in output_coq/*.v; do printf "coq $$i\\n" && coqc $$i ; done
 

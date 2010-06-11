@@ -29,7 +29,7 @@ open Trans
 let usage_msg =
   sprintf
   "Usage: %s [options] [[file|-] \
-   [-a <transform> -t <theory> [-g <goal>]...]...]..."
+   [-a <transform> -T <theory> [-G <goal>]...]...]..."
   (Filename.basename Sys.argv.(0))
 
 let opt_queue = Queue.create ()
@@ -52,7 +52,7 @@ let add_opt_theory =
   in
   match !opt_input, p with
   | None, [] ->
-      eprintf "Option '-t'/'--theory' with a non-qualified \
+      eprintf "Option '-T'/'--theory' with a non-qualified \
         argument requires an input file.@.";
       exit 1
   | Some tlist, [] ->
@@ -69,7 +69,7 @@ let add_opt_theory =
 
 let add_opt_goal x = match !opt_theory with
   | None ->
-      eprintf "Option '-g'/'--goal' requires a theory.@.";
+      eprintf "Option '-G'/'--goal' requires a theory.@.";
       exit 1
   | Some glist ->
       let l = Str.split (Str.regexp "\\.") x in
@@ -101,14 +101,14 @@ let opt_debug = ref false
 let option_list = Arg.align [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
       " Read the input file from stdin";
-  "-t", Arg.String add_opt_theory,
+  "-T", Arg.String add_opt_theory,
       "<theory> Select <theory> in the input file or in the library";
   "--theory", Arg.String add_opt_theory,
-      " same as -t";
-  "-g", Arg.String add_opt_goal,
+      " same as -T";
+  "-G", Arg.String add_opt_goal,
       "<goal> Select <goal> in the last selected theory";
   "--goal", Arg.String add_opt_goal,
-      " same as -g";
+      " same as -G";
   "-C", Arg.String (fun s -> opt_config := Some s),
       "<file> Read configuration from <file>";
   "--config", Arg.String (fun s -> opt_config := Some s),
@@ -127,14 +127,14 @@ let option_list = Arg.align [
       "<format> Input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
-  "-T", Arg.Int (fun i -> opt_timelimit := Some i),
+  "-t", Arg.Int (fun i -> opt_timelimit := Some i),
       "<sec> Set the prover's time limit (default=10, no limit=0)";
   "--timelimit", Arg.Int (fun i -> opt_timelimit := Some i),
-      " same as -T";
-  "-M", Arg.Int (fun i -> opt_memlimit := Some i),
+      " same as -t";
+  "-m", Arg.Int (fun i -> opt_memlimit := Some i),
       "<MiB> Set the prover's memory limit (default: no limit)";
   "--memlimit", Arg.Int (fun i -> opt_timelimit := Some i),
-      " same as -M";
+      " same as -m";
   "-D", Arg.String (fun s -> opt_driver := Some s),
       "<file> Specify a prover's driver (conflicts with -P)";
   "--driver", Arg.String (fun s -> opt_driver := Some s),
@@ -219,11 +219,11 @@ let () =
       exit 1
     end;
     if !opt_timelimit <> None then begin
-      eprintf "Option '-T'/'--timelimit' requires a prover.@.";
+      eprintf "Option '-t'/'--timelimit' requires a prover.@.";
       exit 1
     end;
     if !opt_memlimit <> None then begin
-      eprintf "Option '-M'/'--memlimit' requires a prover.@.";
+      eprintf "Option '-m'/'--memlimit' requires a prover.@.";
       exit 1
     end;
     if !opt_driver = None && not !opt_print_namespace then
