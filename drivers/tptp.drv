@@ -27,7 +27,11 @@ transformation "eliminate_algebraic"
 transformation "eliminate_if"
 transformation "eliminate_let"
 
-transformation "explicit_polymorphism"
+(* tant que le cas des types finis
+n'est pas traité : il y a unit dans les programmes *)
+(*transformation "explicit_polymorphism"*)
+transformation "encoding_decorate"
+
 transformation "simple_types"
 
 
