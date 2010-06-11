@@ -146,3 +146,21 @@ let simplify_trivial_quantification =
 let () = Register.register_transform 
   "simplify_trivial_quantification" simplify_trivial_quantification
 
+let on_goal fn =
+  let fn task = match task with
+    | Some {Task.task_decl = 
+          Task.Decl ({d_node = Decl.Dprop (Pgoal,pr,fmla)});
+           task_prev = task_prev} -> 
+        (List.fold_left Task.add_decl) task_prev (fn pr fmla)
+    | _ -> assert false in
+  Trans.store fn
+
+
+let simplify_trivial_quantification_in_goal =
+  Register.store
+    (fun () -> on_goal (fun pr f -> 
+                          [create_prop_decl Pgoal pr (fmla_remove_quant f)]))
+
+let () = Register.register_transform 
+  "simplify_trivial_quantification_in_goal" 
+   simplify_trivial_quantification_in_goal
