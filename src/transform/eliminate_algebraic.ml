@@ -179,16 +179,6 @@ let add_type (state, task) ts csl =
     let ax = f_forall vl [[Term hd]] (f_equ hd t) in
     add_decl tsk (create_prop_decl Paxiom pr ax)
   in
-  let mt_add_single tsk cs t =
-    let id = mt_ls.ls_name.id_string ^ "_" ^ cs.ls_name.id_string in
-    let pr = create_prsymbol (id_derive id cs.ls_name) in
-    let vs = create_vsymbol (id_fresh "u") (of_option cs.ls_value) in
-    let hd = t_app mt_ls (t_var vs :: mt_tl) mt_ty in
-    let vl = List.rev_append mt_vl [vs] in
-    let ax = f_forall vl [[Term hd]] (f_equ hd t) in
-    add_decl tsk (create_prop_decl Paxiom pr ax)
-  in
-  let mt_add = if List.length csl = 1 then mt_add_single else mt_add in
   let task = List.fold_left2 mt_add task csl mt_tl in
   (* declare and define the projection functions *)
   let pj_add (m,tsk) cs =
@@ -221,7 +211,9 @@ let add_type (state, task) ts csl =
     let app pj = t_app_infer pj [ax_hd] in
     f_equ ax_hd (t_app cs (List.map app pjl) mt_hd)
   in
-  let ax_f = f_forall [ax_vs] [] (map_join_left mk_cs f_or csl) in
+  let ax_f = map_join_left mk_cs f_or csl in
+  let trgl = t_app mt_ls (ax_hd :: mt_tl) mt_ty in
+  let ax_f = f_forall (ax_vs :: mt_vl) [[Term trgl]] ax_f in
   let task = add_decl task (create_prop_decl Paxiom ax_pr ax_f) in
   (* return the updated state and task *)
   { mt_map = mtmap; pj_map = pjmap }, task
