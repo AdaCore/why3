@@ -68,11 +68,6 @@ back  +-+-+-+-------------------+
     (forall i : int. 0 <= i < n -> 0 <= a#i < n) and
     (forall i,j : int. 0 <= i < j < n -> a#i <> a#j)
 
-  lemma Inter3 :
-    forall a : sparse_array . invariant(a) -> 
-        let (val, idx, back, sz, n) = a in
-            n = sz -> permutation(sz, back)
-
   logic dirichlet (n : int, a : int array, i : int) : int
 
   axiom Dirichlet :
@@ -83,25 +78,13 @@ back  +-+-+-+-------------------+
             0 <= dirichlet(n,a,i) < n and 
             a # dirichlet(n,a,i) = i)
 
-  lemma Inter5 :
-    forall a : sparse_array . invariant(a) -> 
-        let (val, idx, back, sz, n) = a in n = sz ->
-            forall i : int. 0 <= i < sz -> 
-                idx#i = dirichlet(sz,back,i)
-
   lemma Inter6 :
     forall a : sparse_array . invariant(a) -> 
-        let (val, idx, back, sz, n) = a in n = sz ->
-            forall i : int. 0 <= i < sz -> is_elt(a,i)
-
-(* 
-    The lemma Inter8 is needed to introduce explicitly Tuple5(...)
-    in order to match triggers in post-condition proof for [test] 
-*)
-
-  lemma Inter8 :
-    forall a : sparse_array, i : int. is_elt(a, i) ->
-        a = (sa_val(a), sa_idx(a), sa_back(a), sa_sz(a), sa_n(a))
+        let (val, idx, back, sz, n) = a in
+        n = sz -> 
+            permutation(sz, back) and
+            forall i : int. 0 <= i < sz ->
+                idx#i = dirichlet(sz,back,i) and is_elt(a,i)
 }
 
 
