@@ -27,6 +27,7 @@ open Task
 open Decl
 
 let why_filename = ["transform" ; "encoding_decorate"]
+let kept_tag = "encoding_decorate : kept"
 
 (* From Encoding Polymorphism CADE07*)
 
@@ -128,7 +129,7 @@ let is_kept tenv ts =
         | None -> true (* every_simple *)
         | Some query ->
             let tags = Driver.query_tags query ts.ts_name in
-            Sstr.mem "encoding_decorate : kept" tags
+            Sstr.mem kept_tag tags
     end
 
 (* Translate a type to a term *)

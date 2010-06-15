@@ -476,13 +476,35 @@ bin/why3-cpulimit: src/tools/@CPULIMIT@.c
 clean::
 	rm -f bin/why3-cpulimit src/tools/*~
 
+#########
+# drivers
+#########
+#Only generated drivers
+DIR_DRIVERS := drivers/
+
+DRIVERS := z3_inst cvc3_inst
+DRIVERS := $(DRIVERS) $(addsuffix _def, $(DRIVERS)) \
+	$(addsuffix _goal, $(DRIVERS)) $(addsuffix _mono, $(DRIVERS))
+DRIVERS := $(DRIVERS) $(addsuffix _nbp, $(DRIVERS))
+DRIVERS := $(addsuffix .drv, $(DRIVERS))
+DRIVERS := $(addprefix $(DIR_DRIVERS), $(DRIVERS))
+
+#Not great for -j
+$(DRIVERS) : $(DIR_DRIVERS)z3.drv $(DIR_DRIVERS)cvc3.drv drivers/gen_drv.sh
+	drivers/gen_drv.sh
+
+byte opt: $(DRIVERS)
+
+clean::
+	rm -f $(DRIVERS)
+
 ########
 # bench
 ########
 
 .PHONY: bench test
 
-bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@
+bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@ $(TOOLS) $(DRIVERS)
 	sh bench/bench \
 	    "bin/why.@OCAMLBEST@" \
 	    "bin/whyml.@OCAMLBEST@"

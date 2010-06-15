@@ -23,7 +23,6 @@ transformation "simplify_trivial_quantification"
 transformation "encoding_instantiate"
 (* transformation "encoding_decorate_every_simple" *)
 
-
 theory BuiltIn
   syntax type int "Int"
   syntax type real "Real"
@@ -73,7 +72,7 @@ theory real.Real
   syntax logic (_+_) "(+ %1 %2)"
   syntax logic (_-_) "(- %1 %2)"
   syntax logic (_*_) "(* %1 %2)"
-  syntax logic (_/_)  "(/ %1 %2)"
+  syntax logic (_/_) "(/ %1 %2)"
   syntax logic (-_)  "(- %1)"
   syntax logic inv  "(/ 1.0 %1)"
 
