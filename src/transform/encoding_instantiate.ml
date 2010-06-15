@@ -54,6 +54,10 @@ type tty =
   | Tyterm of term
   | Tyty of ty
 
+let print_tty fmt = function
+  | Tyterm term -> Format.fprintf fmt "(Tyterm %a)" Pretty.print_term term
+  | Tyty ty -> Format.fprintf fmt "(Tyty %a)" Pretty.print_ty ty
+
 (* It can be backprojected to type, ty_dumb is like a bottom type it
    never appear in final formulas *)
 let reduce_to_type = function
@@ -432,7 +436,14 @@ let load_prelude env =
 (* Some general env creation function *) 
 let create_env task tenv sty =
   let keep = sty in
-  let projty = Sty.fold (fun ty tvar_ty -> Mty.add ty ty tvar_ty)
+  let projty = Sty.fold (fun ty ty_ty -> 
+    let ty2 = match ty.ty_node with 
+      | Tyapp (_,[]) -> ty
+      | Tyapp (ts,_) -> 
+        let ts = create_tysymbol (id_clone ts.ts_name) [] None in 
+        ty_app ts []
+      | _ -> assert false in
+    Mty.add ty ty2 ty_ty)
     keep Mty.empty in
   let task = Mty.fold (fun _ ty task -> 
     match ty.ty_node with
