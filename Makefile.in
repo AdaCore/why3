@@ -695,7 +695,8 @@ tags:
 	      "--regex=/module[ \t]+\([^ \t]+\)/\1/"
 
 otags:
-	otags src/*.mli src/*.ml c/*.mli c/*.ml intf/*.mli intf/*.ml
+	find \( -name '*.ml' -or -name '*.mli' \) -print0 | xargs -0 otags
+#	otags src/*.mli src/*.ml c/*.mli c/*.ml intf/*.mli intf/*.ml
 
 # the previous seems broken. This one is intented for vi(m) users, but could
 # be adapted for emacs (remove the -vi option ?)
