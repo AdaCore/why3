@@ -64,8 +64,10 @@ let print_type drv fmt = catch_unsupportedType (print_type drv fmt)
 
 let rec print_term drv fmt t = match t.t_node with
   | Tbvar _ -> assert false
-  | Tconst c ->
-      Pretty.print_const fmt c
+  | Tconst (ConstInt n) -> fprintf fmt "%s" n
+  | Tconst (ConstReal c) ->
+      Print_real.print_with_integers 
+	"%s.0" "(* %s.0 %s.0)" "(/ %s.0 %s.0)" fmt c
   | Tvar v -> print_var fmt v
   | Tapp (ls, tl) -> begin match Driver.query_syntax drv ls.ls_name with
       | Some s -> Driver.syntax_arguments s (print_term drv) fmt tl

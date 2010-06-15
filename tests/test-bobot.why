@@ -85,6 +85,19 @@ theory TestIte
   goal G2 : forall x:int. if x>=0 then x >= 0 else -x>=0 
 end
 
+theory TestBuiltin_real
+  use import real.Real
+  goal G1 : 5.5 * 10. = 55. 
+  goal G2 : 9. / 3. = 3. 
+  goal G3 : inv(5.) = 0.2
+end
+
+theory TestBuiltin_bool
+  use import bool.Bool
+  goal G : xorb(True,False) = True 
+end
+
+
 (*
 Local Variables: 
 compile-command: "make -C .. test"

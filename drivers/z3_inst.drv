@@ -1,13 +1,13 @@
 
 (* Why driver for SMT syntax *)
 
-prelude ";;; this is a prelude for CVC3 "
+prelude ";;; this is a prelude for Z3"
 
 printer "smtv1"
 filename "%f-%t-%g.smt"
 
-valid "unsat"
-unknown "\\bunknown\\b\\|\\bsat\\b" "Unknown"
+valid "^unsat"
+unknown "^\\(unknown\\|sat\\|Fail\\)" "Unknown"
 
 (* À discuter *)
 transformation "simplify_recursive_definition"      
@@ -20,7 +20,9 @@ transformation "eliminate_algebraic"
 transformation "simplify_formula"
 transformation "simplify_trivial_quantification"
 
-transformation "encoding_decorate"
+transformation "encoding_instantiate"
+(* transformation "encoding_decorate_every_simple" *)
+
 
 theory BuiltIn
   syntax type int "Int"
@@ -29,9 +31,10 @@ theory BuiltIn
   syntax logic (_<>_) "(not (= %1 %2))"
 end
 
+
 theory int.Int
 
-  prelude ";;; this is a prelude for CVC3, Arithmetic"
+  prelude ";;; this is a prelude for Z3, Arithmetic"
 
   syntax logic zero "0"
 
@@ -57,7 +60,9 @@ theory int.Int
   remove prop Trans
   remove prop Antisymm
   remove prop Total
+
 end
+
 
 theory real.Real
 
@@ -68,7 +73,7 @@ theory real.Real
   syntax logic (_+_) "(+ %1 %2)"
   syntax logic (_-_) "(- %1 %2)"
   syntax logic (_*_) "(* %1 %2)"
-  syntax logic (_/_) "(/ %1 %2)"
+  syntax logic (_/_)  "(/ %1 %2)"
   syntax logic (-_)  "(- %1)"
   syntax logic inv  "(/ 1.0 %1)"
 
@@ -108,6 +113,15 @@ end
 *)
 
 
+theory int.EuclideanDivision
+   syntax logic div "(div %1 %2)"
+   syntax logic mod "(mod %1 %2)"
+   remove prop Mod_bound
+   remove prop Div_mod
+   remove prop Mod_1
+   remove prop Div_1
+end
+
 theory transform.encoding_decorate.Kept
   tag cloned type t "encoding_decorate : kept"
 end
@@ -115,6 +129,6 @@ end
 (*
 Local Variables: 
 mode: why
-compile-command: "make -C ../.. bench"
+compile-command: "unset LANG; make -C .. bench"
 End: 
 *)
