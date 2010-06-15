@@ -47,6 +47,7 @@ let rec replacet env t =
             (Ty.ty_match mt x.vs_ty y.t_ty, Mvs.add x y mv)
           in
           let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vs tl in
+          let mt = Ty.ty_match mt (of_option fs.ls_value) t.t_ty  in
           t_ty_subst mt mv t
         with Not_found -> t end
     | _ -> t

@@ -129,7 +129,8 @@ and print_expr drv fmt = e_apply (print_term drv fmt) (print_fmla drv fmt)
 
 and print_triggers drv fmt tl =
   let filter = function 
-    | Term _ | Fmla {f_node = Fapp _} -> true
+    | Term _ -> true 
+    | Fmla {f_node = Fapp (ps,_)} -> not (ls_equal ps ps_equ)
     | _ -> false in
   let tl = List.map (List.filter filter)
     tl in
