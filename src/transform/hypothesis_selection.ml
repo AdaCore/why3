@@ -68,6 +68,7 @@ end
 (** module used to reduce formulae to Normal Form *)
 module NF = struct (* add memoization, one day ? *)
 
+  (* TODO !*)
   (** all quantifiers in prenex form *)
   let prenex_fmla fmla =
     Format.fprintf err "prenex_fmla : @[%a@]@." Pretty.print_fmla fmla;
@@ -116,8 +117,9 @@ module NF = struct (* add memoization, one day ? *)
 	if FmlaHashtbl.mem fmlaTable fmla then
 	  [[FmlaHashtbl.find fmlaTable fmla]]
 	else
-	  let new_fmla = (create_fmla vars) in
+	  let new_fmla = create_fmla vars in
 	  FmlaHashtbl.add fmlaTable old_fmla new_fmla;
+	  FmlaHashtbl.add fmlaTable new_fmla new_fmla;
 	  [[new_fmla]]
   and skipPrenex fmlaTable fmla = match fmla.f_node with
     | Fquant (_,f_bound) ->
@@ -150,6 +152,11 @@ module NF = struct (* add memoization, one day ? *)
 	transform fmlaTable (f_or (f_and f1 (f_not f2)) (f_and (f_not f1) f2))
     | _ -> [[old_f]] (* default case *)
 
+  let make_clauses fmlaTable prop =
+    let prenex_fmla = prenex_fmla prop in
+    let clauses = skipPrenex fmlaTable prenex_fmla in
+    Format.eprintf "==>@ @[%a@]@.@." Util.print_clauses clauses;
+    clauses
 end
 
 
@@ -183,9 +190,11 @@ module GraphPredicate = struct
   with Not_found ->
     let new_v = GP.V.create x in
     SymbHashtbl.add symbTbl x new_v;
+    (* Format.eprintf "generating new vertex : %a@." Pretty.print_ls x; *)
     new_v
 
-  (** analyse a single clause *)
+  (** analyse a single clause, and creates an edge between every positive
+      litteral and every negative litteral of [clause] in [gp] graph. *)
   let analyse_clause symbTbl gp clause =
     let get_symbol x = find symbTbl (extract_symbol x) in
     let negative,positive = List.partition is_negative clause in
@@ -203,17 +212,15 @@ module GraphPredicate = struct
 	  GP.add_edge_e gp (GP.E.create left n right)
       with Not_found ->
 	let e = GP.E.create left n right in
-	GP.add_edge_e gp e
-    in List.fold_left (* add an edge from every negative to any positive *)
-	 (fun gp left ->
-	    List.fold_left (add left) gp positive) gp negative
+	GP.add_edge_e gp e in
+    List.fold_left (* add an edge from every negative to any positive *)
+      (fun gp left ->
+	 List.fold_left (add left) gp positive) gp negative
 
   (** takes a prop, puts it in Normal Form and then builds a clause
       from it *)
   let analyse_prop fmlaTable symbTbl gp prop =
-    let prenex_fmla = NF.prenex_fmla prop in
-    let clauses = NF.skipPrenex fmlaTable prenex_fmla in
-    Format.eprintf "==>@ @[%a@]@.@." Util.print_clauses clauses;
+    let clauses = NF.make_clauses fmlaTable prop in
     List.fold_left (analyse_clause symbTbl) gp clauses
 
   let add_symbol symbTbl gp lsymbol =
@@ -245,18 +252,15 @@ module Select = struct
     in explore [] fmla
 
   let get_clause_predicates acc clause =
-    let rec fmla_get_pred acc fmla = match fmla.f_node with
-      | Fnot f -> fmla_get_negative_pred acc f
-      | Fapp (pred,_) -> (pred, `Positive)::acc
+    let rec fmla_get_pred ?(pos=true) acc fmla = match fmla.f_node with
+      | Fnot f -> fmla_get_pred ~pos:false acc f
+      | Fapp (pred,_) -> (pred, (if pos then `Positive else `Negative))::acc
       | _ -> failwith "bad formula in get_predicates !"
-    and fmla_get_negative_pred acc fmla = match fmla.f_node with
-      | Fapp (pred,_) -> (pred, `Negative)::acc
-      | _ -> failwith "bad (negative) formula in get_predicates !"
     in List.fold_left fmla_get_pred acc clause
 
   (** get the predecessors of [positive] in the graph [gp], at distance <= [i]*)
   let rec get_predecessors i gp acc positive =
-    if i <= 0
+    if i < 0
     then acc
     else
       let acc = positive :: acc in
@@ -271,18 +275,23 @@ module Select = struct
       from data stored in the two graphes [gc] and [gp] given.
       [i] is the parameter of predicate graph ([gp]) based filtering.
       [j] is the parameter for dynamic constants ([gc]) dependency filtering *)
-  let is_pertinent symTbl goal_clauses ?(i=2) ?(j=2) (_gc,gp) fmla =
+  let is_pertinent symTbl goal_clauses ?(i=4) ?(j=2) (_gc,gp) fmla =
+    let is_negative = function
+      | (_,`Negative) -> true
+      | (_,`Positive) -> false in
+    let find_secure symbTbl x =
+      try SymbHashtbl.find symbTbl x
+      with Not_found ->
+	Format.eprintf "failure finding %a !@." Pretty.print_ls x;
+	raise Not_found in
     let goal_predicates =
       List.fold_left get_clause_predicates [] goal_clauses in
     let predicates = get_predicates fmla in
-    let is_negative = function
-      | (_,`Positive) -> false 
-      | (_,`Negative) -> true in
     let negative,positive = List.partition is_negative goal_predicates in
     let negative,positive = List.map fst negative, List.map fst positive in
-    let negative = List.map (SymbHashtbl.find symTbl) negative in
-    let positive = List.map (SymbHashtbl.find symTbl) positive in
-    let predicates = List.map (SymbHashtbl.find symTbl) predicates in
+    let negative = List.map (find_secure symTbl) negative in
+    let positive = List.map (find_secure symTbl) positive in
+    let predicates = List.map (find_secure symTbl) predicates in
     (* list of negative predecessors of any positive predicate of the goal,
        at distance <= i *)
     let predecessors = List.fold_left (get_predecessors i gp) [] positive in
@@ -290,7 +299,9 @@ module Select = struct
     (* a predicates is accepted iff all its predicates are close enough in
        successors or predecessors lists *)
     List.for_all
-      (fun x -> List.mem x predecessors || List.mem x successors)
+      (fun x -> if List.mem x predecessors || List.mem x successors then true
+       else begin Format.eprintf "%a not close enough (dist %d)@."
+	 Pretty.print_ls (GP.V.label x) i; false end)
       predicates
 
   (** preprocesses the goal formula and the graph, and returns a function
@@ -305,7 +316,8 @@ module Select = struct
 	      try
 		if is_pertinent symTbl goal_clauses (gc,gp) fmla
 		then [decl] else []
-	      with Not_found -> [decl] in (* TODO : remove ! *)
+	      with Not_found ->
+		[decl] in (* TODO : remove ! *)
 	    if return_value = [] then Format.eprintf "NO@.@."
 	    else Format.eprintf "YES@.@.";
 	    return_value
@@ -336,12 +348,12 @@ then mapping Select.filter *)
 let transformation fmlaTable symbTbl task =
   (* first, collect data in 2 graphes *)
   let (gc,gp,goal_option) =
-    Trans.apply (collect_info fmlaTable symbTbl) task in
+    Trans.apply (collect_info fmlaTable symbTbl) task in				
   (* get the goal *)
   let goal_fmla = match goal_option with
     | None -> failwith "no goal !"
     | Some goal_fmla -> goal_fmla in
-  let goal_clauses = NF.transform fmlaTable goal_fmla in
+  let goal_clauses = NF.make_clauses fmlaTable goal_fmla in
   (* filter one declaration at once *)
   Trans.apply
     (Trans.decl
