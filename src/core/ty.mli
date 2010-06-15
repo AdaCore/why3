@@ -55,6 +55,8 @@ module Mts : Map.S with type key = tysymbol
 module Hts : Hashtbl.S with type key = tysymbol
 module Wts : Hashweak.S with type key = tysymbol
 
+module Tty : Hashweak.Tagged with type t = ty
+
 module Sty : Set.S with type elt = ty
 module Mty : Map.S with type key = ty
 module Hty : Hashtbl.S with type key = ty

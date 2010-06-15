@@ -78,13 +78,17 @@ module Mstr : Map.S with type key = string
 (* Set, Map, Hashtbl on structures with a unique tag *)
 open Hashweak
 
-module OrderedHash (X : Tagged) :
+module type OrderedHash =
 sig
-  type t = X.t
+  type t
   val hash : t -> int
   val equal : t -> t -> bool
   val compare : t -> t -> int
 end
+
+
+module OrderedHash (X : Tagged) : OrderedHash with type t = X.t
+module OrderedHashList (X : Tagged) : OrderedHash with type t = X.t list
 
 module StructMake (X : Tagged) :
 sig

@@ -95,10 +95,12 @@ module Hsty = Hashcons.Make (struct
   let tag n ty = { ty with ty_tag = n }
 end)
 
-module Ty = StructMake (struct
+module Tty = struct
   type t = ty
   let tag ty = ty.ty_tag
-end)
+end
+
+module Ty = StructMake (Tty)
 
 module Sty = Ty.S
 module Mty = Ty.M

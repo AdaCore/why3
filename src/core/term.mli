@@ -191,6 +191,7 @@ val t_case : term list -> (pattern list * term) list -> ty -> term
 val t_eps : vsymbol -> fmla -> term
 
 val t_app_infer : lsymbol -> term list -> term
+val t_app_inst : lsymbol -> term list -> ty -> ty Mtv.t
 
 val t_label : label list -> term -> term
 val t_label_add : label -> term -> term
@@ -213,6 +214,8 @@ val f_false : fmla
 val f_if : fmla -> fmla -> fmla -> fmla
 val f_let : vsymbol -> term -> fmla -> fmla
 val f_case : term list -> (pattern list * fmla) list -> fmla
+
+val f_app_inst : lsymbol -> term list -> ty Mtv.t
 
 val f_label : label list -> fmla -> fmla
 val f_label_add : label -> fmla -> fmla

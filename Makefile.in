@@ -93,7 +93,7 @@ LIBGENERATED = src/util/rc.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_parser.output src/driver/driver_lexer.ml
 
-LIB_UTIL = pp loc print_tree hashweak util hashcons sysutil rc
+LIB_UTIL = pp loc print_tree hashweak hashcons util sysutil rc
 
 LIB_CORE = ident ty term pattern decl theory task pretty trans env
 
@@ -106,7 +106,7 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula inlining \
 		split_conjunction encoding_decorate \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
-		explicit_polymorphism simple_types
+		explicit_polymorphism simple_types encoding_instantiate
 
 
 LIB_PRINTER = print_real alt_ergo why3 smt coq tptp simplify gappa

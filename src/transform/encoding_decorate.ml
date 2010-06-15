@@ -249,8 +249,8 @@ let rec rewrite_term tenv tvar vsvar t =
     | Tif (f, t1, t2) -> 
         t_if (fnF f) (fnT vsvar t1) (fnT vsvar t2)
     | Tlet (t1, b) -> let u,t2 = t_open_bound b in
-      let (vsvar,u) = conv_vs_let tenv vsvar u in
-      let t1' = fnT vsvar t1 in let t2' = fnT vsvar t2 in
+      let (vsvar',u) = conv_vs_let tenv vsvar u in
+      let t1' = fnT vsvar t1 in let t2' = fnT vsvar' t2 in
       if t_equal t1' t1 && t_equal t2' t2 then t else t_let u t1' t2'
     | Tcase _ | Teps _ | Tbvar _ ->
         Register.unsupportedTerm t

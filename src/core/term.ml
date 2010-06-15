@@ -518,7 +518,8 @@ let f_app_unsafe = f_app
 
 let fs_tuple n =
   let tyl = ref [] in
-  for i = 1 to n do tyl := ty_var (create_tvsymbol (id_fresh "a")) :: !tyl done;
+  for i = 1 to n 
+  do tyl := ty_var (create_tvsymbol (id_fresh "a")) :: !tyl done;
   let ty = ty_tuple !tyl in
   create_fsymbol (id_fresh ("Tuple" ^ string_of_int n)) !tyl ty
 
@@ -616,16 +617,17 @@ let f_any_unsafe prT prF lvl f =
 
 (* unsafe constructors with type checking *)
 
-let t_app fs tl ty =
+let t_app_inst fs tl ty =
   let s = match fs.ls_value with
     | Some vty -> ty_match Mtv.empty vty ty
     | _ -> raise (FunctionSymbolExpected fs)
   in
   let mtch s ty t = ty_match s ty t.t_ty in
-  ignore (try List.fold_left2 mtch s fs.ls_args tl
-    with Invalid_argument _ -> raise (BadArity
-      (List.length fs.ls_args, List.length tl)));
-  t_app fs tl ty
+  try List.fold_left2 mtch s fs.ls_args tl
+  with Invalid_argument _ -> 
+    raise (BadArity (List.length fs.ls_args, List.length tl))
+
+let t_app fs tl ty = ignore (t_app_inst fs tl ty); t_app fs tl ty
 
 let t_app_infer fs tl =
   let mtch s ty t = ty_match s ty t.t_ty in
@@ -640,16 +642,17 @@ let t_app_infer fs tl =
   in
   t_app_unsafe fs tl ty
 
-let f_app ps tl =
+let f_app_inst ps tl =
   let s = match ps.ls_value with
     | None -> Mtv.empty
     | _ -> raise (PredicateSymbolExpected ps)
   in
   let mtch s ty t = ty_match s ty t.t_ty in
-  ignore (try List.fold_left2 mtch s ps.ls_args tl
-    with Invalid_argument _ -> raise (BadArity
-      (List.length ps.ls_args, List.length tl)));
-  f_app ps tl
+  try List.fold_left2 mtch s ps.ls_args tl
+  with Invalid_argument _ -> 
+    raise (BadArity (List.length ps.ls_args, List.length tl))
+
+let f_app ps tl = ignore (f_app_inst ps tl); f_app ps tl
 
 let p_check t p =
   check_ty_equal p.pat_ty t.t_ty

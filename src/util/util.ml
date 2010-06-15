@@ -90,12 +90,36 @@ module Mstr = Map.Make(String)
 
 (* Set, Map, Hashtbl on structures with a unique tag *)
 
+module type OrderedHash = 
+sig
+  type t
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+end
+
 module OrderedHash (X : Hashweak.Tagged) =
 struct
   type t = X.t
   let hash = X.tag
   let equal ts1 ts2 = X.tag ts1 == X.tag ts2
   let compare ts1 ts2 = Pervasives.compare (X.tag ts1) (X.tag ts2)
+end
+
+module OrderedHashList (X : Hashweak.Tagged) =
+struct
+  type t = X.t list
+  let hash = Hashcons.combine_list X.tag 3
+  let equal tsl1 tsl2 = 
+    try List.for_all2 (fun ts1 ts2 -> X.tag ts1 = X.tag ts2) tsl1 tsl2
+    with Invalid_argument _ -> false
+  let rec compare ts1 ts2 = match ts1,ts2 with
+    | [], [] -> 0
+    | [], _ -> -1
+    | _ , [] -> 1
+    | a1::l1, a2::l2 -> 
+      let c = Pervasives.compare (X.tag a1) (X.tag a2) in
+      if c != 0 then c else compare l1 l2
 end
 
 module StructMake (X : Hashweak.Tagged) =
@@ -106,6 +130,7 @@ struct
   module H = Hashtbl.Make(T)
   module W = Hashweak.Make(X)
 end
+
 
 (* memoization *)
 
