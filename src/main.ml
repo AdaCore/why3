@@ -267,37 +267,6 @@ let memlimit = match !opt_memlimit with
 
 let debug = !opt_debug
 
-let rec report fmt = function
-  | Loc.Located (loc, e) ->
-      fprintf fmt "%a%a" Loc.report_position loc report e
-  | Lexer.Error e ->
-      fprintf fmt "lexical error: %a" Lexer.report e;
-  | Parsing.Parse_error ->
-      fprintf fmt "syntax error"
-  | Denv.Error e ->
-      Denv.report fmt e
-  | Typing.Error e ->
-      Typing.report fmt e
-  | Decl.UnknownIdent i ->
-      fprintf fmt "anomaly: unknown ident '%s'" i.Ident.id_string
-  | Decl.UnboundVars vs ->
-      fprintf fmt "anomaly: unknown vars  [%a]" 
-        (Pp.print_iter1 Term.Svs.iter Pp.semi Pretty.print_vs) vs
-  | Driver.Error e ->
-      Driver.report fmt e
-  | Config.Dynlink.Error e ->
-      fprintf fmt "Dynlink: %s" (Config.Dynlink.error_message e)
-  | Whyconf.Error e ->
-      fprintf fmt "Why config: %a" Whyconf.report e
-  | Prover.Error e ->
-      Prover.report fmt e
-  | Register.Error e ->
-      Register.report fmt e
-  | Env.UnknownFormat p ->
-      fprintf fmt "unknown format '%s'" p
-  | e -> 
-      fprintf fmt "anomaly: %s" (Printexc.to_string e)
-
 let print_th_namespace fmt th =
   Pretty.print_namespace fmt th.th_name.Ident.id_string th.th_export
 
@@ -437,7 +406,7 @@ let () =
     let drv = Util.option_map (load_driver env) !opt_driver in
     Queue.iter (do_input env drv) opt_queue
   with e when not debug ->
-    eprintf "%a@." report e;
+    eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
 (*

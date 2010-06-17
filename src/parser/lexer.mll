@@ -38,6 +38,13 @@
     | UnterminatedComment -> fprintf fmt "unterminated comment"
     | UnterminatedString -> fprintf fmt "unterminated string"
 
+
+  let () = Exn_printer.register
+    (fun fmt exn -> match exn with
+      | Error error -> report fmt error
+      | _ -> raise exn)
+
+
   let keywords = Hashtbl.create 97
   let () = 
     List.iter 

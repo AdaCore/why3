@@ -82,6 +82,11 @@ let report fmt = function
   | DuplicateProver s ->
       fprintf fmt "prover %s is already listed" s
 
+let () = Exn_printer.register
+  (fun fmt exn -> match exn with
+    | Error error -> report fmt error
+    | _ -> raise exn)
+
 (* Configuration file *)
 
 type config_prover = {

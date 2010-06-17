@@ -41,6 +41,12 @@
   let infix s = "infix " ^ s
   let prefix s = "prefix " ^ s
 
+  let () = Exn_printer.register
+    (fun fmt exn -> match exn with
+      | Parsing.Parse_error -> Format.fprintf fmt "syntax error"
+      | _ -> raise exn
+    )
+
 %}
 
 /* Tokens */ 

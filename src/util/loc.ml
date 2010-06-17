@@ -107,6 +107,11 @@ let report_obligation_position ?(onlybasename=false) fmt loc =
 let current_offset = ref 0
 let reloc p = { p with pos_cnum = p.pos_cnum + !current_offset }
 
+let () = Exn_printer.register
+  (fun fmt exn -> match exn with
+    | Located (loc,e) ->
+      fprintf fmt "%a%a" report_position loc Exn_printer.exn_printer e
+    | _ -> raise exn)
 (*
 (* Identifiers localization *)
 

@@ -29,6 +29,11 @@ exception Error of error
 
 let report = pp_print_string
 
+let () = Exn_printer.register
+  (fun fmt exn -> match exn with
+    | Error error -> report fmt error
+    | _ -> raise exn)
+
 let error e = raise (Error e)
 
 let errorm f =

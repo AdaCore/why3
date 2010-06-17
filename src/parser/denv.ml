@@ -39,6 +39,10 @@ let report fmt = function
   | AnyMessage s ->
       fprintf fmt "%s" s
 
+let () = Exn_printer.register
+  (fun fmt exn -> match exn with
+    | Error error -> report fmt error
+    | _ -> raise exn)
 
 (** types with destructive type variables *)
 

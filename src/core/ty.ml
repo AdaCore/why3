@@ -129,7 +129,7 @@ let ty_any pr ty =
 
 (* smart constructors *)
 
-exception BadTypeArity of int * int
+exception BadTypeArity of tysymbol * int * int
 exception DuplicateTypeVar of tvsymbol
 exception UnboundTypeVars of Stv.t
 
@@ -158,7 +158,7 @@ let rec tv_inst m ty = match ty.ty_node with
 let ty_app s tl =
   let tll = List.length tl in
   let stl = List.length s.ts_args in
-  if tll <> stl then raise (BadTypeArity (stl,tll));
+  if tll <> stl then raise (BadTypeArity (s,stl,tll));
   match s.ts_def with
     | Some ty ->
         let add m v t = Mtv.add v t m in
@@ -225,3 +225,28 @@ let ty_tuple tyl =
   ty_app (ts_tuple (List.length tyl)) tyl
 
 let is_ts_tuple ts = ts == ts_tuple (List.length ts.ts_args)
+
+
+open Format
+let print_tv fmt tv = pp_print_string fmt tv.tv_name.id_string
+let print_ts fmt ts = pp_print_string fmt ts.ts_name.id_string
+
+let rec print_ty fmt ty = match ty.ty_node with
+  | Tyvar v -> print_tv fmt v
+  | Tyapp (ts, []) -> print_ts fmt ts
+  | Tyapp (ts, [t]) -> fprintf fmt "%a@ %a" print_ty t print_ts ts
+  | Tyapp (ts, l) -> fprintf fmt "(%a)@ %a"
+      (Pp.print_list Pp.comma print_ty) l print_ts ts
+
+
+let () = Exn_printer.register
+  (fun fmt exn -> match exn with
+    | TypeMismatch (t1,t2) ->
+        Format.fprintf fmt "Type mismatch between %a and %a" 
+          print_ty t1 print_ty t2
+    | BadTypeArity(ts, ts_arg, app_arg) ->
+      Format.fprintf fmt 
+        "Bad type arity type symbol %a is applied \
+         with %i arguments instead of %i"
+        print_ts ts ts_arg app_arg
+    | _ -> raise exn)

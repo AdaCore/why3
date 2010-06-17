@@ -203,6 +203,11 @@ let report fmt = function
   | NotImplemented (s) ->
       Format.fprintf fmt "@[<hov 3> Unimplemented feature:@\n%s@]@\n" s
 
+let () = Exn_printer.register
+  (fun fmt exn -> match exn with
+    | Error error -> report fmt error
+    | _ -> raise exn)
+
 (** function which cath inner error *)
 exception Unsupported of string
 

@@ -17,21 +17,33 @@
 (*                                                                        *)
 (**************************************************************************)
 
-# 21 "src/config.ml.in"
+type exn_printer = Format.formatter -> exn -> unit
 
-let why_version   = "@VERSION@"
-let why_builddate = "@BUILDDATE@"
-let why_plugins   = ("@enable_plugins@" = "yes")
+let exn_printers = 
+  (Stack.create () : (Format.formatter -> exn -> unit) Stack.t)
 
-module Dynlink_ = struct
-  let is_native = true
-  let loadfile_private _ = assert false
+let register exn_printer = Stack.push exn_printer exn_printers
 
-  type error
-  exception Error of error
-  let error_message _ = (assert false : string)
-end
+let () =
+  let all_exn_printer fmt exn = 
+    Format.fprintf fmt "anomaly: %s" (Printexc.to_string exn) in
+  register all_exn_printer
 
-module Dynlink = struct
-  include @DYNLINK@
-end
+exception Exit_loop
+
+let exn_printer fmt exn = 
+  let test f = try f fmt exn; raise Exit_loop 
+    with Exit_loop -> raise Exit_loop
+      | _ -> () in
+  try 
+    Stack.iter test exn_printers
+  with Exit_loop -> ()
+
+(** For Config *)
+
+
+let () = register
+  (fun fmt exn -> match exn with
+    | Config.Dynlink.Error error -> 
+        Format.fprintf fmt "Dynlink: %s" (Config.Dynlink.error_message error)
+    | _ -> raise exn)

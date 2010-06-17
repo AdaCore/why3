@@ -534,3 +534,14 @@ let known_add_decl kn d =
   ignore (check_match kn d);
   kn
 
+
+let () = Exn_printer.register
+  (fun fmt exn -> match exn with
+    | UnknownIdent i ->
+      fprintf fmt "anomaly: unknown ident '%s'" i.Ident.id_string
+    | UnboundVars vs ->
+      fprintf fmt "anomaly: unknown vars  [%a]" 
+        (Pp.print_iter1 Term.Svs.iter Pp.semi 
+           (fun fmt vs -> pp_print_string fmt vs.vs_name.Ident.id_string)) vs
+        (* TODO other exceptions *)
+    | _ -> raise exn)

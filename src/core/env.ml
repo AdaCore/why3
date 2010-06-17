@@ -121,3 +121,10 @@ let list_formats () =
   Hashtbl.iter add suffixes_table;
   Hashtbl.fold (fun p l acc -> (p, l) :: acc) h []
 
+
+let () = Exn_printer.register
+  (fun fmt exn -> match exn with
+    | UnknownFormat p -> Format.fprintf fmt "unknown format '%s'" p
+    | _ -> raise exn)
+
+

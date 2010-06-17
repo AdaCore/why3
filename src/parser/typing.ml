@@ -112,6 +112,11 @@ let report fmt = function
   | UnboundSymbol sl ->
        fprintf fmt "Unbound symbol '%a'" (print_list dot pp_print_string) sl
 
+let () = Exn_printer.register
+  (fun fmt exn -> match exn with
+    | Error error -> report fmt error
+    | _ -> raise exn)
+
 (** Environments *)
 
 (** typing using destructive type variables
@@ -726,7 +731,7 @@ let add_types dl th =
 		  in
 		  begin try
 		    ty_app ts (List.map apply tyl)
-		  with Ty.BadTypeArity (tsal, tyll) ->
+		  with Ty.BadTypeArity (_, tsal, tyll) ->
 		    error ~loc:(qloc q) (TypeArity (q, tsal, tyll))
 		  end
 	      | PPTtuple tyl ->

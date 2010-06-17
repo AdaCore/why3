@@ -65,7 +65,7 @@ module Wty : Hashweak.S with type key = ty
 val ts_equal : tysymbol -> tysymbol -> bool
 val ty_equal : ty -> ty -> bool
 
-exception BadTypeArity of int * int
+exception BadTypeArity of tysymbol * int * int
 exception DuplicateTypeVar of tvsymbol
 exception UnboundTypeVars of Stv.t
 
