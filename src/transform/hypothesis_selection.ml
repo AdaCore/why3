@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(**s Transformation which removes most hypothesis, only keeping the one
+(*s Transformation which removes most hypothesis, only keeping the one
 a graph-based heuristic finds close enough to the goal *)
 
 open Util
@@ -36,14 +36,26 @@ module Int_Dft = struct
   let default = max_int
 end
 
-module GP = Digraph.AbstractLabeled(struct type t = Term.lsymbol end)(Int_Dft)
-module GC = Graph.ConcreteLabeled(
+module GP = Digraph.ConcreteLabeled(
   struct
-    type t = Term.fmla
-    let compare x y = compare x.f_tag y.f_tag
-    let hash x = x.f_tag
-    let equal x y = x.f_tag = y.f_tag
+    type t = Term.lsymbol
+    let compare x y = compare x.ls_name.id_tag y.ls_name.id_tag
+    let hash x = x.ls_name.id_tag
+    let equal x y = x.ls_name.id_tag = y.ls_name.id_tag
   end)(Int_Dft)
+module ExprNode = struct
+    type t = Term.expr
+    let compare x y = match x,y with
+      | Term t1, Term t2 -> compare t1.t_tag t2.t_tag
+      | Fmla f1, Fmla f2 -> compare f1.f_tag f2.f_tag
+      | Term _, Fmla _ -> -1
+      | Fmla _, Term _ -> 1
+    let hash x = match x with
+      | Term t -> t.t_tag
+      | Fmla f -> f.f_tag
+    let equal x y = compare x y == 0
+end
+module GC = Graph.Concrete(ExprNode)
 module SymbHashtbl =
   Hashtbl.Make(struct type t = Term.lsymbol
 		      let equal x y = x.ls_name.id_tag = y.ls_name.id_tag
@@ -54,7 +66,13 @@ module FmlaHashtbl =
 		      let equal x y = x.f_tag = y.f_tag
 		      let hash x = x.f_tag
 	       end)
+module TermHashtbl =
+  Hashtbl.Make(struct type t = Term.term
+		      let equal x y = x.t_tag = y.t_tag
+		      let hash x = x.t_tag
+	       end)
 module Sls = Set.Make(GP.V)
+module Sexpr = Set.Make(ExprNode)
 
 let err = Format.err_formatter
 
@@ -64,17 +82,31 @@ module Util = struct
   let print_clauses fmt = Format.fprintf fmt "[%a]@."
     (Pp.print_list Pp.comma print_clause)
 
-  (** all combinations of elements of left and right *)
+  (** all combinaisons of elements of left and right *)
   let map_complete combinator left right =
     let explorer left_elt =
       List.map (fun right_elt -> combinator left_elt right_elt) right in
     List.flatten (List.map explorer left)
+
+(** all combinaisons of elements of left and right, folded *)
+  let fold_complete combinator acc left right =
+    let explorer acc left_elt =
+      List.fold_left
+	(fun acc right_elt -> combinator acc left_elt right_elt)
+	acc right in
+    List.fold_left explorer acc left
+
+  (** given two lists of sets of expr, returns the list made from their union *)
+  let rec merge_list l1 l2 = match l1,l2 with
+    | x::xs,y::ys -> (Sexpr.union x y) :: merge_list xs ys
+    | _,[] -> l1
+    | [],_ -> l2
 end
 
 
 (** module used to reduce formulae to Normal Form *)
 module NF = struct (* add memoization, one day ? *)
-  (* TODO !*)
+  (* TODO ! *)
   (** all quantifiers in prenex form *)
   let prenex_fmla fmla =
     Format.fprintf err "prenex_fmla : @[%a@]@." Pretty.print_fmla fmla;
@@ -119,7 +151,7 @@ module NF = struct (* add memoization, one day ? *)
     | Fquant (_,f_bound) ->
 	let var,_,f = f_open_quant f_bound in
 	traverse fmlaTable old_fmla (var@vars) f
-    | _ -> (* TODO !! remember link between new term and old quantified formula *)
+    | _ ->
 	if FmlaHashtbl.mem fmlaTable fmla then
 	  [[FmlaHashtbl.find fmlaTable fmla]]
 	else
@@ -168,33 +200,76 @@ end
 
 (** module used to compute the graph of constants *)
 module GraphConstant = struct
-
-  let find fTbl fmla = try
+  (** memoizing for formulae and terms, and then expressions *)
+  let rec findF fTbl fmla = try
     FmlaHashtbl.find fTbl fmla
   with Not_found ->
-    let new_v = GC.V.create fmla in
+    let new_v = GC.V.create (Fmla fmla) in
     FmlaHashtbl.add fTbl fmla new_v;
     (* Format.eprintf "generating new vertex : %a@."
       Pretty.print_fmla fmla; *)
     new_v
+  and findT tTbl term = try
+    TermHashtbl.find tTbl term
+  with Not_found ->
+    let new_v = GC.V.create (Term term) in
+    TermHashtbl.add tTbl term new_v;
+    (* Format.eprintf "generating new vertex : %a@."
+      Pretty.print_fmla fmla; *)
+    new_v
+  and find fTbl tTbl expr = match expr with
+    | Term t -> findT tTbl t
+    | Fmla f -> findF fTbl f
 
-  let add_symbol fTbl gc fmla =
-    GC.add_vertex gc (find fTbl fmla)
+  let add_symbol fTbl tTbl gc expr =
+    GC.add_vertex gc (find fTbl tTbl expr)
 
-  (** analyse dynamic dependencies in one atomic formula *)
-  let analyse_fmla _fTbl gc _fmla = gc (* TODO *)
+  (** analyse dynamic dependencies in one atomic formula, from the bottom *)
+  let rec analyse_fmla_base fTbl tTbl gc fmla =
+    let gc,_ = analyse_fmla fTbl tTbl (gc,[]) fmla in gc
+  and analyse_fmla fTbl tTbl (gc,vertices) fmla = match fmla.f_node with
+    | Fapp (_,terms) ->
+	let gc,sub_vertices =
+	  List.fold_left (analyse_term fTbl tTbl) (gc,[]) terms in
+	(* make a clique with [sub_vertices] elements *)
+	let gc = Util.fold_complete GC.add_edge gc sub_vertices sub_vertices in
+	let pred_vertex = findF fTbl fmla in
+	(* add edges between [pred_vertex] and [sub_vertices] *)
+	let gc = List.fold_left
+	  (fun gc term_vertex -> GC.add_edge gc pred_vertex term_vertex)
+	  gc sub_vertices in
+	(gc, pred_vertex :: vertices)
+    | _ -> f_fold (analyse_term fTbl tTbl) (analyse_fmla fTbl tTbl)
+	(gc,vertices) fmla
+  and analyse_term fTbl tTbl (gc,vertices) term = match term.t_node with
+    | Tvar _ | Tconst _ ->
+	let vertex = findT tTbl term in
+	(gc,vertex::vertices)
+    | Tapp (_,terms) ->
+	let gc,sub_vertices =
+	  List.fold_left (analyse_term fTbl tTbl) (gc,[]) terms in
+	(* make a clique with [sub_vertices] elements *)
+	let gc = Util.fold_complete GC.add_edge gc sub_vertices sub_vertices in
+	let func_vertex = findT tTbl term in
+	(* add edges between [func_vertex] and [sub_vertices] *)
+	let gc = List.fold_left
+	  (fun gc term_vertex -> GC.add_edge gc func_vertex term_vertex)
+	  gc sub_vertices in
+	(gc, func_vertex :: vertices)
+    | _ -> t_fold (analyse_term fTbl tTbl) (analyse_fmla fTbl tTbl)
+	(gc,vertices) term
 
-  let analyse_clause fTbl gc clause =
-    List.fold_left (analyse_fmla fTbl) gc clause
+  let analyse_clause fTbl tTbl gc clause =
+    List.fold_left (analyse_fmla_base fTbl tTbl) gc clause
 
-  let analyse_prop fmlaTable fTbl gc prop =
+  let analyse_prop fmlaTable fTbl tTbl gc prop =
     let clauses = NF.make_clauses fmlaTable prop in
-    List.fold_left (analyse_clause fTbl) gc clauses
+    List.fold_left (analyse_clause fTbl tTbl) gc clauses
 
       (** processes a single task_head. *)
-  let update fmlaTable fTbl gc task_head = match task_head.task_decl with
+  let update fmlaTable fTbl tTbl gc task_head = match task_head.task_decl with
     | Decl {d_node = Dprop(_,_,prop_decl)} ->
-      analyse_prop fmlaTable fTbl gc prop_decl
+      analyse_prop fmlaTable fTbl tTbl gc prop_decl
     | _ -> gc
 end
 
@@ -287,6 +362,22 @@ module Select = struct
       | _ -> failwith "bad formula in get_predicates !"
     in List.fold_left fmla_get_pred acc clause
 
+  let rec get_sub_fmlas fTbl tTbl fmla =
+    let rec gather_sub_fmla fTbl tTbl acc fmla = match fmla.f_node with
+      | Fapp (_,terms) ->
+	  let acc = List.fold_left (gather_sub_term fTbl tTbl) acc terms in
+	  GraphConstant.findF fTbl fmla :: acc
+      | _ -> f_fold (gather_sub_term fTbl tTbl)
+	  (gather_sub_fmla fTbl tTbl) acc fmla
+    and gather_sub_term fTbl tTbl acc term = match term.t_node with
+      | Tapp (_,terms) ->
+	  let acc = List.fold_left (gather_sub_term fTbl tTbl) acc terms in
+	  GraphConstant.findT tTbl term :: acc
+      | Tconst _ | Tvar _ -> GraphConstant.findT tTbl term :: acc
+      | _ -> t_fold (gather_sub_term fTbl tTbl)
+	  (gather_sub_fmla fTbl tTbl) acc term in
+    gather_sub_fmla fTbl tTbl [] fmla
+
   (** get the predecessors of [positive] in the graph [gp], at distance <= [i]*)
   let rec get_predecessors i gp acc positive =
     if i < 0 then acc
@@ -305,12 +396,67 @@ module Select = struct
       List.fold_left (follow_edge ~forward:true gp j)
 	acc (GP.succ_e gp negative)
 
-  (* TODO : be clear... *)
+  exception FixPoint
+  exception Exit of Sexpr.t list
+
+  (** builds the list of reachable nodes *)
+  let build_relevant_variables gc goal_clause =
+    let acc = Sexpr.empty in
+    let l0 = List.fold_right Sexpr.add goal_clause acc in
+
+    (** explore one more step *)
+    let rec one_step cur =
+      let step = Sexpr.fold explore cur [cur;cur] in
+      Format.eprintf "one step made !@.";
+      step
+
+    (** explores the neighbours of [vertex] *)
+    and explore vertex l = match l with [next_cur;cur] ->
+
+      (** [changed] indicates whether a vertex has been added;
+	  [v] is a vertex *)
+      let find_odd v ((acc,changed) as old) =
+	if Sexpr.mem v acc then old else
+	  let count = GC.fold_pred
+	    (fun v2 count -> if Sexpr.mem v2 acc then count+1 else count)
+	    gc v 0 in (* how many predecessors in acc ? *)
+	  if count >= 2 then (Sexpr.add v acc,true) else old in
+      let find_even prev_step v ((acc,changed) as old) =
+	if Sexpr.mem v prev_step || Sexpr.mem v acc then old else
+	  if GC.fold_pred (fun v2 bool -> bool || (Sexpr.mem v2 acc))
+	    gc v false (* connected to a vertex in acc ? *)
+	  then (Sexpr.add v acc, true) else old in
+      let next_cur_odd,has_changed = (* compute 2^n+1 elts *)
+	GC.fold_succ find_odd gc vertex (cur,false) in
+      let next_cur_even,has_changed = (* compute 2^n+2 elts *)
+	GC.fold_succ (find_even next_cur_odd)
+	  gc vertex (cur,has_changed) in
+      if has_changed then [next_cur_even;next_cur_odd]
+      else raise FixPoint
+
+      | _ -> assert false (*only not to have warnings on non-exhaustive match*)
+
+    (** iterates [one_step] until an exception is raised *)
+    and control cur acc =
+      let next_acc = try
+	let next_step = one_step cur in
+	next_step @ acc (* next step contains *2* steps *)
+      with FixPoint ->
+	Format.eprintf "[control] : fixpoint reached !";
+	raise (Exit acc) in
+      control (List.hd next_acc) next_acc in
+    try
+      ignore (control l0 [l0]);
+      [l0] (* never returns. this is an odd step (step 1) *)
+    with Exit answer ->
+      List.rev answer
+
+  (* TODO : be more clear... *)
   (** determines if a proposition is pertinent w.r.t the given goal formula,
-      from data stored in the two graphes [gc] and [gp] given.
+      from data stored in the graph [gp] given.
       [i] is the parameter of predicate graph ([gp]) based filtering.
       [j] is the parameter for dynamic constants ([gc]) dependency filtering *)
-  let is_pertinent symTbl goal_clauses ?(i=4) ?(j=2) (_gc,gp) fmla =
+  let is_pertinent_predicate symTbl goal_clauses ?(i=4) gp fmla =
     let is_negative = function
       | (_,`Negative) -> true
       | (_,`Positive) -> false in
@@ -330,7 +476,7 @@ module Select = struct
     (* list of negative predecessors of any positive predicate of the goal,
        at distance <= i *)
     let predecessors = List.fold_left (get_predecessors i gp) Sls.empty positive in
-    let successors = List.fold_left (get_successors j gp) Sls.empty negative in
+    let successors = List.fold_left (get_successors i gp) Sls.empty negative in
     (* a predicates is accepted iff all its predicates are close enough in
        successors or predecessors lists *)
     List.for_all
@@ -339,24 +485,39 @@ module Select = struct
 	   Pretty.print_ls (GP.V.label x) i; false end)
       predicates
 
+  (** tests whether a formula is pertinent according to the dynamic dependency criterion. *)
+  let is_pertinent_dynamic fTbl tTbl goal_clauses ?(j=4) gc =
+    let relevant_variables = (* ideally, there should be only one goal clause *)
+      List.fold_left Util.merge_list []
+	(List.map (build_relevant_variables gc) goal_clauses) in
+    function fmla ->
+      let rec is_close_enough x l count = match (l,count) with 
+	| _,n when n < 0 -> false
+	| y::_,_ when Sexpr.mem x y -> true
+	| _::ys,count -> is_close_enough x ys (count-1)
+	| _,_ ->
+	    false (* case where the fmla is not reachable from goal vars *) in
+      let is_acceptable fmla = is_close_enough fmla relevant_variables j in
+      let sub_fmlas = get_sub_fmlas fTbl tTbl fmla in
+      let sub_fmlas = List.map GC.V.label sub_fmlas in
+      List.for_all is_acceptable sub_fmlas
+
   (** preprocesses the goal formula and the graph, and returns a function
       that will accept or not axioms according to their relevance. *)
-  let filter _fTbl symTbl goal_clauses (gc,gp) = (* TODO : use fTbl *)
-    function decl -> (* TODO : clean up *)
-      match decl.d_node with
-	| Dtype _ | Dlogic _ | Dind _ -> [decl]
-	| Dprop (Paxiom,_,fmla) -> (* filter only axioms *)
-	    Format.eprintf "filter : @[%a@]@." Pretty.print_fmla fmla;
-	    let return_value =
-	      try
-		if is_pertinent symTbl goal_clauses (gc,gp) fmla
-		then [decl] else []
-	      with Not_found ->
-		[decl] in (* TODO : remove ! *)
-	    if return_value = [] then Format.eprintf "NO@.@."
-	    else Format.eprintf "YES@.@.";
-	    return_value
-	| Dprop(_,_,_) -> [decl]
+  let filter fTbl tTbl symTbl goal_clauses (gc,gp) decl =
+    match decl.d_node with
+      | Dtype _ | Dlogic _ | Dind _ -> [decl]
+      | Dprop (Paxiom,_,fmla) -> (* filter only axioms *)
+	  Format.eprintf "filter : @[%a@]@." Pretty.print_fmla fmla;
+	  let goal_exprs = List.map (List.map (fun x -> Fmla x)) goal_clauses in
+	  let return_value =
+	    if is_pertinent_predicate symTbl goal_clauses gp fmla &&
+	      is_pertinent_dynamic fTbl tTbl goal_exprs gc fmla
+	    then [decl] else [] in
+	  if return_value = [] then Format.eprintf "NO@.@."
+	  else Format.eprintf "YES@.@.";
+	  return_value
+      | Dprop(_,_,_) -> [decl]
 end
 
 (** if this is the goal, return it as Some goal after checking there is no other
@@ -369,20 +530,20 @@ let get_goal task_head option =
     | _ -> option
 
 (** collects data on predicates and constants in task *)
-let collect_info fmlaTable fTbl symbTbl =
+let collect_info fmlaTable fTbl tTbl symbTbl =
   Trans.fold
     (fun t (gc, gp, goal_option) ->
-       GraphConstant.update fmlaTable fTbl gc t,
+       GraphConstant.update fmlaTable fTbl tTbl gc t,
        GraphPredicate.update fmlaTable symbTbl gp t,
        get_goal t goal_option)
     (GC.empty, GP.empty, None)
 
 (** the transformation, made from applying collect_info and
 then mapping Select.filter *)
-let transformation fmlaTable fTbl symbTbl task =
+let transformation fmlaTable fTbl tTbl symbTbl task =
   (* first, collect data in 2 graphes *)
   let (gc,gp,goal_option) =
-    Trans.apply (collect_info fmlaTable fTbl symbTbl) task in
+    Trans.apply (collect_info fmlaTable fTbl tTbl symbTbl) task in
   (* get the goal *)
   let goal_fmla = match goal_option with
     | None -> failwith "no goal !"
@@ -391,24 +552,25 @@ let transformation fmlaTable fTbl symbTbl task =
   (* filter one declaration at once *)
   Trans.apply
     (Trans.decl
-       (Select.filter fTbl symbTbl goal_clauses (gc,gp)) None) task
+       (Select.filter fTbl tTbl symbTbl goal_clauses (gc,gp)) None) task
 
 (** the transformation to be registered *)
 let hypothesis_selection =
   Register.store
-    (fun () ->
+    (fun () -> (* create lots of hashtables... *)
        let fmlaTable = FmlaHashtbl.create 17 in
        let fTbl = FmlaHashtbl.create 17 in
+       let tTbl = TermHashtbl.create 17 in
        let symbTbl = SymbHashtbl.create 17 in
        Trans.store
-	 (transformation fmlaTable fTbl symbTbl))
+	 (transformation fmlaTable fTbl tTbl symbTbl))
 
 let _ = Register.register_transform
   "hypothesis_selection" hypothesis_selection
 
 (*
 Local Variables:
-  compile-command: "unset LANG; cd ../..; make src/transform/hypothesis_selection.cmo"
+  compile-command: "unset LANG; make"
 End:
 vim:foldmethod=indent:foldnestmax=1
 *)
