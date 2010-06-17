@@ -21,23 +21,23 @@ parameter create :
     { 0 <= n } 
     uf ref 
     { num(!result) = n and size(!result) = n and
-      forall x:int. (* 0 <= x < n -> *) repr(!result, x) = x }
+      forall x:int. 0 <= x < n -> repr(!result, x) = x }
 
 parameter find : 
   u:uf ref -> x:int -> 
-    {} 
+    { 0 <= x < size(!u) } 
     int writes u 
     { result = repr(!u, x) and 
       size(!u) = size(old(!u)) and num(!u) = num(old(!u)) and 
-      forall x:int. (* 0 <= x < size(!u) -> *) repr(!u, x) = repr(old(!u), x) } 
+      forall x:int. 0 <= x < size(!u) -> repr(!u, x) = repr(old(!u), x) } 
 
 parameter union : 
   u:uf ref -> a:int -> b:int -> 
-    { not same(!u, a, b) }
+    { 0 <= a < size(!u) and 0 <= b < size(!u) and not same(!u, a, b) }
     unit writes u
     { same(!u, a, b) and
       size(!u) = size(old(!u)) and num(!u) = num(old(!u)) - 1 and 
-      forall x,y:int. (* 0 <= x < size(!u) -> 0 <= y < size(!u) ->  *)
+      forall x,y:int. 0 <= x < size(!u) -> 0 <= y < size(!u) -> 
          same(!u, x, y) <->
          same(old(!u), x, y) or
          same(old(!u), x, a) and same(old(!u), b, y) or
@@ -84,9 +84,10 @@ parameter add_edge :
    }
 
 let add_edge_and_union (u:uf ref) (a:int) (b:int) =
-  { not same(!u, a,b) and not path(!graph, a, b) and
+  { 0 <= a < size(!u) and 0 <= b < size(!u) and
+    not same(!u, a,b) and not path(!graph, a, b) and
     forall x,y:int. 
-      (* 0 <= x < size(!u) -> 0 <= y < size(!u) -> *)
+      0 <= x < size(!u) -> 0 <= y < size(!u) ->
       same(!u, x, y) <-> path(!graph, x, y) } 
     add_edge a b;
     union u a b
@@ -94,20 +95,20 @@ let add_edge_and_union (u:uf ref) (a:int) (b:int) =
       same(!u, a, b) and
       size(!u) = size(old(!u)) and num(!u) = num(old(!u)) - 1 and 
       (forall x,y:int. 
-         (* 0 <= x < size(!u) -> 0 <= y < size(!u) ->  *)
+         0 <= x < size(!u) -> 0 <= y < size(!u) ->
          same(!u, x, y) <-> path(!graph, x, y)) }
 
 { 
 (***
   lemma Main_lemma : 
      forall u1,u2:uf [size(u1),size(u2)]. forall g1,g2:graph, a,b:int.
-     (* 0 <= a < size(u1) -> 0 <= b < size(u1) -> *)
+     0 <= a < size(u1) -> 0 <= b < size(u1) ->
      (forall x,y:int. 
-        (* 0 <= x < size(u1) -> 0 <= y < size(u1) -> *)
+        0 <= x < size(u1) -> 0 <= y < size(u1) ->
         same(u1, x, y) <-> path(g1, x, y)) ->
      ((* post union *)
       size(u2) = size(u1) and 
-      forall x,y:int. (* 0 <= x < size(u2) -> 0 <= y < size(u2) ->  *)
+      forall x,y:int. 0 <= x < size(u2) -> 0 <= y < size(u2) -> 
          same(u2, x, y) <->
          same(u1, x, y) or
          same(u1, x, a) and same(u1, b, y) or
@@ -119,7 +120,7 @@ let add_edge_and_union (u:uf ref) (a:int) (b:int) =
           path(g1, x, a) and path(g1, b, y) or
           path(g1, x, b) and path(g1, a, y))  ) ->
      (forall x,y:int. 
-        (* 0 <= x < size(u2) -> 0 <= y < size(u2) -> *)
+        0 <= x < size(u2) -> 0 <= y < size(u2) ->
         same(u2, x, y) <-> path(g2, x, y))
      ***)
 }
@@ -133,7 +134,7 @@ let build_maze (n:int) =
     while get_num_classes u > 1 do
       invariant 
         { 1 <= num(!u) and num(!u) + !num_edges = size(!u) = n*n and
-          forall x,y:int. (* 0 <= x < n*n -> 0 <= y < n*n -> *)
+          forall x,y:int. 0 <= x < n*n -> 0 <= y < n*n ->
             same(!u, x, y) <-> path(!graph, x, y)
         }
       let x = rand n in
@@ -143,12 +144,14 @@ let build_maze (n:int) =
       let z = y (* select d y (y+1) *) (*if d = 0 then y else y+1*) in
       if andb (w < n) (z < n) then (* TODO && *) begin
         let a = y * n + x in
+        assert { 0 <= a < n*n };
         let b = w * n + z in
+        assert { 0 <= b < n*n };
         if find u a <> find u b then begin
           (*add_edge a b;
           union u a b;
           assert { (forall x,y:int. 
-            (* 0 <= x < size(!u) -> 0 <= y < size(!u) ->  *)
+            0 <= x < size(!u) -> 0 <= y < size(!u) -> 
             same(!u, x, y) <-> path(!graph, x, y)) }*)
           add_edge_and_union u a b
           (*assert { repr(!u, a) = repr(!u, b) };*)
@@ -157,7 +160,7 @@ let build_maze (n:int) =
       end
     done
   { !num_edges = n*n-1 and
-    forall x,y:int. (* 0 <= x < n*n -> 0 <= y < n*n ->  *)
+    forall x,y:int. 0 <= x < n*n -> 0 <= y < n*n -> 
       path(!graph, x, y) }
 
 (*
