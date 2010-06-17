@@ -36,10 +36,10 @@ let rec split_pos split_neg acc f =
     | Ffalse -> f::acc
     | Fapp _ -> f::acc
     | Fbinop (Fand,f1,f2) -> 
-(* 	split_pos (split_pos acc f2) f1 *)
-	let l2 = split_pos [] f2 in
-	let acc = List.fold_left (fun acc f -> f_implies f1 f :: acc) acc l2 in
-	split_pos acc f1
+	split_pos (split_pos acc f2) f1
+(* 	let l2 = split_pos [] f2 in *)
+(* 	let acc = List.fold_left (fun acc f -> f_implies f1 f :: acc) acc l2 in *)
+(* 	split_pos acc f1 *)
     | Fbinop (Fimplies,f1,f2) -> 
         list_fold_product 
           (fun acc f1 f2 ->  (f_implies f1 f2)::acc) 

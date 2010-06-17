@@ -11,8 +11,7 @@
 
   axiom OneClass :
     forall u:uf. num(u) = 1 -> 
-      forall x,y:int. (* 0 <= x < size(u) -> 0 <= y < size(u) -> *)
-        repr(u, x) = repr(u, y)
+    forall x,y:int. 0 <= x < size(u) -> 0 <= y < size(u) -> same(u, x, y)
 
 }
 
@@ -88,42 +87,17 @@ let add_edge_and_union (u:uf ref) (a:int) (b:int) =
     not same(!u, a,b) and not path(!graph, a, b) and
     forall x,y:int. 
       0 <= x < size(!u) -> 0 <= y < size(!u) ->
-      same(!u, x, y) <-> path(!graph, x, y) } 
-    add_edge a b;
-    union u a b
+      same(!u, x, y) <-> path(!graph, x, y) 
+  } 
+  add_edge a b;
+  union u a b
   { !num_edges = old(!num_edges) + 1 and
-      same(!u, a, b) and
-      size(!u) = size(old(!u)) and num(!u) = num(old(!u)) - 1 and 
-      (forall x,y:int. 
-         0 <= x < size(!u) -> 0 <= y < size(!u) ->
-         same(!u, x, y) <-> path(!graph, x, y)) }
-
-{ 
-(***
-  lemma Main_lemma : 
-     forall u1,u2:uf [size(u1),size(u2)]. forall g1,g2:graph, a,b:int.
-     0 <= a < size(u1) -> 0 <= b < size(u1) ->
-     (forall x,y:int. 
-        0 <= x < size(u1) -> 0 <= y < size(u1) ->
-        same(u1, x, y) <-> path(g1, x, y)) ->
-     ((* post union *)
-      size(u2) = size(u1) and 
-      forall x,y:int. 0 <= x < size(u2) -> 0 <= y < size(u2) -> 
-         same(u2, x, y) <->
-         same(u1, x, y) or
-         same(u1, x, a) and same(u1, b, y) or
-         same(u1, x, b) and same(u1, a, y)) ->
-     ((* post add_edge *)
-      (forall x,y:int. 
-          path(g2, x, y) <->
-          path(g1, x, y) or 
-          path(g1, x, a) and path(g1, b, y) or
-          path(g1, x, b) and path(g1, a, y))  ) ->
-     (forall x,y:int. 
-        0 <= x < size(u2) -> 0 <= y < size(u2) ->
-        same(u2, x, y) <-> path(g2, x, y))
-     ***)
-}
+    same(!u, a, b) and
+    size(!u) = size(old(!u)) and num(!u) = num(old(!u)) - 1 and 
+    (forall x,y:int. 
+       0 <= x < size(!u) -> 0 <= y < size(!u) ->
+       same(!u, x, y) <-> path(!graph, x, y)) 
+  }
 
 let build_maze (n:int) =
   { 1 <= n and 
@@ -147,16 +121,8 @@ let build_maze (n:int) =
         assert { 0 <= a < n*n };
         let b = w * n + z in
         assert { 0 <= b < n*n };
-        if find u a <> find u b then begin
-          (*add_edge a b;
-          union u a b;
-          assert { (forall x,y:int. 
-            0 <= x < size(!u) -> 0 <= y < size(!u) -> 
-            same(!u, x, y) <-> path(!graph, x, y)) }*)
+        if find u a <> find u b then
           add_edge_and_union u a b
-          (*assert { repr(!u, a) = repr(!u, b) };*)
-          (*assert { path(!graph, a, b) }*)
-        end
       end
     done
   { !num_edges = n*n-1 and
