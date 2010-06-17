@@ -10,6 +10,17 @@ theory Path
 
   logic edge(graph, vertex, vertex)
 
+  inductive path(graph, vertex, vertex) =
+  | Path_empty :
+      forall g : graph, v : vertex. path(g, v, v)
+  | Path_append:
+      forall g : graph, v1,v2,src,dst : vertex.
+      path(g, src, v1) -> edge(g, v1, v2) -> path(g, v2, dst) -> 
+      path(g, src, dst)
+
+end
+
+(*
   inductive simple_path(graph, vertex, vertex list, vertex) =
   | Path_empty : 
       forall g:graph, v:vertex. simple_path(g, v, Nil : vertex list, v)
@@ -21,5 +32,4 @@ theory Path
   logic simple_cycle(g : graph, v : vertex) =
     exists l : vertex list. l <> Nil and simple_path(g, v, l, v)
 
-end
-
+*)
