@@ -200,3 +200,13 @@ let task_goal = function
   | Some { task_decl = Decl { d_node = Dprop (Pgoal,pr,_) }} -> pr
   | _ -> raise GoalNotFound
 
+(* Exception reporting *)
+
+let () = Exn_printer.register
+  begin fun fmt exn -> match exn with
+  | LemmaFound ->   Format.fprintf fmt "Task cannot contain a lemma"
+  | GoalFound ->    Format.fprintf fmt "The task already ends with a goal"
+  | GoalNotFound -> Format.fprintf fmt "The task does not end with a goal"
+  | _ -> raise exn
+  end
+

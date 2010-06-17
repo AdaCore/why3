@@ -66,7 +66,7 @@ let env_tag env = env.env_tag
 
 (** Parsers *)
 
-type read_channel = 
+type read_channel =
   ?debug:bool -> ?parse_only:bool -> ?type_only:bool ->
   env -> string -> in_channel -> theory Mnm.t
 
@@ -84,18 +84,18 @@ let register_format name suffixes rc er =
 exception UnknownFormat of string (* parser name *)
 
 let parser_for_file ?name file = match name with
-  | None -> 
-      begin try 
-	let ext = 
+  | None ->
+      begin try
+	let ext =
 	  let s = Filename.chop_extension file in
 	  let n = String.length s in
 	  String.sub file n (String.length file - n)
 	in
 	Hashtbl.find suffixes_table ext
-      with Invalid_argument _ | Not_found -> 
+      with Invalid_argument _ | Not_found ->
 	"why"
       end
-  | Some n -> 
+  | Some n ->
       n
 
 let find_parser table n =
@@ -103,28 +103,33 @@ let find_parser table n =
   with Not_found -> raise (UnknownFormat n)
 
 let read_channel ?name ?debug ?parse_only ?type_only env file ic =
-  let n = parser_for_file ?name file in 
+  let n = parser_for_file ?name file in
   let rc = find_parser read_channel_table n in
   rc ?debug ?parse_only ?type_only env file ic
 
 let report ?name file fmt e =
-  let n = parser_for_file ?name file in 
+  let n = parser_for_file ?name file in
   let er = find_parser error_report_table n in
   er fmt e
 
 let list_formats () =
   let h = Hashtbl.create 17 in
-  let add s p = 
+  let add s p =
     let l = try Hashtbl.find h p with Not_found -> [] in
     Hashtbl.replace h p (s :: l)
   in
   Hashtbl.iter add suffixes_table;
   Hashtbl.fold (fun p l acc -> (p, l) :: acc) h []
 
+(* Exception reporting *)
 
 let () = Exn_printer.register
-  (fun fmt exn -> match exn with
-    | UnknownFormat p -> Format.fprintf fmt "unknown format '%s'" p
-    | _ -> raise exn)
-
+  begin fun fmt exn -> match exn with
+  | TheoryNotFound (sl, s) ->
+      Format.fprintf fmt "Theory not found: %a.%s"
+        (Pp.print_list Pp.dot Format.pp_print_string) sl s
+  | UnknownFormat s ->
+      Format.fprintf fmt "Unknown input format: %s" s
+  | _ -> raise exn
+  end
 

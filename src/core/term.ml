@@ -171,7 +171,7 @@ let rec pat_freevars s pat = match pat.pat_node with
 
 (* smart constructors for patterns *)
 
-exception BadArity of int * int
+exception BadArity of lsymbol * int * int
 exception FunctionSymbolExpected of lsymbol
 exception PredicateSymbolExpected of lsymbol
 
@@ -183,7 +183,7 @@ let pat_app fs pl ty =
   let mtch s ty p = ty_match s ty p.pat_ty in
   ignore (try List.fold_left2 mtch s fs.ls_args pl
     with Invalid_argument _ -> raise (BadArity
-      (List.length fs.ls_args, List.length pl)));
+      (fs, List.length fs.ls_args, List.length pl)));
   pat_app fs pl ty
 
 let pat_as p v =
@@ -518,7 +518,7 @@ let f_app_unsafe = f_app
 
 let fs_tuple n =
   let tyl = ref [] in
-  for i = 1 to n 
+  for i = 1 to n
   do tyl := ty_var (create_tvsymbol (id_fresh "a")) :: !tyl done;
   let ty = ty_tuple !tyl in
   create_fsymbol (id_fresh ("Tuple" ^ string_of_int n)) !tyl ty
@@ -624,8 +624,8 @@ let t_app_inst fs tl ty =
   in
   let mtch s ty t = ty_match s ty t.t_ty in
   try List.fold_left2 mtch s fs.ls_args tl
-  with Invalid_argument _ -> 
-    raise (BadArity (List.length fs.ls_args, List.length tl))
+  with Invalid_argument _ -> raise (BadArity
+    (fs, List.length fs.ls_args, List.length tl))
 
 let t_app fs tl ty = ignore (t_app_inst fs tl ty); t_app fs tl ty
 
@@ -634,7 +634,7 @@ let t_app_infer fs tl =
   let s =
     try List.fold_left2 mtch Mtv.empty fs.ls_args tl
     with Invalid_argument _ -> raise (BadArity
-      (List.length fs.ls_args, List.length tl))
+      (fs, List.length fs.ls_args, List.length tl))
   in
   let ty = match fs.ls_value with
     | Some ty -> ty_inst s ty
@@ -649,8 +649,8 @@ let f_app_inst ps tl =
   in
   let mtch s ty t = ty_match s ty t.t_ty in
   try List.fold_left2 mtch s ps.ls_args tl
-  with Invalid_argument _ -> 
-    raise (BadArity (List.length ps.ls_args, List.length tl))
+  with Invalid_argument _ -> raise (BadArity
+    (ps, List.length ps.ls_args, List.length tl))
 
 let f_app ps tl = ignore (f_app_inst ps tl); f_app ps tl
 
@@ -1444,11 +1444,11 @@ let rec t_subst_term t1 t2 lvl t = if t_equal t t1 then t2 else
 and f_subst_term t1 t2 lvl f =
   f_map_unsafe (t_subst_term t1 t2) (f_subst_term t1 t2) lvl f
 
-let t_subst_term t1 t2 t = 
+let t_subst_term t1 t2 t =
   check_ty_equal t1.t_ty t2.t_ty;
   t_subst_term t1 t2 0 t
 
-let f_subst_term t1 t2 f = 
+let f_subst_term t1 t2 f =
   check_ty_equal t1.t_ty t2.t_ty;
   f_subst_term t1 t2 0 f
 
@@ -1471,7 +1471,7 @@ let rec t_subst_term_alpha t1 t2 lvl t = if t_equal t t1 then t2 else
 and f_subst_term_alpha t1 t2 lvl f =
   f_map_unsafe (t_subst_term_alpha t1 t2) (f_subst_term_alpha t1 t2) lvl f
 
-let t_subst_term_alpha t1 t2 t = 
+let t_subst_term_alpha t1 t2 t =
   check_ty_equal t1.t_ty t2.t_ty;
   t_subst_term_alpha t1 t2 0 t
 

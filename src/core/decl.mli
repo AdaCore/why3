@@ -112,7 +112,7 @@ exception InvalidIndDecl of lsymbol * prsymbol
 exception TooSpecificIndDecl of lsymbol * prsymbol * term
 exception NonPositiveIndDecl of lsymbol * prsymbol * lsymbol
 
-exception BadLogicDecl of ident
+exception BadLogicDecl of ident * ident
 exception UnboundVars of Svs.t
 exception ClashIdent of ident
 exception EmptyDecl

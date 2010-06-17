@@ -195,7 +195,7 @@ let create_prop_decl k p f = Hsdecl.hashcons (mk_decl (Dprop (k,p,f)))
 
 exception IllegalTypeAlias of tysymbol
 exception ClashIdent of ident
-exception BadLogicDecl of ident
+exception BadLogicDecl of ident * ident
 exception EmptyDecl
 
 let add_id s id =
@@ -233,7 +233,8 @@ let create_ty_decl tdl =
 let create_logic_decl ldl =
   if ldl = [] then raise EmptyDecl;
   let check_decl acc (ls,ld) = match ld with
-    | Some (s,_) when not (ls_equal s ls) -> raise (BadLogicDecl ls.ls_name)
+    | Some (s,_) when not (ls_equal s ls) ->
+        raise (BadLogicDecl (ls.ls_name, s.ls_name))
     | _ -> add_id acc ls.ls_name
   in
   ignore (List.fold_left check_decl Sid.empty ldl);
@@ -534,14 +535,3 @@ let known_add_decl kn d =
   ignore (check_match kn d);
   kn
 
-
-let () = Exn_printer.register
-  (fun fmt exn -> match exn with
-    | UnknownIdent i ->
-      fprintf fmt "anomaly: unknown ident '%s'" i.Ident.id_string
-    | UnboundVars vs ->
-      fprintf fmt "anomaly: unknown vars  [%a]" 
-        (Pp.print_iter1 Term.Svs.iter Pp.semi 
-           (fun fmt vs -> pp_print_string fmt vs.vs_name.Ident.id_string)) vs
-        (* TODO other exceptions *)
-    | _ -> raise exn)

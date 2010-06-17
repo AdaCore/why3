@@ -390,3 +390,77 @@ let print_namespace fmt name ns =
   let module P = Print_tree.Make(NsTree) in
   fprintf fmt "@[<hov>%a@]@." P.print (NsTree.Namespace (name, ns))
 
+(* Exception reporting *)
+
+let () = Exn_printer.register
+  begin fun fmt exn -> match exn with
+  | Ty.TypeMismatch (t1,t2) ->
+      fprintf fmt "Type mismatch between %a and %a"
+        print_ty t1 print_ty t2
+  | Ty.BadTypeArity (ts, ts_arg, app_arg) ->
+      fprintf fmt "Bad type arity: type symbol %a must be applied \
+                   to %i arguments, but is applied to %i"
+        print_ts ts ts_arg app_arg
+  | Ty.DuplicateTypeVar tv ->
+      fprintf fmt "Type variable %a is used twice"
+        print_tv tv
+  | Ty.UnboundTypeVars ts ->
+      fprintf fmt "Unbound type variables: %a"
+        (print_list space print_tv) (Stv.elements ts)
+  | Term.BadArity (ls, ls_arg, app_arg) ->
+      fprintf fmt "Bad arity: symbol %a must be applied \
+                   to %i arguments, but is applied to %i"
+        print_ls ls ls_arg app_arg
+  | Term.DuplicateVar vs ->
+      fprintf fmt "Variable %a is used twice" print_vsty vs
+  | Term.FunctionSymbolExpected ls ->
+      fprintf fmt "Not a function symbol: %a" print_ls ls
+  | Term.PredicateSymbolExpected ls ->
+      fprintf fmt "Not a predicate symbol: %a" print_ls ls
+  | Term.NoMatch ->
+      fprintf fmt "Uncatched Term.NoMatch exception: [tf]_match failed"
+  | Pattern.ConstructorExpected ls ->
+      fprintf fmt "The symbol %a is not a constructor"
+        print_ls ls
+  | Pattern.NonExhaustive pl ->
+      fprintf fmt "Non-exhaustive pattern list:@\n@[<hov 2>%a@]"
+        (print_list newline print_pat) pl
+  | Decl.IllegalTypeAlias ts ->
+      fprintf fmt
+        "Type symbol %a is a type alias and cannot be declared as algebraic"
+        print_ts ts
+  | Decl.InvalidIndDecl (_ls, pr) ->
+      fprintf fmt "Ill-formed clause %a in inductive predicate declaration"
+        print_pr pr
+  | Decl.TooSpecificIndDecl (_ls, pr, t) ->
+      fprintf fmt "Clause %a in inductive predicate declaration \
+          has too type-specific conclusion %a"
+        print_pr pr print_term t
+  | Decl.NonPositiveIndDecl (_ls, pr, ls1) ->
+      fprintf fmt "Clause %a in inductive predicate declaration \
+          contains a negative occurrence of dependent symbol %a"
+        print_pr pr print_ls ls1
+  | Decl.BadLogicDecl (id1,id2) ->
+      fprintf fmt "Ill-formed definition: idents %s and %s are different"
+        id1.id_string id2.id_string
+  | Decl.UnboundVars svs ->
+      fprintf fmt "Unbound variables: %a"
+        (print_list comma print_vsty) (Svs.elements svs)
+  | Decl.ClashIdent id ->
+      fprintf fmt "Ident %s is defined twice" id.id_string
+  | Decl.EmptyDecl ->
+      fprintf fmt "Empty declaration"
+  | Decl.KnownIdent id ->
+      fprintf fmt "Ident %s is already declared" id.id_string
+  | Decl.UnknownIdent id ->
+      fprintf fmt "Ident %s is not yet declared" id.id_string
+  | Decl.RedeclaredIdent id ->
+      fprintf fmt "Ident %s is already declared, with a different declaration"
+        id.id_string
+  | Decl.NonExhaustiveExpr (pl, e) ->
+      fprintf fmt
+        "Non-exhaustive pattern list:@\n@[<hov 2>%a@]@\nin expression %a"
+        (print_list newline print_pat) pl print_expr e
+  | _ -> raise exn
+  end
+

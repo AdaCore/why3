@@ -570,3 +570,23 @@ let tuple_theory n =
 
 let tuple_theory = Util.memo tuple_theory
 
+(* Exception reporting *)
+
+let () = Exn_printer.register
+  begin fun fmt exn -> match exn with
+  | NonLocal id ->
+      Format.fprintf fmt "Non-local ident: %s" id.id_string
+  | CannotInstantiate id ->
+      Format.fprintf fmt "Cannot instantiate a defined ident %s" id.id_string
+  | BadInstance (id1, id2) ->
+      Format.fprintf fmt "Cannot instantiate ident %s with %s"
+        id1.id_string id2.id_string
+  | CloseTheory ->
+      Format.fprintf fmt "Cannot close theory: some namespaces are still open"
+  | NoOpenedNamespace ->
+      Format.fprintf fmt "No opened namespaces"
+  | ClashSymbol s ->
+      Format.fprintf fmt "Symbol %s is already defined in the current scope" s
+  | _ -> raise exn
+  end
+
