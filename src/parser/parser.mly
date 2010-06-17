@@ -460,12 +460,19 @@ list1_pat_sep_comma:
 | pattern                           { [$1] }
 | pattern COMMA list1_pat_sep_comma { $1::$3 }
 
+list1_pat_arg:
+| pat_arg               { [$1] }
+| pat_arg list1_pat_arg { $1::$2 }
+
 pattern:
+| pat_arg               { $1 }
+| uqualid list1_pat_arg { mk_pat (PPpapp ($1, $2)) }
+| pattern AS lident     { mk_pat (PPpas ($1,$3)) }
+
+pat_arg:
 | UNDERSCORE                                    { mk_pat (PPpwild) }
 | lident                                        { mk_pat (PPpvar $1) }
 | uqualid                                       { mk_pat (PPpapp ($1, [])) }
-| uqualid LEFTPAR list1_pat_sep_comma RIGHTPAR  { mk_pat (PPpapp ($1, $3)) }
-| pattern AS lident                             { mk_pat (PPpas ($1,$3)) }
 | LEFTPAR pattern RIGHTPAR                      { $2 }
 | LEFTPAR RIGHTPAR                              { mk_pat (PPptuple []) }
 | LEFTPAR pattern COMMA list1_pat_sep_comma RIGHTPAR 

@@ -11,8 +11,8 @@ theory Length
 
   logic length(l : 'a list) : int = 
     match l with
-    | Nil        -> 0
-    | Cons(_, r) -> 1 + length(r)
+    | Nil      -> 0
+    | Cons _ r -> 1 + length(r)
     end
 
   lemma Length_nonnegative : forall l:'a list. length(l) >= 0
@@ -23,8 +23,8 @@ theory Mem
   use export List
  
   logic mem(x: 'a, l : 'a list) = match l with
-    | Nil -> false
-    | Cons(y, r) -> x = y or mem(x, r)
+    | Nil      -> false
+    | Cons y r -> x = y or mem(x, r)
     end
 
 end
@@ -54,8 +54,8 @@ theory Map
 
   logic map(l : a list) : b list = 
     match l with
-    | Nil        -> Nil
-    | Cons(x, r) -> Cons(f(x), map(r))
+    | Nil      -> Nil
+    | Cons x r -> Cons(f(x), map(r))
     end
 
 end
