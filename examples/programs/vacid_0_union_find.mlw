@@ -1,0 +1,88 @@
+
+{
+
+  type uf
+
+  logic repr(uf, int) : int
+  logic size(uf) : int
+  logic num (uf) : int
+
+}
+
+parameter create : 
+  n:int -> 
+    { 0 <= n } 
+    uf ref 
+    { num(!result) = n and size(!result) = n and
+      forall x:int. 0 <= x < n -> repr(!result, x) = x }
+
+parameter find : 
+  u:uf ref -> x:int -> 
+    {} 
+    int writes u 
+    { result = repr(!u, x) and 
+      size(!u) = size(old(!u)) and num(!u) = num(old(!u)) and 
+      forall x:int. 0 <= x < size(!u) -> repr(!u, x) = repr(old(!u), x) } 
+
+parameter union : 
+  u:uf ref -> x:int -> y:int -> 
+    { repr(!u,x) <> repr(!u,y) }
+    unit writes u
+    { repr(!u, x) = repr(!u, y) and
+      size(!u) = size(old(!u)) and num(!u) = num(old(!u)) - 1 and 
+      forall z:int. 0 <= z < size(!u) -> 
+         repr(!u, z) = repr(old(!u), z) or
+         repr(!u, z) = repr(!u, x) and repr(old(!u), z) = repr(old(!u), x) or
+         repr(!u, z) = repr(!u, y) and repr(old(!u), z) = repr(old(!u), y) }
+
+parameter get_num_classes : 
+  u:uf ref -> {} int reads u { result = num(!u) }
+
+parameter rand : s:int -> {} int { 0 <= result < s }
+
+{
+  axiom Ineq1 : 
+    forall n,x,y:int. 0 <= n -> 0 <= x < n -> 0 <= y < n -> 0 <= x*n+y < n*n
+}
+
+{   
+  type graph
+  
+  clone import graph.Path with type graph = graph, type vertex = int
+}
+
+parameter graph : graph ref
+
+parameter add_edge : 
+  a:int -> b:int -> 
+    { } 
+    unit writes graph 
+    { forall x,y:int. edge(!graph, x, y) <-> 
+                      edge(old(!graph), x, y) or x=a and y=b or y=a and x=b }
+
+let build_maze (n:int) =
+  { 1 <= n }
+    let u = create (n*n) in
+    while get_num_classes u > 1 do
+      invariant { size(!u) = n*n }
+      let x = rand n in
+      let y = rand n in
+      let d = rand 2 in
+      let w = if d = 0 then x+1 else x in
+      let z = if d = 0 then y+1 else y in
+      if if w < n then z < n else False then (* TODO && *) begin
+        let a = y * n + x in
+        let b = w * n + z in
+        if find u a <> find u b then begin
+          add_edge a b;
+          union u a b
+        end
+      end
+    done
+  { }
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/vacid_0_union_find"
+End: 
+*)

@@ -143,6 +143,7 @@ let print_logic_binder drv fmt v =
 
 let print_type_decl fmt ts = match ts.ts_args with
   | [] -> fprintf fmt "type %a" print_ident ts.ts_name
+  | [tv] -> fprintf fmt "type %a %a" print_tvsymbols tv print_ident ts.ts_name
   | tl -> fprintf fmt "type (%a) %a" 
       (print_list comma print_tvsymbols) tl print_ident ts.ts_name
 
