@@ -55,6 +55,9 @@ theory ArrayLength
 
   logic const_length('a, int) : 'a t
 
+  axiom Const_contents : 
+    forall b:'a. forall n,i:int. select(const_length(b, n), i) = b
+
   axiom Length_const : 
     forall a : 'a. forall n : int. length(const_length(a, n)) = n
 
