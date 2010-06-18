@@ -1,0 +1,136 @@
+
+{
+
+  type uf
+
+  logic repr(uf, int) : int
+  logic size(uf) : int
+  logic num (uf) : int
+
+  logic same(u:uf, x:int, y:int) = repr(u, x) = repr(u, y)
+
+  axiom OneClass :
+    forall u:uf. num(u) = 1 -> 
+    forall x,y:int. 0 <= x < size(u) -> 0 <= y < size(u) -> same(u, x, y)
+
+}
+
+parameter create : 
+  n:int -> 
+    { 0 <= n } 
+    uf ref 
+    { num(!result) = n and size(!result) = n and
+      forall x:int. 0 <= x < n -> repr(!result, x) = x }
+
+parameter find : 
+  u:uf ref -> x:int -> 
+    { 0 <= x < size(!u) } 
+    int writes u 
+    { result = repr(!u, x) and 
+      size(!u) = size(old(!u)) and num(!u) = num(old(!u)) and 
+      forall x:int. 0 <= x < size(!u) -> repr(!u, x) = repr(old(!u), x) } 
+
+parameter union : 
+  u:uf ref -> a:int -> b:int -> 
+    { 0 <= a < size(!u) and 0 <= b < size(!u) and not same(!u, a, b) }
+    unit writes u
+    { same(!u, a, b) and
+      size(!u) = size(old(!u)) and num(!u) = num(old(!u)) - 1 and 
+      forall x,y:int. 0 <= x < size(!u) -> 0 <= y < size(!u) -> 
+         same(!u, x, y) <->
+         same(old(!u), x, y) or
+         same(old(!u), x, a) and same(old(!u), b, y) or
+         same(old(!u), x, b) and same(old(!u), a, y) }
+
+parameter get_num_classes : 
+  u:uf ref -> {} int reads u { result = num(!u) }
+
+parameter rand : s:int -> {} int { 0 <= result < s }
+
+{
+  axiom Ineq1 : 
+    forall n,x,y:int. 0 <= n -> 0 <= x < n -> 0 <= y < n -> 0 <= x*n+y < n*n
+}
+
+{   
+  type graph
+  
+  (*clone import graph.Path with type graph = graph, type vertex = int*)
+  logic path(graph, int, int)
+
+  axiom Path_refl : forall g:graph, x:int. path(g, x, x)
+  axiom Path_sym  : forall g:graph, x,y:int. path(g, x, y) -> path(g, y, x)
+  axiom Path_trans: 
+    forall g:graph, x,y,z:int. path(g, x, y) -> path(g, y, z) -> path(g, x, z)
+
+  logic select(d:int, x:'a, y:'a) : 'a = if d = 0 then x else y
+}
+
+parameter graph : graph ref
+
+parameter num_edges : int ref
+
+parameter add_edge : 
+  a:int -> b:int -> 
+    { not path(!graph, a, b) } 
+    unit writes num_edges, graph 
+    { !num_edges = old(!num_edges) + 1 and
+      (forall x,y:int. 
+          path(!graph, x, y) <->
+          path(old(!graph), x, y) or 
+          path(old(!graph), x, a) and path(old(!graph), b, y) or
+          path(old(!graph), x, b) and path(old(!graph), a, y)) 
+   }
+
+let add_edge_and_union (u:uf ref) (a:int) (b:int) =
+  { 0 <= a < size(!u) and 0 <= b < size(!u) and
+    not same(!u, a,b) and not path(!graph, a, b) and
+    forall x,y:int. 
+      0 <= x < size(!u) -> 0 <= y < size(!u) ->
+      same(!u, x, y) <-> path(!graph, x, y) 
+  } 
+  add_edge a b;
+  union u a b
+  { !num_edges = old(!num_edges) + 1 and
+    same(!u, a, b) and
+    size(!u) = size(old(!u)) and num(!u) = num(old(!u)) - 1 and 
+    (forall x,y:int. 
+       0 <= x < size(!u) -> 0 <= y < size(!u) ->
+       same(!u, x, y) <-> path(!graph, x, y)) 
+  }
+
+let build_maze (n:int) =
+  { 1 <= n and 
+    !num_edges = 0 and  
+    forall x,y:int. x<>y -> not path(!graph, x, y) 
+  }
+    let u = create (n*n) in
+    while get_num_classes u > 1 do
+      invariant 
+        { 1 <= num(!u) and num(!u) + !num_edges = size(!u) = n*n and
+          forall x,y:int. 0 <= x < n*n -> 0 <= y < n*n ->
+            same(!u, x, y) <-> path(!graph, x, y)
+        }
+      let x = rand n in
+      let y = rand n in
+      (*let d = rand 2 in*)
+      let w = x+1 (* select d (x+1) x *) (*if d = 0 then x+1 else x *) in
+      let z = y (* select d y (y+1) *) (*if d = 0 then y else y+1*) in
+      if andb (w < n) (z < n) then (* TODO && *) begin
+        let a = y * n + x in
+        assert { 0 <= a < n*n };
+        let b = w * n + z in
+        assert { 0 <= b < n*n };
+        if find u a <> find u b then
+          add_edge_and_union u a b
+      end
+    done
+  { !num_edges = n*n-1 and
+    forall x,y:int. 0 <= x < n*n -> 0 <= y < n*n -> 
+      path(!graph, x, y) }
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/vacid_0_union_find"
+End: 
+*)
