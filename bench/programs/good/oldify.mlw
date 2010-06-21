@@ -6,9 +6,9 @@
 parameter r : int ref
 
 parameter f1 : y:int ->
-             {} unit writes r { q1(!r, old(!r), y) }
+             {} unit writes r { q1 (!r) (old (!r)) y }
 
-let g1 () = {} f1 !r { q1(!r, old(!r), old(!r)) }
+let g1 () = {} f1 !r { q1 (!r) (old (!r)) (old (!r)) }
 
 {
   logic foo(int) : int
@@ -16,12 +16,12 @@ let g1 () = {} f1 !r { q1(!r, old(!r), old(!r)) }
 }
 
 parameter f : t:int ref -> x:int -> 
-             {} unit reads t writes t { q(!t, old(!t), x) }
+             {} unit reads t writes t { q (!t) (old (!t)) x }
 
 let g (t:int ref) =
   {}
   f t (foo !t)
-  { q(!t, old(!t), foo(old(!t))) }
+  { q (!t) (old (!t)) (foo (old (!t))) }
 
 
 (*

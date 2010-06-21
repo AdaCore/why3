@@ -134,13 +134,15 @@ let int_literal =
   decimal_literal | hex_literal | oct_literal | bin_literal
 let hexadigit = ['0'-'9' 'a'-'f' 'A'-'F']
 
-let op_char_1 = ['=' '<' '>']
+let op_char_1 = ['=' '<' '>' '~']
 let op_char_2 = ['+' '-']
 let op_char_3 = ['*' '/' '%']
-let op_char_4 = ['!' '$' '&' '?' '@' '^' '~' '.' ':' '|' '#']
+let op_char_4 = ['!' '$' '&' '?' '@' '^' '.' ':' '|' '#']
 let op_char_34 = op_char_3 | op_char_4
 let op_char_234 = op_char_2 | op_char_34
 let op_char_1234 = op_char_1 | op_char_234
+
+let op_char_pref = ['!' '?']
 
 rule token = parse
   | "#" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
@@ -195,6 +197,8 @@ rule token = parse
       { LEFTSQ }
   | "]"
       { RIGHTSQ }
+  | op_char_pref op_char_4* as s
+      { OPPREF s }
   | op_char_1234* op_char_1 op_char_1234* as s
       { OP1 s }
   | op_char_234*  op_char_2 op_char_234*  as s

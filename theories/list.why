@@ -24,7 +24,7 @@ theory Mem
  
   logic mem(x: 'a, l : 'a list) = match l with
     | Nil      -> false
-    | Cons y r -> x = y or mem(x, r)
+    | Cons y r -> x = y or mem x r
     end
 
 end
@@ -39,9 +39,9 @@ theory Induction
   logic p ('a list)
 
   axiom Induction : 
-    p(Nil : 'a list) -> 
-    (forall x:'a. forall l:'a list. p(l) -> p(Cons(x,l))) ->
-    forall l:'a list. p(l)
+    p (Nil : 'a list) ->
+    (forall x:'a. forall l:'a list. p l -> p (Cons x l)) ->
+    forall l:'a list. p l
 
 end
 
@@ -55,7 +55,7 @@ theory Map
   logic map(l : a list) : b list = 
     match l with
     | Nil      -> Nil
-    | Cons x r -> Cons(f(x), map(r))
+    | Cons x r -> Cons (f x) (map r)
     end
 
 end

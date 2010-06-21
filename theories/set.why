@@ -7,7 +7,7 @@ theory Set
 
   logic empty : 'a t
 
-  logic is_empty(s : 'a t) = forall x : 'a. not mem(x, s)
+  logic is_empty(s : 'a t) = forall x : 'a. not mem x s
 
   axiom Empty_def1 : is_empty(empty : 'a t)
 
@@ -15,35 +15,35 @@ theory Set
 
   axiom Add_def1 : 
     forall x, y : 'a. forall s : 'a t.
-    mem(x, add(y, s)) <-> (x = y or mem(x, s))
+    mem x (add y s) <-> x = y or mem x s
 
   logic remove('a, 'a t) : 'a t
 
   axiom Remove_def1 :
     forall x, y : 'a. forall s : 'a t.
-    mem(x, remove(y, s)) <-> (x <> y and mem(x, s))
+    mem x (remove y s) <-> x <> y and mem x s
 
   logic union('a t, 'a t) : 'a t
 
   axiom Union_def1 : 
     forall s1, s2 : 'a t. forall x : 'a.
-    mem(x, union(s1, s2)) <-> (mem(x, s1) or mem(x, s2))
+    mem x (union s1 s2) <-> mem x s1 or mem x s2
 
   logic inter('a t, 'a t) : 'a t
 
   axiom Inter_def1 : 
     forall s1, s2 : 'a t. forall x : 'a.
-    mem(x, inter(s1, s2)) <-> (mem(x, s1) and mem(x, s2))
+    mem x (inter s1 s2) <-> mem x s1 and mem x s2
 
   logic diff('a t, 'a t) : 'a t
 
   axiom Diff_def1 : 
     forall s1, s2 : 'a t. forall x : 'a.
-    mem(x, diff(s1, s2)) <-> (mem(x, s1) and not mem(x, s2))
+    mem x (diff s1 s2) <-> mem x s1 and not mem x s2
 
-  logic equal(s1 : 'a t, s2 : 'a t) = forall x : 'a. mem(x, s1) <-> mem(x, s2)
+  logic equal(s1 : 'a t, s2 : 'a t) = forall x : 'a. mem x s1 <-> mem x s2
 
-  logic subset(s1 : 'a t, s2 : 'a t) = forall x : 'a. mem(x, s1) -> mem(x, s2)
+  logic subset(s1 : 'a t, s2 : 'a t) = forall x : 'a. mem x s1 -> mem x s2
 
 end
 
@@ -54,20 +54,20 @@ theory Fset
   
   logic cardinal('a t) : int
 
-  axiom Cardinal_nonneg : forall s : 'a t. cardinal(s) >= 0
+  axiom Cardinal_nonneg : forall s : 'a t. cardinal s >= 0
 
   axiom Cardinal_empty : cardinal(empty : 'a t) = 0
 
   axiom Cardinal_add : 
     forall x : 'a. forall s : 'a t. 
-    not mem(x, s) -> cardinal(add(x, s)) = 1 + cardinal(s)
+    not mem x s -> cardinal (add x s) = 1 + cardinal s
 
   axiom Cardinal_remove : 
     forall x : 'a. forall s : 'a t. 
-    mem(x, s) -> cardinal(s) = 1 + cardinal(remove(x, s))
+    mem x s -> cardinal s = 1 + cardinal (remove x s)
 
   axiom Cardinal_subset :
-    forall s1, s2 : 'a t. subset(s1, s2) -> cardinal(s1) <= cardinal(s2)
+    forall s1, s2 : 'a t. subset s1 s2 -> cardinal s1 <= cardinal s2
 
 end
 

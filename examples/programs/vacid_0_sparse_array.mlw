@@ -31,7 +31,7 @@ back  +-+-+-+-------------------+
 
   type 'a array = 'a A.t
 
-  logic (#)(a : 'a array, i : int) : 'a = A.select(a, i)
+  logic (#)(a : 'a array, i : int) : 'a = A.select a i
 
   type sparse_array = 
     elt array * int array * int array * int (*sz*) * int (*n*)
@@ -47,8 +47,8 @@ back  +-+-+-+-------------------+
     0 <= idx#i < n and back#(idx#i) = i
 
   logic model(a : sparse_array, i : int) : elt =
-    if is_elt(a, i) then
-      sa_val(a)#i
+    if is_elt a i then
+      (sa_val a)#i
     else
       default
 
@@ -73,18 +73,18 @@ back  +-+-+-+-------------------+
   axiom Dirichlet :
     forall n : int. 
     forall a : int array.
-        permutation(n, a) ->
+        permutation n a ->
         (forall i : int. 0 <= i < n -> 
-            0 <= dirichlet(n,a,i) < n and 
-            a # dirichlet(n,a,i) = i)
+            0 <= dirichlet n a i < n and 
+            a # dirichlet n a i = i)
 
   lemma Inter6 :
-    forall a : sparse_array . invariant(a) -> 
+    forall a : sparse_array . invariant a -> 
         let (val, idx, back, sz, n) = a in
         n = sz -> 
-            permutation(sz, back) and
+            permutation sz back and
             forall i : int. 0 <= i < sz ->
-                idx#i = dirichlet(sz,back,i) and is_elt(a,i)
+                idx#i = dirichlet sz back i and is_elt a i
 }
 
 
@@ -93,23 +93,23 @@ parameter create :
   sz:int -> 
   { 0 <= sz <= maxlen } 
   sparse_array ref
-  { sa_sz(!result) = sz and forall i:int. model(!result, i) = default }
+  { sa_sz !result = sz and forall i:int. model !result i = default }
 *)
 
 (* BUG
-parameter malloc : n:int -> {} 'a array { A.length(result) = n }
+parameter malloc : n:int -> {} 'a array { A.length result = n }
 *)
-parameter malloc_elt : n:int -> {} elt array { A.length(result) = n }
-parameter malloc_int : n:int -> {} int array { A.length(result) = n }
+parameter malloc_elt : n:int -> {} elt array { A.length result = n }
+parameter malloc_int : n:int -> {} int array { A.length result = n }
 
 let create sz =
   { 0 <= sz <= maxlen } 
   ref ((malloc_elt sz, malloc_int sz, malloc_int sz, sz, 0) : sparse_array)
-  { invariant(!result) and 
-    sa_sz(!result) = sz and forall i:int. model(!result, i) = default }
+  { invariant !result and 
+    sa_sz !result = sz and forall i:int. model !result i = default }
 
 let test a i =
-  { 0 <= i < sa_sz(!a) }
+  { 0 <= i < sa_sz !a }
   let idx = sa_idx !a in
   let back = sa_back !a in
   let n = sa_n !a in
@@ -120,36 +120,36 @@ let test a i =
       False
   else
     False
-  { result=True <-> is_elt(!a, i) }
+  { result=True <-> is_elt !a i }
 
 (*
 parameter get : 
   a:sparse_array ref -> i:int -> 
-    { 0 <= i < sa_sz(!a) } 
+    { 0 <= i < sa_sz !a } 
     elt reads a
-    { result = model(!a, i) }
+    { result = model !a i }
 *)
 let get a i =
-  { 0 <= i < sa_sz(!a) and invariant(!a) } 
+  { 0 <= i < sa_sz !a and invariant !a } 
   let val = sa_val !a in
   if test a i then
     A.select val i 
   else
     default
-  { result = model(!a, i) }
+  { result = model !a i }
 
 (*
 parameter set :
   a:sparse_array ref -> i:int -> v:elt -> 
-    { 0 <= i < sa_sz(!a) and invariant(!a) } 
+    { 0 <= i < sa_sz !a and invariant !a } 
     unit writes a 
-    { invariant(!a) and 
-      sa_sz(!a) = sa_sz(old(!a)) and
-      model(!a, i) = v and
-      forall j:int. j <> i -> model(!a, j) = model(old(!a), j) }
+    { invariant !a and 
+      sa_sz !a = sa_sz (old !a) and
+      model !a i = v and
+      forall j:int. j <> i -> model !a j = model (old !a) j }
 *)
 let set a i v =
-  { 0 <= i < sa_sz(!a) and invariant(!a) } 
+  { 0 <= i < sa_sz !a and invariant !a } 
   let val = sa_val !a in
   let idx = sa_idx !a in
   let back = sa_back !a in
@@ -164,10 +164,10 @@ let set a i v =
     let back = A.store back n i in
     a := (val, idx, back, sz, n+1)
   end
-  { invariant(!a) and 
-    sa_sz(!a) = sa_sz(old(!a)) and
-    model(!a, i) = v and
-    forall j:int. j <> i -> model(!a, j) = model(old(!a), j) }
+  { invariant !a and 
+    sa_sz !a = sa_sz (old !a) and
+    model !a i = v and
+    forall j:int. j <> i -> model !a j = model (old !a) j }
 
 let harness () =
   let a = create 10 in

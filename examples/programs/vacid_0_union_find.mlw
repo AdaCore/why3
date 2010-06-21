@@ -5,7 +5,7 @@
 
   type 'a array = 'a A.t
 
-  logic (#)(a : 'a array, i : int) : 'a = A.select(a, i)
+  logic (#)(a : 'a array, i : int) : 'a = A.select a i
 
   type uf = (* link: *) int array * 
             (* dist: *) int array * (* distance to representative *)
@@ -26,18 +26,18 @@
   logic repr(u:uf, x:int) : int = 
     let l = link(u) in 
     let y = l#x in
-    if y = x then y else repr(u, y)  
+    if y = x then y else repr u y  
 
-  logic same(u:uf, x:int, y:int) = repr(u, x) = repr(u, y)
+  logic same(u:uf, x:int, y:int) = repr u x = repr u y
 
   axiom OneClass :
-    forall u:uf. num(u) = 1 -> 
-    forall x,y:int. 0 <= x < size(u) -> 0 <= y < size(u) -> same(u, x, y)
+    forall u:uf. num u = 1 -> 
+    forall x,y:int. 0 <= x < size u -> 0 <= y < size u -> same u x y
 
 }
 
 let get_num_classes (u:uf ref) =
-  {} num !u { result = num(!u) }
+  {} num !u { result = num !u }
 
 let create (n:int) =
   { 0 <= n } 
@@ -52,63 +52,63 @@ let create (n:int) =
     i := !i + 1
   done;
   ref ((!l, A.const_length 0 n, n, n))
-  { inv(!result) and
-    num(!result) = n and size(!result) = n and
-    forall x:int. 0 <= x < n -> repr(!result, x) = x }
+  { inv !result and
+    num !result = n and size !result = n and
+    forall x:int. 0 <= x < n -> repr !result x = x }
 
 let find (u:uf ref) (x:int) =
-  { inv(!u) and 0 <= x < size(!u) } 
+  { inv !u and 0 <= x < size !u } 
   let l = link !u in
   let y = ref x in
   while A.select l !y <> !y do
-    invariant { 0 <= !y < size(!u) and same(!u, x, !y) } 
+    invariant { 0 <= !y < size !u and same !u x !y } 
     variant { dist(!u) # !y }
     y := A.select l !y
   done;
   !y
-  { inv(!u) and
-    result = repr(!u, x) and 
-    size(!u) = size(old(!u)) and num(!u) = num(old(!u)) and 
-    forall x:int. 0 <= x < size(!u) -> repr(!u, x) = repr(old(!u), x) } 
+  { inv !u and
+    result = repr !u x and 
+    size !u = size (old !u) and num !u = num (old !u) and 
+    forall x:int. 0 <= x < size !u -> repr !u x = repr (old !u) x } 
 
 parameter ghost_find : u:uf ref -> x:int ->
-  { inv(!u) and 0 <= x < size(!u) }
+  { inv !u and 0 <= x < size !u }
   int reads u
-  { result = repr(!u, x) }
+  { result = repr !u x }
 
 let increment (u : uf ref) (r : int) =
-  { inv(!u) and 0 <= r < size(!u) }
+  { inv !u and 0 <= r < size !u }
   let i = ref 0 in
   let d = ref (dist !u) in
   while !i < size !u do
-    invariant { 0 <= !i <= size(!u) and
-                forall j:int. 0 <= j < size(!u) ->
+    invariant { 0 <= !i <= size !u and
+                forall j:int. 0 <= j < size !u ->
                 !d#j = dist(!u)#j + 
-                       if repr(!u, j) = r and j < !i then 1 else 0 }
-    variant { size(!u) - !i }
+                       if repr !u j = r and j < !i then 1 else 0 }
+    variant { size !u - !i }
     if ghost_find u !i = r then
       d := A.store !d !i (A.select !d !i + 1)
   done;
   !d
-  { forall i:int. 0 <= i < size(!u) ->
-      result#i = dist(!u)#i + if repr(!u, i) = r then 1 else 0 }
+  { forall i:int. 0 <= i < size !u ->
+      result#i = (dist !u)#i + if repr !u i = r then 1 else 0 }
 
 let union (u:uf ref) (a:int) (b:int) =
-  { inv(!u) and 
-    0 <= a < size(!u) and 0 <= b < size(!u) and not same(!u, a, b) }
+  { inv !u and 
+    0 <= a < size !u and 0 <= b < size !u and not same !u a b }
   let ra = find u a in
   let rb = find u b in
   let l = link !u in
   let d = increment u ra in
   u := (A.store l ra rb, d, size !u, num !u - 1)
-  { inv(!u) and 
-    same(!u, a, b) and
-    size(!u) = size(old(!u)) and num(!u) = num(old(!u)) - 1 and 
-    forall x,y:int. 0 <= x < size(!u) -> 0 <= y < size(!u) -> 
-      same(!u, x, y) <->
-      same(old(!u), x, y) or
-      same(old(!u), x, a) and same(old(!u), b, y) or
-      same(old(!u), x, b) and same(old(!u), a, y) }
+  { inv !u and 
+    same !u a b and
+    size !u = size (old !u) and num !u = num (old !u) - 1 and 
+    forall x,y:int. 0 <= x < size !u -> 0 <= y < size !u -> 
+      same !u x y <->
+      same (old !u) x y or
+      same (old !u) x a and same (old !u) b y or
+      same (old !u) x b and same (old !u) a y }
 
 
 

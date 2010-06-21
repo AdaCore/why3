@@ -53,7 +53,7 @@
 
 %token <string> LIDENT UIDENT
 %token <string> INTEGER
-%token <string> OP1 OP2 OP3 OP4
+%token <string> OP1 OP2 OP3 OP4 OPPREF
 %token <Ptree.real_constant> FLOAT
 %token <string> STRING
 
@@ -98,6 +98,7 @@
 %left OP3 STAR
 %left OP4
 %nonassoc prefix_op
+%nonassoc OPPREF
 
 /* Entry points */
 
@@ -153,6 +154,8 @@ lident_rich:
 | LEFTPAR_STAR_RIGHTPAR
     { { id = infix "*"; id_loc = loc () } }
 | LEFTPAR lident_op UNDERSCORE RIGHTPAR 
+    { { id = prefix $2; id_loc = loc () } }
+| LEFTPAR OPPREF RIGHTPAR 
     { { id = prefix $2; id_loc = loc () } }
 ;
 
@@ -402,16 +405,33 @@ lexpr:
 | any_op lexpr %prec prefix_op
    { let id = { id = prefix $1; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$2])) }
-| qualid
-   { mk_pp (PPvar $1) }
-| qualid LEFTPAR list1_lexpr_sep_comma RIGHTPAR
-   { mk_pp (PPapp ($1, $3)) }
+| qualid list1_lexpr_arg
+   { mk_pp (PPapp ($1, $2)) }
 | IF lexpr THEN lexpr ELSE lexpr
    { mk_pp (PPif ($2, $4, $6)) }
 | FORALL list1_uquant_sep_comma triggers DOT lexpr
    { mk_pp (PPquant (PPforall, $2, $3, $5)) }
 | EXISTS list1_uquant_sep_comma triggers DOT lexpr
    { mk_pp (PPquant (PPexists, $2, $3, $5)) }
+| STRING lexpr %prec prec_named
+   { mk_pp (PPnamed ($1, $2)) }
+| LET pattern EQUAL lexpr IN lexpr 
+   { match $2.pat_desc with
+       | PPpvar id -> mk_pp (PPlet (id, $4, $6))
+       | _ -> mk_pp (PPmatch ([$4], [[$2], $6])) }
+| MATCH list1_lexpr_sep_comma WITH bar_ match_cases END
+   { mk_pp (PPmatch ($2, $5)) }
+| EPSILON lident COLON primitive_type DOT lexpr
+   { mk_pp (PPeps ($2, $4, $6)) }
+| lexpr COLON simple_primitive_type
+   { mk_pp (PPcast ($1, $3)) }
+| lexpr_arg 
+   { $1 }
+;
+
+lexpr_arg:
+| qualid
+   { mk_pp (PPvar $1) }
 | INTEGER
    { mk_pp (PPconst (Term.ConstInt $1)) }
 | FLOAT
@@ -426,19 +446,13 @@ lexpr:
    { mk_pp (PPtuple []) }
 | LEFTPAR lexpr COMMA list1_lexpr_sep_comma RIGHTPAR
    { mk_pp (PPtuple ($2 :: $4)) }
-| STRING lexpr %prec prec_named
-   { mk_pp (PPnamed ($1, $2)) }
-| LET pattern EQUAL lexpr IN lexpr 
-   { match $2.pat_desc with
-       | PPpvar id -> mk_pp (PPlet (id, $4, $6))
-       | _ -> mk_pp (PPmatch ([$4], [[$2], $6])) }
-| MATCH list1_lexpr_sep_comma WITH bar_ match_cases END
-   { mk_pp (PPmatch ($2, $5)) }
-| EPSILON lident COLON primitive_type DOT lexpr
-   { mk_pp (PPeps ($2, $4, $6)) }
-| lexpr COLON simple_primitive_type
-   { mk_pp (PPcast ($1, $3)) }
-;
+| OPPREF lexpr_arg
+   { let id = { id = prefix $1; id_loc = loc_i 2 } in
+     mk_pp (PPapp (Qident id, [$2])) }
+
+list1_lexpr_arg:
+| lexpr_arg                 { [$1] }
+| lexpr_arg list1_lexpr_arg { $1::$2 }
 
 list1_uquant_sep_comma:
 | uquant                              { [$1] }

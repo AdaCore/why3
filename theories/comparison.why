@@ -8,12 +8,12 @@ theory Abs
 
   logic abs(t) : t
 
-  axiom Pos: forall x:t. ge(x,zero) -> abs(x) = x
-  axiom Neg: forall x:t. not ge(x,zero) -> abs(x) = neg(x)
+  axiom Pos: forall x:t. ge x zero -> abs x = x
+  axiom Neg: forall x:t. not ge x zero -> abs x = neg x
 
 (*
   logic abs(x : t) : t 
-  axiom Abs_def : if ge(x,zero) then abs(x)=x else abs(x)=neg(x)
+  axiom Abs_def : if ge x zero then abs x = x else abs x = neg x
 *)
 end
 
@@ -26,24 +26,24 @@ theory MinMax
   logic min(t,t) : t
   logic max(t,t) : t
 
-  axiom Max_is_ge   : forall x,y:t. ge(max(x,y),x) and ge(max(x,y),y)
-  axiom Max_is_some : forall x,y:t. max(x,y) = x or max(x,y) = y
-  axiom Min_is_le   : forall x,y:t. ge(x,min(x,y)) and ge(y,min(x,y))
-  axiom Min_is_some : forall x,y:t. min(x,y) = x or min(x,y) = y
+  axiom Max_is_ge   : forall x,y:t. ge (max x y) x and ge (max x y) y
+  axiom Max_is_some : forall x,y:t. max x y = x or max x y = y
+  axiom Min_is_le   : forall x,y:t. ge x (min x y) and ge y (min x y)
+  axiom Min_is_some : forall x,y:t. min x y = x or min x y = y
 
 (*
-  axiom Max_x : forall x,y:t. ge(x,y) -> max(x,y) = x
-  axiom Max_y : forall x,y:t. ge(y,x) -> max(x,y) = y
-  axiom Min_y : forall x,y:t. ge(x,y) -> min(x,y) = y
-  axiom Min_x : forall x,y:t. ge(y,x) -> min(x,y) = x
+  axiom Max_x : forall x,y:t. ge x y -> max x y = x
+  axiom Max_y : forall x,y:t. ge y x -> max x y = y
+  axiom Min_y : forall x,y:t. ge x y -> min x y = y
+  axiom Min_x : forall x,y:t. ge y x -> min x y = x
 *)
 
 
 (*
   logic min(x:t,y:t) : t 
-  axiom Min_def : if ge(x,y) then min(x,y)=y else min(x,y)=x 
+  axiom Min_def : if ge x y then min x y = y else min x y = x 
   logic max(x:t,y:t) : t
-  axiom Max_def : if ge(x,y) then max(x,y)=x else max(x,y)=y 
+  axiom Max_def : if ge x y then max x y = x else max x y = y 
 *)
 
 end

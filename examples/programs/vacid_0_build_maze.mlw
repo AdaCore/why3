@@ -3,15 +3,15 @@
 
   type uf
 
-  logic repr(uf, int) : int
-  logic size(uf) : int
+  logic repr (uf,int): int
+  logic size (uf) : int
   logic num (uf) : int
 
-  logic same(u:uf, x:int, y:int) = repr(u, x) = repr(u, y)
+  logic same(u:uf, x:int, y:int) = repr u x = repr u y
 
   axiom OneClass :
-    forall u:uf. num(u) = 1 -> 
-    forall x,y:int. 0 <= x < size(u) -> 0 <= y < size(u) -> same(u, x, y)
+    forall u:uf. num u = 1 -> 
+    forall x,y:int. 0 <= x < size u -> 0 <= y < size u -> same u x y
 
 }
 
@@ -19,31 +19,31 @@ parameter create :
   n:int -> 
     { 0 <= n } 
     uf ref 
-    { num(!result) = n and size(!result) = n and
-      forall x:int. 0 <= x < n -> repr(!result, x) = x }
+    { num !result = n and size !result = n and
+      forall x:int. 0 <= x < n -> repr !result x = x }
 
 parameter find : 
   u:uf ref -> x:int -> 
-    { 0 <= x < size(!u) } 
+    { 0 <= x < size !u } 
     int writes u 
-    { result = repr(!u, x) and 
-      size(!u) = size(old(!u)) and num(!u) = num(old(!u)) and 
-      forall x:int. 0 <= x < size(!u) -> repr(!u, x) = repr(old(!u), x) } 
+    { result = repr !u x and 
+      size !u = size (old !u) and num !u = num (old !u) and 
+      forall x:int. 0 <= x < size !u -> repr !u x = repr (old !u) x } 
 
 parameter union : 
   u:uf ref -> a:int -> b:int -> 
-    { 0 <= a < size(!u) and 0 <= b < size(!u) and not same(!u, a, b) }
+    { 0 <= a < size !u and 0 <= b < size !u and not same !u a b }
     unit writes u
-    { same(!u, a, b) and
-      size(!u) = size(old(!u)) and num(!u) = num(old(!u)) - 1 and 
-      forall x,y:int. 0 <= x < size(!u) -> 0 <= y < size(!u) -> 
-         same(!u, x, y) <->
-         same(old(!u), x, y) or
-         same(old(!u), x, a) and same(old(!u), b, y) or
-         same(old(!u), x, b) and same(old(!u), a, y) }
+    { same !u a b and
+      size !u = size (old !u) and num !u = num (old !u) - 1 and 
+      forall x,y:int. 0 <= x < size !u -> 0 <= y < size !u -> 
+         same !u x y <->
+         same (old !u) x y or
+         same (old !u) x a and same (old !u) b y or
+         same (old !u) x b and same (old !u) a y }
 
 parameter get_num_classes : 
-  u:uf ref -> {} int reads u { result = num(!u) }
+  u:uf ref -> {} int reads u { result = num !u }
 
 parameter rand : s:int -> {} int { 0 <= result < s }
 
@@ -56,12 +56,12 @@ parameter rand : s:int -> {} int { 0 <= result < s }
   type graph
   
   (*clone import graph.Path with type graph = graph, type vertex = int*)
-  logic path(graph, int, int)
+  logic path(graph,int,int)
 
-  axiom Path_refl : forall g:graph, x:int. path(g, x, x)
-  axiom Path_sym  : forall g:graph, x,y:int. path(g, x, y) -> path(g, y, x)
+  axiom Path_refl : forall g:graph, x:int. path g x x
+  axiom Path_sym  : forall g:graph, x,y:int. path g x y -> path g y x
   axiom Path_trans: 
-    forall g:graph, x,y,z:int. path(g, x, y) -> path(g, y, z) -> path(g, x, z)
+    forall g:graph, x,y,z:int. path g x y -> path g y z -> path g x z
 
   logic select(d:int, x:'a, y:'a) : 'a = if d = 0 then x else y
 }
@@ -72,44 +72,44 @@ parameter num_edges : int ref
 
 parameter add_edge : 
   a:int -> b:int -> 
-    { not path(!graph, a, b) } 
+    { not path !graph a b } 
     unit writes num_edges, graph 
-    { !num_edges = old(!num_edges) + 1 and
+    { !num_edges = old !num_edges + 1 and
       (forall x,y:int. 
-          path(!graph, x, y) <->
-          path(old(!graph), x, y) or 
-          path(old(!graph), x, a) and path(old(!graph), b, y) or
-          path(old(!graph), x, b) and path(old(!graph), a, y)) 
+          path !graph x y <->
+          path (old !graph) x y or 
+          path (old !graph) x a and path (old !graph) b y or
+          path (old !graph) x b and path (old !graph) a y) 
    }
 
 let add_edge_and_union (u:uf ref) (a:int) (b:int) =
-  { 0 <= a < size(!u) and 0 <= b < size(!u) and
-    not same(!u, a,b) and not path(!graph, a, b) and
+  { 0 <= a < size !u and 0 <= b < size !u and
+    not same !u a b and not path !graph a b and
     forall x,y:int. 
-      0 <= x < size(!u) -> 0 <= y < size(!u) ->
-      same(!u, x, y) <-> path(!graph, x, y) 
+      0 <= x < size !u -> 0 <= y < size !u ->
+      same !u x y <-> path !graph x y 
   } 
   add_edge a b;
   union u a b
-  { !num_edges = old(!num_edges) + 1 and
-    same(!u, a, b) and
-    size(!u) = size(old(!u)) and num(!u) = num(old(!u)) - 1 and 
+  { !num_edges = old !num_edges + 1 and
+    same !u a b and
+    size !u = size (old !u) and num !u = num (old !u) - 1 and 
     (forall x,y:int. 
-       0 <= x < size(!u) -> 0 <= y < size(!u) ->
-       same(!u, x, y) <-> path(!graph, x, y)) 
+       0 <= x < size !u -> 0 <= y < size !u ->
+       same !u x y <-> path !graph x y) 
   }
 
 let build_maze (n:int) =
   { 1 <= n and 
     !num_edges = 0 and  
-    forall x,y:int. x<>y -> not path(!graph, x, y) 
+    forall x,y:int. x<>y -> not path !graph x y 
   }
     let u = create (n*n) in
     while get_num_classes u > 1 do
       invariant 
-        { 1 <= num(!u) and num(!u) + !num_edges = size(!u) = n*n and
+        { 1 <= num !u and num !u + !num_edges = size !u = n*n and
           forall x,y:int. 0 <= x < n*n -> 0 <= y < n*n ->
-            same(!u, x, y) <-> path(!graph, x, y)
+            same !u x y <-> path !graph x y
         }
       let x = rand n in
       let y = rand n in
@@ -127,7 +127,7 @@ let build_maze (n:int) =
     done
   { !num_edges = n*n-1 and
     forall x,y:int. 0 <= x < n*n -> 0 <= y < n*n -> 
-      path(!graph, x, y) }
+      path !graph x y }
 
 (*
 Local Variables: 

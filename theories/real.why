@@ -23,9 +23,9 @@ theory Abs
 
   logic abs(x : real) : real = if x >= 0.0 then x else -x
 
-  lemma Abs_le: forall x,y:real. abs(x) <= y <-> -y <= x <= y
+  lemma Abs_le: forall x,y:real. abs x <= y <-> -y <= x <= y
 
-  lemma Abs_pos: forall x:real. abs(x) >= 0.0
+  lemma Abs_pos: forall x:real. abs x >= 0.0
 
 end
 
@@ -36,10 +36,10 @@ theory MinMax
   logic min(real,real) : real
   logic max(real,real) : real
 
-  axiom Max_is_ge   : forall x,y:real. max(x,y) >= x and max(x,y) >= y
-  axiom Max_is_some : forall x,y:real. max(x,y) = x or max(x,y) = y
-  axiom Min_is_le   : forall x,y:real. min(x,y) <= x and min(x,y) <= y
-  axiom Min_is_some : forall x,y:real. min(x,y) = x or min(x,y) = y
+  axiom Max_is_ge   : forall x,y:real. max x y >= x and max x y >= y
+  axiom Max_is_some : forall x,y:real. max x y = x or max x y = y
+  axiom Min_is_le   : forall x,y:real. min x y <= x and min x y <= y
+  axiom Min_is_some : forall x,y:real. min x y = x or min x y = y
 
 end
 
@@ -50,17 +50,17 @@ theory FromInt
 
   logic from_int(int) : real
 
-  axiom Zero: from_int(0) = 0.0
-  axiom One: from_int(1) = 1.0
+  axiom Zero: from_int 0 = 0.0
+  axiom One: from_int 1 = 1.0
 
   axiom Add: 
-    forall x,y:int. from_int(Int.(+)(x,y)) = from_int(x) + from_int(y)
+    forall x,y:int. from_int (Int.(+) x y) = from_int x + from_int y
   axiom Sub: 
-    forall x,y:int. from_int(Int.(-)(x,y)) = from_int(x) - from_int(y)
+    forall x,y:int. from_int (Int.(-) x y) = from_int x - from_int y
   axiom Mul: 
-    forall x,y:int. from_int(Int.(*)(x,y)) = from_int(x) * from_int(y)
+    forall x,y:int. from_int (Int.(*) x y) = from_int x * from_int y
   axiom Neg: 
-    forall x,y:int. from_int(Int.(-_)(x)) = - from_int(x)
+    forall x,y:int. from_int (Int.(-_) (x)) = - from_int x
 
 end
 
@@ -68,7 +68,7 @@ theory FromIntTest
 
   use import FromInt
 
-  lemma Test1: from_int(2) = 2.0
+  lemma Test1: from_int 2 = 2.0
 
 end
 
@@ -82,27 +82,27 @@ theory Truncate
   logic truncate(real) : int
 
   axiom Truncate_int :
-    forall i:int. truncate(from_int(i)) = i
+    forall i:int. truncate (from_int i) = i
 
   axiom Truncate_down_pos:
     forall x:real. x >= 0.0 -> 
-      from_int(truncate(x)) <= x < from_int(Int.(+)(truncate(x),1))
+      from_int (truncate x) <= x < from_int (Int.(+) (truncate x) 1)
 
   axiom Truncate_up_neg:
     forall x:real. x <= 0.0 -> 
-      from_int(Int.(-)(truncate(x),1)) < x <= from_int(truncate(x))
+      from_int (Int.(-) (truncate x) 1) < x <= from_int (truncate x)
 
   axiom Real_of_truncate:
-    forall x:real. x - 1.0 <= from_int(truncate(x)) <= x + 1.0
+    forall x:real. x - 1.0 <= from_int (truncate x) <= x + 1.0
 
   axiom Truncate_monotonic:
-    forall x,y:real. x <= y -> Int.(<=)(truncate(x),truncate(y))
+    forall x,y:real. x <= y -> Int.(<=) (truncate x) (truncate y)
 
   axiom Truncate_monotonic_int1:
-    forall x:real, i:int. x <= from_int(i) -> Int.(<=)(truncate(x),i)
+    forall x:real, i:int. x <= from_int i -> Int.(<=) (truncate x) i
 
   axiom Truncate_monotonic_int2:
-    forall x:real, i:int. from_int(i) <= x -> Int.(<=)(i,truncate(x))
+    forall x:real, i:int. from_int i <= x -> Int.(<=) i (truncate x)
 
   (* roundings up and down *)
 
@@ -110,22 +110,22 @@ theory Truncate
   logic ceil(real) : int
 
   axiom Floor_int :
-    forall i:int. floor(from_int(i)) = i
+    forall i:int. floor (from_int i) = i
 
   axiom Ceil_int :
-    forall i:int. floor(from_int(i)) = i
+    forall i:int. floor (from_int i) = i
 
   axiom Floor_down:
-    forall x:real. from_int(floor(x)) <= x < from_int(Int.(+)(floor(x),1))
+    forall x:real. from_int (floor x) <= x < from_int (Int.(+) (floor x) 1)
 
   axiom Ceil_up:
-    forall x:real. from_int(Int.(-)(ceil(x),1)) < x <= from_int(ceil(x))
+    forall x:real. from_int (Int.(-) (ceil x) 1) < x <= from_int (ceil x)
 
   axiom Floor_monotonic:
-    forall x,y:real. x <= y -> Int.(<=)(floor(x),floor(y))
+    forall x,y:real. x <= y -> Int.(<=) (floor x) (floor y)
 
   axiom Ceil_monotonic:
-    forall x,y:real. x <= y -> Int.(<=)(ceil(x),ceil(y))
+    forall x,y:real. x <= y -> Int.(<=) (ceil x) (ceil y)
 
 end
 
@@ -139,13 +139,13 @@ theory Square
   logic sqrt(real):real
 
   axiom Sqrt_positive: 
-    forall x:real. x >= 0.0 -> sqrt(x) >= 0.0
+    forall x:real. x >= 0.0 -> sqrt x >= 0.0
 
   axiom Sqrt_square:  
-    forall x:real. x >= 0.0 -> sqr(sqrt(x)) = x
+    forall x:real. x >= 0.0 -> sqr (sqrt x) = x
 
   axiom Square_sqrt: 
-    forall x:real. x >= 0.0 -> sqrt(x*x) = x
+    forall x:real. x >= 0.0 -> sqrt (x*x) = x
 
 end
 
@@ -153,9 +153,9 @@ theory SquareTest
 
   use import Square
 
-  lemma Sqrt_zero: sqrt(0.0) = 0.0
-  lemma Sqrt_one: sqrt(1.0) = 1.0
-  lemma Sqrt_four: sqrt(4.0) = 2.0
+  lemma Sqrt_zero: sqrt 0.0 = 0.0
+  lemma Sqrt_one: sqrt 1.0 = 1.0
+  lemma Sqrt_four: sqrt 4.0 = 2.0
 
 end
 
@@ -165,21 +165,21 @@ theory ExpLog
 
   logic exp(real) : real
   axiom Exp_zero : exp(0.0) = 1.0
-  axiom Exp_sum : forall x,y:real. exp(x+y) = exp(x)*exp(y)
+  axiom Exp_sum : forall x,y:real. exp (x+y) = exp x * exp y
 
-  logic e : real = exp(1.0)
+  logic e : real = exp 1.0
 
   logic log(real) : real
-  axiom Log_one : log(1.0) = 0.0
+  axiom Log_one : log 1.0 = 0.0
   axiom Log_mul : 
-    forall x,y:real. x > 0.0 and y > 0.0 -> log(x*y) = log(x)+log(y)
+    forall x,y:real. x > 0.0 and y > 0.0 -> log (x*y) = log x + log y
 
-  axiom Log_exp: forall x:real. log(exp(x)) = x
+  axiom Log_exp: forall x:real. log (exp x) = x
 
-  axiom Exp_log: forall x:real. x > 0.0 -> exp(log(x)) = x
+  axiom Exp_log: forall x:real. x > 0.0 -> exp (log x) = x
 
-  logic log2(x:real) : real = log(x)/log(2.0)
-  logic log10(x:real) : real = log(x)/log(10.0)
+  logic log2(x:real) : real = log x / log 2.0
+  logic log10(x:real) : real = log x / log 10.0
 
 end
 
@@ -187,7 +187,7 @@ theory ExpLogTest
 
   use import ExpLog
 
-  lemma Log_e : log(e) = 1.0
+  lemma Log_e : log e = 1.0
 
 end
 
@@ -201,25 +201,25 @@ theory Power
   logic pow(real,real) : real
 
   axiom Pow_zero_y:
-    forall y:real. y <> 0.0 -> pow(0.0,y) = 0.0
+    forall y:real. y <> 0.0 -> pow 0.0 y = 0.0
 
   axiom Pow_x_zero:
-    forall x:real. x <> 0.0 -> pow(x,0.0) = 1.0
+    forall x:real. x <> 0.0 -> pow x 0.0 = 1.0
 
   axiom Pow_x_one:
-    forall x:real. pow(x,1.0) = x
+    forall x:real. pow x 1.0 = x
 
   axiom Pow_one_y:
-    forall y:real. pow(1.0,y) = 1.0
+    forall y:real. pow 1.0 y = 1.0
 
   axiom Pow_x_two:
-    forall x:real. pow(x,2.0) = sqr(x)
+    forall x:real. pow x 2.0 = sqr x
 
   axiom Pow_half:
-    forall x:real. x >= 0.0 -> pow(x,0.5) = sqrt(x)  
+    forall x:real. x >= 0.0 -> pow x 0.5 = sqrt x  
 
   axiom Pow_exp_log:
-    forall x,y:real. x > 0.0 -> pow(x,y) = exp(y*log(x))
+    forall x,y:real. x > 0.0 -> pow x y = exp (y * log x)
 
 end
 
@@ -227,7 +227,7 @@ theory PowerTest
 
   use import Power
 
-  lemma Pow_2_2 : pow(2.0,2.0) = 4.0
+  lemma Pow_2_2 : pow 2.0 2.0 = 4.0
 
 end
 
@@ -246,13 +246,13 @@ theory Trigonometry
   logic sin(real) : real
 
   axiom Pythagorean_identity:
-    forall x:real. sqr(cos(x))+sqr(sin(x)) = 1.0
+    forall x:real. sqr (cos x) + sqr (sin x) = 1.0
 
-  lemma Cos_le_one: forall x:real. abs(cos(x)) <= 1.0
-  lemma Sin_le_one: forall x:real. abs(sin(x)) <= 1.0
+  lemma Cos_le_one: forall x:real. abs (cos x) <= 1.0
+  lemma Sin_le_one: forall x:real. abs (sin x) <= 1.0
 
-  axiom Cos_0: cos(0.0) = 1.0
-  axiom Sin_0: sin(0.0) = 0.0
+  axiom Cos_0: cos 0.0 = 1.0
+  axiom Sin_0: sin 0.0 = 0.0
 
   logic pi : real
 
@@ -261,32 +261,32 @@ theory Trigonometry
    < pi <
    3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038197
 
-  axiom Cos_pi: cos(pi) = -1.0
-  axiom Sin_pi: sin(pi) = 0.0
+  axiom Cos_pi: cos pi = -1.0
+  axiom Sin_pi: sin pi = 0.0
 
-  axiom Cos_pi2: cos(0.5*pi) = 0.0
-  axiom Sin_pi2: sin(0.5*pi) = 1.0
+  axiom Cos_pi2: cos (0.5 * pi) = 0.0
+  axiom Sin_pi2: sin (0.5 * pi) = 1.0
 
-  axiom Cos_plus_pi: forall x:real. cos(x+pi) = -cos(x)
-  axiom Sin_plus_pi: forall x:real. sin(x+pi) = -sin(x)
+  axiom Cos_plus_pi: forall x:real. cos (x + pi) = - cos x
+  axiom Sin_plus_pi: forall x:real. sin (x + pi) = - sin x
 
-  axiom Cos_plus_pi2: forall x:real. cos(x+0.5*pi) = -sin(x)
-  axiom Sin_plus_pi2: forall x:real. sin(x+0.5*pi) = cos(x)
+  axiom Cos_plus_pi2: forall x:real. cos (x + 0.5*pi) = - sin x
+  axiom Sin_plus_pi2: forall x:real. sin (x + 0.5*pi) = cos x
 
   axiom Cos_neg:
-    forall x:real. cos(-x) = cos(x)
+    forall x:real. cos (-x) = cos x
   axiom Sin_neg:
-    forall x:real. sin(-x) = -sin(x)
+    forall x:real. sin (-x) = - sin x
  
   axiom Cos_sum:
-    forall x,y:real. cos(x+y) = cos(x)*cos(y)-sin(x)*sin(y)
+    forall x,y:real. cos (x+y) = cos x * cos y - sin x * sin y
   axiom Sin_sum:
-    forall x,y:real. sin(x+y) = sin(x)*cos(y)+cos(x)*sin(y)
+    forall x,y:real. sin (x+y) = sin x * cos y + cos x * sin y
 
-  logic tan(x:real) : real = sin(x) / cos(x)
+  logic tan(x:real) : real = sin x / cos x
   logic atan(real) : real
   axiom Tan_atan:
-    forall x:real. tan(atan(x)) = x
+    forall x:real. tan (atan x) = x
 
 end
 
@@ -296,10 +296,10 @@ theory TrigonometryTest
   use import Trigonometry
   use import Square
 
-  lemma Cos_2_pi : cos(2.0 * pi) = 1.0
-  lemma Sin_2_pi : cos(2.0 * pi) = 0.
-  lemma Tan_pi_3 : tan(pi / 2.0) = sqrt(3.0)
-  lemma Atan_1 : atan(1.0) = pi / 4.0
+  lemma Cos_2_pi : cos (2.0 * pi) = 1.0
+  lemma Sin_2_pi : cos (2.0 * pi) = 0.
+  lemma Tan_pi_3 : tan (pi / 2.0) = sqrt 3.0
+  lemma Atan_1   : atan 1.0 = pi / 4.0
 
 end
 
@@ -312,17 +312,17 @@ theory Hyperbolic
   use import Square
   use import ExpLog
 
-  logic sinh(x:real) : real = 0.5*(exp(x) - exp(-x))
-  logic cosh(x:real) : real = 0.5*(exp(x) + exp(-x))
-  logic tanh(x:real) : real = sinh(x) / cosh(x)
+  logic sinh(x:real) : real = 0.5 * (exp x - exp (-x))
+  logic cosh(x:real) : real = 0.5 * (exp x + exp (-x))
+  logic tanh(x:real) : real = sinh x / cosh x
 
-  logic arsinh(x:real) : real = log(x+sqrt(sqr(x)+1.0))
+  logic arsinh(x:real) : real = log (x + sqrt (sqr x + 1.0))
   logic arcosh(x:real) : real
   axiom Arcosh_def:
-    forall x:real. x >= 1.0 -> arcosh(x) = log(x+sqrt(sqr(x)-1.0))
+    forall x:real. x >= 1.0 -> arcosh x = log (x + sqrt (sqr x - 1.0))
   logic artanh(x:real) : real
   axiom Artanh_def:
-    forall x:real. -1.0 < x < 1.0 -> artanh(x) = 0.5*log((1.0+x)/(1.0-x))
+    forall x:real. -1.0 < x < 1.0 -> artanh x = 0.5 * log ((1.0+x)/(1.0-x))
 
 end
 
@@ -335,13 +335,13 @@ theory Polar
   use import Square
   use import Trigonometry
 
-  logic hypot(x:real,y:real) : real = sqrt(sqr(x)+sqr(y))
+  logic hypot(x:real,y:real) : real = sqrt (sqr x + sqr y)
   logic atan2(real,real) : real
  
   axiom X_from_polar:
-    forall x,y:real. x = hypot(x,y)*cos(atan2(y,x))
+    forall x,y:real. x = hypot x y * cos (atan2 y x)
 
   axiom Y_from_polar:
-    forall x,y:real. y = hypot(x,y)*sin(atan2(y,x))
+    forall x,y:real. y = hypot x y * sin (atan2 y x)
 end
 

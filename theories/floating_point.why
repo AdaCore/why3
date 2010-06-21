@@ -19,8 +19,8 @@ theory SpecialValues
   use import real.Real
 
   inductive same_sign_real(sign,real) =
-    | Neg_case: forall x:real. x < 0.0 -> same_sign_real(Neg,x)
-    | Pos_case: forall x:real. x > 0.0 -> same_sign_real(Pos,x)
+    | Neg_case: forall x:real. x < 0.0 -> same_sign_real Neg x
+    | Pos_case: forall x:real. x > 0.0 -> same_sign_real Pos x
 
 end
 
@@ -41,36 +41,36 @@ theory GenFloat
   logic exact(t) : real
   logic model(t) : real
 
-  logic round_error(x:t) : real = abs(value(x) - exact(x))
-  logic total_error(x:t) : real = abs(value(x) - model(x))
+  logic round_error(x:t) : real = abs (value x - exact x)
+  logic total_error(x:t) : real = abs (value x - model x)
 
   logic max : real
 
-  logic no_overflow(m:mode,x:real) = abs(round(m,x)) <= max
+  logic no_overflow(m:mode,x:real) = abs (round m x) <= max
 
   axiom Bounded_real_no_overflow :
-    forall m:mode, x:real. abs(x) <= max -> no_overflow(m,x)
+    forall m:mode, x:real. abs x <= max -> no_overflow m x
 
   axiom Round_monotonic :
-    forall m:mode,x,y:real. x <= y -> round(m,x) <= round(m,y)
+    forall m:mode,x,y:real. x <= y -> round m x <= round m y
 
   logic max_representable_integer : int
 
   axiom Exact_rounding_for_integers:
     forall m:mode,i:int.
-      Int.(<=)(Int.(-_)(max_representable_integer), i) and 
-      Int.(<=)(i, max_representable_integer) ->
-        round(m,from_int(i)) = from_int(i)
+      Int.(<=) (Int.(-_) max_representable_integer) i and 
+      Int.(<=) i max_representable_integer ->
+        round m (from_int i) = from_int i
 
   (* rounding up and down *)
   axiom Round_down_le: 
-    forall x:real. round(Down,x) <= x
+    forall x:real. round Down x <= x
   axiom Round_up_ge: 
-    forall x:real. round(Up,x) >= x
+    forall x:real. round Up x >= x
   axiom Round_down_neg: 
-    forall x:real. round(Down,-x) = - round(Up,x)
-  axiom Round_up_neg: 
-    forall x:real. round(Up,-x) = - round(Down,x)
+    forall x:real. round Down (-x) = - round Up x
+  axiom Round_up_neg:
+    forall x:real. round Up (-x) = - round Down x
 
 end
 
@@ -120,7 +120,7 @@ theory Test
   use import Rounding
   use import Single
 
-  lemma Round_01: round(NearestTiesToEven,0.1) = 0x0.199999Ap0
+  lemma Round_01: round NearestTiesToEven 0.1 = 0x0.199999Ap0
 
 end
 

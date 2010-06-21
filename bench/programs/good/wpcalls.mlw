@@ -1,7 +1,7 @@
 
 parameter x : int ref
 
-parameter f : unit -> { } unit writes x { !x = 1 - old(!x) }
+parameter f : unit -> { } unit writes x { !x = 1 - old (!x) }
 
 let p () =
   begin
@@ -9,7 +9,7 @@ let p () =
     let t = () in ();
     (f ());
     (f ());
-    assert { !x = at(!x, Init) };
+    assert { !x = at (!x) Init };
     ()
   end
 

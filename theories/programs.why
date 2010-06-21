@@ -10,12 +10,12 @@ theory Prelude
   logic ge_bool('a, 'a) : bool
   logic gt_bool('a, 'a) : bool
 
-  axiom Eq_bool_def : forall x,y:'a.  eq_bool(x,y)=True <-> x= y
-  axiom Ne_bool_def : forall x,y:'a.  ne_bool(x,y)=True <-> x<>y
-  axiom Le_bool_def : forall x,y:int. le_bool(x,y)=True <-> x<=y
-  axiom Lt_bool_def : forall x,y:int. lt_bool(x,y)=True <-> x< y
-  axiom Ge_bool_def : forall x,y:int. ge_bool(x,y)=True <-> x>=y
-  axiom Gt_bool_def : forall x,y:int. gt_bool(x,y)=True <-> x> y
+  axiom Eq_bool_def : forall x,y:'a.  eq_bool x y = True <-> x= y
+  axiom Ne_bool_def : forall x,y:'a.  ne_bool x y = True <-> x<>y
+  axiom Le_bool_def : forall x,y:int. le_bool x y = True <-> x<=y
+  axiom Lt_bool_def : forall x,y:int. lt_bool x y = True <-> x< y
+  axiom Ge_bool_def : forall x,y:int. ge_bool x y = True <-> x>=y
+  axiom Gt_bool_def : forall x,y:int. gt_bool x y = True <-> x> y
 
   use export unit.Unit
   logic ignore('a) : unit
@@ -23,7 +23,7 @@ theory Prelude
   type ('a, 'b) arrow
 
   type  'a ref
-  logic (!_)('a ref) : 'a
+  logic (!)('a ref) : 'a
 
   type  label
   logic at  ('a, label) : 'a

@@ -24,7 +24,7 @@ theory Abs
 
   logic abs(x:int) : int = if x >= 0 then x else -x
 
-  lemma Abs_pos: forall x:int. abs(x) >= 0
+  lemma Abs_pos: forall x:int. abs x >= 0
 
 end
 
@@ -36,10 +36,10 @@ theory MinMax
   logic min(x:int,y:int) : int = if x <= y then x else y
   logic max(x:int,y:int) : int = if x <= y then y else x
 
-  lemma Max_is_ge   : forall x,y:int. max(x,y) >= x and max(x,y) >= y
-  lemma Max_is_some : forall x,y:int. max(x,y) = x or max(x,y) = y
-  lemma Min_is_le   : forall x,y:int. min(x,y) <= x and min(x,y) <= y
-  lemma Min_is_some : forall x,y:int. min(x,y) = x or min(x,y) = y
+  lemma Max_is_ge   : forall x,y:int. max x y >= x and max x y >= y
+  lemma Max_is_some : forall x,y:int. max x y = x or max x y = y
+  lemma Min_is_le   : forall x,y:int. min x y <= x and min x y <= y
+  lemma Min_is_some : forall x,y:int. min x y = x or min x y = y
 
 end
 *)
@@ -54,14 +54,14 @@ theory EuclideanDivision
   logic mod(int,int) : int
 
   axiom Div_mod: 
-    forall x,y:int. y <> 0 -> x = y * div(x,y) + mod(x,y)
+    forall x,y:int. y <> 0 -> x = y * div x y + mod x y
 
   axiom Mod_bound: 
-    forall x,y:int. y <> 0 -> 0 <= mod(x,y) < abs(y)
+    forall x,y:int. y <> 0 -> 0 <= mod x y < abs y
 
-  lemma Mod_1: forall x:int. mod(x,1) = 0
+  lemma Mod_1: forall x:int. mod x 1 = 0
 
-  lemma Div_1: forall x:int. div(x,1) = x
+  lemma Div_1: forall x:int. div x 1 = x
 
 end
 
@@ -74,14 +74,14 @@ theory ComputerDivision
   logic mod(int,int) : int
 
   axiom Div_mod: 
-    forall x,y:int. y <> 0 -> x = y * div(x,y) + mod(x,y)
+    forall x,y:int. y <> 0 -> x = y * div x y + mod x y
 
   axiom Mod_bound: 
-    forall x,y:int. y <> 0 -> -abs(y) < mod(x,y) < abs(y)
+    forall x,y:int. y <> 0 -> -abs y < mod x y < abs y
 
-  lemma Mod_1: forall x:int. mod(x,1) = 0
+  lemma Mod_1: forall x:int. mod x 1 = 0
 
-  lemma Div_1: forall x:int. div(x,1) = x
+  lemma Div_1: forall x:int. div x 1 = x
 
 end
 
