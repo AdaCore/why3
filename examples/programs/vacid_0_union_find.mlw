@@ -32,7 +32,7 @@
 
   axiom OneClass :
     forall u:uf. num u = 1 -> 
-    forall x,y:int. 0 <= x < size u -> 0 <= y < size u -> same u x y
+    forall x y:int. 0 <= x < size u -> 0 <= y < size u -> same u x y
 
 }
 
@@ -104,7 +104,7 @@ let union (u:uf ref) (a:int) (b:int) =
   { inv !u and 
     same !u a b and
     size !u = size (old !u) and num !u = num (old !u) - 1 and 
-    forall x,y:int. 0 <= x < size !u -> 0 <= y < size !u -> 
+    forall x y:int. 0 <= x < size !u -> 0 <= y < size !u -> 
       same !u x y <->
       same (old !u) x y or
       same (old !u) x a and same (old !u) b y or

@@ -23,7 +23,7 @@ theory Abs
 
   logic abs(x : real) : real = if x >= 0.0 then x else -x
 
-  lemma Abs_le: forall x,y:real. abs x <= y <-> -y <= x <= y
+  lemma Abs_le: forall x y:real. abs x <= y <-> -y <= x <= y
 
   lemma Abs_pos: forall x:real. abs x >= 0.0
 
@@ -36,10 +36,10 @@ theory MinMax
   logic min(real,real) : real
   logic max(real,real) : real
 
-  axiom Max_is_ge   : forall x,y:real. max x y >= x and max x y >= y
-  axiom Max_is_some : forall x,y:real. max x y = x or max x y = y
-  axiom Min_is_le   : forall x,y:real. min x y <= x and min x y <= y
-  axiom Min_is_some : forall x,y:real. min x y = x or min x y = y
+  axiom Max_is_ge   : forall x y:real. max x y >= x and max x y >= y
+  axiom Max_is_some : forall x y:real. max x y = x or max x y = y
+  axiom Min_is_le   : forall x y:real. min x y <= x and min x y <= y
+  axiom Min_is_some : forall x y:real. min x y = x or min x y = y
 
 end
 
@@ -54,13 +54,13 @@ theory FromInt
   axiom One: from_int 1 = 1.0
 
   axiom Add: 
-    forall x,y:int. from_int (Int.(+) x y) = from_int x + from_int y
+    forall x y:int. from_int (Int.(+) x y) = from_int x + from_int y
   axiom Sub: 
-    forall x,y:int. from_int (Int.(-) x y) = from_int x - from_int y
+    forall x y:int. from_int (Int.(-) x y) = from_int x - from_int y
   axiom Mul: 
-    forall x,y:int. from_int (Int.(*) x y) = from_int x * from_int y
+    forall x y:int. from_int (Int.(*) x y) = from_int x * from_int y
   axiom Neg: 
-    forall x,y:int. from_int (Int.(-_) (x)) = - from_int x
+    forall x y:int. from_int (Int.(-_) (x)) = - from_int x
 
 end
 
@@ -96,7 +96,7 @@ theory Truncate
     forall x:real. x - 1.0 <= from_int (truncate x) <= x + 1.0
 
   axiom Truncate_monotonic:
-    forall x,y:real. x <= y -> Int.(<=) (truncate x) (truncate y)
+    forall x y:real. x <= y -> Int.(<=) (truncate x) (truncate y)
 
   axiom Truncate_monotonic_int1:
     forall x:real, i:int. x <= from_int i -> Int.(<=) (truncate x) i
@@ -122,10 +122,10 @@ theory Truncate
     forall x:real. from_int (Int.(-) (ceil x) 1) < x <= from_int (ceil x)
 
   axiom Floor_monotonic:
-    forall x,y:real. x <= y -> Int.(<=) (floor x) (floor y)
+    forall x y:real. x <= y -> Int.(<=) (floor x) (floor y)
 
   axiom Ceil_monotonic:
-    forall x,y:real. x <= y -> Int.(<=) (ceil x) (ceil y)
+    forall x y:real. x <= y -> Int.(<=) (ceil x) (ceil y)
 
 end
 
@@ -165,14 +165,14 @@ theory ExpLog
 
   logic exp(real) : real
   axiom Exp_zero : exp(0.0) = 1.0
-  axiom Exp_sum : forall x,y:real. exp (x+y) = exp x * exp y
+  axiom Exp_sum : forall x y:real. exp (x+y) = exp x * exp y
 
   logic e : real = exp 1.0
 
   logic log(real) : real
   axiom Log_one : log 1.0 = 0.0
   axiom Log_mul : 
-    forall x,y:real. x > 0.0 and y > 0.0 -> log (x*y) = log x + log y
+    forall x y:real. x > 0.0 and y > 0.0 -> log (x*y) = log x + log y
 
   axiom Log_exp: forall x:real. log (exp x) = x
 
@@ -219,7 +219,7 @@ theory Power
     forall x:real. x >= 0.0 -> pow x 0.5 = sqrt x  
 
   axiom Pow_exp_log:
-    forall x,y:real. x > 0.0 -> pow x y = exp (y * log x)
+    forall x y:real. x > 0.0 -> pow x y = exp (y * log x)
 
 end
 
@@ -279,9 +279,9 @@ theory Trigonometry
     forall x:real. sin (-x) = - sin x
  
   axiom Cos_sum:
-    forall x,y:real. cos (x+y) = cos x * cos y - sin x * sin y
+    forall x y:real. cos (x+y) = cos x * cos y - sin x * sin y
   axiom Sin_sum:
-    forall x,y:real. sin (x+y) = sin x * cos y + cos x * sin y
+    forall x y:real. sin (x+y) = sin x * cos y + cos x * sin y
 
   logic tan(x:real) : real = sin x / cos x
   logic atan(real) : real
@@ -339,9 +339,9 @@ theory Polar
   logic atan2(real,real) : real
  
   axiom X_from_polar:
-    forall x,y:real. x = hypot x y * cos (atan2 y x)
+    forall x y:real. x = hypot x y * cos (atan2 y x)
 
   axiom Y_from_polar:
-    forall x,y:real. y = hypot x y * sin (atan2 y x)
+    forall x y:real. y = hypot x y * sin (atan2 y x)
 end
 

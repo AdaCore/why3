@@ -459,7 +459,7 @@ list1_uquant_sep_comma:
 | uquant COMMA list1_uquant_sep_comma { $1::$3 }
 
 uquant:
-| list1_lident_sep_comma COLON primitive_type { $1,$3 }
+| list1_lident COLON primitive_type { $1,$3 }
 
 match_cases:
 | match_case                  { [$1] }
@@ -526,9 +526,9 @@ bar_:
 | BAR           { () }
 ;
 
-list1_lident_sep_comma:
-| lident                              { [$1] }
-| lident COMMA list1_lident_sep_comma { $1 :: $3 }
+list1_lident:
+| lident              { [$1] }
+| lident list1_lident { $1 :: $2 }
 ;
 
 use:

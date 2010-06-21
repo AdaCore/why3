@@ -52,7 +52,7 @@ theory GenFloat
     forall m:mode, x:real. abs x <= max -> no_overflow m x
 
   axiom Round_monotonic :
-    forall m:mode,x,y:real. x <= y -> round m x <= round m y
+    forall m:mode, x y:real. x <= y -> round m x <= round m y
 
   logic max_representable_integer : int
 

@@ -31,7 +31,7 @@ logic invariant(x:int, y:int, e:int) =
   e = 2 * (x + 1) * y2 - (2 * y + 1) * x2 and
   2 * (y2 - x2) <= e <= 2 * y2
 
-lemma Invariant_is_ok : forall x,y,e:int. invariant x y e -> best x y
+lemma Invariant_is_ok : forall x y e:int. invariant x y e -> best x y
 }
 
 let bresenham () =

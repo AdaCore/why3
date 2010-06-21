@@ -7,12 +7,12 @@ theory Array
   logic store (('a,'b) t, 'a, 'b) : ('a,'b) t
   
   axiom Select_eq : 
-    forall m : ('a,'b) t. forall a1,a2 : 'a. 
+    forall m : ('a,'b) t. forall a1 a2 : 'a. 
     forall b : 'b [select (store m a1 b) a2].
     a1 = a2 -> select (store m a1 b) a2  = b
 
   axiom Select_neq : 
-    forall m : ('a,'b) t. forall a1,a2 : 'a. 
+    forall m : ('a,'b) t. forall a1 a2 : 'a. 
     forall b : 'b [select (store m a1 b) a2].
     a1 <> a2 -> select (store m a1 b) a2 = select m a2
 
@@ -32,12 +32,12 @@ theory ArrayKey
   logic store ('a t, key, 'a) : 'a t
   
   axiom Select_eq : 
-    forall m : 'a t. forall a1,a2 : key. 
+    forall m : 'a t. forall a1 a2 : key. 
     forall b : 'a [select (store m a1 b) a2].
     a1 = a2 -> select (store m a1 b) a2 = b
 
   axiom Select_neq : 
-    forall m : 'a t. forall a1,a2 : key. 
+    forall m : 'a t. forall a1 a2 : key. 
     forall b : 'a [select (store m a1 b) a2].
     a1 <> a2 -> select (store m a1 b) a2 = select m a2
 
@@ -56,7 +56,7 @@ theory ArrayLength
   logic const_length('a, int) : 'a t
 
   axiom Const_contents : 
-    forall b:'a. forall n,i:int. select (const_length b n) i = b
+    forall b:'a. forall n i:int. select (const_length b n) i = b
 
   axiom Length_const : 
     forall a : 'a. forall n : int. length (const_length a n) = n
@@ -91,35 +91,35 @@ theory BitVector
 
   logic bw_and(v1:bv,v2:bv) : bv
   axiom Nth_bw_and: 
-    forall v1,v2:bv,n:int. 0 <= n < size -> 
+    forall v1 v2:bv, n:int. 0 <= n < size -> 
       nth (bw_and v1 v2) n = andb (nth v1 n) (nth v2 n)
 
   (* logical shift right *)
   logic lsr(bv,int) : bv
 
   axiom Lsr_nth_low:
-    forall b:bv,n,s:int. 0 <= n+s < size -> nth (lsr b s) n = nth b (n+s)
+    forall b:bv,n s:int. 0 <= n+s < size -> nth (lsr b s) n = nth b (n+s)
 
   axiom Lsr_nth_high:
-    forall b:bv,n,s:int. n+s >= size -> nth (lsr b s) n = False
+    forall b:bv,n s:int. n+s >= size -> nth (lsr b s) n = False
 
   (* arithmetic shift left *)
   logic asr(bv,int) : bv
 
   axiom Asr_nth_low:
-    forall b:bv,n,s:int. 0 <= n+s < size -> nth (asr b s) n = nth b (n+s)
+    forall b:bv,n s:int. 0 <= n+s < size -> nth (asr b s) n = nth b (n+s)
 
   axiom Asr_nth_high:
-    forall b:bv,n,s:int. n+s >= size -> nth (asr b s) n = nth b (size-1)
+    forall b:bv,n s:int. n+s >= size -> nth (asr b s) n = nth b (size-1)
 
   (* logical shift left *)
   logic lsl(bv,int) : bv
 
   axiom Lsl_nth_high:
-    forall b:bv,n,s:int. 0 <= n-s < size -> nth (lsl b s) n = nth b (n-s)
+    forall b:bv,n s:int. 0 <= n-s < size -> nth (lsl b s) n = nth b (n-s)
 
   axiom Lsl_nth_low:
-    forall b:bv,n,s:int. n-s < 0 -> nth (lsl b s) n = False
+    forall b:bv,n s:int. n-s < 0 -> nth (lsl b s) n = False
 
 end
 

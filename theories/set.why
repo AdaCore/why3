@@ -14,31 +14,31 @@ theory Set
   logic add('a, 'a t) : 'a t
 
   axiom Add_def1 : 
-    forall x, y : 'a. forall s : 'a t.
+    forall x y : 'a. forall s : 'a t.
     mem x (add y s) <-> x = y or mem x s
 
   logic remove('a, 'a t) : 'a t
 
   axiom Remove_def1 :
-    forall x, y : 'a. forall s : 'a t.
+    forall x y : 'a. forall s : 'a t.
     mem x (remove y s) <-> x <> y and mem x s
 
   logic union('a t, 'a t) : 'a t
 
   axiom Union_def1 : 
-    forall s1, s2 : 'a t. forall x : 'a.
+    forall s1 s2 : 'a t. forall x : 'a.
     mem x (union s1 s2) <-> mem x s1 or mem x s2
 
   logic inter('a t, 'a t) : 'a t
 
   axiom Inter_def1 : 
-    forall s1, s2 : 'a t. forall x : 'a.
+    forall s1 s2 : 'a t. forall x : 'a.
     mem x (inter s1 s2) <-> mem x s1 and mem x s2
 
   logic diff('a t, 'a t) : 'a t
 
   axiom Diff_def1 : 
-    forall s1, s2 : 'a t. forall x : 'a.
+    forall s1 s2 : 'a t. forall x : 'a.
     mem x (diff s1 s2) <-> mem x s1 and not mem x s2
 
   logic equal(s1 : 'a t, s2 : 'a t) = forall x : 'a. mem x s1 <-> mem x s2
@@ -67,7 +67,7 @@ theory Fset
     mem x s -> cardinal s = 1 + cardinal (remove x s)
 
   axiom Cardinal_subset :
-    forall s1, s2 : 'a t. subset s1 s2 -> cardinal s1 <= cardinal s2
+    forall s1 s2 : 'a t. subset s1 s2 -> cardinal s1 <= cardinal s2
 
 end
 

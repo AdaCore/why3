@@ -66,7 +66,7 @@ back  +-+-+-+-------------------+
 
   logic permutation (n : int, a : int array) =
     (forall i : int. 0 <= i < n -> 0 <= a#i < n) and
-    (forall i,j : int. 0 <= i < j < n -> a#i <> a#j)
+    (forall i j : int. 0 <= i < j < n -> a#i <> a#j)
 
   logic dirichlet (n : int, a : int array, i : int) : int
 
