@@ -27,7 +27,6 @@ open Term
 open Decl
 open Theory
 open Pgm_ttree
-open Pgm_itree
 open Pgm_typing
 
 module E = Pgm_effect

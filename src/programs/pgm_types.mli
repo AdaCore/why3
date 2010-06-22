@@ -1,5 +1,7 @@
 
 open Why
+open Util
+open Ident
 open Ty
 open Theory
 open Term
@@ -29,15 +31,18 @@ and type_c =
 
 and binder = Term.vsymbol * type_v
 
+(* environments *)
+
 type env = private {
   uc      : theory_uc;
-  globals : type_v Mls.t;
-  locals  : type_v Mvs.t;
+  globals : (lsymbol * type_v) Mstr.t;
+  exceptions : lsymbol Mstr.t;
   (* predefined symbols *)
   ts_arrow: tysymbol;
   ts_bool : tysymbol;
   ts_label: tysymbol;
   ts_ref  : tysymbol;
+  ts_exn: tysymbol;
   ts_unit : tysymbol;
   ls_at   : lsymbol;
   ls_bang : lsymbol;
@@ -45,26 +50,22 @@ type env = private {
   ls_True : lsymbol;
 }
 
-val ls_ref    : theory_uc -> lsymbol (* ref: 'a -> 'a ref *)
-val ls_assign : theory_uc -> lsymbol (* := : 'a ref -> 'a -> unit *)
-val ls_Exit   : theory_uc -> lsymbol
+val empty_env : theory_uc -> env
+
+val add_global : preid -> type_v -> env -> lsymbol * env
+
+val add_decl : decl -> env -> env
+
+val add_exception : preid -> ty option -> env -> lsymbol * env
 
 val t_True : env -> term
 
 val type_v_unit : env -> type_v
 
-val purify : theory_uc -> type_v -> ty
+val purify : env -> type_v -> ty
 
 val apply_type_v     : env -> type_v -> vsymbol   -> type_c
 val apply_type_v_ref : env -> type_v -> reference -> type_c
-
-val empty_env : theory_uc -> env
-
-val add_local : vsymbol -> type_v -> env -> env
-
-val add_global : lsymbol -> type_v -> env -> env
-
-val add_decl : decl -> env -> env
 
 val v_result : ty -> vsymbol
 
@@ -73,6 +74,7 @@ val post_map : (fmla -> fmla) -> post -> post
 val subst1 : vsymbol -> term -> term Mvs.t
 
 val eq_type_v : type_v -> type_v -> bool
+
 
 (* pretty-printers *)
 

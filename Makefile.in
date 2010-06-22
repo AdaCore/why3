@@ -221,8 +221,8 @@ $(PGMCMO) $(PGMCMX): INCLUDES = -I src/programs
 
 # build targets
 
-byte: bin/whyml.byte
-opt:  bin/whyml.opt
+# byte: bin/whyml.byte
+# opt:  bin/whyml.opt
 
 bin/whyml.opt: src/why.cmxa $(PGMCMX) src/main.cmx
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
@@ -504,7 +504,8 @@ clean::
 
 .PHONY: bench test
 
-bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@ $(TOOLS) $(DRIVERS)
+# bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@ $(TOOLS) $(DRIVERS)
+bench:: bin/why.@OCAMLBEST@ $(TOOLS) $(DRIVERS)
 	sh bench/bench \
 	    "bin/why.@OCAMLBEST@" \
 	    "bin/whyml.@OCAMLBEST@"

@@ -40,7 +40,10 @@ exception Error of error
 
 val report : Format.formatter -> error -> unit
 
-(** export for program typing *)
+
+(******************************************************************************)
+(** The following is exported for program typing (src/programs/pgm_typing.ml) *)
+(******************************************************************************)
 
 val specialize_fsymbol : 
   Ptree.qualid -> theory_uc -> lsymbol * Denv.dty list * Denv.dty
@@ -66,13 +69,9 @@ val type_fmla : denv -> vsymbol Mstr.t -> Ptree.lexpr -> fmla
 
 val dty : denv -> Ptree.pty -> Denv.dty
 
-type dpattern
-
-val dpat : denv -> Ptree.pattern -> denv * dpattern
+val dpat : denv -> Ptree.pattern -> denv * Denv.dpattern
 val dpat_list : 
-  denv -> Denv.dty list -> Ptree.pattern list -> denv * dpattern list
-
-val pattern : vsymbol Mstr.t -> dpattern -> vsymbol Mstr.t * pattern
+  denv -> Denv.dty list -> Ptree.pattern list -> denv * Denv.dpattern list
 
 val qloc : Ptree.qualid -> Loc.position
 

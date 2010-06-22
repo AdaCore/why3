@@ -27,6 +27,7 @@ type assertion_kind = Pgm_ptree.assertion_kind
 
 type lazy_op = Pgm_ptree.lazy_op
 
+(*****************************************************************************)
 (* phase 1: destructive typing *)
 
 type dreference = 
@@ -39,11 +40,9 @@ type deffect = {
   de_raises : Term.lsymbol list;
 }
 
-type dlexpr = Typing.denv * Ptree.lexpr
+type dpre = Denv.dfmla
 
-type dpre = dlexpr
-
-type dpost = dlexpr * (Term.lsymbol * dlexpr) list
+type dpost = Denv.dfmla * (Term.lsymbol * Denv.dfmla) list
 
 type dtype_v = 
   | DTpure of Denv.dty
@@ -57,18 +56,19 @@ and dtype_c =
 
 and dbinder = string * dtype_v
 
-type dvariant = Ptree.lexpr * Term.lsymbol
+type dvariant = Denv.dterm * Term.lsymbol
 
 type dloop_annotation = {
-  dloop_invariant : Ptree.lexpr option;
+  dloop_invariant : Denv.dfmla option;
   dloop_variant   : dvariant option;
 }
 
 type dexpr = {
-  dexpr_desc : dexpr_desc;
-  dexpr_denv : Typing.denv;
-  dexpr_type : Denv.dty;
-  dexpr_loc  : loc;
+  dexpr_desc  : dexpr_desc;
+  dexpr_denv  : Typing.denv;
+  dexpr_type  : Denv.dty;
+  dexpr_type_v: dtype_v;
+  dexpr_loc   : loc;
 }
 
 and dexpr_desc =
@@ -87,18 +87,19 @@ and dexpr_desc =
   | DEif of dexpr * dexpr * dexpr
   | DEloop of dloop_annotation * dexpr
   | DElazy of lazy_op * dexpr * dexpr
-  | DEmatch of dexpr list * (Typing.dpattern list * dexpr) list
+  | DEmatch of dexpr list * (Denv.dpattern list * dexpr) list
   | DEskip
   | DEabsurd 
   | DEraise of Term.lsymbol * dexpr option
   | DEtry of dexpr * (Term.lsymbol * string option * dexpr) list
 
-  | DEassert of assertion_kind * Ptree.lexpr
+  | DEassert of assertion_kind * Denv.dfmla
   | DElabel of string * dexpr
   | DEany of dtype_c
 
 and dtriple = dpre * dexpr * dpost
 
+(*****************************************************************************)
 (* phase 2: typing annotations *)
 
 type variant = Term.term * Term.lsymbol
@@ -122,18 +123,56 @@ type loop_annotation = {
 
 type label = Term.vsymbol
 
+type iexpr = {
+  iexpr_desc : iexpr_desc;
+  iexpr_type : Ty.ty;
+  iexpr_loc  : loc;
+}
+
+and iexpr_desc =
+  | IElogic of Term.term
+  | IElocal of Term.vsymbol
+  | IEglobal of Term.lsymbol
+  | IEapply of iexpr * Term.vsymbol
+  | IEapply_ref of iexpr * reference
+  | IEfun of binder list * itriple
+  | IElet of Term.vsymbol * iexpr * iexpr
+  | IEletrec of irecfun list * iexpr
+
+  | IEsequence of iexpr * iexpr
+  | IEif of iexpr * iexpr * iexpr
+  | IEloop of loop_annotation * iexpr
+  | IElazy of lazy_op * iexpr * iexpr
+  | IEmatch of iexpr list * (Term.pattern list * iexpr) list
+  | IEskip 
+  | IEabsurd
+  | IEraise of Term.lsymbol * iexpr option
+  | IEtry of iexpr * (Term.lsymbol * Term.vsymbol option * iexpr) list
+
+  | IEassert of assertion_kind * Term.fmla
+  | IElabel of label * iexpr
+  | IEany of type_c
+
+and irecfun = Term.vsymbol * binder list * variant option * itriple
+
+and itriple = pre * iexpr * post
+
+
+(*****************************************************************************)
+(* phase 3: inferring effects *)
+
 type expr = {
-  expr_desc : expr_desc;
-  expr_type : Ty.ty;
-  expr_loc  : loc;
+  expr_desc  : expr_desc;
+  expr_type  : Ty.ty;
+  expr_type_v: type_v;
+  expr_effect: Pgm_effect.t;
+  expr_loc   : loc;
 }
 
 and expr_desc =
   | Elogic of Term.term
   | Elocal of Term.vsymbol
   | Eglobal of Term.lsymbol
-  | Eapply of expr * Term.vsymbol
-  | Eapply_ref of expr * reference
   | Efun of binder list * triple
   | Elet of Term.vsymbol * expr * expr
   | Eletrec of recfun list * expr
@@ -149,6 +188,7 @@ and expr_desc =
   | Etry of expr * (Term.lsymbol * Term.vsymbol option * expr) list
 
   | Eassert of assertion_kind * Term.fmla
+  | Eghost of expr
   | Elabel of label * expr
   | Eany of type_c
 
@@ -162,6 +202,7 @@ type decl =
   | Dparam  of Term.lsymbol * type_v
 
 type file = decl list
+
 
 (*
 Local Variables: 

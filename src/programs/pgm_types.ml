@@ -1,10 +1,13 @@
 
 open Why
+open Util
 open Ident
 open Theory
 open Term
 open Ty
 module E = Pgm_effect
+
+(* types *)
 
 type effect = E.t
 type reference = Pgm_effect.reference
@@ -29,20 +32,30 @@ and type_c =
 and binder = Term.vsymbol * type_v
 
 
+(* environments *)
+
 type env = {
   uc      : theory_uc;
+(***
   globals : type_v Mls.t;
   locals  : type_v Mvs.t;
+***)
+  globals : (lsymbol * type_v) Mstr.t;
+  exceptions : lsymbol Mstr.t;
   ts_arrow: tysymbol;
   ts_bool : tysymbol;
   ts_label: tysymbol;
   ts_ref: tysymbol;
+  ts_exn: tysymbol;
   ts_unit : tysymbol;
   ls_at : lsymbol;
   ls_bang : lsymbol;
   ls_old : lsymbol;
   ls_True : lsymbol;
 }
+
+
+(* prelude *)
 
 let find_ts uc = ns_find_ts (get_namespace uc)
 let find_ls uc = ns_find_ls (get_namespace uc)
@@ -88,7 +101,7 @@ let add_type_v_ref uc m =
 	    c_pre         = f_true;
 	    c_post        = (result, q), []; } in
   let v = Tarrow ([x, Tpure a], c) in
-  Mls.add (ls_ref uc) v m
+  Mstr.add "ref" (ls_ref uc, v) m
 
 let add_type_v_assign uc m =
   let ts_ref = find_ts uc ["ref"] in
@@ -104,17 +117,18 @@ let add_type_v_assign uc m =
 	    c_pre         = f_true;
 	    c_post        = (result, q), []; } in
   let v = Tarrow ([x, Tpure a_ref; y, Tpure a], c) in
-  Mls.add (ls_assign uc) v m
+  Mstr.add "infix :=" (ls_assign uc, v) m
 
 let empty_env uc = { 
   uc = uc; 
-  globals = add_type_v_ref uc (add_type_v_assign uc Mls.empty);
-  locals = Mvs.empty;
+  globals = add_type_v_ref uc (add_type_v_assign uc Mstr.empty);
+  exceptions = Mstr.add "%Exit" (ls_Exit uc) Mstr.empty;
   (* types *)
   ts_arrow = find_ts uc ["arrow"];
   ts_bool  = find_ts uc ["bool"];
   ts_label = find_ts uc ["label"];
   ts_ref   = find_ts uc ["ref"];
+  ts_exn   = find_ts uc ["exn"];
   ts_unit  = find_ts uc ["unit"];
   (* functions *)
   ls_at    = find_ls uc ["at"];
@@ -123,24 +137,37 @@ let empty_env uc = {
   ls_True  = find_ls uc ["True"];
 }    
 
-let add_local x v env = { env with locals = Mvs.add x v env.locals }
+let make_arrow_type env tyl ty =
+  let arrow ty1 ty2 = Ty.ty_app env.ts_arrow [ty1; ty2] in
+  List.fold_right arrow tyl ty
 
-let add_global x v env = { env with globals = Mls.add x v env.globals }
+let rec uncurry_type = function
+  | Tpure ty -> 
+      [], ty
+  | Tarrow (bl, c) -> 
+      let tyl1 = List.map (fun (v,_) -> v.vs_ty) bl in
+      let tyl2, ty = uncurry_type c.c_result_type in
+      tyl1 @ tyl2, ty (* TODO: improve? *)
+
+let purify env v =
+  let tyl, ty = uncurry_type v in 
+  make_arrow_type env tyl ty
+
+(* addition *)
+
+let add_global id tyv env = 
+  let tyl, ty = uncurry_type tyv in
+  let s = create_lsymbol id tyl (Some ty) in
+  s, { env with globals = Mstr.add s.ls_name.id_string (s, tyv) env.globals }
 
 let add_decl d env = { env with uc = add_decl env.uc d }
 
-let ts_arrow uc = ns_find_ts (get_namespace uc) ["arrow"]
+let add_exception id ty env =
+  let tyl = match ty with None -> [] | Some ty -> [ty] in
+  let s = create_lsymbol id tyl (Some (ty_app env.ts_exn [])) in
+  s, { env with exceptions = Mstr.add s.ls_name.id_string s env.exceptions }
 
-let currying uc tyl ty =
-  let make_arrow_type ty1 ty2 = Ty.ty_app (ts_arrow uc) [ty1; ty2] in
-  List.fold_right make_arrow_type tyl ty
-
-let rec purify uc = function
-  | Tpure ty -> 
-      ty
-  | Tarrow (bl, c) -> 
-      currying uc (List.map (fun (v,_) -> v.vs_ty) bl) 
-	(purify uc c.c_result_type)
+(* misc. functions *)
 
 let post_map f ((v, q), ql) = 
   (v, f q), List.map (fun (e,(v,q)) -> e, (v, f q)) ql
@@ -149,7 +176,7 @@ let type_c_of_type_v env = function
   | Tarrow ([], c) ->
       c
   | v ->
-      let ty = purify env.uc v in
+      let ty = purify env v in
       { c_result_type = v;
 	c_effect      = Pgm_effect.empty;
 	c_pre         = f_true;
@@ -193,7 +220,7 @@ let subst1 vs1 t2 = Mvs.add vs1 t2 Mvs.empty
 
 let apply_type_v env v vs = match v with
   | Tarrow ((x, tyx) :: bl, c) ->
-      let ts = ty_match Mtv.empty (purify env.uc tyx) vs.vs_ty in
+      let ts = ty_match Mtv.empty (purify env tyx) vs.vs_ty in
       let c = type_c_of_type_v env (Tarrow (bl, c)) in
       subst_type_c (fun e -> e) ts (subst1 x (t_var vs)) c
   | Tarrow ([], _) | Tpure _ -> 
@@ -201,13 +228,13 @@ let apply_type_v env v vs = match v with
 
 let apply_type_v_ref env v r = match r, v with
   | E.Rlocal vs as r, Tarrow ((x, tyx) :: bl, c) ->
-      let ts = ty_match Mtv.empty (purify env.uc tyx) vs.vs_ty in
+      let ts = ty_match Mtv.empty (purify env tyx) vs.vs_ty in
       let c = type_c_of_type_v env (Tarrow (bl, c)) in
       let ef = E.subst x r in
       subst_type_c ef ts (subst1 x (t_var vs)) c
   | E.Rglobal ls as r, Tarrow ((x, tyx) :: bl, c) -> 
       let ty = match ls.ls_value with None -> assert false | Some ty -> ty in
-      let ts = ty_match Mtv.empty (purify env.uc tyx) ty in
+      let ts = ty_match Mtv.empty (purify env tyx) ty in
       let c = type_c_of_type_v env (Tarrow (bl, c)) in
       let ef = E.subst x r in
       subst_type_c ef ts (subst1 x (t_app ls [] ty)) c
