@@ -55,6 +55,7 @@ val empty_env : theory_uc -> env
 val add_global : preid -> type_v -> env -> lsymbol * env
 
 val add_decl : decl -> env -> env
+val add_pdecl : Env.env -> Ptree.decl -> env -> env
 
 val add_exception : preid -> ty option -> env -> lsymbol * env
 

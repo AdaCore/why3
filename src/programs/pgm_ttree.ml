@@ -64,17 +64,16 @@ type dloop_annotation = {
 }
 
 type dexpr = {
-  dexpr_desc  : dexpr_desc;
-  dexpr_denv  : Typing.denv;
-  dexpr_type  : Denv.dty;
-  dexpr_type_v: dtype_v;
-  dexpr_loc   : loc;
+  dexpr_desc : dexpr_desc;
+  dexpr_denv : Typing.denv;
+  dexpr_type : Denv.dty;
+  dexpr_loc  : loc;
 }
 
 and dexpr_desc =
   | DEconstant of constant
-  | DElocal of string
-  | DEglobal of Term.lsymbol
+  | DElocal of string * dtype_v
+  | DEglobal of Term.lsymbol * dtype_v
   | DElogic of Term.lsymbol
   | DEapply of dexpr * dexpr
   | DEfun of dbinder list * dtriple
@@ -131,8 +130,8 @@ type iexpr = {
 
 and iexpr_desc =
   | IElogic of Term.term
-  | IElocal of Term.vsymbol
-  | IEglobal of Term.lsymbol
+  | IElocal of Term.vsymbol * type_v
+  | IEglobal of Term.lsymbol * type_v
   | IEapply of iexpr * Term.vsymbol
   | IEapply_ref of iexpr * reference
   | IEfun of binder list * itriple

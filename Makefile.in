@@ -208,7 +208,7 @@ PGMGENERATED = src/programs/pgm_parser.mli    src/programs/pgm_parser.ml \
 	       src/programs/pgm_parser.output src/programs/pgm_lexer.ml
 
 PGM_FILES = pgm_ttree pgm_ptree  pgm_parser pgm_lexer pgm_effect \
-	    pgm_types pgm_typing pgm_itree pgm_wp pgm_main
+	    pgm_types pgm_typing pgm_wp pgm_main
 
 PGMMODULES = $(addprefix src/programs/, $(PGM_FILES))
 
@@ -221,8 +221,8 @@ $(PGMCMO) $(PGMCMX): INCLUDES = -I src/programs
 
 # build targets
 
-# byte: bin/whyml.byte
-# opt:  bin/whyml.opt
+byte: bin/whyml.byte
+opt:  bin/whyml.opt
 
 bin/whyml.opt: src/why.cmxa $(PGMCMX) src/main.cmx
 	$(if $(QUIET), @echo 'Linking  $@' &&) \

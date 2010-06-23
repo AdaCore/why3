@@ -160,7 +160,11 @@ let add_global id tyv env =
   let s = create_lsymbol id tyl (Some ty) in
   s, { env with globals = Mstr.add s.ls_name.id_string (s, tyv) env.globals }
 
-let add_decl d env = { env with uc = add_decl env.uc d }
+let add_decl d env = 
+  { env with uc = Typing.with_tuples add_decl env.uc d }
+
+let add_pdecl e d env =
+  { env with uc = Typing.add_decl e Mnm.empty env.uc d }
 
 let add_exception id ty env =
   let tyl = match ty with None -> [] | Some ty -> [ty] in
