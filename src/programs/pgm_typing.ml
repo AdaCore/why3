@@ -511,7 +511,7 @@ let variant loc env (t, ps) =
     | [t1; _] when Ty.ty_equal t1 t.t_ty -> 
 	t, ps
     | [t1; _] -> 
-	errorm ~loc "variant has type %a, but is expected to have type %a"
+	errorm ~loc "@[variant has type %a, but is expected to have type %a@]"
 	  Pretty.print_ty t.t_ty Pretty.print_ty t1
     | _ -> 
 	assert false
