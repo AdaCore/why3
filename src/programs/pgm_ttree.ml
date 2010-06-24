@@ -181,7 +181,6 @@ and expr_desc =
   | Esequence of expr * expr
   | Eif of expr * expr * expr
   | Eloop of loop_annotation * expr
-  | Elazy of lazy_op * expr * expr
   | Ematch of expr list * (Term.pattern list * expr) list
   | Eskip 
   | Eabsurd

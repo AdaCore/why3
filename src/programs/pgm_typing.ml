@@ -447,12 +447,13 @@ and dletrec env dl =
   let add_one env (id, bl, var, t) = 
     let ty = create_type_var id.id_loc in
     let env = add_local env id.id (DTpure ty) in
-    env, ((id, ty), bl, option_map (dvariant env) var, t)
+    env, ((id, ty), bl, var, t)
   in
   let env, dl = map_fold_left add_one env dl in
   (* then type-check all of them and unify *)
   let type_one ((id, tyres), bl, v, t) = 
     let env, bl = map_fold_left dbinder env bl in
+    let v = option_map (dvariant env) v in
     let (_,e,_) as t = dtriple env t in
     let tyl = List.map (fun (x,_) -> Typing.find_var x.id env.denv) bl in
     let ty = dcurrying env.env tyl e.dexpr_type in
@@ -831,7 +832,7 @@ let rec is_pure_expr e =
   | Elabel (_, e1) -> is_pure_expr e1
   | Eany c -> E.no_side_effect c.c_effect
   | Eghost _ | Eassert _ | Etry _ | Eraise _ | Ematch _ 
-  | Elazy _ | Eloop _ | Esequence _ | Eletrec _ | Efun _ 
+  | Eloop _ | Esequence _ | Eletrec _ | Efun _ 
   | Eglobal _ | Eabsurd -> false (* TODO: improve *)
 
 let mk_expr loc ty ef d =
@@ -1116,6 +1117,4 @@ TODO:
 - polymorphic let?
 
 - ghost
-
-- move effect inference here (from pgm_wp), as phase 3
 *)

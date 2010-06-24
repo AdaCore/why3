@@ -1,8 +1,10 @@
 
-let foo (x:int ref) =
-  { }
-  if !x = 0 && !x = 1 then 2 else 3
-  { result = 3 }
+let rec foo (x:int) =
+  { x >= 0 }
+  if x = 0 then 0 else foo (x-1)+1-1
+  { result = 0 }
+
+let test () = {} foo 4 {result=0}
 
 (*
 Local Variables: 

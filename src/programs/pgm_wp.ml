@@ -261,8 +261,10 @@ and wp_desc env e q = match e.expr_desc with
       let q1 = result, f_subst (subst1 x (t_var result)) w2 in
       let q1 = saturate_post e1.expr_effect q1 q in
       wp_expr env e1 q1
-  | Eletrec _ ->
-      assert false (*TODO*)
+  | Eletrec (dl, e1) ->
+      let w1 = wp_expr env e1 q in
+      let wl = List.map (wp_recfun env) dl in 
+      wp_ands ~sym:true (w1 :: wl)
 
   | Esequence (e1, e2) ->
       let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
@@ -295,8 +297,6 @@ and wp_desc env e q = match e.expr_desc with
 		 (quantify env e.expr_effect (wp_implies i we)))
 	in
 	w
-  | Elazy _ ->
-      assert false (*TODO*)
   | Ematch _ ->
       assert false (*TODO*)
   | Eskip ->
@@ -351,7 +351,7 @@ and wp_desc env e q = match e.expr_desc with
       let w = opaque_wp env c.c_effect c.c_post q in
       wp_and c.c_pre w
 
-  | _ -> 
+  | Eghost _ ->
       assert false (*TODO*)
 
 and wp_triple env (p, e, q) =
@@ -359,10 +359,12 @@ and wp_triple env (p, e, q) =
   let f = wp_implies p f in
   quantify ~all:true env e.expr_effect f
 
+and wp_recfun env (_, bl, _var, t) =
+  let f = wp_triple env t in
+  wp_binders bl f
+
 let wp env e = 
   wp_expr env e (default_post e.expr_type e.expr_effect)
-
-let wp_recfun _env _l _def = f_true (* TODO *)
 
 let add_wp_decl l f env =
   let pr = create_prsymbol (id_fresh ("WP_" ^ l.ls_name.id_string)) in
@@ -381,10 +383,11 @@ let decl env = function
       env
   | Pgm_ttree.Dletrec dl ->
       let add_one env (ls, def) = 
-	let f = wp_recfun env ls def in 
-	let env = add_wp_decl ls f env in
-	let _v = assert false (*TODO*) in
-	env
+	let f = wp_recfun env def in 
+	if !debug then
+	  eprintf "wp %a = %a@\n----------------@." 
+	    print_ls ls Pretty.print_fmla f;
+	add_wp_decl ls f env
       in
       List.fold_left add_one env dl
   | Pgm_ttree.Dparam _ ->
