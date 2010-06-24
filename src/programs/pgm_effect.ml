@@ -101,6 +101,9 @@ let equal t1 t2 =
   Sref.equal t1.writes t2.writes &&
   Sls.equal  t1.raises t2.raises
 
+let no_side_effect t =
+  Sref.is_empty t.writes && Sls.is_empty t.raises
+
 let subst vs r t =
   let add1 r' s = match r' with
     | Rlocal vs' when vs_equal vs' vs -> Sref.add r s

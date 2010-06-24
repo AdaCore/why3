@@ -52,6 +52,9 @@ type env = {
   ls_bang : lsymbol;
   ls_old : lsymbol;
   ls_True : lsymbol;
+  ls_False: lsymbol;
+  ls_andb : lsymbol;
+  ls_orb  : lsymbol;
 }
 
 
@@ -135,6 +138,9 @@ let empty_env uc = {
   ls_bang  = find_ls uc ["prefix !"];
   ls_old   = find_ls uc ["old"];
   ls_True  = find_ls uc ["True"];
+  ls_False = find_ls uc ["False"];
+  ls_andb   = find_ls uc ["andb"];
+  ls_orb    = find_ls uc ["orb"];
 }    
 
 let make_arrow_type env tyl ty =

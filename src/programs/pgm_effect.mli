@@ -52,6 +52,8 @@ val union : t -> t -> t
 
 val equal : t -> t -> bool
 
+val no_side_effect : t -> bool
+
 val subst : vsymbol -> reference -> t -> t
 
 val print_reference : Format.formatter -> reference -> unit

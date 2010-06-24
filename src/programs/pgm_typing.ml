@@ -819,6 +819,35 @@ let without_exn_check f x =
   end else
     f x
 
+(*s Pure expressions. Used in [Slazy_and] and [Slazy_or] to decide
+    whether to use [strict_bool_and_] and [strict_bool_or_] or not. *)
+
+let rec is_pure_expr e = 
+  E.no_side_effect e.expr_effect &&
+  match e.expr_desc with
+  | Elocal _ | Elogic _ | Eskip -> true
+  | Eif (e1, e2, e3) -> is_pure_expr e1 && is_pure_expr e2 && is_pure_expr e3
+  | Elet (_, e1, e2) -> is_pure_expr e1 && is_pure_expr e2
+  | Elabel (_, e1) -> is_pure_expr e1
+  | Eany c -> E.no_side_effect c.c_effect
+  | Eghost _ | Eassert _ | Etry _ | Eraise _ | Ematch _ 
+  | Elazy _ | Eloop _ | Esequence _ | Eletrec _ | Efun _ 
+  | Eglobal _ | Eabsurd -> false (* TODO: improve *)
+
+let mk_expr loc ty ef d =
+  { expr_desc = d; expr_type = ty; expr_type_v = Tpure ty;
+    expr_effect = ef; expr_loc = loc }
+
+let mk_simple_expr loc ty d = mk_expr loc ty E.empty d
+
+let mk_bool_constant loc gl ls =
+  let ty = ty_app gl.ts_bool [] in
+  { expr_desc = Elogic (t_app ls [] ty); expr_type = ty; expr_type_v = Tpure ty;
+    expr_effect = E.empty; expr_loc = loc }
+
+let mk_false loc gl = mk_bool_constant loc gl gl.ls_False 
+let mk_true  loc gl = mk_bool_constant loc gl gl.ls_True
+
 (* [expr] translates iexpr into expr
    [env : type_v Mvs.t] maps local variables to their types *)
 
@@ -890,8 +919,29 @@ and expr_desc gl env loc ty = function
 	| None -> ef
       in
       Eloop (a, e1), type_v_unit gl, ef
-  | IElazy _ ->
-      assert false (*TODO*)
+  | IElazy (op, e1, e2) ->
+      let e1 = expr gl env e1 in
+      let e2 = expr gl env e2 in
+      let ef = E.union e1.expr_effect e2.expr_effect in
+      let d = 
+	if is_pure_expr e2 then
+	  let ls = match op with
+	    | Pgm_ptree.LazyAnd -> gl.ls_andb
+	    | Pgm_ptree.LazyOr  -> gl.ls_orb
+	  in
+	  let v1 = create_vsymbol (id_fresh "lazy") ty in
+	  let v2 = create_vsymbol (id_fresh "lazy") ty in
+	  let t = t_app ls [t_var v1; t_var v2] ty in
+	  Elet (v1, e1,
+		mk_expr loc ty ef
+		  (Elet (v2, e2, mk_simple_expr loc ty (Elogic t))))
+	else match op with
+	  | Pgm_ptree.LazyAnd ->
+	      Eif (e1, e2, mk_false loc gl)
+	  | Pgm_ptree.LazyOr ->
+	      Eif (e1, mk_true loc gl, e2)
+      in 
+      d, Tpure ty, ef
   | IEmatch _ ->
       assert false (*TODO*)
   | IEskip ->
