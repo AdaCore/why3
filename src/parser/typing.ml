@@ -358,7 +358,7 @@ let check_quant_linearity uqu =
     if Sstr.mem id.id !s then errorm ~loc:id.id_loc "duplicate variable %s" id.id;
     s := Sstr.add id.id !s
   in
-  List.iter (fun (idl, _) -> List.iter check idl) uqu
+  List.iter (fun (idl, _) -> Util.option_iter check idl) uqu
 
 let rec dterm env t =
   let n, ty = dterm_node t.pp_loc env t.pp_desc in
@@ -454,12 +454,11 @@ and dfmla env e = match e.pp_desc with
       check_quant_linearity uqu;
       let uquant env (idl,ty) =
         let ty = dty env ty in
-        let env, idl =
-          map_fold_left
-            (fun env {id=x} -> { env with dvars = Mstr.add x ty env.dvars }, x)
-            env idl
+        let id = match idl with
+          | Some id -> id.id
+          | None -> assert false
         in
-        env, (idl,ty)
+        { env with dvars = Mstr.add id ty env.dvars }, (id,ty)
       in
       let env, uqu = map_fold_left uquant env uqu in
       let trigger e =
@@ -633,7 +632,7 @@ let add_types dl th =
       | TDalgebraic cl ->
 	  let ty = ty_app ts (List.map ty_var ts.ts_args) in
 	  let constructor (loc, id, pl) =
-	    let param t = ty_of_dty (dty th' t) in
+	    let param (_,t) = ty_of_dty (dty th' t) in
 	    let tyl = List.map param pl in
 	    Hashtbl.replace csymbols id.id loc;
 	    create_fsymbol (id_user id.id loc) tyl ty
@@ -753,7 +752,7 @@ let add_inductives dl th =
     let id = d.in_ident.id in
     let v = id_user id d.in_loc in
     let denv = create_denv th in
-    let type_ty t = ty_of_dty (dty denv t) in
+    let type_ty (_,t) = ty_of_dty (dty denv t) in
     let pl = List.map type_ty d.in_params in
     let ps = create_psymbol v pl in
     Hashtbl.add psymbols id ps;

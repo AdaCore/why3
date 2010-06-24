@@ -1,7 +1,7 @@
 
 (** 1. A loop increasing [i] up to 10. *)
 
-parameter i : int ref
+parameter i : ref int
 
 let loop1 (u:unit) = 
   { !i <= 10 }
@@ -14,7 +14,7 @@ let loop1 (u:unit) =
 
 (** 2. The same loop, followed by a function call. *)
 
-parameter x: int ref
+parameter x: ref int
 
 let negate (u:unit) = {} x := - !x { !x = -old(!x) }
 

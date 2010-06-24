@@ -1,22 +1,22 @@
 
 theory Array
 
-  type ('a,'b) t
+  type t 'a 'b
 
-  logic select (('a,'b) t, 'a) : 'b
-  logic store (('a,'b) t, 'a, 'b) : ('a,'b) t
+  logic select (t 'a 'b) 'a : 'b
+  logic store (t 'a 'b) 'a 'b : t 'a 'b
   
   axiom Select_eq : 
-    forall m : ('a,'b) t. forall a1 a2 : 'a. 
+    forall m : t 'a 'b. forall a1 a2 : 'a. 
     forall b : 'b [select (store m a1 b) a2].
     a1 = a2 -> select (store m a1 b) a2  = b
 
   axiom Select_neq : 
-    forall m : ('a,'b) t. forall a1 a2 : 'a. 
+    forall m : t 'a 'b. forall a1 a2 : 'a. 
     forall b : 'b [select (store m a1 b) a2].
     a1 <> a2 -> select (store m a1 b) a2 = select m a2
 
-  logic const('b) : ('a,'b) t
+  logic const 'b : t 'a 'b
 
   axiom Const : forall b:'b, a:'a. select (const b) a = b
 
@@ -26,22 +26,22 @@ theory ArrayKey
 
   type key
 
-  type 'a t
+  type t 'a
 
-  logic select ('a t, key) : 'a
-  logic store ('a t, key, 'a) : 'a t
+  logic select (t 'a) key : 'a
+  logic store (t 'a) key 'a : t 'a
   
   axiom Select_eq : 
-    forall m : 'a t. forall a1 a2 : key. 
+    forall m : t 'a. forall a1 a2 : key. 
     forall b : 'a [select (store m a1 b) a2].
     a1 = a2 -> select (store m a1 b) a2 = b
 
   axiom Select_neq : 
-    forall m : 'a t. forall a1 a2 : key. 
+    forall m : t 'a. forall a1 a2 : key. 
     forall b : 'a [select (store m a1 b) a2].
     a1 <> a2 -> select (store m a1 b) a2 = select m a2
 
-  logic const('a) : 'a t
+  logic const 'a : t 'a
 
   axiom Const : forall b:'a. forall a:key. select (const b) a = b
 
@@ -51,9 +51,9 @@ theory ArrayLength
 
   clone export ArrayKey with type key = int
 
-  logic length('a t) : int
+  logic length (t 'a) : int
 
-  logic const_length('a, int) : 'a t
+  logic const_length 'a int : t 'a
 
   axiom Const_contents : 
     forall b:'a. forall n i:int. select (const_length b n) i = b
@@ -62,7 +62,7 @@ theory ArrayLength
     forall a : 'a. forall n : int. length (const_length a n) = n
 
   axiom Length_store : 
-    forall a : 'a t. forall k : int. forall v : 'a.
+    forall a : t 'a. forall k : int. forall v : 'a.
     length (store a k v) = length a
 
 end
@@ -76,7 +76,7 @@ theory BitVector
 
   type bv
 
-  logic nth(bv,int): bool
+  logic nth bv int: bool
   
   logic bvzero : bv
   axiom Nth_zero: 
@@ -86,16 +86,16 @@ theory BitVector
   axiom Nth_one: 
     forall n:int. 0 <= n < size -> nth bvone n = True
 
-  logic eq(v1:bv,v2:bv) =
+  logic eq (v1 v2 : bv) =
     forall n:int. 0 <= n < size -> nth v1 n = nth v2 n
 
-  logic bw_and(v1:bv,v2:bv) : bv
+  logic bw_and (v1 v2 : bv) : bv
   axiom Nth_bw_and: 
     forall v1 v2:bv, n:int. 0 <= n < size -> 
       nth (bw_and v1 v2) n = andb (nth v1 n) (nth v2 n)
 
   (* logical shift right *)
-  logic lsr(bv,int) : bv
+  logic lsr bv int : bv
 
   axiom Lsr_nth_low:
     forall b:bv,n s:int. 0 <= n+s < size -> nth (lsr b s) n = nth b (n+s)
@@ -104,7 +104,7 @@ theory BitVector
     forall b:bv,n s:int. n+s >= size -> nth (lsr b s) n = False
 
   (* arithmetic shift left *)
-  logic asr(bv,int) : bv
+  logic asr bv int : bv
 
   axiom Asr_nth_low:
     forall b:bv,n s:int. 0 <= n+s < size -> nth (asr b s) n = nth b (n+s)
@@ -113,7 +113,7 @@ theory BitVector
     forall b:bv,n s:int. n+s >= size -> nth (asr b s) n = nth b (size-1)
 
   (* logical shift left *)
-  logic lsl(bv,int) : bv
+  logic lsl bv int : bv
 
   axiom Lsl_nth_high:
     forall b:bv,n s:int. 0 <= n-s < size -> nth (lsl b s) n = nth b (n-s)

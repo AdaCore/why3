@@ -1,6 +1,6 @@
 theory EndoRelation
   type t
-  logic rel(t,t)
+  logic rel t t
 end
 
 theory Reflexive
@@ -76,13 +76,13 @@ end
 theory Inverse
   clone export EndoRelation
 
-  logic inv_rel(x:t,y:t) = rel y x
+  logic inv_rel (x y : t) = rel y x
 end
 
 theory ReflClosure
   clone export EndoRelation
 
-  inductive relR(t,t) =
+  inductive relR t t =
   | BaseRefl : forall x:t. relR x x
   | StepRefl : forall x y:t. rel x y -> relR x y
 end
@@ -90,7 +90,7 @@ end
 theory TransClosure
   clone export EndoRelation
 
-  inductive relT(t,t) =
+  inductive relT t t =
   | BaseTrans : forall x y:t. rel x y -> relT x y
   | StepTrans : forall x y z:t. relT x y -> rel y z -> relT x z
 end
@@ -98,7 +98,7 @@ end
 theory ReflTransClosure
   clone export EndoRelation
 
-  inductive relTR(t,t) =
+  inductive relTR t t =
   | BaseTransRefl : forall x:t. relTR x x
   | StepTransRefl : forall x y z:t. relTR x y -> rel y z -> relTR x z
 end
@@ -107,7 +107,7 @@ end
 theory PreOrder
 
   type t
-  logic le(t,t)
+  logic le t t
   axiom Refl : forall x:t. le(x,x)
   axiom Trans : forall x y z:t. le x y and le y z -> le x z
 
@@ -117,7 +117,7 @@ theory Equiv
 
   type t
 
-  logic eq(t,t)
+  logic eq t t
 
   clone PreOrder with type t = t, logic le = eq
 
@@ -128,7 +128,7 @@ end
 theory TotalPreOrder
 
   type t
-  logic le(t,t)
+  logic le t t
 
   clone export PreOrder with type t = t, logic le = le
 
@@ -143,16 +143,16 @@ theory TotalOrder
 
   type t
 
-  logic eq (t,t)
+  logic eq t t
   clone Equiv with type t = t, logic eq = eq
 
-  logic le (t,t)
+  logic le t t
   clone PreOrder with type t = t, logic le = le
 
 
   axiom Totality: forall x y:t. eq x y or le x y or le y x
 
-  logic lt(x:t,y:t) = le x y and not eq x y
+  logic lt (x y : t) = le x y and not eq x y
 
   lemma Lt_antirefl: forall x:t. not lt x x
   lemma Lt_trans: forall x y z:t. lt x y and lt y z -> lt x z
@@ -167,8 +167,8 @@ theory MinMax
 
   clone export TotalOrder
 
-  logic min(t,t) : t
-  logic max(t,t) : t
+  logic min t t : t
+  logic max t t : t
 
 end
 *)

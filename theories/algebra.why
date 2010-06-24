@@ -1,19 +1,19 @@
 
 theory Assoc
   type t
-  logic op(t, t) : t
+  logic op t t : t
   axiom Assoc : forall x y z : t. op (op x y) z = op x (op y z)
 end
 
 theory Comm
   type t
-  logic op(t, t) : t
+  logic op t t : t
   axiom Comm : forall x y : t. op x y = op y x
 end
 
 theory AC
   type t
-  logic op(t, t) : t
+  logic op t t : t
   clone Assoc with type t = t, logic op = op
   clone Comm  with type t = t, logic op = op
 end
@@ -23,8 +23,8 @@ theory Group
        
   logic unit : t
        
-  logic op(t,t) : t
-  logic inv(t) : t
+  logic op t t : t
+  logic inv t : t
        
   axiom Unit_def : forall x:t. op x unit = x
 
@@ -41,9 +41,9 @@ end
 theory Ring
   type t
   logic zero : t
-  logic (+)  (t, t) : t
-  logic (-_) (t) : t
-  logic (*)  (t, t) : t
+  logic (+) t t : t
+  logic (-_) t : t
+  logic (*) t t : t
 
   clone CommutativeGroup with type t = t,
                               logic unit = zero,
@@ -54,7 +54,7 @@ theory Ring
 
   axiom Mul_distr: forall x y z : t. x * (y + z) = x * y + x * z
 
-  logic (-) (x:t, y:t) : t = x + -y
+  logic (-) (x y : t) : t = x + -y
 end
 
 theory CommutativeRing
@@ -70,7 +70,7 @@ end
 
 theory Field
   clone export UnitaryCommutativeRing 
-  logic inv(t) : t
+  logic inv t : t
   axiom Inverse : forall x:t. x <> zero -> x * inv x = one
-  logic (/) (x:t, y:t) : t = x * inv y
+  logic (/) (x y : t) : t = x * inv y
 end

@@ -6,13 +6,13 @@ use array.Array as M
 (* iteration on a set *)
 
 parameter set_has_next : 
-  s:'a S.t ref -> 
+  s:ref (S.t 'a) -> 
     {} 
     bool reads s 
     { if result=True then S.is_empty !s else not S.is_empty !s }
 
 parameter set_next :
-  s:'a S.t ref -> 
+  s:ref (S.t 'a) -> 
     { not S.is_empty !s }
     'a writes s 
     { S.mem result (old !s) and !s = S.remove result (old !s) }
@@ -22,14 +22,14 @@ parameter set_next :
 
 type vertex
 
-logic v : vertex S.t
+logic v : S.t vertex
 
-logic g_succ(vertex) : vertex S.t
+logic g_succ(vertex) : S.t vertex
 
 axiom G_succ_sound : 
   forall x:vertex. S.subset (g_succ x) v
 
-logic weight(vertex, vertex) : int (* edge weight, if there is an edge *)
+logic weight vertex vertex : int (* edge weight, if there is an edge *)
 
 axiom Weight_nonneg : forall x y:vertex. weight x y >= 0
 }
@@ -39,18 +39,18 @@ parameter eq_vertex :
 
 (* visited vertices *)
 
-parameter visited : vertex S.t ref
+parameter visited : ref (S.t vertex)
 
 parameter visited_add : 
   x:vertex -> {} unit writes visited { !visited = S.add x (old !visited) }
 
 (* current distances *)
 
-parameter d : (vertex, int) M.t ref
+parameter d : ref (M.t vertex int)
 
 (* priority queue *)
 
-parameter q : vertex S.t ref
+parameter q : ref (S.t vertex)
 
 parameter q_is_empty : 
   unit -> 
@@ -82,7 +82,7 @@ parameter relax :
         !d = M.store (old !d) v (M.select !d u + weight u v)) }	
 
 {
-logic min(m:vertex, q:vertex S.t, d:(vertex, int) M.t) =
+logic min (m:vertex) (q:S.t vertex) (d:M.t vertex int) =
   S.mem m q and 
   forall x:vertex. S.mem x q -> M.select d x <= M.select d m
 }
@@ -100,7 +100,7 @@ parameter q_extract_min :
 	there is a path from x to y of length d, and no shorter path *)
 
 { 
-inductive path(vertex,vertex,int) = 
+inductive path vertex vertex int = 
   | Path_nil  : 
       forall x:vertex. path x x 0
   | Path_cons :   
@@ -109,7 +109,7 @@ inductive path(vertex,vertex,int) =
 
 lemma Length_nonneg : forall x y:vertex. forall d:int. path x y d -> d >= 0
 
-logic shortest_path(x:vertex, y:vertex, d:int) =
+logic shortest_path (x y:vertex) (d:int) =
   path x y d and forall d':int. path x y d' -> d <= d'
 
 lemma Path_inversion :
@@ -130,7 +130,7 @@ lemma Main_lemma :
     shortest_path src v' d' and S.mem v (g_succ v') and d' + weight v' v < d
 
 lemma Completeness_lemma :
-  forall s:vertex S.t. forall src:vertex. forall dst:vertex. forall d:int. 
+  forall s:S.t vertex. forall src:vertex. forall dst:vertex. forall d:int. 
   (* if s is closed under g_succ *)
   (forall v:vertex. 
      S.mem v s -> forall w:vertex. S.mem w (g_succ v) -> S.mem w s) ->
@@ -141,10 +141,10 @@ lemma Completeness_lemma :
 
 (* definitions used in loop invariants *)
 
-logic inv_src(src:vertex, s:vertex S.t, q:vertex S.t) =
+logic inv_src (src:vertex) (s q:S.t vertex) =
   S.mem src s or S.mem src q
 
-logic inv(src:vertex, s:vertex S.t, q:vertex S.t, d:(vertex,int) M.t) =
+logic inv (src:vertex) (s q:S.t vertex) (d:M.t vertex int) =
   inv_src src s q
   (* S,Q are contained in V *)
   and S.subset s v and S.subset q v
@@ -163,13 +163,13 @@ logic inv(src:vertex, s:vertex S.t, q:vertex S.t, d:(vertex,int) M.t) =
      forall x:vertex. forall dx:int. shortest_path src x dx -> 
        dx < M.select d m -> S.mem x s) 
 
-logic inv_succ(src:vertex, s:vertex S.t, q: vertex S.t) =
+logic inv_succ (src:vertex) (s q : S.t vertex) =
   (* successors of vertices in S are either in S or in Q *)
   (forall x:vertex. S.mem x s -> 
      forall y:vertex. S.mem y (g_succ x) -> S.mem y s or S.mem y q)
 
-logic inv_succ2(src:vertex, s:vertex S.t, q: vertex S.t,
-	        u:vertex, su:vertex S.t) =
+logic inv_succ2 (src:vertex) (s q : S.t vertex)
+                (u:vertex) (su:S.t vertex) =
   (* successors of vertices in S are either in S or in Q,
      unless they are successors of u still in su *)
   (forall x:vertex. S.mem x s -> 

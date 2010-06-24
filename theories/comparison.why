@@ -2,11 +2,11 @@
 theory Abs
 
   type t
-  logic ge(t,t)
-  logic neg(t) : t
+  logic ge t t
+  logic neg t : t
   logic zero : t
 
-  logic abs(t) : t
+  logic abs t : t
 
   axiom Pos: forall x:t. ge x zero -> abs x = x
   axiom Neg: forall x:t. not ge x zero -> abs x = neg x
@@ -21,10 +21,10 @@ end
 theory MinMax
 
   type t
-  logic ge(t,t)
+  logic ge t t
 
-  logic min(t,t) : t
-  logic max(t,t) : t
+  logic min t t : t
+  logic max t t : t
 
   axiom Max_is_ge   : forall x y:t. ge (max x y) x and ge (max x y) y
   axiom Max_is_some : forall x y:t. max x y = x or max x y = y
@@ -40,9 +40,9 @@ theory MinMax
 
 
 (*
-  logic min(x:t,y:t) : t 
+  logic min (x y : t) : t 
   axiom Min_def : if ge x y then min x y = y else min x y = x 
-  logic max(x:t,y:t) : t
+  logic max (x y : t) : t
   axiom Max_def : if ge x y then max x y = x else max x y = y 
 *)
 

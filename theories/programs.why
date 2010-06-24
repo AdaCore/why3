@@ -3,12 +3,12 @@ theory Prelude
   use export int.Int
   use export bool.Bool
 
-  logic eq_bool('a, 'a) : bool
-  logic ne_bool('a, 'a) : bool
-  logic le_bool('a, 'a) : bool
-  logic lt_bool('a, 'a) : bool
-  logic ge_bool('a, 'a) : bool
-  logic gt_bool('a, 'a) : bool
+  logic eq_bool 'a 'a : bool
+  logic ne_bool 'a 'a : bool
+  logic le_bool 'a 'a : bool
+  logic lt_bool 'a 'a : bool
+  logic ge_bool 'a 'a : bool
+  logic gt_bool 'a 'a : bool
 
   axiom Eq_bool_def : forall x y:'a.  eq_bool x y = True <-> x= y
   axiom Ne_bool_def : forall x y:'a.  ne_bool x y = True <-> x<>y
@@ -18,20 +18,20 @@ theory Prelude
   axiom Gt_bool_def : forall x y:int. gt_bool x y = True <-> x> y
 
   use export unit.Unit
-  logic ignore('a) : unit
+  logic ignore 'a : unit
 
-  type ('a, 'b) arrow
+  type arrow 'a 'b 
 
-  type  'a ref
-  logic (!)('a ref) : 'a
+  type  ref 'a
+  logic (!) (ref 'a) : 'a
 
   type  label
-  logic at  ('a, label) : 'a
-  logic old ('a)        : 'a
+  logic at  'a label : 'a
+  logic old 'a       : 'a
 
   type exn
 
-  logic wf_lt_int(x:int, y:int) = 0 <= y and x < y
+  logic wf_lt_int (x y:int) = 0 <= y and x < y
 
 end
 

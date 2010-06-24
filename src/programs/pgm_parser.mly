@@ -115,7 +115,7 @@
 
 %token UNDERSCORE QUOTE COMMA LEFTPAR RIGHTPAR COLON SEMICOLON
 %token COLONEQUAL ARROW EQUAL AT DOT LEFTSQ RIGHTSQ BANG
-%token LEFTBLEFTB RIGHTBRIGHTB BAR BARBAR AMPAMP STAR
+%token LEFTBLEFTB RIGHTBRIGHTB BAR BARBAR AMPAMP
 %token EOF
 
 /* Precedences */
@@ -146,7 +146,7 @@
 %left EQUAL OP0
 %left OP1
 %left OP2
-%left OP3 STAR
+%left OP3
 %nonassoc prefix_op
 %right unary_op
 %left prec_app
@@ -225,7 +225,6 @@ any_op:
 | OP0   { $1 }
 | OP2   { $1 }
 | OP3   { $1 }
-| STAR  { "*" }
 ;
 
 qualid:
@@ -256,8 +255,6 @@ expr:
    { mk_infix $1 $2 $3 }
 | expr OP3 expr 
    { mk_infix $1 $2 $3 }
-| expr STAR expr 
-   { mk_infix $1 "*" $3 }
 | NOT expr %prec prefix_op
    { mk_expr (mk_apply_id { id = "notb"; id_loc = loc () } [$2]) }
 | any_op expr %prec prefix_op
@@ -300,7 +297,7 @@ expr:
 	   [exit_exn (), None, mk_expr Eskip])) }
 | ABSURD
    { mk_expr Eabsurd }
-| expr COLON simple_pure_type
+| expr COLON pure_type
    { mk_expr (Ecast ($1, $3)) }
 | RAISE uident
    { mk_expr (Eraise ($2, None)) }
@@ -376,16 +373,34 @@ match_case:
 list1_pat_sep_comma:
 | pattern                           { [$1] }
 | pattern COMMA list1_pat_sep_comma { $1::$3 }
+;
 
 pattern:
-| UNDERSCORE                                    { mk_pat (PPpwild) }
-| lident                                        { mk_pat (PPpvar $1) }
-| uqualid                                       { mk_pat (PPpapp ($1, [])) }
-| uqualid LEFTPAR list1_pat_sep_comma RIGHTPAR  { mk_pat (PPpapp ($1, $3)) }
+| pat_arg           { $1 }
+| uqualid pat_args  { mk_pat (PPpapp ($1, $2)) }
+| pattern AS lident { mk_pat (PPpas ($1,$3)) }
+;
+
+pat_args:
+| pat_arg          { [$1] }
+| pat_arg pat_args { $1 :: $2 }
+;
+
+pat_arg:
+| UNDERSCORE
+   { mk_pat (PPpwild) }
+| lident
+   { mk_pat (PPpvar $1) }
+| uqualid                                       
+   { mk_pat (PPpapp ($1, [])) }
 | LEFTPAR pattern COMMA list1_pat_sep_comma RIGHTPAR          
-                                                { mk_pat (PPptuple ($2 :: $4)) }
-| pattern AS lident                             { mk_pat (PPpas ($1,$3)) }
-| LEFTPAR pattern RIGHTPAR                      { $2 }
+   { mk_pat (PPptuple ($2 :: $4)) }
+/*
+| LEFTPAR RIGHTPAR          
+   { mk_pat (PPptuple []) }
+*/
+| LEFTPAR pattern RIGHTPAR
+   { $2 }
 ;
 
 assertion_kind:
@@ -414,43 +429,56 @@ type_var:
 | QUOTE ident { $2 }
 ;
 
-simple_pure_type:
+pure_type:
+| pure_type_arg_no_paren { $1 }
+| lqualid pure_type_args { PPTtyapp ($2, $1) }
+;
+
+pure_type_args:
+| pure_type_arg                { [$1] }
+| pure_type_arg pure_type_args { $1 :: $2 }
+;
+
+pure_type_arg:
+| LEFTPAR pure_type RIGHTPAR { $2 }
+| pure_type_arg_no_paren     { $1 }
+;
+
+pure_type_arg_no_paren:
 | type_var 
    { PPTtyvar $1 }
 | lqualid
    { PPTtyapp ([], $1) }
-| simple_pure_type lqualid
-   { PPTtyapp ([$1], $2) }
-| LEFTPAR pure_type COMMA list1_pure_type_sep_comma RIGHTPAR lqualid
-   { PPTtyapp ($2 :: $4, $6) }
-;
-
-pure_type:
-| simple_pure_type 
-    { $1 }
-| simple_pure_type STAR list1_simple_pure_type_sep_star
-    { PPTtuple ($1 :: $3) }
-;
-
-list1_simple_pure_type_sep_star:
-| simple_pure_type                                      { [$1] }
-| simple_pure_type STAR list1_simple_pure_type_sep_star { $1 :: $3 }
+| LEFTPAR pure_type COMMA list1_pure_type_sep_comma RIGHTPAR
+   { PPTtuple ($2 :: $4) }
+/*
+| LEFTPAR RIGHTPAR
+   { PPTtuple ([]) }
+*/
 ;
 
 list1_pure_type_sep_comma:
-| pure_type                                      { [$1] }
+| pure_type                                 { [$1] }
 | pure_type COMMA list1_pure_type_sep_comma { $1 :: $3 }
 ;
 
 list1_type_v_binder:
-| type_v_binder                     { [$1] }
-| type_v_binder list1_type_v_binder { $1 :: $2 }
+| type_v_binder                     { $1 }
+| type_v_binder list1_type_v_binder { $1 @ $2 }
 ;
 
 type_v_binder:
-| lident                               { $1, None }
-| LEFTPAR RIGHTPAR                     { id_anonymous (), Some (ty_unit ()) }
-| LEFTPAR lident COLON type_v RIGHTPAR { $2, Some $4 }
+| lident
+   { [$1, None] }
+| LEFTPAR RIGHTPAR                      
+   { [id_anonymous (), Some (ty_unit ())] }
+| LEFTPAR lidents COLON type_v RIGHTPAR
+   { List.map (fun i -> (i, Some $4)) $2 }
+;
+
+lidents:
+| lident         { [$1] }
+| lident lidents { $1 :: $2 }
 ;
 
 type_v:
@@ -478,7 +506,7 @@ type_c:
 
 /* for ANY */
 simple_type_c:
-| simple_pure_type
+| pure_type
     { type_c (lexpr_true ()) (Tpure $1) empty_effect (lexpr_true (), []) }
 | LEFTPAR type_v RIGHTPAR
     { type_c (lexpr_true ()) $2 empty_effect (lexpr_true (), []) }

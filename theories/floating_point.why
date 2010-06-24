@@ -18,7 +18,7 @@ theory SpecialValues
 
   use import real.Real
 
-  inductive same_sign_real(sign,real) =
+  inductive same_sign_real sign real =
     | Neg_case: forall x:real. x < 0.0 -> same_sign_real Neg x
     | Pos_case: forall x:real. x > 0.0 -> same_sign_real Pos x
 
@@ -34,19 +34,19 @@ theory GenFloat
 
   type t
 
-  logic round(mode,real) : real
-  logic round_logic(mode,real) : t
+  logic round mode real : real
+  logic round_logic mode real : t
 
-  logic value(t) : real
-  logic exact(t) : real
-  logic model(t) : real
+  logic value t : real
+  logic exact t : real
+  logic model t : real
 
-  logic round_error(x:t) : real = abs (value x - exact x)
-  logic total_error(x:t) : real = abs (value x - model x)
+  logic round_error (x : t) : real = abs (value x - exact x)
+  logic total_error (x : t) : real = abs (value x - model x)
 
   logic max : real
 
-  logic no_overflow(m:mode,x:real) = abs (round m x) <= max
+  logic no_overflow (m:mode) (x:real) = abs (round m x) <= max
 
   axiom Bounded_real_no_overflow :
     forall m:mode, x:real. abs x <= max -> no_overflow m x
@@ -80,8 +80,8 @@ theory GenFloatFull
   use import SpecialValues
 
   (* special values *)
-  logic class(t) : class
-  logic sign(t)  : sign
+  logic class t : class
+  logic sign t  : sign
 
 end
 

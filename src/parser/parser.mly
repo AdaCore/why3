@@ -29,7 +29,7 @@
   let mk_ppl loc d = { pp_loc = loc; pp_desc = d }
   let mk_pp d = mk_ppl (loc ()) d
   let mk_pp_i i d = mk_ppl (loc_i i) d
-		    
+
   let mk_pat p = { pat_loc = loc (); pat_desc = p }
 
   let infix_ppl loc a i b = mk_ppl loc (PPbinop (a, i, b))
@@ -49,7 +49,7 @@
 
 %}
 
-/* Tokens */ 
+/* Tokens */
 
 %token <string> LIDENT UIDENT
 %token <string> INTEGER
@@ -59,22 +59,22 @@
 
 /* keywords */
 
-%token AND AS AXIOM CLONE 
-%token ELSE END EPSILON EXISTS EXPORT FALSE FORALL  
-%token GOAL IF IMPORT IN INDUCTIVE LEMMA 
-%token LET LOGIC MATCH NAMESPACE NOT OR  
+%token AND AS AXIOM CLONE
+%token ELSE END EPSILON EXISTS EXPORT FALSE FORALL
+%token GOAL IF IMPORT IN INDUCTIVE LEMMA
+%token LET LOGIC MATCH NAMESPACE NOT PROP OR
 %token THEN THEORY TRUE TYPE USE WITH
 
 /* symbols */
 
 %token ARROW
-%token BAR 
-%token COLON COMMA  
+%token BAR
+%token COLON COMMA
 %token DOT EQUAL
-%token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ 
+%token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
 %token LRARROW
 %token QUOTE
-%token RIGHTPAR RIGHTSQ STAR
+%token RIGHTPAR RIGHTSQ
 %token UNDERSCORE
 
 %token EOF
@@ -86,16 +86,16 @@
 %nonassoc LOGIC TYPE INDUCTIVE
 
 %nonassoc DOT ELSE IN
-%nonassoc COLON 
+%nonassoc COLON
 
 %nonassoc prec_named
 %right ARROW LRARROW
-%right OR 
-%right AND 
+%right OR
+%right AND
 %nonassoc NOT
 %left EQUAL OP1
 %left OP2
-%left OP3 STAR
+%left OP3
 %left OP4
 %nonassoc prefix_op
 %nonassoc OPPREF
@@ -110,156 +110,26 @@
 %start logic_file
 %%
 
+/* File, theory, declaration */
+
 logic_file:
-| list1_theory EOF
-   { $1 }
-| EOF 
-   { [] }
+| list1_theory EOF  { $1 }
+| EOF               { [] }
 ;
 
-list1_decl:
-| decl 
-   { [$1] }
-| decl list1_decl 
-   { $1 :: $2 }
+list1_theory:
+| theory                { [$1] }
+| theory list1_theory   { $1 :: $2 }
+;
+
+theory:
+| THEORY uident list0_decl END
+   { { pt_loc = loc (); pt_name = $2; pt_decl = $3 } }
 ;
 
 list0_decl:
-| /* epsilon */
-   { [] }
-| list1_decl 
-   { $1 }
-;
-
-ident:
-| uident { $1 }
-| lident { $1 }
-;
-
-ident_rich:
-| uident      { $1 }
-| lident_rich { $1 }
-;
-
-lident:
-| LIDENT
-    { { id = $1; id_loc = loc () } }
-;
-
-lident_rich:
-| lident
-    { $1 }
-| LEFTPAR lident_op RIGHTPAR 
-    { { id = infix $2; id_loc = loc () } }
-| LEFTPAR_STAR_RIGHTPAR
-    { { id = infix "*"; id_loc = loc () } }
-| LEFTPAR lident_op UNDERSCORE RIGHTPAR 
-    { { id = prefix $2; id_loc = loc () } }
-| LEFTPAR OPPREF RIGHTPAR 
-    { { id = prefix $2; id_loc = loc () } }
-;
-
-lident_op:
-| OP1   { $1 }
-| OP2   { $1 }
-| OP3   { $1 }
-| STAR  { "*" }
-| OP4   { $1 }
-| EQUAL { "=" }
-;
-
-any_op:
-| OP1   { $1 }
-| OP2   { $1 }
-| OP3   { $1 }
-| STAR  { "*" }
-| OP4   { $1 }
-;
-
-uident:
-| UIDENT { { id = $1; id_loc = loc () } }
-;
-
-lqualid:
-| lident             { Qident $1 }
-| uqualid DOT lident { Qdot ($1, $3) }
-;
-
-uqualid:
-| uident             { Qident $1 }
-| uqualid DOT uident { Qdot ($1, $3) }
-;
-
-any_qualid:
-| ident                { Qident $1 }
-| any_qualid DOT ident { Qdot ($1, $3) }
-;
-
-tqualid:
-| uident                { Qident $1 }
-| any_qualid DOT uident { Qdot ($1, $3) }
-
-qualid:
-| ident_rich             { Qident $1 }
-| uqualid DOT ident_rich { Qdot ($1, $3) }
-
-params:
-| /* epsilon */                          { [] }
-| LEFTPAR list1_param_sep_comma RIGHTPAR { $2 }
-;
-
-param:
-| primitive_type              { None, $1 }
-| lident COLON primitive_type { Some $1, $3 }
-;
-
-list1_param_sep_comma:
-| param                             { [$1] }
-| param COMMA list1_param_sep_comma { $1 :: $3 }
-;
-
-primitive_types:
-| /* epsilon */                                   { [] }
-| LEFTPAR list1_primitive_type_sep_comma RIGHTPAR { $2 }
-
-logic_type_option:
-| /* epsilon */        { None }
-| COLON primitive_type { Some $2 }
-;
-
-logic_def_option:
-| /* epsilon */ { None }
-| EQUAL lexpr   { Some $2 }
-;
-
-logic_decl:
-| LOGIC lident_rich params logic_type_option logic_def_option
-  { { ld_loc = loc (); ld_ident = $2; ld_params = $3; 
-      ld_type = $4; ld_def = $5; } }
-;
-
-list1_logic_decl:
-| logic_decl                  %prec prec_decls { [$1] }
-| logic_decl list1_logic_decl                  { $1 :: $2 }
-;
-
-type_decl:
-| TYPE type_args lident typedefn
-  { { td_loc = loc (); td_ident = $3; td_params = $2; td_def = $4 } }
-;
-
-list1_type_decl:
-| type_decl                  %prec prec_decls { [$1] }
-| type_decl list1_type_decl                   { $1 :: $2 }
-;
-
-inductive_decl:
-| INDUCTIVE lident_rich primitive_types inddefn
-  { { in_loc = loc (); in_ident = $2; in_params = $3; in_def = $4 } }
-
-list1_inductive_decl:
-| inductive_decl                      %prec prec_decls { [$1] }
-| inductive_decl list1_inductive_decl                  { $1 :: $2 }
+| /* epsilon */    { [] }
+| decl list0_decl  { $1 :: $2 }
 ;
 
 decl:
@@ -289,33 +159,62 @@ decl:
     { Namespace (loc (), true, None, $4) }
 ;
 
-list1_theory:
-| theory 
-   { [$1] }
-| theory list1_theory 
-   { $1 :: $2 }
+/* Use and clone */
+
+use:
+| imp_exp tqualid
+    { { use_theory = $2; use_as = None; use_imp_exp = $1 } }
+| imp_exp tqualid AS uident
+    { { use_theory = $2; use_as = Some (Some $4); use_imp_exp = $1 } }
+| imp_exp tqualid AS UNDERSCORE
+    { { use_theory = $2; use_as = Some None; use_imp_exp = $1 } }
 ;
 
-theory:
-| THEORY uident list0_decl END 
-   { { pt_loc = loc (); pt_name = $2; pt_decl = $3 } }
+imp_exp:
+| IMPORT        { Import }
+| EXPORT        { Export }
+| /* epsilon */ { Nothing }
+;
+
+clone_subst:
+| /* epsilon */          { [] }
+| WITH list1_comma_subst { $2 }
+;
+
+list1_comma_subst:
+| subst                         { [$1] }
+| subst COMMA list1_comma_subst { $1 :: $3 }
+;
+
+subst:
+| TYPE  qualid EQUAL qualid { CStsym ($2, $4) }
+| LOGIC qualid EQUAL qualid { CSlsym ($2, $4) }
+| LEMMA qualid              { CSlemma $2 }
+| GOAL  qualid              { CSgoal  $2 }
+;
+
+/* Type declarations */
+
+list1_type_decl:
+| type_decl                  %prec prec_decls { [$1] }
+| type_decl list1_type_decl                   { $1 :: $2 }
+;
+
+type_decl:
+| TYPE lident type_args typedefn
+  { { td_loc = loc (); td_ident = $2; td_params = $3; td_def = $4 } }
 ;
 
 type_args:
-| /* epsilon */                                             { [] }
-| type_var                                                  { [$1] }
-| LEFTPAR type_var COMMA list1_type_var_sep_comma RIGHTPAR  { $2 :: $4 }
+| /* epsilon */      { [] }
+| type_var type_args { $1 :: $2 }
 ;
 
 typedefn:
-| /* epsilon */
-    { TDabstract }
-| EQUAL primitive_type
-    { TDalias $2 }
-| EQUAL typecases
-    { TDalgebraic $2 }
-| EQUAL BAR typecases
-    { TDalgebraic $3 }
+| /* epsilon */           { TDabstract }
+| EQUAL primitive_type    { TDalias $2 }
+| EQUAL typecases         { TDalgebraic $2 }
+| EQUAL BAR typecases     { TDalgebraic $3 }
 ;
 
 typecases:
@@ -324,8 +223,42 @@ typecases:
 ;
 
 typecase:
-| uident primitive_types { (loc_i 1,$1,$2) }
+| uident params   { (loc_i 1,$1,$2) }
 ;
+
+/* Logic declarations */
+
+list1_logic_decl:
+| logic_decl                  %prec prec_decls { [$1] }
+| logic_decl list1_logic_decl                  { $1 :: $2 }
+;
+
+logic_decl:
+| LOGIC lident_rich params logic_type_option logic_def_option
+  { { ld_loc = loc (); ld_ident = $2; ld_params = $3;
+      ld_type = $4; ld_def = $5; } }
+;
+
+logic_type_option:
+| /* epsilon */        { None }
+| COLON primitive_type { Some $2 }
+;
+
+logic_def_option:
+| /* epsilon */ { None }
+| EQUAL lexpr   { Some $2 }
+;
+
+/* Inductive declarations */
+
+list1_inductive_decl:
+| inductive_decl                      %prec prec_decls { [$1] }
+| inductive_decl list1_inductive_decl                  { $1 :: $2 }
+;
+
+inductive_decl:
+| INDUCTIVE lident_rich params inddefn
+  { { in_loc = loc (); in_ident = $2; in_params = $3; in_def = $4 } }
 
 inddefn:
 | /* epsilon */       { [] }
@@ -341,26 +274,39 @@ indcase:
 | uident COLON lexpr { (loc (),$1,$3) }
 ;
 
-simple_primitive_type:
-| type_var 
-   { PPTtyvar $1 }
-| lqualid
+/* Type expressions */
+
+primitive_type:
+| primitive_type_arg           { $1 }
+| lqualid primitive_type_args  { PPTtyapp ($2, $1) }
+;
+
+primitive_type_non_lident:
+| primitive_type_arg_non_lident  { $1 }
+| lq_uident primitive_type_args  { PPTtyapp ($2, $1) }
+;
+
+primitive_type_args:
+| primitive_type_arg                      { [$1] }
+| primitive_type_arg primitive_type_args  { $1 :: $2 }
+;
+
+primitive_type_arg:
+| lq_lident                      { PPTtyapp ([], $1) }
+| primitive_type_arg_non_lident  { $1 }
+;
+
+primitive_type_arg_non_lident:
+| lq_uident
    { PPTtyapp ([], $1) }
-| simple_primitive_type lqualid
-   { PPTtyapp ([$1], $2) }
-| LEFTPAR primitive_type COMMA list1_primitive_type_sep_comma RIGHTPAR lqualid
-   { PPTtyapp ($2 :: $4, $6) }
+| type_var
+   { PPTtyvar $1 }
+| LEFTPAR primitive_type COMMA list1_primitive_type_sep_comma RIGHTPAR
+   { PPTtuple ($2 :: $4) }
 | LEFTPAR RIGHTPAR
    { PPTtuple [] }
 | LEFTPAR primitive_type RIGHTPAR
    { $2 }
-;
-
-primitive_type:
-| simple_primitive_type 
-    { $1 }
-| simple_primitive_type STAR list1_simple_primitive_type_sep_star 
-   { PPTtuple ($1 :: $3) }
 ;
 
 list1_primitive_type_sep_comma:
@@ -368,38 +314,36 @@ list1_primitive_type_sep_comma:
 | primitive_type COMMA list1_primitive_type_sep_comma { $1 :: $3 }
 ;
 
-list1_simple_primitive_type_sep_star:
-| simple_primitive_type                                           { [$1] }
-| simple_primitive_type STAR list1_simple_primitive_type_sep_star { $1 :: $3 }
+type_var:
+| QUOTE ident { $2 }
 ;
 
+/* Logic expressions */
+
 lexpr:
-| lexpr ARROW lexpr 
+| lexpr ARROW lexpr
    { infix_pp $1 PPimplies $3 }
-| lexpr LRARROW lexpr 
+| lexpr LRARROW lexpr
    { infix_pp $1 PPiff $3 }
-| lexpr OR lexpr 
+| lexpr OR lexpr
    { infix_pp $1 PPor $3 }
-| lexpr AND lexpr 
+| lexpr AND lexpr
    { infix_pp $1 PPand $3 }
-| NOT lexpr 
+| NOT lexpr
    { prefix_pp PPnot $2 }
-| lexpr EQUAL lexpr 
+| lexpr EQUAL lexpr
    { let id = { id = infix "="; id_loc = loc_i 2 } in
      mk_pp (PPinfix ($1, id, $3)) }
-| lexpr OP1 lexpr 
+| lexpr OP1 lexpr
    { let id = { id = infix $2; id_loc = loc_i 2 } in
      mk_pp (PPinfix ($1, id, $3)) }
-| lexpr OP2 lexpr 
+| lexpr OP2 lexpr
    { let id = { id = infix $2; id_loc = loc_i 2 } in
      mk_pp (PPinfix ($1, id, $3)) }
-| lexpr OP3 lexpr 
+| lexpr OP3 lexpr
    { let id = { id = infix $2; id_loc = loc_i 2 } in
      mk_pp (PPinfix ($1, id, $3)) }
-| lexpr STAR lexpr 
-   { let id = { id = infix "*"; id_loc = loc_i 2 } in
-     mk_pp (PPinfix ($1, id, $3)) }
-| lexpr OP4 lexpr 
+| lexpr OP4 lexpr
    { let id = { id = infix $2; id_loc = loc_i 2 } in
      mk_pp (PPinfix ($1, id, $3)) }
 | any_op lexpr %prec prefix_op
@@ -409,13 +353,13 @@ lexpr:
    { mk_pp (PPapp ($1, $2)) }
 | IF lexpr THEN lexpr ELSE lexpr
    { mk_pp (PPif ($2, $4, $6)) }
-| FORALL list1_uquant_sep_comma triggers DOT lexpr
+| FORALL list1_param_var_sep_comma triggers DOT lexpr
    { mk_pp (PPquant (PPforall, $2, $3, $5)) }
-| EXISTS list1_uquant_sep_comma triggers DOT lexpr
+| EXISTS list1_param_var_sep_comma triggers DOT lexpr
    { mk_pp (PPquant (PPexists, $2, $3, $5)) }
 | STRING lexpr %prec prec_named
    { mk_pp (PPnamed ($1, $2)) }
-| LET pattern EQUAL lexpr IN lexpr 
+| LET pattern EQUAL lexpr IN lexpr
    { match $2.pat_desc with
        | PPpvar id -> mk_pp (PPlet (id, $4, $6))
        | _ -> mk_pp (PPmatch ([$4], [[$2], $6])) }
@@ -423,11 +367,15 @@ lexpr:
    { mk_pp (PPmatch ($2, $5)) }
 | EPSILON lident COLON primitive_type DOT lexpr
    { mk_pp (PPeps ($2, $4, $6)) }
-| lexpr COLON simple_primitive_type
+| lexpr COLON primitive_type
    { mk_pp (PPcast ($1, $3)) }
-| lexpr_arg 
+| lexpr_arg
    { $1 }
 ;
+
+list1_lexpr_arg:
+| lexpr_arg                 { [$1] }
+| lexpr_arg list1_lexpr_arg { $1::$2 }
 
 lexpr_arg:
 | qualid
@@ -439,7 +387,7 @@ lexpr_arg:
 | TRUE
    { mk_pp PPtrue }
 | FALSE
-   { mk_pp PPfalse }    
+   { mk_pp PPfalse }
 | LEFTPAR lexpr RIGHTPAR
    { $2 }
 | LEFTPAR RIGHTPAR
@@ -450,16 +398,28 @@ lexpr_arg:
    { let id = { id = prefix $1; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$2])) }
 
-list1_lexpr_arg:
-| lexpr_arg                 { [$1] }
-| lexpr_arg list1_lexpr_arg { $1::$2 }
+/* Triggers */
 
-list1_uquant_sep_comma:
-| uquant                              { [$1] }
-| uquant COMMA list1_uquant_sep_comma { $1::$3 }
+triggers:
+| /* epsilon */                         { [] }
+| LEFTSQ list1_trigger_sep_bar RIGHTSQ  { $2 }
+;
 
-uquant:
-| list1_lident COLON primitive_type { $1,$3 }
+list1_trigger_sep_bar:
+| trigger                           { [$1] }
+| trigger BAR list1_trigger_sep_bar { $1 :: $3 }
+;
+
+trigger:
+| list1_lexpr_sep_comma { $1 }
+;
+
+list1_lexpr_sep_comma:
+| lexpr                             { [$1] }
+| lexpr COMMA list1_lexpr_sep_comma { $1 :: $3 }
+;
+
+/* Match expressions */
 
 match_cases:
 | match_case                  { [$1] }
@@ -474,92 +434,166 @@ list1_pat_sep_comma:
 | pattern                           { [$1] }
 | pattern COMMA list1_pat_sep_comma { $1::$3 }
 
-list1_pat_arg:
-| pat_arg               { [$1] }
-| pat_arg list1_pat_arg { $1::$2 }
-
 pattern:
 | pat_arg               { $1 }
 | uqualid list1_pat_arg { mk_pat (PPpapp ($1, $2)) }
 | pattern AS lident     { mk_pat (PPpas ($1,$3)) }
 
+list1_pat_arg:
+| pat_arg               { [$1] }
+| pat_arg list1_pat_arg { $1::$2 }
+
 pat_arg:
-| UNDERSCORE                                    { mk_pat (PPpwild) }
-| lident                                        { mk_pat (PPpvar $1) }
-| uqualid                                       { mk_pat (PPpapp ($1, [])) }
-| LEFTPAR pattern RIGHTPAR                      { $2 }
-| LEFTPAR RIGHTPAR                              { mk_pat (PPptuple []) }
-| LEFTPAR pattern COMMA list1_pat_sep_comma RIGHTPAR 
-    { mk_pat (PPptuple ($2 :: $4)) }
+| UNDERSCORE
+   { mk_pat (PPpwild) }
+| lident
+   { mk_pat (PPpvar $1) }
+| uqualid
+   { mk_pat (PPpapp ($1, [])) }
+| LEFTPAR pattern RIGHTPAR
+   { $2 }
+| LEFTPAR RIGHTPAR
+   { mk_pat (PPptuple []) }
+| LEFTPAR pattern COMMA list1_pat_sep_comma RIGHTPAR
+   { mk_pat (PPptuple ($2 :: $4)) }
 ;
 
-triggers:
-| /* epsilon */                         { [] }
-| LEFTSQ list1_trigger_sep_bar RIGHTSQ  { $2 }
+/* Parameters */
+
+params:
+| /* epsilon */   { [] }
+| param params    { $1 @ $2 }
 ;
 
-list1_trigger_sep_bar:
-| trigger                           { [$1] }
-| trigger BAR list1_trigger_sep_bar { $1 :: $3 }
+param:
+| LEFTPAR param_var RIGHTPAR
+   { $2 }
+| LEFTPAR param_type RIGHTPAR
+   { [None, $2] }
+| LEFTPAR param_type COMMA list1_primitive_type_sep_comma RIGHTPAR
+   { [None, PPTtuple ($2::$4)] }
+| LEFTPAR RIGHTPAR
+   { [None, PPTtuple []] }
+| type_var
+   { [None, PPTtyvar $1] }
+| lqualid
+   { [None, PPTtyapp ([], $1)] }
 ;
 
-trigger:
-  list1_lexpr_sep_comma { $1 }
+param_type:
+| lident param_type_cont
+   { PPTtyapp ($2, Qident $1) }
+| lident list1_lident param_type_cont
+   { let id2ty i = PPTtyapp ([], Qident i) in
+     PPTtyapp (List.map id2ty $2 @ $3, Qident $1) }
+| primitive_type_non_lident
+   { $1 }
 ;
 
-list1_lexpr_sep_comma:
-| lexpr                             { [$1] }
-| lexpr COMMA list1_lexpr_sep_comma { $1 :: $3 }
+param_type_cont:
+| /* epsilon */                                      { [] }
+| primitive_type_arg_non_lident                      { [$1] }
+| primitive_type_arg_non_lident primitive_type_args  { $1 :: $2 }
 ;
 
-type_var:
-| QUOTE ident { $2 }
+list1_param_var_sep_comma:
+| param_var                                  { $1 }
+| param_var COMMA list1_param_var_sep_comma  { $1 @ $3 }
 ;
 
-list1_type_var_sep_comma:
-| type_var                                { [$1] }
-| type_var COMMA list1_type_var_sep_comma { $1 :: $3 }
+param_var:
+| list1_lident COLON primitive_type
+   { List.map (fun id -> (Some id, $3)) $1 }
 ;
+
+list1_lident:
+| lident               { [$1] }
+| lident list1_lident  { $1 :: $2 }
+;
+
+/* Idents */
+
+ident:
+| uident { $1 }
+| lident { $1 }
+;
+
+ident_rich:
+| uident      { $1 }
+| lident_rich { $1 }
+;
+
+lident_rich:
+| lident
+    { $1 }
+| LEFTPAR lident_op RIGHTPAR
+    { { id = infix $2; id_loc = loc () } }
+| LEFTPAR_STAR_RIGHTPAR
+    { { id = infix "*"; id_loc = loc () } }
+| LEFTPAR lident_op UNDERSCORE RIGHTPAR
+    { { id = prefix $2; id_loc = loc () } }
+| LEFTPAR OPPREF RIGHTPAR
+    { { id = prefix $2; id_loc = loc () } }
+;
+
+lident:
+| LIDENT  { { id = $1; id_loc = loc () } }
+;
+
+lident_op:
+| OP1   { $1 }
+| OP2   { $1 }
+| OP3   { $1 }
+| OP4   { $1 }
+| EQUAL { "=" }
+;
+
+any_op:
+| OP1   { $1 }
+| OP2   { $1 }
+| OP3   { $1 }
+| OP4   { $1 }
+;
+
+uident:
+| UIDENT { { id = $1; id_loc = loc () } }
+;
+
+lq_lident:
+| lident             { Qident $1 }
+;
+
+lq_uident:
+| uqualid DOT lident { Qdot ($1, $3) }
+;
+
+lqualid:
+| lq_lident { $1 }
+| lq_uident { $1 }
+;
+
+uqualid:
+| uident             { Qident $1 }
+| uqualid DOT uident { Qdot ($1, $3) }
+;
+
+any_qualid:
+| ident                { Qident $1 }
+| any_qualid DOT ident { Qdot ($1, $3) }
+;
+
+tqualid:
+| uident                { Qident $1 }
+| any_qualid DOT uident { Qdot ($1, $3) }
+
+qualid:
+| ident_rich             { Qident $1 }
+| uqualid DOT ident_rich { Qdot ($1, $3) }
+
+/* Misc */
 
 bar_:
 | /* epsilon */ { () }
 | BAR           { () }
-;
-
-list1_lident:
-| lident              { [$1] }
-| lident list1_lident { $1 :: $2 }
-;
-
-use:
-| imp_exp tqualid              
-    { { use_theory = $2; use_as = None; use_imp_exp = $1 } }
-| imp_exp tqualid AS uident
-    { { use_theory = $2; use_as = Some (Some $4); use_imp_exp = $1 } }
-| imp_exp tqualid AS UNDERSCORE
-    { { use_theory = $2; use_as = Some None; use_imp_exp = $1 } }
-;
-
-imp_exp:
-| IMPORT        { Import }
-| EXPORT        { Export }
-| /* epsilon */ { Nothing }
-;
-
-clone_subst:
-| /* epsilon */          { [] } 
-| WITH list1_comma_subst { $2 }
-;
-
-list1_comma_subst:
-| subst                         { [$1] }
-| subst COMMA list1_comma_subst { $1 :: $3 } 
-;
-
-subst:
-| TYPE  qualid EQUAL qualid { CStsym ($2, $4) }
-| LOGIC qualid EQUAL qualid { CSlsym ($2, $4) }
-| LEMMA qualid              { CSlemma $2 }
-| GOAL  qualid              { CSgoal  $2 }
 ;
 

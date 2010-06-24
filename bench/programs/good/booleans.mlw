@@ -1,7 +1,7 @@
 
-parameter incr : x:int ref -> { } unit writes x { !x = old !x + 1 }
+parameter incr : x:ref int -> { } unit writes x { !x = old !x + 1 }
 
-parameter x : int ref
+parameter x : ref int
 
 parameter id_not_0 : x:int -> { x <> 0 } int { result = x }
 
@@ -48,8 +48,8 @@ let test_all_1 () =
   logic d : int
 }
 
-parameter vx : int ref
-parameter vy : int ref
+parameter vx : ref int
+parameter vy : ref int
 
 parameter sq : x:int -> {} int { result = x*x }
 

@@ -1,9 +1,9 @@
 
 {
-  logic q1(int, int, int)
+  logic q1 int int int
 }
 
-parameter r : int ref
+parameter r : ref int
 
 parameter f1 : y:int ->
              {} unit writes r { q1 (!r) (old (!r)) y }
@@ -11,14 +11,14 @@ parameter f1 : y:int ->
 let g1 () = {} f1 !r { q1 (!r) (old (!r)) (old (!r)) }
 
 {
-  logic foo(int) : int
-  logic q(int, int, int)
+  logic foo int : int
+  logic q int int int
 }
 
-parameter f : t:int ref -> x:int -> 
+parameter f : t:ref int -> x:int -> 
              {} unit reads t writes t { q (!t) (old (!t)) x }
 
-let g (t:int ref) =
+let g (t:ref int) =
   {}
   f t (foo !t)
   { q (!t) (old (!t)) (foo (old (!t))) }

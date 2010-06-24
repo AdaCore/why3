@@ -48,8 +48,6 @@ and dpattern_node =
 
 val pattern : vsymbol Mstr.t -> dpattern -> vsymbol Mstr.t * pattern
 
-type uquant = string list * dty
-
 type dterm = { dt_node : dterm_node; dt_ty : dty }
 
 and dterm_node =
@@ -64,7 +62,7 @@ and dterm_node =
 
 and dfmla =
   | Fapp of lsymbol * dterm list
-  | Fquant of quant * uquant list * dtrigger list list * dfmla
+  | Fquant of quant * (string * dty) list * dtrigger list list * dfmla
   | Fbinop of binop * dfmla * dfmla
   | Fnot of dfmla
   | Ftrue

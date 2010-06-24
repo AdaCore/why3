@@ -46,6 +46,8 @@ type pty =
   | PPTtyapp of pty list * qualid
   | PPTtuple of pty list
 
+type param = ident option * pty
+
 type pattern =
   { pat_loc : loc; pat_desc : pat_desc }
 
@@ -55,9 +57,6 @@ and pat_desc =
   | PPpapp of qualid * pattern list
   | PPptuple of pattern list
   | PPpas of pattern * ident
-
-type uquant =
-  ident list * pty
 
 type lexpr = 
   { pp_loc : loc; pp_desc : pp_desc }
@@ -72,7 +71,7 @@ and pp_desc =
   | PPbinop of lexpr * pp_binop * lexpr
   | PPunop of pp_unop * lexpr
   | PPif of lexpr * lexpr * lexpr
-  | PPquant of pp_quant * uquant list * lexpr list list * lexpr
+  | PPquant of pp_quant * param list * lexpr list list * lexpr
   | PPnamed of string * lexpr
   | PPlet of ident * lexpr * lexpr
   | PPeps of ident * pty * lexpr
@@ -101,12 +100,10 @@ type clone_subst =
   | CSlemma of qualid
   | CSgoal  of qualid
       
-type param = ident option * pty
-
 type type_def = 
   | TDabstract
   | TDalias     of pty
-  | TDalgebraic of (loc * ident * pty list) list
+  | TDalgebraic of (loc * ident * param list) list
 
 type type_decl = {
   td_loc    : loc;
@@ -126,7 +123,7 @@ type logic_decl = {
 type ind_decl = {
   in_loc    : loc;
   in_ident  : ident;
-  in_params : pty list;
+  in_params : param list;
   in_def    : (loc * ident * lexpr) list;
 }
 

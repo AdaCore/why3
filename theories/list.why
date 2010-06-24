@@ -1,7 +1,7 @@
 
 theory List
 
-  type 'a list = Nil | Cons('a, 'a list)
+  type list 'a = Nil | Cons 'a (list 'a)
 
 end
 
@@ -9,20 +9,20 @@ theory Length
   use import int.Int
   use import List
 
-  logic length(l : 'a list) : int = 
+  logic length (l : list 'a) : int = 
     match l with
     | Nil      -> 0
     | Cons _ r -> 1 + length(r)
     end
 
-  lemma Length_nonnegative : forall l:'a list. length(l) >= 0
+  lemma Length_nonnegative : forall l:list 'a. length(l) >= 0
 
 end
 
 theory Mem
   use export List
  
-  logic mem(x: 'a, l : 'a list) = match l with
+  logic mem (x: 'a) (l : list 'a) = match l with
     | Nil      -> false
     | Cons y r -> x = y or mem x r
     end
@@ -36,12 +36,12 @@ end
 theory Induction
   use import List
 
-  logic p ('a list)
+  logic p (list 'a)
 
   axiom Induction : 
-    p (Nil : 'a list) ->
-    (forall x:'a. forall l:'a list. p l -> p (Cons x l)) ->
-    forall l:'a list. p l
+    p (Nil : list 'a) ->
+    (forall x:'a. forall l:list 'a. p l -> p (Cons x l)) ->
+    forall l:list 'a. p l
 
 end
 
@@ -50,9 +50,9 @@ theory Map
  
   type a
   type b 
-  logic f (a) : b
+  logic f a : b
 
-  logic map(l : a list) : b list = 
+  logic map(l : list a) : list b = 
     match l with
     | Nil      -> Nil
     | Cons x r -> Cons (f x) (map r)

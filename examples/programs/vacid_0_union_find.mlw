@@ -3,32 +3,32 @@
 
   use array.ArrayLength as A
 
-  type 'a array = 'a A.t
+  type array 'a = A.t 'a
 
-  logic (#)(a : 'a array, i : int) : 'a = A.select a i
+  logic (#) (a : array 'a) (i : int) : 'a = A.select a i
 
-  type uf = (* link: *) int array * 
-            (* dist: *) int array * (* distance to representative *)
-            (* size: *) int       * 
-            (* num : *) int
+  type uf = ((* link: *) array int,
+             (* dist: *) array int, (* distance to representative *)
+             (* size: *) int,
+             (* num : *) int)
 
-  logic link(u : uf) : int array = let (l, _, _, _) = u in l
-  logic dist(u : uf) : int array = let (_, d, _, _) = u in d
-  logic size(u : uf) : int       = let (_, _, s, _) = u in s
-  logic num (u : uf) : int       = let (_, _, _, n) = u in n
+  logic link (u : uf) : array int = let (l, _, _, _) = u in l
+  logic dist (u : uf) : array int = let (_, d, _, _) = u in d
+  logic size (u : uf) : int       = let (_, _, s, _) = u in s
+  logic num  (u : uf) : int       = let (_, _, _, n) = u in n
 
-  logic inv(u : uf) =
+  logic inv (u : uf) =
     let (l, d, s, n) = u in
     (forall i:int. 0 <= i < s -> 0 <= l#i < s) and
     (forall i:int. 0 <= i < s -> 
        (d#i = 0 and l#i = i or d#i > 0 and d#(l#i) = d#i - 1))
 
-  logic repr(u:uf, x:int) : int = 
+  logic repr (u:uf) (x:int) : int = 
     let l = link(u) in 
     let y = l#x in
     if y = x then y else repr u y  
 
-  logic same(u:uf, x:int, y:int) = repr u x = repr u y
+  logic same (u:uf) (x y:int) = repr u x = repr u y
 
   axiom OneClass :
     forall u:uf. num u = 1 -> 
@@ -36,7 +36,7 @@
 
 }
 
-let get_num_classes (u:uf ref) =
+let get_num_classes (u:ref uf) =
   {} num !u { result = num !u }
 
 let create (n:int) =
@@ -56,7 +56,7 @@ let create (n:int) =
     num !result = n and size !result = n and
     forall x:int. 0 <= x < n -> repr !result x = x }
 
-let find (u:uf ref) (x:int) =
+let find (u:ref uf) (x:int) =
   { inv !u and 0 <= x < size !u } 
   let l = link !u in
   let y = ref x in
@@ -71,12 +71,12 @@ let find (u:uf ref) (x:int) =
     size !u = size (old !u) and num !u = num (old !u) and 
     forall x:int. 0 <= x < size !u -> repr !u x = repr (old !u) x } 
 
-parameter ghost_find : u:uf ref -> x:int ->
+parameter ghost_find : u:ref uf -> x:int ->
   { inv !u and 0 <= x < size !u }
   int reads u
   { result = repr !u x }
 
-let increment (u : uf ref) (r : int) =
+let increment (u : ref uf) (r : int) =
   { inv !u and 0 <= r < size !u }
   let i = ref 0 in
   let d = ref (dist !u) in
@@ -93,7 +93,7 @@ let increment (u : uf ref) (r : int) =
   { forall i:int. 0 <= i < size !u ->
       result#i = (dist !u)#i + if repr !u i = r then 1 else 0 }
 
-let union (u:uf ref) (a:int) (b:int) =
+let union (u:ref uf) (a b:int) =
   { inv !u and 
     0 <= a < size !u and 0 <= b < size !u and not same !u a b }
   let ra = find u a in

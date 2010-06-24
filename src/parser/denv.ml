@@ -140,8 +140,6 @@ let rec pattern env p =
       let env, p = pattern (Mstr.add x v env) p in
       env, pat_as p v
 
-type uquant = string list * dty
-
 type dterm = { dt_node : dterm_node; dt_ty : dty }
 
 and dterm_node =
@@ -156,7 +154,7 @@ and dterm_node =
 
 and dfmla =
   | Fapp of lsymbol * dterm list
-  | Fquant of quant * uquant list * dtrigger list list * dfmla
+  | Fquant of quant * (string * dty) list * dtrigger list list * dfmla
   | Fbinop of binop * dfmla * dfmla
   | Fnot of dfmla
   | Ftrue
@@ -219,12 +217,10 @@ and fmla env = function
       f_if (fmla env f1) (fmla env f2) (fmla env f3)
   | Fquant (q, uqu, trl, f1) ->
       (* TODO: shouldn't we localize this ident? *)
-      let uquant env (xl,ty) =
+      let uquant env (x,ty) =
         let ty = ty_of_dty ty in
-        map_fold_left
-          (fun env x ->
-             let v = create_vsymbol (id_fresh x) ty in Mstr.add x v env, v)
-          env xl
+        let v = create_vsymbol (id_fresh x) ty in
+        Mstr.add x v env, v
       in
       let env, vl = map_fold_left uquant env uqu in
       let trigger = function
@@ -232,7 +228,7 @@ and fmla env = function
 	| TRfmla f -> Fmla (fmla env f)
       in
       let trl = List.map (List.map trigger) trl in
-      f_quant q (List.concat vl) trl (fmla env f1)
+      f_quant q vl trl (fmla env f1)
   | Fapp (s, tl) ->
       f_app s (List.map (term env) tl)
   | Flet (e1, x, f2) ->
@@ -327,7 +323,7 @@ and specialize_fmla ~loc htv f = match f.f_node with
       Fapp (ls, List.map (specialize_term ~loc htv) tl)
   | Term.Fquant (q, fq) ->
       let vl, tl, f = f_open_quant fq in
-      let uquant v = [v.vs_name.id_string], specialize_ty ~loc htv v.vs_ty in
+      let uquant v = v.vs_name.id_string, specialize_ty ~loc htv v.vs_ty in
       let tl = List.map (List.map (specialize_trigger ~loc htv)) tl in
       Fquant (q, List.map uquant vl, tl, specialize_fmla ~loc htv f)
   | Term.Fbinop (b, f1, f2) ->

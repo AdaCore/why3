@@ -29,30 +29,29 @@ back  +-+-+-+-------------------+
   logic c1 : elt
   logic c2 : elt
 
-  type 'a array = 'a A.t
+  type array 'a = A.t 'a
 
-  logic (#)(a : 'a array, i : int) : 'a = A.select a i
+  logic (#) (a : array 'a) (i : int) : 'a = A.select a i
 
-  type sparse_array = 
-    elt array * int array * int array * int (*sz*) * int (*n*)
+  type sparse_array = (array elt, array int, array int, int (*sz*), int (*n*))
 
-  logic sa_val (a : sparse_array) : elt array = let (v, _, _, _, _) = a in v
-  logic sa_idx (a : sparse_array) : int array = let (_, i, _, _, _) = a in i
-  logic sa_back(a : sparse_array) : int array = let (_, _, b, _, _) = a in b
+  logic sa_val (a : sparse_array) : array elt = let (v, _, _, _, _) = a in v
+  logic sa_idx (a : sparse_array) : array int = let (_, i, _, _, _) = a in i
+  logic sa_back(a : sparse_array) : array int = let (_, _, b, _, _) = a in b
   logic sa_sz  (a : sparse_array) : int       = let (_, _, _, s, _) = a in s
   logic sa_n   (a : sparse_array) : int       = let (_, _, _, _, n) = a in n
 
-  logic is_elt(a : sparse_array, i : int) =
+  logic is_elt (a : sparse_array) (i : int) =
     let (val, idx, back, _, n) = a in
     0 <= idx#i < n and back#(idx#i) = i
 
-  logic model(a : sparse_array, i : int) : elt =
+  logic model (a : sparse_array) (i : int) : elt =
     if is_elt a i then
       (sa_val a)#i
     else
       default
 
-  logic invariant(a : sparse_array) = 
+  logic invariant (a : sparse_array) = 
     let (val, idx, back, sz, n) = a in
     0 <= n <= sz <= maxlen and
     forall i : int. 0 <= i < n -> 0 <= back#i < sz and idx#(back#i) = i
@@ -64,15 +63,15 @@ back  +-+-+-+-------------------+
     the proof of WPs for the function [set] below.
   *)
 
-  logic permutation (n : int, a : int array) =
+  logic permutation (n : int) (a : array int) =
     (forall i : int. 0 <= i < n -> 0 <= a#i < n) and
     (forall i j : int. 0 <= i < j < n -> a#i <> a#j)
 
-  logic dirichlet (n : int, a : int array, i : int) : int
+  logic dirichlet (n : int) (a : array int) (i : int) : int
 
   axiom Dirichlet :
     forall n : int. 
-    forall a : int array.
+    forall a : array int.
         permutation n a ->
         (forall i : int. 0 <= i < n -> 
             0 <= dirichlet n a i < n and 
@@ -92,11 +91,11 @@ back  +-+-+-+-------------------+
 parameter create :
   sz:int -> 
   { 0 <= sz <= maxlen } 
-  sparse_array ref
+  ref sparse_array
   { sa_sz !result = sz and forall i:int. model !result i = default }
 *)
 
-parameter malloc : n:int -> {} 'a array { A.length result = n }
+parameter malloc : n:int -> {} array 'a { A.length result = n }
 
 let create sz =
   { 0 <= sz <= maxlen } 
@@ -115,7 +114,7 @@ let test a i =
 
 (*
 parameter get : 
-  a:sparse_array ref -> i:int -> 
+  a:ref sparse_array -> i:int -> 
     { 0 <= i < sa_sz !a } 
     elt reads a
     { result = model !a i }
@@ -131,7 +130,7 @@ let get a i =
 
 (*
 parameter set :
-  a:sparse_array ref -> i:int -> v:elt -> 
+  a:ref sparse_array -> i:int -> v:elt -> 
     { 0 <= i < sa_sz !a and invariant !a } 
     unit writes a 
     { invariant !a and 

@@ -8,9 +8,9 @@ theory Path
 
   type vertex
 
-  logic edge(graph, vertex, vertex)
+  logic edge graph vertex vertex
 
-  inductive path(graph, vertex, vertex) =
+  inductive path graph vertex vertex =
   | Path_empty :
       forall g : graph, v : vertex. path g v v
   | Path_append:
@@ -21,15 +21,15 @@ theory Path
 end
 
 (*
-  inductive simple_path(graph, vertex, vertex list, vertex) =
+  inductive simple_path graph vertex (list vertex) vertex =
   | Path_empty : 
-      forall g:graph, v:vertex. simple_path g v (Nil : vertex list) v
+      forall g:graph, v:vertex. simple_path g v (Nil : list vertex) v
   | Path_cons  : 
-      forall g:graph, src v dst : vertex, l : vertex list.
+      forall g:graph, src v dst : vertex, l : list vertex.
       simple_path g v l dst -> edge g src v -> not mem v l ->
       simple_path g src (Cons v l) dst
 
   logic simple_cycle(g : graph, v : vertex) =
-    exists l : vertex list. l <> Nil and simple_path g v l v
+    exists l : list vertex. l <> Nil and simple_path g v l v
 
 *)

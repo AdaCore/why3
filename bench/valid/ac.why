@@ -1,6 +1,6 @@
 theory Test
        type t
-       logic f(t,t) : t
+       logic f t t : t
        clone algebra.AC with type t = t, logic op = f
        goal G1 : forall x y : t. f x y = f y x 
        goal G2 : forall x y z : t. f (f x y) z = f x (f y z)

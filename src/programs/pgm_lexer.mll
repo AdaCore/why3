@@ -171,9 +171,7 @@ rule token = parse
       { OP0 "ge" }
   | "+" | "-" as c
       { OP2 (String.make 1 c) }
-  | "*"
-      { STAR }
-  | "/" | "%" as c
+  | "*" | "/" | "%" as c
       { OP3 (String.make 1 c) }
   | "@"
       { AT }
