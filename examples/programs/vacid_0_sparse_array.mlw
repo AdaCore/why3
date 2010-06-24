@@ -109,13 +109,8 @@ let test a i =
   let idx = sa_idx !a in
   let back = sa_back !a in
   let n = sa_n !a in
-  if 0 <= A.select idx i then 
-    if A.select idx i < n then 
-      A.select back (A.select idx i) = i
-    else
-      False
-  else
-    False
+  0 <= A.select idx i && A.select idx i < n &&
+  A.select back (A.select idx i) = i
   { result=True <-> is_elt !a i }
 
 (*
