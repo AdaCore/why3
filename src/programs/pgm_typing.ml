@@ -112,6 +112,14 @@ let specialize_post ~loc htv ((v, f), ql) =
   in
   specialize_fmla ~loc htv f, List.map specialize_exn ql
 
+let loc_of_id id = match id.id_origin with
+  | User loc -> loc
+  | _ -> assert false
+
+let loc_of_ls ls = match ls.ls_name.id_origin with
+  | User loc -> Some loc
+  | _ -> None (* FIXME: loc for recursive functions *)
+
 let rec specialize_type_v ~loc htv = function
   | Tpure ty ->
       DTpure (Denv.specialize_ty ~loc htv ty)
@@ -126,7 +134,8 @@ and specialize_type_c ~loc htv c =
     dc_post        = specialize_post ~loc htv c.c_post; }
 
 and specialize_binder ~loc htv (vs, tyv) =
-  vs.vs_name.id_string, specialize_type_v ~loc htv tyv
+  let id = { id = vs.vs_name.id_string; id_loc = loc } in
+  id, specialize_type_v ~loc htv tyv
 
 let specialize_global loc x gl =
   let s, tyv = Mstr.find x gl.globals in
@@ -243,12 +252,12 @@ and dtype_c env c =
     dc_post        = dpost env (dpurify env ty) c.Pgm_ptree.pc_post;
   }
 
-and dbinder env ({id=x; id_loc=loc}, v) =
+and dbinder env ({id=x; id_loc=loc} as id, v) =
   let v = match v with
     | Some v -> dtype_v env v 
     | None -> DTpure (create_type_var loc)
   in
-  add_local env x v, (x, v)
+  add_local env x v, (id, v)
 
 let dvariant env (l, p) =
   let s, _ = Typing.specialize_psymbol p env.env.uc in
@@ -301,13 +310,13 @@ and dexpr_desc env loc = function
   | Pgm_ptree.Efun (bl, t) ->
       let env, bl = map_fold_left dbinder env bl in
       let (_,e,_) as t = dtriple env t in
-      let tyl = List.map (fun (x,_) -> Typing.find_var x env.denv) bl in
+      let tyl = List.map (fun (x,_) -> Typing.find_var x.id env.denv) bl in
       let ty = dcurrying env.env tyl e.dexpr_type in
       DEfun (bl, t), ty
-  | Pgm_ptree.Elet ({id=x}, e1, e2) ->
+  | Pgm_ptree.Elet (x, e1, e2) ->
       let e1 = dexpr env e1 in
       let ty1 = e1.dexpr_type in
-      let env = add_local env x (DTpure ty1) in
+      let env = add_local env x.id (DTpure ty1) in
       let e2 = dexpr env e2 in
       DElet (x, e1, e2), e2.dexpr_type
   | Pgm_ptree.Eletrec (dl, e1) ->
@@ -445,13 +454,13 @@ and dletrec env dl =
   let type_one ((id, tyres), bl, v, t) = 
     let env, bl = map_fold_left dbinder env bl in
     let (_,e,_) as t = dtriple env t in
-    let tyl = List.map (fun (x,_) -> Typing.find_var x env.denv) bl in
+    let tyl = List.map (fun (x,_) -> Typing.find_var x.id env.denv) bl in
     let ty = dcurrying env.env tyl e.dexpr_type in
     if not (Denv.unify ty tyres) then 
       errorm ~loc:id.id_loc
 	"this expression has type %a, but is expected to have type %a"
 	print_dty ty print_dty tyres;
-    ((id.id, tyres), bl, v, t)
+    ((id, tyres), bl, v, t)
   in
   env, List.map type_one dl
 
@@ -523,8 +532,8 @@ and type_c gl env c =
 
 and binder gl env (x, tyv) = 
   let tyv = type_v gl env tyv in
-  let v = create_vsymbol (id_fresh x) (purify gl tyv) in
-  let env = Mstr.add x v env in
+  let v = create_vsymbol (id_user x.id x.id_loc) (purify gl tyv) in
+  let env = Mstr.add x.id v env in
   env, (v, tyv)
 
 let mk_iexpr loc ty d = { iexpr_desc = d; iexpr_loc = loc; iexpr_type = ty }
@@ -550,7 +559,7 @@ let make_logic_app loc ty ls el =
     | ({ iexpr_desc = IEglobal (ls, _); iexpr_type = ty }, _) :: r ->
 	make (t_app ls [] ty :: args) r
     | (e, _) :: r ->
-	let v = create_vsymbol (id_fresh "x") e.iexpr_type in
+	let v = create_vsymbol (id_user "x" loc) e.iexpr_type in
 	let d = mk_iexpr loc ty (make (t_var v :: args) r) in
 	IElet (v, e, d)
   in
@@ -575,7 +584,7 @@ let make_app gl loc ty f el =
 	  | IEglobal (v, _) ->
 	      make (fun f -> mk_iexpr loc tye (IEapply_ref (k f, Rglobal v))) r
 	  | _ ->
-	      let v = create_vsymbol (id_fresh "x") e.iexpr_type in
+	      let v = create_vsymbol (id_user "x" loc) e.iexpr_type in
 	      let d = 
 		make (fun f -> mk_iexpr loc tye (IEapply_ref (k f, Rlocal v))) r
 	      in
@@ -584,7 +593,7 @@ let make_app gl loc ty f el =
     | ({ iexpr_desc = IElocal (v, _) }, tye) :: r ->
 	make (fun f -> mk_iexpr loc tye (IEapply (k f, v))) r
     | (e, tye) :: r ->
-	let v = create_vsymbol (id_fresh "x") e.iexpr_type in
+	let v = create_vsymbol (id_user "x" loc) e.iexpr_type in
 	let d = make (fun f -> mk_iexpr loc tye (IEapply (k f, v))) r in
 	mk_iexpr loc ty (IElet (v, e, d))
   in
@@ -631,8 +640,8 @@ and iexpr_desc gl env loc ty = function
       IEfun (bl, itriple gl env e1)
   | DElet (x, e1, e2) ->
       let e1 = iexpr gl env e1 in
-      let v = create_vsymbol (id_fresh x) e1.iexpr_type in
-      let env = Mstr.add x v env in
+      let v = create_vsymbol (id_user x.id x.id_loc) e1.iexpr_type in
+      let env = Mstr.add x.id v env in
       IElet (v, e1, iexpr gl env e2)
   | DEletrec (dl, e1) ->
       let env, dl = iletrec gl env dl in
@@ -704,8 +713,8 @@ and iletrec gl env dl =
   (* add all functions into env, and compute local env *)
   let step1 env ((x, dty), bl, var, t) = 
     let ty = Denv.ty_of_dty dty in
-    let v = create_vsymbol (id_fresh x) ty in
-    let env = Mstr.add x v env in
+    let v = create_vsymbol (id_user x.id x.id_loc) ty in
+    let env = Mstr.add x.id v env in
     env, (v, bl, var, t)
   in
   let env, dl = map_fold_left step1 env dl in
@@ -824,12 +833,14 @@ and expr_desc gl env loc ty = function
   | IElogic t ->
       let ef = term_effect gl E.empty t in
       Elogic t, Tpure ty, ef
-  | IElocal (vs, tyv) ->
+  | IElocal (vs, _) ->
+      let tyv = Mvs.find vs env in
       Elocal vs, tyv, E.empty
   | IEglobal (ls, tyv) ->
       Eglobal ls, tyv, E.empty
   | IEapply (e1, vs) ->
       let e1 = expr gl env e1 in
+      (* printf "e1 : %a@." print_type_v e1.expr_type_v; *)
       let c = apply_type_v gl e1.expr_type_v vs in
       make_apply loc e1 ty c
   | IEapply_ref (e1, r) ->
@@ -848,8 +859,10 @@ and expr_desc gl env loc ty = function
       (* TODO: check reference v does not escape *)
       let ef = E.remove_reference (Rlocal v) ef in
       Elet (v, e1, e2), e2.expr_type_v, ef
-  | IEletrec _ ->
-      assert false (*TODO*)
+  | IEletrec (dl, e1) ->
+      let env, dl = letrec gl env dl in
+      let e1 = expr gl env e1 in
+      Eletrec (dl, e1), e1.expr_type_v, e1.expr_effect
 
   | IEsequence (e1, e2) ->
       let e1 = expr gl env e1 in
@@ -928,9 +941,40 @@ and triple gl env (p, e, q) =
   in
   (p, e, q), c
 
-and recfun _gl _env _def =
-  assert false (*TODO*)
-
+and letrec gl env dl = (* : env * recfun list *)
+  (* effects are computed as a least fixpoint 
+     [efm] maps each function to its current effect *)
+  let one_step m =
+    let add1 env (v, bl, _, _) =
+      let tyv = Tarrow (bl, Mvs.find v m) in
+      add_local v tyv env
+    in
+    let env = List.fold_left add1 env dl in
+    let type1 m (v, bl, var, t) =
+      let env = add_binders env bl in
+      let t, c = triple gl env t in
+      Mvs.add v c m, (v, bl, var, t)
+    in
+    let m, dl = map_fold_left type1 Mvs.empty dl in
+    env, m, dl
+  in
+  let rec fixpoint m =
+    let env, m', dl = one_step m in
+    let same_effect (v,_,_,_) = 
+      E.equal (Mvs.find v m).c_effect (Mvs.find v m').c_effect
+    in
+    if List.for_all same_effect dl then env, dl else fixpoint m'
+  in
+  let add_empty_effect m (v, bl, _, (p,_,q)) = 
+    let tyl, ty = uncurrying gl v.vs_ty in
+    assert (List.length bl = List.length tyl);
+    let c = { c_result_type = Tpure ty;
+	      c_pre = p; c_effect = E.empty; c_post = q; } 
+    in
+    Mvs.add v c m 
+  in
+  let m0 = List.fold_left add_empty_effect Mvs.empty dl in
+  fixpoint m0
 
 (* typing declarations (combines the three phases together) *)
 
@@ -944,14 +988,6 @@ let type_type uc ty =
   let denv = create_denv uc in
   let dty = Typing.dty denv.denv ty in
   Denv.ty_of_dty dty
-
-let loc_of_id id = match id.id_origin with
-  | User loc -> loc
-  | _ -> assert false
-
-let loc_of_ls ls = match ls.ls_name.id_origin with
-  | User loc -> Some loc
-  | _ -> None (* FIXME: loc for recursive functions *)
 
 let add_decl gl ls =
   try
@@ -990,14 +1026,13 @@ let decl env gl = function
       let denv = create_denv gl in
       let _, dl = dletrec denv dl in
       let _, dl = iletrec gl Mstr.empty dl in
-      let one gl (v, bl, var, t) =
+      let env, dl = letrec gl Mvs.empty dl in
+      let one gl (v, _, _, _ as d) =
+	let tyv = Mvs.find v env in
 	let loc = loc_of_id v.vs_name in
 	let id = v.vs_name.id_string in
-	let env = add_binders Mvs.empty bl in
-	let t, c = triple gl env t in
-	let tyv = Tarrow (bl, c) in
 	let ls, gl = add_global loc id tyv gl in
-	gl, (ls, (v, bl, var, t))
+	gl, (ls, d)
       in
       let gl, dl = map_fold_left one gl dl in
       gl, [Dletrec dl]

@@ -21,6 +21,8 @@ open Why
 
 type loc = Loc.position
 
+type ident = Ptree.ident
+
 type constant = Term.constant
 
 type assertion_kind = Pgm_ptree.assertion_kind
@@ -54,7 +56,7 @@ and dtype_c =
     dc_pre         : dpre;
     dc_post        : dpost; }
 
-and dbinder = string * dtype_v
+and dbinder = ident * dtype_v
 
 type dvariant = Denv.dterm * Term.lsymbol
 
@@ -77,7 +79,7 @@ and dexpr_desc =
   | DElogic of Term.lsymbol
   | DEapply of dexpr * dexpr
   | DEfun of dbinder list * dtriple
-  | DElet of string * dexpr * dexpr
+  | DElet of ident * dexpr * dexpr
   | DEletrec of drecfun list * dexpr
 
   | DEsequence of dexpr * dexpr
@@ -94,7 +96,7 @@ and dexpr_desc =
   | DElabel of string * dexpr
   | DEany of dtype_c
 
-and drecfun = (string * Denv.dty) * dbinder list * dvariant option * dtriple
+and drecfun = (ident * Denv.dty) * dbinder list * dvariant option * dtriple
 
 and dtriple = dpre * dexpr * dpost
 

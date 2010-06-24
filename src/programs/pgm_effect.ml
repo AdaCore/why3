@@ -65,6 +65,8 @@ module Reference = struct
     | Rlocal _, Rglobal _ -> -1
     | Rglobal _, Rlocal _ -> 1
 
+  let equal r1 r2 = compare r1 r2 = 0
+
 end
 
 module Sref = Set.Make(Reference)
@@ -93,6 +95,11 @@ let union t1 t2 =
   { reads  = Sref.union t1.reads  t2.reads;
     writes = Sref.union t1.writes t2.writes;
     raises = E.union t1.raises t2.raises; }
+
+let equal t1 t2 =
+  Sref.equal t1.reads  t2.reads &&
+  Sref.equal t1.writes t2.writes &&
+  Sls.equal  t1.raises t2.raises
 
 let subst vs r t =
   let add1 r' s = match r' with
