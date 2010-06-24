@@ -28,7 +28,7 @@ open Denv
 open Ptree
 open Pgm_effect
 open Pgm_ttree
-open Pgm_types
+open Pgm_env
 module E = Pgm_effect
 
 let debug = ref false
@@ -963,51 +963,43 @@ let add_exception loc x ty gl =
     errorm ~loc "clash with previous exception %s" x;
   add_exception (id_user x loc) ty gl
 
-let file env uc dl =
-  let gl = empty_env uc in
-  let gl, dl =
-    List.fold_left
-      (fun (gl, acc) d -> match d with
-	 | Pgm_ptree.Dlogic dl -> 
-	     let dl = logic_list0_decl dl in
-	     let add1 gl d = Pgm_types.add_pdecl env d gl in
-	     let gl = List.fold_left add1 gl dl in
-	     gl, acc
-	 | Pgm_ptree.Dlet (id, e) -> 
-	     let e = type_expr gl e in
-(* 	     if !debug then *)
-(* 	       eprintf "@[--typing %s-----@\n  %a@]@." id.id print_expr e; *)
-	     let ls, gl = add_global id.id_loc id.id e.expr_type_v gl in
-	     gl, Dlet (ls, e) :: acc
-	 | Pgm_ptree.Dletrec dl -> 
-	     let denv = create_denv gl in
-	     let _, dl = dletrec denv dl in
-	     let _, dl = iletrec gl Mstr.empty dl in
-	     let one gl (v, bl, var, t) =
-	       let loc = loc_of_id v.vs_name in
-	       let id = v.vs_name.id_string in
-	       let t, c = triple gl t in
-	       let tyv = Tarrow (bl, c) in
-	       let ls, gl = add_global loc id tyv gl in
-	       gl, (ls, (v, bl, var, t))
-	     in
-	     let gl, dl = map_fold_left one gl dl in
-	     gl, Dletrec dl :: acc
-	 | Pgm_ptree.Dparam (id, tyv) ->
-	     let denv = create_denv gl in
-	     let tyv = dtype_v denv tyv in
-	     let tyv = type_v gl Mstr.empty tyv in
-	     let ls, gl = add_global id.id_loc id.id tyv gl in
-	     let gl = add_global_if_pure gl ls in
-	     gl, Dparam (ls, tyv) :: acc
-	 | Pgm_ptree.Dexn (id, ty) ->
-	     let ty = option_map (type_type gl) ty in
-	     let _, gl = add_exception id.id_loc id.id ty gl in
-	     gl, acc
-      )
-      (gl, []) dl
-  in
-  gl.uc, List.rev dl
+let decl env gl = function
+  | Pgm_ptree.Dlogic dl -> 
+      let dl = logic_list0_decl dl in
+      let add1 gl d = Pgm_env.add_pdecl env d gl in
+      let gl = List.fold_left add1 gl dl in
+      gl, []
+  | Pgm_ptree.Dlet (id, e) -> 
+      let e = type_expr gl e in
+      (* if !debug then *)
+      (*   eprintf "@[--typing %s-----@\n  %a@]@." id.id print_expr e; *)
+      let ls, gl = add_global id.id_loc id.id e.expr_type_v gl in
+      gl, [Dlet (ls, e)]
+  | Pgm_ptree.Dletrec dl -> 
+      let denv = create_denv gl in
+      let _, dl = dletrec denv dl in
+      let _, dl = iletrec gl Mstr.empty dl in
+      let one gl (v, bl, var, t) =
+	let loc = loc_of_id v.vs_name in
+	let id = v.vs_name.id_string in
+	let t, c = triple gl t in
+	let tyv = Tarrow (bl, c) in
+	let ls, gl = add_global loc id tyv gl in
+	gl, (ls, (v, bl, var, t))
+      in
+      let gl, dl = map_fold_left one gl dl in
+      gl, [Dletrec dl]
+  | Pgm_ptree.Dparam (id, tyv) ->
+      let denv = create_denv gl in
+      let tyv = dtype_v denv tyv in
+      let tyv = type_v gl Mstr.empty tyv in
+      let ls, gl = add_global id.id_loc id.id tyv gl in
+      let gl = add_global_if_pure gl ls in
+      gl, [Dparam (ls, tyv)]
+  | Pgm_ptree.Dexn (id, ty) ->
+      let ty = option_map (type_type gl) ty in
+      let _, gl = add_exception id.id_loc id.id ty gl in
+      gl, []
 
 (*
 Local Variables: 

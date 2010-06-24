@@ -21,28 +21,7 @@
 
 open Format
 open Why
-
-(****
-let files = ref []
-let parse_only = ref false
-let type_only = ref false
-let debug = ref false
-let loadpath = ref []
-let prover = ref None
-
-let () = 
-  Arg.parse 
-    ["--parse-only", Arg.Set parse_only, "stops after parsing";
-     "--type-only", Arg.Set type_only, "stops after type-checking";
-     "--debug", Arg.Set debug, "sets the debug flag";
-     "-L", Arg.String (fun s -> loadpath := s :: !loadpath), 
-       "<dir>  adds dir to the loadpath";
-     "-P", Arg.String (fun s -> prover := Some s),
-       "<prover> proves the verification conditions";
-    ]
-    (fun f -> files := f :: !files)
-    "usage: whyl [options] files..."
-***)
+open Pgm_env
 
 let rec report fmt = function
   | Lexer.Error e ->
@@ -66,12 +45,18 @@ let rec report fmt = function
   | e ->
       raise e
 
-open Pgm_ptree
-
 let parse_only _env file c =
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
   ignore (Pgm_lexer.parse_file lb)
+
+let type_and_wp ?(type_only=false) env gl dl =
+  let decl gl d = if type_only then gl else Pgm_wp.decl gl d in
+  let add gl d = 
+    let gl, dl = Pgm_typing.decl env gl d in
+    List.fold_left decl gl dl
+  in
+  List.fold_left add gl dl
 
 let read_channel 
     ?(debug=false) ?(parse_only=false) ?(type_only=false) env file c =
@@ -79,18 +64,19 @@ let read_channel
   Pgm_wp.debug := debug;
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
-  let p = Pgm_lexer.parse_file lb in 
+  let dl = Pgm_lexer.parse_file lb in 
   if parse_only then 
     Theory.Mnm.empty
   else begin
     let uc = Theory.create_theory (Ident.id_fresh "Pgm") in
     let th = Env.find_theory env ["programs"] "Prelude" in
     let uc = Theory.use_export uc th in
-    let uc, dl = Pgm_typing.file env uc p in
+    let gl = empty_env uc in
+    let gl = type_and_wp ~type_only env gl dl in
     if type_only then 
       Theory.Mnm.empty
     else begin
-      let th = Pgm_wp.file uc dl in
+      let th = Theory.close_theory gl.uc in
       Theory.Mnm.add "Pgm" th Theory.Mnm.empty
     end
   end

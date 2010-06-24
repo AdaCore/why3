@@ -28,7 +28,7 @@ open Theory
 open Pretty
 open Pgm_ttree
 open Pgm_typing
-open Pgm_types
+open Pgm_env
 
 module E = Pgm_effect
 
@@ -388,12 +388,8 @@ let decl env = function
 	env
       in
       List.fold_left add_one env dl
-  | Pgm_ttree.Dparam (_ls, _v) ->
+  | Pgm_ttree.Dparam _ ->
       env
-
-let file uc dl =
-  let env = List.fold_left decl (empty_env uc) dl in
-  Theory.close_theory env.uc
 
 (*
 Local Variables: 

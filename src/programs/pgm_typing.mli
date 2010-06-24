@@ -26,11 +26,12 @@ type error
 
 exception Error of error
 
-val errorm : ?loc:Loc.position -> ('a, Format.formatter, unit, 'b) format4 -> 'a
-
 val report : Format.formatter -> error -> unit
 
-val file : Env.env -> theory_uc -> Pgm_ptree.file -> theory_uc * Pgm_ttree.file
+(* val errorm : ?loc:Loc.position -> ('a, Format.formatter, unit, 'b) format4 -> 'a *)
 
+val decl : 
+  Env.env -> Pgm_env.env -> Pgm_ptree.decl -> Pgm_env.env * Pgm_ttree.decl list
 
+(* TODO: move elsewhere? *)
 val reference_of_term : Term.term -> Pgm_effect.reference
