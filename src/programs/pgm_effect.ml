@@ -40,6 +40,11 @@ let ref_equal r1 r2 = match r1, r2 with
   | Rglobal ls1, Rglobal ls2 -> ls_equal ls1 ls2
   | _ -> false
 
+let reference_of_term t = match t.t_node with
+  | Term.Tvar vs -> Rlocal vs
+  | Term.Tapp (ls, []) -> Rglobal ls
+  | _ -> assert false
+
 module Reference = struct
   
   type t = reference
@@ -78,6 +83,9 @@ let empty = { reads = Sref.empty; writes = Sref.empty; raises = E.empty }
 let add_read  r t = { t with reads  = Sref.add r t.reads  }
 let add_write r t = { t with writes = Sref.add r t.writes }
 let add_raise e t = { t with raises = E.add e t.raises }
+
+let remove_reference r t = 
+  { t with reads = Sref.remove r t.reads; writes = Sref.remove r t.writes }
 
 let remove_raise e t = { t with raises = E.remove e t.raises }
 

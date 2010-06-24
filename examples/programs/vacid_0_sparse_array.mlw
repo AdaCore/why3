@@ -57,12 +57,12 @@ back  +-+-+-+-------------------+
     0 <= n <= sz <= maxlen and
     forall i : int. 0 <= i < n -> 0 <= back#i < sz and idx#(back#i) = i
 
-(* 
+  (* 
     The following definitions and the axiom Dirichlet 
     (provable by natural induction) are necessary to
     prove the lemma Inter6, which is sufficient for
     the proof of WPs for the function [set] below.
-*)
+  *)
 
   logic permutation (n : int, a : int array) =
     (forall i : int. 0 <= i < n -> 0 <= a#i < n) and
@@ -96,15 +96,11 @@ parameter create :
   { sa_sz !result = sz and forall i:int. model !result i = default }
 *)
 
-(* BUG
 parameter malloc : n:int -> {} 'a array { A.length result = n }
-*)
-parameter malloc_elt : n:int -> {} elt array { A.length result = n }
-parameter malloc_int : n:int -> {} int array { A.length result = n }
 
 let create sz =
   { 0 <= sz <= maxlen } 
-  ref ((malloc_elt sz, malloc_int sz, malloc_int sz, sz, 0) : sparse_array)
+  ref ((malloc sz, malloc sz, malloc sz, sz, 0) : sparse_array)
   { invariant !result and 
     sa_sz !result = sz and forall i:int. model !result i = default }
 

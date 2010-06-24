@@ -28,10 +28,6 @@ exception Error of error
 
 val report : Format.formatter -> error -> unit
 
-(* val errorm : ?loc:Loc.position -> ('a, Format.formatter, unit, 'b) format4 -> 'a *)
-
 val decl : 
   Env.env -> Pgm_env.env -> Pgm_ptree.decl -> Pgm_env.env * Pgm_ttree.decl list
 
-(* TODO: move elsewhere? *)
-val reference_of_term : Term.term -> Pgm_effect.reference

@@ -27,6 +27,7 @@ type reference =
 val name_of_reference : reference -> Ident.ident
 val type_of_reference : reference -> Ty.ty
 val ref_equal : reference -> reference -> bool
+val reference_of_term : Term.term -> reference
 
 module Sref : Set.S with type elt = reference
 module Mref : Map.S with type key = reference
@@ -42,6 +43,8 @@ val empty : t
 val add_read  : reference -> t -> t
 val add_write : reference -> t -> t
 val add_raise : lsymbol -> t -> t
+
+val remove_reference : reference -> t -> t
 
 val remove_raise : lsymbol -> t -> t
 

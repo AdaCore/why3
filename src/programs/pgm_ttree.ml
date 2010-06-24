@@ -28,7 +28,7 @@ type assertion_kind = Pgm_ptree.assertion_kind
 type lazy_op = Pgm_ptree.lazy_op
 
 (*****************************************************************************)
-(* phase 1: destructive typing *)
+(* phase 1: introduction of destructive types *)
 
 type dreference = 
   | DRlocal  of string
@@ -78,9 +78,7 @@ and dexpr_desc =
   | DEapply of dexpr * dexpr
   | DEfun of dbinder list * dtriple
   | DElet of string * dexpr * dexpr
-  | DEletrec of 
-      ((string * Denv.dty) * dbinder list * dvariant option * dtriple) list * 
-      dexpr
+  | DEletrec of drecfun list * dexpr
 
   | DEsequence of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
@@ -96,10 +94,12 @@ and dexpr_desc =
   | DElabel of string * dexpr
   | DEany of dtype_c
 
+and drecfun = (string * Denv.dty) * dbinder list * dvariant option * dtriple
+
 and dtriple = dpre * dexpr * dpost
 
 (*****************************************************************************)
-(* phase 2: typing annotations *)
+(* phase 2: removal of destructive types *)
 
 type variant = Term.term * Term.lsymbol
 
@@ -158,7 +158,7 @@ and itriple = pre * iexpr * post
 
 
 (*****************************************************************************)
-(* phase 3: inferring effects *)
+(* phase 3: effect inference *)
 
 type expr = {
   expr_desc  : expr_desc;

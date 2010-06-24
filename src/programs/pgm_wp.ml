@@ -27,7 +27,6 @@ open Decl
 open Theory
 open Pretty
 open Pgm_ttree
-open Pgm_typing
 open Pgm_env
 
 module E = Pgm_effect
@@ -97,7 +96,7 @@ let rec unref env r v f =
 
 and unref_term env r v t = match t.t_node with
   | Tapp (ls, [u]) when ls_equal ls env.ls_bang ->
-      let rt = reference_of_term u in
+      let rt = E.reference_of_term u in
       if E.ref_equal rt r then t_var v else t
   | Tapp (ls, _) when ls_equal ls env.ls_old ->
       assert false

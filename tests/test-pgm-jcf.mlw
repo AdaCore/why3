@@ -1,11 +1,6 @@
 
-{ 
-  type 'a t
-}
-
-parameter malloc : int -> {} 'a t { result=result }
-
-let foo () = malloc 1 : int t
+let rec f (x:int) =
+  if x = 0 then 0 else f (x-1)
 
 (*
 Local Variables: 

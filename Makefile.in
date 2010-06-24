@@ -504,8 +504,7 @@ clean::
 
 .PHONY: bench test
 
-# bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@ $(TOOLS) $(DRIVERS)
-bench:: bin/why.@OCAMLBEST@ $(TOOLS) $(DRIVERS)
+bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@ $(TOOLS) $(DRIVERS)
 	sh bench/bench \
 	    "bin/why.@OCAMLBEST@" \
 	    "bin/whyml.@OCAMLBEST@"
