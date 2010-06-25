@@ -375,11 +375,21 @@ module NsTree = struct
 
   let contents ns =
     let add_ns s ns acc = Namespace (s, ns) :: acc in
-    let add_s k s _ acc = Leaf (k ^ s) :: acc in
-    let acc = Mnm.fold add_ns           ns.ns_ns []  in
-    let acc = Mnm.fold (add_s "prop ")  ns.ns_pr acc in
-    let acc = Mnm.fold (add_s "logic ") ns.ns_ls acc in
-    let acc = Mnm.fold (add_s "type ")  ns.ns_ts acc in acc
+    let add_pr s _  acc = Leaf ("prop " ^ s) :: acc in
+    let add_ls s ls acc =
+      if s = "infix ="  && ls_equal ls ps_equ then acc else
+      if s = "infix <>" && ls_equal ls ps_neq then acc else
+        Leaf ("logic " ^ s) :: acc
+    in
+    let add_ts s ts acc =
+      if s = "int"  && ts_equal ts ts_int  then acc else
+      if s = "real" && ts_equal ts ts_real then acc else
+        Leaf ("type " ^ s) :: acc
+    in
+    let acc = Mnm.fold add_ns ns.ns_ns []  in
+    let acc = Mnm.fold add_pr ns.ns_pr acc in
+    let acc = Mnm.fold add_ls ns.ns_ls acc in
+    let acc = Mnm.fold add_ts ns.ns_ts acc in acc
 
   let decomp = function
     | Namespace (s,ns) -> s, contents ns
