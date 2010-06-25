@@ -45,26 +45,30 @@ let empty_ns = {
 
 exception ClashSymbol of string
 
-let ns_add chk x v m =
+let ns_add eq chk x v m =
   if not chk then Mnm.add x v m
   else try
-    if Mnm.find x m != v then raise (ClashSymbol x);
+    if not (eq (Mnm.find x m) v) then raise (ClashSymbol x);
     m
   with Not_found -> Mnm.add x v m
 
+let ts_add = ns_add ts_equal
+let ls_add = ns_add ls_equal
+let pr_add = ns_add prop_equal
+
 let rec merge_ns chk ns1 ns2 =
-  { ns_ts = Mnm.fold (ns_add chk) ns1.ns_ts ns2.ns_ts;
-    ns_ls = Mnm.fold (ns_add chk) ns1.ns_ls ns2.ns_ls;
-    ns_pr = Mnm.fold (ns_add chk) ns1.ns_pr ns2.ns_pr;
+  { ns_ts = Mnm.fold (ts_add chk) ns1.ns_ts ns2.ns_ts;
+    ns_ls = Mnm.fold (ls_add chk) ns1.ns_ls ns2.ns_ls;
+    ns_pr = Mnm.fold (pr_add chk) ns1.ns_pr ns2.ns_pr;
     ns_ns = Mnm.fold (fusion chk) ns1.ns_ns ns2.ns_ns; }
 
 and fusion chk x ns m =
   let os = try Mnm.find x m with Not_found -> empty_ns in
   Mnm.add x (merge_ns chk os ns) m
 
-let add_ts chk x ts ns = { ns with ns_ts = ns_add chk x ts ns.ns_ts }
-let add_ls chk x ls ns = { ns with ns_ls = ns_add chk x ls ns.ns_ls }
-let add_pr chk x pf ns = { ns with ns_pr = ns_add chk x pf ns.ns_pr }
+let add_ts chk x ts ns = { ns with ns_ts = ts_add chk x ts ns.ns_ts }
+let add_ls chk x ls ns = { ns with ns_ls = ls_add chk x ls ns.ns_ls }
+let add_pr chk x pf ns = { ns with ns_pr = pr_add chk x pf ns.ns_pr }
 let add_ns chk x nn ns = { ns with ns_ns = fusion chk x nn ns.ns_ns }
 
 let rec ns_find get_map ns = function

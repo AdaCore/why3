@@ -63,6 +63,10 @@ type prop = prsymbol * fmla
 
 type ind_decl = lsymbol * prop list
 
+val pr_equal : prsymbol -> prsymbol -> bool
+
+val prop_equal : prop -> prop -> bool
+
 (* Proposition declaration *)
 
 type prop_kind =

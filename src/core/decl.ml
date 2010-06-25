@@ -85,11 +85,13 @@ module Spr = Prop.S
 module Mpr = Prop.M
 module Hpr = Prop.H
 
-let pr_equal = (==)
+let pr_equal pr1 pr2 = id_equal pr1.pr_name pr2.pr_name
 
 let create_prsymbol n = { pr_name = id_register n }
 
 type prop = prsymbol * fmla
+
+let prop_equal (pr1,f1) (pr2,f2) = pr_equal pr1 pr2 && f_equal f1 f2
 
 type ind_decl = lsymbol * prop list
 
