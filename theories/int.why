@@ -85,3 +85,57 @@ theory ComputerDivision
 
 end
 
+theory Power
+
+  use import Int
+
+  logic power (x n : int) : int =
+    if n = 0 then 1 else x * power x (n-1)
+
+end
+
+theory NumOf
+
+  use import Int
+
+  logic p int
+
+  (* number of n st a <= n < b and p(n) *)
+  logic num_of (a b : int) : int
+
+  axiom Num_of_empty : 
+    forall a b : int. b <= a -> num_of a b = 0
+  axiom Num_of_zero : 
+    forall a b : int. a < b -> not p a -> num_of a b = num_of (a+1) b
+  axiom Num_of_one : 
+    forall a b : int. a < b -> p a -> num_of a b = 1 + num_of (a+1) b
+  axiom Num_of_append :
+    forall a b c : int. a < b < c -> num_of a c = num_of a b + num_of b c
+
+end
+
+theory NumOfDep
+
+  type dep
+
+  use import Int
+
+  logic p dep int
+
+  (* number of n st a <= n < b and p(d,n) *)
+  logic num_of dep (a b : int) : int
+
+  axiom Num_of_empty : 
+    forall d : dep, a b : int. 
+    b <= a -> num_of d a b = 0
+  axiom Num_of_zero : 
+    forall d : dep, a b : int. 
+    a < b -> not p d a -> num_of d a b = num_of d (a+1) b
+  axiom Num_of_one : 
+    forall d : dep, a b : int. 
+    a < b -> p d a -> num_of d a b = 1 + num_of d (a+1) b
+  axiom Num_of_append :
+    forall d : dep, a b c : int. 
+    a < b < c -> num_of d a c = num_of d a b + num_of d b c
+
+end

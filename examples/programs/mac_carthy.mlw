@@ -13,21 +13,22 @@ let rec f91 (n:int) : int variant { 101-n } =
 (* non-recursive version *)
 
 {
-logic f int : int
+  logic f (x:int) : int =
+    if x >= 101 then x-10 else 91
 
-axiom F_def1 : forall x:int. x >= 101 -> f(x) = x-10
-axiom F_def2 : forall x:int. x <= 101 -> f(x) = 91
+  (* iter_f(n,x) = f^n(x) *)
+  logic iter_f (n x:int) : int =
+    if n = 0 then x else iter_f (n-1) (f x)
 
-logic iter_f int int : int (* iter_f(n,x) = f^n(x) *)
-
-axiom Iter_f_def1 : forall x:int. iter_f 0 x = x
-axiom Iter_f_def2 : forall n x:int. n > 0 -> iter_f n x = iter_f (n-1) (f x)
-
-inductive lex (int,int) (int,int) =
-| Lex_1: forall x1 y1 x2 y2 : int. 
-     lt_nat x1 x2 -> lex (x1,y1) (x2,y2)
-| Lex_2: forall x y1 y2 : int.
-     lt_nat y1 y2 -> lex (x,y1) (x,y2)
+(*
+  clone import relations.Lex with type t1 = int, type t2 = int,
+    logic r1 = lt_nat, logic r2 = lt_int
+*)
+  inductive lex (int,int) (int,int) =
+  | Lex_1: forall x1 y1 x2 y2 : int. 
+       lt_nat x1 x2 -> lex (x1,y1) (x2,y2)
+  | Lex_2: forall x y1 y2 : int.
+       lt_nat y1 y2 -> lex (x,y1) (x,y2)
 }
 
 let f91_nonrec (n:ref int) (x:ref int) =
