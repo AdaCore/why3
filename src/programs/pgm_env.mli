@@ -83,4 +83,5 @@ val eq_type_v : type_v -> type_v -> bool
 (* pretty-printers *)
 
 val print_type_v : Format.formatter -> type_v -> unit
+val print_type_c : Format.formatter -> type_c -> unit
 val print_post   : Format.formatter -> post   -> unit

@@ -105,6 +105,8 @@ and dtriple = dpre * dexpr * dpost
 
 type variant = Term.term * Term.lsymbol
 
+type rec_variant = Term.vsymbol * Term.term * Term.lsymbol
+
 type reference = Pgm_effect.reference
 
 type pre = Pgm_env.pre
@@ -154,7 +156,7 @@ and iexpr_desc =
   | IElabel of label * iexpr
   | IEany of type_c
 
-and irecfun = Term.vsymbol * binder list * variant option * itriple
+and irecfun = Term.vsymbol * binder list * rec_variant option * itriple
 
 and itriple = pre * iexpr * post
 
@@ -192,7 +194,7 @@ and expr_desc =
   | Elabel of label * expr
   | Eany of type_c
 
-and recfun = Term.vsymbol * binder list * variant option * triple
+and recfun = Term.vsymbol * binder list * rec_variant option * triple
 
 and triple = pre * expr * post
 

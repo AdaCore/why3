@@ -725,6 +725,17 @@ and iletrec gl env dl =
     let env, bl = map_fold_left (binder gl) env bl in
     let var = option_map (variant loc env) var in
     let t = itriple gl env t in
+    let var, t = match var with
+      | None -> 
+	  None, t
+      | Some (phi, r) ->
+	  let p, e, q = t in
+	  let phi0 = create_vsymbol (id_fresh "variant") phi.t_ty in
+	  let e_phi = { iexpr_desc = IElogic phi; iexpr_type = phi.t_ty; 
+			iexpr_loc = e.iexpr_loc } in
+	  let e = { e with iexpr_desc = IElet (phi0, e_phi, e) } in
+	  Some (phi0, phi, r), (p, e, q)
+    in
     (v, bl, var, t)
   in
   let dl = List.map step2 dl in
@@ -738,10 +749,10 @@ and iletrec gl env dl =
     | (_, _, None, _) :: r ->
 	let check_no_variant (_,_,var,(_,e,_)) = if var <> None then error e in
 	List.iter check_no_variant r
-    | (_, _, Some (_, ps), _) :: r ->
+    | (_, _, Some (_, _, ps), _) :: r ->
 	let check_variant (_,_,var,(_,e,_)) = match var with
 	  | None -> error e
-	  | Some (_, ps') -> if not (ls_equal ps ps') then 
+	  | Some (_, _, ps') -> if not (ls_equal ps ps') then 
 	      errorm ~loc:e.iexpr_loc 
 		"variants must share the same order relation"
 	in
@@ -995,28 +1006,37 @@ and triple gl env (p, e, q) =
 and letrec gl env dl = (* : env * recfun list *)
   (* effects are computed as a least fixpoint 
      [efm] maps each function to its current effect *)
-  let one_step m =
-    let add1 env (v, bl, _, _) =
-      let tyv = Tarrow (bl, Mvs.find v m) in
-      add_local v tyv env
+  let make_env ~decvar m =
+    let add1 env (v, bl, var, _) =
+      let c = Mvs.find v m in 
+      let c = match decvar, var with
+	| true, Some (phi0, phi, r) ->
+	    let decphi = f_app r [phi; t_var phi0] in
+	    { c with c_pre = f_and decphi c.c_pre }
+	| _ ->
+	    c 
+      in
+      add_local v (Tarrow (bl, c)) env
     in
-    let env = List.fold_left add1 env dl in
+    List.fold_left add1 env dl
+  in
+  let one_step m =
+    let env = make_env ~decvar:true m in
     let type1 m (v, bl, var, t) =
       let env = add_binders env bl in
       let t, c = triple gl env t in
       Mvs.add v c m, (v, bl, var, t)
     in
-    let m, dl = map_fold_left type1 Mvs.empty dl in
-    env, m, dl
+    map_fold_left type1 Mvs.empty dl
   in
   let rec fixpoint m =
-    let env, m', dl = one_step m in
+    let m', dl = one_step m in
     let same_effect (v,_,_,_) = 
       E.equal (Mvs.find v m).c_effect (Mvs.find v m').c_effect
     in
-    if List.for_all same_effect dl then env, dl else fixpoint m'
+    if List.for_all same_effect dl then m, dl else fixpoint m'
   in
-  let add_empty_effect m (v, bl, _, (p,_,q)) = 
+  let add_empty_effect m (v, bl, _, (p, _, q)) = 
     let tyl, ty = uncurrying gl v.vs_ty in
     assert (List.length bl = List.length tyl);
     let c = { c_result_type = Tpure ty;
@@ -1025,7 +1045,8 @@ and letrec gl env dl = (* : env * recfun list *)
     Mvs.add v c m 
   in
   let m0 = List.fold_left add_empty_effect Mvs.empty dl in
-  fixpoint m0
+  let m, dl = fixpoint m0 in
+  make_env ~decvar:false m, dl
 
 (* typing declarations (combines the three phases together) *)
 
