@@ -94,48 +94,49 @@ theory Power
 
 end
 
-theory NumOf
+theory NumOfParam
+
+  type param
 
   use import Int
 
-  logic p int
+  logic pr param int
 
-  (* number of n st a <= n < b and p(n) *)
-  logic num_of (a b : int) : int
+  (* number of n st a <= n < b and pr(p,n) *)
+  logic num_of (p : param) (a b : int) : int
 
   axiom Num_of_empty : 
-    forall a b : int. b <= a -> num_of a b = 0
-  axiom Num_of_zero : 
-    forall a b : int. a < b -> not p a -> num_of a b = num_of (a+1) b
-  axiom Num_of_one : 
-    forall a b : int. a < b -> p a -> num_of a b = 1 + num_of (a+1) b
+    forall p : param, a b : int. 
+    b <= a -> num_of p a b = 0
+
+  axiom Num_of_left_no_add : 
+    forall p : param, a b : int. 
+    a < b -> not pr p a -> num_of p a b = num_of p (a+1) b
+  axiom Num_of_left_add : 
+    forall p : param, a b : int. 
+    a < b -> pr p a -> num_of p a b = 1 + num_of p (a+1) b
+
+  axiom Num_of_right_no_add : 
+    forall p : param, a b : int. 
+    a < b -> not pr p (b-1) -> num_of p a b = num_of p a (b-1)
+  axiom Num_of_right_add : 
+    forall p : param, a b : int. 
+    a < b -> pr p (b-1) -> num_of p a b = 1 + num_of p a (b-1)
+
   axiom Num_of_append :
-    forall a b c : int. a < b < c -> num_of a c = num_of a b + num_of b c
+    forall p : param, a b c : int. 
+    a <= b <= c -> num_of p a c = num_of p a b + num_of p b c
 
 end
 
-theory NumOfDep
+theory NumOf
 
-  type dep
+  logic pr int
 
-  use import Int
+  logic pr0 () (n : int) = pr n
 
-  logic p dep int
+  clone NumOfParam as N with type param = tuple0, logic pr = pr0
 
-  (* number of n st a <= n < b and p(d,n) *)
-  logic num_of dep (a b : int) : int
-
-  axiom Num_of_empty : 
-    forall d : dep, a b : int. 
-    b <= a -> num_of d a b = 0
-  axiom Num_of_zero : 
-    forall d : dep, a b : int. 
-    a < b -> not p d a -> num_of d a b = num_of d (a+1) b
-  axiom Num_of_one : 
-    forall d : dep, a b : int. 
-    a < b -> p d a -> num_of d a b = 1 + num_of d (a+1) b
-  axiom Num_of_append :
-    forall d : dep, a b c : int. 
-    a < b < c -> num_of d a c = num_of d a b + num_of d b c
+  logic num_of (a b : int) : int = N.num_of () a b
 
 end

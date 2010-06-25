@@ -162,23 +162,21 @@ theory TotalOrder
 end
 *)
 
-(*
 theory Lex
 
   type t1
   type t2
  
-  logic r1 t1 t1
-  logic r2 t2 t2
+  logic rel1 t1 t1
+  logic rel2 t2 t2
 
   inductive lex (t1, t2) (t1, t2) =
-  | Lex_1: forall (x1 x2 : t1) (y1 y2 : t2). 
-       r1 x1 x2 -> lex (x1,y1) (x2,y2)
-  | Lex_2: forall (x : t1) (y1 y2 : t2).
-       r2 y1 y2 -> lex (x,y1) (x,y2)
+  | Lex_1: forall x1 x2 : t1, y1 y2 : t2. 
+       rel1 x1 x2 -> lex (x1,y1) (x2,y2)
+  | Lex_2: forall x : t1, y1 y2 : t2.
+       rel2 y1 y2 -> lex (x,y1) (x,y2)
 
 end
-*)
 
 (*
 theory MinMax

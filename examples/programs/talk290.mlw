@@ -1,3 +1,7 @@
+(* How many integers 0 <= n < 10^18 have the property that the sum 
+   of the digits of n equals the sum of digits of 137n? *)
+
+(* answer: 20444710234716473 *)
 
 { 
   use import int.EuclideanDivision
@@ -7,12 +11,18 @@
     if n = 0 then 0 else sum_digits (div n 10) + mod n 10
 
   logic p (n:int) = sum_digits(n) = sum_digits(137 * n)
-  clone int.NumOf as P with logic p = p
+  clone int.NumOf as P with logic pr = p
 
   type int2 = (int,int)
   logic q (d:int2) (n:int) = 
     let (a,b) = d in sum_digits(n) = sum_digits(137 * n + a) = b
-  clone int.NumOfDep as Q with type dep = int2, logic p = q
+  clone int.NumOfParam as Q with type param = int2, logic pr = q
+
+  type int3 = (int,int,int)
+  logic r (d:int3) (n:int) = 
+    let (a,b,c) = d in 
+    0 <= mod n 10 < c and sum_digits(n) = sum_digits(137 * n + a) = b
+  clone int.NumOfParam as R with type param = int3, logic pr = r
 
   goal Test : forall n:int. 0 <= n < power 10 0 -> n = 0 
 }
@@ -27,7 +37,7 @@ let rec sd n =
   { result = sum_digits n }
 
 (* f(m,a,b) = the number of 0 <= n < 10^m such that 
-   digitsum(n) = digitsum(137n+a)+b. *)
+   digitsum(n) = digitsum(137n+a) + b. *)
 let rec f m a b =
   { 0 <= m }
   if m = 0 then begin

@@ -20,18 +20,11 @@ let rec f91 (n:int) : int variant { 101-n } =
   logic iter_f (n x:int) : int =
     if n = 0 then x else iter_f (n-1) (f x)
 
-(*
   clone import relations.Lex with type t1 = int, type t2 = int,
-    logic r1 = lt_nat, logic r2 = lt_int
-*)
-  inductive lex (int,int) (int,int) =
-  | Lex_1: forall x1 y1 x2 y2 : int. 
-       lt_nat x1 x2 -> lex (x1,y1) (x2,y2)
-  | Lex_2: forall x y1 y2 : int.
-       lt_nat y1 y2 -> lex (x,y1) (x,y2)
+    logic rel1 = lt_nat, logic rel2 = lt_nat
 }
 
-let f91_nonrec (n:ref int) (x:ref int) =
+let f91_nonrec (n x : ref int) =
   { !n >= 1 }
   label L:
   while !n > 0 do

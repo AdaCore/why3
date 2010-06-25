@@ -132,7 +132,7 @@ let empty_env uc = {
   ts_label = find_ts uc ["label"];
   ts_ref   = find_ts uc ["ref"];
   ts_exn   = find_ts uc ["exn"];
-  ts_unit  = find_ts uc ["unit"];
+  ts_unit  = find_ts uc ["tuple0"];
   (* functions *)
   ls_at    = find_ls uc ["at"];
   ls_bang  = find_ls uc ["prefix !"];

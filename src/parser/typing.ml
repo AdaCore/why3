@@ -114,8 +114,10 @@ let report fmt = function
 
 let () = Exn_printer.register
   (fun fmt exn -> match exn with
-    | Error error -> report fmt error
-    | _ -> raise exn)
+    | Error error -> 
+	report fmt error
+    | _ -> 
+	raise exn)
 
 (** Environments *)
 

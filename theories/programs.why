@@ -17,7 +17,7 @@ theory Prelude
   axiom Ge_bool_def : forall x y:int. ge_bool x y = True <-> x>=y
   axiom Gt_bool_def : forall x y:int. gt_bool x y = True <-> x> y
 
-  use export unit.Unit
+  type unit = ()
   logic ignore 'a : unit
 
   type arrow 'a 'b 

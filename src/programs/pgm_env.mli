@@ -42,7 +42,7 @@ type env = private {
   ts_bool : tysymbol;
   ts_label: tysymbol;
   ts_ref  : tysymbol;
-  ts_exn: tysymbol;
+  ts_exn  : tysymbol;
   ts_unit : tysymbol;
   ls_at   : lsymbol;
   ls_bang : lsymbol;

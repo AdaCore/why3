@@ -488,6 +488,8 @@ type_v:
    { Tarrow ([id_anonymous (), Some $1], $3) }
 | lident COLON simple_type_v ARROW type_c
    { Tarrow ([$1, Some $3], $5) }
+   /* TODO: we could alllow lidents instead, e.g. x y : int -> ... */
+   /*{ Tarrow (List.map (fun x -> x, Some $3) $1, $5) }*/
 ;
 
 simple_type_v:

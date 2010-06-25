@@ -54,6 +54,7 @@ programs () {
 	if ! $pgml $pgml_options $f > /dev/null 2>&1; then 
 	    echo 
 	    echo "$pgml $pgml_options $f"
+	    $pgml $pgml_options $f
 	    echo "FAILED!"
 	    exit 1 
         else 
@@ -81,6 +82,8 @@ valid_goals () {
 	echo -n "  "$f"... "
 	if $pgml -P alt-ergo $f | grep -q -v Valid; then
 	    echo "valid test $f failed!"
+	    echo "$pgml -P alt-ergo $f"
+	    $pgml -P alt-ergo $f
 	    exit 1
        else 
 	    echo "ok"

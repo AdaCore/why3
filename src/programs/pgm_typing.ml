@@ -77,9 +77,11 @@ let lexpr (loc, s) = parse_string Lexer.parse_lexpr loc s
 
 (* phase 1: typing programs (using destructive type inference) **************)
 
-let dty_bool gl = Tyapp (gl.ts_bool, [])
-let dty_unit gl = Tyapp (gl.ts_unit, [])
-let dty_label gl = Tyapp (gl.ts_label, [])
+let dty_app (ts, tyl) = assert (ts.ts_def = None); Tyapp (ts, tyl)
+
+let dty_bool gl = dty_app (gl.ts_bool, [])
+let dty_unit gl = dty_app (gl.ts_unit, [])
+let dty_label gl = dty_app (gl.ts_label, [])
 
 (* note: local variables are sqimultaneously in locals (to type programs)
    and in denv (to type logic elements) *)
@@ -153,7 +155,7 @@ let create_type_var loc =
   Tyvar (create_ty_decl_var ~loc ~user:false tv)
 
 let dcurrying gl tyl ty =
-  let make_arrow_type ty1 ty2 = Tyapp (gl.ts_arrow, [ty1; ty2]) in
+  let make_arrow_type ty1 ty2 = dty_app (gl.ts_arrow, [ty1; ty2]) in
   List.fold_right make_arrow_type tyl ty
 
 let uncurrying gl ty =
@@ -181,7 +183,7 @@ let rec dpurify env = function
 	(dpurify env c.dc_result_type)
 
 let check_reference_type gl loc ty =
-  let ty_ref = Tyapp (gl.ts_ref, [create_type_var loc]) in
+  let ty_ref = dty_app (gl.ts_ref, [create_type_var loc]) in
   if not (Denv.unify ty ty_ref) then
     errorm ~loc "this expression has type %a, but is expected to be a reference"
       print_dty ty
@@ -200,7 +202,7 @@ let dreference env id =
 
 let dexception env id =
   let _, _, ty as r = specialize_exception id.id_loc id.id env.env in
-  let ty_exn = Tyapp (env.env.ts_exn, []) in
+  let ty_exn = dty_app (env.env.ts_exn, []) in
   if not (Denv.unify ty ty_exn) then
     errorm ~loc:id.id_loc
       "this expression has type %a, but is expected to be an exception"
@@ -284,9 +286,9 @@ let rec dexpr env e =
 
 and dexpr_desc env loc = function
   | Pgm_ptree.Econstant (ConstInt _ as c) ->
-      DEconstant c, Tyapp (Ty.ts_int, [])
+      DEconstant c, dty_app (Ty.ts_int, [])
   | Pgm_ptree.Econstant (ConstReal _ as c) ->
-      DEconstant c, Tyapp (Ty.ts_real, [])
+      DEconstant c, dty_app (Ty.ts_real, [])
   | Pgm_ptree.Eident (Qident {id=x}) when Mstr.mem x env.locals ->
       (* local variable *)
       let tyv = Mstr.find x env.locals in
@@ -302,7 +304,7 @@ and dexpr_desc env loc = function
       let e1 = dexpr env e1 in
       let e2 = dexpr env e2 in
       let ty2 = create_type_var loc and ty = create_type_var loc in
-      if not (Denv.unify e1.dexpr_type (Tyapp (env.env.ts_arrow, [ty2; ty]))) 
+      if not (Denv.unify e1.dexpr_type (dty_app (env.env.ts_arrow, [ty2; ty]))) 
       then
 	errorm ~loc:e1.dexpr_loc "this expression is not a function";
       expected_type e2 ty2;
@@ -327,7 +329,7 @@ and dexpr_desc env loc = function
       let n = List.length el in
       let s = Typing.fs_tuple n in
       let tyl = List.map (fun _ -> create_type_var loc) el in
-      let ty = Tyapp (Typing.ts_tuple n, tyl) in
+      let ty = dty_app (Typing.ts_tuple n, tyl) in
       let create d ty = 
 	{ dexpr_desc = d; dexpr_denv = env.denv;
 	  dexpr_type = ty; dexpr_loc = loc }
@@ -337,7 +339,7 @@ and dexpr_desc env loc = function
 	assert (Denv.unify e2.dexpr_type ty2);
 	let ty = create_type_var loc in
 	assert (Denv.unify e1.dexpr_type 
-		  (Tyapp (env.env.ts_arrow, [ty2; ty])));
+		  (dty_app (env.env.ts_arrow, [ty2; ty])));
 	create (DEapply (e1, e2)) ty
       in
       let e = create (DElogic s) (dcurrying env.env tyl ty) in
