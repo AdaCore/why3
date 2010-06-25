@@ -1,0 +1,55 @@
+
+(**** McCarthy's ``91'' function. *)
+
+let rec f91 (n:int) : int variant { 101-n } =
+  { }
+  if n <= 100 then
+    f91 (f91 (n + 11))
+  else
+    n - 10
+  { (n <= 100 and result = 91) or (n >= 101 and result = n - 10) }
+
+
+(* non-recursive version *)
+
+{
+logic f int : int
+
+axiom F_def1 : forall x:int. x >= 101 -> f(x) = x-10
+axiom F_def2 : forall x:int. x <= 101 -> f(x) = 91
+
+logic iter_f int int : int (* iter_f(n,x) = f^n(x) *)
+
+axiom Iter_f_def1 : forall x:int. iter_f 0 x = x
+axiom Iter_f_def2 : forall n x:int. n > 0 -> iter_f n x = iter_f (n-1) (f x)
+
+inductive lex (int,int) (int,int) =
+| Lex_1: forall x1 y1 x2 y2 : int. 
+     lt_nat x1 x2 -> lex (x1,y1) (x2,y2)
+| Lex_2: forall x y1 y2 : int.
+     lt_nat y1 y2 -> lex (x,y1) (x,y2)
+}
+
+let f91_nonrec (n:ref int) (x:ref int) =
+  { !n >= 1 }
+  label L:
+  while !n > 0 do
+    invariant { !n >= 0 and iter_f !n !x = iter_f (at !n L) (at !x L) }
+    variant { (101 - !x + 10 * !n, !n) } for lex 
+    if !x > 100 then begin
+      x := !x - 10;
+      n := !n - 1
+    end else begin
+      x := !x + 11;
+      n := !n + 1
+    end
+  done;
+  !x
+  { result = iter_f (old !n) (old !x) }
+
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/mac_carthy"
+End: 
+*)

@@ -73,7 +73,7 @@
   let id_anonymous () = { id = "_"; id_loc = loc () }
   let exit_exn () = { id = "%Exit"; id_loc = loc () }
 
-  let id_wf_lt_int () = Qident { id = "wf_lt_int"; id_loc = loc () }
+  let id_lt_nat () = Qident { id = "lt_nat"; id_loc = loc () }
 
   let ty_unit () = Tpure (PPTtyapp ([], Qident (id_unit ())))
 
@@ -558,7 +558,7 @@ opt_raises:
 
 opt_variant:
 | /* epsilon */             { None }
-| VARIANT LOGIC             { Some ($2, id_wf_lt_int ()) }
+| VARIANT LOGIC             { Some ($2, id_lt_nat ()) }
 | VARIANT LOGIC FOR lqualid { Some ($2, $4) }
 ;
 
