@@ -30,7 +30,7 @@ endif
 # install the binaries
 DESTDIR =
 
-prefix 	    = @prefix@
+prefix	    = @prefix@
 exec_prefix = @exec_prefix@
 datarootdir = @datarootdir@
 
@@ -124,7 +124,6 @@ LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
 ifeq (@enable_hypothesis_selection@,yes)
 	LIB_TRANSFORM += hypothesis_selection
-	LIBINCLUDES += -I +ocamlgraph
 	INCLUDES += -I +ocamlgraph
 	EXTLIBS += ocamlgraph/graph
 endif
@@ -135,7 +134,7 @@ LIBMLI = $(addsuffix .mli, $(LIBMODULES))
 LIBCMO = $(addsuffix .cmo, $(LIBMODULES))
 LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
 
-$(LIBCMO) $(LIBCMX): INCLUDES = $(LIBINCLUDES)
+$(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why
 
 # build targets
