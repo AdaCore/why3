@@ -396,9 +396,9 @@ let do_input env drv = function
           Queue.iter (do_local_theory drv fname m) tlist
       with 
 	| Loc.Located (loc, e) ->
-	    eprintf "%a%a@." Loc.report_position loc report e; exit 1
+	    eprintf "@[%a%a@]@." Loc.report_position loc report e; exit 1
 	| e ->
-	    eprintf "%a@." report e; exit 1
+	    eprintf "@[%a@]@." report e; exit 1
 
 let () =
   try

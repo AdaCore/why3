@@ -544,6 +544,51 @@ and dtype_args s loc env el tl =
   in
   check_arg (el, tl)
 
+(** Add projection functions for the algebraic types *)
+
+let add_projection cl p (fs,tyarg,tyval) th =
+  let vs = create_vsymbol (id_fresh p) tyval in
+  let per_cs (_,id,pl) =
+    let cs = find_lsymbol (Qident id) th in
+    let tc = match cs.ls_value with
+      | None -> assert false
+      | Some t -> t
+    in
+    let m = ty_match Mtv.empty tc tyarg in
+    let per_param ty (n,_) = match n with
+      | Some id when id.id = p -> pat_var vs
+      | _ -> pat_wild (ty_inst m ty)
+    in
+    let al = List.map2 per_param cs.ls_args pl in
+    [pat_app cs al tyarg], t_var vs
+  in
+  let vs = create_vsymbol (id_fresh "u") tyarg in
+  let t = t_case [t_var vs] (List.map per_cs cl) tyval in
+  let d = make_fs_defn fs [vs] t in
+  add_logic_decl th [d]
+
+let add_projections th d = match d.td_def with
+  | TDabstract | TDalias _ -> th
+  | TDalgebraic cl ->
+      let per_cs acc (_,id,pl) =
+        let cs = find_lsymbol (Qident id) th in
+        let tc = match cs.ls_value with
+          | None -> assert false
+          | Some t -> t
+        in
+        let per_param acc ty (n,_) = match n with
+          | Some id when not (Mstr.mem id.id acc) ->
+              let fn = id_user id.id id.id_loc in
+              let fs = create_fsymbol fn [tc] ty in
+              Mstr.add id.id (fs,tc,ty) acc
+          | _ -> acc
+        in
+        List.fold_left2 per_param acc cs.ls_args pl
+      in
+      let ps = List.fold_left per_cs Mstr.empty cl in
+      try Mstr.fold (add_projection cl) ps th
+      with e -> raise (Loc.Located (d.td_loc, e))
+
 (** Typing declarations, that is building environments. *)
 
 open Ptree
@@ -643,8 +688,10 @@ let add_types dl th =
     in
     ts, d
   in
-  try add_ty_decls th (List.map decl dl)
-  with ClashSymbol s -> error ~loc:(Hashtbl.find csymbols s) (Clash s)
+  let th = try add_ty_decls th (List.map decl dl)
+    with ClashSymbol s -> error ~loc:(Hashtbl.find csymbols s) (Clash s)
+  in
+  List.fold_left add_projections th dl
 
 let env_of_vsymbol_list vl =
   List.fold_left (fun env v -> Mstr.add v.vs_name.id_string v env) Mstr.empty vl

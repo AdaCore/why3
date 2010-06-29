@@ -7,18 +7,13 @@
 
   logic (#) (a : array 'a) (i : int) : 'a = A.select a i
 
-  type uf = ((* link: *) array int,
-             (* dist: *) array int, (* distance to representative *)
-             (* size: *) int,
-             (* num : *) int)
-
-  logic link (u : uf) : array int = let (l, _, _, _) = u in l
-  logic dist (u : uf) : array int = let (_, d, _, _) = u in d
-  logic size (u : uf) : int       = let (_, _, s, _) = u in s
-  logic num  (u : uf) : int       = let (_, _, _, n) = u in n
+  type uf = UF (link : array int)
+               (dist : array int) (* distance to representative *)
+               (size : int)
+               (num  : int)
 
   logic inv (u : uf) =
-    let (l, d, s, n) = u in
+    let (UF l d s n) = u in
     (forall i:int. 0 <= i < s -> 0 <= l#i < s) and
     (forall i:int. 0 <= i < s -> 
        (d#i = 0 and l#i = i or d#i > 0 and d#(l#i) = d#i - 1))
@@ -51,7 +46,7 @@ let create (n:int) =
     
     i := !i + 1
   done;
-  ref ((!l, A.const_length 0 n, n, n))
+  ref (UF !l (A.const_length 0 n) n n)
   { inv !result and
     num !result = n and size !result = n and
     forall x:int. 0 <= x < n -> repr !result x = x }
@@ -100,7 +95,7 @@ let union (u:ref uf) (a b:int) =
   let rb = find u b in
   let l = link !u in
   let d = increment u ra in
-  u := (A.store l ra rb, d, size !u, num !u - 1)
+  u := UF (A.store l ra rb) d (size !u) (num !u - 1)
   { inv !u and 
     same !u a b and
     size !u = size (old !u) and num !u = num (old !u) - 1 and 

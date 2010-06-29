@@ -33,16 +33,14 @@ back  +-+-+-+-------------------+
 
   logic (#) (a : array 'a) (i : int) : 'a = A.select a i
 
-  type sparse_array = (array elt, array int, array int, int (*sz*), int (*n*))
-
-  logic sa_val (a : sparse_array) : array elt = let (v, _, _, _, _) = a in v
-  logic sa_idx (a : sparse_array) : array int = let (_, i, _, _, _) = a in i
-  logic sa_back(a : sparse_array) : array int = let (_, _, b, _, _) = a in b
-  logic sa_sz  (a : sparse_array) : int       = let (_, _, _, s, _) = a in s
-  logic sa_n   (a : sparse_array) : int       = let (_, _, _, _, n) = a in n
+  type sparse_array = SA (sa_val  : array elt) 
+                         (sa_idx  : array int)
+                         (sa_back : array int)
+                         (sa_sz   : int)
+                         (sa_n    : int)
 
   logic is_elt (a : sparse_array) (i : int) =
-    let (val, idx, back, _, n) = a in
+    let (SA val idx back _ n) = a in
     0 <= idx#i < n and back#(idx#i) = i
 
   logic model (a : sparse_array) (i : int) : elt =
@@ -52,7 +50,7 @@ back  +-+-+-+-------------------+
       default
 
   logic invariant (a : sparse_array) = 
-    let (val, idx, back, sz, n) = a in
+    let (SA val idx back sz n) = a in
     0 <= n <= sz <= maxlen and
     forall i : int. 0 <= i < n -> 0 <= back#i < sz and idx#(back#i) = i
 
@@ -79,7 +77,7 @@ back  +-+-+-+-------------------+
 
   lemma Inter6 :
     forall a : sparse_array . invariant a -> 
-        let (val, idx, back, sz, n) = a in
+        let (SA val idx back sz n) = a in
         n = sz -> 
             permutation sz back and
             forall i : int. 0 <= i < sz ->
@@ -99,7 +97,7 @@ parameter malloc : n:int -> {} array 'a { A.length result = n }
 
 let create sz =
   { 0 <= sz <= maxlen } 
-  ref ((malloc sz, malloc sz, malloc sz, sz, 0) : sparse_array)
+  ref (SA (malloc sz) (malloc sz) (malloc sz) sz 0)
   { invariant !result and 
     sa_sz !result = sz and forall i:int. model !result i = default }
 
@@ -147,12 +145,12 @@ let set a i v =
   let n = sa_n !a in
   let val = A.store val i v in
   if test a i then
-    a := (val, idx, back, sz, n)
+    a := SA val idx back sz n
   else begin
     assert { n < sz };
     let idx = A.store idx i n in 
     let back = A.store back n i in
-    a := (val, idx, back, sz, n+1)
+    a := SA val idx back sz (n+1)
   end
   { invariant !a and 
     sa_sz !a = sa_sz (old !a) and
