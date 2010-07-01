@@ -10,21 +10,18 @@
   logic sum_digits (n:int) : int =
     if n = 0 then 0 else sum_digits (div n 10) + mod n 10
 
-  logic p (n:int) = sum_digits(n) = sum_digits(137 * n)
-  clone int.NumOf as P with logic pr = p
-
-  type int2 = (int,int)
-  logic q (d:int2) (n:int) = 
-    let (a,b) = d in sum_digits(n) = sum_digits(137 * n + a) = b
-  clone int.NumOfParam as Q with type param = int2, logic pr = q
-
   type int3 = (int,int,int)
+
   logic r (d:int3) (n:int) = 
     let (a,b,c) = d in 
-    0 <= mod n 10 < c and sum_digits(n) = sum_digits(137 * n + a) = b
+    0 <= mod n 10 < c and sum_digits n = sum_digits (137 * n + a) + b
+
   clone int.NumOfParam as R with type param = int3, logic pr = r
 
-  goal Test : forall n:int. 0 <= n < power 10 0 -> n = 0 
+  logic solution(m : int) : int = R.num_of (0,0,10) 0 (power 10 m)
+
+  lemma Base00: forall a b : int. 0 <= a -> sum_digits a + b = 0 -> r (a,b,10) 0
+
 }
 
 {
@@ -37,18 +34,19 @@ let rec sd n =
   { result = sum_digits n }
 
 (* f(m,a,b) = the number of 0 <= n < 10^m such that 
-   digitsum(n) = digitsum(137n+a) + b. *)
+   digitsum(137n+a) + b = digitsum(n). *)
 let rec f m a b =
-  { 0 <= m }
+  { 0 <= m and 0 <= a }
   if m = 0 then begin
     (* only n = 0 is possible *)
-    if sum_digits a + b = 0 then 1 else 0
+    if sd a + b = 0 then 1 else 0
   end else begin
+    absurd;
     let sum = ref 0 in
     let c = ref 0 in
     while !c <= 9 do (* n = 10n' + c *)
-      invariant { 0 <= !c <= 10 } 
-      variant { !c }
+      invariant { 0 <= !c <= 10 and !sum = R.num_of (a,b,!c) 0 (power 10 m) } 
+      variant   { 10 - !c }
       let x = 137 * !c + a in
       let a' = div x 10 in
       let c' = mod x 10 in
@@ -57,7 +55,7 @@ let rec f m a b =
     done;
     !sum
   end
-  { result = Q.num_of (a,b) 0 (power 10 m) }
+  { result = solution m }
     
 
 (*

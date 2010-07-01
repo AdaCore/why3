@@ -1,0 +1,32 @@
+
+{ 
+  logic fib (n:int) : int =  
+     if n <= 1 then 1 else fib (n-1) + fib (n-2)
+
+  type option 'a = None | Some 'a
+
+  type table 'a 'b
+
+  logic get (table 'a 'b) 'a : option 'b
+  logic set (table 'a 'b) 'a 'b : table 'a 'b
+
+  axiom Select_eq : 
+    forall m : table 'a 'b. forall a1 a2 : 'a. 
+    forall b : 'b [get (set m a1 b) a2].
+    a1 = a2 -> get (set m a1 b) a2  = Some b
+
+  axiom Select_neq : 
+    forall m : table 'a 'b. forall a1 a2 : 'a. 
+    forall b : 'b [get (set m a1 b) a2].
+    a1 <> a2 -> get (set m a1 b) a2 = get m a2
+
+}
+
+parameter table : ref (table int int)
+
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/fib"
+End: 
+*)
