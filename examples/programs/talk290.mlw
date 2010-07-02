@@ -12,15 +12,38 @@
 
   type int3 = (int,int,int)
 
-  logic r (d:int3) (n:int) = 
+  logic pr1 (d:int3) (n:int) = 
+    let (a,b,c) = d in 
+    mod n 10 = c and sum_digits n = sum_digits (137 * n + a) + b
+
+  clone int.NumOfParam as P1 with type param = int3, logic pr = pr1
+
+  logic pr2 (d:int3) (n:int) = 
     let (a,b,c) = d in 
     0 <= mod n 10 < c and sum_digits n = sum_digits (137 * n + a) + b
 
-  clone int.NumOfParam as R with type param = int3, logic pr = r
+  clone int.NumOfParam as P2 with type param = int3, logic pr = pr2
 
-  logic solution(m : int) : int = R.num_of (0,0,10) 0 (power 10 m)
+  logic solution(a b m : int) : int = P2.num_of (a,b,10) 0 (power 10 m)
 
-  lemma Base00: forall a b : int. 0 <= a -> sum_digits a + b = 0 -> r (a,b,10) 0
+  lemma Base00: 
+    forall a b : int. 0 <= a -> sum_digits a + b = 0 -> pr2 (a,b,10) 0
+
+  lemma Empty:
+    forall a b x y : int. P2.num_of (a,b,0) x y = 0
+
+  lemma Induc1:
+    forall a b c : int. 0 <= a -> 0 <= c < 10 ->
+    forall x y : int. 
+    P2.num_of (a,b,c+1) x y = P2.num_of (a,b,c) x y + P1.num_of (a,b,c) x y
+    
+  lemma Induc2:
+    forall a b c : int. 0 <= a -> 0 <= c < 10 ->
+    let x = 137 * c + a in
+    let a' = div x 10 in
+    let b' = mod x 10 + b - c in
+    forall m : int. m > 0 ->
+    P1.num_of (a,b,c) 0 (power 10 m) = P2.num_of (a', b', 10) 0 (power 10 (m-1))
 
 }
 
@@ -41,11 +64,10 @@ let rec f m a b =
     (* only n = 0 is possible *)
     if sd a + b = 0 then 1 else 0
   end else begin
-    absurd;
     let sum = ref 0 in
     let c = ref 0 in
     while !c <= 9 do (* n = 10n' + c *)
-      invariant { 0 <= !c <= 10 and !sum = R.num_of (a,b,!c) 0 (power 10 m) } 
+      invariant { 0 <= !c <= 10 and !sum = P2.num_of (a,b,!c) 0 (power 10 m) } 
       variant   { 10 - !c }
       let x = 137 * !c + a in
       let a' = div x 10 in
@@ -55,7 +77,7 @@ let rec f m a b =
     done;
     !sum
   end
-  { result = solution m }
+  { result = solution a b m }
     
 
 (*
