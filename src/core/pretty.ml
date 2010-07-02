@@ -412,11 +412,9 @@ let () = Exn_printer.register
                    to %i arguments, but is applied to %i"
         print_ts ts ts_arg app_arg
   | Ty.DuplicateTypeVar tv ->
-      fprintf fmt "Type variable %a is used twice"
-        print_tv tv
-  | Ty.UnboundTypeVars ts ->
-      fprintf fmt "Unbound type variables: %a"
-        (print_list space print_tv) (Stv.elements ts)
+      fprintf fmt "Type variable %a is used twice" print_tv tv
+  | Ty.UnboundTypeVar tv ->
+      fprintf fmt "Unbound type variable: %a" print_tv tv
   | Term.BadArity (ls, ls_arg, app_arg) ->
       fprintf fmt "Bad arity: symbol %a must be applied \
                    to %i arguments, but is applied to %i"
@@ -453,13 +451,16 @@ let () = Exn_printer.register
   | Decl.BadLogicDecl (id1,id2) ->
       fprintf fmt "Ill-formed definition: idents %s and %s are different"
         id1.id_string id2.id_string
-  | Decl.UnboundVars svs ->
-      fprintf fmt "Unbound variables: %a"
-        (print_list comma print_vsty) (Svs.elements svs)
+  | Decl.UnboundVar vs ->
+      fprintf fmt "Unbound variable: %a" print_vsty vs
   | Decl.ClashIdent id ->
       fprintf fmt "Ident %s is defined twice" id.id_string
   | Decl.EmptyDecl ->
       fprintf fmt "Empty declaration"
+  | Decl.EmptyAlgDecl ts ->
+      fprintf fmt "Algebraic type %a has no constructors" print_ts ts
+  | Decl.EmptyIndDecl ls ->
+      fprintf fmt "Inductive predicate %a has no constructors" print_ls ls
   | Decl.KnownIdent id ->
       fprintf fmt "Ident %s is already declared" id.id_string
   | Decl.UnknownIdent id ->

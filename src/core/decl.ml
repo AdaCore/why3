@@ -37,11 +37,12 @@ type ls_defn = lsymbol * fmla
 
 type logic_decl = lsymbol * ls_defn option
 
-exception UnboundVars of Svs.t
+exception UnboundVar of vsymbol
 
 let check_fvs f =
   let fvs = f_freevars Svs.empty f in
-  if Svs.is_empty fvs then f else raise (UnboundVars fvs)
+  Svs.iter (fun vs -> raise (UnboundVar vs)) fvs;
+  f
 
 let make_fs_defn fs vl t =
   let hd = t_app fs (List.map t_var vl) t.t_ty in
@@ -108,6 +109,8 @@ type prop_decl = prop_kind * prsymbol * fmla
 
 type decl = {
   d_node : decl_node;
+  d_syms : Sid.t;       (* idents used in declaration *)
+  d_news : Sid.t;       (* idents introduced in declaration *)
   d_tag  : int;
 }
 
@@ -188,25 +191,40 @@ let d_equal = (==)
 
 (** Declaration constructors *)
 
-let mk_decl n = { d_node = n; d_tag = -1 }
+let mk_decl node syms news = {
+  d_node = node;
+  d_syms = syms;
+  d_news = news;
+  d_tag  = -1;
+}
 
-let create_ty_decl tdl = Hsdecl.hashcons (mk_decl (Dtype tdl))
-let create_logic_decl ldl = Hsdecl.hashcons (mk_decl (Dlogic ldl))
-let create_ind_decl idl = Hsdecl.hashcons (mk_decl (Dind idl))
-let create_prop_decl k p f = Hsdecl.hashcons (mk_decl (Dprop (k,p,f)))
+let create_ty_decl tdl s n = Hsdecl.hashcons (mk_decl (Dtype tdl) s n)
+let create_logic_decl ldl s n = Hsdecl.hashcons (mk_decl (Dlogic ldl) s n)
+let create_ind_decl idl s n = Hsdecl.hashcons (mk_decl (Dind idl) s n)
+let create_prop_decl k p f s n = Hsdecl.hashcons (mk_decl (Dprop (k,p,f)) s n)
 
 exception IllegalTypeAlias of tysymbol
 exception ClashIdent of ident
 exception BadLogicDecl of ident * ident
-exception EmptyDecl
 
-let add_id s id =
+exception EmptyDecl
+exception EmptyAlgDecl of tysymbol
+exception EmptyIndDecl of lsymbol
+
+let news_id s id =
   if Sid.mem id s then raise (ClashIdent id);
   Sid.add id s
 
+let syms_ts s ts = Sid.add ts.ts_name s
+let syms_ls s ls = Sid.add ls.ls_name s
+
+let syms_ty s ty = ty_s_fold syms_ts s ty
+let syms_term s t = t_s_fold syms_ts syms_ls s t
+let syms_fmla s f = f_s_fold syms_ts syms_ls s f
+
 let create_ty_decl tdl =
   if tdl = [] then raise EmptyDecl;
-  let check_constr ty acc fs =
+  let check_constr ty (syms,news) fs =
     let vty = of_option fs.ls_value in
     ignore (ty_match Mtv.empty vty ty);
     let add s ty = match ty.ty_node with
@@ -215,32 +233,41 @@ let create_ty_decl tdl =
     in
     let vs = ty_fold add Stv.empty vty in
     let rec check s ty = match ty.ty_node with
-      | Tyvar v when not (Stv.mem v vs) -> Stv.add v s
-      | _ -> ty_fold check s ty
+      | Tyvar v when Stv.mem v vs -> s
+      | Tyvar v -> raise (UnboundTypeVar v)
+      | Tyapp (ts,_) -> Sid.add ts.ts_name (ty_fold check s ty)
     in
-    let ts = List.fold_left check Stv.empty fs.ls_args in
-    if not (Stv.is_empty ts) then raise (UnboundTypeVars ts);
-    add_id acc fs.ls_name
+    let syms = List.fold_left check syms fs.ls_args in
+    syms, news_id news fs.ls_name
   in
-  let check_decl acc (ts,td) = match td with
-    | Tabstract -> add_id acc ts.ts_name
+  let check_decl (syms,news) (ts,td) = match td with
+    | Tabstract ->
+        let syms = option_apply syms (syms_ty syms) ts.ts_def in
+        syms, news_id news ts.ts_name
     | Talgebraic cl ->
+        if cl = [] then raise (EmptyAlgDecl ts);
         if ts.ts_def <> None then raise (IllegalTypeAlias ts);
+        let news = news_id news ts.ts_name in
         let ty = ty_app ts (List.map ty_var ts.ts_args) in
-        List.fold_left (check_constr ty) (add_id acc ts.ts_name) cl
+        List.fold_left (check_constr ty) (syms,news) cl
   in
-  ignore (List.fold_left check_decl Sid.empty tdl);
-  create_ty_decl tdl
+  let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) tdl in
+  create_ty_decl tdl syms news
 
 let create_logic_decl ldl =
   if ldl = [] then raise EmptyDecl;
-  let check_decl acc (ls,ld) = match ld with
+  let check_decl (syms,news) (ls,ld) = match ld with
     | Some (s,_) when not (ls_equal s ls) ->
         raise (BadLogicDecl (ls.ls_name, s.ls_name))
-    | _ -> add_id acc ls.ls_name
+    | Some (_,f) ->
+        syms_fmla syms f, news_id news ls.ls_name
+    | None ->
+        let syms = option_apply syms (syms_ty syms) ls.ls_value in
+        let syms = List.fold_left syms_ty syms ls.ls_args in
+        syms, news_id news ls.ls_name
   in
-  ignore (List.fold_left check_decl Sid.empty ldl);
-  create_logic_decl ldl
+  let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) ldl in
+  create_logic_decl ldl syms news
 
 exception InvalidIndDecl of lsymbol * prsymbol
 exception TooSpecificIndDecl of lsymbol * prsymbol * term
@@ -267,7 +294,7 @@ let create_ind_decl idl =
   if idl = [] then raise EmptyDecl;
   let add acc (ps,_) = Sls.add ps acc in
   let sps = List.fold_left add Sls.empty idl in
-  let check_ax ps acc (pr,f) =
+  let check_ax ps (syms,news) (pr,f) =
     let rec clause acc f = match f.f_node with
       | Fquant (Fforall, f) ->
           let _,_,f = f_open_quant f in clause acc f
@@ -283,18 +310,22 @@ let create_ind_decl idl =
           in
           ignore (List.fold_left2 mtch Mtv.empty tl ps.ls_args);
           (try ignore (List.for_all (f_pos_ps sps (Some true)) cls)
-          with Found ls ->
-            raise (NonPositiveIndDecl (ps, pr, ls)));
-          add_id acc pr.pr_name
+          with Found ls -> raise (NonPositiveIndDecl (ps, pr, ls)));
+          syms_fmla syms f, news_id news pr.pr_name
       | _ -> raise (InvalidIndDecl (ps, pr))
   in
-  let check_decl acc (ps,al) =
-    List.fold_left (check_ax ps) (add_id acc ps.ls_name) al
+  let check_decl (syms,news) (ps,al) =
+    if al = [] then raise (EmptyIndDecl ps);
+    let news = news_id news ps.ls_name in
+    List.fold_left (check_ax ps) (syms,news) al
   in
-  ignore (List.fold_left check_decl Sid.empty idl);
-  create_ind_decl idl
+  let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) idl in
+  create_ind_decl idl syms news
 
-let create_prop_decl k p f = create_prop_decl k p (check_fvs f)
+let create_prop_decl k p f =
+  let syms = syms_fmla Sid.empty f in
+  let news = news_id Sid.empty p.pr_name in
+  create_prop_decl k p (check_fvs f) syms news
 
 (** Split declarations *)
 
@@ -405,7 +436,8 @@ let decl_fold fnT fnF acc d = match d.d_node with
       let fn acc (_,f) = fnF acc f in
       let fn acc (_,l) = List.fold_left fn acc l in
       List.fold_left fn acc l
-  | Dprop (_,_,f) -> fnF acc f
+  | Dprop (_,_,f) ->
+      fnF acc f
 
 
 (** Known identifiers *)
@@ -419,13 +451,6 @@ type known_map = decl Mid.t
 let known_id kn id =
   if not (Mid.mem id kn) then raise (UnknownIdent id)
 
-let known_ts kn () ts = known_id kn ts.ts_name
-let known_ls kn () ls = known_id kn ls.ls_name
-
-let known_ty kn ty = ty_s_fold (known_ts kn) () ty
-let known_term kn t = t_s_fold (known_ts kn) (known_ls kn) () t
-let known_fmla kn f = f_s_fold (known_ts kn) (known_ls kn) () f
-
 let merge_known kn1 kn2 =
   let add_known id decl kn =
     try
@@ -435,58 +460,19 @@ let merge_known kn1 kn2 =
   in
   Mid.fold add_known kn1 kn2
 
-let add_known id decl kn =
-  try
-    if not (d_equal (Mid.find id kn) decl) then raise (RedeclaredIdent id);
-    raise (KnownIdent id)
-  with Not_found -> Mid.add id decl kn
-
-let add_constr d kn fs = add_known fs.ls_name d kn
-
-let add_type d kn (ts,def) =
-  let kn = add_known ts.ts_name d kn in
-  match def with
-    | Tabstract -> kn
-    | Talgebraic lfs -> List.fold_left (add_constr d) kn lfs
-
-let check_type kn (ts,def) =
-  let check_constr fs = List.iter (known_ty kn) fs.ls_args in
-  match def with
-    | Tabstract -> option_iter (known_ty kn) ts.ts_def
-    | Talgebraic lfs -> List.iter check_constr lfs
-
-let add_logic d kn (ls,_) = add_known ls.ls_name d kn
-
-let check_ls_defn kn ld =
-  let _,e = open_ls_defn ld in
-  e_apply (known_term kn) (known_fmla kn) e
-
-let check_logic kn (ls,ld) =
-  List.iter (known_ty kn) ls.ls_args;
-  option_iter (known_ty kn) ls.ls_value;
-  option_iter (check_ls_defn kn) ld
-
-let add_ind d kn (ps,la) =
-  let kn = add_known ps.ls_name d kn in
-  let add kn (pr,_) = add_known pr.pr_name d kn in
-  List.fold_left add kn la
-
-let check_ind kn (ps,la) =
-  List.iter (known_ty kn) ps.ls_args;
-  let check (_,f) = known_fmla kn f in
-  List.iter check la
-
-let add_decl kn d = match d.d_node with
-  | Dtype dl  -> List.fold_left (add_type d) kn dl
-  | Dlogic dl -> List.fold_left (add_logic d) kn dl
-  | Dind dl   -> List.fold_left (add_ind d) kn dl
-  | Dprop (_,pr,_) -> add_known pr.pr_name d kn
-
-let check_decl kn d = match d.d_node with
-  | Dtype dl  -> List.iter (check_type kn) dl
-  | Dlogic dl -> List.iter (check_logic kn) dl
-  | Dind dl   -> List.iter (check_ind kn) dl
-  | Dprop (_,_,f) -> known_fmla kn f
+let known_add_decl kn decl =
+  let add_known id kn =
+    try
+      if not (d_equal (Mid.find id kn) decl) then raise (RedeclaredIdent id);
+      raise (KnownIdent id)
+    with Not_found -> Mid.add id decl kn
+  in
+  let kn = Sid.fold add_known decl.d_news kn in
+  let check_known id =
+    if not (Mid.mem id kn) then raise (UnknownIdent id)
+  in
+  ignore (Sid.iter check_known decl.d_syms);
+  kn
 
 let find_constructors kn ts =
   match (Mid.find ts.ts_name kn).d_node with
@@ -532,8 +518,7 @@ and check_matchF kn () f = match f.f_node with
 let check_match kn d = decl_fold (check_matchT kn) (check_matchF kn) () d
 
 let known_add_decl kn d =
-  let kn = add_decl kn d in
-  ignore (check_decl kn d);
+  let kn = known_add_decl kn d in
   ignore (check_match kn d);
   kn
 

@@ -131,11 +131,7 @@ let ty_any pr ty =
 
 exception BadTypeArity of tysymbol * int * int
 exception DuplicateTypeVar of tvsymbol
-exception UnboundTypeVars of Stv.t
-
-let rec tv_known s acc ty = match ty.ty_node with
-  | Tyvar n when not (Stv.mem n s) -> Stv.add n acc
-  | _ -> ty_fold (tv_known s) acc ty
+exception UnboundTypeVar of tvsymbol
 
 let create_tysymbol name args def =
   let add s v =
@@ -143,12 +139,11 @@ let create_tysymbol name args def =
     Stv.add v s
   in
   let s = List.fold_left add Stv.empty args in
-  begin match def with
-    | Some ty ->
-        let ts = tv_known s Stv.empty ty in
-        if not (Stv.is_empty ts) then raise (UnboundTypeVars ts)
-    | _ -> ()
-  end;
+  let rec vars () ty = match ty.ty_node with
+    | Tyvar v when not (Stv.mem v s) -> raise (UnboundTypeVar v)
+    | _ -> ty_fold vars () ty
+  in
+  option_iter (vars ()) def;
   create_tysymbol name args def
 
 let rec tv_inst m ty = match ty.ty_node with

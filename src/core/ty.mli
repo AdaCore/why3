@@ -67,7 +67,7 @@ val ty_equal : ty -> ty -> bool
 
 exception BadTypeArity of tysymbol * int * int
 exception DuplicateTypeVar of tvsymbol
-exception UnboundTypeVars of Stv.t
+exception UnboundTypeVar of tvsymbol
 
 val create_tysymbol : preid -> tvsymbol list -> ty option -> tysymbol
 

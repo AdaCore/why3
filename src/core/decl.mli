@@ -80,6 +80,8 @@ type prop_decl = prop_kind * prsymbol * fmla
 
 type decl = private {
   d_node : decl_node;
+  d_syms : Sid.t;       (* idents used in declaration *)
+  d_news : Sid.t;       (* idents introduced in declaration *)
   d_tag  : int;
 }
 
@@ -117,9 +119,12 @@ exception TooSpecificIndDecl of lsymbol * prsymbol * term
 exception NonPositiveIndDecl of lsymbol * prsymbol * lsymbol
 
 exception BadLogicDecl of ident * ident
-exception UnboundVars of Svs.t
+exception UnboundVar of vsymbol
 exception ClashIdent of ident
+
 exception EmptyDecl
+exception EmptyAlgDecl of tysymbol
+exception EmptyIndDecl of lsymbol
 
 (** {2 Utilities} *)
 
