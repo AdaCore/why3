@@ -152,13 +152,13 @@ val try_prover :
   command:string -> driver:Why.Driver.driver -> goal -> (unit -> unit)
   (** attempts to prove goal with the given prover.  This function
       prepares the goal for that prover, adds it as an new
-      external_proof attempt, setting its current status to Running,
+      external_proof attempt, setting its current status to Scheduled,
       and returns immmediately a function.  When called, this function
-      actually launches the prover, and waits for its
-      termination. Upon termination of the external process, the
-      prover's answer is retrieved and database is updated. The
-      [proved] field of the database is updated, and also these of any
-      goal affected, according to invariant above. 
+      actually sets the status to running, launches the prover, and
+      waits for its termination. Upon termination of the external
+      process, the prover's answer is retrieved and database is
+      updated. The [proved] field of the database is updated, and also
+      these of any goal affected, according to invariant above.
 
       Although goal preparation is not re-entrant, the function
       returned initially is re-entrant, thus is suitable for being executed
