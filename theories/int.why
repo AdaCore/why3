@@ -127,6 +127,10 @@ theory NumOfParam
     forall p : param, a b c : int. 
     a <= b <= c -> num_of p a c = num_of p a b + num_of p b c
 
+  axiom Empty :
+    forall p : param, a b : int.
+    (forall n : int. a <= n < b -> not pr p n) -> num_of p a b = 0
+
 end
 
 theory NumOf

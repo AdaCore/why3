@@ -1,31 +1,25 @@
 
+(* Fibonacci function with memoisation *)
+
 { 
   logic fib (n:int) : int =  
      if n <= 1 then 1 else fib (n-1) + fib (n-2)
 
   type option 'a = None | Some 'a
 
-  type table 'a 'b
+  use array.Array as A
 
-  logic get (table 'a 'b) 'a : option 'b
-  logic set (table 'a 'b) 'a 'b : table 'a 'b
-
-  axiom Select_eq : 
-    forall m : table 'a 'b. forall a1 a2 : 'a. forall b : 'b.
-    a1 = a2 -> get (set m a1 b) a2  = Some b
-
-  axiom Select_neq : 
-    forall m : table 'a 'b. forall a1 a2 : 'a. forall b : 'b.
-    a1 <> a2 -> get (set m a1 b) a2 = get m a2
+  type table 'a 'b = A.t 'a (option 'b)
 
   logic inv (t : table int int) =
-    forall x y : int. get t x = Some y -> y = fib x
+    forall x y : int. A.select t x = Some y -> y = fib x
 }
 
 parameter table : ref (table int int)
 
 parameter add : 
-  x:int -> y:int -> {} unit writes table { !table = set (old !table) x y }
+  x:int -> y:int -> 
+    {} unit writes table { !table = A.store (old !table) x (Some y) }
 
 exception Not_found
 
@@ -33,20 +27,22 @@ parameter find :
   x:int -> 
    {} 
    int reads table raises Not_found 
-   { get !table x = Some result } | Not_found -> { get !table x = None }
+   { A.select !table x = Some result } 
+   | Not_found -> { A.select !table x = None }
   
 let rec fibo n =
-  { 0 <= n and inv(!table) }
+  { 0 <= n and inv !table }
   if n <= 1 then
     1
-  else memo_fibo (n-1) + memo_fibo (n-2)
-  { result = fib n and inv(!table) }
+  else 
+    memo_fibo (n-1) + memo_fibo (n-2)
+  { result = fib n and inv !table }
 
 and memo_fibo n =
-  { 0 <= n and inv(!table) }
-  try find n
+  { 0 <= n and inv !table }
+  try  find n
   with Not_found -> let fn = fibo n in add n fn; fn end
-  { result = fib n and inv(!table) }
+  { result = fib n and inv !table }
 
 (*
 Local Variables: 
