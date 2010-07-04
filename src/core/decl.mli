@@ -59,20 +59,17 @@ module Hpr : Hashtbl.S with type key = prsymbol
 
 val create_prsymbol : preid -> prsymbol
 
-type prop = prsymbol * fmla
-
-type ind_decl = lsymbol * prop list
-
 val pr_equal : prsymbol -> prsymbol -> bool
 
-val prop_equal : prop -> prop -> bool
+type ind_decl = lsymbol * (prsymbol * fmla) list
 
 (* Proposition declaration *)
 
 type prop_kind =
-  | Paxiom
-  | Plemma
-  | Pgoal
+  | Plemma    (* prove, use as a premise *)
+  | Paxiom    (* do not prove, use as a premise *)
+  | Pgoal     (* prove, do not use as a premise *)
+  | Pskip     (* do not prove, do not use as a premise *)
 
 type prop_decl = prop_kind * prsymbol * fmla
 
@@ -135,6 +132,7 @@ val decl_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> decl -> 'a
 
 type known_map = decl Mid.t
 
+val known_id : known_map -> ident -> unit
 val known_add_decl : known_map -> decl -> known_map
 val merge_known : known_map -> known_map -> known_map
 
@@ -144,6 +142,6 @@ exception RedeclaredIdent of ident
 exception NonExhaustiveExpr of (pattern list * expr)
 
 val find_constructors : known_map -> tysymbol -> lsymbol list
-val find_inductive_cases : known_map -> lsymbol -> prop list
+val find_inductive_cases : known_map -> lsymbol -> (prsymbol * fmla) list
 val find_prop : known_map -> prsymbol -> fmla
 

@@ -58,6 +58,8 @@ val list_fold_product_l :
       not tail-reccursive
   *)
 
+val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
+
   (* boolean fold accumulators *)
 
 exception FoldSkip

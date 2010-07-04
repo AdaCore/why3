@@ -21,9 +21,9 @@ open Task
 open Trans
 open Driver
 
-type use   = Theory.use_map
-type clone = Theory.clone_map
 type query = driver_query
+type clone = Ident.Sid.t Ident.Mid.t
+type use   = Theory.theory Ident.Mid.t
 
 type 'a value = Env.env option -> driver option -> task -> 'a
 
@@ -67,12 +67,12 @@ let memo_query fn =
     | Some drv -> fun task -> fn (driver_query drv task)
 
 let memo_use fn =
-  let fn task = fn (task_used task) in
+  let fn task = fn (old_task_use task) in
   let fn = WHtask.memoize_option 63 fn in
   fun task -> fn (last_use task)
 
 let memo_clone fn =
-  let fn task = fn (task_clone task) in
+  let fn task = fn (old_task_clone task) in
   let fn = WHtask.memoize_option 63 fn in
   fun task -> fn (last_clone task)
 

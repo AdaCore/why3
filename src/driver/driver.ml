@@ -292,7 +292,7 @@ let add_tags drv id acc = Sstr.union (get_tags drv.drv_tags_cl id) acc
 let add_remove drv id acc = acc || Sid.mem id drv.drv_remove_cl
 
 let driver_query drv task =
-  let clone = task_clone task in
+  let clone = old_task_clone task in
   let htags = Hid.create 7 in
   let query_tags id = try Hid.find htags id with Not_found ->
     let r = try Mid.find id clone with Not_found -> Sid.empty in
@@ -321,7 +321,7 @@ let query_remove dq = dq.query_remove
 let query_tags   dq = dq.query_tags
 let query_driver dq = dq.query_driver
 let query_env    dq = dq.query_driver.drv_env
-let query_clone  dq = task_clone (dq.query_lclone)
+let query_clone  dq = old_task_clone (dq.query_lclone)
 let query_tag    dq = dq.query_tag
 
 (** apply drivers *)
@@ -336,19 +336,13 @@ let print_prelude_list fmt prel =
 
 let print_prelude drv task fmt =
   print_prelude_list fmt drv.drv_prelude;
-  let seen = Hid.create 17 in
-  let rec print_prel th_name th =
-    if Hid.mem seen th_name then () else begin
-      Hid.add seen th_name ();
-      Mid.iter print_prel th.th_used;
-      let prel =
-        try Mid.find th_name drv.drv_thprelude
-        with Not_found -> []
-      in
-      print_prelude_list fmt prel
-    end
+  let th_used = task_fold (fun acc -> function
+    | { td_node = Clone (th,cl) } when Mid.is_empty cl -> th::acc
+    | _ -> acc) [] task 
   in
-  Mid.iter print_prel (task_used task);
+  List.iter (fun th ->
+    let prel = try Mid.find th.th_name drv.drv_thprelude
+    with Not_found -> [] in print_prelude_list fmt prel) th_used;
   fprintf fmt "@."
 
 let print_full_prelude dq = print_prelude dq.query_driver

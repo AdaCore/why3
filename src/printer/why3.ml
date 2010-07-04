@@ -309,6 +309,7 @@ let print_pkind fmt = function
   | Paxiom -> fprintf fmt "axiom"
   | Plemma -> fprintf fmt "lemma"
   | Pgoal  -> fprintf fmt "goal"
+  | Pskip  -> fprintf fmt "skip"
 
 let print_prop_decl drv fmt (k,pr,f) =
   fprintf fmt "@[<hov 2>%a %a : %a@]@\n@\n" print_pkind k

@@ -83,37 +83,26 @@ module WHdecl = Hashweak.Make (struct
   let tag d = d.d_tag
 end)
 
-let decl fn =
+let gen_decl add fn =
   let fn = WHdecl.memoize 63 fn in
-  let fn task acc = match task.task_decl with
-    | Decl d -> List.fold_left add_decl acc (fn d)
-    | td -> add_tdecl acc td
+  let fn task acc = match task.task_decl.td_node with
+    | Decl d -> List.fold_left add acc (fn d)
+    | _ -> add_tdecl acc task.task_decl
   in
   map fn
 
-let decl_l fn =
+let gen_decl_l add fn =
   let fn = WHdecl.memoize 63 fn in
-  let fn task acc = match task.task_decl with
-    | Decl d -> List.rev_map (List.fold_left add_decl acc) (fn d)
-    | td -> [add_tdecl acc td]
+  let fn task acc = match task.task_decl.td_node with
+    | Decl d -> List.rev_map (List.fold_left add acc) (fn d)
+    | _ -> [add_tdecl acc task.task_decl]
   in
   map_l fn
 
-
-let tdecl fn =
-  let fn = WHdecl.memoize 63 fn in
-  let fn task acc = match task.task_decl with
-    | Decl d -> List.fold_left add_tdecl acc (fn d)
-    | td -> add_tdecl acc td
-  in
-  map fn
-
-let tdecl_l fn =
-  let fn = WHdecl.memoize 63 fn in
-  let fn task acc = match task.task_decl with
-    | Decl d -> List.rev_map (List.fold_left add_tdecl acc) (fn d)
-    | td -> [add_tdecl acc td]
-  in
-  map_l fn
+let decl    = gen_decl   add_decl
+let decl_l  = gen_decl_l add_decl
+let tdecl   = gen_decl   add_tdecl
+let tdecl_l = gen_decl_l add_tdecl
 
 let rewrite fnT fnF = decl (fun d -> [decl_map fnT fnF d])
+

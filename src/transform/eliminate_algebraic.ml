@@ -22,6 +22,7 @@ open Ident
 open Ty
 open Term
 open Decl
+open Theory
 open Task
 
 (** Compile match patterns *)
@@ -45,9 +46,9 @@ and rewriteF kn f = match f.f_node with
 let comp t task =
   let fnT = rewriteT t.task_known in
   let fnF = rewriteF t.task_known in
-  match t.task_decl with
+  match t.task_decl.td_node with
   | Decl d -> add_decl task (decl_map fnT fnF d)
-  | td -> add_tdecl task td
+  | _ -> add_tdecl task t.task_decl
 
 let compile_match = Register.store (fun () -> Trans.map comp None)
 
@@ -218,7 +219,7 @@ let add_type (state, task) ts csl =
   (* return the updated state and task *)
   { mt_map = mtmap; pj_map = pjmap }, task
 
-let comp t (state,task) = match t.task_decl with
+let comp t (state,task) = match t.task_decl.td_node with
   | Decl { d_node = Dtype dl } ->
       (* add abstract type declarations *)
       let tydl = List.rev_map (fun (ts,_) -> (ts,Tabstract)) dl in
@@ -233,8 +234,8 @@ let comp t (state,task) = match t.task_decl with
       let fnT = rewriteT t.task_known state in
       let fnF = rewriteF t.task_known state Svs.empty true in
       state, add_decl task (decl_map fnT fnF d)
-  | td ->
-      state, add_tdecl task td
+  | _ ->
+      state, add_tdecl task t.task_decl
 
 let eliminate_compiled_algebraic =
   Register.store (fun () -> Trans.fold_map comp empty_state None)

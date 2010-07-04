@@ -45,7 +45,7 @@ val driver_query : driver -> task -> driver_query
 val query_syntax : driver_query -> ident -> string option
 val query_remove : driver_query -> ident -> bool
 val query_tags   : driver_query -> ident -> Sstr.t
-val query_clone  : driver_query -> Theory.clone_map
+val query_clone  : driver_query -> Sid.t Mid.t
 val query_driver : driver_query -> driver
 val query_env    : driver_query -> env
 val query_tag    : driver_query -> int

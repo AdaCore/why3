@@ -20,6 +20,7 @@
 open Term
 open Decl
 open Task
+open Theory
 
 (** Task transformation *)
 
@@ -59,3 +60,4 @@ val tdecl   : (decl -> tdecl list     ) -> task -> task trans
 val tdecl_l : (decl -> tdecl list list) -> task -> task tlist
 
 val rewrite : (term -> term) -> (fmla -> fmla) -> task -> task trans
+

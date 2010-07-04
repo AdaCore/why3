@@ -313,11 +313,18 @@ let print_pkind fmt = function
   | Paxiom -> fprintf fmt "axiom"
   | Plemma -> fprintf fmt "lemma"
   | Pgoal  -> fprintf fmt "goal"
+  | Pskip  -> fprintf fmt "skip"
 
 let print_prop_decl fmt (k,pr,f) =
   fprintf fmt "@[<hov 2>%a %a : %a@]" print_pkind k
     print_pr pr print_fmla f;
   forget_tvs ()
+
+let print_decl fmt d = match d.d_node with
+  | Dtype tl  -> print_list newline print_type_decl fmt tl
+  | Dlogic ll -> print_list newline print_logic_decl fmt ll
+  | Dind il   -> print_list newline print_ind_decl fmt il
+  | Dprop p   -> print_prop_decl fmt p
 
 let print_inst fmt (id1,id2) =
   if Hid.mem thash id2 then
@@ -332,20 +339,42 @@ let print_inst fmt (id1,id2) =
   else
     fprintf fmt "ident %s = %s" id1.id_string id2.id_string
 
-let print_decl fmt d = match d.d_node with
-  | Dtype tl  -> print_list newline print_type_decl fmt tl
-  | Dlogic ll -> print_list newline print_logic_decl fmt ll
-  | Dind il   -> print_list newline print_ind_decl fmt il
-  | Dprop p   -> print_prop_decl fmt p
+let print_meta_arg_type fmt = function
+  | MTtysymbol -> fprintf fmt "type_symbol"
+  | MTlsymbol -> fprintf fmt "logic_symbol"
+  | MTprsymbol -> fprintf fmt "proposition"
+  | MTstring -> fprintf fmt "string"
+  | MTint -> fprintf fmt "int"
 
-let print_task_tdecl fmt = function
-  | Task.Decl d ->
+let print_meta_arg fmt = function
+  | MARid id ->
+      if Hid.mem thash id then
+        fprintf fmt "type %a" print_ts (Hid.find thash id)
+      else if Hid.mem lhash id then
+        fprintf fmt "logic %a" print_ls (Hid.find lhash id)
+      else if Hid.mem phash id then
+        fprintf fmt "prop %a" print_pr (Hid.find phash id)
+      else
+        fprintf fmt "ident %s" id.id_string
+  | MARstr s -> fprintf fmt "\"%s\"" s
+  | MARint i -> fprintf fmt "%d" i
+
+let print_tdecl fmt td = match td.td_node with
+  | Decl d ->
       print_decl fmt d
-  | Task.Use th ->
+  | Use th ->
       fprintf fmt "@[<hov 2>(* use %a *)@]" print_th th
-  | Task.Clone (th,inst) ->
+  | Clone (th,inst) ->
+      let inst = Mid.fold (fun x y a -> (x,y)::a) inst [] in
       fprintf fmt "@[<hov 2>(* clone %a with %a *)@]"
         print_th th (print_list comma print_inst) inst
+  | Meta (t,al) ->
+      fprintf fmt "@[<hov 2>(* meta %s %a *)@]"
+        t (print_list space print_meta_arg) al
+
+let print_theory fmt th =
+  fprintf fmt "@[<hov 2>theory %a@\n%a@]@\nend@."
+    print_th th (print_list newline2 print_tdecl) th.th_decls
 
 let print_task fmt task =
   fprintf fmt "@[<hov>%a@]@."
@@ -353,20 +382,7 @@ let print_task fmt task =
 
 let print_named_task fmt name task =
   fprintf fmt "@[<hov 2>task %s@\n%a@]@\nend@."
-    name (print_list newline2 print_task_tdecl) (task_tdecls task)
-
-let print_theory_tdecl fmt = function
-  | Theory.Decl d ->
-      print_decl fmt d
-  | Theory.Use th ->
-      fprintf fmt "@[<hov 2>(* use %a *)@]" print_th th
-  | Theory.Clone (th,inst) ->
-      fprintf fmt "@[<hov 2>(* clone %a with %a *)@]"
-        print_th th (print_list comma print_inst) inst
-
-let print_theory fmt th =
-  fprintf fmt "@[<hov 2>theory %a@\n%a@]@\nend@."
-    print_th th (print_list newline2 print_theory_tdecl) th.th_decls
+    name (print_list newline2 print_tdecl) (task_tdecls task)
 
 module NsTree = struct
   type t =

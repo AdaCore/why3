@@ -241,7 +241,7 @@ let find_ns find p ns =
   try find ns sl
   with Not_found -> error ~loc (UnboundSymbol sl)
 
-let find_prop_ns = find_ns ns_find_prop
+let find_prop_ns = find_ns ns_find_pr
 let find_prop p uc = find_prop_ns p (get_namespace uc)
 
 let find_tysymbol_ns = find_ns ns_find_ts
@@ -507,7 +507,8 @@ and dfmla env e = match e.pp_desc with
       let f1 = dfmla env f1 in
       Fnamed (x, f1)
   | PPvar x ->
-      Fvar (snd (find_prop x env.uc))
+      let pr = find_prop x env.uc in
+      Fvar (Decl.find_prop (Theory.get_known env.uc) pr)
   | PPeps _ | PPconst _ | PPcast _ | PPtuple _ ->
       error ~loc:e.pp_loc PredicateExpected
 
@@ -901,12 +902,12 @@ and add_decl env lenv th = function
                   then error ~loc (Clash ls1.ls_name.id_string);
                   { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
               | CSlemma p ->
-                  let pr,_ = find_prop_ns p t.th_export in
+                  let pr = find_prop_ns p t.th_export in
                   if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
                   then error ~loc (Clash pr.pr_name.id_string);
                   { s with inst_lemma = Spr.add pr s.inst_lemma }
               | CSgoal p ->
-                  let pr,_ = find_prop_ns p t.th_export in
+                  let pr = find_prop_ns p t.th_export in
                   if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
                   then error ~loc (Clash pr.pr_name.id_string);
                   { s with inst_goal = Spr.add pr s.inst_goal }

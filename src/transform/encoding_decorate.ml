@@ -57,7 +57,7 @@ type lconv = {d2t : lsymbol;
               tty : term}
 
 type tenv = {query : Driver.driver_query option;
-             clone_builtin : tysymbol -> Task.tdecl list;
+             clone_builtin : tysymbol -> Theory.tdecl list;
              specials : lconv Hty.t;
              deco : ty;
              undeco : ty;

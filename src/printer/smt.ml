@@ -192,7 +192,7 @@ let print_decl drv fmt d = match d.d_node with
         | Some loc -> fprintf fmt " @[;; %a@]@\n" 
             Loc.gen_report_position loc);
       fprintf fmt "  @[(not@ %a)@]" (print_fmla drv) f;true
-  | Dprop (Plemma, _, _) -> assert false
+  | Dprop ((Plemma|Pskip), _, _) -> assert false
 
 let print_decl drv fmt = catch_unsupportedDecl (print_decl drv fmt)
 

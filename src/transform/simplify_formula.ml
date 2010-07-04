@@ -148,8 +148,8 @@ let () = Register.register_transform
 
 let on_goal fn =
   let fn task = match task with
-    | Some {Task.task_decl = 
-          Task.Decl ({d_node = Decl.Dprop (Pgoal,pr,fmla)});
+    | Some {Task.task_decl = {Theory.td_node =  
+      Theory.Decl ({d_node = Decl.Dprop (Pgoal,pr,fmla)})};
            task_prev = task_prev} -> 
         (List.fold_left Task.add_decl) task_prev (fn pr fmla)
     | _ -> assert false in

@@ -330,8 +330,8 @@ let ty_quant =
 
 (* The Core of the transformation *)
 let fold_map task_hd ((env:env),task) =
-  match task_hd.task_decl with
-    | Use _ | Clone _ -> env,add_tdecl task task_hd.task_decl
+  match task_hd.task_decl.td_node with
+    | Use _ | Clone _ | Meta _ -> env,add_tdecl task task_hd.task_decl
     | Decl d -> match d.d_node with
     | Dtype [_,Tabstract] -> (env,task)
     (* Nothing here since the type kept are already defined and the other 
@@ -397,8 +397,8 @@ Perhaps you could use eliminate_definition"
 (* A Pre-transformation to work on monomorphic goal *)
 let on_goal fn =
   let fn task = match task with
-    | Some {Task.task_decl = 
-          Task.Decl ({d_node = Decl.Dprop (Pgoal,pr,fmla)});
+    | Some {Task.task_decl = { td_node =
+          Decl ({d_node = Decl.Dprop (Pgoal,pr,fmla)})};
            task_prev = task_prev} -> 
         (List.fold_left Task.add_decl) task_prev (fn pr fmla)
     | _ -> assert false in
@@ -490,8 +490,8 @@ let is_kept query ts =
 
 let fold_decl f = 
   Trans.fold (fun task_hd acc ->
-    match task_hd.task_decl with
-      | Use _ | Clone _ -> acc
+    match task_hd.task_decl.td_node with
+      | Use _ | Clone _ | Meta _ -> acc
       | Decl d -> f d acc)
 
 let look_for_keep query d sty =

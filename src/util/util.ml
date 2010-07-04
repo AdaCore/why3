@@ -46,7 +46,6 @@ let map_fold_left f acc l =
   let acc, rev = rev_map_fold_left f acc l in
   acc, List.rev rev
 
-
 let list_all2 pr l1 l2 =
   try List.for_all2 pr l1 l2 with Invalid_argument _ -> false
 
@@ -55,7 +54,6 @@ let map_join_left map join = function
   | _ -> raise (Failure "map_join_left")
 
 let list_apply f = List.fold_left (fun acc x -> List.rev_append (f x) acc) []
-
 
 let list_fold_product f acc l1 l2 =
   List.fold_left
@@ -71,6 +69,13 @@ let list_fold_product_l f acc ll =
     | [] -> f acc le
     | l::ll -> List.fold_left (fun acc e -> aux acc (e::le) ll) acc l in
   aux acc [] ll
+
+let list_compare cmp l1 l2 = match l1,l2 with
+  | [], [] ->  0
+  | [], _  -> -1
+  | _,  [] ->  1
+  | a1::l1, a2::l2 ->
+      let c = cmp a1 a2 in if c = 0 then compare l1 l2 else c
 
 (* boolean fold accumulators *)
 
@@ -90,7 +95,7 @@ module Mstr = Map.Make(String)
 
 (* Set, Map, Hashtbl on structures with a unique tag *)
 
-module type OrderedHash = 
+module type OrderedHash =
 sig
   type t
   val hash : t -> int
@@ -110,16 +115,10 @@ module OrderedHashList (X : Hashweak.Tagged) =
 struct
   type t = X.t list
   let hash = Hashcons.combine_list X.tag 3
-  let equal tsl1 tsl2 = 
-    try List.for_all2 (fun ts1 ts2 -> X.tag ts1 = X.tag ts2) tsl1 tsl2
-    with Invalid_argument _ -> false
-  let rec compare ts1 ts2 = match ts1,ts2 with
-    | [], [] -> 0
-    | [], _ -> -1
-    | _ , [] -> 1
-    | a1::l1, a2::l2 -> 
-      let c = Pervasives.compare (X.tag a1) (X.tag a2) in
-      if c != 0 then c else compare l1 l2
+  let equ_ts ts1 ts2 = X.tag ts1 == X.tag ts2
+  let equal = list_all2 equ_ts
+  let cmp_ts ts1 ts2 = Pervasives.compare (X.tag ts1) (X.tag ts2)
+  let compare = list_compare cmp_ts
 end
 
 module StructMake (X : Hashweak.Tagged) =
@@ -131,12 +130,10 @@ struct
   module W = Hashweak.Make(X)
 end
 
-
 (* memoization *)
 
 let memo ?(size=17) f =
   let h = Hashtbl.create size in
   fun x -> try Hashtbl.find h x
   with Not_found -> let y = f x in Hashtbl.add h x y; y
-
 

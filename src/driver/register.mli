@@ -44,8 +44,8 @@ val clear : 'a trans_reg -> unit
 (** {2 Store and apply} *)
 
 type query = Driver.driver_query
-type clone = Theory.clone_map
-type use   = Theory.use_map
+type clone = Ident.Sid.t Ident.Mid.t
+type use   = Theory.theory Ident.Mid.t
 
 val store       : (unit ->                  'a trans) -> 'a trans_reg
 val store_env   : (env  ->                  'a trans) -> 'a trans_reg

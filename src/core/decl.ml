@@ -90,18 +90,15 @@ let pr_equal pr1 pr2 = id_equal pr1.pr_name pr2.pr_name
 
 let create_prsymbol n = { pr_name = id_register n }
 
-type prop = prsymbol * fmla
-
-let prop_equal (pr1,f1) (pr2,f2) = pr_equal pr1 pr2 && f_equal f1 f2
-
-type ind_decl = lsymbol * prop list
+type ind_decl = lsymbol * (prsymbol * fmla) list
 
 (** Proposition declaration *)
 
 type prop_kind =
-  | Paxiom
-  | Plemma
-  | Pgoal
+  | Plemma    (* prove, use as a premise *)
+  | Paxiom    (* do not prove, use as a premise *)
+  | Pgoal     (* prove, do not use as a premise *)
+  | Pskip     (* do not prove, do not use as a premise *)
 
 type prop_decl = prop_kind * prsymbol * fmla
 
@@ -164,14 +161,12 @@ module Hsdecl = Hashcons.Make (struct
   let hs_ind (ps,al) = Hashcons.combine_list hs_prop ps.ls_name.id_tag al
 
   let hs_kind = function
-    | Paxiom -> 7
-    | Plemma -> 11
-    | Pgoal  -> 13
+    | Plemma -> 11 | Paxiom -> 13 | Pgoal  -> 17 | Pskip  -> 19
 
   let hash d = match d.d_node with
-    | Dtype  l -> Hashcons.combine_list hs_td 0 l
-    | Dlogic l -> Hashcons.combine_list hs_ld 3 l
-    | Dind   l -> Hashcons.combine_list hs_ind 5 l
+    | Dtype  l -> Hashcons.combine_list hs_td 3 l
+    | Dlogic l -> Hashcons.combine_list hs_ld 5 l
+    | Dind   l -> Hashcons.combine_list hs_ind 7 l
     | Dprop (k,pr,f) -> Hashcons.combine (hs_kind k) (hs_prop (pr,f))
 
   let tag n d = { d with d_tag = n }
@@ -191,17 +186,12 @@ let d_equal = (==)
 
 (** Declaration constructors *)
 
-let mk_decl node syms news = {
+let mk_decl node syms news = Hsdecl.hashcons {
   d_node = node;
   d_syms = syms;
   d_news = news;
   d_tag  = -1;
 }
-
-let create_ty_decl tdl s n = Hsdecl.hashcons (mk_decl (Dtype tdl) s n)
-let create_logic_decl ldl s n = Hsdecl.hashcons (mk_decl (Dlogic ldl) s n)
-let create_ind_decl idl s n = Hsdecl.hashcons (mk_decl (Dind idl) s n)
-let create_prop_decl k p f s n = Hsdecl.hashcons (mk_decl (Dprop (k,p,f)) s n)
 
 exception IllegalTypeAlias of tysymbol
 exception ClashIdent of ident
@@ -252,7 +242,7 @@ let create_ty_decl tdl =
         List.fold_left (check_constr ty) (syms,news) cl
   in
   let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) tdl in
-  create_ty_decl tdl syms news
+  mk_decl (Dtype tdl) syms news
 
 let create_logic_decl ldl =
   if ldl = [] then raise EmptyDecl;
@@ -267,7 +257,7 @@ let create_logic_decl ldl =
         syms, news_id news ls.ls_name
   in
   let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) ldl in
-  create_logic_decl ldl syms news
+  mk_decl (Dlogic ldl) syms news
 
 exception InvalidIndDecl of lsymbol * prsymbol
 exception TooSpecificIndDecl of lsymbol * prsymbol * term
@@ -320,12 +310,12 @@ let create_ind_decl idl =
     List.fold_left (check_ax ps) (syms,news) al
   in
   let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) idl in
-  create_ind_decl idl syms news
+  mk_decl (Dind idl) syms news
 
 let create_prop_decl k p f =
   let syms = syms_fmla Sid.empty f in
   let news = news_id Sid.empty p.pr_name in
-  create_prop_decl k p (check_fvs f) syms news
+  mk_decl (Dprop (k,p,check_fvs f)) syms news
 
 (** Split declarations *)
 
@@ -460,14 +450,14 @@ let merge_known kn1 kn2 =
   in
   Mid.fold add_known kn1 kn2
 
-let known_add_decl kn decl =
+let known_add_decl kn0 decl =
   let add_known id kn =
     try
-      if not (d_equal (Mid.find id kn) decl) then raise (RedeclaredIdent id);
+      if not (d_equal (Mid.find id kn0) decl) then raise (RedeclaredIdent id);
       raise (KnownIdent id)
     with Not_found -> Mid.add id decl kn
   in
-  let kn = Sid.fold add_known decl.d_news kn in
+  let kn = Sid.fold add_known decl.d_news kn0 in
   let check_known id =
     if not (Mid.mem id kn) then raise (UnknownIdent id)
   in

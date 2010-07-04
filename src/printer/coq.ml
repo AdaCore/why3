@@ -307,10 +307,11 @@ let print_pkind fmt = function
   | Paxiom -> fprintf fmt "Axiom"
   | Plemma -> fprintf fmt "Lemma"
   | Pgoal  -> fprintf fmt "Theorem"
+  | Pskip  -> assert false (* impossible *)
 
 let print_proof fmt = function
-  | Paxiom -> ()
-  | Plemma | Pgoal  -> fprintf fmt "Qed.@\n"
+  | Paxiom | Pskip -> ()
+  | Plemma | Pgoal -> fprintf fmt "Qed.@\n"
 
 let print_decl drv fmt d = match d.d_node with
   | Dtype tl  -> print_list nothing (print_type_decl drv) fmt tl

@@ -168,7 +168,7 @@ let print_decl drv fmt d = match d.d_node with
       end;
       fprintf fmt "@[<hov 2>%a@]@\n" (print_fmla drv) f;
       true
-  | Dprop (Plemma, _, _) -> 
+  | Dprop ((Plemma|Pskip), _, _) -> 
       assert false
 
 let print_decl drv fmt = catch_unsupportedDecl (print_decl drv fmt)

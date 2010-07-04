@@ -142,7 +142,7 @@ let print_decl drv fmt d = match d.d_node with
         (id_unique ~sanitizer:String.uncapitalize ident_printer pr.pr_name)
         (print_fmla drv) f; true
       (* fprintf fmt "@[;; %a@]@\n" print_ident pr.pr_name; *)
-  | Dprop (Plemma, _, _) -> assert false
+  | Dprop ((Plemma|Pskip), _, _) -> assert false
 
 let print_decl drv fmt = catch_unsupportedDecl (print_decl drv fmt)
 

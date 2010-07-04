@@ -17,6 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Util
 open Ident
 open Ty
 open Term
@@ -25,6 +26,9 @@ open Theory
 
 (** Task *)
 
+type clone_map = Stdecl.t Mid.t
+type meta_map = Stdecl.t Mstr.t
+
 type task = task_hd option
 
 and task_hd = private {
@@ -32,31 +36,25 @@ and task_hd = private {
   task_prev  : task;        (* context *)
   task_known : known_map;   (* known identifiers *)
   task_clone : clone_map;   (* cloning history *)
-  task_used  : use_map;     (* referenced theories *)
+  task_meta  : meta_map;    (* meta properties *)
   task_tag   : int;         (* unique task tag *)
 }
-
-and tdecl = private
-  | Decl  of decl
-  | Use   of theory
-  | Clone of theory * (ident * ident) list
 
 val task_equal : task -> task -> bool
 val task_hd_equal : task_hd -> task_hd -> bool
 
 val task_known : task -> known_map
 val task_clone : task -> clone_map
-val task_used  : task -> use_map
+val task_meta  : task -> meta_map
 
 (** {2 constructors} *)
-
-val create_decl : decl -> tdecl
 
 val add_decl : task -> decl -> task
 val add_tdecl : task -> tdecl -> task
 
 val use_export : task -> theory -> task
 val clone_export : task -> theory -> th_inst -> task
+val add_meta : task -> string -> meta_arg list -> task
 
 (** {2 declaration constructors + add_decl} *)
 
@@ -79,17 +77,23 @@ val split_theory : theory -> Spr.t option -> task list
 
 val task_fold : ('a -> tdecl -> 'a) -> 'a -> task -> 'a
 val task_iter : (tdecl -> unit) -> task -> unit
+
 val task_tdecls : task -> tdecl list
-val task_decls : task -> decl list
+val task_decls  : task -> decl list
 
 val task_goal  : task -> prsymbol
 
-val last_clone : task -> task
-val last_use   : task -> task
+(* TO BE REMOVED *)
+
+val old_task_clone : task -> Sid.t Mid.t
+val old_task_use   : task -> theory Mid.t
+val last_clone     : task -> task
+val last_use       : task -> task
 
 (* exceptions *)
 
 exception GoalNotFound
 exception GoalFound
+exception SkipFound
 exception LemmaFound
 
