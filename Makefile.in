@@ -257,6 +257,10 @@ clean::
 %: %.mlw bin/whyml.byte
 	bin/whyml.byte -P alt-ergo $*.mlw
 
+install::
+	mkdir -p $(BINDIR)
+	cp -f bin/whyml.@OCAMLBEST@ $(BINDIR)/whyml3
+
 ###############
 # proof manager
 ###############

@@ -131,14 +131,21 @@ let get_field f = function
   | None -> error (MissingField f)
   | Some v -> v
 
-let load_prover al =
+let absolute_filename dirname f =
+  if Filename.is_relative f then
+    Filename.concat dirname f
+  else
+    f
+
+let load_prover dirname al =
   let nam = ref None in
   let cmd = ref None in
   let drv = ref None in
   let load (key, value) = match key with
     | "name"        -> set_string key nam value
     | "command"     -> set_string key cmd value
-    | "driver"      -> set_string key drv value
+    | "driver"      -> set_string key drv value; 
+	               drv := option_map (absolute_filename dirname) !drv
     | _             -> error (UnknownField key)
   in
   List.iter load al;
@@ -146,12 +153,13 @@ let load_prover al =
     command = get_field "command" !cmd;
     driver  = get_field "driver" !drv }
 
-let load_main main al =
+let load_main dirname main al =
   let lp = ref [] in
   let tl = ref None in
   let ml = ref None in
   let load (key, value) = match key with
-    | "library"   -> lp := (to_string key value) :: !lp
+    | "library"   -> 
+	lp := absolute_filename dirname (to_string key value) :: !lp
     | "timelimit" -> set_int key tl value
     | "memlimit"  -> set_int key ml value
     | _           -> error (UnknownField key)
@@ -169,9 +177,12 @@ let read_config conf_file =
     | None -> begin try Sys.getenv "WHY_CONFIG" with Not_found ->
           if Sys.file_exists "why.conf" then "why.conf" else
           if Sys.file_exists ".why.conf" then ".why.conf" else
-          Filename.concat (Rc.get_home_dir ()) ".why.conf"
+          let f = Filename.concat (Rc.get_home_dir ()) ".why.conf" in
+	  if Sys.file_exists f then f else
+	  Filename.concat Config.why_libdir "why.conf"
         end
   in
+  let dirname = Filename.dirname filename in
   let rc = try Rc.from_file filename with
     | Failure "lexing" -> error SyntaxError
   in
@@ -188,11 +199,11 @@ let read_config conf_file =
     | "main" :: rest ->
         if rest <> [] then error (ExtraParameters "main");
         if !have_main then error (DuplicateSection "main");
-        main := load_main !main al
+        main := load_main dirname !main al
     | "prover" :: name :: rest ->
         if rest <> [] then error (ExtraParameters ("prover " ^ name));
         if Mstr.mem name !provers then error (DuplicateProver name);
-        provers := Mstr.add name (load_prover al) !provers
+        provers := Mstr.add name (load_prover dirname al) !provers
     | "prover" :: [] -> error (MissingParameters "prover")
     | s :: _ -> error (UnknownSection s)
     | [] -> assert false
