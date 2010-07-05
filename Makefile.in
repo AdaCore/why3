@@ -257,7 +257,7 @@ clean::
 # proof manager
 ###############
 
-MNG_FILES = db test
+MNG_FILES = db scheduler test
 
 MNGMODULES = $(addprefix src/manager/, $(MNG_FILES))
 
@@ -266,23 +266,23 @@ MNGMLI = $(addsuffix .mli, $(MNGMODULES))
 MNGCMO = $(addsuffix .cmo, $(MNGMODULES))
 MNGCMX = $(addsuffix .cmx, $(MNGMODULES))
 
-$(MNGCMO) $(MNGCMX): INCLUDES = -I src/manager -I +sqlite3
+$(MNGCMO) $(MNGCMX): INCLUDES = -thread -I src/manager -I +sqlite3 
 
 ifeq (@enable_proof_manager@,yes)
 byte: bin/manager.byte
 opt:  bin/manager.opt
 endif
 
-bin/manager.opt bin/manager.byte: INCLUDES = -I +sqlite3
+bin/manager.opt bin/manager.byte: INCLUDES = -thread -I +sqlite3
 
 bin/manager.opt: src/why.cmxa $(MNGCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) sqlite3.cmxa $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) threads.cmxa sqlite3.cmxa $^
 	$(STRIP) $@
 
 bin/manager.byte: src/why.cma $(MNGCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) sqlite3.cma $^
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma sqlite3.cma $^
 
 # depend and clean targets
 

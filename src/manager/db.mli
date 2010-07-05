@@ -17,6 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Why
 
 (** {1 Proof manager database} *)
 
@@ -88,7 +89,7 @@ end
 
 type transf_data =
     { transf_name : string;
-      transf_action : Why.Task.task Why.Register.tlist_reg
+      transf_action : Task.task Register.tlist_reg
     }
 
 type transf
@@ -103,7 +104,7 @@ val goal_name : goal -> string
 *)
 
 (*
-val goal_task : goal -> Why.Task.task
+val goal_task : goal -> Task.task
 *)
 val goal_task_checksum: goal -> string
 val external_proofs : goal -> external_proof list
@@ -149,7 +150,7 @@ exception AlreadyAttempted
 
 val try_prover : 
   debug:bool -> timelimit:int -> memlimit:int -> prover:prover -> 
-  command:string -> driver:Why.Driver.driver -> goal -> (unit -> unit)
+  command:string -> driver:Driver.driver -> goal -> (unit -> unit)
   (** attempts to prove goal with the given prover.  This function
       prepares the goal for that prover, adds it as an new
       external_proof attempt, setting its current status to Scheduled,
@@ -206,7 +207,7 @@ val add_transformation: goal -> transf -> unit
 
 (* {2 goal updates} *)
 
-val add_or_replace_task: tname:string -> name:string -> Why.Task.task -> goal
+val add_or_replace_task: tname:string -> name:string -> Task.task -> goal
   (** updates the database with the new goal called [name] in the
       theory called [tname]. If a goal with the same [(tname,name)]
       already exists, it is checked whether the task to prove is

@@ -18,12 +18,12 @@
 (**************************************************************************)
 
 
-
+open Why
 
 val schedule_proof_attempt : 
-  debug:bool -> timelimit:int -> memlimit:int -> prover:prover -> 
-  command:string -> driver:Why.Driver.driver -> 
-  callback:(unit -> unit) -> goal -> unit
+  debug:bool -> timelimit:int -> memlimit:int -> prover:Db.prover -> 
+  command:string -> driver:Driver.driver -> 
+  callback:(unit -> unit) -> Db.goal -> unit
   (** schedules an attempt to prove goal with the given prover.  This
       function just prepares the goal for the proof attempt, and put
       it in the queue of waiting proofs attempts, associated with its
@@ -43,14 +43,6 @@ val schedule_proof_attempt :
 
   *)
 
-val start_queue_thread : int -> unit
-(** starts another thread in charge of launching proof attempts
-    the parameter is the maximal number of proof attempts to run in parallel.
-
-    Whenever an external proof attempt terminates, the associated callback
-    is called.
-
-*)
 
 
 
