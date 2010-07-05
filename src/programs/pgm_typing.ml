@@ -261,6 +261,15 @@ and dbinder env ({id=x; id_loc=loc} as id, v) =
   in
   add_local env x v, (id, v)
 
+let rec add_local_pat env p = match p.dp_node with
+  | Pwild -> env
+  | Pvar x -> add_local env x (DTpure p.dp_ty)
+  | Papp (_, pl) -> add_local_pats env pl
+  | Pas (p, _) -> add_local_pat env p
+
+and add_local_pats env pl = 
+  List.fold_left add_local_pat env pl 
+
 let dvariant env (l, p) =
   let s, _ = Typing.specialize_psymbol p env.env.uc in
   let loc = Typing.qloc p in
@@ -375,6 +384,7 @@ and dexpr_desc env loc = function
       let branch (pl, e) =
 	let denv, pl = Typing.dpat_list env.denv tyl pl in
 	let env = { env with denv = denv } in
+	let env = add_local_pats env pl in
 	let e = dexpr env e in
 	expected_type e ty;
 	pl, e
@@ -817,6 +827,15 @@ let add_local x v env = Mvs.add x v env
 let add_binder env (x, v) = add_local x v env
 let add_binders = List.fold_left add_binder
 
+let rec add_local_pat env p = match p.pat_node with
+  | Term.Pwild -> env
+  | Term.Pvar x -> add_local x (Tpure p.pat_ty) env
+  | Term.Papp (_, pl) -> add_local_pats env pl
+  | Term.Pas (p, _) -> add_local_pat env p
+
+and add_local_pats env pl = 
+  List.fold_left add_local_pat env pl
+
 let make_apply loc e1 ty c =
   let x = create_vsymbol (id_fresh "f") e1.expr_type in
   let v = c.c_result_type and ef = c.c_effect in
@@ -956,8 +975,19 @@ and expr_desc gl env loc ty = function
 	      Eif (e1, mk_true loc gl, e2)
       in 
       d, Tpure ty, ef
-  | IEmatch _ ->
-      assert false (*TODO*)
+  | IEmatch (el, bl) ->
+      let add1 ef e = 
+	let e = expr gl env e in E.union ef e.expr_effect, e
+      in
+      let ef, el = map_fold_left add1 E.empty el in
+      let branch ef (pl, e) =
+	let env = add_local_pats env pl in
+	let e = expr gl env e in
+	let ef = E.union ef e.expr_effect in
+	ef, (pl, e)
+      in
+      let ef, bl = map_fold_left branch ef bl in
+      Ematch (el, bl), Tpure ty, ef
   | IEskip ->
       Eskip, Tpure ty, E.empty
   | IEabsurd ->

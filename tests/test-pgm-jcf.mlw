@@ -3,10 +3,13 @@
   type tree 'a = 
      | Leaf (x : 'a)
      | Node (tree 'a) (x: 'a) (tree 'a)
-    
 }
 
-let test (t: tree int) = x t
+let test (t: tree int) = 
+  match t with
+  | Leaf y         -> y
+  | Node _ y _ -> y
+  end
 
 (*
 Local Variables: 
