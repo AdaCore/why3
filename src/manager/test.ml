@@ -192,6 +192,8 @@ let goal_menu g =
       (try 
          let i = try int_of_string s with Failure _ -> raise Not_found in
          let p = List.assoc i menu in
+         (* this was for calling db directly *)
+         (**
          let call = 
 	   try
              Db.try_prover ~debug:true ~timelimit ~memlimit:0 
@@ -202,6 +204,17 @@ let goal_menu g =
 	 in
          call ();
          raise Exit
+         **)
+         (* this is for calling the scheduler *)
+         let callback () =
+           printf "Scheduled goal is finished, you should update@."
+         in
+         Scheduler.schedule_proof_attempt
+           ~debug:true ~timelimit ~memlimit:0 
+           ~prover:p.prover ~command:p.command ~driver:p.driver 
+           ~callback
+           g;
+         raise Exit           
        with Not_found -> 
          printf "unknown choice@.");
     done
