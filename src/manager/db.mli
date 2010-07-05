@@ -150,7 +150,8 @@ exception AlreadyAttempted
 
 val try_prover : 
   debug:bool -> timelimit:int -> memlimit:int -> prover:prover -> 
-  command:string -> driver:Driver.driver -> goal -> (unit -> unit)
+  command:string -> driver:Driver.driver -> goal -> 
+  (unit -> proof_attempt_status)
   (** attempts to prove goal with the given prover.  This function
       prepares the goal for that prover, adds it as an new
       external_proof attempt, setting its current status to Scheduled,
@@ -158,8 +159,9 @@ val try_prover :
       actually sets the status to running, launches the prover, and
       waits for its termination. Upon termination of the external
       process, the prover's answer is retrieved and database is
-      updated. The [proved] field of the database is updated, and also
-      these of any goal affected, according to invariant above.
+      updated, that is the [proved] field of the database is updated,
+      and also these of any goal affected, according to invariant
+      above. The prover result is also returned. 
 
       Although goal preparation is not re-entrant, the function
       returned initially is re-entrant, thus is suitable for being executed

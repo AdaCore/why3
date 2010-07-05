@@ -14,7 +14,7 @@ let schedule_proof_attempt ~debug ~timelimit ~memlimit ~prover
     goal =
   let prepare_goal = 
     try
-      Db.try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver goal 
+      Db.try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver goal;
     with Db.AlreadyAttempted ->
       raise Exit
   in
@@ -27,14 +27,16 @@ let schedule_proof_attempt ~debug ~timelimit ~memlimit ~prover
             (* lock and store the attempt into the queue *)
             Mutex.lock queue_lock;
             Queue.push (prepare_goal,callback) attempts;
+            callback Db.Scheduled;
             (* try to run attempt if resource available *)
             while !running_proofs < !maximum_running_proofs do
               let call,callback = Queue.pop attempts in
               incr running_proofs;
               Mutex.unlock queue_lock;
               (* END LOCKED SECTION *)       
-              call ();
-              callback ();
+              callback Db.Running;
+              let res = call () in
+              callback res;
               (* BEGIN LOCKED SECTION *)
               Mutex.lock queue_lock;
               decr running_proofs;

@@ -1073,7 +1073,7 @@ let root_goals () =
 exception AlreadyAttempted
 
 let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver 
-    (g : goal) : unit -> unit =
+    (g : goal) : unit -> proof_attempt_status =
   let db = current () in
   let attempt =
     try
@@ -1132,16 +1132,20 @@ let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver
             g.proved <- true;
             Goal.set_proved db g true;
             (* TODO: update "proved" status of goal parents if any *)
-            ()         
+            Success         
         | Why.Call_provers.Timeout ->
-            External_proof.set_status db attempt Timeout
+            External_proof.set_status db attempt Timeout;
+            Timeout
         | Why.Call_provers.Invalid | Why.Call_provers.Unknown _ ->
-            External_proof.set_status db attempt Unknown
+            External_proof.set_status db attempt Unknown;
+            Unknown
         | Why.Call_provers.Failure _ | Why.Call_provers.HighFailure ->
-            External_proof.set_status db attempt HighFailure
+            External_proof.set_status db attempt HighFailure;
+            HighFailure
     with Exit ->
       if debug then Format.eprintf "prover callback aborted because of an exception raised during elaboration@.";
-      External_proof.set_status db attempt HighFailure
+      External_proof.set_status db attempt HighFailure;
+      HighFailure
       
       
       

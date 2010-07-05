@@ -178,6 +178,8 @@ let do_theory tname th glist =
 (* A good-old text-based interface *)
 (***********************************)
 
+let count = ref 0
+
 let goal_menu g = 
   try
     while true do 
@@ -206,11 +208,14 @@ let goal_menu g =
          raise Exit
          **)
          (* this is for calling the scheduler *)
-         let callback () =
-           printf "Scheduled goal is finished, you should update@."
+         incr count;
+         let c = !count in
+         printf "Scheduling task #%d@." c;
+         let callback result =
+           printf "Scheduled task #%d: status set to %a, you should update the view@." c Db.print_status result
          in
          Scheduler.schedule_proof_attempt
-           ~debug:true ~timelimit ~memlimit:0 
+           ~debug:false ~timelimit ~memlimit:0 
            ~prover:p.prover ~command:p.command ~driver:p.driver 
            ~callback
            g;

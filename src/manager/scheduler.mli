@@ -23,7 +23,7 @@ open Why
 val schedule_proof_attempt : 
   debug:bool -> timelimit:int -> memlimit:int -> prover:Db.prover -> 
   command:string -> driver:Driver.driver -> 
-  callback:(unit -> unit) -> Db.goal -> unit
+  callback:(Db.proof_attempt_status -> unit) -> Db.goal -> unit
   (** schedules an attempt to prove goal with the given prover.  This
       function just prepares the goal for the proof attempt, and put
       it in the queue of waiting proofs attempts, associated with its
