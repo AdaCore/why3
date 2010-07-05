@@ -83,6 +83,12 @@ AC_ARG_ENABLE(coq-support,
     [  --enable-coq-support    enable Coq support],,
     enable_coq_support=yes)
 
+# hypothesis selection
+
+AC_ARG_ENABLE(hypothesis-selection,
+    [  --enable-hypothesis-selection    enable hypothesis selection support],,
+    enable_hypothesis_selection=yes)
+
 # Check for arch/OS
 
 AC_MSG_CHECKING(executable suffix)
@@ -271,8 +277,9 @@ fi
 
 # hypothesis_selection
 
-AC_CHECK_FILE($OCAMLLIB/ocamlgraph/,enable_hypothesis_selection=yes,enable_hypothesis_selection=no)
-
+if test "$enable_hypothesis_selection" = yes; then
+  AC_CHECK_FILE($OCAMLLIB/ocamlgraph/,enable_hypothesis_selection=yes,enable_hypothesis_selection=no)
+fi
 
 #Viewer for ps and pdf
 dnl AC_CHECK_PROGS(PSVIEWER,gv evince)
