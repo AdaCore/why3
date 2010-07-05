@@ -123,6 +123,7 @@
 %nonassoc prec_post
 %nonassoc BAR
 
+%nonassoc prec_id_pattern
 %nonassoc prec_recfun
 %nonassoc prec_triple
 %left LEFTBLEFTB
@@ -277,6 +278,8 @@ expr:
    { mk_expr (Elazy (LazyOr, $1, $3)) }
 | LET lident EQUAL expr IN expr
    { mk_expr (Elet ($2, $4, $6)) }
+| LET pattern EQUAL expr IN expr 
+   { mk_expr (Ematch ([$4], [[$2], $6])) }
 | LET lident list1_type_v_binder EQUAL triple IN expr
    { mk_expr (Elet ($2, mk_expr_i 3 (Efun ($3, $5)), $7)) }
 | LET REC list1_recfun_sep_and IN expr
@@ -389,7 +392,7 @@ pat_args:
 pat_arg:
 | UNDERSCORE
    { mk_pat (PPpwild) }
-| lident
+| lident %prec prec_id_pattern
    { mk_pat (PPpvar $1) }
 | uqualid                                       
    { mk_pat (PPpapp ($1, [])) }
