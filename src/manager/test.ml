@@ -78,7 +78,7 @@ let config =
 
 let () = printf "Load path is: %a@." (Pp.print_list Pp.comma Pp.string) config.loadpath
 
-let env = Why.Env.create_env (Why.Typing.retrieve config.loadpath)
+let env = Env.create_env (Typing.retrieve config.loadpath)
 
 let timelimit = 
   match config.timelimit with
@@ -95,12 +95,12 @@ let () = Db.init_base (fname ^ ".db")
 
 let get_driver name = 
   let pi = Util.Mstr.find name config.provers in
-  Why.Driver.load_driver env pi.Whyconf.driver
+  Driver.load_driver env pi.Whyconf.driver
 
 type prover_data =
     { prover : Db.prover;
       command : string;
-      driver : Why.Driver.driver;
+      driver : Driver.driver;
     }
 
 let provers_data =
@@ -147,10 +147,10 @@ let rec report fmt = function
   | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
 
 
-let m : Why.Theory.theory Why.Theory.Mnm.t =
+let m : Theory.theory Theory.Mnm.t =
   try
     let cin = open_in (fname ^ ".why") in
-    let m = Why.Env.read_channel env fname cin in
+    let m = Env.read_channel env fname cin in
     close_in cin;
     eprintf "Parsing/Typing Ok@.";
     m
@@ -163,13 +163,13 @@ let m : Why.Theory.theory Why.Theory.Mnm.t =
 (* add corresponding tasks *)
 (***************************)
 
-let add_task (tname : string) (task : Why.Task.task) acc =
-  let name = (Why.Task.task_goal task).Why.Decl.pr_name.Why.Ident.id_string in
+let add_task (tname : string) (task : Task.task) acc =
+  let name = (Task.task_goal task).Decl.pr_name.Ident.id_string in
   eprintf "doing task: tname=%s, name=%s@." tname name;
   Db.add_or_replace_task ~tname ~name task :: acc
 
 let do_theory tname th glist =
-  let tasks = Why.Task.split_theory th None in
+  let tasks = Task.split_theory th None in
   List.fold_right (add_task tname) tasks glist
 
 
@@ -267,15 +267,15 @@ let main_loop goals =
 let () =
   eprintf "looking for goals@.";
   let add_th t th mi = 
-    eprintf "adding theory %s, %s@." th.Why.Theory.th_name.Why.Ident.id_string t;
-    Why.Ident.Mid.add th.Why.Theory.th_name (t,th) mi 
+    eprintf "adding theory %s, %s@." th.Theory.th_name.Ident.id_string t;
+    Ident.Mid.add th.Theory.th_name (t,th) mi 
   in
   let do_th _ (t,th) glist = 
-    eprintf "doing theory %s, %s@." th.Why.Theory.th_name.Why.Ident.id_string t;
+    eprintf "doing theory %s, %s@." th.Theory.th_name.Ident.id_string t;
     do_theory t th glist  
   in
   let goals = 
-    Why.Ident.Mid.fold do_th (Why.Theory.Mnm.fold add_th m Why.Ident.Mid.empty) []
+    Ident.Mid.fold do_th (Theory.Mnm.fold add_th m Ident.Mid.empty) []
   in
   eprintf "Production of goals done@.";
   try

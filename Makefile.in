@@ -262,35 +262,52 @@ install::
 	cp -f bin/whyml.@OCAMLBEST@ $(BINDIR)/whyml3
 
 ###############
-# proof manager
+# rust prover
 ###############
 
-MNG_FILES = db scheduler test
+MNG_FILES = db scheduler 
+MNG_MAIN_FILES = test gmanager
 
 MNGMODULES = $(addprefix src/manager/, $(MNG_FILES))
+MNGMAINS = $(addprefix src/manager/, $(MNG_MAIN_FILES))
 
 MNGML  = $(addsuffix .ml,  $(MNGMODULES))
 MNGMLI = $(addsuffix .mli, $(MNGMODULES))
 MNGCMO = $(addsuffix .cmo, $(MNGMODULES))
 MNGCMX = $(addsuffix .cmx, $(MNGMODULES))
 
-$(MNGCMO) $(MNGCMX): INCLUDES = -thread -I src/manager -I +sqlite3 
+$(MNGCMO) $(MNGCMX) $(addsuffix .cmx, $(MNGMAINS)) $(addsuffix .cmo, $(MNGMAINS)): INCLUDES = -thread -I src/manager -I +sqlite3 -I +threads
 
-ifeq (@enable_proof_manager@,yes)
-byte: bin/manager.byte
-opt:  bin/manager.opt
+src/manager/gmanager.cmo src/manager/gmanager.cmx: INCLUDES += -I +lablgtk2
+
+ifeq (@enable_rust_prover@,yes)
+byte: bin/manager-test.byte bin/why-rustprover.byte
+opt:  bin/manager-test.opt bin/why-rustprover.opt
 endif
 
-bin/manager.opt bin/manager.byte: INCLUDES = -thread -I +sqlite3
+bin/manager-test.opt bin/manager-test.byte: INCLUDES = -thread -I +sqlite3
 
-bin/manager.opt: src/why.cmxa $(MNGCMX)
+bin/manager-test.opt: src/why.cmxa $(MNGCMX) src/manager/test.cmx
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) threads.cmxa sqlite3.cmxa $^
 	$(STRIP) $@
 
-bin/manager.byte: src/why.cma $(MNGCMO)
+bin/manager-test.byte: src/why.cma $(MNGCMO) src/manager/test.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma sqlite3.cma $^
+
+bin/why-rustprover.opt bin/why-rustprover.byte: INCLUDES = -thread -I +sqlite3 -I +lablgtk2
+
+bin/why-rustprover.opt: src/why.cmxa $(MNGCMX) src/manager/gmanager.cmx
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) threads.cmxa \
+	lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx sqlite3.cmxa $^
+	$(STRIP) $@
+
+bin/why-rustprover.byte: src/why.cma $(MNGCMO) src/manager/gmanager.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma \
+	lablgtk.cma lablgtksourceview2.cma gtkThread.cmo sqlite3.cma $^
 
 # depend and clean targets
 

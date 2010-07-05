@@ -59,11 +59,11 @@ AC_ARG_ENABLE(verbose-make,
     [  --enable-verbose-make   verbose makefile commands],,
     enable_verbose_make=no)
 
-# proof manager
+# rust prover
 
-AC_ARG_ENABLE(proof-manager,
-    [  --enable-proof-manager  enable Why3 proof manager],,
-    enable_proof_manager=yes)
+AC_ARG_ENABLE(rust-prover,
+    [  --enable-rust-prover  enable Why3 rust prover],,
+    enable_rust_prover=yes)
 
 # IDE
 
@@ -220,8 +220,8 @@ fi
 AC_CHECK_PROG(CAMLP5O,camlp5o,camlp5o,no)
 
 # checking for sqlite3
-if test "$enable_proof_manager" = yes ; then
-AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_proof_manager=no)
+if test "$enable_rust_prover" = yes ; then
+AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_rust_prover=no)
 fi
 
 # checking for lablgtk2
@@ -316,7 +316,7 @@ dnl AC_SUBST(OCAMLWEB)
 AC_SUBST(CAMLP5O)
 
 AC_SUBST(enable_ide)
-AC_SUBST(enable_proof_manager)
+AC_SUBST(enable_rust_prover)
 AC_SUBST(enable_plugins)
 AC_SUBST(DYNLINK)
 
@@ -351,7 +351,7 @@ echo "OCaml library path      : $OCAMLLIB"
 echo "Verbose make            : $enable_verbose_make"
 echo "Why IDE                 : $enable_ide"
 echo "Why plugins             : $enable_plugins"
-echo "Why proof manager       : $enable_proof_manager"
+echo "Why rust prover         : $enable_rust_prover"
 echo "Coq support             : $enable_coq_support"
 if test "$enable_coq_support" = "yes" ; then
    echo "    Version             : $COQVERSION"
