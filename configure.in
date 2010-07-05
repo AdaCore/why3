@@ -336,9 +336,10 @@ dnl AC_SUBST(PDFVIEWER)
 
 # Finally create the Makefile from Makefile.in
 dnl AC_OUTPUT(Makefile)
-AC_CONFIG_FILES(Makefile src/config.ml doc/version.tex)
+AC_CONFIG_FILES(Makefile src/config.sh doc/version.tex)
 AC_OUTPUT
-chmod a-w Makefile src/config.ml doc/version.tex
+chmod a-w Makefile src/config.sh doc/version.tex
+chmod a+x src/config.sh
 
 # Summary
 

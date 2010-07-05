@@ -1,0 +1,22 @@
+
+F=src/config.ml
+
+echo "let why_version   = \"@VERSION@\"" > $F
+echo "let why_builddate = \"@BUILDDATE@\"" >> $F
+echo "let why_plugins   = (\"@enable_plugins@\" = \"yes\")" >> $F
+echo "let why_libdir    = \"$LIBDIR/why3\"" >> $F
+
+echo "
+module Dynlink_ = struct
+  let is_native = true
+  let loadfile_private _ = assert false
+
+  type error
+  exception Error of error
+  let error_message _ = (assert false : string)
+end
+
+module Dynlink = struct
+  include @DYNLINK@
+end
+" >> $F

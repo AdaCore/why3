@@ -81,7 +81,7 @@ EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS))
 
 all: @OCAMLBEST@
 
-.PHONY: byte opt clean depend all
+.PHONY: byte opt clean depend all install
 
 #############
 # Why library
@@ -198,6 +198,10 @@ src/main.cmx: src/why.cmx
 clean::
 	rm -f src/main.cm[iox] src/main.annot src/main.o
 	rm -f bin/why.byte bin/why.opt
+
+install::
+	mkdir -p $(BINDIR)
+	cp -f bin/why.@OCAMLBEST@ $(BINDIR)/why3
 
 ########
 # Whyml
@@ -475,9 +479,14 @@ bin/why3-cpulimit: src/tools/@CPULIMIT@.c
 clean::
 	rm -f bin/why3-cpulimit src/tools/*~
 
+install::
+	mkdir -p $(BINDIR)
+	cp -f bin/why3-cpulimit $(BINDIR)
+
 #########
 # drivers
 #########
+
 #Only generated drivers
 DIR_DRIVERS := drivers/
 
@@ -556,6 +565,12 @@ testl-type: bin/whyml.byte
 ###############
 # installation
 ###############
+
+install::
+	mkdir -p $(LIBDIR)/why3
+	cp -f --parents theories/*.why theories/*/*.why $(LIBDIR)/why3/
+	cp -f --parents drivers/*.drv $(LIBDIR)/why3/
+	cp -f why.conf $(LIBDIR)/why3/
 
 ## install: install-binary install-lib install-man
 ##
@@ -856,8 +871,11 @@ headers:
 Makefile: Makefile.in config.status
 	./config.status --file $@
 
-src/config.ml: src/config.ml.in config.status
+src/config.sh: src/config.sh.in config.status
 	./config.status --file $@
+
+src/config.ml: src/config.sh config.status
+	LIBDIR=$(LIBDIR) src/config.sh
 
 doc/version.tex: doc/version.tex.in config.status
 	./config.status --file $@
