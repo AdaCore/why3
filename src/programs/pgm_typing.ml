@@ -1007,12 +1007,12 @@ and triple gl env (p, e, q) =
 
 and letrec gl env dl = (* : env * recfun list *)
   (* effects are computed as a least fixpoint 
-     [efm] maps each function to its current effect *)
-  let make_env ~decvar m =
+     [m] maps each function to its current effect *)
+  let make_env ?decvar m =
     let add1 env (v, bl, var, _) =
       let c = Mvs.find v m in 
       let c = match decvar, var with
-	| true, Some (phi0, phi, r) ->
+	| Some phi0, Some (_, phi, r) ->
 	    let decphi = f_app r [phi; t_var phi0] in
 	    { c with c_pre = f_and decphi c.c_pre }
 	| _ ->
@@ -1022,9 +1022,10 @@ and letrec gl env dl = (* : env * recfun list *)
     in
     List.fold_left add1 env dl
   in
-  let one_step m =
-    let env = make_env ~decvar:true m in
+  let one_step m0 =
     let type1 m (v, bl, var, t) =
+      let decvar = match var with Some (v, _, _) -> Some v | None -> None in
+      let env = make_env ?decvar m0 in
       let env = add_binders env bl in
       let t, c = triple gl env t in
       Mvs.add v c m, (v, bl, var, t)
@@ -1048,7 +1049,46 @@ and letrec gl env dl = (* : env * recfun list *)
   in
   let m0 = List.fold_left add_empty_effect Mvs.empty dl in
   let m, dl = fixpoint m0 in
-  make_env ~decvar:false m, dl
+  make_env m, dl
+
+(* pretty-printing (for debugging) *)
+
+let rec print_expr fmt e = match e.expr_desc with
+  | Elogic t ->
+      print_term fmt t
+  | Elocal vs ->
+      fprintf fmt "<local %a>" print_vs vs
+  | Eglobal ls ->
+      fprintf fmt "<global %a>" print_ls ls
+  | Efun (_, t) ->
+      fprintf fmt "@[fun _ ->@ %a@]" print_triple t
+  | Elet (v, e1, e2) ->
+      fprintf fmt "@[let %a = %a in@ %a@]" print_vs v
+	print_expr e1 print_expr e2
+
+  | Esequence (e1, e2) ->
+      fprintf fmt "@[%a;@\n%a@]" print_expr e1 print_expr e2
+  | Eif (e1, e2, e3) ->
+      fprintf fmt "@[if %a@ then@ %a else@ %a@]" 
+	print_expr e1 print_expr e2 print_expr e3
+
+  | Eany c ->
+      fprintf fmt "@[[any %a]@]" print_type_c c
+
+  | _ ->
+      fprintf fmt "<other>"
+
+and print_triple fmt (p, e, q) =
+  fprintf fmt "@[{%a}@ %a@ {%a}@]" print_pre p print_expr e print_post q
+
+and print_pre fmt _ =
+  fprintf fmt "<pre>"
+
+and print_post fmt _ =
+  fprintf fmt "<post>"
+
+and print_recfun fmt (v, _bl, _, t) =
+  fprintf fmt "@[rec %a _ = %a@]" print_vs v print_triple t
 
 (* typing declarations (combines the three phases together) *)
 
@@ -1092,8 +1132,9 @@ let decl env gl = function
       gl, []
   | Pgm_ptree.Dlet (id, e) -> 
       let e = type_expr gl e in
-      (* if !debug then *)
-      (*   eprintf "@[--typing %s-----@\n  %a@]@." id.id print_expr e; *)
+      if !debug then 
+        eprintf "@[--typing %s-----@\n  %a@\n%a@]@." 
+	  id.id print_expr e print_type_v e.expr_type_v;
       let ls, gl = add_global id.id_loc id.id e.expr_type_v gl in
       gl, [Dlet (ls, e)]
   | Pgm_ptree.Dletrec dl -> 
@@ -1105,6 +1146,9 @@ let decl env gl = function
 	let tyv = Mvs.find v env in
 	let loc = loc_of_id v.vs_name in
 	let id = v.vs_name.id_string in
+	if !debug then
+          eprintf "@[--typing %s-----@\n  %a@.%a@]@." 
+	    id print_recfun d print_type_v tyv;
 	let ls, gl = add_global loc id tyv gl in
 	gl, (ls, d)
       in
