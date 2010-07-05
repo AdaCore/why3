@@ -77,7 +77,16 @@ theory ComputerDivision
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
 
   axiom Mod_bound: 
-    forall x y:int. y <> 0 -> -abs y < mod x y < abs y
+    forall x y:int. y <> 0 -> - abs y < mod x y < abs y
+
+  axiom Mod_sign_pos:
+    forall x y:int. x >= 0 and y <> 0 -> mod x y >= 0
+
+  axiom Mod_sign_neg:
+    forall x y:int. x <= 0 and y <> 0 -> mod x y <= 0
+
+  lemma Rounds_toward_zero:
+    forall x y:int. y <> 0 -> abs (div x y * y) <= abs x
 
   lemma Mod_1: forall x:int. mod x 1 = 0
 
