@@ -106,7 +106,8 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula inlining \
 		split_conjunction encoding_decorate \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
-		explicit_polymorphism simple_types encoding_instantiate
+		explicit_polymorphism simple_types encoding_instantiate \
+		simplify_array
 
 
 LIB_PRINTER = print_real alt_ergo why3 smt coq tptp simplify gappa
@@ -538,7 +539,7 @@ bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@ $(TOOLS) $(DRIVERS)
 	    "bin/why.@OCAMLBEST@" \
 	    "bin/whyml.@OCAMLBEST@"
 
-BENCH_PLUGINS_CMO := helloworld.cmo simplify_array.cmo
+BENCH_PLUGINS_CMO := helloworld.cmo
 BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))
 BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
 
@@ -547,8 +548,6 @@ bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) byte $(TOOLS)
 	tests/test-jcf.why -T Test -G G
 	bin/why.$(OCAMLBEST) -D bench/plugins/helloworld.drv  \
 	tests/test-jcf.why -T Test -G G
-	bin/why.$(OCAMLBEST) -D bench/plugins/simplify_array.drv \
-	tests/test-jcf.why -T Test_simplify_array -G G
 
 ###############
 # test targets

@@ -17,7 +17,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Why
 open Term
 open Theory
 open Env
@@ -31,7 +30,7 @@ let make_rt_rf env =
   let array  = 
     try
       find_theory env prelude array
-    with TheoryNotFound (l,s) -> 
+    with TheoryNotFound (_,s) -> 
       Format.eprintf "The theory %s is unknown" s; 
       exit 1 in 
   let store  = (ns_find_ls array.th_export store).ls_name in
@@ -49,8 +48,8 @@ let make_rt_rf env =
   
 let t =
   Register.store_env
-  (fun () env ->
+  (fun env ->
      let rt,rf = make_rt_rf env in
      Trans.rewrite rt rf None)
 
-let () = Driver.register_transform "simplify_array" t
+let () = Register.register_transform "simplify_array" t
