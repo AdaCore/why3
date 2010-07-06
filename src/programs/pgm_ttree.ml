@@ -146,7 +146,7 @@ and iexpr_desc =
   | IEif of iexpr * iexpr * iexpr
   | IEloop of loop_annotation * iexpr
   | IElazy of lazy_op * iexpr * iexpr
-  | IEmatch of iexpr list * (Term.pattern list * iexpr) list
+  | IEmatch of Term.vsymbol list * (Term.pattern list * iexpr) list
   | IEskip 
   | IEabsurd
   | IEraise of Term.lsymbol * iexpr option
@@ -183,7 +183,7 @@ and expr_desc =
   | Esequence of expr * expr
   | Eif of expr * expr * expr
   | Eloop of loop_annotation * expr
-  | Ematch of expr list * (Term.pattern list * expr) list
+  | Ematch of Term.vsymbol list * (Term.pattern list * expr) list
   | Eskip 
   | Eabsurd
   | Eraise of Term.lsymbol * expr option

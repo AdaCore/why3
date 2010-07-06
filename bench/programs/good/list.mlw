@@ -1,0 +1,28 @@
+
+{
+  use import list.List
+  use import list.Length
+}
+
+let rec length_ (l : list 'a) variant { length l } = 
+  {}
+  match l with
+  | Nil -> 0
+  | Cons _ r -> 1 + length_ r
+  end
+  { result = length l }
+
+let rec append (l1 : list 'a) (l2 : list 'a) variant { length l1 } =
+  { }
+  match l1 with
+  | Nil -> l2
+  | Cons x r -> Cons x (append r l2)
+  end
+  { length result = length l1 + length l2 }
+
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../../.. bench/programs/good/list"
+End: 
+*)

@@ -682,7 +682,14 @@ and iexpr_desc gl env loc ty = function
         (pl, iexpr gl env e)
       in
       let bl = List.map branch bl in
-      IEmatch (el, bl)
+      let rec mk_let vl = function
+	| [] ->
+	    IEmatch (List.rev vl, bl)
+	| e :: el ->
+	    let v = create_vsymbol (id_user "x" loc) e.iexpr_type in
+	    IElet (v, e, mk_iexpr loc ty (mk_let (v :: vl) el))
+      in
+      mk_let [] el
   | DEskip ->
       IEskip
   | DEabsurd ->
@@ -975,19 +982,15 @@ and expr_desc gl env loc ty = function
 	      Eif (e1, mk_true loc gl, e2)
       in 
       d, Tpure ty, ef
-  | IEmatch (el, bl) ->
-      let add1 ef e = 
-	let e = expr gl env e in E.union ef e.expr_effect, e
-      in
-      let ef, el = map_fold_left add1 E.empty el in
+  | IEmatch (vl, bl) ->
       let branch ef (pl, e) =
 	let env = add_local_pats env pl in
 	let e = expr gl env e in
 	let ef = E.union ef e.expr_effect in
 	ef, (pl, e)
       in
-      let ef, bl = map_fold_left branch ef bl in
-      Ematch (el, bl), Tpure ty, ef
+      let ef, bl = map_fold_left branch E.empty bl in
+      Ematch (vl, bl), Tpure ty, ef
   | IEskip ->
       Eskip, Tpure ty, E.empty
   | IEabsurd ->

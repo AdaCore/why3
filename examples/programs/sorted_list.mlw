@@ -1,0 +1,36 @@
+(* find a value in a sorted list *)
+
+{
+  use import list.Mem
+
+  inductive sorted (l : list int) =
+    | Sorted_Nil : 
+        sorted Nil
+    | Sorted_One : 
+        forall x:int. sorted (Cons x Nil)
+    | Sorted_Two : 
+        forall x y : int, l : list int. 
+        x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
+ 
+  lemma Sorted_inversion :
+     forall y : int, l : list int. sorted (Cons y l) -> sorted l
+
+  lemma Sorted_not_mem:
+    forall x y : int, l : list int. 
+    x < y -> sorted (Cons y l) -> not mem x (Cons y l)
+
+}
+
+let rec find x l = 
+  { sorted l }
+  match l with   
+  | Nil -> False
+  | Cons y r -> x = y || x > y && find x r
+  end 
+  { result=True <-> mem x l }
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/sorted_list"
+End: 
+*)
