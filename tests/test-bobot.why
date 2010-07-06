@@ -4,8 +4,8 @@
 theory Test_inline_trivial
   type t
   logic c : t
-  logic eq(x:'a, y:'a) = x=y
-  goal G : eq(c,c)
+  logic eq (x y :'a) = x=y
+  goal G : eq c c
 end
 
 theory Test_ind
@@ -31,8 +31,8 @@ end
 
 theory Test_simplify_array
   use import array.Array
-  goal G : forall x,y:int. forall m: (int,int) t. 
-    select(store(m,y,x),y) = x
+  goal G : forall x y:int. forall m: t int int. 
+    select (store m y x) y = x
 end 
 
 theory Test_conjunction
@@ -49,7 +49,7 @@ theory Split_conj
     (*goal G : forall x,y,z:int. ((p(x) -> p(y)) and ((not p(x)) -> p(z))) -> ((p(x) and p(y)) or ((not p(x)) and p(z)))*)
     (*goal G : forall x,y,z:int. (if p(x) then p(y) else p(z)) <-> ((p(x) and p(y)) or ((not p(x)) and p(z)))*)
     (*goal G : forall x,y,z:int. (if p(x) then p(y) else p(z)) -> (if p(x) then p(y) else p(z))*)
-  goal G : forall x,y,z:int. (p(x) <-> p(z)) -> (p(x) <-> p(z))
+  goal G : forall x y z:int. (p(x) <-> p(z)) -> (p(x) <-> p(z))
     (*goal G : forall x,y,z:int. (p(z) <-> p(x)) -> (((not p(z)) and (not p(x))  or  ((p(z)) and (p(x))))) *)
     (*goal G : forall x,y,z:int. (p(x) or p(y)) -> p(z)*)
 end
@@ -59,20 +59,20 @@ end
 
 theory TestEnco
   use import int.Int
-  type 'a mytype
+  type mytype 'a
   logic id(x: int) : int = x
   logic id2(x: int) : int = id(x)
   logic succ(x:int) : int = id(x+1)
 
   goal G : (forall x:int. x=x) or
     (forall x:int. x=x+1)
-  logic p('a ) : 'a mytype
-  logic p2('a mytype) : 'a
+  logic p('a ) : mytype 'a
+  logic p2(mytype 'a) : 'a
   type toto
-  logic f (toto) : toto mytype
-  logic g (int mytype) : toto
-  logic h (int) : toto mytype
-  axiom A1 : forall x : 'a mytype. p(p2(x)) = x
+  logic f (toto) : mytype toto
+  logic g (mytype int) : toto
+  logic h (int) : mytype toto
+  axiom A1 : forall x : mytype 'a. p(p2(x)) = x
   goal G2 : forall x:int. f(g(p(x))) = h(x)
 end
 
@@ -94,7 +94,7 @@ end
 
 theory TestBuiltin_bool
   use import bool.Bool
-  goal G : xorb(True,False) = True 
+  goal G : xorb True False = True 
 end
 
 

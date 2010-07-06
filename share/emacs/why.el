@@ -94,7 +94,7 @@
   :group 'why :type 'string)
 
 (defun why-command-line (file)
-  (concat why-prog-name " -" why-prover " " why-options " " file))
+  (concat why-prog-name " -P " why-prover " " why-options " " file))
 
 (defun why-find-alternate-file ()
   "switch to the proof obligations buffer"
