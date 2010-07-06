@@ -47,6 +47,9 @@ val task_known : task -> known_map
 val task_clone : task -> clone_map
 val task_meta  : task -> meta_map
 
+val find_clone : task -> theory -> Stdecl.t
+val find_meta : task -> string -> Stdecl.t
+
 (** {2 constructors} *)
 
 val add_decl : task -> decl -> task

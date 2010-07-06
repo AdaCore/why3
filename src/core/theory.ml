@@ -112,7 +112,9 @@ let register_meta s al =
   if Hashtbl.mem meta_table s then raise (KnownMeta s);
   Hashtbl.add meta_table s al
 
-let lookup_meta s = Hashtbl.find meta_table s
+let lookup_meta s =
+  try Hashtbl.find meta_table s 
+  with Not_found -> raise (UnknownMeta s)
 
 let list_meta () = Hashtbl.fold (fun k _ acc -> k::acc) meta_table []
 
@@ -682,6 +684,13 @@ let tuple_theory = Util.memo tuple_theory
 
 (* Exception reporting *)
 
+let print_meta_arg_type fmt = function
+  | MTtysymbol -> fprintf fmt "type_symbol"
+  | MTlsymbol -> fprintf fmt "logic_symbol"
+  | MTprsymbol -> fprintf fmt "proposition"
+  | MTstring -> fprintf fmt "string"
+  | MTint -> fprintf fmt "int"
+
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
   | NonLocal id ->
@@ -697,6 +706,17 @@ let () = Exn_printer.register
       Format.fprintf fmt "No opened namespaces"
   | ClashSymbol s ->
       Format.fprintf fmt "Symbol %s is already defined in the current scope" s
+  | UnknownMeta s ->
+      Format.fprintf fmt "Unknown metaproperty %s" s
+  | KnownMeta s ->
+      Format.fprintf fmt "Metaproperty %s is already registered with \
+        a conflicting signature" s
+  | BadMetaArity (s,i1,i2) ->
+      Format.fprintf fmt "Metaproperty %s requires %d arguments but \
+        is applied to %d" s i1 i2
+  | MetaTypeMismatch (s,t1,t2) ->
+      Format.fprintf fmt "Metaproperty %s expects %a argument but \
+        is applied to %a" s print_meta_arg_type t1 print_meta_arg_type t2
   | _ -> raise exn
   end
 

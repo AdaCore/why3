@@ -339,13 +339,6 @@ let print_inst fmt (id1,id2) =
   else
     fprintf fmt "ident %s = %s" id1.id_string id2.id_string
 
-let print_meta_arg_type fmt = function
-  | MTtysymbol -> fprintf fmt "type_symbol"
-  | MTlsymbol -> fprintf fmt "logic_symbol"
-  | MTprsymbol -> fprintf fmt "proposition"
-  | MTstring -> fprintf fmt "string"
-  | MTint -> fprintf fmt "int"
-
 let print_meta_arg fmt = function
   | MARid id ->
       if Hid.mem thash id then
