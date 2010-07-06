@@ -25,9 +25,13 @@ val schedule_proof_attempt :
   command:string -> driver:Driver.driver -> 
   callback:(Db.proof_attempt_status -> unit) -> Db.goal -> unit
   (** schedules an attempt to prove goal with the given prover.  This
-      function just prepares the goal for the proof attempt, and put
-      it in the queue of waiting proofs attempts, associated with its
+      function just prepares the goal for the proof attempt, and puts
+      it in the queue of waiting proof attempts, associated with its
       callback.
+
+      The callback is called each time the status of that proves
+      changes, typically from Scheduled, then Running, then Success or
+      Timeout or Failure.
       
       @param timelimit CPU time limit given for that attempt, in
       seconds, must be positive. (unlimited attempts are not allowed

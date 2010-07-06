@@ -32,13 +32,13 @@ let schedule_proof_attempt ~debug ~timelimit ~memlimit ~prover
             while !running_proofs < !maximum_running_proofs do
               let call,callback = Queue.pop attempts in
               incr running_proofs;
+              callback Db.Running;
               Mutex.unlock queue_lock;
               (* END LOCKED SECTION *)       
-              callback Db.Running;
               let res = call () in
-              callback res;
               (* BEGIN LOCKED SECTION *)
               Mutex.lock queue_lock;
+              callback res;
               decr running_proofs;
             done;
             Mutex.unlock queue_lock

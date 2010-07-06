@@ -198,12 +198,13 @@ let do_theory tname th glist =
 module Ide_goals = struct
 
   let cols = new GTree.column_list
-  let column = cols#add Gobject.Data.string
+  let name_column = cols#add Gobject.Data.string
+  let loc_column = cols#add Gobject.Data.caml
 
   let renderer = GTree.cell_renderer_text [`XALIGN 0.] 
   let vcolumn = 
-    GTree.view_column ~title:"Goals" 
-      ~renderer:(renderer, ["text", column]) () 
+    GTree.view_column ~title:"Theories/Goals" 
+      ~renderer:(renderer, ["text", name_column]) () 
 
   let () = 
     vcolumn#set_resizable true;
@@ -221,32 +222,49 @@ module Ide_goals = struct
 
   let add_goals (model : GTree.tree_store) th =
     let rec fill parent ns =
-      let add_s k s _ = 
+      let add_s s _ = 
 	let row = model#append ~parent () in
-	model#set ~row ~column (k ^ s)
+	model#set ~row ~column:name_column s
       in
-(*
-      Mnm.iter (add_s "type ")  ns.ns_ts;
-      Mnm.iter (add_s "logic ") ns.ns_ls;
-*)
-      Theory.Mnm.iter (add_s "prop ")  ns.Theory.ns_pr;
-(*
-      let add_ns s ns =
-	let row = model#append ~parent () in
-	model#set ~row ~column s;
-	fill row ns
-      in
-      Mnm.iter add_ns ns.ns_ns
-*)
+      Theory.Mnm.iter add_s ns.Theory.ns_pr;
     in
     let row = model#append () in
-    model#set ~row ~column (th.Theory.th_name.Ident.id_string : string);
+    model#set ~row ~column:name_column th.Theory.th_name.Ident.id_string;
+    model#set ~row ~column:loc_column th.Theory.th_name.Ident.id_origin;
     fill row th.Theory.th_export
 
 end
 
-
+(****************)
 (* windows, etc *)
+(****************)
+
+let move_to_line (v : GText.view) line = 
+  if line <= v#buffer#line_count && line <> 0 then begin
+    let it = v#buffer#get_iter (`LINE line) in 
+    let mark = `MARK (v#buffer#create_mark it) in
+    v#scroll_to_mark ~use_align:true ~yalign:0.5 mark
+  end
+
+(* to be run when a row in the tree view is selected *)
+let select_goals (goals_view:GTree.tree_store) (_goal_view:GSourceView2.source_view) 
+   (_source_view:GSourceView2.source_view) selected_rows = 
+  List.iter
+    (fun p ->
+       let row = goals_view#get_iter p in
+       let origin = goals_view#get ~row ~column:Ide_goals.loc_column in
+       match origin with
+         | Ident.User (_loc,_) -> ()
+    (*
+             move_to_line source_view#as_view loc.Lexing.pos_lnum
+    *)
+         | _ -> ()
+    )
+    selected_rows
+
+let alt_ergo_on_all_goals () =
+  begin
+  end
 
 let main () =
   let w = GWindow.window 
@@ -267,6 +285,12 @@ let main () =
     file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit" 
       ~callback:(fun () -> exit 0) () 
   in
+  let tools_menu = factory#add_submenu "_Tools" in
+  let tools_factory = new GMenu.factory tools_menu ~accel_group in
+  let _ = 
+    tools_factory#add_image_item ~label:"Alt-Ergo on all goals" 
+      ~callback:alt_ergo_on_all_goals () 
+  in
 
   (* horizontal paned *)
   let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:vbox#add () in
@@ -281,10 +305,26 @@ let main () =
   let goals_view = Ide_goals.create ~packing:scrollview#add () in
   Theory.Mnm.iter (fun _ th -> Ide_goals.add_goals goals_view th) theories;
 
-  (* source view *)
-  let scrolled_win = GBin.scrolled_window
+  (* horizontal paned *)
+  let vp = GPack.paned `VERTICAL  ~border_width:3 ~packing:hp#add () in
+
+  (* goal text view *)
+  let scrolled_goal_view = GBin.scrolled_window
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~packing:hp#add ()
+    ~packing:vp#add ()
+  in
+  let _goal_view =
+    GSourceView2.source_view
+      ~editable:false
+      ~show_line_numbers:true
+      ~packing:scrolled_goal_view#add ~height:500 ~width:650
+      ()
+  in
+  
+  (* source view *)
+  let scrolled_source_view = GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~packing:vp#add ()
   in
   let source_view =
     GSourceView2.source_view
@@ -293,14 +333,27 @@ let main () =
       ~show_line_numbers:true
       ~right_margin_position:80 ~show_right_margin:true
       (* ~smart_home_end:true *)
-      ~packing:scrolled_win#add ~height:500 ~width:650
+      ~packing:scrolled_source_view#add ~height:500 ~width:650
       ()
   in
+(*
   source_view#misc#modify_font_by_name font_name;
+*)
   source_view#source_buffer#set_language lang;
   source_view#set_highlight_current_line true;
   source_view#source_buffer#set_text source_text;
- 
+
+(* Bind event: row selection on tree view on the left *) 
+(*
+  let _ =
+    goals_view#selection#connect#after#changed ~callback:
+      begin fun () ->
+	let list = goals_view#selection#get_selected_rows in
+        select_goals goals_view goal_view source_view list
+      end
+  in
+*)
+
   w#add_accel_group accel_group;
   w#show ()
 
@@ -310,6 +363,6 @@ let () =
 
 (*
 Local Variables: 
-compile-command: "unset LANG; make -C ../.. bin/whyide.opt"
+compile-command: "unset LANG; make -C ../.. bin/why-rustprover.byte"
 End: 
 *)
