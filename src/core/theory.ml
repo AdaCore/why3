@@ -109,11 +109,12 @@ exception MetaTypeMismatch of string * meta_arg_type * meta_arg_type
 let meta_table = Hashtbl.create 17
 
 let register_meta s al =
-  if Hashtbl.mem meta_table s then raise (KnownMeta s);
-  Hashtbl.add meta_table s al
+  try let al' = Hashtbl.find meta_table s in
+      if al <> al' then raise (KnownMeta s)
+  with Not_found -> Hashtbl.add meta_table s al
 
 let lookup_meta s =
-  try Hashtbl.find meta_table s 
+  try Hashtbl.find meta_table s
   with Not_found -> raise (UnknownMeta s)
 
 let list_meta () = Hashtbl.fold (fun k _ acc -> k::acc) meta_table []
