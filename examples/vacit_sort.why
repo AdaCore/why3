@@ -3,21 +3,21 @@ theory Sorted
        use real.Real
        use import array.Array
        
-       type array = (int, real) t
-       type multi = (real, int) t
+       type array = t int real
+       type multi = t real int
 
        logic n : int = 4
 
        logic sorted(m : array) =
-             forall x,y:int. x<=y -> Real.(<=)(select(m, x),select(m, y))
+             forall x y:int. x<=y -> Real.(<=)(select m  x) (select m y)
 
-       logic count(m : array, i : int, j : int, v : real) : int =
+       logic count(m : array) (i j : int) (v : real) : int =
              if i = j then 0 else
-             let c = count(m,i+1,j,v) in
-             (if select (m,i) = v then c + 1 else c)   
+             let c = count m (i+1) j v in
+             (if select m i = v then c + 1 else c)   
 
-       logic model(m1 : array, m2 : multi) =
-             forall v:real. count(m1,1,n+1,v) = select(m2,v)
+       logic model(m1 : array) (m2 : multi) =
+             forall v:real. count m1 1 (n+1) v = select m2 v
 
 (*
        logic model_aux(m1 : array, i : int) : multi
@@ -41,32 +41,32 @@ theory Sorted
 
        goal G : 
             forall m1 : array.
-            select(m1,1) = 42. ->
-            select(m1,2) = 13. ->
-            select(m1,3) = 42. ->
-            select(m1,4) = 45. ->
+            select m1 1 = 42. ->
+            select m1 2 = 13. ->
+            select m1 3 = 42. ->
+            select m1 4 = 45. ->
             forall m2 : array.
             forall multi : multi.
-            model(m1,multi) ->
-            model(m2,multi) ->
-            sorted(m2) ->
-            select(m2,1) = 13. and
-            select(m2,2) = 42. and
-            select(m2,3) = 42. and
-            select(m2,4) = 45.
+            model m1 multi ->
+            model m2 multi ->
+            sorted m2 ->
+            select m2 1 = 13. and
+            select m2 2 = 42. and
+            select m2 3 = 42. and
+            select m2 4 = 45.
 
 (*       goal G_false : 
             forall m1 : array.
-            select(m1,1) = 42. ->
-            select(m1,2) = 13. ->
-            select(m1,3) = 42. ->
+            select m1 1 = 42. ->
+            select m1 2 = 13. ->
+            select m1 3 = 42. ->
             forall m2 : array.
             forall multi : multi.
-            model(m1,multi) ->
-            model(m2,multi) ->
-            sorted(m2) ->
-            select(m2,1) = 42. and
-            select(m2,2) = 13. and
-            select(m2,3) = 42.
+            model m1 multi ->
+            model m2 multi ->
+            sorted m2 ->
+            select m2 1 = 42. and
+            select m2 2 = 13. and
+            select m2 3 = 42.
 *)           
 end
