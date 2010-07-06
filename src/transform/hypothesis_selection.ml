@@ -267,8 +267,9 @@ module GraphConstant = struct
     List.fold_left (analyse_clause fTbl tTbl) gc clauses
 
       (** processes a single task_head. *)
-  let update fmlaTable fTbl tTbl gc task_head = match task_head.task_decl with
-    | Decl {d_node = Dprop(_,_,prop_decl)} ->
+  let update fmlaTable fTbl tTbl gc task_head = 
+    match task_head.task_decl.Theory.td_node with
+    | Theory.Decl {d_node = Dprop(_,_,prop_decl)} ->
       analyse_prop fmlaTable fTbl tTbl gc prop_decl
     | _ -> gc
 end
@@ -334,11 +335,11 @@ module GraphPredicate = struct
   (** takes a constant graph and a task_head, and add any interesting
       element to the graph it returns. *)
   let update fmlaTable symbTbl gp task_head =
-    match task_head.task_decl with
-      | Decl {d_node = Dprop (_,_,prop_decl) } ->
+    match task_head.task_decl.Theory.td_node with
+      | Theory.Decl {d_node = Dprop (_,_,prop_decl) } ->
         (* a proposition to analyse *)
         analyse_prop fmlaTable symbTbl gp prop_decl
-      | Decl {d_node = Dlogic logic_decls } ->
+      | Theory.Decl {d_node = Dlogic logic_decls } ->
         (* a symbol to add *)
         List.fold_left
           (fun gp logic_decl -> add_symbol symbTbl gp (fst logic_decl))
@@ -523,8 +524,8 @@ end
 (** if this is the goal, return it as Some goal after checking there is no other
     goal. Else, return the option *)
 let get_goal task_head option =
-  match task_head.task_decl with
-    | Decl {d_node = Dprop(Pgoal,_,goal_fmla)} ->
+  match task_head.task_decl.Theory.td_node with
+    | Theory.Decl {d_node = Dprop(Pgoal,_,goal_fmla)} ->
 	assert (option = None); (* only one goal ! *)
 	Some goal_fmla
     | _ -> option
