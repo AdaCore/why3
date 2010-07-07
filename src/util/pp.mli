@@ -101,3 +101,6 @@ val print_in_file : ?margin:int -> (Format.formatter -> unit) -> string -> unit
 val print_list_opt : 
   (formatter -> unit -> unit) -> 
   (formatter -> 'a -> bool) -> formatter -> 'a list -> bool
+
+
+val string_of : (Format.formatter -> 'a -> unit) -> 'a -> string

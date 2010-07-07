@@ -136,3 +136,10 @@ let rec print_list_opt sep print fmt = function
       if notempty1 then sep fmt ();
       let notempty2 = print_list_opt sep print fmt r in
       notempty1 || notempty2
+
+
+let string_of p x =
+  let b = Buffer.create 100 in
+  let fmt = formatter_of_buffer b in
+  fprintf fmt "%a@?" p x;
+  Buffer.contents b

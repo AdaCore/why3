@@ -199,7 +199,7 @@ module Ide_goals = struct
 
   let cols = new GTree.column_list
   let name_column = cols#add Gobject.Data.string
-  let loc_column = cols#add Gobject.Data.caml
+  let id_column = cols#add Gobject.Data.caml
 
   let renderer = GTree.cell_renderer_text [`XALIGN 0.] 
   let vcolumn = 
@@ -216,21 +216,32 @@ module Ide_goals = struct
     let _ = view#selection#set_mode `SINGLE in
     let _ = view#set_rules_hint true in
     ignore (view#append_column vcolumn);
-    model
+    model,view
 
   let clear model = model#clear ()
 
+  let task_table = Ident.Hid.create 17
+
+  let get_task = Ident.Hid.find task_table
+
   let add_goals (model : GTree.tree_store) th =
+    let tasks = Task.split_theory th None in
+    List.iter
+      (fun t->
+         let name = (Task.task_goal t).Decl.pr_name in
+         Ident.Hid.add task_table name t)
+      tasks;
     let rec fill parent ns =
-      let add_s s _ = 
+      let add_s s symb = 
 	let row = model#append ~parent () in
-	model#set ~row ~column:name_column s
+	model#set ~row ~column:name_column s;
+	model#set ~row ~column:id_column symb.Decl.pr_name;
       in
       Theory.Mnm.iter add_s ns.Theory.ns_pr;
     in
     let row = model#append () in
     model#set ~row ~column:name_column th.Theory.th_name.Ident.id_string;
-    model#set ~row ~column:loc_column th.Theory.th_name.Ident.id_origin;
+    model#set ~row ~column:id_column th.Theory.th_name;
     fill row th.Theory.th_export
 
 end
@@ -247,18 +258,24 @@ let move_to_line (v : GText.view) line =
   end
 
 (* to be run when a row in the tree view is selected *)
-let select_goals (goals_view:GTree.tree_store) (_goal_view:GSourceView2.source_view) 
+let select_goals (goals_view:GTree.tree_store) (task_view:GSourceView2.source_view) 
    (_source_view:GSourceView2.source_view) selected_rows = 
   List.iter
     (fun p ->
        let row = goals_view#get_iter p in
-       let origin = goals_view#get ~row ~column:Ide_goals.loc_column in
+       let id = goals_view#get ~row ~column:Ide_goals.id_column in
+       Format.eprintf "You clicked on %s@." id.Ident.id_string;
+       let t = Ide_goals.get_task id in
+       let task_text = Pp.string_of Pretty.print_task t in
+       task_view#source_buffer#set_text task_text;
+       task_view#scroll_to_mark `INSERT
+
+(*
        match origin with
          | Ident.User (_loc,_) -> ()
-    (*
              move_to_line source_view#as_view loc.Lexing.pos_lnum
-    *)
          | _ -> ()
+*)
     )
     selected_rows
 
@@ -302,24 +319,26 @@ let main () =
   in
   let _ = scrollview#set_shadow_type `ETCHED_OUT in
 
-  let goals_view = Ide_goals.create ~packing:scrollview#add () in
-  Theory.Mnm.iter (fun _ th -> Ide_goals.add_goals goals_view th) theories;
+  let goals_model,goals_view = Ide_goals.create ~packing:scrollview#add () in
+  Theory.Mnm.iter (fun _ th -> Ide_goals.add_goals goals_model th) theories;
 
   (* horizontal paned *)
   let vp = GPack.paned `VERTICAL  ~border_width:3 ~packing:hp#add () in
 
   (* goal text view *)
-  let scrolled_goal_view = GBin.scrolled_window
+  let scrolled_task_view = GBin.scrolled_window
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
     ~packing:vp#add ()
   in
-  let _goal_view =
+  let task_view =
     GSourceView2.source_view
       ~editable:false
       ~show_line_numbers:true
-      ~packing:scrolled_goal_view#add ~height:500 ~width:650
+      ~packing:scrolled_task_view#add ~height:500 ~width:650
       ()
   in
+  task_view#source_buffer#set_language lang;
+  task_view#set_highlight_current_line true;
   
   (* source view *)
   let scrolled_source_view = GBin.scrolled_window
@@ -344,15 +363,13 @@ let main () =
   source_view#source_buffer#set_text source_text;
 
 (* Bind event: row selection on tree view on the left *) 
-(*
   let _ =
     goals_view#selection#connect#after#changed ~callback:
       begin fun () ->
 	let list = goals_view#selection#get_selected_rows in
-        select_goals goals_view goal_view source_view list
+        select_goals goals_model task_view source_view list
       end
   in
-*)
 
   w#add_accel_group accel_group;
   w#show ()
