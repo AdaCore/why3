@@ -138,6 +138,7 @@ parameter set :
 *)
 let set a i v =
   { 0 <= i < sa_sz !a and invariant !a } 
+  (* let SA val idx back sz n = !a in *)
   let val = sa_val !a in
   let idx = sa_idx !a in
   let back = sa_back !a in

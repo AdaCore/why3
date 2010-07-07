@@ -9,8 +9,8 @@
 
   type uf = UF (link : array int)
                (dist : array int) (* distance to representative *)
-               (size : int)
-               (num  : int)
+               (size : int)       (* elements are 0..size-1 *)
+               (num  : int)       (* number of classes *)
 
   logic inv (u : uf) =
     let (UF l d s n) = u in
@@ -43,7 +43,6 @@ let create (n:int) =
                 forall j:int. 0 <= j < !i -> !l#j = j } 
     variant { n - !i }
     l := A.store !l !i !i;
-    
     i := !i + 1
   done;
   ref (UF !l (A.const_length 0 n) n n)
@@ -51,16 +50,17 @@ let create (n:int) =
     num !result = n and size !result = n and
     forall x:int. 0 <= x < n -> repr !result x = x }
 
-let find (u:ref uf) (x:int) =
+let rec find (u:ref uf) (x:int) variant { dist !u # x } =
   { inv !u and 0 <= x < size !u } 
-  let l = link !u in
-  let y = ref x in
-  while A.select l !y <> !y do
-    invariant { 0 <= !y < size !u and same !u x !y } 
-    variant { dist(!u) # !y }
-    y := A.select l !y
-  done;
-  !y
+  let y = A.select (link !u) x in
+  if y <> x then begin
+    let r = find u y in
+    let l = A.store (link !u) x r in
+    let d = A.store (dist !u) x 1 in
+    u := UF l d (size !u) (num !u);
+    r
+  end else
+    x
   { inv !u and
     result = repr !u x and 
     size !u = size (old !u) and num !u = num (old !u) and 

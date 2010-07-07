@@ -1,19 +1,12 @@
+
 (* find a value in a sorted list *)
 
 {
   use import list.Mem
+  use import list.Sorted
 
-  inductive sorted (l : list int) =
-    | Sorted_Nil : 
-        sorted Nil
-    | Sorted_One : 
-        forall x:int. sorted (Cons x Nil)
-    | Sorted_Two : 
-        forall x y : int, l : list int. 
-        x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
- 
-  lemma Sorted_inversion :
-     forall y : int, l : list int. sorted (Cons y l) -> sorted l
+  (* FIXME *)
+  lemma Nil_not_Cons : forall x:int, l:list int. Nil <> Cons x l
 
   lemma Sorted_not_mem:
     forall x y : int, l : list int. 

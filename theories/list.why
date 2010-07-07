@@ -29,19 +29,92 @@ theory Mem
 
 end
 
+theory Sorted
+
+  use export List
+  use import int.Int
+ 
+  inductive sorted (l : list int) =
+    | Sorted_Nil : 
+        sorted Nil
+    | Sorted_One : 
+        forall x:int. sorted (Cons x Nil)
+    | Sorted_Two : 
+        forall x y : int, l : list int. 
+        x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
+ 
+  use import Mem
+
+  lemma Sorted_mem :
+    forall x : int, l : list int.
+    (forall y : int. mem y l -> x <= y) and sorted l <-> sorted (Cons x l)
+
+end
+
+theory NumOcc
+  
+  use import int.Int
+  use import List
+
+  (* number of occurence of x in l *)
+  logic num_occ (x : 'a) (l : list 'a) : int = 
+    match l with
+    | Nil -> 0
+    | Cons y r -> (if x = y then 1 else 0) + num_occ x r
+   end
+
+  use import Mem
+
+  lemma Mem_Num_Occ : 
+    forall x:'a, l:list 'a. mem x l <-> num_occ x l > 0
+
+end
+
 theory Permut
-  (* TODO *)
+
+  use import NumOcc
+  use import List
+
+  logic permut (l1 : list 'a) (l2 : list 'a) = 
+    forall x : 'a. num_occ x l1 = num_occ x l2
+
+  lemma Permut_refl : forall l : list 'a. permut l l
+
+  lemma Permut_sym : forall l1 l2 : list 'a. permut l1 l2 -> permut l2 l1
+
+  lemma Permut_trans : 
+    forall l1 l2 l3 : list 'a. permut l1 l2 -> permut l2 l3 -> permut l1 l3
+
+  lemma Permut_cons : 
+    forall x : 'a, l1 l2 : list 'a. 
+    permut l1 l2 -> permut (Cons x l1) (Cons x l2)
+
+  lemma Permut_swap : 
+    forall x y : 'a, l : list 'a. permut (Cons x (Cons y l)) (Cons y (Cons x l))
+  
+  use import Mem
+
+  lemma Permut_mem :
+    forall x : 'a, l1 l2 : list 'a. permut l1 l2 -> mem x l1 -> mem x l2
+
+  use import Length
+
+  lemma Permut_length :
+    forall l1 l2 : list 'a. permut l1 l2 -> length l1 = length l2
+
 end
 
 theory Induction
   use import List
 
-  logic p (list 'a)
+  type elt
+
+  logic p (list elt)
 
   axiom Induction : 
-    p (Nil : list 'a) ->
-    (forall x:'a. forall l:list 'a. p l -> p (Cons x l)) ->
-    forall l:list 'a. p l
+    p (Nil : list elt) ->
+    (forall x:elt. forall l:list elt. p l -> p (Cons x l)) ->
+    forall l:list elt. p l
 
 end
 

@@ -113,10 +113,13 @@ let build_maze (n:int) =
         }
       let x = rand n in
       let y = rand n in
-      (*let d = rand 2 in*)
-      let w = x+1 (* select d (x+1) x *) (*if d = 0 then x+1 else x *) in
-      let z = y (* select d y (y+1) *) (*if d = 0 then y else y+1*) in
-      if andb (w < n) (z < n) then (* TODO && *) begin
+      let d = rand 2 in
+      let w = if d = 0 then x+1 else x in
+      let z = if d = 0 then y else y+1 in
+(*
+      let (w, z) = if d = 0 then (x+1, y) else (x, y+1) in
+*)
+      if w < n && z < n then begin
         let a = y * n + x in
         assert { 0 <= a < n*n };
         let b = w * n + z in
