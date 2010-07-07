@@ -220,3 +220,5 @@ let print_goal drv fmt (id, f, task) =
   print_task drv fmt task;
   fprintf fmt "@\n@[<hov 2>goal %a : %a@]@\n" print_ident id (print_fmla drv) f
 
+let () = Theory.register_meta "AC" [Theory.MTlsymbol]
+

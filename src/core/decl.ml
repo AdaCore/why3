@@ -489,9 +489,9 @@ let find_prop kn pr =
 
 let find_prop_decl kn pr =
   match (Mid.find pr.pr_name kn).d_node with
-    | Dind dl ->
+  | Dind dl ->
       let test (_,l) = List.mem_assq pr l in
-      Pskip, List.assq pr (snd (List.find test dl))
+      Paxiom, List.assq pr (snd (List.find test dl))
   | Dprop (k,_,f) -> k,f
   | _ -> assert false
 

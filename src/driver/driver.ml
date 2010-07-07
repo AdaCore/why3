@@ -123,6 +123,8 @@ type driver = {
   drv_syntax    : string Mid.t;
   drv_remove    : Sid.t;
   drv_remove_cl : Sid.t;
+  drv_meta      : Stdecl.t Mid.t; (* the same as clone_map *)
+  drv_meta_cl   : Stdecl.t Mid.t;
   drv_regexps   : (Str.regexp * Call_provers.prover_answer) list;
   drv_exitcodes : (int * Call_provers.prover_answer) list;
   drv_tag       : int
@@ -186,6 +188,8 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
   let syntax    = ref Mid.empty in
   let remove    = ref Sid.empty in
   let remove_cl = ref Sid.empty in
+  let meta      = ref Mid.empty in
+  let meta_cl   = ref Mid.empty in
   let qualid    = ref [] in
 
   let find_pr th (loc,q) = try ns_find_pr th.th_export q with Not_found ->
@@ -196,6 +200,10 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
   in
   let find_ts th (loc,q) = try ns_find_ts th.th_export q with Not_found ->
     errorm ~loc "unknown type symbol %s" (string_of_qualid !qualid q)
+  in
+  let add_meta th td m =
+    let s = try Mid.find th.th_name !m with Not_found -> Stdecl.empty in
+    m := Mid.add th.th_name (Stdecl.add td s) !m
   in
   let add_syntax loc k (_,q) id n s =
     check_syntax loc s n;
@@ -213,24 +221,42 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
   let add_local th (loc,rule) = match rule with
     | Rprelude s ->
         let l = try Mid.find th.th_name !thprelude with Not_found -> [] in
-        thprelude := Mid.add th.th_name (s::l) !thprelude
+        thprelude := Mid.add th.th_name (l @ [s]) !thprelude
     | Rsyntaxls (q,s) ->
         let ls = find_ls th q in
+        add_meta th (Printer.remove_logic ls) meta;
+        add_meta th (Printer.syntax_logic ls s) meta;
         add_syntax loc "logic" q ls.ls_name (List.length ls.ls_args) s
     | Rsyntaxts (q,s) ->
         let ts = find_ts th q in
-        add_syntax loc "type"  q ts.ts_name (List.length ts.ts_args) s
+        add_meta th (Printer.remove_type ts) meta;
+        add_meta th (Printer.syntax_type ts s) meta;
+        add_syntax loc "type" q ts.ts_name (List.length ts.ts_args) s
     | Rremovepr (c,q) ->
+        let td = Printer.remove_prop (find_pr th q) in
+        add_meta th td (if c then meta_cl else meta);
         let sr = if c then remove_cl else remove in
         sr := Sid.add (find_pr th q).pr_name !sr
-    | Rtagts (c,q,s) -> add_tag c (find_ts th q).ts_name s
-    | Rtagls (c,q,s) -> add_tag c (find_ls th q).ls_name s
-    | Rtagpr (c,q,s) -> add_tag c (find_pr th q).pr_name s
+    | Rtagts (c,q,s) ->
+        let td = create_meta s [MAts (find_ts th q)] in
+        add_meta th td (if c then meta_cl else meta);
+        add_tag c (find_ts th q).ts_name s
+    | Rtagls (c,q,s) ->
+        let td = create_meta s [MAls (find_ls th q)] in
+        add_meta th td (if c then meta_cl else meta);
+        add_tag c (find_ls th q).ls_name s
+    | Rtagpr (c,q,s) ->
+        let td = create_meta s [MApr (find_pr th q)] in
+        add_meta th td (if c then meta_cl else meta);
+        add_tag c (find_pr th q).pr_name s
+  in
+  let add_local th (loc,rule) = 
+    try add_local th (loc,rule) with e -> raise (Loc.Located (loc,e))
   in
   let add_theory { thr_name = (loc,q); thr_rules = trl } =
     let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
-    let th = try Env.find_theory env f id with Env.TheoryNotFound (l,s) ->
-      errorm ~loc "theory %s.%s not found" (String.concat "." l) s
+    let th =
+      try Env.find_theory env f id with e -> raise (Loc.Located (loc,e))
     in
     qualid := q;
     List.iter (add_local th) trl
@@ -250,6 +276,8 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     drv_syntax    = !syntax;
     drv_remove    = !remove;
     drv_remove_cl = !remove_cl;
+    drv_meta      = !meta;
+    drv_meta_cl   = !meta_cl;
     drv_regexps   = !regexps;
     drv_exitcodes = !exitcodes;
     drv_tag       = !driver_tag;

@@ -19,19 +19,19 @@
 
 open Term
 open Decl
-open Task
 open Theory
+open Task
 
 (** Task transformation *)
 
 type 'a trans
 type 'a tlist = 'a list trans
 
+val store : (task -> 'a) -> 'a trans
+val apply : 'a trans -> (task -> 'a)
+
 val identity   : task trans
 val identity_l : task tlist
-
-val apply : 'a trans -> (task -> 'a)
-val store : (task -> 'a) -> 'a trans
 
 val singleton : 'a trans -> 'a tlist
 
@@ -60,4 +60,26 @@ val tdecl   : (decl -> tdecl list     ) -> task -> task trans
 val tdecl_l : (decl -> tdecl list list) -> task -> task tlist
 
 val rewrite : (term -> term) -> (fmla -> fmla) -> task -> task trans
+
+(* dependent transformatons *)
+
+val on_theory : theory -> (tdecl_set -> 'a trans) -> 'a trans
+val on_meta   : string -> (tdecl_set -> 'a trans) -> 'a trans
+
+val on_theories : theory list -> (clone_map -> 'a trans) -> 'a trans
+val on_metas    : string list -> (meta_map  -> 'a trans) -> 'a trans
+
+val on_theories_metas : theory list -> string list ->
+                        (clone_map -> meta_map -> 'a trans) -> 'a trans
+
+(** {2 Registration} *)
+
+val register_transform   : string -> (Env.env -> task trans) -> unit
+val register_transform_l : string -> (Env.env -> task tlist) -> unit
+
+val lookup_transform   : string -> Env.env -> task trans
+val lookup_transform_l : string -> Env.env -> task tlist
+
+val list_transforms   : unit -> string list
+val list_transforms_l : unit -> string list
 

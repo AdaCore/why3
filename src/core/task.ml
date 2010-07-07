@@ -24,10 +24,35 @@ open Term
 open Decl
 open Theory
 
-(** Task *)
+(** Clone and meta history *)
 
-type clone_map = Stdecl.t Mid.t
-type meta_map = Stdecl.t Mstr.t
+type tdecl_set = {
+  tds_set : Stdecl.t;
+  tds_tag : int;
+}
+
+module Hstds = Hashcons.Make (struct
+  type t = tdecl_set
+  let equal s1 s2 = Stdecl.equal s1.tds_set s2.tds_set
+  let hs_td td acc = Hashcons.combine acc td.td_tag
+  let hash s = Stdecl.fold hs_td s.tds_set 0
+  let tag n s = { s with tds_tag = n }
+end)
+
+let mk_tds s = Hstds.hashcons { tds_set = s; tds_tag = -1 }
+let empty_tds = mk_tds Stdecl.empty
+let tds_add td s = mk_tds (Stdecl.add td s.tds_set)
+
+type clone_map = tdecl_set Mid.t
+type meta_map = tdecl_set Mstr.t
+
+let cm_find cm th = try Mid.find th.th_name cm with Not_found -> empty_tds
+let mm_find mm t  = try Mstr.find t mm with Not_found -> empty_tds
+
+let cm_add cm th td = Mid.add th.th_name (tds_add td (cm_find cm th)) cm
+let mm_add mm t  td = Mstr.add t (tds_add td (mm_find mm t)) mm
+
+(** Task *)
 
 type task = task_hd option
 
@@ -74,24 +99,19 @@ let task_known = option_apply Mid.empty (fun t -> t.task_known)
 let task_clone = option_apply Mid.empty (fun t -> t.task_clone)
 let task_meta  = option_apply Mstr.empty (fun t -> t.task_meta)
 
-let find_clone task th =
-  try Mid.find th.th_name (task_clone task) with Not_found -> Stdecl.empty
-
-let find_meta task t =
-  try Mstr.find t (task_meta task) with Not_found -> Stdecl.empty
+let find_clone task th = cm_find (task_clone task) th
+let find_meta  task t  = mm_find (task_meta  task) t
 
 let add_decl task d td =
   let kn = known_add_decl (task_known task) d in
   mk_task td task kn (task_clone task) (task_meta task)
 
 let add_clone task th td =
-  let st = Stdecl.add td (find_clone task th) in
-  let cl = Mid.add th.th_name st (task_clone task) in
+  let cl = cm_add (task_clone task) th td in
   mk_task td task (task_known task) cl (task_meta task)
 
 let add_meta task t td =
-  let st = Stdecl.add td (find_meta task t) in
-  let mt = Mstr.add t st (task_meta task) in
+  let mt = mm_add (task_meta task) t td in
   mk_task td task (task_known task) (task_clone task) mt
 
 (* add_decl with checks *)
@@ -146,7 +166,7 @@ and flat_tdecl task td = match td.td_node with
 
 and use_export task th =
   let td = create_null_clone th in
-  if Stdecl.mem td (find_clone task th) then task else
+  if Stdecl.mem td (find_clone task th).tds_set then task else
   let task = List.fold_left flat_tdecl task th.th_decls in
   add_clone task th td
 
@@ -185,18 +205,18 @@ let task_decls  = task_fold (fun acc td ->
 (* TO BE REMOVED *)
 
 let old_task_clone task =
-  Mid.fold (fun _ -> Stdecl.fold (function
+  Mid.fold (fun _ x -> Stdecl.fold (function
   | { td_node = Clone (_,cl) } ->
       Mid.fold (fun id id' m ->
         let s = try Mid.find id' m with Not_found -> Sid.empty in
         Mid.add id' (Sid.add id s) m) cl
-  | _ -> assert false)) (task_clone task) Mid.empty
+  | _ -> assert false) x.tds_set) (task_clone task) Mid.empty
 
 let old_task_use task =
-  Mid.fold (fun _ -> Stdecl.fold (function
+  Mid.fold (fun _ x -> Stdecl.fold (function
   | { td_node = Clone (th,cl) } -> (fun m ->
       if Mid.is_empty cl then Mid.add th.th_name th m else m)
-  | _ -> assert false)) (task_clone task) Mid.empty
+  | _ -> assert false) x.tds_set) (task_clone task) Mid.empty
 
 let rec last_use task = match task with
   | Some {task_decl={td_node=Clone(_,cl)}} when Mid.is_empty cl -> task

@@ -367,3 +367,6 @@ let t_all = Register.store_env
      Trans.tdecl (decl tenv) init_task)
 
 let () = Register.register_transform "encoding_decorate_every_simple" t_all
+
+let () = Theory.register_meta "encoding_decorate : kept" [Theory.MTtysymbol]
+

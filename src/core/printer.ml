@@ -150,9 +150,9 @@ let get_remove_set task =
     | _ -> assert false
   in
   let s = Sid.empty in
-  let s = Stdecl.fold add (find_meta task meta_remove_type) s in
-  let s = Stdecl.fold add (find_meta task meta_remove_logic) s in
-  let s = Stdecl.fold add (find_meta task meta_remove_prop) s in
+  let s = Stdecl.fold add (find_meta task meta_remove_type).tds_set s in
+  let s = Stdecl.fold add (find_meta task meta_remove_logic).tds_set s in
+  let s = Stdecl.fold add (find_meta task meta_remove_prop).tds_set s in
   s
 
 let get_syntax_map task =
@@ -161,8 +161,8 @@ let get_syntax_map task =
     | _ -> assert false
   in
   let m = Mid.empty in
-  let m = Stdecl.fold add (find_meta task meta_syntax_type) m in
-  let m = Stdecl.fold add (find_meta task meta_syntax_logic) m in
+  let m = Stdecl.fold add (find_meta task meta_syntax_type).tds_set m in
+  let m = Stdecl.fold add (find_meta task meta_syntax_logic).tds_set m in
   m
 
 (** {2 exceptions to use in transformations and printers} *)

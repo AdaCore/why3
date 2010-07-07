@@ -24,10 +24,17 @@ open Term
 open Decl
 open Theory
 
-(** Task *)
+(** Clone and meta history *)
 
-type clone_map = Stdecl.t Mid.t
-type meta_map = Stdecl.t Mstr.t
+type tdecl_set = private {
+  tds_set : Stdecl.t;
+  tds_tag : int;
+}
+
+type clone_map = tdecl_set Mid.t
+type meta_map = tdecl_set Mstr.t
+
+(** Task *)
 
 type task = task_hd option
 
@@ -47,8 +54,8 @@ val task_known : task -> known_map
 val task_clone : task -> clone_map
 val task_meta  : task -> meta_map
 
-val find_clone : task -> theory -> Stdecl.t
-val find_meta : task -> string -> Stdecl.t
+val find_clone : task -> theory -> tdecl_set
+val find_meta  : task -> string -> tdecl_set
 
 (** {2 constructors} *)
 
