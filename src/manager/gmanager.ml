@@ -169,6 +169,17 @@ let provers_data =
   in
   printf "@\n===============================@.";
   l 
+
+let alt_ergo = 
+  match
+    List.fold_left
+      (fun acc p ->
+         if Db.prover_name p.prover = "Alt-Ergo" then Some p else acc)
+      None provers_data
+  with
+    | None -> assert false
+    | Some p -> p
+
    
 let () = 
   printf "previously known goals:@\n";
@@ -220,29 +231,27 @@ module Ide_goals = struct
 
   let clear model = model#clear ()
 
-  let task_table = Ident.Hid.create 17
+  let goal_table = Ident.Hid.create 17
 
-  let get_task = Ident.Hid.find task_table
+  let get_goal id = fst (Ident.Hid.find goal_table id)
 
   let add_goals (model : GTree.tree_store) th =
+    let tname = th.Theory.th_name.Ident.id_string in
+    let parent = model#append () in
+    model#set ~row:parent ~column:name_column tname;
+    model#set ~row:parent ~column:id_column th.Theory.th_name;
     let tasks = Task.split_theory th None in
     List.iter
       (fun t->
-         let name = (Task.task_goal t).Decl.pr_name in
-         Ident.Hid.add task_table name t)
-      tasks;
-    let rec fill parent ns =
-      let add_s s symb = 
-	let row = model#append ~parent () in
-	model#set ~row ~column:name_column s;
-	model#set ~row ~column:id_column symb.Decl.pr_name;
-      in
-      Theory.Mnm.iter add_s ns.Theory.ns_pr;
-    in
-    let row = model#append () in
-    model#set ~row ~column:name_column th.Theory.th_name.Ident.id_string;
-    model#set ~row ~column:id_column th.Theory.th_name;
-    fill row th.Theory.th_export
+         let id = (Task.task_goal t).Decl.pr_name in
+         let name = id.Ident.id_string in
+         let g = Db.add_or_replace_task ~tname ~name t in
+	 let row = model#append ~parent () in
+         Ident.Hid.add goal_table id (g,row);
+	 model#set ~row ~column:name_column name;
+	 model#set ~row ~column:id_column id;
+      )
+      tasks
 
 end
 
@@ -265,8 +274,8 @@ let select_goals (goals_view:GTree.tree_store) (task_view:GSourceView2.source_vi
        let row = goals_view#get_iter p in
        let id = goals_view#get ~row ~column:Ide_goals.id_column in
        Format.eprintf "You clicked on %s@." id.Ident.id_string;
-       let t = Ide_goals.get_task id in
-       let task_text = Pp.string_of Pretty.print_task t in
+       let g = Ide_goals.get_goal id in
+       let task_text = Pp.string_of Pretty.print_task (Db.goal_task g) in
        task_view#source_buffer#set_text task_text;
        task_view#scroll_to_mark `INSERT
 
@@ -279,9 +288,26 @@ let select_goals (goals_view:GTree.tree_store) (task_view:GSourceView2.source_vi
     )
     selected_rows
 
+let count = ref 0
+
 let alt_ergo_on_all_goals () =
-  begin
-  end
+  Ident.Hid.iter
+    (fun id (g,_row) ->
+       Format.eprintf "running Alt-Ergo on goal %s@." id.Ident.id_string;
+       incr count;
+       let c = !count in
+       let callback result =
+         printf "Scheduled task #%d: status set to %a@." c
+           Db.print_status result
+       in
+       let p = alt_ergo in
+       Scheduler.schedule_proof_attempt
+         ~debug:true ~timelimit ~memlimit:0 
+         ~prover:p.prover ~command:p.command ~driver:p.driver 
+         ~callback
+         g
+    )
+    Ide_goals.goal_table
 
 let main () =
   let w = GWindow.window 

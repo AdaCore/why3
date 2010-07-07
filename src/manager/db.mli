@@ -103,9 +103,7 @@ val goal_name : goal -> string
   val parent : goal -> transf option
 *)
 
-(*
 val goal_task : goal -> Task.task
-*)
 val goal_task_checksum: goal -> string
 val external_proofs : goal -> external_proof list
   (** returns the set of external proof attempt for that goal *)

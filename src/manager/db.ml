@@ -38,28 +38,39 @@ let current () =
 	      
 
 let default_busyfn (_db:Sqlite3.db) =
-  print_endline "WARNING: busy";
+  prerr_endline "Db.default_busyfn WARNING: busy";
   (* Thread.delay (Random.float 1.) *)
   ignore (Unix.select [] [] [] (Random.float 1.))
   
 let raise_sql_error x = raise (Sqlite3.Error (Rc.to_string x))
   
+(*
 let try_finally fn finalfn =
   try
     let r = fn () in
     finalfn ();
     r
   with e -> begin
-    Format.eprintf "WARNING: exception: %s@." (Printexc.to_string e);
+    prerr_string "Db.try_finally WARNING: exception: ";
+    prerr_endline (Printexc.to_string e);
+    prerr_endline "== exception backtrace ==";
+    Printexc.print_backtrace stderr;
+    prerr_endline "== end of backtrace ==";
     finalfn ();
     raise e
   end
+*)
   
 (* retry until a non-BUSY error code is returned *)
 let rec db_busy_retry db fn =
   match fn () with
-    | Rc.BUSY -> db.busyfn db.raw_db; db_busy_retry db fn
-    | x -> x
+    | Rc.BUSY -> 
+        prerr_endline "Db.db_busy_retry: BUSY";
+        db.busyfn db.raw_db; db_busy_retry db fn
+    | x -> 
+        prerr_string "Db.db_busy_retry: ";
+        prerr_endline (Rc.to_string x);
+        x
        
 (* make sure an OK is returned from the database *)
 let db_must_ok db fn =
@@ -80,19 +91,28 @@ let transaction db fn =
     | Immediate -> "IMMEDIATE" 
     | Exclusive -> "EXCLUSIVE" 
   in
-  try_finally 
-    (fun () ->
-       if db.in_transaction = 0 then 
-         db_must_ok db 
-           (fun () -> exec db.raw_db ("BEGIN " ^ m ^ " TRANSACTION"));
-       db.in_transaction <- db.in_transaction + 1;
-       fn ();
-    ) 
-    (fun () ->
-       if db.in_transaction = 1 then 
-         db_must_ok db (fun () -> exec db.raw_db "END TRANSACTION");
-       db.in_transaction <- db.in_transaction - 1
-    )
+  try 
+    db_must_ok db 
+      (fun () -> exec db.raw_db ("BEGIN " ^ m ^ " TRANSACTION"));
+    assert (db.in_transaction = 0);
+    db.in_transaction <- 1;
+    let res = fn () in
+    db_must_ok db (fun () -> exec db.raw_db "END TRANSACTION");
+    assert (db.in_transaction = 1);
+    db.in_transaction <- 0;
+    res
+  with
+      e ->
+        prerr_string "Db.transaction WARNING: exception: ";
+        prerr_endline (Printexc.to_string e);
+        prerr_endline "== exception backtrace ==";
+        Printexc.print_backtrace stderr;
+        prerr_endline "== end of backtrace ==";
+        db_must_ok db (fun () -> exec db.raw_db "END TRANSACTION");
+        assert (db.in_transaction = 1);
+        db.in_transaction <- 0;
+        raise e
+    
   
 (* iterate over a result set *)
 let step_fold db stmt iterfn =
@@ -600,6 +620,7 @@ module External_proof = struct
 
 
   let set_status db e stat =
+    try
       transaction db 
         (fun () ->
 	   let id = e.external_proof_id in
@@ -612,6 +633,10 @@ module External_proof = struct
            ]
            in
 	   db_must_done db (fun () -> Sqlite3.step stmt))
+    with e ->
+      Format.eprintf "External_proof.set_status raised an exception %s@."
+        (Printexc.to_string e)
+      
     
   let set_result_time db e t =
       transaction db 
@@ -1058,7 +1083,7 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
 
     | Some _ -> failwith "Db.init_db: already opened"
 
-let init_base f = init_db f
+let init_base f = init_db ~mode:Exclusive f
 
 let root_goals () = 
   let db = current () in
@@ -1098,10 +1123,10 @@ let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver
   in
   if debug then Format.printf "setting attempt status to Scheduled@.";
   External_proof.set_status db attempt Scheduled;
-  if debug then Format.eprintf "Task : %a@." Why.Pretty.print_task g.task;
+  if false && debug then Format.eprintf "Task : %a@." Why.Pretty.print_task g.task;
   let callback = 
     try 
-      if debug then 
+      if false && debug then 
         Format.eprintf "Task for prover: %a@." 
           (Why.Prover.print_task driver) g.task;
       Why.Prover.prove_task ~debug ~command ~timelimit ~memlimit driver g.task
