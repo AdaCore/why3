@@ -277,6 +277,8 @@ MNGMLI = $(addsuffix .mli, $(MNGMODULES))
 MNGCMO = $(addsuffix .cmo, $(MNGMODULES))
 MNGCMX = $(addsuffix .cmx, $(MNGMODULES))
 
+MNGMAINML  = $(addsuffix .ml,  $(MNGMAINS))
+
 $(MNGCMO) $(MNGCMX) $(addsuffix .cmx, $(MNGMAINS)) $(addsuffix .cmo, $(MNGMAINS)): INCLUDES = -thread -I src/manager -I +sqlite3 -I +threads
 
 src/manager/gmanager.cmo src/manager/gmanager.cmx: INCLUDES += -I +lablgtk2
@@ -315,7 +317,7 @@ bin/why-rustprover.byte: src/why.cma $(MNGCMO) src/manager/gmanager.cmo
 include .depend.manager
 
 .depend.manager:
-	$(OCAMLDEP) -slash -I src -I src/manager $(MNGML) $(MNGMLI) > $@
+	$(OCAMLDEP) -slash -I src -I src/manager $(MNGML) $(MNGMLI) $(MNGMAINML) > $@
 
 depend: .depend.manager
 
