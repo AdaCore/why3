@@ -20,3 +20,10 @@ theory Kept
 (* If a driver tags this type by "encoding decorate : kept", all the type which clone this one will be kept by the encoding*)
        type t
 end
+
+theory Prelude_mono
+       logic sort int int : int
+       logic int : int
+       axiom Conv_int : forall x1 x2 : int. sort int x1 = sort int x2 <-> x1 = x2
+end
+
