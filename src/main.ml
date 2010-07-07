@@ -268,7 +268,7 @@ let memlimit = match !opt_memlimit with
 let debug = !opt_debug
 
 let print_th_namespace fmt th =
-  Pretty.print_namespace fmt th.th_name.Ident.id_string th.th_export
+  Pretty.print_namespace fmt th.th_name.Ident.id_string th
 
 let fname_printer = ref (Ident.create_ident_printer [])
 

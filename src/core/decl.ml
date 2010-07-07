@@ -487,6 +487,14 @@ let find_prop kn pr =
   | Dprop (_,_,f) -> f
   | _ -> assert false
 
+let find_prop_decl kn pr =
+  match (Mid.find pr.pr_name kn).d_node with
+    | Dind dl ->
+      let test (_,l) = List.mem_assq pr l in
+      Pskip, List.assq pr (snd (List.find test dl))
+  | Dprop (k,_,f) -> k,f
+  | _ -> assert false
+
 exception NonExhaustiveExpr of (pattern list * expr)
 
 let rec check_matchT kn () t = match t.t_node with

@@ -309,11 +309,13 @@ let print_ind_decl fmt (ps,bl) =
     (print_list newline print_ind) bl;
   forget_tvs ()
 
-let print_pkind fmt = function
-  | Paxiom -> fprintf fmt "axiom"
-  | Plemma -> fprintf fmt "lemma"
-  | Pgoal  -> fprintf fmt "goal"
-  | Pskip  -> fprintf fmt "skip"
+let sprint_pkind = function
+  | Paxiom -> "axiom"
+  | Plemma -> "lemma"
+  | Pgoal  -> "goal"
+  | Pskip  -> "skip"
+
+let print_pkind fmt k = pp_print_string fmt (sprint_pkind k)
 
 let print_prop_decl fmt (k,pr,f) =
   fprintf fmt "@[<hov 2>%a %a : %a@]" print_pkind k
@@ -379,12 +381,14 @@ let print_named_task fmt name task =
 
 module NsTree = struct
   type t =
-    | Namespace of string * namespace
+    | Namespace of string * namespace * known_map
     | Leaf      of string
 
-  let contents ns =
-    let add_ns s ns acc = Namespace (s, ns) :: acc in
-    let add_pr s _  acc = Leaf ("prop " ^ s) :: acc in
+  let contents ns kn =
+    let add_ns s ns acc = Namespace (s, ns, kn) :: acc in
+    let add_pr s p  acc = 
+      let k, _ = find_prop_decl kn p in
+      Leaf (sprint_pkind k ^ " " ^ s) :: acc in
     let add_ls s ls acc =
       if s = "infix ="  && ls_equal ls ps_equ then acc else
       if s = "infix <>" && ls_equal ls ps_neq then acc else
@@ -401,13 +405,14 @@ module NsTree = struct
     let acc = Mnm.fold add_ts ns.ns_ts acc in acc
 
   let decomp = function
-    | Namespace (s,ns) -> s, contents ns
-    | Leaf s           -> s, []
+    | Namespace (s,ns,kn) -> s, contents ns kn
+    | Leaf s              -> s, []
 end
 
-let print_namespace fmt name ns =
+let print_namespace fmt name th =
   let module P = Print_tree.Make(NsTree) in
-  fprintf fmt "@[<hov>%a@]@." P.print (NsTree.Namespace (name, ns))
+  fprintf fmt "@[<hov>%a@]@." P.print 
+    (NsTree.Namespace (name, th.th_export, th.th_known))
 
 (* Exception reporting *)
 

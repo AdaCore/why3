@@ -60,5 +60,5 @@ val print_task : formatter -> task -> unit
 val print_theory : formatter -> theory -> unit
 
 val print_named_task : formatter -> string -> task -> unit
-val print_namespace : formatter -> string -> namespace -> unit
+val print_namespace : formatter -> string -> theory -> unit
 
