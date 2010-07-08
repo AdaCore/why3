@@ -19,19 +19,20 @@
 
 open Term
 
-let rec rt keep t = t_map (rt keep) (rf keep) t
-
-and rf keep f = 
-  let f = f_map (rt keep) (rf keep) f in
-  match f.f_node with
-    | Fquant (Fforall,fq) ->
-      let vsl,trl,f2 = f_open_quant fq in
-      let one_false = ref false in
-      let keep x = let b = keep x in
-                   if b then b else (one_false := true; b) in
-      let trl = List.filter (List.for_all keep) trl in
-      if not (!one_false) then f else f_forall vsl trl f2
-    | _ -> f
+let make_rt_rf keep =
+  let rec rt t = t_map rt rf t
+  and rf f = 
+    let f = f_map rt rf f in
+    match f.f_node with
+      | Fquant (Fforall,fq) ->
+        let vsl,trl,f2 = f_open_quant fq in
+        let one_false = ref false in
+        let keep x = let b = keep x in
+                     if b then b else (one_false := true; b) in
+        let trl = List.filter (List.for_all keep) trl in
+        if not (!one_false) then f else f_forall vsl trl f2
+      | _ -> f in
+  rt,rf
 
 
 let keep_no_predicate = function
@@ -41,8 +42,8 @@ let keep_no_predicate = function
   
 let filter_trigger_no_predicate = 
   Register.store (fun () -> 
-    let keep = keep_no_predicate in
-    Trans.rewrite (rt keep) (rf keep) None)
+    let rt,rf = make_rt_rf keep_no_predicate in
+    Trans.rewrite rt rf None)
 
 let () = Register.register_transform "filter_trigger_no_predicate" 
   filter_trigger_no_predicate
@@ -55,7 +56,9 @@ let keep_no_fmla = function
 
 
 let filter_trigger = Register.store 
-  (fun () -> Trans.rewrite (rt keep_no_fmla) (rf keep_no_fmla) None)
+  (fun () -> 
+    let rt,rf = make_rt_rf keep_no_fmla in
+    Trans.rewrite rt rf None)
 
 let () = Register.register_transform "filter_trigger" filter_trigger
 
@@ -69,8 +72,8 @@ let keep_no_builtin query = function
   
 let filter_trigger_builtin = 
   Register.store_query (fun query -> 
-    let keep = keep_no_builtin query in
-    Trans.rewrite (rt keep) (rf keep) None)
+    let rt,rf = make_rt_rf (keep_no_builtin query) in
+    Trans.rewrite rt rf None)
 
 let () = Register.register_transform "filter_trigger_builtin" 
   filter_trigger_builtin
