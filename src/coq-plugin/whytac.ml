@@ -896,8 +896,8 @@ let whytac s gl =
     let cp, drv = get_prover s in
     let command = cp.command in
     if debug then Format.printf "@[%a@]@\n---@." Pretty.print_task !task;
-    if debug then Format.printf "@[%a@]@\n---@." (Prover.print_task drv) !task;
-    let res = Prover.prove_task ~debug ~command ~timelimit drv !task () in
+    if debug then Format.printf "@[%a@]@\n---@." (Driver.print_task drv) !task;
+    let res = Driver.prove_task ~debug ~command ~timelimit drv !task () in
     match res.pr_answer with
       | Valid -> Tactics.admit_as_an_axiom gl
       | Invalid -> error "Invalid"
