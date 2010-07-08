@@ -33,38 +33,29 @@ let why_filename = ["transform" ; "encoding_decorate"]
 let kept_tag = "encoding_decorate : kept"
 
 (* From Encoding Polymorphism CADE07*)
-type tenv = {query : Driver.driver_query option;
+type tenv = {query : Driver.driver_query;
              unsorted : ty;
              sort : lsymbol;
+             real_to_int : lsymbol;
              trans_lsymbol : lsymbol Hls.t;
              trans_tsymbol : lsymbol Hts.t} 
 
 let load_prelude query env =
   let prelude = Env.find_theory env why_filename "Prelude_mono" in
   let sort = Theory.ns_find_ls prelude.th_export ["sort"] in
-  let unsorted = ty_app (Theory.ns_find_ts prelude.th_export ["unsorted"]) []in
-  let int = Theory.ns_find_ls prelude.th_export ["int"]in
+  let int = Theory.ns_find_ls prelude.th_export ["int"] in
+  let real_to_int = Theory.ns_find_ls prelude.th_export ["real_to_int"] in
   let task = None in
   let task = Task.use_export task prelude in
   let trans_tsymbol = Hts.create 17 in
   Hts.add trans_tsymbol Ty.ts_int int;
   task,
   { query = query;
-    unsorted = unsorted;
+    unsorted = ty_int;
     sort = sort;
+    real_to_int = real_to_int;
     trans_lsymbol = Hls.create 17;
     trans_tsymbol = trans_tsymbol}
-
-let is_kept tenv ts = 
-  ts.ts_args = [] &&  
-    begin
-      ts_equal ts ts_int || ts_equal ts ts_real  (* for the constant *)
-      || match tenv.query with
-        | None -> true (* every_simple *)
-        | Some query ->
-            let tags = Driver.query_tags query ts.ts_name in
-            Sstr.mem kept_tag tags
-    end
 
 (* Translate a type to a term *)
 let rec term_of_ty tenv tvar ty =
@@ -151,7 +142,8 @@ let rec rewrite_term tenv tvar vsvar t =
   let fnT = rewrite_term tenv tvar in
   let fnF = rewrite_fmla tenv tvar vsvar in
   match t.t_node with
-    | Tconst _ -> t
+    | Tconst ConstInt _ -> t
+    | Tconst ConstReal _ -> t_app tenv.real_to_int [t] tenv.unsorted
     | Tvar x -> Mvs.find x vsvar
     | Tapp(p,tl) ->
         let tl = List.map (fnT vsvar) tl in
@@ -201,6 +193,9 @@ and rewrite_fmla tenv tvar vsvar f =
         f_let u t1' f2'
     | _ -> f_map fnT (fnF vsvar) f
 
+let is_kept ls = List.for_all (fun ty -> ty_equal ty_int ty) ls.ls_args
+  && option_apply true (ty_equal ty_int) ls.ls_value
+
 let decl (tenv:tenv) d =
   (* let fnT = rewrite_term tenv in *)
   let fnF = rewrite_fmla tenv in
@@ -219,21 +214,42 @@ let decl (tenv:tenv) d =
         d "encoding_decorate : I can work only on abstract\
             type which are not in recursive bloc."
     | Dlogic l ->
-        let fn = function
+        let fn acc = function
           | _ls, Some _ -> 
               Register.unsupportedDecl 
                 d "encoding_decorate : I can't encode definition. \
 Perhaps you could use eliminate_definition"
-          | ls, None ->
-            
+          | ls1, None ->
+            let ls2 = 
               try
-                let ls = Hls.find tenv.trans_lsymbol ls in
-                ls,None
-              with Not_found ->
-                let ls_conv = conv_ls tenv ls in
-                Hls.add tenv.trans_lsymbol ls ls_conv;
-                ls_conv,None in
-        [create_decl (create_logic_decl (List.map fn l))]
+                Hls.find tenv.trans_lsymbol ls1
+              with Not_found -> conv_ls tenv ls1 in
+            let acc = create_logic_decl [ls2,None] :: acc in
+            let acc = match Driver.query_syntax tenv.query ls1.ls_name with
+              | Some _ when is_kept ls1 -> 
+                let make _ = create_vsymbol (id_fresh "x") ty_int in
+                let vars = List.map make ls1.ls_args in
+                let terms1 = List.map t_var vars in
+                let tvar = Htv.create 0 in
+                let terms2 = List.map 
+                  (fun t -> sort_app tenv tvar t ty_int) terms1 in
+                let fmla = 
+                  match ls1.ls_value with
+                    | None ->
+                      let f1 = f_app ls1 terms1 in
+                      let f2 = f_app ls2 terms2 in
+                      f_iff f1 f2
+                    | Some _ ->
+                      let t1 = t_app ls1 terms1 ty_int in
+                      let t2 = t_app ls2 terms2 ty_int in
+                      f_equ t1 t2  in
+                let fmla = f_forall vars [] fmla in
+                let name = create_prsymbol (id_clone ls1.ls_name) in
+                (create_prop_decl Paxiom name fmla)::d::acc
+              | _ -> acc in
+            Hls.replace tenv.trans_lsymbol ls1 ls2;
+            acc in
+        List.rev_map create_decl (List.fold_left fn [] l)
     | Dind _ -> Register.unsupportedDecl
         d "encoding_decorate : I can't work on inductive"
         (* let fn (pr,f) = pr, fnF f in *)
@@ -258,7 +274,7 @@ let decl tenv d =
 let t = Register.store_query 
   (fun query -> 
      let env = Driver.query_env query in
-     let init_task,tenv = load_prelude (Some query) env in
+     let init_task,tenv = load_prelude query env in
      Trans.tdecl (decl tenv) init_task)
 
 let () = Register.register_transform "encoding_decorate_mono" t

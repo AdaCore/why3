@@ -21,7 +21,12 @@ transformation "eliminate_let"
 transformation "simplify_formula"
 transformation "simplify_trivial_quantification"
 
-transformation "encoding_decorate"
+transformation "filter_trigger_no_predicate"
+(* predicate are *currently* translated to P(\x) = true, thus in a
+trigger they can't appear since = can't appear *)
+(*transformation "filter_trigger_builtin"*)
+
+transformation "encoding_decorate_mono"
 
 theory BuiltIn
   syntax type int "Int"
@@ -39,7 +44,7 @@ theory int.Int
   syntax logic (_+_) "(+ %1 %2)"
   syntax logic (_-_) "(- %1 %2)"
   syntax logic (_*_) "(* %1 %2)"
-  syntax logic (-_)  "(- %1)"
+  syntax logic (-_)  "(- 0 %1)"
 
   syntax logic (_<=_) "(<= %1 %2)"
   syntax logic (_< _) "(< %1 %2)"

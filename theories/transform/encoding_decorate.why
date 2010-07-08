@@ -25,5 +25,8 @@ theory Prelude_mono
        logic sort int int : int
        logic int : int
        axiom Conv_int : forall x1 x2 : int. sort int x1 = sort int x2 <-> x1 = x2
+       
+       (* logic used only to cast real constant *)
+       logic real_to_int real : int
 end
 
