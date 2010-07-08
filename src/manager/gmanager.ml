@@ -185,6 +185,7 @@ let find_prover s =
     | Some p -> p
 
 let alt_ergo = find_prover "Alt-Ergo"
+let simplify = find_prover "simplify"
 let z3 = find_prover "Z3"
 
 
@@ -272,7 +273,7 @@ module Ide_goals = struct
          Ident.Hid.add goal_table id (g,row);
 	 model#set ~row ~column:name_column name;
 	 model#set ~row ~column:id_column id;
-         model#set ~row ~column:status_column `REMOVE;
+(*         model#set ~row ~column:status_column `REMOVE; *)
       )
       tasks
 
@@ -324,17 +325,20 @@ let count = ref 0
 
 let async f = GtkThread.async f ()
 
-let prover_on_all_goals ~(model:GTree.tree_store) p () =
+let prover_on_all_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
   Ident.Hid.iter
     (fun id (g,row) ->
-       Format.eprintf "running %s on goal %s@." (Db.prover_name p.prover) 
-         id.Ident.id_string;
+       let name = Db.prover_name p.prover in
+       Format.eprintf "running %s on goal %s@." name id.Ident.id_string;
+       let prover_row = model#append ~parent:row () in
+       model#set ~row:prover_row ~column:Ide_goals.name_column name;
+       view#expand_row (model#get_path row);
        incr count;
        let c = !count in
        let callback result =
          printf "Scheduled task #%d: status set to %a@." c
            Db.print_status result;         
-         model#set ~row ~column:Ide_goals.status_column (stock_of_result result);         
+         model#set ~row:prover_row ~column:Ide_goals.status_column (stock_of_result result);         
        in
        Scheduler.schedule_proof_attempt
          ~async
@@ -383,8 +387,12 @@ let main () =
     tools_factory#add_image_item ~key:GdkKeysyms._A 
       ~label:"Alt-Ergo on all goals" 
       ~callback:(fun () -> 
-                   prover_on_all_goals ~model:goals_model alt_ergo ()(*;
-                   prover_on_all_goals ~model:goals_model z3 ()*)) () 
+                   prover_on_all_goals ~model:goals_model ~view:goals_view 
+                     alt_ergo ();
+                   prover_on_all_goals ~model:goals_model ~view:goals_view 
+                     simplify ();
+                   prover_on_all_goals ~model:goals_model ~view:goals_view 
+                     z3 ()) () 
   in
   let _ = 
     tools_factory#add_image_item ~key:GdkKeysyms._E 
