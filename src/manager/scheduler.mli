@@ -21,6 +21,7 @@
 open Why
 
 val schedule_proof_attempt : 
+  async:((unit->unit)->unit) ->
   debug:bool -> timelimit:int -> memlimit:int -> prover:Db.prover -> 
   command:string -> driver:Driver.driver -> 
   callback:(Db.proof_attempt_status -> unit) -> Db.goal -> unit

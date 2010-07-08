@@ -62,8 +62,10 @@ let set_file f = match !file with
   | Some _ -> 
       raise (Arg.Bad "only one file")
   | None -> 
+(*
       if not (Filename.check_suffix f ".why") then 
 	raise (Arg.Bad ("don't know what to do with " ^ f));
+*)
       if not (Sys.file_exists f) then begin
 	Format.eprintf "%s %s: no such file@." pname f; 
         exit 1
@@ -172,15 +174,19 @@ let provers_data =
   printf "@\n===============================@.";
   l 
 
-let alt_ergo = 
+let find_prover s =
   match
     List.fold_left
       (fun acc p ->
-         if Db.prover_name p.prover = "Alt-Ergo" then Some p else acc)
+         if Db.prover_name p.prover = s then Some p else acc)
       None provers_data
   with
     | None -> assert false
     | Some p -> p
+
+let alt_ergo = find_prover "Alt-Ergo"
+let z3 = find_prover "Z3"
+
 
    
 let () = 
@@ -213,22 +219,35 @@ module Ide_goals = struct
   let cols = new GTree.column_list
   let name_column = cols#add Gobject.Data.string
   let id_column = cols#add Gobject.Data.caml
+  let status_column = cols#add GtkStock.conv
 
   let renderer = GTree.cell_renderer_text [`XALIGN 0.] 
-  let vcolumn = 
+  let icon_renderer = GTree.cell_renderer_pixbuf [ `STOCK_SIZE `BUTTON ]
+
+  let view_name_column = 
     GTree.view_column ~title:"Theories/Goals" 
       ~renderer:(renderer, ["text", name_column]) () 
 
   let () = 
-    vcolumn#set_resizable true;
-    vcolumn#set_max_width 400
+    view_name_column#set_resizable true;
+    view_name_column#set_max_width 400
+
+  let view_status_column = 
+    GTree.view_column ~title:"Status" 
+      ~renderer:(icon_renderer, ["stock_id", status_column]) ()
+
+  let () = 
+    view_status_column#set_resizable false;
+    view_status_column#set_visible true
+
 
   let create ~packing () =
     let model = GTree.tree_store cols in
     let view = GTree.view ~model ~packing () in
     let _ = view#selection#set_mode `SINGLE in
     let _ = view#set_rules_hint true in
-    ignore (view#append_column vcolumn);
+    ignore (view#append_column view_name_column);
+    ignore (view#append_column view_status_column);
     model,view
 
   let clear model = model#clear ()
@@ -242,6 +261,7 @@ module Ide_goals = struct
     let parent = model#append () in
     model#set ~row:parent ~column:name_column tname;
     model#set ~row:parent ~column:id_column th.Theory.th_name;
+    (* model#set ~row:parent ~column:status_column `REMOVE; *)
     let tasks = Task.split_theory th None in
     List.iter
       (fun t->
@@ -252,6 +272,7 @@ module Ide_goals = struct
          Ident.Hid.add goal_table id (g,row);
 	 model#set ~row ~column:name_column name;
 	 model#set ~row ~column:id_column id;
+         model#set ~row ~column:status_column `REMOVE;
       )
       tasks
 
@@ -290,20 +311,33 @@ let select_goals (goals_view:GTree.tree_store) (task_view:GSourceView2.source_vi
     )
     selected_rows
 
+
+let stock_of_result = function
+  | Db.Scheduled -> `ADD
+  | Db.Running -> `EXECUTE
+  | Db.Success -> `YES
+  | Db.Timeout -> `CUT
+  | Db.Unknown -> `DIALOG_QUESTION
+  | Db.HighFailure -> `PREFERENCES
+
 let count = ref 0
 
-let alt_ergo_on_all_goals () =
+let async f = GtkThread.async f ()
+
+let prover_on_all_goals ~(model:GTree.tree_store) p () =
   Ident.Hid.iter
-    (fun id (g,_row) ->
-       Format.eprintf "running Alt-Ergo on goal %s@." id.Ident.id_string;
+    (fun id (g,row) ->
+       Format.eprintf "running %s on goal %s@." (Db.prover_name p.prover) 
+         id.Ident.id_string;
        incr count;
        let c = !count in
        let callback result =
          printf "Scheduled task #%d: status set to %a@." c
-           Db.print_status result
+           Db.print_status result;         
+         model#set ~row ~column:Ide_goals.status_column (stock_of_result result);         
        in
-       let p = alt_ergo in
        Scheduler.schedule_proof_attempt
+         ~async
          ~debug:true ~timelimit ~memlimit:0 
          ~prover:p.prover ~command:p.command ~driver:p.driver 
          ~callback
@@ -332,10 +366,6 @@ let main () =
   in
   let tools_menu = factory#add_submenu "_Tools" in
   let tools_factory = new GMenu.factory tools_menu ~accel_group in
-  let _ = 
-    tools_factory#add_image_item ~label:"Alt-Ergo on all goals" 
-      ~callback:alt_ergo_on_all_goals () 
-  in
 
   (* horizontal paned *)
   let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:vbox#add () in
@@ -349,6 +379,18 @@ let main () =
 
   let goals_model,goals_view = Ide_goals.create ~packing:scrollview#add () in
   Theory.Mnm.iter (fun _ th -> Ide_goals.add_goals goals_model th) theories;
+  let _ = 
+    tools_factory#add_image_item ~key:GdkKeysyms._A 
+      ~label:"Alt-Ergo on all goals" 
+      ~callback:(fun () -> 
+                   prover_on_all_goals ~model:goals_model alt_ergo ()(*;
+                   prover_on_all_goals ~model:goals_model z3 ()*)) () 
+  in
+  let _ = 
+    tools_factory#add_image_item ~key:GdkKeysyms._E 
+      ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) () 
+  in
+
 
   (* horizontal paned *)
   let vp = GPack.paned `VERTICAL  ~border_width:3 ~packing:hp#add () in
@@ -408,6 +450,6 @@ let () =
 
 (*
 Local Variables: 
-compile-command: "unset LANG; make -C ../.. bin/why-rustprover.byte"
+compile-command: "unset LANG; make -C ../.. bin/why-ide.byte"
 End: 
 *)

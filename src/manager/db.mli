@@ -147,6 +147,7 @@ val root_goals : unit -> goal list
 exception AlreadyAttempted
 
 val try_prover : 
+  async:((unit->unit)->unit) ->
   debug:bool -> timelimit:int -> memlimit:int -> prover:prover -> 
   command:string -> driver:Driver.driver -> goal -> 
   (unit -> proof_attempt_status)

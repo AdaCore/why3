@@ -17,7 +17,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Why
 open Sqlite3
+
 
 type transaction_mode = | Deferred | Immediate | Exclusive
   
@@ -239,14 +241,14 @@ type goal_origin =
 
 type transf_data =
     { transf_name : string;
-      transf_action : Why.Task.task Why.Trans.tlist
+      transf_action : Task.task Trans.tlist
     }
 
 
 type goal = {
   mutable goal_id : db_ident;
   mutable goal_origin : goal_origin;
-  mutable task : Why.Task.task;
+  mutable task : Task.task;
   mutable task_checksum: string;
   mutable proved : bool;
   (** invariant: g.proved == true iff
@@ -1097,7 +1099,8 @@ let root_goals () =
   
 exception AlreadyAttempted
 
-let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver 
+let try_prover ~(async:(unit->unit)->unit)
+    ~debug ~timelimit ~memlimit ~prover ~command ~driver 
     (g : goal) : unit -> proof_attempt_status =
   let db = current () in
   let attempt =
@@ -1123,8 +1126,8 @@ let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver
   in
   if debug then Format.printf "setting attempt status to Scheduled@.";
   External_proof.set_status db attempt Scheduled;
-  if false && debug then Format.eprintf "Task : %a@." Why.Pretty.print_task g.task;
-  let callback = 
+  if false && debug then Format.eprintf "Task : %a@." Pretty.print_task g.task;
+  let callback : unit -> Call_provers.prover_result = 
     try 
       if false && debug then 
         Format.eprintf "Task for prover: %a@." 
@@ -1136,9 +1139,9 @@ let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver
         Format.eprintf "Db.try_prover: prove_task reports %a@." 
           Why.Driver.report e;
         fun () -> raise Exit
-    | Why.Driver.Error e ->
+    | Driver.Error e ->
         Format.eprintf "Db.try_prover: prove_task reports %a@." 
-          Why.Driver.report e;
+          Driver.report e;
         fun () -> raise Exit
 *)
     | e ->
@@ -1148,30 +1151,33 @@ let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver
   in
   fun () ->
     if debug then Format.printf "setting attempt status to Running@.";
-    External_proof.set_status db attempt Running;
+    async (fun () -> External_proof.set_status db attempt Running);
     try
       let r = callback () in
-      if debug then Format.eprintf "prover result: %a@." Why.Call_provers.print_prover_result r;
-      External_proof.set_result_time db attempt r.Why.Call_provers.pr_time;
-      match r.Why.Call_provers.pr_answer with
-        | Why.Call_provers.Valid ->
-            External_proof.set_status db attempt Success;
-            g.proved <- true;
-            Goal.set_proved db g true;
-            (* TODO: update "proved" status of goal parents if any *)
+      if debug then Format.eprintf "prover result: %a@." Call_provers.print_prover_result r;
+      async 
+        (fun () ->
+           External_proof.set_result_time db attempt r.Call_provers.pr_time);
+      match r.Call_provers.pr_answer with
+        | Call_provers.Valid ->
+            async (fun () ->
+                     External_proof.set_status db attempt Success;
+                     g.proved <- true;
+                     Goal.set_proved db g true;
+                     (* TODO: update "proved" status of goal parents if any *));
             Success         
-        | Why.Call_provers.Timeout ->
-            External_proof.set_status db attempt Timeout;
+        | Call_provers.Timeout ->
+            async (fun () -> External_proof.set_status db attempt Timeout);
             Timeout
-        | Why.Call_provers.Invalid | Why.Call_provers.Unknown _ ->
-            External_proof.set_status db attempt Unknown;
+        | Call_provers.Invalid | Call_provers.Unknown _ ->
+            async (fun () -> External_proof.set_status db attempt Unknown);
             Unknown
-        | Why.Call_provers.Failure _ | Why.Call_provers.HighFailure ->
-            External_proof.set_status db attempt HighFailure;
+        | Call_provers.Failure _ | Call_provers.HighFailure ->
+            async (fun () -> External_proof.set_status db attempt HighFailure);
             HighFailure
     with Exit ->
       if debug then Format.eprintf "prover callback aborted because of an exception raised during elaboration@.";
-      External_proof.set_status db attempt HighFailure;
+      async (fun () -> External_proof.set_status db attempt HighFailure);
       HighFailure
       
       
@@ -1180,7 +1186,7 @@ let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver
 let add_transformation (_g : goal) (_t : transf) :  unit =
   assert false (* TODO *)
 
-let add_or_replace_task ~tname ~name (t : Why.Task.task) : goal =
+let add_or_replace_task ~tname ~name (t : Task.task) : goal =
   (* TODO: replace if already exists *)
   let g = {
     goal_id = 0L;

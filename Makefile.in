@@ -284,8 +284,8 @@ $(MNGCMO) $(MNGCMX) $(addsuffix .cmx, $(MNGMAINS)) $(addsuffix .cmo, $(MNGMAINS)
 src/manager/gmanager.cmo src/manager/gmanager.cmx: INCLUDES += -I +lablgtk2
 
 ifeq (@enable_rust_prover@,yes)
-byte: bin/manager-test.byte bin/why-rustprover.byte
-opt:  bin/manager-test.opt bin/why-rustprover.opt
+byte: bin/manager-test.byte bin/why-ide.byte
+opt:  bin/manager-test.opt bin/why-ide.opt
 endif
 
 bin/manager-test.opt bin/manager-test.byte: INCLUDES = -thread -I +sqlite3
@@ -299,15 +299,15 @@ bin/manager-test.byte: src/why.cma $(MNGCMO) src/manager/test.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma sqlite3.cma $^
 
-bin/why-rustprover.opt bin/why-rustprover.byte: INCLUDES = -thread -I +sqlite3 -I +lablgtk2
+bin/why-ide.opt bin/why-ide.byte: INCLUDES = -thread -I +sqlite3 -I +lablgtk2
 
-bin/why-rustprover.opt: src/why.cmxa $(MNGCMX) src/manager/gmanager.cmx
+bin/why-ide.opt: src/why.cmxa $(PGMCMX) $(MNGCMX) src/manager/gmanager.cmx
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) threads.cmxa \
 	lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx sqlite3.cmxa $^
 	$(STRIP) $@
 
-bin/why-rustprover.byte: src/why.cma $(MNGCMO) src/manager/gmanager.cmo
+bin/why-ide.byte: src/why.cma $(PGMCMO) $(MNGCMO) src/manager/gmanager.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma \
 	lablgtk.cma lablgtksourceview2.cma gtkThread.cmo sqlite3.cma $^
@@ -327,56 +327,6 @@ clean::
 	rm -f bin/manager.byte bin/manager.opt
 	rm -f .depend.manager
 
-#####################
-# graphical interface
-#####################
-
-IDE_FILES = ide_main
-
-IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
-
-IDEML  = $(addsuffix .ml,  $(IDEMODULES))
-IDEMLI = $(addsuffix .mli, $(IDEMODULES))
-IDECMO = $(addsuffix .cmo, $(IDEMODULES))
-IDECMX = $(addsuffix .cmx, $(IDEMODULES))
-
-$(IDECMO) $(IDECMX): INCLUDES = -I src/ide -I +lablgtk2 -I +threads
-
-# build targets
-
-ifeq (@enable_ide@,yes)
-byte: bin/whyide.byte
-opt:  bin/whyide.opt
-endif
-
-bin/whyide.opt bin/whyide.byte: INCLUDES = -I +lablgtk2 -I +threads
-
-bin/whyide.opt: src/why.cmxa $(IDECMX)
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) threads.cmxa \
-	    lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx $^
-	$(STRIP) $@
-
-
-bin/whyide.byte: src/why.cma $(IDECMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma \
-	    lablgtk.cma lablgtksourceview2.cma gtkThread.cmo $^
-
-# depend and clean targets
-
-include .depend.ide
-
-.depend.ide:
-	$(OCAMLDEP) -slash -I src -I src/ide $(IDEML) $(IDEMLI) > $@
-
-depend: .depend.ide
-
-clean::
-	rm -f src/ide/*.cm[iox] src/ide/*.o
-	rm -f src/ide/*.annot src/ide/*~
-	rm -f bin/whyide.byte bin/whyide.opt
-	rm -f .depend.ide
 
 ##############
 # Coq plugin

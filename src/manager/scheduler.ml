@@ -9,12 +9,12 @@ let attempts = Queue.create ()
 let running_proofs = ref 0
 let maximum_running_proofs = ref 2
 
-let schedule_proof_attempt ~debug ~timelimit ~memlimit ~prover 
+let schedule_proof_attempt ~async ~debug ~timelimit ~memlimit ~prover 
     ~command ~driver ~callback
     goal =
   let prepare_goal = 
     try
-      Db.try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver goal;
+      Db.try_prover ~async ~debug ~timelimit ~memlimit ~prover ~command ~driver goal;
     with Db.AlreadyAttempted ->
       raise Exit
   in
