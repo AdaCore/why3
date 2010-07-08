@@ -27,15 +27,16 @@ and rf keep f =
     | Fquant (Fforall,fq) ->
       let vsl,trl,f2 = f_open_quant fq in
       let one_false = ref false in
-      let keep = keep one_false in
+      let keep x = let b = keep x in
+                   if b then b else (one_false := true; b) in
       let trl = List.filter (List.for_all keep) trl in
       if not (!one_false) then f else f_forall vsl trl f2
     | _ -> f
 
 
-let keep_no_predicate one_false = function
+let keep_no_predicate = function
         | Term _ -> true
-        | _ -> one_false := true; false
+        | _ -> false
 
   
 let filter_trigger_no_predicate = 
@@ -47,10 +48,10 @@ let () = Register.register_transform "filter_trigger_no_predicate"
   filter_trigger_no_predicate
 
 
-let keep_no_fmla one_false = function
+let keep_no_fmla = function
         | Term _ -> true
         | Fmla {f_node = Fapp (ps,_)} -> not (ls_equal ps ps_equ)
-        | _ -> one_false := true; false
+        | _ -> false
 
 
 let filter_trigger = Register.store 
@@ -59,11 +60,11 @@ let filter_trigger = Register.store
 let () = Register.register_transform "filter_trigger" filter_trigger
 
 
-let keep_no_builtin query one_false = function
+let keep_no_builtin query = function
         | Term _ -> true
-        | Fmla {f_node = Fapp (ps,_)} -> 
+        | Fmla {f_node = Fapp (ps,_)} ->
           Driver.query_syntax query ps.ls_name = None
-        | _ -> one_false := true; false
+        | _ -> false
 
   
 let filter_trigger_builtin = 
