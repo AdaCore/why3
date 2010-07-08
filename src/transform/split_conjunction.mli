@@ -20,12 +20,12 @@
 (** Move the conjunctions to top level and split the axiom or goal *)
 
 
-val split_pos_goal      : Task.task Register.tlist_reg
-val split_pos_neg_goal  : Task.task Register.tlist_reg
-val split_pos_axiom     : Task.task Register.tlist_reg
-val split_pos_neg_axiom : Task.task Register.tlist_reg
-val split_pos_all       : Task.task Register.tlist_reg
-val split_pos_neg_all   : Task.task Register.tlist_reg
+val split_pos_goal      : Task.task Trans.tlist
+val split_pos_neg_goal  : Task.task Trans.tlist
+val split_pos_axiom     : Task.task Trans.tlist
+val split_pos_neg_axiom : Task.task Trans.tlist
+val split_pos_all       : Task.task Trans.tlist
+val split_pos_neg_all   : Task.task Trans.tlist
 
 (**  naming convention :
      - pos : move the conjuctions in positive sub-formula to top level

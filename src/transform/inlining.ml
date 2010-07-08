@@ -114,11 +114,8 @@ let fold isnotinlinedt isnotinlinedf task0 (env, task) =
         fold isnotinlinedt isnotinlinedf d (env, task)
     | td -> env, add_tdecl task td
 
-let t ~isnotinlinedt ~isnotinlinedf = 
-  Register.store 
-    (fun () -> Trans.fold_map 
-       (fold isnotinlinedt isnotinlinedf) 
-       empty_env None)
+let t ~isnotinlinedt ~isnotinlinedf =
+  Trans.fold_map (fold isnotinlinedt isnotinlinedf) empty_env None
 
 let all = t ~isnotinlinedt:(fun _ -> false) ~isnotinlinedf:(fun _ -> false)
 
@@ -139,6 +136,6 @@ let trivial = t
                     | _ -> true)
 
 let () =
-  Register.register_transform "inline_all" all;
-  Register.register_transform "inline_trivial" trivial
+  Trans.register_transform "inline_all" (fun _ -> all);
+  Trans.register_transform "inline_trivial" (fun _ -> trivial)
 

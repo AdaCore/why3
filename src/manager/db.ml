@@ -239,7 +239,7 @@ type goal_origin =
 
 type transf_data =
     { transf_name : string;
-      transf_action : Why.Task.task Why.Register.tlist_reg
+      transf_action : Why.Task.task Why.Trans.tlist
     }
 
 
@@ -285,7 +285,7 @@ let rec string_from_origin o =
 let goal_name g = string_from_origin g.goal_origin
   
 
-module Prover = struct
+module Driver = struct
 
   let init db =
     let sql = 
@@ -331,7 +331,7 @@ module Prover = struct
             | Sqlite3.Data.INT i -> i 
 	    | x -> 
 		try Int64.of_string (Sqlite3.Data.to_string x)
-		with _ -> failwith "Db.Prover.get") ;
+		with _ -> failwith "Db.Driver.get") ;
 	prover_name =
 	  (match Sqlite3.column stmt 1 with
 	    | x -> Sqlite3.Data.to_string x)
@@ -353,7 +353,7 @@ module Prover = struct
     let of_stmt stmt =
       { prover_id = id ;
 	prover_name = stmt_column_TEXT stmt 1 
-          "Prover.from_id: bad prover_name";
+          "Driver.from_id: bad prover_name";
       }
     in 
     (* execute the SQL query *)
@@ -372,7 +372,7 @@ let get_prover_from_id id =
   with Not_found ->
     let p =
       let db = current () in
-      try Prover.from_id db id
+      try Driver.from_id db id
       with Not_found -> assert false
     in
     Hashtbl.add prover_memo id p;
@@ -385,9 +385,9 @@ let get_prover name (* ~short ~long ~command ~driver *) =
 (*
   let checksum = Digest.file driver in
 *)
-  try Prover.get db name (* ~short ~long ~command ~checksum *)
+  try Driver.get db name (* ~short ~long ~command ~checksum *)
   with Not_found -> 
-    Prover.add db name (* ~short ~long ~command ~checksum *)
+    Driver.add db name (* ~short ~long ~command ~checksum *)
  
 	
 
@@ -1072,7 +1072,7 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
         } 
 	in
 	current_db := Some db;
-	Prover.init db;
+	Driver.init db;
 	Loc.init db;
 	External_proof.init db;
 	Goal.init db;
@@ -1128,17 +1128,19 @@ let try_prover ~debug ~timelimit ~memlimit ~prover ~command ~driver
     try 
       if false && debug then 
         Format.eprintf "Task for prover: %a@." 
-          (Why.Prover.print_task driver) g.task;
-      Why.Prover.prove_task ~debug ~command ~timelimit ~memlimit driver g.task
-    with 
-    | Why.Prover.Error e ->
+          (Why.Driver.print_task driver) g.task;
+      Why.Driver.prove_task ~debug ~command ~timelimit ~memlimit driver g.task
+    with
+(*
+    | Why.Driver.Error e ->
         Format.eprintf "Db.try_prover: prove_task reports %a@." 
-          Why.Prover.report e;
+          Why.Driver.report e;
         fun () -> raise Exit
     | Why.Driver.Error e ->
         Format.eprintf "Db.try_prover: prove_task reports %a@." 
           Why.Driver.report e;
         fun () -> raise Exit
+*)
     | e ->
         try
           Printexc.print (fun () -> raise e) ()

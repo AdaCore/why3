@@ -353,10 +353,9 @@ It creates two new hashtables, used everywhere, which updates are
 shared by side effects. *)
 let explicit_polymorphism =
   let prelude_task = Task.add_decl None t_decl in (* declare t first *)
-  Register.store
-    (fun () -> Trans.decl
-      (decl_transform (Hashtbl.create 21) (Hashtbl.create 42)) prelude_task)
+  Trans.decl
+      (decl_transform (Hashtbl.create 21) (Hashtbl.create 42)) prelude_task
 
-let () = Register.register_transform
-  "explicit_polymorphism" explicit_polymorphism
+let () = Trans.register_transform
+  "explicit_polymorphism" (fun _ -> explicit_polymorphism)
 

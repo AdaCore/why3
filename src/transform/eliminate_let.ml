@@ -42,17 +42,17 @@ and elim_f func pred map f = match f.f_node with
   | _ ->
       f_map (elim_t func pred map) (elim_f func pred map) f
 
-let eliminate_let_term = Register.store (fun () -> Trans.rewrite
-  (elim_t true false Mvs.empty) (elim_f true false Mvs.empty) None)
+let eliminate_let_term = Trans.rewrite
+  (elim_t true false Mvs.empty) (elim_f true false Mvs.empty) None
 
-let eliminate_let_fmla = Register.store (fun () -> Trans.rewrite
-  (elim_t false true Mvs.empty) (elim_f false true Mvs.empty) None)
+let eliminate_let_fmla = Trans.rewrite
+  (elim_t false true Mvs.empty) (elim_f false true Mvs.empty) None
 
-let eliminate_let = Register.store (fun () -> Trans.rewrite
-  (elim_t true true Mvs.empty) (elim_f true true Mvs.empty) None)
+let eliminate_let = Trans.rewrite
+  (elim_t true true Mvs.empty) (elim_f true true Mvs.empty) None
 
 let () =
-  Register.register_transform "eliminate_let_term" eliminate_let_term;
-  Register.register_transform "eliminate_let_fmla" eliminate_let_fmla;
-  Register.register_transform "eliminate_let" eliminate_let
+  Trans.register_transform "eliminate_let_term" (fun _ -> eliminate_let_term);
+  Trans.register_transform "eliminate_let_fmla" (fun _ -> eliminate_let_fmla);
+  Trans.register_transform "eliminate_let" (fun _ -> eliminate_let)
 

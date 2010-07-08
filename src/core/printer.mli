@@ -29,9 +29,11 @@ open Task
 type prelude = string list
 type prelude_map = prelude Mid.t
 
+type syntax_map = string Mid.t
+
 type 'a pp = Format.formatter -> 'a -> unit
 
-type printer = prelude -> prelude_map -> task pp
+type printer = prelude -> prelude_map -> syntax_map -> task pp
 
 val register_printer : string -> printer -> unit
 
@@ -48,18 +50,14 @@ val meta_remove_type : string
 val meta_remove_logic : string
 val meta_remove_prop : string
 
-val meta_syntax_type : string
-val meta_syntax_logic : string
-
 val remove_type : tysymbol -> tdecl
 val remove_logic : lsymbol -> tdecl
 val remove_prop : prsymbol -> tdecl
 
-val syntax_type : tysymbol -> string -> tdecl
-val syntax_logic : lsymbol -> string -> tdecl
-
 val get_remove_set : task -> Sid.t
-val get_syntax_map : task -> string Mid.t
+
+val add_ts_syntax : tysymbol -> string -> syntax_map -> syntax_map
+val add_ls_syntax : lsymbol  -> string -> syntax_map -> syntax_map
 
 val syntax_arguments : string -> 'a pp -> 'a list pp
 (** (syntax_arguments templ print_arg fmt l) prints in the formatter fmt
@@ -72,12 +70,12 @@ exception UnsupportedExpr of expr * string
 exception UnsupportedDecl of decl * string
 exception NotImplemented  of        string
 
-val unsupportedType : ty   -> string -> unit
-val unsupportedTerm : term -> string -> unit
-val unsupportedFmla : fmla -> string -> unit
-val unsupportedExpr : expr -> string -> unit
-val unsupportedDecl : decl -> string -> unit
-val notImplemented  :         string -> unit
+val unsupportedType : ty   -> string -> 'a
+val unsupportedTerm : term -> string -> 'a
+val unsupportedFmla : fmla -> string -> 'a
+val unsupportedExpr : expr -> string -> 'a
+val unsupportedDecl : decl -> string -> 'a
+val notImplemented  :         string -> 'a
 
 (** {3 functions that catch inner error} *)
 
@@ -85,7 +83,7 @@ exception Unsupported of string
 (** This exception must be raised only inside a call
     of one of the catch_* functions below *)
 
-val unsupported : string -> unit
+val unsupported : string -> 'a
 
 val catch_unsupportedType : (ty -> 'a) -> (ty -> 'a)
 (** [catch_unsupportedType f] return a function which applied on [arg]:

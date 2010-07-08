@@ -19,7 +19,7 @@
 
 val fmla_simpl : Term.fmla -> Term.fmla
 
-val simplify_formula :  Task.task Register.trans_reg
-val simplify_formula_and_task :  Task.task list Register.trans_reg
+val simplify_formula :  Task.task Trans.trans
+val simplify_formula_and_task :  Task.task list Trans.trans
 
 val fmla_remove_quant : Term.fmla -> Term.fmla

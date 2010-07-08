@@ -47,7 +47,9 @@ type clone_map = tdecl_set Mid.t
 type meta_map = tdecl_set Mstr.t
 
 let cm_find cm th = try Mid.find th.th_name cm with Not_found -> empty_tds
-let mm_find mm t  = try Mstr.find t mm with Not_found -> empty_tds
+
+let mm_find mm t =
+  try Mstr.find t mm with Not_found -> ignore (lookup_meta t); empty_tds
 
 let cm_add cm th td = Mid.add th.th_name (tds_add td (cm_find cm th)) cm
 let mm_add mm t  td = Mstr.add t (tds_add td (mm_find mm t)) mm
@@ -202,40 +204,27 @@ let task_tdecls = task_fold (fun acc td -> td::acc) []
 let task_decls  = task_fold (fun acc td ->
   match td.td_node with Decl d -> d::acc | _ -> acc) []
 
-(* TO BE REMOVED *)
+(* special selector for metaproperties of a single ident *)
 
-let old_task_clone task =
-  Mid.fold (fun _ x -> Stdecl.fold (function
-  | { td_node = Clone (_,cl) } ->
-      Mid.fold (fun id id' m ->
-        let s = try Mid.find id' m with Not_found -> Sid.empty in
-        Mid.add id' (Sid.add id s) m) cl
-  | _ -> assert false) x.tds_set) (task_clone task) Mid.empty
+exception NotTaggingMeta of string
 
-let old_task_use task =
-  Mid.fold (fun _ x -> Stdecl.fold (function
-  | { td_node = Clone (th,cl) } -> (fun m ->
-      if Mid.is_empty cl then Mid.add th.th_name th m else m)
-  | _ -> assert false) x.tds_set) (task_clone task) Mid.empty
-
-let rec last_use task = match task with
-  | Some {task_decl={td_node=Clone(_,cl)}} when Mid.is_empty cl -> task
-  | Some {task_prev=task} -> last_use task
-  | None -> None
-
-let rec last_clone task = match task with
-  | Some {task_decl={td_node=Clone _}} -> task
-  | Some {task_prev=task} -> last_clone task
-  | None -> None
+let find_meta_ids t tds acc =
+  begin match lookup_meta t with
+    | [MTtysymbol|MTlsymbol|MTprsymbol] -> ()
+    | _ -> raise (NotTaggingMeta t)
+  end;
+  Stdecl.fold (fun td acc -> match td.td_node with
+    | Meta (s, [MARid id]) when s = t -> Sid.add id acc
+    | _ -> assert false) tds.tds_set acc
 
 (* Exception reporting *)
 
-let () = Exn_printer.register
-  begin fun fmt exn -> match exn with
+let () = Exn_printer.register (fun fmt exn -> match exn with
   | LemmaFound ->   Format.fprintf fmt "Task cannot contain a lemma"
   | SkipFound ->    Format.fprintf fmt "Task cannot contain a skip"
   | GoalFound ->    Format.fprintf fmt "The task already ends with a goal"
   | GoalNotFound -> Format.fprintf fmt "The task does not end with a goal"
-  | _ -> raise exn
-  end
+  | NotTaggingMeta s ->
+      Format.fprintf fmt "Metaproperty '%s' is not a symbol tag" s
+  | _ -> raise exn)
 

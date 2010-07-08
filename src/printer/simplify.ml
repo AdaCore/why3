@@ -17,7 +17,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Register
 open Format
 open Pp
 open Ident
@@ -25,6 +24,7 @@ open Ty
 open Term
 open Decl
 open Task
+open Printer
 
 let ident_printer = 
   let bls = [] in
@@ -53,7 +53,15 @@ let print_real fmt = function
   | RConstHexa (i, f, e) -> 
       fprintf fmt "0x%s_%sp%a" i f pp_exp e
 
-let rec print_term drv fmt t = match t.t_node with
+type info = {
+  info_syn : syntax_map;
+  info_rem : Sid.t;
+}
+
+let query_syntax info id =
+  try Some (Mid.find id info.info_syn) with Not_found -> None
+
+let rec print_term info fmt t = match t.t_node with
   | Tbvar _ -> 
       assert false
   | Tconst (ConstInt n) ->
@@ -68,13 +76,13 @@ let rec print_term drv fmt t = match t.t_node with
       fprintf fmt "real_constant_%a" print_real c 
   | Tvar v -> 
       print_var fmt v
-  | Tapp (ls, tl) -> begin match Driver.query_syntax drv ls.ls_name with
+  | Tapp (ls, tl) -> begin match query_syntax info ls.ls_name with
       | Some s -> 
-	  Driver.syntax_arguments s (print_term drv) fmt tl
+	  syntax_arguments s (print_term info) fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] -> fprintf fmt "@[%a@]" print_ident ls.ls_name
           | _ -> fprintf fmt "@[(%a@ %a)@]" 
-	      print_ident ls.ls_name (print_list space (print_term drv)) tl
+	      print_ident ls.ls_name (print_list space (print_term info)) tl
         end end
   | Tlet _ ->
       unsupportedTerm t "simplify: you must eliminate let"
@@ -85,33 +93,33 @@ let rec print_term drv fmt t = match t.t_node with
   | Teps _ -> 
       unsupportedTerm t  "simplify: you must eliminate epsilon"
 
-and print_fmla drv fmt f = match f.f_node with
+and print_fmla info fmt f = match f.f_node with
   | Fapp ({ ls_name = id }, []) ->
       print_ident fmt id
-  | Fapp (ls, tl) -> begin match Driver.query_syntax drv ls.ls_name with
+  | Fapp (ls, tl) -> begin match query_syntax info ls.ls_name with
       | Some s -> 
-	  Driver.syntax_arguments s (print_term drv) fmt tl
+	  syntax_arguments s (print_term info) fmt tl
       | None -> 
 	  fprintf fmt "(EQ (%a@ %a) |@@true|)" 
-	    print_ident ls.ls_name (print_list space (print_term drv)) tl 
+	    print_ident ls.ls_name (print_list space (print_term info)) tl 
     end
   | Fquant (q, fq) ->
       let q = match q with Fforall -> "FORALL" | Fexists -> "EXISTS" in
       let vl, tl, f = f_open_quant fq in
       fprintf fmt "@[(%s (%a)%a@ %a)@]" q (print_list space print_var) vl 
-	(print_triggers drv) tl (print_fmla drv) f;
+	(print_triggers info) tl (print_fmla info) f;
       List.iter forget_var vl
   | Fbinop (Fand, f1, f2) ->
-      fprintf fmt "@[(AND@ %a@ %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
+      fprintf fmt "@[(AND@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
   | Fbinop (For, f1, f2) ->
-      fprintf fmt "@[(OR@ %a@ %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
+      fprintf fmt "@[(OR@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
   | Fbinop (Fimplies, f1, f2) ->
       fprintf fmt "@[(IMPLIES@ %a@ %a)@]" 
-        (print_fmla drv) f1 (print_fmla drv) f2
+        (print_fmla info) f1 (print_fmla info) f2
   | Fbinop (Fiff, f1, f2) ->
-      fprintf fmt "@[(IFF@ %a@ %a)@]" (print_fmla drv) f1 (print_fmla drv) f2
+      fprintf fmt "@[(IFF@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
   | Fnot f ->
-      fprintf fmt "@[(NOT@ %a)@]" (print_fmla drv) f
+      fprintf fmt "@[(NOT@ %a)@]" (print_fmla info) f
   | Ftrue ->
       fprintf fmt "TRUE"
   | Ffalse ->
@@ -123,17 +131,17 @@ and print_fmla drv fmt f = match f.f_node with
   | Fcase _ -> 
       unsupportedFmla f "simplify : you must eliminate match"
       
-and print_expr drv fmt = e_apply (print_term drv fmt) (print_fmla drv fmt)
+and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
 
-and print_trigger drv fmt = function
+and print_trigger info fmt = function
   | [] -> ()
-  | [Term ({t_node=Tvar _} as t)] -> fprintf fmt "(MPAT %a)" (print_term drv) t
-  | [t] -> print_expr drv fmt t
-  | tl -> fprintf fmt "(MPAT %a)" (print_list space (print_expr drv)) tl
+  | [Term ({t_node=Tvar _} as t)] -> fprintf fmt "(MPAT %a)" (print_term info) t
+  | [t] -> print_expr info fmt t
+  | tl -> fprintf fmt "(MPAT %a)" (print_list space (print_expr info)) tl
 
-and print_triggers drv fmt = function
+and print_triggers info fmt = function
   | [] -> ()
-  | tl -> fprintf fmt "@ (PATS %a)" (print_list space (print_trigger drv)) tl
+  | tl -> fprintf fmt "@ (PATS %a)" (print_list space (print_trigger info)) tl
 
 let print_logic_decl _drv _fmt (_ls,ld) = match ld with
   | None ->
@@ -142,22 +150,22 @@ let print_logic_decl _drv _fmt (_ls,ld) = match ld with
       (* TODO: predicate definitions could actually be passed to Simplify *)
       unsupported "Predicate and function definition aren't supported"
 
-let print_logic_decl drv fmt d = 
-  if Driver.query_remove drv (fst d).ls_name then false 
-  else begin print_logic_decl drv fmt d; true end
+let print_logic_decl info fmt d = 
+  if Sid.mem (fst d).ls_name info.info_rem then false 
+  else begin print_logic_decl info fmt d; true end
   
-let print_decl drv fmt d = match d.d_node with
+let print_decl info fmt d = match d.d_node with
   | Dtype _ ->
       false
   | Dlogic dl ->
-      print_list_opt newline (print_logic_decl drv) fmt dl
+      print_list_opt newline (print_logic_decl info) fmt dl
   | Dind _ -> 
       unsupportedDecl d "simplify : inductive definition are not supported"
-  | Dprop (Paxiom, pr, _) when Driver.query_remove drv pr.pr_name -> 
+  | Dprop (Paxiom, pr, _) when Sid.mem pr.pr_name info.info_rem -> 
       false
   | Dprop (Paxiom, pr, f) ->
       fprintf fmt "@[(BG_PUSH@\n ;; axiom %s@\n @[<hov 2>%a@])@]@\n"
-        pr.pr_name.id_string (print_fmla drv) f; 
+        pr.pr_name.id_string (print_fmla info) f; 
       true
   | Dprop (Pgoal, pr, f) ->
       fprintf fmt "@[;; %a@]@\n" print_ident pr.pr_name;
@@ -166,21 +174,25 @@ let print_decl drv fmt d = match d.d_node with
         | Some loc -> fprintf fmt " @[;; %a@]@\n" 
             Loc.gen_report_position loc 
       end;
-      fprintf fmt "@[<hov 2>%a@]@\n" (print_fmla drv) f;
+      fprintf fmt "@[<hov 2>%a@]@\n" (print_fmla info) f;
       true
   | Dprop ((Plemma|Pskip), _, _) -> 
       assert false
 
-let print_decl drv fmt = catch_unsupportedDecl (print_decl drv fmt)
+let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
-let print_task drv fmt task = 
-  Driver.print_full_prelude drv task fmt;
+let print_task pr thpr syn fmt task =
+  print_prelude fmt pr;
+  print_th_prelude task fmt thpr;
+  let info = {
+    info_syn = syn;
+    info_rem = get_remove_set task }
+  in
   let decls = Task.task_decls task in
-  ignore (print_list_opt (add_flush newline2) (print_decl drv) fmt decls);
-  fprintf fmt "@."
+  ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)
 
 let () = register_printer "simplify" 
-  (fun drv fmt task -> 
+  (fun pr thpr syn fmt task -> 
      forget_all ident_printer;
-     print_task drv fmt task)
+     print_task pr thpr syn fmt task)
 

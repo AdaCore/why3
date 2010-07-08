@@ -140,8 +140,10 @@ let rec report fmt = function
       Typing.report fmt e
   | Decl.UnknownIdent i ->
       fprintf fmt "anomaly: unknown ident '%s'" i.Ident.id_string
+(*
   | Driver.Error e ->
       Driver.report fmt e
+*)
   | Config.Dynlink.Error e ->
       fprintf fmt "Dynlink : %s" (Config.Dynlink.error_message e)
   | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)

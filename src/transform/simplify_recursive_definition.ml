@@ -129,6 +129,6 @@ let elt d =
     | Dind _ -> [d] (* TODO *)
     | Dprop _ -> [d]
 
-let t = Register.store (fun () -> Trans.decl elt None)
+let t = Trans.decl elt None
 
-let () = Register.register_transform "simplify_recursive_definition" t
+let () = Trans.register_transform "simplify_recursive_definition" (fun _ -> t)

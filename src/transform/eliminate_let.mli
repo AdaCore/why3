@@ -19,7 +19,7 @@
 
 (** eliminate let *)
 
-val eliminate_let_term : Task.task Register.trans_reg
-val eliminate_let_fmla : Task.task Register.trans_reg
-val eliminate_let      : Task.task Register.trans_reg
+val eliminate_let_term : Task.task Trans.trans
+val eliminate_let_fmla : Task.task Trans.trans
+val eliminate_let      : Task.task Trans.trans
 

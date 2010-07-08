@@ -412,17 +412,17 @@ module Select = struct
       step
 
     (** explores the neighbours of [vertex] *)
-    and explore vertex l = match l with [next_cur;cur] ->
+    and explore vertex l = match l with [_next_cur;cur] ->
 
       (** [changed] indicates whether a vertex has been added;
 	  [v] is a vertex *)
-      let find_odd v ((acc,changed) as old) =
+      let find_odd v ((acc,_changed) as old) =
 	if Sexpr.mem v acc then old else
 	  let count = GC.fold_pred
 	    (fun v2 count -> if Sexpr.mem v2 acc then count+1 else count)
 	    gc v 0 in (* how many predecessors in acc ? *)
 	  if count >= 2 then (Sexpr.add v acc,true) else old in
-      let find_even prev_step v ((acc,changed) as old) =
+      let find_even prev_step v ((acc,_changed) as old) =
 	if Sexpr.mem v prev_step || Sexpr.mem v acc then old else
 	  if GC.fold_pred (fun v2 bool -> bool || (Sexpr.mem v2 acc))
 	    gc v false (* connected to a vertex in acc ? *)
@@ -556,18 +556,15 @@ let transformation fmlaTable fTbl tTbl symbTbl task =
        (Select.filter fTbl tTbl symbTbl goal_clauses (gc,gp)) None) task
 
 (** the transformation to be registered *)
-let hypothesis_selection =
-  Register.store
-    (fun () -> (* create lots of hashtables... *)
-       let fmlaTable = FmlaHashtbl.create 17 in
-       let fTbl = FmlaHashtbl.create 17 in
-       let tTbl = TermHashtbl.create 17 in
-       let symbTbl = SymbHashtbl.create 17 in
-       Trans.store
-	 (transformation fmlaTable fTbl tTbl symbTbl))
+let hypothesis_selection = (* create lots of hashtables... *)
+  let fmlaTable = FmlaHashtbl.create 17 in
+  let fTbl = FmlaHashtbl.create 17 in
+  let tTbl = TermHashtbl.create 17 in
+  let symbTbl = SymbHashtbl.create 17 in
+  Trans.store (transformation fmlaTable fTbl tTbl symbTbl)
 
-let _ = Register.register_transform
-  "hypothesis_selection" hypothesis_selection
+let _ = Trans.register_transform
+  "hypothesis_selection" (fun _ -> hypothesis_selection)
 
 (*
 Local Variables:

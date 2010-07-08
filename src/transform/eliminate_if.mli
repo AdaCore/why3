@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val eliminate_if_term : Task.task Register.trans_reg
-val eliminate_if_fmla : Task.task Register.trans_reg
-val eliminate_if      : Task.task Register.trans_reg
+val eliminate_if_term : Task.task Trans.trans
+val eliminate_if_fmla : Task.task Trans.trans
+val eliminate_if      : Task.task Trans.trans
 

@@ -30,17 +30,9 @@ open Term
 open Decl
 open Task
 
+let simple_types = Trans.identity
 
-
-
-
-
-let simple_types =
-  Register.store (fun () ->
-    Trans.identity)
-
-let _ = Register.register_transform
-  "simple_types" simple_types
+let _ = Trans.register_transform "simple_types" (fun _ -> simple_types)
 
 (*
 Local Variables:

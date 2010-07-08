@@ -23,4 +23,4 @@
     Jean-Francois Couchot et Stephane Lescuyer *)
 
 val why_filename : string list
-val kept_tag : string
+val meta_kept : string

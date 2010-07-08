@@ -113,7 +113,7 @@ let is_split_goal = function Pgoal -> true | _ -> false
 let is_split_axiom = function Paxiom -> true | _ -> false
 let is_split_all = function _ -> true
 
-let t isk fsp = Register.store (fun () -> Trans.decl_l (elt isk fsp) None)
+let t isk fsp = Trans.decl_l (elt isk fsp) None
 
 let split_pos1 = split_pos (fun acc x -> x::acc)
 
@@ -127,15 +127,15 @@ let split_pos_neg_axiom = t is_split_axiom split_pos2
 let split_pos_all = t is_split_all split_pos1
 let split_pos_neg_all = t is_split_all split_pos2
 
-let () = Register.register_transform_l 
-  "split_goal_pos_goal" split_pos_goal
-let () = Register.register_transform_l 
-  "split_goal_pos_neg_goal" split_pos_neg_goal
-let () = Register.register_transform_l 
-  "split_goal_pos_axiom" split_pos_axiom
-let () = Register.register_transform_l 
-  "split_goal_pos_neg_axiom" split_pos_neg_axiom
-let () = Register.register_transform_l 
-  "split_goal_pos_all" split_pos_all
-let () = Register.register_transform_l 
-  "split_goal_pos_neg_all" split_pos_neg_all
+let () = Trans.register_transform_l 
+  "split_goal_pos_goal" (fun _ -> split_pos_goal)
+let () = Trans.register_transform_l 
+  "split_goal_pos_neg_goal" (fun _ -> split_pos_neg_goal)
+let () = Trans.register_transform_l 
+  "split_goal_pos_axiom" (fun _ -> split_pos_axiom)
+let () = Trans.register_transform_l 
+  "split_goal_pos_neg_axiom" (fun _ -> split_pos_neg_axiom)
+let () = Trans.register_transform_l 
+  "split_goal_pos_all" (fun _ -> split_pos_all)
+let () = Trans.register_transform_l 
+  "split_goal_pos_neg_all" (fun _ -> split_pos_neg_all)

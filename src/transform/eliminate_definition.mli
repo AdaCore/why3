@@ -17,10 +17,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val eliminate_builtin         : Task.task Register.trans_reg
+val eliminate_builtin         : Task.task Trans.trans
 
-val eliminate_definition_func : Task.task Register.trans_reg
-val eliminate_definition_pred : Task.task Register.trans_reg
-val eliminate_definition      : Task.task Register.trans_reg
+val eliminate_definition_func : Task.task Trans.trans
+val eliminate_definition_pred : Task.task Trans.trans
+val eliminate_definition      : Task.task Trans.trans
 
-val eliminate_mutual_recursion: Task.task Register.trans_reg
+val eliminate_mutual_recursion: Task.task Trans.trans

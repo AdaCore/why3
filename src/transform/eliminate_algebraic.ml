@@ -50,7 +50,7 @@ let comp t task =
   | Decl d -> add_decl task (decl_map fnT fnF d)
   | _ -> add_tdecl task t.task_decl
 
-let compile_match = Register.store (fun () -> Trans.map comp None)
+let compile_match = Trans.map comp None
 
 (** Eliminate algebraic types and match statements *)
 
@@ -76,24 +76,24 @@ let rec rewriteT kn state t = match t.t_node with
         | [{ pat_node = Papp (cs,pl) }] ->
             let add_var e p pj = match p.pat_node with
               | Pvar v -> t_let v (t_app pj [t1] v.vs_ty) e
-              | _ -> Register.unsupportedTerm t uncompiled
+              | _ -> Printer.unsupportedTerm t uncompiled
             in
             let pjl = Mls.find cs state.pj_map in
             let e = List.fold_left2 add_var e pl pjl in
             w, Mls.add cs e m
         | [{ pat_node = Pwild }] ->
             Some e, m
-        | _ -> Register.unsupportedTerm t uncompiled
+        | _ -> Printer.unsupportedTerm t uncompiled
       in
       let w,m = List.fold_left mk_br (None,Mls.empty) bl in
       let find cs = try Mls.find cs m with Not_found -> of_option w in
       let ts = match t1.t_ty.ty_node with
         | Tyapp (ts,_) -> ts
-        | _ -> Register.unsupportedTerm t uncompiled
+        | _ -> Printer.unsupportedTerm t uncompiled
       in
       let tl = List.map find (find_constructors kn ts) in
       t_app (Mts.find ts state.mt_map) (t1::tl) t.t_ty
-  | Tcase _ -> Register.unsupportedTerm t uncompiled
+  | Tcase _ -> Printer.unsupportedTerm t uncompiled
   | _ -> t_map (rewriteT kn state) (rewriteF kn state Svs.empty true) t
 
 and rewriteF kn state av sign f = match f.f_node with
@@ -107,12 +107,12 @@ and rewriteF kn state av sign f = match f.f_node with
         | [{ pat_node = Papp (cs,pl) }] ->
             let get_var p = match p.pat_node with
               | Pvar v -> v
-              | _ -> Register.unsupportedFmla f uncompiled
+              | _ -> Printer.unsupportedFmla f uncompiled
             in
             w, Mls.add cs (List.map get_var pl, e) m
         | [{ pat_node = Pwild }] ->
             Some e, m
-        | _ -> Register.unsupportedFmla f uncompiled
+        | _ -> Printer.unsupportedFmla f uncompiled
       in
       let w,m = List.fold_left mk_br (None,Mls.empty) bl in
       let find cs =
@@ -134,11 +134,11 @@ and rewriteF kn state av sign f = match f.f_node with
       in
       let ts = match t1.t_ty.ty_node with
         | Tyapp (ts,_) -> ts
-        | _ -> Register.unsupportedFmla f uncompiled
+        | _ -> Printer.unsupportedFmla f uncompiled
       in
       let op = if sign then f_and_simp else f_or_simp in
       map_join_left find op (find_constructors kn ts)
-  | Fcase _ -> Register.unsupportedFmla f uncompiled
+  | Fcase _ -> Printer.unsupportedFmla f uncompiled
   | Fquant (q, bf) when (q = Fforall && sign) || (q = Fexists && not sign) ->
       let vl, tr, f1 = f_open_quant bf in
       let tr' = tr_map (rewriteT kn state)
@@ -237,11 +237,11 @@ let comp t (state,task) = match t.task_decl.td_node with
   | _ ->
       state, add_tdecl task t.task_decl
 
-let eliminate_compiled_algebraic =
-  Register.store (fun () -> Trans.fold_map comp empty_state None)
+let eliminate_compiled_algebraic = Trans.fold_map comp empty_state None
 
 let eliminate_algebraic =
-  Register.compose compile_match eliminate_compiled_algebraic
+  Trans.compose compile_match eliminate_compiled_algebraic
 
-let () = Register.register_transform "eliminate_algebraic" eliminate_algebraic
+let () = Trans.register_transform "eliminate_algebraic"
+  (fun _ -> eliminate_algebraic)
 

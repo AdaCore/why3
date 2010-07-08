@@ -27,7 +27,10 @@ open Task
 open Decl
 
 let why_filename = ["transform" ; "encoding_decorate"]
-let kept_tag = "encoding_decorate : kept"
+
+let meta_kept = "encoding_decorate : kept"
+
+let () = Theory.register_meta meta_kept [Theory.MTtysymbol]
 
 (* From Encoding Polymorphism CADE07*)
 
@@ -56,7 +59,7 @@ type lconv = {d2t : lsymbol;
               t2u : lsymbol;
               tty : term}
 
-type tenv = {query : Driver.driver_query option;
+type tenv = {kept : Sid.t option;
              clone_builtin : tysymbol -> Theory.tdecl list;
              specials : lconv Hty.t;
              deco : ty;
@@ -69,7 +72,7 @@ type tenv = {query : Driver.driver_query option;
        comme specials_type ne depend pas*)
     
 
-let load_prelude query env =
+let load_prelude kept env =
   let prelude = Env.find_theory env why_filename "Prelude" in
   let sort = Theory.ns_find_ls prelude.th_export ["sort"] in
   let tyty = ty_app (Theory.ns_find_ts prelude.th_export ["ty"]) [] in
@@ -111,7 +114,7 @@ let load_prelude query env =
     Hty.add specials (ty_app ts []) lconv;
     task_tdecls task in
   task,
-  { query = query;
+  { kept = kept;
     clone_builtin = Wts.memoize 7 clone_builtin;
     specials = specials;
     deco = deco;
@@ -125,11 +128,9 @@ let is_kept tenv ts =
   ts.ts_args = [] &&  
     begin
       ts_equal ts ts_int || ts_equal ts ts_real  (* for the constant *)
-      || match tenv.query with
+      || match tenv.kept with
         | None -> true (* every_simple *)
-        | Some query ->
-            let tags = Driver.query_tags query ts.ts_name in
-            Sstr.mem kept_tag tags
+        | Some s -> Sid.mem ts.ts_name s
     end
 
 (* Translate a type to a term *)
@@ -254,7 +255,7 @@ let rec rewrite_term tenv tvar vsvar t =
       let t1' = fnT vsvar t1 in let t2' = fnT vsvar' t2 in
       if t_equal t1' t1 && t_equal t2' t2 then t else t_let u t1' t2'
     | Tcase _ | Teps _ | Tbvar _ ->
-        Register.unsupportedTerm t
+        Printer.unsupportedTerm t
           "Encoding decorate : I can't encode this term"
 
 and rewrite_fmla tenv tvar vsvar f =
@@ -284,7 +285,7 @@ and rewrite_fmla tenv tvar vsvar f =
       let (vsvar',vl) = List.fold_left (conv_vs tenv tvar) (vsvar,[]) vl in
       let f1' = fnF vsvar' f1 in 
       (* Ici un trigger qui ne match pas assez de variables 
-         peut être généré *)
+         peut être généré *)
       let tl = tr_map (rewrite_term tenv tvar vsvar') (fnF vsvar') tl in
         (*if f_equal f1' f1 &&  vsvar' == vsvar (*&& tr_equal tl' tl*) then f
         else *)
@@ -313,15 +314,15 @@ let decl (tenv:tenv) d =
             Hts.add tenv.trans_tsymbol ts tty;
             tty in
         [create_decl (create_logic_decl [(tty,None)])]
-    | Dtype _ -> Register.unsupportedDecl 
-        d "encoding_decorate : I can work only on abstract\
+    | Dtype _ -> Printer.unsupportedDecl 
+        d "encoding_decorate : I can work only on abstract \
             type which are not in recursive bloc."
     | Dlogic l ->
         let fn = function
           | _ls, Some _ -> 
-              Register.unsupportedDecl 
+              Printer.unsupportedDecl 
                 d "encoding_decorate : I can't encode definition. \
-Perhaps you could use eliminate_definition"
+                    Perhaps you could use eliminate_definition"
           | ls, None ->
               try
                 let ls = Hls.find tenv.trans_lsymbol ls in
@@ -331,7 +332,7 @@ Perhaps you could use eliminate_definition"
                 Hls.add tenv.trans_lsymbol ls ls_conv;
                 ls_conv,None in
         [create_decl (create_logic_decl (List.map fn l))]
-    | Dind _ -> Register.unsupportedDecl
+    | Dind _ -> Printer.unsupportedDecl
         d "encoding_decorate : I can't work on inductive"
         (* let fn (pr,f) = pr, fnF f in *)
         (* let fn (ps,l) = ps, List.map fn l in *)
@@ -352,21 +353,17 @@ let decl tenv d =
   res
 *)
 
-let t = Register.store_query 
-  (fun query -> 
-     let env = Driver.query_env query in
-     let init_task,tenv = load_prelude (Some query) env in
-     Trans.tdecl (decl tenv) init_task)
+let t env = Trans.on_meta meta_kept (fun tds ->
+  let s = Task.find_meta_ids meta_kept tds Sid.empty in
+  let init_task,tenv = load_prelude (Some s) env in
+  Trans.tdecl (decl tenv) init_task)
 
-let () = Register.register_transform "encoding_decorate" t
+let () = Trans.register_transform "encoding_decorate" t
 
 
-let t_all = Register.store_env 
-  (fun env -> 
-     let init_task,tenv = load_prelude None env in
-     Trans.tdecl (decl tenv) init_task)
+let t_all env =
+  let init_task,tenv = load_prelude None env in
+  Trans.tdecl (decl tenv) init_task
 
-let () = Register.register_transform "encoding_decorate_every_simple" t_all
-
-let () = Theory.register_meta "encoding_decorate : kept" [Theory.MTtysymbol]
+let () = Trans.register_transform "encoding_decorate_every_simple" t_all
 

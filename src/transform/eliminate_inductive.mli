@@ -17,5 +17,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val eliminate_inductive : Task.task Register.trans_reg
+val eliminate_inductive : Task.task Trans.trans
 

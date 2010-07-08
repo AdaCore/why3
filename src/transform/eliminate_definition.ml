@@ -25,11 +25,11 @@ open Decl
 (** Discard definitions of built-in symbols *)
 
 let add_ld q = function
-  | ls, Some _ when Driver.query_remove q ls.ls_name -> (ls, None)
+  | ls, Some _ when Sid.mem ls.ls_name q -> (ls, None)
   | d -> d
 
 let add_id q (ld,id) = function
-  | ls, _ when Driver.query_remove q ls.ls_name -> (ls, None)::ld, id
+  | ls, _ when Sid.mem ls.ls_name q -> (ls, None)::ld, id
   | d -> ld, d::id
 
 let elim q d = match d.d_node with
@@ -41,9 +41,15 @@ let elim q d = match d.d_node with
   | _ -> [d]
 
 let eliminate_builtin =
-  Register.store_query (fun q -> Trans.decl (elim q) None)
+  Trans.on_metas
+    [ Printer.meta_remove_type;
+      Printer.meta_remove_logic;
+      Printer.meta_remove_prop ]
+    (fun mm ->
+      Trans.decl (elim (Mstr.fold Task.find_meta_ids mm Sid.empty)) None)
 
-let () = Register.register_transform "eliminate_builtin" eliminate_builtin
+let () = Trans.register_transform "eliminate_builtin"
+  (fun _ -> eliminate_builtin)
 
 (** Eliminate definitions of functions and predicates *)
 
@@ -70,7 +76,7 @@ let rec f_insert hd f = match f.f_node with
   | _ -> f_iff_simp hd f
 
 let add_ld func pred axl d = match d with
-  | _, None -> 
+  | _, None ->
       axl, d
   | ls, Some ld ->
       let vl,e = open_ls_defn ld in begin match e with
@@ -96,26 +102,19 @@ let elim func pred mutual d = match d.d_node with
       d :: List.rev axl
   | _ -> [d]
 
-let eliminate_definition_func =
-  Register.store (fun () -> Trans.decl (elim true false false) None)
-
-let eliminate_definition_pred =
-  Register.store (fun () -> Trans.decl (elim false true false) None)
-
-let eliminate_definition =
-  Register.store (fun () -> Trans.decl (elim true true false) None)
-
-let eliminate_mutual_recursion =
-  Register.store (fun () -> Trans.decl (elim true true true) None)
+let eliminate_definition_func  = Trans.decl (elim true false false) None
+let eliminate_definition_pred  = Trans.decl (elim false true false) None
+let eliminate_definition       = Trans.decl (elim true true false) None
+let eliminate_mutual_recursion = Trans.decl (elim true true true) None
 
 let () =
-  Register.register_transform "eliminate_definition_func"
-                               eliminate_definition_func;
-  Register.register_transform "eliminate_definition_pred"
-                               eliminate_definition_pred;
-  Register.register_transform "eliminate_definition"
-                               eliminate_definition;
-  Register.register_transform "eliminate_mutual_recursion"
-                               eliminate_mutual_recursion
+  Trans.register_transform "eliminate_definition_func"
+    (fun _ -> eliminate_definition_func);
+  Trans.register_transform "eliminate_definition_pred"
+    (fun _ -> eliminate_definition_pred);
+  Trans.register_transform "eliminate_definition"
+    (fun _ -> eliminate_definition);
+  Trans.register_transform "eliminate_mutual_recursion"
+    (fun _ -> eliminate_mutual_recursion)
 
 

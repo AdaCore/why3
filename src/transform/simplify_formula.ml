@@ -34,17 +34,15 @@ let decl_l d =
         end
     | _ -> [[decl_map (fun t -> t) fmla_simpl d]]
 
-let simplify_formula = Register.store 
-  (fun () -> Trans.rewrite (fun t -> t) fmla_simpl None)
+let simplify_formula = Trans.rewrite (fun t -> t) fmla_simpl None
 
-let simplify_formula_and_task = 
-  Register.store (fun () -> Trans.decl_l decl_l None)
+let simplify_formula_and_task = Trans.decl_l decl_l None
 
-let () = Register.register_transform 
-  "simplify_formula" simplify_formula
+let () = Trans.register_transform 
+  "simplify_formula" (fun _ -> simplify_formula)
 
-let () = Register.register_transform_l 
-  "simplify_formula_and_task" simplify_formula_and_task
+let () = Trans.register_transform_l 
+  "simplify_formula_and_task" (fun _ -> simplify_formula_and_task)
 
 (** remove_trivial_quantification
     Original version in the alt-ergo prover by Sylvain Conchon *)
@@ -140,27 +138,28 @@ let rec fmla_remove_quant f =
 *)
 
 let simplify_trivial_quantification = 
-  Register.store 
-    (fun () -> Trans.rewrite (fun t -> t) fmla_remove_quant None)
+  Trans.rewrite (fun t -> t) fmla_remove_quant None
 
-let () = Register.register_transform 
-  "simplify_trivial_quantification" simplify_trivial_quantification
+let () = Trans.register_transform 
+  "simplify_trivial_quantification" (fun _ -> simplify_trivial_quantification)
 
-let on_goal fn =
-  let fn task = match task with
-    | Some {Task.task_decl = {Theory.td_node =  
-      Theory.Decl ({d_node = Decl.Dprop (Pgoal,pr,fmla)})};
-           task_prev = task_prev} -> 
-        (List.fold_left Task.add_decl) task_prev (fn pr fmla)
-    | _ -> assert false in
+let on_goal fn_prop =
+  let rec fn task = match task with
+    | Some { Task.task_decl = {Theory.td_node =  
+                Theory.Decl ({d_node = Decl.Dprop (Pgoal,pr,fmla)})};
+             Task.task_prev = task_prev } -> 
+        (List.fold_left Task.add_decl) task_prev (fn_prop pr fmla)
+    | Some { Task.task_decl = ({Theory.td_node = Theory.Meta _} as td);
+             Task.task_prev = task_prev } ->
+        Task.add_tdecl (fn task_prev) td
+    | _ -> assert false
+  in
   Trans.store fn
 
 
 let simplify_trivial_quantification_in_goal =
-  Register.store
-    (fun () -> on_goal (fun pr f -> 
-                          [create_prop_decl Pgoal pr (fmla_remove_quant f)]))
+  on_goal (fun pr f -> [create_prop_decl Pgoal pr (fmla_remove_quant f)])
 
-let () = Register.register_transform 
+let () = Trans.register_transform 
   "simplify_trivial_quantification_in_goal" 
-   simplify_trivial_quantification_in_goal
+   (fun _ -> simplify_trivial_quantification_in_goal)

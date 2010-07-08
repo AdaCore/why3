@@ -89,7 +89,7 @@ end
 
 type transf_data =
     { transf_name : string;
-      transf_action : Task.task Register.tlist_reg
+      transf_action : Task.task Trans.tlist
     }
 
 type transf

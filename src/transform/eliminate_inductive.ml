@@ -45,7 +45,7 @@ let inv acc (ps,al) =
   let tl = List.map t_var vl in
   let hd = f_app ps tl in
   let dj = Util.map_join_left (exi tl) f_or al in
-  let hsdj = Simplify_formula.fmla_remove_quant (f_implies hd dj) in 
+  let hsdj = Simplify_formula.fmla_remove_quant (f_implies hd dj) in
   let ax = f_forall vl [[Fmla hd]] hsdj in
   let nm = id_derive (ps.ls_name.id_string ^ "_inversion") ps.ls_name in
   create_prop_decl Paxiom (create_prsymbol nm) ax :: acc
@@ -58,7 +58,8 @@ let elim d = match d.d_node with
       List.rev dl
   | _ -> [d]
 
-let eliminate_inductive = Register.store (fun () -> Trans.decl elim None)
+let eliminate_inductive = Trans.decl elim None
 
-let () = Register.register_transform "eliminate_inductive" eliminate_inductive
+let () = Trans.register_transform "eliminate_inductive"
+                         (fun _ -> eliminate_inductive)
 

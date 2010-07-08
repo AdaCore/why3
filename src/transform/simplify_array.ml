@@ -46,10 +46,6 @@ let make_rt_rf env =
   and rf f = f_map rt rf f  in
   rt,rf
   
-let t =
-  Register.store_env
-  (fun env ->
-     let rt,rf = make_rt_rf env in
-     Trans.rewrite rt rf None)
+let t env = let rt,rf = make_rt_rf env in Trans.rewrite rt rf None
 
-let () = Register.register_transform "simplify_array" t
+let () = Trans.register_transform "simplify_array" t

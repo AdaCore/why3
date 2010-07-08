@@ -17,6 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(*
 open Util
 open Ident
 open Ty
@@ -417,7 +418,7 @@ let monomorphise_goal =
       acc ltv in
     acc)
 
-let monomorphise_goal = Register.store (fun () -> monomorphise_goal)
+let monomorphise_goal = Trans.store (fun () -> monomorphise_goal)
 
 (* The prelude for the complete transformation *)
 let load_prelude env =
@@ -468,7 +469,7 @@ let create_env_nbp sty =
   create_env task tenv sty
 
 let register_transform name create_env =
-  let t = Register.store_query
+  let t = Trans.store_query
     (fun query ->
        Trans.store 
          (fun task ->
@@ -477,7 +478,7 @@ let register_transform name create_env =
             let env = Driver.query_env query in
             let init_task,env = create_env env drv task in
             Trans.apply (Trans.fold_map fold_map env init_task) task)) in
-  Register.register_transform name t
+  Trans.register_transform name t
 
 (* The most simple configuration takes only the tag keep into account *)
 let is_kept query ts = 
@@ -504,7 +505,7 @@ let look_for_keep query d sty =
     | _ -> sty
 
 let look_for_keep =
-  Register.store_query
+  Trans.store_query
     (fun query -> fold_decl (look_for_keep query) Sty.empty)
 
 let () = register_transform "encoding_instantiate"
@@ -539,7 +540,7 @@ let mono_in_goal d sty =
     | _ -> sty
 
 let mono_in_goal =
-  Register.store (fun () -> fold_decl mono_in_goal Sty.empty)
+  Trans.store (fun () -> fold_decl mono_in_goal Sty.empty)
 
 let () = register_transform "encoding_instantiate_goal"
   (fun env drv task -> 
@@ -560,7 +561,7 @@ let mono_in_def d sty =
     | _ -> sty
 
 let mono_in_def =
-  Register.store (fun () -> fold_decl mono_in_def Sty.empty)
+  Trans.store (fun () -> fold_decl mono_in_def Sty.empty)
 
 let () = register_transform "encoding_instantiate_def"
   (fun env drv task -> 
@@ -584,7 +585,7 @@ let mono_in_mono d sty =
     | _ -> sty
 
 let mono_in_mono =
-  Register.store (fun () -> fold_decl mono_in_mono Sty.empty)
+  Trans.store (fun () -> fold_decl mono_in_mono Sty.empty)
 
 let () = register_transform "encoding_instantiate_mono"
   (fun env drv task -> 
@@ -597,3 +598,5 @@ let () = register_transform "encoding_instantiate_mono_nbp"
      let sty1 = Register.apply_driver look_for_keep drv task in
      let sty2 = Register.apply mono_in_mono task in
      create_env_nbp (Sty.union sty1 sty2))
+
+*)

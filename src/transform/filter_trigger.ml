@@ -41,12 +41,11 @@ let keep_no_predicate = function
 
   
 let filter_trigger_no_predicate = 
-  Register.store (fun () -> 
     let rt,rf = make_rt_rf keep_no_predicate in
-    Trans.rewrite rt rf None)
+    Trans.rewrite rt rf None
 
-let () = Register.register_transform "filter_trigger_no_predicate" 
-  filter_trigger_no_predicate
+let () = Trans.register_transform "filter_trigger_no_predicate" 
+  (fun _ -> filter_trigger_no_predicate)
 
 
 let keep_no_fmla = function
@@ -55,25 +54,27 @@ let keep_no_fmla = function
         | _ -> false
 
 
-let filter_trigger = Register.store 
-  (fun () -> 
+let filter_trigger =
     let rt,rf = make_rt_rf keep_no_fmla in
-    Trans.rewrite rt rf None)
+    Trans.rewrite rt rf None
 
-let () = Register.register_transform "filter_trigger" filter_trigger
+let () = Trans.register_transform "filter_trigger" 
+  (fun _ -> filter_trigger)
 
 
-let keep_no_builtin query = function
+let keep_no_builtin rem_ls = function
         | Term _ -> true
-        | Fmla {f_node = Fapp (ps,_)} ->
-          Driver.query_syntax query ps.ls_name = None
+        | Fmla {f_node = Fapp (ps,_)} -> not (Ident.Sid.mem ps.ls_name rem_ls)
         | _ -> false
 
   
-let filter_trigger_builtin = 
-  Register.store_query (fun query -> 
-    let rt,rf = make_rt_rf (keep_no_builtin query) in
+let filter_trigger_builtin =
+  Trans.on_meta Printer.meta_remove_logic (fun tds ->
+    let rem_ls = 
+       Task.find_meta_ids Printer.meta_remove_logic tds Ident.Sid.empty
+    in
+    let rt,rf = make_rt_rf (keep_no_builtin rem_ls) in
     Trans.rewrite rt rf None)
 
-let () = Register.register_transform "filter_trigger_builtin" 
-  filter_trigger_builtin
+let () = Trans.register_transform "filter_trigger_builtin" 
+  (fun _ -> filter_trigger_builtin)

@@ -74,6 +74,9 @@ val on_theories_metas : theory list -> string list ->
 
 (** {2 Registration} *)
 
+exception UnknownTrans of string
+exception KnownTrans of string
+
 val register_transform   : string -> (Env.env -> task trans) -> unit
 val register_transform_l : string -> (Env.env -> task tlist) -> unit
 

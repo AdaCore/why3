@@ -38,7 +38,7 @@ let rec elim_t letl contT t = match t.t_node with
       let f = List.fold_left (fun f (v,t) -> f_let v t f) f letl in
       f_if f (elim_t letl contT t1) (elim_t letl contT t2)
   | Tcase _ ->
-      Register.unsupportedTerm t
+      Printer.unsupportedTerm t
         "cannot eliminate 'if-then-else' under 'match' in terms"
   | _ ->
       t_map_cont (elim_t letl) elim_f contT t
@@ -51,7 +51,7 @@ and elim_f contF f = match f.f_node with
 (* the only terms we can still meet are the terms in triggers *)
 and elim_tr contT t = match t.t_node with
   | Tif _ ->
-      Register.unsupportedTerm t
+      Printer.unsupportedTerm t
         "cannot eliminate 'if-then-else' in trigger terms"
   | _ -> t_map_cont elim_tr elim_f contT t
 
@@ -86,7 +86,7 @@ let elim_d d = match d.d_node with
   | _ ->
       [decl_map (fun _ -> assert false) elim_f d]
 
-let eliminate_if_term = Register.store (fun () -> Trans.decl elim_d None)
+let eliminate_if_term = Trans.decl elim_d None
 
 (** Eliminate if-then-else in formulas *)
 
@@ -103,14 +103,12 @@ and elim_f sign f = match f.f_node with
   | _ ->
       f_map_sign elim_t elim_f sign f
 
-let eliminate_if_fmla =
-  Register.store (fun () -> Trans.rewrite elim_t (elim_f true) None)
+let eliminate_if_fmla = Trans.rewrite elim_t (elim_f true) None
 
-let eliminate_if =
-  Register.compose eliminate_if_term eliminate_if_fmla
+let eliminate_if = Trans.compose eliminate_if_term eliminate_if_fmla
 
 let () =
-  Register.register_transform "eliminate_if_term" eliminate_if_term;
-  Register.register_transform "eliminate_if_fmla" eliminate_if_fmla;
-  Register.register_transform "eliminate_if" eliminate_if
+  Trans.register_transform "eliminate_if_term" (fun _ -> eliminate_if_term);
+  Trans.register_transform "eliminate_if_fmla" (fun _ -> eliminate_if_fmla);
+  Trans.register_transform "eliminate_if" (fun _ -> eliminate_if)
 

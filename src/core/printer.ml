@@ -30,10 +30,11 @@ open Task
 
 type prelude = string list
 type prelude_map = prelude Mid.t
+type syntax_map = string Mid.t
 
 type 'a pp = formatter -> 'a -> unit
 
-type printer = prelude -> prelude_map -> task pp
+type printer = prelude -> prelude_map -> syntax_map -> task pp
 
 let printers : (string, printer) Hashtbl.t = Hashtbl.create 17
 
@@ -118,31 +119,31 @@ let print_th_prelude task fmt pm =
     let prel = try Mid.find th.th_name pm with Not_found -> [] in
     print_prelude fmt prel) th_used
 
+exception KnownTypeSyntax of tysymbol
+exception KnownLogicSyntax of lsymbol
+
+let add_ts_syntax ts s sm =
+  check_syntax s (List.length ts.ts_args);
+  if Mid.mem ts.ts_name sm then raise (KnownTypeSyntax ts);
+  Mid.add ts.ts_name s sm
+
+let add_ls_syntax ls s sm =
+  check_syntax s (List.length ls.ls_args);
+  if Mid.mem ls.ls_name sm then raise (KnownLogicSyntax ls);
+  Mid.add ls.ls_name s sm
+
 let meta_remove_type = "remove_type"
 let meta_remove_logic = "remove_logic"
 let meta_remove_prop = "remove_prop"
 
-let meta_syntax_type = "syntax_type"
-let meta_syntax_logic = "syntax_logic"
-
 let () =
   register_meta meta_remove_type [MTtysymbol];
   register_meta meta_remove_logic [MTlsymbol];
-  register_meta meta_remove_prop [MTprsymbol];
-  register_meta meta_syntax_type [MTtysymbol; MTstring];
-  register_meta meta_syntax_logic [MTlsymbol; MTstring]
+  register_meta meta_remove_prop [MTprsymbol]
 
 let remove_type ts = create_meta meta_remove_type [MAts ts]
 let remove_logic ls = create_meta meta_remove_logic [MAls ls]
 let remove_prop pr = create_meta meta_remove_prop [MApr pr]
-
-let syntax_type ts s =
-  check_syntax s (List.length ts.ts_args);
-  create_meta meta_syntax_type [MAts ts; MAstr s]
-
-let syntax_logic ls s =
-  check_syntax s (List.length ls.ls_args);
-  create_meta meta_syntax_logic [MAls ls; MAstr s]
 
 let get_remove_set task =
   let add td s = match td.td_node with
@@ -154,16 +155,6 @@ let get_remove_set task =
   let s = Stdecl.fold add (find_meta task meta_remove_logic).tds_set s in
   let s = Stdecl.fold add (find_meta task meta_remove_prop).tds_set s in
   s
-
-let get_syntax_map task =
-  let add td m = match td.td_node with
-    | Meta (_,[MARid id; MARstr s]) -> Mid.add id s m
-    | _ -> assert false
-  in
-  let m = Mid.empty in
-  let m = Stdecl.fold add (find_meta task meta_syntax_type).tds_set m in
-  let m = Stdecl.fold add (find_meta task meta_syntax_logic).tds_set m in
-  m
 
 (** {2 exceptions to use in transformations and printers} *)
 
@@ -203,6 +194,12 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       fprintf fmt "Printer '%s' is already registered" s
   | UnknownPrinter s ->
       fprintf fmt "Unknown printer '%s'" s
+  | KnownTypeSyntax ts ->
+      fprintf fmt "Syntax for type symbol %a is already defined"
+        Pretty.print_ts ts
+  | KnownLogicSyntax ls ->
+      fprintf fmt "Syntax for logical symbol %a is already defined"
+        Pretty.print_ls ls
   | BadSyntaxIndex i ->
       fprintf fmt "Bad argument index %d, must start with 1" i
   | BadSyntaxArity (i1,i2) ->

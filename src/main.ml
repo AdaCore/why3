@@ -170,17 +170,17 @@ let () =
   Arg.parse option_list add_opt_file usage_msg;
 
   if !opt_list_transforms then begin
-    printf "@[<hov 2>Registered non-splitting transformations:@\n%a@]@\n@."
+    printf "@[<hov 2>Transed non-splitting transformations:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Register.list_transforms ()));
-    printf "@[<hov 2>Registered splitting transformations:@\n%a@]@\n@."
+      (List.sort String.compare (Trans.list_transforms ()));
+    printf "@[<hov 2>Transed splitting transformations:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Register.list_transforms_l ()));
+      (List.sort String.compare (Trans.list_transforms_l ()));
   end;
   if !opt_list_printers then begin
-    printf "@[<hov 2>Registered printers:@\n%a@]@\n@."
+    printf "@[<hov 2>Transed printers:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Register.list_printers ()))
+      (List.sort String.compare (Printer.list_printers ()))
   end;
   if !opt_list_formats then begin
     let print1 fmt s = fprintf fmt "%S" s in
@@ -248,7 +248,7 @@ let () =
   match !opt_prover with
   | Some s ->
       let prover = try Mstr.find s config.provers with
-        | Not_found -> eprintf "Prover %s not found.@." s; exit 1
+        | Not_found -> eprintf "Driver %s not found.@." s; exit 1
       in
       opt_command := Some prover.command;
       opt_driver := Some prover.driver
@@ -276,13 +276,13 @@ let do_task drv fname tname (th : Why.Theory.theory) (task : Task.task) =
   match !opt_output, !opt_command with
     | None, Some command ->
         let res =
-          Prover.prove_task ~debug ~command ~timelimit ~memlimit drv task ()
+          Driver.prove_task ~debug ~command ~timelimit ~memlimit drv task ()
         in
         printf "%s %s %s : %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
           Call_provers.print_prover_result res
     | None, None ->
-        Prover.print_task ~debug drv std_formatter task
+        Driver.print_task ~debug drv std_formatter task
     | Some dir, _ ->
         let fname = Filename.basename fname in
         let fname =
@@ -295,15 +295,13 @@ let do_task drv fname tname (th : Why.Theory.theory) (task : Task.task) =
         let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
         let ext = String.sub dest i (String.length dest - i) in
         let cout = open_out (Filename.concat dir (name ^ ext)) in
-        Prover.print_task ~debug drv (formatter_of_out_channel cout) task;
+        Driver.print_task ~debug drv (formatter_of_out_channel cout) task;
         close_out cout
 
-let do_tasks drv fname tname th trans task =
+let do_tasks env drv fname tname th trans task =
   let lookup acc t = 
-    (try t, Register.singleton (Register.lookup_transform t) with
-         Not_found -> try t, Register.lookup_transform_l t with
-             Not_found -> (eprintf  "unknown transformation %s.@." t;exit 1))
-    ::acc
+    (try t, Trans.singleton (Trans.lookup_transform t env) with
+       Trans.UnknownTrans _ -> t, Trans.lookup_transform_l t env) :: acc
   in
   let transl = List.fold_left lookup [] trans in
   let apply tasks (s, tr) = 
@@ -311,7 +309,7 @@ let do_tasks drv fname tname th trans task =
       if debug then Format.eprintf "apply transformation %s@." s;
       let l = List.fold_left 
         (fun acc task -> 
-           List.rev_append (Register.apply_driver tr drv task) acc) [] tasks in
+           List.rev_append (Trans.apply tr task) acc) [] tasks in
       List.rev l (* In order to keep the order for 1-1 transformation *)
     with e when not debug ->
       Format.eprintf "failure in transformation %s@." s;
@@ -320,7 +318,7 @@ let do_tasks drv fname tname th trans task =
   let tasks = List.fold_left apply [task] transl in
   List.iter (do_task drv fname tname th) tasks
 
-let do_theory drv fname tname th trans glist =
+let do_theory env drv fname tname th trans glist =
   if !opt_print_theory then
     printf "%a@." Pretty.print_theory th
   else if !opt_print_namespace then
@@ -338,7 +336,7 @@ let do_theory drv fname tname th trans glist =
     if Queue.is_empty glist 
     then 
       let tasks = List.rev (split_theory th None) in
-      let do_tasks = do_tasks drv fname tname th trans in
+      let do_tasks = do_tasks env drv fname tname th trans in
       List.iter do_tasks tasks
     else 
       let prtrans,prs = Queue.fold add ([],Decl.Spr.empty) glist in
@@ -349,7 +347,7 @@ let do_theory drv fname tname th trans glist =
       let mpr = List.fold_left recover_pr Decl.Mpr.empty tasks in
       let do_tasks (pr,trans) =
         let task = Decl.Mpr.find pr mpr in
-        do_tasks drv fname tname th trans task in
+        do_tasks env drv fname tname th trans task in
       List.iter do_tasks (List.rev prtrans)
   end
 
@@ -358,14 +356,14 @@ let do_global_theory env drv (tname,p,t,glist,trans) =
     eprintf "Theory '%s' not found.@." tname;
     exit 1
   in
-  do_theory drv "lib" tname th trans glist
+  do_theory env drv "lib" tname th trans glist
 
-let do_local_theory drv fname m (tname,_,t,glist,trans) =
+let do_local_theory env drv fname m (tname,_,t,glist,trans) =
   let th = try Mnm.find t m with Not_found ->
     eprintf "Theory '%s' not found in file '%s'.@." tname fname;
     exit 1
   in
-  do_theory drv fname tname th trans glist
+  do_theory env drv fname tname th trans glist
 
 let do_input env drv = function
   | None, _, _ when !opt_parse_only || !opt_type_only ->
@@ -390,10 +388,10 @@ let do_input env drv = function
         else if Queue.is_empty tlist then
           let glist = Queue.create () in
           let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-          let do_th _ (t,th) = do_theory drv fname t th trans glist in
+          let do_th _ (t,th) = do_theory env drv fname t th trans glist in
           Ident.Mid.iter do_th (Mnm.fold add_th m Ident.Mid.empty)
         else
-          Queue.iter (do_local_theory drv fname m) tlist
+          Queue.iter (do_local_theory env drv fname m) tlist
       with 
 	| Loc.Located (loc, e) ->
 	    eprintf "@[%a%a@]@." Loc.report_position loc report e; exit 1

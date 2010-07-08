@@ -25,115 +25,33 @@ open Term
 open Decl
 open Theory
 open Task
+open Printer
+open Trans
 open Driver_ast
 open Call_provers
-
-(** error handling *)
-
-type error = string
-
-exception Error of error
-
-let report = pp_print_string
-
-let () = Exn_printer.register
-  (fun fmt exn -> match exn with
-    | Error error -> report fmt error
-    | _ -> raise exn)
-
-let error ?loc e = match loc with
-  | None -> raise (Error e)
-  | Some loc -> raise (Loc.Located (loc, Error e))
-
-let errorm ?loc f =
-  let buf = Buffer.create 512 in
-  let fmt = formatter_of_buffer buf in
-  kfprintf
-    (fun _ ->
-       pp_print_flush fmt ();
-       let s = Buffer.contents buf in
-       Buffer.clear buf;
-       error ?loc s)
-    fmt f
-
-(** syntax substitutions *)
-
-let opt_search_forward re s pos =
-  try Some (Str.search_forward re s pos) with Not_found -> None
-
-let global_substitute_fmt expr repl_fun text fmt =
-  let rec replace start last_was_empty =
-    let startpos = if last_was_empty then start + 1 else start in
-    if startpos > String.length text then
-      pp_print_string fmt (Str.string_after text start)
-    else
-      match opt_search_forward expr text startpos with
-      | None ->
-          pp_print_string fmt (Str.string_after text start)
-      | Some pos ->
-          let end_pos = Str.match_end () in
-          pp_print_string fmt (String.sub text start (pos - start));
-          repl_fun text fmt;
-          replace end_pos (end_pos = pos)
-  in
-  replace 0 false
-
-let iter_group expr iter_fun text =
-  let rec iter start last_was_empty =
-    let startpos = if last_was_empty then start + 1 else start in
-    if startpos < String.length text then
-      match opt_search_forward expr text startpos with
-      | None -> ()
-      | Some pos ->
-          let end_pos = Str.match_end () in
-          iter_fun text;
-          iter end_pos (end_pos = pos)
-  in
-  iter 0 false
-
-let regexp_arg_pos = Str.regexp "%\\([0-9]+\\)"
-
-let check_syntax loc s len =
-  let arg s =
-    let i = int_of_string (Str.matched_group 1 s) in
-    if i = 0 then errorm ~loc "bad index '%%0': start with '%%1'";
-    if i > len then
-      errorm ~loc "bad index '%%%i': the symbol has %i arguments" i len
-  in
-  iter_group regexp_arg_pos arg s
-
-let syntax_arguments s print fmt l =
-  let args = Array.of_list l in
-  let repl_fun s fmt =
-    let i = int_of_string (Str.matched_group 1 s) in
-    print fmt args.(i-1) in
-  global_substitute_fmt regexp_arg_pos repl_fun s fmt
 
 (** drivers *)
 
 type driver = {
   drv_env       : Env.env;
   drv_printer   : string option;
-  drv_prelude   : string list;
   drv_filename  : string option;
   drv_transform : string list;
-  drv_thprelude : string list Mid.t;
-  drv_tags      : Sstr.t Mid.t;
-  drv_tags_cl   : Sstr.t Mid.t;
-  drv_syntax    : string Mid.t;
-  drv_remove    : Sid.t;
-  drv_remove_cl : Sid.t;
-  drv_meta      : Stdecl.t Mid.t; (* the same as clone_map *)
-  drv_meta_cl   : Stdecl.t Mid.t;
-  drv_regexps   : (Str.regexp * Call_provers.prover_answer) list;
-  drv_exitcodes : (int * Call_provers.prover_answer) list;
-  drv_tag       : int
+  drv_prelude   : prelude;
+  drv_thprelude : prelude_map;
+  drv_syntax    : syntax_map;
+  drv_meta      : (theory * Stdecl.t) Mid.t;
+  drv_meta_cl   : (theory * Stdecl.t) Mid.t;
+  drv_regexps   : (Str.regexp * prover_answer) list;
+  drv_exitcodes : (int * prover_answer) list;
 }
 
 (** parse a driver file *)
 
+exception NoPlugins
+
 let load_plugin dir (byte,nat) =
-  if not Config.why_plugins then errorm "Plugins not supported";
+  if not Config.why_plugins then raise NoPlugins;
   let file = if Config.Dynlink.is_native then nat else byte in
   let file = Filename.concat dir file in
   Config.Dynlink.loadfile_private file
@@ -146,8 +64,10 @@ let load_file file =
   close_in c;
   f
 
-let string_of_qualid thl idl =
-  String.concat "." thl ^ "." ^ String.concat "." idl
+exception Duplicate    of string
+exception UnknownType  of (string list * string list)
+exception UnknownLogic of (string list * string list)
+exception UnknownProp  of (string list * string list)
 
 let load_driver = let driver_tag = ref (-1) in fun env file ->
   let prelude   = ref [] in
@@ -158,7 +78,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
   let transform = ref [] in
 
   let set_or_raise loc r v error = match !r with
-    | Some _ -> errorm ~loc "duplicate %s" error
+    | Some _ -> raise (Loc.Located (loc, Duplicate error))
     | None   -> r := Some v
   in
   let add_to_list r v = (r := v :: !r) in
@@ -183,75 +103,51 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
   List.iter add_global f.f_global;
 
   let thprelude = ref Mid.empty in
-  let tags      = ref Mid.empty in
-  let tags_cl   = ref Mid.empty in
   let syntax    = ref Mid.empty in
-  let remove    = ref Sid.empty in
-  let remove_cl = ref Sid.empty in
   let meta      = ref Mid.empty in
   let meta_cl   = ref Mid.empty in
   let qualid    = ref [] in
 
-  let find_pr th (loc,q) = try ns_find_pr th.th_export q with Not_found ->
-    errorm ~loc "unknown proposition %s" (string_of_qualid !qualid q)
+  let find_pr th (loc,q) = try ns_find_pr th.th_export q
+    with Not_found -> raise (Loc.Located (loc, UnknownProp (!qualid,q)))
   in
-  let find_ls th (loc,q) = try ns_find_ls th.th_export q with Not_found ->
-    errorm ~loc "unknown logic symbol %s" (string_of_qualid !qualid q)
+  let find_ls th (loc,q) = try ns_find_ls th.th_export q
+    with Not_found -> raise (Loc.Located (loc, UnknownLogic (!qualid,q)))
   in
-  let find_ts th (loc,q) = try ns_find_ts th.th_export q with Not_found ->
-    errorm ~loc "unknown type symbol %s" (string_of_qualid !qualid q)
+  let find_ts th (loc,q) = try ns_find_ts th.th_export q
+    with Not_found -> raise (Loc.Located (loc, UnknownType (!qualid,q)))
   in
   let add_meta th td m =
-    let s = try Mid.find th.th_name !m with Not_found -> Stdecl.empty in
-    m := Mid.add th.th_name (Stdecl.add td s) !m
+    let s = try snd (Mid.find th.th_name !m) with Not_found -> Stdecl.empty in
+    m := Mid.add th.th_name (th, Stdecl.add td s) !m
   in
-  let add_syntax loc k (_,q) id n s =
-    check_syntax loc s n;
-    if Mid.mem id !syntax then
-      errorm ~loc "duplicate syntax rule for %s symbol %s"
-        k (string_of_qualid !qualid q);
-    syntax := Mid.add id s !syntax;
-    remove := Sid.add id !remove
-  in
-  let add_tag c id s =
-    let mr = if c then tags_cl else tags in
-    let im = try Mid.find id !mr with Not_found -> Sstr.empty in
-    mr := Mid.add id (Sstr.add s im) !mr
-  in
-  let add_local th (loc,rule) = match rule with
+  let add_local th = function
     | Rprelude s ->
         let l = try Mid.find th.th_name !thprelude with Not_found -> [] in
         thprelude := Mid.add th.th_name (l @ [s]) !thprelude
     | Rsyntaxls (q,s) ->
         let ls = find_ls th q in
-        add_meta th (Printer.remove_logic ls) meta;
-        add_meta th (Printer.syntax_logic ls s) meta;
-        add_syntax loc "logic" q ls.ls_name (List.length ls.ls_args) s
+        add_meta th (remove_logic ls) meta;
+        syntax := add_ls_syntax ls s !syntax
     | Rsyntaxts (q,s) ->
         let ts = find_ts th q in
-        add_meta th (Printer.remove_type ts) meta;
-        add_meta th (Printer.syntax_type ts s) meta;
-        add_syntax loc "type" q ts.ts_name (List.length ts.ts_args) s
+        add_meta th (remove_type ts) meta;
+        syntax := add_ts_syntax ts s !syntax
     | Rremovepr (c,q) ->
-        let td = Printer.remove_prop (find_pr th q) in
-        add_meta th td (if c then meta_cl else meta);
-        let sr = if c then remove_cl else remove in
-        sr := Sid.add (find_pr th q).pr_name !sr
+        let td = remove_prop (find_pr th q) in
+        add_meta th td (if c then meta_cl else meta)
     | Rtagts (c,q,s) ->
         let td = create_meta s [MAts (find_ts th q)] in
-        add_meta th td (if c then meta_cl else meta);
-        add_tag c (find_ts th q).ts_name s
+        add_meta th td (if c then meta_cl else meta)
     | Rtagls (c,q,s) ->
         let td = create_meta s [MAls (find_ls th q)] in
-        add_meta th td (if c then meta_cl else meta);
-        add_tag c (find_ls th q).ls_name s
+        add_meta th td (if c then meta_cl else meta)
     | Rtagpr (c,q,s) ->
         let td = create_meta s [MApr (find_pr th q)] in
-        add_meta th td (if c then meta_cl else meta);
-        add_tag c (find_pr th q).pr_name s
+        add_meta th td (if c then meta_cl else meta)
   in
-  let add_local th (loc,rule) = 
-    try add_local th (loc,rule) with e -> raise (Loc.Located (loc,e))
+  let add_local th (loc,rule) =
+    try add_local th rule with e -> raise (Loc.Located (loc,e))
   in
   let add_theory { thr_name = (loc,q); thr_rules = trl } =
     let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
@@ -271,119 +167,16 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     drv_filename  = !filename;
     drv_transform = !transform;
     drv_thprelude = !thprelude;
-    drv_tags      = !tags;
-    drv_tags_cl   = !tags_cl;
     drv_syntax    = !syntax;
-    drv_remove    = !remove;
-    drv_remove_cl = !remove_cl;
     drv_meta      = !meta;
     drv_meta_cl   = !meta_cl;
     drv_regexps   = !regexps;
     drv_exitcodes = !exitcodes;
-    drv_tag       = !driver_tag;
   }
-
-(** query drivers *)
-
-type driver_query = {
-  query_syntax : ident -> string option;
-  query_remove : ident -> bool;
-  query_tags   : ident -> Sstr.t;
-  query_driver : driver;
-  query_lclone : task;
-  query_tag    : int;
-}
-
-module Hsdq = Hashcons.Make (struct
-  type t = driver_query
-
-  let equal q1 q2 = q1.query_driver == q2.query_driver &&
-    task_equal q1.query_lclone q2.query_lclone
-
-  let hash q = Hashcons.combine q.query_driver.drv_tag
-    (option_apply 0 (fun t -> 1 + t.task_tag) q.query_lclone)
-
-  let tag n q = { q with query_tag = n }
-end)
-
-module Dq = StructMake (struct
-  type t = driver_query
-  let tag q = q.query_tag
-end)
-
-module Sdq = Dq.S
-module Mdq = Dq.M
-module Hdq = Dq.H
-
-let get_tags map id = try Mid.find id map with Not_found -> Sstr.empty
-let add_tags drv id acc = Sstr.union (get_tags drv.drv_tags_cl id) acc
-let add_remove drv id acc = acc || Sid.mem id drv.drv_remove_cl
-
-let driver_query drv task =
-  let clone = old_task_clone task in
-  let htags = Hid.create 7 in
-  let query_tags id = try Hid.find htags id with Not_found ->
-    let r = try Mid.find id clone with Not_found -> Sid.empty in
-    let s = Sid.fold (add_tags drv) r (get_tags drv.drv_tags id) in
-    Hid.replace htags id s; s
-  in
-  let hremove = Hid.create 7 in
-  let query_remove id = try Hid.find hremove id with Not_found ->
-    let r = try Mid.find id clone with Not_found -> Sid.empty in
-    let s = Sid.fold (add_remove drv) r (Sid.mem id drv.drv_remove) in
-    Hid.replace hremove id s; s
-  in
-  let query_syntax id =
-    try Some (Mid.find id drv.drv_syntax) with Not_found -> None
-  in
-  Hsdq.hashcons {
-    query_syntax = query_syntax;
-    query_remove = query_remove;
-    query_tags   = query_tags;
-    query_driver = drv;
-    query_lclone = last_clone task;
-    query_tag    = -1 }
-
-let query_syntax dq = dq.query_syntax
-let query_remove dq = dq.query_remove
-let query_tags   dq = dq.query_tags
-let query_driver dq = dq.query_driver
-let query_env    dq = dq.query_driver.drv_env
-let query_clone  dq = old_task_clone (dq.query_lclone)
-let query_tag    dq = dq.query_tag
 
 (** apply drivers *)
 
-let get_transform drv = drv.drv_transform
-let get_printer drv = drv.drv_printer
-let get_env drv = drv.drv_env
-
-let print_prelude_list fmt prel =
-  let pr_pr s () = fprintf fmt "%s@\n" s in
-  List.fold_right pr_pr prel ()
-
-let print_prelude drv task fmt =
-  print_prelude_list fmt drv.drv_prelude;
-  let th_used = task_fold (fun acc -> function
-    | { td_node = Clone (th,cl) } when Mid.is_empty cl -> th::acc
-    | _ -> acc) [] task 
-  in
-  List.iter (fun th ->
-    let prel = try Mid.find th.th_name drv.drv_thprelude
-    with Not_found -> [] in print_prelude_list fmt prel) th_used;
-  fprintf fmt "@."
-
-let print_full_prelude dq = print_prelude dq.query_driver
-
-let print_global_prelude dq fmt =
-  print_prelude_list fmt dq.query_driver.drv_prelude
-
-let print_theory_prelude dq th_name fmt =
-  let prel =
-    try Mid.find th_name dq.query_driver.drv_thprelude
-    with Not_found -> []
-  in
-  print_prelude_list fmt prel
+exception UnknownSpec of string
 
 let filename_regexp = Str.regexp "%\\(.\\)"
 
@@ -397,7 +190,7 @@ let get_filename drv input_file theory_name goal_name =
     | "f" -> input_file
     | "t" -> theory_name
     | "g" -> goal_name
-    | _ -> errorm "unknown format specifier, use %%f, %%t or %%g"
+    | s   -> raise (UnknownSpec s)
   in
   Str.global_substitute filename_regexp replace file
 
@@ -411,8 +204,74 @@ let call_on_buffer ?debug ~command ?timelimit ?memlimit drv buffer =
   Call_provers.call_on_buffer
     ?debug ~command ?timelimit ?memlimit ~regexps ~exitcodes ~filename buffer
 
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. test"
-End:
-*)
+(** print'n'prove *)
+
+exception NoPrinter
+exception TransFailure of (string * exn)
+
+let print_task ?(debug=false) drv fmt task =
+  let p = match drv.drv_printer with
+    | None -> raise NoPrinter
+    | Some p -> p
+  in
+  let printer =
+    lookup_printer p drv.drv_prelude drv.drv_thprelude drv.drv_syntax
+  in
+  let lookup_transform t = t, lookup_transform t drv.drv_env in
+  let transl = List.map lookup_transform drv.drv_transform in
+  let task =
+    Mid.fold (fun _ (th,s) task ->
+      let cs = (find_clone task th).tds_set in
+      Stdecl.fold (fun td task -> match td.td_node with
+        | Clone (_,cl) when Mid.is_empty cl ->
+            Stdecl.fold (fun td task -> add_tdecl task td) s task
+        | _ -> assert false (* impossible *)
+      ) cs task
+    ) drv.drv_meta task
+  in
+  let task =
+    Mid.fold (fun _ (th,s) task ->
+      let cs = (find_clone task th).tds_set in
+      Stdecl.fold (fun tdc task ->
+        Stdecl.fold (fun tdm task ->
+          add_tdecl task (clone_meta tdm th tdc)
+        ) s task
+      ) cs task
+    ) drv.drv_meta_cl task
+  in
+  let apply task (t, tr) =
+    try Trans.apply tr task
+    with e when not debug -> raise (TransFailure (t,e))
+  in
+  fprintf fmt "@[%a@]@?" printer (List.fold_left apply task transl)
+
+let prove_task ?debug ~command ?timelimit ?memlimit drv task =
+  let buf = Buffer.create 1024 in
+  let fmt = formatter_of_buffer buf in
+  print_task ?debug drv fmt task; pp_print_flush fmt ();
+  call_on_buffer ?debug ~command ?timelimit ?memlimit drv buf
+
+(* exception report *)
+
+let string_of_qualid thl idl =
+  String.concat "." thl ^ "." ^ String.concat "." idl
+
+let () = Exn_printer.register (fun fmt exn -> match exn with
+  | NoPrinter -> Format.fprintf fmt
+      "No printer specified in the driver file"
+  | NoPlugins -> Format.fprintf fmt
+      "Plugins are not supported, recomplie Why"
+  | Duplicate s -> Format.fprintf fmt
+      "Duplicate %s specification" s
+  | TransFailure (s,e) -> Format.fprintf fmt
+      "Failure in transformation %s@\n%a" s Exn_printer.exn_printer e
+  | UnknownType (thl,idl) -> Format.fprintf fmt
+      "Unknown type symbol %s" (string_of_qualid thl idl)
+  | UnknownLogic (thl,idl) -> Format.fprintf fmt
+      "Unknown logical symbol %s" (string_of_qualid thl idl)
+  | UnknownProp (thl,idl) -> Format.fprintf fmt
+      "Unknown proposition %s" (string_of_qualid thl idl)
+  | UnknownSpec s -> Format.fprintf fmt
+      "Unknown format specifier '%%%s', use %%f, %%t or %%g" s
+  | e -> raise e)
+

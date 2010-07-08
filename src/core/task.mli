@@ -93,12 +93,11 @@ val task_decls  : task -> decl list
 
 val task_goal  : task -> prsymbol
 
-(* TO BE REMOVED *)
+(* special selector for metaproperties of a single ident *)
 
-val old_task_clone : task -> Sid.t Mid.t
-val old_task_use   : task -> theory Mid.t
-val last_clone     : task -> task
-val last_use       : task -> task
+exception NotTaggingMeta of string
+
+val find_meta_ids : string -> tdecl_set -> Sid.t -> Sid.t
 
 (* exceptions *)
 
