@@ -112,13 +112,10 @@ let conv_res_app tenv tvar p tl ty =
 let conv_vs tenv tvar (vsvar,acc) vs =
   let tres,vsres =
     let ty_res = conv_ty_pos tenv vs.vs_ty in
-    if ty_equal ty_res vs.vs_ty then
-      t_var vs,vs
-    else 
-      let tty = term_of_ty tenv tvar vs.vs_ty in
-      let vsres = (create_vsymbol (id_clone vs.vs_name) ty_res) in
-      let t = t_var vsres in 
-      t_app tenv.sort [tty;t] tenv.unsorted, vsres in
+    let tty = term_of_ty tenv tvar vs.vs_ty in
+    let vsres = (create_vsymbol (id_clone vs.vs_name) ty_res) in
+    let t = t_var vsres in 
+    t_app tenv.sort [tty;t] tenv.unsorted, vsres in
   (Mvs.add vs tres vsvar,vsres::acc)
 
 let conv_vs_let tenv vsvar vs =
@@ -138,8 +135,10 @@ let rec rewrite_term tenv tvar vsvar t =
   let fnT = rewrite_term tenv tvar in
   let fnF = rewrite_fmla tenv tvar vsvar in
   match t.t_node with
-    | Tconst ConstInt _ -> t
-    | Tconst ConstReal _ -> t_app tenv.real_to_int [t] tenv.unsorted
+    | Tconst ConstInt _ -> sort_app tenv tvar t t.t_ty
+    | Tconst ConstReal _ -> 
+      let t2 = t_app tenv.real_to_int [t] tenv.unsorted in
+      sort_app tenv tvar t2 t.t_ty
     | Tvar x -> Mvs.find x vsvar
     | Tapp(p,tl) ->
         let tl = List.map (fnT vsvar) tl in
