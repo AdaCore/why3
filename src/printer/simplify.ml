@@ -27,7 +27,7 @@ open Task
 open Printer
 
 let ident_printer = 
-  let bls = [] in
+  let bls = ["select";"store"] in
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
 

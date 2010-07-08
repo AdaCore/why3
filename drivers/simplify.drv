@@ -13,7 +13,7 @@ transformation "simplify_recursive_definition"
 transformation "inline_trivial"
 
 transformation "eliminate_builtin"
-transformation "eliminate_definition"
+transformation "eliminate_definition"(*_func"*)
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic"
 transformation "eliminate_if"
@@ -21,12 +21,13 @@ transformation "eliminate_let"
 transformation "simplify_formula"
 transformation "simplify_trivial_quantification"
 
-transformation "filter_trigger_no_predicate"
+transformation "remove_triggers"
+(*transformation "filter_trigger_no_predicate"*)
 (* predicate are *currently* translated to P(\x) = true, thus in a
 trigger they can't appear since = can't appear *)
 (*transformation "filter_trigger_builtin"*)
 
-transformation "encoding_decorate_mono"
+(*transformation "encoding_decorate_mono"*)
 
 theory BuiltIn
   syntax type int "Int"

@@ -35,6 +35,18 @@ let make_rt_rf keep =
   rt,rf
 
 
+
+let keep_no_trigger _ = false
+
+  
+let remove_triggers = 
+    let rt,rf = make_rt_rf keep_no_trigger in
+    Trans.rewrite rt rf None
+
+let () = Trans.register_transform "remove_triggers"
+  (fun _ -> remove_triggers)
+
+
 let keep_no_predicate = function
         | Term _ -> true
         | _ -> false
