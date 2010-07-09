@@ -189,6 +189,8 @@ decl:
     { Dlogic $1 }
 | LET lident list1_type_v_binder opt_cast EQUAL triple
     { Dlet ($2, mk_expr_i 3 (Efun ($3, cast_body $4 $6))) }
+| LET lident EQUAL FUN list1_type_v_binder ARROW triple
+    { Dlet ($2, mk_expr_i 3 (Efun ($5, $7))) }
 | LET REC list1_recfun_sep_and 
     { Dletrec $3 }
 | PARAMETER lident COLON type_v
