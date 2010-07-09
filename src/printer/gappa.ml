@@ -405,13 +405,10 @@ type info = {
   info_rem : Sid.t;
 }
 
-let query_syntax info id =
-  try Some (Mid.find id info.info_syn) with Not_found -> None
-
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar id -> 
       print_tvsymbols fmt id
-  | Tyapp (ts, tl) -> begin match query_syntax info ts.ts_name with
+  | Tyapp (ts, tl) -> begin match query_syntax info.info_sym ts.ts_name with
       | Some s -> syntax_arguments s (print_type info) fmt tl
       | None -> fprintf fmt "%a%a" (print_tyapp info) tl print_ident ts.ts_name
     end
@@ -428,7 +425,7 @@ let rec print_term info fmt t = match t.t_node with
       Pretty.print_const fmt c
   | Tvar { vs_name = id } ->
       print_ident fmt id
-  | Tapp (ls, tl) -> begin match query_syntax info ls.ls_name with
+  | Tapp (ls, tl) -> begin match query_syntax info.info_sym ls.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | None -> fprintf fmt "%a%a" print_ident ls.ls_name (print_tapp info) tl
     end
@@ -448,7 +445,7 @@ and print_tapp info fmt = function
 let rec print_fmla info fmt f = match f.f_node with
   | Fapp ({ ls_name = id }, []) ->
       print_ident fmt id
-  | Fapp (ls, tl) -> begin match query_syntax info ls.ls_name with
+  | Fapp (ls, tl) -> begin match query_syntax info.info_sym ls.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | None -> fprintf fmt "%a(%a)" print_ident ls.ls_name 
                     (print_list comma (print_term info)) tl

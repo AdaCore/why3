@@ -136,6 +136,6 @@ let trivial = t
                     | _ -> true)
 
 let () =
-  Trans.register_transform "inline_all" (fun _ -> all);
-  Trans.register_transform "inline_trivial" (fun _ -> trivial)
+  Trans.register_transform "inline_all" all;
+  Trans.register_transform "inline_trivial" trivial
 

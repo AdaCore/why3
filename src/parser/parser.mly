@@ -62,7 +62,7 @@
 %token AND AS AXIOM CLONE
 %token ELSE END EPSILON EXISTS EXPORT FALSE FORALL
 %token GOAL IF IMPORT IN INDUCTIVE LEMMA
-%token LET LOGIC MATCH NAMESPACE NOT PROP OR
+%token LET LOGIC MATCH META NAMESPACE NOT PROP OR
 %token THEN THEORY TRUE TYPE USE WITH
 
 /* symbols */
@@ -157,6 +157,8 @@ decl:
     { Namespace (loc (), true, Some $3, $4) }
 | NAMESPACE IMPORT UNDERSCORE list0_decl END
     { Namespace (loc (), true, None, $4) }
+| META ident list1_meta_arg_sep_comma
+    { Meta (loc (), $2, $3) }
 ;
 
 /* Use and clone */
@@ -191,6 +193,21 @@ subst:
 | LOGIC qualid EQUAL qualid { CSlsym ($2, $4) }
 | LEMMA qualid              { CSlemma $2 }
 | GOAL  qualid              { CSgoal  $2 }
+;
+
+/* Meta args */
+
+list1_meta_arg_sep_comma:
+| meta_arg                                { [$1] }
+| meta_arg COMMA list1_meta_arg_sep_comma { $1 :: $3 }
+;
+
+meta_arg:
+| TYPE  qualid { PMAts  $2 }
+| LOGIC qualid { PMAls  $2 }
+| PROP  qualid { PMApr  $2 }
+| STRING       { PMAstr $1 }
+| INTEGER      { PMAint $1 }
 ;
 
 /* Type declarations */

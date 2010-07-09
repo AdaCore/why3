@@ -242,6 +242,5 @@ let eliminate_compiled_algebraic = Trans.fold_map comp empty_state None
 let eliminate_algebraic =
   Trans.compose compile_match eliminate_compiled_algebraic
 
-let () = Trans.register_transform "eliminate_algebraic"
-  (fun _ -> eliminate_algebraic)
+let () = Trans.register_transform "eliminate_algebraic" eliminate_algebraic
 

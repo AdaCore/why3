@@ -154,9 +154,17 @@ let transforms_l : (string, env -> task tlist) Hashtbl.t = Hashtbl.create 17
 
 let register_transform s p =
   if Hashtbl.mem transforms s then raise (KnownTrans s);
-  Hashtbl.replace transforms s (Wenv.memoize 3 p)
+  Hashtbl.replace transforms s (fun _ -> p)
 
 let register_transform_l s p =
+  if Hashtbl.mem transforms_l s then raise (KnownTrans s);
+  Hashtbl.replace transforms_l s (fun _ -> p)
+
+let register_env_transform s p =
+  if Hashtbl.mem transforms s then raise (KnownTrans s);
+  Hashtbl.replace transforms s (Wenv.memoize 3 p)
+
+let register_env_transform_l s p =
   if Hashtbl.mem transforms_l s then raise (KnownTrans s);
   Hashtbl.replace transforms_l s (Wenv.memoize 3 p)
 

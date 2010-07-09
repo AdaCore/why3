@@ -356,6 +356,5 @@ let explicit_polymorphism =
   Trans.decl
       (decl_transform (Hashtbl.create 21) (Hashtbl.create 42)) prelude_task
 
-let () = Trans.register_transform
-  "explicit_polymorphism" (fun _ -> explicit_polymorphism)
+let () = Trans.register_transform "explicit_polymorphism" explicit_polymorphism
 

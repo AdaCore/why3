@@ -46,10 +46,9 @@ let eliminate_builtin =
       Printer.meta_remove_logic;
       Printer.meta_remove_prop ]
     (fun mm ->
-      Trans.decl (elim (Mstr.fold Task.find_meta_ids mm Sid.empty)) None)
+      Trans.decl (elim (Mstr.fold Task.find_tagged mm Sid.empty)) None)
 
-let () = Trans.register_transform "eliminate_builtin"
-  (fun _ -> eliminate_builtin)
+let () = Trans.register_transform "eliminate_builtin" eliminate_builtin
 
 (** Eliminate definitions of functions and predicates *)
 
@@ -109,12 +108,12 @@ let eliminate_mutual_recursion = Trans.decl (elim true true true) None
 
 let () =
   Trans.register_transform "eliminate_definition_func"
-    (fun _ -> eliminate_definition_func);
+    eliminate_definition_func;
   Trans.register_transform "eliminate_definition_pred"
-    (fun _ -> eliminate_definition_pred);
+    eliminate_definition_pred;
   Trans.register_transform "eliminate_definition"
-    (fun _ -> eliminate_definition);
+    eliminate_definition;
   Trans.register_transform "eliminate_mutual_recursion"
-    (fun _ -> eliminate_mutual_recursion)
+    eliminate_mutual_recursion
 
 

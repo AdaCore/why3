@@ -79,14 +79,11 @@ type info = {
   info_rem : Sid.t;
 }
 
-let query_syntax info id =
-  try Some (Mid.find id info.info_syn) with Not_found -> None
-
 (** Types *)
 
 let rec print_ty info fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
-  | Tyapp (ts, tl) -> begin match query_syntax info ts.ts_name with
+  | Tyapp (ts, tl) -> begin match query_syntax info.info_syn ts.ts_name with
       | Some s -> syntax_arguments s (print_ty info) fmt tl
       | None -> begin match tl with
           | []  -> print_ts fmt ts
@@ -123,7 +120,7 @@ let rec print_pat info fmt p = match p.pat_node with
   | Pwild -> fprintf fmt "_"
   | Pvar v -> print_vs fmt v
   | Pas (p,v) -> fprintf fmt "%a as %a" (print_pat info) p print_vs v
-  | Papp (cs,pl) -> begin match query_syntax info cs.ls_name with
+  | Papp (cs,pl) -> begin match query_syntax info.info_syn cs.ls_name with
       | Some s -> syntax_arguments s (print_pat info) fmt pl
       | _ -> fprintf fmt "%a%a"
           print_ls cs (print_paren_r (print_pat info)) pl
@@ -190,7 +187,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
         (print_vsty info) v (print_opl_fmla info) f;
       forget_var v
   | Tapp (fs, tl) ->
-    begin match query_syntax info fs.ls_name with
+    begin match query_syntax info.info_syn fs.ls_name with
       | Some s ->
           syntax_arguments s (print_term info) fmt tl
       | _ -> if unambig_fs fs
@@ -229,7 +226,7 @@ and print_fnode opl opr info fmt f = match f.f_node with
       fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
         (print_fmla info) f1 (print_fmla info) f2 (print_opl_fmla info) f3
   | Fapp (ps, tl) ->
-    begin match query_syntax info ps.ls_name with
+    begin match query_syntax info.info_syn ps.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | _ -> fprintf fmt "(%a %a)" print_ls ps
           (print_space_list (print_term info)) tl

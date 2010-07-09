@@ -97,7 +97,7 @@ val task_goal  : task -> prsymbol
 
 exception NotTaggingMeta of string
 
-val find_meta_ids : string -> tdecl_set -> Sid.t -> Sid.t
+val find_tagged : string -> tdecl_set -> Sid.t -> Sid.t
 
 (* exceptions *)
 

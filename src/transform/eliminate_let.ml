@@ -52,7 +52,7 @@ let eliminate_let = Trans.rewrite
   (elim_t true true Mvs.empty) (elim_f true true Mvs.empty) None
 
 let () =
-  Trans.register_transform "eliminate_let_term" (fun _ -> eliminate_let_term);
-  Trans.register_transform "eliminate_let_fmla" (fun _ -> eliminate_let_fmla);
-  Trans.register_transform "eliminate_let" (fun _ -> eliminate_let)
+  Trans.register_transform "eliminate_let_term" eliminate_let_term;
+  Trans.register_transform "eliminate_let_fmla" eliminate_let_fmla;
+  Trans.register_transform "eliminate_let" eliminate_let
 

@@ -108,7 +108,7 @@ let eliminate_if_fmla = Trans.rewrite elim_t (elim_f true) None
 let eliminate_if = Trans.compose eliminate_if_term eliminate_if_fmla
 
 let () =
-  Trans.register_transform "eliminate_if_term" (fun _ -> eliminate_if_term);
-  Trans.register_transform "eliminate_if_fmla" (fun _ -> eliminate_if_fmla);
-  Trans.register_transform "eliminate_if" (fun _ -> eliminate_if)
+  Trans.register_transform "eliminate_if_term" eliminate_if_term;
+  Trans.register_transform "eliminate_if_fmla" eliminate_if_fmla;
+  Trans.register_transform "eliminate_if" eliminate_if
 

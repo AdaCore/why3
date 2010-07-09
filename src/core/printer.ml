@@ -108,7 +108,8 @@ let syntax_arguments s print fmt l =
 
 (** {2 use printers} *)
 
-let print_prelude = print_list newline pp_print_string
+let print_prelude fmt pl =
+  fprintf fmt "%a@\n" (print_list newline pp_print_string) pl
 
 let print_th_prelude task fmt pm =
   let th_used = task_fold (fun acc -> function
@@ -131,6 +132,9 @@ let add_ls_syntax ls s sm =
   check_syntax s (List.length ls.ls_args);
   if Mid.mem ls.ls_name sm then raise (KnownLogicSyntax ls);
   Mid.add ls.ls_name s sm
+
+let query_syntax sm id =
+  try Some (Mid.find id sm) with Not_found -> None
 
 let meta_remove_type = "remove_type"
 let meta_remove_logic = "remove_logic"

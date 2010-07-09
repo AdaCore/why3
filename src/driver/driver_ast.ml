@@ -23,14 +23,19 @@ type qualid = loc * string list
 
 type cloned = bool
 
+type metarg =
+  | PMAts  of qualid
+  | PMAls  of qualid
+  | PMApr  of qualid
+  | PMAstr of string
+  | PMAint of int
+
 type th_rule =
   | Rprelude  of string
   | Rsyntaxts of qualid * string
   | Rsyntaxls of qualid * string
   | Rremovepr of cloned * qualid
-  | Rtagts    of cloned * qualid * string
-  | Rtagls    of cloned * qualid * string
-  | Rtagpr    of cloned * qualid * string
+  | Rmeta     of cloned * string * metarg list
 
 type theory_rules = {
   thr_name  : qualid;

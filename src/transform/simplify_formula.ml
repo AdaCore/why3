@@ -39,10 +39,10 @@ let simplify_formula = Trans.rewrite (fun t -> t) fmla_simpl None
 let simplify_formula_and_task = Trans.decl_l decl_l None
 
 let () = Trans.register_transform 
-  "simplify_formula" (fun _ -> simplify_formula)
+  "simplify_formula" simplify_formula
 
 let () = Trans.register_transform_l 
-  "simplify_formula_and_task" (fun _ -> simplify_formula_and_task)
+  "simplify_formula_and_task" simplify_formula_and_task
 
 (** remove_trivial_quantification
     Original version in the alt-ergo prover by Sylvain Conchon *)
@@ -141,7 +141,7 @@ let simplify_trivial_quantification =
   Trans.rewrite (fun t -> t) fmla_remove_quant None
 
 let () = Trans.register_transform 
-  "simplify_trivial_quantification" (fun _ -> simplify_trivial_quantification)
+  "simplify_trivial_quantification" simplify_trivial_quantification
 
 let on_goal fn_prop =
   let rec fn task = match task with
@@ -162,4 +162,4 @@ let simplify_trivial_quantification_in_goal =
 
 let () = Trans.register_transform 
   "simplify_trivial_quantification_in_goal" 
-   (fun _ -> simplify_trivial_quantification_in_goal)
+  simplify_trivial_quantification_in_goal

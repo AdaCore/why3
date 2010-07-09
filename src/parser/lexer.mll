@@ -70,6 +70,7 @@
 	"let", LET;
 	"logic", LOGIC;
 	"match", MATCH;
+	"meta", META;
 	"namespace", NAMESPACE;
 	"not", NOT;
 	"or", OR;

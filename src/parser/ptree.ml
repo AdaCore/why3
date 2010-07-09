@@ -29,10 +29,10 @@ type constant = Term.constant
 type pp_quant =
   | PPforall | PPexists
 
-type pp_binop = 
-  | PPand | PPor | PPimplies | PPiff 
+type pp_binop =
+  | PPand | PPor | PPimplies | PPiff
 
-type pp_unop = 
+type pp_unop =
   | PPnot
 
 type ident = { id : string; id_loc : loc }
@@ -58,7 +58,7 @@ and pat_desc =
   | PPptuple of pattern list
   | PPpas of pattern * ident
 
-type lexpr = 
+type lexpr =
   { pp_loc : loc; pp_desc : pp_desc }
 
 and pp_desc =
@@ -99,8 +99,8 @@ type clone_subst =
   | CSlsym  of qualid * qualid
   | CSlemma of qualid
   | CSgoal  of qualid
-      
-type type_def = 
+
+type type_def =
   | TDabstract
   | TDalias     of pty
   | TDalgebraic of (loc * ident * param list) list
@@ -112,7 +112,7 @@ type type_decl = {
   td_def    : type_def;
 }
 
-type logic_decl = { 
+type logic_decl = {
   ld_loc    : loc;
   ld_ident  : ident;
   ld_params : param list;
@@ -130,13 +130,21 @@ type ind_decl = {
 type prop_kind =
   | Kaxiom | Klemma | Kgoal
 
-type decl = 
+type metarg =
+  | PMAts  of qualid
+  | PMAls  of qualid
+  | PMApr  of qualid
+  | PMAstr of string
+  | PMAint of string
+
+type decl =
   | TypeDecl of type_decl list
   | LogicDecl of logic_decl list
   | IndDecl of ind_decl list
   | PropDecl of loc * prop_kind * ident * lexpr
   | UseClone of loc * use * clone_subst list option
   | Namespace of loc * bool * ident option * decl list
+  | Meta of loc * ident * metarg list
 
 type theory = {
   pt_loc  : loc;

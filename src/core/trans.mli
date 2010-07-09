@@ -77,8 +77,11 @@ val on_theories_metas : theory list -> string list ->
 exception UnknownTrans of string
 exception KnownTrans of string
 
-val register_transform   : string -> (Env.env -> task trans) -> unit
-val register_transform_l : string -> (Env.env -> task tlist) -> unit
+val register_env_transform   : string -> (Env.env -> task trans) -> unit
+val register_env_transform_l : string -> (Env.env -> task tlist) -> unit
+
+val register_transform   : string -> task trans -> unit
+val register_transform_l : string -> task tlist -> unit
 
 val lookup_transform   : string -> Env.env -> task trans
 val lookup_transform_l : string -> Env.env -> task tlist

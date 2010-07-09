@@ -272,9 +272,9 @@ let decl tenv d =
 let t env = Trans.on_meta Printer.meta_remove_logic
   (fun tds ->
      let rem_ls = 
-       Task.find_meta_ids Printer.meta_remove_logic tds Sid.empty
+       Task.find_tagged Printer.meta_remove_logic tds Sid.empty
      in
      let init_task,tenv = load_prelude rem_ls env in
      Trans.tdecl (decl tenv) init_task)
 
-let () = Trans.register_transform "encoding_decorate_mono" t
+let () = Trans.register_env_transform "encoding_decorate_mono" t

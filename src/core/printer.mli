@@ -59,6 +59,8 @@ val get_remove_set : task -> Sid.t
 val add_ts_syntax : tysymbol -> string -> syntax_map -> syntax_map
 val add_ls_syntax : lsymbol  -> string -> syntax_map -> syntax_map
 
+val query_syntax : syntax_map -> ident -> string option
+
 val syntax_arguments : string -> 'a pp -> 'a list pp
 (** (syntax_arguments templ print_arg fmt l) prints in the formatter fmt
      the list l using the template templ and the printer print_arg *)

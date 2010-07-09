@@ -24,10 +24,10 @@ transformation "encoding_decorate"
 (* transformation "encoding_decorate_every_simple" *)
 
 theory BuiltIn
-  syntax type int "Int"
-  syntax type real "Real"
-  syntax logic (_=_) "(= %1 %2)"
-  syntax logic (_<>_) "(not (= %1 %2))"
+  syntax type int   "Int"
+  syntax type real  "Real"
+  syntax logic (=)  "(= %1 %2)"
+  syntax logic (<>) "(not (= %1 %2))"
 end
 
 
@@ -37,15 +37,15 @@ theory int.Int
 
   syntax logic zero "0"
 
-  syntax logic (_+_) "(+ %1 %2)"
-  syntax logic (_-_) "(- %1 %2)"
-  syntax logic (_*_) "(* %1 %2)"
-  syntax logic (-_)  "(- %1)"
+  syntax logic (+)  "(+ %1 %2)"
+  syntax logic (-)  "(- %1 %2)"
+  syntax logic (*)  "(* %1 %2)"
+  syntax logic (-_) "(- %1)"
 
-  syntax logic (_<=_) "(<= %1 %2)"
-  syntax logic (_< _) "(< %1 %2)"
-  syntax logic (_>=_) "(>= %1 %2)"
-  syntax logic (_> _) "(> %1 %2)"
+  syntax logic (<=) "(<= %1 %2)"
+  syntax logic (<)  "(< %1 %2)"
+  syntax logic (>=) "(>= %1 %2)"
+  syntax logic (>)  "(> %1 %2)"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -69,17 +69,17 @@ theory real.Real
 
   syntax logic zero "0"
 
-  syntax logic (_+_) "(+ %1 %2)"
-  syntax logic (_-_) "(- %1 %2)"
-  syntax logic (_*_) "(* %1 %2)"
-  syntax logic (_/_) "(/ %1 %2)"
-  syntax logic (-_)  "(- %1)"
+  syntax logic (+)  "(+ %1 %2)"
+  syntax logic (-)  "(- %1 %2)"
+  syntax logic (*)  "(* %1 %2)"
+  syntax logic (/)  "(/ %1 %2)"
+  syntax logic (-_) "(- %1)"
   syntax logic inv  "(/ 1.0 %1)"
 
-  syntax logic (_<=_) "(<= %1 %2)"
-  syntax logic (_< _) "(< %1 %2)"
-  syntax logic (_>=_) "(>= %1 %2)"
-  syntax logic (_> _) "(> %1 %2)"
+  syntax logic (<=) "(<= %1 %2)"
+  syntax logic (<)  "(< %1 %2)"
+  syntax logic (>=) "(>= %1 %2)"
+  syntax logic (>)  "(> %1 %2)"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -100,14 +100,14 @@ end
 (*
 (* L'encodage des types sommes bloquent cette théorie builtin *)
 theory bool.Bool
-   syntax type bool "bool"
-   tag cloned type bool "encoding_decorate : kept"
-   syntax logic True "true"
+   syntax type bool   "bool"
+   syntax logic True  "true"
    syntax logic False "false"
-   syntax logic andb "(and %1 %2)"
-   syntax logic orb "(or %1 %2)"
-   syntax logic xorb "(xor %1 %2)"
-   syntax logic notb "(not %1)" 
+   syntax logic andb  "(and %1 %2)"
+   syntax logic orb   "(or %1 %2)"
+   syntax logic xorb  "(xor %1 %2)"
+   syntax logic notb  "(not %1)" 
+   meta cloned "encoding_decorate : kept" type bool
 end
 *)
 
@@ -122,7 +122,7 @@ theory int.EuclideanDivision
 end
 
 theory transform.encoding_decorate.Kept
-  tag cloned type t "encoding_decorate : kept"
+  meta cloned "encoding_decorate : kept" type t
 end
 
 (*

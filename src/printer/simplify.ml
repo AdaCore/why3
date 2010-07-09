@@ -58,9 +58,6 @@ type info = {
   info_rem : Sid.t;
 }
 
-let query_syntax info id =
-  try Some (Mid.find id info.info_syn) with Not_found -> None
-
 let rec print_term info fmt t = match t.t_node with
   | Tbvar _ -> 
       assert false
@@ -76,7 +73,7 @@ let rec print_term info fmt t = match t.t_node with
       fprintf fmt "real_constant_%a" print_real c 
   | Tvar v -> 
       print_var fmt v
-  | Tapp (ls, tl) -> begin match query_syntax info ls.ls_name with
+  | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> 
 	  syntax_arguments s (print_term info) fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
@@ -96,7 +93,7 @@ let rec print_term info fmt t = match t.t_node with
 and print_fmla info fmt f = match f.f_node with
   | Fapp ({ ls_name = id }, []) ->
       print_ident fmt id
-  | Fapp (ls, tl) -> begin match query_syntax info ls.ls_name with
+  | Fapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> 
 	  syntax_arguments s (print_term info) fmt tl
       | None -> 

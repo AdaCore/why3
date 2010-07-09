@@ -30,10 +30,11 @@
 %token <string> IDENT
 %token <string> STRING
 %token <string> OPERATOR
-%token THEORY END SYNTAX REMOVE TAG PRELUDE PRINTER
+%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER
 %token VALID INVALID TIMEOUT UNKNOWN FAIL
 %token UNDERSCORE LEFTPAR RIGHTPAR CLONED DOT EOF
 %token LOGIC TYPE PROP FILENAME TRANSFORM PLUGIN
+%token LEFTPAR_STAR_RIGHTPAR COMMA
 
 %type <Driver_ast.file> file
 %start file
@@ -74,7 +75,7 @@ list0_theory:
 ;
 
 theory:
-| THEORY qualid list0_trule END
+| THEORY tqualid list0_trule END
     { { thr_name = $2; thr_rules = $3 } }
 ;
 
@@ -88,9 +89,21 @@ trule:
 | SYNTAX TYPE qualid STRING           { Rsyntaxts ($3, $4) }
 | SYNTAX LOGIC qualid STRING          { Rsyntaxls ($3, $4) }
 | REMOVE cloned PROP qualid           { Rremovepr ($2, $4) }
-| TAG cloned TYPE qualid STRING       { Rtagts    ($2, $4, $5) }
-| TAG cloned LOGIC qualid STRING      { Rtagls    ($2, $4, $5) }
-| TAG cloned PROP qualid STRING       { Rtagpr    ($2, $4, $5) }
+| META cloned ident meta_args         { Rmeta     ($2, $3, $4) }
+| META cloned STRING meta_args        { Rmeta     ($2, $3, $4) }
+;
+
+meta_args:
+| meta_arg                 { [$1] }
+| meta_arg COMMA meta_args { $1 :: $3 }
+;
+
+meta_arg:
+| TYPE  qualid { PMAts  $2 }
+| LOGIC qualid { PMAls  $2 }
+| PROP  qualid { PMApr  $2 }
+| STRING       { PMAstr $1 }
+| INTEGER      { PMAint $1 }
 ;
 
 cloned:
@@ -98,25 +111,39 @@ cloned:
 | CLONED        { true  }
 ;
 
+tqualid:
+| ident             { loc (), [$1] }
+| ident DOT tqualid { loc (), ($1 :: snd $3) }
+;
+
 qualid:
-| ident            { loc (), [$1] }
-| ident DOT qualid { loc (), ($1 :: snd $3) }
+| ident_rich        { loc (), [$1] }
+| ident DOT qualid  { loc (), ($1 :: snd $3) }
 ;
 
 ident:
-| IDENT
-    { $1 }
-| STRING
-    { $1 }
-| LEFTPAR UNDERSCORE OPERATOR UNDERSCORE RIGHTPAR
-    { infix $3 }
-| LEFTPAR OPERATOR UNDERSCORE RIGHTPAR
-    { prefix $2 }
+| IDENT     { $1 }
+| SYNTAX    { "syntax" }
+| REMOVE    { "remove" }
 /*
-| LEFTPAR UNDERSCORE lident_op RIGHTPAR
-    { { id = postfix $3; id_loc = loc () } }
+| CLONED    { "cloned" }
 */
-| PRELUDE
-    { "prelude" }
+| PRELUDE   { "prelude" }
+| PRINTER   { "printer" }
+| VALID     { "valid" }
+| INVALID   { "invalid" }
+| TIMEOUT   { "timeout" }
+| UNKNOWN   { "unknown" }
+| FAIL      { "fail" }
+| FILENAME  { "filename" }
+| TRANSFORM { "transformation" }
+| PLUGIN    { "plugin" }
+;
+
+ident_rich:
+| ident                                 { $1 }
+| LEFTPAR_STAR_RIGHTPAR                 { infix "*" }
+| LEFTPAR OPERATOR RIGHTPAR             { infix  $2 }
+| LEFTPAR OPERATOR UNDERSCORE RIGHTPAR  { prefix $2 }
 ;
 

@@ -54,15 +54,12 @@ type info = {
   info_rem : Sid.t;
 }
 
-let query_syntax info id =
-  try Some (Mid.find id info.info_syn) with Not_found -> None
-
 let rec print_term info fmt t = match t.t_node with
   | Tbvar _ -> assert false
   | Tconst c -> fprintf fmt "'%a'"
       Pretty.print_const c
   | Tvar v -> print_var fmt v
-  | Tapp (ls, tl) -> begin match query_syntax info ls.ls_name with
+  | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | None -> begin match tl with (* toto() is not accepted *)
           | [] -> fprintf fmt "@[%a@]" print_symbol ls.ls_name
@@ -83,7 +80,7 @@ let rec print_term info fmt t = match t.t_node with
 and print_fmla info fmt f = match f.f_node with
   | Fapp ({ ls_name = id }, []) ->
       print_symbol fmt id
-  | Fapp (ls, tl) -> begin match query_syntax info ls.ls_name with
+  | Fapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | None -> fprintf fmt "@[%a(%a)@]"
 	      print_symbol ls.ls_name (print_list comma (print_term info)) tl

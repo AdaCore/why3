@@ -131,4 +131,5 @@ let elt d =
 
 let t = Trans.decl elt None
 
-let () = Trans.register_transform "simplify_recursive_definition" (fun _ -> t)
+let () = Trans.register_transform "simplify_recursive_definition" t
+

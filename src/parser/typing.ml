@@ -939,8 +939,20 @@ and add_decl env lenv th = function
       let th = open_namespace th in
       let th = add_decls env lenv th dl in
       let id = option_map (fun id -> id.id) name in
-      try close_namespace th import id
-      with ClashSymbol s -> error ~loc (Clash s)
+      begin try close_namespace th import id
+      with ClashSymbol s -> error ~loc (Clash s) end
+  | Meta (loc, id, al) ->
+      let s = id.id in
+      let convert = function
+        | PMAts q  -> MAts (find_tysymbol q th)
+        | PMAls q  -> MAls (find_lsymbol q th)
+        | PMApr q  -> MApr (find_prop q th)
+        | PMAstr s -> MAstr s
+        | PMAint i -> MAint (int_of_string i)
+      in
+      let al = List.map convert al in
+      begin try add_meta th s al
+      with e -> raise (Loc.Located (loc,e)) end
 
 and type_and_add_theory env lenv pt =
   let id = pt.pt_name in

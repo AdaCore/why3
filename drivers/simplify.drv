@@ -30,10 +30,10 @@ trigger they can't appear since = can't appear *)
 (*transformation "encoding_decorate_mono"*)
 
 theory BuiltIn
-  syntax type int "Int"
-  syntax type real "Real"
-  syntax logic (_=_) "(EQ %1 %2)"
-  syntax logic (_<>_) "(NEQ %1 %2)"
+  syntax type int   "Int"
+  syntax type real  "Real"
+  syntax logic (=)  "(EQ %1 %2)"
+  syntax logic (<>) "(NEQ %1 %2)"
 end
 
 theory int.Int
@@ -42,15 +42,15 @@ theory int.Int
 
   syntax logic zero "0"
 
-  syntax logic (_+_) "(+ %1 %2)"
-  syntax logic (_-_) "(- %1 %2)"
-  syntax logic (_*_) "(* %1 %2)"
-  syntax logic (-_)  "(- 0 %1)"
+  syntax logic (+)  "(+ %1 %2)"
+  syntax logic (-)  "(- %1 %2)"
+  syntax logic (*)  "(* %1 %2)"
+  syntax logic (-_) "(- 0 %1)"
 
-  syntax logic (_<=_) "(<= %1 %2)"
-  syntax logic (_< _) "(< %1 %2)"
-  syntax logic (_>=_) "(>= %1 %2)"
-  syntax logic (_> _) "(> %1 %2)"
+  syntax logic (<=) "(<= %1 %2)"
+  syntax logic (<)  "(< %1 %2)"
+  syntax logic (>=) "(>= %1 %2)"
+  syntax logic (>)  "(> %1 %2)"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -67,7 +67,7 @@ theory int.Int
 end
 
 theory transform.encoding_decorate.Kept
-  tag cloned type t "encoding_decorate : kept"
+  meta cloned "encoding_decorate : kept" type t
 end
 
 (*

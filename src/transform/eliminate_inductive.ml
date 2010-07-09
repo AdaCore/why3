@@ -60,6 +60,5 @@ let elim d = match d.d_node with
 
 let eliminate_inductive = Trans.decl elim None
 
-let () = Trans.register_transform "eliminate_inductive"
-                         (fun _ -> eliminate_inductive)
+let () = Trans.register_transform "eliminate_inductive" eliminate_inductive
 

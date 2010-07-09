@@ -136,14 +136,15 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     | Rremovepr (c,q) ->
         let td = remove_prop (find_pr th q) in
         add_meta th td (if c then meta_cl else meta)
-    | Rtagts (c,q,s) ->
-        let td = create_meta s [MAts (find_ts th q)] in
-        add_meta th td (if c then meta_cl else meta)
-    | Rtagls (c,q,s) ->
-        let td = create_meta s [MAls (find_ls th q)] in
-        add_meta th td (if c then meta_cl else meta)
-    | Rtagpr (c,q,s) ->
-        let td = create_meta s [MApr (find_pr th q)] in
+    | Rmeta (c,s,al) ->
+        let convert = function
+          | PMAts q  -> MAts (find_ts th q)
+          | PMAls q  -> MAls (find_ls th q)
+          | PMApr q  -> MApr (find_pr th q)
+          | PMAstr s -> MAstr s
+          | PMAint i -> MAint i
+        in
+        let td = create_meta s (List.map convert al) in
         add_meta th td (if c then meta_cl else meta)
   in
   let add_local th (loc,rule) =

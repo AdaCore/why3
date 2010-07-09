@@ -22,10 +22,10 @@ transformation "simplify_formula"
 transformation "simplify_trivial_quantification"
 
 theory BuiltIn
-  syntax type int "int"
-  syntax type real "real"
-  syntax logic (_=_) "(%1 = %2)"
-  syntax logic (_<>_) "(%1 <> %2)"
+  syntax type int   "int"
+  syntax type real  "real"
+  syntax logic (=)  "(%1 = %2)"
+  syntax logic (<>) "(%1 <> %2)"
 end
 
 theory int.Int
@@ -35,15 +35,15 @@ theory int.Int
   syntax logic zero "0"
   syntax logic one  "1"
 
-  syntax logic (_+_) "(%1 + %2)"
-  syntax logic (_-_) "(%1 - %2)"
-  syntax logic (_*_) "(%1 * %2)"
-  syntax logic (-_)  "(-%1)"
+  syntax logic (+)  "(%1 + %2)"
+  syntax logic (-)  "(%1 - %2)"
+  syntax logic (*)  "(%1 * %2)"
+  syntax logic (-_) "(-%1)"
 
-  syntax logic (_<=_) "(%1 <= %2)"
-  syntax logic (_<_) "(%1 <  %2)"
-  syntax logic (_>=_) "(%1 >= %2)"
-  syntax logic (_>_) "(%1 >  %2)"
+  syntax logic (<=) "(%1 <= %2)"
+  syntax logic (<)  "(%1 <  %2)"
+  syntax logic (>=) "(%1 >= %2)"
+  syntax logic (>)  "(%1 >  %2)"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -67,17 +67,17 @@ theory real.Real
   syntax logic zero "0.0"
   syntax logic one  "1.0"
 
-  syntax logic (_+_) "(%1 + %2)"
-  syntax logic (_-_) "(%1 - %2)"
-  syntax logic (_*_) "(%1 * %2)"
-  syntax logic (_/_) "(%1 / %2)"
-  syntax logic (-_)  "(-%1)"
-  syntax logic inv   "(1.0 / %1)"
+  syntax logic (+)  "(%1 + %2)"
+  syntax logic (-)  "(%1 - %2)"
+  syntax logic (*)  "(%1 * %2)"
+  syntax logic (/)  "(%1 / %2)"
+  syntax logic (-_) "(-%1)"
+  syntax logic inv  "(1.0 / %1)"
 
-  syntax logic (_<=_) "(%1 <= %2)"
-  syntax logic (_<_) "(%1 <  %2)"
-  syntax logic (_>=_) "(%1 >= %2)"
-  syntax logic (_>_) "(%1 >  %2)"
+  syntax logic (<=) "(%1 <= %2)"
+  syntax logic (<)  "(%1 <  %2)"
+  syntax logic (>=) "(%1 >= %2)"
+  syntax logic (>)  "(%1 >  %2)"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -94,8 +94,6 @@ theory real.Real
   remove prop Inverse
 
 end
-
-
 
 (*
 Local Variables: 

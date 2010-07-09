@@ -128,14 +128,14 @@ let split_pos_all = t is_split_all split_pos1
 let split_pos_neg_all = t is_split_all split_pos2
 
 let () = Trans.register_transform_l 
-  "split_goal_pos_goal" (fun _ -> split_pos_goal)
+  "split_goal_pos_goal" split_pos_goal
 let () = Trans.register_transform_l 
-  "split_goal_pos_neg_goal" (fun _ -> split_pos_neg_goal)
+  "split_goal_pos_neg_goal" split_pos_neg_goal
 let () = Trans.register_transform_l 
-  "split_goal_pos_axiom" (fun _ -> split_pos_axiom)
+  "split_goal_pos_axiom" split_pos_axiom
 let () = Trans.register_transform_l 
-  "split_goal_pos_neg_axiom" (fun _ -> split_pos_neg_axiom)
+  "split_goal_pos_neg_axiom" split_pos_neg_axiom
 let () = Trans.register_transform_l 
-  "split_goal_pos_all" (fun _ -> split_pos_all)
+  "split_goal_pos_all" split_pos_all
 let () = Trans.register_transform_l 
-  "split_goal_pos_neg_all" (fun _ -> split_pos_neg_all)
+  "split_goal_pos_neg_all" split_pos_neg_all

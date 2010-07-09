@@ -48,4 +48,4 @@ let make_rt_rf env =
   
 let t env = let rt,rf = make_rt_rf env in Trans.rewrite rt rf None
 
-let () = Trans.register_transform "simplify_array" t
+let () = Trans.register_env_transform "simplify_array" t

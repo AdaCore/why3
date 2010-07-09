@@ -87,16 +87,13 @@ type info = {
   info_rem : Sid.t;
 }
 
-let query_syntax info id =
-  try Some (Mid.find id info.info_syn) with Not_found -> None
-
 (** Types *)
 
 let rec ns_comma fmt () = fprintf fmt ",@,"
 
 let rec print_ty info fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
-  | Tyapp (ts, tl) -> begin match query_syntax info ts.ts_name with
+  | Tyapp (ts, tl) -> begin match query_syntax info.info_syn ts.ts_name with
       | Some s -> syntax_arguments s (print_ty info) fmt tl
       | None -> fprintf fmt "%a%a" (print_tyapp info) tl print_ts ts
     end
@@ -130,7 +127,7 @@ let rec print_pat info fmt p = match p.pat_node with
   | Pwild -> fprintf fmt "_"
   | Pvar v -> print_vs fmt v
   | Pas (p,v) -> fprintf fmt "%a as %a" (print_pat info) p print_vs v
-  | Papp (cs,pl) -> begin match query_syntax info cs.ls_name with
+  | Papp (cs,pl) -> begin match query_syntax info.info_syn cs.ls_name with
       | Some s -> syntax_arguments s (print_pat info) fmt pl
       | None -> fprintf fmt "%a%a"
           print_cs cs (print_paren_r (print_pat info)) pl
@@ -194,7 +191,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
       fprintf fmt (protect_on opr "epsilon %a.@ %a")
         (print_vsty info) v (print_opl_fmla info) f;
       forget_var v
-  | Tapp (fs, tl) -> begin match query_syntax info fs.ls_name with
+  | Tapp (fs, tl) -> begin match query_syntax info.info_syn fs.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | None -> if unambig_fs fs
           then fprintf fmt "%a%a" print_ls fs
@@ -231,7 +228,7 @@ and print_fnode opl opr info fmt f = match f.f_node with
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
         (print_list comma (print_term info)) tl
         (print_list newline (print_fbranch info)) bl
-  | Fapp (ps, tl) -> begin match query_syntax info ps.ls_name with
+  | Fapp (ps, tl) -> begin match query_syntax info.info_syn ps.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | None -> fprintf fmt "%a%a" print_ls ps
             (print_paren_r (print_term info)) tl

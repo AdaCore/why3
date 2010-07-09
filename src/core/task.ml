@@ -208,7 +208,7 @@ let task_decls  = task_fold (fun acc td ->
 
 exception NotTaggingMeta of string
 
-let find_meta_ids t tds acc =
+let find_tagged t tds acc =
   begin match lookup_meta t with
     | [MTtysymbol|MTlsymbol|MTprsymbol] -> ()
     | _ -> raise (NotTaggingMeta t)

@@ -24,14 +24,14 @@
   open Lexer
 
   let keywords = Hashtbl.create 97
-  let () = 
-    List.iter 
+  let () =
+    List.iter
       (fun (x,y) -> Hashtbl.add keywords x y)
       [ "theory", THEORY;
 	"end", END;
 	"syntax", SYNTAX;
 	"remove", REMOVE;
-	"tag", TAG;
+	"meta", META;
 	"cloned", CLONED;
 	"prelude", PRELUDE;
 	"printer", PRINTER;
@@ -55,33 +55,37 @@ let alpha = ['a'-'z' 'A'-'Z' '_']
 let digit = ['0'-'9']
 let ident = alpha (alpha | digit | '\'')*
 
+let op_char = ['=' '<' '>' '~' '+' '-' '*' '/' '%'
+               '!' '$' '&' '?' '@' '^' '.' ':' '|' '#']
+
 rule token = parse
   | '\n'
       { newline lexbuf; token lexbuf }
-  | space+  
+  | space+
       { token lexbuf }
+  | "(*)"
+      { LEFTPAR_STAR_RIGHTPAR }
   | "(*"
       { comment lexbuf; token lexbuf }
-  | '_' 
+  | '_'
       { UNDERSCORE }
   | ident as id
       { try Hashtbl.find keywords id with Not_found -> IDENT id }
   | digit+ as i
       { INTEGER (int_of_string i) }
-  | "<>" | "<" | "<=" | ">" | ">=" 
-  | "="
-  | "+" | "-"
-  | "*" | "/" | "%" as op
-      { OPERATOR op }
   | "("
       { LEFTPAR }
   | ")"
       { RIGHTPAR }
   | "."
       { DOT }
+  | ","
+      { COMMA }
+  | op_char+ as op
+      { OPERATOR op }
   | "\""
       { STRING (string lexbuf) }
-  | eof 
+  | eof
       { EOF }
   | _ as c
       { raise (Error (IllegalCharacter c)) }

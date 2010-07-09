@@ -52,12 +52,9 @@ type info = {
   info_rem : Sid.t;
 }
 
-let query_syntax info id =
-  try Some (Mid.find id info.info_syn) with Not_found -> None
-
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar _ -> unsupported "smt : you must encode the polymorphism"
-  | Tyapp (ts, tl) -> begin match query_syntax info ts.ts_name with 
+  | Tyapp (ts, tl) -> begin match query_syntax info.info_syn ts.ts_name with 
       | Some s -> syntax_arguments s (print_type info) fmt tl
       | None -> fprintf fmt "%a%a" (print_tyapp info) tl print_ident ts.ts_name
     end
@@ -76,7 +73,7 @@ let rec print_term info fmt t = match t.t_node with
       Print_real.print_with_integers 
 	"%s.0" "(* %s.0 %s.0)" "(/ %s.0 %s.0)" fmt c
   | Tvar v -> print_var fmt v
-  | Tapp (ls, tl) -> begin match query_syntax info ls.ls_name with
+  | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] -> fprintf fmt "@[%a@]" print_ident ls.ls_name
@@ -99,7 +96,7 @@ let rec print_term info fmt t = match t.t_node with
 and print_fmla info fmt f = match f.f_node with
   | Fapp ({ ls_name = id }, []) ->
       print_ident fmt id
-  | Fapp (ls, tl) -> begin match query_syntax info ls.ls_name with
+  | Fapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] -> fprintf fmt "%a" print_ident ls.ls_name

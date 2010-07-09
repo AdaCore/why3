@@ -16,6 +16,7 @@ theory AC
   logic op t t : t
   clone Assoc with type t = t, logic op = op
   clone Comm  with type t = t, logic op = op
+  meta AC logic op (*, prop Assoc.Assoc, prop Comm.Comm*)
 end
 
 theory Group
@@ -36,6 +37,7 @@ end
 theory CommutativeGroup
   clone export Group
   clone Comm with type t = t, logic op = op
+  meta AC logic op (*, prop Assoc.Assoc, prop Comm.Comm*)
 end
 
 theory Ring
@@ -60,6 +62,7 @@ end
 theory CommutativeRing
   clone export Ring
   clone Comm with type t = t, logic op = (*)
+  meta AC logic (*) (*, prop Assoc.Assoc, prop Comm.Comm*)
 end
 
 theory UnitaryCommutativeRing

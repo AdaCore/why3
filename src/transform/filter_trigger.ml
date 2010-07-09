@@ -43,8 +43,7 @@ let remove_triggers =
     let rt,rf = make_rt_rf keep_no_trigger in
     Trans.rewrite rt rf None
 
-let () = Trans.register_transform "remove_triggers"
-  (fun _ -> remove_triggers)
+let () = Trans.register_transform "remove_triggers" remove_triggers
 
 
 let keep_no_predicate = function
@@ -57,7 +56,7 @@ let filter_trigger_no_predicate =
     Trans.rewrite rt rf None
 
 let () = Trans.register_transform "filter_trigger_no_predicate" 
-  (fun _ -> filter_trigger_no_predicate)
+  filter_trigger_no_predicate
 
 
 let keep_no_fmla = function
@@ -70,8 +69,7 @@ let filter_trigger =
     let rt,rf = make_rt_rf keep_no_fmla in
     Trans.rewrite rt rf None
 
-let () = Trans.register_transform "filter_trigger" 
-  (fun _ -> filter_trigger)
+let () = Trans.register_transform "filter_trigger" filter_trigger
 
 
 let keep_no_builtin rem_ls = function
@@ -83,10 +81,10 @@ let keep_no_builtin rem_ls = function
 let filter_trigger_builtin =
   Trans.on_meta Printer.meta_remove_logic (fun tds ->
     let rem_ls = 
-       Task.find_meta_ids Printer.meta_remove_logic tds Ident.Sid.empty
+       Task.find_tagged Printer.meta_remove_logic tds Ident.Sid.empty
     in
     let rt,rf = make_rt_rf (keep_no_builtin rem_ls) in
     Trans.rewrite rt rf None)
 
 let () = Trans.register_transform "filter_trigger_builtin" 
-  (fun _ -> filter_trigger_builtin)
+  filter_trigger_builtin

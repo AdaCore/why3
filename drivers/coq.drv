@@ -13,23 +13,23 @@ theory BuiltIn
   prelude "Require Import ZArith."
   prelude "Require Import Rbase."
 
-  syntax type   int     "Z"
-  syntax type   real    "R"
-  syntax logic  (_=_)   "(%1 = %2)" 
-  syntax logic  (_<>_)  "(%1 <> %2)"
+  syntax type   int   "Z"
+  syntax type   real  "R"
+  syntax logic  (=)   "(%1 = %2)" 
+  syntax logic  (<>)  "(%1 <> %2)"
 end
 
 theory bool.Bool
 
-  syntax type bool "bool"
+  syntax type bool   "bool"
 
-  syntax logic True "true"
+  syntax logic True  "true"
   syntax logic False "false"
 
-  syntax logic andb "(andb %1 %2)"
-  syntax logic orb "(orb %1 %2)"
-  syntax logic xorb "(xorb %1 %2)"
-  syntax logic notb "(negb %1)"
+  syntax logic andb  "(andb %1 %2)"
+  syntax logic orb   "(orb %1 %2)"
+  syntax logic xorb  "(xorb %1 %2)"
+  syntax logic notb  "(negb %1)"
 
 end
 
@@ -37,17 +37,17 @@ end
 theory int.Int
 
   syntax logic zero "0%Z"
-  syntax logic one "1%Z"
+  syntax logic one  "1%Z"
 
-  syntax logic (_+_) "(%1 + %2)%Z"
-  syntax logic (_-_) "(%1 - %2)%Z"
-  syntax logic (_*_) "(%1 * %2)%Z"
-  syntax logic (-_)  "(-%1)%Z"
+  syntax logic (+)  "(%1 + %2)%Z"
+  syntax logic (-)  "(%1 - %2)%Z"
+  syntax logic (*)  "(%1 * %2)%Z"
+  syntax logic (-_) "(-%1)%Z"
 
-  syntax logic (_<=_) "(%1 <= %2)%Z"
-  syntax logic (_<_) "(%1 <  %2)%Z"
-  syntax logic (_>=_) "(%1 >= %2)%Z"
-  syntax logic (_>_) "(%1 >  %2)%Z"
+  syntax logic (<=) "(%1 <= %2)%Z"
+  syntax logic (<)  "(%1 <  %2)%Z"
+  syntax logic (>=) "(%1 >= %2)%Z"
+  syntax logic (>)  "(%1 >  %2)%Z"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -72,19 +72,19 @@ end
 theory real.Real
 
   syntax logic zero "0%R"
-  syntax logic one "1%R"
+  syntax logic one  "1%R"
 
-  syntax logic (_+_) "(%1 + %2)%R"
-  syntax logic (_-_) "(%1 - %2)%R"
-  syntax logic (-_)  "(-%1)%R"
-  syntax logic (_*_) "(%1 * %2)%R"
-  syntax logic (_/_) "(Rdiv %1 %2)%R"
+  syntax logic (+)  "(%1 + %2)%R"
+  syntax logic (-)  "(%1 - %2)%R"
+  syntax logic (-_) "(-%1)%R"
+  syntax logic (*)  "(%1 * %2)%R"
+  syntax logic (/)  "(Rdiv %1 %2)%R"
   syntax logic inv  "(Rinv %1)"
 
-  syntax logic (_<=_) "(%1 <= %2)%R"
-  syntax logic (_<_) "(%1 <  %2)%R"
-  syntax logic (_>=_) "(%1 >= %2)%R"
-  syntax logic (_>_) "(%1 >  %2)%R"
+  syntax logic (<=) "(%1 <= %2)%R"
+  syntax logic (<)  "(%1 <  %2)%R"
+  syntax logic (>=) "(%1 >= %2)%R"
+  syntax logic (>)  "(%1 >  %2)%R"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -117,8 +117,7 @@ theory real.Square
 
   prelude "Require Import R_sqrt."
 
-  syntax logic sqr "(Rsqr %1)"
-
+  syntax logic sqr  "(Rsqr %1)"
   syntax logic sqrt "(sqrt %1)"  (* and not Rsqrt *)
 
 end
@@ -130,7 +129,6 @@ theory real.ExpLog
   prelude "Require Import Rpower."
 
   syntax logic exp "(exp %1)"
-
   syntax logic log "(ln %1)"
 
 end

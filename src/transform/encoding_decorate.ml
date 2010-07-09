@@ -354,16 +354,16 @@ let decl tenv d =
 *)
 
 let t env = Trans.on_meta meta_kept (fun tds ->
-  let s = Task.find_meta_ids meta_kept tds Sid.empty in
+  let s = Task.find_tagged meta_kept tds Sid.empty in
   let init_task,tenv = load_prelude (Some s) env in
   Trans.tdecl (decl tenv) init_task)
 
-let () = Trans.register_transform "encoding_decorate" t
+let () = Trans.register_env_transform "encoding_decorate" t
 
 
 let t_all env =
   let init_task,tenv = load_prelude None env in
   Trans.tdecl (decl tenv) init_task
 
-let () = Trans.register_transform "encoding_decorate_every_simple" t_all
+let () = Trans.register_env_transform "encoding_decorate_every_simple" t_all
 
