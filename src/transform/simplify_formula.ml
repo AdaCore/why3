@@ -143,23 +143,9 @@ let simplify_trivial_quantification =
 let () = Trans.register_transform 
   "simplify_trivial_quantification" simplify_trivial_quantification
 
-let on_goal fn_prop =
-  let rec fn task = match task with
-    | Some { Task.task_decl = {Theory.td_node =  
-                Theory.Decl ({d_node = Decl.Dprop (Pgoal,pr,fmla)})};
-             Task.task_prev = task_prev } -> 
-        (List.fold_left Task.add_decl) task_prev (fn_prop pr fmla)
-    | Some { Task.task_decl = ({Theory.td_node = Theory.Meta _} as td);
-             Task.task_prev = task_prev } ->
-        Task.add_tdecl (fn task_prev) td
-    | _ -> assert false
-  in
-  Trans.store fn
-
-
 let simplify_trivial_quantification_in_goal =
-  on_goal (fun pr f -> [create_prop_decl Pgoal pr (fmla_remove_quant f)])
+  Trans.goal (fun pr f -> [create_prop_decl Pgoal pr (fmla_remove_quant f)])
 
 let () = Trans.register_transform 
   "simplify_trivial_quantification_in_goal" 
-  simplify_trivial_quantification_in_goal
+   simplify_trivial_quantification_in_goal

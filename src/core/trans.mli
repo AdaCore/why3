@@ -59,6 +59,12 @@ val decl_l : (decl -> decl list list) -> task -> task tlist
 val tdecl   : (decl -> tdecl list     ) -> task -> task trans
 val tdecl_l : (decl -> tdecl list list) -> task -> task tlist
 
+val goal   : (prsymbol -> fmla -> decl list     ) -> task trans
+val goal_l : (prsymbol -> fmla -> decl list list) -> task tlist
+
+val tgoal   : (prsymbol -> fmla -> tdecl list     ) -> task trans
+val tgoal_l : (prsymbol -> fmla -> tdecl list list) -> task tlist
+
 val rewrite : (term -> term) -> (fmla -> fmla) -> task -> task trans
 
 (* dependent transformatons *)

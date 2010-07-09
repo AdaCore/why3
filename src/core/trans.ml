@@ -103,6 +103,37 @@ let decl_l  = gen_decl_l add_decl
 let tdecl   = gen_decl   add_tdecl
 let tdecl_l = gen_decl_l add_tdecl
 
+let apply_to_goal fn d = match d.d_node with
+  | Dprop (Pgoal,pr,f) -> fn pr f
+  | _ -> assert false
+
+let gen_goal add fn =
+  let fn = WHdecl.memoize 5 (apply_to_goal fn) in
+  let rec pass task = match task with
+    | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
+        List.fold_left add prev (fn d)
+    | Some { task_decl = td; task_prev = prev } ->
+        add_tdecl (pass prev) td
+    | _ -> assert false
+  in
+  pass
+
+let gen_goal_l add fn =
+  let fn = WHdecl.memoize 5 (apply_to_goal fn) in
+  let rec pass task = match task with
+    | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
+        List.rev_map (List.fold_left add prev) (fn d)
+    | Some { task_decl = td; task_prev = prev } ->
+        List.rev_map (fun task -> add_tdecl task td) (pass prev)
+    | _ -> assert false
+  in
+  pass
+
+let goal    = gen_goal   add_decl
+let goal_l  = gen_goal_l add_decl
+let tgoal   = gen_goal   add_tdecl
+let tgoal_l = gen_goal_l add_tdecl
+
 let rewrite fnT fnF = decl (fun d -> [decl_map fnT fnF d])
 
 (** dependent transformations *)
