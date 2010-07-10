@@ -107,15 +107,21 @@ exception BadMetaArity of string * int * int
 exception MetaTypeMismatch of string * meta_arg_type * meta_arg_type
 
 let meta_table = Hashtbl.create 17
+let meta_exc   = Hashtbl.create 17
 
 let register_meta s al =
   try let al' = Hashtbl.find meta_table s in
       if al <> al' then raise (KnownMeta s)
   with Not_found -> Hashtbl.add meta_table s al
 
+let register_meta_exc s al =
+  register_meta s al; Hashtbl.add meta_exc s ()
+
 let lookup_meta s =
   try Hashtbl.find meta_table s
   with Not_found -> raise (UnknownMeta s)
+
+let is_meta_exc s = Hashtbl.mem meta_exc s
 
 let list_meta () = Hashtbl.fold (fun k _ acc -> k::acc) meta_table []
 

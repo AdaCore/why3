@@ -59,9 +59,11 @@ type meta_arg_real =
   | MARstr of string
   | MARint of int
 
-val register_meta : string -> meta_arg_type list -> unit
+val register_meta     : string -> meta_arg_type list -> unit
+val register_meta_exc : string -> meta_arg_type list -> unit
 
 val lookup_meta : string -> meta_arg_type list
+val is_meta_exc : string -> bool
 
 val list_meta : unit -> string list
 

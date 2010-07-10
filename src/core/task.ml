@@ -40,8 +40,12 @@ module Hstds = Hashcons.Make (struct
 end)
 
 let mk_tds s = Hstds.hashcons { tds_set = s; tds_tag = -1 }
+
 let empty_tds = mk_tds Stdecl.empty
 let tds_add td s = mk_tds (Stdecl.add td s.tds_set)
+let tds_singleton td = mk_tds (Stdecl.singleton td)
+
+let tds_equal = (==)
 
 type clone_map = tdecl_set Mid.t
 type meta_map = tdecl_set Mstr.t
@@ -52,7 +56,10 @@ let mm_find mm t =
   try Mstr.find t mm with Not_found -> ignore (lookup_meta t); empty_tds
 
 let cm_add cm th td = Mid.add th.th_name (tds_add td (cm_find cm th)) cm
-let mm_add mm t  td = Mstr.add t (tds_add td (mm_find mm t)) mm
+
+let mm_add mm t td = if is_meta_exc t
+  then Mstr.add t (tds_singleton td) mm
+  else Mstr.add t (tds_add td (mm_find mm t)) mm
 
 (** Task *)
 
@@ -217,6 +224,14 @@ let find_tagged t tds acc =
     | Meta (s, [MARid id]) when s = t -> Sid.add id acc
     | _ -> assert false) tds.tds_set acc
 
+exception NotExclusiveMeta of string
+
+let get_meta_exc t tds =
+  if not (is_meta_exc t) then raise (NotExclusiveMeta t);
+  Stdecl.fold (fun td _ -> match td.td_node with
+    | Meta (s,_) when s = t -> Some td
+    | _ -> assert false) tds.tds_set None
+
 (* Exception reporting *)
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
@@ -226,5 +241,7 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | GoalNotFound -> Format.fprintf fmt "The task does not end with a goal"
   | NotTaggingMeta s ->
       Format.fprintf fmt "Metaproperty '%s' is not a symbol tag" s
+  | NotExclusiveMeta s ->
+      Format.fprintf fmt "Metaproperty '%s' is not exclusive" s
   | _ -> raise exn)
 

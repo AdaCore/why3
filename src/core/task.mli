@@ -31,6 +31,8 @@ type tdecl_set = private {
   tds_tag : int;
 }
 
+val tds_equal : tdecl_set -> tdecl_set -> bool
+
 type clone_map = tdecl_set Mid.t
 type meta_map = tdecl_set Mstr.t
 
@@ -98,6 +100,12 @@ val task_goal  : task -> prsymbol
 exception NotTaggingMeta of string
 
 val find_tagged : string -> tdecl_set -> Sid.t -> Sid.t
+
+(* special selector for exclusive metaproperties *)
+
+exception NotExclusiveMeta of string
+
+val get_meta_exc : string -> tdecl_set -> tdecl option
 
 (* exceptions *)
 
