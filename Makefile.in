@@ -107,8 +107,7 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula inlining \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
 		explicit_polymorphism simple_types encoding_instantiate \
-		simplify_array filter_trigger
-
+		simplify_array filter_trigger split_goal
 
 LIB_PRINTER = print_real alt_ergo why3 smt coq tptp simplify gappa
 
@@ -266,7 +265,7 @@ install::
 # rust prover
 ###############
 
-MNG_FILES = db scheduler 
+MNG_FILES = db scheduler
 MNG_MAIN_FILES = test gmanager
 
 MNGMODULES = $(addprefix src/manager/, $(MNG_FILES))
