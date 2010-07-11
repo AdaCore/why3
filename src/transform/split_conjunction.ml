@@ -76,7 +76,7 @@ let rec split_neg split_pos acc f =
         list_fold_product 
           (fun acc f1 f2 ->  (f_and f1 f2)::acc) 
           acc (split_neg [] f1) (split_neg [] f2)
-    | Fbinop (Fimplies,f1,f2) -> split_pos (split_neg acc f2) (f_not f1)
+    | Fbinop (Fimplies,f1,f2) -> split_neg (split_neg acc f2) (f_not f1)
     | Fbinop (Fiff,f1,f2) -> 
         split_neg (split_neg acc (f_and (f_not f1) (f_not f2))) (f_and f2 f1)
     | Fbinop (For,f1,f2) -> split_neg (split_neg acc f2) f1
