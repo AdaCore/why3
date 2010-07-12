@@ -25,6 +25,10 @@ open Decl
 open Theory
 open Task
 
+let meta_enum = "enumeration"
+
+let () = Theory.register_meta meta_enum [Theory.MTtysymbol]
+
 (** Compile match patterns *)
 
 let rec rewriteT kn t = match t.t_node with
@@ -216,6 +220,12 @@ let add_type (state, task) ts csl =
   let trgl = t_app mt_ls (ax_hd :: mt_tl) mt_ty in
   let ax_f = f_forall (ax_vs :: mt_vl) [[Term trgl]] ax_f in
   let task = add_decl task (create_prop_decl Paxiom ax_pr ax_f) in
+  (* Add the tag for enumeration if the type is one*)
+  let is_constant ls = ls.ls_args = [] in
+  let is_enumeration = List.for_all is_constant csl in
+  let task = 
+    if is_enumeration then add_meta task meta_enum [MAts ts] else task
+  in
   (* return the updated state and task *)
   { mt_map = mtmap; pj_map = pjmap }, task
 
