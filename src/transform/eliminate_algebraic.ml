@@ -25,9 +25,7 @@ open Decl
 open Theory
 open Task
 
-let meta_enum = "enumeration"
-
-let () = Theory.register_meta meta_enum [Theory.MTtysymbol]
+let meta_enum = Theory.register_meta "enumeration" [Theory.MTtysymbol]
 
 (** Compile match patterns *)
 
