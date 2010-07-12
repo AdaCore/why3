@@ -36,6 +36,7 @@ let ident_printer =
     "false"; "forall"; "function"; "goal"; "if"; "int"; "bitv";
     "logic"; "not"; "or"; "parameter"; "predicate";
     "prop"; "real"; "then"; "true"; "type"; "unit"; "void";
+    "select"; "store";
   ] 
   in
   let san = sanitizer char_to_alpha char_to_alnumus in

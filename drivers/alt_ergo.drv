@@ -116,6 +116,16 @@ theory algebra.AC
 end
 
 (*
+theory array.ArrayLength
+  syntax type  t      "%1 farray"
+  syntax logic select "(%1[%2])"
+  syntax logic store  "(%1[%2 <- %3])"
+  remove prop  Select_eq
+  remove prop  Select_neq
+end
+*)
+
+(*
 Local Variables: 
 mode: why
 compile-command: "make -C .. bench"
