@@ -159,6 +159,8 @@ decl:
     { Namespace (loc (), true, None, $4) }
 | META ident list1_meta_arg_sep_comma
     { Meta (loc (), $2, $3) }
+| META STRING list1_meta_arg_sep_comma
+    { Meta (loc (), { id = $2; id_loc = loc_i 2 }, $3) }
 ;
 
 /* Use and clone */
