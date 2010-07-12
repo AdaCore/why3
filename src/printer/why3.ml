@@ -25,6 +25,7 @@ open Ty
 open Term
 open Decl
 open Printer
+open Theory
 
 let iprinter,tprinter,lprinter,pprinter =
   let bl = ["theory"; "type"; "logic"; "inductive";
@@ -330,17 +331,40 @@ let print_decl info fmt d = match d.d_node with
   | Dtype tl  -> print_list nothing (print_type_decl info) fmt tl
   | Dlogic ll -> print_list nothing (print_logic_decl info) fmt ll
   | Dind il   -> print_list nothing (print_ind_decl info) fmt il
-  | Dprop p -> print_prop_decl info fmt p
+  | Dprop p   -> print_prop_decl info fmt p
 
 let print_decls info fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl info)) dl
+
+let print_inst fmt (id1,id2) =
+  fprintf fmt "ident %s = %s" id1.id_string id2.id_string
+
+let print_meta_arg fmt = function
+  | MARid id -> fprintf fmt "ident %s" id.id_string
+  | MARstr s -> fprintf fmt "\"%s\"" s
+  | MARint i -> fprintf fmt "%d" i
+
+let print_tdecl info fmt td = match td.td_node with
+  | Decl d -> print_decl info fmt d
+  | Use th ->
+      fprintf fmt "@[<hov 2>(* use %s *)@]@\n" th.th_name.id_string
+  | Clone (th,inst) ->
+      let inst = Mid.fold (fun x y a -> (x,y)::a) inst [] in
+      fprintf fmt "@[<hov 2>(* clone %s with %a *)@]@\n"
+        th.th_name.id_string (print_list comma print_inst) inst
+  | Meta (t,al) ->
+      fprintf fmt "@[<hov 2>(* meta %s %a *)@]@\n"
+        t (print_list space print_meta_arg) al
+
+let print_tdecls info fmt dl =
+  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_tdecl info)) dl
 
 let print_task pr thpr syn fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   let info = { info_syn = syn; info_rem = get_remove_set task } in
-  print_decls info fmt (Task.task_decls task)
+  print_tdecls info fmt (Task.task_tdecls task)
 
 let () = register_printer "why3" print_task
 
