@@ -83,19 +83,31 @@ and split_neg acc f = match f.f_node with
       apply_append (f_exists vsl trl) acc (split_neg [] f)
   | Fquant (Fforall,_) -> f::acc
 
-let make_prop k pr f = [create_prop_decl k pr f]
+let split_goal pr f =
+  let make_prop f = [create_prop_decl Pgoal pr f] in
+  List.map make_prop (split_pos [] f)
 
-let split_goal  pr f = List.map (make_prop Pgoal  pr) (split_pos [] f)
-let split_axiom pr f = List.map (make_prop Paxiom pr) (split_neg [] f)
+let split_axiom pr f =
+  let make_prop f =
+    let pr = create_prsymbol (id_clone pr.pr_name) in
+    create_prop_decl Paxiom pr f
+  in
+  List.map make_prop (split_pos [] f)
 
-let split_decl d = match d.d_node with
-  | Dprop (Pgoal, pr,f) -> split_goal  pr f
-  | Dprop (Paxiom,pr,f) -> split_axiom pr f
+let split_all d = match d.d_node with
+  | Dprop (Pgoal, pr,f) ->  split_goal  pr f
+  | Dprop (Paxiom,pr,f) -> [split_axiom pr f]
   | _ -> [[d]]
 
-let split_goal = Trans.goal_l split_goal
-let split_all  = Trans.decl_l split_decl None
+let split_premise d = match d.d_node with
+  | Dprop (Paxiom,pr,f) ->  split_axiom pr f
+  | _ -> [d]
 
-let () = Trans.register_transform_l "split_goal" split_goal
-let () = Trans.register_transform_l "split_all"  split_all
+let split_goal    = Trans.goal_l split_goal
+let split_all     = Trans.decl_l split_all     None
+let split_premise = Trans.decl   split_premise None
+
+let () = Trans.register_transform_l "split_goal"    split_goal
+let () = Trans.register_transform_l "split_all"     split_all
+let () = Trans.register_transform   "split_premise" split_premise
 
