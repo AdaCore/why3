@@ -16,11 +16,6 @@ theory Builtin
          t2u (d2t (sort tty x)) = x
 end
 
-theory Kept
-(* If a driver tags this type by "encoding decorate : kept", all the type which clone this one will be kept by the encoding*)
-       type t
-end
-
 theory Prelude_mono
        logic sort int int : int
        logic int : int
