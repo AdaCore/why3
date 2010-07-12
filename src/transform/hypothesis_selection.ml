@@ -563,8 +563,7 @@ let hypothesis_selection = (* create lots of hashtables... *)
   let symbTbl = SymbHashtbl.create 17 in
   Trans.store (transformation fmlaTable fTbl tTbl symbTbl)
 
-let _ = Trans.register_transform
-  "hypothesis_selection" (fun _ -> hypothesis_selection)
+let _ = Trans.register_transform "hypothesis_selection" hypothesis_selection
 
 (*
 Local Variables:

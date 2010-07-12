@@ -110,12 +110,15 @@ let meta_table = Hashtbl.create 17
 let meta_exc   = Hashtbl.create 17
 
 let register_meta s al =
-  try let al' = Hashtbl.find meta_table s in
-      if al <> al' then raise (KnownMeta s)
-  with Not_found -> Hashtbl.add meta_table s al
+  begin try
+    let al' = Hashtbl.find meta_table s in
+    if al <> al' then raise (KnownMeta s)
+  with Not_found -> Hashtbl.add meta_table s al end;
+  s
 
 let register_meta_exc s al =
-  register_meta s al; Hashtbl.add meta_exc s ()
+  Hashtbl.add meta_exc s ();
+  register_meta s al
 
 let lookup_meta s =
   try Hashtbl.find meta_table s

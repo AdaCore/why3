@@ -136,18 +136,13 @@ let add_ls_syntax ls s sm =
 let query_syntax sm id =
   try Some (Mid.find id sm) with Not_found -> None
 
-let meta_remove_type = "remove_type"
-let meta_remove_logic = "remove_logic"
-let meta_remove_prop = "remove_prop"
+let meta_remove_type  = register_meta "remove_type" [MTtysymbol]
+let meta_remove_logic = register_meta "remove_logic" [MTlsymbol]
+let meta_remove_prop  = register_meta "remove_prop" [MTprsymbol]
 
-let () =
-  register_meta meta_remove_type [MTtysymbol];
-  register_meta meta_remove_logic [MTlsymbol];
-  register_meta meta_remove_prop [MTprsymbol]
-
-let remove_type ts = create_meta meta_remove_type [MAts ts]
+let remove_type  ts = create_meta meta_remove_type [MAts ts]
 let remove_logic ls = create_meta meta_remove_logic [MAls ls]
-let remove_prop pr = create_meta meta_remove_prop [MApr pr]
+let remove_prop  pr = create_meta meta_remove_prop [MApr pr]
 
 let get_remove_set task =
   let add td s = match td.td_node with

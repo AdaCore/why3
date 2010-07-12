@@ -28,9 +28,7 @@ open Decl
 
 let why_filename = ["transform" ; "encoding_decorate"]
 
-let meta_kept = "encoding_decorate : kept"
-
-let () = Theory.register_meta meta_kept [Theory.MTtysymbol]
+let meta_kept = register_meta "encoding_decorate : kept" [MTtysymbol]
 
 (* From Encoding Polymorphism CADE07*)
 

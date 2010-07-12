@@ -26,9 +26,7 @@ open Decl
 open Task
 open Printer
 
-let meta_ac = "AC"
-
-let () = Theory.register_meta meta_ac [Theory.MTlsymbol]
+let meta_ac = Theory.register_meta "AC" [Theory.MTlsymbol]
 
 let ident_printer = 
   let bls = [
