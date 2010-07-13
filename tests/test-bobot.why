@@ -95,8 +95,16 @@ end
 theory TestBuiltin_bool
   use import bool.Bool
   goal G : xorb True False = True 
+  goal G_false : xorb True False = False
 end
 
+theory TestEncodingEnumerate
+  type t = A | B | C
+  goal G : forall x : t. (x = A or x = B) ->  x<>C
+  goal G1 : forall x : t. B <> A
+  goal G2 : forall x : t. x = A or x = B or x=C
+  goal G3 : forall x : t. x = A or x = B or x <> C
+end
 
 (*
 Local Variables: 

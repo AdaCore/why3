@@ -27,7 +27,12 @@ transformation "remove_triggers"
 trigger they can't appear since = can't appear *)
 (*transformation "filter_trigger_builtin"*)
 
+(* Add the projections for enumeration types*)
+transformation "encoding_enumeration"
+
+(* encode the polymorphism and sort *)
 (*transformation "encoding_decorate_mono"*)
+transformation "explicit_polymorphism"
 
 theory BuiltIn
   syntax type int   "Int"
