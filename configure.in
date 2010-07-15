@@ -89,6 +89,12 @@ AC_ARG_ENABLE(hypothesis-selection,
     [  --enable-hypothesis-selection    enable hypothesis selection support],,
     enable_hypothesis_selection=yes)
 
+# profiling
+ENABLE_PROFILING=yes
+AC_ARG_ENABLE(profiling,
+    [  --enable-profiling        enable profiling],,
+    ENABLE_PROFILING=no)
+
 # Check for arch/OS
 
 AC_MSG_CHECKING(executable suffix)
@@ -308,6 +314,7 @@ AC_SUBST(OCAMLDOC)
 AC_SUBST(OCAMLBEST)
 AC_SUBST(OCAMLVERSION)
 AC_SUBST(OCAMLLIB)
+AC_SUBST(ENABLE_PROFILING)
 dnl AC_SUBST(OCAMLV)
 dnl AC_SUBST(FORPACK)
 dnl AC_SUBST(OCAMLGRAPHLIB)
@@ -359,3 +366,4 @@ if test "$enable_coq_support" = "yes" ; then
 fi
 echo "tptp2why support        : $enable_tptp2why_support"
 echo "hypothesis selection    : $enable_hypothesis_selection"
+echo "profiling               : $ENABLE_PROFILING"

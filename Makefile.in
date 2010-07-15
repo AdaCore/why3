@@ -62,6 +62,11 @@ CAMLP5O   = @CAMLP5O@
 BFLAGS = -w Ae -dtypes -g -I src $(INCLUDES)
 OFLAGS = -w Ae -dtypes    -I src $(INCLUDES)
 
+ifeq (@ENABLE_PROFILING@,yes)
+OFLAGS += -g -p
+STRIP = true
+endif
+
 # external libraries common to all binaries
 
 ifeq (@enable_plugins@,yes)
