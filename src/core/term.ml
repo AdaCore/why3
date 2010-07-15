@@ -65,11 +65,26 @@ module Hls = Lsym.H
 
 let ls_equal = (==)
 
-let create_lsymbol name args value = {
-  ls_name   = id_register name;
+let mk_ls name args value = {
+  ls_name   = name;
   ls_args   = args;
   ls_value  = value;
 }
+
+let lsymbol_table = Wid.create 63
+
+let create_lsymbol name args value =
+  let id = id_register name in
+  let ls = mk_ls id args value in
+  let wa = Weak.create 1 in
+  Weak.set wa 0 (Some ls);
+  Wid.set lsymbol_table id wa;
+  ls
+
+let find_lsymbol id =
+  match Weak.get (Wid.find lsymbol_table id) 0 with
+  | Some ls -> ls
+  | None -> raise Not_found
 
 let create_fsymbol nm al vl = create_lsymbol nm al (Some vl)
 let create_psymbol nm al    = create_lsymbol nm al (None)

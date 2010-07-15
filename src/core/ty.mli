@@ -70,6 +70,7 @@ exception DuplicateTypeVar of tvsymbol
 exception UnboundTypeVar of tvsymbol
 
 val create_tysymbol : preid -> tvsymbol list -> ty option -> tysymbol
+val find_tysymbol : ident -> tysymbol
 
 val ty_var : tvsymbol -> ty
 val ty_app : tysymbol -> ty list -> ty

@@ -40,6 +40,7 @@ end)
 module Sid = Id.S
 module Mid = Id.M
 module Hid = Id.H
+module Wid = Id.W
 
 type preid = ident
 
