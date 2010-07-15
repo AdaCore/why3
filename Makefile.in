@@ -851,6 +851,7 @@ Makefile: Makefile.in config.status
 
 src/config.sh: src/config.sh.in config.status
 	./config.status --file $@
+	chmod u+x $@
 
 src/config.ml: src/config.sh config.status
 	LIBDIR=$(LIBDIR) src/config.sh

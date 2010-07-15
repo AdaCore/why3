@@ -201,9 +201,9 @@ let conv_vs tenv tvar (vsvar,acc) vs =
       t_app tenv.sort [tty;t] tenv.deco, vsres in
   (Mvs.add vs tres vsvar,vsres::acc)
 
-let conv_vs_let tenv vsvar vs =
+let conv_vs_let vsvar vs ty_res =
   let tres,vsres =
-    let ty_res = conv_ty_neg tenv vs.vs_ty in
+    (* let ty_res = conv_ty_neg tenv vs.vs_ty in *)
     if ty_equal ty_res vs.vs_ty then
       t_var vs,vs
     else 
@@ -228,15 +228,17 @@ let rec rewrite_term tenv tvar vsvar t =
     | Tif (f, t1, t2) -> 
         t_if (fnF f) (fnT vsvar t1) (fnT vsvar t2)
     | Tlet (t1, b) -> let u,t2 = t_open_bound b in
-      let (vsvar',u) = conv_vs_let tenv vsvar u in
-      let t1' = fnT vsvar t1 in let t2' = fnT vsvar' t2 in
-      if t_equal t1' t1 && t_equal t2' t2 then t else t_let u t1' t2'
+      let t1' = fnT vsvar t1 in
+      let (vsvar',u) = conv_vs_let vsvar u t1'.t_ty in
+      let t2' = fnT vsvar' t2 in
+      if t_equal t1' t1 && t_equal t2' t2 then t else
+        t_let u t1' t2'
     | Tcase _ | Teps _ | Tbvar _ ->
         Printer.unsupportedTerm t
           "Encoding decorate : I can't encode this term"
 
 and rewrite_fmla tenv tvar vsvar f =
-(*  Format.eprintf "@[<hov 2>Fmla : %a =>@\n@?" Pretty.print_fmla f;*)
+  (* Format.eprintf "@[<hov 2>Fmla : %a =>@\n@?" Pretty.print_fmla f; *)
   let fnT = rewrite_term tenv tvar vsvar in
   let fnF = rewrite_fmla tenv tvar in
   match f.f_node with
@@ -266,14 +268,14 @@ and rewrite_fmla tenv tvar vsvar f =
       let tl = tr_map (rewrite_term tenv tvar vsvar') (fnF vsvar') tl in
         (*if f_equal f1' f1 &&  vsvar' == vsvar (*&& tr_equal tl' tl*) then f
         else *)
-          let vl = List.rev vl in
-          f_quant q vl tl f1'
+      let vl = List.rev vl in
+      f_quant q vl tl f1'
     | Flet (t1, b) -> let u,f2 = f_open_bound b in
-      let (vsvar,u) = conv_vs_let tenv vsvar u in
-      let t1' = fnT t1 in let f2' = fnF vsvar f2 in
-      assert (u.vs_ty == t1'.t_ty);
-      (*if t_equal t1' t1 && f_equal f2' f2 then f else *)
-        f_let u t1' f2'
+     let t1' = fnT t1 in
+     let (vsvar,u) = conv_vs_let vsvar u t1'.t_ty in
+     let f2' = fnF vsvar f2 in 
+     if t_equal t1' t1 && f_equal f2' f2 then f else
+     f_let u t1' f2'
     | _ -> f_map fnT (fnF vsvar) f
 
 let decl (tenv:tenv) d =
