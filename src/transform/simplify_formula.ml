@@ -109,7 +109,7 @@ let rec fmla_quant sign f = function
   | vs::l -> 
       let vsl, f = fmla_quant sign f l in
       try
-        fmla_find_subst Svs.empty vs sign f;
+        fmla_find_subst (Svs.singleton vs) vs sign f;
         vs::vsl, f
       with Subst_found t ->
         let f = f_subst_single vs t f in
