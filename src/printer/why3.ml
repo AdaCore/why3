@@ -337,10 +337,21 @@ let print_decls info fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl info)) dl
 
 let print_inst fmt (id1,id2) =
-  fprintf fmt "ident %s = %s" id1.id_string id2.id_string
+  try
+    fprintf fmt "type %s = %a"  id1.id_string print_ts (find_tysymbol id2)
+  with Not_found -> try
+    fprintf fmt "logic %s = %a" id1.id_string print_ls (find_lsymbol  id2)
+  with Not_found ->
+    fprintf fmt "prop %s = %a"  id1.id_string print_pr (find_prsymbol id2)
 
 let print_meta_arg fmt = function
-  | MARid id -> fprintf fmt "ident %s" id.id_string
+  | MARid id -> begin try
+        fprintf fmt "type %a"  print_ts (find_tysymbol id)
+      with Not_found -> try
+        fprintf fmt "logic %a" print_ls (find_lsymbol  id)
+      with Not_found ->
+        fprintf fmt "prop %a"  print_pr (find_prsymbol id)
+      end
   | MARstr s -> fprintf fmt "\"%s\"" s
   | MARint i -> fprintf fmt "%d" i
 
