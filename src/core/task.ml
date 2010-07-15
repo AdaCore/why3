@@ -165,7 +165,7 @@ let add_ind_decls tk dl = List.fold_left add_decl tk (create_ind_decls dl)
 let rec add_tdecl task td = match td.td_node with
   | Decl d -> new_decl task d td
   | Use th -> use_export task th
-  | Clone (th,_) -> add_clone task th td
+  | Clone (th,_,_,_) -> add_clone task th td
   | Meta (t,_) -> add_meta task t td
 
 and flat_tdecl task td = match td.td_node with
@@ -215,13 +215,31 @@ let task_decls  = task_fold (fun acc td ->
 
 exception NotTaggingMeta of string
 
-let find_tagged t tds acc =
+let find_tagged_ts t tds acc =
   begin match lookup_meta t with
-    | [MTtysymbol|MTlsymbol|MTprsymbol] -> ()
+    | [MTtysymbol] -> ()
     | _ -> raise (NotTaggingMeta t)
   end;
   Stdecl.fold (fun td acc -> match td.td_node with
-    | Meta (s, [MARid id]) when s = t -> Sid.add id acc
+    | Meta (s, [MAts ts]) when s = t -> Sts.add ts acc
+    | _ -> assert false) tds.tds_set acc
+
+let find_tagged_ls t tds acc =
+  begin match lookup_meta t with
+    | [MTlsymbol] -> ()
+    | _ -> raise (NotTaggingMeta t)
+  end;
+  Stdecl.fold (fun td acc -> match td.td_node with
+    | Meta (s, [MAls ls]) when s = t -> Sls.add ls acc
+    | _ -> assert false) tds.tds_set acc
+
+let find_tagged_pr t tds acc =
+  begin match lookup_meta t with
+    | [MTprsymbol] -> ()
+    | _ -> raise (NotTaggingMeta t)
+  end;
+  Stdecl.fold (fun td acc -> match td.td_node with
+    | Meta (s, [MApr pr]) when s = t -> Spr.add pr acc
     | _ -> assert false) tds.tds_set acc
 
 exception NotExclusiveMeta of string

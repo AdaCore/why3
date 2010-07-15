@@ -86,7 +86,7 @@ module Spr = Prop.S
 module Mpr = Prop.M
 module Hpr = Prop.H
 
-let pr_equal pr1 pr2 = id_equal pr1.pr_name pr2.pr_name
+let pr_equal = (==)
 
 let create_prsymbol n = { pr_name = id_register n }
 

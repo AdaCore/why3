@@ -82,7 +82,7 @@ let string_of_expr_node node =
     let b = Buffer.create 42 in
     Format.bprintf b "@[%a@]" printer x;
     Buffer.contents b in
-  let white_space = Str.regexp "[ \(\)]" in
+  let white_space = Str.regexp "[ ()]" in
   let translate x = Str.global_replace white_space "_" x in
   let repr = match node with
     | Term t -> print_in_buf Pretty.print_term t

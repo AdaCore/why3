@@ -43,18 +43,11 @@ let iprinter,tprinter,lprinter,pprinter =
   create_ident_printer bl ~sanitizer:isanitize,
   create_ident_printer bl ~sanitizer:usanitize
 
-let thash = Hid.create 63
-let lhash = Hid.create 63
-let phash = Hid.create 63
-
 let forget_all () =
   forget_all iprinter;
   forget_all tprinter;
   forget_all lprinter;
-  forget_all pprinter;
-  Hid.clear thash;
-  Hid.clear lhash;
-  Hid.clear phash
+  forget_all pprinter
 
 let tv_set = ref Sid.empty
 
@@ -81,20 +74,16 @@ let print_th fmt th =
   fprintf fmt "%s" (id_unique iprinter ~sanitizer th.th_name)
 
 let print_ts fmt ts =
-  Hid.replace thash ts.ts_name ts;
   fprintf fmt "%s" (id_unique tprinter ts.ts_name)
 
 let print_ls fmt ls =
-  Hid.replace lhash ls.ls_name ls;
   fprintf fmt "%s" (id_unique lprinter ls.ls_name)
 
 let print_cs fmt ls =
-  Hid.replace lhash ls.ls_name ls;
   let sanitizer = String.capitalize in
   fprintf fmt "%s" (id_unique lprinter ~sanitizer ls.ls_name)
 
 let print_pr fmt pr =
-  Hid.replace phash pr.pr_name pr;
   fprintf fmt "%s" (id_unique pprinter pr.pr_name)
 
 (** Types *)
@@ -328,41 +317,35 @@ let print_decl fmt d = match d.d_node with
   | Dind il   -> print_list newline print_ind_decl fmt il
   | Dprop p   -> print_prop_decl fmt p
 
-let print_inst fmt (id1,id2) =
-  if Hid.mem thash id2 then
-    let n = id_unique tprinter id1 in
-    fprintf fmt "type %s = %a" n print_ts (Hid.find thash id2)
-  else if Hid.mem lhash id2 then
-    let n = id_unique lprinter id1 in
-    fprintf fmt "logic %s = %a" n print_ls (Hid.find lhash id2)
-  else if Hid.mem phash id2 then
-    let n = id_unique pprinter id1 in
-    fprintf fmt "prop %s = %a" n print_pr (Hid.find phash id2)
-  else
-    fprintf fmt "ident %s = %s" id1.id_string id2.id_string
+let print_inst_ts fmt (ts1,ts2) =
+  fprintf fmt "type %a = %a" print_ts ts1 print_ts ts2
+
+let print_inst_ls fmt (ls1,ls2) =
+  fprintf fmt "logic %a = %a" print_ls ls1 print_ls ls2
+
+let print_inst_pr fmt (pr1,pr2) =
+  fprintf fmt "prop %a = %a" print_pr pr1 print_pr pr2
 
 let print_meta_arg fmt = function
-  | MARid id ->
-      if Hid.mem thash id then
-        fprintf fmt "type %a" print_ts (Hid.find thash id)
-      else if Hid.mem lhash id then
-        fprintf fmt "logic %a" print_ls (Hid.find lhash id)
-      else if Hid.mem phash id then
-        fprintf fmt "prop %a" print_pr (Hid.find phash id)
-      else
-        fprintf fmt "ident %s" id.id_string
-  | MARstr s -> fprintf fmt "\"%s\"" s
-  | MARint i -> fprintf fmt "%d" i
+  | MAts ts -> fprintf fmt "type %a" print_ts ts
+  | MAls ls -> fprintf fmt "logic %a" print_ls ls
+  | MApr pr -> fprintf fmt "prop %a" print_pr pr
+  | MAstr s -> fprintf fmt "\"%s\"" s
+  | MAint i -> fprintf fmt "%d" i
 
 let print_tdecl fmt td = match td.td_node with
   | Decl d ->
       print_decl fmt d
   | Use th ->
       fprintf fmt "@[<hov 2>(* use %a *)@]" print_th th
-  | Clone (th,inst) ->
-      let inst = Mid.fold (fun x y a -> (x,y)::a) inst [] in
-      fprintf fmt "@[<hov 2>(* clone %a with %a *)@]"
-        print_th th (print_list comma print_inst) inst
+  | Clone (th,tm,lm,pm) ->
+      let tm = Mts.fold (fun x y a -> (x,y)::a) tm [] in
+      let lm = Mls.fold (fun x y a -> (x,y)::a) lm [] in
+      let pm = Mpr.fold (fun x y a -> (x,y)::a) pm [] in
+      fprintf fmt "@[<hov 2>(* clone %a with %a,%a,%a *)@]"
+        print_th th (print_list comma print_inst_ts) tm
+                    (print_list comma print_inst_ls) lm
+                    (print_list comma print_inst_pr) pm
   | Meta (t,al) ->
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]"
         t (print_list space print_meta_arg) al
@@ -386,7 +369,7 @@ module NsTree = struct
 
   let contents ns kn =
     let add_ns s ns acc = Namespace (s, ns, kn) :: acc in
-    let add_pr s p  acc = 
+    let add_pr s p  acc =
       let k, _ = find_prop_decl kn p in
       Leaf (sprint_pkind k ^ " " ^ s) :: acc in
     let add_ls s ls acc =
@@ -411,7 +394,7 @@ end
 
 let print_namespace fmt name th =
   let module P = Print_tree.Make(NsTree) in
-  fprintf fmt "@[<hov>%a@]@." P.print 
+  fprintf fmt "@[<hov>%a@]@." P.print
     (NsTree.Namespace (name, th.th_export, th.th_known))
 
 (* Exception reporting *)

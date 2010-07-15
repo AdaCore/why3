@@ -96,11 +96,6 @@ type meta_arg =
   | MAstr of string
   | MAint of int
 
-type meta_arg_real =
-  | MARid  of ident
-  | MARstr of string
-  | MARint of int
-
 exception KnownMeta of string
 exception UnknownMeta of string
 exception BadMetaArity of string * int * int
@@ -148,8 +143,8 @@ and tdecl = {
 and tdecl_node =
   | Decl  of decl
   | Use   of theory
-  | Clone of theory * ident Mid.t
-  | Meta  of string * meta_arg_real list
+  | Clone of theory * tysymbol Mts.t * lsymbol Mls.t * prsymbol Mpr.t
+  | Meta  of string * meta_arg list
 
 (** Theory declarations *)
 
@@ -158,32 +153,42 @@ module Hstdecl = Hashcons.Make (struct
   type t = tdecl
 
   let eq_marg a1 a2 = match a1,a2 with
-    | MARid id1, MARid id2 -> id_equal id1 id2
-    | MARstr s1, MARstr s2 -> s1 = s2
-    | MARint i1, MARint i2 -> i1 = i2
+    | MAts ts1, MAts ts2 -> ts_equal ts1 ts2
+    | MAls ls1, MAls ls2 -> ls_equal ls1 ls2
+    | MApr pr1, MApr pr2 -> pr_equal pr1 pr2
+    | MAstr s1, MAstr s2 -> s1 = s2
+    | MAint i1, MAint i2 -> i1 = i2
     | _,_ -> false
 
   let equal td1 td2 = match td1.td_node, td2.td_node with
     | Decl d1, Decl d2 -> d_equal d1 d2
     | Use th1, Use th2 -> id_equal th1.th_name th2.th_name
-    | Clone (th1,cl1), Clone (th2,cl2) ->
+    | Clone (th1,tm1,lm1,pm1), Clone (th2,tm2,lm2,pm2) ->
         id_equal th1.th_name th2.th_name &&
-        Mid.equal id_equal cl1 cl2
+        Mts.equal ts_equal tm1 tm2 &&
+        Mls.equal ls_equal lm1 lm2 &&
+        Mpr.equal pr_equal pm1 pm2
     | Meta (t1,al1), Meta (t2,al2) ->
         t1 = t2 && list_all2 eq_marg al1 al2
     | _,_ -> false
 
-  let hs_cl _ id acc = Hashcons.combine acc id.id_tag
+  let hs_cl_ts _ ts acc = Hashcons.combine acc ts.ts_name.id_tag
+  let hs_cl_ls _ ls acc = Hashcons.combine acc ls.ls_name.id_tag
+  let hs_cl_pr _ pr acc = Hashcons.combine acc pr.pr_name.id_tag
 
   let hs_ta = function
-    | MARid id -> id.id_tag
-    | MARstr s -> Hashtbl.hash s
-    | MARint i -> Hashtbl.hash i
+    | MAts ts -> ts.ts_name.id_tag
+    | MAls ls -> ls.ls_name.id_tag
+    | MApr pr -> pr.pr_name.id_tag
+    | MAstr s -> Hashtbl.hash s
+    | MAint i -> Hashtbl.hash i
 
   let hash td = match td.td_node with
     | Decl d -> d.d_tag
     | Use th -> th.th_name.id_tag
-    | Clone (th,cl) -> Mid.fold hs_cl cl th.th_name.id_tag
+    | Clone (th,tm,lm,pm) ->
+        Mts.fold hs_cl_ts tm (Mls.fold hs_cl_ls lm
+          (Mpr.fold hs_cl_pr pm th.th_name.id_tag))
     | Meta (t,al) -> Hashcons.combine_list hs_ta (Hashtbl.hash t) al
 
   let tag n td = { td with td_tag = n }
@@ -261,12 +266,16 @@ let close_namespace uc import s =
 
 (* Base constructors *)
 
-let known_clone kn cl =
-  Mid.iter (fun _ id -> known_id kn id) cl
+let known_clone kn tm lm pm =
+  Mts.iter (fun _ ts -> known_id kn ts.ts_name) tm;
+  Mls.iter (fun _ ls -> known_id kn ls.ls_name) lm;
+  Mpr.iter (fun _ pr -> known_id kn pr.pr_name) pm
 
 let known_meta kn al =
   let check = function
-    | MARid id -> known_id kn id
+    | MAts ts -> known_id kn ts.ts_name
+    | MAls ls -> known_id kn ls.ls_name
+    | MApr pr -> known_id kn pr.pr_name
     | _ -> ()
   in
   List.iter check al
@@ -281,7 +290,7 @@ let add_tdecl uc td = match td.td_node with
       uc_decls = td :: uc.uc_decls;
       uc_known = merge_known uc.uc_known th.th_known;
       uc_used  = Sid.union uc.uc_used (Sid.add th.th_name th.th_used) }
-  | Clone (_,cl) -> known_clone uc.uc_known cl;
+  | Clone (_,tm,lm,pm) -> known_clone uc.uc_known tm lm pm;
       { uc with uc_decls = td :: uc.uc_decls }
   | Meta (_,al) -> known_meta uc.uc_known al;
       { uc with uc_decls = td :: uc.uc_decls }
@@ -373,72 +382,54 @@ exception CannotInstantiate of ident
 
 type clones = {
   cl_local : Sid.t;
-  ts_table : tysymbol Hts.t;
-  ls_table : lsymbol Hls.t;
-  pr_table : prsymbol Hpr.t;
-  mutable id_table : ident Mid.t;
   mutable id_local : Sid.t;
+  mutable ts_table : tysymbol Mts.t;
+  mutable ls_table : lsymbol Mls.t;
+  mutable pr_table : prsymbol Mpr.t;
 }
 
 let empty_clones s = {
   cl_local = s;
-  ts_table = Hts.create 17;
-  ls_table = Hls.create 17;
-  pr_table = Hpr.create 17;
-  id_table = Mid.empty;
   id_local = Sid.empty;
+  ts_table = Mts.empty;
+  ls_table = Mls.empty;
+  pr_table = Mpr.empty;
 }
-
-let cl_add_ts cl ts ts' =
-  cl.id_table <- Mid.add ts.ts_name ts'.ts_name cl.id_table;
-  Hts.replace cl.ts_table ts ts'
-
-let cl_add_ls cl ls ls' =
-  cl.id_table <- Mid.add ls.ls_name ls'.ls_name cl.id_table;
-  Hls.replace cl.ls_table ls ls'
-
-let cl_add_pr cl pr pr' =
-  cl.id_table <- Mid.add pr.pr_name pr'.pr_name cl.id_table;
-  Hpr.replace cl.pr_table pr pr'
 
 (* populate the clone structure *)
 
-let cl_find_id cl id =
-  if not (Sid.mem id cl.cl_local) then id
-  else Mid.find id cl.id_table
-
 let rec cl_find_ts cl ts =
   if not (Sid.mem ts.ts_name cl.cl_local) then ts
-  else try Hts.find cl.ts_table ts
+  else try Mts.find ts cl.ts_table
   with Not_found ->
     let td' = option_map (cl_trans_ty cl) ts.ts_def in
     let ts' = create_tysymbol (id_dup ts.ts_name) ts.ts_args td' in
     cl.id_local <- Sid.add ts'.ts_name cl.id_local;
-    cl_add_ts cl ts ts';
+    cl.ts_table <- Mts.add ts ts' cl.ts_table;
     ts'
 
 and cl_trans_ty cl ty = ty_s_map (cl_find_ts cl) ty
 
 let cl_find_ls cl ls =
   if not (Sid.mem ls.ls_name cl.cl_local) then ls
-  else try Hls.find cl.ls_table ls
+  else try Mls.find ls cl.ls_table
   with Not_found ->
     let ta' = List.map (cl_trans_ty cl) ls.ls_args in
     let vt' = option_map (cl_trans_ty cl) ls.ls_value in
     let ls' = create_lsymbol (id_dup ls.ls_name) ta' vt' in
     cl.id_local <- Sid.add ls'.ls_name cl.id_local;
-    cl_add_ls cl ls ls';
+    cl.ls_table <- Mls.add ls ls' cl.ls_table;
     ls'
 
 let cl_trans_fmla cl f = f_s_map (cl_find_ts cl) (cl_find_ls cl) f
 
 let cl_find_pr cl pr =
-  if not (Sid.mem pr.pr_name cl.cl_local) then assert false
-  else try ignore (Hpr.find cl.pr_table pr); assert false
+  if not (Sid.mem pr.pr_name cl.cl_local) then pr
+  else try Mpr.find pr cl.pr_table
   with Not_found ->
     let pr' = create_prsymbol (id_dup pr.pr_name) in
     cl.id_local <- Sid.add pr'.pr_name cl.id_local;
-    cl_add_pr cl pr pr';
+    cl.pr_table <- Mpr.add pr pr' cl.pr_table;
     pr'
 
 (* initialize the clone structure *)
@@ -451,7 +442,7 @@ let cl_init_ts cl ts ts' =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   if List.length ts.ts_args <> List.length ts'.ts_args
     then raise (BadInstance (id, ts'.ts_name));
-  cl_add_ts cl ts ts'
+  cl.ts_table <- Mts.add ts ts' cl.ts_table
 
 let cl_init_ls cl ls ls' =
   let id = ls.ls_name in
@@ -467,7 +458,7 @@ let cl_init_ls cl ls ls' =
   in
   ignore (try List.fold_left2 mtch sb ls.ls_args ls'.ls_args
   with Invalid_argument _ -> raise (BadInstance (id, ls'.ls_name)));
-  cl_add_ls cl ls ls'
+  cl.ls_table <- Mls.add ls ls' cl.ls_table
 
 let cl_init_pr cl pr =
   let id = pr.pr_name in
@@ -564,13 +555,16 @@ let cl_decl cl inst d = match d.d_node with
   | Dprop p -> cl_prop cl inst p
 
 let cl_marg cl = function
-  | MARid id -> MARid (cl_find_id cl id)
+  | MAts ts -> MAts (cl_find_ts cl ts)
+  | MAls ls -> MAls (cl_find_ls cl ls)
+  | MApr pr -> MApr (cl_find_pr cl pr)
   | a -> a
 
 let cl_tdecl cl inst td = match td.td_node with
   | Decl d -> Decl (cl_decl cl inst d)
   | Use th -> Use th
-  | Clone (th,i) -> Clone (th, Mid.map (cl_find_id cl) i)
+  | Clone (th,tm,lm,pm) -> Clone (th, Mts.map (cl_find_ts cl) tm,
+          Mls.map (cl_find_ls cl) lm, Mpr.map (cl_find_pr cl) pm)
   | Meta (id,al) -> Meta (id, List.map (cl_marg cl) al)
 
 let clone_theory cl add_td acc th inst =
@@ -582,7 +576,7 @@ let clone_theory cl add_td acc th inst =
     option_apply acc (add_td acc) td
   in
   let acc = List.fold_left add acc th.th_decls in
-  add_td acc (mk_tdecl (Clone (th, cl.id_table)))
+  add_td acc (mk_tdecl (Clone (th, cl.ts_table, cl.ls_table, cl.pr_table)))
 
 let clone_export uc th inst =
   let cl = cl_init th inst in
@@ -593,21 +587,21 @@ let clone_export uc th inst =
 
   let f_ts n ts ns =
     if Sid.mem ts.ts_name th.th_local then
-      let ts' = Hts.find cl.ts_table ts in
+      let ts' = Mts.find ts cl.ts_table in
       if Sid.mem ts'.ts_name cl.id_local
       then add_ts true n ts' ns else ns
     else add_ts true n ts ns in
 
   let f_ls n ls ns =
     if Sid.mem ls.ls_name th.th_local then
-      let ls' = Hls.find cl.ls_table ls in
+      let ls' = Mls.find ls cl.ls_table in
       if Sid.mem ls'.ls_name cl.id_local
       then add_ls true n ls' ns else ns
     else add_ls true n ls ns in
 
   let f_pr n pr ns =
     if Sid.mem pr.pr_name th.th_local then
-      let pr' = Hpr.find cl.pr_table pr in
+      let pr' = Mpr.find pr cl.pr_table in
       if Sid.mem pr'.pr_name cl.id_local
       then add_pr true n pr' ns else ns
     else add_pr true n pr ns in
@@ -633,7 +627,8 @@ let clone_theory add_td acc th inst =
 
 let create_clone = clone_theory (fun tdl td -> td :: tdl)
 
-let create_null_clone th = mk_tdecl (Clone (th,Mid.empty))
+let create_null_clone th =
+  mk_tdecl (Clone (th, Mts.empty, Mls.empty, Mpr.empty))
 
 
 (** Meta properties *)
@@ -649,15 +644,11 @@ let create_meta s al =
   let atl = try Hashtbl.find meta_table s
     with Not_found -> raise (UnknownMeta s)
   in
-  let get_meta_arg_real at a = match at, a with
-    | MTtysymbol, MAts ts -> MARid ts.ts_name
-    | MTlsymbol, MAls ls -> MARid ls.ls_name
-    | MTprsymbol, MApr pr -> MARid pr.pr_name
-    | MTstring, MAstr s -> MARstr s
-    | MTint, MAint i -> MARint i
-    | _,_ -> raise (MetaTypeMismatch (s, at, get_meta_arg_type a))
+  let get_meta_arg at a =
+    let mt = get_meta_arg_type a in
+    if at = mt then a else raise (MetaTypeMismatch (s,at,mt))
   in
-  let al = try List.map2 get_meta_arg_real atl al
+  let al = try List.map2 get_meta_arg atl al
     with Invalid_argument _ ->
       raise (BadMetaArity (s, List.length atl, List.length al))
   in
@@ -666,9 +657,16 @@ let create_meta s al =
 let add_meta uc s al = add_tdecl uc (create_meta s al)
 
 let clone_meta tdt th tdc = match tdt.td_node, tdc.td_node with
-  | Meta (t,al), Clone (th',cl) when id_equal th.th_name th'.th_name ->
-      let find_id id = try Mid.find id cl with Not_found -> id in
-      let cl_marg = function MARid id -> MARid (find_id id) | a -> a in
+  | Meta (t,al), Clone (th',tm,lm,pm) when id_equal th.th_name th'.th_name ->
+      let find_ts ts = try Mts.find ts tm with Not_found -> ts in
+      let find_ls ls = try Mls.find ls lm with Not_found -> ls in
+      let find_pr pr = try Mpr.find pr pm with Not_found -> pr in
+      let cl_marg = function
+        | MAts ts -> MAts (find_ts ts)
+        | MAls ls -> MAls (find_ls ls)
+        | MApr pr -> MApr (find_pr pr)
+        | a -> a
+      in
       mk_tdecl (Meta (t, List.map cl_marg al))
   | _,_ -> invalid_arg "clone_meta"
 

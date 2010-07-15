@@ -224,9 +224,10 @@ let print_task ?(debug=false) drv fmt task =
     Mid.fold (fun _ (th,s) task ->
       let cs = (find_clone task th).tds_set in
       Stdecl.fold (fun td task -> match td.td_node with
-        | Clone (_,cl) when Mid.is_empty cl ->
+        | Clone (_,tm,lm,pm)
+          when Mts.is_empty tm && Mls.is_empty lm && Mpr.is_empty pm ->
             Stdecl.fold (fun td task -> add_tdecl task td) s task
-        | _ -> assert false (* impossible *)
+        | _ -> task
       ) cs task
     ) drv.drv_meta task
   in

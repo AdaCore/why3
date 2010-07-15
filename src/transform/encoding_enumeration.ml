@@ -30,7 +30,7 @@ let why_filename = Encoding_decorate.why_filename
 
 let meta_enum = Eliminate_algebraic.meta_enum
   
-type tenv = {kept : Sid.t;
+type tenv = {kept  : Sts.t;
              projs : lsymbol Hts.t} 
     (* trans_lsymbol ne depend pour l'instant pas du but, 
        comme specials_type ne depend pas*)
@@ -50,8 +50,7 @@ let add_proj tenv ts =
 
 let find_proj tenv ty =
   match ty.ty_node with
-    | Tyapp (tys,_) when Sid.mem tys.ts_name tenv.kept -> 
-      Some (Hts.find tenv.projs tys)
+    | Tyapp (ts,_) when Sts.mem ts tenv.kept -> Some (Hts.find tenv.projs ts)
     | _ -> None
   
 
@@ -113,7 +112,7 @@ let decl (tenv:tenv) d =
   let fnT = rewrite_term tenv Mvs.empty in
   let fnF = rewrite_fmla tenv Mvs.empty in
   match d.d_node with
-    | Dtype [ts,Tabstract] when Sid.mem ts.ts_name tenv.kept -> 
+    | Dtype [ts,Tabstract] when Sts.mem ts tenv.kept -> 
       let ls = add_proj tenv ts in
       [d;create_logic_decl [(ls,None)]]
     | Dtype [_] -> [d]
@@ -136,7 +135,7 @@ let decl tenv d =
 let t env = 
   let init_task, projs = load_prelude env in
   Trans.on_meta meta_enum (fun tds ->
-    let kept = Task.find_tagged meta_enum tds Sid.empty in
+    let kept = Task.find_tagged_ts meta_enum tds Sts.empty in
     let tenv = { kept = kept; projs = projs} in
     Trans.decl (decl tenv) init_task)
 

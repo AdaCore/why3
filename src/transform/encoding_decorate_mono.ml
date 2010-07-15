@@ -34,7 +34,7 @@ let why_filename = ["transform" ; "encoding_decorate"]
 let meta_kept = register_meta "encoding_decorate : kept" [MTtysymbol]
 
 (* From Encoding Polymorphism CADE07*)
-type tenv = {rem_ls : Sid.t;
+type tenv = {rem_ls : Sls.t;
              unsorted : ty;
              sort : lsymbol;
              real_to_int : lsymbol;
@@ -221,7 +221,7 @@ Perhaps you could use eliminate_definition"
                 Hls.find tenv.trans_lsymbol ls1
               with Not_found -> conv_ls tenv ls1 in
             let acc = create_logic_decl [ls2,None] :: acc in
-            let acc = if Sid.mem ls1.ls_name tenv.rem_ls && is_kept ls1
+            let acc = if Sls.mem ls1 tenv.rem_ls && is_kept ls1
               then begin
                 let make _ = create_vsymbol (id_fresh "x") ty_int in
                 let vars = List.map make ls1.ls_args in
@@ -267,12 +267,9 @@ let decl tenv d =
   res
 *)
 
-let t env = Trans.on_meta Printer.meta_remove_logic
-  (fun tds ->
-     let rem_ls = 
-       Task.find_tagged Printer.meta_remove_logic tds Sid.empty
-     in
-     let init_task,tenv = load_prelude rem_ls env in
-     Trans.tdecl (decl tenv) init_task)
+let t env = Trans.on_meta Printer.meta_remove_logic (fun tds ->
+  let rem_ls = Task.find_tagged_ls Printer.meta_remove_logic tds Sls.empty in
+  let init_task,tenv = load_prelude rem_ls env in
+  Trans.tdecl (decl tenv) init_task)
 
 let () = Trans.register_env_transform "encoding_decorate_mono" t

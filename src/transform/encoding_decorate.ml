@@ -32,32 +32,11 @@ let meta_kept = register_meta "encoding_decorate : kept" [MTtysymbol]
 
 (* From Encoding Polymorphism CADE07*)
 
-module Prelude = 
-struct
-(*  let create_ty s = ty_app (create_tysymbol (id_fresh s) [] None) [] in
-  let deco = create_ty "deco" in
-  let undeco = create_ty "undeco" in
-  let ty = create_ty "ty" in
-  let csort = create_fsymbol (id_fresh "csort") [ty;undeco] deco in
-*)
-
-     
-(*  let spec_conv ts =
-    let name = ts.ts_name.id_string in
-    let d2ty = create_fsymbol (id_fresh ("d2"^name)) [deco] (ty_app ts []) in
-    let ty2u = create_fsymbol (id_fresh (name^"2u")) [(ty_app ts [])] undeco in
-    let axiom = 
-      
-    let l = 
-    List.fold_left (fun acc ty -> Sty.add ty acc) Sty.empty l
-*)
-end
-  
 type lconv = {d2t : lsymbol;
               t2u : lsymbol;
               tty : term}
 
-type tenv = {kept : Sid.t option;
+type tenv = {kept : Sts.t option;
              clone_builtin : tysymbol -> Theory.tdecl list;
              specials : lconv Hty.t;
              deco : ty;
@@ -128,7 +107,7 @@ let is_kept tenv ts =
       ts_equal ts ts_int || ts_equal ts ts_real  (* for the constant *)
       || match tenv.kept with
         | None -> true (* every_simple *)
-        | Some s -> Sid.mem ts.ts_name s
+        | Some s -> Sts.mem ts s
     end
 
 (* Translate a type to a term *)
@@ -352,7 +331,7 @@ let decl tenv d =
 *)
 
 let t env = Trans.on_meta meta_kept (fun tds ->
-  let s = Task.find_tagged meta_kept tds Sid.empty in
+  let s = Task.find_tagged_ts meta_kept tds Sts.empty in
   let init_task,tenv = load_prelude (Some s) env in
   Trans.tdecl (decl tenv) init_task)
 

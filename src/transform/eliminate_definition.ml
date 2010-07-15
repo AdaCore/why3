@@ -25,11 +25,11 @@ open Decl
 (** Discard definitions of built-in symbols *)
 
 let add_ld q = function
-  | ls, Some _ when Sid.mem ls.ls_name q -> (ls, None)
+  | ls, Some _ when Sls.mem ls q -> (ls, None)
   | d -> d
 
 let add_id q (ld,id) = function
-  | ls, _ when Sid.mem ls.ls_name q -> (ls, None)::ld, id
+  | ls, _ when Sls.mem ls q -> (ls, None)::ld, id
   | d -> ld, d::id
 
 let elim q d = match d.d_node with
@@ -40,13 +40,9 @@ let elim q d = match d.d_node with
       create_logic_decls (List.rev ld) @ create_ind_decls (List.rev id)
   | _ -> [d]
 
-let eliminate_builtin =
-  Trans.on_metas
-    [ Printer.meta_remove_type;
-      Printer.meta_remove_logic;
-      Printer.meta_remove_prop ]
-    (fun mm ->
-      Trans.decl (elim (Mstr.fold Task.find_tagged mm Sid.empty)) None)
+let eliminate_builtin = Trans.on_meta Printer.meta_remove_logic (fun tds ->
+  let rem_ls = Task.find_tagged_ls Printer.meta_remove_logic tds Sls.empty in
+  Trans.decl (elim rem_ls) None)
 
 let () = Trans.register_transform "eliminate_builtin" eliminate_builtin
 

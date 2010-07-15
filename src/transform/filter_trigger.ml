@@ -73,15 +73,15 @@ let () = Trans.register_transform "filter_trigger" filter_trigger
 
 
 let keep_no_builtin rem_ls = function
-        | Term _ -> true
-        | Fmla {f_node = Fapp (ps,_)} -> not (Ident.Sid.mem ps.ls_name rem_ls)
-        | _ -> false
+  | Term _ -> true
+  | Fmla {f_node = Fapp (ps,_)} -> not (Sls.mem ps rem_ls)
+  | _ -> false
 
   
 let filter_trigger_builtin =
   Trans.on_meta Printer.meta_remove_logic (fun tds ->
     let rem_ls = 
-       Task.find_tagged Printer.meta_remove_logic tds Ident.Sid.empty
+       Task.find_tagged_ls Printer.meta_remove_logic tds Sls.empty
     in
     let rt,rf = make_rt_rf (keep_no_builtin rem_ls) in
     Trans.rewrite rt rf None)

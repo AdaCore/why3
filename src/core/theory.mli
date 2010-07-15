@@ -54,11 +54,6 @@ type meta_arg =
   | MAstr of string
   | MAint of int
 
-type meta_arg_real =
-  | MARid  of ident
-  | MARstr of string
-  | MARint of int
-
 val register_meta     : string -> meta_arg_type list -> string
 val register_meta_exc : string -> meta_arg_type list -> string
 
@@ -86,8 +81,8 @@ and tdecl = private {
 and tdecl_node = private
   | Decl  of decl
   | Use   of theory
-  | Clone of theory * ident Mid.t
-  | Meta  of string * meta_arg_real list
+  | Clone of theory * tysymbol Mts.t * lsymbol Mls.t * prsymbol Mpr.t
+  | Meta  of string * meta_arg list
 
 module Stdecl : Set.S with type elt = tdecl
 module Mtdecl : Map.S with type key = tdecl

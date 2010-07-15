@@ -47,7 +47,7 @@ val print_fmla : formatter -> fmla -> unit        (* formula *)
 val print_expr : formatter -> expr -> unit        (* term or formula *)
 
 val print_pkind : formatter -> prop_kind -> unit
-val print_meta_arg : formatter -> meta_arg_real -> unit
+val print_meta_arg : formatter -> meta_arg -> unit
 
 val print_type_decl : formatter -> ty_decl -> unit
 val print_logic_decl : formatter -> logic_decl -> unit

@@ -53,7 +53,7 @@ let forget_var v = forget_id ident_printer v.vs_name
 type info = {
   info_syn : syntax_map;
   info_rem : Sid.t;
-  info_ac  : Sid.t;
+  info_ac  : Sls.t;
 }
 
 let rec print_type info fmt ty = match ty.ty_node with
@@ -167,7 +167,7 @@ let ac_th = ["algebra";"AC"]
 let print_logic_decl info fmt (ls,ld) =
   match ld with
     | None ->
-        let sac = if Sid.mem ls.ls_name info.info_ac then "ac " else "" in
+        let sac = if Sls.mem ls info.info_ac then "ac " else "" in
         fprintf fmt "@[<hov 2>logic %s%a : %a%s%a@]@\n"
           sac print_ident ls.ls_name
           (print_list comma (print_type info)) ls.ls_args 
@@ -220,7 +220,8 @@ let print_task pr thpr syn fmt task =
   let info = {
     info_syn = syn;
     info_rem = get_remove_set task;
-    info_ac  = Task.find_tagged meta_ac (find_meta task meta_ac) Sid.empty }
+    info_ac  = 
+      Task.find_tagged_ls meta_ac (find_meta task meta_ac) Sls.empty }
   in
   let decls = Task.task_decls task in
   ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)

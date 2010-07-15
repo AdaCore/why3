@@ -68,6 +68,11 @@ let print_vs fmt vs =
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
+(* theory names always start with an upper case letter *)
+let print_th fmt th =
+  let sanitizer = String.capitalize in
+  fprintf fmt "%s" (id_unique iprinter ~sanitizer th.th_name)
+
 let print_ts fmt ts =
   fprintf fmt "%s" (id_unique tprinter ts.ts_name)
 
@@ -336,22 +341,34 @@ let print_decl info fmt d = match d.d_node with
 let print_decls info fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl info)) dl
 
-let print_inst fmt (id1,id2) =
-  fprintf fmt "ident %s = %s" id1.id_string id2.id_string
+let print_inst_ts fmt (ts1,ts2) =
+  fprintf fmt "type %a = %a" print_ts ts1 print_ts ts2
+
+let print_inst_ls fmt (ls1,ls2) =
+  fprintf fmt "logic %a = %a" print_ls ls1 print_ls ls2
+
+let print_inst_pr fmt (pr1,pr2) =
+  fprintf fmt "prop %a = %a" print_pr pr1 print_pr pr2
 
 let print_meta_arg fmt = function
-  | MARid id -> fprintf fmt "ident %s" id.id_string
-  | MARstr s -> fprintf fmt "\"%s\"" s
-  | MARint i -> fprintf fmt "%d" i
+  | MAts ts -> fprintf fmt "type %a" print_ts ts
+  | MAls ls -> fprintf fmt "logic %a" print_ls ls
+  | MApr pr -> fprintf fmt "prop %a" print_pr pr
+  | MAstr s -> fprintf fmt "\"%s\"" s
+  | MAint i -> fprintf fmt "%d" i
 
 let print_tdecl info fmt td = match td.td_node with
   | Decl d -> print_decl info fmt d
   | Use th ->
-      fprintf fmt "@[<hov 2>(* use %s *)@]@\n" th.th_name.id_string
-  | Clone (th,inst) ->
-      let inst = Mid.fold (fun x y a -> (x,y)::a) inst [] in
-      fprintf fmt "@[<hov 2>(* clone %s with %a *)@]@\n"
-        th.th_name.id_string (print_list comma print_inst) inst
+      fprintf fmt "@[<hov 2>(* use %a *)@]@\n" print_th th
+  | Clone (th,tm,lm,pm) ->
+      let tm = Mts.fold (fun x y a -> (x,y)::a) tm [] in
+      let lm = Mls.fold (fun x y a -> (x,y)::a) lm [] in
+      let pm = Mpr.fold (fun x y a -> (x,y)::a) pm [] in
+      fprintf fmt "@[<hov 2>(* clone %a with %a,%a,%a *)@]"
+        print_th th (print_list comma print_inst_ts) tm
+                    (print_list comma print_inst_ls) lm
+                    (print_list comma print_inst_pr) pm
   | Meta (t,al) ->
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]@\n"
         t (print_list space print_meta_arg) al

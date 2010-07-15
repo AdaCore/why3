@@ -113,7 +113,8 @@ let print_prelude fmt pl =
 
 let print_th_prelude task fmt pm =
   let th_used = task_fold (fun acc -> function
-    | { td_node = Clone (th,cl) } when Mid.is_empty cl -> th::acc
+    | { td_node = Clone (th,tm,lm,pm) }
+      when Mts.is_empty tm && Mls.is_empty lm && Mpr.is_empty pm -> th::acc
     | _ -> acc) [] task
   in
   List.iter (fun th ->
@@ -140,19 +141,27 @@ let meta_remove_type  = register_meta "remove_type" [MTtysymbol]
 let meta_remove_logic = register_meta "remove_logic" [MTlsymbol]
 let meta_remove_prop  = register_meta "remove_prop" [MTprsymbol]
 
-let remove_type  ts = create_meta meta_remove_type [MAts ts]
+let remove_type  ts = create_meta meta_remove_type  [MAts ts]
 let remove_logic ls = create_meta meta_remove_logic [MAls ls]
-let remove_prop  pr = create_meta meta_remove_prop [MApr pr]
+let remove_prop  pr = create_meta meta_remove_prop  [MApr pr]
 
 let get_remove_set task =
-  let add td s = match td.td_node with
-    | Meta (_,[MARid id]) -> Sid.add id s
+  let add_ts td s = match td.td_node with
+    | Meta (_,[MAts ts]) -> Sid.add ts.ts_name s
+    | _ -> assert false
+  in
+  let add_ls td s = match td.td_node with
+    | Meta (_,[MAls ls]) -> Sid.add ls.ls_name s
+    | _ -> assert false
+  in
+  let add_pr td s = match td.td_node with
+    | Meta (_,[MApr pr]) -> Sid.add pr.pr_name s
     | _ -> assert false
   in
   let s = Sid.empty in
-  let s = Stdecl.fold add (find_meta task meta_remove_type).tds_set s in
-  let s = Stdecl.fold add (find_meta task meta_remove_logic).tds_set s in
-  let s = Stdecl.fold add (find_meta task meta_remove_prop).tds_set s in
+  let s = Stdecl.fold add_ts (find_meta task meta_remove_type).tds_set s in
+  let s = Stdecl.fold add_ls (find_meta task meta_remove_logic).tds_set s in
+  let s = Stdecl.fold add_pr (find_meta task meta_remove_prop).tds_set s in
   s
 
 (** {2 exceptions to use in transformations and printers} *)

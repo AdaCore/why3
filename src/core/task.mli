@@ -99,7 +99,9 @@ val task_goal  : task -> prsymbol
 
 exception NotTaggingMeta of string
 
-val find_tagged : string -> tdecl_set -> Sid.t -> Sid.t
+val find_tagged_ts : string -> tdecl_set -> Sts.t -> Sts.t
+val find_tagged_ls : string -> tdecl_set -> Sls.t -> Sls.t
+val find_tagged_pr : string -> tdecl_set -> Spr.t -> Spr.t
 
 (* special selector for exclusive metaproperties *)
 
