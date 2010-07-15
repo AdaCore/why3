@@ -75,20 +75,7 @@ let mk_ts name args def = {
   ts_def  = def;
 }
 
-let tysymbol_table = Wid.create 63
-
-let create_tysymbol name args def =
-  let id = id_register name in
-  let ts = mk_ts id args def in
-  let wa = Weak.create 1 in
-  Weak.set wa 0 (Some ts);
-  Wid.set tysymbol_table id wa;
-  ts
-
-let find_tysymbol id =
-  match Weak.get (Wid.find tysymbol_table id) 0 with
-  | Some ts -> ts
-  | None -> raise Not_found
+let create_tysymbol name args def = mk_ts (id_register name) args def
 
 module Hsty = Hashcons.Make (struct
   type t = ty
@@ -222,7 +209,7 @@ let ts_real = create_tysymbol (id_fresh "real") [] None
 let ty_int  = ty_app ts_int  []
 let ty_real = ty_app ts_real []
 
-let ts_tuple n =
+let ts_tuple n = 
   let vl = ref [] in
   for i = 1 to n do vl := create_tvsymbol (id_fresh "a") :: !vl done;
   create_tysymbol (id_fresh ("tuple" ^ string_of_int n)) !vl None

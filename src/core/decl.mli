@@ -58,7 +58,6 @@ module Mpr : Map.S with type key = prsymbol
 module Hpr : Hashtbl.S with type key = prsymbol
 
 val create_prsymbol : preid -> prsymbol
-val find_prsymbol : ident -> prsymbol
 
 val pr_equal : prsymbol -> prsymbol -> bool
 

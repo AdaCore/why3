@@ -33,7 +33,6 @@ and origin =
 module Sid : Set.S with type elt = ident
 module Mid : Map.S with type key = ident
 module Hid : Hashtbl.S with type key = ident
-module Wid : Hashweak.S with type key = ident
 
 val id_equal : ident -> ident -> bool
 

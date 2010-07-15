@@ -86,22 +86,9 @@ module Spr = Prop.S
 module Mpr = Prop.M
 module Hpr = Prop.H
 
-let pr_equal = (==)
+let pr_equal pr1 pr2 = id_equal pr1.pr_name pr2.pr_name
 
-let prsymbol_table = Wid.create 63
-
-let create_prsymbol name =
-  let id = id_register name in
-  let pr = { pr_name = id } in
-  let wa = Weak.create 1 in
-  Weak.set wa 0 (Some pr);
-  Wid.set prsymbol_table id wa;
-  pr
-
-let find_prsymbol id =
-  match Weak.get (Wid.find prsymbol_table id) 0 with
-  | Some pr -> pr
-  | None -> raise Not_found
+let create_prsymbol n = { pr_name = id_register n }
 
 type ind_decl = lsymbol * (prsymbol * fmla) list
 

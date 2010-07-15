@@ -55,8 +55,6 @@ val create_lsymbol : preid -> ty list -> ty option -> lsymbol
 val create_fsymbol : preid -> ty list -> ty -> lsymbol
 val create_psymbol : preid -> ty list -> lsymbol
 
-val find_lsymbol : ident -> lsymbol
-
 (** {2 Exceptions} *)
 
 exception DuplicateVar of vsymbol
