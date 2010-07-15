@@ -66,7 +66,7 @@ module Utils = struct
 
 
   (** type representing types *)
-  let t = Ty.create_tysymbol (id_fresh "t") [] None
+  let t = Ty.create_tysymbol (id_fresh "ty") [] None
   let my_t = ty_app t []
   let t_decl = Decl.create_ty_decl [(t, Tabstract)]
 

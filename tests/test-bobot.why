@@ -14,6 +14,7 @@ theory Test_ind
   goal G : true
 end
 
+(*
 theory Test_encoding
   use import int.Int
   logic id(x: int) : int = x
@@ -28,6 +29,7 @@ theory Test_encoding
     (forall x:int. x=x+1)
   goal G2 : forall x:int. let x = 0 + 1 in x = let y = 0 + 1 + 0 in y
 end
+*)
 
 theory Test_simplify_array
   use import array.Array
