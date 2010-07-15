@@ -125,6 +125,7 @@ LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
 ifeq (@enable_hypothesis_selection@,yes)
 	LIB_TRANSFORM += hypothesis_selection
+	INCLUDES += -I +ocamlgraph
 	LIBINCLUDES += -I +ocamlgraph
 	EXTLIBS += ocamlgraph/graph
 endif

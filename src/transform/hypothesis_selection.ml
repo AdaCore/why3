@@ -27,8 +27,6 @@ open Term
 open Decl
 open Task
 
-(* requires ocamlgraph. TODO : recode this inside *)
-open Graph.Persistent
 
 module Int_Dft = struct
   type t = int
@@ -36,7 +34,8 @@ module Int_Dft = struct
   let default = max_int
 end
 
-module GP = Digraph.ConcreteLabeled(
+open Graph
+module GP = Graph.Persistent.Digraph.ConcreteLabeled(
   struct
     type t = Term.lsymbol
     let compare x y = compare x.ls_name.id_tag y.ls_name.id_tag
@@ -55,7 +54,7 @@ module ExprNode = struct
       | Fmla f -> f.f_tag
     let equal x y = compare x y == 0
 end
-module GC = Graph.Concrete(ExprNode)
+module GC = Graph.Persistent.Graph.Concrete(ExprNode)
 module SymbHashtbl =
   Hashtbl.Make(struct type t = Term.lsymbol
 		      let equal x y = x.ls_name.id_tag = y.ls_name.id_tag
@@ -75,6 +74,32 @@ module Sls = Set.Make(GP.V)
 module Sexpr = Set.Make(ExprNode)
 
 let err = Format.err_formatter
+
+
+(** affiche l'expression donnée, transformant les espaces en _ *)
+let string_of_expr_node node =
+  let print_in_buf printer x =
+    let b = Buffer.create 42 in
+    Format.bprintf b "@[%a@]" printer x;
+    Buffer.contents b in
+  let white_space = Str.regexp "[ \(\)]" in
+  let translate x = Str.global_replace white_space "_" x in
+  let repr = match node with
+    | Term t -> print_in_buf Pretty.print_term t
+    | Fmla f -> print_in_buf Pretty.print_fmla f in
+  translate repr
+
+module Dot_ = Graph.Graphviz.Dot(struct
+			  include GC
+			  let graph_attributes _ = []
+			  let default_vertex_attributes _ = []
+			  let vertex_attributes _ = []
+			  let vertex_name x = string_of_expr_node (GC.V.label x)
+			  let get_subgraph _ = None
+			  let default_edge_attributes _ = []
+			  let edge_attributes _ = []
+			end)
+
 
 module Util = struct
   let print_clause fmt = Format.fprintf fmt "@[[%a]@]"
@@ -545,6 +570,7 @@ let transformation fmlaTable fTbl tTbl symbTbl task =
   (* first, collect data in 2 graphes *)
   let (gc,gp,goal_option) =
     Trans.apply (collect_info fmlaTable fTbl tTbl symbTbl) task in
+  Format.fprintf Format.err_formatter "graph: @\n@\n%a@\n@." Dot_.fprint_graph gc; 
   (* get the goal *)
   let goal_fmla = match goal_option with
     | None -> failwith "no goal !"
