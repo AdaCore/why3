@@ -43,11 +43,18 @@ let iprinter,tprinter,lprinter,pprinter =
   create_ident_printer bl ~sanitizer:isanitize,
   create_ident_printer bl ~sanitizer:usanitize
 
+let thash = Hid.create 63
+let lhash = Hid.create 63
+let phash = Hid.create 63
+
 let forget_all () =
   forget_all iprinter;
   forget_all tprinter;
   forget_all lprinter;
-  forget_all pprinter
+  forget_all pprinter;
+  Hid.clear thash;
+  Hid.clear lhash;
+  Hid.clear phash
 
 let tv_set = ref Sid.empty
 
@@ -74,16 +81,20 @@ let print_th fmt th =
   fprintf fmt "%s" (id_unique iprinter ~sanitizer th.th_name)
 
 let print_ts fmt ts =
+  Hid.replace thash ts.ts_name ts;
   fprintf fmt "%s" (id_unique tprinter ts.ts_name)
 
 let print_ls fmt ls =
+  Hid.replace lhash ls.ls_name ls;
   fprintf fmt "%s" (id_unique lprinter ls.ls_name)
 
 let print_cs fmt ls =
+  Hid.replace lhash ls.ls_name ls;
   let sanitizer = String.capitalize in
   fprintf fmt "%s" (id_unique lprinter ~sanitizer ls.ls_name)
 
 let print_pr fmt pr =
+  Hid.replace phash pr.pr_name pr;
   fprintf fmt "%s" (id_unique pprinter pr.pr_name)
 
 (** Types *)
@@ -318,21 +329,28 @@ let print_decl fmt d = match d.d_node with
   | Dprop p   -> print_prop_decl fmt p
 
 let print_inst fmt (id1,id2) =
-  try
-    fprintf fmt "type %s = %a"  id1.id_string print_ts (find_tysymbol id2)
-  with Not_found -> try
-    fprintf fmt "logic %s = %a" id1.id_string print_ls (find_lsymbol  id2)
-  with Not_found ->
-    fprintf fmt "prop %s = %a"  id1.id_string print_pr (find_prsymbol id2)
+  if Hid.mem thash id2 then
+    let n = id_unique tprinter id1 in
+    fprintf fmt "type %s = %a" n print_ts (Hid.find thash id2)
+  else if Hid.mem lhash id2 then
+    let n = id_unique lprinter id1 in
+    fprintf fmt "logic %s = %a" n print_ls (Hid.find lhash id2)
+  else if Hid.mem phash id2 then
+    let n = id_unique pprinter id1 in
+    fprintf fmt "prop %s = %a" n print_pr (Hid.find phash id2)
+  else
+    fprintf fmt "ident %s = %s" id1.id_string id2.id_string
 
 let print_meta_arg fmt = function
-  | MARid id -> begin try
-        fprintf fmt "type %a"  print_ts (find_tysymbol id)
-      with Not_found -> try
-        fprintf fmt "logic %a" print_ls (find_lsymbol  id)
-      with Not_found ->
-        fprintf fmt "prop %a"  print_pr (find_prsymbol id)
-      end
+  | MARid id ->
+      if Hid.mem thash id then
+        fprintf fmt "type %a" print_ts (Hid.find thash id)
+      else if Hid.mem lhash id then
+        fprintf fmt "logic %a" print_ls (Hid.find lhash id)
+      else if Hid.mem phash id then
+        fprintf fmt "prop %a" print_pr (Hid.find phash id)
+      else
+        fprintf fmt "ident %s" id.id_string
   | MARstr s -> fprintf fmt "\"%s\"" s
   | MARint i -> fprintf fmt "%d" i
 
@@ -368,7 +386,7 @@ module NsTree = struct
 
   let contents ns kn =
     let add_ns s ns acc = Namespace (s, ns, kn) :: acc in
-    let add_pr s p  acc =
+    let add_pr s p  acc = 
       let k, _ = find_prop_decl kn p in
       Leaf (sprint_pkind k ^ " " ^ s) :: acc in
     let add_ls s ls acc =
@@ -393,7 +411,7 @@ end
 
 let print_namespace fmt name th =
   let module P = Print_tree.Make(NsTree) in
-  fprintf fmt "@[<hov>%a@]@." P.print
+  fprintf fmt "@[<hov>%a@]@." P.print 
     (NsTree.Namespace (name, th.th_export, th.th_known))
 
 (* Exception reporting *)
