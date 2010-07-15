@@ -20,10 +20,6 @@
 (*s Hash tables for hash-consing. (Some code is borrowed from the ocaml
     standard library, which is copyright 1996 INRIA.) *)
 
-let gentag =
-  let r = ref 0 in
-  fun () -> incr r; !r
-
 module type HashedType =
   sig
     type t
@@ -40,136 +36,31 @@ module type S =
     val stats : unit -> int * int * int * int * int * int
   end
 
-module Make(H : HashedType) : (S with type t = H.t) = 
+module Make(H : HashedType) : (S with type t = H.t) =
 struct
-
   type t = H.t
 
-  type table = {
-    mutable table : t Weak.t array;
-    mutable totsize : int;             (* sum of the bucket sizes *)
-    mutable limit : int;               (* max ratio totsize/table length *)
-  }
+  module WH = Weak.Make (H)
 
-  let emptybucket = Weak.create 0
+  let next_tag = ref 0
 
-  let create sz =
-    let sz = if sz < 7 then 7 else sz in
-    let sz = if sz > Sys.max_array_length then Sys.max_array_length else sz in
-    {
-      table = Array.create sz emptybucket;
-      totsize = 0;
-      limit = 3;
-    }
-
-  let clear t =
-    for i = 0 to Array.length t.table - 1 do
-      t.table.(i) <- emptybucket
-    done;
-    t.totsize <- 0;
-    t.limit <- 3
-  
-  let fold f t init =
-    let rec fold_bucket i b accu =
-      if i >= Weak.length b then accu else
-      match Weak.get b i with
-      | Some v -> fold_bucket (i+1) b (f v accu)
-      | None -> fold_bucket (i+1) b accu
-    in
-    Array.fold_right (fold_bucket 0) t.table init
-
-  let count t =
-    let rec count_bucket i b accu =
-      if i >= Weak.length b then accu else
-      count_bucket (i+1) b (accu + (if Weak.check b i then 1 else 0))
-    in
-    Array.fold_right (count_bucket 0) t.table 0
-
-  let next_sz n = min (3*n/2 + 3) (Sys.max_array_length - 1)
-
-  let hash n = (H.hash n) land 0x3fffffff
-
-  let rec resize t =
-    let oldlen = Array.length t.table in
-    let newlen = next_sz oldlen in
-    if newlen > oldlen then begin
-      let newt = create newlen in
-      newt.limit <- t.limit + 100;          (* prevent resizing of newt *)
-      fold (fun d () -> add newt d (hash d)) t ();
-      t.table <- newt.table;
-      t.limit <- t.limit + 2;
-    end
-
-  and add t d hkey =
-    let index = hkey mod (Array.length t.table) in
-    let bucket = t.table.(index) in
-    let sz = Weak.length bucket in
-    let rec loop i =
-      if i >= sz then begin
-        let newsz = min (sz + 3) (Sys.max_array_length - 1) in
-        if newsz <= sz then 
-	  failwith "Hashcons.Make: hash bucket cannot grow more";
-        let newbucket = Weak.create newsz in
-        Weak.blit bucket 0 newbucket 0 sz;
-        Weak.set newbucket i (Some d);
-        t.table.(index) <- newbucket;
-        t.totsize <- t.totsize + (newsz - sz);
-        if t.totsize > t.limit * Array.length t.table then resize t;
-      end else begin
-        if Weak.check bucket i
-        then loop (i+1)
-        else Weak.set bucket i (Some d)
-      end
-    in
-    loop 0
-
-  let t = create 5003
+  let htable = WH.create 5003
 
   let hashcons d =
-    let hkey = hash d in
-    let index = hkey mod (Array.length t.table) in
-    let bucket = t.table.(index) in
-    let sz = Weak.length bucket in
-    let rec loop i =
-      if i >= sz then begin
-	let hnode = H.tag (gentag ()) d in
-	add t hnode hkey;
-	hnode
-      end else begin
-        match Weak.get_copy bucket i with
-        | Some v when H.equal v d -> 
-	    begin match Weak.get bucket i with
-              | Some v -> v
-              | None -> loop (i+1)
-            end
-        | _ -> loop (i+1)
-      end
-    in
-    loop 0
-  
-  let iter f =
-    let rec iter_bucket i b =
-      if i >= Weak.length b then () else
-      match Weak.get b i with
-      | Some v -> f v; iter_bucket (i+1) b
-      | None -> iter_bucket (i+1) b
-    in
-    Array.iter (iter_bucket 0) t.table
+    let d = H.tag !next_tag d in
+    let o = WH.merge htable d in
+    if o == d then incr next_tag;
+    o
 
-  let stats () =
-    let len = Array.length t.table in
-    let lens = Array.map Weak.length t.table in
-    Array.sort compare lens;
-    let totlen = Array.fold_left ( + ) 0 lens in
-    (len, count t, totlen, lens.(0), lens.(len/2), lens.(len-1))
-  
+  let iter f = WH.iter f htable
+
+  let stats () = WH.stats htable
 end
 
 let combine acc n = n * 65599 + acc
 let combine2 acc n1 n2 = combine acc (combine n1 n2)
 let combine3 acc n1 n2 n3 = combine acc (combine n1 (combine n2 n3))
 let combine_list f = List.fold_left (fun acc x -> combine acc (f x))
-let combine_option h = function
-  | None -> 0
-  | Some s -> (h s) + 1
+let combine_option h = function None -> 0 | Some s -> (h s) + 1
 let combine_pair h1 h2 (a1,a2) = combine (h1 a1) (h2 a2)
+
