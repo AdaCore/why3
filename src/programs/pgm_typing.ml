@@ -1023,8 +1023,8 @@ and expr_desc gl env loc ty = function
   | IElabel (lab, e1) ->
       let e1 = expr gl env e1 in
       Elabel (lab, e1), e1.expr_type_v, e1.expr_effect
-  | IEany _ ->
-      assert false (*TODO*)
+  | IEany c ->
+      Eany c, c.c_result_type, c.c_effect
 
 and triple gl env (p, e, q) =
   let e = expr gl env e in

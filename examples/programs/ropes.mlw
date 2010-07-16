@@ -1,0 +1,26 @@
+
+{
+  type char
+
+  use array.ArrayLength as S
+
+  type string = S.t char
+
+  logic empty_string : string
+
+  type rope =
+    | Str string (*ofs:*) int (len: int)
+    | App rope rope (len: int)
+
+}
+
+let empty () = Str empty_string 0 0
+
+let length r = len r
+
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/ropes"
+End: 
+*)
