@@ -40,6 +40,8 @@ val print_pr : formatter -> prsymbol -> unit      (* proposition name *)
 val print_ty : formatter -> ty -> unit            (* type *)
 val print_vsty : formatter -> vsymbol -> unit     (* variable : type *)
 
+val print_quant : formatter -> quant -> unit      (* quantifier *)
+val print_binop : formatter -> binop -> unit      (* binary operator *)
 val print_const : formatter -> constant -> unit   (* int/real constant *)
 val print_pat : formatter -> pattern -> unit      (* pattern *)
 val print_term : formatter -> term -> unit        (* term *)
@@ -59,6 +61,5 @@ val print_tdecl : formatter -> tdecl -> unit
 val print_task : formatter -> task -> unit
 val print_theory : formatter -> theory -> unit
 
-val print_named_task : formatter -> string -> task -> unit
 val print_namespace : formatter -> string -> theory -> unit
 

@@ -109,7 +109,8 @@ let syntax_arguments s print fmt l =
 (** {2 use printers} *)
 
 let print_prelude fmt pl =
-  fprintf fmt "%a@\n" (print_list newline pp_print_string) pl
+  let println fmt s = fprintf fmt "%s@\n" s in
+  print_list nothing println fmt pl
 
 let print_th_prelude task fmt pm =
   let th_used = task_fold (fun acc -> function

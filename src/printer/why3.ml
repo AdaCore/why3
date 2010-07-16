@@ -28,8 +28,8 @@ open Printer
 open Theory
 
 let iprinter,tprinter,lprinter,pprinter =
-  let bl = ["theory"; "type"; "logic"; "inductive";
-            "axiom"; "lemma"; "goal"; "use"; "clone";
+  let bl = ["theory"; "type"; "logic"; "inductive"; "meta";
+            "axiom"; "lemma"; "goal"; "use"; "clone"; "prop";
             "namespace"; "import"; "export"; "end";
             "forall"; "exists"; "and"; "or"; "not";
             "true"; "false"; "if"; "then"; "else";
@@ -93,21 +93,30 @@ type info = {
   info_rem : Sid.t;
 }
 
+let info = ref {
+  info_syn = Mid.empty;
+  info_rem = Sid.empty
+}
+
+let query_syntax id = query_syntax !info.info_syn id
+let query_remove id = Sid.mem id !info.info_rem
+
 (** Types *)
 
-let rec ns_comma fmt () = fprintf fmt ",@,"
+let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
-let rec print_ty info fmt ty = match ty.ty_node with
+let rec print_ty_node inn fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
-  | Tyapp (ts, tl) -> begin match query_syntax info.info_syn ts.ts_name with
-      | Some s -> syntax_arguments s (print_ty info) fmt tl
-      | None -> fprintf fmt "%a%a" (print_tyapp info) tl print_ts ts
-    end
+  | Tyapp (ts, tl) -> begin match query_syntax ts.ts_name with
+      | Some s -> syntax_arguments s (print_ty_node false) fmt tl
+      | None -> begin match tl with
+          | [] -> print_ts fmt ts
+          | tl -> fprintf fmt (protect_on inn "%a@ %a")
+              print_ts ts (print_list space (print_ty_node true)) tl
+          end
+      end
 
-and print_tyapp info fmt = function
-  | []  -> ()
-  | [t] -> fprintf fmt "%a@ " (print_ty info) t
-  | l   -> fprintf fmt "(%a)@ " (print_list ns_comma (print_ty info)) l
+let print_ty = print_ty_node false
 
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
@@ -124,222 +133,217 @@ let unambig_fs fs =
 
 (** Patterns, terms, and formulas *)
 
-let lparen_l fmt () = fprintf fmt "@ ("
-let lparen_r fmt () = fprintf fmt "(@,"
-let print_paren_l fmt x = print_list_delim lparen_l rparen comma fmt x
-let print_paren_r fmt x = print_list_delim lparen_r rparen comma fmt x
-
-let rec print_pat info fmt p = match p.pat_node with
+let rec print_pat_node inn fmt p = match p.pat_node with
   | Pwild -> fprintf fmt "_"
   | Pvar v -> print_vs fmt v
-  | Pas (p,v) -> fprintf fmt "%a as %a" (print_pat info) p print_vs v
-  | Papp (cs,pl) -> begin match query_syntax info.info_syn cs.ls_name with
-      | Some s -> syntax_arguments s (print_pat info) fmt pl
-      | None -> fprintf fmt "%a%a"
-          print_cs cs (print_paren_r (print_pat info)) pl
-    end
+  | Pas (p,v) -> fprintf fmt (protect_on inn "%a as %a")
+      (print_pat_node false) p print_vs v
+  | Papp (cs,pl) -> begin match query_syntax cs.ls_name with
+      | Some s -> syntax_arguments s (print_pat_node false) fmt pl
+      | None -> begin match pl with
+          | [] -> print_cs fmt cs
+          | pl -> fprintf fmt (protect_on inn "%a@ %a")
+              print_cs cs (print_list space (print_pat_node true)) pl
+          end
+      end
 
-let print_vsty info fmt v =
-  fprintf fmt "%a:@,%a" print_vs v (print_ty info) v.vs_ty
+let print_pat = print_pat_node false
 
-let print_quant fmt = function
-  | Fforall -> fprintf fmt "forall"
-  | Fexists -> fprintf fmt "exists"
+let print_vsty fmt v =
+  fprintf fmt "%a:@,%a" print_vs v print_ty v.vs_ty
 
-let print_binop fmt = function
-  | Fand -> fprintf fmt "and"
-  | For -> fprintf fmt "or"
-  | Fimplies -> fprintf fmt "->"
-  | Fiff -> fprintf fmt "<->"
+let print_const = Pretty.print_const
+let print_quant = Pretty.print_quant
+let print_binop = Pretty.print_binop
+
+let prio_binop = function
+  | Fand -> 3
+  | For -> 2
+  | Fimplies -> 1
+  | Fiff -> 1
 
 let print_label fmt l = fprintf fmt "\"%s\"" l
 
-let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+let rec print_term fmt t = print_lterm 0 fmt t
+and     print_fmla fmt f = print_lfmla 0 fmt f
 
-let rec print_term info fmt t = print_lrterm false false info fmt t
-and     print_fmla info fmt f = print_lrfmla false false info fmt f
-and print_opl_term info fmt t = print_lrterm true  false info fmt t
-and print_opl_fmla info fmt f = print_lrfmla true  false info fmt f
-and print_opr_term info fmt t = print_lrterm false true  info fmt t
-and print_opr_fmla info fmt f = print_lrfmla false true  info fmt f
+and print_lterm pri fmt t = match t.t_label with
+  | [] -> print_tnode pri fmt t
+  | ll -> fprintf fmt (protect_on (pri > 0) "%a %a")
+      (print_list space print_label) ll (print_tnode 0) t
 
-and print_lrterm opl opr info fmt t = match t.t_label with
-  | [] -> print_tnode opl opr info fmt t
-  | ll -> fprintf fmt "(%a %a)"
-      (print_list space print_label) ll (print_tnode false false info) t
+and print_lfmla pri fmt f = match f.f_label with
+  | [] -> print_fnode pri fmt f
+  | ll -> fprintf fmt (protect_on (pri > 0) "%a %a")
+      (print_list space print_label) ll (print_fnode 0) f
 
-and print_lrfmla opl opr info fmt f = match f.f_label with
-  | [] -> print_fnode opl opr info fmt f
-  | ll -> fprintf fmt "(%a %a)"
-      (print_list space print_label) ll (print_fnode false false info) f
+and print_tapp pri fs fmt tl =
+  match query_syntax fs.ls_name with
+    | Some s -> syntax_arguments s print_term fmt tl
+    | None -> begin match tl with
+        | [] -> print_ls fmt fs
+        | tl -> fprintf fmt (protect_on (pri > 4) "%a@ %a")
+            print_ls fs (print_list space (print_lterm 5)) tl
+        end
 
-and print_tnode opl opr info fmt t = match t.t_node with
+and print_tnode pri fmt t = match t.t_node with
   | Tbvar _ ->
       assert false
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      Pretty.print_const fmt c
+      print_const fmt c
+  | Tapp (fs, tl) when unambig_fs fs ->
+      print_tapp pri fs fmt tl
+  | Tapp (fs, tl) ->
+      fprintf fmt (protect_on (pri > 0) "%a:%a")
+        (print_tapp 0 fs) tl print_ty t.t_ty
   | Tif (f,t1,t2) ->
-      fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
-        (print_fmla info) f (print_term info) t1 (print_opl_term info) t2
+      fprintf fmt (protect_on (pri > 0) "if %a@ then %a@ else %a")
+        print_fmla f print_term t1 print_term t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
-        print_vs v (print_opl_term info) t1 (print_opl_term info) t2;
+      fprintf fmt (protect_on (pri > 0) "let %a =@ %a in@ %a")
+        print_vs v (print_lterm 4) t1 print_term t2;
       forget_var v
   | Tcase (tl,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
-        (print_list comma (print_term info)) tl
-        (print_list newline (print_tbranch info)) bl
+        (print_list comma print_term) tl
+        (print_list newline print_tbranch) bl
   | Teps fb ->
       let v,f = f_open_bound fb in
-      fprintf fmt (protect_on opr "epsilon %a.@ %a")
-        (print_vsty info) v (print_opl_fmla info) f;
+      fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
+        print_vsty v print_fmla f;
       forget_var v
-  | Tapp (fs, tl) -> begin match query_syntax info.info_syn fs.ls_name with
-      | Some s -> syntax_arguments s (print_term info) fmt tl
-      | None -> if unambig_fs fs
-          then fprintf fmt "%a%a" print_ls fs
-            (print_paren_r (print_term info)) tl
-          else fprintf fmt (protect_on opl "%a%a:%a") print_ls fs
-            (print_paren_r (print_term info)) tl (print_ty info) t.t_ty
-    end
 
-and print_fnode opl opr info fmt f = match f.f_node with
+and print_fnode pri fmt f = match f.f_node with
+  | Fapp (ps, tl) -> begin match query_syntax ps.ls_name with
+      | Some s -> syntax_arguments s print_term fmt tl
+      | None -> begin match tl with
+          | [] -> print_ls fmt ps
+          | tl -> fprintf fmt (protect_on (pri > 4) "%a@ %a")
+              print_ls ps (print_list space (print_lterm 5)) tl
+          end
+      end
   | Fquant (q,fq) ->
       let vl,tl,f = f_open_quant fq in
-      fprintf fmt (protect_on opr "%a %a%a.@ %a") print_quant q
-        (print_list comma (print_vsty info)) vl
-        (print_tl info) tl (print_fmla info) f;
+      fprintf fmt (protect_on (pri > 0) "%a %a%a.@ %a") print_quant q
+        (print_list comma print_vsty) vl print_tl tl print_fmla f;
       List.iter forget_var vl
   | Ftrue ->
       fprintf fmt "true"
   | Ffalse ->
       fprintf fmt "false"
   | Fbinop (b,f1,f2) ->
-      fprintf fmt (protect_on (opl || opr) "%a %a@ %a")
-        (print_opr_fmla info) f1 print_binop b (print_opl_fmla info) f2
+      let p = prio_binop b in
+      fprintf fmt (protect_on (pri > p) "%a %a@ %a")
+        (print_lfmla (p + 1)) f1 print_binop b (print_lfmla p) f2
   | Fnot f ->
-      fprintf fmt (protect_on opr "not %a") (print_opl_fmla info) f
+      fprintf fmt (protect_on (pri > 4) "not %a") (print_lfmla 4) f
   | Fif (f1,f2,f3) ->
-      fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
-        (print_fmla info) f1 (print_fmla info) f2 (print_opl_fmla info) f3
+      fprintf fmt (protect_on (pri > 0) "if %a@ then %a@ else %a")
+        print_fmla f1 print_fmla f2 print_fmla f3
   | Flet (t,f) ->
       let v,f = f_open_bound f in
-      fprintf fmt (protect_on opr "let %a =@ %a in@ %a")
-        print_vs v (print_opl_term info) t (print_opl_fmla info) f;
+      fprintf fmt (protect_on (pri > 0) "let %a =@ %a in@ %a")
+        print_vs v (print_lterm 4) t print_fmla f;
       forget_var v
   | Fcase (tl,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
-        (print_list comma (print_term info)) tl
-        (print_list newline (print_fbranch info)) bl
-  | Fapp (ps, tl) -> begin match query_syntax info.info_syn ps.ls_name with
-      | Some s -> syntax_arguments s (print_term info) fmt tl
-      | None -> fprintf fmt "%a%a" print_ls ps
-            (print_paren_r (print_term info)) tl
-    end
+        (print_list comma print_term) tl
+        (print_list newline print_fbranch) bl
 
-and print_tbranch info fmt br =
+and print_tbranch fmt br =
   let pl,t = t_open_branch br in
   fprintf fmt "@[<hov 4>| %a ->@ %a@]"
-    (print_list comma (print_pat info)) pl (print_term info) t;
+    (print_list comma print_pat) pl print_term t;
   Svs.iter forget_var (List.fold_left pat_freevars Svs.empty pl)
 
-and print_fbranch info fmt br =
+and print_fbranch fmt br =
   let pl,f = f_open_branch br in
   fprintf fmt "@[<hov 4>| %a ->@ %a@]"
-    (print_list comma (print_pat info)) pl (print_fmla info) f;
+    (print_list comma print_pat) pl print_fmla f;
   Svs.iter forget_var (List.fold_left pat_freevars Svs.empty pl)
 
-and print_tl info fmt tl =
+and print_tl fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
-    (print_list alt (print_list comma (print_expr info))) tl
+    (print_list alt (print_list comma print_expr)) tl
 
-and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
+and print_expr fmt = e_apply (print_term fmt) (print_fmla fmt)
 
 (** Declarations *)
 
-let print_constr info fmt cs =
+let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
+let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node true) ty
+let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
+
+let print_constr fmt cs =
   fprintf fmt "@[<hov 4>| %a%a@]" print_cs cs
-    (print_paren_l (print_ty info)) cs.ls_args
+    (print_list nothing print_ty_arg) cs.ls_args
 
-let print_ty_args fmt = function
-  | [] -> ()
-  | [tv] -> fprintf fmt " %a" print_tv tv
-  | l -> fprintf fmt " (%a)" (print_list ns_comma print_tv) l
-
-let print_type_decl info fmt (ts,def) = match def with
+let print_type_decl fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
       | None ->
-          fprintf fmt "@[<hov 2>type%a %a@]@\n@\n"
-            print_ty_args ts.ts_args print_ts ts
+          fprintf fmt "@[<hov 2>type %a%a@]@\n@\n" print_ts ts
+            (print_list nothing print_tv_arg) ts.ts_args
       | Some ty ->
-          fprintf fmt "@[<hov 2>type%a %a =@ %a@]@\n@\n"
-            print_ty_args ts.ts_args print_ts ts (print_ty info) ty
+          fprintf fmt "@[<hov 2>type %a%a =@ %a@]@\n@\n" print_ts ts
+            (print_list nothing print_tv_arg) ts.ts_args print_ty ty
       end
   | Talgebraic csl ->
-      fprintf fmt "@[<hov 2>type%a %a =@\n@[<hov>%a@]@]@\n@\n"
-        print_ty_args ts.ts_args print_ts ts
-        (print_list newline (print_constr info)) csl
+      fprintf fmt "@[<hov 2>type %a%a =@\n@[<hov>%a@]@]@\n@\n"
+        print_ts ts (print_list nothing print_tv_arg) ts.ts_args
+        (print_list newline print_constr) csl
 
-let print_type_decl info fmt d =
-  if not (Sid.mem (fst d).ts_name info.info_rem) then
-    (print_type_decl info fmt d; forget_tvs ())
+let print_type_decl fmt d =
+  if not (query_remove (fst d).ts_name) then
+    (print_type_decl fmt d; forget_tvs ())
 
-let print_ls_type info fmt = fprintf fmt " :@ %a" (print_ty info)
+let print_ls_type fmt = fprintf fmt " :@ %a" print_ty
 
-let print_logic_decl info fmt (ls,ld) = match ld with
+let print_logic_decl fmt (ls,ld) = match ld with
   | Some ld ->
       let vl,e = open_ls_defn ld in
       fprintf fmt "@[<hov 2>logic %a%a%a =@ %a@]@\n@\n"
-        print_ls ls (print_paren_l (print_vsty info)) vl
-        (print_option (print_ls_type info)) ls.ls_value
-        (print_expr info) e;
+        print_ls ls (print_list nothing print_vs_arg) vl
+        (print_option print_ls_type) ls.ls_value print_expr e;
       List.iter forget_var vl
   | None ->
       fprintf fmt "@[<hov 2>logic %a%a%a@]@\n@\n"
-        print_ls ls (print_paren_l (print_ty info)) ls.ls_args
-        (print_option (print_ls_type info)) ls.ls_value
+        print_ls ls (print_list nothing print_ty_arg) ls.ls_args
+        (print_option print_ls_type) ls.ls_value
 
-let print_logic_decl info fmt d =
-  if not (Sid.mem (fst d).ls_name info.info_rem) then
-    (print_logic_decl info fmt d; forget_tvs ())
+let print_logic_decl fmt d =
+  if not (query_remove (fst d).ls_name) then
+    (print_logic_decl fmt d; forget_tvs ())
 
-let print_ind info fmt (pr,f) =
-  fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr (print_fmla info) f
+let print_ind fmt (pr,f) =
+  fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr print_fmla f
 
-let print_ind_decl info fmt (ps,bl) =
+let print_ind_decl fmt (ps,bl) =
   fprintf fmt "@[<hov 2>inductive %a%a =@ @[<hov>%a@]@]@\n@\n"
-     print_ls ps (print_paren_l (print_ty info)) ps.ls_args
-     (print_list newline (print_ind info)) bl
+    print_ls ps (print_list nothing print_ty_arg) ps.ls_args
+    (print_list newline print_ind) bl
 
-let print_ind_decl info fmt d =
-  if not (Sid.mem (fst d).ls_name info.info_rem) then
-    (print_ind_decl info fmt d; forget_tvs ())
+let print_ind_decl fmt d =
+  if not (query_remove (fst d).ls_name) then
+    (print_ind_decl fmt d; forget_tvs ())
 
-let print_pkind fmt = function
-  | Paxiom -> fprintf fmt "axiom"
-  | Plemma -> fprintf fmt "lemma"
-  | Pgoal  -> fprintf fmt "goal"
-  | Pskip  -> fprintf fmt "skip"
+let print_pkind = Pretty.print_pkind
 
-let print_prop_decl info fmt (k,pr,f) =
+let print_prop_decl fmt (k,pr,f) =
   fprintf fmt "@[<hov 2>%a %a : %a@]@\n@\n" print_pkind k
-    print_pr pr (print_fmla info) f
+    print_pr pr print_fmla f
 
-let print_prop_decl info fmt (k,pr,f) = match k with
-  | Paxiom when Sid.mem pr.pr_name info.info_rem -> ()
-  | _ -> print_prop_decl info fmt (k,pr,f); forget_tvs ()
+let print_prop_decl fmt (k,pr,f) = match k with
+  | Paxiom when query_remove pr.pr_name -> ()
+  | _ -> print_prop_decl fmt (k,pr,f); forget_tvs ()
 
-let print_decl info fmt d = match d.d_node with
-  | Dtype tl  -> print_list nothing (print_type_decl info) fmt tl
-  | Dlogic ll -> print_list nothing (print_logic_decl info) fmt ll
-  | Dind il   -> print_list nothing (print_ind_decl info) fmt il
-  | Dprop p   -> print_prop_decl info fmt p
-
-let print_decls info fmt dl =
-  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl info)) dl
+let print_decl fmt d = match d.d_node with
+  | Dtype tl  -> print_list nothing print_type_decl fmt tl
+  | Dlogic ll -> print_list nothing print_logic_decl fmt ll
+  | Dind il   -> print_list nothing print_ind_decl fmt il
+  | Dprop p   -> print_prop_decl fmt p
 
 let print_inst_ts fmt (ts1,ts2) =
   fprintf fmt "type %a = %a" print_ts ts1 print_ts ts2
@@ -357,31 +361,33 @@ let print_meta_arg fmt = function
   | MAstr s -> fprintf fmt "\"%s\"" s
   | MAint i -> fprintf fmt "%d" i
 
-let print_tdecl info fmt td = match td.td_node with
-  | Decl d -> print_decl info fmt d
+let print_tdecl fmt td = match td.td_node with
+  | Decl d ->
+      print_decl fmt d
   | Use th ->
-      fprintf fmt "@[<hov 2>(* use %a *)@]@\n" print_th th
+      fprintf fmt "@[<hov 2>(* use %a *)@]@\n@\n" print_th th
+  | Clone (th,tm,lm,pm)
+    when Mts.is_empty tm && Mls.is_empty lm && Mpr.is_empty pm ->
+      fprintf fmt "@[<hov 2>(* use %a *)@]@\n@\n" print_th th
   | Clone (th,tm,lm,pm) ->
       let tm = Mts.fold (fun x y a -> (x,y)::a) tm [] in
       let lm = Mls.fold (fun x y a -> (x,y)::a) lm [] in
       let pm = Mpr.fold (fun x y a -> (x,y)::a) pm [] in
-      fprintf fmt "@[<hov 2>(* clone %a with %a,%a,%a *)@]"
+      fprintf fmt "@[<hov 2>(* clone %a with %a,@ %a,@ %a *)@]@\n@\n"
         print_th th (print_list comma print_inst_ts) tm
                     (print_list comma print_inst_ls) lm
                     (print_list comma print_inst_pr) pm
   | Meta (t,al) ->
-      fprintf fmt "@[<hov 2>(* meta %s %a *)@]@\n"
-        t (print_list space print_meta_arg) al
-
-let print_tdecls info fmt dl =
-  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_tdecl info)) dl
+      fprintf fmt "@[<hov 2>(* meta %s %a *)@]@\n@\n"
+        t (print_list comma print_meta_arg) al
 
 let print_task pr thpr syn fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
-  let info = { info_syn = syn; info_rem = get_remove_set task } in
-  print_tdecls info fmt (Task.task_tdecls task)
+  info := { info_syn = syn; info_rem = get_remove_set task };
+  fprintf fmt "@[<hov 2>theory Task@\n%a@]end@."
+    (print_list nothing print_tdecl) (Task.task_tdecls task)
 
 let () = register_printer "why3" print_task
 
