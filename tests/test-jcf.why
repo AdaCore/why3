@@ -1,17 +1,10 @@
 
 (* test file *)
 
-theory Test
-  use export int.Int
-  logic f(int) : int
-  logic q(int, int)
-  axiom A : forall x:int. q (-x) (f x)
-  goal G : 3.14 = 3.15
-end
-
-theory Test2
-  use export list.List
-  goal G : let x = Nil in let t = (Cons 1 x, Cons 3.14 x) in t=t
+theory S
+  use import int.Int
+  logic p int
+  goal G : forall x:int. (p 1 \/ p 2) -> p 3
 end
 
 

@@ -67,7 +67,7 @@
 
 /* symbols */
 
-%token ARROW
+%token ARROW ASYM_AND ASYM_OR
 %token BAR
 %token COLON COMMA
 %token DOT EQUAL
@@ -90,8 +90,8 @@
 
 %nonassoc prec_named
 %right ARROW LRARROW
-%right OR
-%right AND
+%right OR ASYM_OR
+%right AND ASYM_AND
 %nonassoc NOT
 %left EQUAL OP1
 %left OP2
@@ -346,8 +346,12 @@ lexpr:
    { infix_pp $1 PPiff $3 }
 | lexpr OR lexpr
    { infix_pp $1 PPor $3 }
+| lexpr ASYM_OR lexpr
+   { mk_pp (PPnamed ("asym_split", infix_pp $1 PPor $3)) }
 | lexpr AND lexpr
    { infix_pp $1 PPand $3 }
+| lexpr ASYM_AND lexpr
+   { mk_pp (PPnamed ("asym_split", infix_pp $1 PPand $3)) }
 | NOT lexpr
    { prefix_pp PPnot $2 }
 | lexpr EQUAL lexpr

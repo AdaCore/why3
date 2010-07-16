@@ -79,9 +79,9 @@ back  +-+-+-+-------------------+
     forall a : sparse_array . invariant a -> 
         let (SA val idx back sz n) = a in
         n = sz -> 
-            permutation sz back and
+            permutation sz back /\
             forall i : int. 0 <= i < sz ->
-                idx#i = dirichlet sz back i and is_elt a i
+                idx#i = dirichlet sz back i /\ is_elt a i
 }
 
 

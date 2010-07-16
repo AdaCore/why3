@@ -39,8 +39,9 @@ let debug = ref false
    TODO: use simp forms / tag with label "WP" *)
 
 let wp_and ?(sym=false) f1 f2 = 
-  (* TODO: tag instead? *)
-  if sym then f_and_simp f1 f2 else f_and_simp f1 (f_implies_simp f1 f2) 
+(*   if sym then f_and_simp f1 f2 else f_and_simp f1 (f_implies_simp f1 f2)  *)
+  let f = f_and_simp f1 f2 in
+  if sym then f else f_label [Split_goal.asym_split] f
 
 let wp_ands ?(sym=false) fl =
   List.fold_left (wp_and ~sym) f_true fl

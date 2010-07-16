@@ -33,10 +33,14 @@ let split_case spl c acc tl bl =
   in
   apply_append (f_case tl) acc bll
 
+let asym_split = "asym_split"
+
 let rec split_pos acc f = match f.f_node with
   | Ftrue -> acc
   | Ffalse -> f::acc
   | Fapp _ -> f::acc
+  | Fbinop (Fand,f1,f2) when List.mem asym_split f.f_label ->
+      split_pos (split_pos acc (f_implies f1 f2)) f1
   | Fbinop (Fand,f1,f2) ->
       split_pos (split_pos acc f2) f1
   | Fbinop (Fimplies,f1,f2) ->
@@ -64,10 +68,14 @@ and split_neg acc f = match f.f_node with
   | Fapp _ -> f::acc
   | Fbinop (Fand,f1,f2) ->
       apply_append2 f_and acc (split_neg [] f1) (split_neg [] f2)
+  | Fbinop (Fimplies,f1,f2) when List.mem asym_split f.f_label ->
+      split_neg (split_neg acc (f_and f1 f2)) (f_not f1)
   | Fbinop (Fimplies,f1,f2) ->
       split_neg (split_neg acc f2) (f_not f1)
   | Fbinop (Fiff,f1,f2) ->
       split_neg (split_neg acc (f_and (f_not f1) (f_not f2))) (f_and f2 f1)
+  | Fbinop (For,f1,f2) when List.mem asym_split f.f_label ->
+      split_neg (split_neg acc (f_and (f_not f1) f2)) f1
   | Fbinop (For,f1,f2) ->
       split_neg (split_neg acc f2) f1
   | Fnot f ->

@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+val asym_split : Term.label
+
 val split_pos : Term.fmla list -> Term.fmla -> Term.fmla list
 val split_neg : Term.fmla list -> Term.fmla -> Term.fmla list
 
