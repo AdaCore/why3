@@ -1,20 +1,25 @@
 
 {
-  type char
-
-  use array.ArrayLength as S
-
-  type string = S.t char
-
-  logic empty_string : string
+  use string.String as S
+  type string = S.t
 
   type rope =
     | Str string (*ofs:*) int (len: int)
     | App rope rope (len: int)
 
+  logic inv (r: rope) = match r with
+    | Str s ofs len -> 0 <= ofs < S.length s and ofs + len <= S.length s
+    | App l r len   -> 0 < len l and 0 < len r
+    end
+
+  logic model (r: rope) : string = match r with
+    | Str s ofs len -> S.sub s ofs len
+    | App l r _     -> S.app (model l) (model r)
+    end
+
 }
 
-let empty () = Str empty_string 0 0
+let empty () = Str (S.create 0) 0 0
 
 let length r = len r
 
