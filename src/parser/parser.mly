@@ -86,9 +86,9 @@
 %nonassoc LOGIC TYPE INDUCTIVE
 
 %nonassoc DOT ELSE IN
+%nonassoc prec_named
 %nonassoc COLON
 
-%nonassoc prec_named
 %right ARROW LRARROW
 %right OR ASYM_OR
 %right AND ASYM_AND
