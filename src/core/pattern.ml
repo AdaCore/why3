@@ -53,6 +53,7 @@ module Compile (X : Action) = struct
         let rec populate types p = match p.pat_node with
           | Pwild | Pvar _ -> types
           | Pas (p,_) -> populate types p
+          | Por (p,q) -> populate (populate types p) q
           | Papp (fs,pl) ->
               if Sls.mem fs css then Mls.add fs pl types
               else raise (ConstructorExpected fs)
@@ -73,6 +74,8 @@ module Compile (X : Action) = struct
           match p.pat_node with
             | Papp (fs,pl') ->
                 add_case fs (List.rev_append pl' pl) a cases, wilds
+            | Por (p,q) ->
+                dispatch (p::pl, a) (dispatch (q::pl, a) (cases,wilds))
             | Pas (p,x) ->
                 dispatch (p::pl, mk_let x t a) (cases,wilds)
             | Pvar x ->
@@ -121,15 +124,12 @@ end
 module CompileTerm = Compile (struct
   type action = term
   let mk_let v s t = t_let v s t
-  let mk_case t bl =
-    let ty = (snd (List.hd bl)).t_ty in
-    t_case [t] (List.map (fun (p,a) -> [p],a) bl) ty
+  let mk_case t bl = t_case t bl (snd (List.hd bl)).t_ty
 end)
 
 module CompileFmla = Compile (struct
   type action = fmla
   let mk_let v t f = f_let v t f
-  let mk_case t bl =
-    f_case [t] (List.map (fun (p,a) -> [p],a) bl)
+  let mk_case t bl = f_case t bl
 end)
 

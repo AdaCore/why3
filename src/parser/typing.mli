@@ -71,8 +71,7 @@ val dty : denv -> Ptree.pty -> Denv.dty
 val dterm : denv -> Ptree.lexpr -> Denv.dterm
 val dfmla : denv -> Ptree.lexpr -> Denv.dfmla
 val dpat : denv -> Ptree.pattern -> denv * Denv.dpattern
-val dpat_list : 
-  denv -> Denv.dty list -> Ptree.pattern list -> denv * Denv.dpattern list
+val dpat_list : denv -> Denv.dty -> Ptree.pattern -> denv * Denv.dpattern
 
 val qloc : Ptree.qualid -> Loc.position
 
@@ -81,6 +80,4 @@ val fs_tuple : int -> Term.lsymbol
 
 val with_tuples : 
   ?reset:bool -> (theory_uc -> 'a -> 'b) -> theory_uc -> 'a -> 'b
-
-
 

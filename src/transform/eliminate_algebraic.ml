@@ -30,19 +30,19 @@ let meta_enum = Theory.register_meta "enumeration" [Theory.MTtysymbol]
 (** Compile match patterns *)
 
 let rec rewriteT kn t = match t.t_node with
-  | Tcase (tl,bl) ->
-      let tl = List.map (rewriteT kn) tl in
-      let mk_b (pl,t) = (pl, rewriteT kn t) in
+  | Tcase (t,bl) ->
+      let t = rewriteT kn t in
+      let mk_b (p,t) = ([p], rewriteT kn t) in
       let bl = List.map (fun b -> mk_b (t_open_branch b)) bl in
-      Pattern.CompileTerm.compile (find_constructors kn) tl bl
+      Pattern.CompileTerm.compile (find_constructors kn) [t] bl
   | _ -> t_map (rewriteT kn) (rewriteF kn) t
 
 and rewriteF kn f = match f.f_node with
-  | Fcase (tl,bl) ->
-      let tl = List.map (rewriteT kn) tl in
-      let mk_b (pl,f) = (pl, rewriteF kn f) in
+  | Fcase (t,bl) ->
+      let t = rewriteT kn t in
+      let mk_b (p,f) = ([p], rewriteF kn f) in
       let bl = List.map (fun b -> mk_b (f_open_branch b)) bl in
-      Pattern.CompileFmla.compile (find_constructors kn) tl bl
+      Pattern.CompileFmla.compile (find_constructors kn) [t] bl
   | _ -> f_map (rewriteT kn) (rewriteF kn) f
 
 let comp t task =
@@ -69,13 +69,13 @@ let empty_state = {
 let uncompiled = "eliminate_algebraic: compile_match required"
 
 let rec rewriteT kn state t = match t.t_node with
-  | Tcase ([t1],bl) ->
+  | Tcase (t1,bl) ->
       let t1 = rewriteT kn state t1 in
       let mk_br (w,m) br =
-        let (pl,e) = t_open_branch br in
+        let (p,e) = t_open_branch br in
         let e = rewriteT kn state e in
-        match pl with
-        | [{ pat_node = Papp (cs,pl) }] ->
+        match p with
+        | { pat_node = Papp (cs,pl) } ->
             let add_var e p pj = match p.pat_node with
               | Pvar v -> t_let v (t_app pj [t1] v.vs_ty) e
               | _ -> Printer.unsupportedTerm t uncompiled
@@ -83,7 +83,7 @@ let rec rewriteT kn state t = match t.t_node with
             let pjl = Mls.find cs state.pj_map in
             let e = List.fold_left2 add_var e pl pjl in
             w, Mls.add cs e m
-        | [{ pat_node = Pwild }] ->
+        | { pat_node = Pwild } ->
             Some e, m
         | _ -> Printer.unsupportedTerm t uncompiled
       in
@@ -95,24 +95,23 @@ let rec rewriteT kn state t = match t.t_node with
       in
       let tl = List.map find (find_constructors kn ts) in
       t_app (Mts.find ts state.mt_map) (t1::tl) t.t_ty
-  | Tcase _ -> Printer.unsupportedTerm t uncompiled
   | _ -> t_map (rewriteT kn state) (rewriteF kn state Svs.empty true) t
 
 and rewriteF kn state av sign f = match f.f_node with
-  | Fcase ([t1],bl) ->
+  | Fcase (t1,bl) ->
       let t1 = rewriteT kn state t1 in
       let av' = Svs.diff av (t_freevars Svs.empty t1) in
       let mk_br (w,m) br =
-        let (pl,e) = f_open_branch br in
+        let (p,e) = f_open_branch br in
         let e = rewriteF kn state av' sign e in
-        match pl with
-        | [{ pat_node = Papp (cs,pl) }] ->
+        match p with
+        | { pat_node = Papp (cs,pl) } ->
             let get_var p = match p.pat_node with
               | Pvar v -> v
               | _ -> Printer.unsupportedFmla f uncompiled
             in
             w, Mls.add cs (List.map get_var pl, e) m
-        | [{ pat_node = Pwild }] ->
+        | { pat_node = Pwild } ->
             Some e, m
         | _ -> Printer.unsupportedFmla f uncompiled
       in
@@ -140,7 +139,6 @@ and rewriteF kn state av sign f = match f.f_node with
       in
       let op = if sign then f_and_simp else f_or_simp in
       map_join_left find op (find_constructors kn ts)
-  | Fcase _ -> Printer.unsupportedFmla f uncompiled
   | Fquant (q, bf) when (q = Fforall && sign) || (q = Fexists && not sign) ->
       let vl, tr, f1 = f_open_quant bf in
       let tr' = tr_map (rewriteT kn state)
@@ -218,12 +216,9 @@ let add_type (state, task) ts csl =
   let trgl = t_app mt_ls (ax_hd :: mt_tl) mt_ty in
   let ax_f = f_forall (ax_vs :: mt_vl) [[Term trgl]] ax_f in
   let task = add_decl task (create_prop_decl Paxiom ax_pr ax_f) in
-  (* Add the tag for enumeration if the type is one*)
-  let is_constant ls = ls.ls_args = [] in
-  let is_enumeration = List.for_all is_constant csl in
-  let task = 
-    if is_enumeration then add_meta task meta_enum [MAts ts] else task
-  in
+  (* add the tag for enumeration if the type is one *)
+  let enum = List.for_all (fun ls -> ls.ls_args = []) csl in
+  let task = if enum then add_meta task meta_enum [MAts ts] else task in
   (* return the updated state and task *)
   { mt_map = mtmap; pj_map = pjmap }, task
 

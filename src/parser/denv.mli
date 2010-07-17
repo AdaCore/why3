@@ -38,13 +38,16 @@ val print_dty : Format.formatter -> dty -> unit
 
 val ty_of_dty : dty -> ty
 
+type ident = Ptree.ident
+
 type dpattern = { dp_node : dpattern_node; dp_ty : dty }
 
 and dpattern_node =
   | Pwild
-  | Pvar of string
+  | Pvar of ident
   | Papp of lsymbol * dpattern list
-  | Pas of dpattern * string
+  | Por of dpattern * dpattern
+  | Pas of dpattern * ident
 
 val pattern : vsymbol Mstr.t -> dpattern -> vsymbol Mstr.t * pattern
 
@@ -55,21 +58,21 @@ and dterm_node =
   | Tconst of constant
   | Tapp of lsymbol * dterm list
   | Tif of dfmla * dterm * dterm
-  | Tlet of dterm * string * dterm
-  | Tmatch of dterm list * (dpattern list * dterm) list
+  | Tlet of dterm * ident * dterm
+  | Tmatch of dterm * (dpattern * dterm) list
   | Tnamed of string * dterm
-  | Teps of string * dty * dfmla
+  | Teps of ident * dty * dfmla
 
 and dfmla =
   | Fapp of lsymbol * dterm list
-  | Fquant of quant * (string * dty) list * dtrigger list list * dfmla
+  | Fquant of quant * (ident * dty) list * dtrigger list list * dfmla
   | Fbinop of binop * dfmla * dfmla
   | Fnot of dfmla
   | Ftrue
   | Ffalse
   | Fif of dfmla * dfmla * dfmla
-  | Flet of dterm * string * dfmla
-  | Fmatch of dterm list * (dpattern list * dfmla) list
+  | Flet of dterm * ident * dfmla
+  | Fmatch of dterm * (dpattern * dfmla) list
   | Fnamed of string * dfmla
   | Fvar of fmla
 

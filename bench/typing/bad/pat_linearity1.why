@@ -1,4 +1,4 @@
 theory A
   type list 'a = Nil | Cons 'a (list 'a)
-  axiom A : forall l:int list. match l with Cons x x -> true | Nil -> false end
+  axiom A : forall l: list int. match l with Cons x x -> true | Nil -> false end
 end

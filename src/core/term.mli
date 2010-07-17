@@ -58,6 +58,7 @@ val create_psymbol : preid -> ty list -> lsymbol
 (** {2 Exceptions} *)
 
 exception DuplicateVar of vsymbol
+exception UncoveredVar of vsymbol
 exception BadArity of lsymbol * int * int
 exception FunctionSymbolExpected of lsymbol
 exception PredicateSymbolExpected of lsymbol
@@ -66,6 +67,7 @@ exception PredicateSymbolExpected of lsymbol
 
 type pattern = private {
   pat_node : pattern_node;
+  pat_vars : Svs.t;
   pat_ty : ty;
   pat_tag : int;
 }
@@ -74,6 +76,7 @@ and pattern_node = private
   | Pwild
   | Pvar of vsymbol
   | Papp of lsymbol * pattern list
+  | Por  of pattern * pattern
   | Pas  of pattern * vsymbol
 
 val pat_equal : pattern -> pattern -> bool
@@ -83,6 +86,7 @@ val pat_equal : pattern -> pattern -> bool
 val pat_wild : ty -> pattern
 val pat_var : vsymbol -> pattern
 val pat_app : lsymbol -> pattern list -> ty -> pattern
+val pat_or  : pattern -> pattern -> pattern
 val pat_as  : pattern -> vsymbol -> pattern
 
 (** generic traversal functions *)
@@ -91,8 +95,6 @@ val pat_map : (pattern -> pattern) -> pattern -> pattern
 val pat_fold : ('a -> pattern -> 'a) -> 'a -> pattern -> 'a
 val pat_all : (pattern -> bool) -> pattern -> bool
 val pat_any : (pattern -> bool) -> pattern -> bool
-
-val pat_freevars : Svs.t -> pattern -> Svs.t
 
 (** {2 Terms and formulas} *)
 
@@ -136,7 +138,7 @@ and term_node = private
   | Tapp of lsymbol * term list
   | Tif of fmla * term * term
   | Tlet of term * term_bound
-  | Tcase of term list * term_branch list
+  | Tcase of term * term_branch list
   | Teps of fmla_bound
 
 and fmla_node = private
@@ -148,7 +150,7 @@ and fmla_node = private
   | Ffalse
   | Fif of fmla * fmla * fmla
   | Flet of term * fmla_bound
-  | Fcase of term list * fmla_branch list
+  | Fcase of term * fmla_branch list
 
 and term_bound
 
@@ -187,7 +189,7 @@ val t_real_const : real_constant -> term
 val t_app : lsymbol -> term list -> ty -> term
 val t_if : fmla -> term -> term -> term
 val t_let : vsymbol -> term -> term -> term
-val t_case : term list -> (pattern list * term) list -> ty -> term
+val t_case : term -> (pattern * term) list -> ty -> term
 val t_eps : vsymbol -> fmla -> term
 
 val t_app_infer : lsymbol -> term list -> term
@@ -213,7 +215,7 @@ val f_true : fmla
 val f_false : fmla
 val f_if : fmla -> fmla -> fmla -> fmla
 val f_let : vsymbol -> term -> fmla -> fmla
-val f_case : term list -> (pattern list * fmla) list -> fmla
+val f_case : term -> (pattern * fmla) list -> fmla
 
 val f_app_inst : lsymbol -> term list -> ty Mtv.t
 
@@ -243,8 +245,8 @@ val f_let_simp : vsymbol -> term -> fmla -> fmla
 val t_open_bound : term_bound -> vsymbol * term
 val f_open_bound : fmla_bound -> vsymbol * fmla
 
-val t_open_branch : term_branch -> pattern list * term
-val f_open_branch : fmla_branch -> pattern list * fmla
+val t_open_branch : term_branch -> pattern * term
+val f_open_branch : fmla_branch -> pattern * fmla
 
 val f_open_quant : fmla_quant -> vsymbol list * trigger list * fmla
 

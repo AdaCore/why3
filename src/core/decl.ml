@@ -498,17 +498,17 @@ let find_prop_decl kn pr =
 exception NonExhaustiveExpr of (pattern list * expr)
 
 let rec check_matchT kn () t = match t.t_node with
-  | Tcase (tl,bl) ->
-      let bl = List.map t_open_branch bl in
-      ignore (try Pattern.CompileTerm.compile (find_constructors kn) tl bl
+  | Tcase (t1,bl) ->
+      let bl = List.map (fun b -> let p,t = t_open_branch b in [p],t) bl in
+      ignore (try Pattern.CompileTerm.compile (find_constructors kn) [t1] bl
       with Pattern.NonExhaustive p -> raise (NonExhaustiveExpr (p,Term t)));
       t_fold (check_matchT kn) (check_matchF kn) () t
   | _ -> t_fold (check_matchT kn) (check_matchF kn) () t
 
 and check_matchF kn () f = match f.f_node with
-  | Fcase (tl,bl) ->
-      let bl = List.map f_open_branch bl in
-      ignore (try Pattern.CompileFmla.compile (find_constructors kn) tl bl
+  | Fcase (t1,bl) ->
+      let bl = List.map (fun b -> let p,f = f_open_branch b in [p],f) bl in
+      ignore (try Pattern.CompileFmla.compile (find_constructors kn) [t1] bl
       with Pattern.NonExhaustive p -> raise (NonExhaustiveExpr (p,Fmla f)));
       f_fold (check_matchT kn) (check_matchF kn) () f
   | _ -> f_fold (check_matchT kn) (check_matchF kn) () f

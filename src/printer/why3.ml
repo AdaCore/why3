@@ -133,21 +133,27 @@ let unambig_fs fs =
 
 (** Patterns, terms, and formulas *)
 
-let rec print_pat_node inn fmt p = match p.pat_node with
-  | Pwild -> fprintf fmt "_"
-  | Pvar v -> print_vs fmt v
-  | Pas (p,v) -> fprintf fmt (protect_on inn "%a as %a")
-      (print_pat_node false) p print_vs v
-  | Papp (cs,pl) -> begin match query_syntax cs.ls_name with
-      | Some s -> syntax_arguments s (print_pat_node false) fmt pl
+let rec print_pat_node pri fmt p = match p.pat_node with
+  | Pwild ->
+      fprintf fmt "_"
+  | Pvar v ->
+      print_vs fmt v
+  | Pas (p, v) ->
+      fprintf fmt (protect_on (pri > 1) "%a as %a")
+        (print_pat_node 1) p print_vs v
+  | Por (p, q) ->
+      fprintf fmt (protect_on (pri > 0) "%a | %a")
+        (print_pat_node 0) p (print_pat_node 0) q
+  | Papp (cs, pl) -> begin match query_syntax cs.ls_name with
+      | Some s -> syntax_arguments s (print_pat_node 0) fmt pl
       | None -> begin match pl with
           | [] -> print_cs fmt cs
-          | pl -> fprintf fmt (protect_on inn "%a@ %a")
-              print_cs cs (print_list space (print_pat_node true)) pl
+          | pl -> fprintf fmt (protect_on (pri > 1) "%a@ %a")
+              print_cs cs (print_list space (print_pat_node 2)) pl
           end
       end
 
-let print_pat = print_pat_node false
+let print_pat = print_pat_node 0
 
 let print_vsty fmt v =
   fprintf fmt "%a:@,%a" print_vs v print_ty v.vs_ty
@@ -206,10 +212,9 @@ and print_tnode pri fmt t = match t.t_node with
       fprintf fmt (protect_on (pri > 0) "let %a =@ %a in@ %a")
         print_vs v (print_lterm 4) t1 print_term t2;
       forget_var v
-  | Tcase (tl,bl) ->
+  | Tcase (t1,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
-        (print_list comma print_term) tl
-        (print_list newline print_tbranch) bl
+        print_term t1 (print_list newline print_tbranch) bl
   | Teps fb ->
       let v,f = f_open_bound fb in
       fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
@@ -248,22 +253,19 @@ and print_fnode pri fmt f = match f.f_node with
       fprintf fmt (protect_on (pri > 0) "let %a =@ %a in@ %a")
         print_vs v (print_lterm 4) t print_fmla f;
       forget_var v
-  | Fcase (tl,bl) ->
+  | Fcase (t,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
-        (print_list comma print_term) tl
-        (print_list newline print_fbranch) bl
+        print_term t (print_list newline print_fbranch) bl
 
 and print_tbranch fmt br =
-  let pl,t = t_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]"
-    (print_list comma print_pat) pl print_term t;
-  Svs.iter forget_var (List.fold_left pat_freevars Svs.empty pl)
+  let p,t = t_open_branch br in
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_term t;
+  Svs.iter forget_var p.pat_vars
 
 and print_fbranch fmt br =
-  let pl,f = f_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]"
-    (print_list comma print_pat) pl print_fmla f;
-  Svs.iter forget_var (List.fold_left pat_freevars Svs.empty pl)
+  let p,f = f_open_branch br in
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_fmla f;
+  Svs.iter forget_var p.pat_vars
 
 and print_tl fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"

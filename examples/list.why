@@ -2,14 +2,13 @@ theory Induction2
   use import list.List
   use import list.Length
 
-  logic p ('a list, 'b list)
+  logic p (list 'a) (list 'b)
 
   axiom Induction :
-    p(Nil : 'a list, Nil : 'b list) ->
-    (forall x1:'a, x2:'b, l1:'a list, l2:'b list.
-       p(l1, l2) -> p(Cons(x1,l1), Cons(x2,l2))) ->
-    forall l1:'a list, l2:'b list. length(l1)=length(l2) -> p(l1, l2)
-
+    p (Nil : list 'a) (Nil : list 'b) ->
+    (forall x1:'a, x2:'b, l1:list 'a, l2:list 'b.
+       p l1 l2 -> p (Cons x1 l1) (Cons x2 l2)) ->
+    forall l1:list 'a, l2:list 'b. length l1 = length l2 -> p l1 l2
 end
 
 theory Test1
@@ -17,31 +16,31 @@ theory Test1
   use export list.List
   use export list.Length
 
-  goal G1 : length(Cons(1, Nil)) = 1
-  goal G2 : length(Cons(1, Cons (2, Nil))) = 1 + 1
+  goal G1 : length (Cons 1 Nil) = 1
+  goal G2 : length (Cons 1 (Cons 2 Nil)) = 1 + 1
 
-  logic zip(l1 : 'a list, l2 : 'b list) : ('a * 'b) list =
+  logic zip (l1 : list 'a) (l2 : list 'b) : list ('a,'b) =
     match l1, l2 with
-    | Cons (x1, r1), Cons (x2, r2) -> Cons ((x1, x2), zip (r1, r2))
-    | _, _ -> Nil (* to make it total *)
+    | Cons x1 r1, Cons x2 r2 -> Cons (x1,x2) (zip r1 r2)
+    | (Cons _ _|Nil), _ -> Nil (* to make it total *)
     end
 
-  logic foo(l1 : 'a list, l2 : 'b list) =
-    length(zip(l1, l2)) = length(l1)
+  logic foo (l1 : list 'a) (l2 : list 'b) =
+    length (zip l1 l2) = length l1
 
   clone Induction2 with logic p = foo
 
-  lemma G3 : forall l1: 'a list, l2 : 'b list.
-    length(l1) = length(l2) ->
-    length(zip(l1, l2)) = length(l1)
+  lemma G3 : forall l1: list 'a, l2 : list 'b.
+    length l1 = length l2 ->
+    length (zip l1 l2) = length l1
 
-  goal G4 : zip(Cons(1, Cons(2, Nil)),
-                Cons(1., Cons(2., Nil))) =
-                Cons ((1, 1.), Cons((2, 2.), Nil))
+  goal G4 : zip (Cons 1  (Cons 2  Nil))
+                (Cons 1. (Cons 2. Nil)) =
+                Cons (1, 1.) (Cons (2, 2.) Nil)
 
-  goal G5 : forall l1: 'a list, l2 : 'b list, l3: 'c list, l4: 'd list.
-    length(l1) = length(l2) and length(l2) = length(l3) and
-      length(l3) = length(l4) ->
-    length(zip(zip(l1,l2), zip(l3, l4))) = length(l3)
+  goal G5 : forall l1: list 'a, l2 : list 'b, l3: list 'c, l4: list 'd.
+    length l1 = length l2 and length l2 = length l3 and
+      length l3 = length l4 ->
+    length (zip (zip l1 l2) (zip l3 l4)) = length l3
 
 end

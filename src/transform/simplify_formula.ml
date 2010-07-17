@@ -98,8 +98,7 @@ let rec fmla_find_subst boundvars var sign f =
     | Fcase (_,fbs) ->
         let iter_fb fb =
           let patl,f = f_open_branch fb in
-          let boundvars = 
-            List.fold_left (fun s p -> pat_freevars s p) boundvars patl in
+          let boundvars = patl.pat_vars in 
           fmla_find_subst boundvars var sign f in
         List.iter iter_fb fbs
     | Fbinop (_, _, _) | Fif ( _, _, _) | Fapp _ | Ffalse | Ftrue-> ()

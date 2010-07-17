@@ -119,12 +119,16 @@ let print_space_list fmt x = print_list space fmt x
 let rec print_pat info fmt p = match p.pat_node with
   | Pwild -> fprintf fmt "_"
   | Pvar v -> print_vs fmt v
-  | Pas (p,v) -> fprintf fmt "%a as %a" (print_pat info) p print_vs v
-  | Papp (cs,pl) -> begin match query_syntax info.info_syn cs.ls_name with
-      | Some s -> syntax_arguments s (print_pat info) fmt pl
-      | _ -> fprintf fmt "%a%a"
-          print_ls cs (print_paren_r (print_pat info)) pl
-    end
+  | Pas (p,v) ->
+      fprintf fmt "(%a as %a)" (print_pat info) p print_vs v
+  | Por (p,q) ->
+      fprintf fmt "(%a|%a)" (print_pat info) p (print_pat info) q
+  | Papp (cs,pl) -> 
+      begin match query_syntax info.info_syn cs.ls_name with
+        | Some s -> syntax_arguments s (print_pat info) fmt pl
+        | _ -> fprintf fmt "%a%a"
+            print_ls cs (print_paren_r (print_pat info)) pl
+      end
 
 let print_vsty info fmt v =
   fprintf fmt "(%a:%a)" print_vs v (print_ty info) v.vs_ty
@@ -177,9 +181,9 @@ and print_tnode opl opr info fmt t = match t.t_node with
       fprintf fmt (protect_on opr "let %a :=@ %a in@ %a")
         print_vs v (print_opl_term info) t1 (print_opl_term info) t2;
       forget_var v
-  | Tcase (tl,bl) ->
+  | Tcase (t,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
-        (print_list comma (print_term info)) tl
+        (print_term info) t
         (print_list newline (print_tbranch info)) bl
   | Teps fb ->
       let v,f = f_open_bound fb in
@@ -218,9 +222,9 @@ and print_fnode opl opr info fmt f = match f.f_node with
       fprintf fmt (protect_on opr "let %a :=@ %a in@ %a")
         print_vs v (print_opl_term info) t (print_opl_fmla info) f;
       forget_var v
-  | Fcase (tl,bl) ->
+  | Fcase (t,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
-        (print_list comma (print_term info)) tl
+        (print_term info) t
         (print_list newline (print_fbranch info)) bl
   | Fif (f1,f2,f3) ->
       fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
@@ -233,16 +237,16 @@ and print_fnode opl opr info fmt f = match f.f_node with
     end
 
 and print_tbranch info fmt br =
-  let pl,t = t_open_branch br in
+  let p,t = t_open_branch br in
   fprintf fmt "@[<hov 4>| %a =>@ %a@]"
-    (print_list comma (print_pat info)) pl (print_term info) t;
-  Svs.iter forget_var (List.fold_left pat_freevars Svs.empty pl)
+    (print_pat info) p (print_term info) t;
+  Svs.iter forget_var p.pat_vars
 
 and print_fbranch info fmt br =
-  let pl,f = f_open_branch br in
+  let p,f = f_open_branch br in
   fprintf fmt "@[<hov 4>| %a =>@ %a@]"
-    (print_list comma (print_pat info)) pl (print_fmla info) f;
-  Svs.iter forget_var (List.fold_left pat_freevars Svs.empty pl)
+    (print_pat info) p (print_fmla info) f;
+  Svs.iter forget_var p.pat_vars
 
 and print_tl info fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"

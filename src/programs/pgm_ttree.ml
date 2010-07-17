@@ -86,7 +86,7 @@ and dexpr_desc =
   | DEif of dexpr * dexpr * dexpr
   | DEloop of dloop_annotation * dexpr
   | DElazy of lazy_op * dexpr * dexpr
-  | DEmatch of dexpr list * (Denv.dpattern list * dexpr) list
+  | DEmatch of dexpr * (Denv.dpattern * dexpr) list
   | DEskip
   | DEabsurd 
   | DEraise of Term.lsymbol * dexpr option
@@ -146,7 +146,7 @@ and iexpr_desc =
   | IEif of iexpr * iexpr * iexpr
   | IEloop of loop_annotation * iexpr
   | IElazy of lazy_op * iexpr * iexpr
-  | IEmatch of Term.vsymbol list * (Term.pattern list * iexpr) list
+  | IEmatch of Term.vsymbol * (Term.pattern * iexpr) list
   | IEskip 
   | IEabsurd
   | IEraise of Term.lsymbol * iexpr option
@@ -183,7 +183,7 @@ and expr_desc =
   | Esequence of expr * expr
   | Eif of expr * expr * expr
   | Eloop of loop_annotation * expr
-  | Ematch of Term.vsymbol list * (Term.pattern list * expr) list
+  | Ematch of Term.vsymbol * (Term.pattern * expr) list
   | Eskip 
   | Eabsurd
   | Eraise of Term.lsymbol * expr option

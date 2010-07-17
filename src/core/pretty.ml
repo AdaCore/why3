@@ -40,7 +40,7 @@ let iprinter,tprinter,lprinter,pprinter =
   let usanitize = sanitizer char_to_ualpha char_to_alnumus in
   create_ident_printer bl ~sanitizer:isanitize,
   create_ident_printer bl ~sanitizer:lsanitize,
-  create_ident_printer bl ~sanitizer:lsanitize,
+  create_ident_printer bl ~sanitizer:isanitize,
   create_ident_printer bl ~sanitizer:usanitize
 
 let forget_all () =
@@ -92,6 +92,8 @@ let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
 let rec print_ty_node inn fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
+  | Tyapp (ts, tl) when is_ts_tuple ts -> fprintf fmt "(%a)"
+      (print_list comma (print_ty_node false)) tl
   | Tyapp (ts, []) -> print_ts fmt ts
   | Tyapp (ts, tl) -> fprintf fmt (protect_on inn "%a@ %a")
       print_ts ts (print_list space (print_ty_node true)) tl
@@ -119,16 +121,27 @@ let unambig_fs fs =
 
 (** Patterns, terms, and formulas *)
 
-let rec print_pat_node inn fmt p = match p.pat_node with
-  | Pwild -> fprintf fmt "_"
-  | Pvar v -> print_vs fmt v
-  | Pas (p,v) -> fprintf fmt (protect_on inn "%a as %a")
-      (print_pat_node false) p print_vs v
-  | Papp (cs,[]) -> print_cs fmt cs
-  | Papp (cs,pl) -> fprintf fmt (protect_on inn "%a@ %a")
-      print_cs cs (print_list space (print_pat_node true)) pl
+let rec print_pat_node pri fmt p = match p.pat_node with
+  | Pwild ->
+      fprintf fmt "_"
+  | Pvar v ->
+      print_vs fmt v
+  | Pas (p, v) ->
+      fprintf fmt (protect_on (pri > 1) "%a as %a")
+        (print_pat_node 1) p print_vs v
+  | Por (p, q) ->
+      fprintf fmt (protect_on (pri > 0) "%a | %a")
+        (print_pat_node 0) p (print_pat_node 0) q
+  | Papp (cs, pl) when is_fs_tuple cs ->
+      fprintf fmt (protect_on (pri > 0) "%a")
+        (print_list comma (print_pat_node 1)) pl
+  | Papp (cs, []) ->
+      print_cs fmt cs
+  | Papp (cs, pl) ->
+      fprintf fmt (protect_on (pri > 1) "%a@ %a")
+        print_cs cs (print_list space (print_pat_node 2)) pl
 
-let print_pat = print_pat_node false
+let print_pat = print_pat_node 0
 
 let print_vsty fmt v =
   fprintf fmt "%a:@,%a" print_vs v print_ty v.vs_ty
@@ -171,6 +184,8 @@ and print_tnode pri fmt t = match t.t_node with
       print_vs fmt v
   | Tconst c ->
       print_const fmt c
+  | Tapp (fs, tl) when is_fs_tuple fs ->
+      fprintf fmt "(%a)" (print_list comma print_term) tl
   | Tapp (fs, []) when unambig_fs fs ->
       print_ls fmt fs
   | Tapp (fs, []) ->
@@ -191,10 +206,9 @@ and print_tnode pri fmt t = match t.t_node with
       fprintf fmt (protect_on (pri > 0) "let %a =@ %a in@ %a")
         print_vs v (print_lterm 4) t1 print_term t2;
       forget_var v
-  | Tcase (tl,bl) ->
+  | Tcase (t1,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
-        (print_list comma print_term) tl
-        (print_list newline print_tbranch) bl
+        print_term t1 (print_list newline print_tbranch) bl
   | Teps fb ->
       let v,f = f_open_bound fb in
       fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
@@ -233,22 +247,19 @@ and print_fnode pri fmt f = match f.f_node with
       fprintf fmt (protect_on (pri > 0) "let %a =@ %a in@ %a")
         print_vs v (print_lterm 4) t print_fmla f;
       forget_var v
-  | Fcase (tl,bl) ->
+  | Fcase (t,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
-        (print_list comma print_term) tl
-        (print_list newline print_fbranch) bl
+        print_term t (print_list newline print_fbranch) bl
 
 and print_tbranch fmt br =
-  let pl,t = t_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]"
-    (print_list comma print_pat) pl print_term t;
-  Svs.iter forget_var (List.fold_left pat_freevars Svs.empty pl)
+  let p,t = t_open_branch br in
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_term t;
+  Svs.iter forget_var p.pat_vars
 
 and print_fbranch fmt br =
-  let pl,f = f_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]"
-    (print_list comma print_pat) pl print_fmla f;
-  Svs.iter forget_var (List.fold_left pat_freevars Svs.empty pl)
+  let p,f = f_open_branch br in
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_fmla f;
+  Svs.iter forget_var p.pat_vars
 
 and print_tl fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
@@ -426,6 +437,8 @@ let () = Exn_printer.register
         print_ls ls ls_arg app_arg
   | Term.DuplicateVar vs ->
       fprintf fmt "Variable %a is used twice" print_vsty vs
+  | Term.UncoveredVar vs ->
+      fprintf fmt "Variable %a uncovered in \"or\"-pattern" print_vsty vs
   | Term.FunctionSymbolExpected ls ->
       fprintf fmt "Not a function symbol: %a" print_ls ls
   | Term.PredicateSymbolExpected ls ->

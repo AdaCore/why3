@@ -116,29 +116,42 @@ let rec ty_of_dty = function
   | Tyapp (s, tl) ->
       ty_app s (List.map ty_of_dty tl)
 
+type ident = Ptree.ident
+
 type dpattern = { dp_node : dpattern_node; dp_ty : dty }
 
 and dpattern_node =
   | Pwild
-  | Pvar of string
+  | Pvar of ident
   | Papp of lsymbol * dpattern list
-  | Pas of dpattern * string
+  | Por of dpattern * dpattern
+  | Pas of dpattern * ident
 
-let rec pattern env p =
-  let ty = ty_of_dty p.dp_ty in
-  match p.dp_node with
-  | Pwild -> 
-      env, pat_wild ty
-  | Pvar x ->
-      let v = create_vsymbol (id_fresh x) ty in
-      Mstr.add x v env, pat_var v
+let rec pattern_env env p = match p.dp_node with
+  | Pwild -> env
+  | Papp (_, pl) -> List.fold_left pattern_env env pl
+  | Por (p, _) -> pattern_env env p
+  | Pvar { id = x ; id_loc = loc } ->
+      let ty = ty_of_dty p.dp_ty in
+      let vs = create_vsymbol (id_user x loc) ty in
+      Mstr.add x vs env
+  | Pas (p, { id = x ; id_loc = loc }) ->
+      let ty = ty_of_dty p.dp_ty in
+      let vs = create_vsymbol (id_user x loc) ty in
+      pattern_env (Mstr.add x vs env) p
+
+let get_pat_var env p x = try Mstr.find x env with Not_found ->
+  raise (Term.UncoveredVar (create_vsymbol (id_fresh x) (ty_of_dty p.dp_ty)))
+
+let rec pattern_pat env p = match p.dp_node with
+  | Pwild -> pat_wild (ty_of_dty p.dp_ty)
+  | Pvar x -> pat_var (get_pat_var env p x.id)
+  | Pas (p, x) -> pat_as (pattern_pat env p) (get_pat_var env p x.id)
+  | Por (p, q) -> pat_or (pattern_pat env p) (pattern_pat env q)
   | Papp (s, pl) ->
-      let env, pl = map_fold_left pattern env pl in
-      env, pat_app s pl ty
-  | Pas (p, x) ->
-      let v = create_vsymbol (id_fresh x) ty in
-      let env, p = pattern (Mstr.add x v env) p in
-      env, pat_as p v
+      pat_app s (List.map (pattern_pat env) pl) (ty_of_dty p.dp_ty)
+
+let pattern env p = let env = pattern_env env p in env, pattern_pat env p
 
 type dterm = { dt_node : dterm_node; dt_ty : dty }
 
@@ -147,21 +160,21 @@ and dterm_node =
   | Tconst of constant
   | Tapp of lsymbol * dterm list
   | Tif of dfmla * dterm * dterm
-  | Tlet of dterm * string * dterm
-  | Tmatch of dterm list * (dpattern list * dterm) list
+  | Tlet of dterm * ident * dterm
+  | Tmatch of dterm * (dpattern * dterm) list
   | Tnamed of string * dterm
-  | Teps of string * dty * dfmla
+  | Teps of ident * dty * dfmla
 
 and dfmla =
   | Fapp of lsymbol * dterm list
-  | Fquant of quant * (string * dty) list * dtrigger list list * dfmla
+  | Fquant of quant * (ident * dty) list * dtrigger list list * dfmla
   | Fbinop of binop * dfmla * dfmla
   | Fnot of dfmla
   | Ftrue
   | Ffalse
   | Fif of dfmla * dfmla * dfmla
-  | Flet of dterm * string * dfmla
-  | Fmatch of dterm list * (dpattern list * dfmla) list
+  | Flet of dterm * ident * dfmla
+  | Fmatch of dterm * (dpattern * dfmla) list
   | Fnamed of string * dfmla
   | Fvar of fmla
 
@@ -179,27 +192,26 @@ let rec term env t = match t.dt_node with
       t_app s (List.map (term env) tl) (ty_of_dty t.dt_ty)
   | Tif (f, t1, t2) ->
       t_if (fmla env f) (term env t1) (term env t2)
-  | Tlet (e1, x, e2) ->
+  | Tlet (e1, { id = x ; id_loc = loc }, e2) ->
       let ty = ty_of_dty e1.dt_ty in
       let e1 = term env e1 in
-      let v = create_vsymbol (id_fresh x) ty in
+      let v = create_vsymbol (id_user x loc) ty in
       let env = Mstr.add x v env in
       let e2 = term env e2 in
       t_let v e1 e2
-  | Tmatch (tl, bl) ->
-      let branch (pl,e) =
-        let env, pl = map_fold_left pattern env pl in
-        (pl, term env e)
+  | Tmatch (t1, bl) ->
+      let branch (p,e) =
+        let env, p = pattern env p in (p, term env e)
       in
       let bl = List.map branch bl in
       let ty = (snd (List.hd bl)).t_ty in
-      t_case (List.map (term env) tl) bl ty
+      t_case (term env t1) bl ty
   | Tnamed (x, e1) ->
       let e1 = term env e1 in
       t_label_add x e1
-  | Teps (x, ty, e1) ->
+  | Teps ({ id = x ; id_loc = loc }, ty, e1) ->
       let ty = ty_of_dty ty in
-      let v = create_vsymbol (id_fresh x) ty in
+      let v = create_vsymbol (id_user x loc) ty in
       let env = Mstr.add x v env in
       let e1 = fmla env e1 in
       t_eps v e1
@@ -216,10 +228,9 @@ and fmla env = function
   | Fif (f1, f2, f3) ->
       f_if (fmla env f1) (fmla env f2) (fmla env f3)
   | Fquant (q, uqu, trl, f1) ->
-      (* TODO: shouldn't we localize this ident? *)
-      let uquant env (x,ty) =
+      let uquant env ({ id = x ; id_loc = loc },ty) =
         let ty = ty_of_dty ty in
-        let v = create_vsymbol (id_fresh x) ty in
+        let v = create_vsymbol (id_user x loc) ty in
         Mstr.add x v env, v
       in
       let env, vl = map_fold_left uquant env uqu in
@@ -231,19 +242,18 @@ and fmla env = function
       f_quant q vl trl (fmla env f1)
   | Fapp (s, tl) ->
       f_app s (List.map (term env) tl)
-  | Flet (e1, x, f2) ->
+  | Flet (e1, { id = x ; id_loc = loc }, f2) ->
       let ty = ty_of_dty e1.dt_ty in
       let e1 = term env e1 in
-      let v = create_vsymbol (id_fresh x) ty in
+      let v = create_vsymbol (id_user x loc) ty in
       let env = Mstr.add x v env in
       let f2 = fmla env f2 in
       f_let v e1 f2
-  | Fmatch (tl, bl) ->
-      let branch (pl,e) =
-        let env, pl = map_fold_left pattern env pl in
-        (pl, fmla env e)
+  | Fmatch (t, bl) ->
+      let branch (p,e) =
+        let env, p = pattern env p in (p, fmla env e)
       in
-      f_case (List.map (term env) tl) (List.map branch bl)
+      f_case (term env t) (List.map branch bl)
   | Fnamed (x, f1) ->
       let f1 = fmla env f1 in
       f_label_add x f1
@@ -272,24 +282,33 @@ let specialize_lsymbol ~loc s =
   let env = Htv.create 17 in
   List.map (specialize_ty ~loc env) tl, option_map (specialize_ty ~loc env) t
 
+let ident_of_vs ~loc vs =
+  { id     = vs.vs_name.id_string;
+    id_loc = match vs.vs_name.id_origin with
+      | User loc -> loc
+      | _ -> loc }
+
 let rec specialize_pattern ~loc htv p = 
   { dp_node = specialize_pattern_node  ~loc htv p.pat_node;
-    dp_ty   = specialize_ty           ~loc htv p.pat_ty; }
+    dp_ty   = specialize_ty            ~loc htv p.pat_ty; }
 
 and specialize_pattern_node ~loc htv = function
   | Term.Pwild -> 
       Pwild
   | Term.Pvar v ->
-      Pvar v.vs_name.id_string
+      Pvar (ident_of_vs ~loc v)
   | Term.Papp (s, pl) ->
       Papp (s, List.map (specialize_pattern ~loc htv) pl)
   | Term.Pas (p, v) ->
-      Pas (specialize_pattern ~loc htv p, v.vs_name.id_string)
+      Pas (specialize_pattern ~loc htv p, ident_of_vs ~loc v)
+  | Term.Por (p, q) ->
+      Por (specialize_pattern ~loc htv p, specialize_pattern ~loc htv q)
 
 let rec specialize_term ~loc htv t =  
   { dt_node = specialize_term_node  ~loc htv t.t_node;
-    dt_ty   = specialize_ty        ~loc htv t.t_ty; }
+    dt_ty   = specialize_ty         ~loc htv t.t_ty; }
 
+(* TODO: labels are lost *)
 and specialize_term_node ~loc htv = function
   | Term.Tbvar _ ->
       assert false
@@ -305,16 +324,15 @@ and specialize_term_node ~loc htv = function
   | Term.Tlet (t1, t2) ->
       let v, t2 = t_open_bound t2 in 
       Tlet (specialize_term ~loc htv t1, 
-	    v.vs_name.id_string, specialize_term ~loc htv t2)
-  | Term.Tcase (tl, bl) ->
-      let branch b = 
-	let pl, t = t_open_branch b in 
-	List.map (specialize_pattern ~loc htv) pl, specialize_term ~loc htv t
+	    ident_of_vs ~loc v, specialize_term ~loc htv t2)
+  | Term.Tcase (t1, bl) ->
+      let branch b = let p, t = t_open_branch b in 
+	specialize_pattern ~loc htv p, specialize_term ~loc htv t
       in
-      Tmatch (List.map (specialize_term ~loc htv) tl, List.map branch bl)
+      Tmatch (specialize_term ~loc htv t1, List.map branch bl)
   | Term.Teps fb ->
       let v, f = f_open_bound fb in
-      Teps (v.vs_name.id_string, specialize_ty ~loc htv v.vs_ty,
+      Teps (ident_of_vs ~loc v, specialize_ty ~loc htv v.vs_ty,
 	    specialize_fmla ~loc htv f)
 
 (* TODO: labels are lost *)
@@ -323,7 +341,7 @@ and specialize_fmla ~loc htv f = match f.f_node with
       Fapp (ls, List.map (specialize_term ~loc htv) tl)
   | Term.Fquant (q, fq) ->
       let vl, tl, f = f_open_quant fq in
-      let uquant v = v.vs_name.id_string, specialize_ty ~loc htv v.vs_ty in
+      let uquant v = ident_of_vs ~loc v, specialize_ty ~loc htv v.vs_ty in
       let tl = List.map (List.map (specialize_trigger ~loc htv)) tl in
       Fquant (q, List.map uquant vl, tl, specialize_fmla ~loc htv f)
   | Term.Fbinop (b, f1, f2) ->
@@ -340,13 +358,12 @@ and specialize_fmla ~loc htv f = match f.f_node with
   | Term.Flet (t1, f2b) ->
       let v, f2 = f_open_bound f2b in
       Flet (specialize_term ~loc htv t1,
-	    v.vs_name.id_string, specialize_fmla ~loc htv f2)
-  | Term.Fcase (tl, fbl) ->
-      let branch b = 
-       let pl, f = f_open_branch b in 
-	List.map (specialize_pattern ~loc htv) pl, specialize_fmla ~loc htv f
-     in
-     Fmatch (List.map (specialize_term ~loc htv) tl, List.map branch fbl)
+	    ident_of_vs ~loc v, specialize_fmla ~loc htv f2)
+  | Term.Fcase (t, fbl) ->
+      let branch b = let p, f = f_open_branch b in 
+	specialize_pattern ~loc htv p, specialize_fmla ~loc htv f
+      in
+      Fmatch (specialize_term ~loc htv t, List.map branch fbl)
 
 and specialize_trigger ~loc htv = function
   | Term.Term t -> TRterm (specialize_term ~loc htv t)

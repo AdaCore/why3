@@ -298,10 +298,10 @@ and wp_desc env e q = match e.expr_desc with
 		 (quantify env e.expr_effect (wp_implies i we)))
 	in
 	w
-  | Ematch (xl, bl) ->
+  | Ematch (x, bl) ->
       let branch (p, e) = p, wp_expr env e (filter_post e.expr_effect q) in
-      let tl = List.map t_var xl in
-      f_case tl (List.map branch bl)
+      let t = t_var x in
+      f_case t (List.map branch bl)
   | Eskip ->
       let (_, q), _ = q in q
   | Eabsurd ->

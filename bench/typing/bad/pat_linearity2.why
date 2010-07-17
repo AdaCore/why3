@@ -1,5 +1,4 @@
 theory A
   type list 'a = Nil | Cons 'a (list 'a)
-
-  axiom A : forall l:int list. (match l with Cons x x -> 0 | Nil -> 1 end) = 2
+  axiom A : forall l:list int. (match l with Cons x x -> 0 | Nil -> 1 end) = 2
 end

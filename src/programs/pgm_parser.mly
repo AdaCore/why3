@@ -278,18 +278,20 @@ expr:
    { mk_expr (Elazy (LazyAnd, $1, $3)) }
 | expr BARBAR expr
    { mk_expr (Elazy (LazyOr, $1, $3)) }
-| LET lident EQUAL expr IN expr
-   { mk_expr (Elet ($2, $4, $6)) }
-| LET pattern EQUAL expr IN expr 
-   { mk_expr (Ematch ([$4], [[$2], $6])) }
+| LET pattern EQUAL expr IN expr
+   { match $2.pat_desc with
+       | PPpvar id -> mk_expr (Elet (id, $4, $6))
+       | _ -> mk_expr (Ematch ($4, [$2, $6])) }
 | LET lident list1_type_v_binder EQUAL triple IN expr
    { mk_expr (Elet ($2, mk_expr_i 3 (Efun ($3, $5)), $7)) }
 | LET REC list1_recfun_sep_and IN expr
    { mk_expr (Eletrec ($3, $5)) }
 | FUN list1_type_v_binder ARROW triple
    { mk_expr (Efun ($2, $4)) }
-| MATCH list1_expr_sep_comma WITH option_bar match_cases END
+| MATCH expr WITH option_bar match_cases END
    { mk_expr (Ematch ($2, $5)) }
+| MATCH expr COMMA list1_expr_sep_comma WITH option_bar match_cases END
+   { mk_expr (Ematch (mk_expr (Etuple ($2::$4)), $7)) }
 | LABEL uident COLON expr
    { mk_expr (Elabel ($2, $4)) }
 | WHILE expr DO loop_annotation expr DONE
@@ -372,40 +374,43 @@ match_cases:
 ;
 
 match_case:
-| list1_pat_sep_comma ARROW expr { ($1,$3) }
-;
-
-list1_pat_sep_comma:
-| pattern                           { [$1] }
-| pattern COMMA list1_pat_sep_comma { $1::$3 }
+| pattern ARROW expr   { ($1,$3) }
 ;
 
 pattern:
-| pat_arg           { $1 }
-| uqualid pat_args  { mk_pat (PPpapp ($1, $2)) }
-| pattern AS lident { mk_pat (PPpas ($1,$3)) }
+| pat_conj              { $1 }
+| pat_conj BAR pattern  { mk_pat (PPpor ($1, $3)) }
 ;
 
-pat_args:
-| pat_arg          { [$1] }
-| pat_arg pat_args { $1 :: $2 }
+pat_conj:
+| pat_uni                      { $1 }
+| pat_uni COMMA list1_pat_uni  { mk_pat (PPptuple ($1::$3)) }
+;
+
+list1_pat_uni:
+| pat_uni                      { [$1] }
+| pat_uni COMMA list1_pat_uni  { $1::$3 }
+;
+
+pat_uni:
+| pat_arg                { $1 }
+| uqualid list1_pat_arg  { mk_pat (PPpapp ($1, $2)) }
+| pat_uni AS lident      { mk_pat (PPpas ($1, $3)) }
+;
+
+list1_pat_arg:
+| pat_arg                { [$1] }
+| pat_arg list1_pat_arg  { $1::$2 }
 ;
 
 pat_arg:
-| UNDERSCORE
-   { mk_pat (PPpwild) }
-| lident %prec prec_id_pattern
-   { mk_pat (PPpvar $1) }
-| uqualid                                       
-   { mk_pat (PPpapp ($1, [])) }
-| LEFTPAR pattern COMMA list1_pat_sep_comma RIGHTPAR          
-   { mk_pat (PPptuple ($2 :: $4)) }
+| UNDERSCORE                { mk_pat (PPpwild) }
+| lident                    { mk_pat (PPpvar $1) }
+| uqualid                   { mk_pat (PPpapp ($1, [])) }
 /*
-| LEFTPAR RIGHTPAR          
-   { mk_pat (PPptuple []) }
+| LEFTPAR RIGHTPAR          { mk_pat (PPptuple []) }
 */
-| LEFTPAR pattern RIGHTPAR
-   { $2 }
+| LEFTPAR pattern RIGHTPAR  { $2 }
 ;
 
 assertion_kind:

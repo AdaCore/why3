@@ -278,6 +278,7 @@ list1_inductive_decl:
 inductive_decl:
 | INDUCTIVE lident_rich params inddefn
   { { in_loc = loc (); in_ident = $2; in_params = $3; in_def = $4 } }
+;
 
 inddefn:
 | /* epsilon */       { [] }
@@ -385,9 +386,11 @@ lexpr:
 | LET pattern EQUAL lexpr IN lexpr
    { match $2.pat_desc with
        | PPpvar id -> mk_pp (PPlet (id, $4, $6))
-       | _ -> mk_pp (PPmatch ([$4], [[$2], $6])) }
-| MATCH list1_lexpr_sep_comma WITH bar_ match_cases END
+       | _ -> mk_pp (PPmatch ($4, [$2, $6])) }
+| MATCH lexpr WITH bar_ match_cases END
    { mk_pp (PPmatch ($2, $5)) }
+| MATCH lexpr COMMA list1_lexpr_sep_comma WITH bar_ match_cases END
+   { mk_pp (PPmatch (mk_pp (PPtuple ($2::$4)), $7)) }
 | EPSILON lident COLON primitive_type DOT lexpr
    { mk_pp (PPeps ($2, $4, $6)) }
 | lexpr COLON primitive_type
@@ -399,6 +402,7 @@ lexpr:
 list1_lexpr_arg:
 | lexpr_arg                 { [$1] }
 | lexpr_arg list1_lexpr_arg { $1::$2 }
+;
 
 lexpr_arg:
 | qualid
@@ -420,6 +424,7 @@ lexpr_arg:
 | OPPREF lexpr_arg
    { let id = { id = prefix $1; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$2])) }
+;
 
 /* Triggers */
 
@@ -450,35 +455,41 @@ match_cases:
 ;
 
 match_case:
-| list1_pat_sep_comma ARROW lexpr { ($1,$3) }
+| pattern ARROW lexpr   { ($1,$3) }
 ;
 
-list1_pat_sep_comma:
-| pattern                           { [$1] }
-| pattern COMMA list1_pat_sep_comma { $1::$3 }
-
 pattern:
-| pat_arg               { $1 }
-| uqualid list1_pat_arg { mk_pat (PPpapp ($1, $2)) }
-| pattern AS lident     { mk_pat (PPpas ($1,$3)) }
+| pat_conj              { $1 }
+| pat_conj BAR pattern  { mk_pat (PPpor ($1, $3)) }
+;
+
+pat_conj:
+| pat_uni                      { $1 }
+| pat_uni COMMA list1_pat_uni  { mk_pat (PPptuple ($1::$3)) }
+;
+
+list1_pat_uni:
+| pat_uni                      { [$1] }
+| pat_uni COMMA list1_pat_uni  { $1::$3 }
+;
+
+pat_uni:
+| pat_arg                { $1 }
+| uqualid list1_pat_arg  { mk_pat (PPpapp ($1, $2)) }
+| pat_uni AS lident      { mk_pat (PPpas ($1, $3)) }
+;
 
 list1_pat_arg:
-| pat_arg               { [$1] }
-| pat_arg list1_pat_arg { $1::$2 }
+| pat_arg                { [$1] }
+| pat_arg list1_pat_arg  { $1::$2 }
+;
 
 pat_arg:
-| UNDERSCORE
-   { mk_pat (PPpwild) }
-| lident
-   { mk_pat (PPpvar $1) }
-| uqualid
-   { mk_pat (PPpapp ($1, [])) }
-| LEFTPAR pattern RIGHTPAR
-   { $2 }
-| LEFTPAR RIGHTPAR
-   { mk_pat (PPptuple []) }
-| LEFTPAR pattern COMMA list1_pat_sep_comma RIGHTPAR
-   { mk_pat (PPptuple ($2 :: $4)) }
+| UNDERSCORE                { mk_pat (PPpwild) }
+| lident                    { mk_pat (PPpvar $1) }
+| uqualid                   { mk_pat (PPpapp ($1, [])) }
+| LEFTPAR RIGHTPAR          { mk_pat (PPptuple []) }
+| LEFTPAR pattern RIGHTPAR  { $2 }
 ;
 
 /* Parameters */
@@ -608,10 +619,12 @@ any_qualid:
 tqualid:
 | uident                { Qident $1 }
 | any_qualid DOT uident { Qdot ($1, $3) }
+;
 
 qualid:
 | ident_rich             { Qident $1 }
 | uqualid DOT ident_rich { Qdot ($1, $3) }
+;
 
 /* Misc */
 

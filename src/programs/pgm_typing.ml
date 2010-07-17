@@ -263,12 +263,10 @@ and dbinder env ({id=x; id_loc=loc} as id, v) =
 
 let rec add_local_pat env p = match p.dp_node with
   | Pwild -> env
-  | Pvar x -> add_local env x (DTpure p.dp_ty)
-  | Papp (_, pl) -> add_local_pats env pl
-  | Pas (p, _) -> add_local_pat env p
-
-and add_local_pats env pl = 
-  List.fold_left add_local_pat env pl 
+  | Pvar x -> add_local env x.id (DTpure p.dp_ty)
+  | Papp (_, pl) -> List.fold_left add_local_pat env pl
+  | Pas (p, x) -> add_local_pat (add_local env x.id (DTpure p.dp_ty)) p
+  | Por (p, q) -> add_local_pat (add_local_pat env p) q
 
 let dvariant env (l, p) =
   let s, _ = Typing.specialize_psymbol p env.env.uc in
@@ -377,20 +375,20 @@ and dexpr_desc env loc = function
       let e2 = dexpr env e2 in
       expected_type e2 (dty_bool env.env);
       DElazy (op, e1, e2), (dty_bool env.env)
-  | Pgm_ptree.Ematch (el, bl) ->
-      let el = List.map (dexpr env) el in
-      let tyl = List.map (fun e -> e.dexpr_type) el in
+  | Pgm_ptree.Ematch (e1, bl) ->
+      let e1 = dexpr env e1 in
+      let ty1 = e1.dexpr_type in
       let ty = create_type_var loc in (* the type of all branches *)
-      let branch (pl, e) =
-	let denv, pl = Typing.dpat_list env.denv tyl pl in
+      let branch (p, e) =
+	let denv, p = Typing.dpat_list env.denv ty1 p in
 	let env = { env with denv = denv } in
-	let env = add_local_pats env pl in
+	let env = add_local_pat env p in
 	let e = dexpr env e in
 	expected_type e ty;
-	pl, e
+	p, e
       in
       let bl = List.map branch bl in
-      DEmatch (el, bl), ty
+      DEmatch (e1, bl), ty
   | Pgm_ptree.Eskip ->
       DEskip, (dty_unit env.env)
   | Pgm_ptree.Eabsurd ->
@@ -675,21 +673,14 @@ and iexpr_desc gl env loc ty = function
       IEloop (la, iexpr gl env e1)
   | DElazy (op, e1, e2) ->
       IElazy (op, iexpr gl env e1, iexpr gl env e2)
-  | DEmatch (el, bl) ->
-      let el = List.map (iexpr gl env) el in
-      let branch (pl, e) = 
-        let env, pl = map_fold_left Denv.pattern env pl in
-        (pl, iexpr gl env e)
+  | DEmatch (e1, bl) ->
+      let e1 = iexpr gl env e1 in
+      let branch (p, e) = 
+        let env, p = Denv.pattern env p in (p, iexpr gl env e)
       in
       let bl = List.map branch bl in
-      let rec mk_let vl = function
-	| [] ->
-	    IEmatch (List.rev vl, bl)
-	| e :: el ->
-	    let v = create_vsymbol (id_user "x" loc) e.iexpr_type in
-	    IElet (v, e, mk_iexpr loc ty (mk_let (v :: vl) el))
-      in
-      mk_let [] el
+      let v = create_vsymbol (id_user "x" loc) e1.iexpr_type in
+      IElet (v, e1, mk_iexpr loc ty (IEmatch (v, bl)))
   | DEskip ->
       IEskip
   | DEabsurd ->
@@ -837,11 +828,9 @@ let add_binders = List.fold_left add_binder
 let rec add_local_pat env p = match p.pat_node with
   | Term.Pwild -> env
   | Term.Pvar x -> add_local x (Tpure p.pat_ty) env
-  | Term.Papp (_, pl) -> add_local_pats env pl
-  | Term.Pas (p, _) -> add_local_pat env p
-
-and add_local_pats env pl = 
-  List.fold_left add_local_pat env pl
+  | Term.Papp (_, pl) -> List.fold_left add_local_pat env pl
+  | Term.Pas (p, x) -> add_local_pat (add_local x (Tpure p.pat_ty) env) p
+  | Term.Por (p, _) -> add_local_pat env p
 
 let make_apply loc e1 ty c =
   let x = create_vsymbol (id_fresh "f") e1.expr_type in
@@ -982,15 +971,15 @@ and expr_desc gl env loc ty = function
 	      Eif (e1, mk_true loc gl, e2)
       in 
       d, Tpure ty, ef
-  | IEmatch (vl, bl) ->
-      let branch ef (pl, e) =
-	let env = add_local_pats env pl in
+  | IEmatch (v, bl) ->
+      let branch ef (p, e) =
+	let env = add_local_pat env p in
 	let e = expr gl env e in
 	let ef = E.union ef e.expr_effect in
-	ef, (pl, e)
+	ef, (p, e)
       in
       let ef, bl = map_fold_left branch E.empty bl in
-      Ematch (vl, bl), Tpure ty, ef
+      Ematch (v, bl), Tpure ty, ef
   | IEskip ->
       Eskip, Tpure ty, E.empty
   | IEabsurd ->

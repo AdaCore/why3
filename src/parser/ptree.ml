@@ -56,6 +56,7 @@ and pat_desc =
   | PPpvar of ident
   | PPpapp of qualid * pattern list
   | PPptuple of pattern list
+  | PPpor of pattern * pattern
   | PPpas of pattern * ident
 
 type lexpr =
@@ -75,7 +76,7 @@ and pp_desc =
   | PPnamed of string * lexpr
   | PPlet of ident * lexpr * lexpr
   | PPeps of ident * pty * lexpr
-  | PPmatch of lexpr list * (pattern list * lexpr) list
+  | PPmatch of lexpr * (pattern * lexpr) list
   | PPcast of lexpr * pty
   | PPtuple of lexpr list
 

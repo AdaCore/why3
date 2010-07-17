@@ -285,7 +285,7 @@ let binop = function
   | PPimplies -> Fimplies
   | PPiff -> Fiff
 
-let check_pat_linearity pl =
+let check_pat_linearity p =
   let s = ref Sstr.empty in
   let add id =
     if Sstr.mem id.id !s then
@@ -297,8 +297,9 @@ let check_pat_linearity pl =
     | PPpvar id -> add id
     | PPpapp (_, pl) | PPptuple pl -> List.iter check pl
     | PPpas (p, id) -> check p; add id
+    | PPpor (p, _) -> check p
   in
-  List.iter check pl
+  check p
 
 let fresh_type_var loc =
   let tv = create_tvsymbol (id_user "a" loc) in
@@ -312,9 +313,9 @@ and dpat_node loc env = function
   | PPpwild ->
       let ty = fresh_type_var loc in
       env, Pwild, ty
-  | PPpvar {id=x} ->
+  | PPpvar x ->
       let ty = fresh_type_var loc in
-      let env = { env with dvars = Mstr.add x ty env.dvars } in
+      let env = { env with dvars = Mstr.add x.id ty env.dvars } in
       env, Pvar x, ty
   | PPpapp (x, pl) ->
       let s, tyl, ty = specialize_fsymbol x env.uc in
@@ -327,10 +328,16 @@ and dpat_node loc env = function
       let env, pl = dpat_args s.ls_name loc env tyl pl in
       let ty = Tyapp (ts_tuple n, tyl) in
       env, Papp (s, pl), ty
-  | PPpas (p, {id=x}) ->
+  | PPpas (p, x) ->
       let env, p = dpat env p in
-      let env = { env with dvars = Mstr.add x p.dp_ty env.dvars } in
+      let env = { env with dvars = Mstr.add x.id p.dp_ty env.dvars } in
       env, Pas (p,x), p.dp_ty
+  | PPpor (p, q) ->
+      let env, p = dpat env p in
+      let env, q = dpat env q in
+      if not (unify p.dp_ty q.dp_ty)
+        then term_expected_type ~loc p.dp_ty q.dp_ty;
+      env, Por (p,q), p.dp_ty
 
 and dpat_args s loc env el pl =
   let n = List.length el and m = List.length pl in
@@ -396,26 +403,26 @@ and dterm_node loc env = function
       Tconst c, Tyapp (Ty.ts_int, [])
   | PPconst (ConstReal _ as c) ->
       Tconst c, Tyapp (Ty.ts_real, [])
-  | PPlet ({id=x}, e1, e2) ->
+  | PPlet (x, e1, e2) ->
       let e1 = dterm env e1 in
       let ty = e1.dt_ty in
-      let env = { env with dvars = Mstr.add x ty env.dvars } in
+      let env = { env with dvars = Mstr.add x.id ty env.dvars } in
       let e2 = dterm env e2 in
       Tlet (e1, x, e2), e2.dt_ty
-  | PPmatch (el, bl) ->
-      let tl = List.map (dterm env) el in
-      let tyl = List.map (fun t -> t.dt_ty) tl in
+  | PPmatch (e1, bl) ->
+      let t1 = dterm env e1 in
+      let ty1 = t1.dt_ty in
       let tb = fresh_type_var loc in (* the type of all branches *)
-      let branch (pl, e) =
-        let env, pl = dpat_list env tyl pl in
+      let branch (p, e) =
+        let env, p = dpat_list env ty1 p in
         let loc = e.pp_loc in
 	let e = dterm env e in
 	if not (unify e.dt_ty tb) then term_expected_type ~loc e.dt_ty tb;
-        pl, e
+        p, e
       in
       let bl = List.map branch bl in
       let ty = (snd (List.hd bl)).dt_ty in
-      Tmatch (tl, bl), ty
+      Tmatch (t1, bl), ty
   | PPnamed (x, e1) ->
       let e1 = dterm env e1 in
       Tnamed (x, e1), e1.dt_ty
@@ -432,9 +439,9 @@ and dterm_node loc env = function
       if not (unify e2.dt_ty e3.dt_ty) then
         term_expected_type ~loc e3.dt_ty e2.dt_ty;
       Tif (dfmla env e1, e2, e3), e2.dt_ty
-  | PPeps ({id=x}, ty, e1) ->
+  | PPeps (x, ty, e1) ->
       let ty = dty env ty in
-      let env = { env with dvars = Mstr.add x ty env.dvars } in
+      let env = { env with dvars = Mstr.add x.id ty env.dvars } in
       let e1 = dfmla env e1 in
       Teps (x, ty, e1), ty
   | PPquant _
@@ -457,10 +464,10 @@ and dfmla env e = match e.pp_desc with
       let uquant env (idl,ty) =
         let ty = dty env ty in
         let id = match idl with
-          | Some id -> id.id
+          | Some id -> id
           | None -> assert false
         in
-        { env with dvars = Mstr.add id ty env.dvars }, (id,ty)
+        { env with dvars = Mstr.add id.id ty env.dvars }, (id,ty)
       in
       let env, uqu = map_fold_left uquant env uqu in
       let trigger e =
@@ -489,20 +496,19 @@ and dfmla env e = match e.pp_desc with
 	    let tl = dtype_args s.ls_name e.pp_loc env tyl [e12; e3] in
 	    Fapp (s, tl)
       end
-  | PPlet ({id=x}, e1, e2) ->
+  | PPlet (x, e1, e2) ->
       let e1 = dterm env e1 in
       let ty = e1.dt_ty in
-      let env = { env with dvars = Mstr.add x ty env.dvars } in
+      let env = { env with dvars = Mstr.add x.id ty env.dvars } in
       let e2 = dfmla env e2 in
       Flet (e1, x, e2)
-  | PPmatch (el, bl) ->
-      let tl = List.map (dterm env) el in
-      let tyl = List.map (fun t -> t.dt_ty) tl in
-      let branch (pl, e) =
-        let env, pl = dpat_list env tyl pl in
-        pl, dfmla env e
+  | PPmatch (e1, bl) ->
+      let t1 = dterm env e1 in
+      let ty1 = t1.dt_ty in
+      let branch (p, e) =
+        let env, p = dpat_list env ty1 p in p, dfmla env e
       in
-      Fmatch (tl, List.map branch bl)
+      Fmatch (t1, List.map branch bl)
   | PPnamed (x, f1) ->
       let f1 = dfmla env f1 in
       Fnamed (x, f1)
@@ -512,22 +518,13 @@ and dfmla env e = match e.pp_desc with
   | PPeps _ | PPconst _ | PPcast _ | PPtuple _ ->
       error ~loc:e.pp_loc PredicateExpected
 
-and dpat_list env tyl pl =
-  check_pat_linearity pl;
-  let pattern (env,pl) pat ty =
-    let loc = pat.pat_loc in
-    let env, pat = dpat env pat in
-    if not (unify pat.dp_ty ty)
-      then term_expected_type ~loc pat.dp_ty ty;
-    env, pat::pl
-  in
-  let loc = (List.hd pl).pat_loc in
-  let env, pl = try List.fold_left2 pattern (env,[]) pl tyl
-    with Invalid_argument _ -> errorm ~loc
-      "This pattern has length %d but is expected to have length %d"
-      (List.length pl) (List.length tyl)
-  in
-  env, List.rev pl
+and dpat_list env ty p =
+  check_pat_linearity p;
+  let loc = p.pat_loc in
+  let env, p = dpat env p in
+  if not (unify p.dp_ty ty)
+    then term_expected_type ~loc p.dp_ty ty;
+  env, p
 
 and dtype_args s loc env el tl =
   let n = List.length el and m = List.length tl in
@@ -561,10 +558,10 @@ let add_projection cl p (fs,tyarg,tyval) th =
       | _ -> pat_wild (ty_inst m ty)
     in
     let al = List.map2 per_param cs.ls_args pl in
-    [pat_app cs al tyarg], t_var vs
+    pat_app cs al tyarg, t_var vs
   in
   let vs = create_vsymbol (id_fresh "u") tyarg in
-  let t = t_case [t_var vs] (List.map per_cs cl) tyval in
+  let t = t_case (t_var vs) (List.map per_cs cl) tyval in
   let d = make_fs_defn fs [vs] t in
   add_logic_decl th [d]
 
