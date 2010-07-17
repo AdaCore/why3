@@ -86,6 +86,28 @@ module Compile (X : Action) = struct
         in
         let cases,wilds = List.fold_right dispatch rl (Mls.empty,[]) in
         (* assemble the primitive case statement *)
+        let pat_cont cs vl pl =
+          let rec cont acc vl pl = match vl,pl with
+            | (_::vl), (p::pl) -> cont (p::acc) vl pl
+            | [], pl -> pat_app cs acc ty :: pl
+            | _, _ -> assert false
+          in
+          cont [] vl pl
+        in
+    match t.t_node with
+    | Tapp (cs,al) when Sls.mem cs css ->
+        if Mls.mem cs cases then
+          let tl = List.rev_append al tl in
+          try compile constructors tl (Mls.find cs cases)
+          with NonExhaustive pl -> raise (NonExhaustive (pat_cont cs al pl))
+        else begin
+          try compile constructors tl wilds
+          with NonExhaustive pl ->
+            let al = List.map pat_wild cs.ls_args in
+            let pat = pat_app cs al (of_option cs.ls_value) in
+            raise (NonExhaustive (pat::pl))
+        end
+    | _ -> begin
         let pw = pat_wild ty in
         let nopat =
           if Sls.is_empty css then Some pw else
@@ -107,17 +129,13 @@ module Compile (X : Action) = struct
           let vl = List.map (fun q -> create_vsymbol id q.pat_ty) ql in
           let tl = List.fold_left (fun tl v -> t_var v :: tl) tl vl in
           let pat = pat_app fs (List.map pat_var vl) ty in
-          let rec pat_cont acc vl pl = match vl,pl with
-            | (_::vl), (p::pl) -> pat_cont (p::acc) vl pl
-            | [], pl -> pat_app fs acc ty :: pl
-            | _, _ -> assert false
-          in
           try (pat, compile constructors tl (Mls.find fs cases)) :: acc
-          with NonExhaustive pl -> raise (NonExhaustive (pat_cont [] vl pl))
+          with NonExhaustive pl -> raise (NonExhaustive (pat_cont fs vl pl))
         in
         match Mls.fold add types base with
         | [{ pat_node = Pwild }, a] -> a
         | bl -> mk_case t bl
+    end
 
 end
 

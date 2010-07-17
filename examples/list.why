@@ -22,7 +22,7 @@ theory Test1
   logic zip (l1 : list 'a) (l2 : list 'b) : list ('a,'b) =
     match l1, l2 with
     | Cons x1 r1, Cons x2 r2 -> Cons (x1,x2) (zip r1 r2)
-    | (Cons _ _|Nil), _ -> Nil (* to make it total *)
+    | _, _ -> Nil (* to make it total *)
     end
 
   logic foo (l1 : list 'a) (l2 : list 'b) =

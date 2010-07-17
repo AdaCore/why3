@@ -152,11 +152,12 @@ let pat_var v   = mk_pattern (Pvar v) (Svs.singleton v) v.vs_ty
 let pat_as p v  = mk_pattern (Pas (p,v)) (add_no_dup v p.pat_vars) v.vs_ty
 
 let pat_or p q =
-  (if not (Svs.equal p.pat_vars q.pat_vars) then
+  if Svs.equal p.pat_vars q.pat_vars then
+    mk_pattern (Por (p,q)) p.pat_vars p.pat_ty
+  else
     let s1, s2 = p.pat_vars, q.pat_vars in
-    Svs.iter (fun vs -> raise (UncoveredVar vs))
-      (Svs.union (Svs.diff s1 s2) (Svs.diff s2 s1)));
-  mk_pattern (Por (p,q)) p.pat_vars p.pat_ty
+    let vs = Svs.choose (Svs.union (Svs.diff s1 s2) (Svs.diff s2 s1)) in
+    raise (UncoveredVar vs)
 
 let pat_app f pl ty =
   let merge s p = Svs.fold add_no_dup s p.pat_vars in
