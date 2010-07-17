@@ -199,15 +199,15 @@ and print_tnode pri fmt t = match t.t_node with
         print_ls fs (print_list space (print_lterm 5)) tl
           print_ty t.t_ty
   | Tif (f,t1,t2) ->
-      fprintf fmt (protect_on (pri > 0) "if %a@ then %a@ else %a")
+      fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
         print_fmla f print_term t1 print_term t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on (pri > 0) "let %a =@ %a in@ %a")
+      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
         print_vs v (print_lterm 4) t1 print_term t2;
       forget_var v
   | Tcase (t1,bl) ->
-      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
+      fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
         print_term t1 (print_list newline print_tbranch) bl
   | Teps fb ->
       let v,f = f_open_bound fb in
@@ -240,15 +240,15 @@ and print_fnode pri fmt f = match f.f_node with
   | Fnot f ->
       fprintf fmt (protect_on (pri > 4) "not %a") (print_lfmla 4) f
   | Fif (f1,f2,f3) ->
-      fprintf fmt (protect_on (pri > 0) "if %a@ then %a@ else %a")
+      fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
         print_fmla f1 print_fmla f2 print_fmla f3
   | Flet (t,f) ->
       let v,f = f_open_bound f in
-      fprintf fmt (protect_on (pri > 0) "let %a =@ %a in@ %a")
+      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
         print_vs v (print_lterm 4) t print_fmla f;
       forget_var v
   | Fcase (t,bl) ->
-      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
+      fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
         print_term t (print_list newline print_fbranch) bl
 
 and print_tbranch fmt br =
@@ -487,9 +487,8 @@ let () = Exn_printer.register
       fprintf fmt "Ident %s is already declared, with a different declaration"
         id.id_string
   | Decl.NonExhaustiveExpr (pl, e) ->
-      fprintf fmt
-        "Non-exhaustive pattern list:@\n@[<hov 2>%a@]@\nin expression %a"
-        (print_list newline print_pat) pl print_expr e
+      fprintf fmt "Pattern @[%a@] is not covered in expression:@\n  @[%a@]"
+        (print_list comma print_pat) pl print_expr e
   | _ -> raise exn
   end
 

@@ -103,9 +103,8 @@ module Compile (X : Action) = struct
         else begin
           try compile constructors tl wilds
           with NonExhaustive pl ->
-            let al = List.map pat_wild cs.ls_args in
-            let pat = pat_app cs al (of_option cs.ls_value) in
-            raise (NonExhaustive (pat::pl))
+            let al = List.map (fun t -> pat_wild t.t_ty) al in
+            raise (NonExhaustive (pat_app cs al ty :: pl))
         end
     | _ -> begin
         let pw = pat_wild ty in
@@ -115,8 +114,9 @@ module Compile (X : Action) = struct
           let unused = Sls.filter test css in
           if Sls.is_empty unused then None else
           let cs = Sls.choose unused in
-          let pl = List.map pat_wild cs.ls_args in
-          Some (pat_app cs pl (of_option cs.ls_value))
+          let tm = ty_match Mtv.empty (of_option cs.ls_value) ty in
+          let wild ty = pat_wild (ty_inst tm ty) in
+          Some (pat_app cs (List.map wild cs.ls_args) ty)
         in
         let base = match nopat with
           | None -> []

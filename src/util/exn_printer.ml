@@ -31,19 +31,23 @@ let () =
 
 exception Exit_loop
 
-let exn_printer fmt exn = 
-  let test f = try f fmt exn; raise Exit_loop 
-    with Exit_loop -> raise Exit_loop
-      | _ -> () in
-  try 
-    Stack.iter test exn_printers
+let exn_printer fmt exn =
+  let test f =
+    try
+      Format.fprintf fmt "@[%a@]" f exn;
+      raise Exit_loop
+    with
+      | Exit_loop -> raise Exit_loop
+      | _ -> ()
+  in
+  try Stack.iter test exn_printers
   with Exit_loop -> ()
 
 (** For Config *)
-
 
 let () = register
   (fun fmt exn -> match exn with
     | Config.Dynlink.Error error -> 
         Format.fprintf fmt "Dynlink: %s" (Config.Dynlink.error_message error)
     | _ -> raise exn)
+
