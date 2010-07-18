@@ -41,101 +41,99 @@ module Compile (X : Action) = struct
     | [], (_,a) :: _ -> (* no terms, at least one action *)
         a
     | t :: tl, _ -> (* process the leftmost column *)
-        (* extract the set of constructors *)
         let ty = t.t_ty in
+        (* extract the set of constructors *)
         let css = match ty.ty_node with
           | Tyapp (ts,_) ->
-              let s_add s cs = Sls.add cs s in
-              List.fold_left s_add Sls.empty (constructors ts)
-          | Tyvar _ -> Sls.empty
+              let csl = constructors ts in
+              List.fold_left (fun s cs -> Sls.add cs s) Sls.empty csl
+          | Tyvar _ ->
+              Sls.empty
         in
-        (* map constructors to argument types *)
-        let rec populate types p = match p.pat_node with
-          | Pwild | Pvar _ -> types
-          | Pas (p,_) -> populate types p
-          | Por (p,q) -> populate (populate types p) q
-          | Papp (fs,pl) ->
-              if Sls.mem fs css then Mls.add fs pl types
-              else raise (ConstructorExpected fs)
-        in
-        let populate types (pl,_) = populate types (List.hd pl) in
-        let types = List.fold_left populate Mls.empty rl in
-        (* map constructors to subordinate matrices *)
-        let add_case fs pl a cases =
-          let rl = try Mls.find fs cases with Not_found -> [] in
-          Mls.add fs ((pl,a)::rl) cases
-        in
-        let add_wild pl a fs ql cases =
-          let add pl q = pat_wild q.pat_ty :: pl in
-          add_case fs (List.fold_left add pl ql) a cases
-        in
-        let rec dispatch (pl,a) (cases,wilds) =
-          let p = List.hd pl in let pl = List.tl pl in
-          match p.pat_node with
-            | Papp (fs,pl') ->
-                add_case fs (List.rev_append pl' pl) a cases, wilds
-            | Por (p,q) ->
-                dispatch (p::pl, a) (dispatch (q::pl, a) (cases,wilds))
-            | Pas (p,x) ->
-                dispatch (p::pl, mk_let x t a) (cases,wilds)
-            | Pvar x ->
-                let a = mk_let x t a in
-                Mls.fold (add_wild pl a) types cases, (pl,a)::wilds
-            | Pwild ->
-                Mls.fold (add_wild pl a) types cases, (pl,a)::wilds
-        in
-        let cases,wilds = List.fold_right dispatch rl (Mls.empty,[]) in
-        (* assemble the primitive case statement *)
-        let pat_cont cs vl pl =
-          let rec cont acc vl pl = match vl,pl with
-            | (_::vl), (p::pl) -> cont (p::acc) vl pl
-            | [], pl -> pat_app cs acc ty :: pl
-            | _, _ -> assert false
+        (* map every constructor occurring at the head
+         * of the pattern list to the list of its args *)
+        let types =
+          let rec populate acc p = match p.pat_node with
+            | Pwild | Pvar _ -> acc
+            | Pas (p,_) -> populate acc p
+            | Por (p,q) -> populate (populate acc p) q
+            | Papp (fs,pl) when Sls.mem fs css -> Mls.add fs pl acc
+            | Papp (fs,_) -> raise (ConstructorExpected fs)
           in
-          cont [] vl pl
+          let populate acc (pl,_) = populate acc (List.hd pl) in
+          List.fold_left populate Mls.empty rl
         in
-    match t.t_node with
-    | Tapp (cs,al) when Sls.mem cs css ->
-        if Mls.mem cs cases then
-          let tl = List.rev_append al tl in
-          try compile constructors tl (Mls.find cs cases)
-          with NonExhaustive pl -> raise (NonExhaustive (pat_cont cs al pl))
-        else begin
+        (* dispatch every case to a primitive constructor/wild case *)
+        let cases,wilds =
+          let add_case fs pl a cases =
+            let rl = try Mls.find fs cases with Not_found -> [] in
+            Mls.add fs ((pl,a)::rl) cases
+          in
+          let add_wild pl a fs ql cases =
+            let add pl q = pat_wild q.pat_ty :: pl in
+            add_case fs (List.fold_left add pl ql) a cases
+          in
+          let rec dispatch (pl,a) (cases,wilds) =
+            let p = List.hd pl in let pl = List.tl pl in
+            match p.pat_node with
+              | Papp (fs,pl') ->
+                  add_case fs (List.rev_append pl' pl) a cases, wilds
+              | Por (p,q) ->
+                  dispatch (p::pl, a) (dispatch (q::pl, a) (cases,wilds))
+              | Pas (p,x) ->
+                  dispatch (p::pl, mk_let x t a) (cases,wilds)
+              | Pvar x ->
+                  let a = mk_let x t a in
+                  Mls.fold (add_wild pl a) types cases, (pl,a)::wilds
+              | Pwild ->
+                  Mls.fold (add_wild pl a) types cases, (pl,a)::wilds
+          in
+          List.fold_right dispatch rl (Mls.empty,[])
+        in
+        (* how to proceed if [t] is [Tapp(cs,al)] and [cs] is in [cases] *)
+        let comp_cases cs al =
+          try compile constructors (List.rev_append al tl) (Mls.find cs cases)
+          with NonExhaustive pl ->
+            let rec cont acc vl pl = match vl,pl with
+              | (_::vl), (p::pl) -> cont (p::acc) vl pl
+              | [], pl -> pat_app cs acc ty :: pl
+              | _, _ -> assert false
+            in
+            raise (NonExhaustive (cont [] cs.ls_args pl))
+        in
+        (* how to proceed if [t] is not covered by [cases] *)
+        let comp_wilds () =
           try compile constructors tl wilds
           with NonExhaustive pl ->
-            let al = List.map (fun t -> pat_wild t.t_ty) al in
-            raise (NonExhaustive (pat_app cs al ty :: pl))
-        end
-    | _ -> begin
-        let pw = pat_wild ty in
-        let nopat =
-          if Sls.is_empty css then Some pw else
-          let test cs = not (Mls.mem cs types) in
-          let unused = Sls.filter test css in
-          if Sls.is_empty unused then None else
-          let cs = Sls.choose unused in
-          let tm = ty_match Mtv.empty (of_option cs.ls_value) ty in
-          let wild ty = pat_wild (ty_inst tm ty) in
-          Some (pat_app cs (List.map wild cs.ls_args) ty)
+            let find_cs cs =
+              if Mls.mem cs types then () else
+              let tm = ty_match Mtv.empty (of_option cs.ls_value) ty in
+              let wild ty = pat_wild (ty_inst tm ty) in
+              let pw = pat_app cs (List.map wild cs.ls_args) ty in
+              raise (NonExhaustive (pw :: pl))
+            in
+            Sls.iter find_cs css;
+            raise (NonExhaustive (pat_wild ty :: pl))
         in
-        let base = match nopat with
-          | None -> []
-          | Some pat ->
-              (try [pw, compile constructors tl wilds]
-              with NonExhaustive pl -> raise (NonExhaustive (pat::pl)))
-        in
-        let add fs ql acc =
-          let id = id_fresh "x" in
-          let vl = List.map (fun q -> create_vsymbol id q.pat_ty) ql in
-          let tl = List.fold_left (fun tl v -> t_var v :: tl) tl vl in
-          let pat = pat_app fs (List.map pat_var vl) ty in
-          try (pat, compile constructors tl (Mls.find fs cases)) :: acc
-          with NonExhaustive pl -> raise (NonExhaustive (pat_cont fs vl pl))
-        in
-        match Mls.fold add types base with
-        | [{ pat_node = Pwild }, a] -> a
-        | bl -> mk_case t bl
-    end
+        (* assemble the primitive case statement *)
+        match t.t_node with
+        | _ when Mls.is_empty types ->
+            comp_wilds ()
+        | Tapp (cs,al) when Sls.mem cs css ->
+            if Mls.mem cs types then comp_cases cs al else comp_wilds ()
+        | _ ->
+            let base =
+              if Sls.for_all (fun cs -> Mls.mem cs types) css
+              then [] else [pat_wild ty, comp_wilds ()]
+            in
+            let add cs ql acc =
+              let get_vs q = create_vsymbol (id_fresh "x") q.pat_ty in
+              let vl = List.rev_map get_vs ql in
+              let pl = List.rev_map pat_var vl in
+              let al = List.rev_map t_var vl in
+              (pat_app cs pl ty, comp_cases cs al) :: acc
+            in
+            mk_case t (Mls.fold add types base)
 
 end
 
