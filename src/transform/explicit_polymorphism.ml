@@ -109,7 +109,7 @@ module Utils = struct
   (** returns all type vars (free) in given fmla [f] *)
   let rec f_find_type_vars acc f = match f.f_node with
     | Fapp (p, terms) ->
-      let new_acc = if isSome p.ls_value 
+      let new_acc = if isSome p.ls_value
         then find_tyvars acc (fromSome p.ls_value) else acc in
       List.fold_left t_find_type_vars new_acc terms
     | _ -> f_fold t_find_type_vars f_find_type_vars acc f
@@ -141,9 +141,11 @@ module Utils = struct
       (Debug.print_mtv Pretty.print_ty) tv_to_ty; flush stderr;*)
     tv_to_ty
 
-  module Mint = Map.Make(struct
-    type t = int
-    let compare = Pervasives.compare end);;
+  module Mint = Map.Make(
+    struct
+      type t = int
+      let compare = Pervasives.compare
+    end)
 
   (** [bind_nums_to_type_vars l] takes a lsymbol [l], and binds 1..n (where
   n is the number of type vars in [l]) to type vars of [l] *)
@@ -156,8 +158,8 @@ module Utils = struct
 
 end
 
+(* from now on, we shall use those functions without module qualification *)
 open Utils
-
 
 (** {2 module to separate utilities from important functions} *)
 
@@ -186,6 +188,7 @@ module Transform = struct
     if new_ty = [] then lsymbol (* same type *) else
       let new_ty = List.map (const my_t) new_ty in
       let all_new_ty = new_ty @ lsymbol.ls_args in
+      (* creates a new lsymbol with the same name but a different type *)
       let new_lsymbol =
         Term.create_lsymbol (id_clone lsymbol.ls_name)
           all_new_ty lsymbol.ls_value in
@@ -198,7 +201,7 @@ module Transform = struct
     Term.create_lsymbol name args (Some my_t)
 
 
-  (** different finders *)
+  (** different finders for logic and type declarations *)
 
   let findL tbl x = find_generic logic_to_logic tbl x
   let findT tbl x = find_generic type_to_logic tbl x
@@ -210,7 +213,9 @@ module Transform = struct
     | Tyvar x -> (try Mtv.find x tv_to_ty with Not_found -> ty)
     | Tyapp(typ, tys) -> ty_app typ (List.map (ty_to_ty tv_to_ty) tys)
 
-  (** transforms a type into a term (new args of polymorphic symbols) *)
+  (** transforms a type into a term (new args of polymorphic symbols).
+      [tblT] is a hashtable used to associate types and symbols
+      [varM] is a Map used to associate some type vars and symbols *)
   let rec ty_to_term tblT varM tv_to_ty ty =
     match ty.ty_node with
     | Tyvar _ ->
@@ -259,6 +264,7 @@ module Transform = struct
           (fmla_transform tblT tblL varM) t
   (** translation of formulae *)
   and fmla_transform tblT tblL varM f = match f.f_node with
+      (* first case : predicate (not = or <>), we must translate it and its args *)
     | Fapp(p,terms) when (not (ls_equal p ps_equ)) && not(ls_equal p ps_neq) ->
       let new_p = findL tblL p in
       (* first, remember an order for type vars of new_f *)
@@ -278,16 +284,17 @@ module Transform = struct
       let transformed_terms = List.map
         (term_transform tblT tblL varM) terms in
       f_app new_p (new_terms @ transformed_terms)
-    | _ ->
+    | _ -> (* otherwise : just traverse and translate *)
       f_map (term_transform tblT tblL varM)
         (fmla_transform tblT tblL varM) f
-  
+
 
 
   (** transforms a list of logic declarations into another.
   Declares new lsymbols with explicit polymorphic signatures.
   @param tbl hashtable used to memoize new lsymbols *)
   let logic_transform tbl decls =
+    (* if there is a definition, we must take it into account *)
     let helper = function
     | (lsymbol, Some ldef) ->
       let new_lsymbol = findL tbl lsymbol in (* new lsymbol *)
@@ -334,8 +341,9 @@ end
 (** {2 main part} *)
 
 (** main function, takes hashtables (for memoization of types and logic
-symbols) and a declaration, and returns the corresponding declaration in
-explicit polymorphism logic. *)
+    symbols) and a declaration, and returns the corresponding declaration in
+    explicit polymorphism logic.
+    It is to be applied on every declarations of the task. *)
 let decl_transform tblT tblL d =
   (*Format.eprintf "%a@." Pretty.print_decl d;*)
   let result = match d.d_node with
@@ -349,12 +357,13 @@ let decl_transform tblT tblL d =
 
 
 (** the transformation to be registered.
-It creates two new hashtables, used everywhere, which updates are
-shared by side effects. *)
+    It creates two new hashtables, used everywhere, which updates are
+    shared by side effects. *)
 let explicit_polymorphism =
   let prelude_task = Task.add_decl None t_decl in (* declare t first *)
   Trans.decl
       (decl_transform (Hashtbl.create 21) (Hashtbl.create 42)) prelude_task
+
 
 let () = Trans.register_transform "explicit_polymorphism" explicit_polymorphism
 
