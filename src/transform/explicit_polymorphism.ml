@@ -158,6 +158,8 @@ module Utils = struct
 
 end
 
+let ts_ty = Utils.t
+
 (* from now on, we shall use those functions without module qualification *)
 open Utils
 

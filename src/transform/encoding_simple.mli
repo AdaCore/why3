@@ -17,25 +17,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(**s transformation from a typed logic to a logic with only one universal
-type, builtin types, and symbols used to convert explicitely values from
-the universal type to builtin ones (and the other way) *)
-(* TODO : learn english... *)
+val meta_kept : string
 
-
-open Util
-open Ident
-open Ty
-open Term
-open Decl
-open Task
-
-let simple_types = Trans.identity
-
-let _ = Trans.register_transform "simple_types" simple_types
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. -k"
-End:
-*)

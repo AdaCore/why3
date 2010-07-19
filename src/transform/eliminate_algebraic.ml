@@ -225,8 +225,8 @@ let add_type (state, task) ts csl =
 let comp t (state,task) = match t.task_decl.td_node with
   | Decl { d_node = Dtype dl } ->
       (* add abstract type declarations *)
-      let tydl = List.rev_map (fun (ts,_) -> (ts,Tabstract)) dl in
-      let task = add_decl task (create_ty_decl tydl) in
+      let tydl = List.map (fun (ts,_) -> [ts,Tabstract]) dl in
+      let task = List.fold_left add_ty_decl task tydl in
       (* add needed functions and axioms *)
       let add acc (ts,df) = match df with
         | Tabstract      -> acc
