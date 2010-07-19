@@ -689,11 +689,11 @@ and tr_term dep tvm bv env t =
 	  let ls = tr_global_ls dep env (ConstructRef cj) in
 	  if List.length vars <> List.length ls.ls_args then raise NotFO;
 	  let pat = pat_app ls (List.map pat_var vars) ty in
-	  [pat], tr_term dep tvm bv env bj
+	  pat, tr_term dep tvm bv env bj
 	in
 	let ty = type_of env Evd.empty t in
 	let ty = tr_type dep tvm env ty in
-	t_case [e] (Array.to_list (Array.mapi branch br)) ty
+	t_case e (Array.to_list (Array.mapi branch br)) ty
     | _ ->
 	let f, cl = decompose_app t in
 	let r = global_of_constr f in
@@ -821,9 +821,9 @@ and tr_formula dep tvm bv env f =
 	  let ls = tr_global_ls dep env (ConstructRef cj) in
 	  if List.length vars <> List.length ls.ls_args then raise NotFO;
 	  let pat = pat_app ls (List.map pat_var vars) ty in
-	  [pat], tr_formula dep tvm bv env bj
+	  pat, tr_formula dep tvm bv env bj
 	in
-	f_case [t] (Array.to_list (Array.mapi branch br))
+	f_case t (Array.to_list (Array.mapi branch br))
     | Case _, _ :: _ ->
 	raise NotFO (* TODO: we could possibly swap case and application *)
     | _ ->
