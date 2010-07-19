@@ -68,14 +68,14 @@ let init_tenv kept =
       create_prop_decl Paxiom pr_t t2u2t ]
   in
   task,
-  { kept          = option_map (Sts.add Explicit_polymorphism.ts_ty) kept;
+  { kept          = kept;
     declare_kept  = Wts.memoize 7 declare_kept;
     specials      = specials;
     ty_uni        = ty_uni;
     trans_lsymbol = Hls.create 17 }
 
 let is_kept tenv ts =
-  ts_equal ts ts_int || ts_equal ts ts_real ||
+  ts_equal ts Explicit_polymorphism.ts_ty ||
   ts.ts_args = [] && match tenv.kept with
   | Some s -> Sts.mem ts s
   | None   -> true
@@ -193,7 +193,8 @@ let decl tenv d =
       [decl_map (fnT Mvs.empty) (fnF Mvs.empty) d]
 
 let t = Trans.on_meta meta_kept (fun tds ->
-  let s = Task.find_tagged_ts meta_kept tds Sts.empty in
+  let s = Sts.add ts_int (Sts.singleton ts_real) in
+  let s = Task.find_tagged_ts meta_kept tds s in
   let task, tenv = init_tenv (Some s) in
   Trans.decl (decl tenv) task)
 
