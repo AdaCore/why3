@@ -47,7 +47,17 @@ let wp_ands ?(sym=false) fl =
   List.fold_left (wp_and ~sym) f_true fl
 
 let wp_implies = f_implies_simp
-let wp_forall  = f_forall_simp
+
+let is_ref_ty env ty = match ty.ty_node with
+  | Tyapp (ts, _) -> ts_equal ts env.ts_ref
+  | _ -> false
+
+let is_arrow_ty env ty = match ty.ty_node with
+  | Tyapp (ts, _) -> ts_equal ts env.ts_arrow
+  | _ -> false
+
+let wp_forall env v f = 
+  if is_arrow_ty env v.vs_ty then f else f_forall_simp [v] [] f
 
 (* utility functions for building WPs *)
 
@@ -55,11 +65,11 @@ let fresh_label env =
   let ty = ty_app env.ts_label [] in
   create_vsymbol (id_fresh "label") ty
 
-let wp_binder (x, tv) f = match tv with
-  | Tpure _ -> wp_forall [x] [] f
+let wp_binder env (x, tv) f = match tv with
+  | Tpure _ -> wp_forall env x f
   | Tarrow _ -> f
 
-let wp_binders = List.fold_right wp_binder 
+let wp_binders env = List.fold_right (wp_binder env)
 
 (* replace old(t) with at(t,lab) everywhere in formula f *)
 let rec old_label env lab f =
@@ -87,10 +97,6 @@ let unref_ty env ty = match ty.ty_node with
   | Tyapp (ts, [ty]) when ts_equal ts env.ts_ref -> ty
   | _ -> assert false
 
-let is_ref_ty env ty = match ty.ty_node with
-  | Tyapp (ts, [_]) -> ts_equal ts env.ts_ref
-  | _ -> false
-
 (* replace !r by v everywhere in formula f *)
 let rec unref env r v f =
   f_map (unref_term env r v) (unref env r v) f
@@ -113,7 +119,7 @@ let quantify ?(all=false) env ef f =
     let ty = unref_ty env (E.type_of_reference r) in
     let v = create_vsymbol (id_clone (E.name_of_reference r)) ty in
     let f = unref env r v f in
-    wp_forall [v] [] f
+    wp_forall env v f
   in
   let s = ef.E.writes in
   let s = if all then E.Sref.union ef.E.reads s else s in
@@ -126,9 +132,9 @@ let abstract_wp env ef (q',ql') (q,ql) =
     let f = match res with 
       | Some v when is_ref_ty env v.vs_ty -> 
 	  let v' = create_vsymbol (id_clone v.vs_name) (unref_ty env v.vs_ty) in
-	  wp_forall [v'] [] (unref env (E.Rlocal v) v' f)
+	  wp_forall env v' (unref env (E.Rlocal v) v' f)
       | Some v -> 
-	  wp_forall [v] [] f
+	  wp_forall env v f
       | None -> 
 	  f 
     in
@@ -255,7 +261,7 @@ and wp_desc env e q = match e.expr_desc with
   | Efun (bl, t) ->
       let (_, q), _ = q in
       let f = wp_triple env t in
-      wp_and q (wp_binders bl f)
+      wp_and q (wp_binders env bl f)
   | Elet (x, e1, e2) ->
       let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
       let result = v_result e1.expr_type in
@@ -364,7 +370,7 @@ and wp_triple env (p, e, q) =
 
 and wp_recfun env (_, bl, _var, t) =
   let f = wp_triple env t in
-  wp_binders bl f
+  wp_binders env bl f
 
 let wp env e = 
   wp_expr env e (default_post e.expr_type e.expr_effect)
