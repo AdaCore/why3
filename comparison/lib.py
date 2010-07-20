@@ -26,7 +26,7 @@ def diff(cursor, prover1, prover2):
 
 
 
-def print_columns(lines):
+def print_columns(lines, sep = "."):
   "affiche les colonnes bien alignées"
   if len(lines) == 0:
     return
@@ -35,10 +35,15 @@ def print_columns(lines):
 
   for line in lines:
     for i in xrange(column_width-1):
-      widths[i] = max(widths[i], len(str(line[i])))
+      widths[i] = max(widths[i], len(unicode(line[i])))
 
   for line in lines:
     for i in xrange(column_width-1):
-      assert(len(str(line[i])) <= widths[i])
-      print str(line[i]).ljust(widths[i]+2, "."),
+      assert(len(unicode(line[i])) <= widths[i])
+      print unicode(line[i]).ljust(widths[i]+2, sep),
     print line[-1]
+
+
+def print_sep():
+  "affiche une ligne de '-' pour séparer clairement des sections de l'affichage"
+  print "---------------------------------------------------------------"
