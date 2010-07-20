@@ -17,6 +17,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* useful combinators *)
+
+let ($) f x = f x
+
+let const f _ = f
+
 (* useful option combinators *)
 
 let of_option = function None -> assert false | Some x -> x
@@ -88,7 +94,12 @@ let any_fn pr _ t = pr t && raise FoldSkip
 let ttrue _ = true
 let ffalse _ = false
 
-(* Set and Map on strings *)
+(* Set and Map on ints and strings *)
+
+module Int  = struct type t = int let compare = Pervasives.compare end
+
+module Sint = Set.Make(Int)
+module Mint = Map.Make(Int)
 
 module Sstr = Set.Make(String)
 module Mstr = Map.Make(String)

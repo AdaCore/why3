@@ -56,11 +56,6 @@ end
 
 module Utils = struct
 
-  (** parenthesing operator *)
-  let ($) f x = f x
-
-  let const x _ = x
-
   let map_keys m = Mty.fold (fun key _ acc -> key::acc) m []
   let map_values m = Mty.fold (fun _ value acc -> value::acc) m []
 
@@ -140,12 +135,6 @@ module Utils = struct
     (*Format.eprintf "gives @[%a@]@."
       (Debug.print_mtv Pretty.print_ty) tv_to_ty; flush stderr;*)
     tv_to_ty
-
-  module Mint = Map.Make(
-    struct
-      type t = int
-      let compare = Pervasives.compare
-    end)
 
   (** [bind_nums_to_type_vars l] takes a lsymbol [l], and binds 1..n (where
   n is the number of type vars in [l]) to type vars of [l] *)

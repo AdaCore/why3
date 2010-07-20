@@ -19,6 +19,10 @@
 
 (** Useful functions *)
 
+val ($) : ('a -> 'b) -> 'a -> 'b
+
+val const : 'a -> 'b -> 'a
+
 (* useful option combinators *)
 
 val of_option : 'a option -> 'a
@@ -49,18 +53,16 @@ val list_fold_product :
   ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
   (** [list_fold_product f acc l1 l2] apply the function [f] with the
       accumulator [acc] on all the pair of elements of [l1] and [l2]
-      tail-reccursive
-  *)
+      tail-reccursive *)
 
 val list_fold_product_l :
   ('a -> 'b list -> 'a) -> 'a -> 'b list list -> 'a
   (** generalisation of {! list_fold_product}
-      not tail-reccursive
-  *)
+      not tail-reccursive *)
 
 val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
 
-  (* boolean fold accumulators *)
+(* boolean fold accumulators *)
 
 exception FoldSkip
 
@@ -72,7 +74,10 @@ val ffalse : 'a -> bool
 val ttrue : 'a -> bool
 (** [ttrue] constant function [true] *)
 
-(* Set and Map on strings *)
+(* Set and Map on ints and strings *)
+
+module Sint : Set.S with type elt = int
+module Mint : Map.S with type key = int
 
 module Sstr : Set.S with type elt = string
 module Mstr : Map.S with type key = string
@@ -88,7 +93,6 @@ sig
   val compare : t -> t -> int
 end
 
-
 module OrderedHash (X : Tagged) : OrderedHash with type t = X.t
 module OrderedHashList (X : Tagged) : OrderedHash with type t = X.t list
 
@@ -103,3 +107,4 @@ end
 (* memoization *)
 
 val memo : ?size:int -> ('a -> 'b) -> 'a -> 'b
+
