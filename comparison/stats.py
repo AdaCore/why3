@@ -57,3 +57,42 @@ for prover in provers:
   table.append(entry)
 
 lib.print_columns(table, sep = " ")
+
+
+
+# trouver quels prouveurs sont supérieurs les uns aux autres
+
+lib.print_sep()
+
+order = {}
+
+for p1, p2 in [(p1,p2) for p1 in provers for p2 in provers if p1 != p2]:
+
+
+  print "compare", p1, p2,
+  sys.stdout.flush()
+  sups = lib.superior(cursor, p1, p2)
+
+  # effacer la ligne
+  lib.erase_line()
+
+  order[ (p1, p2) ] = len(sups)
+
+print "\n"
+
+# affiche l'ordre partiel
+
+table = [ ["prouveur1", ">", "prouveur2", "de", "nombre de tasks"] ]
+
+for ((p1,p2), num) in order.iteritems():
+  table.append( [p1, "", p2, "", unicode(num)] )
+
+def getKey(x):
+  try:
+    return int(x[4])
+  except:
+    return 0
+
+table.sort(key = getKey)
+
+lib.print_columns(table, sep = " ") # TODO : afficher un tableau

@@ -24,6 +24,24 @@ def diff(cursor, prover1, prover2):
     return []
 
 
+def superior(cursor, prover1, prover2):
+  "trouve les (file,goal) pour lesquels prover1 > prover2"
+
+  query = """SELECT distinct r1.file, r1.goal
+    FROM runs r1 JOIN runs r2
+    WHERE r1.prover = "%s" AND r2.prover = "%s"
+      AND r1.result = "Valid"
+      AND r2.result = "Timeout"
+      AND r1.file = r2.file AND r1.goal = r2.goal
+    """ % (prover1, prover2)
+
+  try:
+    result = cursor.execute(query)
+    return result.fetchall()
+  except Exception, e:
+    print >> sys.stderr, "exception :", repr(e)
+    return None
+
 
 
 def print_columns(lines, sep = "."):
@@ -47,3 +65,10 @@ def print_columns(lines, sep = "."):
 def print_sep():
   "affiche une ligne de '-' pour séparer clairement des sections de l'affichage"
   print "---------------------------------------------------------------"
+
+
+
+def erase_line(stream = sys.stdout):
+  "efface la ligne et revient au début"
+  stream.write("\033[2K\r")
+  stream.flush()
