@@ -210,6 +210,8 @@ let add_logic_decls = with_tuples ~reset:true add_logic_decls
 let add_ind_decl  = with_tuples add_ind_decl
 let add_ind_decls = with_tuples ~reset:true add_ind_decls
 
+let add_prop_decl = with_tuples ~reset:true add_prop_decl
+
 let rec type_inst s ty = match ty.ty_node with
   | Ty.Tyvar n -> Mtv.find n s
   | Ty.Tyapp (ts, tyl) -> Tyapp (ts, List.map (type_inst s) tyl)
