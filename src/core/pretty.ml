@@ -273,9 +273,12 @@ let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
 let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node true) ty
 let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
 
-let print_constr fmt cs =
+let print_constr ty fmt cs =
+  let ty_val = of_option cs.ls_value in
+  let m = ty_match Mtv.empty ty_val ty in
+  let tl = List.map (ty_inst m) cs.ls_args in
   fprintf fmt "@[<hov 4>| %a%a@]" print_cs cs
-    (print_list nothing print_ty_arg) cs.ls_args
+    (print_list nothing print_ty_arg) tl
 
 let print_type_decl fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
@@ -287,9 +290,10 @@ let print_type_decl fmt (ts,def) = match def with
             (print_list nothing print_tv_arg) ts.ts_args print_ty ty
       end
   | Talgebraic csl ->
+      let ty = ty_app ts (List.map ty_var ts.ts_args) in
       fprintf fmt "@[<hov 2>type %a%a =@\n@[<hov>%a@]@]"
         print_ts ts (print_list nothing print_tv_arg) ts.ts_args
-        (print_list newline print_constr) csl
+        (print_list newline (print_constr ty)) csl
 
 let print_type_decl fmt d = print_type_decl fmt d; forget_tvs ()
 

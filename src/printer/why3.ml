@@ -205,15 +205,15 @@ and print_tnode pri fmt t = match t.t_node with
       fprintf fmt (protect_on (pri > 0) "%a:%a")
         (print_tapp 0 fs) tl print_ty t.t_ty
   | Tif (f,t1,t2) ->
-      fprintf fmt (protect_on (pri > 0) "if %a@ then %a@ else %a")
+      fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
         print_fmla f print_term t1 print_term t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on (pri > 0) "let %a =@ %a in@ %a")
+      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
         print_vs v (print_lterm 4) t1 print_term t2;
       forget_var v
   | Tcase (t1,bl) ->
-      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
+      fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
         print_term t1 (print_list newline print_tbranch) bl
   | Teps fb ->
       let v,f = f_open_bound fb in
@@ -246,15 +246,15 @@ and print_fnode pri fmt f = match f.f_node with
   | Fnot f ->
       fprintf fmt (protect_on (pri > 4) "not %a") (print_lfmla 4) f
   | Fif (f1,f2,f3) ->
-      fprintf fmt (protect_on (pri > 0) "if %a@ then %a@ else %a")
+      fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
         print_fmla f1 print_fmla f2 print_fmla f3
   | Flet (t,f) ->
       let v,f = f_open_bound f in
-      fprintf fmt (protect_on (pri > 0) "let %a =@ %a in@ %a")
+      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
         print_vs v (print_lterm 4) t print_fmla f;
       forget_var v
   | Fcase (t,bl) ->
-      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
+      fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
         print_term t (print_list newline print_fbranch) bl
 
 and print_tbranch fmt br =
@@ -283,6 +283,13 @@ let print_constr fmt cs =
   fprintf fmt "@[<hov 4>| %a%a@]" print_cs cs
     (print_list nothing print_ty_arg) cs.ls_args
 
+let print_constr ty fmt cs =
+  let ty_val = of_option cs.ls_value in
+  let m = ty_match Mtv.empty ty_val ty in
+  let tl = List.map (ty_inst m) cs.ls_args in
+  fprintf fmt "@[<hov 4>| %a%a@]" print_cs cs
+    (print_list nothing print_ty_arg) tl
+
 let print_type_decl fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
       | None ->
@@ -293,9 +300,10 @@ let print_type_decl fmt (ts,def) = match def with
             (print_list nothing print_tv_arg) ts.ts_args print_ty ty
       end
   | Talgebraic csl ->
+      let ty = ty_app ts (List.map ty_var ts.ts_args) in
       fprintf fmt "@[<hov 2>type %a%a =@\n@[<hov>%a@]@]@\n@\n"
         print_ts ts (print_list nothing print_tv_arg) ts.ts_args
-        (print_list newline print_constr) csl
+        (print_list newline (print_constr ty)) csl
 
 let print_type_decl fmt d =
   if not (query_remove (fst d).ts_name) then
@@ -388,7 +396,7 @@ let print_task pr thpr syn fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   info := { info_syn = syn; info_rem = get_remove_set task };
-  fprintf fmt "@[<hov 2>theory Task@\n%a@]end@."
+  fprintf fmt "@[<hov 2>theory Task@\n%a@]@\nend@."
     (print_list nothing print_tdecl) (Task.task_tdecls task)
 
 let () = register_printer "why3" print_task
