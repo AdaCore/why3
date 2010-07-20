@@ -108,13 +108,9 @@ let conv_ls tenv ls =
 let conv_arg tenv ty_arg t =
   let ty_val = t.t_ty in
   if ty_equal ty_arg ty_val then t else
-  if ty_equal ty_arg tenv.ty_uni then
-    let lc = Hty.find tenv.specials ty_val in
-    t_app lc.t2u [t] ty_arg
-  else if ty_equal ty_val tenv.ty_uni then
-    let lc = Hty.find tenv.specials ty_arg in
-    t_app lc.u2t [t] ty_arg
-  else assert false
+  (* ty_val is kept and ty_arg = ty_uni *)
+  let lc = Hty.find tenv.specials ty_val in
+  t_app lc.t2u [t] ty_arg
 
 let rec rewrite_term tenv vm t =
   let fnT = rewrite_term tenv in
@@ -127,7 +123,12 @@ let rec rewrite_term tenv vm t =
       let fs = conv_ls tenv fs in
       let fn ty t = conv_arg tenv ty (fnT vm t) in
       let tl = List.map2 fn fs.ls_args tl in
-      t_app fs tl (conv_ty tenv t.t_ty)
+      let nt = t_app fs tl (of_option fs.ls_value) in
+      (* convert if nt.t_ty = ty_uni but t.t_ty is kept *)
+      let ty = conv_ty tenv t.t_ty in
+      if ty_equal nt.t_ty ty then nt else
+      let lc = Hty.find tenv.specials ty in
+      t_app lc.u2t [nt] ty
   | Tif (f, t1, t2) ->
       t_if (fnF vm f) (fnT vm t1) (fnT vm t2)
   | Tlet (t1, b) ->
@@ -207,7 +208,8 @@ let t_all =
 let () = Trans.register_transform "encoding_simple_all" t_all
 
 let t_none =
-  let task, tenv = init_tenv (Some Sts.empty) in
+  let s = Sts.add ts_int (Sts.singleton ts_real) in
+  let task, tenv = init_tenv (Some s) in
   Trans.decl (decl tenv) task
 
 let () = Trans.register_transform "encoding_simple" t_none
