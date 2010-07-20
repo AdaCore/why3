@@ -402,7 +402,7 @@ val f_subst_term_alpha : term -> term -> fmla -> fmla
 val t_subst_fmla_alpha : fmla -> fmla -> term -> term
 val f_subst_fmla_alpha : fmla -> fmla -> fmla -> fmla
 
-(** term/fmla matching modulo alpha in the pattern *)
+(** binder-free term/fmla matching *)
 
 exception NoMatch
 
