@@ -38,8 +38,15 @@ diffs = cursor.execute("""SELECT r1.file,r1.goal, r1.prover, r1.result, r2.prove
 
 tptp = ["spass", "eprover"]
 
+def isTptp(x):
+  "x est-il le nom d'un prouveur tptp ?"
+  for t in tptp:
+    if x.find(t) >= 0:
+      return True
+  return False
+
 # garder les lignes représentant une différence entre un tptp et un smt
-diffs = [line for line in diffs if (line[2] in tptp) ^ (line[4] in tptp)]
+diffs = [line for line in diffs if (isTptp(line[2]) ^ isTptp(line[4]))]
 
 # afficher
 lib.print_columns(diffs)

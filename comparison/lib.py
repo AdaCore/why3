@@ -35,10 +35,10 @@ def print_columns(lines):
 
   for line in lines:
     for i in xrange(column_width-1):
-      widths[i] = max(widths[i], len(line[i]))
+      widths[i] = max(widths[i], len(str(line[i])))
 
   for line in lines:
     for i in xrange(column_width-1):
-      assert(len(line[i]) <= widths[i])
-      print line[i].ljust(widths[i]+2, "."),
+      assert(len(str(line[i])) <= widths[i])
+      print str(line[i]).ljust(widths[i]+2, "."),
     print line[-1]
