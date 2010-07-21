@@ -30,9 +30,9 @@ def superior(cursor, prover1, prover2):
   query = """SELECT distinct r1.file, r1.goal
     FROM runs r1 JOIN runs r2
     WHERE r1.prover = "%s" AND r2.prover = "%s"
+      AND r1.file = r2.file AND r1.goal = r2.goal
       AND r1.result = "Valid"
       AND r2.result = "Timeout"
-      AND r1.file = r2.file AND r1.goal = r2.goal
     """ % (prover1, prover2)
 
   try:
@@ -44,8 +44,9 @@ def superior(cursor, prover1, prover2):
 
 
 
-def print_columns(lines, sep = "."):
+def print_columns(lines, sep = u"."):
   "affiche les colonnes bien alignées"
+  sep = unicode(sep)
   if len(lines) == 0:
     return
   column_width = len(lines[0])
@@ -58,7 +59,9 @@ def print_columns(lines, sep = "."):
   for line in lines:
     for i in xrange(column_width-1):
       assert(len(unicode(line[i])) <= widths[i])
-      print unicode(line[i]).ljust(widths[i]+2, sep),
+      item = unicode(line[i])
+      item = item.ljust(widths[i]+2, sep)
+      print item,
     print line[-1]
 
 

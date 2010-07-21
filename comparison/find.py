@@ -2,7 +2,7 @@
 #-*- coding: UTF-8 -*-
 
 
-# ce script cherche un but qui corresponde aux critères demandés
+# ce script cherche les (file,goal) pour lesquels un prouveur SMT et un prouveur TPTP ont des résultats différents.
 
 import sys
 

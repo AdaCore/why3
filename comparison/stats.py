@@ -17,7 +17,7 @@ cursor = conn.cursor()
 # trouver les prouveurs
 
 provers = cursor.execute("select distinct prover from runs").fetchall()
-provers = [line[0] for line in provers]
+provers = [unicode(line[0]) for line in provers]
 
 print "prouveurs trouvés :", ", ".join(provers)
 
@@ -46,19 +46,17 @@ for prover in provers:
 
   stats[prover] = (len(successes), len(failures))
 
-
+sys.stdout.flush()
 # mettre en forme
 
-table = [["prouveur", u"nombre de succès", u"nombre d'échecs", "nombre total"]]
+table = [["prouveur", "nombre de succes", "nombre d'echecs", "nombre total"]]
 
 for prover in provers:
 
   entry = [prover, stats[prover][0], stats[prover][1], stats[prover][0] + stats[prover][1]]
   table.append(entry)
 
-lib.print_columns(table, sep = " ")
-
-
+lib.print_columns(table, sep = u" ")
 
 # trouver quels prouveurs sont supérieurs les uns aux autres
 
@@ -82,17 +80,16 @@ print "\n"
 
 # affiche l'ordre partiel
 
-table = [ ["prouveur1", ">", "prouveur2", "de", "nombre de tasks"] ]
+table = []
 
 for ((p1,p2), num) in order.iteritems():
   table.append( [p1, "", p2, "", unicode(num)] )
 
-def getKey(x):
-  try:
-    return int(x[4])
-  except:
-    return 0
 
-table.sort(key = getKey)
+# trier puis insérer en haut la légende
+table.sort(key = lambda x:x[0])
+
+table[:0] = [["prouveur1", ">", "prouveur2", "pour", "nombre de tasks"]]
+
 
 lib.print_columns(table, sep = " ") # TODO : afficher un tableau
