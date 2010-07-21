@@ -750,11 +750,11 @@ and f_abst m l lvl f = f_label_copy f (match f.f_node with
   | _ ->
       f_map_unsafe (t_abst m l) (f_abst m l) lvl f)
 
-let t_abst_single v t = t_abst (Mvs.add v 0 Mvs.empty) [] 0 t
-let f_abst_single v f = f_abst (Mvs.add v 0 Mvs.empty) [] 0 f
+let t_abst m t = t_abst m [] 0 t
+let f_abst m f = f_abst m [] 0 f
 
-let t_abst m t = if Mvs.is_empty m then t else t_abst m [] 0 t
-let f_abst m f = if Mvs.is_empty m then f else f_abst m [] 0 f
+let t_abst_single v t = t_abst (Mvs.add v 0 Mvs.empty) t
+let f_abst_single v f = f_abst (Mvs.add v 0 Mvs.empty) f
 
 (* replaces de Bruijn indices with variables in term [t] using map [m] *)
 
@@ -790,11 +790,11 @@ and bmap_join m lvl b s =
     if Mint.mem i s || not (Sint.mem i b)
     then acc else Mint.add i t acc) m s
 
-let t_inst_single v s t = t_inst (Mint.add 0 v s) 0 t
-let f_inst_single v s f = f_inst (Mint.add 0 v s) 0 f
+let t_inst m t = t_inst m 0 t
+let f_inst m f = f_inst m 0 f
 
-let t_inst m t = if Mint.is_empty m then t else t_inst m 0 t
-let f_inst m f = if Mint.is_empty m then f else f_inst m 0 f
+let t_inst_single v s t = t_inst (Mint.add 0 v s) t
+let f_inst_single v s f = f_inst (Mint.add 0 v s) f
 
 (* t_map_unsafe and f_map_unsafe should not change types
  * (this check could go above but [tf]_(abst|inst) are safe) *)
@@ -824,12 +824,17 @@ let pat_varmap p =
   m, !i + 1
 
 let t_close_branch pat t =
-  let m,nv = pat_varmap pat in (pat, nv, Sint.empty, Mint.empty, t_abst m t)
+  let m,nv = pat_varmap pat in
+  let t = if nv = 0 then t else t_abst m t in
+  (pat, nv, Sint.empty, Mint.empty, t)
 
 let f_close_branch pat f =
-  let m,nv = pat_varmap pat in (pat, nv, Sint.empty, Mint.empty, f_abst m f)
+  let m,nv = pat_varmap pat in
+  let f = if nv = 0 then f else f_abst m f in
+  (pat, nv, Sint.empty, Mint.empty, f)
 
 let f_close_quant vl tl f =
+  if vl = [] then (vl, 0, Sint.empty, Mint.empty, tl, f) else
   let i = ref (-1) in
   let add m v =
     if Mvs.mem v m then raise (DuplicateVar v);
@@ -858,11 +863,11 @@ let pat_substs p s =
     let x' = fresh_vsymbol x in
     Mint.add i (t_var x') s, Mvs.add x x' ns) m (s, Mvs.empty)
 
-let t_open_branch (p,_,_,s,t) =
-  let m, ns = pat_substs p s in (pat_rename ns p, t_inst m t)
+let t_open_branch (p,nv,_,s,t) = if nv = 0 then (p, t_inst s t)
+  else let m, ns = pat_substs p s in (pat_rename ns p, t_inst m t)
 
-let f_open_branch (p,_,_,s,f) =
-  let m, ns = pat_substs p s in (pat_rename ns p, f_inst m f)
+let f_open_branch (p,nv,_,s,f) = if nv = 0 then (p, f_inst s f)
+  else let m, ns = pat_substs p s in (pat_rename ns p, f_inst m f)
 
 let f_open_quant (vl,_,_,s,tl,f) =
   let i = ref (-1) in
@@ -963,12 +968,12 @@ let t_app_infer fs tl =
   in
   t_app_unsafe fs tl ty
 
-exception EmptyMatch
+exception EmptyCase
 
 let t_case t bl =
   let ty = match bl with
     | (_,_,_,_,tbr) :: _ -> tbr.t_ty
-    | _ -> raise EmptyMatch
+    | _ -> raise EmptyCase
   in
   let t_check_branch (p,_,_,_,tbr) =
     check_ty_equal p.pat_ty t.t_ty;
@@ -978,7 +983,7 @@ let t_case t bl =
   t_case t bl ty
 
 let f_case t bl =
-  if bl = [] then raise EmptyMatch;
+  if bl = [] then raise EmptyCase;
   let f_check_branch (p,_,_,_,_) =
     check_ty_equal p.pat_ty t.t_ty
   in

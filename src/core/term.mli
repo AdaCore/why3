@@ -57,7 +57,7 @@ val create_psymbol : preid -> ty list -> lsymbol
 
 (** {2 Exceptions} *)
 
-exception EmptyMatch
+exception EmptyCase
 exception DuplicateVar of vsymbol
 exception UncoveredVar of vsymbol
 exception BadArity of lsymbol * int * int
