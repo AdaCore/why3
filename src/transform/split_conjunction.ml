@@ -57,13 +57,14 @@ let rec split_pos split_neg acc f =
           (f_implies (f_not fif) felse)
     | Flet (t,fb) ->
         let vs,f = f_open_bound fb in
-        List.fold_left (fun acc f -> (f_let vs t f)::acc) acc (split_pos [] f)
+        List.fold_left 
+          (fun acc f -> (f_let_close vs t f)::acc) acc (split_pos [] f)
     | Fcase _ -> (* TODO better *) f::acc
     | Fquant (Fforall,fmlaq) ->
         let vsl,trl,fmla = f_open_quant fmlaq in
         List.fold_left (fun acc f -> 
                           (* TODO : Remove unused variable*)
-                          (f_forall vsl trl f)::acc) acc (split_pos [] fmla)
+          (f_forall_close vsl trl f)::acc) acc (split_pos [] fmla)
     | Fquant (Fexists,_) -> f::acc
 
 let rec split_neg split_pos acc f =
@@ -86,13 +87,14 @@ let rec split_neg split_pos acc f =
           (f_and (f_not fif) felse)
     | Flet (t,fb) ->
         let vs,f = f_open_bound fb in
-        List.fold_left (fun acc f -> (f_let vs t f)::acc) acc (split_neg [] f)
+        List.fold_left 
+          (fun acc f -> (f_let_close vs t f)::acc) acc (split_neg [] f)
     | Fcase _ -> (* TODO better *) f::acc
     | Fquant (Fexists,fmlaq) ->
         let vsl,trl,fmla = f_open_quant fmlaq in
         List.fold_left (fun acc f -> 
                           (* TODO : Remove unused variable*)
-                          (f_exists vsl trl f)::acc) acc (split_neg [] fmla)
+          (f_exists_close vsl trl f)::acc) acc (split_neg [] fmla)
     | Fquant (Fforall,_) -> f::acc
 
 

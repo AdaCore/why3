@@ -26,16 +26,13 @@ open Decl
 
 let rec elim_t letl contT t = match t.t_node with
   | Tlet (t1,tb) ->
-      let u,t2 = t_open_bound tb in
-      let t_let e1 e2 =
-        if t_equal e1 t1 && t_equal e2 t2 then t else t_let u e1 e2
-      in
-      let cont_in t1 t2 = contT (t_let t1 t2) in
+      let u,t2,close = t_open_bound_cb tb in
+      let cont_in t1 t2 = contT (t_let t1 (close u t2)) in
       let cont_let t1 = elim_t ((u,t1)::letl) (cont_in t1) t2 in
       elim_t letl cont_let t1
   | Tif (f,t1,t2) ->
       let f = elim_f (fun f -> f) f in
-      let f = List.fold_left (fun f (v,t) -> f_let v t f) f letl in
+      let f = List.fold_left (fun f (v,t) -> f_let_close v t f) f letl in
       f_if f (elim_t letl contT t1) (elim_t letl contT t2)
   | Tcase _ ->
       Printer.unsupportedTerm t
@@ -72,7 +69,7 @@ let add_ld axl d = match d with
             let nm = ls.ls_name.id_string ^ "_def" in
             let pr = create_prsymbol (id_derive nm ls.ls_name) in
             let hd = t_app ls (List.map t_var vl) t.t_ty in
-            let f = f_forall vl [[Term hd]] (elim_f (f_equ hd t)) in
+            let f = f_forall_close vl [[Term hd]] (elim_f (f_equ hd t)) in
             create_prop_decl Paxiom pr f :: axl, (ls, None)
         | _ ->
             axl, make_ls_defn ls vl (e_map elim_t elim_f e)

@@ -46,12 +46,12 @@ let check_fvs f =
 
 let make_fs_defn fs vl t =
   let hd = t_app fs (List.map t_var vl) t.t_ty in
-  let fd = f_forall vl [] (f_equ hd t) in
+  let fd = f_forall_close vl [] (f_equ hd t) in
   fs, Some (fs, check_fvs fd)
 
 let make_ps_defn ps vl f =
   let hd = f_app ps (List.map t_var vl) in
-  let pd = f_forall vl [] (f_iff hd f) in
+  let pd = f_forall_close vl [] (f_iff hd f) in
   ps, Some (ps, check_fvs pd)
 
 let make_ls_defn ls vl = e_apply (make_fs_defn ls vl) (make_ps_defn ls vl)

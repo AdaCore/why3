@@ -297,8 +297,10 @@ module Transform = struct
         polymorphic_vars in (* new vars for polymorphism *)
       let vars = List.append new_vars vars in (* add new vars in signature *)
       (match expr with
-      | Term t -> Decl.make_fs_defn new_lsymbol vars t
-      | Fmla f -> Decl.make_ps_defn new_lsymbol vars (f_forall new_vars [] f))
+      | Term t ->
+          Decl.make_fs_defn new_lsymbol vars t
+      | Fmla f ->
+          Decl.make_ps_defn new_lsymbol vars (f_forall_close new_vars [] f))
     | (lsymbol, None) ->
       let new_lsymbol = findL tbl lsymbol in
       (new_lsymbol, None) in
@@ -324,7 +326,7 @@ module Transform = struct
     Format.eprintf "-----------@."; *)
     (*universal quantification over ty vars*)
     let new_fmla = (fmla_transform tblT tblL varM fmla) in
-    let quantified_fmla = f_forall (map_values varM) [] new_fmla in
+    let quantified_fmla = f_forall_close (map_values varM) [] new_fmla in
     [Decl.create_prop_decl prop_kind prop_name quantified_fmla]
 
 end

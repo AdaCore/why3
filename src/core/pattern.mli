@@ -24,8 +24,10 @@ open Term
 
 module type Action = sig
   type action
+  type branch
   val mk_let : vsymbol -> term -> action -> action
-  val mk_case : term -> (pattern * action) list -> action
+  val mk_branch : pattern -> action -> branch
+  val mk_case : term -> branch list -> action
 end
 
 exception ConstructorExpected of lsymbol

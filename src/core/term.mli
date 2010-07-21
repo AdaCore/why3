@@ -179,65 +179,15 @@ val e_equal : expr -> expr -> bool
 
 val tr_equal : trigger list -> trigger list -> bool
 
-(** smart constructors for term *)
+(** close bindings *)
 
-val t_var : vsymbol -> term
-val t_const : constant -> ty -> term
-val t_int_const : string -> term
-val t_real_const : real_constant -> term
-val t_app : lsymbol -> term list -> ty -> term
-val t_if : fmla -> term -> term -> term
-val t_let : vsymbol -> term -> term -> term
-val t_case : term -> (pattern * term) list -> ty -> term
-val t_eps : vsymbol -> fmla -> term
+val t_close_bound : vsymbol -> term -> term_bound
+val f_close_bound : vsymbol -> fmla -> fmla_bound
 
-val t_app_infer : lsymbol -> term list -> term
-val t_app_inst : lsymbol -> term list -> ty -> ty Mtv.t
+val t_close_branch : pattern -> term -> term_branch
+val f_close_branch : pattern -> fmla -> fmla_branch
 
-val t_label : label list -> term -> term
-val t_label_add : label -> term -> term
-val t_label_copy : term -> term -> term
-
-(** smart constructors for fmla *)
-
-val f_app : lsymbol -> term list -> fmla
-val f_forall : vsymbol list -> trigger list -> fmla -> fmla
-val f_exists : vsymbol list -> trigger list -> fmla -> fmla
-val f_quant : quant -> vsymbol list -> trigger list -> fmla -> fmla
-val f_and : fmla -> fmla -> fmla
-val f_or : fmla -> fmla -> fmla
-val f_implies : fmla -> fmla -> fmla
-val f_iff : fmla -> fmla -> fmla
-val f_binary : binop -> fmla -> fmla -> fmla
-val f_not : fmla -> fmla
-val f_true : fmla
-val f_false : fmla
-val f_if : fmla -> fmla -> fmla -> fmla
-val f_let : vsymbol -> term -> fmla -> fmla
-val f_case : term -> (pattern * fmla) list -> fmla
-
-val f_app_inst : lsymbol -> term list -> ty Mtv.t
-
-val f_label : label list -> fmla -> fmla
-val f_label_add : label -> fmla -> fmla
-val f_label_copy : fmla -> fmla -> fmla
-
-(** constructors with propositional simplification *)
-
-val f_forall_simp : vsymbol list -> trigger list -> fmla -> fmla
-val f_exists_simp : vsymbol list -> trigger list -> fmla -> fmla
-val f_quant_simp : quant -> vsymbol list -> trigger list -> fmla -> fmla
-val f_and_simp : fmla -> fmla -> fmla
-val f_and_simp_l : fmla list -> fmla
-val f_or_simp : fmla -> fmla -> fmla
-val f_or_simp_l : fmla list -> fmla
-val f_implies_simp : fmla -> fmla -> fmla
-val f_iff_simp : fmla -> fmla -> fmla
-val f_binary_simp : binop -> fmla -> fmla -> fmla
-val f_not_simp : fmla -> fmla
-val t_if_simp : fmla -> term -> term -> term
-val f_if_simp : fmla -> fmla -> fmla -> fmla
-val f_let_simp : vsymbol -> term -> fmla -> fmla
+val f_close_quant : vsymbol list -> trigger list -> fmla -> fmla_quant
 
 (** open bindings *)
 
@@ -251,6 +201,97 @@ val f_open_quant : fmla_quant -> vsymbol list * trigger list * fmla
 
 val f_open_forall : fmla -> vsymbol list * fmla
 val f_open_exists : fmla -> vsymbol list * fmla
+
+(** open bindings with optimized closing callbacks *)
+
+val t_open_bound_cb :
+  term_bound -> vsymbol * term * (vsymbol -> term -> term_bound)
+
+val f_open_bound_cb :
+  fmla_bound -> vsymbol * fmla * (vsymbol -> fmla -> fmla_bound)
+
+val t_open_branch_cb :
+  term_branch -> pattern * term * (pattern -> term -> term_branch)
+
+val f_open_branch_cb :
+  fmla_branch -> pattern * fmla * (pattern -> fmla -> fmla_branch)
+
+val f_open_quant_cb :
+  fmla_quant -> vsymbol list * trigger list * fmla *
+              (vsymbol list -> trigger list -> fmla -> fmla_quant)
+
+(** smart constructors for term *)
+
+val t_var : vsymbol -> term
+val t_const : constant -> term
+val t_int_const : string -> term
+val t_real_const : real_constant -> term
+val t_app : lsymbol -> term list -> ty -> term
+val t_if : fmla -> term -> term -> term
+val t_let : term -> term_bound -> term
+val t_case : term -> term_branch list -> term
+val t_eps : fmla_bound -> term
+
+val t_let_close : vsymbol -> term -> term -> term
+val t_eps_close : vsymbol -> fmla -> term
+
+val t_app_infer : lsymbol -> term list -> term
+val t_app_inst : lsymbol -> term list -> ty -> ty Mtv.t
+
+val t_label : label list -> term -> term
+val t_label_add : label -> term -> term
+val t_label_copy : term -> term -> term
+
+(** smart constructors for fmla *)
+
+val f_app : lsymbol -> term list -> fmla
+val f_quant : quant -> fmla_quant -> fmla
+val f_forall : fmla_quant -> fmla
+val f_exists : fmla_quant -> fmla
+val f_binary : binop -> fmla -> fmla -> fmla
+val f_and : fmla -> fmla -> fmla
+val f_or : fmla -> fmla -> fmla
+val f_implies : fmla -> fmla -> fmla
+val f_iff : fmla -> fmla -> fmla
+val f_not : fmla -> fmla
+val f_true : fmla
+val f_false : fmla
+val f_if : fmla -> fmla -> fmla -> fmla
+val f_let : term -> fmla_bound -> fmla
+val f_case : term -> fmla_branch list -> fmla
+
+val f_let_close : vsymbol -> term -> fmla -> fmla
+val f_quant_close : quant -> vsymbol list -> trigger list -> fmla -> fmla
+val f_forall_close : vsymbol list -> trigger list -> fmla -> fmla
+val f_exists_close : vsymbol list -> trigger list -> fmla -> fmla
+
+val f_app_inst : lsymbol -> term list -> ty Mtv.t
+
+val f_label : label list -> fmla -> fmla
+val f_label_add : label -> fmla -> fmla
+val f_label_copy : fmla -> fmla -> fmla
+
+(** constructors with propositional simplification *)
+
+val f_quant_simp : quant -> fmla_quant -> fmla
+val f_forall_simp : fmla_quant -> fmla
+val f_exists_simp : fmla_quant -> fmla
+val f_binary_simp : binop -> fmla -> fmla -> fmla
+val f_and_simp : fmla -> fmla -> fmla
+val f_and_simp_l : fmla list -> fmla
+val f_or_simp : fmla -> fmla -> fmla
+val f_or_simp_l : fmla list -> fmla
+val f_implies_simp : fmla -> fmla -> fmla
+val f_iff_simp : fmla -> fmla -> fmla
+val f_not_simp : fmla -> fmla
+val t_if_simp : fmla -> term -> term -> term
+val f_if_simp : fmla -> fmla -> fmla -> fmla
+val f_let_simp : term -> fmla_bound -> fmla
+
+val f_let_close_simp : vsymbol -> term -> fmla -> fmla
+val f_quant_close_simp : quant -> vsymbol list -> trigger list -> fmla -> fmla
+val f_forall_close_simp : vsymbol list -> trigger list -> fmla -> fmla
+val f_exists_close_simp : vsymbol list -> trigger list -> fmla -> fmla
 
 (** expr and trigger traversal *)
 

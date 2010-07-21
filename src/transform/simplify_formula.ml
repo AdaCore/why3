@@ -117,7 +117,7 @@ let rec fmla_quant sign f = function
 let rec fmla_remove_quant f =
   match f.f_node with
     | Fquant (k,fb) ->
-        let vsl,trl,f' = f_open_quant fb in
+        let vsl,trl,f',close = f_open_quant_cb fb in
           if trl <> [] 
           then f
           else
@@ -125,7 +125,7 @@ let rec fmla_remove_quant f =
               | Fforall -> false | Fexists -> true in
             let vsl, f' = fmla_quant sign f' vsl in
             let f' = fmla_remove_quant f' in
-            f_quant k vsl [] f'
+            f_quant k (close vsl [] f')
     | _ -> f_map (fun t -> t) fmla_remove_quant f
 
 (*let fmla_remove_quant f =

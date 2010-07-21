@@ -620,7 +620,7 @@ let rec iexpr gl env e =
 
 and iexpr_desc gl env loc ty = function
   | DEconstant c ->
-      IElogic (t_const c ty)
+      IElogic (t_const c)
   | DElocal (x, tyv) ->
       IElocal (Mstr.find x env, type_v gl env tyv)
   | DEglobal (ls, tyv) ->

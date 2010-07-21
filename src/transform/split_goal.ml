@@ -27,9 +27,11 @@ let apply_append2 fn = Util.list_fold_product (fun l e1 e2 -> fn e1 e2 :: l)
 let split_case spl c acc tl bl =
   let bl = List.rev_map f_open_branch bl in
   let bll,_ = List.fold_left (fun (bll,el) (pl,f) ->
-    let bll = List.rev_map (fun rl -> (pl,c)::rl) bll in
-    let bll = apply_append (fun f -> (pl,f)::el) bll (spl [] f) in
-    bll, (pl,c)::el) ([],[]) bl
+    let spf = spl [] f in
+    let brc = f_close_branch pl c in
+    let bll = List.rev_map (fun rl -> brc::rl) bll in
+    let bll = apply_append (fun f -> f_close_branch pl f :: el) bll spf in
+    bll, brc::el) ([],[]) bl
   in
   apply_append (f_case tl) acc bll
 
@@ -54,12 +56,12 @@ let rec split_pos acc f = match f.f_node with
   | Fif (fif,fthen,felse) ->
       split_pos (split_pos acc (f_implies fif fthen)) (f_or fif felse)
   | Flet (t,fb) -> let vs,f = f_open_bound fb in
-      apply_append (f_let vs t) acc (split_pos [] f)
+      apply_append (f_let_close vs t) acc (split_pos [] f)
   | Fcase (tl,bl) ->
       split_case split_pos f_true acc tl bl
   | Fquant (Fforall,fq) -> let vsl,trl,f = f_open_quant fq in
       (* TODO : Remove unused variable *)
-      apply_append (f_forall vsl trl) acc (split_pos [] f)
+      apply_append (f_forall_close vsl trl) acc (split_pos [] f)
   | Fquant (Fexists,_) -> f::acc
 
 and split_neg acc f = match f.f_node with
@@ -83,12 +85,12 @@ and split_neg acc f = match f.f_node with
   | Fif (fif,fthen,felse) ->
       split_neg (split_neg acc (f_and fif fthen)) (f_and (f_not fif) felse)
   | Flet (t,fb) -> let vs,f = f_open_bound fb in
-      apply_append (f_let vs t) acc (split_neg [] f)
+      apply_append (f_let_close vs t) acc (split_neg [] f)
   | Fcase (tl,bl) ->
       split_case split_neg f_false acc tl bl
   | Fquant (Fexists,fq) -> let vsl,trl,f = f_open_quant fq in
       (* TODO : Remove unused variable *)
-      apply_append (f_exists vsl trl) acc (split_neg [] f)
+      apply_append (f_exists_close vsl trl) acc (split_neg [] f)
   | Fquant (Fforall,_) -> f::acc
 
 let split_goal pr f =

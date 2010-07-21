@@ -187,7 +187,7 @@ let rec term env t = match t.dt_node with
       assert (Mstr.mem x env);
       t_var (Mstr.find x env)
   | Tconst c ->
-      t_const c (ty_of_dty t.dt_ty)
+      t_const c
   | Tapp (s, tl) ->
       t_app s (List.map (term env) tl) (ty_of_dty t.dt_ty)
   | Tif (f, t1, t2) ->
@@ -198,14 +198,12 @@ let rec term env t = match t.dt_node with
       let v = create_vsymbol (id_user x loc) ty in
       let env = Mstr.add x v env in
       let e2 = term env e2 in
-      t_let v e1 e2
+      t_let_close v e1 e2
   | Tmatch (t1, bl) ->
       let branch (p,e) =
-        let env, p = pattern env p in (p, term env e)
+        let env, p = pattern env p in t_close_branch p (term env e)
       in
-      let bl = List.map branch bl in
-      let ty = (snd (List.hd bl)).t_ty in
-      t_case (term env t1) bl ty
+      t_case (term env t1) (List.map branch bl)
   | Tnamed (x, e1) ->
       let e1 = term env e1 in
       t_label_add x e1
@@ -214,7 +212,7 @@ let rec term env t = match t.dt_node with
       let v = create_vsymbol (id_user x loc) ty in
       let env = Mstr.add x v env in
       let e1 = fmla env e1 in
-      t_eps v e1
+      t_eps_close v e1
 
 and fmla env = function
   | Ftrue ->
@@ -239,7 +237,7 @@ and fmla env = function
 	| TRfmla f -> Fmla (fmla env f)
       in
       let trl = List.map (List.map trigger) trl in
-      f_quant q vl trl (fmla env f1)
+      f_quant_close q vl trl (fmla env f1)
   | Fapp (s, tl) ->
       f_app s (List.map (term env) tl)
   | Flet (e1, { id = x ; id_loc = loc }, f2) ->
@@ -248,10 +246,10 @@ and fmla env = function
       let v = create_vsymbol (id_user x loc) ty in
       let env = Mstr.add x v env in
       let f2 = fmla env f2 in
-      f_let v e1 f2
+      f_let_close v e1 f2
   | Fmatch (t, bl) ->
       let branch (p,e) =
-        let env, p = pattern env p in (p, fmla env e)
+        let env, p = pattern env p in f_close_branch p (fmla env e)
       in
       f_case (term env t) (List.map branch bl)
   | Fnamed (x, f1) ->

@@ -58,8 +58,8 @@ let init_tenv kept =
     let tt = t_var vt in
     let u2t2u = t_app t2u [t_app u2t [tu] ty] ty_uni in
     let t2u2t = t_app u2t [t_app t2u [tt] ty_uni] ty in
-    let u2t2u = f_forall [vu] [] (f_equ u2t2u tu) in
-    let t2u2t = f_forall [vt] [] (f_equ t2u2t tt) in
+    let u2t2u = f_forall_close [vu] [] (f_equ u2t2u tu) in
+    let t2u2t = f_forall_close [vt] [] (f_equ t2u2t tt) in
     Hty.add specials ty { u2t = u2t ; t2u = t2u };
     [ create_ty_decl [ts, Tabstract];
       create_logic_decl [u2t, None];
@@ -132,12 +132,11 @@ let rec rewrite_term tenv vm t =
   | Tif (f, t1, t2) ->
       t_if (fnF vm f) (fnT vm t1) (fnT vm t2)
   | Tlet (t1, b) ->
-      let u,t2 = t_open_bound b in
+      let u,t2,close = t_open_bound_cb b in
       let u' = conv_vs tenv u in
       let t1' = fnT vm t1 in
       let t2' = fnT (Mvs.add u (t_var u') vm) t2 in
-      if vs_equal u u' && t_equal t1 t1' && t_equal t2 t2'
-      then t else t_let u' t1' t2'
+      t_let t1' (close u' t2')
   | Tcase _ | Teps _ | Tbvar _ ->
       Printer.unsupportedTerm t "unsupported term"
 
@@ -153,20 +152,18 @@ and rewrite_fmla tenv vm f =
       let tl = List.map2 fn ps.ls_args tl in
       f_app ps tl
   | Fquant (q,b) ->
-      let vl, tl, f1 = f_open_quant b in
+      let vl, tl, f1, close = f_open_quant_cb b in
       let add m v = let v' = conv_vs tenv v in Mvs.add v (t_var v') m, v' in
       let vm', vl' = Util.map_fold_left add vm vl in
       let tl' = tr_map (fnT vm') (fnF vm') tl in
       let f1' = fnF vm' f1 in
-      if List.for_all2 vs_equal vl vl' && tr_equal tl tl' && f_equal f1 f1'
-      then f else f_quant q vl' tl' f1'
+      f_quant q (close vl' tl' f1')
   | Flet (t1, b) ->
-      let u,f1 = f_open_bound b in
+      let u,f1,close = f_open_bound_cb b in
       let u' = conv_vs tenv u in
       let t1' = fnT vm t1 in
       let f1' = fnF (Mvs.add u (t_var u') vm) f1 in
-      if vs_equal u u' && t_equal t1 t1' && f_equal f1 f1'
-      then f else f_let u' t1' f1'
+      f_let t1' (close u' f1')
   | Fcase _ ->
       Printer.unsupportedFmla f "unsupported formula"
   | _ -> f_map (fnT vm) (fnF vm) f

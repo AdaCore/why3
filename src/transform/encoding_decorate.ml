@@ -227,12 +227,12 @@ let rec rewrite_term tenv tvar vsvar t =
         conv_res_app tenv tvar p tl t.t_ty
     | Tif (f, t1, t2) -> 
         t_if (fnF f) (fnT vsvar t1) (fnT vsvar t2)
-    | Tlet (t1, b) -> let u,t2 = t_open_bound b in
-      let t1' = fnT vsvar t1 in
-      let (vsvar',u) = conv_vs_let vsvar u t1'.t_ty in
-      let t2' = fnT vsvar' t2 in
-      if t_equal t1' t1 && t_equal t2' t2 then t else
-        t_let u t1' t2'
+    | Tlet (t1, b) -> 
+        let u,t2,close = t_open_bound_cb b in
+        let t1 = fnT vsvar t1 in
+        let (vsvar,u) = conv_vs_let vsvar u t1.t_ty in
+        let t2 = fnT vsvar t2 in
+        t_let t1 (close u t2)
     | Tcase _ | Teps _ | Tbvar _ ->
         Printer.unsupportedTerm t
           "Encoding decorate : I can't encode this term"
@@ -260,22 +260,21 @@ and rewrite_fmla tenv tvar vsvar f =
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv tvar) tl p.ls_args in
         f_app p tl
-    | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
-      let (vsvar',vl) = List.fold_left (conv_vs tenv tvar) (vsvar,[]) vl in
-      let f1' = fnF vsvar' f1 in 
-      (* Ici un trigger qui ne match pas assez de variables 
-         peut être généré *)
-      let tl = tr_map (rewrite_term tenv tvar vsvar') (fnF vsvar') tl in
-        (*if f_equal f1' f1 &&  vsvar' == vsvar (*&& tr_equal tl' tl*) then f
-        else *)
-      let vl = List.rev vl in
-      f_quant q vl tl f1'
-    | Flet (t1, b) -> let u,f2 = f_open_bound b in
-     let t1' = fnT t1 in
-     let (vsvar,u) = conv_vs_let vsvar u t1'.t_ty in
-     let f2' = fnF vsvar f2 in 
-     if t_equal t1' t1 && f_equal f2' f2 then f else
-     f_let u t1' f2'
+    | Fquant (q, b) ->
+        let vl, tl, f1, close = f_open_quant_cb b in
+        let (vsvar,vl) = List.fold_left (conv_vs tenv tvar) (vsvar,[]) vl in
+        let f1 = fnF vsvar f1 in 
+        (* Ici un trigger qui ne match pas assez de variables 
+           peut être généré *)
+        let tl = tr_map (rewrite_term tenv tvar vsvar) (fnF vsvar) tl in
+        let vl = List.rev vl in
+        f_quant q (close vl tl f1)
+    | Flet (t1, b) ->
+        let u,f2,close = f_open_bound_cb b in
+        let t1 = fnT t1 in
+        let (vsvar,u) = conv_vs_let vsvar u t1.t_ty in
+        let f2 = fnF vsvar f2 in 
+        f_let t1 (close u f2)
     | _ -> f_map fnT (fnF vsvar) f
 
 let decl (tenv:tenv) d =
@@ -320,7 +319,7 @@ let decl (tenv:tenv) d =
         let tvar = Htv.create 17 in
         let f = fnF tvar Mvs.empty f in
         let tvl = Htv.fold (fun _ tv acc -> tv::acc) tvar [] in
-        let f = f_forall tvl [] f in
+        let f = f_forall_close tvl [] f in
         [create_decl (create_prop_decl k pr f)]
 
 (*

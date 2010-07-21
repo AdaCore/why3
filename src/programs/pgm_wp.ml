@@ -57,7 +57,7 @@ let is_arrow_ty env ty = match ty.ty_node with
   | _ -> false
 
 let wp_forall env v f = 
-  if is_arrow_ty env v.vs_ty then f else f_forall_simp [v] [] f
+  if is_arrow_ty env v.vs_ty then f else f_forall_close_simp [v] [] f
 
 (* utility functions for building WPs *)
 
@@ -252,7 +252,7 @@ let rec wp_expr env e q =
 and wp_desc env e q = match e.expr_desc with
   | Elogic t ->
       let (v, q), _ = q in
-      f_let v t q
+      f_let_close v t q
   | Elocal v ->
       let (res, q), _ = q in
       f_subst (subst1 res (t_var v)) q
@@ -305,7 +305,9 @@ and wp_desc env e q = match e.expr_desc with
 	in
 	w
   | Ematch (x, bl) ->
-      let branch (p, e) = p, wp_expr env e (filter_post e.expr_effect q) in
+      let branch (p, e) = 
+        f_close_branch p (wp_expr env e (filter_post e.expr_effect q)) 
+      in
       let t = t_var x in
       f_case t (List.map branch bl)
   | Eskip ->

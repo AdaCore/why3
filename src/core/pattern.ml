@@ -24,8 +24,10 @@ open Term
 
 module type Action = sig
   type action
+  type branch
   val mk_let : vsymbol -> term -> action -> action
-  val mk_case : term -> (pattern * action) list -> action
+  val mk_branch : pattern -> action -> branch
+  val mk_case : term -> branch list -> action
 end
 
 exception ConstructorExpected of lsymbol
@@ -124,28 +126,32 @@ module Compile (X : Action) = struct
         | _ ->
             let base =
               if Sls.for_all (fun cs -> Mls.mem cs types) css
-              then [] else [pat_wild ty, comp_wilds ()]
+              then [] else [mk_branch (pat_wild ty) (comp_wilds ())]
             in
             let add cs ql acc =
               let get_vs q = create_vsymbol (id_fresh "x") q.pat_ty in
               let vl = List.rev_map get_vs ql in
               let pl = List.rev_map pat_var vl in
               let al = List.rev_map t_var vl in
-              (pat_app cs pl ty, comp_cases cs al) :: acc
+              mk_branch (pat_app cs pl ty) (comp_cases cs al) :: acc
             in
             mk_case t (Mls.fold add types base)
 
 end
 
-module CompileTerm = Compile (struct
+module CompileTerm  = Compile (struct
   type action = term
-  let mk_let v s t = t_let v s t
-  let mk_case t bl = t_case t bl (snd (List.hd bl)).t_ty
+  type branch = term_branch
+  let mk_let v s t  = t_let_close v s t
+  let mk_branch p t = t_close_branch p t
+  let mk_case t bl  = t_case t bl
 end)
 
-module CompileFmla = Compile (struct
+module CompileFmla  = Compile (struct
   type action = fmla
-  let mk_let v t f = f_let v t f
-  let mk_case t bl = f_case t bl
+  type branch = fmla_branch
+  let mk_let v t f  = f_let_close v t f
+  let mk_branch p f = f_close_branch p f
+  let mk_case t bl  = f_case t bl
 end)
 

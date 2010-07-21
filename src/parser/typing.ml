@@ -560,10 +560,10 @@ let add_projection cl p (fs,tyarg,tyval) th =
       | _ -> pat_wild (ty_inst m ty)
     in
     let al = List.map2 per_param cs.ls_args pl in
-    pat_app cs al tyarg, t_var vs
+    t_close_branch (pat_app cs al tyarg) (t_var vs)
   in
   let vs = create_vsymbol (id_fresh "u") tyarg in
-  let t = t_case (t_var vs) (List.map per_cs cl) tyval in
+  let t = t_case (t_var vs) (List.map per_cs cl) in
   let d = make_fs_defn fs [vs] t in
   add_logic_decl th [d]
 

@@ -77,7 +77,7 @@ let rec rewriteT kn state t = match t.t_node with
         match p with
         | { pat_node = Papp (cs,pl) } ->
             let add_var e p pj = match p.pat_node with
-              | Pvar v -> t_let v (t_app pj [t1] v.vs_ty) e
+              | Pvar v -> t_let_close v (t_app pj [t1] v.vs_ty) e
               | _ -> Printer.unsupportedTerm t uncompiled
             in
             let pjl = Mls.find cs state.pj_map in
@@ -125,13 +125,13 @@ and rewriteF kn state av sign f = match f.f_node with
         let hd = t_app cs (List.map t_var vl) t1.t_ty in
         match t1.t_node with
         | Tvar v when Svs.mem v av ->
-            let hd = f_let v hd e in if sign
-            then f_forall_simp vl [] hd
-            else f_exists_simp vl [] hd
+            let hd = f_let_close v hd e in if sign
+            then f_forall_close_simp vl [] hd
+            else f_exists_close_simp vl [] hd
         | _ ->
             let hd = f_equ t1 hd in if sign
-            then f_forall_simp vl [] (f_implies_simp hd e)
-            else f_exists_simp vl [] (f_and_simp     hd e)
+            then f_forall_close_simp vl [] (f_implies_simp hd e)
+            else f_exists_close_simp vl [] (f_and_simp     hd e)
       in
       let ts = match t1.t_ty.ty_node with
         | Tyapp (ts,_) -> ts
@@ -140,12 +140,12 @@ and rewriteF kn state av sign f = match f.f_node with
       let op = if sign then f_and_simp else f_or_simp in
       map_join_left find op (find_constructors kn ts)
   | Fquant (q, bf) when (q = Fforall && sign) || (q = Fexists && not sign) ->
-      let vl, tr, f1 = f_open_quant bf in
-      let tr' = tr_map (rewriteT kn state)
-                       (rewriteF kn state Svs.empty sign) tr in
+      let vl, tr, f1, close = f_open_quant_cb bf in
+      let tr = tr_map (rewriteT kn state)
+                      (rewriteF kn state Svs.empty sign) tr in
       let av = List.fold_left (fun s v -> Svs.add v s) av vl in
-      let f1' = rewriteF kn state av sign f1 in
-      if f_equal f1' f1 && tr_equal tr' tr then f else f_quant q vl tr' f1'
+      let f1 = rewriteF kn state av sign f1 in
+      f_quant q (close vl tr f1)
   | Fbinop (o, _, _) when (o = Fand && sign) || (o = For && not sign) ->
       f_map_sign (rewriteT kn state) (rewriteF kn state av) sign f
   | Flet (t1, _) ->
@@ -177,7 +177,7 @@ let add_type (state, task) ts csl =
     let hd = t_app cs (List.rev_map t_var vl) (of_option cs.ls_value) in
     let hd = t_app mt_ls (hd::mt_tl) mt_ty in
     let vl = List.rev_append mt_vl (List.rev vl) in
-    let ax = f_forall vl [[Term hd]] (f_equ hd t) in
+    let ax = f_forall_close vl [[Term hd]] (f_equ hd t) in
     add_decl tsk (create_prop_decl Paxiom pr ax)
   in
   let task = List.fold_left2 mt_add task csl mt_tl in
@@ -195,7 +195,7 @@ let add_type (state, task) ts csl =
       let id = id_derive (ls.ls_name.id_string ^ "_def") ls.ls_name in
       let pr = create_prsymbol id in
       let hh = t_app ls [hd] t.t_ty in
-      let ax = f_forall (List.rev vl) [[Term hd]] (f_equ hh t) in
+      let ax = f_forall_close (List.rev vl) [[Term hd]] (f_equ hh t) in
       ls::pjl, add_decl tsk (create_prop_decl Paxiom pr ax)
     in
     let pjl,tsk = List.fold_left add ([],tsk) tl in
@@ -214,7 +214,7 @@ let add_type (state, task) ts csl =
   in
   let ax_f = map_join_left mk_cs f_or csl in
   let trgl = t_app mt_ls (ax_hd :: mt_tl) mt_ty in
-  let ax_f = f_forall (ax_vs :: mt_vl) [[Term trgl]] ax_f in
+  let ax_f = f_forall_close (ax_vs :: mt_vl) [[Term trgl]] ax_f in
   let task = add_decl task (create_prop_decl Paxiom ax_pr ax_f) in
   (* add the tag for enumeration if the type is one *)
   let enum = List.for_all (fun ls -> ls.ls_args = []) csl in

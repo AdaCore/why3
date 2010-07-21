@@ -53,9 +53,12 @@ let rec t_insert hd t = match t.t_node with
       f_if f1 (t_insert hd t2) (t_insert hd t3)
   | Tlet (t1,bt) ->
       let v,t2 = t_open_bound bt in
-      f_let v t1 (t_insert hd t2)
+      f_let_close v t1 (t_insert hd t2)
   | Tcase (tl,bl) ->
-      let br b = let pl,t1 = t_open_branch b in pl, t_insert hd t1 in
+      let br b =
+        let pl,t1 = t_open_branch b in
+        f_close_branch pl (t_insert hd t1)
+      in
       f_case tl (List.map br bl)
   | _ -> f_equ_simp hd t
 
@@ -64,9 +67,12 @@ let rec f_insert hd f = match f.f_node with
       f_if f1 (f_insert hd f2) (f_insert hd f3)
   | Flet (t1,bf) ->
       let v,f2 = f_open_bound bf in
-      f_let v t1 (f_insert hd f2)
+      f_let_close v t1 (f_insert hd f2)
   | Fcase (tl,bl) ->
-      let br b = let pl,f1 = f_open_branch b in pl, f_insert hd f1 in
+      let br b =
+        let pl,f1 = f_open_branch b in
+        f_close_branch pl (f_insert hd f1)
+      in
       f_case tl (List.map br bl)
   | _ -> f_iff_simp hd f
 
@@ -78,13 +84,13 @@ let add_ld func pred axl d = match d with
         | Term t when func ->
             let nm = ls.ls_name.id_string ^ "_def" in
             let hd = t_app ls (List.map t_var vl) t.t_ty in
-            let ax = f_forall vl [[Term hd]] (t_insert hd t) in
+            let ax = f_forall_close vl [[Term hd]] (t_insert hd t) in
             let pr = create_prsymbol (id_derive nm ls.ls_name) in
             create_prop_decl Paxiom pr ax :: axl, (ls, None)
         | Fmla f when pred ->
             let nm = ls.ls_name.id_string ^ "_def" in
             let hd = f_app ls (List.map t_var vl) in
-            let ax = f_forall vl [[Fmla hd]] (f_insert hd f) in
+            let ax = f_forall_close vl [[Fmla hd]] (f_insert hd f) in
             let pr = create_prsymbol (id_derive nm ls.ls_name) in
             create_prop_decl Paxiom pr ax :: axl, (ls, None)
         | _ -> axl, d

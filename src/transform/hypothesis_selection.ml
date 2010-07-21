@@ -203,7 +203,7 @@ module NF = struct (* add memoization, one day ? *)
   and handle_not fmlaTable old_f f = match f.f_node with
     | Fquant (Fforall,f_bound) ->
 	let vars,triggers,f1 = f_open_quant f_bound in
-	transform fmlaTable (f_exists vars triggers (f_not f1))
+	transform fmlaTable (f_exists_close vars triggers (f_not f1))
     | Fnot f1 -> transform fmlaTable f1
     | Fbinop (Fand,f1,f2) ->
 	transform fmlaTable (f_or (f_not f1) (f_not f2))
