@@ -439,6 +439,8 @@ let () = Exn_printer.register
       fprintf fmt "Bad arity: symbol %a must be applied \
                    to %i arguments, but is applied to %i"
         print_ls ls ls_arg app_arg
+  | Term.EmptyMatch ->
+      fprintf fmt "Empty match statement"
   | Term.DuplicateVar vs ->
       fprintf fmt "Variable %a is used twice" print_vsty vs
   | Term.UncoveredVar vs ->
