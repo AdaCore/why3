@@ -177,8 +177,7 @@ val t_equal : term -> term -> bool
 val f_equal : fmla -> fmla -> bool
 val e_equal : expr -> expr -> bool
 
-val tr_equal : trigger -> trigger -> bool
-val trl_equal : trigger list -> trigger list -> bool
+val tr_equal : trigger list -> trigger list -> bool
 
 (** smart constructors for term *)
 

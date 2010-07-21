@@ -325,8 +325,7 @@ let e_equal e1 e2 = match e1, e2 with
   | Fmla f1, Fmla f2 -> f_equal f1 f2
   | _ -> false
 
-let tr_equal  = list_all2 e_equal
-let trl_equal = list_all2 tr_equal
+let tr_equal = list_all2 (list_all2 e_equal)
 
 (* expr and trigger traversal *)
 
@@ -430,7 +429,7 @@ module Hsfmla = Hashcons.Make (struct
 
   let f_eq_quant (vl1,_,_,s1,tl1,f1) (vl2,_,_,s2,tl2,f2) =
     f_equal f1 f2 && list_all2 vs_equal vl1 vl2 &&
-    bmap_equal s1 s2 && trl_equal tl1 tl2
+    bmap_equal s1 s2 && tr_equal tl1 tl2
 
   let f_equal_node f1 f2 = match f1,f2 with
     | Fapp (s1,l1), Fapp (s2,l2) ->
@@ -1139,7 +1138,7 @@ let f_map fnT fnF f = f_label_copy f (match f.f_node with
   | Fapp (p, tl) -> f_app_unsafe p (List.map fnT tl)
   | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
       let f1' = fnF f1 in let tl' = tr_map fnT fnF tl in
-      if f_equal f1' f1 && trl_equal tl' tl then f
+      if f_equal f1' f1 && tr_equal tl' tl then f
       else f_quant q vl tl' f1'
   | Fbinop (op, f1, f2) -> f_binary op (fnF f1) (fnF f2)
   | Fnot f1 -> f_not (fnF f1)
@@ -1295,7 +1294,7 @@ let f_map_cont fnT fnF contF f =
   | Fquant (q, b) ->
       let vl, tl, f1 = f_open_quant b in
       let f_quant el e1 =
-        if f_equal e1 f1 && trl_equal el tl
+        if f_equal e1 f1 && tr_equal el tl
         then f else f_quant q vl el e1
       in
       let cont_dot tl f1 = contF (f_quant tl f1) in
@@ -1695,7 +1694,7 @@ let f_map_simp fnT fnF f = f_label_copy f (match f.f_node with
   | Fapp (p, tl) -> f_app_unsafe p (List.map fnT tl)
   | Fquant (q, b) -> let vl, tl, f1 = f_open_quant b in
       let f1' = fnF f1 in let tl' = tr_map fnT fnF tl in
-      if f_equal f1' f1 && trl_equal tl' tl && not (is_true_false f1) then f
+      if f_equal f1' f1 && tr_equal tl' tl && not (is_true_false f1) then f
       else f_quant_simp q vl tl' f1'
   | Fbinop (op, f1, f2) -> f_binary_simp op (fnF f1) (fnF f2)
   | Fnot f1 -> f_not_simp (fnF f1)

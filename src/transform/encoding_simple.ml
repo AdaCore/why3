@@ -158,7 +158,7 @@ and rewrite_fmla tenv vm f =
       let vm', vl' = Util.map_fold_left add vm vl in
       let tl' = tr_map (fnT vm') (fnF vm') tl in
       let f1' = fnF vm' f1 in
-      if List.for_all2 vs_equal vl vl' && trl_equal tl tl' && f_equal f1 f1'
+      if List.for_all2 vs_equal vl vl' && tr_equal tl tl' && f_equal f1 f1'
       then f else f_quant q vl' tl' f1'
   | Flet (t1, b) ->
       let u,f1 = f_open_bound b in
