@@ -77,3 +77,75 @@ def erase_line(stream = sys.stdout):
   "efface la ligne et revient au début"
   stream.write("\033[2K\r")
   stream.flush()
+
+
+def getTerminalSize():
+  "récupère la largeur et la hauteur du terminal"
+# {{{
+  def ioctl_GWINSZ(fd):
+    try:
+      import fcntl, termios, struct, os
+      cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
+    except:
+      return None
+    return cr
+  cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)
+  if not cr:
+    try:
+      fd = os.open(os.ctermid(), os.O_RDONLY)
+      cr = ioctl_GWINSZ(fd)
+      os.close(fd)
+    except:
+        pass
+  if not cr:
+    try:
+      cr = (env['LINES'], env['COLUMNS'])
+    except:
+      cr = (25, 80)
+  return int(cr[1]), int(cr[0])
+# }}}
+
+def printTab(tab):
+  "affiche le tableau carré donné en entrée"
+
+  items = list(set( [unicode(x) for (x,y) in tab.keys()] )) # enlever doublons
+  for i in items:
+    tab[ (None,i) ] = i # pour la première ligne
+
+  max_width = 0
+  normal_sum = 0
+  for i in items:
+    max_width = max(max_width, len(i)+1)
+    normal_sum += len(i) + 1
+
+  width,height = getTerminalSize()
+  if max_width * (len(items)+1)  >= width: # ça ne rentre pas
+    print >> sys.stderr, "terminal trop étroit"
+    max_width = width / (len(items) + 1)
+
+  def print_line(item):
+    if item != None:
+      sys.stdout.write(item[:max_width-1].ljust(max_width-1, " ")+"|")
+    else:
+      sys.stdout.write("x\y : x>y".ljust(max_width-1, " ")+"|")
+    for i in xrange(len(items)):
+      i = items[i]
+      if i == item:
+        sys.stdout.write("x".ljust(max_width, " "))
+      else:
+        num = unicode(tab[ (item,i) ])
+        sys.stdout.write(num[:max_width-1].ljust(max_width, " "))
+    sys.stdout.write("\n")
+
+  print "légende : [colonne] est meilleur que [ligne] sur [case] buts\n"
+  print_line(None)
+  for i in items:
+    print("-"*(len(items)+1)*max_width)
+    print_line(i)
+
+  for i in items:
+    try:
+      del tab[ (None,i) ]
+    except:
+      pass
+

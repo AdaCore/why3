@@ -64,10 +64,15 @@ lib.print_sep()
 
 order = {}
 
-for p1, p2 in [(p1,p2) for p1 in provers for p2 in provers if p1 != p2]:
+tuples = [(p1,p2) for p1 in provers for p2 in provers if p1 != p2]
+max_len = 0
+for prover in provers:
+  max_len = max(max_len, len(prover))
+for tuple in tuples:
+  p1,p2 = tuple
 
-
-  print "compare", p1, p2,
+  current = ("compare " + p1 + " "+ p2).ljust(12+2*max_len, " ")
+  print current ,"(%.2f %%)" % (float(tuples.index(tuple)) / len(tuples)*100),
   sys.stdout.flush()
   sups = lib.superior(cursor, p1, p2)
 
@@ -80,16 +85,9 @@ print "\n"
 
 # affiche l'ordre partiel
 
-table = []
+table = {}
 
 for ((p1,p2), num) in order.iteritems():
-  table.append( [p1, "", p2, "", unicode(num)] )
+  table[ (p1,p2) ] = unicode(num)
 
-
-# trier puis insérer en haut la légende
-table.sort(key = lambda x:x[0])
-
-table[:0] = [["prouveur1", ">", "prouveur2", "pour", "nombre de tasks"]]
-
-
-lib.print_columns(table, sep = " ") # TODO : afficher un tableau
+lib.printTab(table)
