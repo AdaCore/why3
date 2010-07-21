@@ -1,0 +1,48 @@
+==== Descriptif général : ====
+
+Ensemble de scripts destinés à recueillir et analyser les résultats obtenus par whyml3 en fonction du fichier, du but et du prouveur utilisé. Les données peuvent être utilisées pour comparer les prouveurs entre eux, pour trouver les fichiers et buts sur lesquels les prouveurs ont des difficultés, etc.
+
+==== Usage des scripts : ====
+
+* run_all.sh : lance process_file.py avec tous les prouveurs sur tous les fichiers de ../examples/programs/ et ../bench/programs/good/.
+
+* process_file.py : étant donné un fichier et une liste de prouveurs (séparés par des virgules), lance chaque prouveur sur le fichier par le biais de whyml3.
+Les résultats sont stockés dans output.db (par défaut).
+Un seul résultat est stocké pour un triplet (fichier, but, prouveur) donné.
+
+* clear.py : vide la base dans output.db (avec confirmation).
+
+* dump.py : affiche le contenu de la base, aligné par colonnes. Utile en combinaison avec grep.
+
+* find.py : trouve les (fichier,but,prover1,result1,prover2,result2) tels que, sur le (fichier,but) concerné, les prouveurs prover1 et prover2 se comportent différemment.
+Les résultats sont donnés pour pouvoir comparer les performances comparées des prouveurs sur des buts donnés.
+
+* diff.py : prend une liste d'au moins 2 prouveurs (séparés par des virgules), et donne la liste des (fichier,but) sur lesquels ces prouveurs se comportent différemment.
+
+* stats.py : recueille des statistiques variées sur tous les prouveurs de la base de données.
+
+note : lib.py contient des fonctions utilitaires destinées aux scripts, mais aussi utilisables directement dans (i)python.
+
+
+==== Exemple typique d'utilisation ====
+
+En partant d'une base vide (fichier vide ou inexistant) :
+
+$ ./run_all.sh
+<logs divers, prend un certain temps>
+
+$ ./dump.py
+<contenu de la base>
+
+$ ./stats.py
+<ratio échecs/succès par prouveur>
+<pour chaque couple de prouveur, nombre de buts sur lequel le premier a été meilleur que le second>
+
+$ ./diff.py z3,cvc3
+<buts sur lesquels z3 et cvc3 se comportent différemment>
+
+$ ./diff.py z3,cvc3,z3_simple
+<buts sur lesquels 2 de ces prouveurs ont des résultats différents>
+
+$ ./clear.py  # données trop confidentielles pour qu'on les laisse à disposition des concurrents !
+[y/n] y

@@ -12,9 +12,11 @@ def diff(cursor, prover1, prover2):
   "trouve les (file,goal) dont le résultat est différent\
   pour prover1 et prover2"
 
-  query = """SELECT distinct r1.file, r1.goal, r1.prover, r1.result, r2.prover, r2.result
+  query = """SELECT r1.file, r1.goal, r1.prover, r1.result, r2.prover, r2.result
     FROM runs r1 JOIN runs r2
-    WHERE r1.prover = "%s" and r2.prover = "%s" and r1.result <> r2.result""" % \
+    WHERE r1.prover = "%s" AND r2.prover = "%s"
+      AND r1.file = r2.file AND r1.goal = r2.goal
+      AND r1.result <> r2.result""" % \
       (prover1, prover2)
   try:
     result = cursor.execute(query)
@@ -32,7 +34,7 @@ def superior(cursor, prover1, prover2):
     WHERE r1.prover = "%s" AND r2.prover = "%s"
       AND r1.file = r2.file AND r1.goal = r2.goal
       AND r1.result = "Valid"
-      AND r2.result = "Timeout"
+      AND r2.result <> "Valid"
     """ % (prover1, prover2)
 
   try:

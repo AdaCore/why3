@@ -40,7 +40,7 @@ for prover in provers:
 
   failures = cursor.execute("""
     SELECT DISTINCT file,goal FROM runs
-    WHERE result = "Timeout"
+    WHERE result <> "Valid"
     AND prover = "%s"
     """ % prover).fetchall()
 
