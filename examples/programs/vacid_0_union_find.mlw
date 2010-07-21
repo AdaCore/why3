@@ -36,7 +36,7 @@ let get_num_classes (u:ref uf) =
 
 let create (n:int) =
   { 0 <= n } 
-  let l = ref (A.const_length 0 n) in
+  let l = ref (A.create_const_length 0 n) in
   let i = ref 0 in
   while !i < n do
     invariant { 0 <= !i <= n and
@@ -45,7 +45,7 @@ let create (n:int) =
     l := A.set !l !i !i;
     i := !i + 1
   done;
-  ref (UF !l (A.const_length 0 n) n n)
+  ref (UF !l (A.create_const_length 0 n) n n)
   { inv !result and
     num !result = n and size !result = n and
     forall x:int. 0 <= x < n -> repr !result x = x }

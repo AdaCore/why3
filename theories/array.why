@@ -22,6 +22,8 @@ theory ArrayPoly
 
 end
 
+(* arrays with monomorphic keys *)
+
 theory Array
 
   type key
@@ -41,9 +43,10 @@ theory Array
     forall b : 'a [get (set m a1 b) a2].
     a1 <> a2 -> get (set m a1 b) a2 = get m a2
 
-  logic const 'a : t 'a
+  logic create_const 'a : t 'a
 
-  axiom Const : forall b:'a. forall a:key. get (const b) a = b
+  axiom Create_const_get : 
+    forall b:'a. forall a:key. get (create_const b) a = b
 
 end
 
@@ -53,17 +56,22 @@ theory ArrayLength
 
   logic length (t 'a) : int
 
-  logic const_length 'a int : t 'a
-
-  axiom Const_contents : 
-    forall b:'a. forall n i:int. get (const_length b n) i = b
-
-  axiom Length_const : 
-    forall a : 'a. forall n : int. length (const_length a n) = n
-
   axiom Length_set : 
     forall a : t 'a. forall k : int. forall v : 'a.
     length (set a k v) = length a
+
+  logic create_const_length 'a int : t 'a
+
+  axiom Create_const_length_get : 
+    forall b:'a. forall n i:int. get (create_const_length b n) i = b
+
+  axiom Create_const_length_length : 
+    forall a : 'a. forall n : int. length (create_const_length a n) = n
+
+  logic create_length int : t 'a
+
+  axiom Create_length_length : 
+    forall n : int. length (create_length n : t 'a) = n
 
 end
 
@@ -72,11 +80,6 @@ theory ArrayRich
   use import int.Int
   
   clone export ArrayLength
-
-  logic create int : t 'a
-
-  axiom Create_length : 
-    forall n : int. length (create n : t 'a) = n
 
   logic sub (t 'a) int int : t 'a
 
@@ -88,6 +91,96 @@ theory ArrayRich
     get (sub s ofs len) i = get s (ofs + i)
 
   logic app (t 'a) (t 'a) : t 'a
+
+  axiom App_length : 
+    forall s1 s2 : t 'a. length (app s1 s2) = length s1 + length s2
+
+  axiom App_get :
+    forall s1 s2 : t 'a, i : int. 
+    get (app s1 s2) i = 
+      if i < length s1 then get s1 i else get s2 (i - length s1)
+
+end
+
+(* monomorphic versions (the type of elements is elt) *)
+
+theory ArrayMono
+
+  type key
+
+  type elt
+
+  type t
+
+  logic get t key : elt
+  logic set t key elt : t
+  
+  axiom Select_eq : 
+    forall m : t. forall a1 a2 : key. 
+    forall b : elt [get (set m a1 b) a2].
+    a1 = a2 -> get (set m a1 b) a2 = b
+
+  axiom Select_neq : 
+    forall m : t. forall a1 a2 : key. 
+    forall b : elt [get (set m a1 b) a2].
+    a1 <> a2 -> get (set m a1 b) a2 = get m a2
+
+  logic create_const elt : t
+
+  axiom Create_const_get : 
+    forall b:elt. forall a:key. get (create_const b) a = b
+
+end
+
+theory ArrayMonoLength
+
+  clone export ArrayMono with type key = int
+
+  logic length t : int
+
+  axiom Length_set : 
+    forall a : t. forall k : int. forall v : elt.
+    length (set a k v) = length a
+
+  logic create_const_length elt int : t
+
+  axiom Create_const_length_get : 
+    forall b:elt. forall n i:int. get (create_const_length b n) i = b
+
+  axiom Create_const_length_length : 
+    forall a : elt. forall n : int. length (create_const_length a n) = n
+
+  logic create_length int : t
+
+  axiom Create_length_length : 
+    forall n : int. length (create_length n : t) = n
+
+end
+
+theory ArrayMonoRich
+
+  use import int.Int
+  
+  clone export ArrayMonoLength
+
+  logic sub t int int : t
+
+  axiom Sub_length : 
+    forall s : t, ofs len : int. length (sub s ofs len) = len
+
+  axiom Sub_get :
+    forall s : t, ofs len i : int. 
+    get (sub s ofs len) i = get s (ofs + i)
+
+  logic app t t : t
+
+  axiom App_length : 
+    forall s1 s2 : t. length (app s1 s2) = length s1 + length s2
+
+  axiom App_get :
+    forall s1 s2 : t, i : int. 
+    get (app s1 s2) i = 
+      if i < length s1 then get s1 i else get s2 (i - length s1)
 
 end
 
