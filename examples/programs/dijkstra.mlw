@@ -1,6 +1,6 @@
 {
-use set.Fset as S
-use array.Array as M
+  use set.Fset as S
+  use array.ArrayPoly as M
 }
 
 (* iteration on a set *)
@@ -64,7 +64,7 @@ parameter init :
     unit writes visited, q, d 
     { S.is_empty !visited and 
       !q = S.add src S.empty and 
-      !d = M.store (old !d) src 0  }
+      !d = M.set (old !d) src 0  }
 
 parameter relax :
   u:vertex -> v:vertex -> 
@@ -72,19 +72,19 @@ parameter relax :
     unit reads visited writes d,q 
     { (S.mem v !visited and !q = old !q and !d = old !d) 
       or
-      (S.mem v !q and M.select !d u + weight u v >= M.select !d v and 
+      (S.mem v !q and M.get !d u + weight u v >= M.get !d v and 
         !q = old !q and !d = old !d) 
       or	
-      (S.mem v !q  and M.select !d u + weight u v < M.select !d v and 
-        !q = old !q and !d = M.store (old !d) v (M.select !d u + weight u v))
+      (S.mem v !q  and M.get !d u + weight u v < M.get !d v and 
+        !q = old !q and !d = M.set (old !d) v (M.get !d u + weight u v))
       or
       (not S.mem v !visited and not S.mem v !q and !q = S.add v (old !q) and
-        !d = M.store (old !d) v (M.select !d u + weight u v)) }	
+        !d = M.set (old !d) v (M.get !d u + weight u v)) }	
 
 {
 logic min (m:vertex) (q:S.t vertex) (d:M.t vertex int) =
   S.mem m q and 
-  forall x:vertex. S.mem x q -> M.select d x <= M.select d m
+  forall x:vertex. S.mem x q -> M.get d x <= M.get d m
 }
 
 parameter q_extract_min :
@@ -153,15 +153,15 @@ logic inv (src:vertex) (s q:S.t vertex) (d:M.t vertex int) =
   (forall v:vertex. S.mem v q -> S.mem v s -> false)
   (* we already found the shortest paths for vertices in S *)
   and
-  (forall v:vertex. S.mem v s -> shortest_path src v (M.select d v))
+  (forall v:vertex. S.mem v s -> shortest_path src v (M.get d v))
   (* there are paths for vertices in Q *)
   and
-  (forall v:vertex. S.mem v q -> path src v (M.select d v))
+  (forall v:vertex. S.mem v q -> path src v (M.get d v))
   (* vertices at distance < min(Q) are already in S *)
   and
   (forall m:vertex. min m q d -> 
      forall x:vertex. forall dx:int. shortest_path src x dx -> 
-       dx < M.select d m -> S.mem x s) 
+       dx < M.get d m -> S.mem x s) 
 
 logic inv_succ (src:vertex) (s q : S.t vertex) =
   (* successors of vertices in S are either in S or in Q *)
@@ -186,7 +186,7 @@ let shortest_path_code (src:vertex) (dst:vertex) =
     invariant { inv src !visited !q !d and inv_succ src !visited !q }
     variant   { S.cardinal v - S.cardinal !visited }
     let u = q_extract_min () in
-    assert { shortest_path src u (M.select !d u) };
+    assert { shortest_path src u (M.get !d u) };
     visited_add u;
     let su = ref (g_succ u) in
     while not (set_has_next su) do 
@@ -199,7 +199,7 @@ let shortest_path_code (src:vertex) (dst:vertex) =
     done
   done
   { (forall v:vertex. 
-       S.mem v !visited -> shortest_path src v (M.select !d v)) 
+       S.mem v !visited -> shortest_path src v (M.get !d v)) 
     and
     (forall v:vertex. 
        not S.mem v !visited -> forall dv:int. not path src v dv) }

@@ -7,19 +7,19 @@
 
   type option 'a = None | Some 'a
 
-  use array.Array as A
+  use array.ArrayPoly as A
 
   type table = A.t int (option int)
 
   logic inv (t : table) =
-    forall x y : int. A.select t x = Some y -> y = fib x
+    forall x y : int. A.get t x = Some y -> y = fib x
 }
 
 parameter table : ref table
 
 parameter add : 
   x:int -> y:int -> 
-    {} unit writes table { !table = A.store (old !table) x (Some y) }
+    {} unit writes table { !table = A.set (old !table) x (Some y) }
 
 exception Not_found
 
@@ -27,8 +27,8 @@ parameter find :
   x:int -> 
    {} 
    int reads table raises Not_found 
-   { A.select !table x = Some result } 
-   | Not_found -> { A.select !table x = None }
+   { A.get !table x = Some result } 
+   | Not_found -> { A.get !table x = None }
   
 let rec fibo n =
   { 0 <= n and inv !table }

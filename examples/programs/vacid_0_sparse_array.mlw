@@ -31,7 +31,7 @@ back  +-+-+-+-------------------+
 
   type array 'a = A.t 'a
 
-  logic (#) (a : array 'a) (i : int) : 'a = A.select a i
+  logic (#) (a : array 'a) (i : int) : 'a = A.get a i
 
   type sparse_array = SA (sa_val  : array elt) 
                          (sa_idx  : array int)
@@ -106,8 +106,8 @@ let test a i =
   let idx = sa_idx !a in
   let back = sa_back !a in
   let n = sa_n !a in
-  0 <= A.select idx i && A.select idx i < n &&
-  A.select back (A.select idx i) = i
+  0 <= A.get idx i && A.get idx i < n &&
+  A.get back (A.get idx i) = i
   { result=True <-> is_elt !a i }
 
 (*
@@ -121,7 +121,7 @@ let get a i =
   { 0 <= i < sa_sz !a and invariant !a } 
   let val = sa_val !a in
   if test a i then
-    A.select val i 
+    A.get val i 
   else
     default
   { result = model !a i }
@@ -144,13 +144,13 @@ let set a i v =
   let back = sa_back !a in
   let sz= sa_sz !a in
   let n = sa_n !a in
-  let val = A.store val i v in
+  let val = A.set val i v in
   if test a i then
     a := SA val idx back sz n
   else begin
     assert { n < sz };
-    let idx = A.store idx i n in 
-    let back = A.store back n i in
+    let idx = A.set idx i n in 
+    let back = A.set back n i in
     a := SA val idx back sz (n+1)
   end
   { invariant !a and 

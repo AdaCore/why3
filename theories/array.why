@@ -1,69 +1,93 @@
 
-theory Array
+theory ArrayPoly
 
   type t 'a 'b
 
-  logic select (t 'a 'b) 'a : 'b
-  logic store (t 'a 'b) 'a 'b : t 'a 'b
+  logic get (t 'a 'b) 'a : 'b
+  logic set (t 'a 'b) 'a 'b : t 'a 'b
   
   axiom Select_eq : 
     forall m : t 'a 'b. forall a1 a2 : 'a. 
-    forall b : 'b [select (store m a1 b) a2].
-    a1 = a2 -> select (store m a1 b) a2  = b
+    forall b : 'b [get (set m a1 b) a2].
+    a1 = a2 -> get (set m a1 b) a2  = b
 
   axiom Select_neq : 
     forall m : t 'a 'b. forall a1 a2 : 'a. 
-    forall b : 'b [select (store m a1 b) a2].
-    a1 <> a2 -> select (store m a1 b) a2 = select m a2
+    forall b : 'b [get (set m a1 b) a2].
+    a1 <> a2 -> get (set m a1 b) a2 = get m a2
 
   logic const 'b : t 'a 'b
 
-  axiom Const : forall b:'b, a:'a. select (const b) a = b
+  axiom Const : forall b:'b, a:'a. get (const b) a = b
 
 end
 
-theory ArrayKey
+theory Array
 
   type key
 
   type t 'a
 
-  logic select (t 'a) key : 'a
-  logic store (t 'a) key 'a : t 'a
+  logic get (t 'a) key : 'a
+  logic set (t 'a) key 'a : t 'a
   
   axiom Select_eq : 
     forall m : t 'a. forall a1 a2 : key. 
-    forall b : 'a [select (store m a1 b) a2].
-    a1 = a2 -> select (store m a1 b) a2 = b
+    forall b : 'a [get (set m a1 b) a2].
+    a1 = a2 -> get (set m a1 b) a2 = b
 
   axiom Select_neq : 
     forall m : t 'a. forall a1 a2 : key. 
-    forall b : 'a [select (store m a1 b) a2].
-    a1 <> a2 -> select (store m a1 b) a2 = select m a2
+    forall b : 'a [get (set m a1 b) a2].
+    a1 <> a2 -> get (set m a1 b) a2 = get m a2
 
   logic const 'a : t 'a
 
-  axiom Const : forall b:'a. forall a:key. select (const b) a = b
+  axiom Const : forall b:'a. forall a:key. get (const b) a = b
 
 end
 
 theory ArrayLength
 
-  clone export ArrayKey with type key = int
+  clone export Array with type key = int
 
   logic length (t 'a) : int
 
   logic const_length 'a int : t 'a
 
   axiom Const_contents : 
-    forall b:'a. forall n i:int. select (const_length b n) i = b
+    forall b:'a. forall n i:int. get (const_length b n) i = b
 
   axiom Length_const : 
     forall a : 'a. forall n : int. length (const_length a n) = n
 
-  axiom Length_store : 
+  axiom Length_set : 
     forall a : t 'a. forall k : int. forall v : 'a.
-    length (store a k v) = length a
+    length (set a k v) = length a
+
+end
+
+theory ArrayRich
+
+  use import int.Int
+  
+  clone export ArrayLength
+
+  logic create int : t 'a
+
+  axiom Create_length : 
+    forall n : int. length (create n : t 'a) = n
+
+  logic sub (t 'a) int int : t 'a
+
+  axiom Sub_length : 
+    forall s : t 'a, ofs len : int. length (sub s ofs len) = len
+
+  axiom Sub_get :
+    forall s : t 'a, ofs len i : int. 
+    get (sub s ofs len) i = get s (ofs + i)
+
+  logic app (t 'a) (t 'a) : t 'a
 
 end
 
