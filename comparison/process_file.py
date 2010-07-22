@@ -2,8 +2,9 @@
 #-*- coding: UTF-8 -*-
 
 
-# ce script lance un prouveur sur un fichier .mlw (grâce à why3)
+# ce script lance un prouveur sur un fichier .mlw (grâce à whyml3)
 # et stocke la sortie dans la base output.db
+# il peut aussi être utilisé avec why3 grâce à l'option -t
 
 import sys
 from os import path
@@ -15,12 +16,12 @@ import getopt
 #------------------------------------------------
 # parse les arguments
 
-db_file = "output.db"
 
 try:
-  opt, args = getopt.getopt(sys.argv[1:], "df:C:", [])
+  opt, args = getopt.getopt(sys.argv[1:], "df:C:t:", [])
 
   target_file = args[0]
+  _,extension = path.splitext(target_file)
   provers = args[1]
   provers = provers.split(",")
 
@@ -33,18 +34,26 @@ try:
 
   if '-f' in opt:
     db_file = opt['-f']
+  else:
+    db_file = "output.db"
 
   if '-C' in opt:
     config_file = opt['-C']
   else:
     config_file = None
 
+  if '-t' in opt:
+    tool = opt['-t']
+  else:
+    tool = "whyml3"
+
 except:
   print """usage:
-  process_file [-d] [-f file] [-C config_file] file prover[,prover[,prover...]]
+process_file.py [-d] [-f file] [-C config_file] [-t tool] file prover[,prover[,prover...]]
   -d : active le mode debug
   -f <file> : stocke les résultats dans <file>
-  -C <file> : utilise le fichier de configuration <file>"""
+  -C <file> : utilise le fichier de configuration <file>
+  -t <tool> : utilise <tool> pour les preuves (why, whyml...)"""
   sys.exit(1)
 
 print >> sys.stderr, "utilise le(s) prouveur(s) %s sur %s (db : %s)" % \
@@ -59,6 +68,8 @@ import sqlite3
 conn = sqlite3.connect(db_file)
 cursor = conn.cursor()
 
+# si la table runs n'existe pas, la créer. Sinon, signaler qu'on a trouvé une base.
+# le cas où la table existe mais n'est pas au bon format n'est pas traité.
 try:
   cursor.execute("""create table runs
     (file string, goal string, prover string, result string, time float)""")
@@ -68,12 +79,11 @@ except sqlite3.OperationalError:
 
 
 #------------------------------------------------
-# lance whyml3 sur le fichier
-
-def launch_whyml(target_file, prover):
+# lance [tool] sur le fichier pour récupérer les résultats
+def launch_tool(target_file, prover):
   target_file = path.abspath(target_file)
 
-  command_list = ["whyml3", "-P", prover, "-a", "split_goal"]
+  command_list = [tool, "-P", prover, "-a", "split_goal"]
   if config_file:
     command_list += ["-C", config_file]
   command_list.append(target_file)
@@ -92,7 +102,7 @@ def launch_whyml(target_file, prover):
 
 def getFile(x):
   "récupère le nom de fichier"
-  return path.basename(x.partition(".mlw")[0] + ".mlw")
+  return path.basename(x.partition(extension)[0] + extension)
 
 def getGoal(x):
   "récupère le nom du but"
@@ -190,7 +200,7 @@ def process(prover):
   "toute la chaine de traitement pour un prouveur donné"
 
   prover = prover.strip()
-  results = launch_whyml(target_file, prover)
+  results = launch_tool(target_file, prover)
   lines = process_results(results)
   process_lines(lines)
   print_lines(lines)

@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# lance les prouveurs donnés (ou ceux donnés en argument) sur les fichiers de 2 dossiers
 
 PROVERS="spass,eprover,z3,cvc3,simplify,alt-ergo,z3_simple,cvc3_simple,eprover_simple,spass_simple"
 
@@ -8,7 +9,6 @@ if [ -n $1 ]; then
   echo "utilise les prouveurs $1"
 fi
 
-#TARGET_DIR="../bench/programs/good/"
 TARGET_DIRS="../examples/programs/ ../bench/programs/good/"
 
 for TARGET_DIR in $TARGET_DIRS; do

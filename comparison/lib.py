@@ -6,14 +6,14 @@
 import sys
 
 
-
-
+# différences de résultats entre les 2 prouveurs
 def diff(cursor, prover1, prover2):
   "trouve les (file,goal) dont le résultat est différent\
   pour prover1 et prover2"
 
   query = """SELECT r1.file, r1.goal, r1.prover, r1.result, r2.prover, r2.result
-    FROM runs r1 JOIN runs r2
+    FROM runs r1
+    INNER JOIN runs r2
     WHERE r1.prover = "%s" AND r2.prover = "%s"
       AND r1.file = r2.file AND r1.goal = r2.goal
       AND r1.result <> r2.result""" % \
@@ -26,11 +26,13 @@ def diff(cursor, prover1, prover2):
     return []
 
 
+# (file,goal) sur lesquels le premier prouveur est meilleur que le second
 def superior(cursor, prover1, prover2):
   "trouve les (file,goal) pour lesquels prover1 > prover2"
 
   query = """SELECT distinct r1.file, r1.goal
-    FROM runs r1 JOIN runs r2
+    FROM runs r1
+    INNER JOIN runs r2
     WHERE r1.prover = "%s" AND r2.prover = "%s"
       AND r1.file = r2.file AND r1.goal = r2.goal
       AND r1.result = "Valid"
@@ -45,7 +47,7 @@ def superior(cursor, prover1, prover2):
     return None
 
 
-
+# affichage aligné en colonnes
 def print_columns(lines, sep = u"."):
   "affiche les colonnes bien alignées"
   sep = unicode(sep)
@@ -53,7 +55,7 @@ def print_columns(lines, sep = u"."):
     return
   column_width = len(lines[0])
   widths = [0 for x in xrange(column_width)]
-
+  # calculer la largeur de chaque colonne (max des largeurs de ses éléments)
   for line in lines:
     for i in xrange(column_width-1):
       widths[i] = max(widths[i], len(unicode(line[i])))
@@ -67,18 +69,21 @@ def print_columns(lines, sep = u"."):
     print line[-1]
 
 
+# petite facilité
 def print_sep():
-  "affiche une ligne de '-' pour séparer clairement des sections de l'affichage"
+  "affiche une ligne de '-' pour séparer clairement des\
+  sections de l'affichage"
   print "---------------------------------------------------------------"
 
 
-
+# effacer la ligne courante du terminal
 def erase_line(stream = sys.stdout):
   "efface la ligne et revient au début"
   stream.write("\033[2K\r")
   stream.flush()
 
 
+# récupéré sur le net, pour obtenir largeur et hauteur du terminal
 def getTerminalSize():
   "récupère la largeur et la hauteur du terminal"
 # {{{
@@ -105,6 +110,12 @@ def getTerminalSize():
   return int(cr[1]), int(cr[0])
 # }}}
 
+
+
+# tente d'affichier un tableau donné en entrée. Ce tableau
+# est un dictionnaire (colonne,ligne) -> item qui doit vérifier
+# la propriété suivante :
+# pour tout (i,j) dans tab, (j,i) est aussi dans tab
 def printTab(tab):
   "affiche le tableau carré donné en entrée"
 

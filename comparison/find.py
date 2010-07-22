@@ -2,7 +2,8 @@
 #-*- coding: UTF-8 -*-
 
 
-# ce script cherche les (file,goal) pour lesquels un prouveur SMT et un prouveur TPTP ont des résultats différents.
+# ce script cherche les (file,goal) pour lesquels un prouveur SMT et
+# un prouveur TPTP ont des résultats différents.
 
 import sys
 
@@ -14,18 +15,19 @@ conn = sqlite3.connect("output.db")
 cursor = conn.cursor()
 
 
-
 # utilitaires
 import lib
 
-# les prouveurs
+# les prouveurs (demander à la DB)
 provers = cursor.execute("select distinct prover from runs").fetchall()
 
 provers = [p[0] for p in provers]
 
-# les 2 uplets de prouveurs
+# les 2 uplets de prouveurs, sans redondances
 provers_combinaisons = [(p1,p2) for p1 in provers for p2 in provers if p1 < p2]
 
+# trouver les couples de prouveurs dont l'un échoue et l'autre réussit,
+# pour chaque (fichier,but)
 diffs = []
 diffs = cursor.execute("""SELECT r1.file,r1.goal, r1.prover, r1.result, r2.prover, r2.result
   FROM runs r1
@@ -33,9 +35,11 @@ diffs = cursor.execute("""SELECT r1.file,r1.goal, r1.prover, r1.result, r2.prove
   WHERE r1.file = r2.file
     AND r1.goal = r2.goal
     AND r1.result = "Valid"
-    AND r2.result = "Timeout"
+    AND r2.result <> "Valid"
   ORDER BY r1.file ASC""").fetchall()
 
+
+# comment différencier un prouveur TPTP d'un prouveur SMT ?
 tptp = ["spass", "eprover"]
 
 def isTptp(x):
