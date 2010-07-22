@@ -27,6 +27,7 @@ open Term
 open Decl
 open Task
 
+(* lots of modules and functors applications to be used later *)
 
 module Int_Dft = struct
   type t = int
@@ -42,6 +43,8 @@ module GP = Graph.Persistent.Digraph.ConcreteLabeled(
     let hash x = x.ls_name.id_tag
     let equal x y = x.ls_name.id_tag = y.ls_name.id_tag
   end)(Int_Dft)
+
+(** a way to compare/hash expressions *)
 module ExprNode = struct
     type t = Term.expr
     let compare x y = match x,y with
@@ -75,8 +78,7 @@ module Sexpr = Set.Make(ExprNode)
 
 let err = Format.err_formatter
 
-
-(** affiche l'expression donnée, transformant les espaces en _ *)
+(** prints the given expression, transforming spaces into _ *)
 let string_of_expr_node node =
   let print_in_buf printer x =
     let b = Buffer.create 42 in
@@ -89,6 +91,7 @@ let string_of_expr_node node =
     | Fmla f -> print_in_buf Pretty.print_fmla f in
   translate repr
 
+(* for debugging (graph printing) purposes *)
 module Dot_ = Graph.Graphviz.Dot(struct
 			  include GC
 			  let graph_attributes _ = []
@@ -101,19 +104,23 @@ module Dot_ = Graph.Graphviz.Dot(struct
 			end)
 
 
+
+(** some useful things *)
 module Util = struct
   let print_clause fmt = Format.fprintf fmt "@[[%a]@]"
     (Pp.print_list Pp.comma Pretty.print_fmla)
   let print_clauses fmt = Format.fprintf fmt "[%a]@."
     (Pp.print_list Pp.comma print_clause)
 
-  (** all combinaisons of elements of left and right *)
+  (** [combinator] applied to all combinaisons of elements
+      of [left] and [right] *)
   let map_complete combinator left right =
     let explorer left_elt =
       List.map (fun right_elt -> combinator left_elt right_elt) right in
     List.flatten (List.map explorer left)
 
-(** all combinaisons of elements of left and right, folded *)
+(** all combinaisons of elements of [left] and [right],
+    folded with [combinator] starting with [acc] *)
   let fold_complete combinator acc left right =
     let explorer acc left_elt =
       List.fold_left
@@ -121,7 +128,8 @@ module Util = struct
 	acc right in
     List.fold_left explorer acc left
 
-  (** given two lists of sets of expr, returns the list made from their union *)
+  (** given two lists of sets of expr, returns the list made from their union.
+      It is like zipping the lists with Sexpr.union. *)
   let rec merge_list l1 l2 = match l1,l2 with
     | x::xs,y::ys -> (Sexpr.union x y) :: merge_list xs ys
     | _,[] -> l1
@@ -132,12 +140,12 @@ end
 (** module used to reduce formulae to Normal Form *)
 module NF = struct (* add memoization, one day ? *)
   (* TODO ! *)
-  (** all quantifiers in prenex form *)
+  (** all quantifiers in prenex form, currently just identity *)
   let prenex_fmla fmla =
     Format.fprintf err "prenex_fmla : @[%a@]@." Pretty.print_fmla fmla;
     fmla
 
-  (** creates a fresh formula representing a quantified formula *)
+  (** creates a fresh non-quantified formula, representing a quantified formula *)
   let create_fmla (vars:Term.vsymbol list) : Term.fmla =
     let pred = create_psymbol (id_fresh "temoin")
       (List.map (fun var -> var.vs_ty) vars) in
@@ -146,7 +154,8 @@ module NF = struct (* add memoization, one day ? *)
 
   (** transforms a formulae into its Normal Form as a list of clauses.
       The first argument is a hastable from formulae to formulae.
-      A clause is a list of formulae *)
+      A clause is a list of formulae, so this function returns a list
+      of list of formulae. *)
   let rec transform fmlaTable fmla =
     Format.fprintf err "transform : @[%a@]@." Pretty.print_fmla fmla;
     match fmla.f_node with
@@ -172,6 +181,9 @@ module NF = struct (* add memoization, one day ? *)
     | Fif (_,_,_) -> failwith "if formulae not handled"
     | Flet (_,_) -> failwith "let formulae not handled"
     | Fcase (_,_) -> failwith "case formulae not handled"
+
+  (** travers prefix quantifiers until it reaches a non-quantified formula,
+      collecting bounded vars encountered *)
   and traverse fmlaTable old_fmla vars fmla = match fmla.f_node with
     | Fquant (_,f_bound) ->
 	let var,_,f = f_open_quant f_bound in
@@ -184,11 +196,15 @@ module NF = struct (* add memoization, one day ? *)
 	  FmlaHashtbl.add fmlaTable old_fmla new_fmla;
 	  FmlaHashtbl.add fmlaTable new_fmla new_fmla;
 	  [[new_fmla]]
+
+  (** skips prenex quantifiers *)
   and skipPrenex fmlaTable fmla = match fmla.f_node with
     | Fquant (_,f_bound) ->
 	let _,_,f = f_open_quant f_bound in
 	skipPrenex fmlaTable f
     | _ -> transform fmlaTable fmla
+
+(** logical binary operators splitting *)
   and split f = match f.f_node with
     | Fbinop (Fimplies,{f_node = Fbinop (For, h1, h2)},f2) ->
 	(split (f_binary Fimplies h1 f2)) @ (split (f_binary Fimplies h2 f2))
@@ -200,6 +216,8 @@ module NF = struct (* add memoization, one day ? *)
 	else split (f_or (f_not f1) f2)
     | Fbinop (Fand,f1,f2) -> [f1; f2]
     | _ -> [f]
+
+  (** negation operator handling (with de morgan rules) *)
   and handle_not fmlaTable old_f f = match f.f_node with
     | Fquant (Fforall,f_bound) ->
 	let vars,triggers,f1 = f_open_quant f_bound in
@@ -215,6 +233,7 @@ module NF = struct (* add memoization, one day ? *)
 	transform fmlaTable (f_or (f_and f1 (f_not f2)) (f_and (f_not f1) f2))
     | _ -> [[old_f]] (* default case *)
 
+  (** the function to use to effectively transform into a normal form *)
   let make_clauses fmlaTable prop =
     let prenex_fmla = prenex_fmla prop in
     let clauses = skipPrenex fmlaTable prenex_fmla in
@@ -223,8 +242,9 @@ module NF = struct (* add memoization, one day ? *)
 end
 
 
-(** module used to compute the graph of constants *)
+(** module used to compute the graph of relations between constants *)
 module GraphConstant = struct
+  
   (** memoizing for formulae and terms, and then expressions *)
   let rec findF fTbl fmla = try
     FmlaHashtbl.find fTbl fmla
@@ -246,12 +266,15 @@ module GraphConstant = struct
     | Term t -> findT tTbl t
     | Fmla f -> findF fTbl f
 
+  (** adds a symbol to the graph *)
   let add_symbol fTbl tTbl gc expr =
     GC.add_vertex gc (find fTbl tTbl expr)
 
   (** analyse dynamic dependencies in one atomic formula, from the bottom *)
   let rec analyse_fmla_base fTbl tTbl gc fmla =
     let gc,_ = analyse_fmla fTbl tTbl (gc,[]) fmla in gc
+
+  (** recursive function used by the previous function *)
   and analyse_fmla fTbl tTbl (gc,vertices) fmla = match fmla.f_node with
     | Fapp (_,terms) ->
 	let gc,sub_vertices =
@@ -266,6 +289,8 @@ module GraphConstant = struct
 	(gc, pred_vertex :: vertices)
     | _ -> f_fold (analyse_term fTbl tTbl) (analyse_fmla fTbl tTbl)
 	(gc,vertices) fmla
+
+  (** explore terms. mutually recursive with the previous function *)
   and analyse_term fTbl tTbl (gc,vertices) term = match term.t_node with
     | Tvar _ | Tconst _ ->
 	let vertex = findT tTbl term in
@@ -284,14 +309,18 @@ module GraphConstant = struct
     | _ -> t_fold (analyse_term fTbl tTbl) (analyse_fmla fTbl tTbl)
 	(gc,vertices) term
 
+(** analyse a single clause by folding analyse_fmla_base over it *)
   let analyse_clause fTbl tTbl gc clause =
     List.fold_left (analyse_fmla_base fTbl tTbl) gc clause
 
+  (** analyses a proposition :
+      - get it into normal form
+      - fold over clauses with analyse_clause *)
   let analyse_prop fmlaTable fTbl tTbl gc prop =
     let clauses = NF.make_clauses fmlaTable prop in
     List.fold_left (analyse_clause fTbl tTbl) gc clauses
 
-      (** processes a single task_head. *)
+  (** processes a single task_head. *)
   let update fmlaTable fTbl tTbl gc task_head = 
     match task_head.task_decl.Theory.td_node with
     | Theory.Decl {d_node = Dprop(_,_,prop_decl)} ->
@@ -303,10 +332,13 @@ end
 module GraphPredicate = struct
   exception Exit of lsymbol
 
+  (** test for negative formulae *)
   let is_negative = function
     | { f_node = Fnot _ } -> true
     | _ -> false
 
+  (** assuming the formula looks like p(t1,t2...),
+      returns the symbol p *)
   let extract_symbol fmla =
     let rec search = function
       | { f_node = Fapp(p,_) } -> raise (Exit p)
@@ -354,6 +386,7 @@ module GraphPredicate = struct
     let clauses = NF.make_clauses fmlaTable prop in
     List.fold_left (analyse_clause symbTbl) gp clauses
 
+  (** add a symbol to the graph as a new vertex *)
   let add_symbol symbTbl gp lsymbol =
     GP.add_vertex gp (find symbTbl lsymbol)
 
@@ -374,6 +407,8 @@ end
 
 (** module that makes the final selection *)
 module Select = struct
+
+  (** gets all predicates symbols of the formula *)
   let get_predicates fmla =
     let id acc _ = acc in
     let rec explore acc fmla = match fmla.f_node with
@@ -381,6 +416,7 @@ module Select = struct
       | _ -> f_fold id explore acc fmla
     in explore [] fmla
 
+  (** gets all predicate symbols from a clause *)
   let get_clause_predicates acc clause =
     let rec fmla_get_pred ?(pos=true) acc fmla = match fmla.f_node with
       | Fnot f -> fmla_get_pred ~pos:false acc f
@@ -388,6 +424,7 @@ module Select = struct
       | _ -> failwith "bad formula in get_predicates !"
     in List.fold_left fmla_get_pred acc clause
 
+  (** get all sub-formulae *)
   let rec get_sub_fmlas fTbl tTbl fmla =
     let rec gather_sub_fmla fTbl tTbl acc fmla = match fmla.f_node with
       | Fapp (_,terms) ->
@@ -425,7 +462,7 @@ module Select = struct
   exception FixPoint
   exception Exit of Sexpr.t list
 
-  (** builds the list of reachable nodes *)
+  (** builds the list of reachable nodes in a non-directed graph (of constants)*)
   let build_relevant_variables gc goal_clause =
     let acc = Sexpr.empty in
     let l0 = List.fold_right Sexpr.add goal_clause acc in
@@ -511,7 +548,8 @@ module Select = struct
 	   Pretty.print_ls (GP.V.label x) i; false end)
       predicates
 
-  (** tests whether a formula is pertinent according to the dynamic dependency criterion. *)
+  (** tests whether a formula is pertinent according to the dynamic
+      dependency criterion (using the undirected graph gc). *)
   let is_pertinent_dynamic fTbl tTbl goal_clauses ?(j=4) gc =
     let relevant_variables = (* ideally, there should be only one goal clause *)
       List.fold_left Util.merge_list []
@@ -529,7 +567,8 @@ module Select = struct
       List.for_all is_acceptable sub_fmlas
 
   (** preprocesses the goal formula and the graph, and returns a function
-      that will accept or not axioms according to their relevance. *)
+      that will accept or not axioms according to their relevance.
+      This is the function directly used to filter axioms. *)
   let filter fTbl tTbl symTbl goal_clauses (gc,gp) decl =
     match decl.d_node with
       | Dtype _ | Dlogic _ | Dind _ -> [decl]

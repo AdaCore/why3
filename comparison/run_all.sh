@@ -4,7 +4,7 @@
 
 PROVERS="spass,eprover,z3,cvc3,simplify,alt-ergo,z3_simple,cvc3_simple,eprover_simple,spass_simple"
 
-if [ -n $1 ]; then
+if [ -n "$1" ]; then
   PROVERS="$1"
   echo "utilise les prouveurs $1"
 fi
