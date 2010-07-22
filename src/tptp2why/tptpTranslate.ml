@@ -220,7 +220,7 @@ module Translate = struct
   | FQuant (quant, vars, f) -> begin
     (* Format.printf "@[<hov 2>quantifier %s %s (depth %d)@]\n" (if quant=Forall then "forall" else "exists") (String.concat ", " vars) (EnvVar.depth ()); *)
     EnvVar.push_scope vars; (* new scope *)
-    let answer = Term.f_quant
+    let answer = Term.f_quant_close
       (translate_quant quant)
       (List.map EnvVar.find vars)
       [] (* no triggers *)
