@@ -519,8 +519,6 @@ let t_label_add l t = Hsterm.hashcons { t with t_label = l :: t.t_label }
 let t_label_copy { t_label = l } t =
   if t.t_label = [] && l <> [] then t_label l t else t
 
-let t_app_unsafe = t_app
-
 (* hash-consing constructors for formulas *)
 
 let mk_fmla n = Hsfmla.hashcons { f_node = n; f_label = []; f_tag = -1 }
@@ -562,8 +560,6 @@ let f_app p tl =
 let f_equ t1 t2 = f_app ps_equ [t1; t2]
 let f_neq t1 t2 = f_app ps_neq [t1; t2]
 
-let f_app_unsafe = f_app
-
 let fs_tuple n =
   let tyl = ref [] in
   for i = 1 to n
@@ -579,111 +575,73 @@ let t_tuple tl =
   let ty = ty_tuple (List.map (fun t -> t.t_ty) tl) in
   t_app (fs_tuple (List.length tl)) tl ty
 
-(* unsafe map with level *)
+(* unsafe map *)
 
-let bmlvl fnT lvl s = bmap_map (fnT lvl) s
+let bound_map  fnT fnE (u,b,s,e) = (u, b, bmap_map fnT s, fnE e)
+let branch_map fnT fnE (pat,nv,b,s,e) = (pat, nv, b, bmap_map fnT s, fnE e)
 
-let brlvl fnT fnE lvl (pat,nv,b,s,e) =
-  let lvl = lvl + nv in (pat, nv, b, bmlvl fnT lvl s, fnE lvl e)
+let t_map_unsafe fnT fnF t = t_label_copy t (match t.t_node with
+  | Tbvar _ | Tvar _ | Tconst _ -> t
+  | Tapp (f,tl) -> t_app f (List.map fnT tl) t.t_ty
+  | Tif (f,t1,t2) -> t_if (fnF f) (fnT t1) (fnT t2)
+  | Tlet (e,b) -> t_let (fnT e) (bound_map fnT fnT b) t.t_ty
+  | Tcase (e,bl) -> t_case (fnT e) (List.map (branch_map fnT fnT) bl) t.t_ty
+  | Teps b -> t_eps (bound_map fnT fnF b) t.t_ty)
 
-let t_map_unsafe fnT fnF lvl t = t_label_copy t (match t.t_node with
-  | Tbvar _ | Tvar _ | Tconst _ ->
-      t
-  | Tapp (f,tl) ->
-      t_app f (List.map (fnT lvl) tl) t.t_ty
-  | Tif (f,t1,t2) ->
-      t_if (fnF lvl f) (fnT lvl t1) (fnT lvl t2)
-  | Tlet (t1,(u,b,s,t2)) ->
-      let t1 = fnT lvl t1 in let lvl = lvl + 1 in
-      t_let t1 (u, b, bmlvl fnT lvl s, fnT lvl t2) t.t_ty
-  | Tcase (t1,bl) ->
-      t_case (fnT lvl t1) (List.map (brlvl fnT fnT lvl) bl) t.t_ty
-  | Teps (u,b,s,f) -> let lvl = lvl + 1 in
-      t_eps (u, b, bmlvl fnT lvl s, fnF lvl f) t.t_ty)
-
-let f_map_unsafe fnT fnF lvl f = f_label_copy f (match f.f_node with
-  | Fapp (p,tl) ->
-      f_app p (List.map (fnT lvl) tl)
+let f_map_unsafe fnT fnF f = f_label_copy f (match f.f_node with
+  | Fapp (p,tl) -> f_app p (List.map fnT tl)
   | Fquant (q,(vl,nv,b,s,tl,f1)) ->
-      let lvl = lvl + nv in
-      let tl = tr_map (fnT lvl) (fnF lvl) tl in
-      f_quant q (vl, nv, b, bmlvl fnT lvl s, tl, fnF lvl f1)
-  | Fbinop (op,f1,f2) ->
-      f_binary op (fnF lvl f1) (fnF lvl f2)
-  | Fnot f1 ->
-      f_not (fnF lvl f1)
-  | Ftrue | Ffalse ->
-      f
-  | Fif (f1,f2,f3) ->
-      f_if (fnF lvl f1) (fnF lvl f2) (fnF lvl f3)
-  | Flet (t,(u,b,s,f1)) ->
-      let t = fnT lvl t in let lvl = lvl + 1 in
-      f_let t (u, b, bmlvl fnT lvl s, fnF lvl f1)
-  | Fcase (t,bl) ->
-      f_case (fnT lvl t) (List.map (brlvl fnT fnF lvl) bl))
+      f_quant q (vl, nv, b, bmap_map fnT s, tr_map fnT fnF tl, fnF f1)
+  | Fbinop (op,f1,f2) -> f_binary op (fnF f1) (fnF f2)
+  | Fnot f1 -> f_not (fnF f1)
+  | Ftrue | Ffalse -> f
+  | Fif (f1,f2,f3) -> f_if (fnF f1) (fnF f2) (fnF f3)
+  | Flet (e,b) -> f_let (fnT e) (bound_map fnT fnF b)
+  | Fcase (e,bl) -> f_case (fnT e) (List.map (branch_map fnT fnF) bl))
 
-(* unsafe fold with level *)
+(* unsafe fold *)
 
-let bmlvl fnT lvl acc s = bmap_fold (fnT lvl) acc s
+let bound_fold  fnT fnE acc (_,_,s,e)   = fnE (bmap_fold fnT acc s) e
+let branch_fold fnT fnE acc (_,_,_,s,e) = fnE (bmap_fold fnT acc s) e
 
-let brlvl fnT fnE lvl acc (_,nv,_,s,e) =
-  let lvl = lvl + nv in fnE lvl (bmlvl fnT lvl acc s) e
+let t_fold_unsafe fnT fnF acc t = match t.t_node with
+  | Tbvar _ | Tvar _ | Tconst _ -> acc
+  | Tapp (_,tl) -> List.fold_left fnT acc tl
+  | Tif (f,t1,t2) -> fnT (fnT (fnF acc f) t1) t2
+  | Tlet (e,b) -> fnT (bound_fold fnT fnT acc b) e
+  | Tcase (e,bl) -> List.fold_left (branch_fold fnT fnT) (fnT acc e) bl
+  | Teps b -> bound_fold fnT fnF acc b
 
-let t_fold_unsafe fnT fnF lvl acc t = match t.t_node with
-  | Tbvar _ | Tvar _ | Tconst _ ->
-      acc
-  | Tapp (_,tl) ->
-      List.fold_left (fnT lvl) acc tl
-  | Tif (f,t1,t2) ->
-      fnT lvl (fnT lvl (fnF lvl acc f) t1) t2
-  | Tlet (t1,(_,_,s,t2)) ->
-      let acc = fnT lvl acc t1 in
-      let lvl = lvl + 1 in fnT lvl (bmlvl fnT lvl acc s) t2
-  | Tcase (t1,bl) ->
-      List.fold_left (brlvl fnT fnT lvl) (fnT lvl acc t1) bl
-  | Teps (_,_,s,f) ->
-      let lvl = lvl + 1 in fnF lvl (bmlvl fnT lvl acc s) f
+let f_fold_unsafe fnT fnF acc f = match f.f_node with
+  | Fapp (_,tl) -> List.fold_left fnT acc tl
+  | Fquant (_,(_,_,_,s,tl,f1)) ->
+      fnF (tr_fold fnT fnF (bmap_fold fnT acc s) tl) f1
+  | Fbinop (_,f1,f2) -> fnF (fnF acc f1) f2
+  | Fnot f1 -> fnF acc f1
+  | Ftrue | Ffalse -> acc
+  | Fif (f1,f2,f3) -> fnF (fnF (fnF acc f1) f2) f3
+  | Flet (e,b) -> fnT (bound_fold fnT fnF acc b) e
+  | Fcase (e,bl) -> List.fold_left (branch_fold fnT fnF) (fnT acc e) bl
 
-let f_fold_unsafe fnT fnF lvl acc f = match f.f_node with
-  | Fapp (_,tl) ->
-      List.fold_left (fnT lvl) acc tl
-  | Fquant (_,(_,nv,_,s,tl,f1)) ->
-      let lvl = lvl + nv in
-      let acc = tr_fold (fnT lvl) (fnF lvl) acc tl in
-      fnF lvl (bmlvl fnT lvl acc s) f1
-  | Fbinop (_,f1,f2) ->
-      fnF lvl (fnF lvl acc f1) f2
-  | Fnot f1 ->
-      fnF lvl acc f1
-  | Ftrue | Ffalse ->
-      acc
-  | Fif (f1,f2,f3) ->
-      fnF lvl (fnF lvl (fnF lvl acc f1) f2) f3
-  | Flet (t,(_,_,s,f1)) ->
-      let acc = fnT lvl acc t in
-      let lvl = lvl + 1 in fnF lvl (bmlvl fnT lvl acc s) f1
-  | Fcase (t,bl) ->
-      List.fold_left (brlvl fnT fnF lvl) (fnT lvl acc t) bl
+let all_fnT prT _ t = prT t || raise FoldSkip
+let all_fnF prF _ f = prF f || raise FoldSkip
+let any_fnT prT _ t = prT t && raise FoldSkip
+let any_fnF prF _ f = prF f && raise FoldSkip
 
-let all_fnT prT lvl _ t = prT lvl t || raise FoldSkip
-let all_fnF prF lvl _ f = prF lvl f || raise FoldSkip
-let any_fnT prT lvl _ t = prT lvl t && raise FoldSkip
-let any_fnF prF lvl _ f = prF lvl f && raise FoldSkip
-
-let t_all_unsafe prT prF lvl t =
-  try t_fold_unsafe (all_fnT prT) (all_fnF prF) lvl true t
+let t_all_unsafe prT prF t =
+  try t_fold_unsafe (all_fnT prT) (all_fnF prF) true t
   with FoldSkip -> false
 
-let f_all_unsafe prT prF lvl f =
-  try f_fold_unsafe (all_fnT prT) (all_fnF prF) lvl true f
+let f_all_unsafe prT prF f =
+  try f_fold_unsafe (all_fnT prT) (all_fnF prF) true f
   with FoldSkip -> false
 
-let t_any_unsafe prT prF lvl t =
-  try t_fold_unsafe (any_fnT prT) (any_fnF prF) lvl false t
+let t_any_unsafe prT prF t =
+  try t_fold_unsafe (any_fnT prT) (any_fnF prF) false t
   with FoldSkip -> true
 
-let f_any_unsafe prT prF lvl f =
-  try f_fold_unsafe (any_fnT prT) (any_fnF prF) lvl false f
+let f_any_unsafe prT prF f =
+  try f_fold_unsafe (any_fnT prT) (any_fnF prF) false f
   with FoldSkip -> true
 
 (* replaces variables with de Bruijn indices in term [t] using map [m] *)
@@ -728,7 +686,7 @@ let rec t_abst m l p lvl t = t_label_copy t (match t.t_node with
       let f = f_abst m l p lvl f in
       t_eps (u, !rb, Mint.empty, f) t.t_ty
   | _ ->
-      t_map_unsafe (t_abst m l p) (f_abst m l p) lvl t)
+      t_map_unsafe (t_abst m l p lvl) (f_abst m l p lvl) t)
 
 and f_abst m l p lvl f = f_label_copy f (match f.f_node with
   | Fquant (q, (vl,nv,b,s,tl,f1)) ->
@@ -750,7 +708,7 @@ and f_abst m l p lvl f = f_label_copy f (match f.f_node with
       in
       f_case t (List.map br_abst bl)
   | _ ->
-      f_map_unsafe (t_abst m l p) (f_abst m l p) lvl f)
+      f_map_unsafe (t_abst m l p lvl) (f_abst m l p lvl) f)
 
 let t_abst m t = t_abst m [] (0, 0, Mint.empty) 0 t
 let f_abst m f = f_abst m [] (0, 0, Mint.empty) 0 f
@@ -773,37 +731,23 @@ let branch_inst m (pat,nv,b,s,e) =
 let quant_inst m (vl,nv,b,s,tl,f) =
   (vl, nv, Sint.empty, bmap_filter b s nv m, tl, f)
 
-let rec t_inst m lvl t = t_label_copy t (match t.t_node with
+let rec t_inst m t = t_label_copy t (match t.t_node with
   | Tbvar i -> bmap_find i m
-  | Tlet (t1,bt) -> t_let (t_inst m lvl t1) (bound_inst m bt) t.t_ty
+  | Tlet (t1,bt) -> t_let (t_inst m t1) (bound_inst m bt) t.t_ty
   | Tcase (t1,bl) ->
-      t_case (t_inst m lvl t1) (List.map (branch_inst m) bl) t.t_ty
+      t_case (t_inst m t1) (List.map (branch_inst m) bl) t.t_ty
   | Teps bf -> t_eps (bound_inst m bf) t.t_ty
-  | _ -> t_map_unsafe (t_inst m) (f_inst m) lvl t)
+  | _ -> t_map_unsafe (t_inst m) (f_inst m) t)
 
-and f_inst m lvl f = f_label_copy f (match f.f_node with
+and f_inst m f = f_label_copy f (match f.f_node with
   | Fquant (q,qf) -> f_quant q (quant_inst m qf)
-  | Flet (t,bf) -> f_let (t_inst m lvl t) (bound_inst m bf)
+  | Flet (t,bf) -> f_let (t_inst m t) (bound_inst m bf)
   | Fcase (t,bl) ->
-      f_case (t_inst m lvl t) (List.map (branch_inst m) bl)
-  | _ -> f_map_unsafe (t_inst m) (f_inst m) lvl f)
-
-let t_inst m t = t_inst m 0 t
-let f_inst m f = f_inst m 0 f
+      f_case (t_inst m t) (List.map (branch_inst m) bl)
+  | _ -> f_map_unsafe (t_inst m) (f_inst m) f)
 
 let t_inst_single v s t = t_inst (Mint.add 0 v s) t
 let f_inst_single v s f = f_inst (Mint.add 0 v s) f
-
-(* t_map_unsafe and f_map_unsafe should not change types
- * (this check could go above but [tf]_(abst|inst) are safe) *)
-
-let protect fn lvl t =
-  let res = fn lvl t in
-  check_ty_equal t.t_ty res.t_ty;
-  res
-
-let t_map_unsafe fnT = t_map_unsafe (protect fnT)
-let f_map_unsafe fnT = f_map_unsafe (protect fnT)
 
 (* close bindings *)
 
@@ -964,7 +908,7 @@ let t_app_infer fs tl =
     | Some ty -> ty_inst s ty
     | _ -> raise (FunctionSymbolExpected fs)
   in
-  t_app_unsafe fs tl ty
+  t_app fs tl ty
 
 exception EmptyCase
 
@@ -1172,42 +1116,24 @@ let f_s_any prT prL f =
 
 (* safe opening map *)
 
-let t_branch fn acc b =
-  let p,t = t_open_branch b in let t' = fn t in acc && t_equal t' t, (p,t')
-
-let f_branch fn acc b =
-  let p,f = f_open_branch b in let f' = fn f in acc && f_equal f' f, (p,f')
+let t_bound  fn b = let u,t,close = t_open_bound_cb  b in close u (fn t)
+let f_bound  fn b = let u,f,close = f_open_bound_cb  b in close u (fn f)
+let t_branch fn b = let p,t,close = t_open_branch_cb b in close p (fn t)
+let f_branch fn b = let p,f,close = f_open_branch_cb b in close p (fn f)
 
 let t_map fnT fnF t = t_label_copy t (match t.t_node with
-  | Tbvar _ -> raise UnboundIndex
-  | Tvar _ | Tconst _ -> t
-  | Tapp (f, tl) -> t_app_unsafe f (List.map fnT tl) t.t_ty
-  | Tif (f, t1, t2) -> t_if (fnF f) (fnT t1) (fnT t2)
-  | Tlet (t1, b) ->
-      let u,t2,close = t_open_bound_cb b in
-      t_let (fnT t1) (close u (fnT t2))
-  | Tcase (t1, bl) ->
-      let brl b = let p,t,close = t_open_branch_cb b in close p (fnT t) in
-      t_case (fnT t1) (List.map brl bl)
-  | Teps b ->
-      let u,f,close = f_open_bound_cb b in
-      t_eps (close u (fnF f)))
+  | Tlet (t1, b) -> t_let (fnT t1) (t_bound fnT b)
+  | Tcase (t1, bl) -> t_case (fnT t1) (List.map (t_branch fnT) bl)
+  | Teps b -> t_eps (f_bound fnF b)
+  | _ -> t_map_unsafe fnT fnF t)
 
 let f_map fnT fnF f = f_label_copy f (match f.f_node with
-  | Fapp (p, tl) -> f_app_unsafe p (List.map fnT tl)
   | Fquant (q, b) ->
       let vl, tl, f1, close = f_open_quant_cb b in
       f_quant q (close vl (tr_map fnT fnF tl) (fnF f1))
-  | Fbinop (op, f1, f2) -> f_binary op (fnF f1) (fnF f2)
-  | Fnot f1 -> f_not (fnF f1)
-  | Ftrue | Ffalse -> f
-  | Fif (f1, f2, f3) -> f_if (fnF f1) (fnF f2) (fnF f3)
-  | Flet (t, b) ->
-      let u,f1,close = f_open_bound_cb b in
-      f_let (fnT t) (close u (fnF f1))
-  | Fcase (t, bl) ->
-      let brl b = let p,f,close = f_open_branch_cb b in close p (fnF f) in
-      f_case (fnT t) (List.map brl bl))
+  | Flet (t, b) -> f_let (fnT t) (f_bound fnF b)
+  | Fcase (t, bl) -> f_case (fnT t) (List.map (f_branch fnF) bl)
+  | _ -> f_map_unsafe fnT fnF f)
 
 let protect fn t =
   let res = fn t in
@@ -1243,24 +1169,17 @@ let t_branch fn acc b = let _,t = t_open_branch b in fn acc t
 let f_branch fn acc b = let _,f = f_open_branch b in fn acc f
 
 let t_fold fnT fnF acc t = match t.t_node with
-  | Tbvar _ -> raise UnboundIndex
-  | Tvar _ | Tconst _ -> acc
-  | Tapp (_, tl) -> List.fold_left fnT acc tl
-  | Tif (f, t1, t2) -> fnT (fnT (fnF acc f) t1) t2
   | Tlet (t1, b) -> let _,t2 = t_open_bound b in fnT (fnT acc t1) t2
   | Tcase (t1, bl) -> List.fold_left (t_branch fnT) (fnT acc t1) bl
   | Teps b -> let _,f = f_open_bound b in fnF acc f
+  | _ -> t_fold_unsafe fnT fnF acc t
 
 let f_fold fnT fnF acc f = match f.f_node with
-  | Fapp (_, tl) -> List.fold_left fnT acc tl
-  | Fquant (_, b) -> let _, tl, f1 = f_open_quant b in
-      tr_fold fnT fnF (fnF acc f1) tl
-  | Fbinop (_, f1, f2) -> fnF (fnF acc f1) f2
-  | Fnot f1 -> fnF acc f1
-  | Ftrue | Ffalse -> acc
-  | Fif (f1, f2, f3) -> fnF (fnF (fnF acc f1) f2) f3
+  | Fquant (_, b) ->
+      let _, tl, f1 = f_open_quant b in tr_fold fnT fnF (fnF acc f1) tl
   | Flet (t, b) -> let _,f1 = f_open_bound b in fnF (fnT acc t) f1
   | Fcase (t, bl) -> List.fold_left (f_branch fnF) (fnT acc t) bl
+  | _ -> f_fold_unsafe fnT fnF acc f
 
 let t_all prT prF t =
   try t_fold (all_fn prT) (all_fn prF) true t with FoldSkip -> false
@@ -1297,7 +1216,7 @@ let t_map_cont fnT fnF contT t =
   | Tbvar _ -> raise UnboundIndex
   | Tvar _ | Tconst _ -> contT t
   | Tapp (fs, tl) ->
-      let cont_app tl = contT (t_app_unsafe fs tl t.t_ty) in
+      let cont_app tl = contT (t_app fs tl t.t_ty) in
       list_map_cont fnT cont_app tl
   | Tif (f, t1, t2) ->
       let cont_else f t1 t2 = contT (t_if f t1 t2) in
@@ -1326,7 +1245,7 @@ let f_map_cont fnT fnF contF f =
   let contF e = contF (f_label_copy f e) in
   match f.f_node with
   | Fapp (ps, tl) ->
-      let cont_app tl = contF (f_app_unsafe ps tl) in
+      let cont_app tl = contF (f_app ps tl) in
       list_map_cont fnT cont_app tl
   | Fquant (q, b) ->
       let vl, tl, f1, close = f_open_quant_cb b in
@@ -1369,29 +1288,26 @@ let f_map_cont fnT = f_map_cont (fun c t -> fnT (protect_cont t c) t)
 
 (* map/fold over free variables *)
 
-let rec t_v_map fn lvl t = match t.t_node with
-  | Tvar u -> fn u
-  | _ -> t_map_unsafe (t_v_map fn) (f_v_map fn) lvl t
+let rec t_v_map fn t = match t.t_node with
+  | Tvar u ->
+      let res = fn u in
+      check_ty_equal t.t_ty res.t_ty;
+      res
+  | _ ->
+      t_map_unsafe (t_v_map fn) (f_v_map fn) t
 
-and f_v_map fn lvl f = f_map_unsafe (t_v_map fn) (f_v_map fn) lvl f
+and f_v_map fn f = f_map_unsafe (t_v_map fn) (f_v_map fn) f
 
-let rec t_v_fold fn lvl acc t = match t.t_node with
+let rec t_v_fold fn acc t = match t.t_node with
   | Tvar u -> fn acc u
-  | _ -> t_fold_unsafe (t_v_fold fn) (f_v_fold fn) lvl acc t
+  | _ -> t_fold_unsafe (t_v_fold fn) (f_v_fold fn) acc t
 
-and f_v_fold fn lvl acc f
-  = f_fold_unsafe (t_v_fold fn) (f_v_fold fn) lvl acc f
+and f_v_fold fn acc f = f_fold_unsafe (t_v_fold fn) (f_v_fold fn) acc f
 
-let t_v_all pr t = try t_v_fold (all_fn pr) 0 true t with FoldSkip -> false
-let f_v_all pr f = try f_v_fold (all_fn pr) 0 true f with FoldSkip -> false
-let t_v_any pr t = try t_v_fold (any_fn pr) 0 false t with FoldSkip -> true
-let f_v_any pr f = try f_v_fold (any_fn pr) 0 false f with FoldSkip -> true
-
-let t_v_map fn = t_v_map fn 0
-let f_v_map fn = f_v_map fn 0
-
-let t_v_fold fn = t_v_fold fn 0
-let f_v_fold fn = f_v_fold fn 0
+let t_v_all pr t = try t_v_fold (all_fn pr) true t with FoldSkip -> false
+let f_v_all pr f = try f_v_fold (all_fn pr) true f with FoldSkip -> false
+let t_v_any pr t = try t_v_fold (any_fn pr) false t with FoldSkip -> true
+let f_v_any pr f = try f_v_fold (any_fn pr) false f with FoldSkip -> true
 
 (* looks for occurrence of a variable from set [s] in a term [t] *)
 
@@ -1545,97 +1461,79 @@ and f_match s f1 f2 =
 
 (* occurrence check *)
 
-let rec t_occurs_term r lvl t = t_equal r t ||
-  t_any_unsafe (t_occurs_term r) (f_occurs_term r) lvl t
+let rec t_occurs_term r t = t_equal r t ||
+  t_any_unsafe (t_occurs_term r) (f_occurs_term r) t
 
-and f_occurs_term r lvl f =
-  f_any_unsafe (t_occurs_term r) (f_occurs_term r) lvl f
+and f_occurs_term r f =
+  f_any_unsafe (t_occurs_term r) (f_occurs_term r) f
 
-let t_occurs_term r t = t_occurs_term r 0 t
-let f_occurs_term r f = f_occurs_term r 0 f
+let rec t_occurs_fmla r t =
+  t_any_unsafe (t_occurs_fmla r) (f_occurs_fmla r) t
 
-let rec t_occurs_fmla r lvl t =
-  t_any_unsafe (t_occurs_fmla r) (f_occurs_fmla r) lvl t
-
-and f_occurs_fmla r lvl f = f_equal r f ||
-  f_any_unsafe (t_occurs_fmla r) (f_occurs_fmla r) lvl f
-
-let t_occurs_fmla r t = t_occurs_fmla r 0 t
-let f_occurs_fmla r f = f_occurs_fmla r 0 f
+and f_occurs_fmla r f = f_equal r f ||
+  f_any_unsafe (t_occurs_fmla r) (f_occurs_fmla r) f
 
 (* occurrence check modulo alpha *)
 
-let rec t_occurs_term_alpha r lvl t = t_equal_alpha r t ||
-  t_any_unsafe (t_occurs_term_alpha r) (f_occurs_term_alpha r) lvl t
+let rec t_occurs_term_alpha r t = t_equal_alpha r t ||
+  t_any_unsafe (t_occurs_term_alpha r) (f_occurs_term_alpha r) t
 
-and f_occurs_term_alpha r lvl f =
-  f_any_unsafe (t_occurs_term_alpha r) (f_occurs_term_alpha r) lvl f
+and f_occurs_term_alpha r f =
+  f_any_unsafe (t_occurs_term_alpha r) (f_occurs_term_alpha r) f
 
-let t_occurs_term_alpha r t = t_occurs_term_alpha r 0 t
-let f_occurs_term_alpha r f = f_occurs_term_alpha r 0 f
+let rec t_occurs_fmla_alpha r t =
+  t_any_unsafe (t_occurs_fmla_alpha r) (f_occurs_fmla_alpha r) t
 
-let rec t_occurs_fmla_alpha r lvl t =
-  t_any_unsafe (t_occurs_fmla_alpha r) (f_occurs_fmla_alpha r) lvl t
-
-and f_occurs_fmla_alpha r lvl f = f_equal_alpha r f ||
-  f_any_unsafe (t_occurs_fmla_alpha r) (f_occurs_fmla_alpha r) lvl f
-
-let t_occurs_fmla_alpha r t = t_occurs_fmla_alpha r 0 t
-let f_occurs_fmla_alpha r f = f_occurs_fmla_alpha r 0 f
+and f_occurs_fmla_alpha r f = f_equal_alpha r f ||
+  f_any_unsafe (t_occurs_fmla_alpha r) (f_occurs_fmla_alpha r) f
 
 (* substitutes term [t2] for term [t1] in term [t] *)
 
-let rec t_subst_term t1 t2 lvl t = if t_equal t t1 then t2 else
-  t_map_unsafe (t_subst_term t1 t2) (f_subst_term t1 t2) lvl t
+let rec t_subst_term t1 t2 t = if t_equal t t1 then t2 else
+  t_map_unsafe (t_subst_term t1 t2) (f_subst_term t1 t2) t
 
-and f_subst_term t1 t2 lvl f =
-  f_map_unsafe (t_subst_term t1 t2) (f_subst_term t1 t2) lvl f
+and f_subst_term t1 t2 f =
+  f_map_unsafe (t_subst_term t1 t2) (f_subst_term t1 t2) f
 
 let t_subst_term t1 t2 t =
   check_ty_equal t1.t_ty t2.t_ty;
-  t_subst_term t1 t2 0 t
+  t_subst_term t1 t2 t
 
 let f_subst_term t1 t2 f =
   check_ty_equal t1.t_ty t2.t_ty;
-  f_subst_term t1 t2 0 f
+  f_subst_term t1 t2 f
 
 (* substitutes fmla [f2] for fmla [f1] in term [t] *)
 
-let rec t_subst_fmla f1 f2 lvl t =
-  t_map_unsafe (t_subst_fmla f1 f2) (f_subst_fmla f1 f2) lvl t
+let rec t_subst_fmla f1 f2 t =
+  t_map_unsafe (t_subst_fmla f1 f2) (f_subst_fmla f1 f2) t
 
-and f_subst_fmla f1 f2 lvl f = if f_equal f f1 then f2 else
-  f_map_unsafe (t_subst_fmla f1 f2) (f_subst_fmla f1 f2) lvl f
-
-let t_subst_fmla f1 f2 t = t_subst_fmla f1 f2 0 t
-let f_subst_fmla f1 f2 f = f_subst_fmla f1 f2 0 f
+and f_subst_fmla f1 f2 f = if f_equal f f1 then f2 else
+  f_map_unsafe (t_subst_fmla f1 f2) (f_subst_fmla f1 f2) f
 
 (* substitutes term [t2] for term [t1] in term [t] modulo alpha *)
 
-let rec t_subst_term_alpha t1 t2 lvl t = if t_equal t t1 then t2 else
-  t_map_unsafe (t_subst_term_alpha t1 t2) (f_subst_term_alpha t1 t2) lvl t
+let rec t_subst_term_alpha t1 t2 t = if t_equal t t1 then t2 else
+  t_map_unsafe (t_subst_term_alpha t1 t2) (f_subst_term_alpha t1 t2) t
 
-and f_subst_term_alpha t1 t2 lvl f =
-  f_map_unsafe (t_subst_term_alpha t1 t2) (f_subst_term_alpha t1 t2) lvl f
+and f_subst_term_alpha t1 t2 f =
+  f_map_unsafe (t_subst_term_alpha t1 t2) (f_subst_term_alpha t1 t2) f
 
 let t_subst_term_alpha t1 t2 t =
   check_ty_equal t1.t_ty t2.t_ty;
-  t_subst_term_alpha t1 t2 0 t
+  t_subst_term_alpha t1 t2 t
 
 let f_subst_term_alpha t1 t2 f =
   check_ty_equal t1.t_ty t2.t_ty;
-  f_subst_term_alpha t1 t2 0 f
+  f_subst_term_alpha t1 t2 f
 
 (* substitutes fmla [f2] for fmla [f1] in term [t] modulo alpha *)
 
-let rec t_subst_fmla_alpha f1 f2 lvl t =
-  t_map_unsafe (t_subst_fmla_alpha f1 f2) (f_subst_fmla_alpha f1 f2) lvl t
+let rec t_subst_fmla_alpha f1 f2 t =
+  t_map_unsafe (t_subst_fmla_alpha f1 f2) (f_subst_fmla_alpha f1 f2) t
 
-and f_subst_fmla_alpha f1 f2 lvl f = if f_equal f f1 then f2 else
-  f_map_unsafe (t_subst_fmla_alpha f1 f2) (f_subst_fmla_alpha f1 f2) lvl f
-
-let t_subst_fmla_alpha f1 f2 t = t_subst_fmla_alpha f1 f2 0 t
-let f_subst_fmla_alpha f1 f2 f = f_subst_fmla_alpha f1 f2 0 f
+and f_subst_fmla_alpha f1 f2 f = if f_equal f f1 then f2 else
+  f_map_unsafe (t_subst_fmla_alpha f1 f2) (f_subst_fmla_alpha f1 f2) f
 
 (* constructors with propositional simplification *)
 
@@ -1722,15 +1620,14 @@ let is_true_false f = match f.f_node with
 
 (* Could we add an optional argument which toggle
    the simplification to the other map? *)
-let f_branch fn acc b =
-  let p,f = f_open_branch b in let f' = fn f in acc && f_equal f' f, (p,f')
+
+let f_bound  fn b = let u,f,close = f_open_bound_cb  b in close u (fn f)
+let f_branch fn b = let p,f,close = f_open_branch_cb b in close p (fn f)
 
 let f_map_simp fnT fnF f = f_label_copy f (match f.f_node with
-  | Fapp (p, [t1;t2]) when ls_equal p ps_equ ->
-      f_equ_simp (fnT t1) (fnT t2)
-  | Fapp (p, [t1;t2]) when ls_equal p ps_neq ->
-      f_neq_simp (fnT t1) (fnT t2)
-  | Fapp (p, tl) -> f_app_unsafe p (List.map fnT tl)
+  | Fapp (p, [t1;t2]) when ls_equal p ps_equ -> f_equ_simp (fnT t1) (fnT t2)
+  | Fapp (p, [t1;t2]) when ls_equal p ps_neq -> f_neq_simp (fnT t1) (fnT t2)
+  | Fapp (p, tl) -> f_app p (List.map fnT tl)
   | Fquant (q, b) ->
       let vl, tl, f1, close = f_open_quant_cb b in
       f_quant_simp q (close vl (tr_map fnT fnF tl) (fnF f1))
@@ -1738,12 +1635,8 @@ let f_map_simp fnT fnF f = f_label_copy f (match f.f_node with
   | Fnot f1 -> f_not_simp (fnF f1)
   | Ftrue | Ffalse -> f
   | Fif (f1, f2, f3) -> f_if_simp (fnF f1) (fnF f2) (fnF f3)
-  | Flet (t, b) ->
-      let u,f1,close = f_open_bound_cb b in
-      f_let_simp (fnT t) (close u (fnF f1))
-  | Fcase (t, bl) ->
-      let brl b = let p,f,close = f_open_branch_cb b in close p (fnF f) in
-      f_case (fnT t) (List.map brl bl))
+  | Flet (t, b) -> f_let_simp (fnT t) (f_bound fnF b)
+  | Fcase (t, bl) -> f_case (fnT t) (List.map (f_branch fnF) bl))
 
 let f_map_simp fnT = f_map_simp (protect fnT)
 
