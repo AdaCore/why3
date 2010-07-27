@@ -688,107 +688,105 @@ let f_any_unsafe prT prF lvl f =
 
 (* replaces variables with de Bruijn indices in term [t] using map [m] *)
 
-let add_bound i (lvl,rb) = rb := Sint.add (i + lvl) !rb
+exception UnboundIndex
 
-let rec t_abst m l lvl t = t_label_copy t (match t.t_node with
+let bmap_find i s =
+  try Mint.find i s with Not_found -> raise UnboundIndex
+
+let bset_add i (lvl,rb) = rb := Sint.add (i + lvl) !rb
+
+let bset_filter l ((blvl,_,_) as p) lvl nv b s =
+  let p = if Sint.is_empty b then (lvl, nv, s) else p in
+  let rb = ref (Sint.filter (fun i -> i < lvl - blvl) b) in
+  (lvl, rb) :: l, p, lvl + nv, rb
+
+let rec t_abst m l p lvl t = t_label_copy t (match t.t_node with
   | Tvar u -> begin try
       let i = Mvs.find u m in
-      List.iter (add_bound i) l;
+      List.iter (bset_add i) l;
       t_bvar (i + lvl) t.t_ty
       with Not_found -> t end
+  | Tbvar i ->
+      let blvl, nv, s = p in
+      let i = i - (lvl - blvl) in if i < 0 then t else
+      t_abst m l (lvl, 0, Mint.empty) lvl (bmap_find (i + nv) s)
   | Tlet (t1, (u,b,s,t2)) ->
-      let t1 = t_abst m l lvl t1 in
-      let lvl = lvl + 1 in
-      let b = ref b in let l = (lvl, b) :: l in
-      let s = Mint.map (t_abst m l lvl) s in
-      let t2 = t_abst m l lvl t2 in
-      t_let t1 (u,!b,s,t2) t.t_ty
+      let t1 = t_abst m l p lvl t1 in
+      let l, p, lvl, rb = bset_filter l p lvl 1 b s in
+      let t2 = t_abst m l p lvl t2 in
+      t_let t1 (u, !rb, Mint.empty, t2) t.t_ty
   | Tcase (t1, bl) ->
-      let t1 = t_abst m l lvl t1 in
-      let brl (pat,nv,b,s,t) =
-        let lvl = lvl + nv in
-        let b = ref b in let l = (lvl, b) :: l in
-        let s = Mint.map (t_abst m l lvl) s in
-        let t = t_abst m l lvl t in
-        (pat,nv,!b,s,t)
+      let t1 = t_abst m l p lvl t1 in
+      let br_abst (pat,nv,b,s,t2) =
+        let l, p, lvl, rb = bset_filter l p lvl nv b s in
+        let t2 = t_abst m l p lvl t2 in
+        (pat, nv, !rb, Mint.empty, t2)
       in
-      t_case t1 (List.map brl bl) t.t_ty
+      t_case t1 (List.map br_abst bl) t.t_ty
   | Teps (u,b,s,f) ->
-      let lvl = lvl + 1 in
-      let b = ref b in let l = (lvl, b) :: l in
-      let s = Mint.map (t_abst m l lvl) s in
-      let f = f_abst m l lvl f in
-      t_eps (u,!b,s,f) t.t_ty
+      let l, p, lvl, rb = bset_filter l p lvl 1 b s in
+      let f = f_abst m l p lvl f in
+      t_eps (u, !rb, Mint.empty, f) t.t_ty
   | _ ->
-      t_map_unsafe (t_abst m l) (f_abst m l) lvl t)
+      t_map_unsafe (t_abst m l p) (f_abst m l p) lvl t)
 
-and f_abst m l lvl f = f_label_copy f (match f.f_node with
+and f_abst m l p lvl f = f_label_copy f (match f.f_node with
   | Fquant (q, (vl,nv,b,s,tl,f1)) ->
-      let lvl = lvl + nv in
-      let b = ref b in let l = (lvl, b) :: l in
-      let s = Mint.map (t_abst m l lvl) s in
-      let tl = tr_map (t_abst m l lvl) (f_abst m l lvl) tl in
-      let f1 = f_abst m l lvl f1 in
-      f_quant q (vl,nv,!b,s,tl,f1)
+      let l, p, lvl, rb = bset_filter l p lvl nv b s in
+      let tl = tr_map (t_abst m l p lvl) (f_abst m l p lvl) tl in
+      let f1 = f_abst m l p lvl f1 in
+      f_quant q (vl, nv, !rb, Mint.empty, tl, f1)
   | Flet (t, (u,b,s,f1)) ->
-      let t = t_abst m l lvl t in
-      let lvl = lvl + 1 in
-      let b = ref b in let l = (lvl, b) :: l in
-      let s = Mint.map (t_abst m l lvl) s in
-      let f1 = f_abst m l lvl f1 in
-      f_let t (u,!b,s,f1)
+      let t = t_abst m l p lvl t in
+      let l, p, lvl, rb = bset_filter l p lvl 1 b s in
+      let f1 = f_abst m l p lvl f1 in
+      f_let t (u, !rb, Mint.empty, f1)
   | Fcase (t, bl) ->
-      let t = t_abst m l lvl t in
-      let brl (pat,nv,b,s,f) =
-        let lvl = lvl + nv in
-        let b = ref b in let l = (lvl, b) :: l in
-        let s = Mint.map (t_abst m l lvl) s in
-        let f = f_abst m l lvl f in
-        (pat,nv,!b,s,f)
+      let t = t_abst m l p lvl t in
+      let br_abst (pat,nv,b,s,f1) =
+        let l, p, lvl, rb = bset_filter l p lvl nv b s in
+        let f1 = f_abst m l p lvl f1 in
+        (pat, nv, !rb, Mint.empty, f1)
       in
-      f_case t (List.map brl bl)
+      f_case t (List.map br_abst bl)
   | _ ->
-      f_map_unsafe (t_abst m l) (f_abst m l) lvl f)
+      f_map_unsafe (t_abst m l p) (f_abst m l p) lvl f)
 
-let t_abst m t = t_abst m [] 0 t
-let f_abst m f = f_abst m [] 0 f
+let t_abst m t = t_abst m [] (0, 0, Mint.empty) 0 t
+let f_abst m f = f_abst m [] (0, 0, Mint.empty) 0 f
 
 let t_abst_single v t = t_abst (Mvs.add v 0 Mvs.empty) t
 let f_abst_single v f = f_abst (Mvs.add v 0 Mvs.empty) f
 
 (* replaces de Bruijn indices with variables in term [t] using map [m] *)
 
-exception UnboundIndex
+let bmap_filter b s nv m =
+  let filt i acc = Mint.add (i + nv) (bmap_find i m) acc in
+  Sint.fold filt b s
+
+let bound_inst m (u,b,s,e) =
+  (u, Sint.empty, bmap_filter b s 1 m, e)
+
+let branch_inst m (pat,nv,b,s,e) =
+  (pat, nv, Sint.empty, bmap_filter b s nv m, e)
+
+let quant_inst m (vl,nv,b,s,tl,f) =
+  (vl, nv, Sint.empty, bmap_filter b s nv m, tl, f)
 
 let rec t_inst m lvl t = t_label_copy t (match t.t_node with
-  | Tbvar n when n >= lvl ->
-      (try Mint.find (n - lvl) m with Not_found -> raise UnboundIndex)
-  | Tlet (t1, (u, b, s, t2)) ->
-      t_let (t_inst m lvl t1) (u, b, bmap_join m (lvl + 1) b s, t2) t.t_ty
-  | Tcase (t1, bl) ->
-      let brl (pat,nv,b,s,t) = (pat, nv, b, bmap_join m (lvl + nv) b s, t) in
-      t_case (t_inst m lvl t1) (List.map brl bl) t.t_ty
-  | Teps (u, b, s, f) ->
-      t_eps (u, b, bmap_join m (lvl + 1) b s, f) t.t_ty
-  | _ ->
-      t_map_unsafe (t_inst m) (f_inst m) lvl t)
+  | Tbvar i -> bmap_find i m
+  | Tlet (t1,bt) -> t_let (t_inst m lvl t1) (bound_inst m bt) t.t_ty
+  | Tcase (t1,bl) ->
+      t_case (t_inst m lvl t1) (List.map (branch_inst m) bl) t.t_ty
+  | Teps bf -> t_eps (bound_inst m bf) t.t_ty
+  | _ -> t_map_unsafe (t_inst m) (f_inst m) lvl t)
 
 and f_inst m lvl f = f_label_copy f (match f.f_node with
-  | Fquant (q, (vl, nv, b, s, tl, f1)) ->
-      f_quant q (vl, nv, b, bmap_join m (lvl + nv) b s, tl, f1)
-  | Flet (t, (u, b, s, f1)) ->
-      f_let (t_inst m lvl t) (u, b, bmap_join m (lvl + 1) b s, f1)
-  | Fcase (t, bl) ->
-      let brl (pat,nv,b,s,t) = (pat, nv, b, bmap_join m (lvl + nv) b s, t) in
-      f_case (t_inst m lvl t) (List.map brl bl)
-  | _ ->
-      f_map_unsafe (t_inst m) (f_inst m) lvl f)
-
-and bmap_join m lvl b s =
-  let s = Mint.map (t_inst m lvl) s in
-  Mint.fold (fun i t acc -> let i = i + lvl in
-    if Mint.mem i s || not (Sint.mem i b)
-    then acc else Mint.add i t acc) m s
+  | Fquant (q,qf) -> f_quant q (quant_inst m qf)
+  | Flet (t,bf) -> f_let (t_inst m lvl t) (bound_inst m bf)
+  | Fcase (t,bl) ->
+      f_case (t_inst m lvl t) (List.map (branch_inst m) bl)
+  | _ -> f_map_unsafe (t_inst m) (f_inst m) lvl f)
 
 let t_inst m t = t_inst m 0 t
 let f_inst m f = f_inst m 0 f
