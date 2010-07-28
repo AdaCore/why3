@@ -651,12 +651,10 @@ let f_any_unsafe prT prF f =
 
 (* replaces variables with de Bruijn indices in term [t] using map [m] *)
 
-let bnd_add i (lvl,rb) = rb := Sint.add (i + lvl) !rb
-
 let rec t_abst m l lvl t = t_label_copy t (match t.t_node with
   | Tvar u -> begin try
       let i = Mvs.find u m in
-      List.iter (bnd_add i) l;
+      l := Sint.add i !l;
       t_bvar (i + lvl) t.t_ty
       with Not_found -> t end
   | Tlet (e, (u,b,t1)) ->
@@ -684,27 +682,32 @@ and f_abst m l lvl f = f_label_copy f (match f.f_node with
       f_map_unsafe (t_abst m l lvl) (f_abst m l lvl) f)
 
 and bnd_t_abst m l lvl bv t =
-  let rb = ref bv.bv_open in
+  let l' = ref Sint.empty in
   let bv = bnd_map (t_abst m l lvl) bv in
-  let t = t_abst m ((lvl,rb) :: l) (lvl + bv.bv_bound) t in
-  { bv with bv_open = !rb }, t
+  let t = t_abst m l' (lvl + bv.bv_bound) t in
+  update_open lvl l l' bv, t
 
 and bnd_f_abst m l lvl bv f =
-  let rb = ref bv.bv_open in
+  let l' = ref Sint.empty in
   let bv = bnd_map (t_abst m l lvl) bv in
-  let f = f_abst m ((lvl,rb) :: l) (lvl + bv.bv_bound) f in
-  { bv with bv_open = !rb }, f
+  let f = f_abst m l' (lvl + bv.bv_bound) f in
+  update_open lvl l l' bv, f
 
 and bnd_q_abst m l lvl (vl,bv,tl,f) =
-  let rb = ref bv.bv_open in
+  let l' = ref Sint.empty in
+  let lvl' = lvl + bv.bv_bound in
   let bv = bnd_map (t_abst m l lvl) bv in
-  let l = (lvl,rb) :: l in let lvl = lvl + bv.bv_bound in
-  let tl = tr_map (t_abst m l lvl) (f_abst m l lvl) tl in
-  let f = f_abst m l lvl f in
-  vl, { bv with bv_open = !rb }, tl, f
+  let tl = tr_map (t_abst m l' lvl') (f_abst m l' lvl') tl in
+  let f = f_abst m l' lvl' f in
+  vl, update_open lvl l l' bv, tl, f
 
-let t_abst m t = t_abst m [] 0 t
-let f_abst m f = f_abst m [] 0 f
+and update_open lvl l l' bv =
+  l := Sint.union !l' !l;
+  let add i acc = Sint.add (i + lvl) acc in
+  { bv with bv_open = Sint.fold add !l' bv.bv_open }
+
+let t_abst m t = t_abst m (ref Sint.empty) 0 t
+let f_abst m f = f_abst m (ref Sint.empty) 0 f
 
 (* replaces de Bruijn indices with variables in term [t] using map [m] *)
 
