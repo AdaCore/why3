@@ -804,18 +804,24 @@ let pat_substs p s =
     Mint.add i (t_var x') s, Mvs.add x x' ns) m (s, Mvs.empty)
 
 let t_open_branch (p,b,t) =
+  if b.bv_bound = 0 then (p, t) else
   let m,ns = pat_substs p b.bv_defer in
   pat_rename ns p, t_inst m b.bv_bound t
 
 let f_open_branch (p,b,f) =
+  if b.bv_bound = 0 then (p, f) else
   let m,ns = pat_substs p b.bv_defer in
   pat_rename ns p, f_inst m b.bv_bound f
 
-let f_open_quant (vl,b,tl,f) =
-  let nv = b.bv_bound in let i = ref (-1) in
+let quant_vars vl s =
+  let i = ref (-1) in
   let add m v = let v = fresh_vsymbol v in
     incr i; Mint.add !i (t_var v) m, v in
-  let m,vl = map_fold_left add b.bv_defer vl in
+  map_fold_left add s vl
+
+let f_open_quant (vl,b,tl,f) =
+  if b.bv_bound = 0 then (vl, tl, f) else
+  let m,vl = quant_vars vl b.bv_defer and nv = b.bv_bound in
   (vl, tr_map (t_inst m nv) (f_inst m nv) tl, f_inst m nv f)
 
 let rec f_open_forall f = match f.f_node with
@@ -1367,9 +1373,7 @@ let branch_equal_alpha fnE m1 m2 (p1,b1,e1) (p2,b2,e2) =
 
 let quant_equal_alpha fnF m1 m2 (vl1,b1,_,f1) (vl2,b2,_,f2) =
   list_all2 (fun v1 v2 -> ty_equal v1.vs_ty v2.vs_ty) vl1 vl2 &&
-  let i = ref (-1) in
-  let add m v = incr i; Mint.add !i (t_var (fresh_vsymbol v)) m in
-  let mn = List.fold_left add Mint.empty vl1 in
+  let mn,_ = quant_vars vl1 Mint.empty in
   let m1 = bound_inst m1.bv_defer m1.bv_bound b1 in
   let m2 = bound_inst m2.bv_defer m2.bv_bound b2 in
   let m1 = { m1 with bv_defer = Mint.fold Mint.add mn m1.bv_defer } in
@@ -1464,38 +1468,38 @@ and f_match s f1 f2 =
 (* occurrence check *)
 
 let rec t_occurs_term r t = t_equal r t ||
-  t_any_unsafe (t_occurs_term r) (f_occurs_term r) t
+  t_any (t_occurs_term r) (f_occurs_term r) t
 
 and f_occurs_term r f =
-  f_any_unsafe (t_occurs_term r) (f_occurs_term r) f
+  f_any (t_occurs_term r) (f_occurs_term r) f
 
 let rec t_occurs_fmla r t =
-  t_any_unsafe (t_occurs_fmla r) (f_occurs_fmla r) t
+  t_any (t_occurs_fmla r) (f_occurs_fmla r) t
 
 and f_occurs_fmla r f = f_equal r f ||
-  f_any_unsafe (t_occurs_fmla r) (f_occurs_fmla r) f
+  f_any (t_occurs_fmla r) (f_occurs_fmla r) f
 
 (* occurrence check modulo alpha *)
 
 let rec t_occurs_term_alpha r t = t_equal_alpha r t ||
-  t_any_unsafe (t_occurs_term_alpha r) (f_occurs_term_alpha r) t
+  t_any (t_occurs_term_alpha r) (f_occurs_term_alpha r) t
 
 and f_occurs_term_alpha r f =
-  f_any_unsafe (t_occurs_term_alpha r) (f_occurs_term_alpha r) f
+  f_any (t_occurs_term_alpha r) (f_occurs_term_alpha r) f
 
 let rec t_occurs_fmla_alpha r t =
-  t_any_unsafe (t_occurs_fmla_alpha r) (f_occurs_fmla_alpha r) t
+  t_any (t_occurs_fmla_alpha r) (f_occurs_fmla_alpha r) t
 
 and f_occurs_fmla_alpha r f = f_equal_alpha r f ||
-  f_any_unsafe (t_occurs_fmla_alpha r) (f_occurs_fmla_alpha r) f
+  f_any (t_occurs_fmla_alpha r) (f_occurs_fmla_alpha r) f
 
 (* substitutes term [t2] for term [t1] in term [t] *)
 
 let rec t_subst_term t1 t2 t = if t_equal t t1 then t2 else
-  t_map_unsafe (t_subst_term t1 t2) (f_subst_term t1 t2) t
+  t_map (t_subst_term t1 t2) (f_subst_term t1 t2) t
 
 and f_subst_term t1 t2 f =
-  f_map_unsafe (t_subst_term t1 t2) (f_subst_term t1 t2) f
+  f_map (t_subst_term t1 t2) (f_subst_term t1 t2) f
 
 let t_subst_term t1 t2 t =
   check_ty_equal t1.t_ty t2.t_ty;
@@ -1508,18 +1512,18 @@ let f_subst_term t1 t2 f =
 (* substitutes fmla [f2] for fmla [f1] in term [t] *)
 
 let rec t_subst_fmla f1 f2 t =
-  t_map_unsafe (t_subst_fmla f1 f2) (f_subst_fmla f1 f2) t
+  t_map (t_subst_fmla f1 f2) (f_subst_fmla f1 f2) t
 
 and f_subst_fmla f1 f2 f = if f_equal f f1 then f2 else
-  f_map_unsafe (t_subst_fmla f1 f2) (f_subst_fmla f1 f2) f
+  f_map (t_subst_fmla f1 f2) (f_subst_fmla f1 f2) f
 
 (* substitutes term [t2] for term [t1] in term [t] modulo alpha *)
 
-let rec t_subst_term_alpha t1 t2 t = if t_equal t t1 then t2 else
-  t_map_unsafe (t_subst_term_alpha t1 t2) (f_subst_term_alpha t1 t2) t
+let rec t_subst_term_alpha t1 t2 t = if t_equal_alpha t t1 then t2 else
+  t_map (t_subst_term_alpha t1 t2) (f_subst_term_alpha t1 t2) t
 
 and f_subst_term_alpha t1 t2 f =
-  f_map_unsafe (t_subst_term_alpha t1 t2) (f_subst_term_alpha t1 t2) f
+  f_map (t_subst_term_alpha t1 t2) (f_subst_term_alpha t1 t2) f
 
 let t_subst_term_alpha t1 t2 t =
   check_ty_equal t1.t_ty t2.t_ty;
@@ -1532,10 +1536,10 @@ let f_subst_term_alpha t1 t2 f =
 (* substitutes fmla [f2] for fmla [f1] in term [t] modulo alpha *)
 
 let rec t_subst_fmla_alpha f1 f2 t =
-  t_map_unsafe (t_subst_fmla_alpha f1 f2) (f_subst_fmla_alpha f1 f2) t
+  t_map (t_subst_fmla_alpha f1 f2) (f_subst_fmla_alpha f1 f2) t
 
-and f_subst_fmla_alpha f1 f2 f = if f_equal f f1 then f2 else
-  f_map_unsafe (t_subst_fmla_alpha f1 f2) (f_subst_fmla_alpha f1 f2) f
+and f_subst_fmla_alpha f1 f2 f = if f_equal_alpha f f1 then f2 else
+  f_map (t_subst_fmla_alpha f1 f2) (f_subst_fmla_alpha f1 f2) f
 
 (* constructors with propositional simplification *)
 
