@@ -295,23 +295,25 @@ and fmla_node =
   | Flet of term * fmla_bound
   | Fcase of term * fmla_branch list
 
-and term_bound  = vsymbol *       bound_set * bound_map * term
-and fmla_bound  = vsymbol *       bound_set * bound_map * fmla
+and term_bound  = vsymbol * bind_info * term
+and fmla_bound  = vsymbol * bind_info * fmla
 
-and term_branch = pattern * int * bound_set * bound_map * term
-and fmla_branch = pattern * int * bound_set * bound_map * fmla
+and term_branch = pattern * bind_info * term
+and fmla_branch = pattern * bind_info * fmla
 
-and fmla_quant  = vsymbol list * int *
-                  bound_set * bound_map * trigger list * fmla
+and fmla_quant  = vsymbol list * bind_info * trigger list * fmla
 
-and bound_set = Sint.t
-and bound_map = term Mint.t
+and bind_info = {
+  bv_bound : int;         (* properly bound and inst-deferred indices *)
+  bv_open  : Sint.t;      (* externally visible indices *)
+  bv_defer : term Mint.t  (* deferred instantiation *)
+}
+
+and trigger = expr list
 
 and expr =
   | Term of term
   | Fmla of fmla
-
-and trigger = expr list
 
 (* term and fmla equality *)
 
@@ -336,13 +338,19 @@ let e_apply fnT fnF = function Term t -> fnT t | Fmla f -> fnF f
 let tr_map fnT fnF = List.map (List.map (e_map fnT fnF))
 let tr_fold fnT fnF = List.fold_left (List.fold_left (e_fold fnT fnF))
 
-(* bound_map equality, hash, and traversal *)
+let ftr_map fnT fnF (tl,f) = (tr_map fnT fnF tl, fnF f)
+let ftr_fold fnT fnF acc (tl,f) = fnF (tr_fold fnT fnF acc tl) f
 
-let bmap_equal = Mint.equal t_equal
-let bmap_hash  = Mint.fold (fun i t a -> Hashcons.combine2 i t.t_tag a)
+(* bind_info equality, hash, and traversal *)
 
-let bmap_map fn s = Mint.map fn s
-let bmap_fold fn acc s = Mint.fold (fun _ t a -> fn a t) s acc
+let bnd_equal b1 b2 =
+  b1.bv_bound = b2.bv_bound && Mint.equal t_equal b1.bv_defer b2.bv_defer
+
+let bnd_hash bv =
+  Mint.fold (fun i t a -> Hashcons.combine2 i t.t_tag a) bv.bv_defer
+
+let bnd_map fn bv = { bv with bv_defer = Mint.map fn bv.bv_defer }
+let bnd_fold fn acc bv = Mint.fold (fun _ t a -> fn a t) bv.bv_defer acc
 
 (* hash-consing for terms and formulas *)
 
@@ -350,14 +358,14 @@ module Hsterm = Hashcons.Make (struct
 
   type t = term
 
-  let t_eq_branch (p1,_,_,s1,t1) (p2,_,_,s2,t2) =
-    pat_equal p1 p2 && bmap_equal s1 s2 && t_equal t1 t2
+  let t_eq_branch (p1,b1,t1) (p2,b2,t2) =
+    pat_equal p1 p2 && bnd_equal b1 b2 && t_equal t1 t2
 
-  let t_eq_bound (v1,_,s1,t1) (v2,_,s2,t2) =
-    vs_equal v1 v2 && bmap_equal s1 s2 && t_equal t1 t2
+  let t_eq_bound (v1,b1,t1) (v2,b2,t2) =
+    vs_equal v1 v2 && bnd_equal b1 b2 && t_equal t1 t2
 
-  let f_eq_bound (v1,_,s1,f1) (v2,_,s2,f2) =
-    vs_equal v1 v2 && bmap_equal s1 s2 && f_equal f1 f2
+  let f_eq_bound (v1,b1,f1) (v2,b2,f2) =
+    vs_equal v1 v2 && bnd_equal b1 b2 && f_equal f1 f2
 
   let t_equal_node t1 t2 = match t1,t2 with
     | Tbvar x1, Tbvar x2 -> x1 = x2
@@ -379,14 +387,14 @@ module Hsterm = Hashcons.Make (struct
     t_equal_node t1.t_node t2.t_node &&
     list_all2 (=) t1.t_label t2.t_label
 
-  let t_hash_branch (p,_,_,s,t) =
-    Hashcons.combine p.pat_tag (bmap_hash s t.t_tag)
+  let t_hash_branch (p,b,t) =
+    Hashcons.combine p.pat_tag (bnd_hash b t.t_tag)
 
-  let t_hash_bound (v,_,s,t) =
-    Hashcons.combine v.vs_name.id_tag (bmap_hash s t.t_tag)
+  let t_hash_bound (v,b,t) =
+    Hashcons.combine v.vs_name.id_tag (bnd_hash b t.t_tag)
 
-  let f_hash_bound (v,_,s,f) =
-    Hashcons.combine v.vs_name.id_tag (bmap_hash s f.f_tag)
+  let f_hash_bound (v,b,f) =
+    Hashcons.combine v.vs_name.id_tag (bnd_hash b f.f_tag)
 
   let t_hash t = t.t_tag
 
@@ -421,15 +429,15 @@ module Hsfmla = Hashcons.Make (struct
 
   type t = fmla
 
-  let f_eq_branch (p1,_,_,s1,f1) (p2,_,_,s2,f2) =
-    pat_equal p1 p2 && bmap_equal s1 s2 && f_equal f1 f2
+  let f_eq_branch (p1,b1,f1) (p2,b2,f2) =
+    pat_equal p1 p2 && bnd_equal b1 b2 && f_equal f1 f2
 
-  let f_eq_bound (v1,_,s1,f1) (v2,_,s2,f2) =
-    vs_equal v1 v2 && bmap_equal s1 s2 && f_equal f1 f2
+  let f_eq_bound (v1,b1,f1) (v2,b2,f2) =
+    vs_equal v1 v2 && bnd_equal b1 b2 && f_equal f1 f2
 
-  let f_eq_quant (vl1,_,_,s1,tl1,f1) (vl2,_,_,s2,tl2,f2) =
+  let f_eq_quant (vl1,b1,tl1,f1) (vl2,b2,tl2,f2) =
     f_equal f1 f2 && list_all2 vs_equal vl1 vl2 &&
-    bmap_equal s1 s2 && tr_equal tl1 tl2
+    bnd_equal b1 b2 && tr_equal tl1 tl2
 
   let f_equal_node f1 f2 = match f1,f2 with
     | Fapp (s1,l1), Fapp (s2,l2) ->
@@ -456,16 +464,16 @@ module Hsfmla = Hashcons.Make (struct
 
   let t_hash t = t.t_tag
 
-  let f_hash_branch (p,_,_,s,f) =
-    Hashcons.combine p.pat_tag (bmap_hash s f.f_tag)
+  let f_hash_branch (p,b,f) =
+    Hashcons.combine p.pat_tag (bnd_hash b f.f_tag)
 
-  let f_hash_bound (v,_,s,f) =
-    Hashcons.combine v.vs_name.id_tag (bmap_hash s f.f_tag)
+  let f_hash_bound (v,b,f) =
+    Hashcons.combine v.vs_name.id_tag (bnd_hash b f.f_tag)
 
   let tr_hash = function Term t -> t.t_tag | Fmla f -> f.f_tag
 
-  let f_hash_quant (vl,_,_,s,tl,f) =
-    let h = bmap_hash s f.f_tag in
+  let f_hash_quant (vl,b,tl,f) =
+    let h = bnd_hash b f.f_tag in
     let h = Hashcons.combine_list v_hash h vl in
     List.fold_left (Hashcons.combine_list tr_hash) h tl
 
@@ -577,51 +585,48 @@ let t_tuple tl =
 
 (* unsafe map *)
 
-let bound_map  fnT fnE (u,b,s,e) = (u, b, bmap_map fnT s, fnE e)
-let branch_map fnT fnE (pat,nv,b,s,e) = (pat, nv, b, bmap_map fnT s, fnE e)
+let bound_map fnT fnE (u,b,e) = (u, bnd_map fnT b, fnE e)
 
 let t_map_unsafe fnT fnF t = t_label_copy t (match t.t_node with
   | Tbvar _ | Tvar _ | Tconst _ -> t
   | Tapp (f,tl) -> t_app f (List.map fnT tl) t.t_ty
   | Tif (f,t1,t2) -> t_if (fnF f) (fnT t1) (fnT t2)
   | Tlet (e,b) -> t_let (fnT e) (bound_map fnT fnT b) t.t_ty
-  | Tcase (e,bl) -> t_case (fnT e) (List.map (branch_map fnT fnT) bl) t.t_ty
+  | Tcase (e,bl) -> t_case (fnT e) (List.map (bound_map fnT fnT) bl) t.t_ty
   | Teps b -> t_eps (bound_map fnT fnF b) t.t_ty)
 
 let f_map_unsafe fnT fnF f = f_label_copy f (match f.f_node with
   | Fapp (p,tl) -> f_app p (List.map fnT tl)
-  | Fquant (q,(vl,nv,b,s,tl,f1)) ->
-      f_quant q (vl, nv, b, bmap_map fnT s, tr_map fnT fnF tl, fnF f1)
+  | Fquant (q,(vl,b,tl,f)) ->
+      f_quant q (vl, bnd_map fnT b, tr_map fnT fnF tl, fnF f)
   | Fbinop (op,f1,f2) -> f_binary op (fnF f1) (fnF f2)
   | Fnot f1 -> f_not (fnF f1)
   | Ftrue | Ffalse -> f
   | Fif (f1,f2,f3) -> f_if (fnF f1) (fnF f2) (fnF f3)
   | Flet (e,b) -> f_let (fnT e) (bound_map fnT fnF b)
-  | Fcase (e,bl) -> f_case (fnT e) (List.map (branch_map fnT fnF) bl))
+  | Fcase (e,bl) -> f_case (fnT e) (List.map (bound_map fnT fnF) bl))
 
 (* unsafe fold *)
 
-let bound_fold  fnT fnE acc (_,_,s,e)   = fnE (bmap_fold fnT acc s) e
-let branch_fold fnT fnE acc (_,_,_,s,e) = fnE (bmap_fold fnT acc s) e
+let bound_fold fnT fnE acc (_,b,e) = fnE (bnd_fold fnT acc b) e
 
 let t_fold_unsafe fnT fnF acc t = match t.t_node with
   | Tbvar _ | Tvar _ | Tconst _ -> acc
   | Tapp (_,tl) -> List.fold_left fnT acc tl
   | Tif (f,t1,t2) -> fnT (fnT (fnF acc f) t1) t2
   | Tlet (e,b) -> fnT (bound_fold fnT fnT acc b) e
-  | Tcase (e,bl) -> List.fold_left (branch_fold fnT fnT) (fnT acc e) bl
+  | Tcase (e,bl) -> List.fold_left (bound_fold fnT fnT) (fnT acc e) bl
   | Teps b -> bound_fold fnT fnF acc b
 
 let f_fold_unsafe fnT fnF acc f = match f.f_node with
   | Fapp (_,tl) -> List.fold_left fnT acc tl
-  | Fquant (_,(_,_,_,s,tl,f1)) ->
-      fnF (tr_fold fnT fnF (bmap_fold fnT acc s) tl) f1
+  | Fquant (_,(_,b,tl,f)) -> fnF (tr_fold fnT fnF (bnd_fold fnT acc b) tl) f
   | Fbinop (_,f1,f2) -> fnF (fnF acc f1) f2
   | Fnot f1 -> fnF acc f1
   | Ftrue | Ffalse -> acc
   | Fif (f1,f2,f3) -> fnF (fnF (fnF acc f1) f2) f3
   | Flet (e,b) -> fnT (bound_fold fnT fnF acc b) e
-  | Fcase (e,bl) -> List.fold_left (branch_fold fnT fnF) (fnT acc e) bl
+  | Fcase (e,bl) -> List.fold_left (bound_fold fnT fnF) (fnT acc e) bl
 
 let all_fnT prT _ t = prT t || raise FoldSkip
 let all_fnF prF _ f = prF f || raise FoldSkip
@@ -646,113 +651,107 @@ let f_any_unsafe prT prF f =
 
 (* replaces variables with de Bruijn indices in term [t] using map [m] *)
 
-exception UnboundIndex
+let bnd_add i (lvl,rb) = rb := Sint.add (i + lvl) !rb
 
-let bmap_find i s =
-  try Mint.find i s with Not_found -> raise UnboundIndex
-
-let bset_add i (lvl,rb) = rb := Sint.add (i + lvl) !rb
-
-let bset_filter l ((blvl,_,_) as p) lvl nv b s =
-  let p = if Sint.is_empty b then (lvl, nv, s) else p in
-  let rb = ref (Sint.filter (fun i -> i < lvl - blvl) b) in
-  (lvl, rb) :: l, p, lvl + nv, rb
-
-let rec t_abst m l p lvl t = t_label_copy t (match t.t_node with
+let rec t_abst m l lvl t = t_label_copy t (match t.t_node with
   | Tvar u -> begin try
       let i = Mvs.find u m in
-      List.iter (bset_add i) l;
+      List.iter (bnd_add i) l;
       t_bvar (i + lvl) t.t_ty
       with Not_found -> t end
-  | Tbvar i ->
-      let blvl, nv, s = p in
-      let i = i - (lvl - blvl) in if i < 0 then t else
-      t_abst m l (lvl, 0, Mint.empty) lvl (bmap_find (i + nv) s)
-  | Tlet (t1, (u,b,s,t2)) ->
-      let t1 = t_abst m l p lvl t1 in
-      let l, p, lvl, rb = bset_filter l p lvl 1 b s in
-      let t2 = t_abst m l p lvl t2 in
-      t_let t1 (u, !rb, Mint.empty, t2) t.t_ty
-  | Tcase (t1, bl) ->
-      let t1 = t_abst m l p lvl t1 in
-      let br_abst (pat,nv,b,s,t2) =
-        let l, p, lvl, rb = bset_filter l p lvl nv b s in
-        let t2 = t_abst m l p lvl t2 in
-        (pat, nv, !rb, Mint.empty, t2)
-      in
-      t_case t1 (List.map br_abst bl) t.t_ty
-  | Teps (u,b,s,f) ->
-      let l, p, lvl, rb = bset_filter l p lvl 1 b s in
-      let f = f_abst m l p lvl f in
-      t_eps (u, !rb, Mint.empty, f) t.t_ty
+  | Tlet (e, (u,b,t1)) ->
+      let b,t1 = bnd_t_abst m l lvl b t1 in
+      t_let (t_abst m l lvl e) (u,b,t1) t.t_ty
+  | Tcase (e, bl) ->
+      let br_abst (p,b,e) = let b,e = bnd_t_abst m l lvl b e in (p,b,e) in
+      t_case (t_abst m l lvl e) (List.map br_abst bl) t.t_ty
+  | Teps (u,b,f) ->
+      let b,f = bnd_f_abst m l lvl b f in
+      t_eps (u,b,f) t.t_ty
   | _ ->
-      t_map_unsafe (t_abst m l p lvl) (f_abst m l p lvl) t)
+      t_map_unsafe (t_abst m l lvl) (f_abst m l lvl) t)
 
-and f_abst m l p lvl f = f_label_copy f (match f.f_node with
-  | Fquant (q, (vl,nv,b,s,tl,f1)) ->
-      let l, p, lvl, rb = bset_filter l p lvl nv b s in
-      let tl = tr_map (t_abst m l p lvl) (f_abst m l p lvl) tl in
-      let f1 = f_abst m l p lvl f1 in
-      f_quant q (vl, nv, !rb, Mint.empty, tl, f1)
-  | Flet (t, (u,b,s,f1)) ->
-      let t = t_abst m l p lvl t in
-      let l, p, lvl, rb = bset_filter l p lvl 1 b s in
-      let f1 = f_abst m l p lvl f1 in
-      f_let t (u, !rb, Mint.empty, f1)
-  | Fcase (t, bl) ->
-      let t = t_abst m l p lvl t in
-      let br_abst (pat,nv,b,s,f1) =
-        let l, p, lvl, rb = bset_filter l p lvl nv b s in
-        let f1 = f_abst m l p lvl f1 in
-        (pat, nv, !rb, Mint.empty, f1)
-      in
-      f_case t (List.map br_abst bl)
+and f_abst m l lvl f = f_label_copy f (match f.f_node with
+  | Fquant (q, qf) ->
+      f_quant q (bnd_q_abst m l lvl qf)
+  | Flet (e, (u,b,f1)) ->
+      let b,f1 = bnd_f_abst m l lvl b f1 in
+      f_let (t_abst m l lvl e) (u,b,f1)
+  | Fcase (e, bl) ->
+      let br_abst (p,b,e) = let b,e = bnd_f_abst m l lvl b e in (p,b,e) in
+      f_case (t_abst m l lvl e) (List.map br_abst bl)
   | _ ->
-      f_map_unsafe (t_abst m l p lvl) (f_abst m l p lvl) f)
+      f_map_unsafe (t_abst m l lvl) (f_abst m l lvl) f)
 
-let t_abst m t = t_abst m [] (0, 0, Mint.empty) 0 t
-let f_abst m f = f_abst m [] (0, 0, Mint.empty) 0 f
+and bnd_t_abst m l lvl bv t =
+  let rb = ref bv.bv_open in
+  let bv = bnd_map (t_abst m l lvl) bv in
+  let t = t_abst m ((lvl,rb) :: l) (lvl + bv.bv_bound) t in
+  { bv with bv_open = !rb }, t
 
-let t_abst_single v t = t_abst (Mvs.add v 0 Mvs.empty) t
-let f_abst_single v f = f_abst (Mvs.add v 0 Mvs.empty) f
+and bnd_f_abst m l lvl bv f =
+  let rb = ref bv.bv_open in
+  let bv = bnd_map (t_abst m l lvl) bv in
+  let f = f_abst m ((lvl,rb) :: l) (lvl + bv.bv_bound) f in
+  { bv with bv_open = !rb }, f
+
+and bnd_q_abst m l lvl (vl,bv,tl,f) =
+  let rb = ref bv.bv_open in
+  let bv = bnd_map (t_abst m l lvl) bv in
+  let l = (lvl,rb) :: l in let lvl = lvl + bv.bv_bound in
+  let tl = tr_map (t_abst m l lvl) (f_abst m l lvl) tl in
+  let f = f_abst m l lvl f in
+  vl, { bv with bv_open = !rb }, tl, f
+
+let t_abst m t = t_abst m [] 0 t
+let f_abst m f = f_abst m [] 0 f
 
 (* replaces de Bruijn indices with variables in term [t] using map [m] *)
 
-let bmap_filter b s nv m =
-  let filt i acc = Mint.add (i + nv) (bmap_find i m) acc in
-  Sint.fold filt b s
+exception UnboundIndex
 
-let bound_inst m (u,b,s,e) =
-  (u, Sint.empty, bmap_filter b s 1 m, e)
+let bnd_find i m =
+  try Mint.find i m with Not_found -> raise UnboundIndex
 
-let branch_inst m (pat,nv,b,s,e) =
-  (pat, nv, Sint.empty, bmap_filter b s nv m, e)
+let bnd_add m nv i s = Mint.add (i + nv) (bnd_find i m) s
 
-let quant_inst m (vl,nv,b,s,tl,f) =
-  (vl, nv, Sint.empty, bmap_filter b s nv m, tl, f)
+let bnd_inst m nv b =
+  let s = Sint.fold (bnd_add m b.bv_bound) b.bv_open b.bv_defer in
+  { bv_bound = nv + b.bv_bound ; bv_open = Sint.empty ; bv_defer = s }
 
-let rec t_inst m t = t_label_copy t (match t.t_node with
-  | Tbvar i -> bmap_find i m
-  | Tlet (t1,bt) -> t_let (t_inst m t1) (bound_inst m bt) t.t_ty
-  | Tcase (t1,bl) ->
-      t_case (t_inst m t1) (List.map (branch_inst m) bl) t.t_ty
-  | Teps bf -> t_eps (bound_inst m bf) t.t_ty
-  | _ -> t_map_unsafe (t_inst m) (f_inst m) t)
+let rec t_inst m nv t = t_label_copy t (match t.t_node with
+  | Tbvar i ->
+      bnd_find i m
+  | Tlet (e,(u,b,t1)) ->
+      t_let (t_inst m nv e) (u, bound_inst m nv b, t1) t.t_ty
+  | Tcase (e,bl) ->
+      let br_inst (u,b,e) = (u, bound_inst m nv b, e) in
+      t_case (t_inst m nv e) (List.map br_inst bl) t.t_ty
+  | Teps (u,b,f) ->
+      t_eps (u, bound_inst m nv b, f) t.t_ty
+  | _ ->
+      t_map_unsafe (t_inst m nv) (f_inst m nv) t)
 
-and f_inst m f = f_label_copy f (match f.f_node with
-  | Fquant (q,qf) -> f_quant q (quant_inst m qf)
-  | Flet (t,bf) -> f_let (t_inst m t) (bound_inst m bf)
-  | Fcase (t,bl) ->
-      f_case (t_inst m t) (List.map (branch_inst m) bl)
-  | _ -> f_map_unsafe (t_inst m) (f_inst m) f)
+and f_inst m nv f = f_label_copy f (match f.f_node with
+  | Fquant (q,(vl,b,tl,f)) ->
+      f_quant q (vl, bound_inst m nv b, tl, f)
+  | Flet (e,(u,b,f1)) ->
+      f_let (t_inst m nv e) (u, bound_inst m nv b, f1)
+  | Fcase (e,bl) ->
+      let br_inst (u,b,e) = (u, bound_inst m nv b, e) in
+      f_case (t_inst m nv e) (List.map br_inst bl)
+  | _ ->
+      f_map_unsafe (t_inst m nv) (f_inst m nv) f)
 
-let t_inst_single v s t = t_inst (Mint.add 0 v s) t
-let f_inst_single v s f = f_inst (Mint.add 0 v s) f
+and bound_inst m nv b = bnd_inst m nv (bnd_map (t_inst m nv) b)
 
 (* close bindings *)
 
-let t_close_bound v t = (v, Sint.empty, Mint.empty, t_abst_single v t)
-let f_close_bound v f = (v, Sint.empty, Mint.empty, f_abst_single v f)
+let bnd_new nv =
+  { bv_bound = nv ; bv_open = Sint.empty ; bv_defer = Mint.empty }
+
+let t_close_bound v t = (v, bnd_new 1, t_abst (Mvs.add v 0 Mvs.empty) t)
+let f_close_bound v f = (v, bnd_new 1, f_abst (Mvs.add v 0 Mvs.empty) f)
 
 let pat_varmap p =
   let i = ref (-1) in
@@ -767,32 +766,31 @@ let pat_varmap p =
 
 let t_close_branch pat t =
   let m,nv = pat_varmap pat in
-  let t = if nv = 0 then t else t_abst m t in
-  (pat, nv, Sint.empty, Mint.empty, t)
+  (pat, bnd_new nv, if nv = 0 then t else t_abst m t)
 
 let f_close_branch pat f =
   let m,nv = pat_varmap pat in
-  let f = if nv = 0 then f else f_abst m f in
-  (pat, nv, Sint.empty, Mint.empty, f)
+  (pat, bnd_new nv, if nv = 0 then f else f_abst m f)
 
 let f_close_quant vl tl f =
-  if vl = [] then (vl, 0, Sint.empty, Mint.empty, tl, f) else
+  if vl = [] then (vl, bnd_new 0, tl, f) else
   let i = ref (-1) in
   let add m v =
     if Mvs.mem v m then raise (DuplicateVar v);
     incr i; Mvs.add v !i m
   in
   let m = List.fold_left add Mvs.empty vl in
-  let tl = tr_map (t_abst m) (f_abst m) tl in
-  (vl, !i + 1, Sint.empty, Mint.empty, tl, f_abst m f)
+  (vl, bnd_new (!i + 1), tr_map (t_abst m) (f_abst m) tl, f_abst m f)
 
 (* open bindings *)
 
-let t_open_bound (v,_,s,t) =
-  let v = fresh_vsymbol v in v, t_inst_single (t_var v) s t
+let t_open_bound (v,b,t) =
+  let v = fresh_vsymbol v in
+  v, t_inst (Mint.add 0 (t_var v) b.bv_defer) b.bv_bound t
 
-let f_open_bound (v,_,s,f) =
-  let v = fresh_vsymbol v in v, f_inst_single (t_var v) s f
+let f_open_bound (v,b,f) =
+  let v = fresh_vsymbol v in
+  v, f_inst (Mint.add 0 (t_var v) b.bv_defer) b.bv_bound f
 
 let rec pat_rename ns p = match p.pat_node with
   | Pvar n -> pat_var (Mvs.find n ns)
@@ -805,19 +803,20 @@ let pat_substs p s =
     let x' = fresh_vsymbol x in
     Mint.add i (t_var x') s, Mvs.add x x' ns) m (s, Mvs.empty)
 
-let t_open_branch (p,nv,_,s,t) = if nv = 0 then (p, t_inst s t)
-  else let m, ns = pat_substs p s in (pat_rename ns p, t_inst m t)
+let t_open_branch (p,b,t) =
+  let m,ns = pat_substs p b.bv_defer in
+  pat_rename ns p, t_inst m b.bv_bound t
 
-let f_open_branch (p,nv,_,s,f) = if nv = 0 then (p, f_inst s f)
-  else let m, ns = pat_substs p s in (pat_rename ns p, f_inst m f)
+let f_open_branch (p,b,f) =
+  let m,ns = pat_substs p b.bv_defer in
+  pat_rename ns p, f_inst m b.bv_bound f
 
-let f_open_quant (vl,_,_,s,tl,f) =
-  let i = ref (-1) in
-  let add m v = incr i; Mint.add !i (t_var v) m in
-  let vl = List.map fresh_vsymbol vl in
-  let m = List.fold_left add s vl in
-  let tl = tr_map (t_inst m) (f_inst m) tl in
-  (vl, tl, f_inst m f)
+let f_open_quant (vl,b,tl,f) =
+  let nv = b.bv_bound in let i = ref (-1) in
+  let add m v = let v = fresh_vsymbol v in
+    incr i; Mint.add !i (t_var v) m, v in
+  let m,vl = map_fold_left add b.bv_defer vl in
+  (vl, tr_map (t_inst m nv) (f_inst m nv) tl, f_inst m nv f)
 
 let rec f_open_forall f = match f.f_node with
   | Fquant (Fforall, f) ->
@@ -914,10 +913,10 @@ exception EmptyCase
 
 let t_case t bl =
   let ty = match bl with
-    | (_,_,_,_,tbr) :: _ -> tbr.t_ty
+    | (_,_,tbr) :: _ -> tbr.t_ty
     | _ -> raise EmptyCase
   in
-  let t_check_branch (p,_,_,_,tbr) =
+  let t_check_branch (p,_,tbr) =
     check_ty_equal p.pat_ty t.t_ty;
     check_ty_equal ty tbr.t_ty
   in
@@ -926,7 +925,7 @@ let t_case t bl =
 
 let f_case t bl =
   if bl = [] then raise EmptyCase;
-  let f_check_branch (p,_,_,_,_) =
+  let f_check_branch (p,_,_) =
     check_ty_equal p.pat_ty t.t_ty
   in
   List.iter f_check_branch bl;
@@ -936,22 +935,22 @@ let t_if f t1 t2 =
   check_ty_equal t1.t_ty t2.t_ty;
   t_if f t1 t2
 
-let t_let t1 ((v,_,_,t2) as bt) =
+let t_let t1 ((v,_,t2) as bt) =
   check_ty_equal v.vs_ty t1.t_ty;
   t_let t1 bt t2.t_ty
 
-let f_let t1 ((v,_,_,_) as bf) =
+let f_let t1 ((v,_,_) as bf) =
   check_ty_equal v.vs_ty t1.t_ty;
   f_let t1 bf
 
-let t_eps ((v,_,_,_) as bf) =
+let t_eps ((v,_,_) as bf) =
   t_eps bf v.vs_ty
 
 let t_const c = match c with
   | ConstInt _ -> t_const c ty_int
   | ConstReal _ -> t_const c ty_real
 
-let f_quant q ((vl,_,_,_,_,f) as qf) =
+let f_quant q ((vl,_,_,f) as qf) =
   if vl = [] then f else f_quant q qf
 
 let f_forall = f_quant Fforall
@@ -984,44 +983,42 @@ let rec t_gen_map fnT fnB fnV fnL t =
     | Tconst _ -> t
     | Tapp (f, tl) -> t_app (fnL f) (List.map fn_t tl) ty
     | Tif (f, t1, t2) -> t_if (fn_f f) (fn_t t1) (fn_t t2)
-    | Tlet (t1, (u, b, s, t2)) ->
+    | Tlet (t1, (u,b,t2)) ->
         let t1 = fn_t t1 in
-        t_let t1 (fnB u t1.t_ty, b, bmap_map fn_t s, fn_t t2)
+        t_let t1 (fnB u t1.t_ty, bnd_map fn_t b, fn_t t2)
     | Tcase (t1, bl) ->
         let fn_b = t_branch fnT fnB fnV fnL in
         t_case (fn_t t1) (List.map fn_b bl)
-    | Teps (u, b, s, f) ->
-        t_eps (fnB u ty, b, bmap_map fn_t s, fn_f f))
+    | Teps (u,b,f) ->
+        t_eps (fnB u ty, bnd_map fn_t b, fn_f f))
 
 and f_gen_map fnT fnB fnV fnL f =
   let fn_t = t_gen_map fnT fnB fnV fnL in
   let fn_f = f_gen_map fnT fnB fnV fnL in
   f_label_copy f (match f.f_node with
     | Fapp (p, tl) -> f_app (fnL p) (List.map fn_t tl)
-    | Fquant (q, (vl, nv, b, s, tl, f1)) ->
-        let s = bmap_map fn_t s in
-        let tl = tr_map fn_t fn_f tl in
-        let fn_v u = fnB u (fnT u.vs_ty) in
-        f_quant q (List.map fn_v vl, nv, b, s, tl, fn_f f1)
+    | Fquant (q, (vl,b,tl,f1)) ->
+        let vl = List.map (fun u -> fnB u (fnT u.vs_ty)) vl in
+        f_quant q (vl, bnd_map fn_t b, tr_map fn_t fn_f tl, fn_f f1)
     | Fbinop (op, f1, f2) -> f_binary op (fn_f f1) (fn_f f2)
     | Fnot f1 -> f_not (fn_f f1)
     | Ftrue | Ffalse -> f
     | Fif (f1, f2, f3) -> f_if (fn_f f1) (fn_f f2) (fn_f f3)
-    | Flet (t, (u, b, s, f1)) ->
+    | Flet (t, (u,b,f1)) ->
         let t1 = fn_t t in
-        f_let t1 (fnB u t1.t_ty, b, bmap_map fn_t s, fn_f f1)
+        f_let t1 (fnB u t1.t_ty, bnd_map fn_t b, fn_f f1)
     | Fcase (t, bl) ->
         let fn_b = f_branch fnT fnB fnV fnL in
         f_case (fn_t t) (List.map fn_b bl))
 
-and t_branch fnT fnB fnV fnL (p, nv, b, s, t) =
-  (pat_s_map fnT fnB fnL p, nv, b,
-  bmap_map (t_gen_map fnT fnB fnV fnL) s,
+and t_branch fnT fnB fnV fnL (p,b,t) =
+  (pat_s_map fnT fnB fnL p,
+  bnd_map (t_gen_map fnT fnB fnV fnL) b,
   t_gen_map fnT fnB fnV fnL t)
 
-and f_branch fnT fnB fnV fnL (p, nv, b, s, f) =
-  (pat_s_map fnT fnB fnL p, nv, b,
-  bmap_map (t_gen_map fnT fnB fnV fnL) s,
+and f_branch fnT fnB fnV fnL (p,b,f) =
+  (pat_s_map fnT fnB fnL p,
+  bnd_map (t_gen_map fnT fnB fnV fnL) b,
   f_gen_map fnT fnB fnV fnL f)
 
 let get_fnT fn =
@@ -1072,9 +1069,9 @@ let rec t_s_fold fnT fnL acc t =
   | Tbvar _ | Tvar _ | Tconst _ -> acc
   | Tapp (f, tl) -> List.fold_left fn_t (fnL acc f) tl
   | Tif (f, t1, t2) -> fn_t (fn_t (fn_f acc f) t1) t2
-  | Tlet (t1, (_,_,s,t2)) -> fn_t (bmap_fold fn_t (fn_t acc t1) s) t2
+  | Tlet (t1, (_,b,t2)) -> fn_t (bnd_fold fn_t (fn_t acc t1) b) t2
   | Tcase (t1, bl) -> List.fold_left (t_branch fnT fnL) (fn_t acc t1) bl
-  | Teps (_,_,s,f) -> fn_f (bmap_fold fn_t acc s) f
+  | Teps (_,b,f) -> fn_f (bnd_fold fn_t acc b) f
 
 and f_s_fold fnT fnL acc f =
   let fn_t = t_s_fold fnT fnL in
@@ -1082,25 +1079,25 @@ and f_s_fold fnT fnL acc f =
   let fn_v acc u = ty_s_fold fnT acc u.vs_ty in
   match f.f_node with
   | Fapp (p, tl) -> List.fold_left fn_t (fnL acc p) tl
-  | Fquant (_, (vl,_,_,s,tl,f1)) ->
-      let acc = bmap_fold fn_t acc s in
+  | Fquant (_, (vl,b,tl,f1)) ->
+      let acc = bnd_fold fn_t acc b in
       let acc = List.fold_left fn_v acc vl in
       fn_f (tr_fold fn_t fn_f acc tl) f1
   | Fbinop (_, f1, f2) -> fn_f (fn_f acc f1) f2
   | Fnot f1 -> fn_f acc f1
   | Ftrue | Ffalse -> acc
   | Fif (f1, f2, f3) -> fn_f (fn_f (fn_f acc f1) f2) f3
-  | Flet (t, (_,_,s,f1)) -> fn_f (bmap_fold fn_t (fn_t acc t) s) f1
+  | Flet (t, (_,b,f1)) -> fn_f (bnd_fold fn_t (fn_t acc t) b) f1
   | Fcase (t, bl) -> List.fold_left (f_branch fnT fnL) (fn_t acc t) bl
 
-and t_branch fnT fnL acc (p,_,_,s,t) =
+and t_branch fnT fnL acc (p,b,t) =
   let fn_t = t_s_fold fnT fnL in
-  fn_t (pat_s_fold fnT fnL (bmap_fold fn_t acc s) p) t
+  fn_t (pat_s_fold fnT fnL (bnd_fold fn_t acc b) p) t
 
-and f_branch fnT fnL acc (p,_,_,s,f) =
+and f_branch fnT fnL acc (p,b,f) =
   let fn_t = t_s_fold fnT fnL in
   let fn_f = f_s_fold fnT fnL in
-  fn_f (pat_s_fold fnT fnL (bmap_fold fn_t acc s) p) f
+  fn_f (pat_s_fold fnT fnL (bnd_fold fn_t acc b) p) f
 
 let t_s_all prT prL t =
   try t_s_fold (all_fn prT) (all_fn prL) true t with FoldSkip -> false
@@ -1350,80 +1347,85 @@ let rec pat_equal_alpha p1 p2 =
 
 (* alpha-equality on terms and formulas *)
 
-let rec t_equal_alpha lv1 lv2 l1 l2 t1 t2 =
+let bound_equal_alpha fnE m1 m2 (v1,b1,e1) (v2,b2,e2) =
+  ty_equal v1.vs_ty v2.vs_ty &&
+  let vn = t_var (fresh_vsymbol v1) in
+  let m1 = bound_inst m1.bv_defer m1.bv_bound b1 in
+  let m2 = bound_inst m2.bv_defer m2.bv_bound b2 in
+  let m1 = { m1 with bv_defer = Mint.add 0 vn m1.bv_defer } in
+  let m2 = { m2 with bv_defer = Mint.add 0 vn m2.bv_defer } in
+  fnE m1 m2 e1 e2
+
+let branch_equal_alpha fnE m1 m2 (p1,b1,e1) (p2,b2,e2) =
+  pat_equal_alpha p1 p2 &&
+  let mn,_ = pat_substs p1 Mint.empty in
+  let m1 = bound_inst m1.bv_defer m1.bv_bound b1 in
+  let m2 = bound_inst m2.bv_defer m2.bv_bound b2 in
+  let m1 = { m1 with bv_defer = Mint.fold Mint.add mn m1.bv_defer } in
+  let m2 = { m2 with bv_defer = Mint.fold Mint.add mn m2.bv_defer } in
+  fnE m1 m2 e1 e2
+
+let quant_equal_alpha fnF m1 m2 (vl1,b1,_,f1) (vl2,b2,_,f2) =
+  list_all2 (fun v1 v2 -> ty_equal v1.vs_ty v2.vs_ty) vl1 vl2 &&
+  let i = ref (-1) in
+  let add m v = incr i; Mint.add !i (t_var (fresh_vsymbol v)) m in
+  let mn = List.fold_left add Mint.empty vl1 in
+  let m1 = bound_inst m1.bv_defer m1.bv_bound b1 in
+  let m2 = bound_inst m2.bv_defer m2.bv_bound b2 in
+  let m1 = { m1 with bv_defer = Mint.fold Mint.add mn m1.bv_defer } in
+  let m2 = { m2 with bv_defer = Mint.fold Mint.add mn m2.bv_defer } in
+  fnF m1 m2 f1 f2
+
+let rec t_equal_alpha m1 m2 t1 t2 =
   t_equal t1 t2 || ty_equal t1.t_ty t2.t_ty &&
-  let t_eq = t_equal_alpha lv1 lv2 l1 l2 in
-  let f_eq = f_equal_alpha lv1 lv2 l1 l2 in
-  let tb_eq = t_equal_bound_alpha lv1 lv2 l1 l2 in
-  let fb_eq = f_equal_bound_alpha lv1 lv2 l1 l2 in
-  let tbr_eq = t_equal_branch_alpha lv1 lv2 l1 l2 in
+  let t_eq = t_equal_alpha m1 m2 in
+  let f_eq = f_equal_alpha m1 m2 in
   match t1.t_node, t2.t_node with
-    | Tbvar x1, Tbvar x2 when l1 = [] && l2 = [] -> lv1 - x1 = lv2 - x2
-    | Tbvar x1, _ when l1 <> [] ->
-        let lv1',s1 = List.hd l1 in
-        let x1' = x1 - (lv1 - lv1') in
-        let t1' = try Mint.find x1' s1 with Not_found -> t_bvar x1' t1.t_ty in
-        t_equal_alpha lv1' lv2 (List.tl l1) l2 t1' t2
-    | _, Tbvar x2 when l2 <> [] ->
-        let lv2',s2 = List.hd l2 in
-        let x2' = x2 - (lv2 - lv2') in
-        let t2' = try Mint.find x2' s2 with Not_found -> t_bvar x2' t2.t_ty in
-        t_equal_alpha lv1 lv2' l1 (List.tl l2) t1 t2'
-    | Tvar v1, Tvar v2 -> vs_equal v1 v2
-    | Tconst c1, Tconst c2 -> c1 = c2
-    | Tapp (s1,l1), Tapp (s2,l2) -> ls_equal s1 s2 && List.for_all2 t_eq l1 l2
-    | Tif (f1,t1,e1), Tif (f2,t2,e2) -> f_eq f1 f2 && t_eq t1 t2 && t_eq e1 e2
-    | Tlet (t1,tb1), Tlet (t2,tb2) -> t_eq t1 t2 && tb_eq tb1 tb2
-    | Tcase (t1,bl1), Tcase (t2,bl2) -> t_eq t1 t2 && list_all2 tbr_eq bl1 bl2
-    | Teps fb1, Teps fb2 -> fb_eq fb1 fb2
+    | Tbvar i, _ ->
+        t_equal_alpha (bnd_new 0) m2 (bnd_find i m1.bv_defer) t2
+    | _, Tbvar i ->
+        t_equal_alpha m1 (bnd_new 0) t1 (bnd_find i m2.bv_defer)
+    | Tvar v1, Tvar v2 ->
+        vs_equal v1 v2
+    | Tconst c1, Tconst c2 ->
+        c1 = c2
+    | Tapp (s1,l1), Tapp (s2,l2) ->
+        ls_equal s1 s2 && List.for_all2 t_eq l1 l2
+    | Tif (f1,t1,e1), Tif (f2,t2,e2) ->
+        f_eq f1 f2 && t_eq t1 t2 && t_eq e1 e2
+    | Tlet (t1,tb1), Tlet (t2,tb2) ->
+        t_eq t1 t2 && bound_equal_alpha t_equal_alpha m1 m2 tb1 tb2
+    | Tcase (t1,b1), Tcase (t2,b2) ->
+        t_eq t1 t2 && list_all2 (branch_equal_alpha t_equal_alpha m1 m2) b1 b2
+    | Teps fb1, Teps fb2 ->
+        bound_equal_alpha f_equal_alpha m1 m2 fb1 fb2
     | _ -> false
 
-and f_equal_alpha lv1 lv2 l1 l2 f1 f2 =
+and f_equal_alpha m1 m2 f1 f2 =
   f_equal f1 f2 ||
-  let t_eq = t_equal_alpha lv1 lv2 l1 l2 in
-  let f_eq = f_equal_alpha lv1 lv2 l1 l2 in
-  let fb_eq = f_equal_bound_alpha lv1 lv2 l1 l2 in
-  let fq_eq = f_equal_quant_alpha lv1 lv2 l1 l2 in
-  let fbr_eq = f_equal_branch_alpha lv1 lv2 l1 l2 in
+  let t_eq = t_equal_alpha m1 m2 in
+  let f_eq = f_equal_alpha m1 m2 in
   match f1.f_node, f2.f_node with
-    | Fapp (s1,l1), Fapp (s2,l2) -> ls_equal s1 s2 && List.for_all2 t_eq l1 l2
-    | Fquant (q1,b1), Fquant (q2,b2) -> q1 = q2 && fq_eq b1 b2
-    | Fbinop (a,f1,g1), Fbinop (b,f2,g2) -> a = b && f_eq f1 f2 && f_eq g1 g2
-    | Fnot f1, Fnot f2 -> f_eq f1 f2
-    | Ftrue, Ftrue | Ffalse, Ffalse -> true
-    | Fif (f1,g1,h1), Fif (f2,g2,h2) -> f_eq f1 f2 && f_eq g1 g2 && f_eq h1 h2
-    | Flet (t1,fb1), Flet (t2,fb2) -> t_eq t1 t2 && fb_eq fb1 fb2
-    | Fcase (t1,bl1), Fcase (t2,bl2) -> t_eq t1 t2 && list_all2 fbr_eq bl1 bl2
+    | Fapp (s1,l1), Fapp (s2,l2) ->
+        ls_equal s1 s2 && List.for_all2 t_eq l1 l2
+    | Fquant (q1,b1), Fquant (q2,b2) ->
+        q1 = q2 && quant_equal_alpha f_equal_alpha m1 m2 b1 b2
+    | Fbinop (a,f1,g1), Fbinop (b,f2,g2) ->
+        a = b && f_eq f1 f2 && f_eq g1 g2
+    | Fnot f1, Fnot f2 ->
+        f_eq f1 f2
+    | Ftrue, Ftrue | Ffalse, Ffalse ->
+        true
+    | Fif (f1,g1,h1), Fif (f2,g2,h2) ->
+        f_eq f1 f2 && f_eq g1 g2 && f_eq h1 h2
+    | Flet (t1,fb1), Flet (t2,fb2) ->
+        t_eq t1 t2 && bound_equal_alpha f_equal_alpha m1 m2 fb1 fb2
+    | Fcase (t1,b1), Fcase (t2,b2) ->
+        t_eq t1 t2 && list_all2 (branch_equal_alpha f_equal_alpha m1 m2) b1 b2
     | _ -> false
 
-and t_equal_bound_alpha lv1 lv2 l1 l2 b1 b2 =
-  let v1, _, s1, t1 = b1 in let l1 = (lv1 + 1, s1) :: l1 in
-  let v2, _, s2, t2 = b2 in let l2 = (lv2 + 1, s2) :: l2 in
-  ty_equal v1.vs_ty v2.vs_ty && t_equal_alpha (lv1 + 1) (lv2 + 1) l1 l2 t1 t2
-
-and f_equal_bound_alpha lv1 lv2 l1 l2 b1 b2 =
-  let v1, _, s1, f1 = b1 in let l1 = (lv1 + 1, s1) :: l1 in
-  let v2, _, s2, f2 = b2 in let l2 = (lv2 + 1, s2) :: l2 in
-  ty_equal v1.vs_ty v2.vs_ty && f_equal_alpha (lv1 + 1) (lv2 + 1) l1 l2 f1 f2
-
-and t_equal_branch_alpha lv1 lv2 l1 l2 br1 br2 =
-  let p1, nv1, _, s1, t1 = br1 in let l1 = (lv1 + nv1, s1) :: l1 in
-  let p2, nv2, _, s2, t2 = br2 in let l2 = (lv2 + nv2, s2) :: l2 in
-  pat_equal_alpha p1 p2 && t_equal_alpha (lv1 + nv1) (lv2 + nv2) l1 l2 t1 t2
-
-and f_equal_branch_alpha lv1 lv2 l1 l2 br1 br2 =
-  let p1, nv1, _, s1, f1 = br1 in let l1 = (lv1 + nv1, s1) :: l1 in
-  let p2, nv2, _, s2, f2 = br2 in let l2 = (lv2 + nv2, s2) :: l2 in
-  pat_equal_alpha p1 p2 && f_equal_alpha (lv1 + nv1) (lv2 + nv2) l1 l2 f1 f2
-
-and f_equal_quant_alpha lv1 lv2 l1 l2 qf1 qf2 =
-  let cmp v1 v2 = ty_equal v1.vs_ty v2.vs_ty in
-  let vl1, nv1, _, s1, _, f1 = qf1 in let l1 = (lv1 + nv1, s1) :: l1 in
-  let vl2, nv2, _, s2, _, f2 = qf2 in let l2 = (lv2 + nv2, s2) :: l2 in
-  list_all2 cmp vl1 vl2 && f_equal_alpha (lv1 + nv1) (lv2 + nv2) l1 l2 f1 f2
-
-let t_equal_alpha = t_equal_alpha 0 0 [] []
-let f_equal_alpha = f_equal_alpha 0 0 [] []
+let t_equal_alpha = t_equal_alpha (bnd_new 0) (bnd_new 0)
+let f_equal_alpha = f_equal_alpha (bnd_new 0) (bnd_new 0)
 
 (* binder-free term/formula matching *)
 
@@ -1594,13 +1596,13 @@ let f_if_simp f1 f2 f3 = match f1.f_node, f2.f_node, f3.f_node with
   | _, _, Ffalse -> f_and_simp f1 f2
   | _, _, _      -> if f_equal f2 f3 then f2 else f_if f1 f2 f3
 
-let f_let_simp t ((_,_,_,f) as bf) = match f.f_node with
+let f_let_simp t ((_,_,f) as bf) = match f.f_node with
   | Ftrue | Ffalse -> f | _ -> f_let t bf
 
 let f_let_close_simp v t f = match f.f_node with
   | Ftrue | Ffalse -> f | _ -> f_let_close v t f
 
-let f_quant_simp q ((_,_,_,_,_,f) as qf) = match f.f_node with
+let f_quant_simp q ((_,_,_,f) as qf) = match f.f_node with
   | Ftrue | Ffalse -> f | _ -> f_quant q qf
 
 let f_forall_simp = f_quant_simp Fforall
