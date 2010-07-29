@@ -210,16 +210,11 @@ let call_on_buffer ?debug ~command ?timelimit ?memlimit drv buffer =
 exception NoPrinter
 exception TransFailure of (string * exn)
 
-let print_task ?(debug=false) drv fmt task =
-  let p = match drv.drv_printer with
-    | None -> raise NoPrinter
-    | Some p -> p
+let update_task drv task =
+  let task, goal = match task with
+    | Some { task_decl = g ; task_prev = t } -> t,g
+    | None -> raise Task.GoalNotFound
   in
-  let printer =
-    lookup_printer p drv.drv_prelude drv.drv_thprelude drv.drv_syntax
-  in
-  let lookup_transform t = t, lookup_transform t drv.drv_env in
-  let transl = List.map lookup_transform drv.drv_transform in
   let task =
     Mid.fold (fun _ (th,s) task ->
       let cs = (find_clone task th).tds_set in
@@ -241,11 +236,27 @@ let print_task ?(debug=false) drv fmt task =
       ) cs task
     ) drv.drv_meta_cl task
   in
+  add_tdecl task goal
+
+let print_task ?(debug=false) drv fmt task =
+  let p = match drv.drv_printer with
+    | None -> raise NoPrinter
+    | Some p -> p
+  in
+  let printer =
+    lookup_printer p drv.drv_prelude drv.drv_thprelude drv.drv_syntax
+  in
+  let lookup_transform t = t, lookup_transform t drv.drv_env in
+  let transl = List.map lookup_transform drv.drv_transform in
   let apply task (t, tr) =
+(*  Format.printf "@\n@\n[%f] %s@." (Sys.time ()) t; *)
     try Trans.apply tr task
     with e when not debug -> raise (TransFailure (t,e))
   in
-  fprintf fmt "@[%a@]@?" printer (List.fold_left apply task transl)
+(*Format.printf "@\n@\nTASK";*)
+  let task = update_task drv task in
+  let task = List.fold_left apply task transl in
+  fprintf fmt "@[%a@]@?" printer task
 
 let prove_task ?debug ~command ?timelimit ?memlimit drv task =
   let buf = Buffer.create 1024 in

@@ -52,6 +52,10 @@ let store fn = WHtask.memoize_option 63 fn
 let fold fn v =
   let h = WHtask.create 63 in
   let rewind acc task =
+(*
+    Format.printf "%c%d." (match task.task_decl.td_node with
+      Decl _ -> 'D' | Clone _ -> 'C' | Use _ -> 'U' | Meta _ -> 'M') task.task_tag;
+*)
     let acc = fn task acc in
     WHtask.set h task acc;
     acc
