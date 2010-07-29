@@ -683,26 +683,23 @@ and f_abst m l lvl f = f_label_copy f (match f.f_node with
 
 and bnd_t_abst m l lvl bv t =
   let l' = ref Sint.empty in
-  let bv = bnd_map (t_abst m l lvl) bv in
   let t = t_abst m l' (lvl + bv.bv_bound) t in
-  update_open lvl l l' bv, t
+  update_bv m l lvl l' bv, t
 
 and bnd_f_abst m l lvl bv f =
   let l' = ref Sint.empty in
-  let bv = bnd_map (t_abst m l lvl) bv in
   let f = f_abst m l' (lvl + bv.bv_bound) f in
-  update_open lvl l l' bv, f
+  update_bv m l lvl l' bv, f
 
 and bnd_q_abst m l lvl (vl,bv,tl,f) =
-  let l' = ref Sint.empty in
-  let lvl' = lvl + bv.bv_bound in
-  let bv = bnd_map (t_abst m l lvl) bv in
+  let l' = ref Sint.empty and lvl' = lvl + bv.bv_bound in
   let tl = tr_map (t_abst m l' lvl') (f_abst m l' lvl') tl in
   let f = f_abst m l' lvl' f in
-  vl, update_open lvl l l' bv, tl, f
+  vl, update_bv m l lvl l' bv, tl, f
 
-and update_open lvl l l' bv =
+and update_bv m l lvl l' bv =
   l := Sint.union !l' !l;
+  let bv = bnd_map (t_abst m l lvl) bv in
   let add i acc = Sint.add (i + lvl) acc in
   { bv with bv_open = Sint.fold add !l' bv.bv_open }
 
@@ -716,11 +713,9 @@ exception UnboundIndex
 let bnd_find i m =
   try Mint.find i m with Not_found -> raise UnboundIndex
 
-let bnd_add m nv i s = Mint.add (i + nv) (bnd_find i m) s
-
-let bnd_inst m nv b =
-  let s = Sint.fold (bnd_add m b.bv_bound) b.bv_open b.bv_defer in
-  { bv_bound = nv + b.bv_bound ; bv_open = Sint.empty ; bv_defer = s }
+let bnd_inst m nv { bv_bound = d ; bv_open = b ; bv_defer = s } =
+  let s = Sint.fold (fun i -> Mint.add (i + d) (bnd_find i m)) b s in
+  { bv_bound = d + nv ; bv_open = Sint.empty ; bv_defer = s }
 
 let rec t_inst m nv t = t_label_copy t (match t.t_node with
   | Tbvar i ->
