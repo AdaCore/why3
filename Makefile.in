@@ -847,17 +847,16 @@ headers:
 #########
 
 Makefile: Makefile.in config.status
-	./config.status --file $@
+	./config.status chmod --file $@
 
 src/config.sh: src/config.sh.in config.status
-	./config.status --file $@
-	chmod u+x $@
+	./config.status chmod --file $@
 
-src/config.ml: src/config.sh config.status
+src/config.ml: src/config.sh
 	LIBDIR=$(LIBDIR) src/config.sh
 
 doc/version.tex: doc/version.tex.in config.status
-	./config.status --file $@
+	./config.status chmod --file $@
 
 config.status: configure Version
 	./config.status --recheck
