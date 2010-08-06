@@ -110,7 +110,9 @@ let conv_arg tenv ty_arg t =
   if ty_equal ty_arg ty_val then t else
   (* ty_val is kept and ty_arg = ty_uni *)
   let lc = Hty.find tenv.specials ty_val in
-  t_app lc.t2u [t] ty_arg
+  match t.t_node with
+  | Tapp (fs,[t]) when ls_equal fs lc.u2t -> t
+  | _ -> t_app lc.t2u [t] ty_arg
 
 let rec rewrite_term tenv vm t =
   let fnT = rewrite_term tenv in
