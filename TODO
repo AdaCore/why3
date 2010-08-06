@@ -8,12 +8,15 @@ syntaxe
 sémantique
 ----------
 
+  - should split_goal provide a "right-hand side only split"?
+
   - produce reparsable tasks in Why3 format: how to preserve information about
     the origins of symbols to be able to use drivers after reparsing?
 
   - weak memoization in transformations has a disadvantage: if a task or a decl
     is not changed by a transformation, it will stay in the hash table forever,
-    since the key is the value.
+    since the key is the value. Should we use generation numbers in arguments
+    and results of transformations?
 
   - uses : pour l'instant, l'ordre des théories dans le fichier est important 
     i.e. les théories mentionnées par uses doivent être définies précédemment
