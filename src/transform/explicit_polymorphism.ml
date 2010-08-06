@@ -123,7 +123,7 @@ module Transform = struct
       let tv_to_ty = t_app_inst f terms t.t_ty in
       (* Debug.print_mtv Pretty.print_ty Format.err_formatter tv_to_ty; *)
       (* fresh terms to be added at the beginning of the list of arguments *)
-      let find_ty v = ty_to_term tblT varM (Mtv.find v tv_to_ty) in
+      let find_ty v = ty_to_term tblT varM (ty_inst tv_to_ty (ty_var v)) in
       let new_terms = List.map find_ty type_vars in
       let transformed_terms = List.map (term_transform tblT tblL varM) terms in
       t_app new_f (new_terms @ transformed_terms) t.t_ty
@@ -141,7 +141,7 @@ module Transform = struct
       let tv_to_ty = f_app_inst p terms in
       (* Debug.print_mtv Pretty.print_ty Format.err_formatter tv_to_ty; *)
       (* fresh terms to be added at the beginning of the list of arguments *)
-      let find_ty v = ty_to_term tblT varM (Mtv.find v tv_to_ty) in
+      let find_ty v = ty_to_term tblT varM (ty_inst tv_to_ty (ty_var v)) in
       let new_terms = List.map find_ty type_vars in
       let transformed_terms = List.map (term_transform tblT tblL varM) terms in
       f_app new_p (new_terms @ transformed_terms)
