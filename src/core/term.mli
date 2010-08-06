@@ -300,11 +300,17 @@ val e_map : (term -> term) -> (fmla -> fmla) -> expr -> expr
 val e_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> expr -> 'a
 val e_apply : (term -> 'a) -> (fmla -> 'a) -> expr -> 'a
 
+val e_map_fold : ('a -> term -> 'a * term) ->
+                 ('a -> fmla -> 'a * fmla) -> 'a -> expr -> 'a * expr
+
 val tr_map : (term -> term) ->
              (fmla -> fmla) -> trigger list -> trigger list
 
 val tr_fold : ('a -> term -> 'a) ->
               ('a -> fmla -> 'a) -> 'a -> trigger list -> 'a
+
+val tr_map_fold : ('a -> term -> 'a * term) -> ('a -> fmla -> 'a * fmla) ->
+                   'a -> trigger list -> 'a * trigger list
 
 (** map/fold over symbols *)
 
@@ -363,19 +369,22 @@ val f_all : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 val t_any : (term -> bool) -> (fmla -> bool) -> term -> bool
 val f_any : (term -> bool) -> (fmla -> bool) -> fmla -> bool
 
+val t_map_fold : ('a -> term -> 'a * term) ->
+                 ('a -> fmla -> 'a * fmla) -> 'a -> term -> 'a * term
+
+val f_map_fold : ('a -> term -> 'a * term) ->
+                 ('a -> fmla -> 'a * fmla) -> 'a -> fmla -> 'a * fmla
+
 (** continuation-passing map *)
 
 val t_map_cont : ((term -> 'a) -> term -> 'a) ->
-                 ((fmla -> 'a) -> fmla -> 'a) ->
-                  (term -> 'a) -> term -> 'a
+                 ((fmla -> 'a) -> fmla -> 'a) -> (term -> 'a) -> term -> 'a
 
 val f_map_cont : ((term -> 'a) -> term -> 'a) ->
-                 ((fmla -> 'a) -> fmla -> 'a) ->
-                  (fmla -> 'a) -> fmla -> 'a
+                 ((fmla -> 'a) -> fmla -> 'a) -> (fmla -> 'a) -> fmla -> 'a
 
 (** simplification map *)
 val f_map_simp : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
-
 
 (** map/fold over free variables *)
 

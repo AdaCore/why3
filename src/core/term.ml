@@ -335,11 +335,15 @@ let e_map fnT fnF = function Term t -> Term (fnT t) | Fmla f -> Fmla (fnF f)
 let e_fold fnT fnF acc = function Term t -> fnT acc t | Fmla f -> fnF acc f
 let e_apply fnT fnF = function Term t -> fnT t | Fmla f -> fnF f
 
+let e_map_fold fnT fnF acc = function
+  | Term t -> let acc, t = fnT acc t in acc, Term t
+  | Fmla f -> let acc, f = fnF acc f in acc, Fmla f
+
 let tr_map fnT fnF = List.map (List.map (e_map fnT fnF))
 let tr_fold fnT fnF = List.fold_left (List.fold_left (e_fold fnT fnF))
 
-let ftr_map fnT fnF (tl,f) = (tr_map fnT fnF tl, fnF f)
-let ftr_fold fnT fnF acc (tl,f) = fnF (tr_fold fnT fnF acc tl) f
+let tr_map_fold fnT fnF =
+  Util.map_fold_left (Util.map_fold_left (e_map_fold fnT fnF))
 
 (* bind_info equality, hash, and traversal *)
 
@@ -351,6 +355,13 @@ let bnd_hash bv =
 
 let bnd_map fn bv = { bv with bv_defer = Mint.map fn bv.bv_defer }
 let bnd_fold fn acc bv = Mint.fold (fun _ t a -> fn a t) bv.bv_defer acc
+
+let bnd_map_fold fn acc bv =
+  let acc,s = Mint.fold
+    (fun i t (a,b) -> let a,t = fn a t in a, Mint.add i t b)
+    bv.bv_defer (acc, Mint.empty)
+  in
+  acc, { bv with bv_defer = s }
 
 (* hash-consing for terms and formulas *)
 
@@ -597,8 +608,8 @@ let t_map_unsafe fnT fnF t = t_label_copy t (match t.t_node with
 
 let f_map_unsafe fnT fnF f = f_label_copy f (match f.f_node with
   | Fapp (p,tl) -> f_app p (List.map fnT tl)
-  | Fquant (q,(vl,b,tl,f)) ->
-      f_quant q (vl, bnd_map fnT b, tr_map fnT fnF tl, fnF f)
+  | Fquant (q,(vl,b,tl,f1)) ->
+      f_quant q (vl, bnd_map fnT b, tr_map fnT fnF tl, fnF f1)
   | Fbinop (op,f1,f2) -> f_binary op (fnF f1) (fnF f2)
   | Fnot f1 -> f_not (fnF f1)
   | Ftrue | Ffalse -> f
@@ -620,7 +631,7 @@ let t_fold_unsafe fnT fnF acc t = match t.t_node with
 
 let f_fold_unsafe fnT fnF acc f = match f.f_node with
   | Fapp (_,tl) -> List.fold_left fnT acc tl
-  | Fquant (_,(_,b,tl,f)) -> fnF (tr_fold fnT fnF (bnd_fold fnT acc b) tl) f
+  | Fquant (_,(_,b,tl,f1)) -> fnF (tr_fold fnT fnF (bnd_fold fnT acc b) tl) f1
   | Fbinop (_,f1,f2) -> fnF (fnF acc f1) f2
   | Fnot f1 -> fnF acc f1
   | Ftrue | Ffalse -> acc
@@ -648,6 +659,68 @@ let t_any_unsafe prT prF t =
 let f_any_unsafe prT prF f =
   try f_fold_unsafe (any_fnT prT) (any_fnF prF) false f
   with FoldSkip -> true
+
+(* unsafe map_fold *)
+
+let bound_map_fold fnT fnE acc (u,b,e) =
+  let acc, b = bnd_map_fold fnT acc b in
+  let acc, e = fnE acc e in
+  acc, (u,b,e)
+
+let t_map_fold_unsafe fnT fnF acc t = match t.t_node with
+  | Tbvar _ | Tvar _ | Tconst _ ->
+      acc, t
+  | Tapp (f,tl) ->
+      let acc,tl = map_fold_left fnT acc tl in
+      acc, t_label_copy t (t_app f tl t.t_ty)
+  | Tif (f,t1,t2) ->
+      let acc, f  = fnF acc f in
+      let acc, t1 = fnT acc t1 in
+      let acc, t2 = fnT acc t2 in
+      acc, t_label_copy t (t_if f t1 t2)
+  | Tlet (e,b) ->
+      let acc, e = fnT acc e in
+      let acc, b = bound_map_fold fnT fnT acc b in
+      acc, t_label_copy t (t_let e b t.t_ty)
+  | Tcase (e,bl) ->
+      let acc, e = fnT acc e in
+      let acc, bl = map_fold_left (bound_map_fold fnT fnT) acc bl in
+      acc, t_label_copy t (t_case e bl t.t_ty)
+  | Teps b ->
+      let acc, b = bound_map_fold fnT fnF acc b in
+      acc, t_label_copy t (t_eps b t.t_ty)
+
+let f_map_fold_unsafe fnT fnF acc f = match f.f_node with
+  | Fapp (p,tl) ->
+      let acc,tl = map_fold_left fnT acc tl in
+      acc, f_label_copy f (f_app p tl)
+  | Fquant (q,(vl,b,tl,f1)) ->
+      let acc, b = bnd_map_fold fnT acc b in
+      let acc, tl = tr_map_fold fnT fnF acc tl in
+      let acc, f1 = fnF acc f1 in
+      acc, f_label_copy f (f_quant q (vl,b,tl,f1))
+  | Fbinop (op,f1,f2) ->
+      let acc, f1 = fnF acc f1 in
+      let acc, f2 = fnF acc f2 in
+      acc, f_label_copy f (f_binary op f1 f2)
+  | Fnot f1 ->
+      let acc, f1 = fnF acc f1 in
+      acc, f_label_copy f (f_not f1)
+  | Ftrue | Ffalse ->
+      acc, f
+  | Fif (f1,f2,f3) ->
+      let acc, f1 = fnF acc f1 in
+      let acc, f2 = fnF acc f2 in
+      let acc, f3 = fnF acc f3 in
+      acc, f_label_copy f (f_if f1 f2 f3)
+  | Flet (e,b) ->
+      let acc, e = fnT acc e in
+      let acc, b = bound_map_fold fnT fnF acc b in
+      acc, f_label_copy f (f_let e b)
+  | Fcase (e,bl) ->
+      let acc, e = fnT acc e in
+      let acc, bl = map_fold_left (bound_map_fold fnT fnF) acc bl in
+      acc, f_label_copy f (f_case e bl)
 
 (* replaces variables with de Bruijn indices in term [t] using map [m] *)
 
@@ -1193,6 +1266,58 @@ let t_any prT prF t =
 
 let f_any prT prF f =
   try f_fold (any_fn prT) (any_fn prF) false f with FoldSkip -> true
+
+(* safe opening map_fold *)
+
+let t_bound fn acc b =
+  let u,t,close = t_open_bound_cb  b in let acc,t = fn acc t in acc, close u t
+
+let f_bound fn acc b =
+  let u,f,close = f_open_bound_cb  b in let acc,f = fn acc f in acc, close u f
+
+let t_branch fn acc b =
+  let p,t,close = t_open_branch_cb b in let acc,t = fn acc t in acc, close p t
+
+let f_branch fn acc b =
+  let p,f,close = f_open_branch_cb b in let acc,f = fn acc f in acc, close p f
+
+let t_map_fold fnT fnF acc t = match t.t_node with
+  | Tlet (e,b) ->
+      let acc, e = fnT acc e in
+      let acc, b = t_bound fnT acc b in
+      acc, t_label_copy t (t_let e b)
+  | Tcase (e,bl) ->
+      let acc, e = fnT acc e in
+      let acc, bl = map_fold_left (t_branch fnT) acc bl in
+      acc, t_label_copy t (t_case e bl)
+  | Teps b ->
+      let acc, b = f_bound fnF acc b in
+      acc, t_label_copy t (t_eps b)
+  | _ -> t_map_fold_unsafe fnT fnF acc t
+
+let f_map_fold fnT fnF acc f = match f.f_node with
+  | Fquant (q,b) ->
+      let vl,tl,f1,close = f_open_quant_cb b in
+      let acc, tl = tr_map_fold fnT fnF acc tl in
+      let acc, f1 = fnF acc f1 in
+      acc, f_label_copy f (f_quant q (close vl tl f1))
+  | Flet (e,b) ->
+      let acc, e = fnT acc e in
+      let acc, b = f_bound fnF acc b in
+      acc, f_label_copy f (f_let e b)
+  | Fcase (e,bl) ->
+      let acc, e = fnT acc e in
+      let acc, bl = map_fold_left (f_branch fnF) acc bl in
+      acc, f_label_copy f (f_case e bl)
+  | _ -> f_map_fold_unsafe fnT fnF acc f
+
+let protect_fold fn acc t =
+  let acc,res = fn acc t in
+  check_ty_equal t.t_ty res.t_ty;
+  acc,res
+
+let t_map_fold fnT = t_map_fold (protect_fold fnT)
+let f_map_fold fnT = f_map_fold (protect_fold fnT)
 
 (* continuation-passing traversal *)
 
