@@ -25,3 +25,5 @@ val split_neg : Term.fmla list -> Term.fmla -> Term.fmla list
 val split_goal : Task.task Trans.tlist
 val split_all  : Task.task Trans.tlist
 
+val right_split : Task.task Trans.tlist
+

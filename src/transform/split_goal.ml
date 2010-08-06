@@ -121,3 +121,42 @@ let () = Trans.register_transform_l "split_goal"    split_goal
 let () = Trans.register_transform_l "split_all"     split_all
 let () = Trans.register_transform   "split_premise" split_premise
 
+let ls_of_var v =
+  create_fsymbol (id_fresh ("spl_" ^ v.vs_name.id_string)) [] v.vs_ty
+
+let rec rsplit pr dl acc f =
+  let rsp = rsplit pr dl in
+  match f.f_node with
+  | Ftrue -> acc
+  | Fbinop (Fand,f1,f2) when List.mem asym_split f.f_label ->
+      rsp (rsp acc (f_implies f1 f2)) f1
+  | Fbinop (Fand,f1,f2) ->
+      rsp (rsp acc f2) f1
+  | Fbinop (Fimplies,f1,f2) ->
+      let pp = create_prsymbol (id_fresh (pr.pr_name.id_string ^ "_spl")) in
+      let dl = create_prop_decl Paxiom pp f1 :: dl in
+      rsplit pr dl acc f2
+  | Fbinop (Fiff,f1,f2) ->
+      rsp (rsp acc (f_implies f1 f2)) (f_implies f2 f1)
+  | Fif (fif,fthen,felse) ->
+      rsp (rsp acc (f_implies fif fthen)) (f_implies (f_not fif) felse)
+  | Flet (t,fb) -> let vs,f = f_open_bound fb in
+      let ls = ls_of_var vs in
+      let f  = f_subst_single vs (t_app ls [] vs.vs_ty) f in
+      let dl = create_logic_decl [make_fs_defn ls [] t] :: dl in
+      rsplit pr dl acc f
+  | Fquant (Fforall,fq) -> let vsl,_,f = f_open_quant fq in
+      let lls = List.map ls_of_var vsl in
+      let add s vs ls = Mvs.add vs (t_app ls [] vs.vs_ty) s in
+      let f = f_subst (List.fold_left2 add Mvs.empty vsl lls) f in
+      let add dl ls = create_logic_decl [ls, None] :: dl in
+      let dl = List.fold_left add dl lls in
+      rsplit pr dl acc f
+  | _ ->
+      let goal f = List.rev (create_prop_decl Pgoal pr f :: dl) in
+      List.rev_append (List.rev_map goal (split_pos [] f)) acc
+
+let right_split = Trans.goal_l (fun pr f -> rsplit pr [] [] f)
+
+let () = Trans.register_transform_l "right_split" right_split
+
