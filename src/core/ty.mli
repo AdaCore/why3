@@ -89,6 +89,8 @@ exception TypeMismatch of ty * ty
 val ty_match : ty Mtv.t -> ty -> ty -> ty Mtv.t
 val ty_inst  : ty Mtv.t -> ty -> ty
 
+val ty_freevars : Stv.t -> ty -> Stv.t
+
 (* built-in symbols *)
 
 val ts_int  : tysymbol
@@ -101,3 +103,4 @@ val ts_tuple : int -> tysymbol
 val ty_tuple : ty list -> ty
 
 val is_ts_tuple : tysymbol -> bool
+

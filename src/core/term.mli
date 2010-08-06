@@ -423,6 +423,11 @@ val f_ty_subst : ty Mtv.t -> term Mvs.t -> fmla -> fmla
 val t_freevars : Svs.t -> term -> Svs.t
 val f_freevars : Svs.t -> fmla -> Svs.t
 
+(** set of free type variables *)
+
+val t_ty_freevars : Stv.t -> term -> Stv.t
+val f_ty_freevars : Stv.t -> fmla -> Stv.t
+
 (** equality modulo alpha *)
 
 val t_equal_alpha : term -> term -> bool

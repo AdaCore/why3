@@ -220,8 +220,8 @@ let pat_or p q =
 
 (* symbol-wise map/fold *)
 
-let rec pat_s_map fnT fnV fnL pat =
-  let fn p = pat_s_map fnT fnV fnL p in
+let rec pat_gen_map fnT fnV fnL pat =
+  let fn p = pat_gen_map fnT fnV fnL p in
   let ty = fnT pat.pat_ty in
   match pat.pat_node with
     | Pwild -> pat_wild ty
@@ -230,14 +230,15 @@ let rec pat_s_map fnT fnV fnL pat =
     | Pas (p, v) -> pat_as (fn p) (fnV v ty)
     | Por (p, q) -> pat_or (fn p) (fn q)
 
-let rec pat_s_fold fnT fnL acc pat =
-  let fn acc p = pat_s_fold fnT fnL acc p in
-  let acc = ty_s_fold fnT acc pat.pat_ty in
+let rec pat_gen_fold fnT fnV fnL acc pat =
+  let fn acc p = pat_gen_fold fnT fnV fnL acc p in
+  let acc = fnT acc pat.pat_ty in
   match pat.pat_node with
-    | Pwild | Pvar _ -> acc
+    | Pwild -> acc
+    | Pvar v -> fnV acc v
     | Papp (s, pl) -> List.fold_left fn (fnL acc s) pl
     | Por (p, q) -> fn (fn acc p) q
-    | Pas (p, _) -> fn acc p
+    | Pas (p, v) -> fn (fnV acc v) p
 
 (** Terms and formulas *)
 
@@ -1064,8 +1065,8 @@ let rec t_gen_map fnT fnB fnV fnL t =
         let t1 = fn_t t1 in
         t_let t1 (fnB u t1.t_ty, bnd_map fn_t b, fn_t t2)
     | Tcase (t1, bl) ->
-        let fn_b = t_branch fnT fnB fnV fnL in
-        t_case (fn_t t1) (List.map fn_b bl)
+        let br (p,b,t) = pat_gen_map fnT fnB fnL p, bnd_map fn_t b, fn_t t in
+        t_case (fn_t t1) (List.map br bl)
     | Teps (u,b,f) ->
         t_eps (fnB u ty, bnd_map fn_t b, fn_f f))
 
@@ -1085,18 +1086,8 @@ and f_gen_map fnT fnB fnV fnL f =
         let t1 = fn_t t in
         f_let t1 (fnB u t1.t_ty, bnd_map fn_t b, fn_f f1)
     | Fcase (t, bl) ->
-        let fn_b = f_branch fnT fnB fnV fnL in
-        f_case (fn_t t) (List.map fn_b bl))
-
-and t_branch fnT fnB fnV fnL (p,b,t) =
-  (pat_s_map fnT fnB fnL p,
-  bnd_map (t_gen_map fnT fnB fnV fnL) b,
-  t_gen_map fnT fnB fnV fnL t)
-
-and f_branch fnT fnB fnV fnL (p,b,f) =
-  (pat_s_map fnT fnB fnL p,
-  bnd_map (t_gen_map fnT fnB fnV fnL) b,
-  f_gen_map fnT fnB fnV fnL f)
+        let br (p,b,f) = pat_gen_map fnT fnB fnL p, bnd_map fn_t b, fn_f f in
+        f_case (fn_t t) (List.map br bl))
 
 let get_fnT fn =
   let ht = Hashtbl.create 17 in
@@ -1138,43 +1129,46 @@ let f_ty_subst mapT mapV f =
 
 (* fold over symbols *)
 
-let rec t_s_fold fnT fnL acc t =
-  let fn_t = t_s_fold fnT fnL in
-  let fn_f = f_s_fold fnT fnL in
-  let acc = ty_s_fold fnT acc t.t_ty in
+let rec t_gen_fold fnT fnB fnV fnL acc t =
+  let fn_t = t_gen_fold fnT fnB fnV fnL in
+  let fn_f = f_gen_fold fnT fnB fnV fnL in
+  let acc = fnT acc t.t_ty in
   match t.t_node with
-  | Tbvar _ | Tvar _ | Tconst _ -> acc
+  | Tbvar _ | Tconst _ -> acc
+  | Tvar v -> fnV acc v
   | Tapp (f, tl) -> List.fold_left fn_t (fnL acc f) tl
   | Tif (f, t1, t2) -> fn_t (fn_t (fn_f acc f) t1) t2
-  | Tlet (t1, (_,b,t2)) -> fn_t (bnd_fold fn_t (fn_t acc t1) b) t2
-  | Tcase (t1, bl) -> List.fold_left (t_branch fnT fnL) (fn_t acc t1) bl
-  | Teps (_,b,f) -> fn_f (bnd_fold fn_t acc b) f
+  | Tlet (t1, (u,b,t2)) -> fn_t (bnd_fold fn_t (fn_t (fnB acc u) t1) b) t2
+  | Tcase (t1, bl) ->
+      let branch acc (p,b,t) =
+        fn_t (pat_gen_fold fnT fnB fnL (bnd_fold fn_t acc b) p) t in
+      List.fold_left branch (fn_t acc t1) bl
+  | Teps (u,b,f) -> fn_f (bnd_fold fn_t (fnB acc u) b) f
 
-and f_s_fold fnT fnL acc f =
-  let fn_t = t_s_fold fnT fnL in
-  let fn_f = f_s_fold fnT fnL in
-  let fn_v acc u = ty_s_fold fnT acc u.vs_ty in
+and f_gen_fold fnT fnB fnV fnL acc f =
+  let fn_t = t_gen_fold fnT fnB fnV fnL in
+  let fn_f = f_gen_fold fnT fnB fnV fnL in
   match f.f_node with
   | Fapp (p, tl) -> List.fold_left fn_t (fnL acc p) tl
   | Fquant (_, (vl,b,tl,f1)) ->
-      let acc = bnd_fold fn_t acc b in
+      let fn_v acc u = fnB (fnT acc u.vs_ty) u in
       let acc = List.fold_left fn_v acc vl in
-      fn_f (tr_fold fn_t fn_f acc tl) f1
+      fn_f (tr_fold fn_t fn_f (bnd_fold fn_t acc b) tl) f1
   | Fbinop (_, f1, f2) -> fn_f (fn_f acc f1) f2
   | Fnot f1 -> fn_f acc f1
   | Ftrue | Ffalse -> acc
   | Fif (f1, f2, f3) -> fn_f (fn_f (fn_f acc f1) f2) f3
-  | Flet (t, (_,b,f1)) -> fn_f (bnd_fold fn_t (fn_t acc t) b) f1
-  | Fcase (t, bl) -> List.fold_left (f_branch fnT fnL) (fn_t acc t) bl
+  | Flet (t, (u,b,f1)) -> fn_f (bnd_fold fn_t (fn_t (fnB acc u) t) b) f1
+  | Fcase (t, bl) ->
+      let branch acc (p,b,f) =
+        fn_f (pat_gen_fold fnT fnB fnL (bnd_fold fn_t acc b) p) f in
+      List.fold_left branch (fn_t acc t) bl
 
-and t_branch fnT fnL acc (p,b,t) =
-  let fn_t = t_s_fold fnT fnL in
-  fn_t (pat_s_fold fnT fnL (bnd_fold fn_t acc b) p) t
+let t_s_fold fnT fnL acc t =
+  t_gen_fold (ty_s_fold fnT) Util.const Util.const fnL acc t
 
-and f_branch fnT fnL acc (p,b,f) =
-  let fn_t = t_s_fold fnT fnL in
-  let fn_f = f_s_fold fnT fnL in
-  fn_f (pat_s_fold fnT fnL (bnd_fold fn_t acc b) p) f
+let f_s_fold fnT fnL acc f =
+  f_gen_fold (ty_s_fold fnT) Util.const Util.const fnL acc f
 
 let t_s_all prT prL t =
   try t_s_fold (all_fn prT) (all_fn prL) true t with FoldSkip -> false
@@ -1187,6 +1181,14 @@ let t_s_any prT prL t =
 
 let f_s_any prT prL f =
   try f_s_fold (any_fn prT) (any_fn prL) false f with FoldSkip -> true
+
+(* free type variables *)
+
+let t_ty_freevars s t =
+  t_gen_fold ty_freevars Util.const Util.const Util.const s t
+
+let f_ty_freevars s f =
+  f_gen_fold ty_freevars Util.const Util.const Util.const s f
 
 (* safe opening map *)
 

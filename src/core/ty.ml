@@ -150,6 +150,10 @@ let rec tv_inst m ty = match ty.ty_node with
   | Tyvar n -> Mtv.find n m
   | _ -> ty_map (tv_inst m) ty
 
+let rec ty_freevars s ty = match ty.ty_node with
+  | Tyvar n -> Stv.add n s
+  | _ -> ty_fold ty_freevars s ty
+
 let ty_app s tl =
   let tll = List.length tl in
   let stl = List.length s.ts_args in
@@ -209,7 +213,7 @@ let ts_real = create_tysymbol (id_fresh "real") [] None
 let ty_int  = ty_app ts_int  []
 let ty_real = ty_app ts_real []
 
-let ts_tuple n = 
+let ts_tuple n =
   let vl = ref [] in
   for i = 1 to n do vl := create_tvsymbol (id_fresh "a") :: !vl done;
   create_tysymbol (id_fresh ("tuple" ^ string_of_int n)) !vl None
