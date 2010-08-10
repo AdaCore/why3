@@ -23,6 +23,8 @@ let ($) f x = f x
 
 let const f _ = f
 
+let flip f x y = f y x
+
 (* useful option combinators *)
 
 let of_option = function None -> assert false | Some x -> x

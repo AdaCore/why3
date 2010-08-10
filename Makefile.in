@@ -473,7 +473,7 @@ DIR_DRIVERS := drivers/
 DRIVERS := z3_inst cvc3_inst
 DRIVERS := $(DRIVERS) $(addsuffix _def, $(DRIVERS)) \
 	$(addsuffix _goal, $(DRIVERS)) $(addsuffix _mono, $(DRIVERS))
-DRIVERS := $(DRIVERS) $(addsuffix _nbp, $(DRIVERS))
+DRIVERS := $(DRIVERS) $(addsuffix _incomplete, $(DRIVERS))
 DRIVERS := $(addsuffix .drv, $(DRIVERS))
 DRIVERS := $(addprefix $(DIR_DRIVERS), $(DRIVERS))
 

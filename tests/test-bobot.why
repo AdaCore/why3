@@ -32,9 +32,9 @@ end
 *)
 
 theory Test_simplify_array
-  use import array.Array
+  use import array.ArrayPoly
   goal G : forall x y:int. forall m: t int int. 
-    select (store m y x) y = x
+    get (set m y x) y = x
 end 
 
 theory Test_conjunction

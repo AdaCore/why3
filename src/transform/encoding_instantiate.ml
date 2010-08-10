@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*
+
 open Util
 open Ident
 open Ty
@@ -26,6 +26,9 @@ open Task
 open Theory
 open Task
 open Decl
+
+
+let meta_kept = register_meta "encoding_instantiate : kept" [MTtysymbol]
 
 (* Ce type est utiliser pour indiquer un alpha *)
 let tv_dumb = create_tvsymbol (id_fresh "instantiate_alpha") 
@@ -239,12 +242,12 @@ let rec rewrite_term menv tvar vsvar t =
       deco_res menv app ty
     | Tif(f, t1, t2) ->
       t_if (fnF vsvar f) (fnT vsvar t1) (fnT vsvar t2)
-    | Tlet (t1, b) -> let u,t2 = t_open_bound b in
+    | Tlet (t1, b) -> let u,t2,cb = t_open_bound_cb b in
       let (vsvar',u) = conv_vs_let menv tvar vsvar u in
-      let t1' = fnT vsvar t1 in let t2' = fnT vsvar' t2 in
-      if t_equal t1' t1 && t_equal t2' t2 then t else t_let u t1' t2'
+      let t1 = fnT vsvar t1 in let t2 = fnT vsvar' t2 in
+      t_let t1 (cb u t2)
     | Tcase _ | Teps _ | Tbvar _ ->
-      Register.unsupportedTerm t
+      Printer.unsupportedTerm t
         "Encoding instantiate : I can't encode this term"
 
 and rewrite_fmla menv tvar vsvar f = 
@@ -257,23 +260,20 @@ and rewrite_fmla menv tvar vsvar f =
       let p = find_logic menv p tyl None in
       f_app p tl'
     | Fquant(q, b) -> 
-      let vl, tl, f1 = f_open_quant b in
+      let vl, tl, f1, cb = f_open_quant_cb b in
       let vsvar,vl = map_fold_left (conv_vs menv tvar) vsvar vl in
       
-      let f1' = fnF vsvar f1 in 
+      let f1 = fnF vsvar f1 in 
       (* Ici un trigger qui ne match pas assez de variables 
          peut être généré *)
       let tl = tr_map (fnT vsvar) (fnF vsvar) tl in
-        (*if f_equal f1' f1 &&  vsvar' == vsvar (*&& tr_equal tl' tl*) then f
-        else *)
-          let vl = List.rev vl in
-          f_quant q vl tl f1'
-    | Flet (t1, b) -> let u,f2 = f_open_bound b in
+      let vl = List.rev vl in
+      f_quant q (cb vl tl f1)
+    | Flet (t1, b) -> let u,f2,cb = f_open_bound_cb b in
       let (vsvar',u) = conv_vs_let menv tvar vsvar u in
-      let t1' = fnT vsvar t1 in let f2' = fnF vsvar' f2 in
-      assert (u.vs_ty == t1'.t_ty);
-      (*if t_equal t1' t1 && f_equal f2' f2 then f else *)
-        f_let u t1' f2'
+      let t1 = fnT vsvar t1 and f2 = fnF vsvar' f2 in
+      assert (u.vs_ty == t1.t_ty);
+      f_let t1 (cb u f2)
     | _ -> f_map (fnT vsvar) (fnF vsvar) f
 
 (* Generation of all the possible instantiation of a formula *)
@@ -337,19 +337,19 @@ let fold_map task_hd ((env:env),task) =
     | Dtype [_,Tabstract] -> (env,task)
     (* Nothing here since the type kept are already defined and the other 
        will be lazily defined *)
-    | Dtype _ -> Register.unsupportedDecl 
+    | Dtype _ -> Printer.unsupportedDecl 
         d "encoding_decorate : I can work only on abstract\
             type which are not in recursive bloc."
     | Dlogic l ->
         let fn = function
           | _, Some _ -> 
-              Register.unsupportedDecl 
+              Printer.unsupportedDecl 
                 d "encoding_decorate : I can't encode definition. \
 Perhaps you could use eliminate_definition"
           | _, None -> () in
             (* Noting here since the logics are lazily defined *)
             List.iter fn l; (env,task)
-    | Dind _ -> Register.unsupportedDecl
+    | Dind _ -> Printer.unsupportedDecl
         d "encoding_decorate : I can't work on inductive"
         (* let fn (pr,f) = pr, fnF f in *)
         (* let fn (ps,l) = ps, List.map fn l in *)
@@ -372,7 +372,7 @@ Perhaps you could use eliminate_definition"
         (*Format.eprintf "f : %a env : %a@." Pretty.print_fmla f
           print_env menv;*)
         let tvl = Mtv.fold (fun _ vs acc -> vs::acc) tvar.tvar_term [] in
-        let f = f_forall tvl [] f in
+        let f = f_forall_close tvl [] f in
         let pr = 
           if tvarl_len = 1 then pr 
           else create_prsymbol (id_clone pr.pr_name) in
@@ -395,18 +395,9 @@ Perhaps you could use eliminate_definition"
       },
       List.fold_left conv_f task tvarl
 
-(* A Pre-transformation to work on monomorphic goal *)
-let on_goal fn =
-  let fn task = match task with
-    | Some {Task.task_decl = { td_node =
-          Decl ({d_node = Decl.Dprop (Pgoal,pr,fmla)})};
-           task_prev = task_prev} -> 
-        (List.fold_left Task.add_decl) task_prev (fn pr fmla)
-    | _ -> assert false in
-  Trans.store fn
 
 let monomorphise_goal =
-  on_goal (fun pr f ->
+  Trans.goal (fun pr f ->
     let stv = ty_quant f in
     let mty,ltv = Stv.fold (fun tv (mty,ltv) -> 
       let ts = create_tysymbol (id_clone tv.tv_name) [] None in
@@ -417,8 +408,6 @@ let monomorphise_goal =
       (fun acc ts -> (create_ty_decl [ts,Tabstract]) :: acc)
       acc ltv in
     acc)
-
-let monomorphise_goal = Trans.store (fun () -> monomorphise_goal)
 
 (* The prelude for the complete transformation *)
 let load_prelude env =
@@ -434,9 +423,27 @@ let load_prelude env =
     sort = sort;
     ty = ty}
 
+
+let collect_green_part tds =
+  (* int and real are always taken in the green part (the constants
+     can't be written otherwise). Trigger that only when Int or Real
+     theory is used should not be sufficient. *)
+  let sts = Sts.add ts_int (Sts.singleton ts_real) in
+  let sts = Task.find_tagged_ts meta_kept tds sts in
+  let extract ts tys = 
+    assert (ts.ts_args = []); (* UnsupportedTySymbol? *)
+    Sty.add (match ts.ts_def with
+      | None -> ty_app ts []
+      | Some ty -> ty) tys in
+  let sty = Sts.fold extract sts Sty.empty in
+  (* complete by subterm *)
+  let rec subty sty ty = ty_fold subty (Sty.add ty sty) ty in
+  Sty.fold (flip subty) sty Sty.empty
+
+
 (* Some general env creation function *) 
-let create_env task tenv sty =
-  let keep = sty in
+let create_env task tenv tds =
+  let keep = collect_green_part tds in
   let projty = Sty.fold (fun ty ty_ty -> 
     let ty2 = match ty.ty_node with 
       | Tyapp (_,[]) -> ty
@@ -458,68 +465,30 @@ let create_env task tenv sty =
     edefined_tsymbol = Mts.empty
   }
 
-
-let create_env_complete env sty =
+let create_trans_complete env tds =
   let task,tenv = load_prelude env in
-  create_env task (Tenv tenv) sty
+  let init_task,env = create_env task (Tenv tenv) tds in
+  Trans.fold_map fold_map env init_task
 
-let create_env_nbp sty =
+let create_trans_incomplete tds =
   let task = use_export None builtin_theory in
   let tenv = No_black_part in
-  create_env task tenv sty
+  let init_task,env = create_env task tenv tds in
+  Trans.fold_map fold_map env init_task
 
-let register_transform name create_env =
-  let t = Trans.store_query
-    (fun query ->
-       Trans.store 
-         (fun task ->
-            let task = Register.apply monomorphise_goal task in
-            let drv = Driver.query_driver query in
-            let env = Driver.query_env query in
-            let init_task,env = create_env env drv task in
-            Trans.apply (Trans.fold_map fold_map env init_task) task)) in
-  Trans.register_transform name t
+let encoding_gen get_kept env =
+  Trans.compose monomorphise_goal (
+    Trans.compose get_kept
+      (Trans.on_meta meta_kept (create_trans_complete env)))
 
-(* The most simple configuration takes only the tag keep into account *)
-let is_kept query ts = 
-  ts.ts_args = [] &&  
-    begin
-      ts_equal ts ts_int || ts_equal ts ts_real  (* for the constant *)
-      || let tags = Driver.query_tags query ts.ts_name in
-         Sstr.mem Encoding_decorate.kept_tag tags
-    end
 
-let fold_decl f = 
-  Trans.fold (fun task_hd acc ->
-    match task_hd.task_decl.td_node with
-      | Use _ | Clone _ | Meta _ -> acc
-      | Decl d -> f d acc)
-
-let look_for_keep query d sty =
-  match d.d_node with
-    | Dtype [ts,Tabstract] -> 
-        if is_kept query ts then Sty.add (ty_app ts []) sty else sty
-    | Dtype _ -> Register.unsupportedDecl 
-        d "encoding_decorate : I can work only on abstract\
-            type which are not in recursive bloc."
-    | _ -> sty
-
-let look_for_keep =
-  Trans.store_query
-    (fun query -> fold_decl (look_for_keep query) Sty.empty)
-
-let () = register_transform "encoding_instantiate"
-  (fun env drv task -> 
-     let sty = Register.apply_driver look_for_keep drv task in
-     create_env_complete env sty)
-
-let () = register_transform "encoding_instantiate_nbp"
-  (fun _ drv task -> 
-     let sty = Register.apply_driver look_for_keep drv task in
-     create_env_nbp sty)
+let encoding_gen_incomplete get_kept = 
+  Trans.compose monomorphise_goal
+    (Trans.compose get_kept
+       (Trans.on_meta meta_kept create_trans_incomplete))
 
 (* This one take use the tag but also all the type which appear in the goal *)
-let is_ty_mono ~only_mono ty = 
+let is_ty_mono ~only_mono ty =
   try
     let rec check () ty = match ty.ty_node with
       | Tyvar _ -> raise Exit
@@ -528,75 +497,59 @@ let is_ty_mono ~only_mono ty =
     true
   with Exit when not only_mono -> false
 
-let find_mono ~only_mono sty f = 
+let find_mono ~only_mono sty f =
   let add sty ty = if is_ty_mono ~only_mono ty then Sty.add ty sty else sty in
   f_fold_ty add sty f
 
-let mono_in_goal d sty =
-  match d.d_node with
-    | Dprop (Pgoal,_,f) -> 
-        (try find_mono ~only_mono:true sty f
-         with Exit -> assert false) (*monomorphise goal should have been used*)
-    | _ -> sty
+let create_meta_ty ty acc =
+  let name = id_fresh "meta_ty" in
+  let ts = create_tysymbol name [] (Some ty) in
+  (create_meta meta_kept [MAts ts])::acc
 
-let mono_in_goal =
-  Trans.store (fun () -> fold_decl mono_in_goal Sty.empty)
+let create_meta_tyl sty d =
+  Sty.fold create_meta_ty sty [create_decl d]
 
-let () = register_transform "encoding_instantiate_goal"
-  (fun env drv task -> 
-     let sty1 = Register.apply_driver look_for_keep drv task in
-     let sty2 = Register.apply mono_in_goal task in
-     create_env_complete env (Sty.union sty1 sty2))
+let mono_in_goal pr f =
+  let sty = (try find_mono ~only_mono:true Sty.empty f
+    with Exit -> assert false) (*monomorphise goal should have been used*) in
+   create_meta_tyl sty (create_prop_decl Pgoal pr f)
 
-let () = register_transform "encoding_instantiate_goal_nbp"
-  (fun _ drv task -> 
-     let sty1 = Register.apply_driver look_for_keep drv task in
-     let sty2 = Register.apply mono_in_goal task in
-     create_env_nbp (Sty.union sty1 sty2))
+let mono_in_goal = Trans.tgoal mono_in_goal
 
 (* This one use the tag and also all the type in all the definition *)
-let mono_in_def d sty =
+let mono_in_def d =
   match d.d_node with
-    | Dprop (_,_,f) -> find_mono ~only_mono:false sty f
-    | _ -> sty
+    | Dprop (_,_,f) -> let sty = find_mono ~only_mono:false Sty.empty f in
+                       create_meta_tyl sty d
+    | _ -> [create_decl d]
 
-let mono_in_def =
-  Trans.store (fun () -> fold_decl mono_in_def Sty.empty)
+let mono_in_def = Trans.tdecl mono_in_def None
 
-let () = register_transform "encoding_instantiate_def"
-  (fun env drv task -> 
-     let sty1 = Register.apply_driver look_for_keep drv task in
-     let sty2 = Register.apply mono_in_def task in
-     create_env_complete env (Sty.union sty1 sty2))
-
-let () = register_transform "encoding_instantiate_def_nbp"
-  (fun _ drv task -> 
-     let sty1 = Register.apply_driver look_for_keep drv task in
-     let sty2 = Register.apply mono_in_def task in
-     create_env_nbp (Sty.union sty1 sty2))
-
-(* This one use the tag and also all ther type in all the 
+(* This one use the tag and also all ther type in all the
    monomorphic definition*)
-let mono_in_mono d sty =
+let mono_in_mono d =
   match d.d_node with
-    | Dprop (_,_,f) -> 
-        (try find_mono ~only_mono:true sty f
-         with Exit -> sty)
-    | _ -> sty
+    | Dprop (_,_,f) ->
+        (try let sty = find_mono ~only_mono:true Sty.empty f in
+             create_meta_tyl sty d
+         with Exit -> [create_decl d])
+    | _ -> [create_decl d]
 
-let mono_in_mono =
-  Trans.store (fun () -> fold_decl mono_in_mono Sty.empty)
+let mono_in_mono = Trans.tdecl mono_in_mono None
 
-let () = register_transform "encoding_instantiate_mono"
-  (fun env drv task -> 
-     let sty1 = Register.apply_driver look_for_keep drv task in
-     let sty2 = Register.apply mono_in_mono task in
-     create_env_complete env (Sty.union sty1 sty2))
+let () =
+  List.iter (fun (name,get_kept) -> 
+    Trans.register_env_transform name (encoding_gen get_kept))
+    ["encoding_instantiate",Trans.identity;
+     "encoding_instantiate_goal", mono_in_goal;
+     "encoding_instantiate_def", mono_in_def;
+     "encoding_instantiate_mono", mono_in_mono]
 
-let () = register_transform "encoding_instantiate_mono_nbp"
-  (fun _ drv task -> 
-     let sty1 = Register.apply_driver look_for_keep drv task in
-     let sty2 = Register.apply mono_in_mono task in
-     create_env_nbp (Sty.union sty1 sty2))
 
-*)
+let () =
+  List.iter (fun (name,get_kept) -> 
+    Trans.register_transform name (encoding_gen_incomplete get_kept))
+    ["encoding_instantiate_incomplete",Trans.identity;
+     "encoding_instantiate_goal_incomplete", mono_in_goal;
+     "encoding_instantiate_def_incomplete", mono_in_def;
+     "encoding_instantiate_mono_incomplete", mono_in_mono]

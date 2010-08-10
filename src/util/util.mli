@@ -23,6 +23,8 @@ val ($) : ('a -> 'b) -> 'a -> 'b
 
 val const : 'a -> 'b -> 'a
 
+val flip : ('a -> 'b -> 'c) -> 'b -> 'a -> 'c
+
 (* useful option combinators *)
 
 val of_option : 'a option -> 'a
