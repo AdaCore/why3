@@ -29,6 +29,8 @@ open Decl
 
 
 let meta_kept = register_meta "encoding_instantiate : kept" [MTtysymbol]
+let meta_level = register_meta_excl "encoding_instantiate : level" [MTstring]
+
 
 (* Ce type est utiliser pour indiquer un alpha *)
 let tv_dumb = create_tvsymbol (id_fresh "instantiate_alpha") 
@@ -542,7 +544,7 @@ let () =
     Trans.register_env_transform name (encoding_gen get_kept))
     ["encoding_instantiate",Trans.identity;
      "encoding_instantiate_goal", mono_in_goal;
-     "encoding_instantiate_def", mono_in_def;
+     "encoding_instantiate_all", mono_in_def;
      "encoding_instantiate_mono", mono_in_mono]
 
 
@@ -551,5 +553,5 @@ let () =
     Trans.register_transform name (encoding_gen_incomplete get_kept))
     ["encoding_instantiate_incomplete",Trans.identity;
      "encoding_instantiate_goal_incomplete", mono_in_goal;
-     "encoding_instantiate_def_incomplete", mono_in_def;
+     "encoding_instantiate_all_incomplete", mono_in_def;
      "encoding_instantiate_mono_incomplete", mono_in_mono]

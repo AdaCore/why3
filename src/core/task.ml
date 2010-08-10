@@ -57,7 +57,7 @@ let mm_find mm t =
 
 let cm_add cm th td = Mid.add th.th_name (tds_add td (cm_find cm th)) cm
 
-let mm_add mm t td = if is_meta_exc t
+let mm_add mm t td = if is_meta_excl t
   then Mstr.add t (tds_singleton td) mm
   else Mstr.add t (tds_add td (mm_find mm t)) mm
 
@@ -193,8 +193,8 @@ let split_tdecl names (res,task) td = match td.td_node with
   | _ ->
       res, flat_tdecl task td
 
-let split_theory th names =
-  fst (List.fold_left (split_tdecl names) ([],None) th.th_decls)
+let split_theory ?(init=None) th names =
+  fst (List.fold_left (split_tdecl names) ([],init) th.th_decls)
 
 (* Generic utilities *)
 
@@ -245,7 +245,7 @@ let find_tagged_pr t tds acc =
 exception NotExclusiveMeta of string
 
 let get_meta_exc t tds =
-  if not (is_meta_exc t) then raise (NotExclusiveMeta t);
+  if not (is_meta_excl t) then raise (NotExclusiveMeta t);
   Stdecl.fold (fun td _ -> match td.td_node with
     | Meta (s,_) when s = t -> Some td
     | _ -> assert false) tds.tds_set None

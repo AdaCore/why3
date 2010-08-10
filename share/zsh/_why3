@@ -29,6 +29,7 @@ _arguments -s -S \
      "(-L --library -I)"'-I'"[same as -L (obsolete)]:Mlpost lib path (obsolete use -L):_files -/  "\
      "(-D --driver -P -prover)"'-P'"[<prover> Prove or print (with -o) the selected goals]:<prover>:->provers"\
      "(-D --driver -P -prover)"'--prover'"[same as -P]:<prover>:->provers"\
+     '-M'"[<meta_name>,<string> Add a meta option to each tasks]:<meta_name>:->metas:<meta_arg>:"\
      "(-F --format)"'-F'"[<format> Input format (default: \"why\")]:<input format>:"\
      "(-F --format)"'--format'"[same as -F]:<input format>:"\
      "(-t --timelimit)"'-t'"[<sec> Set the prover\'s time limit (default=10, no limit=0)]:<timeout s>:"\
@@ -45,6 +46,7 @@ _arguments -s -S \
      '--list-printers'"[List the registered printers]"\
      '--list-provers'"[List the known provers]"\
      '--list-formats'"[List the known input formats]"\
+     '--list-metas'"[List the known metas]"\
      "(--type-only --parse-only -D --driver -P -prover -L --library -I -t --timelimit -m --memlimit)"'--parse-only'"[Stop after parsing]"\
      "(--type-only --parse-only -D --driver -P -prover -L --library -I -t --timelimit -m --memlimit)"'--type-only'"[Stop after type checking]"\
      '--debug'"[Set the debug flag]"\
@@ -68,6 +70,11 @@ case $state in
     provers)
         _message "<provers>"
         compadd $($cmd --list-provers | egrep -E "^  [a-z]"|cut -d' '  -f 3);
+        return 0
+        ;;
+    metas)
+        _message "<metas>"
+        compadd "$($cmd --list-metas | egrep -E "^  [a-z]" | sed "s/^[ ]*\(.*\)$/\1/")";
         return 0
         ;;
     theories)

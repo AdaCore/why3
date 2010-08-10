@@ -37,6 +37,7 @@ let opt_queue = Queue.create ()
 let opt_input = ref None
 let opt_theory = ref None
 let opt_trans = ref []
+let opt_metas = ref []
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -77,6 +78,9 @@ let add_opt_goal x = match !opt_theory with
 
 let add_opt_trans x = opt_trans := x::!opt_trans
 
+let add_opt_meta meta_name meta_arg =
+  opt_metas := (meta_name,meta_arg)::!opt_metas
+
 let opt_config = ref None
 let opt_parser = ref None
 let opt_prover = ref None
@@ -86,6 +90,7 @@ let opt_output = ref None
 let opt_timelimit = ref None
 let opt_memlimit = ref None
 let opt_command = ref None
+let opt_task = ref None
 
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
@@ -93,6 +98,7 @@ let opt_list_transforms = ref false
 let opt_list_printers = ref false
 let opt_list_provers = ref false
 let opt_list_formats = ref false
+let opt_list_metas = ref false
 
 let opt_parse_only = ref false
 let opt_type_only = ref false
@@ -135,6 +141,11 @@ let option_list = Arg.align [
       "<MiB> Set the prover's memory limit (default: no limit)";
   "--memlimit", Arg.Int (fun i -> opt_timelimit := Some i),
       " same as -m";
+  "-M", 
+  begin let meta_opt = ref "" in 
+        Arg.Tuple ([Arg.Set_string meta_opt;
+                    Arg.String (fun s -> add_opt_meta !meta_opt s)]) end,
+    "<meta_name>,<string> Add a meta option to each tasks";
   "-D", Arg.String (fun s -> opt_driver := Some s),
       "<file> Specify a prover's driver (conflicts with -P)";
   "--driver", Arg.String (fun s -> opt_driver := Some s),
@@ -155,6 +166,8 @@ let option_list = Arg.align [
       " List the known provers";
   "--list-formats", Arg.Set opt_list_formats,
       " List the known input formats";
+  "--list-metas", Arg.Set opt_list_metas,
+    " List the known metas option (currently only with one string argument)";
   "--parse-only", Arg.Set opt_parse_only,
       " Stop after parsing";
   "--type-only", Arg.Set opt_type_only,
@@ -169,6 +182,8 @@ let option_list = Arg.align [
 let () =
   Arg.parse option_list add_opt_file usage_msg;
 
+  (* TODO? : Since drivers can dynlink ml code they can add printer, 
+     transformations, ... So drivers should be loaded before listing *)
   if !opt_list_transforms then begin
     printf "@[<hov 2>Transed non-splitting transformations:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
@@ -197,9 +212,20 @@ let () =
     let print fmt m = Mstr.iter (print fmt) m in
     printf "@[<hov 2>Known provers:@\n%a@]@." print config.provers
   end;
-
+  if !opt_list_metas then begin
+    let metas = list_metas () in
+    let filter (s,args) =
+      match args with
+        | [MTstring] -> is_meta_excl s
+        | _ -> false in
+    let metas = List.filter filter metas in
+    let metas = List.map fst metas in
+    printf "@[<hov 2>Known metas:@\n%a@]@\n@."
+      (Pp.print_list Pp.newline Pp.string)
+      (List.sort String.compare metas)
+  end;
   if !opt_list_transforms || !opt_list_printers || !opt_list_provers ||
-     !opt_list_formats
+     !opt_list_formats || !opt_list_metas
   then exit 0;
 
   if Queue.is_empty opt_queue then begin
@@ -245,7 +271,7 @@ let () =
   opt_loadpath := List.rev_append !opt_loadpath config.loadpath;
   if !opt_timelimit = None then opt_timelimit := config.timelimit;
   if !opt_memlimit  = None then opt_memlimit  := config.memlimit;
-  match !opt_prover with
+  begin match !opt_prover with
   | Some s ->
       let prover = try Mstr.find s config.provers with
         | Not_found -> eprintf "Driver %s not found.@." s; exit 1
@@ -253,7 +279,9 @@ let () =
       opt_command := Some prover.command;
       opt_driver := Some prover.driver
   | None ->
-      ()
+    () end;
+  let add_meta task (meta,s) = add_meta task meta [MAstr s] in
+  opt_task := List.fold_left add_meta !opt_task !opt_metas
 
 let timelimit = match !opt_timelimit with
   | None -> 10
@@ -335,12 +363,12 @@ let do_theory env drv fname tname th trans glist =
     let drv = Util.of_option drv in
     if Queue.is_empty glist 
     then 
-      let tasks = List.rev (split_theory th None) in
+      let tasks = List.rev (split_theory ~init:!opt_task th None) in
       let do_tasks = do_tasks env drv fname tname th trans in
       List.iter do_tasks tasks
     else 
       let prtrans,prs = Queue.fold add ([],Decl.Spr.empty) glist in
-      let tasks = split_theory th (Some prs) in
+      let tasks = split_theory ~init:!opt_task th (Some prs) in
       let recover_pr mpr task =
         let pr = task_goal task in
         Decl.Mpr.add pr task mpr in

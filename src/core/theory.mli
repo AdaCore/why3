@@ -54,13 +54,13 @@ type meta_arg =
   | MAstr of string
   | MAint of int
 
-val register_meta     : string -> meta_arg_type list -> string
-val register_meta_exc : string -> meta_arg_type list -> string
+val register_meta      : string -> meta_arg_type list -> string
+val register_meta_excl : string -> meta_arg_type list -> string
 
-val lookup_meta : string -> meta_arg_type list
-val is_meta_exc : string -> bool
+val lookup_meta  : string -> meta_arg_type list
+val is_meta_excl : string -> bool
 
-val list_meta : unit -> string list
+val list_metas : unit -> (string * meta_arg_type list) list
 
 (** Theory *)
 

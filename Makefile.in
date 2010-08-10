@@ -471,7 +471,7 @@ install::
 DIR_DRIVERS := drivers/
 
 DRIVERS := z3_inst cvc3_inst
-DRIVERS := $(DRIVERS) $(addsuffix _def, $(DRIVERS)) \
+DRIVERS := $(DRIVERS) $(addsuffix _all, $(DRIVERS)) \
 	$(addsuffix _goal, $(DRIVERS)) $(addsuffix _mono, $(DRIVERS))
 DRIVERS := $(DRIVERS) $(addsuffix _incomplete, $(DRIVERS))
 DRIVERS := $(addsuffix .drv, $(DRIVERS))
