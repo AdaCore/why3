@@ -74,6 +74,13 @@ let create_lsymbol name args value = {
 let create_fsymbol nm al vl = create_lsymbol nm al (Some vl)
 let create_psymbol nm al    = create_lsymbol nm al (None)
 
+let ls_ty_freevars ls =
+  let acc = match ls.ls_value with
+    | None -> Stv.empty
+    | Some ty -> ty_freevars Stv.empty ty
+  in
+  List.fold_left ty_freevars acc ls.ls_args
+
 (** Patterns *)
 
 type pattern = {
@@ -950,29 +957,28 @@ let f_open_quant_cb fq =
 
 (* constructors with type checking *)
 
-let t_app_inst fs tl ty =
-  let s = match fs.ls_value with
-    | Some vty -> ty_match Mtv.empty vty ty
-    | _ -> raise (FunctionSymbolExpected fs)
+let ls_app_inst ls tl ty =
+  let s = match ls.ls_value, ty with
+    | Some _, None -> raise (PredicateSymbolExpected ls)
+    | None, Some _ -> raise (FunctionSymbolExpected ls)
+    | Some vty, Some ty -> ty_match Mtv.empty vty ty
+    | None, None -> Mtv.empty
   in
-  let mtch s ty t = ty_match s ty t.t_ty in
-  try List.fold_left2 mtch s fs.ls_args tl
-  with Invalid_argument _ -> raise (BadArity
-    (fs, List.length fs.ls_args, List.length tl))
-
-let f_app_inst ps tl =
-  let s = match ps.ls_value with
-    | None -> Mtv.empty
-    | _ -> raise (PredicateSymbolExpected ps)
+  let s =
+    let mtch s ty t = ty_match s ty t.t_ty in
+    try List.fold_left2 mtch s ls.ls_args tl
+    with Invalid_argument _ -> raise (BadArity
+     (ls, List.length ls.ls_args, List.length tl))
   in
-  let mtch s ty t = ty_match s ty t.t_ty in
-  try List.fold_left2 mtch s ps.ls_args tl
-  with Invalid_argument _ -> raise (BadArity
-    (ps, List.length ps.ls_args, List.length tl))
+  let add v acc = Mtv.add v (ty_inst s (ty_var v)) acc in
+  Stv.fold add (ls_ty_freevars ls) Mtv.empty
 
-let t_app fs tl ty = ignore (t_app_inst fs tl ty); t_app fs tl ty
+let fs_app_inst fs tl ty = ls_app_inst fs tl (Some ty)
+let ps_app_inst ps tl    = ls_app_inst ps tl None
 
-let f_app ps tl = ignore (f_app_inst ps tl); f_app ps tl
+let t_app fs tl ty = ignore (fs_app_inst fs tl ty); t_app fs tl ty
+
+let f_app ps tl = ignore (ps_app_inst ps tl); f_app ps tl
 
 let t_app_infer fs tl =
   let mtch s ty t = ty_match s ty t.t_ty in

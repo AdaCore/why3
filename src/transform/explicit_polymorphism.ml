@@ -64,28 +64,17 @@ module Transform = struct
       Hashtbl.add tbl id new_image;
       new_image
 
-  (** returns all type vars in given lsymbol *)
-  let l_find_type_vars l =
-    let acc = match l.ls_value with
-      | None -> Stv.empty
-      | Some ty -> ty_freevars Stv.empty ty in
-    let s = List.fold_left ty_freevars acc l.ls_args in
-    Stv.elements s
-
   (** creates a new logic symbol, with a different type if the
   given symbol was polymorphic *)
   let logic_to_logic lsymbol =
     if ls_equal lsymbol ps_equ || ls_equal lsymbol ps_neq then lsymbol else
-    let new_ty = l_find_type_vars lsymbol in
+    let new_ty = ls_ty_freevars lsymbol in
     (* as many t as type vars *)
-    if new_ty = [] then lsymbol (* same type *) else
-      let new_ty = List.map (const my_t) new_ty in
-      let all_new_ty = new_ty @ lsymbol.ls_args in
+    if Stv.is_empty new_ty then lsymbol (* same type *) else
+      let add _ acc = my_t :: acc in
+      let args = Stv.fold add new_ty lsymbol.ls_args in
       (* creates a new lsymbol with the same name but a different type *)
-      let new_lsymbol =
-        Term.create_lsymbol (id_clone lsymbol.ls_name)
-          all_new_ty lsymbol.ls_value in
-      new_lsymbol
+      Term.create_lsymbol (id_clone lsymbol.ls_name) args lsymbol.ls_value
 
   (** creates a lsymbol associated with the given tysymbol *)
   let type_to_logic ty =
@@ -116,37 +105,28 @@ module Transform = struct
   (** translation of terms *)
   let rec term_transform tblT tblL varM t = match t.t_node with
     | Tapp(f, terms) ->
-      let new_f = findL tblL f in
-      (* first, remember an order for type vars of new_f *)
-      let type_vars = l_find_type_vars f in
-      (* Debug.print_list Pretty.print_ty Format.std_formatter type_vars; *)
-      let tv_to_ty = t_app_inst f terms t.t_ty in
-      (* Debug.print_mtv Pretty.print_ty Format.err_formatter tv_to_ty; *)
-      (* fresh terms to be added at the beginning of the list of arguments *)
-      let find_ty v = ty_to_term tblT varM (ty_inst tv_to_ty (ty_var v)) in
-      let new_terms = List.map find_ty type_vars in
-      let transformed_terms = List.map (term_transform tblT tblL varM) terms in
-      t_app new_f (new_terms @ transformed_terms) t.t_ty
+      let terms = args_transform tblT tblL varM f terms (Some t.t_ty) in
+      t_app (findL tblL f) terms t.t_ty
     | _ -> (* default case : traverse *)
       t_map (term_transform tblT tblL varM) (fmla_transform tblT tblL varM) t
 
   (** translation of formulae *)
   and fmla_transform tblT tblL varM f = match f.f_node with
-      (* first case : predicate (not = or <>), we must translate it and its args *)
-    | Fapp(p,terms) when (not (ls_equal p ps_equ)) && not(ls_equal p ps_neq) ->
-      let new_p = findL tblL p in
-      (* first, remember an order for type vars of new_f *)
-      let type_vars = l_find_type_vars p in
-      (* Debug.print_list Pretty.print_ty Format.std_formatter type_vars; *)
-      let tv_to_ty = f_app_inst p terms in
-      (* Debug.print_mtv Pretty.print_ty Format.err_formatter tv_to_ty; *)
-      (* fresh terms to be added at the beginning of the list of arguments *)
-      let find_ty v = ty_to_term tblT varM (ty_inst tv_to_ty (ty_var v)) in
-      let new_terms = List.map find_ty type_vars in
-      let transformed_terms = List.map (term_transform tblT tblL varM) terms in
-      f_app new_p (new_terms @ transformed_terms)
+      (* first case : predicate (not =), we must translate it and its args *)
+    | Fapp(p,terms) when not (ls_equal p ps_equ || ls_equal p ps_neq) ->
+      let terms = args_transform tblT tblL varM p terms None in
+      f_app (findL tblL p) terms
     | _ -> (* otherwise : just traverse and translate *)
       f_map (term_transform tblT tblL varM) (fmla_transform tblT tblL varM) f
+
+  and args_transform tblT tblL varM ls args ty =
+    (* Debug.print_list Pretty.print_ty Format.std_formatter type_vars; *)
+    let tv_to_ty = ls_app_inst ls args ty in
+    (* Debug.print_mtv Pretty.print_ty Format.err_formatter tv_to_ty; *)
+    let args = List.map (term_transform tblT tblL varM) args in
+    (* fresh args to be added at the beginning of the list of arguments *)
+    let add _ ty acc = ty_to_term tblT varM ty :: acc in
+    Mtv.fold add tv_to_ty args
 
   (** transforms a list of logic declarations into another.
   Declares new lsymbols with explicit polymorphic signatures.
@@ -157,20 +137,19 @@ module Transform = struct
     let helper = function
     | (lsymbol, Some ldef) ->
       let new_lsymbol = findL tblL lsymbol in (* new lsymbol *)
-      let polymorphic_vars = l_find_type_vars lsymbol in
-      let new_vars = List.map
-        (fun _ -> Term.create_vsymbol (id_fresh "t") my_t)
-        polymorphic_vars in (* new vars for polymorphism *)
-      let varM = List.fold_left2 (fun m x v -> Mtv.add x v m)
-        Mtv.empty polymorphic_vars new_vars in
       let vars,expr = open_ls_defn ldef in
+      let add v (vl,vm) =
+        let vs = Term.create_vsymbol (id_fresh "t") my_t in
+        vs :: vl, Mtv.add v vs vm
+      in
+      let vars,varM = Stv.fold add (ls_ty_freevars lsymbol) (vars,Mtv.empty) in
       (match expr with
       | Term t ->
           let t = term_transform tblT tblL varM t in
-          Decl.make_fs_defn new_lsymbol (new_vars @ vars) t
+          Decl.make_fs_defn new_lsymbol vars t
       | Fmla f ->
           let f = fmla_transform tblT tblL varM f in
-          Decl.make_ps_defn new_lsymbol (new_vars @ vars) f)
+          Decl.make_ps_defn new_lsymbol vars f)
     | (lsymbol, None) ->
       let new_lsymbol = findL tblL lsymbol in
       (new_lsymbol, None) in

@@ -55,6 +55,8 @@ val create_lsymbol : preid -> ty list -> ty option -> lsymbol
 val create_fsymbol : preid -> ty list -> ty -> lsymbol
 val create_psymbol : preid -> ty list -> lsymbol
 
+val ls_ty_freevars : lsymbol -> Stv.t
+
 (** {2 Exceptions} *)
 
 exception EmptyCase
@@ -221,6 +223,12 @@ val f_open_quant_cb :
   fmla_quant -> vsymbol list * trigger list * fmla *
               (vsymbol list -> trigger list -> fmla -> fmla_quant)
 
+(** compute type instance *)
+
+val ls_app_inst : lsymbol -> term list -> ty option -> ty Mtv.t
+val fs_app_inst : lsymbol -> term list -> ty -> ty Mtv.t
+val ps_app_inst : lsymbol -> term list -> ty Mtv.t
+
 (** smart constructors for term *)
 
 val t_var : vsymbol -> term
@@ -237,7 +245,6 @@ val t_let_close : vsymbol -> term -> term -> term
 val t_eps_close : vsymbol -> fmla -> term
 
 val t_app_infer : lsymbol -> term list -> term
-val t_app_inst : lsymbol -> term list -> ty -> ty Mtv.t
 
 val t_label : label list -> term -> term
 val t_label_add : label -> term -> term
@@ -265,8 +272,6 @@ val f_let_close : vsymbol -> term -> fmla -> fmla
 val f_quant_close : quant -> vsymbol list -> trigger list -> fmla -> fmla
 val f_forall_close : vsymbol list -> trigger list -> fmla -> fmla
 val f_exists_close : vsymbol list -> trigger list -> fmla -> fmla
-
-val f_app_inst : lsymbol -> term list -> ty Mtv.t
 
 val f_label : label list -> fmla -> fmla
 val f_label_add : label -> fmla -> fmla
