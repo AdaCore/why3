@@ -72,10 +72,12 @@ theory TestEnco
   logic p2(mytype 'a) : 'a
   type toto
   logic f (toto) : mytype toto
+  axiom A0 : forall x : toto. f(x) = p(x)
   logic g (mytype int) : toto
-  logic h (int) : mytype toto
+  logic h (int) : toto
+  axiom A05 : forall x : int. g(p(x)) = h(x)
   axiom A1 : forall x : mytype 'a. p(p2(x)) = x
-  goal G2 : forall x:int. f(g(p(x))) = h(x)
+  goal G2 : forall x:mytype toto. f(p2(x)) = x
 end
 
 theory TestIte

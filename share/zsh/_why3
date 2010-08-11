@@ -29,7 +29,7 @@ _arguments -s -S \
      "(-L --library -I)"'-I'"[same as -L (obsolete)]:Mlpost lib path (obsolete use -L):_files -/  "\
      "(-D --driver -P -prover)"'-P'"[<prover> Prove or print (with -o) the selected goals]:<prover>:->provers"\
      "(-D --driver -P -prover)"'--prover'"[same as -P]:<prover>:->provers"\
-     '-M'"[<meta_name>,<string> Add a meta option to each tasks]:<meta_name>:->metas:<meta_arg>:"\
+     '*-M'"[<meta_name> <string> Add a meta option to each tasks]:<meta_name>:->metas:<meta_arg>:"\
      "(-F --format)"'-F'"[<format> Input format (default: \"why\")]:<input format>:"\
      "(-F --format)"'--format'"[same as -F]:<input format>:"\
      "(-t --timelimit)"'-t'"[<sec> Set the prover\'s time limit (default=10, no limit=0)]:<timeout s>:"\
@@ -63,18 +63,20 @@ last_theory=$last_theories[-1]
 
 case $state in
     transforms)
-        _message "<transformations>"
+        _message "<transformations>";
         compadd $($cmd --list-transforms | grep -e "^  ");
         return 0
         ;;
     provers)
-        _message "<provers>"
+        _message "<provers>";
         compadd $($cmd --list-provers | egrep -E "^  [a-z]"|cut -d' '  -f 3);
         return 0
         ;;
     metas)
-        _message "<metas>"
-        compadd "$($cmd --list-metas | egrep -E "^  [a-z]" | sed "s/^[ ]*\(.*\)$/'\1'/")";
+        _message "<metas>";
+        METAS="$($cmd --list-metas | egrep -E "^  [a-z]" | sed "s/^[ ]*//")";
+        METAS=(${(f)METAS});
+        compadd $METAS;
         return 0
         ;;
     theories)
