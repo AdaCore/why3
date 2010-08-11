@@ -397,7 +397,6 @@ module NsTree = struct
       Leaf (sprint_pkind k ^ " " ^ s) :: acc in
     let add_ls s ls acc =
       if s = "infix ="  && ls_equal ls ps_equ then acc else
-      if s = "infix <>" && ls_equal ls ps_neq then acc else
         Leaf ("logic " ^ s) :: acc
     in
     let add_ts s ts acc =

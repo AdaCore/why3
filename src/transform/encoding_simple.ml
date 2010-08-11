@@ -92,7 +92,7 @@ let conv_vs tenv vs =
 
 (* Convert a logic symbol to the encoded one *)
 let conv_ls tenv ls =
-  if ls_equal ls ps_equ || ls_equal ls ps_neq then ls
+  if ls_equal ls ps_equ then ls
   else try Hls.find tenv.trans_lsymbol ls with Not_found ->
   let ty_res = Util.option_map (conv_ty tenv) ls.ls_value in
   let ty_arg = List.map (conv_ty tenv) ls.ls_args in
@@ -146,7 +146,7 @@ and rewrite_fmla tenv vm f =
   let fnT = rewrite_term tenv in
   let fnF = rewrite_fmla tenv in
   match f.f_node with
-  | Fapp (ps,tl) when ls_equal ps ps_equ || ls_equal ps ps_neq ->
+  | Fapp (ps,tl) when ls_equal ps ps_equ ->
       f_app ps (List.map (fnT vm) tl)
   | Fapp (ps,tl) ->
       let ps = conv_ls tenv ps in

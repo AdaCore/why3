@@ -337,8 +337,6 @@ val f_s_any : (tysymbol -> bool) -> (lsymbol -> bool) -> fmla -> bool
 
 (* equality predicate *)
 val ps_equ : lsymbol
-(* inequality predicate *)
-val ps_neq : lsymbol
 
 val f_equ : term -> term -> fmla
 val f_neq : term -> term -> fmla

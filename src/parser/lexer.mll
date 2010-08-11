@@ -199,6 +199,8 @@ rule token = parse
       { BAR }
   | "="
       { EQUAL }
+  | "<>"
+      { LTGT }
   | "["
       { LEFTSQ }
   | "]"

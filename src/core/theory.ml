@@ -678,7 +678,6 @@ let builtin_theory =
   let uc = add_ty_decl uc [ts_int, Tabstract] in
   let uc = add_ty_decl uc [ts_real, Tabstract] in
   let uc = add_logic_decl uc [ps_equ, None] in
-  let uc = add_logic_decl uc [ps_neq, None] in
   close_theory uc
 
 let create_theory n = use_export (empty_theory n) builtin_theory

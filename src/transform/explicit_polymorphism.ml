@@ -67,7 +67,7 @@ module Transform = struct
   (** creates a new logic symbol, with a different type if the
   given symbol was polymorphic *)
   let logic_to_logic lsymbol =
-    if ls_equal lsymbol ps_equ || ls_equal lsymbol ps_neq then lsymbol else
+    if ls_equal lsymbol ps_equ then lsymbol else
     let new_ty = ls_ty_freevars lsymbol in
     (* as many t as type vars *)
     if Stv.is_empty new_ty then lsymbol (* same type *) else
@@ -113,7 +113,7 @@ module Transform = struct
   (** translation of formulae *)
   and fmla_transform tblT tblL varM f = match f.f_node with
       (* first case : predicate (not =), we must translate it and its args *)
-    | Fapp(p,terms) when not (ls_equal p ps_equ || ls_equal p ps_neq) ->
+    | Fapp(p,terms) when not (ls_equal p ps_equ) ->
       let terms = args_transform tblT tblL varM p terms None in
       f_app (findL tblL p) terms
     | _ -> (* otherwise : just traverse and translate *)

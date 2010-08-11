@@ -70,7 +70,7 @@
 %token ARROW ASYM_AND ASYM_OR
 %token BAR
 %token COLON COMMA
-%token DOT EQUAL
+%token DOT EQUAL LTGT
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
 %token LRARROW
 %token QUOTE
@@ -78,7 +78,6 @@
 %token UNDERSCORE
 
 %token EOF
-
 
 /* Precedences */
 
@@ -93,7 +92,7 @@
 %right OR ASYM_OR
 %right AND ASYM_AND
 %nonassoc NOT
-%left EQUAL OP1
+%left EQUAL LTGT OP1
 %left OP2
 %left OP3
 %left OP4
@@ -358,6 +357,9 @@ lexpr:
 | lexpr EQUAL lexpr
    { let id = { id = infix "="; id_loc = loc_i 2 } in
      mk_pp (PPinfix ($1, id, $3)) }
+| lexpr LTGT lexpr
+   { let id = { id = infix "="; id_loc = loc_i 2 } in
+     prefix_pp PPnot (mk_pp (PPinfix ($1, id, $3))) }
 | lexpr OP1 lexpr
    { let id = { id = infix $2; id_loc = loc_i 2 } in
      mk_pp (PPinfix ($1, id, $3)) }

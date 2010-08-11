@@ -577,15 +577,8 @@ let ps_equ =
   let v = ty_var (create_tvsymbol (id_fresh "a")) in
   create_psymbol (id_fresh "infix =") [v; v]
 
-let ps_neq =
-  let v = ty_var (create_tvsymbol (id_fresh "a")) in
-  create_psymbol (id_fresh "infix <>") [v; v]
-
-let f_app p tl =
-  if ls_equal p ps_neq then f_not (f_app ps_equ tl) else f_app p tl
-
 let f_equ t1 t2 = f_app ps_equ [t1; t2]
-let f_neq t1 t2 = f_app ps_neq [t1; t2]
+let f_neq t1 t2 = f_not (f_app ps_equ [t1; t2])
 
 let fs_tuple n =
   let tyl = ref [] in
@@ -1763,7 +1756,6 @@ let f_branch fn b = let p,f,close = f_open_branch_cb b in close p (fn f)
 
 let f_map_simp fnT fnF f = f_label_copy f (match f.f_node with
   | Fapp (p, [t1;t2]) when ls_equal p ps_equ -> f_equ_simp (fnT t1) (fnT t2)
-  | Fapp (p, [t1;t2]) when ls_equal p ps_neq -> f_neq_simp (fnT t1) (fnT t2)
   | Fapp (p, tl) -> f_app p (List.map fnT tl)
   | Fquant (q, b) ->
       let vl, tl, f1, close = f_open_quant_cb b in
