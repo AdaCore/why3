@@ -28,8 +28,12 @@ open Task
 open Decl
 
 
-let meta_kept = register_meta "encoding_instantiate : kept" [MTtysymbol]
-let meta_level = register_meta_excl "encoding_instantiate : level" [MTstring]
+let meta_kept = register_meta
+  "encoding_instantiate : kept" [MTtysymbol]
+let meta_level = register_meta_excl 
+  "encoding_instantiate : level" [MTstring]
+let meta_complete = register_meta_excl 
+  "encoding_instantiate : complete" [MTstring]
 
 
 (* Ce type est utiliser pour indiquer un alpha *)
@@ -420,10 +424,10 @@ let load_prelude env =
   let undeco = ty_app (Theory.ns_find_ts prelude.th_export ["undeco"]) [] in
   let task = None in
   let task = Task.use_export task prelude in
-  task,{ deco = deco;
-    undeco = undeco;
-    sort = sort;
-    ty = ty}
+  task,Tenv { deco = deco;
+              undeco = undeco;
+              sort = sort;
+              ty = ty}
 
 
 let collect_green_part tds =
@@ -466,28 +470,6 @@ let create_env task tenv tds =
     edefined_lsymbol = Mls.empty;
     edefined_tsymbol = Mts.empty
   }
-
-let create_trans_complete env tds =
-  let task,tenv = load_prelude env in
-  let init_task,env = create_env task (Tenv tenv) tds in
-  Trans.fold_map fold_map env init_task
-
-let create_trans_incomplete tds =
-  let task = use_export None builtin_theory in
-  let tenv = No_black_part in
-  let init_task,env = create_env task tenv tds in
-  Trans.fold_map fold_map env init_task
-
-let encoding_gen get_kept env =
-  Trans.compose monomorphise_goal (
-    Trans.compose get_kept
-      (Trans.on_meta meta_kept (create_trans_complete env)))
-
-
-let encoding_gen_incomplete get_kept = 
-  Trans.compose monomorphise_goal
-    (Trans.compose get_kept
-       (Trans.on_meta meta_kept create_trans_incomplete))
 
 (* This one take use the tag but also all the type which appear in the goal *)
 let is_ty_mono ~only_mono ty =
@@ -539,19 +521,33 @@ let mono_in_mono d =
 
 let mono_in_mono = Trans.tdecl mono_in_mono None
 
-let () =
-  List.iter (fun (name,get_kept) -> 
-    Trans.register_env_transform name (encoding_gen get_kept))
-    ["encoding_instantiate",Trans.identity;
-     "encoding_instantiate_goal", mono_in_goal;
-     "encoding_instantiate_all", mono_in_def;
-     "encoding_instantiate_mono", mono_in_mono]
+
+let get_kept =
+  Trans.on_meta meta_level (fun tds ->
+    match get_meta_exc meta_level tds with
+      | None | Some [MAstr "goal"] -> mono_in_goal
+      | Some [MAstr "kept"] -> Trans.identity
+      | Some [MAstr "all"] -> mono_in_def
+      | Some [MAstr "mono"] -> mono_in_mono
+      | _ -> failwith "instantiate level wrong argument")
 
 
-let () =
-  List.iter (fun (name,get_kept) -> 
-    Trans.register_transform name (encoding_gen_incomplete get_kept))
-    ["encoding_instantiate_incomplete",Trans.identity;
-     "encoding_instantiate_goal_incomplete", mono_in_goal;
-     "encoding_instantiate_all_incomplete", mono_in_def;
-     "encoding_instantiate_mono_incomplete", mono_in_mono]
+let create_trans_complete env metas =
+  let tds_kept = Mstr.find meta_kept metas in
+  let complete = get_meta_exc meta_complete (Mstr.find meta_complete metas) in
+  let task, tenv = match complete with
+    | None | Some [MAstr "yes"] -> load_prelude env
+    | Some [MAstr "no"] ->  
+      let task = use_export None builtin_theory in
+      let tenv = No_black_part in
+      task, tenv
+    | _ -> failwith "instantiate complete wrong argument" in
+  let init_task,env = create_env task tenv tds_kept in
+  Trans.fold_map fold_map env init_task
+
+let encoding env =
+  Trans.compose monomorphise_goal (
+    Trans.compose get_kept
+      (Trans.on_metas [meta_kept;meta_complete] (create_trans_complete env)))
+
+let () = Trans.register_env_transform "encoding_instantiate" encoding

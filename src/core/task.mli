@@ -107,7 +107,7 @@ val find_tagged_pr : string -> tdecl_set -> Spr.t -> Spr.t
 
 exception NotExclusiveMeta of string
 
-val get_meta_exc : string -> tdecl_set -> tdecl option
+val get_meta_exc : string -> tdecl_set -> meta_arg list option
 
 (* exceptions *)
 

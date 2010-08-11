@@ -470,10 +470,8 @@ install::
 #Only generated drivers
 DIR_DRIVERS := drivers/
 
-DRIVERS := z3_inst cvc3_inst
-DRIVERS := $(DRIVERS) $(addsuffix _all, $(DRIVERS)) \
-	$(addsuffix _goal, $(DRIVERS)) $(addsuffix _mono, $(DRIVERS))
-DRIVERS := $(DRIVERS) $(addsuffix _incomplete, $(DRIVERS))
+DRIVERS := z3_inst cvc3_inst z3_simple cvc3_simple
+
 DRIVERS := $(addsuffix .drv, $(DRIVERS))
 DRIVERS := $(addprefix $(DIR_DRIVERS), $(DRIVERS))
 

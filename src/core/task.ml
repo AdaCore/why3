@@ -247,7 +247,7 @@ exception NotExclusiveMeta of string
 let get_meta_exc t tds =
   if not (is_meta_excl t) then raise (NotExclusiveMeta t);
   Stdecl.fold (fun td _ -> match td.td_node with
-    | Meta (s,_) when s = t -> Some td
+    | Meta (s,arg) when s = t -> Some arg
     | _ -> assert false) tds.tds_set None
 
 (* Exception reporting *)

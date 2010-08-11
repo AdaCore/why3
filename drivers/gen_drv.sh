@@ -2,10 +2,21 @@
 
 DIR=drivers/
 
+
+
+replace (){
+ prover=$1;
+ suffix=$2;
+ src=$3
+ dst=$4
+ cat ${DIR}${prover}.drv |sed -e "s/${src}/${dst}/" > ${DIR}${prover}_${suffix}.drv
+}
+
 for prover in z3 cvc3; do
-    for what in "" _goal _mono _all; do
-        for complete in "" _incomplete; do
-            cat ${DIR}${prover}.drv |sed -e "s/transformation \"encoding_decorate\"/transformation \"encoding_instantiate$what$complete\"/" > ${DIR}${prover}_inst${what}${complete}.drv
-        done
-    done
+    replace $prover "inst" transformation\ \"encoding_decorate\" transformation\ \"encoding_instantiate\"
+done
+
+for prover in z3 cvc3; do
+    replace $prover "simple" transformation\ \"encoding_decorate\" \
+"transformation \"encoding_enumeration\"\ntransformation \"explicit_polymorphism\"\ntransformation \"encoding_simple_kept\""
 done
