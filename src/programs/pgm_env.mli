@@ -71,6 +71,8 @@ val purify : env -> type_v -> ty
 val apply_type_v     : env -> type_v -> vsymbol   -> type_c
 val apply_type_v_ref : env -> type_v -> reference -> type_c
 
+val occur_type_v : reference -> type_v -> bool
+
 val v_result : ty -> vsymbol
 
 val post_map : (fmla -> fmla) -> post -> post

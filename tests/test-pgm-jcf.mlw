@@ -1,34 +1,12 @@
 
-let foo () = 
-  {}
-  any {} int {result=2}  + 1
-  {result=3}
+let foo (x : ref int) (y : ref int) = 
+  x := 1;
+  y := 2
 
-let rec div x y variant {x} =
-  { 0 <= x and 0 < y }
-  if y < x then 
-    (0, x)
-  else 
-    let (q,r) = div (x-y) y in (q+1, r)
-  { let (q,r) = result in x = q*y + r and 0 <= r < x }
-
-{ 
-  type tree 'a = 
-     | Empty
-     | Node (tree 'a) 'a (tree 'a)
-}
-let rec mem x t = match t : tree int with
-  | Empty -> False
-  | Node l y r -> x=y || mem x (if x < y then l else r)
-  end
-
-let root t : 'a = 
-  { t <> Empty }
-  match t with
-  | Empty -> absurd
-  | Node _ x _ -> x
-  end
-  { }
+let test () =
+  let x = ref 0 in
+  let y = x in
+  foo x y
 
 (*
 Local Variables: 

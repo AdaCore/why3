@@ -903,6 +903,8 @@ and expr_desc gl env loc ty = function
       make_apply loc e1 ty c
   | IEapply_ref (e1, r) ->
       let e1 = expr gl env e1 in
+      if occur_type_v r e1.expr_type_v then
+	errorm ~loc "this application would create an alias";
       let c = apply_type_v_ref gl e1.expr_type_v r in
       make_apply loc e1 ty c
   | IEfun (bl, t) ->

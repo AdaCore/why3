@@ -56,5 +56,7 @@ val no_side_effect : t -> bool
 
 val subst : vsymbol -> reference -> t -> t
 
+val occur : reference -> t -> bool
+
 val print_reference : Format.formatter -> reference -> unit
 val print           : Format.formatter -> t         -> unit

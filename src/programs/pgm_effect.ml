@@ -112,6 +112,9 @@ let subst vs r t =
   let apply s = Sref.fold add1 s Sref.empty in
   { reads = apply t.reads; writes = apply t.writes; raises = t.raises }
 
+let occur r t =
+  Sref.mem r t.reads || Sref.mem r t.writes
+
 open Format
 open Pp
 open Pretty

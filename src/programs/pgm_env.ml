@@ -251,6 +251,33 @@ let apply_type_v_ref env v r = match r, v with
   | _ ->
       assert false
 
+let occur_formula r f = match r with
+  | E.Rlocal vs  -> f_occurs_single vs f
+  | E.Rglobal ls -> f_s_any (fun _ -> false) (ls_equal ls) f
+
+let rec occur_type_v r = function
+  | Tpure _ ->
+      false
+  | Tarrow (bl, c) ->
+      occur_arrow r bl c
+
+and occur_arrow r bl c = match bl with
+  | [] -> 
+      occur_type_c r c
+  | (vs, v) :: bl -> 
+      occur_type_v r v || 
+      not (E.ref_equal r (E.Rlocal vs)) && occur_arrow r bl c
+
+and occur_type_c r c = 
+  occur_type_v r c.c_result_type ||
+  occur_formula r c.c_pre ||
+  E.occur r c.c_effect ||
+  occur_post r c.c_post
+
+and occur_post r ((_, q), ql) =
+  occur_formula r q ||
+  List.exists (fun (_, (_, qe)) -> occur_formula r qe) ql
+
 let rec eq_type_v v1 v2 = match v1, v2 with
   | Tpure ty1, Tpure ty2 ->
       ty_equal ty1 ty2

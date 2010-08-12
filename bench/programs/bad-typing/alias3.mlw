@@ -1,0 +1,9 @@
+
+let foo (x : ref int) (y : ref int) = 
+  x := 1;
+  y := 2
+
+let test () =
+  let x = ref 0 in
+  foo x x
+
