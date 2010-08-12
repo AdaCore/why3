@@ -1,12 +1,15 @@
 
-let foo (x : ref int) (y : ref int) = 
-  x := 1;
-  y := 2
+let test (x : ref int) =
+  {}
+  let z = ref 0 in
+  if !x >= 0 then ref !x else z
+  { !result >= 0 }
 
-let test () =
-  let x = ref 0 in
-  let y = x in
-  foo x y
+let f () = 
+  let r = test (ref (-2)) in
+  assert { !r >= 0 };
+  r := 1;
+  assert { !r > 0 }
 
 (*
 Local Variables: 

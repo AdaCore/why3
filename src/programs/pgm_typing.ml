@@ -859,7 +859,7 @@ let rec is_pure_expr e =
   | Elet (_, e1, e2) -> is_pure_expr e1 && is_pure_expr e2
   | Elabel (_, e1) -> is_pure_expr e1
   | Eany c -> E.no_side_effect c.c_effect
-  | Eghost _ | Eassert _ | Etry _ | Eraise _ | Ematch _ 
+  | Eassert _ | Etry _ | Eraise _ | Ematch _ 
   | Eloop _ | Esequence _ | Eletrec _ | Efun _ 
   | Eglobal _ | Eabsurd -> false (* TODO: improve *)
 
@@ -877,6 +877,18 @@ let mk_bool_constant loc gl ls =
 let mk_false loc gl = mk_bool_constant loc gl gl.ls_False 
 let mk_true  loc gl = mk_bool_constant loc gl gl.ls_True
 
+(* types do not contain inner reference types *)
+
+let rec check_type ?(noref=false) gl loc ty = match ty.ty_node with
+  | Ty.Tyapp (ts, tyl) when ts_equal ts gl.ts_arrow -> 
+      List.iter (check_type gl loc) tyl
+  | Ty.Tyapp (ts, _) when noref && ts_equal ts gl.ts_ref ->
+      errorm ~loc "inner reference types are not allowed"
+  | Ty.Tyapp (_, tyl) -> 
+      List.iter (check_type ~noref:true gl loc) tyl
+  | Ty.Tyvar _ -> 
+      ()
+
 (* [expr] translates iexpr into expr
    [env : type_v Mvs.t] maps local variables to their types *)
 
@@ -884,6 +896,7 @@ let rec expr gl env e =
   let ty = e.iexpr_type in
   let loc = e.iexpr_loc in
   let d, v, ef = expr_desc gl env loc ty e.iexpr_desc in
+  check_type gl loc ty; (* TODO: improve efficiency *)
   { expr_desc = d; expr_type = ty; 
     expr_type_v = v; expr_effect = ef; expr_loc = loc }
 
@@ -916,8 +929,10 @@ and expr_desc gl env loc ty = function
       let env = add_local v e1.expr_type_v env in
       let e2 = expr gl env e2 in
       let ef = E.union e1.expr_effect e2.expr_effect in
-      (* TODO: check reference v does not escape *)
-      let ef = E.remove_reference (Rlocal v) ef in
+      let r = Rlocal v in
+      if occur_type_v r e2.expr_type_v then
+	errorm ~loc "local reference would escape its scope";
+      let ef = E.remove_reference r ef in
       Elet (v, e1, e2), e2.expr_type_v, ef
   | IEletrec (dl, e1) ->
       let env, dl = letrec gl env dl in
@@ -947,7 +962,7 @@ and expr_desc gl env loc ty = function
       in
       let ef = match a.loop_variant with
 	| Some (t, _) -> term_effect gl ef t
-	| None -> ef
+	| None        -> ef
       in
       Eloop (a, e1), type_v_unit gl, ef
   | IElazy (op, e1, e2) ->
@@ -974,6 +989,8 @@ and expr_desc gl env loc ty = function
       in 
       d, Tpure ty, ef
   | IEmatch (v, bl) ->
+      if is_reference_type gl v.vs_ty then
+	errorm ~loc "cannot match over a reference";
       let branch ef (p, e) =
 	let env = add_local_pat env p in
 	let e = expr gl env e in
@@ -1075,6 +1092,50 @@ and letrec gl env dl = (* : env * recfun list *)
   let m, dl = fixpoint m0 in
   make_env m, dl
 
+(* freshness analysis *)
+
+let rec fresh_expr ~term locals e = match e.expr_desc with
+  | Elocal vs when not term || not (Svs.mem vs locals) -> 
+      errorm ~loc:e.expr_loc "not a fresh reference (could create an alias)"
+  | Elogic _ | Elocal _ | Eglobal _ ->
+      ()
+  | Efun (_, t) ->
+      fresh_triple t
+  | Elet (vs, e1, e2) ->
+      fresh_expr ~term:false locals              e1;
+      fresh_expr ~term       (Svs.add vs locals) e2
+  | Eletrec (fl, e1) ->
+      List.iter (fun (_, _, _, t) -> fresh_triple t) fl;
+      fresh_expr ~term locals e1
+
+  | Esequence (e1, e2) ->
+      fresh_expr ~term:false locals e1;
+      fresh_expr ~term       locals e2
+  | Eif (e1, e2, e3) ->
+      fresh_expr ~term:false locals e1;
+      fresh_expr ~term       locals e2;
+      fresh_expr ~term       locals e3
+  | Eloop (_, e1) ->
+      fresh_expr ~term:false locals e1
+  | Ematch (_, bl) ->
+      let branch (_, e1) = fresh_expr ~term locals e1 in
+      List.iter branch bl
+  | Eskip | Eabsurd | Eraise (_, None) ->
+      ()
+  | Eraise (_, Some e1) ->
+      fresh_expr ~term:false locals e1
+  | Etry (e1, hl) ->
+      fresh_expr ~term:false locals e1;
+      List.iter (fun (_, _, e2) -> fresh_expr ~term locals e2) hl
+
+  | Elabel (_, e) ->
+      fresh_expr ~term locals e
+  | Eassert _ | Eany _ ->
+      ()
+
+and fresh_triple (_, e, _) =
+  fresh_expr ~term:true Svs.empty e
+
 (* pretty-printing (for debugging) *)
 
 let rec print_expr fmt e = match e.expr_desc with
@@ -1120,7 +1181,9 @@ let type_expr gl e =
   let denv = create_denv gl in
   let e = dexpr denv e in
   let e = iexpr gl Mstr.empty e in
-  expr gl Mvs.empty e
+  let e = expr gl Mvs.empty e in
+  fresh_expr ~term:true Svs.empty e;
+  e
 
 let type_type uc ty =
   let denv = create_denv uc in

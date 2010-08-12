@@ -190,7 +190,6 @@ and expr_desc =
   | Etry of expr * (Term.lsymbol * Term.vsymbol option * expr) list
 
   | Eassert of assertion_kind * Term.fmla
-  | Eghost of expr
   | Elabel of label * expr
   | Eany of type_c
 

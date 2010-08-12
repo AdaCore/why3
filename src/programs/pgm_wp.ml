@@ -375,9 +375,6 @@ and wp_desc env e q = match e.expr_desc with
       let w = opaque_wp env c.c_effect c.c_post q in
       wp_and c.c_pre w
 
-  | Eghost _ ->
-      assert false (*TODO*)
-
 and wp_triple env (p, e, q) =
   let f = wp_expr env e q in
   let f = wp_implies p f in
