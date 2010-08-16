@@ -1094,47 +1094,48 @@ and letrec gl env dl = (* : env * recfun list *)
 
 (* freshness analysis *)
 
-let rec fresh_expr ~term locals e = match e.expr_desc with
-  | Elocal vs when not term || not (Svs.mem vs locals) -> 
+let rec fresh_expr gl ~term locals e = match e.expr_desc with
+  | Elocal vs when is_reference_type gl vs.vs_ty 
+    && (not term || not (Svs.mem vs locals)) -> 
       errorm ~loc:e.expr_loc "not a fresh reference (could create an alias)"
   | Elogic _ | Elocal _ | Eglobal _ ->
       ()
   | Efun (_, t) ->
-      fresh_triple t
+      fresh_triple gl t
   | Elet (vs, e1, e2) ->
-      fresh_expr ~term:false locals              e1;
-      fresh_expr ~term       (Svs.add vs locals) e2
+      fresh_expr gl ~term:false locals              e1;
+      fresh_expr gl ~term       (Svs.add vs locals) e2
   | Eletrec (fl, e1) ->
-      List.iter (fun (_, _, _, t) -> fresh_triple t) fl;
-      fresh_expr ~term locals e1
+      List.iter (fun (_, _, _, t) -> fresh_triple gl t) fl;
+      fresh_expr gl ~term locals e1
 
   | Esequence (e1, e2) ->
-      fresh_expr ~term:false locals e1;
-      fresh_expr ~term       locals e2
+      fresh_expr gl ~term:false locals e1;
+      fresh_expr gl ~term       locals e2
   | Eif (e1, e2, e3) ->
-      fresh_expr ~term:false locals e1;
-      fresh_expr ~term       locals e2;
-      fresh_expr ~term       locals e3
+      fresh_expr gl ~term:false locals e1;
+      fresh_expr gl ~term       locals e2;
+      fresh_expr gl ~term       locals e3
   | Eloop (_, e1) ->
-      fresh_expr ~term:false locals e1
+      fresh_expr gl ~term:false locals e1
   | Ematch (_, bl) ->
-      let branch (_, e1) = fresh_expr ~term locals e1 in
+      let branch (_, e1) = fresh_expr gl ~term locals e1 in
       List.iter branch bl
   | Eskip | Eabsurd | Eraise (_, None) ->
       ()
   | Eraise (_, Some e1) ->
-      fresh_expr ~term:false locals e1
+      fresh_expr gl ~term:false locals e1
   | Etry (e1, hl) ->
-      fresh_expr ~term:false locals e1;
-      List.iter (fun (_, _, e2) -> fresh_expr ~term locals e2) hl
+      fresh_expr gl ~term:false locals e1;
+      List.iter (fun (_, _, e2) -> fresh_expr gl ~term locals e2) hl
 
   | Elabel (_, e) ->
-      fresh_expr ~term locals e
+      fresh_expr gl ~term locals e
   | Eassert _ | Eany _ ->
       ()
 
-and fresh_triple (_, e, _) =
-  fresh_expr ~term:true Svs.empty e
+and fresh_triple gl (_, e, _) =
+  fresh_expr gl ~term:true Svs.empty e
 
 (* pretty-printing (for debugging) *)
 
@@ -1182,7 +1183,7 @@ let type_expr gl e =
   let e = dexpr denv e in
   let e = iexpr gl Mstr.empty e in
   let e = expr gl Mvs.empty e in
-  fresh_expr ~term:true Svs.empty e;
+  fresh_expr gl ~term:true Svs.empty e;
   e
 
 let type_type uc ty =
