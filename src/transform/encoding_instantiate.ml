@@ -55,17 +55,18 @@ type tenv_aux = {
 }
 
 type tenv =
-  | Tenv of tenv_aux (* The transformation decorates with tenv_aux.* *)
-  | No_black_part (* The environnement when the transformation isn't complete*)
+  | Complete (* The transformation keep the polymorphism *)
+  | Incomplete (* The environnement when the transformation isn't complete*)
+
 
 (* A type is projected on term or type depending 
    of its color (green part,red part, black part) *)
 type tty =
-  | Tyterm of term
+  | Tyterm of ty
   | Tyty of ty
 
 let print_tty fmt = function
-  | Tyterm term -> Format.fprintf fmt "(Tyterm %a)" Pretty.print_term term
+  | Tyterm ty -> Format.fprintf fmt "(Tyterm %a)" Pretty.print_ty ty
   | Tyty ty -> Format.fprintf fmt "(Tyty %a)" Pretty.print_ty ty
 
 (* It can be backprojected to type, ty_dumb is like a bottom type it
@@ -74,17 +75,21 @@ let reduce_to_type = function
   | Tyty ty -> ty
   | Tyterm _ -> ty_dumb
 
-let reduce_to_pos tenv = function
-  | Tyty ty -> ty
-  | Tyterm _ -> match tenv with 
-      | No_black_part -> assert false (* All is type in this mode *)
-      | Tenv tenv -> tenv.undeco
 
-let reduce_to_neg tenv = function
-  | Tyty ty -> ty
-  | Tyterm _ -> match tenv with 
-      | No_black_part -> assert false (* All is type in this mode *)
-      | Tenv tenv -> tenv.deco
+let reduce_to_real = function
+  | Tyty ty | Tyterm ty -> ty
+
+(* let reduce_to_pos tenv = function *)
+(*   | Tyty ty -> ty *)
+(*   | Tyterm _ -> match tenv with  *)
+(*       | Incomplete -> assert false (\* All is type in this mode *\) *)
+(*       | Tenv tenv -> tenv.undeco *)
+
+(* let reduce_to_neg tenv = function *)
+(*   | Tyty ty -> ty *)
+(*   | Tyterm _ -> match tenv with  *)
+(*       | Incomplete -> assert false (\* All is type in this mode *\) *)
+(*       | Tenv tenv -> tenv.deco *)
 
 (* The environnement of the transformation between two decl (* unmutable *) *)
 type env = {
@@ -92,7 +97,7 @@ type env = {
   ekeep : Sty.t;
   eprojty : ty Mty.t;
   edefined_lsymbol : lsymbol Mtyl.t Mls.t;
-  edefined_tsymbol : lsymbol Mtyl.t Mts.t;
+  edefined_tsymbol : tysymbol Mtyl.t Mts.t;
 }
 
 (* The environnement of the transformation during 
@@ -102,7 +107,7 @@ type menv = {
   keep : Sty.t;
   mutable projty : ty Mty.t;
   mutable defined_lsymbol : lsymbol Mtyl.t Mls.t;
-  mutable defined_tsymbol : lsymbol Mtyl.t Mts.t;
+  mutable defined_tsymbol : tysymbol Mtyl.t Mts.t;
   mutable undef_lsymbol : Sls.t;
   mutable undef_tsymbol : Sts.t;
 }
@@ -117,55 +122,22 @@ let print_env fmt menv =
     (Pp.print_iter2 Mts.iter Pp.semi Pp.comma Pretty.print_ts 
        (Pp.print_iter2 Mtyl.iter Pp.semi Pp.arrow
           (Pp.print_list Pp.space Pretty.print_ty)
-          Pretty.print_ls)) menv.defined_tsymbol
+          Pretty.print_ts)) menv.defined_tsymbol
 
-type tvar = {
-  tvar_term : vsymbol Mtv.t;
-  tvar_ty : ty Mtv.t;
-}
+type tvar = ty Mtv.t
 
 let why_filename = Encoding_decorate.why_filename
-(* Useful function *)
-let rec logic_inst tl = function
-  | None -> List.map reduce_to_type tl
-  | Some ty -> (reduce_to_type ty) :: (logic_inst tl None)
 
-let find_logic menv p tyl ty =
-  if ls_equal p ps_equ then p else
-  let inst = logic_inst tyl ty in
-  (*Format.eprintf "fl : env : %a  p : %a | inst : %a@." 
-    print_env menv
-    Pretty.print_ls p
-    (Pp.print_list Pp.comma Pretty.print_ty) inst;*)
-  try
-    let insts = Mls.find p menv.defined_lsymbol in
-    Mtyl.find inst insts 
-  with Not_found ->
-    let insts = 
-      try
-        Mls.find p menv.defined_lsymbol
-      with Not_found ->
-        Mtyl.empty in
-    let arg = List.map (reduce_to_neg menv.tenv) tyl in
-    let result = option_map (reduce_to_pos menv.tenv) ty in
-    let ls = if List.for_all2 ty_equal arg p.ls_args &&
-        option_eq ty_equal result p.ls_value 
-      then p else create_lsymbol (id_clone p.ls_name) arg result in
-    let insts = Mtyl.add inst ls insts in
-    menv.defined_lsymbol <- Mls.add p insts menv.defined_lsymbol;
-    menv.undef_lsymbol <- Sls.add ls menv.undef_lsymbol;
-    ls
-
-let rec projty menv tvar ty : tty =
+let rec projty menv tvar ty =
   let rec aux ty =
     match ty.ty_node with
-      | Tyvar tv -> Tyterm (t_var (Mtv.find tv tvar.tvar_term))
+      | Tyvar _ -> Tyterm ty
       | Tyapp (ts,tyl) ->
         try
           Tyty (Mty.find ty menv.projty)
         with Not_found ->
           match menv.tenv with
-            | No_black_part -> 
+            | Incomplete -> 
               (* In this configuration there is no term representing type,
                  all type are a type or are in the black part 
                  (the or is not a xor)*)
@@ -177,10 +149,10 @@ let rec projty menv tvar ty : tty =
               (*Format.eprintf "projty : ts : %a env : %a@." Pretty.print_ts ts
               print_env menv;*)
               Tyty tty
-            | Tenv tenv ->
+            | Complete ->
               let tyl = List.map aux tyl in
               let tyl_red = List.map reduce_to_type tyl in
-              let ls = 
+              let tys = 
                 try
                   Mtyl.find tyl_red (Mts.find ts menv.defined_tsymbol)
                 with Not_found ->
@@ -188,68 +160,116 @@ let rec projty menv tvar ty : tty =
                     with Not_found -> Mtyl.empty in
                   let args = List.fold_left (fun acc e ->
                     match e with
-                      | Tyterm _ -> tenv.ty::acc
+                      | Tyterm _ -> (create_tvsymbol (id_fresh "a"))::acc
                       | Tyty _ -> acc) [] tyl in
-                  let ls = create_fsymbol (id_clone ts.ts_name) args tenv.ty in
-                  let insts = Mtyl.add tyl_red ls insts in
+                  let tys = if List.length args = List.length ts.ts_args 
+                    then ts 
+                    else create_tysymbol (id_clone ts.ts_name) args None in
+                  let insts = Mtyl.add tyl_red tys insts in
                   menv.defined_tsymbol <-
                     Mts.add ts insts menv.defined_tsymbol;
-                  menv.undef_lsymbol <- Sls.add ls menv.undef_lsymbol;
-                  ls in
+                  menv.undef_tsymbol <- Sts.add tys menv.undef_tsymbol;
+                  tys in
               let args = List.rev (List.fold_left (fun acc e ->
                 match e with
-                  | Tyterm t -> t::acc
+                  | Tyterm ty -> ty::acc
                   | Tyty _ -> acc) [] tyl) in
-              Tyterm (t_app ls args tenv.ty) in
-  let ty = ty_inst tvar.tvar_ty ty in
+              Tyterm (ty_app tys args) in
+  let ty = ty_inst tvar ty in
   aux ty
 
-let deco_res menv t ty =
-  match ty with
-    | Tyty _ -> t
-    | Tyterm tyterm ->
-      match menv.tenv with
-        | No_black_part -> assert false
-        | Tenv tenv -> t_app tenv.sort [tyterm;t] tenv.deco
+let projty_real menv tvar ty = reduce_to_real (projty menv tvar ty)
 
-let sort_app tenv ty t =
-  match tenv with
-    | No_black_part -> assert false
-    | Tenv tenv -> t_app tenv.sort [ty;t] tenv.deco   
+(* let reduce_to_default menv d = function *)
+(*   | Tyty ty -> ty *)
+(*   | Tyterm ty -> match menv.tenv with *)
+(*       | Incomplete -> ty *)
+(*       | Complete -> projty menv Mtv.empty d *)
+
+
+let reduce_to_default menv tvar d ty = 
+  match projty menv tvar ty with
+    | Tyty ty -> ty
+    | Tyterm _ -> ty_var d
+
+let find_logic menv tvar p tyl ret =
+  if ls_equal p ps_equ then p else begin
+    let inst = ls_app_inst p tyl ret in
+     (*Format.eprintf "inst : %a@."
+       (Pp.print_iter2 Mtv.iter Pp.comma Pp.space Pp.nothing 
+          Pretty.print_ty) inst;*)
+    let inst = Mtv.mapi (reduce_to_default menv tvar) inst in
+    let inst_l = Mtv.fold (fun _ v acc -> v::acc) inst [] in
+    (* Format.eprintf "p : %a | arg : %a| tyl = %a | inst_l : %i@." *)
+    (*   Pretty.print_ls p        *)
+    (*   (Pp.print_list Pp.comma Pretty.print_ty) p.ls_args *)
+    (*   (Pp.print_list Pp.comma Pretty.print_ty)  *)
+    (*   (List.map (fun t -> t.t_ty) tyl) *)
+    (*   (List.length inst_l); *)
+      try
+      let insts = Mls.find p menv.defined_lsymbol in
+      Mtyl.find inst_l insts 
+    with Not_found ->
+      let insts = 
+        try
+          Mls.find p menv.defined_lsymbol
+        with Not_found ->
+          Mtyl.empty in
+      let proj ty = reduce_to_real (projty menv Mtv.empty ty) in
+      let arg = List.map (ty_inst inst) p.ls_args in
+      let arg = List.map proj arg in
+      let result = option_map (ty_inst inst) p.ls_value in
+      let result = option_map proj result in
+      let ls = if List.for_all2 ty_equal arg p.ls_args &&
+          option_eq ty_equal result p.ls_value 
+        then p else create_lsymbol (id_clone p.ls_name) arg result in
+      let insts = Mtyl.add inst_l ls insts in
+      menv.defined_lsymbol <- Mls.add p insts menv.defined_lsymbol;
+      menv.undef_lsymbol <- Sls.add ls menv.undef_lsymbol;
+      (* Format.eprintf "fl : env : %a  p : %a | inst : %a@."  *)
+      (*   print_env menv *)
+      (*   Pretty.print_ls p *)
+      (*   (Pp.print_list Pp.comma Pretty.print_ty) inst_l; *)
+      ls
+  end
+
+
+(* let deco_res menv t ty = *)
+(*   match ty with *)
+(*     | Tyty _ -> t *)
+(*     | Tyterm tyterm -> *)
+(*       match menv.tenv with *)
+(*         | Incomplete -> assert false *)
+(*         | Tenv tenv -> t_app tenv.sort [tyterm;t] tenv.deco *)
+
+(* let sort_app tenv ty t = *)
+(*   match tenv with *)
+(*     | Incomplete -> assert false *)
+(*     | Tenv tenv -> t_app tenv.sort [ty;t] tenv.deco    *)
 
 
 let conv_vs menv tvar vsvar vs =
-  let ty = projty menv tvar vs.vs_ty in
-  let vs'= create_vsymbol (id_clone vs.vs_name) (reduce_to_pos menv.tenv ty) in
-  (match ty with
-    | Tyterm t -> Mvs.add vs (sort_app menv.tenv t (t_var vs')) vsvar
-    | Tyty _ -> Mvs.add vs (t_var vs') vsvar),vs'
-
-let conv_vs_let menv tvar vsvar vs =
-  let ty = projty menv tvar vs.vs_ty in
-  let vs'= create_vsymbol (id_clone vs.vs_name) (reduce_to_neg menv.tenv ty) in
-  (match ty with
-    | Tyterm _ -> Mvs.add vs (t_var vs') vsvar
-    | Tyty _ -> Mvs.add vs (t_var vs') vsvar),vs'
+  let ty = projty_real menv tvar vs.vs_ty in
+  let vs' = if ty_equal ty vs.vs_ty then vs else
+      create_vsymbol (id_clone vs.vs_name) ty in
+  Mvs.add vs (t_var vs') vsvar,vs'
 
 (* The convertion of term and formula *)
 let rec rewrite_term menv tvar vsvar t = 
   let fnT = rewrite_term menv tvar in
   let fnF = rewrite_fmla menv tvar in
+  (* Format.eprintf "@[<hov 2>Term : %a =>@\n@?" Pretty.print_term t; *)
   match t.t_node with
     | Tconst _ -> t
     | Tvar x -> Mvs.find x vsvar
     | Tapp(p,tl) -> 
       let tl' = List.map (fnT vsvar) tl in
-      let tyl = List.map (fun t -> projty menv tvar t.t_ty) tl in
-      let ty = projty menv tvar t.t_ty in
-      let p = find_logic menv p tyl (Some ty) in
-      let app = t_app_infer p tl' in
-      deco_res menv app ty
+      let p = find_logic menv tvar p tl (Some t.t_ty) in
+      t_app p tl' (projty_real menv tvar t.t_ty)
     | Tif(f, t1, t2) ->
       t_if (fnF vsvar f) (fnT vsvar t1) (fnT vsvar t2)
     | Tlet (t1, b) -> let u,t2,cb = t_open_bound_cb b in
-      let (vsvar',u) = conv_vs_let menv tvar vsvar u in
+      let (vsvar',u) = conv_vs menv tvar vsvar u in
       let t1 = fnT vsvar t1 in let t2 = fnT vsvar' t2 in
       t_let t1 (cb u t2)
     | Tcase _ | Teps _ | Tbvar _ ->
@@ -259,11 +279,11 @@ let rec rewrite_term menv tvar vsvar t =
 and rewrite_fmla menv tvar vsvar f = 
   let fnT = rewrite_term menv tvar in
   let fnF = rewrite_fmla menv tvar in
+  (* Format.eprintf "@[<hov 2>Fmla : %a =>@\n@?" Pretty.print_fmla f; *)
   match f.f_node with
     | Fapp(p, tl) ->
       let tl' = List.map (fnT vsvar) tl in
-      let tyl = List.map (fun t -> projty menv tvar t.t_ty) tl in
-      let p = find_logic menv p tyl None in
+      let p = find_logic menv tvar p tl None in
       f_app p tl'
     | Fquant(q, b) -> 
       let vl, tl, f1, cb = f_open_quant_cb b in
@@ -276,8 +296,10 @@ and rewrite_fmla menv tvar vsvar f =
       let vl = List.rev vl in
       f_quant q (cb vl tl f1)
     | Flet (t1, b) -> let u,f2,cb = f_open_bound_cb b in
-      let (vsvar',u) = conv_vs_let menv tvar vsvar u in
+      let (vsvar',u) = conv_vs menv tvar vsvar u in
       let t1 = fnT vsvar t1 and f2 = fnF vsvar' f2 in
+      (* Format.eprintf "u.vs_ty : %a == t1.t_ty : %a@." *)
+      (*    Pretty.print_ty u.vs_ty Pretty.print_ty t1.t_ty; *)
       assert (u.vs_ty == t1.t_ty);
       f_let t1 (cb u f2)
     | _ -> f_map (fnT vsvar) (fnF vsvar) f
@@ -285,17 +307,15 @@ and rewrite_fmla menv tvar vsvar f =
 (* Generation of all the possible instantiation of a formula *)
 let gen_tvar env ts = 
   let aux tv tvarl = 
-    let gen tvar ty = {tvar with tvar_ty = Mtv.add tv ty tvar.tvar_ty} in
+    let gen tvar ty = Mtv.add tv ty tvar in
     let tvarl' = List.fold_left (fun acc tvar -> 
       Sty.fold (fun ty acc -> gen tvar ty :: acc) env.ekeep acc) [] tvarl in
     match env.etenv with
-      | No_black_part -> tvarl'
-      | Tenv tenv ->
-        let gen acc tvar =
-          let vs = create_vsymbol (id_clone (tv.tv_name)) tenv.ty in
-          {tvar with tvar_term = Mtv.add tv vs tvar.tvar_term}::acc in
+      | Incomplete -> tvarl'
+      | Complete ->
+        let gen acc tvar = (Mtv.add tv (ty_var tv) tvar)::acc in
         List.fold_left gen tvarl' tvarl in
-  Stv.fold aux ts [{tvar_term = Mtv.empty; tvar_ty = Mtv.empty}]
+  Stv.fold aux ts [Mtv.empty]
 
 (*
 let ty_args_from_tty = 
@@ -374,18 +394,20 @@ Perhaps you could use eliminate_definition"
         undef_tsymbol = Sts.empty;
       } in
       let conv_f task tvar = 
+        (* Format.eprintf "f0 : %a@. env : %a@." Pretty.print_fmla  *)
+        (*   (f_ty_subst tvar Mvs.empty f) *)
+        (*   print_env menv; *)
         let f = rewrite_fmla menv tvar Mvs.empty f in
-        (*Format.eprintf "f : %a env : %a@." Pretty.print_fmla f
-          print_env menv;*)
-        let tvl = Mtv.fold (fun _ vs acc -> vs::acc) tvar.tvar_term [] in
-        let f = f_forall_close tvl [] f in
+        (* Format.eprintf "f : %a@. env : %a@." Pretty.print_fmla f *)
+        (*   print_env menv; *)
         let pr = 
           if tvarl_len = 1 then pr 
           else create_prsymbol (id_clone pr.pr_name) in
-        (*Format.eprintf "undef ls : %a, ts : %a@."
-          (Pp.print_iter1 Sls.iter Pp.comma Pretty.print_ls) menv.undef_lsymbol
-          (Pp.print_iter1 Sts.iter Pp.comma Pretty.print_ts)
-          menv.undef_tsymbol;*)
+        (* Format.eprintf "undef ls : %a, ts : %a@." *)
+        (*   (Pp.print_iter1 Sls.iter Pp.comma Pretty.print_ls) *)
+        (*   menv.undef_lsymbol *)
+        (*   (Pp.print_iter1 Sts.iter Pp.comma Pretty.print_ts) *)
+        (*   menv.undef_tsymbol; *)
         let task = Sts.fold 
           (fun ts task -> add_ty_decl task [ts,Tabstract]) 
           menv.undef_tsymbol task in
@@ -414,20 +436,6 @@ let monomorphise_goal =
       (fun acc ts -> (create_ty_decl [ts,Tabstract]) :: acc)
       acc ltv in
     acc)
-
-(* The prelude for the complete transformation *)
-let load_prelude env =
-  let prelude = Env.find_theory env why_filename "Prelude" in
-  let sort = Theory.ns_find_ls prelude.th_export ["sort"] in
-  let ty = ty_app (Theory.ns_find_ts prelude.th_export ["ty"]) [] in
-  let deco = ty_app (Theory.ns_find_ts prelude.th_export ["deco"]) [] in
-  let undeco = ty_app (Theory.ns_find_ts prelude.th_export ["undeco"]) [] in
-  let task = None in
-  let task = Task.use_export task prelude in
-  task,Tenv { deco = deco;
-              undeco = undeco;
-              sort = sort;
-              ty = ty}
 
 
 let collect_green_part tds =
@@ -532,22 +540,20 @@ let get_kept =
       | _ -> failwith "instantiate level wrong argument")
 
 
-let create_trans_complete env metas =
+let create_trans_complete metas =
   let tds_kept = Mstr.find meta_kept metas in
   let complete = get_meta_exc meta_complete (Mstr.find meta_complete metas) in
-  let task, tenv = match complete with
-    | None | Some [MAstr "yes"] -> load_prelude env
-    | Some [MAstr "no"] ->  
-      let task = use_export None builtin_theory in
-      let tenv = No_black_part in
-      task, tenv
+  let task = use_export None builtin_theory in
+  let tenv = match complete with
+    | None | Some [MAstr "yes"] -> Complete
+    | Some [MAstr "no"] ->  Incomplete
     | _ -> failwith "instantiate complete wrong argument" in
   let init_task,env = create_env task tenv tds_kept in
   Trans.fold_map fold_map env init_task
 
-let encoding env =
+let encoding =
   Trans.compose monomorphise_goal (
     Trans.compose get_kept
-      (Trans.on_metas [meta_kept;meta_complete] (create_trans_complete env)))
+      (Trans.on_metas [meta_kept;meta_complete] create_trans_complete))
 
-let () = Trans.register_env_transform "encoding_instantiate" encoding
+let () = Trans.register_transform "encoding_instantiate" encoding

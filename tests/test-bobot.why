@@ -61,6 +61,7 @@ end
 
 theory TestEnco
   use import int.Int
+  meta "encoding_decorate : kept" type int
   type mytype 'a
   logic id(x: int) : int = x
   logic id2(x: int) : int = id(x)

@@ -16,6 +16,17 @@ theory Builtin
          t2u (d2t (sort tty x)) = x
 end
 
+
+theory Bridge
+       type t
+       type tb
+       logic tb2t tb : t
+       logic t2tb t : tb
+       axiom Conv1 : forall x:t [t2tb x]. tb2t (t2tb x) = x
+       axiom Conv2 : forall x:tb [t2tb (tb2t x)]. t2tb (tb2t x) = x
+end
+
+
 theory Prelude_mono
        logic sort int int : int
        logic int : int
