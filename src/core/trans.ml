@@ -54,7 +54,8 @@ let fold fn v =
   let rewind acc task =
 (*
     Format.printf "%c%d." (match task.task_decl.td_node with
-      Decl _ -> 'D' | Clone _ -> 'C' | Use _ -> 'U' | Meta _ -> 'M') task.task_tag;
+      Decl _ -> 'D' | Clone _ -> 'C' 
+  | Use _ -> 'U' | Meta _ -> 'M') task.task_tag;
 *)
     let acc = fn task acc in
     WHtask.set h task acc;
@@ -164,10 +165,10 @@ let on_theories tl fn =
 
 let on_metas tl fn =
   let rec pass acc = function
-    | t::tl -> on_meta t (fun st -> pass (Mstr.add t st acc) tl)
+    | t::tl -> on_meta t (fun st -> pass (Mmeta.add t st acc) tl)
     | []    -> fn acc
   in
-  pass Mstr.empty tl
+  pass Mmeta.empty tl
 
 let on_theories_metas thl tl fn =
   on_theories thl (fun cm -> on_metas tl (fn cm))

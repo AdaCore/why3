@@ -70,12 +70,12 @@ val rewrite : (term -> term) -> (fmla -> fmla) -> task -> task trans
 (* dependent transformatons *)
 
 val on_theory : theory -> (tdecl_set -> 'a trans) -> 'a trans
-val on_meta   : string -> (tdecl_set -> 'a trans) -> 'a trans
+val on_meta   : meta -> (tdecl_set -> 'a trans) -> 'a trans
 
 val on_theories : theory list -> (clone_map -> 'a trans) -> 'a trans
-val on_metas    : string list -> (meta_map  -> 'a trans) -> 'a trans
+val on_metas    : meta list -> (meta_map  -> 'a trans) -> 'a trans
 
-val on_theories_metas : theory list -> string list ->
+val on_theories_metas : theory list -> meta list ->
                         (clone_map -> meta_map -> 'a trans) -> 'a trans
 
 (** {2 Registration} *)

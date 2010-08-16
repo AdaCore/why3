@@ -23,4 +23,4 @@ val eliminate_compiled_algebraic : Task.task Trans.trans
 
 val eliminate_algebraic : Task.task Trans.trans
 
-val meta_enum : string
+val meta_enum : Theory.meta

@@ -532,7 +532,7 @@ let mono_in_mono = Trans.tdecl mono_in_mono None
 
 let get_kept =
   Trans.on_meta meta_level (fun tds ->
-    match get_meta_exc meta_level tds with
+    match get_meta_excl meta_level tds with
       | None | Some [MAstr "goal"] -> mono_in_goal
       | Some [MAstr "kept"] -> Trans.identity
       | Some [MAstr "all"] -> mono_in_def
@@ -541,8 +541,9 @@ let get_kept =
 
 
 let create_trans_complete metas =
-  let tds_kept = Mstr.find meta_kept metas in
-  let complete = get_meta_exc meta_complete (Mstr.find meta_complete metas) in
+  let tds_kept = Mmeta.find meta_kept metas in
+  let complete = get_meta_excl meta_complete 
+    (Mmeta.find meta_complete metas) in
   let task = use_export None builtin_theory in
   let tenv = match complete with
     | None | Some [MAstr "yes"] -> Complete

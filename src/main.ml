@@ -78,7 +78,11 @@ let add_opt_goal x = match !opt_theory with
 
 let add_opt_trans x = opt_trans := x::!opt_trans
 
-let add_opt_meta meta_name meta_arg =
+let add_opt_meta meta =
+  let meta_name, meta_arg = 
+    let index = String.index meta '=' in
+    (String.sub meta 0 index),
+    (String.sub meta (index+1) (String.length meta - (index + 1))) in
   opt_metas := (meta_name,meta_arg)::!opt_metas
 
 let opt_config = ref None
@@ -141,11 +145,8 @@ let option_list = Arg.align [
       "<MiB> Set the prover's memory limit (default: no limit)";
   "--memlimit", Arg.Int (fun i -> opt_timelimit := Some i),
       " same as -m";
-  "-M", 
-  begin let meta_opt = ref "" in 
-        Arg.Tuple ([Arg.Set_string meta_opt;
-                    Arg.String (fun s -> add_opt_meta !meta_opt s)]) end,
-    "<meta_name>,<string> Add a meta option to each tasks";
+  "-M", Arg.String add_opt_meta,
+    "<meta_name>=<string> Add a meta option to each tasks";
   "-D", Arg.String (fun s -> opt_driver := Some s),
       "<file> Specify a prover's driver (conflicts with -P)";
   "--driver", Arg.String (fun s -> opt_driver := Some s),
@@ -214,15 +215,15 @@ let () =
   end;
   if !opt_list_metas then begin
     let metas = list_metas () in
-    let filter (s,args) =
-      match args with
-        | [MTstring] -> is_meta_excl s
-        | _ -> false in
-    let metas = List.filter filter metas in
-    let metas = List.map fst metas in
+    let fold acc m =
+      match meta_arg_type m with
+        | [MTstring] when is_meta_excl m -> Smeta.add m acc
+        | _ -> acc in
+    let metas = List.fold_left fold Smeta.empty metas in
     printf "@[<hov 2>Known metas:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare metas)
+      (Pp.print_iter1 Smeta.iter Pp.newline 
+         (fun fmt m -> pp_print_string fmt (meta_name m)))
+      metas
   end;
   if !opt_list_transforms || !opt_list_printers || !opt_list_provers ||
      !opt_list_formats || !opt_list_metas
@@ -280,7 +281,9 @@ let () =
       opt_driver := Some prover.driver
   | None ->
     () end;
-  let add_meta task (meta,s) = add_meta task meta [MAstr s] in
+  let add_meta task (meta,s) = 
+    let meta = lookup_meta meta in
+    add_meta task meta [MAstr s] in
   opt_task := List.fold_left add_meta !opt_task !opt_metas
 
 let timelimit = match !opt_timelimit with

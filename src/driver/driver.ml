@@ -144,7 +144,8 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
           | PMAstr s -> MAstr s
           | PMAint i -> MAint i
         in
-        let td = create_meta s (List.map convert al) in
+        let m = lookup_meta s in
+        let td = create_meta m (List.map convert al) in
         add_meta th td (if c then meta_cl else meta)
   in
   let add_local th (loc,rule) =

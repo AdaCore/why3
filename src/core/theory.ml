@@ -96,32 +96,57 @@ type meta_arg =
   | MAstr of string
   | MAint of int
 
-exception KnownMeta of string
+type meta = {
+  meta_tag : int;
+  meta_name : string;
+  meta_arg_type : meta_arg_type list;
+  meta_excl : bool;
+}
+
+module SMmeta = StructMake(struct type t = meta let tag m = m.meta_tag end)
+module Smeta = SMmeta.S
+module Mmeta = SMmeta.M
+module Hmeta = SMmeta.H
+
+let meta_equal m1 m2 = m1.meta_tag = m2.meta_tag
+
+exception KnownMeta of meta
 exception UnknownMeta of string
-exception BadMetaArity of string * int * int
-exception MetaTypeMismatch of string * meta_arg_type * meta_arg_type
+exception BadMetaArity of meta * int * int
+exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
 
+let meta_tag = let c =  ref (-1) in
+               fun () -> incr c; !c
 let meta_table = Hashtbl.create 17
-let meta_excl  = Hashtbl.create 17
 
-let register_meta s al =
-  begin try
+let register_meta s al excl =
+  try
     let al' = Hashtbl.find meta_table s in
-    if al <> al' then raise (KnownMeta s)
-  with Not_found -> Hashtbl.add meta_table s al end;
-  s
+    if al <> al'.meta_arg_type ||
+      excl <> al'.meta_excl
+    then raise (KnownMeta al')
+    else al'
+  with Not_found -> 
+    let meta = { meta_tag = meta_tag ();
+                 meta_arg_type = al;
+                 meta_name = s;
+                 meta_excl = excl} in
+    Hashtbl.add meta_table s meta;
+    meta
 
-let register_meta_excl s al =
-  Hashtbl.add meta_excl s ();
-  register_meta s al
+let register_meta_excl s al = register_meta s al true
+
+let register_meta s al = register_meta s al false
 
 let lookup_meta s =
   try Hashtbl.find meta_table s
   with Not_found -> raise (UnknownMeta s)
 
-let is_meta_excl s = Hashtbl.mem meta_excl s
+let is_meta_excl m = m.meta_excl
+let meta_arg_type m = m.meta_arg_type
+let meta_name m = m.meta_name
 
-let list_metas () = Hashtbl.fold (fun k v acc -> (k,v)::acc) meta_table []
+let list_metas () = Hashtbl.fold (fun _ v acc -> v::acc) meta_table []
 
 
 (** Theory *)
@@ -144,7 +169,7 @@ and tdecl_node =
   | Decl  of decl
   | Use   of theory
   | Clone of theory * tysymbol Mts.t * lsymbol Mls.t * prsymbol Mpr.t
-  | Meta  of string * meta_arg list
+  | Meta  of meta * meta_arg list
 
 (** Theory declarations *)
 
@@ -640,19 +665,16 @@ let get_meta_arg_type = function
   | MAstr _ -> MTstring
   | MAint _ -> MTint
 
-let create_meta s al =
-  let atl = try Hashtbl.find meta_table s
-    with Not_found -> raise (UnknownMeta s)
-  in
+let create_meta m al =
   let get_meta_arg at a =
     let mt = get_meta_arg_type a in
-    if at = mt then a else raise (MetaTypeMismatch (s,at,mt))
+    if at = mt then a else raise (MetaTypeMismatch (m,at,mt))
   in
-  let al = try List.map2 get_meta_arg atl al
+  let al = try List.map2 get_meta_arg m.meta_arg_type al
     with Invalid_argument _ ->
-      raise (BadMetaArity (s, List.length atl, List.length al))
+      raise (BadMetaArity (m, List.length m.meta_arg_type, List.length al))
   in
-  mk_tdecl (Meta (s,al))
+  mk_tdecl (Meta (m,al))
 
 let add_meta uc s al = add_tdecl uc (create_meta s al)
 
@@ -715,15 +737,16 @@ let () = Exn_printer.register
       Format.fprintf fmt "Symbol %s is already defined in the current scope" s
   | UnknownMeta s ->
       Format.fprintf fmt "Unknown metaproperty %s" s
-  | KnownMeta s ->
+  | KnownMeta m ->
       Format.fprintf fmt "Metaproperty %s is already registered with \
-        a conflicting signature" s
-  | BadMetaArity (s,i1,i2) ->
+        a conflicting signature" m.meta_name
+  | BadMetaArity (m,i1,i2) ->
       Format.fprintf fmt "Metaproperty %s requires %d arguments but \
-        is applied to %d" s i1 i2
-  | MetaTypeMismatch (s,t1,t2) ->
+        is applied to %d" m.meta_name i1 i2
+  | MetaTypeMismatch (m,t1,t2) ->
       Format.fprintf fmt "Metaproperty %s expects %a argument but \
-        is applied to %a" s print_meta_arg_type t1 print_meta_arg_type t2
+        is applied to %a"
+        m.meta_name print_meta_arg_type t1 print_meta_arg_type t2
   | _ -> raise exn
   end
 

@@ -54,13 +54,23 @@ type meta_arg =
   | MAstr of string
   | MAint of int
 
-val register_meta      : string -> meta_arg_type list -> string
-val register_meta_excl : string -> meta_arg_type list -> string
+type meta
 
-val lookup_meta  : string -> meta_arg_type list
-val is_meta_excl : string -> bool
+module Smeta : Set.S with type elt = meta
+module Mmeta : Map.S with type key = meta
+module Hmeta : Hashtbl.S with type key = meta
 
-val list_metas : unit -> (string * meta_arg_type list) list
+val meta_equal : meta -> meta -> bool
+
+val register_meta      : string -> meta_arg_type list -> meta
+val register_meta_excl : string -> meta_arg_type list -> meta
+val lookup_meta        : string -> meta
+
+val meta_name     : meta -> string
+val meta_arg_type : meta -> meta_arg_type list
+val is_meta_excl  : meta -> bool
+
+val list_metas : unit -> meta list
 
 (** Theory *)
 
@@ -82,7 +92,7 @@ and tdecl_node = private
   | Decl  of decl
   | Use   of theory
   | Clone of theory * tysymbol Mts.t * lsymbol Mls.t * prsymbol Mpr.t
-  | Meta  of string * meta_arg list
+  | Meta  of meta * meta_arg list
 
 module Stdecl : Set.S with type elt = tdecl
 module Mtdecl : Map.S with type key = tdecl
@@ -152,9 +162,9 @@ val create_null_clone : theory -> tdecl
 
 (** Meta *)
 
-val create_meta : string -> meta_arg list -> tdecl
+val create_meta : meta -> meta_arg list -> tdecl
 
-val add_meta : theory_uc -> string -> meta_arg list -> theory_uc
+val add_meta : theory_uc -> meta -> meta_arg list -> theory_uc
 
 val clone_meta : tdecl -> theory -> tdecl -> tdecl
 (* [clone_meta td_meta th td_clone] produces from [td_meta]
@@ -177,8 +187,8 @@ exception CloseTheory
 exception NoOpenedNamespace
 exception ClashSymbol of string
 
-exception KnownMeta of string
+exception KnownMeta of meta
 exception UnknownMeta of string
-exception BadMetaArity of string * int * int
-exception MetaTypeMismatch of string * meta_arg_type * meta_arg_type
+exception BadMetaArity of meta * int * int
+exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
 

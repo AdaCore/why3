@@ -48,18 +48,18 @@ let tds_singleton td = mk_tds (Stdecl.singleton td)
 let tds_equal = (==)
 
 type clone_map = tdecl_set Mid.t
-type meta_map = tdecl_set Mstr.t
+type meta_map = tdecl_set Mmeta.t
 
 let cm_find cm th = try Mid.find th.th_name cm with Not_found -> empty_tds
 
 let mm_find mm t =
-  try Mstr.find t mm with Not_found -> ignore (lookup_meta t); empty_tds
+  try Mmeta.find t mm with Not_found -> empty_tds
 
 let cm_add cm th td = Mid.add th.th_name (tds_add td (cm_find cm th)) cm
 
 let mm_add mm t td = if is_meta_excl t
-  then Mstr.add t (tds_singleton td) mm
-  else Mstr.add t (tds_add td (mm_find mm t)) mm
+  then Mmeta.add t (tds_singleton td) mm
+  else Mmeta.add t (tds_add td (mm_find mm t)) mm
 
 (** Task *)
 
@@ -106,7 +106,7 @@ let mk_task decl prev known clone meta = Some (Hstask.hashcons {
 
 let task_known = option_apply Mid.empty (fun t -> t.task_known)
 let task_clone = option_apply Mid.empty (fun t -> t.task_clone)
-let task_meta  = option_apply Mstr.empty (fun t -> t.task_meta)
+let task_meta  = option_apply Mmeta.empty (fun t -> t.task_meta)
 
 let find_clone task th = cm_find (task_clone task) th
 let find_meta  task t  = mm_find (task_meta  task) t
@@ -213,38 +213,38 @@ let task_decls  = task_fold (fun acc td ->
 
 (* special selector for metaproperties of a single ident *)
 
-exception NotTaggingMeta of string
+exception NotTaggingMeta of meta
 
 let find_tagged_ts t tds acc =
-  begin match lookup_meta t with
+  begin match meta_arg_type t with
     | [MTtysymbol] -> ()
     | _ -> raise (NotTaggingMeta t)
   end;
   Stdecl.fold (fun td acc -> match td.td_node with
-    | Meta (s, [MAts ts]) when s = t -> Sts.add ts acc
+    | Meta (s, [MAts ts]) when meta_equal s t -> Sts.add ts acc
     | _ -> assert false) tds.tds_set acc
 
 let find_tagged_ls t tds acc =
-  begin match lookup_meta t with
+  begin match meta_arg_type t with
     | [MTlsymbol] -> ()
     | _ -> raise (NotTaggingMeta t)
   end;
   Stdecl.fold (fun td acc -> match td.td_node with
-    | Meta (s, [MAls ls]) when s = t -> Sls.add ls acc
+    | Meta (s, [MAls ls]) when meta_equal s t -> Sls.add ls acc
     | _ -> assert false) tds.tds_set acc
 
 let find_tagged_pr t tds acc =
-  begin match lookup_meta t with
+  begin match meta_arg_type t with
     | [MTprsymbol] -> ()
     | _ -> raise (NotTaggingMeta t)
   end;
   Stdecl.fold (fun td acc -> match td.td_node with
-    | Meta (s, [MApr pr]) when s = t -> Spr.add pr acc
+    | Meta (s, [MApr pr]) when meta_equal s t -> Spr.add pr acc
     | _ -> assert false) tds.tds_set acc
 
-exception NotExclusiveMeta of string
+exception NotExclusiveMeta of meta
 
-let get_meta_exc t tds =
+let get_meta_excl t tds =
   if not (is_meta_excl t) then raise (NotExclusiveMeta t);
   Stdecl.fold (fun td _ -> match td.td_node with
     | Meta (s,arg) when s = t -> Some arg
@@ -257,9 +257,9 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | SkipFound ->    Format.fprintf fmt "Task cannot contain a skip"
   | GoalFound ->    Format.fprintf fmt "The task already ends with a goal"
   | GoalNotFound -> Format.fprintf fmt "The task does not end with a goal"
-  | NotTaggingMeta s ->
-      Format.fprintf fmt "Metaproperty '%s' is not a symbol tag" s
-  | NotExclusiveMeta s ->
-      Format.fprintf fmt "Metaproperty '%s' is not exclusive" s
+  | NotTaggingMeta m ->
+      Format.fprintf fmt "Metaproperty '%s' is not a symbol tag" (meta_name m)
+  | NotExclusiveMeta m ->
+      Format.fprintf fmt "Metaproperty '%s' is not exclusive" (meta_name m)
   | _ -> raise exn)
 

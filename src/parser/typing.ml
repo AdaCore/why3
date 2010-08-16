@@ -950,7 +950,9 @@ and add_decl env lenv th = function
         | PMAint i -> MAint (int_of_string i)
       in
       let al = List.map convert al in
-      begin try add_meta th s al
+      begin try 
+              let m = lookup_meta s in
+              add_meta th m al
       with e -> raise (Loc.Located (loc,e)) end
 
 and type_and_add_theory env lenv pt =

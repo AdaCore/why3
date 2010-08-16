@@ -34,7 +34,7 @@ type tdecl_set = private {
 val tds_equal : tdecl_set -> tdecl_set -> bool
 
 type clone_map = tdecl_set Mid.t
-type meta_map = tdecl_set Mstr.t
+type meta_map = tdecl_set Mmeta.t
 
 (** Task *)
 
@@ -57,7 +57,7 @@ val task_clone : task -> clone_map
 val task_meta  : task -> meta_map
 
 val find_clone : task -> theory -> tdecl_set
-val find_meta  : task -> string -> tdecl_set
+val find_meta  : task -> meta -> tdecl_set
 
 (** {2 constructors} *)
 
@@ -66,7 +66,7 @@ val add_tdecl : task -> tdecl -> task
 
 val use_export : task -> theory -> task
 val clone_export : task -> theory -> th_inst -> task
-val add_meta : task -> string -> meta_arg list -> task
+val add_meta : task -> meta -> meta_arg list -> task
 
 (** {2 declaration constructors + add_decl} *)
 
@@ -97,17 +97,17 @@ val task_goal  : task -> prsymbol
 
 (* special selector for metaproperties of a single ident *)
 
-exception NotTaggingMeta of string
+exception NotTaggingMeta of meta
 
-val find_tagged_ts : string -> tdecl_set -> Sts.t -> Sts.t
-val find_tagged_ls : string -> tdecl_set -> Sls.t -> Sls.t
-val find_tagged_pr : string -> tdecl_set -> Spr.t -> Spr.t
+val find_tagged_ts : meta -> tdecl_set -> Sts.t -> Sts.t
+val find_tagged_ls : meta -> tdecl_set -> Sls.t -> Sls.t
+val find_tagged_pr : meta -> tdecl_set -> Spr.t -> Spr.t
 
 (* special selector for exclusive metaproperties *)
 
-exception NotExclusiveMeta of string
+exception NotExclusiveMeta of meta
 
-val get_meta_exc : string -> tdecl_set -> meta_arg list option
+val get_meta_excl : meta -> tdecl_set -> meta_arg list option
 
 (* exceptions *)
 

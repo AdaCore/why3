@@ -46,9 +46,9 @@ val list_printers : unit -> string list
 val print_prelude : prelude pp
 val print_th_prelude : task -> prelude_map pp
 
-val meta_remove_type : string
-val meta_remove_logic : string
-val meta_remove_prop : string
+val meta_remove_type : meta
+val meta_remove_logic : meta
+val meta_remove_prop : meta
 
 val remove_type : tysymbol -> tdecl
 val remove_logic : lsymbol -> tdecl
