@@ -209,4 +209,6 @@ let explicit_polymorphism =
 
 
 let () = Trans.register_transform "explicit_polymorphism" explicit_polymorphism
+let () = 
+  Encoding.register_enco_poly "explicit" (fun _ -> explicit_polymorphism)
 

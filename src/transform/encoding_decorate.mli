@@ -23,4 +23,3 @@
     Jean-Francois Couchot et Stephane Lescuyer *)
 
 val why_filename : string list
-val meta_kept : Theory.meta

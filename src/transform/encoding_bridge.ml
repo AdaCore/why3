@@ -25,10 +25,9 @@ open Task
 open Theory
 open Task
 open Decl
+open Encoding
 
 let why_filename = ["transform" ; "encoding_decorate"]
-
-let meta_kept = Encoding_decorate.meta_kept
 
 (* From Encoding Polymorphism CADE07*)
 
@@ -36,7 +35,7 @@ type lconv = {tb2t : lsymbol;
               t2tb : lsymbol;
               tb   : ty}
 
-type tenv = {kept          : Sts.t option;
+type tenv = {kept          : Sts.t;
              clone_builtin : tysymbol -> Theory.tdecl list;
              specials      : lconv Hty.t;
              trans_lsymbol : lsymbol Hls.t;
@@ -52,7 +51,6 @@ let load_prelude kept env =
   let type_t = Theory.ns_find_ts builtin.th_export ["t"] in
   let trans_tsymbol = Hts.create 17 in
   let clone_builtin ts =
-    let task = None in
     let name = ts.ts_name.id_string in
     let th_uc = create_theory (id_fresh ("bridge_for_"^name)) in
     let th_uc = 
@@ -66,7 +64,7 @@ let load_prelude kept env =
     let t2tb = ns_find_ls th.th_export ["t2tb"] in
     let tb = ns_find_ts th.th_export ["tb"] in
     let lconv = { tb2t = tb2t; t2tb = t2tb; tb = ty_app tb []} in
-    let task = Task.use_export task th in
+    let task = Task.use_export None th in
     Hts.add trans_tsymbol ts tb;
     Hty.add specials (ty_app ts []) lconv;
     task_tdecls task in
@@ -91,13 +89,7 @@ let rec ty_of_ty tenv ty =
 let ty_of_ty_specials tenv ty =
   if Hty.mem tenv.specials ty then ty else ty_of_ty tenv ty
 
-let is_kept tenv ts = 
-  ts.ts_args = [] &&  
-    begin
-      match tenv.kept with
-        | None -> true (* every_simple *)
-        | Some s -> Sts.mem ts s
-    end
+let is_kept tenv ts = ts.ts_args = [] && Sts.mem ts tenv.kept
     
 (* Convert a logic symbols to the encoded one *)
 let conv_ls tenv ls = 
@@ -155,26 +147,15 @@ let rec rewrite_term tenv t =
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv) tl p.ls_args in
         conv_res_app tenv p tl t.t_ty
-    | Tconst _ | Tvar _ | Tif _ | Tlet _ -> t_map fnT fnF t
-    | Tcase _ | Teps _ | Tbvar _ ->
-        Printer.unsupportedTerm t
-          "Encoding decorate : I can't encode this term"
+    | _ -> t_map fnT fnF t
 
 and rewrite_fmla tenv f =
   (* Format.eprintf "@[<hov 2>Fmla : %a =>@\n@?" Pretty.print_fmla f; *)
   let fnT = rewrite_term tenv in
   let fnF = rewrite_fmla tenv in
   match f.f_node with
-    | Fapp(p, tl) when ls_equal p ps_equ ->
-        let tl = List.map fnT tl in
-        begin
-          match tl with
-            | [a1;_] ->
-                let ty = a1.t_ty in
-                let tl = List.map2 (conv_arg tenv) tl [ty;ty] in
-                f_app p tl
-            | _ -> assert false
-        end
+    | Fapp(p, [t1;t2]) when ls_equal p ps_equ ->
+        f_equ (fnT t1) (fnT t2)
     | Fapp(p, tl) -> 
         let tl = List.map fnT tl in
         let p = Hls.find tenv.trans_lsymbol p in
@@ -227,15 +208,8 @@ let decl tenv d =
 
 let t env = Trans.on_meta meta_kept (fun tds ->
   let s = Task.find_tagged_ts meta_kept tds Sts.empty in
-  let init_task,tenv = load_prelude (Some s) env in
+  let init_task,tenv = load_prelude s env in
   Trans.tdecl (decl tenv) init_task)
 
-let () = Trans.register_env_transform "encoding_bridge" t
-
-
-let t_all env =
-  let init_task,tenv = load_prelude None env in
-  Trans.tdecl (decl tenv) init_task
-
-let () = Trans.register_env_transform "encoding_bridge_every_simple" t_all
+let () = register_enco_kept "bridge" t
 

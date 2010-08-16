@@ -25,20 +25,14 @@ open Task
 open Theory
 open Task
 open Decl
+open Encoding
 
 let why_filename = ["transform" ; "encoding_decorate"]
 
-let meta_kept = register_meta "encoding_decorate : kept" [MTtysymbol]
-
 (* From Encoding Polymorphism CADE07*)
 
-type lconv = {d2t : lsymbol;
-              t2u : lsymbol;
-              tty : term}
-
-type tenv = {kept : Sts.t option;
-             clone_builtin : tysymbol -> Theory.tdecl list;
-             specials : lconv Hty.t;
+type tenv = {kept : Sts.t;
+             keptty : Sty.t;
              deco : ty;
              undeco : ty;
              sort : lsymbol;
@@ -58,42 +52,10 @@ let load_prelude kept env =
   let task = None in
   let task = Task.use_export task prelude in
   let trans_tsymbol = Hts.create 17 in
-  let specials = Hty.create 17 in
-  let builtin = Env.find_theory env why_filename "Builtin" in
-  let type_t = Theory.ns_find_ts builtin.th_export ["t"] in
-  let logic_d2t = Theory.ns_find_ls builtin.th_export ["d2t"] in
-  let logic_t2u = Theory.ns_find_ls builtin.th_export ["t2u"] in
-  let logic_tty = Theory.ns_find_ls builtin.th_export ["tty"] in
-  let clone_builtin ts =
-    let task = None in
-    let name = ts.ts_name.id_string in
-    let th_uc = create_theory (id_fresh ("encoding_decorate_for_"^name)) in
-    let th_uc = Theory.use_export th_uc prelude in
-    let th_uc = 
-      if ts_equal ts ts_int || ts_equal ts ts_real then th_uc
-      else Theory.add_ty_decl th_uc [ts,Tabstract] in
-    let ty = ty_app ts [] in
-    let add_fsymbol fs th_uc =
-      Theory.add_logic_decl th_uc [fs,None] in
-    let tty = create_fsymbol (id_clone ts.ts_name) [] tyty in
-    let d2ty = create_fsymbol (id_fresh ("d2"^name)) [deco]  ty in
-    let ty2u = create_fsymbol (id_fresh (name^"2u")) [ty] undeco in
-    let th_uc = add_fsymbol d2ty (add_fsymbol ty2u (add_fsymbol tty th_uc)) in
-    let th_inst = create_inst 
-      ~ts:[type_t,ts]
-      ~ls:[logic_d2t,d2ty;logic_t2u,ty2u;logic_tty,tty]
-      ~lemma:[] ~goal:[] in
-    let lconv = { d2t = d2ty; t2u = ty2u; tty = t_app tty [] tyty} in
-    let th_uc = Theory.clone_export th_uc builtin th_inst in
-    let th = close_theory th_uc in
-    let task = Task.use_export task th in
-    Hts.add trans_tsymbol ts tty;
-    Hty.add specials (ty_app ts []) lconv;
-    task_tdecls task in
+  let kepty = Sts.fold (fun ts -> Sty.add (ty_app ts [])) kept Sty.empty in
   task,
   { kept = kept;
-    clone_builtin = Wts.memoize 7 clone_builtin;
-    specials = specials;
+    keptty = kepty;
     deco = deco;
     undeco = undeco;
     ty = tyty;
@@ -102,13 +64,7 @@ let load_prelude kept env =
     trans_tsymbol = trans_tsymbol}
 
 let is_kept tenv ts = 
-  ts.ts_args = [] &&  
-    begin
-      ts_equal ts ts_int || ts_equal ts ts_real  (* for the constant *)
-      || match tenv.kept with
-        | None -> true (* every_simple *)
-        | Some s -> Sts.mem ts s
-    end
+  ts.ts_args = [] && Sts.mem ts tenv.kept
 
 (* Translate a type to a term *)
 let rec term_of_ty tenv tvar ty =
@@ -131,14 +87,14 @@ let sort_app tenv tvar t ty =
 
 (* Convert a type at the right of an arrow *)
 let conv_ty_neg tenv ty =
-  if Hty.mem tenv.specials ty then
+  if Sty.mem ty tenv.keptty then
     ty
   else
     tenv.deco
 
 (* Convert a type at the left of an arrow *)
 let conv_ty_pos tenv ty =
-  if Hty.mem tenv.specials ty then
+  if Sty.mem ty tenv.keptty then
     ty
   else
     tenv.undeco
@@ -163,31 +119,11 @@ let conv_ts tenv ts =
   let tyl = List.map (fun _ -> tenv.ty) ts.ts_args in
   create_fsymbol preid tyl tenv.ty
 
-(* Convert the argument of a function from specials to deco or deco to
-   specials if needed*)
-let conv_arg tenv tvar t ty = 
-  let tty = t.t_ty in
-  if ty_equal tty ty then t else
-    if ty_equal ty tenv.deco then
-      let tylconv = Hty.find tenv.specials tty in
-      let t = (t_app tylconv.t2u [t] tenv.undeco) in
-      sort_app tenv tvar t tty
-    else (* tty is tenv.deco *)
-      begin
-        assert (ty_equal tty tenv.deco);
-        let tylconv = Hty.find tenv.specials ty in       
-        t_app tylconv.d2t [t] ty
-      end
-
 (* Convert to undeco or to a specials an application *)
-let conv_res_app tenv tvar p tl ty = 
-  let tty = Util.of_option p.ls_value in
-  if ty_equal tty ty then t_app p tl tty else
-    begin
-      assert (ty_equal tty tenv.undeco);
-      let t = t_app p tl tenv.undeco in
-      sort_app tenv tvar t ty
-    end
+let conv_res_app tenv tvar t ty =
+  let tty = t.t_ty in
+  if Sty.mem tty tenv.keptty then t 
+  else sort_app tenv tvar t ty
 
 let conv_vs tenv tvar (vsvar,acc) vs =
   let tres,vsres =
@@ -214,7 +150,8 @@ let conv_vs_let vsvar vs ty_res =
 
 
 let rec rewrite_term tenv tvar vsvar t =
-  (*Format.eprintf "@[<hov 2>Term : %a =>@\n@?" Pretty.print_term t;*)
+  (* Format.eprintf "@[<hov 3>Term : %a : %a =>@\n@?" *)
+  (*   Pretty.print_term t Pretty.print_ty t.t_ty; *)
   let fnT = rewrite_term tenv tvar in
   let fnF = rewrite_fmla tenv tvar vsvar in
   match t.t_node with
@@ -223,8 +160,8 @@ let rec rewrite_term tenv tvar vsvar t =
     | Tapp(p,tl) ->
         let tl = List.map (fnT vsvar) tl in
         let p = Hls.find tenv.trans_lsymbol p in
-        let tl = List.map2 (conv_arg tenv tvar) tl p.ls_args in
-        conv_res_app tenv tvar p tl t.t_ty
+        let t' = t_app_infer p tl in
+        conv_res_app tenv tvar t' t.t_ty
     | Tif (f, t1, t2) -> 
         t_if (fnF f) (fnT vsvar t1) (fnT vsvar t2)
     | Tlet (t1, b) -> 
@@ -238,27 +175,19 @@ let rec rewrite_term tenv tvar vsvar t =
           "Encoding decorate : I can't encode this term"
 
 and rewrite_fmla tenv tvar vsvar f =
-  (* Format.eprintf "@[<hov 2>Fmla : %a =>@\n@?" Pretty.print_fmla f; *)
+  (* Format.eprintf "@[<hov>Fmla : %a =>@]@." Pretty.print_fmla f; *)
   let fnT = rewrite_term tenv tvar vsvar in
   let fnF = rewrite_fmla tenv tvar in
   match f.f_node with
-    | Fapp(p, tl) when ls_equal p ps_equ ->
-        let tl = List.map fnT tl in
-        begin
-          match tl with
-            | [a1;_] ->
-                let ty = 
-                  if Hty.mem tenv.specials a1.t_ty
-                  then a1.t_ty
-                  else tenv.deco in
-                let tl = List.map2 (conv_arg tenv tvar) tl [ty;ty] in
-                f_app p tl
-            | _ -> assert false
-        end
+    | Fapp(p, [a1;a2]) when ls_equal p ps_equ ->
+        let a1 = fnT a1 in let a2 = fnT a2 in
+        (* Format.eprintf "@[<hov>%a : %a = %a : %a@]@." *)
+        (*   Pretty.print_term a1 Pretty.print_ty a1.t_ty *)
+        (*   Pretty.print_term a2 Pretty.print_ty a2.t_ty; *)
+        f_equ a1 a2
     | Fapp(p, tl) -> 
         let tl = List.map fnT tl in
         let p = Hls.find tenv.trans_lsymbol p in
-        let tl = List.map2 (conv_arg tenv tvar) tl p.ls_args in
         f_app p tl
     | Fquant (q, b) ->
         let vl, tl, f1, close = f_open_quant_cb b in
@@ -281,8 +210,7 @@ let decl (tenv:tenv) d =
   (* let fnT = rewrite_term tenv in *)
   let fnF = rewrite_fmla tenv in
   match d.d_node with
-    | Dtype [ts,Tabstract] when is_kept tenv ts -> 
-        tenv.clone_builtin ts
+    | Dtype [ts,Tabstract] when is_kept tenv ts -> [create_decl d]
     | Dtype [ts,Tabstract] -> 
         let tty = 
           try 
@@ -333,15 +261,7 @@ let decl tenv d =
 
 let t env = Trans.on_meta meta_kept (fun tds ->
   let s = Task.find_tagged_ts meta_kept tds Sts.empty in
-  let init_task,tenv = load_prelude (Some s) env in
+  let init_task,tenv = load_prelude s env in
   Trans.tdecl (decl tenv) init_task)
 
-let () = Trans.register_env_transform "encoding_decorate" t
-
-
-let t_all env =
-  let init_task,tenv = load_prelude None env in
-  Trans.tdecl (decl tenv) init_task
-
-let () = Trans.register_env_transform "encoding_decorate_every_simple" t_all
-
+let () = register_enco_poly "decorate" t

@@ -443,6 +443,7 @@ end)
 module Sterm = Term.S
 module Mterm = Term.M
 module Hterm = Term.H
+module Wterm = Term.W
 
 module Hsfmla = Hashcons.Make (struct
 

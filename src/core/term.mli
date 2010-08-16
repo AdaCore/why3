@@ -173,6 +173,7 @@ and trigger = expr list
 
 module Mterm : Map.S with type key = term
 module Sterm : Set.S with type elt = term
+module Wterm : Hashweak.S with type key = term
 module Mfmla : Map.S with type key = fmla
 module Sfmla : Set.S with type elt = fmla
 

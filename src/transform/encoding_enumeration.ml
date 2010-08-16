@@ -79,12 +79,12 @@ let decl tenv d = match d.d_node with
   | _ ->
       [decl_map (rewrite_term tenv) (rewrite_fmla tenv) d]
 
-let t =
+let encoding_enumeration =
   let projs = Hts.create 17 in
   Trans.on_meta meta_enum (fun tds ->
     let enum = Task.find_tagged_ts meta_enum tds Sts.empty in
     let tenv = { enum = enum ; projs = projs } in
     Trans.decl (decl tenv) None)
 
-let () = Trans.register_transform "encoding_enumeration" t
+let () = Trans.register_transform "encoding_enumeration" encoding_enumeration
 

@@ -20,7 +20,7 @@ transformation "eliminate_algebraic"
 transformation "simplify_formula"
 transformation "simplify_trivial_quantification"
 
-transformation "encoding_decorate"
+transformation "encoding_smt"
 
 theory BuiltIn
   syntax type int   "Int"
@@ -56,6 +56,9 @@ theory int.Int
   remove prop Trans
   remove prop Antisymm
   remove prop Total
+
+  meta "encoding : kept" type int
+
 end
 
 theory real.Real
@@ -89,6 +92,8 @@ theory real.Real
   remove prop Trans
   remove prop Antisymm
   remove prop Total
+
+  meta "encoding : kept" type real
 
 end
 
