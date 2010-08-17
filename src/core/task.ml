@@ -57,7 +57,7 @@ let mm_find mm t =
 
 let cm_add cm th td = Mid.add th.th_name (tds_add td (cm_find cm th)) cm
 
-let mm_add mm t td = if is_meta_excl t
+let mm_add mm t td = if t.meta_excl
   then Mmeta.add t (tds_singleton td) mm
   else Mmeta.add t (tds_add td (mm_find mm t)) mm
 
@@ -216,7 +216,7 @@ let task_decls  = task_fold (fun acc td ->
 exception NotTaggingMeta of meta
 
 let find_tagged_ts t tds acc =
-  begin match meta_arg_type t with
+  begin match t.meta_type with
     | [MTtysymbol] -> ()
     | _ -> raise (NotTaggingMeta t)
   end;
@@ -225,7 +225,7 @@ let find_tagged_ts t tds acc =
     | _ -> assert false) tds.tds_set acc
 
 let find_tagged_ls t tds acc =
-  begin match meta_arg_type t with
+  begin match t.meta_type with
     | [MTlsymbol] -> ()
     | _ -> raise (NotTaggingMeta t)
   end;
@@ -234,7 +234,7 @@ let find_tagged_ls t tds acc =
     | _ -> assert false) tds.tds_set acc
 
 let find_tagged_pr t tds acc =
-  begin match meta_arg_type t with
+  begin match t.meta_type with
     | [MTprsymbol] -> ()
     | _ -> raise (NotTaggingMeta t)
   end;
@@ -245,7 +245,7 @@ let find_tagged_pr t tds acc =
 exception NotExclusiveMeta of meta
 
 let get_meta_excl t tds =
-  if not (is_meta_excl t) then raise (NotExclusiveMeta t);
+  if not t.meta_excl then raise (NotExclusiveMeta t);
   Stdecl.fold (fun td _ -> match td.td_node with
     | Meta (s,arg) when s = t -> Some arg
     | _ -> assert false) tds.tds_set None
@@ -258,8 +258,8 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | GoalFound ->    Format.fprintf fmt "The task already ends with a goal"
   | GoalNotFound -> Format.fprintf fmt "The task does not end with a goal"
   | NotTaggingMeta m ->
-      Format.fprintf fmt "Metaproperty '%s' is not a symbol tag" (meta_name m)
+      Format.fprintf fmt "Metaproperty '%s' is not a symbol tag" m.meta_name
   | NotExclusiveMeta m ->
-      Format.fprintf fmt "Metaproperty '%s' is not exclusive" (meta_name m)
+      Format.fprintf fmt "Metaproperty '%s' is not exclusive" m.meta_name
   | _ -> raise exn)
 

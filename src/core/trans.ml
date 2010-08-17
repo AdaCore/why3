@@ -54,8 +54,8 @@ let fold fn v =
   let rewind acc task =
 (*
     Format.printf "%c%d." (match task.task_decl.td_node with
-      Decl _ -> 'D' | Clone _ -> 'C' 
-  | Use _ -> 'U' | Meta _ -> 'M') task.task_tag;
+    | Decl _ -> 'D' | Clone _ -> 'C'
+    | Use _  -> 'U' | Meta _  -> 'M') task.task_tag;
 *)
     let acc = fn task acc in
     WHtask.set h task acc;

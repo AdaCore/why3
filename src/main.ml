@@ -79,7 +79,7 @@ let add_opt_goal x = match !opt_theory with
 let add_opt_trans x = opt_trans := x::!opt_trans
 
 let add_opt_meta meta =
-  let meta_name, meta_arg = 
+  let meta_name, meta_arg =
     let index = String.index meta '=' in
     (String.sub meta 0 index),
     (String.sub meta (index+1) (String.length meta - (index + 1))) in
@@ -175,15 +175,15 @@ let option_list = Arg.align [
       " Stop after type checking";
   "--debug", Arg.Set opt_debug,
       " Set the debug flag";
-  "-a", Arg.String add_opt_trans, 
+  "-a", Arg.String add_opt_trans,
   "<transformation> Add a transformation to apply to the task" ;
-  "--apply-transform", Arg.String add_opt_trans, 
+  "--apply-transform", Arg.String add_opt_trans,
   " same as -a" ]
 
 let () =
   Arg.parse option_list add_opt_file usage_msg;
 
-  (* TODO? : Since drivers can dynlink ml code they can add printer, 
+  (* TODO? : Since drivers can dynlink ml code they can add printer,
      transformations, ... So drivers should be loaded before listing *)
   if !opt_list_transforms then begin
     printf "@[<hov 2>Transed non-splitting transformations:@\n%a@]@\n@."
@@ -200,10 +200,10 @@ let () =
   end;
   if !opt_list_formats then begin
     let print1 fmt s = fprintf fmt "%S" s in
-    let print fmt (p, l) = 
+    let print fmt (p, l) =
       fprintf fmt "%s [%a]" p (Pp.print_list Pp.comma print1) l
     in
-    printf "@[<hov 2>Known input formats:@\n%a@]@." 
+    printf "@[<hov 2>Known input formats:@\n%a@]@."
       (Pp.print_list Pp.newline print)
       (List.sort Pervasives.compare (Env.list_formats ()))
   end;
@@ -215,14 +215,14 @@ let () =
   end;
   if !opt_list_metas then begin
     let metas = list_metas () in
-    let fold acc m =
-      match meta_arg_type m with
-        | [MTstring] when is_meta_excl m -> Smeta.add m acc
-        | _ -> acc in
+    let fold acc m = match m.meta_type with
+      | [MTstring] when m.meta_excl -> Smeta.add m acc
+      | _ -> acc
+    in
     let metas = List.fold_left fold Smeta.empty metas in
     printf "@[<hov 2>Known metas:@\n%a@]@\n@."
-      (Pp.print_iter1 Smeta.iter Pp.newline 
-         (fun fmt m -> pp_print_string fmt (meta_name m)))
+      (Pp.print_iter1 Smeta.iter Pp.newline
+         (fun fmt m -> pp_print_string fmt m.meta_name))
       metas
   end;
   if !opt_list_transforms || !opt_list_printers || !opt_list_provers ||
@@ -281,7 +281,7 @@ let () =
       opt_driver := Some prover.driver
   | None ->
     () end;
-  let add_meta task (meta,s) = 
+  let add_meta task (meta,s) =
     let meta = lookup_meta meta in
     add_meta task meta [MAstr s] in
   opt_task := List.fold_left add_meta !opt_task !opt_metas
@@ -330,16 +330,16 @@ let do_task drv fname tname (th : Why.Theory.theory) (task : Task.task) =
         close_out cout
 
 let do_tasks env drv fname tname th trans task =
-  let lookup acc t = 
+  let lookup acc t =
     (try t, Trans.singleton (Trans.lookup_transform t env) with
        Trans.UnknownTrans _ -> t, Trans.lookup_transform_l t env) :: acc
   in
   let transl = List.fold_left lookup [] trans in
-  let apply tasks (s, tr) = 
+  let apply tasks (s, tr) =
     try
       if debug then Format.eprintf "apply transformation %s@." s;
-      let l = List.fold_left 
-        (fun acc task -> 
+      let l = List.fold_left
+        (fun acc task ->
            List.rev_append (Trans.apply tr task) acc) [] tasks in
       List.rev l (* In order to keep the order for 1-1 transformation *)
     with e when not debug ->
@@ -364,12 +364,12 @@ let do_theory env drv fname tname th trans glist =
       (pr,trans)::accm,accs
     in
     let drv = Util.of_option drv in
-    if Queue.is_empty glist 
-    then 
+    if Queue.is_empty glist
+    then
       let tasks = List.rev (split_theory ~init:!opt_task th None) in
       let do_tasks = do_tasks env drv fname tname th trans in
       List.iter do_tasks tasks
-    else 
+    else
       let prtrans,prs = Queue.fold add ([],Decl.Spr.empty) glist in
       let tasks = split_theory ~init:!opt_task th (Some prs) in
       let recover_pr mpr task =
@@ -408,13 +408,13 @@ let do_input env drv = function
       in
       let report = Env.report ?name:!opt_parser fname in
       try
-	let m = 
-	  Env.read_channel ?name:!opt_parser ~debug:!opt_debug 
+	let m =
+	  Env.read_channel ?name:!opt_parser ~debug:!opt_debug
 	    ~parse_only:!opt_parse_only ~type_only:!opt_type_only
-	    env fname cin 
+	    env fname cin
 	in
         close_in cin;
-        if !opt_type_only then 
+        if !opt_type_only then
 	  ()
         else if Queue.is_empty tlist then
           let glist = Queue.create () in
@@ -423,7 +423,7 @@ let do_input env drv = function
           Ident.Mid.iter do_th (Mnm.fold add_th m Ident.Mid.empty)
         else
           Queue.iter (do_local_theory env drv fname m) tlist
-      with 
+      with
 	| Loc.Located (loc, e) ->
 	    eprintf "@[%a%a@]@." Loc.report_position loc report e; exit 1
 	| e ->

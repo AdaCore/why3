@@ -50,8 +50,7 @@ let enco_gen opt env =
     try
       (Hashtbl.find opt.table s) env
     with Not_found -> failwith
-      (Format.sprintf "encoding : %s wrong argument %s"
-         (meta_name opt.meta) s))
+      (Format.sprintf "encoding : %s wrong argument %s" opt.meta.meta_name s))
 
 let enco_select = enco_gen select_opt
 let enco_kept = enco_gen kept_opt

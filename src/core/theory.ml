@@ -97,13 +97,14 @@ type meta_arg =
   | MAint of int
 
 type meta = {
-  meta_tag : int;
   meta_name : string;
-  meta_arg_type : meta_arg_type list;
+  meta_type : meta_arg_type list;
   meta_excl : bool;
+  meta_tag  : int;
 }
 
 module SMmeta = StructMake(struct type t = meta let tag m = m.meta_tag end)
+
 module Smeta = SMmeta.S
 module Mmeta = SMmeta.M
 module Hmeta = SMmeta.H
@@ -115,39 +116,34 @@ exception UnknownMeta of string
 exception BadMetaArity of meta * int * int
 exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
 
-let meta_tag = let c =  ref (-1) in
-               fun () -> incr c; !c
 let meta_table = Hashtbl.create 17
+
+let mk_meta =
+  let c = ref (-1) in
+  fun s al excl -> {
+    meta_name = s;
+    meta_type = al;
+    meta_excl = excl;
+    meta_tag  = (incr c; !c) }
 
 let register_meta s al excl =
   try
-    let al' = Hashtbl.find meta_table s in
-    if al <> al'.meta_arg_type ||
-      excl <> al'.meta_excl
-    then raise (KnownMeta al')
-    else al'
-  with Not_found -> 
-    let meta = { meta_tag = meta_tag ();
-                 meta_arg_type = al;
-                 meta_name = s;
-                 meta_excl = excl} in
-    Hashtbl.add meta_table s meta;
-    meta
+    let m = Hashtbl.find meta_table s in
+    if al = m.meta_type && excl = m.meta_excl then m
+    else raise (KnownMeta m)
+  with Not_found ->
+    let m = mk_meta s al excl in
+    Hashtbl.add meta_table s m;
+    m
 
 let register_meta_excl s al = register_meta s al true
-
-let register_meta s al = register_meta s al false
+let register_meta      s al = register_meta s al false
 
 let lookup_meta s =
   try Hashtbl.find meta_table s
   with Not_found -> raise (UnknownMeta s)
 
-let is_meta_excl m = m.meta_excl
-let meta_arg_type m = m.meta_arg_type
-let meta_name m = m.meta_name
-
 let list_metas () = Hashtbl.fold (fun _ v acc -> v::acc) meta_table []
-
 
 (** Theory *)
 
@@ -670,9 +666,9 @@ let create_meta m al =
     let mt = get_meta_arg_type a in
     if at = mt then a else raise (MetaTypeMismatch (m,at,mt))
   in
-  let al = try List.map2 get_meta_arg m.meta_arg_type al
+  let al = try List.map2 get_meta_arg m.meta_type al
     with Invalid_argument _ ->
-      raise (BadMetaArity (m, List.length m.meta_arg_type, List.length al))
+      raise (BadMetaArity (m, List.length m.meta_type, List.length al))
   in
   mk_tdecl (Meta (m,al))
 

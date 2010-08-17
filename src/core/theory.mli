@@ -54,7 +54,12 @@ type meta_arg =
   | MAstr of string
   | MAint of int
 
-type meta
+type meta = private {
+  meta_name : string;
+  meta_type : meta_arg_type list;
+  meta_excl : bool;
+  meta_tag  : int;
+}
 
 module Smeta : Set.S with type elt = meta
 module Mmeta : Map.S with type key = meta
@@ -64,13 +69,9 @@ val meta_equal : meta -> meta -> bool
 
 val register_meta      : string -> meta_arg_type list -> meta
 val register_meta_excl : string -> meta_arg_type list -> meta
-val lookup_meta        : string -> meta
 
-val meta_name     : meta -> string
-val meta_arg_type : meta -> meta_arg_type list
-val is_meta_excl  : meta -> bool
-
-val list_metas : unit -> meta list
+val lookup_meta : string -> meta
+val list_metas  : unit -> meta list
 
 (** Theory *)
 
