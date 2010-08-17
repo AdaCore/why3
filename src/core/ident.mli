@@ -20,9 +20,10 @@
 (** Identifiers *)
 
 type ident = private {
-  id_string : string;   (* non-unique name *)
-  id_origin : origin;   (* origin of the ident *)
-  id_tag    : int;      (* unique numeric tag *)
+  id_string : string;       (* non-unique name *)
+  id_origin : origin;       (* origin of the ident *)
+  id_weak   : Hashweak.key; (* weak hashtable key *)
+  id_tag    : int;          (* unique numeric tag *)
 }
 
 and origin =

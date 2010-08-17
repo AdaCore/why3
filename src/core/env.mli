@@ -23,7 +23,7 @@ open Theory
 
 type env
 
-val env_tag : env -> int
+val env_weak : env -> Hashweak.key
 
 type retrieve_theory = env -> string list -> theory Mnm.t
 
@@ -32,20 +32,12 @@ val create_env : retrieve_theory -> env
 exception TheoryNotFound of string list * string
 
 val find_theory : env -> string list -> string -> theory
-  (** [find_theory e p n] finds the theory named [p.n] in environment
-      [e] 
-
-      @raises [TheoryNotFound p n] if theory not present in env [e]
-
-  *)
-  
-
-
-
+  (** [find_theory e p n] finds the theory named [p.n] in environment [e]
+      @raises [TheoryNotFound p n] if theory not present in env [e] *)
 
 (** Parsers *)
 
-type read_channel = 
+type read_channel =
   ?debug:bool -> ?parse_only:bool -> ?type_only:bool ->
   env -> string -> in_channel -> theory Mnm.t
 

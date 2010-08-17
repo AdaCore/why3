@@ -85,7 +85,12 @@ module Sstr : Set.S with type elt = string
 module Mstr : Map.S with type key = string
 
 (* Set, Map, Hashtbl on structures with a unique tag *)
-open Hashweak
+
+module type Tagged =
+sig
+  type t
+  val tag : t -> int
+end
 
 module type OrderedHash =
 sig
@@ -103,7 +108,6 @@ sig
   module S : Set.S with type elt = X.t
   module M : Map.S with type key = X.t
   module H : Hashtbl.S with type key = X.t
-  module W : Hashweak.S with type key = X.t
 end
 
 (* memoization *)

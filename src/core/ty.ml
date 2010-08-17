@@ -49,6 +49,7 @@ type tysymbol = {
 
 and ty = {
   ty_node : ty_node;
+  ty_weak : Hashweak.key;
   ty_tag : int;
 }
 
@@ -64,7 +65,11 @@ end)
 module Sts = Tsym.S
 module Mts = Tsym.M
 module Hts = Tsym.H
-module Wts = Tsym.W
+
+module Wts = Hashweak.Make (struct
+  type t = tysymbol
+  let key ts = ts.ts_name.id_weak
+end)
 
 let ts_equal = (==)
 let ty_equal = (==)
@@ -105,9 +110,18 @@ module Ty = StructMake (Tty)
 module Sty = Ty.S
 module Mty = Ty.M
 module Hty = Ty.H
-module Wty = Ty.W
 
-let mk_ty n = { ty_node = n; ty_tag = -1 }
+module Wty = Hashweak.Make (struct
+  type t = ty
+  let key ty = ty.ty_weak
+end)
+
+let mk_ty n = {
+  ty_node = n;
+  ty_weak = Hashweak.create_key ();
+  ty_tag  = -1
+}
+
 let ty_var n = Hsty.hashcons (mk_ty (Tyvar n))
 let ty_app s tl = Hsty.hashcons (mk_ty (Tyapp (s, tl)))
 

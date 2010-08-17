@@ -63,6 +63,11 @@ module Sls = Lsym.S
 module Mls = Lsym.M
 module Hls = Lsym.H
 
+module Wls = Hashweak.Make (struct
+  type t = lsymbol
+  let key ls = ls.ls_name.id_weak
+end)
+
 let ls_equal = (==)
 
 let create_lsymbol name args value = {
@@ -443,7 +448,6 @@ end)
 module Sterm = Term.S
 module Mterm = Term.M
 module Hterm = Term.H
-module Wterm = Term.W
 
 module Hsfmla = Hashcons.Make (struct
 

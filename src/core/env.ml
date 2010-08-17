@@ -25,28 +25,25 @@ open Theory
 type env = {
   env_retrieve : retrieve_theory;
   env_memo     : (string list, theory Mnm.t) Hashtbl.t;
-  env_tag      : int;
+  env_weak     : Hashweak.key;
 }
 
 and retrieve_theory = env -> string list -> theory Mnm.t
 
-let create_env =
-  let r = ref 0 in
-  fun retrieve ->
-    incr r;
-    let env = {
-      env_retrieve = retrieve;
-      env_memo     = Hashtbl.create 17;
-      env_tag      = !r }
-    in
-    let add th m = Mnm.add th.th_name.id_string th m in
-    let m = Mnm.empty in
-    let m = add builtin_theory m in
-    let m = add (tuple_theory 0) m in
-    let m = add (tuple_theory 1) m in
-    let m = add (tuple_theory 2) m in
-    Hashtbl.add env.env_memo [] m;
-    env
+let create_env retrieve =
+  let env = {
+    env_retrieve = retrieve;
+    env_memo     = Hashtbl.create 17;
+    env_weak     = Hashweak.create_key (); }
+  in
+  let add th m = Mnm.add th.th_name.id_string th m in
+  let m = Mnm.empty in
+  let m = add builtin_theory m in
+  let m = add (tuple_theory 0) m in
+  let m = add (tuple_theory 1) m in
+  let m = add (tuple_theory 2) m in
+  Hashtbl.add env.env_memo [] m;
+  env
 
 exception TheoryNotFound of string list * string
 
@@ -65,7 +62,7 @@ let find_theory env sl s =
   with Not_found ->
     raise (TheoryNotFound (sl, s))
 
-let env_tag env = env.env_tag
+let env_weak env = env.env_weak
 
 
 (** Parsers *)

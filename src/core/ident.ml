@@ -22,9 +22,10 @@ open Util
 (** Identifiers *)
 
 type ident = {
-  id_string : string;   (* non-unique name *)
-  id_origin : origin;   (* origin of the ident *)
-  id_tag    : int;      (* unique numeric tag *)
+  id_string : string;       (* non-unique name *)
+  id_origin : origin;       (* origin of the ident *)
+  id_weak   : Hashweak.key; (* weak hashtable key *)
+  id_tag    : int;          (* unique numeric tag *)
 }
 
 and origin =
@@ -54,6 +55,7 @@ let id_register id = { id with id_tag = gentag () }
 let create_ident name origin = {
   id_string = name;
   id_origin = origin;
+  id_weak   = Hashweak.create_key ();
   id_tag    = -1
 }
 

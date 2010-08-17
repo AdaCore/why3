@@ -69,7 +69,7 @@ let init_tenv kept =
   in
   task,
   { kept          = kept;
-    declare_kept  = Wts.memoize 7 declare_kept;
+    declare_kept  = Wts.memoize declare_kept;
     specials      = specials;
     ty_uni        = ty_uni;
     trans_lsymbol = Hls.create 17 }

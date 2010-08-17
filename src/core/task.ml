@@ -27,8 +27,9 @@ open Theory
 (** Clone and meta history *)
 
 type tdecl_set = {
-  tds_set : Stdecl.t;
-  tds_tag : int;
+  tds_set  : Stdecl.t;
+  tds_weak : Hashweak.key;
+  tds_tag  : int;
 }
 
 module Hstds = Hashcons.Make (struct
@@ -39,7 +40,11 @@ module Hstds = Hashcons.Make (struct
   let tag n s = { s with tds_tag = n }
 end)
 
-let mk_tds s = Hstds.hashcons { tds_set = s; tds_tag = -1 }
+let mk_tds s = Hstds.hashcons {
+  tds_set  = s;
+  tds_weak = Hashweak.create_key ();
+  tds_tag  = -1
+}
 
 let empty_tds = mk_tds Stdecl.empty
 let tds_add td s = mk_tds (Stdecl.add td s.tds_set)
@@ -66,12 +71,13 @@ let mm_add mm t td = if t.meta_excl
 type task = task_hd option
 
 and task_hd = {
-  task_decl  : tdecl;       (* last declaration *)
-  task_prev  : task;        (* context *)
-  task_known : known_map;   (* known identifiers *)
-  task_clone : clone_map;   (* cloning history *)
-  task_meta  : meta_map;    (* meta properties *)
-  task_tag   : int;         (* unique task tag *)
+  task_decl  : tdecl;        (* last declaration *)
+  task_prev  : task;         (* context *)
+  task_known : known_map;    (* known identifiers *)
+  task_clone : clone_map;    (* cloning history *)
+  task_meta  : meta_map;     (* meta properties *)
+  task_weak  : Hashweak.key; (* weak hashtable key *)
+  task_tag   : int;          (* unique task tag *)
 }
 
 let task_hd_equal = (==)
@@ -101,6 +107,7 @@ let mk_task decl prev known clone meta = Some (Hstask.hashcons {
   task_known = known;
   task_clone = clone;
   task_meta  = meta;
+  task_weak  = Hashweak.create_key ();
   task_tag   = -1;
 })
 

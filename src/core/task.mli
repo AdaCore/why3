@@ -27,8 +27,9 @@ open Theory
 (** Clone and meta history *)
 
 type tdecl_set = private {
-  tds_set : Stdecl.t;
-  tds_tag : int;
+  tds_set  : Stdecl.t;
+  tds_weak : Hashweak.key;
+  tds_tag  : int;
 }
 
 val tds_equal : tdecl_set -> tdecl_set -> bool
@@ -41,12 +42,13 @@ type meta_map = tdecl_set Mmeta.t
 type task = task_hd option
 
 and task_hd = private {
-  task_decl  : tdecl;       (* last declaration *)
-  task_prev  : task;        (* context *)
-  task_known : known_map;   (* known identifiers *)
-  task_clone : clone_map;   (* cloning history *)
-  task_meta  : meta_map;    (* meta properties *)
-  task_tag   : int;         (* unique task tag *)
+  task_decl  : tdecl;        (* last declaration *)
+  task_prev  : task;         (* context *)
+  task_known : known_map;    (* known identifiers *)
+  task_clone : clone_map;    (* cloning history *)
+  task_meta  : meta_map;     (* meta properties *)
+  task_weak  : Hashweak.key; (* weak hashtable key *)
+  task_tag   : int;          (* unique task tag *)
 }
 
 val task_equal : task -> task -> bool

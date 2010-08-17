@@ -56,6 +56,7 @@ type prsymbol = private {
 module Spr : Set.S with type elt = prsymbol
 module Mpr : Map.S with type key = prsymbol
 module Hpr : Hashtbl.S with type key = prsymbol
+module Wpr : Hashweak.S with type key = prsymbol
 
 val create_prsymbol : preid -> prsymbol
 
@@ -77,8 +78,9 @@ type prop_decl = prop_kind * prsymbol * fmla
 
 type decl = private {
   d_node : decl_node;
-  d_syms : Sid.t;       (* idents used in declaration *)
-  d_news : Sid.t;       (* idents introduced in declaration *)
+  d_syms : Sid.t;         (* idents used in declaration *)
+  d_news : Sid.t;         (* idents introduced in declaration *)
+  d_weak : Hashweak.key;  (* weak hashtable key *)
   d_tag  : int;
 }
 
@@ -90,7 +92,6 @@ and decl_node =
 
 module Sdecl : Set.S with type elt = decl
 module Mdecl : Map.S with type key = decl
-module Hdecl : Hashtbl.S with type key = decl
 
 val d_equal : decl -> decl -> bool
 

@@ -43,6 +43,7 @@ type tysymbol = private {
 
 and ty = private {
   ty_node : ty_node;
+  ty_weak : Hashweak.key;
   ty_tag  : int;
 }
 
@@ -55,7 +56,7 @@ module Mts : Map.S with type key = tysymbol
 module Hts : Hashtbl.S with type key = tysymbol
 module Wts : Hashweak.S with type key = tysymbol
 
-module Tty : Hashweak.Tagged with type t = ty
+module Tty : Util.Tagged with type t = ty
 
 module Sty : Set.S with type elt = ty
 module Mty : Map.S with type key = ty

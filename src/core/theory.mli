@@ -98,7 +98,6 @@ and tdecl_node = private
 module Stdecl : Set.S with type elt = tdecl
 module Mtdecl : Map.S with type key = tdecl
 module Htdecl : Hashtbl.S with type key = tdecl
-module Wtdecl : Hashweak.S with type key = tdecl
 
 val td_equal : tdecl -> tdecl -> bool
 

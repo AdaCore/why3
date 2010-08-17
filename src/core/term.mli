@@ -48,6 +48,7 @@ type lsymbol = private {
 module Sls : Set.S with type elt = lsymbol
 module Mls : Map.S with type key = lsymbol
 module Hls : Hashtbl.S with type key = lsymbol
+module Wls : Hashweak.S with type key = lsymbol
 
 val ls_equal : lsymbol -> lsymbol -> bool
 
@@ -71,8 +72,8 @@ exception PredicateSymbolExpected of lsymbol
 type pattern = private {
   pat_node : pattern_node;
   pat_vars : Svs.t;
-  pat_ty : ty;
-  pat_tag : int;
+  pat_ty   : ty;
+  pat_tag  : int;
 }
 
 and pattern_node = private
@@ -173,7 +174,6 @@ and trigger = expr list
 
 module Mterm : Map.S with type key = term
 module Sterm : Set.S with type elt = term
-module Wterm : Hashweak.S with type key = term
 module Mfmla : Map.S with type key = fmla
 module Sfmla : Set.S with type elt = fmla
 

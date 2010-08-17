@@ -86,6 +86,11 @@ module Spr = Prop.S
 module Mpr = Prop.M
 module Hpr = Prop.H
 
+module Wpr = Hashweak.Make (struct
+  type t = prsymbol
+  let key pr = pr.pr_name.id_weak
+end)
+
 let pr_equal = (==)
 
 let create_prsymbol n = { pr_name = id_register n }
@@ -106,8 +111,9 @@ type prop_decl = prop_kind * prsymbol * fmla
 
 type decl = {
   d_node : decl_node;
-  d_syms : Sid.t;       (* idents used in declaration *)
-  d_news : Sid.t;       (* idents introduced in declaration *)
+  d_syms : Sid.t;         (* idents used in declaration *)
+  d_news : Sid.t;         (* idents introduced in declaration *)
+  d_weak : Hashweak.key;  (* weak hashtable key *)
   d_tag  : int;
 }
 
@@ -180,7 +186,6 @@ end)
 
 module Sdecl = Decl.S
 module Mdecl = Decl.M
-module Hdecl = Decl.H
 
 let d_equal = (==)
 
@@ -190,6 +195,7 @@ let mk_decl node syms news = Hsdecl.hashcons {
   d_node = node;
   d_syms = syms;
   d_news = news;
+  d_weak = Hashweak.create_key ();
   d_tag  = -1;
 }
 

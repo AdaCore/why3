@@ -226,7 +226,6 @@ end)
 module Stdecl = Tdecl.S
 module Mtdecl = Tdecl.M
 module Htdecl = Tdecl.H
-module Wtdecl = Tdecl.W
 
 let td_equal = (==)
 

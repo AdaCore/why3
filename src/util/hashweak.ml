@@ -17,14 +17,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
-module type S = sig
+module Weak : sig
 
   type key
 
   type 'a t
 
-  val create : int -> 'a t
+  val create_key : unit -> key
+
+  val create : unit -> 'a t
     (* create a hashtbl with weak keys *)
 
   val find : 'a t -> key -> 'a
@@ -37,64 +38,90 @@ module type S = sig
   val set : 'a t -> key -> 'a -> unit
     (* bind the key _once_ with the given value *)
 
-  val memoize : int -> (key -> 'a) -> (key -> 'a)
+end = struct
+
+  type key = ((int,Obj.t) Hashtbl.t) Lazy.t
+
+  type 'a t = int
+
+  let create_key () = lazy (Hashtbl.create 3)
+
+  let create = let c = ref (-1) in fun () -> incr c; !c
+
+  let find t k  = Obj.obj (Hashtbl.find (Lazy.force k) t)
+  let mem t k   = Hashtbl.mem (Lazy.force k) t
+  let set t k v = Hashtbl.replace (Lazy.force k) t (Obj.repr v)
+
+end
+
+include Weak
+
+module type S = sig
+
+  type key
+
+  type 'a t
+
+  val create : unit -> 'a t
+    (* create a hashtbl with weak keys *)
+
+  val find : 'a t -> key -> 'a
+    (* find the value bound to a key.
+       Raises Not_found if there is no binding *)
+
+  val mem : 'a t -> key -> bool
+    (* test if a key is bound *)
+
+  val set : 'a t -> key -> 'a -> unit
+    (* bind the key _once_ with the given value *)
+
+  val memoize : (key -> 'a) -> (key -> 'a)
     (* create a memoizing function *)
 
-  val memoize_option : int -> (key option -> 'a) -> (key option -> 'a)
+  val memoize_option : (key option -> 'a) -> (key option -> 'a)
     (* memoizing functions on option types *)
 
 end
 
-module type Tagged =
+module type Weakey =
 sig
   type t
-  val tag : t -> int
+  val key : t -> Weak.key
 end
 
-module Make (S : Tagged) = struct
+module Make (S : Weakey) = struct
+
   type key = S.t
 
-  type 'a t = {
-    table : (int,'a) Hashtbl.t;
-    final : S.t -> unit;
-  }
+  type 'a t = 'a Weak.t
 
-  let create n =
-    let table = Hashtbl.create n in
-    let w = Weak.create 1 in
-    Weak.set w 0 (Some table);
-    let final x = match Weak.get w 0 with
-      | Some h -> Hashtbl.remove h (S.tag x)
-      | None -> ()
-    in
-    { table = table; final = final }
+  let create = Weak.create
 
-  let add_tag  h = Hashtbl.add  h.table
-  let mem_tag  h = Hashtbl.mem  h.table
-  let find_tag h = Hashtbl.find h.table
+  let set_key  h = Weak.set  h
+  let mem_key  h = Weak.mem  h
+  let find_key h = Weak.find h
 
-  let set_tag h t e v =
-    assert (not (mem_tag h t));
-    Gc.finalise h.final e;
-    add_tag h t v
+  let set_key h k v =
+    assert (not (mem_key h k));
+    set_key h k v
 
-  let set  h e = set_tag  h (S.tag e) e
-  let mem  h e = mem_tag  h (S.tag e)
-  let find h e = find_tag h (S.tag e)
+  let set  h e = set_key  h (S.key e)
+  let mem  h e = mem_key  h (S.key e)
+  let find h e = find_key h (S.key e)
 
-  let memoize n fn =
-    let h = create n in fun e ->
-      let t = S.tag e in
-      try find_tag h t
+  let memoize fn =
+    let h = create () in fun e ->
+      let k = S.key e in
+      try find_key h k
       with Not_found ->
         let v = fn e in
-        set_tag h t e v;
+        set_key h k v;
         v
 
-  let memoize_option n fn =
+  let memoize_option fn =
     let v = lazy (fn None) in
-    let fn e = fn (Some e) in 
-    let fn = memoize n fn in
+    let fn e = fn (Some e) in
+    let fn = memoize fn in
     function
       | Some e -> fn e
       | None -> Lazy.force v
