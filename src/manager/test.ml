@@ -171,7 +171,7 @@ let add_task (tname : string) (task : Task.task) acc =
   Db.add_or_replace_task ~tname ~name task :: acc
 
 let do_theory tname th glist =
-  let tasks = Task.split_theory th None in
+  let tasks = Task.split_theory th None None in
   List.fold_right (add_task tname) tasks glist
 
 

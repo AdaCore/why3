@@ -366,12 +366,12 @@ let do_theory env drv fname tname th trans glist =
     let drv = Util.of_option drv in
     if Queue.is_empty glist
     then
-      let tasks = List.rev (split_theory ~init:!opt_task th None) in
+      let tasks = List.rev (split_theory th None !opt_task) in
       let do_tasks = do_tasks env drv fname tname th trans in
       List.iter do_tasks tasks
     else
       let prtrans,prs = Queue.fold add ([],Decl.Spr.empty) glist in
-      let tasks = split_theory ~init:!opt_task th (Some prs) in
+      let tasks = split_theory th (Some prs) !opt_task in
       let recover_pr mpr task =
         let pr = task_goal task in
         Decl.Mpr.add pr task mpr in

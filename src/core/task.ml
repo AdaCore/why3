@@ -111,41 +111,43 @@ let task_meta  = option_apply Mmeta.empty (fun t -> t.task_meta)
 let find_clone task th = cm_find (task_clone task) th
 let find_meta  task t  = mm_find (task_meta  task) t
 
-let add_decl task d td =
-  let kn = known_add_decl (task_known task) d in
-  mk_task td task kn (task_clone task) (task_meta task)
-
-let add_clone task th td =
-  let cl = cm_add (task_clone task) th td in
-  mk_task td task (task_known task) cl (task_meta task)
-
-let add_meta task t td =
-  let mt = mm_add (task_meta task) t td in
-  mk_task td task (task_known task) (task_clone task) mt
-
-(* add_decl with checks *)
+(* constructors with checks *)
 
 exception LemmaFound
 exception SkipFound
 exception GoalFound
 exception GoalNotFound
 
-let rec task_goal = function
-  | Some task ->
-      begin match task.task_decl.td_node with
-        | Decl { d_node = Dprop (Pgoal,pr,_) } -> pr
-        | Decl _ -> raise GoalNotFound
-        | _ -> task_goal task.task_prev
-      end
-  | None -> raise GoalNotFound
+let find_goal = function
+  | Some {task_decl = {td_node = Decl {d_node = Dprop (Pgoal,p,_)}}} -> Some p
+  | _ -> None
 
-let new_decl task d td = match d.d_node with
-  | Dprop (Plemma,_,_) -> raise LemmaFound
-  | Dprop (Pskip,_,_)  -> raise SkipFound
-  | _ ->
-      try ignore (task_goal task); raise GoalFound
-      with GoalNotFound -> try add_decl task d td
-      with KnownIdent _ -> task
+let task_goal task  = match find_goal task with
+  | Some pr -> pr
+  | None    -> raise GoalNotFound
+
+let check_task task = match find_goal task with
+  | Some _  -> raise GoalFound
+  | None    -> task
+
+let check_decl = function
+  | { d_node = Dprop (Plemma,_,_)} -> raise LemmaFound
+  | { d_node = Dprop (Pskip,_,_)}  -> raise SkipFound
+  | d -> d
+
+let new_decl task d td =
+  let kn = known_add_decl (task_known task) (check_decl d) in
+  mk_task td (check_task task) kn (task_clone task) (task_meta task)
+
+let new_decl task d td = try new_decl task d td with KnownIdent _ -> task
+
+let new_clone task th td =
+  let cl = cm_add (task_clone task) th td in
+  mk_task td (check_task task) (task_known task) cl (task_meta task)
+
+let new_meta task t td =
+  let mt = mm_add (task_meta task) t td in
+  mk_task td (check_task task) (task_known task) (task_clone task) mt
 
 (* declaration constructors + add_decl *)
 
@@ -165,8 +167,8 @@ let add_ind_decls tk dl = List.fold_left add_decl tk (create_ind_decls dl)
 let rec add_tdecl task td = match td.td_node with
   | Decl d -> new_decl task d td
   | Use th -> use_export task th
-  | Clone (th,_,_,_) -> add_clone task th td
-  | Meta (t,_) -> add_meta task t td
+  | Clone (th,_,_,_) -> new_clone task th td
+  | Meta (t,_) -> new_meta task t td
 
 and flat_tdecl task td = match td.td_node with
   | Decl { d_node = Dprop (Plemma,pr,f) } -> add_prop_decl task Paxiom pr f
@@ -177,11 +179,11 @@ and use_export task th =
   let td = create_null_clone th in
   if Stdecl.mem td (find_clone task th).tds_set then task else
   let task = List.fold_left flat_tdecl task th.th_decls in
-  add_clone task th td
+  new_clone task th td
 
 let clone_export = clone_theory flat_tdecl
 
-let add_meta task t al = add_meta task t (create_meta t al)
+let add_meta task t al = new_meta task t (create_meta t al)
 
 (* split theory *)
 
@@ -193,7 +195,7 @@ let split_tdecl names (res,task) td = match td.td_node with
   | _ ->
       res, flat_tdecl task td
 
-let split_theory ?(init=None) th names =
+let split_theory th names init =
   fst (List.fold_left (split_tdecl names) ([],init) th.th_decls)
 
 (* Generic utilities *)

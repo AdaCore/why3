@@ -81,7 +81,7 @@ val add_ind_decls : task -> ind_decl list -> task
 
 (** {2 utilities} *)
 
-val split_theory : ?init:task -> theory -> Spr.t option -> task list
+val split_theory : theory -> Spr.t option -> task -> task list
   (** [split_theory th s] returns the tasks of [th] which end by one
       of [s]. They are in the opposite order than in the theory *)
 

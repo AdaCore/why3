@@ -207,7 +207,7 @@ let add_task (tname : string) (task : Why.Task.task) acc =
   Db.add_or_replace_task ~tname ~name task :: acc
 
 let do_theory tname th glist =
-  let tasks = Why.Task.split_theory th None in
+  let tasks = Why.Task.split_theory th None None in
   List.fold_right (add_task tname) tasks glist
 
 
@@ -263,7 +263,7 @@ module Ide_goals = struct
     model#set ~row:parent ~column:name_column tname;
     model#set ~row:parent ~column:id_column th.Theory.th_name;
     (* model#set ~row:parent ~column:status_column `REMOVE; *)
-    let tasks = Task.split_theory th None in
+    let tasks = Task.split_theory th None None in
     List.iter
       (fun t->
          let id = (Task.task_goal t).Decl.pr_name in
