@@ -87,7 +87,6 @@ and dexpr_desc =
   | DEloop of dloop_annotation * dexpr
   | DElazy of lazy_op * dexpr * dexpr
   | DEmatch of dexpr * (Denv.dpattern * dexpr) list
-  | DEskip
   | DEabsurd 
   | DEraise of Term.lsymbol * dexpr option
   | DEtry of dexpr * (Term.lsymbol * string option * dexpr) list
@@ -142,12 +141,10 @@ and iexpr_desc =
   | IElet of Term.vsymbol * iexpr * iexpr
   | IEletrec of irecfun list * iexpr
 
-  | IEsequence of iexpr * iexpr
   | IEif of iexpr * iexpr * iexpr
   | IEloop of loop_annotation * iexpr
   | IElazy of lazy_op * iexpr * iexpr
   | IEmatch of Term.vsymbol * (Term.pattern * iexpr) list
-  | IEskip 
   | IEabsurd
   | IEraise of Term.lsymbol * iexpr option
   | IEtry of iexpr * (Term.lsymbol * Term.vsymbol option * iexpr) list
@@ -180,11 +177,9 @@ and expr_desc =
   | Elet of Term.vsymbol * expr * expr
   | Eletrec of recfun list * expr
 
-  | Esequence of expr * expr
   | Eif of expr * expr * expr
   | Eloop of loop_annotation * expr
   | Ematch of Term.vsymbol * (Term.pattern * expr) list
-  | Eskip 
   | Eabsurd
   | Eraise of Term.lsymbol * expr option
   | Etry of expr * (Term.lsymbol * Term.vsymbol option * expr) list

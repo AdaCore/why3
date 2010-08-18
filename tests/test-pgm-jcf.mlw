@@ -12,9 +12,11 @@ let f () =
   assert { !r > 0 }
 
 let foo () =
-  let x = any {} int {result=0} in
-  let y = any {} int {result=result+1} in 
-  assert { false }
+  let x = ref 0 in
+  x := 1;
+  assert { !x = 1 };
+  x := !x + 1;
+  assert { !x > 1 }
 
 (*
 Local Variables: 

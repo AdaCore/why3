@@ -284,10 +284,6 @@ and wp_desc env e q = match e.expr_desc with
       let wl = List.map (wp_recfun env) dl in 
       wp_ands ~sym:true (w1 :: wl)
 
-  | Esequence (e1, e2) ->
-      let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
-      let q1 = saturate_post e1.expr_effect (v_result e1.expr_type, w2) q in
-      wp_expr env e1 q1
   | Eif (e1, e2, e3) ->
       let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
       let w3 = wp_expr env e3 (filter_post e3.expr_effect q) in
@@ -323,8 +319,6 @@ and wp_desc env e q = match e.expr_desc with
       in
       let t = t_var x in
       f_case t (List.map branch bl)
-  | Eskip ->
-      let (_, q), _ = q in q
   | Eabsurd ->
       f_false
   | Eraise (x, None) ->

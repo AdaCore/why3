@@ -390,7 +390,7 @@ and dexpr_desc env loc = function
       let bl = List.map branch bl in
       DEmatch (e1, bl), ty
   | Pgm_ptree.Eskip ->
-      DEskip, (dty_unit env.env)
+      DElogic env.env.ls_unit, (dty_unit env.env)
   | Pgm_ptree.Eabsurd ->
       DEabsurd, create_type_var loc
   | Pgm_ptree.Eraise (id, e) ->
@@ -660,7 +660,8 @@ and iexpr_desc gl env loc ty = function
       IEletrec (dl, e1)
 
   | DEsequence (e1, e2) ->
-      IEsequence (iexpr gl env e1, iexpr gl env e2)
+      let vs = create_vsymbol (id_fresh "_") (ty_app gl.ts_unit []) in
+      IElet (vs, iexpr gl env e1, iexpr gl env e2)
   | DEif (e1, e2, e3) ->
       IEif (iexpr gl env e1, iexpr gl env e2, iexpr gl env e3)
   | DEloop (la, e1) ->
@@ -681,8 +682,6 @@ and iexpr_desc gl env loc ty = function
       let bl = List.map branch bl in
       let v = create_vsymbol (id_user "x" loc) e1.iexpr_type in
       IElet (v, e1, mk_iexpr loc ty (IEmatch (v, bl)))
-  | DEskip ->
-      IEskip
   | DEabsurd ->
       IEabsurd
   | DEraise (ls, e) ->
@@ -798,9 +797,6 @@ let rec print_iexpr fmt e = match e.iexpr_desc with
       fprintf fmt "@[let %a = %a in@ %a@]" print_vs v
 	print_iexpr e1 print_iexpr e2
 
-  | IEsequence (e1, e2) ->
-      fprintf fmt "@[%a;@\n%a@]" print_iexpr e1 print_iexpr e2
-
   | _ ->
       fprintf fmt "<other>"
 
@@ -854,13 +850,13 @@ let without_exn_check f x =
 let rec is_pure_expr e = 
   E.no_side_effect e.expr_effect &&
   match e.expr_desc with
-  | Elocal _ | Elogic _ | Eskip -> true
+  | Elocal _ | Elogic _ -> true
   | Eif (e1, e2, e3) -> is_pure_expr e1 && is_pure_expr e2 && is_pure_expr e3
   | Elet (_, e1, e2) -> is_pure_expr e1 && is_pure_expr e2
   | Elabel (_, e1) -> is_pure_expr e1
   | Eany c -> E.no_side_effect c.c_effect
   | Eassert _ | Etry _ | Eraise _ | Ematch _ 
-  | Eloop _ | Esequence _ | Eletrec _ | Efun _ 
+  | Eloop _ | Eletrec _ | Efun _ 
   | Eglobal _ | Eabsurd -> false (* TODO: improve *)
 
 let mk_expr loc ty ef d =
@@ -939,11 +935,6 @@ and expr_desc gl env loc ty = function
       let e1 = expr gl env e1 in
       Eletrec (dl, e1), e1.expr_type_v, e1.expr_effect
 
-  | IEsequence (e1, e2) ->
-      let e1 = expr gl env e1 in
-      let e2 = expr gl env e2 in
-      let ef = E.union e1.expr_effect e2.expr_effect in
-      Esequence (e1, e2), e2.expr_type_v, ef
   | IEif (e1, e2, e3) ->
       let e1 = expr gl env e1 in
       let e2 = expr gl env e2 in
@@ -999,8 +990,6 @@ and expr_desc gl env loc ty = function
       in
       let ef, bl = map_fold_left branch E.empty bl in
       Ematch (v, bl), Tpure ty, ef
-  | IEskip ->
-      Eskip, Tpure ty, E.empty
   | IEabsurd ->
       Eabsurd, Tpure ty, E.empty
   | IEraise (x, e1) ->
@@ -1109,9 +1098,6 @@ let rec fresh_expr gl ~term locals e = match e.expr_desc with
       List.iter (fun (_, _, _, t) -> fresh_triple gl t) fl;
       fresh_expr gl ~term locals e1
 
-  | Esequence (e1, e2) ->
-      fresh_expr gl ~term:false locals e1;
-      fresh_expr gl ~term       locals e2
   | Eif (e1, e2, e3) ->
       fresh_expr gl ~term:false locals e1;
       fresh_expr gl ~term       locals e2;
@@ -1121,7 +1107,7 @@ let rec fresh_expr gl ~term locals e = match e.expr_desc with
   | Ematch (_, bl) ->
       let branch (_, e1) = fresh_expr gl ~term locals e1 in
       List.iter branch bl
-  | Eskip | Eabsurd | Eraise (_, None) ->
+  | Eabsurd | Eraise (_, None) ->
       ()
   | Eraise (_, Some e1) ->
       fresh_expr gl ~term:false locals e1
@@ -1152,8 +1138,6 @@ let rec print_expr fmt e = match e.expr_desc with
       fprintf fmt "@[let %a = %a in@ %a@]" print_vs v
 	print_expr e1 print_expr e2
 
-  | Esequence (e1, e2) ->
-      fprintf fmt "@[%a;@\n%a@]" print_expr e1 print_expr e2
   | Eif (e1, e2, e3) ->
       fprintf fmt "@[if %a@ then@ %a else@ %a@]" 
 	print_expr e1 print_expr e2 print_expr e3

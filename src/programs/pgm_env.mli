@@ -51,6 +51,7 @@ type env = private {
   ls_False: lsymbol;
   ls_andb : lsymbol;
   ls_orb  : lsymbol;
+  ls_unit : lsymbol;
 }
 
 val empty_env : theory_uc -> env

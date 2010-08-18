@@ -55,6 +55,7 @@ type env = {
   ls_False: lsymbol;
   ls_andb : lsymbol;
   ls_orb  : lsymbol;
+  ls_unit : lsymbol;
 }
 
 
@@ -141,6 +142,7 @@ let empty_env uc = {
   ls_False = find_ls uc ["False"];
   ls_andb   = find_ls uc ["andb"];
   ls_orb    = find_ls uc ["orb"];
+  ls_unit   = find_ls uc ["Tuple0"];
 }    
 
 let make_arrow_type env tyl ty =
