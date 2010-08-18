@@ -94,9 +94,9 @@ let equal t1 t2 =
 let no_side_effect t =
   Sref.is_empty t.writes && Sls.is_empty t.raises
 
-let subst vs r t =
+let subst m t =
   let add1 r' s = match r' with
-    | Rlocal vs' when vs_equal vs' vs -> Sref.add r s
+    | Rlocal vs' -> Sref.add (try Mvs.find vs' m with Not_found -> r') s
     | _ -> Sref.add r' s
   in
   let apply s = Sref.fold add1 s Sref.empty in

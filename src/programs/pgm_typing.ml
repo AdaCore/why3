@@ -528,10 +528,10 @@ let variant loc env (t, ps) =
 
 let rec type_v gl env = function
   | DTpure ty -> 
-      Tpure (Denv.ty_of_dty ty)
+      tpure (Denv.ty_of_dty ty)
   | DTarrow (bl, c) -> 
       let env, bl = map_fold_left (binder gl) env bl in
-      Tarrow (bl, type_c gl env c)
+      tarrow bl (type_c gl env c)
 
 and type_c gl env c = 
   let tyv = type_v gl env c.dc_result_type in
@@ -823,9 +823,9 @@ let add_binders = List.fold_left add_binder
 
 let rec add_local_pat env p = match p.pat_node with
   | Term.Pwild -> env
-  | Term.Pvar x -> add_local x (Tpure p.pat_ty) env
+  | Term.Pvar x -> add_local x (tpure p.pat_ty) env
   | Term.Papp (_, pl) -> List.fold_left add_local_pat env pl
-  | Term.Pas (p, x) -> add_local_pat (add_local x (Tpure p.pat_ty) env) p
+  | Term.Pas (p, x) -> add_local_pat (add_local x (tpure p.pat_ty) env) p
   | Term.Por (p, _) -> add_local_pat env p
 
 let make_apply loc e1 ty c =
@@ -860,14 +860,14 @@ let rec is_pure_expr e =
   | Eglobal _ | Eabsurd -> false (* TODO: improve *)
 
 let mk_expr loc ty ef d =
-  { expr_desc = d; expr_type = ty; expr_type_v = Tpure ty;
+  { expr_desc = d; expr_type = ty; expr_type_v = tpure ty;
     expr_effect = ef; expr_loc = loc }
 
 let mk_simple_expr loc ty d = mk_expr loc ty E.empty d
 
 let mk_bool_constant loc gl ls =
   let ty = ty_app gl.ts_bool [] in
-  { expr_desc = Elogic (t_app ls [] ty); expr_type = ty; expr_type_v = Tpure ty;
+  { expr_desc = Elogic (t_app ls [] ty); expr_type = ty; expr_type_v = tpure ty;
     expr_effect = E.empty; expr_loc = loc }
 
 let mk_false loc gl = mk_bool_constant loc gl gl.ls_False 
@@ -899,7 +899,7 @@ let rec expr gl env e =
 and expr_desc gl env loc ty = function
   | IElogic t ->
       let ef = term_effect gl E.empty t in
-      Elogic t, Tpure ty, ef
+      Elogic t, tpure ty, ef
   | IElocal (vs, _) ->
       let tyv = Mvs.find vs env in
       Elocal vs, tyv, E.empty
@@ -919,7 +919,7 @@ and expr_desc gl env loc ty = function
   | IEfun (bl, t) ->
       let env = add_binders env bl in
       let t, c = triple gl env t in
-      Efun (bl, t), Tarrow (bl, c), E.empty
+      Efun (bl, t), tarrow bl c, E.empty
   | IElet (v, e1, e2) ->
       let e1 = expr gl env e1 in
       let env = add_local v e1.expr_type_v env in
@@ -978,7 +978,7 @@ and expr_desc gl env loc ty = function
 	  | Pgm_ptree.LazyOr ->
 	      Eif (e1, mk_true loc gl, e2)
       in 
-      d, Tpure ty, ef
+      d, tpure ty, ef
   | IEmatch (v, bl) ->
       if is_reference_type gl v.vs_ty then
 	errorm ~loc "cannot match over a reference";
@@ -989,14 +989,14 @@ and expr_desc gl env loc ty = function
 	ef, (p, e)
       in
       let ef, bl = map_fold_left branch E.empty bl in
-      Ematch (v, bl), Tpure ty, ef
+      Ematch (v, bl), tpure ty, ef
   | IEabsurd ->
-      Eabsurd, Tpure ty, E.empty
+      Eabsurd, tpure ty, E.empty
   | IEraise (x, e1) ->
       let e1 = option_map (expr gl env) e1 in
       let ef = match e1 with Some e1 -> e1.expr_effect | None -> E.empty in
       let ef = E.add_raise x ef in
-      Eraise (x, e1), Tpure ty, ef
+      Eraise (x, e1), tpure ty, ef
   | IEtry (e1, hl) ->
       let e1 = expr gl env e1 in
       let ef = e1.expr_effect in
@@ -1004,7 +1004,7 @@ and expr_desc gl env loc ty = function
 	if not (Sls.mem x ef.E.raises) && !exn_check then
 	  errorm ~loc "exception %a cannot be raised" print_ls x;
 	let env = match x.ls_args, v with
-	  | [ty], Some v -> add_local v (Tpure ty) env
+	  | [ty], Some v -> add_local v (tpure ty) env
 	  | [], None -> env
 	  | _ -> assert false
 	in
@@ -1012,11 +1012,11 @@ and expr_desc gl env loc ty = function
       in
       let hl = List.map handler hl in
       let ef = List.fold_left (fun e (x,_,_) -> E.remove_raise x e) ef hl in
-      Etry (e1, hl), Tpure ty, ef
+      Etry (e1, hl), tpure ty, ef
 
   | IEassert (k, f) ->
       let ef = fmla_effect gl E.empty f in
-      Eassert (k, f), Tpure ty, ef
+      Eassert (k, f), tpure ty, ef
   | IElabel (lab, e1) ->
       let e1 = expr gl env e1 in
       Elabel (lab, e1), e1.expr_type_v, e1.expr_effect
@@ -1048,7 +1048,7 @@ and letrec gl env dl = (* : env * recfun list *)
 	| _ ->
 	    c 
       in
-      add_local v (Tarrow (bl, c)) env
+      add_local v (tarrow bl c) env
     in
     List.fold_left add1 env dl
   in
@@ -1072,7 +1072,7 @@ and letrec gl env dl = (* : env * recfun list *)
   let add_empty_effect m (v, bl, _, (p, _, q)) = 
     let tyl, ty = uncurrying gl v.vs_ty in
     assert (List.length bl = List.length tyl);
-    let c = { c_result_type = Tpure ty;
+    let c = { c_result_type = tpure ty;
 	      c_pre = p; c_effect = E.empty; c_post = q; } 
     in
     Mvs.add v c m 

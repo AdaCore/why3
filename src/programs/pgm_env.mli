@@ -19,7 +19,7 @@ type exn_post_fmla = Term.vsymbol (* result *) option * Term.fmla
 
 type post = post_fmla * (Term.lsymbol * exn_post_fmla) list
 
-type type_v = 
+type type_v = private
   | Tpure of Ty.ty
   | Tarrow of binder list * type_c
 
@@ -30,6 +30,9 @@ and type_c =
     c_post        : post; }
 
 and binder = Term.vsymbol * type_v
+
+val tpure : Ty.ty -> type_v
+val tarrow : binder list -> type_c -> type_v
 
 (* environments *)
 

@@ -220,7 +220,7 @@ theory BitVector
   axiom Lsr_nth_high:
     forall b:bv,n s:int. n+s >= size -> nth (lsr b s) n = False
 
-  (* arithmetic shift left *)
+  (* arithmetic shift right *)
   logic asr bv int : bv
 
   axiom Asr_nth_low:

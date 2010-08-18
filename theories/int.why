@@ -153,3 +153,37 @@ theory NumOf
   logic num_of (a b : int) : int = N.num_of () a b
 
 end
+
+(* number theory *)
+
+theory Divisibility
+
+  use import Int
+
+  logic divides (a b : int) = exists q : int. b = q * a
+
+end
+
+theory Gcd 
+
+  use import Int
+  use import Divisibility
+
+  logic gcd (a b g : int) = 
+    divides g a and 
+    divides g b and
+    forall x : int. divides x a -> divides x b -> divides x g
+
+  lemma Gcd_sym : forall a b g : int. gcd a b g -> gcd b a g
+ 
+  lemma Gcd_0 : forall a : int. gcd a 0 a
+
+  lemma Gcd_euclid : forall a b q g : int. gcd a (b - q * a) g -> gcd a b g
+
+end
+
+(*
+Local Variables: 
+compile-command: "../bin/why.opt int.why"
+End: 
+*)

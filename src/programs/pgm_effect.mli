@@ -54,7 +54,7 @@ val equal : t -> t -> bool
 
 val no_side_effect : t -> bool
 
-val subst : vsymbol -> reference -> t -> t
+val subst : reference Mvs.t -> t -> t
 
 val occur : reference -> t -> bool
 

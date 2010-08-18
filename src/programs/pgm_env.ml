@@ -31,7 +31,6 @@ and type_c =
 
 and binder = Term.vsymbol * type_v
 
-
 (* environments *)
 
 type env = {
@@ -212,7 +211,7 @@ and subst_post ts s ((v, q), ql) =
   
 let rec subst_type_c ef ts s c = 
   { c_result_type = subst_type_v ef ts s c.c_result_type;
-    c_effect      = ef c.c_effect;
+    c_effect      = E.subst ef c.c_effect;
     c_pre         = f_ty_subst ts s c.c_pre;
     c_post        = subst_post ts s c.c_post; }
 
@@ -228,13 +227,30 @@ and binder ef ts s (vs, v) =
   let s, vs = subst_var ts s vs in
   s, (vs, v)
 
+let tpure ty = Tpure ty
+
+let tarrow bl c = match bl with
+  | [] -> 
+      invalid_arg "tarrow"
+  | _ -> 
+      let rename (e, s) (vs, v) = 
+	let vs' = create_vsymbol (id_clone vs.vs_name) vs.vs_ty in
+	let v' = subst_type_v e Mtv.empty s v in
+	let e' = Mvs.add vs (E.Rlocal vs') e in
+	let s' = Mvs.add vs (t_var vs') s in
+	(e', s'), (vs', v')
+      in
+      let (e, s), bl' = Util.map_fold_left rename (Mvs.empty, Mvs.empty) bl in
+      Tarrow (bl', subst_type_c e Mtv.empty s c)
+
+
 let subst1 vs1 t2 = Mvs.add vs1 t2 Mvs.empty
 
 let apply_type_v env v vs = match v with
   | Tarrow ((x, tyx) :: bl, c) ->
       let ts = ty_match Mtv.empty (purify env tyx) vs.vs_ty in
       let c = type_c_of_type_v env (Tarrow (bl, c)) in
-      subst_type_c (fun e -> e) ts (subst1 x (t_var vs)) c
+      subst_type_c Mvs.empty ts (subst1 x (t_var vs)) c
   | Tarrow ([], _) | Tpure _ -> 
       assert false
 
@@ -242,13 +258,13 @@ let apply_type_v_ref env v r = match r, v with
   | E.Rlocal vs as r, Tarrow ((x, tyx) :: bl, c) ->
       let ts = ty_match Mtv.empty (purify env tyx) vs.vs_ty in
       let c = type_c_of_type_v env (Tarrow (bl, c)) in
-      let ef = E.subst x r in
+      let ef = Mvs.add x r Mvs.empty in
       subst_type_c ef ts (subst1 x (t_var vs)) c
   | E.Rglobal ls as r, Tarrow ((x, tyx) :: bl, c) -> 
       let ty = match ls.ls_value with None -> assert false | Some ty -> ty in
       let ts = ty_match Mtv.empty (purify env tyx) ty in
       let c = type_c_of_type_v env (Tarrow (bl, c)) in
-      let ef = E.subst x r in
+      let ef = Mvs.add x r Mvs.empty in
       subst_type_c ef ts (subst1 x (t_app ls [] ty)) c
   | _ ->
       assert false
