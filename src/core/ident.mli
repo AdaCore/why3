@@ -22,8 +22,7 @@
 type ident = private {
   id_string : string;       (* non-unique name *)
   id_origin : origin;       (* origin of the ident *)
-  id_weak   : Hashweak.key; (* weak hashtable key *)
-  id_tag    : int;          (* unique numeric tag *)
+  id_tag    : Hashweak.tag; (* unique magical tag *)
 }
 
 and origin =
@@ -36,6 +35,8 @@ module Mid : Map.S with type key = ident
 module Hid : Hashtbl.S with type key = ident
 
 val id_equal : ident -> ident -> bool
+
+val id_hash : ident -> int
 
 (* a user-created type of unregistered identifiers *)
 type preid

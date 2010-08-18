@@ -28,7 +28,7 @@ type vsymbol = {
   vs_ty   : ty;
 }
 
-module Vsym = StructMake (struct
+module Vsym = WeakStructMake (struct
   type t = vsymbol
   let tag vs = vs.vs_name.id_tag
 end)
@@ -38,6 +38,8 @@ module Mvs = Vsym.M
 module Hvs = Vsym.H
 
 let vs_equal = (==)
+
+let vs_hash vs = id_hash vs.vs_name
 
 let create_vsymbol name ty = {
   vs_name = id_register name;
@@ -54,7 +56,7 @@ type lsymbol = {
   ls_value  : ty option;
 }
 
-module Lsym = StructMake (struct
+module Lsym = WeakStructMake (struct
   type t = lsymbol
   let tag ls = ls.ls_name.id_tag
 end)
@@ -62,13 +64,11 @@ end)
 module Sls = Lsym.S
 module Mls = Lsym.M
 module Hls = Lsym.H
-
-module Wls = Hashweak.Make (struct
-  type t = lsymbol
-  let key ls = ls.ls_name.id_weak
-end)
+module Wls = Lsym.W
 
 let ls_equal = (==)
+
+let ls_hash ls = id_hash ls.ls_name
 
 let create_lsymbol name args value = {
   ls_name   = id_register name;
@@ -104,6 +104,8 @@ and pattern_node =
 
 let pat_equal = (==)
 
+let pat_hash p = p.pat_tag
+
 module Hspat = Hashcons.Make (struct
   type t = pattern
 
@@ -121,16 +123,14 @@ module Hspat = Hashcons.Make (struct
   let equal p1 p2 =
     equal_node p1.pat_node p2.pat_node && ty_equal p1.pat_ty p2.pat_ty
 
-  let hash_pattern p = p.pat_tag
-
   let hash_node = function
     | Pwild -> 0
-    | Pvar v -> v.vs_name.id_tag
-    | Papp (s, pl) -> Hashcons.combine_list hash_pattern s.ls_name.id_tag pl
-    | Por (p, q) -> Hashcons.combine (hash_pattern p) (hash_pattern q)
-    | Pas (p, v) -> Hashcons.combine (hash_pattern p) v.vs_name.id_tag
+    | Pvar v -> vs_hash v
+    | Papp (s, pl) -> Hashcons.combine_list pat_hash (ls_hash s) pl
+    | Por (p, q) -> Hashcons.combine (pat_hash p) (pat_hash q)
+    | Pas (p, v) -> Hashcons.combine (pat_hash p) (vs_hash v)
 
-  let hash p = Hashcons.combine (hash_node p.pat_node) p.pat_ty.ty_tag
+  let hash p = Hashcons.combine (hash_node p.pat_node) (ty_hash p.pat_ty)
 
   let tag n p = { p with pat_tag = n }
 end)
@@ -333,6 +333,9 @@ and expr =
 let t_equal = (==)
 let f_equal = (==)
 
+let t_hash t = t.t_tag
+let f_hash f = f.f_tag
+
 (* expr and trigger equality *)
 
 let e_equal e1 e2 = match e1, e2 with
@@ -364,7 +367,7 @@ let bnd_equal b1 b2 =
   b1.bv_bound = b2.bv_bound && Mint.equal t_equal b1.bv_defer b2.bv_defer
 
 let bnd_hash bv =
-  Mint.fold (fun i t a -> Hashcons.combine2 i t.t_tag a) bv.bv_defer
+  Mint.fold (fun i t a -> Hashcons.combine2 i (t_hash t) a) bv.bv_defer
 
 let bnd_map fn bv = { bv with bv_defer = Mint.map fn bv.bv_defer }
 let bnd_fold fn acc bv = Mint.fold (fun _ t a -> fn a t) bv.bv_defer acc
@@ -412,29 +415,27 @@ module Hsterm = Hashcons.Make (struct
     list_all2 (=) t1.t_label t2.t_label
 
   let t_hash_branch (p,b,t) =
-    Hashcons.combine p.pat_tag (bnd_hash b t.t_tag)
+    Hashcons.combine (pat_hash p) (bnd_hash b (t_hash t))
 
   let t_hash_bound (v,b,t) =
-    Hashcons.combine v.vs_name.id_tag (bnd_hash b t.t_tag)
+    Hashcons.combine (vs_hash v) (bnd_hash b (t_hash t))
 
   let f_hash_bound (v,b,f) =
-    Hashcons.combine v.vs_name.id_tag (bnd_hash b f.f_tag)
-
-  let t_hash t = t.t_tag
+    Hashcons.combine (vs_hash v) (bnd_hash b (f_hash f))
 
   let t_hash_node = function
     | Tbvar n -> n
-    | Tvar v -> v.vs_name.id_tag
+    | Tvar v -> vs_hash v
     | Tconst c -> Hashtbl.hash c
-    | Tapp (f,tl) -> Hashcons.combine_list t_hash (f.ls_name.id_tag) tl
-    | Tif (f,t,e) -> Hashcons.combine2 f.f_tag t.t_tag e.t_tag
-    | Tlet (t,bt) -> Hashcons.combine t.t_tag (t_hash_bound bt)
-    | Tcase (t,bl) -> Hashcons.combine_list t_hash_branch t.t_tag bl
+    | Tapp (f,tl) -> Hashcons.combine_list t_hash (ls_hash f) tl
+    | Tif (f,t,e) -> Hashcons.combine2 (f_hash f) (t_hash t) (t_hash e)
+    | Tlet (t,bt) -> Hashcons.combine (t_hash t) (t_hash_bound bt)
+    | Tcase (t,bl) -> Hashcons.combine_list t_hash_branch (t_hash t) bl
     | Teps f -> f_hash_bound f
 
   let hash t =
     Hashcons.combine (t_hash_node t.t_node)
-      (Hashcons.combine_list Hashtbl.hash t.t_ty.ty_tag t.t_label)
+      (Hashcons.combine_list Hashtbl.hash (ty_hash t.t_ty) t.t_label)
 
   let tag n t = { t with t_tag = n }
 
@@ -484,34 +485,30 @@ module Hsfmla = Hashcons.Make (struct
     f_equal_node f1.f_node f2.f_node &&
     list_all2 (=) f1.f_label f2.f_label
 
-  let v_hash v = v.vs_name.id_tag
-
-  let t_hash t = t.t_tag
-
   let f_hash_branch (p,b,f) =
-    Hashcons.combine p.pat_tag (bnd_hash b f.f_tag)
+    Hashcons.combine (pat_hash p) (bnd_hash b (f_hash f))
 
   let f_hash_bound (v,b,f) =
-    Hashcons.combine v.vs_name.id_tag (bnd_hash b f.f_tag)
+    Hashcons.combine (vs_hash v) (bnd_hash b (f_hash f))
 
-  let tr_hash = function Term t -> t.t_tag | Fmla f -> f.f_tag
+  let e_hash = function Term t -> t_hash t | Fmla f -> f_hash f
 
   let f_hash_quant (vl,b,tl,f) =
-    let h = bnd_hash b f.f_tag in
-    let h = Hashcons.combine_list v_hash h vl in
-    List.fold_left (Hashcons.combine_list tr_hash) h tl
+    let h = bnd_hash b (f_hash f) in
+    let h = Hashcons.combine_list vs_hash h vl in
+    List.fold_left (Hashcons.combine_list e_hash) h tl
 
   let f_hash_node = function
-    | Fapp (p,tl) -> Hashcons.combine_list t_hash p.ls_name.id_tag tl
+    | Fapp (p,tl) -> Hashcons.combine_list t_hash (ls_hash p) tl
     | Fquant (q,bf) -> Hashcons.combine (Hashtbl.hash q) (f_hash_quant bf)
     | Fbinop (op,f1,f2) ->
-        Hashcons.combine2 (Hashtbl.hash op) f1.f_tag f2.f_tag
-    | Fnot f -> Hashcons.combine 1 f.f_tag
+        Hashcons.combine2 (Hashtbl.hash op) (f_hash f1) (f_hash f2)
+    | Fnot f -> Hashcons.combine 1 (f_hash f)
     | Ftrue -> 0
     | Ffalse -> 1
-    | Fif (f1,f2,f3) -> Hashcons.combine2 f1.f_tag f2.f_tag f3.f_tag
-    | Flet (t,bf) -> Hashcons.combine t.t_tag (f_hash_bound bf)
-    | Fcase (t,bl) -> Hashcons.combine_list f_hash_branch t.t_tag bl
+    | Fif (f1,f2,f3) -> Hashcons.combine2 (f_hash f1) (f_hash f2) (f_hash f3)
+    | Flet (t,bf) -> Hashcons.combine (t_hash t) (f_hash_bound bf)
+    | Fcase (t,bl) -> Hashcons.combine_list f_hash_branch (t_hash t) bl
 
   let hash f =
     Hashcons.combine_list Hashtbl.hash (f_hash_node f.f_node) f.f_label

@@ -44,13 +44,13 @@ let apply f x = f x
 
 module Wtask = Hashweak.Make (struct
   type t = task_hd
-  let key t = t.task_weak
+  let tag t = t.task_tag
 end)
 
-let store fn = Wtask.memoize_option fn
+let store fn = Wtask.memoize_option 63 fn
 
 let fold fn v =
-  let h = Wtask.create () in
+  let h = Wtask.create 63 in
   let rewind acc task =
 (*
     Format.printf "%c%d." (match task.task_decl.td_node with
@@ -82,13 +82,8 @@ let fold_map_l fn v t = conv_res (List.rev_map snd) (fold_l fn (v, t))
 let map   fn = fold   (fun t1 t2 -> fn t1 t2)
 let map_l fn = fold_l (fun t1 t2 -> fn t1 t2)
 
-module Wdecl = Hashweak.Make (struct
-  type t = decl
-  let key d = d.d_weak
-end)
-
 let gen_decl add fn =
-  let fn = Wdecl.memoize fn in
+  let fn = Wdecl.memoize 63 fn in
   let fn task acc = match task.task_decl.td_node with
     | Decl d -> List.fold_left add acc (fn d)
     | _ -> add_tdecl acc task.task_decl
@@ -96,7 +91,7 @@ let gen_decl add fn =
   map fn
 
 let gen_decl_l add fn =
-  let fn = Wdecl.memoize fn in
+  let fn = Wdecl.memoize 63 fn in
   let fn task acc = match task.task_decl.td_node with
     | Decl d -> List.rev_map (List.fold_left add acc) (fn d)
     | _ -> [add_tdecl acc task.task_decl]
@@ -113,7 +108,7 @@ let apply_to_goal fn d = match d.d_node with
   | _ -> assert false
 
 let gen_goal add fn =
-  let fn = Wdecl.memoize (apply_to_goal fn) in
+  let fn = Wdecl.memoize 5 (apply_to_goal fn) in
   let rec pass task = match task with
     | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
         List.fold_left add prev (fn d)
@@ -124,7 +119,7 @@ let gen_goal add fn =
   pass
 
 let gen_goal_l add fn =
-  let fn = Wdecl.memoize (apply_to_goal fn) in
+  let fn = Wdecl.memoize 5 (apply_to_goal fn) in
   let rec pass task = match task with
     | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
         List.rev_map (List.fold_left add prev) (fn d)
@@ -145,15 +140,15 @@ let rewrite fnT fnF = decl (fun d -> [decl_map fnT fnF d])
 
 module Wtds = Hashweak.Make (struct
   type t = tdecl_set
-  let key s = s.tds_weak
+  let tag s = s.tds_tag
 end)
 
 let on_theory th fn =
-  let fn = Wtds.memoize fn in
+  let fn = Wtds.memoize 17 fn in
   fun task -> fn (find_clone task th) task
 
 let on_meta t fn =
-  let fn = Wtds.memoize fn in
+  let fn = Wtds.memoize 17 fn in
   fun task -> fn (find_meta task t) task
 
 let on_theories tl fn =
@@ -179,7 +174,7 @@ open Env
 
 module Wenv = Hashweak.Make (struct
   type t = env
-  let key = env_weak
+  let tag = env_tag
 end)
 
 exception UnknownTrans of string
@@ -198,11 +193,11 @@ let register_transform_l s p =
 
 let register_env_transform s p =
   if Hashtbl.mem transforms s then raise (KnownTrans s);
-  Hashtbl.replace transforms s (Wenv.memoize p)
+  Hashtbl.replace transforms s (Wenv.memoize 3 p)
 
 let register_env_transform_l s p =
   if Hashtbl.mem transforms_l s then raise (KnownTrans s);
-  Hashtbl.replace transforms_l s (Wenv.memoize p)
+  Hashtbl.replace transforms_l s (Wenv.memoize 3 p)
 
 let lookup_transform s =
   try Hashtbl.find transforms s with Not_found -> raise (UnknownTrans s)

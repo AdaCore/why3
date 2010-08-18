@@ -110,6 +110,14 @@ sig
   module H : Hashtbl.S with type key = X.t
 end
 
+module WeakStructMake (X : Hashweak.Weakey) :
+sig
+  module S : Set.S with type elt = X.t
+  module M : Map.S with type key = X.t
+  module H : Hashtbl.S with type key = X.t
+  module W : Hashweak.S with type key = X.t
+end
+
 (* memoization *)
 
 val memo : ?size:int -> ('a -> 'b) -> 'a -> 'b

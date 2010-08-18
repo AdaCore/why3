@@ -77,7 +77,7 @@ type prsymbol = {
   pr_name : ident;
 }
 
-module Prop = StructMake (struct
+module Prop = WeakStructMake (struct
   type t = prsymbol
   let tag pr = pr.pr_name.id_tag
 end)
@@ -85,13 +85,11 @@ end)
 module Spr = Prop.S
 module Mpr = Prop.M
 module Hpr = Prop.H
-
-module Wpr = Hashweak.Make (struct
-  type t = prsymbol
-  let key pr = pr.pr_name.id_weak
-end)
+module Wpr = Prop.W
 
 let pr_equal = (==)
+
+let pr_hash pr = id_hash pr.pr_name
 
 let create_prsymbol n = { pr_name = id_register n }
 
@@ -113,8 +111,7 @@ type decl = {
   d_node : decl_node;
   d_syms : Sid.t;         (* idents used in declaration *)
   d_news : Sid.t;         (* idents introduced in declaration *)
-  d_weak : Hashweak.key;  (* weak hashtable key *)
-  d_tag  : int;
+  d_tag  : Hashweak.tag;  (* unique magical tag *)
 }
 
 and decl_node =
@@ -154,17 +151,15 @@ module Hsdecl = Hashcons.Make (struct
     | _,_ -> false
 
   let hs_td (ts,td) = match td with
-    | Tabstract -> ts.ts_name.id_tag
-    | Talgebraic l ->
-        let tag fs = fs.ls_name.id_tag in
-        1 + Hashcons.combine_list tag ts.ts_name.id_tag l
+    | Tabstract -> ts_hash ts
+    | Talgebraic l -> 1 + Hashcons.combine_list ls_hash (ts_hash ts) l
 
-  let hs_ld (ls,ld) = Hashcons.combine ls.ls_name.id_tag
-    (Hashcons.combine_option (fun (_,f) -> f.f_tag) ld)
+  let hs_ld (ls,ld) = Hashcons.combine (ls_hash ls)
+    (Hashcons.combine_option (fun (_,f) -> f_hash f) ld)
 
-  let hs_prop (pr,f) = Hashcons.combine pr.pr_name.id_tag f.f_tag
+  let hs_prop (pr,f) = Hashcons.combine (pr_hash pr) (f_hash f)
 
-  let hs_ind (ps,al) = Hashcons.combine_list hs_prop ps.ls_name.id_tag al
+  let hs_ind (ps,al) = Hashcons.combine_list hs_prop (ls_hash ps) al
 
   let hs_kind = function
     | Plemma -> 11 | Paxiom -> 13 | Pgoal  -> 17 | Pskip  -> 19
@@ -175,19 +170,22 @@ module Hsdecl = Hashcons.Make (struct
     | Dind   l -> Hashcons.combine_list hs_ind 7 l
     | Dprop (k,pr,f) -> Hashcons.combine (hs_kind k) (hs_prop (pr,f))
 
-  let tag n d = { d with d_tag = n }
+  let tag n d = { d with d_tag = Hashweak.create_tag n }
 
 end)
 
-module Decl = StructMake (struct
+module Decl = WeakStructMake (struct
   type t = decl
   let tag d = d.d_tag
 end)
 
 module Sdecl = Decl.S
 module Mdecl = Decl.M
+module Wdecl = Decl.W
 
 let d_equal = (==)
+
+let d_hash d = Hashweak.tag_hash d.d_tag
 
 (** Declaration constructors *)
 
@@ -195,8 +193,7 @@ let mk_decl node syms news = Hsdecl.hashcons {
   d_node = node;
   d_syms = syms;
   d_news = news;
-  d_weak = Hashweak.create_key ();
-  d_tag  = -1;
+  d_tag  = Hashweak.dummy_tag;
 }
 
 exception IllegalTypeAlias of tysymbol

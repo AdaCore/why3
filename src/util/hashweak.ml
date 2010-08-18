@@ -17,53 +17,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Weak : sig
-
-  type key
-
-  type 'a t
-
-  val create_key : unit -> key
-
-  val create : unit -> 'a t
-    (* create a hashtbl with weak keys *)
-
-  val find : 'a t -> key -> 'a
-    (* find the value bound to a key.
-       Raises Not_found if there is no binding *)
-
-  val mem : 'a t -> key -> bool
-    (* test if a key is bound *)
-
-  val set : 'a t -> key -> 'a -> unit
-    (* bind the key _once_ with the given value *)
-
-end = struct
-
-  type key = ((int,Obj.t) Hashtbl.t) Lazy.t
-
-  type 'a t = int
-
-  let create_key () = lazy (Hashtbl.create 3)
-
-  let create = let c = ref (-1) in fun () -> incr c; !c
-
-  let find t k  = Obj.obj (Hashtbl.find (Lazy.force k) t)
-  let mem t k   = Hashtbl.mem (Lazy.force k) t
-  let set t k v = Hashtbl.replace (Lazy.force k) t (Obj.repr v)
-
-end
-
-include Weak
-
 module type S = sig
 
   type key
 
   type 'a t
 
-  val create : unit -> 'a t
+  val create : int -> 'a t
     (* create a hashtbl with weak keys *)
+
+  val clear : 'a t -> unit
+
+  val copy : 'a t -> 'a t
 
   val find : 'a t -> key -> 'a
     (* find the value bound to a key.
@@ -75,53 +40,121 @@ module type S = sig
   val set : 'a t -> key -> 'a -> unit
     (* bind the key _once_ with the given value *)
 
-  val memoize : (key -> 'a) -> (key -> 'a)
+  val remove : 'a t -> key -> unit
+    (* remove the value *)
+
+  val iter : (key -> 'a -> unit) -> 'a t -> unit
+
+  val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+
+  val iterk : (key -> unit) -> 'a t -> unit
+
+  val foldk : (key -> 'b -> 'b) -> 'a t -> 'b -> 'b
+
+  val length : 'a t -> int
+
+  val memoize : int -> (key -> 'a) -> (key -> 'a)
     (* create a memoizing function *)
 
-  val memoize_option : (key option -> 'a) -> (key option -> 'a)
+  val memoize_option : int -> (key option -> 'a) -> (key option -> 'a)
     (* memoizing functions on option types *)
 
 end
 
+type tag = {
+  tag_map : ((int,Obj.t) Hashtbl.t) Lazy.t;
+  tag_tag : int;
+}
+
+let create_tag tag = {
+  tag_map = lazy (Hashtbl.create 3);
+  tag_tag = tag;
+}
+
+let dummy_tag = {
+  tag_map = lazy (failwith "dummy tag");
+  tag_tag = -1;
+}
+
+let tag_hash k = assert (k != dummy_tag); k.tag_tag
+
+let tag_equal k1 k2 = k1.tag_tag = k2.tag_tag
+
+let tag_compare k1 k2 = Pervasives.compare k1.tag_tag k2.tag_tag
+
 module type Weakey =
 sig
   type t
-  val key : t -> Weak.key
+  val tag : t -> tag
 end
 
 module Make (S : Weakey) = struct
 
   type key = S.t
 
-  type 'a t = 'a Weak.t
+  module H = Weak.Make (struct
+    type t = S.t
+    let hash k = (S.tag k).tag_tag
+    let equal k1 k2 = S.tag k1 == S.tag k2
+  end)
 
-  let create = Weak.create
+  type 'a t = {
+    tbl_set : H.t;
+    tbl_tag : int;
+  }
 
-  let set_key  h = Weak.set  h
-  let mem_key  h = Weak.mem  h
-  let find_key h = Weak.find h
+  let tag_map k = Lazy.force (S.tag k).tag_map
 
-  let set_key h k v =
-    assert (not (mem_key h k));
-    set_key h k v
+  let find (t : 'a t) k : 'a =
+    Obj.obj (Hashtbl.find (tag_map k) t.tbl_tag)
 
-  let set  h e = set_key  h (S.key e)
-  let mem  h e = mem_key  h (S.key e)
-  let find h e = find_key h (S.key e)
+  let mem t k = Hashtbl.mem (tag_map k) t.tbl_tag
 
-  let memoize fn =
-    let h = create () in fun e ->
-      let k = S.key e in
-      try find_key h k
+  let set (t : 'a t) k (v : 'a) =
+    Hashtbl.replace (tag_map k) t.tbl_tag (Obj.repr v);
+    H.add t.tbl_set k
+
+  let remove t k =
+    Hashtbl.remove (tag_map k) t.tbl_tag;
+    H.remove t.tbl_set k
+
+  let iterk fn t = H.iter fn t.tbl_set
+  let foldk fn t = H.fold fn t.tbl_set
+
+  let iter  fn t = H.iter (fun k -> fn k (find t k)) t.tbl_set
+  let fold  fn t = H.fold (fun k -> fn k (find t k)) t.tbl_set
+
+  let tbl_final t = iterk (fun k -> Hashtbl.remove (tag_map k) t.tbl_tag) t
+
+  let create = let c = ref (-1) in fun n ->
+    let t = {
+      tbl_set = H.create n;
+      tbl_tag = (incr c; !c) }
+    in
+    Gc.finalise tbl_final t;
+    t
+
+  let clear t = tbl_final t; H.clear t.tbl_set
+
+  let length t = H.count t.tbl_set
+
+  let copy t =
+    let t' = create (length t) in
+    iter (set t') t;
+    t'
+
+  let memoize n fn =
+    let h = create n in fun e ->
+      try find h e
       with Not_found ->
         let v = fn e in
-        set_key h k v;
+        set h e v;
         v
 
-  let memoize_option fn =
+  let memoize_option n fn =
     let v = lazy (fn None) in
     let fn e = fn (Some e) in
-    let fn = memoize fn in
+    let fn = memoize n fn in
     function
       | Some e -> fn e
       | None -> Lazy.force v

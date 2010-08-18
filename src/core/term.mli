@@ -34,6 +34,7 @@ module Mvs : Map.S with type key = vsymbol
 module Hvs : Hashtbl.S with type key = vsymbol
 
 val vs_equal : vsymbol -> vsymbol -> bool
+val vs_hash : vsymbol -> int
 
 val create_vsymbol : preid -> ty -> vsymbol
 
@@ -51,6 +52,7 @@ module Hls : Hashtbl.S with type key = lsymbol
 module Wls : Hashweak.S with type key = lsymbol
 
 val ls_equal : lsymbol -> lsymbol -> bool
+val ls_hash : lsymbol -> int
 
 val create_lsymbol : preid -> ty list -> ty option -> lsymbol
 val create_fsymbol : preid -> ty list -> ty -> lsymbol
@@ -84,6 +86,7 @@ and pattern_node = private
   | Pas  of pattern * vsymbol
 
 val pat_equal : pattern -> pattern -> bool
+val pat_hash : pattern -> int
 
 (** smart constructors for patterns *)
 
@@ -172,16 +175,22 @@ and expr =
 
 and trigger = expr list
 
-module Mterm : Map.S with type key = term
 module Sterm : Set.S with type elt = term
-module Mfmla : Map.S with type key = fmla
+module Mterm : Map.S with type key = term
+module Hterm : Hashtbl.S with type key = term
+
 module Sfmla : Set.S with type elt = fmla
+module Mfmla : Map.S with type key = fmla
+module Hfmla : Hashtbl.S with type key = fmla
 
 val t_equal : term -> term -> bool
 val f_equal : fmla -> fmla -> bool
 val e_equal : expr -> expr -> bool
 
 val tr_equal : trigger list -> trigger list -> bool
+
+val t_hash : term -> int
+val f_hash : fmla -> int
 
 (** close bindings *)
 

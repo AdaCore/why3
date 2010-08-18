@@ -38,41 +38,29 @@ end
 open Graph
 module GP = Graph.Persistent.Digraph.ConcreteLabeled(
   struct
-    type t = Term.lsymbol
-    let compare x y = compare x.ls_name.id_tag y.ls_name.id_tag
-    let hash x = x.ls_name.id_tag
-    let equal x y = x.ls_name.id_tag = y.ls_name.id_tag
+    type t = lsymbol
+    let compare x y = compare (ls_hash x) (ls_hash y)
+    let hash = ls_hash
+    let equal = ls_equal
   end)(Int_Dft)
 
 (** a way to compare/hash expressions *)
 module ExprNode = struct
     type t = Term.expr
+
     let compare x y = match x,y with
-      | Term t1, Term t2 -> compare t1.t_tag t2.t_tag
-      | Fmla f1, Fmla f2 -> compare f1.f_tag f2.f_tag
+      | Term t1, Term t2 -> compare (t_hash t1) (t_hash t2)
+      | Fmla f1, Fmla f2 -> compare (f_hash f1) (f_hash f2)
       | Term _, Fmla _ -> -1
       | Fmla _, Term _ -> 1
+
     let hash x = match x with
-      | Term t -> t.t_tag
-      | Fmla f -> f.f_tag
+      | Term t -> 2 * (t_hash t)
+      | Fmla f -> 2 * (f_hash f) + 1
+
     let equal x y = compare x y == 0
 end
 module GC = Graph.Persistent.Graph.Concrete(ExprNode)
-module SymbHashtbl =
-  Hashtbl.Make(struct type t = Term.lsymbol
-		      let equal x y = x.ls_name.id_tag = y.ls_name.id_tag
-		      let hash x = x.ls_name.id_tag
-	       end)
-module FmlaHashtbl =
-  Hashtbl.Make(struct type t = Term.fmla
-		      let equal x y = x.f_tag = y.f_tag
-		      let hash x = x.f_tag
-	       end)
-module TermHashtbl =
-  Hashtbl.Make(struct type t = Term.term
-		      let equal x y = x.t_tag = y.t_tag
-		      let hash x = x.t_tag
-	       end)
 module Sls = Set.Make(GP.V)
 module Sexpr = Set.Make(ExprNode)
 
@@ -189,12 +177,12 @@ module NF = struct (* add memoization, one day ? *)
 	let var,_,f = f_open_quant f_bound in
 	traverse fmlaTable old_fmla (var@vars) f
     | _ ->
-	if FmlaHashtbl.mem fmlaTable fmla then
-	  [[FmlaHashtbl.find fmlaTable fmla]]
+	if Hfmla.mem fmlaTable fmla then
+	  [[Hfmla.find fmlaTable fmla]]
 	else
 	  let new_fmla = create_fmla vars in
-	  FmlaHashtbl.add fmlaTable old_fmla new_fmla;
-	  FmlaHashtbl.add fmlaTable new_fmla new_fmla;
+	  Hfmla.add fmlaTable old_fmla new_fmla;
+	  Hfmla.add fmlaTable new_fmla new_fmla;
 	  [[new_fmla]]
 
   (** skips prenex quantifiers *)
@@ -244,21 +232,21 @@ end
 
 (** module used to compute the graph of relations between constants *)
 module GraphConstant = struct
-  
+
   (** memoizing for formulae and terms, and then expressions *)
   let rec findF fTbl fmla = try
-    FmlaHashtbl.find fTbl fmla
+    Hfmla.find fTbl fmla
   with Not_found ->
     let new_v = GC.V.create (Fmla fmla) in
-    FmlaHashtbl.add fTbl fmla new_v;
+    Hfmla.add fTbl fmla new_v;
     (* Format.eprintf "generating new vertex : %a@."
       Pretty.print_fmla fmla; *)
     new_v
   and findT tTbl term = try
-    TermHashtbl.find tTbl term
+    Hterm.find tTbl term
   with Not_found ->
     let new_v = GC.V.create (Term term) in
-    TermHashtbl.add tTbl term new_v;
+    Hterm.add tTbl term new_v;
     (* Format.eprintf "generating new vertex : %a@."
       Pretty.print_fmla fmla; *)
     new_v
@@ -321,7 +309,7 @@ module GraphConstant = struct
     List.fold_left (analyse_clause fTbl tTbl) gc clauses
 
   (** processes a single task_head. *)
-  let update fmlaTable fTbl tTbl gc task_head = 
+  let update fmlaTable fTbl tTbl gc task_head =
     match task_head.task_decl.Theory.td_node with
     | Theory.Decl {d_node = Dprop(_,_,prop_decl)} ->
       analyse_prop fmlaTable fTbl tTbl gc prop_decl
@@ -349,10 +337,10 @@ module GraphPredicate = struct
     with Exit p -> p
 
   let find symbTbl x = try
-    SymbHashtbl.find symbTbl x
+    Hls.find symbTbl x
   with Not_found ->
     let new_v = GP.V.create x in
-    SymbHashtbl.add symbTbl x new_v;
+    Hls.add symbTbl x new_v;
     (* Format.eprintf "generating new vertex : %a@." Pretty.print_ls x; *)
     new_v
 
@@ -524,7 +512,7 @@ module Select = struct
       | (_,`Negative) -> true
       | (_,`Positive) -> false in
     let find_secure symbTbl x =
-      try SymbHashtbl.find symbTbl x
+      try Hls.find symbTbl x
       with Not_found ->
 	Format.eprintf "failure finding %a !@." Pretty.print_ls x;
 	raise Not_found in
@@ -555,7 +543,7 @@ module Select = struct
       List.fold_left Util.merge_list []
 	(List.map (build_relevant_variables gc) goal_clauses) in
     function fmla ->
-      let rec is_close_enough x l count = match (l,count) with 
+      let rec is_close_enough x l count = match (l,count) with
 	| _,n when n < 0 -> false
 	| y::_,_ when Sexpr.mem x y -> true
 	| _::ys,count -> is_close_enough x ys (count-1)
@@ -609,7 +597,7 @@ let transformation fmlaTable fTbl tTbl symbTbl task =
   (* first, collect data in 2 graphes *)
   let (gc,gp,goal_option) =
     Trans.apply (collect_info fmlaTable fTbl tTbl symbTbl) task in
-  Format.fprintf Format.err_formatter "graph: @\n@\n%a@\n@." Dot_.fprint_graph gc; 
+  Format.fprintf Format.err_formatter "graph: @\n@\n%a@\n@." Dot_.fprint_graph gc;
   (* get the goal *)
   let goal_fmla = match goal_option with
     | None -> failwith "no goal !"
@@ -622,10 +610,10 @@ let transformation fmlaTable fTbl tTbl symbTbl task =
 
 (** the transformation to be registered *)
 let hypothesis_selection = (* create lots of hashtables... *)
-  let fmlaTable = FmlaHashtbl.create 17 in
-  let fTbl = FmlaHashtbl.create 17 in
-  let tTbl = TermHashtbl.create 17 in
-  let symbTbl = SymbHashtbl.create 17 in
+  let fmlaTable = Hfmla.create 17 in
+  let fTbl = Hfmla.create 17 in
+  let tTbl = Hterm.create 17 in
+  let symbTbl = Hls.create 17 in
   Trans.store (transformation fmlaTable fTbl tTbl symbTbl)
 
 let _ = Trans.register_transform "hypothesis_selection" hypothesis_selection

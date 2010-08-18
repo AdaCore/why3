@@ -19,24 +19,17 @@
 
 (** Hashtable with weak key used for memoization *)
 
-type key
+type tag
 
-type 'a t
+val dummy_tag : tag
 
-val create_key : unit -> key
+val create_tag : int -> tag
 
-val create : unit -> 'a t
-  (* create a hashtbl with weak keys *)
+val tag_hash : tag -> int
 
-val find : 'a t -> key -> 'a
-  (* find the value bound to a key.
-     Raises Not_found if there is no binding *)
+val tag_equal : tag -> tag -> bool
 
-val mem : 'a t -> key -> bool
-  (* test if a key is bound *)
-
-val set : 'a t -> key -> 'a -> unit
-  (* assign the key to the given value *)
+val tag_compare : tag -> tag -> int
 
 module type S = sig
 
@@ -44,8 +37,12 @@ module type S = sig
 
   type 'a t
 
-  val create : unit -> 'a t
+  val create : int -> 'a t
     (* create a hashtbl with weak keys *)
+
+  val clear : 'a t -> unit
+
+  val copy : 'a t -> 'a t
 
   val find : 'a t -> key -> 'a
     (* find the value bound to a key.
@@ -57,10 +54,23 @@ module type S = sig
   val set : 'a t -> key -> 'a -> unit
     (* bind the key _once_ with the given value *)
 
-  val memoize : (key -> 'a) -> (key -> 'a)
+  val remove : 'a t -> key -> unit
+    (* remove the value *)
+
+  val iter : (key -> 'a -> unit) -> 'a t -> unit
+
+  val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+
+  val iterk : (key -> unit) -> 'a t -> unit
+
+  val foldk : (key -> 'b -> 'b) -> 'a t -> 'b -> 'b
+
+  val length : 'a t -> int
+
+  val memoize : int -> (key -> 'a) -> (key -> 'a)
     (* create a memoizing function *)
 
-  val memoize_option : (key option -> 'a) -> (key option -> 'a)
+  val memoize_option : int -> (key option -> 'a) -> (key option -> 'a)
     (* memoizing functions on option types *)
 
 end
@@ -68,7 +78,7 @@ end
 module type Weakey =
 sig
   type t
-  val key : t -> key
+  val tag : t -> tag
 end
 
 module Make (S : Weakey) : S with type key = S.t

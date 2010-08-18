@@ -27,23 +27,21 @@ open Theory
 (** Clone and meta history *)
 
 type tdecl_set = {
-  tds_set  : Stdecl.t;
-  tds_weak : Hashweak.key;
-  tds_tag  : int;
+  tds_set : Stdecl.t;
+  tds_tag : Hashweak.tag;
 }
 
 module Hstds = Hashcons.Make (struct
   type t = tdecl_set
   let equal s1 s2 = Stdecl.equal s1.tds_set s2.tds_set
-  let hs_td td acc = Hashcons.combine acc td.td_tag
+  let hs_td td acc = Hashcons.combine acc (td_hash td)
   let hash s = Stdecl.fold hs_td s.tds_set 0
-  let tag n s = { s with tds_tag = n }
+  let tag n s = { s with tds_tag = Hashweak.create_tag n }
 end)
 
 let mk_tds s = Hstds.hashcons {
-  tds_set  = s;
-  tds_weak = Hashweak.create_key ();
-  tds_tag  = -1
+  tds_set = s;
+  tds_tag = Hashweak.dummy_tag;
 }
 
 let empty_tds = mk_tds Stdecl.empty
@@ -51,6 +49,7 @@ let tds_add td s = mk_tds (Stdecl.add td s.tds_set)
 let tds_singleton td = mk_tds (Stdecl.singleton td)
 
 let tds_equal = (==)
+let tds_hash tds = Hashweak.tag_hash tds.tds_tag
 
 type clone_map = tdecl_set Mid.t
 type meta_map = tdecl_set Mmeta.t
@@ -76,16 +75,19 @@ and task_hd = {
   task_known : known_map;    (* known identifiers *)
   task_clone : clone_map;    (* cloning history *)
   task_meta  : meta_map;     (* meta properties *)
-  task_weak  : Hashweak.key; (* weak hashtable key *)
-  task_tag   : int;          (* unique task tag *)
+  task_tag   : Hashweak.tag; (* unique magical tag *)
 }
 
 let task_hd_equal = (==)
+
+let task_hd_hash t = Hashweak.tag_hash t.task_tag
 
 let task_equal t1 t2 = match t1, t2 with
   | Some t1, Some t2 -> task_hd_equal t1 t2
   | None, None -> true
   | _ -> false
+
+let task_hash t = option_apply 0 (fun t -> task_hd_hash t + 1) t
 
 module Hstask = Hashcons.Make (struct
   type t = task_hd
@@ -93,12 +95,9 @@ module Hstask = Hashcons.Make (struct
   let equal t1 t2 = td_equal t1.task_decl t2.task_decl &&
                   task_equal t1.task_prev t2.task_prev
 
-  let hash task =
-    let decl = task.task_decl.td_tag in
-    let prev = option_apply 0 (fun t -> t.task_tag + 1) task.task_prev in
-    Hashcons.combine decl prev
+  let hash t = Hashcons.combine (td_hash t.task_decl) (task_hash t.task_prev)
 
-  let tag i task = { task with task_tag = i }
+  let tag i task = { task with task_tag = Hashweak.create_tag i }
 end)
 
 let mk_task decl prev known clone meta = Some (Hstask.hashcons {
@@ -107,8 +106,7 @@ let mk_task decl prev known clone meta = Some (Hstask.hashcons {
   task_known = known;
   task_clone = clone;
   task_meta  = meta;
-  task_weak  = Hashweak.create_key ();
-  task_tag   = -1;
+  task_tag   = Hashweak.dummy_tag;
 })
 
 let task_known = option_apply Mid.empty (fun t -> t.task_known)

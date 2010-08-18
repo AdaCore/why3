@@ -25,16 +25,16 @@ open Theory
 type env = {
   env_retrieve : retrieve_theory;
   env_memo     : (string list, theory Mnm.t) Hashtbl.t;
-  env_weak     : Hashweak.key;
+  env_tag      : Hashweak.tag;
 }
 
 and retrieve_theory = env -> string list -> theory Mnm.t
 
-let create_env retrieve =
+let create_env = let c = ref (-1) in fun retrieve ->
   let env = {
     env_retrieve = retrieve;
     env_memo     = Hashtbl.create 17;
-    env_weak     = Hashweak.create_key (); }
+    env_tag      = (incr c; Hashweak.create_tag !c) }
   in
   let add th m = Mnm.add th.th_name.id_string th m in
   let m = Mnm.empty in
@@ -62,7 +62,7 @@ let find_theory env sl s =
   with Not_found ->
     raise (TheoryNotFound (sl, s))
 
-let env_weak env = env.env_weak
+let env_tag env = env.env_tag
 
 
 (** Parsers *)

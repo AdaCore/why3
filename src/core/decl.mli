@@ -62,6 +62,8 @@ val create_prsymbol : preid -> prsymbol
 
 val pr_equal : prsymbol -> prsymbol -> bool
 
+val pr_hash : prsymbol -> int
+
 type ind_decl = lsymbol * (prsymbol * fmla) list
 
 (* Proposition declaration *)
@@ -80,8 +82,7 @@ type decl = private {
   d_node : decl_node;
   d_syms : Sid.t;         (* idents used in declaration *)
   d_news : Sid.t;         (* idents introduced in declaration *)
-  d_weak : Hashweak.key;  (* weak hashtable key *)
-  d_tag  : int;
+  d_tag  : Hashweak.tag;  (* unique magical tag *)
 }
 
 and decl_node =
@@ -92,8 +93,10 @@ and decl_node =
 
 module Sdecl : Set.S with type elt = decl
 module Mdecl : Map.S with type key = decl
+module Wdecl : Hashweak.S with type key = decl
 
 val d_equal : decl -> decl -> bool
+val d_hash : decl -> int
 
 (** {2 Declaration constructors} *)
 

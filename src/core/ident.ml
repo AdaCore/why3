@@ -24,8 +24,7 @@ open Util
 type ident = {
   id_string : string;       (* non-unique name *)
   id_origin : origin;       (* origin of the ident *)
-  id_weak   : Hashweak.key; (* weak hashtable key *)
-  id_tag    : int;          (* unique numeric tag *)
+  id_tag    : Hashweak.tag; (* unique magical tag *)
 }
 
 and origin =
@@ -33,7 +32,7 @@ and origin =
   | Derived of ident
   | Fresh
 
-module Id = StructMake (struct
+module Id = WeakStructMake (struct
   type t = ident
   let tag id = id.id_tag
 end)
@@ -46,24 +45,24 @@ type preid = ident
 
 let id_equal = (==)
 
+let id_hash id = Hashweak.tag_hash id.id_tag
+
 (* constructors *)
 
-let gentag = let r = ref 0 in fun () -> incr r; !r
-
-let id_register id = { id with id_tag = gentag () }
+let id_register = let r = ref 0 in fun id ->
+  { id with id_tag = (incr r; Hashweak.create_tag !r) }
 
 let create_ident name origin = {
   id_string = name;
   id_origin = origin;
-  id_weak   = Hashweak.create_key ();
-  id_tag    = -1
+  id_tag    = Hashweak.dummy_tag;
 }
 
 let id_fresh nm = create_ident nm Fresh
 let id_user nm loc = create_ident nm (User loc)
 let id_derive nm id = create_ident nm (Derived id)
 let id_clone id = create_ident id.id_string (Derived id)
-let id_dup id = { id with id_tag = -1 }
+let id_dup id = { id with id_tag = Hashweak.dummy_tag }
 
 let rec id_derived_from i1 i2 = id_equal i1 i2 ||
   (match i1.id_origin with
@@ -80,7 +79,7 @@ let rec id_from_user i =
 
 type ident_printer = {
   indices   : (string, int) Hashtbl.t;
-  values    : (int, string) Hashtbl.t;
+  values    : string Hid.t;
   sanitizer : string -> string;
   blacklist : string list;
 }
@@ -107,31 +106,31 @@ let create_ident_printer ?(sanitizer = same) sl =
   let indices = Hashtbl.create 1997 in
   List.iter (reserve indices) sl;
   { indices   = indices;
-    values    = Hashtbl.create 1997;
+    values    = Hid.create 1997;
     sanitizer = sanitizer;
     blacklist = sl }
 
 let id_unique printer ?(sanitizer = same) id =
   try
-    Hashtbl.find printer.values id.id_tag
+    Hid.find printer.values id
   with Not_found ->
     let name = sanitizer (printer.sanitizer id.id_string) in
     let name = find_unique printer.indices name in
-    Hashtbl.replace printer.values id.id_tag name;
+    Hid.replace printer.values id name;
     name
 
 let string_unique printer s = find_unique printer.indices s
 
 let forget_id printer id =
   try
-    let name = Hashtbl.find printer.values id.id_tag in
+    let name = Hid.find printer.values id in
     Hashtbl.remove printer.indices name;
-    Hashtbl.remove printer.values id.id_tag
+    Hid.remove printer.values id
   with Not_found -> ()
 
 let forget_all printer =
+  Hid.clear printer.values;
   Hashtbl.clear printer.indices;
-  Hashtbl.clear printer.values;
   List.iter (reserve printer.indices) printer.blacklist
 
 (** Sanitizers *)

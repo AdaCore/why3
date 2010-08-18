@@ -66,6 +66,7 @@ module Mmeta : Map.S with type key = meta
 module Hmeta : Hashtbl.S with type key = meta
 
 val meta_equal : meta -> meta -> bool
+val meta_hash : meta -> int
 
 val register_meta      : string -> meta_arg_type list -> meta
 val register_meta_excl : string -> meta_arg_type list -> meta
@@ -100,6 +101,7 @@ module Mtdecl : Map.S with type key = tdecl
 module Htdecl : Hashtbl.S with type key = tdecl
 
 val td_equal : tdecl -> tdecl -> bool
+val td_hash : tdecl -> int
 
 (** Constructors and utilities *)
 
@@ -132,7 +134,6 @@ val add_ind_decls : theory_uc -> ind_decl list -> theory_uc
 (** Use *)
 
 val create_use : theory -> tdecl
-
 val use_export : theory_uc -> theory -> theory_uc
 
 (** Clone *)

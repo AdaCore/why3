@@ -26,7 +26,7 @@ type tvsymbol = {
   tv_name : ident;
 }
 
-module Tvar = StructMake (struct
+module Tvar = WeakStructMake (struct
   type t = tvsymbol
   let tag tv = tv.tv_name.id_tag
 end)
@@ -36,6 +36,8 @@ module Mtv = Tvar.M
 module Htv = Tvar.H
 
 let tv_equal = (==)
+
+let tv_hash tv = id_hash tv.tv_name
 
 let create_tvsymbol n = { tv_name = id_register n }
 
@@ -49,15 +51,14 @@ type tysymbol = {
 
 and ty = {
   ty_node : ty_node;
-  ty_weak : Hashweak.key;
-  ty_tag : int;
+  ty_tag  : Hashweak.tag;
 }
 
 and ty_node =
   | Tyvar of tvsymbol
   | Tyapp of tysymbol * ty list
 
-module Tsym = StructMake (struct
+module Tsym = WeakStructMake (struct
   type t = tysymbol
   let tag ts = ts.ts_name.id_tag
 end)
@@ -65,14 +66,13 @@ end)
 module Sts = Tsym.S
 module Mts = Tsym.M
 module Hts = Tsym.H
-
-module Wts = Hashweak.Make (struct
-  type t = tysymbol
-  let key ts = ts.ts_name.id_weak
-end)
+module Wts = Tsym.W
 
 let ts_equal = (==)
 let ty_equal = (==)
+
+let ts_hash ts = id_hash ts.ts_name
+let ty_hash ty = Hashweak.tag_hash ty.ty_tag
 
 let mk_ts name args def = {
   ts_name = name;
@@ -91,35 +91,26 @@ module Hsty = Hashcons.Make (struct
         ts_equal s1 s2 && List.for_all2 ty_equal l1 l2
     | _ -> false
 
-  let hash_ty ty = ty.ty_tag
-
   let hash ty = match ty.ty_node with
-    | Tyvar v -> v.tv_name.id_tag
-    | Tyapp (s,tl) -> Hashcons.combine_list hash_ty s.ts_name.id_tag tl
+    | Tyvar v -> tv_hash v
+    | Tyapp (s,tl) -> Hashcons.combine_list ty_hash (ts_hash s) tl
 
-  let tag n ty = { ty with ty_tag = n }
+  let tag n ty = { ty with ty_tag = Hashweak.create_tag n }
 end)
 
-module Tty = struct
+module Ty = WeakStructMake (struct
   type t = ty
   let tag ty = ty.ty_tag
-end
-
-module Ty = StructMake (Tty)
+end)
 
 module Sty = Ty.S
 module Mty = Ty.M
 module Hty = Ty.H
-
-module Wty = Hashweak.Make (struct
-  type t = ty
-  let key ty = ty.ty_weak
-end)
+module Wty = Ty.W
 
 let mk_ty n = {
   ty_node = n;
-  ty_weak = Hashweak.create_key ();
-  ty_tag  = -1
+  ty_tag  = Hashweak.dummy_tag;
 }
 
 let ty_var n = Hsty.hashcons (mk_ty (Tyvar n))

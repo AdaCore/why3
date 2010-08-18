@@ -23,7 +23,7 @@ open Theory
 
 type env
 
-val env_weak : env -> Hashweak.key
+val env_tag : env -> Hashweak.tag
 
 type retrieve_theory = env -> string list -> theory Mnm.t
 

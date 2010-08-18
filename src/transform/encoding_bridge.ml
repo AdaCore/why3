@@ -70,7 +70,7 @@ let load_prelude kept env =
     task_tdecls task in
   task,
   { kept = kept;
-    clone_builtin = Wts.memoize clone_builtin;
+    clone_builtin = Wts.memoize 7 clone_builtin;
     specials = specials;
     trans_lsymbol = Hls.create 17;
     trans_tsymbol = trans_tsymbol}

@@ -109,7 +109,9 @@ module Smeta = SMmeta.S
 module Mmeta = SMmeta.M
 module Hmeta = SMmeta.H
 
-let meta_equal m1 m2 = m1.meta_tag = m2.meta_tag
+let meta_equal = (==)
+
+let meta_hash m = m.meta_tag
 
 exception KnownMeta of meta
 exception UnknownMeta of string
@@ -193,23 +195,23 @@ module Hstdecl = Hashcons.Make (struct
         t1 = t2 && list_all2 eq_marg al1 al2
     | _,_ -> false
 
-  let hs_cl_ts _ ts acc = Hashcons.combine acc ts.ts_name.id_tag
-  let hs_cl_ls _ ls acc = Hashcons.combine acc ls.ls_name.id_tag
-  let hs_cl_pr _ pr acc = Hashcons.combine acc pr.pr_name.id_tag
+  let hs_cl_ts _ ts acc = Hashcons.combine acc (ts_hash ts)
+  let hs_cl_ls _ ls acc = Hashcons.combine acc (ls_hash ls)
+  let hs_cl_pr _ pr acc = Hashcons.combine acc (pr_hash pr)
 
   let hs_ta = function
-    | MAts ts -> ts.ts_name.id_tag
-    | MAls ls -> ls.ls_name.id_tag
-    | MApr pr -> pr.pr_name.id_tag
+    | MAts ts -> ts_hash ts
+    | MAls ls -> ls_hash ls
+    | MApr pr -> pr_hash pr
     | MAstr s -> Hashtbl.hash s
     | MAint i -> Hashtbl.hash i
 
   let hash td = match td.td_node with
-    | Decl d -> d.d_tag
-    | Use th -> th.th_name.id_tag
+    | Decl d -> d_hash d
+    | Use th -> id_hash th.th_name
     | Clone (th,tm,lm,pm) ->
         Mts.fold hs_cl_ts tm (Mls.fold hs_cl_ls lm
-          (Mpr.fold hs_cl_pr pm th.th_name.id_tag))
+          (Mpr.fold hs_cl_pr pm (id_hash th.th_name)))
     | Meta (t,al) -> Hashcons.combine_list hs_ta (Hashtbl.hash t) al
 
   let tag n td = { td with td_tag = n }
@@ -228,6 +230,7 @@ module Mtdecl = Tdecl.M
 module Htdecl = Tdecl.H
 
 let td_equal = (==)
+let td_hash td = td.td_tag
 
 (** Constructors and utilities *)
 

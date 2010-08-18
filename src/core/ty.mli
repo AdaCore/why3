@@ -31,6 +31,8 @@ module Htv : Hashtbl.S with type key = tvsymbol
 
 val tv_equal : tvsymbol -> tvsymbol -> bool
 
+val tv_hash : tvsymbol -> int
+
 val create_tvsymbol : preid -> tvsymbol
 
 (* type symbols and types *)
@@ -43,8 +45,7 @@ type tysymbol = private {
 
 and ty = private {
   ty_node : ty_node;
-  ty_weak : Hashweak.key;
-  ty_tag  : int;
+  ty_tag  : Hashweak.tag;
 }
 
 and ty_node = private
@@ -56,8 +57,6 @@ module Mts : Map.S with type key = tysymbol
 module Hts : Hashtbl.S with type key = tysymbol
 module Wts : Hashweak.S with type key = tysymbol
 
-module Tty : Util.Tagged with type t = ty
-
 module Sty : Set.S with type elt = ty
 module Mty : Map.S with type key = ty
 module Hty : Hashtbl.S with type key = ty
@@ -65,6 +64,9 @@ module Wty : Hashweak.S with type key = ty
 
 val ts_equal : tysymbol -> tysymbol -> bool
 val ty_equal : ty -> ty -> bool
+
+val ts_hash : tysymbol -> int
+val ty_hash : ty -> int
 
 exception BadTypeArity of tysymbol * int * int
 exception DuplicateTypeVar of tvsymbol

@@ -148,6 +148,21 @@ struct
   module H = Hashtbl.Make(T)
 end
 
+module MakeTagged (X : Hashweak.Weakey) =
+struct
+  type t = X.t
+  let tag t = Hashweak.tag_hash (X.tag t)
+end
+
+module WeakStructMake (X : Hashweak.Weakey) =
+struct
+  module T = OrderedHash(MakeTagged(X))
+  module S = Set.Make(T)
+  module M = Map.Make(T)
+  module H = Hashtbl.Make(T)
+  module W = Hashweak.Make(X)
+end
+
 (* memoization *)
 
 let memo ?(size=17) f =

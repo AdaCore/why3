@@ -27,12 +27,12 @@ open Theory
 (** Clone and meta history *)
 
 type tdecl_set = private {
-  tds_set  : Stdecl.t;
-  tds_weak : Hashweak.key;
-  tds_tag  : int;
+  tds_set : Stdecl.t;
+  tds_tag : Hashweak.tag;
 }
 
 val tds_equal : tdecl_set -> tdecl_set -> bool
+val tds_hash : tdecl_set -> int
 
 type clone_map = tdecl_set Mid.t
 type meta_map = tdecl_set Mmeta.t
@@ -47,12 +47,14 @@ and task_hd = private {
   task_known : known_map;    (* known identifiers *)
   task_clone : clone_map;    (* cloning history *)
   task_meta  : meta_map;     (* meta properties *)
-  task_weak  : Hashweak.key; (* weak hashtable key *)
-  task_tag   : int;          (* unique task tag *)
+  task_tag   : Hashweak.tag; (* unique magical tag *)
 }
 
 val task_equal : task -> task -> bool
 val task_hd_equal : task_hd -> task_hd -> bool
+
+val task_hash : task -> int
+val task_hd_hash : task_hd -> int
 
 val task_known : task -> known_map
 val task_clone : task -> clone_map

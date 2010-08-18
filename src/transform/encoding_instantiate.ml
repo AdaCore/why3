@@ -40,7 +40,11 @@ let ty_dumb = ty_var tv_dumb
    instantié. Un tag sur un logique polymorphe doit être un tag sur toute
    la famille de fonctions *)
 
-module OHTyl = OrderedHashList(Tty)
+module OHTyl = OrderedHashList(struct
+  type t = ty
+  let tag = ty_hash
+end)
+
 module Mtyl = Map.Make(OHTyl)
 
 type tenv_aux = {
