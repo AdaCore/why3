@@ -216,7 +216,7 @@ and print_tnode pri fmt t = match t.t_node with
       forget_var v
 
 and print_fnode pri fmt f = match f.f_node with
-  | Fapp (ps,[t1;t2]) when ps = ps_equ ->
+  | Fapp (ps,[t1;t2]) when ls_equal ps ps_equ ->
       fprintf fmt (protect_on (pri > 4) "%a =@ %a")
         (print_lterm 4) t1 (print_lterm 4) t2
   | Fapp (ps,[]) ->

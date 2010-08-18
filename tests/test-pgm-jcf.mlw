@@ -11,6 +11,11 @@ let f () =
   r := 1;
   assert { !r > 0 }
 
+let foo () =
+  let x = any {} int {result=0} in
+  let y = any {} int {result=result+1} in 
+  assert { false }
+
 (*
 Local Variables: 
 compile-command: "unset LANG; make -C .. testl"

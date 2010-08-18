@@ -83,7 +83,7 @@ let dty_bool gl = dty_app (gl.ts_bool, [])
 let dty_unit gl = dty_app (gl.ts_unit, [])
 let dty_label gl = dty_app (gl.ts_label, [])
 
-(* note: local variables are sqimultaneously in locals (to type programs)
+(* note: local variables are simultaneously in locals (to type programs)
    and in denv (to type logic elements) *)
 type denv = {
   env   : env;
