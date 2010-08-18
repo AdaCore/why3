@@ -84,6 +84,8 @@ module Mint : Map.S with type key = int
 module Sstr : Set.S with type elt = string
 module Mstr : Map.S with type key = string
 
+val memo_int : int -> (int -> 'a) -> int -> 'a
+
 (* Set, Map, Hashtbl on structures with a unique tag *)
 
 module type Tagged =
@@ -117,8 +119,4 @@ sig
   module H : Hashtbl.S with type key = X.t
   module W : Hashweak.S with type key = X.t
 end
-
-(* memoization *)
-
-val memo : ?size:int -> ('a -> 'b) -> 'a -> 'b
 

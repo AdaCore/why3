@@ -582,14 +582,12 @@ let ps_equ =
 let f_equ t1 t2 = f_app ps_equ [t1; t2]
 let f_neq t1 t2 = f_not (f_app ps_equ [t1; t2])
 
-let fs_tuple n =
+let fs_tuple = Util.memo_int 17 (fun n ->
   let tyl = ref [] in
   for i = 1 to n
   do tyl := ty_var (create_tvsymbol (id_fresh "a")) :: !tyl done;
   let ty = ty_tuple !tyl in
-  create_fsymbol (id_fresh ("Tuple" ^ string_of_int n)) !tyl ty
-
-let fs_tuple = Util.memo fs_tuple
+  create_fsymbol (id_fresh ("Tuple" ^ string_of_int n)) !tyl ty)
 
 let is_fs_tuple fs = fs == fs_tuple (List.length fs.ls_args)
 

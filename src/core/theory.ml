@@ -702,12 +702,10 @@ let builtin_theory =
 
 let create_theory n = use_export (empty_theory n) builtin_theory
 
-let tuple_theory n =
+let tuple_theory = Util.memo_int 17 (fun n ->
   let uc = empty_theory (id_fresh ("Tuple" ^ string_of_int n)) in
   let uc = add_ty_decl uc [ts_tuple n, Talgebraic [fs_tuple n]] in
-  close_theory uc
-
-let tuple_theory = Util.memo tuple_theory
+  close_theory uc)
 
 (* Exception reporting *)
 

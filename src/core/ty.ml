@@ -218,15 +218,12 @@ let ts_real = create_tysymbol (id_fresh "real") [] None
 let ty_int  = ty_app ts_int  []
 let ty_real = ty_app ts_real []
 
-let ts_tuple n =
+let ts_tuple = Util.memo_int 17 (fun n ->
   let vl = ref [] in
   for i = 1 to n do vl := create_tvsymbol (id_fresh "a") :: !vl done;
-  create_tysymbol (id_fresh ("tuple" ^ string_of_int n)) !vl None
+  create_tysymbol (id_fresh ("tuple" ^ string_of_int n)) !vl None)
 
-let ts_tuple = Util.memo ts_tuple
-
-let ty_tuple tyl =
-  ty_app (ts_tuple (List.length tyl)) tyl
+let ty_tuple tyl = ty_app (ts_tuple (List.length tyl)) tyl
 
 let is_ts_tuple ts = ts == ts_tuple (List.length ts.ts_args)
 
