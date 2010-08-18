@@ -25,11 +25,9 @@ val dummy_tag : tag
 
 val create_tag : int -> tag
 
-val tag_hash : tag -> int
-
 val tag_equal : tag -> tag -> bool
 
-val tag_compare : tag -> tag -> int
+val tag_hash : tag -> int
 
 module type S = sig
 

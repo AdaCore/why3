@@ -76,11 +76,9 @@ let dummy_tag = {
   tag_tag = -1;
 }
 
+let tag_equal = (==)
+
 let tag_hash k = assert (k != dummy_tag); k.tag_tag
-
-let tag_equal k1 k2 = k1.tag_tag = k2.tag_tag
-
-let tag_compare k1 k2 = Pervasives.compare k1.tag_tag k2.tag_tag
 
 module type Weakey =
 sig
