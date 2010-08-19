@@ -1088,15 +1088,7 @@ and f_gen_map fnT fnB fnV fnL f =
         let br (p,b,f) = pat_gen_map fnT fnB fnL p, bnd_map fn_t b, fn_f f in
         f_case (fn_t t) (List.map br bl))
 
-let get_fnT fn =
-  let ht = Hashtbl.create 17 in
-  let fnT ty =
-    try Hashtbl.find ht ty.ty_tag with Not_found ->
-      let nt = ty_s_map fn ty in
-      Hashtbl.add ht ty.ty_tag nt;
-      nt
-  in
-  fnT
+let get_fnT fn = Wty.memoize 17 (fun ty -> ty_s_map fn ty)
 
 let get_fnB () =
   let ht = Hid.create 17 in
