@@ -141,9 +141,10 @@ let rec projty menv tvar ty =
               (* In this configuration there is no term representing type,
                  all type are a type or are in the black part
                  (the or is not a xor)*)
-              let preid = id_clone ts.ts_name in
-              let ts = create_tysymbol preid [] None (*Some ty*) in
-              let tty = ty_app ts [] in
+              (* let preid = id_clone ts.ts_name in *)
+              (* let ts = create_tysymbol preid [] None (\*Some ty*\) in *)
+              (* let tty = ty_app ts [] in *)
+              let tty = ty in
               menv.projty <- Mty.add ty tty menv.projty;
               menv.undef_tsymbol <- Sts.add ts menv.undef_tsymbol;
               (*Format.eprintf "projty : ts : %a env : %a@." Pretty.print_ts ts
@@ -449,33 +450,25 @@ let collect_green_part tds =
   let sts = Task.find_tagged_ts meta_kept tds Sts.empty in
   let extract ts tys =
     assert (ts.ts_args = []); (* UnsupportedTySymbol? *)
-    Sty.add (match ts.ts_def with
+    Mty.add (match ts.ts_def with
       | None -> ty_app ts []
-      | Some ty -> ty) tys in
-  let sty = Sts.fold extract sts Sty.empty in
-  (* complete by subterm *)
-  let rec subty sty ty = ty_fold subty (Sty.add ty sty) ty in
-  Sty.fold (flip subty) sty Sty.empty
-
+      | Some ty -> ty) ts tys in
+  Sts.fold extract sts Mty.empty
+  
+  
 
 (* Some general env creation function *)
 let create_env task tenv tds =
   let keep = collect_green_part tds in
-  let projty = Sty.fold (fun ty ty_ty ->
-    let ty2 = match ty.ty_node with
-      | Tyapp (_,[]) -> ty
-      | Tyapp (ts,_) ->
-        let ts = create_tysymbol (id_clone ts.ts_name) [] None in
-        ty_app ts []
-      | _ -> assert false in
-    Mty.add ty ty2 ty_ty)
+  let projty = Mty.fold (fun ty _ ty_ty ->
+    Mty.add ty ty ty_ty)
     keep Mty.empty in
-  let task = Mty.fold (fun _ ty task ->
-    match ty.ty_node with
-      | Tyapp (ts,[]) ->
-        let task = add_ty_decl task [ts,Tabstract] in
-        add_meta task meta_kept [MAts ts]
-      | _ -> assert false) projty task in
+  let task = Mty.fold (fun ty ts task ->
+    let add_ts task ts = add_ty_decl task [ts,Tabstract] in
+    let task = ty_s_fold add_ts task ty in
+    let task = add_ts task ts in
+    task (* the meta is yet here *)) keep task in
+  let keep = Mty.fold (fun ty _ sty -> Sty.add ty sty) keep Sty.empty in
     task,{
     etenv = tenv;
     ekeep = keep;

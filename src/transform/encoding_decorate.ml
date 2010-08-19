@@ -57,10 +57,9 @@ let load_prelude kept env =
     | Some ty -> Sty.add ty sty
     | None -> Sty.add (ty_app ts []) sty in
   let kepty = Sts.fold add kept Sty.empty in
-  let add ty sts = match ty.ty_node with
-    | Tyapp (ts,[]) -> Sts.add ts sts
-    | _ -> sts in
-  let kept = Sty.fold add kepty Sts.empty in
+  let add_ts sts ts = Sts.add ts sts in
+  let add_ts ty sts = ty_s_fold add_ts sts ty in
+  let kept = Sty.fold add_ts kepty Sts.empty in
   task,
   { kept = kept;
     keptty = kepty;
@@ -72,9 +71,6 @@ let load_prelude kept env =
     trans_tsymbol = trans_tsymbol;
     trans_consts = Hterm.create 3;
   }
-
-let is_kept tenv ts = 
-  ts.ts_args = [] && Sts.mem ts tenv.kept
 
 (* Translate a type to a term *)
 let rec term_of_ty tenv tvar ty =
@@ -231,7 +227,6 @@ let decl (tenv:tenv) d =
   let fnF = rewrite_fmla tenv in
   match d.d_node with
     | Dtype [{ts_def = Some _},_] -> []
-    | Dtype [ts,Tabstract] when is_kept tenv ts -> [create_decl d]
     | Dtype [ts,Tabstract] -> 
         let tty = 
           try 
@@ -240,7 +235,8 @@ let decl (tenv:tenv) d =
             let tty = conv_ts tenv ts in
             Hts.add tenv.trans_tsymbol ts tty;
             tty in
-        [create_decl (create_logic_decl [(tty,None)])]
+        let td = [create_decl (create_logic_decl [(tty,None)])] in
+        if Sts.mem ts tenv.kept then (create_decl d)::td else td
     | Dtype _ -> Printer.unsupportedDecl 
         d "encoding_decorate : I can work only on abstract \
             type which are not in recursive bloc."
