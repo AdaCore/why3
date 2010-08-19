@@ -53,7 +53,14 @@ let load_prelude kept env =
   let task = None in
   let task = Task.use_export task prelude in
   let trans_tsymbol = Hts.create 17 in
-  let kepty = Sts.fold (fun ts -> Sty.add (ty_app ts [])) kept Sty.empty in
+  let add ts sty = match ts.ts_def with
+    | Some ty -> Sty.add ty sty
+    | None -> Sty.add (ty_app ts []) sty in
+  let kepty = Sts.fold add kept Sty.empty in
+  let add ty sts = match ty.ty_node with
+    | Tyapp (ts,[]) -> Sts.add ts sts
+    | _ -> sts in
+  let kept = Sty.fold add kepty Sts.empty in
   task,
   { kept = kept;
     keptty = kepty;
@@ -223,6 +230,7 @@ let decl (tenv:tenv) d =
   (* let fnT = rewrite_term tenv in *)
   let fnF = rewrite_fmla tenv in
   match d.d_node with
+    | Dtype [{ts_def = Some _},_] -> []
     | Dtype [ts,Tabstract] when is_kept tenv ts -> [create_decl d]
     | Dtype [ts,Tabstract] -> 
         let tty = 
@@ -265,14 +273,13 @@ let decl (tenv:tenv) d =
         let add fs () acc = (create_decl (create_logic_decl [fs,None]))::acc in
         Hls.fold add consts [create_decl (create_prop_decl k pr f)]
 
-(*
-let decl tenv d =
-  Format.eprintf "@[<hov 2>Decl : %a =>@\n@?" Pretty.print_decl d;
-  let res = decl tenv d in
-  Format.eprintf "%a@]@." (Pp.print_list Pp.newline Pretty.print_task_tdecl)
-    res;
-  res
-*)
+
+(* let decl tenv d = *)
+(*   Format.eprintf "@[<hov 2>Decl : %a =>@\n@?" Pretty.print_decl d; *)
+(*   let res = decl tenv d in *)
+(*   Format.eprintf "%a@]@." (Pp.print_list Pp.newline Pretty.print_tdecl) *)
+(*     res; *)
+(*   res *)
 
 let t env = Trans.on_meta meta_kept (fun tds ->
   let s = Task.find_tagged_ts meta_kept tds Sts.empty in

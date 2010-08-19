@@ -35,8 +35,7 @@ type lconv = {tb2t : lsymbol;
               t2tb : lsymbol;
               tb   : ty}
 
-type tenv = {kept          : Sts.t;
-             clone_builtin : tysymbol -> Theory.tdecl list;
+type tenv = {kept          : Sty.t;
              specials      : lconv Hty.t;
              trans_lsymbol : lsymbol Hls.t;
              trans_tsymbol : tysymbol Hts.t}
@@ -44,60 +43,87 @@ type tenv = {kept          : Sts.t;
        comme specials_type ne depend pas*)
     
 
+(* Translate a type to a type without kept *)
+let rec ty_of_ty tenv ty =
+  match ty.ty_node with
+    | Tyapp (ts,[]) ->
+      let tts = try Hts.find tenv.trans_tsymbol ts 
+        with Not_found -> ts in
+      ty_app tts []
+    | Tyapp (ts,l) -> ty_app ts (List.map (ty_of_ty tenv) l)
+    | Tyvar _ -> ty
+
 let load_prelude kept env =
   let task = None in
   let specials = Hty.create 17 in
   let builtin = Env.find_theory env why_filename "Bridge" in
   let type_t = Theory.ns_find_ts builtin.th_export ["t"] in
+  let type_tb = Theory.ns_find_ts builtin.th_export ["tb"] in
+  let logic_tb2t = Theory.ns_find_ls builtin.th_export ["tb2t"] in
+  let logic_t2tb = Theory.ns_find_ls builtin.th_export ["t2tb"] in
   let trans_tsymbol = Hts.create 17 in
-  let clone_builtin ts =
-    let name = ts.ts_name.id_string in
-    let th_uc = create_theory (id_fresh ("bridge_for_"^name)) in
-    let th_uc = 
-      if ts_equal ts ts_int || ts_equal ts ts_real then th_uc
-      else Theory.add_ty_decl th_uc [ts,Tabstract] in
+  let tenv_tmp =
+    { kept = Sty.empty;
+      specials = specials;
+      trans_lsymbol = Hls.create 17;
+      trans_tsymbol = trans_tsymbol} in
+  let clone_builtin ts (task,sty) =
+    let ty = match ts.ts_def with 
+      | Some ty -> ty 
+      | None -> try ty_app ts [] with BadTypeArity(_,_,_) -> 
+        failwith "kept without definition must be constant"  in
+    let add_ts task ts = add_ty_decl task [ts,Tabstract] in
+    let task = ty_s_fold add_ts task ty in
+    let is_constant = 
+      match ty.ty_node with 
+        | Tyapp (_,[]) -> true
+        | _ -> false in
+    let ts_head =
+      match ty.ty_node with 
+        | Tyapp (ts,_) -> ts
+        | _ -> assert false in
+    let task = add_ts task ts in
+    let tb = create_tysymbol (id_clone ts_head.ts_name) []
+      (if is_constant then None else Some (ty_of_ty tenv_tmp ty)) in
+    let task = add_ts task tb in
+    let tytb = ty_app tb [] in 
+    let tb2t = create_fsymbol (id_clone logic_t2tb.ls_name) [tytb] ty in
+    let t2tb = create_fsymbol (id_clone logic_t2tb.ls_name) [ty] tytb in
+    let task = add_logic_decl task [tb2t,None] in
+    let task = add_logic_decl task [t2tb,None] in
     let th_inst = create_inst 
-      ~ts:[type_t,ts] ~ls:[] ~lemma:[] ~goal:[] in
-    let th_uc = Theory.clone_export th_uc builtin th_inst in
-    let th = close_theory th_uc in
-    let tb2t = ns_find_ls th.th_export ["tb2t"] in
-    let t2tb = ns_find_ls th.th_export ["t2tb"] in
-    let tb = ns_find_ts th.th_export ["tb"] in
+      ~ts:[type_t,ts;type_tb,tb]
+      ~ls:[logic_t2tb,t2tb;logic_tb2t,tb2t] ~lemma:[] ~goal:[] in
+    let task = Task.clone_export task builtin th_inst in
     let lconv = { tb2t = tb2t; t2tb = t2tb; tb = ty_app tb []} in
-    let task = Task.use_export None th in
-    Hts.add trans_tsymbol ts tb;
-    Hty.add specials (ty_app ts []) lconv;
-    task_tdecls task in
-  task,
-  { kept = kept;
-    clone_builtin = Wts.memoize 7 clone_builtin;
-    specials = specials;
-    trans_lsymbol = Hls.create 17;
-    trans_tsymbol = trans_tsymbol}
+    (* Add the constant sort to trans_tsymbol *)
+    if is_constant then Hts.add trans_tsymbol ts_head tb;
+    Hty.add specials ty lconv;
+    task,Sty.add ty sty in
+  let task,kept = Sts.fold clone_builtin kept (task,Sty.empty) in
+  task, { tenv_tmp with kept = kept}
 
-(* Translate a type to a type without kept *)
-let rec ty_of_ty tenv ty =
-  match ty.ty_node with
-    | Tyapp (ts,l) -> 
-        let tts = try Hts.find tenv.trans_tsymbol ts 
-          with Not_found -> ts in
-        ty_app tts (List.map (ty_of_ty tenv) l)
-    | Tyvar _ -> ty
 
 
 (* Translate with the previous function except when the type is specials *)
-let ty_of_ty_specials tenv ty =
+let conv_ty tenv ty =
   if Hty.mem tenv.specials ty then ty else ty_of_ty tenv ty
 
-let is_kept tenv ts = ts.ts_args = [] && Sts.mem ts tenv.kept
-    
+(* let is_kept tenv ts = ts.ts_args = [] && Sty.mem ts tenv.kept *)
+
+(* Convert a variable *)
+let conv_vs tenv vs =
+  let ty = conv_ty tenv vs.vs_ty in
+  if ty_equal ty vs.vs_ty then vs else
+      create_vsymbol (id_dup vs.vs_name) ty
+
 (* Convert a logic symbols to the encoded one *)
 let conv_ls tenv ls = 
   if ls_equal ls ps_equ
   then ls
   else
-    let tyl = List.map (ty_of_ty_specials tenv) ls.ls_args in
-    let ty_res = Util.option_map (ty_of_ty_specials tenv) ls.ls_value in
+    let tyl = List.map (conv_ty tenv) ls.ls_args in
+    let ty_res = Util.option_map (conv_ty tenv) ls.ls_value in
     if Util.option_eq ty_equal ty_res ls.ls_value 
       && List.for_all2 ty_equal tyl ls.ls_args 
     then ls
@@ -110,17 +136,12 @@ let conv_arg tenv t aty =
   let tty = t.t_ty in
   if ty_equal tty aty then t else
     try
-      (* tb2t *)
-      let tylconv = Hty.find tenv.specials aty in
-      t_app tylconv.tb2t [t] aty
+      (* polymorph specials t2tb *)
+      let tylconv = Hty.find tenv.specials tty in
+      t_app tylconv.t2tb [t] tylconv.tb
     with Not_found ->
-      try
-        (* polymorph specials t2tb *)
-        let tylconv = Hty.find tenv.specials tty in
-        t_app tylconv.t2tb [t] tylconv.tb
-      with Not_found ->
-        (* polymorph not specials *)
-        t
+      (* polymorph not specials *)
+      t
 
 (* Convert with a bridge an application if needed *)
 let conv_res_app tenv p tl tty = 
@@ -137,38 +158,68 @@ let conv_res_app tenv p tl tty =
     let tty = ty_of_ty tenv tty in
     t_app p tl tty
 
-let rec rewrite_term tenv t =
-  (*Format.eprintf "@[<hov 2>Term : %a =>@\n@?" Pretty.print_term t;*)
+let rec rewrite_term tenv vsvar t =
+  (* Format.eprintf "@[<hov 2>Term : %a =>@\n@?" Pretty.print_term t; *)
   let fnT = rewrite_term tenv in
   let fnF = rewrite_fmla tenv in
-  match t.t_node with
+  let t = match t.t_node with
+    | Tvar vs -> Mvs.find vs vsvar
     | Tapp(p,tl) ->
-        let tl = List.map fnT tl in
+        let tl = List.map (fnT vsvar) tl in
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv) tl p.ls_args in
         conv_res_app tenv p tl t.t_ty
-    | _ -> t_map fnT fnF t
+    | Tlet (t1, b) -> 
+        let u,t2,close = t_open_bound_cb b in
+        let t1 = fnT vsvar t1 in
+        let u' = conv_vs tenv u in
+        let vsvar = Mvs.add u (t_var u') vsvar in
+        let t2 = fnT vsvar t2 in
+        t_let t1 (close u t2)
+    | _ -> t_map (fnT vsvar) (fnF vsvar) t in
+  (* Format.eprintf "@[<hov 2>Term : => %a : %a@\n@?" Pretty.print_term t *)
+  (*   Pretty.print_ty t.t_ty; *)
+    t
 
-and rewrite_fmla tenv f =
+and rewrite_fmla tenv vsvar f =
   (* Format.eprintf "@[<hov 2>Fmla : %a =>@\n@?" Pretty.print_fmla f; *)
   let fnT = rewrite_term tenv in
   let fnF = rewrite_fmla tenv in
   match f.f_node with
     | Fapp(p, [t1;t2]) when ls_equal p ps_equ ->
-        f_equ (fnT t1) (fnT t2)
+        f_equ (fnT vsvar t1) (fnT vsvar t2)
     | Fapp(p, tl) -> 
-        let tl = List.map fnT tl in
+        let tl = List.map (fnT vsvar) tl in
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv) tl p.ls_args in
         f_app p tl
-    | _ -> f_map fnT fnF f
+    | Fquant (q, b) ->
+        let vl, tl, f1, close = f_open_quant_cb b in
+        let conv_vs (vsvar,l) vs =
+          let vs' = conv_vs tenv vs in
+          Mvs.add vs (t_var vs') vsvar,vs'::l in
+        let (vsvar,vl) = List.fold_left conv_vs (vsvar,[]) vl in
+        let f1 = fnF vsvar f1 in 
+        (* Ici un trigger qui ne match pas assez de variables 
+           peut être généré *)
+        let tl = tr_map (fnT vsvar) (fnF vsvar) tl in
+        let vl = List.rev vl in
+        f_quant q (close vl tl f1)
+    | Flet (t1, b) ->
+        let u,f2,close = f_open_bound_cb b in
+        let t1 = fnT vsvar t1 in
+        let u' = conv_vs tenv u in
+        let vsvar = Mvs.add u (t_var u') vsvar in
+        let f2 = fnF vsvar f2 in 
+        f_let t1 (close u f2)
+    | _ -> f_map (fnT vsvar) (fnF vsvar) f
 
 let decl (tenv:tenv) d =
   (* let fnT = rewrite_term tenv in *)
   let fnF = rewrite_fmla tenv in
   match d.d_node with
-    | Dtype [ts,Tabstract] when is_kept tenv ts -> 
-        tenv.clone_builtin ts
+    (* | Dtype [ts,Tabstract] when is_kept tenv ts ->  *)
+    (*     tenv.clone_builtin ts *)
     | Dtype [_,Tabstract] -> [create_decl d]
     | Dtype _ -> Printer.unsupportedDecl 
         d "encoding_decorate : I can work only on abstract \
@@ -194,7 +245,7 @@ let decl (tenv:tenv) d =
         (* let fn (ps,l) = ps, List.map fn l in *)
         (* [create_ind_decl (List.map fn l)] *)
     | Dprop (k,pr,f) ->
-        let f = fnF f in
+        let f = fnF Mvs.empty f in
         [create_decl (create_prop_decl k pr f)]
 
 (*

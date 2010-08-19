@@ -25,6 +25,8 @@ let const f _ = f
 
 let flip f x y = f y x
 
+let cons f acc x = (f x)::acc
+
 (* useful option combinators *)
 
 let of_option = function None -> assert false | Some x -> x

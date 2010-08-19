@@ -189,23 +189,23 @@ let projty_real menv tvar ty = reduce_to_real (projty menv tvar ty)
 
 let reduce_to_default menv tvar d ty =
   match projty menv tvar ty with
-    | Tyty ty -> ty
+    | Tyty _ -> (*keep the term unfolded *) ty_inst tvar ty
     | Tyterm _ -> ty_var d
 
 let find_logic menv tvar p tyl ret =
   if ls_equal p ps_equ then p else begin
     let inst = ls_app_inst p tyl ret in
-     (*Format.eprintf "inst : %a@."
-       (Pp.print_iter2 Mtv.iter Pp.comma Pp.space Pp.nothing
-          Pretty.print_ty) inst;*)
+     (* Format.eprintf "inst : %a@." *)
+     (*   (Pp.print_iter2 Mtv.iter Pp.comma Pp.space Pp.nothing *)
+     (*      Pretty.print_ty) inst; *)
     let inst = Mtv.mapi (reduce_to_default menv tvar) inst in
     let inst_l = Mtv.fold (fun _ v acc -> v::acc) inst [] in
-    (* Format.eprintf "p : %a | arg : %a| tyl = %a | inst_l : %i@." *)
-    (*   Pretty.print_ls p        *)
+    (* Format.eprintf "p : %a | arg : %a| tyl = %a | inst_l : %a@." *)
+    (*   Pretty.print_ls p *)
     (*   (Pp.print_list Pp.comma Pretty.print_ty) p.ls_args *)
-    (*   (Pp.print_list Pp.comma Pretty.print_ty)  *)
-    (*   (List.map (fun t -> t.t_ty) tyl) *)
-    (*   (List.length inst_l); *)
+    (*   (Pp.print_list Pp.comma Pretty.print_ty) *)
+    (*   (List.map (fun t -> (projty_real menv tvar t.t_ty)) tyl) *)
+    (*   (Pp.print_list Pp.comma Pretty.print_ty) inst_l; *)
       try
       let insts = Mls.find p menv.defined_lsymbol in
       Mtyl.find inst_l insts
@@ -215,18 +215,22 @@ let find_logic menv tvar p tyl ret =
           Mls.find p menv.defined_lsymbol
         with Not_found ->
           Mtyl.empty in
+      (* proj fold the types previously kept unfold in inst *)
       let proj ty = reduce_to_real (projty menv Mtv.empty ty) in
       let arg = List.map (ty_inst inst) p.ls_args in
       let arg = List.map proj arg in
       let result = option_map (ty_inst inst) p.ls_value in
       let result = option_map proj result in
+      (* Format.eprintf "arg : %a ; result : %a@." *)
+      (*   (Pp.print_list Pp.comma Pretty.print_ty) arg *)
+      (*   (Pp.print_option Pretty.print_ty) result; *)
       let ls = if List.for_all2 ty_equal arg p.ls_args &&
           option_eq ty_equal result p.ls_value
         then p else create_lsymbol (id_clone p.ls_name) arg result in
       let insts = Mtyl.add inst_l ls insts in
       menv.defined_lsymbol <- Mls.add p insts menv.defined_lsymbol;
       menv.undef_lsymbol <- Sls.add ls menv.undef_lsymbol;
-      (* Format.eprintf "fl : env : %a  p : %a | inst : %a@."  *)
+      (* Format.eprintf "fl : env : %a  p : %a | inst : %a@." *)
       (*   print_env menv *)
       (*   Pretty.print_ls p *)
       (*   (Pp.print_list Pp.comma Pretty.print_ty) inst_l; *)
@@ -259,7 +263,7 @@ let rec rewrite_term menv tvar vsvar t =
   let fnT = rewrite_term menv tvar in
   let fnF = rewrite_fmla menv tvar in
   (* Format.eprintf "@[<hov 2>Term : %a =>@\n@?" Pretty.print_term t; *)
-  match t.t_node with
+  let t = match t.t_node with
     | Tconst _ -> t
     | Tvar x -> Mvs.find x vsvar
     | Tapp(p,tl) ->
@@ -274,7 +278,10 @@ let rec rewrite_term menv tvar vsvar t =
       t_let t1 (cb u t2)
     | Tcase _ | Teps _ | Tbvar _ ->
       Printer.unsupportedTerm t
-        "Encoding instantiate : I can't encode this term"
+        "Encoding instantiate : I can't encode this term" in
+  (* Format.eprintf "@[<hov 2>Term : => %a : %a@\n@?" *)
+  (*   Pretty.print_term t Pretty.print_ty t.t_ty; *)
+  t
 
 and rewrite_fmla menv tvar vsvar f =
   let fnT = rewrite_term menv tvar in
@@ -394,7 +401,7 @@ Perhaps you could use eliminate_definition"
         undef_tsymbol = Sts.empty;
       } in
       let conv_f task tvar =
-        (* Format.eprintf "f0 : %a@. env : %a@." Pretty.print_fmla  *)
+        (* Format.eprintf "f0 : %a@. env : %a@." Pretty.print_fmla *)
         (*   (f_ty_subst tvar Mvs.empty f) *)
         (*   print_env menv; *)
         let f = rewrite_fmla menv tvar Mvs.empty f in
@@ -439,11 +446,7 @@ let monomorphise_goal =
 
 
 let collect_green_part tds =
-  (* int and real are always taken in the green part (the constants
-     can't be written otherwise). Trigger that only when Int or Real
-     theory is used should not be sufficient. *)
-  let sts = Sts.add ts_int (Sts.singleton ts_real) in
-  let sts = Task.find_tagged_ts meta_kept tds sts in
+  let sts = Task.find_tagged_ts meta_kept tds Sts.empty in
   let extract ts tys =
     assert (ts.ts_args = []); (* UnsupportedTySymbol? *)
     Sty.add (match ts.ts_def with
@@ -514,16 +517,21 @@ let () =
 (* Select *)
 
 let find_mono ~only_mono sty f =
-  let add sty ty = if is_ty_mono ~only_mono ty then Sty.add ty sty else sty in
+  let rec ty_add sty ty = ty_fold ty_add (Sty.add ty sty) ty in
+  let add sty ty = if is_ty_mono ~only_mono ty then 
+      ty_add sty ty else sty in
   f_fold_ty add sty f
 
-let create_meta_ty ty acc =
+let create_meta_ty ty =
   let name = id_fresh "meta_ty" in
   let ts = create_tysymbol name [] (Some ty) in
-  (create_meta meta_kept [MAts ts])::acc
+  (create_meta meta_kept [MAts ts])
+
+ (* Weak table is useless since ty is in ts *)
+let create_meta_ty = Wty.memoize 17 create_meta_ty
 
 let create_meta_tyl sty d =
-  Sty.fold create_meta_ty sty [create_decl d]
+  Sty.fold (flip $ cons create_meta_ty) sty [create_decl d]
 
 let mono_in_goal pr f =
   let sty = (try find_mono ~only_mono:true Sty.empty f

@@ -25,6 +25,8 @@ val const : 'a -> 'b -> 'a
 
 val flip : ('a -> 'b -> 'c) -> 'b -> 'a -> 'c
 
+val cons : ('a -> 'b) -> 'b list -> 'a -> 'b list
+
 (* useful option combinators *)
 
 val of_option : 'a option -> 'a
