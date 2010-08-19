@@ -38,7 +38,8 @@ type tenv = {kept : Sts.t;
              sort : lsymbol;
              ty : ty;
              trans_lsymbol : lsymbol Hls.t;
-             trans_tsymbol : lsymbol Hts.t} 
+             trans_tsymbol : lsymbol Hts.t;
+             trans_consts   : lsymbol Hterm.t} 
     (* trans_lsymbol ne depend pour l'instant pas du but, 
        comme specials_type ne depend pas*)
     
@@ -61,7 +62,9 @@ let load_prelude kept env =
     ty = tyty;
     sort = sort;
     trans_lsymbol = Hls.create 17;
-    trans_tsymbol = trans_tsymbol}
+    trans_tsymbol = trans_tsymbol;
+    trans_consts = Hterm.create 3;
+  }
 
 let is_kept tenv ts = 
   ts.ts_args = [] && Sts.mem ts tenv.kept
@@ -148,14 +151,24 @@ let conv_vs_let vsvar vs ty_res =
       t, vsres in              
   (Mvs.add vs tres vsvar,vsres)
 
+let conv_const tenv consts tvar t =
+  let fs = 
+    try Hterm.find tenv.trans_consts t
+    with Not_found -> 
+      let s = "const_"^Pp.string_of Pretty.print_term t in
+      let fs = create_fsymbol (id_fresh s) [] tenv.undeco in
+      Hterm.add tenv.trans_consts t fs; fs in
+  Hls.replace consts fs ();
+  conv_res_app tenv tvar (t_app fs [] tenv.undeco) t.t_ty
 
-let rec rewrite_term tenv tvar vsvar t =
+let rec rewrite_term tenv consts tvar vsvar t =
   (* Format.eprintf "@[<hov 3>Term : %a : %a =>@\n@?" *)
   (*   Pretty.print_term t Pretty.print_ty t.t_ty; *)
-  let fnT = rewrite_term tenv tvar in
-  let fnF = rewrite_fmla tenv tvar vsvar in
+  let fnT = rewrite_term tenv consts tvar in
+  let fnF = rewrite_fmla tenv consts tvar vsvar in
   match t.t_node with
-    | Tconst _ -> t
+    | Tconst _ when Sty.mem t.t_ty tenv.keptty -> t
+    | Tconst _ -> conv_const tenv consts tvar t
     | Tvar x -> Mvs.find x vsvar
     | Tapp(p,tl) ->
         let tl = List.map (fnT vsvar) tl in
@@ -174,10 +187,10 @@ let rec rewrite_term tenv tvar vsvar t =
         Printer.unsupportedTerm t
           "Encoding decorate : I can't encode this term"
 
-and rewrite_fmla tenv tvar vsvar f =
+and rewrite_fmla tenv consts tvar vsvar f =
   (* Format.eprintf "@[<hov>Fmla : %a =>@]@." Pretty.print_fmla f; *)
-  let fnT = rewrite_term tenv tvar vsvar in
-  let fnF = rewrite_fmla tenv tvar in
+  let fnT = rewrite_term tenv consts tvar vsvar in
+  let fnF = rewrite_fmla tenv consts tvar in
   match f.f_node with
     | Fapp(p, [a1;a2]) when ls_equal p ps_equ ->
         let a1 = fnT a1 in let a2 = fnT a2 in
@@ -195,7 +208,7 @@ and rewrite_fmla tenv tvar vsvar f =
         let f1 = fnF vsvar f1 in 
         (* Ici un trigger qui ne match pas assez de variables 
            peut être généré *)
-        let tl = tr_map (rewrite_term tenv tvar vsvar) (fnF vsvar) tl in
+        let tl = tr_map (rewrite_term tenv consts tvar vsvar) (fnF vsvar) tl in
         let vl = List.rev vl in
         f_quant q (close vl tl f1)
     | Flet (t1, b) ->
@@ -245,10 +258,12 @@ let decl (tenv:tenv) d =
         (* [create_ind_decl (List.map fn l)] *)
     | Dprop (k,pr,f) ->
         let tvar = Htv.create 17 in
-        let f = fnF tvar Mvs.empty f in
+        let consts = Hls.create 3 in
+        let f = fnF consts tvar Mvs.empty f in
         let tvl = Htv.fold (fun _ tv acc -> tv::acc) tvar [] in
         let f = f_forall_close tvl [] f in
-        [create_decl (create_prop_decl k pr f)]
+        let add fs () acc = (create_decl (create_logic_decl [fs,None]))::acc in
+        Hls.fold add consts [create_decl (create_prop_decl k pr f)]
 
 (*
 let decl tenv d =
