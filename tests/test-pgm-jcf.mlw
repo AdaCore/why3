@@ -1,16 +1,15 @@
 
 {
-  use import int.Gcd
-  use import int.ComputerDivision
+  use import list.List
 }
 
-let rec gcd u v variant { v } =
-  { u >= 0 and v >= 0 }
-  if v = 0 then
-    u
-  else 
-    gcd v (mod u v)
-  { gcd u v result }
+parameter assign : r : ref 'a -> 'a -> unit
+
+parameter alloc : 'a -> ref 'a
+
+parameter head : list 'a -> 'a
+
+exception E of 'a
 
 (*
 Local Variables: 

@@ -1196,6 +1196,18 @@ let add_exception loc x ty gl =
     errorm ~loc "clash with previous exception %s" x;
   add_exception (id_user x loc) ty gl
 
+let rec polymorphic_pure_type ty = match ty.ty_node with
+  | Ty.Tyvar _ -> true
+  | Ty.Tyapp (_, tyl) -> List.exists polymorphic_pure_type tyl
+
+let cannot_be_generalized gl = function
+  | Tpure { ty_node = Ty.Tyapp (ts, [ty]) } when ts_equal ts gl.ts_ref ->
+      polymorphic_pure_type ty
+  | Tpure { ty_node = Ty.Tyvar _ } ->
+      true
+  | Tpure _ | Tarrow _ ->
+      false
+
 let decl env gl = function
   | Pgm_ptree.Dlogic dl -> 
       let dl = logic_list0_decl dl in
@@ -1227,10 +1239,12 @@ let decl env gl = function
       let gl, dl = map_fold_left one gl dl in
       gl, [Dletrec dl]
   | Pgm_ptree.Dparam (id, tyv) ->
+      let loc = id.id_loc in
       let denv = create_denv gl in
       let tyv = dtype_v denv tyv in
       let tyv = type_v gl Mstr.empty tyv in
-      let ls, gl = add_global id.id_loc id.id tyv gl in
+      if cannot_be_generalized gl tyv then errorm ~loc "cannot be generalized";
+      let ls, gl = add_global loc id.id tyv gl in
       let gl = add_global_if_pure gl ls in
       gl, [Dparam (ls, tyv)]
   | Pgm_ptree.Dexn (id, ty) ->
