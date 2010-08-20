@@ -75,7 +75,7 @@ let init_tenv kept =
     trans_lsymbol = Hls.create 17 }
 
 let is_kept tenv ts =
-  ts_equal ts Explicit_polymorphism.ts_ty ||
+  ts_equal ts Libencoding.ts_type ||
   ts.ts_args = [] && match tenv.kept with
   | Some s -> Sts.mem ts s
   | None   -> true

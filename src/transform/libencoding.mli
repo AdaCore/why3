@@ -57,9 +57,9 @@ val ls_of_const : constant -> lsymbol
 (* convert a constant to a term of type ty_base *)
 val term_of_const : constant -> term
 
-(* convert a set of preserved tysymbols to a set of types *)
-val tyset_of_tsset : Sts.t -> Sty.t
-
 (* monomorphise modulo the set of kept types * and an lsymbol map *)
 val d_monomorph : Sty.t -> (lsymbol -> lsymbol) -> decl -> decl list
+
+(* convert tysymbols tagged with meta_kept to a set of types *)
+val get_kept_types : Task.tdecl_set -> Sty.t
 

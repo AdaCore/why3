@@ -76,7 +76,9 @@ let ls_of_const =
     | Tconst _ ->
         begin try Hterm.find ht t with Not_found ->
           let s = Pp.string_of Pretty.print_term t in
-          create_fsymbol (id_fresh ("const_" ^ s)) [] ty_base
+          let ls = create_fsymbol (id_fresh ("const_" ^ s)) [] ty_base in
+          Hterm.add ht t ls;
+          ls
         end
     | _ -> assert false
   in
@@ -85,19 +87,20 @@ let ls_of_const =
 (* convert a constant to a term of type ty_base *)
 let term_of_const c = t_app (ls_of_const c) [] ty_base
 
-(* convert a set of preserved tysymbols to a set of types *)
-let tyset_of_tsset kept =
+(* convert tysymbols tagged with meta_kept to a set of types *)
+let get_kept_types tds =
+  let tss = Task.find_tagged_ts Encoding.meta_kept tds Sts.empty in
   let add ts acc = match ts.ts_def with
     | Some ty -> Sty.add ty acc
     | None -> Sty.add (ty_app ts []) acc
   in
-  Sts.fold add kept Sty.empty
+  Sts.fold add tss (Sty.singleton ty_type)
 
 (* monomorphise modulo the set of kept types * and an lsymbol map *)
 
 let vs_monomorph kept vs =
-  if ty_equal vs.vs_ty ty_type || Sty.mem vs.vs_ty kept
-  then vs else create_vsymbol (id_clone vs.vs_name) ty_base
+  if Sty.mem vs.vs_ty kept then vs else
+  create_vsymbol (id_clone vs.vs_name) ty_base
 
 let rec t_monomorph kept lsmap consts vmap t =
   let t_mono = t_monomorph kept lsmap consts in
@@ -107,6 +110,8 @@ let rec t_monomorph kept lsmap consts vmap t =
         assert false
     | Tvar v ->
         Mvs.find v vmap
+    | Tconst _ when Sty.mem t.t_ty kept ->
+        t
     | Tconst c ->
         let ls = ls_of_const c in
         consts := Sls.add ls !consts;
@@ -171,7 +176,7 @@ let d_monomorph kept lsmap d =
           | _, Talgebraic _ ->
               Printer.unsupportedDecl d "no algebraic types at this point"
           | { ts_def = Some _ }, _ -> acc
-          | ts, _ when Sty.exists (ty_s_any (ts_equal ts)) kept -> acc
+          | ts, _ when not (Sty.exists (ty_s_any (ts_equal ts)) kept) -> acc
           | _ -> create_ty_decl [td] :: acc
         in
         List.fold_right add tdl []

@@ -87,7 +87,7 @@ let load_prelude kept env =
       (if is_constant then None else Some (ty_of_ty tenv_tmp ty)) in
     let task = add_ts task tb in
     let tytb = ty_app tb [] in 
-    let tb2t = create_fsymbol (id_clone logic_t2tb.ls_name) [tytb] ty in
+    let tb2t = create_fsymbol (id_clone logic_tb2t.ls_name) [tytb] ty in
     let t2tb = create_fsymbol (id_clone logic_t2tb.ls_name) [ty] tytb in
     let task = add_logic_decl task [tb2t,None] in
     let task = add_logic_decl task [t2tb,None] in
