@@ -75,8 +75,8 @@ let ls_of_const =
   let ls_of_t t = match t.t_node with
     | Tconst _ ->
         begin try Hterm.find ht t with Not_found ->
-          let s = Pp.string_of Pretty.print_term t in
-          let ls = create_fsymbol (id_fresh ("const_" ^ s)) [] ty_base in
+          let s = "const_" ^ Pp.string_of Pretty.print_term t in
+          let ls = create_fsymbol (id_fresh s) [] ty_base in
           Hterm.add ht t ls;
           ls
         end
