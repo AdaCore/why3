@@ -21,7 +21,6 @@ open Env
 open Theory
 open Task
 open Trans
-open Encoding_enumeration
 
 let meta_kept = register_meta "encoding : kept" [MTtysymbol]
 
@@ -41,6 +40,9 @@ let select_opt,register_enco_select = enco_opt "select" "kept"
 let kept_opt,register_enco_kept = enco_opt "kept" "bridge"
 let poly_opt,register_enco_poly = enco_opt "poly" "decorate"
 
+let poly_smt_opt = poly_opt
+let poly_tptp_opt = { poly_opt with default = "explicit" }
+
 let enco_gen opt env =
   Trans.on_meta opt.meta (fun tds ->
     let s = match get_meta_excl opt.meta tds with
@@ -54,13 +56,24 @@ let enco_gen opt env =
 
 let enco_select = enco_gen select_opt
 let enco_kept = enco_gen kept_opt
-let enco_poly = enco_gen poly_opt
+let enco_poly_smt = enco_gen poly_smt_opt
+let enco_poly_tptp = enco_gen poly_tptp_opt
 
-let encoding_smt env =
-  compose (enco_select env)
-  (compose (enco_kept env) (enco_poly env))
+let maybe_encoding_enumeration =
+  Trans.on_meta poly_smt_opt.meta (fun tds ->
+    let s = match get_meta_excl poly_smt_opt.meta tds with
+      | None -> poly_smt_opt.default
+      | Some [MAstr s] -> s
+      | _ -> assert false in
+    if s = "explicit"
+    then Encoding_enumeration.encoding_enumeration
+    else identity)
 
-let encoding_tptp env = compose (encoding_smt env) encoding_enumeration
+let encoding_smt env = compose maybe_encoding_enumeration
+  (compose (enco_select env) (compose (enco_kept env) (enco_poly_smt env)))
+
+let encoding_tptp env = compose Encoding_enumeration.encoding_enumeration
+  (compose (enco_select env) (compose (enco_kept env) (enco_poly_tptp env)))
 
 let () =
   register_env_transform "encoding_smt" encoding_smt;
