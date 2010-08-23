@@ -1,4 +1,3 @@
-
 (* Why driver for SMT syntax *)
 
 prelude ";;; this is a prelude for Z3"
@@ -10,19 +9,19 @@ valid "^unsat"
 unknown "^\\(unknown\\|sat\\|Fail\\)" "Unknown"
 
 (* À discuter *)
-transformation "simplify_recursive_definition"      
+transformation "simplify_recursive_definition"
 transformation "inline_trivial"
 
 transformation "eliminate_builtin"
 transformation "eliminate_definition"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic"
+
 transformation "simplify_formula"
 transformation "simplify_trivial_quantification"
 
 transformation "encoding_smt"
 transformation "encoding_simple2"
-(* transformation "encoding_decorate_every_simple" *)
 
 theory BuiltIn
   syntax type int   "Int"
@@ -30,12 +29,12 @@ theory BuiltIn
   syntax logic (=)  "(= %1 %2)"
 end
 
-
 theory int.Int
 
-  prelude ";;; this is a prelude for Z3, Arithmetic"
-  
+  prelude ";;; this is a prelude for Z3 integer arithmetic"
+
   syntax logic zero "0"
+  syntax logic one  "1"
 
   syntax logic (+)  "(+ %1 %2)"
   syntax logic (-)  "(- %1 %2)"
@@ -67,9 +66,10 @@ end
 
 theory real.Real
 
-  prelude ";;; this is a prelude for Z3, Arithmetic"
+  prelude ";;; this is a prelude for Z3 real arithmetic"
 
-  syntax logic zero "0"
+  syntax logic zero "0.0"
+  syntax logic one  "1.0"
 
   syntax logic (+)  "(+ %1 %2)"
   syntax logic (-)  "(- %1 %2)"
@@ -110,7 +110,7 @@ theory bool.Bool
    syntax logic andb  "(and %1 %2)"
    syntax logic orb   "(or %1 %2)"
    syntax logic xorb  "(xor %1 %2)"
-   syntax logic notb  "(not %1)" 
+   syntax logic notb  "(not %1)"
    meta cloned "encoding_decorate : kept" type bool
 end
 *)
@@ -126,8 +126,8 @@ theory int.EuclideanDivision
 end
 
 (*
-Local Variables: 
+Local Variables:
 mode: why
 compile-command: "unset LANG; make -C .. bench"
-End: 
+End:
 *)

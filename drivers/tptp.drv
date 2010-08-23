@@ -1,19 +1,17 @@
-
 (* Why driver for tptp first-order logic solvers *)
 
 prelude "% this is a why prelude for tptp solvers
-fof(two_constants, axiom, ~ ('0' = '1')).
-"
+fof(two_constants, axiom, ~ ('0' = '1'))."
 
 printer "tptp"
 filename "%f-%t-%g.p"
 
-valid "Proof found"
+valid   "Proof found"
 invalid "Completion found"
-fail "Failure" "Failure"
-unknown "No Proof Found" "Unknown"
-timeout "Resource limit exceeded"
 timeout "Ran out of time"
+timeout "Resource limit exceeded"
+unknown "No Proof Found"            "Unknown"
+fail    "Failure"                   "Failure"
 
 (* to be improved *)
 
@@ -27,13 +25,9 @@ transformation "eliminate_algebraic"
 transformation "eliminate_if"
 transformation "eliminate_let"
 
-(* Add the projections for enumeration types*)
-transformation "encoding_enumeration"
-transformation "explicit_polymorphism"
+transformation "encoding_tptp"
 
 theory BuiltIn
-  syntax type int   "Int"
-  syntax type real  "Real"
   syntax logic (=)  "(%1 = %2)"
 end
 
@@ -42,6 +36,4 @@ Local Variables:
 mode: why
 compile-command: "unset LANG; make -C .. bench"
 End:
-*)
-(* vim:syntax=ocaml
 *)
