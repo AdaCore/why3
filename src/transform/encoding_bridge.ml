@@ -138,7 +138,9 @@ let conv_arg tenv t aty =
     try
       (* polymorph specials t2tb *)
       let tylconv = Hty.find tenv.specials tty in
-      t_app tylconv.t2tb [t] tylconv.tb
+      match t.t_node with
+      | Tapp (fs,[t']) when ls_equal fs tylconv.tb2t -> t'
+      | _ -> t_app tylconv.t2tb [t] tylconv.tb
     with Not_found ->
       (* polymorph not specials *)
       t
