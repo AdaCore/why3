@@ -39,6 +39,9 @@ val is_ls_of_ts : lsymbol -> bool
 (* convert a type to a term of type ty_type *)
 val term_of_ty : vsymbol Mtv.t -> ty -> term
 
+(* rewrite a closed formula modulo its free typevars *)
+val f_type_close : (vsymbol Mtv.t -> fmla -> fmla) -> fmla -> fmla
+
 (* convert a type declaration to a list of lsymbol declarations *)
 val lsdecl_of_tydecl : ty_decl list -> decl list
 

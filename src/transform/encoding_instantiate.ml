@@ -126,8 +126,6 @@ let print_env fmt menv =
 
 type tvar = ty Mtv.t
 
-let why_filename = Encoding_decorate.why_filename
-
 let rec projty menv tvar ty =
   let rec aux ty =
     match ty.ty_node with

@@ -114,28 +114,15 @@ module Transform = struct
     in
     [Decl.create_logic_decl (List.map helper decls)]
 
-  (** transforms a closed formula *)
-  let sentence_transform fmla =
-    let type_vars = f_ty_freevars Stv.empty fmla in
-    let varM = Stv.fold (* create a vsymbol for each type var *)
-      (fun x m -> Mtv.add x (create_vsymbol (id_fresh "t") ty_type) m)
-      type_vars Mtv.empty in
-    (* Debug.print_mtv Pretty.print_vs Format.err_formatter varM;
-    Format.eprintf "-----------@."; *)
-    (*universal quantification over ty vars*)
-    let new_fmla = fmla_transform varM fmla in
-    let vars = Mtv.fold (fun _ value acc -> value::acc) varM [] in
-    f_forall_close vars [] new_fmla
-
   (** transform an inductive declaration *)
   let ind_transform idl =
-    let iconv (pr,f) = pr, sentence_transform f in
+    let iconv (pr,f) = pr, Libencoding.f_type_close fmla_transform f in
     let conv (ls,il) = findL ls, List.map iconv il in
     [Decl.create_ind_decl (List.map conv idl)]
 
   (** transforms a proposition into another (mostly a substitution) *)
-  let prop_transform (prop_kind, prop_name, fmla) =
-    let quantified_fmla = sentence_transform fmla in
+  let prop_transform (prop_kind, prop_name, f) =
+    let quantified_fmla = Libencoding.f_type_close fmla_transform f in
     [Decl.create_prop_decl prop_kind prop_name quantified_fmla]
 
 end
