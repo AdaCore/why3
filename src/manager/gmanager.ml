@@ -55,7 +55,12 @@ let window_width = 1024
 let window_height = 768
 let font_name = "Monospace 10"
 
-let spec = []
+let split = ref false
+
+let spec = [
+  "-split", Arg.Set split, "split all goals";
+]
+
 let usage_str = "why-rustprover [options] <file>.why"
 let file = ref None
 let set_file f = match !file with
@@ -200,16 +205,31 @@ let () =
 (* Process input theories  *)
 (* add corresponding tasks *)
 (***************************)
-
+  (*
 let add_task (tname : string) (task : Why.Task.task) acc =
   let name = (Why.Task.task_goal task).Why.Decl.pr_name.Why.Ident.id_string in
   eprintf "doing task: tname=%s, name=%s@." tname name;
   Db.add_or_replace_task ~tname ~name task :: acc
+  *)
 
+(*
 let do_theory tname th glist =
+  eprintf "do_theory@.";
   let tasks = Why.Task.split_theory th None None in
+  let tasks =
+    if !split then
+      begin
+        eprintf "splitting@.";
+        let l = List.fold_left
+          (fun acc task ->
+             List.rev_append (Trans.apply tr task) acc) [] tasks in
+        List.rev l (* In order to keep the order for 1-1 transformation *)
+      end
+    else
+      tasks
+  in
   List.fold_right (add_task tname) tasks glist
-
+*)
 
 (****************)
 (* goals widget *)
@@ -275,6 +295,8 @@ module Ide_goals = struct
 
   let get_goal id = fst (Ident.Hid.find goal_table id)
 
+  let tr = Trans.lookup_transform_l "split_goal" env
+
   let add_goals (model : GTree.tree_store) th =
     let tname = th.Theory.th_name.Ident.id_string in
     let parent = model#append () in
@@ -282,6 +304,18 @@ module Ide_goals = struct
     model#set ~row:parent ~column:id_column th.Theory.th_name;
     (* model#set ~row:parent ~column:status_column `REMOVE; *)
     let tasks = Task.split_theory th None None in
+    let tasks =
+      if !split then
+        begin
+          eprintf "splitting@.";
+          let l = List.fold_left
+            (fun acc task ->
+               List.rev_append (Trans.apply tr task) acc) [] tasks in
+          List.rev l (* In order to keep the order for 1-1 transformation *)
+        end
+      else
+        tasks
+    in
     List.iter
       (fun t->
          let id = (Task.task_goal t).Decl.pr_name in
