@@ -34,10 +34,12 @@ let add_id q (ld,id) = function
 
 let elim q d = match d.d_node with
   | Dlogic l ->
-      create_logic_decls (List.map (add_ld q) l)
+      [create_logic_decl (List.map (add_ld q) l)]
   | Dind l ->
       let ld, id = List.fold_left (add_id q) ([],[]) l in
-      create_logic_decls (List.rev ld) @ create_ind_decls (List.rev id)
+      let ld = if ld = [] then [] else [create_logic_decl (List.rev ld)] in
+      let id = if id = [] then [] else [create_ind_decl   (List.rev id)] in
+      ld @ id
   | _ -> [d]
 
 let eliminate_builtin = Trans.on_meta Printer.meta_remove_logic (fun tds ->

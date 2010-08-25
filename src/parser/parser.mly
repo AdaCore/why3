@@ -81,9 +81,6 @@
 
 /* Precedences */
 
-%nonassoc prec_decls
-%nonassoc LOGIC TYPE INDUCTIVE
-
 %nonassoc DOT ELSE IN
 %nonassoc prec_named
 %nonassoc COLON
@@ -132,12 +129,12 @@ list0_decl:
 ;
 
 decl:
-| list1_type_decl
-    { TypeDecl $1 }
-| list1_logic_decl
-    { LogicDecl $1 }
-| list1_inductive_decl
-    { IndDecl $1 }
+| TYPE list1_type_decl
+    { TypeDecl $2 }
+| LOGIC list1_logic_decl
+    { LogicDecl $2 }
+| INDUCTIVE list1_inductive_decl
+    { IndDecl $2 }
 | AXIOM uident COLON lexpr
     { PropDecl (loc (), Kaxiom, $2, $4) }
 | LEMMA uident COLON lexpr
@@ -214,13 +211,13 @@ meta_arg:
 /* Type declarations */
 
 list1_type_decl:
-| type_decl                  %prec prec_decls { [$1] }
-| type_decl list1_type_decl                   { $1 :: $2 }
+| type_decl                       { [$1] }
+| type_decl WITH list1_type_decl  { $1 :: $3 }
 ;
 
 type_decl:
-| TYPE lident type_args typedefn
-  { { td_loc = loc (); td_ident = $2; td_params = $3; td_def = $4 } }
+| lident type_args typedefn
+  { { td_loc = loc (); td_ident = $1; td_params = $2; td_def = $3 } }
 ;
 
 type_args:
@@ -247,14 +244,14 @@ typecase:
 /* Logic declarations */
 
 list1_logic_decl:
-| logic_decl                  %prec prec_decls { [$1] }
-| logic_decl list1_logic_decl                  { $1 :: $2 }
+| logic_decl                        { [$1] }
+| logic_decl WITH list1_logic_decl  { $1 :: $3 }
 ;
 
 logic_decl:
-| LOGIC lident_rich params logic_type_option logic_def_option
-  { { ld_loc = loc (); ld_ident = $2; ld_params = $3;
-      ld_type = $4; ld_def = $5; } }
+| lident_rich params logic_type_option logic_def_option
+  { { ld_loc = loc (); ld_ident = $1; ld_params = $2;
+      ld_type = $3; ld_def = $4; } }
 ;
 
 logic_type_option:
@@ -270,13 +267,13 @@ logic_def_option:
 /* Inductive declarations */
 
 list1_inductive_decl:
-| inductive_decl                      %prec prec_decls { [$1] }
-| inductive_decl list1_inductive_decl                  { $1 :: $2 }
+| inductive_decl                            { [$1] }
+| inductive_decl WITH list1_inductive_decl  { $1 :: $3 }
 ;
 
 inductive_decl:
-| INDUCTIVE lident_rich params inddefn
-  { { in_loc = loc (); in_ident = $2; in_params = $3; in_def = $4 } }
+| lident_rich params inddefn
+  { { in_loc = loc (); in_ident = $1; in_params = $2; in_def = $3 } }
 ;
 
 inddefn:

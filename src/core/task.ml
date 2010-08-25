@@ -163,10 +163,6 @@ let add_logic_decl tk dl = add_decl tk (create_logic_decl dl)
 let add_ind_decl tk dl = add_decl tk (create_ind_decl dl)
 let add_prop_decl tk k p f = add_decl tk (create_prop_decl k p f)
 
-let add_ty_decls tk dl = List.fold_left add_decl tk (create_ty_decls dl)
-let add_logic_decls tk dl = List.fold_left add_decl tk (create_logic_decls dl)
-let add_ind_decls tk dl = List.fold_left add_decl tk (create_ind_decls dl)
-
 (* task constructors *)
 
 let rec add_tdecl task td = match td.td_node with

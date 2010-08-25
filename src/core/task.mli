@@ -79,10 +79,6 @@ val add_logic_decl : task -> logic_decl list -> task
 val add_ind_decl : task -> ind_decl list -> task
 val add_prop_decl : task -> prop_kind -> prsymbol -> fmla -> task
 
-val add_ty_decls : task -> ty_decl list -> task
-val add_logic_decls : task -> logic_decl list -> task
-val add_ind_decls : task -> ind_decl list -> task
-
 (** {2 utilities} *)
 
 val split_theory : theory -> Spr.t option -> task -> task list

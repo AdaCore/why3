@@ -360,10 +360,6 @@ let add_logic_decl uc dl = add_decl uc (create_logic_decl dl)
 let add_ind_decl uc dl = add_decl uc (create_ind_decl dl)
 let add_prop_decl uc k p f = add_decl uc (create_prop_decl k p f)
 
-let add_ty_decls uc dl = List.fold_left add_decl uc (create_ty_decls dl)
-let add_logic_decls uc dl = List.fold_left add_decl uc (create_logic_decls dl)
-let add_ind_decls uc dl = List.fold_left add_decl uc (create_ind_decls dl)
-
 (** Use *)
 
 let create_use th = mk_tdecl (Use th)

@@ -202,13 +202,13 @@ let with_tuples ?(reset=false) f uc x =
   uc
 
 let add_ty_decl  = with_tuples add_ty_decl
-let add_ty_decls = with_tuples ~reset:true add_ty_decls
+let add_ty_decls = with_tuples ~reset:true add_ty_decl
 
 let add_logic_decl  = with_tuples add_logic_decl
-let add_logic_decls = with_tuples ~reset:true add_logic_decls
+let add_logic_decls = with_tuples ~reset:true add_logic_decl
 
 let add_ind_decl  = with_tuples add_ind_decl
-let add_ind_decls = with_tuples ~reset:true add_ind_decls
+let add_ind_decls = with_tuples ~reset:true add_ind_decl
 
 let add_prop_decl = with_tuples ~reset:true add_prop_decl
 

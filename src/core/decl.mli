@@ -105,12 +105,6 @@ val create_logic_decl : logic_decl list -> decl
 val create_ind_decl : ind_decl list -> decl
 val create_prop_decl : prop_kind -> prsymbol -> fmla -> decl
 
-(* separate independent groups of declarations *)
-
-val create_ty_decls : ty_decl list -> decl list
-val create_logic_decls : logic_decl list -> decl list
-val create_ind_decls : ind_decl list -> decl list
-
 (* exceptions *)
 
 exception IllegalTypeAlias of tysymbol

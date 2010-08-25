@@ -127,10 +127,6 @@ val add_logic_decl : theory_uc -> logic_decl list -> theory_uc
 val add_ind_decl : theory_uc -> ind_decl list -> theory_uc
 val add_prop_decl : theory_uc -> prop_kind -> prsymbol -> fmla -> theory_uc
 
-val add_ty_decls : theory_uc -> ty_decl list -> theory_uc
-val add_logic_decls : theory_uc -> logic_decl list -> theory_uc
-val add_ind_decls : theory_uc -> ind_decl list -> theory_uc
-
 (** Use *)
 
 val create_use : theory -> tdecl
