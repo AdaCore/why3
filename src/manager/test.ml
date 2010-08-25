@@ -220,6 +220,7 @@ let goal_menu g =
            ~debug:false ~timelimit ~memlimit:0 
            ~prover:p.prover ~command:p.command ~driver:p.driver 
            ~callback
+           ~async:(fun f -> f ())
            g;
          raise Exit           
        with Not_found -> 
@@ -289,7 +290,7 @@ let () =
 
 (*
 Local Variables: 
-compile-command: "make -C ../.. bin/manager.byte"
+compile-command: "make -C ../.. bin/why-ide.byte"
 End: 
 *)
 

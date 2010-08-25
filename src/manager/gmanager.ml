@@ -220,10 +220,17 @@ module Ide_goals = struct
   let cols = new GTree.column_list
   let name_column = cols#add Gobject.Data.string
   let id_column = cols#add Gobject.Data.caml
+(*
   let status_column = cols#add GtkStock.conv
+*)
+  let status_column = cols#add Gobject.Data.gobject
+  let time_column = cols#add Gobject.Data.string
 
   let renderer = GTree.cell_renderer_text [`XALIGN 0.] 
+(*
   let icon_renderer = GTree.cell_renderer_pixbuf [ `STOCK_SIZE `BUTTON ]
+*)
+  let image_renderer = GTree.cell_renderer_pixbuf [ ] 
 
   let view_name_column = 
     GTree.view_column ~title:"Theories/Goals" 
@@ -235,11 +242,21 @@ module Ide_goals = struct
 
   let view_status_column = 
     GTree.view_column ~title:"Status" 
-      ~renderer:(icon_renderer, ["stock_id", status_column]) ()
+      (*
+        ~renderer:(icon_renderer, ["stock_id", status_column]) 
+      *)
+      ~renderer:(image_renderer, ["pixbuf", status_column]) 
+      ()
+
+  let view_time_column = 
+    GTree.view_column ~title:"Time" 
+      ~renderer:(renderer, ["text", time_column]) ()
 
   let () = 
     view_status_column#set_resizable false;
-    view_status_column#set_visible true
+    view_status_column#set_visible true;
+    view_time_column#set_resizable false;
+    view_time_column#set_visible true
 
 
   let create ~packing () =
@@ -249,6 +266,7 @@ module Ide_goals = struct
     let _ = view#set_rules_hint true in
     ignore (view#append_column view_name_column);
     ignore (view#append_column view_status_column);
+    ignore (view#append_column view_time_column);
     model,view
 
   let clear model = model#clear ()
@@ -321,7 +339,69 @@ let stock_of_result = function
   | Db.Unknown -> `DIALOG_QUESTION
   | Db.HighFailure -> `PREFERENCES
 
+(*
+
+  boomy icons
+
+*)
+
+let image ?size f =
+  let n = Filename.concat "" (* todo *) (Filename.concat "images" (f^".png"))
+  in
+  match size with
+    | None ->
+        GdkPixbuf.from_file n
+    | Some s ->
+        GdkPixbuf.from_file_at_size ~width:s ~height:s n
+
+let iconname_default = "pause32"
+let iconname_running = "play32"
+let iconname_valid = "accept32"
+let iconname_unknown = "help32"
+let iconname_invalid = "delete32"
+let iconname_timeout = "clock32"
+let iconname_failure = "bug32"
+let iconname_yes = "accept32"
+let iconname_no = "delete32"
+let iconname_down = "play32"
+
+let image_default = ref (image ~size:32 iconname_default)
+let image_running = ref !image_default
+let image_valid = ref !image_default
+let image_unknown = ref !image_default
+let image_invalid = ref !image_default
+let image_timeout = ref !image_default
+let image_failure = ref !image_default
+let image_yes = ref !image_default
+let image_no = ref !image_default
+let image_down = ref !image_default
+
+let resize_images size =
+  image_default := image ~size iconname_default;
+  image_running := image ~size iconname_running;
+  image_valid := image ~size iconname_valid;
+  image_unknown := image ~size iconname_unknown;
+  image_invalid := image ~size iconname_invalid;
+  image_timeout := image ~size iconname_timeout;
+  image_failure := image ~size iconname_failure;
+  image_yes := image ~size iconname_yes;
+  image_no := image ~size iconname_no;
+  image_down := image ~size iconname_down
+
+let () = resize_images 16
+
+let image_of_result = function
+  | Db.Scheduled -> !image_down
+  | Db.Running -> !image_running
+  | Db.Success -> !image_valid
+  | Db.Timeout -> !image_timeout
+  | Db.Unknown -> !image_unknown
+  | Db.HighFailure -> !image_failure
+
+
+(*
 let count = ref 0
+*)
 
 let async f = GtkThread.async f ()
 
@@ -331,18 +411,29 @@ let prover_on_all_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
        let name = Db.prover_name p.prover in
        Format.eprintf "running %s on goal %s@." name id.Ident.id_string;
        let prover_row = model#append ~parent:row () in
-       model#set ~row:prover_row ~column:Ide_goals.name_column name;
+       model#set ~row:prover_row ~column:Ide_goals.name_column ("prover: " ^name);
        view#expand_row (model#get_path row);
+(*
        incr count;
        let c = !count in
+*)
        let callback result =
-         printf "Scheduled task #%d: status set to %a@." c
+         (*
+           printf "Scheduled task #%d: status set to %a@." c
            Db.print_status result;         
-         model#set ~row:prover_row ~column:Ide_goals.status_column (stock_of_result result);         
+         *)
+         (*
+           model#set ~row:prover_row ~column:Ide_goals.status_column 
+           (stock_of_result result);         
+         *)
+         model#set ~row:prover_row ~column:Ide_goals.status_column 
+           (image_of_result result);
+
+         model#set ~row:prover_row ~column:Ide_goals.time_column "n.a."; 
        in
        Scheduler.schedule_proof_attempt
          ~async
-         ~debug:true ~timelimit ~memlimit:0 
+         ~debug:false ~timelimit ~memlimit:0 
          ~prover:p.prover ~command:p.command ~driver:p.driver 
          ~callback
          g

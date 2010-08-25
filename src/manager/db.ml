@@ -67,11 +67,15 @@ let try_finally fn finalfn =
 let rec db_busy_retry db fn =
   match fn () with
     | Rc.BUSY -> 
+(*
         prerr_endline "Db.db_busy_retry: BUSY";
+*)
         db.busyfn db.raw_db; db_busy_retry db fn
     | x -> 
+(*
         prerr_string "Db.db_busy_retry: ";
         prerr_endline (Rc.to_string x);
+*)
         x
        
 (* make sure an OK is returned from the database *)
@@ -1192,7 +1196,7 @@ let add_or_replace_task ~tname ~name (t : Task.task) : goal =
     goal_id = 0L;
     goal_origin = Goal (tname,name);
     task = t;
-    task_checksum = Digest.string (Marshal.to_string t []);
+    task_checksum = "" (* Digest.string (Marshal.to_string t []) *);
     proved = false;
     observers = [];
   }
