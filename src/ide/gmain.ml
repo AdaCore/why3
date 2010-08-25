@@ -216,6 +216,7 @@ module Ide_goals = struct
   let cols = new GTree.column_list
   let name_column = cols#add Gobject.Data.string
   let id_column = cols#add Gobject.Data.caml
+  let proved_column = cols#add Gobject.Data.boolean
   let status_column = cols#add Gobject.Data.gobject
   let time_column = cols#add Gobject.Data.string
 
@@ -269,7 +270,6 @@ module Ide_goals = struct
     let parent = model#append () in
     model#set ~row:parent ~column:name_column tname;
     model#set ~row:parent ~column:id_column th.Theory.th_name;
-    (* model#set ~row:parent ~column:status_column `REMOVE; *)
     let tasks = Task.split_theory th None None in
     let tasks =
       if !split then
@@ -292,7 +292,6 @@ module Ide_goals = struct
          Ident.Hid.add goal_table id (g,row);
 	 model#set ~row ~column:name_column name;
 	 model#set ~row ~column:id_column id;
-(*         model#set ~row ~column:status_column `REMOVE; *)
       )
       tasks
 
@@ -403,9 +402,11 @@ let () =
   end 
 
 
-let prover_on_all_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
+let prover_on_unproved_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
   Ident.Hid.iter
     (fun _id (g,row) ->
+       let proved = model#get ~row ~column:Ide_goals.proved_column in
+       if not proved then         
        let name = (* Db.prover_name *) p.prover in
 (*
        Format.eprintf "[GUI thread] scheduling %s on goal %s@." name id.Ident.id_string;
@@ -424,7 +425,9 @@ let prover_on_all_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
          model#set ~row:prover_row ~column:Ide_goals.time_column t;
          if result = Scheduler.Success then
            begin
+             model#set ~row:prover_row ~column:Ide_goals.proved_column true;
              model#set ~row ~column:Ide_goals.status_column !image_yes;
+             model#set ~row ~column:Ide_goals.proved_column true;
              view#collapse_row (model#get_path row);
            end
        in
@@ -472,15 +475,28 @@ let main () =
   let goals_model,goals_view = Ide_goals.create ~packing:scrollview#add () in
   Theory.Mnm.iter (fun _ th -> Ide_goals.add_goals goals_model th) theories;
   let _ = 
-    tools_factory#add_image_item ~key:GdkKeysyms._A 
-      ~label:"Alt-Ergo on all goals" 
+    tools_factory#add_image_item ~key:GdkKeysyms._S
+      ~label:"Simplify on unproved goals" 
       ~callback:(fun () -> 
-                   prover_on_all_goals ~model:goals_model ~view:goals_view 
-                     alt_ergo ();
-                   prover_on_all_goals ~model:goals_model ~view:goals_view 
-                     simplify ();
-                   prover_on_all_goals ~model:goals_model ~view:goals_view 
-                     z3 ()) () 
+                   prover_on_unproved_goals ~model:goals_model ~view:goals_view 
+                     simplify ()) 
+      () 
+  in
+  let _ = 
+    tools_factory#add_image_item ~key:GdkKeysyms._A 
+      ~label:"Alt-Ergo on unproved goals" 
+      ~callback:(fun () -> 
+                   prover_on_unproved_goals ~model:goals_model ~view:goals_view 
+                     alt_ergo ()) 
+      () 
+  in
+  let _ = 
+    tools_factory#add_image_item ~key:GdkKeysyms._Z 
+      ~label:"Z3 on unproved goals" 
+      ~callback:(fun () -> 
+                   prover_on_unproved_goals ~model:goals_model ~view:goals_view 
+                     z3 ()) 
+      () 
   in
   let _ = 
     tools_factory#add_image_item ~key:GdkKeysyms._E 
