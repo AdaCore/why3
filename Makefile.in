@@ -292,21 +292,21 @@ $(IDECMO) $(IDECMX) $(addsuffix .cmx, $(IDEMAIN)) $(addsuffix .cmo, $(IDEMAIN)):
 src/ide/gmain.cmo src/ide/gmain.cmx: INCLUDES += -I +lablgtk2
 
 ifeq (@enable_ide@,yes)
-byte: bin/gwhy.byte
-opt:  bin/gwhy.opt
+byte: bin/whyide.byte
+opt:  bin/whyide.opt
 endif
 
-bin/gwhy.opt bin/gwhy.byte: INCLUDES = -thread -I +lablgtk2
+bin/whyide.opt bin/whyide.byte: INCLUDES = -thread -I +lablgtk2
 # -I +sqlite3 
 
-bin/gwhy.opt: src/why.cmxa $(PGMCMX) $(IDECMX) src/ide/gmain.cmx
+bin/whyide.opt: src/why.cmxa $(PGMCMX) $(IDECMX) src/ide/gmain.cmx
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) threads.cmxa \
 	lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx $^
 	$(STRIP) $@
 # sqlite3.cmxa 
 
-bin/gwhy.byte: src/why.cma $(PGMCMO) $(IDECMO) src/ide/gmain.cmo
+bin/whyide.byte: src/why.cma $(PGMCMO) $(IDECMO) src/ide/gmain.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma \
 	lablgtk.cma lablgtksourceview2.cma gtkThread.cmo $^
@@ -324,74 +324,8 @@ depend: .depend.ide
 clean::
 	rm -f src/ide/*.cm[iox] src/ide/*.o
 	rm -f src/ide/*.annot src/ide/*~
-	rm -f bin/gwhy.byte bin/gwhy.opt
+	rm -f bin/whyide.byte bin/whyide.opt
 	rm -f .depend.ide
-
-###############
-# rust prover
-###############
-
-MNG_FILES = db scheduler
-MNG_MAIN_FILES = test gmanager
-
-MNGMODULES = $(addprefix src/manager/, $(MNG_FILES))
-MNGMAINS = $(addprefix src/manager/, $(MNG_MAIN_FILES))
-
-MNGML  = $(addsuffix .ml,  $(MNGMODULES))
-MNGMLI = $(addsuffix .mli, $(MNGMODULES))
-MNGCMO = $(addsuffix .cmo, $(MNGMODULES))
-MNGCMX = $(addsuffix .cmx, $(MNGMODULES))
-
-MNGMAINML  = $(addsuffix .ml,  $(MNGMAINS))
-
-$(MNGCMO) $(MNGCMX) $(addsuffix .cmx, $(MNGMAINS)) $(addsuffix .cmo, $(MNGMAINS)): INCLUDES = -thread -I src/manager -I +sqlite3 -I +threads
-
-src/manager/gmanager.cmo src/manager/gmanager.cmx: INCLUDES += -I +lablgtk2
-
-ifeq (@enable_rust_prover@,yes)
-byte: bin/manager-test.byte bin/why-ide.byte
-opt:  bin/manager-test.opt bin/why-ide.opt
-endif
-
-bin/manager-test.opt bin/manager-test.byte: INCLUDES = -thread -I +sqlite3
-
-bin/manager-test.opt: src/why.cmxa $(MNGCMX) src/manager/test.cmx
-	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) threads.cmxa sqlite3.cmxa $^
-	$(STRIP) $@
-
-bin/manager-test.byte: src/why.cma $(MNGCMO) src/manager/test.cmo
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma sqlite3.cma $^
-
-bin/why-ide.opt bin/why-ide.byte: INCLUDES = -thread -I +sqlite3 -I +lablgtk2
-
-bin/why-ide.opt: src/why.cmxa $(PGMCMX) $(MNGCMX) src/manager/gmanager.cmx
-	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) threads.cmxa \
-	lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx sqlite3.cmxa $^
-	$(STRIP) $@
-
-bin/why-ide.byte: src/why.cma $(PGMCMO) $(MNGCMO) src/manager/gmanager.cmo
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma \
-	lablgtk.cma lablgtksourceview2.cma gtkThread.cmo sqlite3.cma $^
-
-# depend and clean targets
-
-include .depend.manager
-
-.depend.manager:
-	$(OCAMLDEP) -slash -I src -I src/manager $(MNGML) $(MNGMLI) $(MNGMAINML) > $@
-
-depend: .depend.manager
-
-clean::
-	rm -f src/manager/*.cm[iox] src/manager/*.o
-	rm -f src/manager/*.annot src/manager/*~
-	rm -f bin/manager.byte bin/manager.opt
-	rm -f .depend.manager
-
 
 ##############
 # Coq plugin
@@ -588,15 +522,15 @@ install::
 
 ## install: install-binary install-lib install-man
 ##
-## BINARYFILES = $(BINARY) bin/why-ide.$(OCAMLBEST)
+## BINARYFILES = $(BINARY) bin/whyide.$(OCAMLBEST)
 ##
 ## # install-binary should not depend on $(BINARYFILES); otherwise it
-## # enforces the compilation of why-ide, even when lablgtk2 is not installed
+## # enforces the compilation of whyide, even when lablgtk2 is not installed
 ## install-binary:
 ## 	mkdir -p $(BINDIR)
 ## 	cp -f $(BINARY) $(BINDIR)/why$(EXE)
-## 	if test -f bin/why-ide.$(OCAMLBEST); then \
-## 		cp -f bin/why-ide.$(OCAMLBEST) $(BINDIR)/why-ide-bin$(EXE); \
+## 	if test -f bin/whyide.$(OCAMLBEST); then \
+## 		cp -f bin/whyide.$(OCAMLBEST) $(BINDIR)/whyide-bin$(EXE); \
 ## 	fi
 ##
 ## install-lib:
@@ -638,12 +572,12 @@ install::
 ## 	cp lib/mizar/why.miz @MIZARLIB@/mml
 ## 	cp lib/mizar/dict/why.voc @MIZARLIB@/mml/dict
 ##
-## local-install: $(BINARY) $(WHYCONFIG) $(JESSIE) bin/why-ide.$(OCAMLBEST) byte bin/why-ide.byte
+## local-install: $(BINARY) $(WHYCONFIG) $(JESSIE) bin/whyide.$(OCAMLBEST) byte bin/whyide.byte
 ## 	cp $(BINARY) $$HOME/bin/why
 ## 	cp $(WHYCONFIG) $$HOME/bin/why
 ## 	cp $(JESSIE) $$HOME/bin/jessie
-## 	if test -f bin/why-ide.$(OCAMLBEST); then \
-## 	  cp -f bin/why-ide.$(OCAMLBEST) $$HOME/bin/why-ide; \
+## 	if test -f bin/whyide.$(OCAMLBEST); then \
+## 	  cp -f bin/whyide.$(OCAMLBEST) $$HOME/bin/whyide; \
 ## 	fi
 ##
 ## local: install
@@ -770,7 +704,7 @@ dep: depend
 # FTP = $(WWW)/download
 # WWWKRAKATOA = /users/www-perso/projets/krakatoa
 #
-# FILES =src/*.ml* c/*.ml* jc/*.ml* java/*.ml* ml/*.ml* ml/*/*.ml* intf/*.ml* tools/*.ml* tools/*.c bin/why-ide.sh \
+# FILES =src/*.ml* c/*.ml* jc/*.ml* java/*.ml* ml/*.ml* ml/*/*.ml* intf/*.ml* tools/*.ml* tools/*.c bin/whyide.sh \
 #       mix/*.ml* \
 #       version.sh Version Makefile.in configure.in configure .depend .depend.coq \
 #       config/check_ocamlgraph.ml \

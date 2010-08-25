@@ -32,6 +32,7 @@ type config = {
   loadpath  : string list;  (* "/usr/local/share/why/theories" *)
   timelimit : int option;   (* default prover time limit in seconds *)
   memlimit  : int option;   (* default prover memory limit in megabytes *)
+  running_provers_max : int option; (* max number of running prover processes *)
   provers   : config_prover Mstr.t;   (* indexed by short identifiers *)
 }
 

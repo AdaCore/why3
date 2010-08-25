@@ -100,7 +100,8 @@ type config = {
   loadpath  : string list;  (* "/usr/local/share/why/theories" *)
   timelimit : int option;   (* default prover time limit in seconds *)
   memlimit  : int option;   (* default prover memory limit in megabytes *)
-  provers   : config_prover Mstr.t;   (* indexed by short identifiers *)
+  running_provers_max : int option; (* max number of running prover processes *)
+  provers   : config_prover Mstr.t; (* indexed by short identifiers *)
 }
 
 let to_string key = function
@@ -157,11 +158,13 @@ let load_main dirname main al =
   let lp = ref [] in
   let tl = ref None in
   let ml = ref None in
+  let rp = ref None in
   let load (key, value) = match key with
     | "library"   -> 
 	lp := absolute_filename dirname (to_string key value) :: !lp
     | "timelimit" -> set_int key tl value
     | "memlimit"  -> set_int key ml value
+    | "running_provers_max" -> set_int key rp value
     | _           -> error (UnknownField key)
   in
   List.iter load al;
@@ -169,6 +172,7 @@ let load_main dirname main al =
     loadpath  = List.rev !lp;
     timelimit = !tl;
     memlimit  = !ml;
+    running_provers_max = !rp;
     provers   = Mstr.empty }
 
 let read_config conf_file =
@@ -191,6 +195,7 @@ let read_config conf_file =
     loadpath  = [];
     timelimit = None;
     memlimit  = None;
+    running_provers_max = None;
     provers   = Mstr.empty }
   in
   let provers = ref Mstr.empty in
@@ -218,6 +223,7 @@ let save_config config =
   List.iter (fprintf fmt "library = \"%s\"@\n") config.loadpath;
   Util.option_iter (fprintf fmt "timelimit = %d@\n") config.timelimit;
   Util.option_iter (fprintf fmt "memlimit = %d@\n") config.memlimit;
+  Util.option_iter (fprintf fmt "running_provers_max = %d@\n") config.running_provers_max;
   fprintf fmt "@.";
   let print_prover name prover =
     fprintf fmt "[prover %s]@\n" name;

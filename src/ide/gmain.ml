@@ -53,7 +53,9 @@ let timelimit =
 (* TODO: put that in config file *)
 let window_width = 1024
 let window_height = 768
+(*
 let font_name = "Monospace 10"
+*)
 
 let split = ref false
 
@@ -230,9 +232,6 @@ module Ide_goals = struct
 
   let view_status_column = 
     GTree.view_column ~title:"Status" 
-      (*
-        ~renderer:(icon_renderer, ["stock_id", status_column]) 
-      *)
       ~renderer:(image_renderer, ["pixbuf", status_column]) 
       ()
 
@@ -360,9 +359,6 @@ let iconname_timeout = "clock32"
 let iconname_failure = "bug32"
 let iconname_yes = "accept32"
 let iconname_no = "delete32"
-(*
-let iconname_down = "play32"
-*)
 
 let image_default = ref (image ~size:32 iconname_default)
 let image_scheduled = ref !image_default
@@ -374,9 +370,6 @@ let image_timeout = ref !image_default
 let image_failure = ref !image_default
 let image_yes = ref !image_default
 let image_no = ref !image_default
-(*
-let image_down = ref !image_default
-*)
 
 let resize_images size =
   image_default := image ~size iconname_default;
@@ -389,9 +382,6 @@ let resize_images size =
   image_failure := image ~size iconname_failure;
   image_yes := image ~size iconname_yes;
   image_no := image ~size iconname_no
-(*
-  image_down := image ~size iconname_down
-*)
 
 let () = resize_images 16
 
@@ -403,11 +393,15 @@ let image_of_result = function
   | Scheduler.Unknown -> !image_unknown
   | Scheduler.HighFailure -> !image_failure
 
-(*
-let count = ref 0
-*)
+let () = 
+  begin
+    Scheduler.async := GtkThread.async;
+    match config.running_provers_max with
+      | None -> ()
+      | Some n -> 
+          if n >= 1 then Scheduler.maximum_running_proofs := n
+  end 
 
-let () = Scheduler.async := GtkThread.async
 
 let prover_on_all_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
   Ident.Hid.iter
@@ -419,10 +413,6 @@ let prover_on_all_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
        let prover_row = model#append ~parent:row () in
        model#set ~row:prover_row ~column:Ide_goals.name_column ("prover: " ^name);
        view#expand_row (model#get_path row);
-(*
-       incr count;
-       let c = !count in
-*)
        let callback result time =
          (*
            printf "Scheduled task #%d: status set to %a@." c
@@ -556,6 +546,6 @@ let () =
 
 (*
 Local Variables: 
-compile-command: "unset LANG; make -C ../.. bin/gwhy.opt"
+compile-command: "unset LANG; make -C ../.. bin/whyide.opt"
 End: 
 *)

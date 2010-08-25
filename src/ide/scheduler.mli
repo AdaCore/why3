@@ -21,7 +21,12 @@
 open Why
 
 val async: ((unit->unit)->unit->unit) ref
-(** async f () should call [f ()] *)
+(** async f () should call [f ()] asynchronously, in a suitable way
+    for the current user interface (e.g. GtkThread.async) *)
+
+val maximum_running_proofs: int ref
+(** bound on the number of prover processes running in parallel. 
+    default is 2 *)
 
 type proof_attempt_status =
   | Scheduled (** external proof attempt is scheduled *)

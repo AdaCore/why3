@@ -266,6 +266,7 @@ let () =
       loadpath  = [];
       timelimit = None;
       memlimit  = None;
+      running_provers_max = None;
       provers   = Mstr.empty }
   in
 
