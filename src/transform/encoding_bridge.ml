@@ -165,20 +165,31 @@ let rec rewrite_term tenv vsvar t =
   let fnT = rewrite_term tenv in
   let fnF = rewrite_fmla tenv in
   let t = match t.t_node with
+    | Tbvar _ -> assert false
     | Tvar vs -> Mvs.find vs vsvar
+    | Tconst _ -> t
     | Tapp(p,tl) ->
         let tl = List.map (fnT vsvar) tl in
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv) tl p.ls_args in
         conv_res_app tenv p tl t.t_ty
-    | Tlet (t1, b) -> 
+    | Tlet (t1, b) ->
         let u,t2,close = t_open_bound_cb b in
         let t1 = fnT vsvar t1 in
         let u' = conv_vs tenv u in
         let vsvar = Mvs.add u (t_var u') vsvar in
         let t2 = fnT vsvar t2 in
-        t_let t1 (close u t2)
-    | _ -> t_map (fnT vsvar) (fnF vsvar) t in
+        t_let t1 (close u' t2)
+    | Teps b ->
+        let u,f,close = f_open_bound_cb b in
+        let u' = conv_vs tenv u in
+        let vsvar = Mvs.add u (t_var u') vsvar in
+        let f = fnF vsvar f in
+        t_eps (close u' f)
+    | Tif (f,t1,t2) ->
+        t_if (fnF vsvar f) (fnT vsvar t1) (fnT vsvar t2)
+    | Tcase _ ->
+        Printer.unsupportedTerm t "no match expressions at this point" in
   (* Format.eprintf "@[<hov 2>Term : => %a : %a@\n@?" Pretty.print_term t *)
   (*   Pretty.print_ty t.t_ty; *)
     t
@@ -187,7 +198,7 @@ and rewrite_fmla tenv vsvar f =
   (* Format.eprintf "@[<hov 2>Fmla : %a =>@\n@?" Pretty.print_fmla f; *)
   let fnT = rewrite_term tenv in
   let fnF = rewrite_fmla tenv in
-  match f.f_node with
+  let f = match f.f_node with
     | Fapp(p, [t1;t2]) when ls_equal p ps_equ ->
         f_equ (fnT vsvar t1) (fnT vsvar t2)
     | Fapp(p, tl) -> 
@@ -212,9 +223,18 @@ and rewrite_fmla tenv vsvar f =
         let t1 = fnT vsvar t1 in
         let u' = conv_vs tenv u in
         let vsvar = Mvs.add u (t_var u') vsvar in
-        let f2 = fnF vsvar f2 in 
-        f_let t1 (close u f2)
-    | _ -> f_map (fnT vsvar) (fnF vsvar) f
+        let f2 = fnF vsvar f2 in
+        f_let t1 (close u' f2)
+    | Fbinop (op,f1,f2) -> f_binary op (fnF vsvar f1) (fnF vsvar f2)
+    | Fnot f1 -> f_not (fnF vsvar f1)
+    | Ftrue | Ffalse -> f
+    | Fif (f1,f2,f3) ->
+        f_if (fnF vsvar f1) (fnF vsvar f2) (fnF vsvar f3)
+    | Fcase _ ->
+        Printer.unsupportedFmla f "no match expressions at this point" in
+  (* Format.eprintf "@[<hov 2>Fmla : => %a@\n@?" Pretty.print_fmla f; *)
+  f
+
 
 let decl (tenv:tenv) d =
   (* let fnT = rewrite_term tenv in *)

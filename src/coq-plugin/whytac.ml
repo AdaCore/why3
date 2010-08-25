@@ -692,7 +692,7 @@ and tr_term dep tvm bv env t =
 	  t_close_branch pat (tr_term dep tvm bv env bj)
 	in
 	let ty = type_of env Evd.empty t in
-	let ty = tr_type dep tvm env ty in
+	let _ty = tr_type dep tvm env ty in
 	t_case e (Array.to_list (Array.mapi branch br))
     | _ ->
 	let f, cl = decompose_app t in
