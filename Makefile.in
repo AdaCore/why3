@@ -56,6 +56,12 @@ OCAMLVERSION = @OCAMLVERSION@
 
 CAMLP5O   = @CAMLP5O@
 
+ifeq (@enable_menhirlib@,yes)
+  MENHIR = @MENHIR@ --table
+else
+  MENHIR = @MENHIR@
+endif
+
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
@@ -75,10 +81,18 @@ else
   DYNLINK =
 endif
 
+ifeq (@enable_menhirlib@,yes)
+  INCLUDES += -I +menhirLib
+  MENHIRLIB = menhirLib
+else
+  MENHIRLIB =
+endif
 
+EXTOBJS = $(MENHIRLIB)
 EXTLIBS = str unix nums $(DYNLINK)
-EXTCMA	= $(addsuffix .cma,$(EXTLIBS))
-EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS))
+
+EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
+EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
 
 ###############
 # main target
@@ -142,7 +156,7 @@ LIBMLI = $(addsuffix .mli, $(LIBMODULES))
 LIBCMO = $(addsuffix .cmo, $(LIBMODULES))
 LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
 
-$(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
+$(LIBCMO) $(LIBCMX): INCLUDES = $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why
 
 # build targets
@@ -273,51 +287,45 @@ install::
 # IDE
 ###############
 
-IDE_FILES = scheduler 
-IDE_MAIN_FILE = gmain
+IDE_FILES = scheduler gmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
-IDEMAIN = $(addprefix src/ide/, $(IDE_MAIN_FILE))
 
 IDEML  = $(addsuffix .ml,  $(IDEMODULES))
 IDEMLI = $(addsuffix .mli, $(IDEMODULES))
 IDECMO = $(addsuffix .cmo, $(IDEMODULES))
 IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
-IDEMAINML  = $(addsuffix .ml,  $(IDEMAIN))
+$(IDECMO) $(IDECMX): INCLUDES += -I src/ide
 
-$(IDECMO) $(IDECMX) $(addsuffix .cmx, $(IDEMAIN)) $(addsuffix .cmo, $(IDEMAIN)): INCLUDES = -thread -I src/ide -I +threads
-# -I +sqlite3 
-
-src/ide/gmain.cmo src/ide/gmain.cmx: INCLUDES += -I +lablgtk2
+# build targets
 
 ifeq (@enable_ide@,yes)
 byte: bin/whyide.byte
 opt:  bin/whyide.opt
 endif
 
-bin/whyide.opt bin/whyide.byte: INCLUDES = -thread -I +lablgtk2
-# -I +sqlite3 
+bin/whyide.opt bin/whyide.byte: INCLUDES += -thread -I +threads -I +lablgtk2
+# -I +sqlite3
+bin/whyide.opt bin/whyide.byte: EXTOBJS += gtkThread
+bin/whyide.opt bin/whyide.byte: EXTLIBS += threads lablgtk lablgtksourceview2
+# sqlite3
 
-bin/whyide.opt: src/why.cmxa $(PGMCMX) $(IDECMX) src/ide/gmain.cmx
+bin/whyide.opt: src/why.cmxa $(PGMCMX) $(IDECMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) threads.cmxa \
-	lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
-# sqlite3.cmxa 
 
-bin/whyide.byte: src/why.cma $(PGMCMO) $(IDECMO) src/ide/gmain.cmo
+bin/whyide.byte: src/why.cma $(PGMCMO) $(IDECMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma \
-	lablgtk.cma lablgtksourceview2.cma gtkThread.cmo $^
-# sqlite3.cma 
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
 # depend and clean targets
 
 include .depend.ide
 
 .depend.ide:
-	$(OCAMLDEP) -slash -I src -I src/ide $(IDEML) $(IDEMLI) $(IDEMAINML) > $@
+	$(OCAMLDEP) -slash -I src -I src/ide $(IDEML) $(IDEMLI) > $@
 
 depend: .depend.ide
 
@@ -385,31 +393,25 @@ clean::
 # Tptp2why
 ########
 
-MENHIR=@MENHIR@
-
 TPTPGENERATED = src/tptp2why/tptpLexer.ml \
 	src/tptp2why/tptpParser.ml src/tptp2why/tptpParser.mli
 
 TPTP_FILES = tptpTree tptpParser tptpLexer tptpTranslate tptp2why
-TPTP_DIR=src/tptp2why/
 
-TPTPMODULES = $(addprefix $(TPTP_DIR), $(TPTP_FILES))
+TPTPMODULES = $(addprefix src/tptp2why/, $(TPTP_FILES))
 
 TPTPML  = $(addsuffix .ml,  $(TPTPMODULES))
 TPTPMLI = $(addsuffix .mli, $(TPTPMODULES))
 TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
 TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
 
-$(TPTPCMO) $(TPTPCMX): INCLUDES = -I $(TPTP_DIR) -I src/core/
+$(TPTPML) $(TPTPMLI): OCAMLYACC = $(MENHIR)
+$(TPTPCMO) $(TPTPCMX): INCLUDES += -I src/tptp2why
 
 # build targets
 
-ifeq (@enable_tptp2why_support@,yes)
 byte: bin/tptp2why.byte
 opt:  bin/tptp2why.opt
-endif
-
-src/tptp2why/tptpParser.ml src/tptp2why/tptpParser.mli: OCAMLYACC = $(MENHIR)
 
 bin/tptp2why.opt: src/why.cmxa $(TPTPCMX) src/main.cmx
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
@@ -422,14 +424,12 @@ bin/tptp2why.byte: src/why.cma $(TPTPCMO) src/main.cmo
 
 # depend and clean targets
 
-ifeq (@enable_tptp2why_support@,yes)
 include .depend.tptp2why
 
 .depend.tptp2why: $(TPTPGENERATED)
 	$(OCAMLDEP) -slash -I src -I src/tptp2why $(TPTPML) $(TPTPMLI) > $@
 
 depend: .depend.tptp2why
-endif
 
 clean::
 	rm -f $(TPTPGENERATED)

@@ -59,12 +59,6 @@ AC_ARG_ENABLE(verbose-make,
     [  --enable-verbose-make   verbose makefile commands],,
     enable_verbose_make=no)
 
-# rust prover
-
-AC_ARG_ENABLE(rust-prover,
-    [  --enable-rust-prover    enable Why3 rust prover],,
-    enable_rust_prover=yes)
-
 # IDE
 
 AC_ARG_ENABLE(ide,
@@ -82,6 +76,12 @@ AC_ARG_ENABLE(plugins,
 AC_ARG_ENABLE(coq-support,
     [  --enable-coq-support    enable Coq support],,
     enable_coq_support=yes)
+
+# Menhir library
+
+AC_ARG_ENABLE(menhirlib,
+    [  --enable-menhirlib      enable Menhir library],,
+    enable_menhirlib=yes)
 
 # hypothesis selection
 
@@ -213,6 +213,11 @@ if test "$OCAMLYACC" = no ; then
 	AC_MSG_ERROR(Cannot find ocamlyacc.)
 fi
 
+AC_CHECK_PROG(MENHIR,menhir,menhir,no)
+if test "$MENHIR" = no ; then
+	AC_MSG_ERROR(Cannot find menhir.)
+fi
+
 AC_CHECK_PROG(OCAMLDOC,ocamldoc,ocamldoc,true)
 if test "$OCAMLDOC" = true ; then
     AC_MSG_WARN(Cannot find ocamldoc)
@@ -225,13 +230,14 @@ fi
 
 AC_CHECK_PROG(CAMLP5O,camlp5o,camlp5o,no)
 
-# checking for sqlite3
-if test "$enable_rust_prover" = yes ; then
-AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_rust_prover=no)
+# checking for libmenhir
+if test "$enable_menhirlib" = yes ; then
+AC_CHECK_FILE($OCAMLLIB/menhirLib,,enable_menhirlib=no)
 fi
 
-# checking for lablgtk2
+# checking for sqlite3 and lablgtk2
 if test "$enable_ide" = yes ; then
+#AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_ide=no)
 AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtk.cma,,enable_ide=no)
 AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtksourceview2.cma,,enable_ide=no)
 fi
@@ -271,16 +277,6 @@ if test "$CAMLP5O" = no; then
    enable_coq_support=no
 fi
 
-# tptp2why
-
-AC_CHECK_PROG(MENHIR,menhir,menhir,no)
-
-if test "$MENHIR" = no; then
-  enable_tptp2why_support=no
-else
-  enable_tptp2why_support=yes
-fi
-
 # hypothesis_selection
 
 if test "$enable_hypothesis_selection" = yes; then
@@ -310,6 +306,7 @@ AC_SUBST(OCAMLOPT)
 AC_SUBST(OCAMLDEP)
 AC_SUBST(OCAMLLEX)
 AC_SUBST(OCAMLYACC)
+AC_SUBST(MENHIR)
 AC_SUBST(OCAMLDOC)
 AC_SUBST(OCAMLBEST)
 AC_SUBST(OCAMLVERSION)
@@ -323,7 +320,6 @@ dnl AC_SUBST(OCAMLWEB)
 AC_SUBST(CAMLP5O)
 
 AC_SUBST(enable_ide)
-AC_SUBST(enable_rust_prover)
 AC_SUBST(enable_plugins)
 AC_SUBST(DYNLINK)
 
@@ -333,8 +329,7 @@ AC_SUBST(COQDEP)
 AC_SUBST(COQLIB)
 AC_SUBST(COQVERSION)
 
-AC_SUBST(MENHIR)
-AC_SUBST(enable_tptp2why_support)
+AC_SUBST(enable_menhirlib)
 
 AC_SUBST(enable_hypothesis_selection)
 
@@ -361,13 +356,12 @@ echo "OCaml library path      : $OCAMLLIB"
 echo "Verbose make            : $enable_verbose_make"
 echo "Why IDE                 : $enable_ide"
 echo "Why plugins             : $enable_plugins"
-echo "Why rust prover         : $enable_rust_prover"
 echo "Coq support             : $enable_coq_support"
 if test "$enable_coq_support" = "yes" ; then
    echo "    Version             : $COQVERSION"
    echo "    Lib                 : $COQLIB"
 fi
-echo "tptp2why support        : $enable_tptp2why_support"
+echo "Menhir library          : $enable_menhirlib"
 echo "hypothesis selection    : $enable_hypothesis_selection"
 echo "profiling               : $ENABLE_PROFILING"
 
