@@ -410,15 +410,15 @@ $(TPTPCMO) $(TPTPCMX): INCLUDES += -I src/tptp2why
 
 # build targets
 
-byte: bin/tptp2why.byte
-opt:  bin/tptp2why.opt
+byte: bin/whytptp.byte
+opt:  bin/whytptp.opt
 
-bin/tptp2why.opt: src/why.cmxa $(TPTPCMX) src/main.cmx
+bin/whytptp.opt: src/why.cmxa $(TPTPCMX) src/main.cmx
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/tptp2why.byte: src/why.cma $(TPTPCMO) src/main.cmo
+bin/whytptp.byte: src/why.cma $(TPTPCMO) src/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
@@ -435,7 +435,7 @@ clean::
 	rm -f $(TPTPGENERATED)
 	rm -f src/tptp2why/*.cm[iox] src/tptp2why/*.o
 	rm -f src/tptp2why/*.annot src/tptp2why/*~
-	rm -f bin/tptp2why.byte bin/tptp2why.opt
+	rm -f bin/whytptp.byte bin/whytptp.opt
 	rm -f .depend.tptp2why
 
 #######
