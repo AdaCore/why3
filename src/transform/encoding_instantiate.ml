@@ -308,7 +308,7 @@ and rewrite_fmla menv tvar vsvar f =
       (*    Pretty.print_ty u.vs_ty Pretty.print_ty t1.t_ty; *)
       assert (u.vs_ty == t1.t_ty);
       f_let t1 (cb u f2)
-    | _ -> f_map (fnT vsvar) (fnF vsvar) f
+    | _ -> f_map (fun _ -> assert false) (fnF vsvar) f
 
 (* Generation of all the possible instantiation of a formula *)
 let gen_tvar env ts =
