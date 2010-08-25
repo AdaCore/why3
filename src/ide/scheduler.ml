@@ -112,14 +112,12 @@ let event_handler () =
           in ()
         with
           | e ->
-              try
-                Printexc.print (fun () -> raise e) ()
-              with _ -> 
-                Mutex.lock queue_lock;
-                Queue.push (a,HighFailure,0.0) answers_queue ;
-                (* Condition.signal queue_condition; *)
-                Mutex.unlock queue_lock;
-                ()
+            eprintf "%a@." Exn_printer.exn_printer e;
+            Mutex.lock queue_lock;
+            Queue.push (a,HighFailure,0.0) answers_queue ;
+            (* Condition.signal queue_condition; *)
+            Mutex.unlock queue_lock;
+            ()
      with Queue.Empty -> 
         eprintf "Scheduler.event_handler: unexpected empty queues@.";
         assert false
