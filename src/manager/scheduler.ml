@@ -60,3 +60,10 @@ let schedule_proof_attempt ~async ~debug ~timelimit ~memlimit ~prover
         
 
   
+
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. bin/gwhy.byte"
+End: 
+*)

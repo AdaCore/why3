@@ -270,6 +270,64 @@ install::
 	cp -f bin/whyml.@OCAMLBEST@ $(BINDIR)/whyml3
 
 ###############
+# IDE
+###############
+
+IDE_FILES = scheduler 
+IDE_MAIN_FILE = gmain
+
+IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
+IDEMAIN = $(addprefix src/ide/, $(IDE_MAIN_FILE))
+
+IDEML  = $(addsuffix .ml,  $(IDEMODULES))
+IDEMLI = $(addsuffix .mli, $(IDEMODULES))
+IDECMO = $(addsuffix .cmo, $(IDEMODULES))
+IDECMX = $(addsuffix .cmx, $(IDEMODULES))
+
+IDEMAINML  = $(addsuffix .ml,  $(IDEMAIN))
+
+$(IDECMO) $(IDECMX) $(addsuffix .cmx, $(IDEMAIN)) $(addsuffix .cmo, $(IDEMAIN)): INCLUDES = -thread -I src/ide -I +threads
+# -I +sqlite3 
+
+src/ide/gmain.cmo src/ide/gmain.cmx: INCLUDES += -I +lablgtk2
+
+ifeq (@enable_ide@,yes)
+byte: bin/gwhy.byte
+opt:  bin/gwhy.opt
+endif
+
+bin/gwhy.opt bin/gwhy.byte: INCLUDES = -thread -I +lablgtk2
+# -I +sqlite3 
+
+bin/gwhy.opt: src/why.cmxa $(PGMCMX) $(IDECMX) src/ide/gmain.cmx
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) threads.cmxa \
+	lablgtk.cmxa lablgtksourceview2.cmxa gtkThread.cmx $^
+	$(STRIP) $@
+# sqlite3.cmxa 
+
+bin/gwhy.byte: src/why.cma $(PGMCMO) $(IDECMO) src/ide/gmain.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) threads.cma \
+	lablgtk.cma lablgtksourceview2.cma gtkThread.cmo $^
+# sqlite3.cma 
+
+# depend and clean targets
+
+include .depend.ide
+
+.depend.ide:
+	$(OCAMLDEP) -slash -I src -I src/ide $(IDEML) $(IDEMLI) $(IDEMAINML) > $@
+
+depend: .depend.ide
+
+clean::
+	rm -f src/ide/*.cm[iox] src/ide/*.o
+	rm -f src/ide/*.annot src/ide/*~
+	rm -f bin/gwhy.byte bin/gwhy.opt
+	rm -f .depend.ide
+
+###############
 # rust prover
 ###############
 
