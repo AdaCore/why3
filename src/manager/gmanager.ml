@@ -201,35 +201,6 @@ let () =
   printf "@."
 
 
-(***************************)
-(* Process input theories  *)
-(* add corresponding tasks *)
-(***************************)
-  (*
-let add_task (tname : string) (task : Why.Task.task) acc =
-  let name = (Why.Task.task_goal task).Why.Decl.pr_name.Why.Ident.id_string in
-  eprintf "doing task: tname=%s, name=%s@." tname name;
-  Db.add_or_replace_task ~tname ~name task :: acc
-  *)
-
-(*
-let do_theory tname th glist =
-  eprintf "do_theory@.";
-  let tasks = Why.Task.split_theory th None None in
-  let tasks =
-    if !split then
-      begin
-        eprintf "splitting@.";
-        let l = List.fold_left
-          (fun acc task ->
-             List.rev_append (Trans.apply tr task) acc) [] tasks in
-        List.rev l (* In order to keep the order for 1-1 transformation *)
-      end
-    else
-      tasks
-  in
-  List.fold_right (add_task tname) tasks glist
-*)
 
 (****************)
 (* goals widget *)
@@ -240,16 +211,10 @@ module Ide_goals = struct
   let cols = new GTree.column_list
   let name_column = cols#add Gobject.Data.string
   let id_column = cols#add Gobject.Data.caml
-(*
-  let status_column = cols#add GtkStock.conv
-*)
   let status_column = cols#add Gobject.Data.gobject
   let time_column = cols#add Gobject.Data.string
 
   let renderer = GTree.cell_renderer_text [`XALIGN 0.] 
-(*
-  let icon_renderer = GTree.cell_renderer_pixbuf [ `STOCK_SIZE `BUTTON ]
-*)
   let image_renderer = GTree.cell_renderer_pixbuf [ ] 
 
   let view_name_column = 
@@ -365,14 +330,6 @@ let select_goals (goals_view:GTree.tree_store) (task_view:GSourceView2.source_vi
     selected_rows
 
 
-let stock_of_result = function
-  | Db.Scheduled -> `ADD
-  | Db.Running -> `EXECUTE
-  | Db.Success -> `YES
-  | Db.Timeout -> `CUT
-  | Db.Unknown -> `DIALOG_QUESTION
-  | Db.HighFailure -> `PREFERENCES
-
 (*
 
   boomy icons
@@ -389,6 +346,7 @@ let image ?size f =
         GdkPixbuf.from_file_at_size ~width:s ~height:s n
 
 let iconname_default = "pause32"
+let iconname_scheduled = "pause32"
 let iconname_running = "play32"
 let iconname_valid = "accept32"
 let iconname_unknown = "help32"
@@ -397,9 +355,12 @@ let iconname_timeout = "clock32"
 let iconname_failure = "bug32"
 let iconname_yes = "accept32"
 let iconname_no = "delete32"
+(*
 let iconname_down = "play32"
+*)
 
 let image_default = ref (image ~size:32 iconname_default)
+let image_scheduled = ref !image_default
 let image_running = ref !image_default
 let image_valid = ref !image_default
 let image_unknown = ref !image_default
@@ -408,10 +369,13 @@ let image_timeout = ref !image_default
 let image_failure = ref !image_default
 let image_yes = ref !image_default
 let image_no = ref !image_default
+(*
 let image_down = ref !image_default
+*)
 
 let resize_images size =
   image_default := image ~size iconname_default;
+  image_scheduled := image ~size iconname_scheduled;
   image_running := image ~size iconname_running;
   image_valid := image ~size iconname_valid;
   image_unknown := image ~size iconname_unknown;
@@ -419,13 +383,15 @@ let resize_images size =
   image_timeout := image ~size iconname_timeout;
   image_failure := image ~size iconname_failure;
   image_yes := image ~size iconname_yes;
-  image_no := image ~size iconname_no;
+  image_no := image ~size iconname_no
+(*
   image_down := image ~size iconname_down
+*)
 
 let () = resize_images 16
 
 let image_of_result = function
-  | Db.Scheduled -> !image_down
+  | Db.Scheduled -> !image_scheduled
   | Db.Running -> !image_running
   | Db.Success -> !image_valid
   | Db.Timeout -> !image_timeout
@@ -443,7 +409,7 @@ let prover_on_all_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
   Ident.Hid.iter
     (fun id (g,row) ->
        let name = Db.prover_name p.prover in
-       Format.eprintf "running %s on goal %s@." name id.Ident.id_string;
+       Format.eprintf "[main thread] scheduling %s on goal %s@." name id.Ident.id_string;
        let prover_row = model#append ~parent:row () in
        model#set ~row:prover_row ~column:Ide_goals.name_column ("prover: " ^name);
        view#expand_row (model#get_path row);
@@ -455,10 +421,6 @@ let prover_on_all_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
          (*
            printf "Scheduled task #%d: status set to %a@." c
            Db.print_status result;         
-         *)
-         (*
-           model#set ~row:prover_row ~column:Ide_goals.status_column 
-           (stock_of_result result);         
          *)
          model#set ~row:prover_row ~column:Ide_goals.status_column 
            (image_of_result result);

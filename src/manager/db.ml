@@ -805,7 +805,9 @@ module Goal = struct
          in
 	 db_must_done db (fun () -> Sqlite3.step stmt);
 	 let new_id = Sqlite3.last_insert_rowid db.raw_db in         
-         Format.eprintf "Db.Goal.add: add a new goal with id=%Ld@." new_id;
+         (*
+           Format.eprintf "Db.Goal.add: add a new goal with id=%Ld@." new_id;
+         *)
 	 g.goal_id <- new_id)
 
 
@@ -1129,7 +1131,9 @@ let try_prover ~(async:(unit->unit)->unit)
       Goal.add_external_proof db ~prover g
   in
   if debug then Format.printf "setting attempt status to Scheduled@.";
+(*
   External_proof.set_status db attempt Scheduled;
+*)
   if false && debug then Format.eprintf "Task : %a@." Pretty.print_task g.task;
   let callback : unit -> Call_provers.prover_result = 
     try 
