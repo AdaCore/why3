@@ -211,6 +211,9 @@ let () =
 (* goals widget *)
 (****************)
 
+let split_transformation = Trans.lookup_transform_l "split_goal" env
+
+
 module Ide_goals = struct
 
   let cols = new GTree.column_list
@@ -219,6 +222,7 @@ module Ide_goals = struct
   let proved_column = cols#add Gobject.Data.boolean
   let status_column = cols#add Gobject.Data.gobject
   let time_column = cols#add Gobject.Data.string
+  let visible_column = cols#add Gobject.Data.boolean
 
   let renderer = GTree.cell_renderer_text [`XALIGN 0.] 
   let image_renderer = GTree.cell_renderer_pixbuf [ ] 
@@ -249,7 +253,9 @@ module Ide_goals = struct
 
   let create ~packing () =
     let model = GTree.tree_store cols in
-    let view = GTree.view ~model ~packing () in
+    let model_filter = GTree.model_filter model in
+    model_filter#set_visible_column visible_column;
+    let view = GTree.view ~model:model_filter ~packing () in
     let _ = view#selection#set_mode `SINGLE in
     let _ = view#set_rules_hint true in
     ignore (view#append_column view_name_column);
@@ -263,13 +269,12 @@ module Ide_goals = struct
 
   let get_goal id = fst (Ident.Hid.find goal_table id)
 
-  let tr = Trans.lookup_transform_l "split_goal" env
-
   let add_goals (model : GTree.tree_store) th =
     let tname = th.Theory.th_name.Ident.id_string in
     let parent = model#append () in
     model#set ~row:parent ~column:name_column tname;
     model#set ~row:parent ~column:id_column th.Theory.th_name;
+    model#set ~row:parent ~column:visible_column true;
     let tasks = Task.split_theory th None None in
     let tasks =
       if !split then
@@ -277,7 +282,7 @@ module Ide_goals = struct
           eprintf "splitting@.";
           let l = List.fold_left
             (fun acc task ->
-               List.rev_append (Trans.apply tr task) acc) [] tasks in
+               List.rev_append (Trans.apply split_transformation task) acc) [] tasks in
           List.rev l (* In order to keep the order for 1-1 transformation *)
         end
       else
@@ -292,6 +297,7 @@ module Ide_goals = struct
          Ident.Hid.add goal_table id (g,row);
 	 model#set ~row ~column:name_column name;
 	 model#set ~row ~column:id_column id;
+         model#set ~row ~column:visible_column true;
       )
       tasks
 
@@ -401,6 +407,9 @@ let () =
           if n >= 1 then Scheduler.maximum_running_proofs := n
   end 
 
+(*****************************************************)
+(* method: run a given prover on each unproved goals *)
+(*****************************************************)
 
 let prover_on_unproved_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
   Ident.Hid.iter
@@ -413,6 +422,7 @@ let prover_on_unproved_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
 *)
        let prover_row = model#append ~parent:row () in
        model#set ~row:prover_row ~column:Ide_goals.name_column ("prover: " ^name);
+       model#set ~row:prover_row ~column:Ide_goals.visible_column true;
        view#expand_row (model#get_path row);
        let callback result time =
          (*
@@ -440,6 +450,34 @@ let prover_on_unproved_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
     )
     Ide_goals.goal_table
 
+(*****************************************************)
+(* method: split all unproved goals *)
+(*****************************************************)
+
+let split_unproved_goals ~(model:GTree.tree_store) ~(view:GTree.view) () =
+  Ident.Hid.iter
+    (fun _id (g,row) ->
+       let proved = model#get ~row ~column:Ide_goals.proved_column in
+       if not proved then         
+         let goal_name = model#get ~row ~column:Ide_goals.name_column in
+         let split = Trans.apply split_transformation g in
+         if List.length split >= 2 then
+           let _ = List.fold_right
+             (fun subtask count ->
+                let id = (Task.task_goal subtask).Decl.pr_name in
+                let subtask_row = model#append ~parent:row () in
+                Ident.Hid.add Ide_goals.goal_table id (subtask,subtask_row);
+	        model#set ~row:subtask_row ~column:Ide_goals.id_column id;
+                model#set ~row:subtask_row ~column:Ide_goals.visible_column true;
+                model#set ~row:subtask_row ~column:Ide_goals.name_column 
+                  (goal_name ^ "." ^ (string_of_int count));
+                count+1)
+             split 1
+           in
+           view#expand_row (model#get_path row)
+    )
+    Ide_goals.goal_table
+
 let main () =
   let w = GWindow.window 
     ~allow_grow:true ~allow_shrink:true
@@ -453,14 +491,6 @@ let main () =
   let menubar = GMenu.menu_bar ~packing:vbox#pack () in
   let factory = new GMenu.factory menubar in
   let accel_group = factory#accel_group in
-  let file_menu = factory#add_submenu "_File" in
-  let file_factory = new GMenu.factory file_menu ~accel_group in
-  let _ = 
-    file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit" 
-      ~callback:(fun () -> exit 0) () 
-  in
-  let tools_menu = factory#add_submenu "_Tools" in
-  let tools_factory = new GMenu.factory tools_menu ~accel_group in
 
   (* horizontal paned *)
   let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:vbox#add () in
@@ -474,6 +504,23 @@ let main () =
 
   let goals_model,goals_view = Ide_goals.create ~packing:scrollview#add () in
   Theory.Mnm.iter (fun _ th -> Ide_goals.add_goals goals_model th) theories;
+
+  let file_menu = factory#add_submenu "_File" in
+  let file_factory = new GMenu.factory file_menu ~accel_group in
+  let _ = 
+    file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit" 
+      ~callback:(fun () -> exit 0) () 
+  in
+  let view_menu = factory#add_submenu "_View" in
+  let view_factory = new GMenu.factory view_menu ~accel_group in
+  let _ = 
+    view_factory#add_image_item ~key:GdkKeysyms._E 
+      ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) () 
+  in
+
+  let tools_menu = factory#add_submenu "_Tools" in
+  let tools_factory = new GMenu.factory tools_menu ~accel_group in
+
   let _ = 
     tools_factory#add_image_item ~key:GdkKeysyms._S
       ~label:"Simplify on unproved goals" 
@@ -499,10 +546,13 @@ let main () =
       () 
   in
   let _ = 
-    tools_factory#add_image_item ~key:GdkKeysyms._E 
-      ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) () 
+    tools_factory#add_image_item 
+      ~label:"Split unproved goals" 
+      ~callback:(fun () -> 
+                   split_unproved_goals ~model:goals_model ~view:goals_view 
+                     ()) 
+      () 
   in
-
 
   (* horizontal paned *)
   let vp = GPack.paned `VERTICAL  ~border_width:3 ~packing:hp#add () in
