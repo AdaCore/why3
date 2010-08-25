@@ -19,7 +19,7 @@ type proof_attempt_status =
 (**** queues of events to process ****)
 
 type attempt = bool * int * int * string * string * Driver.driver * 
-    (proof_attempt_status -> unit) * Task.task 
+    (proof_attempt_status -> float -> unit) * Task.task 
 
 (* queue of external proof attempts *)
 let prover_attempts_queue : attempt Queue.t = Queue.create ()
@@ -28,7 +28,8 @@ let prover_attempts_queue : attempt Queue.t = Queue.create ()
 let transf_queue  : int Queue.t = Queue.create ()
 
 (* queue of prover answers *)
-let answers_queue  : (attempt * proof_attempt_status) Queue.t = Queue.create ()
+let answers_queue  : (attempt * proof_attempt_status * float) Queue.t 
+    = Queue.create ()
 
 (* number of running external proofs *)
 let running_proofs = ref 0
@@ -54,14 +55,14 @@ let event_handler () =
     Condition.wait queue_condition queue_lock
   done;
   try
-    let (a,res) = Queue.pop answers_queue in
+    let (a,res,time) = Queue.pop answers_queue in
     decr running_proofs;
     Mutex.unlock queue_lock;
     eprintf "[Why thread] Scheduler.event_handler: got prover answer@.";
     (* TODO: update database *)
     (* call GUI callback with argument [res] *)
     let (_,_,_,_,_,_,callback,_) = a in
-    !async (fun () -> callback res) ()
+    !async (fun () -> callback res time) ()
   with Queue.Empty ->
     try
       let _t = Queue.pop transf_queue in
@@ -82,33 +83,44 @@ let event_handler () =
         (* build the prover task from goal in [a] *)
         let (debug,timelimit,memlimit,_prover,command,driver,callback,goal) = a 
         in
-        !async (fun () -> callback Running) ();
-        let call_prover : unit -> Call_provers.prover_result = 
+        !async (fun () -> callback Running 0.0) ();
+        try
+          let call_prover : unit -> Call_provers.prover_result = 
             if false && debug then 
               Format.eprintf "Task for prover: %a@." 
                 (Driver.print_task driver) goal;
             Driver.prove_task ~debug ~command ~timelimit ~memlimit driver goal
-        in              
-        let (_ : Thread.t) = Thread.create 
-          (fun () -> 
-             let r = call_prover () in
-             Mutex.lock queue_lock;
-             let res =
-               match r.Call_provers.pr_answer with
-                 | Call_provers.Valid -> Success         
-                 | Call_provers.Timeout -> Timeout
-                 | Call_provers.Invalid | Call_provers.Unknown _ -> Unknown
-                 | Call_provers.Failure _ | Call_provers.HighFailure 
-                     -> HighFailure
-             in
-             Queue.push (a,res) answers_queue ;
-             Mutex.unlock queue_lock;
-             Condition.signal queue_condition;
-             ()
-          )
-          ()
-        in ()
-      with Queue.Empty -> 
+          in
+          let (_ : Thread.t) = Thread.create 
+            (fun () -> 
+               let r = call_prover () in
+               Mutex.lock queue_lock;
+               let res =
+                 match r.Call_provers.pr_answer with
+                   | Call_provers.Valid -> Success         
+                   | Call_provers.Timeout -> Timeout
+                   | Call_provers.Invalid | Call_provers.Unknown _ -> Unknown
+                   | Call_provers.Failure _ | Call_provers.HighFailure 
+                       -> HighFailure
+               in
+               Queue.push (a,res,r.Call_provers.pr_time) answers_queue ;
+               Condition.signal queue_condition;
+               Mutex.unlock queue_lock;
+               ()
+            )
+            ()
+          in ()
+        with
+          | e ->
+              try
+                Printexc.print (fun () -> raise e) ()
+              with _ -> 
+                Mutex.lock queue_lock;
+                Queue.push (a,HighFailure,0.0) answers_queue ;
+                (* Condition.signal queue_condition; *)
+                Mutex.unlock queue_lock;
+                ()
+     with Queue.Empty -> 
         eprintf "Scheduler.event_handler: unexpected empty queues@.";
         assert false
 
@@ -139,8 +151,8 @@ let schedule_proof_attempt ~debug ~timelimit ~memlimit ~prover
   Mutex.lock queue_lock;
   Queue.push (debug,timelimit,memlimit,prover,command,driver,callback,goal)
     prover_attempts_queue;
-  Mutex.unlock queue_lock;
   Condition.signal queue_condition;
+  Mutex.unlock queue_lock;
   ()
  
 

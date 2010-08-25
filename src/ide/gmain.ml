@@ -318,12 +318,12 @@ let select_goals (goals_view:GTree.tree_store) (task_view:GSourceView2.source_vi
        let row = goals_view#get_iter p in
        let id = goals_view#get ~row ~column:Ide_goals.id_column in
        Format.eprintf "You clicked on %s@." id.Ident.id_string;
-       let _g = Ide_goals.get_goal id in
-       let task_text = "n.a." 
-         (* Pp.string_of Pretty.print_task (Db.goal_task g) *)
-       in
-       task_view#source_buffer#set_text task_text;
-       task_view#scroll_to_mark `INSERT
+       try
+         let g = Ide_goals.get_goal id in
+         let task_text = Pp.string_of Pretty.print_task g in
+         task_view#source_buffer#set_text task_text;
+         task_view#scroll_to_mark `INSERT
+       with Not_found -> ()
 
 (*
        match origin with
@@ -411,9 +411,11 @@ let () = Scheduler.async := GtkThread.async
 
 let prover_on_all_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
   Ident.Hid.iter
-    (fun id (g,row) ->
+    (fun _id (g,row) ->
        let name = (* Db.prover_name *) p.prover in
+(*
        Format.eprintf "[GUI thread] scheduling %s on goal %s@." name id.Ident.id_string;
+*)
        let prover_row = model#append ~parent:row () in
        model#set ~row:prover_row ~column:Ide_goals.name_column ("prover: " ^name);
        view#expand_row (model#get_path row);
@@ -421,17 +423,22 @@ let prover_on_all_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
        incr count;
        let c = !count in
 *)
-       let callback result =
+       let callback result time =
          (*
            printf "Scheduled task #%d: status set to %a@." c
            Db.print_status result;         
          *)
          model#set ~row:prover_row ~column:Ide_goals.status_column 
            (image_of_result result);
-
-         model#set ~row:prover_row ~column:Ide_goals.time_column "n.a."; 
+         let t = if time > 0.0 then Format.sprintf "%.2f" time else "" in
+         model#set ~row:prover_row ~column:Ide_goals.time_column t;
+         if result = Scheduler.Success then
+           begin
+             model#set ~row ~column:Ide_goals.status_column !image_yes;
+             view#collapse_row (model#get_path row);
+           end
        in
-       callback Scheduler.Scheduled;
+       callback Scheduler.Scheduled 0.0;
        Scheduler.schedule_proof_attempt
          ~debug:false ~timelimit ~memlimit:0 
          ~prover:p.prover ~command:p.command ~driver:p.driver 
@@ -549,6 +556,6 @@ let () =
 
 (*
 Local Variables: 
-compile-command: "unset LANG; make -C ../.. bin/gwhy.byte"
+compile-command: "unset LANG; make -C ../.. bin/gwhy.opt"
 End: 
 *)
