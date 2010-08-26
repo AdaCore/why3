@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let pname = "[Why-rustprover]"
+let pname = "[Why Ide]"
 
 let () = ignore (GtkMain.Main.init ())
 
@@ -57,13 +57,10 @@ let window_height = 768
 let font_name = "Monospace 10"
 *)
 
-let split = ref false
-
 let spec = [
-  "-split", Arg.Set split, "split all goals";
 ]
 
-let usage_str = "why-rustprover [options] <file>.why"
+let usage_str = "whyide [options] <file>.why"
 let file = ref None
 let set_file f = match !file with
   | Some _ -> 
@@ -214,7 +211,7 @@ let () =
 *)
 
 let image ?size f =
-  let n = Filename.concat "" (* todo *) (Filename.concat "images" (f^".png"))
+  let n = Filename.concat "" (* todo: libdir *) (Filename.concat "images" (f^".png"))
   in
   match size with
     | None ->
@@ -235,7 +232,7 @@ let iconname_no = "delete32"
 let iconname_directory = "folder32"
 let iconname_file = "file32"
 let iconname_prover = "wizard32"
-let iconname_transf = "cut32"
+let iconname_transf = "cutb32"
 
 let image_default = ref (image ~size:20 iconname_default)
 let image_scheduled = ref !image_default
@@ -276,15 +273,51 @@ let () = resize_images 20
 (****************)
 
 
-let split_transformation = Trans.lookup_transform_l "split_goal" env
+module Model = struct
 
-module Ide_goals = struct
+
+  type proof_attempt =
+      { prover : prover_data;
+        status : Scheduler.proof_attempt_status;
+        time : float;
+        output : string;
+      }
+
+  type goal_parent =
+    | Theory of theory
+    | Transf of transf
+
+  and goal =
+      { parent : goal_parent;
+        task: Task.task;
+        goal_row : Gtk.tree_iter;
+        mutable proved : bool;
+        mutable external_proofs: proof_attempt list;
+        mutable transformations : transf list;
+      }
+
+  and transf =
+      { parent_goal : goal;
+(*
+        transf : Task.task Trans.trans;
+*)
+        transf_row : Gtk.tree_iter;
+        mutable subgoals : goal list;
+      }
+        
+  and theory =
+      { theory : Theory.theory;
+        theory_row : Gtk.tree_iter;
+        mutable goals : goal list;
+        mutable verified : bool;
+      }
+
+  let all : theory list ref = ref [] 
 
   let cols = new GTree.column_list
   let name_column = cols#add Gobject.Data.string
   let icon_column = cols#add Gobject.Data.gobject
   let id_column = cols#add Gobject.Data.caml
-  let proved_column = cols#add Gobject.Data.boolean
   let status_column = cols#add Gobject.Data.gobject
   let time_column = cols#add Gobject.Data.string
   let visible_column = cols#add Gobject.Data.boolean
@@ -346,47 +379,119 @@ module Ide_goals = struct
 
   let get_goal id = fst (Ident.Hid.find goal_table id)
 
-  let add_goals (model : GTree.tree_store) th =
+end
+
+(***************)
+(* Main window *)
+(***************)
+
+let w = GWindow.window 
+  ~allow_grow:true ~allow_shrink:true
+  ~width:window_width ~height:window_height 
+  ~title:"why-ide" ()
+
+let (_ : GtkSignal.id) = w#connect#destroy ~callback:(fun () -> exit 0) 
+
+let vbox = GPack.vbox ~homogeneous:false ~packing:w#add () 
+
+(* Menu *)
+
+let menubar = GMenu.menu_bar ~packing:vbox#pack () 
+
+let factory = new GMenu.factory menubar 
+
+let accel_group = factory#accel_group 
+
+(* horizontal paned *)
+
+let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:vbox#add () 
+
+(* tree view *)
+let scrollview = 
+  GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC 
+    ~width:(window_width / 3) ~packing:hp#add () 
+
+let () = scrollview#set_shadow_type `ETCHED_OUT 
+
+let goals_model,goals_view = Model.create ~packing:scrollview#add () 
+
+module Helpers = struct
+
+  open Model
+
+  let set_theory_proved t =
+    t.verified <- true;
+    let row = t.theory_row in
+    goals_model#set ~row ~column:Model.status_column !image_yes;
+    goals_view#collapse_row (goals_model#get_path row)
+    
+  let rec set_proved g =
+    let row = g.goal_row in
+    g.proved <- true;
+    goals_view#collapse_row (goals_model#get_path row);
+    goals_model#set ~row ~column:Model.status_column !image_yes;
+    match g.parent with
+      | Theory t ->
+          if List.for_all (fun g -> g.proved) t.goals then
+            set_theory_proved t
+      | Transf t ->
+          if List.for_all (fun g -> g.proved) t.subgoals then
+            begin
+              (*
+              t.verified <- true;
+                goals_model#set ~row ~column:Model.status_column !image_yes;
+              *)
+              set_proved t.parent_goal;
+            end
+              
+
+  let add_theory th =
     let tname = th.Theory.th_name.Ident.id_string in
-    let parent = model#append () in
-    model#set ~row:parent ~column:name_column tname;
-    model#set ~row:parent ~column:icon_column !image_directory;
-    model#set ~row:parent ~column:id_column th.Theory.th_name;
-    model#set ~row:parent ~column:visible_column true;
-(*
-    model#set ~row:parent ~column:bg_column (GDraw.color (`NAME "pink"));
-*)
-    let tasks = Task.split_theory th None None in
-    let tasks =
-      if !split then
-        begin
-          eprintf "splitting@.";
-          let l = List.fold_left
-            (fun acc task ->
-               List.rev_append (Trans.apply split_transformation task) acc) [] tasks in
-          List.rev l (* In order to keep the order for 1-1 transformation *)
-        end
-      else
-        tasks
+    let parent = goals_model#append () in
+    let mth = { theory = th; 
+                theory_row = parent; 
+                goals = [] ; 
+                verified = true } 
     in
-    List.iter
-      (fun t->
-         let id = (Task.task_goal t).Decl.pr_name in
-         let name = id.Ident.id_string in
-         let g = (* Db.add_or_replace_task ~tname ~name *) t in
-	 let row = model#append ~parent () in
-         Ident.Hid.add goal_table id (g,row);
-	 model#set ~row ~column:name_column name;
-         model#set ~row ~column:icon_column !image_file;
-(*
-         model#set ~row ~column:bg_column (GDraw.color (`NAME "cyan"));
-*)
-	 model#set ~row ~column:id_column id;
-         model#set ~row ~column:visible_column true;
-      )
-      tasks
+    all := !all @ [mth];
+    goals_model#set ~row:parent ~column:name_column tname;
+    goals_model#set ~row:parent ~column:icon_column !image_directory;
+    goals_model#set ~row:parent ~column:id_column th.Theory.th_name;
+    goals_model#set ~row:parent ~column:visible_column true;
+    let tasks = Task.split_theory th None None in
+    let goals =
+      List.fold_left
+        (fun acc t ->
+           let id = (Task.task_goal t).Decl.pr_name in
+           let name = id.Ident.id_string in
+           let row = goals_model#append ~parent () in
+           Ident.Hid.add goal_table id (t,row);
+	   goals_model#set ~row ~column:name_column name;
+           goals_model#set ~row ~column:icon_column !image_file;
+	   goals_model#set ~row ~column:id_column id;
+           goals_model#set ~row ~column:visible_column true;
+           let goal = { parent = Theory mth; 
+                        task = t ; 
+                        goal_row = row;
+                        external_proofs = [];
+                        transformations = [];
+                        proved = false;
+                      }
+           in
+           goal :: acc
+        )
+        []
+        (List.rev tasks)
+    in
+    mth.goals <- List.rev goals;
+    if goals = [] then set_theory_proved mth
+    
 
 end
+
+let () = 
+  Theory.Mnm.iter (fun _ th -> Helpers.add_theory th) theories
+
 
 (****************)
 (* windows, etc *)
@@ -405,10 +510,10 @@ let select_goals (goals_view:GTree.tree_store) (task_view:GSourceView2.source_vi
   List.iter
     (fun p ->
        let row = goals_view#get_iter p in
-       let id = goals_view#get ~row ~column:Ide_goals.id_column in
+       let id = goals_view#get ~row ~column:Model.id_column in
        Format.eprintf "You clicked on %s@." id.Ident.id_string;
        try
-         let g = Ide_goals.get_goal id in
+         let g = Model.get_goal id in
          let task_text = Pp.string_of Pretty.print_task g in
          task_view#source_buffer#set_text task_text;
          task_view#scroll_to_mark `INSERT
@@ -445,215 +550,261 @@ let () =
 (* method: run a given prover on each unproved goals *)
 (*****************************************************)
 
-let prover_on_unproved_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
-  Ident.Hid.iter
-    (fun _id (g,row) ->
-       let proved = model#get ~row ~column:Ide_goals.proved_column in
-       if not proved then         
-       let name = (* Db.prover_name *) p.prover in
-(*
-       Format.eprintf "[GUI thread] scheduling %s on goal %s@." name id.Ident.id_string;
-*)
-       let prover_row = model#append ~parent:row () in
-       model#set ~row:prover_row ~column:Ide_goals.icon_column !image_prover;
-       model#set ~row:prover_row ~column:Ide_goals.name_column ("prover: " ^name);
-       model#set ~row:prover_row ~column:Ide_goals.visible_column true;
-       view#expand_row (model#get_path row);
-       let callback result time =
-         (*
-           printf "Scheduled task #%d: status set to %a@." c
-           Db.print_status result;         
-         *)
-         model#set ~row:prover_row ~column:Ide_goals.status_column 
-           (image_of_result result);
-         let t = if time > 0.0 then Format.sprintf "%.2f" time else "" in
-         model#set ~row:prover_row ~column:Ide_goals.time_column t;
-         if result = Scheduler.Success then
-           begin
-             model#set ~row:prover_row ~column:Ide_goals.proved_column true;
-             model#set ~row ~column:Ide_goals.status_column !image_yes;
-             model#set ~row ~column:Ide_goals.proved_column true;
-             view#collapse_row (model#get_path row);
-           end
-       in
-       callback Scheduler.Scheduled 0.0;
-       Scheduler.schedule_proof_attempt
-         ~debug:false ~timelimit ~memlimit:0 
-         ~prover:p.prover ~command:p.command ~driver:p.driver 
-         ~callback
-         g
+let rec prover_on_goal p g =
+  let row = g.Model.goal_row in
+  let name = p.prover in
+  let prover_row = goals_model#append ~parent:row () in
+  goals_model#set ~row:prover_row ~column:Model.icon_column !image_prover;
+  goals_model#set ~row:prover_row ~column:Model.name_column ("prover: " ^name);
+  goals_model#set ~row:prover_row ~column:Model.visible_column true;
+  goals_view#expand_row (goals_model#get_path row);
+  let callback result time =
+    goals_model#set ~row:prover_row ~column:Model.status_column 
+      (image_of_result result);
+    let t = if time > 0.0 then Format.sprintf "%.2f" time else "" in
+    goals_model#set ~row:prover_row ~column:Model.time_column t;
+    if result = Scheduler.Success then
+      Helpers.set_proved g
+  in
+  callback Scheduler.Scheduled 0.0;
+  Scheduler.schedule_proof_attempt
+    ~debug:false ~timelimit ~memlimit:0 
+    ~prover:p.prover ~command:p.command ~driver:p.driver 
+    ~callback
+    g.Model.task;
+  List.iter
+    (fun t -> List.iter (prover_on_goal p) t.Model.subgoals)
+    g.Model.transformations
+    
+let prover_on_unproved_goals p () =
+  List.iter
+    (fun th ->
+       List.iter
+         (fun g -> if not g.Model.proved then prover_on_goal p g)
+         th.Model.goals;
     )
-    Ide_goals.goal_table
+    !Model.all
 
 (*****************************************************)
 (* method: split all unproved goals *)
 (*****************************************************)
 
-let split_unproved_goals ~(model:GTree.tree_store) ~(view:GTree.view) () =
-  Ident.Hid.iter
-    (fun _id (g,row) ->
-       let proved = model#get ~row ~column:Ide_goals.proved_column in
-       if not proved then         
-         let goal_name = model#get ~row ~column:Ide_goals.name_column in
-         let callback subgoals =
-           if List.length subgoals >= 0 (* 2 *) then
-             let split_row = model#append ~parent:row () in
-             model#set ~row:split_row ~column:Ide_goals.visible_column true;
-             model#set ~row:split_row ~column:Ide_goals.name_column "split";
-             model#set ~row:split_row ~column:Ide_goals.icon_column !image_transf;
+let split_transformation = Trans.lookup_transform_l "split_goal" env
+
+let split_unproved_goals () =
+  List.iter
+    (fun th ->
+       List.iter
+         (fun g ->
+            if not g.Model.proved then         
+              let row = g.Model.goal_row in
+              let goal_name = goals_model#get ~row ~column:Model.name_column in
+              let callback subgoals =
+                if List.length subgoals >= 2 then
+                  let split_row = goals_model#append ~parent:row () in
+                  goals_model#set ~row:split_row ~column:Model.visible_column true;
+                  goals_model#set ~row:split_row ~column:Model.name_column "split";
+                  goals_model#set ~row:split_row ~column:Model.icon_column !image_transf;
+                  let tr =
+                    { Model.parent_goal = g;
 (*
-             model#set ~row:split_row ~column:Ide_goals.bg_column (GDraw.color (`NAME "yellow"));
+                      Model.transf = split_transformation;
 *)
-             let _ = List.fold_right
-               (fun subtask count ->
-                  let id = (Task.task_goal subtask).Decl.pr_name in
-                  let subtask_row = model#append ~parent:split_row () in
-                  Ident.Hid.add Ide_goals.goal_table id (subtask,subtask_row);
-	          model#set ~row:subtask_row ~column:Ide_goals.id_column id;
-                  model#set ~row:subtask_row ~column:Ide_goals.visible_column true;
-                  model#set ~row:subtask_row ~column:Ide_goals.name_column 
-                    (goal_name ^ "." ^ (string_of_int count));
-                  model#set ~row:subtask_row ~column:Ide_goals.icon_column !image_file;
-                  count+1)
-               subgoals 1
-             in
-             view#expand_row (model#get_path row)           
-         in
-         Scheduler.apply_transformation ~callback split_transformation g
+                      Model.transf_row = split_row;
+                      subgoals = [];
+                    }
+                  in
+                  g.Model.transformations <- tr :: g.Model.transformations;
+                  let goals,_ = List.fold_left
+                    (fun (acc,count) subtask ->
+                       let id = (Task.task_goal subtask).Decl.pr_name in
+                       let subtask_row = goals_model#append ~parent:split_row () in
+                       Ident.Hid.add Model.goal_table id (subtask,subtask_row);
+	               goals_model#set ~row:subtask_row ~column:Model.id_column id;
+                       goals_model#set ~row:subtask_row ~column:Model.visible_column true;
+                       goals_model#set ~row:subtask_row ~column:Model.name_column 
+                         (goal_name ^ "." ^ (string_of_int count));
+                       goals_model#set ~row:subtask_row ~column:Model.icon_column !image_file;
+                       let goal = { Model.parent = Model.Transf tr; 
+                                    Model.task = subtask ; 
+                                    Model.goal_row = subtask_row;
+                                    Model.external_proofs = [];
+                                    Model.transformations = [];
+                                    Model.proved = false;
+                                  }
+                       in
+                       (goal :: acc, count+1))
+                    ([],1) subgoals 
+                  in
+                  tr.Model.subgoals <- List.rev goals;
+                  goals_view#expand_row (goals_model#get_path row)           
+              in
+              
+              Scheduler.apply_transformation ~callback split_transformation g.Model.task
+         )
+         th.Model.goals
     )
-    Ide_goals.goal_table
+    !Model.all
 
-let main () =
-  let w = GWindow.window 
-    ~allow_grow:true ~allow_shrink:true
-    ~width:window_width ~height:window_height 
-    ~title:"why-ide" ()
-  in
-  let _ = w#connect#destroy ~callback:(fun () -> exit 0) in
-  let vbox = GPack.vbox ~homogeneous:false ~packing:w#add () in
 
-  (* Menu *)
-  let menubar = GMenu.menu_bar ~packing:vbox#pack () in
-  let factory = new GMenu.factory menubar in
-  let accel_group = factory#accel_group in
+(*************)
+(* File menu *)
+(*************)
 
-  (* horizontal paned *)
-  let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:vbox#add () in
+let file_menu = factory#add_submenu "_File" 
+let file_factory = new GMenu.factory file_menu ~accel_group 
+let (_ : GMenu.image_menu_item) = 
+  file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit" 
+    ~callback:(fun () -> exit 0) () 
 
-  (* left tree of namespace *)
-  let scrollview = 
-    GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC 
-    ~width:(window_width / 3) ~packing:hp#add () 
-  in
-  let _ = scrollview#set_shadow_type `ETCHED_OUT in
+(*************)
+(* View menu *)
+(*************)
 
-  let goals_model,goals_view = Ide_goals.create ~packing:scrollview#add () in
-  Theory.Mnm.iter (fun _ th -> Ide_goals.add_goals goals_model th) theories;
+let view_menu = factory#add_submenu "_View" 
+let view_factory = new GMenu.factory view_menu ~accel_group 
+let (_ : GMenu.image_menu_item) = 
+  view_factory#add_image_item ~key:GdkKeysyms._E 
+    ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) () 
 
-  let file_menu = factory#add_submenu "_File" in
-  let file_factory = new GMenu.factory file_menu ~accel_group in
-  let _ = 
-    file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit" 
-      ~callback:(fun () -> exit 0) () 
-  in
-  let view_menu = factory#add_submenu "_View" in
-  let view_factory = new GMenu.factory view_menu ~accel_group in
-  let _ = 
-    view_factory#add_image_item ~key:GdkKeysyms._E 
-      ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) () 
-  in
+(**************)
+(* Tools menu *)
+(**************)
 
-  let tools_menu = factory#add_submenu "_Tools" in
-  let tools_factory = new GMenu.factory tools_menu ~accel_group in
+let tools_menu = factory#add_submenu "_Tools" 
+let tools_factory = new GMenu.factory tools_menu ~accel_group 
 
-  let _ = 
-    tools_factory#add_image_item ~key:GdkKeysyms._S
-      ~label:"Simplify on unproved goals" 
-      ~callback:(fun () -> 
-                   prover_on_unproved_goals ~model:goals_model ~view:goals_view 
-                     simplify ()) 
-      () 
-  in
-  let _ = 
-    tools_factory#add_image_item ~key:GdkKeysyms._A 
-      ~label:"Alt-Ergo on unproved goals" 
-      ~callback:(fun () -> 
-                   prover_on_unproved_goals ~model:goals_model ~view:goals_view 
-                     alt_ergo ()) 
-      () 
-  in
-  let _ = 
-    tools_factory#add_image_item ~key:GdkKeysyms._Z 
-      ~label:"Z3 on unproved goals" 
-      ~callback:(fun () -> 
-                   prover_on_unproved_goals ~model:goals_model ~view:goals_view 
-                     z3 ()) 
-      () 
-  in
-  let _ = 
-    tools_factory#add_image_item 
-      ~label:"Split unproved goals" 
-      ~callback:(fun () -> 
-                   split_unproved_goals ~model:goals_model ~view:goals_view 
-                     ()) 
-      () 
-  in
+let (_ : GMenu.image_menu_item) = 
+  tools_factory#add_image_item ~key:GdkKeysyms._S
+    ~label:"Simplify on unproved goals" 
+    ~callback:(fun () -> prover_on_unproved_goals simplify ()) 
+    () 
 
-  (* horizontal paned *)
-  let vp = GPack.paned `VERTICAL  ~border_width:3 ~packing:hp#add () in
+let (_ : GMenu.image_menu_item) = 
+  tools_factory#add_image_item ~key:GdkKeysyms._A 
+    ~label:"Alt-Ergo on unproved goals" 
+    ~callback:(fun () -> prover_on_unproved_goals alt_ergo ()) 
+    () 
 
-  (* goal text view *)
-  let scrolled_task_view = GBin.scrolled_window
-    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~packing:vp#add ()
-  in
-  let task_view =
-    GSourceView2.source_view
-      ~editable:false
-      ~show_line_numbers:true
-      ~packing:scrolled_task_view#add ~height:500 ~width:650
-      ()
-  in
-  task_view#source_buffer#set_language lang;
-  task_view#set_highlight_current_line true;
+let (_ : GMenu.image_menu_item) = 
+  tools_factory#add_image_item ~key:GdkKeysyms._Z 
+    ~label:"Z3 on unproved goals" 
+    ~callback:(fun () -> prover_on_unproved_goals z3 ()) 
+    () 
   
-  (* source view *)
-  let scrolled_source_view = GBin.scrolled_window
-    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~packing:vp#add ()
+let (_ : GMenu.image_menu_item) = 
+  tools_factory#add_image_item 
+    ~label:"Split unproved goals" 
+    ~callback:split_unproved_goals
+    () 
+
+(*************)
+(* Help menu *)
+(*************)
+
+let info_window t s () =
+  let d = GWindow.message_dialog
+    ~message:s
+    ~message_type:`INFO
+    ~buttons:GWindow.Buttons.close
+    ~title:t
+    ~show:true () 
   in
-  let source_view =
-    GSourceView2.source_view
-      ~auto_indent:true
-      ~insert_spaces_instead_of_tabs:true ~tab_width:2
-      ~show_line_numbers:true
-      ~right_margin_position:80 ~show_right_margin:true
-      (* ~smart_home_end:true *)
-      ~packing:scrolled_source_view#add ~height:500 ~width:650
-      ()
+  let (_ : GtkSignal.id) =
+    d#connect#response 
+      ~callback:(function `CLOSE | `DELETE_EVENT -> d#destroy ())
   in
+  ()
+
+let help_menu = factory#add_submenu "_Help" 
+let help_factory = new GMenu.factory help_menu ~accel_group 
+
+let (_ : GMenu.image_menu_item) = 
+  help_factory#add_image_item 
+    ~label:"Legend" 
+    ~callback:(info_window "Legend" "This is the legend")
+    () 
+
+let (_ : GMenu.image_menu_item) = 
+  help_factory#add_image_item 
+    ~label:"About" 
+    ~callback:(info_window "About" 
+                 "This is Why3 preliminary version
+Copyright 2010 
+Francois Bobot
+Jean-Christophe Filliatre
+Johannes Kanig
+Claude Marche
+Andrei Paskevich"
+              )
+    () 
+
+
+(******************************)
+(* vertical paned on the right*)
+(******************************)
+
+let vp = GPack.paned `VERTICAL  ~border_width:3 ~packing:hp#add () 
+
+(******************)
+(* goal text view *)
+(******************)
+
+let scrolled_task_view = GBin.scrolled_window
+  ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+  ~packing:vp#add ()
+  
+let task_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_task_view#add ~height:500 ~width:650
+    ()
+
+let () = task_view#source_buffer#set_language lang
+let () = task_view#set_highlight_current_line true
+  
+(***************)
+(* source view *)
+(***************)
+
+let scrolled_source_view = GBin.scrolled_window
+  ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+  ~packing:vp#add 
+  ()
+  
+let source_view =
+  GSourceView2.source_view
+    ~auto_indent:true
+    ~insert_spaces_instead_of_tabs:true ~tab_width:2
+    ~show_line_numbers:true
+    ~right_margin_position:80 ~show_right_margin:true
+    (* ~smart_home_end:true *)
+    ~packing:scrolled_source_view#add ~height:500 ~width:650
+    ()
+
 (*
   source_view#misc#modify_font_by_name font_name;
 *)
-  source_view#source_buffer#set_language lang;
-  source_view#set_highlight_current_line true;
-  source_view#source_buffer#set_text source_text;
+let () = source_view#source_buffer#set_language lang
+let () = source_view#set_highlight_current_line true
+let () = source_view#source_buffer#set_text source_text
 
-(* Bind event: row selection on tree view on the left *) 
-  let _ =
-    goals_view#selection#connect#after#changed ~callback:
-      begin fun () ->
-	let list = goals_view#selection#get_selected_rows in
-        select_goals goals_model task_view source_view list
-      end
-  in
+(***************)
+(* Bind events *)
+(***************)
 
-  w#add_accel_group accel_group;
-  w#show ()
+(* row selection on tree view on the left *) 
+let (_ : GtkSignal.id) =
+  goals_view#selection#connect#after#changed ~callback:
+    begin fun () ->
+      let list = goals_view#selection#get_selected_rows in
+      select_goals goals_model task_view source_view list
+    end
 
-let () =
-  main ();
-  GtkThread.main ()
+let () = w#add_accel_group accel_group
+let () = w#show () 
+let () = GtkThread.main ()
 
 (*
 Local Variables: 
