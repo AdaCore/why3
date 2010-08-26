@@ -26,23 +26,15 @@ open Ty
 open Term
 open Theory
 
-type error = 
-  | AnyMessage of string
-
-exception Error of error
+exception AnyMessage of string
 
 let error ?loc e = match loc with
-  | None -> raise (Error e)
-  | Some loc -> raise (Loc.Located (loc, Error e))
+  | None -> raise e
+  | Some loc -> raise (Loc.Located (loc,e))
 
-let report fmt = function
-  | AnyMessage s ->
-      fprintf fmt "%s" s
-
-let () = Exn_printer.register
-  (fun fmt exn -> match exn with
-    | Error error -> report fmt error
-    | _ -> raise exn)
+let () = Exn_printer.register (fun fmt e -> match e with
+  | AnyMessage s -> fprintf fmt "%s" s
+  | _ -> raise e)
 
 (** types with destructive type variables *)
 

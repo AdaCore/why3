@@ -25,13 +25,14 @@
   open Term
   open Pgm_parser
 
-  type error = 
-    | UnterminatedLogic
+  exception UnterminatedLogic
+  exception IllegalCharacter of char
 
-  exception Error of error
-
-  let report fmt = function
+  let () = Exn_printer.register (fun fmt exn -> match exn with
     | UnterminatedLogic -> fprintf fmt "unterminated logic block"
+    | IllegalCharacter c -> fprintf fmt "illegal character %c" c
+    | Parsing.Parse_error -> fprintf fmt "syntax error"
+    | _ -> raise exn)
 
   let keywords = Hashtbl.create 97
   let () = 
@@ -203,7 +204,7 @@ rule token = parse
   | eof 
       { EOF }
   | _ as c
-      { raise (Lexer.Error (IllegalCharacter c)) }
+      { raise (IllegalCharacter c) }
 
 and logic = parse
   | "}"
@@ -213,7 +214,7 @@ and logic = parse
   | newline
       { newline lexbuf; Buffer.add_char logic_buffer '\n'; logic lexbuf }
   | eof
-      { raise (Loc.Located (!logic_start_loc, Error UnterminatedLogic)) }
+      { raise (Loc.Located (!logic_start_loc, UnterminatedLogic)) }
   | _ as c
       { Buffer.add_char logic_buffer c; logic lexbuf }
 

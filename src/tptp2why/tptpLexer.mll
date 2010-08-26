@@ -45,6 +45,14 @@
     fprintf fmter "file %s, line %d, char %d"
       s (pos.pos_lnum) (pos.pos_cnum-pos.pos_bol)
 
+  (** report errors *)
+  let () = Why.Exn_printer.register (fun fmt exn -> match exn with
+    | TptpParser.Error ->
+      Format.fprintf fmt "syntax error.@."
+    | LexicalError (s, pos) ->
+      Format.fprintf fmt "lexical error: %a@." report (s, pos)
+    | e -> raise e)
+
 }
 
 let newline = '\n'

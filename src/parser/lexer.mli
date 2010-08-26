@@ -17,13 +17,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type error = 
-  | IllegalCharacter of char
-  | UnterminatedComment
-  | UnterminatedString
-
-exception Error of error
-
 (** parsing entry points *)
 
 val parse_list0_decl : Lexing.lexbuf -> Ptree.decl list
@@ -38,8 +31,6 @@ val newline : Lexing.lexbuf -> unit
 val comment : Lexing.lexbuf -> unit
 
 val string : Lexing.lexbuf -> string
-
-val report : Format.formatter -> error -> unit
 
 val remove_leading_plus : string -> string
 

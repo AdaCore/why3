@@ -31,31 +31,28 @@ open Denv
 
 (** errors *)
 
-type error =
-  | Message of string
-  | DuplicateTypeVar of string
-  | TypeArity of qualid * int * int
-  | Clash of string
-  | PredicateExpected
-  | TermExpected
-  | BadNumberOfArguments of Ident.ident * int * int
-  | ClashTheory of string
-  | UnboundTheory of qualid
-  | AlreadyTheory of string
-  | UnboundFile of string
-  | UnboundDir of string
-  | AmbiguousPath of string * string
-  | NotInLoadpath of string
-  | CyclicTypeDef
-  | UnboundTypeVar of string
-  | UnboundType of string list
-  | UnboundSymbol of string list
-
-exception Error of error
+exception Message of string
+exception DuplicateTypeVar of string
+exception TypeArity of qualid * int * int
+exception Clash of string
+exception PredicateExpected
+exception TermExpected
+exception BadNumberOfArguments of Ident.ident * int * int
+exception ClashTheory of string
+exception UnboundTheory of qualid
+exception AlreadyTheory of string
+exception UnboundFile of string
+exception UnboundDir of string
+exception AmbiguousPath of string * string
+exception NotInLoadpath of string
+exception CyclicTypeDef
+exception UnboundTypeVar of string
+exception UnboundType of string list
+exception UnboundSymbol of string list
 
 let error ?loc e = match loc with
-  | None -> raise (Error e)
-  | Some loc -> raise (Loc.Located (loc, Error e))
+  | None -> raise e
+  | Some loc -> raise (Loc.Located (loc,e))
 
 let errorm ?loc f =
   let buf = Buffer.create 512 in
@@ -72,7 +69,7 @@ let rec print_qualid fmt = function
   | Qident s -> fprintf fmt "%s" s.id
   | Qdot (m, s) -> fprintf fmt "%a.%s" print_qualid m s.id
 
-let report fmt = function
+let () = Exn_printer.register (fun fmt e -> match e with
   | Message s ->
       fprintf fmt "%s" s
   | DuplicateTypeVar s ->
@@ -111,13 +108,7 @@ let report fmt = function
        fprintf fmt "Unbound type '%a'" (print_list dot pp_print_string) sl
   | UnboundSymbol sl ->
        fprintf fmt "Unbound symbol '%a'" (print_list dot pp_print_string) sl
-
-let () = Exn_printer.register
-  (fun fmt exn -> match exn with
-    | Error error -> 
-	report fmt error
-    | _ -> 
-	raise exn)
+  | _ -> raise e)
 
 (** Environments *)
 
@@ -359,7 +350,7 @@ and dpat_args s loc env el pl =
   check_arg env (el, pl)
 
 let rec trigger_not_a_term_exn = function
-  | Error TermExpected -> true
+  | TermExpected -> true
   | Loc.Located (_, exn) -> trigger_not_a_term_exn exn
   | _ -> false
 
@@ -881,7 +872,7 @@ and add_decl env lenv th = function
 	  find_theory env lenv q id
 	with
 	  | TheoryNotFound _ -> error ~loc (UnboundTheory use.use_theory)
-	  | Error (AmbiguousPath _ as e) -> error ~loc e
+	  | AmbiguousPath _ as e -> error ~loc e
       in
       let use_or_clone th = match subst with
 	| None ->

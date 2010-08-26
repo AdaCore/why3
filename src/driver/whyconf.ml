@@ -22,26 +22,23 @@ open Util
 
 (* Error handling *)
 
-type error =
-  | SyntaxError
-  | ExtraParameters of string
-  | MissingParameters of string
-  | UnknownSection of string
-  | UnknownField of string
-  | MissingSection of string
-  | MissingField of string
-  | DuplicateSection of string
-  | DuplicateField of string * Rc.rc_value * Rc.rc_value
-  | StringExpected of string * Rc.rc_value
-  | IdentExpected of string * Rc.rc_value
-  | IntExpected of string * Rc.rc_value
-  | DuplicateProver of string
-
-exception Error of error
+exception SyntaxError
+exception ExtraParameters of string
+exception MissingParameters of string
+exception UnknownSection of string
+exception UnknownField of string
+exception MissingSection of string
+exception MissingField of string
+exception DuplicateSection of string
+exception DuplicateField of string * Rc.rc_value * Rc.rc_value
+exception StringExpected of string * Rc.rc_value
+exception IdentExpected of string * Rc.rc_value
+exception IntExpected of string * Rc.rc_value
+exception DuplicateProver of string
 
 let error ?loc e = match loc with
-  | None -> raise (Error e)
-  | Some loc -> raise (Loc.Located (loc, Error e))
+  | None -> raise e
+  | Some loc -> raise (Loc.Located (loc, e))
 
 let print_rc_value fmt = function
   | Rc.RCint i -> fprintf fmt "%d" i
@@ -50,7 +47,7 @@ let print_rc_value fmt = function
   | Rc.RCstring s -> fprintf fmt "\"%s\"" s
   | Rc.RCident s -> fprintf fmt "%s" s
 
-let report fmt = function
+let () = Exn_printer.register (fun fmt e -> match e with
   | SyntaxError ->
       fprintf fmt "syntax error"
   | ExtraParameters s ->
@@ -81,11 +78,7 @@ let report fmt = function
         s print_rc_value v
   | DuplicateProver s ->
       fprintf fmt "prover %s is already listed" s
-
-let () = Exn_printer.register
-  (fun fmt exn -> match exn with
-    | Error error -> report fmt error
-    | _ -> raise exn)
+  | e -> raise e)
 
 (* Configuration file *)
 

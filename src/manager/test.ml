@@ -72,8 +72,8 @@ let config =
         autodetection ();
 *)
         exit 1
-    | Whyconf.Error e ->
-        eprintf "Error while reading config file: %a@." Whyconf.report e;
+    | e ->
+        eprintf "%a@." Exn_printer.exn_printer e;
         exit 1
 
 let () = printf "Load path is: %a@." (Pp.print_list Pp.comma Pp.string) config.loadpath
@@ -126,28 +126,6 @@ let () =
 (***********************)
 (* Parsing input file  *)
 (***********************)
-   
-let rec report fmt = function
-  | Lexer.Error e ->
-      fprintf fmt "lexical error: %a" Lexer.report e;
-  | Loc.Located (loc, e) ->
-      fprintf fmt "%a%a" Loc.report_position loc report e
-  | Parsing.Parse_error ->
-      fprintf fmt "syntax error"
-  | Denv.Error e ->
-      Denv.report fmt e
-  | Typing.Error e ->
-      Typing.report fmt e
-  | Decl.UnknownIdent i ->
-      fprintf fmt "anomaly: unknown ident '%s'" i.Ident.id_string
-(*
-  | Driver.Error e ->
-      Driver.report fmt e
-*)
-  | Config.Dynlink.Error e ->
-      fprintf fmt "Dynlink : %s" (Config.Dynlink.error_message e)
-  | e -> fprintf fmt "anomaly: %s" (Printexc.to_string e)
-
 
 let m : Theory.theory Theory.Mnm.t =
   try
@@ -157,7 +135,7 @@ let m : Theory.theory Theory.Mnm.t =
     eprintf "Parsing/Typing Ok@.";
     m
   with e -> 
-    eprintf "%a@." report e;
+    eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
 (***************************)

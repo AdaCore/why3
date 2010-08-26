@@ -43,11 +43,3 @@ val read_config : string option -> config
 
 val save_config : config -> unit
 
-(** error reporting *)
-
-type error
-
-exception Error of error
-
-val report : Format.formatter -> error -> unit
-

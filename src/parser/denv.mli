@@ -95,12 +95,3 @@ val specialize_term : loc:Ptree.loc -> type_var Htv.t -> term -> dterm
 
 val specialize_fmla : loc:Ptree.loc -> type_var Htv.t -> fmla -> dfmla
 
-
-(** Error reporting *)
-
-type error
-
-exception Error of error
-
-val report : Format.formatter -> error -> unit
-

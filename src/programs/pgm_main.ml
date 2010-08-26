@@ -23,16 +23,6 @@ open Format
 open Why
 open Pgm_env
 
-let () = Exn_printer.register
-  (fun fmt exn -> match exn with
-    | Pgm_lexer.Error e ->
-        fprintf fmt "lexical error: %a" Pgm_lexer.report e;
-    | Parsing.Parse_error ->
-        fprintf fmt "syntax error"
-    | Pgm_typing.Error e ->
-        Pgm_typing.report fmt e
-    | _ -> raise exn)
-
 let parse_only _env file c =
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;

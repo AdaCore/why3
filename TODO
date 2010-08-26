@@ -24,3 +24,9 @@ sémantique
   - open (et échouer si "open A" et "open B" avec A et B déclarant un symbole 
     de même nom)
 
+error reporting
+---------------
+
+  - should we create a common [exception Why.Error of exn] to facilitate
+    integration of the library? This would require a special [raise] call:
+        why_raise e = raise (Why.Error e)

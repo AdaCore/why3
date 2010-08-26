@@ -32,15 +32,6 @@ val retrieve : string list -> retrieve_theory
 
 val add_decl : env -> theory Mnm.t -> theory_uc -> Ptree.decl -> theory_uc
 
-(** error reporting *)
-
-type error
-
-exception Error of error
-
-val report : Format.formatter -> error -> unit
-
-
 (******************************************************************************)
 (** The following is exported for program typing (src/programs/pgm_typing.ml) *)
 (******************************************************************************)

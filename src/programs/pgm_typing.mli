@@ -22,12 +22,6 @@ open Theory
 
 val debug : bool ref
 
-type error
-
-exception Error of error
-
-val report : Format.formatter -> error -> unit
-
 val decl : 
   Env.env -> Pgm_env.env -> Pgm_ptree.decl -> Pgm_env.env * Pgm_ttree.decl list
 

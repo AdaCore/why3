@@ -33,14 +33,11 @@ module E = Pgm_effect
 
 let debug = ref false
 
-type error =
-  | Message of string
-
-exception Error of error
+exception Message of string
 
 let error ?loc e = match loc with
-  | None -> raise (Error e)
-  | Some loc -> raise (Loc.Located (loc, Error e))
+  | None -> raise e
+  | Some loc -> raise (Loc.Located (loc, e))
 
 let errorm ?loc f =
   let buf = Buffer.create 512 in
@@ -53,9 +50,9 @@ let errorm ?loc f =
        error ?loc (Message s))
     fmt f
 
-let report fmt = function
-  | Message s ->
-      fprintf fmt "%s" s
+let () = Exn_printer.register (fun fmt e -> match e with
+  | Message s -> fprintf fmt "%s" s
+  | _ -> raise e)
 
 let id_result = "result"
 

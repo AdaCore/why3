@@ -45,8 +45,7 @@ val register_format :
   string -> string list -> read_channel -> unit
   (** [register_format name extensions f1 f2] registers a new format
       under name [name], for files with extensions in list [extensions];
-      [f1] is the function to perform parsing;
-      [f2] is the function to report errors *)
+      [f1] is the function to perform parsing *)
 
 val read_channel : ?name:string -> read_channel
 

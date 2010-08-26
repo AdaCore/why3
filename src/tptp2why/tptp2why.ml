@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** this is a tool to convert tptp files (.p files) to .why files *)
+(** this is a parser for tptp problems (.p files) *)
 
 open TptpTree
 
@@ -31,22 +31,12 @@ open TptpTranslate
 (** module to process a single file *)
 module Process : sig
 
-  (** deprecated *)
-  val printFile : Format.formatter -> string -> string -> string -> unit
-
   val read_channel : Env.read_channel
+
 end = struct
 
   let fromInclude = function | Include x -> x | _ -> assert false
   let isInclude = function | Include _ -> true | _ -> false
-
-  (** report errors *)
-  let () = Exn_printer.register (fun fmt exn -> match exn with
-    | TptpLexer.LexicalError (s, pos) ->
-      Format.fprintf fmt "lexical error: %a@." TptpLexer.report (s, pos)
-    | TptpParser.Error ->
-      Format.fprintf fmt "syntax error.@." (*TODO : find how to report pos*)
-    | e -> raise e)
 
   (** for a given file, returns the list of declarations
   for this file and all the files it includes, recursively *)
@@ -86,60 +76,7 @@ end = struct
       let my_theory = theory_of_decls file decls in
       Theory.Mnm.add "Tptp" my_theory Theory.Mnm.empty
 
-
-  (** process a single file and all includes inside *)
-  let printFile fmter include_dir theoryName filename =
-    let decls = getAllDecls ~first:true include_dir filename in
-    let theory = TptpTranslate.theory_of_decls theoryName decls in
-    (* Format.eprintf "translation done@."; *)
-    Pretty.print_theory fmter theory
-
 end
-
-
-
-(*s main function and arg parsing *)
-
-
-
-(** module for options processing *)
-(*module Init = struct
-
-  let input_files = ref []
-  let output_chan = ref (Format.formatter_of_out_channel stdout)
-  let include_dir = ref "."
-
-  let output_updater filename = if filename <> "-"
-    then output_chan := Format.formatter_of_out_channel (open_out filename)
-    else ()
-
-  let include_updater s = include_dir := s
-
-  let options = [
-    ("-o", String output_updater, "outputs to a file");
-    ("-I", String include_updater, "search for included files in this dir");
-    ("-", Unit (fun () -> input_files := "-" :: !input_files), "reads from stdin")
-  ]
-
-  let usage = "tptp2why [file1|-] [file2...] [-o file] [-I dir]
-  It parses tptp files (fof or cnf format) and prints a why file
-  with one theory per input file."
-
-end
-
-open Init *)
-
-(** read options, and process each input file accordingly *)
-(* let () =
-  parse options (fun file -> input_files := file :: (!input_files)) usage;
-  input_files := List.rev !input_files;
-  let theoryCounter = ref 0 in
-  List.iter
-    (fun x -> let theoryName = "Theory"^(string_of_int !theoryCounter) in
-              incr theoryCounter;
-              Process.printFile !output_chan !include_dir theoryName x)
-    !input_files *)
-
 
 (** register as a .p/.ax file parser *)
 let () = Env.register_format "tptp" ["p"] Process.read_channel

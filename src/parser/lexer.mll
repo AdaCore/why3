@@ -26,24 +26,15 @@
 
   (* lexical errors *)
 
-  type error = 
-    | IllegalCharacter of char
-    | UnterminatedComment
-    | UnterminatedString
+  exception IllegalCharacter of char
+  exception UnterminatedComment
+  exception UnterminatedString
 
-  exception Error of error
-
-  let report fmt = function
+  let () = Exn_printer.register (fun fmt e -> match e with
     | IllegalCharacter c -> fprintf fmt "illegal character %c" c
     | UnterminatedComment -> fprintf fmt "unterminated comment"
     | UnterminatedString -> fprintf fmt "unterminated string"
-
-
-  let () = Exn_printer.register
-    (fun fmt exn -> match exn with
-      | Error error -> report fmt error
-      | _ -> raise exn)
-
+    | _ -> raise e)
 
   let keywords = Hashtbl.create 97
   let () = 
@@ -220,7 +211,7 @@ rule token = parse
   | eof 
       { EOF }
   | _ as c
-      { raise (Error (IllegalCharacter c)) }
+      { raise (IllegalCharacter c) }
 
 and comment = parse
   | "*)" 
@@ -230,7 +221,7 @@ and comment = parse
   | newline 
       { newline lexbuf; comment lexbuf }
   | eof
-      { raise (Loc.Located (!comment_start_loc, Error UnterminatedComment)) }
+      { raise (Loc.Located (!comment_start_loc,UnterminatedComment)) }
   | _ 
       { comment lexbuf }
 
@@ -244,7 +235,7 @@ and string = parse
   | newline 
       { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
   | eof
-      { raise (Loc.Located (!string_start_loc, Error UnterminatedString)) }
+      { raise (Loc.Located (!string_start_loc, UnterminatedString)) }
   | _ as c
       { Buffer.add_char string_buf c; string lexbuf }
 

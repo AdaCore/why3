@@ -1142,16 +1142,6 @@ let try_prover ~(async:(unit->unit)->unit)
           (Why.Driver.print_task driver) g.task;
       Why.Driver.prove_task ~debug ~command ~timelimit ~memlimit driver g.task
     with
-(*
-    | Why.Driver.Error e ->
-        Format.eprintf "Db.try_prover: prove_task reports %a@." 
-          Why.Driver.report e;
-        fun () -> raise Exit
-    | Driver.Error e ->
-        Format.eprintf "Db.try_prover: prove_task reports %a@." 
-          Driver.report e;
-        fun () -> raise Exit
-*)
     | e ->
         try
           Printexc.print (fun () -> raise e) ()

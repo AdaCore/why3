@@ -21,7 +21,6 @@
 
   open TptpTree
 
-
   let translateSpecial t = let module M =
       Map.Make(struct type t=string let compare=String.compare end) in
     let known = List.fold_left (fun acc (x, y) -> M.add x y acc) M.empty [
@@ -31,8 +30,6 @@
     try
       M.find t known
     with _ -> t
-
-
 
 %}
 

@@ -23,6 +23,12 @@
   open Driver_parser
   open Lexer
 
+  exception IllegalCharacter of char
+
+  let () = Exn_printer.register (fun fmt e -> match e with
+    | IllegalCharacter c -> fprintf fmt "illegal character %c" c
+    | _ -> raise e)
+
   let keywords = Hashtbl.create 97
   let () =
     List.iter
@@ -88,7 +94,7 @@ rule token = parse
   | eof
       { EOF }
   | _ as c
-      { raise (Error (IllegalCharacter c)) }
+      { raise (IllegalCharacter c) }
 
 {
   let loc lb = (lexeme_start_p lb, lexeme_end_p lb)
