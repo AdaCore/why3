@@ -224,7 +224,7 @@ and comment = parse
   | newline 
       { newline lexbuf; comment lexbuf }
   | eof
-      { raise (Loc.Located (!comment_start_loc,UnterminatedComment)) }
+      { raise (Loc.Located (!comment_start_loc, UnterminatedComment)) }
   | _ 
       { comment lexbuf }
 
@@ -244,9 +244,8 @@ and string = parse
 
 {
   let with_location f lb =
-    try 
-      f lb 
-    with 
+    if Debug.test_flag Debug.stack_trace then f lb else
+    try f lb with
       | Loc.Located _ as e -> raise e
       | e -> raise (Loc.Located (loc lb, e))
 

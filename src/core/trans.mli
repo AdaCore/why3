@@ -95,3 +95,5 @@ val lookup_transform_l : string -> Env.env -> task tlist
 val list_transforms   : unit -> string list
 val list_transforms_l : unit -> string list
 
+val apply_named : string -> 'a trans -> (task -> 'a)
+

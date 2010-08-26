@@ -46,3 +46,5 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | UnknownFlag s -> Format.fprintf fmt "unknown debug flag `%s'@." s
   | _ -> raise e)
 
+let stack_trace = register_flag "stack_trace"
+

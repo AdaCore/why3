@@ -209,7 +209,6 @@ let call_on_buffer ~command ?timelimit ?memlimit drv buffer =
 (** print'n'prove *)
 
 exception NoPrinter
-exception TransFailure of (string * exn)
 
 let update_task drv task =
   let task, goal = match task with
@@ -240,8 +239,6 @@ let update_task drv task =
   add_tdecl task goal
 
 let print_task drv fmt task =
-  (* TODO: wrong debug flag, should use one in Trans *)
-  let debug = Debug.test_flag Call_provers.debug in
   let p = match drv.drv_printer with
     | None -> raise NoPrinter
     | Some p -> p
@@ -253,8 +250,7 @@ let print_task drv fmt task =
   let transl = List.map lookup_transform drv.drv_transform in
   let apply task (t, tr) =
 (*  Format.printf "@\n@\n[%f] %s@." (Sys.time ()) t; *)
-    try Trans.apply tr task
-    with e when not debug -> raise (TransFailure (t,e))
+    Trans.apply_named t tr task
   in
 (*Format.printf "@\n@\nTASK";*)
   let task = update_task drv task in
@@ -279,8 +275,6 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       "Plugins are not supported, recomplie Why"
   | Duplicate s -> Format.fprintf fmt
       "Duplicate %s specification" s
-  | TransFailure (s,e) -> Format.fprintf fmt
-      "Failure in transformation %s@\n%a" s Exn_printer.exn_printer e
   | UnknownType (thl,idl) -> Format.fprintf fmt
       "Unknown type symbol %s" (string_of_qualid thl idl)
   | UnknownLogic (thl,idl) -> Format.fprintf fmt

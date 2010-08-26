@@ -325,9 +325,6 @@ let memlimit = match !opt_memlimit with
   | Some i when i <= 0 -> 0
   | Some i -> i
 
-(* TODO: move every debugging output to the proper module *)
-let debug = !opt_debug_all
-
 let print_th_namespace fmt th =
   Pretty.print_namespace fmt th.th_name.Ident.id_string th
 
@@ -366,15 +363,8 @@ let do_tasks env drv fname tname th trans task =
   in
   let transl = List.fold_left lookup [] trans in
   let apply tasks (s, tr) =
-    try
-      if debug then Format.eprintf "apply transformation %s@." s;
-      let l = List.fold_left
-        (fun acc task ->
-           List.rev_append (Trans.apply tr task) acc) [] tasks in
-      List.rev l (* In order to keep the order for 1-1 transformation *)
-    with e when not debug ->
-      Format.eprintf "failure in transformation %s@." s;
-      raise e
+    List.rev (List.fold_left (fun acc task ->
+      List.rev_append (Trans.apply_named s tr task) acc) [] tasks)
   in
   let tasks = List.fold_left apply [task] transl in
   List.iter (do_task drv fname tname th) tasks
@@ -453,7 +443,7 @@ let () =
     let env = Env.create_env (Lexer.retrieve !opt_loadpath) in
     let drv = Util.option_map (load_driver env) !opt_driver in
     Queue.iter (do_input env drv) opt_queue
-  with e when not debug ->
+  with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 

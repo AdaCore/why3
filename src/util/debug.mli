@@ -29,3 +29,4 @@ val toggle_flag : flag -> unit
 
 val test_flag : flag -> bool
 
+val stack_trace : flag

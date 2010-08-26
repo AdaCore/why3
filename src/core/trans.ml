@@ -40,7 +40,13 @@ let singleton f x = [f x]
 let compose   f g x =            g (f x)
 let compose_l f g x = list_apply g (f x)
 
+exception TransFailure of (string * exn)
+
 let apply f x = f x
+
+let apply_named s f x = try apply f x with
+  | e when not (Debug.test_flag Debug.stack_trace) ->
+      raise (TransFailure (s,e))
 
 module Wtask = Hashweak.Make (struct
   type t = task_hd
@@ -213,5 +219,8 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       Format.fprintf fmt "Transformation '%s' is already registered" s
   | UnknownTrans s ->
       Format.fprintf fmt "Unknown transformation '%s'" s
+  | TransFailure (s,e) ->
+      Format.fprintf fmt "Failure in transformation %s@\n%a" s
+        Exn_printer.exn_printer e
   | e -> raise e)
 
