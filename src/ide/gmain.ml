@@ -314,6 +314,8 @@ module Model = struct
 
   let all : theory list ref = ref [] 
 
+  let toggle_hide_proved_goals = ref false
+
   let cols = new GTree.column_list
   let name_column = cols#add Gobject.Data.string
   let icon_column = cols#add Gobject.Data.gobject
@@ -422,14 +424,19 @@ module Helpers = struct
   let set_theory_proved t =
     t.verified <- true;
     let row = t.theory_row in
+    goals_view#collapse_row (goals_model#get_path row);
     goals_model#set ~row ~column:Model.status_column !image_yes;
-    goals_view#collapse_row (goals_model#get_path row)
+    if !Model.toggle_hide_proved_goals then
+      goals_model#set ~row ~column:Model.visible_column false
+      
     
   let rec set_proved g =
     let row = g.goal_row in
     g.proved <- true;
     goals_view#collapse_row (goals_model#get_path row);
     goals_model#set ~row ~column:Model.status_column !image_yes;
+    if !Model.toggle_hide_proved_goals then
+      goals_model#set ~row ~column:Model.visible_column false;
     match g.parent with
       | Theory t ->
           if List.for_all (fun g -> g.proved) t.goals then
@@ -689,12 +696,37 @@ let hide_verified_theories () =
          List.iter hide_proved_goal th.Model.goals)
     !Model.all
     
-let show_all_goals () = ()
+
+let rec show_all_goals g =
+  let row = g.Model.goal_row in
+  goals_model#set ~row ~column:Model.visible_column true;
+  if g.Model.proved then
+    goals_view#collapse_row (goals_model#get_path row)
+  else
+    goals_view#expand_row (goals_model#get_path row);
+  List.iter 
+    (fun t -> List.iter show_all_goals t.Model.subgoals)
+    g.Model.transformations
+
+let show_all_theories () = 
+  List.iter
+    (fun th ->
+       let row = th.Model.theory_row in
+       goals_model#set ~row ~column:Model.visible_column true;
+       if th.Model.verified then
+         goals_view#collapse_row (goals_model#get_path row)
+       else
+         goals_view#expand_row (goals_model#get_path row);
+       List.iter show_all_goals th.Model.goals)
+    !Model.all
+    
+
 
 let (_ : GMenu.check_menu_item) = view_factory#add_check_item 
-  ~callback:(function 
-               | true -> hide_verified_theories ()
-               | false -> show_all_goals ())
+  ~callback:(fun b ->
+               Model.toggle_hide_proved_goals := b;
+               if b then hide_verified_theories ()
+               else show_all_theories ())
   "Hide proved goals"
   
 
