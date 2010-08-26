@@ -34,10 +34,13 @@ let list_flags () = Hashtbl.fold (fun s v acc -> (s,s,v)::acc) flag_table []
 
 let test_flag s = !on > 0 && Hashtbl.find flag_table s
 
-let set_flag s = Hashtbl.replace flag_table s true; incr on
-let unset_flag s = Hashtbl.replace flag_table s false; decr on
+let raw_set_flag s = Hashtbl.replace flag_table s true
+let raw_unset_flag s = Hashtbl.replace flag_table s false
 
-let toggle_flag s = if test_flag s then unset_flag s else set_flag s
+let set_flag s = if not (test_flag s) then (raw_set_flag s; incr on)
+let unset_flag s = if test_flag s then (raw_unset_flag s; decr on)
+let toggle_flag s = if test_flag s
+  then (raw_unset_flag s; decr on) else (raw_set_flag s; incr on)
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | UnknownFlag s -> Format.fprintf fmt "unknown debug flag `%s'@." s
