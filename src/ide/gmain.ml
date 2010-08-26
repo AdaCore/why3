@@ -207,9 +207,74 @@ let () =
 *)
 
 
+(*
+
+  boomy icons
+
+*)
+
+let image ?size f =
+  let n = Filename.concat "" (* todo *) (Filename.concat "images" (f^".png"))
+  in
+  match size with
+    | None ->
+        GdkPixbuf.from_file n
+    | Some s ->
+        GdkPixbuf.from_file_at_size ~width:s ~height:s n
+
+let iconname_default = "pause32"
+let iconname_scheduled = "pause32"
+let iconname_running = "play32"
+let iconname_valid = "accept32"
+let iconname_unknown = "help32"
+let iconname_invalid = "delete32"
+let iconname_timeout = "clock32"
+let iconname_failure = "bug32"
+let iconname_yes = "accept32"
+let iconname_no = "delete32"
+let iconname_directory = "folder32"
+let iconname_file = "file32"
+let iconname_prover = "wizard32"
+let iconname_transf = "cut32"
+
+let image_default = ref (image ~size:20 iconname_default)
+let image_scheduled = ref !image_default
+let image_running = ref !image_default
+let image_valid = ref !image_default
+let image_unknown = ref !image_default
+let image_invalid = ref !image_default
+let image_timeout = ref !image_default
+let image_failure = ref !image_default
+let image_yes = ref !image_default
+let image_no = ref !image_default
+let image_directory = ref !image_default
+let image_file = ref !image_default
+let image_prover = ref !image_default
+let image_transf = ref !image_default
+
+let resize_images size =
+  image_default := image ~size iconname_default;
+  image_scheduled := image ~size iconname_scheduled;
+  image_running := image ~size iconname_running;
+  image_valid := image ~size iconname_valid;
+  image_unknown := image ~size iconname_unknown;
+  image_invalid := image ~size iconname_invalid;
+  image_timeout := image ~size iconname_timeout;
+  image_failure := image ~size iconname_failure;
+  image_yes := image ~size iconname_yes;
+  image_no := image ~size iconname_no;
+  image_directory := image ~size iconname_directory;
+  image_file := image ~size iconname_file;
+  image_prover := image ~size iconname_prover;
+  image_transf := image ~size iconname_transf;
+  ()
+
+let () = resize_images 20
+
 (****************)
 (* goals widget *)
 (****************)
+
 
 let split_transformation = Trans.lookup_transform_l "split_goal" env
 
@@ -217,22 +282,35 @@ module Ide_goals = struct
 
   let cols = new GTree.column_list
   let name_column = cols#add Gobject.Data.string
+  let icon_column = cols#add Gobject.Data.gobject
   let id_column = cols#add Gobject.Data.caml
   let proved_column = cols#add Gobject.Data.boolean
   let status_column = cols#add Gobject.Data.gobject
   let time_column = cols#add Gobject.Data.string
   let visible_column = cols#add Gobject.Data.boolean
+(*
+  let bg_column = cols#add (Gobject.Data.unsafe_boxed (Gobject.Type.from_name "GdkColor"))
+*)
 
+  let name_renderer = GTree.cell_renderer_text [`XALIGN 0.] 
   let renderer = GTree.cell_renderer_text [`XALIGN 0.] 
   let image_renderer = GTree.cell_renderer_pixbuf [ ] 
+  let icon_renderer = GTree.cell_renderer_pixbuf [ ]
 
   let view_name_column = 
-    GTree.view_column ~title:"Theories/Goals" 
-      ~renderer:(renderer, ["text", name_column]) () 
+    GTree.view_column ~title:"Theories/Goals" ()
 
   let () = 
+    view_name_column#pack icon_renderer ;
+    view_name_column#add_attribute icon_renderer "pixbuf" icon_column ;
+    view_name_column#pack name_renderer;
+    view_name_column#add_attribute name_renderer "text" name_column;
     view_name_column#set_resizable true;
-    view_name_column#set_max_width 400
+    view_name_column#set_max_width 400;
+(*
+    view_name_column#add_attribute name_renderer "background-gdk" bg_column
+*)
+    ()
 
   let view_status_column = 
     GTree.view_column ~title:"Status" 
@@ -272,8 +350,12 @@ module Ide_goals = struct
     let tname = th.Theory.th_name.Ident.id_string in
     let parent = model#append () in
     model#set ~row:parent ~column:name_column tname;
+    model#set ~row:parent ~column:icon_column !image_directory;
     model#set ~row:parent ~column:id_column th.Theory.th_name;
     model#set ~row:parent ~column:visible_column true;
+(*
+    model#set ~row:parent ~column:bg_column (GDraw.color (`NAME "pink"));
+*)
     let tasks = Task.split_theory th None None in
     let tasks =
       if !split then
@@ -295,6 +377,10 @@ module Ide_goals = struct
 	 let row = model#append ~parent () in
          Ident.Hid.add goal_table id (g,row);
 	 model#set ~row ~column:name_column name;
+         model#set ~row ~column:icon_column !image_file;
+(*
+         model#set ~row ~column:bg_column (GDraw.color (`NAME "cyan"));
+*)
 	 model#set ~row ~column:id_column id;
          model#set ~row ~column:visible_column true;
       )
@@ -338,57 +424,6 @@ let select_goals (goals_view:GTree.tree_store) (task_view:GSourceView2.source_vi
     selected_rows
 
 
-(*
-
-  boomy icons
-
-*)
-
-let image ?size f =
-  let n = Filename.concat "" (* todo *) (Filename.concat "images" (f^".png"))
-  in
-  match size with
-    | None ->
-        GdkPixbuf.from_file n
-    | Some s ->
-        GdkPixbuf.from_file_at_size ~width:s ~height:s n
-
-let iconname_default = "pause32"
-let iconname_scheduled = "pause32"
-let iconname_running = "play32"
-let iconname_valid = "accept32"
-let iconname_unknown = "help32"
-let iconname_invalid = "delete32"
-let iconname_timeout = "clock32"
-let iconname_failure = "bug32"
-let iconname_yes = "accept32"
-let iconname_no = "delete32"
-
-let image_default = ref (image ~size:32 iconname_default)
-let image_scheduled = ref !image_default
-let image_running = ref !image_default
-let image_valid = ref !image_default
-let image_unknown = ref !image_default
-let image_invalid = ref !image_default
-let image_timeout = ref !image_default
-let image_failure = ref !image_default
-let image_yes = ref !image_default
-let image_no = ref !image_default
-
-let resize_images size =
-  image_default := image ~size iconname_default;
-  image_scheduled := image ~size iconname_scheduled;
-  image_running := image ~size iconname_running;
-  image_valid := image ~size iconname_valid;
-  image_unknown := image ~size iconname_unknown;
-  image_invalid := image ~size iconname_invalid;
-  image_timeout := image ~size iconname_timeout;
-  image_failure := image ~size iconname_failure;
-  image_yes := image ~size iconname_yes;
-  image_no := image ~size iconname_no
-
-let () = resize_images 16
-
 let image_of_result = function
   | Scheduler.Scheduled -> !image_scheduled
   | Scheduler.Running -> !image_running
@@ -420,6 +455,7 @@ let prover_on_unproved_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
        Format.eprintf "[GUI thread] scheduling %s on goal %s@." name id.Ident.id_string;
 *)
        let prover_row = model#append ~parent:row () in
+       model#set ~row:prover_row ~column:Ide_goals.icon_column !image_prover;
        model#set ~row:prover_row ~column:Ide_goals.name_column ("prover: " ^name);
        model#set ~row:prover_row ~column:Ide_goals.visible_column true;
        view#expand_row (model#get_path row);
@@ -460,16 +496,24 @@ let split_unproved_goals ~(model:GTree.tree_store) ~(view:GTree.view) () =
        if not proved then         
          let goal_name = model#get ~row ~column:Ide_goals.name_column in
          let callback subgoals =
-           if List.length subgoals >= 2 then
+           if List.length subgoals >= 0 (* 2 *) then
+             let split_row = model#append ~parent:row () in
+             model#set ~row:split_row ~column:Ide_goals.visible_column true;
+             model#set ~row:split_row ~column:Ide_goals.name_column "split";
+             model#set ~row:split_row ~column:Ide_goals.icon_column !image_transf;
+(*
+             model#set ~row:split_row ~column:Ide_goals.bg_column (GDraw.color (`NAME "yellow"));
+*)
              let _ = List.fold_right
                (fun subtask count ->
                   let id = (Task.task_goal subtask).Decl.pr_name in
-                  let subtask_row = model#append ~parent:row () in
+                  let subtask_row = model#append ~parent:split_row () in
                   Ident.Hid.add Ide_goals.goal_table id (subtask,subtask_row);
 	          model#set ~row:subtask_row ~column:Ide_goals.id_column id;
                   model#set ~row:subtask_row ~column:Ide_goals.visible_column true;
                   model#set ~row:subtask_row ~column:Ide_goals.name_column 
                     (goal_name ^ "." ^ (string_of_int count));
+                  model#set ~row:subtask_row ~column:Ide_goals.icon_column !image_file;
                   count+1)
                subgoals 1
              in

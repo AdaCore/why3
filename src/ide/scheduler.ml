@@ -60,7 +60,9 @@ let event_handler () =
     let (a,res,time) = Queue.pop answers_queue in
     decr running_proofs;
     Mutex.unlock queue_lock;
+(*
     eprintf "[Why thread] Scheduler.event_handler: got prover answer@.";
+*)
     (* TODO: update database *)
     (* call GUI callback with argument [res] *)
     let (_,_,_,_,_,_,callback,_) = a in
