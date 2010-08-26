@@ -371,7 +371,7 @@ module Model = struct
     ignore (view#append_column view_name_column);
     ignore (view#append_column view_status_column);
     ignore (view#append_column view_time_column);
-    model,view
+    model,model_filter,view
 
   let clear model = model#clear ()
 
@@ -413,7 +413,7 @@ let scrollview =
 
 let () = scrollview#set_shadow_type `ETCHED_OUT 
 
-let goals_model,goals_view = Model.create ~packing:scrollview#add () 
+let goals_model,filter_model,goals_view = Model.create ~packing:scrollview#add () 
 
 module Helpers = struct
 
@@ -437,10 +437,6 @@ module Helpers = struct
       | Transf t ->
           if List.for_all (fun g -> g.proved) t.subgoals then
             begin
-              (*
-              t.verified <- true;
-                goals_model#set ~row ~column:Model.status_column !image_yes;
-              *)
               set_proved t.parent_goal;
             end
               
@@ -451,7 +447,7 @@ module Helpers = struct
     let mth = { theory = th; 
                 theory_row = parent; 
                 goals = [] ; 
-                verified = true } 
+                verified = false } 
     in
     all := !all @ [mth];
     goals_model#set ~row:parent ~column:name_column tname;
@@ -505,12 +501,13 @@ let move_to_line (v : GText.view) line =
   end
 
 (* to be run when a row in the tree view is selected *)
-let select_goals (goals_view:GTree.tree_store) (task_view:GSourceView2.source_view) 
-   (_source_view:GSourceView2.source_view) selected_rows = 
+let select_goals (filter_model : GTree.model_filter) 
+    (task_view:GSourceView2.source_view) 
+    (_source_view:GSourceView2.source_view) selected_rows = 
   List.iter
     (fun p ->
-       let row = goals_view#get_iter p in
-       let id = goals_view#get ~row ~column:Model.id_column in
+       let row = filter_model#get_iter p in
+       let id = filter_model#get ~row ~column:Model.id_column in
        Format.eprintf "You clicked on %s@." id.Ident.id_string;
        try
          let g = Model.get_goal id in
@@ -667,6 +664,40 @@ let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._E 
     ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) () 
 
+let rec hide_proved_goal g =
+  if g.Model.proved then
+    begin
+      let row = g.Model.goal_row in
+      goals_view#collapse_row (goals_model#get_path row);
+      goals_model#set ~row ~column:Model.visible_column false
+    end
+  else
+    List.iter 
+      (fun t -> List.iter hide_proved_goal t.Model.subgoals)
+      g.Model.transformations
+
+let hide_verified_theories () =
+  List.iter
+    (fun th ->
+       if th.Model.verified then
+         begin
+           let row = th.Model.theory_row in
+           goals_view#collapse_row (goals_model#get_path row);
+           goals_model#set ~row ~column:Model.visible_column false
+         end
+       else
+         List.iter hide_proved_goal th.Model.goals)
+    !Model.all
+    
+let show_all_goals () = ()
+
+let (_ : GMenu.check_menu_item) = view_factory#add_check_item 
+  ~callback:(function 
+               | true -> hide_verified_theories ()
+               | false -> show_all_goals ())
+  "Hide proved goals"
+  
+
 (**************)
 (* Tools menu *)
 (**************)
@@ -799,7 +830,7 @@ let (_ : GtkSignal.id) =
   goals_view#selection#connect#after#changed ~callback:
     begin fun () ->
       let list = goals_view#selection#get_selected_rows in
-      select_goals goals_model task_view source_view list
+      select_goals filter_model task_view source_view list
     end
 
 let () = w#add_accel_group accel_group
