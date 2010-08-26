@@ -18,6 +18,37 @@
 /**************************************************************************/
 
 %{
+  open Theory
+
+  let env_ref  = ref []
+  let lenv_ref = ref []
+  let uc_ref   = ref []
+
+  let ref_get  ref = List.hd !ref
+  let ref_tail ref = List.tl !ref
+  let ref_drop ref = ref := ref_tail ref
+  let ref_pop  ref = let v = ref_get ref in ref_drop ref; v
+
+  let ref_push ref v = ref := v :: !ref
+  let ref_set  ref v = ref := v :: ref_tail ref
+
+  let inside_env env rule lexer lexbuf =
+    ref_push env_ref env;
+      ref_push lenv_ref Mnm.empty;
+    let res = rule lexer lexbuf in
+      ref_drop lenv_ref;
+    ref_drop env_ref;
+    res
+
+  let inside_uc env lenv uc rule lexer lexbuf =
+    ref_push env_ref env;
+      ref_push lenv_ref lenv;
+        ref_push uc_ref uc;
+    let res = rule lexer lexbuf in
+        ref_drop uc_ref;
+      ref_drop lenv_ref;
+    ref_drop env_ref;
+    res
 
   open Ptree
   open Parsing
@@ -93,39 +124,78 @@
 %left OP3
 %left OP4
 %nonassoc prefix_op
-%nonassoc OPPREF
 
 /* Entry points */
 
-%type <Ptree.lexpr> lexpr
-%start lexpr
-%type <Ptree.decl list> list0_decl
-%start list0_decl
-%type <Ptree.logic_file> logic_file
-%start logic_file
+%type <Ptree.lexpr> lexpr_eof
+%start lexpr_eof
+%type <Theory.theory_uc> list0_decl_eof
+%start list0_decl_eof
+%type <Theory.theory Theory.Mnm.t> logic_file_eof
+%start logic_file_eof
 %%
 
-/* File, theory, declaration */
-
-logic_file:
-| list1_theory EOF  { $1 }
-| EOF               { [] }
+logic_file_eof:
+| list0_theory EOF  { ref_get lenv_ref }
 ;
 
-list1_theory:
-| theory                { [$1] }
-| theory list1_theory   { $1 :: $2 }
+list0_decl_eof:
+| list0_decl EOF  { ref_get uc_ref }
+;
+
+lexpr_eof:
+| lexpr EOF  { $1 }
+;
+
+/* File, theory, namespace */
+
+list0_theory:
+| /* epsilon */         { () }
+| theory list0_theory   { () }
+;
+
+theory_head:
+| THEORY uident
+   { let id = $2 in
+     let name = Ident.id_user id.id id.id_loc in
+     ref_push uc_ref (create_theory name); id }
 ;
 
 theory:
-| THEORY uident list0_decl END
-   { { pt_loc = loc (); pt_name = $2; pt_decl = $3 } }
+| theory_head list0_decl END
+   { let uc = ref_pop uc_ref in
+     ref_set lenv_ref (Typing.close_theory (ref_get lenv_ref) $1 uc) }
 ;
 
 list0_decl:
-| /* epsilon */    { [] }
-| decl list0_decl  { $1 :: $2 }
+| /* epsilon */        { () }
+| new_decl list0_decl  { () }
 ;
+
+new_decl:
+| decl
+   { let env = ref_get env_ref in let lenv = ref_get lenv_ref in
+     ref_set uc_ref (Typing.add_decl env lenv (ref_get uc_ref) $1) }
+| namespace_head namespace_import namespace_name list0_decl END
+   { ref_set uc_ref (Typing.close_namespace (loc ()) $2 $3 (ref_get uc_ref)) }
+;
+
+namespace_head:
+| NAMESPACE
+   { ref_set uc_ref (open_namespace (ref_get uc_ref)) }
+;
+
+namespace_import:
+| /* epsilon */  { false }
+| IMPORT         { true }
+;
+
+namespace_name:
+| uident      { Some $1 }
+| UNDERSCORE  { None }
+;
+
+/* Declaration */
 
 decl:
 | TYPE list1_type_decl
@@ -144,14 +214,6 @@ decl:
     { UseClone (loc (), $2, None) }
 | CLONE use clone_subst
     { UseClone (loc (), $2, Some $3) }
-| NAMESPACE uident list0_decl END
-    { Namespace (loc (), false, Some $2, $3) }
-| NAMESPACE UNDERSCORE list0_decl END
-    { Namespace (loc (), false, None, $3) }
-| NAMESPACE IMPORT uident list0_decl END
-    { Namespace (loc (), true, Some $3, $4) }
-| NAMESPACE IMPORT UNDERSCORE list0_decl END
-    { Namespace (loc (), true, None, $4) }
 | META ident list1_meta_arg_sep_comma
     { Meta (loc (), $2, $3) }
 | META STRING list1_meta_arg_sep_comma

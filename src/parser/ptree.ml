@@ -144,14 +144,5 @@ type decl =
   | IndDecl of ind_decl list
   | PropDecl of loc * prop_kind * ident * lexpr
   | UseClone of loc * use * clone_subst list option
-  | Namespace of loc * bool * ident option * decl list
   | Meta of loc * ident * metarg list
-
-type theory = {
-  pt_loc  : loc;
-  pt_name : ident;
-  pt_decl : decl list;
-}
-
-type logic_file = theory list
 

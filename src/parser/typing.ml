@@ -40,11 +40,6 @@ exception TermExpected
 exception BadNumberOfArguments of Ident.ident * int * int
 exception ClashTheory of string
 exception UnboundTheory of qualid
-exception AlreadyTheory of string
-exception UnboundFile of string
-exception UnboundDir of string
-exception AmbiguousPath of string * string
-exception NotInLoadpath of string
 exception CyclicTypeDef
 exception UnboundTypeVar of string
 exception UnboundType of string list
@@ -90,16 +85,6 @@ let () = Exn_printer.register (fun fmt e -> match e with
       fprintf fmt "clash with previous theory %s" s
   | UnboundTheory q ->
       fprintf fmt "unbound theory %a" print_qualid q
-  | AlreadyTheory s ->
-      fprintf fmt "already using a theory with name %s" s
-  | UnboundFile s ->
-      fprintf fmt "no such file %s" s
-  | UnboundDir s ->
-      fprintf fmt "no such directory %s" s
-  | AmbiguousPath (f1, f2) ->
-      fprintf fmt "@[ambiguous path:@ both `%s'@ and `%s'@ match@]" f1 f2
-  | NotInLoadpath f ->
-      fprintf fmt "cannot find `%s' in loadpath" f
   | CyclicTypeDef ->
       fprintf fmt "cyclic type definition"
   | UnboundTypeVar s ->
@@ -109,6 +94,9 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | UnboundSymbol sl ->
        fprintf fmt "Unbound symbol '%a'" (print_list dot pp_print_string) sl
   | _ -> raise e)
+
+let debug_parse_only = Debug.register_flag "parse_only"
+let debug_type_only  = Debug.register_flag "type_only"
 
 (** Environments *)
 
@@ -184,7 +172,7 @@ let ts_tuple n = Hashtbl.replace tuples_needed n (); ts_tuple n
 let fs_tuple n = Hashtbl.replace tuples_needed n (); fs_tuple n
 
 let add_tuple_decls uc =
-  Hashtbl.fold (fun n _ uc -> Theory.use_export uc (tuple_theory n)) 
+  Hashtbl.fold (fun n _ uc -> Theory.use_export uc (tuple_theory n))
     tuples_needed uc
 
 let with_tuples ?(reset=false) f uc x =
@@ -259,7 +247,7 @@ let specialize_psymbol p uc =
     | None -> s, tl
     | Some _ -> let loc = qloc p in error ~loc PredicateExpected
 
-let is_psymbol p uc = 
+let is_psymbol p uc =
   let s = find_lsymbol p uc in
   s.ls_value = None
 
@@ -585,12 +573,12 @@ let add_projections th d = match d.td_def with
 open Ptree
 
 let add_types dl th =
-  let def = List.fold_left 
+  let def = List.fold_left
     (fun def d ->
-      let id = d.td_ident.id in 
+      let id = d.td_ident.id in
       if Mstr.mem id def then error ~loc:d.td_loc (Clash id);
-      Mstr.add id d def) 
-    Mstr.empty dl 
+      Mstr.add id d def)
+    Mstr.empty dl
   in
   let tysymbols = Hashtbl.create 17 in
   let rec visit x =
@@ -645,7 +633,7 @@ let add_types dl th =
       Hashtbl.add tysymbols x (Some ts);
       ts
   in
-  let tsl = List.rev_map (fun d -> visit d.td_ident.id, Tabstract) dl in 
+  let tsl = List.rev_map (fun d -> visit d.td_ident.id, Tabstract) dl in
   let th' = try add_ty_decl th tsl
     with ClashSymbol s -> error ~loc:(Mstr.find s def).td_loc (Clash s)
   in
@@ -752,7 +740,7 @@ let add_logics dl th =
 	      let loc = t.pp_loc in
 	      let ty = dty denv ty in
 	      let t = dterm denv t in
-	      if not (unify t.dt_ty ty) then 
+	      if not (unify t.dt_ty ty) then
 		term_expected_type ~loc t.dt_ty ty;
               let vl = match fs.ls_value with
                 | Some _ -> mk_vlist fs.ls_args
@@ -821,18 +809,7 @@ let add_inductives dl th =
   | TooSpecificIndDecl (_,pr,t) -> errorm ~loc:(loc_of_id pr.pr_name)
       "term @[%a@] is too specific" Pretty.print_term t
 
-(* parse file and store all theories into parsed_theories *)
-
-let load_channel file c =
-  let lb = Lexing.from_channel c in
-  Loc.set_file file lb;
-  Lexer.parse_logic_file lb
-
-let load_file file =
-  let c = open_in file in
-  let tl = load_channel file c in
-  close_in c;
-  tl
+(* parse declarations *)
 
 let prop_kind = function
   | Kaxiom -> Paxiom
@@ -848,15 +825,7 @@ let find_theory env lenv q id = match q with
       (* theory in file f *)
       find_theory env q id
 
-let rec type_theory env lenv id pt =
-  let n = id_user id.id id.id_loc in
-  let th = create_theory n in
-  let th = add_decls env lenv th pt.pt_decl in
-  close_theory th
-
-and add_decls env lenv th = List.fold_left (add_decl env lenv) th
-
-and add_decl env lenv th = function
+let add_decl env lenv th = function
   | TypeDecl dl ->
       add_types dl th
   | LogicDecl dl ->
@@ -872,7 +841,6 @@ and add_decl env lenv th = function
 	  find_theory env lenv q id
 	with
 	  | TheoryNotFound _ -> error ~loc (UnboundTheory use.use_theory)
-	  | AmbiguousPath _ as e -> error ~loc e
       in
       let use_or_clone th = match subst with
 	| None ->
@@ -925,12 +893,6 @@ and add_decl env lenv th = function
 	    use_or_clone th
       with ClashSymbol s -> error ~loc (Clash s)
       end
-  | Namespace (loc, import, name, dl) ->
-      let th = open_namespace th in
-      let th = add_decls env lenv th dl in
-      let id = option_map (fun id -> id.id) name in
-      begin try close_namespace th import id
-      with ClashSymbol s -> error ~loc (Clash s) end
   | Meta (loc, id, al) ->
       let s = id.id in
       let convert = function
@@ -944,46 +906,19 @@ and add_decl env lenv th = function
       begin try add_meta th (lookup_meta s) al
       with e -> raise (Loc.Located (loc,e)) end
 
-and type_and_add_theory env lenv pt =
-  let id = pt.pt_name in
-  if Mnm.mem id.id lenv || id.id = builtin_theory.th_name.id_string
-    then error (ClashTheory id.id);
-  let th = type_theory env lenv id pt in
-  Mnm.add id.id th lenv
+let add_decl env lenv th d =
+  if Debug.test_flag debug_parse_only then th else
+  add_decl env lenv th d
 
-let type_theories env tl =
-  List.fold_left (type_and_add_theory env) Mnm.empty tl
+let close_theory lenv { id = id ; id_loc = loc } th =
+  if Mnm.mem id lenv then error ~loc (ClashTheory id);
+  if Debug.test_flag debug_parse_only then lenv else
+  Mnm.add id (close_theory th) lenv
 
-let read_file env file =
-  let tl = load_file file in
-  type_theories env tl
-
-let debug_parse_only = Debug.register_flag "parse_only"
-let debug_type_only  = Debug.register_flag "type_only"
-
-let read_channel env file ic =
-  let tl = load_channel file ic in
-  if Debug.test_flag debug_parse_only then Mnm.empty else
-  let tl = type_theories env tl in
-  if Debug.test_flag debug_type_only then Mnm.empty else
-  tl
-
-let locate_file lp sl =
-  let f = List.fold_left Filename.concat "" sl ^ ".why" in
-  let fl = List.map (fun dir -> Filename.concat  dir f) lp in
-  match List.filter Sys.file_exists fl with
-    | [] -> raise Not_found
-    | [file] -> file
-    | file1 :: file2 :: _ -> error (AmbiguousPath (file1, file2))
-
-let retrieve lp env sl =
-  let file = locate_file lp sl in
-  read_file env file
-
-
-(** register Why parser *)
-
-let () = Env.register_format "why" ["why"] read_channel
+let close_namespace loc import name th =
+  let id = option_map (fun id -> id.id) name in
+  try close_namespace th import id
+  with ClashSymbol s -> error ~loc (Clash s)
 
 (*
 Local Variables:

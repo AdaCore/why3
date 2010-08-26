@@ -106,7 +106,7 @@ let source_text =
   close_in ic;
   buf
 
-let env = Why.Env.create_env (Why.Typing.retrieve config.loadpath)
+let env = Why.Env.create_env (Why.Lexer.retrieve config.loadpath)
 
 
 (***********************)

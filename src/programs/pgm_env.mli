@@ -62,7 +62,10 @@ val empty_env : theory_uc -> env
 val add_global : preid -> type_v -> env -> lsymbol * env
 
 val add_decl : decl -> env -> env
-val add_pdecl : Env.env -> Ptree.decl -> env -> env
+
+val logic_lexpr : Lexing.position * string -> Ptree.lexpr
+
+val logic_decls : Lexing.position * string -> Env.env -> env -> env
 
 val add_exception : preid -> ty option -> env -> lsymbol * env
 

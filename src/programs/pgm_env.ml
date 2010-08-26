@@ -160,6 +160,24 @@ let purify env v =
   let tyl, ty = uncurry_type v in 
   make_arrow_type env tyl ty
 
+(* parsing LOGIC strings using functions from src/parser/
+   requires proper relocation *)
+
+let reloc loc lb =
+  lb.Lexing.lex_curr_p <- loc;
+  lb.Lexing.lex_abs_pos <- loc.Lexing.pos_cnum
+
+let parse_string f loc s =
+  let lb = Lexing.from_string s in
+  reloc loc lb;
+  f lb
+
+let logic_lexpr (loc, s) = parse_string Lexer.parse_lexpr loc s
+
+let logic_decls (loc, s) e env =
+  let parse = Lexer.parse_list0_decl e Mnm.empty env.uc in
+  { env with uc = parse_string parse loc s }
+
 (* addition *)
 
 let add_global id tyv env = 
@@ -169,9 +187,6 @@ let add_global id tyv env =
 
 let add_decl d env = 
   { env with uc = Typing.with_tuples add_decl env.uc d }
-
-let add_pdecl e d env =
-  { env with uc = Typing.add_decl e Mnm.empty env.uc d }
 
 let add_exception id ty env =
   let tyl = match ty with None -> [] | Some ty -> [ty] in

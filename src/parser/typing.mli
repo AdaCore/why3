@@ -23,29 +23,30 @@ open Util
 open Ty
 open Term
 open Theory
-open Env
 
 val debug_parse_only : Debug.flag
 val debug_type_only : Debug.flag
 
-val retrieve : string list -> retrieve_theory
-  (** creates a new typing environment for a given loadpath *)
-
 (** incremental parsing *)
 
-val add_decl : env -> theory Mnm.t -> theory_uc -> Ptree.decl -> theory_uc
+val add_decl : Env.env -> theory Mnm.t -> theory_uc -> Ptree.decl -> theory_uc
+
+val close_namespace :
+  Loc.position -> bool -> Ptree.ident option -> theory_uc -> theory_uc
+
+val close_theory : theory Mnm.t -> Ptree.ident -> theory_uc -> theory Mnm.t
 
 (******************************************************************************)
 (** The following is exported for program typing (src/programs/pgm_typing.ml) *)
 (******************************************************************************)
 
-val specialize_fsymbol : 
+val specialize_fsymbol :
   Ptree.qualid -> theory_uc -> lsymbol * Denv.dty list * Denv.dty
 
-val specialize_psymbol : 
+val specialize_psymbol :
   Ptree.qualid -> theory_uc -> lsymbol * Denv.dty list
 
-val specialize_tysymbol : 
+val specialize_tysymbol :
   Loc.position -> Ptree.qualid -> theory_uc -> Ty.tysymbol * int
 
 type denv
@@ -72,6 +73,6 @@ val qloc : Ptree.qualid -> Loc.position
 val ts_tuple : int -> Ty.tysymbol
 val fs_tuple : int -> Term.lsymbol
 
-val with_tuples : 
+val with_tuples :
   ?reset:bool -> (theory_uc -> 'a -> 'b) -> theory_uc -> 'a -> 'b
 

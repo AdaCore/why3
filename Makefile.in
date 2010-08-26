@@ -117,7 +117,7 @@ LIB_UTIL = exn_printer debug pp loc print_tree \
 
 LIB_CORE = ident ty term pattern decl theory task pretty env printer trans
 
-LIB_PARSER = ptree parser lexer denv typing
+LIB_PARSER = ptree denv typing parser lexer
 
 LIB_DRIVER = call_provers driver_ast driver_parser driver_lexer driver \
 	     whyconf
@@ -157,6 +157,20 @@ LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
 
 $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why
+
+LIB_PARSER_POSTLUDE = \
+  "let logic_file_eof env = inside_env env logic_file_eof\n" \
+  "let list0_decl_eof env lenv uc = inside_uc env lenv uc list0_decl_eof"
+
+LIB_PARSER_INTERFACE = \
+  -e "s/^val \+logic_file_eof *:/\0 Env.env ->/" \
+  -e "s/^val \+list0_decl_eof *:/\0 Env.env -> \
+  Theory.theory Theory.Mnm.t -> Theory.theory_uc ->/"
+
+src/parser/parser.ml src/parser/parser.mli: src/parser/parser.mly
+	$(OCAMLYACC) $<
+	echo $(LIB_PARSER_POSTLUDE) >> src/parser/parser.ml
+	sed -i $(LIB_PARSER_INTERFACE) src/parser/parser.mli
 
 # build targets
 

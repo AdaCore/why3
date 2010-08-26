@@ -17,12 +17,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Theory
+
 (** parsing entry points *)
 
-val parse_list0_decl : Lexing.lexbuf -> Ptree.decl list
-val parse_lexpr      : Lexing.lexbuf -> Ptree.lexpr
+val retrieve : string list -> Env.retrieve_theory
+  (** creates a new typing environment for a given loadpath *)
 
-val parse_logic_file : Lexing.lexbuf -> Ptree.logic_file
+val parse_list0_decl :
+  Env.env -> theory Mnm.t -> theory_uc -> Lexing.lexbuf -> theory_uc
+
+val parse_lexpr : Lexing.lexbuf -> Ptree.lexpr
 
 (** other functions to be re-used in other lexers/parsers *)
 

@@ -450,7 +450,7 @@ let do_input env drv = function
 
 let () =
   try
-    let env = Env.create_env (Typing.retrieve !opt_loadpath) in
+    let env = Env.create_env (Lexer.retrieve !opt_loadpath) in
     let drv = Util.option_map (load_driver env) !opt_driver in
     Queue.iter (do_input env drv) opt_queue
   with e when not debug ->

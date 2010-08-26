@@ -29,11 +29,14 @@
   exception IllegalCharacter of char
   exception UnterminatedComment
   exception UnterminatedString
+  exception AmbiguousPath of string * string
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | IllegalCharacter c -> fprintf fmt "illegal character %c" c
     | UnterminatedComment -> fprintf fmt "unterminated comment"
     | UnterminatedString -> fprintf fmt "unterminated string"
+    | AmbiguousPath (f1, f2) ->
+        fprintf fmt "ambiguous path:@ both `%s'@ and `%s'@ match" f1 f2
     | _ -> raise e)
 
   let keywords = Hashtbl.create 97
@@ -239,10 +242,7 @@ and string = parse
   | _ as c
       { Buffer.add_char string_buf c; string lexbuf }
 
-
-
 {
-
   let with_location f lb =
     try 
       f lb 
@@ -250,11 +250,35 @@ and string = parse
       | Loc.Located _ as e -> raise e
       | e -> raise (Loc.Located (loc lb, e))
 
-  let parse_logic_file = with_location (logic_file token)
+  let parse_logic_file env = with_location (logic_file_eof env token)
 
-  let parse_lexpr = with_location (lexpr token)
-  let parse_list0_decl = with_location (list0_decl token)
+  let parse_list0_decl env lenv uc =
+    with_location (list0_decl_eof env lenv uc token)
 
+  let parse_lexpr = with_location (lexpr_eof token)
+
+  let read_channel env file c =
+    let lb = Lexing.from_channel c in
+    Loc.set_file file lb;
+    parse_logic_file env lb
+
+  let retrieve lp env sl =
+    let f = List.fold_left Filename.concat "" sl ^ ".why" in
+    let fl = List.map (fun dir -> Filename.concat dir f) lp in
+    let file = match List.filter Sys.file_exists fl with
+      | [] -> raise Not_found
+      | [file] -> file
+      | file1 :: file2 :: _ -> raise (AmbiguousPath (file1, file2))
+    in
+    let c = open_in file in
+    try
+      let tl = read_channel env file c in
+      close_in c;
+      tl
+    with
+      | e -> close_in c; raise e
+
+  let () = Env.register_format "why" ["why"] read_channel
 }
 
 (*

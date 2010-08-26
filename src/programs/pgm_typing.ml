@@ -56,22 +56,6 @@ let () = Exn_printer.register (fun fmt e -> match e with
 
 let id_result = "result"
 
-(* parsing LOGIC strings using functions from src/parser/
-   requires proper relocation *)
-
-let reloc loc lb =
-  lb.Lexing.lex_curr_p <- loc;
-  lb.Lexing.lex_abs_pos <- loc.Lexing.pos_cnum
-    
-let parse_string f loc s =
-  let lb = Lexing.from_string s in
-  reloc loc lb;
-  f lb
-
-let logic_list0_decl (loc, s) = parse_string Lexer.parse_list0_decl loc s
-  
-let lexpr (loc, s) = parse_string Lexer.parse_lexpr loc s
-
 (* phase 1: typing programs (using destructive type inference) **************)
 
 let dty_app (ts, tyl) = assert (ts.ts_def = None); Tyapp (ts, tyl)
@@ -213,8 +197,8 @@ let deffect env e =
       List.map (fun id -> let ls,_,_ = dexception env id in ls) 
 	e.Pgm_ptree.pe_raises; }
 
-let dterm env l = Typing.dterm env (lexpr l)
-let dfmla env l = Typing.dfmla env (lexpr l)
+let dterm env l = Typing.dterm env (Pgm_env.logic_lexpr l)
+let dfmla env l = Typing.dfmla env (Pgm_env.logic_lexpr l)
 
 let dpost env ty (q, ql) =
   let dexn (id, l) =
@@ -1206,11 +1190,8 @@ let cannot_be_generalized gl = function
       false
 
 let decl env gl = function
-  | Pgm_ptree.Dlogic dl -> 
-      let dl = logic_list0_decl dl in
-      let add1 gl d = Pgm_env.add_pdecl env d gl in
-      let gl = List.fold_left add1 gl dl in
-      gl, []
+  | Pgm_ptree.Dlogic dl ->
+      Pgm_env.logic_decls dl env gl, []
   | Pgm_ptree.Dlet (id, e) -> 
       let e = type_expr gl e in
       if Debug.test_flag debug then
