@@ -46,7 +46,6 @@
       | Parsing.Parse_error -> Format.fprintf fmt "syntax error"
       | _ -> raise exn
     )
-
 %}
 
 /* Tokens */

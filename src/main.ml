@@ -407,28 +407,21 @@ let do_input env drv = function
         | "-" -> "stdin", stdin
         | f   -> f, open_in f
       in
-      let report = Env.report ?name:!opt_parser fname in
-      try
-	let m =
-	  Env.read_channel ?name:!opt_parser ~debug:!opt_debug
-	    ~parse_only:!opt_parse_only ~type_only:!opt_type_only
-	    env fname cin
-	in
-        close_in cin;
-        if !opt_type_only then
-	  ()
-        else if Queue.is_empty tlist then
-          let glist = Queue.create () in
-          let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-          let do_th _ (t,th) = do_theory env drv fname t th trans glist in
-          Ident.Mid.iter do_th (Mnm.fold add_th m Ident.Mid.empty)
-        else
-          Queue.iter (do_local_theory env drv fname m) tlist
-      with
-	| Loc.Located (loc, e) ->
-	    eprintf "@[%a%a@]@." Loc.report_position loc report e; exit 1
-	| e ->
-	    eprintf "@[%a@]@." report e; exit 1
+      let m =
+        Env.read_channel ?name:!opt_parser ~debug:!opt_debug
+          ~parse_only:!opt_parse_only ~type_only:!opt_type_only
+          env fname cin
+      in
+      close_in cin;
+      if !opt_type_only then
+        ()
+      else if Queue.is_empty tlist then
+        let glist = Queue.create () in
+        let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
+        let do_th _ (t,th) = do_theory env drv fname t th trans glist in
+        Ident.Mid.iter do_th (Mnm.fold add_th m Ident.Mid.empty)
+      else
+        Queue.iter (do_local_theory env drv fname m) tlist
 
 let () =
   try

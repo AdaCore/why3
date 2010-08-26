@@ -23,23 +23,15 @@ open Format
 open Why
 open Pgm_env
 
-let rec report fmt = function
-  | Lexer.Error e ->
-      fprintf fmt "lexical error: %a" Lexer.report e;
-  | Pgm_lexer.Error e ->
-      fprintf fmt "lexical error: %a" Pgm_lexer.report e;
-  | Loc.Located (loc, e) ->
-      fprintf fmt "%a%a" Loc.report_position loc report e
-  | Parsing.Parse_error ->
-      fprintf fmt "syntax error"
-  | Typing.Error e ->
-      Typing.report fmt e
-  | Pgm_typing.Error e ->
-      Pgm_typing.report fmt e
-  | Denv.Error e ->
-      Denv.report fmt e
-  | e ->
-      raise e
+let () = Exn_printer.register
+  (fun fmt exn -> match exn with
+    | Pgm_lexer.Error e ->
+        fprintf fmt "lexical error: %a" Pgm_lexer.report e;
+    | Parsing.Parse_error ->
+        fprintf fmt "syntax error"
+    | Pgm_typing.Error e ->
+        Pgm_typing.report fmt e
+    | _ -> raise exn)
 
 let parse_only _env file c =
   let lb = Lexing.from_channel c in
@@ -77,8 +69,7 @@ let read_channel
     end
   end
 
-let () =
-  Env.register_format "whyml" ["mlw"] read_channel report
+let () = Env.register_format "whyml" ["mlw"] read_channel
 
 (*
 Local Variables: 

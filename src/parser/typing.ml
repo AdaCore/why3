@@ -988,19 +988,7 @@ let retrieve lp env sl =
 
 (** register Why parser *)
 
-let error_report fmt = function
-  | Lexer.Error e ->
-      fprintf fmt "lexical error: %a" Lexer.report e;
-  | Parsing.Parse_error ->
-      fprintf fmt "syntax error"
-  | Denv.Error e ->
-      Denv.report fmt e
-  | Error e ->
-      report fmt e
-  | e -> 
-      raise e
-
-let () = Env.register_format "why" ["why"] read_channel error_report
+let () = Env.register_format "why" ["why"] read_channel
 
 (*
 Local Variables:

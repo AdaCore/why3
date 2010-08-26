@@ -35,22 +35,18 @@ module Process : sig
   val printFile : Format.formatter -> string -> string -> string -> unit
 
   val read_channel : Env.read_channel
-  val report : Env.error_report
 end = struct
 
   let fromInclude = function | Include x -> x | _ -> assert false
   let isInclude = function | Include _ -> true | _ -> false
 
   (** report errors *)
-  let report fmt = function
+  let () = Exn_printer.register (fun fmt exn -> match exn with
     | TptpLexer.LexicalError (s, pos) ->
       Format.fprintf fmt "lexical error: %a@." TptpLexer.report (s, pos)
     | TptpParser.Error ->
       Format.fprintf fmt "syntax error.@." (*TODO : find how to report pos*)
-    | e -> 
-      Format.fprintf fmt "exception uncaught : %s@." (Printexc.to_string e);
-      raise e
-
+    | e -> raise e)
 
   (** for a given file, returns the list of declarations
   for this file and all the files it includes, recursively *)
@@ -146,8 +142,7 @@ open Init *)
 
 
 (** register as a .p/.ax file parser *)
-let () =
-  Env.register_format "tptp" ["p"] Process.read_channel Process.report
+let () = Env.register_format "tptp" ["p"] Process.read_channel
 
 
 (*

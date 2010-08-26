@@ -71,15 +71,11 @@ type read_channel =
   ?debug:bool -> ?parse_only:bool -> ?type_only:bool ->
   env -> string -> in_channel -> theory Mnm.t
 
-type error_report = Format.formatter -> exn -> unit
-
 let read_channel_table = Hashtbl.create 17 (* parser name -> read_channel *)
-let error_report_table = Hashtbl.create 17 (* parser name -> error_report *)
 let suffixes_table     = Hashtbl.create 17 (* suffix -> parser name *)
 
-let register_format name suffixes rc er =
+let register_format name suffixes rc =
   Hashtbl.add read_channel_table name rc;
-  Hashtbl.add error_report_table name er;
   List.iter (fun s -> Hashtbl.add suffixes_table ("." ^ s) name) suffixes
 
 exception UnknownFormat of string (* parser name *)
@@ -107,11 +103,6 @@ let read_channel ?name ?debug ?parse_only ?type_only env file ic =
   let n = parser_for_file ?name file in
   let rc = find_parser read_channel_table n in
   rc ?debug ?parse_only ?type_only env file ic
-
-let report ?name file fmt e =
-  let n = parser_for_file ?name file in
-  let er = find_parser error_report_table n in
-  er fmt e
 
 let list_formats () =
   let h = Hashtbl.create 17 in
