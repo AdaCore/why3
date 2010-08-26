@@ -18,9 +18,8 @@
 (**************************************************************************)
 
 open Why
-open Theory
 
-val debug : bool ref
+val debug : Debug.flag
 
 val decl : Pgm_env.env -> Pgm_ttree.decl -> Pgm_env.env
   (** takes as input the result of [Pgm_typing.file] and produces

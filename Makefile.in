@@ -112,7 +112,8 @@ LIBGENERATED = src/util/rc.ml src/parser/lexer.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml
 
-LIB_UTIL = exn_printer pp loc print_tree hashweak hashcons util sysutil rc
+LIB_UTIL = exn_printer debug pp loc print_tree \
+	   hashweak hashcons util sysutil rc
 
 LIB_CORE = ident ty term pattern decl theory task pretty env printer trans
 

@@ -38,6 +38,7 @@ let opt_input = ref None
 let opt_theory = ref None
 let opt_trans = ref []
 let opt_metas = ref []
+let opt_debug = ref []
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -78,6 +79,8 @@ let add_opt_goal x = match !opt_theory with
 
 let add_opt_trans x = opt_trans := x::!opt_trans
 
+let add_opt_debug x = opt_debug := x::!opt_debug
+
 let add_opt_meta meta =
   let meta_name, meta_arg =
     let index = String.index meta '=' in
@@ -103,10 +106,11 @@ let opt_list_printers = ref false
 let opt_list_provers = ref false
 let opt_list_formats = ref false
 let opt_list_metas = ref false
+let opt_list_flags = ref false
 
 let opt_parse_only = ref false
 let opt_type_only = ref false
-let opt_debug = ref false
+let opt_debug_all = ref false
 
 let option_list = Arg.align [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
@@ -145,8 +149,14 @@ let option_list = Arg.align [
       "<MiB> Set the prover's memory limit (default: no limit)";
   "--memlimit", Arg.Int (fun i -> opt_timelimit := Some i),
       " same as -m";
+  "-a", Arg.String add_opt_trans,
+      "<transformation> Apply a transformation to every task";
+  "--apply-transform", Arg.String add_opt_trans,
+      " same as -a";
   "-M", Arg.String add_opt_meta,
-    "<meta_name>=<string> Add a meta option to each tasks";
+      "<meta_name>=<string> Add a meta-option to every task";
+  "--meta", Arg.String add_opt_meta,
+      " same as -M";
   "-D", Arg.String (fun s -> opt_driver := Some s),
       "<file> Specify a prover's driver (conflicts with -P)";
   "--driver", Arg.String (fun s -> opt_driver := Some s),
@@ -156,49 +166,53 @@ let option_list = Arg.align [
   "--output", Arg.String (fun s -> opt_output := Some s),
       " same as -o";
   "--print-theory", Arg.Set opt_print_theory,
-      " Print the selected theories";
+      " Print selected theories";
   "--print-namespace", Arg.Set opt_print_namespace,
-      " Print the namespaces of selected theories";
+      " Print namespaces of selected theories";
   "--list-transforms", Arg.Set opt_list_transforms,
-      " List the registered transformations";
+      " List known transformations";
   "--list-printers", Arg.Set opt_list_printers,
-      " List the registered printers";
+      " List known printers";
   "--list-provers", Arg.Set opt_list_provers,
-      " List the known provers";
+      " List known provers";
   "--list-formats", Arg.Set opt_list_formats,
-      " List the known input formats";
+      " List known input formats";
   "--list-metas", Arg.Set opt_list_metas,
-    " List the known metas option (currently only with one string argument)";
+      " List known meta-options of one string argument";
+  "--list-debug-flags", Arg.Set opt_list_flags,
+      " List known debug flags";
   "--parse-only", Arg.Set opt_parse_only,
-      " Stop after parsing";
+      " Stop after parsing (same as --debug parse_only)";
   "--type-only", Arg.Set opt_type_only,
-      " Stop after type checking";
-  "--debug", Arg.Set opt_debug,
-      " Set the debug flag";
-  "-a", Arg.String add_opt_trans,
-  "<transformation> Add a transformation to apply to the task" ;
-  "--apply-transform", Arg.String add_opt_trans,
-  " same as -a" ]
+      " Stop after type checking (same as --debug type_only)";
+  "--debug-all", Arg.Set opt_debug_all,
+      " Set every known debug flag";
+  "--debug", Arg.String add_opt_debug,
+      "<flag> Set a debug flag" ]
 
 let () =
   Arg.parse option_list add_opt_file usage_msg;
 
   (* TODO? : Since drivers can dynlink ml code they can add printer,
      transformations, ... So drivers should be loaded before listing *)
+  let opt_list = ref false in
   if !opt_list_transforms then begin
-    printf "@[<hov 2>Transed non-splitting transformations:@\n%a@]@\n@."
+    opt_list := true;
+    printf "@[<hov 2>Known non-splitting transformations:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
       (List.sort String.compare (Trans.list_transforms ()));
-    printf "@[<hov 2>Transed splitting transformations:@\n%a@]@\n@."
+    printf "@[<hov 2>Known splitting transformations:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
       (List.sort String.compare (Trans.list_transforms_l ()));
   end;
   if !opt_list_printers then begin
-    printf "@[<hov 2>Transed printers:@\n%a@]@\n@."
+    opt_list := true;
+    printf "@[<hov 2>Known printers:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
       (List.sort String.compare (Printer.list_printers ()))
   end;
   if !opt_list_formats then begin
+    opt_list := true;
     let print1 fmt s = fprintf fmt "%S" s in
     let print fmt (p, l) =
       fprintf fmt "%s [%a]" p (Pp.print_list Pp.comma print1) l
@@ -208,26 +222,32 @@ let () =
       (List.sort Pervasives.compare (Env.list_formats ()))
   end;
   if !opt_list_provers then begin
+    opt_list := true;
     let config = read_config !opt_config in
     let print fmt s prover = fprintf fmt "%s (%s)@\n" s prover.name in
     let print fmt m = Mstr.iter (print fmt) m in
     printf "@[<hov 2>Known provers:@\n%a@]@." print config.provers
   end;
   if !opt_list_metas then begin
-    let metas = list_metas () in
+    opt_list := true;
     let fold acc m = match m.meta_type with
       | [MTstring] when m.meta_excl -> Smeta.add m acc
       | _ -> acc
     in
-    let metas = List.fold_left fold Smeta.empty metas in
-    printf "@[<hov 2>Known metas:@\n%a@]@\n@."
+    let metas = List.fold_left fold Smeta.empty (list_metas ()) in
+    printf "@[<hov 2>Known meta-options:@\n%a@]@\n@."
       (Pp.print_iter1 Smeta.iter Pp.newline
          (fun fmt m -> pp_print_string fmt m.meta_name))
       metas
   end;
-  if !opt_list_transforms || !opt_list_printers || !opt_list_provers ||
-     !opt_list_formats || !opt_list_metas
-  then exit 0;
+  if !opt_list_flags then begin
+    opt_list := true;
+    let print fmt (p,_,_) = fprintf fmt "%s" p in
+    printf "@[<hov 2>Known debug flags:@\n%a@]@."
+      (Pp.print_list Pp.newline print)
+      (List.sort Pervasives.compare (Debug.list_flags ()))
+  end;
+  if !opt_list then exit 0;
 
   if Queue.is_empty opt_queue then begin
     Arg.usage option_list usage_msg;
@@ -256,6 +276,14 @@ let () =
     if !opt_driver = None && not !opt_print_namespace then
       opt_print_theory := true
   end;
+
+  if !opt_debug_all then
+    List.iter (fun (_,f,_) -> Debug.set_flag f) (Debug.list_flags ());
+
+  List.iter (fun s -> Debug.set_flag (Debug.lookup_flag s)) !opt_debug;
+
+  if !opt_parse_only then Debug.set_flag Typing.debug_parse_only;
+  if !opt_type_only then Debug.set_flag Typing.debug_type_only;
 
   let config = try read_config !opt_config with Not_found ->
     option_iter (eprintf "Config file '%s' not found.@.") !opt_config;
@@ -297,7 +325,8 @@ let memlimit = match !opt_memlimit with
   | Some i when i <= 0 -> 0
   | Some i -> i
 
-let debug = !opt_debug
+(* TODO: move every debugging output to the proper module *)
+let debug = !opt_debug_all
 
 let print_th_namespace fmt th =
   Pretty.print_namespace fmt th.th_name.Ident.id_string th
@@ -407,11 +436,7 @@ let do_input env drv = function
         | "-" -> "stdin", stdin
         | f   -> f, open_in f
       in
-      let m =
-        Env.read_channel ?name:!opt_parser ~debug:!opt_debug
-          ~parse_only:!opt_parse_only ~type_only:!opt_type_only
-          env fname cin
-      in
+      let m = Env.read_channel ?name:!opt_parser env fname cin in
       close_in cin;
       if !opt_type_only then
         ()

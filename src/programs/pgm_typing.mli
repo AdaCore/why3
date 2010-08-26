@@ -18,9 +18,8 @@
 (**************************************************************************)
 
 open Why
-open Theory
 
-val debug : bool ref
+val debug : Debug.flag
 
 val decl : 
   Env.env -> Pgm_env.env -> Pgm_ptree.decl -> Pgm_env.env * Pgm_ttree.decl list

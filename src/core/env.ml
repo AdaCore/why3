@@ -67,9 +67,7 @@ let env_tag env = env.env_tag
 
 (** Parsers *)
 
-type read_channel =
-  ?debug:bool -> ?parse_only:bool -> ?type_only:bool ->
-  env -> string -> in_channel -> theory Mnm.t
+type read_channel = env -> string -> in_channel -> theory Mnm.t
 
 let read_channel_table = Hashtbl.create 17 (* parser name -> read_channel *)
 let suffixes_table     = Hashtbl.create 17 (* suffix -> parser name *)
@@ -99,10 +97,10 @@ let find_parser table n =
   try Hashtbl.find table n
   with Not_found -> raise (UnknownFormat n)
 
-let read_channel ?name ?debug ?parse_only ?type_only env file ic =
+let read_channel ?name env file ic =
   let n = parser_for_file ?name file in
   let rc = find_parser read_channel_table n in
-  rc ?debug ?parse_only ?type_only env file ic
+  rc env file ic
 
 let list_formats () =
   let h = Hashtbl.create 17 in

@@ -31,7 +31,7 @@ open Pgm_ttree
 open Pgm_env
 module E = Pgm_effect
 
-let debug = ref false
+let debug = Debug.register_flag "program_typing"
 
 exception Message of string
 
@@ -1213,7 +1213,7 @@ let decl env gl = function
       gl, []
   | Pgm_ptree.Dlet (id, e) -> 
       let e = type_expr gl e in
-      if !debug then 
+      if Debug.test_flag debug then
         eprintf "@[--typing %s-----@\n  %a@\n%a@]@." 
 	  id.id print_expr e print_type_v e.expr_type_v;
       let ls, gl = add_global id.id_loc id.id e.expr_type_v gl in
@@ -1227,7 +1227,7 @@ let decl env gl = function
 	let tyv = Mvs.find v env in
 	let loc = loc_of_id v.vs_name in
 	let id = v.vs_name.id_string in
-	if !debug then
+	if Debug.test_flag debug then
           eprintf "@[--typing %s-----@\n  %a@.%a@]@." 
 	    id print_recfun d print_type_v tyv;
 	let ls, gl = add_global loc id tyv gl in

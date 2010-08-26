@@ -958,11 +958,15 @@ let read_file env file =
   let tl = load_file file in
   type_theories env tl
 
-let read_channel 
-    ?(debug=false) ?(parse_only=false) ?(type_only=false) env file ic =
-  ignore (debug, type_only);
+let debug_parse_only = Debug.register_flag "parse_only"
+let debug_type_only  = Debug.register_flag "type_only"
+
+let read_channel env file ic =
   let tl = load_channel file ic in
-  if parse_only then Mnm.empty else type_theories env tl
+  if Debug.test_flag debug_parse_only then Mnm.empty else
+  let tl = type_theories env tl in
+  if Debug.test_flag debug_type_only then Mnm.empty else
+  tl
 
 let locate_file lp sl =
   let f = List.fold_left Filename.concat "" sl ^ ".why" in

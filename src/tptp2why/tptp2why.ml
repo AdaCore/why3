@@ -68,11 +68,12 @@ end = struct
     TptpParser.tptp TptpLexer.token lb
 
 
-  let read_channel
-  ?(debug=false) ?(parse_only=false) ?(type_only=false) _env file c =
-    if debug then Format.eprintf "tptp2why : starts parsing %s@." file;
+  let read_channel _env file c =
     let decls = getDeclsFromChan c in
-    if parse_only || type_only then Theory.Mnm.empty else
+    if Debug.test_flag Typing.debug_parse_only ||
+       Debug.test_flag Typing.debug_type_only
+    then Theory.Mnm.empty
+    else
       let my_theory = theory_of_decls file decls in
       Theory.Mnm.add "Tptp" my_theory Theory.Mnm.empty
 

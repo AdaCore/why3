@@ -23,11 +23,6 @@ open Format
 open Why
 open Pgm_env
 
-let parse_only _env file c =
-  let lb = Lexing.from_channel c in
-  Loc.set_file file lb;
-  ignore (Pgm_lexer.parse_file lb)
-
 let type_and_wp ?(type_only=false) env gl dl =
   let decl gl d = if type_only then gl else Pgm_wp.decl gl d in
   let add gl d = 
@@ -36,16 +31,14 @@ let type_and_wp ?(type_only=false) env gl dl =
   in
   List.fold_left add gl dl
 
-let read_channel 
-    ?(debug=false) ?(parse_only=false) ?(type_only=false) env file c =
-  Pgm_typing.debug := debug;
-  Pgm_wp.debug := debug;
+let read_channel env file c =
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
   let dl = Pgm_lexer.parse_file lb in 
-  if parse_only then 
+  if Debug.test_flag Typing.debug_parse_only then
     Theory.Mnm.empty
   else begin
+    let type_only = Debug.test_flag Typing.debug_type_only in
     let uc = Theory.create_theory (Ident.id_fresh "Pgm") in
     let th = Env.find_theory env ["programs"] "Prelude" in
     let uc = Theory.use_export uc th in

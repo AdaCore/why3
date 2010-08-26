@@ -25,6 +25,9 @@ open Term
 open Theory
 open Env
 
+val debug_parse_only : Debug.flag
+val debug_type_only : Debug.flag
+
 val retrieve : string list -> retrieve_theory
   (** creates a new typing environment for a given loadpath *)
 

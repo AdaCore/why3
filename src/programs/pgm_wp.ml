@@ -31,7 +31,7 @@ open Pgm_env
 
 module E = Pgm_effect
 
-let debug = ref false
+let debug = Debug.register_flag "program_wp"
 
 (* phase 4: weakest preconditions *******************************************)
 
@@ -253,7 +253,7 @@ let well_founded_rel = function
 (* Recursive computation of the weakest precondition *)
 
 let rec wp_expr env e q = 
-  (* if !debug then  *)
+  (* if Debug.test_flag debug then  *)
   (*   eprintf "@[wp_expr: q=%a@]@." Pretty.print_fmla (snd (fst q)); *)
   let lab = fresh_label env in
   let q = post_map (old_label env lab) q in
@@ -388,18 +388,18 @@ let add_wp_decl l f env =
 
 let decl env = function
   | Pgm_ttree.Dlet (ls, e) ->
-      if !debug then
+      if Debug.test_flag debug then
 	eprintf "@[--effect %a-----@\n  %a@]@\n----------------@."
 	  Pretty.print_ls ls print_type_v e.expr_type_v;
       let f = wp env e in
-      if !debug then
+      if Debug.test_flag debug then
 	eprintf "wp = %a@\n----------------@." Pretty.print_fmla f;
       let env = add_wp_decl ls f env in	
       env
   | Pgm_ttree.Dletrec dl ->
       let add_one env (ls, def) = 
 	let f = wp_recfun env def in 
-	if !debug then
+	if Debug.test_flag debug then
 	  eprintf "wp %a = %a@\n----------------@." 
 	    print_ls ls Pretty.print_fmla f;
 	add_wp_decl ls f env
