@@ -213,7 +213,6 @@ let () =
 
 let split_transformation = Trans.lookup_transform_l "split_goal" env
 
-
 module Ide_goals = struct
 
   let cols = new GTree.column_list
@@ -460,21 +459,23 @@ let split_unproved_goals ~(model:GTree.tree_store) ~(view:GTree.view) () =
        let proved = model#get ~row ~column:Ide_goals.proved_column in
        if not proved then         
          let goal_name = model#get ~row ~column:Ide_goals.name_column in
-         let split = Trans.apply split_transformation g in
-         if List.length split >= 2 then
-           let _ = List.fold_right
-             (fun subtask count ->
-                let id = (Task.task_goal subtask).Decl.pr_name in
-                let subtask_row = model#append ~parent:row () in
-                Ident.Hid.add Ide_goals.goal_table id (subtask,subtask_row);
-	        model#set ~row:subtask_row ~column:Ide_goals.id_column id;
-                model#set ~row:subtask_row ~column:Ide_goals.visible_column true;
-                model#set ~row:subtask_row ~column:Ide_goals.name_column 
-                  (goal_name ^ "." ^ (string_of_int count));
-                count+1)
-             split 1
-           in
-           view#expand_row (model#get_path row)
+         let callback subgoals =
+           if List.length subgoals >= 2 then
+             let _ = List.fold_right
+               (fun subtask count ->
+                  let id = (Task.task_goal subtask).Decl.pr_name in
+                  let subtask_row = model#append ~parent:row () in
+                  Ident.Hid.add Ide_goals.goal_table id (subtask,subtask_row);
+	          model#set ~row:subtask_row ~column:Ide_goals.id_column id;
+                  model#set ~row:subtask_row ~column:Ide_goals.visible_column true;
+                  model#set ~row:subtask_row ~column:Ide_goals.name_column 
+                    (goal_name ^ "." ^ (string_of_int count));
+                  count+1)
+               subgoals 1
+             in
+             view#expand_row (model#get_path row)           
+         in
+         Scheduler.apply_transformation ~callback split_transformation g
     )
     Ide_goals.goal_table
 

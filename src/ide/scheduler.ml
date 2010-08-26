@@ -25,7 +25,9 @@ type attempt = bool * int * int * string * string * Driver.driver *
 let prover_attempts_queue : attempt Queue.t = Queue.create ()
 
 (* queue of transformations *)
-let transf_queue  : int Queue.t = Queue.create ()
+let transf_queue  : 
+    ((Task.task list -> unit) * 'a Trans.trans * Task.task) Queue.t 
+    = Queue.create ()
 
 (* queue of prover answers *)
 let answers_queue  : (attempt * proof_attempt_status * float) Queue.t 
@@ -65,11 +67,12 @@ let event_handler () =
     !async (fun () -> callback res time) ()
   with Queue.Empty ->
     try
-      let _t = Queue.pop transf_queue in
+      let (callback,transf,task) = Queue.pop transf_queue in
       Mutex.unlock queue_lock;
-      eprintf "[Why thread] Scheduler.event_handler: transformations not supported yet@.";
+      let subtasks : Task.task list = Trans.apply transf task in
       (* TODO: update database *)
-      (* TODO: call GUI back given new subgoals *)
+      (* call GUI back given new subgoals *)
+      !async (fun () -> callback subtasks) ()
     with Queue.Empty ->
       (* since answers_queue and transf_queue are empty, 
          we are sure that both
@@ -152,5 +155,12 @@ let schedule_proof_attempt ~debug ~timelimit ~memlimit ~prover
   Condition.signal queue_condition;
   Mutex.unlock queue_lock;
   ()
- 
+
+let apply_transformation ~callback transf goal =
+  Mutex.lock queue_lock;
+  Queue.push (callback,transf,goal) transf_queue;
+  Condition.signal queue_condition;
+  Mutex.unlock queue_lock;
+  ()
+  
 
