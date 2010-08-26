@@ -107,11 +107,10 @@ all: @OCAMLBEST@
 # Why library
 #############
 
-LIBGENERATED = src/util/rc.ml \
+LIBGENERATED = src/util/rc.ml src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
-	       src/parser/parser.output src/parser/lexer.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
-	       src/driver/driver_parser.output src/driver/driver_lexer.ml
+	       src/driver/driver_lexer.ml
 
 LIB_UTIL = exn_printer pp loc print_tree hashweak hashcons util sysutil rc
 
@@ -149,7 +148,6 @@ ifeq (@enable_hypothesis_selection@,yes)
 	INCLUDES += -I +ocamlgraph
 	EXTLIBS += ocamlgraph/graph
 endif
-
 
 LIBML  = $(addsuffix .ml,  $(LIBMODULES))
 LIBMLI = $(addsuffix .mli, $(LIBMODULES))
@@ -190,6 +188,8 @@ depend: .depend.lib
 LIBSDIRS = src $(addprefix src/, $(LIBDIRS))
 LIBCLEAN = $(addsuffix /*.cm[iox], $(LIBSDIRS)) \
 	   $(addsuffix /*.annot, $(LIBSDIRS)) \
+	   $(addsuffix /*.output, $(LIBSDIRS)) \
+	   $(addsuffix /*.automaton, $(LIBSDIRS)) \
 	   $(addsuffix /*.o, $(LIBSDIRS)) \
 	   $(addsuffix /*~, $(LIBSDIRS))
 
@@ -229,11 +229,11 @@ install::
 # Whyml
 ########
 
-PGMGENERATED = src/programs/pgm_parser.mli    src/programs/pgm_parser.ml \
-	       src/programs/pgm_parser.output src/programs/pgm_lexer.ml
+PGMGENERATED = src/programs/pgm_parser.mli src/programs/pgm_parser.ml \
+	       src/programs/pgm_lexer.ml
 
-PGM_FILES = pgm_ttree pgm_ptree  pgm_parser pgm_lexer pgm_effect \
-	    pgm_env   pgm_typing pgm_wp pgm_main
+PGM_FILES = pgm_ttree pgm_ptree pgm_parser pgm_lexer pgm_effect \
+	    pgm_env pgm_typing pgm_wp pgm_main
 
 PGMMODULES = $(addprefix src/programs/, $(PGM_FILES))
 
@@ -271,6 +271,7 @@ clean::
 	rm -f $(PGMGENERATED)
 	rm -f src/programs/*.cm[iox] src/programs/*.o
 	rm -f src/programs/*.annot src/programs/*~
+	rm -f src/programs/*.output src/programs/*.automaton
 	rm -f bin/whyml.byte bin/whyml.opt
 	rm -f .depend.programs
 
@@ -442,6 +443,7 @@ clean::
 	rm -f $(TPTPGENERATED)
 	rm -f src/tptp2why/*.cm[iox] src/tptp2why/*.o
 	rm -f src/tptp2why/*.annot src/tptp2why/*~
+	rm -f src/tptp2why/*.output src/tptp2why/*.automaton
 	rm -f bin/whytptp.byte bin/whytptp.opt
 	rm -f .depend.tptp2why
 
@@ -645,7 +647,7 @@ clean::
 %.ml: %.mll
 	$(OCAMLLEX) $<
 
-%.ml %.mli %.output: %.mly
+%.ml %.mli: %.mly
 	$(OCAMLYACC) -v $<
 
 # .ml4.ml:
