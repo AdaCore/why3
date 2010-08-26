@@ -35,18 +35,15 @@ val load_driver : Env.env -> string -> driver
 val file_of_task : driver -> string -> string -> Task.task -> string
 
 val call_on_buffer :
-  ?debug     : bool ->
   command    : string ->
   ?timelimit : int ->
   ?memlimit  : int ->
   driver -> Buffer.t -> unit -> Call_provers.prover_result
 
 val print_task :
-  ?debug : bool ->
   driver -> Format.formatter -> Task.task -> unit
 
 val prove_task :
-  ?debug     : bool ->
   command    : string ->
   ?timelimit : int ->
   ?memlimit  : int ->

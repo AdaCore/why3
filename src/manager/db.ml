@@ -1140,7 +1140,7 @@ let try_prover ~(async:(unit->unit)->unit)
       if false && debug then 
         Format.eprintf "Task for prover: %a@." 
           (Why.Driver.print_task driver) g.task;
-      Why.Driver.prove_task ~debug ~command ~timelimit ~memlimit driver g.task
+      Why.Driver.prove_task ~command ~timelimit ~memlimit driver g.task
     with
     | e ->
         try

@@ -94,7 +94,7 @@ let event_handler () =
             if false && debug then 
               Format.eprintf "Task for prover: %a@." 
                 (Driver.print_task driver) goal;
-            Driver.prove_task ~debug ~command ~timelimit ~memlimit driver goal
+            Driver.prove_task ~command ~timelimit ~memlimit driver goal
           in
           let (_ : Thread.t) = Thread.create 
             (fun () -> 

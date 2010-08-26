@@ -199,12 +199,12 @@ let get_filename drv input_file theory_name goal_name =
 let file_of_task drv input_file theory_name task =
   get_filename drv input_file theory_name (task_goal task).pr_name.id_string
 
-let call_on_buffer ?debug ~command ?timelimit ?memlimit drv buffer =
+let call_on_buffer ~command ?timelimit ?memlimit drv buffer =
   let regexps = drv.drv_regexps in
   let exitcodes = drv.drv_exitcodes in
   let filename = get_filename drv "" "" "" in
   Call_provers.call_on_buffer
-    ?debug ~command ?timelimit ?memlimit ~regexps ~exitcodes ~filename buffer
+    ~command ?timelimit ?memlimit ~regexps ~exitcodes ~filename buffer
 
 (** print'n'prove *)
 
@@ -239,7 +239,9 @@ let update_task drv task =
   in
   add_tdecl task goal
 
-let print_task ?(debug=false) drv fmt task =
+let print_task drv fmt task =
+  (* TODO: wrong debug flag, should use one in Trans *)
+  let debug = Debug.test_flag Call_provers.debug in
   let p = match drv.drv_printer with
     | None -> raise NoPrinter
     | Some p -> p
@@ -259,11 +261,11 @@ let print_task ?(debug=false) drv fmt task =
   let task = List.fold_left apply task transl in
   fprintf fmt "@[%a@]@?" printer task
 
-let prove_task ?debug ~command ?timelimit ?memlimit drv task =
+let prove_task ~command ?timelimit ?memlimit drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
-  print_task ?debug drv fmt task; pp_print_flush fmt ();
-  call_on_buffer ?debug ~command ?timelimit ?memlimit drv buf
+  print_task drv fmt task; pp_print_flush fmt ();
+  call_on_buffer ~command ?timelimit ?memlimit drv buf
 
 (* exception report *)
 

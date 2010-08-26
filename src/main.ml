@@ -337,13 +337,13 @@ let do_task drv fname tname (th : Why.Theory.theory) (task : Task.task) =
   match !opt_output, !opt_command with
     | None, Some command ->
         let res =
-          Driver.prove_task ~debug ~command ~timelimit ~memlimit drv task ()
+          Driver.prove_task ~command ~timelimit ~memlimit drv task ()
         in
         printf "%s %s %s : %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
           Call_provers.print_prover_result res
     | None, None ->
-        Driver.print_task ~debug drv std_formatter task
+        Driver.print_task drv std_formatter task
     | Some dir, _ ->
         let fname = Filename.basename fname in
         let fname =
@@ -356,7 +356,7 @@ let do_task drv fname tname (th : Why.Theory.theory) (task : Task.task) =
         let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
         let ext = String.sub dest i (String.length dest - i) in
         let cout = open_out (Filename.concat dir (name ^ ext)) in
-        Driver.print_task ~debug drv (formatter_of_out_channel cout) task;
+        Driver.print_task drv (formatter_of_out_channel cout) task;
         close_out cout
 
 let do_tasks env drv fname tname th trans task =

@@ -51,8 +51,10 @@ val print_prover_result : Format.formatter -> prover_result -> unit
     The output of the prover is printed if and only if the answer is
     a [HighFailure] *)
 
+val debug : Debug.flag
+(** debug flag for the calling procedure (option "--debug call_prover") *)
+
 val call_on_buffer :
-  ?debug     : bool ->
   command    : string ->
   ?timelimit : int ->
   ?memlimit  : int ->
