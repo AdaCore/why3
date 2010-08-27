@@ -241,7 +241,78 @@ let preferences c =
   dialog#add_button "Close" `CLOSE ;
   let ( _ : GWindow.Buttons.about) = dialog#run () in
   dialog#destroy ()
+
+
+
+
+
+(* auto-detection of provers *)
+
+type prover_kind = ATP | ITP
+type prover_autodetection_data =
+    { kind : prover_kind;
+      prover_id : string;
+      mutable prover_name : string;
+      mutable commands : string list;
+      mutable version_switch : string;
+      mutable version_regexp : string;
+      mutable versions_ok : string list;
+      mutable versions_old : string list;
+    }
+
+let default k id =
+  { kind = k;
+    prover_id = id;
+    prover_name = "";
+    commands = [];
+    version_switch = "";
+    version_regexp = "";
+    versions_ok = [];
+    versions_old = [];
+    }
+
+let load_prover d (key, value) = 
+  match key with
+    | "name" -> d.prover_name <- Rc.string value
+    | "command" -> d.commands <- Rc.string value :: d.commands
+    | "version_switch" -> d.version_switch <- Rc.string value
+    | "version_regexp" -> d.version_regexp <- Rc.string value
+    | "version_ok" -> d.versions_ok <- Rc.string value :: d.versions_ok
+    | "version_old" -> d.versions_old <- Rc.string value :: d.versions_old
+    | s -> 
+        eprintf "unknown key [%s] in autodetection data@." s;
+        exit 1
+        
+let load acc (key,l) =
+  match key with
+    | ["ATP" ; id] -> 
+        let d = default ATP id in
+        List.iter (load_prover d) l;
+        d :: acc
+    | ["ITP" ; id] -> 
+        let d = default ITP id in
+        List.iter (load_prover d) l;
+        d :: acc
+    | s :: _ ->
+        eprintf "unknown section [%s] in auto detection data@." s;
+        exit 1
+    | [] -> assert false
   
+let read_auto_detection_data () =
+  try
+    let rc = Rc.from_file "prover-detection-data.conf" in
+    List.fold_left load [] rc
+  with
+    | Failure "lexing" -> 
+        eprintf "Syntax error in prover-detection-data.conf@.";
+        exit 2
+    | Not_found ->
+        eprintf "prover-detection-data.conf not found@.";
+        exit 2
+    
+
+
+
 (*
 Local Variables: 
 compile-command: "unset LANG; make -C ../.. bin/whyide.opt"
