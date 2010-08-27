@@ -60,18 +60,20 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     <!-- here's the main context -->
     <context id="why">
       <include>
-	<context id="symbol-star" style-ref="decimal">
+	<context id="symbol-star">
 	  <match>\(\*\)</match>
 	</context>
 	<context id="comment" style-ref="comment">
 	  <start>\(\*</start>
 	  <end>\*\)</end>
 	  <include>
+	    <context ref="symbol-star"/>
 	    <context id="comment-in-comment" style-ref="comment">
 	      <start>\(\*</start>
 	      <end>\*\)</end>
 	      <include>
 		<context ref="string"/>
+		<context ref="symbol-star"/>
 		<context ref="comment-in-comment"/>
 		<context ref="def:in-comment:*"/>
 	      </include>
