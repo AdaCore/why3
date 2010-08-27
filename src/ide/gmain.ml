@@ -25,16 +25,16 @@ open Format
 open Why
 open Whyconf
 
-(******************************)
-(* loading user configuration *)
-(******************************)
+(*****************************)
+(* loading Why configuration *)
+(*****************************)
 
 let config = 
   try 
     Whyconf.read_config None
   with 
     | Not_found ->
-        eprintf "%s No config file found.@." pname;
+        eprintf "%s no config file found.@." pname;
         exit 1
     | e ->
         eprintf "%a@." Exn_printer.exn_printer e;
@@ -49,12 +49,17 @@ let timelimit =
     | Some n -> n
 
 
-(* TODO: put that in config file *)
-let window_width = 1024
-let window_height = 768
-(*
-let font_name = "Monospace 10"
-*)
+(********************************)
+(* loading WhyIDE configuration *)
+(********************************)
+
+let gconfig = 
+  eprintf "%s reading IDE config file@." pname;
+  Gconfig.read_config ()
+
+(***************************)
+(* parsing comand_line *)
+(***************************)
 
 let spec = [
 ]
@@ -364,12 +369,25 @@ end
 (* Main window *)
 (***************)
 
+let exit_function () =
+  eprintf "%s saving IDE config file@." pname;
+  Gconfig.save_config gconfig;
+  exit 0
+
 let w = GWindow.window 
   ~allow_grow:true ~allow_shrink:true
-  ~width:window_width ~height:window_height 
+  ~width:gconfig.Gconfig.window_width 
+  ~height:gconfig.Gconfig.window_height 
   ~title:"why-ide" ()
 
-let (_ : GtkSignal.id) = w#connect#destroy ~callback:(fun () -> exit 0) 
+let (_ : GtkSignal.id) = w#connect#destroy ~callback:exit_function 
+
+let (_ : GtkSignal.id) = 
+  w#misc#connect#size_allocate 
+    ~callback:
+    (fun {Gtk.width=w;Gtk.height=h} -> 
+       gconfig.Gconfig.window_height <- h;
+       gconfig.Gconfig.window_width <- w)
 
 let vbox = GPack.vbox ~homogeneous:false ~packing:w#add () 
 
@@ -388,7 +406,8 @@ let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:vbox#add ()
 (* tree view *)
 let scrollview = 
   GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC 
-    ~width:(window_width / 3) ~packing:hp#add () 
+    ~width:gconfig.Gconfig.tree_width 
+    ~packing:hp#add () 
 
 let () = scrollview#set_shadow_type `ETCHED_OUT 
 
@@ -472,42 +491,6 @@ end
 let () = 
   Theory.Mnm.iter (fun _ th -> Helpers.add_theory th) theories
 
-
-(****************)
-(* windows, etc *)
-(****************)
-
-let move_to_line (v : GText.view) line = 
-  if line <= v#buffer#line_count && line <> 0 then begin
-    let it = v#buffer#get_iter (`LINE line) in 
-    let mark = `MARK (v#buffer#create_mark it) in
-    v#scroll_to_mark ~use_align:true ~yalign:0.5 mark
-  end
-
-(* to be run when a row in the tree view is selected *)
-let select_goals (filter_model : GTree.model_filter) 
-    (task_view:GSourceView2.source_view) 
-    (_source_view:GSourceView2.source_view) selected_rows = 
-  List.iter
-    (fun p ->
-       let row = filter_model#get_iter p in
-       let id = filter_model#get ~row ~column:Model.id_column in
-       Format.eprintf "You clicked on %s@." id.Ident.id_string;
-       try
-         let g = Model.get_goal id in
-         let task_text = Pp.string_of Pretty.print_task g in
-         task_view#source_buffer#set_text task_text;
-         task_view#scroll_to_mark `INSERT
-       with Not_found -> ()
-
-(*
-       match origin with
-         | Ident.User (_loc,_) -> ()
-             move_to_line source_view#as_view loc.Lexing.pos_lnum
-         | _ -> ()
-*)
-    )
-    selected_rows
 
 
 let image_of_result = function
@@ -636,7 +619,7 @@ let file_menu = factory#add_submenu "_File"
 let file_factory = new GMenu.factory file_menu ~accel_group 
 let (_ : GMenu.image_menu_item) = 
   file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit" 
-    ~callback:(fun () -> exit 0) () 
+    ~callback:exit_function () 
 
 (*************)
 (* View menu *)
@@ -648,6 +631,35 @@ let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._E 
     ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) () 
 
+let rec collapse_proved_goal g =
+  if g.Model.proved then
+    begin
+      let row = g.Model.goal_row in
+      goals_view#collapse_row (goals_model#get_path row);
+    end
+  else
+    List.iter 
+      (fun t -> List.iter collapse_proved_goal t.Model.subgoals)
+      g.Model.transformations
+
+let collapse_verified_theories () =
+  List.iter
+    (fun th ->
+       if th.Model.verified then
+         begin
+           let row = th.Model.theory_row in
+           goals_view#collapse_row (goals_model#get_path row);
+         end
+       else
+         List.iter collapse_proved_goal th.Model.goals)
+    !Model.all
+
+let (_ : GMenu.image_menu_item) = 
+  view_factory#add_image_item ~key:GdkKeysyms._C
+    ~label:"Collapse proved goals" 
+    ~callback:collapse_verified_theories 
+    () 
+  
 let rec hide_proved_goal g =
   if g.Model.proved then
     begin
@@ -803,6 +815,37 @@ let task_view =
 
 let () = task_view#source_buffer#set_language lang
 let () = task_view#set_highlight_current_line true
+
+let move_to_line (v : GText.view) line = 
+  if line <= v#buffer#line_count && line <> 0 then begin
+    let it = v#buffer#get_iter (`LINE line) in 
+    let mark = `MARK (v#buffer#create_mark it) in
+    v#scroll_to_mark ~use_align:true ~yalign:0.5 mark
+  end
+
+(* to be run when a row in the tree view is selected *)
+let select_goals selected_rows = 
+  List.iter
+    (fun p ->
+       let row = filter_model#get_iter p in
+       let id = filter_model#get ~row ~column:Model.id_column in
+       Format.eprintf "You clicked on %s@." id.Ident.id_string;
+       try
+         let g = Model.get_goal id in
+         let task_text = Pp.string_of Pretty.print_task g in
+         task_view#source_buffer#set_text task_text;
+         task_view#scroll_to_mark `INSERT
+       with Not_found -> ()
+
+(*
+       match origin with
+         | Ident.User (_loc,_) -> ()
+             move_to_line source_view#as_view loc.Lexing.pos_lnum
+         | _ -> ()
+*)
+    )
+    selected_rows
+
   
 (***************)
 (* source view *)
@@ -839,7 +882,7 @@ let (_ : GtkSignal.id) =
   goals_view#selection#connect#after#changed ~callback:
     begin fun () ->
       let list = goals_view#selection#get_selected_rows in
-      select_goals filter_model task_view source_view list
+      select_goals list
     end
 
 let () = w#add_accel_group accel_group
