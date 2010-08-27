@@ -410,6 +410,11 @@ let scrollview =
     ~packing:hp#add () 
 
 let () = scrollview#set_shadow_type `ETCHED_OUT 
+let (_ : GtkSignal.id) = 
+  scrollview#misc#connect#size_allocate 
+    ~callback:
+    (fun {Gtk.width=w;Gtk.height=_h} -> 
+       gconfig.Gconfig.tree_width <- w)
 
 let goals_model,filter_model,goals_view = Model.create ~packing:scrollview#add () 
 
@@ -806,11 +811,18 @@ let scrolled_task_view = GBin.scrolled_window
   ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
   ~packing:vp#add ()
   
+let (_ : GtkSignal.id) = 
+  scrolled_task_view#misc#connect#size_allocate 
+    ~callback:
+    (fun {Gtk.width=_w;Gtk.height=h} -> 
+       gconfig.Gconfig.task_height <- h)
+
 let task_view =
   GSourceView2.source_view
     ~editable:false
     ~show_line_numbers:true
-    ~packing:scrolled_task_view#add ~height:500 ~width:650
+    ~packing:scrolled_task_view#add 
+    ~height:gconfig.Gconfig.task_height
     ()
 
 let () = task_view#source_buffer#set_language lang
@@ -863,7 +875,8 @@ let source_view =
     ~show_line_numbers:true
     ~right_margin_position:80 ~show_right_margin:true
     (* ~smart_home_end:true *)
-    ~packing:scrolled_source_view#add ~height:500 ~width:650
+    ~packing:scrolled_source_view#add 
+    (* ~height:500 ~width:650 *)
     ()
 
 (*

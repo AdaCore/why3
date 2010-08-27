@@ -6,12 +6,14 @@ type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
+      mutable task_height : int;
     }
 
 let default = 
   { window_width = 1024;
     window_height = 768;
     tree_width = 512;
+    task_height = 384;
   }
 
 let conf_file = Filename.concat (Rc.get_home_dir ()) ".whyide.conf"
@@ -23,6 +25,7 @@ let save_config config =
   fprintf fmt "width = %d@\n" config.window_width;
   fprintf fmt "height = %d@\n" config.window_height;
   fprintf fmt "tree_width = %d@\n" config.tree_width;
+  fprintf fmt "task_height = %d@\n" config.task_height;
   fprintf fmt "@.";
   close_out ch
 
@@ -31,6 +34,7 @@ let load_main c (key, value) =
     | "width" -> c.window_width <- Rc.int value
     | "height" -> c.window_height <- Rc.int value
     | "tree_width" -> c.tree_width <- Rc.int value
+    | "task_height" -> c.task_height <- Rc.int value
     | s -> 
         eprintf "Warning: ignore unknown key [%s] in whyide config file@." s
         
