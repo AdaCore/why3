@@ -75,7 +75,7 @@ let print_pr fmt pr =
 (* info *)
 
 type info = {
-  info_syn : syntax_map;
+  info_syn : string Mid.t;
   info_rem : Sid.t;
 }
 
@@ -337,11 +337,13 @@ let print_decl info fmt d = match d.d_node with
 let print_decls info fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl info)) dl
 
-let print_task pr thpr syn fmt task =
+let print_task pr thpr fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
-  let info = { info_syn = syn; info_rem = get_remove_set task } in
+  let info = {
+    info_syn = get_syntax_map task;
+    info_rem = get_remove_set task } in
   print_decls info fmt (Task.task_decls task)
 
 let () = register_printer "coq" print_task

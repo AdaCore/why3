@@ -51,7 +51,7 @@ let print_tvsymbols fmt tv =
 let forget_var v = forget_id ident_printer v.vs_name
 
 type info = {
-  info_syn : syntax_map;
+  info_syn : string Mid.t;
   info_rem : Sid.t;
   info_ac  : Sls.t;
 }
@@ -214,11 +214,11 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
-let print_task pr thpr syn fmt task =
+let print_task pr thpr fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   let info = {
-    info_syn = syn;
+    info_syn = get_syntax_map task;
     info_rem = get_remove_set task;
     info_ac  = 
       Task.find_tagged_ls meta_ac (find_meta task meta_ac) Sls.empty }
@@ -227,9 +227,9 @@ let print_task pr thpr syn fmt task =
   ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)
 
 let () = register_printer "alt-ergo" 
-  (fun pr thpr syn fmt task -> 
+  (fun pr thpr fmt task ->
      forget_all ident_printer;
-     print_task pr thpr syn fmt task)
+     print_task pr thpr fmt task)
 
 (*
 let print_goal info fmt (id, f, task) =

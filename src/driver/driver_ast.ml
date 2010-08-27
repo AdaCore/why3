@@ -32,8 +32,8 @@ type metarg =
 
 type th_rule =
   | Rprelude  of string
-  | Rsyntaxts of qualid * string
-  | Rsyntaxls of qualid * string
+  | Rsyntaxts of cloned * qualid * string
+  | Rsyntaxls of cloned * qualid * string
   | Rremovepr of cloned * qualid
   | Rmeta     of cloned * string * metarg list
 

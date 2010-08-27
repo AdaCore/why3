@@ -39,7 +39,6 @@ type driver = {
   drv_transform : string list;
   drv_prelude   : prelude;
   drv_thprelude : prelude_map;
-  drv_syntax    : syntax_map;
   drv_meta      : (theory * Stdecl.t) Mid.t;
   drv_meta_cl   : (theory * Stdecl.t) Mid.t;
   drv_regexps   : (Str.regexp * prover_answer) list;
@@ -103,7 +102,6 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
   List.iter add_global f.f_global;
 
   let thprelude = ref Mid.empty in
-  let syntax    = ref Mid.empty in
   let meta      = ref Mid.empty in
   let meta_cl   = ref Mid.empty in
   let qualid    = ref [] in
@@ -125,14 +123,12 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     | Rprelude s ->
         let l = try Mid.find th.th_name !thprelude with Not_found -> [] in
         thprelude := Mid.add th.th_name (l @ [s]) !thprelude
-    | Rsyntaxls (q,s) ->
-        let ls = find_ls th q in
-        add_meta th (remove_logic ls) meta;
-        syntax := add_ls_syntax ls s !syntax
-    | Rsyntaxts (q,s) ->
-        let ts = find_ts th q in
-        add_meta th (remove_type ts) meta;
-        syntax := add_ts_syntax ts s !syntax
+    | Rsyntaxts (c,q,s) ->
+        let td = syntax_type (find_ts th q) s in
+        add_meta th td (if c then meta_cl else meta)
+    | Rsyntaxls (c,q,s) ->
+        let td = syntax_logic (find_ls th q) s in
+        add_meta th td (if c then meta_cl else meta)
     | Rremovepr (c,q) ->
         let td = remove_prop (find_pr th q) in
         add_meta th td (if c then meta_cl else meta)
@@ -169,7 +165,6 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     drv_filename  = !filename;
     drv_transform = !transform;
     drv_thprelude = !thprelude;
-    drv_syntax    = !syntax;
     drv_meta      = !meta;
     drv_meta_cl   = !meta_cl;
     drv_regexps   = !regexps;
@@ -243,9 +238,7 @@ let print_task drv fmt task =
     | None -> raise NoPrinter
     | Some p -> p
   in
-  let printer =
-    lookup_printer p drv.drv_prelude drv.drv_thprelude drv.drv_syntax
-  in
+  let printer = lookup_printer p drv.drv_prelude drv.drv_thprelude in
   let lookup_transform t = t, lookup_transform t drv.drv_env in
   let transl = List.map lookup_transform drv.drv_transform in
   let apply task (t, tr) =

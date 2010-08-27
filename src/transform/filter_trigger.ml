@@ -79,9 +79,9 @@ let keep_no_builtin rem_ls = function
 
   
 let filter_trigger_builtin =
-  Trans.on_meta Printer.meta_remove_logic (fun tds ->
+  Trans.on_meta Printer.meta_syntax_logic (fun tds ->
     let rem_ls = 
-       Task.find_tagged_ls Printer.meta_remove_logic tds Sls.empty
+       Task.find_tagged_ls Printer.meta_syntax_logic tds Sls.empty
     in
     let rt,rf = make_rt_rf (keep_no_builtin rem_ls) in
     Trans.rewrite rt rf None)

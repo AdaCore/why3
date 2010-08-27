@@ -42,8 +42,8 @@ let elim q d = match d.d_node with
       ld @ id
   | _ -> [d]
 
-let eliminate_builtin = Trans.on_meta Printer.meta_remove_logic (fun tds ->
-  let rem_ls = Task.find_tagged_ls Printer.meta_remove_logic tds Sls.empty in
+let eliminate_builtin = Trans.on_meta Printer.meta_syntax_logic (fun tds ->
+  let rem_ls = Task.find_tagged_ls Printer.meta_syntax_logic tds Sls.empty in
   Trans.decl (elim rem_ls) None)
 
 let () = Trans.register_transform "eliminate_builtin" eliminate_builtin

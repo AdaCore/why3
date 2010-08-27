@@ -48,7 +48,7 @@ let print_var fmt {vs_name = id} =
   fprintf fmt "%s" n
 
 type info = {
-  info_syn : syntax_map;
+  info_syn : string Mid.t;
   info_rem : Sid.t;
 }
 
@@ -203,14 +203,14 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
-let print_task pr thpr syn fmt task = 
+let print_task pr thpr fmt task =
   fprintf fmt "(benchmark why3@\n" 
     (*print_ident (Task.task_goal task).pr_name*);
   fprintf fmt "  :status unknown@\n";
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   let info = {
-    info_syn = syn;
+    info_syn = get_syntax_map task;
     info_rem = get_remove_set task }
   in
   let decls = Task.task_decls task in
@@ -218,6 +218,6 @@ let print_task pr thpr syn fmt task =
   fprintf fmt "@\n)@."
 
 let () = register_printer "smtv1" 
-  (fun pr thpr syn fmt task -> 
+  (fun pr thpr fmt task ->
      forget_all ident_printer;
-     print_task pr thpr syn fmt task)
+     print_task pr thpr fmt task)

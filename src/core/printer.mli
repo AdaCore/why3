@@ -29,11 +29,9 @@ open Task
 type prelude = string list
 type prelude_map = prelude Mid.t
 
-type syntax_map = string Mid.t
-
 type 'a pp = Format.formatter -> 'a -> unit
 
-type printer = prelude -> prelude_map -> syntax_map -> task pp
+type printer = prelude -> prelude_map -> task pp
 
 val register_printer : string -> printer -> unit
 
@@ -46,20 +44,18 @@ val list_printers : unit -> string list
 val print_prelude : prelude pp
 val print_th_prelude : task -> prelude_map pp
 
-val meta_remove_type : meta
-val meta_remove_logic : meta
+val meta_syntax_type : meta
+val meta_syntax_logic : meta
 val meta_remove_prop : meta
 
-val remove_type : tysymbol -> tdecl
-val remove_logic : lsymbol -> tdecl
+val syntax_type : tysymbol -> string -> tdecl
+val syntax_logic : lsymbol -> string -> tdecl
 val remove_prop : prsymbol -> tdecl
 
+val get_syntax_map : task -> string Mid.t
 val get_remove_set : task -> Sid.t
 
-val add_ts_syntax : tysymbol -> string -> syntax_map -> syntax_map
-val add_ls_syntax : lsymbol  -> string -> syntax_map -> syntax_map
-
-val query_syntax : syntax_map -> ident -> string option
+val query_syntax : string Mid.t -> ident -> string option
 
 val syntax_arguments : string -> 'a pp -> 'a list pp
 (** (syntax_arguments templ print_arg fmt l) prints in the formatter fmt

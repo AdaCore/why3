@@ -89,7 +89,7 @@ let print_pr fmt pr =
 (* info *)
 
 type info = {
-  info_syn : syntax_map;
+  info_syn : string Mid.t;
   info_rem : Sid.t;
 }
 
@@ -391,11 +391,13 @@ let print_tdecl fmt td = match td.td_node with
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]@\n@\n"
         m.meta_name (print_list comma print_meta_arg) al
 
-let print_task pr thpr syn fmt task =
+let print_task pr thpr fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
-  info := { info_syn = syn; info_rem = get_remove_set task };
+  info := {
+    info_syn = get_syntax_map task;
+    info_rem = get_remove_set task };
   fprintf fmt "@[<hov 2>theory Task@\n%a@]@\nend@."
     (print_list nothing print_tdecl) (Task.task_tdecls task)
 

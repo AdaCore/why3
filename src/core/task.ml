@@ -220,29 +220,29 @@ exception NotTaggingMeta of meta
 
 let find_tagged_ts t tds acc =
   begin match t.meta_type with
-    | [MTtysymbol] -> ()
+    | MTtysymbol :: _ -> ()
     | _ -> raise (NotTaggingMeta t)
   end;
   Stdecl.fold (fun td acc -> match td.td_node with
-    | Meta (s, [MAts ts]) when meta_equal s t -> Sts.add ts acc
+    | Meta (s, MAts ts :: _) when meta_equal s t -> Sts.add ts acc
     | _ -> assert false) tds.tds_set acc
 
 let find_tagged_ls t tds acc =
   begin match t.meta_type with
-    | [MTlsymbol] -> ()
+    | MTlsymbol :: _ -> ()
     | _ -> raise (NotTaggingMeta t)
   end;
   Stdecl.fold (fun td acc -> match td.td_node with
-    | Meta (s, [MAls ls]) when meta_equal s t -> Sls.add ls acc
+    | Meta (s, MAls ls :: _) when meta_equal s t -> Sls.add ls acc
     | _ -> assert false) tds.tds_set acc
 
 let find_tagged_pr t tds acc =
   begin match t.meta_type with
-    | [MTprsymbol] -> ()
+    | MTprsymbol :: _ -> ()
     | _ -> raise (NotTaggingMeta t)
   end;
   Stdecl.fold (fun td acc -> match td.td_node with
-    | Meta (s, [MApr pr]) when meta_equal s t -> Spr.add pr acc
+    | Meta (s, MApr pr :: _) when meta_equal s t -> Spr.add pr acc
     | _ -> assert false) tds.tds_set acc
 
 exception NotExclusiveMeta of meta

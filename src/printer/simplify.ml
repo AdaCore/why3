@@ -54,7 +54,7 @@ let print_real fmt = function
       fprintf fmt "0x%s_%sp%a" i f pp_exp e
 
 type info = {
-  info_syn : syntax_map;
+  info_syn : string Mid.t;
   info_rem : Sid.t;
 }
 
@@ -178,18 +178,18 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
-let print_task pr thpr syn fmt task =
+let print_task pr thpr fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   let info = {
-    info_syn = syn;
+    info_syn = get_syntax_map task;
     info_rem = get_remove_set task }
   in
   let decls = Task.task_decls task in
   ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)
 
 let () = register_printer "simplify" 
-  (fun pr thpr syn fmt task -> 
+  (fun pr thpr fmt task ->
      forget_all ident_printer;
-     print_task pr thpr syn fmt task)
+     print_task pr thpr fmt task)
 

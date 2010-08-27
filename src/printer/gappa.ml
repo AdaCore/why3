@@ -401,7 +401,7 @@ let print_tvsymbols fmt tv =
 let forget_var v = forget_id ident_printer v.vs_name
 
 type info = {
-  info_syn : syntax_map;
+  info_syn : string Mid.t;
   info_rem : Sid.t;
 }
 

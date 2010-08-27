@@ -30,11 +30,10 @@ open Task
 
 type prelude = string list
 type prelude_map = prelude Mid.t
-type syntax_map = string Mid.t
 
 type 'a pp = formatter -> 'a -> unit
 
-type printer = prelude -> prelude_map -> syntax_map -> task pp
+type printer = prelude -> prelude_map -> task pp
 
 let printers : (string, printer) Hashtbl.t = Hashtbl.create 17
 
@@ -125,34 +124,46 @@ let print_th_prelude task fmt pm =
 exception KnownTypeSyntax of tysymbol
 exception KnownLogicSyntax of lsymbol
 
-let add_ts_syntax ts s sm =
-  check_syntax s (List.length ts.ts_args);
-  if Mid.mem ts.ts_name sm then raise (KnownTypeSyntax ts);
-  Mid.add ts.ts_name s sm
-
-let add_ls_syntax ls s sm =
-  check_syntax s (List.length ls.ls_args);
-  if Mid.mem ls.ls_name sm then raise (KnownLogicSyntax ls);
-  Mid.add ls.ls_name s sm
-
-let query_syntax sm id =
-  try Some (Mid.find id sm) with Not_found -> None
-
-let meta_remove_type  = register_meta "remove_type" [MTtysymbol]
-let meta_remove_logic = register_meta "remove_logic" [MTlsymbol]
+let meta_syntax_type  = register_meta "syntax_type" [MTtysymbol; MTstring]
+let meta_syntax_logic = register_meta "syntax_logic" [MTlsymbol; MTstring]
 let meta_remove_prop  = register_meta "remove_prop" [MTprsymbol]
 
-let remove_type  ts = create_meta meta_remove_type  [MAts ts]
-let remove_logic ls = create_meta meta_remove_logic [MAls ls]
-let remove_prop  pr = create_meta meta_remove_prop  [MApr pr]
+let syntax_type ts s =
+  check_syntax s (List.length ts.ts_args);
+  create_meta meta_syntax_type [MAts ts; MAstr s]
+
+let syntax_logic ls s =
+  check_syntax s (List.length ls.ls_args);
+  create_meta meta_syntax_logic [MAls ls; MAstr s]
+
+let remove_prop pr =
+  create_meta meta_remove_prop [MApr pr]
+
+let get_syntax_map task =
+  let add_ts td m = match td.td_node with
+    | Meta (_,[MAts ts; MAstr s]) ->
+        if Mid.mem ts.ts_name m then raise (KnownTypeSyntax ts);
+        Mid.add ts.ts_name s m
+    | _ -> assert false
+  in
+  let add_ls td m = match td.td_node with
+    | Meta (_,[MAls ls; MAstr s]) ->
+        if Mid.mem ls.ls_name m then raise (KnownLogicSyntax ls);
+        Mid.add ls.ls_name s m
+    | _ -> assert false
+  in
+  let m = Mid.empty in
+  let m = Stdecl.fold add_ts (find_meta task meta_syntax_type).tds_set m in
+  let m = Stdecl.fold add_ls (find_meta task meta_syntax_logic).tds_set m in
+  m
 
 let get_remove_set task =
   let add_ts td s = match td.td_node with
-    | Meta (_,[MAts ts]) -> Sid.add ts.ts_name s
+    | Meta (_,[MAts ts; _]) -> Sid.add ts.ts_name s
     | _ -> assert false
   in
   let add_ls td s = match td.td_node with
-    | Meta (_,[MAls ls]) -> Sid.add ls.ls_name s
+    | Meta (_,[MAls ls; _]) -> Sid.add ls.ls_name s
     | _ -> assert false
   in
   let add_pr td s = match td.td_node with
@@ -160,10 +171,13 @@ let get_remove_set task =
     | _ -> assert false
   in
   let s = Sid.empty in
-  let s = Stdecl.fold add_ts (find_meta task meta_remove_type).tds_set s in
-  let s = Stdecl.fold add_ls (find_meta task meta_remove_logic).tds_set s in
+  let s = Stdecl.fold add_ts (find_meta task meta_syntax_type).tds_set s in
+  let s = Stdecl.fold add_ls (find_meta task meta_syntax_logic).tds_set s in
   let s = Stdecl.fold add_pr (find_meta task meta_remove_prop).tds_set s in
   s
+
+let query_syntax sm id =
+  try Some (Mid.find id sm) with Not_found -> None
 
 (** {2 exceptions to use in transformations and printers} *)
 

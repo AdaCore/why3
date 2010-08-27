@@ -86,8 +86,8 @@ list0_trule:
 
 trule:
 | PRELUDE STRING                      { Rprelude  ($2) }
-| SYNTAX TYPE qualid STRING           { Rsyntaxts ($3, $4) }
-| SYNTAX LOGIC qualid STRING          { Rsyntaxls ($3, $4) }
+| SYNTAX cloned TYPE qualid STRING    { Rsyntaxts ($2, $4, $5) }
+| SYNTAX cloned LOGIC qualid STRING   { Rsyntaxls ($2, $4, $5) }
 | REMOVE cloned PROP qualid           { Rremovepr ($2, $4) }
 | META cloned ident meta_args         { Rmeta     ($2, $3, $4) }
 | META cloned STRING meta_args        { Rmeta     ($2, $3, $4) }
