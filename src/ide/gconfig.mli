@@ -5,6 +5,8 @@ type t =
       mutable window_height : int;
       mutable tree_width : int;
       mutable task_height : int;
+      mutable time_limit : int;
+      mutable max_running_processes : int;
     }
 
 val read_config : unit -> t
@@ -37,7 +39,7 @@ val image_failure : GdkPixbuf.pixbuf ref
 
 val show_legend_window : unit -> unit
 val show_about_window : unit -> unit
-val preferences : unit -> unit
+val preferences : t -> unit
 
 (*
 Local Variables: 

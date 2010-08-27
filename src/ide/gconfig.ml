@@ -7,6 +7,8 @@ type t =
       mutable window_height : int;
       mutable tree_width : int;
       mutable task_height : int;
+      mutable time_limit : int;
+      mutable max_running_processes : int;
     }
 
 let default = 
@@ -14,6 +16,8 @@ let default =
     window_height = 768;
     tree_width = 512;
     task_height = 384;
+    time_limit = 2;
+    max_running_processes = 2;
   }
 
 let conf_file = Filename.concat (Rc.get_home_dir ()) ".whyide.conf"
@@ -26,6 +30,8 @@ let save_config config =
   fprintf fmt "height = %d@\n" config.window_height;
   fprintf fmt "tree_width = %d@\n" config.tree_width;
   fprintf fmt "task_height = %d@\n" config.task_height;
+  fprintf fmt "time_limit = %d@\n" config.time_limit;
+  fprintf fmt "max_processes = %d@\n" config.max_running_processes;
   fprintf fmt "@.";
   close_out ch
 
@@ -35,6 +41,8 @@ let load_main c (key, value) =
     | "height" -> c.window_height <- Rc.int value
     | "tree_width" -> c.tree_width <- Rc.int value
     | "task_height" -> c.task_height <- Rc.int value
+    | "time_limit" -> c.time_limit <- Rc.int value
+    | "max_processes" -> c.max_running_processes <- Rc.int value
     | s -> 
         eprintf "Warning: ignore unknown key [%s] in whyide config file@." s
         
@@ -185,38 +193,51 @@ let show_about_window () =
   let ( _ : GWindow.Buttons.about) = about_dialog#run () in
   about_dialog#destroy ()
 
-let nb_processes = ref 2
-
-let preferences () =
+let preferences c =
   let dialog = GWindow.dialog ~title:"Why: preferences" () in      
   let vbox = dialog#vbox in
   let notebook = GPack.notebook ~packing:vbox#add () in
+  (** page 1 **)
   let label1 = GMisc.label ~text:"Provers" () in
   let page1 =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label1#coerce w)) ()
   in 
+  (* debug mode ? *)
   let _debugmode = 
     GButton.check_button ~label:"debug" ~packing:page1#add ()
   in
+  (* timelimit ? *)
+  let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
+  let _ = GMisc.label ~text:"Time limit" ~packing:hb#add () in
+  let timelimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
+  timelimit_spin#adjustment#set_bounds ~lower:2. ~upper:300. ~step_incr:1. ();
+  timelimit_spin#adjustment#set_value (float_of_int c.time_limit);
+  let (_ : GtkSignal.id) = 
+    timelimit_spin#connect#value_changed ~callback:
+      (fun () -> c.time_limit <- timelimit_spin#value_as_int)
+  in
+  (* nb of processes ? *)
   let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
   let _ = GMisc.label ~text:"Nb of processes" ~packing:hb#add () in
   let nb_processes_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   nb_processes_spin#adjustment#set_bounds ~lower:1. ~upper:16. ~step_incr:1. ();
-  nb_processes_spin#adjustment#set_value (float_of_int !nb_processes);
+  nb_processes_spin#adjustment#set_value (float_of_int c.max_running_processes);
   let (_ : GtkSignal.id) = 
     nb_processes_spin#connect#value_changed ~callback:
-      (fun () -> nb_processes := nb_processes_spin#value_as_int)
+      (fun () -> c.max_running_processes <- nb_processes_spin#value_as_int)
   in
-
+  (** page 2 **)
   let label2 = GMisc.label ~text:"Misc" () in
   let _page2 = GMisc.label ~text:"contents of page 2" 
     ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label2#coerce w)) () 
   in
+(*
   let (_ : GtkSignal.id) =
     notebook#connect#switch_page 
       ~callback:(fun i -> prerr_endline ("Page switch to " ^ string_of_int i))
   in
+*)
   dialog#add_button "Close" `CLOSE ;
   let ( _ : GWindow.Buttons.about) = dialog#run () in
   dialog#destroy ()

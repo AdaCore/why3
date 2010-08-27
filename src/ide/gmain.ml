@@ -44,10 +44,12 @@ let config =
 let () = eprintf "%s Load path is: %a@." pname
   (Pp.print_list Pp.comma Pp.string) config.loadpath
 
+(*
 let timelimit = 
   match config.timelimit with
     | None -> 2
     | Some n -> n
+*)
 
 
 (********************************)
@@ -446,10 +448,13 @@ let image_of_result = function
 let () = 
   begin
     Scheduler.async := GtkThread.async;
+(*
     match config.running_provers_max with
       | None -> ()
       | Some n -> 
           if n >= 1 then Scheduler.maximum_running_proofs := n
+*)
+    Scheduler.maximum_running_proofs := gconfig.max_running_processes
   end 
 
 (*****************************************************)
@@ -474,7 +479,7 @@ let rec prover_on_goal p g =
   in
   callback Scheduler.Scheduled 0.0;
   Scheduler.schedule_proof_attempt
-    ~debug:false ~timelimit ~memlimit:0 
+    ~debug:false ~timelimit:gconfig.time_limit ~memlimit:0 
     ~prover:p.prover ~command:p.command ~driver:p.driver 
     ~callback
     g.Model.task;
@@ -561,8 +566,11 @@ let file_menu = factory#add_submenu "_File"
 let file_factory = new GMenu.factory file_menu ~accel_group 
 
 let (_ : GMenu.image_menu_item) = 
-  file_factory#add_image_item ~label:"_Preferences" 
-    ~callback:Gconfig.preferences () 
+  file_factory#add_image_item ~label:"_Preferences" ~callback:
+    (fun () ->
+       Gconfig.preferences gconfig;
+       Scheduler.maximum_running_proofs := gconfig.max_running_processes)
+    () 
 
 let (_ : GMenu.image_menu_item) = 
   file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit" 
