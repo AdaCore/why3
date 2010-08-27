@@ -350,6 +350,13 @@ let print_inst_ls fmt (ls1,ls2) =
 let print_inst_pr fmt (pr1,pr2) =
   fprintf fmt "prop %a = %a" print_pr pr1 print_pr pr2
 
+let print_meta_arg_type fmt = function
+  | MTtysymbol -> fprintf fmt "[type symbol]"
+  | MTlsymbol  -> fprintf fmt "[logic symbol]"
+  | MTprsymbol -> fprintf fmt "[proposition]"
+  | MTstring   -> fprintf fmt "[string]"
+  | MTint      -> fprintf fmt "[integer]"
+
 let print_meta_arg fmt = function
   | MAts ts -> fprintf fmt "type %a" print_ts ts
   | MAls ls -> fprintf fmt "logic %a" print_ls ls

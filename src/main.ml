@@ -136,7 +136,7 @@ let option_list = Arg.align [
   "--prover", Arg.String (fun s -> opt_prover := Some s),
       " same as -P";
   "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> Input format (default: \"why\")";
+      "<format> Select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
   "-t", Arg.Int (fun i -> opt_timelimit := Some i),
@@ -152,7 +152,7 @@ let option_list = Arg.align [
   "--apply-transform", Arg.String add_opt_trans,
       " same as -a";
   "-M", Arg.String add_opt_meta,
-      "<meta_name>=<string> Add a meta-option to every task";
+      "<meta_name>=<string> Add a string meta to every task";
   "--meta", Arg.String add_opt_meta,
       " same as -M";
   "-D", Arg.String (fun s -> opt_driver := Some s),
@@ -176,7 +176,7 @@ let option_list = Arg.align [
   "--list-formats", Arg.Set opt_list_formats,
       " List known input formats";
   "--list-metas", Arg.Set opt_list_metas,
-      " List known meta-options of one string argument";
+      " List known metas";
   "--list-debug-flags", Arg.Set opt_list_flags,
       " List known debug flags";
   "--parse-only", Arg.Set opt_parse_only,
@@ -228,15 +228,15 @@ let () =
   end;
   if !opt_list_metas then begin
     opt_list := true;
-    let fold acc m = match m.meta_type with
-      | [MTstring] when m.meta_excl -> Smeta.add m acc
-      | _ -> acc
+    let print fmt m = fprintf fmt "@[%s %s%a@]"
+      (let s = m.meta_name in
+        if String.contains s ' ' then "\"" ^ s ^ "\"" else s)
+      (if m.meta_excl then "* " else "")
+      (Pp.print_list Pp.space Pretty.print_meta_arg_type) m.meta_type
     in
-    let metas = List.fold_left fold Smeta.empty (list_metas ()) in
-    printf "@[<hov 2>Known meta-options:@\n%a@]@\n@."
-      (Pp.print_iter1 Smeta.iter Pp.newline
-         (fun fmt m -> pp_print_string fmt m.meta_name))
-      metas
+    let cmp m1 m2 = Pervasives.compare m1.meta_name m2.meta_name in
+    printf "@[<hov 2>Known metas:@\n%a@]@\n@."
+      (Pp.print_list Pp.newline print) (List.sort cmp (Theory.list_metas ()))
   end;
   if !opt_list_flags then begin
     opt_list := true;
