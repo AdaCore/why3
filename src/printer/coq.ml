@@ -143,7 +143,7 @@ let print_binop fmt = function
   | Fimplies -> fprintf fmt "->"
   | Fiff -> fprintf fmt "<->"
 
-let print_label fmt l = fprintf fmt "\"%s\"" l
+let print_label = Pretty.print_label
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 

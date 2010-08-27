@@ -103,9 +103,13 @@ val pat_fold : ('a -> pattern -> 'a) -> 'a -> pattern -> 'a
 val pat_all : (pattern -> bool) -> pattern -> bool
 val pat_any : (pattern -> bool) -> pattern -> bool
 
-(** {2 Terms and formulas} *)
+(** {2 Labels} *)
 
-type label = string
+type label = string * Loc.position option
+
+val label : ?loc:Loc.position -> string -> label
+
+(** {2 Terms and formulas} *)
 
 type quant =
   | Fforall

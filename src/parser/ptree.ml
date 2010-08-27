@@ -25,6 +25,7 @@ type loc = Loc.position
 
 type real_constant = Term.real_constant
 type constant = Term.constant
+type label = Term.label
 
 type pp_quant =
   | PPforall | PPexists
@@ -73,7 +74,7 @@ and pp_desc =
   | PPunop of pp_unop * lexpr
   | PPif of lexpr * lexpr * lexpr
   | PPquant of pp_quant * param list * lexpr list list * lexpr
-  | PPnamed of string * lexpr
+  | PPnamed of label * lexpr
   | PPlet of ident * lexpr * lexpr
   | PPeps of ident * pty * lexpr
   | PPmatch of lexpr * (pattern * lexpr) list

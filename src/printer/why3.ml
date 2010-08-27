@@ -168,7 +168,7 @@ let prio_binop = function
   | Fimplies -> 1
   | Fiff -> 1
 
-let print_label fmt l = fprintf fmt "\"%s\"" l
+let print_label = Pretty.print_label
 
 let rec print_term fmt t = print_lterm 0 fmt t
 and     print_fmla fmt f = print_lfmla 0 fmt f

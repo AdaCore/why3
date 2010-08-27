@@ -405,11 +405,13 @@ lexpr:
 | lexpr OR lexpr
    { infix_pp $1 PPor $3 }
 | lexpr ASYM_OR lexpr
-   { mk_pp (PPnamed ("asym_split", infix_pp $1 PPor $3)) }
+   { let label = Term.label "asym_split" in
+     mk_pp (PPnamed (label, infix_pp $1 PPor $3)) }
 | lexpr AND lexpr
    { infix_pp $1 PPand $3 }
 | lexpr ASYM_AND lexpr
-   { mk_pp (PPnamed ("asym_split", infix_pp $1 PPand $3)) }
+   { let label = Term.label "asym_split" in
+     mk_pp (PPnamed (label, infix_pp $1 PPand $3)) }
 | NOT lexpr
    { prefix_pp PPnot $2 }
 | lexpr EQUAL lexpr
@@ -442,7 +444,7 @@ lexpr:
 | EXISTS list1_param_var_sep_comma triggers DOT lexpr
    { mk_pp (PPquant (PPexists, $2, $3, $5)) }
 | STRING lexpr %prec prec_named
-   { mk_pp (PPnamed ($1, $2)) }
+   { mk_pp (PPnamed (Term.label ~loc:(loc ()) $1, $2)) }
 | LET pattern EQUAL lexpr IN lexpr
    { match $2.pat_desc with
        | PPpvar id -> mk_pp (PPlet (id, $4, $6))
