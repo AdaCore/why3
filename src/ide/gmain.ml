@@ -776,24 +776,73 @@ let info_window t s () =
 let help_menu = factory#add_submenu "_Help" 
 let help_factory = new GMenu.factory help_menu ~accel_group 
 
+let show_legend_window () =
+  let dialog = GWindow.dialog ~title:"Why: legend of icons" () in      
+  let vbox = dialog#vbox in
+  let text = GText.view ~packing:vbox#add () in
+  let b = text#buffer in
+  let i s = b#insert ~iter:b#end_iter s in
+  let ib i = b#insert_pixbuf ~iter:b#end_iter ~pixbuf:!i in
+  i "== icons in the tree view on the left ==\n";
+  i "\n";
+  ib image_directory;
+  i "A theory, containing a set of goals\n";
+  ib image_file;
+  i "A goal\n";
+  ib image_prover;
+  i "An external prover\n";
+  ib image_transf;
+  i "A split transformation\n";
+  i "\n";
+  i "== icons in the satatus column\n";
+  i "\n";
+  ib image_scheduled;
+  i "external proof scheduled by not started yet\n";
+  ib image_running;
+  i "external proof is running\n";
+  ib image_valid;
+  i "goal is proved/theory is fully verified\n";
+  ib image_timeout;
+  i "external prover reached the time limit\n";
+  ib image_unknown;
+  i "external prover answer was not conclusive\n";
+  ib image_failure;
+  i "external prover call failed\n";
+  i "\n";
+  dialog#add_button "Close" `CLOSE ;
+  let ( _ : GWindow.Buttons.about) = dialog#run () in
+  dialog#destroy ()
+
 let (_ : GMenu.image_menu_item) = 
   help_factory#add_image_item 
     ~label:"Legend" 
-    ~callback:(info_window "Legend" "This is the legend")
+    ~callback:show_legend_window
     () 
+
+let show_about_window () =
+  let about_dialog = 
+    GWindow.about_dialog 
+      ~name:"Why" 
+      ~authors:["Francois Bobot";
+                "Jean-Christophe Filliatre";
+                "Johannes Kanig";
+                "Claude Marche";
+                "Andrei Paskevich"
+               ]
+      ~copyright:"Copyright 2010"
+      ~license:"Gnu Lesser General Public License"
+      ~website:"http://why.lri.fr"
+      ~website_label:"Click here for the web site"
+      ~version:"3.0 alpha"
+      ()
+  in      
+  let ( _ : GWindow.Buttons.about) = about_dialog#run () in
+  about_dialog#destroy ()
 
 let (_ : GMenu.image_menu_item) = 
   help_factory#add_image_item 
     ~label:"About" 
-    ~callback:(info_window "About" 
-                 "This is Why3 preliminary version
-Copyright 2010 
-Francois Bobot
-Jean-Christophe Filliatre
-Johannes Kanig
-Claude Marche
-Andrei Paskevich"
-              )
+    ~callback:show_about_window
     () 
 
 
@@ -876,7 +925,6 @@ let source_view =
     ~right_margin_position:80 ~show_right_margin:true
     (* ~smart_home_end:true *)
     ~packing:scrolled_source_view#add 
-    (* ~height:500 ~width:650 *)
     ()
 
 (*
