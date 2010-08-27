@@ -68,6 +68,20 @@ let print_vs fmt vs =
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
+(* pretty-print infix and prefix logic symbols *)
+
+let extract_op ls =
+  let s = ls.ls_name.id_string in
+  let len = String.length s in
+  if len < 7 then None else
+  let inf = String.sub s 0 6 in
+  if inf = "infix "  then Some (String.sub s 6 (len - 6)) else
+  let prf = String.sub s 0 7 in
+  if prf = "prefix " then Some (String.sub s 7 (len - 7)) else
+  None
+
+let tight_op s = let c = String.sub s 0 1 in c = "!" || c = "?"
+
 (* theory names always start with an upper case letter *)
 let print_th fmt th =
   let sanitizer = String.capitalize in
@@ -76,8 +90,9 @@ let print_th fmt th =
 let print_ts fmt ts =
   fprintf fmt "%s" (id_unique tprinter ts.ts_name)
 
-let print_ls fmt ls =
-  fprintf fmt "%s" (id_unique lprinter ls.ls_name)
+let print_ls fmt ls = match extract_op ls with
+  | Some s -> fprintf fmt "(%s)" s
+  | None   -> fprintf fmt "%s" (id_unique lprinter ls.ls_name)
 
 let print_cs fmt ls =
   let sanitizer = String.capitalize in
@@ -177,6 +192,22 @@ and print_lfmla pri fmt f = match f.f_label with
   | ll -> fprintf fmt (protect_on (pri > 0) "%a %a")
       (print_list space print_label) ll (print_fnode 0) f
 
+and print_app pri ls fmt tl = match extract_op ls, tl with
+  | _, [] ->
+      print_ls fmt ls
+  | Some s, [t1] when tight_op s ->
+      fprintf fmt (protect_on (pri > 6) "%s%a")
+        s (print_lterm 6) t1
+  | Some s, [t1] ->
+      fprintf fmt (protect_on (pri > 4) "%s %a")
+        s (print_lterm 5) t1
+  | Some s, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 4) "%a %s@ %a")
+        (print_lterm 5) t1 s (print_lterm 5) t2
+  | _, tl ->
+      fprintf fmt (protect_on (pri > 5) "%a@ %a")
+        print_ls ls (print_list space (print_lterm 6)) tl
+
 and print_tnode pri fmt t = match t.t_node with
   | Tbvar _ ->
       assert false
@@ -186,18 +217,11 @@ and print_tnode pri fmt t = match t.t_node with
       print_const fmt c
   | Tapp (fs, tl) when is_fs_tuple fs ->
       fprintf fmt "(%a)" (print_list comma print_term) tl
-  | Tapp (fs, []) when unambig_fs fs ->
-      print_ls fmt fs
-  | Tapp (fs, []) ->
-      fprintf fmt (protect_on (pri > 0) "%a:%a")
-        print_ls fs print_ty t.t_ty
   | Tapp (fs, tl) when unambig_fs fs ->
-      fprintf fmt (protect_on (pri > 4) "%a@ %a")
-        print_ls fs (print_list space (print_lterm 5)) tl
+      print_app pri fs fmt tl
   | Tapp (fs, tl) ->
-      fprintf fmt (protect_on (pri > 0) "%a@ %a:%a")
-        print_ls fs (print_list space (print_lterm 5)) tl
-          print_ty t.t_ty
+      fprintf fmt (protect_on (pri > 0) "%a:%a")
+        (print_app 5 fs) tl print_ty t.t_ty
   | Tif (f,t1,t2) ->
       fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
         print_fmla f print_term t1 print_term t2
@@ -216,14 +240,8 @@ and print_tnode pri fmt t = match t.t_node with
       forget_var v
 
 and print_fnode pri fmt f = match f.f_node with
-  | Fapp (ps,[t1;t2]) when ls_equal ps ps_equ ->
-      fprintf fmt (protect_on (pri > 4) "%a =@ %a")
-        (print_lterm 4) t1 (print_lterm 4) t2
-  | Fapp (ps,[]) ->
-      print_ls fmt ps
   | Fapp (ps,tl) ->
-      fprintf fmt (protect_on (pri > 4) "%a@ %a")
-        print_ls ps (print_list space (print_lterm 5)) tl
+      print_app pri ps fmt tl
   | Fquant (q,fq) ->
       let vl,tl,f = f_open_quant fq in
       fprintf fmt (protect_on (pri > 0) "%a %a%a.@ %a") print_quant q
