@@ -185,24 +185,38 @@ let show_about_window () =
   let ( _ : GWindow.Buttons.about) = about_dialog#run () in
   about_dialog#destroy ()
 
+let nb_processes = ref 2
+
 let preferences () =
-  let dialog = GWindow.dialog ~title:"Why: legend of icons" () in      
+  let dialog = GWindow.dialog ~title:"Why: preferences" () in      
   let vbox = dialog#vbox in
   let notebook = GPack.notebook ~packing:vbox#add () in
-  let button = GButton.button ~label:"Page 1" 
-    ~packing:(fun w -> ignore (notebook#append_page w)) () in
-  let (_ : GtkSignal.id) = button#connect#clicked 
-    ~callback:(fun () -> prerr_endline "Hello again - cool button 1 was pressed") 
+  let label1 = GMisc.label ~text:"Provers" () in
+  let page1 =
+    GPack.vbox ~homogeneous:false ~packing:
+      (fun w -> ignore(notebook#append_page ~tab_label:label1#coerce w)) ()
+  in 
+  let _debugmode = 
+    GButton.check_button ~label:"debug" ~packing:page1#add ()
   in
-  let button = GButton.button ~label:"Page 2" 
-    ~packing:(fun w -> ignore (notebook#append_page w))
-    () in
-  button#connect#clicked ~callback:
-    (fun () -> prerr_endline "Hello again - cool button 2 was pressed");
-  notebook#connect#switch_page 
-    ~callback:(fun i -> prerr_endline ("Page switch to " ^ string_of_int i));
-  button#connect#clicked ~callback:
-    (fun () -> prerr_endline "Coucou");
+  let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
+  let _ = GMisc.label ~text:"Nb of processes" ~packing:hb#add () in
+  let nb_processes_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
+  nb_processes_spin#adjustment#set_bounds ~lower:1. ~upper:16. ~step_incr:1. ();
+  nb_processes_spin#adjustment#set_value (float_of_int !nb_processes);
+  let (_ : GtkSignal.id) = 
+    nb_processes_spin#connect#value_changed ~callback:
+      (fun () -> nb_processes := nb_processes_spin#value_as_int)
+  in
+
+  let label2 = GMisc.label ~text:"Misc" () in
+  let _page2 = GMisc.label ~text:"contents of page 2" 
+    ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label2#coerce w)) () 
+  in
+  let (_ : GtkSignal.id) =
+    notebook#connect#switch_page 
+      ~callback:(fun i -> prerr_endline ("Page switch to " ^ string_of_int i))
+  in
   dialog#add_button "Close" `CLOSE ;
   let ( _ : GWindow.Buttons.about) = dialog#run () in
   dialog#destroy ()
