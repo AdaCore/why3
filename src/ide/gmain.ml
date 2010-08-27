@@ -24,6 +24,7 @@ let () = ignore (GtkMain.Main.init ())
 open Format
 open Why
 open Whyconf
+open Gconfig
 
 (*****************************)
 (* loading Why configuration *)
@@ -55,7 +56,7 @@ let timelimit =
 
 let gconfig = 
   eprintf "%s reading IDE config file@." pname;
-  Gconfig.read_config ()
+  read_config ()
 
 (***************************)
 (* parsing comand_line *)
@@ -186,70 +187,6 @@ let () =
 *)
 
 
-(*
-
-  boomy icons
-
-*)
-
-let image ?size f =
-  let n = Filename.concat "" (* todo: libdir *) (Filename.concat "images" (f^".png"))
-  in
-  match size with
-    | None ->
-        GdkPixbuf.from_file n
-    | Some s ->
-        GdkPixbuf.from_file_at_size ~width:s ~height:s n
-
-let iconname_default = "pause32"
-let iconname_scheduled = "pause32"
-let iconname_running = "play32"
-let iconname_valid = "accept32"
-let iconname_unknown = "help32"
-let iconname_invalid = "delete32"
-let iconname_timeout = "clock32"
-let iconname_failure = "bug32"
-let iconname_yes = "accept32"
-let iconname_no = "delete32"
-let iconname_directory = "folder32"
-let iconname_file = "file32"
-let iconname_prover = "wizard32"
-let iconname_transf = "cutb32"
-
-let image_default = ref (image ~size:20 iconname_default)
-let image_scheduled = ref !image_default
-let image_running = ref !image_default
-let image_valid = ref !image_default
-let image_unknown = ref !image_default
-let image_invalid = ref !image_default
-let image_timeout = ref !image_default
-let image_failure = ref !image_default
-let image_yes = ref !image_default
-let image_no = ref !image_default
-let image_directory = ref !image_default
-let image_file = ref !image_default
-let image_prover = ref !image_default
-let image_transf = ref !image_default
-
-let resize_images size =
-  image_default := image ~size iconname_default;
-  image_scheduled := image ~size iconname_scheduled;
-  image_running := image ~size iconname_running;
-  image_valid := image ~size iconname_valid;
-  image_unknown := image ~size iconname_unknown;
-  image_invalid := image ~size iconname_invalid;
-  image_timeout := image ~size iconname_timeout;
-  image_failure := image ~size iconname_failure;
-  image_yes := image ~size iconname_yes;
-  image_no := image ~size iconname_no;
-  image_directory := image ~size iconname_directory;
-  image_file := image ~size iconname_file;
-  image_prover := image ~size iconname_prover;
-  image_transf := image ~size iconname_transf;
-  ()
-
-let () = resize_images 20
-
 (****************)
 (* goals widget *)
 (****************)
@@ -371,13 +308,13 @@ end
 
 let exit_function () =
   eprintf "%s saving IDE config file@." pname;
-  Gconfig.save_config gconfig;
-  exit 0
+  save_config gconfig;
+  GMain.quit ()
 
 let w = GWindow.window 
   ~allow_grow:true ~allow_shrink:true
-  ~width:gconfig.Gconfig.window_width 
-  ~height:gconfig.Gconfig.window_height 
+  ~width:gconfig.window_width 
+  ~height:gconfig.window_height 
   ~title:"why-ide" ()
 
 let (_ : GtkSignal.id) = w#connect#destroy ~callback:exit_function 
@@ -386,8 +323,8 @@ let (_ : GtkSignal.id) =
   w#misc#connect#size_allocate 
     ~callback:
     (fun {Gtk.width=w;Gtk.height=h} -> 
-       gconfig.Gconfig.window_height <- h;
-       gconfig.Gconfig.window_width <- w)
+       gconfig.window_height <- h;
+       gconfig.window_width <- w)
 
 let vbox = GPack.vbox ~homogeneous:false ~packing:w#add () 
 
@@ -406,7 +343,7 @@ let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:vbox#add ()
 (* tree view *)
 let scrollview = 
   GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC 
-    ~width:gconfig.Gconfig.tree_width 
+    ~width:gconfig.tree_width 
     ~packing:hp#add () 
 
 let () = scrollview#set_shadow_type `ETCHED_OUT 
@@ -414,7 +351,7 @@ let (_ : GtkSignal.id) =
   scrollview#misc#connect#size_allocate 
     ~callback:
     (fun {Gtk.width=w;Gtk.height=_h} -> 
-       gconfig.Gconfig.tree_width <- w)
+       gconfig.tree_width <- w)
 
 let goals_model,filter_model,goals_view = Model.create ~packing:scrollview#add () 
 
@@ -622,6 +559,11 @@ let split_unproved_goals () =
 
 let file_menu = factory#add_submenu "_File" 
 let file_factory = new GMenu.factory file_menu ~accel_group 
+
+let (_ : GMenu.image_menu_item) = 
+  file_factory#add_image_item ~label:"_Preferences" 
+    ~callback:Gconfig.preferences () 
+
 let (_ : GMenu.image_menu_item) = 
   file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit" 
     ~callback:exit_function () 
@@ -776,68 +718,11 @@ let info_window t s () =
 let help_menu = factory#add_submenu "_Help" 
 let help_factory = new GMenu.factory help_menu ~accel_group 
 
-let show_legend_window () =
-  let dialog = GWindow.dialog ~title:"Why: legend of icons" () in      
-  let vbox = dialog#vbox in
-  let text = GText.view ~packing:vbox#add () in
-  let b = text#buffer in
-  let i s = b#insert ~iter:b#end_iter s in
-  let ib i = b#insert_pixbuf ~iter:b#end_iter ~pixbuf:!i in
-  i "== icons in the tree view on the left ==\n";
-  i "\n";
-  ib image_directory;
-  i "A theory, containing a set of goals\n";
-  ib image_file;
-  i "A goal\n";
-  ib image_prover;
-  i "An external prover\n";
-  ib image_transf;
-  i "A split transformation\n";
-  i "\n";
-  i "== icons in the satatus column\n";
-  i "\n";
-  ib image_scheduled;
-  i "external proof scheduled by not started yet\n";
-  ib image_running;
-  i "external proof is running\n";
-  ib image_valid;
-  i "goal is proved/theory is fully verified\n";
-  ib image_timeout;
-  i "external prover reached the time limit\n";
-  ib image_unknown;
-  i "external prover answer was not conclusive\n";
-  ib image_failure;
-  i "external prover call failed\n";
-  i "\n";
-  dialog#add_button "Close" `CLOSE ;
-  let ( _ : GWindow.Buttons.about) = dialog#run () in
-  dialog#destroy ()
-
 let (_ : GMenu.image_menu_item) = 
   help_factory#add_image_item 
     ~label:"Legend" 
     ~callback:show_legend_window
     () 
-
-let show_about_window () =
-  let about_dialog = 
-    GWindow.about_dialog 
-      ~name:"Why" 
-      ~authors:["Francois Bobot";
-                "Jean-Christophe Filliatre";
-                "Johannes Kanig";
-                "Claude Marche";
-                "Andrei Paskevich"
-               ]
-      ~copyright:"Copyright 2010"
-      ~license:"Gnu Lesser General Public License"
-      ~website:"http://why.lri.fr"
-      ~website_label:"Click here for the web site"
-      ~version:"3.0 alpha"
-      ()
-  in      
-  let ( _ : GWindow.Buttons.about) = about_dialog#run () in
-  about_dialog#destroy ()
 
 let (_ : GMenu.image_menu_item) = 
   help_factory#add_image_item 
@@ -864,14 +749,14 @@ let (_ : GtkSignal.id) =
   scrolled_task_view#misc#connect#size_allocate 
     ~callback:
     (fun {Gtk.width=_w;Gtk.height=h} -> 
-       gconfig.Gconfig.task_height <- h)
+       gconfig.task_height <- h)
 
 let task_view =
   GSourceView2.source_view
     ~editable:false
     ~show_line_numbers:true
     ~packing:scrolled_task_view#add 
-    ~height:gconfig.Gconfig.task_height
+    ~height:gconfig.task_height
     ()
 
 let () = task_view#source_buffer#set_language lang
