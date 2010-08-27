@@ -59,7 +59,10 @@ let rec grep out l = match l with
         | HighFailure -> assert false
       with Not_found -> grep out l end
 
-let call_prover debug command opt_cout buffer =
+
+let debug = Debug.register_flag "call_prover"
+
+let call_prover command opt_cout buffer =
   let time = Unix.gettimeofday () in
   let (cin,_) as p = match opt_cout with
     | Some cout ->
@@ -73,14 +76,11 @@ let call_prover debug command opt_cout buffer =
   let out = channel_contents cin in
   let ret = Unix.close_process p in
   let time = Unix.gettimeofday () -. time in
-  if debug then eprintf "Call_provers: prover output:@\n%s@." out;
+  Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   ret, out, time
-
-let debug = Debug.register_flag "call_prover"
 
 let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
                    ~regexps ~exitcodes ~filename buffer () =
-  let debug = Debug.test_flag debug in
   let on_stdin = ref true in
   let on_timelimit = ref false in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
@@ -93,28 +93,28 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
   in
   let cmd = Str.global_substitute cmd_regexp (replace "") command in
   let ret, out, time =
-    if !on_stdin then call_prover debug cmd None buffer else begin
+    if !on_stdin then call_prover cmd None buffer else begin
       let fout,cout = Filename.open_temp_file "why_" ("_" ^ filename) in
       try
         let cmd = Str.global_substitute cmd_regexp (replace fout) command in
-        let res = call_prover debug cmd (Some cout) buffer in
-        if not debug then Sys.remove fout;
+        let res = call_prover cmd (Some cout) buffer in
+        if Debug.nottest_flag debug then Sys.remove fout;
         res
       with e ->
         close_out cout;
-        if not debug then Sys.remove fout;
+        if Debug.nottest_flag debug then Sys.remove fout;
         raise e
     end
   in
   let ans = match ret with
     | Unix.WSTOPPED n ->
-        if debug then eprintf "Call_provers: stopped by signal %d@." n;
+        Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
         HighFailure
     | Unix.WSIGNALED n ->
-        if debug then eprintf "Call_provers: killed by signal %d@." n;
+        Debug.dprintf debug "Call_provers: killed by signal %d@." n;
         HighFailure
     | Unix.WEXITED n ->
-        if debug then eprintf "Call_provers: exited with status %d@." n;
+        Debug.dprintf debug "Call_provers: exited with status %d@." n;
         (try List.assoc n exitcodes with Not_found -> grep out regexps)
   in
   let ans = match ans with

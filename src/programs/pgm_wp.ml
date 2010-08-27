@@ -388,19 +388,16 @@ let add_wp_decl l f env =
 
 let decl env = function
   | Pgm_ttree.Dlet (ls, e) ->
-      if Debug.test_flag debug then
-	eprintf "@[--effect %a-----@\n  %a@]@\n----------------@."
+      Debug.dprintf debug "@[--effect %a-----@\n  %a@]@\n----------------@."
 	  Pretty.print_ls ls print_type_v e.expr_type_v;
       let f = wp env e in
-      if Debug.test_flag debug then
-	eprintf "wp = %a@\n----------------@." Pretty.print_fmla f;
+      Debug.dprintf debug "wp = %a@\n----------------@." Pretty.print_fmla f;
       let env = add_wp_decl ls f env in	
       env
   | Pgm_ttree.Dletrec dl ->
       let add_one env (ls, def) = 
 	let f = wp_recfun env def in 
-	if Debug.test_flag debug then
-	  eprintf "wp %a = %a@\n----------------@." 
+	Debug.dprintf debug "wp %a = %a@\n----------------@." 
 	    print_ls ls Pretty.print_fmla f;
 	add_wp_decl ls f env
       in

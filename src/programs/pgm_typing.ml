@@ -1194,9 +1194,8 @@ let decl env gl = function
       Pgm_env.logic_decls dl env gl, []
   | Pgm_ptree.Dlet (id, e) -> 
       let e = type_expr gl e in
-      if Debug.test_flag debug then
-        eprintf "@[--typing %s-----@\n  %a@\n%a@]@." 
-	  id.id print_expr e print_type_v e.expr_type_v;
+      Debug.dprintf debug "@[--typing %s-----@\n  %a@\n%a@]@."
+	id.id print_expr e print_type_v e.expr_type_v;
       let ls, gl = add_global id.id_loc id.id e.expr_type_v gl in
       gl, [Dlet (ls, e)]
   | Pgm_ptree.Dletrec dl -> 
