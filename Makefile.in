@@ -159,8 +159,7 @@ $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why
 
 LIB_PARSER_POSTLUDE = \
-  "let logic_file_eof env = inside_env env logic_file_eof\n" \
-  "let list0_decl_eof env lenv uc = inside_uc env lenv uc list0_decl_eof"
+  "let logic_file_eof env = inside_env env logic_file_eof\nlet list0_decl_eof env lenv uc = inside_uc env lenv uc list0_decl_eof\n"
 
 LIB_PARSER_INTERFACE = \
   -e "s/^val \+logic_file_eof *:/\0 Env.env ->/" \
@@ -169,7 +168,7 @@ LIB_PARSER_INTERFACE = \
 
 src/parser/parser.ml src/parser/parser.mli: src/parser/parser.mly
 	$(OCAMLYACC) $<
-	echo $(LIB_PARSER_POSTLUDE) >> src/parser/parser.ml
+	printf $(LIB_PARSER_POSTLUDE) >> src/parser/parser.ml
 	sed -i $(LIB_PARSER_INTERFACE) src/parser/parser.mli
 
 # build targets
