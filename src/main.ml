@@ -26,10 +26,8 @@ open Task
 open Driver
 open Trans
 
-let usage_msg =
-  sprintf
-  "Usage: %s [options] [[file|-] \
-   [-a <transform> -T <theory> [-G <goal>]...]...]..."
+let usage_msg = sprintf
+  "Usage: %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]..."
   (Filename.basename Sys.argv.(0))
 
 let opt_queue = Queue.create ()
@@ -42,7 +40,7 @@ let opt_debug = ref []
 
 let add_opt_file x =
   let tlist = Queue.create () in
-  Queue.push (Some x, tlist,!opt_trans) opt_queue;
+  Queue.push (Some x, tlist) opt_queue;
   opt_input := Some tlist
 
 let add_opt_theory =
@@ -59,14 +57,14 @@ let add_opt_theory =
       exit 1
   | Some tlist, [] ->
       let glist = Queue.create () in
-      Queue.push (x, p, t, glist, !opt_trans) tlist;
+      Queue.push (x, p, t, glist) tlist;
       opt_theory := Some glist
   | _ ->
       let tlist = Queue.create () in
-      Queue.push (None, tlist, !opt_trans) opt_queue;
+      Queue.push (None, tlist) opt_queue;
       opt_input := None;
       let glist = Queue.create () in
-      Queue.push (x, p, t, glist, !opt_trans) tlist;
+      Queue.push (x, p, t, glist) tlist;
       opt_theory := Some glist
 
 let add_opt_goal x = match !opt_theory with
@@ -75,7 +73,7 @@ let add_opt_goal x = match !opt_theory with
       exit 1
   | Some glist ->
       let l = Str.split (Str.regexp "\\.") x in
-      Queue.push (x, l, !opt_trans) glist
+      Queue.push (x, l) glist
 
 let add_opt_trans x = opt_trans := x::!opt_trans
 
@@ -356,72 +354,59 @@ let do_task drv fname tname (th : Why.Theory.theory) (task : Task.task) =
         Driver.print_task drv (formatter_of_out_channel cout) task;
         close_out cout
 
-let do_tasks env drv fname tname th trans task =
+let do_tasks env drv fname tname th task =
   let lookup acc t =
     (try t, Trans.singleton (Trans.lookup_transform t env) with
        Trans.UnknownTrans _ -> t, Trans.lookup_transform_l t env) :: acc
   in
-  let transl = List.fold_left lookup [] trans in
+  let trans = List.fold_left lookup [] !opt_trans in
   let apply tasks (s, tr) =
     List.rev (List.fold_left (fun acc task ->
       List.rev_append (Trans.apply_named s tr task) acc) [] tasks)
   in
-  let tasks = List.fold_left apply [task] transl in
+  let tasks = List.fold_left apply [task] trans in
   List.iter (do_task drv fname tname th) tasks
 
-let do_theory env drv fname tname th trans glist =
+let do_theory env drv fname tname th glist =
   if !opt_print_theory then
     printf "%a@." Pretty.print_theory th
   else if !opt_print_namespace then
     printf "%a@." print_th_namespace th
   else begin
-    let add (accm,accs) (x,l,trans) =
+    let add acc (x,l) =
       let pr = try ns_find_pr th.th_export l with Not_found ->
         eprintf "Goal '%s' not found in theory '%s'.@." x tname;
         exit 1
       in
-      let accs = Decl.Spr.add pr accs in
-      (pr,trans)::accm,accs
+      Decl.Spr.add pr acc
     in
     let drv = Util.of_option drv in
-    if Queue.is_empty glist
-    then
-      let tasks = List.rev (split_theory th None !opt_task) in
-      let do_tasks = do_tasks env drv fname tname th trans in
-      List.iter do_tasks tasks
-    else
-      let prtrans,prs = Queue.fold add ([],Decl.Spr.empty) glist in
-      let tasks = split_theory th (Some prs) !opt_task in
-      let recover_pr mpr task =
-        let pr = task_goal task in
-        Decl.Mpr.add pr task mpr in
-      let mpr = List.fold_left recover_pr Decl.Mpr.empty tasks in
-      let do_tasks (pr,trans) =
-        let task = Decl.Mpr.find pr mpr in
-        do_tasks env drv fname tname th trans task in
-      List.iter do_tasks (List.rev prtrans)
+    let prs = Queue.fold add Decl.Spr.empty glist in
+    let sel = if Decl.Spr.is_empty prs then None else Some prs in
+    let tasks = List.rev (split_theory th sel !opt_task) in
+    List.iter (do_tasks env drv fname tname th) tasks
   end
 
-let do_global_theory env drv (tname,p,t,glist,trans) =
+let do_global_theory env drv (tname,p,t,glist) =
   let th = try Env.find_theory env p t with Env.TheoryNotFound _ ->
     eprintf "Theory '%s' not found.@." tname;
     exit 1
   in
-  do_theory env drv "lib" tname th trans glist
+  do_theory env drv "lib" tname th glist
 
-let do_local_theory env drv fname m (tname,_,t,glist,trans) =
+let do_local_theory env drv fname m (tname,_,t,glist) =
   let th = try Mnm.find t m with Not_found ->
     eprintf "Theory '%s' not found in file '%s'.@." tname fname;
     exit 1
   in
-  do_theory env drv fname tname th trans glist
+  do_theory env drv fname tname th glist
 
 let do_input env drv = function
-  | None, _, _ when !opt_parse_only || !opt_type_only ->
+  | None, _ when !opt_parse_only || !opt_type_only ->
       ()
-  | None, tlist, _ ->
+  | None, tlist ->
       Queue.iter (do_global_theory env drv) tlist
-  | Some f, tlist, trans ->
+  | Some f, tlist ->
       let fname, cin = match f with
         | "-" -> "stdin", stdin
         | f   -> f, open_in f
@@ -433,7 +418,7 @@ let do_input env drv = function
       else if Queue.is_empty tlist then
         let glist = Queue.create () in
         let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-        let do_th _ (t,th) = do_theory env drv fname t th trans glist in
+        let do_th _ (t,th) = do_theory env drv fname t th glist in
         Ident.Mid.iter do_th (Mnm.fold add_th m Ident.Mid.empty)
       else
         Queue.iter (do_local_theory env drv fname m) tlist
