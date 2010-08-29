@@ -1,4 +1,13 @@
 
+open Why
+
+type prover_data =
+    { prover_id : string;
+      prover_name : string;
+      prover_version : string;
+      command : string;
+      driver : Driver.driver;
+    }
 
 type t = 
     { mutable window_width : int;
@@ -7,9 +16,10 @@ type t =
       mutable task_height : int;
       mutable time_limit : int;
       mutable max_running_processes : int;
+      mutable provers : prover_data list;
     }
 
-val read_config : unit -> t
+val read_config : Env.env -> Whyconf.config -> t
 
 val save_config : t -> unit
 
@@ -40,6 +50,8 @@ val image_failure : GdkPixbuf.pixbuf ref
 val show_legend_window : unit -> unit
 val show_about_window : unit -> unit
 val preferences : t -> unit
+
+val run_auto_detection : Env.env -> Whyconf.config -> t -> unit
 
 (*
 Local Variables: 

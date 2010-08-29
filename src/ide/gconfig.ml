@@ -2,6 +2,14 @@
 open Format
 open Why
 
+type prover_data =
+    { prover_id : string;
+      prover_name : string;
+      prover_version : string;
+      command : string;
+      driver : Why.Driver.driver;
+    }
+
 type t = 
     { mutable window_width : int;
       mutable window_height : int;
@@ -9,6 +17,7 @@ type t =
       mutable task_height : int;
       mutable time_limit : int;
       mutable max_running_processes : int;
+      mutable provers : prover_data list;
     }
 
 let default = 
@@ -18,9 +27,16 @@ let default =
     task_height = 384;
     time_limit = 2;
     max_running_processes = 2;
+    provers = [];
   }
 
 let conf_file = Filename.concat (Rc.get_home_dir ()) ".whyide.conf"
+
+let save_prover fmt p =
+  fprintf fmt "[prover]@\n";
+  fprintf fmt "id = \"%s\"@\n" p.prover_id;
+  fprintf fmt "version = \"%s\"@\n" p.prover_version;
+  fprintf fmt "@."
 
 let save_config config =
   let ch = open_out conf_file in
@@ -33,6 +49,7 @@ let save_config config =
   fprintf fmt "time_limit = %d@\n" config.time_limit;
   fprintf fmt "max_processes = %d@\n" config.max_running_processes;
   fprintf fmt "@.";
+  List.iter (save_prover fmt) config.provers; 
   close_out ch
 
 let load_main c (key, value) = 
@@ -45,20 +62,45 @@ let load_main c (key, value) =
     | "max_processes" -> c.max_running_processes <- Rc.int value
     | s -> 
         eprintf "Warning: ignore unknown key [%s] in whyide config file@." s
+
+
+
+let get_prover_data env config id ver = 
+  let pi = Util.Mstr.find id config.Whyconf.provers in
+  let d = Why.Driver.load_driver env pi.Whyconf.driver in
+  { prover_id = id ;
+    prover_name = pi.Whyconf.name;
+    prover_version = ver;
+    command = pi.Whyconf.command;
+    driver = d; 
+  }
+
+let load_prover env whyconfig l =
+  let id = ref "?" in
+  let v = ref "?" in
+  List.iter
+    (fun (key, value) -> 
+	match key with
+	  | "id" -> id := Rc.string value
+	  | "version" -> v := Rc.string value
+	  | s -> 
+            eprintf "Warning: ignore unknown key [%s] in prover data of whyide config file@." s)
+    l;
+  get_prover_data env whyconfig !id !v
         
-let load c (key, al) = 
+let load env whyconfig c (key, al) = 
   match key with
-    | "main" :: _ ->
-        List.iter (load_main c) al
+    | "main" :: _ -> List.iter (load_main c) al
+    | "prover" :: _ -> c.provers <- load_prover env whyconfig al :: c.provers
     | s :: _ -> 
         eprintf "Warning: ignored unknown section [%s] in whyide config file@." s
     | [] -> assert false
         
-let read_config () =
+let read_config env whyconfig =
   try
     let rc = Rc.from_file conf_file in
     let c = default in
-    List.iter (load c) rc;
+    List.iter (load env whyconfig c) rc;
     c
   with
     | Failure "lexing" -> 
@@ -311,7 +353,70 @@ let read_auto_detection_data () =
         exit 2
     
 
+let provers_found = ref 0
 
+let prover_tips_info = ref false
+
+
+let detect_prover env whyconfig acc data =
+  List.fold_left
+    (fun acc com ->
+	let out = Filename.temp_file "out" "" in
+        let cmd = com ^ " " ^ data.version_switch in
+	let c = cmd ^ " > " ^ out in
+	let ret = Sys.command c in
+	if ret <> 0 then
+	  begin
+	    eprintf "command '%s' failed@." cmd;
+	    acc
+	  end
+	else
+	  let s = 
+            try 
+              let ch = open_in out in
+              let s = ref (input_line ch) in
+              while !s = "" do s := input_line ch done;
+              close_in ch;
+	      Sys.remove out;
+              !s              
+            with Not_found | End_of_file  -> ""
+          in
+	  let re = Str.regexp data.version_regexp in
+	  if Str.string_match re s 0 then            
+	    let nam = data.prover_name in
+	    let ver = Str.matched_group 1 s in
+            if List.mem ver data.versions_ok then 
+	      eprintf "Found prover %s version %s, OK.@." nam ver
+            else
+              begin
+                prover_tips_info := true;
+                if List.mem ver data.versions_old then 
+                  eprintf "Warning: prover %s version %s is quite old, please consider upgrading to a newer version.@." nam ver	    
+                else
+                  eprintf "Warning: prover %s version %s is not known to be supported, use it at your own risk!@." nam ver
+              end;
+            incr provers_found;
+	    get_prover_data env whyconfig data.prover_id ver :: acc
+	  else 
+	    begin
+              prover_tips_info := true;
+	      eprintf "Warning: found prover %s but name/version not recognized by regexp `%s'@." data.prover_name data.version_regexp;
+	      eprintf "Answer was `%s'@." s;
+(*
+	      p.command <- cmd;
+	      p.version <- "?";
+*)
+	      acc
+	    end)
+    acc
+    data.commands
+
+
+let run_auto_detection env whyconfig gconfig =
+  let l = read_auto_detection_data () in
+  let detect = List.fold_left (detect_prover env whyconfig) [] l in
+  gconfig.provers <- detect
+    
 
 (*
 Local Variables: 

@@ -52,14 +52,6 @@ let timelimit =
 *)
 
 
-(********************************)
-(* loading WhyIDE configuration *)
-(********************************)
-
-let gconfig = 
-  eprintf "%s reading IDE config file@." pname;
-  read_config ()
-
 (***************************)
 (* parsing comand_line *)
 (***************************)
@@ -116,6 +108,15 @@ let source_text =
 
 let env = Why.Env.create_env (Why.Lexer.retrieve config.loadpath)
 
+(********************************)
+(* loading WhyIDE configuration *)
+(********************************)
+
+let gconfig = 
+  eprintf "%s reading IDE config file@." pname;
+  read_config env config
+
+
 
 (***********************)
 (* Parsing input file  *)
@@ -140,45 +141,26 @@ let theories : Theory.theory Theory.Mnm.t =
 let () = Db.init_base (fname ^ ".db")
 *)
 
-let get_driver name = 
-  let pi = Util.Mstr.find name config.provers in
-  Why.Driver.load_driver env pi.Whyconf.driver
 
-type prover_data =
-    { prover : string (* Db.prover *);
-      command : string;
-      driver : Why.Driver.driver;
-    }
-
-let provers_data =
-  printf "===============================@\nProvers: ";
-  let l = 
-    Util.Mstr.fold
-    (fun id conf acc ->
-       let name = conf.Whyconf.name in
-       printf " %s, " name;
-       { prover = (* Db.get_prover *) name;
-         command = conf.Whyconf.command;
-         driver = get_driver id; } :: acc
-    ) config.provers []
-  in
-  printf "@\n===============================@.";
-  l 
-
-let find_prover s =
+(*
+let find_prover s = 
   match
     List.fold_left
       (fun acc p ->
-         if (* Db.prover_name *) p.prover = s then Some p else acc)
-      None provers_data
+        if (* Db.prover_name *) p.prover_id = s then Some p else acc)
+      None gconfig.provers
   with
-    | None -> assert false
+    | None -> 
+      eprintf "prover id '%s' not found in Why config file@." s;
+      raise Not_found
     | Some p -> p
+*)
 
-let alt_ergo = find_prover "Alt-Ergo"
+(*
+let alt_ergo = find_prover "alt-ergo"
 let simplify = find_prover "simplify"
 let z3 = find_prover "Z3"
-
+*)
 
    
 (*
@@ -463,10 +445,10 @@ let () =
 
 let rec prover_on_goal p g =
   let row = g.Model.goal_row in
-  let name = p.prover in
+  let name = p.prover_name in
   let prover_row = goals_model#append ~parent:row () in
   goals_model#set ~row:prover_row ~column:Model.icon_column !image_prover;
-  goals_model#set ~row:prover_row ~column:Model.name_column ("prover: " ^name);
+  goals_model#set ~row:prover_row ~column:Model.name_column (name ^ " " ^ p.prover_version);
   goals_model#set ~row:prover_row ~column:Model.visible_column true;
   goals_view#expand_row (goals_model#get_path row);
   let callback result time =
@@ -480,7 +462,7 @@ let rec prover_on_goal p g =
   callback Scheduler.Scheduled 0.0;
   Scheduler.schedule_proof_attempt
     ~debug:false ~timelimit:gconfig.time_limit ~memlimit:0 
-    ~prover:p.prover ~command:p.command ~driver:p.driver 
+    ~prover:p.prover_id ~command:p.command ~driver:p.driver 
     ~callback
     g.Model.task;
   List.iter
@@ -570,6 +552,11 @@ let (_ : GMenu.image_menu_item) =
     (fun () ->
        Gconfig.preferences gconfig;
        Scheduler.maximum_running_proofs := gconfig.max_running_processes)
+    () 
+
+let (_ : GMenu.image_menu_item) = 
+  file_factory#add_image_item ~label:"_Detect provers" ~callback:
+    (fun () -> Gconfig.run_auto_detection env config gconfig)
     () 
 
 let (_ : GMenu.image_menu_item) = 
@@ -681,11 +668,16 @@ let (_ : GMenu.check_menu_item) = view_factory#add_check_item
 let tools_menu = factory#add_submenu "_Tools" 
 let tools_factory = new GMenu.factory tools_menu ~accel_group 
 
-let (_ : GMenu.image_menu_item) = 
-  tools_factory#add_image_item ~key:GdkKeysyms._S
-    ~label:"Simplify on unproved goals" 
-    ~callback:(fun () -> prover_on_unproved_goals simplify ()) 
-    () 
+let () =
+  List.iter (fun p ->
+    let (_ : GMenu.image_menu_item) = 
+      let n = p.prover_name ^ " " ^ p.prover_version in
+      tools_factory#add_image_item ~label:(n ^ " on unproved goals") 
+	~callback:(fun () -> prover_on_unproved_goals p ()) 
+	()
+    in ()) gconfig.provers 
+
+(*
 
 let (_ : GMenu.image_menu_item) = 
   tools_factory#add_image_item ~key:GdkKeysyms._A 
@@ -698,7 +690,7 @@ let (_ : GMenu.image_menu_item) =
     ~label:"Z3 on unproved goals" 
     ~callback:(fun () -> prover_on_unproved_goals z3 ()) 
     () 
-  
+*)
 let (_ : GMenu.image_menu_item) = 
   tools_factory#add_image_item 
     ~label:"Split unproved goals" 
