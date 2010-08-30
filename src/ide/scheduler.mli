@@ -40,7 +40,7 @@ val schedule_proof_attempt :
   debug:bool -> timelimit:int -> memlimit:int -> 
   prover:string (*Db.prover*) -> 
   command:string -> driver:Driver.driver -> 
-  callback:(proof_attempt_status -> float -> unit) -> 
+  callback:(proof_attempt_status -> float -> string -> unit) -> 
   Task.task (* Db.goal *) -> unit
   (** schedules an attempt to prove goal with the given prover.  This
       function just prepares the goal for the proof attempt, and puts

@@ -19,7 +19,7 @@ type proof_attempt_status =
 (**** queues of events to process ****)
 
 type attempt = bool * int * int * string * string * Driver.driver * 
-    (proof_attempt_status -> float -> unit) * Task.task 
+    (proof_attempt_status -> float -> string -> unit) * Task.task 
 
 (* queue of external proof attempts *)
 let prover_attempts_queue : attempt Queue.t = Queue.create ()
@@ -30,7 +30,7 @@ let transf_queue  :
     = Queue.create ()
 
 (* queue of prover answers *)
-let answers_queue  : (attempt * proof_attempt_status * float) Queue.t 
+let answers_queue  : (attempt * proof_attempt_status * float * string) Queue.t 
     = Queue.create ()
 
 (* number of running external proofs *)
@@ -57,7 +57,7 @@ let event_handler () =
     Condition.wait queue_condition queue_lock
   done;
   try
-    let (a,res,time) = Queue.pop answers_queue in
+    let (a,res,time,output) = Queue.pop answers_queue in
     decr running_proofs;
     Mutex.unlock queue_lock;
 (*
@@ -66,7 +66,7 @@ let event_handler () =
     (* TODO: update database *)
     (* call GUI callback with argument [res] *)
     let (_,_,_,_,_,_,callback,_) = a in
-    !async (fun () -> callback res time) ()
+    !async (fun () -> callback res time output) ()
   with Queue.Empty ->
     try
       let (callback,transf,task) = Queue.pop transf_queue in
@@ -88,7 +88,7 @@ let event_handler () =
         (* build the prover task from goal in [a] *)
         let (debug,timelimit,memlimit,_prover,command,driver,callback,goal) = a 
         in
-        !async (fun () -> callback Running 0.0) ();
+        !async (fun () -> callback Running 0.0 "") ();
         try
           let call_prover : unit -> Call_provers.prover_result = 
             if false && debug then 
@@ -108,7 +108,7 @@ let event_handler () =
                    | Call_provers.Failure _ | Call_provers.HighFailure 
                        -> HighFailure
                in
-               Queue.push (a,res,r.Call_provers.pr_time) answers_queue ;
+               Queue.push (a,res,r.Call_provers.pr_time,r.Call_provers.pr_output) answers_queue ;
                Condition.signal queue_condition;
                Mutex.unlock queue_lock;
                ()
@@ -119,7 +119,7 @@ let event_handler () =
           | e ->
             eprintf "%a@." Exn_printer.exn_printer e;
             Mutex.lock queue_lock;
-            Queue.push (a,HighFailure,0.0) answers_queue ;
+            Queue.push (a,HighFailure,0.0,"Prover call failed") answers_queue ;
             (* Condition.signal queue_condition; *)
             Mutex.unlock queue_lock;
             ()

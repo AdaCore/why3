@@ -181,9 +181,9 @@ module Model = struct
 
   type proof_attempt =
       { prover : prover_data;
-        status : Scheduler.proof_attempt_status;
-        time : float;
-        output : string;
+        mutable status : Scheduler.proof_attempt_status;
+        mutable time : float;
+        mutable output : string;
       }
 
   type goal_parent =
@@ -215,6 +215,12 @@ module Model = struct
         mutable verified : bool;
       }
 
+  type any_row =
+    | Row_theory of theory
+    | Row_goal of goal
+    | Row_proof_attempt of proof_attempt
+    | Row_transformation of transf
+
   let all : theory list ref = ref [] 
 
   let toggle_hide_proved_goals = ref false
@@ -222,7 +228,7 @@ module Model = struct
   let cols = new GTree.column_list
   let name_column = cols#add Gobject.Data.string
   let icon_column = cols#add Gobject.Data.gobject
-  let id_column = cols#add Gobject.Data.caml
+  let index_column : any_row GTree.column = cols#add Gobject.Data.caml 
   let status_column = cols#add Gobject.Data.gobject
   let time_column = cols#add Gobject.Data.string
   let visible_column = cols#add Gobject.Data.boolean
@@ -279,10 +285,6 @@ module Model = struct
     model,model_filter,view
 
   let clear model = model#clear ()
-
-  let goal_table = Ident.Hid.create 17
-
-  let get_goal id = fst (Ident.Hid.find goal_table id)
 
 end
 
@@ -381,7 +383,7 @@ module Helpers = struct
     all := !all @ [mth];
     goals_model#set ~row:parent ~column:name_column tname;
     goals_model#set ~row:parent ~column:icon_column !image_directory;
-    goals_model#set ~row:parent ~column:id_column th.Theory.th_name;
+    goals_model#set ~row:parent ~column:index_column (Row_theory mth);
     goals_model#set ~row:parent ~column:visible_column true;
     let tasks = Task.split_theory th None None in
     let goals =
@@ -390,11 +392,6 @@ module Helpers = struct
            let id = (Task.task_goal t).Decl.pr_name in
            let name = id.Ident.id_string in
            let row = goals_model#append ~parent () in
-           Ident.Hid.add goal_table id (t,row);
-	   goals_model#set ~row ~column:name_column name;
-           goals_model#set ~row ~column:icon_column !image_file;
-	   goals_model#set ~row ~column:id_column id;
-           goals_model#set ~row ~column:visible_column true;
            let goal = { parent = Theory mth; 
                         task = t ; 
                         goal_row = row;
@@ -403,6 +400,10 @@ module Helpers = struct
                         proved = false;
                       }
            in
+	   goals_model#set ~row ~column:name_column name;
+           goals_model#set ~row ~column:icon_column !image_file;
+	   goals_model#set ~row ~column:index_column (Row_goal goal);
+           goals_model#set ~row ~column:visible_column true;
            goal :: acc
         )
         []
@@ -451,15 +452,31 @@ let rec prover_on_goal p g =
   goals_model#set ~row:prover_row ~column:Model.name_column (name ^ " " ^ p.prover_version);
   goals_model#set ~row:prover_row ~column:Model.visible_column true;
   goals_view#expand_row (goals_model#get_path row);
-  let callback result time =
+  let a = { Model.prover = p;
+            Model.status = Scheduler.Scheduled;
+            Model.time = 0.0;
+            Model.output = "" }
+  in
+  goals_model#set ~row:prover_row ~column:Model.index_column 
+    (Model.Row_proof_attempt a);
+  g.Model.external_proofs <- a :: g.Model.external_proofs;
+  let callback result time output =
+    a.Model.status <- result;
+    a.Model.output <- output;
     goals_model#set ~row:prover_row ~column:Model.status_column 
       (image_of_result result);
-    let t = if time > 0.0 then Format.sprintf "%.2f" time else "" in
+    let t = if time > 0.0 then 
+      begin
+        a.Model.time <- time;
+        Format.sprintf "%.2f" time 
+      end
+    else "" 
+    in
     goals_model#set ~row:prover_row ~column:Model.time_column t;
     if result = Scheduler.Success then
       Helpers.set_proved g
   in
-  callback Scheduler.Scheduled 0.0;
+  callback Scheduler.Scheduled 0.0 "";
   Scheduler.schedule_proof_attempt
     ~debug:false ~timelimit:gconfig.time_limit ~memlimit:0 
     ~prover:p.prover_id ~command:p.command ~driver:p.driver 
@@ -507,17 +524,15 @@ let split_unproved_goals () =
                       subgoals = [];
                     }
                   in
+                  goals_model#set ~row:split_row ~column:Model.index_column 
+                    (Model.Row_transformation tr);
                   g.Model.transformations <- tr :: g.Model.transformations;
                   let goals,_ = List.fold_left
                     (fun (acc,count) subtask ->
-                       let id = (Task.task_goal subtask).Decl.pr_name in
-                       let subtask_row = goals_model#append ~parent:split_row () in
-                       Ident.Hid.add Model.goal_table id (subtask,subtask_row);
-	               goals_model#set ~row:subtask_row ~column:Model.id_column id;
-                       goals_model#set ~row:subtask_row ~column:Model.visible_column true;
-                       goals_model#set ~row:subtask_row ~column:Model.name_column 
-                         (goal_name ^ "." ^ (string_of_int count));
-                       goals_model#set ~row:subtask_row ~column:Model.icon_column !image_file;
+                       let _id = (Task.task_goal subtask).Decl.pr_name in
+                       let subtask_row = 
+                         goals_model#append ~parent:split_row () 
+                       in
                        let goal = { Model.parent = Model.Transf tr; 
                                     Model.task = subtask ; 
                                     Model.goal_row = subtask_row;
@@ -526,6 +541,15 @@ let split_unproved_goals () =
                                     Model.proved = false;
                                   }
                        in
+	               goals_model#set ~row:subtask_row 
+                         ~column:Model.index_column (Model.Row_goal goal);
+                       goals_model#set ~row:subtask_row 
+                         ~column:Model.visible_column true;
+                       goals_model#set ~row:subtask_row 
+                         ~column:Model.name_column 
+                         (goal_name ^ "." ^ (string_of_int count));
+                       goals_model#set ~row:subtask_row 
+                         ~column:Model.icon_column !image_file;
                        (goal :: acc, count+1))
                     ([],1) subgoals 
                   in
@@ -770,18 +794,21 @@ let move_to_line (v : GText.view) line =
   end
 
 (* to be run when a row in the tree view is selected *)
-let select_goals selected_rows = 
-  List.iter
-    (fun p ->
-       let row = filter_model#get_iter p in
-       let id = filter_model#get ~row ~column:Model.id_column in
-       Format.eprintf "You clicked on %s@." id.Ident.id_string;
-       try
-         let g = Model.get_goal id in
-         let task_text = Pp.string_of Pretty.print_task g in
-         task_view#source_buffer#set_text task_text;
-         task_view#scroll_to_mark `INSERT
-       with Not_found -> ()
+let select_row p = 
+  let row = filter_model#get_iter p in
+  match filter_model#get ~row ~column:Model.index_column with
+    | Model.Row_goal g ->
+        let t = g.Model.task in
+        let task_text = Pp.string_of Pretty.print_task t in
+        task_view#source_buffer#set_text task_text;
+        task_view#scroll_to_mark `INSERT
+    | Model.Row_theory _th ->
+        task_view#source_buffer#set_text ""
+    | Model.Row_proof_attempt a ->
+        task_view#source_buffer#set_text a.Model.output
+    | Model.Row_transformation _tr ->
+        task_view#source_buffer#set_text ""
+
 
 (*
        match origin with
@@ -789,9 +816,7 @@ let select_goals selected_rows =
              move_to_line source_view#as_view loc.Lexing.pos_lnum
          | _ -> ()
 *)
-    )
-    selected_rows
-
+  
   
 (***************)
 (* source view *)
@@ -827,8 +852,9 @@ let () = source_view#source_buffer#set_text source_text
 let (_ : GtkSignal.id) =
   goals_view#selection#connect#after#changed ~callback:
     begin fun () ->
-      let list = goals_view#selection#get_selected_rows in
-      select_goals list
+      match goals_view#selection#get_selected_rows with
+        | [p] -> select_row p
+        | _ -> assert false (* multi-selection is disabled *)
     end
 
 let () = w#add_accel_group accel_group
