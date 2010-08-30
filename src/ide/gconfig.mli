@@ -15,6 +15,7 @@ type t =
       mutable tree_width : int;
       mutable task_height : int;
       mutable time_limit : int;
+      mutable verbose : int;
       mutable max_running_processes : int;
       mutable provers : prover_data list;
     }

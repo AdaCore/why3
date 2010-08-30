@@ -16,6 +16,7 @@ type t =
       mutable tree_width : int;
       mutable task_height : int;
       mutable time_limit : int;
+      mutable verbose : int;
       mutable max_running_processes : int;
       mutable provers : prover_data list;
     }
@@ -26,6 +27,7 @@ let default =
     tree_width = 512;
     task_height = 384;
     time_limit = 2;
+    verbose = 0;
     max_running_processes = 2;
     provers = [];
   }
@@ -47,6 +49,7 @@ let save_config config =
   fprintf fmt "tree_width = %d@\n" config.tree_width;
   fprintf fmt "task_height = %d@\n" config.task_height;
   fprintf fmt "time_limit = %d@\n" config.time_limit;
+  fprintf fmt "verbose = %d@\n" config.verbose;
   fprintf fmt "max_processes = %d@\n" config.max_running_processes;
   fprintf fmt "@.";
   List.iter (save_prover fmt) config.provers; 
@@ -59,6 +62,7 @@ let load_main c (key, value) =
     | "tree_width" -> c.tree_width <- Rc.int value
     | "task_height" -> c.task_height <- Rc.int value
     | "time_limit" -> c.time_limit <- Rc.int value
+    | "verbose" -> c.verbose <- Rc.int value
     | "max_processes" -> c.max_running_processes <- Rc.int value
     | s -> 
         eprintf "Warning: ignore unknown key [%s] in whyide config file@." s
@@ -240,14 +244,19 @@ let preferences c =
   let vbox = dialog#vbox in
   let notebook = GPack.notebook ~packing:vbox#add () in
   (** page 1 **)
-  let label1 = GMisc.label ~text:"Provers" () in
+  let label1 = GMisc.label ~text:"General" () in
   let page1 =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label1#coerce w)) ()
   in 
   (* debug mode ? *)
-  let _debugmode = 
+  let debugmode = 
     GButton.check_button ~label:"debug" ~packing:page1#add ()
+      ~active:(c.verbose > 0)
+  in
+  let (_ : GtkSignal.id) = 
+    debugmode#connect#toggled ~callback:
+      (fun () -> c.verbose <- 1 - c.verbose)
   in
   (* timelimit ? *)
   let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
@@ -270,18 +279,14 @@ let preferences c =
       (fun () -> c.max_running_processes <- nb_processes_spin#value_as_int)
   in
   (** page 2 **)
-  let label2 = GMisc.label ~text:"Misc" () in
-  let _page2 = GMisc.label ~text:"contents of page 2" 
+  let label2 = GMisc.label ~text:"Provers" () in
+  let _page2 = GMisc.label ~text:"This page should display detected provers" 
     ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label2#coerce w)) () 
   in
-(*
-  let (_ : GtkSignal.id) =
-    notebook#connect#switch_page 
-      ~callback:(fun i -> prerr_endline ("Page switch to " ^ string_of_int i))
-  in
-*)
   dialog#add_button "Close" `CLOSE ;
   let ( _ : GWindow.Buttons.about) = dialog#run () in
+  eprintf "saving IDE config file@.";
+  save_config c;
   dialog#destroy ()
 
 

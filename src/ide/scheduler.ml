@@ -91,7 +91,7 @@ let event_handler () =
         !async (fun () -> callback Running 0.0 "") ();
         try
           let call_prover : unit -> Call_provers.prover_result = 
-            if false && debug then 
+            if debug then 
               Format.eprintf "Task for prover: %a@." 
                 (Driver.print_task driver) goal;
             Driver.prove_task ~command ~timelimit ~memlimit driver goal

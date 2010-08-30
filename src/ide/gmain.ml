@@ -17,8 +17,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let pname = "[Why Ide]"
-
 let () = ignore (GtkMain.Main.init ())
 
 open Format
@@ -35,13 +33,13 @@ let config =
     Whyconf.read_config None
   with 
     | Not_found ->
-        eprintf "%s no config file found.@." pname;
+        eprintf "no config file found.@.";
         exit 1
     | e ->
         eprintf "%a@." Exn_printer.exn_printer e;
         exit 1
 
-let () = eprintf "%s Load path is: %a@." pname
+let () = eprintf "Load path is: %a@." 
   (Pp.print_list Pp.comma Pp.string) config.loadpath
 
 (*
@@ -65,12 +63,8 @@ let set_file f = match !file with
   | Some _ -> 
       raise (Arg.Bad "only one file")
   | None -> 
-(*
-      if not (Filename.check_suffix f ".why") then 
-	raise (Arg.Bad ("don't know what to do with " ^ f));
-*)
       if not (Sys.file_exists f) then begin
-	Format.eprintf "%s %s: no such file@." pname f; 
+	Format.eprintf "%s: no such file@." f; 
         exit 1
       end;
       file := Some f
@@ -113,7 +107,7 @@ let env = Why.Env.create_env (Why.Lexer.retrieve config.loadpath)
 (********************************)
 
 let gconfig = 
-  eprintf "%s reading IDE config file@." pname;
+  eprintf "reading IDE config file@.";
   read_config env config
 
 
@@ -293,7 +287,7 @@ end
 (***************)
 
 let exit_function () =
-  eprintf "%s saving IDE config file@." pname;
+  eprintf "saving IDE config file@.";
   save_config gconfig;
   GMain.quit ()
 
@@ -478,7 +472,7 @@ let rec prover_on_goal p g =
   in
   callback Scheduler.Scheduled 0.0 "";
   Scheduler.schedule_proof_attempt
-    ~debug:false ~timelimit:gconfig.time_limit ~memlimit:0 
+    ~debug:(gconfig.verbose > 0) ~timelimit:gconfig.time_limit ~memlimit:0 
     ~prover:p.prover_id ~command:p.command ~driver:p.driver 
     ~callback
     g.Model.task;
