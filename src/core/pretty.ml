@@ -82,6 +82,11 @@ let extract_op ls =
 
 let tight_op s = let c = String.sub s 0 1 in c = "!" || c = "?"
 
+let escape_op s =
+  let s = Str.replace_first (Str.regexp "^\\*.") " \\0" s in
+  let s = Str.replace_first (Str.regexp ".\\*$") "\\0 " s in
+  s
+
 (* theory names always start with an upper case letter *)
 let print_th fmt th =
   let sanitizer = String.capitalize in
@@ -91,7 +96,7 @@ let print_ts fmt ts =
   fprintf fmt "%s" (id_unique tprinter ts.ts_name)
 
 let print_ls fmt ls = match extract_op ls with
-  | Some s -> fprintf fmt "(%s)" s
+  | Some s -> fprintf fmt "(%s)" (escape_op s)
   | None   -> fprintf fmt "%s" (id_unique lprinter ls.ls_name)
 
 let print_cs fmt ls =
