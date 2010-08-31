@@ -825,10 +825,12 @@ let edit_selected_row p =
         ()
     | Model.Row_proof_attempt a ->
         eprintf "schudeling editing@.";
-        let file = "goal.v" in
-        a.Model.edited_as <- file;
         let g = a.Model.proof_goal in
         let t = g.Model.task in
+        let id = (Task.task_goal t).Decl.pr_name in
+        let name = id.Ident.id_string in
+        let file = name ^ ".v" in
+        a.Model.edited_as <- file;
         let old_status = a.Model.status in
         Helpers.set_proof_status a Scheduler.Running;
         let callback () =
