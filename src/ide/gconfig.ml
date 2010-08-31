@@ -7,7 +7,8 @@ type prover_data =
       prover_name : string;
       prover_version : string;
       command : string;
-      driver : Why.Driver.driver;
+      driver_name : string;
+      driver : Driver.driver;
     }
 
 type t = 
@@ -32,12 +33,14 @@ let default =
     provers = [];
   }
 
-let conf_file = Filename.concat (Rc.get_home_dir ()) ".whyide.conf"
+let conf_file = Filename.concat (Rc.get_home_dir ()) ".why.conf"
 
 let save_prover fmt p =
-  fprintf fmt "[prover]@\n";
-  fprintf fmt "id = \"%s\"@\n" p.prover_id;
+  fprintf fmt "[prover %s]@\n" p.prover_id;
+  fprintf fmt "name = \"%s\"@\n" p.prover_name;
   fprintf fmt "version = \"%s\"@\n" p.prover_version;
+  fprintf fmt "command = \"%s\"@\n" p.command;
+  fprintf fmt "driver = \"%s\"@\n" p.driver_name;  
   fprintf fmt "@."
 
 let save_config config =
@@ -69,42 +72,52 @@ let load_main c (key, value) =
 
 
 
-let get_prover_data env config id ver = 
-  let pi = Util.Mstr.find id config.Whyconf.provers in
-  let d = Why.Driver.load_driver env pi.Whyconf.driver in
-  { prover_id = id ;
-    prover_name = pi.Whyconf.name;
-    prover_version = ver;
-    command = pi.Whyconf.command;
-    driver = d; 
-  }
+let get_prover_data env id name ver c d = 
+  try
+    let dr = Driver.load_driver env d in
+    { prover_id = id ;
+      prover_name = name;
+      prover_version = ver;
+      command = c;
+      driver_name = d;
+      driver = dr; 
+    }
+  with _e ->
+    eprintf "Failed to load driver %s for prover %s. prover disabled@."
+      d name;
+    raise Not_found
 
-let load_prover env whyconfig l =
-  let id = ref "?" in
+let load_prover env id l =
+  let name = ref "?" in
   let v = ref "?" in
+  let c = ref "?" in
+  let d = ref "?" in
   List.iter
     (fun (key, value) -> 
 	match key with
-	  | "id" -> id := Rc.string value
+	  | "name" -> name := Rc.string value
 	  | "version" -> v := Rc.string value
+          | "command" -> c := Rc.string value
+          | "driver" -> d := Rc.string value
 	  | s -> 
             eprintf "Warning: ignore unknown key [%s] in prover data of whyide config file@." s)
     l;
-  get_prover_data env whyconfig !id !v
+  get_prover_data env id !name !v !c !d
         
-let load env whyconfig c (key, al) = 
+let load env c (key, al) = 
   match key with
     | "main" :: _ -> List.iter (load_main c) al
-    | "prover" :: _ -> c.provers <- load_prover env whyconfig al :: c.provers
+    | "prover" :: id :: _ -> 
+        c.provers <- load_prover env id al :: c.provers
     | s :: _ -> 
         eprintf "Warning: ignored unknown section [%s] in whyide config file@." s
     | [] -> assert false
         
-let read_config env whyconfig =
+let read_config env =
   try
     let rc = Rc.from_file conf_file in
     let c = default in
-    List.iter (load env whyconfig c) rc;
+    List.iter (load env c) rc;
     c
   with
     | Failure "lexing" -> 
@@ -300,32 +313,38 @@ type prover_autodetection_data =
     { kind : prover_kind;
       prover_id : string;
       mutable prover_name : string;
-      mutable commands : string list;
+      mutable execs : string list;
       mutable version_switch : string;
       mutable version_regexp : string;
       mutable versions_ok : string list;
       mutable versions_old : string list;
+      mutable command : string;
+      mutable driver : string;
     }
 
 let default k id =
   { kind = k;
     prover_id = id;
     prover_name = "";
-    commands = [];
+    execs = [];
     version_switch = "";
     version_regexp = "";
     versions_ok = [];
     versions_old = [];
+    command = "";
+    driver ="";
     }
 
 let load_prover d (key, value) = 
   match key with
     | "name" -> d.prover_name <- Rc.string value
-    | "command" -> d.commands <- Rc.string value :: d.commands
+    | "exec" -> d.execs <- Rc.string value :: d.execs
     | "version_switch" -> d.version_switch <- Rc.string value
     | "version_regexp" -> d.version_regexp <- Rc.string value
     | "version_ok" -> d.versions_ok <- Rc.string value :: d.versions_ok
     | "version_old" -> d.versions_old <- Rc.string value :: d.versions_old
+    | "command" -> d.command <- Rc.string value 
+    | "driver" -> d.driver <- Rc.string value
     | s -> 
         eprintf "unknown key [%s] in autodetection data@." s;
         exit 1
@@ -363,7 +382,15 @@ let provers_found = ref 0
 let prover_tips_info = ref false
 
 
-let detect_prover env whyconfig acc data =
+let make_command exec com =
+  let cmd_regexp = Str.regexp "%\\(.\\)" in
+  let replace s = match Str.matched_group 1 s with
+    | "e" -> exec
+    | c -> "%"^c
+  in
+  Str.global_substitute cmd_regexp replace com
+
+let detect_prover env acc data =
   List.fold_left
     (fun acc com ->
 	let out = Filename.temp_file "out" "" in
@@ -401,25 +428,24 @@ let detect_prover env whyconfig acc data =
                   eprintf "Warning: prover %s version %s is not known to be supported, use it at your own risk!@." nam ver
               end;
             incr provers_found;
-	    get_prover_data env whyconfig data.prover_id ver :: acc
+            let c = make_command com data.command in
+	    get_prover_data env data.prover_id data.prover_name ver 
+              c data.driver :: acc
 	  else 
 	    begin
               prover_tips_info := true;
 	      eprintf "Warning: found prover %s but name/version not recognized by regexp `%s'@." data.prover_name data.version_regexp;
 	      eprintf "Answer was `%s'@." s;
-(*
-	      p.command <- cmd;
-	      p.version <- "?";
-*)
 	      acc
 	    end)
     acc
-    data.commands
+    data.execs
 
 
-let run_auto_detection env whyconfig gconfig =
+let run_auto_detection env gconfig =
   let l = read_auto_detection_data () in
-  let detect = List.fold_left (detect_prover env whyconfig) [] l in
+  let detect = List.fold_left (detect_prover env) [] l in
+  eprintf "%d provers detected.@." (List.length detect);
   gconfig.provers <- detect
     
 

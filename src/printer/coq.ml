@@ -320,32 +320,65 @@ let print_pkind fmt = function
   | Pgoal  -> fprintf fmt "Theorem"
   | Pskip  -> assert false (* impossible *)
 
-let print_proof fmt = function
-  | Paxiom | Pskip -> ()
-  | Plemma | Pgoal -> fprintf fmt "Qed.@\n"
+let proof_begin = "(* YOU MAY EDIT THE PROOF BELOW *)"
+let proof_end = "(* DO NOT EDIT BELOW *)"
 
-let print_decl info fmt d = match d.d_node with
+let print_empty_proof fmt =
+  fprintf fmt "%s@\n" proof_begin;
+  fprintf fmt "@\n";
+  fprintf fmt "Qed.@\n";
+  fprintf fmt "%s@\n" proof_end
+
+let print_next_proof ch fmt =
+  try
+    while true do
+      let s = input_line ch in
+      if s = proof_begin then
+        begin
+          fprintf fmt "%s@\n" proof_begin;
+          while true do
+            let s = input_line ch in
+            fprintf fmt "%s@\n" s;
+            if s = proof_end then raise Exit
+          done
+        end
+    done
+  with
+    | End_of_file -> print_empty_proof fmt
+    | Exit -> ()
+
+let print_proof ?old fmt = function
+  | Paxiom | Pskip -> ()
+  | Plemma | Pgoal ->
+      match old with
+        | None -> print_empty_proof fmt
+        | Some ch -> print_next_proof ch fmt
+
+let print_decl ?old info fmt d = match d.d_node with
   | Dtype tl  -> print_list nothing (print_type_decl info) fmt tl
   | Dlogic ll -> print_list nothing (print_logic_decl info) fmt ll
   | Dind il   -> print_list nothing (print_ind_decl info) fmt il
   | Dprop (_,pr,_) when Sid.mem pr.pr_name info.info_rem -> ()
   | Dprop (k,pr,f) ->
+ (*
+     fprintf fmt "@\n@\n(* YOU MAY EDIT BELOW *)@\n@\n@\n";
+      fprintf fmt "(* DO NOT EDIT BELOW *)@\n@\@\n";
+ *)
       fprintf fmt "@[<hov 2>%a %a : %a.@]@\n%a@\n" print_pkind k
-        print_pr pr (print_fmla info) f print_proof k;
+        print_pr pr (print_fmla info) f (print_proof ?old) k;
       forget_tvs ()
 
-let print_decls info fmt dl =
-  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl info)) dl
+let print_decls ?old info fmt dl =
+  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl ?old info)) dl
 
 let print_task pr thpr ?old fmt task =
-  ignore old;
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   let info = {
     info_syn = get_syntax_map task;
     info_rem = get_remove_set task } in
-  print_decls info fmt (Task.task_decls task)
+  print_decls ?old info fmt (Task.task_decls task)
 
 let () = register_printer "coq" print_task
 

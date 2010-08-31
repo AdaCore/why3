@@ -6,6 +6,7 @@ type prover_data =
       prover_name : string;
       prover_version : string;
       command : string;
+      driver_name : string;
       driver : Driver.driver;
     }
 
@@ -20,7 +21,7 @@ type t =
       mutable provers : prover_data list;
     }
 
-val read_config : Env.env -> Whyconf.config -> t
+val read_config : Env.env -> t
 
 val save_config : t -> unit
 
@@ -52,7 +53,7 @@ val show_legend_window : unit -> unit
 val show_about_window : unit -> unit
 val preferences : t -> unit
 
-val run_auto_detection : Env.env -> Whyconf.config -> t -> unit
+val run_auto_detection : Env.env -> t -> unit
 
 (*
 Local Variables: 

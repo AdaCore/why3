@@ -38,7 +38,7 @@ type proof_attempt_status =
 
 val schedule_proof_attempt : 
   debug:bool -> timelimit:int -> memlimit:int -> 
-  prover:string (*Db.prover*) -> 
+  ?old:in_channel ->
   command:string -> driver:Driver.driver -> 
   callback:(proof_attempt_status -> float -> string -> unit) -> 
   Task.task (* Db.goal *) -> unit
@@ -71,11 +71,16 @@ val apply_transformation :
   Why.Task.task list Trans.trans -> Task.task -> unit
 
 
-
+val edit_proof :
+  debug:bool ->
+  editor:string ->
+  file:string ->
+  driver:Why.Driver.driver ->
+  callback:(unit->unit) -> Why.Task.task -> unit
 
 (*
 Local Variables: 
-compile-command: "make -C ../.. bin/gwhy.byte"
+compile-command: "make -C ../.. bin/whyide.byte"
 End: 
 *)
 

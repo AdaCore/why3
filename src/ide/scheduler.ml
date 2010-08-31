@@ -18,11 +18,16 @@ type proof_attempt_status =
 
 (**** queues of events to process ****)
 
-type attempt = bool * int * int * string * string * Driver.driver * 
-    (proof_attempt_status -> float -> string -> unit) * Task.task 
+type callback = proof_attempt_status -> float -> string -> unit
+type attempt = bool * int * int * in_channel option * string * Driver.driver * 
+    callback * Task.task 
 
 (* queue of external proof attempts *)
 let prover_attempts_queue : attempt Queue.t = Queue.create ()
+
+(* queue of proof editing tasks *)
+let proof_edition_queue : (bool * string * string * Driver.driver * 
+    (unit -> unit) * Task.task)  Queue.t = Queue.create ()
 
 (* queue of transformations *)
 let transf_queue  : 
@@ -30,7 +35,7 @@ let transf_queue  :
     = Queue.create ()
 
 (* queue of prover answers *)
-let answers_queue  : (attempt * proof_attempt_status * float * string) Queue.t 
+let answers_queue  : (callback * proof_attempt_status * float * string) Queue.t 
     = Queue.create ()
 
 (* number of running external proofs *)
@@ -51,13 +56,15 @@ let event_handler () =
   while 
     Queue.is_empty transf_queue && 
       Queue.is_empty answers_queue && 
+      Queue.is_empty proof_edition_queue && 
       (Queue.is_empty prover_attempts_queue ||
          !running_proofs >= !maximum_running_proofs)
   do
     Condition.wait queue_condition queue_lock
   done;
   try
-    let (a,res,time,output) = Queue.pop answers_queue in
+    (* priority 1: collect answers from provers *)
+    let (callback,res,time,output) = Queue.pop answers_queue in
     decr running_proofs;
     Mutex.unlock queue_lock;
 (*
@@ -65,10 +72,10 @@ let event_handler () =
 *)
     (* TODO: update database *)
     (* call GUI callback with argument [res] *)
-    let (_,_,_,_,_,_,callback,_) = a in
     !async (fun () -> callback res time output) ()
   with Queue.Empty ->
     try
+      (* priority 2: apply transformations *)
       let (callback,transf,task) = Queue.pop transf_queue in
       Mutex.unlock queue_lock;
       let subtasks : Task.task list = Trans.apply transf task in
@@ -76,25 +83,52 @@ let event_handler () =
       (* call GUI back given new subgoals *)
       !async (fun () -> callback subtasks) ()
     with Queue.Empty ->
+    try
+      (* priority 3: edit proofs *)
+      let (_debug,editor,file,driver,callback,goal) = Queue.pop proof_edition_queue in
+      Mutex.unlock queue_lock;
+      let backup = file ^ ".bak" in
+      let old = 
+        if Sys.file_exists file
+        then 
+          begin
+            Sys.rename file backup;           
+            Some(open_in backup) 
+          end
+        else None
+      in
+      let ch = open_out file in
+      let fmt = formatter_of_out_channel ch in
+      Driver.print_task ?old driver fmt goal;
+      Util.option_iter close_in old;
+      close_out ch;
+      let _ = Sys.command(editor ^ " " ^ file) in
+      (* when done, call GUI back *)
+      !async (fun () -> callback ()) () 
+
+    with Queue.Empty ->
+      (* priority low: start new external proof attempt *)
       (* since answers_queue and transf_queue are empty, 
          we are sure that both
          prover_attempts_queue is non empty and
          running_proofs < maximum_running_proofs
       *)
       try
-        let a = Queue.pop prover_attempts_queue in
+        let (_debug,timelimit,memlimit,old,command,driver,callback,goal) =
+          Queue.pop prover_attempts_queue 
+        in
         incr running_proofs;
         Mutex.unlock queue_lock;
         (* build the prover task from goal in [a] *)
-        let (debug,timelimit,memlimit,_prover,command,driver,callback,goal) = a 
-        in
         !async (fun () -> callback Running 0.0 "") ();
         try
           let call_prover : unit -> Call_provers.prover_result = 
+(*
             if debug then 
               Format.eprintf "Task for prover: %a@." 
                 (Driver.print_task driver) goal;
-            Driver.prove_task ~command ~timelimit ~memlimit driver goal
+*)
+            Driver.prove_task ?old ~command ~timelimit ~memlimit driver goal
           in
           let (_ : Thread.t) = Thread.create 
             (fun () -> 
@@ -108,7 +142,7 @@ let event_handler () =
                    | Call_provers.Failure _ | Call_provers.HighFailure 
                        -> HighFailure
                in
-               Queue.push (a,res,r.Call_provers.pr_time,r.Call_provers.pr_output) answers_queue ;
+               Queue.push (callback,res,r.Call_provers.pr_time,r.Call_provers.pr_output) answers_queue ;
                Condition.signal queue_condition;
                Mutex.unlock queue_lock;
                ()
@@ -119,7 +153,7 @@ let event_handler () =
           | e ->
             eprintf "%a@." Exn_printer.exn_printer e;
             Mutex.lock queue_lock;
-            Queue.push (a,HighFailure,0.0,"Prover call failed") answers_queue ;
+            Queue.push (callback,HighFailure,0.0,"Prover call failed") answers_queue ;
             (* Condition.signal queue_condition; *)
             Mutex.unlock queue_lock;
             ()
@@ -148,12 +182,19 @@ let (_scheduler_thread : Thread.t) =
 
 (***** to be called from GUI ****)
 
-let schedule_proof_attempt ~debug ~timelimit ~memlimit ~prover 
+let schedule_proof_attempt ~debug ~timelimit ~memlimit ?old
     ~command ~driver ~callback
     goal =
   Mutex.lock queue_lock;
-  Queue.push (debug,timelimit,memlimit,prover,command,driver,callback,goal)
+  Queue.push (debug,timelimit,memlimit,old,command,driver,callback,goal)
     prover_attempts_queue;
+  Condition.signal queue_condition;
+  Mutex.unlock queue_lock;
+  ()
+
+let edit_proof ~debug ~editor ~file ~driver ~callback goal =
+  Mutex.lock queue_lock;
+  Queue.push (debug,editor,file,driver,callback,goal) proof_edition_queue;
   Condition.signal queue_condition;
   Mutex.unlock queue_lock;
   ()

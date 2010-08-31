@@ -28,6 +28,7 @@ open Gconfig
 (* loading Why configuration *)
 (*****************************)
 
+(*
 let config = 
   try 
     Whyconf.read_config None
@@ -41,14 +42,7 @@ let config =
 
 let () = eprintf "Load path is: %a@." 
   (Pp.print_list Pp.comma Pp.string) config.loadpath
-
-(*
-let timelimit = 
-  match config.timelimit with
-    | None -> 2
-    | Some n -> n
 *)
-
 
 (***************************)
 (* parsing comand_line *)
@@ -100,7 +94,7 @@ let source_text =
   close_in ic;
   buf
 
-let env = Why.Env.create_env (Why.Lexer.retrieve config.loadpath)
+let env = Why.Env.create_env (Why.Lexer.retrieve ["theories"])
 
 (********************************)
 (* loading WhyIDE configuration *)
@@ -108,7 +102,7 @@ let env = Why.Env.create_env (Why.Lexer.retrieve config.loadpath)
 
 let gconfig = 
   eprintf "reading IDE config file@.";
-  read_config env config
+  read_config env 
 
 
 
@@ -175,12 +169,16 @@ module Model = struct
 
   type proof_attempt =
       { prover : prover_data;
+        proof_goal : goal;
+        proof_row : Gtk.tree_iter;
         mutable status : Scheduler.proof_attempt_status;
+        mutable proof_obsolete : bool;
         mutable time : float;
         mutable output : string;
+        mutable edited_as : string;
       }
 
-  type goal_parent =
+  and goal_parent =
     | Theory of theory
     | Transf of transf
 
@@ -189,7 +187,7 @@ module Model = struct
         task: Task.task;
         goal_row : Gtk.tree_iter;
         mutable proved : bool;
-        mutable external_proofs: proof_attempt list;
+        external_proofs: (string, proof_attempt) Hashtbl.t;
         mutable transformations : transf list;
       }
 
@@ -337,6 +335,14 @@ let goals_model,filter_model,goals_view = Model.create ~packing:scrollview#add (
 
 module Helpers = struct
 
+  let image_of_result = function
+    | Scheduler.Scheduled -> !image_scheduled
+    | Scheduler.Running -> !image_running
+    | Scheduler.Success -> !image_valid
+    | Scheduler.Timeout -> !image_timeout
+    | Scheduler.Unknown -> !image_unknown
+    | Scheduler.HighFailure -> !image_failure
+        
   open Model
 
   let set_theory_proved t =
@@ -346,8 +352,7 @@ module Helpers = struct
     goals_model#set ~row ~column:Model.status_column !image_yes;
     if !Model.toggle_hide_proved_goals then
       goals_model#set ~row ~column:Model.visible_column false
-      
-    
+         
   let rec set_proved g =
     let row = g.goal_row in
     g.proved <- true;
@@ -364,7 +369,13 @@ module Helpers = struct
             begin
               set_proved t.parent_goal;
             end
-              
+
+  let set_proof_status a s =
+    a.status <- s;
+    let row = a.proof_row in
+    goals_model#set ~row ~column:Model.status_column 
+      (image_of_result s);
+    if s = Scheduler.Success then set_proved a.proof_goal              
 
   let add_theory th =
     let tname = th.Theory.th_name.Ident.id_string in
@@ -389,7 +400,7 @@ module Helpers = struct
            let goal = { parent = Theory mth; 
                         task = t ; 
                         goal_row = row;
-                        external_proofs = [];
+                        external_proofs = Hashtbl.create 7;
                         transformations = [];
                         proved = false;
                       }
@@ -414,14 +425,6 @@ let () =
 
 
 
-let image_of_result = function
-  | Scheduler.Scheduled -> !image_scheduled
-  | Scheduler.Running -> !image_running
-  | Scheduler.Success -> !image_valid
-  | Scheduler.Timeout -> !image_timeout
-  | Scheduler.Unknown -> !image_unknown
-  | Scheduler.HighFailure -> !image_failure
-
 let () = 
   begin
     Scheduler.async := GtkThread.async;
@@ -440,25 +443,35 @@ let () =
 
 let rec prover_on_goal p g =
   let row = g.Model.goal_row in
-  let name = p.prover_name in
-  let prover_row = goals_model#append ~parent:row () in
-  goals_model#set ~row:prover_row ~column:Model.icon_column !image_prover;
-  goals_model#set ~row:prover_row ~column:Model.name_column (name ^ " " ^ p.prover_version);
-  goals_model#set ~row:prover_row ~column:Model.visible_column true;
-  goals_view#expand_row (goals_model#get_path row);
-  let a = { Model.prover = p;
-            Model.status = Scheduler.Scheduled;
-            Model.time = 0.0;
-            Model.output = "" }
+  let id = p.prover_id in
+  let a = 
+    try Hashtbl.find g.Model.external_proofs id 
+    with Not_found ->
+      (* creating a new row *)
+      let name = p.prover_name in
+      let prover_row = goals_model#append ~parent:row () in
+      goals_model#set ~row:prover_row ~column:Model.icon_column !image_prover;
+      goals_model#set ~row:prover_row ~column:Model.name_column (name ^ " " ^ p.prover_version);
+      goals_model#set ~row:prover_row ~column:Model.visible_column true;
+      goals_view#expand_row (goals_model#get_path row);
+      let a = { Model.prover = p;
+                Model.proof_goal = g;
+                Model.proof_row = prover_row;
+                Model.status = Scheduler.Scheduled;
+                Model.proof_obsolete = false;
+                Model.time = 0.0;
+                Model.output = "";
+                Model.edited_as = "";
+              }
+      in
+      goals_model#set ~row:prover_row ~column:Model.index_column 
+        (Model.Row_proof_attempt a);
+      Hashtbl.add g.Model.external_proofs id a;
+      a
   in
-  goals_model#set ~row:prover_row ~column:Model.index_column 
-    (Model.Row_proof_attempt a);
-  g.Model.external_proofs <- a :: g.Model.external_proofs;
   let callback result time output =
-    a.Model.status <- result;
     a.Model.output <- output;
-    goals_model#set ~row:prover_row ~column:Model.status_column 
-      (image_of_result result);
+    Helpers.set_proof_status a result;
     let t = if time > 0.0 then 
       begin
         a.Model.time <- time;
@@ -466,14 +479,15 @@ let rec prover_on_goal p g =
       end
     else "" 
     in
-    goals_model#set ~row:prover_row ~column:Model.time_column t;
-    if result = Scheduler.Success then
-      Helpers.set_proved g
+    goals_model#set ~row:a.Model.proof_row ~column:Model.time_column t
   in
   callback Scheduler.Scheduled 0.0 "";
+  let old = if a.Model.edited_as = "" then None else
+    (Some (open_in a.Model.edited_as))
+  in
   Scheduler.schedule_proof_attempt
     ~debug:(gconfig.verbose > 0) ~timelimit:gconfig.time_limit ~memlimit:0 
-    ~prover:p.prover_id ~command:p.command ~driver:p.driver 
+    ?old ~command:p.command ~driver:p.driver 
     ~callback
     g.Model.task;
   List.iter
@@ -530,7 +544,7 @@ let split_unproved_goals () =
                        let goal = { Model.parent = Model.Transf tr; 
                                     Model.task = subtask ; 
                                     Model.goal_row = subtask_row;
-                                    Model.external_proofs = [];
+                                    Model.external_proofs = Hashtbl.create 7;
                                     Model.transformations = [];
                                     Model.proved = false;
                                   }
@@ -574,7 +588,7 @@ let (_ : GMenu.image_menu_item) =
 
 let (_ : GMenu.image_menu_item) = 
   file_factory#add_image_item ~label:"_Detect provers" ~callback:
-    (fun () -> Gconfig.run_auto_detection env config gconfig)
+    (fun () -> Gconfig.run_auto_detection env gconfig)
     () 
 
 let (_ : GMenu.image_menu_item) = 
@@ -695,20 +709,6 @@ let () =
 	()
     in ()) gconfig.provers 
 
-(*
-
-let (_ : GMenu.image_menu_item) = 
-  tools_factory#add_image_item ~key:GdkKeysyms._A 
-    ~label:"Alt-Ergo on unproved goals" 
-    ~callback:(fun () -> prover_on_unproved_goals alt_ergo ()) 
-    () 
-
-let (_ : GMenu.image_menu_item) = 
-  tools_factory#add_image_item ~key:GdkKeysyms._Z 
-    ~label:"Z3 on unproved goals" 
-    ~callback:(fun () -> prover_on_unproved_goals z3 ()) 
-    () 
-*)
 let (_ : GMenu.image_menu_item) = 
   tools_factory#add_image_item 
     ~label:"Split unproved goals" 
@@ -811,6 +811,51 @@ let select_row p =
          | _ -> ()
 *)
   
+
+(*****************************)
+(* method: edit current goal *)
+(*****************************)
+
+let edit_selected_row p =
+  let row = filter_model#get_iter p in
+  match filter_model#get ~row ~column:Model.index_column with
+    | Model.Row_goal _g ->
+        ()
+    | Model.Row_theory _th ->
+        ()
+    | Model.Row_proof_attempt a ->
+        eprintf "schudeling editing@.";
+        let file = "goal.v" in
+        a.Model.edited_as <- file;
+        let g = a.Model.proof_goal in
+        let t = g.Model.task in
+        let old_status = a.Model.status in
+        Helpers.set_proof_status a Scheduler.Running;
+        let callback () =
+          Helpers.set_proof_status a old_status;
+        in
+        Scheduler.edit_proof ~debug:false ~editor:"coqide"            
+          ~file
+          ~driver:a.Model.prover.driver
+          ~callback
+          t
+    | Model.Row_transformation _tr ->
+        ()
+
+let edit_current_proof () =
+  match goals_view#selection#get_selected_rows with
+    | [] -> ()
+    | [p] -> edit_selected_row p
+    | _ -> assert false (* multi-selection is disabled *)
+
+let (_ : GMenu.image_menu_item) = 
+  tools_factory#add_image_item 
+    ~label:"Edit current proof" 
+    ~callback:edit_current_proof
+    () 
+
+
+
   
 (***************)
 (* source view *)
@@ -848,6 +893,7 @@ let (_ : GtkSignal.id) =
     begin fun () ->
       match goals_view#selection#get_selected_rows with
         | [p] -> select_row p
+        | [] -> ()
         | _ -> assert false (* multi-selection is disabled *)
     end
 
