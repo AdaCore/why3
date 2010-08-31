@@ -41,11 +41,13 @@ val call_on_buffer :
   driver -> Buffer.t -> unit -> Call_provers.prover_result
 
 val print_task :
+  ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> unit
 
 val prove_task :
   command    : string ->
   ?timelimit : int ->
   ?memlimit  : int ->
-  driver -> Task.task -> unit -> Call_provers.prover_result
+  ?old       : in_channel ->
+  driver -> Task.task -> (unit -> Call_provers.prover_result)
 

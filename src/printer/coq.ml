@@ -337,7 +337,8 @@ let print_decl info fmt d = match d.d_node with
 let print_decls info fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl info)) dl
 
-let print_task pr thpr fmt task =
+let print_task pr thpr ?old fmt task =
+  ignore old;
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;

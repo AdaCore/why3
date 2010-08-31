@@ -31,7 +31,7 @@ type prelude_map = prelude Mid.t
 
 type 'a pp = Format.formatter -> 'a -> unit
 
-type printer = prelude -> prelude_map -> task pp
+type printer = prelude -> prelude_map -> ?old:in_channel -> task pp
 
 val register_printer : string -> printer -> unit
 

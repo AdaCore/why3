@@ -233,7 +233,7 @@ let update_task drv task =
   in
   add_tdecl task goal
 
-let print_task drv fmt task =
+let print_task ?old drv fmt task =
   let p = match drv.drv_printer with
     | None -> raise NoPrinter
     | Some p -> p
@@ -248,12 +248,12 @@ let print_task drv fmt task =
 (*Format.printf "@\n@\nTASK";*)
   let task = update_task drv task in
   let task = List.fold_left apply task transl in
-  fprintf fmt "@[%a@]@?" printer task
+  fprintf fmt "@[%a@]@?" (printer ?old) task
 
-let prove_task ~command ?timelimit ?memlimit drv task =
+let prove_task ~command ?timelimit ?memlimit ?old drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
-  print_task drv fmt task; pp_print_flush fmt ();
+  print_task ?old drv fmt task; pp_print_flush fmt ();
   call_on_buffer ~command ?timelimit ?memlimit drv buf
 
 (* exception report *)
