@@ -127,6 +127,7 @@ let read_config env =
     let rc = Rc.from_file conf_file in
     let c = default in
     List.iter (load env c) rc;
+    c.provers <- List.rev c.provers;
     c
   with
     | Failure "lexing" -> 
@@ -329,6 +330,7 @@ type prover_autodetection_data =
       mutable versions_old : string list;
       mutable command : string;
       mutable driver : string;
+      mutable editor : string;
     }
 
 let default k id =
@@ -341,7 +343,8 @@ let default k id =
     versions_ok = [];
     versions_old = [];
     command = "";
-    driver ="";
+    driver = "";
+    editor = "";
     }
 
 let load_prover d (key, value) = 
@@ -354,6 +357,7 @@ let load_prover d (key, value) =
     | "version_old" -> d.versions_old <- Rc.string value :: d.versions_old
     | "command" -> d.command <- Rc.string value 
     | "driver" -> d.driver <- Rc.string value
+    | "editor" -> d.editor <- Rc.string value
     | s -> 
         eprintf "unknown key [%s] in autodetection data@." s;
         exit 1
@@ -439,7 +443,7 @@ let detect_prover env acc data =
             incr provers_found;
             let c = make_command com data.command in
 	    get_prover_data env data.prover_id data.prover_name ver 
-              c data.driver "" :: acc
+              c data.driver data.editor :: acc
 	  else 
 	    begin
               prover_tips_info := true;
