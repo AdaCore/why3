@@ -130,12 +130,11 @@ let rec print_pat info fmt p = match p.pat_node with
             print_ls cs (print_paren_r (print_pat info)) pl
       end
 
-let print_vsty info fmt v =
-  fprintf fmt "(%a:%a)" print_vs v (print_ty info) v.vs_ty
+let print_vsty_nopar info fmt v =
+  fprintf fmt "%a:%a" print_vs v (print_ty info) v.vs_ty
 
-let print_quant fmt = function
-  | Fforall -> fprintf fmt "forall"
-  | Fexists -> fprintf fmt "exists"
+let print_vsty info fmt v =
+  fprintf fmt "(%a)" (print_vsty_nopar info) v
 
 let print_binop fmt = function
   | Fand -> fprintf fmt "/\\"
@@ -202,11 +201,23 @@ and print_tnode opl opr info fmt t = match t.t_node with
     end
 
 and print_fnode opl opr info fmt f = match f.f_node with
-  | Fquant (q,fq) ->
-      let vl,tl,f = f_open_quant fq in
-      fprintf fmt (protect_on opr "%a %a%a,@ %a") print_quant q
+  | Fquant (Fforall,fq) ->
+      let vl,_tl,f = f_open_quant fq in
+      fprintf fmt (protect_on opr "forall %a,@ %a") 
         (print_space_list (print_vsty info)) vl
-        (print_tl info) tl (print_fmla info) f;
+        (* (print_tl info) tl *) (print_fmla info) f;
+      List.iter forget_var vl
+  | Fquant (Fexists,fq) ->
+      let vl,_tl,f = f_open_quant fq in
+      let rec aux vl =
+        match vl with
+          | [] -> print_fmla info fmt f
+          | v::vr ->
+              fprintf fmt (protect_on opr "exists %a,@ ") 
+                (print_vsty_nopar info) v;
+              aux vr
+      in
+      aux vl;
       List.iter forget_var vl
   | Ftrue ->
       fprintf fmt "True"
