@@ -98,17 +98,39 @@ let add_ld func pred axl d = match d with
         | _ -> axl, d
       end
 
-let elim func pred mutual d = match d.d_node with
-  | Dlogic l when not mutual || List.length l > 1 ->
-      let axl, l = map_fold_left (add_ld func pred) [] l in
-      let d = create_logic_decl l in
-      d :: List.rev axl
+let elim_decl func pred l =
+  let axl, l = map_fold_left (add_ld func pred) [] l in
+  let d = create_logic_decl l in
+  d :: List.rev axl
+
+let elim func pred d = match d.d_node with
+  | Dlogic l -> elim_decl func pred l
   | _ -> [d]
 
-let eliminate_definition_func  = Trans.decl (elim true false false) None
-let eliminate_definition_pred  = Trans.decl (elim false true false) None
-let eliminate_definition       = Trans.decl (elim true true false) None
-let eliminate_mutual_recursion = Trans.decl (elim true true true) None
+let is_rec = function
+  | [] -> assert false
+  | [_, None] -> false
+  | [ls, Some ld] ->
+      let _, e = open_ls_defn ld in
+      begin match e with
+        | Term t -> t_s_any (const false) (ls_equal ls) t
+        | Fmla f -> f_s_any (const false) (ls_equal ls) f
+      end
+  | _ -> true
+
+let elim_recursion d = match d.d_node with
+  | Dlogic l when is_rec l -> elim_decl true true l
+  | _ -> [d]
+
+let elim_mutual d = match d.d_node with
+  | Dlogic l when List.length l > 1 -> elim_decl true true l
+  | _ -> [d]
+
+let eliminate_definition_func  = Trans.decl (elim true false) None
+let eliminate_definition_pred  = Trans.decl (elim false true) None
+let eliminate_definition       = Trans.decl (elim true true) None
+let eliminate_recursion        = Trans.decl elim_recursion None
+let eliminate_mutual_recursion = Trans.decl elim_mutual None
 
 let () =
   Trans.register_transform "eliminate_definition_func"
@@ -117,6 +139,8 @@ let () =
     eliminate_definition_pred;
   Trans.register_transform "eliminate_definition"
     eliminate_definition;
+  Trans.register_transform "eliminate_recursion"
+    eliminate_recursion;
   Trans.register_transform "eliminate_mutual_recursion"
     eliminate_mutual_recursion
 
