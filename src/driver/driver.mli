@@ -31,8 +31,11 @@ val load_driver : Env.env -> string -> driver
 
 (** {2 use a driver} *)
 
-(** file_of_task input_file theory_name task *)
 val file_of_task : driver -> string -> string -> Task.task -> string
+(** [file_of_task d f th t] produces a filename
+    for the prover of driver [d], for a task [t] generated from
+    a goal in theory [th] of filename [f]
+*)
 
 val call_on_buffer :
   command    : string ->

@@ -824,12 +824,10 @@ let edit_selected_row p =
     | Model.Row_theory _th ->
         ()
     | Model.Row_proof_attempt a ->
-        eprintf "schudeling editing@.";
         let g = a.Model.proof_goal in
         let t = g.Model.task in
-        let id = (Task.task_goal t).Decl.pr_name in
-        let name = id.Ident.id_string in
-        let file = name ^ ".v" in
+        let driver = a.Model.prover.driver in
+        let file = Driver.file_of_task driver "f" "th" t in
         a.Model.edited_as <- file;
         let old_status = a.Model.status in
         Helpers.set_proof_status a Scheduler.Running;
@@ -843,7 +841,7 @@ let edit_selected_row p =
         in
         Scheduler.edit_proof ~debug:false ~editor
           ~file
-          ~driver:a.Model.prover.driver
+          ~driver
           ~callback
           t
     | Model.Row_transformation _tr ->

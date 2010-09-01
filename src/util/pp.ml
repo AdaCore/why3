@@ -70,6 +70,7 @@ let print_pair_delim start sep stop pr1 pr2 fmt (a,b) =
 
 let dot fmt () = fprintf fmt ".@ "
 let comma fmt () = fprintf fmt ",@ "
+let star fmt () = fprintf fmt "*@ "
 let simple_comma fmt () = fprintf fmt ", "
 let underscore fmt () = fprintf fmt "_"
 let semi fmt () = fprintf fmt ";@ "

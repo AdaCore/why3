@@ -69,6 +69,7 @@ val newline : formatter -> unit -> unit
 val newline2 : formatter -> unit -> unit
 val dot : formatter -> unit -> unit
 val comma : formatter -> unit -> unit
+val star : formatter -> unit -> unit
 val simple_comma : formatter -> unit -> unit
 val semi : formatter -> unit -> unit
 val underscore : formatter -> unit -> unit

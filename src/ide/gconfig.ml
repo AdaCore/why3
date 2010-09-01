@@ -44,7 +44,7 @@ let save_prover fmt p =
   fprintf fmt "version = \"%s\"@\n" p.prover_version;
   fprintf fmt "command = \"%s\"@\n" p.command;
   fprintf fmt "driver = \"%s\"@\n" p.driver_name;  
-  fprintf fmt "editor = \"%s\"@\n" p.editor;  
+  if p.editor <> "" then fprintf fmt "editor = \"%s\"@\n" p.editor;  
   fprintf fmt "@."
 
 let save_config config =

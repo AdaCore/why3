@@ -47,10 +47,34 @@ let forget_all () =
 let tv_set = ref Sid.empty
 
 (* type variables *)
+
 let print_tv fmt tv =
-  tv_set := Sid.add tv.tv_name !tv_set;
   let n = id_unique iprinter tv.tv_name in
   fprintf fmt "%s" n
+
+let print_tv_binder fmt tv =
+  tv_set := Sid.add tv.tv_name !tv_set;
+  let n = id_unique iprinter tv.tv_name in
+  fprintf fmt "(%s:Type)" n
+
+let print_ne_params fmt stv =
+  Stv.iter
+    (fun tv -> fprintf fmt "@ %a" print_tv_binder tv)
+    stv
+
+let print_ne_params_list fmt ltv =
+  List.iter
+    (fun tv -> fprintf fmt "@ %a" print_tv_binder tv)
+    ltv
+
+let print_params fmt stv =
+  if Stv.is_empty stv then () else
+    fprintf fmt "forall%a,@ " print_ne_params stv
+
+let print_params_list fmt ltv =
+  match ltv with
+    | [] -> () 
+    | _ -> fprintf fmt "forall%a,@ " print_ne_params_list ltv
 
 let forget_tvs () =
   Sid.iter (forget_id iprinter) !tv_set;
@@ -83,14 +107,25 @@ type info = {
 
 let rec print_ty info fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
-  | Tyapp (ts, tl) -> begin match query_syntax info.info_syn ts.ts_name with
-      | Some s -> syntax_arguments s (print_ty info) fmt tl
-      | None -> begin match tl with
-          | []  -> print_ts fmt ts
-          | l   -> fprintf fmt "(%a@ %a)" print_ts ts
-                     (print_list space (print_ty info)) l
-        end
-    end
+  | Tyapp (ts, tl) when is_ts_tuple ts ->
+      begin 
+        match tl with
+          | []  -> fprintf fmt "unit"
+          | [ty] -> print_ty info fmt ty
+          | _   -> fprintf fmt "(%a@ %a)" print_ts ts
+              (print_list star (print_ty info)) tl
+      end      
+  | Tyapp (ts, tl) -> 
+      begin match query_syntax info.info_syn ts.ts_name with
+        | Some s -> syntax_arguments s (print_ty info) fmt tl
+        | None -> 
+            begin 
+              match tl with
+                | []  -> print_ts fmt ts
+                | l   -> fprintf fmt "(%a@ %a)" print_ts ts
+                    (print_list space (print_ty info)) l
+            end
+      end
 
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
@@ -271,20 +306,22 @@ let print_constr info fmt cs =
   fprintf fmt "@[<hov 4>| %a%a@]" print_ls cs
     (print_paren_l (print_ty info)) cs.ls_args
 
-let print_type_decl info fmt (ts,def) = match def with
-  | Tabstract -> begin match ts.ts_def with
-      | None ->
-          fprintf fmt "@[<hov 2>Parameter %a : %aType.@]@\n@\n"
-            print_ts ts (print_arrow_list print_tv) ts.ts_args
-      | Some ty ->
-          fprintf fmt "@[<hov 2>Definition %a %a :=@ %a@]@\n@\n"
-            print_ts ts (print_arrow_list print_tv) ts.ts_args
-	    (print_ty info) ty
+let print_type_decl info fmt (ts,def) = 
+  if is_ts_tuple ts then () else
+  match def with
+    | Tabstract -> begin match ts.ts_def with
+        | None ->
+            fprintf fmt "@[<hov 2>Parameter %a : %aType.@]@\n@\n"
+              print_ts ts print_params_list ts.ts_args
+        | Some ty ->
+            fprintf fmt "@[<hov 2>Definition %a %a :=@ %a.@]@\n@\n"
+              print_ts ts (print_arrow_list print_tv) ts.ts_args
+	      (print_ty info) ty
       end
-  | Talgebraic csl ->
-      fprintf fmt "@[<hov 2>Inductive %a %a :=@\n@[<hov>%a@].@]@\n@\n"
-        print_ts ts (print_arrow_list print_tv) ts.ts_args
-        (print_list newline (print_constr info)) csl
+    | Talgebraic csl ->
+        fprintf fmt "@[<hov 2>Inductive %a %a :=@\n@[<hov>%a@].@]@\n@\n"
+          print_ts ts (print_arrow_list print_tv) ts.ts_args
+          (print_list newline (print_constr info)) csl
 
 let print_type_decl info fmt d =
   if not (Sid.mem (fst d).ts_name info.info_rem) then
@@ -296,18 +333,32 @@ let print_ls_type ?(arrow=false) info fmt ls =
   | None -> fprintf fmt "Prop"
   | Some ty -> print_ty info fmt ty
 
-let print_logic_decl info fmt (ls,ld) = match ld with
-  | Some ld ->
-      let vl,e = open_ls_defn ld in
-      fprintf fmt "@[<hov 2>Definition %a%a: %a :=@ %a.@]@\n@\n"
-        print_ls ls (print_space_list (print_vsty info)) vl
-        (print_ls_type info) ls.ls_value
-        (print_expr info) e;
-      List.iter forget_var vl
-  | None ->
-      fprintf fmt "@[<hov 2>Parameter %a: %a@ %a.@]@\n@\n"
-        print_ls ls (print_arrow_list (print_ty info)) ls.ls_args
-        (print_ls_type ~arrow:(List.length ls.ls_args > 0) info) ls.ls_value
+let print_logic_decl info fmt (ls,ld) = 
+  let params = ls_ty_freevars ls in
+  begin
+    match ld with
+      | Some ld ->
+          let vl,e = open_ls_defn ld in
+          fprintf fmt "@[<hov 2>Definition %a%a%a: %a :=@ %a.@]@\n"
+            print_ls ls 
+            print_params params
+            (print_space_list (print_vsty info)) vl
+            (print_ls_type info) ls.ls_value
+            (print_expr info) e;
+          List.iter forget_var vl
+      | None ->
+          fprintf fmt "@[<hov 2>Parameter %a: %a%a@ %a.@]@\n"
+            print_ls ls 
+            print_params params
+            (print_arrow_list (print_ty info)) ls.ls_args
+            (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
+  end;
+  if Stv.is_empty params then 
+    fprintf fmt "@\n"
+  else
+    fprintf fmt "Implicit Arguments %a.@\n@\n"
+      print_ls ls 
+    
 
 let print_logic_decl info fmt d =
   if not (Sid.mem (fst d).ls_name info.info_rem) then 
@@ -375,8 +426,12 @@ let print_decl ?old info fmt d = match d.d_node with
      fprintf fmt "@\n@\n(* YOU MAY EDIT BELOW *)@\n@\n@\n";
       fprintf fmt "(* DO NOT EDIT BELOW *)@\n@\@\n";
  *)
-      fprintf fmt "@[<hov 2>%a %a : %a.@]@\n%a@\n" print_pkind k
-        print_pr pr (print_fmla info) f (print_proof ?old) k;
+      let params = f_ty_freevars Stv.empty f in
+      fprintf fmt "@[<hov 2>%a %a : %a%a.@]@\n%a@\n" 
+        print_pkind k
+        print_pr pr 
+        print_params params
+        (print_fmla info) f (print_proof ?old) k;
       forget_tvs ()
 
 let print_decls ?old info fmt dl =
@@ -393,3 +448,11 @@ let print_task pr thpr ?old fmt task =
 
 let () = register_printer "coq" print_task
 
+
+
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. "
+End: 
+*)
