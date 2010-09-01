@@ -24,25 +24,6 @@ open Why
 open Whyconf
 open Gconfig
 
-(*****************************)
-(* loading Why configuration *)
-(*****************************)
-
-(*
-let config = 
-  try 
-    Whyconf.read_config None
-  with 
-    | Not_found ->
-        eprintf "no config file found.@.";
-        exit 1
-    | e ->
-        eprintf "%a@." Exn_printer.exn_printer e;
-        exit 1
-
-let () = eprintf "Load path is: %a@." 
-  (Pp.print_list Pp.comma Pp.string) config.loadpath
-*)
 
 (***************************)
 (* parsing comand_line *)
@@ -827,7 +808,7 @@ let edit_selected_row p =
         let g = a.Model.proof_goal in
         let t = g.Model.task in
         let driver = a.Model.prover.driver in
-        let file = Driver.file_of_task driver "f" "th" t in
+        let file = Driver.file_of_task driver fname "" t in
         a.Model.edited_as <- file;
         let old_status = a.Model.status in
         Helpers.set_proof_status a Scheduler.Running;
