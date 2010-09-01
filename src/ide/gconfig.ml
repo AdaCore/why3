@@ -9,6 +9,7 @@ type prover_data =
       command : string;
       driver_name : string;
       driver : Driver.driver;
+      mutable editor : string;
     }
 
 type t = 
@@ -20,6 +21,7 @@ type t =
       mutable verbose : int;
       mutable max_running_processes : int;
       mutable provers : prover_data list;
+      mutable default_editor : string;
     }
 
 let default = 
@@ -31,6 +33,7 @@ let default =
     verbose = 0;
     max_running_processes = 2;
     provers = [];
+    default_editor = "";
   }
 
 let conf_file = Filename.concat (Rc.get_home_dir ()) ".why.conf"
@@ -41,6 +44,7 @@ let save_prover fmt p =
   fprintf fmt "version = \"%s\"@\n" p.prover_version;
   fprintf fmt "command = \"%s\"@\n" p.command;
   fprintf fmt "driver = \"%s\"@\n" p.driver_name;  
+  fprintf fmt "editor = \"%s\"@\n" p.editor;  
   fprintf fmt "@."
 
 let save_config config =
@@ -54,6 +58,7 @@ let save_config config =
   fprintf fmt "time_limit = %d@\n" config.time_limit;
   fprintf fmt "verbose = %d@\n" config.verbose;
   fprintf fmt "max_processes = %d@\n" config.max_running_processes;
+  fprintf fmt "default_editor = \"%s\"@\n" config.default_editor;  
   fprintf fmt "@.";
   List.iter (save_prover fmt) config.provers; 
   close_out ch
@@ -67,12 +72,13 @@ let load_main c (key, value) =
     | "time_limit" -> c.time_limit <- Rc.int value
     | "verbose" -> c.verbose <- Rc.int value
     | "max_processes" -> c.max_running_processes <- Rc.int value
+    | "default_editor" -> c.default_editor <- Rc.string value
     | s -> 
         eprintf "Warning: ignore unknown key [%s] in whyide config file@." s
 
 
 
-let get_prover_data env id name ver c d = 
+let get_prover_data env id name ver c d e = 
   try
     let dr = Driver.load_driver env d in
     { prover_id = id ;
@@ -81,6 +87,7 @@ let get_prover_data env id name ver c d =
       command = c;
       driver_name = d;
       driver = dr; 
+      editor = e;
     }
   with _e ->
     eprintf "Failed to load driver %s for prover %s. prover disabled@."
@@ -92,6 +99,7 @@ let load_prover env id l =
   let v = ref "?" in
   let c = ref "?" in
   let d = ref "?" in
+  let e = ref "" in
   List.iter
     (fun (key, value) -> 
 	match key with
@@ -99,10 +107,11 @@ let load_prover env id l =
 	  | "version" -> v := Rc.string value
           | "command" -> c := Rc.string value
           | "driver" -> d := Rc.string value
+          | "editor" -> e := Rc.string value
 	  | s -> 
             eprintf "Warning: ignore unknown key [%s] in prover data of whyide config file@." s)
     l;
-  get_prover_data env id !name !v !c !d
+  get_prover_data env id !name !v !c !d !e
         
 let load env c (key, al) = 
   match key with
@@ -430,7 +439,7 @@ let detect_prover env acc data =
             incr provers_found;
             let c = make_command com data.command in
 	    get_prover_data env data.prover_id data.prover_name ver 
-              c data.driver :: acc
+              c data.driver "" :: acc
 	  else 
 	    begin
               prover_tips_info := true;

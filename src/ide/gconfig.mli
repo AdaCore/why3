@@ -8,6 +8,7 @@ type prover_data =
       command : string;
       driver_name : string;
       driver : Driver.driver;
+      mutable editor : string;
     }
 
 type t = 
@@ -19,6 +20,7 @@ type t =
       mutable verbose : int;
       mutable max_running_processes : int;
       mutable provers : prover_data list;
+      mutable default_editor : string;
     }
 
 val read_config : Env.env -> t

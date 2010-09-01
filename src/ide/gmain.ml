@@ -836,7 +836,12 @@ let edit_selected_row p =
         let callback () =
           Helpers.set_proof_status a old_status;
         in
-        Scheduler.edit_proof ~debug:false ~editor:"coqide"            
+        let editor = 
+          match a.Model.prover.editor with
+            | "" -> gconfig.default_editor
+            | _ -> a.Model.prover.editor
+        in
+        Scheduler.edit_proof ~debug:false ~editor
           ~file
           ~driver:a.Model.prover.driver
           ~callback
