@@ -50,24 +50,34 @@ let error ?loc e = match loc with
    bin/t -> no   (dirname = "bin", is_implicit = yes)
 
 *)
+(*
 let implicit_path =
   let s = Sys.argv.(0) in
   Filename.is_implicit s && 
     Filename.dirname s = Filename.current_dir_name
+*)
 
 let libdir =  
+(*
   if implicit_path then
+*)
     try
       Sys.getenv "WHY3LIB"
     with Not_found -> Config.libdir
+(*
   else "."
+*)
 
 let datadir =
+(*
   if implicit_path then
+*)
     try
       Sys.getenv "WHY3DATA"
     with Not_found -> Config.datadir
+(*
   else "share"
+*)
 
 
 
