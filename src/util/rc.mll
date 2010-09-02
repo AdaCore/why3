@@ -147,18 +147,44 @@ and string_val key = parse
 {
 
   let from_file f =
-      let c = 
-	try open_in f 
-	with Sys_error _ -> raise Not_found
-(*
+    let c = 
+      try open_in f 
+      with Sys_error _ -> raise Not_found
+	(*
 	  Format.eprintf "Cannot open file %s@." f;
 	  exit 1
-*)
-      in
-      current := [];
-      let lb = from_channel c in
-      record lb;
-      close_in c;
-      List.rev !current
+	*)
+    in
+    current := [];
+    let lb = from_channel c in
+    record lb;
+    close_in c;
+    List.rev !current
+      
+  open Format
+  open Pp
 
+  let print_value fmt = function
+    | RCint n -> fprintf fmt "%d" n
+    | RCbool b -> fprintf fmt "%b" b
+    | RCfloat f -> fprintf fmt "%f" f
+    | RCstring s -> fprintf fmt "\"%s\"" s
+    | RCident i -> fprintf fmt "%s" i
+
+  let record fmt (keys,fl) =
+    fprintf fmt "[%a]@\n" (print_list space pp_print_string) keys;
+    List.iter
+      (fun (f,v) -> fprintf fmt "%s = %a@\n" f print_value v)
+      fl;
+    fprintf fmt "@."
+
+  let to_file f l =
+    let c = 
+      try open_out f 
+      with Sys_error _ -> raise Not_found
+    in
+    let fmt = formatter_of_out_channel c in
+    List.iter (record fmt) l;
+    close_out c
+      
 }

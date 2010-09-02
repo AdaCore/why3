@@ -40,6 +40,9 @@ val from_file : string -> (string list * (string * rc_value) list) list
       @raise Not_found is f does not exists 
       @raise Failure "lexing" in case of incorrect syntax *)
 
+val to_file : string -> (string list * (string * rc_value) list) list -> unit
+  (** write the records into the file [f] *)
+
 val get_home_dir : unit -> string
   (** returns the home dir of the user *)
 
