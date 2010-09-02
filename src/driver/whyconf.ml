@@ -40,6 +40,23 @@ let error ?loc e = match loc with
   | None -> raise e
   | Some loc -> raise (Loc.Located (loc, e))
 
+(* lib and shared dirs *)
+
+let libdir =
+  try
+    Sys.getenv "WHY3LIB"
+  with Not_found -> Config.libdir
+
+let datadir =
+  try
+    Sys.getenv "WHY3DATA"
+  with Not_found -> Config.datadir
+
+
+
+
+(* conf files *)
+
 let print_rc_value fmt = function
   | Rc.RCint i -> fprintf fmt "%d" i
   | Rc.RCbool b -> fprintf fmt "%B" b
@@ -90,7 +107,9 @@ type config_prover = {
 
 type config = {
   conf_file : string;       (* "/home/innocent_user/.why.conf" *)
+(*
   loadpath  : string list;  (* "/usr/local/share/why/theories" *)
+*)
   timelimit : int option;   (* default prover time limit in seconds *)
   memlimit  : int option;   (* default prover memory limit in megabytes *)
   running_provers_max : int option; (* max number of running prover processes *)
@@ -140,7 +159,10 @@ let load_prover dirname al =
     | "command"     -> set_string key cmd value
     | "driver"      -> set_string key drv value; 
 	               drv := option_map (absolute_filename dirname) !drv
-    | _             -> error (UnknownField key)
+    | _             -> ()
+        (*
+          error (UnknownField key)
+        *)
   in
   List.iter load al;
   { name    = get_field "name" !nam;
@@ -158,11 +180,16 @@ let load_main dirname main al =
     | "timelimit" -> set_int key tl value
     | "memlimit"  -> set_int key ml value
     | "running_provers_max" -> set_int key rp value
-    | _           -> error (UnknownField key)
+    | _           -> ()
+        (*
+          error (UnknownField key)
+        *)
   in
   List.iter load al;
   { main with
+(*
     loadpath  = List.rev !lp;
+*)
     timelimit = !tl;
     memlimit  = !ml;
     running_provers_max = !rp;
@@ -176,7 +203,7 @@ let read_config conf_file =
           if Sys.file_exists ".why.conf" then ".why.conf" else
           let f = Filename.concat (Rc.get_home_dir ()) ".why.conf" in
 	  if Sys.file_exists f then f else
-	  Filename.concat Config.why_libdir "why.conf"
+	  Filename.concat Config.libdir "why.conf"
         end
   in
   let dirname = Filename.dirname filename in
@@ -185,7 +212,9 @@ let read_config conf_file =
   in
   let main = ref {
     conf_file = filename;
+(*
     loadpath  = [];
+*)
     timelimit = None;
     memlimit  = None;
     running_provers_max = None;
@@ -213,7 +242,9 @@ let save_config config =
   let ch = open_out config.conf_file in
   let fmt = Format.formatter_of_out_channel ch in
   fprintf fmt "[main]@\n";
+(*
   List.iter (fprintf fmt "library = \"%s\"@\n") config.loadpath;
+*)
   Util.option_iter (fprintf fmt "timelimit = %d@\n") config.timelimit;
   Util.option_iter (fprintf fmt "memlimit = %d@\n") config.memlimit;
   Util.option_iter (fprintf fmt "running_provers_max = %d@\n") config.running_provers_max;

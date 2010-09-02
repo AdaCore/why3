@@ -36,7 +36,7 @@ datarootdir = @datarootdir@
 
 BINDIR  = $(DESTDIR)@bindir@
 LIBDIR  = $(DESTDIR)@libdir@
-DATADIR = $(DESTDIR)@datadir@
+DATADIR = $(DESTDIR)@datarootdir@
 MANDIR  = $(DESTDIR)@mandir@
 
 # OS specific stuff
@@ -212,6 +212,21 @@ clean::
 	rm -f src/why.cm[iox] src/why.[ao] src/why.cma src/why.cmxa
 	rm -f .depend.lib
 
+###############
+# installation
+###############
+
+install::
+	mkdir -p $(BINDIR)
+	mkdir -p $(LIBDIR)/why3
+	mkdir -p $(DATADIR)/why3/images
+	mkdir -p $(DATADIR)/why3/lang
+	cp -f --parents theories/*.why theories/*/*.why $(DATADIR)/why3/
+	cp -f --parents drivers/*.drv $(DATADIR)/why3/
+	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
+	cp -f share/images/*.png $(DATADIR)/why3/images
+	cp -f share/lang/why.lang $(DATADIR)/why3/lang/why.lang
+
 ##################
 # Why binary
 ##################
@@ -236,7 +251,6 @@ clean::
 	rm -f bin/why.byte bin/why.opt
 
 install::
-	mkdir -p $(BINDIR)
 	cp -f bin/why.@OCAMLBEST@ $(BINDIR)/why3
 
 ########
@@ -295,8 +309,7 @@ clean::
 	bin/whyml.byte -P alt-ergo $*.mlw
 
 install::
-	mkdir -p $(BINDIR)
-	cp -f bin/whyml.@OCAMLBEST@ $(BINDIR)/whyml3
+	cp -f bin/whyml.@OCAMLBEST@ $(BINDIR)/why3ml
 
 ###############
 # IDE
@@ -349,6 +362,9 @@ clean::
 	rm -f src/ide/*.annot src/ide/*~
 	rm -f bin/whyide.byte bin/whyide.opt
 	rm -f .depend.ide
+
+install::
+	cp -f bin/whyide.@OCAMLBEST@ $(BINDIR)/why3ide
 
 ##############
 # Coq plugin
@@ -476,7 +492,6 @@ clean::
 	rm -f bin/why3-cpulimit src/tools/*~
 
 install::
-	mkdir -p $(BINDIR)
 	cp -f bin/why3-cpulimit $(BINDIR)
 
 ########
@@ -533,15 +548,6 @@ testl: bin/whyml.byte
 testl-type: bin/whyml.byte
 	ocamlrun -bt bin/whyml.byte --type-only tests/test-pgm-jcf.mlw
 
-###############
-# installation
-###############
-
-install::
-	mkdir -p $(LIBDIR)/why3
-	cp -f --parents theories/*.why theories/*/*.why $(LIBDIR)/why3/
-	cp -f --parents drivers/*.drv $(LIBDIR)/why3/
-	cp -f why.conf $(LIBDIR)/why3/
 
 ## install: install-binary install-lib install-man
 ##
@@ -846,7 +852,7 @@ src/config.sh: src/config.sh.in config.status
 	./config.status chmod --file $@
 
 src/config.ml: src/config.sh
-	LIBDIR=$(LIBDIR) src/config.sh
+	LIBDIR=$(LIBDIR) DATADIR=$(DATADIR) src/config.sh
 
 doc/version.tex: doc/version.tex.in config.status
 	./config.status chmod --file $@

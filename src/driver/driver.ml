@@ -50,7 +50,7 @@ type driver = {
 exception NoPlugins
 
 let load_plugin dir (byte,nat) =
-  if not Config.why_plugins then raise NoPlugins;
+  if not Config.plugins then raise NoPlugins;
   let file = if Config.Dynlink.is_native then nat else byte in
   let file = Filename.concat dir file in
   Config.Dynlink.loadfile_private file

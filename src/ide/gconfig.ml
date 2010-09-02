@@ -79,8 +79,9 @@ let load_main c (key, value) =
 
 
 let get_prover_data env id name ver c d e = 
+  let f = Filename.concat Whyconf.datadir d in
   try
-    let dr = Driver.load_driver env d in
+    let dr = Driver.load_driver env f in
     { prover_id = id ;
       prover_name = name;
       prover_version = ver;
@@ -89,10 +90,18 @@ let get_prover_data env id name ver c d e =
       driver = dr; 
       editor = e;
     }
-  with _e ->
-    eprintf "Failed to load driver %s for prover %s. prover disabled@."
-      d name;
-    raise Not_found
+  with 
+    | Loc.Located(p,e) ->
+        eprintf "Syntax error %a in driver %s for prover %s (%s).@\nprover disabled@."
+          Loc.report_position p f name (Printexc.to_string e);
+        Printexc.print_backtrace stdout;
+        raise Not_found
+
+    | e ->
+        eprintf "Failed to load driver %s for prover %s (%s).@\nprover disabled@."
+          f name (Printexc.to_string e);
+        Printexc.print_backtrace stdout;
+        raise Not_found
 
 let load_prover env id l =
   let name = ref "?" in
@@ -145,7 +154,7 @@ let read_config env =
 *)
 
 let image ?size f =
-  let n = Filename.concat "" (* todo: libdir *) (Filename.concat "images" (f^".png"))
+  let n = Filename.concat Whyconf.datadir (Filename.concat "images" (f^".png"))
   in
   match size with
     | None ->

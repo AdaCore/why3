@@ -21,6 +21,9 @@
 
 open Util
 
+val libdir : string
+val datadir : string
+
 type config_prover = {
   name    : string;   (* "Alt-Ergo v2.95 (special)" *)
   command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
@@ -29,7 +32,9 @@ type config_prover = {
 
 type config = {
   conf_file : string;       (* "/home/innocent_user/.why.conf" *)
+(*
   loadpath  : string list;  (* "/usr/local/share/why/theories" *)
+*)
   timelimit : int option;   (* default prover time limit in seconds *)
   memlimit  : int option;   (* default prover memory limit in megabytes *)
   running_provers_max : int option; (* max number of running prover processes *)

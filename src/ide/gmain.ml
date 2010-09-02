@@ -54,17 +54,17 @@ let fname = match !file with
       f
 
 let lang =
-  let load_path = 
-    List.fold_right Filename.concat 
-      [Filename.dirname Sys.argv.(0); ".."; "share"] "lang" 
-  in
+  let load_path = Filename.concat Whyconf.datadir "lang" in
   let languages_manager = 
     GSourceView2.source_language_manager ~default:true 
   in
   languages_manager#set_search_path 
     (load_path :: languages_manager#search_path);
   match languages_manager#language "why" with
-    | None -> Format.eprintf "pas trouvé@;"; None
+    | None -> 
+        Format.eprintf "language file for 'why' not found in directory %s@." 
+          load_path; 
+        exit 1
     | Some _ as l -> l
 
 let source_text = 
@@ -75,7 +75,7 @@ let source_text =
   close_in ic;
   buf
 
-let env = Why.Env.create_env (Why.Lexer.retrieve ["theories"])
+let env = Why.Env.create_env (Why.Lexer.retrieve [Filename.concat Whyconf.datadir "theories"])
 
 (********************************)
 (* loading WhyIDE configuration *)

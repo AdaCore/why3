@@ -2,10 +2,11 @@
 
 F=src/config.ml
 
-echo "let why_version   = \"@VERSION@\"" > $F
-echo "let why_builddate = \"@BUILDDATE@\"" >> $F
-echo "let why_plugins   = (\"@enable_plugins@\" = \"yes\")" >> $F
-echo "let why_libdir    = \"$LIBDIR/why3\"" >> $F
+echo "let version   = \"@VERSION@\"" > $F
+echo "let builddate = \"@BUILDDATE@\"" >> $F
+echo "let plugins   = (\"@enable_plugins@\" = \"yes\")" >> $F
+echo "let libdir    = \"$LIBDIR/why3\"" >> $F
+echo "let datadir   = \"$DATADIR/why3\"" >> $F
 
 echo "
 module Dynlink_ = struct
