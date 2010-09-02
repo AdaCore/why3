@@ -23,6 +23,7 @@ open Task
 open Trans
 
 let meta_kept = register_meta "encoding : kept" [MTtysymbol]
+let meta_base = register_meta_excl "encoding : base" [MTtysymbol]
 
 type enco_opt =
     { meta : meta;

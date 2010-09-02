@@ -75,6 +75,9 @@ let deco kept = Trans.decl (deco_decl kept) deco_init
 
 (** Monomorphisation *)
 
+let ts_base = create_tysymbol (id_fresh "uni") [] None
+let ty_base = ty_app ts_base []
+
 let ts_deco = create_tysymbol (id_fresh "deco") [] None
 let ty_deco = ty_app ts_deco []
 let ls_deco = create_fsymbol (id_fresh "sort") [ty_type;ty_base] ty_deco
@@ -90,6 +93,7 @@ let lsmap kept = Wls.memoize 63 (fun ls ->
      && List.for_all2 ty_equal tyl ls.ls_args then ls
   else create_lsymbol (id_clone ls.ls_name) tyl tyr)
 
+let d_ts_base = create_ty_decl [ts_base, Tabstract]
 let d_ts_deco = create_ty_decl [ts_deco, Tabstract]
 
 let mono_init =
@@ -97,7 +101,8 @@ let mono_init =
   let init = Task.add_decl init d_ts_deco in
   init
 
-let mono kept = Trans.decl (d_monomorph kept (lsmap kept)) mono_init
+let mono kept =
+  Trans.decl (d_monomorph ty_base kept (lsmap kept)) mono_init
 
 let t = Trans.on_meta Encoding.meta_kept (fun tds ->
   let kept = Libencoding.get_kept_types tds in

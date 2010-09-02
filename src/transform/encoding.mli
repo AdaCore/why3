@@ -23,6 +23,7 @@ open Task
 open Trans
 
 val meta_kept : meta
+val meta_base : meta
 
 val register_enco_select : string -> (env -> task trans) -> unit
 val register_enco_kept : string -> (env -> task trans) -> unit

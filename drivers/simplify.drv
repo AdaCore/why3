@@ -27,7 +27,7 @@ transformation "remove_triggers"
 trigger they can't appear since = can't appear *)
 (*transformation "filter_trigger_builtin"*)
 
-(* transformation "encoding_tptp" *)
+transformation "encoding_tptp"
 
 theory BuiltIn
   syntax logic (=)  "(EQ %1 %2)"
@@ -62,6 +62,12 @@ theory int.Int
   remove prop Trans
   remove prop Antisymm
   remove prop Total
+
+  (* use with explicit polymorphism *)
+  meta "encoding : base" type int
+
+  (* use with encoding_decorate *)
+  (* meta "encoding : kept" type int *)
 
 end
 

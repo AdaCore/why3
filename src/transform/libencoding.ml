@@ -68,19 +68,10 @@ let lsdecl_of_tydecl tdl =
   in
   List.fold_right add tdl []
 
-(* sort symbol by default (= undeco) *)
-let ts_base = create_tysymbol (id_fresh "uni") [] None
-
-(* sort by default (= undeco) *)
-let ty_base = ty_app ts_base []
-
-(* ts_base declaration *)
-let d_ts_base = create_ty_decl [ts_base, Tabstract]
-
 (* convert a constant to a functional symbol of type ty_base *)
-let ls_of_const =
+let ls_of_const ty_base =
   let ht = Hterm.create 63 in
-  let ls_of_t t = match t.t_node with
+  fun t -> match t.t_node with
     | Tconst _ ->
         begin try Hterm.find ht t with Not_found ->
           let s = "const_" ^ Pp.string_of Pretty.print_term t in
@@ -89,30 +80,23 @@ let ls_of_const =
           ls
         end
     | _ -> assert false
-  in
-  fun c -> ls_of_t (t_const c)
 
-(* convert a constant to a term of type ty_base *)
-let term_of_const c = t_app (ls_of_const c) [] ty_base
-
-(* convert tysymbols tagged with meta_kept to a set of types *)
-let get_kept_types tds =
-  let tss = Task.find_tagged_ts Encoding.meta_kept tds Sts.empty in
-  let add ts acc = match ts.ts_def with
-    | Some ty -> Sty.add ty acc
-    | None -> Sty.add (ty_app ts []) acc
-  in
-  Sts.fold add tss (Sty.singleton ty_type)
+let ls_of_const =
+  let ht = Hty.create 3 in
+  fun ty -> try Hty.find ht ty with Not_found ->
+    let fn = ls_of_const ty in
+    Hty.add ht ty fn;
+    fn
 
 (* monomorphise modulo the set of kept types * and an lsymbol map *)
 
-let vs_monomorph kept vs =
+let vs_monomorph ty_base kept vs =
   if Sty.mem vs.vs_ty kept then vs else
   create_vsymbol (id_clone vs.vs_name) ty_base
 
-let rec t_monomorph kept lsmap consts vmap t =
-  let t_mono = t_monomorph kept lsmap consts in
-  let f_mono = f_monomorph kept lsmap consts in
+let rec t_monomorph ty_base kept lsmap consts vmap t =
+  let t_mono = t_monomorph ty_base kept lsmap consts in
+  let f_mono = f_monomorph ty_base kept lsmap consts in
   t_label_copy t (match t.t_node with
     | Tbvar _ ->
         assert false
@@ -120,8 +104,8 @@ let rec t_monomorph kept lsmap consts vmap t =
         Mvs.find v vmap
     | Tconst _ when Sty.mem t.t_ty kept ->
         t
-    | Tconst c ->
-        let ls = ls_of_const c in
+    | Tconst _ ->
+        let ls = ls_of_const ty_base t in
         consts := Sls.add ls !consts;
         t_app ls [] ty_base
     | Tapp (fs,_) when is_ls_of_ts fs ->
@@ -134,20 +118,20 @@ let rec t_monomorph kept lsmap consts vmap t =
         t_if (f_mono vmap f) (t_mono vmap t1) (t_mono vmap t2)
     | Tlet (t1,b) ->
         let u,t2,close = t_open_bound_cb b in
-        let v = vs_monomorph kept u in
+        let v = vs_monomorph ty_base kept u in
         let t2 = t_mono (Mvs.add u (t_var v) vmap) t2 in
         t_let (t_mono vmap t1) (close v t2)
     | Tcase _ ->
         Printer.unsupportedTerm t "no match expressions at this point"
     | Teps b ->
         let u,f,close = f_open_bound_cb b in
-        let v = vs_monomorph kept u in
+        let v = vs_monomorph ty_base kept u in
         let f = f_mono (Mvs.add u (t_var v) vmap) f in
         t_eps (close v f))
 
-and f_monomorph kept lsmap consts vmap f =
-  let t_mono = t_monomorph kept lsmap consts in
-  let f_mono = f_monomorph kept lsmap consts in
+and f_monomorph ty_base kept lsmap consts vmap f =
+  let t_mono = t_monomorph ty_base kept lsmap consts in
+  let f_mono = f_monomorph ty_base kept lsmap consts in
   f_label_copy f (match f.f_node with
     | Fapp (ps,[t1;t2]) when ls_equal ps ps_equ ->
         f_equ (t_mono vmap t1) (t_mono vmap t2)
@@ -155,7 +139,7 @@ and f_monomorph kept lsmap consts vmap f =
         f_app (lsmap ps) (List.map (t_mono vmap) tl)
     | Fquant (q,b) ->
         let ul,tl,f1,close = f_open_quant_cb b in
-        let vl = List.map (vs_monomorph kept) ul in
+        let vl = List.map (vs_monomorph ty_base kept) ul in
         let add acc u v = Mvs.add u (t_var v) acc in
         let vmap = List.fold_left2 add vmap ul vl in
         let tl = tr_map (t_mono vmap) (f_mono vmap) tl in
@@ -170,14 +154,17 @@ and f_monomorph kept lsmap consts vmap f =
         f_if (f_mono vmap f1) (f_mono vmap f2) (f_mono vmap f3)
     | Flet (t,b) ->
         let u,f1,close = f_open_bound_cb b in
-        let v = vs_monomorph kept u in
+        let v = vs_monomorph ty_base kept u in
         let f1 = f_mono (Mvs.add u (t_var v) vmap) f1 in
         f_let (t_mono vmap t) (close v f1)
     | Fcase _ ->
         Printer.unsupportedFmla f "no match expressions at this point")
 
-let d_monomorph kept lsmap d =
+let d_monomorph ty_base kept lsmap d =
+  let kept = Sty.add ty_base kept in
   let consts = ref Sls.empty in
+  let t_mono = t_monomorph ty_base kept lsmap consts in
+  let f_mono = f_monomorph ty_base kept lsmap consts in
   let dl = match d.d_node with
     | Dtype tdl ->
         let add td acc = match td with
@@ -196,12 +183,12 @@ let d_monomorph kept lsmap d =
           match ld with
           | Some ld ->
               let ul,e = open_ls_defn ld in
-              let vl = List.map (vs_monomorph kept) ul in
+              let vl = List.map (vs_monomorph ty_base kept) ul in
               let add acc u v = Mvs.add u (t_var v) acc in
               let vmap = List.fold_left2 add Mvs.empty ul vl in
               let e = match e with
-                | Term t -> Term (t_monomorph kept lsmap consts vmap t)
-                | Fmla f -> Fmla (f_monomorph kept lsmap consts vmap f)
+                | Term t -> Term (t_mono vmap t)
+                | Fmla f -> Fmla (f_mono vmap f)
               in
               make_ls_defn ls vl e
           | None ->
@@ -209,12 +196,23 @@ let d_monomorph kept lsmap d =
         in
         [create_logic_decl (List.map conv ldl)]
     | Dind idl ->
-        let iconv (pr,f) = pr, f_monomorph kept lsmap consts Mvs.empty f in
+        let iconv (pr,f) = pr, f_mono Mvs.empty f in
         let conv (ls,il) = lsmap ls, List.map iconv il in
         [create_ind_decl (List.map conv idl)]
     | Dprop (k,pr,f) ->
-        [create_prop_decl k pr (f_monomorph kept lsmap consts Mvs.empty f)]
+        [create_prop_decl k pr (f_mono Mvs.empty f)]
   in
   let add ls acc = create_logic_decl [ls,None] :: acc in
   Sls.fold add !consts dl
+
+(* convert tysymbols tagged with meta_kept to a set of types *)
+let get_kept_types tds =
+  let tss = Task.find_tagged_ts Encoding.meta_kept tds Sts.empty in
+  let add ts acc =
+    if ts.ts_args <> [] then acc
+    else match ts.ts_def with
+    | Some ty -> Sty.add ty acc
+    | None -> Sty.add (ty_app ts []) acc
+  in
+  Sts.fold add tss (Sty.singleton ty_type)
 
