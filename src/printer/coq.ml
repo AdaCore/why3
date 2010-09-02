@@ -177,7 +177,7 @@ let print_binop fmt = function
   | Fimplies -> fprintf fmt "->"
   | Fiff -> fprintf fmt "<->"
 
-let print_label = Pretty.print_label
+let print_label fmt (l,_) = fprintf fmt "(*%s*)" l
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
@@ -356,8 +356,10 @@ let print_logic_decl info fmt (ls,ld) =
   if Stv.is_empty params then 
     fprintf fmt "@\n"
   else
-    fprintf fmt "Implicit Arguments %a.@\n@\n"
-      print_ls ls 
+    let b = ls.ls_args = [] in
+    if b then fprintf fmt "Set Contextual Implicit.@\n";
+    fprintf fmt "Implicit Arguments %a.@\n" print_ls ls;
+    if b then fprintf fmt "Unset Contextual Implicit.@\n"
     
 
 let print_logic_decl info fmt d =
