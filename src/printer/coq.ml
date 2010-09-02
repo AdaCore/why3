@@ -231,7 +231,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
       | _ -> if unambig_fs fs
           then fprintf fmt "(%a %a)" print_ls fs
             (print_space_list (print_term info)) tl
-          else fprintf fmt (protect_on opl "%a%a:%a") print_ls fs
+          else fprintf fmt (protect_on opl "(%a%a:%a)") print_ls fs
             (print_paren_r (print_term info)) tl (print_ty info) t.t_ty
     end
 
@@ -341,7 +341,7 @@ let print_logic_decl info fmt (ls,ld) =
           let vl,e = open_ls_defn ld in
           fprintf fmt "@[<hov 2>Definition %a%a%a: %a :=@ %a.@]@\n"
             print_ls ls 
-            print_params params
+            print_ne_params params
             (print_space_list (print_vsty info)) vl
             (print_ls_type info) ls.ls_value
             (print_expr info) e;

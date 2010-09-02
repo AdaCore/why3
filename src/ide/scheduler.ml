@@ -34,9 +34,11 @@ let transf_queue  :
     ((Task.task list -> unit) * 'a Trans.trans * Task.task) Queue.t 
     = Queue.create ()
 
+type answer =
+  | Prover_answer of callback * proof_attempt_status * float * string
+  | Editor_exited of (unit -> unit)
 (* queue of prover answers *)
-let answers_queue  : (callback * proof_attempt_status * float * string) Queue.t 
-    = Queue.create ()
+let answers_queue  : answer Queue.t = Queue.create ()
 
 (* number of running external proofs *)
 let running_proofs = ref 0
@@ -62,17 +64,22 @@ let event_handler () =
   do
     Condition.wait queue_condition queue_lock
   done;
-  try
-    (* priority 1: collect answers from provers *)
-    let (callback,res,time,output) = Queue.pop answers_queue in
-    decr running_proofs;
-    Mutex.unlock queue_lock;
-(*
-    eprintf "[Why thread] Scheduler.event_handler: got prover answer@.";
-*)
-    (* TODO: update database *)
-    (* call GUI callback with argument [res] *)
-    !async (fun () -> callback res time output) ()
+  try begin
+    (* priority 1: collect answers from provers or editors *)
+    match Queue.pop answers_queue with
+      | Prover_answer (callback,res,time,output) ->
+          decr running_proofs;
+          Mutex.unlock queue_lock;
+          (*
+            eprintf "[Why thread] Scheduler.event_handler: got prover answer@.";
+          *)
+          (* TODO: update database *)
+          (* call GUI callback with argument [res] *)
+          !async (fun () -> callback res time output) ()
+      | Editor_exited callback ->
+          Mutex.unlock queue_lock;
+          !async callback ()
+  end
   with Queue.Empty ->
     try
       (* priority 2: apply transformations *)
@@ -102,10 +109,15 @@ let event_handler () =
       Driver.print_task ?old driver fmt goal;
       Util.option_iter close_in old;
       close_out ch;
-      let _ = Sys.command(editor ^ " " ^ file) in
-      (* when done, call GUI back *)
-      !async (fun () -> callback ()) () 
-
+      let (_ : Thread.t) = Thread.create 
+        (fun () -> 
+           let _ = Sys.command(editor ^ " " ^ file) in
+           Mutex.lock queue_lock;
+           Queue.push (Editor_exited callback) answers_queue ;
+           Condition.signal queue_condition;
+           Mutex.unlock queue_lock)
+        ()
+      in ()
     with Queue.Empty ->
       (* priority low: start new external proof attempt *)
       (* since answers_queue and transf_queue are empty, 
@@ -142,7 +154,9 @@ let event_handler () =
                    | Call_provers.Failure _ | Call_provers.HighFailure 
                        -> HighFailure
                in
-               Queue.push (callback,res,r.Call_provers.pr_time,r.Call_provers.pr_output) answers_queue ;
+               Queue.push 
+                 (Prover_answer (callback,res,r.Call_provers.pr_time,
+                                 r.Call_provers.pr_output)) answers_queue ;
                Condition.signal queue_condition;
                Mutex.unlock queue_lock;
                ()
@@ -153,7 +167,9 @@ let event_handler () =
           | e ->
             eprintf "%a@." Exn_printer.exn_printer e;
             Mutex.lock queue_lock;
-            Queue.push (callback,HighFailure,0.0,"Prover call failed") answers_queue ;
+            Queue.push 
+              (Prover_answer (callback, HighFailure,0.0,
+                              "Prover call failed")) answers_queue ;
             (* Condition.signal queue_condition; *)
             Mutex.unlock queue_lock;
             ()
