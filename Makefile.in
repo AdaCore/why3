@@ -311,6 +311,60 @@ clean::
 install::
 	cp -f bin/whyml.@OCAMLBEST@ $(BINDIR)/why3ml
 
+
+########
+# Config
+########
+
+CONFIG_FILES = whyconfig
+
+CONFIGMODULES = $(addprefix src/config/, $(CONFIG_FILES))
+
+CONFIGML  = $(addsuffix .ml,  $(CONFIGMODULES))
+CONFIGMLI = $(addsuffix .mli, $(CONFIGMODULES))
+CONFIGCMO = $(addsuffix .cmo, $(CONFIGMODULES))
+CONFIGCMX = $(addsuffix .cmx, $(CONFIGMODULES))
+
+$(CONFIGCMO) $(CONFIGCMX): INCLUDES += -I src/programs
+
+# build targets
+
+byte: bin/whyconfig.byte
+opt:  bin/whyconfig.opt
+
+bin/whyconfig.opt: src/why.cmxa $(CONFIGCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	$(STRIP) $@
+
+bin/whyconfig.byte: src/why.cma $(CONFIGCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+# depend and clean targets
+
+include .depend.config
+
+.depend.config: $(CONFIGGENERATED)
+	$(OCAMLDEP) -slash -I src -I src/config $(CONFIGML) $(CONFIGMLI) > $@
+
+depend: .depend.config
+
+clean::
+	rm -f src/config/*.cm[iox] src/config/*.o
+	rm -f src/config/*.annot src/config/*~
+	rm -f src/config/*.output src/config/*.automaton
+	rm -f bin/whyconfig.byte bin/whyconfig.opt
+	rm -f .why.conf
+	rm -f .depend.config
+
+local_config: bin/whyconfig.@OCAMLBEST@
+	WHY3LIB=$(PWD) WHY3DATA=$(PWD)/share bin/whyconfig.@OCAMLBEST@ --autodetect-provers --conf_file .why.conf
+
+install::
+	cp -f bin/whyconfig.@OCAMLBEST@ $(BINDIR)/why3config
+
+
 ###############
 # IDE
 ###############

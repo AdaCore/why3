@@ -149,6 +149,9 @@ let get_config (filename,rc) =
     provers   = provers;
   }
 
+let default_config conf_file = get_config (conf_file,Rc.empty)
+
+
 let read_config conf_file =
   let filenamerc = try read_config_rc conf_file
     with Exit ->
@@ -172,6 +175,8 @@ let set_provers config provers =
     config = set_provers config.config provers;
     provers = provers;
   }
+
+let set_conf_file config conf_file = {config with conf_file = conf_file}
 
 let get_section config name = assert (name <> "main");
   get_section config.config name

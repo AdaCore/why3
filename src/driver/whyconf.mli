@@ -50,14 +50,16 @@ type config
     "./why.conf"; "./.why.conf"; "$HOME/.why.conf";
     "$USERPROFILE/.why.conf"; the built-in default_config *)
 val read_config : string option -> config
-
 val save_config : config -> unit
+val default_config : string -> config
 
 val get_main    : config  -> main
 val get_provers : config  -> config_prover Mstr.t
 
 val set_main    : config -> main                 -> config
 val set_provers : config -> config_prover Mstr.t -> config
+
+val set_conf_file : config -> string -> config
 
 val get_section : config -> string -> Rc.section option
 val get_family  : config -> string -> Rc.family
