@@ -66,4 +66,5 @@ let () =
     if !auto
     then Autodetection.run_auto_detection config
     else config in
+  printf "Save config to %s@." (get_conf_file config);
   save_config config

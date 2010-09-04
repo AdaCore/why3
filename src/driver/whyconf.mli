@@ -60,6 +60,7 @@ val set_main    : config -> main                 -> config
 val set_provers : config -> config_prover Mstr.t -> config
 
 val set_conf_file : config -> string -> config
+val get_conf_file : config -> string
 
 val get_section : config -> string -> Rc.section option
 val get_family  : config -> string -> Rc.family

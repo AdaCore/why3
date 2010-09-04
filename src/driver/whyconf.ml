@@ -26,12 +26,18 @@ open Rc
 let libdir =
   try
     Sys.getenv "WHY3LIB"
-  with Not_found -> Config.libdir
+  with Not_found -> default_option Config.libdir Config.localdir
 
 let datadir =
   try
     Sys.getenv "WHY3DATA"
-  with Not_found -> Config.datadir
+  with Not_found -> option_apply Config.datadir
+    (fun d -> Filename.concat d "share") Config.localdir
+
+let default_conf_file =
+  Filename.concat  (match Config.localdir with
+    | None -> Rc.get_home_dir ()
+    | Some d -> d) ".why.conf"
 
 (* Configuration file *)
 
@@ -63,7 +69,7 @@ let default_main =
   {
     libdir = libdir;
     datadir = datadir;
-    loadpath = [Filename.concat libdir "theories"];
+    loadpath = [Filename.concat datadir "theories"];
     timelimit = 10;
     memlimit = 0;
     running_provers_max = 2;
@@ -128,8 +134,8 @@ let read_config_rc conf_file =
     | None -> begin try Sys.getenv "WHY_CONFIG" with Not_found ->
           if Sys.file_exists "why.conf" then "why.conf" else
           if Sys.file_exists ".why.conf" then ".why.conf" else
-          let f = Filename.concat (Rc.get_home_dir ()) ".why.conf" in
-	  if Sys.file_exists f then f else raise Exit
+          if Sys.file_exists default_conf_file then default_conf_file
+          else raise Exit
         end
   in
   filename,Rc.from_file filename
@@ -154,8 +160,7 @@ let default_config conf_file = get_config (conf_file,Rc.empty)
 
 let read_config conf_file =
   let filenamerc = try read_config_rc conf_file
-    with Exit ->
-      (Filename.concat (Rc.get_home_dir ()) ".why.conf",Rc.empty) in
+    with Exit -> (default_conf_file,Rc.empty) in
   get_config filenamerc
 
 
@@ -177,6 +182,7 @@ let set_provers config provers =
   }
 
 let set_conf_file config conf_file = {config with conf_file = conf_file}
+let get_conf_file config           =  config.conf_file
 
 let get_section config name = assert (name <> "main");
   get_section config.config name

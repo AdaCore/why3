@@ -144,7 +144,7 @@ let detect_prover main acc data =
               {name = data.prover_name;
                version = ver;
                command = c;
-               driver  = Filename.concat main.libdir data.prover_driver;
+               driver  = Filename.concat main.datadir data.prover_driver;
                editor = data.prover_editor} acc
 	  with Not_found ->
 	    begin
