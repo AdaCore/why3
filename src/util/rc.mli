@@ -18,13 +18,14 @@
 (**************************************************************************)
 
 (** Parse rc files *)
-
 type rc_value =
   | RCint of int
   | RCbool of bool
   | RCfloat of float
   | RCstring of string
   | RCident of string
+
+type t = (string list * (string * rc_value) list) list
 
 val int : rc_value -> int
   (** raise Failure "Rc.int" if not a int value *)
@@ -35,13 +36,13 @@ val bool : rc_value -> bool
 val string : rc_value -> string
   (** raise Failure "Rc.string" if not a string or an ident value *)
 
-val from_file : string -> (string list * (string * rc_value) list) list
+val from_file : string -> t
   (** returns the records of the file [f]
       @raise Not_found is f does not exists 
       @raise Failure "lexing" in case of incorrect syntax *)
 
-val to_file : string -> (string list * (string * rc_value) list) list -> unit
-  (** write the records into the file [f] *)
+val to_file   : string -> t -> unit
+  (** save the records in the filr [f] *)
 
 val get_home_dir : unit -> string
   (** returns the home dir of the user *)

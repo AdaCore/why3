@@ -31,6 +31,8 @@ let cons f acc x = (f x)::acc
 
 let of_option = function None -> assert false | Some x -> x
 
+let default_option d = function None -> d | Some x -> x
+
 let option_map f = function None -> None | Some x -> Some (f x)
 
 let option_apply d f = function None -> d | Some x -> f x

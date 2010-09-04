@@ -42,11 +42,9 @@ let debug =
 
 let config = Whyconf.read_config None
 
-let timelimit = match config.timelimit with
-  | None -> 3
-  | Some t -> t
+let timelimit = config.main.timelimit
 
-let env = Env.create_env (Lexer.retrieve config.loadpath)
+let env = Env.create_env (Lexer.retrieve config.main.loadpath)
     
 let provers = Hashtbl.create 17
 

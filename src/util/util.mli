@@ -31,6 +31,8 @@ val cons : ('a -> 'b) -> 'b list -> 'a -> 'b list
 
 val of_option : 'a option -> 'a
 
+val default_option : 'a -> 'a option -> 'a
+
 val option_map : ('a -> 'b) -> 'a option -> 'b option
 
 val option_iter : ('a -> unit) -> 'a option -> unit

@@ -75,15 +75,13 @@ let source_text =
   close_in ic;
   buf
 
-let env = Why.Env.create_env (Why.Lexer.retrieve [Filename.concat Whyconf.datadir "theories"])
-
 (********************************)
 (* loading WhyIDE configuration *)
 (********************************)
 
 let gconfig = 
   eprintf "reading IDE config file@.";
-  read_config env 
+  read_config ()
 
 
 
@@ -94,7 +92,7 @@ let gconfig =
 let theories : Theory.theory Theory.Mnm.t =
   try
     let cin = open_in fname in
-    let m = Env.read_channel env fname cin in
+    let m = Env.read_channel gconfig.env fname cin in
     close_in cin;
     eprintf "Parsing/Typing Ok@.";
     m
@@ -488,7 +486,7 @@ let prover_on_unproved_goals p () =
 (* method: split all unproved goals *)
 (*****************************************************)
 
-let split_transformation = Trans.lookup_transform_l "split_goal" env
+let split_transformation = Trans.lookup_transform_l "split_goal" gconfig.env
 
 let split_unproved_goals () =
   List.iter
@@ -569,7 +567,7 @@ let (_ : GMenu.image_menu_item) =
 
 let (_ : GMenu.image_menu_item) = 
   file_factory#add_image_item ~label:"_Detect provers" ~callback:
-    (fun () -> Gconfig.run_auto_detection env gconfig)
+    (fun () -> Gconfig.run_auto_detection gconfig)
     () 
 
 let (_ : GMenu.image_menu_item) = 

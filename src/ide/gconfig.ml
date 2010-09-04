@@ -1,6 +1,8 @@
 
 open Format
 open Why
+open Util
+open Whyconf
 
 type prover_data =
     { prover_id : string;
@@ -12,58 +14,22 @@ type prover_data =
       mutable editor : string;
     }
 
-type t = 
+type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
       mutable task_height : int;
       mutable time_limit : int;
+      mutable mem_limit : int;
       mutable verbose : int;
       mutable max_running_processes : int;
       mutable provers : prover_data list;
       mutable default_editor : string;
+      env : Env.env;
+      mutable config : Whyconf.config;
     }
 
-let default = 
-  { window_width = 1024;
-    window_height = 768;
-    tree_width = 512;
-    task_height = 384;
-    time_limit = 2;
-    verbose = 0;
-    max_running_processes = 2;
-    provers = [];
-    default_editor = "";
-  }
-
-let conf_file = Filename.concat (Rc.get_home_dir ()) ".why.conf"
-
-let save_prover fmt p =
-  fprintf fmt "[prover %s]@\n" p.prover_id;
-  fprintf fmt "name = \"%s\"@\n" p.prover_name;
-  fprintf fmt "version = \"%s\"@\n" p.prover_version;
-  fprintf fmt "command = \"%s\"@\n" p.command;
-  fprintf fmt "driver = \"%s\"@\n" p.driver_name;  
-  if p.editor <> "" then fprintf fmt "editor = \"%s\"@\n" p.editor;  
-  fprintf fmt "@."
-
-let save_config config =
-  let ch = open_out conf_file in
-  let fmt = formatter_of_out_channel ch in
-  fprintf fmt "[main]@\n";
-  fprintf fmt "width = %d@\n" config.window_width;
-  fprintf fmt "height = %d@\n" config.window_height;
-  fprintf fmt "tree_width = %d@\n" config.tree_width;
-  fprintf fmt "task_height = %d@\n" config.task_height;
-  fprintf fmt "time_limit = %d@\n" config.time_limit;
-  fprintf fmt "verbose = %d@\n" config.verbose;
-  fprintf fmt "max_processes = %d@\n" config.max_running_processes;
-  fprintf fmt "default_editor = \"%s\"@\n" config.default_editor;  
-  fprintf fmt "@.";
-  List.iter (save_prover fmt) config.provers; 
-  close_out ch
-
-let load_main c (key, value) = 
+let load_main c (key, value) =
   match key with
     | "width" -> c.window_width <- Rc.int value
     | "height" -> c.window_height <- Rc.int value
@@ -73,79 +39,78 @@ let load_main c (key, value) =
     | "verbose" -> c.verbose <- Rc.int value
     | "max_processes" -> c.max_running_processes <- Rc.int value
     | "default_editor" -> c.default_editor <- Rc.string value
-    | s -> 
+    | s ->
         eprintf "Warning: ignore unknown key [%s] in whyide config file@." s
 
 
 
-let get_prover_data env id name ver c d e = 
-  let f = Filename.concat Whyconf.datadir d in
+let get_prover_data env id pr acc =
   try
-    let dr = Driver.load_driver env f in
+    let dr = Driver.load_driver env pr.Whyconf.driver in
     { prover_id = id ;
-      prover_name = name;
-      prover_version = ver;
-      command = c;
-      driver_name = d;
-      driver = dr; 
-      editor = e;
+      prover_name = pr.Whyconf.name;
+      prover_version = pr.Whyconf.version;
+      command = pr.Whyconf.command;
+      driver_name = pr.Whyconf.driver;
+      driver = dr;
+      editor = pr.Whyconf.editor;
+    }::acc
+  with _e ->
+    eprintf "Failed to load driver %s for prover %s. prover disabled@."
+      pr.Whyconf.driver pr.Whyconf.name;
+    acc
+
+let load_config config =
+    let env = Env.create_env (Lexer.retrieve config.main.loadpath) in
+    { window_height = config.ide.Whyconf.window_height;
+      window_width  = config.ide.Whyconf.window_width;
+      tree_width    = config.ide.Whyconf.tree_width;
+      task_height   = config.ide.Whyconf.task_height;
+      time_limit    = config.main.Whyconf.timelimit;
+      mem_limit     = config.main.Whyconf.memlimit;
+      verbose       = config.ide.Whyconf.verbose;
+      max_running_processes = config.main.Whyconf.running_provers_max;
+      provers = Mstr.fold (get_prover_data env) config.Whyconf.provers [];
+      default_editor = config.ide.Whyconf.default_editor;
+      config         = config;
+      env            = env
     }
-  with 
-    | Loc.Located(p,e) ->
-        eprintf "Syntax error %a in driver %s for prover %s (%s).@\nprover disabled@."
-          Loc.report_position p f name (Printexc.to_string e);
-        Printexc.print_backtrace stdout;
-        raise Not_found
 
-    | e ->
-        eprintf "Failed to load driver %s for prover %s (%s).@\nprover disabled@."
-          f name (Printexc.to_string e);
-        Printexc.print_backtrace stdout;
-        raise Not_found
+let read_config () =
+    let config = Whyconf.read_config None in
+    load_config config
 
-let load_prover env id l =
-  let name = ref "?" in
-  let v = ref "?" in
-  let c = ref "?" in
-  let d = ref "?" in
-  let e = ref "" in
-  List.iter
-    (fun (key, value) -> 
-	match key with
-	  | "name" -> name := Rc.string value
-	  | "version" -> v := Rc.string value
-          | "command" -> c := Rc.string value
-          | "driver" -> d := Rc.string value
-          | "editor" -> e := Rc.string value
-	  | s -> 
-            eprintf "Warning: ignore unknown key [%s] in prover data of whyide config file@." s)
-    l;
-  get_prover_data env id !name !v !c !d !e
-        
-let load env c (key, al) = 
-  match key with
-    | "main" :: _ -> List.iter (load_main c) al
-    | "prover" :: id :: _ -> 
-        c.provers <- load_prover env id al :: c.provers
-    | s :: _ -> 
-        eprintf "Warning: ignored unknown section [%s] in whyide config file@." s
-    | [] -> assert false
-        
-let read_config env =
-  try
-    let rc = Rc.from_file conf_file in
-    let c = default in
-    List.iter (load env c) rc;
-    c.provers <- List.rev c.provers;
-    c
-  with
-    | Failure "lexing" -> 
-        eprintf "Warning: syntax error in whyide config file@.";
-        default
-    | Not_found ->
-        eprintf "Warning: no whyide config file, using default values@.";
-        default
-    
+
+let save_config t =
+  let save_prover acc pr =
+    Mstr.add pr.prover_id
+      {
+        Whyconf.name    = pr.prover_name;
+        command = pr.command;
+        driver  = pr.driver_name;
+        version = pr.prover_version;
+        editor  = pr.editor;
+      } acc in
+  let config = t.config in
+  let main = { config.main with
+    Whyconf.timelimit    = t.time_limit;
+    memlimit     = t.mem_limit;
+    running_provers_max = t.max_running_processes;
+  } in
+  let ide = {
+    Whyconf.window_height = t.window_height;
+    window_width = t.window_width;
+    tree_width   = t.tree_width;
+    task_height  = t.task_height;
+    verbose  = t.verbose;
+    default_editor = t.default_editor;
+  } in
+  let config = {config with
+    Whyconf.provers = List.fold_left save_prover Mstr.empty t.provers;
+    main    = main;
+    ide     = ide;
+  } in
+  save_config config
 
 (*
 
@@ -321,155 +286,20 @@ let preferences c =
   save_config c;
   dialog#destroy ()
 
-
-
-
-
-(* auto-detection of provers *)
-
-type prover_kind = ATP | ITP
-type prover_autodetection_data =
-    { kind : prover_kind;
-      prover_id : string;
-      mutable prover_name : string;
-      mutable execs : string list;
-      mutable version_switch : string;
-      mutable version_regexp : string;
-      mutable versions_ok : string list;
-      mutable versions_old : string list;
-      mutable command : string;
-      mutable driver : string;
-      mutable editor : string;
-    }
-
-let default k id =
-  { kind = k;
-    prover_id = id;
-    prover_name = "";
-    execs = [];
-    version_switch = "";
-    version_regexp = "";
-    versions_ok = [];
-    versions_old = [];
-    command = "";
-    driver = "";
-    editor = "";
-    }
-
-let load_prover d (key, value) = 
-  match key with
-    | "name" -> d.prover_name <- Rc.string value
-    | "exec" -> d.execs <- Rc.string value :: d.execs
-    | "version_switch" -> d.version_switch <- Rc.string value
-    | "version_regexp" -> d.version_regexp <- Rc.string value
-    | "version_ok" -> d.versions_ok <- Rc.string value :: d.versions_ok
-    | "version_old" -> d.versions_old <- Rc.string value :: d.versions_old
-    | "command" -> d.command <- Rc.string value 
-    | "driver" -> d.driver <- Rc.string value
-    | "editor" -> d.editor <- Rc.string value
-    | s -> 
-        eprintf "unknown key [%s] in autodetection data@." s;
-        exit 1
-        
-let load acc (key,l) =
-  match key with
-    | ["ATP" ; id] -> 
-        let d = default ATP id in
-        List.iter (load_prover d) l;
-        d :: acc
-    | ["ITP" ; id] -> 
-        let d = default ITP id in
-        List.iter (load_prover d) l;
-        d :: acc
-    | s :: _ ->
-        eprintf "unknown section [%s] in auto detection data@." s;
-        exit 1
-    | [] -> assert false
-  
-let read_auto_detection_data () =
-  try
-    let rc = Rc.from_file "prover-detection-data.conf" in
-    List.fold_left load [] rc
-  with
-    | Failure "lexing" -> 
-        eprintf "Syntax error in prover-detection-data.conf@.";
-        exit 2
-    | Not_found ->
-        eprintf "prover-detection-data.conf not found@.";
-        exit 2
-    
-
-let provers_found = ref 0
-
-let prover_tips_info = ref false
-
-
-let make_command exec com =
-  let cmd_regexp = Str.regexp "%\\(.\\)" in
-  let replace s = match Str.matched_group 1 s with
-    | "e" -> exec
-    | c -> "%"^c
-  in
-  Str.global_substitute cmd_regexp replace com
-
-let detect_prover env acc data =
-  List.fold_left
-    (fun acc com ->
-	let out = Filename.temp_file "out" "" in
-        let cmd = com ^ " " ^ data.version_switch in
-	let c = cmd ^ " > " ^ out in
-	let ret = Sys.command c in
-	if ret <> 0 then
-	  begin
-	    eprintf "command '%s' failed@." cmd;
-	    acc
-	  end
-	else
-	  let s = 
-            try 
-              let ch = open_in out in
-              let s = ref (input_line ch) in
-              while !s = "" do s := input_line ch done;
-              close_in ch;
-	      Sys.remove out;
-              !s              
-            with Not_found | End_of_file  -> ""
-          in
-	  let re = Str.regexp data.version_regexp in
-	  if Str.string_match re s 0 then            
-	    let nam = data.prover_name in
-	    let ver = Str.matched_group 1 s in
-            if List.mem ver data.versions_ok then 
-	      eprintf "Found prover %s version %s, OK.@." nam ver
-            else
-              begin
-                prover_tips_info := true;
-                if List.mem ver data.versions_old then 
-                  eprintf "Warning: prover %s version %s is quite old, please consider upgrading to a newer version.@." nam ver	    
-                else
-                  eprintf "Warning: prover %s version %s is not known to be supported, use it at your own risk!@." nam ver
-              end;
-            incr provers_found;
-            let c = make_command com data.command in
-	    get_prover_data env data.prover_id data.prover_name ver 
-              c data.driver data.editor :: acc
-	  else 
-	    begin
-              prover_tips_info := true;
-	      eprintf "Warning: found prover %s but name/version not recognized by regexp `%s'@." data.prover_name data.version_regexp;
-	      eprintf "Answer was `%s'@." s;
-	      acc
-	    end)
-    acc
-    data.execs
-
-
-let run_auto_detection env gconfig =
-  let l = read_auto_detection_data () in
-  let detect = List.fold_left (detect_prover env) [] l in
-  eprintf "%d provers detected.@." (List.length detect);
-  gconfig.provers <- detect
-    
+let run_auto_detection gconfig =
+  let config2 = run_auto_detection gconfig.config in
+  let gconfig2 = load_config config2 in
+  gconfig.window_width <- gconfig2.window_width;
+  gconfig.window_height <- gconfig2.window_height;
+  gconfig.tree_width <- gconfig2.tree_width;
+  gconfig.task_height <- gconfig2.task_height;
+  gconfig.time_limit <- gconfig2.time_limit;
+  gconfig.mem_limit <- gconfig2.mem_limit;
+  gconfig.verbose <- gconfig2.verbose;
+  gconfig.max_running_processes <- gconfig2.max_running_processes;
+  gconfig.provers <- gconfig2.provers;
+  gconfig.default_editor <- gconfig2.default_editor;
+  gconfig.config <- gconfig2.config
 
 (*
 Local Variables: 

@@ -17,13 +17,16 @@ type t =
       mutable tree_width : int;
       mutable task_height : int;
       mutable time_limit : int;
+      mutable mem_limit : int;
       mutable verbose : int;
       mutable max_running_processes : int;
       mutable provers : prover_data list;
       mutable default_editor : string;
+      env : Why.Env.env;
+      mutable config : Whyconf.config;
     }
 
-val read_config : Env.env -> t
+val read_config : unit -> t
 
 val save_config : t -> unit
 
@@ -55,7 +58,7 @@ val show_legend_window : unit -> unit
 val show_about_window : unit -> unit
 val preferences : t -> unit
 
-val run_auto_detection : Env.env -> t -> unit
+val run_auto_detection : t -> unit
 
 (*
 Local Variables: 

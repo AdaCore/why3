@@ -89,7 +89,7 @@ let add_opt_meta meta =
 let opt_config = ref None
 let opt_parser = ref None
 let opt_prover = ref None
-let opt_loadpath = ref [Filename.concat Whyconf.datadir "theories"]
+let opt_loadpath = ref []
 let opt_driver = ref None
 let opt_output = ref None
 let opt_timelimit = ref None
@@ -288,21 +288,12 @@ let () =
     option_iter
       (eprintf "No config file found (required by '-P %s').@.") !opt_prover;
     if !opt_config <> None || !opt_prover <> None then exit 1;
-    { conf_file = "";
-(*
-      loadpath  = [];
-*)
-      timelimit = None;
-      memlimit  = None;
-      running_provers_max = None;
-      provers   = Mstr.empty }
+    default_config
   in
 
-(*
-  opt_loadpath := List.rev_append !opt_loadpath config.loadpath;
-*)
-  if !opt_timelimit = None then opt_timelimit := config.timelimit;
-  if !opt_memlimit  = None then opt_memlimit  := config.memlimit;
+  opt_loadpath := List.rev_append !opt_loadpath config.main.loadpath;
+  if !opt_timelimit = None then opt_timelimit := Some config.main.timelimit;
+  if !opt_memlimit  = None then opt_memlimit  := Some config.main.memlimit;
   begin match !opt_prover with
   | Some s ->
       let prover = try Mstr.find s config.provers with

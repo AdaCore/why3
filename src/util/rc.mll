@@ -35,6 +35,8 @@ type rc_value =
   | RCstring of string
   | RCident of string
 
+type t = (string list * (string * rc_value) list) list
+
 let int = function
   | RCint n -> n
   | _ -> failwith "Rc.int"
@@ -147,44 +149,40 @@ and string_val key = parse
 {
 
   let from_file f =
-    let c = 
-      try open_in f 
-      with Sys_error _ -> raise Not_found
-	(*
+      let c = 
+	try open_in f 
+	with Sys_error _ -> raise Not_found
+(*
 	  Format.eprintf "Cannot open file %s@." f;
 	  exit 1
-	*)
-    in
-    current := [];
-    let lb = from_channel c in
-    record lb;
-    close_in c;
-    List.rev !current
-      
-  open Format
-  open Pp
+*)
+      in
+      current := [];
+      let lb = from_channel c in
+      record lb;
+      close_in c;
+      List.rev !current
 
+open Format
+
+let to_file s l =
   let print_value fmt = function
-    | RCint n -> fprintf fmt "%d" n
-    | RCbool b -> fprintf fmt "%b" b
-    | RCfloat f -> fprintf fmt "%f" f
-    | RCstring s -> fprintf fmt "\"%s\"" s
-    | RCident i -> fprintf fmt "%s" i
+      | RCint i -> pp_print_int fmt i
+      | RCbool b -> pp_print_bool fmt b
+      | RCfloat f -> pp_print_float fmt f
+      | RCstring s -> fprintf fmt "\"%S\"" s
+      | RCident s -> pp_print_string fmt s in
+  let print_kv fmt (k,v) = fprintf fmt "%s = %a" k print_value v in
+  let print_section fmt (h,l) =
+    fprintf fmt "[%a]@\n%a"
+      (Pp.print_list Pp.space pp_print_string) h
+      (Pp.print_list Pp.newline print_kv) l in
+  let out = open_out s in
+  let fmt = formatter_of_out_channel out in
+  Pp.print_list Pp.newline print_section fmt l;
+  pp_print_flush fmt ();
+  close_out out
 
-  let record fmt (keys,fl) =
-    fprintf fmt "[%a]@\n" (print_list space pp_print_string) keys;
-    List.iter
-      (fun (f,v) -> fprintf fmt "%s = %a@\n" f print_value v)
-      fl;
-    fprintf fmt "@."
 
-  let to_file f l =
-    let c = 
-      try open_out f 
-      with Sys_error _ -> raise Not_found
-    in
-    let fmt = formatter_of_out_channel c in
-    List.iter (record fmt) l;
-    close_out c
-      
+
 }

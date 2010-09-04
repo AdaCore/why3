@@ -21,25 +21,43 @@
 
 open Util
 
-val libdir : string
-val datadir : string
+val sharedir : string (* For image, ... *)
 
 type config_prover = {
   name    : string;   (* "Alt-Ergo v2.95 (special)" *)
   command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
   driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
+  version : string;   (* "v2.95" *)
+  editor  : string;   (* Interative theorem prover *)
+}
+
+type main = {
+  loadpath  : string list;  (* "/usr/local/share/why/theories" *)
+  timelimit : int;   (* default prover time limit in seconds
+                               (0 unlimited) *)
+  memlimit  : int;
+  (* default prover memory limit in megabytes (0 unlimited)*)
+  running_provers_max : int;
+  (* max number of running prover processes *)
+}
+
+type ide = {
+  window_width : int;
+  window_height : int;
+  tree_width : int;
+  task_height : int;
+  verbose : int;
+  default_editor : string;
 }
 
 type config = {
   conf_file : string;       (* "/home/innocent_user/.why.conf" *)
-(*
-  loadpath  : string list;  (* "/usr/local/share/why/theories" *)
-*)
-  timelimit : int option;   (* default prover time limit in seconds *)
-  memlimit  : int option;   (* default prover memory limit in megabytes *)
-  running_provers_max : int option; (* max number of running prover processes *)
   provers   : config_prover Mstr.t;   (* indexed by short identifiers *)
+  main      : main;
+  ide       : ide;
 }
+
+val default_config : config
 
 (** if conf_file is not given, tries the following:
    "$WHY_CONFIG"; "./why.conf"; "./.why.conf";
@@ -48,4 +66,5 @@ val read_config : string option -> config
 
 val save_config : config -> unit
 
-
+(** Replace the provers by autodetected one *)
+val run_auto_detection : config -> config
