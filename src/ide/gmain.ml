@@ -570,9 +570,11 @@ let (_ : GMenu.image_menu_item) =
        Scheduler.maximum_running_proofs := gconfig.max_running_processes)
     () 
 
+let refresh_provers = ref (fun () -> ())
+
 let (_ : GMenu.image_menu_item) = 
   file_factory#add_image_item ~label:"_Detect provers" ~callback:
-    (fun () -> Gconfig.run_auto_detection gconfig)
+    (fun () -> Gconfig.run_auto_detection gconfig; !refresh_provers () )
     () 
 
 let (_ : GMenu.image_menu_item) = 
@@ -681,23 +683,39 @@ let (_ : GMenu.check_menu_item) = view_factory#add_check_item
 (* Tools menu *)
 (**************)
 
+let add_refresh_provers f =
+  let rp = !refresh_provers in
+  refresh_provers := (fun () -> rp (); f ())
+
+
 let tools_menu = factory#add_submenu "_Tools" 
 let tools_factory = new GMenu.factory tools_menu ~accel_group 
 
-let () =
-  List.iter (fun p ->
-    let (_ : GMenu.image_menu_item) = 
-      let n = p.prover_name ^ " " ^ p.prover_version in
-      tools_factory#add_image_item ~label:(n ^ " on unproved goals") 
-	~callback:(fun () -> prover_on_unproved_goals p ()) 
-	()
-    in ()) gconfig.provers 
+let () = add_refresh_provers (fun () ->
+  List.iter (fun item -> item#destroy ()) tools_menu#all_children)
 
-let (_ : GMenu.image_menu_item) = 
-  tools_factory#add_image_item 
-    ~label:"Split unproved goals" 
-    ~callback:split_unproved_goals
-    () 
+let () =
+  let add_item_provers () =
+    List.iter (fun p ->
+      let (_ : GMenu.image_menu_item) =
+        let n = p.prover_name ^ " " ^ p.prover_version in
+        tools_factory#add_image_item ~label:(n ^ " on unproved goals")
+	  ~callback:(fun () -> prover_on_unproved_goals p ())
+	  ()
+      in ()) gconfig.provers in
+  add_refresh_provers add_item_provers;
+  add_item_provers ()
+
+let () =
+  let add_item_split () =
+    ignore(tools_factory#add_image_item
+             ~label:"Split unproved goals"
+             ~callback:split_unproved_goals
+             () : GMenu.image_menu_item) in
+  add_refresh_provers add_item_split;
+  add_item_split ()
+
+
 
 (*************)
 (* Help menu *)
@@ -837,11 +855,15 @@ let edit_current_proof () =
     | [p] -> edit_selected_row p
     | _ -> assert false (* multi-selection is disabled *)
 
-let (_ : GMenu.image_menu_item) = 
-  tools_factory#add_image_item 
-    ~label:"Edit current proof" 
-    ~callback:edit_current_proof
-    () 
+let add_item_edit () =
+  ignore (tools_factory#add_image_item
+            ~label:"Edit current proof"
+            ~callback:edit_current_proof
+            () : GMenu.image_menu_item)
+
+let () =
+  add_refresh_provers add_item_edit;
+  add_item_edit ()
 
 
 
