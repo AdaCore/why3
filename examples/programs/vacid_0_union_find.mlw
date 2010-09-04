@@ -3,7 +3,7 @@
 
   use array.ArrayLength as A
 
-  type array 'a = A.t 'a
+  type array 'a = A.t int 'a
 
   logic (#) (a : array 'a) (i : int) : 'a = A.get a i
 

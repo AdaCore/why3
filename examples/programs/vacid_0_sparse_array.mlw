@@ -29,7 +29,7 @@ back  +-+-+-+-------------------+
   logic c1 : elt
   logic c2 : elt
 
-  type array 'a = A.t 'a
+  type array 'a = A.t int 'a
 
   logic (#) (a : array 'a) (i : int) : 'a = A.get a i
 

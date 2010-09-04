@@ -1,0 +1,23 @@
+theory Array
+  type key
+  type elt
+  type t
+
+  logic get t key : elt
+  logic set t key elt : t
+
+  axiom Select_eq :
+    forall m : t. forall a1 a2 : key.
+    forall b : elt [get (set m a1 b) a2].
+    a1 = a2 -> get (set m a1 b) a2  = b
+
+  axiom Select_neq : 
+    forall m : t. forall a1 a2 : key. 
+    forall b : elt [get (set m a1 b) a2].
+    a1 <> a2 -> get (set m a1 b) a2 = get m a2
+
+  logic create_const elt : t
+
+  axiom Const : forall b:elt, a:key. get (create_const b) a = b
+
+end

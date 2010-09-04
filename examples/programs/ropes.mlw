@@ -1,8 +1,8 @@
 
 {
   type char
-  clone array.ArrayMonoRich as S with type elt = char
-  type string = S.t
+  clone array.ArrayRich as S
+  type string = S.t int char
 
   type rope =
     | Str string int  (len: int)

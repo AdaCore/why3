@@ -1,66 +1,38 @@
 
-theory ArrayPoly
+theory Array
 
   type t 'a 'b
 
   logic get (t 'a 'b) 'a : 'b
   logic set (t 'a 'b) 'a 'b : t 'a 'b
-  
-  axiom Select_eq : 
-    forall m : t 'a 'b. forall a1 a2 : 'a. 
+
+  axiom Select_eq :
+    forall m : t 'a 'b. forall a1 a2 : 'a.
     forall b : 'b [get (set m a1 b) a2].
     a1 = a2 -> get (set m a1 b) a2  = b
 
-  axiom Select_neq : 
-    forall m : t 'a 'b. forall a1 a2 : 'a. 
+  axiom Select_neq :
+    forall m : t 'a 'b. forall a1 a2 : 'a.
     forall b : 'b [get (set m a1 b) a2].
     a1 <> a2 -> get (set m a1 b) a2 = get m a2
 
-  logic const 'b : t 'a 'b
+  logic create_const 'b : t 'a 'b
 
-  axiom Const : forall b:'b, a:'a. get (const b) a = b
-
-end
-
-(* arrays with monomorphic keys *)
-
-theory Array
-
-  type key
-
-  type t 'a
-
-  logic get (t 'a) key : 'a
-  logic set (t 'a) key 'a : t 'a
-  
-  axiom Select_eq : 
-    forall m : t 'a. forall a1 a2 : key. 
-    forall b : 'a [get (set m a1 b) a2].
-    a1 = a2 -> get (set m a1 b) a2 = b
-
-  axiom Select_neq : 
-    forall m : t 'a. forall a1 a2 : key. 
-    forall b : 'a [get (set m a1 b) a2].
-    a1 <> a2 -> get (set m a1 b) a2 = get m a2
-
-  logic create_const 'a : t 'a
-
-  axiom Create_const_get : 
-    forall b:'a. forall a:key. get (create_const b) a = b
+  axiom Const : forall b:'b, a:'a. get (create_const b) a = b
 
 end
 
 theory ArrayLength
 
-  clone export Array with type key = int
+  use export Array
 
-  logic length (t 'a) : int
+  logic length (t int 'a) : int
 
   axiom Length_set : 
-    forall a : t 'a. forall k : int. forall v : 'a.
+    forall a : t int 'a. forall k : int. forall v : 'a.
     length (set a k v) = length a
 
-  logic create_const_length 'a int : t 'a
+  logic create_const_length 'a int : t int 'a
 
   axiom Create_const_length_get : 
     forall b:'a. forall n i:int. get (create_const_length b n) i = b
@@ -68,10 +40,10 @@ theory ArrayLength
   axiom Create_const_length_length : 
     forall a : 'a. forall n : int. length (create_const_length a n) = n
 
-  logic create_length int : t 'a
+  logic create_length int : t int 'a
 
   axiom Create_length_length : 
-    forall n : int. length (create_length n : t 'a) = n
+    forall n : int. length (create_length n : t int 'a) = n
 
 end
 
@@ -79,106 +51,24 @@ theory ArrayRich
 
   use import int.Int
   
-  clone export ArrayLength
+  use export ArrayLength
 
-  logic sub (t 'a) int int : t 'a
-
-  axiom Sub_length : 
-    forall s : t 'a, ofs len : int. length (sub s ofs len) = len
-
-  axiom Sub_get :
-    forall s : t 'a, ofs len i : int. 
-    get (sub s ofs len) i = get s (ofs + i)
-
-  logic app (t 'a) (t 'a) : t 'a
-
-  axiom App_length : 
-    forall s1 s2 : t 'a. length (app s1 s2) = length s1 + length s2
-
-  axiom App_get :
-    forall s1 s2 : t 'a, i : int. 
-    get (app s1 s2) i = 
-      if i < length s1 then get s1 i else get s2 (i - length s1)
-
-end
-
-(* monomorphic versions (the type of elements is elt) *)
-
-theory ArrayMono
-
-  type key
-
-  type elt
-
-  type t
-
-  logic get t key : elt
-  logic set t key elt : t
-  
-  axiom Select_eq : 
-    forall m : t. forall a1 a2 : key. 
-    forall b : elt [get (set m a1 b) a2].
-    a1 = a2 -> get (set m a1 b) a2 = b
-
-  axiom Select_neq : 
-    forall m : t. forall a1 a2 : key. 
-    forall b : elt [get (set m a1 b) a2].
-    a1 <> a2 -> get (set m a1 b) a2 = get m a2
-
-  logic create_const elt : t
-
-  axiom Create_const_get : 
-    forall b:elt. forall a:key. get (create_const b) a = b
-
-end
-
-theory ArrayMonoLength
-
-  clone export ArrayMono with type key = int
-
-  logic length t : int
-
-  axiom Length_set : 
-    forall a : t. forall k : int. forall v : elt.
-    length (set a k v) = length a
-
-  logic create_const_length elt int : t
-
-  axiom Create_const_length_get : 
-    forall b:elt. forall n i:int. get (create_const_length b n) i = b
-
-  axiom Create_const_length_length : 
-    forall a : elt. forall n : int. length (create_const_length a n) = n
-
-  logic create_length int : t
-
-  axiom Create_length_length : 
-    forall n : int. length (create_length n : t) = n
-
-end
-
-theory ArrayMonoRich
-
-  use import int.Int
-  
-  clone export ArrayMonoLength
-
-  logic sub t int int : t
+  logic sub (t int 'a) int int : t int 'a
 
   axiom Sub_length : 
-    forall s : t, ofs len : int. length (sub s ofs len) = len
+    forall s : t int 'a, ofs len : int. length (sub s ofs len) = len
 
   axiom Sub_get :
-    forall s : t, ofs len i : int. 
+    forall s : t int 'a, ofs len i : int. 
     get (sub s ofs len) i = get s (ofs + i)
 
-  logic app t t : t
+  logic app (t int 'a) (t int 'a) : t int 'a
 
   axiom App_length : 
-    forall s1 s2 : t. length (app s1 s2) = length s1 + length s2
+    forall s1 s2 : t int 'a. length (app s1 s2) = length s1 + length s2
 
   axiom App_get :
-    forall s1 s2 : t, i : int. 
+    forall s1 s2 : t int 'a, i : int. 
     get (app s1 s2) i = 
       if i < length s1 then get s1 i else get s2 (i - length s1)
 

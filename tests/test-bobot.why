@@ -32,7 +32,7 @@ end
 *)
 
 theory Test_simplify_array
-  use import array.ArrayPoly
+  use import array.Array
   goal G : forall x y:int. forall m: t int int. 
     get (set m y x) y = x
 end 
