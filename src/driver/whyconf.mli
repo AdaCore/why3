@@ -21,8 +21,6 @@
 
 open Util
 
-val sharedir : string (* For image, ... *)
-
 type config_prover = {
   name    : string;   (* "Alt-Ergo v2.95 (special)" *)
   command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
@@ -32,7 +30,9 @@ type config_prover = {
 }
 
 type main = {
-  loadpath  : string list;  (* "/usr/local/share/why/theories" *)
+  libdir   : string;      (* "/usr/local/lib/why/" *)
+  datadir  : string;      (* "/usr/local/share/why/" *)
+  loadpath  : string list;  (* "/usr/local/lib/why/theories" *)
   timelimit : int;   (* default prover time limit in seconds
                                (0 unlimited) *)
   memlimit  : int;
@@ -41,16 +41,14 @@ type main = {
   (* max number of running prover processes *)
 }
 
-type config = {
-  conf_file : string;       (* "/home/innocent_user/.why.conf" *)
-  config    : Rc.t;
-}
+type config
 
-val default_config : config
-
-(** if conf_file is not given, tries the following:
-   "$WHY_CONFIG"; "./why.conf"; "./.why.conf";
-   "$HOME/.why.conf"; "$USERPROFILE/.why.conf" *)
+(** - If conf_file is given and the file doesn't exists Not_found is
+    raised.
+    - If "$WHY_CONFIG" is given and the file doesn't exists Not_found is raised
+    - otherwise tries the following:
+    "./why.conf"; "./.why.conf"; "$HOME/.why.conf";
+    "$USERPROFILE/.why.conf"; the built-in default_config *)
 val read_config : string option -> config
 
 val save_config : config -> unit
@@ -61,6 +59,9 @@ val get_provers : config  -> config_prover Mstr.t
 val set_main    : config -> main                 -> config
 val set_provers : config -> config_prover Mstr.t -> config
 
+val get_section : config -> string -> Rc.section option
+val get_family  : config -> string -> Rc.family
 
-(** Replace the provers by autodetected one *)
-val run_auto_detection : unit -> config_prover Mstr.t
+val set_section : config -> string -> Rc.section -> config
+val set_family  : config -> string -> Rc.family  -> config
+

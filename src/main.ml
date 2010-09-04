@@ -288,8 +288,7 @@ let () =
     option_iter (eprintf "Config file '%s' not found.@.") !opt_config;
     option_iter
       (eprintf "No config file found (required by '-P %s').@.") !opt_prover;
-    if !opt_config <> None || !opt_prover <> None then exit 1;
-    default_config
+    exit 1;
   in
 
   let main = get_main config in

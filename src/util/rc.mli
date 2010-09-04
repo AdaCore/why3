@@ -17,23 +17,32 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Parse rc files *)
-exception Bad_value_type of string * string * string
-(** key * expected * found *)
-exception Key_not_found of string
-(** key *)
-exception Multiple_value of string
-(** key *)
-exception Yet_defined_key of string
-(** key *)
-exception Multiple_section of string
-exception Section_b_family of string
-exception Family_two_many_args of string
-exception Not_exhaustive of  string
-exception Yet_defined_section of string
-(** key *)
 
+(* Exception *)
 
+type rc_value =
+  | RCint of int
+  | RCbool of bool
+  | RCfloat of float
+  | RCstring of string
+  | RCident of string
+
+(* exception SyntaxError *)
+exception ExtraParameters of string
+exception MissingParameters of string
+(* exception UnknownSection of string *)
+exception UnknownField of string
+(* exception MissingSection of string *)
+exception MissingField of string
+exception DuplicateSection of string
+exception DuplicateField of string * rc_value * rc_value
+exception StringExpected of string * rc_value
+exception IdentExpected of string * rc_value
+exception IntExpected of string * rc_value
+exception BoolExpected of string * rc_value
+exception DuplicateProver of string
+
+(* RC API *)
 type t
 type section
 type family  = (string * section) list

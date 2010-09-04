@@ -54,7 +54,8 @@ let fname = match !file with
       f
 
 let lang =
-  let load_path = Filename.concat Whyconf.datadir "lang" in
+  let main = get_main () in
+  let load_path = Filename.concat main.datadir "lang" in
   let languages_manager = 
     GSourceView2.source_language_manager ~default:true 
   in
@@ -79,11 +80,7 @@ let source_text =
 (* loading WhyIDE configuration *)
 (********************************)
 
-let gconfig = 
-  eprintf "reading IDE config file@.";
-  read_config ()
-
-
+let gconfig = Gconfig.config
 
 (***********************)
 (* Parsing input file  *)
@@ -133,7 +130,8 @@ let z3 = find_prover "Z3"
 (*
 let () = 
   printf "previously known goals:@\n";
-  List.iter (fun s -> printf "%s@\n" (Db.goal_task_checksum s)) (Db.root_goals ());
+  List.iter (fun s -> printf "%s@\n" (Db.goal_task_checksum s))
+  (Db.root_goals ());
   printf "@."
 *)
 
@@ -204,7 +202,8 @@ module Model = struct
   let time_column = cols#add Gobject.Data.string
   let visible_column = cols#add Gobject.Data.boolean
 (*
-  let bg_column = cols#add (Gobject.Data.unsafe_boxed (Gobject.Type.from_name "GdkColor"))
+  let bg_column = cols#add (Gobject.Data.unsafe_boxed 
+  (Gobject.Type.from_name "GdkColor"))
 *)
 
   let name_renderer = GTree.cell_renderer_text [`XALIGN 0.] 
@@ -265,7 +264,7 @@ end
 
 let exit_function () =
   eprintf "saving IDE config file@.";
-  save_config gconfig;
+  save_config ();
   GMain.quit ()
 
 let w = GWindow.window 
@@ -310,7 +309,8 @@ let (_ : GtkSignal.id) =
     (fun {Gtk.width=w;Gtk.height=_h} -> 
        gconfig.tree_width <- w)
 
-let goals_model,filter_model,goals_view = Model.create ~packing:scrollview#add () 
+let goals_model,filter_model,goals_view =
+  Model.create ~packing:scrollview#add ()
 
 module Helpers = struct
 
@@ -430,7 +430,8 @@ let rec prover_on_goal p g =
       let name = p.prover_name in
       let prover_row = goals_model#append ~parent:row () in
       goals_model#set ~row:prover_row ~column:Model.icon_column !image_prover;
-      goals_model#set ~row:prover_row ~column:Model.name_column (name ^ " " ^ p.prover_version);
+      goals_model#set ~row:prover_row ~column:Model.name_column
+        (name ^ " " ^ p.prover_version);
       goals_model#set ~row:prover_row ~column:Model.visible_column true;
       goals_view#expand_row (goals_model#get_path row);
       let a = { Model.prover = p;
@@ -499,9 +500,12 @@ let split_unproved_goals () =
               let callback subgoals =
                 if List.length subgoals >= 2 then
                   let split_row = goals_model#append ~parent:row () in
-                  goals_model#set ~row:split_row ~column:Model.visible_column true;
-                  goals_model#set ~row:split_row ~column:Model.name_column "split";
-                  goals_model#set ~row:split_row ~column:Model.icon_column !image_transf;
+                  goals_model#set ~row:split_row ~column:Model.visible_column
+                    true;
+                  goals_model#set ~row:split_row ~column:Model.name_column
+                    "split";
+                  goals_model#set ~row:split_row ~column:Model.icon_column
+                    !image_transf;
                   let tr =
                     { Model.parent_goal = g;
 (*
@@ -544,7 +548,8 @@ let split_unproved_goals () =
                   goals_view#expand_row (goals_model#get_path row)           
               in
               
-              Scheduler.apply_transformation ~callback split_transformation g.Model.task
+              Scheduler.apply_transformation ~callback
+                split_transformation g.Model.task
          )
          th.Model.goals
     )

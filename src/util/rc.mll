@@ -20,6 +20,7 @@
 {
 
   open Lexing
+  open Format
   open Util
 
   let get_home_dir () =
@@ -29,18 +30,7 @@
       try Sys.getenv "USERPROFILE"
       with Not_found -> ""
 
-exception Bad_value_type of string * string * string
-(** key * expected * found *)
-exception Key_not_found of string
-(** key *)
-exception Multiple_value of string
-(** key *)
-exception Multiple_section of string
-exception Section_b_family of string
-exception Family_two_many_args of string
-exception Not_exhaustive of  string
-exception Yet_defined_section of string
-exception Yet_defined_key of string
+
 
 type rc_value =
   | RCint of int
@@ -48,6 +38,70 @@ type rc_value =
   | RCfloat of float
   | RCstring of string
   | RCident of string
+
+
+(* Error handling *)
+
+(* exception SyntaxError *)
+exception ExtraParameters of string
+exception MissingParameters of string
+(* exception UnknownSection of string *)
+exception UnknownField of string
+(* exception MissingSection of string *)
+exception MissingField of string
+exception DuplicateSection of string
+exception DuplicateField of string * rc_value * rc_value
+exception StringExpected of string * rc_value
+exception IdentExpected of string * rc_value
+exception IntExpected of string * rc_value
+exception BoolExpected of string * rc_value
+exception DuplicateProver of string
+
+let error ?loc e = match loc with
+  | None -> raise e
+  | Some loc -> raise (Loc.Located (loc, e))
+
+(* conf files *)
+
+let print_rc_value fmt = function
+  | RCint i -> fprintf fmt "%d" i
+  | RCbool b -> fprintf fmt "%B" b
+  | RCfloat f -> fprintf fmt "%f" f
+  | RCstring s -> fprintf fmt "%S" s (* "%s"  %S ? *)
+  | RCident s -> fprintf fmt "%s" s
+
+let () = Exn_printer.register (fun fmt e -> match e with
+  (* | SyntaxError -> *)
+  (*     fprintf fmt "syntax error" *)
+  | ExtraParameters s ->
+      fprintf fmt "section '%s': header too long" s
+  | MissingParameters s ->
+      fprintf fmt "section '%s': header too short" s
+  (* | UnknownSection s -> *)
+  (*     fprintf fmt "unknown section '%s'" s *)
+  | UnknownField s ->
+      fprintf fmt "unknown field '%s'" s
+  (* | MissingSection s -> *)
+  (*     fprintf fmt "section '%s' is missing" s *)
+  | MissingField s ->
+      fprintf fmt "field '%s' is missing" s
+  | DuplicateSection s ->
+      fprintf fmt "section '%s' is already given" s
+  | DuplicateField (s,u,v) ->
+      fprintf fmt "cannot set field '%s' to %a, as it is already set to %a"
+        s print_rc_value v print_rc_value u
+  | StringExpected (s,v) ->
+      fprintf fmt "cannot set field '%s' to %a: a string is expected"
+        s print_rc_value v
+  | IdentExpected (s,v) ->
+      fprintf fmt "cannot set field '%s' to %a: an identifier is expected"
+        s print_rc_value v
+  | IntExpected (s,v) ->
+      fprintf fmt "cannot set field '%s' to %a: an integer is expected"
+        s print_rc_value v
+  | DuplicateProver s ->
+      fprintf fmt "prover %s is already listed" s
+  | e -> raise e)
 
 type section = rc_value list Mstr.t
 type family  = (string * section) list
@@ -66,7 +120,7 @@ let make_t tl =
       | []    -> assert false
       | [sname]    -> sname,None
       | [sname;arg] -> sname,Some arg
-      | sname::_     -> raise (Family_two_many_args sname) in
+      | sname::_     -> raise (ExtraParameters sname) in
     let m = List.fold_left add_key empty_section sectionl in
     let m = Mstr.map List.rev m in
     let l = try Mstr.find sname t with Not_found -> [] in
@@ -78,15 +132,15 @@ let get_section t sname =
     let l = Mstr.find sname t in
     match l with
       | [None,v] -> Some v
-      | [Some _,_] -> raise (Section_b_family sname)
-      | _ -> raise (Multiple_section sname)
+      | [Some _,_] -> raise (ExtraParameters sname)
+      | _ -> raise (DuplicateSection sname)
   with Not_found -> None
 
 let get_family t sname =
   try
     let l = Mstr.find sname t in
     let get (arg,section) =
-      (match arg with None -> raise (Section_b_family sname) | Some v -> v,
+      (match arg with None -> raise (MissingParameters sname) | Some v -> v,
         section) in
     List.map get l
   with Not_found -> []
@@ -104,20 +158,21 @@ let get_value read ?default section key =
   try
     let l = Mstr.find key section in
     match l with
-      | [v] -> read v
-      | _ -> raise (Multiple_value key)
+      | []  -> assert false
+      | [v] -> read key v
+      | v1::v2::_ -> raise (DuplicateField (key,v1,v2))
   with Not_found ->
     match default with
-      | None -> raise (Key_not_found key)
+      | None -> raise (MissingField key)
       | Some v -> v
 
 let get_valuel read ?default section key =
   try
     let l = Mstr.find key section in
-    List.map read l
+    List.map (read key) l
   with Not_found ->
     match default with
-      | None -> raise (Key_not_found key)
+      | None -> raise (MissingField key)
       | Some v -> v
 
 let set_value write section key value =
@@ -127,21 +182,21 @@ let set_valuel write section key valuel =
   if valuel = [] then Mstr.remove key section else
     Mstr.add key (List.map write valuel) section
 
-let rint = function
+let rint k = function
   | RCint n -> n
-  | _ -> failwith "Rc.int"
+  | v -> raise (IntExpected (k,v))
 
 let wint i = RCint i
 
-let rbool = function
+let rbool k = function
   | RCbool b -> b
-  | _ -> failwith "Rc.bool"
+  | v -> raise (BoolExpected (k,v))
 
 let wbool b = RCbool b
 
-let rstring = function
+let rstring k = function
   | RCident s | RCstring s -> s
-  | _ -> failwith "Rc.string"
+  | v -> raise (StringExpected (k,v))
 
 let wstring s = RCstring s
 
@@ -162,7 +217,7 @@ let set_stringl = set_valuel wstring
 
 let check_exhaustive section keyl =
   let test k _ = if Sstr.mem k keyl then ()
-    else raise (Not_exhaustive k) in
+    else raise (UnknownField k) in
   Mstr.iter test section
 
 let buf = Buffer.create 17
@@ -279,23 +334,15 @@ and string_val key = parse
       close_in c;
       make_t !current
 
-open Format
-
 let to_file s t =
-  let print_value fmt = function
-      | RCint i -> pp_print_int fmt i
-      | RCbool b -> pp_print_bool fmt b
-      | RCfloat f -> pp_print_float fmt f
-      | RCstring s -> fprintf fmt "%S" s
-      | RCident s -> pp_print_string fmt s in
-  let print_kv k fmt v = fprintf fmt "%s = %a" k print_value v in
+  let print_kv k fmt v = fprintf fmt "%s = %a" k print_rc_value v in
   let print_kvl fmt k vl = Pp.print_list Pp.newline (print_kv k) fmt vl in
   let print_section sname fmt (h,l) =
     fprintf fmt "[%s %a]@\n%a"
       sname (Pp.print_option Pp.string) h
-      (Pp.print_iter22 Mstr.iter Pp.newline2 print_kvl) l in
+      (Pp.print_iter22 Mstr.iter Pp.newline print_kvl) l in
   let print_sectionl fmt sname l =
-    Pp.print_list Pp.newline (print_section sname) fmt l in
+    Pp.print_list Pp.newline2 (print_section sname) fmt l in
   let print_t fmt t =
     Pp.print_iter22 Mstr.iter Pp.newline2 print_sectionl fmt t in
   let out = open_out s in

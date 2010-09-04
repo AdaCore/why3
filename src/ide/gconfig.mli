@@ -26,9 +26,11 @@ type t =
       mutable config : Whyconf.config;
     }
 
-val read_config : unit -> t
+val save_config : unit -> unit
 
-val save_config : t -> unit
+val config      : t
+
+val get_main : unit -> Whyconf.main
 
 (***************)
 (* boomy icons *)

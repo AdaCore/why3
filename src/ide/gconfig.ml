@@ -2,8 +2,9 @@
 open Format
 open Why
 open Util
-open Whyconf
 open Rc
+open Whyconf
+
 
 type prover_data =
     { prover_id : string;
@@ -46,7 +47,7 @@ let default_ide =
     ide_tree_width = 512;
     ide_task_height = 384;
     ide_verbose = 0;
-    ide_default_editor = "";
+    ide_default_editor = ""; (*TODO : editor? *)
   }
 
 let load_ide section =
@@ -83,7 +84,7 @@ let get_prover_data env id pr acc =
 
 let load_config config =
   let main = get_main config in
-  let ide  = match get_section config.Whyconf.config "ide" with
+  let ide  = match get_section config "ide" with
     | None -> default_ide
     | Some s -> load_ide s in
   let provers = get_provers config in
@@ -131,11 +132,19 @@ let save_config t =
   let ide = set_int ide "task_height" t.task_height in
   let ide = set_int ide "verbose" t.verbose in
   let ide = set_string ide "default_editor" t.default_editor in
-  let rc = set_section config.Whyconf.config "ide" ide in
-  let config = {config with Whyconf.config = rc} in
+  let config = set_section config "ide" ide in
   let config = set_provers config
     (List.fold_left save_prover Mstr.empty t.provers) in
   save_config config
+
+let config =
+  eprintf "reading IDE config file@.";
+  read_config ()
+
+let save_config () = save_config config
+
+let get_main () = (get_main config.config)
+
 
 (*
 
@@ -144,7 +153,8 @@ let save_config t =
 *)
 
 let image ?size f =
-  let n = Filename.concat Whyconf.datadir (Filename.concat "images" (f^".png"))
+  let main = get_main () in
+  let n = Filename.concat main.datadir (Filename.concat "images" (f^".png"))
   in
   match size with
     | None ->
@@ -294,8 +304,10 @@ let preferences c =
   let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
   let _ = GMisc.label ~text:"Nb of processes" ~packing:hb#add () in
   let nb_processes_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
-  nb_processes_spin#adjustment#set_bounds ~lower:1. ~upper:16. ~step_incr:1. ();
-  nb_processes_spin#adjustment#set_value (float_of_int c.max_running_processes);
+  nb_processes_spin#adjustment#set_bounds
+    ~lower:1. ~upper:16. ~step_incr:1. ();
+  nb_processes_spin#adjustment#set_value
+    (float_of_int c.max_running_processes);
   let (_ : GtkSignal.id) = 
     nb_processes_spin#connect#value_changed ~callback:
       (fun () -> c.max_running_processes <- nb_processes_spin#value_as_int)
@@ -303,16 +315,19 @@ let preferences c =
   (** page 2 **)
   let label2 = GMisc.label ~text:"Provers" () in
   let _page2 = GMisc.label ~text:"This page should display detected provers" 
-    ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label2#coerce w)) () 
+    ~packing:(fun w -> ignore(notebook#append_page 
+                                ~tab_label:label2#coerce w)) () 
   in
   dialog#add_button "Close" `CLOSE ;
   let ( _ : GWindow.Buttons.about) = dialog#run () in
   eprintf "saving IDE config file@.";
-  save_config c;
+  save_config ();
   dialog#destroy ()
 
 let run_auto_detection gconfig =
-  let provers = run_auto_detection () in
+  let config = Autodetection.run_auto_detection gconfig.config in
+  gconfig.config <- config;
+  let provers = get_provers config in
   gconfig.provers <- Mstr.fold (get_prover_data gconfig.env) provers [];
 
 (*
