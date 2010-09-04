@@ -41,20 +41,9 @@ type main = {
   (* max number of running prover processes *)
 }
 
-type ide = {
-  window_width : int;
-  window_height : int;
-  tree_width : int;
-  task_height : int;
-  verbose : int;
-  default_editor : string;
-}
-
 type config = {
   conf_file : string;       (* "/home/innocent_user/.why.conf" *)
-  provers   : config_prover Mstr.t;   (* indexed by short identifiers *)
-  main      : main;
-  ide       : ide;
+  config    : Rc.t;
 }
 
 val default_config : config
@@ -66,5 +55,12 @@ val read_config : string option -> config
 
 val save_config : config -> unit
 
+val get_main    : config  -> main
+val get_provers : config  -> config_prover Mstr.t
+
+val set_main    : config -> main                 -> config
+val set_provers : config -> config_prover Mstr.t -> config
+
+
 (** Replace the provers by autodetected one *)
-val run_auto_detection : config -> config
+val run_auto_detection : unit -> config_prover Mstr.t

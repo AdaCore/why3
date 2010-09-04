@@ -41,10 +41,12 @@ let debug =
   with Not_found -> false
 
 let config = Whyconf.read_config None
+let main = Whyconf.get_main config
+let cprovers = Whyconf.get_provers config
 
-let timelimit = config.main.timelimit
+let timelimit = main.timelimit
 
-let env = Env.create_env (Lexer.retrieve config.main.loadpath)
+let env = Env.create_env (Lexer.retrieve main.loadpath)
     
 let provers = Hashtbl.create 17
 
@@ -52,7 +54,7 @@ let get_prover s =
   try 
     Hashtbl.find provers s 
   with Not_found -> 
-    let cp = Util.Mstr.find s config.provers in
+    let cp = Util.Mstr.find s cprovers in
     let drv = Driver.load_driver env cp.driver in
     Hashtbl.add provers s (cp, drv);
     cp, drv

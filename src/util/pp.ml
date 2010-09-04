@@ -58,11 +58,20 @@ let print_iter1 iter sep print fmt l =
 
 let print_iter2 iter sep1 sep2 print1 print2 fmt l =
   let first = ref true in
-  iter (fun x y -> 
+  iter (fun x y ->
           if !first
           then first := false
-          else sep1 fmt (); 
+          else sep1 fmt ();
           print1 fmt x;sep2 fmt (); print2 fmt y) l
+
+
+let print_iter22 iter sep print fmt l =
+  let first = ref true in
+  iter (fun x y ->
+          if !first
+          then first := false
+          else sep fmt ();
+          print fmt x y) l
 
 
 let print_pair_delim start sep stop pr1 pr2 fmt (a,b) =

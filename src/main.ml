@@ -224,7 +224,8 @@ let () =
     let config = read_config !opt_config in
     let print fmt s prover = fprintf fmt "%s (%s)@\n" s prover.name in
     let print fmt m = Mstr.iter (print fmt) m in
-    printf "@[<hov 2>Known provers:@\n%a@]@." print config.provers
+    let provers = get_provers config in
+    printf "@[<hov 2>Known provers:@\n%a@]@." print provers
   end;
   if !opt_list_metas then begin
     opt_list := true;
@@ -291,12 +292,13 @@ let () =
     default_config
   in
 
-  opt_loadpath := List.rev_append !opt_loadpath config.main.loadpath;
-  if !opt_timelimit = None then opt_timelimit := Some config.main.timelimit;
-  if !opt_memlimit  = None then opt_memlimit  := Some config.main.memlimit;
+  let main = get_main config in
+  opt_loadpath := List.rev_append !opt_loadpath main.loadpath;
+  if !opt_timelimit = None then opt_timelimit := Some main.timelimit;
+  if !opt_memlimit  = None then opt_memlimit  := Some main.memlimit;
   begin match !opt_prover with
   | Some s ->
-      let prover = try Mstr.find s config.provers with
+      let prover = try Mstr.find s (get_provers config) with
         | Not_found -> eprintf "Driver %s not found.@." s; exit 1
       in
       opt_command := Some prover.command;

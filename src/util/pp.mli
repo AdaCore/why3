@@ -55,13 +55,28 @@ val print_iter1 :
   (Format.formatter -> 'a -> unit) -> 
   Format.formatter -> 'b -> unit
 
-val print_iter2: 
+val print_iter2:
   (('a -> 'b -> unit) -> 'c -> unit) ->
   (Format.formatter -> unit -> unit) ->
   (Format.formatter -> unit -> unit) ->
-  (Format.formatter -> 'a -> unit) -> 
-  (Format.formatter -> 'b -> unit) -> 
+  (Format.formatter -> 'a -> unit) ->
+  (Format.formatter -> 'b -> unit) ->
   Format.formatter -> 'c -> unit
+(**  [print_iter2 iter sep1 sep2 print1 print2 fmt t]
+     iter iterator on [t : 'c]
+     print1 k sep2 () print2 v sep1 () print1  sep2 () ...
+*)
+
+val print_iter22:
+  (('a -> 'b -> unit) -> 'c -> unit) ->
+  (Format.formatter -> unit -> unit) ->
+  (Format.formatter -> 'a -> 'b -> unit) ->
+  Format.formatter -> 'c -> unit
+(**  [print_iter22 iter sep print fmt t]
+     iter iterator on [t : 'c]
+     print k v sep () print k v sep () ...
+*)
+
 
 val space : formatter -> unit -> unit
 val alt : formatter -> unit -> unit

@@ -19,6 +19,7 @@
 
 open Format
 open Util
+open Rc
 
 (* Error handling *)
 
@@ -30,10 +31,10 @@ exception UnknownField of string
 exception MissingSection of string
 exception MissingField of string
 exception DuplicateSection of string
-exception DuplicateField of string * Rc.rc_value * Rc.rc_value
-exception StringExpected of string * Rc.rc_value
-exception IdentExpected of string * Rc.rc_value
-exception IntExpected of string * Rc.rc_value
+(* exception DuplicateField of string * Rc.rc_value * Rc.rc_value *)
+(* exception StringExpected of string * Rc.rc_value *)
+(* exception IdentExpected of string * Rc.rc_value *)
+(* exception IntExpected of string * Rc.rc_value *)
 exception DuplicateProver of string
 
 let error ?loc e = match loc with
@@ -56,14 +57,14 @@ let datadir =
 
 
 (* conf files *)
-
+(*
 let print_rc_value fmt = function
   | Rc.RCint i -> fprintf fmt "%d" i
   | Rc.RCbool b -> fprintf fmt "%B" b
   | Rc.RCfloat f -> fprintf fmt "%f" f
   | Rc.RCstring s -> fprintf fmt "\"%s\"" s
   | Rc.RCident s -> fprintf fmt "%s" s
-
+*)
 let () = Exn_printer.register (fun fmt e -> match e with
   | SyntaxError ->
       fprintf fmt "syntax error"
@@ -81,18 +82,19 @@ let () = Exn_printer.register (fun fmt e -> match e with
       fprintf fmt "field '%s' is missing" s
   | DuplicateSection s ->
       fprintf fmt "section '%s' is already given" s
-  | DuplicateField (s,u,v) ->
-      fprintf fmt "cannot set field '%s' to %a, as it is already set to %a"
-        s print_rc_value v print_rc_value u
-  | StringExpected (s,v) ->
-      fprintf fmt "cannot set field '%s' to %a: a string is expected"
-        s print_rc_value v
-  | IdentExpected (s,v) ->
-      fprintf fmt "cannot set field '%s' to %a: an identifier is expected"
-        s print_rc_value v
-  | IntExpected (s,v) ->
-      fprintf fmt "cannot set field '%s' to %a: an integer is expected"
-        s print_rc_value v
+  (* | DuplicateField (s,u,v) -> *)
+  (*     fprintf fmt "cannot set field '%s' to %a, as it is already set to %a"
+  *)
+  (*       s print_rc_value v print_rc_value u *)
+  (* | StringExpected (s,v) -> *)
+  (*     fprintf fmt "cannot set field '%s' to %a: a string is expected" *)
+  (*       s print_rc_value v *)
+  (* | IdentExpected (s,v) -> *)
+  (*     fprintf fmt "cannot set field '%s' to %a: an identifier is expected"*)
+  (*       s print_rc_value v *)
+  (* | IntExpected (s,v) -> *)
+  (*     fprintf fmt "cannot set field '%s' to %a: an integer is expected" *)
+  (*       s print_rc_value v *)
   | DuplicateProver s ->
       fprintf fmt "prover %s is already listed" s
   | e -> raise e)
@@ -114,20 +116,9 @@ type main = {
   running_provers_max : int;
 }
 
-type ide = {
-  window_width : int;
-  window_height : int;
-  tree_width : int;
-  task_height : int;
-  verbose : int;
-  default_editor : string;
-}
-
 type config = {
   conf_file : string;       (* "/home/innocent_user/.why.conf" *)
-  provers   : config_prover Mstr.t;   (* indexed by short identifiers *)
-  main      : main;
-  ide       : ide;
+  config    : Rc.t  ;
 }
 
 let default_main = {
@@ -137,49 +128,32 @@ let default_main = {
   running_provers_max = 2;
 }
 
-let default_ide =
-  { window_width = 1024;
-    window_height = 768;
-    tree_width = 512;
-    task_height = 384;
-    verbose = 0;
-    default_editor = "";
-  }
+let set_main config main =
+  let section = empty_section in
+  let section = set_stringl section "loadpath" main.loadpath in
+  let section = set_int section "timelimit" main.timelimit in
+  let section = set_int section "memlimit" main.memlimit in
+  let section =
+    set_int section "running_provers_max" main.running_provers_max in
+  {config with config = set_section config.config "main" section}
+
+let set_prover id prover family =
+  let section = empty_section in
+  let section = set_string section "name" prover.name in
+  let section = set_string section "command" prover.command in
+  let section = set_string section "driver" prover.driver in
+  let section = set_string section "version" prover.version in
+  let section = set_string section "editor" prover.editor in
+  (id,section)::family
+
+let set_provers config provers =
+  let family = Mstr.fold set_prover provers [] in
+  {config with config = set_family config.config "prover" family}
 
 let default_config =
-  { conf_file = Filename.concat (Rc.get_home_dir ()) ".why.conf";
-    provers   = Mstr.empty;
-    main      = default_main;
-    ide       = default_ide;
+  {conf_file = Filename.concat (Rc.get_home_dir ()) ".why.conf";
+   config = Rc.empty;
   }
-
-let to_string key = function
-  | Rc.RCstring s -> s
-  | v -> error (StringExpected (key,v))
-
-let to_ident key = function
-  | Rc.RCident s -> s
-  | v -> error (IdentExpected (key,v))
-
-let to_int key = function
-  | Rc.RCint i -> i
-  | v -> error (IntExpected (key,v))
-
-let set_string key r v = match !r with
-  | Some u -> error (DuplicateField (key,Rc.RCstring u,v))
-  | None -> r := Some (to_string key v)
-
-let set_ident key r v = match !r with
-  | Some u -> error (DuplicateField (key,Rc.RCident u,v))
-  | None -> r := Some (to_ident key v)
-
-let set_int key r v = match !r with
-  | Some u -> error (DuplicateField (key,Rc.RCint u,v))
-  | None -> r := Some (to_int key v)
-
-let get_field f = function
-  | None -> error (MissingField f)
-  | Some v -> v
 
 let absolute_filename dirname f =
   if Filename.is_relative f then
@@ -187,76 +161,37 @@ let absolute_filename dirname f =
   else
     f
 
-let load_prover dirname al =
-  let nam = ref None in
-  let cmd = ref None in
-  let drv = ref None in
-  let version = ref None in
-  let editor = ref "" in
-  let load (key, value) = match key with
-    | "name"        -> set_string key nam value
-    | "command"     -> set_string key cmd value
-    | "driver"      -> set_string key drv value;
-	               drv := option_map (absolute_filename dirname) !drv
-    | "version"     -> set_string key version value
-    | "editor"      -> editor := Rc.string value
-    | _             -> error (UnknownField key)
-  in
-  List.iter load al;
-  { name    = get_field "name" !nam;
-    command = get_field "command" !cmd;
-    driver  = get_field "driver" !drv;
-    version = get_field "version" !version;
-    editor  = !editor;
+let load_prover dirname provers (id,section) =
+  Mstr.add id
+    { name    = get_string section "name";
+      command = get_string section "command";
+      (* TODO command : absolute_filename dirname ? *)
+      driver  = absolute_filename dirname (get_string section "driver");
+      version = get_string ~default:"" section "version";
+      editor  = get_string ~default:"" section "editor";
+    } provers
+
+let get_provers config =
+  let dirname = Filename.dirname config.conf_file in
+  let provers = get_family config.config "prover" in
+  List.fold_left (load_prover dirname) Mstr.empty provers
+
+let load_main dirname section =
+  { loadpath  = List.map (absolute_filename dirname)
+      (get_stringl ~default:default_main.loadpath section "loadpath");
+    timelimit = get_int ~default:default_main.timelimit section "timelimit";
+    memlimit  = get_int ~default:default_main.memlimit section "memlimit";
+    running_provers_max =
+      get_int ~default:default_main.running_provers_max section
+        "running_provers_max";
   }
 
-let load_main dirname main al =
-  let lp = ref [] in
-  let tl = ref None in
-  let ml = ref None in
-  let rp = ref None in
-  let load (key, value) = match key with
-    | "library"   -> 
-	lp := absolute_filename dirname (to_string key value) :: !lp
-    | "timelimit" -> set_int key tl value
-    | "memlimit"  -> set_int key ml value
-    | "running_provers_max" -> set_int key rp value
-    | _           -> () (*error (UnknownField key)*)
-  in
-  List.iter load al;
-  (* let none_if_null d = function None -> d | Some 0 -> None | v -> v in *)
-  { loadpath  = List.rev !lp;
-    timelimit = default_option main.timelimit !tl;
-    memlimit  = default_option main.memlimit !ml;
-    running_provers_max = default_option main.running_provers_max !rp
-  }
-
-
-let load_ide ide al =
-  let width = ref None in
-  let height = ref None in
-  let tree_width = ref None in
-  let task_height = ref None in
-  let verbose = ref None in
-  let default_editor = ref None in
-  let load (key, value) = match key with
-    | "window_width"   -> set_int key width value
-    | "window_height"  -> set_int key height value
-    | "tree_width" -> set_int key tree_width value
-    | "task_height" -> set_int key task_height value
-    | "verbose" -> set_int key verbose value
-    | "default_editor" -> set_string key default_editor value
-    | _           -> error (UnknownField key)
-  in
-  List.iter load al;
-  { window_height = default_option ide.window_height !height;
-    window_width = default_option ide.window_width !width;
-    tree_width = default_option ide.tree_width !tree_width;
-    task_height = default_option ide.task_height !task_height;
-    verbose = default_option ide.verbose !verbose;
-    default_editor = default_option ide.default_editor !default_editor;
-  }
-
+let get_main config =
+  match get_section config.config "main" with
+    | None -> default_main
+    | Some main ->
+      let dirname = Filename.dirname config.conf_file in
+      load_main dirname main
 
 let read_config conf_file =
   let filename = match conf_file with
@@ -268,73 +203,15 @@ let read_config conf_file =
 	  if Sys.file_exists f then f else raise Not_found
         end
   in
-  let dirname = Filename.dirname filename in
-  let rc = try Rc.from_file filename with
-    | Failure "lexing" -> error SyntaxError
-  in
-  let provers = ref Mstr.empty in
-  let main = ref default_main in
-  let have_main = ref false in
-  let ide = ref default_ide in
-  let have_ide = ref false in
-  let load (key, al) = match key with
-    | ["main"] when not !have_main ->
-      main := load_main dirname !main al;
-      have_main := true
-    | ["main"] when !have_main -> error (DuplicateSection "main")
-    | "main" :: _ -> error (ExtraParameters "main");
-    | ["ide"] when not !have_ide ->
-      ide := load_ide !ide al;
-      have_ide := true
-    | ["ide"] when !have_ide -> error (DuplicateSection "ide")
-    | "ide" :: _ -> error (ExtraParameters "ide");
-    | "prover" :: name :: rest ->
-        if rest <> [] then error (ExtraParameters ("prover " ^ name));
-        if Mstr.mem name !provers then error (DuplicateProver name);
-        provers := Mstr.add name (load_prover dirname al) !provers
-    | "prover" :: [] -> error (MissingParameters "prover")
-    | s :: _ -> error (UnknownSection s)
-    | [] -> assert false
-  in
-  List.iter load rc;
+  let rc = Rc.from_file filename in
   { conf_file = filename;
-    provers = !provers;
-    main = !main;
-    ide = !ide}
+    config = rc;
+  }
 
 let read_config conf_file =
   try read_config conf_file with Not_found -> default_config
 
-let save_config config =
-  let ch = open_out config.conf_file in
-  let fmt = Format.formatter_of_out_channel ch in
-  fprintf fmt "[main]@\n";
-  List.iter (fprintf fmt "library = \"%s\"@\n") config.main.loadpath;
-  fprintf fmt "timelimit = %d@\n"
-    config.main.timelimit;
-  fprintf fmt "memlimit = %d@\n"
-    config.main.memlimit;
-  fprintf fmt "running_provers_max = %d@\n"
-    config.main.running_provers_max;
-  fprintf fmt "@.";
-  fprintf fmt "[ide]@\n";
-  fprintf fmt "window_width = %d@\n" config.ide.window_width;
-  fprintf fmt "window_height = %d@\n" config.ide.window_height;
-  fprintf fmt "tree_width = %d@\n" config.ide.tree_width;
-  fprintf fmt "task_height = %d@\n" config.ide.task_height;
-  fprintf fmt "verbose = %d@\n" config.ide.verbose;
-  fprintf fmt "default_editor = \"%s\"@\n" config.ide.default_editor;
-  fprintf fmt "@.";
-  let print_prover name prover =
-    fprintf fmt "[prover %s]@\n" name;
-    fprintf fmt "name = \"%s\"@\n" prover.name;
-    fprintf fmt "command = \"%s\"@\n" prover.command;
-    fprintf fmt "driver = \"%s\"@\n@." prover.driver;
-    fprintf fmt "version = \"%s\"@\n@." prover.version;
-    fprintf fmt "editor = \"%s\"@\n@." prover.editor;
-  in
-  Mstr.iter print_prover config.provers;
-  close_out ch
+let save_config config = to_file config.conf_file config.config
 
 (* auto-detection of provers *)
 
@@ -367,40 +244,39 @@ let default k id =
     prover_editor = "";
     }
 
-let load_prover d (key, value) =
-  match key with
-    | "name" -> d.prover_name <- Rc.string value
-    | "exec" -> d.execs <- Rc.string value :: d.execs
-    | "version_switch" -> d.version_switch <- Rc.string value
-    | "version_regexp" -> d.version_regexp <- Rc.string value
-    | "version_ok" -> d.versions_ok <- Rc.string value :: d.versions_ok
-    | "version_old" -> d.versions_old <- Rc.string value :: d.versions_old
-    | "command" -> d.prover_command <- Rc.string value
-    | "driver" -> d.prover_driver <- Rc.string value
-    | "editor" -> d.prover_editor <- Rc.string value
-    | s ->
-        eprintf "unknown key [%s] in autodetection data@." s;
-        exit 1
+let prover_keys =
+  let add acc k = Sstr.add k acc in
+  List.fold_left add Sstr.empty
+    ["name";"exec";"version_switch";"version_regexp";
+     "version_ok";"version_old";"command";
+     "editor";"driver"]
 
-let load acc (key,l) =
-  match key with
-    | ["ATP" ; id] ->
-        let d = default ATP id in
-        List.iter (load_prover d) l;
-        d :: acc
-    | ["ITP" ; id] -> 
-        let d = default ITP id in
-        List.iter (load_prover d) l;
-        d :: acc
-    | s :: _ ->
-        eprintf "unknown section [%s] in auto detection data@." s;
-        exit 1
-    | [] -> assert false
+let load_prover kind (id,section) =
+  check_exhaustive section prover_keys;
+  { kind = kind;
+    prover_id = id;
+    prover_name = get_string section "name";
+    execs = get_stringl section "exec";
+    version_switch = get_string section ~default:"" "version_switch";
+    version_regexp = get_string section ~default:"" "version_regexp";
+    versions_ok = get_stringl section ~default:[] "version_ok";
+    versions_old = get_stringl section ~default:[] "version_old";
+    prover_command = get_string section "command";
+    prover_driver = get_string section "driver";
+    prover_editor = get_string section ~default:"" "editor";
+  }
+
+let load rc =
+  let atps = get_family rc "ATP" in
+  let atps = List.map (load_prover ATP) atps in
+  let itps = get_family rc "ITP" in
+  let tps = List.fold_left (cons (load_prover ITP)) atps itps in
+  tps
 
 let read_auto_detection_data () =
   try
     let rc = Rc.from_file "prover-detection-data.conf" in
-    List.fold_left load [] rc
+    load rc
   with
     | Failure "lexing" ->
         eprintf "Syntax error in prover-detection-data.conf@.";
@@ -484,9 +360,9 @@ let detect_prover acc data =
     data.execs
 
 
-let run_auto_detection config =
+let run_auto_detection () =
   let l = read_auto_detection_data () in
   let detect = List.fold_left detect_prover Mstr.empty l in
   let length = Mstr.fold (fun _ _ i -> i+1) detect 0 in
   eprintf "%d provers detected.@." length;
-  {config with provers = detect}
+  detect

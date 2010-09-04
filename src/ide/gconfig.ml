@@ -3,6 +3,7 @@ open Format
 open Why
 open Util
 open Whyconf
+open Rc
 
 type prover_data =
     { prover_id : string;
@@ -29,20 +30,40 @@ type t =
       mutable config : Whyconf.config;
     }
 
-let load_main c (key, value) =
-  match key with
-    | "width" -> c.window_width <- Rc.int value
-    | "height" -> c.window_height <- Rc.int value
-    | "tree_width" -> c.tree_width <- Rc.int value
-    | "task_height" -> c.task_height <- Rc.int value
-    | "time_limit" -> c.time_limit <- Rc.int value
-    | "verbose" -> c.verbose <- Rc.int value
-    | "max_processes" -> c.max_running_processes <- Rc.int value
-    | "default_editor" -> c.default_editor <- Rc.string value
-    | s ->
-        eprintf "Warning: ignore unknown key [%s] in whyide config file@." s
 
+type ide = {
+  ide_window_width : int;
+  ide_window_height : int;
+  ide_tree_width : int;
+  ide_task_height : int;
+  ide_verbose : int;
+  ide_default_editor : string;
+}
 
+let default_ide =
+  { ide_window_width = 1024;
+    ide_window_height = 768;
+    ide_tree_width = 512;
+    ide_task_height = 384;
+    ide_verbose = 0;
+    ide_default_editor = "";
+  }
+
+let load_ide section =
+  { ide_window_width =
+      get_int section ~default:default_ide.ide_window_width "window_width";
+    ide_window_height =
+      get_int section ~default:default_ide.ide_window_height "window_height";
+    ide_tree_width =
+      get_int section ~default:default_ide.ide_tree_width "tree_width";
+    ide_task_height =
+      get_int section ~default:default_ide.ide_task_height "task_height";
+    ide_verbose =
+      get_int section ~default:default_ide.ide_verbose "verbose";
+    ide_default_editor =
+      get_string section ~default:default_ide.ide_default_editor
+        "default_editor";
+  }
 
 let get_prover_data env id pr acc =
   try
@@ -61,17 +82,22 @@ let get_prover_data env id pr acc =
     acc
 
 let load_config config =
-    let env = Env.create_env (Lexer.retrieve config.main.loadpath) in
-    { window_height = config.ide.Whyconf.window_height;
-      window_width  = config.ide.Whyconf.window_width;
-      tree_width    = config.ide.Whyconf.tree_width;
-      task_height   = config.ide.Whyconf.task_height;
-      time_limit    = config.main.Whyconf.timelimit;
-      mem_limit     = config.main.Whyconf.memlimit;
-      verbose       = config.ide.Whyconf.verbose;
-      max_running_processes = config.main.Whyconf.running_provers_max;
-      provers = Mstr.fold (get_prover_data env) config.Whyconf.provers [];
-      default_editor = config.ide.Whyconf.default_editor;
+  let main = get_main config in
+  let ide  = match get_section config.Whyconf.config "ide" with
+    | None -> default_ide
+    | Some s -> load_ide s in
+  let provers = get_provers config in
+  let env = Env.create_env (Lexer.retrieve main.loadpath) in
+    { window_height = ide.ide_window_height;
+      window_width  = ide.ide_window_width;
+      tree_width    = ide.ide_tree_width;
+      task_height   = ide.ide_task_height;
+      time_limit    = main.Whyconf.timelimit;
+      mem_limit     = main.Whyconf.memlimit;
+      verbose       = ide.ide_verbose;
+      max_running_processes = main.Whyconf.running_provers_max;
+      provers = Mstr.fold (get_prover_data env) provers [];
+      default_editor = ide.ide_default_editor;
       config         = config;
       env            = env
     }
@@ -92,24 +118,23 @@ let save_config t =
         editor  = pr.editor;
       } acc in
   let config = t.config in
-  let main = { config.main with
-    Whyconf.timelimit    = t.time_limit;
-    memlimit     = t.mem_limit;
-    running_provers_max = t.max_running_processes;
-  } in
-  let ide = {
-    Whyconf.window_height = t.window_height;
-    window_width = t.window_width;
-    tree_width   = t.tree_width;
-    task_height  = t.task_height;
-    verbose  = t.verbose;
-    default_editor = t.default_editor;
-  } in
-  let config = {config with
-    Whyconf.provers = List.fold_left save_prover Mstr.empty t.provers;
-    main    = main;
-    ide     = ide;
-  } in
+  let config = set_main config
+    { (get_main config) with
+      timelimit    = t.time_limit;
+      memlimit     = t.mem_limit;
+      running_provers_max = t.max_running_processes;
+    } in
+  let ide = empty_section in
+  let ide = set_int ide "window_height" t.window_height in
+  let ide = set_int ide "window_width" t.window_width in
+  let ide = set_int ide "tree_width" t.tree_width in
+  let ide = set_int ide "task_height" t.task_height in
+  let ide = set_int ide "verbose" t.verbose in
+  let ide = set_string ide "default_editor" t.default_editor in
+  let rc = set_section config.Whyconf.config "ide" ide in
+  let config = {config with Whyconf.config = rc} in
+  let config = set_provers config
+    (List.fold_left save_prover Mstr.empty t.provers) in
   save_config config
 
 (*
@@ -287,19 +312,8 @@ let preferences c =
   dialog#destroy ()
 
 let run_auto_detection gconfig =
-  let config2 = run_auto_detection gconfig.config in
-  let gconfig2 = load_config config2 in
-  gconfig.window_width <- gconfig2.window_width;
-  gconfig.window_height <- gconfig2.window_height;
-  gconfig.tree_width <- gconfig2.tree_width;
-  gconfig.task_height <- gconfig2.task_height;
-  gconfig.time_limit <- gconfig2.time_limit;
-  gconfig.mem_limit <- gconfig2.mem_limit;
-  gconfig.verbose <- gconfig2.verbose;
-  gconfig.max_running_processes <- gconfig2.max_running_processes;
-  gconfig.provers <- gconfig2.provers;
-  gconfig.default_editor <- gconfig2.default_editor;
-  gconfig.config <- gconfig2.config
+  let provers = run_auto_detection () in
+  gconfig.provers <- Mstr.fold (get_prover_data gconfig.env) provers [];
 
 (*
 Local Variables: 
