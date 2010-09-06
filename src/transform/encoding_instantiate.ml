@@ -46,6 +46,7 @@ module OHTyl = OrderedHashList(struct
 end)
 
 module Mtyl = Map.Make(OHTyl)
+module Htyl = Hashtbl.Make(OHTyl)
 
 type tenv_aux = {
   deco : ty;
@@ -191,6 +192,20 @@ let reduce_to_default menv tvar d ty =
     | Tyty _ -> (*keep the term unfolded *) ty_inst tvar ty
     | Tyterm _ -> ty_var d
 
+(* Weakmemo only on the symbols *)
+let clone_lsymbol_memo =
+  let clone_lsymbol p =
+    let h = Htyl.create 7 in
+    fun arg result ->
+      let key = (option_apply arg (fun r -> r::arg) result) in
+      try
+        Htyl.find h key
+      with Not_found ->
+        let p = create_lsymbol (id_clone p.ls_name) arg result in
+        Htyl.add h key p;
+        p in
+  Wls.memoize 7 clone_lsymbol
+
 let find_logic menv tvar p tyl ret =
   if ls_equal p ps_equ then p else begin
     let inst = ls_app_inst p tyl ret in
@@ -225,7 +240,7 @@ let find_logic menv tvar p tyl ret =
       (*   (Pp.print_option Pretty.print_ty) result; *)
       let ls = if List.for_all2 ty_equal arg p.ls_args &&
           option_eq ty_equal result p.ls_value
-        then p else create_lsymbol (id_clone p.ls_name) arg result in
+        then p else clone_lsymbol_memo p arg result in
       let insts = Mtyl.add inst_l ls insts in
       menv.defined_lsymbol <- Mls.add p insts menv.defined_lsymbol;
       menv.undef_lsymbol <- Sls.add ls menv.undef_lsymbol;
