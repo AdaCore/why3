@@ -17,8 +17,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Rc file management *)
 
-(* Exception *)
+(** {2 Exception} *)
 
 type rc_value =
   | RCint of int
@@ -29,84 +30,125 @@ type rc_value =
 
 (* exception SyntaxError *)
 exception ExtraParameters of string
+(** [ExtraParameters name] One section of name [name] has two many
+    parameters : more than one if [name] is a family, more than none
+    if [name] is a section *)
+
 exception MissingParameters of string
+(** [MissingParameters name] One section of a family [name] has no
+    parameters *)
+
 (* exception UnknownSection of string *)
 exception UnknownField of string
+(** [UnknownField key] The key [key] appeared in a section but is not
+    expected there *)
 (* exception MissingSection of string *)
 exception MissingField of string
+(** [MissingField key] The field [key] is required but not given *)
 exception DuplicateSection of string
+(** [DuplicateSection name] section [name] appears more than once *)
 exception DuplicateField of string * rc_value * rc_value
+(** [DuplicateField key] key [key] appears more than once *)
 exception StringExpected of string * rc_value
-exception IdentExpected of string * rc_value
+(** [StringExpected key value] string expected *)
+(* exception IdentExpected of string * rc_value *)
+(* (\** [IdentExpected key value] string expected *\) *)
 exception IntExpected of string * rc_value
+(** [IntExpected key value] int expected *)
 exception BoolExpected of string * rc_value
-exception DuplicateProver of string
+(** [BoolExpected key value] bool expected *)
 
-(* RC API *)
-type t
-type section
-type family  = (string * section) list
 
-val empty : t
-val empty_section : section
+(** {2 RC API} *)
+
+
+type t (** Rc parsed file *)
+type section (** section in rc file *)
+type family  = (string * section) list (** A family in rc files *)
+
+val empty : t (** An empty Rc *)
+val empty_section : section (** An empty section *)
 
 val get_section : t -> string -> section option
-(** return None if the section is not in the rc file *)
+(** [get_section rc name]
+    @return None if the section is not in the rc file
+    @raise DuplicateSection if multiple section has the name [name]
+    @raise ExtraParameters if [name] is a family in [rc] instead of a section
+*)
+
 val get_family  : t -> string -> family
+(** [get_family rc name] return all the sections of the family [name]
+    in [rc]
+    @raise MissingParameters if [name] correspond also too a section in [rc]
+ *)
 
 val set_section : t -> string -> section -> t
+(** [set_section rc name section] add a section [section] with name [name] in
+    [rc]. Remove former section [name] if present in [rc] *)
+
 val set_family  : t -> string -> family  -> t
+(** [set_family rc name family] add all the section in [family] using
+    the associated [string] as argument of the family [name] in the rc
+    file [rc]. Remove all the former sections of family [name] if
+    present in [rc] *)
 
 val get_int  : ?default:int      -> section -> string -> int
-  (** raise Bad_value_type
-      raise Key_not_found
-      raise Multiple_value
-  *)
+(** [get_int ~default section key] one key to one value
+
+    @raise Bad_value_type if the value associated to [key] is not of type
+    {!int}
+
+    @raise Key_not_found if default is not given and no value is
+    associated to [key]
+
+    @raise Multiple_value if the key appears multiple time.
+*)
 
 val get_intl : ?default:int list -> section -> string -> int list
-  (** raise Bad_value_type
-      raise Key_not_found *)
+(** [get_intl ~default section key] one key to many value
+
+    @raise Bad_value_type if the value associated to [key] is not of
+    type {!int}
+
+    @raise Key_not_found if default is not given and no values are
+    associated to [key]
+*)
 
 val set_int : section -> string -> int -> section
-  (** raise Yet_defined_key *)
+(** [set_int section key value] add the association [key] to [value]
+    in the section. Remove all former associations with this [key]
+*)
 
 val set_intl : section -> string -> int list -> section
-  (** raise Yet_defined_key *)
+(** [set_int section key lvalue] add the associations [key] to all the
+    [lvalue] in the section. Remove all former associations with this
+    [key]
+*)
 
 val get_bool  : ?default:bool       -> section -> string -> bool
-  (** raise Bad_value_type
-      raise Key_not_found
-      raise Multiple_value
-  *)
+(** Same as {!get_int} but on bool *)
 
 val get_booll  : ?default:bool list -> section -> string -> bool list
-  (** raise Bad_value_type
-      raise Key_not_found *)
+(** Same as {!get_intl} but on bool *)
 
 val set_bool : section -> string -> bool -> section
-  (** raise Yet_defined_key *)
+(** Same as {!set_int} but on bool *)
 
 val set_booll : section -> string -> bool list -> section
-  (** raise Yet_defined_key *)
+(** Same as {!set_intl} but on bool *)
 
 
-val get_string  : ?default:string      -> section -> string -> string
-  (** raise Bad_value_type
-      raise Key_not_found
-      raise Multiple_value
-  *)
+val get_string  : ?default:string       -> section -> string -> string
+(** Same as {!get_int} but on string *)
 
-val get_stringl : ?default:string list -> section -> string -> string list
-  (** raise Bad_value_type
-      raise Key_not_found *)
+val get_stringl  : ?default:string list -> section -> string -> string list
+(** Same as {!get_intl} but on string *)
 
 val set_string : section -> string -> string -> section
-  (** raise Yet_defined_key *)
+(** Same as {!set_int} but on string *)
 
 val set_stringl : section -> string -> string list -> section
-  (** raise Yet_defined_key *)
-
-
+(** Same as {!set_intl} but on string *)
 
 (* val ident  : ?default:string      -> section -> string -> string *)
 (*   (\** raise Bad_value_type *)
@@ -129,17 +171,24 @@ val set_stringl : section -> string -> string list -> section
 (*   *\) *)
 
 val check_exhaustive : section -> Util.Sstr.t -> unit
-  (**  raise Not_exhaustive of string *)
+(** [check_exhaustive section keys] check that only the keys in [keys]
+    appear inside the section [section]
+
+    @raise UnknownField if it is not the case
+
+*)
 
 val from_file : string -> t
-  (** returns the records of the file [f]
-      @raise Not_found is f does not exists
-      @raise Failure "lexing" in case of incorrect syntax *)
+(** [from_file filename] returns the Rc of the file [filename]
+    @raise Not_found is [filename] does not exists
+    @raise Failure "lexing" in case of incorrect syntax
+    @raise ExtraParameters if a section header has more than one argument
+*)
 
 val to_file   : string -> t -> unit
-  (** [to_file f t] save the records [t] in the file [f] *)
+  (** [to_file filename rc] save the Rc [rc] in the file [filename] *)
 
 val get_home_dir : unit -> string
-  (** returns the home dir of the user *)
+  (** [get_home_dir ()] returns the home dir of the user *)
 
 

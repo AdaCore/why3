@@ -33,7 +33,7 @@ exception TheoryNotFound of string list * string
 
 val find_theory : env -> string list -> string -> theory
   (** [find_theory e p n] finds the theory named [p.n] in environment [e]
-      @raises [TheoryNotFound p n] if theory not present in env [e] *)
+      @raise TheoryNotFound if theory not present in env [e] *)
 
 (** Parsers *)
 

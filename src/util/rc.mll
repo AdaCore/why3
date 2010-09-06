@@ -55,7 +55,6 @@ exception StringExpected of string * rc_value
 exception IdentExpected of string * rc_value
 exception IntExpected of string * rc_value
 exception BoolExpected of string * rc_value
-exception DuplicateProver of string
 
 let error ?loc e = match loc with
   | None -> raise e
@@ -99,8 +98,6 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | IntExpected (s,v) ->
       fprintf fmt "cannot set field '%s' to %a: an integer is expected"
         s print_rc_value v
-  | DuplicateProver s ->
-      fprintf fmt "prover %s is already listed" s
   | e -> raise e)
 
 type section = rc_value list Mstr.t

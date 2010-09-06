@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** SMT v1 printer with some extensions *)
+
 open Format
 open Pp
 open Ident
