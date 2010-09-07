@@ -2,6 +2,31 @@
 
 \section{Compilation, Installation}
 
+Compilation of Why3 must start with a configuration phase which is run as
+\begin{verbatim}
+./configure
+\end{verbatim}
+This analyzes you current configuration and check if requirements hold.
+Compilation requires:
+\begin{itemize}
+\item The Objective Caml compiler, version 3.10 or higher. It is available
+as a binary package for most Unix distributions. For debian-based Linux distributions, you can install the packages
+\begin{verbatim}
+ocaml ocaml-native-compilers
+\end{verbatim}
+It is also installable from sources, downloadable from the Web site
+\url{http://caml.inria.fr/ocaml/}
+
+\item The Lablgtk2 library for Ocaml bindings of the gtk2 graphical library.
+ For debian-based Linux distributions, you can install the packages
+\begin{verbatim}
+liblablgtk2-ocaml-dev liblablgtksourceview2-ocaml-dev
+\end{verbatim}
+It is also installable from sources, available from the site \url{http://wwwfun.kurims.kyoto-u.ac.jp/soft/olabl/lablgtk.html}
+
+\item TODO: sqlite3
+\end{itemize}
+
 \section{Installation of external provers}
 
 \section{The \texttt{why3} command-line tool}
