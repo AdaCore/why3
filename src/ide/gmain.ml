@@ -68,7 +68,7 @@ let lang =
         exit 1
     | Some _ as l -> l
 
-let source_text = 
+let source_text fname = 
   let ic = open_in fname in
   let size = in_channel_length ic in
   let buf = String.create size in
@@ -782,11 +782,60 @@ let task_view =
 let () = task_view#source_buffer#set_language lang
 let () = task_view#set_highlight_current_line true
 
-let move_to_line (v : GText.view) line = 
+(***************)
+(* source view *)
+(***************)
+
+let scrolled_source_view = GBin.scrolled_window
+  ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+  ~packing:vp#add 
+  ()
+  
+let source_view =
+  GSourceView2.source_view
+    ~auto_indent:true
+    ~insert_spaces_instead_of_tabs:true ~tab_width:2
+    ~show_line_numbers:true
+    ~right_margin_position:80 ~show_right_margin:true
+    (* ~smart_home_end:true *)
+    ~packing:scrolled_source_view#add 
+    ()
+
+let current_file = ref ""
+
+(*
+  source_view#misc#modify_font_by_name font_name;
+*)
+let () = source_view#source_buffer#set_language lang
+let () = source_view#set_highlight_current_line true
+(*
+let () = source_view#source_buffer#set_text (source_text fname)
+*)
+
+let move_to_line (v : GSourceView2.source_view) line = 
   if line <= v#buffer#line_count && line <> 0 then begin
     let it = v#buffer#get_iter (`LINE line) in 
     let mark = `MARK (v#buffer#create_mark it) in
-    v#scroll_to_mark ~use_align:true ~yalign:0.5 mark
+    v#scroll_to_mark ~use_align:true ~yalign:0.0 mark
+  end
+
+let scroll_to_source_goal g =
+  let t = g.Model.task in
+  let id = (Task.task_goal t).Decl.pr_name in
+  begin
+    match id.Ident.id_origin with
+      | Ident.User loc -> 
+	  let (f,l,_b,_e) = Loc.extract loc in
+	  if f <> !current_file then
+	    begin
+	      source_view#source_buffer#set_text (source_text f);
+	      current_file := f;
+	    end;
+	  move_to_line source_view (l-1)
+      | Ident.Fresh 
+      | Ident.Derived _ -> 
+	  source_view#source_buffer#set_text "(no position available)\n";
+	  current_file := ""
   end
 
 (* to be run when a row in the tree view is selected *)
@@ -797,21 +846,20 @@ let select_row p =
         let t = g.Model.task in
         let task_text = Pp.string_of Pretty.print_task t in
         task_view#source_buffer#set_text task_text;
-        task_view#scroll_to_mark `INSERT
+        task_view#scroll_to_mark `INSERT;
+	scroll_to_source_goal g
     | Model.Row_theory _th ->
-        task_view#source_buffer#set_text ""
+        task_view#source_buffer#set_text ""; 
+	source_view#source_buffer#set_text "";
+	current_file := ""
     | Model.Row_proof_attempt a ->
-        task_view#source_buffer#set_text a.Model.output
-    | Model.Row_transformation _tr ->
-        task_view#source_buffer#set_text ""
+        task_view#source_buffer#set_text a.Model.output;
+	scroll_to_source_goal a.Model.proof_goal
+    | Model.Row_transformation tr ->
+        task_view#source_buffer#set_text "";
+	scroll_to_source_goal tr.Model.parent_goal
 
 
-(*
-       match origin with
-         | Ident.User (_loc,_) -> ()
-             move_to_line source_view#as_view loc.Lexing.pos_lnum
-         | _ -> ()
-*)
   
 
 (*****************************)
@@ -868,32 +916,6 @@ let () =
 
 
   
-(***************)
-(* source view *)
-(***************)
-
-let scrolled_source_view = GBin.scrolled_window
-  ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-  ~packing:vp#add 
-  ()
-  
-let source_view =
-  GSourceView2.source_view
-    ~auto_indent:true
-    ~insert_spaces_instead_of_tabs:true ~tab_width:2
-    ~show_line_numbers:true
-    ~right_margin_position:80 ~show_right_margin:true
-    (* ~smart_home_end:true *)
-    ~packing:scrolled_source_view#add 
-    ()
-
-(*
-  source_view#misc#modify_font_by_name font_name;
-*)
-let () = source_view#source_buffer#set_language lang
-let () = source_view#set_highlight_current_line true
-let () = source_view#source_buffer#set_text source_text
-
 (***************)
 (* Bind events *)
 (***************)
