@@ -280,8 +280,17 @@ let preferences c =
   let page1 =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label1#coerce w)) ()
-  in 
+  in
+  (* editor *)
+ let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
+ let _ = GMisc.label ~text:"Default editor" ~packing:hb#add () in
+ let editor_entry = GEdit.entry ~text:c.default_editor ~packing:hb#add () in
+ let (_ : GtkSignal.id) = 
+    editor_entry#connect#changed ~callback:
+      (fun () -> c.default_editor <- editor_entry#text)
+  in
   (* debug mode ? *)
+(*
   let debugmode = 
     GButton.check_button ~label:"debug" ~packing:page1#add ()
       ~active:(c.verbose > 0)
@@ -290,6 +299,7 @@ let preferences c =
     debugmode#connect#toggled ~callback:
       (fun () -> c.verbose <- 1 - c.verbose)
   in
+*)
   (* timelimit ? *)
   let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
   let _ = GMisc.label ~text:"Time limit" ~packing:hb#add () in
