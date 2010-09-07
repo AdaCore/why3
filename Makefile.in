@@ -679,12 +679,14 @@ test-api: src/why.cma
 # documentation
 ################
 
-DOC = doc/manual.pdf doc/manual.html
+DOC = doc/manual.pdf
+# doc/manual.html
 
-doc: $(DOC)
+doc: $(DOC) 
 
-doc/manual.pdf: doc/manual.tex doc/version.tex
-	$(MAKE) -C doc manual.pdf
+doc/manual.pdf: doc/apidoc.tex doc/manual.tex doc/version.tex
+	cd doc; pdflatex manual
+	cd doc; pdflatex manual
 
 doc/manual.html: doc/manual.tex doc/version.tex
 	$(MAKE) -C doc manual.html
@@ -698,10 +700,22 @@ clean::
 
 .PHONY: apidoc
 
+MODULESTODOC = core/ident core/ty core/term core/decl core/theory \
+	core/env core/task \
+	driver/whyconf driver/driver 
+
+FILESTODOC = $(addsuffix .mli, $(addprefix src/, $(MODULESTODOC)))
+
 apidoc:
 	mkdir -p apidoc
-	$(OCAMLDOC) -d apidoc -html -keep-code -I src $(LIBINCLUDES) -I +sqlite3 \
-	    $(LIBML) $(LIBMLI) $(MNGML) $(MNGMLI)
+	$(OCAMLDOC) -d apidoc -html -keep-code $(INCLUDES) \
+		$(LIBINCLUDES) $(FILESTODOC)
+# $(LIBML) 
+
+doc/apidoc.tex:
+	$(OCAMLDOC) -o doc/apidoc.tex -latex -noheader -notrailer $(INCLUDES) \
+		$(LIBINCLUDES) $(FILESTODOC)
+# $(LIBML) 
 
 clean::
 	rm -f apidoc/*
