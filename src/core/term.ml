@@ -252,12 +252,6 @@ let rec pat_gen_fold fnT fnV fnL acc pat =
     | Por (p, q) -> fn (fn acc p) q
     | Pas (p, v) -> fn (fnV acc v) p
 
-(** Labels *)
-
-type label = string * Loc.position option
-
-let label ?loc s = (s,loc)
-
 (** Terms and formulas *)
 
 type quant =

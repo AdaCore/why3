@@ -19,6 +19,12 @@
 
 open Util
 
+(** Labels *)
+
+type label = string * Loc.position option
+
+let label ?loc s = (s,loc)
+
 (** Identifiers *)
 
 type ident = {

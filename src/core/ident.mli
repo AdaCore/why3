@@ -17,7 +17,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Identifiers *)
+(** {2 Labels} *)
+
+type label = string * Loc.position option
+
+val label : ?loc:Loc.position -> string -> label
+
+(** {2 Identifiers} *)
 
 type ident = private {
   id_string : string;       (* non-unique name *)

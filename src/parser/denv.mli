@@ -60,7 +60,7 @@ and dterm_node =
   | Tif of dfmla * dterm * dterm
   | Tlet of dterm * ident * dterm
   | Tmatch of dterm * (dpattern * dterm) list
-  | Tnamed of label * dterm
+  | Tnamed of Ident.label * dterm
   | Teps of ident * dty * dfmla
 
 and dfmla =
@@ -73,7 +73,7 @@ and dfmla =
   | Fif of dfmla * dfmla * dfmla
   | Flet of dterm * ident * dfmla
   | Fmatch of dterm * (dpattern * dfmla) list
-  | Fnamed of label * dfmla
+  | Fnamed of Ident.label * dfmla
   | Fvar of fmla
 
 and dtrigger =

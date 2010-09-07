@@ -391,6 +391,7 @@ let proof_end = "(* DO NOT EDIT BELOW *)"
 
 let print_empty_proof fmt =
   fprintf fmt "%s@\n" proof_begin;
+  fprintf fmt "intuition.@\n";
   fprintf fmt "@\n";
   fprintf fmt "Qed.@\n";
   fprintf fmt "%s@\n" proof_end

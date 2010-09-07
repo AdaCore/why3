@@ -25,7 +25,7 @@ type loc = Loc.position
 
 type real_constant = Term.real_constant
 type constant = Term.constant
-type label = Term.label
+type label = Ident.label
 
 type pp_quant =
   | PPforall | PPexists

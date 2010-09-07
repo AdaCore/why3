@@ -47,7 +47,7 @@ let default_ide =
     ide_tree_width = 512;
     ide_task_height = 384;
     ide_verbose = 0;
-    ide_default_editor = ""; (*TODO : editor? *)
+    ide_default_editor = ""; 
   }
 
 let load_ide section =
@@ -89,19 +89,19 @@ let load_config config =
     | Some s -> load_ide s in
   let provers = get_provers config in
   let env = Env.create_env (Lexer.retrieve main.loadpath) in
-    { window_height = ide.ide_window_height;
-      window_width  = ide.ide_window_width;
-      tree_width    = ide.ide_tree_width;
-      task_height   = ide.ide_task_height;
-      time_limit    = main.Whyconf.timelimit;
-      mem_limit     = main.Whyconf.memlimit;
-      verbose       = ide.ide_verbose;
-      max_running_processes = main.Whyconf.running_provers_max;
-      provers = Mstr.fold (get_prover_data env) provers [];
-      default_editor = ide.ide_default_editor;
-      config         = config;
-      env            = env
-    }
+  { window_height = ide.ide_window_height;
+    window_width  = ide.ide_window_width;
+    tree_width    = ide.ide_tree_width;
+    task_height   = ide.ide_task_height;
+    time_limit    = main.Whyconf.timelimit;
+    mem_limit     = main.Whyconf.memlimit;
+    verbose       = ide.ide_verbose;
+    max_running_processes = main.Whyconf.running_provers_max;
+    provers = Mstr.fold (get_prover_data env) provers [];
+    default_editor = ide.ide_default_editor;
+    config         = config;
+    env            = env
+  }
 
 let read_config () =
     let config = Whyconf.read_config None in
