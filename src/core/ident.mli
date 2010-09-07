@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Identifiers *)
+
 (** {2 Labels} *)
 
 type label = string * Loc.position option

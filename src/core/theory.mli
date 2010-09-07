@@ -17,12 +17,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Theories and Namespaces *)
+
 open Ident
 open Ty
 open Term
 open Decl
-
-(** Namespace *)
 
 module Snm : Set.S with type elt = string
 module Mnm : Map.S with type key = string

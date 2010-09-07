@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Manage Why drivers *)
+(** Managing the drivers for external provers *)
 
 (** {2 create a driver} *)
 

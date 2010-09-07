@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** terms module *)
+(** Terms and Formulas *)
 
 open Ident
 open Ty
@@ -88,7 +88,7 @@ and pattern_node = private
 val pat_equal : pattern -> pattern -> bool
 val pat_hash : pattern -> int
 
-(** smart constructors for patterns *)
+(** Smart constructors for patterns *)
 
 val pat_wild : ty -> pattern
 val pat_var : vsymbol -> pattern
@@ -96,14 +96,14 @@ val pat_app : lsymbol -> pattern list -> ty -> pattern
 val pat_or  : pattern -> pattern -> pattern
 val pat_as  : pattern -> vsymbol -> pattern
 
-(** generic traversal functions *)
+(** Generic traversal functions *)
 
 val pat_map : (pattern -> pattern) -> pattern -> pattern
 val pat_fold : ('a -> pattern -> 'a) -> 'a -> pattern -> 'a
 val pat_all : (pattern -> bool) -> pattern -> bool
 val pat_any : (pattern -> bool) -> pattern -> bool
 
-(** {2 Terms and formulas} *)
+(** {2 Terms and Formulas} *)
 
 type quant =
   | Fforall
@@ -237,7 +237,7 @@ val ls_app_inst : lsymbol -> term list -> ty option -> ty Mtv.t
 val fs_app_inst : lsymbol -> term list -> ty -> ty Mtv.t
 val ps_app_inst : lsymbol -> term list -> ty Mtv.t
 
-(** smart constructors for term *)
+(** Smart constructors for term *)
 
 val t_var : vsymbol -> term
 val t_const : constant -> term
@@ -258,7 +258,7 @@ val t_label : label list -> term -> term
 val t_label_add : label -> term -> term
 val t_label_copy : term -> term -> term
 
-(** smart constructors for fmla *)
+(** Smart constructors for fmla *)
 
 val f_app : lsymbol -> term list -> fmla
 val f_quant : quant -> fmla_quant -> fmla
@@ -285,7 +285,7 @@ val f_label : label list -> fmla -> fmla
 val f_label_add : label -> fmla -> fmla
 val f_label_copy : fmla -> fmla -> fmla
 
-(** constructors with propositional simplification *)
+(** Constructors with propositional simplification *)
 
 val f_quant_simp : quant -> fmla_quant -> fmla
 val f_forall_simp : fmla_quant -> fmla
@@ -307,7 +307,7 @@ val f_quant_close_simp : quant -> vsymbol list -> trigger list -> fmla -> fmla
 val f_forall_close_simp : vsymbol list -> trigger list -> fmla -> fmla
 val f_exists_close_simp : vsymbol list -> trigger list -> fmla -> fmla
 
-(** expr and trigger traversal *)
+(** Expr and trigger traversal *)
 
 val e_map : (term -> term) -> (fmla -> fmla) -> expr -> expr
 val e_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> expr -> 'a

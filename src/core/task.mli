@@ -17,14 +17,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Proof Tasks, Cloning and Meta History *)
+
 open Util
 open Ident
 open Ty
 open Term
 open Decl
 open Theory
-
-(** Clone and meta history *)
 
 type tdecl_set = private {
   tds_set : Stdecl.t;

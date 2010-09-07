@@ -17,11 +17,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Logic Declarations *)
+
 open Ident
 open Ty
 open Term
-
-(** declarations module *)
 
 (** {2 Type declaration} *)
 
@@ -31,7 +31,7 @@ type ty_def =
 
 type ty_decl = tysymbol * ty_def
 
-(** {2 Logic declaration} *)
+(** {2 Logic symbols declaration} *)
 
 type ls_defn
 

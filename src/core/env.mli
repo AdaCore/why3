@@ -17,9 +17,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Theory
+(** Access to Environment, Load Path *)
 
-(** Environment *)
+open Theory
 
 type env
 

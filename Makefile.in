@@ -712,7 +712,7 @@ apidoc:
 		$(LIBINCLUDES) $(FILESTODOC)
 # $(LIBML) 
 
-doc/apidoc.tex:
+doc/apidoc.tex: $(FILESTODOC)
 	$(OCAMLDOC) -o doc/apidoc.tex -latex -noheader -notrailer $(INCLUDES) \
 		$(LIBINCLUDES) $(FILESTODOC)
 # $(LIBML) 

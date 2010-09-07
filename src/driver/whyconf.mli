@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Manage the config file of Why *)
+(** Managing the configuration of Why *)
 
 open Util
 
