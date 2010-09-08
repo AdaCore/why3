@@ -1,21 +1,72 @@
 \documentclass[a4paper]{memoir}
 
-%\usepackage[T1]{fontenc}
+\usepackage[T1]{fontenc}
 \usepackage{url}
-\usepackage{ocamldoc}
 
+% for ocamldoc generated pages
+\usepackage{ocamldoc}
 \let\tt\ttfamily
 \let\bf\bfseries
 
+
 \begin{document}
 
-\title{Why3 manual}
-\author{F. Bobot \and J.-C. Filli\^atre \and C. March\'e \and A. Paskevich}
-\maketitle
+\thispagestyle{empty}
+
+\begin{center}
+
+~
+
+\vfill
+
+{\Huge\bfseries Why3 manual}
+
+\vfill
+
+{\Large F. Bobot$^{1,2}$ \\ 
+J.-C. Filli\^atre$^{2,1}$  \\ 
+C. March\'e$^{3,1}$ \\ 
+A. Paskevich$^{1,2}$}
+
+\vfill
+
+\begin{tabular}{l}
+$^1$ Univ Paris-Sud, Orsay, F-91405 \\
+$^2$ LRI, CNRS, Orsay, F-91405 \\
+$^3$ INRIA Saclay - \^Ile-de-France, ProVal, Orsay, F-91893 
+\end{tabular}
+
+\vfill
+
+\begin{flushleft}
+  \textcopyright 2010-2010 Univ Paris-Sud, CNRS, INRIA
+
+  This work has been supported by the `U3CAT' national ANR project
+  (ANR-08-SEGI-021-08, \url{http://frama-c.cea.fr/u3cat}) and by the
+  Hi-Lite (\url{http://www.open-do.org/projects/hi-lite/}) FUI project of the
+  System@tic competitivity cluster.
+
+\end{flushleft}
+\end{center}
 
 \cleardoublepage
 
 \tableofcontents
+
+\chapter*{Foreword}
+
+This is the manual for the Why platform version 3, or Why3 for
+short. Why3 is a complete reimplementation of the former Why
+platform~\cite{filliatre07cav} for program verification.  The major
+change is a completely new design of the architecture for calling
+external provers. An important emphasis is put on the genericity,
+which allows for the end user to easily add the support for a new
+external prover if wanted.  An major new feature is also the ability
+to use Why programmatically, via an well-defined API.
+
+\section*{Acknowledgements}
+
+We gratefully thank all the people who contributed to this document:
 
 \input{syntax.tex}
 
