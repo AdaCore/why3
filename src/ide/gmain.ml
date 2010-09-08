@@ -832,9 +832,11 @@ let scroll_to_source_goal g =
 	      current_file := f;
 	    end;
 	  move_to_line source_view (l-1)
-      | Ident.Fresh 
+      | Ident.Fresh -> 
+	  source_view#source_buffer#set_text "Fresh ident (no position available)\n";
+	  current_file := ""
       | Ident.Derived _ -> 
-	  source_view#source_buffer#set_text "(no position available)\n";
+	  source_view#source_buffer#set_text "Derived ident (no position available)\n";
 	  current_file := ""
   end
 

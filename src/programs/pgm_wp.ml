@@ -382,7 +382,12 @@ let wp env e =
   wp_expr env e (default_post e.expr_type e.expr_effect)
 
 let add_wp_decl l f env =
-  let pr = create_prsymbol (id_fresh ("WP_" ^ l.ls_name.id_string)) in
+  let s = "WP_" ^ l.ls_name.id_string in
+  let id = match id_from_user l.ls_name with
+    | None -> id_fresh s
+    | Some loc -> id_user s loc
+  in
+  let pr = create_prsymbol id in
   let d = create_prop_decl Pgoal pr f in
   add_decl d env
 
