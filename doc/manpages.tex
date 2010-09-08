@@ -37,6 +37,63 @@ It is also installable from sources, available from the site \url{http://wwwfun.
 
 \section{The \texttt{why.conf} configuration file}
 
+\section{Drivers of external provers}
+
+\section{Transformations}
+
+\subsection{Non-splitting transformations}
+
+\begin{description}
+\item[eliminate\_algebraic] Replaces algebraic data types by first-order
+definitions~\cite{paskevich09rr}
+\item[eliminate\_builtin]
+\item[eliminate\_definition]
+\item[eliminate\_definition\_func]
+\item[eliminate\_definition\_pred]
+\item[eliminate\_if]
+\item[eliminate\_if\_fmla]
+\item[eliminate\_if\_term]
+\item[eliminate\_inductive]
+\item[eliminate\_let]
+\item[eliminate\_let\_fmla]
+\item[eliminate\_let\_term]
+\item[eliminate\_mutual\_recursion]
+\item[eliminate\_recursion]
+\item[encoding\_decorate\_mono]
+\item[encoding\_enumeration]
+\item[encoding\_simple2]
+\item[encoding\_smt]
+\item[encoding\_tptp]
+\item[filter\_trigger]
+\item[filter\_trigger\_builtin]
+\item[filter\_trigger\_no\_predicate]
+\item[hypothesis\_selection]
+\item[inline\_all]
+\item[inline\_trivial]
+\item[remove\_triggers]
+\item[simplify\_array]
+\item[simplify\_formula]
+\item[simplify\_recursive\_definition]
+\item[simplify\_trivial\_quantification]
+\item[simplify\_trivial\_quantification\_in\_goal]
+\item[split\_premise]
+\end{description}
+
+\subsection{Splitting transformations}
+
+\begin{description}
+\item[right\_split]
+\item[simplify\_formula\_and\_task]
+\item[split\_all]
+\item[split\_goal]
+\item[split\_goal\_pos\_all]
+\item[split\_goal\_pos\_axiom]
+\item[split\_goal\_pos\_goal]
+\item[split\_goal\_pos\_neg\_all]
+\item[split\_goal\_pos\_neg\_axiom]
+\item[split\_goal\_pos\_neg\_goal]
+\end{description}
+
 
 
 %%% Local Variables:
