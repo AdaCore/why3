@@ -30,8 +30,8 @@ type config_prover = {
 }
 
 type main = {
-  libdir   : string;      (* "/usr/local/lib/why/" *)
-  datadir  : string;      (* "/usr/local/share/why/" *)
+  private_libdir   : string;      (* "/usr/local/lib/why/" *)
+  private_datadir  : string;      (* "/usr/local/share/why/" *)
   loadpath  : string list;  (* "/usr/local/lib/why/theories" *)
   timelimit : int;   (* default prover time limit in seconds
                                (0 unlimited) *)
@@ -40,6 +40,9 @@ type main = {
   running_provers_max : int;
   (* max number of running prover processes *)
 }
+
+val libdir: main -> string
+val datadir: main -> string
 
 type config
 (** A configuration linked to an rc file. Whyconf gives access to

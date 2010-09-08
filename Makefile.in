@@ -604,8 +604,8 @@ testl-type: bin/whyml.byte
 
 test-api: src/why.cma
 	ocaml unix.cma str.cma nums.cma dynlink.cma ocamlgraph/graph.cma \
-		src/why.cma -I src examples/use_api.ml
-
+		src/why.cma -I src examples/use_api.ml \
+	|| (printf "Test of Why API calls failed. Please fix it"; exit 2)
 
 ## install: install-binary install-lib install-man
 ##

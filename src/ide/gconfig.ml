@@ -154,7 +154,7 @@ let get_main () = (get_main config.config)
 
 let image ?size f =
   let main = get_main () in
-  let n = Filename.concat main.datadir (Filename.concat "images" (f^".png"))
+  let n = Filename.concat (datadir main) (Filename.concat "images" (f^".png"))
   in
   match size with
     | None ->

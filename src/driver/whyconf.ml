@@ -23,16 +23,14 @@ open Rc
 
 (* lib and shared dirs *)
 
-let libdir =
-  try
-    Sys.getenv "WHY3LIB"
-  with Not_found -> default_option Config.libdir Config.localdir
+let compilation_libdir = default_option Config.libdir Config.localdir
 
-let datadir =
-  try
-    Sys.getenv "WHY3DATA"
-  with Not_found -> option_apply Config.datadir
+let compilation_datadir = 
+  option_apply Config.datadir
     (fun d -> Filename.concat d "share") Config.localdir
+
+let compilation_loadpath = 
+  Filename.concat compilation_datadir "theories"
 
 let default_conf_file =
   Filename.concat  (match Config.localdir with
@@ -50,13 +48,23 @@ type config_prover = {
 }
 
 type main = {
-  libdir    : string;
-  datadir   : string;
+  private_libdir    : string;
+  private_datadir   : string;
   loadpath  : string list;
   timelimit : int;
   memlimit  : int;
   running_provers_max : int;
 }
+
+let libdir m =
+  try
+    Sys.getenv "WHY3LIB"
+  with Not_found -> m.private_libdir
+
+let datadir m =
+  try
+    Sys.getenv "WHY3DATA"
+  with Not_found -> m.private_datadir
 
 type config = {
   conf_file : string;       (* "/home/innocent_user/.why.conf" *)
@@ -67,9 +75,9 @@ type config = {
 
 let default_main =
   {
-    libdir = libdir;
-    datadir = datadir;
-    loadpath = [Filename.concat datadir "theories"];
+    private_libdir = compilation_libdir;
+    private_datadir = compilation_datadir;
+    loadpath = [compilation_loadpath];
     timelimit = 10;
     memlimit = 0;
     running_provers_max = 2;
@@ -77,8 +85,8 @@ let default_main =
 
 let set_main rc main =
   let section = empty_section in
-  let section = set_string section "libdir"    main.libdir in
-  let section = set_string section "datadir"    main.datadir in
+  let section = set_string section "libdir"    main.private_libdir in
+  let section = set_string section "datadir"    main.private_datadir in
   let section = set_stringl section "loadpath" main.loadpath in
   let section = set_int section "timelimit" main.timelimit in
   let section = set_int section "memlimit" main.memlimit in
@@ -116,8 +124,8 @@ let load_prover dirname provers (id,section) =
     } provers
 
 let load_main dirname section =
-  { libdir    = get_string ~default:default_main.libdir section "libdir";
-    datadir   = get_string ~default:default_main.datadir section "datadir";
+  { private_libdir    = get_string ~default:default_main.private_libdir section "libdir";
+    private_datadir   = get_string ~default:default_main.private_datadir section "datadir";
     loadpath  = List.map (absolute_filename dirname)
       (get_stringl ~default:default_main.loadpath section "loadpath");
     timelimit = get_int ~default:default_main.timelimit section "timelimit";

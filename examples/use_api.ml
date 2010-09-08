@@ -122,5 +122,3 @@ let () = printf "@[On task 3, alt-ergo answers %a@."
 (* build a theory with all these goals *)
 
 
-
-

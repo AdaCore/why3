@@ -70,7 +70,7 @@ let load rc =
   tps
 
 let read_auto_detection_data main =
-  let filename = Filename.concat main.datadir "provers-detection-data.conf" in
+  let filename = Filename.concat (Whyconf.datadir main) "provers-detection-data.conf" in
   try
     let rc = Rc.from_file filename in
     load rc
@@ -144,7 +144,7 @@ let detect_prover main acc data =
               {name = data.prover_name;
                version = ver;
                command = c;
-               driver  = Filename.concat main.datadir data.prover_driver;
+               driver  = Filename.concat (datadir main) data.prover_driver;
                editor = data.prover_editor} acc
 	  with Not_found ->
 	    begin

@@ -55,7 +55,7 @@ let fname = match !file with
 
 let lang =
   let main = get_main () in
-  let load_path = Filename.concat main.datadir "lang" in
+  let load_path = Filename.concat (datadir main) "lang" in
   let languages_manager = 
     GSourceView2.source_language_manager ~default:true 
   in
