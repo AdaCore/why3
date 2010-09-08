@@ -28,6 +28,10 @@ open Term
 open Decl
 open Task
 
+type info = {
+  info_syn : string Mid.t;
+  info_rem : Sid.t;
+}
 
 let ident_printer = 
   let bls = [
@@ -41,27 +45,39 @@ let print_ident fmt id =
 
 let constant_value t =
   match t.t_node with
+(*
     | Tconst (ConstInt s) -> s
+    | Tconst (ConstReal r) -> sprintf "%a" Pretty.print_const r
+*)
+    | Tconst c -> 
+	fprintf str_formatter "%a" Pretty.print_const c;
+	flush_str_formatter ()
     | _ -> raise Not_found
 
 (* terms *)
 
-let print_term fmt t = match t.t_node with
+(*
+let int_theory = Env.find_theory env ["int"] "Int"
+
+let plus_symbol = Theory.ns_find_ls int_theory.Theory.th_export ["infix +"]
+*)
+
+let rec print_term info fmt t = 
+  let term = print_term info in
+  match t.t_node with
   | Tbvar _ -> 
       assert false
   | Tconst c ->
       Pretty.print_const fmt c
   | Tvar { vs_name = id } ->
       print_ident fmt id
-  | Tapp (ls, _tl) -> 
-      unsupportedTerm t 
-        ("gappa: function '" ^ ls.ls_name.id_string ^ "' is not supported")
-(*
-begin match query_syntax info.info_syn ls.ls_name with
-      | Some s -> syntax_arguments s (print_term info) fmt tl
-      | None -> fprintf fmt "%a%a" print_ident ls.ls_name (print_tapp info) tl
-    end
-*)
+  | Tapp (ls, tl) -> 
+      begin match query_syntax info.info_syn ls.ls_name with
+	| Some s -> syntax_arguments s term fmt tl
+	| None -> 
+	    unsupportedTerm t 
+              ("gappa: function '" ^ ls.ls_name.id_string ^ "' is not supported")
+      end
   | Tlet _ -> unsupportedTerm t
       "gappa: you must eliminate let in term"
   | Tif _ -> unsupportedTerm t 
@@ -74,30 +90,30 @@ begin match query_syntax info.info_syn ls.ls_name with
 
 (* predicates *)
 
-let rec print_fmla fmt f = match f.f_node with
+let rec print_fmla info fmt f = 
+  let term = print_term info in
+  let fmla = print_fmla info in
+  match f.f_node with
   | Fapp ({ ls_name = id }, []) ->
       print_ident fmt id
   | Fapp (ls, [t1;t2]) when ls == ps_equ -> 
       begin try
         let c1 = constant_value t1 in
-        fprintf fmt "%a in [%s,%s]" print_term t2 c1 c1          
+        fprintf fmt "%a in [%s,%s]" term t2 c1 c1          
       with Not_found ->
         try
           let c2 = constant_value t2 in
-          fprintf fmt "%a in [%s,%s]" print_term t1 c2 c2          
+          fprintf fmt "%a in [%s,%s]" term t1 c2 c2          
         with Not_found ->
-          fprintf fmt "%a - %a in [0,0]" print_term t1 print_term t2           
+          fprintf fmt "%a - %a in [0,0]" term t1 term t2           
       end
-  | Fapp (ls, _tl) -> 
-      unsupportedFmla f 
-        ("gappa: predicate '" ^ ls.ls_name.id_string ^ "' is not supported")
-(*
-begin match query_syntax info.info_syn ls.ls_name with
-      | Some s -> syntax_arguments s (print_term info) fmt tl
-      | None -> fprintf fmt "%a(%a)" print_ident ls.ls_name 
-                    (print_list comma (print_term info)) tl
-    end
-*)
+  | Fapp (ls, tl) -> 
+      begin match query_syntax info.info_syn ls.ls_name with
+	| Some s -> syntax_arguments s term fmt tl
+	| None -> 
+	    unsupportedFmla f 
+              ("gappa: predicate '" ^ ls.ls_name.id_string ^ "' is not supported")
+      end
   | Fquant (_q, _fq) ->
       unsupportedFmla f 
         "gappa: quantifiers are not supported"     
@@ -112,16 +128,16 @@ begin match query_syntax info.info_syn ls.ls_name with
       List.iter forget_var vl
 *)
   | Fbinop (Fand, f1, f2) ->
-      fprintf fmt "(%a /\\@ %a)" print_fmla f1 print_fmla f2
+      fprintf fmt "(%a /\\@ %a)" fmla f1 fmla f2
   | Fbinop (For, f1, f2) ->
-      fprintf fmt "(%a \\/@ %a)" print_fmla f1 print_fmla f2
+      fprintf fmt "(%a \\/@ %a)" fmla f1 fmla f2
   | Fbinop (Fimplies, f1, f2) ->
-      fprintf fmt "(%a ->@ %a)" print_fmla f1 print_fmla f2
+      fprintf fmt "(%a ->@ %a)" fmla f1 fmla f2
   | Fbinop (Fiff, _f1, _f2) ->
       unsupportedFmla f 
         "gappa: connector <-> is not supported"     
   | Fnot f ->
-      fprintf fmt "not %a" print_fmla f
+      fprintf fmt "not %a" fmla f
   | Ftrue -> 
       fprintf fmt "(0 in [0,0])"
   | Ffalse ->
@@ -134,7 +150,7 @@ begin match query_syntax info.info_syn ls.ls_name with
   | Fcase _ -> unsupportedFmla f 
       "gappa: you must eliminate match"
   
-let print_decl (* ?old *) fmt d = 
+let print_decl (* ?old *) info fmt d = 
   match d.d_node with
   | Dtype _ -> ()
 (*
@@ -155,17 +171,17 @@ unsupportedDecl d
 *)
   | Dprop (Pgoal, pr, f) ->
       fprintf fmt "# goal '%a'@\n" print_ident pr.pr_name;
-      fprintf fmt "@[<hv 2>{ %a@ }@]@\n" print_fmla f
+      fprintf fmt "@[<hv 2>{ %a@ }@]@\n" (print_fmla info) f
   | Dprop ((Plemma|Pskip), _, _) ->
       unsupportedDecl d 
         "gappa: lemmas are not supported"
 
-let print_decl ?old fmt = 
+let print_decl ?old info fmt = 
   ignore(old);
-  catch_unsupportedDecl (print_decl (* ?old *) fmt)
+  catch_unsupportedDecl (print_decl (* ?old *) info fmt)
 
-let print_decls ?old fmt dl =
-  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl ?old)) dl
+let print_decls ?old info fmt dl =
+  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl ?old info)) dl
 
 let print_task pr thpr ?old fmt task =
 (*
@@ -173,7 +189,12 @@ let print_task pr thpr ?old fmt task =
 *)
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
-  print_decls ?old fmt (Task.task_decls task)
+  let info = {
+    info_syn = get_syntax_map task;
+    info_rem = get_remove_set task;
+  }
+  in
+  print_decls ?old info fmt (Task.task_decls task)
 
 let () = register_printer "gappa" print_task
 
