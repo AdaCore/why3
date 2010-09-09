@@ -19,6 +19,7 @@ transformation "eliminate_if"
 transformation "eliminate_let"
 transformation "simplify_formula"
 transformation "simplify_trivial_quantification"
+transformation "intros"
 
 theory BuiltIn
   syntax type int   "int"
@@ -37,11 +38,6 @@ theory int.Int
   syntax logic (-)  "(%1 - %2)"
   syntax logic (*)  "(%1 * %2)"
   syntax logic (-_) "(-%1)"
-
-  syntax logic (<=) "(%1 <= %2)"
-  syntax logic (<)  "(%1 <  %2)"
-  syntax logic (>=) "(%1 >= %2)"
-  syntax logic (>)  "(%1 >  %2)"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -72,11 +68,6 @@ theory real.Real
   syntax logic (-_) "(-%1)"
   syntax logic inv  "(1.0 / %1)"
 
-  syntax logic (<=) "(%1 <= %2)"
-  syntax logic (<)  "(%1 <  %2)"
-  syntax logic (>=) "(%1 >= %2)"
-  syntax logic (>)  "(%1 >  %2)"
-
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
   remove prop CommutativeGroup.Unit_def
@@ -90,6 +81,12 @@ theory real.Real
   remove prop Total
   remove prop Antisymm
   remove prop Inverse
+
+end
+
+theory real.Abs
+
+  syntax logic abs  "| %1 |"
 
 end
 

@@ -12,5 +12,15 @@ theory Test
    goal Test2: forall x:int. x*x >= 0
 
    goal Test3: 1<>0 
+
+   goal Test4: 1=2 -> 3=4 
+
+   goal Test5: forall x:int. x <> 0 -> x*x > 0
+
+   use import real.Real
+   use import real.Abs
+
+   goal Test6: forall x:real. 100.0 >= abs x >= 1.0 -> x*x >= 1.0
+
 end
 

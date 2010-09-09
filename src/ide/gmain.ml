@@ -488,6 +488,7 @@ let prover_on_unproved_goals p () =
 (*****************************************************)
 
 let split_transformation = Trans.lookup_transform_l "split_goal" gconfig.env
+let intro_transformation = Trans.lookup_transform "intros" gconfig.env
 
 let split_unproved_goals () =
   List.iter
@@ -846,6 +847,7 @@ let select_row p =
   match filter_model#get ~row ~column:Model.index_column with
     | Model.Row_goal g ->
         let t = g.Model.task in
+        let t = Trans.apply intro_transformation t in 
         let task_text = Pp.string_of Pretty.print_task t in
         task_view#source_buffer#set_text task_text;
         task_view#scroll_to_mark `INSERT;

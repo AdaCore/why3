@@ -69,7 +69,8 @@ let rec print_term info fmt t =
       assert false
   | Tconst c ->
       Pretty.print_const fmt c
-  | Tvar { vs_name = id } ->
+  | Tvar { vs_name = id } 
+  | Tapp ( { ls_name = id } ,[] ) ->
       print_ident fmt id
   | Tapp (ls, tl) -> 
       begin match query_syntax info.info_syn ls.ls_name with
@@ -96,7 +97,7 @@ let rec print_fmla info fmt f =
   match f.f_node with
   | Fapp ({ ls_name = id }, []) ->
       print_ident fmt id
-  | Fapp (ls, [t1;t2]) when ls == ps_equ -> 
+  | Fapp (ls, [t1;t2]) when ls_equal ls ps_equ -> 
       begin try
         let c1 = constant_value t1 in
         fprintf fmt "%a in [%s,%s]" term t2 c1 c1          

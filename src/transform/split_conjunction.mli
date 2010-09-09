@@ -29,7 +29,7 @@ val split_pos_neg_all   : Task.task Trans.tlist
 
 (**  naming convention :
      - pos : move the conjuctions in positive sub-formula to top level
-     - pos : move the conjuctions in negative sub-formula to top level
+     - neg : move the conjuctions in negative sub-formula to top level
      - goal : apply the transformation only to goal
      - axiom : apply the transformation only to axioms
      - all : apply the transformation to goal and axioms *)

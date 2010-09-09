@@ -47,17 +47,26 @@ It is also installable from sources, available from the site \url{http://wwwfun.
 \begin{description}
 \item[eliminate\_algebraic] Replaces algebraic data types by first-order
 definitions~\cite{paskevich09rr}
-\item[eliminate\_builtin]
+\item[eliminate\_builtin] Suppress definitions of symbols which are
+  declared as builtin in the driver, i.e. with a ``syntax'' rule.
+  
 \item[eliminate\_definition]
 \item[eliminate\_definition\_func]
 \item[eliminate\_definition\_pred]
+\item[eliminate\_if\_fmla] replaces formulas of the form if f1 then f2
+  else f3 by an equivalent formula using implications and other
+  connectives. (TODO: detail)
+\item[eliminate\_if\_term] replaces terms of the form if formula then
+  t2 else t3 by lift it at the level of the formula (TODO: detail)
 \item[eliminate\_if]
-\item[eliminate\_if\_fmla]
-\item[eliminate\_if\_term]
-\item[eliminate\_inductive]
-\item[eliminate\_let]
+  apply both two above transformations
+\item[eliminate\_inductive] replaces inductive predicates by
+  (incomplete) axiomatic definitions, i.e construction axioms and an
+  inversion axiom (TODO: detail)
 \item[eliminate\_let\_fmla]
 \item[eliminate\_let\_term]
+\item[eliminate\_let]
+  apply both two above transformations
 \item[eliminate\_mutual\_recursion]
 \item[eliminate\_recursion]
 \item[encoding\_decorate\_mono]
@@ -72,11 +81,49 @@ Should we cite \cite{conchon08smt} here?
 \item[hypothesis\_selection]
 \item[inline\_all]
 \item[inline\_trivial]
+  removes definitions of the form
+\begin{verbatim}
+logic f x_1 .. x_n = (g e_1 .. e_k)
+\end{verbatim}
+when each e_i is either a constant or one of the x_j, and
+each x_1 .. x_n occur at most once in the e_i 
+
 \item[remove\_triggers]
 \item[simplify\_array]
-\item[simplify\_formula]
+\item[simplify\_formula] reduces trivial equalities $t=t$ to True and
+  then simplifies propositional structure: removes True, False, ``f
+  and f'' to ``f'', etc.
 \item[simplify\_recursive\_definition]
+  reduces mutually recursive definitions if they are not really mutually recursive, e.g.:
+\begin{verbatim}
+logic f : ... = .... g ...
+
+with g : .. = e
+\end{verbatim}
+becomes
+\begin{verbatim}
+logic g : .. = e
+logic f : ... = .... g ...
+\end{verbatim}
+if f does not occur in e
+
 \item[simplify\_trivial\_quantification]
+  simplifies quantifications of the form
+\begin{verbatim}
+  forall x, x=t -> P(x)
+\end{verbatim}
+or
+\begin{verbatim}
+  forall x, t=x -> P(x)
+\end{verbatim}
+  when x does not occur in t
+  into 
+\begin{verbatim}
+P(t)
+\end{verbatim}
+  More generally, it applies this simplification whenever x=t appear
+  in a negative position.
+  
 \item[simplify\_trivial\_quantification\_in\_goal]
 \item[split\_premise]
 \end{description}
