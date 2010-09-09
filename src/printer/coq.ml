@@ -442,7 +442,7 @@ let print_decl ?old info fmt d = match d.d_node with
 let print_decls ?old info fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl ?old info)) dl
 
-let print_task pr thpr ?old fmt task =
+let print_task _env pr thpr ?old fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;

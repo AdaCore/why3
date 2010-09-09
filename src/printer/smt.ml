@@ -220,7 +220,6 @@ let print_task pr thpr fmt task =
   fprintf fmt "@\n)@."
 
 let () = register_printer "smtv1" 
-  (fun pr thpr ?old fmt task ->
-     ignore old;
+  (fun _env pr thpr ?old:_ fmt task ->
      forget_all ident_printer;
      print_task pr thpr fmt task)

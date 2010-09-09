@@ -393,8 +393,7 @@ let print_tdecl fmt td = match td.td_node with
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]@\n@\n"
         m.meta_name (print_list comma print_meta_arg) al
 
-let print_task pr thpr ?old fmt task =
-  ignore old;
+let print_task _env pr thpr ?old:_ fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;

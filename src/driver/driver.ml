@@ -238,7 +238,9 @@ let print_task ?old drv fmt task =
     | None -> raise NoPrinter
     | Some p -> p
   in
-  let printer = lookup_printer p drv.drv_prelude drv.drv_thprelude in
+  let printer = 
+    lookup_printer p drv.drv_env drv.drv_prelude drv.drv_thprelude 
+  in
   let lookup_transform t = t, lookup_transform t drv.drv_env in
   let transl = List.map lookup_transform drv.drv_transform in
   let apply task (t, tr) =

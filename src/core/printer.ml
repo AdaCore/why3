@@ -33,7 +33,7 @@ type prelude_map = prelude Mid.t
 
 type 'a pp = formatter -> 'a -> unit
 
-type printer = prelude -> prelude_map -> ?old:in_channel -> task pp
+type printer = Env.env -> prelude -> prelude_map -> ?old:in_channel -> task pp
 
 let printers : (string, printer) Hashtbl.t = Hashtbl.create 17
 

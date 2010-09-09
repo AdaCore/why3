@@ -29,6 +29,7 @@ open Decl
 open Task
 
 type info = {
+  le_real : lsymbol;
   info_syn : string Mid.t;
   info_rem : Sid.t;
 }
@@ -108,6 +109,17 @@ let rec print_fmla info fmt f =
         with Not_found ->
           fprintf fmt "%a - %a in [0,0]" term t1 term t2           
       end
+  | Fapp (ls, [t1;t2]) when ls_equal ls info.le_real -> 
+      begin try
+        let c1 = constant_value t1 in
+        fprintf fmt "%a >= %s" term t2 c1
+      with Not_found ->
+        try
+          let c2 = constant_value t2 in
+          fprintf fmt "%a <= %s" term t1 c2
+        with Not_found ->
+          fprintf fmt "%a - %a <= 0" term t1 term t2           
+      end
   | Fapp (ls, tl) -> 
       begin match query_syntax info.info_syn ls.ls_name with
 	| Some s -> syntax_arguments s term fmt tl
@@ -165,11 +177,9 @@ unsupportedDecl d
 *)
   | Dind _ -> unsupportedDecl d 
       "gappa: inductive definitions are not supported"
-  | Dprop (Paxiom, _pr, _f) -> ()
-(*
-      unsupportedDecl d 
-        "gappa: axioms are not supported"
-*)
+  | Dprop (Paxiom, pr, _f) -> 
+      fprintf fmt "# hypothesis '%a'@\n" print_ident pr.pr_name;
+      (* fprintf fmt "@[<hv 2>%a@]@\n" (print_hyp info) f      *)
   | Dprop (Pgoal, pr, f) ->
       fprintf fmt "# goal '%a'@\n" print_ident pr.pr_name;
       fprintf fmt "@[<hv 2>{ %a@ }@]@\n" (print_fmla info) f
@@ -177,24 +187,26 @@ unsupportedDecl d
       unsupportedDecl d 
         "gappa: lemmas are not supported"
 
-let print_decl ?old info fmt = 
-  ignore(old);
+let print_decl ?old:_ info fmt = 
   catch_unsupportedDecl (print_decl (* ?old *) info fmt)
 
 let print_decls ?old info fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl ?old info)) dl
 
-let print_task pr thpr ?old fmt task =
-(*
-  forget_all ();
-*)
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
-  let info = {
+let get_info env task =
+  let real_theory = Env.find_theory env ["real"] "Real" in
+  let le_real = Theory.ns_find_ls real_theory.Theory.th_export ["infix <="] in
+   {
+    le_real = le_real;
     info_syn = get_syntax_map task;
     info_rem = get_remove_set task;
   }
-  in
+
+let print_task env pr thpr ?old fmt task =
+  forget_all ident_printer;
+  print_prelude fmt pr;
+  print_th_prelude task fmt thpr;
+  let info = get_info env task in
   print_decls ?old info fmt (Task.task_decls task)
 
 let () = register_printer "gappa" print_task

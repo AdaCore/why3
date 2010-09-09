@@ -162,8 +162,7 @@ let print_task pr thpr fmt task =
   ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)
 
 let () = register_printer "tptp" 
-  (fun pr thpr ?old fmt task ->
-     ignore old;
+  (fun _env pr thpr ?old:_ fmt task ->
      forget_all ident_printer;
      print_task pr thpr fmt task)
 
