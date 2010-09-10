@@ -58,7 +58,9 @@ let get_info =
             let l = 
               List.fold_right Sls.add 
                 [real_add; real_sub; real_mul; real_div;
+(*
                  ls_equ; 
+*)
                  !real_le;
                  real_abs] Sls.empty 
             in
