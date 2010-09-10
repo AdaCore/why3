@@ -52,6 +52,7 @@ module Hls : Hashtbl.S with type key = lsymbol
 module Wls : Hashweak.S with type key = lsymbol
 
 val ls_equal : lsymbol -> lsymbol -> bool
+  (** equality of function and predicate symbols *)
 val ls_hash : lsymbol -> int
 
 val create_lsymbol : preid -> ty list -> ty option -> lsymbol
@@ -362,7 +363,11 @@ val is_fs_tuple : lsymbol -> bool
 (** generic term/fmla traversal *)
 
 val t_map : (term -> term) -> (fmla -> fmla) -> term -> term
+  (** [t_map fnT fnF t] applies function fnT, resp. fnF, to
+      each immediate subterms, resp. sub-formula, of [t] *)
 val f_map : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
+  (** [f_map fnT fnF f] applies function fnT, resp. fnF, to
+      each immediate subterms, resp. sub-formula, of [t] *)
 
 val f_map_sign : (term -> term) -> (bool -> fmla -> fmla) ->
                                     bool -> fmla -> fmla

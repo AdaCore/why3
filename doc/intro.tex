@@ -1,6 +1,26 @@
 
 \chapter{Introduction}
 
+\section{Architecture and Terminology}
+
+Everything in Why3 revolves around the notion of
+\emph{task}\index{task}.  Why3, as a platform, as a tool that
+translates its input to a number of tasks, and dispatches these tasks
+to external provers. 
+
+Essentially, a task is a sequence of premises followed by a goal
+(i.e.~a \emph{logical sequent} with exactly one formula in the
+succedent). The language of tasks is based on first-order language
+extended with 
+\begin{itemize}
+\item polymorphic types;
+\item algebraic types together with pattern matching;
+\item definitions of functions and predicates, possibly recursive or
+  mutually recursive;
+\item inductively defined predicates;
+\item \texttt{let} and \texttt{if-then-else} constructs;
+%\item Hilbert's epsilon construct
+\end{itemize}
 
 \section{Organization of this document}
 

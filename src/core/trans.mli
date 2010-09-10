@@ -51,9 +51,12 @@ val fold_map_l : (task_hd -> 'a * task -> ('a * task) list) ->
                                       'a -> task -> task tlist
 
 val map   : (task_hd -> task -> task     ) -> task -> task trans
+(** [map] is the same as fold with 'a = task  *)
+
 val map_l : (task_hd -> task -> task list) -> task -> task tlist
 
 val decl   : (decl -> decl list     ) -> task -> task trans
+(** [decl f acc [d1;..;dn]] returns acc@f d1@..@f dn *)
 val decl_l : (decl -> decl list list) -> task -> task tlist
 
 val tdecl   : (decl -> tdecl list     ) -> task -> task trans

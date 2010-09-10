@@ -49,7 +49,7 @@ let rec intros pr f = match f.f_node with
 
 let intros pr f : decl list = intros pr f 
 
-let () = Trans.register_transform "introduce_premisses" (Trans.goal intros)
+let () = Trans.register_transform "introduce_premises" (Trans.goal intros)
 
 
 

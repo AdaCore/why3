@@ -26,10 +26,75 @@ open Ident
 open Ty
 open Term
 open Decl
+open Theory
 open Task
 
+(* Gappa pre-compilation *)
+
+let term_table = Hterm.create 257 
+let fmla_table = Hfmla.create 257 
+
+(*
+let real_abs = ref ps_equ
+let real_plus = ref ps_equ
+let real_minus = ref ps_equ
+*)
+let real_le = ref ps_equ
+
+let arith_symbols = ref Sls.empty
+let arith_rel_symbols = ref Sls.empty
+
+let extra_decls = ref []
+
+let rec abstract_term t : term =
+  match t.t_node with
+    | Tconst _ | Tapp(_,[]) -> t
+    | Tapp(ls,_) when Sls.mem ls !arith_symbols ->
+        t_map abstract_term abstract_fmla t
+    | _ ->
+        begin try Hterm.find term_table t with Not_found ->
+          let ls = create_fsymbol (id_fresh "abstr") [] t.t_ty in
+          let tabs = t_app ls [] t.t_ty in
+          extra_decls := ls :: !extra_decls;
+          Hterm.add term_table t tabs;
+          tabs
+        end          
+        
+and abstract_fmla f =
+  match f.f_node with
+    | Ftrue | Ffalse -> f
+    | Fnot _ | Fbinop _ -> 
+        f_map abstract_term abstract_fmla f
+    | Fapp(ls,_) when Sls.mem ls !arith_rel_symbols ->
+        f_map abstract_term abstract_fmla f
+    | _ ->
+        begin try Hfmla.find fmla_table f with Not_found ->
+          let ls = create_psymbol (id_fresh "abstr") [] in
+          let fabs = f_app ls [] in
+          extra_decls := ls :: !extra_decls;
+          Hfmla.add fmla_table f fabs;
+          fabs
+        end          
+        
+   
+let abstract_decl (d : decl) : decl list = 
+  let d = decl_map abstract_term abstract_fmla d in
+  let l = 
+    List.fold_left
+      (fun acc ls -> create_logic_decl [ls,None] :: acc)
+      [d]
+      !extra_decls
+  in
+  extra_decls := []; l   
+
+let abstraction (t: task) : task = 
+  Hfmla.clear fmla_table;
+  Hterm.clear term_table;
+  Trans.apply (Trans.decl abstract_decl None) t
+
+
+(* Gappa printing *)
 type info = {
-  le_real : lsymbol;
   info_syn : string Mid.t;
   info_rem : Sid.t;
 }
@@ -109,7 +174,7 @@ let rec print_fmla info fmt f =
         with Not_found ->
           fprintf fmt "%a - %a in [0,0]" term t1 term t2           
       end
-  | Fapp (ls, [t1;t2]) when ls_equal ls info.le_real -> 
+  | Fapp (ls, [t1;t2]) when ls_equal ls !real_le -> 
       begin try
         let c1 = constant_value t1 in
         fprintf fmt "%a >= %s" term t2 c1
@@ -177,12 +242,15 @@ unsupportedDecl d
 *)
   | Dind _ -> unsupportedDecl d 
       "gappa: inductive definitions are not supported"
-  | Dprop (Paxiom, pr, _f) -> 
+  | Dprop (Paxiom, pr, f) -> 
       fprintf fmt "# hypothesis '%a'@\n" print_ident pr.pr_name;
-      (* fprintf fmt "@[<hv 2>%a@]@\n" (print_hyp info) f      *)
+      fprintf fmt "@[<hv 2>%a ->@]@\n" (print_fmla info) f     
   | Dprop (Pgoal, pr, f) ->
       fprintf fmt "# goal '%a'@\n" print_ident pr.pr_name;
+(*
       fprintf fmt "@[<hv 2>{ %a@ }@]@\n" (print_fmla info) f
+*)
+      fprintf fmt "@[<hv 2>%a@]@\n" (print_fmla info) f
   | Dprop ((Plemma|Pskip), _, _) ->
       unsupportedDecl d 
         "gappa: lemmas are not supported"
@@ -191,18 +259,32 @@ let print_decl ?old:_ info fmt =
   catch_unsupportedDecl (print_decl (* ?old *) info fmt)
 
 let print_decls ?old info fmt dl =
-  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl ?old info)) dl
+  fprintf fmt "@[<hov>{ %a }@\n@]" (print_list nothing (print_decl ?old info)) dl
 
 let get_info env task =
   let real_theory = Env.find_theory env ["real"] "Real" in
-  let le_real = Theory.ns_find_ls real_theory.Theory.th_export ["infix <="] in
-   {
-    le_real = le_real;
+  let find_real = Theory.ns_find_ls real_theory.Theory.th_export in
+  let real_add = find_real ["infix +"] in
+  let real_sub = find_real ["infix -"] in
+  let real_mul = find_real ["infix *"] in
+  let real_div = find_real ["infix /"] in
+  real_le := Theory.ns_find_ls real_theory.Theory.th_export ["infix <="];
+  let real_abs_theory = Env.find_theory env ["real"] "Abs" in
+  let real_abs = Theory.ns_find_ls real_abs_theory.Theory.th_export ["abs"] in
+  (* sets of known symbols *)
+  arith_symbols := 
+    List.fold_right Sls.add 
+      [real_add; real_sub; real_mul; real_div;
+       real_abs] Sls.empty ;
+  arith_rel_symbols := 
+    List.fold_right Sls.add [!real_le] Sls.empty ;
+  {
     info_syn = get_syntax_map task;
     info_rem = get_remove_set task;
   }
 
 let print_task env pr thpr ?old fmt task =
+  let task = abstraction task in
   forget_all ident_printer;
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;

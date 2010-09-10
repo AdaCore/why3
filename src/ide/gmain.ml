@@ -488,7 +488,7 @@ let prover_on_unproved_goals p () =
 (*****************************************************)
 
 let split_transformation = Trans.lookup_transform_l "split_goal" gconfig.env
-let intro_transformation = Trans.lookup_transform "intros" gconfig.env
+let intro_transformation = Trans.lookup_transform "introduce_premises" gconfig.env
 
 let split_unproved_goals () =
   List.iter
