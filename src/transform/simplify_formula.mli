@@ -23,3 +23,5 @@ val simplify_formula :  Task.task Trans.trans
 val simplify_formula_and_task :  Task.task list Trans.trans
 
 val fmla_remove_quant : Term.fmla -> Term.fmla
+(** transforms \exists x. x == y /\ F into F[y/x] 
+    and \forall x. x <> y \/ F into F[y/x] *)

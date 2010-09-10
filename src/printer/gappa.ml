@@ -45,6 +45,11 @@ let get_info =
     let l =
       match !arith_symbols with 
         | None ->
+            let int_theory = Env.find_theory env ["int"] "Int" in
+            let find_int = Theory.ns_find_ls int_theory.Theory.th_export in
+            let int_add = find_int ["infix +"] in
+            let int_sub = find_int ["infix -"] in
+            let int_mul = find_int ["infix *"] in
             let real_theory = Env.find_theory env ["real"] "Real" in
             let find_real = Theory.ns_find_ls real_theory.Theory.th_export in
             let real_add = find_real ["infix +"] in
@@ -57,10 +62,9 @@ let get_info =
             (* sets of known symbols *)
             let l = 
               List.fold_right Sls.add 
-                [real_add; real_sub; real_mul; real_div;
-(*
-                 ls_equ; 
-*)
+                [int_add; int_sub; int_mul;
+		 real_add; real_sub; real_mul; real_div;
+                 ps_equ; 
                  !real_le;
                  real_abs] Sls.empty 
             in
@@ -205,6 +209,7 @@ let rec print_fmla info fmt f =
   | Fcase _ -> unsupportedFmla f 
       "gappa: you must eliminate match"
   
+(*
 let print_decl (* ?old *) info fmt d = 
   match d.d_node with
   | Dtype _ -> ()
@@ -231,15 +236,57 @@ unsupportedDecl d
   | Dprop ((Plemma|Pskip), _, _) ->
       unsupportedDecl d 
         "gappa: lemmas are not supported"
+*)
 
+(*
 let print_decl ?old:_ info fmt = 
   catch_unsupportedDecl (print_decl (* ?old *) info fmt)
 
 let print_decls ?old info fmt dl =
   fprintf fmt "@[<hov>{ %a }@\n@]" (print_list nothing (print_decl ?old info)) dl
+*)
 
+let filter_hyp eqs hyps pr f =
+  match f.f_node with
+    | Fapp(ls,[t1;t2]) when ls == ps_equ -> ((pr,t1,t2)::eqs,hyps)
+	(* todo: support more kinds of hypotheses *)
+    | _ -> (eqs,hyps)
 
-let print_task env pr thpr ?old fmt task =
+let prepare ((eqs,hyps,goal) as acc) d =
+  match d.d_node with
+    | Dtype _ -> acc
+    | Dlogic _ -> acc
+    | Dind _ -> 
+	unsupportedDecl d 
+	  "please remove inductive definitions before calling gappa printer"
+    | Dprop (Paxiom, pr, f) -> 
+	let (eqs,hyps) = filter_hyp eqs hyps pr f in (eqs,hyps,goal)
+    | Dprop (Pgoal, pr, f) ->
+	begin
+	  match goal with
+	    | None -> (eqs,hyps,Some (pr,f))
+	    | Some _ -> assert false
+	end
+    | Dprop ((Plemma|Pskip), _, _) ->
+	unsupportedDecl d 
+          "gappa: lemmas are not supported"
+
+let print_equation info fmt (pr,t1,t2) =
+  fprintf fmt "# equation '%a'@\n" print_ident pr.pr_name;
+  fprintf fmt "%a = %a ;@\n" (print_term info) t1 (print_term info) t2
+ 
+let print_hyp info fmt (pr,f) =
+  fprintf fmt "# hypothesis '%a'@\n" print_ident pr.pr_name;
+  fprintf fmt "%a@\n" (print_fmla info) f
+  
+let print_goal info fmt g =
+  match g with
+    | Some(pr,f) ->
+	fprintf fmt "# goal '%a'@\n" print_ident pr.pr_name;
+	fprintf fmt "%a@\n" (print_fmla info) f
+    | None -> assert false
+  
+let print_task env pr thpr ?old:_ fmt task =
   forget_all ident_printer;
   let info = get_info env task in
   let task = 
@@ -249,7 +296,15 @@ let print_task env pr thpr ?old fmt task =
   in
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;  
+  let equations,hyps,goal = 
+    List.fold_left prepare ([],[],None) (Task.task_decls task) 
+  in
+  List.iter (print_equation info fmt) equations;
+  fprintf fmt "@[<hov>{ %a %a }@\n@]" (print_list nothing (print_hyp info)) hyps
+    (print_goal info) goal
+(*  
   print_decls ?old info fmt (Task.task_decls task)
+*)
 
 let () = register_printer "gappa" print_task
 
