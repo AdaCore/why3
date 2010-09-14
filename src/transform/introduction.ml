@@ -7,24 +7,6 @@
 *)
 
 
-(** Introduction of premises *)
-
-(** The premises of the goal of a task are introduced in the
-    context, e.g
-
-      goal G: forall x:t, f1 -> forall y:u, f2 and f3 -> f4
-
-    becomes
-
-      logic x:t
-      axiom H1: f1
-      logic y:u
-      axiom H2: f2
-      axiom H3: f3
-      goal G: f4
-
-*)
-
 open Ident
 open Term
 open Decl
@@ -33,10 +15,21 @@ open Task
 
 let rec intros pr f = match f.f_node with
   | Fbinop (Fimplies,f1,f2) ->
-      (* TODO: split f1 *)
-      let id = create_prsymbol (id_fresh "H") in
-      let d = create_prop_decl Paxiom id f1 in
-      d :: intros pr f2
+      (* split f1 *)
+      let l = Split_goal.split_pos [] f1 in
+      List.fold_right
+	(fun f acc ->
+	   let id = create_prsymbol (id_fresh "H") in
+	   let d = create_prop_decl Paxiom id f in
+	   d :: acc)
+	l
+	(intros pr f2)
+      (* old version, f1 not splitted *)
+      (*
+	let id = create_prsymbol (id_fresh "H") in
+	let d = create_prop_decl Paxiom id f1 in
+	d :: intros pr f2
+      *)
   | Fquant (Fforall,fq) -> 
       let vsl,_trl,f = f_open_quant fq in
       let intro_var subst vs =
