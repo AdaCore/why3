@@ -33,23 +33,15 @@ open Task
 
 type info = {
   info_symbols : Sls.t;
-  info_ops_of_rel : (string * string) Mls.t;
+  info_ops_of_rel : (bool * string * string) Mls.t;
   info_syn : string Mid.t;
   info_rem : Sid.t;
 }
 
-let int_le = ref ps_equ
-let int_ge = ref ps_equ
-let int_lt = ref ps_equ
-let int_gt = ref ps_equ
-
-let real_le = ref ps_equ
-let real_ge = ref ps_equ
-let real_lt = ref ps_equ
-let real_gt = ref ps_equ
-
-let single_value = ref ps_equ
-
+let find_th env file th =
+  let theory = Env.find_theory env [file] th in
+  fun id -> Theory.ns_find_ls theory.Theory.th_export [id] 
+    
 let get_info = 
   let arith_symbols = ref None in
   let ops_of_rels = ref Mls.empty in
@@ -57,56 +49,57 @@ let get_info =
     let l =
       match !arith_symbols with 
 	| None ->
-            let int_theory = Env.find_theory env ["int"] "Int" in
-            let find_int = Theory.ns_find_ls int_theory.Theory.th_export in
-            let int_add = find_int ["infix +"] in
-            let int_sub = find_int ["infix -"] in
-            let int_mul = find_int ["infix *"] in
-            int_le := Theory.ns_find_ls int_theory.Theory.th_export ["infix <="];
-            int_ge := Theory.ns_find_ls int_theory.Theory.th_export ["infix >="];
-            int_lt := Theory.ns_find_ls int_theory.Theory.th_export ["infix <"];
-            int_gt := Theory.ns_find_ls int_theory.Theory.th_export ["infix >"];
-            let int_abs_theory = Env.find_theory env ["int"] "Abs" in
-            let int_abs = Theory.ns_find_ls int_abs_theory.Theory.th_export ["abs"] in
-            let real_theory = Env.find_theory env ["real"] "Real" in
-            let find_real = Theory.ns_find_ls real_theory.Theory.th_export in
-            let real_add = find_real ["infix +"] in
-            let real_sub = find_real ["infix -"] in
-            let real_mul = find_real ["infix *"] in
-            let real_div = find_real ["infix /"] in
-            real_le := Theory.ns_find_ls real_theory.Theory.th_export ["infix <="];
-            real_ge := Theory.ns_find_ls real_theory.Theory.th_export ["infix >="];
-            real_lt := Theory.ns_find_ls real_theory.Theory.th_export ["infix <"];
-            real_gt := Theory.ns_find_ls real_theory.Theory.th_export ["infix >"];
-            let real_abs_theory = Env.find_theory env ["real"] "Abs" in
-            let real_abs = Theory.ns_find_ls real_abs_theory.Theory.th_export ["abs"] in
+            let find_int = find_th env "int" "Int" in 
+            let int_add = find_int "infix +" in
+            let int_sub = find_int "infix -" in
+            let int_mul = find_int "infix *" in
+            let int_le = find_int "infix <=" in
+            let int_ge = find_int "infix >=" in
+            let int_lt = find_int "infix <" in
+            let int_gt = find_int "infix >" in
+            let find_int_abs = find_th env "int" "Abs" in
+            let int_abs = find_int_abs "abs" in
+            let find_real = find_th env "real" "Real" in
+            let real_add = find_real "infix +" in
+            let real_sub = find_real "infix -" in
+            let real_mul = find_real "infix *" in
+            let real_div = find_real "infix /" in
+            let real_le = find_real "infix <=" in
+            let real_ge = find_real "infix >=" in
+            let real_lt = find_real "infix <" in
+            let real_gt = find_real "infix >" in
+            let find_real_abs = find_th env "real" "Abs" in
+            let real_abs = find_real_abs "abs" in
+(*
 	    let single_theory = Env.find_theory env ["floating_point"] "Single" in
 	    single_value := Theory.ns_find_ls single_theory.Theory.th_export ["value"];
+*)
             (* sets of known symbols *)
             let l = 
               List.fold_right Sls.add 
                 [ps_equ; 
                  int_add; int_sub; int_mul;
-                 !int_le; !int_ge; !int_lt; !int_gt;
+                 int_le; int_ge; int_lt; int_gt;
 		 int_abs;
 		 real_add; real_sub; real_mul; real_div;
-                 !real_le; !real_ge; !real_lt; !real_gt;
+                 real_le; real_ge; real_lt; real_gt;
                  real_abs;
-		 !single_value] Sls.empty 
+		 (* !single_value; *)
+		] Sls.empty 
             in
             arith_symbols := Some l;
 	    ops_of_rels :=
 	      List.fold_left
-		(fun acc (ls,op,rev_op) -> Mls.add ls (op,rev_op) acc)
+		(fun acc (ls,b,op,rev_op) -> Mls.add ls (b,op,rev_op) acc)
 		Mls.empty
-		[ !int_le,"<=",">=" ;
-		  !int_ge,">=","<=" ;
-		  !int_lt,"<",">" ;
-		  !int_gt,">","<" ;
-		  !real_le,"<=",">=" ;
-		  !real_ge,">=","<=" ;
-		  !real_lt,"<",">" ;
-		  !real_gt,">","<" ;
+		[ int_le,true,"<=",">=" ;
+		  int_ge,true,">=","<=" ;
+		  int_lt,false,">=","<=" ;
+		  int_gt,false,"<=",">=" ;
+		  real_le,true,"<=",">=" ;
+		  real_ge,true,">=","<=" ;
+		  real_lt,false,">=","<=" ;
+		  real_gt,false,"<=",">=" ;
 		];	  
             l
         | Some l -> l
@@ -196,18 +189,19 @@ let rec print_fmla info fmt f =
           fprintf fmt "%a - %a in [0,0]" term t1 term t2           
       end
   | Fapp (ls, [t1;t2]) when Mls.mem ls info.info_ops_of_rel -> 
-      let op,rev_op = try Mls.find ls info.info_ops_of_rel
+      let b,op,rev_op = try Mls.find ls info.info_ops_of_rel
 	with Not_found -> assert false
       in
+      let s=if b then "" else "not " in
       begin try
         let c1 = constant_value t1 in
-        fprintf fmt "%a %s %s" term t2 rev_op c1
+        fprintf fmt "%s%a %s %s" s term t2 rev_op c1
       with Not_found ->
         try
           let c2 = constant_value t2 in
-          fprintf fmt "%a %s %s" term t1 op c2
+          fprintf fmt "%s%a %s %s" s term t1 op c2
         with Not_found ->
-          fprintf fmt "%a - %a %s 0" term t1 term t2 op
+          fprintf fmt "%s%a - %a %s 0" s term t1 term t2 op
       end
   | Fapp (ls, tl) -> 
       begin match query_syntax info.info_syn ls.ls_name with
@@ -289,7 +283,7 @@ let print_decls ?old info fmt dl =
   fprintf fmt "@[<hov>{ %a }@\n@]" (print_list nothing (print_decl ?old info)) dl
 *)
 
-let filter_hyp eqs hyps pr f =
+let filter_hyp info eqs hyps pr f =
   match f.f_node with
     | Fapp(ls,[t1;t2]) when ls == ps_equ -> 
 	begin match t1.t_node with
@@ -302,6 +296,8 @@ let filter_hyp eqs hyps pr f =
 		| _ -> (eqs, (pr,f)::hyps)
 	end
 	  (* todo: support more kinds of hypotheses *)
+    | Fapp(ls,_) when Sls.mem ls info.info_symbols ->
+	(eqs, (pr,f)::hyps)
     | _ -> (eqs,hyps)
 
 let filter_goal pr f =
@@ -310,7 +306,7 @@ let filter_goal pr f =
 	(* todo: filter more goals *)
     | _ -> Some(pr,f)
   
-let prepare ((eqs,hyps,goal) as acc) d =
+let prepare info ((eqs,hyps,goal) as acc) d =
   match d.d_node with
     | Dtype _ -> acc
     | Dlogic _ -> acc
@@ -318,7 +314,7 @@ let prepare ((eqs,hyps,goal) as acc) d =
 	unsupportedDecl d 
 	  "please remove inductive definitions before calling gappa printer"
     | Dprop (Paxiom, pr, f) -> 
-	let (eqs,hyps) = filter_hyp eqs hyps pr f in (eqs,hyps,goal)
+	let (eqs,hyps) = filter_hyp info eqs hyps pr f in (eqs,hyps,goal)
     | Dprop (Pgoal, pr, f) ->
 	begin
 	  match goal with
@@ -357,10 +353,10 @@ let print_task env pr thpr ?old:_ fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;  
   let equations,hyps,goal = 
-    List.fold_left prepare ([],[],None) (Task.task_decls task) 
+    List.fold_left (prepare info) ([],[],None) (Task.task_decls task) 
   in
   List.iter (print_equation info fmt) equations;
-  fprintf fmt "@[<hov>{ %a %a }@\n@]" (print_list nothing (print_hyp info)) hyps
+  fprintf fmt "@[<v 2>{ %a@\n%a }@\n@]" (print_list nothing (print_hyp info)) hyps
     (print_goal info) goal
 (*  
   print_decls ?old info fmt (Task.task_decls task)
