@@ -355,8 +355,8 @@ let print_task env pr thpr ?old:_ fmt task =
   let equations,hyps,goal = 
     List.fold_left (prepare info) ([],[],None) (Task.task_decls task) 
   in
-  List.iter (print_equation info fmt) equations;
-  fprintf fmt "@[<v 2>{ %a@\n%a }@\n@]" (print_list nothing (print_hyp info)) hyps
+  List.iter (print_equation info fmt) (List.rev equations);
+  fprintf fmt "@[<v 2>{ %a%a}@\n@]" (print_list nothing (print_hyp info)) hyps
     (print_goal info) goal
 (*  
   print_decls ?old info fmt (Task.task_decls task)
