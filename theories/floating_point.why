@@ -118,9 +118,11 @@ end
 theory Test
 
   use import Rounding
-  use import Single
+  use Single
+  use Double
 
-  lemma Round_01: round NearestTiesToEven 0.1 = 0x0.199999Ap0
+  lemma Round_single_01: Single.round NearestTiesToEven 0.1 = 0x0.199999Ap0
+  lemma Round_double_01: Double.round NearestTiesToEven 0.1 = 0x0.199999Ap0
 
 end
 
