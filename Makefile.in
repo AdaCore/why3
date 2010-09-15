@@ -101,7 +101,7 @@ EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
 
 all: @OCAMLBEST@
 
-.PHONY: byte opt clean depend all install
+.PHONY: byte opt clean depend all install install_no_local
 
 #############
 # Why library
@@ -216,8 +216,7 @@ clean::
 ###############
 # installation
 ###############
-
-install::
+install_no_local::
 	mkdir -p $(BINDIR)
 	mkdir -p $(LIBDIR)/why3
 	mkdir -p $(DATADIR)/why3/images
@@ -227,6 +226,15 @@ install::
 	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
 	cp -f share/images/*.png $(DATADIR)/why3/images
 	cp -f share/lang/why.lang $(DATADIR)/why3/lang/why.lang
+
+ifeq ("@ENABLE_LOCAL@","no")
+install: install_no_local
+else
+install:
+	@echo "You use a local configuration you can't install with it."
+	@echo "Run ./configure without --enable-local"
+endif
+
 
 ##################
 # Why binary
@@ -251,7 +259,7 @@ clean::
 	rm -f src/main.cm[iox] src/main.annot src/main.o
 	rm -f bin/why.byte bin/why.opt
 
-install::
+install_no_local::
 	cp -f bin/why.@OCAMLBEST@ $(BINDIR)/why3
 
 ########
@@ -309,7 +317,7 @@ clean::
 %: %.mlw bin/whyml.byte
 	bin/whyml.byte -P alt-ergo $*.mlw
 
-install::
+install_no_local::
 	cp -f bin/whyml.@OCAMLBEST@ $(BINDIR)/why3ml
 
 
@@ -362,7 +370,7 @@ clean::
 local_config: bin/whyconfig.@OCAMLBEST@
 	WHY3LIB=$(PWD) WHY3DATA=$(PWD)/share bin/whyconfig.@OCAMLBEST@ --autodetect-provers --conf_file .why.conf
 
-install::
+install_no_local::
 	cp -f bin/whyconfig.@OCAMLBEST@ $(BINDIR)/why3config
 
 
@@ -418,7 +426,7 @@ clean::
 	rm -f bin/whyide.byte bin/whyide.opt
 	rm -f .depend.ide
 
-install::
+install_no_local::
 	cp -f bin/whyide.@OCAMLBEST@ $(BINDIR)/why3ide
 
 ##############
@@ -546,7 +554,7 @@ bin/why3-cpulimit: src/tools/@CPULIMIT@.c
 clean::
 	rm -f bin/why3-cpulimit src/tools/*~
 
-install::
+install_no_local::
 	cp -f bin/why3-cpulimit $(BINDIR)
 
 ########
