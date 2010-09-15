@@ -34,9 +34,12 @@ open Task
 type info = {
   info_symbols : Sls.t;
   info_ops_of_rel : (bool * string * string) Mls.t;
+  rounding_modes : string Mls.t;
   info_syn : string Mid.t;
   info_rem : Sid.t;
 }
+
+let round_single = ref ps_equ
 
 let find_th env file th =
   let theory = Env.find_theory env [file] th in
@@ -45,6 +48,7 @@ let find_th env file th =
 let get_info = 
   let arith_symbols = ref None in
   let ops_of_rels = ref Mls.empty in
+  let modes = ref Mls.empty in
   fun env task ->
     let l =
       match !arith_symbols with 
@@ -70,10 +74,10 @@ let get_info =
             let real_gt = find_real "infix >" in
             let find_real_abs = find_th env "real" "Abs" in
             let real_abs = find_real_abs "abs" in
-(*
-	    let single_theory = Env.find_theory env ["floating_point"] "Single" in
-	    single_value := Theory.ns_find_ls single_theory.Theory.th_export ["value"];
-*)
+	    let find_rounding_theory = find_th env "floating_point" "Rounding" in
+	    let round_ne = find_rounding_theory "NearestTiesToEven" in
+	    let find_single_theory = find_th env "floating_point" "Single" in
+	    round_single := find_single_theory "round";
             (* sets of known symbols *)
             let l = 
               List.fold_right Sls.add 
@@ -84,7 +88,7 @@ let get_info =
 		 real_add; real_sub; real_mul; real_div;
                  real_le; real_ge; real_lt; real_gt;
                  real_abs;
-		 (* !single_value; *)
+		 !round_single; 
 		] Sls.empty 
             in
             arith_symbols := Some l;
@@ -101,12 +105,19 @@ let get_info =
 		  real_lt,false,">=","<=" ;
 		  real_gt,false,"<=",">=" ;
 		];	  
+	    modes :=
+	      List.fold_left
+		(fun acc (ls,s) -> Mls.add ls s acc)
+		Mls.empty
+		[ round_ne,"ne" ;
+		];	  
             l
         | Some l -> l
     in
     {
       info_symbols = l;
       info_ops_of_rel = !ops_of_rels;
+      rounding_modes = !modes;
       info_syn = get_syntax_map task;
       info_rem = get_remove_set task;
     }
@@ -136,11 +147,13 @@ let constant_value t =
 
 (* terms *)
 
-(*
-let int_theory = Env.find_theory env ["int"] "Int"
-
-let plus_symbol = Theory.ns_find_ls int_theory.Theory.th_export ["infix +"]
-*)
+let get_mode info m = 
+  match m.t_node with
+    | Tapp(ls,[]) -> 
+	begin try Mls.find ls info.rounding_modes
+	with Not_found -> assert false
+	end
+    | _ -> assert false
 
 let rec print_term info fmt t = 
   let term = print_term info in
@@ -152,6 +165,8 @@ let rec print_term info fmt t =
   | Tvar { vs_name = id } 
   | Tapp ( { ls_name = id } ,[] ) ->
       print_ident fmt id
+  | Tapp (ls, [m;t]) when ls_equal ls !round_single -> 
+      fprintf fmt "rnd_ieee32_%s(%a)" (get_mode info m) term t
   | Tapp (ls, tl) -> 
       begin match query_syntax info.info_syn ls.ls_name with
 	| Some s -> syntax_arguments s term fmt tl

@@ -22,5 +22,10 @@ theory Test
 
    goal Test6: forall x:real. 100.0 >= abs x >= 1.0 -> x*x >= 1.0
 
+   use import floating_point.Rounding
+   use floating_point.Single
+
+   lemma Round_single_01: Single.round NearestTiesToEven 0.1 = 0x0.199999Ap0
+
 end
 
