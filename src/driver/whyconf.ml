@@ -33,9 +33,9 @@ let compilation_loadpath =
   Filename.concat compilation_datadir "theories"
 
 let default_conf_file =
-  Filename.concat  (match Config.localdir with
-    | None -> Rc.get_home_dir ()
-    | Some d -> d) ".why.conf"
+  match Config.localdir with
+    | None -> Filename.concat (Rc.get_home_dir ()) ".why.conf"
+    | Some d -> Filename.concat d "why.conf"
 
 (* Configuration file *)
 
@@ -124,8 +124,10 @@ let load_prover dirname provers (id,section) =
     } provers
 
 let load_main dirname section =
-  { private_libdir    = get_string ~default:default_main.private_libdir section "libdir";
-    private_datadir   = get_string ~default:default_main.private_datadir section "datadir";
+  { private_libdir    = get_string ~default:default_main.private_libdir
+      section "libdir";
+    private_datadir   = get_string ~default:default_main.private_datadir
+      section "datadir";
     loadpath  = List.map (absolute_filename dirname)
       (get_stringl ~default:default_main.loadpath section "loadpath");
     timelimit = get_int ~default:default_main.timelimit section "timelimit";
