@@ -231,7 +231,7 @@ let show_legend_window () =
   ib image_transf;
   i "A split transformation\n";
   i "\n";
-  i "== icons in the satatus column\n";
+  i "== icons in the status column ==\n";
   i "\n";
   ib image_scheduled;
   i "external proof scheduled by not started yet\n";

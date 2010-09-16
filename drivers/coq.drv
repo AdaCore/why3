@@ -80,6 +80,25 @@ theory int.Abs
 
 end
 
+theory int.EuclideanDivision
+
+  prelude "Require Zdiv."
+
+  syntax logic div "(Zdiv %1 %2)"
+  syntax logic mod "(Zmod %1 %2)"
+
+end
+
+theory int.ComputerDivision
+
+  prelude "Require ZOdiv."
+
+  syntax logic div "(ZOdiv %1 %2)"
+  syntax logic mod "(ZOmod %1 %2)"
+
+end
+
+
 theory real.Real
 
   syntax logic zero "0%R"

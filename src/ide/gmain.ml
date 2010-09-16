@@ -420,6 +420,30 @@ let () =
 (* method: run a given prover on each unproved goals *)
 (*****************************************************)
 
+let redo_external_proof g a =
+  let p = a.Model.prover in
+  let callback result time output =
+    a.Model.output <- output;
+    Helpers.set_proof_status a result;
+    let t = if time > 0.0 then 
+      begin
+        a.Model.time <- time;
+        Format.sprintf "%.2f" time 
+      end
+    else "" 
+    in
+    goals_model#set ~row:a.Model.proof_row ~column:Model.time_column t
+  in
+  callback Scheduler.Scheduled 0.0 "";
+  let old = if a.Model.edited_as = "" then None else
+    (Some (open_in a.Model.edited_as))
+  in
+  Scheduler.schedule_proof_attempt
+    ~debug:(gconfig.verbose > 0) ~timelimit:gconfig.time_limit ~memlimit:0 
+    ?old ~command:p.command ~driver:p.driver 
+    ~callback
+    g.Model.task
+
 let rec prover_on_goal p g =
   let row = g.Model.goal_row in
   let id = p.prover_id in
@@ -449,32 +473,12 @@ let rec prover_on_goal p g =
       Hashtbl.add g.Model.external_proofs id a;
       a
   in
-  let callback result time output =
-    a.Model.output <- output;
-    Helpers.set_proof_status a result;
-    let t = if time > 0.0 then 
-      begin
-        a.Model.time <- time;
-        Format.sprintf "%.2f" time 
-      end
-    else "" 
-    in
-    goals_model#set ~row:a.Model.proof_row ~column:Model.time_column t
-  in
-  callback Scheduler.Scheduled 0.0 "";
-  let old = if a.Model.edited_as = "" then None else
-    (Some (open_in a.Model.edited_as))
-  in
-  Scheduler.schedule_proof_attempt
-    ~debug:(gconfig.verbose > 0) ~timelimit:gconfig.time_limit ~memlimit:0 
-    ?old ~command:p.command ~driver:p.driver 
-    ~callback
-    g.Model.task;
+  redo_external_proof g a;
   List.iter
     (fun t -> List.iter (prover_on_goal p) t.Model.subgoals)
     g.Model.transformations
     
-let prover_on_unproved_goals p () =
+let prover_on_unproved_goals p =
   List.iter
     (fun th ->
        List.iter
@@ -482,6 +486,34 @@ let prover_on_unproved_goals p () =
          th.Model.goals;
     )
     !Model.all
+
+let rec prover_on_goal_or_children p g =
+  if not g.Model.proved then 
+    begin
+      match g.Model.transformations with
+	| [] -> prover_on_goal p g
+	| l ->
+	    List.iter (fun t -> 
+			 List.iter (prover_on_goal_or_children p) 
+			   t.Model.subgoals) l
+    end
+
+let prover_on_selected_goal_or_children pr row =
+  let row = filter_model#get_iter row in
+  match filter_model#get ~row ~column:Model.index_column with
+    | Model.Row_goal g ->
+	prover_on_goal_or_children pr g
+    | Model.Row_theory th -> 
+	List.iter (prover_on_goal_or_children pr) th.Model.goals
+    | Model.Row_proof_attempt a ->
+	prover_on_goal_or_children pr a.Model.proof_goal
+    | Model.Row_transformation tr ->
+	List.iter (prover_on_goal_or_children pr) tr.Model.subgoals
+
+let prover_on_selected_goals pr =
+  List.iter
+    (prover_on_selected_goal_or_children pr)
+    goals_view#selection#get_selected_rows 
 
 (*****************************************************)
 (* method: split all unproved goals *)
@@ -697,13 +729,21 @@ let () = add_refresh_provers (fun () ->
 
 let () =
   let add_item_provers () =
-    List.iter (fun p ->
-      let (_ : GMenu.image_menu_item) =
-        let n = p.prover_name ^ " " ^ p.prover_version in
-        tools_factory#add_image_item ~label:(n ^ " on unproved goals")
-	  ~callback:(fun () -> prover_on_unproved_goals p ())
-	  ()
-      in ()) gconfig.provers in
+    List.iter 
+      (fun p ->
+	 let n = p.prover_name ^ " " ^ p.prover_version in
+	 let (_ : GMenu.image_menu_item) =
+           tools_factory#add_image_item ~label:(n ^ " on all unproved goals")
+	     ~callback:(fun () -> prover_on_unproved_goals p)
+	     ()
+	 in
+	 let (_ : GMenu.image_menu_item) =
+           tools_factory#add_image_item ~label:(n ^ " on selection")
+	     ~callback:(fun () -> prover_on_selected_goals p)
+	     ()
+	 in ()) 
+      gconfig.provers 
+  in
   add_refresh_provers add_item_provers;
   add_item_provers ()
 
@@ -722,6 +762,7 @@ let () =
 (* Help menu *)
 (*************)
 
+(*
 let info_window t s () =
   let d = GWindow.message_dialog
     ~message:s
@@ -735,6 +776,7 @@ let info_window t s () =
       ~callback:(function `CLOSE | `DELETE_EVENT -> d#destroy ())
   in
   ()
+*)
 
 let help_menu = factory#add_submenu "_Help" 
 let help_factory = new GMenu.factory help_menu ~accel_group 
@@ -820,26 +862,45 @@ let move_to_line (v : GSourceView2.source_view) line =
     v#scroll_to_mark ~use_align:true ~yalign:0.0 mark
   end
 
+let orange_bg = source_view#buffer#create_tag 
+  ~name:"orange_bg" [`BACKGROUND "orange"] 
+
+let color_loc (v:GSourceView2.source_view) l b e =
+  let buf = v#buffer in
+  buf#remove_tag orange_bg ~start:buf#start_iter ~stop:buf#end_iter;
+  let top = buf#start_iter in
+  let start = top#forward_lines (l-1) in
+  let start = start#forward_chars b in
+  let stop = start#forward_chars (e-b) in
+  buf#apply_tag ~start ~stop orange_bg
+
+let scroll_to_id id =
+  match id.Ident.id_origin with
+    | Ident.User loc -> 
+	let (f,l,b,e) = Loc.extract loc in
+	if f <> !current_file then
+	  begin
+	    source_view#source_buffer#set_text (source_text f);
+	    current_file := f;
+	  end;
+	move_to_line source_view (l-1);
+	color_loc source_view l b e
+    | Ident.Fresh -> 
+	source_view#source_buffer#set_text "Fresh ident (no position available)\n";
+	current_file := ""
+    | Ident.Derived _ -> 
+	source_view#source_buffer#set_text "Derived ident (no position available)\n";
+	current_file := ""
+
 let scroll_to_source_goal g =
   let t = g.Model.task in
   let id = (Task.task_goal t).Decl.pr_name in
-  begin
-    match id.Ident.id_origin with
-      | Ident.User loc -> 
-	  let (f,l,_b,_e) = Loc.extract loc in
-	  if f <> !current_file then
-	    begin
-	      source_view#source_buffer#set_text (source_text f);
-	      current_file := f;
-	    end;
-	  move_to_line source_view (l-1)
-      | Ident.Fresh -> 
-	  source_view#source_buffer#set_text "Fresh ident (no position available)\n";
-	  current_file := ""
-      | Ident.Derived _ -> 
-	  source_view#source_buffer#set_text "Derived ident (no position available)\n";
-	  current_file := ""
-  end
+  scroll_to_id id
+
+let scroll_to_theory th = 
+  let t = th.Model.theory in
+  let id = t.Theory.th_name in
+  scroll_to_id id
 
 (* to be run when a row in the tree view is selected *)
 let select_row p = 
@@ -852,10 +913,9 @@ let select_row p =
         task_view#source_buffer#set_text task_text;
         task_view#scroll_to_mark `INSERT;
 	scroll_to_source_goal g
-    | Model.Row_theory _th ->
+    | Model.Row_theory th ->
         task_view#source_buffer#set_text ""; 
-	source_view#source_buffer#set_text "";
-	current_file := ""
+	scroll_to_theory th
     | Model.Row_proof_attempt a ->
         task_view#source_buffer#set_text a.Model.output;
 	scroll_to_source_goal a.Model.proof_goal
@@ -904,7 +964,7 @@ let edit_selected_row p =
 let edit_current_proof () =
   match goals_view#selection#get_selected_rows with
     | [] -> ()
-    | [p] -> edit_selected_row p
+    | [r] -> edit_selected_row r
     | _ -> assert false (* multi-selection is disabled *)
 
 let add_item_edit () =
