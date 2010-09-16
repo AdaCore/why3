@@ -19,10 +19,25 @@ theory Test
 
    goal Test6: 2+3 = 5 and forall x:int. x*x >= 0
 
+   use int.EuclideanDivision
+
+   goal EDiv1: EuclideanDivision.div 1 2 = 0
+
+   goal EDiv2: EuclideanDivision.div (-1) 2 = -1
+
+   use int.ComputerDivision
+
+   goal CDiv1: ComputerDivision.div 1 2 = 0
+
+   goal CDiv2: ComputerDivision.div (-1) 2 = 0
+
    use import real.Real
+
+   goal Real1: forall x:real. x <> 0.0 -> x*x <> 0.0
+
    use import real.Abs
 
-   goal Real1: forall x:real. 100.0 >= abs x >= 1.0 -> x*x >= 1.0
+   goal RealAbs1: forall x:real. 100.0 >= abs x >= 1.0 -> x*x >= 1.0
 
    use import floating_point.Rounding
    use floating_point.Single
