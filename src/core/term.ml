@@ -571,28 +571,6 @@ let f_or      = f_binary For
 let f_implies = f_binary Fimplies
 let f_iff     = f_binary Fiff
 
-(* built-in symbols *)
-
-let ps_equ =
-  let v = ty_var (create_tvsymbol (id_fresh "a")) in
-  create_psymbol (id_fresh "infix =") [v; v]
-
-let f_equ t1 t2 = f_app ps_equ [t1; t2]
-let f_neq t1 t2 = f_not (f_app ps_equ [t1; t2])
-
-let fs_tuple = Util.memo_int 17 (fun n ->
-  let tyl = ref [] in
-  for i = 1 to n
-  do tyl := ty_var (create_tvsymbol (id_fresh "a")) :: !tyl done;
-  let ty = ty_tuple !tyl in
-  create_fsymbol (id_fresh ("Tuple" ^ string_of_int n)) !tyl ty)
-
-let is_fs_tuple fs = fs == fs_tuple (List.length fs.ls_args)
-
-let t_tuple tl =
-  let ty = ty_tuple (List.map (fun t -> t.t_ty) tl) in
-  t_app (fs_tuple (List.length tl)) tl ty
-
 (* unsafe map *)
 
 let bound_map fnT fnE (u,b,e) = (u, bnd_map fnT b, fnE e)
@@ -1043,6 +1021,46 @@ let t_let_close v t1 t2 = t_let t1 (t_close_bound v t2)
 let f_let_close v t1 f2 = f_let t1 (f_close_bound v f2)
 
 let t_eps_close v f = t_eps (f_close_bound v f)
+
+(* built-in symbols *)
+
+let ps_equ =
+  let v = ty_var (create_tvsymbol (id_fresh "a")) in
+  create_psymbol (id_fresh "infix =") [v; v]
+
+let f_equ t1 t2 = f_app ps_equ [t1; t2]
+let f_neq t1 t2 = f_not (f_app ps_equ [t1; t2])
+
+let fs_func_app =
+  let ty_a = ty_var (create_tvsymbol (id_fresh "a")) in
+  let ty_b = ty_var (create_tvsymbol (id_fresh "b")) in
+  create_fsymbol (id_fresh "infix @!") [ty_func ty_a ty_b; ty_a] ty_b
+
+let ps_pred_app =
+  let ty_a = ty_var (create_tvsymbol (id_fresh "a")) in
+  create_psymbol (id_fresh "infix @?") [ty_pred ty_a; ty_a]
+
+let t_func_app fn t = t_app_infer fs_func_app [fn; t]
+let f_pred_app pr t = f_app ps_pred_app [pr; t]
+
+let t_func_app_l = List.fold_left t_func_app
+
+let f_pred_app_l pr tl = match List.rev tl with
+  | t::tl -> f_pred_app (t_func_app_l pr (List.rev tl)) t
+  | _ -> Pervasives.invalid_arg "f_pred_app_l"
+
+let fs_tuple = Util.memo_int 17 (fun n ->
+  let tyl = ref [] in
+  for i = 1 to n
+  do tyl := ty_var (create_tvsymbol (id_fresh "a")) :: !tyl done;
+  let ty = ty_tuple !tyl in
+  create_fsymbol (id_fresh ("Tuple" ^ string_of_int n)) !tyl ty)
+
+let is_fs_tuple fs = fs == fs_tuple (List.length fs.ls_args)
+
+let t_tuple tl =
+  let ty = ty_tuple (List.map (fun t -> t.t_ty) tl) in
+  t_app (fs_tuple (List.length tl)) tl ty
 
 (** Term library *)
 

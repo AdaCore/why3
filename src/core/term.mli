@@ -353,6 +353,15 @@ val f_neq : term -> term -> fmla
 val f_equ_simp : term -> term -> fmla
 val f_neq_simp : term -> term -> fmla
 
+val fs_func_app : lsymbol
+val ps_pred_app : lsymbol
+
+val t_func_app : term -> term -> term
+val f_pred_app : term -> term -> fmla
+
+val t_func_app_l : term -> term list -> term
+val f_pred_app_l : term -> term list -> fmla
+
 val fs_tuple : int -> lsymbol
 val t_tuple : term list -> term
 

@@ -39,6 +39,7 @@ let create_env = let c = ref (-1) in fun retrieve ->
   let add th m = Mnm.add th.th_name.id_string th m in
   let m = Mnm.empty in
   let m = add builtin_theory m in
+  let m = add highord_theory m in
   let m = add (tuple_theory 0) m in
   let m = add (tuple_theory 1) m in
   let m = add (tuple_theory 2) m in

@@ -218,6 +218,18 @@ let ts_real = create_tysymbol (id_fresh "real") [] None
 let ty_int  = ty_app ts_int  []
 let ty_real = ty_app ts_real []
 
+let ts_func =
+  let tv_a = create_tvsymbol (id_fresh "a") in
+  let tv_b = create_tvsymbol (id_fresh "b") in
+  create_tysymbol (id_fresh "func") [tv_a;tv_b] None
+
+let ts_pred =
+  let tv_a = create_tvsymbol (id_fresh "a") in
+  create_tysymbol (id_fresh "pred") [tv_a] None
+
+let ty_func ty_a ty_b = ty_app ts_func [ty_a;ty_b]
+let ty_pred ty_a = ty_app ts_pred [ty_a]
+
 let ts_tuple = Util.memo_int 17 (fun n ->
   let vl = ref [] in
   for i = 1 to n do vl := create_tvsymbol (id_fresh "a") :: !vl done;

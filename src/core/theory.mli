@@ -172,6 +172,8 @@ val clone_meta : tdecl -> theory -> tdecl -> tdecl
 
 val builtin_theory : theory
 
+val highord_theory : theory
+
 val tuple_theory : int -> theory
 
 (* exceptions *)

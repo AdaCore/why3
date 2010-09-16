@@ -696,6 +696,14 @@ let builtin_theory =
   let uc = add_logic_decl uc [ps_equ, None] in
   close_theory uc
 
+let highord_theory =
+  let uc = empty_theory (id_fresh "HighOrd") in
+  let uc = add_ty_decl uc [ts_func, Tabstract] in
+  let uc = add_ty_decl uc [ts_pred, Tabstract] in
+  let uc = add_logic_decl uc [fs_func_app, None] in
+  let uc = add_logic_decl uc [ps_pred_app, None] in
+  close_theory uc
+
 let create_theory n = use_export (empty_theory n) builtin_theory
 
 let tuple_theory = Util.memo_int 17 (fun n ->
