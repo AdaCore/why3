@@ -425,7 +425,61 @@ and dterm_node loc env = function
       let env = { env with dvars = Mstr.add x.id ty env.dvars } in
       let e1 = dfmla env e1 in
       Teps (x, ty, e1), ty
-  | PPquant _
+  | PPquant (q, uqu, trl, a) ->
+      check_quant_linearity uqu;
+      let uquant env (idl,ty) =
+        let ty = dty env ty in
+        let id = match idl with
+          | Some id -> id
+          | None -> assert false
+        in
+        { env with dvars = Mstr.add id.id ty env.dvars }, (id,ty)
+      in
+      let env, uqu = map_fold_left uquant env uqu in
+      let trigger e =
+	try
+	  TRterm (dterm env e)
+	with exn when trigger_not_a_term_exn exn ->
+	  TRfmla (dfmla env e)
+      in
+      let trl = List.map (List.map trigger) trl in
+      let id, ty, f = match q with
+        | PPfunc ->
+            let t = dterm env a in
+            let id = { id = "fc" ; id_loc = loc } in
+            let tyl,ty = List.fold_right (fun (_,uty) (tyl,ty) ->
+              let nty = Tyapp (ts_func, [uty;ty]) in ty :: tyl, nty)
+              uqu ([],t.dt_ty)
+            in
+            let h = { dt_node = Tvar id.id ; dt_ty = ty } in
+            let h = List.fold_left2 (fun h (uid,uty) ty ->
+              let u = { dt_node = Tvar uid.id ; dt_ty = uty } in
+              { dt_node = Tapp (fs_func_app, [h;u]) ; dt_ty = ty })
+              h uqu tyl
+            in
+            id, ty, Fapp (ps_equ, [h;t])
+        | PPpred ->
+            let f = dfmla env a in
+            let id = { id = "pc" ; id_loc = loc } in
+            let (uid,uty),uqu = match List.rev uqu with
+              | uq :: uqu -> uq, List.rev uqu
+              | [] -> assert false
+            in
+            let tyl,ty = List.fold_right (fun (_,uty) (tyl,ty) ->
+              let nty = Tyapp (ts_func, [uty;ty]) in ty :: tyl, nty)
+              uqu ([],Tyapp (ts_pred, [uty]))
+            in
+            let h = { dt_node = Tvar id.id ; dt_ty = ty } in
+            let h = List.fold_left2 (fun h (uid,uty) ty ->
+              let u = { dt_node = Tvar uid.id ; dt_ty = uty } in
+              { dt_node = Tapp (fs_func_app, [h;u]) ; dt_ty = ty })
+              h uqu tyl
+            in
+            let u = { dt_node = Tvar uid.id ; dt_ty = uty } in
+            id, ty, Fbinop (Fiff, Fapp (ps_pred_app, [h;u]), f)
+        | _ -> error ~loc:loc TermExpected
+      in
+      Teps (id, ty, Fquant (Fforall, uqu, trl, f)), ty
   | PPbinop _ | PPunop _ | PPfalse | PPtrue ->
       error ~loc TermExpected
 
@@ -461,6 +515,7 @@ and dfmla env e = match e.pp_desc with
       let q = match q with
         | PPforall -> Fforall
         | PPexists -> Fexists
+        | _ -> error ~loc:e.pp_loc PredicateExpected
       in
       Fquant (q, uqu, trl, dfmla env a)
   | PPapp (x, tl) ->
