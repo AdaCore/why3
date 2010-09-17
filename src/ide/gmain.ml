@@ -991,7 +991,7 @@ let (_ : GtkSignal.id) =
       match goals_view#selection#get_selected_rows with
         | [p] -> select_row p
         | [] -> ()
-        | _ -> assert false (* multi-selection is disabled *)
+        | _ -> () 
     end
 
 let () = w#add_accel_group accel_group
