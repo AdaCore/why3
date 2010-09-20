@@ -28,7 +28,7 @@ type constant = Term.constant
 type label = Ident.label
 
 type pp_quant =
-  | PPforall | PPexists | PPfunc | PPpred
+  | PPforall | PPexists | PPlambda
 
 type pp_binop =
   | PPand | PPor | PPimplies | PPiff

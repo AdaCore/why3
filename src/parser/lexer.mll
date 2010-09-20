@@ -187,6 +187,8 @@ rule token = parse
       { ASYM_AND }
   | "\\/"
       { ASYM_OR }
+  | "\\"
+      { LAMBDA }
   | "."
       { DOT }
   | "|"

@@ -425,7 +425,7 @@ and dterm_node loc env = function
       let env = { env with dvars = Mstr.add x.id ty env.dvars } in
       let e1 = dfmla env e1 in
       Teps (x, ty, e1), ty
-  | PPquant (q, uqu, trl, a) ->
+  | PPquant (PPlambda, uqu, trl, a) ->
       check_quant_linearity uqu;
       let uquant env (idl,ty) =
         let ty = dty env ty in
@@ -443,9 +443,8 @@ and dterm_node loc env = function
 	  TRfmla (dfmla env e)
       in
       let trl = List.map (List.map trigger) trl in
-      let id, ty, f = match q with
-        | PPfunc ->
-            let t = dterm env a in
+      let id, ty, f = match trigger a with
+        | TRterm t ->
             let id = { id = "fc" ; id_loc = loc } in
             let tyl,ty = List.fold_right (fun (_,uty) (tyl,ty) ->
               let nty = Tyapp (ts_func, [uty;ty]) in ty :: tyl, nty)
@@ -458,8 +457,7 @@ and dterm_node loc env = function
               h uqu tyl
             in
             id, ty, Fapp (ps_equ, [h;t])
-        | PPpred ->
-            let f = dfmla env a in
+        | TRfmla f ->
             let id = { id = "pc" ; id_loc = loc } in
             let (uid,uty),uqu = match List.rev uqu with
               | uq :: uqu -> uq, List.rev uqu
@@ -477,10 +475,9 @@ and dterm_node loc env = function
             in
             let u = { dt_node = Tvar uid.id ; dt_ty = uty } in
             id, ty, Fbinop (Fiff, Fapp (ps_pred_app, [h;u]), f)
-        | _ -> error ~loc:loc TermExpected
       in
       Teps (id, ty, Fquant (Fforall, uqu, trl, f)), ty
-  | PPbinop _ | PPunop _ | PPfalse | PPtrue ->
+  | PPquant _ | PPbinop _ | PPunop _ | PPfalse | PPtrue ->
       error ~loc TermExpected
 
 and dfmla env e = match e.pp_desc with

@@ -91,7 +91,7 @@
 
 %token AND AS AXIOM CLONE
 %token ELSE END EPSILON EXISTS EXPORT FALSE FORALL
-%token GOAL IF IMPORT IN INDUCTIVE LEMMA
+%token GOAL IF IMPORT IN INDUCTIVE LAMBDA LEMMA
 %token LET LOGIC MATCH META NAMESPACE NOT PROP OR
 %token THEN THEORY TRUE TYPE USE WITH
 
@@ -439,8 +439,8 @@ lexpr:
    { mk_pp (PPapp ($1, $2)) }
 | IF lexpr THEN lexpr ELSE lexpr
    { mk_pp (PPif ($2, $4, $6)) }
-| FORALL list1_param_var_sep_comma triggers DOT lexpr
-   { mk_pp (PPquant (PPforall, $2, $3, $5)) }
+| quant list1_param_var_sep_comma triggers DOT lexpr
+   { mk_pp (PPquant ($1, $2, $3, $5)) }
 | EXISTS list1_param_var_sep_comma triggers DOT lexpr
    { mk_pp (PPquant (PPexists, $2, $3, $5)) }
 | STRING lexpr %prec prec_named
@@ -486,6 +486,12 @@ lexpr_arg:
 | OPPREF lexpr_arg
    { let id = { id = prefix $1; id_loc = loc_i 2 } in
      mk_pp (PPapp (Qident id, [$2])) }
+;
+
+quant:
+| FORALL  { PPforall }
+| EXISTS  { PPexists }
+| LAMBDA  { PPlambda }
 ;
 
 /* Triggers */
