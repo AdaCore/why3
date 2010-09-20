@@ -215,9 +215,13 @@ let dpost env ty (q, ql) =
 
 let add_local env x tyv = 
   let ty = dpurify env tyv in
-  { env with 
-      locals = Mstr.add x tyv env.locals;
-      denv = Typing.add_var x ty env.denv } 
+  match tyv with
+    | DTpure _ ->
+	{ env with 
+	    locals = Mstr.add x tyv env.locals;
+	    denv = Typing.add_var x ty env.denv } 
+    | DTarrow _ ->
+	{ env with locals = Mstr.add x tyv env.locals }
 
 let rec dtype_v env = function
   | Pgm_ptree.Tpure pt -> 

@@ -3,11 +3,21 @@
 
   type uf
 
-  logic repr uf int: int
+  logic repr uf int int
   logic size uf : int
   logic num uf : int
 
-  logic same (u:uf) (x y:int) = repr u x = repr u y
+  axiom Repr_function_1:
+    forall u:uf, x:int. 
+    0 <= x < size u -> exists y:int. 0 <= y < size u and repr u x y
+  axiom Repr_function_2:
+    forall u:uf, x y z:int. 
+    0 <= x < size u -> repr u x y -> repr u x z -> y = z
+
+  logic same (u:uf) (x y:int) = forall r:int. repr u x r <-> repr u y r
+
+  logic same_reprs (u1 u2 : uf) = 
+     forall x r:int. repr u1 x r <-> repr u2 x r
 
   axiom OneClass :
     forall u:uf. num u = 1 -> 
@@ -20,15 +30,15 @@ parameter create :
     { 0 <= n } 
     ref uf 
     { num !result = n and size !result = n and
-      forall x:int. 0 <= x < n -> repr !result x = x }
+      forall x:int. 0 <= x < n -> repr !result x x }
 
 parameter find : 
   u:ref uf -> x:int -> 
     { 0 <= x < size !u } 
     int writes u 
-    { result = repr !u x and 
+    { repr !u x result and 
       size !u = size (old !u) and num !u = num (old !u) and 
-      forall x:int. 0 <= x < size !u -> repr !u x = repr (old !u) x } 
+      same_reprs !u (old !u) } 
 
 parameter union : 
   u:ref uf -> a:int -> b:int -> 

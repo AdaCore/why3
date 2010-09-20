@@ -13,17 +13,43 @@
                (num  : int)       (* number of classes *)
 
   logic inv (u : uf) =
-    let (UF l d s n) = u in
+    let UF l d s n = u in
     (forall i:int. 0 <= i < s -> 0 <= l#i < s) and
     (forall i:int. 0 <= i < s -> 
-       (d#i = 0 and l#i = i or d#i > 0 and d#(l#i) = d#i - 1))
+       (d#i = 0 and l#i = i or d#i > 0 and d#(l#i) < d#i))
 
-  logic repr (u:uf) (x:int) : int = 
-    let l = link(u) in 
-    let y = l#x in
-    if y = x then y else repr u y  
+  inductive repr (u:uf) (x:int) (r:int) = 
+  | Repr_root: forall u:uf. inv u -> 
+               forall x:int. 0 <= x < size u -> 
+               link u #x = x -> repr u x x
+  | Repr_link: forall u:uf. inv u -> 
+               forall x:int. 0 <= x < size u -> 
+               forall r:int. repr u (link u # x) r -> repr u x r
 
-  logic same (u:uf) (x y:int) = repr u x = repr u y
+(*
+  lemma Repr_inv:
+    forall u:uf, x y:int. repr u x y -> inv u
+  lemma Repr_bounds_1:
+    forall u:uf, x y:int. repr u x y -> 0 <= x < size u
+*)
+  lemma Repr_bounds_2:
+    forall u:uf, x y:int. repr u x y -> 0 <= y < size u
+  lemma Repr_dist_1:
+    forall u:uf, x y:int. repr u x y -> dist u # y = 0
+(*
+  lemma Repr_dist_2:
+    forall u:uf. inv u -> 
+    forall x:int. 0 <= x < size u -> dist u # x = 0 -> repr u x x
+  lemma Repr_dist_3:
+    forall u:uf. inv u -> 
+    forall x:int. 0 <= x < size u -> dist u # x = 1 -> repr u x (link u # x)
+*)
+
+  logic same (u:uf) (x y:int) = 
+    forall r:int. repr u x r <-> repr u y r
+
+  logic same_reprs (u1 u2 : uf) = 
+    forall x r:int. repr u1 x r <-> repr u2 x r
 
   axiom OneClass :
     forall u:uf. num u = 1 -> 
@@ -48,28 +74,39 @@ let create (n:int) =
   ref (UF !l (A.create_const_length 0 n) n n)
   { inv !result and
     num !result = n and size !result = n and
-    forall x:int. 0 <= x < n -> repr !result x = x }
+    forall x:int. 0 <= x < n -> repr !result x x }
+
+{ 
+logic path_compression (u:uf) (x:int) (r:int) : uf =
+  let l = A.set (link u) x r in
+  let d = A.set (dist u) x 1 in
+  UF l d (size u) (num u)
+ 
+lemma Path_compression:
+  forall u:uf. forall x r:int. repr u x r -> 
+  same_reprs u (path_compression u x r)
+}
 
 let rec find (u:ref uf) (x:int) variant { dist !u # x } =
   { inv !u and 0 <= x < size !u } 
   let y = A.get (link !u) x in
   if y <> x then begin
     let r = find u y in
-    let l = A.set (link !u) x r in
-    let d = A.set (dist !u) x 1 in
-    u := UF l d (size !u) (num !u);
+    u := path_compression !u x r;
     r
   end else
     x
   { inv !u and
-    result = repr !u x and 
-    size !u = size (old !u) and num !u = num (old !u) and 
-    forall x:int. 0 <= x < size !u -> repr !u x = repr (old !u) x } 
+    repr !u x result and 
+    size !u = size (old !u) and num !u = num (old !u) and
+    same_reprs !u (old !u) } 
+
+(***
 
 parameter ghost_find : u:ref uf -> x:int ->
   { inv !u and 0 <= x < size !u }
   int reads u
-  { result = repr !u x }
+  { repr !u x result }
 
 let increment (u : ref uf) (r : int) =
   { inv !u and 0 <= r < size !u }
@@ -79,14 +116,14 @@ let increment (u : ref uf) (r : int) =
     invariant { 0 <= !i <= size !u and
                 forall j:int. 0 <= j < size !u ->
                 !d#j = dist(!u)#j + 
-                       if repr !u j = r and j < !i then 1 else 0 }
+                       if repr !u j r and j < !i then 1 else 0 }
     variant { size !u - !i }
     if ghost_find u !i = r then
       d := A.set !d !i (A.get !d !i + 1)
   done;
   !d
   { forall i:int. 0 <= i < size !u ->
-      result#i = (dist !u)#i + if repr !u i = r then 1 else 0 }
+      result#i = (dist !u)#i + if repr !u i r then 1 else 0 }
 
 let union (u:ref uf) (a b:int) =
   { inv !u and 
@@ -105,7 +142,7 @@ let union (u:ref uf) (a b:int) =
       same (old !u) x a and same (old !u) b y or
       same (old !u) x b and same (old !u) a y }
 
-
+***)
 
 (*
 Local Variables: 
