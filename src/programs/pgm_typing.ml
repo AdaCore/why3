@@ -135,6 +135,10 @@ let create_type_var loc =
   let tv = Ty.create_tvsymbol (id_user "a" loc) in
   Tyvar (create_ty_decl_var ~loc ~user:false tv)
 
+let add_pure_var id ty env = match ty with
+  | Tyapp (ts, _) when Ty.ts_equal ts env.env.ts_arrow -> env.denv
+  | _ -> Typing.add_var id ty env.denv
+
 let dcurrying gl tyl ty =
   let make_arrow_type ty1 ty2 = dty_app (gl.ts_arrow, [ty1; ty2]) in
   List.fold_right make_arrow_type tyl ty
@@ -205,23 +209,21 @@ let dpost env ty (q, ql) =
     let s, tyl, _ = dexception env id in
     let denv = match tyl with
       | [] -> env.denv
-      | [ty] -> Typing.add_var id_result ty env.denv
+      | [ty] -> add_pure_var id_result ty env
       | _ -> assert false
     in
     s, dfmla denv l
   in
-  let denv = Typing.add_var id_result ty env.denv in
+  let denv = add_pure_var id_result ty env in
   dfmla denv q, List.map dexn ql
+
+let add_local_top env x tyv =
+  { env with locals = Mstr.add x tyv env.locals }
 
 let add_local env x tyv = 
   let ty = dpurify env tyv in
-  match tyv with
-    | DTpure _ ->
-	{ env with 
-	    locals = Mstr.add x tyv env.locals;
-	    denv = Typing.add_var x ty env.denv } 
-    | DTarrow _ ->
-	{ env with locals = Mstr.add x tyv env.locals }
+  { env with locals = Mstr.add x tyv env.locals;
+             denv = add_pure_var x ty env }
 
 let rec dtype_v env = function
   | Pgm_ptree.Tpure pt -> 
@@ -425,7 +427,7 @@ and dexpr_desc env loc = function
       if Typing.mem_var s env.denv then 
 	errorm ~loc "clash with previous label %s" s;
       let ty = dty_label env.env in
-      let env = { env with denv = Typing.add_var s ty env.denv } in
+      let env = { env with denv = add_pure_var s ty env } in
       let e1 = dexpr env e1 in
       DElabel (s, e1), e1.dexpr_type
   | Pgm_ptree.Ecast (e1, ty) ->
@@ -441,7 +443,7 @@ and dletrec env dl =
   (* add all functions into environment *)
   let add_one env (id, bl, var, t) = 
     let ty = create_type_var id.id_loc in
-    let env = add_local env id.id (DTpure ty) in
+    let env = add_local_top env id.id (DTpure ty) in
     env, ((id, ty), bl, var, t)
   in
   let env, dl = map_fold_left add_one env dl in

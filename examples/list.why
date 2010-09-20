@@ -1,3 +1,26 @@
+theory Map
+  use import list.List
+
+  use HighOrd as HO
+
+  logic map (fn : HO.func 'a 'b) (l : list 'a) : list 'b = match l with
+    | Cons x r -> Cons (fn x) (map fn r)
+    | Nil -> Nil
+  end
+
+  logic forall2 (pr : HO.func 'a (HO.pred 'b)) (l1 : list 'a) (l2 : list 'b) =
+    match l1, l2 with
+    | Cons x1 r1, Cons x2 r2 -> pr x1 x2 and forall2 pr r1 r2
+    | _, _ -> true
+    end
+
+  use export int.Int
+
+  logic double (l : list int) : list int = map (\ i : int . i * 2) l
+
+  logic lequal (l1 l2 : list int) = forall2 (\ i1 i2 : int . i1 = i2) l1 l2
+end
+
 theory Induction2
   use import list.List
   use import list.Length

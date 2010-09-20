@@ -11,7 +11,7 @@
   logic inv (r: rope) = match r with
     | Str s ofs len -> 
         len = 0 or 0 <= ofs < S.length s and ofs + len <= S.length s
-    | App l r   len -> 
+    | App l r _ ->
         0 < len l and inv l and 0 < len r and inv r
   end
 

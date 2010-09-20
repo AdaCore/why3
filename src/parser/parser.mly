@@ -441,8 +441,6 @@ lexpr:
    { mk_pp (PPif ($2, $4, $6)) }
 | quant list1_param_var_sep_comma triggers DOT lexpr
    { mk_pp (PPquant ($1, $2, $3, $5)) }
-| EXISTS list1_param_var_sep_comma triggers DOT lexpr
-   { mk_pp (PPquant (PPexists, $2, $3, $5)) }
 | STRING lexpr %prec prec_named
    { mk_pp (PPnamed (Ident.label ~loc:(loc ()) $1, $2)) }
 | LET pattern EQUAL lexpr IN lexpr

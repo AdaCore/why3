@@ -350,6 +350,15 @@ let check_quant_linearity uqu =
   in
   List.iter (fun (idl, _) -> Util.option_iter check idl) uqu
 
+let check_highord env x tl = match x with
+  | Qident { id = x } when Mstr.mem x env.dvars -> true
+  | _ -> List.length tl > List.length ((find_lsymbol x env.uc).ls_args)
+
+let apply_highord loc x tl = match List.rev tl with
+  | a::[] -> [{pp_loc = loc; pp_desc = PPvar x}; a]
+  | a::tl -> [{pp_loc = loc; pp_desc = PPapp (x, List.rev tl)}; a]
+  | [] -> assert false
+
 let rec dterm env t =
   let n, ty = dterm_node t.pp_loc env t.pp_desc in
   { dt_node = n; dt_ty = ty }
@@ -365,6 +374,11 @@ and dterm_node loc env = function
       let n = List.length tyl in
       if n > 0 then error ~loc (BadNumberOfArguments (s.ls_name, 0, n));
       Tapp (s, []), ty
+  | PPapp (x, tl) when check_highord env x tl ->
+      let tl = apply_highord loc x tl in
+      let atyl, aty = Denv.specialize_lsymbol ~loc fs_func_app in
+      let tl = dtype_args fs_func_app.ls_name loc env atyl tl in
+      Tapp (fs_func_app, tl), Util.of_option aty
   | PPapp (x, tl) ->
       let s, tyl, ty = specialize_fsymbol x env.uc in
       let tl = dtype_args s.ls_name loc env tyl tl in
@@ -515,6 +529,11 @@ and dfmla env e = match e.pp_desc with
         | _ -> error ~loc:e.pp_loc PredicateExpected
       in
       Fquant (q, uqu, trl, dfmla env a)
+  | PPapp (x, tl) when check_highord env x tl ->
+      let tl = apply_highord e.pp_loc x tl in
+      let atyl, _ = Denv.specialize_lsymbol ~loc:(e.pp_loc) ps_pred_app in
+      let tl = dtype_args ps_pred_app.ls_name e.pp_loc env atyl tl in
+      Fapp (ps_pred_app, tl)
   | PPapp (x, tl) ->
       let s, tyl = specialize_psymbol x env.uc in
       let tl = dtype_args s.ls_name e.pp_loc env tyl tl in
