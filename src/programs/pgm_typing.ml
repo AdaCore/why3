@@ -292,7 +292,11 @@ and dexpr_desc env loc = function
       let s, tyv = specialize_global loc x env.env in
       DEglobal (s, tyv), dpurify env tyv
   | Pgm_ptree.Eident p ->
-      let s, tyl, ty = Typing.specialize_fsymbol p env.env.uc in
+      let s,tyl,ty = Typing.specialize_lsymbol p env.env.uc in
+      let ty = match ty with
+        | Some ty -> ty
+        | None -> dty_bool env.env
+      in
       DElogic s, dcurrying env.env tyl ty
   | Pgm_ptree.Eapply (e1, e2) ->
       let e1 = dexpr env e1 in
@@ -536,6 +540,10 @@ and binder gl env (x, tyv) =
 
 let mk_iexpr loc ty d = { iexpr_desc = d; iexpr_loc = loc; iexpr_type = ty }
 
+let mk_t_if gl f =
+  let ty = ty_app gl.ts_bool [] in
+  t_if f (t_app gl.ls_True [] ty) (t_app gl.ls_False [] ty)
+
 (* apply ls to a list of expressions, introducing let's if necessary
 
   ls [e1; e2; ...; en]
@@ -546,10 +554,13 @@ let mk_iexpr loc ty d = { iexpr_desc = d; iexpr_loc = loc; iexpr_type = ty }
   let xn = en in
   ls(x1,x2,...,xn)
 *)
-let make_logic_app loc ty ls el =
+let make_logic_app gl loc ty ls el =
   let rec make args = function
-    | [] -> 
-	IElogic (t_app ls (List.rev args) ty)
+    | [] ->
+        begin match ls.ls_value with
+          | Some _ -> IElogic (t_app ls (List.rev args) ty)
+          | None -> IElogic (mk_t_if gl (f_app ls (List.rev args)))
+        end
     | ({ iexpr_desc = IElogic t }, _) :: r ->
 	make (t :: args) r
     | ({ iexpr_desc = IElocal (vs, _) }, _) :: r ->
@@ -613,10 +624,12 @@ and iexpr_desc gl env loc ty = function
   | DEglobal (ls, tyv) ->
       IEglobal (ls, type_v gl env tyv)
   | DElogic ls ->
-      begin match ls.ls_args with
-	| [] -> 
+      begin match ls.ls_args, ls.ls_value with
+	| [], Some _ ->
 	    IElogic (t_app ls [] ty)
-	| al -> 
+	| [], None ->
+            IElogic (mk_t_if gl (f_app ls []))
+	| al, _ ->
 	    errorm ~loc "function symbol %s is expecting %d arguments"
 	      ls.ls_name.id_string (List.length al)
       end
@@ -628,7 +641,7 @@ and iexpr_desc gl env loc ty = function
 	    if List.length args <> n then 
 	      errorm ~loc "function symbol %s is expecting %d arguments"
 		ls.ls_name.id_string n;
-	    make_logic_app loc ty ls args
+	    make_logic_app gl loc ty ls args
 	| _ ->
 	    let f = iexpr gl env f in
 	    (make_app gl loc ty f args).iexpr_desc

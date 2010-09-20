@@ -113,6 +113,16 @@ let int_literal =
   decimal_literal | hex_literal | oct_literal | bin_literal
 let hexadigit = ['0'-'9' 'a'-'f' 'A'-'F']
 
+let op_char_1 = ['=' '<' '>' '~']
+let op_char_2 = ['+' '-']
+let op_char_3 = ['*' '/' '%']
+let op_char_4 = ['!' '$' '&' '?' '@' '^' '.' ':' '|' '#']
+let op_char_34 = op_char_3 | op_char_4
+let op_char_234 = op_char_2 | op_char_34
+let op_char_1234 = op_char_1 | op_char_234
+
+let op_char_pref = ['!' '?']
+
 rule token = parse
   | "#" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
     space* (digit+ as line) space* (digit+ as char) space* "#"
@@ -152,8 +162,6 @@ rule token = parse
       { COLON }
   | ";"
       { SEMICOLON }
-  | "!"
-      { BANG }
   | ":="
       { COLONEQUAL }
   | "->"
@@ -161,19 +169,7 @@ rule token = parse
   | "="
       { EQUAL }
   | "<>"
-      { OP0 "ne" }
-  | "<"
-      { OP0 "lt" }
-  | "<="
-      { OP0 "le" }
-  | ">"
-      { OP0 "gt" }
-  | ">="
-      { OP0 "ge" }
-  | "+" | "-" as c
-      { OP2 (String.make 1 c) }
-  | "*" | "/" | "%" as c
-      { OP3 (String.make 1 c) }
+      { LTGT }
   | "@"
       { AT }
   | "."
@@ -199,6 +195,16 @@ rule token = parse
       { BARBAR }
   | "&&" 
       { AMPAMP }
+  | op_char_pref op_char_4* as s
+      { OPPREF s }
+  | op_char_1234* op_char_1 op_char_1234* as s
+      { OP1 s }
+  | op_char_234*  op_char_2 op_char_234*  as s
+      { OP2 s }
+  | op_char_34*   op_char_3 op_char_34*  as s
+      { OP3 s }
+  | op_char_4+ as s
+      { OP4 s }
   | "\""
       { STRING (string lexbuf) }
   | eof 

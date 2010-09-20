@@ -233,16 +233,17 @@ let find_lsymbol q uc = find_lsymbol_ns q (get_namespace uc)
 
 let specialize_lsymbol p uc =
   let s = find_lsymbol p uc in
-  s, specialize_lsymbol ~loc:(qloc p) s
+  let tl,ty = specialize_lsymbol ~loc:(qloc p) s in
+  s,tl,ty
 
 let specialize_fsymbol p uc =
-  let s, (tl, ty) = specialize_lsymbol p uc in
+  let s,tl,ty = specialize_lsymbol p uc in
   match ty with
     | None -> let loc = qloc p in error ~loc TermExpected
     | Some ty -> s, tl, ty
 
 let specialize_psymbol p uc =
-  let s, (tl, ty) = specialize_lsymbol p uc in
+  let s,tl,ty = specialize_lsymbol p uc in
   match ty with
     | None -> s, tl
     | Some _ -> let loc = qloc p in error ~loc PredicateExpected

@@ -40,6 +40,9 @@ val close_theory : theory Mnm.t -> Ptree.ident -> theory_uc -> theory Mnm.t
 (** The following is exported for program typing (src/programs/pgm_typing.ml) *)
 (******************************************************************************)
 
+val specialize_lsymbol :
+  Ptree.qualid -> theory_uc -> lsymbol * Denv.dty list * Denv.dty option
+
 val specialize_fsymbol :
   Ptree.qualid -> theory_uc -> lsymbol * Denv.dty list * Denv.dty
 

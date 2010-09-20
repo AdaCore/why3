@@ -98,7 +98,7 @@
 
 %token <string> LIDENT UIDENT
 %token <string> INTEGER
-%token <string> OP0 OP1 OP2 OP3
+%token <string> OP1 OP2 OP3 OP4 OPPREF
 %token <Why.Ptree.real_constant> REAL
 %token <string> STRING
 %token <Lexing.position * string> LOGIC
@@ -114,7 +114,7 @@
 /* symbols */
 
 %token UNDERSCORE QUOTE COMMA LEFTPAR RIGHTPAR COLON SEMICOLON
-%token COLONEQUAL ARROW EQUAL AT DOT LEFTSQ RIGHTSQ BANG
+%token COLONEQUAL ARROW EQUAL LTGT AT DOT LEFTSQ RIGHTSQ
 %token LEFTBLEFTB RIGHTBRIGHTB BAR BARBAR AMPAMP
 %token EOF
 
@@ -144,10 +144,10 @@
 %right BARBAR
 %right AMPAMP
 %right prec_if
-%left EQUAL OP0
-%left OP1
+%left EQUAL LTGT OP1
 %left OP2
 %left OP3
+%left OP4
 %nonassoc prefix_op
 %right unary_op
 %left prec_app
@@ -225,9 +225,10 @@ ident:
 ;
 
 any_op:
-| OP0   { $1 }
+| OP1   { $1 }
 | OP2   { $1 }
 | OP3   { $1 }
+| OP4   { $1 }
 ;
 
 qualid:
@@ -248,15 +249,18 @@ uqualid:
 expr:
 | simple_expr %prec prec_simple 
    { $1 }
-| expr EQUAL expr 
-   { mk_binop $1 "eq_bool" $3 }
-| expr OP0 expr 
-   { mk_binop $1 ($2 ^ "_bool") $3 }
+| expr EQUAL expr
+   { mk_infix $1 "=" $3 }
+| expr LTGT expr
+   { let t = mk_infix $1 "=" $3 in
+     mk_expr (mk_apply_id { id = "notb"; id_loc = loc () } [t]) }
 | expr OP1 expr 
    { mk_infix $1 $2 $3 }
 | expr OP2 expr 
    { mk_infix $1 $2 $3 }
 | expr OP3 expr 
+   { mk_infix $1 $2 $3 }
+| expr OP4 expr
    { mk_infix $1 $2 $3 }
 | NOT expr %prec prefix_op
    { mk_expr (mk_apply_id { id = "notb"; id_loc = loc () } [$2]) }
@@ -328,8 +332,6 @@ triple:
 simple_expr:
 | constant
     { mk_expr (Econstant $1) }
-| BANG simple_expr
-    { mk_prefix "!" $2 }
 | qualid 
     { mk_expr (Eident $1) }
 | LEFTPAR expr RIGHTPAR
@@ -340,6 +342,8 @@ simple_expr:
     { mk_expr Eskip }
 | BEGIN END
     { mk_expr Eskip }
+| OPPREF simple_expr
+    { mk_prefix $1 $2 }
 ;
 
 list1_simple_expr:

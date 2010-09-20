@@ -3,20 +3,6 @@ theory Prelude
   use export int.Int
   use export bool.Bool
 
-  logic eq_bool 'a 'a : bool
-  logic ne_bool 'a 'a : bool
-  logic le_bool 'a 'a : bool
-  logic lt_bool 'a 'a : bool
-  logic ge_bool 'a 'a : bool
-  logic gt_bool 'a 'a : bool
-
-  axiom Eq_bool_def : forall x y:'a.  eq_bool x y = True <-> x= y
-  axiom Ne_bool_def : forall x y:'a.  ne_bool x y = True <-> x<>y
-  axiom Le_bool_def : forall x y:int. le_bool x y = True <-> x<=y
-  axiom Lt_bool_def : forall x y:int. lt_bool x y = True <-> x< y
-  axiom Ge_bool_def : forall x y:int. ge_bool x y = True <-> x>=y
-  axiom Gt_bool_def : forall x y:int. gt_bool x y = True <-> x> y
-
   type unit = ()
   logic ignore 'a : unit
 
