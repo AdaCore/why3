@@ -29,7 +29,10 @@ open Gconfig
 (* parsing comand_line *)
 (***************************)
 
-let spec = [
+let includes = ref []
+
+let spec = Arg.align [
+  "-I", Arg.String (fun s -> includes := s :: !includes), "<s> add s to loadpath" ;
 ]
 
 let usage_str = "whyide [options] <file>.why"
@@ -80,7 +83,13 @@ let source_text fname =
 (* loading WhyIDE configuration *)
 (********************************)
 
-let gconfig = Gconfig.config
+let gconfig = 
+  let c = Gconfig.config in
+  let loadpath = (get_main ()).loadpath @ List.rev !includes in
+  c.env <- Env.create_env (Lexer.retrieve loadpath);
+  let provers = Whyconf.get_provers c.Gconfig.config in
+  c.provers <- Util.Mstr.fold (Gconfig.get_prover_data c.env) provers [];
+  c
 
 (***********************)
 (* Parsing input file  *)

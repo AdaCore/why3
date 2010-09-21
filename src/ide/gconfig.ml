@@ -27,7 +27,7 @@ type t =
       mutable max_running_processes : int;
       mutable provers : prover_data list;
       mutable default_editor : string;
-      env : Env.env;
+      mutable env : Env.env;
       mutable config : Whyconf.config;
     }
 
@@ -87,8 +87,14 @@ let load_config config =
   let ide  = match get_section config "ide" with
     | None -> default_ide
     | Some s -> load_ide s in
+(*
   let provers = get_provers config in
+*)
+(*
   let env = Env.create_env (Lexer.retrieve main.loadpath) in
+*)
+  (* temporary sets env to empty *)
+  let env = Env.create_env (Lexer.retrieve []) in
   { window_height = ide.ide_window_height;
     window_width  = ide.ide_window_width;
     tree_width    = ide.ide_tree_width;
@@ -97,7 +103,10 @@ let load_config config =
     mem_limit     = main.Whyconf.memlimit;
     verbose       = ide.ide_verbose;
     max_running_processes = main.Whyconf.running_provers_max;
+(*
     provers = Mstr.fold (get_prover_data env) provers [];
+*)
+    provers = [];
     default_editor = ide.ide_default_editor;
     config         = config;
     env            = env
