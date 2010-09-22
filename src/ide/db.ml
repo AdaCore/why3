@@ -38,7 +38,6 @@ let current () =
     | Some x -> x
 
 	      
-
 let default_busyfn (_db:Sqlite3.db) =
   prerr_endline "Db.default_busyfn WARNING: busy";
   (* Thread.delay (Random.float 1.) *)
@@ -46,36 +45,13 @@ let default_busyfn (_db:Sqlite3.db) =
   
 let raise_sql_error x = raise (Sqlite3.Error (Rc.to_string x))
   
-(*
-let try_finally fn finalfn =
-  try
-    let r = fn () in
-    finalfn ();
-    r
-  with e -> begin
-    prerr_string "Db.try_finally WARNING: exception: ";
-    prerr_endline (Printexc.to_string e);
-    prerr_endline "== exception backtrace ==";
-    Printexc.print_backtrace stderr;
-    prerr_endline "== end of backtrace ==";
-    finalfn ();
-    raise e
-  end
-*)
-  
+ 
 (* retry until a non-BUSY error code is returned *)
 let rec db_busy_retry db fn =
   match fn () with
     | Rc.BUSY -> 
-(*
-        prerr_endline "Db.db_busy_retry: BUSY";
-*)
         db.busyfn db.raw_db; db_busy_retry db fn
     | x -> 
-(*
-        prerr_string "Db.db_busy_retry: ";
-        prerr_endline (Rc.to_string x);
-*)
         x
        
 (* make sure an OK is returned from the database *)
@@ -177,104 +153,54 @@ let stmt_column_bool stmt i msg =
 
 type db_ident = int64 
 
-type loc_record = 
-    { mutable loc_id : db_ident option;
-      (** when None, the record has never been stored in database yet *)
-      mutable file : string;
-      mutable line : int;
-      mutable start : int;
-      mutable stop : int;
-    }
-
-
 type proof_attempt_status =
-  | Scheduled (** external proof attempt is scheduled *)
-  | Running (** external proof attempt is in progress *)
   | Success (** external proof attempt succeeded *)
   | Timeout (** external proof attempt was interrupted *)
   | Unknown (** external prover answered ``don't know'' or equivalent *)
-  | HighFailure (** external prover call failed *)
-
-let string_of_status = function
-  | Scheduled -> "Scheduled"
-  | Running -> "Running"
-  | Success -> "Success"
-  | Timeout -> "Timeout"
-  | Unknown -> "Unknown"
-  | HighFailure -> "HighFailure"
-
-let print_status fmt s = Format.fprintf fmt "%s" (string_of_status s)
+  | Failure (** external prover call failed *)
 
 type prover =
     { prover_id : db_ident;
       prover_name : string;
-(*
-      prover_short : string;
-      prover_long : string;
-      prover_command : string;
-      prover_driver_checksum : string;
-*)
     }
 
-let prover_name p = p.prover_name
+let prover_id p = p.prover_name
 
-type external_proof = {
+type proof_attempt = {
     mutable external_proof_id : db_ident;
     mutable prover : db_ident;
     mutable timelimit : int;
     mutable memlimit : int;
     mutable status : proof_attempt_status;
     mutable result_time : float;
-    mutable trace : string;
+    mutable edited_as : string;
     mutable proof_obsolete : bool;
 }
 
-let timelimit e = e.timelimit
-let memlimit e = e.memlimit
-let status e = e.status
-let result_time e = e.result_time
-let trace e = e.trace
-let proof_obsolete e = e.proof_obsolete
+let prover p = p.prover
+let status p = p.status
+let proof_obsolete p = p.proof_obsolete
+let time p = p.result_time
+let edited_as p = p.edited_as
 
-type goal_origin =
-  | Goal of string * string
-(*
-  | VCfun of loc * explain * ...
-  | Subgoal of goal
-*)
-
-type transf_data =
-    { transf_name : string;
-      transf_action : Task.task Trans.tlist
+type transf =
+    { mutable transf_id : db_ident;
+      mutable transf_name : string;
+      mutable transf_subgoals : goal list;
     }
 
-
-type goal = {
+and goal = {
   mutable goal_id : db_ident;
-  mutable goal_origin : goal_origin;
-  mutable task : Task.task;
   mutable task_checksum: string;
   mutable proved : bool;
-  (** invariant: g.proved == true iff
-      exists attempts a in g.attempts, a.obsolete == false and
-      (a = External e and e.result == Valid or
-      a = Transf(gl) and forall g in gl, g.proved)
-  *)
-  mutable observers: (bool -> unit) list;
-  (** observers that wants to be notified by any changes of the proved status *)
-(*
-  mutable external_proofs : external_proof list;
-  mutable transformations : transf list;
-*)
+  mutable external_proofs : (int, proof_attempt) Hashtbl.t;
+  mutable transformations : (int, transf) Hashtbl.t;
 }
 
-and transf = {
-    mutable transf_id : db_ident;
-    mutable transf_data : transf_data;
-    mutable transf_obsolete : bool;
-    mutable subgoals : goal list;
-}
-
+val task_checksum : goal -> string (** checksum *)
+val proved : goal -> bool
+val external_proofs: (string, proof_attempt) Hashtbl.t
+val transformations : (string, transf) Hashtbl.t
 
 let goal_task g = g.task
 let goal_task_checksum g = g.task_checksum

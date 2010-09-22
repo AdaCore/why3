@@ -461,7 +461,7 @@ let rec prover_on_goal p g =
     with Not_found ->
       (* creating a new row *)
       let name = p.prover_name in
-      let prover_row = goals_model#append ~parent:row () in
+      let prover_row = goals_model#prepend ~parent:row () in
       goals_model#set ~row:prover_row ~column:Model.icon_column !image_prover;
       goals_model#set ~row:prover_row ~column:Model.name_column
         (name ^ " " ^ p.prover_version);

@@ -1,5 +1,5 @@
 
-theory Array
+theory Array (* "Theory of arrays" *)
 
   type t 'a 'b
 
@@ -22,28 +22,43 @@ theory Array
 
 end
 
-theory ArrayLength
+theory ArrayLength (* "Theory of arrays with length" *)
+
+(* these arrays
+
+  use import int.Int
 
   use export Array
 
   logic length (t int 'a) : int
+
+  axiom Length_non_negative (* "Array length is always non negative" *):
+    forall a : t int 'a. length a >= 0
 
   axiom Length_set : 
     forall a : t int 'a. forall k : int. forall v : 'a.
     length (set a k v) = length a
 
   logic create_const_length 'a int : t int 'a
+    (* [create_const_length x n] is the array of length n
+       with all cells initialized to x 
+       (not specified if n is negative)
+    *)     
 
   axiom Create_const_length_get : 
     forall b:'a. forall n i:int. get (create_const_length b n) i = b
 
   axiom Create_const_length_length : 
-    forall a : 'a. forall n : int. length (create_const_length a n) = n
+    forall a : 'a. forall n : int. 
+      (* premise needed to guaranty length >= 0 invariant *)
+       n >= 0 -> length (create_const_length a n) = n
 
   logic create_length int : t int 'a
 
   axiom Create_length_length : 
-    forall n : int. length (create_length n : t int 'a) = n
+    forall n : int. 
+      (* premise needed to guaranty length >= 0 invariant *)
+      n >=0 -> length (create_length n : t int 'a) = n
 
 end
 

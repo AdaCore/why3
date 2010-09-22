@@ -387,7 +387,7 @@ IDEMLI = $(addsuffix .mli, $(IDEMODULES))
 IDECMO = $(addsuffix .cmo, $(IDEMODULES))
 IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
-$(IDECMO) $(IDECMX): INCLUDES += -I src/ide
+$(IDECMO) $(IDECMX): INCLUDES += -I src/ide -I +sqlite3
 
 # build targets
 
@@ -712,11 +712,12 @@ clean::
 MODULESTODOC = core/ident core/ty core/term core/decl core/theory \
 	core/env core/task \
 	driver/whyconf driver/driver \
-	transform/introduction
+	transform/introduction \
+	ide/db
 
 FILESTODOC = $(addsuffix .mli, $(addprefix src/, $(MODULESTODOC)))
 
-apidoc:
+apidoc: $(FILESTODOC)
 	mkdir -p apidoc
 	$(OCAMLDOC) -d apidoc -html -keep-code $(INCLUDES) \
 		$(LIBINCLUDES) $(FILESTODOC)
