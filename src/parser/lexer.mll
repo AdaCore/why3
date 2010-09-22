@@ -219,6 +219,8 @@ rule token = parse
       { raise (IllegalCharacter c) }
 
 and comment = parse
+  | "(*)"
+      { comment lexbuf }
   | "*)" 
       { () }
   | "(*" 

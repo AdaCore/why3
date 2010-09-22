@@ -148,6 +148,8 @@ rule token = parse
 		  |(hexadigit+ as i) ("" as f))
     ['p' 'P'] (['-' '+']? digit+ as e)
       { REAL (RConstHexa (i, f, remove_leading_plus e)) }
+  | "(*)"
+      { LEFTPAR_STAR_RIGHTPAR }
   | "(*"
       { comment lexbuf; token lexbuf }
   | "'"
