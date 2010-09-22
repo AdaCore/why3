@@ -30,6 +30,7 @@ let label ?loc s = (s,loc)
 type ident = {
   id_string : string;       (* non-unique name *)
   id_origin : origin;       (* origin of the ident *)
+  id_label  : label list;   (* identifier labels *)
   id_tag    : Hashweak.tag; (* unique magical tag *)
 }
 
@@ -58,17 +59,22 @@ let id_hash id = Hashweak.tag_hash id.id_tag
 let id_register = let r = ref 0 in fun id ->
   { id with id_tag = (incr r; Hashweak.create_tag !r) }
 
-let create_ident name origin = {
+let create_ident name origin labels = {
   id_string = name;
   id_origin = origin;
+  id_label  = labels;
   id_tag    = Hashweak.dummy_tag;
 }
 
-let id_fresh nm = create_ident nm Fresh
-let id_user nm loc = create_ident nm (User loc)
-let id_derive nm id = create_ident nm (Derived id)
-let id_clone id = create_ident id.id_string (Derived id)
-let id_dup id = { id with id_tag = Hashweak.dummy_tag }
+let id_fresh ?(labels = []) nm = create_ident nm Fresh labels
+let id_user ?(labels = []) nm loc = create_ident nm (User loc) labels
+let id_derive ?(labels = []) nm id = create_ident nm (Derived id) labels
+
+let id_clone ?(labels = []) id =
+  create_ident id.id_string (Derived id) (labels @ id.id_label)
+
+let id_dup ?(labels = []) id =
+  create_ident id.id_string id.id_origin (labels @ id.id_label)
 
 let rec id_derived_from i1 i2 = id_equal i1 i2 ||
   (match i1.id_origin with

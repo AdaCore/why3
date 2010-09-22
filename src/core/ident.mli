@@ -30,6 +30,7 @@ val label : ?loc:Loc.position -> string -> label
 type ident = private {
   id_string : string;       (* non-unique name *)
   id_origin : origin;       (* origin of the ident *)
+  id_label  : label list;   (* identifier labels *)
   id_tag    : Hashweak.tag; (* unique magical tag *)
 }
 
@@ -53,19 +54,19 @@ type preid
 val id_register : preid -> ident
 
 (* create a fresh pre-ident *)
-val id_fresh : string -> preid
+val id_fresh : ?labels:(label list) -> string -> preid
 
 (* create a localized pre-ident *)
-val id_user : string -> Loc.position -> preid
+val id_user : ?labels:(label list) -> string -> Loc.position -> preid
 
 (* create a derived pre-ident *)
-val id_derive : string -> ident -> preid
+val id_derive : ?labels:(label list) -> string -> ident -> preid
 
-(* create a derived pre-ident with the same name *)
-val id_clone : ident -> preid
+(* create a derived pre-ident with the same name and labels *)
+val id_clone : ?labels:(label list) -> ident -> preid
 
 (* create a duplicate pre-ident *)
-val id_dup : ident -> preid
+val id_dup : ?labels:(label list) -> ident -> preid
 
 (* id_derived_from i1 i2 <=> i1 is derived from i2 *)
 val id_derived_from : ident -> ident -> bool
