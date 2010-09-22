@@ -34,6 +34,17 @@
 
   let mk_pat p = { pat_loc = loc (); pat_desc = p }
 
+  let add_lab id l = { id with id_lab = l }
+
+  let user_loc fname lnum bol cnum1 cnum2 =
+    let pos = {
+      Lexing.pos_fname = fname;
+      Lexing.pos_lnum = lnum;
+      Lexing.pos_bol = bol;
+      Lexing.pos_cnum = cnum1 }
+    in
+    pos, { pos with Lexing.pos_cnum = cnum2 }
+
   (* FIXME: factorize with parser/parser.mly *)
   let infix s = "infix " ^ s
   let prefix s = "prefix " ^ s
@@ -57,23 +68,23 @@
     mk_apply e
       
   let mk_infix e1 op e2 =
-    let id = { id = infix op; id_loc = loc_i 2 } in
+    let id = { id = infix op; id_lab = []; id_loc = loc_i 2 } in
     mk_expr (mk_apply_id id [e1; e2])
      
   let mk_binop e1 op e2 =
-    let id = { id = op; id_loc = loc_i 2 } in
+    let id = { id = op; id_lab = []; id_loc = loc_i 2 } in
     mk_expr (mk_apply_id id [e1; e2])
      
   let mk_prefix op e1 =
-    let id = { id = prefix op; id_loc = loc_i 1 } in
+    let id = { id = prefix op; id_lab = []; id_loc = loc_i 1 } in
     mk_expr (mk_apply_id id [e1])
 
-  let id_unit () = { id = "unit"; id_loc = loc () }
-  let id_result () = { id = "result"; id_loc = loc () }
-  let id_anonymous () = { id = "_"; id_loc = loc () }
-  let exit_exn () = { id = "%Exit"; id_loc = loc () }
+  let id_unit () = { id = "unit"; id_lab = []; id_loc = loc () }
+  let id_result () = { id = "result"; id_lab = []; id_loc = loc () }
+  let id_anonymous () = { id = "_"; id_lab = []; id_loc = loc () }
+  let exit_exn () = { id = "%Exit"; id_lab = []; id_loc = loc () }
 
-  let id_lt_nat () = Qident { id = "lt_nat"; id_loc = loc () }
+  let id_lt_nat () = Qident { id = "lt_nat"; id_lab = []; id_loc = loc () }
 
   let ty_unit () = Tpure (PPTtyapp ([], Qident (id_unit ())))
 
@@ -116,7 +127,7 @@
 %token UNDERSCORE QUOTE COMMA LEFTPAR RIGHTPAR COLON SEMICOLON
 %token COLONEQUAL ARROW EQUAL LTGT AT DOT LEFTSQ RIGHTSQ
 %token LEFTBLEFTB RIGHTBRIGHTB BAR BARBAR AMPAMP
-%token LEFTPAR_STAR_RIGHTPAR EOF
+%token BACKQUOTE LEFTPAR_STAR_RIGHTPAR EOF
 
 /* Precedences */
 
@@ -187,18 +198,18 @@ list1_decl:
 decl:
 | LOGIC
     { Dlogic $1 }
-| LET lident list1_type_v_binder opt_cast EQUAL triple
-    { Dlet ($2, mk_expr_i 3 (Efun ($3, cast_body $4 $6))) }
-| LET lident EQUAL FUN list1_type_v_binder ARROW triple
-    { Dlet ($2, mk_expr_i 3 (Efun ($5, $7))) }
+| LET lident labels list1_type_v_binder opt_cast EQUAL triple
+    { Dlet (add_lab $2 $3, mk_expr_i 7 (Efun ($4, cast_body $5 $7))) }
+| LET lident labels EQUAL FUN list1_type_v_binder ARROW triple
+    { Dlet (add_lab $2 $3, mk_expr_i 8 (Efun ($6, $8))) }
 | LET REC list1_recfun_sep_and 
     { Dletrec $3 }
-| PARAMETER lident COLON type_v
-    { Dparam ($2, $4) }
-| EXCEPTION uident 
-    { Dexn ($2, None) }
-| EXCEPTION uident OF pure_type
-    { Dexn ($2, Some $4) }
+| PARAMETER lident labels COLON type_v
+    { Dparam (add_lab $2 $3, $5) }
+| EXCEPTION uident labels
+    { Dexn (add_lab $2 $3, None) }
+| EXCEPTION uident labels OF pure_type
+    { Dexn (add_lab $2 $3, Some $5) }
 ;
 
 list1_recfun_sep_and:
@@ -207,16 +218,16 @@ list1_recfun_sep_and:
 ;
 
 recfun:
-| lident list1_type_v_binder opt_cast opt_variant EQUAL triple
-   { $1, $2, $4, cast_body $3 $6 }
+| lident labels list1_type_v_binder opt_cast opt_variant EQUAL triple
+   { add_lab $1 $2, $3, $5, cast_body $4 $7 }
 ;
 
 lident:
-| LIDENT { { id = $1; id_loc = loc () } }
+| LIDENT { { id = $1; id_lab = []; id_loc = loc () } }
 ;
 
 uident:
-| UIDENT { { id = $1; id_loc = loc () } }
+| UIDENT { { id = $1; id_lab = []; id_loc = loc () } }
 ;
 
 ident:
@@ -253,7 +264,7 @@ expr:
    { mk_infix $1 "=" $3 }
 | expr LTGT expr
    { let t = mk_infix $1 "=" $3 in
-     mk_expr (mk_apply_id { id = "notb"; id_loc = loc () } [t]) }
+     mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = loc () } [t]) }
 | expr OP1 expr 
    { mk_infix $1 $2 $3 }
 | expr OP2 expr 
@@ -263,7 +274,7 @@ expr:
 | expr OP4 expr
    { mk_infix $1 $2 $3 }
 | NOT expr %prec prefix_op
-   { mk_expr (mk_apply_id { id = "notb"; id_loc = loc () } [$2]) }
+   { mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = loc () } [$2]) }
 | any_op expr %prec prefix_op
    { mk_prefix $1 $2 }
 | expr COLONEQUAL expr 
@@ -286,8 +297,8 @@ expr:
    { match $2.pat_desc with
        | PPpvar id -> mk_expr (Elet (id, $4, $6))
        | _ -> mk_expr (Ematch ($4, [$2, $6])) }
-| LET lident list1_type_v_binder EQUAL triple IN expr
-   { mk_expr (Elet ($2, mk_expr_i 3 (Efun ($3, $5)), $7)) }
+| LET lident labels list1_type_v_binder EQUAL triple IN expr
+   { mk_expr (Elet (add_lab $2 $3, mk_expr_i 6 (Efun ($4, $6)), $8)) }
 | LET REC list1_recfun_sep_and IN expr
    { mk_expr (Eletrec ($3, $5)) }
 | FUN list1_type_v_binder ARROW triple
@@ -397,9 +408,9 @@ list1_pat_uni:
 ;
 
 pat_uni:
-| pat_arg                { $1 }
-| uqualid list1_pat_arg  { mk_pat (PPpapp ($1, $2)) }
-| pat_uni AS lident      { mk_pat (PPpas ($1, $3)) }
+| pat_arg                   { $1 }
+| uqualid list1_pat_arg     { mk_pat (PPpapp ($1, $2)) }
+| pat_uni AS lident labels  { mk_pat (PPpas ($1, add_lab $3 $4)) }
 ;
 
 list1_pat_arg:
@@ -409,11 +420,9 @@ list1_pat_arg:
 
 pat_arg:
 | UNDERSCORE                { mk_pat (PPpwild) }
-| lident                    { mk_pat (PPpvar $1) }
+| lident labels             { mk_pat (PPpvar (add_lab $1 $2)) }
 | uqualid                   { mk_pat (PPpapp ($1, [])) }
-/*
 | LEFTPAR RIGHTPAR          { mk_pat (PPptuple []) }
-*/
 | LEFTPAR pattern RIGHTPAR  { $2 }
 ;
 
@@ -465,10 +474,8 @@ pure_type_arg_no_paren:
    { PPTtyapp ([], $1) }
 | LEFTPAR pure_type COMMA list1_pure_type_sep_comma RIGHTPAR
    { PPTtuple ($2 :: $4) }
-/*
 | LEFTPAR RIGHTPAR
    { PPTtuple ([]) }
-*/
 ;
 
 list1_pure_type_sep_comma:
@@ -482,17 +489,17 @@ list1_type_v_binder:
 ;
 
 type_v_binder:
-| lident
-   { [$1, None] }
+| lident labels
+   { [add_lab $1 $2, None] }
 | LEFTPAR RIGHTPAR                      
    { [id_anonymous (), Some (ty_unit ())] }
-| LEFTPAR lidents COLON type_v RIGHTPAR
+| LEFTPAR lidents_lab COLON type_v RIGHTPAR
    { List.map (fun i -> (i, Some $4)) $2 }
 ;
 
-lidents:
-| lident         { [$1] }
-| lident lidents { $1 :: $2 }
+lidents_lab:
+| lident labels             { add_lab $1 $2 :: [] }
+| lident labels lidents_lab { add_lab $1 $2 :: $3 }
 ;
 
 type_v:
@@ -500,8 +507,8 @@ type_v:
    { $1 }
 | simple_type_v ARROW type_c
    { Tarrow ([id_anonymous (), Some $1], $3) }
-| lident COLON simple_type_v ARROW type_c
-   { Tarrow ([$1, Some $3], $5) }
+| lident labels COLON simple_type_v ARROW type_c
+   { Tarrow ([add_lab $1 $2, Some $4], $6) }
    /* TODO: we could alllow lidents instead, e.g. x y : int -> ... */
    /*{ Tarrow (List.map (fun x -> x, Some $3) $1, $5) }*/
 ;
@@ -601,6 +608,21 @@ list0_uident_sep_comma:
 list1_uident_sep_comma:
 | uident                              { [$1] }
 | uident COMMA list1_uident_sep_comma { $1 :: $3 }
+;
+
+label:
+| STRING
+   { Ident.label $1 }
+| STRING BACKQUOTE INTEGER BACKQUOTE INTEGER
+         BACKQUOTE INTEGER BACKQUOTE INTEGER BACKQUOTE STRING
+   { let loc = user_loc $11 (int_of_string $3) (int_of_string $5)
+                            (int_of_string $7) (int_of_string $9) in
+     Ident.label ~loc $1 }
+;
+
+labels:
+| /* epsilon */ { [] }
+| label labels  { $1 :: $2 }
 ;
 
 /*

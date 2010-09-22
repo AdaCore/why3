@@ -460,7 +460,7 @@ and dterm_node loc env = function
       let trl = List.map (List.map trigger) trl in
       let id, ty, f = match trigger a with
         | TRterm t ->
-            let id = { id = "fc" ; id_loc = loc } in
+            let id = { id = "fc"; id_lab = []; id_loc = loc } in
             let tyl,ty = List.fold_right (fun (_,uty) (tyl,ty) ->
               let nty = Tyapp (ts_func, [uty;ty]) in ty :: tyl, nty)
               uqu ([],t.dt_ty)
@@ -473,7 +473,7 @@ and dterm_node loc env = function
             in
             id, ty, Fapp (ps_equ, [h;t])
         | TRfmla f ->
-            let id = { id = "pc" ; id_loc = loc } in
+            let id = { id = "pc"; id_lab = []; id_loc = loc } in
             let (uid,uty),uqu = match List.rev uqu with
               | uq :: uqu -> uq, List.rev uqu
               | [] -> assert false

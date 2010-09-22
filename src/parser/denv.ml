@@ -274,6 +274,7 @@ let specialize_lsymbol ~loc s =
 
 let ident_of_vs ~loc vs =
   { id     = vs.vs_name.id_string;
+    id_lab = vs.vs_name.id_label;
     id_loc = match vs.vs_name.id_origin with
       | User loc -> loc
       | _ -> loc }

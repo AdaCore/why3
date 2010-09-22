@@ -36,7 +36,7 @@ type pp_binop =
 type pp_unop =
   | PPnot
 
-type ident = { id : string; id_loc : loc }
+type ident = { id : string; id_lab : label list; id_loc : loc }
 
 type qualid =
   | Qident of ident

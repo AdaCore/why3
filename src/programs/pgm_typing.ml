@@ -117,7 +117,9 @@ and specialize_type_c ~loc htv c =
     dc_post        = specialize_post ~loc htv c.c_post; }
 
 and specialize_binder ~loc htv (vs, tyv) =
-  let id = { id = vs.vs_name.id_string; id_loc = loc } in
+  let id = { id = vs.vs_name.id_string;
+             id_lab = vs.vs_name.id_label;
+             id_loc = loc } in
   id, specialize_type_v ~loc htv tyv
 
 let specialize_global loc x gl =

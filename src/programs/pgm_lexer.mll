@@ -154,6 +154,8 @@ rule token = parse
       { comment lexbuf; token lexbuf }
   | "'"
       { QUOTE }
+  | "`"
+      { BACKQUOTE }
   | ","
       { COMMA }
   | "("

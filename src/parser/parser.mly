@@ -72,6 +72,10 @@
   let infix s = "infix " ^ s
   let prefix s = "prefix " ^ s
 
+  let mk_id id loc = { id = id; id_lab = []; id_loc = loc }
+
+  let add_lab id l = { id with id_lab = l }
+
   let user_loc fname lnum bol cnum1 cnum2 =
     let pos = {
       Lexing.pos_fname = fname;
@@ -164,9 +168,9 @@ list0_theory:
 ;
 
 theory_head:
-| THEORY uident
-   { let id = $2 in
-     let name = Ident.id_user id.id id.id_loc in
+| THEORY uident labels
+   { let id = add_lab $2 $3 and labels = $3 in
+     let name = Ident.id_user ~labels id.id id.id_loc in
      ref_push uc_ref (create_theory name); id }
 ;
 
@@ -226,7 +230,7 @@ decl:
 | META ident list1_meta_arg_sep_comma
     { Meta (loc (), $2, $3) }
 | META STRING list1_meta_arg_sep_comma
-    { Meta (loc (), { id = $2; id_loc = loc_i 2 }, $3) }
+    { Meta (loc (), mk_id $2 (loc_i 2), $3) }
 ;
 
 /* Use and clone */
@@ -286,13 +290,14 @@ list1_type_decl:
 ;
 
 type_decl:
-| lident type_args typedefn
-  { { td_loc = loc (); td_ident = $1; td_params = $2; td_def = $3 } }
+| lident labels type_args typedefn
+  { { td_loc = loc (); td_ident = add_lab $1 $2;
+      td_params = $3; td_def = $4 } }
 ;
 
 type_args:
-| /* epsilon */      { [] }
-| type_var type_args { $1 :: $2 }
+| /* epsilon */             { [] }
+| type_var labels type_args { add_lab $1 $2 :: $3 }
 ;
 
 typedefn:
@@ -308,7 +313,7 @@ typecases:
 ;
 
 typecase:
-| uident params   { (loc_i 1,$1,$2) }
+| uident labels params   { (loc (), add_lab $1 $2, $3) }
 ;
 
 /* Logic declarations */
@@ -319,9 +324,9 @@ list1_logic_decl:
 ;
 
 logic_decl:
-| lident_rich params logic_type_option logic_def_option
-  { { ld_loc = loc (); ld_ident = $1; ld_params = $2;
-      ld_type = $3; ld_def = $4; } }
+| lident_rich labels params logic_type_option logic_def_option
+  { { ld_loc = loc (); ld_ident = add_lab $1 $2;
+      ld_params = $3; ld_type = $4; ld_def = $5 } }
 ;
 
 logic_type_option:
@@ -342,8 +347,9 @@ list1_inductive_decl:
 ;
 
 inductive_decl:
-| lident_rich params inddefn
-  { { in_loc = loc (); in_ident = $1; in_params = $2; in_def = $3 } }
+| lident_rich labels params inddefn
+  { { in_loc = loc (); in_ident = add_lab $1 $2;
+      in_params = $3; in_def = $4 } }
 ;
 
 inddefn:
@@ -357,7 +363,7 @@ indcases:
 ;
 
 indcase:
-| uident COLON lexpr { (loc (),$1,$3) }
+| uident labels COLON lexpr { (loc (), add_lab $1 $2, $4) }
 ;
 
 /* Type expressions */
@@ -414,36 +420,27 @@ lexpr:
 | lexpr OR lexpr
    { infix_pp $1 PPor $3 }
 | lexpr ASYM_OR lexpr
-   { let label = Ident.label "asym_split" in
-     mk_pp (PPnamed (label, infix_pp $1 PPor $3)) }
+   { mk_pp (PPnamed (Ident.label "asym_split", infix_pp $1 PPor $3)) }
 | lexpr AND lexpr
    { infix_pp $1 PPand $3 }
 | lexpr ASYM_AND lexpr
-   { let label = Ident.label "asym_split" in
-     mk_pp (PPnamed (label, infix_pp $1 PPand $3)) }
+   { mk_pp (PPnamed (Ident.label "asym_split", infix_pp $1 PPand $3)) }
 | NOT lexpr
    { prefix_pp PPnot $2 }
 | lexpr EQUAL lexpr
-   { let id = { id = infix "="; id_loc = loc_i 2 } in
-     mk_pp (PPinfix ($1, id, $3)) }
+   { mk_pp (PPinfix ($1, mk_id (infix "=") (loc_i 2), $3)) }
 | lexpr LTGT lexpr
-   { let id = { id = infix "="; id_loc = loc_i 2 } in
-     prefix_pp PPnot (mk_pp (PPinfix ($1, id, $3))) }
+   { prefix_pp PPnot (mk_pp (PPinfix ($1, mk_id (infix "=") (loc_i 2), $3))) }
 | lexpr OP1 lexpr
-   { let id = { id = infix $2; id_loc = loc_i 2 } in
-     mk_pp (PPinfix ($1, id, $3)) }
+   { mk_pp (PPinfix ($1, mk_id (infix $2) (loc_i 2), $3)) }
 | lexpr OP2 lexpr
-   { let id = { id = infix $2; id_loc = loc_i 2 } in
-     mk_pp (PPinfix ($1, id, $3)) }
+   { mk_pp (PPinfix ($1, mk_id (infix $2) (loc_i 2), $3)) }
 | lexpr OP3 lexpr
-   { let id = { id = infix $2; id_loc = loc_i 2 } in
-     mk_pp (PPinfix ($1, id, $3)) }
+   { mk_pp (PPinfix ($1, mk_id (infix $2) (loc_i 2), $3)) }
 | lexpr OP4 lexpr
-   { let id = { id = infix $2; id_loc = loc_i 2 } in
-     mk_pp (PPinfix ($1, id, $3)) }
+   { mk_pp (PPinfix ($1, mk_id (infix $2) (loc_i 2), $3)) }
 | any_op lexpr %prec prefix_op
-   { let id = { id = prefix $1; id_loc = loc_i 2 } in
-     mk_pp (PPapp (Qident id, [$2])) }
+   { mk_pp (PPapp (Qident (mk_id (prefix $1) (loc_i 2)), [$2])) }
 | qualid list1_lexpr_arg
    { mk_pp (PPapp ($1, $2)) }
 | IF lexpr THEN lexpr ELSE lexpr
@@ -460,8 +457,8 @@ lexpr:
    { mk_pp (PPmatch ($2, $5)) }
 | MATCH lexpr COMMA list1_lexpr_sep_comma WITH bar_ match_cases END
    { mk_pp (PPmatch (mk_pp (PPtuple ($2::$4)), $7)) }
-| EPSILON lident COLON primitive_type DOT lexpr
-   { mk_pp (PPeps ($2, $4, $6)) }
+| EPSILON lident labels COLON primitive_type DOT lexpr
+   { mk_pp (PPeps (add_lab $2 $3, $5, $7)) }
 | lexpr COLON primitive_type
    { mk_pp (PPcast ($1, $3)) }
 | lexpr_arg
@@ -491,8 +488,7 @@ lexpr_arg:
 | LEFTPAR lexpr COMMA list1_lexpr_sep_comma RIGHTPAR
    { mk_pp (PPtuple ($2 :: $4)) }
 | OPPREF lexpr_arg
-   { let id = { id = prefix $1; id_loc = loc_i 2 } in
-     mk_pp (PPapp (Qident id, [$2])) }
+   { mk_pp (PPapp (Qident (mk_id (prefix $1) (loc_i 2)), [$2])) }
 ;
 
 quant:
@@ -549,9 +545,9 @@ list1_pat_uni:
 ;
 
 pat_uni:
-| pat_arg                { $1 }
-| uqualid list1_pat_arg  { mk_pat (PPpapp ($1, $2)) }
-| pat_uni AS lident      { mk_pat (PPpas ($1, $3)) }
+| pat_arg                   { $1 }
+| uqualid list1_pat_arg     { mk_pat (PPpapp ($1, $2)) }
+| pat_uni AS lident labels  { mk_pat (PPpas ($1, add_lab $3 $4)) }
 ;
 
 list1_pat_arg:
@@ -561,7 +557,7 @@ list1_pat_arg:
 
 pat_arg:
 | UNDERSCORE                { mk_pat (PPpwild) }
-| lident                    { mk_pat (PPpvar $1) }
+| lident labels             { mk_pat (PPpvar (add_lab $1 $2)) }
 | uqualid                   { mk_pat (PPpapp ($1, [])) }
 | LEFTPAR RIGHTPAR          { mk_pat (PPptuple []) }
 | LEFTPAR pattern RIGHTPAR  { $2 }
@@ -613,11 +609,22 @@ list1_param_var_sep_comma:
 param_var:
 | list1_lident COLON primitive_type
    { List.map (fun id -> (Some id, $3)) $1 }
+| list1_lident label labels list0_lident_labels COLON primitive_type
+   { let l = match List.rev $1 with
+       | i :: l -> add_lab i ($2 :: $3) :: l
+       | [] -> assert false
+     in
+     List.map (fun id -> (Some id, $6)) (List.rev_append l $4) }
 ;
 
 list1_lident:
 | lident               { [$1] }
 | lident list1_lident  { $1 :: $2 }
+;
+
+list0_lident_labels:
+| /* epsilon */                      { [] }
+| lident labels list0_lident_labels  { add_lab $1 $2 :: $3 }
 ;
 
 /* Idents */
@@ -636,17 +643,17 @@ lident_rich:
 | lident
     { $1 }
 | LEFTPAR lident_op RIGHTPAR
-    { { id = infix $2; id_loc = loc () } }
+    { mk_id (infix $2) (loc ()) }
 | LEFTPAR_STAR_RIGHTPAR
-    { { id = infix "*"; id_loc = loc () } }
+    { mk_id (infix "*") (loc ()) }
 | LEFTPAR lident_op UNDERSCORE RIGHTPAR
-    { { id = prefix $2; id_loc = loc () } }
+    { mk_id (prefix $2) (loc ()) }
 | LEFTPAR OPPREF RIGHTPAR
-    { { id = prefix $2; id_loc = loc () } }
+    { mk_id (prefix $2) (loc ()) }
 ;
 
 lident:
-| LIDENT  { { id = $1; id_loc = loc () } }
+| LIDENT { mk_id $1 (loc ()) }
 ;
 
 lident_op:
@@ -665,7 +672,7 @@ any_op:
 ;
 
 uident:
-| UIDENT { { id = $1; id_loc = loc () } }
+| UIDENT { mk_id $1 (loc ()) }
 ;
 
 lq_lident:
@@ -711,6 +718,11 @@ label:
    { let loc = user_loc $11 (int_of_string $3) (int_of_string $5)
                             (int_of_string $7) (int_of_string $9) in
      Ident.label ~loc $1 }
+;
+
+labels:
+| /* epsilon */ { [] }
+| label labels  { $1 :: $2 }
 ;
 
 bar_:
