@@ -72,6 +72,15 @@
   let infix s = "infix " ^ s
   let prefix s = "prefix " ^ s
 
+  let user_loc fname lnum bol cnum1 cnum2 =
+    let pos = {
+      Lexing.pos_fname = fname;
+      Lexing.pos_lnum = lnum;
+      Lexing.pos_bol = bol;
+      Lexing.pos_cnum = cnum1 }
+    in
+    pos, { pos with Lexing.pos_cnum = cnum2 }
+
   let () = Exn_printer.register
     (fun fmt exn -> match exn with
       | Parsing.Parse_error -> Format.fprintf fmt "syntax error"
@@ -98,7 +107,7 @@
 /* symbols */
 
 %token ARROW ASYM_AND ASYM_OR
-%token BAR
+%token BACKQUOTE BAR
 %token COLON COMMA
 %token DOT EQUAL LTGT
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
@@ -441,8 +450,8 @@ lexpr:
    { mk_pp (PPif ($2, $4, $6)) }
 | quant list1_param_var_sep_comma triggers DOT lexpr
    { mk_pp (PPquant ($1, $2, $3, $5)) }
-| STRING lexpr %prec prec_named
-   { mk_pp (PPnamed (Ident.label ~loc:(loc ()) $1, $2)) }
+| label lexpr %prec prec_named
+   { mk_pp (PPnamed ($1, $2)) }
 | LET pattern EQUAL lexpr IN lexpr
    { match $2.pat_desc with
        | PPpvar id -> mk_pp (PPlet (id, $4, $6))
@@ -693,6 +702,16 @@ qualid:
 ;
 
 /* Misc */
+
+label:
+| STRING
+   { Ident.label $1 }
+| STRING BACKQUOTE INTEGER BACKQUOTE INTEGER
+         BACKQUOTE INTEGER BACKQUOTE INTEGER BACKQUOTE STRING
+   { let loc = user_loc $11 (int_of_string $3) (int_of_string $5)
+                            (int_of_string $7) (int_of_string $9) in
+     Ident.label ~loc $1 }
+;
 
 bar_:
 | /* epsilon */ { () }

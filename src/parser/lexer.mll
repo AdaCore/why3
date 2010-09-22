@@ -171,6 +171,8 @@ rule token = parse
       { comment_start_loc := loc lexbuf; comment lexbuf; token lexbuf }
   | "'"
       { QUOTE }
+  | "`"
+      { BACKQUOTE }
   | ","
       { COMMA }
   | "("
