@@ -41,7 +41,7 @@ let debug = Debug.register_flag "program_wp"
 let wp_and ?(sym=false) f1 f2 = 
 (*   if sym then f_and_simp f1 f2 else f_and_simp f1 (f_implies_simp f1 f2)  *)
   let f = f_and_simp f1 f2 in
-  if sym then f else f_label [Split_goal.asym_split] f
+  if sym then f else f_label_add (Split_goal.asym_split) f
 
 let wp_ands ?(sym=false) fl =
   List.fold_left (wp_and ~sym) f_true fl
@@ -58,13 +58,13 @@ let is_arrow_ty env ty = match ty.ty_node with
 
 let wp_forall env v f =
   if is_arrow_ty env v.vs_ty then f else match f.f_node with
-    | Fbinop (Fimplies, {f_node = Fapp (s,[{t_node = Tvar u};r])},h)
-      when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) ->
-        f_subst_single v r h
-    | Fbinop (Fimplies, {f_node = Fbinop (Fand, g,
-                        {f_node = Fapp (s,[{t_node = Tvar u};r])})},h)
-      when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) ->
-        f_subst_single v r (f_implies_simp g h)
+(*     | Fbinop (Fimplies, {f_node = Fapp (s,[{t_node = Tvar u};r])},h) *)
+(*       when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) -> *)
+(*         f_subst_single v r h *)
+(*     | Fbinop (Fimplies, {f_node = Fbinop (Fand, g, *)
+(*                         {f_node = Fapp (s,[{t_node = Tvar u};r])})},h) *)
+(*       when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) -> *)
+(*         f_subst_single v r (f_implies_simp g h) *)
     | _ when f_occurs_single v f ->
         f_forall_close_simp [v] [] f
     | _ ->
@@ -252,6 +252,9 @@ let well_founded_rel = function
 
 (* Recursive computation of the weakest precondition *)
 
+let propose_label l f =
+  if f.f_label = [] then f_label [l] f else f
+
 let rec wp_expr env e q = 
   (* if Debug.test_flag debug then  *)
   (*   eprintf "@[wp_expr: q=%a@]@." Pretty.print_fmla (snd (fst q)); *)
@@ -259,7 +262,7 @@ let rec wp_expr env e q =
   let q = post_map (old_label env lab) q in
   let f = wp_desc env e q in
   let f = erase_label env lab f in
-  f_label [label ~loc:e.expr_loc "WP-loc"] f
+  propose_label (label ~loc:e.expr_loc "WP") f
 
 and wp_desc env e q = match e.expr_desc with
   | Elogic t ->
@@ -276,8 +279,9 @@ and wp_desc env e q = match e.expr_desc with
       wp_and q (wp_binders env bl f)
   | Elet (x, e1, e2) ->
       let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
-      let result = v_result e1.expr_type in
-      let q1 = result, f_subst (subst1 x (t_var result)) w2 in
+      let v1 = v_result e1.expr_type in
+      let t1 = t_label_add (label ~loc:e1.expr_loc "let") (t_var v1) in
+      let q1 = v1, f_subst (subst1 x t1) w2 in
       let q1 = saturate_post e1.expr_effect q1 q in
       wp_expr env e1 q1
   | Eletrec (dl, e1) ->
@@ -291,6 +295,7 @@ and wp_desc env e q = match e.expr_desc with
       let q1 = (* if result=True then w2 else w3 *)
 	let res = v_result e1.expr_type in
 	let test = f_equ (t_var res) (t_True env) in
+	let test = f_label_add (label ~loc:e1.expr_loc "WP") test in
 	let q1 = f_if test w2 w3 in
 	saturate_post e1.expr_effect (res, q1) q
       in
@@ -367,8 +372,10 @@ and wp_desc env e q = match e.expr_desc with
       let w1 = wp_expr env e1 q in
       erase_label env lab w1
   | Eany c ->
+      (* TODO: propagate call labels into c.c_post *)
       let w = opaque_wp env c.c_effect c.c_post q in
-      wp_and c.c_pre w
+      let p = f_label_add (label ~loc:e.expr_loc "call pre") c.c_pre in
+      wp_and p w
 
 and wp_triple env (p, e, q) =
   let f = wp_expr env e q in

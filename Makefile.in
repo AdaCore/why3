@@ -606,6 +606,9 @@ testl: bin/whyml.byte
 	ocamlrun -bt bin/whyml.byte --debug-all tests/test-pgm-jcf.mlw
 	ocamlrun -bt bin/whyml.byte -P alt-ergo tests/test-pgm-jcf.mlw
 
+testl-ide: bin/whyide.opt
+	bin/whyide.opt tests/test-pgm-jcf.mlw
+
 testl-type: bin/whyml.byte
 	ocamlrun -bt bin/whyml.byte --type-only tests/test-pgm-jcf.mlw
 

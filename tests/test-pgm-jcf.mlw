@@ -11,8 +11,16 @@ parameter head : list 'a -> 'a
 
 exception E of 'a
 
+let f x =
+  { x > 0 }
+  assert { x >= 0 };
+  let y = x+1 in
+  assert { y > 1 };
+  ()
+  {}
+
 (*
 Local Variables: 
-compile-command: "unset LANG; make -C .. testl"
+compile-command: "unset LANG; make -C .. testl-ide"
 End: 
 *)

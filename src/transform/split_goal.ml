@@ -43,7 +43,12 @@ let asym_split = Ident.label "asym_split"
 
 let to_split f = List.exists (fun (l,_) -> l = "asym_split") f.f_label
 
-let rec split_pos acc f = match f.f_node with
+let inherit_labels ll f =
+  if f.f_label = [] then f_label ll f else f
+
+let rec split_pos acc f = 
+  let f = f_map (fun t -> t) (inherit_labels f.f_label) f in
+  match f.f_node with
   | Ftrue -> acc
   | Ffalse -> f::acc
   | Fapp _ -> f::acc
@@ -71,7 +76,9 @@ let rec split_pos acc f = match f.f_node with
       apply_append (f_forall_close vsl trl) acc (split_pos [] f)
   | Fquant (Fexists,_) -> f::acc
 
-and split_neg acc f = match f.f_node with
+and split_neg acc f =
+  let f = f_map (fun t -> t) (inherit_labels f.f_label) f in
+  match f.f_node with
   | Ftrue -> f::acc
   | Ffalse -> acc
   | Fapp _ -> f::acc
