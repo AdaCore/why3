@@ -52,7 +52,7 @@ let comp t task =
   | Decl d -> add_decl task (decl_map fnT fnF d)
   | _ -> add_tdecl task t.task_decl
 
-let compile_match = Trans.map comp None
+let compile_match = Trans.fold comp None
 
 (** Eliminate algebraic types and match statements *)
 

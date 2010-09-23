@@ -21,8 +21,12 @@ open Ident
 open Term
 open Decl
 
-let apply_append  fn = List.fold_left (fun l e -> fn e :: l)
-let apply_append2 fn = Util.list_fold_product (fun l e1 e2 -> fn e1 e2 :: l)
+let apply_append fn acc l =
+  List.fold_left (fun l e -> fn e :: l) acc (List.rev l)
+
+let apply_append2 fn acc l1 l2 =
+  Util.list_fold_product (fun l e1 e2 -> fn e1 e2 :: l)
+    acc (List.rev l1) (List.rev l2)
 
 let split_case spl c acc tl bl =
   let bl = List.rev_map f_open_branch bl in
@@ -50,14 +54,14 @@ let rec split_pos acc f = match f.f_node with
   | Fbinop (Fimplies,f1,f2) ->
       apply_append2 f_implies acc (split_neg [] f1) (split_pos [] f2)
   | Fbinop (Fiff,f1,f2) ->
-      split_pos (split_pos acc (f_implies f1 f2)) (f_implies f2 f1)
+      split_pos (split_pos acc (f_implies f2 f1)) (f_implies f1 f2)
   | Fbinop (For,f1,f2) ->
       apply_append2 f_or acc (split_pos [] f1) (split_pos [] f2)
   | Fnot f ->
       apply_append f_not acc (split_neg [] f)
   | Fif (fif,fthen,felse) ->
-      split_pos (split_pos acc (f_implies fif fthen)) 
-        (f_implies (f_not fif) felse)
+      split_pos (split_pos acc (f_implies (f_not fif) felse))
+        (f_implies fif fthen)
   | Flet (t,fb) -> let vs,f = f_open_bound fb in
       apply_append (f_let_close vs t) acc (split_pos [] f)
   | Fcase (tl,bl) ->
@@ -78,7 +82,7 @@ and split_neg acc f = match f.f_node with
   | Fbinop (Fimplies,f1,f2) ->
       split_neg (split_neg acc f2) (f_not f1)
   | Fbinop (Fiff,f1,f2) ->
-      split_neg (split_neg acc (f_and (f_not f1) (f_not f2))) (f_and f2 f1)
+      split_neg (split_neg acc (f_and (f_not f1) (f_not f2))) (f_and f1 f2)
   | Fbinop (For,f1,f2) when to_split f ->
       split_neg (split_neg acc (f_and (f_not f1) f2)) f1
   | Fbinop (For,f1,f2) ->
@@ -86,7 +90,7 @@ and split_neg acc f = match f.f_node with
   | Fnot f ->
       apply_append f_not acc (split_pos [] f)
   | Fif (fif,fthen,felse) ->
-      split_neg (split_neg acc (f_and fif fthen)) (f_and (f_not fif) felse)
+      split_neg (split_neg acc (f_and (f_not fif) felse)) (f_and fif fthen)
   | Flet (t,fb) -> let vs,f = f_open_bound fb in
       apply_append (f_let_close vs t) acc (split_neg [] f)
   | Fcase (tl,bl) ->

@@ -82,11 +82,8 @@ let fold fn v =
 
 let fold_l fn v = fold (fun task -> list_apply (fn task)) [v]
 
-let fold_map   fn v t = conv_res snd                (fold   fn (v, t))
-let fold_map_l fn v t = conv_res (List.rev_map snd) (fold_l fn (v, t))
-
-let map   fn = fold   (fun t1 t2 -> fn t1 t2)
-let map_l fn = fold_l (fun t1 t2 -> fn t1 t2)
+let fold_map   fn v t = conv_res snd            (fold   fn (v, t))
+let fold_map_l fn v t = conv_res (List.map snd) (fold_l fn (v, t))
 
 let gen_decl add fn =
   let fn = Wdecl.memoize 63 fn in
@@ -94,15 +91,15 @@ let gen_decl add fn =
     | Decl d -> List.fold_left add acc (fn d)
     | _ -> add_tdecl acc task.task_decl
   in
-  map fn
+  fold fn
 
 let gen_decl_l add fn =
   let fn = Wdecl.memoize 63 fn in
   let fn task acc = match task.task_decl.td_node with
-    | Decl d -> List.rev_map (List.fold_left add acc) (fn d)
+    | Decl d -> List.map (List.fold_left add acc) (fn d)
     | _ -> [add_tdecl acc task.task_decl]
   in
-  map_l fn
+  fold_l fn
 
 let decl    = gen_decl   add_decl
 let decl_l  = gen_decl_l add_decl
@@ -114,26 +111,16 @@ let apply_to_goal fn d = match d.d_node with
   | _ -> assert false
 
 let gen_goal add fn =
-  let fn = Wdecl.memoize 5 (apply_to_goal fn) in
-  let rec pass task = match task with
+  let fn = Wdecl.memoize 5 (apply_to_goal fn) in function
     | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
         List.fold_left add prev (fn d)
-    | Some { task_decl = td; task_prev = prev } ->
-        add_tdecl (pass prev) td
     | _ -> assert false
-  in
-  pass
 
 let gen_goal_l add fn =
-  let fn = Wdecl.memoize 5 (apply_to_goal fn) in
-  let rec pass task = match task with
+  let fn = Wdecl.memoize 5 (apply_to_goal fn) in function
     | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
-        List.rev_map (List.fold_left add prev) (fn d)
-    | Some { task_decl = td; task_prev = prev } ->
-        List.rev_map (fun task -> add_tdecl task td) (pass prev)
+        List.map (List.fold_left add prev) (fn d)
     | _ -> assert false
-  in
-  pass
 
 let goal    = gen_goal   add_decl
 let goal_l  = gen_goal_l add_decl

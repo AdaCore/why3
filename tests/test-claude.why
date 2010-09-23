@@ -17,7 +17,9 @@ theory TestInt
 
    goal Test5: forall x:int. x <> 0 -> x*x > 0
 
-   goal Test6: 2+3 = 5 and forall x:int. x*x >= 0
+   goal Test6: 2+3 = 5 and (forall x:int. x*x >= 0)
+
+   goal Test7: 0 = 1 /\ 2 = 3 /\ 4 = 5 /\ 6 = 7
 
 end
 

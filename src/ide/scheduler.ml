@@ -73,7 +73,6 @@ let event_handler () =
           (*
             eprintf "[Why thread] Scheduler.event_handler: got prover answer@.";
           *)
-          (* TODO: update database *)
           (* call GUI callback with argument [res] *)
           !async (fun () -> callback res time output) ()
       | Editor_exited callback ->
@@ -86,7 +85,6 @@ let event_handler () =
       let (callback,transf,task) = Queue.pop transf_queue in
       Mutex.unlock queue_lock;
       let subtasks : Task.task list = Trans.apply transf task in
-      (* TODO: update database *)
       (* call GUI back given new subgoals *)
       !async (fun () -> callback subtasks) ()
     with Queue.Empty ->

@@ -65,7 +65,8 @@ let map_join_left map join = function
   | x :: xl -> List.fold_left (fun acc x -> join acc (map x)) (map x) xl
   | _ -> raise (Failure "map_join_left")
 
-let list_apply f = List.fold_left (fun acc x -> List.rev_append (f x) acc) []
+let list_apply f l =
+  List.rev (List.fold_left (fun acc x -> List.rev_append (f x) acc) [] l)
 
 let list_fold_product f acc l1 l2 =
   List.fold_left
@@ -79,7 +80,8 @@ let list_fold_product_l f acc ll =
   let ll = List.rev ll in
   let rec aux acc le = function
     | [] -> f acc le
-    | l::ll -> List.fold_left (fun acc e -> aux acc (e::le) ll) acc l in
+    | l::ll -> List.fold_left (fun acc e -> aux acc (e::le) ll) acc l
+  in
   aux acc [] ll
 
 let list_compare cmp l1 l2 = match l1,l2 with

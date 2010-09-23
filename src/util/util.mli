@@ -54,6 +54,7 @@ val list_all2 : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool
 val map_join_left : ('a -> 'b) -> ('b -> 'b -> 'b) -> 'a list -> 'b
 
 val list_apply : ('a -> 'b list) -> 'a list -> 'b list
+(** [list_apply f [a1;..;an] returns (f a1)@...@(f an) *)
 
 val list_fold_product :
   ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
