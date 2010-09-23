@@ -1678,6 +1678,7 @@ and f_subst_fmla_alpha f1 f2 f = if f_equal_alpha f f1 then f2 else
 let f_not_simp f = match f.f_node with
   | Ftrue  -> f_false
   | Ffalse -> f_true
+  | Fnot f -> f
   | _      -> f_not f
 
 let f_and_simp f1 f2 = match f1.f_node, f2.f_node with
@@ -1726,9 +1727,9 @@ let t_if_simp f t1 t2 = match f.f_node with
 let f_if_simp f1 f2 f3 = match f1.f_node, f2.f_node, f3.f_node with
   | Ftrue, _, _  -> f2
   | Ffalse, _, _ -> f3
-  | _, Ftrue, _  -> f_or_simp f1 f3
-  | _, Ffalse, _ -> f_and_simp (f_not f1) f3
-  | _, _, Ftrue  -> f_or_simp  (f_not f1) f2
+  | _, Ftrue, _  -> f_implies_simp (f_not_simp f1) f3
+  | _, Ffalse, _ -> f_and_simp (f_not_simp f1) f3
+  | _, _, Ftrue  -> f_implies_simp f1 f2
   | _, _, Ffalse -> f_and_simp f1 f2
   | _, _, _      -> if f_equal f2 f3 then f2 else f_if f1 f2 f3
 

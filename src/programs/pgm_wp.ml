@@ -381,12 +381,35 @@ and wp_recfun env (_, bl, _var, t) =
 let wp env e = 
   wp_expr env e (default_post e.expr_type e.expr_effect)
 
+let rec t_btop env t = match t.t_node with
+  | Tif (f,t1,t2) -> let f = f_btop env f in
+      f_label t.t_label (f_if_simp f (t_btop env t1) (t_btop env t2))
+  | Tapp (ls, [t1;t2]) when ls_equal ls env.ls_andb ->
+      f_label t.t_label (f_and_simp (t_btop env t1) (t_btop env t2))
+  | Tapp (ls, [t1;t2]) when ls_equal ls env.ls_orb ->
+      f_label t.t_label (f_or_simp (t_btop env t1) (t_btop env t2))
+  | Tapp (ls, [t1]) when ls_equal ls env.ls_notb ->
+      f_label t.t_label (f_not_simp (t_btop env t1))
+  | Tapp (ls, []) when ls_equal ls env.ls_True ->
+      f_label t.t_label f_true
+  | Tapp (ls, []) when ls_equal ls env.ls_False ->
+      f_label t.t_label f_false
+  | _ ->
+      f_equ t (t_True env)
+
+and f_btop env f = match f.f_node with
+  | Fapp (ls, [{t_ty = {ty_node = Tyapp (ts, [])}} as l; r])
+  when ls_equal ls ps_equ && ts_equal ts env.ts_bool ->
+      f_label_copy f (f_iff_simp (t_btop env l) (t_btop env r))
+  | _ -> f_map (fun t -> t) (f_btop env) f
+
 let add_wp_decl l f env =
   let s = "WP_" ^ l.ls_name.id_string in
   let id = match id_from_user l.ls_name with
     | None -> id_fresh s
     | Some loc -> id_user s loc
   in
+  let f = f_btop env f in
   let pr = create_prsymbol id in
   let d = create_prop_decl Pgoal pr f in
   add_decl d env

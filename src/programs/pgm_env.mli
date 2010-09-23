@@ -54,6 +54,7 @@ type env = private {
   ls_False: lsymbol;
   ls_andb : lsymbol;
   ls_orb  : lsymbol;
+  ls_notb : lsymbol;
   ls_unit : lsymbol;
 }
 
