@@ -31,7 +31,7 @@ type assertion_kind = Aassert | Aassume | Acheck
 
 type lazy_op = LazyAnd | LazyOr
 
-type logic = Lexing.position * string
+type logic = Loc.position * string
 
 type lexpr = logic
 

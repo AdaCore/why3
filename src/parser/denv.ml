@@ -296,10 +296,12 @@ and specialize_pattern_node ~loc htv = function
       Por (specialize_pattern ~loc htv p, specialize_pattern ~loc htv q)
 
 let rec specialize_term ~loc htv t =  
-  { dt_node = specialize_term_node  ~loc htv t.t_node;
-    dt_ty   = specialize_ty         ~loc htv t.t_ty; }
+  let dt = 
+    { dt_node = specialize_term_node  ~loc htv t.t_node;
+      dt_ty   = specialize_ty         ~loc htv t.t_ty; }
+  in
+  List.fold_left (fun t l -> { t with dt_node = Tnamed (l, t) }) dt t.t_label
 
-(* TODO: labels are lost *)
 and specialize_term_node ~loc htv = function
   | Term.Tbvar _ ->
       assert false
@@ -327,7 +329,11 @@ and specialize_term_node ~loc htv = function
 	    specialize_fmla ~loc htv f)
 
 (* TODO: labels are lost *)
-and specialize_fmla ~loc htv f = match f.f_node with
+and specialize_fmla ~loc htv f = 
+  let df = specialize_fmla_node ~loc htv f.f_node in
+  List.fold_left (fun f l -> Fnamed (l, f)) df f.f_label
+
+and specialize_fmla_node ~loc htv = function
   | Term.Fapp (ls, tl) ->
       Fapp (ls, List.map (specialize_term ~loc htv) tl)
   | Term.Fquant (q, fq) ->

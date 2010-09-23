@@ -174,9 +174,12 @@ let parse_string f loc s =
   reloc loc lb;
   f lb
 
-let logic_lexpr (loc, s) = parse_string Lexer.parse_lexpr loc s
+let logic_lexpr ((pos, _) as loc, s) = 
+  let e = parse_string Lexer.parse_lexpr pos s in
+  let lab = Ident.label ~loc "annotation" in
+  { e with Ptree.pp_desc = Ptree.PPnamed (lab, e) }
 
-let logic_decls (loc, s) e env =
+let logic_decls ((loc, _), s) e env =
   let parse = Lexer.parse_list0_decl e Mnm.empty env.uc in
   { env with uc = parse_string parse loc s }
 

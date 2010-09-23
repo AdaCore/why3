@@ -185,10 +185,10 @@ rule token = parse
   | "{"
       { logic_start_loc := loc lexbuf; 
 	let s = logic lexbuf in
-	LOGIC (fst !logic_start_loc, s) }
+	LOGIC ((fst !logic_start_loc, snd (loc lexbuf)), s) }
   (* FIXME: allow newlines as well *)
   | "{" space* "}"
-      { LOGIC (lexeme_start_p lexbuf, "true") }
+      { LOGIC (loc lexbuf, "true") }
   | "{{"
       { LEFTBLEFTB }
   | "}}"

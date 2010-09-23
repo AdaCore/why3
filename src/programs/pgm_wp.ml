@@ -258,7 +258,8 @@ let rec wp_expr env e q =
   let lab = fresh_label env in
   let q = post_map (old_label env lab) q in
   let f = wp_desc env e q in
-  erase_label env lab f
+  let f = erase_label env lab f in
+  f_label [label ~loc:e.expr_loc "WP-loc"] f
 
 and wp_desc env e q = match e.expr_desc with
   | Elogic t ->

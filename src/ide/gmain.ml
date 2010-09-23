@@ -874,9 +874,12 @@ let move_to_line (v : GSourceView2.source_view) line =
 let orange_bg = source_view#buffer#create_tag 
   ~name:"orange_bg" [`BACKGROUND "orange"] 
 
+let erase_color_loc (v:GSourceView2.source_view) =
+  let buf = v#buffer in
+  buf#remove_tag orange_bg ~start:buf#start_iter ~stop:buf#end_iter
+
 let color_loc (v:GSourceView2.source_view) l b e =
   let buf = v#buffer in
-  buf#remove_tag orange_bg ~start:buf#start_iter ~stop:buf#end_iter;
   let top = buf#start_iter in
   let start = top#forward_lines (l-1) in
   let start = start#forward_chars b in
@@ -893,6 +896,7 @@ let scroll_to_id id =
 	    current_file := f;
 	  end;
 	move_to_line source_view (l-1);
+	erase_color_loc source_view;
 	color_loc source_view l b e
     | Ident.Fresh -> 
 	source_view#source_buffer#set_text "Fresh ident (no position available)\n";
@@ -901,10 +905,33 @@ let scroll_to_id id =
 	source_view#source_buffer#set_text "Derived ident (no position available)\n";
 	current_file := ""
 
+let color_label = function
+  | _, Some loc when (fst loc).Lexing.pos_fname = !current_file ->
+      let _, l, b, e = Loc.extract loc in
+      color_loc source_view l b e
+  | _ ->
+      ()
+
+let rec color_f_labels () f =
+  List.iter color_label f.Term.f_label;
+  Term.f_fold color_t_labels color_f_labels () f
+
+and color_t_labels () t =
+  List.iter color_label t.Term.t_label;
+  Term.t_fold color_t_labels color_f_labels () t
+
 let scroll_to_source_goal g =
   let t = g.Model.task in
   let id = (Task.task_goal t).Decl.pr_name in
-  scroll_to_id id
+  scroll_to_id id;
+  match t with
+    | Some 
+	{ Task.task_decl = 
+	    { Theory.td_node = 
+		Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f) }}} ->
+	color_f_labels () f
+    | _ ->
+	assert false
 
 let scroll_to_theory th = 
   let t = th.Model.theory in

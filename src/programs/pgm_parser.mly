@@ -88,8 +88,8 @@
 
   let ty_unit () = Tpure (PPTtyapp ([], Qident (id_unit ())))
 
-  let lexpr_true () = symbol_start_pos (), "true"
-  let lexpr_false () = symbol_start_pos (), "false"
+  let lexpr_true () = loc (), "true"
+  let lexpr_false () = loc (), "false"
 
   let empty_effect = { pe_reads = []; pe_writes = []; pe_raises = [] }
 
@@ -112,7 +112,7 @@
 %token <string> OP1 OP2 OP3 OP4 OPPREF
 %token <Why.Ptree.real_constant> REAL
 %token <string> STRING
-%token <Lexing.position * string> LOGIC
+%token <Why.Loc.position * string> LOGIC
 
 /* keywords */
 
