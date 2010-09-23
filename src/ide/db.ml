@@ -240,7 +240,18 @@ let subgoals t = t.subgoals
 
 
 type theory 
+
+let theory_name _ = assert false
+let goals _ = assert false
+let verified _ = assert false
+
+let init_base _ = assert false
+let files _ = assert false
+
 type file 
+
+let file_name _ = assert false
+let theories _ = assert false
 
 
 
@@ -1064,23 +1075,26 @@ let root_goals () =
 *)
 
 
-let add_file _ = assert false
-let add_theory _ = assert false
-let add_goal _ = assert false
-let add_transformation _ = assert false
-let set_edited_as _ = assert false
-let set_obsolete _ = assert false
-let set_status _ = assert false
-let add_proof_attempt _ = assert false
-let prover_from_name _ = assert false
+
+let prover_from_name n = 
+  let db = current () in
+  try ProverId.get db n 
+  with Not_found -> ProverId.add db n
+
+let transf_from_name _n = assert false
+
 exception AlreadyExist 
-let files _ = assert false
-let init_base _ = assert false
-let theories _ = assert false
-let file_name _ = assert false
-let verified _ = assert false
-let goals _ = assert false
-let theory_name _ = assert false
+
+let add_proof_attempt _ = assert false
+
+let set_status _ = assert false
+
+let set_obsolete _ = assert false
+let set_edited_as _ = assert false
+let add_transformation _ = assert false
+let add_goal _ = assert false
+let add_theory _ = assert false
+let add_file _ = assert false
 
 
 (*

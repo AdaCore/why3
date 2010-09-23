@@ -120,10 +120,15 @@ val files : unit -> file list
 
 exception AlreadyExist
 
-(** {3 provers} *)
+(** {3 prover id} *)
 val prover_from_name : string -> prover_id
 (** retrieves existing prover id from its name.
     creates prover id if not existing yet *)
+
+(** {3 transf id} *)
+val transf_from_name : string -> transf_id
+(** retrieves existing transformation id from its name.
+    creates it if not existing yet *)
 
 (** {3 external proof attempts} *)
 
