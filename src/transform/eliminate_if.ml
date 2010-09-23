@@ -95,7 +95,7 @@ and elim_f sign f = match f.f_node with
       let f1n = elim_f (not sign) f1 in
       let f2 = elim_f sign f2 in
       let f3 = elim_f sign f3 in
-      if sign then f_and (f_implies f1n f2) (f_or f1p f3)
+      if sign then f_and (f_implies f1n f2) (f_implies (f_not f1p) f3)
               else f_or (f_and f1p f2) (f_and (f_not f1n) f3)
   | _ ->
       f_map_sign elim_t elim_f sign f

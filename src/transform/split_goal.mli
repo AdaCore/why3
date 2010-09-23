@@ -20,7 +20,12 @@
 val asym_split : Ident.label
 
 val split_pos : Term.fmla list -> Term.fmla -> Term.fmla list
+(** [split_pos l f] returns a list [g1;..;gk] @ l such that
+ f is logically equivalent to g1 /\ .. /\ gk *)
+
 val split_neg : Term.fmla list -> Term.fmla -> Term.fmla list
+(** [split_neg l f] returns a list [g1;..;gk] @ l such that
+ f is logically equivalent to g1 \/ .. \/ gk *)
 
 val split_goal : Task.task Trans.tlist
 val split_all  : Task.task Trans.tlist

@@ -1064,23 +1064,23 @@ let root_goals () =
 *)
 
 
-let add_file = assert false
-let add_theory = assert false
-let add_goal = assert false
-let add_transformation = assert false
-let set_edited_as = assert false
-let set_obsolete = assert false
-let set_status = assert false
-let add_proof_attempt = assert false
-let prover_from_name = assert false
+let add_file _ = assert false
+let add_theory _ = assert false
+let add_goal _ = assert false
+let add_transformation _ = assert false
+let set_edited_as _ = assert false
+let set_obsolete _ = assert false
+let set_status _ = assert false
+let add_proof_attempt _ = assert false
+let prover_from_name _ = assert false
 exception AlreadyExist 
-let files = assert false
-let init_base = assert false
-let theories = assert false
-let file_name = assert false
-let verified = assert false
-let goals = assert false
-let theory_name = assert false
+let files _ = assert false
+let init_base _ = assert false
+let theories _ = assert false
+let file_name _ = assert false
+let verified _ = assert false
+let goals _ = assert false
+let theory_name _ = assert false
 
 
 (*

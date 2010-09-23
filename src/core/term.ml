@@ -1242,7 +1242,7 @@ let f_map_sign fnT fnF sign f = f_label_copy f (match f.f_node with
       let f1p = fnF sign f1 in let f1n = fnF (not sign) f1 in
       let f2 = fnF sign f2 in let f3 = fnF sign f3 in
       if f_equal f1p f1n then f_if f1p f2 f3 else if sign
-        then f_and (f_implies f1n f2) (f_or f1p f3)
+        then f_and (f_implies f1n f2) (f_implies (f_not f1p) f3)
         else f_or (f_and f1p f2) (f_and (f_not f1n) f3)
   | _ -> f_map fnT (fnF sign) f)
 

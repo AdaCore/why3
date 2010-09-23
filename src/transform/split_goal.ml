@@ -56,7 +56,8 @@ let rec split_pos acc f = match f.f_node with
   | Fnot f ->
       apply_append f_not acc (split_neg [] f)
   | Fif (fif,fthen,felse) ->
-      split_pos (split_pos acc (f_implies fif fthen)) (f_or fif felse)
+      split_pos (split_pos acc (f_implies fif fthen)) 
+        (f_implies (f_not fif) felse)
   | Flet (t,fb) -> let vs,f = f_open_bound fb in
       apply_append (f_let_close vs t) acc (split_pos [] f)
   | Fcase (tl,bl) ->
