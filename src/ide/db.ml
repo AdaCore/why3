@@ -116,6 +116,7 @@ let bind db sql l =
       1 l
   in stmt
 
+(*
 let stmt_column_INT stmt i msg =
   match Sqlite3.column stmt i with
     | Sqlite3.Data.INT i -> i
@@ -130,6 +131,7 @@ let stmt_column_TEXT stmt i msg =
   match Sqlite3.column stmt i with
     | Sqlite3.Data.TEXT i -> i
     | _ -> failwith msg
+*)
 
 let stmt_column_int stmt i msg =
   match Sqlite3.column stmt i with
@@ -149,29 +151,56 @@ let stmt_column_bool stmt i msg =
     | Sqlite3.Data.INT i -> bool_from_int64 i
     | _ -> failwith msg
 
+let stmt_column_string stmt i msg =
+  match Sqlite3.column stmt i with
+    | Sqlite3.Data.TEXT i -> i
+    | _ -> failwith msg
+
 (** Data *)
 
-type db_ident = int64 
+type prover_id =
+    { prover_id : int;
+      prover_name : string;
+    }
 
-type proof_attempt_status =
+let prover_name p = p.prover_name
+
+module Hprover = Hashtbl.Make
+  (struct
+     type t = prover_id
+     let equal p1 p2 = p1.prover_id == p2.prover_id
+     let hash p = Hashtbl.hash p.prover_id
+   end)
+
+type transf_id =
+    { transf_id : int;
+      transf_name : string;
+    }
+
+let transf_name t = t.transf_name
+
+module Htransf = Hashtbl.Make
+  (struct
+     type t = transf_id
+     let equal t1 t2 = t1.transf_id == t2.transf_id
+     let hash t = Hashtbl.hash t.transf_id
+   end)
+
+
+
+
+type proof_status =
   | Success (** external proof attempt succeeded *)
   | Timeout (** external proof attempt was interrupted *)
   | Unknown (** external prover answered ``don't know'' or equivalent *)
   | Failure (** external prover call failed *)
 
-type prover =
-    { prover_id : db_ident;
-      prover_name : string;
-    }
-
-let prover_id p = p.prover_name
-
 type proof_attempt = {
-    mutable external_proof_id : db_ident;
-    mutable prover : db_ident;
+    mutable proof_attempt_id : int;
+    mutable prover : prover_id;
     mutable timelimit : int;
     mutable memlimit : int;
-    mutable status : proof_attempt_status;
+    mutable status : proof_status;
     mutable result_time : float;
     mutable edited_as : string;
     mutable proof_obsolete : bool;
@@ -184,40 +213,39 @@ let time p = p.result_time
 let edited_as p = p.edited_as
 
 type transf =
-    { mutable transf_id : db_ident;
-      mutable transf_name : string;
-      mutable transf_subgoals : goal list;
+    { mutable transf_id : transf_id;
+      mutable subgoals : goal list;
     }
 
 and goal = {
-  mutable goal_id : db_ident;
+  mutable goal_id : int;
   mutable task_checksum: string;
   mutable proved : bool;
-  mutable external_proofs : (int, proof_attempt) Hashtbl.t;
-  mutable transformations : (int, transf) Hashtbl.t;
+  mutable external_proofs : proof_attempt Hprover.t;
+  mutable transformations : transf Htransf.t;
 }
 
-val task_checksum : goal -> string (** checksum *)
-val proved : goal -> bool
-val external_proofs: (string, proof_attempt) Hashtbl.t
-val transformations : (string, transf) Hashtbl.t
+(** goal accessors *)
 
-let goal_task g = g.task
-let goal_task_checksum g = g.task_checksum
-let goal_proved g = g.proved
+let task_checksum g = g.task_checksum
+let proved g = g.proved
+let external_proofs g = g.external_proofs
+let transformations g = g.transformations
 
-let transf_data t = t.transf_data
-let transf_obsolete t = t.transf_obsolete
+(** transf accessors *)
+
+let transf_id t = t.transf_id
 let subgoals t = t.subgoals
 
-let rec string_from_origin o =
-  match o with
-    | Goal(t,n) -> t ^ "." ^ n
-    
-let goal_name g = string_from_origin g.goal_origin
-  
 
-module Driver = struct
+
+type theory 
+type file 
+
+
+
+
+module ProverId = struct
 
   let init db =
     let sql = 
@@ -248,7 +276,8 @@ module Driver = struct
          let stmt = bind db sql [ Sqlite3.Data.TEXT name ] in
          db_must_done db (fun () -> Sqlite3.step stmt);
          let new_id = Sqlite3.last_insert_rowid db.raw_db in
-         { prover_id = new_id ; prover_name = name })
+         { prover_id = Int64.to_int new_id ; 
+	   prover_name = name })
 
   let get db name =
     let sql =
@@ -258,15 +287,8 @@ module Driver = struct
     let stmt = bind db sql [Sqlite3.Data.TEXT name] in
     (* convert statement into record *)
     let of_stmt stmt =
-      { prover_id =
-	  (match Sqlite3.column stmt 0 with
-            | Sqlite3.Data.INT i -> i 
-	    | x -> 
-		try Int64.of_string (Sqlite3.Data.to_string x)
-		with _ -> failwith "Db.Driver.get") ;
-	prover_name =
-	  (match Sqlite3.column stmt 1 with
-	    | x -> Sqlite3.Data.to_string x)
+      { prover_id = stmt_column_int stmt 0 "ProverId.get: bad prover id";
+	prover_name = stmt_column_string stmt 1 "ProverId.get: bad prover name";
       }
     in 
     (* execute the SQL query *)
@@ -283,9 +305,9 @@ module Driver = struct
     let stmt = bind db sql [Sqlite3.Data.INT id] in
     (* convert statement into record *)
     let of_stmt stmt =
-      { prover_id = id ;
-	prover_name = stmt_column_TEXT stmt 1 
-          "Driver.from_id: bad prover_name";
+      { prover_id = Int64.to_int id ;
+	prover_name = stmt_column_string stmt 1 
+          "ProverId.from_id: bad prover_name";
       }
     in 
     (* execute the SQL query *)
@@ -296,6 +318,7 @@ module Driver = struct
 
 end
 
+(*
 let prover_memo = Hashtbl.create 7
 
 let get_prover_from_id id =
@@ -304,7 +327,7 @@ let get_prover_from_id id =
   with Not_found ->
     let p =
       let db = current () in
-      try Driver.from_id db id
+      try ProverId.from_id db id
       with Not_found -> assert false
     in
     Hashtbl.add prover_memo id p;
@@ -317,13 +340,14 @@ let get_prover name (* ~short ~long ~command ~driver *) =
 (*
   let checksum = Digest.file driver in
 *)
-  try Driver.get db name (* ~short ~long ~command ~checksum *)
+  try ProverId.get db name (* ~short ~long ~command ~checksum *)
   with Not_found -> 
-    Driver.add db name (* ~short ~long ~command ~checksum *)
+    ProverId.add db name (* ~short ~long ~command ~checksum *)
  
+*)
 	
 
-
+(*
 module Loc = struct
 
   let init db =
@@ -494,23 +518,22 @@ module Loc = struct
 
 end
 
+*)
+
 let int64_from_status = function
-  | Scheduled -> 1L
-  | Running -> 2L
-  | Success -> 3L
-  | Timeout -> 4L
-  | Unknown -> 5L
-  | HighFailure -> 6L
+  | Success -> 1L
+  | Timeout -> 2L
+  | Unknown -> 3L
+  | Failure -> 4L
 
 let status_from_int64 i = 
-  if i=1L then Scheduled else
-    if i=2L then Running else
-      if i=3L then Success else
-        if i=4L then Timeout else
-          if i=5L then Unknown else
-            if i=6L then HighFailure else
-              failwith "Db.status_from_int64"
+  if i=1L then Success else
+    if i=2L then Timeout else
+      if i=3L then Unknown else
+        if i=4L then Failure else
+          failwith "Db.status_from_int64"
 
+(*
 
 module External_proof = struct
 
@@ -675,11 +698,11 @@ module External_proof = struct
 	   })
    
 end
+*)
 
 
 
-
-
+(*
 module Goal = struct
   
   type t = goal
@@ -819,11 +842,19 @@ module Goal = struct
 
 end
 
+*)
+
+(*
 
 let external_proofs g = 
   Goal.get_all_external_proofs (current ()) g
 
 let transformations _g = assert false
+
+*)
+
+
+(*
 
 module Transf = struct
 
@@ -977,7 +1008,10 @@ module Transf = struct
 
 end
 
+*)
 
+
+(*
 
 module Main = struct
 
@@ -995,6 +1029,9 @@ module Main = struct
 
 end
 
+*)
+
+(*
 let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
   match !current_db with
     | None ->
@@ -1006,7 +1043,7 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
         } 
 	in
 	current_db := Some db;
-	Driver.init db;
+	ProverId.init db;
 	Loc.init db;
 	External_proof.init db;
 	Goal.init db;
@@ -1024,104 +1061,30 @@ let root_goals () =
   let l = Main.all_root_goals db in
   List.rev_map (Goal.from_id db) l
     
-
-
-
-(* operations on database *)
-  
-exception AlreadyAttempted
-
-let try_prover ~(async:(unit->unit)->unit)
-    ~debug ~timelimit ~memlimit ~prover ~command ~driver 
-    (g : goal) : unit -> proof_attempt_status =
-  let db = current () in
-  let attempt =
-    try
-      if debug then Format.printf "looking for an attempt with same prover@.";
-      let a = Goal.get_external_proof db ~prover g in
-      if debug then Format.printf "attempt found, status=%a@." print_status a.status;
-      match a.status with
-          (* if already in progress, do not try again *)
-        | Scheduled | Running -> raise AlreadyAttempted
-          (* if already non-obsolete result within the timelimit, do not try again *)
-        | Success | Unknown | HighFailure ->
-            if a.proof_obsolete then a else raise AlreadyAttempted
-          (* if already non-obsolete timeout with a higher or equal timelimit,
-             do not try again *)
-        | Timeout -> 
-            if a.proof_obsolete then a else
-              if a.timelimit < timelimit then a 
-              else raise AlreadyAttempted
-    with Not_found ->
-      if debug then Format.printf "no attempt found, adding one@.";
-      Goal.add_external_proof db ~prover g
-  in
-  if debug then Format.printf "setting attempt status to Scheduled@.";
-(*
-  External_proof.set_status db attempt Scheduled;
 *)
-  if false && debug then Format.eprintf "Task : %a@." Pretty.print_task g.task;
-  let callback : unit -> Call_provers.prover_result = 
-    try 
-      if false && debug then 
-        Format.eprintf "Task for prover: %a@." 
-          (Why.Driver.print_task driver) g.task;
-      Why.Driver.prove_task ~command ~timelimit ~memlimit driver g.task
-    with
-    | e ->
-        try
-          Printexc.print (fun () -> raise e) ()
-        with _ -> fun () -> raise Exit
-  in
-  fun () ->
-    if debug then Format.printf "setting attempt status to Running@.";
-    async (fun () -> External_proof.set_status db attempt Running);
-    try
-      let r = callback () in
-      if debug then Format.eprintf "prover result: %a@." Call_provers.print_prover_result r;
-      async 
-        (fun () ->
-           External_proof.set_result_time db attempt r.Call_provers.pr_time);
-      match r.Call_provers.pr_answer with
-        | Call_provers.Valid ->
-            async (fun () ->
-                     External_proof.set_status db attempt Success;
-                     g.proved <- true;
-                     Goal.set_proved db g true;
-                     (* TODO: update "proved" status of goal parents if any *));
-            Success         
-        | Call_provers.Timeout ->
-            async (fun () -> External_proof.set_status db attempt Timeout);
-            Timeout
-        | Call_provers.Invalid | Call_provers.Unknown _ ->
-            async (fun () -> External_proof.set_status db attempt Unknown);
-            Unknown
-        | Call_provers.Failure _ | Call_provers.HighFailure ->
-            async (fun () -> External_proof.set_status db attempt HighFailure);
-            HighFailure
-    with Exit ->
-      if debug then Format.eprintf "prover callback aborted because of an exception raised during elaboration@.";
-      async (fun () -> External_proof.set_status db attempt HighFailure);
-      HighFailure
-      
-      
-      
-
-let add_transformation (_g : goal) (_t : transf) :  unit =
-  assert false (* TODO *)
-
-let add_or_replace_task ~tname ~name (t : Task.task) : goal =
-  (* TODO: replace if already exists *)
-  let g = {
-    goal_id = 0L;
-    goal_origin = Goal (tname,name);
-    task = t;
-    task_checksum = "" (* Digest.string (Marshal.to_string t []) *);
-    proved = false;
-    observers = [];
-  }
-  in
-  Goal.add (current()) g;
-  g
 
 
+let add_file = assert false
+let add_theory = assert false
+let add_goal = assert false
+let add_transformation = assert false
+let set_edited_as = assert false
+let set_obsolete = assert false
+let set_status = assert false
+let add_proof_attempt = assert false
+let prover_from_name = assert false
+exception AlreadyExist 
+let files = assert false
+let init_base = assert false
+let theories = assert false
+let file_name = assert false
+let verified = assert false
+let goals = assert false
+let theory_name = assert false
+
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. bin/whyide.byte"
+End: 
+*)

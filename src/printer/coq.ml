@@ -359,6 +359,12 @@ let print_logic_decl info fmt (ls,ld) =
     fprintf fmt "@\n"
   else
     let b = ls.ls_args = [] in
+    (* TODO: this condition is not sufficient, e.g
+
+        logic create_array int : array 'a
+       
+       has 1 parameter, but 'a cannot be inferred from it
+    *)
     if b then fprintf fmt "Set Contextual Implicit.@\n";
     fprintf fmt "Implicit Arguments %a.@\n" print_ls ls;
     if b then fprintf fmt "Unset Contextual Implicit.@\n"

@@ -21,6 +21,16 @@
 
 (** {2 data types} *)
 
+type prover_id
+(** a prover identifier *)
+
+module Hprover : Hashtbl.S with type key = prover_id
+
+type transf_id
+(** a transformation identifier *)
+
+module Htransf : Hashtbl.S with type key = transf_id
+
 type file
 (** a database contains a (ordered?) set of files *)
 
@@ -32,14 +42,12 @@ type goal
 
 type proof_attempt 
 (** each goal has a set of proof attempts, indeed a map indexed
-    by provers *)
+    by prover identifiers *)
 
 type transf
 (** each goal also has a set of transformations, indeed a map indexed
-    by transformation names *)
+    by transformation identifiers *)
 
-type prover
-(** a prover *)
 
 (** status of an external proof attempt *)
 type proof_status =
@@ -58,11 +66,14 @@ type goal_parent =
 
 (** {2 accessors} *)
 
-(** prover accessors *)
-val prover_id : prover -> string
+(** prover_id accessors *)
+val prover_name : prover_id -> string
+
+(** transf_id accessors *)
+val transf_name : transf_id -> string
 
 (** proof_attempt accessors *)
-val prover : proof_attempt -> prover
+val prover : proof_attempt -> prover_id
 (*
 val proof_goal : proof_attempt -> goal
 *)
@@ -77,14 +88,14 @@ val parent : goal -> goal_parent
 *)
 val task_checksum : goal -> string (** checksum *)
 val proved : goal -> bool
-val external_proofs: (string, proof_attempt) Hashtbl.t
-val transformations : (string, transf) Hashtbl.t
+val external_proofs: goal -> proof_attempt Hprover.t
+val transformations : goal -> transf Htransf.t
 
 (** transf accessors *)
 (*
 val parent_goal : transf -> goal
 *)
-val transf_name : transf -> string
+val transf_id : transf -> transf_id
 val subgoals : transf -> goal list
 
 (** theory accessors *)        
@@ -110,13 +121,13 @@ val files : unit -> file list
 exception AlreadyExist
 
 (** {3 provers} *)
-val prover_from_id : string -> prover
-(** retrieves existing prover data from its name.
-    creates prover data if not existing yet *)
+val prover_from_name : string -> prover_id
+(** retrieves existing prover id from its name.
+    creates prover id if not existing yet *)
 
 (** {3 external proof attempts} *)
 
-val add_proof_attempt : goal -> prover -> proof_attempt
+val add_proof_attempt : goal -> prover_id -> proof_attempt
 (** adds a proof attempt for this prover, with status is set to Unknown.
     @raise AlreadyExist if an attempt for the same prover
     is already there *)

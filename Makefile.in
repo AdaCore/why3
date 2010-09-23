@@ -378,7 +378,7 @@ install_no_local::
 # IDE
 ###############
 
-IDE_FILES = gconfig scheduler gmain
+IDE_FILES = gconfig scheduler db gmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
@@ -396,11 +396,9 @@ byte: bin/whyide.byte
 opt:  bin/whyide.opt
 endif
 
-bin/whyide.opt bin/whyide.byte: INCLUDES += -thread -I +threads -I +lablgtk2
-# -I +sqlite3
+bin/whyide.opt bin/whyide.byte: INCLUDES += -thread -I +threads -I +lablgtk2 -I +sqlite3
 bin/whyide.opt bin/whyide.byte: EXTOBJS += gtkThread
-bin/whyide.opt bin/whyide.byte: EXTLIBS += threads lablgtk lablgtksourceview2
-# sqlite3
+bin/whyide.opt bin/whyide.byte: EXTLIBS += threads lablgtk lablgtksourceview2 sqlite3
 
 bin/whyide.opt: src/why.cmxa $(PGMCMX) $(IDECMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
