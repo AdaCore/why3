@@ -58,13 +58,13 @@ let is_arrow_ty env ty = match ty.ty_node with
 
 let wp_forall env v f =
   if is_arrow_ty env v.vs_ty then f else match f.f_node with
-(*     | Fbinop (Fimplies, {f_node = Fapp (s,[{t_node = Tvar u};r])},h) *)
-(*       when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) -> *)
-(*         f_subst_single v r h *)
-(*     | Fbinop (Fimplies, {f_node = Fbinop (Fand, g, *)
-(*                         {f_node = Fapp (s,[{t_node = Tvar u};r])})},h) *)
-(*       when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) -> *)
-(*         f_subst_single v r (f_implies_simp g h) *)
+    | Fbinop (Fimplies, {f_node = Fapp (s,[{t_node = Tvar u};r])},h)
+      when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) ->
+        f_subst_single v r h
+    | Fbinop (Fimplies, {f_node = Fbinop (Fand, g,
+                        {f_node = Fapp (s,[{t_node = Tvar u};r])})},h)
+      when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) ->
+        f_subst_single v r (f_implies_simp g h)
     | _ when f_occurs_single v f ->
         f_forall_close_simp [v] [] f
     | _ ->
