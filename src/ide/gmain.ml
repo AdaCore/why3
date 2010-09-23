@@ -557,7 +557,6 @@ let split_unproved_goals () =
                       subgoals = [];
                     }
                   in
-                  List.iter (fun t -> eprintf "%a@." Pretty.print_task t) subgoals;
                   goals_model#set ~row:split_row ~column:Model.index_column 
                     (Model.Row_transformation tr);
                   g.Model.transformations <- tr :: g.Model.transformations;

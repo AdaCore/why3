@@ -33,7 +33,7 @@ let split_case spl c acc tl bl =
   let bll,_ = List.fold_left (fun (bll,el) (pl,f) ->
     let spf = spl [] f in
     let brc = f_close_branch pl c in
-    let bll = List.rev_map (fun rl -> brc::rl) bll in
+    let bll = List.map (fun rl -> brc::rl) bll in
     let bll = apply_append (fun f -> f_close_branch pl f :: el) bll spf in
     bll, brc::el) ([],[]) bl
   in
