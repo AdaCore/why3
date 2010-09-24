@@ -409,7 +409,8 @@ module Helpers = struct
 end
 
 let () = 
-  Theory.Mnm.iter (fun _ th -> Helpers.add_theory th) theories
+  Theory.Mnm.iter (fun _ th -> Helpers.add_theory th) theories;
+  goals_view#expand_all ()
 
 
 
@@ -587,7 +588,8 @@ let split_unproved_goals () =
                     ([],1) subgoals 
                   in
                   tr.Model.subgoals <- List.rev goals;
-                  goals_view#expand_row (goals_model#get_path row)           
+                  goals_view#expand_row (goals_model#get_path row);
+                  goals_view#expand_row (goals_model#get_path split_row)
               in
               
               Scheduler.apply_transformation ~callback
