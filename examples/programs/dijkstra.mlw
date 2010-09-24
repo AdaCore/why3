@@ -66,25 +66,31 @@ parameter init :
       !q = S.add src S.empty and 
       !d = M.set (old !d) src 0  }
 
-parameter relax :
-  u:vertex -> v:vertex -> 
-    {} 
-    unit reads visited writes d,q 
-    { (S.mem v !visited and !q = old !q and !d = old !d) 
-      or
-      (S.mem v !q and M.get !d u + weight u v >= M.get !d v and 
+let relax u v =
+  {}
+  if not (S.mem v !visited) then
+    let x = M.get !d u + weight u v in
+    if S.mem v !q then begin
+      if x < M.get !d v then d := M.set !d v x
+    end else begin
+      q := S.add v !q;
+      d := M.set !d v x
+    end
+  { (S.mem v !visited and !q = old !q and !d = old !d) 
+    or
+    (S.mem v !q and M.get !d u + weight u v >= M.get !d v and 
         !q = old !q and !d = old !d) 
-      or	
-      (S.mem v !q  and M.get !d u + weight u v < M.get !d v and 
-        !q = old !q and !d = M.set (old !d) v (M.get !d u + weight u v))
-      or
-      (not S.mem v !visited and not S.mem v !q and !q = S.add v (old !q) and
-        !d = M.set (old !d) v (M.get !d u + weight u v)) }	
+    or	
+    (S.mem v !q  and M.get (old !d) u + weight u v < M.get (old !d) v and 
+        !q = old !q and !d = M.set (old !d) v (M.get (old !d) u + weight u v))
+    or
+    (not S.mem v !visited and not S.mem v !q and !q = S.add v (old !q) and
+        !d = M.set (old !d) v (M.get (old !d) u + weight u v)) }	
 
 {
 logic min (m:vertex) (q:S.t vertex) (d:M.t vertex int) =
   S.mem m q and 
-  forall x:vertex. S.mem x q -> M.get d x <= M.get d m
+  forall x:vertex. S.mem x q -> M.get d m <= M.get d x
 }
 
 parameter q_extract_min :

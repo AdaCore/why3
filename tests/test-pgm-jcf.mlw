@@ -1,23 +1,19 @@
 
 {
-  use import list.List
 }
 
-parameter assign : r : ref 'a -> 'a -> unit
-
-parameter alloc : 'a -> ref 'a
-
-parameter head : list 'a -> 'a
-
-exception E of 'a
-
 let f x =
-  { x > 0 }
-  assert { x >= 0 };
-  let y = x+1 in
-  assert { y > 1 };
-  ()
   {}
+  if x = 1 then
+    1
+  else
+    if x = 2 then
+      2
+    else
+      3
+  {    x = 1
+    or (not x = 1 and x = 2)
+    or (not x = 1 and not x = 2 and result = 3) }
 
 (*
 Local Variables: 
