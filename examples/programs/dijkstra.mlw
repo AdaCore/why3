@@ -84,7 +84,7 @@ let relax u v =
     (S.mem v !q  and M.get (old !d) u + weight u v < M.get (old !d) v and 
         !q = old !q and !d = M.set (old !d) v (M.get (old !d) u + weight u v))
     or
-    (not S.mem v !visited and not S.mem v !q and !q = S.add v (old !q) and
+    (not S.mem v !visited and not S.mem v (old !q) and !q = S.add v (old !q) and
         !d = M.set (old !d) v (M.get (old !d) u + weight u v)) }	
 
 {
