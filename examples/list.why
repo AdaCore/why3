@@ -17,6 +17,9 @@ theory Map
   use export int.Int
 
   logic double (l : list int) : list int = map (\ i : int . i * 2) l
+  logic double_let (l : list int) : list int =
+    let x = 2 in
+    map (\ i : int . i * x) l
 
   logic lequal (l1 l2 : list int) = forall2 (\ i1 i2 : int . i1 = i2) l1 l2
 end
@@ -38,6 +41,7 @@ theory Test1
   use export int.Int
   use export list.List
   use export list.Length
+  use Map as M
 
   goal G1 : length (Cons 1 Nil) = 1
   goal G2 : length (Cons 1 (Cons 2 Nil)) = 1 + 1
