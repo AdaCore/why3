@@ -21,6 +21,13 @@ open Decl
 open Task
 open Term
 
+let forall_merge vs f =
+  match f.f_node with
+  | Fquant (Fforall, fq) ->
+      let vs', trs, f = f_open_quant fq in
+      f_forall_close (vs@vs') trs f
+  | _ -> f_forall_close vs [] f
+
 let rec rewriteT t = match t.t_node with
   | Teps fb ->
       let fv = Svs.elements (t_freevars Svs.empty t) in
@@ -39,7 +46,7 @@ let rec rewriteT t = match t.t_node with
         (* substitute [magic] for [x] *)
         let f = f_subst_single x rx f in
         (* quantify over free variables and epsilon-close over [magic] *)
-        let f = f_forall_close_simp fv [] f in
+        let f = forall_merge fv f in
         let f = t_eps_close magic_fs f in
         (* apply epsilon-term to variables *)
         List.fold_left (fun acc x -> t_func_app acc (t_var x)) f fv
