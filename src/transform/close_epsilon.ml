@@ -28,8 +28,39 @@ let forall_merge vs f =
       f_forall_close (vs@vs') trs f
   | _ -> f_forall_close vs [] f
 
-let rec rewriteT t = match t.t_node with
+let is_func_ty t =
+  match t.Ty.ty_node with
+  | Ty.Tyapp (s,_) ->
+      Ty.ts_equal s Ty.ts_func || Ty.ts_equal s Ty.ts_pred
+  | _ -> false
+
+type lambda_match =
+  | Flam of vsymbol list * trigger list * fmla
+  | Tlam of vsymbol list * trigger list * term
+  | LNone
+
+let destruct_lambda t =
+  match t.t_node with
   | Teps fb ->
+      let fn, f = f_open_bound fb in
+      if is_func_ty fn.vs_ty then
+        begin match f.f_node with
+        | Fquant (Fforall, fq) ->
+            let args, trs, f = f_open_quant fq in
+            begin match f.f_node with
+            | Fbinop (Fiff,_,body) -> Flam (args, trs, body)
+            | Fapp (ls,[_;body]) when ls_equal ls ps_equ ->
+                Tlam (args, trs, body)
+            | _ -> LNone end
+        | _ -> LNone end
+      else LNone
+  | _ -> LNone
+
+let is_lambda t = destruct_lambda t <> LNone
+
+let rec rewriteT t =
+  match t.t_node with
+  | Teps fb when is_lambda t ->
       let fv = Svs.elements (t_freevars Svs.empty t) in
       let x, f = f_open_bound fb in
       let f = rewriteF f in
