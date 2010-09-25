@@ -43,103 +43,118 @@ let asym_split = Ident.label "asym_split"
 
 let to_split f = List.exists (fun (l,_) -> l = "asym_split") f.f_label
 
-let inherit_labels ll f =
-  if f.f_label = [] then f_label ll f else f
-
-let rec split_pos acc f = 
-  let f = f_map (fun t -> t) (inherit_labels f.f_label) f in
-  match f.f_node with
+let rec split_pos ro acc f = match f.f_node with
   | Ftrue -> acc
   | Ffalse -> f::acc
   | Fapp _ -> f::acc
   | Fbinop (Fand,f1,f2) when to_split f ->
-      split_pos (split_pos acc (f_implies f1 f2)) f1
+      split_pos ro (split_pos ro acc (f_implies f1 f2)) f1
   | Fbinop (Fand,f1,f2) ->
-      split_pos (split_pos acc f2) f1
+      split_pos ro (split_pos ro acc f2) f1
+  | Fbinop (Fimplies,f1,f2) when ro ->
+      apply_append (f_implies f1) acc (split_pos ro [] f2)
   | Fbinop (Fimplies,f1,f2) ->
-      apply_append2 f_implies acc (split_neg [] f1) (split_pos [] f2)
+      apply_append2 f_implies acc (split_neg ro [] f1) (split_pos ro [] f2)
   | Fbinop (Fiff,f1,f2) ->
-      split_pos (split_pos acc (f_implies f2 f1)) (f_implies f1 f2)
+      split_pos ro (split_pos ro acc (f_implies f2 f1)) (f_implies f1 f2)
+  | Fbinop (For,f1,f2) when ro ->
+      apply_append (f_or f1) acc (split_pos ro [] f2)
   | Fbinop (For,f1,f2) ->
-      apply_append2 f_or acc (split_pos [] f1) (split_pos [] f2)
+      apply_append2 f_or acc (split_pos ro [] f1) (split_pos ro [] f2)
   | Fnot f ->
-      apply_append f_not acc (split_neg [] f)
+      apply_append f_not acc (split_neg ro [] f)
   | Fif (fif,fthen,felse) ->
-      split_pos (split_pos acc (f_implies (f_not fif) felse))
-        (f_implies fif fthen)
+      let acc = split_pos ro acc (f_implies (f_not fif) felse) in
+      split_pos ro acc (f_implies fif fthen)
   | Flet (t,fb) -> let vs,f = f_open_bound fb in
-      apply_append (f_let_close vs t) acc (split_pos [] f)
+      apply_append (f_let_close vs t) acc (split_pos ro [] f)
   | Fcase (tl,bl) ->
-      split_case split_pos f_true acc tl bl
+      split_case (split_pos ro) f_true acc tl bl
   | Fquant (Fforall,fq) -> let vsl,trl,f = f_open_quant fq in
       (* TODO : Remove unused variable *)
-      apply_append (f_forall_close vsl trl) acc (split_pos [] f)
+      apply_append (f_forall_close vsl trl) acc (split_pos ro [] f)
   | Fquant (Fexists,_) -> f::acc
 
-and split_neg acc f =
-  let f = f_map (fun t -> t) (inherit_labels f.f_label) f in
-  match f.f_node with
+and split_neg ro acc f = match f.f_node with
   | Ftrue -> f::acc
   | Ffalse -> acc
   | Fapp _ -> f::acc
+  | Fbinop (Fand,f1,f2) when ro ->
+      apply_append (f_and f1) acc (split_neg ro [] f2)
   | Fbinop (Fand,f1,f2) ->
-      apply_append2 f_and acc (split_neg [] f1) (split_neg [] f2)
+      apply_append2 f_and acc (split_neg ro [] f1) (split_neg ro [] f2)
   | Fbinop (Fimplies,f1,f2) when to_split f ->
-      split_neg (split_neg acc (f_and f1 f2)) (f_not f1)
+      split_neg ro (split_neg ro acc (f_and f1 f2)) (f_not f1)
   | Fbinop (Fimplies,f1,f2) ->
-      split_neg (split_neg acc f2) (f_not f1)
+      split_neg ro (split_neg ro acc f2) (f_not f1)
   | Fbinop (Fiff,f1,f2) ->
-      split_neg (split_neg acc (f_and (f_not f1) (f_not f2))) (f_and f1 f2)
+      let acc = split_neg ro acc (f_and (f_not f1) (f_not f2)) in
+      split_neg ro acc (f_and f1 f2)
   | Fbinop (For,f1,f2) when to_split f ->
-      split_neg (split_neg acc (f_and (f_not f1) f2)) f1
+      split_neg ro (split_neg ro acc (f_and (f_not f1) f2)) f1
   | Fbinop (For,f1,f2) ->
-      split_neg (split_neg acc f2) f1
+      split_neg ro (split_neg ro acc f2) f1
   | Fnot f ->
-      apply_append f_not acc (split_pos [] f)
+      apply_append f_not acc (split_pos ro [] f)
   | Fif (fif,fthen,felse) ->
-      split_neg (split_neg acc (f_and (f_not fif) felse)) (f_and fif fthen)
+      let acc = split_neg ro acc (f_and (f_not fif) felse) in
+      split_neg ro acc (f_and fif fthen)
   | Flet (t,fb) -> let vs,f = f_open_bound fb in
-      apply_append (f_let_close vs t) acc (split_neg [] f)
+      apply_append (f_let_close vs t) acc (split_neg ro [] f)
   | Fcase (tl,bl) ->
-      split_case split_neg f_false acc tl bl
+      split_case (split_neg ro) f_false acc tl bl
   | Fquant (Fexists,fq) -> let vsl,trl,f = f_open_quant fq in
       (* TODO : Remove unused variable *)
-      apply_append (f_exists_close vsl trl) acc (split_neg [] f)
+      apply_append (f_exists_close vsl trl) acc (split_neg ro [] f)
   | Fquant (Fforall,_) -> f::acc
 
-let split_goal pr f =
+let split_goal ro pr f =
   let make_prop f = [create_prop_decl Pgoal pr f] in
-  List.map make_prop (split_pos [] f)
+  List.map make_prop (split_pos ro [] f)
 
-let split_axiom pr f =
+let split_axiom ro pr f =
   let make_prop f =
     let pr = create_prsymbol (id_clone pr.pr_name) in
     create_prop_decl Paxiom pr f
   in
-  List.map make_prop (split_pos [] f)
+  List.map make_prop (split_pos ro [] f)
 
-let split_all d = match d.d_node with
-  | Dprop (Pgoal, pr,f) ->  split_goal  pr f
-  | Dprop (Paxiom,pr,f) -> [split_axiom pr f]
+let split_all ro d = match d.d_node with
+  | Dprop (Pgoal, pr,f) ->  split_goal  ro pr f
+  | Dprop (Paxiom,pr,f) -> [split_axiom ro pr f]
   | _ -> [[d]]
 
-let split_premise d = match d.d_node with
-  | Dprop (Paxiom,pr,f) ->  split_axiom pr f
+let split_premise ro d = match d.d_node with
+  | Dprop (Paxiom,pr,f) ->  split_axiom ro pr f
   | _ -> [d]
 
-let split_goal    = Trans.goal_l split_goal
-let split_all     = Trans.decl_l split_all     None
-let split_premise = Trans.decl   split_premise None
+let full_split_pos = split_pos false []
+let full_split_neg = split_neg false []
+
+let split_pos = split_pos true []
+let split_neg = split_neg true []
+
+let full_split_goal    = Trans.goal_l (split_goal    false)
+let full_split_all     = Trans.decl_l (split_all     false) None
+let full_split_premise = Trans.decl   (split_premise false) None
+
+let split_goal    = Trans.goal_l (split_goal    true)
+let split_all     = Trans.decl_l (split_all     true) None
+let split_premise = Trans.decl   (split_premise true) None
 
 let () = Trans.register_transform_l "split_goal"    split_goal
 let () = Trans.register_transform_l "split_all"     split_all
 let () = Trans.register_transform   "split_premise" split_premise
 
+let () = Trans.register_transform_l "full_split_goal"    full_split_goal
+let () = Trans.register_transform_l "full_split_all"     full_split_all
+let () = Trans.register_transform   "full_split_premise" full_split_premise
+
 let ls_of_var v =
   create_fsymbol (id_fresh ("spl_" ^ v.vs_name.id_string)) [] v.vs_ty
 
-let rec rsplit pr dl acc f =
-  let rsp = rsplit pr dl in
+let rec split_intro pr dl acc f =
+  let rsp = split_intro pr dl in
   match f.f_node with
   | Ftrue -> acc
   | Fbinop (Fand,f1,f2) when to_split f ->
@@ -149,28 +164,28 @@ let rec rsplit pr dl acc f =
   | Fbinop (Fimplies,f1,f2) ->
       let pp = create_prsymbol (id_fresh (pr.pr_name.id_string ^ "_spl")) in
       let dl = create_prop_decl Paxiom pp f1 :: dl in
-      rsplit pr dl acc f2
+      split_intro pr dl acc f2
   | Fbinop (Fiff,f1,f2) ->
-      rsp (rsp acc (f_implies f1 f2)) (f_implies f2 f1)
+      rsp (rsp acc (f_implies f2 f1)) (f_implies f1 f2)
   | Fif (fif,fthen,felse) ->
-      rsp (rsp acc (f_implies fif fthen)) (f_implies (f_not fif) felse)
+      rsp (rsp acc (f_implies (f_not fif) felse)) (f_implies fif fthen)
   | Flet (t,fb) -> let vs,f = f_open_bound fb in
       let ls = ls_of_var vs in
       let f  = f_subst_single vs (t_app ls [] vs.vs_ty) f in
       let dl = create_logic_decl [make_fs_defn ls [] t] :: dl in
-      rsplit pr dl acc f
+      split_intro pr dl acc f
   | Fquant (Fforall,fq) -> let vsl,_,f = f_open_quant fq in
       let lls = List.map ls_of_var vsl in
       let add s vs ls = Mvs.add vs (t_app ls [] vs.vs_ty) s in
       let f = f_subst (List.fold_left2 add Mvs.empty vsl lls) f in
       let add dl ls = create_logic_decl [ls, None] :: dl in
       let dl = List.fold_left add dl lls in
-      rsplit pr dl acc f
+      split_intro pr dl acc f
   | _ ->
       let goal f = List.rev (create_prop_decl Pgoal pr f :: dl) in
-      List.rev_append (List.rev_map goal (split_pos [] f)) acc
+      List.rev_append (List.rev_map goal (split_pos f)) acc
 
-let right_split = Trans.goal_l (fun pr f -> rsplit pr [] [] f)
+let split_intro = Trans.goal_l (fun pr f -> split_intro pr [] [] f)
 
-let () = Trans.register_transform_l "right_split" right_split
+let () = Trans.register_transform_l "split_intro" split_intro
 

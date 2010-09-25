@@ -19,16 +19,29 @@
 
 val asym_split : Ident.label
 
-val split_pos : Term.fmla list -> Term.fmla -> Term.fmla list
-(** [split_pos l f] returns a list [g1;..;gk] @ l such that
- f is logically equivalent to g1 /\ .. /\ gk *)
+val split_pos : Term.fmla -> Term.fmla list
+(** [split_pos f] returns a list [[g1;..;gk]] such that
+ [f] is logically equivalent to [g1 /\ .. /\ gk] *)
 
-val split_neg : Term.fmla list -> Term.fmla -> Term.fmla list
-(** [split_neg l f] returns a list [g1;..;gk] @ l such that
- f is logically equivalent to g1 \/ .. \/ gk *)
+val split_neg : Term.fmla -> Term.fmla list
+(** [split_neg f] returns a list [[g1;..;gk]] such that
+ [f] is logically equivalent to [g1 \/ .. \/ gk] *)
+
+val full_split_pos : Term.fmla -> Term.fmla list
+(** [full_split_pos f] returns a list [[g1;..;gk]] such that
+ [f] is logically equivalent to [g1 /\ .. /\ gk] and the length
+ of the resulting list can be exponential wrt the size of [f] *)
+
+val full_split_neg : Term.fmla -> Term.fmla list
+(** [full_split_neg f] returns a list [[g1;..;gk]] such that
+ [f] is logically equivalent to [g1 \/ .. \/ gk] and the length
+ of the resulting list can be exponential wrt the size of [f] *)
 
 val split_goal : Task.task Trans.tlist
 val split_all  : Task.task Trans.tlist
 
-val right_split : Task.task Trans.tlist
+val full_split_goal : Task.task Trans.tlist
+val full_split_all  : Task.task Trans.tlist
 
+val split_intro : Task.task Trans.tlist
+(** [split_intro] is [split_goal] with skolemization and formula separation *)
