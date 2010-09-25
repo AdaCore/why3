@@ -1034,7 +1034,7 @@ let f_neq t1 t2 = f_not (f_app ps_equ [t1; t2])
 let fs_func_app =
   let ty_a = ty_var (create_tvsymbol (id_fresh "a")) in
   let ty_b = ty_var (create_tvsymbol (id_fresh "b")) in
-  create_fsymbol (id_fresh "infix @") [ty_func ty_a ty_b; ty_a] ty_b
+  create_fsymbol (id_fresh "infix @!") [ty_func ty_a ty_b; ty_a] ty_b
 
 let ps_pred_app =
   let ty_a = ty_var (create_tvsymbol (id_fresh "a")) in

@@ -440,7 +440,7 @@ and dterm_node loc env = function
       let env = { env with dvars = Mstr.add x.id ty env.dvars } in
       let e1 = dfmla env e1 in
       Teps (x, ty, e1), ty
-  | PPquant (PPlambda, uqu, trl, a) ->
+  | PPquant ((PPlambda|PPfunc|PPpred) as q, uqu, trl, a) ->
       check_quant_linearity uqu;
       let uquant env (idl,ty) =
         let ty = dty env ty in
@@ -458,7 +458,13 @@ and dterm_node loc env = function
 	  TRfmla (dfmla env e)
       in
       let trl = List.map (List.map trigger) trl in
-      let id, ty, f = match trigger a with
+      let e = match q with
+        | PPfunc -> TRterm (dterm env a)
+        | PPpred -> TRfmla (dfmla env a)
+        | PPlambda -> trigger a
+        | _ -> assert false
+      in
+      let id, ty, f = match e with
         | TRterm t ->
             let id = { id = "fc"; id_lab = []; id_loc = loc } in
             let tyl,ty = List.fold_right (fun (_,uty) (tyl,ty) ->

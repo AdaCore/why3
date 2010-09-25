@@ -191,6 +191,10 @@ rule token = parse
       { ASYM_OR }
   | "\\"
       { LAMBDA }
+  | "\\?"
+      { PRED }
+  | "\\!"
+      { FUNC }
   | "."
       { DOT }
   | "|"
