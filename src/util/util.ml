@@ -44,6 +44,13 @@ let option_eq eq a b = match a,b with
   | None, _ | _, None -> false
   | Some x, Some y -> eq x y
 
+let option_map_fold f acc x =
+  match x with
+  | None -> acc, None
+  | Some x ->
+      let acc, x = f acc x in
+      acc, Some x
+
 (* useful list combinators *)
 
 let rev_map_fold_left f acc l =

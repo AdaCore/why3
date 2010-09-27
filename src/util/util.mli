@@ -41,6 +41,9 @@ val option_apply : 'b -> ('a -> 'b) -> 'a option -> 'b
 
 val option_eq : ('a -> 'b -> bool) -> 'a option -> 'b option -> bool
 
+val option_map_fold :
+  ('a -> 'b -> 'a * 'b) -> 'a -> 'b option -> 'a * 'b option
+
 (* useful list combinators *)
 
 val rev_map_fold_left :
