@@ -24,3 +24,14 @@
   εx.P(x) => εF.(P(F@y₁@...@y_n)) where y₁...y_n are the free variable in P and
   @ is the higher-order application symbol.
   *)
+
+open Term
+
+type lambda_match =
+  | Flam of vsymbol list * trigger list * fmla
+  | Tlam of vsymbol list * trigger list * term
+  | LNone
+
+
+val destruct_lambda : term -> lambda_match
+val is_lambda : term -> bool

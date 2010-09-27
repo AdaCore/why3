@@ -21,13 +21,6 @@ open Decl
 open Task
 open Term
 
-let forall_merge vs f =
-  match f.f_node with
-  | Fquant (Fforall, fq) ->
-      let vs', trs, f = f_open_quant fq in
-      f_forall_close (vs@vs') trs f
-  | _ -> f_forall_close vs [] f
-
 let is_func_ty t =
   match t.Ty.ty_node with
   | Ty.Tyapp (s,_) ->
@@ -77,7 +70,7 @@ let rec rewriteT t =
         (* substitute [magic] for [x] *)
         let f = f_subst_single x rx f in
         (* quantify over free variables and epsilon-close over [magic] *)
-        let f = forall_merge fv f in
+        let f = f_forall_close_merge fv f in
         let f = t_eps_close magic_fs f in
         (* apply epsilon-term to variables *)
         List.fold_left (fun acc x -> t_func_app acc (t_var x)) f fv
@@ -86,12 +79,10 @@ let rec rewriteT t =
 
 and rewriteF f = f_map rewriteT rewriteF f
 
-let comp t task =
-  match t.task_decl.td_node with
-  | Decl d -> add_decl task (decl_map rewriteT rewriteF d)
-  | _ -> add_tdecl task t.task_decl
+let close d = [decl_map rewriteT rewriteF d]
 
-let close_epsilon =
-  Trans.fold comp None
+let close_epsilon = Trans.decl close None
 
 let () = Trans.register_transform "close_epsilon" close_epsilon
+
+(* TODO variable abstraction *)
