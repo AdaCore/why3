@@ -357,6 +357,29 @@ let decl_fold fnT fnF acc d = match d.d_node with
   | Dprop (_,_,f) ->
       fnF acc f
 
+let rpair_map_fold f acc (x1,x2) =
+  let acc, x2 = f acc x2 in
+  acc, (x1, x2)
+
+let list_rpair_map_fold f =
+  Util.map_fold_left (rpair_map_fold f)
+
+let decl_map_fold fnT fnF acc d =
+  match d.d_node with
+  | Dtype _ -> acc, d
+  | Dprop (k,pr,f) ->
+      let acc, f = f_map_fold fnT fnF acc f in
+      acc, create_prop_decl k pr f
+  | Dind l ->
+      let acc, l =
+        list_rpair_map_fold (list_rpair_map_fold (f_map_fold fnT fnF)) acc l in
+      acc, create_ind_decl l
+  | Dlogic l ->
+      let acc, l =
+      list_rpair_map_fold (option_map_fold
+        (rpair_map_fold (f_map_fold fnT fnF))) acc l in
+      acc, create_logic_decl l
+
 
 (** Known identifiers *)
 

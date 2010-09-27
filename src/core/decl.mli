@@ -126,6 +126,10 @@ exception EmptyIndDecl of lsymbol
 val decl_map : (term -> term) -> (fmla -> fmla) -> decl -> decl
 val decl_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> decl -> 'a
 
+val decl_map_fold :
+  ('a -> term -> 'a * term) -> ('a -> fmla -> 'a * fmla) ->
+      'a -> decl -> 'a * decl
+
 (** {2 Known identifiers} *)
 
 type known_map = decl Mid.t
