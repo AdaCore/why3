@@ -1757,6 +1757,13 @@ let f_neq_simp t1 t2 = if t_equal t1 t2 then f_false else f_neq t1 t2
 let is_true_false f = match f.f_node with
   | Ftrue | Ffalse -> true | _  -> false
 
+let f_forall_close_merge vs f =
+  match f.f_node with
+  | Fquant (Fforall, fq) ->
+      let vs', trs, f = f_open_quant fq in
+      f_forall_close (vs@vs') trs f
+  | _ -> f_forall_close vs [] f
+
 (* Could we add an optional argument which toggle
    the simplification to the other map? *)
 

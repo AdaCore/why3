@@ -308,6 +308,13 @@ val f_quant_close_simp : quant -> vsymbol list -> trigger list -> fmla -> fmla
 val f_forall_close_simp : vsymbol list -> trigger list -> fmla -> fmla
 val f_exists_close_simp : vsymbol list -> trigger list -> fmla -> fmla
 
+
+val f_forall_close_merge : vsymbol list -> fmla -> fmla
+(** [forall_close_merge vs f] - put a universal quantifier on top of [f]; merge
+  variable lists if [f] is already a universally quantified formula; reuse
+  triggers of [f], if any, otherwise the quantifier has no triggers. *)
+
+
 (** Expr and trigger traversal *)
 
 val e_map : (term -> term) -> (fmla -> fmla) -> expr -> expr
