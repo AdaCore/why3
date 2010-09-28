@@ -97,9 +97,7 @@ let gconfig =
 
 let theories : Theory.theory Theory.Mnm.t =
   try
-    let cin = open_in fname in
-    let m = Env.read_channel gconfig.env fname cin in
-    close_in cin;
+    let m = Env.read_file gconfig.env fname in
     eprintf "Parsing/Typing Ok@.";
     m
   with e -> 

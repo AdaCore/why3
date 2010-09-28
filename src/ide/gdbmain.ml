@@ -395,16 +395,9 @@ module Helpers = struct
     mth
     
 
-  let input_theories file : Theory.theory Theory.Mnm.t =
-    let cin = open_in file in
-    let m = Env.read_channel gconfig.env fname cin in
-    close_in cin;
-    m
-
   let add_file f =
     try
-      let theories = input_theories f in
-      (* TODO: if syntax error, do something clean *)
+      let theories = Env.read_file gconfig.env f in
       let _dbfile = Db.add_file f in
       let parent = goals_model#append () in
       let mfile = { file_name = f; 

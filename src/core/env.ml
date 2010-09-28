@@ -89,7 +89,9 @@ let parser_for_file ?name file = match name with
 	in
 	Hashtbl.find suffixes_table ext
       with Invalid_argument _ | Not_found ->
-	"why"
+        Format.eprintf "Cannot determine format for file=%S@." file;
+        Format.eprintf "Using 'why' as default@.";
+        "why"
       end
   | Some n ->
       n
@@ -102,6 +104,12 @@ let read_channel ?name env file ic =
   let n = parser_for_file ?name file in
   let rc = find_parser read_channel_table n in
   rc env file ic
+
+let read_file ?name env file =
+  let cin = open_in file in
+  let m = read_channel ?name env file cin in
+  close_in cin;
+  m
 
 let list_formats () =
   let h = Hashtbl.create 17 in

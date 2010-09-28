@@ -45,6 +45,16 @@ val register_format : string -> string list -> read_channel -> unit
       [f1] is the function to perform parsing *)
 
 val read_channel : ?name:string -> read_channel
+(** [read_channel ?name env f c] returns the map of theories
+    in channel [c]. When given, [name] enforces the format, otherwise
+    the format is chosen according to [f]'s extension. 
+    Beware that it cannot be checked that [c] corresponds 
+    to the contents of [f] *)
+
+val read_file : ?name:string -> env -> string -> theory Mnm.t 
+(** [read_file ?name env f] returns the map of theories
+    in file [f]. When given, [name] enforces the format, otherwise
+    the format is chosen according to [f]'s extension. *)
 
 exception UnknownFormat of string (* format name *)
 
