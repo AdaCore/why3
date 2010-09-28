@@ -181,7 +181,7 @@ val add_theory : file -> string -> string -> unit
 
 (** {3 files} *)
 
-val add_file :  string -> file
+val add_file :  string -> file 
 (** adds a file to the database.
     @raise AlreadyExist if a file with the same id already exists *)
 

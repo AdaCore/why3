@@ -245,10 +245,7 @@ let theory_name _ = assert false
 let goals _ = assert false
 let verified _ = assert false
 
-let init_base _ = assert false
-let files _ = assert false
-
-type file 
+type file = int64 
 
 let file_name _ = assert false
 let theories _ = assert false
@@ -1022,27 +1019,35 @@ end
 *)
 
 
-(*
-
 module Main = struct
 
   let init db =
-    let sql = "CREATE TABLE IF NOT EXISTS rootgoals (goal_id INTEGER);" in
+    let sql = "CREATE TABLE IF NOT EXISTS files (file_name TEXT);" in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
     ()
 
-  let all_root_goals db =
-    let sql="SELECT goal_id FROM rootgoals" in
+  let all_files db =
+    let sql="SELECT file_name FROM files" in
     let stmt = Sqlite3.prepare db.raw_db sql in
-    let of_stmt stmt = stmt_column_INT stmt 0 "Db.all_root_goals" in
-    let goals_ids = step_fold db stmt of_stmt in
-    goals_ids
+    let of_stmt stmt = stmt_column_string stmt 0 "Db.all_files" in
+    step_fold db stmt of_stmt 
 
+  let add db name = 
+    transaction db 
+      (fun () ->
+         let sql = "INSERT INTO files VALUES(?)" in
+         let stmt = bind db sql [ Sqlite3.Data.TEXT name ] in
+         db_must_done db (fun () -> Sqlite3.step stmt);
+         let new_id = Sqlite3.last_insert_rowid db.raw_db in
+	 new_id
+(*
+         { prover_id = Int64.to_int new_id ; 
+	   prover_name = name }
+*)
+      )
 end
 
-*)
 
-(*
 let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
   match !current_db with
     | None ->
@@ -1055,24 +1060,28 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
 	in
 	current_db := Some db;
 	ProverId.init db;
+(*
 	Loc.init db;
 	External_proof.init db;
 	Goal.init db;
-	(*
           Transf.init db;
 	*)
 	Main.init db
 
     | Some _ -> failwith "Db.init_db: already opened"
 
+
 let init_base f = init_db ~mode:Exclusive f
 
+(*
 let root_goals () = 
   let db = current () in
   let l = Main.all_root_goals db in
   List.rev_map (Goal.from_id db) l
     
 *)
+
+let files _ = assert false
 
 
 
@@ -1094,11 +1103,12 @@ let set_edited_as _ = assert false
 let add_transformation _ = assert false
 let add_goal _ = assert false
 let add_theory _ = assert false
-let add_file _ = assert false
+
+let add_file f = Main.add (current()) f
 
 
 (*
 Local Variables: 
-compile-command: "unset LANG; make -C ../.. bin/whyide.byte"
+compile-command: "unset LANG; make -C ../.. bin/whydb.byte"
 End: 
 *)

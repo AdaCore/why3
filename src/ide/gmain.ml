@@ -25,9 +25,9 @@ open Whyconf
 open Gconfig
 
 
-(***************************)
-(* parsing comand_line *)
-(***************************)
+(************************)
+(* parsing command line *)
+(************************)
 
 let includes = ref []
 
