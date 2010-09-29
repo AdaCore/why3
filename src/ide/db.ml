@@ -217,20 +217,25 @@ type transf =
       mutable subgoals : goal list;
     }
 
-and goal = {
+and goal = int64
+
+(*
+{
   mutable goal_id : int;
   mutable task_checksum: string;
   mutable proved : bool;
   mutable external_proofs : proof_attempt Hprover.t;
   mutable transformations : transf Htransf.t;
 }
+*)
 
 (** goal accessors *)
 
-let task_checksum g = g.task_checksum
-let proved g = g.proved
-let external_proofs g = g.external_proofs
-let transformations g = g.transformations
+let task_checksum _g = assert false
+let proved _g = assert false
+let external_proofs _g = assert false
+let transformations _g = assert false
+
 
 (** transf accessors *)
 
@@ -239,7 +244,7 @@ let subgoals t = t.subgoals
 
 
 
-type theory 
+type theory = int64
 
 let theory_name _ = assert false
 let goals _ = assert false
@@ -710,29 +715,24 @@ end
 
 
 
-(*
 module Goal = struct
   
-  type t = goal
-      
-  let hash g = Hashtbl.hash g.goal_id 
-
-  let equal g1 g2 = g1.goal_id = g2.goal_id
-
-  let compare g1 g2 = Pervasives.compare g1.goal_id g2.goal_id
-
-
-(*
   let init db =
-    let sql = "create table if not exists goal (id integer primary key autoincrement,task_checksum text,parent_id integer,name text,pos_id integer,proved integer);" in
-    db_must_ok db (fun () -> Sqlite3.exec db.db sql);
+    let sql = 
+      "CREATE TABLE IF NOT EXISTS goals \
+       (goal_id INTEGER PRIMARY KEY AUTOINCREMENT, \
+        goal_name TEXT, task_checksum TEXT, proved INTEGER);" 
+    in
+    db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
+(*
     let sql = "create table if not exists map_external_proofs_goal_external_proof (goal_id integer, external_proof_id integer, primary key(goal_id, external_proof_id));" in
     db_must_ok db (fun () -> Sqlite3.exec db.db sql);
     let sql = "create table if not exists map_transformations_goal_transf (goal_id integer, transf_id integer, primary key(goal_id, transf_id));" in
     db_must_ok db (fun () -> Sqlite3.exec db.db sql);
-    ()
 *)
-
+    ()
+      
+(*
   let init db =
     (* TODO: store the goal origin too *)
     let sql = 
@@ -747,27 +747,23 @@ module Goal = struct
         PRIMARY KEY(goal_id, prover_id));" 
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
+*)
 
-  let add db (g : goal) = 
+  let add db (_th:theory) (name : string) (sum:string) = 
     transaction db 
       (fun () ->
-	 assert (g.goal_id = 0L);
 	 let sql = 
-	   "INSERT INTO goal VALUES(NULL,?,?)" 
+	   "INSERT INTO goals VALUES(NULL,?,?,0)" 
 	 in
 	 let stmt = bind db sql [
-           Sqlite3.Data.TEXT g.task_checksum;
-           Sqlite3.Data.INT (int64_from_bool g.proved);
+           Sqlite3.Data.TEXT name;
+           Sqlite3.Data.TEXT sum;
          ]
          in
 	 db_must_done db (fun () -> Sqlite3.step stmt);
-	 let new_id = Sqlite3.last_insert_rowid db.raw_db in         
-         (*
-           Format.eprintf "Db.Goal.add: add a new goal with id=%Ld@." new_id;
-         *)
-	 g.goal_id <- new_id)
+	 Sqlite3.last_insert_rowid db.raw_db)
 
-
+(*
   let get_all_external_proofs db g =
     let sql="SELECT map_goal_prover_external_proof.external_proof_id \
              FROM map_goal_prover_external_proof WHERE goal_id=?" 
@@ -825,7 +821,9 @@ module Goal = struct
         );
       e
 
+*)
 
+(*
   let set_proved db g b =
       transaction db 
         (fun () ->
@@ -839,18 +837,19 @@ module Goal = struct
            ]
            in
 	   db_must_done db (fun () -> Sqlite3.step stmt))
+*)
     
 
+(*
   let from_id _db _id : goal =
     assert false
       (*
 	let sql="SELECT goal.id, goal.task_checksum, goal.parent_id, goal.name, goal.pos_id, goal.proved, goal_pos.id, goal_pos.file, goal_pos.line, goal_pos.start, goal_pos.stop, goal_parent.id, goal_parent.name, goal_parent.obsolete FROM goal LEFT JOIN transf AS goal_parent ON (goal_parent.id = goal.parent_id) LEFT JOIN loc AS goal_pos ON (goal_pos.id = goal.pos_id) " ^ q in
 	let stmt=Sqlite3.prepare db.db sql in
       *)
+*)
 
 end
-
-*)
 
 (*
 
@@ -1019,12 +1018,37 @@ end
 *)
 
 
+module Theory = struct
+
+  let init db =
+    let sql = "CREATE TABLE IF NOT EXISTS theories (theory_name TEXT, theory_file INTEGER);" in
+    db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
+    ()
+
+  let add db file name = 
+    transaction db 
+      (fun () ->
+         let sql = "INSERT INTO theories VALUES(?,?)" in
+         let stmt = bind db sql [ Sqlite3.Data.TEXT name ; 
+				  Sqlite3.Data.INT file ] in
+         db_must_done db (fun () -> Sqlite3.step stmt);
+         let new_id = Sqlite3.last_insert_rowid db.raw_db in
+	 new_id)
+end
+
 module Main = struct
 
   let init db =
-    let sql = "CREATE TABLE IF NOT EXISTS files (file_name TEXT);" in
+    let sql = "CREATE TABLE IF NOT EXISTS files \
+          (file_id INTEGER PRIMARY KEY AUTOINCREMENT,file_name TEXT);" 
+    in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
-    ()
+    let sql = 
+      "CREATE UNIQUE INDEX IF NOT EXISTS file_idx \
+       ON files (file_id)" 
+    in
+    db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
+
 
   let all_files db =
     let sql="SELECT file_name FROM files" in
@@ -1035,16 +1059,11 @@ module Main = struct
   let add db name = 
     transaction db 
       (fun () ->
-         let sql = "INSERT INTO files VALUES(?)" in
+         let sql = "INSERT INTO files VALUES(NULL,?)" in
          let stmt = bind db sql [ Sqlite3.Data.TEXT name ] in
          db_must_done db (fun () -> Sqlite3.step stmt);
          let new_id = Sqlite3.last_insert_rowid db.raw_db in
-	 new_id
-(*
-         { prover_id = Int64.to_int new_id ; 
-	   prover_name = name }
-*)
-      )
+	 new_id)
 end
 
 
@@ -1063,9 +1082,12 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
 (*
 	Loc.init db;
 	External_proof.init db;
+*)
 	Goal.init db;
+(*
           Transf.init db;
 	*)
+	Theory.init db;
 	Main.init db
 
     | Some _ -> failwith "Db.init_db: already opened"
@@ -1084,7 +1106,6 @@ let root_goals () =
 let files _ = assert false
 
 
-
 let prover_from_name n = 
   let db = current () in
   try ProverId.get db n 
@@ -1101,8 +1122,10 @@ let set_status _ = assert false
 let set_obsolete _ = assert false
 let set_edited_as _ = assert false
 let add_transformation _ = assert false
-let add_goal _ = assert false
-let add_theory _ = assert false
+let add_goal th id sum = Goal.add (current()) th id sum
+
+let add_subgoal _ = assert false
+let add_theory f th = Theory.add (current()) f th
 
 let add_file f = Main.add (current()) f
 

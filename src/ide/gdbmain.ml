@@ -141,6 +141,7 @@ module Model = struct
       { parent : goal_parent;
         task: Task.task;
         goal_row : Gtk.tree_iter;
+	goal_db : Db.goal;
         mutable proved : bool;
         external_proofs: (string, proof_attempt) Hashtbl.t;
         mutable transformations : transf list;
@@ -152,19 +153,23 @@ module Model = struct
         transf : Task.task Trans.trans;
 *)
         transf_row : Gtk.tree_iter;
+	transf_db : Db.transf;
         mutable subgoals : goal list;
       }
         
   and theory =
       { theory : Theory.theory;
         theory_row : Gtk.tree_iter;
+	theory_db : Db.theory;
+	theory_parent : file;
         mutable goals : goal list;
         mutable verified : bool;
       }
 
-  type file =
+  and file =
       { file_name : string;
 	file_row : Gtk.tree_iter;
+	file_db : Db.file;
 	mutable theories: theory list;
         mutable file_verified : bool;
       }
@@ -299,6 +304,10 @@ let (_ : GtkSignal.id) =
 let goals_model,filter_model,goals_view =
   Model.create ~packing:scrollview#add ()
 
+let task_checksum t = 
+  fprintf str_formatter "%a@." Pretty.print_task t;
+  Digest.to_hex (Digest.string (flush_str_formatter ()))
+
 module Helpers = struct
 
   let image_of_result = function
@@ -325,9 +334,10 @@ module Helpers = struct
     goals_view#collapse_row (goals_model#get_path row);
     goals_model#set ~row ~column:Model.status_column !image_yes;
     if !Model.toggle_hide_proved_goals then
-      goals_model#set ~row ~column:Model.visible_column false
-	(* TODO: check if all_theories are verified,
-	   if yes, call set_file proved *)
+      goals_model#set ~row ~column:Model.visible_column false;
+    let f = t.theory_parent in
+    if List.for_all (fun t -> t.verified) f.theories then
+      set_file_verified f
          
   let rec set_proved g =
     let row = g.goal_row in
@@ -355,10 +365,13 @@ module Helpers = struct
 
   let add_theory mfile th =
     let tname = th.Theory.th_name.Ident.id_string in
+    let db_theory = Db.add_theory mfile.file_db tname in
     let parent = mfile.file_row in
     let row = goals_model#append ~parent () in
     let mth = { theory = th; 
                 theory_row = row; 
+		theory_db = db_theory;
+		theory_parent = mfile;
                 goals = [] ; 
                 verified = false } 
     in
@@ -373,9 +386,12 @@ module Helpers = struct
            let id = (Task.task_goal t).Decl.pr_name in
            let name = id.Ident.id_string in
            let row = goals_model#append ~parent:row () in
+	   let sum = task_checksum t in
+	   let db_goal = Db.add_goal db_theory name sum in
            let goal = { parent = Theory mth; 
                         task = t ; 
                         goal_row = row;
+			goal_db = db_goal;
                         external_proofs = Hashtbl.create 7;
                         transformations = [];
                         proved = false;
@@ -398,10 +414,11 @@ module Helpers = struct
   let add_file f =
     try
       let theories = Env.read_file gconfig.env f in
-      let _dbfile = Db.add_file f in
+      let dbfile = Db.add_file f in
       let parent = goals_model#append () in
       let mfile = { file_name = f; 
                     file_row = parent; 
+		    file_db = dbfile;
                     theories = [] ; 
                     file_verified = false } 
       in
@@ -562,6 +579,7 @@ let split_transformation = Trans.lookup_transform_l "split_goal" gconfig.env
 let intro_transformation = Trans.lookup_transform "introduce_premises" gconfig.env
 
 let split_unproved_goals () =
+  let transf_id_split = Db.transf_from_name "split_goal" in
   List.iter
     (fun th ->
        List.iter
@@ -578,12 +596,16 @@ let split_unproved_goals () =
                     "split";
                   goals_model#set ~row:split_row ~column:Model.icon_column
                     !image_transf;
+		  let db_transf = 
+		    Db.add_transformation g.Model.goal_db transf_id_split 
+		  in
                   let tr =
                     { Model.parent_goal = g;
 (*
                       Model.transf = split_transformation;
 *)
                       Model.transf_row = split_row;
+		      Model.transf_db = db_transf;
                       subgoals = [];
                     }
                   in
@@ -593,12 +615,18 @@ let split_unproved_goals () =
                   let goals,_ = List.fold_left
                     (fun (acc,count) subtask ->
                        let _id = (Task.task_goal subtask).Decl.pr_name in
+		       let subgoal_name = 
+                         goal_name ^ "." ^ (string_of_int count)
+		       in
                        let subtask_row = 
                          goals_model#append ~parent:split_row () 
                        in
+		       let sum = task_checksum subtask in
+		       let subtask_db = Db.add_subgoal db_transf subgoal_name sum in
                        let goal = { Model.parent = Model.Transf tr; 
                                     Model.task = subtask ; 
                                     Model.goal_row = subtask_row;
+				    Model.goal_db = subtask_db;
                                     Model.external_proofs = Hashtbl.create 7;
                                     Model.transformations = [];
                                     Model.proved = false;
@@ -609,8 +637,7 @@ let split_unproved_goals () =
                        goals_model#set ~row:subtask_row 
                          ~column:Model.visible_column true;
                        goals_model#set ~row:subtask_row 
-                         ~column:Model.name_column 
-                         (goal_name ^ "." ^ (string_of_int count));
+                         ~column:Model.name_column subgoal_name;
                        goals_model#set ~row:subtask_row 
                          ~column:Model.icon_column !image_file;
                        (goal :: acc, count+1))
@@ -672,7 +699,7 @@ let file_menu = factory#add_submenu "_File"
 let file_factory = new GMenu.factory file_menu ~accel_group 
 
 let (_ : GMenu.image_menu_item) = 
-  file_factory#add_image_item ~label:"_Add file" ~callback:select_file
+  file_factory#add_image_item ~key:GdkKeysyms._A ~label:"_Add file" ~callback:select_file
     () 
 
 let (_ : GMenu.image_menu_item) = 

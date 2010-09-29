@@ -151,9 +151,10 @@ val set_edited_as : proof_attempt -> string -> unit
 
 (** {3 transformations} *)
 
-val add_transformation : goal -> string -> goal list -> transf
-(** adds a transformation for this goal, with the given subgoals
-    @raise AlreadyExist if a transformation with the same name
+val add_transformation : goal -> transf_id -> transf
+(** adds a transformation for this goal.
+    subgoals must be added afterwards by [add_subgoal]
+    @raise AlreadyExist if a transformation with the same id
     is already there *)
 
 (* todo: remove_transformation *)
@@ -166,15 +167,20 @@ val add_goal : theory -> string -> string -> goal
     @raise AlreadyExist if a goal with the same id already exists
     in this theory *)
 
+val add_subgoal : transf -> string -> string -> goal
+(** [add_subgoal t id sum] adds to transf [t] a new subgoal named [id], with
+    [sum] as the checksum of its task. 
+    @raise AlreadyExist if a goal with the same id already exists
+    as subgoal of this transf *)
+
 (* todo: remove_goal *)
 
 (** {3 theories} *)
 
-val add_theory : file -> string -> string -> unit
-(** [add_goal th id sum] adds to theory [th] a new goal named [id], with
-    [sum] as the checksum of its task.
-    @raise AlreadyExist if a goal with the same id already exists
-    in this theory *)
+val add_theory : file -> string -> theory
+(** [add_theory f id] adds to file f a theory named [th].
+    @raise AlreadyExist if a theory with the same id already exists
+    in this file *)
 
 (* todo: remove_theory *)
 
