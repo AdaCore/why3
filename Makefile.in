@@ -387,6 +387,8 @@ install_no_local::
 # IDE
 ###############
 
+ifeq (@enable_ide@,yes)
+
 IDE_FILES = gconfig scheduler gmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
@@ -400,10 +402,8 @@ $(IDECMO) $(IDECMX): INCLUDES += -I src/ide
 
 # build targets
 
-ifeq (@enable_ide@,yes)
 byte: bin/whyide.byte 
 opt:  bin/whyide.opt 
-endif
 
 bin/whyide.opt bin/whyide.byte: INCLUDES += -thread -I +threads -I +lablgtk2 
 bin/whyide.opt bin/whyide.byte: EXTOBJS += gtkThread
@@ -436,10 +436,13 @@ clean::
 install_no_local::
 	cp -f bin/whyide.@OCAMLBEST@ $(BINDIR)/why3ide
 
+endif
 
 ###############
 # IDE WITH DB
 ###############
+
+ifeq (@enable_sql@,yes)
 
 DB_FILES = gconfig scheduler db gdbmain
 
@@ -454,10 +457,8 @@ $(DBCMO) $(DBCMX): INCLUDES += -I src/ide -I +sqlite3
 
 # build targets
 
-ifeq (@enable_sql@,yes)
 byte: bin/whydb.byte 
 opt:  bin/whydb.opt 
-endif
 
 bin/whydb.opt bin/whydb.byte: INCLUDES += -thread -I +threads -I +lablgtk2 -I +sqlite3
 bin/whydb.opt bin/whydb.byte: EXTOBJS += gtkThread
@@ -489,6 +490,8 @@ clean::
 
 install_no_local::
 	cp -f bin/whydb.@OCAMLBEST@ $(BINDIR)/why3db
+
+endif
 
 ##############
 # Coq plugin
