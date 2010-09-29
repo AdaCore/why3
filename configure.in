@@ -72,6 +72,10 @@ AC_ARG_ENABLE(ide,
     [  --enable-ide            enable Why3 IDE],,
     enable_ide=yes)
 
+AC_ARG_ENABLE(sql,
+    [  --enable-sql            enable Why3 IDE + SQL],,
+    enable_sql=yes)
+
 # dynlink
 
 AC_ARG_ENABLE(plugins,
@@ -250,12 +254,19 @@ if test "$enable_menhirlib" = yes ; then
 AC_CHECK_FILE($OCAMLLIB/menhirLib,,enable_menhirlib=no)
 fi
 
-# checking for sqlite3 and lablgtk2
+# checking for lablgtk2
 if test "$enable_ide" = yes ; then
 #AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_ide=no)
 AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtk.cma,,enable_ide=no)
 AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtksourceview2.cma,,enable_ide=no)
 fi
+
+# checking for sqlite3
+if test "$enable_sql" = yes ; then
+AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_sql=no)
+fi
+
+
 dnl AC_CHECK_PROG(enable_ide,lablgtk2,yes,no) not always available (Win32)
 
 dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
@@ -342,6 +353,7 @@ dnl AC_SUBST(OCAMLWEB)
 AC_SUBST(CAMLP5O)
 
 AC_SUBST(enable_ide)
+AC_SUBST(enable_sql)
 AC_SUBST(enable_plugins)
 AC_SUBST(DYNLINK)
 
@@ -381,6 +393,7 @@ echo "OCaml version           : $OCAMLVERSION"
 echo "OCaml library path      : $OCAMLLIB"
 echo "Verbose make            : $enable_verbose_make"
 echo "Why IDE                 : $enable_ide"
+echo "Why IDE with database   : $enable_sql"
 echo "Why plugins             : $enable_plugins"
 echo "Coq support             : $enable_coq_support"
 if test "$enable_coq_support" = "yes" ; then

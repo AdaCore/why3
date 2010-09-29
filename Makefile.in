@@ -450,7 +450,7 @@ $(DBCMO) $(DBCMX): INCLUDES += -I src/ide -I +sqlite3
 
 # build targets
 
-ifeq (@enable_ide@,yes)
+ifeq (@enable_sql@,yes)
 byte: bin/whydb.byte 
 opt:  bin/whydb.opt 
 endif
