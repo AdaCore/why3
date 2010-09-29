@@ -407,7 +407,7 @@ let do_input env drv = function
         | "-" -> "stdin", stdin
         | f   -> f, open_in f
       in
-      let m = Env.read_channel ?name:!opt_parser env fname cin in
+      let m = Env.read_channel ?format:!opt_parser env fname cin in
       close_in cin;
       if !opt_type_only then
         ()

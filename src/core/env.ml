@@ -77,9 +77,11 @@ let register_format name suffixes rc =
   Hashtbl.add read_channel_table name rc;
   List.iter (fun s -> Hashtbl.add suffixes_table ("." ^ s) name) suffixes
 
+exception NoFormat
+exception UnknownExtension of string 
 exception UnknownFormat of string (* parser name *)
 
-let parser_for_file ?name file = match name with
+let parser_for_file ?format file = match format with
   | None ->
       begin try
 	let ext =
@@ -87,11 +89,11 @@ let parser_for_file ?name file = match name with
 	  let n = String.length s in
 	  String.sub file n (String.length file - n)
 	in
-	Hashtbl.find suffixes_table ext
-      with Invalid_argument _ | Not_found ->
-        Format.eprintf "Cannot determine format for file=%S@." file;
-        Format.eprintf "Using 'why' as default@.";
-        "why"
+        try
+	  Hashtbl.find suffixes_table ext
+        with Not_found -> raise (UnknownExtension ext)
+      with 
+        | Invalid_argument _ -> raise NoFormat
       end
   | Some n ->
       n
@@ -100,14 +102,14 @@ let find_parser table n =
   try Hashtbl.find table n
   with Not_found -> raise (UnknownFormat n)
 
-let read_channel ?name env file ic =
-  let n = parser_for_file ?name file in
+let read_channel ?format env file ic =
+  let n = parser_for_file ?format file in
   let rc = find_parser read_channel_table n in
   rc env file ic
 
-let read_file ?name env file =
+let read_file ?format env file =
   let cin = open_in file in
-  let m = read_channel ?name env file cin in
+  let m = read_channel ?format env file cin in
   close_in cin;
   m
 
@@ -129,6 +131,10 @@ let () = Exn_printer.register
         (Pp.print_list Pp.dot Format.pp_print_string) sl s
   | UnknownFormat s ->
       Format.fprintf fmt "Unknown input format: %s" s
+  | UnknownExtension s ->
+      Format.fprintf fmt "Unknown file extension: %s" s
+  | NoFormat ->
+      Format.fprintf fmt "No input format given"
   | _ -> raise exn
   end
 
