@@ -170,7 +170,12 @@ LIB_PARSER_INTERFACE = \
 src/parser/parser.ml src/parser/parser.mli: src/parser/parser.mly
 	$(OCAMLYACC) $<
 	printf $(LIB_PARSER_POSTLUDE) >> src/parser/parser.ml
-	sed -i $(LIB_PARSER_INTERFACE) src/parser/parser.mli
+	# not portable: sed -i $(LIB_PARSER_INTERFACE) src/parser/parser.mli
+	mv src/parser/parser.mli src/parser/parser.mli.bak
+	sed $(LIB_PARSER_INTERFACE) src/parser/parser.mli.bak > src/parser/parser.mli
+
+
+
 
 # build targets
 
