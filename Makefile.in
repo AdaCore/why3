@@ -163,19 +163,17 @@ LIB_PARSER_POSTLUDE = \
   "let logic_file_eof env = inside_env env logic_file_eof\nlet list0_decl_eof env lenv uc = inside_uc env lenv uc list0_decl_eof\n"
 
 LIB_PARSER_INTERFACE = \
-  -e "s/^val \+logic_file_eof *:/\0 Env.env ->/" \
-  -e "s/^val \+list0_decl_eof *:/\0 Env.env -> \
+  -e "s/^val  *logic_file_eof *:/val logic_file_eof : Env.env ->/" \
+  -e "s/^val  *list0_decl_eof *:/val list0_decl_eof : Env.env -> \
   Theory.theory Theory.Mnm.t -> Theory.theory_uc ->/"
 
 src/parser/parser.ml src/parser/parser.mli: src/parser/parser.mly
 	$(OCAMLYACC) $<
 	printf $(LIB_PARSER_POSTLUDE) >> src/parser/parser.ml
-	# not portable: sed -i $(LIB_PARSER_INTERFACE) src/parser/parser.mli
-	perl -pi -e  "s/val logic_file_eof :/val logic_file_eof : Env.env ->/" src/parser/parser.mli
-	perl -pi -e   "s/val list0_decl_eof :/val list0_decl_eof : Env.env -> \
-  Theory.theory Theory.Mnm.t -> Theory.theory_uc ->/" src/parser/parser.mli
-
-
+	mv src/parser/parser.mli src/parser/parser.mli.orig
+	sed $(LIB_PARSER_INTERFACE) src/parser/parser.mli.orig > \
+					src/parser/parser.mli
+	rm src/parser/parser.mli.orig
 
 # build targets
 
@@ -398,14 +396,14 @@ IDEMLI = $(addsuffix .mli, $(IDEMODULES))
 IDECMO = $(addsuffix .cmo, $(IDEMODULES))
 IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
-$(IDECMO) $(IDECMX): INCLUDES += -I src/ide 
+$(IDECMO) $(IDECMX): INCLUDES += -I src/ide
 
 # build targets
 
-byte: bin/whyide.byte 
-opt:  bin/whyide.opt 
+byte: bin/whyide.byte
+opt:  bin/whyide.opt
 
-bin/whyide.opt bin/whyide.byte: INCLUDES += -thread -I +threads -I +lablgtk2 
+bin/whyide.opt bin/whyide.byte: INCLUDES += -thread -I +threads -I +lablgtk2
 bin/whyide.opt bin/whyide.byte: EXTOBJS += gtkThread
 bin/whyide.opt bin/whyide.byte: EXTLIBS += threads lablgtk lablgtksourceview2
 
@@ -457,8 +455,8 @@ $(DBCMO) $(DBCMX): INCLUDES += -I src/ide -I +sqlite3
 
 # build targets
 
-byte: bin/whydb.byte 
-opt:  bin/whydb.opt 
+byte: bin/whydb.byte
+opt:  bin/whydb.opt
 
 bin/whydb.opt bin/whydb.byte: INCLUDES += -thread -I +threads -I +lablgtk2 -I +sqlite3
 bin/whydb.opt bin/whydb.byte: EXTOBJS += gtkThread
@@ -757,7 +755,7 @@ test-api: src/why.cma
 DOC = doc/manual.pdf
 # doc/manual.html
 
-doc: $(DOC) 
+doc: $(DOC)
 
 doc/manual.pdf: doc/apidoc.tex doc/manual.tex doc/version.tex
 	cd doc; pdflatex manual
@@ -787,12 +785,12 @@ apidoc: $(FILESTODOC)
 	mkdir -p apidoc
 	$(OCAMLDOC) -d apidoc -html -keep-code $(INCLUDES) \
 		$(LIBINCLUDES) $(FILESTODOC)
-# $(LIBML) 
+# $(LIBML)
 
 doc/apidoc.tex: $(FILESTODOC)
 	$(OCAMLDOC) -o doc/apidoc.tex -latex -noheader -notrailer $(INCLUDES) \
 		$(LIBINCLUDES) $(FILESTODOC)
-# $(LIBML) 
+# $(LIBML)
 
 clean::
 	rm -f apidoc/*
