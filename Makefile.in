@@ -226,8 +226,12 @@ install_no_local::
 	mkdir -p $(LIBDIR)/why3
 	mkdir -p $(DATADIR)/why3/images
 	mkdir -p $(DATADIR)/why3/lang
-	cp -f --parents theories/*.why theories/*/*.why $(DATADIR)/why3/
-	cp -f --parents drivers/*.drv $(DATADIR)/why3/
+	mkdir -p $(DATADIR)/why3/theories
+	mkdir -p $(DATADIR)/why3/theories/transform
+	mkdir -p $(DATADIR)/why3/drivers
+	cp -f theories/*.why $(DATADIR)/why3/theories
+	cp -f theories/transform/*.why $(DATADIR)/why3/theories/transform
+	cp -f drivers/*.drv $(DATADIR)/why3/drivers
 	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
 	cp -f share/images/*.png $(DATADIR)/why3/images
 	cp -f share/lang/why.lang $(DATADIR)/why3/lang/why.lang
