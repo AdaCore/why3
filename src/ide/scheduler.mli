@@ -66,10 +66,13 @@ val schedule_proof_attempt :
   *)
 
 
-val apply_transformation : 
-  callback:(Why.Task.task list -> unit) -> 
-  Why.Task.task list Trans.trans -> Task.task -> unit
+val apply_transformation :
+  callback:(Why.Task.task -> unit) ->
+  Why.Task.task Trans.trans -> Task.task -> unit
 
+val apply_transformation_l :
+  callback:(Why.Task.task list -> unit) ->
+  Why.Task.task list Trans.trans -> Task.task -> unit
 
 val edit_proof :
   debug:bool ->

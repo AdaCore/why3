@@ -647,7 +647,7 @@ let split_unproved_goals () =
                   goals_view#expand_row (goals_model#get_path row)           
               in
               
-              Scheduler.apply_transformation ~callback
+              Scheduler.apply_transformation_l ~callback
                 split_transformation g.Model.task
          )
          th.Model.goals

@@ -19,20 +19,22 @@ type proof_attempt_status =
 (**** queues of events to process ****)
 
 type callback = proof_attempt_status -> float -> string -> unit
-type attempt = bool * int * int * in_channel option * string * Driver.driver * 
-    callback * Task.task 
+type attempt = bool * int * int * in_channel option * string * Driver.driver *
+    callback * Task.task
 
 (* queue of external proof attempts *)
 let prover_attempts_queue : attempt Queue.t = Queue.create ()
 
 (* queue of proof editing tasks *)
-let proof_edition_queue : (bool * string * string * Driver.driver * 
+let proof_edition_queue : (bool * string * string * Driver.driver *
     (unit -> unit) * Task.task)  Queue.t = Queue.create ()
 
+type job =
+  | TaskL of (Task.task list -> unit) * Task.task list Trans.trans * Task.task
+  | Task of (Task.task -> unit) * Task.task Trans.trans * Task.task
+
 (* queue of transformations *)
-let transf_queue  : 
-    ((Task.task list -> unit) * 'a Trans.trans * Task.task) Queue.t 
-    = Queue.create ()
+let transf_queue  : job Queue.t = Queue.create ()
 
 type answer =
   | Prover_answer of callback * proof_attempt_status * float * string
@@ -82,23 +84,27 @@ let event_handler () =
   with Queue.Empty ->
     try
       (* priority 2: apply transformations *)
-      let (callback,transf,task) = Queue.pop transf_queue in
+      let k = Queue.pop transf_queue in
       Mutex.unlock queue_lock;
-      let subtasks : Task.task list = Trans.apply transf task in
-      (* call GUI back given new subgoals *)
-      !async (fun () -> callback subtasks) ()
+      match k with
+      | TaskL (cb, tf, task) ->
+          let subtasks : Task.task list = Trans.apply tf task in
+          !async (fun () -> cb subtasks) ()
+      | Task (cb,tf, task) ->
+          let task = Trans.apply tf task in
+          !async (fun () -> cb task) ()
     with Queue.Empty ->
     try
       (* priority 3: edit proofs *)
       let (_debug,editor,file,driver,callback,goal) = Queue.pop proof_edition_queue in
       Mutex.unlock queue_lock;
       let backup = file ^ ".bak" in
-      let old = 
+      let old =
         if Sys.file_exists file
-        then 
+        then
           begin
-            Sys.rename file backup;           
-            Some(open_in backup) 
+            Sys.rename file backup;
+            Some(open_in backup)
           end
         else None
       in
@@ -215,9 +221,15 @@ let edit_proof ~debug ~editor ~file ~driver ~callback goal =
 
 let apply_transformation ~callback transf goal =
   Mutex.lock queue_lock;
-  Queue.push (callback,transf,goal) transf_queue;
+  Queue.push (Task (callback,transf,goal)) transf_queue;
   Condition.signal queue_condition;
   Mutex.unlock queue_lock;
   ()
-  
 
+
+let apply_transformation_l ~callback transf goal =
+  Mutex.lock queue_lock;
+  Queue.push (TaskL (callback,transf,goal)) transf_queue;
+  Condition.signal queue_condition;
+  Mutex.unlock queue_lock;
+  ()

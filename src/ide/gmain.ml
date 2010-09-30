@@ -274,50 +274,62 @@ let exit_function () =
   save_config ();
   GMain.quit ()
 
-let w = GWindow.window 
+let w = GWindow.window
   ~allow_grow:true ~allow_shrink:true
-  ~width:gconfig.window_width 
-  ~height:gconfig.window_height 
+  ~width:gconfig.window_width
+  ~height:gconfig.window_height
   ~title:"why-ide" ()
 
-let (_ : GtkSignal.id) = w#connect#destroy ~callback:exit_function 
+let (_ : GtkSignal.id) = w#connect#destroy ~callback:exit_function
 
-let (_ : GtkSignal.id) = 
-  w#misc#connect#size_allocate 
+let (_ : GtkSignal.id) =
+  w#misc#connect#size_allocate
     ~callback:
-    (fun {Gtk.width=w;Gtk.height=h} -> 
+    (fun {Gtk.width=w;Gtk.height=h} ->
        gconfig.window_height <- h;
        gconfig.window_width <- w)
 
-let vbox = GPack.vbox ~homogeneous:false ~packing:w#add () 
+let vbox = GPack.vbox ~homogeneous:false ~packing:w#add ()
 
 (* Menu *)
 
-let menubar = GMenu.menu_bar ~packing:vbox#pack () 
+let menubar = GMenu.menu_bar ~packing:vbox#pack ()
 
-let factory = new GMenu.factory menubar 
+let factory = new GMenu.factory menubar
 
-let accel_group = factory#accel_group 
+let accel_group = factory#accel_group
 
 (* horizontal paned *)
 
-let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:vbox#add () 
+let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:vbox#add ()
 
 (* tree view *)
-let scrollview = 
-  GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC 
-    ~width:gconfig.tree_width 
-    ~packing:hp#add () 
+let scrollview =
+  GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
+    ~width:gconfig.tree_width
+    ~packing:hp#add ()
 
-let () = scrollview#set_shadow_type `ETCHED_OUT 
-let (_ : GtkSignal.id) = 
-  scrollview#misc#connect#size_allocate 
+let () = scrollview#set_shadow_type `ETCHED_OUT
+let (_ : GtkSignal.id) =
+  scrollview#misc#connect#size_allocate
     ~callback:
-    (fun {Gtk.width=w;Gtk.height=_h} -> 
+    (fun {Gtk.width=w;Gtk.height=_h} ->
        gconfig.tree_width <- w)
 
 let goals_model,filter_model,goals_view =
   Model.create ~packing:scrollview#add ()
+
+let new_row ?(dir=`Append) ?(visible=true) ?parent ~icon name index =
+  let row =
+    match dir with
+    | `Append -> goals_model#append ?parent ()
+    | `Prepend -> goals_model#prepend ?parent () in
+  goals_model#set ~row ~column:Model.visible_column visible;
+  goals_model#set ~row ~column:Model.name_column name;
+  goals_model#set ~row ~column:Model.icon_column icon;
+  let block, index = index row in
+  goals_model#set ~row ~column:Model.index_column index;
+  row, block
 
 module Helpers = struct
 
@@ -359,70 +371,53 @@ module Helpers = struct
   let set_proof_status a s =
     a.status <- s;
     let row = a.proof_row in
-    goals_model#set ~row ~column:Model.status_column 
+    goals_model#set ~row ~column:Model.status_column
       (image_of_result s);
-    if s = Scheduler.Success then set_proved a.proof_goal              
+    if s = Scheduler.Success then set_proved a.proof_goal
 
   let add_theory th =
     let tname = th.Theory.th_name.Ident.id_string in
-    let parent = goals_model#append () in
-    let mth = { theory = th; 
-                theory_row = parent; 
-                goals = [] ; 
-                verified = false } 
-    in
+    let parent, mth = new_row ~icon:!image_directory tname
+    (fun r ->
+      let mth = { theory = th; theory_row = r;
+                  goals = [] ; verified = false } in
+      mth, Row_theory mth) in
     all := !all @ [mth];
-    goals_model#set ~row:parent ~column:name_column tname;
-    goals_model#set ~row:parent ~column:icon_column !image_directory;
-    goals_model#set ~row:parent ~column:index_column (Row_theory mth);
-    goals_model#set ~row:parent ~column:visible_column true;
     let tasks = Task.split_theory th None None in
     let goals =
-      List.fold_left
-        (fun acc t ->
-           let id = (Task.task_goal t).Decl.pr_name in
-           let name = id.Ident.id_string in
-           let row = goals_model#append ~parent () in
-           let goal = { parent = Theory mth; 
-                        task = t ; 
-                        goal_row = row;
-                        external_proofs = Hashtbl.create 7;
-                        transformations = [];
-                        proved = false;
-                      }
-           in
-	   goals_model#set ~row ~column:name_column name;
-           goals_model#set ~row ~column:icon_column !image_file;
-	   goals_model#set ~row ~column:index_column (Row_goal goal);
-           goals_model#set ~row ~column:visible_column true;
-           goal :: acc
-        )
-        []
-        (List.rev tasks)
+      List.fold_left (fun acc t ->
+         let id = (Task.task_goal t).Decl.pr_name in
+         let name = id.Ident.id_string in
+         let _, goal = new_row ~parent ~icon:!image_file name
+           (fun r ->
+             let goal = { parent = Theory mth; task = t ;
+                          goal_row = r;
+                          external_proofs = Hashtbl.create 7;
+                          transformations = []; proved = false; } in
+             goal, Row_goal goal) in
+         goal :: acc) [] (List.rev tasks)
     in
     mth.goals <- List.rev goals;
     if goals = [] then set_theory_proved mth
-    
-
 end
 
-let () = 
+let () =
   Theory.Mnm.iter (fun _ th -> Helpers.add_theory th) theories;
   goals_view#expand_all ()
 
 
 
-let () = 
+let () =
   begin
     Scheduler.async := GtkThread.async;
 (*
     match config.running_provers_max with
       | None -> ()
-      | Some n -> 
+      | Some n ->
           if n >= 1 then Scheduler.maximum_running_proofs := n
 *)
     Scheduler.maximum_running_proofs := gconfig.max_running_processes
-  end 
+  end
 
 (*****************************************************)
 (* method: run a given prover on each unproved goals *)
@@ -447,37 +442,33 @@ let redo_external_proof g a =
     (Some (open_in a.Model.edited_as))
   in
   Scheduler.schedule_proof_attempt
-    ~debug:(gconfig.verbose > 0) ~timelimit:gconfig.time_limit ~memlimit:0 
-    ?old ~command:p.command ~driver:p.driver 
+    ~debug:(gconfig.verbose > 0) ~timelimit:gconfig.time_limit ~memlimit:0
+    ?old ~command:p.command ~driver:p.driver
     ~callback
     g.Model.task
 
 let rec prover_on_goal p g =
   let row = g.Model.goal_row in
   let id = p.prover_id in
-  let a = 
-    try Hashtbl.find g.Model.external_proofs id 
+  let a =
+    try Hashtbl.find g.Model.external_proofs id
     with Not_found ->
       (* creating a new row *)
       let name = p.prover_name in
-      let prover_row = goals_model#prepend ~parent:row () in
-      goals_model#set ~row:prover_row ~column:Model.icon_column !image_prover;
-      goals_model#set ~row:prover_row ~column:Model.name_column
-        (name ^ " " ^ p.prover_version);
-      goals_model#set ~row:prover_row ~column:Model.visible_column true;
+      let _, a =
+        new_row ~dir:`Prepend ~parent:row ~icon:!image_prover
+          (name ^ " " ^ p.prover_version)
+          (fun r ->
+            let a = { Model.prover = p;
+                      Model.proof_goal = g;
+                      Model.proof_row = r;
+                      Model.status = Scheduler.Scheduled;
+                      Model.proof_obsolete = false;
+                      Model.time = 0.0;
+                      Model.output = "";
+                      Model.edited_as = ""; } in
+            a, Model.Row_proof_attempt a) in
       goals_view#expand_row (goals_model#get_path row);
-      let a = { Model.prover = p;
-                Model.proof_goal = g;
-                Model.proof_row = prover_row;
-                Model.status = Scheduler.Scheduled;
-                Model.proof_obsolete = false;
-                Model.time = 0.0;
-                Model.output = "";
-                Model.edited_as = "";
-              }
-      in
-      goals_model#set ~row:prover_row ~column:Model.index_column 
-        (Model.Row_proof_attempt a);
       Hashtbl.add g.Model.external_proofs id a;
       a
   in
@@ -529,74 +520,53 @@ let prover_on_selected_goals pr =
 
 let split_transformation = Trans.lookup_transform_l "split_goal" gconfig.env
 let intro_transformation = Trans.lookup_transform "introduce_premises" gconfig.env
+let lookup_transform s = Trans.lookup_transform s gconfig.env
+let lookup_transform_l s = Trans.lookup_transform_l s gconfig.env
+let split_transformation = lookup_transform_l "split_goal"
+let intro_transformation = lookup_transform "introduce_premises"
 
-let split_unproved_goals () =
-  List.iter
-    (fun th ->
-       List.iter
-         (fun g ->
-            if not g.Model.proved then         
-              let row = g.Model.goal_row in
-              let goal_name = goals_model#get ~row ~column:Model.name_column in
-              let callback subgoals =
-                if List.length subgoals >= 2 then
-                  let split_row = goals_model#append ~parent:row () in
-                  goals_model#set ~row:split_row ~column:Model.visible_column
-                    true;
-                  goals_model#set ~row:split_row ~column:Model.name_column
-                    "split";
-                  goals_model#set ~row:split_row ~column:Model.icon_column
-                    !image_transf;
-                  let tr =
-                    { Model.parent_goal = g;
-(*
-                      Model.transf = split_transformation;
-*)
-                      Model.transf_row = split_row;
-                      subgoals = [];
-                    }
-                  in
-                  goals_model#set ~row:split_row ~column:Model.index_column 
-                    (Model.Row_transformation tr);
-                  g.Model.transformations <- tr :: g.Model.transformations;
-                  let goals,_ = List.fold_left
-                    (fun (acc,count) subtask ->
-                       let _id = (Task.task_goal subtask).Decl.pr_name in
-                       let subtask_row = 
-                         goals_model#append ~parent:split_row () 
-                       in
-                       let goal = { Model.parent = Model.Transf tr; 
-                                    Model.task = subtask ; 
-                                    Model.goal_row = subtask_row;
-                                    Model.external_proofs = Hashtbl.create 7;
-                                    Model.transformations = [];
-                                    Model.proved = false;
-                                  }
-                       in
-	               goals_model#set ~row:subtask_row 
-                         ~column:Model.index_column (Model.Row_goal goal);
-                       goals_model#set ~row:subtask_row 
-                         ~column:Model.visible_column true;
-                       goals_model#set ~row:subtask_row 
-                         ~column:Model.name_column 
-                         (goal_name ^ "." ^ (string_of_int count));
-                       goals_model#set ~row:subtask_row 
-                         ~column:Model.icon_column !image_file;
-                       (goal :: acc, count+1))
-                    ([],1) subgoals 
-                  in
-                  tr.Model.subgoals <- List.rev goals;
-                  goals_view#expand_row (goals_model#get_path row);
-                  goals_view#expand_row (goals_model#get_path split_row)
-              in
-              
-              Scheduler.apply_transformation ~callback
-                split_transformation g.Model.task
-         )
-         th.Model.goals
-    )
-    !Model.all
+let build_subtree g row name abort_cond subgoals =
+  let goal_name = goals_model#get ~row ~column:Model.name_column in
+  if not (abort_cond subgoals) then
+    let nrow, tr = new_row ~parent:row ~icon:!image_transf name
+      (fun r ->
+        let tr =
+          { Model.parent_goal = g; Model.transf_row = r; subgoals = []; } in
+        tr, Model.Row_transformation tr) in
+    g.Model.transformations <- tr :: g.Model.transformations;
+    let goals,_ = List.fold_left
+      (fun (acc,count) subtask ->
+         let _id = (Task.task_goal subtask).Decl.pr_name in
+         let _, goal =
+           new_row ~parent:nrow ~icon:!image_file
+                   (goal_name ^ "." ^ (string_of_int count))
+                   (fun r ->
+                     let goal =
+                       { Model.parent = Model.Transf tr;
+                         Model.task = subtask ;
+                         Model.goal_row = r;
+                         Model.external_proofs = Hashtbl.create 7;
+                         Model.transformations = [];
+                         Model.proved = false; } in
+                     goal, Model.Row_goal g) in
+         (goal :: acc, count+1))
+      ([],1) subgoals
+    in
+    tr.Model.subgoals <- List.rev goals;
+    goals_view#expand_row (goals_model#get_path row);
+    goals_view#expand_row (goals_model#get_path nrow)
 
+ let split_unproved_goals () =
+  List.iter (fun th ->
+    List.iter (fun g ->
+      if not g.Model.proved then
+        let row = g.Model.goal_row in
+        let callback =
+          build_subtree g row "split" (fun l -> List.length l < 2) in
+        Scheduler.apply_transformation_l ~callback
+          split_transformation g.Model.task
+      ) th.Model.goals
+    ) !Model.all
 
 (*************)
 (* File menu *)
@@ -640,7 +610,7 @@ let rec collapse_proved_goal g =
       goals_view#collapse_row (goals_model#get_path row);
     end
   else
-    List.iter 
+    List.iter
       (fun t -> List.iter collapse_proved_goal t.Model.subgoals)
       g.Model.transformations
 
@@ -756,15 +726,14 @@ let () =
   add_refresh_provers add_item_provers;
   add_item_provers ()
 
-let () =
-  let add_item_split () =
-    ignore(tools_factory#add_image_item
-             ~label:"Split unproved goals"
-             ~callback:split_unproved_goals
-             () : GMenu.image_menu_item) in
-  add_refresh_provers add_item_split;
-  add_item_split ()
+let add_transformation_entry label callback =
+  let add_item () =
+    ignore(tools_factory#add_image_item ~label ~callback ()) in
+  add_refresh_provers add_item;
+  add_item ()
 
+let () =
+  add_transformation_entry "Split unproved goals" split_unproved_goals
 
 
 (*************)
