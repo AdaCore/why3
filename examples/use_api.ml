@@ -27,7 +27,7 @@ let alt_ergo =
     Util.Mstr.find "alt-ergo" provers 
   with Not_found ->
     eprintf "Prover alt-ergo not installed or not configured@.";
-    failwith "Cannot continue without alt-ergo installed"
+    exit 0
 
 let alt_ergo_driver = Driver.load_driver env alt_ergo.Whyconf.driver
 

@@ -308,6 +308,21 @@ let task_checksum t =
   fprintf str_formatter "%a@." Pretty.print_task t;
   Digest.to_hex (Digest.string (flush_str_formatter ()))
 
+
+let info_window mt s =
+  let d = GWindow.message_dialog
+    ~message:s
+    ~message_type:mt
+    ~buttons:GWindow.Buttons.close
+    ~title:"Why3 info or error"
+    ~show:true () 
+  in
+  let (_ : GtkSignal.id) =
+    d#connect#response 
+      ~callback:(function `CLOSE | `DELETE_EVENT -> d#destroy ())
+  in
+  ()
+
 module Helpers = struct
 
   let image_of_result = function
@@ -363,9 +378,8 @@ module Helpers = struct
       (image_of_result s);
     if s = Scheduler.Success then set_proved a.proof_goal              
 
-  let add_theory mfile th =
+  let add_theory_row mfile th db_theory =
     let tname = th.Theory.th_name.Ident.id_string in
-    let db_theory = Db.add_theory mfile.file_db tname in
     let parent = mfile.file_row in
     let row = goals_model#append ~parent () in
     let mth = { theory = th; 
@@ -379,7 +393,14 @@ module Helpers = struct
     goals_model#set ~row ~column:icon_column !image_directory;
     goals_model#set ~row ~column:index_column (Row_theory mth);
     goals_model#set ~row ~column:visible_column true;
+    mth
+
+  let add_theory mfile th =
     let tasks = Task.split_theory th None None in
+    let tname = th.Theory.th_name.Ident.id_string in
+    let db_theory = Db.add_theory mfile.file_db tname in
+    let mth = add_theory_row mfile th db_theory in
+    let row = mth.theory_row in
     let goals =
       List.fold_left
         (fun acc t ->
@@ -410,11 +431,7 @@ module Helpers = struct
     if goals = [] then set_theory_proved mth;
     mth
     
-
-  let add_file f =
-    try
-      let theories = Env.read_file gconfig.env f in
-      let dbfile = Db.add_file f in
+  let add_file_row f dbfile =
       let parent = goals_model#append () in
       let mfile = { file_name = f; 
                     file_row = parent; 
@@ -428,6 +445,13 @@ module Helpers = struct
       goals_model#set ~row:parent ~column:icon_column !image_directory;
       goals_model#set ~row:parent ~column:index_column (Row_file mfile);
       goals_model#set ~row:parent ~column:visible_column true;
+      mfile
+
+  let add_file f =
+    try
+      let theories = Env.read_file gconfig.env f in
+      let dbfile = Db.add_file f in
+      let mfile = add_file_row f dbfile in
       let theories = 
 	Theory.Mnm.fold
           (fun thname t acc ->
@@ -441,27 +465,46 @@ module Helpers = struct
       mfile.theories <- List.rev theories;
       if theories = [] then set_file_verified mfile
     with e ->
-      eprintf "Error while reading file '%s': %a@." f 
-	Exn_printer.exn_printer e
+      fprintf str_formatter 
+        "@[Error while reading file@ '%s':@ %a@]" f
+	Exn_printer.exn_printer e;
+      let msg = flush_str_formatter () in
+      info_window `ERROR msg
 
 end
 
-(*
+(*********************************)
+(*  read previous data from db   *)
+(*********************************)
 
-TODO: read files from db
+let () =
+  let files = Db.files () in
+  List.iter
+    (fun (f,fn) -> 
+       eprintf "Reimporting file '%s'@." fn;
+       let theories = Env.read_file gconfig.env fn in
+       let mfile = Helpers.add_file_row fn f in
+       let ths = Db.theories f in
+       List.iter
+         (fun db_th ->
+            let tname = Db.theory_name db_th in
+            eprintf "Reimporting theory '%s'@."tname;
+            let th = Theory.Mnm.find tname theories in
+            let (_mth : Model.theory) = Helpers.add_theory_row mfile th db_th in
+            ( (* TODO *) )
+         )
+         ths
+    )
+    files
 
-*)
 
+(**********************)
+(* set up scheduler   *)
+(**********************)
 
 let () = 
   begin
     Scheduler.async := GtkThread.async;
-(*
-    match config.running_provers_max with
-      | None -> ()
-      | Some n -> 
-          if n >= 1 then Scheduler.maximum_running_proofs := n
-*)
     Scheduler.maximum_running_proofs := gconfig.max_running_processes
   end 
 
@@ -870,21 +913,6 @@ let () =
 (* Help menu *)
 (*************)
 
-(*
-let info_window t s () =
-  let d = GWindow.message_dialog
-    ~message:s
-    ~message_type:`INFO
-    ~buttons:GWindow.Buttons.close
-    ~title:t
-    ~show:true () 
-  in
-  let (_ : GtkSignal.id) =
-    d#connect#response 
-      ~callback:(function `CLOSE | `DELETE_EVENT -> d#destroy ())
-  in
-  ()
-*)
 
 let help_menu = factory#add_submenu "_Help" 
 let help_factory = new GMenu.factory help_menu ~accel_group 

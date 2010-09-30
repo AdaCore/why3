@@ -57,10 +57,10 @@ val read_channel : ?format:string -> read_channel
     the format is chosen according to [f]'s extension. 
     Beware that nothing ensures that [c] corresponds to the contents of [f] 
 
-    @raise [NoFormat] if [format] is not given and [f] has no extension
-    @raise [UnknownExtension s] if the extension [s] is not known in 
+    @raise NoFormat if [format] is not given and [f] has no extension
+    @raise UnknownExtension [s] if the extension [s] is not known in 
       any registered parser
-    @raise [UnknownFormat f] if the [format] is not registered
+    @raise UnknownFormat [f] if the [format] is not registered
 *)
 
 val read_file : ?format:string -> env -> string -> theory Mnm.t 

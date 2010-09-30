@@ -116,12 +116,12 @@ let bind db sql l =
       1 l
   in stmt
 
-(*
 let stmt_column_INT stmt i msg =
   match Sqlite3.column stmt i with
     | Sqlite3.Data.INT i -> i
     | _ -> failwith msg
 
+(*
 let stmt_column_FLOAT stmt i msg =
   match Sqlite3.column stmt i with
     | Sqlite3.Data.FLOAT i -> i
@@ -246,14 +246,12 @@ let subgoals t = t.subgoals
 
 type theory = int64
 
-let theory_name _ = assert false
 let goals _ = assert false
 let verified _ = assert false
 
 type file = int64 
 
 let file_name _ = assert false
-let theories _ = assert false
 
 
 
@@ -721,9 +719,17 @@ module Goal = struct
     let sql = 
       "CREATE TABLE IF NOT EXISTS goals \
        (goal_id INTEGER PRIMARY KEY AUTOINCREMENT, \
+        goal_theory INTEGER,
         goal_name TEXT, task_checksum TEXT, proved INTEGER);" 
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
+(*
+    let sql = 
+      "CREATE UNIQUE INDEX IF NOT EXISTS goal_theory_idx \
+       ON goals (goal_theory)" 
+    in
+    db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
+*)
 (*
     let sql = "create table if not exists map_external_proofs_goal_external_proof (goal_id integer, external_proof_id integer, primary key(goal_id, external_proof_id));" in
     db_must_ok db (fun () -> Sqlite3.exec db.db sql);
@@ -749,13 +755,14 @@ module Goal = struct
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 *)
 
-  let add db (_th:theory) (name : string) (sum:string) = 
+  let add db (th:theory) (name : string) (sum:string) = 
     transaction db 
       (fun () ->
 	 let sql = 
-	   "INSERT INTO goals VALUES(NULL,?,?,0)" 
+	   "INSERT INTO goals VALUES(NULL,?,?,?,0)" 
 	 in
 	 let stmt = bind db sql [
+           Sqlite3.Data.INT th;
            Sqlite3.Data.TEXT name;
            Sqlite3.Data.TEXT sum;
          ]
@@ -1021,20 +1028,53 @@ end
 module Theory = struct
 
   let init db =
-    let sql = "CREATE TABLE IF NOT EXISTS theories (theory_name TEXT, theory_file INTEGER);" in
+    let sql = 
+      "CREATE TABLE IF NOT EXISTS theories \
+       (theory_id INTEGER PRIMARY KEY AUTOINCREMENT,\
+        theory_file INTEGER, theory_name TEXT);" in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
     ()
+
+  let name db th =
+    let sql="SELECT theory_name FROM theories \
+       WHERE theories.theory_id=?"
+    in
+    let stmt = bind db sql [Sqlite3.Data.INT th] in
+    let of_stmt stmt = 
+      (stmt_column_string stmt 0 "Theory.name")
+    in
+    match step_fold db stmt of_stmt with
+      | [] -> raise Not_found
+      | [x] -> x
+      | _ -> assert false
+
+  let of_file db f =
+    let sql="SELECT theory_id FROM theories \
+       WHERE theories.theory_file=?"
+    in
+    let stmt = bind db sql [Sqlite3.Data.INT f] in
+    let of_stmt stmt = 
+      (stmt_column_INT stmt 0 "Theory.of_file")
+    in
+    step_fold db stmt of_stmt 
 
   let add db file name = 
     transaction db 
       (fun () ->
-         let sql = "INSERT INTO theories VALUES(?,?)" in
-         let stmt = bind db sql [ Sqlite3.Data.TEXT name ; 
-				  Sqlite3.Data.INT file ] in
+         let sql = "INSERT INTO theories VALUES(NULL,?,?)" in
+         let stmt = bind db sql 
+           [ Sqlite3.Data.INT file;
+             Sqlite3.Data.TEXT name;
+           ]
+         in
          db_must_done db (fun () -> Sqlite3.step stmt);
          let new_id = Sqlite3.last_insert_rowid db.raw_db in
 	 new_id)
 end
+
+let theory_name th = Theory.name (current()) th
+
+let theories f = Theory.of_file (current()) f
 
 module Main = struct
 
@@ -1043,17 +1083,22 @@ module Main = struct
           (file_id INTEGER PRIMARY KEY AUTOINCREMENT,file_name TEXT);" 
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
+(*
     let sql = 
       "CREATE UNIQUE INDEX IF NOT EXISTS file_idx \
        ON files (file_id)" 
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
-
+*)
+    ()
 
   let all_files db =
-    let sql="SELECT file_name FROM files" in
+    let sql="SELECT file_id,file_name FROM files" in
     let stmt = Sqlite3.prepare db.raw_db sql in
-    let of_stmt stmt = stmt_column_string stmt 0 "Db.all_files" in
+    let of_stmt stmt = 
+      (stmt_column_INT stmt 0 "Db.all_files",
+       stmt_column_string stmt 1 "Db.all_files")
+    in
     step_fold db stmt of_stmt 
 
   let add db name = 
@@ -1103,7 +1148,8 @@ let root_goals () =
     
 *)
 
-let files _ = assert false
+let files () = 
+  Main.all_files (current())
 
 
 let prover_from_name n = 

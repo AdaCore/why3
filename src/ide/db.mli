@@ -112,8 +112,8 @@ val theories : file -> theory list
 val init_base : string -> unit
 (** opens or creates the current database, from given file name *)
 
-val files : unit -> file list
-(** returns the current set of files *)
+val files : unit -> (file * string) list
+(** returns the current set of files, with their filenames *)
 
 
 (** {2 Updates} *)
