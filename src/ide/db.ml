@@ -246,8 +246,6 @@ let subgoals t = t.subgoals
 
 type theory = int64
 
-let goals _ = assert false
-let verified _ = assert false
 
 type file = int64 
 
@@ -770,6 +768,30 @@ module Goal = struct
 	 db_must_done db (fun () -> Sqlite3.step stmt);
 	 Sqlite3.last_insert_rowid db.raw_db)
 
+  let name db g =
+    let sql="SELECT goal_name FROM goals \
+       WHERE goals.goal_id=?"
+    in
+    let stmt = bind db sql [Sqlite3.Data.INT g] in
+    let of_stmt stmt = 
+      (stmt_column_string stmt 0 "Goal.name")
+    in
+    match step_fold db stmt of_stmt with
+      | [] -> raise Not_found
+      | [x] -> x
+      | _ -> assert false
+
+  let of_theory db th =
+    let sql="SELECT goal_id FROM goals \
+       WHERE goals.goal_theory=?"
+    in
+    let stmt = bind db sql [Sqlite3.Data.INT th] in
+    let of_stmt stmt = 
+      (stmt_column_INT stmt 0 "Goal.of_theory")
+    in
+    List.rev (step_fold db stmt of_stmt) 
+
+
 (*
   let get_all_external_proofs db g =
     let sql="SELECT map_goal_prover_external_proof.external_proof_id \
@@ -857,6 +879,11 @@ module Goal = struct
 *)
 
 end
+
+let goal_name g = Goal.name (current()) g
+
+let goals th = Goal.of_theory (current()) th
+
 
 (*
 
@@ -1073,6 +1100,8 @@ module Theory = struct
 end
 
 let theory_name th = Theory.name (current()) th
+
+let verified _ = assert false
 
 let theories f = Theory.of_file (current()) f
 

@@ -378,6 +378,24 @@ module Helpers = struct
       (image_of_result s);
     if s = Scheduler.Success then set_proved a.proof_goal              
 
+  let add_goal_row mth name t db_goal =
+    let parent = mth.theory_row in
+    let row = goals_model#append ~parent () in
+    let goal = { parent = Theory mth; 
+                 task = t ; 
+                 goal_row = row;
+		 goal_db = db_goal;
+                 external_proofs = Hashtbl.create 7;
+                 transformations = [];
+                 proved = false;
+               }
+    in
+    goals_model#set ~row ~column:name_column name;
+    goals_model#set ~row ~column:icon_column !image_file;
+    goals_model#set ~row ~column:index_column (Row_goal goal);
+    goals_model#set ~row ~column:visible_column true;
+    goal
+
   let add_theory_row mfile th db_theory =
     let tname = th.Theory.th_name.Ident.id_string in
     let parent = mfile.file_row in
@@ -400,28 +418,14 @@ module Helpers = struct
     let tname = th.Theory.th_name.Ident.id_string in
     let db_theory = Db.add_theory mfile.file_db tname in
     let mth = add_theory_row mfile th db_theory in
-    let row = mth.theory_row in
     let goals =
       List.fold_left
         (fun acc t ->
-           let id = (Task.task_goal t).Decl.pr_name in
-           let name = id.Ident.id_string in
-           let row = goals_model#append ~parent:row () in
+	   let id = (Task.task_goal t).Decl.pr_name in
+	   let name = id.Ident.id_string in
 	   let sum = task_checksum t in
 	   let db_goal = Db.add_goal db_theory name sum in
-           let goal = { parent = Theory mth; 
-                        task = t ; 
-                        goal_row = row;
-			goal_db = db_goal;
-                        external_proofs = Hashtbl.create 7;
-                        transformations = [];
-                        proved = false;
-                      }
-           in
-	   goals_model#set ~row ~column:name_column name;
-           goals_model#set ~row ~column:icon_column !image_file;
-	   goals_model#set ~row ~column:index_column (Row_goal goal);
-           goals_model#set ~row ~column:visible_column true;
+	   let goal = add_goal_row mth name t db_goal in
            goal :: acc
         )
         []
@@ -490,8 +494,26 @@ let () =
             let tname = Db.theory_name db_th in
             eprintf "Reimporting theory '%s'@."tname;
             let th = Theory.Mnm.find tname theories in
-            let (_mth : Model.theory) = Helpers.add_theory_row mfile th db_th in
-            ( (* TODO *) )
+            let mth = Helpers.add_theory_row mfile th db_th in
+	    let goals = Db.goals db_th in
+	    let tasks = List.rev (Task.split_theory th None None) in
+    	    List.iter2
+              (fun db_goal t ->
+		 let gname = Db.goal_name db_goal in
+		 let taskname = 
+		   (Task.task_goal t).Decl.pr_name.Ident.id_string 
+		 in
+		 if gname <> taskname then
+		   begin
+		     eprintf "gname = %s, taskname = %s@." gname taskname;
+		     assert false;
+		   end;
+		 let (_mg : Model.goal) = 
+		   Helpers.add_goal_row mth gname t db_goal
+		 in
+		 ()
+		 )
+	      goals tasks
          )
          ths
     )

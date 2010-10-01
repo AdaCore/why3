@@ -86,6 +86,7 @@ val edited_as : proof_attempt -> string
 (*
 val parent : goal -> goal_parent
 *)
+val goal_name : goal -> string
 val task_checksum : goal -> string (** checksum *)
 val proved : goal -> bool
 val external_proofs: goal -> proof_attempt Hprover.t
