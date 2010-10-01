@@ -46,7 +46,8 @@ let lift kind =
           (* assume that lambdas always exist *)
           | Implied when not (is_lambda t) ->
               f_forall_close_merge fv
-                (f_implies (f_exists_close [x] [] f) (f_subst_single x xlapp f))
+                (f_implies (f_exists_close [x] [] f)
+                   (f_subst_single x xlapp f))
           | _ -> f_subst_single x xlapp f
         in
         let acc = add_decl acc (Decl.create_prop_decl Decl.Paxiom axs f) in
@@ -61,12 +62,17 @@ let lift kind =
         add_decl acc d
     | _ -> add_tdecl acc th
 
-let lift_epsilon = Trans.fold (lift Implicit) None
+let lift_epsilon kind = Trans.fold (lift kind) None
+
+let meta_epsilon = Theory.register_meta_excl "lift_epsilon" [MTstring]
+
+let lift_epsilon = Trans.on_meta meta_epsilon
+  (fun tset ->
+    let kind = match get_meta_excl meta_epsilon tset with
+      | Some ([MAstr "implicit"]) -> Implicit
+      | Some ([MAstr "implied"]) | None -> Implied
+      | _ -> failwith "lift_epsilon accepts only 'implicit' and 'implied'"
+    in
+    lift_epsilon kind)
 
 let () = Trans.register_transform "lift_epsilon" lift_epsilon
-
-(* TODO different variants for εx.P(x) :
-  * logic x + axiom P(x)
-  * goal ∃x.P(x) + logic x + axiom P(x)
-  * logic x + axiom (∃x.P(x)) => P(x)
-  *)
