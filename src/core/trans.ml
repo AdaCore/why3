@@ -83,7 +83,7 @@ let fold fn v =
 let fold_l fn v = fold (fun task -> list_apply (fn task)) [v]
 
 let fold_map   fn v t = conv_res snd            (fold   fn (v, t))
-let fold_map_l fn v t = conv_res (List.map snd) (fold_l fn (v, t))
+let fold_map_l fn v t = conv_res (List.rev_map snd) (fold_l fn (v, t))
 
 let gen_decl add fn =
   let fn = Wdecl.memoize 63 fn in
