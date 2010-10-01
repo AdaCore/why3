@@ -126,6 +126,7 @@ module Model = struct
       { prover : prover_data;
         proof_goal : goal;
         proof_row : Gtk.tree_iter;
+        proof_db : Db.proof_attempt;
         mutable status : Scheduler.proof_attempt_status;
         mutable proof_obsolete : bool;
         mutable time : float;
@@ -339,17 +340,17 @@ module Helpers = struct
     f.file_verified <- true;
     let row = f.file_row in
     goals_view#collapse_row (goals_model#get_path row);
-    goals_model#set ~row ~column:Model.status_column !image_yes;
-    if !Model.toggle_hide_proved_goals then
-      goals_model#set ~row ~column:Model.visible_column false
+    goals_model#set ~row ~column:status_column !image_yes;
+    if !toggle_hide_proved_goals then
+      goals_model#set ~row ~column:visible_column false
          
   let set_theory_proved t =
     t.verified <- true;
     let row = t.theory_row in
     goals_view#collapse_row (goals_model#get_path row);
-    goals_model#set ~row ~column:Model.status_column !image_yes;
-    if !Model.toggle_hide_proved_goals then
-      goals_model#set ~row ~column:Model.visible_column false;
+    goals_model#set ~row ~column:status_column !image_yes;
+    if !toggle_hide_proved_goals then
+      goals_model#set ~row ~column:visible_column false;
     let f = t.theory_parent in
     if List.for_all (fun t -> t.verified) f.theories then
       set_file_verified f
@@ -358,9 +359,9 @@ module Helpers = struct
     let row = g.goal_row in
     g.proved <- true;
     goals_view#collapse_row (goals_model#get_path row);
-    goals_model#set ~row ~column:Model.status_column !image_yes;
-    if !Model.toggle_hide_proved_goals then
-      goals_model#set ~row ~column:Model.visible_column false;
+    goals_model#set ~row ~column:status_column !image_yes;
+    if !toggle_hide_proved_goals then
+      goals_model#set ~row ~column:visible_column false;
     match g.parent with
       | Theory t ->
           if List.for_all (fun g -> g.proved) t.goals then
@@ -374,9 +375,36 @@ module Helpers = struct
   let set_proof_status a s =
     a.status <- s;
     let row = a.proof_row in
-    goals_model#set ~row ~column:Model.status_column 
+    goals_model#set ~row ~column:status_column 
       (image_of_result s);
     if s = Scheduler.Success then set_proved a.proof_goal              
+
+
+  let add_external_proof_row g p db_proof =
+    let parent = g.goal_row in
+    let name = p.prover_name in
+    let row = goals_model#prepend ~parent () in
+    goals_model#set ~row ~column:icon_column !image_prover;
+    goals_model#set ~row ~column:name_column
+      (name ^ " " ^ p.prover_version);
+    goals_model#set ~row ~column:visible_column true;
+    goals_view#expand_row (goals_model#get_path parent);
+    let a = { prover = p;
+              proof_goal = g;
+              proof_row = row;
+              proof_db = db_proof;
+              status = Scheduler.Scheduled;
+              proof_obsolete = false;
+              time = 0.0;
+              output = "";
+              edited_as = "";
+            }
+    in
+    goals_model#set ~row ~column:index_column 
+      (Row_proof_attempt a);
+    Hashtbl.add g.external_proofs p.prover_id a;
+    a
+      
 
   let add_goal_row mth name t db_goal =
     let parent = mth.theory_row in
@@ -394,7 +422,9 @@ module Helpers = struct
     goals_model#set ~row ~column:icon_column !image_file;
     goals_model#set ~row ~column:index_column (Row_goal goal);
     goals_model#set ~row ~column:visible_column true;
+    mth.goals <- goal :: mth.goals;
     goal
+
 
   let add_theory_row mfile th db_theory =
     let tname = th.Theory.th_name.Ident.id_string in
@@ -425,13 +455,11 @@ module Helpers = struct
 	   let name = id.Ident.id_string in
 	   let sum = task_checksum t in
 	   let db_goal = Db.add_goal db_theory name sum in
-	   let goal = add_goal_row mth name t db_goal in
-           goal :: acc
-        )
+	   let goal = add_goal_row mth name t db_goal in 
+           goal :: acc)
         []
         (List.rev tasks)
     in
-    mth.goals <- List.rev goals;
     if goals = [] then set_theory_proved mth;
     mth
     
@@ -483,7 +511,7 @@ end
 
 let () =
   let files = Db.files () in
-  List.iter
+  List.iter 
     (fun (f,fn) -> 
        eprintf "Reimporting file '%s'@." fn;
        let theories = Env.read_file gconfig.env fn in
@@ -494,9 +522,14 @@ let () =
             let tname = Db.theory_name db_th in
             eprintf "Reimporting theory '%s'@."tname;
             let th = Theory.Mnm.find tname theories in
+            (* TODO: capturer Not_found, cad detecter si la theorie a ete supprmee du fichier *)
+            (* on pourrait retrouver l'ordre des theories dans le fichier source
+               en comparant les locations des idents de ces theories *)
             let mth = Helpers.add_theory_row mfile th db_th in
 	    let goals = Db.goals db_th in
 	    let tasks = List.rev (Task.split_theory th None None) in
+            (* TODO: remplacer iter2 par un parcours intelligent
+               en detectant d'eventuelles nouvelles tasks *)
     	    List.iter2
               (fun db_goal t ->
 		 let gname = Db.goal_name db_goal in
@@ -508,14 +541,16 @@ let () =
 		     eprintf "gname = %s, taskname = %s@." gname taskname;
 		     assert false;
 		   end;
-		 let (_mg : Model.goal) = 
-		   Helpers.add_goal_row mth gname t db_goal
-		 in
+		 let _goal = Helpers.add_goal_row mth gname t db_goal in
+                 let _external_proofs = Db.external_proofs db_goal in
 		 ()
 		 )
 	      goals tasks
          )
-         ths
+         ths;
+       (* TODO: detecter d'eventuelles nouvelles theories, qui seraient donc
+          dans [theories] mais pas dans [ths]
+       *)
     )
     files
 
@@ -559,33 +594,13 @@ let redo_external_proof g a =
     g.Model.task
 
 let rec prover_on_goal p g =
-  let row = g.Model.goal_row in
   let id = p.prover_id in
   let a = 
     try Hashtbl.find g.Model.external_proofs id 
     with Not_found ->
-      (* creating a new row *)
-      let name = p.prover_name in
-      let prover_row = goals_model#prepend ~parent:row () in
-      goals_model#set ~row:prover_row ~column:Model.icon_column !image_prover;
-      goals_model#set ~row:prover_row ~column:Model.name_column
-        (name ^ " " ^ p.prover_version);
-      goals_model#set ~row:prover_row ~column:Model.visible_column true;
-      goals_view#expand_row (goals_model#get_path row);
-      let a = { Model.prover = p;
-                Model.proof_goal = g;
-                Model.proof_row = prover_row;
-                Model.status = Scheduler.Scheduled;
-                Model.proof_obsolete = false;
-                Model.time = 0.0;
-                Model.output = "";
-                Model.edited_as = "";
-              }
-      in
-      goals_model#set ~row:prover_row ~column:Model.index_column 
-        (Model.Row_proof_attempt a);
-      Hashtbl.add g.Model.external_proofs id a;
-      a
+      let db_prover = Db.prover_from_name id in
+      let db_pa = Db.add_proof_attempt g.Model.goal_db db_prover in
+      Helpers.add_external_proof_row g p db_pa
   in
   redo_external_proof g a;
   List.iter

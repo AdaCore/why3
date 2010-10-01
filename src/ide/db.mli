@@ -51,6 +51,7 @@ type transf
 
 (** status of an external proof attempt *)
 type proof_status =
+  | Undone
   | Success (** external proof attempt succeeded *)
   | Timeout (** external proof attempt was interrupted *)
   | Unknown (** external prover answered ``don't know'' or equivalent *)

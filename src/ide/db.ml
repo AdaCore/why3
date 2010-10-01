@@ -158,18 +158,23 @@ let stmt_column_string stmt i msg =
 
 (** Data *)
 
-type prover_id =
+type prover_id = int64
+(*
     { prover_id : int;
       prover_name : string;
     }
+*)
 
-let prover_name p = p.prover_name
+let prover_name _p = 
+  assert false
+(* p.prover_name *)
+
 
 module Hprover = Hashtbl.Make
   (struct
      type t = prover_id
-     let equal p1 p2 = p1.prover_id == p2.prover_id
-     let hash p = Hashtbl.hash p.prover_id
+     let equal _p1 _p2 = assert false (* p1.prover_id == p2.prover_id *)
+     let hash _p = assert false (* Hashtbl.hash p.prover_id *)
    end)
 
 type transf_id =
@@ -190,6 +195,7 @@ module Htransf = Hashtbl.Make
 
 
 type proof_status =
+  | Undone (** external proof attempt no done yet *)
   | Success (** external proof attempt succeeded *)
   | Timeout (** external proof attempt was interrupted *)
   | Unknown (** external prover answered ``don't know'' or equivalent *)
@@ -233,7 +239,7 @@ and goal = int64
 
 let task_checksum _g = assert false
 let proved _g = assert false
-let external_proofs _g = assert false
+let external_proofs _g = Hprover.create 7 (* TODO !!! *)
 let transformations _g = assert false
 
 
@@ -285,9 +291,14 @@ module ProverId = struct
          let stmt = bind db sql [ Sqlite3.Data.TEXT name ] in
          db_must_done db (fun () -> Sqlite3.step stmt);
          let new_id = Sqlite3.last_insert_rowid db.raw_db in
+         new_id
+(*
          { prover_id = Int64.to_int new_id ; 
-	   prover_name = name })
+	   prover_name = name }
+*)
+      )
 
+(*
   let get db name =
     let sql =
       "SELECT prover.prover_id, prover.prover_name FROM prover \
@@ -305,7 +316,9 @@ module ProverId = struct
       | [] -> raise Not_found
       | [x] -> x
       | _ -> assert false
+*)
 
+(*
   let from_id db id =
     let sql =
       "SELECT prover.prover_id, prover.prover_name FROM prover \
@@ -324,6 +337,7 @@ module ProverId = struct
       | [] -> raise Not_found
       | [x] -> x
       | _ -> assert false
+*)
 
 end
 
@@ -529,32 +543,35 @@ end
 
 *)
 
+let status_array = [| Undone; Success; Timeout; Unknown; Failure |]
+
 let int64_from_status = function
+  | Undone -> 0L
   | Success -> 1L
   | Timeout -> 2L
   | Unknown -> 3L
   | Failure -> 4L
 
 let status_from_int64 i = 
-  if i=1L then Success else
-    if i=2L then Timeout else
-      if i=3L then Unknown else
-        if i=4L then Failure else
-          failwith "Db.status_from_int64"
-
-(*
+  try
+    status_array.(Int64.to_int i)
+  with _ -> failwith "Db.status_from_int64"
 
 module External_proof = struct
 
   let init db =
     let sql = 
+      (* timelimit INTEGER, memlimit INTEGER,
+         edited_as TEXT, obsolete INTEGER *)
       "CREATE TABLE IF NOT EXISTS external_proof \
-       (external_proof_id INTEGER PRIMARY KEY AUTOINCREMENT,\
-        prover INTEGER,timelimit INTEGER,memlimit INTEGER,\
-        status INTEGER,result_time REAL,trace TEXT,obsolete INTEGER);" 
+       (goal_id INTEGER,\
+        prover_id INTEGER, \
+        status INTEGER,\
+        result_time REAL);" 
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 
+(*
   let delete db e =
     let id = e.external_proof_id in
     assert (id <> 0L);
@@ -562,26 +579,33 @@ module External_proof = struct
     let stmt = bind db sql [ Sqlite3.Data.INT id ] in
     ignore(step_fold db stmt (fun _ -> ()));
     e.external_proof_id <- 0L
+*)
 
-  let add db (e : external_proof) = 
+  let add db (g : goal) (p: prover_id) = 
     transaction db 
       (fun () ->
-	 assert (e.external_proof_id = 0L);
-	 let sql = "INSERT INTO external_proof VALUES(NULL,?,?,?,?,?,?,?)" in
+	 let sql = "INSERT INTO external_proof VALUES(?,0,0,?)" in
 	 let stmt = bind db sql [
-           Sqlite3.Data.INT e.prover ;
+           Sqlite3.Data.INT g;
+           Sqlite3.Data.INT p;
+(*
            Sqlite3.Data.INT (Int64.of_int e.timelimit);
            Sqlite3.Data.INT (Int64.of_int e.memlimit);
+*)
+(*
            Sqlite3.Data.INT (int64_from_status e.status);
            Sqlite3.Data.FLOAT e.result_time;
+*)
+(*
            Sqlite3.Data.TEXT e.trace;
            Sqlite3.Data.INT (int64_from_bool e.proof_obsolete);
+*)
          ]
          in
 	 db_must_done db (fun () -> Sqlite3.step stmt);
-	 let new_id = Sqlite3.last_insert_rowid db.raw_db in
-	 e.external_proof_id <- new_id)
+	 Sqlite3.last_insert_rowid db.raw_db)
 
+(*
 
   let set_status db e stat =
     try
@@ -705,9 +729,9 @@ module External_proof = struct
                stmt_column_bool stmt 7
                  "External_Proof.fromids: bad proof_obsolete";
 	   })
-   
+
+*)   
 end
-*)
 
 
 
@@ -1181,16 +1205,21 @@ let files () =
   Main.all_files (current())
 
 
-let prover_from_name n = 
+let prover_from_name _n = 
+  assert false
+(*
   let db = current () in
   try ProverId.get db n 
   with Not_found -> ProverId.add db n
-
+*)
 let transf_from_name _n = assert false
 
 exception AlreadyExist 
 
-let add_proof_attempt _ = assert false
+let add_proof_attempt _g _pid = assert false
+(*
+External_proof.add (current()) g pid
+*)
 
 let set_status _ = assert false
 
