@@ -203,8 +203,8 @@ let deffect env e =
       List.map (fun id -> let ls,_,_ = dexception env id in ls) 
 	e.Pgm_ptree.pe_raises; }
 
-let dterm env l = Typing.dterm env (Pgm_env.logic_lexpr l)
-let dfmla env l = Typing.dfmla env (Pgm_env.logic_lexpr l)
+let dterm env l = Typing.dterm ~localize:true env (Pgm_env.logic_lexpr l)
+let dfmla env l = Typing.dfmla ~localize:true env (Pgm_env.logic_lexpr l)
 
 let dpost env ty (q, ql) =
   let dexn (id, l) =
