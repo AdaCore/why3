@@ -548,7 +548,7 @@ let build_subtree g row name abort_cond subgoals =
                          Model.external_proofs = Hashtbl.create 7;
                          Model.transformations = [];
                          Model.proved = false; } in
-                     goal, Model.Row_goal g) in
+                     goal, Model.Row_goal goal) in
          (goal :: acc, count+1))
       ([],1) subgoals
     in
