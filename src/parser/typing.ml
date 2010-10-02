@@ -360,11 +360,16 @@ let apply_highord loc x tl = match List.rev tl with
   | a::tl -> [{pp_loc = loc; pp_desc = PPapp (x, List.rev tl)}; a]
   | [] -> assert false
 
-let rec dterm env t =
-  let n, ty = dterm_node t.pp_loc env t.pp_desc in
-  { dt_node = n; dt_ty = ty }
+let rec dterm ?(localize=false) env { pp_loc = loc; pp_desc = t } =
+  let n, ty = dterm_node ~localize loc env t in
+  let t = { dt_node = n; dt_ty = ty } in
+  if localize then
+    let n = Tnamed (Ident.label ~loc "", t) in
+    { dt_node = n; dt_ty = ty }
+  else
+    t
 
-and dterm_node loc env = function
+and dterm_node ~localize loc env = function
   | PPvar (Qident {id=x}) when Mstr.mem x env.dvars ->
       (* local variable *)
       let ty = Mstr.find x env.dvars in
@@ -400,19 +405,19 @@ and dterm_node loc env = function
   | PPconst (ConstReal _ as c) ->
       Tconst c, Tyapp (Ty.ts_real, [])
   | PPlet (x, e1, e2) ->
-      let e1 = dterm env e1 in
+      let e1 = dterm ~localize env e1 in
       let ty = e1.dt_ty in
       let env = { env with dvars = Mstr.add x.id ty env.dvars } in
-      let e2 = dterm env e2 in
+      let e2 = dterm ~localize env e2 in
       Tlet (e1, x, e2), e2.dt_ty
   | PPmatch (e1, bl) ->
-      let t1 = dterm env e1 in
+      let t1 = dterm ~localize env e1 in
       let ty1 = t1.dt_ty in
       let tb = fresh_type_var loc in (* the type of all branches *)
       let branch (p, e) =
         let env, p = dpat_list env ty1 p in
         let loc = e.pp_loc in
-	let e = dterm env e in
+	let e = dterm ~localize env e in
 	if not (unify e.dt_ty tb) then term_expected_type ~loc e.dt_ty tb;
         p, e
       in
@@ -420,25 +425,25 @@ and dterm_node loc env = function
       let ty = (snd (List.hd bl)).dt_ty in
       Tmatch (t1, bl), ty
   | PPnamed (x, e1) ->
-      let e1 = dterm env e1 in
+      let e1 = dterm ~localize env e1 in
       Tnamed (x, e1), e1.dt_ty
   | PPcast (e1, ty) ->
       let loc = e1.pp_loc in
-      let e1 = dterm env e1 in
+      let e1 = dterm ~localize env e1 in
       let ty = dty env ty in
       if not (unify e1.dt_ty ty) then term_expected_type ~loc e1.dt_ty ty;
       e1.dt_node, ty
   | PPif (e1, e2, e3) ->
       let loc = e3.pp_loc in
-      let e2 = dterm env e2 in
-      let e3 = dterm env e3 in
+      let e2 = dterm ~localize env e2 in
+      let e3 = dterm ~localize env e3 in
       if not (unify e2.dt_ty e3.dt_ty) then
         term_expected_type ~loc e3.dt_ty e2.dt_ty;
-      Tif (dfmla env e1, e2, e3), e2.dt_ty
+      Tif (dfmla ~localize env e1, e2, e3), e2.dt_ty
   | PPeps (x, ty, e1) ->
       let ty = dty env ty in
       let env = { env with dvars = Mstr.add x.id ty env.dvars } in
-      let e1 = dfmla env e1 in
+      let e1 = dfmla ~localize env e1 in
       Teps (x, ty, e1), ty
   | PPquant ((PPlambda|PPfunc|PPpred) as q, uqu, trl, a) ->
       check_quant_linearity uqu;
@@ -453,14 +458,14 @@ and dterm_node loc env = function
       let env, uqu = map_fold_left uquant env uqu in
       let trigger e =
 	try
-	  TRterm (dterm env e)
+	  TRterm (dterm ~localize env e)
 	with exn when trigger_not_a_term_exn exn ->
-	  TRfmla (dfmla env e)
+	  TRfmla (dfmla ~localize env e)
       in
       let trl = List.map (List.map trigger) trl in
       let e = match q with
-        | PPfunc -> TRterm (dterm env a)
-        | PPpred -> TRfmla (dfmla env a)
+        | PPfunc -> TRterm (dterm ~localize env a)
+        | PPpred -> TRfmla (dfmla ~localize env a)
         | PPlambda -> trigger a
         | _ -> assert false
       in
@@ -501,17 +506,21 @@ and dterm_node loc env = function
   | PPquant _ | PPbinop _ | PPunop _ | PPfalse | PPtrue ->
       error ~loc TermExpected
 
-and dfmla env e = match e.pp_desc with
+and dfmla ?(localize=false) env { pp_loc = loc; pp_desc = f } =
+  let n = dfmla_node ~localize loc env f in
+  if localize then Fnamed (Ident.label ~loc "", n) else n
+
+and dfmla_node ~localize loc env = function
   | PPtrue ->
       Ftrue
   | PPfalse ->
       Ffalse
   | PPunop (PPnot, a) ->
-      Fnot (dfmla env a)
+      Fnot (dfmla ~localize env a)
   | PPbinop (a, (PPand | PPor | PPimplies | PPiff as op), b) ->
-      Fbinop (binop op, dfmla env a, dfmla env b)
+      Fbinop (binop op, dfmla ~localize env a, dfmla ~localize env b)
   | PPif (a, b, c) ->
-      Fif (dfmla env a, dfmla env b, dfmla env c)
+      Fif (dfmla ~localize env a, dfmla ~localize env b, dfmla ~localize env c)
   | PPquant (q, uqu, trl, a) ->
       check_quant_linearity uqu;
       let uquant env (idl,ty) =
@@ -525,57 +534,57 @@ and dfmla env e = match e.pp_desc with
       let env, uqu = map_fold_left uquant env uqu in
       let trigger e =
 	try
-	  TRterm (dterm env e)
+	  TRterm (dterm ~localize env e)
 	with exn when trigger_not_a_term_exn exn ->
-	  TRfmla (dfmla env e)
+	  TRfmla (dfmla ~localize env e)
       in
       let trl = List.map (List.map trigger) trl in
       let q = match q with
         | PPforall -> Fforall
         | PPexists -> Fexists
-        | _ -> error ~loc:e.pp_loc PredicateExpected
+        | _ -> error ~loc PredicateExpected
       in
-      Fquant (q, uqu, trl, dfmla env a)
+      Fquant (q, uqu, trl, dfmla ~localize env a)
   | PPapp (x, tl) when check_highord env x tl ->
-      let tl = apply_highord e.pp_loc x tl in
-      let atyl, _ = Denv.specialize_lsymbol ~loc:(e.pp_loc) ps_pred_app in
-      let tl = dtype_args ps_pred_app.ls_name e.pp_loc env atyl tl in
+      let tl = apply_highord loc x tl in
+      let atyl, _ = Denv.specialize_lsymbol ~loc ps_pred_app in
+      let tl = dtype_args ps_pred_app.ls_name loc env atyl tl in
       Fapp (ps_pred_app, tl)
   | PPapp (x, tl) ->
       let s, tyl = specialize_psymbol x env.uc in
-      let tl = dtype_args s.ls_name e.pp_loc env tyl tl in
+      let tl = dtype_args s.ls_name loc env tyl tl in
       Fapp (s, tl)
   | PPinfix (e12, op2, e3) ->
       begin match e12.pp_desc with
 	| PPinfix (_, op1, e2) when is_psymbol (Qident op1) env.uc ->
-	    let e23 = { e with pp_desc = PPinfix (e2, op2, e3) } in
-	    Fbinop (Fand, dfmla env e12, dfmla env e23)
+	    let e23 = { pp_desc = PPinfix (e2, op2, e3); pp_loc = loc } in
+	    Fbinop (Fand, dfmla ~localize env e12, dfmla ~localize env e23)
 	| _ ->
 	    let s, tyl = specialize_psymbol (Qident op2) env.uc in
-	    let tl = dtype_args s.ls_name e.pp_loc env tyl [e12; e3] in
+	    let tl = dtype_args s.ls_name loc env tyl [e12; e3] in
 	    Fapp (s, tl)
       end
   | PPlet (x, e1, e2) ->
-      let e1 = dterm env e1 in
+      let e1 = dterm ~localize env e1 in
       let ty = e1.dt_ty in
       let env = { env with dvars = Mstr.add x.id ty env.dvars } in
-      let e2 = dfmla env e2 in
+      let e2 = dfmla ~localize env e2 in
       Flet (e1, x, e2)
   | PPmatch (e1, bl) ->
-      let t1 = dterm env e1 in
+      let t1 = dterm ~localize env e1 in
       let ty1 = t1.dt_ty in
       let branch (p, e) =
-        let env, p = dpat_list env ty1 p in p, dfmla env e
+        let env, p = dpat_list env ty1 p in p, dfmla ~localize env e
       in
       Fmatch (t1, List.map branch bl)
   | PPnamed (x, f1) ->
-      let f1 = dfmla env f1 in
+      let f1 = dfmla ~localize env f1 in
       Fnamed (x, f1)
   | PPvar x ->
       let pr = find_prop x env.uc in
       Fvar (Decl.find_prop (Theory.get_known env.uc) pr)
   | PPeps _ | PPconst _ | PPcast _ | PPtuple _ ->
-      error ~loc:e.pp_loc PredicateExpected
+      error ~loc PredicateExpected
 
 and dpat_list env ty p =
   check_pat_linearity p;
