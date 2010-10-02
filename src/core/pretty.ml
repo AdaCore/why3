@@ -182,7 +182,8 @@ let prio_binop = function
   | Fimplies -> 1
   | Fiff -> 1
 
-let print_label fmt (l,_) = fprintf fmt "\"%s\"" l
+let print_label fmt (l,_) =
+  if l = "" then () else fprintf fmt "\"%s\"" l
 
 let rec print_term fmt t = print_lterm 0 fmt t
 and     print_fmla fmt f = print_lfmla 0 fmt f
