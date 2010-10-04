@@ -82,7 +82,10 @@ and rewriteF f = f_map rewriteT rewriteF f
 let close d = [decl_map rewriteT rewriteF d]
 
 let close_epsilon =
-  Trans.on_theory highord_theory (fun _ -> Trans.decl close None)
+  let td = create_null_clone highord_theory in
+  Trans.on_theory highord_theory (fun tds ->
+    if Stdecl.mem td tds.tds_set then Trans.decl close None
+    else Trans.identity)
 
 let () = Trans.register_transform "close_epsilon" close_epsilon
 
