@@ -83,6 +83,8 @@ let fold fn v =
 let fold_l fn v = fold (fun task -> list_apply (fn task)) [v]
 
 let fold_map   fn v t = conv_res snd            (fold   fn (v, t))
+(* We keep the order is important for the user. So we use
+   List.map is instead of List.map_rev *)
 let fold_map_l fn v t = conv_res (List.map snd) (fold_l fn (v, t))
 
 let gen_decl add fn =
