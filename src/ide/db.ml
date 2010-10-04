@@ -158,12 +158,10 @@ let stmt_column_string stmt i msg =
 
 (** Data *)
 
-type prover_id = int64
-(*
-    { prover_id : int;
+type prover_id = 
+    { prover_id : int64;
       prover_name : string;
     }
-*)
 
 let prover_name _p = 
   assert false
@@ -201,7 +199,9 @@ type proof_status =
   | Unknown (** external prover answered ``don't know'' or equivalent *)
   | Failure (** external prover call failed *)
 
-type proof_attempt = {
+type proof_attempt = int64
+(*
+{
     mutable proof_attempt_id : int;
     mutable prover : prover_id;
     mutable timelimit : int;
@@ -211,12 +211,13 @@ type proof_attempt = {
     mutable edited_as : string;
     mutable proof_obsolete : bool;
 }
+*)
 
-let prover p = p.prover
-let status p = p.status
-let proof_obsolete p = p.proof_obsolete
-let time p = p.result_time
-let edited_as p = p.edited_as
+let prover _p = assert false (* p.prover *)
+let status _p = assert false (* p.status *)
+let proof_obsolete _p = assert false (* p.proof_obsolete *)
+let time _p = assert false (* p.result_time *)
+let edited_as _p = assert false (* p.edited_as *)
 
 type transf =
     { mutable transf_id : transf_id;
@@ -291,14 +292,10 @@ module ProverId = struct
          let stmt = bind db sql [ Sqlite3.Data.TEXT name ] in
          db_must_done db (fun () -> Sqlite3.step stmt);
          let new_id = Sqlite3.last_insert_rowid db.raw_db in
-         new_id
-(*
-         { prover_id = Int64.to_int new_id ; 
+         { prover_id = new_id ; 
 	   prover_name = name }
-*)
       )
 
-(*
   let get db name =
     let sql =
       "SELECT prover.prover_id, prover.prover_name FROM prover \
@@ -307,7 +304,7 @@ module ProverId = struct
     let stmt = bind db sql [Sqlite3.Data.TEXT name] in
     (* convert statement into record *)
     let of_stmt stmt =
-      { prover_id = stmt_column_int stmt 0 "ProverId.get: bad prover id";
+      { prover_id = stmt_column_INT stmt 0 "ProverId.get: bad prover id";
 	prover_name = stmt_column_string stmt 1 "ProverId.get: bad prover name";
       }
     in 
@@ -316,7 +313,6 @@ module ProverId = struct
       | [] -> raise Not_found
       | [x] -> x
       | _ -> assert false
-*)
 
 (*
   let from_id db id =
@@ -564,10 +560,10 @@ module External_proof = struct
       (* timelimit INTEGER, memlimit INTEGER,
          edited_as TEXT, obsolete INTEGER *)
       "CREATE TABLE IF NOT EXISTS external_proof \
-       (goal_id INTEGER,\
+       (external_proof_id INTEGER,\
         prover_id INTEGER, \
         status INTEGER,\
-        result_time REAL);" 
+        time REAL);" 
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 
@@ -584,10 +580,10 @@ module External_proof = struct
   let add db (g : goal) (p: prover_id) = 
     transaction db 
       (fun () ->
-	 let sql = "INSERT INTO external_proof VALUES(?,0,0,?)" in
+	 let sql = "INSERT INTO external_proof VALUES(?,?,0,0.0)" in
 	 let stmt = bind db sql [
            Sqlite3.Data.INT g;
-           Sqlite3.Data.INT p;
+           Sqlite3.Data.INT p.prover_id;
 (*
            Sqlite3.Data.INT (Int64.of_int e.timelimit);
            Sqlite3.Data.INT (Int64.of_int e.memlimit);
@@ -605,19 +601,17 @@ module External_proof = struct
 	 db_must_done db (fun () -> Sqlite3.step stmt);
 	 Sqlite3.last_insert_rowid db.raw_db)
 
-(*
-
-  let set_status db e stat =
+  let set_status db e stat time =
     try
       transaction db 
         (fun () ->
-	   let id = e.external_proof_id in
 	   let sql = 
-	     "UPDATE external_proof SET status=? WHERE external_proof_id=?" 
+	     "UPDATE external_proof SET status=?,time=? WHERE external_proof_id=?" 
 	   in
 	   let stmt = bind db sql [
              Sqlite3.Data.INT (int64_from_status stat);
-             Sqlite3.Data.INT id;
+             Sqlite3.Data.FLOAT time;
+             Sqlite3.Data.INT e;
            ]
            in
 	   db_must_done db (fun () -> Sqlite3.step stmt))
@@ -625,7 +619,7 @@ module External_proof = struct
       Format.eprintf "External_proof.set_status raised an exception %s@."
         (Printexc.to_string e)
       
-    
+    (*
   let set_result_time db e t =
       transaction db 
         (fun () ->
@@ -1177,10 +1171,7 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
 	in
 	current_db := Some db;
 	ProverId.init db;
-(*
-	Loc.init db;
 	External_proof.init db;
-*)
 	Goal.init db;
 (*
           Transf.init db;
@@ -1205,23 +1196,19 @@ let files () =
   Main.all_files (current())
 
 
-let prover_from_name _n = 
-  assert false
-(*
+let prover_from_name n = 
   let db = current () in
   try ProverId.get db n 
   with Not_found -> ProverId.add db n
-*)
+
 let transf_from_name _n = assert false
 
 exception AlreadyExist 
 
-let add_proof_attempt _g _pid = assert false
-(*
-External_proof.add (current()) g pid
-*)
+let add_proof_attempt g pid = External_proof.add (current()) g pid
 
-let set_status _ = assert false
+let set_status a r t = 
+  External_proof.set_status (current()) a r t
 
 let set_obsolete _ = assert false
 let set_edited_as _ = assert false

@@ -574,8 +574,16 @@ let redo_external_proof g a =
   let callback result time output =
     a.Model.output <- output;
     Helpers.set_proof_status a result;
+    let db_res = match result with
+      | Scheduler.Scheduled | Scheduler.Running -> Db.Undone
+      | Scheduler.Success -> Db.Success
+      | Scheduler.Unknown -> Db.Unknown
+      | Scheduler.Timeout -> Db.Timeout
+      | Scheduler.HighFailure -> Db.Failure
+    in
     let t = if time > 0.0 then 
       begin
+	Db.set_status a.Model.proof_db db_res time;
         a.Model.time <- time;
         Format.sprintf "%.2f" time 
       end
