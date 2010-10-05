@@ -20,19 +20,19 @@ type t =
       mutable mem_limit : int;
       mutable verbose : int;
       mutable max_running_processes : int;
-      mutable provers : prover_data list;
+      mutable provers : prover_data Util.Mstr.t;
       mutable default_editor : string;
       mutable env : Why.Env.env;
       mutable config : Whyconf.config;
     }
 
-val get_prover_data : Why.Env.env ->
-           string ->
-           Why.Whyconf.config_prover -> prover_data list -> prover_data list
+val get_prover_data : Why.Env.env -> string ->
+  Why.Whyconf.config_prover -> 
+  prover_data Why.Util.Mstr.t -> prover_data Why.Util.Mstr.t
 
 val save_config : unit -> unit
 
-val config      : t
+val config : t
 
 val get_main : unit -> Whyconf.main
 

@@ -84,8 +84,10 @@ let gconfig =
   let loadpath = (get_main ()).loadpath @ List.rev !includes in
   c.env <- Env.create_env (Lexer.retrieve loadpath);
   let provers = Whyconf.get_provers c.Gconfig.config in
-  c.provers <- Util.Mstr.fold (Gconfig.get_prover_data c.env) provers [];
+  c.provers <- 
+    Util.Mstr.fold (Gconfig.get_prover_data c.env) provers Util.Mstr.empty;
   c
+
 
 (********************)
 (* opening database *)
@@ -372,15 +374,22 @@ module Helpers = struct
               set_proved t.parent_goal;
             end
 
-  let set_proof_status a s =
+  let set_proof_status a s time =
     a.status <- s;
     let row = a.proof_row in
-    goals_model#set ~row ~column:status_column 
-      (image_of_result s);
+    goals_model#set ~row ~column:status_column (image_of_result s);
+    let t = if time > 0.0 then 
+      begin
+        a.Model.time <- time;
+        Format.sprintf "%.2f" time 
+      end
+    else "" 
+    in
+    goals_model#set ~row:a.Model.proof_row ~column:Model.time_column t;
     if s = Scheduler.Success then set_proved a.proof_goal              
 
 
-  let add_external_proof_row g p db_proof =
+  let add_external_proof_row g p db_proof status time =
     let parent = g.goal_row in
     let name = p.prover_name in
     let row = goals_model#prepend ~parent () in
@@ -393,16 +402,16 @@ module Helpers = struct
               proof_goal = g;
               proof_row = row;
               proof_db = db_proof;
-              status = Scheduler.Scheduled;
+              status = status;
               proof_obsolete = false;
-              time = 0.0;
+              time = time;
               output = "";
               edited_as = "";
             }
     in
-    goals_model#set ~row ~column:index_column 
-      (Row_proof_attempt a);
+    goals_model#set ~row ~column:index_column (Row_proof_attempt a);
     Hashtbl.add g.external_proofs p.prover_id a;
+    set_proof_status a status time;
     a
       
 
@@ -541,9 +550,28 @@ let () =
 		     eprintf "gname = %s, taskname = %s@." gname taskname;
 		     assert false;
 		   end;
-		 let _goal = Helpers.add_goal_row mth gname t db_goal in
-                 let _external_proofs = Db.external_proofs db_goal in
-		 ()
+		 let goal = Helpers.add_goal_row mth gname t db_goal in
+                 let external_proofs = Db.external_proofs db_goal in
+		 Db.Hprover.iter
+                   (fun pid a ->
+                      let p = 
+                        Util.Mstr.find (Db.prover_name pid) gconfig.provers 
+                      in
+                      let s,t = Db.status_and_time a in
+                      eprintf "time = %f@." t;
+                      let s = match s with
+                        | Db.Undone -> Scheduler.HighFailure
+                        | Db.Success -> Scheduler.Success  
+                        | Db.Unknown -> Scheduler.Unknown 
+                        | Db.Timeout -> Scheduler.Timeout
+                        | Db.Failure -> Scheduler.HighFailure
+                      in
+                      let (_pa : Model.proof_attempt) = 
+                        Helpers.add_external_proof_row goal p a s t
+                      in
+                      ((* TODO *))
+                   )
+                   external_proofs
 		 )
 	      goals tasks
          )
@@ -573,7 +601,7 @@ let redo_external_proof g a =
   let p = a.Model.prover in
   let callback result time output =
     a.Model.output <- output;
-    Helpers.set_proof_status a result;
+    Helpers.set_proof_status a result time;
     let db_res = match result with
       | Scheduler.Scheduled | Scheduler.Running -> Db.Undone
       | Scheduler.Success -> Db.Success
@@ -581,15 +609,7 @@ let redo_external_proof g a =
       | Scheduler.Timeout -> Db.Timeout
       | Scheduler.HighFailure -> Db.Failure
     in
-    let t = if time > 0.0 then 
-      begin
-	Db.set_status a.Model.proof_db db_res time;
-        a.Model.time <- time;
-        Format.sprintf "%.2f" time 
-      end
-    else "" 
-    in
-    goals_model#set ~row:a.Model.proof_row ~column:Model.time_column t
+    Db.set_status a.Model.proof_db db_res time
   in
   callback Scheduler.Scheduled 0.0 "";
   let old = if a.Model.edited_as = "" then None else
@@ -608,7 +628,7 @@ let rec prover_on_goal p g =
     with Not_found ->
       let db_prover = Db.prover_from_name id in
       let db_pa = Db.add_proof_attempt g.Model.goal_db db_prover in
-      Helpers.add_external_proof_row g p db_pa
+      Helpers.add_external_proof_row g p db_pa Scheduler.Scheduled 0.0
   in
   redo_external_proof g a;
   List.iter
@@ -923,8 +943,8 @@ let () = add_refresh_provers (fun () ->
 
 let () =
   let add_item_provers () =
-    List.iter 
-      (fun p ->
+    Util.Mstr.iter 
+      (fun _ p ->
 	 let n = p.prover_name ^ " " ^ p.prover_version in
 (*
 	 let (_ : GMenu.image_menu_item) =
@@ -1157,9 +1177,9 @@ let edit_selected_row p =
         let file = Driver.file_of_task driver fname "" t in
         a.Model.edited_as <- file;
         let old_status = a.Model.status in
-        Helpers.set_proof_status a Scheduler.Running;
+        Helpers.set_proof_status a Scheduler.Running 0.0;
         let callback () =
-          Helpers.set_proof_status a old_status;
+          Helpers.set_proof_status a old_status 0.0;
         in
         let editor = 
           match a.Model.prover.editor with

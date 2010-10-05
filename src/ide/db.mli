@@ -78,9 +78,8 @@ val prover : proof_attempt -> prover_id
 (*
 val proof_goal : proof_attempt -> goal
 *)
-val status : proof_attempt -> proof_status
+val status_and_time : proof_attempt -> proof_status * float
 val proof_obsolete : proof_attempt -> bool
-val time : proof_attempt -> float
 val edited_as : proof_attempt -> string
 
 (** goal accessors *)

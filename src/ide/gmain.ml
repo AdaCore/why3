@@ -88,7 +88,7 @@ let gconfig =
   let loadpath = (get_main ()).loadpath @ List.rev !includes in
   c.env <- Env.create_env (Lexer.retrieve loadpath);
   let provers = Whyconf.get_provers c.Gconfig.config in
-  c.provers <- Util.Mstr.fold (Gconfig.get_prover_data c.env) provers [];
+  c.provers <- Util.Mstr.fold (Gconfig.get_prover_data c.env) provers Util.Mstr.empty;
   c
 
 (***********************)
@@ -708,8 +708,8 @@ let () = add_refresh_provers (fun () ->
 
 let () =
   let add_item_provers () =
-    List.iter 
-      (fun p ->
+    Util.Mstr.iter 
+      (fun _ p ->
 	 let n = p.prover_name ^ " " ^ p.prover_version in
 	 let (_ : GMenu.image_menu_item) =
            tools_factory#add_image_item ~label:(n ^ " on all unproved goals")

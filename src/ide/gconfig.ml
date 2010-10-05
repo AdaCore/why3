@@ -25,7 +25,7 @@ type t =
       mutable mem_limit : int;
       mutable verbose : int;
       mutable max_running_processes : int;
-      mutable provers : prover_data list;
+      mutable provers : prover_data Util.Mstr.t;
       mutable default_editor : string;
       mutable env : Env.env;
       mutable config : Whyconf.config;
@@ -69,14 +69,16 @@ let load_ide section =
 let get_prover_data env id pr acc =
   try
     let dr = Driver.load_driver env pr.Whyconf.driver in
-    { prover_id = id ;
+    Mstr.add id
+      { prover_id = id ;
       prover_name = pr.Whyconf.name;
       prover_version = pr.Whyconf.version;
       command = pr.Whyconf.command;
       driver_name = pr.Whyconf.driver;
       driver = dr;
       editor = pr.Whyconf.editor;
-    }::acc
+    }
+      acc
   with _e ->
     eprintf "Failed to load driver %s for prover %s. prover disabled@."
       pr.Whyconf.driver pr.Whyconf.name;
@@ -106,7 +108,7 @@ let load_config config =
 (*
     provers = Mstr.fold (get_prover_data env) provers [];
 *)
-    provers = [];
+    provers = Mstr.empty;
     default_editor = ide.ide_default_editor;
     config         = config;
     env            = env
@@ -118,7 +120,7 @@ let read_config () =
 
 
 let save_config t =
-  let save_prover acc pr =
+  let save_prover _ pr acc =
     Mstr.add pr.prover_id
       {
         Whyconf.name    = pr.prover_name;
@@ -143,7 +145,7 @@ let save_config t =
   let ide = set_string ide "default_editor" t.default_editor in
   let config = set_section config "ide" ide in
   let config = set_provers config
-    (List.fold_left save_prover Mstr.empty t.provers) in
+    (Mstr.fold save_prover t.provers Mstr.empty) in
   save_config config
 
 let config =
@@ -347,7 +349,7 @@ let run_auto_detection gconfig =
   let config = Autodetection.run_auto_detection gconfig.config in
   gconfig.config <- config;
   let provers = get_provers config in
-  gconfig.provers <- Mstr.fold (get_prover_data gconfig.env) provers [];
+  gconfig.provers <- Mstr.fold (get_prover_data gconfig.env) provers Mstr.empty;
 
 (*
 Local Variables: 
