@@ -113,13 +113,18 @@ test_prover () {
     fi
 }
 
+echo "=== Checking drivers ==="
+drivers drivers
+echo ""
 
-# 1. Syntax
+echo "=== Checking valid goals ==="
+valid_goals bench/valid
+echo ""
+
 echo "=== Parsing good files  ==="
 goods bench/typing/bad --parse-only
 echo ""
 
-# 2. Typing
 echo "=== Type-checking bad files ==="
 bads bench/typing/bad --type-only
 echo ""
@@ -150,12 +155,10 @@ programs bench/programs/good
 programs examples/programs
 echo ""
 
-echo "=== Checking drivers ==="
-drivers drivers
-echo ""
-
-echo "=== Checking valid goals ==="
-valid_goals bench/valid
+echo "=== VC generation on good programs ==="
+pgml_options=
+programs bench/programs/good
+programs examples/programs
 echo ""
 
 echo "=== Checking provers ==="
