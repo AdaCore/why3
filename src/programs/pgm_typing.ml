@@ -1012,8 +1012,11 @@ and expr_desc gl env loc ty = function
 	in
 	x, v, expr gl env h
       in
-      let hl = List.map handler hl in
       let ef = List.fold_left (fun e (x,_,_) -> E.remove_raise x e) ef hl in
+      let hl = List.map handler hl in
+      let ef = 
+	List.fold_left (fun e (_,_,h) -> E.union e h.expr_effect) ef hl 
+      in
       Etry (e1, hl), tpure ty, ef
 
   | IEassert (k, f) ->

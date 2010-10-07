@@ -197,7 +197,7 @@ let default_post ty ef =
   List.map default_exn_post (Sls.elements ef.E.raises)
 
 let rec assoc_handler x = function
-  | [] -> assert false
+  | [] -> raise Not_found
   | (y, h) :: _ when ls_equal x y -> h
   | _ :: hl -> assoc_handler x hl
 

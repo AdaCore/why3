@@ -1,19 +1,19 @@
+exception Break
 
-{
-}
-
-let f x =
-  {}
-  if x = 1 then
-    1
-  else
-    if x = 2 then
-      2
-    else
-      3
-  {    x = 1
-    or (not x = 1 and x = 2)
-    or (not x = 1 and not x = 2 and result = 3) }
+let f (n : int) : int  =
+  { true }
+  let i = ref n in 
+  try
+    while (!i > 0) do
+      invariant { true }
+      variant { !i }
+      if (!i <= 10) then raise Break;
+      i := !i - 1
+    done
+  with Break -> ()
+  end;
+  !i
+  { result <= 10 } 
 
 (*
 Local Variables: 
