@@ -109,7 +109,10 @@ let task3 = Task.use_export task3 int_theory
 let goal_id3 = Decl.create_prsymbol (Ident.id_fresh "goal3") 
 let task3 = Task.add_prop_decl task3 Decl.Pgoal goal_id3 fmla3
 
+(*
 let () = printf "@[task 3 created:@\n%a@]@." Pretty.print_task task3
+*)
+let () = printf "@[task 3 created@]@." 
 
 let result3 = 
   Driver.prove_task ~command:alt_ergo.Whyconf.command

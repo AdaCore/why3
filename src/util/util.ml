@@ -37,6 +37,8 @@ let option_map f = function None -> None | Some x -> Some (f x)
 
 let option_apply d f = function None -> d | Some x -> f x
 
+let option_fold f d = function None -> d | Some x -> f d x
+
 let option_iter f = function None -> () | Some x -> f x
 
 let option_eq eq a b = match a,b with

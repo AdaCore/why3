@@ -114,8 +114,7 @@ let rec print_ty info fmt ty = match ty.ty_node with
         match tl with
           | []  -> fprintf fmt "unit"
           | [ty] -> print_ty info fmt ty
-          | _   -> fprintf fmt "(%a@ %a)" print_ts ts
-              (print_list star (print_ty info)) tl
+          | _   -> fprintf fmt "(%a)%%type" (print_list star (print_ty info)) tl
       end      
   | Tyapp (ts, tl) -> 
       begin match query_syntax info.info_syn ts.ts_name with
@@ -160,6 +159,8 @@ let rec print_pat info fmt p = match p.pat_node with
       fprintf fmt "(%a as %a)" (print_pat info) p print_vs v
   | Por (p,q) ->
       fprintf fmt "(%a|%a)" (print_pat info) p (print_pat info) q
+  | Papp (cs,pl) when is_fs_tuple cs -> 
+      fprintf fmt "%a" (print_paren_r (print_pat info)) pl
   | Papp (cs,pl) -> 
       begin match query_syntax info.info_syn cs.ls_name with
         | Some s -> syntax_arguments s (print_pat info) fmt pl
@@ -226,6 +227,8 @@ and print_tnode opl opr info fmt t = match t.t_node with
       fprintf fmt (protect_on opr "epsilon %a.@ %a")
         (print_vsty info) v (print_opl_fmla info) f;
       forget_var v
+  | Tapp (fs,pl) when is_fs_tuple fs -> 
+      fprintf fmt "%a" (print_paren_r (print_term info)) pl
   | Tapp (fs, tl) ->
     begin match query_syntax info.info_syn fs.ls_name with
       | Some s ->
@@ -336,14 +339,16 @@ let print_ls_type ?(arrow=false) info fmt ls =
   | Some ty -> print_ty info fmt ty
 
 let print_logic_decl info fmt (ls,ld) = 
-  let params = ls_ty_freevars ls in
+  let ty_vars_args = List.fold_left Ty.ty_freevars Stv.empty ls.ls_args in
+  let ty_vars_value = option_fold Ty.ty_freevars Stv.empty ls.ls_value in
+  let all_ty_params = Stv.union ty_vars_args ty_vars_value in
   begin
     match ld with
       | Some ld ->
           let vl,e = open_ls_defn ld in
           fprintf fmt "@[<hov 2>Definition %a%a%a: %a :=@ %a.@]@\n"
             print_ls ls 
-            print_ne_params params
+            print_ne_params all_ty_params
             (print_space_list (print_vsty info)) vl
             (print_ls_type info) ls.ls_value
             (print_expr info) e;
@@ -351,23 +356,18 @@ let print_logic_decl info fmt (ls,ld) =
       | None ->
           fprintf fmt "@[<hov 2>Parameter %a: %a%a@ %a.@]@\n"
             print_ls ls 
-            print_params params
+            print_params all_ty_params
             (print_arrow_list (print_ty info)) ls.ls_args
             (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
   end;
-  if Stv.is_empty params then 
-    fprintf fmt "@\n"
-  else
-    let b = ls.ls_args = [] in
-    (* TODO: this condition is not sufficient, e.g
-
-        logic create_array int : array 'a
-       
-       has 1 parameter, but 'a cannot be inferred from it
-    *)
-    if b then fprintf fmt "Set Contextual Implicit.@\n";
-    fprintf fmt "Implicit Arguments %a.@\n" print_ls ls;
-    if b then fprintf fmt "Unset Contextual Implicit.@\n"
+  if not (Stv.is_empty all_ty_params) then 
+    begin
+      let need_context = not (Stv.subset ty_vars_value ty_vars_args) in 
+      if need_context then fprintf fmt "Set Contextual Implicit.@\n";
+      fprintf fmt "Implicit Arguments %a.@\n" print_ls ls;
+      if need_context then fprintf fmt "Unset Contextual Implicit.@\n"
+    end;
+  fprintf fmt "@\n"
     
 
 let print_logic_decl info fmt d =

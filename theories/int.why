@@ -79,6 +79,12 @@ theory ComputerDivision
   axiom Mod_bound: 
     forall x y:int. y <> 0 -> - abs y < mod x y < abs y
 
+  axiom Div_sign_pos:
+    forall x y:int. x >= 0 and y > 0 -> div x y >= 0
+
+  axiom Div_sign_neg:
+    forall x y:int. x <= 0 and y > 0 -> div x y <= 0
+
   axiom Mod_sign_pos:
     forall x y:int. x >= 0 and y <> 0 -> mod x y >= 0
 
