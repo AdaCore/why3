@@ -261,11 +261,7 @@ and goal = int64
 
 (** goal accessors *)
 
-let task_checksum _g = assert false
 let proved _g = assert false
-(*
-let external_proofs _g = Hprover.create 7 (* TODO !!! *)
-*)
 let transformations _g = assert false
 
 
@@ -858,6 +854,18 @@ module Goal = struct
       | [x] -> x
       | _ -> assert false
 
+  let task_checksum db g =
+    let sql="SELECT task_checksum FROM goals WHERE goals.goal_id=?"
+    in
+    let stmt = bind db sql [Sqlite3.Data.INT g] in
+    let of_stmt stmt = 
+      (stmt_column_string stmt 0 "Goal.task_checksum")
+    in
+    match step_fold db stmt of_stmt with
+      | [] -> raise Not_found
+      | [x] -> x
+      | _ -> assert false
+
   let of_theory db th =
     let sql="SELECT goal_id FROM goals \
        WHERE goals.goal_theory=?"
@@ -958,8 +966,10 @@ module Goal = struct
 end
 
 let goal_name g = Goal.name (current()) g
+let task_checksum g = Goal.task_checksum (current()) g
 
 let goals th = Goal.of_theory (current()) th
+
 
 
 (*

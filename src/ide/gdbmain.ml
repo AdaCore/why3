@@ -309,7 +309,9 @@ let goals_model,filter_model,goals_view =
 
 let task_checksum t = 
   fprintf str_formatter "%a@." Pretty.print_task t;
-  Digest.to_hex (Digest.string (flush_str_formatter ()))
+  let s = flush_str_formatter () in
+  eprintf "task = %s@." s;
+  Digest.to_hex (Digest.string s)
 
 
 let info_window mt s =
@@ -385,8 +387,7 @@ module Helpers = struct
       end
     else "" 
     in
-    goals_model#set ~row:a.Model.proof_row ~column:Model.time_column t;
-    if s = Scheduler.Success then set_proved a.proof_goal              
+    goals_model#set ~row:a.Model.proof_row ~column:Model.time_column t
 
 
   let add_external_proof_row g p db_proof status time =
@@ -550,6 +551,12 @@ let () =
 		     eprintf "gname = %s, taskname = %s@." gname taskname;
 		     assert false;
 		   end;
+		 let sum = task_checksum t in
+		 let db_sum = Db.task_checksum db_goal in
+		 if sum <> db_sum then
+		   begin
+		     eprintf "bad checksum for %s: %s <> %s@." gname sum db_sum;
+		   end;		 
 		 let goal = Helpers.add_goal_row mth gname t db_goal in
                  let external_proofs = Db.external_proofs db_goal in
 		 Db.Hprover.iter
@@ -602,6 +609,7 @@ let redo_external_proof g a =
   let callback result time output =
     a.Model.output <- output;
     Helpers.set_proof_status a result time;
+    if result = Scheduler.Success then Helpers.set_proved a.Model.proof_goal;
     let db_res = match result with
       | Scheduler.Scheduled | Scheduler.Running -> Db.Undone
       | Scheduler.Success -> Db.Success

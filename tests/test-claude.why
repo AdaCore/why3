@@ -1,4 +1,4 @@
-
+(*
 theory TestInt
 
    use import int.Int
@@ -23,6 +23,8 @@ theory TestInt
 
 end
 
+*)
+
 theory TestDiv
 
    use import int.Int
@@ -30,6 +32,7 @@ theory TestDiv
 
    goal EDiv1: EuclideanDivision.div 1 2 = 0
 
+(*
    goal EDiv2: EuclideanDivision.div (-1) 2 = -1
 
    use int.ComputerDivision
@@ -37,8 +40,11 @@ theory TestDiv
    goal CDiv1: ComputerDivision.div 1 2 = 0
 
    goal CDiv2: ComputerDivision.div (-1) 2 = 0
+*)
 
 end
+
+(*
 
 theory TestReal
 
@@ -51,6 +57,7 @@ theory TestReal
    goal RealAbs1: forall x:real. 100.0 >= abs x >= 1.0 -> x*x >= 1.0
 
 end
+*)
 
 theory TestFloat
 
@@ -61,6 +68,8 @@ theory TestFloat
 
 end
 
+
+(*
 
 theory TestList
 
@@ -77,3 +86,4 @@ theory TestList
      end  
 
 end  
+*)
