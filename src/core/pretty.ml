@@ -413,6 +413,7 @@ let print_theory fmt th =
     print_th th (print_list newline2 print_tdecl) th.th_decls
 
 let print_task fmt task =
+  forget_all ();
   fprintf fmt "@[<hov 2>theory Task@\n%a@]@\nend@."
     (print_list newline2 print_tdecl) (task_tdecls task)
 
