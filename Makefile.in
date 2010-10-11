@@ -223,6 +223,7 @@ install_no_local::
 	mkdir -p $(BINDIR)
 	mkdir -p $(LIBDIR)/why3
 	mkdir -p $(DATADIR)/why3/images
+	mkdir -p $(DATADIR)/why3/emacs
 	mkdir -p $(DATADIR)/why3/lang
 	mkdir -p $(DATADIR)/why3/theories
 	mkdir -p $(DATADIR)/why3/theories/transform
@@ -232,6 +233,7 @@ install_no_local::
 	cp -f drivers/*.drv $(DATADIR)/why3/drivers
 	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
 	cp -f share/images/*.png $(DATADIR)/why3/images
+	cp -f share/emacs/why.el $(DATADIR)/why3/emacs/why.el
 	cp -f share/lang/why.lang $(DATADIR)/why3/lang/why.lang
 
 ifeq ("@ENABLE_LOCAL@","no")
