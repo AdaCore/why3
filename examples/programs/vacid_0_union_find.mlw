@@ -26,24 +26,10 @@
                forall x:int. 0 <= x < size u -> 
                forall r:int. repr u (link u # x) r -> repr u x r
 
-(*
-  lemma Repr_inv:
-    forall u:uf, x y:int. repr u x y -> inv u
-  lemma Repr_bounds_1:
-    forall u:uf, x y:int. repr u x y -> 0 <= x < size u
-*)
   lemma Repr_bounds_2:
     forall u:uf, x y:int. repr u x y -> 0 <= y < size u
   lemma Repr_dist_1:
     forall u:uf, x y:int. repr u x y -> dist u # y = 0
-(*
-  lemma Repr_dist_2:
-    forall u:uf. inv u -> 
-    forall x:int. 0 <= x < size u -> dist u # x = 0 -> repr u x x
-  lemma Repr_dist_3:
-    forall u:uf. inv u -> 
-    forall x:int. 0 <= x < size u -> dist u # x = 1 -> repr u x (link u # x)
-*)
 
   logic same (u:uf) (x y:int) = 
     forall r:int. repr u x r <-> repr u y r

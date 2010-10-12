@@ -14,7 +14,8 @@
     forall u:uf, x y z:int. 
     0 <= x < size u -> repr u x y -> repr u x z -> y = z
 
-  logic same (u:uf) (x y:int) = forall r:int. repr u x r <-> repr u y r
+  logic same (u:uf) (x y:int) = 
+     forall r:int. repr u x r <-> repr u y r
 
   logic same_reprs (u1 u2 : uf) = 
      forall x r:int. repr u1 x r <-> repr u2 x r
@@ -112,14 +113,16 @@ let add_edge_and_union (u:ref uf) (a:int) (b:int) =
 let build_maze (n:int) =
   { 1 <= n and 
     !num_edges = 0 and  
-    forall x y:int. x<>y -> not path !graph x y 
+    forall x y:int. x=y <-> path !graph x y 
   }
     let u = create (n*n) in
+    assert { forall x y:int. 0 <= x < n*n -> 0 <= y < n*n ->
+             same !u x y -> (repr !u x y /\ repr !u x x /\ x = y) };
     while get_num_classes u > 1 do
       invariant 
         { 1 <= num !u and num !u + !num_edges = size !u = n*n and
           forall x y:int. 0 <= x < n*n -> 0 <= y < n*n ->
-            same !u x y <-> path !graph x y
+                          (same !u x y <-> path !graph x y)
         }
       let x = rand n in
       let y = rand n in
