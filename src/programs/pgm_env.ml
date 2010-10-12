@@ -167,7 +167,7 @@ let purify env v =
 
 let reloc loc lb =
   lb.Lexing.lex_curr_p <- loc;
-  lb.Lexing.lex_abs_pos <- loc.Lexing.pos_cnum
+  lb.Lexing.lex_abs_pos <- loc.Lexing.pos_cnum + 1
 
 let parse_string f loc s =
   let lb = Lexing.from_string s in

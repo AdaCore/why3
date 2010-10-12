@@ -16,7 +16,7 @@
     let UF l d s n = u in
     (forall i:int. 0 <= i < s -> 0 <= l#i < s) and
     (forall i:int. 0 <= i < s -> 
-       (d#i = 0 and l#i = i or d#i > 0 and d#(l#i) < d#i))
+       ((d#i = 0 and l#i = i) or (d#i > 0 and d#(l#i) < d#i)))
 
   inductive repr (u:uf) (x:int) (r:int) = 
   | Repr_root: forall u:uf. inv u -> 
@@ -76,23 +76,21 @@ let create (n:int) =
     num !result = n and size !result = n and
     forall x:int. 0 <= x < n -> repr !result x x }
 
-{ 
-logic path_compression (u:uf) (x:int) (r:int) : uf =
-  let l = A.set (link u) x r in
-  let d = A.set (dist u) x 1 in
-  UF l d (size u) (num u)
+let path_compression u x r =
+  { inv !u and 0 <= x < size !u and dist !u # x > 0 and repr !u x r }
+  let UF l d s n = !u in
+  let l = A.set l x r in
+  let d = A.set d x 1 in
+  u := UF l d s n
+  { inv !u and size !u = size (old !u) and 
+    num !u = num (old !u) and same_reprs (old !u) !u }
  
-lemma Path_compression:
-  forall u:uf. forall x r:int. repr u x r -> 
-  same_reprs u (path_compression u x r)
-}
-
 let rec find (u:ref uf) (x:int) variant { dist !u # x } =
   { inv !u and 0 <= x < size !u } 
   let y = A.get (link !u) x in
   if y <> x then begin
     let r = find u y in
-    u := path_compression !u x r;
+    path_compression u x r;
     r
   end else
     x

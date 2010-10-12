@@ -323,8 +323,8 @@ clean::
 
 # test target
 
-%: %.mlw bin/whyml.byte
-	bin/whyml.byte -P alt-ergo $*.mlw
+%: %.mlw bin/whyide.opt
+	bin/whyide.opt $*.mlw
 
 install_no_local::
 	cp -f bin/whyml.@OCAMLBEST@ $(BINDIR)/why3ml
