@@ -164,8 +164,8 @@ let rec print_pat info fmt p = match p.pat_node with
   | Papp (cs,pl) -> 
       begin match query_syntax info.info_syn cs.ls_name with
         | Some s -> syntax_arguments s (print_pat info) fmt pl
-        | _ -> fprintf fmt "%a%a"
-            print_ls cs (print_paren_r (print_pat info)) pl
+        | _ -> fprintf fmt "%a %a"
+            print_ls cs (print_list space (print_pat info)) pl
       end
 
 let print_vsty_nopar info fmt v =
@@ -307,9 +307,10 @@ and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
 
 (** Declarations *)
 
-let print_constr info fmt cs =
-  fprintf fmt "@[<hov 4>| %a%a@]" print_ls cs
-    (print_paren_l (print_ty info)) cs.ls_args
+let print_constr info ts fmt cs =
+  fprintf fmt "@[<hov 4>| %a : %a -> %a %a@]" print_ls cs
+    (print_arrow_list (print_ty info)) cs.ls_args
+    print_ts ts (print_list space print_tv) ts.ts_args
 
 let print_type_decl info fmt (ts,def) = 
   if is_ts_tuple ts then () else
@@ -325,8 +326,8 @@ let print_type_decl info fmt (ts,def) =
       end
     | Talgebraic csl ->
         fprintf fmt "@[<hov 2>Inductive %a %a :=@\n@[<hov>%a@].@]@\n@\n"
-          print_ts ts (print_arrow_list print_tv) ts.ts_args
-          (print_list newline (print_constr info)) csl
+          print_ts ts (print_list space print_tv) ts.ts_args
+          (print_list newline (print_constr info ts)) csl
 
 let print_type_decl info fmt d =
   if not (Sid.mem (fst d).ts_name info.info_rem) then
@@ -377,9 +378,10 @@ let print_logic_decl info fmt d =
 let print_ind info fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr (print_fmla info) f
 
+(* TODO: fix syntax with type parameters *)
 let print_ind_decl info fmt (ps,bl) =
-  fprintf fmt "@[<hov 2>Inductive %a%a : Prop :=@ @[<hov>%a@].@]@\n@\n"
-     print_ls ps (print_paren_l (print_ty info)) ps.ls_args
+  fprintf fmt "@[<hov 2>Inductive %a : %a -> Prop :=@ @[<hov>%a@].@]@\n@\n"
+     print_ls ps (print_arrow_list (print_ty info)) ps.ls_args
      (print_list newline (print_ind info)) bl
 
 let print_ind_decl info fmt d =
