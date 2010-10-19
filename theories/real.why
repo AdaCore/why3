@@ -1,21 +1,38 @@
 
-theory Real 
+theory Real
 
   logic zero : real = 0.0
   logic one  : real = 1.0
-  
-  clone export algebra.Field with 
+
+  clone export algebra.Field with
      type t = real, logic zero = zero, logic one = one
 
   logic (< ) real real
   logic (<=) (x y : real) = x < y or x = y
   logic (> ) (x y : real) = y < x
   logic (>=) (x y : real) = y <= x
-  
+
   clone export relations.TotalOrder with
     type t = real, logic rel = (<=)
 
-end 
+end
+
+theory RealInfix
+
+  use import Real
+
+  logic (+.) (x:real) (y:real) : real = x + y
+  logic (-.) (x:real) (y:real) : real = x - y
+  logic ( *.) (x:real) (y:real) : real = x * y
+  logic (/.) (x:real) (y:real) : real = x / y
+  logic (-._) (x:real) : real = - x
+
+  logic (<=.) (x:real) (y:real) = x <= y
+  logic (>=.) (x:real) (y:real) = x >= y
+  logic (<.) (x:real) (y:real) = x < y
+  logic (>.) (x:real) (y:real) = x > y
+
+end
 
 theory Abs
 
@@ -53,13 +70,13 @@ theory FromInt
   axiom Zero: from_int 0 = 0.0
   axiom One: from_int 1 = 1.0
 
-  axiom Add: 
+  axiom Add:
     forall x y:int. from_int (Int.(+) x y) = from_int x + from_int y
-  axiom Sub: 
+  axiom Sub:
     forall x y:int. from_int (Int.(-) x y) = from_int x - from_int y
-  axiom Mul: 
+  axiom Mul:
     forall x y:int. from_int (Int.(*) x y) = from_int x * from_int y
-  axiom Neg: 
+  axiom Neg:
     forall x y:int. from_int (Int.(-_) (x)) = - from_int x
 
 end
@@ -85,11 +102,11 @@ theory Truncate
     forall i:int. truncate (from_int i) = i
 
   axiom Truncate_down_pos:
-    forall x:real. x >= 0.0 -> 
+    forall x:real. x >= 0.0 ->
       from_int (truncate x) <= x < from_int (Int.(+) (truncate x) 1)
 
   axiom Truncate_up_neg:
-    forall x:real. x <= 0.0 -> 
+    forall x:real. x <= 0.0 ->
       from_int (Int.(-) (truncate x) 1) < x <= from_int (truncate x)
 
   axiom Real_of_truncate:
@@ -138,13 +155,13 @@ theory Square
 
   logic sqrt real : real
 
-  axiom Sqrt_positive: 
+  axiom Sqrt_positive:
     forall x:real. x >= 0.0 -> sqrt x >= 0.0
 
-  axiom Sqrt_square:  
+  axiom Sqrt_square:
     forall x:real. x >= 0.0 -> sqr (sqrt x) = x
 
-  axiom Square_sqrt: 
+  axiom Square_sqrt:
     forall x:real. x >= 0.0 -> sqrt (x*x) = x
 
 end
@@ -171,7 +188,7 @@ theory ExpLog
 
   logic log real : real
   axiom Log_one : log 1.0 = 0.0
-  axiom Log_mul : 
+  axiom Log_mul :
     forall x y:real. x > 0.0 and y > 0.0 -> log (x*y) = log x + log y
 
   axiom Log_exp: forall x:real. log (exp x) = x
@@ -192,7 +209,7 @@ theory ExpLogTest
 end
 
 
-theory Power 
+theory Power
 
   use import Real
   use import Square
@@ -216,7 +233,7 @@ theory Power
     forall x:real. pow x 2.0 = sqr x
 
   axiom Pow_half:
-    forall x:real. x >= 0.0 -> pow x 0.5 = sqrt x  
+    forall x:real. x >= 0.0 -> pow x 0.5 = sqrt x
 
   axiom Pow_exp_log:
     forall x y:real. x > 0.0 -> pow x y = exp (y * log x)
@@ -233,7 +250,7 @@ end
 
 
 
-(** Trigonometric functions 
+(** Trigonometric functions
     [http://en.wikipedia.org/wiki/Trigonometric_function]
 *)
 theory Trigonometry
@@ -277,7 +294,7 @@ theory Trigonometry
     forall x:real. cos (-x) = cos x
   axiom Sin_neg:
     forall x:real. sin (-x) = - sin x
- 
+
   axiom Cos_sum:
     forall x y:real. cos (x+y) = cos x * cos y - sin x * sin y
   axiom Sin_sum:
@@ -303,7 +320,7 @@ theory TrigonometryTest
 
 end
 
-(** hyperbolic functions 
+(** hyperbolic functions
     [http://en.wikipedia.org/wiki/Hyperbolic_function]
 *)
 theory Hyperbolic
@@ -326,7 +343,7 @@ theory Hyperbolic
 
 end
 
-(** polar coordinates: atan2, hypot 
+(** polar coordinates: atan2, hypot
     [http://en.wikipedia.org/wiki/Atan2]
 *)
 theory Polar
@@ -337,7 +354,7 @@ theory Polar
 
   logic hypot (x y : real) : real = sqrt (sqr x + sqr y)
   logic atan2 real real : real
- 
+
   axiom X_from_polar:
     forall x y:real. x = hypot x y * cos (atan2 y x)
 

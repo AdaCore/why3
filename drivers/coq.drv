@@ -128,6 +128,20 @@ theory real.Real
 
 end
 
+theory real.RealInfix
+
+  syntax logic (+.)  "(%1 + %2)%R"
+  syntax logic (-.)  "(%1 - %2)%R"
+  syntax logic (-._) "(-%1)%R"
+  syntax logic ( *.)  "(%1 * %2)%R"
+  syntax logic (/.)  "(Rdiv %1 %2)%R"
+
+  syntax logic (<=.) "(%1 <= %2)%R"
+  syntax logic (<.)  "(%1 <  %2)%R"
+  syntax logic (>=.) "(%1 >= %2)%R"
+  syntax logic (>.)  "(%1 >  %2)%R"
+
+end
 
 theory real.Abs
 

@@ -105,6 +105,21 @@ theory real.Real
 
 end
 
+theory real.RealInfix
+
+  syntax logic (+.)  "(%1 + %2)"
+  syntax logic (-.)  "(%1 - %2)"
+  syntax logic ( *.)  "(%1 * %2)"
+  syntax logic (/.)  "(%1 / %2)"
+  syntax logic (-._) "(-%1)"
+
+  syntax logic (<=.) "(%1 <= %2)"
+  syntax logic (<.)  "(%1 <  %2)"
+  syntax logic (>=.) "(%1 >= %2)"
+  syntax logic (>.)  "(%1 >  %2)"
+
+end
+
 theory bool.Bool
   syntax type  bool  "bool"
   syntax logic True  "true"
