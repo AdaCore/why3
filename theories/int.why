@@ -1,10 +1,10 @@
 
-theory Int 
+theory Int
 
   logic zero : int = 0
   logic one  : int = 1
-  
-  clone export algebra.UnitaryCommutativeRing with 
+
+  clone export algebra.UnitaryCommutativeRing with
      type t = int, logic zero = zero, logic one = one
 
   logic (< ) int int
@@ -53,10 +53,13 @@ theory EuclideanDivision
   logic div int int : int
   logic mod int int : int
 
-  axiom Div_mod: 
+  axiom Div_mod:
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
 
-  axiom Mod_bound: 
+  axiom Div_bound:
+    forall x y:int. x >= 0 and y > 0 -> 0 <= div x y <= x
+
+  axiom Mod_bound:
     forall x y:int. y <> 0 -> 0 <= mod x y < abs y
 
   lemma Mod_1: forall x:int. mod x 1 = 0
@@ -73,10 +76,13 @@ theory ComputerDivision
   logic div int int : int
   logic mod int int : int
 
-  axiom Div_mod: 
+  axiom Div_mod:
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
 
-  axiom Mod_bound: 
+  axiom Div_bound:
+    forall x y:int. x >= 0 and y > 0 -> 0 <= div x y <= x
+
+  axiom Mod_bound:
     forall x y:int. y <> 0 -> - abs y < mod x y < abs y
 
   axiom Div_sign_pos:
@@ -120,26 +126,26 @@ theory NumOfParam
   (* number of n st a <= n < b and pr(p,n) *)
   logic num_of (p : param) (a b : int) : int
 
-  axiom Num_of_empty : 
-    forall p : param, a b : int. 
+  axiom Num_of_empty :
+    forall p : param, a b : int.
     b <= a -> num_of p a b = 0
 
-  axiom Num_of_left_no_add : 
-    forall p : param, a b : int. 
+  axiom Num_of_left_no_add :
+    forall p : param, a b : int.
     a < b -> not pr p a -> num_of p a b = num_of p (a+1) b
-  axiom Num_of_left_add : 
-    forall p : param, a b : int. 
+  axiom Num_of_left_add :
+    forall p : param, a b : int.
     a < b -> pr p a -> num_of p a b = 1 + num_of p (a+1) b
 
-  axiom Num_of_right_no_add : 
-    forall p : param, a b : int. 
+  axiom Num_of_right_no_add :
+    forall p : param, a b : int.
     a < b -> not pr p (b-1) -> num_of p a b = num_of p a (b-1)
-  axiom Num_of_right_add : 
-    forall p : param, a b : int. 
+  axiom Num_of_right_add :
+    forall p : param, a b : int.
     a < b -> pr p (b-1) -> num_of p a b = 1 + num_of p a (b-1)
 
   axiom Num_of_append :
-    forall p : param, a b c : int. 
+    forall p : param, a b c : int.
     a <= b <= c -> num_of p a c = num_of p a b + num_of p b c
 
   axiom Empty :
@@ -170,18 +176,18 @@ theory Divisibility
 
 end
 
-theory Gcd 
+theory Gcd
 
   use import Int
   use import Divisibility
 
-  logic gcd (a b g : int) = 
-    divides g a and 
+  logic gcd (a b g : int) =
+    divides g a and
     divides g b and
     forall x : int. divides x a -> divides x b -> divides x g
 
   lemma Gcd_sym : forall a b g : int. gcd a b g -> gcd b a g
- 
+
   lemma Gcd_0 : forall a : int. gcd a 0 a
 
   lemma Gcd_euclid : forall a b q g : int. gcd a (b - q * a) g -> gcd a b g
@@ -189,7 +195,7 @@ theory Gcd
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "../bin/why.opt int.why"
-End: 
+End:
 *)
