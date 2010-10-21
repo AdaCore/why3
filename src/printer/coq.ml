@@ -308,9 +308,14 @@ and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
 (** Declarations *)
 
 let print_constr info ts fmt cs =
-  fprintf fmt "@[<hov 4>| %a : %a -> %a %a@]" print_ls cs
-    (print_arrow_list (print_ty info)) cs.ls_args
-    print_ts ts (print_list space print_tv) ts.ts_args
+  match cs.ls_args with
+    | [] ->
+        fprintf fmt "@[<hov 4>| %a : %a %a@]" print_ls cs
+          print_ts ts (print_list space print_tv) ts.ts_args
+    | l ->
+        fprintf fmt "@[<hov 4>| %a : %a -> %a %a@]" print_ls cs
+          (print_arrow_list (print_ty info)) l
+          print_ts ts (print_list space print_tv) ts.ts_args
 
 let print_type_decl info fmt (ts,def) = 
   if is_ts_tuple ts then () else
