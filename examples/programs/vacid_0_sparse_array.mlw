@@ -52,6 +52,7 @@ back  +-+-+-+-------------------+
   logic invariant (a : sparse_array) = 
     let (SA val idx back sz n) = a in
     0 <= n <= sz <= maxlen and
+    A.length val = sz and A.length idx = sz and A.length back = sz and
     forall i : int. 0 <= i < n -> 0 <= back#i < sz and idx#(back#i) = i
 
   (* 
@@ -101,13 +102,19 @@ let create sz =
   { invariant !result and 
     sa_sz !result = sz and forall i:int. model !result i = default }
 
+let array_get (a : array 'a) i = 
+  { 0 <= i < A.length a } A.get a i { result = A.get a i }
+
+let array_set (a : array 'a) i v = 
+  { 0 <= i < A.length a } A.set a i v { result = A.set a i v }
+
 let test a i =
-  { 0 <= i < sa_sz !a }
+  { 0 <= i < sa_sz !a and invariant !a }
   let idx = sa_idx !a in
   let back = sa_back !a in
   let n = sa_n !a in
-  0 <= A.get idx i && A.get idx i < n &&
-  A.get back (A.get idx i) = i
+  0 <= array_get idx i && array_get idx i < n &&
+  array_get back (array_get idx i) = i
   { result=True <-> is_elt !a i }
 
 (*
@@ -121,7 +128,7 @@ let get a i =
   { 0 <= i < sa_sz !a and invariant !a } 
   let val = sa_val !a in
   if test a i then
-    A.get val i 
+    array_get val i 
   else
     default
   { result = model !a i }
@@ -144,13 +151,13 @@ let set a i v =
   let back = sa_back !a in
   let sz= sa_sz !a in
   let n = sa_n !a in
-  let val = A.set val i v in
+  let val = array_set val i v in
   if test a i then
     a := SA val idx back sz n
   else begin
     assert { n < sz };
-    let idx = A.set idx i n in 
-    let back = A.set back n i in
+    let idx = array_set idx i n in 
+    let back = array_set back n i in
     a := SA val idx back sz (n+1)
   end
   { invariant !a and 
@@ -167,6 +174,8 @@ let harness () =
   set b 7 c2;
   let get_a_5 = get a 5 in assert { get_a_5 = c1 };
   let get_b_7 = get b 7 in assert { get_b_7 = c2 };
+  let get_a_7 = get a 7 in assert { get_a_7 = default };
+  let get_b_5 = get b 5 in assert { get_b_5 = default };
   let get_a_0 = get a 0 in assert { get_a_0 = default };
   let get_b_0 = get b 0 in assert { get_b_0 = default };
   ()
