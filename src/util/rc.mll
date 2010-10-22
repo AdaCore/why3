@@ -18,19 +18,16 @@
 (**************************************************************************)
 
 {
+open Lexing
+open Format
+open Util
 
-  open Lexing
-  open Format
-  open Util
-
-  let get_home_dir () =
-    try Sys.getenv "HOME"
-    with Not_found -> 
-      (* try windows env var *)
-      try Sys.getenv "USERPROFILE"
-      with Not_found -> ""
-
-
+let get_home_dir () =
+  try Sys.getenv "HOME"
+  with Not_found ->
+    (* try windows env var *)
+    try Sys.getenv "USERPROFILE"
+    with Not_found -> ""
 
 type rc_value =
   | RCint of int
@@ -237,21 +234,21 @@ let push_record () =
 let space = [' ' '\t' '\r' '\n']+
 let digit = ['0'-'9']
 let letter = ['a'-'z' 'A'-'Z']
-let ident = (letter | '_') (letter | digit | '_' | '-' | '(' | ')') * 
-let sign = '-' | '+' 
+let ident = (letter | '_') (letter | digit | '_' | '-' | '(' | ')') *
+let sign = '-' | '+'
 let integer = sign? digit+
 let mantissa = ['e''E'] sign? digit+
 let real = sign? digit* '.' digit* mantissa?
 let escape = ['\\''"''n''t''r']
 
 rule record = parse
-  | space 
+  | space
       { record lexbuf }
   | '[' (ident as key) space*
       { header [key] lexbuf }
-  | eof 
+  | eof
       { push_record () }
-  | (ident as key) space* '=' space* 
+  | (ident as key) space* '=' space*
       { value key lexbuf }
   | _ as c
       { failwith ("Rc: invalid keyval pair starting with " ^ String.make 1 c) }
@@ -275,9 +272,9 @@ and value key = parse
   | real as r
       { push_field key (RCfloat (float_of_string r));
         record lexbuf }
-  | '"' 
+  | '"'
       { Buffer.clear buf;
-	string_val key lexbuf } 
+	string_val key lexbuf }
   | "true"
       { push_field key (RCbool true);
         record lexbuf }
@@ -292,15 +289,15 @@ and value key = parse
   | _ as c
       { failwith ("Rc: invalid value starting with " ^ String.make 1 c) }
 
-and string_val key = parse 
-  | '"' 
+and string_val key = parse
+  | '"'
       { push_field key (RCstring (Buffer.contents buf));
 	record lexbuf
       }
   | [^ '\\' '"'] as c
       { Buffer.add_char buf c;
         string_val key lexbuf }
-  | '\\' (['\\''\"'] as c)   
+  | '\\' (['\\''\"'] as c)
       { Buffer.add_char buf c;
         string_val key lexbuf }
   | '\\' 'n'
@@ -316,22 +313,26 @@ and string_val key = parse
 
 {
 
-  let from_file f =
-      let c = 
-	try open_in f 
-	with Sys_error _ -> raise Not_found
-(*
-	  Format.eprintf "Cannot open file %s@." f;
-	  exit 1
-*)
-      in
-      current := [];
-      let lb = from_channel c in
-      record lb;
-      close_in c;
-      make_t !current
+let from_channel cin =
+  current := [];
+  record (from_channel cin);
+  make_t !current
 
-let to_file s t =
+let from_file f =
+  let c =
+    try open_in f
+    with Sys_error _ -> raise Not_found
+(* TODO: can we catch only the "file not found" errors
+   and let other Sys_error's just come through? *)
+(*
+    Format.eprintf "Cannot open file %s@." f;
+    exit 1
+*)
+  in
+  try let r = from_channel c in close_in c; r
+  with e -> close_in c; raise e
+
+let to_formatter fmt t =
   let print_kv k fmt v = fprintf fmt "%s = %a" k print_rc_value v in
   let print_kvl fmt k vl = Pp.print_list Pp.newline (print_kv k) fmt vl in
   let print_section sname fmt (h,l) =
@@ -342,12 +343,15 @@ let to_file s t =
     Pp.print_list Pp.newline2 (print_section sname) fmt l in
   let print_t fmt t =
     Pp.print_iter22 Mstr.iter Pp.newline2 print_sectionl fmt t in
-  let out = open_out s in
-  let fmt = formatter_of_out_channel out in
   print_t fmt t;
-  pp_print_flush fmt ();
+  pp_print_flush fmt ()
+
+let to_channel cout t =
+  to_formatter (formatter_of_out_channel cout) t
+
+let to_file s t =
+  let out = open_out s in
+  to_channel out t;
   close_out out
-
-
 
 }

@@ -175,7 +175,12 @@ val check_exhaustive : section -> Util.Sstr.t -> unit
     appear inside the section [section]
 
     @raise UnknownField if it is not the case
+*)
 
+val from_channel : in_channel -> t
+(** [from_channel cin] returns the Rc of the input channel [cin]
+    @raise Failure "lexing" in case of incorrect syntax
+    @raise ExtraParameters if a section header has more than one argument
 *)
 
 val from_file : string -> t
@@ -185,8 +190,14 @@ val from_file : string -> t
     @raise ExtraParameters if a section header has more than one argument
 *)
 
-val to_file   : string -> t -> unit
-  (** [to_file filename rc] save the Rc [rc] in the file [filename] *)
+val to_formatter : Format.formatter -> t -> unit
+  (** [to_formatter fmt rc] writes the Rc [rc] to the formatter [fmt] *)
+
+val to_channel : out_channel -> t -> unit
+  (** [to_channel cout rc] writes the Rc [rc] to the output channel [out] *)
+
+val to_file : string -> t -> unit
+  (** [to_file filename rc] writes the Rc [rc] to the file [filename] *)
 
 val get_home_dir : unit -> string
   (** [get_home_dir ()] returns the home dir of the user *)
