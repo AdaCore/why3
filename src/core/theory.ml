@@ -39,8 +39,8 @@ type namespace = {
 let empty_ns = {
   ns_ts = Mnm.empty;
   ns_ls = Mnm.empty;
-  ns_ns = Mnm.empty;
   ns_pr = Mnm.empty;
+  ns_ns = Mnm.empty;
 }
 
 exception ClashSymbol of string
@@ -79,6 +79,7 @@ let rec ns_find get_map ns = function
 let ns_find_ts = ns_find (fun ns -> ns.ns_ts)
 let ns_find_ls = ns_find (fun ns -> ns.ns_ls)
 let ns_find_pr = ns_find (fun ns -> ns.ns_pr)
+let ns_find_ns = ns_find (fun ns -> ns.ns_ns)
 
 (** Meta properties *)
 

@@ -231,6 +231,9 @@ let find_tysymbol q uc = find_tysymbol_ns q (get_namespace uc)
 let find_lsymbol_ns = find_ns ns_find_ls
 let find_lsymbol q uc = find_lsymbol_ns q (get_namespace uc)
 
+let find_namespace_ns = find_ns ns_find_ns
+let find_namespace q uc = find_namespace_ns q (get_namespace uc)
+
 let specialize_lsymbol p uc =
   let s = find_lsymbol p uc in
   let tl,ty = specialize_lsymbol ~loc:(qloc p) s in
@@ -912,6 +915,29 @@ let find_theory env lenv q id = match q with
       (* theory in file f *)
       find_theory env q id
 
+let rec clone_ns loc sl ns2 ns1 s =
+  let clash id = error ~loc (Clash id.id_string) in
+  let s = Mnm.fold (fun nm ns1 acc ->
+    if not (Mnm.mem nm ns2.ns_ns) then acc else
+    let ns2 = Mnm.find nm ns2.ns_ns in
+    clone_ns loc sl ns2 ns1 acc) ns1.ns_ns s
+  in
+  let inst_ts = Mnm.fold (fun nm ts1 acc ->
+    if not (Mnm.mem nm ns2.ns_ts) then acc else
+    if not (Sid.mem ts1.ts_name sl) then acc else
+    if Mts.mem ts1 acc then clash ts1.ts_name else
+    let ts2 = Mnm.find nm ns2.ns_ts in
+    Mts.add ts1 ts2 acc) ns1.ns_ts s.inst_ts
+  in
+  let inst_ls = Mnm.fold (fun nm ls1 acc ->
+    if not (Mnm.mem nm ns2.ns_ls) then acc else
+    if not (Sid.mem ls1.ls_name sl) then acc else
+    if Mls.mem ls1 acc then clash ls1.ls_name else
+    let ls2 = Mnm.find nm ns2.ns_ls in
+    Mls.add ls1 ls2 acc) ns1.ns_ls s.inst_ls
+  in
+  { s with inst_ts = inst_ts; inst_ls = inst_ls }
+
 let add_decl env lenv th = function
   | TypeDecl dl ->
       add_types dl th
@@ -934,6 +960,11 @@ let add_decl env lenv th = function
 	    use_export th t
 	| Some s ->
             let add_inst s = function
+              | CSns (p,q) ->
+                  let find ns x = find_namespace_ns x ns in
+                  let ns1 = option_fold find t.th_export p in
+                  let ns2 = option_fold find (get_namespace th) q in
+                  clone_ns loc t.th_local ns2 ns1 s
               | CStsym (p,q) ->
                   let ts1 = find_tysymbol_ns p t.th_export in
                   let ts2 = find_tysymbol q th in

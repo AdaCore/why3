@@ -97,6 +97,7 @@ type use = {
 }
 
 type clone_subst =
+  | CSns    of qualid option * qualid option
   | CStsym  of qualid * qualid
   | CSlsym  of qualid * qualid
   | CSlemma of qualid

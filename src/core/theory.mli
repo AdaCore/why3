@@ -37,6 +37,7 @@ type namespace = private {
 val ns_find_ts : namespace -> string list -> tysymbol
 val ns_find_ls : namespace -> string list -> lsymbol
 val ns_find_pr : namespace -> string list -> prsymbol
+val ns_find_ns : namespace -> string list -> namespace
 
 (** Meta properties *)
 

@@ -261,10 +261,16 @@ list1_comma_subst:
 ;
 
 subst:
+| NAMESPACE ns EQUAL ns     { CSns   ($2, $4) }
 | TYPE  qualid EQUAL qualid { CStsym ($2, $4) }
 | LOGIC qualid EQUAL qualid { CSlsym ($2, $4) }
 | LEMMA qualid              { CSlemma $2 }
 | GOAL  qualid              { CSgoal  $2 }
+;
+
+ns:
+| uqualid { Some $1 }
+| DOT     { None }
 ;
 
 /* Meta args */
