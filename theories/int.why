@@ -28,22 +28,12 @@ theory Abs
 
 end
 
-(*
 theory MinMax
 
   use import Int
-
-  logic min (x y : int) : int = if x <= y then x else y
-  logic max (x y : int) : int = if x <= y then y else x
-
-  lemma Max_is_ge   : forall x y:int. max x y >= x and max x y >= y
-  lemma Max_is_some : forall x y:int. max x y = x or max x y = y
-  lemma Min_is_le   : forall x y:int. min x y <= x and min x y <= y
-  lemma Min_is_some : forall x y:int. min x y = x or min x y = y
+  clone export comparison.MinMax with type t = int, logic ge = (>=)
 
 end
-*)
-
 
 theory EuclideanDivision
 
