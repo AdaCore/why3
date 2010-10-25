@@ -1,0 +1,81 @@
+
+(*
+   ACM Portugese National Programming Contest (MIUP) 2010
+
+   Given an integer X >= 0, with N digits, and another integer Y > 0,
+   find the smallest Z > X such that digit_sum(Z) = Y.
+
+   Ocaml code given at the end of file.
+*)
+
+{
+  use array.ArrayLength as A
+
+  type array 'a = A.t int 'a
+
+  logic (#) (a : array 'a) (i : int) : 'a = A.get a i
+}
+
+let array_get (a : array 'a) i = 
+  { 0 <= i < A.length a } A.get a i { result = A.get a i }
+
+let array_set (a : array 'a) i v = 
+  { 0 <= i < A.length a } A.set a i v { result = A.set a i v }
+
+parameter x : array int
+
+{ 
+  logic n : int
+  logic y : int
+  
+  use import int.MinMax
+  use import int.EuclideanDivision
+
+  logic m : int = 1 + max n (div y 9)
+}
+
+let search () =
+  { n >= 0 and y > 0 and A.length x >= m }
+  ()
+  { true }
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/next_digit_sum"
+End: 
+*)
+
+
+
+(*
+let s = Sys.argv.(1)
+let n = String.length s
+let y = int_of_string Sys.argv.(2)
+
+let max_digits = 1 + max n (y / 9)
+let x = Array.create max_digits 0
+let () = 
+  for i = 0 to n - 1 do x.(n - 1 - i) <- Char.code s.[i] - Char.code '0' done
+
+let () =
+  let s = ref 0 in
+  for i = 0 to max_digits - 1 do s := !s + x.(i) done;
+  for d = 0 to max_digits - 1 do
+    (* s is the sum of digits d..n-1 *)
+    (* solution with digits > d intacts, and digit d increased by 1 or more *)
+    for c = x.(d) + 1 to 9 do
+      let delta = y - !s - c + x.(d) in
+      if 0 <= delta && delta <= 9 * d then begin
+	x.(d) <- c;
+	let k = delta / 9 in
+	for i = 0 to d-1 do 
+	  x.(i) <- if i < k then 9 else if i = k then delta mod 9 else 0
+	done;
+	for i = max d (n-1) downto 0 do printf "%d" x.(i) done;
+	printf "@.";
+	exit 0
+      end
+    done;
+    s := !s - x.(d)
+  done
+*)
