@@ -22,7 +22,7 @@ let array_get (a : array 'a) i =
 let array_set (a : array 'a) i v = 
   { 0 <= i < A.length a } A.set a i v { result = A.set a i v }
 
-parameter x : array int
+parameter x : ref (array int)
 
 { 
   logic n : int
@@ -32,12 +32,23 @@ parameter x : array int
   use import int.EuclideanDivision
 
   logic m : int = 1 + max n (div y 9)
+
 }
 
+exception Success
+
 let search () =
-  { n >= 0 and y > 0 and A.length x >= m }
+  { n >= 0 and y > 0 and A.length !x >= m and
+    (n = 0 or !x#(n-1) <> 0) and
+    (forall i:int. 0 <= i < n -> 0 <= !x#i <= 9) and
+    (forall i:int. n <= i < m -> !x#i = 0) }
+  let s = ref 0 in
+  let i = ref 0 in
+  while !i < n do invariant { 0 <= !i <= n } (*variant { n - !i }*)
+    s := !s + array_get !x !i; i := !i + 1 
+  done;
   ()
-  { true }
+  { true(*false*) } (* | Success -> { true } *)
 
 (*
 Local Variables: 

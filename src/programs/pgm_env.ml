@@ -93,6 +93,11 @@ let ls_Exit = memo_ls
 
 let v_result ty = create_vsymbol (id_fresh "result") ty
 
+let exn_v_result ls = match ls.ls_args with
+  | [] -> None
+  | [ty] -> Some (v_result ty)
+  | _ -> assert false
+
 let add_type_v_ref uc m =
   let ts_ref = find_ts uc ["ref"] in
   let a = ty_var (create_tvsymbol (id_fresh "a")) in

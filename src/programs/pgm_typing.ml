@@ -887,6 +887,30 @@ let rec check_type ?(noref=false) gl loc ty = match ty.ty_node with
   | Ty.Tyvar _ -> 
       ()
 
+(* Saturation of postconditions: a postcondition must be set for
+   any possibly raised exception *)
+
+(* let warning_no_post loc x =  *)
+(*   wprintf loc "no postcondition for exception %a; false inserted@\n"  *)
+(*     Ident.print x; *)
+(*   if werror then exit 1 *)
+
+let saturation loc ef (a,al) =
+  let xs = ef.E.raises in
+  let check (x,_) =
+    if not (Sls.mem x xs) then 
+      errorm ~loc "exception %a cannot be raised" print_ls x
+  in
+  List.iter check al;
+  let set_post x = 
+    try 
+      x, List.assoc x al 
+    with Not_found -> 
+      (* warning_no_post loc x; *)
+      x, (exn_v_result x, f_false)
+  in
+  (a, List.map set_post (Sls.elements xs))
+
 (* [expr] translates iexpr into expr
    [env : type_v Mvs.t] maps local variables to their types *)
 
@@ -1030,6 +1054,7 @@ and expr_desc gl env loc ty = function
 
 and triple gl env (p, e, q) =
   let e = expr gl env e in
+  let q = saturation e.expr_loc e.expr_effect q in
   let ef = post_effect gl (fmla_effect gl e.expr_effect p) q in
   let e = { e with expr_effect = ef } in
   let c = 

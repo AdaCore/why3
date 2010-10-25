@@ -185,11 +185,6 @@ let rec ls_assoc ls = function
   | (ls', x) :: _ when ls_equal ls ls' -> x
   | _ :: r -> ls_assoc ls r
 
-let exn_v_result ls = match ls.ls_args with
-  | [] -> None
-  | [ty] -> Some (v_result ty)
-  | _ -> assert false
-
 let default_exn_post ls = ls, (exn_v_result ls, f_true)
 
 let default_post ty ef =
