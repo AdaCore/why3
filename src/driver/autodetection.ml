@@ -70,7 +70,8 @@ let load rc =
   tps
 
 let read_auto_detection_data main =
-  let filename = Filename.concat (Whyconf.datadir main) "provers-detection-data.conf" in
+  let filename = Filename.concat (Whyconf.datadir main)
+    "provers-detection-data.conf" in
   try
     let rc = Rc.from_file filename in
     load rc
@@ -102,6 +103,7 @@ let detect_prover main acc data =
 	let out = Filename.temp_file "out" "" in
         let cmd = sprintf "%s %s" com data.version_switch in
 	let c = sprintf "(%s) > %s" cmd out in
+        eprintf "Run : %s@." c;
 	let ret = Sys.command c in
 	if ret <> 0 then
 	  begin
