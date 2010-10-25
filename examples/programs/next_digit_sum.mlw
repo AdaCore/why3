@@ -16,11 +16,11 @@
   logic (#) (a : array 'a) (i : int) : 'a = A.get a i
 }
 
-let array_get (a : array 'a) i = 
-  { 0 <= i < A.length a } A.get a i { result = A.get a i }
+let array_get (a : ref (array 'a)) i = 
+  { 0 <= i < A.length !a } A.get !a i { result = A.get !a i }
 
-let array_set (a : array 'a) i v = 
-  { 0 <= i < A.length a } A.set a i v { result = A.set a i v }
+let array_set (a : ref (array 'a)) i v = 
+  { 0 <= i < A.length !a } a := A.set !a i v { !a = A.set (old !a) i v }
 
 parameter x : ref (array int)
 
@@ -38,17 +38,49 @@ parameter x : ref (array int)
 exception Success
 
 let search () =
-  { n >= 0 and y > 0 and A.length !x >= m and
+  { n >= 0 and y > 0 and A.length !x = m and
     (n = 0 or !x#(n-1) <> 0) and
     (forall i:int. 0 <= i < n -> 0 <= !x#i <= 9) and
     (forall i:int. n <= i < m -> !x#i = 0) }
+  label Init:
   let s = ref 0 in
   let i = ref 0 in
-  while !i < n do invariant { 0 <= !i <= n } (*variant { n - !i }*)
-    s := !s + array_get !x !i; i := !i + 1 
+  while !i < n do 
+    invariant { 0 <= !i <= n } variant { n - !i }
+    s := !s + array_get x !i; 
+    i := !i + 1 
   done;
-  ()
-  { true(*false*) } (* | Success -> { true } *)
+  let d = ref 0 in
+  while !d < m do
+    invariant { 0 <= !d <= m and !x = at !x Init } 
+    variant { m - !d }
+    let c = ref (array_get x !d) in
+    while !c <= 9 do
+      invariant { !x # !d <= !c <= 10 and !x = at !x Init } 
+      variant { 10 - !c }
+      let delta = y - !s - !c + array_get x !d in
+      if 0 <= delta && delta <= 9 * !d then begin
+        array_set x !d !c;
+	let k = div delta 9 in
+        assert { k <= !d };
+        i := 0;
+	while !i < k do 
+ 	  invariant { 0 <= !i <= k and A.length !x = m } variant { k - !i }
+          array_set x !i 9; i := !i + 1
+        done;
+        array_set x !i (mod delta 9);
+        i := !i + 1;
+        while !i < !d do 
+          invariant { k+1 <= !i and A.length !x = m } variant { !d - !i }
+	  array_set x !i 0; i := !i + 1 
+	done;
+        raise Success
+      end;
+      c := !c + 1
+    done;
+    d := !d + 1
+  done
+  { true(*false*) } | Success -> { true }
 
 (*
 Local Variables: 

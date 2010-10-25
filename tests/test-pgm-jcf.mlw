@@ -1,19 +1,23 @@
-exception Break
+{
 
-let f (n : int) : int  =
-  { true }
-  let i = ref n in 
-  try
-    while (!i > 0) do
-      invariant { true }
-      variant { !i }
-      if (!i <= 10) then raise Break;
-      i := !i - 1
-    done
-  with Break -> ()
-  end;
-  !i
-  { result <= 10 } 
+type purse = ref int
+
+}
+
+parameter new_purse : unit -> purse
+
+let purse_init (balance: purse) (amount: int): unit =
+{ amount >= 0 } 
+    balance := amount
+{ !balance = amount}
+
+let test () : int =
+{ true }
+  let p1 = new_purse() in
+  purse_init p1 150;
+  let p2 = new_purse() in
+  !p2
+{ result = 150 }
 
 (*
 Local Variables: 
