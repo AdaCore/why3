@@ -354,7 +354,10 @@ let run_auto_detection gconfig =
   let config = Autodetection.run_auto_detection gconfig.config in
   gconfig.config <- config;
   let provers = get_provers config in
-  gconfig.provers <- Mstr.fold (get_prover_data gconfig.env) provers Mstr.empty;
+  gconfig.provers <- Mstr.fold (get_prover_data gconfig.env) provers Mstr.empty
+
+
+let () = eprintf "end of configuration initialization@."
 
 (*
 Local Variables: 
