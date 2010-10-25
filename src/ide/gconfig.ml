@@ -149,8 +149,10 @@ let save_config t =
   save_config config
 
 let config =
-  eprintf "reading IDE config file@.";
-  read_config ()
+  eprintf "reading IDE config file...@?";
+  let c= read_config () in
+  eprintf " done.@.";
+  c
 
 let save_config () = save_config config
 
