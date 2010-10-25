@@ -222,7 +222,10 @@ let resize_images size =
   image_transf := image ~size iconname_transf;
   ()
 
-let () = resize_images 20
+let () = 
+  eprintf "reading icons...@?";
+  resize_images 20;
+  eprintf " done.@."
 
 
 

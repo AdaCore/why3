@@ -47,7 +47,11 @@ let set_file f = match !file with
       end;
       file := Some f
 
-let () = Arg.parse spec set_file usage_str
+let () = 
+  eprintf "Parsing command line...@?";
+  Arg.parse spec set_file usage_str;
+  eprintf " done.@."
+
 
 let fname = match !file with
   | None -> 
