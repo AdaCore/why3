@@ -62,9 +62,14 @@ let () =
   (* let main = option_apply main (fun d -> {main with datadir = d})
      !datadir in *)
   let config = set_main config main in
+  let conf_file = get_conf_file config in
+  let conf_file_doesnt_exist = not (Sys.file_exists conf_file) in
+  if conf_file_doesnt_exist then
+    printf "Config file %s doesn't exist, \
+ so autodection is automatically triggered@." conf_file;
   let config =
-    if !auto
+    if !auto || conf_file_doesnt_exist
     then Autodetection.run_auto_detection config
     else config in
-  printf "Save config to %s@." (get_conf_file config);
+  printf "Save config to %s@." conf_file;
   save_config config
