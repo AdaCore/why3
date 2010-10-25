@@ -17,9 +17,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let () = ignore (GtkMain.Main.init ())
-
 open Format
+
+let () = 
+  eprintf "Init the GTK interface...@?";
+  ignore (GtkMain.Main.init ());
+  eprintf " done.@."
+
 open Why
 open Whyconf
 open Gconfig
