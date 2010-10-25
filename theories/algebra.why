@@ -69,6 +69,7 @@ theory UnitaryCommutativeRing
   clone export CommutativeRing
   logic one : t
   axiom Unitary : forall x:t. one * x = x
+  axiom NonTrivialRing : zero <> one
 end
 
 theory Field
