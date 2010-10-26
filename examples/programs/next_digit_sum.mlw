@@ -83,49 +83,36 @@ let search () =
     (forall i:int. n <= i < m -> !x#i = 0) }
   label Init:
   let s = ref 0 in
-  let i = ref 0 in
-  while !i < m do (* could be n instead of m *)
-    invariant { 0 <= !i <= m and !s = sum_digits (interp !x 0 !i) } 
-    variant { m - !i }
-    s := !s + array_get x !i; 
-    i := !i + 1 
+  for i = 0 to m - 1 do (* could be n instead of m *)
+    invariant { !s = sum_digits (interp !x 0 i) } 
+    s := !s + array_get x i 
   done;
   assert { !s = sum_digits (interp !x 0 m) };
-  let d = ref 0 in
-  while !d < m do
+  for d = 0 to m - 1 do
     invariant { 
-      0 <= !d <= m and !x = at !x Init and
-      !s = sum_digits (interp !x !d m) 
+      !x = at !x Init and
+      !s = sum_digits (interp !x d m) 
     } 
-    variant { m - !d }
-    let c = ref (array_get x !d) in
-    while !c <= 9 do
-      invariant { !x # !d <= !c <= 10 and !x = at !x Init } 
-      variant { 10 - !c }
-      let delta = y - !s - !c + array_get x !d in
-      if 0 <= delta && delta <= 9 * !d then begin
-        array_set x !d !c;
-        assert { sum_digits (interp !x !d m) = y - delta };
+    for c = array_get x d + 1 to 9 do
+      invariant { !x = at !x Init } 
+      let delta = y - !s - c + array_get x d in
+      if 0 <= delta && delta <= 9 * d then begin
+        array_set x d c;
+        assert { sum_digits (interp !x d m) = y - delta };
 	let k = div delta 9 in
-        assert { k <= !d };
-        i := 0;
-	while !i < k do 
- 	  invariant { 0 <= !i <= k and A.length !x = m } variant { k - !i }
-          array_set x !i 9; i := !i + 1
+        assert { k <= d };
+        for i = 0 to k - 1 do invariant { A.length !x = m } 
+          array_set x i 9
         done;
-        array_set x !i (mod delta 9);
-        i := !i + 1;
-        while !i < !d do 
-          invariant { k+1 <= !i and A.length !x = m } variant { !d - !i }
-	  array_set x !i 0; i := !i + 1 
+        array_set x k (mod delta 9);
+        for i = k + 1 to d - 1 do invariant { A.length !x = m } 
+	  array_set x i 0
 	done;
-        assume { sum_digits (interp !x 0 !d) = delta };
+        assume { sum_digits (interp !x 0 d) = delta };
         raise Success
-      end;
-      c := !c + 1
+      end
     done;
-    s := !s - array_get x !d;
-    d := !d + 1
+    s := !s - array_get x d
   done
   { true(*false*) } 
   | Success -> 

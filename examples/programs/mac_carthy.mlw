@@ -29,7 +29,7 @@ let f91_nonrec (n x : ref int) =
   label L:
   while !n > 0 do
     invariant { !n >= 0 and iter_f !n !x = iter_f (at !n L) (at !x L) }
-    variant { (101 - !x + 10 * !n, !n) } for lex 
+    variant { (101 - !x + 10 * !n, !n) } with lex 
     if !x > 100 then begin
       x := !x - 10;
       n := !n - 1

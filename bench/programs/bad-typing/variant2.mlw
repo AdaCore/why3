@@ -5,7 +5,7 @@
 logic rel int int
 }
 
-let rec even (x:int) : int variant {x} for rel =
+let rec even (x:int) : int variant {x} with rel =
   odd (x-1) 
 and odd (x:int) : int variant {x} =
   even (x-1)

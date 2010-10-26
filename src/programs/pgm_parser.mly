@@ -582,9 +582,9 @@ opt_raises:
 ;
 
 opt_variant:
-| /* epsilon */             { None }
-| VARIANT LOGIC             { Some ($2, id_lt_nat ()) }
-| VARIANT LOGIC FOR lqualid { Some ($2, $4) }
+| /* epsilon */              { None }
+| VARIANT LOGIC              { Some ($2, id_lt_nat ()) }
+| VARIANT LOGIC WITH lqualid { Some ($2, $4) }
 ;
 
 opt_cast:
