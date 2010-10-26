@@ -3,13 +3,13 @@
       If the sparse array contains three elements x y z, at index
       a b c respectively, then the three arrays look like this:
 
-             b     a      c 
+             b     a      c
 val   +-----+-+---+-+----+-+----+
       |     |y|   |x|    |z|    |
       +-----+-+---+-+----+-+----+
 
 idx   +-----+-+---+-+----+-+----+
-      |     |1|   |0|    |2|    |  
+      |     |1|   |0|    |2|    |
       +-----+-+---+-+----+-+----+
 
        0 1 2  n=3
@@ -33,7 +33,7 @@ back  +-+-+-+-------------------+
 
   logic (#) (a : array 'a) (i : int) : 'a = A.get a i
 
-  type sparse_array = SA (sa_val  : array elt) 
+  type sparse_array = SA (sa_val  : array elt)
                          (sa_idx  : array int)
                          (sa_back : array int)
                          (sa_sz   : int)
@@ -49,14 +49,14 @@ back  +-+-+-+-------------------+
     else
       default
 
-  logic invariant (a : sparse_array) = 
+  logic invariant (a : sparse_array) =
     let (SA val idx back sz n) = a in
     0 <= n <= sz <= maxlen and
     A.length val = sz and A.length idx = sz and A.length back = sz and
     forall i : int. 0 <= i < n -> 0 <= back#i < sz and idx#(back#i) = i
 
-  (* 
-    The following definitions and the axiom Dirichlet 
+  (*
+    The following definitions and the axiom Dirichlet
     (provable by natural induction) are necessary to
     prove the lemma Inter6, which is sufficient for
     the proof of WPs for the function [set] below.
@@ -69,17 +69,17 @@ back  +-+-+-+-------------------+
   logic dirichlet (n : int) (a : array int) (i : int) : int
 
   axiom Dirichlet :
-    forall n : int. 
+    forall n : int.
     forall a : array int.
         permutation n a ->
-        (forall i : int. 0 <= i < n -> 
-            0 <= dirichlet n a i < n and 
+        (forall i : int. 0 <= i < n ->
+            0 <= dirichlet n a i < n and
             a # dirichlet n a i = i)
 
   lemma Inter6 :
-    forall a : sparse_array . invariant a -> 
+    forall a : sparse_array . invariant a ->
         let (SA val idx back sz n) = a in
-        n = sz -> 
+        n = sz ->
             permutation sz back /\
             forall i : int. 0 <= i < sz ->
                 idx#i = dirichlet sz back i /\ is_elt a i
@@ -88,8 +88,8 @@ back  +-+-+-+-------------------+
 
 (*
 parameter create :
-  sz:int -> 
-  { 0 <= sz <= maxlen } 
+  sz:int ->
+  { 0 <= sz <= maxlen }
   ref sparse_array
   { sa_sz !result = sz and forall i:int. model !result i = default }
 *)
@@ -97,15 +97,15 @@ parameter create :
 parameter malloc : n:int -> {} array 'a { A.length result = n }
 
 let create sz =
-  { 0 <= sz <= maxlen } 
+  { 0 <= sz <= maxlen }
   ref (SA (malloc sz) (malloc sz) (malloc sz) sz 0)
-  { invariant !result and 
+  { invariant !result and
     sa_sz !result = sz and forall i:int. model !result i = default }
 
-let array_get (a : array 'a) i = 
+let array_get (a : array 'a) i =
   { 0 <= i < A.length a } A.get a i { result = A.get a i }
 
-let array_set (a : array 'a) i v = 
+let array_set (a : array 'a) i v =
   { 0 <= i < A.length a } A.set a i v { result = A.set a i v }
 
 let test a i =
@@ -118,33 +118,33 @@ let test a i =
   { result=True <-> is_elt !a i }
 
 (*
-parameter get : 
-  a:ref sparse_array -> i:int -> 
-    { 0 <= i < sa_sz !a } 
+parameter get :
+  a:ref sparse_array -> i:int ->
+    { 0 <= i < sa_sz !a }
     elt reads a
     { result = model !a i }
 *)
 let get a i =
-  { 0 <= i < sa_sz !a and invariant !a } 
+  { 0 <= i < sa_sz !a and invariant !a }
   let val = sa_val !a in
   if test a i then
-    array_get val i 
+    array_get val i
   else
     default
   { result = model !a i }
 
 (*
 parameter set :
-  a:ref sparse_array -> i:int -> v:elt -> 
-    { 0 <= i < sa_sz !a and invariant !a } 
-    unit writes a 
-    { invariant !a and 
+  a:ref sparse_array -> i:int -> v:elt ->
+    { 0 <= i < sa_sz !a and invariant !a }
+    unit writes a
+    { invariant !a and
       sa_sz !a = sa_sz (old !a) and
       model !a i = v and
       forall j:int. j <> i -> model !a j = model (old !a) j }
 *)
 let set a i v =
-  { 0 <= i < sa_sz !a and invariant !a } 
+  { 0 <= i < sa_sz !a and invariant !a }
   (* let SA val idx back sz n = !a in *)
   let val = sa_val !a in
   let idx = sa_idx !a in
@@ -156,11 +156,11 @@ let set a i v =
     a := SA val idx back sz n
   else begin
     assert { n < sz };
-    let idx = array_set idx i n in 
+    let idx = array_set idx i n in
     let back = array_set back n i in
     a := SA val idx back sz (n+1)
   end
-  { invariant !a and 
+  { invariant !a and
     sa_sz !a = sa_sz (old !a) and
     model !a i = v and
     forall j:int. j <> i -> model !a j = model (old !a) j }
@@ -182,7 +182,7 @@ let harness () =
 
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/vacid_0_sparse_array"
-End: 
+End:
 *)

@@ -1293,8 +1293,7 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
 
 let init_base f = init_db ~mode:Exclusive f
 
-let files () =
-  Main.all_files (current())
+let files () = List.rev (Main.all_files (current()))
 
 let transf_from_name _n = assert false
 
