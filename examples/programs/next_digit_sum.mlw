@@ -10,10 +10,53 @@
 
 {
   use array.ArrayLength as A
+  use import int.MinMax
+  use import int.EuclideanDivision
+  use import int.Power
 
   type array 'a = A.t int 'a
 
   logic (#) (a : array 'a) (i : int) : 'a = A.get a i
+
+  logic sum_digits (n:int) : int =
+    if n = 0 then 0 else sum_digits (div n 10) + mod n 10
+
+  (* interp x i j is the integer X[j-1]...X[i] *)
+
+  logic interp (array int) int int : int
+
+  axiom Interp_1 : 
+    forall x : array int, i j : int. 
+    i >= j -> interp x i j = 0
+
+  axiom Interp_2 :
+    forall x : array int, i j : int. 
+    i < j -> interp x i j = x#i + 10 * interp x (i+1) j
+
+  (* interp9 X i j is the j-digit integer obtained by replacing the i least
+     significant digits in X by 9, i.e. X[j-1]...X[i]9...9 *)
+
+  logic interp9 (x : array int) (i j : int) : int =
+    power 10 i * (interp x i j + 1) - 1
+
+  (* to allow provers to prove that an assignment does not change the
+     interpretation on the left (or on the right); requires induction *)
+  lemma Interp_sum_eq:
+    forall x1 x2 : array int, i j : int. 
+    (forall k : int. i <= k < j -> x1#k = x2#k) -> interp x1 i j = interp x2 i j
+
+  lemma Interp_sum_digit_left:
+    forall x : array int, i j : int. i < j ->
+    sum_digits (interp x i j) = sum_digits (interp x i (j-1)) + x#(j-1)
+
+  lemma Interp_sum_digit_right:
+    forall x : array int, i j : int. i < j ->
+    sum_digits (interp x i j) = x#i + sum_digits (interp x (i+1) j)
+
+  lemma Interp_sum_trans:
+    forall x : array int, i k j : int. i <= k <= j ->
+    sum_digits (interp x i j) = 
+    sum_digits (interp x i k) + sum_digits (interp x k j)
 }
 
 let array_get (a : ref (array 'a)) i = 
@@ -28,11 +71,7 @@ parameter x : ref (array int)
   logic n : int
   logic y : int
   
-  use import int.MinMax
-  use import int.EuclideanDivision
-
   logic m : int = 1 + max n (div y 9)
-
 }
 
 exception Success
@@ -45,14 +84,19 @@ let search () =
   label Init:
   let s = ref 0 in
   let i = ref 0 in
-  while !i < n do 
-    invariant { 0 <= !i <= n } variant { n - !i }
+  while !i < m do (* could be n instead of m *)
+    invariant { 0 <= !i <= m and !s = sum_digits (interp !x 0 !i) } 
+    variant { m - !i }
     s := !s + array_get x !i; 
     i := !i + 1 
   done;
+  assert { !s = sum_digits (interp !x 0 m) };
   let d = ref 0 in
   while !d < m do
-    invariant { 0 <= !d <= m and !x = at !x Init } 
+    invariant { 
+      0 <= !d <= m and !x = at !x Init and
+      !s = sum_digits (interp !x !d m) 
+    } 
     variant { m - !d }
     let c = ref (array_get x !d) in
     while !c <= 9 do
@@ -61,6 +105,7 @@ let search () =
       let delta = y - !s - !c + array_get x !d in
       if 0 <= delta && delta <= 9 * !d then begin
         array_set x !d !c;
+        assert { sum_digits (interp !x !d m) = y - delta };
 	let k = div delta 9 in
         assert { k <= !d };
         i := 0;
@@ -74,13 +119,17 @@ let search () =
           invariant { k+1 <= !i and A.length !x = m } variant { !d - !i }
 	  array_set x !i 0; i := !i + 1 
 	done;
+        assume { sum_digits (interp !x 0 !d) = delta };
         raise Success
       end;
       c := !c + 1
     done;
+    s := !s - array_get x !d;
     d := !d + 1
   done
-  { true(*false*) } | Success -> { true }
+  { true(*false*) } 
+  | Success -> 
+    { true (*sum_digits (interp !x 0 m) = y*) }
 
 (*
 Local Variables: 
