@@ -350,7 +350,7 @@ module Helpers = struct
     if !toggle_hide_proved_goals then
       goals_model#set ~row ~column:visible_column false
 
-  let set_theory_proved t =
+  let set_theory_proved ~propagate  t =
     t.verified <- true;
     let row = t.theory_row in
     goals_view#collapse_row (goals_model#get_path row);
@@ -358,25 +358,27 @@ module Helpers = struct
     if !toggle_hide_proved_goals then
       goals_model#set ~row ~column:visible_column false;
     let f = t.theory_parent in
-    if List.for_all (fun t -> t.verified) f.theories then
-      set_file_verified f
+    if propagate then
+      if List.for_all (fun t -> t.verified) f.theories then
+        set_file_verified f
 
-  let rec set_proved g =
+  let rec set_proved ~propagate g =
     let row = g.goal_row in
     g.proved <- true;
     goals_view#collapse_row (goals_model#get_path row);
     goals_model#set ~row ~column:status_column !image_yes;
     if !toggle_hide_proved_goals then
       goals_model#set ~row ~column:visible_column false;
-    match g.parent with
-      | Theory t ->
-          if List.for_all (fun g -> g.proved) t.goals then
-            set_theory_proved t
-      | Transf t ->
-          if List.for_all (fun g -> g.proved) t.subgoals then
-            begin
-              set_proved t.parent_goal;
-            end
+    if propagate then
+      match g.parent with
+        | Theory t ->
+            if List.for_all (fun g -> g.proved) t.goals then
+              set_theory_proved ~propagate t
+        | Transf t ->
+            if List.for_all (fun g -> g.proved) t.subgoals then
+              begin
+                set_proved ~propagate t.parent_goal;
+              end
 
   let set_proof_status ~obsolete a s time  =
     a.status <- s;
@@ -473,7 +475,7 @@ module Helpers = struct
         []
         (List.rev tasks)
     in
-    if goals = [] then set_theory_proved mth;
+    if goals = [] then set_theory_proved ~propagate:false mth;
     mth
 
   let add_file_row f dbfile =
@@ -530,6 +532,7 @@ let () =
        let theories = Env.read_file gconfig.env fn in
        let mfile = Helpers.add_file_row fn f in
        let ths = Db.theories f in
+       let file_proved = ref true in
        List.iter
          (fun db_th ->
             let tname = Db.theory_name db_th in
@@ -541,6 +544,7 @@ let () =
             let mth = Helpers.add_theory_row mfile th db_th in
             let goals = Db.goals db_th in
             let tasks = List.rev (Task.split_theory th None None) in
+            let theory_proved = ref true in
             (* TODO: remplacer iter2 par un parcours intelligent
                en detectant d'eventuelles nouvelles tasks *)
             List.iter2
@@ -564,6 +568,7 @@ let () =
                    end;
                  let goal = Helpers.add_goal_row mth gname t db_goal in
                  let external_proofs = Db.external_proofs db_goal in
+                 let proved = ref false in
                  Db.Hprover.iter
                    (fun pid a ->
                       let p =
@@ -574,7 +579,7 @@ let () =
                       let obsolete = goal_obsolete or o in
                       let s = match s with
                         | Db.Undone -> Scheduler.HighFailure
-                        | Db.Success -> Scheduler.Success
+                        | Db.Success -> proved := true; Scheduler.Success
                         | Db.Unknown -> Scheduler.Unknown
                         | Db.Timeout -> Scheduler.Timeout
                         | Db.Failure -> Scheduler.HighFailure
@@ -582,16 +587,21 @@ let () =
                       let (_pa : Model.proof_attempt) =
                         Helpers.add_external_proof_row ~obsolete goal p a s t
                       in
-                      ((* TODO *))
+                      ((* TODO ?*))
                    )
-                   external_proofs
+                   external_proofs;
+                 if !proved then Helpers.set_proved ~propagate:false goal
+                 else theory_proved := false;
                  )
-              goals tasks
-         )
+              goals tasks;
+            if !theory_proved then Helpers.set_theory_proved ~propagate:false mth
+            else file_proved := false
+            )
          ths;
        (* TODO: detecter d'eventuelles nouvelles theories, qui seraient donc
           dans [theories] mais pas dans [ths]
        *)
+       if !file_proved then Helpers.set_file_verified mfile
     )
     files
 
@@ -615,7 +625,7 @@ let redo_external_proof g a =
   let callback result time output =
     a.Model.output <- output;
     Helpers.set_proof_status ~obsolete:false a result time ;
-    if result = Scheduler.Success then Helpers.set_proved a.Model.proof_goal;
+    if result = Scheduler.Success then Helpers.set_proved ~propagate:true a.Model.proof_goal;
     let db_res = match result with
       | Scheduler.Scheduled | Scheduler.Running -> Db.Undone
       | Scheduler.Success -> Db.Success
