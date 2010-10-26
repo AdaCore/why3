@@ -3,7 +3,13 @@
 
 theory Test
 
-  type t = tuple2 int int
+  use export int.Int
+
+  use real.Real as R
+  logic ( *. ) (x:real) (y:real) : real = R.(*) x y 
+
+  logic power (x : real) (n : int) : real =
+     if n = 0 then 1.0 else x *. power x (n-1)
 
 end
 
