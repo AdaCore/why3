@@ -195,17 +195,17 @@ module Hprover = Hashtbl.Make
    end)
 
 type transf_id =
-    { transf_id : int;
-      transf_name : string;
+    { transformation_id : int64;
+      transformation_name : string;
     }
 
-let transf_name t = t.transf_name
+let transf_name t = t.transformation_name
 
 module Htransf = Hashtbl.Make
   (struct
      type t = transf_id
-     let equal t1 t2 = t1.transf_id == t2.transf_id
-     let hash t = Hashtbl.hash t.transf_id
+     let equal t1 t2 = t1.transformation_id = t2.transformation_id
+     let hash t = Hashtbl.hash t.transformation_id
    end)
 
 
@@ -232,7 +232,9 @@ type proof_attempt = int64
 }
 *)
 
+(*
 let prover _p = assert false (* p.prover *)
+*)
 (*
 let status _p = assert false (* p.status *)
 *)
@@ -278,7 +280,9 @@ type theory = int64
 
 type file = int64
 
+(*
 let file_name _ = assert false
+*)
 
 
 
@@ -391,6 +395,103 @@ let get_prover name (* ~short ~long ~command ~driver *) =
     ProverId.add db name (* ~short ~long ~command ~checksum *)
 
 *)
+
+
+module TransfId = struct
+
+  let init db =
+    let sql =
+      "CREATE TABLE IF NOT EXISTS transformation \
+       (transformation_id INTEGER PRIMARY KEY AUTOINCREMENT,transformation_name TEXT);"
+    in
+    db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
+    let sql =
+      "CREATE UNIQUE INDEX IF NOT EXISTS transformation_name_idx \
+       ON transformation (transformation_name)"
+    in
+    db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
+
+(*
+  let delete db pr =
+    let id =  pr.prover_id in
+    let sql = "DELETE FROM prover WHERE id=?" in
+    let stmt = Sqlite3.prepare db.raw_db sql in
+    db_must_ok db (fun () -> Sqlite3.bind stmt 1 (Sqlite3.Data.INT id));
+    ignore (step_fold db stmt (fun _ -> ()));
+    pr.prover_id <- 0L
+*)
+
+  let add db name =
+    transaction db
+      (fun () ->
+         let sql = "INSERT INTO transformation VALUES(NULL,?)" in
+         let stmt = bind db sql [ Sqlite3.Data.TEXT name ] in
+         db_must_done db (fun () -> Sqlite3.step stmt);
+         let new_id = Sqlite3.last_insert_rowid db.raw_db in
+         { transformation_id = new_id ;
+	   transformation_name = name }
+      )
+
+  let from_name db name =
+    let sql =
+      "SELECT transformation.transformation_id FROM transformation \
+       WHERE transformation.transformation_name=?"
+    in
+    let stmt = bind db sql [Sqlite3.Data.TEXT name] in
+    (* convert statement into record *)
+    let of_stmt stmt =
+      { transformation_id = stmt_column_INT stmt 0 "TransfId.from_name: bad transformation id";
+	transformation_name = name;
+      }
+    in
+    (* execute the SQL query *)
+    match step_fold db stmt of_stmt with
+      | [] -> raise Not_found
+      | [x] -> x
+      | _ -> assert false
+
+  let from_id db id =
+    let sql =
+      "SELECT transformation.transformation_name FROM transformation \
+       WHERE transformation.transformation_id=?"
+    in
+    let stmt = bind db sql [Sqlite3.Data.INT id] in
+    (* convert statement into record *)
+    let of_stmt stmt =
+      { transformation_id = id ;
+	transformation_name = stmt_column_string stmt 0
+          "TransfId.from_id: bad transformation name";
+      }
+    in
+    (* execute the SQL query *)
+    match step_fold db stmt of_stmt with
+      | [] -> raise Not_found
+      | [x] -> x
+      | _ -> assert false
+
+end
+
+(*
+let prover_memo = Hashtbl.create 7
+
+let prover_from_id id =
+  try
+    Hashtbl.find prover_memo id
+  with Not_found ->
+    let p =
+      let db = current () in
+      try TransfId.from_id db id
+      with Not_found -> assert false
+    in
+    Hashtbl.add prover_memo id p;
+    p
+*)
+
+let transf_from_name n =
+  let db = current () in
+  try TransfId.from_name db n
+  with Not_found -> TransfId.add db n
+
 
 
 (*
@@ -1280,6 +1381,7 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
 	in
 	current_db := Some db;
 	ProverId.init db;
+	TransfId.init db;
 	External_proof.init db;
 	Goal.init db;
 (*
@@ -1294,8 +1396,6 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
 let init_base f = init_db ~mode:Exclusive f
 
 let files () = List.rev (Main.all_files (current()))
-
-let transf_from_name _n = assert false
 
 exception AlreadyExist
 

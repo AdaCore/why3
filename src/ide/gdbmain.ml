@@ -446,6 +446,67 @@ module Helpers = struct
     goal
 
 
+  let add_transformation_row parent g subgoals =
+    let row = goals_model#append ~parent () in
+    let goal_name = goals_model#get ~row:parent ~column:Model.name_column in
+    goals_model#set ~row ~column:Model.visible_column
+      true;
+    goals_model#set ~row ~column:Model.name_column
+      "split";
+    goals_model#set ~row ~column:Model.icon_column
+      !image_transf;
+    let transf_id_split = Db.transf_from_name "split_goal" in
+    let db_transf =
+      Db.add_transformation g.Model.goal_db transf_id_split
+    in
+    let tr =
+      { Model.parent_goal = g;
+        (*
+          Model.transf = split_transformation;
+        *)
+        Model.transf_row = row;
+        Model.transf_db = db_transf;
+        subgoals = [];
+      }
+    in
+    goals_model#set ~row ~column:Model.index_column
+      (Model.Row_transformation tr);
+    g.Model.transformations <- tr :: g.Model.transformations;
+    let goals,_ = List.fold_left
+      (fun (acc,count) subtask ->
+         let _id = (Task.task_goal subtask).Decl.pr_name in
+         let subgoal_name =
+           goal_name ^ "." ^ (string_of_int count)
+         in
+         let subtask_row =
+           goals_model#append ~parent:row ()
+         in
+         let sum = task_checksum subtask in
+         let subtask_db = Db.add_subgoal db_transf subgoal_name sum in
+         (* TODO: call add_goal_row *)
+         let goal = { Model.parent = Model.Transf tr;
+                      Model.task = subtask ;
+                      Model.goal_row = subtask_row;
+                      Model.goal_db = subtask_db;
+                      Model.external_proofs = Hashtbl.create 7;
+                      Model.transformations = [];
+                      Model.proved = false;
+                    }
+         in
+         goals_model#set ~row:subtask_row
+           ~column:Model.index_column (Model.Row_goal goal);
+         goals_model#set ~row:subtask_row
+           ~column:Model.visible_column true;
+         goals_model#set ~row:subtask_row
+           ~column:Model.name_column subgoal_name;
+         goals_model#set ~row:subtask_row
+           ~column:Model.icon_column !image_file;
+         (goal :: acc, count+1))
+      ([],1) subgoals
+    in
+    tr.Model.subgoals <- List.rev goals;
+    goals_view#expand_row (goals_model#get_path parent)
+
   let add_theory_row mfile th db_theory =
     let tname = th.Theory.th_name.Ident.id_string in
     let parent = mfile.file_row in
@@ -712,12 +773,64 @@ let prover_on_selected_goals pr =
     (prover_on_selected_goal_or_children pr)
     goals_view#selection#get_selected_rows
 
+
+
+
 (*****************************************************)
-(* method: split all unproved goals *)
+(* method: split selected goals *)
 (*****************************************************)
 
 let split_transformation = Trans.lookup_transform_l "split_goal" gconfig.env
 let intro_transformation = Trans.lookup_transform "introduce_premises" gconfig.env
+
+let split_goal g =
+  if not g.Model.proved then
+    let row = g.Model.goal_row in
+    let callback subgoals =
+      if List.length subgoals >= 2 then
+        Helpers.add_transformation_row row g subgoals
+    in
+    Scheduler.apply_transformation_l ~callback
+      split_transformation g.Model.task
+
+let rec split_goal_or_children g =
+  if not g.Model.proved then
+    begin
+      match g.Model.transformations with
+        | [] -> split_goal g
+        | l ->
+            List.iter (fun t ->
+                         List.iter split_goal_or_children
+                           t.Model.subgoals) l
+    end
+
+let split_selected_goal_or_children row =
+  let row = filter_model#get_iter row in
+  match filter_model#get ~row ~column:Model.index_column with
+    | Model.Row_goal g ->
+        split_goal_or_children g
+    | Model.Row_theory th ->
+        List.iter split_goal_or_children th.Model.goals
+    | Model.Row_file file ->
+        List.iter
+          (fun th ->
+             List.iter split_goal_or_children th.Model.goals)
+          file.Model.theories
+    | Model.Row_proof_attempt a ->
+        split_goal_or_children a.Model.proof_goal
+    | Model.Row_transformation tr ->
+        List.iter split_goal_or_children tr.Model.subgoals
+
+
+let split_selected_goals () =
+  List.iter
+    split_selected_goal_or_children
+    goals_view#selection#get_selected_rows
+
+
+(*****************************************************)
+(* method: split all unproved goals *)
+(*****************************************************)
 
 let split_unproved_goals () =
   let transf_id_split = Db.transf_from_name "split_goal" in
@@ -795,6 +908,7 @@ let split_unproved_goals () =
          th.Model.goals
     )
     [] (* !Model.all *)
+
 
 (*********************************)
 (* add a new file in the project *)
@@ -1000,8 +1114,8 @@ let () =
 let () =
   let add_item_split () =
     ignore(tools_factory#add_image_item
-             ~label:"Split unproved goals"
-             ~callback:split_unproved_goals
+             ~label:"Split selection"
+             ~callback:split_selected_goals
              () : GMenu.image_menu_item) in
   add_refresh_provers add_item_split;
   add_item_split ()

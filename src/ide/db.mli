@@ -74,7 +74,9 @@ val prover_name : prover_id -> string
 val transf_name : transf_id -> string
 
 (** proof_attempt accessors *)
+(*
 val prover : proof_attempt -> prover_id
+*)
 (*
 val proof_goal : proof_attempt -> goal
 *)
@@ -110,7 +112,9 @@ val verified : theory -> bool
 *)
 
 (** file accessors *)
+(*
 val file_name : file -> string
+*)
 val theories : file -> theory list
 
 (** {2 The persistent database} *)
