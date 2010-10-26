@@ -72,9 +72,39 @@ theory UnitaryCommutativeRing
   axiom NonTrivialRing : zero <> one
 end
 
+theory OrderedUnitaryCommutativeRing
+  clone export UnitaryCommutativeRing
+  logic (<=) t t
+  logic (>=) (x y : t) = y <= x
+  clone export relations.TotalOrder with type t = t, logic rel = (<=)
+
+  axiom CompatOrderAdd  : forall x y z : t. x <= y -> x + z <= y + z
+  axiom CompatOrderMult : forall x y z : t. x <= y -> zero <= z -> x * z <= y * z
+
+(*
+  lemma InvMult : forall x y : t. (-x) * y = - (x * y) = x * (-y)
+  lemma InvSquare : forall x : t. x * x = (-x) * (-x)
+  lemma ZeroMult : forall x : t. x * zero = zero = zero * x
+  lemma SquareNonNeg1 : forall x : t. x <= zero -> zero <= x * x
+  lemma SquareNonNeg : forall x : t. zero <= x * x
+  lemma ZeroLessOne : zero <= one
+*)
+end
+
 theory Field
   clone export UnitaryCommutativeRing
   logic inv t : t
   axiom Inverse : forall x:t. x <> zero -> x * inv x = one
   logic (/) (x y : t) : t = x * inv y
+end
+
+theory OrderedField
+  clone export Field
+
+  logic (<=) t t
+  logic (>=) (x y : t) = y <= x
+  clone export relations.TotalOrder with type t = t, logic rel = (<=)
+
+  axiom CompatOrderAdd  : forall x y z : t. x <= y -> x + z <= y + z
+  axiom CompatOrderMult : forall x y z : t. x <= y -> zero <= z -> x * z <= y * z
 end

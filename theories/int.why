@@ -4,16 +4,12 @@ theory Int
   logic zero : int = 0
   logic one  : int = 1
 
-  clone export algebra.UnitaryCommutativeRing with
-     type t = int, logic zero = zero, logic one = one
-
   logic (< ) int int
-  logic (<=) (x y : int) = x < y or x = y
   logic (> ) (x y : int) = y < x
-  logic (>=) (x y : int) = y <= x
+  logic (<=) (x y : int) = x < y or x = y
 
-  clone export relations.TotalOrder with
-    type t = int, logic rel = (<=)
+  clone export algebra.OrderedUnitaryCommutativeRing with
+     type t = int, logic zero = zero, logic one = one, logic (<=) = (<=)
 
 end
 

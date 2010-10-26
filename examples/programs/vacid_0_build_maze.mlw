@@ -59,7 +59,7 @@ parameter get_num_classes :
 parameter rand : s:int -> {} int { 0 <= result < s }
 
 {
-  axiom Ineq1 : 
+  lemma Ineq1 :
     forall n x y:int. 0 <= n -> 0 <= x < n -> 0 <= y < n -> 0 <= x*n+y < n*n
 }
 

@@ -4,16 +4,12 @@ theory Real
   logic zero : real = 0.0
   logic one  : real = 1.0
 
-  clone export algebra.Field with
-     type t = real, logic zero = zero, logic one = one
-
   logic (< ) real real
-  logic (<=) (x y : real) = x < y or x = y
   logic (> ) (x y : real) = y < x
-  logic (>=) (x y : real) = y <= x
+  logic (<=) (x y : real) = x < y or x = y
 
-  clone export relations.TotalOrder with
-    type t = real, logic rel = (<=)
+  clone export algebra.OrderedField with
+     type t = real, logic zero = zero, logic one = one, logic (<=) = (<=)
 
 end
 
@@ -29,8 +25,8 @@ theory RealInfix
 
   logic (<=.) (x:real) (y:real) = x <= y
   logic (>=.) (x:real) (y:real) = x >= y
-  logic (<.) (x:real) (y:real) = x < y
-  logic (>.) (x:real) (y:real) = x > y
+  logic ( <.) (x:real) (y:real) = x < y
+  logic ( >.) (x:real) (y:real) = x > y
 
 end
 
