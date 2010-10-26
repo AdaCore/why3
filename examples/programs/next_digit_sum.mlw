@@ -18,8 +18,14 @@
 
   logic (#) (a : array 'a) (i : int) : 'a = A.get a i
 
+(*
   logic sum_digits (n:int) : int =
     if n = 0 then 0 else sum_digits (div n 10) + mod n 10
+*)
+  logic sum_digits int : int
+
+  axiom Sum_digits_def : forall n : int. sum_digits n =
+    if n <= 0 then 0 else sum_digits (div n 10) + mod n 10
 
   (* interp x i j is the integer X[j-1]...X[i] *)
 

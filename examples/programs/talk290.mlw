@@ -6,9 +6,15 @@
 { 
   use import int.EuclideanDivision
   use import int.Power
-  
+
+(*
   logic sum_digits (n:int) : int =
     if n = 0 then 0 else sum_digits (div n 10) + mod n 10
+*)
+  logic sum_digits int : int
+
+  axiom Sum_digits_def : forall n : int. sum_digits n =
+    if n <= 0 then 0 else sum_digits (div n 10) + mod n 10
 
   (* the number of n st 0 <= n mod 10 < c and sd(n) = sd(137n+a)+b *)
 

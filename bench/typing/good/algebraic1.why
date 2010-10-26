@@ -1,5 +1,28 @@
 theory TreeForest
   type list 'a = Nil | Cons 'a (list 'a)
-  type tree 'a = Leaf 'a | Node (forest 'a)
+  type tree 'a = Leaf 'a | Node (tree 'a) (forest 'a)
   with forest 'a = list (tree 'a)
+
+  use import int.Int
+
+  logic count_forest (f : forest int) : int =
+    match f, 1.0 with
+    | Nil, _ -> 0
+    | Cons t f, _ -> count_tree t + count_forest f
+    end
+
+  with count_tree (t : tree int) : int =
+    match t with
+    | Leaf i -> i
+    | Node t f -> 1 + count_tree t + count_forest f
+    end
+
+  type nat = Zero | Succ nat
+
+  logic ack (m n : nat) : nat = match m, n with
+    | Zero, _ -> Succ n
+    | Succ m', Zero -> ack m' (Succ Zero)
+    | Succ m', Succ n' -> ack m' (ack m n')
+    end
+
 end

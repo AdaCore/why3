@@ -71,6 +71,162 @@ let open_ps_defn ld = let vl,e = open_ls_defn ld in
 
 let ls_defn_axiom (_,f) = f
 
+(** Termination checking for mutually recursive logic declarations *)
+
+type descent = Less | Equal | Unknown
+
+let build_matrix dm ls vl =
+  let n = List.length vl in
+  let htb = Hls.create 5 in
+  let self_call vm tl =
+    let i = ref (-1) in
+    let arr = Array.make n Unknown in
+    let chk v t = incr i; match t.t_node with
+      | Tvar u when Mvs.mem u vm ->
+          let w,rel = Mvs.find u vm in
+          if vs_equal v w then Array.set arr !i rel else ()
+      | _ -> ()
+    in
+    List.iter2 chk vl tl;
+    arr
+  in
+  let other_call vm tl vl =
+    let chk nvm t v = match t.t_node with
+      | Tvar u when Mvs.mem u vm -> Mvs.add v (Mvs.find u vm) nvm
+      | _ -> nvm
+    in
+    List.fold_left2 chk Mvs.empty tl vl
+  in
+  let new_call ls vm =
+    let subsume u (v1,d1) =
+      let v2,d2 = Mvs.find u vm in
+      if vs_equal v1 v2 && (d1 = Equal || d2 = Less)
+      then () else raise Not_found
+    in
+    let unsubsuming ovm =
+      try Mvs.iter subsume ovm; false
+      with Not_found -> true
+    in
+    let res = List.for_all unsubsuming (Hls.find_all htb ls) in
+    if res then Hls.add htb ls vm;
+    res
+  in
+  let rec pat_on_var link vml p = match p.pat_node with
+    | Pwild -> vml
+    | Pvar u ->
+        List.rev_map (Mvs.add u link) vml
+    | Pas (p,u) ->
+        List.rev_map (Mvs.add u link) (pat_on_var link vml p)
+    | Por (p1,p2) ->
+        let vml1 = pat_on_var link vml p1 in
+        let vml2 = pat_on_var link vml p2 in
+        List.rev_append vml1 vml2
+    | Papp _ ->
+        let join u = Mvs.add u (fst link, Less) in
+        List.rev_map (Svs.fold join p.pat_vars) vml
+  in
+  let rec pat_on_term t vm vml p = match t.t_node, p.pat_node with
+    | _, Pwild -> vml
+    | Tvar v, _ when not (Mvs.mem v vm) -> vml
+    | Tvar v, _ -> pat_on_var (Mvs.find v vm) vml p
+    | Tapp _, Pvar _ -> vml
+    | Tapp _, Pas (p,_) -> pat_on_term t vm vml p
+    | Tapp _, Por (p1,p2) ->
+        let vml1 = pat_on_term t vm vml p1 in
+        let vml2 = pat_on_term t vm vml p2 in
+        List.rev_append vml1 vml2
+    | Tapp (fs1,tl), Papp (fs2,pl) when ls_equal fs1 fs2 ->
+        List.fold_left2 (fun l t p -> pat_on_term t vm l p) vml tl pl
+    | _,_ -> vml
+  in
+  let rec term vm acc t = match t.t_node with
+    | Tapp (s,tl) when ls_equal s ls ->
+        let acc = t_fold (term vm) (fmla vm) acc t in
+        self_call vm tl :: acc
+    | Tapp (s,tl) when Mls.mem s dm ->
+        let acc = t_fold (term vm) (fmla vm) acc t in
+        let vl,e = Mls.find s dm in
+        let vm = other_call vm tl vl in
+        if new_call s vm then expr vm acc e else acc
+    | Tlet ({t_node = Tvar v}, b) when Mvs.mem v vm ->
+        let u,e = t_open_bound b in
+        term (Mvs.add u (Mvs.find v vm) vm) acc e
+    | Tcase (e,bl) ->
+        let branch acc b =
+          let p,t = t_open_branch b in
+          let vml = pat_on_term e vm [vm] p in
+          List.fold_left (fun acc vm -> term vm acc t) acc vml
+        in
+        List.fold_left branch (term vm acc e) bl
+    | _ -> t_fold (term vm) (fmla vm) acc t
+  and fmla vm acc f =
+    match f.f_node with
+    | Fapp (s,tl) when ls_equal s ls ->
+        let acc = f_fold (term vm) (fmla vm) acc f in
+        self_call vm tl :: acc
+    | Fapp (s,tl) when Mls.mem s dm ->
+        let acc = f_fold (term vm) (fmla vm) acc f in
+        let vl,e = Mls.find s dm in
+        let vm = other_call vm tl vl in
+        if new_call s vm then expr vm acc e else acc
+    | Flet ({t_node = Tvar v}, b) when Mvs.mem v vm ->
+        let u,e = f_open_bound b in
+        fmla (Mvs.add u (Mvs.find v vm) vm) acc e
+    | Fcase (e,bl) ->
+        let branch acc b =
+          let p,f = f_open_branch b in
+          let vml = pat_on_term e vm [vm] p in
+          List.fold_left (fun acc vm -> fmla vm acc f) acc vml
+        in
+        List.fold_left branch (term vm acc e) bl
+    | Fquant (_,b) ->
+        let _,_,f = f_open_quant b in
+        fmla vm acc f
+    | _ -> f_fold (term vm) (fmla vm) acc f
+  and expr vm acc = function
+    | Term t -> term vm acc t
+    | Fmla f -> fmla vm acc f
+  in
+  expr
+
+exception NoTerminationProof of lsymbol
+
+let rec check_matrix ls n acc = function
+  | [] -> List.rev acc
+  | (a :: rest) as mx ->
+      (* calculate the bitwise minimum of all call vectors *)
+      let p = Array.copy a in
+      let join d1 d2 = match d1, d2 with
+        | _, Unknown | Unknown, _ -> Unknown
+        | _, Less | Less, _ -> Less
+        | _, _ -> Equal
+      in
+      let join i d = Array.set p i (join (Array.get p i) d) in
+      List.iter (Array.iteri join) rest;
+      (* find the decreasing argument positions *)
+      let i = ref (-1) in
+      let find l d = incr i; match d with Less -> !i :: l | _ -> l in
+      let res = Array.fold_left find [] p in
+      (* eliminate the decreasing calls *)
+      if res = [] then raise (NoTerminationProof ls);
+      let test a = List.for_all (fun i -> Array.get a i <> Less) res in
+      check_matrix ls n (List.rev_append res acc) (List.filter test mx)
+
+let check_termination ldl =
+  let add acc (ls,ld) = match ld with
+    | Some ld -> Mls.add ls (open_ls_defn ld) acc
+    | None -> acc
+  in
+  let dm = List.fold_left add Mls.empty ldl in
+  let check ls (vl,e) acc =
+    let add_arg vm vs = Mvs.add vs (vs, Equal) vm in
+    let vm = List.fold_left add_arg Mvs.empty vl in
+    let mx = build_matrix dm ls vl vm [] e in
+    let al = check_matrix ls (List.length vl) [] mx in
+    Mls.add ls al acc
+  in
+  Mls.fold check dm Mls.empty
+
 (** Inductive predicate declaration *)
 
 type prsymbol = {
@@ -198,7 +354,7 @@ let mk_decl node syms news = Hsdecl.hashcons {
 
 exception IllegalTypeAlias of tysymbol
 exception ClashIdent of ident
-exception BadLogicDecl of ident * ident
+exception BadLogicDecl of lsymbol * lsymbol
 
 exception EmptyDecl
 exception EmptyAlgDecl of tysymbol
@@ -251,7 +407,7 @@ let create_logic_decl ldl =
   if ldl = [] then raise EmptyDecl;
   let check_decl (syms,news) (ls,ld) = match ld with
     | Some (s,_) when not (ls_equal s ls) ->
-        raise (BadLogicDecl (ls.ls_name, s.ls_name))
+        raise (BadLogicDecl (ls, s))
     | Some (_,f) ->
         syms_fmla syms f, news_id news ls.ls_name
     | None ->
@@ -260,6 +416,7 @@ let create_logic_decl ldl =
         syms, news_id news ls.ls_name
   in
   let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) ldl in
+  ignore (check_termination ldl);
   mk_decl (Dlogic ldl) syms news
 
 exception InvalidIndDecl of lsymbol * prsymbol

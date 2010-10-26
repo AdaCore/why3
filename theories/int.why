@@ -96,8 +96,15 @@ theory Power
 
   use import Int
 
+(*
   logic power (x n : int) : int =
     if n = 0 then 1 else x * power x (n-1)
+*)
+  logic power int int : int
+
+(* FIXME: should we give a partial definition? *)
+  axiom Power_def : forall x n : int. power x n =
+    if n <= 0 then 1 else x * power x (n-1)
 
 end
 

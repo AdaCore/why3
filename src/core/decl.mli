@@ -47,6 +47,13 @@ val open_ps_defn : ls_defn -> vsymbol list * fmla
 
 val ls_defn_axiom : ls_defn -> fmla
 
+val check_termination : logic_decl list -> (int list) Mls.t
+(** [check_termination ldl] returns a mapping of every logical
+    symbol defined in [ldl] to a list of its argument positions
+    (numbered from 0) that ensures a lexicographical structural
+    descent for every recursive call. Triggers are ignored.
+    @raise [NoTerminationProof ls] when no such list is found for [ls] *)
+
 (** {2 Inductive predicate declaration} *)
 
 type prsymbol = private {
@@ -113,7 +120,8 @@ exception InvalidIndDecl of lsymbol * prsymbol
 exception TooSpecificIndDecl of lsymbol * prsymbol * term
 exception NonPositiveIndDecl of lsymbol * prsymbol * lsymbol
 
-exception BadLogicDecl of ident * ident
+exception NoTerminationProof of lsymbol
+exception BadLogicDecl of lsymbol * lsymbol
 exception UnboundVar of vsymbol
 exception ClashIdent of ident
 

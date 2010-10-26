@@ -2,7 +2,14 @@
 (* Fibonacci function with memoisation *)
 
 { 
+(*
   logic fib (n:int) : int =  
+     if n <= 1 then 1 else fib (n-1) + fib (n-2)
+*)
+
+  logic fib int : int
+
+  axiom Fib_def : forall n:int. fib n =
      if n <= 1 then 1 else fib (n-1) + fib (n-2)
 
   type option 'a = None | Some 'a

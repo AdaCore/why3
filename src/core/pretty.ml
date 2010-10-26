@@ -503,9 +503,9 @@ let () = Exn_printer.register
       fprintf fmt "Clause %a in inductive predicate declaration \
           contains a negative occurrence of dependent symbol %a"
         print_pr pr print_ls ls1
-  | Decl.BadLogicDecl (id1,id2) ->
-      fprintf fmt "Ill-formed definition: idents %s and %s are different"
-        id1.id_string id2.id_string
+  | Decl.BadLogicDecl (ls1,ls2) ->
+      fprintf fmt "Ill-formed definition: symbols %a and %a are different"
+        print_ls ls1 print_ls ls2
   | Decl.UnboundVar vs ->
       fprintf fmt "Unbound variable: %a" print_vsty vs
   | Decl.ClashIdent id ->
@@ -523,6 +523,8 @@ let () = Exn_printer.register
   | Decl.RedeclaredIdent id ->
       fprintf fmt "Ident %s is already declared, with a different declaration"
         id.id_string
+  | Decl.NoTerminationProof ls ->
+      fprintf fmt "Cannot prove the termination of %a" print_ls ls
   | Decl.NonExhaustiveExpr (pl, e) ->
       fprintf fmt "Pattern @[%a@] is not covered in expression:@\n  @[%a@]"
         (print_list comma print_pat) pl print_expr e
