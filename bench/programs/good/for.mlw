@@ -1,6 +1,6 @@
 
 (* for loop with invariant *)
-let test () =
+let test1 () =
   let x = ref 0 in
   for i = 1 to 10 do
     invariant { !x = i-1 }
@@ -41,6 +41,42 @@ let test4 x =
   end
   { result=True <-> 0 <= x <= 10 }
 
+(* and now downto *)
+
+let test1d () =
+  let x = ref 11 in
+  for i = 10 downto 1 do
+    invariant { !x = i+1 }
+    x := !x - 1
+  done;
+  assert { !x = 1 }
+
+let test2d () =
+  let x = ref 0 in
+  for i = 1 downto 2 do
+    x := 1
+  done;
+  assert { !x = 0 }
+
+let test3d () =
+  { }
+  for i = 10 downto 1 do invariant { i < 10 -> false }
+    raise E
+  done
+  { false } | E -> { true }
+
+let test4d x =
+  { }
+  try
+    for i = 10 downto 0 do
+      invariant { x > 10 or x <= i }
+      if i = x then raise E
+    done;
+    False
+  with E ->
+    True
+  end
+  { result=True <-> 0 <= x <= 10 }
 
 (*
 Local Variables: 

@@ -354,7 +354,7 @@ and wp_desc env e q = match e.expr_desc with
       let q1 = saturate_post e1.expr_effect (fst q) q in
       let q1 = filter_post e1.expr_effect (make_post q1) in
       wp_expr env e1 q1
-  | Efor (x, v1, v2, inv, e1) ->
+  | Efor (x, v1, d, v2, inv, e1) ->
       (* wp(for x = v1 to v2 do inv { I(x) } e1, Q, R) =
              v1 > v2  -> Q
          and v1 <= v2 ->     I(v1)
@@ -362,11 +362,15 @@ and wp_desc env e q = match e.expr_desc with
                                                  I(i) -> wp(e1, I(i+1), R)
 	                               and I(v2+1) -> Q                    *)
       let (res, q1), _ = q in
-      let v1_gt_v2 = f_app env.ls_gt [t_var v1; t_var v2] in
-      let v1_le_v2 = f_app env.ls_le [t_var v1; t_var v2] in
+      let gt, le, incr = match d with
+	| Pgm_ptree.To     -> env.ls_gt, env.ls_le, t_int_const  "1" 
+	| Pgm_ptree.Downto -> env.ls_lt, env.ls_ge, t_int_const "-1" 
+      in
+      let v1_gt_v2 = f_app gt [t_var v1; t_var v2] in
+      let v1_le_v2 = f_app le [t_var v1; t_var v2] in
       let inv = match inv with Some inv -> inv | None -> f_true in
       let wp1 = 
-	let xp1 = t_app env.ls_add [t_var x; t_int_const "1"] ty_int in
+	let xp1 = t_app env.ls_add [t_var x; incr] ty_int in
 	let post = f_subst (subst1 x xp1) inv in
 	let q1 = saturate_post e1.expr_effect (res, post) q in
 	wp_expr env e1 q1
@@ -376,10 +380,10 @@ and wp_desc env e q = match e.expr_desc with
 	(quantify env e.expr_effect
 	   (wp_and ~sym:true
 	      (wp_forall env x
-	         (wp_implies (wp_and (f_app env.ls_le [t_var v1; t_var x])
-			             (f_app env.ls_le [t_var x;  t_var v2])) 
+	         (wp_implies (wp_and (f_app le [t_var v1; t_var x])
+			             (f_app le [t_var x;  t_var v2])) 
                  (wp_implies inv wp1))) 
-	      (let sv2 = t_app env.ls_add [t_var v2; t_int_const "1"] ty_int in
+	      (let sv2 = t_app env.ls_add [t_var v2; incr] ty_int in
 	       wp_implies (f_subst (subst1 x sv2) inv) q1)))
       in
       wp_and ~sym:true (wp_implies v1_gt_v2 q1) (wp_implies v1_le_v2 f)

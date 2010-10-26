@@ -56,8 +56,10 @@ type env = {
   ls_orb  : lsymbol;
   ls_notb : lsymbol;
   ls_unit : lsymbol;
+  ls_lt   : lsymbol;
   ls_gt   : lsymbol;
   ls_le   : lsymbol;
+  ls_ge   : lsymbol;
   ls_add  : lsymbol;
 }
 
@@ -152,8 +154,10 @@ let empty_env uc = {
   ls_orb   = find_ls uc ["orb"];
   ls_notb  = find_ls uc ["notb"];
   ls_unit  = find_ls uc ["Tuple0"];
+  ls_lt    = find_ls uc ["infix <"];
   ls_gt    = find_ls uc ["infix >"];
   ls_le    = find_ls uc ["infix <="];
+  ls_ge    = find_ls uc ["infix >="];
   ls_add   = find_ls uc ["infix +"];
 }    
 

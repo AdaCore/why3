@@ -42,6 +42,8 @@ type loop_annotation = {
   loop_variant   : variant option;
 }
 
+type for_direction = To | Downto
+
 type effect = {
   pe_reads  : ident list;
   pe_writes : ident list;
@@ -88,7 +90,7 @@ and expr_desc =
   | Eabsurd
   | Eraise of ident * expr option
   | Etry of expr * (ident * ident option * expr) list
-  | Efor of ident * expr * expr * lexpr option * expr
+  | Efor of ident * expr * for_direction * expr * lexpr option * expr
   (* annotations *)
   | Eassert of assertion_kind * lexpr
   | Elabel of ident * expr

@@ -116,7 +116,7 @@
 
 /* keywords */
 
-%token ABSURD AND ANY AS ASSERT ASSUME BEGIN CHECK DO DONE ELSE END
+%token ABSURD AND ANY AS ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO ELSE END
 %token EXCEPTION FOR
 %token FUN GHOST IF IN INVARIANT LABEL LET MATCH NOT OF PARAMETER
 %token RAISE RAISES READS REC 
@@ -317,8 +317,8 @@ expr:
 		     mk_expr (Eif ($2, $5,
 				   mk_expr (Eraise (exit_exn (), None)))))),
 	   [exit_exn (), None, mk_expr Eskip])) }
-| FOR lident EQUAL expr TO expr DO loop_invariant expr DONE
-   { mk_expr (Efor ($2, $4, $6, $8, $9)) }
+| FOR lident EQUAL expr for_direction expr DO loop_invariant expr DONE
+   { mk_expr (Efor ($2, $4, $5, $6, $8, $9)) }
 | ABSURD
    { mk_expr Eabsurd }
 | expr COLON pure_type
@@ -432,6 +432,11 @@ assertion_kind:
 | ASSERT { Aassert }
 | ASSUME { Aassume }
 | CHECK  { Acheck  }
+;
+
+for_direction:
+| TO     { To }
+| DOWNTO { Downto }
 ;
 
 loop_annotation:

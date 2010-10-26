@@ -427,7 +427,7 @@ and dexpr_desc env loc = function
 	(ls, x, h)
       in
       DEtry (e1, List.map handler hl), e1.dexpr_type
-  | Pgm_ptree.Efor (x, e1, e2, inv, e3) ->
+  | Pgm_ptree.Efor (x, e1, d, e2, inv, e3) ->
       let e1 = dexpr env e1 in
       expected_type e1 (dty_int env.env);
       let e2 = dexpr env e2 in
@@ -436,7 +436,7 @@ and dexpr_desc env loc = function
       let inv = option_map (dfmla env.denv) inv in
       let e3 = dexpr env e3 in
       expected_type e3 (dty_unit env.env);
-      DEfor (x, e1, e2, inv, e3), dty_unit env.env
+      DEfor (x, e1, d, e2, inv, e3), dty_unit env.env
 
   | Pgm_ptree.Eassert (k, le) ->
       DEassert (k, dfmla env.denv le), dty_unit env.env
@@ -712,7 +712,7 @@ and iexpr_desc gl env loc ty = function
 	(ls, x, iexpr gl env h)
       in
       IEtry (iexpr gl env e, List.map handler hl)
-  | DEfor (x, e1, e2, inv, e3) ->
+  | DEfor (x, e1, d, e2, inv, e3) ->
       let e1 = iexpr gl env e1 in
       let e2 = iexpr gl env e2 in
       let vx = create_vsymbol (id_user x.id x.id_loc) e1.iexpr_type in
@@ -723,7 +723,7 @@ and iexpr_desc gl env loc ty = function
       let v2 = create_vsymbol (id_user "for_end" loc)   e2.iexpr_type in
       IElet (v1, e1, mk_iexpr loc ty (
       IElet (v2, e2, mk_iexpr loc ty (
-      IEfor (vx, v1, v2, inv, e3)))))
+      IEfor (vx, v1, d, v2, inv, e3)))))
 
   | DEassert (k, f) ->
       let f = Denv.fmla env f in
@@ -1065,14 +1065,14 @@ and expr_desc gl env loc ty = function
 	List.fold_left (fun e (_,_,h) -> E.union e h.expr_effect) ef hl 
       in
       Etry (e1, hl), tpure ty, ef
-  | IEfor (x, v1, v2, inv, e3) ->
+  | IEfor (x, v1, d, v2, inv, e3) ->
       let env = add_local x (tpure v1.vs_ty) env in
       let e3 = expr gl env e3 in
       let ef = match inv with
 	| Some f -> fmla_effect gl e3.expr_effect f 
 	| None -> e3.expr_effect
       in
-      Efor (x, v1, v2, inv, e3), type_v_unit gl, ef
+      Efor (x, v1, d, v2, inv, e3), type_v_unit gl, ef
 
   | IEassert (k, f) ->
       let ef = fmla_effect gl E.empty f in
@@ -1179,8 +1179,8 @@ let rec fresh_expr gl ~term locals e = match e.expr_desc with
   | Etry (e1, hl) ->
       fresh_expr gl ~term:false locals e1;
       List.iter (fun (_, _, e2) -> fresh_expr gl ~term locals e2) hl
-  | Efor (_, _, _, _, e3) ->
-      fresh_expr gl ~term:false locals e3
+  | Efor (_, _, _, _, _, e1) ->
+      fresh_expr gl ~term:false locals e1
 
   | Elabel (_, e) ->
       fresh_expr gl ~term locals e

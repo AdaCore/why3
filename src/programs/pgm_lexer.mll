@@ -48,6 +48,7 @@
         "check", CHECK;
 	"do", DO;
 	"done", DONE;
+ 	"downto", DOWNTO;
         "else", ELSE;
 	"end", END;
 	"exception", EXCEPTION; 
