@@ -22,7 +22,7 @@ open Sqlite3
 
 
 type transaction_mode = | Deferred | Immediate | Exclusive
-  
+
 type handle = {
   raw_db : Sqlite3.db;
   mutable in_transaction: int;
@@ -31,50 +31,50 @@ type handle = {
 }
 
 let current_db = ref None
- 
-let current () = 
+
+let current () =
   match !current_db with
     | None -> failwith "Db.current: database not yet initialized"
     | Some x -> x
 
-	      
+
 let default_busyfn (_db:Sqlite3.db) =
   prerr_endline "Db.default_busyfn WARNING: busy";
   (* Thread.delay (Random.float 1.) *)
   ignore (Unix.select [] [] [] (Random.float 1.))
-  
+
 let raise_sql_error x = raise (Sqlite3.Error (Rc.to_string x))
-  
- 
+
+
 (* retry until a non-BUSY error code is returned *)
 let rec db_busy_retry db fn =
   match fn () with
-    | Rc.BUSY -> 
+    | Rc.BUSY ->
         db.busyfn db.raw_db; db_busy_retry db fn
-    | x -> 
+    | x ->
         x
-       
+
 (* make sure an OK is returned from the database *)
 let db_must_ok db fn =
   match db_busy_retry db fn with
     | Rc.OK -> ()
     | x -> raise_sql_error x
-       
+
 (* make sure a DONE is returned from the database *)
-let db_must_done db fn = 
+let db_must_done db fn =
   match db_busy_retry db fn with
     | Rc.DONE -> ()
     | x -> raise_sql_error x
-       
+
 (* request a transaction *)
 let transaction db fn =
   let m = match db.mode with
-    | Deferred -> "DEFERRED" 
-    | Immediate -> "IMMEDIATE" 
-    | Exclusive -> "EXCLUSIVE" 
+    | Deferred -> "DEFERRED"
+    | Immediate -> "IMMEDIATE"
+    | Exclusive -> "EXCLUSIVE"
   in
-  try 
-    db_must_ok db 
+  try
+    db_must_ok db
       (fun () -> exec db.raw_db ("BEGIN " ^ m ^ " TRANSACTION"));
     assert (db.in_transaction = 0);
     db.in_transaction <- 1;
@@ -94,8 +94,8 @@ let transaction db fn =
         assert (db.in_transaction = 1);
         db.in_transaction <- 0;
         raise e
-    
-  
+
+
 (* iterate over a result set *)
 let step_fold db stmt iterfn =
   let stepfn () = Sqlite3.step stmt in
@@ -178,7 +178,7 @@ let stmt_column_string stmt i msg =
 
 (** Data *)
 
-type prover_id = 
+type prover_id =
     { prover_id : int64;
       prover_name : string;
     }
@@ -190,8 +190,8 @@ let prover_name p = p.prover_name
 module Hprover = Hashtbl.Make
   (struct
      type t = prover_id
-     let equal p1 p2 = p1.prover_id = p2.prover_id 
-     let hash p = Hashtbl.hash p.prover_id 
+     let equal p1 p2 = p1.prover_id = p2.prover_id
+     let hash p = Hashtbl.hash p.prover_id
    end)
 
 type transf_id =
@@ -236,7 +236,9 @@ let prover _p = assert false (* p.prover *)
 (*
 let status _p = assert false (* p.status *)
 *)
+(*
 let proof_obsolete _p = assert false (* p.proof_obsolete *)
+*)
 (*
 let time _p = assert false (* p.result_time *)
 *)
@@ -261,7 +263,6 @@ and goal = int64
 
 (** goal accessors *)
 
-let proved _g = assert false
 let transformations _g = assert false
 
 
@@ -275,7 +276,7 @@ let subgoals t = t.subgoals
 type theory = int64
 
 
-type file = int64 
+type file = int64
 
 let file_name _ = assert false
 
@@ -285,14 +286,14 @@ let file_name _ = assert false
 module ProverId = struct
 
   let init db =
-    let sql = 
+    let sql =
       "CREATE TABLE IF NOT EXISTS prover \
-       (prover_id INTEGER PRIMARY KEY AUTOINCREMENT,prover_name TEXT);" 
+       (prover_id INTEGER PRIMARY KEY AUTOINCREMENT,prover_name TEXT);"
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
-    let sql = 
+    let sql =
       "CREATE UNIQUE INDEX IF NOT EXISTS prover_name_idx \
-       ON prover (prover_name)" 
+       ON prover (prover_name)"
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 
@@ -306,21 +307,21 @@ module ProverId = struct
     pr.prover_id <- 0L
 *)
 
-  let add db name = 
-    transaction db 
+  let add db name =
+    transaction db
       (fun () ->
          let sql = "INSERT INTO prover VALUES(NULL,?)" in
          let stmt = bind db sql [ Sqlite3.Data.TEXT name ] in
          db_must_done db (fun () -> Sqlite3.step stmt);
          let new_id = Sqlite3.last_insert_rowid db.raw_db in
-         { prover_id = new_id ; 
+         { prover_id = new_id ;
 	   prover_name = name }
       )
 
   let from_name db name =
     let sql =
       "SELECT prover.prover_id FROM prover \
-       WHERE prover.prover_name=?" 
+       WHERE prover.prover_name=?"
     in
     let stmt = bind db sql [Sqlite3.Data.TEXT name] in
     (* convert statement into record *)
@@ -328,7 +329,7 @@ module ProverId = struct
       { prover_id = stmt_column_INT stmt 0 "ProverId.get: bad prover id";
 	prover_name = name;
       }
-    in 
+    in
     (* execute the SQL query *)
     match step_fold db stmt of_stmt with
       | [] -> raise Not_found
@@ -338,7 +339,7 @@ module ProverId = struct
   let from_id db id =
     let sql =
       "SELECT prover.prover_name FROM prover \
-       WHERE prover.prover_id=?" 
+       WHERE prover.prover_id=?"
     in
     let stmt = bind db sql [Sqlite3.Data.INT id] in
     (* convert statement into record *)
@@ -347,7 +348,7 @@ module ProverId = struct
 	prover_name = stmt_column_string stmt 0
           "ProverId.from_id: bad prover_name";
       }
-    in 
+    in
     (* execute the SQL query *)
     match step_fold db stmt of_stmt with
       | [] -> raise Not_found
@@ -371,9 +372,9 @@ let prover_from_id id =
     p
 
 
-let prover_from_name n = 
+let prover_from_name n =
   let db = current () in
-  try ProverId.from_name db n 
+  try ProverId.from_name db n
   with Not_found -> ProverId.add db n
 
 
@@ -386,20 +387,20 @@ let get_prover name (* ~short ~long ~command ~driver *) =
   let checksum = Digest.file driver in
 *)
   try ProverId.get db name (* ~short ~long ~command ~checksum *)
-  with Not_found -> 
+  with Not_found ->
     ProverId.add db name (* ~short ~long ~command ~checksum *)
- 
+
 *)
-	
+
 
 (*
 module Loc = struct
 
   let init db =
-    let sql = 
+    let sql =
       "CREATE TABLE IF NOT EXISTS loc \
        (id INTEGER PRIMARY KEY AUTOINCREMENT,file TEXT,line INTEGER,\
-        start INTEGER,stop INTEGER);" 
+        start INTEGER,stop INTEGER);"
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 
@@ -413,12 +414,12 @@ module Loc = struct
           ignore (step_fold db stmt (fun _ -> ()));
           loc.loc_id <- None
 
-  let save db (loc : loc_record) = 
-    transaction db 
+  let save db (loc : loc_record) =
+    transaction db
       (fun () ->
          (* insert any foreign-one fields into their table and get id *)
          let curobj_id = match loc.loc_id with
-           | None -> 
+           | None ->
                (* insert new record *)
                let sql = "INSERT INTO loc VALUES(NULL,?,?,?,?)" in
                let stmt = bind db sql [
@@ -426,16 +427,16 @@ module Loc = struct
                  Sqlite3.Data.INT (Int64.of_int loc.line);
                  Sqlite3.Data.INT (Int64.of_int loc.start);
                  Sqlite3.Data.INT (Int64.of_int loc.stop);
-               ] 
+               ]
                in
                db_must_done db (fun () -> Sqlite3.step stmt);
                let new_id = Sqlite3.last_insert_rowid db.raw_db in
                loc.loc_id <- Some new_id;
                new_id
-           | Some id -> 
+           | Some id ->
                (* update *)
-               let sql = 
-                 "UPDATE loc SET file=?,line=?,start=?,stop=? WHERE id=?" 
+               let sql =
+                 "UPDATE loc SET file=?,line=?,start=?,stop=? WHERE id=?"
                in
                let stmt = bind db sql [
                  Sqlite3.Data.TEXT loc.file ;
@@ -443,84 +444,84 @@ module Loc = struct
                  Sqlite3.Data.INT (Int64.of_int loc.start);
                  Sqlite3.Data.INT (Int64.of_int loc.stop);
                  Sqlite3.Data.INT id;
-               ] 
+               ]
                in
                db_must_done db (fun () -> Sqlite3.step stmt);
                id
          in
          curobj_id)
 
-      
+
   (* General get function for any of the columns *)
   let get ?id ?file ?line ?start ?stop ?(custom_where=("",[])) db =
     (* assemble the SQL query string *)
     let q = "" in
     let first = ref true in
-    let f () = if !first then (first := false; " WHERE ") else " AND " 
+    let f () = if !first then (first := false; " WHERE ") else " AND "
     in
-    let q = match id with 
+    let q = match id with
       | None -> q | Some _b -> q ^ (f()) ^ "loc.id=?" in
-    let q = match file with 
+    let q = match file with
       | None -> q | Some _b -> q ^ (f()) ^ "loc.file=?" in
-    let q = match line with 
+    let q = match line with
       | None -> q | Some _b -> q ^ (f()) ^ "loc.line=?" in
-    let q = match start with 
+    let q = match start with
       | None -> q | Some _b -> q ^ (f()) ^ "loc.start=?" in
-    let q = match stop with 
+    let q = match stop with
       | None -> q | Some _b -> q ^ (f()) ^ "loc.stop=?" in
-    let q = match custom_where with 
+    let q = match custom_where with
       | "",_ -> q | w,_ -> q ^ (f()) ^ "(" ^ w ^ ")" in
     let sql =
-      "SELECT loc.id, loc.file, loc.line, loc.start, loc.stop FROM loc " ^ q 
+      "SELECT loc.id, loc.file, loc.line, loc.start, loc.stop FROM loc " ^ q
     in
     let stmt=Sqlite3.prepare db.raw_db sql in
     (* bind the position variables to the statement *)
     let bindpos = ref 1 in
     begin
-      match id with 
-        | None -> () 
+      match id with
+        | None -> ()
         | Some v ->
-            db_must_ok db 
+            db_must_ok db
               (fun () -> Sqlite3.bind stmt !bindpos (Sqlite3.Data.INT v));
-            incr bindpos          
+            incr bindpos
     end;
-    begin 
-      match file with 
-        | None -> () 
+    begin
+      match file with
+        | None -> ()
         | Some v ->
-            db_must_ok db 
+            db_must_ok db
               (fun () -> Sqlite3.bind stmt !bindpos (Sqlite3.Data.TEXT v));
             incr bindpos
     end;
     begin
-      match line with 
-        | None -> () 
-        | Some v -> 
-            db_must_ok db 
-              (fun () -> Sqlite3.bind stmt !bindpos (Sqlite3.Data.INT v));
-            incr bindpos
-    end;
-    begin 
-      match start with 
-        | None -> () 
+      match line with
+        | None -> ()
         | Some v ->
-            db_must_ok db 
+            db_must_ok db
               (fun () -> Sqlite3.bind stmt !bindpos (Sqlite3.Data.INT v));
             incr bindpos
     end;
     begin
-      match stop with 
-        | None -> () 
+      match start with
+        | None -> ()
         | Some v ->
-            db_must_ok db 
+            db_must_ok db
               (fun () -> Sqlite3.bind stmt !bindpos (Sqlite3.Data.INT v));
             incr bindpos
     end;
     begin
-      match custom_where with 
-        | _,[] -> () 
-        | _,eb -> 
-            List.iter 
+      match stop with
+        | None -> ()
+        | Some v ->
+            db_must_ok db
+              (fun () -> Sqlite3.bind stmt !bindpos (Sqlite3.Data.INT v));
+            incr bindpos
+    end;
+    begin
+      match custom_where with
+        | _,[] -> ()
+        | _,eb ->
+            List.iter
               (fun b ->
                  db_must_ok db (fun () -> Sqlite3.bind stmt !bindpos b);
                  incr bindpos) eb
@@ -530,8 +531,8 @@ module Loc = struct
       { (* native fields *)
 	loc_id = (match Sqlite3.column stmt 0 with
                | Sqlite3.Data.NULL -> None
-               | Sqlite3.Data.INT i -> Some i 
-	       | x -> 
+               | Sqlite3.Data.INT i -> Some i
+	       | x ->
 		   try Some (Int64.of_string (Sqlite3.Data.to_string x))
 		   with _ -> failwith "error: loc id") ;
 	file = (match Sqlite3.column stmt 1 with
@@ -539,25 +540,25 @@ module Loc = struct
 		 | x -> Sqlite3.Data.to_string x) ;
 	line = (match Sqlite3.column stmt 2 with
 		 | Sqlite3.Data.NULL -> failwith "null of_stmt"
-		 | Sqlite3.Data.INT i -> Int64.to_int i 
-		 | x -> 
-		     try int_of_string (Sqlite3.Data.to_string x) 
+		 | Sqlite3.Data.INT i -> Int64.to_int i
+		 | x ->
+		     try int_of_string (Sqlite3.Data.to_string x)
 		     with _ -> failwith "error: loc line") ;
 	start = (match Sqlite3.column stmt 3 with
 		  | Sqlite3.Data.NULL -> failwith "null of_stmt"
-		  | Sqlite3.Data.INT i -> Int64.to_int i 
-		  | x -> 
-		      try int_of_string (Sqlite3.Data.to_string x) 
+		  | Sqlite3.Data.INT i -> Int64.to_int i
+		  | x ->
+		      try int_of_string (Sqlite3.Data.to_string x)
 		      with _ -> failwith "error: loc start") ;
 	stop = (match Sqlite3.column stmt 4 with
 		 | Sqlite3.Data.NULL -> failwith "null of_stmt"
-		 | Sqlite3.Data.INT i -> Int64.to_int i 
-		 | x -> 
-		     try int_of_string (Sqlite3.Data.to_string x) 
+		 | Sqlite3.Data.INT i -> Int64.to_int i
+		 | x ->
+		     try int_of_string (Sqlite3.Data.to_string x)
 		     with _ -> failwith "error: loc stop")
 	(* foreign fields *)
       }
-    in 
+    in
     (* execute the SQL query *)
     step_fold db stmt of_stmt
 
@@ -574,7 +575,7 @@ let int64_from_status = function
   | Unknown -> 3L
   | Failure -> 4L
 
-let status_from_int64 i = 
+let status_from_int64 i =
   try
     status_array.(Int64.to_int i)
   with _ -> failwith "Db.status_from_int64"
@@ -582,15 +583,16 @@ let status_from_int64 i =
 module External_proof = struct
 
   let init db =
-    let sql = 
+    let sql =
       (* timelimit INTEGER, memlimit INTEGER,
-         edited_as TEXT, obsolete INTEGER *)
+         edited_as TEXT,  *)
       "CREATE TABLE IF NOT EXISTS external_proofs \
        (external_proof_id INTEGER PRIMARY KEY AUTOINCREMENT,\
         goal_id INTEGER,\
         prover_id INTEGER, \
         status INTEGER,\
-        time REAL);" 
+        obsolete INTEGER,\
+        time REAL);"
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 
@@ -604,10 +606,10 @@ module External_proof = struct
     e.external_proof_id <- 0L
 *)
 
-  let add db (g : goal) (p: prover_id) = 
-    transaction db 
+  let add db (g : goal) (p: prover_id) =
+    transaction db
       (fun () ->
-	 let sql = "INSERT INTO external_proofs VALUES(NULL,?,?,0,0.0)" in
+	 let sql = "INSERT INTO external_proofs VALUES(NULL,?,?,0,0,0.0)" in
 	 let stmt = bind db sql [
            Sqlite3.Data.INT g;
            Sqlite3.Data.INT p.prover_id;
@@ -617,11 +619,11 @@ module External_proof = struct
 *)
 (*
            Sqlite3.Data.INT (int64_from_status e.status);
+           Sqlite3.Data.INT (int64_from_bool e.proof_obsolete);
            Sqlite3.Data.FLOAT e.result_time;
 *)
 (*
            Sqlite3.Data.TEXT e.trace;
-           Sqlite3.Data.INT (int64_from_bool e.proof_obsolete);
 *)
          ]
          in
@@ -629,14 +631,26 @@ module External_proof = struct
 	 Sqlite3.last_insert_rowid db.raw_db)
 
   let set_status db e stat time =
-    transaction db 
+    transaction db
       (fun () ->
-	 let sql = 
-	   "UPDATE external_proofs SET status=?,time=? WHERE external_proof_id=?" 
+	 let sql =
+	   "UPDATE external_proofs SET status=?,obsolete=0,time=? WHERE external_proof_id=?"
 	 in
 	 let stmt = bind db sql [
            Sqlite3.Data.INT (int64_from_status stat);
            Sqlite3.Data.FLOAT time;
+           Sqlite3.Data.INT e;
+         ]
+         in
+	 db_must_done db (fun () -> Sqlite3.step stmt))
+
+  let set_obsolete db e =
+    transaction db
+      (fun () ->
+	 let sql =
+	   "UPDATE external_proofs SET obsolete=1 WHERE external_proof_id=?"
+	 in
+	 let stmt = bind db sql [
            Sqlite3.Data.INT e;
          ]
          in
@@ -648,38 +662,39 @@ module External_proof = struct
     in
     let stmt = bind db sql [Sqlite3.Data.INT g] in
     let res = Hprover.create 7 in
-    let of_stmt stmt = 
+    let of_stmt stmt =
       let pid = stmt_column_INT stmt 0 "External_proof.of_goal" in
       let a = stmt_column_INT stmt 1 "External_proof.of_goal" in
       Hprover.add res (prover_from_id pid) a
     in
     step_iter db stmt of_stmt;
     res
-      
+
   let status_and_time db p =
-    let sql="SELECT status,time FROM external_proofs \
+    let sql="SELECT status,time,obsolete FROM external_proofs \
        WHERE external_proofs.external_proof_id=?"
     in
     let stmt = bind db sql [Sqlite3.Data.INT p] in
-    let of_stmt stmt = 
+    let of_stmt stmt =
       let status = stmt_column_INT stmt 0 "External_proof.status_and_time" in
       let t = stmt_column_FLOAT stmt 1 "External_proof.status_and_time" in
-      (status_from_int64 status, t)
+      let o = stmt_column_bool stmt 2 "External_proof.status_and_time" in
+      (status_from_int64 status, t, o)
     in
     match step_fold db stmt of_stmt with
       | [] -> raise Not_found
       | [x] -> x
       | _ -> assert false
 
-      
+
     (*
   let set_result_time db e t =
-      transaction db 
+      transaction db
         (fun () ->
 	   let id = e.external_proof_id in
-	   let sql = 
+	   let sql =
 	     "UPDATE external_proof SET result_time=? \
-              WHERE external_proof_id=?" 
+              WHERE external_proof_id=?"
 	   in
 	   let stmt = bind db sql [
              Sqlite3.Data.FLOAT t;
@@ -687,7 +702,7 @@ module External_proof = struct
            ]
            in
 	   db_must_done db (fun () -> Sqlite3.step stmt))
-    
+
   let from_id db id =
       let sql="SELECT external_proof.prover, external_proof.timelimit, \
                external_proof.memlimit, external_proof.status, \
@@ -696,16 +711,16 @@ module External_proof = struct
                WHERE external_proof.external_proof_id=?"
       in
       let stmt = bind db sql [Sqlite3.Data.INT id] in
-      let l = step_fold db stmt 
+      let l = step_fold db stmt
         (fun stmt ->
            { external_proof_id = id;
-	     prover = 
-               stmt_column_INT stmt 0 
+	     prover =
+               stmt_column_INT stmt 0
                  "External_Proof.from_id: bad prover id";
-             timelimit = 
+             timelimit =
                stmt_column_int stmt 1
                  "External_Proof.from_id: bad timelimit";
-	     memlimit = 
+	     memlimit =
                stmt_column_int stmt 2
                  "External_Proof.from_id: bad memlimit";
 	     status =
@@ -725,9 +740,9 @@ module External_proof = struct
     match l with
       | [] -> raise Not_found
       | [x] -> x
-      | _ -> assert false   
+      | _ -> assert false
 
-    
+
   let from_ids db idl =
     let len = List.length idl in
     if len = 0 then [] else
@@ -744,40 +759,40 @@ module External_proof = struct
       let _ =
         List.fold_left
           (fun i id ->
-             db_must_ok db 
+             db_must_ok db
                (fun () -> Sqlite3.bind stmt i (Sqlite3.Data.INT id));
              succ i)
           1 idl
       in
-      step_fold db stmt 
+      step_fold db stmt
         (fun stmt ->
-           { external_proof_id = 
+           { external_proof_id =
 	       stmt_column_INT stmt 0
                  "External_Proof.from_ids: bad external_proof_id";
-	     prover = 
-	       stmt_column_INT stmt 1 
+	     prover =
+	       stmt_column_INT stmt 1
                  "External_Proof.fromids: bad prover id";
              timelimit =
                stmt_column_int stmt 2
                  "External_Proof.fromids: bad timelimit";
 	     memlimit =
-               stmt_column_int stmt 3 
+               stmt_column_int stmt 3
                  "External_Proof.fromids: bad memlimit";
 	     status =
-               status_from_int64 (stmt_column_INT stmt 4 
+               status_from_int64 (stmt_column_INT stmt 4
                                     "External_Proof.fromids: bad status");
 	     result_time =
-               stmt_column_FLOAT stmt 5 
+               stmt_column_FLOAT stmt 5
                  "External_Proof.fromids: bad result_time";
 	     trace =
-               stmt_column_TEXT stmt 6 
+               stmt_column_TEXT stmt 6
                  "External_Proof.fromids: bad trace";
 	     proof_obsolete =
                stmt_column_bool stmt 7
                  "External_Proof.fromids: bad proof_obsolete";
 	   })
 
-*)   
+*)
 end
 
 let status_and_time p = External_proof.status_and_time (current()) p
@@ -785,19 +800,19 @@ let status_and_time p = External_proof.status_and_time (current()) p
 let external_proofs g = External_proof.of_goal (current()) g
 
 module Goal = struct
-  
+
   let init db =
-    let sql = 
+    let sql =
       "CREATE TABLE IF NOT EXISTS goals \
        (goal_id INTEGER PRIMARY KEY AUTOINCREMENT, \
         goal_theory INTEGER,
-        goal_name TEXT, task_checksum TEXT, proved INTEGER);" 
+        goal_name TEXT, task_checksum TEXT, proved INTEGER);"
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
 (*
-    let sql = 
+    let sql =
       "CREATE UNIQUE INDEX IF NOT EXISTS goal_theory_idx \
-       ON goals (goal_theory)" 
+       ON goals (goal_theory)"
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
 *)
@@ -808,29 +823,29 @@ module Goal = struct
     db_must_ok db (fun () -> Sqlite3.exec db.db sql);
 *)
     ()
-      
+
 (*
   let init db =
     (* TODO: store the goal origin too *)
-    let sql = 
+    let sql =
       "CREATE TABLE IF NOT EXISTS goal \
        (goal_id INTEGER PRIMARY KEY AUTOINCREMENT,\
-        task_checksum TEXT,proved INTEGER);" 
+        task_checksum TEXT,proved INTEGER);"
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
-    let sql = 
+    let sql =
       "CREATE TABLE IF NOT EXISTS map_goal_prover_external_proof \
        (goal_id INTEGER, prover_id INTEGER, external_proof_id INTEGER, \
-        PRIMARY KEY(goal_id, prover_id));" 
+        PRIMARY KEY(goal_id, prover_id));"
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 *)
 
-  let add db (th:theory) (name : string) (sum:string) = 
-    transaction db 
+  let add db (th:theory) (name : string) (sum:string) =
+    transaction db
       (fun () ->
-	 let sql = 
-	   "INSERT INTO goals VALUES(NULL,?,?,?,0)" 
+	 let sql =
+	   "INSERT INTO goals VALUES(NULL,?,?,?,0)"
 	 in
 	 let stmt = bind db sql [
            Sqlite3.Data.INT th;
@@ -841,12 +856,26 @@ module Goal = struct
 	 db_must_done db (fun () -> Sqlite3.step stmt);
 	 Sqlite3.last_insert_rowid db.raw_db)
 
+  let set_task_checksum db g s =
+    transaction db
+      (fun () ->
+	 let sql =
+	   "UPDATE goals SET task_checksum=? WHERE goal_id=?"
+	 in
+	 let stmt = bind db sql [
+           Sqlite3.Data.TEXT s;
+           Sqlite3.Data.INT g;
+         ]
+         in
+	 db_must_done db (fun () -> Sqlite3.step stmt))
+
+
   let name db g =
     let sql="SELECT goal_name FROM goals \
        WHERE goals.goal_id=?"
     in
     let stmt = bind db sql [Sqlite3.Data.INT g] in
-    let of_stmt stmt = 
+    let of_stmt stmt =
       (stmt_column_string stmt 0 "Goal.name")
     in
     match step_fold db stmt of_stmt with
@@ -858,7 +887,7 @@ module Goal = struct
     let sql="SELECT task_checksum FROM goals WHERE goals.goal_id=?"
     in
     let stmt = bind db sql [Sqlite3.Data.INT g] in
-    let of_stmt stmt = 
+    let of_stmt stmt =
       (stmt_column_string stmt 0 "Goal.task_checksum")
     in
     match step_fold db stmt of_stmt with
@@ -871,40 +900,40 @@ module Goal = struct
        WHERE goals.goal_theory=?"
     in
     let stmt = bind db sql [Sqlite3.Data.INT th] in
-    let of_stmt stmt = 
+    let of_stmt stmt =
       (stmt_column_INT stmt 0 "Goal.of_theory")
     in
-    List.rev (step_fold db stmt of_stmt) 
+    List.rev (step_fold db stmt of_stmt)
 
 
 (*
   let get_all_external_proofs db g =
     let sql="SELECT map_goal_prover_external_proof.external_proof_id \
-             FROM map_goal_prover_external_proof WHERE goal_id=?" 
+             FROM map_goal_prover_external_proof WHERE goal_id=?"
     in
     let stmt = bind db sql [ Sqlite3.Data.INT g.goal_id ] in
     let l =
-      step_fold db stmt 
+      step_fold db stmt
         (fun stmt -> stmt_column_INT stmt 0 "Db.get_all_external_proofs")
     in External_proof.from_ids db l
 
   let get_external_proof db ~prover g =
     let sql="SELECT map_goal_prover_external_proof.external_proof_id \
              FROM map_goal_prover_external_proof \
-             WHERE goal_id=? AND prover_id=?" 
+             WHERE goal_id=? AND prover_id=?"
     in
     let stmt = bind db sql [
       Sqlite3.Data.INT g.goal_id;
       Sqlite3.Data.INT prover.prover_id
     ]
     in
-    let l = step_fold db stmt 
+    let l = step_fold db stmt
       (fun stmt -> stmt_column_INT stmt 0 "Db.get_external_proof")
     in
     match l with
       | [] -> raise Not_found
       | [x] -> External_proof.from_id db x
-      | _ -> assert false   
+      | _ -> assert false
 
     let add_external_proof db ~prover g =
       let e = {
@@ -920,10 +949,10 @@ module Goal = struct
       in
       External_proof.add db e;
       let id = e.external_proof_id in
-      transaction db 
+      transaction db
         (fun () ->
-	   let sql = 
-	     "INSERT INTO map_goal_prover_external_proof VALUES(?,?,?)" 
+	   let sql =
+	     "INSERT INTO map_goal_prover_external_proof VALUES(?,?,?)"
 	   in
 	   let stmt = bind db sql [
              Sqlite3.Data.INT g.goal_id;
@@ -939,11 +968,11 @@ module Goal = struct
 
 (*
   let set_proved db g b =
-      transaction db 
+      transaction db
         (fun () ->
 	   let id = g.goal_id in
-	   let sql = 
-	     "UPDATE goal SET proved=? WHERE goal_id=?" 
+	   let sql= 
+	     "UPDATE goal SET proved=? WHERE goal_id=?"
 	   in
 	   let stmt = bind db sql [
              Sqlite3.Data.INT (int64_from_bool b);
@@ -952,7 +981,7 @@ module Goal = struct
            in
 	   db_must_done db (fun () -> Sqlite3.step stmt))
 *)
-    
+
 
 (*
   let from_id _db _id : goal =
@@ -967,6 +996,7 @@ end
 
 let goal_name g = Goal.name (current()) g
 let task_checksum g = Goal.task_checksum (current()) g
+let change_checksum g s = Goal.set_task_checksum (current()) g s
 
 let goals th = Goal.of_theory (current()) th
 
@@ -974,7 +1004,7 @@ let goals th = Goal.of_theory (current()) th
 
 (*
 
-let external_proofs g = 
+let external_proofs g =
   Goal.get_all_external_proofs (current ()) g
 
 let transformations _g = assert false
@@ -1128,7 +1158,7 @@ module Transf = struct
           Goal.get ~id:(Some i) db)
         ))
     db
-    in 
+    in
     (* execute the SQL query *)
     step_fold db stmt of_stmt
 
@@ -1142,7 +1172,7 @@ end
 module Theory = struct
 
   let init db =
-    let sql = 
+    let sql =
       "CREATE TABLE IF NOT EXISTS theories \
        (theory_id INTEGER PRIMARY KEY AUTOINCREMENT,\
         theory_file INTEGER, theory_name TEXT);" in
@@ -1154,7 +1184,7 @@ module Theory = struct
        WHERE theories.theory_id=?"
     in
     let stmt = bind db sql [Sqlite3.Data.INT th] in
-    let of_stmt stmt = 
+    let of_stmt stmt =
       (stmt_column_string stmt 0 "Theory.name")
     in
     match step_fold db stmt of_stmt with
@@ -1167,16 +1197,16 @@ module Theory = struct
        WHERE theories.theory_file=?"
     in
     let stmt = bind db sql [Sqlite3.Data.INT f] in
-    let of_stmt stmt = 
+    let of_stmt stmt =
       (stmt_column_INT stmt 0 "Theory.of_file")
     in
-    step_fold db stmt of_stmt 
+    step_fold db stmt of_stmt
 
-  let add db file name = 
-    transaction db 
+  let add db file name =
+    transaction db
       (fun () ->
          let sql = "INSERT INTO theories VALUES(NULL,?,?)" in
-         let stmt = bind db sql 
+         let stmt = bind db sql
            [ Sqlite3.Data.INT file;
              Sqlite3.Data.TEXT name;
            ]
@@ -1188,21 +1218,19 @@ end
 
 let theory_name th = Theory.name (current()) th
 
-let verified _ = assert false
-
 let theories f = Theory.of_file (current()) f
 
 module Main = struct
 
   let init db =
     let sql = "CREATE TABLE IF NOT EXISTS files \
-          (file_id INTEGER PRIMARY KEY AUTOINCREMENT,file_name TEXT);" 
+          (file_id INTEGER PRIMARY KEY AUTOINCREMENT,file_name TEXT);"
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
 (*
-    let sql = 
+    let sql =
       "CREATE UNIQUE INDEX IF NOT EXISTS file_idx \
-       ON files (file_id)" 
+       ON files (file_id)"
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 *)
@@ -1211,14 +1239,14 @@ module Main = struct
   let all_files db =
     let sql="SELECT file_id,file_name FROM files" in
     let stmt = Sqlite3.prepare db.raw_db sql in
-    let of_stmt stmt = 
+    let of_stmt stmt =
       (stmt_column_INT stmt 0 "Db.all_files",
        stmt_column_string stmt 1 "Db.all_files")
     in
-    step_fold db stmt of_stmt 
+    step_fold db stmt of_stmt
 
-  let add db name = 
-    transaction db 
+  let add db name =
+    transaction db
       (fun () ->
          let sql = "INSERT INTO files VALUES(NULL,?)" in
          let stmt = bind db sql [ Sqlite3.Data.TEXT name ] in
@@ -1232,11 +1260,11 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
   match !current_db with
     | None ->
         let db = {
-	  raw_db = Sqlite3.db_open db_name; 
-	  in_transaction = 0; 
-	  mode = mode; 
+	  raw_db = Sqlite3.db_open db_name;
+	  in_transaction = 0;
+	  mode = mode;
 	  busyfn = busyfn;
-        } 
+        }
 	in
 	current_db := Some db;
 	ProverId.init db;
@@ -1253,27 +1281,21 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
 
 let init_base f = init_db ~mode:Exclusive f
 
-(*
-let root_goals () = 
-  let db = current () in
-  let l = Main.all_root_goals db in
-  List.rev_map (Goal.from_id db) l
-    
-*)
-
-let files () = 
+let files () =
   Main.all_files (current())
 
 let transf_from_name _n = assert false
 
-exception AlreadyExist 
+exception AlreadyExist
 
 let add_proof_attempt g pid = External_proof.add (current()) g pid
 
-let set_status a r t = 
+let set_status a r t =
   External_proof.set_status (current()) a r t
 
-let set_obsolete _ = assert false
+let set_obsolete a = 
+  External_proof.set_obsolete (current()) a 
+
 let set_edited_as _ = assert false
 let add_transformation _ = assert false
 let add_goal th id sum = Goal.add (current()) th id sum
@@ -1285,7 +1307,7 @@ let add_file f = Main.add (current()) f
 
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. bin/whydb.byte"
-End: 
+End:
 *)

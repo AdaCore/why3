@@ -310,7 +310,9 @@ let goals_model,filter_model,goals_view =
 let task_checksum t =
   fprintf str_formatter "%a@." Pretty.print_task t;
   let s = flush_str_formatter () in
+(*
   eprintf "task = %s@." s;
+*)
   Digest.to_hex (Digest.string s)
 
 
@@ -376,7 +378,7 @@ module Helpers = struct
               set_proved t.parent_goal;
             end
 
-  let set_proof_status a s time =
+  let set_proof_status ~obsolete a s time  =
     a.status <- s;
     let row = a.proof_row in
     goals_model#set ~row ~column:status_column (image_of_result s);
@@ -387,10 +389,11 @@ module Helpers = struct
       end
     else ""
     in
+    let t = if obsolete then t ^ " (obsolete)" else t in
     goals_model#set ~row:a.Model.proof_row ~column:Model.time_column t
 
 
-  let add_external_proof_row g p db_proof status time =
+  let add_external_proof_row ~obsolete g p db_proof status time =
     let parent = g.goal_row in
     let name = p.prover_name in
     let row = goals_model#prepend ~parent () in
@@ -404,7 +407,7 @@ module Helpers = struct
               proof_row = row;
               proof_db = db_proof;
               status = status;
-              proof_obsolete = false;
+              proof_obsolete = obsolete;
               time = time;
               output = "";
               edited_as = "";
@@ -412,7 +415,7 @@ module Helpers = struct
     in
     goals_model#set ~row ~column:index_column (Row_proof_attempt a);
     Hashtbl.add g.external_proofs p.prover_id a;
-    set_proof_status a status time;
+    set_proof_status ~obsolete a status time;
     a
 
 
@@ -424,7 +427,7 @@ module Helpers = struct
                  goal_row = row;
                  goal_db = db_goal;
                  external_proofs = Hashtbl.create 7;
-                 transformations = [];
+                 transformations = [];                 
                  proved = false;
                }
     in
@@ -553,9 +556,11 @@ let () =
                    end;
                  let sum = task_checksum t in
                  let db_sum = Db.task_checksum db_goal in
-                 if sum <> db_sum then
+                 let goal_obsolete = sum <> db_sum in
+                 if goal_obsolete then
                    begin
-                     eprintf "bad checksum for %s: %s <> %s@." gname sum db_sum;
+                     eprintf "Goal %s.%s has changed@." tname gname;
+                     Db.change_checksum db_goal sum
                    end;
                  let goal = Helpers.add_goal_row mth gname t db_goal in
                  let external_proofs = Db.external_proofs db_goal in
@@ -564,8 +569,9 @@ let () =
                       let p =
                         Util.Mstr.find (Db.prover_name pid) gconfig.provers
                       in
-                      let s,t = Db.status_and_time a in
-                      eprintf "time = %f@." t;
+                      let s,t,o = Db.status_and_time a in
+                      if goal_obsolete && not o then Db.set_obsolete a;
+                      let obsolete = goal_obsolete or o in
                       let s = match s with
                         | Db.Undone -> Scheduler.HighFailure
                         | Db.Success -> Scheduler.Success
@@ -574,7 +580,7 @@ let () =
                         | Db.Failure -> Scheduler.HighFailure
                       in
                       let (_pa : Model.proof_attempt) =
-                        Helpers.add_external_proof_row goal p a s t
+                        Helpers.add_external_proof_row ~obsolete goal p a s t
                       in
                       ((* TODO *))
                    )
@@ -608,7 +614,7 @@ let redo_external_proof g a =
   let p = a.Model.prover in
   let callback result time output =
     a.Model.output <- output;
-    Helpers.set_proof_status a result time;
+    Helpers.set_proof_status ~obsolete:false a result time ;
     if result = Scheduler.Success then Helpers.set_proved a.Model.proof_goal;
     let db_res = match result with
       | Scheduler.Scheduled | Scheduler.Running -> Db.Undone
@@ -636,7 +642,7 @@ let rec prover_on_goal p g =
     with Not_found ->
       let db_prover = Db.prover_from_name id in
       let db_pa = Db.add_proof_attempt g.Model.goal_db db_prover in
-      Helpers.add_external_proof_row g p db_pa Scheduler.Scheduled 0.0
+      Helpers.add_external_proof_row ~obsolete:false g p db_pa Scheduler.Scheduled 0.0
   in
   redo_external_proof g a;
   List.iter
@@ -739,6 +745,7 @@ let split_unproved_goals () =
                        in
                        let sum = task_checksum subtask in
                        let subtask_db = Db.add_subgoal db_transf subgoal_name sum in
+                       (* TODO: call add_goal_row *)
                        let goal = { Model.parent = Model.Transf tr;
                                     Model.task = subtask ;
                                     Model.goal_row = subtask_row;
@@ -1185,9 +1192,9 @@ let edit_selected_row p =
         let file = Driver.file_of_task driver fname "" t in
         a.Model.edited_as <- file;
         let old_status = a.Model.status in
-        Helpers.set_proof_status a Scheduler.Running 0.0;
+        Helpers.set_proof_status ~obsolete:false a Scheduler.Running 0.0;
         let callback () =
-          Helpers.set_proof_status a old_status 0.0;
+          Helpers.set_proof_status ~obsolete:false a old_status 0.0;
         in
         let editor =
           match a.Model.prover.editor with

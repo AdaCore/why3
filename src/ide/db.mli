@@ -78,8 +78,9 @@ val prover : proof_attempt -> prover_id
 (*
 val proof_goal : proof_attempt -> goal
 *)
-val status_and_time : proof_attempt -> proof_status * float
-val proof_obsolete : proof_attempt -> bool
+val status_and_time : proof_attempt -> proof_status * float * bool
+  (* returns status, time and the obsolete flag *)
+
 val edited_as : proof_attempt -> string
 
 (** goal accessors *)
@@ -88,7 +89,9 @@ val parent : goal -> goal_parent
 *)
 val goal_name : goal -> string
 val task_checksum : goal -> string (** checksum *)
+(*
 val proved : goal -> bool
+*)
 val external_proofs: goal -> proof_attempt Hprover.t
 val transformations : goal -> transf Htransf.t
 
@@ -102,7 +105,9 @@ val subgoals : transf -> goal list
 (** theory accessors *)        
 val theory_name : theory -> string
 val goals : theory -> goal list
+(*
 val verified : theory -> bool
+*)
 
 (** file accessors *)
 val file_name : file -> string
@@ -140,15 +145,15 @@ val add_proof_attempt : goal -> prover_id -> proof_attempt
 
 (* todo: remove_proof_attempt *)
 
-val set_status : proof_attempt -> proof_status -> float -> unit
-(** sets the proof status for this prover, and its time.
-*)
-
 val set_obsolete : proof_attempt -> unit
 (** marks this proof as obsolete *)
 
+val set_status : proof_attempt -> proof_status -> float -> unit
+(** set the proof status for this prover, and its time.
+    also unset the obsolete flag *)
+
 val set_edited_as : proof_attempt -> string -> unit
-(** sets the file name where this proof can be edited *)
+(** set the file name where this proof can be edited *)
 
 (** {3 transformations} *)
 
@@ -167,6 +172,9 @@ val add_goal : theory -> string -> string -> goal
     [sum] as the checksum of its task. 
     @raise AlreadyExist if a goal with the same id already exists
     in this theory *)
+
+val change_checksum: goal -> string -> unit
+(** [change_checksum g sum] replaces checksum of [g] by [sum] *)
 
 val add_subgoal : transf -> string -> string -> goal
 (** [add_subgoal t id sum] adds to transf [t] a new subgoal named [id], with
