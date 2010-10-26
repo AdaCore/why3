@@ -896,7 +896,7 @@ module Goal = struct
       | _ -> assert false
 
   let of_theory db th =
-    let sql="SELECT goal_id FROM goals \
+  (*  let sql="SELECT goal_id FROM goals \
        WHERE goals.goal_theory=?"
     in
     let stmt = bind db sql [Sqlite3.Data.INT th] in
@@ -904,7 +904,19 @@ module Goal = struct
       (stmt_column_INT stmt 0 "Goal.of_theory")
     in
     List.rev (step_fold db stmt of_stmt)
-
+    *)
+    let sql="SELECT goal_id,goal_name FROM goals \
+       WHERE goals.goal_theory=?"
+    in
+    let stmt = bind db sql [Sqlite3.Data.INT th] in
+    step_fold_gen db stmt 
+      (fun stmt acc ->
+         let g = stmt_column_INT stmt 0 "Goal.of_theory" in
+         let n = stmt_column_string stmt 1 "Goal.of_theory" in
+         Util.Mstr.add n g acc)
+      Util.Mstr.empty
+         
+      
 
 (*
   let get_all_external_proofs db g =

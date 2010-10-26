@@ -12,13 +12,21 @@ theory TestInt
 
    goal Test3: 1<>0 
 
+(*
    goal Test4: 1=2 -> 3=4 
+*)
 
    goal Test5: forall x:int. x <> 0 -> x*x > 0
 
    goal Test6: 2+3 = 5 and (forall x:int. x*x >= 0)
 
+(*
    goal Test7: 0 = 1 /\ 2 = 3 /\ 4 = 5 /\ 6 = 7
+*)
+
+(*
+   goal Test8: 3+3=7
+*)
 
 end
 
@@ -48,7 +56,7 @@ theory TestReal
 
    use import real.Abs
 
-   goal RealAbs1: forall x:real. 100.0 >= abs x >= 1.0 -> x*x >= 1.0
+   goal RealAbs1: forall x:real. 100.0 >= abs x >= 2.0 -> x*x >= 4.0
 
 end
 
@@ -70,11 +78,13 @@ theory TestList
 
   logic x : list int
 
+(*
   goal Test1: 
      match x with 
      | Nil -> 1 = 0 /\ 2 = 3
      | Cons _ Nil -> 4 = 5 and 6 = 7
      | Cons _ _ -> 8 = 9 /\ 10 = 11
      end  
+*)
 
 end  

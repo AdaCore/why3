@@ -104,7 +104,7 @@ val subgoals : transf -> goal list
 
 (** theory accessors *)        
 val theory_name : theory -> string
-val goals : theory -> goal list
+val goals : theory -> goal Why.Util.Mstr.t
 (*
 val verified : theory -> bool
 *)

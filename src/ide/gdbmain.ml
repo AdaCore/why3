@@ -359,7 +359,12 @@ module Helpers = struct
       goals_model#set ~row ~column:visible_column false;
     let f = t.theory_parent in
     if propagate then
-      if List.for_all (fun t -> t.verified) f.theories then
+      if List.for_all (fun t -> 
+(*
+                         let tname = t.theory.Theory.th_name.Ident.id_string in
+                         eprintf "checking theory %s@." tname;
+*)
+                         t.verified) f.theories then
         set_file_verified f
 
   let rec set_proved ~propagate g =
@@ -456,6 +461,7 @@ module Helpers = struct
     goals_model#set ~row ~column:icon_column !image_directory;
     goals_model#set ~row ~column:index_column (Row_theory mth);
     goals_model#set ~row ~column:visible_column true;
+    mfile.theories <- mth :: mfile.theories;
     mth
 
   let add_theory mfile th =
@@ -545,27 +551,27 @@ let () =
             let goals = Db.goals db_th in
             let tasks = List.rev (Task.split_theory th None None) in
             let theory_proved = ref true in
-            (* TODO: remplacer iter2 par un parcours intelligent
-               en detectant d'eventuelles nouvelles tasks *)
-            List.iter2
-              (fun db_goal t ->
-                 let gname = Db.goal_name db_goal in
-                 let taskname =
+            List.iter
+              (fun t ->
+                 let gname =
                    (Task.task_goal t).Decl.pr_name.Ident.id_string
                  in
-                 if gname <> taskname then
-                   begin
-                     eprintf "gname = %s, taskname = %s@." gname taskname;
-                     assert false;
-                   end;
                  let sum = task_checksum t in
-                 let db_sum = Db.task_checksum db_goal in
-                 let goal_obsolete = sum <> db_sum in
-                 if goal_obsolete then
-                   begin
-                     eprintf "Goal %s.%s has changed@." tname gname;
-                     Db.change_checksum db_goal sum
-                   end;
+                 let db_goal,goal_obsolete =
+                   try
+                     let dbg = Util.Mstr.find gname goals in
+                     let db_sum = Db.task_checksum dbg in
+                     let goal_obsolete = sum <> db_sum in
+                     if goal_obsolete then
+                       begin
+                         eprintf "Goal %s.%s has changed@." tname gname;
+                         Db.change_checksum dbg sum
+                       end;
+                     dbg,goal_obsolete
+                   with Not_found -> 
+                     let dbg = Db.add_goal db_th gname sum in
+                     dbg,false
+                 in
                  let goal = Helpers.add_goal_row mth gname t db_goal in
                  let external_proofs = Db.external_proofs db_goal in
                  let proved = ref false in
@@ -579,7 +585,9 @@ let () =
                       let obsolete = goal_obsolete or o in
                       let s = match s with
                         | Db.Undone -> Scheduler.HighFailure
-                        | Db.Success -> proved := true; Scheduler.Success
+                        | Db.Success -> 
+                            if not obsolete then proved := true; 
+                            Scheduler.Success
                         | Db.Unknown -> Scheduler.Unknown
                         | Db.Timeout -> Scheduler.Timeout
                         | Db.Failure -> Scheduler.HighFailure
@@ -593,7 +601,8 @@ let () =
                  if !proved then Helpers.set_proved ~propagate:false goal
                  else theory_proved := false;
                  )
-              goals tasks;
+              tasks;
+            (* TODO: what to do with remaining goals in Db ??? *)
             if !theory_proved then Helpers.set_theory_proved ~propagate:false mth
             else file_proved := false
             )
