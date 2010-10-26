@@ -61,6 +61,7 @@ let id_result = "result"
 let dty_app (ts, tyl) = assert (ts.ts_def = None); Tyapp (ts, tyl)
 
 let dty_bool gl = dty_app (gl.ts_bool, [])
+let dty_int _gl = dty_app (Ty.ts_int, [])
 let dty_unit gl = dty_app (gl.ts_unit, [])
 let dty_label gl = dty_app (gl.ts_label, [])
 
@@ -361,13 +362,13 @@ and dexpr_desc env loc = function
   | Pgm_ptree.Eloop (a, e1) ->
       let e1 = dexpr env e1 in
       expected_type e1 (dty_unit env.env);
-      DEloop (dloop_annotation env a, e1), (dty_unit env.env)
+      DEloop (dloop_annotation env a, e1), dty_unit env.env
   | Pgm_ptree.Elazy (op, e1, e2) ->
       let e1 = dexpr env e1 in
       expected_type e1 (dty_bool env.env);
       let e2 = dexpr env e2 in
       expected_type e2 (dty_bool env.env);
-      DElazy (op, e1, e2), (dty_bool env.env)
+      DElazy (op, e1, e2), dty_bool env.env
   | Pgm_ptree.Ematch (e1, bl) ->
       let e1 = dexpr env e1 in
       let ty1 = e1.dexpr_type in
@@ -383,7 +384,7 @@ and dexpr_desc env loc = function
       let bl = List.map branch bl in
       DEmatch (e1, bl), ty
   | Pgm_ptree.Eskip ->
-      DElogic env.env.ls_unit, (dty_unit env.env)
+      DElogic env.env.ls_unit, dty_unit env.env
   | Pgm_ptree.Eabsurd ->
       DEabsurd, create_type_var loc
   | Pgm_ptree.Eraise (id, e) ->
@@ -426,6 +427,16 @@ and dexpr_desc env loc = function
 	(ls, x, h)
       in
       DEtry (e1, List.map handler hl), e1.dexpr_type
+  | Pgm_ptree.Efor (x, e1, e2, inv, e3) ->
+      let e1 = dexpr env e1 in
+      expected_type e1 (dty_int env.env);
+      let e2 = dexpr env e2 in
+      expected_type e2 (dty_int env.env);
+      let env = add_local env x.id (DTpure (dty_int env.env)) in
+      let inv = option_map (dfmla env.denv) inv in
+      let e3 = dexpr env e3 in
+      expected_type e3 (dty_unit env.env);
+      DEfor (x, e1, e2, inv, e3), dty_unit env.env
 
   | Pgm_ptree.Eassert (k, le) ->
       DEassert (k, dfmla env.denv le), dty_unit env.env
@@ -701,6 +712,18 @@ and iexpr_desc gl env loc ty = function
 	(ls, x, iexpr gl env h)
       in
       IEtry (iexpr gl env e, List.map handler hl)
+  | DEfor (x, e1, e2, inv, e3) ->
+      let e1 = iexpr gl env e1 in
+      let e2 = iexpr gl env e2 in
+      let vx = create_vsymbol (id_user x.id x.id_loc) e1.iexpr_type in
+      let env = Mstr.add x.id vx env in
+      let inv = option_map (Denv.fmla env) inv in
+      let e3 = iexpr gl env e3 in
+      let v1 = create_vsymbol (id_user "for_start" loc) e1.iexpr_type in
+      let v2 = create_vsymbol (id_user "for_end" loc)   e2.iexpr_type in
+      IElet (v1, e1, mk_iexpr loc ty (
+      IElet (v2, e2, mk_iexpr loc ty (
+      IEfor (vx, v1, v2, inv, e3)))))
 
   | DEassert (k, f) ->
       let f = Denv.fmla env f in
@@ -857,7 +880,7 @@ let rec is_pure_expr e =
   | Elet (_, e1, e2) -> is_pure_expr e1 && is_pure_expr e2
   | Elabel (_, e1) -> is_pure_expr e1
   | Eany c -> E.no_side_effect c.c_effect
-  | Eassert _ | Etry _ | Eraise _ | Ematch _ 
+  | Eassert _ | Etry _ | Efor _ | Eraise _ | Ematch _ 
   | Eloop _ | Eletrec _ | Efun _ 
   | Eglobal _ | Eabsurd -> false (* TODO: improve *)
 
@@ -1042,6 +1065,14 @@ and expr_desc gl env loc ty = function
 	List.fold_left (fun e (_,_,h) -> E.union e h.expr_effect) ef hl 
       in
       Etry (e1, hl), tpure ty, ef
+  | IEfor (x, v1, v2, inv, e3) ->
+      let env = add_local x (tpure v1.vs_ty) env in
+      let e3 = expr gl env e3 in
+      let ef = match inv with
+	| Some f -> fmla_effect gl e3.expr_effect f 
+	| None -> e3.expr_effect
+      in
+      Efor (x, v1, v2, inv, e3), type_v_unit gl, ef
 
   | IEassert (k, f) ->
       let ef = fmla_effect gl E.empty f in
@@ -1111,7 +1142,11 @@ and letrec gl env dl = (* : env * recfun list *)
   let m, dl = fixpoint m0 in
   make_env m, dl
 
-(* freshness analysis *)
+(* freshness analysis
+
+   checks that values of type 'a ref are only freshly allocated
+   term:bool indicates if we are in terminal position in the expression
+   (to allow functions to return fresh references) *)
 
 let rec fresh_expr gl ~term locals e = match e.expr_desc with
   | Elocal vs when is_reference_type gl vs.vs_ty 
@@ -1144,6 +1179,8 @@ let rec fresh_expr gl ~term locals e = match e.expr_desc with
   | Etry (e1, hl) ->
       fresh_expr gl ~term:false locals e1;
       List.iter (fun (_, _, e2) -> fresh_expr gl ~term locals e2) hl
+  | Efor (_, _, _, _, e3) ->
+      fresh_expr gl ~term:false locals e3
 
   | Elabel (_, e) ->
       fresh_expr gl ~term locals e

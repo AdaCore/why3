@@ -312,6 +312,7 @@ and wp_desc env e q = match e.expr_desc with
 		 (quantify env e.expr_effect (wp_implies i we)))
 	in
 	w
+  (* optimization for the particular case let _ = y in e *)
   | Ematch (_, [{pat_node = Pwild}, e]) ->
       wp_expr env e (filter_post e.expr_effect q)
   | Ematch (x, bl) ->
@@ -353,7 +354,36 @@ and wp_desc env e q = match e.expr_desc with
       let q1 = saturate_post e1.expr_effect (fst q) q in
       let q1 = filter_post e1.expr_effect (make_post q1) in
       wp_expr env e1 q1
-
+  | Efor (x, v1, v2, inv, e1) ->
+      (* wp(for x = v1 to v2 do inv { I(x) } e1, Q, R) =
+             v1 > v2  -> Q
+         and v1 <= v2 ->     I(v1)
+                         and forall S. forall i. v1 <= i <= v2 -> 
+                                                 I(i) -> wp(e1, I(i+1), R)
+	                               and I(v2+1) -> Q                    *)
+      let (res, q1), _ = q in
+      let v1_gt_v2 = f_app env.ls_gt [t_var v1; t_var v2] in
+      let v1_le_v2 = f_app env.ls_le [t_var v1; t_var v2] in
+      let inv = match inv with Some inv -> inv | None -> f_true in
+      let wp1 = 
+	let xp1 = t_app env.ls_add [t_var x; t_int_const "1"] ty_int in
+	let post = f_subst (subst1 x xp1) inv in
+	let q1 = saturate_post e1.expr_effect (res, post) q in
+	wp_expr env e1 q1
+      in
+      let f = wp_and ~sym:true
+	(f_subst (subst1 x (t_var v1)) inv)
+	(quantify env e.expr_effect
+	   (wp_and ~sym:true
+	      (wp_forall env x
+	         (wp_implies (wp_and (f_app env.ls_le [t_var v1; t_var x])
+			             (f_app env.ls_le [t_var x;  t_var v2])) 
+                 (wp_implies inv wp1))) 
+	      (let sv2 = t_app env.ls_add [t_var v2; t_int_const "1"] ty_int in
+	       wp_implies (f_subst (subst1 x sv2) inv) q1)))
+      in
+      wp_and ~sym:true (wp_implies v1_gt_v2 q1) (wp_implies v1_le_v2 f)
+      
   | Eassert (Pgm_ptree.Aassert, f) ->
       let (_, q), _ = q in
       wp_and f q

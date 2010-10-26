@@ -90,6 +90,7 @@ and dexpr_desc =
   | DEabsurd 
   | DEraise of Term.lsymbol * dexpr option
   | DEtry of dexpr * (Term.lsymbol * string option * dexpr) list
+  | DEfor of ident * dexpr * dexpr * Denv.dfmla option * dexpr
 
   | DEassert of assertion_kind * Denv.dfmla
   | DElabel of string * dexpr
@@ -148,6 +149,8 @@ and iexpr_desc =
   | IEabsurd
   | IEraise of Term.lsymbol * iexpr option
   | IEtry of iexpr * (Term.lsymbol * Term.vsymbol option * iexpr) list
+  | IEfor of 
+      Term.vsymbol * Term.vsymbol * Term.vsymbol * Term.fmla option * iexpr
 
   | IEassert of assertion_kind * Term.fmla
   | IElabel of label * iexpr
@@ -183,6 +186,8 @@ and expr_desc =
   | Eabsurd
   | Eraise of Term.lsymbol * expr option
   | Etry of expr * (Term.lsymbol * Term.vsymbol option * expr) list
+  | Efor of 
+      Term.vsymbol * Term.vsymbol * Term.vsymbol * Term.fmla option * expr
 
   | Eassert of assertion_kind * Term.fmla
   | Elabel of label * expr

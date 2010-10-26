@@ -120,7 +120,7 @@
 %token EXCEPTION FOR
 %token FUN GHOST IF IN INVARIANT LABEL LET MATCH NOT OF PARAMETER
 %token RAISE RAISES READS REC 
-%token THEN TRY TYPE VARIANT WHILE WITH WRITES
+%token THEN TO TRY TYPE VARIANT WHILE WITH WRITES
 
 /* symbols */
 
@@ -317,6 +317,8 @@ expr:
 		     mk_expr (Eif ($2, $5,
 				   mk_expr (Eraise (exit_exn (), None)))))),
 	   [exit_exn (), None, mk_expr Eskip])) }
+| FOR lident EQUAL expr TO expr DO loop_invariant expr DONE
+   { mk_expr (Efor ($2, $4, $6, $8, $9)) }
 | ABSURD
    { mk_expr Eabsurd }
 | expr COLON pure_type

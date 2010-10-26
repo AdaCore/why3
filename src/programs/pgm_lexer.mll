@@ -68,6 +68,7 @@
 	"reads", READS;
 	"rec", REC;
 	"then", THEN;
+	"to", TO;
 	"try", TRY;
 	"type", TYPE;
 	"variant", VARIANT;
