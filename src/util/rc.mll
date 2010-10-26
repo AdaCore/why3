@@ -234,7 +234,7 @@ let push_record () =
 let space = [' ' '\t' '\r' '\n']+
 let digit = ['0'-'9']
 let letter = ['a'-'z' 'A'-'Z']
-let ident = (letter | '_') (letter | digit | '_' | '-' | '(' | ')') *
+let ident = (letter | '_') (letter | digit | '_' | '-' | '+' | '.') *
 let sign = '-' | '+'
 let integer = sign? digit+
 let mantissa = ['e''E'] sign? digit+
@@ -344,7 +344,7 @@ let to_formatter fmt t =
   let print_t fmt t =
     Pp.print_iter22 Mstr.iter Pp.newline2 print_sectionl fmt t in
   print_t fmt t;
-  pp_print_flush fmt ()
+  pp_print_newline fmt ()
 
 let to_channel cout t =
   to_formatter (formatter_of_out_channel cout) t

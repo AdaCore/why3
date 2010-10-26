@@ -97,8 +97,20 @@ let make_command exec com =
   in
   Str.global_substitute cmd_regexp replace com
 
+let sanitize_exec =
+  let first c = match c with
+    | '_' | ' ' -> "_"
+    | _ -> Ident.char_to_alpha c
+  in
+  let rest c = match c with
+    | '+' | '-' | '.' -> String.make 1 c
+    | _ -> Ident.char_to_alnumus c
+  in
+  Ident.sanitizer first rest
+
 let detect_prover main acc data =
-  List.fold_left
+  let keys = Queue.create () in
+  let acc = List.fold_left
     (fun acc com ->
 	let out = Filename.temp_file "out" "" in
         let cmd = sprintf "%s %s" com data.version_switch in
@@ -142,7 +154,9 @@ let detect_prover main acc data =
               end;
             incr provers_found;
             let c = make_command com data.prover_command in
-            Mstr.add data.prover_id
+            let key = sanitize_exec com in
+            Queue.add key keys;
+            Mstr.add key
               {name = data.prover_name;
                version = ver;
                command = c;
@@ -159,7 +173,14 @@ let detect_prover main acc data =
 	    end)
     acc
     data.execs
-
+  in
+  if Queue.length keys = 1 then
+    let key = Queue.take keys in
+    let prv = Mstr.find key acc in
+    let acc = Mstr.remove key acc in
+    Mstr.add data.prover_id prv acc
+  else
+    acc
 
 let run_auto_detection config =
   let main = get_main config in
