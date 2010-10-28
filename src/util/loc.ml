@@ -51,6 +51,7 @@ let report_line fmt l = fprintf fmt "%s:%d:" l.pos_fname l.pos_lnum
 
 type position = Lexing.position * Lexing.position
 
+
 exception Located of position * exn
 
 let set_file file lb =
@@ -73,6 +74,13 @@ let extract (b,e) =
   let fc = b.pos_cnum - b.pos_bol in
   let lc = e.pos_cnum - b.pos_bol in
   (f,l,fc,lc)
+
+let compare (_,l1,b1,e1) (_,l2,b2,e2) =
+  let c = Pervasives.compare l1 l2 in
+  if c <> 0 then c else
+  let c = Pervasives.compare b1 b2 in
+  if c <> 0 then c else
+  Pervasives.compare e1 e2
 
 let gen_report_position fmt loc = 
   gen_report_line fmt (extract loc)

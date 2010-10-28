@@ -115,6 +115,21 @@ let () =
     raise e
 
 
+let read_file fn =
+  let theories = Env.read_file gconfig.env fn in
+  let theories =
+    Theory.Mnm.fold
+      (fun name th acc ->
+         match th.Theory.th_name.Ident.id_origin with
+           | Ident.User l -> (Loc.extract l,name,th)::acc
+           | _ -> assert false)
+      theories []
+  in
+  let theories = List.sort
+    (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
+    theories
+  in theories
+
 
 (****************)
 (* goals widget *)
@@ -434,7 +449,7 @@ module Helpers = struct
                  goal_row = row;
                  goal_db = db_goal;
                  external_proofs = Hashtbl.create 7;
-                 transformations = [];                 
+                 transformations = [];
                  proved = false;
                }
     in
@@ -563,20 +578,19 @@ module Helpers = struct
 
   let add_file f =
     try
-      let theories = Env.read_file gconfig.env f in
       let dbfile = Db.add_file f in
       let mfile = add_file_row f dbfile in
-      let theories =
-        Theory.Mnm.fold
-          (fun thname t acc ->
+      let theories = read_file f in
+      let mths =
+        List.fold_left
+          (fun acc (_,thname,t) ->
              eprintf "Adding theory '%s'@." thname;
              let mth = add_theory mfile t in
              mth :: acc
           )
-          theories
-          []
+          [] theories
       in
-      mfile.theories <- List.rev theories;
+      mfile.theories <- List.rev mths;
       if theories = [] then set_file_verified mfile
     with e ->
       fprintf str_formatter
@@ -591,85 +605,130 @@ end
 (*  read previous data from db   *)
 (*********************************)
 
+let rec reimport_root_task mth tname goals t : bool =
+(* re-imports DB informations of a task in theory mth (named tname)
+   goals is a table of DB goals known to be a possible match for t.
+   returns true whenever the task t is known to be proved *)
+  let gname =
+    (Task.task_goal t).Decl.pr_name.Ident.id_string
+  in
+  let sum = task_checksum t in
+  let db_goal,goal_obsolete =
+    try
+      let dbg = Util.Mstr.find gname goals in
+      let db_sum = Db.task_checksum dbg in
+      let goal_obsolete = sum <> db_sum in
+      if goal_obsolete then
+        begin
+          eprintf "Goal %s.%s has changed@." tname gname;
+          Db.change_checksum dbg sum
+        end;
+      dbg,goal_obsolete
+    with Not_found -> 
+      let dbg = Db.add_goal mth.Model.theory_db gname sum in
+      dbg,false
+  in
+  let goal = Helpers.add_goal_row mth gname t db_goal in
+  let proved = ref false in
+  let external_proofs = Db.external_proofs db_goal in
+  Db.Hprover.iter
+    (fun pid a ->
+       let p =
+         Util.Mstr.find (Db.prover_name pid) gconfig.provers
+       in
+       let s,t,o = Db.status_and_time a in
+       if goal_obsolete && not o then Db.set_obsolete a;
+       let obsolete = goal_obsolete or o in
+       let s = match s with
+         | Db.Undone -> Scheduler.HighFailure
+         | Db.Success -> 
+             if not obsolete then proved := true; 
+             Scheduler.Success
+         | Db.Unknown -> Scheduler.Unknown
+         | Db.Timeout -> Scheduler.Timeout
+         | Db.Failure -> Scheduler.HighFailure
+       in
+       let (_pa : Model.proof_attempt) =
+         Helpers.add_external_proof_row ~obsolete goal p a s t
+       in
+       ((* something TODO ?*))
+    )
+    external_proofs;
+(*
+  let transformations = Db.transformations db_goal in
+  Db.Htransf.iter
+    (fun tr_id tr ->
+       let tr = Db.trans_name tr_id in
+       assert (tr = "split_goal"); (* TODO *)
+       let s,t,o = Db.status_and_time a in
+       if goal_obsolete && not o then Db.set_obsolete a;
+       let obsolete = goal_obsolete or o in
+       let s = match s with
+         | Db.Undone -> Scheduler.HighFailure
+         | Db.Success -> 
+             if not obsolete then proved := true; 
+             Scheduler.Success
+         | Db.Unknown -> Scheduler.Unknown
+         | Db.Timeout -> Scheduler.Timeout
+         | Db.Failure -> Scheduler.HighFailure
+       in
+       let (_pa : Model.proof_attempt) =
+         Helpers.add_external_proof_row ~obsolete goal p a s t
+       in
+       ((* something TODO ?*))
+    )
+    transformations;
+*)
+  if !proved then Helpers.set_proved ~propagate:false goal;
+  !proved
+
 let () =
   let files = Db.files () in
   List.iter
     (fun (f,fn) ->
        eprintf "Reimporting file '%s'@." fn;
-       let theories = Env.read_file gconfig.env fn in
        let mfile = Helpers.add_file_row fn f in
+       let theories = Env.read_file gconfig.env fn in
+       let theories =
+         Theory.Mnm.fold
+           (fun name th acc ->
+              match th.Theory.th_name.Ident.id_origin with
+                | Ident.User l -> (Loc.extract l,name,th)::acc
+                | _ -> assert false)
+           theories []
+       in
+       let theories = List.sort
+         (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
+         theories
+       in
        let ths = Db.theories f in
        let file_proved = ref true in
        List.iter
-         (fun db_th ->
-            let tname = Db.theory_name db_th in
+         (fun (_,tname,th) ->
             eprintf "Reimporting theory '%s'@."tname;
-            let th = Theory.Mnm.find tname theories in
-            (* TODO: capturer Not_found, cad detecter si la theorie a ete supprmee du fichier *)
-            (* on pourrait retrouver l'ordre des theories dans le fichier source
-               en comparant les locations des idents de ces theories *)
+            let db_th = 
+              try
+                Util.Mstr.find tname ths 
+              with Not_found ->
+                assert false (* TODO *)
+                  (* la theorie n'existe pas encore dans la db *)
+            in
             let mth = Helpers.add_theory_row mfile th db_th in
             let goals = Db.goals db_th in
             let tasks = List.rev (Task.split_theory th None None) in
             let theory_proved = ref true in
             List.iter
-              (fun t ->
-                 let gname =
-                   (Task.task_goal t).Decl.pr_name.Ident.id_string
-                 in
-                 let sum = task_checksum t in
-                 let db_goal,goal_obsolete =
-                   try
-                     let dbg = Util.Mstr.find gname goals in
-                     let db_sum = Db.task_checksum dbg in
-                     let goal_obsolete = sum <> db_sum in
-                     if goal_obsolete then
-                       begin
-                         eprintf "Goal %s.%s has changed@." tname gname;
-                         Db.change_checksum dbg sum
-                       end;
-                     dbg,goal_obsolete
-                   with Not_found -> 
-                     let dbg = Db.add_goal db_th gname sum in
-                     dbg,false
-                 in
-                 let goal = Helpers.add_goal_row mth gname t db_goal in
-                 let external_proofs = Db.external_proofs db_goal in
-                 let proved = ref false in
-                 Db.Hprover.iter
-                   (fun pid a ->
-                      let p =
-                        Util.Mstr.find (Db.prover_name pid) gconfig.provers
-                      in
-                      let s,t,o = Db.status_and_time a in
-                      if goal_obsolete && not o then Db.set_obsolete a;
-                      let obsolete = goal_obsolete or o in
-                      let s = match s with
-                        | Db.Undone -> Scheduler.HighFailure
-                        | Db.Success -> 
-                            if not obsolete then proved := true; 
-                            Scheduler.Success
-                        | Db.Unknown -> Scheduler.Unknown
-                        | Db.Timeout -> Scheduler.Timeout
-                        | Db.Failure -> Scheduler.HighFailure
-                      in
-                      let (_pa : Model.proof_attempt) =
-                        Helpers.add_external_proof_row ~obsolete goal p a s t
-                      in
-                      ((* TODO ?*))
-                   )
-                   external_proofs;
-                 if !proved then Helpers.set_proved ~propagate:false goal
-                 else theory_proved := false;
-                 )
+              (fun t -> theory_proved := reimport_root_task mth tname goals t && !theory_proved)
               tasks;
-            (* TODO: what to do with remaining goals in Db ??? *)
+            (* TODO: what to do with remaining tasks in Db ??? 
+               for the moment they remain in the db, but they are not shown
+            *)
             if !theory_proved then Helpers.set_theory_proved ~propagate:false mth
             else file_proved := false
             )
-         ths;
-       (* TODO: detecter d'eventuelles nouvelles theories, qui seraient donc
-          dans [theories] mais pas dans [ths]
+         theories;
+       (* TODO: detecter d'eventuelles vieilles theories, qui seraient donc
+          dans [ths] mais pas dans [theories]
        *)
        if !file_proved then Helpers.set_file_verified mfile
     )

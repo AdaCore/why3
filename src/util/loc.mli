@@ -38,6 +38,8 @@ val dummy_position : position
 
 type floc = string * int * int * int
 
+val compare : floc -> floc -> int
+
 val dummy_floc : floc
 
 val extract :  position -> floc

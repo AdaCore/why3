@@ -101,8 +101,10 @@ val transformations : goal -> transf Htransf.t
 (*
 val parent_goal : transf -> goal
 *)
+(*
 val transf_id : transf -> transf_id
-val subgoals : transf -> goal list
+*)
+val subgoals : transf -> goal Why.Util.Mstr.t
 
 (** theory accessors *)        
 val theory_name : theory -> string
@@ -115,7 +117,7 @@ val verified : theory -> bool
 (*
 val file_name : file -> string
 *)
-val theories : file -> theory list
+val theories : file -> theory Why.Util.Mstr.t
 
 (** {2 The persistent database} *)
 

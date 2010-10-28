@@ -43,6 +43,24 @@ theory TestDiv
 
 end
 
+theory TestList
+
+  use import int.Int
+  use import list.List
+
+  logic x : list int
+
+(*
+  goal Test1: 
+     match x with 
+     | Nil -> 1 = 0 /\ 2 = 3
+     | Cons _ Nil -> 4 = 5 and 6 = 7
+     | Cons _ _ -> 8 = 9 /\ 10 = 11
+     end  
+*)
+
+end  
+
 
 theory TestReal
 
@@ -67,20 +85,3 @@ end
 
 
 
-theory TestList
-
-  use import int.Int
-  use import list.List
-
-  logic x : list int
-
-(*
-  goal Test1: 
-     match x with 
-     | Nil -> 1 = 0 /\ 2 = 3
-     | Cons _ Nil -> 4 = 5 and 6 = 7
-     | Cons _ _ -> 8 = 9 /\ 10 = 11
-     end  
-*)
-
-end  
