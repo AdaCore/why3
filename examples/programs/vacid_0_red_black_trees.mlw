@@ -1,4 +1,6 @@
 
+(* Red-black trees *)
+
 {
   type key = int
   type value = int
@@ -8,12 +10,53 @@
   type tree =
     | Leaf 
     | Node color tree key value tree
+
+  logic memt (t : tree) (k : key) (v : value) = 
+    match t with
+    | Leaf -> false
+    | Node _ l k' v' r -> (k = k' and v = v') or memt l k v or memt r k v
+    end
 }
 
-(* static RedBlackTree create(int defaultValue); *)
-(* void replace(int key, int value); *)
-(* void remove(int key); *)
-(* int lookup(int key); *)
+(* the VACID-0 interface = map + default value *)
+
+{
+  type rbt = (value, tree)
+
+  logic default (r : rbt) : value =
+    let (d, _) = r in d
+
+  logic mem (r : rbt) (k : key) (v : value) =
+    let (d, t) = r in memt t k v or v = d
+}
+
+let create d =
+  { }
+  let x = (d, Leaf) in ref x (* BUG: ref (d, Leaf) *)
+  { default !result = d and
+    forall k:key, v:value. mem !result k v <-> v = d }
+
+parameter replace :
+  m:ref rbt -> k:key -> v:value ->
+  {} 
+  unit writes m 
+  { default !m = default (old !m) and
+    forall k':key, v':value. 
+    mem !m k' v' <-> if k' = k then v' = v else mem (old !m) k' v' }
+
+parameter lookup :
+  m:ref rbt -> k:key -> 
+  {} 
+  value reads m 
+  { mem !m k result }
+
+(* the easy way (remove implemented using replace) *)
+let remove m k =
+  { } 
+  replace m k (default !m)
+  { default !m = default (old !m) and
+    forall k':key, v':value. 
+    mem !m k' v' <-> if k' = k then v' = default !m else mem (old !m) k' v' }
 
 (*
 Local Variables: 
