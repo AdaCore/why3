@@ -1,0 +1,22 @@
+
+{
+  type key = int
+  type value = int
+
+  type color = Red | Black
+
+  type tree =
+    | Leaf 
+    | Node color tree key value tree
+}
+
+(* static RedBlackTree create(int defaultValue); *)
+(* void replace(int key, int value); *)
+(* void remove(int key); *)
+(* int lookup(int key); *)
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/vacid_0_red_black_trees"
+End: 
+*)
