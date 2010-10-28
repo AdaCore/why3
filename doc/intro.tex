@@ -4,7 +4,7 @@
 \section{Architecture and Terminology}
 
 Everything in Why3 revolves around the notion of
-\emph{task}\index{task}.  Why3, as a platform, as a tool that
+\emph{task}\index{task}.  Why3, as a platform, is a tool that
 translates its input to a number of tasks, and dispatches these tasks
 to external provers. 
 
@@ -22,6 +22,8 @@ extended with
 %\item Hilbert's epsilon construct
 \end{itemize}
 
+TODO: continue
+
 \section{Organization of this document}
 
 This document is organized as follows. The first three chapters are
@@ -35,12 +37,19 @@ theories and goals, call external provers for trying to solve them,
 apply transformations to simplify them. The two first chapters are
 thus to read for the beginners.
 
-Chapter~\ref{chap:api} presents how to use Why3 programmatically,
-using the API.  It is for the more advanced users, who wants to link
-Why3 library with their own code. 
+Chapter~\ref{chap:library} documents the standard library of theories
+distributed with Why3. Chapter~\ref{chap:whyml} presents the
+verification condition generator built upon the Why3 core.  The two
+next chapters are for users with a little more experience, in
+particular those who wants to use Why for verification of algorithms.
 
-Chapter~\ref{chap:manpages} are the technical manual pages for the tools of
-the platform. All tool options, and all the configuration files are described in details there.
+Chapter~\ref{chap:api} presents how to use Why3 programmatically,
+using the API.  It is for the experimented users, who wants to link
+Why3 library with their own code.
+
+Chapter~\ref{chap:manpages} are the technical manual pages for the
+tools of the platform. All tool options, and all the configuration
+files are described in details there.
 
 Chapter~\ref{chap:apidoc} is the technical documentation of the API.
 
