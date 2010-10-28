@@ -56,7 +56,7 @@ parameter union :
 parameter get_num_classes : 
   u:ref uf -> {} int reads u { result = num !u }
 
-parameter rand : s:int -> {} int { 0 <= result < s }
+parameter rand : s:int -> { 0 < s } int { 0 <= result < s }
 
 {
   lemma Ineq1 :
@@ -129,9 +129,6 @@ let build_maze (n:int) =
       let d = rand 2 in
       let w = if d = 0 then x+1 else x in
       let z = if d = 0 then y else y+1 in
-(*
-      let (w, z) = if d = 0 then (x+1, y) else (x, y+1) in
-*)
       if w < n && z < n then begin
         let a = y * n + x in
         assert { 0 <= a < n*n };

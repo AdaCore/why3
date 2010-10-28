@@ -23,14 +23,15 @@ exception Not_found
 parameter find :
   t : tree -> k : key -> 
   { }
-  value
+  value raises Not_found
   { memt t k result } | Not_found -> { forall v : value. not (memt t k v) }
 
 parameter add :
   t : tree -> k : key -> v : value ->
   {}
   tree
-  { forall k':key, v':value. 
+  { memt result k v and
+    forall k':key, v':value. 
     memt result k' v' <-> if k' = k then v' = v else memt t k' v' }
 
 (* the VACID-0 interface = mutable map with default value*)
@@ -60,13 +61,13 @@ let replace m k v =
     forall k':key, v':value. 
     mem !m k' v' <-> if k' = k then v' = v else mem (old !m) k' v' }
 
-parameter lookup :
-  m:ref rbt -> k:key -> 
+let lookup m k =
   {} 
-  value reads m 
+  let (d, t) = !m in
+  try find t k with Not_found -> d end
   { mem !m k result }
 
-(* the easy way (implements "remove" using "replace") *)
+(* the easy way: implements "remove" using "replace" *)
 let remove m k =
   { } 
   replace m k (default !m)
