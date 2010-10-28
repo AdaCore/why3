@@ -441,10 +441,13 @@ module Helpers = struct
     a
 
 
-  let add_goal_row mth name t db_goal =
-    let parent = mth.theory_row in
-    let row = goals_model#append ~parent () in
-    let goal = { parent = Theory mth;
+  let add_goal_row parent name t db_goal =
+    let parent_row = match parent with
+      | Theory mth -> mth.theory_row 
+      | Transf mtr -> mtr.transf_row
+    in
+    let row = goals_model#append ~parent:parent_row () in
+    let goal = { parent = parent;
                  task = t ;
                  goal_row = row;
                  goal_db = db_goal;
@@ -457,7 +460,10 @@ module Helpers = struct
     goals_model#set ~row ~column:icon_column !image_file;
     goals_model#set ~row ~column:index_column (Row_goal goal);
     goals_model#set ~row ~column:visible_column true;
-    mth.goals <- goal :: mth.goals;
+    begin match parent with
+      | Theory mth -> mth.goals <- goal :: mth.goals
+      | Transf mtr -> mtr.subgoals <- goal :: mtr.subgoals
+    end;
     goal
 
 
@@ -493,34 +499,18 @@ module Helpers = struct
          let subgoal_name =
            goal_name ^ "." ^ (string_of_int count)
          in
-         let subtask_row =
-           goals_model#append ~parent:row ()
-         in
          let sum = task_checksum subtask in
          let subtask_db = Db.add_subgoal db_transf subgoal_name sum in
          (* TODO: call add_goal_row *)
-         let goal = { Model.parent = Model.Transf tr;
-                      Model.task = subtask ;
-                      Model.goal_row = subtask_row;
-                      Model.goal_db = subtask_db;
-                      Model.external_proofs = Hashtbl.create 7;
-                      Model.transformations = [];
-                      Model.proved = false;
-                    }
+         let goal =
+           add_goal_row (Model.Transf tr) subgoal_name subtask subtask_db
          in
-         goals_model#set ~row:subtask_row
-           ~column:Model.index_column (Model.Row_goal goal);
-         goals_model#set ~row:subtask_row
-           ~column:Model.visible_column true;
-         goals_model#set ~row:subtask_row
-           ~column:Model.name_column subgoal_name;
-         goals_model#set ~row:subtask_row
-           ~column:Model.icon_column !image_file;
          (goal :: acc, count+1))
       ([],1) subgoals
     in
     tr.Model.subgoals <- List.rev goals;
     goals_view#expand_row (goals_model#get_path parent)
+
 
   let add_theory_row mfile th db_theory =
     let tname = th.Theory.th_name.Ident.id_string in
@@ -540,6 +530,7 @@ module Helpers = struct
     mfile.theories <- mth :: mfile.theories;
     mth
 
+
   let add_theory mfile th =
     let tasks = Task.split_theory th None None in
     let tname = th.Theory.th_name.Ident.id_string in
@@ -552,7 +543,7 @@ module Helpers = struct
            let name = id.Ident.id_string in
            let sum = task_checksum t in
            let db_goal = Db.add_goal db_theory name sum in
-           let goal = add_goal_row mth name t db_goal in
+           let goal = add_goal_row (Theory mth) name t db_goal in
            goal :: acc)
         []
         (List.rev tasks)
@@ -605,30 +596,9 @@ end
 (*  read previous data from db   *)
 (*********************************)
 
-let rec reimport_root_task mth tname goals t : bool =
-(* re-imports DB informations of a task in theory mth (named tname)
-   goals is a table of DB goals known to be a possible match for t.
-   returns true whenever the task t is known to be proved *)
-  let gname =
-    (Task.task_goal t).Decl.pr_name.Ident.id_string
-  in
-  let sum = task_checksum t in
-  let db_goal,goal_obsolete =
-    try
-      let dbg = Util.Mstr.find gname goals in
-      let db_sum = Db.task_checksum dbg in
-      let goal_obsolete = sum <> db_sum in
-      if goal_obsolete then
-        begin
-          eprintf "Goal %s.%s has changed@." tname gname;
-          Db.change_checksum dbg sum
-        end;
-      dbg,goal_obsolete
-    with Not_found -> 
-      let dbg = Db.add_goal mth.Model.theory_db gname sum in
-      dbg,false
-  in
-  let goal = Helpers.add_goal_row mth gname t db_goal in
+
+let rec reimport_any_goal parent gname t db_goal goal_obsolete =
+  let goal = Helpers.add_goal_row parent gname t db_goal in
   let proved = ref false in
   let external_proofs = Db.external_proofs db_goal in
   Db.Hprover.iter
@@ -682,6 +652,34 @@ let rec reimport_root_task mth tname goals t : bool =
   if !proved then Helpers.set_proved ~propagate:false goal;
   !proved
 
+
+let reimport_root_goal mth tname goals t : bool =
+  (* re-imports DB informations of a goal in theory mth (named tname)
+     goals is a table, indexed by names of DB goals formerly known to be
+     a in theory mth.  returns true whenever the task t is known to be
+     proved *)
+  let gname =
+    (Task.task_goal t).Decl.pr_name.Ident.id_string
+  in
+  let sum = task_checksum t in
+  let db_goal,goal_obsolete =
+    try
+      let dbg = Util.Mstr.find gname goals in
+      let db_sum = Db.task_checksum dbg in
+      let goal_obsolete = sum <> db_sum in
+      if goal_obsolete then
+        begin
+          eprintf "Goal %s.%s has changed@." tname gname;
+          Db.change_checksum dbg sum
+        end;
+      dbg,goal_obsolete
+    with Not_found -> 
+      let dbg = Db.add_goal mth.Model.theory_db gname sum in
+      dbg,false
+  in
+  reimport_any_goal (Model.Theory mth) gname t db_goal goal_obsolete
+
+(* reimports all files *)
 let () =
   let files = Db.files () in
   List.iter
@@ -718,7 +716,7 @@ let () =
             let tasks = List.rev (Task.split_theory th None None) in
             let theory_proved = ref true in
             List.iter
-              (fun t -> theory_proved := reimport_root_task mth tname goals t && !theory_proved)
+              (fun t -> theory_proved := reimport_root_goal mth tname goals t && !theory_proved)
               tasks;
             (* TODO: what to do with remaining tasks in Db ??? 
                for the moment they remain in the db, but they are not shown
