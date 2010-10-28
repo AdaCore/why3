@@ -122,7 +122,7 @@ let read_file fn =
       (fun name th acc ->
          match th.Theory.th_name.Ident.id_origin with
            | Ident.User l -> (Loc.extract l,name,th)::acc
-           | _ -> assert false)
+           | _ -> (Loc.dummy_floc,name,th)::acc)
       theories []
   in
   let theories = List.sort
@@ -374,7 +374,7 @@ module Helpers = struct
       goals_model#set ~row ~column:visible_column false;
     let f = t.theory_parent in
     if propagate then
-      if List.for_all (fun t -> 
+      if List.for_all (fun t ->
 (*
                          let tname = t.theory.Theory.th_name.Ident.id_string in
                          eprintf "checking theory %s@." tname;
@@ -442,7 +442,7 @@ module Helpers = struct
 
   let add_goal_row parent name t db_goal =
     let parent_row = match parent with
-      | Theory mth -> mth.theory_row 
+      | Theory mth -> mth.theory_row
       | Transf mtr -> mtr.transf_row
     in
     let row = goals_model#append ~parent:parent_row () in
@@ -585,8 +585,8 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
        let obsolete = goal_obsolete or o in
        let s = match s with
          | Db.Undone -> Scheduler.HighFailure
-         | Db.Success -> 
-             if not obsolete then proved := true; 
+         | Db.Success ->
+             if not obsolete then proved := true;
              Scheduler.Success
          | Db.Unknown -> Scheduler.Unknown
          | Db.Timeout -> Scheduler.Timeout
@@ -617,20 +617,20 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
               in
               let sum = task_checksum subtask in
               let subtask_db =
-                try Util.Mstr.find sum db_subgoals 
+                try Util.Mstr.find sum db_subgoals
                 with Not_found -> assert false (* TODO: new subgoal *)
                   (* Db.add_subgoal db_transf subgoal_name sum *)
               in
-              let subgoal,subgoal_proved = 
-                reimport_any_goal 
+              let subgoal,subgoal_proved =
+                reimport_any_goal
                   (Model.Transf mtr) subgoal_name subtask subtask_db
                   false (* subgoal_obsolete *)
               in
               (subgoal :: acc, count+1,proved && subgoal_proved))
            ([],1,true) subgoals
-       in       
+       in
        mtr.Model.subgoals <- List.rev goals;
-       if subgoals_proved (* TODO : && not obsolete *) 
+       if subgoals_proved (* TODO : && not obsolete *)
        then proved := true
     )
     transformations;
@@ -658,7 +658,7 @@ let reimport_root_goal mth tname goals t : Model.goal * bool =
           Db.change_checksum dbg sum
         end;
       dbg,goal_obsolete
-    with Not_found -> 
+    with Not_found ->
       let dbg = Db.add_goal mth.Model.theory_db gname sum in
       dbg,false
   in
@@ -677,7 +677,7 @@ let () =
            (fun name th acc ->
               match th.Theory.th_name.Ident.id_origin with
                 | Ident.User l -> (Loc.extract l,name,th)::acc
-                | _ -> assert false)
+                | _ -> (Loc.dummy_floc,name,th)::acc)
            theories []
        in
        let theories = List.sort
@@ -689,9 +689,9 @@ let () =
        List.iter
          (fun (_,tname,th) ->
             eprintf "Reimporting theory '%s'@."tname;
-            let db_th = 
+            let db_th =
               try
-                Util.Mstr.find tname ths 
+                Util.Mstr.find tname ths
               with Not_found ->
                 assert false (* TODO *)
                   (* la theorie n'existe pas encore dans la db *)
@@ -700,13 +700,13 @@ let () =
             let goals = Db.goals db_th in
             let tasks = List.rev (Task.split_theory th None None) in
             let goals,proved = List.fold_left
-              (fun (acc,proved) t -> 
+              (fun (acc,proved) t ->
                  let (g,p) = reimport_root_goal mth tname goals t in
                  (g::acc,proved && p))
               ([],true) tasks
             in
             mth.Model.goals <- List.rev goals;
-            (* TODO: what to do with remaining tasks in Db ??? 
+            (* TODO: what to do with remaining tasks in Db ???
                for the moment they remain in the db, but they are not shown
             *)
             if proved then Helpers.set_theory_proved ~propagate:false mth
@@ -834,7 +834,7 @@ let split_goal g =
           Db.add_transformation g.Model.goal_db transf_id_split
         in
         let tr = Helpers.add_transformation_row g db_transf (* subgoals *) in
-        let goal_name = "SFSDF" 
+        let goal_name = "SFSDF"
           (*goals_model#get ~row:parent ~column:Model.name_column*)
         in
         let goals,_ = List.fold_left
@@ -1061,22 +1061,31 @@ let rec collapse_proved_goal g =
       (fun t -> List.iter collapse_proved_goal t.Model.subgoals)
       g.Model.transformations
 
-let collapse_verified_theories () =
-  List.iter
-    (fun th ->
-       if th.Model.verified then
-         begin
-           let row = th.Model.theory_row in
-           goals_view#collapse_row (goals_model#get_path row);
-         end
-       else
-         List.iter collapse_proved_goal th.Model.goals)
-    [] (* !Model.all *)
+let collapse_verified_theory th =
+  if th.Model.verified then
+    begin
+      let row = th.Model.theory_row in
+      goals_view#collapse_row (goals_model#get_path row);
+    end
+  else
+    List.iter collapse_proved_goal th.Model.goals
+
+let collapse_verified_file f =
+  if f.Model.file_verified then
+    begin
+      let row = f.Model.file_row in
+      goals_view#collapse_row (filter_model#get_path row);
+    end
+  else
+    List.iter collapse_verified_theory f.Model.theories
+
+let collapse_all_verified_things () =
+  List.iter collapse_verified_file !Model.all_files
 
 let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._C
     ~label:"Collapse proved goals"
-    ~callback:collapse_verified_theories
+    ~callback:collapse_all_verified_things
     ()
 
 let rec hide_proved_goal g =
