@@ -459,58 +459,25 @@ module Helpers = struct
     goals_model#set ~row ~column:icon_column !image_file;
     goals_model#set ~row ~column:index_column (Row_goal goal);
     goals_model#set ~row ~column:visible_column true;
-(*
-    begin match parent with
-      | Theory mth -> mth.goals <- goal :: mth.goals
-      | Transf mtr -> mtr.subgoals <- goal :: mtr.subgoals
-    end;
-*)
     goal
 
 
-  let add_transformation_row g subgoals =
+  let add_transformation_row g db_transf (*subgoals*) =
     let parent = g.Model.goal_row in
     let row = goals_model#append ~parent () in
-    let goal_name = goals_model#get ~row:parent ~column:Model.name_column in
-    goals_model#set ~row ~column:Model.visible_column
-      true;
-    goals_model#set ~row ~column:Model.name_column
-      "split";
-    goals_model#set ~row ~column:Model.icon_column
-      !image_transf;
-    let transf_id_split = Db.transf_from_name "split_goal" in
-    let db_transf =
-      Db.add_transformation g.Model.goal_db transf_id_split
+    let tr = { Model.parent_goal = g;
+               Model.transf_row = row;
+               Model.transf_db = db_transf;
+               subgoals = [];
+             }
     in
-    let tr =
-      { Model.parent_goal = g;
-        (*
-          Model.transf = split_transformation;
-        *)
-        Model.transf_row = row;
-        Model.transf_db = db_transf;
-        subgoals = [];
-      }
-    in
+    goals_model#set ~row ~column:Model.name_column "split";
+    goals_model#set ~row ~column:Model.icon_column !image_transf;
     goals_model#set ~row ~column:Model.index_column
       (Model.Row_transformation tr);
-    g.Model.transformations <- tr :: g.Model.transformations;
-    let goals,_ = List.fold_left
-      (fun (acc,count) subtask ->
-         let _id = (Task.task_goal subtask).Decl.pr_name in
-         let subgoal_name =
-           goal_name ^ "." ^ (string_of_int count)
-         in
-         let sum = task_checksum subtask in
-         let subtask_db = Db.add_subgoal db_transf subgoal_name sum in
-         let goal =
-           add_goal_row (Model.Transf tr) subgoal_name subtask subtask_db
-         in
-         (goal :: acc, count+1))
-      ([],1) subgoals
-    in
-    tr.Model.subgoals <- List.rev goals;
-    goals_view#expand_row (goals_model#get_path parent)
+    goals_model#set ~row ~column:Model.visible_column true;
+    goals_view#expand_row (goals_model#get_path parent);
+    tr
 
 
   let add_theory_row mfile th db_theory =
@@ -533,7 +500,7 @@ module Helpers = struct
 
 
   let add_theory mfile th =
-    let tasks = Task.split_theory th None None in
+    let tasks = List.rev (Task.split_theory th None None) in
     let tname = th.Theory.th_name.Ident.id_string in
     let db_theory = Db.add_theory mfile.file_db tname in
     let mth = add_theory_row mfile th db_theory in
@@ -633,24 +600,45 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
     external_proofs;
   let transformations = Db.transformations db_goal in
   Db.Htransf.iter
-    (fun tr_id _tr ->
+    (fun tr_id tr ->
        let trname = Db.transf_name tr_id in
+       eprintf "Reimporting transformation %s for goal %s @." trname gname;
        assert (trname = "split_goal"); (* TODO *)
        let subgoals = Trans.apply split_transformation t in
-       Helpers.add_transformation_row goal subgoals
-(*
-       let _db_subgoals = Db.subgoals tr in
-       List.iter
-         (fun t ->
-            
-*)
-         )
+       let mtr = Helpers.add_transformation_row goal tr in
+       let db_subgoals = Db.subgoals tr in
+       let goal_name = "db" in
+       let goals,_,subgoals_proved =
+         List.fold_left
+           (fun (acc,count,proved) subtask ->
+              let _id = (Task.task_goal subtask).Decl.pr_name in
+              let subgoal_name =
+                goal_name ^ "." ^ (string_of_int count)
+              in
+              let sum = task_checksum subtask in
+              let subtask_db =
+                try Util.Mstr.find sum db_subgoals 
+                with Not_found -> assert false (* TODO: new subgoal *)
+                  (* Db.add_subgoal db_transf subgoal_name sum *)
+              in
+              let subgoal,subgoal_proved = 
+                reimport_any_goal 
+                  (Model.Transf mtr) subgoal_name subtask subtask_db
+                  false (* subgoal_obsolete *)
+              in
+              (subgoal :: acc, count+1,proved && subgoal_proved))
+           ([],1,true) subgoals
+       in       
+       mtr.Model.subgoals <- List.rev goals;
+       if subgoals_proved (* TODO : && not obsolete *) 
+       then proved := true
+    )
     transformations;
   if !proved then Helpers.set_proved ~propagate:false goal;
-  !proved
+  goal,!proved
 
 
-let reimport_root_goal mth tname goals t : bool =
+let reimport_root_goal mth tname goals t : Model.goal * bool =
   (* re-imports DB informations of a goal in theory mth (named tname)
      goals is a table, indexed by names of DB goals formerly known to be
      a in theory mth.  returns true whenever the task t is known to be
@@ -711,14 +699,17 @@ let () =
             let mth = Helpers.add_theory_row mfile th db_th in
             let goals = Db.goals db_th in
             let tasks = List.rev (Task.split_theory th None None) in
-            let theory_proved = ref true in
-            List.iter
-              (fun t -> theory_proved := reimport_root_goal mth tname goals t && !theory_proved)
-              tasks;
+            let goals,proved = List.fold_left
+              (fun (acc,proved) t -> 
+                 let (g,p) = reimport_root_goal mth tname goals t in
+                 (g::acc,proved && p))
+              ([],true) tasks
+            in
+            mth.Model.goals <- List.rev goals;
             (* TODO: what to do with remaining tasks in Db ??? 
                for the moment they remain in the db, but they are not shown
             *)
-            if !theory_proved then Helpers.set_theory_proved ~propagate:false mth
+            if proved then Helpers.set_theory_proved ~propagate:false mth
             else file_proved := false
             )
          theories;
@@ -838,7 +829,30 @@ let split_goal g =
   if not g.Model.proved then
     let callback subgoals =
       if List.length subgoals >= 2 then
-        Helpers.add_transformation_row g subgoals
+        let transf_id_split = Db.transf_from_name "split_goal" in
+        let db_transf =
+          Db.add_transformation g.Model.goal_db transf_id_split
+        in
+        let tr = Helpers.add_transformation_row g db_transf (* subgoals *) in
+        let goal_name = "SFSDF" 
+          (*goals_model#get ~row:parent ~column:Model.name_column*)
+        in
+        let goals,_ = List.fold_left
+          (fun (acc,count) subtask ->
+             let _id = (Task.task_goal subtask).Decl.pr_name in
+             let subgoal_name =
+               goal_name ^ "." ^ (string_of_int count)
+             in
+             let sum = task_checksum subtask in
+             let subtask_db = Db.add_subgoal db_transf subgoal_name sum in
+             let goal =
+               Helpers.add_goal_row (Model.Transf tr) subgoal_name subtask subtask_db
+             in
+             (goal :: acc, count+1))
+          ([],1) subgoals
+        in
+        tr.Model.subgoals <- List.rev goals;
+        g.Model.transformations <- tr :: g.Model.transformations
     in
     Scheduler.apply_transformation_l ~callback
       split_transformation g.Model.task

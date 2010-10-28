@@ -704,15 +704,15 @@ module Goal = struct
       Util.Mstr.empty
 
   let of_transf db tr =
-    let sql="SELECT goal_id,goal_name FROM goals \
+    let sql="SELECT goal_id,task_checksum FROM goals \
        WHERE goals.goal_transf=?"
     in
     let stmt = bind db sql [Sqlite3.Data.INT tr] in
     step_fold_gen db stmt 
       (fun stmt acc ->
          let g = stmt_column_INT stmt 0 "Goal.of_transf" in
-         let n = stmt_column_string stmt 1 "Goal.of_transf" in
-         Util.Mstr.add n g acc)
+         let sum = stmt_column_string stmt 1 "Goal.of_transf" in
+         Util.Mstr.add sum g acc)
       Util.Mstr.empty
 
 end
