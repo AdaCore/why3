@@ -249,16 +249,6 @@ let edited_as _p = assert false (* p.edited_as *)
 type transf = int64
 and goal = int64
 
-(** goal accessors *)
-
-let transformations _g = assert false
-
-(** transf accessors *)
-
-(*
-let transf_id t = t.transf_id
-let subgoals t = t.subgoals
-*)
 
 
 type theory = int64
@@ -457,21 +447,19 @@ module TransfId = struct
 
 end
 
-(*
-let prover_memo = Hashtbl.create 7
+let transf_memo = Hashtbl.create 7
 
-let prover_from_id id =
+let transf_from_id id =
   try
-    Hashtbl.find prover_memo id
+    Hashtbl.find transf_memo id
   with Not_found ->
-    let p =
+    let t =
       let db = current () in
       try TransfId.from_id db id
       with Not_found -> assert false
     in
-    Hashtbl.add prover_memo id p;
-    p
-*)
+    Hashtbl.add transf_memo id t;
+    t
 
 let transf_from_name n =
   let db = current () in
@@ -774,9 +762,24 @@ module Transf = struct
 	 db_must_done db (fun () -> Sqlite3.step stmt);
 	 Sqlite3.last_insert_rowid db.raw_db)
 
+  let of_goal db g =
+    let sql="SELECT transf_id,transf_id_id FROM transformations \
+       WHERE transformations.parent_goal=?"
+    in
+    let stmt = bind db sql [Sqlite3.Data.INT g] in
+    let res = Htransf.create 7 in
+    let of_stmt stmt =
+      let t = stmt_column_INT stmt 0 "Transf.of_goal" in
+      let tid = stmt_column_INT stmt 1 "Transf.of_goal" in
+      Htransf.add res (transf_from_id tid) t
+    in
+    step_iter db stmt of_stmt;
+    res
+
+
 end
 
-
+let transformations g = Transf.of_goal (current()) g
 
 module Theory = struct
 

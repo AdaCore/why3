@@ -440,7 +440,6 @@ module Helpers = struct
     set_proof_status ~obsolete a status time;
     a
 
-
   let add_goal_row parent name t db_goal =
     let parent_row = match parent with
       | Theory mth -> mth.theory_row 
@@ -460,14 +459,17 @@ module Helpers = struct
     goals_model#set ~row ~column:icon_column !image_file;
     goals_model#set ~row ~column:index_column (Row_goal goal);
     goals_model#set ~row ~column:visible_column true;
+(*
     begin match parent with
       | Theory mth -> mth.goals <- goal :: mth.goals
       | Transf mtr -> mtr.subgoals <- goal :: mtr.subgoals
     end;
+*)
     goal
 
 
-  let add_transformation_row parent g subgoals =
+  let add_transformation_row g subgoals =
+    let parent = g.Model.goal_row in
     let row = goals_model#append ~parent () in
     let goal_name = goals_model#get ~row:parent ~column:Model.name_column in
     goals_model#set ~row ~column:Model.visible_column
@@ -501,7 +503,6 @@ module Helpers = struct
          in
          let sum = task_checksum subtask in
          let subtask_db = Db.add_subgoal db_transf subgoal_name sum in
-         (* TODO: call add_goal_row *)
          let goal =
            add_goal_row (Model.Transf tr) subgoal_name subtask subtask_db
          in
@@ -546,8 +547,9 @@ module Helpers = struct
            let goal = add_goal_row (Theory mth) name t db_goal in
            goal :: acc)
         []
-        (List.rev tasks)
+        tasks
     in
+    mth.goals <- List.rev goals;
     if goals = [] then set_theory_proved ~propagate:false mth;
     mth
 
@@ -597,6 +599,11 @@ end
 (*********************************)
 
 
+let split_transformation = Trans.lookup_transform_l "split_goal" gconfig.env
+let intro_transformation = Trans.lookup_transform "introduce_premises" gconfig.env
+
+
+
 let rec reimport_any_goal parent gname t db_goal goal_obsolete =
   let goal = Helpers.add_goal_row parent gname t db_goal in
   let proved = ref false in
@@ -624,31 +631,21 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
        ((* something TODO ?*))
     )
     external_proofs;
-(*
   let transformations = Db.transformations db_goal in
   Db.Htransf.iter
-    (fun tr_id tr ->
-       let tr = Db.trans_name tr_id in
-       assert (tr = "split_goal"); (* TODO *)
-       let s,t,o = Db.status_and_time a in
-       if goal_obsolete && not o then Db.set_obsolete a;
-       let obsolete = goal_obsolete or o in
-       let s = match s with
-         | Db.Undone -> Scheduler.HighFailure
-         | Db.Success -> 
-             if not obsolete then proved := true; 
-             Scheduler.Success
-         | Db.Unknown -> Scheduler.Unknown
-         | Db.Timeout -> Scheduler.Timeout
-         | Db.Failure -> Scheduler.HighFailure
-       in
-       let (_pa : Model.proof_attempt) =
-         Helpers.add_external_proof_row ~obsolete goal p a s t
-       in
-       ((* something TODO ?*))
-    )
-    transformations;
+    (fun tr_id _tr ->
+       let trname = Db.transf_name tr_id in
+       assert (trname = "split_goal"); (* TODO *)
+       let subgoals = Trans.apply split_transformation t in
+       Helpers.add_transformation_row goal subgoals
+(*
+       let _db_subgoals = Db.subgoals tr in
+       List.iter
+         (fun t ->
+            
 *)
+         )
+    transformations;
   if !proved then Helpers.set_proved ~propagate:false goal;
   !proved
 
@@ -837,15 +834,11 @@ let prover_on_selected_goals pr =
 (* method: split selected goals *)
 (*****************************************************)
 
-let split_transformation = Trans.lookup_transform_l "split_goal" gconfig.env
-let intro_transformation = Trans.lookup_transform "introduce_premises" gconfig.env
-
 let split_goal g =
   if not g.Model.proved then
-    let row = g.Model.goal_row in
     let callback subgoals =
       if List.length subgoals >= 2 then
-        Helpers.add_transformation_row row g subgoals
+        Helpers.add_transformation_row g subgoals
     in
     Scheduler.apply_transformation_l ~callback
       split_transformation g.Model.task
