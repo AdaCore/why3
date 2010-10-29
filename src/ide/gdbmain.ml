@@ -17,9 +17,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let () = ignore (GtkMain.Main.init ())
-
 open Format
+
+let () = 
+  eprintf "Init the GTK interface...@?";
+  ignore (GtkMain.Main.init ());
+  eprintf " done.@."
+
+
 open Why
 open Whyconf
 open Gconfig
@@ -156,7 +161,8 @@ module Model = struct
     | Transf of transf
 
   and goal =
-      { parent : goal_parent;
+      { goal_name : string;
+	parent : goal_parent;
         task: Task.task;
         goal_row : Gtk.tree_iter;
         goal_db : Db.goal;
@@ -446,7 +452,8 @@ module Helpers = struct
       | Transf mtr -> mtr.transf_row
     in
     let row = goals_model#append ~parent:parent_row () in
-    let goal = { parent = parent;
+    let goal = { goal_name = name;
+		 parent = parent;
                  task = t ;
                  goal_row = row;
                  goal_db = db_goal;
@@ -537,10 +544,10 @@ module Helpers = struct
       mfile
 
   let add_file f =
-    try
+    try 
+      let theories = read_file f in
       let dbfile = Db.add_file f in
       let mfile = add_file_row f dbfile in
-      let theories = read_file f in
       let mths =
         List.fold_left
           (fun acc (_,thname,t) ->
@@ -552,12 +559,13 @@ module Helpers = struct
       in
       mfile.theories <- List.rev mths;
       if theories = [] then set_file_verified mfile
-    with e ->
-      fprintf str_formatter
-        "@[Error while reading file@ '%s':@ %a@]" f
-        Exn_printer.exn_printer e;
-      let msg = flush_str_formatter () in
-      info_window `ERROR msg
+   with e ->
+	fprintf str_formatter
+          "@[Error while reading file@ '%s':@ %a@]" f
+          Exn_printer.exn_printer e;
+	let msg = flush_str_formatter () in
+	info_window `ERROR msg
+	
 
 end
 
@@ -607,19 +615,18 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
        let subgoals = Trans.apply split_transformation t in
        let mtr = Helpers.add_transformation_row goal tr in
        let db_subgoals = Db.subgoals tr in
-       let goal_name = "db" in
        let goals,_,subgoals_proved =
          List.fold_left
            (fun (acc,count,proved) subtask ->
               let _id = (Task.task_goal subtask).Decl.pr_name in
-              let subgoal_name =
-                goal_name ^ "." ^ (string_of_int count)
-              in
+              let subgoal_name = gname ^ "." ^ (string_of_int count) in
               let sum = task_checksum subtask in
               let subtask_db =
                 try Util.Mstr.find sum db_subgoals
-                with Not_found -> assert false (* TODO: new subgoal *)
-                  (* Db.add_subgoal db_transf subgoal_name sum *)
+		  (* a subgoal has the same check sum *)
+                with Not_found -> 
+		  (* otherwise, create a new one *)
+                  Db.add_subgoal tr subgoal_name sum
               in
               let subgoal,subgoal_proved =
                 reimport_any_goal
@@ -671,52 +678,43 @@ let () =
     (fun (f,fn) ->
        eprintf "Reimporting file '%s'@." fn;
        let mfile = Helpers.add_file_row fn f in
-       let theories = Env.read_file gconfig.env fn in
-       let theories =
-         Theory.Mnm.fold
-           (fun name th acc ->
-              match th.Theory.th_name.Ident.id_origin with
-                | Ident.User l -> (Loc.extract l,name,th)::acc
-                | _ -> (Loc.dummy_floc,name,th)::acc)
-           theories []
-       in
-       let theories = List.sort
-         (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
-         theories
-       in
-       let ths = Db.theories f in
-       let file_proved = ref true in
-       List.iter
-         (fun (_,tname,th) ->
-            eprintf "Reimporting theory '%s'@."tname;
-            let db_th =
-              try
-                Util.Mstr.find tname ths
-              with Not_found ->
-                assert false (* TODO *)
-                  (* la theorie n'existe pas encore dans la db *)
-            in
-            let mth = Helpers.add_theory_row mfile th db_th in
-            let goals = Db.goals db_th in
-            let tasks = List.rev (Task.split_theory th None None) in
-            let goals,proved = List.fold_left
-              (fun (acc,proved) t ->
-                 let (g,p) = reimport_root_goal mth tname goals t in
-                 (g::acc,proved && p))
-              ([],true) tasks
-            in
-            mth.Model.goals <- List.rev goals;
-            (* TODO: what to do with remaining tasks in Db ???
-               for the moment they remain in the db, but they are not shown
-            *)
-            if proved then Helpers.set_theory_proved ~propagate:false mth
-            else file_proved := false
-            )
-         theories;
-       (* TODO: detecter d'eventuelles vieilles theories, qui seraient donc
-          dans [ths] mais pas dans [theories]
-       *)
-       if !file_proved then Helpers.set_file_verified mfile
+       try
+	 let theories = read_file fn in
+	 let ths = Db.theories f in
+	 let file_proved = ref true in
+	 List.iter
+           (fun (_,tname,th) ->
+              eprintf "Reimporting theory '%s'@."tname;
+              let db_th =
+		try
+                  Util.Mstr.find tname ths
+		with Not_found -> Db.add_theory f tname 
+              in
+              let mth = Helpers.add_theory_row mfile th db_th in
+              let goals = Db.goals db_th in
+              let tasks = List.rev (Task.split_theory th None None) in
+              let goals,proved = List.fold_left
+		(fun (acc,proved) t ->
+                   let (g,p) = reimport_root_goal mth tname goals t in
+                   (g::acc,proved && p))
+		([],true) tasks
+              in
+              mth.Model.goals <- List.rev goals;
+              (* TODO: what to do with remaining tasks in Db ???
+		 for the moment they remain in the db, but they are not shown
+              *)
+              if proved then Helpers.set_theory_proved ~propagate:false mth
+              else file_proved := false
+           )
+           theories;
+	 (* TODO: detecter d'eventuelles vieilles theories, qui seraient donc
+            dans [ths] mais pas dans [theories]
+	 *)
+	 if !file_proved then Helpers.set_file_verified mfile
+      with e ->
+	eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
+          Exn_printer.exn_printer e;
+	exit 1
     )
     files
 
@@ -834,9 +832,7 @@ let split_goal g =
           Db.add_transformation g.Model.goal_db transf_id_split
         in
         let tr = Helpers.add_transformation_row g db_transf (* subgoals *) in
-        let goal_name = "SFSDF"
-          (*goals_model#get ~row:parent ~column:Model.name_column*)
-        in
+        let goal_name = g.Model.goal_name in
         let goals,_ = List.fold_left
           (fun (acc,count) subtask ->
              let _id = (Task.task_goal subtask).Decl.pr_name in
@@ -896,6 +892,8 @@ let split_selected_goals () =
 (* method: split all unproved goals *)
 (*****************************************************)
 
+(*
+
 let split_unproved_goals () =
   let transf_id_split = Db.transf_from_name "split_goal" in
   List.iter
@@ -942,14 +940,16 @@ let split_unproved_goals () =
                        let sum = task_checksum subtask in
                        let subtask_db = Db.add_subgoal db_transf subgoal_name sum in
                        (* TODO: call add_goal_row *)
-                       let goal = { Model.parent = Model.Transf tr;
-                                    Model.task = subtask ;
-                                    Model.goal_row = subtask_row;
-                                    Model.goal_db = subtask_db;
-                                    Model.external_proofs = Hashtbl.create 7;
-                                    Model.transformations = [];
-                                    Model.proved = false;
-                                  }
+                       let goal = { 
+			 Model.goal_name = subgoal_name;
+			 Model.parent = Model.Transf tr;
+                         Model.task = subtask ;
+                         Model.goal_row = subtask_row;
+                         Model.goal_db = subtask_db;
+                         Model.external_proofs = Hashtbl.create 7;
+                         Model.transformations = [];
+                         Model.proved = false;
+                       }
                        in
                        goals_model#set ~row:subtask_row
                          ~column:Model.index_column (Model.Row_goal goal);
@@ -972,6 +972,7 @@ let split_unproved_goals () =
          th.Model.goals
     )
     [] (* !Model.all *)
+*)
 
 
 (*********************************)

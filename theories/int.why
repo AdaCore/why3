@@ -167,6 +167,11 @@ theory Divisibility
 
   logic divides (a b : int) = exists q : int. b = q * a
 
+  lemma Divides_x_zero: forall x:int. divides x 0 
+
+  lemma Divides_one_x: forall x:int. divides 1 x 
+
+  (* todo: divides x y <-> if y=0 then true else x mod y = 0 *)
 end
 
 theory Gcd
@@ -184,6 +189,18 @@ theory Gcd
   lemma Gcd_0 : forall a : int. gcd a 0 a
 
   lemma Gcd_euclid : forall a b q g : int. gcd a (b - q * a) g -> gcd a b g
+
+  use ComputerDivision
+
+  lemma Gcd_computer_mod : 
+    forall a b g : int [gcd a (ComputerDivision.mod a b) g]. 
+      b <> 0 -> gcd a (ComputerDivision.mod a b) g -> gcd a b g
+
+  use EuclideanDivision
+
+  lemma Gcd_euclidean_mod : 
+    forall a b g : int [gcd a (EuclideanDivision.mod a b) g]. 
+      b <> 0 -> gcd a (EuclideanDivision.mod a b) g -> gcd a b g
 
 end
 
