@@ -263,8 +263,11 @@ module Model = struct
     let model_filter = GTree.model_filter model in
     model_filter#set_visible_column visible_column;
     let view = GTree.view ~model:model_filter ~packing () in
-    let _ = view#selection#set_mode `SINGLE in
-    let _ = view#set_rules_hint true in
+(*
+    let () = view#selection#set_mode `SINGLE in
+*)
+    let () = view#selection#set_mode `MULTIPLE in
+    let () = view#set_rules_hint true in
     ignore (view#append_column view_name_column);
     ignore (view#append_column view_status_column);
     ignore (view#append_column view_time_column);
@@ -1441,7 +1444,9 @@ let edit_current_proof () =
   match goals_view#selection#get_selected_rows with
     | [] -> ()
     | [r] -> edit_selected_row r
-    | _ -> assert false (* multi-selection is disabled *)
+    | _ ->
+	info_window `INFO "Please select exactly one proof to edit"
+
 
 let add_item_edit () =
   ignore (tools_factory#add_image_item
