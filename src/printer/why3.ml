@@ -292,54 +292,60 @@ let print_constr ty fmt cs =
   fprintf fmt "@[<hov 4>| %a%a@]" print_cs cs
     (print_list nothing print_ty_arg) tl
 
-let print_type_decl fmt (ts,def) = match def with
+let print_type_decl fst fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
       | None ->
-          fprintf fmt "@[<hov 2>type %a%a@]@\n@\n" print_ts ts
+          fprintf fmt "@[<hov 2>%s %a%a@]@\n@\n"
+            (if fst then "type" else "with") print_ts ts
             (print_list nothing print_tv_arg) ts.ts_args
       | Some ty ->
-          fprintf fmt "@[<hov 2>type %a%a =@ %a@]@\n@\n" print_ts ts
+          fprintf fmt "@[<hov 2>%s %a%a =@ %a@]@\n@\n"
+            (if fst then "type" else "with") print_ts ts
             (print_list nothing print_tv_arg) ts.ts_args print_ty ty
       end
   | Talgebraic csl ->
       let ty = ty_app ts (List.map ty_var ts.ts_args) in
-      fprintf fmt "@[<hov 2>type %a%a =@\n@[<hov>%a@]@]@\n@\n"
-        print_ts ts (print_list nothing print_tv_arg) ts.ts_args
+      fprintf fmt "@[<hov 2>%s %a%a =@\n@[<hov>%a@]@]@\n@\n"
+        (if fst then "type" else "with") print_ts ts
+        (print_list nothing print_tv_arg) ts.ts_args
         (print_list newline (print_constr ty)) csl
 
-let print_type_decl fmt d =
+let print_type_decl first fmt d =
   if not (query_remove (fst d).ts_name) then
-    (print_type_decl fmt d; forget_tvs ())
+    (print_type_decl first fmt d; forget_tvs ())
 
 let print_ls_type fmt = fprintf fmt " :@ %a" print_ty
 
-let print_logic_decl fmt (ls,ld) = match ld with
+let print_logic_decl fst fmt (ls,ld) = match ld with
   | Some ld ->
       let vl,e = open_ls_defn ld in
-      fprintf fmt "@[<hov 2>logic %a%a%a =@ %a@]@\n@\n"
-        print_ls ls (print_list nothing print_vs_arg) vl
+      fprintf fmt "@[<hov 2>%s %a%a%a =@ %a@]@\n@\n"
+        (if fst then "logic" else "with") print_ls ls
+        (print_list nothing print_vs_arg) vl
         (print_option print_ls_type) ls.ls_value print_expr e;
       List.iter forget_var vl
   | None ->
-      fprintf fmt "@[<hov 2>logic %a%a%a@]@\n@\n"
-        print_ls ls (print_list nothing print_ty_arg) ls.ls_args
+      fprintf fmt "@[<hov 2>%s %a%a%a@]@\n@\n"
+        (if fst then "logic" else "with") print_ls ls
+        (print_list nothing print_ty_arg) ls.ls_args
         (print_option print_ls_type) ls.ls_value
 
-let print_logic_decl fmt d =
+let print_logic_decl first fmt d =
   if not (query_remove (fst d).ls_name) then
-    (print_logic_decl fmt d; forget_tvs ())
+    (print_logic_decl first fmt d; forget_tvs ())
 
 let print_ind fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr print_fmla f
 
-let print_ind_decl fmt (ps,bl) =
-  fprintf fmt "@[<hov 2>inductive %a%a =@ @[<hov>%a@]@]@\n@\n"
-    print_ls ps (print_list nothing print_ty_arg) ps.ls_args
+let print_ind_decl fst fmt (ps,bl) =
+  fprintf fmt "@[<hov 2>%s %a%a =@ @[<hov>%a@]@]@\n@\n"
+    (if fst then "inductive" else "with") print_ls ps
+    (print_list nothing print_ty_arg) ps.ls_args
     (print_list newline print_ind) bl
 
-let print_ind_decl fmt d =
+let print_ind_decl first fmt d =
   if not (query_remove (fst d).ls_name) then
-    (print_ind_decl fmt d; forget_tvs ())
+    (print_ind_decl first fmt d; forget_tvs ())
 
 let print_pkind = Pretty.print_pkind
 
@@ -351,10 +357,16 @@ let print_prop_decl fmt (k,pr,f) = match k with
   | Paxiom when query_remove pr.pr_name -> ()
   | _ -> print_prop_decl fmt (k,pr,f); forget_tvs ()
 
+let print_list_next sep print fmt = function
+  | [] -> ()
+  | [x] -> print true fmt x
+  | x :: r -> print true fmt x; sep fmt ();
+      print_list sep (print false) fmt r
+
 let print_decl fmt d = match d.d_node with
-  | Dtype tl  -> print_list nothing print_type_decl fmt tl
-  | Dlogic ll -> print_list nothing print_logic_decl fmt ll
-  | Dind il   -> print_list nothing print_ind_decl fmt il
+  | Dtype tl  -> print_list_next nothing print_type_decl fmt tl
+  | Dlogic ll -> print_list_next nothing print_logic_decl fmt ll
+  | Dind il   -> print_list_next nothing print_ind_decl fmt il
   | Dprop p   -> print_prop_decl fmt p
 
 let print_inst_ts fmt (ts1,ts2) =

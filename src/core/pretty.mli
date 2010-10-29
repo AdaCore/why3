@@ -56,7 +56,11 @@ val print_meta_arg_type : formatter -> meta_arg_type -> unit
 val print_type_decl : formatter -> ty_decl -> unit
 val print_logic_decl : formatter -> logic_decl -> unit
 val print_ind_decl : formatter -> ind_decl -> unit
+val print_next_type_decl : formatter -> ty_decl -> unit
+val print_next_logic_decl : formatter -> logic_decl -> unit
+val print_next_ind_decl : formatter -> ind_decl -> unit
 val print_prop_decl : formatter -> prop_decl -> unit
+
 val print_decl : formatter -> decl -> unit
 val print_tdecl : formatter -> tdecl -> unit
 
