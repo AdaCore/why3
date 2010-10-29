@@ -249,15 +249,15 @@ and print_fnode opl opr info fmt f = match f.f_node with
       List.iter forget_var vl
   | Fquant (Fexists,fq) ->
       let vl,_tl,f = f_open_quant fq in
-      let rec aux vl =
+      let rec aux fmt vl =
         match vl with
           | [] -> print_fmla info fmt f
           | v::vr ->
-              fprintf fmt (protect_on opr "exists %a,@ ") 
-                (print_vsty_nopar info) v;
-              aux vr
+              fprintf fmt (protect_on opr "exists %a,@ %a") 
+                (print_vsty_nopar info) v
+                aux vr
       in
-      aux vl;
+      aux fmt vl;
       List.iter forget_var vl
   | Ftrue ->
       fprintf fmt "True"
