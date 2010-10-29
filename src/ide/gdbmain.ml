@@ -1112,6 +1112,7 @@ let hide_proved_in_theory th =
     List.iter hide_proved_in_goal th.Model.goals
 
 let hide_proved_in_file f =
+  eprintf "hiding proved goals in file %s@." f.Model.file_name;
   if f.Model.file_verified then
     begin
       let row = f.Model.file_row in
