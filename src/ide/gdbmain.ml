@@ -502,7 +502,6 @@ module Helpers = struct
     goals_model#set ~row ~column:icon_column !image_directory;
     goals_model#set ~row ~column:index_column (Row_theory mth);
     goals_model#set ~row ~column:visible_column true;
-    mfile.theories <- mth :: mfile.theories;
     mth
 
 
@@ -681,36 +680,37 @@ let () =
        try
 	 let theories = read_file fn in
 	 let ths = Db.theories f in
-	 let file_proved = ref true in
-	 List.iter
-           (fun (_,tname,th) ->
-              eprintf "Reimporting theory '%s'@."tname;
-              let db_th =
-		try
-                  Util.Mstr.find tname ths
-		with Not_found -> Db.add_theory f tname 
-              in
-              let mth = Helpers.add_theory_row mfile th db_th in
-              let goals = Db.goals db_th in
-              let tasks = List.rev (Task.split_theory th None None) in
-              let goals,proved = List.fold_left
-		(fun (acc,proved) t ->
-                   let (g,p) = reimport_root_goal mth tname goals t in
-                   (g::acc,proved && p))
-		([],true) tasks
-              in
-              mth.Model.goals <- List.rev goals;
-              (* TODO: what to do with remaining tasks in Db ???
-		 for the moment they remain in the db, but they are not shown
-              *)
-              if proved then Helpers.set_theory_proved ~propagate:false mth
-              else file_proved := false
-           )
-           theories;
+	 let (mths,file_proved) =
+	   List.fold_left
+             (fun (acc,file_proved) (_,tname,th) ->
+		eprintf "Reimporting theory '%s'@."tname;
+		let db_th =
+		  try
+                    Util.Mstr.find tname ths
+		  with Not_found -> Db.add_theory f tname 
+		in
+		let mth = Helpers.add_theory_row mfile th db_th in
+		let goals = Db.goals db_th in
+		let tasks = List.rev (Task.split_theory th None None) in
+		let goals,proved = List.fold_left
+		  (fun (acc,proved) t ->
+                     let (g,p) = reimport_root_goal mth tname goals t in
+                     (g::acc,proved && p))
+		  ([],true) tasks
+		in
+		mth.Model.goals <- List.rev goals;
+		(* TODO: what to do with remaining tasks in Db ???
+		   for the moment they remain in the db, but they are not shown
+		*)
+		if proved then Helpers.set_theory_proved ~propagate:false mth;
+		(mth::acc,file_proved && proved))
+             ([],true) theories
+	 in
 	 (* TODO: detecter d'eventuelles vieilles theories, qui seraient donc
             dans [ths] mais pas dans [theories]
 	 *)
-	 if !file_proved then Helpers.set_file_verified mfile
+	 mfile.Model.theories <- List.rev mths;
+	 if file_proved then Helpers.set_file_verified mfile
       with e ->
 	eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
           Exn_printer.exn_printer e;
@@ -1075,7 +1075,7 @@ let collapse_verified_file f =
   if f.Model.file_verified then
     begin
       let row = f.Model.file_row in
-      goals_view#collapse_row (filter_model#get_path row);
+      goals_view#collapse_row (goals_model#get_path row);
     end
   else
     List.iter collapse_verified_theory f.Model.theories
@@ -1093,7 +1093,7 @@ let rec hide_proved_in_goal g =
   if g.Model.proved then
     begin
       let row = g.Model.goal_row in
-      goals_view#collapse_row (filter_model#get_path row);
+      goals_view#collapse_row (goals_model#get_path row);
       goals_model#set ~row ~column:Model.visible_column false
     end
   else
@@ -1105,7 +1105,7 @@ let hide_proved_in_theory th =
   if th.Model.verified then
     begin
       let row = th.Model.theory_row in
-      goals_view#collapse_row (filter_model#get_path row);
+      goals_view#collapse_row (goals_model#get_path row);
       goals_model#set ~row ~column:Model.visible_column false
     end
   else
@@ -1115,7 +1115,7 @@ let hide_proved_in_file f =
   if f.Model.file_verified then
     begin
       let row = f.Model.file_row in
-      goals_view#collapse_row (filter_model#get_path row);
+      goals_view#collapse_row (goals_model#get_path row);
       goals_model#set ~row ~column:Model.visible_column false
     end
   else
@@ -1128,9 +1128,9 @@ let rec show_all_in_goal g =
   let row = g.Model.goal_row in
   goals_model#set ~row ~column:Model.visible_column true;
   if g.Model.proved then
-    goals_view#collapse_row (filter_model#get_path row)
+    goals_view#collapse_row (goals_model#get_path row)
   else
-    goals_view#expand_row (filter_model#get_path row);
+    goals_view#expand_row (goals_model#get_path row);
   List.iter
     (fun t -> List.iter show_all_in_goal t.Model.subgoals)
     g.Model.transformations
@@ -1139,10 +1139,10 @@ let show_all_in_theory th =
   let row = th.Model.theory_row in
   goals_model#set ~row ~column:Model.visible_column true;
   if th.Model.verified then
-    goals_view#collapse_row (filter_model#get_path row)
+    goals_view#collapse_row (goals_model#get_path row)
   else
     begin
-      goals_view#expand_row (filter_model#get_path row);
+      goals_view#expand_row (goals_model#get_path row);
       List.iter show_all_in_goal th.Model.goals
     end
 
@@ -1150,10 +1150,10 @@ let show_all_in_file f =
   let row = f.Model.file_row in
   goals_model#set ~row ~column:Model.visible_column true;
   if f.Model.file_verified then
-    goals_view#collapse_row (filter_model#get_path row)
+    goals_view#collapse_row (goals_model#get_path row)
   else
     begin
-      goals_view#expand_row (filter_model#get_path row);
+      goals_view#expand_row (goals_model#get_path row);
       List.iter show_all_in_theory f.Model.theories
     end
 
