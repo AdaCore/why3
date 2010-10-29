@@ -828,7 +828,10 @@ let redo_external_proof g a =
   in
   callback Scheduler.Scheduled 0.0 "";
   let old = if a.Model.edited_as = "" then None else
-    (Some (open_in a.Model.edited_as))
+    begin
+      eprintf "Info: proving using edited file %s@." a.Model.edited_as;
+      (Some (open_in a.Model.edited_as))
+    end
   in
   Scheduler.schedule_proof_attempt
     ~debug:(gconfig.verbose > 0) ~timelimit:gconfig.time_limit ~memlimit:0
@@ -849,17 +852,6 @@ let rec prover_on_goal p g =
   List.iter
     (fun t -> List.iter (prover_on_goal p) t.Model.subgoals)
     g.Model.transformations
-
-(*
-let prover_on_unproved_goals p =
-  List.iter
-    (fun th ->
-       List.iter
-         (fun g -> if not g.Model.proved then prover_on_goal p g)
-         th.Model.goals;
-    )
-    !Model.all
-*)
 
 let rec prover_on_goal_or_children p g =
   if not g.Model.proved then
