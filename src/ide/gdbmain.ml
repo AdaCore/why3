@@ -17,6 +17,46 @@
 (*                                                                        *)
 (**************************************************************************)
 
+
+(* TODO:
+
+* When DB contains an edited proof, use the file for the run
+
+* when proof attempt is finished and is it the one currently selected,
+the new output should be displayed on upper-right window
+
+* when returning from edited proofs: should we run the prover again immediately ?
+
+* bug trouve par Johannes:
+
+Pour reproduire le bug :
+
+1) Partir d'un répértoire sans fichier de projet
+2) Lancer why3db, ajouter un fichier
+3) Prouver quelques buts (pas tous)
+4) Choisir "Hide Proved Goals"
+5) Prouver le reste des buts, la fênetre devient vide
+6) Décocher "Hide Proved Goals"
+
+Maintenant, le fichier réapparait dans la liste, mais on ne peut pas le
+déplier, donc accéder au sous-buts, stats des appels de prouvers etc ...
+
+Ce n'est pas un bug très grave, parce qu'il suffit de quitter l'ide,
+puis le relancer, et là on peut de nouveau déplier le fichier.
+
+* Francois :
+
+   - Les temps indiqués sont très bizarre, mais cela doit-être un bug
+   plus profond, au niveau de l'appel des prouveurs (wall time au lieu
+   de cpu time?)
+
+   - Si on modifie le fichier à droite, les buts ne sont pas marqués
+   obsolètes ou ajouté à gauche.
+
+*)
+
+
+
 open Format
 
 let () = 
@@ -35,16 +75,23 @@ open Gconfig
 (************************)
 
 let includes = ref []
+let file = ref None
 
 let spec = Arg.align [
-  "-I", Arg.String (fun s -> includes := s :: !includes), "<s> add s to loadpath" ;
+  ("-I",
+   Arg.String (fun s -> includes := s :: !includes),
+   "<s> add s to loadpath") ;
+(*
+  ("-f",
+   Arg.String (fun s -> input_files := s :: !input_files),
+   "<f> add file f to the project (ignored if it is already there)") ;
+*)
 ]
 
-let usage_str = "whydb [options] <project name>"
-let file = ref None
+let usage_str = "whydb [options] [<file.why>|<project directory>]"
 let set_file f = match !file with
   | Some _ ->
-      raise (Arg.Bad "only one file")
+      raise (Arg.Bad "only one parameter")
   | None ->
       file := Some f
 
@@ -98,25 +145,42 @@ let gconfig =
 (* opening database *)
 (********************)
 
-let () =
+let project_dir, file_to_read =
   if Sys.file_exists fname then
     begin
-      if not (Sys.is_directory fname) then
+      if Sys.is_directory fname then
         begin
-          eprintf "'%s' is not a directory@." fname;
-          exit 1
+          eprintf "Info: found directory '%s' for the project@." fname;
+          fname, None
+        end
+      else
+        begin
+          eprintf "Info: found regular file '%s'@." fname;
+          let d = 
+            try Filename.chop_extension fname
+            with Invalid_argument _ -> fname
+          in
+          eprintf "Info: using '%s' as directory for the project@." d;
+          d, Some fname
         end
     end
   else
+    fname, None
+
+let () =
+  if not (Sys.file_exists project_dir) then
     begin
-      Format.eprintf "creating new directory '%s' for the project@." fname;
-      Unix.mkdir fname 0o777
-    end;
-  let dbfname = Filename.concat fname "project.db" in
+      eprintf "Info: '%s' does not exists. Creating directory of that name for the project@." fname;
+      Unix.mkdir project_dir 0o777
+    end
+
+let () =
+  let dbfname = Filename.concat project_dir "project.db" in
   try
     Db.init_base dbfname
   with e ->
-    Format.eprintf "Error while opening database '%s'@." dbfname;
+    eprintf "Error while opening database '%s'@." dbfname;
+    eprintf "Aborting...@.";
     raise e
 
 
@@ -546,28 +610,20 @@ module Helpers = struct
       mfile
 
   let add_file f =
-    try 
-      let theories = read_file f in
-      let dbfile = Db.add_file f in
-      let mfile = add_file_row f dbfile in
-      let mths =
-        List.fold_left
-          (fun acc (_,thname,t) ->
-             eprintf "Adding theory '%s'@." thname;
-             let mth = add_theory mfile t in
-             mth :: acc
-          )
-          [] theories
-      in
-      mfile.theories <- List.rev mths;
-      if theories = [] then set_file_verified mfile
-   with e ->
-	fprintf str_formatter
-          "@[Error while reading file@ '%s':@ %a@]" f
-          Exn_printer.exn_printer e;
-	let msg = flush_str_formatter () in
-	info_window `ERROR msg
-	
+    let theories = read_file f in
+    let dbfile = Db.add_file f in
+    let mfile = add_file_row f dbfile in
+    let mths =
+      List.fold_left
+        (fun acc (_,thname,t) ->
+           eprintf "Adding theory '%s'@." thname;
+           let mth = add_theory mfile t in
+           mth :: acc
+        )
+        [] theories
+    in
+    mfile.theories <- List.rev mths;
+    if theories = [] then set_file_verified mfile
 
 end
 
@@ -674,8 +730,9 @@ let reimport_root_goal mth tname goals t : Model.goal * bool =
   reimport_any_goal (Model.Theory mth) gname t db_goal goal_obsolete
 
 (* reimports all files *)
+let files_in_db = Db.files ()
+
 let () =
-  let files = Db.files () in
   List.iter
     (fun (f,fn) ->
        eprintf "Reimporting file '%s'@." fn;
@@ -719,7 +776,25 @@ let () =
           Exn_printer.exn_printer e;
 	exit 1
     )
-    files
+    files_in_db
+
+(**********************************)
+(* add new file from command line *)
+(**********************************)
+
+let () =
+  match file_to_read with
+    | None -> ()
+    | Some fn ->
+        if List.exists (fun (_,f) -> f = fn) files_in_db then 
+          eprintf "Info: file %s already in database@." fn
+        else
+          try
+            Helpers.add_file fn
+          with e -> 
+	    eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
+              Exn_printer.exn_printer e;
+	    exit 1
 
 
 (**********************)
@@ -1009,7 +1084,14 @@ let select_file () =
           | None -> ()
           | Some f ->
               eprintf "Adding file '%s'@." f;
-              Helpers.add_file f
+              try
+                Helpers.add_file f
+              with e ->
+	        fprintf str_formatter
+                  "@[Error while reading file@ '%s':@ %a@]" f
+                  Exn_printer.exn_printer e;
+	        let msg = flush_str_formatter () in
+	        info_window `ERROR msg
       end
   | `DELETE_EVENT | `CANCEL -> ()
   end ;
@@ -1407,6 +1489,19 @@ let select_row p =
 (* method: edit current goal *)
 (*****************************)
 
+
+let ft_of_th th =
+  (Filename.basename th.Model.theory_parent.Model.file_name, 
+   th.Model.theory.Theory.th_name.Ident.id_string)
+
+let rec ft_of_goal g =
+  match g.Model.parent with
+    | Model.Transf tr -> ft_of_goal tr.Model.parent_goal
+    | Model.Theory th -> ft_of_th th
+
+let ft_of_pa a =
+  ft_of_goal a.Model.proof_goal
+
 let edit_selected_row p =
   let row = filter_model#get_iter p in
   match filter_model#get ~row ~column:Model.index_column with
@@ -1420,7 +1515,10 @@ let edit_selected_row p =
         let g = a.Model.proof_goal in
         let t = g.Model.task in
         let driver = a.Model.prover.driver in
-        let file = Driver.file_of_task driver fname "" t in
+        let (fn,tn) = ft_of_pa a in
+        let file = Driver.file_of_task driver 
+          (Filename.concat project_dir fn) tn t 
+        in
         a.Model.edited_as <- file;
         let old_status = a.Model.status in
         Helpers.set_proof_status ~obsolete:false a Scheduler.Running 0.0;

@@ -840,15 +840,7 @@ module Main = struct
     let sql = "CREATE TABLE IF NOT EXISTS files \
           (file_id INTEGER PRIMARY KEY AUTOINCREMENT,file_name TEXT);"
     in
-    db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql);
-(*
-    let sql =
-      "CREATE UNIQUE INDEX IF NOT EXISTS file_idx \
-       ON files (file_id)"
-    in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
-*)
-    ()
 
   let all_files db =
     let sql="SELECT file_id,file_name FROM files" in
