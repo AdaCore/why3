@@ -1089,62 +1089,83 @@ let (_ : GMenu.image_menu_item) =
     ~callback:collapse_all_verified_things
     ()
 
-let rec hide_proved_goal g =
+let rec hide_proved_in_goal g =
   if g.Model.proved then
     begin
       let row = g.Model.goal_row in
-      goals_view#collapse_row (goals_model#get_path row);
+      goals_view#collapse_row (filter_model#get_path row);
       goals_model#set ~row ~column:Model.visible_column false
     end
   else
     List.iter
-      (fun t -> List.iter hide_proved_goal t.Model.subgoals)
+      (fun t -> List.iter hide_proved_in_goal t.Model.subgoals)
       g.Model.transformations
 
-let hide_verified_theories () =
-  List.iter
-    (fun th ->
-       if th.Model.verified then
-         begin
-           let row = th.Model.theory_row in
-           goals_view#collapse_row (goals_model#get_path row);
-           goals_model#set ~row ~column:Model.visible_column false
-         end
-       else
-         List.iter hide_proved_goal th.Model.goals)
-    [] (* !Model.all *)
+let hide_proved_in_theory th =
+  if th.Model.verified then
+    begin
+      let row = th.Model.theory_row in
+      goals_view#collapse_row (filter_model#get_path row);
+      goals_model#set ~row ~column:Model.visible_column false
+    end
+  else
+    List.iter hide_proved_in_goal th.Model.goals
 
+let hide_proved_in_file f =
+  if f.Model.file_verified then
+    begin
+      let row = f.Model.file_row in
+      goals_view#collapse_row (filter_model#get_path row);
+      goals_model#set ~row ~column:Model.visible_column false
+    end
+  else
+    List.iter hide_proved_in_theory f.Model.theories
 
-let rec show_all_goals g =
+let hide_proved_in_files () =
+  List.iter hide_proved_in_file !Model.all_files
+
+let rec show_all_in_goal g =
   let row = g.Model.goal_row in
   goals_model#set ~row ~column:Model.visible_column true;
   if g.Model.proved then
-    goals_view#collapse_row (goals_model#get_path row)
+    goals_view#collapse_row (filter_model#get_path row)
   else
-    goals_view#expand_row (goals_model#get_path row);
+    goals_view#expand_row (filter_model#get_path row);
   List.iter
-    (fun t -> List.iter show_all_goals t.Model.subgoals)
+    (fun t -> List.iter show_all_in_goal t.Model.subgoals)
     g.Model.transformations
 
-let show_all_theories () =
-  List.iter
-    (fun th ->
-       let row = th.Model.theory_row in
-       goals_model#set ~row ~column:Model.visible_column true;
-       if th.Model.verified then
-         goals_view#collapse_row (goals_model#get_path row)
-       else
-         goals_view#expand_row (goals_model#get_path row);
-       List.iter show_all_goals th.Model.goals)
-    [] (* !Model.all *)
+let show_all_in_theory th =
+  let row = th.Model.theory_row in
+  goals_model#set ~row ~column:Model.visible_column true;
+  if th.Model.verified then
+    goals_view#collapse_row (filter_model#get_path row)
+  else
+    begin
+      goals_view#expand_row (filter_model#get_path row);
+      List.iter show_all_in_goal th.Model.goals
+    end
 
+let show_all_in_file f =
+  let row = f.Model.file_row in
+  goals_model#set ~row ~column:Model.visible_column true;
+  if f.Model.file_verified then
+    goals_view#collapse_row (filter_model#get_path row)
+  else
+    begin
+      goals_view#expand_row (filter_model#get_path row);
+      List.iter show_all_in_theory f.Model.theories
+    end
+
+let show_all_in_files () =
+  List.iter show_all_in_file !Model.all_files
 
 
 let (_ : GMenu.check_menu_item) = view_factory#add_check_item
   ~callback:(fun b ->
                Model.toggle_hide_proved_goals := b;
-               if b then hide_verified_theories ()
-               else show_all_theories ())
+               if b then hide_proved_in_files ()
+               else show_all_in_files ())
   "Hide proved goals"
 
 
