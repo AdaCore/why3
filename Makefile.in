@@ -167,13 +167,13 @@ LIB_PARSER_INTERFACE = \
   -e "s/^val  *list0_decl_eof *:/val list0_decl_eof : Env.env -> \
   Theory.theory Theory.Mnm.t -> Theory.theory_uc ->/"
 
-src/parser/parser.ml src/parser/parser.mli: src/parser/parser.mly
-	$(OCAMLYACC) $<
+src/parser/parser.ml: src/parser/parser.pre.ml
+	cp src/parser/parser.pre.ml src/parser/parser.ml
 	printf $(LIB_PARSER_POSTLUDE) >> src/parser/parser.ml
-	mv src/parser/parser.mli src/parser/parser.mli.orig
-	sed $(LIB_PARSER_INTERFACE) src/parser/parser.mli.orig > \
+
+src/parser/parser.mli: src/parser/parser.pre.mli
+	sed $(LIB_PARSER_INTERFACE) src/parser/parser.pre.mli > \
 					src/parser/parser.mli
-	rm src/parser/parser.mli.orig
 
 # build targets
 
