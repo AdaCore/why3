@@ -175,8 +175,8 @@ let image ?size f =
     | Some s ->
         GdkPixbuf.from_file_at_size ~width:s ~height:s n
 
-let iconname_default = "pause32"
-let iconname_scheduled = "pause32"
+let iconname_default = "pausehalf32"
+let iconname_scheduled = "pausehalf32"
 let iconname_running = "play32"
 let iconname_valid = "accept32"
 let iconname_unknown = "help32"
