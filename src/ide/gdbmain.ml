@@ -341,6 +341,7 @@ module Model = struct
 
 end
 
+
 (***************)
 (* Main window *)
 (***************)
@@ -1109,6 +1110,10 @@ let (_ : GMenu.image_menu_item) =
 
 let refresh_provers = ref (fun () -> ())
 
+let add_refresh_provers f =
+  let rp = !refresh_provers in
+  refresh_provers := (fun () -> rp (); f ())
+
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~label:"_Detect provers" ~callback:
     (fun () -> Gconfig.run_auto_detection gconfig; !refresh_provers () )
@@ -1127,6 +1132,48 @@ let view_factory = new GMenu.factory view_menu ~accel_group
 let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._E
     ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
+
+
+let tools_window =
+  GWindow.window
+    ~title: "Why3 tool box"
+    ()
+
+let tools_window_vbox = 
+  GPack.vbox ~homogeneous:false ~packing:tools_window#add ()
+
+let tools_frame = GBin.frame ~label:"Provers" ~packing:tools_window_vbox#add ()
+
+let tools_box = GPack.button_box `VERTICAL ~border_width:5 
+(*
+  ~layout
+  ~child_height 
+  ~child_width 
+*)
+  ~spacing:5
+  ~packing:tools_frame#add () 
+
+let others_frame = GBin.frame ~label:"Other" ~packing:tools_window_vbox#add ()
+
+let others_box = 
+  GPack.button_box `VERTICAL ~border_width:5 ~packing:others_frame#add () 
+
+
+(*
+let view_tools_box = ref true
+
+let set_view_tools_box b =
+  view_tools_box := b;
+  if b then tools_window#show() else tools_window#hide ()
+
+let () = set_view_tools_box true
+
+let (_ : GMenu.check_menu_item) = view_factory#add_check_item
+  ~active:!view_tool_box
+  ~callback:set_view_tools_box
+  "Show tool box"
+*)
+
 
 let rec collapse_proved_goal g =
   if g.Model.proved then
@@ -1250,10 +1297,9 @@ let (_ : GMenu.check_menu_item) = view_factory#add_check_item
 (* Tools menu *)
 (**************)
 
-let add_refresh_provers f =
-  let rp = !refresh_provers in
-  refresh_provers := (fun () -> rp (); f ())
 
+let () = add_refresh_provers (fun () ->
+  List.iter (fun item -> item#destroy ()) tools_box#all_children)
 
 let tools_menu = factory#add_submenu "_Tools"
 let tools_factory = new GMenu.factory tools_menu ~accel_group
@@ -1277,6 +1323,11 @@ let () =
            tools_factory#add_image_item ~label:(n ^ " on selection")
              ~callback:(fun () -> prover_on_selected_goals p)
              ()
+         in
+         let b = GButton.button ~packing:tools_box#add ~label:n () in
+         let (_ : GtkSignal.id) =
+           b#connect#pressed 
+             ~callback:(fun () -> prover_on_selected_goals p)
          in ())
       gconfig.provers
   in
@@ -1291,6 +1342,13 @@ let () =
              () : GMenu.image_menu_item) in
   add_refresh_provers add_item_split;
   add_item_split ()
+
+
+let () =
+  let b = GButton.button ~packing:others_box#add ~label:"Split" () in
+  let (_ : GtkSignal.id) =
+    b#connect#pressed ~callback:split_selected_goals
+  in ()
 
 
 
@@ -1549,6 +1607,11 @@ let () =
   add_item_edit ()
 
 
+let () =
+  let b = GButton.button ~packing:others_box#add ~label:"Edit" () in
+  let (_ : GtkSignal.id) =
+    b#connect#pressed ~callback:edit_current_proof
+  in ()
 
 
 (***************)
@@ -1567,6 +1630,7 @@ let (_ : GtkSignal.id) =
 
 let () = w#add_accel_group accel_group
 let () = w#show ()
+let () = tools_window#show ()
 let () = GtkThread.main ()
 
 (*

@@ -47,7 +47,7 @@ let default_ide =
     ide_tree_width = 512;
     ide_task_height = 384;
     ide_verbose = 0;
-    ide_default_editor = ""; 
+    ide_default_editor = "";
   }
 
 let load_ide section =
@@ -222,7 +222,7 @@ let resize_images size =
   image_transf := image ~size iconname_transf;
   ()
 
-let () = 
+let () =
   eprintf "reading icons...@?";
   resize_images 20;
   eprintf " done.@."
@@ -230,7 +230,7 @@ let () =
 
 
 let show_legend_window () =
-  let dialog = GWindow.dialog ~title:"Why: legend of icons" () in      
+  let dialog = GWindow.dialog ~title:"Why: legend of icons" () in
   let vbox = dialog#vbox in
   let text = GText.view ~packing:vbox#add () in
   let b = text#buffer in
@@ -268,9 +268,9 @@ let show_legend_window () =
 
 
 let show_about_window () =
-  let about_dialog = 
-    GWindow.about_dialog 
-      ~name:"Why" 
+  let about_dialog =
+    GWindow.about_dialog
+      ~name:"Why"
       ~authors:["Francois Bobot";
                 "Jean-Christophe Filliatre";
                 "Johannes Kanig";
@@ -283,12 +283,12 @@ let show_about_window () =
       ~website_label:"Click here for the web site"
       ~version:"3.0 alpha"
       ()
-  in      
+  in
   let ( _ : GWindow.Buttons.about) = about_dialog#run () in
   about_dialog#destroy ()
 
 let preferences c =
-  let dialog = GWindow.dialog ~title:"Why: preferences" () in      
+  let dialog = GWindow.dialog ~title:"Why: preferences" () in
   let vbox = dialog#vbox in
   let notebook = GPack.notebook ~packing:vbox#add () in
   (** page 1 **)
@@ -301,17 +301,17 @@ let preferences c =
  let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
  let _ = GMisc.label ~text:"Default editor" ~packing:hb#add () in
  let editor_entry = GEdit.entry ~text:c.default_editor ~packing:hb#add () in
- let (_ : GtkSignal.id) = 
+ let (_ : GtkSignal.id) =
     editor_entry#connect#changed ~callback:
       (fun () -> c.default_editor <- editor_entry#text)
   in
   (* debug mode ? *)
 (*
-  let debugmode = 
+  let debugmode =
     GButton.check_button ~label:"debug" ~packing:page1#add ()
       ~active:(c.verbose > 0)
   in
-  let (_ : GtkSignal.id) = 
+  let (_ : GtkSignal.id) =
     debugmode#connect#toggled ~callback:
       (fun () -> c.verbose <- 1 - c.verbose)
   in
@@ -322,7 +322,7 @@ let preferences c =
   let timelimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   timelimit_spin#adjustment#set_bounds ~lower:2. ~upper:300. ~step_incr:1. ();
   timelimit_spin#adjustment#set_value (float_of_int c.time_limit);
-  let (_ : GtkSignal.id) = 
+  let (_ : GtkSignal.id) =
     timelimit_spin#connect#value_changed ~callback:
       (fun () -> c.time_limit <- timelimit_spin#value_as_int)
   in
@@ -334,15 +334,15 @@ let preferences c =
     ~lower:1. ~upper:16. ~step_incr:1. ();
   nb_processes_spin#adjustment#set_value
     (float_of_int c.max_running_processes);
-  let (_ : GtkSignal.id) = 
+  let (_ : GtkSignal.id) =
     nb_processes_spin#connect#value_changed ~callback:
       (fun () -> c.max_running_processes <- nb_processes_spin#value_as_int)
   in
   (** page 2 **)
   let label2 = GMisc.label ~text:"Provers" () in
-  let _page2 = GMisc.label ~text:"This page should display detected provers" 
-    ~packing:(fun w -> ignore(notebook#append_page 
-                                ~tab_label:label2#coerce w)) () 
+  let _page2 = GMisc.label ~text:"This page should display detected provers"
+    ~packing:(fun w -> ignore(notebook#append_page
+                                ~tab_label:label2#coerce w)) ()
   in
   dialog#add_button "Close" `CLOSE ;
   let ( _ : GWindow.Buttons.about) = dialog#run () in
@@ -360,7 +360,7 @@ let run_auto_detection gconfig =
 let () = eprintf "end of configuration initialization@."
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. bin/whyide.opt"
-End: 
+End:
 *)
