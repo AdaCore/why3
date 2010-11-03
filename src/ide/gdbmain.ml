@@ -20,6 +20,9 @@
 
 (* TODO:
 
+* bug: the file names are stored as relative, so if you restart
+from another directory, they are not found
+
 * When DB contains an edited proof, use the file for the run
 
 * when proof attempt is finished and is it the one currently selected,
