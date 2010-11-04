@@ -1,4 +1,3 @@
- 
 \documentclass[12pt]{article}
 \usepackage{fullpage,amsmath} 
 %\usepackage{isolatin1} 
@@ -100,20 +99,27 @@ formelles ou mathématiques, en les remplaçant au mieux par une mesure
 expérimentale de performance et de validation par le biais d'une
 activité de test ou d'exécution contrôlée.
 
-Si la situation semble moins critique sur le premier de ces points ce n'est pas encore suffisamment le cas pour le pint suivant.
 
+%%% j'aime pas trop la formulation commentée qui suit, 
+%%% mais l'idée est lá 
 
+%--
+%Si la situation semble moins critique sur le premier de ces deux
+%derniers points ce n'est pas encore le cas pour le point
+%suivant.
 
-La formation en complexité algorithmique est maintenant répandue et
-l'analyse de la complexité dans le pire des cas est un bagage standard
-de tout informaticien.  L'analyse de performance, essentiellement dans
-le pire des cas, dispose aussi maintenant d'outils automatiques assez
-performants.
-%que l'enseignement des techniques de preuve de programmes.
+%De fait, la formation en complexité algorithmique est maintenant
+%répandue et l'analyse de la complexité dans le pire des cas est un
+%bagage standard de tout informaticien. Reconnaitre une solution au
+%comportement exponentielle est accessible à l'informaticien standard.
+%L'analyse de performance, essentiellement dans le pire des cas,
+%dispose aussi maintenant d'outils automatiques assez performants.
+%--
+
 
 Nous allons montrer par la pratique qu'il est possible d'entreprendre
 l'approche rigoureuse jusqu'à son terme en s'attaquant à la dernière
-des phases: la vérification de la correction et de la complétude.
+des phases, la plus communément oubliée: la vérification de la correction et de la complétude.
 
 
 Si cette tâche est possible, elle n'est, bien entendu, pas forcément
@@ -133,7 +139,7 @@ du langage de programmation et la maîtrise de la conception de
 programmes, si il y a une science de la preuve de programme, il existe
 également tout un art, un savoir-faire, dans la construction d'une
 preuve, surtout si l'on vise une preuve élégante ou aussi automatique
-que possible.  Comprendre quel spécification rendra la preuve plus
+que possible.  Comprendre quelle spécification rendra la preuve plus
 aisée requiert une certaine expérience.
 
 
@@ -168,8 +174,19 @@ comme longueur $\lceil \frac{a}{9}\rceil$ et est $i\overbrace{9
   \ldots 9}^{\lfloor \frac{a}{9}\rfloor}$ où $i = a\mod 9$.
 
 Ainsi, dans le cas limite où $y$ est $89999$, le plus petit entier
-ayant cette digit-sum est de longueur $\lceil \frac{89999}{9}\rceil
+ayant cette digit-sum a pour longueur $\lceil \frac{89999}{9}\rceil
 $, soit 10\,000, et est égal à $8\overbrace{9 \ldots 9}^{9\,999}$.
+
+
+Étant donnée les limites du problème, il est clair que aucun des nombres à calculer aura plus de $10\,001$ chiffres, vu qu'il est possible de trouver un nombre $x$ avec exactement $10\,0001$ chiffres tel que $d(x)=y$ quelque soit l'entier non nul $y<90000$.    
+
+ Par exemple, si $y= 99$, alors on peut choisir $x=1\overbrace{0\ldots 0}^{9\,989}\overbrace{9\ldots 9}^{10}8$. En effet  $d(x)=y=99$ et $x$ a $10\,001$ chiffres.
+Un autre exemple peut être $y=89\,999$. Alors on peut choisir $x=18\overbrace{9 \ldots 9}^{9\,998}$. Signalons néanmoins que sin nous devoins choisir un entier plus grand que $8\overbrace{9 \ldots 9}^{9\,999}$ nous aurions pu choisir $x=98\overbrace{9\ldots 9}^{9\,998}$ et rester dans les limites des $10\,000$ chiffres.
+
+Pour finir avec les consideration introductoires, definissons une autre borne à considérer: celle de la taille de $x$ connaissant $y$ et $z$.
+Considerons $\lceil y \rceil$ qui est le nombre de chiffres du plus petit entier dont la digit-sum est $y$. Si la taille de $z$ est plus grande que cette valeur, alors au pire des cas $x$ aura la taille de $z$ plus $1$ \footnote{Il faut considerer un chiffre su0plementaire à cause du cas limite où, par exemple, $z$ n'est constitué que du chiffre $9$.}, sinon la taille de $x$ sera $\lceil y \rceil$. 
+ 
+ 
 
 
 
@@ -181,6 +198,7 @@ représenter les entiers manipulés par la séquence des ces chiffres.
 \begin{lstlisting}
 let ys = Sys.argv.(1)
 let n = String.length ys
+let 
 let z = int_of_string Sys.argv.(2)
 
 let max_digits = 1 + max n (z / 9)
@@ -211,7 +229,7 @@ let () =
   done
 \end{lstlisting}
 
-
+\section{Considérations sur la complexité de la solution}
 \section{Considérations sur la vérification formelle de la solution}
 \section{Un courte introduction à la preuve de programmes avec l'outils Why}
 \section{Preuve incrémentale de correction et de complétude de la solution}

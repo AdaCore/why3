@@ -172,14 +172,14 @@ End:
 
 
 (*
-let s = Sys.argv.(1)
-let n = String.length s
 let y = int_of_string Sys.argv.(2)
+let z = Sys.argv.(1)
+let n = String.length z
 
-let max_digits = 1 + max n (y / 9)
+let max_digits = 1 + max n (y / 9) (*<------simão:  pourquoi y/9?, ça serait pas plutôt (int_of_string s) /9?*)
 let x = Array.create max_digits 0
 let () = 
-  for i = 0 to n - 1 do x.(n - 1 - i) <- Char.code s.[i] - Char.code '0' done
+  for i = 0 to n - 1 do x.(n - 1 - i) <- Char.code z.[i] - Char.code '0' done
 
 let () =
   let s = ref 0 in
