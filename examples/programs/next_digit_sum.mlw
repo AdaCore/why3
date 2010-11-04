@@ -18,10 +18,6 @@
 
   logic (#) (a : array 'a) (i : int) : 'a = A.get a i
 
-(*
-  logic sum_digits (n:int) : int =
-    if n = 0 then 0 else sum_digits (div n 10) + mod n 10
-*)
   logic sum_digits int : int
 
   axiom Sum_digits_def : forall n : int. sum_digits n =
@@ -39,6 +35,10 @@
     forall x : array int, i j : int. 
     i < j -> interp x i j = x#i + 10 * interp x (i+1) j
 
+  (* shortcut for sum_digits (interp x i j) *)
+  logic sum_digits_a (x : array int) (i j : int) : int =
+    sum_digits (interp x i j)
+
   (* interp9 X i j is the j-digit integer obtained by replacing the i least
      significant digits in X by 9, i.e. X[j-1]...X[i]9...9 *)
 
@@ -47,22 +47,32 @@
 
   (* to allow provers to prove that an assignment does not change the
      interpretation on the left (or on the right); requires induction *)
-  lemma Interp_sum_eq:
+  lemma Interp_eq:
     forall x1 x2 : array int, i j : int. 
     (forall k : int. i <= k < j -> x1#k = x2#k) -> interp x1 i j = interp x2 i j
 
-  lemma Interp_sum_digit_left:
-    forall x : array int, i j : int. i < j ->
-    sum_digits (interp x i j) = sum_digits (interp x i (j-1)) + x#(j-1)
+  lemma Sum_digits_a_eq:
+    forall x1 x2 : array int, i j : int. 
+    (forall k : int. i <= k < j -> x1#k = x2#k) -> 
+    sum_digits_a x1 i j = sum_digits_a x2 i j
 
-  lemma Interp_sum_digit_right:
-    forall x : array int, i j : int. i < j ->
-    sum_digits (interp x i j) = x#i + sum_digits (interp x (i+1) j)
+  lemma Sum_digits_a_set_eq:
+    forall x : array int, i j k v : int.
+    (k < i or k >= j) -> sum_digits_a (A.set x k v) i j = sum_digits_a x i j
 
-  lemma Interp_sum_trans:
+  lemma Interp_sum_digits_left:
+    forall x : array int, i j : int. i < j ->
+    sum_digits_a x i j = sum_digits_a x i (j-1) + x#(j-1)
+
+  lemma Interp_sum_digits_right:
+    forall x : array int, i j : int. i < j ->
+    sum_digits_a x i j = x#i + sum_digits_a x (i+1) j
+
+  lemma Interp_sum_digits_trans:
     forall x : array int, i k j : int. i <= k <= j ->
-    sum_digits (interp x i j) = 
-    sum_digits (interp x i k) + sum_digits (interp x k j)
+    sum_digits_a x i j = 
+    sum_digits_a x i k + sum_digits_a x k j
+
 }
 
 let array_get (a : ref (array 'a)) i = 
@@ -82,6 +92,34 @@ parameter x : ref (array int)
 
 exception Success
 
+let search_safety () =
+  { A.length !x = m }
+  label Init:
+  let s = ref 0 in
+  for i = 0 to m - 1 do (* could be n instead of m *)
+    s := !s + array_get x i 
+  done;
+  for d = 0 to m - 1 do
+    invariant { A.length !x = m } 
+    for c = array_get x d + 1 to 9 do
+      invariant { A.length !x = m } 
+      let delta = y - !s - c + array_get x d in
+      if 0 <= delta && delta <= 9 * d then begin
+        array_set x d c;
+	let k = div delta 9 in
+        for i = 0 to d - 1 do 
+          invariant { A.length !x = m } 
+          if i < k then array_set x i 9
+	  else if i = k then array_set x i (mod delta 9)
+          else array_set x i 0
+        done;
+        raise Success
+      end
+    done;
+    s := !s - array_get x d
+  done
+  { true } | Success -> { true }
+
 let search () =
   { n >= 0 and y > 0 and A.length !x = m and
     (n = 0 or !x#(n-1) <> 0) and
@@ -90,39 +128,40 @@ let search () =
   label Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
-    invariant { !s = sum_digits (interp !x 0 i) } 
+    invariant { !s = sum_digits_a !x 0 i } 
     s := !s + array_get x i 
   done;
-  assert { !s = sum_digits (interp !x 0 m) };
+  assert { !s = sum_digits_a !x 0 m };
   for d = 0 to m - 1 do
     invariant { 
       !x = at !x Init and
-      !s = sum_digits (interp !x d m) 
+      !s = sum_digits_a !x d m 
     } 
     for c = array_get x d + 1 to 9 do
       invariant { !x = at !x Init } 
       let delta = y - !s - c + array_get x d in
       if 0 <= delta && delta <= 9 * d then begin
         array_set x d c;
-        assert { sum_digits (interp !x d m) = y - delta };
+        assert { sum_digits_a !x d m = y - delta };
 	let k = div delta 9 in
         assert { k <= d };
-        for i = 0 to k - 1 do invariant { A.length !x = m } 
-          array_set x i 9
+        for i = 0 to d - 1 do 
+          invariant { A.length !x = m and
+                      sum_digits_a !x d m = y - delta and
+                      sum_digits_a !x 0 i = if i <= k then 9*i else delta } 
+          if i < k then array_set x i 9
+	  else if i = k then array_set x i (mod delta 9)
+          else array_set x i 0
         done;
-        array_set x k (mod delta 9);
-        for i = k + 1 to d - 1 do invariant { A.length !x = m } 
-	  array_set x i 0
-	done;
-        assume { sum_digits (interp !x 0 d) = delta };
+        (* assume { sum_digits_a !x 0 d = delta }; *)
+        assert { sum_digits_a !x 0 d = delta };
         raise Success
       end
     done;
     s := !s - array_get x d
   done
-  { true(*false*) } 
-  | Success -> 
-    { true (*sum_digits (interp !x 0 m) = y*) }
+  { true } 
+  | Success -> { sum_digits_a !x 0 m = y }
 
 (*
 Local Variables: 
