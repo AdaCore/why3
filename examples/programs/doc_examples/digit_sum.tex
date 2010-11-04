@@ -11,6 +11,44 @@
  
 \usepackage{xspace} 
 \usepackage[french]{babel} 
+
+
+\usepackage{hyperref}
+
+\usepackage{listings}
+
+
+
+
+\def\lstlanguagefiles{lstlang1.sty,lstlang2.sty,lstlang3.sty}
+\lstloadlanguages{[Objective]Caml}
+
+
+\lstset{%
+language=[Objective]Caml,%
+flexiblecolumns=false,%
+keywordstyle=\footnotesize\bfseries,%
+commentstyle=\it,%
+basicstyle=\footnotesize,%
+showstringspaces=false,%
+%extendedchar=true,%
+escapeinside={(*@}{@*)}%
+%numbers=left,%
+%numberstyle=\tiny,%
+%stepnumber=1,%
+%numbersep=15pt%
+}
+
+
+
+\lstset{literate=%
+  {=>}{{$\Rightarrow$}}1%
+  {>->}{{$\rightarrowtail$}}2%
+  {->}{{$\to$}}1%
+  {~}{{$\neg$}}1}
+
+
+
 \pagestyle{empty}  
 \thispagestyle{empty}  
 \sloppy  
@@ -19,7 +57,7 @@
 \title{An exercise on proving programs with Why}  
  
  
-\author{Jean-Christophe Filliatre and Simao Melo de Sousa} 
+\author{Jean-Christophe Filliâtre and Simão Melo de Sousa} 
  
 \date{November 2010} 
 \begin{document}  
@@ -27,7 +65,159 @@
 \maketitle  
 \tableofcontents 
 
+\section{Introduction}
 
+Programmer -- bien,  c'est concevoir une solution informatique adéquate,
+aussi systématique et efficace que possible à un problème soluble concret donné.
+
+Or, concevoir une telle solution n'est pas en générale une tache
+triviale.  Une approche classique et rigoureuse voudrait que le
+processus de conception soit, dans le cadre de la conception
+d'algorithme, constitué des phases suivantes:
+
+%\begin{itemize}
+%\item Analyse du problème et de ces pré-requis
+%\item Modélisation de la solution
+%\item Codification de la solution dans un langage de programmation
+%\item Analyse de performance
+%\item Validation de la solution et de son code
+%\end{itemize} 
+%
+%Si nous laissons le cadre général du génie logiciel et nous nous restreignons au cadre 
+%de la conception algorithmique, l'approche précédente peut se réécrire en  
+
+\begin{itemize}
+\item Définition du problème et de ces contraintes
+\item Conception algorithmique de la solution
+\item Codification de la solution dans un langage de programmation
+\item Analyse la complexité algorithmique de la solution proposée
+\item Preuve de correction (totale) et de complétude.
+\end{itemize}
+
+La pratique habituelle de la programmation ignore néanmoins ou
+minimise les activités liées aux deux dernière phases, de nature plus
+formelles ou mathématiques, en les remplaçant au mieux par une mesure
+expérimentale de performance et de validation par le biais d'une
+activité de test ou d'exécution contrôlée.
+
+Si la situation semble moins critique sur le premier de ces points ce n'est pas encore suffisamment le cas pour le pint suivant.
+
+
+
+La formation en complexité algorithmique est maintenant répandue et
+l'analyse de la complexité dans le pire des cas est un bagage standard
+de tout informaticien.  L'analyse de performance, essentiellement dans
+le pire des cas, dispose aussi maintenant d'outils automatiques assez
+performants.
+%que l'enseignement des techniques de preuve de programmes.
+
+Nous allons montrer par la pratique qu'il est possible d'entreprendre
+l'approche rigoureuse jusqu'à son terme en s'attaquant à la dernière
+des phases: la vérification de la correction et de la complétude.
+
+
+Si cette tâche est possible, elle n'est, bien entendu, pas forcément
+aisée. La difficulté de cet exercice est clairement liée à la
+complexité ou subtilité de la solution algorithmique/programmatique
+proposée.
+
+Une solution efficace se distancie en générale d'une solution
+naturelle souvent simples mais inefficace. Comprendre et accepter sa
+correction peux exiger une certaine réflexion. L'argumenter ne sera
+donc pas forcement une tâche immédiate.
+
+
+
+Tout comme en programmation où il y a un fossé entre la connaissance
+du langage de programmation et la maîtrise de la conception de
+programmes, si il y a une science de la preuve de programme, il existe
+également tout un art, un savoir-faire, dans la construction d'une
+preuve, surtout si l'on vise une preuve élégante ou aussi automatique
+que possible.  Comprendre quel spécification rendra la preuve plus
+aisée requiert une certaine expérience.
+
+
+Ce document s'attache donc à explorer un exemple de cette catégorie et
+à introduire l'exercice de démonstration de correction et de
+complétude assistée par ordinateur.
+
+
+\section{Organisation du document}
+
+\section{Définition du problème}
+
+
+The digit sum $d(x)$ of a natural number $x$ is the sum of its
+digits. For instance $d(10043827) = 25$.
+  
+Given two natural numbers $y$ and $z$ such that $0<y < 90\,000$ and
+$z$ has at most $10\, 000$ digits, compute the smallest natural number
+$x$ such that $z<x$ and $d(x)=y$.
+
+The input is organized in exactly two lines, each one with one
+integer. The first one is $y$ and the second one is $z$.
+
+The  expected output consists in exactly one line and is the number $x$.  
+
+\section{Résolution algorithmique}
+
+Analysons premièrement quelques données du problème.
+
+Étant donné un entier $a$, le plus petit entier $b$ tel que $d(b)=a$ a
+comme longueur $\lfloor \frac{a}{10}\rfloor + 1$ et est $i\overbrace{9
+  \ldots 9}^{\lfloor \frac{a}{10}\rfloor}$ (où $i$ est le reste de la
+division de $a$ par $10$).
+
+Ainsi, dans le cas limite où $y$ est $89999$, le plus petit entier
+ayant cette digit-sum est de longueur $\lfloor \frac{89999}{10}\rfloor
++1$ et est égal à $(89999\, mod\, 10)\overbrace{9 \ldots 9}^{\lfloor
+  \frac{89999}{10}\rfloor}$.
+
+
+
+
+Le choix suivant à considérer est celle de la représentation des
+données que la solution manipulera. Nous choisissons ici de
+représenter les entiers manipulés par la séquence des ces chiffres.
+
+\begin{lstlisting}
+let ys = Sys.argv.(1)
+let n = String.length ys
+let z = int_of_string Sys.argv.(2)
+
+let max_digits = 1 + max n (z / 9)
+let x = Array.create max_digits 0
+let () = 
+  for i = 0 to n - 1 do x.(n - 1 - i) <- Char.code ys.[i] - Char.code '0' done
+
+let () =
+  let s = ref 0 in
+  for i = 0 to max_digits - 1 do s := !s + x.(i) done;
+  for d = 0 to max_digits - 1 do
+    (* s is the sum of digits d..n-1 *)
+    (* solution with digits > d intacts, and digit d increased by 1 or more *)
+    for c = x.(d) + 1 to 9 do
+      let delta = z - !s - c + x.(d) in
+      if 0 <= delta && delta <= 9 * d then begin
+	x.(d) <- c;
+	let k = delta / 9 in
+	for i = 0 to d-1 do 
+	  x.(i) <- if i < k then 9 else if i = k then delta mod 9 else 0
+	done;
+	for i = max d (n-1) downto 0 do printf "%d" x.(i) done;
+	printf "@.";
+	exit 0
+      end
+    done;
+    s := !s - x.(d)
+  done
+\end{lstlisting}
+
+
+\section{Considérations sur la vérification formelle de la solution}
+\section{Un courte introduction à la preuve de programmes avec l'outils Why}
+\section{Preuve incrémentale de correction et de complétude de la solution}
+\section{Conclusion}
 \end{document}  
  
 %%% Local Variables: 
