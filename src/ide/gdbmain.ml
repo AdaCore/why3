@@ -1328,6 +1328,8 @@ let () =
              ()
          in
          let b = GButton.button ~packing:tools_box#add ~label:n () in
+         let i = GMisc.image ~pixbuf:(!image_prover) ()in
+         let () = b#set_image i#coerce in
          let (_ : GtkSignal.id) =
            b#connect#pressed 
              ~callback:(fun () -> prover_on_selected_goals p)
@@ -1349,6 +1351,8 @@ let () =
 
 let () =
   let b = GButton.button ~packing:others_box#add ~label:"Split" () in
+  let i = GMisc.image ~pixbuf:(!image_transf) () in
+  let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:split_selected_goals
   in ()
@@ -1612,6 +1616,8 @@ let () =
 
 let () =
   let b = GButton.button ~packing:others_box#add ~label:"Edit" () in
+  let i = GMisc.image ~pixbuf:(!image_editor) () in
+  let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:edit_current_proof
   in ()
