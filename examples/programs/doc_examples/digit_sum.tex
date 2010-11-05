@@ -66,8 +66,9 @@ escapeinside={(*@}{@*)}%
 
 \section{Introduction}
 
-Programmer -- bien,  c'est concevoir une solution informatique adéquate,
-aussi systématique et efficace que possible à un problème soluble concret donné.
+Programmer -- bien, c'est concevoir une solution informatique
+adéquate, aussi systématique et efficace que possible à un problème
+soluble concret donné.
 
 Or, concevoir une telle solution n'est pas en générale une tache
 triviale.  Une approche classique et rigoureuse voudrait que le
@@ -82,8 +83,9 @@ d'algorithme, constitué des phases suivantes:
 %\item Validation de la solution et de son code
 %\end{itemize} 
 %
-%Si nous laissons le cadre général du génie logiciel et nous nous restreignons au cadre 
-%de la conception algorithmique, l'approche précédente peut se réécrire en  
+%Si nous laissons le cadre général du génie logiciel et nous nous
+% restreignons au cadre de la conception algorithmique, l'approche
+% précédente peut se réécrire en
 
 \begin{itemize}
 \item Définition du problème et de ces contraintes
@@ -104,9 +106,8 @@ activité de test ou d'exécution contrôlée.
 %%% mais l'idée est lá 
 
 %--
-%Si la situation semble moins critique sur le premier de ces deux
-%derniers points ce n'est pas encore le cas pour le point
-%suivant.
+Si la situation semble moins critique sur le premier de ces deux
+derniers points, ce n'est pas encore vraiment le cas pour le deuxième.
 
 %De fait, la formation en complexité algorithmique est maintenant
 %répandue et l'analyse de la complexité dans le pire des cas est un
@@ -117,9 +118,10 @@ activité de test ou d'exécution contrôlée.
 %--
 
 
-Nous allons montrer par la pratique qu'il est possible d'entreprendre
-l'approche rigoureuse jusqu'à son terme en s'attaquant à la dernière
-des phases, la plus communément oubliée: la vérification de la correction et de la complétude.
+Nous allons ainsi montrer par la pratique qu'il est possible
+d'entreprendre l'approche rigoureuse jusqu'à son terme en s'attaquant
+à la dernière des phases: la vérification de la correction et de la
+complétude.
 
 
 Si cette tâche est possible, elle n'est, bien entendu, pas forcément
@@ -152,6 +154,8 @@ complétude assistée par ordinateur.
 
 \section{Définition du problème}
 
+Le problème considéré ici a été proposé comme défi au concours de programmation MIUP'2010 (Maratona Inter-Universitária de Programação, épreuve nacional portugaise du circuit de concours ACM-ICPC) qui a eu lieu a l'Université d'Évora  - Portugal le 16 Octobre 2010. 
+
 
 The digit sum $d(x)$ of a natural number $x$ is the sum of its
 digits. For instance $d(10043827) = 25$.
@@ -163,11 +167,13 @@ $x$ such that $z<x$ and $d(x)=y$.
 The input is organized in exactly two lines, each one with one
 integer. The first one is $y$ and the second one is $z$.
 
-The  expected output consists in exactly one line and is the number $x$.  
+The expected output consists in exactly one line and is the number $x$.  
 
 \section{Résolution algorithmique}
 
-Analysons premièrement quelques données du problème.
+\subsection{Quelques considérations initiales}
+
+Analysons premièrement quelques particularités et faits remarquebles liés au problème.
 
 Étant donné un entier $a$, le plus petit entier $b$ tel que $d(b)=a$ a
 comme longueur $\lceil \frac{a}{9}\rceil$ et est $i\overbrace{9
@@ -178,33 +184,74 @@ ayant cette digit-sum a pour longueur $\lceil \frac{89999}{9}\rceil
 $, soit 10\,000, et est égal à $8\overbrace{9 \ldots 9}^{9\,999}$.
 
 
-Étant donnée les limites du problème, il est clair que aucun des nombres à calculer aura plus de $10\,001$ chiffres, vu qu'il est possible de trouver un nombre $x$ avec exactement $10\,0001$ chiffres tel que $d(x)=y$ quelque soit l'entier non nul $y<90000$.    
+Étant donnée les limites du problème, il est clair que aucun des
+nombres à calculer aura plus de $10\,001$ chiffres, vu qu'il est
+possible de trouver un nombre $x$ avec exactement $10\,0001$ chiffres
+tel que $d(x)=y$ quelque soit l'entier non nul $y<90000$.
 
- Par exemple, si $y= 99$, alors on peut choisir $x=1\overbrace{0\ldots 0}^{9\,989}\overbrace{9\ldots 9}^{10}8$. En effet  $d(x)=y=99$ et $x$ a $10\,001$ chiffres.
-Un autre exemple peut être $y=89\,999$. Alors on peut choisir $x=18\overbrace{9 \ldots 9}^{9\,998}$. Signalons néanmoins que sin nous devoins choisir un entier plus grand que $8\overbrace{9 \ldots 9}^{9\,999}$ nous aurions pu choisir $x=98\overbrace{9\ldots 9}^{9\,998}$ et rester dans les limites des $10\,000$ chiffres.
+Par exemple, si $y= 99$, alors on peut choisir $x=1\overbrace{0\ldots
+  0}^{9\,989}\overbrace{9\ldots 9}^{10}8$. En effet $d(x)=y=99$ et $x$
+a $10\,001$ chiffres.  Un autre exemple peut être $y=89\,999$. Alors
+on peut choisir $x=18\overbrace{9 \ldots 9}^{9\,998}$. Signalons
+néanmoins que si nous devions choisir un entier plus grand que
+$8\overbrace{9 \ldots 9}^{9\,999}$ nous aurions pu choisir
+$x=98\overbrace{9\ldots 9}^{9\,998}$ et rester dans les limites des
+$10\,000$ chiffres.
 
-Pour finir avec les consideration introductoires, definissons une autre borne à considérer: celle de la taille de $x$ connaissant $y$ et $z$.
-Considerons $\lceil y \rceil$ qui est le nombre de chiffres du plus petit entier dont la digit-sum est $y$. Si la taille de $z$ est plus grande que cette valeur, alors au pire des cas $x$ aura la taille de $z$ plus $1$ \footnote{Il faut considerer un chiffre su0plementaire à cause du cas limite où, par exemple, $z$ n'est constitué que du chiffre $9$.}, sinon la taille de $x$ sera $\lceil y \rceil$. 
+D'une façon plus générale, si il est possible de trouver un nombre de taille $a$ dont la digit-sum est $b$, il est possible de trouver un nombre de taille $a+1$ ayant la même digit-sum.
+
+
+Ces considérations nous permettent de fixer une borne supérieure raisonnable à la taille de l'entier à calculer $x$ connaissant $y$ et $z$.  
+Considérons $u=\lceil \frac{y}{9} \rceil$ le nombre de chiffres du
+plus petit entier dont la digit-sum est $y$ et $v$ le nombre de chiffre de $z$.
+
+Si $u$ est strictement plus grand que $v$ alors  la borne est necessairement $u$ (et dans ce cas on sait même quelle est la valeur de $x$), dans le cas contraire la taille de $x$ sera au mieux $v$ et au plus $v+1$.  Car on se sait pas a priori s'il existe des nombres de taille $v$ plus grand de $z$ qui ont $y$ comme digit-sum, mais certainement que l'on arrive à en trouver avec $v+1$ chiffres.  
+
  
+\subsection{Représentation des données}
+
+
+
+
+Le premier choix à considérer au niveau de la solution est celle de la représentation des données que la solution manipulera. Les nombres manipulés sont potentiellement très grand, et la solution aura à manipuler en particulier les chiffres de ces nombres. Ansi il est assez naturel de choisir représenter les entiers manipulés (ici $x$) par la séquence de ces chiffres. 
+Comme nous allons le voir, la solution choisie devra parcourir le nombre du chiffre de poid le moins significatif au chiffre de poid le plus signigficatif. Pour cela il sera plus convenable représenter les chiffre dans l'ordre inverse dans le tableau. Ainsi le parcours se fera ainsi de gauche a droite dans le tableau.
+
+
+
+% voir si cette note est utile
+Il pourra être important garantir que la representation des entiers est cohérente. C'est à dire que les éléments du tableau sont des entiers entre $0$ et $9$, qu'à gauche du premier chiffre il n'y a, la cas échéant, que des $0$ (dans le cas de la représentation des chiffre en ordre inverse, à droite du dernier chiffre repésentatif il n'y a que des $0$ ).  Nous reviendrons sur ce point le moment venu.
+
+
+
+\subsection{L'algorithme}
+
+
+Considérons que la solution $x$ soit constitué des chiffre $x_m\ldots x_1x_0$ et que $z$ soit constitué des chiffres $z_m\ldots z_1z_0$ (les chiffres à gauche pouvant être des $0$ si nécessaire). 
+
+Comme $x$ est le premier entier qui suit $z$  (suivant l'ordre croissant) et qui a pour digit-sum $y$, remarquons qu'il doit exister un indice $d$ tel que qu'à gauche de cet indice $x$ coincide avec $z$ ($\forall i, d<i\leq m \implies x_i=z_i$) et que ce qui reste de $x$ à droite (d inclu) soit un nombre plus grand strictement que  ce qui reste de $z$ à droite de $d$ ($x_d\ldots x_0 > z_d\ldots z_0$).
  
+Dans ce cas notons que $\Sigma_{i=d+1}^m x_i=\Sigma_{i=d+1}^m z_i$ 
+(soit $a$ cette valeur).
+Soient $b_x=\Sigma_{i=0}^d x_i$ et $b_z = \Sigma_{i=0}^d z_i$, nous avons $b_x>b_z$. Il est facile de voir que $y=a+b_x$ et $d(z)=a+b_z$.
+
+Trouver le plus petit $x$ c'est donc, partant de $z$, trouver un indice $d$  plus a droite possible de $z$ tel qu'il soit possible de trouver la plus petite augmentation de $z_d$ ($x_d$) qui rende possible l'expression d'un nombre  $x_{d-1}\ldots x_0$  ayant comme digit-sum $y-a-x_d$ (c'est à dire, 
+$\Sigma_{i=0}^{d-1}x_i = y-a-x_d$).
 
 
+Pour cela remarquons qu'il nous suffit de  parcourir $z$ de $z_0$ à $z_m$ et que pour chacun des $z_i$ 
 
 
-Le choix suivant à considérer est celle de la représentation des
-données que la solution manipulera. Nous choisissons ici de
-représenter les entiers manipulés par la séquence des ces chiffres.
 
 \begin{lstlisting}
 let ys = Sys.argv.(1)
-let n = String.length ys
-let 
-let z = int_of_string Sys.argv.(2)
+let zs = Sys.argv.(2)
+let n = String.length zs
+let y = int_of_string ys
 
-let max_digits = 1 + max n (z / 9)
+let max_digits = 1 + max n (y / 9)
 let x = Array.create max_digits 0
 let () = 
-  for i = 0 to n - 1 do x.(n - 1 - i) <- Char.code ys.[i] - Char.code '0' done
+  for i = 0 to n - 1 do x.(n - 1 - i) <- Char.code zs.[i] - Char.code '0' done
 
 let () =
   let s = ref 0 in
@@ -213,15 +260,15 @@ let () =
     (* s is the sum of digits d..n-1 *)
     (* solution with digits > d intacts, and digit d increased by 1 or more *)
     for c = x.(d) + 1 to 9 do
-      let delta = z - !s - c + x.(d) in
+      let delta = y - !s - c + x.(d) in
       if 0 <= delta && delta <= 9 * d then begin
 	x.(d) <- c;
 	let k = delta / 9 in
 	for i = 0 to d-1 do 
 	  x.(i) <- if i < k then 9 else if i = k then delta mod 9 else 0
 	done;
-	for i = max d (n-1) downto 0 do printf "%d" x.(i) done;
-	printf "@.";
+	for i = max d (n-1) downto 0 do Format.printf "%d" x.(i) done;
+	Format.printf "@.";
 	exit 0
       end
     done;
