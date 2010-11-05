@@ -323,8 +323,11 @@ clean::
 
 # test target
 
-%: %.mlw bin/whyide.opt
-	bin/whyide.opt $*.mlw
+%.gui: %.why bin/whyide.opt
+	bin/whyide.opt $*.why
+
+%.gui: %.mlw bin/whyide.opt
+	bin/whydb.opt $*.mlw
 
 install_no_local::
 	cp -f bin/whyml.@OCAMLBEST@ $(BINDIR)/why3ml
