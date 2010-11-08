@@ -84,15 +84,36 @@ let array_set (a : ref (array 'a)) i v =
 parameter x : ref (array int)
 
 { 
+  (* the number of digis of X *)
   logic n : int
+
+  (* the target digit sum *)
   logic y : int
+
+  axiom Hypotheses: n >= 0 and y > 0
   
   logic m : int = 1 + max n (div y 9)
+
+  (* x[0..m-1] is a well-formed integer i.e. has digits in 0..9 *)
+  logic is_integer (x : array int) =
+    forall k : int. 0 <= k < m -> 0 <= x#k <= 9
+
+  (* x1 > x2 since x1[d] > x2[d] and x1[d+1..m-1] = x2[d+1..m-1] *)
+  logic gt_digit (x1 x2 : array int) (d : int) =
+    is_integer x1 and is_integer x2 and 0 <= d < m and 
+    x1#d > x2#d and forall k : int. d < k < m -> x1#k = x2#k
+    
+  lemma Gt_digit_interp:
+    forall x1 x2 : array int, d : int.
+    gt_digit x1 x2 d -> interp x1 0 m > interp x2 0 m
 }
 
 exception Success
 
-let search_safety () =
+(* 1. Safety: we only prove that array access are within bounds 
+   (and termination, implicitely proved since we only have for loops) *)
+
+let search_safety () = 
   { A.length !x = m }
   label Init:
   let s = ref 0 in
@@ -120,11 +141,11 @@ let search_safety () =
   done
   { true } | Success -> { true }
 
+(* 2. Correctness, part 1: when Sucess is raised, x contains an integer
+      with digit sum y *)
+
 let search () =
-  { n >= 0 and y > 0 and A.length !x = m and
-    (n = 0 or !x#(n-1) <> 0) and
-    (forall i:int. 0 <= i < n -> 0 <= !x#i <= 9) and
-    (forall i:int. n <= i < m -> !x#i = 0) }
+  { A.length !x = m and is_integer !x }
   label Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
@@ -146,7 +167,7 @@ let search () =
 	let k = div delta 9 in
         assert { k <= d };
         for i = 0 to d - 1 do 
-          invariant { A.length !x = m and
+          invariant { A.length !x = m and is_integer !x and
                       sum_digits_a !x d m = y - delta and
                       sum_digits_a !x 0 i = if i <= k then 9*i else delta } 
           if i < k then array_set x i 9
@@ -161,7 +182,61 @@ let search () =
     s := !s - array_get x d
   done
   { true } 
-  | Success -> { sum_digits_a !x 0 m = y }
+  | Success -> { is_integer !x and sum_digits_a !x 0 m = y }
+
+(* 3. Correctness, part 2: we now prove that, on success, x contains the
+   smallest integer > old(x) with digit sum y *)
+
+let search_smallest () =
+  { A.length !x = m and is_integer !x }
+  label Init:
+  let s = ref 0 in
+  for i = 0 to m - 1 do (* could be n instead of m *)
+    invariant { !s = sum_digits_a !x 0 i } 
+    s := !s + array_get x i 
+  done;
+  assert { !s = sum_digits_a !x 0 m };
+  for d = 0 to m - 1 do
+    invariant { 
+      !x = at !x Init and
+      !s = sum_digits_a !x d m 
+    } 
+    for c = array_get x d + 1 to 9 do
+      invariant { !x = at !x Init } 
+      let delta = y - !s - c + array_get x d in
+      if 0 <= delta && delta <= 9 * d then begin
+        array_set x d c;
+        assert { sum_digits_a !x d m = y - delta };
+	let k = div delta 9 in
+        assert { k <= d };
+        for i = 0 to d - 1 do 
+          invariant { A.length !x = m and is_integer !x and
+                      sum_digits_a !x d m = y - delta and
+                      sum_digits_a !x 0 i = (if i <= k then 9*i else delta) and 
+                      gt_digit !x (at !x Init) d } 
+          if i < k then array_set x i 9
+	  else if i = k then array_set x i (mod delta 9)
+          else array_set x i 0;
+          assert { is_integer !x }
+        done;
+        assert { sum_digits_a !x 0 d = delta };
+        raise Success
+      end
+    done;
+    s := !s - array_get x d
+  done
+  { true } 
+  | Success -> { is_integer !x and sum_digits_a !x 0 m = y and
+                 interp !x 0 m > interp (old !x) 0 m }
+
+(* 4. Completeness: we always raise the Success exception *)
+
+(*
+    (n = 0 or !x#(n-1) <> 0) and
+    (forall i:int. 0 <= i < n -> 0 <= !x#i <= 9) and
+    (forall i:int. n <= i < m -> !x#i = 0)
+*)
+
 
 (*
 Local Variables: 
