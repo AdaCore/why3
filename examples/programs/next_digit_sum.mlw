@@ -30,6 +30,7 @@
   axiom Interp_1 : 
     forall x : array int, i j : int. 
     i >= j -> interp x i j = 0
+  { A.length !x = m and is_integer !x }
 
   axiom Interp_2 :
     forall x : array int, i j : int. 
@@ -38,12 +39,6 @@
   (* shortcut for sum_digits (interp x i j) *)
   logic sum_digits_a (x : array int) (i j : int) : int =
     sum_digits (interp x i j)
-
-  (* interp9 X i j is the j-digit integer obtained by replacing the i least
-     significant digits in X by 9, i.e. X[j-1]...X[i]9...9 *)
-
-  logic interp9 (x : array int) (i j : int) : int =
-    power 10 i * (interp x i j + 1) - 1
 
   (* to allow provers to prove that an assignment does not change the
      interpretation on the left (or on the right); requires induction *)
@@ -73,6 +68,16 @@
     sum_digits_a x i j = 
     sum_digits_a x i k + sum_digits_a x k j
 
+  (* interp9 X i j is the j-digit integer obtained by replacing the i least
+     significant digits in X by 9, i.e. X[j-1]...X[i]9...9 *)
+
+  logic interp9 (x : array int) (i j : int) : int =
+    power 10 i * (interp x i j + 1) - 1
+
+  lemma Interp9_step:
+    forall x : array int, i j : int.
+    i < j -> interp9 (A.set x i 9) i j = interp9 x (i+1) j
+
 }
 
 let array_get (a : ref (array 'a)) i = 
@@ -94,18 +99,6 @@ parameter x : ref (array int)
   
   logic m : int = 1 + max n (div y 9)
 
-  (* x[0..m-1] is a well-formed integer i.e. has digits in 0..9 *)
-  logic is_integer (x : array int) =
-    forall k : int. 0 <= k < m -> 0 <= x#k <= 9
-
-  (* x1 > x2 since x1[d] > x2[d] and x1[d+1..m-1] = x2[d+1..m-1] *)
-  logic gt_digit (x1 x2 : array int) (d : int) =
-    is_integer x1 and is_integer x2 and 0 <= d < m and 
-    x1#d > x2#d and forall k : int. d < k < m -> x1#k = x2#k
-    
-  lemma Gt_digit_interp:
-    forall x1 x2 : array int, d : int.
-    gt_digit x1 x2 d -> interp x1 0 m > interp x2 0 m
 }
 
 exception Success
@@ -143,6 +136,12 @@ let search_safety () =
 
 (* 2. Correctness, part 1: when Sucess is raised, x contains an integer
       with digit sum y *)
+
+{
+  (* x[0..m-1] is a well-formed integer i.e. has digits in 0..9 *)
+  logic is_integer (x : array int) =
+    forall k : int. 0 <= k < m -> 0 <= x#k <= 9
+}
 
 let search () =
   { A.length !x = m and is_integer !x }
@@ -185,10 +184,90 @@ let search () =
   | Success -> { is_integer !x and sum_digits_a !x 0 m = y }
 
 (* 3. Correctness, part 2: we now prove that, on success, x contains the
-   smallest integer > old(x) with digit sum y *)
+   smallest integer > old(x) with digit sum y 
+
+   4. Completeness: we always raise the Success exception *)
+
+{
+  (* x1 > x2 since x1[d] > x2[d] and x1[d+1..m-1] = x2[d+1..m-1] *)
+  logic gt_digit (x1 x2 : array int) (d : int) =
+    is_integer x1 and is_integer x2 and 0 <= d < m and 
+    x1#d > x2#d and forall k : int. d < k < m -> x1#k = x2#k
+    
+  lemma Gt_digit_interp:
+    forall x1 x2 : array int, d : int.
+    gt_digit x1 x2 d -> interp x1 0 m > interp x2 0 m
+
+  lemma Gt_digit_update:
+    forall x1 x2 : array int, d i v : int.
+    gt_digit x1 x2 d -> 0 <= i < d -> 0 <= v <= 9 ->
+    gt_digit (A.set x1 i v) x2 d
+
+  (* the number of digits of a given integer *)
+  logic nb_digits int : int
+
+  lemma Nb_digits_0 :
+    nb_digits 0 = 0
+    
+  axiom Nb_digits_def :
+    forall y : int. y > 0 -> nb_digits y = 1 + nb_digits (div y 10)
+
+  (* the smallest integer with digit sum y is (y mod 9)9..9
+     with exactly floor(y/9) trailing 9s *)
+
+  logic smallest int : array int
+
+  logic smallest_size int : int
+
+  axiom Smallest_size_def0:
+    smallest_size 0 = 0
+
+  axiom Smallest_size_def1:
+    forall y : int. y > 0 -> 
+    smallest_size y = if mod y 9 = 0 then div y 9 else 1 + div y 9
+
+  (* smallest(y) is an integer *)
+  axiom Smallest_def1:
+    forall y : int. y >= 0 -> 
+    forall k : int. 0 <= k < smallest_size y -> 0 <= smallest y # k <= 9
+
+  (* smallest(y) has digit sum y *)
+  axiom Smallest_def2:
+    forall y : int. y >= 0 -> 
+    sum_digits_a (smallest y) 0 (smallest_size y) = y
+
+  (* smallest(y) is the smallest integer with digit sum y *)
+  axiom Smallest_def3:
+    forall y : int. y >= 0 ->
+    forall u : int. 0 <= u < interp (smallest y) 0 (smallest_size y) -> 
+    sum_digits u <> y
+
+  lemma Smallest_shape_1:
+    forall y : int. y >= 0 -> mod y 9 = 0 ->
+    forall k : int. 0 <= k < smallest_size y -> smallest y # k = 9
+    
+  lemma Smallest_shape_2:
+    forall y : int. y >= 0 -> mod y 9 <> 0 ->
+    (forall k : int. 0 <= k < smallest_size y - 1 -> smallest y # k = 9) and
+    smallest y # (smallest_size y - 1) = mod y 9
+    
+  lemma Smallest_nb_digits:
+    forall y : int. y >= 0 -> 
+    nb_digits (interp (smallest y) 0 (smallest_size y)) = smallest_size y
+
+  lemma Any_nb_digits_above_smallest_size:
+    forall y : int. y > 0 -> 
+    forall d : int. d >= smallest_size y -> 
+    exists u : int. nb_digits u = d and digit_sum u = y
+
+  (* TODO: lemma Completeness: there exists an integer u with m digits and
+     digit sum y *)
+
+}
 
 let search_smallest () =
-  { A.length !x = m and is_integer !x }
+  { A.length !x = m and is_integer !x 
+    (* FIXME: x has at most n digits *) }
   label Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
@@ -199,43 +278,53 @@ let search_smallest () =
   for d = 0 to m - 1 do
     invariant { 
       !x = at !x Init and
-      !s = sum_digits_a !x d m 
+      !s = sum_digits_a !x d m and
+      forall u : int. 
+         interp (at !x Init) 0 m < u < interp9 !x d m -> sum_digits u <> y
+                           (* FIXME? <= *)
     } 
     for c = array_get x d + 1 to 9 do
-      invariant { !x = at !x Init } 
+      invariant { 
+        !x = at !x Init and
+	forall c' : int. !x # d < c' < c -> 
+          forall u : int. 
+          interp (at !x Init) 0 m < u < interp9 (A.set !x d c') d m -> 
+                                      (* FIXME? *)
+  	  sum_digits u <> y } 
       let delta = y - !s - c + array_get x d in
       if 0 <= delta && delta <= 9 * d then begin
+        assert { smallest_size delta <= d };
         array_set x d c;
         assert { sum_digits_a !x d m = y - delta };
+        assert { gt_digit !x (at !x Init) d };
 	let k = div delta 9 in
         assert { k <= d };
         for i = 0 to d - 1 do 
-          invariant { A.length !x = m and is_integer !x and
-                      sum_digits_a !x d m = y - delta and
-                      sum_digits_a !x 0 i = (if i <= k then 9*i else delta) and 
-                      gt_digit !x (at !x Init) d } 
+          invariant { 
+	     A.length !x = m and is_integer !x and
+             sum_digits_a !x d m = y - delta and
+             sum_digits_a !x 0 i = (if i <= k then 9*i else delta) and 
+             (forall j : int. 0 <= j < i -> 
+                (j <  smallest_size delta -> !x # j = smallest delta # j) and
+                (j >= smallest_size delta -> !x # j = 0)) and
+             gt_digit !x (at !x Init) d } 
           if i < k then array_set x i 9
 	  else if i = k then array_set x i (mod delta 9)
           else array_set x i 0;
           assert { is_integer !x }
         done;
         assert { sum_digits_a !x 0 d = delta };
+        assert { interp !x 0 d = interp (smallest delta) 0 d };
         raise Success
       end
     done;
     s := !s - array_get x d
   done
-  { true } 
+  { false } 
   | Success -> { is_integer !x and sum_digits_a !x 0 m = y and
-                 interp !x 0 m > interp (old !x) 0 m }
-
-(* 4. Completeness: we always raise the Success exception *)
-
-(*
-    (n = 0 or !x#(n-1) <> 0) and
-    (forall i:int. 0 <= i < n -> 0 <= !x#i <= 9) and
-    (forall i:int. n <= i < m -> !x#i = 0)
-*)
+                 interp !x 0 m > interp (old !x) 0 m and
+                 forall u : int. interp (old !x) 0 m < u < interp !x 0 m ->
+                                 sum_digits u <> y }
 
 
 (*
