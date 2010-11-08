@@ -154,7 +154,10 @@ complétude assistée par ordinateur.
 
 \section{Définition du problème}
 
-Le problème considéré ici a été proposé comme défi au concours de programmation MIUP'2010 (Maratona Inter-Universitária de Programação, épreuve nacional portugaise du circuit de concours ACM-ICPC) qui a eu lieu a l'Université d'Évora  - Portugal le 16 Octobre 2010. 
+Le problème considéré ici a été proposé comme défi au concours de
+programmation MIUP'2010 (Maratona Inter-Universitária de Programação,
+épreuve nacional portugaise du circuit de concours ACM-ICPC) qui a eu
+lieu a l'Université d'Évora - Portugal le 16 Octobre 2010.
 
 
 The digit sum $d(x)$ of a natural number $x$ is the sum of its
@@ -173,21 +176,39 @@ The expected output consists in exactly one line and is the number $x$.
 
 \subsection{Quelques considérations initiales}
 
-Analysons premièrement quelques particularités et faits remarquebles liés au problème.
+Analysons premièrement quelques particularités et faits remarquables
+liés au problème.
+
+
+La première remarque que l'on peut faire est que les limites du 
+problème indiquent clairement  la solution à formuler doit être
+efficace pour pouvoir traiter des données du problème  
+en temps raisonnable. Énumérer les entiers plus grand que $z$ jusqu'à 
+trouver le bon candidat n'est simplement pas raisonnable.
 
 Étant donné un entier $a$, le plus petit entier $b$ tel que $d(b)=a$ a
-comme longueur $\lceil \frac{a}{9}\rceil$ et est $i\overbrace{9
-  \ldots 9}^{\lfloor \frac{a}{9}\rfloor}$ où $i = a\mod 9$.
+comme longueur $\lceil \frac{a}{9}\rceil$ et est $i\overbrace{9 \ldots
+  9}^{\lfloor \frac{a}{9}\rfloor}$ où $i = a\mod 9$.
+
 
 Ainsi, dans le cas limite où $y$ est $89999$, le plus petit entier
-ayant cette digit-sum a pour longueur $\lceil \frac{89999}{9}\rceil
-$, soit 10\,000, et est égal à $8\overbrace{9 \ldots 9}^{9\,999}$.
+ayant cette digit-sum a pour longueur $\lceil \frac{89999}{9}\rceil $,
+soit 10\,000, et est égal à $8\overbrace{9 \ldots 9}^{9\,999}$.
+
+Une autre remarque intéressante est la suivante. S'il est possible de
+trouver un nombre $b$ de taille $c$ dont la digit-sum est $a$, il est
+possible de trouver un nombre de taille $c+1$ ayant la même digit-sum.
+Par exemple, il suffit de rajouter un $0$ à droite de $b$, ou alors de
+baisser d'une unité n'importe quel chiffre non nul de $b$ et
+d'intercaler le chiffre $1$ dans n'importe quelle position dans $b$,
+etc.
 
 
-Étant donnée les limites du problème, il est clair que aucun des
-nombres à calculer aura plus de $10\,001$ chiffres, vu qu'il est
+Ainsi, étant donnée les limites du problème, il est clair que aucun
+des nombres à calculer aura plus de $10\,001$ chiffres, vu qu'il est
 possible de trouver un nombre $x$ avec exactement $10\,0001$ chiffres
-tel que $d(x)=y$ quelque soit l'entier non nul $y<90000$.
+tel que $d(x)=y$ quelque soit l'entier non nul $y$ inférieur
+strictement à $90000$.
 
 Par exemple, si $y= 99$, alors on peut choisir $x=1\overbrace{0\ldots
   0}^{9\,989}\overbrace{9\ldots 9}^{10}8$. En effet $d(x)=y=99$ et $x$
@@ -198,14 +219,19 @@ $8\overbrace{9 \ldots 9}^{9\,999}$ nous aurions pu choisir
 $x=98\overbrace{9\ldots 9}^{9\,998}$ et rester dans les limites des
 $10\,000$ chiffres.
 
-D'une façon plus générale, si il est possible de trouver un nombre de taille $a$ dont la digit-sum est $b$, il est possible de trouver un nombre de taille $a+1$ ayant la même digit-sum.
 
+Ces considérations nous permettent de fixer une borne supérieure
+raisonnable à la taille de l'entier à calculer $x$ connaissant $y$ et
+$z$.  Considérons $u=\lceil \frac{y}{9} \rceil$ le nombre de chiffres
+du plus petit entier dont la digit-sum est $y$ et $v$ le nombre de
+chiffre de $z$.
 
-Ces considérations nous permettent de fixer une borne supérieure raisonnable à la taille de l'entier à calculer $x$ connaissant $y$ et $z$.  
-Considérons $u=\lceil \frac{y}{9} \rceil$ le nombre de chiffres du
-plus petit entier dont la digit-sum est $y$ et $v$ le nombre de chiffre de $z$.
-
-Si $u$ est strictement plus grand que $v$ alors  la borne est necessairement $u$ (et dans ce cas on sait même quelle est la valeur de $x$), dans le cas contraire la taille de $x$ sera au mieux $v$ et au plus $v+1$.  Car on se sait pas a priori s'il existe des nombres de taille $v$ plus grand de $z$ qui ont $y$ comme digit-sum, mais certainement que l'on arrive à en trouver avec $v+1$ chiffres.  
+Si $u$ est strictement plus grand que $v$ alors la borne est
+nécessairement $u$ (et dans ce cas on sait même quelle est la valeur
+de $x$), dans le cas contraire la taille de $x$ sera au mieux $v$ et
+au plus $v+1$.  Car on se sait pas a priori s'il existe des nombres de
+taille $v$ plus grand de $z$ qui ont $y$ comme digit-sum, mais
+certainement que l'on arrive à en trouver avec $v+1$ chiffres.
 
  
 \subsection{Représentation des données}
@@ -213,63 +239,102 @@ Si $u$ est strictement plus grand que $v$ alors  la borne est necessairement $u$
 
 
 
-Le premier choix à considérer au niveau de la solution est celle de la représentation des données que la solution manipulera. Les nombres manipulés sont potentiellement très grand, et la solution aura à manipuler en particulier les chiffres de ces nombres. Ansi il est assez naturel de choisir représenter les entiers manipulés (ici $x$) par la séquence de ces chiffres. 
-Comme nous allons le voir, la solution choisie devra parcourir le nombre du chiffre de poid le moins significatif au chiffre de poid le plus signigficatif. Pour cela il sera plus convenable représenter les chiffre dans l'ordre inverse dans le tableau. Ainsi le parcours se fera ainsi de gauche a droite dans le tableau.
+Le premier choix à considérer au niveau de la solution est celle de la
+représentation des données que la solution manipulera. Les nombres
+manipulés sont potentiellement très grand, et la solution aura à
+manipuler en particulier les chiffres de ces nombres. Ainsi il est
+assez naturel de choisir représenter les entiers manipulés (ici $x$)
+par la séquence de ces chiffres.  Comme nous allons le voir, la
+solution choisie devra parcourir le nombre du chiffre de poids le moins
+significatif au chiffre de poids le plus significatif. Pour cela il
+sera plus convenable représenter les chiffre dans l'ordre inverse dans
+le tableau. Ainsi le parcours se fera ainsi de gauche a droite dans le
+tableau.
 
 
 
 % voir si cette note est utile
-Il pourra être important garantir que la representation des entiers est cohérente. C'est à dire que les éléments du tableau sont des entiers entre $0$ et $9$, qu'à gauche du premier chiffre il n'y a, la cas échéant, que des $0$ (dans le cas de la représentation des chiffre en ordre inverse, à droite du dernier chiffre repésentatif il n'y a que des $0$ ).  Nous reviendrons sur ce point le moment venu.
+Il pourra être pertinent garantir que la représentation des entiers
+est cohérente. C'est à dire que les éléments du tableau sont des
+entiers entre $0$ et $9$, qu'à gauche du premier chiffre il n'y a, le
+cas échéant, que des $0$ (dans le cas de la représentation des chiffre
+en ordre inverse, à droite du dernier chiffre représentatif il n'y a
+que des $0$).  Nous reviendrons sur ce point le moment venu.
 
 
 
 \subsection{L'algorithme}
 
 
-Considérons que la solution $x$ soit constitué des chiffre $x_m\ldots x_1x_0$ et que $z$ soit constitué des chiffres $z_m\ldots z_1z_0$ (les chiffres à gauche pouvant être des $0$ si nécessaire). 
+Considérons que la solution $x$ soit constitué des chiffre $x_m\ldots
+x_1x_0$ et que $z$ soit constitué des chiffres $z_m\ldots z_1z_0$ (les
+chiffres à gauche pouvant être des $0$ si nécessaire).
 
-Comme $x$ est le premier entier qui suit $z$  (suivant l'ordre croissant) et qui a pour digit-sum $y$, remarquons qu'il doit exister un indice $d$ tel que qu'à gauche de cet indice $x$ coincide avec $z$ ($\forall i, d<i\leq m \implies x_i=z_i$) et que ce qui reste de $x$ à droite (d inclu) soit un nombre plus grand strictement que  ce qui reste de $z$ à droite de $d$ ($x_d\ldots x_0 > z_d\ldots z_0$).
+Comme $x$ est le premier entier qui suit $z$ (suivant l'ordre
+croissant) et qui a pour digit-sum $y$, remarquons qu'il doit exister
+un indice $d$ tel que qu'à gauche de cet indice $x$ coïncide avec $z$
+($\forall i, d<i\leq m \implies x_i=z_i$) et que ce qui reste de $x$ à
+droite (d inclus) soit un nombre plus grand strictement que ce qui
+reste de $z$ à droite de $d$ ($x_d\ldots x_0 > z_d\ldots z_0$).
  
-Dans ce cas notons que $\Sigma_{i=d+1}^m x_i=\Sigma_{i=d+1}^m z_i$ 
-(soit $a$ cette valeur).
-Soient $b_x=\Sigma_{i=0}^d x_i$ et $b_z = \Sigma_{i=0}^d z_i$, nous avons $b_x>b_z$. Il est facile de voir que $y=a+b_x$ et $d(z)=a+b_z$.
+Dans ce cas notons aussi que $\Sigma_{i=d+1}^m x_i=\Sigma_{i=d+1}^m z_i$
+(soit $a$ cette valeur).  Soient $b_x=\Sigma_{i=0}^d x_i$ et $b_z =
+\Sigma_{i=0}^d z_i$, nous avons $b_x>b_z$. Il est facile de voir que
+$y=a+b_x$ et $d(z)=a+b_z$.
 
-Trouver le plus petit $x$ c'est donc, partant de $z$, trouver un indice $d$  plus a droite possible de $z$ tel qu'il soit possible de trouver la plus petite augmentation de $z_d$ ($x_d$) qui rende possible l'expression d'un nombre  $x_{d-1}\ldots x_0$  ayant comme digit-sum $y-a-x_d$ (c'est à dire, 
-$\Sigma_{i=0}^{d-1}x_i = y-a-x_d$).
+Trouver le plus petit $x$ c'est donc, partant de $z$, trouver un
+indice $d$ plus à droite possible dans $z$ tel qu'il soit possible de
+trouver la plus petite augmentation de $z_d$ ($x_d$) qui rende
+possible l'expression d'un nombre $x_{d-1}\ldots x_0$ ayant comme
+digit-sum $y-a-x_d$ (c'est à dire, $\Sigma_{i=0}^{d-1}x_i = y-a-x_d$).
 
 
-Pour cela remarquons qu'il nous suffit de  parcourir $z$ de $z_0$ à $z_m$ et que pour chacun des $z_i$ 
+Pour cela remarquons qu'il nous suffit de parcourir $z$ de $z_0$ à
+$z_m$ et que pour chacun des $z_i$ essayer (dans l'ordre) les différents chiffres qui suivent $z_i$.
+Une tentative réussi si l'on réussi à exprimer avec $i-1$ chiffres le plus petit nombre qui complète la digit-sum.
+Si aucune tentative réussi alors $z_i$ n'est pas le bon chiffre ($i$ n'est pas $d$), il faut tenter $z_{i+1}$. 
 
 
 
 \begin{lstlisting}
+
+(*reading the input*)
 let ys = Sys.argv.(1)
 let zs = Sys.argv.(2)
+
+(*n is the size of z*)
 let n = String.length zs
 let y = int_of_string ys
 
+(* bound for the size of x*)
 let max_digits = 1 + max n (y / 9)
+
+(* x is initialized as z (with the digit in reverse order)*)
 let x = Array.create max_digits 0
 let () = 
   for i = 0 to n - 1 do x.(n - 1 - i) <- Char.code zs.[i] - Char.code '0' done
 
 let () =
+  (* let s be the digit-sum of x / z*)
   let s = ref 0 in
   for i = 0 to max_digits - 1 do s := !s + x.(i) done;
+  
+  (* we try for each digit, staring from the rightmost digit*)
   for d = 0 to max_digits - 1 do
     (* s is the sum of digits d..n-1 *)
     (* solution with digits > d intacts, and digit d increased by 1 or more *)
     for c = x.(d) + 1 to 9 do
       let delta = y - !s - c + x.(d) in
-      if 0 <= delta && delta <= 9 * d then begin
-	x.(d) <- c;
-	let k = delta / 9 in
-	for i = 0 to d-1 do 
-	  x.(i) <- if i < k then 9 else if i = k then delta mod 9 else 0
-	done;
-	for i = max d (n-1) downto 0 do Format.printf "%d" x.(i) done;
-	Format.printf "@.";
-	exit 0
+      if 0 <= delta && delta <= 9 * d then 
+      begin
+      	x.(d) <- c;
+		let k = delta / 9 in
+		for i = 0 to d-1 do 
+	  	  x.(i) <- if i < k then 9 else if i = k then delta mod 9 else 0
+		done;
+		for i = max d (n-1) downto 0 do Format.printf "%d" x.(i) done;
+		Format.printf "@.";
+		exit 0
       end
     done;
     s := !s - x.(d)

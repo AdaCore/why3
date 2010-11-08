@@ -358,7 +358,7 @@ let w = GWindow.window
   ~allow_grow:true ~allow_shrink:true
   ~width:gconfig.window_width
   ~height:gconfig.window_height
-  ~title:"why-db" ()
+  ~title:"why GUI with database" ()
 
 let (_ : GtkSignal.id) = w#connect#destroy ~callback:exit_function
 
