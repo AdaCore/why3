@@ -188,6 +188,35 @@ module type S =
        key and the associated value for each binding of the map. *)
 
 
+    (** {3} Added into why stdlib version *)
+
+
+    val change : key -> ('a option -> 'a option) -> 'a t -> 'a t
+    (** [change x f m] returns a map containing the same bindings as
+        [m], except the binding of [x] in [m] is changed from [y] to
+        [f (Some y)] if [m] contains a binding of [x], otherwise the
+        binding of [x] becomes [f None].
+
+        [change x f m] corresponds to a more efficient way to do
+        [add x (try f (Some (find x m)) with Not_found -> f None) m]
+    *)
+
+    val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
+    (** [union f m1 m2] computes a map whose keys is a subset of keys of [m1]
+        and of [m2]. If a binding is present in [m1] (resp. [m2]) and not in
+        [m2] (resp. [m1]) the same binding is present in the result. Indeed the
+        function [f] is called only in ambiguous cases.
+     *)
+
+    val inter : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
+    (** [inter f m1 m2] computes a map whose keys is a subset of keys of [m1]
+        and of [m2].
+     *)
+
+    val find_default : key -> 'a -> 'a t -> 'a
+    (** [find_default x d m] returns the current binding of [x] in [m],
+        or return [d] if no such binding exists. *)
+
   end
 (** Output signature of the functor {!Map.Make}. *)
 

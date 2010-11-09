@@ -50,6 +50,12 @@ module type S =
     val find: key -> 'a t -> 'a
     val map: ('a -> 'b) -> 'a t -> 'b t
     val mapi: (key -> 'a -> 'b) -> 'a t -> 'b t
+
+    (** Added into why stdlib version *)
+    val change : key -> ('a option -> 'a option) -> 'a t -> 'a t
+    val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
+    val inter : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
+    val find_default : key -> 'a -> 'a t -> 'a
   end
 
 module Make(Ord: OrderedType) = struct
@@ -314,6 +320,73 @@ module Make(Ord: OrderedType) = struct
       bindings_aux [] s
 
     let choose = min_binding
+
+    (** Added into why stdlib version *)
+
+    let rec change x f = function
+      | Empty ->
+        begin match f None with
+          | None -> Empty
+          | Some d -> Node(Empty, x, d, Empty, 1)
+        end
+      | Node(l, v, d, r, h) ->
+          let c = Ord.compare x v in
+          if c = 0 then
+            (* concat or bal *)
+            match f (Some d) with
+              | None -> concat l r
+              | Some d -> Node(l, x, d, r, h)
+          else if c < 0 then
+            bal (change x f l) v d r
+          else
+            bal l v d (change x f r)
+
+    let rec union f s1 s2 =
+      match (s1, s2) with
+        (Empty, t2) -> t2
+      | (t1, Empty) -> t1
+      | (Node(l1, v1, d1, r1, h1), Node(l2, v2, d2, r2, h2)) ->
+          if h1 >= h2 then
+            if h2 = 1 then
+              change v2 (function None -> Some d2 | Some d1 -> f v2 d1 d2) s1
+            else begin
+              let (l2, d2, r2) = split v1 s2 in
+              match d2 with
+                | None -> join (union f l1 l2) v1 d1 (union f r1 r2)
+                | Some d2 ->
+                  concat_or_join (union f l1 l2) v1 (f v1 d1 d2)
+                    (union f r1 r2)
+            end
+          else
+            if h1 = 1 then
+              change v1 (function None -> Some d1 | Some d2 -> f v1 d1 d2) s2
+            else begin
+              let (l1, d1, r1) = split v2 s1 in
+              match d1 with
+                | None -> join (union f l1 l2) v2 d2 (union f r1 r2)
+                | Some d1 ->
+                  concat_or_join (union f l1 l2) v2 (f v2 d1 d2)
+                    (union f r1 r2)
+            end
+
+
+    let rec inter f s1 s2 =
+      match (s1, s2) with
+      | (Empty, _) | (_, Empty) -> Empty
+      | (Node(l1, v1, d1, r1, _), t2) ->
+          match split v1 t2 with
+            (l2, None, r2) ->
+              concat (inter f l1 l2) (inter f r1 r2)
+          | (l2, Some d2, r2) ->
+              concat_or_join (inter f l1 l2) v1 (f v1 d1 d2) (inter f r1 r2)
+
+    let rec find_default x def = function
+        Empty -> def
+      | Node(l, v, d, r, _) ->
+          let c = Ord.compare x v in
+          if c = 0 then d
+          else find_default x def (if c < 0 then l else r)
+
 
 end
 

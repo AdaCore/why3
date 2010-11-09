@@ -113,7 +113,7 @@ let rec match_term vm t acc p = match t.t_node, p.pat_node with
 let build_call_graph cgr syms ls =
   let call vm s tl =
     let desc t = match t.t_node with
-      | Tvar v -> (try Mvs.find v vm with Not_found -> Unknown)
+      | Tvar v -> Mvs.find_default v Unknown vm
       | _ -> Unknown
     in
     Hls.add cgr s (ls, Array.of_list (List.map desc tl))
@@ -563,13 +563,9 @@ let known_id kn id =
   if not (Mid.mem id kn) then raise (UnknownIdent id)
 
 let merge_known kn1 kn2 =
-  let add_known id decl kn =
-    try
-      if not (d_equal (Mid.find id kn2) decl) then raise (RedeclaredIdent id);
-      kn
-    with Not_found -> Mid.add id decl kn
-  in
-  Mid.fold add_known kn1 kn2
+  let check_known id decl1 decl2 =
+    if d_equal decl1 decl2 then Some decl1 else raise (RedeclaredIdent id) in
+  Mid.union check_known kn1 kn2
 
 let known_add_decl kn0 decl =
   let add_known id kn =

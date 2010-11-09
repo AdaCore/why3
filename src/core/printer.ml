@@ -118,7 +118,7 @@ let print_th_prelude task fmt pm =
     | _ -> acc) [] task
   in
   List.iter (fun th ->
-    let prel = try Mid.find th.th_name pm with Not_found -> [] in
+    let prel = Mid.find_default th.th_name [] pm in
     print_prelude fmt prel) th_used
 
 exception KnownTypeSyntax of tysymbol

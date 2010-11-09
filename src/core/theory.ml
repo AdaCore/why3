@@ -47,10 +47,10 @@ exception ClashSymbol of string
 
 let ns_add eq chk x v m =
   if not chk then Mnm.add x v m
-  else try
-    if not (eq (Mnm.find x m) v) then raise (ClashSymbol x);
-    m
-  with Not_found -> Mnm.add x v m
+  else Mnm.change x (function
+    | None -> Some v
+    | Some vm when eq vm v -> Some vm
+    | _ -> raise (ClashSymbol x)) m
 
 let ts_add = ns_add ts_equal
 let ls_add = ns_add ls_equal
@@ -63,8 +63,9 @@ let rec merge_ns chk ns1 ns2 =
     ns_ns = Mnm.fold (fusion chk) ns1.ns_ns ns2.ns_ns; }
 
 and fusion chk x ns m =
-  let os = try Mnm.find x m with Not_found -> empty_ns in
-  Mnm.add x (merge_ns chk os ns) m
+  Mnm.change x (function
+    | None -> Some (merge_ns chk empty_ns ns)
+    | Some os -> Some (merge_ns chk os ns)) m
 
 let add_ts chk x ts ns = { ns with ns_ts = ts_add chk x ts ns.ns_ts }
 let add_ls chk x ls ns = { ns with ns_ls = ls_add chk x ls ns.ns_ls }
@@ -675,9 +676,9 @@ let add_meta uc s al = add_tdecl uc (create_meta s al)
 
 let clone_meta tdt th tdc = match tdt.td_node, tdc.td_node with
   | Meta (t,al), Clone (th',tm,lm,pm) when id_equal th.th_name th'.th_name ->
-      let find_ts ts = try Mts.find ts tm with Not_found -> ts in
-      let find_ls ls = try Mls.find ls lm with Not_found -> ls in
-      let find_pr pr = try Mpr.find pr pm with Not_found -> pr in
+      let find_ts ts = Mts.find_default ts ts tm in
+      let find_ls ls = Mls.find_default ls ls lm in
+      let find_pr pr = Mpr.find_default pr pr pm in
       let cl_marg = function
         | MAts ts -> MAts (find_ts ts)
         | MAls ls -> MAls (find_ls ls)

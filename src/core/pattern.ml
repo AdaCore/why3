@@ -68,7 +68,7 @@ module Compile (X : Action) = struct
         (* dispatch every case to a primitive constructor/wild case *)
         let cases,wilds =
           let add_case fs pl a cases =
-            let rl = try Mls.find fs cases with Not_found -> [] in
+            let rl = Mls.find_default fs [] cases in
             Mls.add fs ((pl,a)::rl) cases
           in
           let add_wild pl a fs ql cases =
