@@ -16,7 +16,7 @@
 (*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
 (*                                                                        *)
 (**************************************************************************)
-
+open Stdlib
 (* useful combinators *)
 
 let ($) f x = f x

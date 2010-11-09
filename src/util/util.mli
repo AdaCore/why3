@@ -16,7 +16,7 @@
 (*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
 (*                                                                        *)
 (**************************************************************************)
-
+open Stdlib
 (** Useful functions *)
 
 val ($) : ('a -> 'b) -> 'a -> 'b

@@ -13,6 +13,8 @@
 
 (* $Id: map.mli 10483 2010-05-31 12:48:13Z doligez $ *)
 
+module Map : sig
+
 (** Association tables over ordered types.
 
    This module implements applicative association tables, also known as
@@ -192,3 +194,5 @@ module type S =
 module Make (Ord : OrderedType) : S with type key = Ord.t
 (** Functor building an implementation of the map structure
    given a totally ordered type. *)
+
+end
