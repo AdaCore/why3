@@ -217,6 +217,10 @@ module type S =
     (** [find_default x d m] returns the current binding of [x] in [m],
         or return [d] if no such binding exists. *)
 
+    val mapi_fold:
+      (key -> 'a -> 'acc -> 'acc * 'b)-> 'a t -> 'acc -> 'acc * 'b t
+      (** fold and map at the same time *)
+
   end
 (** Output signature of the functor {!Map.Make}. *)
 

@@ -56,6 +56,8 @@ module type S =
     val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
     val inter : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
     val find_default : key -> 'a -> 'a t -> 'a
+    val mapi_fold:
+      (key -> 'a -> 'acc -> 'acc * 'b)-> 'a t -> 'acc -> 'acc * 'b t
   end
 
 module Make(Ord: OrderedType) = struct
@@ -386,6 +388,17 @@ module Make(Ord: OrderedType) = struct
           let c = Ord.compare x v in
           if c = 0 then d
           else find_default x def (if c < 0 then l else r)
+
+
+    let rec mapi_fold f m acc =
+      match m with
+        Empty -> acc, Empty
+      | Node(l, v, d, r, h) ->
+          let acc,l' = mapi_fold f l acc in
+          let acc,d' = f v d acc in
+          let acc,r' = mapi_fold f r acc in
+          acc,Node(l', v, d', r', h)
+
 
 
 end
