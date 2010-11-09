@@ -45,6 +45,22 @@ let empty_ns = {
 
 exception ClashSymbol of string
 
+let ns_union eq chk m1 m2 =
+  Mnm.union (fun x k1 k2 ->
+    if not chk || eq k1 k2
+    then Some k1
+    else raise (ClashSymbol x)
+  ) m1 m2
+
+let rec merge_ns chk ns1 ns2 =
+  { ns_ts = ns_union ts_equal chk ns1.ns_ts ns2.ns_ts;
+    ns_ls = ns_union ls_equal chk ns1.ns_ls ns2.ns_ls;
+    ns_pr = ns_union pr_equal chk ns1.ns_pr ns2.ns_pr;
+    ns_ns = fusion            chk ns1.ns_ns ns2.ns_ns; }
+
+and fusion chk ns1 ns2 =
+  Mnm.union (fun _ ns1 ns2 -> Some (merge_ns chk ns1 ns2)) ns1 ns2
+
 let ns_add eq chk x v m =
   if not chk then Mnm.add x v m
   else Mnm.change x (function
@@ -55,22 +71,16 @@ let ns_add eq chk x v m =
 let ts_add = ns_add ts_equal
 let ls_add = ns_add ls_equal
 let pr_add = ns_add pr_equal
-
-let rec merge_ns chk ns1 ns2 =
-  { ns_ts = Mnm.fold (ts_add chk) ns1.ns_ts ns2.ns_ts;
-    ns_ls = Mnm.fold (ls_add chk) ns1.ns_ls ns2.ns_ls;
-    ns_pr = Mnm.fold (pr_add chk) ns1.ns_pr ns2.ns_pr;
-    ns_ns = Mnm.fold (fusion chk) ns1.ns_ns ns2.ns_ns; }
-
-and fusion chk x ns m =
+let nm_add chk x ns m =
   Mnm.change x (function
-    | None -> Some (merge_ns chk empty_ns ns)
+    | None -> Some ns
     | Some os -> Some (merge_ns chk os ns)) m
+
 
 let add_ts chk x ts ns = { ns with ns_ts = ts_add chk x ts ns.ns_ts }
 let add_ls chk x ls ns = { ns with ns_ls = ls_add chk x ls ns.ns_ls }
 let add_pr chk x pf ns = { ns with ns_pr = pr_add chk x pf ns.ns_pr }
-let add_ns chk x nn ns = { ns with ns_ns = fusion chk x nn ns.ns_ns }
+let add_ns chk x nn ns = { ns with ns_ns = nm_add chk x nn ns.ns_ns }
 
 let rec ns_find get_map ns = function
   | []   -> assert false
