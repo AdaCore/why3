@@ -17,10 +17,6 @@ let rec f91 (n:int) : int variant { 101-n } =
     if x >= 101 then x-10 else 91
 
   (* iter_f(n,x) = f^n(x) *)
-(*
-  logic iter_f (n x:int) : int =
-    if n = 0 then x else iter_f (n-1) (f x)
-*)
   logic iter_f int int : int
 
   axiom Iter_def : forall n x : int. iter_f n x =
