@@ -246,14 +246,17 @@ let search () =
     forall d : int. d >= smallest_size y -> 
     exists u : int. nb_digits u = d and sum_digits u = y
 
-  (* TODO: lemma Completeness: there exists an integer u with m digits and
-     digit sum y *)
-
+  (* there exists an integer u with m digits and digit sum y *)
+  lemma Completeness: 
+    m >= smallest_size y and (* cut *)
+    exists u : int. nb_digits u = m and sum_digits u = y
 }
 
 let search_smallest () =
-  { A.length !x = m and is_integer !x 
-    (* FIXME: x has at most n digits *) }
+  { A.length !x = m and is_integer !x and
+    (* x has at most n digits *) 
+    forall k : int. n <= k < m -> !x # k = 0
+  }
   label Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
@@ -266,16 +269,14 @@ let search_smallest () =
       !x = at !x Init and
       !s = sum !x d m and
       forall u : int. 
-         interp (at !x Init) 0 m < u < interp9 !x d m -> sum_digits u <> y
-                           (* FIXME? <= *)
+         interp (at !x Init) 0 m < u <= interp9 !x d m -> sum_digits u <> y
     } 
     for c = array_get x d + 1 to 9 do
       invariant { 
         !x = at !x Init and
 	forall c' : int. !x # d < c' < c -> 
           forall u : int. 
-          interp (at !x Init) 0 m < u < interp9 (A.set !x d c') d m -> 
-                                      (* FIXME? *)
+          interp (at !x Init) 0 m < u <= interp9 (A.set !x d c') d m -> 
   	  sum_digits u <> y } 
       let delta = y - !s - c + array_get x d in
       if 0 <= delta && delta <= 9 * d then begin
