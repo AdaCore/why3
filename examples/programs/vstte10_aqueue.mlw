@@ -1,0 +1,63 @@
+(* VSTTE'10 competition 
+   Problem 5: amortized queue *)
+
+{
+  use export list.List
+  use export list.Length
+  use export list.Append
+  use export list.Reverse
+
+  type queue 'a = Q (front : list 'a) (lenf : int)
+                    (rear  : list 'a) (lenr : int)
+
+  logic inv (q : queue 'a) =
+    length (front q) = lenf q and
+    length (rear  q) = lenr q and
+    lenf q >= lenr q
+
+  logic model (q : queue 'a) : list 'a =
+    append (front q) (reverse (rear q))
+}
+
+let create f lf r lr =
+  { lf = length f and lr = length r }
+  if lf >= lr then
+    Q f lf r lr
+  else
+    let f = append f (reverse r) in
+    Q f (lf + lr) Nil 0
+  : queue 'a
+  { inv result and model result = append f (reverse r) }
+
+let empty () =
+  {}
+  Q Nil 0 Nil 0 : queue 'a
+  { inv result and model result = Nil }
+
+let head (q : queue 'a) =
+  { inv q and model q <> Nil }
+  match front q with
+    | Nil -> absurd
+    | Cons x _ -> x
+  end
+  { match model q with Nil -> false | Cons x _ -> result = x end }
+
+let tail (q : queue 'a) =
+  { inv q and model q <> Nil }
+  match front q with
+    | Nil -> absurd
+    | Cons _ r -> create r (lenf q - 1) (rear q) (lenr q)
+  end
+  { inv result and
+    match model q with Nil -> false | Cons _ r -> model result = r end }
+
+let enqueue (x : 'a) (q : queue 'a) =
+  { inv q }
+  create (front q) (lenf q) (Cons x (rear q)) (lenr q + 1) 
+  { inv result and model result = append (model q) (Cons x Nil) }
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/vstte10_aqueue.gui"
+End: 
+*)

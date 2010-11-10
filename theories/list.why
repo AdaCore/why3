@@ -17,6 +17,8 @@ theory Length
 
   lemma Length_nonnegative : forall l:list 'a. length(l) >= 0
 
+  lemma Length_nil : forall l:list 'a. length l = 0 <-> l = Nil
+
 end
 
 theory Mem
@@ -35,9 +37,49 @@ theory Nth
   use import int.Int
   
   logic nth (n : int) (l : list 'a) : option 'a = match l with
-   | Nil -> None
-   | Cons x r -> if n = 0 then Some x else nth (n - 1) r
+    | Nil -> None
+    | Cons x r -> if n = 0 then Some x else nth (n - 1) r
   end
+
+end
+
+theory Append
+  use export List
+
+  logic append (l1 l2 : list 'a) : list 'a = match l1 with
+    | Nil -> l2
+    | Cons x1 r1 -> Cons x1 (append r1 l2)
+  end
+
+  lemma Append_assoc : 
+    forall l1 l2 l3 : list 'a. 
+    append l1 (append l2 l3) = append (append l1 l2) l3
+
+  lemma Append_l_nil :
+    forall l : list 'a. append l Nil = l
+
+  use import Length
+  use import int.Int
+
+  lemma Append_length :
+    forall l1 l2 : list 'a. length (append l1 l2) = length l1 + length l2
+
+end
+
+theory Reverse
+
+  use export List
+  use import Append
+
+  logic reverse (l : list 'a) : list 'a = match l with
+    | Nil -> Nil
+    | Cons x r -> append (reverse r) (Cons x Nil)
+  end
+
+  use import Length
+ 
+  lemma Reverse_length :
+    forall l : list 'a. length (reverse l) = length l
 
 end
 
