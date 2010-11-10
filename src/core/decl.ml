@@ -429,7 +429,7 @@ let create_logic_decl ldl =
         syms, news_id news ls.ls_name
   in
   let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) ldl in
-  ignore (check_termination ldl);
+  (* ignore (check_termination ldl); *)
   mk_decl (Dlogic ldl) syms news
 
 exception InvalidIndDecl of lsymbol * prsymbol
