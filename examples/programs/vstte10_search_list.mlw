@@ -4,27 +4,29 @@
 {
   use export list.List
   use export list.Length
-  use export option.Option
-
-(*
-  logic nth (n : int) (l : list 'a) = match l with
-   | Nil -> None
-   | Cons x r -> if n = 0 then Some x else nth (n - 1) r
-  end
-*)
+  use export list.Nth
 }
 
 let rec search i l = 
+  {}
   match l with
   | Nil -> i
   | Cons x r -> if x = 0 then i else search (i+1) r
   end
+  { (i <= result < i + length l and nth (result - i) l = Some 0 and
+     forall j:int. 0 <= j < result - i -> nth j l <> Some 0) 
+    or
+    (result = i + length l and 
+     forall j:int. 0 <= j < length l -> nth j l <> Some 0) }
 
 let search_list l =
   { }
   search 0 l
-  { (0 <= result < length l (* nth result l = 0*)) or 
-    (result = length l) }
+  { (0 <= result < length l and nth result l = Some 0 and
+     forall j:int. 0 <= j < result -> nth j l <> Some 0) 
+    or 
+    (result = length l and
+     forall j:int. 0 <= j < length l -> nth j l <> Some 0) }
 
 
 (*

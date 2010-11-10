@@ -29,19 +29,17 @@ theory Mem
 
 end
 
-(*
 theory Nth
   use export List
-  use import option.Option
+  use export option.Option
   use import int.Int
   
-  logic nth (n : int) (l : list 'a) = match l with
+  logic nth (n : int) (l : list 'a) : option 'a = match l with
    | Nil -> None
    | Cons x r -> if n = 0 then Some x else nth (n - 1) r
   end
 
 end
-*)
 
 theory Sorted
 
