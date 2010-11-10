@@ -1,0 +1,28 @@
+(* VSTTE'10 competition *)
+
+{
+  use array.ArrayLength as A
+  use import int.MinMax
+
+  type array 'a = A.t int 'a
+
+  logic (#) (a : array 'a) (i : int) : 'a = A.get a i
+}
+
+let max_sum a n =
+  { n >= 0 and forall i:int. 0 <= i < n -> a#i >= 0 }
+  let sum = ref 0 in
+  let max = ref 0 in
+  for i = 0 to n-1 do
+    invariant { !sum <= i * !max and forall j:int. 0 <= j < i -> a#j <= !max }
+    if !max < a#i then max := a#i;
+    sum := !sum + a#i
+  done;
+  (!sum, !max)
+  { let (sum, max) = result in sum <= n * max }
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/vstte10_max_sum.gui"
+End: 
+*)
