@@ -93,7 +93,8 @@ module type S =
     val mapi_fold:
       (key -> 'a -> 'acc -> 'acc * 'b) -> 'a t -> 'acc -> 'acc * 'b t
 
-    module Set : SetS with type elt = key and type t = unit t
+    module type SetS = SetS with type elt = key and type t = unit t
+    module Set : SetS
 
   end
 
@@ -468,6 +469,8 @@ module Make(Ord: OrderedType) = struct
           let acc,d' = f v d acc in
           let acc,r' = mapi_fold f r acc in
           acc,Node(l', v, d', r', h)
+
+    module type SetS = SetS with type elt = key and type t = unit t
 
     module Set =
       struct

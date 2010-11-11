@@ -120,14 +120,14 @@ module OrderedHashList (X : Tagged) : OrderedHash with type t = X.t list
 module StructMake (X : Tagged) :
 sig
   module M : Map.S with type key = X.t
-  module S : Map.SetS with type elt = X.t and type t = unit M.t
+  module S : M.SetS
   module H : Hashtbl.S with type key = X.t
 end
 
 module WeakStructMake (X : Hashweak.Weakey) :
 sig
   module M : Map.S with type key = X.t
-  module S : Map.SetS with type elt = X.t and type t = unit M.t
+  module S : M.SetS
   module H : Hashtbl.S with type key = X.t
   module W : Hashweak.S with type key = X.t
 end

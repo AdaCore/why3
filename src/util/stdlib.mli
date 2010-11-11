@@ -344,14 +344,15 @@ module type S =
       (key -> 'a -> 'acc -> 'acc * 'b)-> 'a t -> 'acc -> 'acc * 'b t
       (** fold and map at the same time *)
 
-    module Set : SetS with type elt = key and type t = unit t
+    module type SetS = SetS with type elt = key and type t = unit t
+
+    module Set : SetS
 
   end
 
 (** Output signature of the functor {!Map.Make}. *)
 
-module Make (Ord : OrderedType) : S with
-  type key = Ord.t and type Set.elt = Ord.t
+module Make (Ord : OrderedType) : S with type key = Ord.t
 (** Functor building an implementation of the map/set structure
    given a totally ordered type. *)
 
