@@ -1573,13 +1573,10 @@ let rec t_match s t1 t2 =
   match t1.t_node, t2.t_node with
     | Tconst c1, Tconst c2 when c1 = c2 -> s
     | Tvar v1, _ ->
-      Mvs.change v1 (function
-        | None -> Some t2
-        | Some tv1 when t_equal tv1 t2 -> Some tv1
-        | _ -> raise NoMatch) s
-      (* begin try *)
-      (*   if t_equal (Mvs.find v1 s) t2 then s else raise NoMatch *)
-      (*   with Not_found -> Mvs.add v1 t2 s end *)
+        Mvs.change v1 (function
+          | None -> Some t2
+          | Some t1 as r when t_equal t1 t2 -> r
+          | _ -> raise NoMatch) s
     | Tapp (s1,l1), Tapp (s2,l2) when ls_equal s1 s2 ->
         List.fold_left2 t_match s l1 l2
     | Tif (f1,t1,e1), Tif (f2,t2,e2) ->
