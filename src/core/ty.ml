@@ -139,9 +139,8 @@ exception DuplicateTypeVar of tvsymbol
 exception UnboundTypeVar of tvsymbol
 
 let create_tysymbol name args def =
-  let add s v =
-    if Stv.mem v s then raise (DuplicateTypeVar v);
-    Stv.add v s
+  let add s v = Stv.change v (fun there ->
+    if there then raise (DuplicateTypeVar v) else true) s
   in
   let s = List.fold_left add Stv.empty args in
   let rec vars () ty = match ty.ty_node with
@@ -196,10 +195,10 @@ let rec ty_match s ty1 ty2 =
   if ty_equal ty1 ty2 then s
   else match ty1.ty_node, ty2.ty_node with
     | Tyvar n1, _ ->
-      Mtv.change n1 (function
-        | None -> Some ty2
-        | Some ty1 as r when ty_equal ty1 ty2 -> r
-        | _ -> raise Exit) s
+        Mtv.change n1 (function
+          | None -> Some ty2
+          | Some ty1 as r when ty_equal ty1 ty2 -> r
+          | _ -> raise Exit) s
     | Tyapp (f1, l1), Tyapp (f2, l2) when ts_equal f1 f2 ->
         List.fold_left2 ty_match s l1 l2
     | _ ->
