@@ -40,6 +40,120 @@ module type OrderedType =
   end
 (** Input signature of the functor {!Map.Make}. *)
 
+module type SetS =
+  sig
+    type elt
+
+    type t
+    (** The type of sets of type [elt]. *)
+
+    val empty: t
+    (** The empty set. *)
+
+    val is_empty: t -> bool
+    (** Test whether a set is empty or not. *)
+
+    val mem: elt -> t -> bool
+    (** [mem x s] returns [true] if [s] contains [x],
+       and [false] otherwise. *)
+
+    val add: elt -> t -> t
+    (** [add x s] returns a set containing the same elements as
+       [s], plus [x]. *)
+
+    val singleton: elt -> t
+    (** [singleton x] returns the one-element set that contains [x]. *)
+
+    val remove: elt -> t -> t
+    (** [remove x s] returns a set containing the same elements as [s],
+       except for [x]. *)
+
+    val merge: (elt -> bool -> bool -> bool) -> t -> t -> t
+    (** [merge f s1 s2] computes a set whose elts is a subset of elts
+        of [s1] and of [s2]. The presence of each such element is
+        determined with the function [f]. *)
+
+    val compare: t -> t -> int
+    (** Total ordering between sets. *)
+
+    val equal: t -> t -> bool
+    (** [equal s1 s2] tests whether the sets [s1] and [s2] are equal. *)
+
+    val subset: t -> t -> bool
+    (** [subset s1 s2] tests whether the set [s1] is a subset of [s2]. *)
+
+    val iter: (elt -> unit) -> t -> unit
+    (** [iter f s] applies [f] to all elements of [s].
+       The elements are passed to [f] in increasing order with respect
+       to the ordering over the type of the elts. *)
+
+    val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    (** [fold f s a] computes [(f eN ... (f e1 a)...)],
+       where [e1 ... eN] are the element of [s] in increasing order. *)
+
+    val for_all: (elt -> bool) -> t -> bool
+    (** [for_all p s] checks if all the elements of [s] satisfy
+       the predicate [p]. *)
+
+    val exists: (elt -> bool) -> t -> bool
+    (** [exists p s] checks if at least one element of [s] satisfies
+       the predicate [p]. *)
+
+    val filter: (elt -> bool) -> t -> t
+    (** [filter p s] returns the set with all the elements of [s]
+        that satisfy predicate [p]. *)
+
+    val partition: (elt -> bool) -> t -> t * t
+    (** [partition p s] returns a pair of sets [(s1, s2)], where
+        [s1] contains all the elements of [s] that satisfy the
+        predicate [p], and [s2] is the map with all the elements of
+        [s] that do not satisfy [p]. *)
+
+    val cardinal: t -> int
+    (** Return the number of elements in a set. *)
+
+    val elements: t -> elt list
+    (** Return the list of all elements of the given set.
+       The returned list is sorted in increasing order. *)
+
+    val min_elt: t -> elt
+    (** Return the smallest element of the given set or raise
+       [Not_found] if the set is empty. *)
+
+    val max_elt: t -> elt
+    (** Return the largest element of the given set or raise
+       [Not_found] if the set is empty. *)
+
+    val choose: t -> elt
+    (** Return one element of the given set, or raise [Not_found] if
+       the set is empty. Which element is chosen is unspecified,
+       but equal elements will be chosen for equal sets. *)
+
+    val split: elt -> t -> t * bool * t
+    (** [split x s] returns a triple [(l, mem, r)], where
+          [l] is the set with all the elements of [s] that are
+        strictly less than [x];
+          [r] is the set with all the elements of [s] that are
+        strictly greater than [x];
+          [mem] is [true] if [x] belongs to [s] and [false] otherwise. *)
+
+    val change : elt -> (bool -> bool) -> t -> t
+    (** [change x f s] returns a set containing the same elements as
+        [s], except [x] which is added to [s] if [f (mem x s)] returns
+        [true] and removed otherwise. *)
+
+    val union : t -> t -> t
+    (** [union f s1 s2] computes the union of two sets *)
+
+    val inter : t -> t -> t
+    (** [inter f s1 s2] computes the intersection of two sets *)
+
+    val diff : t -> t -> t
+    (** [diss f s1 s2] computes the difference of two sets *)
+
+  end
+
+
 module type S =
   sig
     type key
@@ -230,125 +344,14 @@ module type S =
       (key -> 'a -> 'acc -> 'acc * 'b)-> 'a t -> 'acc -> 'acc * 'b t
       (** fold and map at the same time *)
 
-    module S :
-      sig
-        type elt
-
-        type t
-        (** The type of sets of type [elt]. *)
-
-        val empty: t
-        (** The empty set. *)
-
-        val is_empty: t -> bool
-        (** Test whether a set is empty or not. *)
-
-        val mem: elt -> t -> bool
-        (** [mem x s] returns [true] if [s] contains [x],
-           and [false] otherwise. *)
-
-        val add: elt -> t -> t
-        (** [add x s] returns a set containing the same elements as
-           [s], plus [x]. *)
-
-        val singleton: elt -> t
-        (** [singleton x] returns the one-element set that contains [x]. *)
-
-        val remove: elt -> t -> t
-        (** [remove x s] returns a set containing the same elements as [s],
-           except for [x]. *)
-
-        val merge: (elt -> bool -> bool -> bool) -> t -> t -> t
-        (** [merge f s1 s2] computes a set whose elts is a subset of elts
-            of [s1] and of [s2]. The presence of each such element is
-            determined with the function [f]. *)
-
-        val compare: t -> t -> int
-        (** Total ordering between sets. *)
-
-        val equal: t -> t -> bool
-        (** [equal s1 s2] tests whether the sets [s1] and [s2] are equal. *)
-
-        val subset: t -> t -> bool
-        (** [subset s1 s2] tests whether the set [s1] is a subset of [s2]. *)
-
-        val iter: (elt -> unit) -> t -> unit
-        (** [iter f s] applies [f] to all elements of [s].
-           The elements are passed to [f] in increasing order with respect
-           to the ordering over the type of the elts. *)
-
-        val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
-        (** [fold f s a] computes [(f eN ... (f e1 a)...)],
-           where [e1 ... eN] are the element of [s] in increasing order. *)
-
-        val for_all: (elt -> bool) -> t -> bool
-        (** [for_all p s] checks if all the elements of [s] satisfy
-           the predicate [p]. *)
-
-        val exists: (elt -> bool) -> t -> bool
-        (** [exists p s] checks if at least one element of [s] satisfies
-           the predicate [p]. *)
-
-        val filter: (elt -> bool) -> t -> t
-        (** [filter p s] returns the set with all the elements of [s]
-            that satisfy predicate [p]. *)
-
-        val partition: (elt -> bool) -> t -> t * t
-        (** [partition p s] returns a pair of sets [(s1, s2)], where
-            [s1] contains all the elements of [s] that satisfy the
-            predicate [p], and [s2] is the map with all the elements of
-            [s] that do not satisfy [p]. *)
-
-        val cardinal: t -> int
-        (** Return the number of elements in a set. *)
-
-        val elements: t -> elt list
-        (** Return the list of all elements of the given set.
-           The returned list is sorted in increasing order. *)
-
-        val min_elt: t -> elt
-        (** Return the smallest element of the given set or raise
-           [Not_found] if the set is empty. *)
-
-        val max_elt: t -> elt
-        (** Return the largest element of the given set or raise
-           [Not_found] if the set is empty. *)
-
-        val choose: t -> elt
-        (** Return one element of the given set, or raise [Not_found] if
-           the set is empty. Which element is chosen is unspecified,
-           but equal elements will be chosen for equal sets. *)
-
-        val split: elt -> t -> t * bool * t
-        (** [split x s] returns a triple [(l, mem, r)], where
-              [l] is the set with all the elements of [s] that are
-            strictly less than [x];
-              [r] is the set with all the elements of [s] that are
-            strictly greater than [x];
-              [mem] is [true] if [x] belongs to [s] and [false] otherwise. *)
-
-        val change : elt -> (bool -> bool) -> t -> t
-        (** [change x f s] returns a set containing the same elements as
-            [s], except [x] which is added to [s] if [f (mem x s)] returns
-            [true] and removed otherwise. *)
-
-        val union : t -> t -> t
-        (** [union f s1 s2] computes the union of two sets *)
-
-        val inter : t -> t -> t
-        (** [inter f s1 s2] computes the intersection of two sets *)
-
-        val diff : t -> t -> t
-        (** [diss f s1 s2] computes the difference of two sets *)
-
-      end with type elt = key and type t = unit t
+    module Set : SetS with type elt = key and type t = unit t
 
   end
 
 (** Output signature of the functor {!Map.Make}. *)
 
 module Make (Ord : OrderedType) : S with
-  type key = Ord.t and type S.elt = Ord.t
+  type key = Ord.t and type Set.elt = Ord.t
 (** Functor building an implementation of the map/set structure
    given a totally ordered type. *)
 
