@@ -45,37 +45,32 @@ let empty_ns = {
 
 exception ClashSymbol of string
 
-let ns_union eq chk m1 m2 =
-  Mnm.union (fun x k1 k2 ->
-    if not chk || eq k1 k2
-    then Some k1
-    else raise (ClashSymbol x)
-  ) m1 m2
+let ns_replace eq chk x vo vn =
+  if not chk then vn else
+  if eq vo vn then vo else
+  raise (ClashSymbol x)
+
+let ns_union eq chk =
+  Mnm.union (fun x vn vo -> Some (ns_replace eq chk x vo vn))
 
 let rec merge_ns chk ns1 ns2 =
+  let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
   { ns_ts = ns_union ts_equal chk ns1.ns_ts ns2.ns_ts;
     ns_ls = ns_union ls_equal chk ns1.ns_ls ns2.ns_ls;
     ns_pr = ns_union pr_equal chk ns1.ns_pr ns2.ns_pr;
-    ns_ns = fusion            chk ns1.ns_ns ns2.ns_ns; }
+    ns_ns = Mnm.union fusion      ns1.ns_ns ns2.ns_ns; }
 
-and fusion chk ns1 ns2 =
-  Mnm.union (fun _ ns1 ns2 -> Some (merge_ns chk ns1 ns2)) ns1 ns2
+let nm_add chk x ns m = Mnm.change x (function
+  | None -> Some ns
+  | Some os -> Some (merge_ns chk ns os)) m
 
-let ns_add eq chk x v m =
-  if not chk then Mnm.add x v m
-  else Mnm.change x (function
-    | None -> Some v
-    | Some vm when eq vm v -> Some vm
-    | _ -> raise (ClashSymbol x)) m
+let ns_add eq chk x v m = Mnm.change x (function
+  | None -> Some v
+  | Some vo -> Some (ns_replace eq chk x vo v)) m
 
 let ts_add = ns_add ts_equal
 let ls_add = ns_add ls_equal
 let pr_add = ns_add pr_equal
-let nm_add chk x ns m =
-  Mnm.change x (function
-    | None -> Some ns
-    | Some os -> Some (merge_ns chk os ns)) m
-
 
 let add_ts chk x ts ns = { ns with ns_ts = ts_add chk x ts ns.ns_ts }
 let add_ls chk x ls ns = { ns with ns_ls = ls_add chk x ls ns.ns_ls }
@@ -413,7 +408,6 @@ exception CannotInstantiate of ident
 
 type clones = {
   cl_local : Sid.t;
-  mutable id_local : Sid.t;
   mutable ts_table : tysymbol Mts.t;
   mutable ls_table : lsymbol Mls.t;
   mutable pr_table : prsymbol Mpr.t;
@@ -421,7 +415,6 @@ type clones = {
 
 let empty_clones s = {
   cl_local = s;
-  id_local = Sid.empty;
   ts_table = Mts.empty;
   ls_table = Mls.empty;
   pr_table = Mpr.empty;
@@ -435,7 +428,6 @@ let rec cl_find_ts cl ts =
   with Not_found ->
     let td' = option_map (cl_trans_ty cl) ts.ts_def in
     let ts' = create_tysymbol (id_dup ts.ts_name) ts.ts_args td' in
-    cl.id_local <- Sid.add ts'.ts_name cl.id_local;
     cl.ts_table <- Mts.add ts ts' cl.ts_table;
     ts'
 
@@ -448,7 +440,6 @@ let cl_find_ls cl ls =
     let ta' = List.map (cl_trans_ty cl) ls.ls_args in
     let vt' = option_map (cl_trans_ty cl) ls.ls_value in
     let ls' = create_lsymbol (id_dup ls.ls_name) ta' vt' in
-    cl.id_local <- Sid.add ls'.ls_name cl.id_local;
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     ls'
 
@@ -459,7 +450,6 @@ let cl_find_pr cl pr =
   else try Mpr.find pr cl.pr_table
   with Not_found ->
     let pr' = create_prsymbol (id_dup pr.pr_name) in
-    cl.id_local <- Sid.add pr'.pr_name cl.id_local;
     cl.pr_table <- Mpr.add pr pr' cl.pr_table;
     pr'
 
@@ -611,41 +601,22 @@ let clone_theory cl add_td acc th inst =
 
 let clone_export uc th inst =
   let cl = cl_init th inst in
-  let lc = uc.uc_local in
   let uc = clone_theory cl add_tdecl uc th inst in
 
-  assert (Sid.equal uc.uc_local (Sid.union lc cl.id_local));
+  let g_ts _ ts = not (Mts.mem ts inst.inst_ts) in
+  let g_ls _ ls = not (Mls.mem ls inst.inst_ls) in
 
-  let f_ts n ts ns =
-    if Sid.mem ts.ts_name th.th_local then
-      let ts' = Mts.find ts cl.ts_table in
-      if Sid.mem ts'.ts_name cl.id_local
-      then add_ts true n ts' ns else ns
-    else add_ts true n ts ns in
+  let f_ts ts = Mts.find_default ts ts cl.ts_table in
+  let f_ls ls = Mls.find_default ls ls cl.ls_table in
+  let f_pr pr = Mpr.find_default pr pr cl.pr_table in
 
-  let f_ls n ls ns =
-    if Sid.mem ls.ls_name th.th_local then
-      let ls' = Mls.find ls cl.ls_table in
-      if Sid.mem ls'.ls_name cl.id_local
-      then add_ls true n ls' ns else ns
-    else add_ls true n ls ns in
+  let rec f_ns ns = {
+    ns_ts = Mnm.map f_ts (Mnm.filter g_ts ns.ns_ts);
+    ns_ls = Mnm.map f_ls (Mnm.filter g_ls ns.ns_ls);
+    ns_pr = Mnm.map f_pr ns.ns_pr;
+    ns_ns = Mnm.map f_ns ns.ns_ns; } in
 
-  let f_pr n pr ns =
-    if Sid.mem pr.pr_name th.th_local then
-      let pr' = Mpr.find pr cl.pr_table in
-      if Sid.mem pr'.pr_name cl.id_local
-      then add_pr true n pr' ns else ns
-    else add_pr true n pr ns in
-
-  let rec f_ns n s = add_ns true n (merge_namespace empty_ns s)
-
-  and merge_namespace acc ns =
-    let acc = Mnm.fold f_ts ns.ns_ts acc in
-    let acc = Mnm.fold f_ls ns.ns_ls acc in
-    let acc = Mnm.fold f_pr ns.ns_pr acc in
-    let acc = Mnm.fold f_ns ns.ns_ns acc in acc  in
-
-  let ns = merge_namespace empty_ns th.th_export in
+  let ns = f_ns th.th_export in
 
   match uc.uc_import, uc.uc_export with
     | i0 :: sti, e0 :: ste -> { uc with
