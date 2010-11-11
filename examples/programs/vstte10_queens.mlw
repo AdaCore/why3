@@ -25,7 +25,7 @@ let array_set (a : ref (array 'a)) i v =
   logic is_consistent (board : array int) (pos : int) =
     forall q:int. 0 <= q < pos -> consistent_row board pos q
 
-  axiom Is_consistent_eq :
+  lemma Is_consistent_set :
     forall board : array int, pos q i : int.
     is_consistent board pos -> pos <= q -> is_consistent (A.set board q i) pos
 }
@@ -53,29 +53,58 @@ let check_is_consistent board pos =
   { result=True <-> is_consistent !board pos }
 
 { 
+  logic is_board (board : array int) (pos : int) =
+    forall q:int. 0 <= q < pos -> 0 <= board#q < A.length board
+
   logic solution (board : array int) (pos : int) =
-    forall q:int. 0 <= q < pos -> 
-      0 <= board#q < A.length board and is_consistent board q
+    is_board board pos and
+    forall q:int. 0 <= q < pos -> is_consistent board q
+
+  logic eq_board (b1 b2 : array int) (pos : int) =
+    forall q:int. 0 <= q < pos -> b2#q = b1#q
+
+  lemma Solution_eq_board :
+    forall b1 b2 : array int, pos : int.
+    eq_board b2 b1 pos -> solution b1 pos -> solution b2 pos
+
+  lemma Eq_board_set :
+    forall b : array int, pos q i : int.
+    pos <= q -> eq_board b (A.set b q i) pos
+
+  lemma Eq_board_trans :
+    forall b1 b2 b3 : array int, pos : int.
+    eq_board b1 b2 pos -> eq_board b2 b3 pos -> eq_board b1 b3 pos
 }
 
 exception Solution
 
-let rec queens (board : ref (array int)) pos =
-  { 0 <= pos <= A.length !board and solution !board pos }
+let rec bt_queens (board : ref (array int)) n pos variant { n - pos } =
+  { A.length !board = n and 0 <= pos <= n and solution !board pos }
   label Init:
-  if pos = A.length !board then raise Solution;
-  for i = 0 to A.length !board - 1 do
+  if pos = n then raise Solution;
+  for i = 0 to n - 1 do
     invariant { 
-      A.length !board = at (A.length !board) Init and 
-      solution !board pos }
+      A.length !board = n and 
+      eq_board !board (at !board Init) pos
+      (*solution !board pos*) }
     array_set board pos i;
-    if check_is_consistent board pos then queens board (pos+1)
+    assert { eq_board !board (at !board Init) pos };
+    if check_is_consistent board pos then bt_queens board n (pos+1)
   done
   { (* no solution (TODO: show there is indeed no solution) *) 
-    A.length !board = old (A.length !board) and solution !board pos } 
+    A.length !board = n and 
+    eq_board !board (old !board) pos (* and
+    forall b:array int. 
+      is_board b n -> eq_board !board b pos -> not (solution b n) *) }
   | Solution -> 
   { (* a solution *)
-    solution !board (A.length !board) }
+    solution !board n }
+
+let queens board n =
+  { A.length !board = n }
+  bt_queens board n 0
+  { true }
+  | Solution -> { solution !board n }
 
 (*
 Local Variables: 
