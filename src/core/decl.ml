@@ -373,9 +373,8 @@ exception EmptyDecl
 exception EmptyAlgDecl of tysymbol
 exception EmptyIndDecl of lsymbol
 
-let news_id s id =
-  if Sid.mem id s then raise (ClashIdent id);
-  Sid.add id s
+let news_id s id = Sid.change id (fun there ->
+  if there then raise (ClashIdent id) else true) s
 
 let syms_ts s ts = Sid.add ts.ts_name s
 let syms_ls s ls = Sid.add ls.ls_name s
@@ -564,22 +563,22 @@ let known_id kn id =
 
 let merge_known kn1 kn2 =
   let check_known id decl1 decl2 =
-    if d_equal decl1 decl2 then Some decl1 else raise (RedeclaredIdent id) in
+    if d_equal decl1 decl2 then Some decl1
+    else raise (RedeclaredIdent id)
+  in
   Mid.union check_known kn1 kn2
 
 let known_add_decl kn0 decl =
-  let add_known id kn =
-    try
-      if not (d_equal (Mid.find id kn0) decl) then raise (RedeclaredIdent id);
-      raise (KnownIdent id)
-    with Not_found -> Mid.add id decl kn
+  let kn = Mid.map (fun _ -> decl) decl.d_news in
+  let check id decl0 _ =
+    if d_equal decl0 decl
+    then raise (KnownIdent id)
+    else raise (RedeclaredIdent id)
   in
-  let kn = Sid.fold add_known decl.d_news kn0 in
-  let check_known id =
-    if not (Mid.mem id kn) then raise (UnknownIdent id)
-  in
-  ignore (Sid.iter check_known decl.d_syms);
-  kn
+  let kn = Mid.union check kn0 kn in
+  let unk = Mid.diff (fun _ _ _ -> None) decl.d_syms kn in
+  if Sid.is_empty unk then kn
+  else raise (UnknownIdent (Sid.choose unk))
 
 let find_constructors kn ts =
   match (Mid.find ts.ts_name kn).d_node with

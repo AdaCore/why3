@@ -41,8 +41,8 @@ and origin =
   | Derived of ident
   | Fresh
 
-module Sid : Set.S with type elt = ident
 module Mid : Map.S with type key = ident
+module Sid : Map.SetS with type elt = ident and type t = unit Mid.t
 module Hid : Hashtbl.S with type key = ident
 
 val id_equal : ident -> ident -> bool
