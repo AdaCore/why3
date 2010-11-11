@@ -5,28 +5,30 @@
   use export list.List
   use export list.Length
   use export list.Nth
+
+  logic zero_at (l : list int) (i : int) =
+    nth i l = Some 0 and forall j:int. 0 <= j < i -> nth j l <> Some 0 
+
+  logic no_zero (l : list int) =
+    forall j:int. 0 <= j < length l -> nth j l <> Some 0
 }
 
-let rec search i l = 
+let rec search i l variant { length l } = 
   {}
   match l with
   | Nil -> i
   | Cons x r -> if x = 0 then i else search (i+1) r
   end
-  { (i <= result < i + length l and nth (result - i) l = Some 0 and
-     forall j:int. 0 <= j < result - i -> nth j l <> Some 0) 
+  { (i <= result < i + length l and zero_at l (result - i)) 
     or
-    (result = i + length l and 
-     forall j:int. 0 <= j < length l -> nth j l <> Some 0) }
+    (result = i + length l and no_zero l) }
 
 let search_list l =
   { }
   search 0 l
-  { (0 <= result < length l and nth result l = Some 0 and
-     forall j:int. 0 <= j < result -> nth j l <> Some 0) 
+  { (0 <= result < length l and zero_at l result)
     or 
-    (result = length l and
-     forall j:int. 0 <= j < length l -> nth j l <> Some 0) }
+    (result = length l and no_zero l) }
 
 
 (*
