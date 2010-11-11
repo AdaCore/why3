@@ -158,8 +158,8 @@ end
 module StructMake (X : Tagged) =
 struct
   module T = OrderedHash(X)
-  module S = Set.Make(T)
   module M = Map.Make(T)
+  module S = M.S
   module H = Hashtbl.Make(T)
 end
 
@@ -172,8 +172,8 @@ end
 module WeakStructMake (X : Hashweak.Weakey) =
 struct
   module T = OrderedHash(MakeTagged(X))
-  module S = Set.Make(T)
   module M = Map.Make(T)
+  module S = M.S
   module H = Hashtbl.Make(T)
   module W = Hashweak.Make(X)
 end

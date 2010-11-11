@@ -54,10 +54,45 @@ module type S =
     (** Added into why stdlib version *)
     val change : key -> ('a option -> 'a option) -> 'a t -> 'a t
     val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
-    val inter : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
+    val inter : (key -> 'a -> 'b -> 'c option) -> 'a t -> 'b t -> 'c t
+    val diff : (key -> 'a -> 'b -> 'a option) -> 'a t -> 'b t -> 'a t
+    val submap : (key -> 'a -> 'b -> bool) -> 'a t -> 'b t -> bool
     val find_default : key -> 'a -> 'a t -> 'a
     val mapi_fold:
-      (key -> 'a -> 'acc -> 'acc * 'b)-> 'a t -> 'acc -> 'acc * 'b t
+      (key -> 'a -> 'acc -> 'acc * 'b) -> 'a t -> 'acc -> 'acc * 'b t
+
+    module S :
+      sig
+        type elt
+        type t
+        val empty: t
+        val is_empty: t -> bool
+        val mem: elt -> t -> bool
+        val add: elt -> t -> t
+        val singleton: elt -> t
+        val remove: elt -> t -> t
+        val merge: (elt -> bool -> bool -> bool) -> t -> t -> t
+        val compare: t -> t -> int
+        val equal: t -> t -> bool
+        val subset: t -> t -> bool
+        val iter: (elt -> unit) -> t -> unit
+        val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
+        val for_all: (elt -> bool) -> t -> bool
+        val exists: (elt -> bool) -> t -> bool
+        val filter: (elt -> bool) -> t -> t
+        val partition: (elt -> bool) -> t -> t * t
+        val cardinal: t -> int
+        val elements: t -> elt list
+        val min_elt: t -> elt
+        val max_elt: t -> elt
+        val choose: t -> elt
+        val split: elt -> t -> t * bool * t
+        val change : elt -> (bool -> bool) -> t -> t
+        val union : t -> t -> t
+        val inter : t -> t -> t
+        val diff : t -> t -> t
+      end with type elt = key and type t = unit t
+
   end
 
 module Make(Ord: OrderedType) = struct
@@ -314,6 +349,13 @@ module Make(Ord: OrderedType) = struct
         Empty -> 0
       | Node(l, _, _, r, _) -> cardinal l + 1 + cardinal r
 
+    let rec keys_aux accu = function
+        Empty -> accu
+      | Node(l, v, _, r, _) -> keys_aux (v :: keys_aux accu r) l
+
+    let keys s =
+      keys_aux [] s
+
     let rec bindings_aux accu = function
         Empty -> accu
       | Node(l, v, d, r, _) -> bindings_aux ((v, d) :: bindings_aux accu r) l
@@ -382,6 +424,32 @@ module Make(Ord: OrderedType) = struct
           | (l2, Some d2, r2) ->
               concat_or_join (inter f l1 l2) v1 (f v1 d1 d2) (inter f r1 r2)
 
+
+    let rec diff f s1 s2 =
+      match (s1, s2) with
+        (Empty, _t2) -> Empty
+      | (t1, Empty) -> t1
+      | (Node(l1, v1, d1, r1, _), t2) ->
+          match split v1 t2 with
+          | (l2, None, r2) -> join (diff f l1 l2) v1 d1 (diff f r1 r2)
+          | (l2, Some d2, r2) ->
+              concat_or_join (diff f l1 l2) v1 (f v1 d1 d2) (diff f r1 r2)
+
+
+    let rec submap pr s1 s2 =
+      match (s1, s2) with
+      |  Empty, _ -> true
+      | _, Empty -> false
+      | Node (l1, v1, d1, r1, _), (Node (l2, v2, d2, r2, _) as t2) ->
+          let c = Ord.compare v1 v2 in
+          if c = 0 then
+            pr v1 d1 d2 && submap pr l1 l2 && submap pr r1 r2
+          else if c < 0 then
+            submap pr (Node (l1, v1, d1, Empty, 0)) l2 && submap pr r1 t2
+          else
+            submap pr (Node (Empty, v1, d1, r1, 0)) r2 && submap pr l1 t2
+
+
     let rec find_default x def = function
         Empty -> def
       | Node(l, v, d, r, _) ->
@@ -399,7 +467,44 @@ module Make(Ord: OrderedType) = struct
           let acc,r' = mapi_fold f r acc in
           acc,Node(l', v, d', r', h)
 
+    module S =
+      struct
+        type elt = Ord.t
+        type set = unit t
+        type t = set
 
+        let is_true b = if b then Some () else None
+        let is_some o = o <> None
+        let const f e _ = f e
+
+        let empty = empty
+        let is_empty = is_empty
+        let mem = mem
+        let add e = add e ()
+        let singleton e = singleton e ()
+        let remove = remove
+        let merge f = merge (fun e a b ->
+          is_true (f e (is_some a) (is_some b)))
+        let compare = compare (fun _ _ -> 0)
+        let equal = equal (fun _ _ -> true)
+        let subset = submap (fun _ _ _ -> true)
+        let iter f = iter (const f)
+        let fold f = fold (const f)
+        let for_all f = for_all (const f)
+        let exists f = exists (const f)
+        let filter f = filter (const f)
+        let partition f = partition (const f)
+        let cardinal = cardinal
+        let elements = keys
+        let min_elt t = fst (min_binding t)
+        let max_elt t = fst (max_binding t)
+        let choose t = fst (choose t)
+        let split e t = let l,m,r = split e t in l,(m <> None),r
+        let change e f = change e (fun a -> is_true (f (is_some a)))
+        let union = union (fun _ _ _ -> Some ())
+        let inter = inter (fun _ _ _ -> Some ())
+        let diff = diff (fun _ _ _ -> None)
+      end
 
 end
 
