@@ -27,7 +27,7 @@ let array_set (a : ref (array 'a)) i v =
 
   lemma Is_consistent_set :
     forall board : array int, pos q i : int.
-    is_consistent board pos -> pos <= q -> is_consistent (A.set board q i) pos
+    is_consistent board pos -> pos < q -> is_consistent (A.set board q i) pos
 }
 
 exception Inconsistent
@@ -63,13 +63,21 @@ let check_is_consistent board pos =
   logic eq_board (b1 b2 : array int) (pos : int) =
     forall q:int. 0 <= q < pos -> b2#q = b1#q
 
-  lemma Solution_eq_board :
+  lemma Is_consistent_eq :
     forall b1 b2 : array int, pos : int.
+    eq_board b1 b2 (pos+1) -> is_consistent b1 pos -> is_consistent b2 pos
+
+  lemma Solution_eq_board :
+    forall b1 b2 : array int, pos : int. A.length b1 = A.length b2 ->
     eq_board b2 b1 pos -> solution b1 pos -> solution b2 pos
 
   lemma Eq_board_set :
     forall b : array int, pos q i : int.
     pos <= q -> eq_board b (A.set b q i) pos
+
+  lemma Eq_board_sym :
+    forall b1 b2 : array int, pos : int.
+    eq_board b1 b2 pos -> eq_board b2 b1 pos
 
   lemma Eq_board_trans :
     forall b1 b2 b3 : array int, pos : int.
@@ -84,18 +92,17 @@ let rec bt_queens (board : ref (array int)) n pos variant { n - pos } =
   if pos = n then raise Solution;
   for i = 0 to n - 1 do
     invariant { 
-      A.length !board = n and 
-      eq_board !board (at !board Init) pos
-      (*solution !board pos*) }
+      A.length !board = n and eq_board !board (at !board Init) pos and
+      forall b:array int. A.length b = n -> is_board b n -> 
+        eq_board !board b pos -> 0 <= b#pos < i -> not (solution b n) }
     array_set board pos i;
     assert { eq_board !board (at !board Init) pos };
     if check_is_consistent board pos then bt_queens board n (pos+1)
   done
-  { (* no solution (TODO: show there is indeed no solution) *) 
-    A.length !board = n and 
-    eq_board !board (old !board) pos (* and
-    forall b:array int. 
-      is_board b n -> eq_board !board b pos -> not (solution b n) *) }
+  { (* no solution *) 
+    A.length !board = n and eq_board !board (old !board) pos and
+    forall b:array int. A.length b = n -> is_board b n -> 
+      eq_board !board b pos -> not (solution b n) }
   | Solution -> 
   { (* a solution *)
     solution !board n }
@@ -103,7 +110,7 @@ let rec bt_queens (board : ref (array int)) n pos variant { n - pos } =
 let queens board n =
   { A.length !board = n }
   bt_queens board n 0
-  { true }
+  { forall b:array int. A.length b = n -> is_board b n -> not (solution b n) }
   | Solution -> { solution !board n }
 
 (*
