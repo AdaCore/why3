@@ -226,9 +226,18 @@ module type S =
     (** [find_default x d m] returns the current binding of [x] in [m],
         or return [d] if no such binding exists. *)
 
+    val find_option : key -> 'a t -> 'a option
+    (** [find_default x d m] returns the [Some] of the current binding
+        of [x] in [m], or return [None] if no such binding exists. *)
+
     val mapi_fold:
       (key -> 'a -> 'acc -> 'acc * 'b)-> 'a t -> 'acc -> 'acc * 'b t
     (** fold and map at the same time *)
+
+    val translate : (key -> key) -> 'a t -> 'a t
+    (** [translate f m] translates the keys in the map [m] by the
+        function [f]. [f] must be strictly monotone on the key of [m].
+        Otherwise it raises invalid_arg *)
 
     module type Set =
     sig
@@ -340,6 +349,11 @@ module type S =
 
       val diff : t -> t -> t
     (** [diss f s1 s2] computes the difference of two sets *)
+
+      val translate : (elt -> elt) -> t -> t
+    (** [translate f s] translates the elements in the set [s] by the
+        function [f]. [f] must be strictly monotone on the elements of [s].
+        Otherwise it raises invalid_arg *)
 
     end
 

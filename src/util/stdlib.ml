@@ -58,8 +58,11 @@ module type S =
     val diff : (key -> 'a -> 'b -> 'a option) -> 'a t -> 'b t -> 'a t
     val submap : (key -> 'a -> 'b -> bool) -> 'a t -> 'b t -> bool
     val find_default : key -> 'a -> 'a t -> 'a
+    val find_option : key -> 'a t -> 'a option
     val mapi_fold:
       (key -> 'a -> 'acc -> 'acc * 'b) -> 'a t -> 'acc -> 'acc * 'b t
+    val translate : (key -> key) -> 'a t -> 'a t
+
     module type Set =
     sig
       type elt = key
@@ -91,6 +94,7 @@ module type S =
       val union : t -> t -> t
       val inter : t -> t -> t
       val diff : t -> t -> t
+      val translate : (elt -> elt) -> t -> t
     end
 
     module Set : Set
@@ -459,6 +463,13 @@ module Make(Ord: OrderedType) = struct
           if c = 0 then d
           else find_default x def (if c < 0 then l else r)
 
+    let rec find_option x = function
+        Empty -> None
+      | Node(l, v, d, r, _) ->
+          let c = Ord.compare x v in
+          if c = 0 then Some d
+          else find_option x (if c < 0 then l else r)
+
 
     let rec mapi_fold f m acc =
       match m with
@@ -468,6 +479,22 @@ module Make(Ord: OrderedType) = struct
           let acc,d' = f v d acc in
           let acc,r' = mapi_fold f r acc in
           acc,Node(l', v, d', r', h)
+
+    let translate f m =
+      let rec aux last = function
+        | Empty -> Empty,last
+        | Node(l, v, d, r, h) ->
+          let l,last = aux last l in
+          let v = f v in
+          begin match last with
+            | None -> ()
+            | Some last ->
+              if Ord.compare last v >= 0
+              then invalid_arg "Map.translate : given function incorrect"
+          end;
+          let r,last = aux (Some v) r in
+          Node(l,v,d,r,h),last in
+      let m,_ = aux None m in m
 
     module type Set =
     sig
@@ -500,6 +527,7 @@ module Make(Ord: OrderedType) = struct
       val union : t -> t -> t
       val inter : t -> t -> t
       val diff : t -> t -> t
+      val translate : (elt -> elt) -> t -> t
     end
 
     module Set =
@@ -539,6 +567,7 @@ module Make(Ord: OrderedType) = struct
         let union = union (fun _ _ _ -> Some ())
         let inter = inter (fun _ _ _ -> Some ())
         let diff = diff (fun _ _ _ -> None)
+        let translate = translate
       end
 
 end
