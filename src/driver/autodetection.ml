@@ -114,7 +114,7 @@ let detect_prover main acc data =
     (fun acc com ->
 	let out = Filename.temp_file "out" "" in
         let cmd = sprintf "%s %s" com data.version_switch in
-	let c = sprintf "(%s) > %s" cmd out in
+	let c = sprintf "(%s) > %s 2>&1" cmd out in
         eprintf "Run : %s@." c;
 	let ret = Sys.command c in
 	if ret <> 0 then
@@ -126,12 +126,10 @@ let detect_prover main acc data =
 	  let s =
             try
               let ch = open_in out in
-              Sysutil.channel_contents ch
-              (* let s = ref (input_line ch) in *)
-              (* while !s = "" do s := input_line ch done; *)
-              (* close_in ch; *)
-	      (* Sys.remove out; *)
-              (* !s *)
+              let c = Sysutil.channel_contents ch in
+              close_in ch;
+	      Sys.remove out;
+              c
             with Not_found | End_of_file  -> ""
           in
 	  let re = Str.regexp data.version_regexp in

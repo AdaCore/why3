@@ -1588,6 +1588,8 @@ let edit_selected_row p =
         let file = Driver.file_of_task driver 
           (Filename.concat project_dir fn) tn t 
         in
+        (* TODO: ne pas le changer mais le retuiliser 
+           s'il existe deja! en principe peut venir de la base de donnees *)
         a.Model.edited_as <- file;
         let old_status = a.Model.status in
         Helpers.set_proof_status ~obsolete:false a Scheduler.Running 0.0;

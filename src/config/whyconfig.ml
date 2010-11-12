@@ -66,7 +66,7 @@ let () =
   let conf_file_doesnt_exist = not (Sys.file_exists conf_file) in
   if conf_file_doesnt_exist then
     printf "Config file %s doesn't exist, \
- so autodection is automatically triggered@." conf_file;
+ so autodetection is automatically triggered@." conf_file;
   let config =
     if !auto || conf_file_doesnt_exist
     then Autodetection.run_auto_detection config
