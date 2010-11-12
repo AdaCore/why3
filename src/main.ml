@@ -295,9 +295,9 @@ let () =
   in
 
   let main = get_main config in
-  opt_loadpath := List.rev_append !opt_loadpath main.loadpath;
-  if !opt_timelimit = None then opt_timelimit := Some main.timelimit;
-  if !opt_memlimit  = None then opt_memlimit  := Some main.memlimit;
+  opt_loadpath := List.rev_append !opt_loadpath (Whyconf.loadpath main);
+  if !opt_timelimit = None then opt_timelimit := Some (Whyconf.timelimit main);
+  if !opt_memlimit  = None then opt_memlimit  := Some (Whyconf.memlimit main);
   begin match !opt_prover with
   | Some s ->
       let prover = try Mstr.find s (get_provers config) with

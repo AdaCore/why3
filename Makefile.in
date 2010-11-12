@@ -327,7 +327,7 @@ clean::
 	bin/whyide.opt $*.why
 
 %.gui: %.mlw bin/whyide.opt
-	bin/whydb.opt $*.mlw
+	bin/whyide.opt $*.mlw
 
 install_no_local::
 	cp -f bin/whyml.@OCAMLBEST@ $(BINDIR)/why3ml
@@ -392,7 +392,7 @@ install_no_local::
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = gconfig scheduler gmain
+IDE_FILES = gconfig scheduler db gmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
@@ -401,16 +401,16 @@ IDEMLI = $(addsuffix .mli, $(IDEMODULES))
 IDECMO = $(addsuffix .cmo, $(IDEMODULES))
 IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
-$(IDECMO) $(IDECMX): INCLUDES += -I src/ide
+$(IDECMO) $(IDECMX): INCLUDES += -I src/ide -I +sqlite3
 
 # build targets
 
 byte: bin/whyide.byte
 opt:  bin/whyide.opt
 
-bin/whyide.opt bin/whyide.byte: INCLUDES += -thread -I +threads -I +lablgtk2
+bin/whyide.opt bin/whyide.byte: INCLUDES += -thread -I +threads -I +lablgtk2 -I +sqlite3
 bin/whyide.opt bin/whyide.byte: EXTOBJS += gtkThread
-bin/whyide.opt bin/whyide.byte: EXTLIBS += threads lablgtk lablgtksourceview2
+bin/whyide.opt bin/whyide.byte: EXTLIBS += threads lablgtk lablgtksourceview2 sqlite3
 
 bin/whyide.opt: src/why.cmxa $(PGMCMX) $(IDECMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
@@ -441,60 +441,6 @@ install_no_local::
 
 endif
 
-###############
-# IDE WITH DB
-###############
-
-ifeq (@enable_sql@,yes)
-
-DB_FILES = gconfig scheduler db gdbmain
-
-DBMODULES = $(addprefix src/ide/, $(DB_FILES))
-
-DBML  = $(addsuffix .ml,  $(DBMODULES))
-DBMLI = $(addsuffix .mli, $(DBMODULES))
-DBCMO = $(addsuffix .cmo, $(DBMODULES))
-DBCMX = $(addsuffix .cmx, $(DBMODULES))
-
-$(DBCMO) $(DBCMX): INCLUDES += -I src/ide -I +sqlite3
-
-# build targets
-
-byte: bin/whydb.byte
-opt:  bin/whydb.opt
-
-bin/whydb.opt bin/whydb.byte: INCLUDES += -thread -I +threads -I +lablgtk2 -I +sqlite3
-bin/whydb.opt bin/whydb.byte: EXTOBJS += gtkThread
-bin/whydb.opt bin/whydb.byte: EXTLIBS += threads lablgtk lablgtksourceview2 sqlite3
-
-bin/whydb.opt: src/why.cmxa $(PGMCMX) $(DBCMX)
-	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
-	$(STRIP) $@
-
-bin/whydb.byte: src/why.cma $(PGMCMO) $(DBCMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
-
-# depend and clean targets
-
-include .depend.db
-
-.depend.db:
-	$(OCAMLDEP) -slash -I src -I src/ide $(DBML) $(DBMLI) > $@
-
-depend: .depend.db
-
-clean::
-	rm -f src/ide/*.cm[iox] src/ide/*.o
-	rm -f src/ide/*.annot src/ide/*~
-	rm -f bin/whydb.byte bin/whydb.opt
-	rm -f .depend.db
-
-install_no_local::
-	cp -f bin/whydb.@OCAMLBEST@ $(BINDIR)/why3db
-
-endif
 
 ##############
 # Coq plugin

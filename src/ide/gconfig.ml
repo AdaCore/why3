@@ -101,10 +101,10 @@ let load_config config =
     window_width  = ide.ide_window_width;
     tree_width    = ide.ide_tree_width;
     task_height   = ide.ide_task_height;
-    time_limit    = main.Whyconf.timelimit;
-    mem_limit     = main.Whyconf.memlimit;
+    time_limit    = Whyconf.timelimit main;
+    mem_limit     = Whyconf.memlimit main;
     verbose       = ide.ide_verbose;
-    max_running_processes = main.Whyconf.running_provers_max;
+    max_running_processes = Whyconf.running_provers_max main;
 (*
     provers = Mstr.fold (get_prover_data env) provers [];
 *)
@@ -131,11 +131,9 @@ let save_config t =
       } acc in
   let config = t.config in
   let config = set_main config
-    { (get_main config) with
-      timelimit    = t.time_limit;
-      memlimit     = t.mem_limit;
-      running_provers_max = t.max_running_processes;
-    } in
+    (set_limits (get_main config)
+       t.time_limit t.mem_limit t.max_running_processes)
+  in
   let ide = empty_section in
   let ide = set_int ide "window_height" t.window_height in
   let ide = set_int ide "window_width" t.window_width in

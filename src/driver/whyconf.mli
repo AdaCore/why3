@@ -29,20 +29,15 @@ type config_prover = {
   editor  : string;   (* Interative theorem prover *)
 }
 
-type main = {
-  private_libdir   : string;      (* "/usr/local/lib/why/" *)
-  private_datadir  : string;      (* "/usr/local/share/why/" *)
-  loadpath  : string list;  (* "/usr/local/lib/why/theories" *)
-  timelimit : int;   (* default prover time limit in seconds
-                               (0 unlimited) *)
-  memlimit  : int;
-  (* default prover memory limit in megabytes (0 unlimited)*)
-  running_provers_max : int;
-  (* max number of running prover processes *)
-}
+type main
 
 val libdir: main -> string
 val datadir: main -> string
+val loadpath: main -> string list
+val timelimit: main -> int
+val memlimit: main -> int
+val running_provers_max: main -> int
+val set_limits: main -> int -> int -> int -> main
 
 type config
 (** A configuration linked to an rc file. Whyconf gives access to

@@ -72,10 +72,6 @@ AC_ARG_ENABLE(ide,
     [  --enable-ide            enable Why3 IDE],,
     enable_ide=yes)
 
-AC_ARG_ENABLE(sql,
-    [  --enable-sql            enable Why3 IDE + SQL],,
-    enable_sql=yes)
-
 # dynlink
 
 AC_ARG_ENABLE(plugins,
@@ -256,14 +252,26 @@ fi
 
 # checking for lablgtk2
 if test "$enable_ide" = yes ; then
-#AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_ide=no)
 AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtk.cma,,enable_ide=no)
-AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtksourceview2.cma,,enable_ide=no)
+if test "$enable_ide" = no; then
+   AC_MSG_WARN("Lib lablgtk2 not found, IDE disabled.)
+   reason_ide=" (lablgtk2 not found)"
+else
+   AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtksourceview2.cma,,enable_ide=no)
+   if test "$enable_ide" = no; then
+     AC_MSG_WARN("Lib lablgtksourceview2 not found, IDE disabled.)
+   reason_ide=" (lablgtksourceview2 not found)"
+   fi
+fi
 fi
 
 # checking for sqlite3
-if test "$enable_sql" = yes ; then
-AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_sql=no)
+if test "$enable_ide" = yes ; then
+   AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_ide=no)
+   if test "$enable_ide" = no; then
+     AC_MSG_WARN("Lib sqlite3 not found, IDE disabled.)
+   reason_ide=" (sqlite3 not found)"
+   fi
 fi
 
 
@@ -276,11 +284,13 @@ dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
 if test "$enable_coq_support" = no; then
     enable_coq_support=no
     AC_MSG_WARN(coq support disabled)
+    reason_coq_support=" (disabled by user)"
 else
     AC_CHECK_PROG(COQC,coqc,coqc,no)
     if test "$COQC" = no ; then
         enable_coq_support=no
         AC_MSG_WARN(Cannot find coqc.)
+        reason_coq_support=" (coqc not found)"
     else
         COQLIB=`$COQC -where | sed -e 's|\\\|/|g' -e 's| |\\ |g'`
         AC_MSG_CHECKING(Coq version)
@@ -289,18 +299,26 @@ else
         case $COQVERSION in
           8.*|trunk)
 	        enable_coq_support=yes
-                AC_MSG_RESULT($COQVERSION);;
+                AC_MSG_RESULT($COQVERSION)
+                ;;
           *)
                 enable_coq_support=no
-	        AC_MSG_WARN(You need Coq 8.x or later; Coq discarded);;
+	        AC_MSG_WARN(You need Coq 8.x or later; Coq discarded)
+                reason_coq_support=" (need version 8.x or later)"
+                ;;
         esac
     fi
 fi
 if test "$enable_coq_support" = yes; then
    AC_CHECK_FILE($COQLIB/kernel/term.cmi,,enable_coq_support=no)
+   if test "$enable_coq_support" = no; then
+      reason_coq_support=" ($COQLIB/kernel/term.cmi not found)"
+   fi
 fi
+
 if test "$CAMLP5O" = no; then
    enable_coq_support=no
+   reason_coq_support=" ($CAMLP5O not found)"
 fi
 
 # hypothesis_selection
@@ -353,7 +371,6 @@ dnl AC_SUBST(OCAMLWEB)
 AC_SUBST(CAMLP5O)
 
 AC_SUBST(enable_ide)
-AC_SUBST(enable_sql)
 AC_SUBST(enable_plugins)
 AC_SUBST(DYNLINK)
 
@@ -392,10 +409,9 @@ echo "-----------------------------------------"
 echo "OCaml version           : $OCAMLVERSION"
 echo "OCaml library path      : $OCAMLLIB"
 echo "Verbose make            : $enable_verbose_make"
-echo "Why IDE                 : $enable_ide"
-echo "Why IDE with database   : $enable_sql"
+echo "Why IDE                 : $enable_ide $reason_ide"
 echo "Why plugins             : $enable_plugins"
-echo "Coq support             : $enable_coq_support"
+echo "Coq plugin support      : $enable_coq_support $reason_coq_support"
 if test "$enable_coq_support" = "yes" ; then
    echo "    Version             : $COQVERSION"
    echo "    Lib                 : $COQLIB"

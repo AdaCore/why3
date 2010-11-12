@@ -18,7 +18,7 @@ the alt-ergo prover to check them
 
 let config = Whyconf.read_config None
 let main = Whyconf.get_main config
-let env = Env.create_env (Lexer.retrieve main.Whyconf.loadpath) 
+let env = Env.create_env (Lexer.retrieve (Whyconf.loadpath main)) 
 
 let provers = Whyconf.get_provers config
 

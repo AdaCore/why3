@@ -48,12 +48,15 @@ type config_prover = {
 }
 
 type main = {
-  private_libdir    : string;
-  private_datadir   : string;
-  loadpath  : string list;
-  timelimit : int;
+  private_libdir   : string;      (* "/usr/local/lib/why/" *)
+  private_datadir  : string;      (* "/usr/local/share/why/" *)
+  loadpath  : string list;  (* "/usr/local/lib/why/theories" *)
+  timelimit : int;   (* default prover time limit in seconds
+                               (0 unlimited) *)
   memlimit  : int;
+  (* default prover memory limit in megabytes (0 unlimited)*)
   running_provers_max : int;
+  (* max number of running prover processes *)
 }
 
 let libdir m =
@@ -63,8 +66,28 @@ let libdir m =
 
 let datadir m =
   try
-    Sys.getenv "WHY3DATA"
+    let d = Sys.getenv "WHY3DATA" in
+(*
+    eprintf "[Info] datadir set using WHY3DATA='%s'@." d;
+*)
+    d
   with Not_found -> m.private_datadir
+
+let loadpath m = 
+  try
+    let d = Sys.getenv "WHY3LOADPATH" in
+(*
+    eprintf "[Info] loadpath set using WHY3LOADPATH='%s'@." d;
+*)
+    [d]
+  with Not_found -> m.loadpath
+
+let timelimit m = m.timelimit
+let memlimit m = m.memlimit
+let running_provers_max m = m.running_provers_max
+
+let set_limits m time mem running =
+  { m with timelimit = time; memlimit = mem; running_provers_max = running }
 
 type config = {
   conf_file : string;       (* "/home/innocent_user/.why.conf" *)

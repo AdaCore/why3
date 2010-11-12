@@ -2,8 +2,11 @@
 
 # auto bench for why
 
+(* Useless in this script ?
 export WHY3LIB=lib
 export WHY3DATA=.
+*)
+export WHY3LOADPATH=theories
 
 pgm=$1
 pgml=$2
@@ -16,6 +19,9 @@ goods () {
 	# running Why
 	if ! $pgm $2 $f > /dev/null 2>&1; then
 	    echo "why FAILED"
+            echo "env: WHY3DATA='$WHY3DATA'"
+            echo "invocation: $pgm $2 $f"
+            echo "result:"
 	    $pgm $2 $f
 	    exit 1
 	fi
