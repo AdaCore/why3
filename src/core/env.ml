@@ -30,38 +30,45 @@ type env = {
 
 and retrieve_theory = env -> string list -> theory Mnm.t
 
-let create_env = let c = ref (-1) in fun retrieve ->
-  let env = {
-    env_retrieve = retrieve;
-    env_memo     = Hashtbl.create 17;
-    env_tag      = (incr c; Hashweak.create_tag !c) }
-  in
-  let add th m = Mnm.add th.th_name.id_string th m in
-  let m = Mnm.empty in
-  let m = add builtin_theory m in
-  let m = add highord_theory m in
-  let m = add (tuple_theory 0) m in
-  let m = add (tuple_theory 1) m in
-  let m = add (tuple_theory 2) m in
-  Hashtbl.add env.env_memo [] m;
-  env
+let create_memo () =
+  let ht = Hashtbl.create 17 in
+  Hashtbl.add ht [] Mnm.empty;
+  ht
+
+let create_env = let c = ref (-1) in fun retrieve -> {
+  env_retrieve = retrieve;
+  env_memo     = create_memo ();
+  env_tag      = (incr c; Hashweak.create_tag !c) }
 
 exception TheoryNotFound of string list * string
 
-let find_theory env sl s =
-  try
-    let m =
-      try
-	Hashtbl.find env.env_memo sl
-      with Not_found ->
-	Hashtbl.add env.env_memo sl Mnm.empty;
-	let m = env.env_retrieve env sl in
-	Hashtbl.replace env.env_memo sl m;
-	m
-    in
-    Mnm.find s m
+let get_builtin s =
+  if s = builtin_theory.th_name.id_string then builtin_theory else
+  if s = highord_theory.th_name.id_string then highord_theory else
+  match tuple_theory_name s with
+  | Some n -> tuple_theory n
+  | None -> raise (TheoryNotFound ([],s))
+
+let find_builtin env s =
+  let m = Hashtbl.find env.env_memo [] in
+  try Mnm.find s m with Not_found ->
+    let th = get_builtin s in
+    let m = Mnm.add s th m in
+    Hashtbl.replace env.env_memo [] m;
+    th
+
+let find_library env sl =
+  try Hashtbl.find env.env_memo sl
   with Not_found ->
-    raise (TheoryNotFound (sl, s))
+    Hashtbl.add env.env_memo sl Mnm.empty;
+    let m = env.env_retrieve env sl in
+    Hashtbl.replace env.env_memo sl m;
+    m
+
+let find_theory env sl s =
+  if sl = [] then find_builtin env s
+  else try Mnm.find s (find_library env sl)
+  with Not_found -> raise (TheoryNotFound (sl, s))
 
 let env_tag env = env.env_tag
 
@@ -78,25 +85,21 @@ let register_format name suffixes rc =
   List.iter (fun s -> Hashtbl.add suffixes_table ("." ^ s) name) suffixes
 
 exception NoFormat
-exception UnknownExtension of string 
+exception UnknownExtension of string
 exception UnknownFormat of string (* parser name *)
 
 let parser_for_file ?format file = match format with
   | None ->
       begin try
-	let ext =
-	  let s = Filename.chop_extension file in
-	  let n = String.length s in
-	  String.sub file n (String.length file - n)
-	in
-        try
-	  Hashtbl.find suffixes_table ext
+        let ext =
+          let s = Filename.chop_extension file in
+          let n = String.length s in
+          String.sub file n (String.length file - n)
+        in
+        try Hashtbl.find suffixes_table ext
         with Not_found -> raise (UnknownExtension ext)
-      with 
-        | Invalid_argument _ -> raise NoFormat
-      end
-  | Some n ->
-      n
+      with Invalid_argument _ -> raise NoFormat end
+  | Some n -> n
 
 let find_parser table n =
   try Hashtbl.find table n

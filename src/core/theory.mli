@@ -179,6 +179,8 @@ val highord_theory : theory
 
 val tuple_theory : int -> theory
 
+val tuple_theory_name : string -> int option
+
 (* exceptions *)
 
 exception NonLocal of ident

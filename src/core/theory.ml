@@ -723,6 +723,17 @@ let tuple_theory = Util.memo_int 17 (fun n ->
   let uc = add_ty_decl uc [ts_tuple n, Talgebraic [fs_tuple n]] in
   close_theory uc)
 
+let tuple_theory_name s =
+  let l = String.length s in
+  if l < 6 then None else
+  let p = String.sub s 0 5 in
+  if p <> "Tuple" then None else
+  let q = String.sub s 5 (l - 5) in
+  let i = try int_of_string q with _ -> 0 in
+  (* we only accept the decimal notation *)
+  if q <> string_of_int i then None else
+  Some i
+
 (* Exception reporting *)
 
 let print_meta_arg_type fmt = function
