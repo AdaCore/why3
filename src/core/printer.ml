@@ -142,14 +142,16 @@ let remove_prop pr =
 let get_syntax_map task =
   let add_ts td m = match td.td_node with
     | Meta (_,[MAts ts; MAstr s]) ->
-        if Mid.mem ts.ts_name m then raise (KnownTypeSyntax ts);
-        Mid.add ts.ts_name s m
+      Mid.change ts.ts_name (function
+        | None -> Some s
+        | Some _ -> raise (KnownTypeSyntax ts)) m
     | _ -> assert false
   in
   let add_ls td m = match td.td_node with
     | Meta (_,[MAls ls; MAstr s]) ->
-        if Mid.mem ls.ls_name m then raise (KnownLogicSyntax ls);
-        Mid.add ls.ls_name s m
+      Mid.change ls.ls_name (function
+        | None -> Some s
+        | Some _ -> raise (KnownLogicSyntax ls)) m
     | _ -> assert false
   in
   let m = Mid.empty in
@@ -176,8 +178,7 @@ let get_remove_set task =
   let s = Stdecl.fold add_pr (find_meta task meta_remove_prop).tds_set s in
   s
 
-let query_syntax sm id =
-  try Some (Mid.find id sm) with Not_found -> None
+let query_syntax sm id = Mid.find_option id sm
 
 (** {2 exceptions to use in transformations and printers} *)
 

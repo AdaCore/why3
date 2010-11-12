@@ -67,28 +67,32 @@ module Compile (X : Action) = struct
         in
         (* dispatch every case to a primitive constructor/wild case *)
         let cases,wilds =
-          let add_case fs pl a cases =
-            let rl = Mls.find_default fs [] cases in
-            Mls.add fs ((pl,a)::rl) cases
-          in
-          let add_wild pl a fs ql cases =
-            let add pl q = pat_wild q.pat_ty :: pl in
-            add_case fs (List.fold_left add pl ql) a cases
-          in
+          let change_case fs pl a cases =
+            Mls.change fs (function
+              | None -> Some [pl,a]
+              | Some rl -> Some ((pl,a)::rl)) cases in
+          let union_cases pl a types cases =
+            let make_wild pl a ql =
+              let add pl q = pat_wild q.pat_ty :: pl in
+              [List.fold_left add pl ql,a]
+            in
+            let types = Mls.map (make_wild pl a) types in
+            Mls.union (fun _ pla rl -> Some (List.append pla rl))
+              types cases in
           let rec dispatch (pl,a) (cases,wilds) =
             let p = List.hd pl in let pl = List.tl pl in
             match p.pat_node with
               | Papp (fs,pl') ->
-                  add_case fs (List.rev_append pl' pl) a cases, wilds
+                  change_case fs (List.rev_append pl' pl) a cases, wilds
               | Por (p,q) ->
                   dispatch (p::pl, a) (dispatch (q::pl, a) (cases,wilds))
               | Pas (p,x) ->
                   dispatch (p::pl, mk_let x t a) (cases,wilds)
               | Pvar x ->
                   let a = mk_let x t a in
-                  Mls.fold (add_wild pl a) types cases, (pl,a)::wilds
+                  union_cases pl a types cases, (pl,a)::wilds
               | Pwild ->
-                  Mls.fold (add_wild pl a) types cases, (pl,a)::wilds
+                  union_cases pl a types cases, (pl,a)::wilds
           in
           List.fold_right dispatch rl (Mls.empty,[])
         in
@@ -125,7 +129,7 @@ module Compile (X : Action) = struct
             if Mls.mem cs types then comp_cases cs al else comp_wilds ()
         | _ ->
             let base =
-              if Sls.for_all (fun cs -> Mls.mem cs types) css
+              if Mls.submap (fun _ () _ -> true) css types
               then [] else [mk_branch (pat_wild ty) (comp_wilds ())]
             in
             let add cs ql acc =

@@ -234,11 +234,10 @@ let check_termination ldl =
   in
   let syms = List.fold_left add Mls.empty ldl in
   Mls.iter (build_call_graph cgr syms) syms;
-  let check ls _ acc =
+  let check ls _ =
     let cl = build_call_list cgr ls in
-    Mls.add ls (check_call_list ls cl) acc
-  in
-  Mls.fold check syms Mls.empty
+    check_call_list ls cl in
+  Mls.mapi check syms
 
 (** Inductive predicate declaration *)
 
