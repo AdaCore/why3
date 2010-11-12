@@ -184,7 +184,7 @@ let option_list = Arg.align [
   "--type-only", Arg.Set opt_type_only,
       " Stop after type checking (same as --debug type_only)";
   "--debug-all", Arg.Set opt_debug_all,
-      " Set every known debug flag";
+      " Set all debug flags (except parse_only and type_only)";
   "--debug", Arg.String add_opt_debug,
       "<flag> Set a debug flag" ]
 
@@ -276,8 +276,11 @@ let () =
       opt_print_theory := true
   end;
 
-  if !opt_debug_all then
+  if !opt_debug_all then begin
     List.iter (fun (_,f,_) -> Debug.set_flag f) (Debug.list_flags ());
+    Debug.unset_flag Typing.debug_parse_only;
+    Debug.unset_flag Typing.debug_type_only
+  end;
 
   List.iter (fun s -> Debug.set_flag (Debug.lookup_flag s)) !opt_debug;
 
@@ -303,10 +306,12 @@ let () =
       opt_command := Some prover.command;
       opt_driver := Some prover.driver
   | None ->
-    () end;
+      ()
+  end;
   let add_meta task (meta,s) =
     let meta = lookup_meta meta in
-    add_meta task meta [MAstr s] in
+    add_meta task meta [MAstr s]
+  in
   opt_task := List.fold_left add_meta !opt_task !opt_metas
 
 let timelimit = match !opt_timelimit with
