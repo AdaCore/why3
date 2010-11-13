@@ -44,9 +44,9 @@ let config = Whyconf.read_config None
 let main = Whyconf.get_main config
 let cprovers = Whyconf.get_provers config
 
-let timelimit = main.timelimit
+let timelimit = timelimit main
 
-let env = Env.create_env (Lexer.retrieve main.loadpath)
+let env = Env.create_env (Lexer.retrieve (loadpath main))
     
 let provers = Hashtbl.create 17
 
