@@ -28,15 +28,16 @@ module Map : sig
 module type OrderedType =
   sig
     type t
-      (** The type of the map keys. *)
+    (** The type of the map keys. *)
+
     val compare : t -> t -> int
-      (** A total ordering function over the keys.
-          This is a two-argument function [f] such that
-          [f e1 e2] is zero if the keys [e1] and [e2] are equal,
-          [f e1 e2] is strictly negative if [e1] is smaller than [e2],
-          and [f e1 e2] is strictly positive if [e1] is greater than [e2].
-          Example: a suitable ordering function is the generic structural
-          comparison function {!Pervasives.compare}. *)
+    (** A total ordering function over the keys.
+        This is a two-argument function [f] such that
+        [f e1 e2] is zero if the keys [e1] and [e2] are equal,
+        [f e1 e2] is strictly negative if [e1] is smaller than [e2],
+        and [f e1 e2] is strictly positive if [e1] is greater than [e2].
+        Example: a suitable ordering function is the generic structural
+        comparison function {!Pervasives.compare}. *)
   end
 (** Input signature of the functor {!Map.Make}. *)
 
@@ -56,30 +57,28 @@ module type S =
 
     val mem: key -> 'a t -> bool
     (** [mem x m] returns [true] if [m] contains a binding for [x],
-       and [false] otherwise. *)
+        and [false] otherwise. *)
 
     val add: key -> 'a -> 'a t -> 'a t
     (** [add x y m] returns a map containing the same bindings as
-       [m], plus a binding of [x] to [y]. If [x] was already bound
-       in [m], its previous binding disappears. *)
+        [m], plus a binding of [x] to [y]. If [x] was already bound
+        in [m], its previous binding disappears. *)
 
     val singleton: key -> 'a -> 'a t
     (** [singleton x y] returns the one-element map that contains a binding [y]
         for [x].
-        @since 3.12.0
-     *)
+        @since 3.12.0 *)
 
     val remove: key -> 'a t -> 'a t
     (** [remove x m] returns a map containing the same bindings as
-       [m], except for [x] which is unbound in the returned map. *)
+        [m], except for [x] which is unbound in the returned map. *)
 
     val merge:
          (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
     (** [merge f m1 m2] computes a map whose keys is a subset of keys of [m1]
         and of [m2]. The presence of each such binding, and the corresponding
         value, is determined with the function [f].
-        @since 3.12.0
-     *)
+        @since 3.12.0 *)
 
     val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
     (** Total ordering between maps.  The first argument is a total ordering
@@ -87,9 +86,9 @@ module type S =
 
     val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
     (** [equal cmp m1 m2] tests whether the maps [m1] and [m2] are
-       equal, that is, contain equal keys and associate them with
-       equal data.  [cmp] is the equality predicate used to compare
-       the data associated with the keys. *)
+        equal, that is, contain equal keys and associate them with
+        equal data.  [cmp] is the equality predicate used to compare
+        the data associated with the keys. *)
 
     val iter: (key -> 'a -> unit) -> 'a t -> unit
     (** [iter f m] applies [f] to all bindings in map [m].
@@ -98,68 +97,59 @@ module type S =
        order with respect to the ordering over the type of the keys. *)
 
     val fold: (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
-    (** [fold f m a] computes [(f kN dN ... (f k1 d1 a)...)],
-       where [k1 ... kN] are the keys of all bindings in [m]
-       (in increasing order), and [d1 ... dN] are the associated data. *)
+    (** [fold f m a] computes [(f kN dN ... (f k1 d1 a)...)], where
+        [k1 ... kN] are the keys of all bindings in [m] (in increasing
+        order), and [d1 ... dN] are the associated data. *)
 
     val for_all: (key -> 'a -> bool) -> 'a t -> bool
     (** [for_all p m] checks if all the bindings of the map
         satisfy the predicate [p].
-        @since 3.12.0
-     *)
+        @since 3.12.0 *)
 
     val exists: (key -> 'a -> bool) -> 'a t -> bool
     (** [exists p m] checks if at least one binding of the map
         satisfy the predicate [p].
-        @since 3.12.0
-     *)
+        @since 3.12.0 *)
 
     val filter: (key -> 'a -> bool) -> 'a t -> 'a t
     (** [filter p m] returns the map with all the bindings in [m]
         that satisfy predicate [p].
-        @since 3.12.0
-     *)
+        @since 3.12.0 *)
 
     val partition: (key -> 'a -> bool) -> 'a t -> 'a t * 'a t
     (** [partition p m] returns a pair of maps [(m1, m2)], where
         [m1] contains all the bindings of [s] that satisfy the
         predicate [p], and [m2] is the map with all the bindings of
         [s] that do not satisfy [p].
-        @since 3.12.0
-     *)
+        @since 3.12.0 *)
 
     val cardinal: 'a t -> int
     (** Return the number of bindings of a map.
-        @since 3.12.0
-     *)
+        @since 3.12.0 *)
 
     val bindings: 'a t -> (key * 'a) list
     (** Return the list of all bindings of the given map.
-       The returned list is sorted in increasing order with respect
-       to the ordering [Ord.compare], where [Ord] is the argument
-       given to {!Map.Make}.
-        @since 3.12.0
-     *)
+        The returned list is sorted in increasing order with respect
+        to the ordering [Ord.compare], where [Ord] is the argument
+        given to {!Map.Make}.
+        @since 3.12.0 *)
 
     val min_binding: 'a t -> (key * 'a)
     (** Return the smallest binding of the given map
-       (with respect to the [Ord.compare] ordering), or raise
-       [Not_found] if the map is empty.
-        @since 3.12.0
-     *)
+        (with respect to the [Ord.compare] ordering), or raise
+        [Not_found] if the map is empty.
+        @since 3.12.0 *)
 
     val max_binding: 'a t -> (key * 'a)
-    (** Same as {!Map.S.max_binding}, but returns the largest binding
-        of the given map.
-        @since 3.12.0
-     *)
+    (** Same as {!Map.S.max_binding}, but returns the largest
+        binding of the given map.
+        @since 3.12.0 *)
 
     val choose: 'a t -> (key * 'a)
     (** Return one binding of the given map, or raise [Not_found] if
-       the map is empty. Which binding is chosen is unspecified,
-       but equal bindings will be chosen for equal maps.
-        @since 3.12.0
-     *)
+        the map is empty. Which binding is chosen is unspecified,
+        but equal bindings will be chosen for equal maps.
+        @since 3.12.0 *)
 
     val split: key -> 'a t -> 'a t * 'a option * 'a t
     (** [split x m] returns a triple [(l, data, r)], where
@@ -169,23 +159,22 @@ module type S =
         is strictly greater than [x];
           [data] is [None] if [m] contains no binding for [x],
           or [Some v] if [m] binds [v] to [x].
-        @since 3.12.0
-     *)
+        @since 3.12.0 *)
 
     val find: key -> 'a t -> 'a
     (** [find x m] returns the current binding of [x] in [m],
-       or raises [Not_found] if no such binding exists. *)
+        or raises [Not_found] if no such binding exists. *)
 
     val map: ('a -> 'b) -> 'a t -> 'b t
-    (** [map f m] returns a map with same domain as [m], where the
-       associated value [a] of all bindings of [m] has been
-       replaced by the result of the application of [f] to [a].
-       The bindings are passed to [f] in increasing order
-       with respect to the ordering over the type of the keys. *)
+    (** [map f m] returns a map with same domain as [m], where
+        the associated value [a] of all bindings of [m] has been
+        replaced by the result of the application of [f] to [a].
+        The bindings are passed to [f] in increasing order
+        with respect to the ordering over the type of the keys. *)
 
     val mapi: (key -> 'a -> 'b) -> 'a t -> 'b t
-    (** Same as {!Map.S.map}, but the function receives as arguments both the
-       key and the associated value for each binding of the map. *)
+    (** Same as {!Map.S.map}, but the function receives as arguments both
+        the key and the associated value for each binding of the map. *)
 
 
     (** {3} Added into why stdlib version *)
@@ -197,20 +186,17 @@ module type S =
         binding of [x] becomes [f None].
 
         [change x f m] corresponds to a more efficient way to do
-        [add x (try f (Some (find x m)) with Not_found -> f None) m]
-    *)
+        [add x (try f (Some (find x m)) with Not_found -> f None) m] *)
 
     val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
-    (** [union f m1 m2] computes a map whose keys is a subset of keys of [m1]
-        and of [m2]. If a binding is present in [m1] (resp. [m2]) and not in
-        [m2] (resp. [m1]) the same binding is present in the result. Indeed the
-        function [f] is called only in ambiguous cases.
-     *)
+    (** [union f m1 m2] computes a map whose keys is a subset of keys
+        of [m1] and of [m2]. If a binding is present in [m1] (resp. [m2])
+        and not in [m2] (resp. [m1]) the same binding is present in
+        the result. The function [f] is called only in ambiguous cases. *)
 
     val inter : (key -> 'a -> 'b -> 'c option) -> 'a t -> 'b t -> 'c t
     (** [inter f m1 m2] computes a map whose keys is a subset of
-        the intersection of keys of [m1] and of [m2].
-     *)
+        the intersection of keys of [m1] and of [m2]. *)
 
     val diff : (key -> 'a -> 'b -> 'a option) -> 'a t -> 'b t -> 'a t
     (** [diff f m1 m2] computes a map whose keys is a subset of keys
@@ -219,8 +205,8 @@ module type S =
         otherwise [Some d1] is returned, the key binds to [d1] in [m1] *)
 
     val submap : (key -> 'a -> 'b -> bool) -> 'a t -> 'b t -> bool
-      (** [submap pr m1 m2] verifies that all the keys in m1 are in m2
-          and that for each such binding pr is verified. *)
+    (** [submap pr m1 m2] verifies that all the keys in m1 are in m2
+        and that for each such binding pr is verified. *)
 
     val find_default : key -> 'a -> 'a t -> 'a
     (** [find_default x d m] returns the current binding of [x] in [m],
@@ -247,114 +233,113 @@ module type S =
       (** The type of sets of type [elt]. *)
 
       val empty: t
-    (** The empty set. *)
+      (** The empty set. *)
 
       val is_empty: t -> bool
-    (** Test whether a set is empty or not. *)
+      (** Test whether a set is empty or not. *)
 
       val mem: elt -> t -> bool
-    (** [mem x s] returns [true] if [s] contains [x],
-        and [false] otherwise. *)
+      (** [mem x s] returns [true] if [s] contains [x],
+          and [false] otherwise. *)
 
       val add: elt -> t -> t
-    (** [add x s] returns a set containing the same elements as
-        [s], plus [x]. *)
+      (** [add x s] returns a set containing the same elements as
+          [s], plus [x]. *)
 
       val singleton: elt -> t
-    (** [singleton x] returns the one-element set that contains [x]. *)
+      (** [singleton x] returns the one-element set that contains [x]. *)
 
       val remove: elt -> t -> t
-    (** [remove x s] returns a set containing the same elements as [s],
-        except for [x]. *)
+      (** [remove x s] returns a set containing the same elements as [s],
+          except for [x]. *)
 
       val merge: (elt -> bool -> bool -> bool) -> t -> t -> t
-    (** [merge f s1 s2] computes a set whose elts is a subset of elts
-        of [s1] and of [s2]. The presence of each such element is
-        determined with the function [f]. *)
+      (** [merge f s1 s2] computes a set whose elts is a subset of elts
+          of [s1] and of [s2]. The presence of each such element is
+          determined with the function [f]. *)
 
       val compare: t -> t -> int
-    (** Total ordering between sets. *)
+      (** Total ordering between sets. *)
 
       val equal: t -> t -> bool
-    (** [equal s1 s2] tests whether the sets [s1] and [s2] are equal. *)
+      (** [equal s1 s2] tests whether the sets [s1] and [s2] are equal. *)
 
       val subset: t -> t -> bool
-    (** [subset s1 s2] tests whether the set [s1] is a subset of [s2]. *)
+      (** [subset s1 s2] tests whether the set [s1] is a subset of [s2]. *)
 
       val iter: (elt -> unit) -> t -> unit
-    (** [iter f s] applies [f] to all elements of [s].
-        The elements are passed to [f] in increasing order with respect
-        to the ordering over the type of the elts. *)
+      (** [iter f s] applies [f] to all elements of [s].
+          The elements are passed to [f] in increasing order with respect
+          to the ordering over the type of the elts. *)
 
       val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
-    (** [fold f s a] computes [(f eN ... (f e1 a)...)],
-        where [e1 ... eN] are the element of [s] in increasing order. *)
+      (** [fold f s a] computes [(f eN ... (f e1 a)...)],
+          where [e1 ... eN] are the element of [s] in increasing order. *)
 
       val for_all: (elt -> bool) -> t -> bool
-    (** [for_all p s] checks if all the elements of [s] satisfy
-        the predicate [p]. *)
+      (** [for_all p s] checks if all the elements of [s] satisfy
+          the predicate [p]. *)
 
       val exists: (elt -> bool) -> t -> bool
-    (** [exists p s] checks if at least one element of [s] satisfies
-        the predicate [p]. *)
+      (** [exists p s] checks if at least one element of [s] satisfies
+          the predicate [p]. *)
 
       val filter: (elt -> bool) -> t -> t
-    (** [filter p s] returns the set with all the elements of [s]
-        that satisfy predicate [p]. *)
+      (** [filter p s] returns the set with all the elements of [s]
+          that satisfy predicate [p]. *)
 
       val partition: (elt -> bool) -> t -> t * t
-    (** [partition p s] returns a pair of sets [(s1, s2)], where
-        [s1] contains all the elements of [s] that satisfy the
-        predicate [p], and [s2] is the map with all the elements of
-        [s] that do not satisfy [p]. *)
+      (** [partition p s] returns a pair of sets [(s1, s2)], where
+          [s1] contains all the elements of [s] that satisfy the
+          predicate [p], and [s2] is the map with all the elements
+          of [s] that do not satisfy [p]. *)
 
       val cardinal: t -> int
-    (** Return the number of elements in a set. *)
+      (** Return the number of elements in a set. *)
 
       val elements: t -> elt list
-    (** Return the list of all elements of the given set.
-        The returned list is sorted in increasing order. *)
+      (** Return the list of all elements of the given set.
+          The returned list is sorted in increasing order. *)
 
       val min_elt: t -> elt
-    (** Return the smallest element of the given set or raise
-        [Not_found] if the set is empty. *)
+      (** Return the smallest element of the given set or raise
+          [Not_found] if the set is empty. *)
 
       val max_elt: t -> elt
-    (** Return the largest element of the given set or raise
-        [Not_found] if the set is empty. *)
+      (** Return the largest element of the given set or raise
+          [Not_found] if the set is empty. *)
 
       val choose: t -> elt
-    (** Return one element of the given set, or raise [Not_found] if
-        the set is empty. Which element is chosen is unspecified,
-        but equal elements will be chosen for equal sets. *)
+      (** Return one element of the given set, or raise [Not_found] if
+          the set is empty. Which element is chosen is unspecified,
+          but equal elements will be chosen for equal sets. *)
 
       val split: elt -> t -> t * bool * t
-    (** [split x s] returns a triple [(l, mem, r)], where
-        [l] is the set with all the elements of [s] that are
-        strictly less than [x];
-        [r] is the set with all the elements of [s] that are
-        strictly greater than [x];
-        [mem] is [true] if [x] belongs to [s] and [false] otherwise. *)
+      (** [split x s] returns a triple [(l, mem, r)], where
+          [l] is the set with all the elements of [s] that are
+          strictly less than [x];
+          [r] is the set with all the elements of [s] that are
+          strictly greater than [x];
+          [mem] is [true] if [x] belongs to [s] and [false] otherwise. *)
 
       val change : elt -> (bool -> bool) -> t -> t
-    (** [change x f s] returns a set containing the same elements as
-        [s], except [x] which is added to [s] if [f (mem x s)] returns
-        [true] and removed otherwise. *)
+      (** [change x f s] returns a set containing the same elements as
+          [s], except [x] which is added to [s] if [f (mem x s)] returns
+          [true] and removed otherwise. *)
 
       val union : t -> t -> t
-    (** [union f s1 s2] computes the union of two sets *)
+      (** [union f s1 s2] computes the union of two sets *)
 
       val inter : t -> t -> t
-    (** [inter f s1 s2] computes the intersection of two sets *)
+      (** [inter f s1 s2] computes the intersection of two sets *)
 
       val diff : t -> t -> t
-    (** [diss f s1 s2] computes the difference of two sets *)
+      (** [diss f s1 s2] computes the difference of two sets *)
 
       val translate : (elt -> elt) -> t -> t
-    (** [translate f s] translates the elements in the set [s] by the
-        function [f]. [f] must be strictly monotone on the elements of [s].
-        Otherwise it raises invalid_arg *)
-
+      (** [translate f s] translates the elements in the set [s] by the
+          function [f]. [f] must be strictly monotone on the elements of [s].
+          Otherwise it raises invalid_arg *)
     end
 
     module Set : Set
@@ -365,6 +350,6 @@ module type S =
 
 module Make (Ord : OrderedType) : S with type key = Ord.t
 (** Functor building an implementation of the map/set structure
-   given a totally ordered type. *)
+    given a totally ordered type. *)
 
 end
