@@ -115,11 +115,11 @@ let ffalse _ = false
 
 module Int  = struct type t = int let compare = Pervasives.compare end
 
-module Sint = Set.Make(Int)
 module Mint = Map.Make(Int)
+module Sint = Mint.Set
 
-module Sstr = Set.Make(String)
 module Mstr = Map.Make(String)
+module Sstr = Mstr.Set
 
 (* Set, Map, Hashtbl on structures with a unique tag *)
 

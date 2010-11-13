@@ -42,7 +42,7 @@ and origin =
   | Fresh
 
 module Mid : Map.S with type key = ident
-module Sid : Mid.SetS
+module Sid : Mid.Set
 module Hid : Hashtbl.S with type key = ident
 
 val id_equal : ident -> ident -> bool

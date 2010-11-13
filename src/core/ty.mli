@@ -26,8 +26,8 @@ type tvsymbol = private {
   tv_name : ident;
 }
 
-module Stv : Set.S with type elt = tvsymbol
 module Mtv : Map.S with type key = tvsymbol
+module Stv : Mtv.Set
 module Htv : Hashtbl.S with type key = tvsymbol
 
 val tv_equal : tvsymbol -> tvsymbol -> bool
@@ -53,13 +53,13 @@ and ty_node = private
   | Tyvar of tvsymbol
   | Tyapp of tysymbol * ty list
 
-module Sts : Set.S with type elt = tysymbol
 module Mts : Map.S with type key = tysymbol
+module Sts : Mts.Set
 module Hts : Hashtbl.S with type key = tysymbol
 module Wts : Hashweak.S with type key = tysymbol
 
-module Sty : Set.S with type elt = ty
 module Mty : Map.S with type key = ty
+module Sty : Mty.Set
 module Hty : Hashtbl.S with type key = ty
 module Wty : Hashweak.S with type key = ty
 

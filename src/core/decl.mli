@@ -62,8 +62,8 @@ type prsymbol = private {
   pr_name : ident;
 }
 
-module Spr : Set.S with type elt = prsymbol
 module Mpr : Map.S with type key = prsymbol
+module Spr : Mpr.Set
 module Hpr : Hashtbl.S with type key = prsymbol
 module Wpr : Hashweak.S with type key = prsymbol
 
@@ -100,8 +100,8 @@ and decl_node =
   | Dind   of ind_decl list     (* inductive predicates *)
   | Dprop  of prop_decl         (* axiom / lemma / goal *)
 
-module Sdecl : Set.S with type elt = decl
 module Mdecl : Map.S with type key = decl
+module Sdecl : Mdecl.Set
 module Wdecl : Hashweak.S with type key = decl
 
 val d_equal : decl -> decl -> bool

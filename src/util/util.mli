@@ -90,11 +90,11 @@ val ttrue : 'a -> bool
 
 (* Set and Map on ints and strings *)
 
-module Sint : Set.S with type elt = int
 module Mint : Map.S with type key = int
+module Sint : Mint.Set
 
-module Sstr : Set.S with type elt = string
 module Mstr : Map.S with type key = string
+module Sstr : Mstr.Set
 
 val memo_int : int -> (int -> 'a) -> int -> 'a
 
@@ -120,14 +120,14 @@ module OrderedHashList (X : Tagged) : OrderedHash with type t = X.t list
 module StructMake (X : Tagged) :
 sig
   module M : Map.S with type key = X.t
-  module S : M.SetS
+  module S : M.Set  with type elt = X.t
   module H : Hashtbl.S with type key = X.t
 end
 
 module WeakStructMake (X : Hashweak.Weakey) :
 sig
   module M : Map.S with type key = X.t
-  module S : M.SetS
+  module S : M.Set
   module H : Hashtbl.S with type key = X.t
   module W : Hashweak.S with type key = X.t
 end

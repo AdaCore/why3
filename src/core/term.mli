@@ -31,8 +31,8 @@ type vsymbol = private {
   vs_ty : ty;
 }
 
-module Svs : Set.S with type elt = vsymbol
 module Mvs : Map.S with type key = vsymbol
+module Svs : Mvs.Set
 module Hvs : Hashtbl.S with type key = vsymbol
 
 val vs_equal : vsymbol -> vsymbol -> bool
@@ -48,8 +48,8 @@ type lsymbol = private {
   ls_value  : ty option;
 }
 
-module Sls : Set.S with type elt = lsymbol
 module Mls : Map.S with type key = lsymbol
+module Sls : Mls.Set
 module Hls : Hashtbl.S with type key = lsymbol
 module Wls : Hashweak.S with type key = lsymbol
 
@@ -176,12 +176,12 @@ and expr =
 
 and trigger = expr list
 
-module Sterm : Set.S with type elt = term
 module Mterm : Map.S with type key = term
+module Sterm : Mterm.Set
 module Hterm : Hashtbl.S with type key = term
 
-module Sfmla : Set.S with type elt = fmla
 module Mfmla : Map.S with type key = fmla
+module Sfmla : Mfmla.Set
 module Hfmla : Hashtbl.S with type key = fmla
 
 val t_equal : term -> term -> bool

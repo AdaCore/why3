@@ -26,8 +26,8 @@ open Ty
 open Term
 open Decl
 
-module Snm : Set.S with type elt = string
 module Mnm : Map.S with type key = string
+module Snm : Mnm.Set
 
 type namespace = private {
   ns_ts : tysymbol Mnm.t;   (* type symbols *)
@@ -64,8 +64,8 @@ type meta = private {
   meta_tag  : int;
 }
 
-module Smeta : Set.S with type elt = meta
 module Mmeta : Map.S with type key = meta
+module Smeta : Mmeta.Set
 module Hmeta : Hashtbl.S with type key = meta
 
 val meta_equal : meta -> meta -> bool
@@ -99,8 +99,8 @@ and tdecl_node = private
   | Clone of theory * tysymbol Mts.t * lsymbol Mls.t * prsymbol Mpr.t
   | Meta  of meta * meta_arg list
 
-module Stdecl : Set.S with type elt = tdecl
 module Mtdecl : Map.S with type key = tdecl
+module Stdecl : Mtdecl.Set
 module Htdecl : Hashtbl.S with type key = tdecl
 
 val td_equal : tdecl -> tdecl -> bool

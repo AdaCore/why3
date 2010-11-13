@@ -21,38 +21,6 @@ module type OrderedType =
     val compare: t -> t -> int
   end
 
-module type SetS =
-  sig
-    type elt
-    type t
-    val empty: t
-    val is_empty: t -> bool
-    val mem: elt -> t -> bool
-    val add: elt -> t -> t
-    val singleton: elt -> t
-    val remove: elt -> t -> t
-    val merge: (elt -> bool -> bool -> bool) -> t -> t -> t
-    val compare: t -> t -> int
-    val equal: t -> t -> bool
-    val subset: t -> t -> bool
-    val iter: (elt -> unit) -> t -> unit
-    val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
-    val for_all: (elt -> bool) -> t -> bool
-    val exists: (elt -> bool) -> t -> bool
-    val filter: (elt -> bool) -> t -> t
-    val partition: (elt -> bool) -> t -> t * t
-    val cardinal: t -> int
-    val elements: t -> elt list
-    val min_elt: t -> elt
-    val max_elt: t -> elt
-    val choose: t -> elt
-    val split: elt -> t -> t * bool * t
-    val change : elt -> (bool -> bool) -> t -> t
-    val union : t -> t -> t
-    val inter : t -> t -> t
-    val diff : t -> t -> t
-  end
-
 module type S =
   sig
     type key
@@ -92,9 +60,40 @@ module type S =
     val find_default : key -> 'a -> 'a t -> 'a
     val mapi_fold:
       (key -> 'a -> 'acc -> 'acc * 'b) -> 'a t -> 'acc -> 'acc * 'b t
+    module type Set =
+    sig
+      type elt = key
+      type set = unit t
+      type t = set
+      val empty: t
+      val is_empty: t -> bool
+      val mem: elt -> t -> bool
+      val add: elt -> t -> t
+      val singleton: elt -> t
+      val remove: elt -> t -> t
+      val merge: (elt -> bool -> bool -> bool) -> t -> t -> t
+      val compare: t -> t -> int
+      val equal: t -> t -> bool
+      val subset: t -> t -> bool
+      val iter: (elt -> unit) -> t -> unit
+      val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
+      val for_all: (elt -> bool) -> t -> bool
+      val exists: (elt -> bool) -> t -> bool
+      val filter: (elt -> bool) -> t -> t
+      val partition: (elt -> bool) -> t -> t * t
+      val cardinal: t -> int
+      val elements: t -> elt list
+      val min_elt: t -> elt
+      val max_elt: t -> elt
+      val choose: t -> elt
+      val split: elt -> t -> t * bool * t
+      val change : elt -> (bool -> bool) -> t -> t
+      val union : t -> t -> t
+      val inter : t -> t -> t
+      val diff : t -> t -> t
+    end
 
-    module type SetS = SetS with type elt = key and type t = unit t
-    module Set : SetS
+    module Set : Set
 
   end
 
@@ -470,7 +469,38 @@ module Make(Ord: OrderedType) = struct
           let acc,r' = mapi_fold f r acc in
           acc,Node(l', v, d', r', h)
 
-    module type SetS = SetS with type elt = key and type t = unit t
+    module type Set =
+    sig
+      type elt = key
+      type set = unit t
+      type t = set
+      val empty: t
+      val is_empty: t -> bool
+      val mem: elt -> t -> bool
+      val add: elt -> t -> t
+      val singleton: elt -> t
+      val remove: elt -> t -> t
+      val merge: (elt -> bool -> bool -> bool) -> t -> t -> t
+      val compare: t -> t -> int
+      val equal: t -> t -> bool
+      val subset: t -> t -> bool
+      val iter: (elt -> unit) -> t -> unit
+      val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
+      val for_all: (elt -> bool) -> t -> bool
+      val exists: (elt -> bool) -> t -> bool
+      val filter: (elt -> bool) -> t -> t
+      val partition: (elt -> bool) -> t -> t * t
+      val cardinal: t -> int
+      val elements: t -> elt list
+      val min_elt: t -> elt
+      val max_elt: t -> elt
+      val choose: t -> elt
+      val split: elt -> t -> t * bool * t
+      val change : elt -> (bool -> bool) -> t -> t
+      val union : t -> t -> t
+      val inter : t -> t -> t
+      val diff : t -> t -> t
+    end
 
     module Set =
       struct
