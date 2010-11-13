@@ -62,6 +62,7 @@ module type S =
     val mapi_fold:
       (key -> 'a -> 'acc -> 'acc * 'b) -> 'a t -> 'acc -> 'acc * 'b t
     val translate : (key -> key) -> 'a t -> 'a t
+    val add_new : key -> 'a -> exn -> 'a t -> 'a t
 
     module type Set =
     sig
@@ -95,6 +96,7 @@ module type S =
       val inter : t -> t -> t
       val diff : t -> t -> t
       val translate : (elt -> elt) -> t -> t
+      val add_new : elt -> exn -> t -> t
     end
 
     module Set : Set
@@ -496,6 +498,10 @@ module Make(Ord: OrderedType) = struct
           Node(l,v,d,r,h),last in
       let m,_ = aux None m in m
 
+    let add_new x v e m = change x (function
+      | Some _ -> raise e
+      | None -> Some v) m
+
     module type Set =
     sig
       type elt = key
@@ -528,6 +534,7 @@ module Make(Ord: OrderedType) = struct
       val inter : t -> t -> t
       val diff : t -> t -> t
       val translate : (elt -> elt) -> t -> t
+      val add_new : elt -> exn -> t -> t
     end
 
     module Set =
@@ -568,6 +575,7 @@ module Make(Ord: OrderedType) = struct
         let inter = inter (fun _ _ _ -> Some ())
         let diff = diff (fun _ _ _ -> None)
         let translate = translate
+        let add_new x = add_new x ()
       end
 
 end

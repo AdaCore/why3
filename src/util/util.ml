@@ -16,12 +16,18 @@
 (*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
 (*                                                                        *)
 (**************************************************************************)
+
 open Stdlib
+
 (* useful combinators *)
 
 let ($) f x = f x
 
 let const f _ = f
+
+let const2 f _ _ = f
+
+let const3 f _ _ _ = f
 
 let flip f x y = f y x
 

@@ -225,6 +225,10 @@ module type S =
         function [f]. [f] must be strictly monotone on the key of [m].
         Otherwise it raises invalid_arg *)
 
+    val add_new : key -> 'a -> exn -> 'a t -> 'a t
+    (** [add_new x v e m] binds [x] to [v] in [m] if [x] is not bound,
+        and raises [exn] otherwise. *)
+
     module type Set =
     sig
       type elt = key
@@ -340,6 +344,10 @@ module type S =
       (** [translate f s] translates the elements in the set [s] by the
           function [f]. [f] must be strictly monotone on the elements of [s].
           Otherwise it raises invalid_arg *)
+
+      val add_new : elt -> exn -> t -> t
+      (** [add_new x e s] adds [x] to [s] if [s] does not contain [x],
+          and raises [exn] otherwise. *)
     end
 
     module Set : Set

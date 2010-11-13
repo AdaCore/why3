@@ -67,23 +67,22 @@ module Compile (X : Action) = struct
         in
         (* dispatch every case to a primitive constructor/wild case *)
         let cases,wilds =
-          let change_case fs pl a cases =
+          let add_case fs pl a cases =
             Mls.change fs (function
               | None -> Some [pl,a]
-              | Some rl -> Some ((pl,a)::rl)) cases in
+              | Some rl -> Some ((pl,a)::rl)) cases
+          in
           let union_cases pl a types cases =
-            let make_wild pl a ql =
-              let add pl q = pat_wild q.pat_ty :: pl in
-              [List.fold_left add pl ql,a]
-            in
-            let types = Mls.map (make_wild pl a) types in
-            Mls.union (fun _ pla rl -> Some (List.append pla rl))
-              types cases in
+            let add pl q = pat_wild q.pat_ty :: pl in
+            let wild ql = [List.fold_left add pl ql, a] in
+            let join _ wl rl = Some (List.append wl rl) in
+            Mls.union join (Mls.map wild types) cases
+          in
           let rec dispatch (pl,a) (cases,wilds) =
             let p = List.hd pl in let pl = List.tl pl in
             match p.pat_node with
               | Papp (fs,pl') ->
-                  change_case fs (List.rev_append pl' pl) a cases, wilds
+                  add_case fs (List.rev_append pl' pl) a cases, wilds
               | Por (p,q) ->
                   dispatch (p::pl, a) (dispatch (q::pl, a) (cases,wilds))
               | Pas (p,x) ->
@@ -129,8 +128,8 @@ module Compile (X : Action) = struct
             if Mls.mem cs types then comp_cases cs al else comp_wilds ()
         | _ ->
             let base =
-              if Mls.submap (fun _ () _ -> true) css types
-              then [] else [mk_branch (pat_wild ty) (comp_wilds ())]
+              if Mls.submap (const3 true) css types then []
+              else [mk_branch (pat_wild ty) (comp_wilds ())]
             in
             let add cs ql acc =
               let get_vs q = create_vsymbol (id_fresh "x") q.pat_ty in

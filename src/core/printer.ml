@@ -142,16 +142,12 @@ let remove_prop pr =
 let get_syntax_map task =
   let add_ts td m = match td.td_node with
     | Meta (_,[MAts ts; MAstr s]) ->
-      Mid.change ts.ts_name (function
-        | None -> Some s
-        | Some _ -> raise (KnownTypeSyntax ts)) m
+        Mid.add_new ts.ts_name s (KnownTypeSyntax ts) m
     | _ -> assert false
   in
   let add_ls td m = match td.td_node with
     | Meta (_,[MAls ls; MAstr s]) ->
-      Mid.change ls.ls_name (function
-        | None -> Some s
-        | Some _ -> raise (KnownLogicSyntax ls)) m
+        Mid.add_new ls.ls_name s (KnownLogicSyntax ls) m
     | _ -> assert false
   in
   let m = Mid.empty in

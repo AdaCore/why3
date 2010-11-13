@@ -236,7 +236,8 @@ let check_termination ldl =
   Mls.iter (build_call_graph cgr syms) syms;
   let check ls _ =
     let cl = build_call_list cgr ls in
-    check_call_list ls cl in
+    check_call_list ls cl
+  in
   Mls.mapi check syms
 
 (** Inductive predicate declaration *)
@@ -372,8 +373,7 @@ exception EmptyDecl
 exception EmptyAlgDecl of tysymbol
 exception EmptyIndDecl of lsymbol
 
-let news_id s id = Sid.change id (fun there ->
-  if there then raise (ClashIdent id) else true) s
+let news_id s id = Sid.add_new id (ClashIdent id) s
 
 let syms_ts s ts = Sid.add ts.ts_name s
 let syms_ls s ls = Sid.add ls.ls_name s

@@ -16,12 +16,18 @@
 (*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
 (*                                                                        *)
 (**************************************************************************)
+
 open Stdlib
+
 (** Useful functions *)
 
 val ($) : ('a -> 'b) -> 'a -> 'b
 
 val const : 'a -> 'b -> 'a
+
+val const2 : 'a -> 'b -> 'c -> 'a
+
+val const3 : 'a -> 'b -> 'c -> 'd -> 'a
 
 val flip : ('a -> 'b -> 'c) -> 'b -> 'a -> 'c
 
@@ -85,6 +91,7 @@ val any_fn : ('a -> bool) -> 'b -> 'a -> bool
 
 val ffalse : 'a -> bool
 (** [ffalse] constant function [false] *)
+
 val ttrue : 'a -> bool
 (** [ttrue] constant function [true] *)
 
@@ -120,7 +127,7 @@ module OrderedHashList (X : Tagged) : OrderedHash with type t = X.t list
 module StructMake (X : Tagged) :
 sig
   module M : Map.S with type key = X.t
-  module S : M.Set  with type elt = X.t
+  module S : M.Set
   module H : Hashtbl.S with type key = X.t
 end
 
