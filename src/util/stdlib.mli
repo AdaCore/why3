@@ -216,14 +216,25 @@ module type S =
     (** [find_default x d m] returns the [Some] of the current binding
         of [x] in [m], or return [None] if no such binding exists. *)
 
+    val map_filter: ('a -> 'b option) -> 'a t -> 'b t
+    (** Same as {!Map.S.map}, but may remove bindings. *)
+
+    val mapi_filter: (key -> 'a -> 'b option) -> 'a t -> 'b t
+    (** Same as {!Map.S.mapi}, but may remove bindings. *)
+
     val mapi_fold:
-      (key -> 'a -> 'acc -> 'acc * 'b)-> 'a t -> 'acc -> 'acc * 'b t
+      (key -> 'a -> 'acc -> 'acc * 'b) -> 'a t -> 'acc -> 'acc * 'b t
     (** fold and map at the same time *)
 
     val translate : (key -> key) -> 'a t -> 'a t
     (** [translate f m] translates the keys in the map [m] by the
         function [f]. [f] must be strictly monotone on the key of [m].
         Otherwise it raises invalid_arg *)
+
+    val mapi_filter_fold:
+      (key -> 'a -> 'acc -> 'acc * 'b option) -> 'a t -> 'acc -> 'acc * 'b t
+    (** Same as {!Map.S.mapi_fold}, but may remove bindings. *)
+
 
     val add_new : key -> 'a -> exn -> 'a t -> 'a t
     (** [add_new x v e m] binds [x] to [v] in [m] if [x] is not bound,

@@ -59,9 +59,13 @@ module type S =
     val submap : (key -> 'a -> 'b -> bool) -> 'a t -> 'b t -> bool
     val find_default : key -> 'a -> 'a t -> 'a
     val find_option : key -> 'a t -> 'a option
+    val map_filter: ('a -> 'b option) -> 'a t -> 'b t
+    val mapi_filter: (key -> 'a -> 'b option) -> 'a t -> 'b t
     val mapi_fold:
       (key -> 'a -> 'acc -> 'acc * 'b) -> 'a t -> 'acc -> 'acc * 'b t
     val translate : (key -> key) -> 'a t -> 'a t
+    val mapi_filter_fold:
+      (key -> 'a -> 'acc -> 'acc * 'b option) -> 'a t -> 'acc -> 'acc * 'b t
     val add_new : key -> 'a -> exn -> 'a t -> 'a t
 
     module type Set =
@@ -204,6 +208,8 @@ module Make(Ord: OrderedType) = struct
       | (_, _) ->
           let (x, d) = min_binding t2 in
           bal t1 x d (remove_min_binding t2)
+
+    let merge_bal = merge
 
     let rec remove x = function
         Empty ->
@@ -386,7 +392,7 @@ module Make(Ord: OrderedType) = struct
           if c = 0 then
             (* concat or bal *)
             match f (Some d) with
-              | None -> concat l r
+              | None -> merge_bal l r
               | Some d -> Node(l, x, d, r, h)
           else if c < 0 then
             bal (change x f l) v d r
@@ -472,6 +478,15 @@ module Make(Ord: OrderedType) = struct
           if c = 0 then Some d
           else find_option x (if c < 0 then l else r)
 
+    let rec map_filter f = function
+        Empty -> Empty
+      | Node(l, v, d, r, _h) ->
+          concat_or_join (map_filter f l) v (f d) (map_filter f r)
+
+    let rec mapi_filter f = function
+        Empty -> Empty
+      | Node(l, v, d, r, _h) ->
+          concat_or_join (mapi_filter f l) v (f v d) (mapi_filter f r)
 
     let rec mapi_fold f m acc =
       match m with
@@ -481,6 +496,7 @@ module Make(Ord: OrderedType) = struct
           let acc,d' = f v d acc in
           let acc,r' = mapi_fold f r acc in
           acc,Node(l', v, d', r', h)
+
 
     let translate f m =
       let rec aux last = function
@@ -497,6 +513,15 @@ module Make(Ord: OrderedType) = struct
           let r,last = aux (Some v) r in
           Node(l,v,d,r,h),last in
       let m,_ = aux None m in m
+
+    let rec mapi_filter_fold f m acc =
+      match m with
+        Empty -> acc, Empty
+      | Node(l, v, d, r, _h) ->
+          let acc,l' = mapi_filter_fold f l acc in
+          let acc,d' = f v d acc in
+          let acc,r' = mapi_filter_fold f r acc in
+          acc, concat_or_join l' v d' r'
 
     let add_new x v e m = change x (function
       | Some _ -> raise e
