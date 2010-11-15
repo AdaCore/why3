@@ -12,7 +12,7 @@
     forall i j : int. 0 <= i < n -> 0 <= j < n -> i <> j -> a#i <> a#j
 
   logic surjective (a : array int) (n : int) =
-    forall i : int. 0 <= i < n -> exists j : int. (0 <= j < n and a#j = i)
+    forall i : int [i]. 0 <= i < n -> exists j : int. (0 <= j < n and a#j = i)
 
   logic range (a : array int) (n : int) =
     forall i : int. 0 <= i < n -> 0 <= a#i < n

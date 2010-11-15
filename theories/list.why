@@ -43,6 +43,35 @@ theory Nth
 
 end
 
+theory HdTl "head and tail"
+
+  use export List
+  use export option.Option
+
+  logic hd (l : list 'a) : option 'a = match l with
+    | Nil -> None
+    | Cons h _ -> Some h
+  end
+
+  logic tl (l : list 'a) : option (list 'a) = match l with
+    | Nil -> None
+    | Cons _ t -> Some t
+  end
+
+  (* TODO: move these lemmas into another theory? *)
+  use import Nth
+  use import int.Int
+
+  lemma Nth_tl :
+    forall l1 l2 : list 'a. tl l1 = Some l2 -> 
+    forall i : int. nth i l2 = nth (i+1) l1
+
+  lemma Nth0_head:
+    forall l : list 'a. nth 0 l = hd l
+
+end
+
+
 theory Append
   use export List
 
