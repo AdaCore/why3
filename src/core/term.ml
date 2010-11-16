@@ -764,9 +764,11 @@ let bnd_find i m =
   try Mint.find i m with Not_found -> raise UnboundIndex
 
 let bnd_inst m nv { bv_bound = d ; bv_open = b ; bv_defer = s } =
+  let s = Sint.fold (fun i -> Mint.add (i + d) (bnd_find i m)) b s in
+(* assert (Mint.submap (const3 true) b m);
   let m = Mint.inter (fun _ () x -> Some x) b m in
   let m = Mint.translate ((+) d) m in
-  let s = Mint.union (fun _ _ _ -> assert false) m s in
+  let s = Mint.union (fun _ _ _ -> assert false) m s in *)
   { bv_bound = d + nv ; bv_open = Sint.empty ; bv_defer = s }
 
 let rec t_inst m nv t = t_label_copy t (match t.t_node with
