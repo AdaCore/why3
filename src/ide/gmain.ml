@@ -381,7 +381,7 @@ let (_ : GtkSignal.id) =
        gconfig.window_height <- h;
        gconfig.window_width <- w)
 
-let vbox = GPack.vbox ~homogeneous:false ~packing:w#add ()
+let vbox = GPack.vbox (* ~homogeneous:false *) ~packing:w#add ()
 
 (* Menu *)
 
@@ -391,15 +391,56 @@ let factory = new GMenu.factory menubar
 
 let accel_group = factory#accel_group
 
+let hb = GPack.hbox (* ~homogeneous:false *) ~packing:vbox#add ()
+
+(*
+let tools_window =
+  GWindow.window
+    ~title: "Why3 tool box"
+    ()
+
+let tools_window_vbox = 
+  GPack.vbox ~homogeneous:false ~packing:tools_window#add ()
+*)
+
+let tools_window_vbox = 
+  try
+    GPack.vbox (* ~homogeneous:false *) ~packing:hb#add  ()
+  with Gtk.Error _ -> assert false
+
+let tools_frame = GBin.frame ~label:"Provers" ~packing:tools_window_vbox#add ()
+
+(*
+let tools_frame = tools_window_vbox
+*)
+
+let tools_box = GPack.button_box `VERTICAL ~border_width:5 
+(*
+  ~layout
+  ~child_height 
+  ~child_width 
+*)
+  ~spacing:5
+  ~packing:tools_frame#add () 
+
+let others_frame = GBin.frame ~label:"Other" ~packing:tools_window_vbox#add ()
+
+let others_box = 
+  GPack.button_box `VERTICAL ~border_width:5 ~packing:others_frame#add () 
+
+
 (* horizontal paned *)
 
-let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:vbox#add ()
+let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:hb#add ()
+
 
 (* tree view *)
 let scrollview =
-  GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
-    ~width:gconfig.tree_width
-    ~packing:hp#add ()
+  try
+    GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
+      ~width:gconfig.tree_width
+      ~packing:hp#add ()
+  with Gtk.Error _ -> assert false
 
 let () = scrollview#set_shadow_type `ETCHED_OUT
 let (_ : GtkSignal.id) =
@@ -1149,30 +1190,6 @@ let (_ : GMenu.image_menu_item) =
     ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
 
 
-let tools_window =
-  GWindow.window
-    ~title: "Why3 tool box"
-    ()
-
-let tools_window_vbox = 
-  GPack.vbox ~homogeneous:false ~packing:tools_window#add ()
-
-let tools_frame = GBin.frame ~label:"Provers" ~packing:tools_window_vbox#add ()
-
-let tools_box = GPack.button_box `VERTICAL ~border_width:5 
-(*
-  ~layout
-  ~child_height 
-  ~child_width 
-*)
-  ~spacing:5
-  ~packing:tools_frame#add () 
-
-let others_frame = GBin.frame ~label:"Other" ~packing:tools_window_vbox#add ()
-
-let others_box = 
-  GPack.button_box `VERTICAL ~border_width:5 ~packing:others_frame#add () 
-
 
 (*
 let view_tools_box = ref true
@@ -1396,7 +1413,11 @@ let (_ : GMenu.image_menu_item) =
 (* vertical paned on the right*)
 (******************************)
 
-let vp = GPack.paned `VERTICAL  ~border_width:3 ~packing:hp#add ()
+let vp = 
+  try
+    GPack.paned `VERTICAL  ~border_width:3 ~packing:hp#add ()
+  with Gtk.Error _ -> assert false
+
 
 (******************)
 (* goal text view *)
@@ -1653,7 +1674,9 @@ let (_ : GtkSignal.id) =
 
 let () = w#add_accel_group accel_group
 let () = w#show ()
+(*
 let () = tools_window#show ()
+*)
 let () = GtkThread.main ()
 
 (*
