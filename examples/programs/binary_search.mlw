@@ -1,0 +1,58 @@
+
+(* Binary search *)
+
+{
+  use array.ArrayLength as A
+  use import int.ComputerDivision
+
+  type array = A.t int int
+
+  logic (#) (a : array) (i : int) : int = A.get a i
+}
+
+let array_get (a : ref array) i = 
+  { 0 <= i < A.length !a } A.get !a i { result = A.get !a i }
+
+let array_set (a : ref array) i v = 
+  { 0 <= i < A.length !a } a := A.set !a i v { !a = A.set (old !a) i v }
+
+let length (a : ref array) =
+  { } A.length !a { result = A.length !a }
+
+exception Break of int
+exception Not_found
+
+let binary_search (a : ref array) (v : int) =
+  { A.length !a >= 1 and
+    forall i1 i2 : int. 0 <= i1 <= i2 < A.length !a -> !a#i1 <= !a#i2 }
+  try
+    let l = ref 0 in
+    let u = ref (length a - 1) in
+    while !l <= !u do
+      invariant {
+	0 <= !l and !u < A.length !a and 
+        forall i : int. 0 <= i < A.length !a -> !a#i = v -> !l <= i <= !u }
+      variant { !u - !l }
+      let m = !l + div (!u - !l) 2 in
+      assert { !l <= m <= !u };
+      if array_get a m < v then
+        l := m + 1
+      else if array_get a m > v then
+        u := m - 1
+      else 
+        raise (Break m)
+    done;
+    raise Not_found
+  with Break i ->
+    i
+  end
+  { 0 <= result < A.length !a and !a#result = v }
+  | Not_found -> { forall i:int. 0 <= i < A.length !a -> !a#i <> v }
+
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/binary_search.gui"
+End: 
+*)
+
