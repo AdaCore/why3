@@ -80,8 +80,9 @@ val prover : proof_attempt -> prover_id
 (*
 val proof_goal : proof_attempt -> goal
 *)
-val status_and_time : proof_attempt -> proof_status * float * bool
-  (* returns status, time and the obsolete flag *)
+val status_and_time : 
+  proof_attempt -> proof_status * float * bool * string
+  (** returns (status, time, obsolete flag, edited file name) *)
 
 val edited_as : proof_attempt -> string
 
@@ -213,3 +214,9 @@ val add_file :  string -> file
 
 
   
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. bin/whyide.byte"
+End:
+*)

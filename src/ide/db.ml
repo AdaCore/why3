@@ -486,14 +486,15 @@ module External_proof = struct
   let init db =
     let sql =
       (* timelimit INTEGER, memlimit INTEGER,
-         edited_as TEXT,  *)
+         *)
       "CREATE TABLE IF NOT EXISTS external_proofs \
        (external_proof_id INTEGER PRIMARY KEY AUTOINCREMENT,\
         goal_id INTEGER,\
         prover_id INTEGER, \
         status INTEGER,\
         obsolete INTEGER,\
-        time REAL);"
+        time REAL,\
+        edited_as TEXT);"
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 
@@ -510,7 +511,7 @@ module External_proof = struct
   let add db (g : goal) (p: prover_id) =
     transaction db
       (fun () ->
-	 let sql = "INSERT INTO external_proofs VALUES(NULL,?,?,0,0,0.0)" in
+	 let sql = "INSERT INTO external_proofs VALUES(NULL,?,?,0,0,0.0,\"\")" in
 	 let stmt = bind db sql [
            Sqlite3.Data.INT g;
            Sqlite3.Data.INT p.prover_id;
@@ -557,6 +558,19 @@ module External_proof = struct
          in
 	 db_must_done db (fun () -> Sqlite3.step stmt))
 
+  let set_edited_as db e f =
+    transaction db
+      (fun () ->
+	 let sql =
+	   "UPDATE external_proofs SET edited_as=? WHERE external_proof_id=?"
+	 in
+	 let stmt = bind db sql [
+           Sqlite3.Data.TEXT f;
+           Sqlite3.Data.INT e;
+         ]
+         in
+	 db_must_done db (fun () -> Sqlite3.step stmt))
+
   let of_goal db g =
     let sql="SELECT prover_id,external_proof_id FROM external_proofs \
        WHERE external_proofs.goal_id=?"
@@ -572,7 +586,7 @@ module External_proof = struct
     res
 
   let status_and_time db p =
-    let sql="SELECT status,time,obsolete FROM external_proofs \
+    let sql="SELECT status,time,obsolete,edited_as FROM external_proofs \
        WHERE external_proofs.external_proof_id=?"
     in
     let stmt = bind db sql [Sqlite3.Data.INT p] in
@@ -580,7 +594,8 @@ module External_proof = struct
       let status = stmt_column_INT stmt 0 "External_proof.status_and_time" in
       let t = stmt_column_FLOAT stmt 1 "External_proof.status_and_time" in
       let o = stmt_column_bool stmt 2 "External_proof.status_and_time" in
-      (status_from_int64 status, t, o)
+      let e = stmt_column_string stmt 3 "External_proof.status_and_time" in
+      (status_from_int64 status, t, o, e)
     in
     match step_fold db stmt of_stmt with
       | [] -> raise Not_found
@@ -898,7 +913,8 @@ let set_status a r t =
 let set_obsolete a = 
   External_proof.set_obsolete (current()) a 
 
-let set_edited_as _ = assert false
+let set_edited_as a f = 
+  External_proof.set_edited_as (current()) a f
 
 let add_transformation g tr_id = Transf.add (current()) g tr_id
 
@@ -913,6 +929,6 @@ let add_file f = Main.add (current()) f
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/whydb.byte"
+compile-command: "unset LANG; make -C ../.. bin/whyide.byte"
 End:
 *)

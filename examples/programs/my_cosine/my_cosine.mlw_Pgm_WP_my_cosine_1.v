@@ -160,7 +160,6 @@ Theorem WP_my_cosine : forall (x:single),
   ((Rabs (value x)) <= (1 / 32)%R)%R ->
   ((Rabs (((1)%R - (((value x) * (value x))%R * (05 / 10)%R)%R)%R - (cos (value x)))%R) <= (1 / 16777216)%R)%R.
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros x Hx.
 Require Import Interval_tactic.
 interval with (i_bisect_diff (value x)).
 Qed.

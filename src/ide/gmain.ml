@@ -1625,15 +1625,15 @@ let edit_selected_row p =
 		let ext = String.sub file i (String.length file - i) in
 		let i = ref 1 in
 		while Sys.file_exists 
-                  (name ^ "_" ^ (string_of_int !i) ^ ext) do
-                    incr i 
+		  (name ^ "_" ^ (string_of_int !i) ^ ext) do
+		    incr i 
 		done;
 		let file = name ^ "_" ^ (string_of_int !i) ^ ext in
 		a.Model.edited_as <- file;
 		Db.set_edited_as a.Model.proof_db file;
 		file
-            | f -> f
-	in	
+	    | f -> f
+	in
         let old_status = a.Model.status in
         Helpers.set_proof_status ~obsolete:false a Scheduler.Running 0.0;
         let callback () =

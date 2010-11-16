@@ -18,11 +18,9 @@ theory TestInt
 
    goal Test6: 2+3 = 5 and (forall x:int. x*x >= 0)
 
-   goal Test7: 0 = 2 /\ 2 = 3 /\ 4 = 5 /\ 6 = 7
+   goal Test7: 0 = 2 and 2 = 3 and 4 = 5 and 6 = 7
 
-(*
-   goal Test8: 3+3=7
-*)
+   goal Test8: 2+2=4 and 3+3=6
 
 end
 
@@ -53,7 +51,7 @@ theory TestList
 (*
   goal Test1: 
      match x with 
-     | Nil -> 1 = 0 /\ 2 = 3
+     | Nil -> 1 = 0 and 2 = 3
      | Cons _ Nil -> 4 = 5 and 6 = 7
      | Cons _ _ -> 8 = 9 /\ 10 = 11
      end  
