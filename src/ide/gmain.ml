@@ -405,10 +405,11 @@ let tools_window_vbox =
 
 let tools_window_vbox = 
   try
-    GPack.vbox (* ~homogeneous:false *) ~packing:hb#add  ()
+    GPack.vbox ~packing:(hb#pack ~expand:false)  ()
   with Gtk.Error _ -> assert false
 
-let tools_frame = GBin.frame ~label:"Provers" ~packing:tools_window_vbox#add ()
+let tools_frame = GBin.frame ~label:"Provers" 
+  ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 (*
 let tools_frame = tools_window_vbox
@@ -423,7 +424,9 @@ let tools_box = GPack.button_box `VERTICAL ~border_width:5
   ~spacing:5
   ~packing:tools_frame#add () 
 
-let others_frame = GBin.frame ~label:"Other" ~packing:tools_window_vbox#add ()
+let others_frame = 
+  GBin.frame ~label:"Other" 
+    ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 let others_box = 
   GPack.button_box `VERTICAL ~border_width:5 ~packing:others_frame#add () 
