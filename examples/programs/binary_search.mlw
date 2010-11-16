@@ -1,5 +1,10 @@
 
-(* Binary search *)
+(* Binary search
+
+   The classical example. Searches a sorted array for a given value v. 
+*)
+
+(* the usual array modeling *)
 
 {
   use array.ArrayLength as A
@@ -19,12 +24,13 @@ let array_set (a : ref array) i v =
 let length (a : ref array) =
   { } A.length !a { result = A.length !a }
 
-exception Break of int
-exception Not_found
+(* the code and its specification *)
+
+exception Break of int (* raised to exit the loop *)
+exception Not_found    (* raised to signal a search failure *)
 
 let binary_search (a : ref array) (v : int) =
-  { A.length !a >= 1 and
-    forall i1 i2 : int. 0 <= i1 <= i2 < A.length !a -> !a#i1 <= !a#i2 }
+  { forall i1 i2 : int. 0 <= i1 <= i2 < A.length !a -> !a#i1 <= !a#i2 }
   try
     let l = ref 0 in
     let u = ref (length a - 1) in
