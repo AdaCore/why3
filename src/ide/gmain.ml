@@ -381,7 +381,7 @@ let (_ : GtkSignal.id) =
        gconfig.window_height <- h;
        gconfig.window_width <- w)
 
-let vbox = GPack.vbox (* ~homogeneous:false *) ~packing:w#add ()
+let vbox = GPack.vbox ~packing:w#add ()
 
 (* Menu *)
 
@@ -391,7 +391,7 @@ let factory = new GMenu.factory menubar
 
 let accel_group = factory#accel_group
 
-let hb = GPack.hbox (* ~homogeneous:false *) ~packing:vbox#add ()
+let hb = GPack.hbox ~packing:vbox#add ()
 
 (*
 let tools_window =
@@ -548,7 +548,7 @@ module Helpers = struct
     goals_model#set ~row:a.Model.proof_row ~column:Model.time_column t
 
 
-  let add_external_proof_row ~obsolete g p db_proof status time =
+  let add_external_proof_row ~obsolete ~edit g p db_proof status time =
     let parent = g.goal_row in
     let name = p.prover_name in
     let row = goals_model#prepend ~parent () in
@@ -565,7 +565,7 @@ module Helpers = struct
               proof_obsolete = obsolete;
               time = time;
               output = "";
-              edited_as = "";
+              edited_as = edit;
             }
     in
     goals_model#set ~row ~column:index_column (Row_proof_attempt a);
@@ -706,7 +706,7 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
        let p =
          Util.Mstr.find (Db.prover_name pid) gconfig.provers
        in
-       let s,t,o = Db.status_and_time a in
+       let s,t,o,edit = Db.status_and_time a in
        if goal_obsolete && not o then Db.set_obsolete a;
        let obsolete = goal_obsolete or o in
        let s = match s with
@@ -719,7 +719,7 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
          | Db.Failure -> Scheduler.HighFailure
        in
        let (_pa : Model.proof_attempt) =
-         Helpers.add_external_proof_row ~obsolete goal p a s t
+         Helpers.add_external_proof_row ~obsolete ~edit goal p a s t
        in
        ((* something TODO ?*))
     )
@@ -906,7 +906,8 @@ let rec prover_on_goal p g =
     with Not_found ->
       let db_prover = Db.prover_from_name id in
       let db_pa = Db.add_proof_attempt g.Model.goal_db db_prover in
-      Helpers.add_external_proof_row ~obsolete:false g p db_pa Scheduler.Scheduled 0.0
+      Helpers.add_external_proof_row ~obsolete:false ~edit:""
+	g p db_pa Scheduler.Scheduled 0.0
   in
   redo_external_proof g a;
   List.iter
@@ -1606,15 +1607,33 @@ let edit_selected_row p =
         ()
     | Model.Row_proof_attempt a ->
         let g = a.Model.proof_goal in
-        let t = g.Model.task in
-        let driver = a.Model.prover.driver in
-        let (fn,tn) = ft_of_pa a in
-        let file = Driver.file_of_task driver 
-          (Filename.concat project_dir fn) tn t 
-        in
-        (* TODO: ne pas le changer mais le retuiliser 
-           s'il existe deja! en principe peut venir de la base de donnees *)
-        a.Model.edited_as <- file;
+	let t = g.Model.task in 
+	let driver = a.Model.prover.driver in
+	let file =
+          match a.Model.edited_as with
+            | "" ->
+		let (fn,tn) = ft_of_pa a in
+		let file = Driver.file_of_task driver 
+                  (Filename.concat project_dir fn) tn t 
+		in
+		(* Uniquify the filename if it exists on disk *)
+		let i = 
+                  try String.rindex file '.' 
+                  with _ -> String.length file 
+		in
+		let name = String.sub file 0 i in
+		let ext = String.sub file i (String.length file - i) in
+		let i = ref 1 in
+		while Sys.file_exists 
+                  (name ^ "_" ^ (string_of_int !i) ^ ext) do
+                    incr i 
+		done;
+		let file = name ^ "_" ^ (string_of_int !i) ^ ext in
+		a.Model.edited_as <- file;
+		Db.set_edited_as a.Model.proof_db file;
+		file
+            | f -> f
+	in	
         let old_status = a.Model.status in
         Helpers.set_proof_status ~obsolete:false a Scheduler.Running 0.0;
         let callback () =
