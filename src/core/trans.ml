@@ -183,6 +183,18 @@ let on_metas tl fn =
 let on_theories_metas thl tl fn =
   on_theories thl (fun cm -> on_metas tl (fn cm))
 
+let on_used_theory th fn =
+  let td = create_null_clone th in
+  on_theory_tds th (fun tds -> fn (Stdecl.mem td tds.tds_set))
+
+let on_used_theories thl fn =
+  let add acc th = Mid.add th.th_name (create_null_clone th) acc in
+  let tdm = List.fold_left add Mid.empty thl in
+  let test _ td tds =
+    if Stdecl.mem td tds.tds_set then Some () else None
+  in
+  on_theories thl (fun cm -> fn (Mid.inter test tdm cm))
+
 let on_meta_excl t fn =
   on_meta_tds t (fun tds -> fn (get_meta_excl t tds))
 
