@@ -68,9 +68,6 @@ val rewrite : (term -> term) -> (fmla -> fmla) -> task -> task trans
 
 (* dependent transformatons *)
 
-val on_theories_metas : theory list -> meta list ->
-                        (clone_map -> meta_map -> 'a trans) -> 'a trans
-
 val on_theories : theory list -> (clone_map -> 'a trans) -> 'a trans
 val on_metas    : meta list -> (meta_map -> 'a trans) -> 'a trans
 

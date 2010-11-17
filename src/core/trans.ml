@@ -180,9 +180,6 @@ let on_metas tl fn =
   in
   pass Mmeta.empty tl
 
-let on_theories_metas thl tl fn =
-  on_theories thl (fun cm -> on_metas tl (fn cm))
-
 let on_used_theory th fn =
   let td = create_null_clone th in
   on_theory_tds th (fun tds -> fn (Stdecl.mem td tds.tds_set))
