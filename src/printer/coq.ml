@@ -317,6 +317,20 @@ let print_constr info ts fmt cs =
           (print_arrow_list (print_ty info)) l
           print_ts ts (print_list space print_tv) ts.ts_args
 
+let ls_ty_vars ls =
+  let ty_vars_args = List.fold_left Ty.ty_freevars Stv.empty ls.ls_args in
+  let ty_vars_value = option_fold Ty.ty_freevars Stv.empty ls.ls_value in
+  (ty_vars_args, ty_vars_value, Stv.union ty_vars_args ty_vars_value)
+
+let print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params =
+  if not (Stv.is_empty all_ty_params) then 
+    begin
+      let need_context = not (Stv.subset ty_vars_value ty_vars_args) in 
+      if need_context then fprintf fmt "Set Contextual Implicit.@\n";
+      fprintf fmt "Implicit Arguments %a.@\n" print_ls ls;
+      if need_context then fprintf fmt "Unset Contextual Implicit.@\n"
+    end
+
 let print_type_decl info fmt (ts,def) = 
   if is_ts_tuple ts then () else
   match def with
@@ -330,9 +344,15 @@ let print_type_decl info fmt (ts,def) =
 	      (print_ty info) ty
       end
     | Talgebraic csl ->
-        fprintf fmt "@[<hov 2>Inductive %a %a :=@\n@[<hov>%a@].@]@\n@\n"
+        fprintf fmt "@[<hov 2>Inductive %a %a :=@\n@[<hov>%a@].@]@\n"
           print_ts ts (print_list space print_tv) ts.ts_args
-          (print_list newline (print_constr info ts)) csl
+          (print_list newline (print_constr info ts)) csl;
+        List.iter
+          (fun cs ->
+             let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars cs in
+             print_implicits fmt cs ty_vars_args ty_vars_value all_ty_params)
+          csl;
+        fprintf fmt "@\n"
 
 let print_type_decl info fmt d =
   if not (Sid.mem (fst d).ts_name info.info_rem) then
@@ -345,9 +365,7 @@ let print_ls_type ?(arrow=false) info fmt ls =
   | Some ty -> print_ty info fmt ty
 
 let print_logic_decl info fmt (ls,ld) = 
-  let ty_vars_args = List.fold_left Ty.ty_freevars Stv.empty ls.ls_args in
-  let ty_vars_value = option_fold Ty.ty_freevars Stv.empty ls.ls_value in
-  let all_ty_params = Stv.union ty_vars_args ty_vars_value in
+  let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars ls in
   begin
     match ld with
       | Some ld ->
@@ -366,13 +384,7 @@ let print_logic_decl info fmt (ls,ld) =
             (print_arrow_list (print_ty info)) ls.ls_args
             (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
   end;
-  if not (Stv.is_empty all_ty_params) then 
-    begin
-      let need_context = not (Stv.subset ty_vars_value ty_vars_args) in 
-      if need_context then fprintf fmt "Set Contextual Implicit.@\n";
-      fprintf fmt "Implicit Arguments %a.@\n" print_ls ls;
-      if need_context then fprintf fmt "Unset Contextual Implicit.@\n"
-    end;
+  print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params;
   fprintf fmt "@\n"
     
 
