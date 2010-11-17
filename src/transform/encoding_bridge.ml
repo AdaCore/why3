@@ -279,8 +279,7 @@ let decl tenv d =
   res
 *)
 
-let t env = Trans.on_meta meta_kept (fun tds ->
-  let s = Task.find_tagged_ts meta_kept tds Sts.empty in
+let t env = Trans.on_tagged_ts meta_kept (fun s ->
   let init_task,tenv = load_prelude s env in
   Trans.tdecl (decl tenv) init_task)
 

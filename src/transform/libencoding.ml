@@ -206,8 +206,7 @@ let d_monomorph ty_base kept lsmap d =
   Sls.fold add !consts dl
 
 (* convert tysymbols tagged with meta_kept to a set of types *)
-let get_kept_types tds =
-  let tss = Task.find_tagged_ts Encoding.meta_kept tds Sts.empty in
+let get_kept_types tss =
   let add ts acc =
     if ts.ts_args <> [] then acc
     else match ts.ts_def with

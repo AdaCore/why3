@@ -267,8 +267,7 @@ let decl tenv d =
   res
 *)
 
-let t env = Trans.on_meta Printer.meta_syntax_logic (fun tds ->
-  let rem_ls = Task.find_tagged_ls Printer.meta_syntax_logic tds Sls.empty in
+let t env = Trans.on_tagged_ls Printer.meta_syntax_logic (fun rem_ls ->
   let init_task,tenv = load_prelude rem_ls env in
   Trans.tdecl (decl tenv) init_task)
 

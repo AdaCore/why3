@@ -138,30 +138,62 @@ module Wtds = Hashweak.Make (struct
   let tag s = s.tds_tag
 end)
 
-let on_theory th fn =
+let on_theory_tds th fn =
   let fn = Wtds.memoize 17 fn in
   fun task -> fn (find_clone task th) task
 
-let on_meta t fn =
+let on_meta_tds t fn =
   let fn = Wtds.memoize 17 fn in
   fun task -> fn (find_meta task t) task
 
+let on_theory th fn =
+  let sml td acc = match td.td_node with
+    | Clone (_,sm) -> sm::acc
+    | _ -> assert false
+  in
+  on_theory_tds th (fun tds -> fn (Stdecl.fold sml tds.tds_set []))
+
+let on_meta t fn =
+  let mal td acc = match td.td_node with
+    | Meta (_,ma) -> ma::acc
+    | _ -> assert false
+  in
+  on_meta_tds t (fun tds -> fn (Stdecl.fold mal tds.tds_set []))
+
 let on_theories tl fn =
   let rec pass acc = function
-    | th::tl -> on_theory th (fun st -> pass (Mid.add th.th_name st acc) tl)
-    | []     -> fn acc
+    | th::tl ->
+        let fn st = pass (Mid.add th.th_name st acc) tl in
+        on_theory_tds th fn
+    | [] ->
+        fn acc
   in
   pass Mid.empty tl
 
 let on_metas tl fn =
   let rec pass acc = function
-    | t::tl -> on_meta t (fun st -> pass (Mmeta.add t st acc) tl)
-    | []    -> fn acc
+    | t::tl ->
+        let fn st = pass (Mmeta.add t st acc) tl in
+        on_meta_tds t fn
+    | [] ->
+        fn acc
   in
   pass Mmeta.empty tl
 
 let on_theories_metas thl tl fn =
   on_theories thl (fun cm -> on_metas tl (fn cm))
+
+let on_meta_excl t fn =
+  on_meta_tds t (fun tds -> fn (get_meta_excl t tds))
+
+let on_tagged_ts t fn =
+  on_meta_tds t (fun tds -> fn (find_tagged_ts t tds Sts.empty))
+
+let on_tagged_ls t fn =
+  on_meta_tds t (fun tds -> fn (find_tagged_ls t tds Sls.empty))
+
+let on_tagged_pr t fn =
+  on_meta_tds t (fun tds -> fn (find_tagged_pr t tds Spr.empty))
 
 (** register transformations *)
 

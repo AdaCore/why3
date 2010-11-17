@@ -81,8 +81,7 @@ let decl tenv d = match d.d_node with
 
 let encoding_enumeration =
   let projs = Hts.create 17 in
-  Trans.on_meta meta_enum (fun tds ->
-    let enum = Task.find_tagged_ts meta_enum tds Sts.empty in
+  Trans.on_tagged_ts meta_enum (fun enum ->
     let tenv = { enum = enum ; projs = projs } in
     Trans.decl (decl tenv) None)
 

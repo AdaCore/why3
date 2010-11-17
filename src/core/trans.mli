@@ -17,6 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Ty
 open Term
 open Decl
 open Theory
@@ -67,14 +68,20 @@ val rewrite : (term -> term) -> (fmla -> fmla) -> task -> task trans
 
 (* dependent transformatons *)
 
-val on_theory : theory -> (tdecl_set -> 'a trans) -> 'a trans
-val on_meta   : meta -> (tdecl_set -> 'a trans) -> 'a trans
-
-val on_theories : theory list -> (clone_map -> 'a trans) -> 'a trans
-val on_metas    : meta list -> (meta_map  -> 'a trans) -> 'a trans
-
 val on_theories_metas : theory list -> meta list ->
                         (clone_map -> meta_map -> 'a trans) -> 'a trans
+
+val on_theories : theory list -> (clone_map -> 'a trans) -> 'a trans
+val on_metas    : meta list -> (meta_map -> 'a trans) -> 'a trans
+
+val on_theory : theory -> (symbol_map list -> 'a trans) -> 'a trans
+val on_meta   : meta -> (meta_arg list list -> 'a trans) -> 'a trans
+
+val on_meta_excl : meta -> (meta_arg list option -> 'a trans) -> 'a trans
+
+val on_tagged_ts : meta -> (Sts.t -> 'a trans) -> 'a trans
+val on_tagged_ls : meta -> (Sls.t -> 'a trans) -> 'a trans
+val on_tagged_pr : meta -> (Spr.t -> 'a trans) -> 'a trans
 
 (** {2 Registration} *)
 
