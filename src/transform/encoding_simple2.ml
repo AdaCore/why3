@@ -43,8 +43,8 @@ let init_tenv = {
 let conv_ty tenv undefined ty =
   match ty.ty_node with
     | Tyapp (_,[]) -> ty
-    | Tyapp (ts,_) -> 
-        let ts = 
+    | Tyapp (ts,_) ->
+        let ts =
           try
             Hty.find tenv.specials ty
           with Not_found ->
@@ -52,7 +52,7 @@ let conv_ty tenv undefined ty =
             Hty.add tenv.specials ty ts;
             ts in
         Hts.replace undefined ts ();
-        ty_app ts [] 
+        ty_app ts []
     | _ -> Printer.unsupportedType ty "type variable must be encoded"
 
 (* Convert a variable *)
@@ -154,7 +154,7 @@ let decl tenv d =
     let ud = Hts.create 3 in
     decl_ud ud [decl_map (fnT ud Mvs.empty) (fnF ud Mvs.empty) d]
 
-let t = 
+let t =
   let tenv = init_tenv in
   Trans.decl (decl tenv) None
 

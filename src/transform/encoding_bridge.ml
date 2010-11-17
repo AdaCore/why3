@@ -39,15 +39,15 @@ type tenv = {kept          : Sty.t;
              specials      : lconv Hty.t;
              trans_lsymbol : lsymbol Hls.t;
              trans_tsymbol : tysymbol Hts.t}
-(* trans_lsymbol ne depend pour l'instant pas du but, 
+(* trans_lsymbol ne depend pour l'instant pas du but,
        comme specials_type ne depend pas*)
-    
+
 
 (* Translate a type to a type without kept *)
 let rec ty_of_ty tenv ty =
   match ty.ty_node with
     | Tyapp (ts,[]) ->
-      let tts = try Hts.find tenv.trans_tsymbol ts 
+      let tts = try Hts.find tenv.trans_tsymbol ts
         with Not_found -> ts in
       ty_app tts []
     | Tyapp (ts,l) -> ty_app ts (List.map (ty_of_ty tenv) l)
@@ -68,30 +68,30 @@ let load_prelude kept env =
       trans_lsymbol = Hls.create 17;
       trans_tsymbol = trans_tsymbol} in
   let clone_builtin ts (task,sty) =
-    let ty = match ts.ts_def with 
-      | Some ty -> ty 
-      | None -> try ty_app ts [] with BadTypeArity(_,_,_) -> 
+    let ty = match ts.ts_def with
+      | Some ty -> ty
+      | None -> try ty_app ts [] with BadTypeArity(_,_,_) ->
         failwith "kept without definition must be constant"  in
     let add_ts task ts = add_ty_decl task [ts,Tabstract] in
     let task = ty_s_fold add_ts task ty in
-    let is_constant = 
-      match ty.ty_node with 
+    let is_constant =
+      match ty.ty_node with
         | Tyapp (_,[]) -> true
         | _ -> false in
     let ts_head =
-      match ty.ty_node with 
+      match ty.ty_node with
         | Tyapp (ts,_) -> ts
         | _ -> assert false in
     let task = add_ts task ts in
     let tb = create_tysymbol (id_clone ts_head.ts_name) []
       (if is_constant then None else Some (ty_of_ty tenv_tmp ty)) in
     let task = add_ts task tb in
-    let tytb = ty_app tb [] in 
+    let tytb = ty_app tb [] in
     let tb2t = create_fsymbol (id_clone logic_tb2t.ls_name) [tytb] ty in
     let t2tb = create_fsymbol (id_clone logic_t2tb.ls_name) [ty] tytb in
     let task = add_logic_decl task [tb2t,None] in
     let task = add_logic_decl task [t2tb,None] in
-    let th_inst = create_inst 
+    let th_inst = create_inst
       ~ts:[type_t,ts;type_tb,tb]
       ~ls:[logic_t2tb,t2tb;logic_tb2t,tb2t] ~lemma:[] ~goal:[] in
     let task = Task.clone_export task builtin th_inst in
@@ -118,21 +118,21 @@ let conv_vs tenv vs =
       create_vsymbol (id_dup vs.vs_name) ty
 
 (* Convert a logic symbols to the encoded one *)
-let conv_ls tenv ls = 
+let conv_ls tenv ls =
   if ls_equal ls ps_equ
   then ls
   else
     let tyl = List.map (conv_ty tenv) ls.ls_args in
     let ty_res = Util.option_map (conv_ty tenv) ls.ls_value in
-    if Util.option_eq ty_equal ty_res ls.ls_value 
-      && List.for_all2 ty_equal tyl ls.ls_args 
+    if Util.option_eq ty_equal ty_res ls.ls_value
+      && List.for_all2 ty_equal tyl ls.ls_args
     then ls
     else
       let preid = id_clone ls.ls_name in
       create_lsymbol preid tyl ty_res
 
 (* Convert the argument of a function use the bridge if needed*)
-let conv_arg tenv t aty = 
+let conv_arg tenv t aty =
   let tty = t.t_ty in
   if ty_equal tty aty then t else
     try
@@ -146,7 +146,7 @@ let conv_arg tenv t aty =
       t
 
 (* Convert with a bridge an application if needed *)
-let conv_res_app tenv p tl tty = 
+let conv_res_app tenv p tl tty =
   try
     (* tty is a special value *)
     let tylconv = Hty.find tenv.specials tty in
@@ -201,7 +201,7 @@ and rewrite_fmla tenv vsvar f =
   let f = match f.f_node with
     | Fapp(p, [t1;t2]) when ls_equal p ps_equ ->
         f_equ (fnT vsvar t1) (fnT vsvar t2)
-    | Fapp(p, tl) -> 
+    | Fapp(p, tl) ->
         let tl = List.map (fnT vsvar) tl in
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv) tl p.ls_args in
@@ -212,8 +212,8 @@ and rewrite_fmla tenv vsvar f =
           let vs' = conv_vs tenv vs in
           Mvs.add vs (t_var vs') vsvar,vs'::l in
         let (vsvar,vl) = List.fold_left conv_vs (vsvar,[]) vl in
-        let f1 = fnF vsvar f1 in 
-        (* Ici un trigger qui ne match pas assez de variables 
+        let f1 = fnF vsvar f1 in
+        (* Ici un trigger qui ne match pas assez de variables
            peut être généré *)
         let tl = tr_map (fnT vsvar) (fnF vsvar) tl in
         let vl = List.rev vl in
@@ -243,13 +243,13 @@ let decl (tenv:tenv) d =
     (* | Dtype [ts,Tabstract] when is_kept tenv ts ->  *)
     (*     tenv.clone_builtin ts *)
     | Dtype [_,Tabstract] -> [create_decl d]
-    | Dtype _ -> Printer.unsupportedDecl 
+    | Dtype _ -> Printer.unsupportedDecl
         d "encoding_decorate : I can work only on abstract \
             type which are not in recursive bloc."
     | Dlogic l ->
         let fn = function
-          | _ls, Some _ -> 
-              Printer.unsupportedDecl 
+          | _ls, Some _ ->
+              Printer.unsupportedDecl
                 d "encoding_decorate : I can't encode definition. \
                     Perhaps you could use eliminate_definition"
           | ls, None ->

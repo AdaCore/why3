@@ -37,11 +37,11 @@ let print_env fmt env =
     (print_map Mls.iter Pretty.print_term Pretty.print_lsymbol) env.fs
     (print_map Mls.iter Pretty.print_fmla Pretty.print_lsymbol) env.ps
 *)
-let rec replacet env t = 
+let rec replacet env t =
   let t = substt env t in
   match t.t_node with
     | Tapp (fs,tl) ->
-        begin try 
+        begin try
           let (vs,t) = Mls.find fs env.fs in
           let add (mt,mv) x y =
             (Ty.ty_match mt x.vs_ty y.t_ty, Mvs.add x y mv)
@@ -52,11 +52,11 @@ let rec replacet env t =
         with Not_found -> t end
     | _ -> t
 
-and replacep env f = 
+and replacep env f =
   let f = substp env f in
   match f.f_node with
     | Fapp (ps,tl) ->
-        begin try 
+        begin try
           let (vs,f) = Mls.find ps env.ps in
           let add (mt,mv) x y =
             (Ty.ty_match mt x.vs_ty y.t_ty, Mvs.add x y mv)
@@ -69,7 +69,7 @@ and replacep env f =
 and substt env d = t_map (replacet env) (replacep env) d
 and substp env d = f_map (replacet env) (replacep env) d
 
-let fold isnotinlinedt isnotinlinedf d (env, task) = 
+let fold isnotinlinedt isnotinlinedf d (env, task) =
 (*  Format.printf "I see : %a@\n%a@\n" Pretty.print_decl d print_env env;*)
   match d.d_node with
     | Dlogic [ls,ld] -> begin
@@ -81,34 +81,34 @@ let fold isnotinlinedt isnotinlinedf d (env, task) =
                 | Term t ->
                     let t = replacet env t in
                     if isnotinlinedt t || t_s_any ffalse (ls_equal ls) t
-                    then env, add_decl task 
+                    then env, add_decl task
                       (create_logic_decl [make_fs_defn ls vs t])
                     else {env with fs = Mls.add ls (vs,t) env.fs},task
-                | Fmla f -> 
+                | Fmla f ->
                     let f = replacep env f in
                     if isnotinlinedf f || f_s_any ffalse (ls_equal ls) f
-                    then env, add_decl task 
+                    then env, add_decl task
                       (create_logic_decl [make_ps_defn ls vs f])
                     else {env with ps = Mls.add ls (vs,f) env.ps},task
       end
     | Dind dl ->
-        env, add_decl task (create_ind_decl 
-          (List.map (fun (ps,fmlal) -> ps, List.map 
+        env, add_decl task (create_ind_decl
+          (List.map (fun (ps,fmlal) -> ps, List.map
             (fun (pr,f) -> pr, replacep env f) fmlal) dl))
-    | Dlogic dl -> 
+    | Dlogic dl ->
         env,
-        add_decl task (create_logic_decl 
-           (List.map (fun (ls,ld) -> match ld with 
+        add_decl task (create_logic_decl
+           (List.map (fun (ls,ld) -> match ld with
               | None -> ls, None
               | Some ld ->
                 let vs,e = open_ls_defn ld in
                 let e = e_map (replacet env) (replacep env) e in
                 make_ls_defn ls vs e) dl))
     | Dtype _ -> env,add_decl task d
-    | Dprop (k,pr,f) -> 
+    | Dprop (k,pr,f) ->
         env,add_decl task (create_prop_decl k pr (replacep env f))
-        
-let fold isnotinlinedt isnotinlinedf task0 (env, task) = 
+
+let fold isnotinlinedt isnotinlinedf task0 (env, task) =
   match task0.task_decl with
     | { Theory.td_node = Theory.Decl d } ->
         fold isnotinlinedt isnotinlinedf d (env, task)
@@ -119,19 +119,19 @@ let t ~isnotinlinedt ~isnotinlinedf =
 
 let all = t ~isnotinlinedt:(fun _ -> false) ~isnotinlinedf:(fun _ -> false)
 
-let trivial = t 
+let trivial = t
   ~isnotinlinedt:(fun m -> match m.t_node with
                     | Tconst _ | Tvar _ -> false
-                    | Tapp (_,tl) when List.for_all 
-                        (fun m -> match m.t_node with 
-                           | Tvar _ -> true 
+                    | Tapp (_,tl) when List.for_all
+                        (fun m -> match m.t_node with
+                           | Tvar _ -> true
                            | _ -> false) tl -> false
                     | _ -> true )
-  ~isnotinlinedf:(fun m -> match m.f_node with 
+  ~isnotinlinedf:(fun m -> match m.f_node with
                     | Ftrue | Ffalse -> false
-                    | Fapp (_,tl) when List.for_all 
-                        (fun m -> match m.t_node with 
-                           | Tvar _ -> true 
+                    | Fapp (_,tl) when List.for_all
+                        (fun m -> match m.t_node with
+                           | Tvar _ -> true
                            | _ -> false) tl -> false
                     | _ -> true)
 

@@ -39,7 +39,7 @@ type tenv = {rem_ls : Sls.t;
              sort : lsymbol;
              real_to_int : lsymbol;
              trans_lsymbol : lsymbol Hls.t;
-             trans_tsymbol : lsymbol Hts.t} 
+             trans_tsymbol : lsymbol Hts.t}
 
 let load_prelude rem_ls env =
   let prelude = Env.find_theory env why_filename "Prelude_mono" in
@@ -61,18 +61,18 @@ let load_prelude rem_ls env =
 (* Translate a type to a term *)
 let rec term_of_ty tenv tvar ty =
   match ty.ty_node with
-    | Tyapp (ts,l) -> 
+    | Tyapp (ts,l) ->
         let tts = Hts.find tenv.trans_tsymbol ts in
         t_app tts (List.map (term_of_ty tenv tvar) l) tenv.unsorted
-    | Tyvar tv -> 
+    | Tyvar tv ->
         t_var (try Htv.find tvar tv
-              with Not_found -> 
-                (let var = create_vsymbol 
+              with Not_found ->
+                (let var = create_vsymbol
                    (id_fresh ("tv"^tv.tv_name.id_string))
                   tenv.unsorted in
                  Htv.add tvar tv var;
                  var))
-    
+
 let sort_app tenv tvar t ty =
   let tty = term_of_ty tenv tvar ty in
   t_app tenv.sort [tty;t] tenv.unsorted
@@ -84,7 +84,7 @@ let conv_ty_neg tenv _ty = tenv.unsorted
 let conv_ty_pos tenv _ty = tenv.unsorted
 
 (* Convert a logic symbols to the encoded one *)
-let conv_ls tenv ls = 
+let conv_ls tenv ls =
   if ls_equal ls ps_equ
   then ls
   else
@@ -104,18 +104,18 @@ let conv_ts tenv ts =
 let conv_arg _tenv _tvar t _ty = t
 
 (* Convert to undeco or to a specials an application *)
-let conv_res_app tenv tvar p tl ty = 
+let conv_res_app tenv tvar p tl ty =
   let tty = Util.of_option p.ls_value in
   assert (ty_equal tty tenv.unsorted);
   let t = t_app p tl tenv.unsorted in
   sort_app tenv tvar t ty
-  
+
 let conv_vs tenv tvar (vsvar,acc) vs =
   let tres,vsres =
     let ty_res = conv_ty_pos tenv vs.vs_ty in
     let tty = term_of_ty tenv tvar vs.vs_ty in
     let vsres = (create_vsymbol (id_clone vs.vs_name) ty_res) in
-    let t = t_var vsres in 
+    let t = t_var vsres in
     t_app tenv.sort [tty;t] tenv.unsorted, vsres in
   (Mvs.add vs tres vsvar,vsres::acc)
 
@@ -124,10 +124,10 @@ let conv_vs_let tenv vsvar vs =
     let ty_res = conv_ty_neg tenv vs.vs_ty in
     if ty_equal ty_res vs.vs_ty then
       t_var vs,vs
-    else 
+    else
       let vsres = (create_vsymbol (id_clone vs.vs_name) ty_res) in
-      let t = t_var vsres in 
-      t, vsres in              
+      let t = t_var vsres in
+      t, vsres in
   (Mvs.add vs tres vsvar,vsres)
 
 
@@ -137,7 +137,7 @@ let rec rewrite_term tenv tvar vsvar t =
   let fnF = rewrite_fmla tenv tvar vsvar in
   match t.t_node with
     | Tconst ConstInt _ -> sort_app tenv tvar t t.t_ty
-    | Tconst ConstReal _ -> 
+    | Tconst ConstReal _ ->
       let t2 = t_app tenv.real_to_int [t] tenv.unsorted in
       sort_app tenv tvar t2 t.t_ty
     | Tvar x -> Mvs.find x vsvar
@@ -146,7 +146,7 @@ let rec rewrite_term tenv tvar vsvar t =
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv tvar) tl p.ls_args in
         conv_res_app tenv tvar p tl t.t_ty
-    | Tif (f, t1, t2) -> 
+    | Tif (f, t1, t2) ->
         t_if (fnF f) (fnT vsvar t1) (fnT vsvar t2)
     | Tlet (t1, b) ->
         let u,t2,close = t_open_bound_cb b in
@@ -167,7 +167,7 @@ and rewrite_fmla tenv tvar vsvar f =
       let ty = tenv.unsorted in
       let tl = List.map2 (conv_arg tenv tvar) tl [ty;ty] in
       f_app p tl
-    | Fapp(p, tl) -> 
+    | Fapp(p, tl) ->
       let tl = List.map fnT tl in
       let p = Hls.find tenv.trans_lsymbol p in
       let tl = List.map2 (conv_arg tenv tvar) tl p.ls_args in
@@ -175,13 +175,13 @@ and rewrite_fmla tenv tvar vsvar f =
     | Fquant (q, b) ->
       let vl, tl, f1, close = f_open_quant_cb b in
       let (vsvar,vl) = List.fold_left (conv_vs tenv tvar) (vsvar,[]) vl in
-      let f1 = fnF vsvar f1 in 
-      (* Ici un trigger qui ne match pas assez de variables 
+      let f1 = fnF vsvar f1 in
+      (* Ici un trigger qui ne match pas assez de variables
          peut être généré *)
       let tl = tr_map (rewrite_term tenv tvar vsvar) (fnF vsvar) tl in
       let vl = List.rev vl in
       f_quant q (close vl tl f1)
-    | Flet (t1, b) -> 
+    | Flet (t1, b) ->
       let u, f2, close = f_open_bound_cb b in
       let (vsvar,u) = conv_vs_let tenv vsvar u in
       let t1 = fnT t1 in let f2 = fnF vsvar f2 in
@@ -197,26 +197,26 @@ let decl (tenv:tenv) d =
   let fnF = rewrite_fmla tenv in
   match d.d_node with
     | Dtype [ts,Tabstract] when ts_equal ts ts_int -> []
-    | Dtype [ts,Tabstract] -> 
-        let tty = 
-          try 
-            Hts.find tenv.trans_tsymbol ts 
-          with Not_found -> 
+    | Dtype [ts,Tabstract] ->
+        let tty =
+          try
+            Hts.find tenv.trans_tsymbol ts
+          with Not_found ->
             let tty = conv_ts tenv ts in
             Hts.add tenv.trans_tsymbol ts tty;
             tty in
         [create_decl (create_logic_decl [(tty,None)])]
-    | Dtype _ -> Printer.unsupportedDecl 
+    | Dtype _ -> Printer.unsupportedDecl
         d "encoding_decorate : I can work only on abstract\
             type which are not in recursive bloc."
     | Dlogic l ->
         let fn acc = function
-          | _ls, Some _ -> 
-              Printer.unsupportedDecl 
+          | _ls, Some _ ->
+              Printer.unsupportedDecl
                 d "encoding_decorate : I can't encode definition. \
 Perhaps you could use eliminate_definition"
           | ls1, None ->
-            let ls2 = 
+            let ls2 =
               try
                 Hls.find tenv.trans_lsymbol ls1
               with Not_found -> conv_ls tenv ls1 in
@@ -227,9 +227,9 @@ Perhaps you could use eliminate_definition"
                 let vars = List.map make ls1.ls_args in
                 let terms1 = List.map t_var vars in
                 let tvar = Htv.create 0 in
-                let terms2 = List.map 
+                let terms2 = List.map
                   (fun t -> sort_app tenv tvar t ty_int) terms1 in
-                let fmla = 
+                let fmla =
                   match ls1.ls_value with
                     | None ->
                       let f1 = f_app ls1 terms1 in

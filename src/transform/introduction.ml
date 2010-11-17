@@ -30,7 +30,7 @@ let rec intros pr f = match f.f_node with
 	let d = create_prop_decl Paxiom id f1 in
 	d :: intros pr f2
       *)
-  | Fquant (Fforall,fq) -> 
+  | Fquant (Fforall,fq) ->
       let vsl,_trl,f = f_open_quant fq in
       let intro_var subst vs =
         let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
@@ -38,7 +38,7 @@ let rec intros pr f = match f.f_node with
         create_logic_decl [ls,None]
       in
       let subst, dl = Util.map_fold_left intro_var Mvs.empty vsl in
-      let f = f_subst subst f in  
+      let f = f_subst subst f in
       dl @ intros pr f
 
   | _ -> [create_prop_decl Pgoal pr f]

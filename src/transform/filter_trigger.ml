@@ -21,7 +21,7 @@ open Term
 
 let make_rt_rf keep =
   let rec rt t = t_map rt rf t
-  and rf f = 
+  and rf f =
     let f = f_map rt rf f in
     match f.f_node with
       | Fquant (Fforall,fq) ->
@@ -38,8 +38,8 @@ let make_rt_rf keep =
 
 let keep_no_trigger _ = false
 
-  
-let remove_triggers = 
+
+let remove_triggers =
     let rt,rf = make_rt_rf keep_no_trigger in
     Trans.rewrite rt rf None
 
@@ -50,12 +50,12 @@ let keep_no_predicate = function
         | Term _ -> true
         | _ -> false
 
-  
-let filter_trigger_no_predicate = 
+
+let filter_trigger_no_predicate =
     let rt,rf = make_rt_rf keep_no_predicate in
     Trans.rewrite rt rf None
 
-let () = Trans.register_transform "filter_trigger_no_predicate" 
+let () = Trans.register_transform "filter_trigger_no_predicate"
   filter_trigger_no_predicate
 
 
@@ -77,14 +77,14 @@ let keep_no_builtin rem_ls = function
   | Fmla {f_node = Fapp (ps,_)} -> not (Sls.mem ps rem_ls)
   | _ -> false
 
-  
+
 let filter_trigger_builtin =
   Trans.on_meta Printer.meta_syntax_logic (fun tds ->
-    let rem_ls = 
+    let rem_ls =
        Task.find_tagged_ls Printer.meta_syntax_logic tds Sls.empty
     in
     let rt,rf = make_rt_rf (keep_no_builtin rem_ls) in
     Trans.rewrite rt rf None)
 
-let () = Trans.register_transform "filter_trigger_builtin" 
+let () = Trans.register_transform "filter_trigger_builtin"
   filter_trigger_builtin

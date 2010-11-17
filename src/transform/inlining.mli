@@ -22,7 +22,7 @@
 
 val t :
   isnotinlinedt:(Term.term -> bool) ->
-  isnotinlinedf:(Term.fmla -> bool) -> 
+  isnotinlinedf:(Term.fmla -> bool) ->
   Task.task Trans.trans
 
 
@@ -44,5 +44,5 @@ val empty_env : env
 
 (*val add_decl : env -> Theory.decl -> env *)
 
-val replacet : env -> Term.term -> Term.term 
+val replacet : env -> Term.term -> Term.term
 val replacep : env -> Term.fmla -> Term.fmla
