@@ -45,8 +45,8 @@ let poly_smt_opt = poly_opt
 let poly_tptp_opt = { poly_opt with default = "explicit" }
 
 let enco_gen opt env =
-  Trans.on_meta opt.meta (fun tds ->
-    let s = match get_meta_excl opt.meta tds with
+  Trans.on_meta_excl opt.meta (fun alo ->
+    let s = match alo with
       | None -> opt.default
       | Some [MAstr s] -> s
       | _ -> assert false in
@@ -61,8 +61,8 @@ let enco_poly_smt = enco_gen poly_smt_opt
 let enco_poly_tptp = enco_gen poly_tptp_opt
 
 let maybe_encoding_enumeration =
-  Trans.on_meta poly_smt_opt.meta (fun tds ->
-    let s = match get_meta_excl poly_smt_opt.meta tds with
+  Trans.on_meta_excl poly_smt_opt.meta (fun alo ->
+    let s = match alo with
       | None -> poly_smt_opt.default
       | Some [MAstr s] -> s
       | _ -> assert false in

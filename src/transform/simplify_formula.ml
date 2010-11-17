@@ -24,7 +24,7 @@ let rec fmla_simpl f = f_map_simp (fun t -> t) fmla_simpl f
 
 let decl_l d =
   match d.d_node with
-    | Dprop (k,pr,f) -> 
+    | Dprop (k,pr,f) ->
         let f = fmla_simpl f in
         begin match f.f_node, k with
           | Ftrue, Paxiom -> [[]]
@@ -38,10 +38,10 @@ let simplify_formula = Trans.rewrite (fun t -> t) fmla_simpl None
 
 let simplify_formula_and_task = Trans.decl_l decl_l None
 
-let () = Trans.register_transform 
+let () = Trans.register_transform
   "simplify_formula" simplify_formula
 
-let () = Trans.register_transform_l 
+let () = Trans.register_transform_l
   "simplify_formula_and_task" simplify_formula_and_task
 
 (** remove_trivial_quantification
@@ -50,7 +50,7 @@ let () = Trans.register_transform_l
 (** transform \exists x. x == y /\ F into F[y/x] *)
 (** transform \forall x. x <> y \/ F into F[y/x] *)
 
-(** test if the freevariable of a term 
+(** test if the freevariable of a term
     are included in a given set *)
 let t_boundvars_in fvars t =
   try
@@ -64,20 +64,20 @@ let rec fmla_find_subst boundvars var sign f =
   let fnF = fmla_find_subst boundvars var in
   match f.f_node with
     | Fapp (ls,[{t_node=Tvar vs} as tv;t])
-    | Fapp (ls,[t;{t_node=Tvar vs} as tv])         
-        when sign && ls_equal ls ps_equ && vs_equal vs var 
+    | Fapp (ls,[t;{t_node=Tvar vs} as tv])
+        when sign && ls_equal ls ps_equ && vs_equal vs var
           && not (t_equal t tv) && not (t_boundvars_in boundvars t) ->
         raise (Subst_found t)
-    | Fbinop (For, f1, f2)  when not sign -> (fnF sign f1); (fnF sign f2) 
+    | Fbinop (For, f1, f2)  when not sign -> (fnF sign f1); (fnF sign f2)
     | Fbinop (Fand, f1, f2) when sign ->  (fnF sign f1); (fnF sign f2)
-    | Fbinop (Fimplies, f1, f2) when not sign -> 
+    | Fbinop (Fimplies, f1, f2) when not sign ->
         (fnF (not sign) f1); (fnF sign f2)
     | Fnot f1 -> fnF (not sign) f1
     | Fquant (_,fb) ->
         let vsl,trl,f' = f_open_quant fb in
-        if trl = [] 
-        then 
-          let boundvars = 
+        if trl = []
+        then
+          let boundvars =
             List.fold_left (fun s v -> Svs.add v s) boundvars vsl in
           fmla_find_subst boundvars var sign f'
     | Flet (_,fb) ->
@@ -87,14 +87,14 @@ let rec fmla_find_subst boundvars var sign f =
     | Fcase (_,fbs) ->
         let iter_fb fb =
           let patl,f = f_open_branch fb in
-          let boundvars = patl.pat_vars in 
+          let boundvars = patl.pat_vars in
           fmla_find_subst boundvars var sign f in
         List.iter iter_fb fbs
     | Fbinop (_, _, _) | Fif ( _, _, _) | Fapp _ | Ffalse | Ftrue-> ()
 
 let rec fmla_quant sign f = function
   | [] -> [], f
-  | vs::l -> 
+  | vs::l ->
       let vsl, f = fmla_quant sign f l in
       try
         fmla_find_subst (Svs.singleton vs) vs sign f;
@@ -107,7 +107,7 @@ let rec fmla_remove_quant f =
   match f.f_node with
     | Fquant (k,fb) ->
         let vsl,trl,f',close = f_open_quant_cb fb in
-          if trl <> [] 
+          if trl <> []
           then f
           else
             let sign = match k with
@@ -125,15 +125,15 @@ let rec fmla_remove_quant f =
   f
 *)
 
-let simplify_trivial_quantification = 
+let simplify_trivial_quantification =
   Trans.rewrite (fun t -> t) fmla_remove_quant None
 
-let () = Trans.register_transform 
+let () = Trans.register_transform
   "simplify_trivial_quantification" simplify_trivial_quantification
 
 let simplify_trivial_quantification_in_goal =
   Trans.goal (fun pr f -> [create_prop_decl Pgoal pr (fmla_remove_quant f)])
 
-let () = Trans.register_transform 
-  "simplify_trivial_quantification_in_goal" 
+let () = Trans.register_transform
+  "simplify_trivial_quantification_in_goal"
    simplify_trivial_quantification_in_goal

@@ -27,12 +27,12 @@ let store = ["store"]
 let select = ["select"]
 
 let make_rt_rf env =
-  let array  = 
+  let array  =
     try
       find_theory env prelude array
-    with TheoryNotFound (_,s) -> 
-      Format.eprintf "The theory %s is unknown" s; 
-      exit 1 in 
+    with TheoryNotFound (_,s) ->
+      Format.eprintf "The theory %s is unknown" s;
+      exit 1 in
   let store  = (ns_find_ls array.th_export store).ls_name in
   let select = (ns_find_ls array.th_export select).ls_name in
   let rec rt t =
@@ -45,7 +45,7 @@ let make_rt_rf env =
       | _ -> t
   and rf f = f_map rt rf f  in
   rt,rf
-  
+
 let t env = let rt,rf = make_rt_rf env in Trans.rewrite rt rf None
 
 let () = Trans.register_env_transform "simplify_array" t

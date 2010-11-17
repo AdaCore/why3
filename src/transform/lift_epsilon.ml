@@ -66,11 +66,11 @@ let lift_epsilon kind = Trans.fold (lift kind) None
 
 let meta_epsilon = Theory.register_meta_excl "lift_epsilon" [MTstring]
 
-let lift_epsilon = Trans.on_meta meta_epsilon
-  (fun tset ->
-    let kind = match get_meta_excl meta_epsilon tset with
-      | Some ([MAstr "implicit"]) -> Implicit
-      | Some ([MAstr "implied"]) | None -> Implied
+let lift_epsilon = Trans.on_meta_excl meta_epsilon
+  (fun alo ->
+    let kind = match alo with
+      | Some [MAstr "implicit"] -> Implicit
+      | Some [MAstr "implied"] | None -> Implied
       | _ -> failwith "lift_epsilon accepts only 'implicit' and 'implied'"
     in
     lift_epsilon kind)

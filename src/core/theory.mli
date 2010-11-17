@@ -96,8 +96,14 @@ and tdecl = private {
 and tdecl_node = private
   | Decl  of decl
   | Use   of theory
-  | Clone of theory * tysymbol Mts.t * lsymbol Mls.t * prsymbol Mpr.t
+  | Clone of theory * symbol_map
   | Meta  of meta * meta_arg list
+
+and symbol_map = {
+  sm_ts : tysymbol Mts.t;
+  sm_ls : lsymbol Mls.t;
+  sm_pr : prsymbol Mpr.t;
+}
 
 module Mtdecl : Map.S with type key = tdecl
 module Stdecl : Mtdecl.Set
@@ -159,6 +165,8 @@ val create_clone : tdecl list -> theory -> th_inst -> tdecl list
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 
 val create_null_clone : theory -> tdecl
+
+val is_empty_sm : symbol_map -> bool
 
 (** Meta *)
 

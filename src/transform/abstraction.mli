@@ -13,5 +13,5 @@ val abstraction : (Term.lsymbol -> bool) -> Task.task -> Task.task
 
     [abstraction (fun f -> List.mem f ["+";"-"]) "goal x*x+y*y = 1"]
     returns ["logic abs1 = x*x; logic abs2 = y*y; goal abs1+abs2 = 1"]
-    
+
 *)

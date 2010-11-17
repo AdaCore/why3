@@ -467,8 +467,8 @@ let collect_green_part tds =
       | None -> ty_app ts []
       | Some ty -> ty) ts tys in
   Sts.fold extract sts Mty.empty
-  
-  
+
+
 
 (* Some general env creation function *)
 let create_env task tenv tds =
@@ -524,7 +524,7 @@ let () =
 
 let find_mono ~only_mono sty f =
   let rec ty_add sty ty = ty_fold ty_add (Sty.add ty sty) ty in
-  let add sty ty = if is_ty_mono ~only_mono ty then 
+  let add sty ty = if is_ty_mono ~only_mono ty then
       ty_add sty ty else sty in
   f_fold_ty add sty f
 

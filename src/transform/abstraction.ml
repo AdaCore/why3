@@ -5,8 +5,8 @@ open Term
 open Decl
 open Task
 
-let term_table = Hterm.create 257 
-let fmla_table = Hfmla.create 257 
+let term_table = Hterm.create 257
+let fmla_table = Hfmla.create 257
 let extra_decls = ref []
 
 let rec abstract_term keep t : term =
@@ -21,12 +21,12 @@ let rec abstract_term keep t : term =
           extra_decls := ls :: !extra_decls;
           Hterm.add term_table t tabs;
           tabs
-        end          
-        
+        end
+
 and abstract_fmla keep f =
   match f.f_node with
     | Ftrue | Ffalse -> f
-    | Fnot _ | Fbinop _ -> 
+    | Fnot _ | Fbinop _ ->
         f_map (abstract_term keep) (abstract_fmla keep) f
     | Fapp(ls,_) when keep ls ->
         f_map (abstract_term keep) (abstract_fmla keep) f
@@ -37,20 +37,20 @@ and abstract_fmla keep f =
           extra_decls := ls :: !extra_decls;
           Hfmla.add fmla_table f fabs;
           fabs
-        end          
-        
-   
-let abstract_decl keep (d : decl) : decl list = 
+        end
+
+
+let abstract_decl keep (d : decl) : decl list =
   let d = decl_map (abstract_term keep) (abstract_fmla keep) d in
-  let l = 
+  let l =
     List.fold_left
       (fun acc ls -> create_logic_decl [ls,None] :: acc)
       [d]
       !extra_decls
   in
-  extra_decls := []; l   
+  extra_decls := []; l
 
-let abstraction (keep : lsymbol -> bool) (t: task) : task = 
+let abstraction (keep : lsymbol -> bool) (t: task) : task =
   Hfmla.clear fmla_table;
   Hterm.clear term_table;
   Trans.apply (Trans.decl (abstract_decl keep) None) t

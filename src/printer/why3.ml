@@ -390,13 +390,12 @@ let print_tdecl fmt td = match td.td_node with
       print_decl fmt d
   | Use th ->
       fprintf fmt "@[<hov 2>(* use %a *)@]@\n@\n" print_th th
-  | Clone (th,tm,lm,pm)
-    when Mts.is_empty tm && Mls.is_empty lm && Mpr.is_empty pm ->
+  | Clone (th,sm) when is_empty_sm sm ->
       fprintf fmt "@[<hov 2>(* use %a *)@]@\n@\n" print_th th
-  | Clone (th,tm,lm,pm) ->
-      let tm = Mts.fold (fun x y a -> (x,y)::a) tm [] in
-      let lm = Mls.fold (fun x y a -> (x,y)::a) lm [] in
-      let pm = Mpr.fold (fun x y a -> (x,y)::a) pm [] in
+  | Clone (th,sm) ->
+      let tm = Mts.fold (fun x y a -> (x,y)::a) sm.sm_ts [] in
+      let lm = Mls.fold (fun x y a -> (x,y)::a) sm.sm_ls [] in
+      let pm = Mpr.fold (fun x y a -> (x,y)::a) sm.sm_pr [] in
       fprintf fmt "@[<hov 2>(* clone %a with %a,@ %a,@ %a *)@]@\n@\n"
         print_th th (print_list comma print_inst_ts) tm
                     (print_list comma print_inst_ls) lm

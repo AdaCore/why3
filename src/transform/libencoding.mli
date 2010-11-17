@@ -49,5 +49,5 @@ val lsdecl_of_tydecl : ty_decl list -> decl list
 val d_monomorph : ty -> Sty.t -> (lsymbol -> lsymbol) -> decl -> decl list
 
 (* convert tysymbols tagged with meta_kept to a set of types *)
-val get_kept_types : Task.tdecl_set -> Sty.t
+val get_kept_types : Sts.t -> Sty.t
 

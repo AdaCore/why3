@@ -152,8 +152,8 @@ let lsmap tyb kept = Wls.memoize 63 (fun ls ->
 
 let d_ts_base = create_ty_decl [ts_base, Tabstract]
 
-let monomorph tyb = Trans.on_meta Encoding.meta_kept (fun tds ->
-  let kept = Libencoding.get_kept_types tds in
+let monomorph tyb = Trans.on_tagged_ts Encoding.meta_kept (fun tss ->
+  let kept = Libencoding.get_kept_types tss in
   let tyb = match tyb.ty_node with
     | Tyapp (_,[]) when not (Sty.mem tyb kept) -> tyb
     | _ -> ty_base
@@ -161,8 +161,8 @@ let monomorph tyb = Trans.on_meta Encoding.meta_kept (fun tds ->
   let decl = Libencoding.d_monomorph tyb kept (lsmap tyb kept) in
   Trans.decl decl (Task.add_decl None d_ts_base))
 
-let monomorph = Trans.on_meta Encoding.meta_base (fun tds ->
-  let tyb = match Task.get_meta_excl Encoding.meta_base tds with
+let monomorph = Trans.on_meta_excl Encoding.meta_base (fun alo ->
+  let tyb = match alo with
     | Some [Theory.MAts ts] when ts.ts_args = [] ->
         begin match ts.ts_def with
           | Some ty -> ty
