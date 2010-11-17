@@ -113,8 +113,7 @@ let print_prelude fmt pl =
 
 let print_th_prelude task fmt pm =
   let th_used = task_fold (fun acc -> function
-    | { td_node = Clone (th,tm,lm,pm) }
-      when Mts.is_empty tm && Mls.is_empty lm && Mpr.is_empty pm -> th::acc
+    | { td_node = Clone (th,sm) } when is_empty_sm sm -> th::acc
     | _ -> acc) [] task
   in
   List.iter (fun th ->

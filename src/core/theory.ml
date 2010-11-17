@@ -173,8 +173,14 @@ and tdecl = {
 and tdecl_node =
   | Decl  of decl
   | Use   of theory
-  | Clone of theory * tysymbol Mts.t * lsymbol Mls.t * prsymbol Mpr.t
+  | Clone of theory * symbol_map
   | Meta  of meta * meta_arg list
+
+and symbol_map = {
+  sm_ts : tysymbol Mts.t;
+  sm_ls : lsymbol Mls.t;
+  sm_pr : prsymbol Mpr.t;
+}
 
 (** Theory declarations *)
 
@@ -190,14 +196,16 @@ module Hstdecl = Hashcons.Make (struct
     | MAint i1, MAint i2 -> i1 = i2
     | _,_ -> false
 
+  let eq_smap sm1 sm2 =
+    Mts.equal ts_equal sm1.sm_ts sm2.sm_ts &&
+    Mls.equal ls_equal sm1.sm_ls sm2.sm_ls &&
+    Mpr.equal pr_equal sm1.sm_pr sm2.sm_pr
+
   let equal td1 td2 = match td1.td_node, td2.td_node with
     | Decl d1, Decl d2 -> d_equal d1 d2
     | Use th1, Use th2 -> id_equal th1.th_name th2.th_name
-    | Clone (th1,tm1,lm1,pm1), Clone (th2,tm2,lm2,pm2) ->
-        id_equal th1.th_name th2.th_name &&
-        Mts.equal ts_equal tm1 tm2 &&
-        Mls.equal ls_equal lm1 lm2 &&
-        Mpr.equal pr_equal pm1 pm2
+    | Clone (th1,sm1), Clone (th2,sm2) ->
+        id_equal th1.th_name th2.th_name && eq_smap sm1 sm2
     | Meta (t1,al1), Meta (t2,al2) ->
         t1 = t2 && list_all2 eq_marg al1 al2
     | _,_ -> false
@@ -213,12 +221,15 @@ module Hstdecl = Hashcons.Make (struct
     | MAstr s -> Hashtbl.hash s
     | MAint i -> Hashtbl.hash i
 
+  let hs_smap sm h =
+    Mts.fold hs_cl_ts sm.sm_ts
+      (Mls.fold hs_cl_ls sm.sm_ls
+        (Mpr.fold hs_cl_pr sm.sm_pr h))
+
   let hash td = match td.td_node with
     | Decl d -> d_hash d
     | Use th -> id_hash th.th_name
-    | Clone (th,tm,lm,pm) ->
-        Mts.fold hs_cl_ts tm (Mls.fold hs_cl_ls lm
-          (Mpr.fold hs_cl_pr pm (id_hash th.th_name)))
+    | Clone (th,sm) -> hs_smap sm (id_hash th.th_name)
     | Meta (t,al) -> Hashcons.combine_list hs_ta (Hashtbl.hash t) al
 
   let tag n td = { td with td_tag = n }
@@ -296,10 +307,10 @@ let close_namespace uc import s =
 
 (* Base constructors *)
 
-let known_clone kn tm lm pm =
-  Mts.iter (fun _ ts -> known_id kn ts.ts_name) tm;
-  Mls.iter (fun _ ls -> known_id kn ls.ls_name) lm;
-  Mpr.iter (fun _ pr -> known_id kn pr.pr_name) pm
+let known_clone kn sm =
+  Mts.iter (fun _ ts -> known_id kn ts.ts_name) sm.sm_ts;
+  Mls.iter (fun _ ls -> known_id kn ls.ls_name) sm.sm_ls;
+  Mpr.iter (fun _ pr -> known_id kn pr.pr_name) sm.sm_pr
 
 let known_meta kn al =
   let check = function
@@ -320,7 +331,7 @@ let add_tdecl uc td = match td.td_node with
       uc_decls = td :: uc.uc_decls;
       uc_known = merge_known uc.uc_known th.th_known;
       uc_used  = Sid.union uc.uc_used (Sid.add th.th_name th.th_used) }
-  | Clone (_,tm,lm,pm) -> known_clone uc.uc_known tm lm pm;
+  | Clone (_,sm) -> known_clone uc.uc_known sm;
       { uc with uc_decls = td :: uc.uc_decls }
   | Meta (_,al) -> known_meta uc.uc_known al;
       { uc with uc_decls = td :: uc.uc_decls }
@@ -581,11 +592,15 @@ let cl_marg cl = function
   | MApr pr -> MApr (cl_find_pr cl pr)
   | a -> a
 
+let cl_smap cl sm = {
+  sm_ts = Mts.map (cl_find_ts cl) sm.sm_ts;
+  sm_ls = Mls.map (cl_find_ls cl) sm.sm_ls;
+  sm_pr = Mpr.map (cl_find_pr cl) sm.sm_pr}
+
 let cl_tdecl cl inst td = match td.td_node with
   | Decl d -> Decl (cl_decl cl inst d)
   | Use th -> Use th
-  | Clone (th,tm,lm,pm) -> Clone (th, Mts.map (cl_find_ts cl) tm,
-          Mls.map (cl_find_ls cl) lm, Mpr.map (cl_find_pr cl) pm)
+  | Clone (th,sm) -> Clone (th, cl_smap cl sm)
   | Meta (id,al) -> Meta (id, List.map (cl_marg cl) al)
 
 let clone_theory cl add_td acc th inst =
@@ -597,7 +612,12 @@ let clone_theory cl add_td acc th inst =
     option_apply acc (add_td acc) td
   in
   let acc = List.fold_left add acc th.th_decls in
-  add_td acc (mk_tdecl (Clone (th, cl.ts_table, cl.ls_table, cl.pr_table)))
+  let sm = {
+    sm_ts = cl.ts_table;
+    sm_ls = cl.ls_table;
+    sm_pr = cl.pr_table}
+  in
+  add_td acc (mk_tdecl (Clone (th, sm)))
 
 let clone_export uc th inst =
   let cl = cl_init th inst in
@@ -630,7 +650,17 @@ let clone_theory add_td acc th inst =
 let create_clone = clone_theory (fun tdl td -> td :: tdl)
 
 let create_null_clone th =
-  mk_tdecl (Clone (th, Mts.empty, Mls.empty, Mpr.empty))
+  let sm = {
+    sm_ts = Mts.empty;
+    sm_ls = Mls.empty;
+    sm_pr = Mpr.empty}
+  in
+  mk_tdecl (Clone (th,sm))
+
+let is_empty_sm sm =
+  Mts.is_empty sm.sm_ts &&
+  Mls.is_empty sm.sm_ls &&
+  Mpr.is_empty sm.sm_pr
 
 
 (** Meta properties *)
@@ -656,10 +686,10 @@ let create_meta m al =
 let add_meta uc s al = add_tdecl uc (create_meta s al)
 
 let clone_meta tdt th tdc = match tdt.td_node, tdc.td_node with
-  | Meta (t,al), Clone (th',tm,lm,pm) when id_equal th.th_name th'.th_name ->
-      let find_ts ts = Mts.find_default ts ts tm in
-      let find_ls ls = Mls.find_default ls ls lm in
-      let find_pr pr = Mpr.find_default pr pr pm in
+  | Meta (t,al), Clone (th',sm) when id_equal th.th_name th'.th_name ->
+      let find_ts ts = Mts.find_default ts ts sm.sm_ts in
+      let find_ls ls = Mls.find_default ls ls sm.sm_ls in
+      let find_pr pr = Mpr.find_default pr pr sm.sm_pr in
       let cl_marg = function
         | MAts ts -> MAts (find_ts ts)
         | MAls ls -> MAls (find_ls ls)

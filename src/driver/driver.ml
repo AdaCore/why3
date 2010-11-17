@@ -214,8 +214,7 @@ let update_task drv task =
     Mid.fold (fun _ (th,s) task ->
       let cs = (find_clone task th).tds_set in
       Stdecl.fold (fun td task -> match td.td_node with
-        | Clone (_,tm,lm,pm)
-          when Mts.is_empty tm && Mls.is_empty lm && Mpr.is_empty pm ->
+        | Clone (_,sm) when is_empty_sm sm ->
             Stdecl.fold (fun td task -> add_tdecl task td) s task
         | _ -> task
       ) cs task
@@ -238,8 +237,8 @@ let print_task ?old drv fmt task =
     | None -> raise NoPrinter
     | Some p -> p
   in
-  let printer = 
-    lookup_printer p drv.drv_env drv.drv_prelude drv.drv_thprelude 
+  let printer =
+    lookup_printer p drv.drv_env drv.drv_prelude drv.drv_thprelude
   in
   let lookup_transform t = t, lookup_transform t drv.drv_env in
   let transl = List.map lookup_transform drv.drv_transform in

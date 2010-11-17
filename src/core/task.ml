@@ -169,7 +169,7 @@ let add_prop_decl tk k p f = add_decl tk (create_prop_decl k p f)
 let rec add_tdecl task td = match td.td_node with
   | Decl d -> new_decl task d td
   | Use th -> use_export task th
-  | Clone (th,_,_,_) -> new_clone task th td
+  | Clone (th,_) -> new_clone task th td
   | Meta (t,_) -> new_meta task t td
 
 and flat_tdecl task td = match td.td_node with
