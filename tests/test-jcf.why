@@ -3,13 +3,11 @@
 
 theory Test
 
-  use export int.Int
+  use import list.List
 
-  use real.Real as R
-  logic ( *. ) (x:real) (y:real) : real = R.(*) x y 
+  logic p (list 'a)
 
-  logic power (x : real) (n : int) : real =
-     if n = 0 then 1.0 else x *. power x (n-1)
+  goal G : p (Nil : list 'a) -> not (p (Nil : list 'b)) -> false
 
 end
 

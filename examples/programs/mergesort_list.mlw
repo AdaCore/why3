@@ -8,6 +8,10 @@
  lemma Permut_append: 
     forall l1 l2 k1 k2 : list 'a.
     permut l1 k1 -> permut l2 k2 -> permut (append l1 l2) (append k1 k2)
+
+ lemma Permut_cons_append:
+   forall x : 'a, l1 l2 : list 'a.
+   permut (append (Cons x l1) l2) (append l1 (Cons x l2))
 }
 
 let split l0 =

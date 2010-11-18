@@ -12,7 +12,7 @@ theory Length
   logic length (l : list 'a) : int = 
     match l with
     | Nil      -> 0
-    | Cons _ r -> 1 + length(r)
+    | Cons _ r -> 1 + length r
     end
 
   lemma Length_nonnegative : forall l:list 'a. length(l) >= 0
