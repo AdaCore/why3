@@ -39,6 +39,11 @@ let channel_contents_buf cin =
 
 let channel_contents cin = Buffer.contents (channel_contents_buf cin)
 
+let rec fold_channel f acc cin =
+  try
+    fold_channel f (f acc (input_line cin)) cin
+  with End_of_file -> acc
+
 let file_contents_fmt f fmt =
   try
     let cin = open_in f in

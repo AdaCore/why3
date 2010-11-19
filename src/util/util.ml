@@ -59,6 +59,11 @@ let option_map_fold f acc x =
       let acc, x = f acc x in
       acc, Some x
 
+(* useful iterator on int *)
+let rec foldi f acc min max =
+  if min > max then acc else foldi f (f acc min) (succ min) max
+let rec mapi f = foldi (fun acc i -> f i::acc) []
+
 (* useful list combinators *)
 
 let rev_map_fold_left f acc l =

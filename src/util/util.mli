@@ -54,6 +54,10 @@ val option_eq : ('a -> 'b -> bool) -> 'a option -> 'b option -> bool
 val option_map_fold :
   ('a -> 'b -> 'a * 'b) -> 'a -> 'b option -> 'a * 'b option
 
+(* useful int iterator *)
+val foldi : ('a -> int -> 'a) -> 'a -> int -> int -> 'a
+val mapi : (int -> 'a) -> int -> int -> 'a list
+
 (* useful list combinators *)
 
 val rev_map_fold_left :

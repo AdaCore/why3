@@ -26,6 +26,9 @@ val channel_contents_buf : in_channel -> Buffer.t
 (* put the content of an in_channel in a formatter *)
 val channel_contents_fmt : in_channel -> Format.formatter -> unit
 
+(* fold on the line of a file *)
+val fold_channel : ('a -> string -> 'a) -> 'a -> in_channel -> 'a
+
 (* return the content of a file *)
 val file_contents : string -> string
 
