@@ -466,6 +466,8 @@ val f_ty_freevars : Stv.t -> fmla -> Stv.t
 
 val t_equal_alpha : term -> term -> bool
 val f_equal_alpha : fmla -> fmla -> bool
+module Hterm_alpha : Hashtbl.S with type key = term
+module Hfmla_alpha : Hashtbl.S with type key = fmla
 
 (** occurrence check *)
 

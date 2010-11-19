@@ -1567,6 +1567,114 @@ and f_equal_alpha m1 m2 f1 f2 =
 let t_equal_alpha = t_equal_alpha (bnd_new 0) (bnd_new 0)
 let f_equal_alpha = f_equal_alpha (bnd_new 0) (bnd_new 0)
 
+(* hash modulo alpha *)
+
+let rec pat_hash_alpha p =
+  match p.pat_node with
+  | Pwild -> 0
+  | Pvar _ -> assert false (* TODO 1 ? *)
+  | Papp (f, l) -> 
+      let acc = Hashcons.combine 2 (ls_hash f) in
+      Hashcons.combine_list pat_hash_alpha acc l
+  | Pas (p, _) -> Hashcons.combine 3 (pat_hash_alpha p)
+  | Por (p, q) -> 
+      Hashcons.combine 
+        (Hashcons.combine 4 (pat_hash_alpha p)) (pat_hash_alpha q)
+
+(* hash modulo alpha of terms and formulas *)
+
+let bound_hash_alpha fnE m (v,b,e) =
+  let vn = t_var (fresh_vsymbol v) in
+  let m = bound_inst m.bv_defer m.bv_bound b in
+  let m = { m with bv_defer = Mint.add 0 vn m.bv_defer } in
+  fnE m e
+
+let branch_hash_alpha fnE m (p,b,e) =
+  let mn,_ = pat_substs p Mint.empty in
+  let m = bound_inst m.bv_defer m.bv_bound b in
+  let m = { m with bv_defer = Mint.fold Mint.add mn m.bv_defer } in
+  fnE m e
+
+let quant_hash_alpha fnF m (vl,b,_,f) =
+  let mn,_ = quant_vars vl Mint.empty in
+  let m = bound_inst m.bv_defer m.bv_bound b in
+  let m = { m with bv_defer = Mint.fold Mint.add mn m.bv_defer } in
+  fnF m f
+
+let quant_hash = function
+  | Fforall -> 1
+  | Fexists -> 2
+
+let binop_hash = function
+  | Fand -> 3
+  | For -> 4
+  | Fimplies -> 5
+  | Fiff -> 7
+
+let rec t_hash_alpha m t =
+  match t.t_node with
+    | Tbvar i -> t_hash_alpha m (bnd_find i m.bv_defer)
+    | Tvar v -> Hashcons.combine 1 (vs_hash v)
+    | Tconst c -> Hashcons.combine 2 (Hashtbl.hash c)
+    | Tapp (s,l) -> 
+        let acc = Hashcons.combine 3 (ls_hash s) in
+        Hashcons.combine_list (t_hash_alpha m) acc l
+    | Tif (f,t,e) -> 
+        Hashcons.combine3 4 (f_hash_alpha m f) (t_hash_alpha m t) 
+          (t_hash_alpha m e)
+    | Tlet (t,tb)-> 
+        Hashcons.combine2 5 (t_hash_alpha m t) 
+          (bound_hash_alpha t_hash_alpha m tb)
+    | Tcase (t,b) -> 
+        let acc = Hashcons.combine 6 (t_hash_alpha m t) in
+        Hashcons.combine_list (branch_hash_alpha t_hash_alpha m) acc b
+    | Teps fb -> 
+        Hashcons.combine 7 (bound_hash_alpha f_hash_alpha m fb)
+
+and f_hash_alpha m f =
+  match f.f_node with
+    | Fapp (s,l) -> 
+        let acc = Hashcons.combine 0 (ls_hash s) in
+        Hashcons.combine_list (t_hash_alpha m) acc l
+    | Fquant (q,b) -> 
+        Hashcons.combine2 1 (quant_hash q) (quant_hash_alpha f_hash_alpha m b)
+    | Fbinop (a,f,g) -> 
+        Hashcons.combine3 2 (binop_hash a) (f_hash_alpha m f) (f_hash_alpha m g)
+    | Fnot f -> Hashcons.combine 3 (f_hash_alpha m f)
+    | Ftrue -> 4
+    | Ffalse -> 5
+    | Fif (f,g,h) -> 
+        Hashcons.combine3 6 (f_hash_alpha m f) (f_hash_alpha m g) 
+          (f_hash_alpha m h)
+    | Flet (t,fb) -> 
+        Hashcons.combine2 7 (t_hash_alpha m t) 
+          (bound_hash_alpha f_hash_alpha m fb)
+    | Fcase (t,b) -> 
+        let acc = Hashcons.combine 8 (t_hash_alpha m t) in
+        Hashcons.combine_list (branch_hash_alpha f_hash_alpha m) acc b
+
+let t_hash_alpha = t_hash_alpha (bnd_new 0)
+let f_hash_alpha = f_hash_alpha (bnd_new 0)
+
+
+module Hterm_alpha = 
+  Hashtbl.Make
+    (struct 
+       type t = term 
+       let equal = t_equal_alpha
+       let hash = t_hash_alpha
+     end)
+
+module Hfmla_alpha = 
+  Hashtbl.Make
+    (struct 
+       type t = fmla 
+       let equal = f_equal_alpha
+       let hash = f_hash_alpha
+     end)
+
+
+
 (* binder-free term/formula matching *)
 
 exception NoMatch
