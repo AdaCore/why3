@@ -6,6 +6,7 @@
   use export list.Length
   use export list.Append
   use export list.Reverse
+  use export list.HdTl
 
   type queue 'a = Q (front : list 'a) (lenf : int)
                     (rear  : list 'a) (lenr : int)
@@ -40,7 +41,7 @@ let head (q : queue 'a) =
     | Nil -> absurd
     | Cons x _ -> x
   end
-  { match model q with Nil -> false | Cons x _ -> result = x end }
+  { hd (model q) = Some result }
 
 let tail (q : queue 'a) =
   { inv q and model q <> Nil }
@@ -48,8 +49,7 @@ let tail (q : queue 'a) =
     | Nil -> absurd
     | Cons _ r -> create r (lenf q - 1) (rear q) (lenr q)
   end
-  { inv result and
-    match model q with Nil -> false | Cons _ r -> model result = r end }
+  { inv result and tl (model q) = Some (model result) }
 
 let enqueue (x : 'a) (q : queue 'a) =
   { inv q }
