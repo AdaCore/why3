@@ -35,6 +35,7 @@ type info = {
   info_symbols : Sls.t;
   info_ops_of_rel : (bool * string * string) Mls.t;
   rounding_modes : string Mls.t;
+  info_inline : Sls.t;
   info_syn : string Mid.t;
   info_rem : Sid.t;
 }
@@ -49,6 +50,7 @@ let get_info =
   let arith_symbols = ref None in
   let ops_of_rels = ref Mls.empty in
   let modes = ref Mls.empty in
+  let inline = ref Sls.empty in
   fun env task ->
     let l =
       match !arith_symbols with 
@@ -72,12 +74,22 @@ let get_info =
             let real_ge = find_real "infix >=" in
             let real_lt = find_real "infix <" in
             let real_gt = find_real "infix >" in
+            let find_reali = find_th env "real" "RealInfix" in
+            let real_addi = find_reali "infix +." in
+            let real_subi = find_reali "infix -." in
+            let real_muli = find_reali "infix *." in
+            let real_divi = find_reali "infix /." in
+            let real_lei = find_reali "infix <=." in
+            let real_gei = find_reali "infix >=." in
+            let real_lti = find_reali "infix <." in
+            let real_gti = find_reali "infix >." in
             let find_real_abs = find_th env "real" "Abs" in
             let real_abs = find_real_abs "abs" in
 	    let find_rounding_theory = find_th env "floating_point" "Rounding" in
 	    let round_ne = find_rounding_theory "NearestTiesToEven" in
 	    let find_single_theory = find_th env "floating_point" "Single" in
 	    round_single := find_single_theory "round";
+	    let no_overflow_single = find_single_theory "no_overflow" in
             (* sets of known symbols *)
             let l = 
               List.fold_right Sls.add 
@@ -87,6 +99,8 @@ let get_info =
 		 int_abs;
 		 real_add; real_sub; real_mul; real_div;
                  real_le; real_ge; real_lt; real_gt;
+		 real_addi; real_subi; real_muli; real_divi;
+                 real_lei; real_gei; real_lti; real_gti;
                  real_abs;
 		 !round_single; 
 		] Sls.empty 
@@ -104,13 +118,23 @@ let get_info =
 		  real_ge,true,">=","<=" ;
 		  real_lt,false,">=","<=" ;
 		  real_gt,false,"<=",">=" ;
+		  real_lei,true,"<=",">=" ;
+		  real_gei,true,">=","<=" ;
+		  real_lti,false,">=","<=" ;
+		  real_gti,false,"<=",">=" ;
 		];	  
 	    modes :=
 	      List.fold_left
 		(fun acc (ls,s) -> Mls.add ls s acc)
 		Mls.empty
 		[ round_ne,"ne" ;
-		];	  
+		];
+	    inline := 
+	      List.fold_left
+		(fun acc ls -> Sls.add ls acc)
+		Sls.empty
+		[ no_overflow_single ;
+		];
             l
         | Some l -> l
     in
@@ -118,6 +142,7 @@ let get_info =
       info_symbols = l;
       info_ops_of_rel = !ops_of_rels;
       rounding_modes = !modes;
+      info_inline = !inline;
       info_syn = get_syntax_map task;
       info_rem = get_remove_set task;
     }
@@ -360,11 +385,23 @@ let print_goal info fmt g =
 let print_task env pr thpr ?old:_ fmt task =
   forget_all ident_printer;
   let info = get_info env task in
+  let isnotinlinedt _t = true in
+  let isnotinlinedf f = match f.f_node with
+    | Fapp (ps,_) when Sls.mem ps info.info_inline -> 
+        eprintf "inlining no_overflow_single!!@.";
+        false
+    | Fapp (ps,_) -> 
+        eprintf "NOT inlining symbol %a@." print_ident ps.ls_name;
+        false
+    | _ -> true
+  in
+  let task = Trans.apply (Inlining.t ~isnotinlinedt ~isnotinlinedf) task in
   let task = 
     Abstraction.abstraction 
       (fun f -> Sls.mem f info.info_symbols)
       task 
   in
+  eprintf "Abstraction: @\n%a@." Pretty.print_task task;
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;  
   let equations,hyps,goal = 

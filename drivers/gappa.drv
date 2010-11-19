@@ -9,16 +9,16 @@ filename "%f-%t-%g.gappa"
 valid 0
 unknown "no contradiction was found\\|some enclosures were not satisfied" "Unknown"
 
-transformation "simplify_recursive_definition"
-(* transformation "inline_trivial" *)
-transformation "inline_all" 
-transformation "eliminate_builtin"
-transformation "eliminate_inductive"
-transformation "eliminate_algebraic"
+(*transformation "simplify_recursive_definition"*)
+transformation "inline_trivial"
+(* transformation "inline_all": much too strong, e.g <= becomes < or = *)
+(* transformation "eliminate_builtin" *)
+(* transformation "eliminate_inductive" *)
+(* transformation "eliminate_algebraic"*)
 (* transformation "eliminate_if"  *)
-transformation "eliminate_let"
-transformation "simplify_formula"
-transformation "simplify_trivial_quantification"
+(* transformation "eliminate_let" *)
+(* transformation "simplify_formula" *)
+(* transformation "simplify_trivial_quantification" *)
 transformation "introduce_premises"
 
 theory BuiltIn
@@ -102,6 +102,16 @@ theory real.Real
 
 end
 
+theory real.RealInfix
+
+  syntax logic (+.)  "(%1 + %2)"
+  syntax logic (-.)  "(%1 - %2)"
+  syntax logic ( *.)  "(%1 * %2)"
+  syntax logic (/.)  "(%1 / %2)"
+  syntax logic (-._) "(-%1)"
+
+end
+
 theory real.Abs
 
   syntax logic abs  "| %1 |"
@@ -111,6 +121,12 @@ end
 theory floating_point.Single
 
   prelude "@rnd_ieee32_ne=float<ieee_32,ne>;"
+
+end
+
+theory floating_point.Double
+
+  prelude "@rnd_ieee64_ne=float<ieee_64,ne>;"
 
 end
 
