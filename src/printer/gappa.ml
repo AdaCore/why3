@@ -401,7 +401,9 @@ let print_task env pr thpr ?old:_ fmt task =
       (fun f -> Sls.mem f info.info_symbols)
       task 
   in
+(*
   eprintf "Abstraction: @\n%a@." Pretty.print_task task;
+*)
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;  
   let equations,hyps,goal = 
