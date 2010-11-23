@@ -39,6 +39,10 @@ theory int.Int
   syntax logic (*)  "(%1 * %2)"
   syntax logic (-_) "(-%1)"
 
+  meta "inline : no" logic (<=)
+  meta "inline : no" logic (>=)
+  meta "inline : no" logic (>)
+
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
   remove prop CommutativeGroup.Unit_def
@@ -85,6 +89,10 @@ theory real.Real
   syntax logic (/)  "(%1 / %2)"
   syntax logic (-_) "(-%1)"
   syntax logic inv  "(1.0 / %1)"
+
+  meta "inline : no" logic (<=)
+  meta "inline : no" logic (>=)
+  meta "inline : no" logic (>)
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc

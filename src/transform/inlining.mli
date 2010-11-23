@@ -18,31 +18,54 @@
 (**************************************************************************)
 
 
-(* Inline the definition not recursive *)
+(** Inline the definitions not recursive *)
+
+val meta : Theory.meta
+
+(** {2 Generic inlining} *)
 
 val t :
-  isnotinlinedt:(Term.term -> bool) ->
-  isnotinlinedf:(Term.fmla -> bool) ->
+  ?use_meta:bool ->
+  notdeft:(Term.term -> bool) ->
+  notdeff:(Term.fmla -> bool) ->
+  notls  :(Term.lsymbol -> bool) ->
   Task.task Trans.trans
+(** [t ~use_meta ~notdeft ~notdeff ~notls] returns a transformation which
+    inlines a symbol definition in the other definitions and propositions when
+    it verifies this condition :
+    - Its definitions doesn't verify [notdeft] in case of a logic function or
+    [notdeff] in case of a predicate
+    - Its logic symbol doesn't verify [notls]
+    - use_meta is not set or its logic symbol is not tagged by "inline : not"
 
+    Notice that [use_meta], [notdeft], [notdeff], [notls] restrict only which
+    symbols are inlined not when.
+*)
 
-(* Inline them all *)
+(** {2 Registered Transformation} *)
 
 val all : Task.task Trans.trans
+(** [all] corresponds to the transformation "inline_all" *)
 
-(* Inline only the trivial definition :
-   logic c : t = a
-   logic f(x : t,...., ) : t = g(y : t2,...) *)
+
+
 val trivial : Task.task Trans.trans
+(** [trivial] corresponds to the transformation "inline_trivial"
+    Inline only the trivial definition :
+    logic c : t = a
+    logic f(x : t,...., ) : t = g(y : t2,...) *)
 
-
-(* Function to use in other transformations if inlining is needed *)
+(** Functions to use in other transformations if inlining is needed *)
 
 type env
 
 val empty_env : env
 
-(*val add_decl : env -> Theory.decl -> env *)
+val addfs : env -> Term.lsymbol -> Term.vsymbol list -> Term.term -> env
+val addps : env -> Term.lsymbol -> Term.vsymbol list -> Term.fmla -> env
+(** [addls env ls vs t] trigger the inlining of [ls] by the definition
+    [t] with the free variables [vs]. The variables of [vs] must have
+    the type of the arguments of [ls] *)
 
 val replacet : env -> Term.term -> Term.term
 val replacep : env -> Term.fmla -> Term.fmla

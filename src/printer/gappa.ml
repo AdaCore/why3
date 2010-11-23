@@ -385,17 +385,17 @@ let print_goal info fmt g =
 let print_task env pr thpr ?old:_ fmt task =
   forget_all ident_printer;
   let info = get_info env task in
-  let isnotinlinedt _t = true in
-  let isnotinlinedf f = match f.f_node with
-    | Fapp (ps,_) when Sls.mem ps info.info_inline -> 
-        eprintf "inlining no_overflow_single!!@.";
-        false
-    | Fapp (ps,_) -> 
-        eprintf "NOT inlining symbol %a@." print_ident ps.ls_name;
-        false
-    | _ -> true
-  in
-  let task = Trans.apply (Inlining.t ~isnotinlinedt ~isnotinlinedf) task in
+  (* let isnotinlinedt _t = true in *)
+  (* let isnotinlinedf f = match f.f_node with *)
+  (*   | Fapp (ps,_) when Sls.mem ps info.info_inline ->  *)
+  (*       eprintf "inlining no_overflow_single!!@."; *)
+  (*       false *)
+  (*   | Fapp (ps,_) ->  *)
+  (*       eprintf "NOT inlining symbol %a@." print_ident ps.ls_name; *)
+  (*       false *)
+  (*   | _ -> true *)
+  (* in *)
+  (* let task = Trans.apply (Inlining.t ~isnotinlinedt ~isnotinlinedf) task in *)
   let task = 
     Abstraction.abstraction 
       (fun f -> Sls.mem f info.info_symbols)

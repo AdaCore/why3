@@ -69,10 +69,13 @@ and replacep env f =
 and substt env d = t_map (replacet env) (replacep env) d
 and substp env d = f_map (replacet env) (replacep env) d
 
-let fold isnotinlinedt isnotinlinedf d (env, task) =
+let addfs env ls vs t = {env with fs = Mls.add ls (vs,t) env.fs}
+let addps env ls vs f = {env with ps = Mls.add ls (vs,f) env.ps}
+
+let fold notdeft notdeff notls d (env, task) =
 (*  Format.printf "I see : %a@\n%a@\n" Pretty.print_decl d print_env env;*)
   match d.d_node with
-    | Dlogic [ls,ld] -> begin
+    | Dlogic [ls,ld] when not (notls ls) -> begin
         match ld with
           | None -> env,add_decl task d
           | Some ld ->
@@ -80,16 +83,16 @@ let fold isnotinlinedt isnotinlinedf d (env, task) =
               match e with
                 | Term t ->
                     let t = replacet env t in
-                    if isnotinlinedt t || t_s_any ffalse (ls_equal ls) t
+                    if notdeft t || t_s_any ffalse (ls_equal ls) t
                     then env, add_decl task
                       (create_logic_decl [make_fs_defn ls vs t])
-                    else {env with fs = Mls.add ls (vs,t) env.fs},task
+                    else (addfs env ls vs t),task
                 | Fmla f ->
                     let f = replacep env f in
-                    if isnotinlinedf f || f_s_any ffalse (ls_equal ls) f
+                    if notdeff f || f_s_any ffalse (ls_equal ls) f
                     then env, add_decl task
                       (create_logic_decl [make_ps_defn ls vs f])
-                    else {env with ps = Mls.add ls (vs,f) env.ps},task
+                    else (addps env ls vs f),task
       end
     | Dind dl ->
         env, add_decl task (create_ind_decl
@@ -108,32 +111,48 @@ let fold isnotinlinedt isnotinlinedf d (env, task) =
     | Dprop (k,pr,f) ->
         env,add_decl task (create_prop_decl k pr (replacep env f))
 
-let fold isnotinlinedt isnotinlinedf task0 (env, task) =
+let fold notdeft notdeff notls task0 (env, task) =
   match task0.task_decl with
     | { Theory.td_node = Theory.Decl d } ->
-        fold isnotinlinedt isnotinlinedf d (env, task)
+        fold notdeft notdeff notls d (env, task)
     | td -> env, add_tdecl task td
 
-let t ~isnotinlinedt ~isnotinlinedf =
-  Trans.fold_map (fold isnotinlinedt isnotinlinedf) empty_env None
+let meta = Theory.register_meta "inline : no" [Theory.MTlsymbol]
 
-let all = t ~isnotinlinedt:(fun _ -> false) ~isnotinlinedf:(fun _ -> false)
+let t ?(use_meta=true) ~notdeft ~notdeff ~notls =
+  let trans notls =
+    Trans.fold_map (fold notdeft notdeff notls) empty_env None in
+  if use_meta then
+    Trans.on_meta meta (fun ml ->
+      let sls = List.fold_left (fun acc e ->
+        match e with
+          | [Theory.MAls ls] -> Sls.add ls acc
+          |_ -> assert false) Sls.empty ml in
+      let notls ls = Sls.mem ls sls || notls ls in
+      trans notls)
+  else trans notls
 
+let all = t ~use_meta:true ~notdeft:ffalse ~notdeff:ffalse ~notls:ffalse
+
+(** TODO : restrict to linear substitution,
+    ie each variable appear exactly once *)
 let trivial = t
-  ~isnotinlinedt:(fun m -> match m.t_node with
+  ~use_meta:true
+  ~notdeft:(fun m -> match m.t_node with
                     | Tconst _ | Tvar _ -> false
                     | Tapp (_,tl) when List.for_all
                         (fun m -> match m.t_node with
                            | Tvar _ -> true
                            | _ -> false) tl -> false
                     | _ -> true )
-  ~isnotinlinedf:(fun m -> match m.f_node with
+  ~notdeff:(fun m -> match m.f_node with
                     | Ftrue | Ffalse -> false
                     | Fapp (_,tl) when List.for_all
                         (fun m -> match m.t_node with
                            | Tvar _ -> true
                            | _ -> false) tl -> false
                     | _ -> true)
+  ~notls:ffalse
 
 let () =
   Trans.register_transform "inline_all" all;
