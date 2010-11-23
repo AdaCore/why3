@@ -47,7 +47,7 @@ let default_ide =
     ide_tree_width = 512;
     ide_task_height = 384;
     ide_verbose = 0;
-    ide_default_editor = "";
+    ide_default_editor = try Sys.getenv "EDITOR" with Not_found -> "editor";
   }
 
 let load_ide section =
