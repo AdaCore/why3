@@ -74,15 +74,6 @@ let get_info =
             let real_ge = find_real "infix >=" in
             let real_lt = find_real "infix <" in
             let real_gt = find_real "infix >" in
-            let find_reali = find_th env "real" "RealInfix" in
-            let real_addi = find_reali "infix +." in
-            let real_subi = find_reali "infix -." in
-            let real_muli = find_reali "infix *." in
-            let real_divi = find_reali "infix /." in
-            let real_lei = find_reali "infix <=." in
-            let real_gei = find_reali "infix >=." in
-            let real_lti = find_reali "infix <." in
-            let real_gti = find_reali "infix >." in
             let find_real_abs = find_th env "real" "Abs" in
             let real_abs = find_real_abs "abs" in
 	    let find_rounding_theory = find_th env "floating_point" "Rounding" in
@@ -99,8 +90,6 @@ let get_info =
 		 int_abs;
 		 real_add; real_sub; real_mul; real_div;
                  real_le; real_ge; real_lt; real_gt;
-		 real_addi; real_subi; real_muli; real_divi;
-                 real_lei; real_gei; real_lti; real_gti;
                  real_abs;
 		 !round_single; 
 		] Sls.empty 
@@ -118,11 +107,7 @@ let get_info =
 		  real_ge,true,">=","<=" ;
 		  real_lt,false,">=","<=" ;
 		  real_gt,false,"<=",">=" ;
-		  real_lei,true,"<=",">=" ;
-		  real_gei,true,">=","<=" ;
-		  real_lti,false,">=","<=" ;
-		  real_gti,false,"<=",">=" ;
-		];	  
+		];
 	    modes :=
 	      List.fold_left
 		(fun acc (ls,s) -> Mls.add ls s acc)
