@@ -32,12 +32,11 @@ val t :
   Task.task Trans.trans
 (** [t ~use_meta ~notdeft ~notdeff ~notls] returns a transformation which
     inlines a symbol definition in the other definitions and propositions when
-    it verifies this condition :
-    [CLAUDE: C'EST UN ou OU UN et DE CES CONDITIONS ??]
+    it verifies all of these conditions :
     - Its definitions doesn't verify [notdeft] in case of a logic function or
     [notdeff] in case of a predicate
     - Its logic symbol doesn't verify [notls]
-    - use_meta is not set or its logic symbol is not tagged by "inline : not"
+    - use_meta is not set or its logic symbol is not tagged by "inline : no"
 
     Notice that [use_meta], [notdeft], [notdeff], [notls] restrict only which
     symbols are inlined not when.
@@ -66,7 +65,7 @@ val addfs : env -> Term.lsymbol -> Term.vsymbol list -> Term.term -> env
 val addps : env -> Term.lsymbol -> Term.vsymbol list -> Term.fmla -> env
 (** [addls env ls vs t] trigger the inlining of [ls] by the definition
     [t] with the free variables [vs]. The variables of [vs] must have
-    the type of the arguments of [ls] *)
+    the same type as the arguments of [ls] *)
 
 val replacet : env -> Term.term -> Term.term
 val replacep : env -> Term.fmla -> Term.fmla
