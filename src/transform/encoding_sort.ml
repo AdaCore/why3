@@ -158,5 +158,5 @@ let t =
   let tenv = init_tenv in
   Trans.decl (decl tenv) None
 
-let () = Trans.register_transform "encoding_simple2" t
+let () = Trans.register_transform "encoding_sort" t
 
