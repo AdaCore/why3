@@ -44,18 +44,18 @@ let round_single = ref ps_equ
 
 let find_th env file th =
   let theory = Env.find_theory env [file] th in
-  fun id -> Theory.ns_find_ls theory.Theory.th_export [id] 
-    
-let get_info = 
+  fun id -> Theory.ns_find_ls theory.Theory.th_export [id]
+
+let get_info =
   let arith_symbols = ref None in
   let ops_of_rels = ref Mls.empty in
   let modes = ref Mls.empty in
   let _inline = ref Sls.empty in
   fun env task ->
     let l =
-      match !arith_symbols with 
+      match !arith_symbols with
 	| None ->
-            let find_int = find_th env "int" "Int" in 
+            let find_int = find_th env "int" "Int" in
             let int_add = find_int "infix +" in
             let int_sub = find_int "infix -" in
             let int_mul = find_int "infix *" in
@@ -84,17 +84,17 @@ let get_info =
 	    let no_overflow_single = find_single_theory "no_overflow" in
 *)
             (* sets of known symbols *)
-            let l = 
-              List.fold_right Sls.add 
-                [ps_equ; 
+            let l =
+              List.fold_right Sls.add
+                [ps_equ;
                  int_add; int_sub; int_mul;
                  int_le; int_ge; int_lt; int_gt;
 		 int_abs;
 		 real_add; real_sub; real_mul; real_div;
                  real_le; real_ge; real_lt; real_gt;
                  real_abs;
-		 !round_single; 
-		] Sls.empty 
+		 !round_single;
+		] Sls.empty
             in
             arith_symbols := Some l;
 	    ops_of_rels :=
@@ -117,7 +117,7 @@ let get_info =
 		[ round_ne,"ne" ;
 		];
 (*
-	    inline := 
+	    inline :=
 	      List.fold_left
 		(fun acc ls -> Sls.add ls acc)
 		Sls.empty
@@ -138,9 +138,9 @@ let get_info =
 
 (* Gappa printing *)
 
-let ident_printer = 
+let ident_printer =
   let bls = [
-  ] 
+  ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
@@ -154,70 +154,70 @@ let constant_value t =
     | Tconst (ConstInt s) -> s
     | Tconst (ConstReal r) -> sprintf "%a" Pretty.print_const r
 *)
-    | Tconst c -> 
+    | Tconst c ->
 	fprintf str_formatter "%a" Pretty.print_const c;
 	flush_str_formatter ()
     | _ -> raise Not_found
 
 (* terms *)
 
-let get_mode info m = 
+let get_mode info m =
   match m.t_node with
-    | Tapp(ls,[]) -> 
+    | Tapp(ls,[]) ->
 	begin try Mls.find ls info.rounding_modes
 	with Not_found -> assert false
 	end
     | _ -> assert false
 
-let rec print_term info fmt t = 
+let rec print_term info fmt t =
   let term = print_term info in
   match t.t_node with
-  | Tbvar _ -> 
+  | Tbvar _ ->
       assert false
   | Tconst c ->
       Pretty.print_const fmt c
-  | Tvar { vs_name = id } 
+  | Tvar { vs_name = id }
   | Tapp ( { ls_name = id } ,[] ) ->
       print_ident fmt id
-  | Tapp (ls, [m;t]) when ls_equal ls !round_single -> 
+  | Tapp (ls, [m;t]) when ls_equal ls !round_single ->
       fprintf fmt "rnd_ieee32_%s(%a)" (get_mode info m) term t
-  | Tapp (ls, tl) -> 
+  | Tapp (ls, tl) ->
       begin match query_syntax info.info_syn ls.ls_name with
 	| Some s -> syntax_arguments s term fmt tl
-	| None -> 
-	    unsupportedTerm t 
+	| None ->
+	    unsupportedTerm t
               ("gappa: function '" ^ ls.ls_name.id_string ^ "' is not supported")
       end
   | Tlet _ -> unsupportedTerm t
       "gappa: you must eliminate let in term"
-  | Tif _ -> unsupportedTerm t 
+  | Tif _ -> unsupportedTerm t
       "gappa: you must eliminate if_then_else"
-  | Tcase _ -> unsupportedTerm t 
+  | Tcase _ -> unsupportedTerm t
       "gappa: you must eliminate match"
-  | Teps _ -> unsupportedTerm t 
+  | Teps _ -> unsupportedTerm t
       "gappa : you must eliminate epsilon"
 
 
 (* predicates *)
 
-let rec print_fmla info fmt f = 
+let rec print_fmla info fmt f =
   let term = print_term info in
   let fmla = print_fmla info in
   match f.f_node with
   | Fapp ({ ls_name = id }, []) ->
       print_ident fmt id
-  | Fapp (ls, [t1;t2]) when ls_equal ls ps_equ -> 
+  | Fapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
       begin try
         let c1 = constant_value t1 in
-        fprintf fmt "%a in [%s,%s]" term t2 c1 c1          
+        fprintf fmt "%a in [%s,%s]" term t2 c1 c1
       with Not_found ->
         try
           let c2 = constant_value t2 in
-          fprintf fmt "%a in [%s,%s]" term t1 c2 c2          
+          fprintf fmt "%a in [%s,%s]" term t1 c2 c2
         with Not_found ->
-          fprintf fmt "%a - %a in [0,0]" term t1 term t2           
+          fprintf fmt "%a - %a in [0,0]" term t1 term t2
       end
-  | Fapp (ls, [t1;t2]) when Mls.mem ls info.info_ops_of_rel -> 
+  | Fapp (ls, [t1;t2]) when Mls.mem ls info.info_ops_of_rel ->
       let b,op,rev_op = try Mls.find ls info.info_ops_of_rel
 	with Not_found -> assert false
       in
@@ -232,20 +232,20 @@ let rec print_fmla info fmt f =
         with Not_found ->
           fprintf fmt "%s%a - %a %s 0" s term t1 term t2 op
       end
-  | Fapp (ls, tl) -> 
+  | Fapp (ls, tl) ->
       begin match query_syntax info.info_syn ls.ls_name with
 	| Some s -> syntax_arguments s term fmt tl
-	| None -> 
-	    unsupportedFmla f 
+	| None ->
+	    unsupportedFmla f
               ("gappa: predicate '" ^ ls.ls_name.id_string ^ "' is not supported")
       end
   | Fquant (_q, _fq) ->
-      unsupportedFmla f 
-        "gappa: quantifiers are not supported"     
+      unsupportedFmla f
+        "gappa: quantifiers are not supported"
 (*
       let q = match q with Fforall -> "forall" | Fexists -> "exists" in
       let vl, tl, f = f_open_quant fq in
-      let forall fmt v = 
+      let forall fmt v =
 	fprintf fmt "%s %a:%a" q print_ident v.vs_name (print_type info) v.vs_ty
       in
       fprintf fmt "@[(%a%a.@ %a)@]" (print_list dot forall) vl
@@ -259,11 +259,11 @@ let rec print_fmla info fmt f =
   | Fbinop (Fimplies, f1, f2) ->
       fprintf fmt "(%a ->@ %a)" fmla f1 fmla f2
   | Fbinop (Fiff, _f1, _f2) ->
-      unsupportedFmla f 
-        "gappa: connector <-> is not supported"     
+      unsupportedFmla f
+        "gappa: connector <-> is not supported"
   | Fnot f ->
       fprintf fmt "not %a" fmla f
-  | Ftrue -> 
+  | Ftrue ->
       fprintf fmt "(0 in [0,0])"
   | Ffalse ->
       fprintf fmt "(1 in [0,0])"
@@ -272,27 +272,27 @@ let rec print_fmla info fmt f =
         "gappa: you must eliminate if in formula"
   | Flet _ -> unsupportedFmla f
       "gappa: you must eliminate let in formula"
-  | Fcase _ -> unsupportedFmla f 
+  | Fcase _ -> unsupportedFmla f
       "gappa: you must eliminate match"
-  
+
 (*
-let print_decl (* ?old *) info fmt d = 
+let print_decl (* ?old *) info fmt d =
   match d.d_node with
   | Dtype _ -> ()
 (*
-unsupportedDecl d 
+unsupportedDecl d
       "gappa : type declarations are not supported"
 *)
   | Dlogic _ -> ()
 (*
-unsupportedDecl d 
+unsupportedDecl d
       "gappa : logic declarations are not supported"
 *)
-  | Dind _ -> unsupportedDecl d 
+  | Dind _ -> unsupportedDecl d
       "gappa: inductive definitions are not supported"
-  | Dprop (Paxiom, pr, f) -> 
+  | Dprop (Paxiom, pr, f) ->
       fprintf fmt "# hypothesis '%a'@\n" print_ident pr.pr_name;
-      fprintf fmt "@[<hv 2>%a ->@]@\n" (print_fmla info) f     
+      fprintf fmt "@[<hv 2>%a ->@]@\n" (print_fmla info) f
   | Dprop (Pgoal, pr, f) ->
       fprintf fmt "# goal '%a'@\n" print_ident pr.pr_name;
 (*
@@ -300,12 +300,12 @@ unsupportedDecl d
 *)
       fprintf fmt "@[<hv 2>%a@]@\n" (print_fmla info) f
   | Dprop ((Plemma|Pskip), _, _) ->
-      unsupportedDecl d 
+      unsupportedDecl d
         "gappa: lemmas are not supported"
 *)
 
 (*
-let print_decl ?old:_ info fmt = 
+let print_decl ?old:_ info fmt =
   catch_unsupportedDecl (print_decl (* ?old *) info fmt)
 
 let print_decls ?old info fmt dl =
@@ -314,7 +314,7 @@ let print_decls ?old info fmt dl =
 
 let filter_hyp info eqs hyps pr f =
   match f.f_node with
-    | Fapp(ls,[t1;t2]) when ls == ps_equ -> 
+    | Fapp(ls,[t1;t2]) when ls == ps_equ ->
 	begin match t1.t_node with
 	  | Tapp(_,[]) ->
 	      ((pr,t1,t2)::eqs,hyps)
@@ -339,15 +339,15 @@ let filter_goal pr f =
     | Fapp(ps,[]) -> Goal_bad ("symbol " ^ ps.ls_name.Ident.id_string ^ " unknown")
 	(* todo: filter more goals *)
     | _ -> Goal_good(pr,f)
-  
+
 let prepare info ((eqs,hyps,goal) as acc) d =
   match d.d_node with
     | Dtype _ -> acc
     | Dlogic _ -> acc
-    | Dind _ -> 
-	unsupportedDecl d 
+    | Dind _ ->
+	unsupportedDecl d
 	  "please remove inductive definitions before calling gappa printer"
-    | Dprop (Paxiom, pr, f) -> 
+    | Dprop (Paxiom, pr, f) ->
 	let (eqs,hyps) = filter_hyp info eqs hyps pr f in (eqs,hyps,goal)
     | Dprop (Pgoal, pr, f) ->
 	begin
@@ -356,29 +356,29 @@ let prepare info ((eqs,hyps,goal) as acc) d =
 	    | _ -> assert false
 	end
     | Dprop ((Plemma|Pskip), _, _) ->
-	unsupportedDecl d 
+	unsupportedDecl d
           "gappa: lemmas are not supported"
 
 let print_equation info fmt (pr,t1,t2) =
   fprintf fmt "# equation '%a'@\n" print_ident pr.pr_name;
   fprintf fmt "%a = %a ;@\n" (print_term info) t1 (print_term info) t2
- 
+
 let print_hyp info fmt (pr,f) =
   fprintf fmt "# hypothesis '%a'@\n" print_ident pr.pr_name;
   fprintf fmt "%a ->@\n" (print_fmla info) f
-  
+
 let print_goal info fmt g =
   match g with
     | Goal_good(pr,f) ->
 	fprintf fmt "# goal '%a'@\n" print_ident pr.pr_name;
 	fprintf fmt "%a@\n" (print_fmla info) f
-    | Goal_bad msg -> 
+    | Goal_bad msg ->
 	fprintf fmt "# (unsupported kind of goal: %s)@\n" msg;
 	fprintf fmt "1 in [0,0]@\n"
-    | Goal_none -> 
+    | Goal_none ->
 	fprintf fmt "# (no goal at all ??)@\n";
 	fprintf fmt "1 in [0,0]@\n"
-  
+
 let print_task env pr thpr ?old:_ fmt task =
   forget_all ident_printer;
   let info = get_info env task in
@@ -396,21 +396,21 @@ let print_task env pr thpr ?old:_ fmt task =
   (* let task = Trans.apply (Inlining.t ~isnotinlinedt ~isnotinlinedf) task in *)
 (* ======= *)
 (*
-  let isnotinlinedt t = 
+  let isnotinlinedt t =
     match t.t_node with
-      | Tapp (ls,_) when Sls.mem ls info.info_inline -> 
+      | Tapp (ls,_) when Sls.mem ls info.info_inline ->
           eprintf "NOT inlining symbol %a@." print_ident ls.ls_name;
           true
-      | Tapp (ls,_) -> 
+      | Tapp (ls,_) ->
           eprintf "inlining symbol %a@." print_ident ls.ls_name;
           false
       | _ -> true
   in
   let isnotinlinedf f = match f.f_node with
-    | Fapp (ps,_) when Sls.mem ps info.info_inline -> 
+    | Fapp (ps,_) when Sls.mem ps info.info_inline ->
         eprintf "NOT inlining symbol %a@." print_ident ps.ls_name;
         true
-    | Fapp (ps,_) -> 
+    | Fapp (ps,_) ->
         eprintf "inlining symbol %a@." print_ident ps.ls_name;
         false
     | _ -> true
@@ -420,23 +420,23 @@ let print_task env pr thpr ?old:_ fmt task =
   eprintf "Inlining: @\n%a@." Pretty.print_task task;
 *)
 (* > Stashed changes *)
-  let task = 
-    Abstraction.abstraction 
+  let task =
+    Abstraction.abstraction
       (fun f -> Sls.mem f info.info_symbols)
-      task 
+      task
   in
 (*
   eprintf "Abstraction: @\n%a@." Pretty.print_task task;
 *)
   print_prelude fmt pr;
-  print_th_prelude task fmt thpr;  
-  let equations,hyps,goal = 
-    List.fold_left (prepare info) ([],[],Goal_none) (Task.task_decls task) 
+  print_th_prelude task fmt thpr;
+  let equations,hyps,goal =
+    List.fold_left (prepare info) ([],[],Goal_none) (Task.task_decls task)
   in
   List.iter (print_equation info fmt) (List.rev equations);
   fprintf fmt "@[<v 2>{ %a%a}@\n@]" (print_list nothing (print_hyp info)) hyps
     (print_goal info) goal
-(*  
+(*
   print_decls ?old info fmt (Task.task_decls task)
 *)
 

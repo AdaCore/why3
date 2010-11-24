@@ -5,7 +5,7 @@ Require Import Rbase.
 Require Import Rbasic_fun.
 Require Import R_sqrt.
 Require Import Rtrigo.
-Require Import AltSeries.
+Require Import AltSeries. (* for def of pi *)
 Definition unit  := unit.
 
 Parameter ignore: forall (a:Type), a  -> unit.
