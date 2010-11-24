@@ -50,7 +50,7 @@ let get_info =
   let arith_symbols = ref None in
   let ops_of_rels = ref Mls.empty in
   let modes = ref Mls.empty in
-  let inline = ref Sls.empty in
+  let _inline = ref Sls.empty in
   fun env task ->
     let l =
       match !arith_symbols with 
@@ -80,7 +80,9 @@ let get_info =
 	    let round_ne = find_rounding_theory "NearestTiesToEven" in
 	    let find_single_theory = find_th env "floating_point" "Single" in
 	    round_single := find_single_theory "round";
+(*
 	    let no_overflow_single = find_single_theory "no_overflow" in
+*)
             (* sets of known symbols *)
             let l = 
               List.fold_right Sls.add 
@@ -114,12 +116,14 @@ let get_info =
 		Mls.empty
 		[ round_ne,"ne" ;
 		];
+(*
 	    inline := 
 	      List.fold_left
 		(fun acc ls -> Sls.add ls acc)
 		Sls.empty
-		[ no_overflow_single ;
+		[ real_lei ;
 		];
+*)
             l
         | Some l -> l
     in
@@ -127,7 +131,7 @@ let get_info =
       info_symbols = l;
       info_ops_of_rel = !ops_of_rels;
       rounding_modes = !modes;
-      info_inline = !inline;
+      info_inline = l (* !inline*);
       info_syn = get_syntax_map task;
       info_rem = get_remove_set task;
     }
@@ -325,11 +329,16 @@ let filter_hyp info eqs hyps pr f =
 	(eqs, (pr,f)::hyps)
     | _ -> (eqs,hyps)
 
+type filter_goal =
+  | Goal_good of Decl.prsymbol * fmla
+  | Goal_bad of string
+  | Goal_none
+
 let filter_goal pr f =
   match f.f_node with
-    | Fapp(_,[]) -> None 
+    | Fapp(ps,[]) -> Goal_bad ("symbol " ^ ps.ls_name.Ident.id_string ^ " unknown")
 	(* todo: filter more goals *)
-    | _ -> Some(pr,f)
+    | _ -> Goal_good(pr,f)
   
 let prepare info ((eqs,hyps,goal) as acc) d =
   match d.d_node with
@@ -343,8 +352,8 @@ let prepare info ((eqs,hyps,goal) as acc) d =
     | Dprop (Pgoal, pr, f) ->
 	begin
 	  match goal with
-	    | None -> (eqs,hyps,filter_goal pr f)
-	    | Some _ -> assert false
+	    | Goal_none -> (eqs,hyps,filter_goal pr f)
+	    | _ -> assert false
 	end
     | Dprop ((Plemma|Pskip), _, _) ->
 	unsupportedDecl d 
@@ -360,16 +369,20 @@ let print_hyp info fmt (pr,f) =
   
 let print_goal info fmt g =
   match g with
-    | Some(pr,f) ->
+    | Goal_good(pr,f) ->
 	fprintf fmt "# goal '%a'@\n" print_ident pr.pr_name;
 	fprintf fmt "%a@\n" (print_fmla info) f
-    | None -> 
-	fprintf fmt "# (unsupported kind of goal)@\n";
+    | Goal_bad msg -> 
+	fprintf fmt "# (unsupported kind of goal: %s)@\n" msg;
+	fprintf fmt "1 in [0,0]@\n"
+    | Goal_none -> 
+	fprintf fmt "# (no goal at all ??)@\n";
 	fprintf fmt "1 in [0,0]@\n"
   
 let print_task env pr thpr ?old:_ fmt task =
   forget_all ident_printer;
   let info = get_info env task in
+(* Updated upstream *)
   (* let isnotinlinedt _t = true in *)
   (* let isnotinlinedf f = match f.f_node with *)
   (*   | Fapp (ps,_) when Sls.mem ps info.info_inline ->  *)
@@ -381,6 +394,32 @@ let print_task env pr thpr ?old:_ fmt task =
   (*   | _ -> true *)
   (* in *)
   (* let task = Trans.apply (Inlining.t ~isnotinlinedt ~isnotinlinedf) task in *)
+(* ======= *)
+(*
+  let isnotinlinedt t = 
+    match t.t_node with
+      | Tapp (ls,_) when Sls.mem ls info.info_inline -> 
+          eprintf "NOT inlining symbol %a@." print_ident ls.ls_name;
+          true
+      | Tapp (ls,_) -> 
+          eprintf "inlining symbol %a@." print_ident ls.ls_name;
+          false
+      | _ -> true
+  in
+  let isnotinlinedf f = match f.f_node with
+    | Fapp (ps,_) when Sls.mem ps info.info_inline -> 
+        eprintf "NOT inlining symbol %a@." print_ident ps.ls_name;
+        true
+    | Fapp (ps,_) -> 
+        eprintf "inlining symbol %a@." print_ident ps.ls_name;
+        false
+    | _ -> true
+  in
+  eprintf "Before inlining: @\n%a@." Pretty.print_task task;
+  let task = Trans.apply (Inlining.t ~isnotinlinedt ~isnotinlinedf) task in
+  eprintf "Inlining: @\n%a@." Pretty.print_task task;
+*)
+(* > Stashed changes *)
   let task = 
     Abstraction.abstraction 
       (fun f -> Sls.mem f info.info_symbols)
@@ -392,7 +431,7 @@ let print_task env pr thpr ?old:_ fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;  
   let equations,hyps,goal = 
-    List.fold_left (prepare info) ([],[],None) (Task.task_decls task) 
+    List.fold_left (prepare info) ([],[],Goal_none) (Task.task_decls task) 
   in
   List.iter (print_equation info fmt) (List.rev equations);
   fprintf fmt "@[<v 2>{ %a%a}@\n@]" (print_list nothing (print_hyp info)) hyps

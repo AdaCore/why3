@@ -1613,7 +1613,7 @@ let binop_hash = function
 
 let rec t_hash_alpha m t =
   match t.t_node with
-    | Tbvar i -> 0 
+    | Tbvar _i -> 0 
     | Tvar v -> Hashcons.combine 1 (vs_hash v)
     | Tconst c -> Hashcons.combine 2 (Hashtbl.hash c)
     | Tapp (s,l) -> 

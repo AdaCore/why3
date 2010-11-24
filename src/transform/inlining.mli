@@ -33,6 +33,7 @@ val t :
 (** [t ~use_meta ~notdeft ~notdeff ~notls] returns a transformation which
     inlines a symbol definition in the other definitions and propositions when
     it verifies this condition :
+    [CLAUDE: C'EST UN ou OU UN et DE CES CONDITIONS ??]
     - Its definitions doesn't verify [notdeft] in case of a logic function or
     [notdeff] in case of a predicate
     - Its logic symbol doesn't verify [notls]
