@@ -24,28 +24,40 @@ open Decl
 
 (** Eliminate if-then-else in terms *)
 
-let rec elim_t letl contT t = match t.t_node with
+let rec has_if t = match t.t_node with
+  | Tif _ -> true
+  | _ -> t_any has_if ffalse t
+
+let rec elim_t contT t =
+  let contTl e = contT (t_label_copy t e) in
+  match t.t_node with
   | Tlet (t1,tb) ->
       let u,t2,close = t_open_bound_cb tb in
-      let cont_in t1 t2 = contT (t_let t1 (close u t2)) in
-      let cont_let t1 = elim_t ((u,t1)::letl) (cont_in t1) t2 in
-      elim_t letl cont_let t1
+      let cont_in t1 t2 = contTl (t_let t1 (close u t2)) in
+      let cont_let_t t1 = elim_t (cont_in t1) t2 in
+      let cont_let_f t1 = f_let_close u t1 (elim_t contT t2) in
+      elim_t (if has_if t2 then cont_let_f else cont_let_t) t1
   | Tif (f,t1,t2) ->
       let f = elim_f (fun f -> f) f in
-      let f = List.fold_left (fun f (v,t) -> f_let_close v t f) f letl in
-      f_if f (elim_t letl contT t1) (elim_t letl contT t2)
-  | Tcase _ ->
-      Printer.unsupportedTerm t
-        "cannot eliminate 'if-then-else' under 'match' in terms"
+      f_if f (elim_t contT t1) (elim_t contT t2)
+  | Tcase (t1, bl) ->
+      let bl = List.rev_map t_open_branch_cb bl in
+      let fi = List.exists (fun (_,t,_) -> has_if t) bl in
+      let fnB ctB (p,t,cl) = elim_t (fun t -> ctB (cl p t)) t in
+      let cont_with t1 bl = contTl (t_case t1 (List.rev bl)) in
+      let cont_case_t t1 = list_map_cont fnB (cont_with t1) bl in
+      let close (p,t,_) = f_close_branch p (elim_t contT t) in
+      let cont_case_f t1 = f_case t1 (List.rev_map close bl) in
+      elim_t (if fi then cont_case_f else cont_case_t) t1
   | _ ->
-      t_map_cont (elim_t letl) elim_f contT t
+      t_map_cont elim_t elim_f contT t
 
 and elim_f contF f = match f.f_node with
   | Fapp _ | Flet _ | Fcase _ ->
-      contF (f_map_cont (elim_t []) elim_f (fun f -> f) f)
+      contF (f_map_cont elim_t elim_f (fun f -> f) f)
   | _ -> f_map_cont elim_tr elim_f contF f
 
-(* the only terms we can still meet are the terms in triggers *)
+(* the only terms we still can meet are the terms in triggers *)
 and elim_tr contT t = match t.t_node with
   | Tif _ ->
       Printer.unsupportedTerm t
@@ -55,10 +67,6 @@ and elim_tr contT t = match t.t_node with
 let elim_f f = elim_f (fun f -> f) f
 
 let rec elim_t t = t_map elim_t elim_f t
-
-let rec has_if t = match t.t_node with
-  | Tif _ -> true
-  | _ -> t_any has_if ffalse t
 
 let add_ld axl d = match d with
   | _, None -> axl, d

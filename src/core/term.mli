@@ -417,6 +417,12 @@ val t_map_cont : ((term -> 'a) -> term -> 'a) ->
 val f_map_cont : ((term -> 'a) -> term -> 'a) ->
                  ((fmla -> 'a) -> fmla -> 'a) -> (fmla -> 'a) -> fmla -> 'a
 
+val e_map_cont : ((term -> 'a) -> term -> 'b) ->
+                 ((fmla -> 'a) -> fmla -> 'b) -> (expr -> 'a) -> expr -> 'b
+
+val list_map_cont : (('a -> 'b) -> 'c -> 'b) ->
+                    ('a list -> 'b) -> 'c list -> 'b
+
 (** simplification map *)
 val f_map_simp : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
 
