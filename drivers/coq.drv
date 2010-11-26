@@ -16,6 +16,8 @@ transformation "inline_trivial"
 transformation "eliminate_builtin"
 transformation "eliminate_recursion"
 
+transformation "eliminate_if"
+
 transformation "simplify_formula"
 transformation "simplify_trivial_quantification_in_goal"
 
@@ -197,12 +199,12 @@ theory real.Trigonometry
   prelude "Require Import Rtrigo."
   prelude "Require Import AltSeries. (* for def of pi *)"
 
-  syntax logic cos "(cos %1)"
-  syntax logic sin "(sin %1)"
+  syntax logic cos "(Rtrigo_def.cos %1)"
+  syntax logic sin "(Rtrigo_def.sin %1)"
 
   syntax logic pi "PI"
 
-  syntax logic tan "(tan %1)"
+  syntax logic tan "(Rtrigo.tan %1)"
   (* syntax logic atan "atan not defined in Coq ?" *)
 
 end
