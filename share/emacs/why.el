@@ -26,7 +26,8 @@
 
 (defconst why-font-lock-keywords-1
   (list
-   '("(\\*\\([^*)]\\([^*]\\|\\*[^)]\\)*\\)?\\*)" . font-lock-comment-face)
+   ;; Note: comment font-lock is guaranteed by suitable syntax entries
+   ;; '("(\\*\\([^*)]\\([^*]\\|\\*[^)]\\)*\\)?\\*)" . font-lock-comment-face)
    '("{\\([^}]*\\)}" . font-lock-type-face)
    `(,(why-regexp-opt '("use" "clone" "namespace" "import" "export" "inductive" "external" "logic" "parameter" "exception" "axiom" "lemma" "goal" "type")) . font-lock-builtin-face)
    `(,(why-regexp-opt '("and" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "invariant" "variant" "for" "to" "downto" "do" "done" "label" "assert" "absurd" "assume" "check" "ghost" "try" "with" "theory" "uses")) . font-lock-keyword-face)
@@ -52,7 +53,12 @@
     (setq why-mode-syntax-table (make-syntax-table))
     (set-syntax-table why-mode-syntax-table)
     (modify-syntax-entry ?' "w" why-mode-syntax-table)
-    (modify-syntax-entry ?_ "w" why-mode-syntax-table)))
+    (modify-syntax-entry ?_ "w" why-mode-syntax-table)
+    ; comments
+    (modify-syntax-entry ?\( ". 1" why-mode-syntax-table)
+    (modify-syntax-entry ?\) ". 4" why-mode-syntax-table)
+    (modify-syntax-entry ?* ". 23" why-mode-syntax-table)
+    ))
 
 ;; utility functions 
 
@@ -186,9 +192,15 @@
                             ))))))
         ;For the definition its very badly done...
           (if (looking-at "^[ \t]*$")
+	      ;; (save-excursion 
+	      ;; 	(forward-line -1)
+	      ;; 	(setq cur-indent (current-indentation))
+	      ;; 	(setq not-indented nil))
               (progn
                 (setq cur-indent 0)
                 (setq not-indented nil))
+	    (if (not
+		 (looking-at "^[ \t]*(\*.*"))
             (if (not 
                  (looking-at "^[ \t]*\\(logic\\|type\\|axiom\\|goal\\|lemma\\|inductive\\|use\\|theory\\|clone\\)"))
                 (save-excursion
@@ -203,7 +215,7 @@
                           "^[ \t]*\\(logic\\|type\\|axiom\\|goal\\|lemma\\|inductive\\)")
                          (setq cur-indent (+ (current-indentation) why-indent))
                        (setq cur-indent (current-indentation)))
-                     (setq not-indented nil))))))
+                     (setq not-indented nil)))))))
           ;For inside theory or namespace
           (save-excursion 
             (while not-indented
@@ -223,10 +235,7 @@
             (indent-line-to cur-indent)
           (indent-line-to 0)))))))
 
-
-
 ;; setting the mode
-
 (defun why-mode ()
   "Major mode for editing Why programs.
 
@@ -240,6 +249,8 @@
   ; indentation
   (make-local-variable 'indent-line-function)
   (setq indent-line-function 'why-indent-line)
+  ; OCaml style comments for comment-region, comment-dwim, etc.
+  (setq comment-start "(*" comment-end "*)")
   ; menu
   ; providing the mode
   (setq major-mode 'why-mode)
