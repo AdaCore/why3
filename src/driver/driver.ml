@@ -167,8 +167,8 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     drv_thprelude = !thprelude;
     drv_meta      = !meta;
     drv_meta_cl   = !meta_cl;
-    drv_regexps   = !regexps;
-    drv_exitcodes = !exitcodes;
+    drv_regexps   = List.rev !regexps;
+    drv_exitcodes = List.rev !exitcodes;
   }
 
 (** apply drivers *)
