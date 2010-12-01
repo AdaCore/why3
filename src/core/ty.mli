@@ -78,11 +78,16 @@ val create_tysymbol : preid -> tvsymbol list -> ty option -> tysymbol
 val ty_var : tvsymbol -> ty
 val ty_app : tysymbol -> ty list -> ty
 
+(** {3 generic traversal functions} *)
+(** traverse only one level of constructor, if you want full traversal
+    you need to call those function inside your function *)
 val ty_map : (ty -> ty) -> ty -> ty
 val ty_fold : ('a -> ty -> 'a) -> 'a -> ty -> 'a
 val ty_all : (ty -> bool) -> ty -> bool
 val ty_any : (ty -> bool) -> ty -> bool
 
+(** {3 symbol-wise map/fold} *)
+(** visites every symbol of the type} *)
 val ty_s_map : (tysymbol -> tysymbol) -> ty -> ty
 val ty_s_fold : ('a -> tysymbol -> 'a) -> 'a -> ty -> 'a
 val ty_s_all : (tysymbol -> bool) -> ty -> bool

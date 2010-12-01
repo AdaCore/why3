@@ -227,6 +227,7 @@ let find_tagged_ts t tds acc =
   Stdecl.fold (fun td acc -> match td.td_node with
     | Meta (s, MAts ts :: _) when meta_equal s t -> Sts.add ts acc
     | _ -> assert false) tds.tds_set acc
+(* TODO an exception instead of an assert false (wrong META used) *)
 
 let find_tagged_ls t tds acc =
   begin match t.meta_type with

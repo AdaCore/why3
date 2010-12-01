@@ -73,6 +73,8 @@ val meta_hash : meta -> int
 
 val register_meta      : string -> meta_arg_type list -> meta
 val register_meta_excl : string -> meta_arg_type list -> meta
+(** Register exclusive meta, each new setting remove the previous one.
+Useful for transformation or printer parameters *)
 
 val lookup_meta : string -> meta
 val list_metas  : unit -> meta list
