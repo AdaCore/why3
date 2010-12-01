@@ -49,6 +49,8 @@ val option_fold : ('b -> 'a -> 'b) -> 'b -> 'a option -> 'b
 (** [option_fold f d o] returns [d] if [o] is [None], and
     [f d x] if [o] is [Some x] *)
 
+val option_map2 : ('a -> 'b -> 'c) -> 'a option -> 'b option -> 'c option
+
 val option_eq : ('a -> 'b -> bool) -> 'a option -> 'b option -> bool
 
 val option_map_fold :
@@ -91,7 +93,10 @@ val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
 exception FoldSkip
 
 val all_fn : ('a -> bool) -> 'b -> 'a -> bool
+(* [all_fn pr b a] return true if pr is true on a, otherwise raise FoldSkip *)
 val any_fn : ('a -> bool) -> 'b -> 'a -> bool
+(* [all_fn pr b a] return false if pr is false on a,
+   otherwise raise FoldSkip *)
 
 val ffalse : 'a -> bool
 (** [ffalse] constant function [false] *)

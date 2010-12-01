@@ -47,6 +47,12 @@ let option_fold f d = function None -> d | Some x -> f d x
 
 let option_iter f = function None -> () | Some x -> f x
 
+let option_map2 f x y =
+  match x,y with
+    | None, None -> None
+    | Some x, Some y -> Some (f x y)
+    | _ -> failwith "option_map2 : None and Some at the same time"
+
 let option_eq eq a b = match a,b with
   | None, None -> true
   | None, _ | _, None -> false
