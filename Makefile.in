@@ -261,8 +261,8 @@ bin/why.byte: src/why.cma src/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
-src/main.cmo: src/why.cmo
-src/main.cmx: src/why.cmx
+src/main.cmo: src/why.cma
+src/main.cmx: src/why.cmxa
 
 clean::
 	rm -f src/main.cm[iox] src/main.annot src/main.o
@@ -632,6 +632,50 @@ testl-type: bin/whyml.byte
 test-api: src/why.cma
 	ocaml $(EXTCMA)	src/why.cma -I src examples/use_api.ml \
 	|| (printf "Test of Why API calls failed. Please fix it"; exit 2)
+
+
+## Examples : Plugins ##
+
+PLUGDIR = examples/plugins/
+PLUG_FILES = genequlin
+
+PLUGMODULES = $(addprefix $(PLUGDIR), $(PLUG_FILES))
+
+PLUGML  = $(addsuffix .ml,  $(PLUGMODULES))
+PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
+PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
+PLUGCMXS = $(addsuffix .cmxs, $(PLUGMODULES))
+
+# ifeq (@enable_plug_support@,yes)
+# byte: src/plug-plugin/whytac.cma
+# opt:  src/plug-plugin/whytac.cmxs
+# endif
+
+# $(PLUGCMO):  src/why.cma
+# $(PLUGCMXS): src/why.cmxa
+
+.PHONY: examples_plugins.byte examples_plugins.opt
+
+examples_plugins.byte : $(PLUGCMO)
+examples_plugins.opt : $(PLUGCMXS)
+
+# depend and clean targets
+
+ifeq (@enable_plugins@,yes)
+include .depend.plug
+
+.depend.plug: $(PLUGGENERATED)
+	$(OCAMLDEP) -slash -I src -I $(PLUGDIR) $(PLUGML) | sed "s/cmx/cmxs/" > $@
+
+depend: .depend.plug
+endif
+
+clean::
+	rm -f $(PLUGDIR)/*.cm[iox] $(PLUGDIR)/*.o
+	rm -f $(PLUGDIR)/*.cma $(PLUGDIR)/*.cmxs
+	rm -f $(PLUGDIR)/*.annot $(PLUGDIR)/*~
+	rm -f $(PLUGGENERATED)
+	rm -f .depend.plug
 
 ## install: install-binary install-lib install-man
 ##
