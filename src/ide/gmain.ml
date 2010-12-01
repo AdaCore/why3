@@ -155,6 +155,9 @@ let gconfig =
     Util.Mstr.fold (Gconfig.get_prover_data c.env) provers Util.Mstr.empty;
   c
 
+let () =
+  Whyconf.load_plugins (get_main ())
+
 
 (********************)
 (* opening database *)
