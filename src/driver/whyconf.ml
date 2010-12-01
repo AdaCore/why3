@@ -106,8 +106,9 @@ let load_plugins m =
   let dirs = [pluginsdir m] in
   let load x =
     try Plugin.load ~dirs x
-    with Plugin.Plugin_Not_Found _ as exn
-        -> Format.eprintf "%a@." Exn_printer.exn_printer exn in
+    with exn ->
+      Format.eprintf "%s can't be loaded : %a@." x
+        Exn_printer.exn_printer exn in
   List.iter load m.plugins
 
 type config = {

@@ -189,6 +189,7 @@ let option_list = Arg.align [
       "<flag> Set a debug flag" ]
 
 let () =
+  try
   Arg.parse option_list add_opt_file usage_msg;
 
   (** Debug flag *)
@@ -317,6 +318,9 @@ let () =
     add_meta task meta [MAstr s]
   in
   opt_task := List.fold_left add_meta !opt_task !opt_metas
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    eprintf "%a@." Exn_printer.exn_printer e;
+    exit 1
 
 let timelimit = match !opt_timelimit with
   | None -> 10

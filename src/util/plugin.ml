@@ -46,4 +46,6 @@ let () =
       | Plugin_Not_Found (pl,sl) ->
         Format.fprintf fmt "The plugin %s can't be found in the directories %a"
           pl (Pp.print_list Pp.space Pp.string) sl
+      | Dynlink.Error (error) ->
+        Format.fprintf fmt "Dynlink error : %s@." (Dynlink.error_message error)
       | _ -> raise exn)
