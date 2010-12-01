@@ -106,3 +106,11 @@ let call_asynchronous (f : unit -> 'a) =
             | _ -> raise (Bad_execution ps) in
         f
 
+let copy_file from to_ =
+  let cin = open_in from in
+  let cout = open_out to_ in
+  let buff = String.make 1024 ' ' in
+  let n = ref 0 in
+  while n := input cin buff 0 1024; !n <> 0 do
+    output cout buff 0 !n
+  done

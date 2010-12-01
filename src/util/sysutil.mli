@@ -55,3 +55,6 @@ val call_asynchronous : (unit -> 'a) -> (unit -> 'a)
    it is not as bad as it can be in 3.11.0 :
    http://caml.inria.fr/mantis/view.php?id=4577
 *)
+
+val copy_file : string -> string -> unit
+(** [copy_file from to] copy the file from [from] to [to] *) 

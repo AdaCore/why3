@@ -191,8 +191,31 @@ let option_list = Arg.align [
 let () =
   Arg.parse option_list add_opt_file usage_msg;
 
-  (* TODO? : Since drivers can dynlink ml code they can add printer,
-     transformations, ... So drivers should be loaded before listing *)
+  (** Debug flag *)
+  if !opt_debug_all then begin
+    List.iter (fun (_,f,_) -> Debug.set_flag f) (Debug.list_flags ());
+    Debug.unset_flag Typing.debug_parse_only;
+    Debug.unset_flag Typing.debug_type_only
+  end;
+
+  List.iter (fun s -> Debug.set_flag (Debug.lookup_flag s)) !opt_debug;
+
+  if !opt_parse_only then Debug.set_flag Typing.debug_parse_only;
+  if !opt_type_only then Debug.set_flag Typing.debug_type_only;
+
+  (** Configuration *)
+  let config = try read_config !opt_config with Not_found ->
+    option_iter (eprintf "Config file '%s' not found.@.") !opt_config;
+    option_iter
+      (eprintf "No config file found (required by '-P %s').@.") !opt_prover;
+    exit 1;
+  in
+
+  let main = get_main config in
+  Whyconf.load_plugins main;
+
+  (** listings*)
+
   let opt_list = ref false in
   if !opt_list_transforms then begin
     opt_list := true;
@@ -276,25 +299,6 @@ let () =
       opt_print_theory := true
   end;
 
-  if !opt_debug_all then begin
-    List.iter (fun (_,f,_) -> Debug.set_flag f) (Debug.list_flags ());
-    Debug.unset_flag Typing.debug_parse_only;
-    Debug.unset_flag Typing.debug_type_only
-  end;
-
-  List.iter (fun s -> Debug.set_flag (Debug.lookup_flag s)) !opt_debug;
-
-  if !opt_parse_only then Debug.set_flag Typing.debug_parse_only;
-  if !opt_type_only then Debug.set_flag Typing.debug_type_only;
-
-  let config = try read_config !opt_config with Not_found ->
-    option_iter (eprintf "Config file '%s' not found.@.") !opt_config;
-    option_iter
-      (eprintf "No config file found (required by '-P %s').@.") !opt_prover;
-    exit 1;
-  in
-
-  let main = get_main config in
   opt_loadpath := List.rev_append !opt_loadpath (Whyconf.loadpath main);
   if !opt_timelimit = None then opt_timelimit := Some (Whyconf.timelimit main);
   if !opt_memlimit  = None then opt_memlimit  := Some (Whyconf.memlimit main);

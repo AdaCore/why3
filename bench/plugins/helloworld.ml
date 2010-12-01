@@ -19,10 +19,10 @@
 
 open Why
 
-let print_context _ fmt _ = Format.fprintf fmt "helloworld@\n"
+let print_context _ _ _ ?old:_ fmt _ = Format.fprintf fmt "helloworld@\n"
 
-let transform_context = Register.identity
+let transform_context = Trans.identity
 
-let () = 
-  Driver.register_printer "helloworld" print_context;
-  Driver.register_transform "helloworld" transform_context
+let () =
+  Printer.register_printer "helloworld" print_context;
+  Trans.register_transform "helloworld" transform_context

@@ -113,7 +113,7 @@ LIBGENERATED = src/util/rc.ml src/parser/lexer.ml \
 	       src/driver/driver_lexer.ml
 
 LIB_UTIL = stdlib exn_printer debug pp loc print_tree \
-	   hashweak hashcons util sysutil rc
+	   hashweak hashcons util sysutil rc plugin
 
 LIB_CORE = ident ty term pattern decl theory task pretty env printer trans
 
@@ -574,7 +574,7 @@ install_no_local::
 # bench
 ########
 
-.PHONY: bench test
+.PHONY: bench test comp_bench_plugins
 
 bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@ $(TOOLS) $(DRIVERS) test-api
 	sh bench/bench \
@@ -585,11 +585,13 @@ BENCH_PLUGINS_CMO := helloworld.cmo
 BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))
 BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
 
-bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) byte $(TOOLS)
-	bin/why.byte -D bench/plugins/helloworld.drv \
-	tests/test-jcf.why -T Test -G G
-	bin/why.$(OCAMLBEST) -D bench/plugins/helloworld.drv  \
-	tests/test-jcf.why -T Test -G G
+comp_bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS)
+
+# bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) byte $(TOOLS)
+# 	bin/why.byte -D bench/plugins/helloworld.drv \
+# 	tests/test-jcf.why -T Test -G G
+# 	bin/why.$(OCAMLBEST) -D bench/plugins/helloworld.drv  \
+# 	tests/test-jcf.why -T Test -G G
 
 ###############
 # test targets

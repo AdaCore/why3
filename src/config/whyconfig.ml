@@ -34,6 +34,10 @@ let auto = ref false
 
 let set_oref r = (fun s -> r := Some s)
 
+let plugins = Queue.create ()
+
+let add_plugin x = Queue.add x plugins
+
 let option_list = Arg.align [
   (* "--libdir", Arg.String (set_oref libdir), *)
   (* "<dir> set the lib directory ($WHY3LIB)"; *)
@@ -43,9 +47,25 @@ let option_list = Arg.align [
   "<file> use this configuration file, create it if it doesn't exist
 ($WHY_CONFIG), otherwise use the default one";
   "--autodetect-provers", Arg.Set auto,
-  " autodetect the provers in the $PATH"]
+  " autodetect the provers in the $PATH";
+  "--install-plugin", Arg.String add_plugin,
+  "install a plugin to the actual libdir";
+]
 
 let anon_file _ = Arg.usage option_list usage_msg; exit 1
+
+let install_plugin main p =
+  begin match Plugin.check_extension p with
+    | Plugin.Extbad -> eprintf "Unknown extension (.cmo|.cmxs) : %s@." p;exit 1
+    | Plugin.Extother ->
+      eprintf "This plugin %s will not be used with this kind of compilation@."
+        p
+    | Plugin.Extgood -> ()
+  end;
+  let base = Filename.basename p in
+  let pluginsdir = Whyconf.pluginsdir main in
+  Sysutil.copy_file p (Filename.concat pluginsdir base);
+  Whyconf.add_plugin main (Filename.chop_extension base)
 
 let () =
   Arg.parse option_list anon_file usage_msg;
@@ -61,6 +81,7 @@ let () =
      !libdir in *)
   (* let main = option_apply main (fun d -> {main with datadir = d})
      !datadir in *)
+  let main = Queue.fold install_plugin main plugins in
   let config = set_main config main in
   let conf_file = get_conf_file config in
   let conf_file_doesnt_exist = not (Sys.file_exists conf_file) in

@@ -38,6 +38,11 @@ val timelimit: main -> int
 val memlimit: main -> int
 val running_provers_max: main -> int
 val set_limits: main -> int -> int -> int -> main
+val plugins : main -> string list
+val pluginsdir : main -> string
+val set_plugins : main -> string list -> main
+val add_plugin : main -> string -> main
+val load_plugins : main -> unit
 
 type config
 (** A configuration linked to an rc file. Whyconf gives access to

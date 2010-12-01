@@ -57,6 +57,9 @@ type main = {
   (* default prover memory limit in megabytes (0 unlimited)*)
   running_provers_max : int;
   (* max number of running prover processes *)
+  plugins : string list;
+  (* plugins to load, without extension, relative to 
+     [private_libdir]/plugins *)
 }
 
 let libdir m =
@@ -89,6 +92,24 @@ let running_provers_max m = m.running_provers_max
 let set_limits m time mem running =
   { m with timelimit = time; memlimit = mem; running_provers_max = running }
 
+let plugins m = m.plugins
+let set_plugins m pl =
+  (* TODO : sanitize? *)
+  { m with plugins = pl}
+let add_plugin m p =
+  if List.mem p m.plugins
+  then m
+  else { m with plugins = List.rev (p::(List.rev m.plugins))}
+
+let pluginsdir m = Filename.concat m.private_libdir "plugins"
+let load_plugins m =
+  let dirs = [pluginsdir m] in
+  let load x =
+    try Plugin.load ~dirs x
+    with Plugin.Plugin_Not_Found _ as exn
+        -> Format.eprintf "%a@." Exn_printer.exn_printer exn in
+  List.iter load m.plugins
+
 type config = {
   conf_file : string;       (* "/home/innocent_user/.why.conf" *)
   config    : Rc.t  ;
@@ -104,6 +125,7 @@ let default_main =
     timelimit = 10;
     memlimit = 0;
     running_provers_max = 2;
+    plugins = [];
   }
 
 let set_main rc main =
@@ -115,6 +137,7 @@ let set_main rc main =
   let section = set_int section "memlimit" main.memlimit in
   let section =
     set_int section "running_provers_max" main.running_provers_max in
+  let section = set_stringl section "plugin" main.plugins in
   set_section rc "main" section
 
 let set_prover id prover family =
@@ -158,6 +181,7 @@ let load_main dirname section =
     running_provers_max =
       get_int ~default:default_main.running_provers_max section
         "running_provers_max";
+    plugins = get_stringl ~default:[] section "plugin";
   }
 
 
