@@ -40,19 +40,24 @@ let init_tenv = {
 
 
 (* Convert type *)
+let conv_ts tenv undefined name ty =
+  let ts =
+    try
+      Hty.find tenv.specials ty
+    with Not_found ->
+      let ts = create_tysymbol (id_dup name) [] None in
+      Hty.add tenv.specials ty ts;
+      ts in
+  Hts.replace undefined ts ();
+  ts
+
+
 let conv_ty tenv undefined ty =
   match ty.ty_node with
     | Tyapp (_,[]) -> ty
     | Tyapp (ts,_) ->
-        let ts =
-          try
-            Hty.find tenv.specials ty
-          with Not_found ->
-            let ts = create_tysymbol (id_dup ts.ts_name) [] None in
-            Hty.add tenv.specials ty ts;
-            ts in
-        Hts.replace undefined ts ();
-        ty_app ts []
+      let ts = conv_ts tenv undefined ts.ts_name ty in
+      ty_app ts []
     | _ -> Printer.unsupportedType ty "type variable must be encoded"
 
 (* Convert a variable *)
@@ -125,38 +130,58 @@ and rewrite_fmla tenv ud vm f =
       Printer.unsupportedFmla f "unsupported formula"
   | _ -> f_map (fnT vm) (fnF vm) f
 
-let decl_ud ud acc =
-  let add ts () acc = (create_ty_decl [ts,Tabstract])::acc in
-  Hts.fold add ud acc
+let decl_ud ud task =
+  let add ts () task = add_ty_decl task [ts,Tabstract] in
+  Hts.fold add ud task
 
-let decl tenv d =
+let fold tenv taskpre task =
   let fnT = rewrite_term tenv in
   let fnF = rewrite_fmla tenv in
-  match d.d_node with
-  | Dtype dl ->
-      let add acc = function
-        | ({ts_def = Some _} | {ts_args = _::_}), Tabstract -> acc
-        | _, Tabstract as d -> d::acc
-        | _ -> Printer.unsupportedDecl d "use eliminate_algebraic"
-      in
-      let l = List.rev (List.fold_left add [] dl) in
-      if l = [] then [] else [create_ty_decl l]
-  | Dlogic ll ->
-    let ud = Hts.create 3 in
-    let conv = function
-      | ls, None -> create_logic_decl [conv_ls tenv ud ls, None]
-      | _ -> Printer.unsupportedDecl d "use eliminate_definition"
-    in
-    decl_ud ud (List.map conv ll)
-  | Dind _ ->
-      Printer.unsupportedDecl d "use eliminate_inductive"
-  | Dprop _ ->
-    let ud = Hts.create 3 in
-    decl_ud ud [decl_map (fnT ud Mvs.empty) (fnF ud Mvs.empty) d]
-
+  match taskpre.task_decl.td_node with
+    | Decl d ->
+      begin match d.d_node with
+        | Dtype dl ->
+          let add acc = function
+            | ({ts_def = Some _} | {ts_args = _::_}), Tabstract -> acc
+            | _, Tabstract as d -> d::acc
+            | _ -> Printer.unsupportedDecl d "use eliminate_algebraic"
+          in
+          let l = List.rev (List.fold_left add [] dl) in
+          if l = [] then task else add_ty_decl task l
+        | Dlogic ll ->
+          let ud = Hts.create 3 in
+          let conv = function
+            | ls, None -> conv_ls tenv ud ls, None
+            | _ -> Printer.unsupportedDecl d "use eliminate_definition"
+          in
+          decl_ud ud (add_logic_decl task (List.map conv ll))
+        | Dind _ ->
+          Printer.unsupportedDecl d "use eliminate_inductive"
+        | Dprop _ ->
+          let ud = Hts.create 3 in
+          decl_ud ud (add_decl task
+                        (decl_map (fnT ud Mvs.empty) (fnF ud Mvs.empty) d))
+      end
+    | Meta(meta,ml) ->
+      begin try
+        let ud = Hts.create 3 in
+        let map = function
+          | MAts {ts_name = name; ts_args = []; ts_def = Some ty} ->
+            MAts (conv_ts tenv ud name ty)
+          | MAts _ -> raise Exit
+          | MAls ls -> MAls (conv_ls tenv ud ls)
+          | MApr _ -> raise Exit
+          | MAstr _ as s -> s
+          | MAint _ as i -> i in
+        decl_ud ud (add_meta task meta (List.map map ml))
+      with
+        | Printer.UnsupportedType _
+        | Exit -> add_tdecl task taskpre.task_decl
+      end
+    | _ -> add_tdecl task taskpre.task_decl
 let t =
   let tenv = init_tenv in
-  Trans.decl (decl tenv) None
+  Trans.fold (fold tenv) None
 
 let () = Trans.register_transform "encoding_sort" t
 
