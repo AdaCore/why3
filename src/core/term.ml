@@ -1896,3 +1896,33 @@ let f_map_simp fnT fnF f = f_label_copy f (match f.f_node with
 
 let f_map_simp fnT = f_map_simp (protect fnT)
 
+(** Proposition of another fold *)
+(* Type in terms and formulae *)
+let rec t_fold_ty fty s t =
+  let s = t_fold_unsafe (t_fold_ty fty) (f_fold_ty fty) s t in
+  let s = fty s t.t_ty in
+  match t.t_node with
+    | Teps fb ->
+      let vs,_,_ = fb in
+      fty s vs.vs_ty
+    | _ -> s
+
+and f_fold_ty fty s f =
+  let s = f_fold_unsafe (t_fold_ty fty) (f_fold_ty fty) s f in
+  match f.f_node with
+    | Fquant (_,fq) ->
+      let (vsl,_,_,_) = fq in
+      List.fold_left (fun s vs -> fty s vs.vs_ty) s vsl
+    | _ -> s
+
+let rec t_fold_sig fty s t =
+  let s = t_fold_unsafe (t_fold_sig fty) (f_fold_sig fty) s t in
+  match t.t_node with
+    | Tapp (fs,tl) -> fty s fs (List.map (fun t -> t.t_ty) tl)
+    | _ -> s
+
+and f_fold_sig fty s f =
+  let s = f_fold_unsafe (t_fold_sig fty) (f_fold_sig fty) s f in
+  match f.f_node with
+    | Fapp (fs,tl) -> fty s fs (List.map (fun t -> t.t_ty) tl)
+    | _ -> s

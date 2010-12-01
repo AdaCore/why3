@@ -506,3 +506,9 @@ exception NoMatch
 val t_match : term Mvs.t -> term -> term -> term Mvs.t
 val f_match : term Mvs.t -> fmla -> fmla -> term Mvs.t
 
+(** Proposition of another fold *)
+val t_fold_ty : ('a -> ty -> 'a) -> 'a -> term -> 'a
+val f_fold_ty : ('a -> ty -> 'a) -> 'a -> fmla -> 'a
+
+val t_fold_sig : ('a -> lsymbol -> ty list -> 'a) -> 'a -> term -> 'a
+val f_fold_sig : ('a -> lsymbol -> ty list -> 'a) -> 'a -> fmla -> 'a
