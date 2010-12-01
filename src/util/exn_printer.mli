@@ -18,8 +18,13 @@
 (**************************************************************************)
 
 type exn_printer = Format.formatter -> exn -> unit
+(* an [exn_printer] is a formatter of exception which prints on the
+   given formatter a message for the user if it knows the given
+   exception. Otherwise it raises the exception *)
 
 val register : exn_printer -> unit
+(* Register a formatter of exception *)
 
 val exn_printer : exn_printer
-(* exn_printer fmt exn : print the exception and return *)
+(* exn_printer fmt exn : print the exception using all the previously
+   registered printer and return *)

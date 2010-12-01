@@ -110,7 +110,7 @@ val get_intl : ?default:int list -> section -> string -> int list
     @raise Bad_value_type if the value associated to [key] is not of
     type {!int}
 
-    @raise Key_not_found if default is not given and no values are
+    @raise MissingField if default is not given and no values are
     associated to [key]
 *)
 
