@@ -57,10 +57,10 @@ let queue_condition = Condition.create ()
 
 let event_handler () =
   Mutex.lock queue_lock;
-  while 
-    Queue.is_empty transf_queue && 
-      Queue.is_empty answers_queue && 
-      Queue.is_empty proof_edition_queue && 
+  while
+    Queue.is_empty transf_queue &&
+      Queue.is_empty answers_queue &&
+      Queue.is_empty proof_edition_queue &&
       (Queue.is_empty prover_attempts_queue ||
          !running_proofs >= !maximum_running_proofs)
   do
@@ -73,7 +73,8 @@ let event_handler () =
           decr running_proofs;
           Mutex.unlock queue_lock;
           (*
-            eprintf "[Why thread] Scheduler.event_handler: got prover answer@.";
+            eprintf
+            "[Why thread] Scheduler.event_handler: got prover answer@.";
           *)
           (* call GUI callback with argument [res] *)
           !async (fun () -> callback res time output) ()
@@ -96,7 +97,8 @@ let event_handler () =
     with Queue.Empty ->
     try
       (* priority 3: edit proofs *)
-      let (_debug,editor,file,driver,callback,goal) = Queue.pop proof_edition_queue in
+      let (_debug,editor,file,driver,callback,goal) =
+        Queue.pop proof_edition_queue in
       Mutex.unlock queue_lock;
       let backup = file ^ ".bak" in
       let old =
@@ -113,8 +115,8 @@ let event_handler () =
       Driver.print_task ?old driver fmt goal;
       Util.option_iter close_in old;
       close_out ch;
-      let (_ : Thread.t) = Thread.create 
-        (fun () -> 
+      let (_ : Thread.t) = Thread.create
+        (fun () ->
            let _ = Sys.command(editor ^ " " ^ file) in
            Mutex.lock queue_lock;
            Queue.push (Editor_exited callback) answers_queue ;
@@ -124,41 +126,41 @@ let event_handler () =
       in ()
     with Queue.Empty ->
       (* priority low: start new external proof attempt *)
-      (* since answers_queue and transf_queue are empty, 
+      (* since answers_queue and transf_queue are empty,
          we are sure that both
          prover_attempts_queue is non empty and
          running_proofs < maximum_running_proofs
       *)
       try
         let (_debug,timelimit,memlimit,old,command,driver,callback,goal) =
-          Queue.pop prover_attempts_queue 
+          Queue.pop prover_attempts_queue
         in
         incr running_proofs;
         Mutex.unlock queue_lock;
         (* build the prover task from goal in [a] *)
         !async (fun () -> callback Running 0.0 "") ();
         try
-          let call_prover : unit -> Call_provers.prover_result = 
+          let call_prover : unit -> Call_provers.prover_result =
 (*
-            if debug then 
-              Format.eprintf "Task for prover: %a@." 
+            if debug then
+              Format.eprintf "Task for prover: %a@."
                 (Driver.print_task driver) goal;
 *)
             Driver.prove_task ?old ~command ~timelimit ~memlimit driver goal
           in
-          let (_ : Thread.t) = Thread.create 
-            (fun () -> 
+          let (_ : Thread.t) = Thread.create
+            (fun () ->
                let r = call_prover () in
                Mutex.lock queue_lock;
                let res =
                  match r.Call_provers.pr_answer with
-                   | Call_provers.Valid -> Success         
+                   | Call_provers.Valid -> Success
                    | Call_provers.Timeout -> Timeout
                    | Call_provers.Invalid | Call_provers.Unknown _ -> Unknown
-                   | Call_provers.Failure _ | Call_provers.HighFailure 
+                   | Call_provers.Failure _ | Call_provers.HighFailure
                        -> HighFailure
                in
-               Queue.push 
+               Queue.push
                  (Prover_answer (callback,res,r.Call_provers.pr_time,
                                  r.Call_provers.pr_output)) answers_queue ;
                Condition.signal queue_condition;
@@ -171,13 +173,13 @@ let event_handler () =
           | e ->
             eprintf "%a@." Exn_printer.exn_printer e;
             Mutex.lock queue_lock;
-            Queue.push 
+            Queue.push
               (Prover_answer (callback, HighFailure,0.0,
                               "Prover call failed")) answers_queue ;
             (* Condition.signal queue_condition; *)
             Mutex.unlock queue_lock;
             ()
-     with Queue.Empty -> 
+     with Queue.Empty ->
         eprintf "Scheduler.event_handler: unexpected empty queues@.";
         assert false
 
@@ -185,7 +187,7 @@ let event_handler () =
 (***** start of the scheduler thread ****)
 
 let (_scheduler_thread : Thread.t) =
-  Thread.create 
+  Thread.create
     (fun () ->
        try
          (* loop forever *)
@@ -194,7 +196,7 @@ let (_scheduler_thread : Thread.t) =
          done;
          assert false
        with
-           e -> 
+           e ->
              eprintf "Scheduler thread stopped unexpectedly@.";
              raise e)
     ()
