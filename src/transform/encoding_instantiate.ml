@@ -352,24 +352,6 @@ let conv_to_tty env ts tyl proj_ty =
   else let args = ty_args_from_tty tyl in
 *)
 
-
-(* Free type in terms and formulae *)
-let rec t_fold_ty fty s t =
-  let s = t_fold (t_fold_ty fty) (f_fold_ty fty) s t in
-  let s = fty s t.t_ty in
-  match t.t_node with
-    | Teps fb ->
-      let vs,_ = f_open_bound fb in
-      fty s vs.vs_ty
-    | _ -> s
-and f_fold_ty fty s f =
-  let s = f_fold (t_fold_ty fty) (f_fold_ty fty) s f in
-  match f.f_node with
-    | Fquant (_,fq) ->
-      let (vsl,_,_) = f_open_quant fq in
-      List.fold_left (fun s vs -> fty s vs.vs_ty) s vsl
-    | _ -> s
-
 let ty_quant =
   let rec add_vs s ty = match ty.ty_node with
     | Tyvar vs -> Stv.add vs s
@@ -533,7 +515,7 @@ let create_meta_ty ty =
   let ts = create_tysymbol name [] (Some ty) in
   (create_meta meta_kept [MAts ts])
 
- (* Weak table is useless since ty is in ts *)
+
 let create_meta_ty = Wty.memoize 17 create_meta_ty
 
 let create_meta_tyl sty d =
@@ -573,3 +555,54 @@ let () =
       "goal", mono_in_goal;
       "mono", mono_in_mono;
       "all", mono_in_def]
+
+
+(* Select array *)
+let meta_kept_array = register_meta "encoding : kept_array" [MTtysymbol]
+
+(* select the type array which appear as argument of set and get.
+  set and get must be in sls *)
+let find_mono_array ~only_mono sls sty f =
+  let add sty ls tyl =
+    match tyl with
+      | ty::_ when Sls.mem ls sls && is_ty_mono ~only_mono ty ->
+        Sty.add ty sty
+      | _ -> sty in
+  f_fold_sig add sty f
+
+let create_meta_ty ty =
+  let name = id_fresh "meta_ty" in
+  let ts = create_tysymbol name [] (Some ty) in
+  (create_meta meta_kept_array [MAts ts])
+
+let create_meta_ty = Wty.memoize 17 create_meta_ty
+
+let create_meta_tyl sty d =
+  Sty.fold (flip $ cons create_meta_ty) sty [create_decl d]
+
+let mono_in_goal sls pr f =
+  let sty = (try find_mono_array ~only_mono:true sls Sty.empty f
+    with Exit -> assert false) (*monomorphise goal should have been used*) in
+   create_meta_tyl sty (create_prop_decl Pgoal pr f)
+
+let mono_in_goal sls = Trans.tgoal (mono_in_goal sls)
+
+let trans_array th_array =
+  let set = ns_find_ls th_array.th_export ["set"] in
+  let get = ns_find_ls th_array.th_export ["get"] in
+  let sls = Sls.add set (Sls.add get Sls.empty) in
+  mono_in_goal sls
+
+let trans_array env =
+  let th_array = Env.find_theory env ["array"] "Array" in
+  Trans.on_used_theory th_array (fun used ->
+    if not used then Trans.identity else trans_array th_array)
+
+let () = Trans.register_env_transform "use_builtin_array" trans_array
+
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. byte"
+End:
+*)

@@ -25,10 +25,17 @@ open Ident
 open Ty
 open Term
 open Decl
+open Theory
 open Task
 open Printer
 
-let ident_printer = 
+(** Options of this printer *)
+let use_trigger = Theory.register_meta_excl "Smt : trigger" []
+let use_builtin_array = Theory.register_meta_excl "Smt : builtin array" []
+
+(** *)
+
+let ident_printer =
   let bls = ["and";" benchmark";" distinct";"exists";"false";"flet";"forall";
      "if then else";"iff";"implies";"ite";"let";"logic";"not";"or";
      "sat";"theory";"true";"unknown";"unsat";"xor";
@@ -52,6 +59,8 @@ let print_var fmt {vs_name = id} =
 type info = {
   info_syn : string Mid.t;
   info_rem : Sid.t;
+  use_trigger : bool;
+  barrays : (ty*ty) Mts.t;
 }
 
 let rec print_type info fmt ty = match ty.ty_node with
@@ -155,7 +164,13 @@ let print_logic_binder info fmt v =
 let print_type_decl info fmt = function
   | ts, Tabstract when Sid.mem ts.ts_name info.info_rem -> false
   | ts, Tabstract when ts.ts_args = [] ->
-      fprintf fmt ":extrasorts (%a)" print_ident ts.ts_name; true
+    begin try
+      let key,elt = Mts.find ts info.barrays in
+      fprintf fmt ":define_sorts ((%a  (array %a %a)))"
+        print_ident ts.ts_name
+        (print_type info) key (print_type info) elt; true
+    with Not_found ->
+      fprintf fmt ":extrasorts (%a)" print_ident ts.ts_name; true end
   | _, Tabstract -> unsupported 
           "smtv1 : type with argument are not supported"
   | _, Talgebraic _ -> unsupported 
@@ -205,6 +220,21 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
+let barrays task =
+  let sds = find_meta task Encoding_arrays.meta_mono_array in
+  let fold tdecl barrays =
+    match tdecl.td_node with
+      | Meta (_,[MAts tst;MAts tsk;MAts tse]) ->
+        let extract_ty ts =
+          if ts.ts_args <> [] then
+            unsupported "smtv1 : type with argument are not supported";
+          match ts.ts_def with
+            | Some ty -> ty
+            | None -> ty_app ts [] in
+        Mts.add tst (extract_ty tsk,extract_ty tse) barrays
+      | _ -> barrays in
+  Stdecl.fold fold sds.tds_set Mts.empty
+
 let print_task pr thpr fmt task =
   fprintf fmt "(benchmark why3@\n" 
     (*print_ident (Task.task_goal task).pr_name*);
@@ -213,7 +243,10 @@ let print_task pr thpr fmt task =
   print_th_prelude task fmt thpr;
   let info = {
     info_syn = get_syntax_map task;
-    info_rem = get_remove_set task }
+    info_rem = get_remove_set task;
+    use_trigger = false;
+    barrays = barrays task;
+  }
   in
   let decls = Task.task_decls task in
   ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls);

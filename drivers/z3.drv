@@ -20,6 +20,8 @@ transformation "eliminate_algebraic"
 transformation "simplify_formula"
 transformation "simplify_trivial_quantification"
 
+transformation "encoding_array"
+
 transformation "encoding_smt"
 transformation "encoding_sort"
 
@@ -127,6 +129,11 @@ theory int.EuclideanDivision
    remove prop Div_mod
    remove prop Mod_1
    remove prop Div_1
+end
+
+theory transform.array.Array
+   syntax logic get "(select %1 %2)"
+   syntax logic get "(store %1 %2)"
 end
 
 (*
