@@ -1896,33 +1896,32 @@ let f_map_simp fnT fnF f = f_label_copy f (match f.f_node with
 
 let f_map_simp fnT = f_map_simp (protect fnT)
 
-(** Proposition of another fold *)
-(* Type in terms and formulae *)
-let rec t_fold_ty fty s t =
-  let s = t_fold_unsafe (t_fold_ty fty) (f_fold_ty fty) s t in
-  let s = fty s t.t_ty in
+(* Fold over types in terms and formulas *)
+
+let rec t_fold_ty fty acc t =
+  let acc = t_fold_unsafe (t_fold_ty fty) (f_fold_ty fty) acc t in
+  let acc = fty acc t.t_ty in
   match t.t_node with
-    | Teps fb ->
-      let vs,_,_ = fb in
-      fty s vs.vs_ty
-    | _ -> s
+    | Teps (vs,_,_) -> fty acc vs.vs_ty
+    | _ -> acc
 
-and f_fold_ty fty s f =
-  let s = f_fold_unsafe (t_fold_ty fty) (f_fold_ty fty) s f in
+and f_fold_ty fty acc f =
+  let acc = f_fold_unsafe (t_fold_ty fty) (f_fold_ty fty) acc f in
   match f.f_node with
-    | Fquant (_,fq) ->
-      let (vsl,_,_,_) = fq in
-      List.fold_left (fun s vs -> fty s vs.vs_ty) s vsl
-    | _ -> s
+    | Fquant (_,(vsl,_,_,_)) ->
+        List.fold_left (fun acc vs -> fty acc vs.vs_ty) acc vsl
+    | _ -> acc
 
-let rec t_fold_sig fty s t =
-  let s = t_fold_unsafe (t_fold_sig fty) (f_fold_sig fty) s t in
+(* Fold over EXACTLY WHAT? in terms and formulas *)
+
+let rec t_fold_sig fty acc t =
+  let acc = t_fold_unsafe (t_fold_sig fty) (f_fold_sig fty) acc t in
   match t.t_node with
-    | Tapp (fs,tl) -> fty s fs (List.map (fun t -> t.t_ty) tl)
-    | _ -> s
+    | Tapp (fs,tl) -> fty acc fs (List.map (fun t -> t.t_ty) tl)
+    | _ -> acc
 
-and f_fold_sig fty s f =
-  let s = f_fold_unsafe (t_fold_sig fty) (f_fold_sig fty) s f in
+and f_fold_sig fty acc f =
+  let acc = f_fold_unsafe (t_fold_sig fty) (f_fold_sig fty) acc f in
   match f.f_node with
-    | Fapp (fs,tl) -> fty s fs (List.map (fun t -> t.t_ty) tl)
-    | _ -> s
+    | Fapp (fs,tl) -> fty acc fs (List.map (fun t -> t.t_ty) tl)
+    | _ -> acc

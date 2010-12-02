@@ -13,7 +13,6 @@ val load : ?dirs:string list -> plugin -> unit
    plugin named [plugin]. It add the extension .cmo or .cmxs to the
    filename according to the compilation used for the main program *)
 
-
 type plu =
   (* not a plugin extension *)
   | Plubad

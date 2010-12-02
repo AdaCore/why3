@@ -424,6 +424,7 @@ val list_map_cont : (('a -> 'b) -> 'c -> 'b) ->
                     ('a list -> 'b) -> 'c list -> 'b
 
 (** simplification map *)
+
 val f_map_simp : (term -> term) -> (fmla -> fmla) -> fmla -> fmla
 
 (** map/fold over free variables *)
@@ -472,6 +473,7 @@ val f_ty_freevars : Stv.t -> fmla -> Stv.t
 
 val t_equal_alpha : term -> term -> bool
 val f_equal_alpha : fmla -> fmla -> bool
+
 module Hterm_alpha : Hashtbl.S with type key = term
 module Hfmla_alpha : Hashtbl.S with type key = fmla
 
@@ -506,7 +508,8 @@ exception NoMatch
 val t_match : term Mvs.t -> term -> term -> term Mvs.t
 val f_match : term Mvs.t -> fmla -> fmla -> term Mvs.t
 
-(** Proposition of another fold *)
+(** fold over types in terms and formulas *)
+
 val t_fold_ty : ('a -> ty -> 'a) -> 'a -> term -> 'a
 val f_fold_ty : ('a -> ty -> 'a) -> 'a -> fmla -> 'a
 

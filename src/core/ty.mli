@@ -87,7 +87,7 @@ val ty_all : (ty -> bool) -> ty -> bool
 val ty_any : (ty -> bool) -> ty -> bool
 
 (** {3 symbol-wise map/fold} *)
-(** visites every symbol of the type} *)
+(** visits every symbol of the type} *)
 val ty_s_map : (tysymbol -> tysymbol) -> ty -> ty
 val ty_s_fold : ('a -> tysymbol -> 'a) -> 'a -> ty -> 'a
 val ty_s_all : (tysymbol -> bool) -> ty -> bool
