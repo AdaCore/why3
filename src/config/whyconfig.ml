@@ -33,6 +33,8 @@ let conf_file = ref None
 let autoprovers = ref false
 let autoplugins = ref false
 
+let save = ref true
+
 let set_oref r = (fun s -> r := Some s)
 
 let plugins = Queue.create ()
@@ -53,6 +55,8 @@ let option_list = Arg.align [
   " autodetect the plugins in the default library directories";
   "--install-plugin", Arg.String add_plugin,
   "install a plugin to the actual libdir";
+  "--dont-save", Arg.Clear save,
+  "dont modify the config file"
 ]
 
 let anon_file _ = Arg.usage option_list usage_msg; exit 1
@@ -118,5 +122,6 @@ let () =
     if !autoplugins || conf_file_doesnt_exist
     then plugins_auto_detection config
     else config in
-  printf "Save config to %s@." conf_file;
-  save_config config
+  if !save then begin
+    printf "Save config to %s@." conf_file;
+    save_config config end
