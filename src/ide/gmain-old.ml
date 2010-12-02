@@ -19,7 +19,7 @@
 
 open Format
 
-let () = 
+let () =
   eprintf "Init the GTK interface...@?";
   ignore (GtkMain.Main.init ());
   eprintf " done.@."
@@ -42,44 +42,44 @@ let spec = Arg.align [
 let usage_str = "whyide [options] <file>.why"
 let file = ref None
 let set_file f = match !file with
-  | Some _ -> 
+  | Some _ ->
       raise (Arg.Bad "only one file")
-  | None -> 
+  | None ->
       if not (Sys.file_exists f) then begin
-	Format.eprintf "%s: no such file@." f; 
+	Format.eprintf "%s: no such file@." f;
         exit 1
       end;
       file := Some f
 
-let () = 
+let () =
   eprintf "Parsing command line...@?";
   Arg.parse spec set_file usage_str;
   eprintf " done.@."
 
 
 let fname = match !file with
-  | None -> 
-      Arg.usage spec usage_str; 
+  | None ->
+      Arg.usage spec usage_str;
       exit 1
-  | Some f -> 
+  | Some f ->
       f
 
 let lang =
   let main = get_main () in
   let load_path = Filename.concat (datadir main) "lang" in
-  let languages_manager = 
-    GSourceView2.source_language_manager ~default:true 
+  let languages_manager =
+    GSourceView2.source_language_manager ~default:true
   in
-  languages_manager#set_search_path 
+  languages_manager#set_search_path
     (load_path :: languages_manager#search_path);
   match languages_manager#language "why" with
-    | None -> 
-        Format.eprintf "language file for 'why' not found in directory %s@." 
-          load_path; 
+    | None ->
+        Format.eprintf "language file for 'why' not found in directory %s@."
+          load_path;
         exit 1
     | Some _ as l -> l
 
-let source_text fname = 
+let source_text fname =
   let ic = open_in fname in
   let size = in_channel_length ic in
   let buf = String.create size in
@@ -91,7 +91,7 @@ let source_text fname =
 (* loading WhyIDE configuration *)
 (********************************)
 
-let gconfig = 
+let gconfig =
   let c = Gconfig.config in
   let loadpath = (get_main ()).loadpath @ List.rev !includes in
   c.env <- Env.create_env (Lexer.retrieve loadpath);
@@ -108,7 +108,7 @@ let theories : Theory.theory Theory.Mnm.t =
     let m = Env.read_file gconfig.env fname in
     eprintf "Parsing/Typing Ok@.";
     m
-  with e -> 
+  with e ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
@@ -122,14 +122,14 @@ let () = Db.init_base (fname ^ ".db")
 
 
 (*
-let find_prover s = 
+let find_prover s =
   match
     List.fold_left
       (fun acc p ->
         if (* Db.prover_name *) p.prover_id = s then Some p else acc)
       None gconfig.provers
   with
-    | None -> 
+    | None ->
       eprintf "prover id '%s' not found in Why config file@." s;
       raise Not_found
     | Some p -> p
@@ -141,9 +141,9 @@ let simplify = find_prover "simplify"
 let z3 = find_prover "Z3"
 *)
 
-   
+
 (*
-let () = 
+let () =
   printf "previously known goals:@\n";
   List.iter (fun s -> printf "%s@\n" (Db.goal_task_checksum s))
   (Db.root_goals ());
@@ -191,7 +191,7 @@ module Model = struct
         transf_row : Gtk.tree_iter;
         mutable subgoals : goal list;
       }
-        
+
   and theory =
       { theory : Theory.theory;
         theory_row : Gtk.tree_iter;
@@ -205,31 +205,31 @@ module Model = struct
     | Row_proof_attempt of proof_attempt
     | Row_transformation of transf
 
-  let all : theory list ref = ref [] 
+  let all : theory list ref = ref []
 
   let toggle_hide_proved_goals = ref false
 
   let cols = new GTree.column_list
   let name_column = cols#add Gobject.Data.string
   let icon_column = cols#add Gobject.Data.gobject
-  let index_column : any_row GTree.column = cols#add Gobject.Data.caml 
+  let index_column : any_row GTree.column = cols#add Gobject.Data.caml
   let status_column = cols#add Gobject.Data.gobject
   let time_column = cols#add Gobject.Data.string
   let visible_column = cols#add Gobject.Data.boolean
 (*
-  let bg_column = cols#add (Gobject.Data.unsafe_boxed 
+  let bg_column = cols#add (Gobject.Data.unsafe_boxed
   (Gobject.Type.from_name "GdkColor"))
 *)
 
-  let name_renderer = GTree.cell_renderer_text [`XALIGN 0.] 
-  let renderer = GTree.cell_renderer_text [`XALIGN 0.] 
-  let image_renderer = GTree.cell_renderer_pixbuf [ ] 
+  let name_renderer = GTree.cell_renderer_text [`XALIGN 0.]
+  let renderer = GTree.cell_renderer_text [`XALIGN 0.]
+  let image_renderer = GTree.cell_renderer_pixbuf [ ]
   let icon_renderer = GTree.cell_renderer_pixbuf [ ]
 
-  let view_name_column = 
+  let view_name_column =
     GTree.view_column ~title:"Theories/Goals" ()
 
-  let () = 
+  let () =
     view_name_column#pack icon_renderer ;
     view_name_column#add_attribute icon_renderer "pixbuf" icon_column ;
     view_name_column#pack name_renderer;
@@ -241,16 +241,16 @@ module Model = struct
 *)
     ()
 
-  let view_status_column = 
-    GTree.view_column ~title:"Status" 
-      ~renderer:(image_renderer, ["pixbuf", status_column]) 
+  let view_status_column =
+    GTree.view_column ~title:"Status"
+      ~renderer:(image_renderer, ["pixbuf", status_column])
       ()
 
-  let view_time_column = 
-    GTree.view_column ~title:"Time" 
+  let view_time_column =
+    GTree.view_column ~title:"Time"
       ~renderer:(renderer, ["text", time_column]) ()
 
-  let () = 
+  let () =
     view_status_column#set_resizable false;
     view_status_column#set_visible true;
     view_time_column#set_resizable false;
@@ -348,7 +348,7 @@ module Helpers = struct
     | Scheduler.Timeout -> !image_timeout
     | Scheduler.Unknown -> !image_unknown
     | Scheduler.HighFailure -> !image_failure
-        
+
   open Model
 
   let set_theory_proved t =
@@ -358,7 +358,7 @@ module Helpers = struct
     goals_model#set ~row ~column:Model.status_column !image_yes;
     if !Model.toggle_hide_proved_goals then
       goals_model#set ~row ~column:Model.visible_column false
-         
+
   let rec set_proved g =
     let row = g.goal_row in
     g.proved <- true;
@@ -436,12 +436,12 @@ let redo_external_proof g a =
   let callback result time output =
     a.Model.output <- output;
     Helpers.set_proof_status a result;
-    let t = if time > 0.0 then 
+    let t = if time > 0.0 then
       begin
         a.Model.time <- time;
-        Format.sprintf "%.2f" time 
+        Format.sprintf "%.2f" time
       end
-    else "" 
+    else ""
     in
     goals_model#set ~row:a.Model.proof_row ~column:Model.time_column t
   in
@@ -484,7 +484,7 @@ let rec prover_on_goal p g =
   List.iter
     (fun t -> List.iter (prover_on_goal p) t.Model.subgoals)
     g.Model.transformations
-    
+
 let prover_on_unproved_goals p =
   List.iter
     (fun th ->
@@ -495,13 +495,13 @@ let prover_on_unproved_goals p =
     !Model.all
 
 let rec prover_on_goal_or_children p g =
-  if not g.Model.proved then 
+  if not g.Model.proved then
     begin
       match g.Model.transformations with
 	| [] -> prover_on_goal p g
 	| l ->
-	    List.iter (fun t -> 
-			 List.iter (prover_on_goal_or_children p) 
+	    List.iter (fun t ->
+			 List.iter (prover_on_goal_or_children p)
 			   t.Model.subgoals) l
     end
 
@@ -510,7 +510,7 @@ let prover_on_selected_goal_or_children pr row =
   match filter_model#get ~row ~column:Model.index_column with
     | Model.Row_goal g ->
 	prover_on_goal_or_children pr g
-    | Model.Row_theory th -> 
+    | Model.Row_theory th ->
 	List.iter (prover_on_goal_or_children pr) th.Model.goals
     | Model.Row_proof_attempt a ->
 	prover_on_goal_or_children pr a.Model.proof_goal
@@ -520,7 +520,7 @@ let prover_on_selected_goal_or_children pr row =
 let prover_on_selected_goals pr =
   List.iter
     (prover_on_selected_goal_or_children pr)
-    goals_view#selection#get_selected_rows 
+    goals_view#selection#get_selected_rows
 
 (*****************************************************)
 (* method: split all unproved goals *)
@@ -580,36 +580,36 @@ let build_subtree g row name abort_cond subgoals =
 (* File menu *)
 (*************)
 
-let file_menu = factory#add_submenu "_File" 
-let file_factory = new GMenu.factory file_menu ~accel_group 
+let file_menu = factory#add_submenu "_File"
+let file_factory = new GMenu.factory file_menu ~accel_group
 
-let (_ : GMenu.image_menu_item) = 
+let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~label:"_Preferences" ~callback:
     (fun () ->
        Gconfig.preferences gconfig;
        Scheduler.maximum_running_proofs := gconfig.max_running_processes)
-    () 
+    ()
 
 let refresh_provers = ref (fun () -> ())
 
-let (_ : GMenu.image_menu_item) = 
+let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~label:"_Detect provers" ~callback:
     (fun () -> Gconfig.run_auto_detection gconfig; !refresh_provers () )
-    () 
+    ()
 
-let (_ : GMenu.image_menu_item) = 
-  file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit" 
-    ~callback:exit_function () 
+let (_ : GMenu.image_menu_item) =
+  file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit"
+    ~callback:exit_function ()
 
 (*************)
 (* View menu *)
 (*************)
 
-let view_menu = factory#add_submenu "_View" 
-let view_factory = new GMenu.factory view_menu ~accel_group 
-let (_ : GMenu.image_menu_item) = 
-  view_factory#add_image_item ~key:GdkKeysyms._E 
-    ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) () 
+let view_menu = factory#add_submenu "_View"
+let view_factory = new GMenu.factory view_menu ~accel_group
+let (_ : GMenu.image_menu_item) =
+  view_factory#add_image_item ~key:GdkKeysyms._E
+    ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
 
 let rec collapse_proved_goal g =
   if g.Model.proved then
@@ -634,12 +634,12 @@ let collapse_verified_theories () =
          List.iter collapse_proved_goal th.Model.goals)
     !Model.all
 
-let (_ : GMenu.image_menu_item) = 
+let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._C
-    ~label:"Collapse proved goals" 
-    ~callback:collapse_verified_theories 
-    () 
-  
+    ~label:"Collapse proved goals"
+    ~callback:collapse_verified_theories
+    ()
+
 let rec hide_proved_goal g =
   if g.Model.proved then
     begin
@@ -648,7 +648,7 @@ let rec hide_proved_goal g =
       goals_model#set ~row ~column:Model.visible_column false
     end
   else
-    List.iter 
+    List.iter
       (fun t -> List.iter hide_proved_goal t.Model.subgoals)
       g.Model.transformations
 
@@ -664,7 +664,7 @@ let hide_verified_theories () =
        else
          List.iter hide_proved_goal th.Model.goals)
     !Model.all
-    
+
 
 let rec show_all_goals g =
   let row = g.Model.goal_row in
@@ -673,11 +673,11 @@ let rec show_all_goals g =
     goals_view#collapse_row (goals_model#get_path row)
   else
     goals_view#expand_row (goals_model#get_path row);
-  List.iter 
+  List.iter
     (fun t -> List.iter show_all_goals t.Model.subgoals)
     g.Model.transformations
 
-let show_all_theories () = 
+let show_all_theories () =
   List.iter
     (fun th ->
        let row = th.Model.theory_row in
@@ -688,16 +688,16 @@ let show_all_theories () =
          goals_view#expand_row (goals_model#get_path row);
        List.iter show_all_goals th.Model.goals)
     !Model.all
-    
 
 
-let (_ : GMenu.check_menu_item) = view_factory#add_check_item 
+
+let (_ : GMenu.check_menu_item) = view_factory#add_check_item
   ~callback:(fun b ->
                Model.toggle_hide_proved_goals := b;
                if b then hide_verified_theories ()
                else show_all_theories ())
   "Hide proved goals"
-  
+
 
 (**************)
 (* Tools menu *)
@@ -708,15 +708,15 @@ let add_refresh_provers f =
   refresh_provers := (fun () -> rp (); f ())
 
 
-let tools_menu = factory#add_submenu "_Tools" 
-let tools_factory = new GMenu.factory tools_menu ~accel_group 
+let tools_menu = factory#add_submenu "_Tools"
+let tools_factory = new GMenu.factory tools_menu ~accel_group
 
 let () = add_refresh_provers (fun () ->
   List.iter (fun item -> item#destroy ()) tools_menu#all_children)
 
 let () =
   let add_item_provers () =
-    Util.Mstr.iter 
+    Util.Mstr.iter
       (fun _ p ->
 	 let n = p.prover_name ^ " " ^ p.prover_version in
 	 let (_ : GMenu.image_menu_item) =
@@ -728,8 +728,8 @@ let () =
            tools_factory#add_image_item ~label:(n ^ " on selection")
 	     ~callback:(fun () -> prover_on_selected_goals p)
 	     ()
-	 in ()) 
-      gconfig.provers 
+	 in ())
+      gconfig.provers
   in
   add_refresh_provers add_item_provers;
   add_item_provers ()
@@ -755,36 +755,36 @@ let info_window t s () =
     ~message_type:`INFO
     ~buttons:GWindow.Buttons.close
     ~title:t
-    ~show:true () 
+    ~show:true ()
   in
   let (_ : GtkSignal.id) =
-    d#connect#response 
+    d#connect#response
       ~callback:(function `CLOSE | `DELETE_EVENT -> d#destroy ())
   in
   ()
 *)
 
-let help_menu = factory#add_submenu "_Help" 
-let help_factory = new GMenu.factory help_menu ~accel_group 
+let help_menu = factory#add_submenu "_Help"
+let help_factory = new GMenu.factory help_menu ~accel_group
 
-let (_ : GMenu.image_menu_item) = 
-  help_factory#add_image_item 
-    ~label:"Legend" 
+let (_ : GMenu.image_menu_item) =
+  help_factory#add_image_item
+    ~label:"Legend"
     ~callback:show_legend_window
-    () 
+    ()
 
-let (_ : GMenu.image_menu_item) = 
-  help_factory#add_image_item 
-    ~label:"About" 
+let (_ : GMenu.image_menu_item) =
+  help_factory#add_image_item
+    ~label:"About"
     ~callback:show_about_window
-    () 
+    ()
 
 
 (******************************)
 (* vertical paned on the right*)
 (******************************)
 
-let vp = GPack.paned `VERTICAL  ~border_width:3 ~packing:hp#add () 
+let vp = GPack.paned `VERTICAL  ~border_width:3 ~packing:hp#add ()
 
 (******************)
 (* goal text view *)
@@ -793,18 +793,18 @@ let vp = GPack.paned `VERTICAL  ~border_width:3 ~packing:hp#add ()
 let scrolled_task_view = GBin.scrolled_window
   ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
   ~packing:vp#add ()
-  
-let (_ : GtkSignal.id) = 
-  scrolled_task_view#misc#connect#size_allocate 
+
+let (_ : GtkSignal.id) =
+  scrolled_task_view#misc#connect#size_allocate
     ~callback:
-    (fun {Gtk.width=_w;Gtk.height=h} -> 
+    (fun {Gtk.width=_w;Gtk.height=h} ->
        gconfig.task_height <- h)
 
 let task_view =
   GSourceView2.source_view
     ~editable:false
     ~show_line_numbers:true
-    ~packing:scrolled_task_view#add 
+    ~packing:scrolled_task_view#add
     ~height:gconfig.task_height
     ()
 
@@ -817,9 +817,9 @@ let () = task_view#set_highlight_current_line true
 
 let scrolled_source_view = GBin.scrolled_window
   ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-  ~packing:vp#add 
+  ~packing:vp#add
   ()
-  
+
 let source_view =
   GSourceView2.source_view
     ~auto_indent:true
@@ -827,7 +827,7 @@ let source_view =
     ~show_line_numbers:true
     ~right_margin_position:80 ~show_right_margin:true
     (* ~smart_home_end:true *)
-    ~packing:scrolled_source_view#add 
+    ~packing:scrolled_source_view#add
     ()
 
 let current_file = ref ""
@@ -841,15 +841,15 @@ let () = source_view#set_highlight_current_line true
 let () = source_view#source_buffer#set_text (source_text fname)
 *)
 
-let move_to_line (v : GSourceView2.source_view) line = 
+let move_to_line (v : GSourceView2.source_view) line =
   if line <= v#buffer#line_count && line <> 0 then begin
-    let it = v#buffer#get_iter (`LINE line) in 
+    let it = v#buffer#get_iter (`LINE line) in
     let mark = `MARK (v#buffer#create_mark it) in
     v#scroll_to_mark ~use_align:true ~yalign:0.0 mark
   end
 
-let orange_bg = source_view#buffer#create_tag 
-  ~name:"orange_bg" [`BACKGROUND "orange"] 
+let orange_bg = source_view#buffer#create_tag
+  ~name:"orange_bg" [`BACKGROUND "orange"]
 
 let erase_color_loc (v:GSourceView2.source_view) =
   let buf = v#buffer in
@@ -865,7 +865,7 @@ let color_loc (v:GSourceView2.source_view) l b e =
 
 let scroll_to_id id =
   match id.Ident.id_origin with
-    | Ident.User loc -> 
+    | Ident.User loc ->
 	let (f,l,b,e) = Loc.extract loc in
 	if f <> !current_file then
 	  begin
@@ -875,10 +875,10 @@ let scroll_to_id id =
 	move_to_line source_view (l-1);
 	erase_color_loc source_view;
 	color_loc source_view l b e
-    | Ident.Fresh -> 
+    | Ident.Fresh ->
 	source_view#source_buffer#set_text "Fresh ident (no position available)\n";
 	current_file := ""
-    | Ident.Derived _ -> 
+    | Ident.Derived _ ->
 	source_view#source_buffer#set_text "Derived ident (no position available)\n";
 	current_file := ""
 
@@ -902,32 +902,32 @@ let scroll_to_source_goal g =
   let id = (Task.task_goal t).Decl.pr_name in
   scroll_to_id id;
   match t with
-    | Some 
-	{ Task.task_decl = 
-	    { Theory.td_node = 
+    | Some
+	{ Task.task_decl =
+	    { Theory.td_node =
 		Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f) }}} ->
 	color_f_labels () f
     | _ ->
 	assert false
 
-let scroll_to_theory th = 
+let scroll_to_theory th =
   let t = th.Model.theory in
   let id = t.Theory.th_name in
   scroll_to_id id
 
 (* to be run when a row in the tree view is selected *)
-let select_row p = 
+let select_row p =
   let row = filter_model#get_iter p in
   match filter_model#get ~row ~column:Model.index_column with
     | Model.Row_goal g ->
         let t = g.Model.task in
-        let t = Trans.apply intro_transformation t in 
+        let t = Trans.apply intro_transformation t in
         let task_text = Pp.string_of Pretty.print_task t in
         task_view#source_buffer#set_text task_text;
         task_view#scroll_to_mark `INSERT;
 	scroll_to_source_goal g
     | Model.Row_theory th ->
-        task_view#source_buffer#set_text ""; 
+        task_view#source_buffer#set_text "";
 	scroll_to_theory th
     | Model.Row_proof_attempt a ->
         task_view#source_buffer#set_text a.Model.output;
@@ -937,7 +937,7 @@ let select_row p =
 	scroll_to_source_goal tr.Model.parent_goal
 
 
-  
+
 
 (*****************************)
 (* method: edit current goal *)
@@ -961,7 +961,7 @@ let edit_selected_row p =
         let callback () =
           Helpers.set_proof_status a old_status;
         in
-        let editor = 
+        let editor =
           match a.Model.prover.editor with
             | "" -> gconfig.default_editor
             | _ -> a.Model.prover.editor
@@ -992,27 +992,27 @@ let () =
 
 
 
-  
+
 (***************)
 (* Bind events *)
 (***************)
 
-(* row selection on tree view on the left *) 
+(* row selection on tree view on the left *)
 let (_ : GtkSignal.id) =
   goals_view#selection#connect#after#changed ~callback:
     begin fun () ->
       match goals_view#selection#get_selected_rows with
         | [p] -> select_row p
         | [] -> ()
-        | _ -> () 
+        | _ -> ()
     end
 
 let () = w#add_accel_group accel_group
-let () = w#show () 
+let () = w#show ()
 let () = GtkThread.main ()
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. bin/whyide.opt"
-End: 
+End:
 *)

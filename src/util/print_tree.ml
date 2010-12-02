@@ -32,14 +32,14 @@ module Make(T : Tree) = struct
 
   (* [print_node] prints one node and [print_sons] its children.
      [pref] is the prefix to output at the beginning of line
-     and [start] is the branching drawing (["+-"] the first time, 
+     and [start] is the branching drawing (["+-"] the first time,
      and then ["|-"]). *)
 
   let print fmt t =
-    let rec print_node pref t = 
+    let rec print_node pref t =
       let (s, sons) = T.decomp t in
       pp_print_string fmt s;
-      if sons <> [] then 
+      if sons <> [] then
         let w = String.length s in
         let pref' = pref ^ String.make (w + 1) ' ' in
         match sons with
@@ -47,16 +47,16 @@ module Make(T : Tree) = struct
           | _ -> pp_print_string fmt "-"; print_sons pref' "+-" sons
 
     and print_sons pref start = function
-      | [] -> 
+      | [] ->
           assert false
-      | [s] -> 
+      | [s] ->
           pp_print_string fmt "`-"; print_node (pref ^ "  ") s
-      | s :: sons -> 
+      | s :: sons ->
           pp_print_string fmt start; print_node (pref ^ "| ") s;
           pp_force_newline fmt (); pp_print_string fmt pref;
           print_sons pref "|-" sons
 
     in
     print_node "" t
-        
+
 end

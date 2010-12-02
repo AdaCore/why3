@@ -75,7 +75,7 @@ let print_params fmt stv =
 
 let print_params_list fmt ltv =
   match ltv with
-    | [] -> () 
+    | [] -> ()
     | _ -> fprintf fmt "forall%a,@ " print_ne_params_list ltv
 
 let forget_tvs () =
@@ -110,17 +110,17 @@ type info = {
 let rec print_ty info fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
   | Tyapp (ts, tl) when is_ts_tuple ts ->
-      begin 
+      begin
         match tl with
           | []  -> fprintf fmt "unit"
           | [ty] -> print_ty info fmt ty
           | _   -> fprintf fmt "(%a)%%type" (print_list star (print_ty info)) tl
-      end      
-  | Tyapp (ts, tl) -> 
+      end
+  | Tyapp (ts, tl) ->
       begin match query_syntax info.info_syn ts.ts_name with
         | Some s -> syntax_arguments s (print_ty info) fmt tl
-        | None -> 
-            begin 
+        | None ->
+            begin
               match tl with
                 | []  -> print_ts fmt ts
                 | l   -> fprintf fmt "(%a@ %a)" print_ts ts
@@ -159,9 +159,9 @@ let rec print_pat info fmt p = match p.pat_node with
       fprintf fmt "(%a as %a)" (print_pat info) p print_vs v
   | Por (p,q) ->
       fprintf fmt "(%a|%a)" (print_pat info) p (print_pat info) q
-  | Papp (cs,pl) when is_fs_tuple cs -> 
+  | Papp (cs,pl) when is_fs_tuple cs ->
       fprintf fmt "%a" (print_paren_r (print_pat info)) pl
-  | Papp (cs,pl) -> 
+  | Papp (cs,pl) ->
       begin match query_syntax info.info_syn cs.ls_name with
         | Some s -> syntax_arguments s (print_pat info) fmt pl
         | _ -> fprintf fmt "%a %a"
@@ -227,7 +227,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
       fprintf fmt (protect_on opr "epsilon %a.@ %a")
         (print_vsty info) v (print_opl_fmla info) f;
       forget_var v
-  | Tapp (fs,pl) when is_fs_tuple fs -> 
+  | Tapp (fs,pl) when is_fs_tuple fs ->
       fprintf fmt "%a" (print_paren_r (print_term info)) pl
   | Tapp (fs, tl) ->
     begin match query_syntax info.info_syn fs.ls_name with
@@ -243,7 +243,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
 and print_fnode opl opr info fmt f = match f.f_node with
   | Fquant (Fforall,fq) ->
       let vl,_tl,f = f_open_quant fq in
-      fprintf fmt (protect_on opr "forall %a,@ %a") 
+      fprintf fmt (protect_on opr "forall %a,@ %a")
         (print_space_list (print_vsty info)) vl
         (* (print_tl info) tl *) (print_fmla info) f;
       List.iter forget_var vl
@@ -253,7 +253,7 @@ and print_fnode opl opr info fmt f = match f.f_node with
         match vl with
           | [] -> print_fmla info fmt f
           | v::vr ->
-              fprintf fmt (protect_on opr "exists %a,@ %a") 
+              fprintf fmt (protect_on opr "exists %a,@ %a")
                 (print_vsty_nopar info) v
                 aux vr
       in
@@ -323,15 +323,15 @@ let ls_ty_vars ls =
   (ty_vars_args, ty_vars_value, Stv.union ty_vars_args ty_vars_value)
 
 let print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params =
-  if not (Stv.is_empty all_ty_params) then 
+  if not (Stv.is_empty all_ty_params) then
     begin
-      let need_context = not (Stv.subset ty_vars_value ty_vars_args) in 
+      let need_context = not (Stv.subset ty_vars_value ty_vars_args) in
       if need_context then fprintf fmt "Set Contextual Implicit.@\n";
       fprintf fmt "Implicit Arguments %a.@\n" print_ls ls;
       if need_context then fprintf fmt "Unset Contextual Implicit.@\n"
     end
 
-let print_type_decl info fmt (ts,def) = 
+let print_type_decl info fmt (ts,def) =
   if is_ts_tuple ts then () else
   match def with
     | Tabstract -> begin match ts.ts_def with
@@ -364,14 +364,14 @@ let print_ls_type ?(arrow=false) info fmt ls =
   | None -> fprintf fmt "Prop"
   | Some ty -> print_ty info fmt ty
 
-let print_logic_decl info fmt (ls,ld) = 
+let print_logic_decl info fmt (ls,ld) =
   let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars ls in
   begin
     match ld with
       | Some ld ->
           let vl,e = open_ls_defn ld in
           fprintf fmt "@[<hov 2>Definition %a%a%a: %a :=@ %a.@]@\n"
-            print_ls ls 
+            print_ls ls
             print_ne_params all_ty_params
             (print_space_list (print_vsty info)) vl
             (print_ls_type info) ls.ls_value
@@ -379,17 +379,17 @@ let print_logic_decl info fmt (ls,ld) =
           List.iter forget_var vl
       | None ->
           fprintf fmt "@[<hov 2>Parameter %a: %a%a@ %a.@]@\n"
-            print_ls ls 
+            print_ls ls
             print_params all_ty_params
             (print_arrow_list (print_ty info)) ls.ls_args
             (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
   end;
   print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params;
   fprintf fmt "@\n"
-    
+
 
 let print_logic_decl info fmt d =
-  if not (Sid.mem (fst d).ls_name info.info_rem) then 
+  if not (Sid.mem (fst d).ls_name info.info_rem) then
     (print_logic_decl info fmt d; forget_tvs ())
 
 let print_ind info fmt (pr,f) =
@@ -402,7 +402,7 @@ let print_ind_decl info fmt (ps,bl) =
      (print_list newline (print_ind info)) bl
 
 let print_ind_decl info fmt d =
-  if not (Sid.mem (fst d).ls_name info.info_rem) then 
+  if not (Sid.mem (fst d).ls_name info.info_rem) then
     (print_ind_decl info fmt d; forget_tvs ())
 
 let print_pkind fmt = function
@@ -457,9 +457,9 @@ let print_decl ?old info fmt d = match d.d_node with
       fprintf fmt "(* DO NOT EDIT BELOW *)@\n@\@\n";
  *)
       let params = f_ty_freevars Stv.empty f in
-      fprintf fmt "@[<hov 2>%a %a : %a%a.@]@\n%a@\n" 
+      fprintf fmt "@[<hov 2>%a %a : %a%a.@]@\n%a@\n"
         print_pkind k
-        print_pr pr 
+        print_pr pr
         print_params params
         (print_fmla info) f (print_proof ?old) k;
       forget_tvs ()
@@ -482,7 +482,7 @@ let () = register_printer "coq" print_task
 
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. "
-End: 
+End:
 *)

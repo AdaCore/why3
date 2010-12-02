@@ -27,7 +27,7 @@ open Schema
 
 let boolean = integer
 
-let all_tables = make 
+let all_tables = make
   [
     (* table of locs *)
     ("loc",
@@ -56,7 +56,7 @@ let all_tables = make
      [ text "task_checksum";
        foreign "transf" "parent"; (* parent transf if any *)
        text "name"; (* qualified proposition name *)
-       foreign "loc" "pos"; 
+       foreign "loc" "pos";
        foreign_many "external_proof" "external_proofs";
        foreign_many "transf" "transformations";
        boolean "proved";
@@ -70,8 +70,8 @@ let all_tables = make
        foreign_many "goal" "subgoals";
      ],
      [], default_opts);
-    
-  ]       
+
+  ]
 
 let () = generate ~debug:false all_tables "src/manager/db"
 

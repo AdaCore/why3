@@ -37,16 +37,16 @@ type external_proof =
     timelimit : int; (** CPU limit given in seconds *)
     status : proof_attempt_status; (** the current state *)
     result_time : float ; (** CPU time for that run *)
-    trace : string; 
+    trace : string;
       (** any kind of trace returned by the prover.
           when redoing the same attempt, the former trace is sent again *)
     obsolete : bool;
       (** when true, goal as changed after that proof attempt *)
-  } 
+  }
 
 type transf = Task.task Register.tlist_reg
 
-(** an proof attempt is either an external proof or a transformation 
+(** an proof attempt is either an external proof or a transformation
     into subtasks *)
 type attempt =
   | External of external_proof
@@ -93,8 +93,8 @@ type loc_record_in_db =
   }
 
 type goal_record_in_db =
-  { 
-    task_checksum : string; 
+  {
+    task_checksum : string;
     parent : transf_in_db option;
     name : string; (* qualified proposition name *)
     origin : loc_record_in_db option;
@@ -110,7 +110,7 @@ and external_proof_in_db =
     memlimit : int; (** VM limit given in megabytes *)
     status : int; (** enum{proof_attempt_status}; the current state *)
     result_time : float ; (** CPU time for that run in seconds *)
-    trace : string option; 
+    trace : string option;
       (** any kind of trace returned by an automatic prover,
           or any kind of proof script for an interactive prover *)
     obsolete : bool;
@@ -129,8 +129,8 @@ val read_db_from_file : unit -> goal list
 
 exception AlreadyAttempted
 
-val try_prover : 
-  timelimit:int -> ?memlimit:int -> goal -> Driver.driver -> unit 
+val try_prover :
+  timelimit:int -> ?memlimit:int -> goal -> Driver.driver -> unit
   (** attempts to prove goal with the given prover. This function adds
       a new corresponding attempt for that goal, sets its current
       status to Running, launches the prover in a separate process and
@@ -167,7 +167,7 @@ val add_transformation: goal -> transf -> unit
       A,B,C, C was proved interactively, and the new transformations
       produces only 2 goals, the interactive proof of C is keep in an
       extra dummy goal "true"
-      
+
       @raise AlreadyAttempted if this transformation has already been attempted
       and is not obsolete
 
@@ -179,7 +179,7 @@ val add_transformation: goal -> transf -> unit
 
 (* {2 goal updates} *)
 
-val add_or_replace_goal: goal -> unit 
+val add_or_replace_goal: goal -> unit
   (** updates the database with the new goal.  If a goal with the same
       origin already exists, it is checked whether the task to
       prove is different or not. If it is the same, proof attempts are
@@ -194,7 +194,7 @@ val add_or_replace_goal: goal -> unit
 (** TODO: full update, removing goals that are not pertinent anymore *)
 
 
-  
+
 
 
 

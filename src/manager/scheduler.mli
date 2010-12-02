@@ -20,10 +20,10 @@
 
 open Why
 
-val schedule_proof_attempt : 
+val schedule_proof_attempt :
   async:((unit->unit)->unit) ->
-  debug:bool -> timelimit:int -> memlimit:int -> prover:Db.prover -> 
-  command:string -> driver:Driver.driver -> 
+  debug:bool -> timelimit:int -> memlimit:int -> prover:Db.prover ->
+  command:string -> driver:Driver.driver ->
   callback:(Db.proof_attempt_status -> unit) -> Db.goal -> unit
   (** schedules an attempt to prove goal with the given prover.  This
       function just prepares the goal for the proof attempt, and puts
@@ -33,7 +33,7 @@ val schedule_proof_attempt :
       The callback is called each time the status of that proves
       changes, typically from Scheduled, then Running, then Success or
       Timeout or Failure.
-      
+
       @param timelimit CPU time limit given for that attempt, in
       seconds, must be positive. (unlimited attempts are not allowed
       with this function)
@@ -52,9 +52,9 @@ val schedule_proof_attempt :
 
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "make -C ../.. bin/manager.byte"
-End: 
+End:
 *)
 
 

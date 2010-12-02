@@ -35,8 +35,8 @@
     | _ -> raise exn)
 
   let keywords = Hashtbl.create 97
-  let () = 
-    List.iter 
+  let () =
+    List.iter
       (fun (x,y) -> Hashtbl.add keywords x y)
       [ "absurd", ABSURD;
 	"and", AND;
@@ -51,7 +51,7 @@
  	"downto", DOWNTO;
         "else", ELSE;
 	"end", END;
-	"exception", EXCEPTION; 
+	"exception", EXCEPTION;
 	"for", FOR;
 	"fun", FUN;
 	"ghost", GHOST;
@@ -77,11 +77,11 @@
 	"with", WITH;
         "writes", WRITES;
       ]
-	
+
   let update_loc lexbuf file line chars =
     let pos = lexbuf.lex_curr_p in
     let new_file = match file with None -> pos.pos_fname | Some s -> s in
-    lexbuf.lex_curr_p <- 
+    lexbuf.lex_curr_p <-
       { pos with
 	  pos_fname = new_file;
 	  pos_lnum = int_of_string line;
@@ -129,15 +129,15 @@ rule token = parse
   | "#" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
     space* (digit+ as line) space* (digit+ as char) space* "#"
       { update_loc lexbuf file line char; token lexbuf }
-  | newline 
+  | newline
       { newline lexbuf; token lexbuf }
-  | space+  
+  | space+
       { token lexbuf }
   | '_'
       { UNDERSCORE }
-  | lident as id  
+  | lident as id
       { try Hashtbl.find keywords id with Not_found -> LIDENT id }
-  | uident as id  
+  | uident as id
       { UIDENT id }
   | int_literal as s
       { INTEGER s }
@@ -145,7 +145,7 @@ rule token = parse
   | (digit+ as i) '.' (digit* as f) (['e' 'E'] (['-' '+']? digit+ as e))?
   | (digit* as i) '.' (digit+ as f) (['e' 'E'] (['-' '+']? digit+ as e))?
       { REAL (RConstDecimal (i, f, Util.option_map remove_leading_plus e)) }
-  | '0' ['x' 'X'] ((hexadigit* as i) '.' (hexadigit+ as f) 
+  | '0' ['x' 'X'] ((hexadigit* as i) '.' (hexadigit+ as f)
                   |(hexadigit+ as i) '.' (hexadigit* as f)
 		  |(hexadigit+ as i) ("" as f))
     ['p' 'P'] (['-' '+']? digit+ as e)
@@ -185,7 +185,7 @@ rule token = parse
   | "]"
       { RIGHTSQ }
   | "{"
-      { logic_start_loc := loc lexbuf; 
+      { logic_start_loc := loc lexbuf;
 	let s = logic lexbuf in
 	LOGIC ((fst !logic_start_loc, snd (loc lexbuf)), s) }
   (* FIXME: allow newlines as well *)
@@ -199,7 +199,7 @@ rule token = parse
       { BAR }
   | "||"
       { BARBAR }
-  | "&&" 
+  | "&&"
       { AMPAMP }
   | op_char_pref op_char_4* as s
       { OPPREF s }
@@ -213,7 +213,7 @@ rule token = parse
       { OP4 s }
   | "\""
       { STRING (string lexbuf) }
-  | eof 
+  | eof
       { EOF }
   | _ as c
       { raise (IllegalCharacter c) }
@@ -238,8 +238,8 @@ and logic = parse
 }
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. testl"
-End: 
+End:
 *)
 

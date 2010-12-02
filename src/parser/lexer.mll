@@ -40,10 +40,10 @@
     | _ -> raise e)
 
   let keywords = Hashtbl.create 97
-  let () = 
-    List.iter 
+  let () =
+    List.iter
       (fun (x,y) -> Hashtbl.add keywords x y)
-      [ 
+      [
 	"and", AND;
 	"as", AS;
 	"axiom", AXIOM;
@@ -76,10 +76,10 @@
 	"use", USE;
 	"with", WITH;
       ]
-	       
+
   let newline lexbuf =
     let pos = lexbuf.lex_curr_p in
-    lexbuf.lex_curr_p <- 
+    lexbuf.lex_curr_p <-
       { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
 
   let string_start_loc = ref Loc.dummy_position
@@ -95,7 +95,7 @@
   let update_loc lexbuf file line chars =
     let pos = lexbuf.lex_curr_p in
     let new_file = match file with None -> pos.pos_fname | Some s -> s in
-    lexbuf.lex_curr_p <- 
+    lexbuf.lex_curr_p <-
       { pos with
 	  pos_fname = new_file;
 	  pos_lnum = int_of_string line;
@@ -103,7 +103,7 @@
       }
 
   let remove_leading_plus s =
-    let n = String.length s in 
+    let n = String.length s in
     if n > 0 && s.[0] = '+' then String.sub s 1 (n-1) else s
 
   let loc lb = (lexeme_start_p lb, lexeme_end_p lb)
@@ -144,15 +144,15 @@ rule token = parse
   | "#" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
     space* (digit+ as line) space* (digit+ as char) space* "#"
       { update_loc lexbuf file line char; token lexbuf }
-  | newline 
+  | newline
       { newline lexbuf; token lexbuf }
-  | space+  
+  | space+
       { token lexbuf }
   | '_'
       { UNDERSCORE }
-  | lident as id  
+  | lident as id
       { try Hashtbl.find keywords id with Not_found -> LIDENT id }
-  | uident as id  
+  | uident as id
       { UIDENT id }
   | int_literal as s
       { INTEGER s }
@@ -160,7 +160,7 @@ rule token = parse
   | (digit+ as i) '.' (digit* as f) (['e' 'E'] (['-' '+']? digit+ as e))?
   | (digit* as i) '.' (digit+ as f) (['e' 'E'] (['-' '+']? digit+ as e))?
       { FLOAT (RConstDecimal (i, f, Util.option_map remove_leading_plus e)) }
-  | '0' ['x' 'X'] ((hexadigit* as i) '.' (hexadigit+ as f) 
+  | '0' ['x' 'X'] ((hexadigit* as i) '.' (hexadigit+ as f)
                   |(hexadigit+ as i) '.' (hexadigit* as f)
 		  |(hexadigit+ as i) ("" as f))
     ['p' 'P'] (['-' '+']? digit+ as e)
@@ -219,7 +219,7 @@ rule token = parse
       { OP4 s }
   | "\""
       { string_start_loc := loc lexbuf; STRING (string lexbuf) }
-  | eof 
+  | eof
       { EOF }
   | _ as c
       { raise (IllegalCharacter c) }
@@ -227,25 +227,25 @@ rule token = parse
 and comment = parse
   | "(*)"
       { comment lexbuf }
-  | "*)" 
+  | "*)"
       { () }
-  | "(*" 
+  | "(*"
       { comment lexbuf; comment lexbuf }
-  | newline 
+  | newline
       { newline lexbuf; comment lexbuf }
   | eof
       { raise (Loc.Located (!comment_start_loc, UnterminatedComment)) }
-  | _ 
+  | _
       { comment lexbuf }
 
 and string = parse
   | "\""
       { let s = Buffer.contents string_buf in
-	Buffer.clear string_buf; 
+	Buffer.clear string_buf;
 	s }
   | "\\" (_ as c)
       { Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
-  | newline 
+  | newline
       { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
   | eof
       { raise (Loc.Located (!string_start_loc, UnterminatedString)) }
@@ -291,8 +291,8 @@ and string = parse
 }
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. test"
-End: 
+End:
 *)
 

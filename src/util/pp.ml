@@ -50,10 +50,10 @@ let print_list_delim start stop sep pr fmt = function
 
 let print_iter1 iter sep print fmt l =
   let first = ref true in
-  iter (fun x -> 
+  iter (fun x ->
           if !first
           then first := false
-          else sep fmt (); 
+          else sep fmt ();
           print fmt x ) l
 
 let print_iter2 iter sep1 sep2 print1 print2 fmt l =
@@ -109,10 +109,10 @@ let hov n fmt f x = pp_open_hovbox fmt n; f x; pp_close_box fmt ()
 let open_formatter ?(margin=78) cout =
   let fmt = formatter_of_out_channel cout in
   pp_set_margin fmt margin;
-  pp_open_box fmt 0; 
+  pp_open_box fmt 0;
   fmt
 
-let close_formatter fmt = 
+let close_formatter fmt =
   pp_close_box fmt ();
   pp_print_flush fmt ()
 
@@ -141,7 +141,7 @@ let print_in_file ?(margin=78) p f =
 let rec print_list_opt sep print fmt = function
   | [] -> false
   | [x] -> print fmt x
-  | x :: r -> 
+  | x :: r ->
       let notempty1 = print fmt x in
       if notempty1 then sep fmt ();
       let notempty2 = print_list_opt sep print fmt r in

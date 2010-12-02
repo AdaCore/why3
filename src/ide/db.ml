@@ -711,7 +711,7 @@ module Goal = struct
        WHERE goals.goal_theory=?"
     in
     let stmt = bind db sql [Sqlite3.Data.INT th] in
-    step_fold_gen db stmt 
+    step_fold_gen db stmt
       (fun stmt acc ->
          let g = stmt_column_INT stmt 0 "Goal.of_theory" in
          let n = stmt_column_string stmt 1 "Goal.of_theory" in
@@ -723,7 +723,7 @@ module Goal = struct
        WHERE goals.goal_transf=?"
     in
     let stmt = bind db sql [Sqlite3.Data.INT tr] in
-    step_fold_gen db stmt 
+    step_fold_gen db stmt
       (fun stmt acc ->
          let g = stmt_column_INT stmt 0 "Goal.of_transf" in
          let sum = stmt_column_string stmt 1 "Goal.of_transf" in
@@ -763,7 +763,7 @@ module Transf = struct
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 
-  let add db root_goal tr_id = 
+  let add db root_goal tr_id =
     transaction db
       (fun () ->
 	 let sql =
@@ -910,10 +910,10 @@ let add_proof_attempt g pid = External_proof.add (current()) g pid
 let set_status a r t =
   External_proof.set_status (current()) a r t
 
-let set_obsolete a = 
-  External_proof.set_obsolete (current()) a 
+let set_obsolete a =
+  External_proof.set_obsolete (current()) a
 
-let set_edited_as a f = 
+let set_edited_as a f =
   External_proof.set_edited_as (current()) a f
 
 let add_transformation g tr_id = Transf.add (current()) g tr_id

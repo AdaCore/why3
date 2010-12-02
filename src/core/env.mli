@@ -48,22 +48,22 @@ val register_format : string -> string list -> read_channel -> unit
       [f] is the function to perform parsing *)
 
 exception NoFormat
-exception UnknownExtension of string 
+exception UnknownExtension of string
 exception UnknownFormat of string (* format name *)
 
 val read_channel : ?format:string -> read_channel
 (** [read_channel ?format env f c] returns the map of theories
     in channel [c]. When given, [format] enforces the format, otherwise
-    the format is chosen according to [f]'s extension. 
-    Beware that nothing ensures that [c] corresponds to the contents of [f] 
+    the format is chosen according to [f]'s extension.
+    Beware that nothing ensures that [c] corresponds to the contents of [f]
 
     @raise NoFormat if [format] is not given and [f] has no extension
-    @raise UnknownExtension [s] if the extension [s] is not known in 
+    @raise UnknownExtension [s] if the extension [s] is not known in
       any registered parser
     @raise UnknownFormat [f] if the [format] is not registered
 *)
 
-val read_file : ?format:string -> env -> string -> theory Mnm.t 
+val read_file : ?format:string -> env -> string -> theory Mnm.t
 (** [read_file ?format env f] returns the map of theories
     in file [f]. When given, [format] enforces the format, otherwise
     the format is chosen according to [f]'s extension. *)

@@ -86,7 +86,7 @@ and expr_desc =
   | Eloop of loop_annotation * expr
   | Elazy of lazy_op * expr * expr
   | Ematch of expr * (Ptree.pattern * expr) list
-  | Eskip 
+  | Eskip
   | Eabsurd
   | Eraise of ident * expr option
   | Etry of expr * (ident * ident option * expr) list

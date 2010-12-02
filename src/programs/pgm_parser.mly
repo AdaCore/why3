@@ -53,28 +53,28 @@
   let join (b,_) (_,e) = (b,e)
 
   let rec mk_apply f = function
-    | [] -> 
+    | [] ->
 	assert false
-    | [a] -> 
+    | [a] ->
 	Eapply (f, a)
-    | a :: l -> 
-	let loc = join f.expr_loc a.expr_loc in 
+    | a :: l ->
+	let loc = join f.expr_loc a.expr_loc in
 	mk_apply { expr_loc = loc; expr_desc = Eapply (f, a) } l
 
-  let mk_apply_id id = 
-    let e = 
-      { expr_desc = Eident (Qident id); expr_loc = id.id_loc } 
+  let mk_apply_id id =
+    let e =
+      { expr_desc = Eident (Qident id); expr_loc = id.id_loc }
     in
     mk_apply e
-      
+
   let mk_infix e1 op e2 =
     let id = { id = infix op; id_lab = []; id_loc = loc_i 2 } in
     mk_expr (mk_apply_id id [e1; e2])
-     
+
   let mk_binop e1 op e2 =
     let id = { id = op; id_lab = []; id_loc = loc_i 2 } in
     mk_expr (mk_apply_id id [e1; e2])
-     
+
   let mk_prefix op e1 =
     let id = { id = prefix op; id_lab = []; id_loc = loc_i 1 } in
     mk_expr (mk_apply_id id [e1])
@@ -105,7 +105,7 @@
 
 %}
 
-/* Tokens */ 
+/* Tokens */
 
 %token <string> LIDENT UIDENT
 %token <string> INTEGER
@@ -119,7 +119,7 @@
 %token ABSURD AND ANY AS ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO ELSE END
 %token EXCEPTION FOR
 %token FUN GHOST IF IN INVARIANT LABEL LET MATCH NOT OF PARAMETER
-%token RAISE RAISES READS REC 
+%token RAISE RAISES READS REC
 %token THEN TO TRY TYPE VARIANT WHILE WITH WRITES
 
 /* symbols */
@@ -140,7 +140,7 @@
 %left LEFTBLEFTB
 %left prec_simple
 
-%left COLON 
+%left COLON
 
 %left prec_letrec
 %left IN
@@ -184,14 +184,14 @@ file:
 list0_decl:
 | /* epsilon */
    { [] }
-| list1_decl 
+| list1_decl
    { $1 }
 ;
 
 list1_decl:
-| decl 
+| decl
    { [$1] }
-| decl list1_decl 
+| decl list1_decl
    { $1 :: $2 }
 ;
 
@@ -202,7 +202,7 @@ decl:
     { Dlet (add_lab $2 $3, mk_expr_i 7 (Efun ($4, cast_body $5 $7))) }
 | LET lident labels EQUAL FUN list1_type_v_binder ARROW triple
     { Dlet (add_lab $2 $3, mk_expr_i 8 (Efun ($6, $8))) }
-| LET REC list1_recfun_sep_and 
+| LET REC list1_recfun_sep_and
     { Dletrec $3 }
 | PARAMETER lident labels COLON type_v
     { Dparam (add_lab $2 $3, $5) }
@@ -258,18 +258,18 @@ uqualid:
 ;
 
 expr:
-| simple_expr %prec prec_simple 
+| simple_expr %prec prec_simple
    { $1 }
 | expr EQUAL expr
    { mk_infix $1 "=" $3 }
 | expr LTGT expr
    { let t = mk_infix $1 "=" $3 in
      mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = loc () } [t]) }
-| expr OP1 expr 
+| expr OP1 expr
    { mk_infix $1 $2 $3 }
-| expr OP2 expr 
+| expr OP2 expr
    { mk_infix $1 $2 $3 }
-| expr OP3 expr 
+| expr OP3 expr
    { mk_infix $1 $2 $3 }
 | expr OP4 expr
    { mk_infix $1 $2 $3 }
@@ -277,7 +277,7 @@ expr:
    { mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = loc () } [$2]) }
 | any_op expr %prec prefix_op
    { mk_prefix $1 $2 }
-| expr COLONEQUAL expr 
+| expr COLONEQUAL expr
    { mk_infix $1 ":=" $3 }
 | simple_expr list1_simple_expr %prec prec_app
    { mk_expr (mk_apply $1 $2) }
@@ -310,10 +310,10 @@ expr:
 | LABEL uident COLON expr
    { mk_expr (Elabel ($2, $4)) }
 | WHILE expr DO loop_annotation expr DONE
-   { mk_expr 
-       (Etry 
+   { mk_expr
+       (Etry
 	  (mk_expr
-	     (Eloop ($4, 
+	     (Eloop ($4,
 		     mk_expr (Eif ($2, $5,
 				   mk_expr (Eraise (exit_exn (), None)))))),
 	   [exit_exn (), None, mk_expr Eskip])) }
@@ -345,7 +345,7 @@ triple:
 simple_expr:
 | constant
     { mk_expr (Econstant $1) }
-| qualid 
+| qualid
     { mk_expr (Eident $1) }
 | LEFTPAR expr RIGHTPAR
     { $2 }
@@ -475,7 +475,7 @@ pure_type_arg:
 ;
 
 pure_type_arg_no_paren:
-| type_var 
+| type_var
    { PPTtyvar $1 }
 | lqualid
    { PPTtyapp ([], $1) }
@@ -498,7 +498,7 @@ list1_type_v_binder:
 type_v_binder:
 | lident labels
    { [add_lab $1 $2, None] }
-| LEFTPAR RIGHTPAR                      
+| LEFTPAR RIGHTPAR
    { [id_anonymous (), Some (ty_unit ())] }
 | LEFTPAR lidents_lab COLON type_v RIGHTPAR
    { List.map (fun i -> (i, Some $4)) $2 }
@@ -528,7 +528,7 @@ simple_type_v:
 ;
 
 type_c:
-| type_v 
+| type_v
     { type_c (lexpr_true ()) $1 empty_effect (lexpr_true (), []) }
 | pre type_v effects post
     { type_c $1 $2 $3 $4 }
@@ -633,9 +633,9 @@ labels:
 ;
 
 /*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. testl"
-End: 
+End:
 */
 
 

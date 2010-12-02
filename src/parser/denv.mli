@@ -28,7 +28,7 @@ type type_var
 
 val create_ty_decl_var : ?loc:Ptree.loc -> user:bool -> tvsymbol -> type_var
 
-type dty = 
+type dty =
   | Tyvar of type_var
   | Tyapp of tysymbol * dty list
 
@@ -88,7 +88,7 @@ val fmla : vsymbol Mstr.t -> dfmla -> fmla
 
 val specialize_ty : loc:Ptree.loc -> type_var Htv.t -> ty -> dty
 
-val specialize_lsymbol  : 
+val specialize_lsymbol  :
   loc:Ptree.loc -> lsymbol -> dty list * dty option
 
 val specialize_term : loc:Ptree.loc -> type_var Htv.t -> term -> dterm

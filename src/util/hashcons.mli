@@ -19,7 +19,7 @@
 
 (** Hash tables for hash consing *)
 
-(*s Hash tables for hash consing. 
+(*s Hash tables for hash consing.
 
     Hash consed values are of the
     following type [hash_consed]. The field [tag] contains a unique
@@ -27,7 +27,7 @@
     [hkey] contains the hash key of the value (without modulo) for
     possible use in other hash tables (and internally when hash
     consing tables are resized). The field [node] contains the value
-    itself. 
+    itself.
 
     Hash consing tables are using weak pointers, so that values that are no
     more referenced from anywhere else can be erased by the GC. *)
@@ -46,7 +46,7 @@ module type S =
 
     val hashcons : t -> t
       (** [hashcons n f] hash-cons the value [n] using function [f] i.e. returns
-	  any existing value in the table equal to [n], if any; 
+	  any existing value in the table equal to [n], if any;
 	  otherwise, creates a new value with function [f], stores it
 	  in the table and returns it. Function [f] is passed
 	  the node [n] as first argument and the unique id as second argument.
@@ -57,7 +57,7 @@ module type S =
     val stats : unit -> int * int * int * int * int * int
       (** Return statistics on the table.  The numbers are, in order:
 	  table length, number of entries, sum of bucket lengths,
-	  smallest bucket length, median bucket length, biggest 
+	  smallest bucket length, median bucket length, biggest
 	  bucket length. *)
   end
 

@@ -38,7 +38,7 @@ let debug = Debug.register_flag "program_wp"
 (* smart constructors for building WPs
    TODO: use simp forms / tag with label "WP" *)
 
-let wp_and ?(sym=false) f1 f2 = 
+let wp_and ?(sym=false) f1 f2 =
 (*   if sym then f_and_simp f1 f2 else f_and_simp f1 (f_implies_simp f1 f2)  *)
   let f = f_and_simp f1 f2 in
   if sym then f else f_label_add (Split_goal.asym_split) f
@@ -98,7 +98,7 @@ let rec erase_label env lab f =
   f_map (erase_label_term env lab) (erase_label env lab) f
 
 and erase_label_term env lab t = match t.t_node with
-  | Tapp (ls, [t; {t_node = Tvar l}]) 
+  | Tapp (ls, [t; {t_node = Tvar l}])
     when ls_equal ls env.ls_at && vs_equal l lab ->
       erase_label_term env lab t
   | _ ->
@@ -119,14 +119,14 @@ and unref_term env r v t = match t.t_node with
   | Tapp (ls, _) when ls_equal ls env.ls_old ->
       assert false
   | Tapp (ls, _) when ls_equal ls env.ls_at -> (* do not recurse in at(...) *)
-      t 
+      t
   | _ ->
       t_map (unref_term env r v) (unref env r v) t
 
 (* quantify over all references in ef *)
 let quantify ?(all=false) env ef f =
   (* eprintf "quantify: ef=%a f=%a@." E.print ef Pretty.print_fmla f; *)
-  let quantify1 r f = 
+  let quantify1 r f =
     let ty = unref_ty env (E.type_of_reference r) in
     let v = create_vsymbol (id_clone (E.name_of_reference r)) ty in
     let f = unref env r v f in
@@ -140,14 +140,14 @@ let abstract_wp env ef (q',ql') (q,ql) =
   assert (List.length ql' = List.length ql);
   let quantify_res f' f res =
     let f = wp_implies f' f in
-    let f = match res with 
-      | Some v when is_ref_ty env v.vs_ty -> 
+    let f = match res with
+      | Some v when is_ref_ty env v.vs_ty ->
 	  let v' = create_vsymbol (id_clone v.vs_name) (unref_ty env v.vs_ty) in
 	  wp_forall env v' (unref env (E.Rlocal v) v' f)
-      | Some v -> 
+      | Some v ->
 	  wp_forall env v f
-      | None -> 
-	  f 
+      | None ->
+	  f
     in
     quantify env ef f
   in
@@ -160,14 +160,14 @@ let abstract_wp env ef (q',ql') (q,ql) =
     in
     quantify_res f' f res
   in
-  let f = 
+  let f =
     let res, f = q and res', f' = q' in
     let f' = f_subst (subst1 res' (t_var res)) f' in
     quantify_res f' f (Some res)
   in
   wp_ands (f :: List.map2 quantify_h ql' ql)
 
-let opaque_wp env ef q' q = 
+let opaque_wp env ef q' q =
   let lab = fresh_label env in
   let q' = post_map (old_label env lab) q' in
   let f = abstract_wp env ef q' q in
@@ -188,7 +188,7 @@ let rec ls_assoc ls = function
 let default_exn_post ls = ls, (exn_v_result ls, f_true)
 
 let default_post ty ef =
-  (v_result ty, f_true), 
+  (v_result ty, f_true),
   List.map default_exn_post (Sls.elements ef.E.raises)
 
 let rec assoc_handler x = function
@@ -199,7 +199,7 @@ let rec assoc_handler x = function
 (*s [saturate_post ef f q] makes a postcondition for a program of effect [ef]
     out of a normal postcondition [f] and the exc. postconditions from [q] *)
 
-let saturate_post ef q (_, ql) = 
+let saturate_post ef q (_, ql) =
   let set_post x = try x, ls_assoc x ql with Not_found -> default_exn_post x in
   let xs = Sls.elements ef.E.raises in
   (q, List.map set_post xs)
@@ -214,30 +214,30 @@ let sup ((q, ql) : post) (_, ql') =
     assert (ls_equal x x');
     if is_default_post fa then a' else a
   in
-  q, List.map2 supx ql ql' 
+  q, List.map2 supx ql ql'
 
 (* post-condition for a loop body *)
 
 let default_exns_post ef =
   let xs = Sls.elements ef.E.raises in
   List.map default_exn_post xs
- 
+
 let term_at env lab t =
   t_app env.ls_at [t; t_var lab] t.t_ty
 
-let while_post_block env inv var lab e = 
+let while_post_block env inv var lab e =
   let decphi = match var with
-    | None -> 
+    | None ->
 	f_true
-    | Some (phi, r) -> 
+    | Some (phi, r) ->
 	f_app r [phi; term_at env lab phi]
   in
   let ql = default_exns_post e.expr_effect in
   let res = v_result e.expr_type in
   match inv with
-    | None -> 
+    | None ->
 	(res, decphi), ql
-    | Some i -> 
+    | Some i ->
 	(res, wp_and i decphi), ql
 
 let well_founded_rel = function
@@ -250,7 +250,7 @@ let well_founded_rel = function
 let propose_label l f =
   if f.f_label = [] then f_label [l] f else f
 
-let rec wp_expr env e q = 
+let rec wp_expr env e q =
   (* if Debug.test_flag debug then  *)
   (*   eprintf "@[wp_expr: q=%a@]@." Pretty.print_fmla (snd (fst q)); *)
   let lab = fresh_label env in
@@ -281,7 +281,7 @@ and wp_desc env e q = match e.expr_desc with
       wp_expr env e1 q1
   | Eletrec (dl, e1) ->
       let w1 = wp_expr env e1 q in
-      let wl = List.map (wp_recfun env) dl in 
+      let wl = List.map (wp_recfun env) dl in
       wp_ands ~sym:true (w1 :: wl)
 
   | Eif (e1, e2, e3) ->
@@ -316,8 +316,8 @@ and wp_desc env e q = match e.expr_desc with
   | Ematch (_, [{pat_node = Pwild}, e]) ->
       wp_expr env e (filter_post e.expr_effect q)
   | Ematch (x, bl) ->
-      let branch (p, e) = 
-        f_close_branch p (wp_expr env e (filter_post e.expr_effect q)) 
+      let branch (p, e) =
+        f_close_branch p (wp_expr env e (filter_post e.expr_effect q))
       in
       let t = t_var x in
       f_case t (List.map branch bl)
@@ -331,19 +331,19 @@ and wp_desc env e q = match e.expr_desc with
       (* $wp(raise (E e1), _, R) = wp(e1, R, R)$ *)
       let _, ql = q in
       let q1 = match assoc_handler x ql with
-	| Some v, r -> (v, r), ql 
+	| Some v, r -> (v, r), ql
 	| None, _ -> assert false
       in
       let q1 = filter_post e1.expr_effect q1 in
       wp_expr env e1 q1
   | Etry (e1, hl) ->
       (* $wp(try e1 with E -> e2, Q, R) = wp(e1, Q, wp(e2, Q, R))$ *)
-      let hwl = 
-	List.map 
-	  (fun (x, v, h) -> 
+      let hwl =
+	List.map
+	  (fun (x, v, h) ->
 	     let w = wp_expr env h (filter_post h.expr_effect q) in
 	     x, (v, w))
-	  hl 
+	  hl
       in
       let make_post (q, ql) =
 	let hpost (x, r) =
@@ -358,18 +358,18 @@ and wp_desc env e q = match e.expr_desc with
       (* wp(for x = v1 to v2 do inv { I(x) } e1, Q, R) =
              v1 > v2  -> Q
          and v1 <= v2 ->     I(v1)
-                         and forall S. forall i. v1 <= i <= v2 -> 
+                         and forall S. forall i. v1 <= i <= v2 ->
                                                  I(i) -> wp(e1, I(i+1), R)
 	                               and I(v2+1) -> Q                    *)
       let (res, q1), _ = q in
       let gt, le, incr = match d with
-	| Pgm_ptree.To     -> env.ls_gt, env.ls_le, t_int_const  "1" 
-	| Pgm_ptree.Downto -> env.ls_lt, env.ls_ge, t_int_const "-1" 
+	| Pgm_ptree.To     -> env.ls_gt, env.ls_le, t_int_const  "1"
+	| Pgm_ptree.Downto -> env.ls_lt, env.ls_ge, t_int_const "-1"
       in
       let v1_gt_v2 = f_app gt [t_var v1; t_var v2] in
       let v1_le_v2 = f_app le [t_var v1; t_var v2] in
       let inv = match inv with Some inv -> inv | None -> f_true in
-      let wp1 = 
+      let wp1 =
 	let xp1 = t_app env.ls_add [t_var x; incr] ty_int in
 	let post = f_subst (subst1 x xp1) inv in
 	let q1 = saturate_post e1.expr_effect (res, post) q in
@@ -381,13 +381,13 @@ and wp_desc env e q = match e.expr_desc with
 	   (wp_and ~sym:true
 	      (wp_forall env x
 	         (wp_implies (wp_and (f_app le [t_var v1; t_var x])
-			             (f_app le [t_var x;  t_var v2])) 
-                 (wp_implies inv wp1))) 
+			             (f_app le [t_var x;  t_var v2]))
+                 (wp_implies inv wp1)))
 	      (let sv2 = t_app env.ls_add [t_var v2; incr] ty_int in
 	       wp_implies (f_subst (subst1 x sv2) inv) q1)))
       in
       wp_and ~sym:true (wp_implies v1_gt_v2 q1) (wp_implies v1_le_v2 f)
-      
+
   | Eassert (Pgm_ptree.Aassert, f) ->
       let (_, q), _ = q in
       wp_and f q
@@ -415,7 +415,7 @@ and wp_recfun env (_, bl, _var, t) =
   let f = wp_triple env t in
   wp_binders env bl f
 
-let wp env e = 
+let wp env e =
   wp_expr env e (default_post e.expr_type e.expr_effect)
 
 let rec t_btop env t = match t.t_node with
@@ -457,12 +457,12 @@ let decl env = function
 	  Pretty.print_ls ls print_type_v e.expr_type_v;
       let f = wp env e in
       Debug.dprintf debug "wp = %a@\n----------------@." Pretty.print_fmla f;
-      let env = add_wp_decl ls f env in	
+      let env = add_wp_decl ls f env in
       env
   | Pgm_ttree.Dletrec dl ->
-      let add_one env (ls, def) = 
-	let f = wp_recfun env def in 
-	Debug.dprintf debug "wp %a = %a@\n----------------@." 
+      let add_one env (ls, def) =
+	let f = wp_recfun env def in
+	Debug.dprintf debug "wp %a = %a@\n----------------@."
 	    print_ls ls Pretty.print_fmla f;
 	add_wp_decl ls f env
       in
@@ -471,7 +471,7 @@ let decl env = function
       env
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. testl"
-End: 
+End:
 *)

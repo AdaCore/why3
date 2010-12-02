@@ -21,7 +21,7 @@ open Format
 
 val print : formatter -> Term.real_constant -> unit
 
-val print_with_integers : 
+val print_with_integers :
   (string -> 'a, Format.formatter, unit) format ->
   (string -> string -> 'a, Format.formatter, unit) format ->
   (string -> string -> 'a, Format.formatter, unit) format ->

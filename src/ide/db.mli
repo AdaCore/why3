@@ -40,7 +40,7 @@ type theory
 type goal
 (** each theory contains an ordered sequences of goals *)
 
-type proof_attempt 
+type proof_attempt
 (** each goal has a set of proof attempts, indeed a map indexed
     by prover identifiers *)
 
@@ -57,7 +57,7 @@ type proof_status =
   | Unknown (** external prover answered ``don't know'' or equivalent *)
   | Failure (** external prover call failed *)
 
-(** parent of a goal: either a theory (for "toplevel" goals) 
+(** parent of a goal: either a theory (for "toplevel" goals)
     or a transformation (for "subgoals") *)
 (* useful ?
 type goal_parent =
@@ -80,7 +80,7 @@ val prover : proof_attempt -> prover_id
 (*
 val proof_goal : proof_attempt -> goal
 *)
-val status_and_time : 
+val status_and_time :
   proof_attempt -> proof_status * float * bool * string
   (** returns (status, time, obsolete flag, edited file name) *)
 
@@ -107,7 +107,7 @@ val transf_id : transf -> transf_id
 *)
 val subgoals : transf -> goal Why.Util.Mstr.t
 
-(** theory accessors *)        
+(** theory accessors *)
 val theory_name : theory -> string
 val goals : theory -> goal Why.Util.Mstr.t
 (*
@@ -176,7 +176,7 @@ val add_transformation : goal -> transf_id -> transf
 
 val add_goal : theory -> string -> string -> goal
 (** [add_goal th id sum] adds to theory [th] a new goal named [id], with
-    [sum] as the checksum of its task. 
+    [sum] as the checksum of its task.
     @raise AlreadyExist if a goal with the same id already exists
     in this theory *)
 
@@ -185,7 +185,7 @@ val change_checksum: goal -> string -> unit
 
 val add_subgoal : transf -> string -> string -> goal
 (** [add_subgoal t id sum] adds to transf [t] a new subgoal named [id], with
-    [sum] as the checksum of its task. 
+    [sum] as the checksum of its task.
     @raise AlreadyExist if a goal with the same id already exists
     as subgoal of this transf *)
 
@@ -203,7 +203,7 @@ val add_theory : file -> string -> theory
 
 (** {3 files} *)
 
-val add_file :  string -> file 
+val add_file :  string -> file
 (** adds a file to the database.
     @raise AlreadyExist if a file with the same id already exists *)
 
@@ -213,7 +213,7 @@ val add_file :  string -> file
 
 
 
-  
+
 
 (*
 Local Variables:

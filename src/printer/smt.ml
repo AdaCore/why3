@@ -65,7 +65,7 @@ type info = {
 
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar _ -> unsupported "smt : you must encode the polymorphism"
-  | Tyapp (ts, tl) -> begin match query_syntax info.info_syn ts.ts_name with 
+  | Tyapp (ts, tl) -> begin match query_syntax info.info_syn ts.ts_name with
       | Some s -> syntax_arguments s (print_type info) fmt tl
       | None -> fprintf fmt "%a%a" (print_tyapp info) tl print_ident ts.ts_name
     end
@@ -81,14 +81,14 @@ let rec print_term info fmt t = match t.t_node with
   | Tbvar _ -> assert false
   | Tconst (ConstInt n) -> fprintf fmt "%s" n
   | Tconst (ConstReal c) ->
-      Print_real.print_with_integers 
+      Print_real.print_with_integers
 	"%s.0" "(* %s.0 %s.0)" "(/ %s.0 %s.0)" fmt c
   | Tvar v -> print_var fmt v
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] -> fprintf fmt "@[%a@]" print_ident ls.ls_name
-          | _ -> fprintf fmt "@[(%a@ %a)@]" 
+          | _ -> fprintf fmt "@[(%a@ %a)@]"
 	      print_ident ls.ls_name (print_list space (print_term info)) tl
         end end
   | Tlet (t1, tb) ->
@@ -96,12 +96,12 @@ let rec print_term info fmt t = match t.t_node with
       fprintf fmt "@[(let (%a %a)@ %a)@]" print_var v
         (print_term info) t1 (print_term info) t2;
       forget_var v
-  | Tif (f1,t1,t2) -> 
+  | Tif (f1,t1,t2) ->
       fprintf fmt "@[(ite %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_term info) t1 (print_term info) t2
-  | Tcase _ -> unsupportedTerm t 
+  | Tcase _ -> unsupportedTerm t
       "smtv1 : you must eliminate match"
-  | Teps _ -> unsupportedTerm t 
+  | Teps _ -> unsupportedTerm t
       "smtv1 : you must eliminate epsilon"
 
 and print_fmla info fmt f = match f.f_node with
@@ -111,8 +111,8 @@ and print_fmla info fmt f = match f.f_node with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] -> fprintf fmt "%a" print_ident ls.ls_name
-          | _ -> fprintf fmt "(%a@ %a)" 
-	      print_ident ls.ls_name (print_list space (print_term info)) tl 
+          | _ -> fprintf fmt "(%a@ %a)"
+	      print_ident ls.ls_name (print_list space (print_term info)) tl
         end end
   | Fquant (q, fq) ->
       let q = match q with Fforall -> "forall" | Fexists -> "exists" in
@@ -121,8 +121,8 @@ and print_fmla info fmt f = match f.f_node with
       smtwithtriggers/smtstrict *)
       let rec forall fmt = function
         | [] -> print_fmla info fmt f
-        | v::l -> 
-	    fprintf fmt "@[(%s (%a %a)@ %a)@]" q print_var v 
+        | v::l ->
+	    fprintf fmt "@[(%s (%a %a)@ %a)@]" q print_var v
               (print_type info) v.vs_ty forall l
       in
       forall fmt vl;
@@ -132,7 +132,7 @@ and print_fmla info fmt f = match f.f_node with
   | Fbinop (For, f1, f2) ->
       fprintf fmt "@[(or@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
   | Fbinop (Fimplies, f1, f2) ->
-      fprintf fmt "@[(implies@ %a@ %a)@]" 
+      fprintf fmt "@[(implies@ %a@ %a)@]"
         (print_fmla info) f1 (print_fmla info) f2
   | Fbinop (Fiff, f1, f2) ->
       fprintf fmt "@[(iff@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
@@ -150,9 +150,9 @@ and print_fmla info fmt f = match f.f_node with
       fprintf fmt "@[(let (%a %a)@ %a)@]" print_var v
         (print_term info) t1 (print_fmla info) f2;
       forget_var v
-  | Fcase _ -> unsupportedFmla f 
+  | Fcase _ -> unsupportedFmla f
       "smtv1 : you must eliminate match"
-      
+
 and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
 
 and print_triggers info fmt tl = print_list comma (print_expr info) fmt tl
@@ -171,9 +171,9 @@ let print_type_decl info fmt = function
         (print_type info) key (print_type info) elt; true
     with Not_found ->
       fprintf fmt ":extrasorts (%a)" print_ident ts.ts_name; true end
-  | _, Tabstract -> unsupported 
+  | _, Tabstract -> unsupported
           "smtv1 : type with argument are not supported"
-  | _, Talgebraic _ -> unsupported 
+  | _, Talgebraic _ -> unsupported
           "smtv1 : algebraic type are not supported"
 
 let print_logic_decl info fmt (ls,ld) = match ld with
@@ -186,22 +186,22 @@ let print_logic_decl info fmt (ls,ld) = match ld with
         | Some value ->
             fprintf fmt "@[<hov 2>:extrafuns ((%a %a %a))@]@\n"
               print_ident ls.ls_name
-              (print_list space (print_type info)) ls.ls_args 
+              (print_list space (print_type info)) ls.ls_args
               (print_type info) value
       end
-  | Some _ -> unsupported 
+  | Some _ -> unsupported
       "Predicate and function definition aren't supported"
 
-let print_logic_decl info fmt d = 
+let print_logic_decl info fmt d =
   if Sid.mem (fst d).ls_name info.info_rem then
     false else (print_logic_decl info fmt d; true)
-  
+
 let print_decl info fmt d = match d.d_node with
   | Dtype dl ->
       print_list_opt newline (print_type_decl info) fmt dl
   | Dlogic dl ->
       print_list_opt newline (print_logic_decl info) fmt dl
-  | Dind _ -> unsupportedDecl d 
+  | Dind _ -> unsupportedDecl d
       "smt : inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Sid.mem pr.pr_name info.info_rem -> false
   | Dprop (Paxiom, pr, f) ->
@@ -213,7 +213,7 @@ let print_decl info fmt d = match d.d_node with
       fprintf fmt "@[;; %a@]@\n" print_ident pr.pr_name;
       (match id_from_user pr.pr_name with
         | None -> ()
-        | Some loc -> fprintf fmt " @[;; %a@]@\n" 
+        | Some loc -> fprintf fmt " @[;; %a@]@\n"
             Loc.gen_report_position loc);
       fprintf fmt "  @[(not@ %a)@]" (print_fmla info) f;true
   | Dprop ((Plemma|Pskip), _, _) -> assert false
@@ -236,7 +236,7 @@ let barrays task =
   Stdecl.fold fold sds.tds_set Mts.empty
 
 let print_task pr thpr fmt task =
-  fprintf fmt "(benchmark why3@\n" 
+  fprintf fmt "(benchmark why3@\n"
     (*print_ident (Task.task_goal task).pr_name*);
   fprintf fmt "  :status unknown@\n";
   print_prelude fmt pr;
@@ -252,7 +252,7 @@ let print_task pr thpr fmt task =
   ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls);
   fprintf fmt "@\n)@."
 
-let () = register_printer "smtv1" 
+let () = register_printer "smtv1"
   (fun _env pr thpr ?old:_ fmt task ->
      forget_all ident_printer;
      print_task pr thpr fmt task)

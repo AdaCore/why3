@@ -38,26 +38,26 @@ val file_contents_buf : string -> Buffer.t
 (* put the content of a file in a formatter *)
 val file_contents_fmt : string -> Format.formatter -> unit
 
-val open_temp_file : 
+val open_temp_file :
   ?debug:bool -> (* don't remove the file *)
   string -> (string -> out_channel -> 'a) -> 'a
-(* open_temp_file suffix usefile 
+(* open_temp_file suffix usefile
    Create a temporary file with suffix suffix,
    and call usefile on this file (filename and open_out).
    usefile can close the file *)
 
 val call_asynchronous : (unit -> 'a) -> (unit -> 'a)
-  (* Transform a synchronous call to an 
+  (* Transform a synchronous call to an
      asynchronous in a separate memory.
-     call_asynchronous f forks and run the 
-     function in the child process. In the parent 
-     process the function returned will wait the end 
+     call_asynchronous f forks and run the
+     function in the child process. In the parent
+     process the function returned will wait the end
      of the child process*)
 
-(* With this function we can make fork in a thread 
+(* With this function we can make fork in a thread
    it is not as bad as it can be in 3.11.0 :
    http://caml.inria.fr/mantis/view.php?id=4577
 *)
 
 val copy_file : string -> string -> unit
-(** [copy_file from to] copy the file from [from] to [to] *) 
+(** [copy_file from to] copy the file from [from] to [to] *)

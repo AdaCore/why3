@@ -11,7 +11,7 @@ type prover_data =
       mutable editor : string;
     }
 
-type t = 
+type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
@@ -27,7 +27,7 @@ type t =
     }
 
 val get_prover_data : Why.Env.env -> string ->
-  Why.Whyconf.config_prover -> 
+  Why.Whyconf.config_prover ->
   prover_data Why.Util.Mstr.t -> prover_data Why.Util.Mstr.t
 
 val save_config : unit -> unit
@@ -68,7 +68,7 @@ val preferences : t -> unit
 val run_auto_detection : t -> unit
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. bin/whyide.opt"
-End: 
+End:
 *)

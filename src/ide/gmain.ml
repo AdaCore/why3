@@ -74,7 +74,7 @@ puis le relancer, et là on peut de nouveau déplier le fichier.
 
 open Format
 
-let () = 
+let () =
   eprintf "Init the GTK interface...@?";
   ignore (GtkMain.Main.init ());
   eprintf " done.@."
@@ -174,7 +174,7 @@ let project_dir, file_to_read =
       else
         begin
           eprintf "Info: found regular file '%s'@." fname;
-          let d = 
+          let d =
             try Filename.chop_extension fname
             with Invalid_argument _ -> fname
           in
@@ -402,37 +402,37 @@ let tools_window =
     ~title: "Why3 tool box"
     ()
 
-let tools_window_vbox = 
+let tools_window_vbox =
   GPack.vbox ~homogeneous:false ~packing:tools_window#add ()
 *)
 
-let tools_window_vbox = 
+let tools_window_vbox =
   try
     GPack.vbox ~packing:(hb#pack ~expand:false)  ()
   with Gtk.Error _ -> assert false
 
-let tools_frame = GBin.frame ~label:"Provers" 
+let tools_frame = GBin.frame ~label:"Provers"
   ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 (*
 let tools_frame = tools_window_vbox
 *)
 
-let tools_box = GPack.button_box `VERTICAL ~border_width:5 
+let tools_box = GPack.button_box `VERTICAL ~border_width:5
 (*
   ~layout
-  ~child_height 
-  ~child_width 
+  ~child_height
+  ~child_width
 *)
   ~spacing:5
-  ~packing:tools_frame#add () 
+  ~packing:tools_frame#add ()
 
-let others_frame = 
-  GBin.frame ~label:"Other" 
+let others_frame =
+  GBin.frame ~label:"Other"
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
-let others_box = 
-  GPack.button_box `VERTICAL ~border_width:5 ~packing:others_frame#add () 
+let others_box =
+  GPack.button_box `VERTICAL ~border_width:5 ~packing:others_frame#add ()
 
 
 (* horizontal paned *)
@@ -745,7 +745,7 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
               let subtask_db =
                 try Util.Mstr.find sum db_subgoals
 		  (* a subgoal has the same check sum *)
-                with Not_found -> 
+                with Not_found ->
 		  (* otherwise, create a new one *)
                   Db.add_subgoal tr subgoal_name sum
               in
@@ -810,7 +810,7 @@ let () =
 		let db_th =
 		  try
                     Util.Mstr.find tname ths
-		  with Not_found -> Db.add_theory f tname 
+		  with Not_found -> Db.add_theory f tname
 		in
 		let mth = Helpers.add_theory_row mfile th db_th in
 		let goals = Db.goals db_th in
@@ -849,12 +849,12 @@ let () =
   match file_to_read with
     | None -> ()
     | Some fn ->
-        if List.exists (fun (_,f) -> f = fn) files_in_db then 
+        if List.exists (fun (_,f) -> f = fn) files_in_db then
           eprintf "Info: file %s already in database@." fn
         else
           try
             Helpers.add_file fn
-          with e -> 
+          with e ->
 	    eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
               Exn_printer.exn_printer e;
 	    exit 1
@@ -1074,7 +1074,7 @@ let split_unproved_goals () =
                        let sum = task_checksum subtask in
                        let subtask_db = Db.add_subgoal db_transf subgoal_name sum in
                        (* TODO: call add_goal_row *)
-                       let goal = { 
+                       let goal = {
 			 Model.goal_name = subgoal_name;
 			 Model.parent = Model.Transf tr;
                          Model.task = subtask ;
@@ -1367,7 +1367,7 @@ let () =
          let i = GMisc.image ~pixbuf:(!image_prover) ()in
          let () = b#set_image i#coerce in
          let (_ : GtkSignal.id) =
-           b#connect#pressed 
+           b#connect#pressed
              ~callback:(fun () -> prover_on_selected_goals p)
          in ())
       gconfig.provers
@@ -1420,7 +1420,7 @@ let (_ : GMenu.image_menu_item) =
 (* vertical paned on the right*)
 (******************************)
 
-let vp = 
+let vp =
   try
     GPack.paned `VERTICAL  ~border_width:3 ~packing:hp#add ()
   with Gtk.Error _ -> assert false
@@ -1588,7 +1588,7 @@ let select_row p =
 
 
 let ft_of_th th =
-  (Filename.basename th.Model.theory_parent.Model.file_name, 
+  (Filename.basename th.Model.theory_parent.Model.file_name,
    th.Model.theory.Theory.th_name.Ident.id_string)
 
 let rec ft_of_goal g =
@@ -1610,26 +1610,26 @@ let edit_selected_row p =
         ()
     | Model.Row_proof_attempt a ->
         let g = a.Model.proof_goal in
-	let t = g.Model.task in 
+	let t = g.Model.task in
 	let driver = a.Model.prover.driver in
 	let file =
           match a.Model.edited_as with
             | "" ->
 		let (fn,tn) = ft_of_pa a in
-		let file = Driver.file_of_task driver 
-                  (Filename.concat project_dir fn) tn t 
+		let file = Driver.file_of_task driver
+                  (Filename.concat project_dir fn) tn t
 		in
 		(* Uniquify the filename if it exists on disk *)
-		let i = 
-                  try String.rindex file '.' 
-                  with _ -> String.length file 
+		let i =
+                  try String.rindex file '.'
+                  with _ -> String.length file
 		in
 		let name = String.sub file 0 i in
 		let ext = String.sub file i (String.length file - i) in
 		let i = ref 1 in
-		while Sys.file_exists 
+		while Sys.file_exists
 		  (name ^ "_" ^ (string_of_int !i) ^ ext) do
-		    incr i 
+		    incr i
 		done;
 		let file = name ^ "_" ^ (string_of_int !i) ^ ext in
 		a.Model.edited_as <- file;

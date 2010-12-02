@@ -26,7 +26,7 @@ open Whyconf
 (******************************)
 
 (*
-let autodetection () = 
+let autodetection () =
   let alt_ergo = {
     name    = "Alt-Ergo";
     command = "alt-ergo %s";
@@ -62,11 +62,11 @@ let autodetection () =
   save_config config
 *)
 
-let config = 
-  try 
+let config =
+  try
     Whyconf.read_config None
-  with 
-      Not_found -> 
+  with
+      Not_found ->
         eprintf "No config file found.@.";
 (* "Running autodetection of provers.@.";
         autodetection ();
@@ -80,7 +80,7 @@ let () = printf "Load path is: %a@." (Pp.print_list Pp.comma Pp.string) config.l
 
 let env = Env.create_env (Typing.retrieve config.loadpath)
 
-let timelimit = 
+let timelimit =
   match config.timelimit with
     | None -> 2
     | Some n -> n
@@ -93,7 +93,7 @@ let fname = "tests/test-claude"
 
 let () = Db.init_base (fname ^ ".db")
 
-let get_driver name = 
+let get_driver name =
   let pi = Util.Mstr.find name config.provers in
   Driver.load_driver env pi.Whyconf.driver
 
@@ -105,7 +105,7 @@ type prover_data =
 
 let provers_data =
   printf "===============================@\nProvers: ";
-  let l = 
+  let l =
     Util.Mstr.fold
     (fun id conf acc ->
        let name = conf.Whyconf.name in
@@ -116,9 +116,9 @@ let provers_data =
     ) config.provers []
   in
   printf "@\n===============================@.";
-  l 
-   
-let () = 
+  l
+
+let () =
   printf "previously known goals:@\n";
   List.iter (fun s -> printf "%s@\n" (Db.goal_task_checksum s)) (Db.root_goals ());
   printf "@."
@@ -134,7 +134,7 @@ let m : Theory.theory Theory.Mnm.t =
     close_in cin;
     eprintf "Parsing/Typing Ok@.";
     m
-  with e -> 
+  with e ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
@@ -160,26 +160,26 @@ let do_theory tname th glist =
 
 let count = ref 0
 
-let goal_menu g = 
+let goal_menu g =
   try
-    while true do 
+    while true do
       printf "Choose a prover:@.";
       let _,menu = List.fold_left
-        (fun (i,acc) p -> 
+        (fun (i,acc) p ->
            let i = succ i in
            printf "%2d: try %s@." i (Db.prover_name p.prover);
            (i,(i,p)::acc)) (0,[]) provers_data
       in
       let s = read_line () in
-      (try 
+      (try
          let i = try int_of_string s with Failure _ -> raise Not_found in
          let p = List.assoc i menu in
          (* this was for calling db directly *)
          (**
-         let call = 
+         let call =
 	   try
-             Db.try_prover ~debug:true ~timelimit ~memlimit:0 
-               ~prover:p.prover ~command:p.command ~driver:p.driver g 
+             Db.try_prover ~debug:true ~timelimit ~memlimit:0
+               ~prover:p.prover ~command:p.command ~driver:p.driver g
            with Db.AlreadyAttempted ->
              printf "Proof already attempted, no need to rerun@.";
              raise Exit
@@ -195,51 +195,51 @@ let goal_menu g =
            printf "Scheduled task #%d: status set to %a, you should update the view@." c Db.print_status result
          in
          Scheduler.schedule_proof_attempt
-           ~debug:false ~timelimit ~memlimit:0 
-           ~prover:p.prover ~command:p.command ~driver:p.driver 
+           ~debug:false ~timelimit ~memlimit:0
+           ~prover:p.prover ~command:p.command ~driver:p.driver
            ~callback
            ~async:(fun f -> f ())
            g;
-         raise Exit           
-       with Not_found -> 
+         raise Exit
+       with Not_found ->
          printf "unknown choice@.");
     done
   with Exit -> ()
-    
+
 let main_loop goals =
   try
     while true do
       printf "======================@\nMenu:@.";
       printf " 0: exit@.";
       let _,menu = List.fold_left
-        (fun (i,acc) g -> 
+        (fun (i,acc) g ->
            let i = succ i in
-           printf "%2d: name='%s', proved=%b@." i 
+           printf "%2d: name='%s', proved=%b@." i
              (Db.goal_name g) (Db.goal_proved g);
            let e = Db.external_proofs g in
-           List.iter 
+           List.iter
              (fun e ->
                 let p = Db.prover e in
-                printf 
+                printf
                   "    external proof: prover=%s, obsolete=%b\
                        , result=%a, time=%.2f@."
-                  (Db.prover_name p) (Db.proof_obsolete e) 
+                  (Db.prover_name p) (Db.proof_obsolete e)
                   Db.print_status (Db.status e)
                   (Db.result_time e))
-             
+
              e;
            (i,(i,g)::acc)) (0,[]) goals
       in
       let s = read_line () in
-      (try 
+      (try
          let i = int_of_string s in
-         if i=0 then raise Exit; 
+         if i=0 then raise Exit;
          goal_menu (List.assoc i menu)
-       with Not_found | Failure _ -> 
+       with Not_found | Failure _ ->
          printf "unknown choice@.");
     done
   with Exit -> ()
-  
+
 
 (****************)
 (* Main program *)
@@ -247,15 +247,15 @@ let main_loop goals =
 
 let () =
   eprintf "looking for goals@.";
-  let add_th t th mi = 
+  let add_th t th mi =
     eprintf "adding theory %s, %s@." th.Theory.th_name.Ident.id_string t;
-    Ident.Mid.add th.Theory.th_name (t,th) mi 
+    Ident.Mid.add th.Theory.th_name (t,th) mi
   in
-  let do_th _ (t,th) glist = 
+  let do_th _ (t,th) glist =
     eprintf "doing theory %s, %s@." th.Theory.th_name.Ident.id_string t;
-    do_theory t th glist  
+    do_theory t th glist
   in
-  let goals = 
+  let goals =
     Ident.Mid.fold do_th (Theory.Mnm.fold add_th m Ident.Mid.empty) []
   in
   eprintf "Production of goals done@.";
@@ -267,9 +267,9 @@ let () =
 
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "make -C ../.. bin/why-ide.byte"
-End: 
+End:
 *)
 
 

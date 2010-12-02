@@ -34,7 +34,7 @@ type for_direction = Pgm_ptree.for_direction
 (*****************************************************************************)
 (* phase 1: introduction of destructive types *)
 
-type dreference = 
+type dreference =
   | DRlocal  of string
   | DRglobal of Term.lsymbol
 
@@ -48,11 +48,11 @@ type dpre = Denv.dfmla
 
 type dpost = Denv.dfmla * (Term.lsymbol * Denv.dfmla) list
 
-type dtype_v = 
+type dtype_v =
   | DTpure of Denv.dty
   | DTarrow of dbinder list * dtype_c
 
-and dtype_c = 
+and dtype_c =
   { dc_result_type : dtype_v;
     dc_effect      : deffect;
     dc_pre         : dpre;
@@ -89,7 +89,7 @@ and dexpr_desc =
   | DEloop of dloop_annotation * dexpr
   | DElazy of lazy_op * dexpr * dexpr
   | DEmatch of dexpr * (Denv.dpattern * dexpr) list
-  | DEabsurd 
+  | DEabsurd
   | DEraise of Term.lsymbol * dexpr option
   | DEtry of dexpr * (Term.lsymbol * string option * dexpr) list
   | DEfor of ident * dexpr * for_direction * dexpr * Denv.dfmla option * dexpr
@@ -151,7 +151,7 @@ and iexpr_desc =
   | IEabsurd
   | IEraise of Term.lsymbol * iexpr option
   | IEtry of iexpr * (Term.lsymbol * Term.vsymbol option * iexpr) list
-  | IEfor of Term.vsymbol * Term.vsymbol * for_direction * Term.vsymbol * 
+  | IEfor of Term.vsymbol * Term.vsymbol * for_direction * Term.vsymbol *
              Term.fmla option * iexpr
 
   | IEassert of assertion_kind * Term.fmla
@@ -188,7 +188,7 @@ and expr_desc =
   | Eabsurd
   | Eraise of Term.lsymbol * expr option
   | Etry of expr * (Term.lsymbol * Term.vsymbol option * expr) list
-  | Efor of Term.vsymbol * Term.vsymbol * for_direction * Term.vsymbol * 
+  | Efor of Term.vsymbol * Term.vsymbol * for_direction * Term.vsymbol *
             Term.fmla option * expr
 
   | Eassert of assertion_kind * Term.fmla
@@ -208,7 +208,7 @@ type file = decl list
 
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. testl"
-End: 
+End:
 *)

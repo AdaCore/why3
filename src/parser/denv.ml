@@ -41,9 +41,9 @@ let () = Exn_printer.register (fun fmt e -> match e with
 type dty =
   | Tyvar of type_var
   | Tyapp of tysymbol * dty list
-      
-and type_var = { 
-  tag : int; 
+
+and type_var = {
+  tag : int;
   user : bool;
   tvsymbol : tvsymbol;
   mutable type_val : dty option;
@@ -57,16 +57,16 @@ let rec print_dty fmt = function
       fprintf fmt "'%s" v.tv_name.id_string
   | Tyapp (s, []) ->
       fprintf fmt "%s" s.ts_name.id_string
-  | Tyapp (s, [t]) -> 
+  | Tyapp (s, [t]) ->
       fprintf fmt "%a %s" print_dty t s.ts_name.id_string
-  | Tyapp (s, l) -> 
-      fprintf fmt "(%a) %s" 
+  | Tyapp (s, l) ->
+      fprintf fmt "(%a) %s"
 	(print_list comma print_dty) l s.ts_name.id_string
 
 let create_ty_decl_var =
   let t = ref 0 in
-  fun ?loc ~user tv -> 
-    incr t; 
+  fun ?loc ~user tv ->
+    incr t;
     { tag = !t; user = user; tvsymbol = tv; type_val = None;
       type_var_loc = loc }
 
@@ -94,7 +94,7 @@ let rec unify t1 t2 = match t1, t2 with
   | Tyapp _, _ | _, Tyapp _ ->
       false
 	(* other cases *)
-  | Tyvar {user=true; tag=t1}, Tyvar {user=true; tag=t2} -> 
+  | Tyvar {user=true; tag=t1}, Tyvar {user=true; tag=t2} ->
       t1 = t2
 
 (* intermediate types -> types *)
@@ -259,9 +259,9 @@ let find_type_var ~loc env tv =
     let v = create_ty_decl_var ~loc ~user:false tv in
     Htv.add env tv v;
     v
- 
+
 let rec specialize_ty ~loc env t = match t.ty_node with
-  | Ty.Tyvar tv -> 
+  | Ty.Tyvar tv ->
       Tyvar (find_type_var ~loc env tv)
   | Ty.Tyapp (s, tl) ->
       Tyapp (s, List.map (specialize_ty ~loc env) tl)
@@ -279,12 +279,12 @@ let ident_of_vs ~loc vs =
       | User loc -> loc
       | _ -> loc }
 
-let rec specialize_pattern ~loc htv p = 
+let rec specialize_pattern ~loc htv p =
   { dp_node = specialize_pattern_node  ~loc htv p.pat_node;
     dp_ty   = specialize_ty            ~loc htv p.pat_ty; }
 
 and specialize_pattern_node ~loc htv = function
-  | Term.Pwild -> 
+  | Term.Pwild ->
       Pwild
   | Term.Pvar v ->
       Pvar (ident_of_vs ~loc v)
@@ -295,8 +295,8 @@ and specialize_pattern_node ~loc htv = function
   | Term.Por (p, q) ->
       Por (specialize_pattern ~loc htv p, specialize_pattern ~loc htv q)
 
-let rec specialize_term ~loc htv t =  
-  let dt = 
+let rec specialize_term ~loc htv t =
+  let dt =
     { dt_node = specialize_term_node  ~loc htv t.t_node;
       dt_ty   = specialize_ty         ~loc htv t.t_ty; }
   in
@@ -305,21 +305,21 @@ let rec specialize_term ~loc htv t =
 and specialize_term_node ~loc htv = function
   | Term.Tbvar _ ->
       assert false
-  | Term.Tvar v -> 
+  | Term.Tvar v ->
       Tvar v.vs_name.id_string (* TODO: correct? is capture possible? *)
   | Term.Tconst c ->
       Tconst c
   | Term.Tapp (ls, tl) ->
       Tapp (ls, List.map (specialize_term ~loc htv) tl)
   | Term.Tif (f, t1, t2) ->
-      Tif (specialize_fmla ~loc htv f, 
+      Tif (specialize_fmla ~loc htv f,
 	   specialize_term ~loc htv t1, specialize_term ~loc htv t2)
   | Term.Tlet (t1, t2) ->
-      let v, t2 = t_open_bound t2 in 
-      Tlet (specialize_term ~loc htv t1, 
+      let v, t2 = t_open_bound t2 in
+      Tlet (specialize_term ~loc htv t1,
 	    ident_of_vs ~loc v, specialize_term ~loc htv t2)
   | Term.Tcase (t1, bl) ->
-      let branch b = let p, t = t_open_branch b in 
+      let branch b = let p, t = t_open_branch b in
 	specialize_pattern ~loc htv p, specialize_term ~loc htv t
       in
       Tmatch (specialize_term ~loc htv t1, List.map branch bl)
@@ -329,7 +329,7 @@ and specialize_term_node ~loc htv = function
 	    specialize_fmla ~loc htv f)
 
 (* TODO: labels are lost *)
-and specialize_fmla ~loc htv f = 
+and specialize_fmla ~loc htv f =
   let df = specialize_fmla_node ~loc htv f.f_node in
   List.fold_left (fun f l -> Fnamed (l, f)) df f.f_label
 
@@ -350,14 +350,14 @@ and specialize_fmla_node ~loc htv = function
   | Term.Ffalse ->
       Ffalse
   | Term.Fif (f1, f2, f3) ->
-      Fif (specialize_fmla ~loc htv f1, 
+      Fif (specialize_fmla ~loc htv f1,
 	   specialize_fmla ~loc htv f2, specialize_fmla ~loc htv f3)
   | Term.Flet (t1, f2b) ->
       let v, f2 = f_open_bound f2b in
       Flet (specialize_term ~loc htv t1,
 	    ident_of_vs ~loc v, specialize_fmla ~loc htv f2)
   | Term.Fcase (t, fbl) ->
-      let branch b = let p, f = f_open_branch b in 
+      let branch b = let p, f = f_open_branch b in
 	specialize_pattern ~loc htv p, specialize_fmla ~loc htv f
       in
       Fmatch (specialize_term ~loc htv t, List.map branch fbl)

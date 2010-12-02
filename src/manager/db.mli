@@ -25,7 +25,7 @@ open Why
 
 (** prover data *)
 
-type prover 
+type prover
   (** abstract type for the set of provers of the database *)
 
 val prover_name : prover -> string
@@ -76,9 +76,9 @@ type goal
 
 (** module Goal to allow use of goals in Hashtables or Map or Set *)
 module Goal : sig
-  
+
   type t = goal
-      
+
   val hash : t -> int
 
   val equal : t -> t -> bool
@@ -146,10 +146,10 @@ val root_goals : unit -> goal list
 
 exception AlreadyAttempted
 
-val try_prover : 
+val try_prover :
   async:((unit->unit)->unit) ->
-  debug:bool -> timelimit:int -> memlimit:int -> prover:prover -> 
-  command:string -> driver:Driver.driver -> goal -> 
+  debug:bool -> timelimit:int -> memlimit:int -> prover:prover ->
+  command:string -> driver:Driver.driver -> goal ->
   (unit -> proof_attempt_status)
   (** attempts to prove goal with the given prover.  This function
       prepares the goal for that prover, adds it as an new
@@ -160,12 +160,12 @@ val try_prover :
       process, the prover's answer is retrieved and database is
       updated, that is the [proved] field of the database is updated,
       and also these of any goal affected, according to invariant
-      above. The prover result is also returned. 
+      above. The prover result is also returned.
 
       Although goal preparation is not re-entrant, the function
       returned initially is re-entrant, thus is suitable for being executed
       in a thread, in contexts where background execution of provers is wanted.
-      
+
       @param timelimit CPU time limit given for that attempt, in
       seconds, must be positive. (unlimited attempts are not allowed
       with this function)
@@ -196,7 +196,7 @@ val add_transformation: goal -> transf -> unit
       A,B,C, C was proved interactively, and the new transformations
       produces only 2 goals, the interactive proof of C is keep in an
       extra dummy goal "true"
-      
+
       @raise AlreadyAttempted if this transformation has already been attempted
       and is not obsolete
 
@@ -221,10 +221,10 @@ val add_or_replace_task: tname:string -> name:string -> Task.task -> goal
 
       IMPORTANT: this kills every running prover tasks
 
-      
+
   *)
 
 (** TODO: full update, removing goals that are not pertinent anymore *)
 
 
-  
+

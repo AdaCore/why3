@@ -51,9 +51,9 @@ end = struct
     | _ -> assert false
 
   let var_of_reference env = function
-    | E.Rlocal vs -> 
+    | E.Rlocal vs ->
 	create_vsymbol (id_fresh vs.vs_name.id_string) (unref_ty env vs.vs_ty)
-    | E.Rglobal { ls_name = id; ls_value = Some ty } -> 
+    | E.Rglobal { ls_name = id; ls_value = Some ty } ->
 	create_vsymbol (id_fresh id.id_string) (unref_ty env ty)
     | E.Rglobal { ls_value = None } ->
 	assert false
@@ -62,11 +62,11 @@ end = struct
     let v = var_of_reference env r in
     E.Mref.add r v m
 
-  let create env ef = 
+  let create env ef =
     let s = E.Sref.union ef.E.reads ef.E.writes in
     { current = E.Sref.fold (havoc1 env) s E.Mref.empty; old = Mvs.empty; }
 
-  let havoc env ?pre ef s = 
+  let havoc env ?pre ef s =
     let l = match pre with
       | None -> fresh_label env
       | Some l -> l
@@ -74,11 +74,11 @@ end = struct
     { current = E.Sref.fold (havoc1 env) ef.E.writes s.current;
       old = Mvs.add l s.current s.old; }
 
-  let push_label env ?label s = 
+  let push_label env ?label s =
     let l = match label with None -> fresh_label env | Some l -> l in
     l, havoc env ~pre:l E.empty s
 
-  let ref_at cur s r = 
+  let ref_at cur s r =
     let m = match cur with
       | None -> s.current
       | Some l -> assert (Mvs.mem l s.old); Mvs.find l s.old
@@ -96,13 +96,13 @@ end = struct
     | _ ->
 	t_map (term_at env old cur s) (fmla_at env old cur s) t
 
-  and fmla_at env old cur s f = 
+  and fmla_at env old cur s f =
     f_map (term_at env old cur s) (fmla_at env old cur s) f
 
   let term env      s t = term_at env None None s t
   let fmla env ?old s f = fmla_at env old  None s f
 
-  let quantify _env s ef f = 
+  let quantify _env s ef f =
     let quant r f = wp_forall [ref_at None s r] [] f in
     let s = E.Sref.union ef.E.reads ef.E.writes in
     E.Sref.fold quant s f

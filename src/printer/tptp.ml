@@ -34,7 +34,7 @@ let ident_printer =
      "funs";"extrafuns";"extrasorts";"extrapreds";"language";
      "notes";"preds";"sorts";"status";"theory";"Int";"Real";"Bool";
      "Array";"U";"select";"store"] in *)
-  let bls = ["fof"; "axiom"; "conjecture"; "&"; "="; "!="; "!"; "|"; "=>"; 
+  let bls = ["fof"; "axiom"; "conjecture"; "&"; "="; "!="; "!"; "|"; "=>";
       "~"; "?"; "itef"] in
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
@@ -161,7 +161,7 @@ let print_task pr thpr fmt task =
   let decls = Task.task_decls task in
   ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)
 
-let () = register_printer "tptp" 
+let () = register_printer "tptp"
   (fun _env pr thpr ?old:_ fmt task ->
      forget_all ident_printer;
      print_task pr thpr fmt task)

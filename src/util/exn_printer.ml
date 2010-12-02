@@ -19,13 +19,13 @@
 
 type exn_printer = Format.formatter -> exn -> unit
 
-let exn_printers = 
+let exn_printers =
   (Stack.create () : (Format.formatter -> exn -> unit) Stack.t)
 
 let register exn_printer = Stack.push exn_printer exn_printers
 
 let () =
-  let all_exn_printer fmt exn = 
+  let all_exn_printer fmt exn =
     Format.fprintf fmt "anomaly: %s" (Printexc.to_string exn) in
   register all_exn_printer
 
@@ -47,7 +47,7 @@ let exn_printer fmt exn =
 
 let () = register
   (fun fmt exn -> match exn with
-    | Config.Dynlink.Error error -> 
+    | Config.Dynlink.Error error ->
         Format.fprintf fmt "Dynlink: %s" (Config.Dynlink.error_message error)
     | _ -> raise exn)
 

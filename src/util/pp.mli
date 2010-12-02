@@ -24,11 +24,11 @@ open Format
 val print_option : (formatter -> 'a -> unit) -> formatter -> 'a option -> unit
 val print_option_or_default :
   string -> (formatter -> 'a -> unit) -> formatter -> 'a option -> unit
-val print_list : 
-  (formatter -> unit -> unit) -> 
+val print_list :
+  (formatter -> unit -> unit) ->
   (formatter -> 'a -> unit) -> formatter -> 'a list -> unit
 val print_list_or_default :
-  string -> (formatter -> unit -> unit) -> 
+  string -> (formatter -> unit -> unit) ->
   (formatter -> 'a -> unit) -> formatter -> 'a list -> unit
 val print_list_par :
   (Format.formatter -> unit -> 'a) ->
@@ -43,16 +43,16 @@ val print_pair_delim :
   (Format.formatter -> unit -> unit) ->
   (Format.formatter -> unit -> unit) ->
   (Format.formatter -> unit -> unit) ->
-  (Format.formatter -> 'a -> unit) -> 
+  (Format.formatter -> 'a -> unit) ->
   (Format.formatter -> 'b -> unit) -> Format.formatter -> 'a * 'b -> unit
 val print_pair :
-  (Format.formatter -> 'a -> unit) -> 
+  (Format.formatter -> 'a -> unit) ->
   (Format.formatter -> 'b -> unit) -> Format.formatter -> 'a * 'b -> unit
 
-val print_iter1 : 
+val print_iter1 :
   (('a -> unit) -> 'b -> unit) ->
-  (Format.formatter -> unit -> unit) -> 
-  (Format.formatter -> 'a -> unit) -> 
+  (Format.formatter -> unit -> unit) ->
+  (Format.formatter -> 'a -> unit) ->
   Format.formatter -> 'b -> unit
 
 val print_iter2:
@@ -109,13 +109,13 @@ val open_formatter : ?margin:int -> out_channel -> formatter
 val close_formatter : formatter -> unit
 val open_file_and_formatter : ?margin:int -> string -> out_channel * formatter
 val close_file_and_formatter : out_channel * formatter -> unit
-val print_in_file_no_close : 
+val print_in_file_no_close :
   ?margin:int -> (Format.formatter -> unit) -> string -> out_channel
 val print_in_file : ?margin:int -> (Format.formatter -> unit) -> string -> unit
 
 
-val print_list_opt : 
-  (formatter -> unit -> unit) -> 
+val print_list_opt :
+  (formatter -> unit -> unit) ->
   (formatter -> 'a -> bool) -> formatter -> 'a list -> bool
 
 

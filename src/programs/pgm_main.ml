@@ -25,7 +25,7 @@ open Pgm_env
 
 let type_and_wp ?(type_only=false) env gl dl =
   let decl gl d = if type_only then gl else Pgm_wp.decl gl d in
-  let add gl d = 
+  let add gl d =
     let gl, dl = Pgm_typing.decl env gl d in
     List.fold_left decl gl dl
   in
@@ -34,7 +34,7 @@ let type_and_wp ?(type_only=false) env gl dl =
 let read_channel env file c =
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
-  let dl = Pgm_lexer.parse_file lb in 
+  let dl = Pgm_lexer.parse_file lb in
   if Debug.test_flag Typing.debug_parse_only then
     Theory.Mnm.empty
   else begin
@@ -44,7 +44,7 @@ let read_channel env file c =
     let uc = Theory.use_export uc th in
     let gl = empty_env uc in
     let gl = type_and_wp ~type_only env gl dl in
-    if type_only then 
+    if type_only then
       Theory.Mnm.empty
     else begin
       let th = Theory.close_theory gl.uc in
@@ -55,7 +55,7 @@ let read_channel env file c =
 let () = Env.register_format "whyml" ["mlw"] read_channel
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. testl"
-End: 
+End:
 *)

@@ -25,7 +25,7 @@ val async: ((unit->unit)->unit->unit) ref
     for the current user interface (e.g. GtkThread.async) *)
 
 val maximum_running_proofs: int ref
-(** bound on the number of prover processes running in parallel. 
+(** bound on the number of prover processes running in parallel.
     default is 2 *)
 
 type proof_attempt_status =
@@ -36,11 +36,11 @@ type proof_attempt_status =
   | Unknown (** external prover answered ``don't know'' or equivalent *)
   | HighFailure (** external prover call failed *)
 
-val schedule_proof_attempt : 
-  debug:bool -> timelimit:int -> memlimit:int -> 
+val schedule_proof_attempt :
+  debug:bool -> timelimit:int -> memlimit:int ->
   ?old:in_channel ->
-  command:string -> driver:Driver.driver -> 
-  callback:(proof_attempt_status -> float -> string -> unit) -> 
+  command:string -> driver:Driver.driver ->
+  callback:(proof_attempt_status -> float -> string -> unit) ->
   Task.task (* Db.goal *) -> unit
   (** schedules an attempt to prove goal with the given prover.  This
       function just prepares the goal for the proof attempt, and puts
@@ -50,7 +50,7 @@ val schedule_proof_attempt :
       The callback is called each time the status of that proves
       changes, typically from Scheduled, then Running, then Success or
       Timeout or Failure.
-      
+
       @param timelimit CPU time limit given for that attempt, in
       seconds, must be positive. (unlimited attempts are not allowed
       with this function)
@@ -82,9 +82,9 @@ val edit_proof :
   callback:(unit->unit) -> Why.Task.task -> unit
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "make -C ../.. bin/whyide.byte"
-End: 
+End:
 *)
 
 

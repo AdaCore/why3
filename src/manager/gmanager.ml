@@ -29,10 +29,10 @@ open Whyconf
 (* loading user configuration *)
 (******************************)
 
-let config = 
-  try 
+let config =
+  try
     Whyconf.read_config None
-  with 
+  with
     | Not_found ->
         eprintf "%s No config file found.@." pname;
         exit 1
@@ -43,7 +43,7 @@ let config =
 let () = eprintf "%s Load path is: %a@." pname
   (Pp.print_list Pp.comma Pp.string) config.loadpath
 
-let timelimit = 
+let timelimit =
   match config.timelimit with
     | None -> 2
     | Some n -> n
@@ -63,15 +63,15 @@ let spec = [
 let usage_str = "why-rustprover [options] <file>.why"
 let file = ref None
 let set_file f = match !file with
-  | Some _ -> 
+  | Some _ ->
       raise (Arg.Bad "only one file")
-  | None -> 
+  | None ->
 (*
-      if not (Filename.check_suffix f ".why") then 
+      if not (Filename.check_suffix f ".why") then
 	raise (Arg.Bad ("don't know what to do with " ^ f));
 *)
       if not (Sys.file_exists f) then begin
-	Format.eprintf "%s %s: no such file@." pname f; 
+	Format.eprintf "%s %s: no such file@." pname f;
         exit 1
       end;
       file := Some f
@@ -79,27 +79,27 @@ let set_file f = match !file with
 let () = Arg.parse spec set_file usage_str
 
 let fname = match !file with
-  | None -> 
-      Arg.usage spec usage_str; 
+  | None ->
+      Arg.usage spec usage_str;
       exit 1
-  | Some f -> 
+  | Some f ->
       f
 
 let lang =
-  let load_path = 
-    List.fold_right Filename.concat 
-      [Filename.dirname Sys.argv.(0); ".."; "share"] "lang" 
+  let load_path =
+    List.fold_right Filename.concat
+      [Filename.dirname Sys.argv.(0); ".."; "share"] "lang"
   in
-  let languages_manager = 
-    GSourceView2.source_language_manager ~default:true 
+  let languages_manager =
+    GSourceView2.source_language_manager ~default:true
   in
-  languages_manager#set_search_path 
+  languages_manager#set_search_path
     (load_path :: languages_manager#search_path);
   match languages_manager#language "why" with
     | None -> Format.eprintf "pas trouvé@;"; None
     | Some _ as l -> l
 
-let source_text = 
+let source_text =
   let ic = open_in fname in
   let size = in_channel_length ic in
   let buf = String.create size in
@@ -113,7 +113,7 @@ let env = Why.Env.create_env (Why.Typing.retrieve config.loadpath)
 (***********************)
 (* Parsing input file  *)
 (***********************)
-   
+
 let theories : Theory.theory Theory.Mnm.t =
   try
     let cin = open_in fname in
@@ -121,7 +121,7 @@ let theories : Theory.theory Theory.Mnm.t =
     close_in cin;
     eprintf "Parsing/Typing Ok@.";
     m
-  with e -> 
+  with e ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
@@ -131,7 +131,7 @@ let theories : Theory.theory Theory.Mnm.t =
 
 let () = Db.init_base (fname ^ ".db")
 
-let get_driver name = 
+let get_driver name =
   let pi = Util.Mstr.find name config.provers in
   Why.Driver.load_driver env pi.Whyconf.driver
 
@@ -143,7 +143,7 @@ type prover_data =
 
 let provers_data =
   printf "===============================@\nProvers: ";
-  let l = 
+  let l =
     Util.Mstr.fold
     (fun id conf acc ->
        let name = conf.Whyconf.name in
@@ -154,7 +154,7 @@ let provers_data =
     ) config.provers []
   in
   printf "@\n===============================@.";
-  l 
+  l
 
 let find_prover s =
   match
@@ -171,8 +171,8 @@ let simplify = find_prover "simplify"
 let z3 = find_prover "Z3"
 
 
-   
-let () = 
+
+let () =
   printf "previously known goals:@\n";
   List.iter (fun s -> printf "%s@\n" (Db.goal_task_checksum s)) (Db.root_goals ());
   printf "@."
@@ -191,30 +191,30 @@ module Ide_goals = struct
   let status_column = cols#add Gobject.Data.gobject
   let time_column = cols#add Gobject.Data.string
 
-  let renderer = GTree.cell_renderer_text [`XALIGN 0.] 
-  let image_renderer = GTree.cell_renderer_pixbuf [ ] 
+  let renderer = GTree.cell_renderer_text [`XALIGN 0.]
+  let image_renderer = GTree.cell_renderer_pixbuf [ ]
 
-  let view_name_column = 
-    GTree.view_column ~title:"Theories/Goals" 
-      ~renderer:(renderer, ["text", name_column]) () 
+  let view_name_column =
+    GTree.view_column ~title:"Theories/Goals"
+      ~renderer:(renderer, ["text", name_column]) ()
 
-  let () = 
+  let () =
     view_name_column#set_resizable true;
     view_name_column#set_max_width 400
 
-  let view_status_column = 
-    GTree.view_column ~title:"Status" 
+  let view_status_column =
+    GTree.view_column ~title:"Status"
       (*
-        ~renderer:(icon_renderer, ["stock_id", status_column]) 
+        ~renderer:(icon_renderer, ["stock_id", status_column])
       *)
-      ~renderer:(image_renderer, ["pixbuf", status_column]) 
+      ~renderer:(image_renderer, ["pixbuf", status_column])
       ()
 
-  let view_time_column = 
-    GTree.view_column ~title:"Time" 
+  let view_time_column =
+    GTree.view_column ~title:"Time"
       ~renderer:(renderer, ["text", time_column]) ()
 
-  let () = 
+  let () =
     view_status_column#set_resizable false;
     view_status_column#set_visible true;
     view_time_column#set_resizable false;
@@ -277,16 +277,16 @@ end
 (* windows, etc *)
 (****************)
 
-let move_to_line (v : GText.view) line = 
+let move_to_line (v : GText.view) line =
   if line <= v#buffer#line_count && line <> 0 then begin
-    let it = v#buffer#get_iter (`LINE line) in 
+    let it = v#buffer#get_iter (`LINE line) in
     let mark = `MARK (v#buffer#create_mark it) in
     v#scroll_to_mark ~use_align:true ~yalign:0.5 mark
   end
 
 (* to be run when a row in the tree view is selected *)
-let select_goals (goals_view:GTree.tree_store) (task_view:GSourceView2.source_view) 
-   (_source_view:GSourceView2.source_view) selected_rows = 
+let select_goals (goals_view:GTree.tree_store) (task_view:GSourceView2.source_view)
+   (_source_view:GSourceView2.source_view) selected_rows =
   List.iter
     (fun p ->
        let row = goals_view#get_iter p in
@@ -397,26 +397,26 @@ let prover_on_all_goals ~(model:GTree.tree_store) ~(view:GTree.view) p () =
        let callback result =
          (*
            printf "Scheduled task #%d: status set to %a@." c
-           Db.print_status result;         
+           Db.print_status result;
          *)
-         model#set ~row:prover_row ~column:Ide_goals.status_column 
+         model#set ~row:prover_row ~column:Ide_goals.status_column
            (image_of_result result);
 
-         model#set ~row:prover_row ~column:Ide_goals.time_column "n.a."; 
+         model#set ~row:prover_row ~column:Ide_goals.time_column "n.a.";
        in
        Scheduler.schedule_proof_attempt
          ~async
-         ~debug:false ~timelimit ~memlimit:0 
-         ~prover:p.prover ~command:p.command ~driver:p.driver 
+         ~debug:false ~timelimit ~memlimit:0
+         ~prover:p.prover ~command:p.command ~driver:p.driver
          ~callback
          g
     )
     Ide_goals.goal_table
 
 let main () =
-  let w = GWindow.window 
+  let w = GWindow.window
     ~allow_grow:true ~allow_shrink:true
-    ~width:window_width ~height:window_height 
+    ~width:window_width ~height:window_height
     ~title:"why-ide" ()
   in
   let _ = w#connect#destroy ~callback:(fun () -> exit 0) in
@@ -428,9 +428,9 @@ let main () =
   let accel_group = factory#accel_group in
   let file_menu = factory#add_submenu "_File" in
   let file_factory = new GMenu.factory file_menu ~accel_group in
-  let _ = 
-    file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit" 
-      ~callback:(fun () -> exit 0) () 
+  let _ =
+    file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit"
+      ~callback:(fun () -> exit 0) ()
   in
   let tools_menu = factory#add_submenu "_Tools" in
   let tools_factory = new GMenu.factory tools_menu ~accel_group in
@@ -439,28 +439,28 @@ let main () =
   let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:vbox#add () in
 
   (* left tree of namespace *)
-  let scrollview = 
-    GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC 
-    ~width:(window_width / 3) ~packing:hp#add () 
+  let scrollview =
+    GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
+    ~width:(window_width / 3) ~packing:hp#add ()
   in
   let _ = scrollview#set_shadow_type `ETCHED_OUT in
 
   let goals_model,goals_view = Ide_goals.create ~packing:scrollview#add () in
   Theory.Mnm.iter (fun _ th -> Ide_goals.add_goals goals_model th) theories;
-  let _ = 
-    tools_factory#add_image_item ~key:GdkKeysyms._A 
-      ~label:"Alt-Ergo on all goals" 
-      ~callback:(fun () -> 
-                   prover_on_all_goals ~model:goals_model ~view:goals_view 
+  let _ =
+    tools_factory#add_image_item ~key:GdkKeysyms._A
+      ~label:"Alt-Ergo on all goals"
+      ~callback:(fun () ->
+                   prover_on_all_goals ~model:goals_model ~view:goals_view
                      alt_ergo ();
-                   prover_on_all_goals ~model:goals_model ~view:goals_view 
+                   prover_on_all_goals ~model:goals_model ~view:goals_view
                      simplify ();
-                   prover_on_all_goals ~model:goals_model ~view:goals_view 
-                     z3 ()) () 
+                   prover_on_all_goals ~model:goals_model ~view:goals_view
+                     z3 ()) ()
   in
-  let _ = 
-    tools_factory#add_image_item ~key:GdkKeysyms._E 
-      ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) () 
+  let _ =
+    tools_factory#add_image_item ~key:GdkKeysyms._E
+      ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
   in
 
 
@@ -481,7 +481,7 @@ let main () =
   in
   task_view#source_buffer#set_language lang;
   task_view#set_highlight_current_line true;
-  
+
   (* source view *)
   let scrolled_source_view = GBin.scrolled_window
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
@@ -504,7 +504,7 @@ let main () =
   source_view#set_highlight_current_line true;
   source_view#source_buffer#set_text source_text;
 
-(* Bind event: row selection on tree view on the left *) 
+(* Bind event: row selection on tree view on the left *)
   let _ =
     goals_view#selection#connect#after#changed ~callback:
       begin fun () ->
@@ -521,7 +521,7 @@ let () =
   GtkThread.main ()
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. bin/why-ide.byte"
-End: 
+End:
 *)

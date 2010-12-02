@@ -28,11 +28,11 @@ let finally ff f x =
 let linenum f b =
   let cin = open_in f in
   let rec lookup n l cl =
-    if n = b then 
+    if n = b then
       (l,cl)
-    else 
+    else
       let c = input_char cin in
-      lookup (succ n) (if c == '\n' then succ l else l) 
+      lookup (succ n) (if c == '\n' then succ l else l)
 	(if c == '\n' then 0 else succ cl)
   in
   try let r = lookup 0 1 0 in close_in cin; r with e -> close_in cin; raise e
@@ -55,12 +55,12 @@ type position = Lexing.position * Lexing.position
 exception Located of position * exn
 
 let set_file file lb =
-  lb.Lexing.lex_curr_p <- 
+  lb.Lexing.lex_curr_p <-
     { lb.Lexing.lex_curr_p with Lexing.pos_fname = file }
 
 let dummy_position = Lexing.dummy_pos, Lexing.dummy_pos
 
-let gen_report_line fmt (f,l,b,e) = 
+let gen_report_line fmt (f,l,b,e) =
   fprintf fmt "File \"%s\", " f;
   fprintf fmt "line %d, characters %d-%d" l b e
 
@@ -68,7 +68,7 @@ type floc = string * int * int * int
 
 let dummy_floc = ("",0,0,0)
 
-let extract (b,e) = 
+let extract (b,e) =
   let f = b.pos_fname in
   let l = b.pos_lnum in
   let fc = b.pos_cnum - b.pos_bol in
@@ -82,10 +82,10 @@ let compare (_,l1,b1,e1) (_,l2,b2,e2) =
   if c <> 0 then c else
   Pervasives.compare e1 e2
 
-let gen_report_position fmt loc = 
+let gen_report_position fmt loc =
   gen_report_line fmt (extract loc)
 
-let report_position fmt pos = 
+let report_position fmt pos =
   fprintf fmt "%a:@\n" gen_report_position pos
 
 let string =
@@ -99,9 +99,9 @@ let string =
 
 let parse s =
   Scanf.sscanf s "File %S, line %d, characters %d-%d"
-    (fun f l c1 c2 -> 
+    (fun f l c1 c2 ->
        (*Format.eprintf "Loc.parse %S %d %d %d@." f l c1 c2;*)
-       let p = 
+       let p =
 	 { Lexing.dummy_pos with pos_fname = f; pos_lnum = l; pos_bol = 0 }
        in
        { p with pos_cnum = c1 }, { p with pos_cnum = c2 })

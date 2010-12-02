@@ -23,7 +23,7 @@ type type_v = private
   | Tpure of Ty.ty
   | Tarrow of binder list * type_c
 
-and type_c = 
+and type_c =
   { c_result_type : type_v;
     c_effect      : effect;
     c_pre         : pre;

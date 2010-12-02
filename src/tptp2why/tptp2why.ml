@@ -84,7 +84,7 @@ let () = Env.register_format "tptp" ["p"] Process.read_channel
 
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.."
-End: 
+End:
 *)

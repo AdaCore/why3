@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* POUR L'INSTANT, CE NE SONT ICI QUE DES EXPÉRIENCES 
+(* POUR L'INSTANT, CE NE SONT ICI QUE DES EXPÉRIENCES
    MERCI DE NE PAS CONSIDÉRER CE CODE COMME DÉFINITIF
    -- jcf
 *)
@@ -38,10 +38,10 @@ let font_family = "Monospace"
 
 let file = ref None
 let set_file f = match !file with
-  | Some _ -> 
+  | Some _ ->
       raise (Arg.Bad "only one file, please")
-  | None -> 
-      if not (Filename.check_suffix f ".why") then 
+  | None ->
+      if not (Filename.check_suffix f ".why") then
 	raise (Arg.Bad ("don't know what to do with " ^ f));
       if not (Sys.file_exists f) then begin
 	Format.eprintf "why-ide: %s: no such file@." f; exit 1
@@ -49,35 +49,35 @@ let set_file f = match !file with
       file := Some f
 let loadpath = ref []
 
-let spec = 
+let spec =
   [
-    "-I", Arg.String (fun s -> loadpath := s :: !loadpath), 
+    "-I", Arg.String (fun s -> loadpath := s :: !loadpath),
     "<dir> Add <dir> to the library search path";
   ]
 let usage_str = "why-ide [options] file.why"
 let () = Arg.parse spec set_file usage_str
 
 let fname = match !file with
-  | None -> 
+  | None ->
       Arg.usage spec usage_str; exit 1
-  | Some f -> 
+  | Some f ->
       f
 
 let lang =
-  let load_path = 
-    List.fold_right Filename.concat 
-      [Filename.dirname Sys.argv.(0); ".."; "share"] "lang" 
+  let load_path =
+    List.fold_right Filename.concat
+      [Filename.dirname Sys.argv.(0); ".."; "share"] "lang"
   in
-  let languages_manager = 
-    GSourceView2.source_language_manager ~default:true 
+  let languages_manager =
+    GSourceView2.source_language_manager ~default:true
   in
-  languages_manager#set_search_path 
+  languages_manager#set_search_path
     (load_path :: languages_manager#search_path);
   match languages_manager#language "why" with
     | None -> Format.eprintf "pas trouvé@;"; None
     | Some _ as l -> l
 
-let text = 
+let text =
   let ic = open_in fname in
   let size = in_channel_length ic in
   let buf = String.create size in
@@ -87,7 +87,7 @@ let text =
 
 let env = Env.create_env (Typing.retrieve !loadpath)
 
-let theories = 
+let theories =
   let cin = open_in fname in
   let m = Env.read_channel env fname cin in
   close_in cin;
@@ -99,12 +99,12 @@ module Ide_namespace = struct
   let cols = new GTree.column_list
   let column = cols#add Gobject.Data.string
 
-  let renderer = GTree.cell_renderer_text [`XALIGN 0.] 
-  let vcolumn = 
-    GTree.view_column ~title:"theories" 
-      ~renderer:(renderer, ["text", column]) () 
+  let renderer = GTree.cell_renderer_text [`XALIGN 0.]
+  let vcolumn =
+    GTree.view_column ~title:"theories"
+      ~renderer:(renderer, ["text", column]) ()
 
-  let () = 
+  let () =
     vcolumn#set_resizable true;
     vcolumn#set_max_width 400
 
@@ -116,12 +116,12 @@ module Ide_namespace = struct
     ignore (view#append_column vcolumn);
     model
 
-  let clear model = 
+  let clear model =
     model#clear ()
 
   let add_theory (model : GTree.tree_store) th =
     let rec fill parent ns =
-      let add_s k s _ = 
+      let add_s k s _ =
 	let row = model#append ~parent () in
 	model#set ~row ~column (k ^ s)
       in
@@ -145,9 +145,9 @@ end
 (* windows, etc *)
 
 let main () =
-  let w = GWindow.window 
+  let w = GWindow.window
     ~allow_grow:true ~allow_shrink:true
-    ~width:window_width ~height:window_height 
+    ~width:window_width ~height:window_height
     ~title:"why-ide" ()
   in
   let _ = w#connect#destroy ~callback:(fun () -> exit 0) in
@@ -159,16 +159,16 @@ let main () =
   let accel_group = factory#accel_group in
   let file_menu = factory#add_submenu "_File" in
   let file_factory = new GMenu.factory file_menu ~accel_group in
-  let _ = 
-    file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit" 
-      ~callback:(fun () -> exit 0) () 
+  let _ =
+    file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit"
+      ~callback:(fun () -> exit 0) ()
   in
 
   (* top line *)
   let top_box = GPack.hbox ~packing:vbox#pack () in
   (* Replay *)
-  let button = 
-    GButton.button ~label:"repousser le front d'obsolescence" 
+  let button =
+    GButton.button ~label:"repousser le front d'obsolescence"
       ~packing:top_box#add ()
   in
   ignore (button#connect#clicked
@@ -178,9 +178,9 @@ let main () =
   let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:vbox#add () in
 
   (* left tree of namespace *)
-  let scrollview = 
-    GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC 
-    ~width:(window_width / 3) ~packing:hp#add () 
+  let scrollview =
+    GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
+    ~width:(window_width / 3) ~packing:hp#add ()
   in
   let _ = scrollview#set_shadow_type `ETCHED_OUT in
 
@@ -206,7 +206,7 @@ let main () =
   source_view#source_buffer#set_language lang;
   source_view#set_highlight_current_line true;
   source_view#source_buffer#set_text text;
- 
+
   w#add_accel_group accel_group;
   w#show ()
 
@@ -215,7 +215,7 @@ let () =
   GtkThread.main ()
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. bin/whyide.opt"
-End: 
+End:
 *)

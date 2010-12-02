@@ -32,7 +32,7 @@ let channel_contents_buf cin =
   let buf = Buffer.create 1024
   and buff = String.make 1024 ' ' in
   let n = ref 0 in
-  while n := input cin buff 0 1024; !n <> 0 do 
+  while n := input cin buff 0 1024; !n <> 0 do
     Buffer.add_substring buf buff 0 !n
   done;
   buf
@@ -49,16 +49,16 @@ let file_contents_fmt f fmt =
     let cin = open_in f in
     channel_contents_fmt cin fmt;
     close_in cin
-  with _ -> 
+  with _ ->
     invalid_arg (Printf.sprintf "(cannot open %s)" f)
 
 let file_contents_buf f =
-  try 
+  try
     let cin = open_in f in
     let buf = channel_contents_buf cin in
     close_in cin;
     buf
-  with _ -> 
+  with _ ->
     invalid_arg (Printf.sprintf "(cannot open %s)" f)
 
 let file_contents f = Buffer.contents (file_contents_buf f)
@@ -71,7 +71,7 @@ let open_temp_file ?(debug=false) filesuffix usefile =
     close_out cout;
     res
   with
-    | e ->    
+    | e ->
         if not debug then Sys.remove file;
         close_out cout;
         raise e
@@ -84,13 +84,13 @@ open Unix
 
 exception Bad_execution of process_status
 
-let call_asynchronous (f : unit -> 'a) = 
+let call_asynchronous (f : unit -> 'a) =
   let cin,cout = pipe () in
   let cin = in_channel_of_descr cin in
   let cout = out_channel_of_descr cout in
   match fork () with
-    | 0 -> 
-        let result = 
+    | 0 ->
+        let result =
           try
             Result (f ())
           with exn -> Exception exn in

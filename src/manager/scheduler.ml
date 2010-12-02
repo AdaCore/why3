@@ -1,6 +1,6 @@
 
 
-(* queue of pending proof attempts 
+(* queue of pending proof attempts
    protected by a lock
 *)
 
@@ -9,10 +9,10 @@ let attempts = Queue.create ()
 let running_proofs = ref 0
 let maximum_running_proofs = ref 2
 
-let schedule_proof_attempt ~async ~debug ~timelimit ~memlimit ~prover 
+let schedule_proof_attempt ~async ~debug ~timelimit ~memlimit ~prover
     ~command ~driver ~callback
     goal =
-  let prepare_goal = 
+  let prepare_goal =
     try
       Db.try_prover ~async ~debug ~timelimit ~memlimit ~prover ~command ~driver goal;
     with Db.AlreadyAttempted ->
@@ -20,7 +20,7 @@ let schedule_proof_attempt ~async ~debug ~timelimit ~memlimit ~prover
   in
   let _thread_id =
     Thread.create
-      begin 
+      begin
         fun () ->
           try
             (* BEGIN LOCKED SECTION *)
@@ -34,7 +34,7 @@ let schedule_proof_attempt ~async ~debug ~timelimit ~memlimit ~prover
               incr running_proofs;
               callback Db.Running;
               Mutex.unlock queue_lock;
-              (* END LOCKED SECTION *)       
+              (* END LOCKED SECTION *)
               let res = call () in
               (* BEGIN LOCKED SECTION *)
               Mutex.lock queue_lock;
@@ -42,28 +42,28 @@ let schedule_proof_attempt ~async ~debug ~timelimit ~memlimit ~prover
               decr running_proofs;
             done;
             Mutex.unlock queue_lock
-              (* END LOCKED SECTION *)       
+              (* END LOCKED SECTION *)
           with
             | Queue.Empty ->
                 (* Queue was Empty *)
                 Mutex.unlock queue_lock
-                  (* END LOCKED SECTION *)       
+                  (* END LOCKED SECTION *)
             | e ->
-                (* any other exception should be propagated 
+                (* any other exception should be propagated
                    after unlocking the lock *)
                 Mutex.unlock queue_lock;
-                (* END LOCKED SECTION *)       
+                (* END LOCKED SECTION *)
                 raise e
       end
       ()
   in ()
-        
 
-  
+
+
 
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. bin/gwhy.byte"
-End: 
+End:
 *)

@@ -20,7 +20,7 @@
 open Why
 open Term
 
-type reference = 
+type reference =
   | Rlocal  of Term.vsymbol
   | Rglobal of Term.lsymbol
 

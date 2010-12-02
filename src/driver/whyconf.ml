@@ -25,11 +25,11 @@ open Rc
 
 let compilation_libdir = default_option Config.libdir Config.localdir
 
-let compilation_datadir = 
+let compilation_datadir =
   option_apply Config.datadir
     (fun d -> Filename.concat d "share") Config.localdir
 
-let compilation_loadpath = 
+let compilation_loadpath =
   Filename.concat compilation_datadir "theories"
 
 let default_conf_file =
@@ -58,7 +58,7 @@ type main = {
   running_provers_max : int;
   (* max number of running prover processes *)
   plugins : string list;
-  (* plugins to load, without extension, relative to 
+  (* plugins to load, without extension, relative to
      [private_libdir]/plugins *)
 }
 
@@ -76,7 +76,7 @@ let datadir m =
     d
   with Not_found -> m.private_datadir
 
-let loadpath m = 
+let loadpath m =
   try
     let d = Sys.getenv "WHY3LOADPATH" in
 (*

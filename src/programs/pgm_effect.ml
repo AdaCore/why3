@@ -22,7 +22,7 @@ open Util
 open Ident
 open Term
 
-type reference = 
+type reference =
   | Rlocal  of Term.vsymbol
   | Rglobal of Term.lsymbol
 
@@ -46,7 +46,7 @@ let reference_of_term t = match t.t_node with
   | _ -> assert false
 
 module Reference = struct
-  
+
   type t = reference
 
   let compare r1 r2 = match r1, r2 with
@@ -76,7 +76,7 @@ let add_read  r t = { t with reads  = Sref.add r t.reads  }
 let add_write r t = { t with writes = Sref.add r t.writes }
 let add_raise e t = { t with raises = E.add e t.raises }
 
-let remove_reference r t = 
+let remove_reference r t =
   { t with reads = Sref.remove r t.reads; writes = Sref.remove r t.writes }
 
 let remove_raise e t = { t with raises = E.remove e t.raises }
@@ -117,11 +117,11 @@ let print_rset fmt s = print_list comma print_reference fmt (Sref.elements s)
 let print_eset fmt s = print_list comma print_ls        fmt (E.elements s)
 
 let print fmt e =
-  if not (Sref.is_empty e.reads) then 
+  if not (Sref.is_empty e.reads) then
     fprintf fmt "@ reads %a" print_rset e.reads;
-  if not (Sref.is_empty e.writes) then 
+  if not (Sref.is_empty e.writes) then
     fprintf fmt "@ writes %a" print_rset e.writes;
-  if not (E.is_empty e.raises) then 
+  if not (E.is_empty e.raises) then
     fprintf fmt "@ raises %a" print_eset e.raises
 
 
