@@ -13,12 +13,15 @@ val load : ?dirs:string list -> plugin -> unit
    plugin named [plugin]. It add the extension .cmo or .cmxs to the
    filename according to the compilation used for the main program *)
 
-type ext =
-(* not a plugin extension *)
-  | Extbad
-(* good plugin extension *)
-  | Extgood
- (* good plugin extension but not the current compilation used *)
-  | Extother
 
-val check_extension : plugin -> ext
+type plu =
+  (* not a plugin extension *)
+  | Plubad
+  (* good plugin extension *)
+  | Plugood
+  (* good plugin extension but fail to load *)
+  | Plufail of exn
+  (* good plugin extension but not tested ( other kind of compilation ) *)
+  | Pluother
+
+val check_plugin : plugin -> plu

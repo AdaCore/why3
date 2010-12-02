@@ -103,9 +103,8 @@ let add_plugin m p =
 
 let pluginsdir m = Filename.concat m.private_libdir "plugins"
 let load_plugins m =
-  let dirs = [pluginsdir m] in
   let load x =
-    try Plugin.load ~dirs x
+    try Plugin.load x
     with exn ->
       Format.eprintf "%s can't be loaded : %a@." x
         Exn_printer.exn_printer exn in

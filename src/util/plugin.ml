@@ -6,6 +6,11 @@ let debug = Debug.register_flag "load_plugin"
 
 exception Plugin_Not_Found of plugin * string list
 
+let loadfile f =
+  Debug.dprintf debug "Plugin loaded : %s@." f;
+  Dynlink.loadfile_private f
+
+
 let add_extension p =
   if Dynlink.is_native then p^".cmxs" else p^".cmo"
 
@@ -20,25 +25,27 @@ let load ?dirs p =
           let f = Filename.concat d p in
           if Sys.file_exists f then f else find ld in
       find ld in
-  Debug.dprintf debug "Plugin loaded : %s" f;
-  Dynlink.loadfile_private f
+  loadfile f
 
-type ext =
+type plu =
   (* not a plugin extension *)
-  | Extbad
+  | Plubad
   (* good plugin extension *)
-  | Extgood
-  (* good plugin extension but not the current compilation used *)
-  | Extother
+  | Plugood
+  (* good plugin extension but fail to load *)
+  | Plufail of exn
+  (* good plugin extension but not tested *)
+  | Pluother
 
-let check_extension f =
+let check_plugin f =
   let cmxs = Filename.check_suffix f ".cmxs" in
   let cmo = Filename.check_suffix f ".cmo" in
   if not cmxs && not cmo
-  then Extbad
+  then Plubad
   else
     if (if Dynlink.is_native then cmxs else cmo)
-    then Extgood else Extother
+    then try loadfile f; Plugood with exn -> Plufail exn
+    else Pluother
 
 let () =
   Exn_printer.register (fun fmt exn ->
@@ -47,5 +54,5 @@ let () =
         Format.fprintf fmt "The plugin %s can't be found in the directories %a"
           pl (Pp.print_list Pp.space Pp.string) sl
       | Dynlink.Error (error) ->
-        Format.fprintf fmt "Dynlink error : %s@." (Dynlink.error_message error)
+        Format.fprintf fmt "Dynlink error : %s" (Dynlink.error_message error)
       | _ -> raise exn)
