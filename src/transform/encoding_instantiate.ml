@@ -356,7 +356,7 @@ let ty_quant =
   let rec add_vs s ty = match ty.ty_node with
     | Tyvar vs -> Stv.add vs s
     | _ -> ty_fold add_vs s ty in
-  f_fold_ty add_vs Stv.empty
+  f_ty_fold add_vs Stv.empty
 
 (* The Core of the transformation *)
 let fold_map task_hd ((env:env),task) =
@@ -506,7 +506,7 @@ let find_mono ~only_mono sty f =
   let rec ty_add sty ty = ty_fold ty_add (Sty.add ty sty) ty in
   let add sty ty = if is_ty_mono ~only_mono ty then
       ty_add sty ty else sty in
-  f_fold_ty add sty f
+  f_ty_fold add sty f
 
 let create_meta_ty ty =
   let name = id_fresh "meta_ty" in
@@ -561,12 +561,12 @@ let meta_kept_array = register_meta "encoding : kept_array" [MTtysymbol]
 (* select the type array which appear as argument of set and get.
   set and get must be in sls *)
 let find_mono_array ~only_mono sls sty f =
-  let add sty ls tyl =
+  let add sty ls tyl _ =
     match tyl with
       | ty::_ when Sls.mem ls sls && is_ty_mono ~only_mono ty ->
         Sty.add ty sty
       | _ -> sty in
-  f_fold_sig add sty f
+  f_app_fold add sty f
 
 let create_meta_ty ty =
   let name = id_fresh "meta_ty" in

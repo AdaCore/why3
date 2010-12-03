@@ -310,12 +310,10 @@ val f_quant_close_simp : quant -> vsymbol list -> trigger list -> fmla -> fmla
 val f_forall_close_simp : vsymbol list -> trigger list -> fmla -> fmla
 val f_exists_close_simp : vsymbol list -> trigger list -> fmla -> fmla
 
-
 val f_forall_close_merge : vsymbol list -> fmla -> fmla
-(** [forall_close_merge vs f] - put a universal quantifier on top of [f]; merge
-  variable lists if [f] is already a universally quantified formula; reuse
-  triggers of [f], if any, otherwise the quantifier has no triggers. *)
-
+(** [forall_close_merge vs f] puts a universal quantifier over [f];
+    merges variable lists if [f] is already universally quantified;
+    reuses triggers of [f], if any, otherwise puts no triggers. *)
 
 (** Expr and trigger traversal *)
 
@@ -350,6 +348,19 @@ val t_s_all : (tysymbol -> bool) -> (lsymbol -> bool) -> term -> bool
 val f_s_all : (tysymbol -> bool) -> (lsymbol -> bool) -> fmla -> bool
 val t_s_any : (tysymbol -> bool) -> (lsymbol -> bool) -> term -> bool
 val f_s_any : (tysymbol -> bool) -> (lsymbol -> bool) -> fmla -> bool
+
+(** fold over types in terms and formulas *)
+
+val t_ty_fold : ('a -> ty -> 'a) -> 'a -> term -> 'a
+val f_ty_fold : ('a -> ty -> 'a) -> 'a -> fmla -> 'a
+
+(* fold over applications in terms and formulas *)
+
+val t_app_fold :
+  ('a -> lsymbol -> ty list -> ty option -> 'a) -> 'a -> term -> 'a
+
+val f_app_fold :
+  ('a -> lsymbol -> ty list -> ty option -> 'a) -> 'a -> fmla -> 'a
 
 (** built-in symbols *)
 
@@ -508,10 +519,3 @@ exception NoMatch
 val t_match : term Mvs.t -> term -> term -> term Mvs.t
 val f_match : term Mvs.t -> fmla -> fmla -> term Mvs.t
 
-(** fold over types in terms and formulas *)
-
-val t_fold_ty : ('a -> ty -> 'a) -> 'a -> term -> 'a
-val f_fold_ty : ('a -> ty -> 'a) -> 'a -> fmla -> 'a
-
-val t_fold_sig : ('a -> lsymbol -> ty list -> 'a) -> 'a -> term -> 'a
-val f_fold_sig : ('a -> lsymbol -> ty list -> 'a) -> 'a -> fmla -> 'a

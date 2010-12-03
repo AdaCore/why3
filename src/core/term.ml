@@ -765,10 +765,6 @@ let bnd_find i m =
 
 let bnd_inst m nv { bv_bound = d ; bv_open = b ; bv_defer = s } =
   let s = Sint.fold (fun i -> Mint.add (i + d) (bnd_find i m)) b s in
-(* assert (Mint.submap (const3 true) b m);
-  let m = Mint.inter (fun _ () x -> Some x) b m in
-  let m = Mint.translate ((+) d) m in
-  let s = Mint.union (fun _ _ _ -> assert false) m s in *)
   { bv_bound = d + nv ; bv_open = Sint.empty ; bv_defer = s }
 
 let rec t_inst m nv t = t_label_copy t (match t.t_node with
@@ -1192,6 +1188,34 @@ let t_s_any prT prL t =
 
 let f_s_any prT prL f =
   try f_s_fold (any_fn prT) (any_fn prL) false f with FoldSkip -> true
+
+(* fold over types in terms and formulas *)
+
+let rec t_ty_fold fn acc t =
+  let acc = t_fold_unsafe (t_ty_fold fn) (f_ty_fold fn) acc t in
+  fn acc t.t_ty
+
+and f_ty_fold fn acc f =
+  let acc = f_fold_unsafe (t_ty_fold fn) (f_ty_fold fn) acc f in
+  match f.f_node with
+    | Fquant (_,(vsl,_,_,_)) ->
+    (* these variables (and their types) may never appear below *)
+        List.fold_left (fun acc vs -> fn acc vs.vs_ty) acc vsl
+    | _ -> acc
+
+(* fold over applications in terms and formulas *)
+
+let rec t_app_fold fn acc t =
+  let acc = t_fold_unsafe (t_app_fold fn) (f_app_fold fn) acc t in
+  match t.t_node with
+    | Tapp (ls,tl) -> fn acc ls (List.map (fun t -> t.t_ty) tl) (Some t.t_ty)
+    | _ -> acc
+
+and f_app_fold fn acc f =
+  let acc = f_fold_unsafe (t_app_fold fn) (f_app_fold fn) acc f in
+  match f.f_node with
+    | Fapp (ls,tl) -> fn acc ls (List.map (fun t -> t.t_ty) tl) None
+    | _ -> acc
 
 (* free type variables *)
 
@@ -1896,32 +1920,3 @@ let f_map_simp fnT fnF f = f_label_copy f (match f.f_node with
 
 let f_map_simp fnT = f_map_simp (protect fnT)
 
-(* Fold over types in terms and formulas *)
-
-let rec t_fold_ty fty acc t =
-  let acc = t_fold_unsafe (t_fold_ty fty) (f_fold_ty fty) acc t in
-  let acc = fty acc t.t_ty in
-  match t.t_node with
-    | Teps (vs,_,_) -> fty acc vs.vs_ty
-    | _ -> acc
-
-and f_fold_ty fty acc f =
-  let acc = f_fold_unsafe (t_fold_ty fty) (f_fold_ty fty) acc f in
-  match f.f_node with
-    | Fquant (_,(vsl,_,_,_)) ->
-        List.fold_left (fun acc vs -> fty acc vs.vs_ty) acc vsl
-    | _ -> acc
-
-(* Fold over EXACTLY WHAT? in terms and formulas *)
-
-let rec t_fold_sig fty acc t =
-  let acc = t_fold_unsafe (t_fold_sig fty) (f_fold_sig fty) acc t in
-  match t.t_node with
-    | Tapp (fs,tl) -> fty acc fs (List.map (fun t -> t.t_ty) tl)
-    | _ -> acc
-
-and f_fold_sig fty acc f =
-  let acc = f_fold_unsafe (t_fold_sig fty) (f_fold_sig fty) acc f in
-  match f.f_node with
-    | Fapp (fs,tl) -> fty acc fs (List.map (fun t -> t.t_ty) tl)
-    | _ -> acc
