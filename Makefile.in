@@ -504,7 +504,7 @@ clean::
 TPTPGENERATED = src/tptp2why/tptpLexer.ml \
 	src/tptp2why/tptpParser.ml src/tptp2why/tptpParser.mli
 
-TPTP_FILES = tptpTree tptpParser tptpLexer tptpTranslate tptp2why
+TPTP_FILES = tptpTree tptpParser tptpLexer tptpTranslate tptp2whymain
 
 TPTPMODULES = $(addprefix src/tptp2why/, $(TPTP_FILES))
 
@@ -519,21 +519,29 @@ $(TPTPCMO) $(TPTPCMX): INCLUDES += -I src/tptp2why
 # build targets
 
 ifeq (@enable_whytptp@,yes)
-byte: bin/whytptp.byte
-opt:  bin/whytptp.opt
+byte: plugins/whytptp.cmo
+opt:  plugins/whytptp.cmxs
 endif
 
-bin/whytptp.opt bin/whytptp.byte: EXTOBJS += $(MENHIRLIB)
-bin/whytptp.opt bin/whytptp.byte: INCLUDES += $(MENHIRINC)
+plugins/whytptp.cmxs plugins/whytptp.cmo: EXTOBJS += $(MENHIRLIB)
+plugins/whytptp.cmxs plugins/whytptp.cmo: INCLUDES += $(MENHIRINC)
 
-bin/whytptp.opt: src/why.cmxa $(TPTPCMX) src/main.cmx
+plugins:
+	@mkdir plugins
+
+src/tptp2why/whytptp.cmxs: $(TPTPCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
-	$(STRIP) $@
+	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
 
-bin/whytptp.byte: src/why.cma $(TPTPCMO) src/main.cmo
+src/tptp2why/whytptp.cmo: $(TPTPCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+	    $(OCAMLC) $(BFLAGS) -pack -o $@ $^
+
+plugins/whytptp.cmxs: plugins src/tptp2why/whytptp.cmxs
+	@cp src/tptp2why/whytptp.cmxs $@
+
+plugins/whytptp.cmo: plugins src/tptp2why/whytptp.cmo
+	@cp src/tptp2why/whytptp.cmo $@
 
 # depend and clean targets
 

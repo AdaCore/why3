@@ -67,7 +67,7 @@ let install_plugin main p =
       raise Exit
     | Plugin.Pluother ->
       eprintf "The plugin %s will not be used with this kind of compilation \
-and it has not be tested@."
+and it has not been tested@."
         p
     | Plugin.Plugood -> ()
     | Plugin.Plufail exn -> eprintf "The plugin %s dynlink failed :@.%a@."
