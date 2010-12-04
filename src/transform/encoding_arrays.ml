@@ -352,7 +352,7 @@ let create_env env task thpoly tds =
           add_ty_decl task [ts,Tabstract],ts in
     let task,tskey = add_ty task key in
     let task,tselt = add_ty task elt in
-    let ts_name = "bta_"^(Pp.string_of Pretty.print_ty ty) in
+    let ts_name = "bta_"^(Pp.string_of_wnl Pretty.print_ty ty) in
     let ts = create_tysymbol (id_fresh ts_name) [] None in
     let task = add_ty_decl task [ts,Tabstract] in
     let th_inst = create_inst ~ts:[ct,ts; ckey,tskey; celt,tselt] ~ls:[]

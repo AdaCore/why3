@@ -151,6 +151,13 @@ let rec print_list_opt sep print fmt = function
 let string_of p x =
   let b = Buffer.create 100 in
   let fmt = formatter_of_buffer b in
+  fprintf fmt "%a@?" p x;
+  Buffer.contents b
+
+
+let string_of_wnl p x =
+  let b = Buffer.create 100 in
+  let fmt = formatter_of_buffer b in
   let out,flush,_newline,spaces =
     pp_get_all_formatter_output_functions fmt () in
   pp_set_all_formatter_output_functions fmt
