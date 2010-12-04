@@ -26,9 +26,16 @@ let prover_attempts_queue : attempt Queue.t = Queue.create ()
 let proof_edition_queue : (bool * string * string * Driver.driver *
     (unit -> unit) * Task.task)  Queue.t = Queue.create ()
 
+type ('a,'b) doable = { callback : 'b -> unit;
+                        argument : 'a;
+                        funct    : 'a -> 'b   }
+
+type exists_doable = { exists : 'a 'b. ('a,'b) doable -> unit }
+
 type job =
   | TaskL of (Task.task list -> unit) * Task.task list Trans.trans * Task.task
   | Task of (Task.task -> unit) * Task.task Trans.trans * Task.task
+  | Do of (exists_doable -> unit)
 
 (* queue of transformations *)
 let transf_queue  : job Queue.t = Queue.create ()
@@ -91,6 +98,11 @@ let event_handler () =
       | Task (cb,tf, task) ->
           let task = Trans.apply tf task in
           !async (fun () -> cb task) ()
+      | Do e ->
+        let f d =
+          let r = d.funct d.argument in
+          !async (fun () -> d.callback r) () in
+        e {exists = f}
     with Queue.Empty ->
     try
       (* priority 3: edit proofs *)
@@ -220,6 +232,18 @@ let apply_transformation ~callback transf goal =
 let apply_transformation_l ~callback transf goal =
   Mutex.lock queue_lock;
   Queue.push (TaskL (callback,transf,goal)) transf_queue;
+  Condition.signal queue_condition;
+  Mutex.unlock queue_lock;
+  ()
+
+
+let do_why ~callback funct argument =
+  let doable = { callback = callback;
+                 argument = argument;
+                 funct    = funct } in
+  let exists f = f.exists doable in
+  Mutex.lock queue_lock;
+  Queue.push (Do exists) transf_queue;
   Condition.signal queue_condition;
   Mutex.unlock queue_lock;
   ()

@@ -74,6 +74,9 @@ val apply_transformation_l :
   callback:(Why.Task.task list -> unit) ->
   Why.Task.task list Trans.trans -> Task.task -> unit
 
+val do_why : callback:('b -> unit) -> ('a -> 'b) -> 'a -> unit
+(** use do why for all the function which deals with creating why value *)
+
 val edit_proof :
   debug:bool ->
   editor:string ->
