@@ -90,6 +90,7 @@ let ns_find_ns = ns_find (fun ns -> ns.ns_ns)
 (** Meta properties *)
 
 type meta_arg_type =
+  | MTty
   | MTtysymbol
   | MTlsymbol
   | MTprsymbol
@@ -97,6 +98,7 @@ type meta_arg_type =
   | MTint
 
 type meta_arg =
+  | MAty  of ty
   | MAts  of tysymbol
   | MAls  of lsymbol
   | MApr  of prsymbol
@@ -189,6 +191,7 @@ module Hstdecl = Hashcons.Make (struct
   type t = tdecl
 
   let eq_marg a1 a2 = match a1,a2 with
+    | MAty ty1, MAty ty2 -> ty_equal ty1 ty2
     | MAts ts1, MAts ts2 -> ts_equal ts1 ts2
     | MAls ls1, MAls ls2 -> ls_equal ls1 ls2
     | MApr pr1, MApr pr2 -> pr_equal pr1 pr2
@@ -215,6 +218,7 @@ module Hstdecl = Hashcons.Make (struct
   let hs_cl_pr _ pr acc = Hashcons.combine acc (pr_hash pr)
 
   let hs_ta = function
+    | MAty ty -> ty_hash ty
     | MAts ts -> ts_hash ts
     | MAls ls -> ls_hash ls
     | MApr pr -> pr_hash pr
@@ -314,6 +318,7 @@ let known_clone kn sm =
 
 let known_meta kn al =
   let check = function
+    | MAty ty -> ty_s_fold (fun () ts -> known_id kn ts.ts_name) () ty
     | MAts ts -> known_id kn ts.ts_name
     | MAls ls -> known_id kn ls.ls_name
     | MApr pr -> known_id kn pr.pr_name
@@ -587,6 +592,7 @@ let cl_decl cl inst d = match d.d_node with
   | Dprop p -> cl_prop cl inst p
 
 let cl_marg cl = function
+  | MAty ty -> MAty (cl_trans_ty cl ty)
   | MAts ts -> MAts (cl_find_ts cl ts)
   | MAls ls -> MAls (cl_find_ls cl ls)
   | MApr pr -> MApr (cl_find_pr cl pr)
@@ -666,6 +672,7 @@ let is_empty_sm sm =
 (** Meta properties *)
 
 let get_meta_arg_type = function
+  | MAty  _ -> MTty
   | MAts  _ -> MTtysymbol
   | MAls  _ -> MTlsymbol
   | MApr  _ -> MTprsymbol
@@ -674,6 +681,12 @@ let get_meta_arg_type = function
 
 let create_meta m al =
   let get_meta_arg at a =
+    (* we allow "constant tysymbol <=> ty" conversion *)
+    let a = match at,a with
+      | MTtysymbol, MAty ({ ty_node = Tyapp (ts,[]) }) -> MAts ts
+      | MTty, MAts ts when ts.ts_args = [] -> MAty (ty_app ts [])
+      | _, _ -> a
+    in
     let mt = get_meta_arg_type a in
     if at = mt then a else raise (MetaTypeMismatch (m,at,mt))
   in
@@ -685,19 +698,20 @@ let create_meta m al =
 
 let add_meta uc s al = add_tdecl uc (create_meta s al)
 
-let clone_meta tdt th tdc = match tdt.td_node, tdc.td_node with
-  | Meta (t,al), Clone (th',sm) when id_equal th.th_name th'.th_name ->
+let clone_meta tdt sm = match tdt.td_node with
+  | Meta (t,al) ->
       let find_ts ts = Mts.find_default ts ts sm.sm_ts in
       let find_ls ls = Mls.find_default ls ls sm.sm_ls in
       let find_pr pr = Mpr.find_default pr pr sm.sm_pr in
       let cl_marg = function
+        | MAty ty -> MAty (ty_s_map find_ts ty)
         | MAts ts -> MAts (find_ts ts)
         | MAls ls -> MAls (find_ls ls)
         | MApr pr -> MApr (find_pr pr)
         | a -> a
       in
       mk_tdecl (Meta (t, List.map cl_marg al))
-  | _,_ -> invalid_arg "clone_meta"
+  | _ -> invalid_arg "clone_meta"
 
 
 (** Base theories *)
@@ -738,6 +752,7 @@ let tuple_theory_name s =
 (* Exception reporting *)
 
 let print_meta_arg_type fmt = function
+  | MTty -> fprintf fmt "type"
   | MTtysymbol -> fprintf fmt "type_symbol"
   | MTlsymbol -> fprintf fmt "logic_symbol"
   | MTprsymbol -> fprintf fmt "proposition"

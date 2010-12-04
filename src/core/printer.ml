@@ -139,38 +139,38 @@ let remove_prop pr =
   create_meta meta_remove_prop [MApr pr]
 
 let get_syntax_map task =
-  let add_ts td m = match td.td_node with
-    | Meta (_,[MAts ts; MAstr s]) ->
+  let add_ts m = function
+    | [MAts ts; MAstr s] ->
         Mid.add_new ts.ts_name s (KnownTypeSyntax ts) m
     | _ -> assert false
   in
-  let add_ls td m = match td.td_node with
-    | Meta (_,[MAls ls; MAstr s]) ->
+  let add_ls m = function
+    | [MAls ls; MAstr s] ->
         Mid.add_new ls.ls_name s (KnownLogicSyntax ls) m
     | _ -> assert false
   in
   let m = Mid.empty in
-  let m = Stdecl.fold add_ts (find_meta task meta_syntax_type).tds_set m in
-  let m = Stdecl.fold add_ls (find_meta task meta_syntax_logic).tds_set m in
+  let m = Task.on_meta meta_syntax_logic add_ls m task in
+  let m = Task.on_meta meta_syntax_type add_ts m task in
   m
 
 let get_remove_set task =
-  let add_ts td s = match td.td_node with
-    | Meta (_,[MAts ts; _]) -> Sid.add ts.ts_name s
+  let add_ts s = function
+    | [MAts ts; _] -> Sid.add ts.ts_name s
     | _ -> assert false
   in
-  let add_ls td s = match td.td_node with
-    | Meta (_,[MAls ls; _]) -> Sid.add ls.ls_name s
+  let add_ls s = function
+    | [MAls ls; _] -> Sid.add ls.ls_name s
     | _ -> assert false
   in
-  let add_pr td s = match td.td_node with
-    | Meta (_,[MApr pr]) -> Sid.add pr.pr_name s
+  let add_pr s = function
+    | [MApr pr] -> Sid.add pr.pr_name s
     | _ -> assert false
   in
   let s = Sid.empty in
-  let s = Stdecl.fold add_ts (find_meta task meta_syntax_type).tds_set s in
-  let s = Stdecl.fold add_ls (find_meta task meta_syntax_logic).tds_set s in
-  let s = Stdecl.fold add_pr (find_meta task meta_remove_prop).tds_set s in
+  let s = Task.on_meta meta_syntax_type add_ts s task in
+  let s = Task.on_meta meta_syntax_logic add_ls s task in
+  let s = Task.on_meta meta_remove_prop add_pr s task in
   s
 
 let query_syntax sm id = Mid.find_option id sm

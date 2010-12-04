@@ -44,7 +44,7 @@ let mk_tds s = Hstds.hashcons {
   tds_tag = Hashweak.dummy_tag;
 }
 
-let empty_tds = mk_tds Stdecl.empty
+let tds_empty = mk_tds Stdecl.empty
 let tds_add td s = mk_tds (Stdecl.add td s.tds_set)
 let tds_singleton td = mk_tds (Stdecl.singleton td)
 
@@ -54,9 +54,9 @@ let tds_hash tds = Hashweak.tag_hash tds.tds_tag
 type clone_map = tdecl_set Mid.t
 type meta_map = tdecl_set Mmeta.t
 
-let cm_find cm th = Mid.find_default th.th_name empty_tds cm
+let cm_find cm th = Mid.find_default th.th_name tds_empty cm
 
-let mm_find mm t = Mmeta.find_default t empty_tds mm
+let mm_find mm t = Mmeta.find_default t tds_empty mm
 
 let cm_add cm th td = Mid.change th.th_name (function
   | None -> Some (tds_singleton td)
@@ -114,8 +114,8 @@ let task_known = option_apply Mid.empty (fun t -> t.task_known)
 let task_clone = option_apply Mid.empty (fun t -> t.task_clone)
 let task_meta  = option_apply Mmeta.empty (fun t -> t.task_meta)
 
-let find_clone task th = cm_find (task_clone task) th
-let find_meta  task t  = mm_find (task_meta  task) t
+let find_clone_tds task th = cm_find (task_clone task) th
+let find_meta_tds  task t  = mm_find (task_meta  task) t
 
 (* constructors with checks *)
 
@@ -179,7 +179,7 @@ and flat_tdecl task td = match td.td_node with
 
 and use_export task th =
   let td = create_null_clone th in
-  if Stdecl.mem td (find_clone task th).tds_set then task else
+  if Stdecl.mem td (find_clone_tds task th).tds_set then task else
   let task = List.fold_left flat_tdecl task th.th_decls in
   new_clone task th td
 
@@ -215,45 +215,88 @@ let task_tdecls = task_fold (fun acc td -> td::acc) []
 let task_decls  = task_fold (fun acc td ->
   match td.td_node with Decl d -> d::acc | _ -> acc) []
 
-(* special selector for metaproperties of a single ident *)
+(* Selectors *)
 
 exception NotTaggingMeta of meta
+exception NotExclusiveMeta of meta
 
-let find_tagged_ts t tds acc =
+let on_meta t fn acc task =
+  let add td acc = match td.td_node with
+    | Meta (_,ma) -> fn acc ma
+    | _ -> assert false
+  in
+  let tds = find_meta_tds task t in
+  Stdecl.fold add tds.tds_set acc
+
+let on_theory th fn acc task =
+  let add td acc = match td.td_node with
+    | Clone (_,sm) -> fn acc sm
+    | _ -> assert false
+  in
+  let tds = find_clone_tds task th in
+  Stdecl.fold add tds.tds_set acc
+
+let on_meta_excl t task =
+  if not t.meta_excl then raise (NotExclusiveMeta t);
+  let add td _ = match td.td_node with
+    | Meta (_,ma) -> Some ma
+    | _ -> assert false
+  in
+  let tds = find_meta_tds task t in
+  Stdecl.fold add tds.tds_set None
+
+let on_used_theory th task =
+  let td = create_null_clone th in
+  let tds = find_clone_tds task th in
+  Stdecl.mem td tds.tds_set
+
+let on_tagged_ty t task =
+  begin match t.meta_type with
+    | MTty :: _ -> ()
+    | _ -> raise (NotTaggingMeta t)
+  end;
+  let add td acc = match td.td_node with
+    | Meta (_, MAty ty :: _) -> Sty.add ty acc
+    | _ -> assert false
+  in
+  let tds = find_meta_tds task t in
+  Stdecl.fold add tds.tds_set Sty.empty
+
+let on_tagged_ts t task =
   begin match t.meta_type with
     | MTtysymbol :: _ -> ()
     | _ -> raise (NotTaggingMeta t)
   end;
-  Stdecl.fold (fun td acc -> match td.td_node with
-    | Meta (s, MAts ts :: _) when meta_equal s t -> Sts.add ts acc
-    | _ -> assert false) tds.tds_set acc
-(* TODO an exception instead of an assert false (wrong META used) *)
+  let add td acc = match td.td_node with
+    | Meta (_, MAts ts :: _) -> Sts.add ts acc
+    | _ -> assert false
+  in
+  let tds = find_meta_tds task t in
+  Stdecl.fold add tds.tds_set Sts.empty
 
-let find_tagged_ls t tds acc =
+let on_tagged_ls t task =
   begin match t.meta_type with
     | MTlsymbol :: _ -> ()
     | _ -> raise (NotTaggingMeta t)
   end;
-  Stdecl.fold (fun td acc -> match td.td_node with
-    | Meta (s, MAls ls :: _) when meta_equal s t -> Sls.add ls acc
-    | _ -> assert false) tds.tds_set acc
+  let add td acc = match td.td_node with
+    | Meta (_, MAls ls :: _) -> Sls.add ls acc
+    | _ -> assert false
+  in
+  let tds = find_meta_tds task t in
+  Stdecl.fold add tds.tds_set Sls.empty
 
-let find_tagged_pr t tds acc =
+let on_tagged_pr t task =
   begin match t.meta_type with
     | MTprsymbol :: _ -> ()
     | _ -> raise (NotTaggingMeta t)
   end;
-  Stdecl.fold (fun td acc -> match td.td_node with
-    | Meta (s, MApr pr :: _) when meta_equal s t -> Spr.add pr acc
-    | _ -> assert false) tds.tds_set acc
-
-exception NotExclusiveMeta of meta
-
-let get_meta_excl t tds =
-  if not t.meta_excl then raise (NotExclusiveMeta t);
-  Stdecl.fold (fun td _ -> match td.td_node with
-    | Meta (s,arg) when s = t -> Some arg
-    | _ -> assert false) tds.tds_set None
+  let add td acc = match td.td_node with
+    | Meta (_, MApr pr :: _) -> Spr.add pr acc
+    | _ -> assert false
+  in
+  let tds = find_meta_tds task t in
+  Stdecl.fold add tds.tds_set Spr.empty
 
 (* Exception reporting *)
 

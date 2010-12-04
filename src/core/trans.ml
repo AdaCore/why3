@@ -140,69 +140,81 @@ end)
 
 let on_theory_tds th fn =
   let fn = Wtds.memoize 17 fn in
-  fun task -> fn (find_clone task th) task
+  fun task -> fn (find_clone_tds task th) task
 
 let on_meta_tds t fn =
   let fn = Wtds.memoize 17 fn in
-  fun task -> fn (find_meta task t) task
+  fun task -> fn (find_meta_tds task t) task
 
 let on_theory th fn =
-  let sml td acc = match td.td_node with
+  let add td acc = match td.td_node with
     | Clone (_,sm) -> sm::acc
     | _ -> assert false
   in
-  on_theory_tds th (fun tds -> fn (Stdecl.fold sml tds.tds_set []))
+  on_theory_tds th (fun tds -> fn (Stdecl.fold add tds.tds_set []))
 
 let on_meta t fn =
-  let mal td acc = match td.td_node with
+  let add td acc = match td.td_node with
     | Meta (_,ma) -> ma::acc
     | _ -> assert false
   in
-  on_meta_tds t (fun tds -> fn (Stdecl.fold mal tds.tds_set []))
-
-let on_theories tl fn =
-  let rec pass acc = function
-    | th::tl ->
-        let fn st = pass (Mid.add th.th_name st acc) tl in
-        on_theory_tds th fn
-    | [] ->
-        fn acc
-  in
-  pass Mid.empty tl
-
-let on_metas tl fn =
-  let rec pass acc = function
-    | t::tl ->
-        let fn st = pass (Mmeta.add t st acc) tl in
-        on_meta_tds t fn
-    | [] ->
-        fn acc
-  in
-  pass Mmeta.empty tl
+  on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set []))
 
 let on_used_theory th fn =
   let td = create_null_clone th in
   on_theory_tds th (fun tds -> fn (Stdecl.mem td tds.tds_set))
 
-let on_used_theories thl fn =
-  let add acc th = Mid.add th.th_name (create_null_clone th) acc in
-  let tdm = List.fold_left add Mid.empty thl in
-  let test _ td tds =
-    if Stdecl.mem td tds.tds_set then Some () else None
-  in
-  on_theories thl (fun cm -> fn (Mid.inter test tdm cm))
-
 let on_meta_excl t fn =
-  on_meta_tds t (fun tds -> fn (get_meta_excl t tds))
+  if not t.meta_excl then raise (NotExclusiveMeta t);
+  let add td _ = match td.td_node with
+    | Meta (_,ma) -> Some ma
+    | _ -> assert false
+  in
+  on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set None))
+
+let on_tagged_ty t fn =
+  begin match t.meta_type with
+    | MTty :: _ -> ()
+    | _ -> raise (NotTaggingMeta t)
+  end;
+  let add td acc = match td.td_node with
+    | Meta (_, MAty ty :: _) -> Sty.add ty acc
+    | _ -> assert false
+  in
+  on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set Sty.empty))
 
 let on_tagged_ts t fn =
-  on_meta_tds t (fun tds -> fn (find_tagged_ts t tds Sts.empty))
+  begin match t.meta_type with
+    | MTtysymbol :: _ -> ()
+    | _ -> raise (NotTaggingMeta t)
+  end;
+  let add td acc = match td.td_node with
+    | Meta (_, MAts ts :: _) -> Sts.add ts acc
+    | _ -> assert false
+  in
+  on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set Sts.empty))
 
 let on_tagged_ls t fn =
-  on_meta_tds t (fun tds -> fn (find_tagged_ls t tds Sls.empty))
+  begin match t.meta_type with
+    | MTlsymbol :: _ -> ()
+    | _ -> raise (NotTaggingMeta t)
+  end;
+  let add td acc = match td.td_node with
+    | Meta (_, MAls ls :: _) -> Sls.add ls acc
+    | _ -> assert false
+  in
+  on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set Sls.empty))
 
 let on_tagged_pr t fn =
-  on_meta_tds t (fun tds -> fn (find_tagged_pr t tds Spr.empty))
+  begin match t.meta_type with
+    | MTprsymbol :: _ -> ()
+    | _ -> raise (NotTaggingMeta t)
+  end;
+  let add td acc = match td.td_node with
+    | Meta (_, MApr pr :: _) -> Spr.add pr acc
+    | _ -> assert false
+  in
+  on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set Spr.empty))
 
 (** register transformations *)
 

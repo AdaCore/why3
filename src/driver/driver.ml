@@ -212,22 +212,20 @@ let update_task drv task =
   in
   let task =
     Mid.fold (fun _ (th,s) task ->
-      let cs = (find_clone task th).tds_set in
-      Stdecl.fold (fun td task -> match td.td_node with
-        | Clone (_,sm) when is_empty_sm sm ->
-            Stdecl.fold (fun td task -> add_tdecl task td) s task
-        | _ -> task
-      ) cs task
+      if Task.on_used_theory th task then
+        Stdecl.fold (fun tdm task ->
+          add_tdecl task tdm
+        ) s task
+      else task
     ) drv.drv_meta task
   in
   let task =
     Mid.fold (fun _ (th,s) task ->
-      let cs = (find_clone task th).tds_set in
-      Stdecl.fold (fun tdc task ->
+      Task.on_theory th (fun task sm ->
         Stdecl.fold (fun tdm task ->
-          add_tdecl task (clone_meta tdm th tdc)
+          add_tdecl task (clone_meta tdm sm)
         ) s task
-      ) cs task
+      ) task task
     ) drv.drv_meta_cl task
   in
   add_tdecl task goal

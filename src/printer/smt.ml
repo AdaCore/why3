@@ -221,10 +221,9 @@ let print_decl info fmt d = match d.d_node with
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
 let barrays task =
-  let sds = find_meta task Encoding_arrays.meta_mono_array in
-  let fold tdecl barrays =
-    match tdecl.td_node with
-      | Meta (_,[MAts tst;MAts tsk;MAts tse]) ->
+  let fold barrays =
+    function
+      | [MAts tst;MAts tsk;MAts tse] ->
         let extract_ty ts =
           if ts.ts_args <> [] then
             unsupported "smtv1 : type with argument are not supported";
@@ -233,7 +232,7 @@ let barrays task =
             | None -> ty_app ts [] in
         Mts.add tst (extract_ty tsk,extract_ty tse) barrays
       | _ -> barrays in
-  Stdecl.fold fold sds.tds_set Mts.empty
+  Task.on_meta Encoding_arrays.meta_mono_array fold Mts.empty task
 
 let print_task pr thpr fmt task =
   fprintf fmt "(benchmark why3@\n"

@@ -222,8 +222,7 @@ let print_task pr thpr fmt task =
   let info = {
     info_syn = get_syntax_map task;
     info_rem = get_remove_set task;
-    info_ac  =
-      Task.find_tagged_ls meta_ac (find_meta task meta_ac) Sls.empty }
+    info_ac  = Task.on_tagged_ls meta_ac task }
   in
   let decls = Task.task_decls task in
   ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)

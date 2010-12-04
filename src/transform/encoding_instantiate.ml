@@ -441,8 +441,7 @@ let monomorphise_goal =
     acc)
 
 
-let collect_green_part tds =
-  let sts = Task.find_tagged_ts meta_kept tds Sts.empty in
+let collect_green_part sts =
   let extract ts tys =
     assert (ts.ts_args = []); (* UnsupportedTySymbol? *)
     Mty.add (match ts.ts_def with
@@ -453,8 +452,8 @@ let collect_green_part tds =
 
 
 (* Some general env creation function *)
-let create_env task tenv tds =
-  let keep = collect_green_part tds in
+let create_env task tenv kept =
+  let keep = collect_green_part kept in
   let projty = Mty.fold (fun ty _ ty_ty ->
     Mty.add ty ty ty_ty)
     keep Mty.empty in
@@ -483,20 +482,19 @@ let is_ty_mono ~only_mono ty =
   with Exit when not only_mono -> false
 
 
-let create_trans_complete metas =
-  let tds_kept = Mmeta.find meta_kept metas in
-  let complete = get_meta_excl meta_complete
-    (Mmeta.find meta_complete metas) in
+let create_trans_complete kept complete =
   let task = use_export None builtin_theory in
   let tenv = match complete with
     | None | Some [MAstr "yes"] -> Complete
     | Some [MAstr "no"] ->  Incomplete
     | _ -> failwith "instantiate complete wrong argument" in
-  let init_task,env = create_env task tenv tds_kept in
+  let init_task,env = create_env task tenv kept in
   Trans.fold_map fold_map env init_task
 
 let encoding_instantiate =
-  Trans.on_metas [meta_kept;meta_complete] create_trans_complete
+  Trans.on_tagged_ts meta_kept (fun kept ->
+  Trans.on_meta_excl meta_complete (fun complete ->
+  create_trans_complete kept complete))
 
 let () =
   register_enco_kept "instantiate" (fun _ -> encoding_instantiate)

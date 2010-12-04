@@ -25,10 +25,6 @@ open Decl
 open Theory
 open Task
 
-let meta_kept = register_meta "encoding_decorate : kept" [MTtysymbol]
-
-(* From Encoding Polymorphism CADE07*)
-
 type tenv = {
   specials : tysymbol Hty.t;
   trans_lsymbol : lsymbol Hls.t
@@ -166,6 +162,7 @@ let fold tenv taskpre task =
       begin try
         let ud = Hts.create 3 in
         let map = function
+          | MAty ty -> MAty (conv_ty tenv ud ty)
           | MAts {ts_name = name; ts_args = []; ts_def = Some ty} ->
             MAts (conv_ts tenv ud name ty)
           | MAts _ -> raise Exit
@@ -179,6 +176,7 @@ let fold tenv taskpre task =
         | Exit -> add_tdecl task taskpre.task_decl
       end
     | _ -> add_tdecl task taskpre.task_decl
+
 let t =
   let tenv = init_tenv in
   Trans.fold (fold tenv) None

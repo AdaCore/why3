@@ -44,6 +44,7 @@ val ns_find_ns : namespace -> string list -> namespace
 (** Meta properties *)
 
 type meta_arg_type =
+  | MTty
   | MTtysymbol
   | MTlsymbol
   | MTprsymbol
@@ -51,6 +52,7 @@ type meta_arg_type =
   | MTint
 
 type meta_arg =
+  | MAty  of ty
   | MAts  of tysymbol
   | MAls  of lsymbol
   | MApr  of prsymbol
@@ -176,10 +178,9 @@ val create_meta : meta -> meta_arg list -> tdecl
 
 val add_meta : theory_uc -> meta -> meta_arg list -> theory_uc
 
-val clone_meta : tdecl -> theory -> tdecl -> tdecl
-(* [clone_meta td_meta th td_clone] produces from [td_meta]
- * a new Meta tdecl instantiated with respect to [td_clone].
- * The [th] argument must be the same as in [td_clone]. *)
+val clone_meta : tdecl -> symbol_map -> tdecl
+(* [clone_meta td_meta sm] produces from [td_meta]
+ * a new Meta tdecl instantiated with respect to [sm]]. *)
 
 (** Base theories *)
 
