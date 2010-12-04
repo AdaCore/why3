@@ -10,15 +10,12 @@ let async = ref (fun f () -> f ())
 type proof_attempt_status =
   | Scheduled (** external proof attempt is scheduled *)
   | Running (** external proof attempt is in progress *)
-  | Success (** external proof attempt succeeded *)
-  | Timeout (** external proof attempt was interrupted *)
-  | Unknown (** external prover answered ``don't know'' or equivalent *)
-  | HighFailure (** external prover call failed *)
-
+  | Done of Call_provers.prover_result (** external proof done *)
+  | InternalFailure of exn (** external proof aborted by internal error *)
 
 (**** queues of events to process ****)
 
-type callback = proof_attempt_status -> float -> string -> unit
+type callback = proof_attempt_status -> unit
 type attempt = bool * int * int * in_channel option * string * Driver.driver *
     callback * Task.task
 
@@ -37,7 +34,7 @@ type job =
 let transf_queue  : job Queue.t = Queue.create ()
 
 type answer =
-  | Prover_answer of callback * proof_attempt_status * float * string
+  | Prover_answer of callback * proof_attempt_status
   | Editor_exited of (unit -> unit)
 (* queue of prover answers *)
 let answers_queue  : answer Queue.t = Queue.create ()
@@ -69,7 +66,7 @@ let event_handler () =
   try begin
     (* priority 1: collect answers from provers or editors *)
     match Queue.pop answers_queue with
-      | Prover_answer (callback,res,time,output) ->
+      | Prover_answer (callback,res) ->
           decr running_proofs;
           Mutex.unlock queue_lock;
           (*
@@ -77,7 +74,7 @@ let event_handler () =
             "[Why thread] Scheduler.event_handler: got prover answer@.";
           *)
           (* call GUI callback with argument [res] *)
-          !async (fun () -> callback res time output) ()
+          !async (fun () -> callback res) ()
       | Editor_exited callback ->
           Mutex.unlock queue_lock;
           !async callback ()
@@ -138,7 +135,7 @@ let event_handler () =
         incr running_proofs;
         Mutex.unlock queue_lock;
         (* build the prover task from goal in [a] *)
-        !async (fun () -> callback Running 0.0 "") ();
+        !async (fun () -> callback Running) ();
         try
           let call_prover : unit -> Call_provers.prover_result =
 (*
@@ -152,17 +149,9 @@ let event_handler () =
             (fun () ->
                let r = call_prover () in
                Mutex.lock queue_lock;
-               let res =
-                 match r.Call_provers.pr_answer with
-                   | Call_provers.Valid -> Success
-                   | Call_provers.Timeout -> Timeout
-                   | Call_provers.Invalid | Call_provers.Unknown _ -> Unknown
-                   | Call_provers.Failure _ | Call_provers.HighFailure
-                       -> HighFailure
-               in
+               let res = Done r in
                Queue.push
-                 (Prover_answer (callback,res,r.Call_provers.pr_time,
-                                 r.Call_provers.pr_output)) answers_queue ;
+                 (Prover_answer (callback,res)) answers_queue ;
                Condition.signal queue_condition;
                Mutex.unlock queue_lock;
                ()
@@ -174,8 +163,7 @@ let event_handler () =
             eprintf "%a@." Exn_printer.exn_printer e;
             Mutex.lock queue_lock;
             Queue.push
-              (Prover_answer (callback, HighFailure,0.0,
-                              "Prover call failed")) answers_queue ;
+              (Prover_answer (callback, InternalFailure e)) answers_queue ;
             (* Condition.signal queue_condition; *)
             Mutex.unlock queue_lock;
             ()

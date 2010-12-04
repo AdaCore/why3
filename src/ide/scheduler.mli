@@ -28,19 +28,19 @@ val maximum_running_proofs: int ref
 (** bound on the number of prover processes running in parallel.
     default is 2 *)
 
+
+
 type proof_attempt_status =
   | Scheduled (** external proof attempt is scheduled *)
   | Running (** external proof attempt is in progress *)
-  | Success (** external proof attempt succeeded *)
-  | Timeout (** external proof attempt was interrupted *)
-  | Unknown (** external prover answered ``don't know'' or equivalent *)
-  | HighFailure (** external prover call failed *)
+  | Done of Call_provers.prover_result (** external proof done *)
+  | InternalFailure of exn (** external proof aborted by internal error *)
 
 val schedule_proof_attempt :
   debug:bool -> timelimit:int -> memlimit:int ->
   ?old:in_channel ->
   command:string -> driver:Driver.driver ->
-  callback:(proof_attempt_status -> float -> string -> unit) ->
+  callback:(proof_attempt_status -> unit) ->
   Task.task (* Db.goal *) -> unit
   (** schedules an attempt to prove goal with the given prover.  This
       function just prepares the goal for the proof attempt, and puts

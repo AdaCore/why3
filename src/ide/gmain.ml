@@ -22,7 +22,8 @@
 
 * bug: the file names are stored as relative, so if you restart
 from another directory, they are not found
-  but on the other hand, storing them as relative helps if you change the machine
+  but on the other hand, storing them as relative helps if you change
+   the machine
   Solution: store the name relative to the database, e.g if
 
   dir/file.why
@@ -40,7 +41,8 @@ from another directory, they are not found
 * when proof attempt is finished and is it the one currently selected,
 the new output should be displayed on upper-right window
 
-* when returning from edited proofs: should we run the prover again immediately ?
+* when returning from edited proofs: should we run the prover again
+   immediately ?
 
 * bug trouve par Johannes:
 
@@ -188,7 +190,8 @@ let project_dir, file_to_read =
 let () =
   if not (Sys.file_exists project_dir) then
     begin
-      eprintf "Info: '%s' does not exists. Creating directory of that name for the project@." fname;
+      eprintf "Info: '%s' does not exists. Creating directory of that name \
+ for the project@." fname;
       Unix.mkdir project_dir 0o777
     end
 
@@ -225,13 +228,21 @@ let read_file fn =
 
 module Model = struct
 
+  type proof_attempt_status =
+    | Scheduled (** external proof attempt is scheduled *)
+    | Running (** external proof attempt is in progress *)
+    | Success (** external proof attempt succeeded *)
+    | Timeout (** external proof attempt was interrupted *)
+    | Unknown (** external prover answered ``don't know'' or equivalent *)
+    | HighFailure (** external prover call failed *)
+
 
   type proof_attempt =
       { prover : prover_data;
         proof_goal : goal;
         proof_row : Gtk.tree_iter;
         proof_db : Db.proof_attempt;
-        mutable status : Scheduler.proof_attempt_status;
+        mutable status : proof_attempt_status;
         mutable proof_obsolete : bool;
         mutable time : float;
         mutable output : string;
@@ -483,15 +494,15 @@ let info_window mt s =
 
 module Helpers = struct
 
-  let image_of_result = function
-    | Scheduler.Scheduled -> !image_scheduled
-    | Scheduler.Running -> !image_running
-    | Scheduler.Success -> !image_valid
-    | Scheduler.Timeout -> !image_timeout
-    | Scheduler.Unknown -> !image_unknown
-    | Scheduler.HighFailure -> !image_failure
-
   open Model
+
+  let image_of_result = function
+    | Scheduled -> !image_scheduled
+    | Running -> !image_running
+    | Success -> !image_valid
+    | Timeout -> !image_timeout
+    | Unknown -> !image_unknown
+    | HighFailure -> !image_failure
 
   let set_file_verified f =
     f.file_verified <- true;
@@ -696,7 +707,8 @@ end
 
 
 let split_transformation = Trans.lookup_transform_l "split_goal" gconfig.env
-let intro_transformation = Trans.lookup_transform "introduce_premises" gconfig.env
+let intro_transformation = Trans.lookup_transform "introduce_premises"
+  gconfig.env
 
 
 
@@ -713,13 +725,13 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
        if goal_obsolete && not o then Db.set_obsolete a;
        let obsolete = goal_obsolete or o in
        let s = match s with
-         | Db.Undone -> Scheduler.HighFailure
+         | Db.Undone -> Model.HighFailure
          | Db.Success ->
              if not obsolete then proved := true;
-             Scheduler.Success
-         | Db.Unknown -> Scheduler.Unknown
-         | Db.Timeout -> Scheduler.Timeout
-         | Db.Failure -> Scheduler.HighFailure
+             Model.Success
+         | Db.Unknown -> Model.Unknown
+         | Db.Timeout -> Model.Timeout
+         | Db.Failure -> Model.HighFailure
        in
        let (_pa : Model.proof_attempt) =
          Helpers.add_external_proof_row ~obsolete ~edit goal p a s t
@@ -874,22 +886,37 @@ let () =
 (* method: run a given prover on each unproved goals *)
 (*****************************************************)
 
+let callback_of_callback callback = function
+  | Scheduler.Scheduled -> callback Model.Scheduled 0. ""
+  | Scheduler.Running   -> callback Model.Running 0. ""
+  | Scheduler.InternalFailure _ ->
+    callback Model.HighFailure 0. "Prover call failed"
+  | Scheduler.Done r ->
+    let res = match r.Call_provers.pr_answer with
+      | Call_provers.Valid -> Model.Success
+      | Call_provers.Timeout -> Model.Timeout
+      | Call_provers.Unknown _ | Call_provers.Invalid -> Model.Unknown
+      | Call_provers.Failure _ | Call_provers.HighFailure ->
+        Model.HighFailure in
+    callback res r.Call_provers.pr_time r.Call_provers.pr_output
+
 let redo_external_proof g a =
   let p = a.Model.prover in
   let callback result time output =
     a.Model.output <- output;
     Helpers.set_proof_status ~obsolete:false a result time ;
-    if result = Scheduler.Success then Helpers.set_proved ~propagate:true a.Model.proof_goal;
+    if result = Model.Success
+    then Helpers.set_proved ~propagate:true a.Model.proof_goal;
     let db_res = match result with
-      | Scheduler.Scheduled | Scheduler.Running -> Db.Undone
-      | Scheduler.Success -> Db.Success
-      | Scheduler.Unknown -> Db.Unknown
-      | Scheduler.Timeout -> Db.Timeout
-      | Scheduler.HighFailure -> Db.Failure
+      | Model.Scheduled | Model.Running -> Db.Undone
+      | Model.Success -> Db.Success
+      | Model.Unknown -> Db.Unknown
+      | Model.Timeout -> Db.Timeout
+      | Model.HighFailure -> Db.Failure
     in
     Db.set_status a.Model.proof_db db_res time
   in
-  callback Scheduler.Scheduled 0.0 "";
+  callback Model.Scheduled 0.0 "";
   let old = if a.Model.edited_as = "" then None else
     begin
       eprintf "Info: proving using edited file %s@." a.Model.edited_as;
@@ -899,7 +926,7 @@ let redo_external_proof g a =
   Scheduler.schedule_proof_attempt
     ~debug:(gconfig.verbose > 0) ~timelimit:gconfig.time_limit ~memlimit:0
     ?old ~command:p.command ~driver:p.driver
-    ~callback
+    ~callback:(callback_of_callback callback)
     g.Model.task
 
 let rec prover_on_goal p g =
@@ -910,7 +937,7 @@ let rec prover_on_goal p g =
       let db_prover = Db.prover_from_name id in
       let db_pa = Db.add_proof_attempt g.Model.goal_db db_prover in
       Helpers.add_external_proof_row ~obsolete:false ~edit:""
-	g p db_pa Scheduler.Scheduled 0.0
+	g p db_pa Model.Scheduled 0.0
   in
   redo_external_proof g a;
   List.iter
@@ -976,7 +1003,8 @@ let split_goal g =
              let sum = task_checksum subtask in
              let subtask_db = Db.add_subgoal db_transf subgoal_name sum in
              let goal =
-               Helpers.add_goal_row (Model.Transf tr) subgoal_name subtask subtask_db
+               Helpers.add_goal_row (Model.Transf tr) subgoal_name subtask
+                 subtask_db
              in
              (goal :: acc, count+1))
           ([],1) subgoals
@@ -1072,7 +1100,8 @@ let split_unproved_goals () =
                          goals_model#append ~parent:split_row ()
                        in
                        let sum = task_checksum subtask in
-                       let subtask_db = Db.add_subgoal db_transf subgoal_name sum in
+                       let subtask_db = Db.add_subgoal db_transf
+  subgoal_name sum in
                        (* TODO: call add_goal_row *)
                        let goal = {
 			 Model.goal_name = subgoal_name;
@@ -1161,7 +1190,8 @@ let file_menu = factory#add_submenu "_File"
 let file_factory = new GMenu.factory file_menu ~accel_group
 
 let (_ : GMenu.image_menu_item) =
-  file_factory#add_image_item ~key:GdkKeysyms._A ~label:"_Add file" ~callback:select_file
+  file_factory#add_image_item ~key:GdkKeysyms._A
+    ~label:"_Add file" ~callback:select_file
     ()
 
 let (_ : GMenu.image_menu_item) =
@@ -1516,10 +1546,12 @@ let scroll_to_id id =
         erase_color_loc source_view;
         color_loc source_view l b e
     | Ident.Fresh ->
-        source_view#source_buffer#set_text "Fresh ident (no position available)\n";
+        source_view#source_buffer#set_text
+          "Fresh ident (no position available)\n";
         current_file := ""
     | Ident.Derived _ ->
-        source_view#source_buffer#set_text "Derived ident (no position available)\n";
+        source_view#source_buffer#set_text
+          "Derived ident (no position available)\n";
         current_file := ""
 
 let color_label = function
@@ -1545,7 +1577,7 @@ let scroll_to_source_goal g =
     | Some
         { Task.task_decl =
             { Theory.td_node =
-                Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f) }}} ->
+                Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
         color_f_labels () f
     | _ ->
         assert false
@@ -1638,7 +1670,7 @@ let edit_selected_row p =
 	    | f -> f
 	in
         let old_status = a.Model.status in
-        Helpers.set_proof_status ~obsolete:false a Scheduler.Running 0.0;
+        Helpers.set_proof_status ~obsolete:false a Model.Running 0.0;
         let callback () =
           Helpers.set_proof_status ~obsolete:false a old_status 0.0;
         in
