@@ -443,6 +443,58 @@ install_no_local::
 endif
 
 
+###############
+# BENCH
+###############
+
+BENCH_FILES = bench whybench
+
+BENCHMODULES := $(addprefix src/bench/, $(BENCH_FILES))
+
+BENCHMODULES := src/ide/scheduler $(BENCHMODULES)
+
+BENCHML  = $(addsuffix .ml,  $(BENCHMODULES))
+BENCHMLI = $(addsuffix .mli, $(BENCHMODULES))
+BENCHCMO = $(addsuffix .cmo, $(BENCHMODULES))
+BENCHCMX = $(addsuffix .cmx, $(BENCHMODULES))
+
+$(BENCHCMO) $(BENCHCMX): INCLUDES += -I src/ide -I src/bench -I +sqlite3
+
+# build targets
+
+byte: bin/whybench.byte
+opt:  bin/whybench.opt
+
+bin/whybench.opt bin/whybench.byte: INCLUDES += -thread -I +threads
+bin/whybench.opt bin/whybench.byte: EXTLIBS += threads
+
+bin/whybench.opt: src/why.cmxa $(PGMCMX) $(BENCHCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	$(STRIP) $@
+
+bin/whybench.byte: src/why.cma  $(PGMCMO) $(BENCHCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+# depend and clean targets
+
+include .depend.bench
+
+.depend.bench:
+	$(OCAMLDEP) -slash -I src -I src/bench -I src/ide $(BENCHML) $(BENCHMLI) > $@
+
+depend: .depend.bench
+
+clean::
+	rm -f src/bench/*.cm[iox] src/bench/*.o
+	rm -f src/bench/*.annot src/bench/*~
+	rm -f bin/whybench.byte bin/whybench.opt
+	rm -f .depend.bench
+
+install_no_local::
+	cp -f bin/whybench.@OCAMLBEST@ $(BINDIR)/why3bench
+
 ##############
 # Coq plugin
 ##############
