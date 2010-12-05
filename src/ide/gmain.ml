@@ -86,7 +86,6 @@ open Why
 open Whyconf
 open Gconfig
 
-
 (************************)
 (* parsing command line *)
 (************************)

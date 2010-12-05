@@ -341,7 +341,7 @@ let do_task drv fname tname (th : Why.Theory.theory) (task : Task.task) =
   match !opt_output, !opt_command with
     | None, Some command ->
         let res =
-          Driver.prove_task ~command ~timelimit ~memlimit drv task ()
+          Driver.prove_task ~command ~timelimit ~memlimit drv task () ()
         in
         printf "%s %s %s : %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string

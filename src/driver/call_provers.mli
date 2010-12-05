@@ -65,8 +65,9 @@ val call_on_buffer :
   regexps    : (Str.regexp * prover_answer) list ->
   exitcodes  : (int * prover_answer) list ->
   filename   : string ->
-  Buffer.t -> unit -> prover_result
+  Buffer.t -> unit -> unit -> prover_result
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
+    Only the computation between the two [unit] is parallelisable.
 
     @param timelimit : set the available time limit (default 0 : unlimited)
     @param memlimit : set the available time limit (default 0 :

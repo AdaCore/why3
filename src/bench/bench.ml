@@ -58,7 +58,7 @@ struct
 
   let start s = Mutex.lock s.m; s.nb_task <- s.nb_task + 1; Mutex.unlock s.m
   let stop s = Mutex.lock s.m; s.nb_task <- s.nb_task - 1;
-    Mutex.unlock s.m; if s.nb_task = 0 then Condition.signal s.c
+    if s.nb_task = 0 then Condition.signal s.c; Mutex.unlock s.m
   let wait s = Mutex.lock s.m; Condition.wait s.c s.m
   let lock s = Mutex.lock s.m
   let unlock s = Mutex.unlock s.m

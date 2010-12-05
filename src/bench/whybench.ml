@@ -373,7 +373,12 @@ let count_result =
     Mnm.add res.B.tool tr m in
   List.fold_left fold m
 
-let () = Scheduler.async := (fun f v -> ignore (Thread.create f v))
+let () =
+  (** WHY some outputs are mixed, altought there is a mutex? *)
+  let m = Mutex.create () in
+  Scheduler.async := (fun f v ->
+    let f v = Mutex.lock m; f v; Mutex.unlock m in
+    ignore (Thread.create f v))
 
 let () =
   let callback tool prob task i res =

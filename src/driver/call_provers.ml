@@ -80,7 +80,7 @@ let call_prover command opt_cout buffer =
   ret, out, time
 
 let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
-                   ~regexps ~exitcodes ~filename buffer () =
+                   ~regexps ~exitcodes ~filename buffer =
   let on_stdin = ref true in
   let on_timelimit = ref false in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
@@ -92,11 +92,13 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
     | _ -> failwith "unknown format specifier, use %%f, %%t or %%m"
   in
   let cmd = Str.global_substitute cmd_regexp (replace "") command in
-  let ret, out, time =
-    if !on_stdin then call_prover cmd None buffer else begin
+  let f = if !on_stdin then
+    fun () -> call_prover cmd None buffer
+  else begin
       let fout,cout = Filename.open_temp_file "why_" ("_" ^ filename) in
       try
         let cmd = Str.global_substitute cmd_regexp (replace fout) command in
+        fun () ->
         let res = call_prover cmd (Some cout) buffer in
         if Debug.nottest_flag debug then Sys.remove fout;
         res
@@ -106,6 +108,9 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
         raise e
     end
   in
+  fun () ->
+    let ret,out,time = f () in
+    fun () ->
   let ans = match ret with
     | Unix.WSTOPPED n ->
         Debug.dprintf debug "Call_provers: stopped by signal %d@." n;

@@ -3,7 +3,8 @@
 open Format
 open Why
 
-
+(** max scheduled proofs / max running proofs *)
+let coef_buf = 2
 
 let async = ref (fun f () -> f ())
 
@@ -47,20 +48,25 @@ type job =
 let transf_queue  : job Queue.t = Queue.create ()
 
 type answer =
-  | Prover_answer of callback * proof_attempt_status
+  | Prover_answer of callback * (unit -> Call_provers.prover_result)
   | Editor_exited of (unit -> unit)
 (* queue of prover answers *)
 let answers_queue  : answer Queue.t = Queue.create ()
 
-(* number of running external proofs *)
-let running_proofs = ref 0
+(* number of scheduled external proofs *)
+let scheduled_proofs = ref 0
 let maximum_running_proofs = ref 2
 
 (* they are protected by a lock *)
 let queue_lock = Mutex.create ()
 let queue_condition = Condition.create ()
 
+(* number of running external proofs *)
+let running_proofs = ref 0
 
+(* it is protected by a lock *)
+let running_lock = Mutex.create ()
+let running_condition = Condition.create ()
 
 
 (***** handler of events *****)
@@ -72,27 +78,28 @@ let event_handler () =
       Queue.is_empty answers_queue &&
       Queue.is_empty proof_edition_queue &&
       (Queue.is_empty prover_attempts_queue ||
-         !running_proofs >= !maximum_running_proofs)
+         !scheduled_proofs >= !maximum_running_proofs * coef_buf)
   do
     Condition.wait queue_condition queue_lock
   done;
   try begin
     (* priority 1: collect answers from provers or editors *)
     match Queue.pop answers_queue with
-      | Prover_answer (callback,res) ->
-          decr running_proofs;
-          Mutex.unlock queue_lock;
+      | Prover_answer (callback,r) ->
+        Mutex.unlock queue_lock;
+        let res = r () in
           (*
             eprintf
             "[Why thread] Scheduler.event_handler: got prover answer@.";
           *)
           (* call GUI callback with argument [res] *)
-          !async (fun () -> callback res) ()
+          !async (fun () -> callback (Done res)) ()
       | Editor_exited callback ->
           Mutex.unlock queue_lock;
           !async callback ()
   end
   with Queue.Empty ->
+    Thread.yield ();
     try
       (* priority 2: apply transformations *)
       let k = Queue.pop transf_queue in
@@ -144,18 +151,18 @@ let event_handler () =
       (* since answers_queue and transf_queue are empty,
          we are sure that both
          prover_attempts_queue is non empty and
-         running_proofs < maximum_running_proofs
+         scheduled_proofs < maximum_running_proofs * coef_buf
       *)
       try
         let (_debug,timelimit,memlimit,old,command,driver,callback,goal) =
           Queue.pop prover_attempts_queue
         in
-        incr running_proofs;
+        incr scheduled_proofs;
         Mutex.unlock queue_lock;
         (* build the prover task from goal in [a] *)
-        !async (fun () -> callback Running) ();
+        !async (fun () -> callback Scheduled) ();
         try
-          let call_prover : unit -> Call_provers.prover_result =
+          let call_prover : unit -> unit -> Call_provers.prover_result =
 (*
             if debug then
               Format.eprintf "Task for prover: %a@."
@@ -165,11 +172,25 @@ let event_handler () =
           in
           let (_ : Thread.t) = Thread.create
             (fun () ->
+              Mutex.lock running_lock;
+              while !running_proofs >= !maximum_running_proofs; do
+                Condition.wait running_condition running_lock
+              done;
+              incr running_proofs;
+              Mutex.unlock running_lock;
+              Mutex.lock queue_lock;
+              decr scheduled_proofs;
+              Condition.signal queue_condition;
+              Mutex.unlock queue_lock;
+              !async (fun () -> callback Running) ();
                let r = call_prover () in
+               Mutex.lock running_lock;
+               decr running_proofs;
+               Condition.signal running_condition;
+               Mutex.unlock running_lock;
                Mutex.lock queue_lock;
-               let res = Done r in
                Queue.push
-                 (Prover_answer (callback,res)) answers_queue ;
+                 (Prover_answer (callback,r)) answers_queue ;
                Condition.signal queue_condition;
                Mutex.unlock queue_lock;
                ()
@@ -180,15 +201,12 @@ let event_handler () =
           | e ->
             eprintf "%a@." Exn_printer.exn_printer e;
             Mutex.lock queue_lock;
-            Queue.push
-              (Prover_answer (callback, InternalFailure e)) answers_queue ;
-            (* Condition.signal queue_condition; *)
+            decr scheduled_proofs;
             Mutex.unlock queue_lock;
-            ()
+            !async (fun () -> callback (InternalFailure e)) ()
      with Queue.Empty ->
         eprintf "Scheduler.event_handler: unexpected empty queues@.";
         assert false
-
 
 (***** start of the scheduler thread ****)
 
@@ -218,30 +236,26 @@ let schedule_proof_attempt ~debug ~timelimit ~memlimit ?old
   Queue.push (debug,timelimit,memlimit,old,command,driver,callback,goal)
     prover_attempts_queue;
   Condition.signal queue_condition;
-  Mutex.unlock queue_lock;
-  ()
+  Mutex.unlock queue_lock
 
 let edit_proof ~debug ~editor ~file ~driver ~callback goal =
   Mutex.lock queue_lock;
   Queue.push (debug,editor,file,driver,callback,goal) proof_edition_queue;
   Condition.signal queue_condition;
-  Mutex.unlock queue_lock;
-  ()
+  Mutex.unlock queue_lock
 
 let apply_transformation ~callback transf goal =
   Mutex.lock queue_lock;
   Queue.push (Task (callback,transf,goal)) transf_queue;
   Condition.signal queue_condition;
-  Mutex.unlock queue_lock;
-  ()
+  Mutex.unlock queue_lock
 
 
 let apply_transformation_l ~callback transf goal =
   Mutex.lock queue_lock;
   Queue.push (TaskL (callback,transf,goal)) transf_queue;
   Condition.signal queue_condition;
-  Mutex.unlock queue_lock;
-  ()
+  Mutex.unlock queue_lock
 
 
 let do_why ~callback funct argument =
@@ -252,8 +266,7 @@ let do_why ~callback funct argument =
   Mutex.lock queue_lock;
   Queue.push (Do exists) transf_queue;
   Condition.signal queue_condition;
-  Mutex.unlock queue_lock;
-  ()
+  Mutex.unlock queue_lock
 
 (* TODO : understand Thread.Event *)
 let do_why_sync funct argument =

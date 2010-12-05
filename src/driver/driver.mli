@@ -41,7 +41,7 @@ val call_on_buffer :
   command    : string ->
   ?timelimit : int ->
   ?memlimit  : int ->
-  driver -> Buffer.t -> unit -> Call_provers.prover_result
+  driver -> Buffer.t -> unit -> unit -> Call_provers.prover_result
 
 val print_task :
   ?old       : in_channel ->
@@ -52,5 +52,5 @@ val prove_task :
   ?timelimit : int ->
   ?memlimit  : int ->
   ?old       : in_channel ->
-  driver -> Task.task -> (unit -> Call_provers.prover_result)
+  driver -> Task.task -> (unit -> unit -> Call_provers.prover_result)
 
