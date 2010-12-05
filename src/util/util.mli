@@ -22,6 +22,7 @@ open Stdlib
 (** Useful functions *)
 
 val ($) : ('a -> 'b) -> 'a -> 'b
+val (|>) : 'a -> ('a -> 'b) -> 'b
 
 val const : 'a -> 'b -> 'a
 

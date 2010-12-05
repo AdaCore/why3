@@ -22,6 +22,7 @@ open Stdlib
 (* useful combinators *)
 
 let ($) f x = f x
+let (|>) x f = f x
 
 let const f _ = f
 
