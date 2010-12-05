@@ -373,6 +373,7 @@ let count_result =
     Mnm.add res.B.tool tr m in
   List.fold_left fold m
 
+let () = Scheduler.async := (fun f v -> ignore (Thread.create f v))
 
 let () =
   let callback tool prob task i res =
