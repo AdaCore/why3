@@ -36,6 +36,8 @@ type proof_attempt_status =
   | Done of Call_provers.prover_result (** external proof done *)
   | InternalFailure of exn (** external proof aborted by internal error *)
 
+val print_pas : Format.formatter -> proof_attempt_status -> unit
+
 val schedule_proof_attempt :
   debug:bool -> timelimit:int -> memlimit:int ->
   ?old:in_channel ->
@@ -76,6 +78,8 @@ val apply_transformation_l :
 
 val do_why : callback:('b -> unit) -> ('a -> 'b) -> 'a -> unit
 (** use do why for all the function which deals with creating why value *)
+
+val do_why_sync : ('a -> 'b) -> 'a -> 'b
 
 val edit_proof :
   debug:bool ->

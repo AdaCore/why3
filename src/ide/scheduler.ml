@@ -13,6 +13,12 @@ type proof_attempt_status =
   | Done of Call_provers.prover_result (** external proof done *)
   | InternalFailure of exn (** external proof aborted by internal error *)
 
+let print_pas fmt = function
+  | Scheduled -> fprintf fmt "Scheduled"
+  | Running -> fprintf fmt "Running"
+  | InternalFailure exn ->
+    fprintf fmt "InternalFailure %a" Exn_printer.exn_printer exn
+  | Done pr -> Call_provers.print_prover_result fmt pr
 (**** queues of events to process ****)
 
 type callback = proof_attempt_status -> unit
@@ -197,7 +203,8 @@ let (_scheduler_thread : Thread.t) =
          assert false
        with
            e ->
-             eprintf "Scheduler thread stopped unexpectedly@.";
+             eprintf "Scheduler thread stopped unexpectedly : %a@."
+             Exn_printer.exn_printer e;
              raise e)
     ()
 
@@ -247,3 +254,14 @@ let do_why ~callback funct argument =
   Condition.signal queue_condition;
   Mutex.unlock queue_lock;
   ()
+
+(* TODO : understand Thread.Event *)
+let do_why_sync funct argument =
+  let m = Mutex.create () in
+  let c = Condition.create () in
+  let r = ref None in
+  let cb res =
+    Mutex.lock m; r := Some res; Mutex.unlock m; Condition.signal c in
+  do_why ~callback:cb funct argument;
+  Mutex.lock m; Condition.wait c m;
+  Util.of_option !r
