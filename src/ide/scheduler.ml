@@ -8,6 +8,8 @@ let coef_buf = 2
 
 let async = ref (fun f () -> f ())
 
+let debug = Debug.register_flag "scheduler"
+
 type proof_attempt_status =
   | Scheduled (** external proof attempt is scheduled *)
   | Running (** external proof attempt is in progress *)
@@ -158,6 +160,9 @@ let event_handler () =
           Queue.pop prover_attempts_queue
         in
         incr scheduled_proofs;
+        Debug.dprintf debug
+          "scheduled_proofs = %i; maximum_running_proofs = %i@."
+          !scheduled_proofs !maximum_running_proofs;
         Mutex.unlock queue_lock;
         (* build the prover task from goal in [a] *)
         !async (fun () -> callback Scheduled) ();

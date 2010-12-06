@@ -203,7 +203,7 @@ let () =
 
   let main = get_main config in
   Whyconf.load_plugins main;
-
+  Scheduler.maximum_running_proofs := Whyconf.running_provers_max main;
   (** listings*)
 
   let opt_list = ref false in
@@ -373,18 +373,18 @@ let count_result =
     Mnm.add res.B.tool tr m in
   List.fold_left fold m
 
-let () =
-  (** WHY some outputs are mixed, altought there is a mutex? *)
-  let m = Mutex.create () in
-  Scheduler.async := (fun f v ->
-    let f v = Mutex.lock m; f v; Mutex.unlock m in
-    ignore (Thread.create f v))
+let () = Scheduler.async := (fun f v -> ignore (Thread.create f v))
+
 
 let () =
+  let m = Mutex.create () in
   let callback tool prob task i res =
-    eprintf "%s %a %i with %s : %a@."
+    Mutex.lock m;
+    printf "%s %a %i with %s : %a@."
       prob Pretty.print_pr (task_goal task) i tool
-      Scheduler.print_pas res in
+      Scheduler.print_pas res;
+    Mutex.unlock m
+  in
   let l = B.all_list ~callback !tools !probs in
   (* let print_result fmt res = *)
   (*   fprintf fmt "%s %a %i with %s : %a@." *)
