@@ -67,6 +67,31 @@ val schedule_proof_attempt :
 
   *)
 
+type attempt
+
+val create_proof_attempt :  debug:bool -> timelimit:int -> memlimit:int ->
+  ?old:in_channel ->
+  command:string -> driver:Driver.driver ->
+  callback:(proof_attempt_status -> unit) ->
+  Task.task -> attempt
+
+val transfer_proof_attempts : attempt Queue.t -> unit
+(** same as the iteration of {!schedule_proof_attempt} but runs in
+    constant time. The given queue is cleared. *)
+
+
+val schedule_some_proof_attempts :
+  debug:bool -> timelimit:int -> memlimit:int ->
+  ?old:in_channel ->
+  command:string -> driver:Driver.driver ->
+  callback:(proof_attempt_status -> unit) ->
+  Task.task -> attempt Queue.t -> unit
+(** a middle between schedule_proof_attempts and
+    transfer_proof_attempts, use an heuristics to send sometimes the
+    proof_attemps. dont forget to use transfer_proof_attempts at the
+    end in order to flush the queue.
+*)
+
 
 val apply_transformation :
   callback:(Why.Task.task -> unit) ->

@@ -66,18 +66,21 @@ end
 
 let call s callback tool prob =
   (** Prove goal *)
-  let call cb task =
-    schedule_proof_attempt ~debug:(Debug.test_flag debug)
+  let call q cb task =
+    Queue.add (create_proof_attempt ~debug:(Debug.test_flag debug)
       ~timelimit:(tool.ttime) ~memlimit:(tool.tmem)
       ~command:(tool.tcommand) ~driver:(tool.tdriver)
-      ~callback:cb task in
-  let iter pval i task =
+      ~callback:cb task) q in
+  let iter q pval i task =
     MTask.start s;
     let cb res = callback pval i task res;
       match res with Done _ | InternalFailure _ -> MTask.stop s | _ -> () in
-    call cb task; succ i in
+    call q cb task; succ i in
   let trans_cb pval tl =
-    ignore (List.fold_left (iter pval) 0 (List.rev tl)); MTask.stop s in
+    let q = Queue.create () in
+    ignore (List.fold_left (iter q pval) 0 (List.rev tl));
+    transfer_proof_attempts q;
+    MTask.stop s in
   (** Apply trans *)
   let iter_task (pval,task) =
     MTask.start s;

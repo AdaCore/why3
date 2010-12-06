@@ -899,7 +899,8 @@ let callback_of_callback callback = function
         Model.HighFailure in
     callback res r.Call_provers.pr_time r.Call_provers.pr_output
 
-let redo_external_proof g a =
+(* q is a queue of proof attempt where to put the new one *)
+let redo_external_proof q g a =
   let p = a.Model.prover in
   let callback result time output =
     a.Model.output <- output;
@@ -915,66 +916,70 @@ let redo_external_proof g a =
     in
     Db.set_status a.Model.proof_db db_res time
   in
-  callback Model.Scheduled 0.0 "";
+  GtkThread.sync (callback Model.Scheduled 0.0) "";
   let old = if a.Model.edited_as = "" then None else
     begin
       eprintf "Info: proving using edited file %s@." a.Model.edited_as;
       (Some (open_in a.Model.edited_as))
     end
   in
-  Scheduler.schedule_proof_attempt
+  Scheduler.schedule_some_proof_attempts
     ~debug:(gconfig.verbose > 0) ~timelimit:gconfig.time_limit ~memlimit:0
     ?old ~command:p.command ~driver:p.driver
     ~callback:(callback_of_callback callback)
-    g.Model.task
+    g.Model.task q
 
-let rec prover_on_goal p g =
+let rec prover_on_goal q p g =
   let id = p.prover_id in
   let a =
     try Hashtbl.find g.Model.external_proofs id
     with Not_found ->
+      GtkThread.sync (fun () ->
       let db_prover = Db.prover_from_name id in
       let db_pa = Db.add_proof_attempt g.Model.goal_db db_prover in
       Helpers.add_external_proof_row ~obsolete:false ~edit:""
-	g p db_pa Model.Scheduled 0.0
+	g p db_pa Model.Scheduled 0.0) ()
   in
-  redo_external_proof g a;
+  redo_external_proof q g a;
   List.iter
-    (fun t -> List.iter (prover_on_goal p) t.Model.subgoals)
+    (fun t -> List.iter (prover_on_goal q p) t.Model.subgoals)
     g.Model.transformations
 
-let rec prover_on_goal_or_children p g =
+let rec prover_on_goal_or_children q p g =
   if not g.Model.proved then
     begin
       match g.Model.transformations with
-        | [] -> prover_on_goal p g
+        | [] -> prover_on_goal q p g
         | l ->
             List.iter (fun t ->
-                         List.iter (prover_on_goal_or_children p)
+                         List.iter (prover_on_goal_or_children q p)
                            t.Model.subgoals) l
     end
 
-let prover_on_selected_goal_or_children pr row =
+let prover_on_selected_goal_or_children q pr row =
   let row = filter_model#get_iter row in
   match filter_model#get ~row ~column:Model.index_column with
     | Model.Row_goal g ->
-        prover_on_goal_or_children pr g
+        prover_on_goal_or_children q pr g
     | Model.Row_theory th ->
-        List.iter (prover_on_goal_or_children pr) th.Model.goals
+        List.iter (prover_on_goal_or_children q pr) th.Model.goals
     | Model.Row_file file ->
         List.iter
           (fun th ->
-             List.iter (prover_on_goal_or_children pr) th.Model.goals)
+             List.iter (prover_on_goal_or_children q pr) th.Model.goals)
           file.Model.theories
     | Model.Row_proof_attempt a ->
-        prover_on_goal_or_children pr a.Model.proof_goal
+        prover_on_goal_or_children q pr a.Model.proof_goal
     | Model.Row_transformation tr ->
-        List.iter (prover_on_goal_or_children pr) tr.Model.subgoals
+        List.iter (prover_on_goal_or_children q pr) tr.Model.subgoals
 
 let prover_on_selected_goals pr =
-  List.iter
-    (prover_on_selected_goal_or_children pr)
-    goals_view#selection#get_selected_rows
+  ignore (Thread.create (fun pr ->
+    let q = Queue.create () in
+    List.iter
+      (prover_on_selected_goal_or_children q pr)
+      goals_view#selection#get_selected_rows;
+    Scheduler.transfer_proof_attempts q ) pr)
 
 
 

@@ -243,6 +243,26 @@ let schedule_proof_attempt ~debug ~timelimit ~memlimit ?old
   Condition.signal queue_condition;
   Mutex.unlock queue_lock
 
+let create_proof_attempt  ~debug ~timelimit ~memlimit ?old
+    ~command ~driver ~callback
+    goal =
+  (debug,timelimit,memlimit,old,command,driver,callback,goal)
+
+let transfer_proof_attempts q =
+  Mutex.lock queue_lock;
+  Queue.transfer q prover_attempts_queue;
+  Condition.signal queue_condition;
+  Mutex.unlock queue_lock
+
+let schedule_some_proof_attempts ~debug ~timelimit ~memlimit ?old
+    ~command ~driver ~callback
+    goal q =
+  Queue.add
+    (debug,timelimit,memlimit,old,command,driver,callback,goal) q;
+  if Queue.length q >= !maximum_running_proofs * coef_buf * 2 then
+    transfer_proof_attempts q
+
+
 let edit_proof ~debug ~editor ~file ~driver ~callback goal =
   Mutex.lock queue_lock;
   Queue.push (debug,editor,file,driver,callback,goal) proof_edition_queue;
