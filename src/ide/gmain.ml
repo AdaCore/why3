@@ -991,15 +991,18 @@ let prover_on_selected_goals pr =
 let split_goal g =
   if not g.Model.proved then
     let callback subgoals =
+      ignore (Thread.create (fun subgoals ->
       if List.length subgoals >= 2 then
-        let transf_id_split = Db.transf_from_name "split_goal" in
+        let transf_id_split =
+          (GtkThread.sync Db.transf_from_name) "split_goal" in
         let db_transf =
-          Db.add_transformation g.Model.goal_db transf_id_split
+          (GtkThread.sync Db.add_transformation)
+            g.Model.goal_db transf_id_split
         in
-        let tr = Helpers.add_transformation_row g db_transf (* subgoals *) in
+        let tr = (GtkThread.sync Helpers.add_transformation_row) g db_transf
+ (* subgoals *) in
         let goal_name = g.Model.goal_name in
-        let goals,_ = List.fold_left
-          (fun (acc,count) subtask ->
+        let fold = (fun (acc,count) subtask ->
              let _id = (Task.task_goal subtask).Decl.pr_name in
              let subgoal_name =
                goal_name ^ "." ^ (string_of_int count)
@@ -1010,11 +1013,11 @@ let split_goal g =
                Helpers.add_goal_row (Model.Transf tr) subgoal_name subtask
                  subtask_db
              in
-             (goal :: acc, count+1))
-          ([],1) subgoals
+             (goal :: acc, count+1)) in
+        let goals,_ = List.fold_left (GtkThread.sync fold) ([],1) subgoals
         in
         tr.Model.subgoals <- List.rev goals;
-        g.Model.transformations <- tr :: g.Model.transformations
+        g.Model.transformations <- tr :: g.Model.transformations) subgoals)
     in
     Scheduler.apply_transformation_l ~callback
       split_transformation g.Model.task
@@ -1049,9 +1052,10 @@ let split_selected_goal_or_children row =
 
 
 let split_selected_goals () =
-  List.iter
-    split_selected_goal_or_children
-    goals_view#selection#get_selected_rows
+  ignore (Thread.create (fun () ->
+    List.iter
+      split_selected_goal_or_children
+      goals_view#selection#get_selected_rows) ())
 
 
 (*****************************************************)
