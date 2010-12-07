@@ -61,6 +61,7 @@
 	"label", LABEL;
 	"let", LET;
 	"match", MATCH;
+	"module", MODULE;
 	"not", NOT;
 	"of", OF;
 	"parameter", PARAMETER;

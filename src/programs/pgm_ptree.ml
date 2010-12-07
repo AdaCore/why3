@@ -108,5 +108,10 @@ type decl =
   | Dparam  of ident * type_v
   | Dexn    of ident * Ptree.pty option
 
-type file = decl list
+type module_ = {
+  mod_name : ident;
+  mod_decl : decl list;
+}
+
+type file = module_ list
 

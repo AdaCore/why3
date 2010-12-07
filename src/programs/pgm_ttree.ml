@@ -111,15 +111,15 @@ type rec_variant = Term.vsymbol * Term.term * Term.lsymbol
 
 type reference = Pgm_effect.reference
 
-type pre = Pgm_env.pre
+type pre = Pgm_types.pre
 
-type post = Pgm_env.post
+type post = Pgm_types.post
 
-type type_v = Pgm_env.type_v
+type type_v = Pgm_types.type_v
 
-type type_c = Pgm_env.type_c
+type type_c = Pgm_types.type_c
 
-type binder = Pgm_env.binder
+type binder = Pgm_types.binder
 
 type loop_annotation = {
   loop_invariant : Term.fmla option;

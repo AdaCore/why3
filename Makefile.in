@@ -282,7 +282,7 @@ PGMGENERATED = src/programs/pgm_parser.mli src/programs/pgm_parser.ml \
 	       src/programs/pgm_lexer.ml
 
 PGM_FILES = pgm_ttree pgm_ptree pgm_parser pgm_lexer pgm_effect \
-	    pgm_env pgm_typing pgm_wp pgm_main
+	    pgm_types pgm_module # pgm_env pgm_typing pgm_wp pgm_main
 
 PGMMODULES = $(addprefix src/programs/, $(PGM_FILES))
 

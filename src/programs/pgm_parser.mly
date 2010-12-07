@@ -118,7 +118,7 @@
 
 %token ABSURD AND ANY AS ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO ELSE END
 %token EXCEPTION FOR
-%token FUN GHOST IF IN INVARIANT LABEL LET MATCH NOT OF PARAMETER
+%token FUN GHOST IF IN INVARIANT LABEL LET MATCH MODULE NOT OF PARAMETER
 %token RAISE RAISES READS REC
 %token THEN TO TRY TYPE VARIANT WHILE WITH WRITES
 
@@ -178,7 +178,26 @@
 %%
 
 file:
-| list0_decl EOF { $1 }
+| list0_module_ EOF { $1 }
+;
+
+list0_module_:
+| /* epsilon */
+   { [] }
+| list1_module_
+   { $1 }
+;
+
+list1_module_:
+| module_
+   { [$1] }
+| module_ list1_module_
+   { $1 :: $2 }
+;
+
+module_:
+| MODULE uident list0_decl END
+   { { mod_name = $2; mod_decl = $3 } }
 ;
 
 list0_decl:
