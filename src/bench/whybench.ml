@@ -313,20 +313,25 @@ let () =
   let fold_prob acc = function
     | None, _ -> acc
     | Some f, _ ->
-      let gen env task =
-        let fwhy () =
-          let fname, cin = match f with
-            | "-" -> "stdin", stdin
-            | f   -> f, open_in f
-          in
-          let m = Env.read_channel ?format:!opt_parser env fname cin in
-          close_in cin;
-          let th = Mnm.bindings m in
-          let map (name,th) = name,Task.split_theory th None task in
-          let fold acc (n,l) =
-            List.rev_append (List.map (fun v -> (n,v)) l) acc in
-          th |> List.map map |> List.fold_left fold [] in
-        Scheduler.do_why_sync fwhy () in
+      let env = env in
+      let task = !opt_task in
+      let tlist =
+        let fname, cin = match f with
+          | "-" -> "stdin", stdin
+          | f   -> f, open_in f
+        in
+        let m = Env.read_channel ?format:!opt_parser env fname cin in
+        close_in cin;
+        let th = Mnm.bindings m in
+        let map (name,th) = name,Task.split_theory th None task in
+        let fold acc (n,l) =
+          List.rev_append (List.map (fun v -> (n,v)) l) acc in
+        th |> List.map map |> List.fold_left fold [] in
+      (* let gen = Env.Wenv.memoize 3 (fun env -> *)
+      (*   let memo = Trans.store (fun task -> gen env task) in *)
+      (*   Trans.apply memo) in *)
+      let gen _ _  = tlist in
+      let gen env task = Scheduler.do_why_sync (gen env) task in
       { B.ptask   = gen;
         ptrans   = transl;
       }::acc in

@@ -72,6 +72,7 @@ let find_theory env sl s =
 
 let env_tag env = env.env_tag
 
+module Wenv = Hashweak.Make(struct type t = env let tag = env_tag end)
 
 (** Parsers *)
 

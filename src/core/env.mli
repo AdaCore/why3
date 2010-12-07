@@ -25,6 +25,8 @@ type env
 
 val env_tag : env -> Hashweak.tag
 
+module Wenv : Hashweak.S with type key = env
+
 type retrieve_theory = env -> string list -> theory Mnm.t
 
 val create_env : retrieve_theory -> env
