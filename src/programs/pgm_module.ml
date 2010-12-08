@@ -74,6 +74,9 @@ type uc = {
   uc_export : namespace list;
 }
 
+let namespace uc = List.hd uc.uc_import
+let theory_uc uc = uc.uc_th
+
 let create_module n =
   let uc = Theory.create_theory n in
   (* let th = Env.find_theory env ["programs"] "Prelude" in *)
@@ -104,6 +107,30 @@ let close_namespace uc import s =
   | [_], [_] -> raise NoOpenedNamespace
   | _ -> assert false
 
+(** Insertion of new declarations *)
+
+let add_symbol add id v uc =
+  match uc.uc_import, uc.uc_export with
+  | i0 :: sti, e0 :: ste -> { uc with
+      uc_import = add false id.id_string v i0 :: sti;
+      uc_export = add true  id.id_string v e0 :: ste }
+  | _ -> assert false
+
+let add_psymbol ps uc =
+  add_symbol add_pr ps.p_ls.ls_name ps uc
+
+let add_esymbol ls uc =
+  add_symbol add_ex ls.ls_name ls uc
+
+let add_decl d uc =
+  { uc with uc_decls = d :: uc.uc_decls }
+
+let add_logic_decl d uc =
+  let th = Typing.with_tuples Theory.add_decl uc.uc_th d in
+  { uc with uc_th = th }
+
+(** Modules *)
+
 type t = {
   m_name   : Ident.ident;
   m_th     : theory;
@@ -121,6 +148,25 @@ let close_module uc = match uc.uc_export with
 	m_th = close_theory uc.uc_th; }
   | _ ->
       raise CloseModule
+
+(* parsing LOGIC strings using functions from src/parser/
+   requires proper relocation *)
+
+let reloc loc lb =
+  lb.Lexing.lex_curr_p <- loc;
+  lb.Lexing.lex_abs_pos <- loc.Lexing.pos_cnum + 1
+
+let parse_string f loc s =
+  let lb = Lexing.from_string s in
+  reloc loc lb;
+  f lb
+
+let logic_lexpr ((pos, _), s) =
+  parse_string Lexer.parse_lexpr pos s
+
+let parse_logic_decls env ((loc, _), s) uc =
+  let parse = Lexer.parse_list0_decl env Theory.Mnm.empty uc.uc_th in
+  { uc with uc_th = parse_string parse loc s }
 
 
 

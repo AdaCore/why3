@@ -21,8 +21,7 @@ open Why
 
 val debug : Debug.flag
 
-val decl :
-  Env.env -> Pgm_env.env -> Pgm_ptree.decl -> Pgm_env.env * Pgm_ttree.decl list
+val decl : Env.env -> Pgm_module.uc -> Pgm_ptree.decl -> Pgm_module.uc
 
 val print_post : Format.formatter -> Pgm_ttree.post -> unit
 

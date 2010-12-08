@@ -61,8 +61,10 @@ type psymbol = {
   p_tv : type_v;
 }
 
-(* TODO: ensure ls = purify v *)
-let create_psymbol ls v = { p_ls = ls; p_tv = v }
+let create_psymbol id v = 
+  let tyl, ty = uncurry_type v in
+  let ls = create_lsymbol id tyl (Some ty) in
+  { p_ls = ls; p_tv = v }
 
 type esymbol = lsymbol
 

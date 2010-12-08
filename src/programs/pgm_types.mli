@@ -41,7 +41,7 @@ type psymbol = private {
   p_tv : type_v;
 }
 
-val create_psymbol : lsymbol -> type_v -> psymbol
+val create_psymbol : preid -> type_v -> psymbol
 
 type esymbol = lsymbol
 

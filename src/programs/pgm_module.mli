@@ -19,6 +19,9 @@ val ns_find_ns : namespace -> string list -> namespace
 (** a module under construction *)
 type uc
 
+val namespace : uc -> namespace
+val theory_uc : uc -> Theory.theory_uc
+
 (** a module *)
 type t
 
@@ -28,6 +31,19 @@ val close_module : uc -> t
 val open_namespace  : uc -> uc
 val close_namespace : uc -> bool -> string option -> uc
 
-(* exceptions *)
+(** insertion *)
+
+exception ClashSymbol of string
+
+val add_psymbol : psymbol -> uc -> uc
+val add_esymbol : esymbol -> uc -> uc
+val add_decl : Pgm_ttree.decl -> uc -> uc
+val add_logic_decl : Decl.decl -> uc -> uc
+
+(** TODO: *)
+val parse_logic_decls : Env.env -> Loc.position * string -> uc -> uc
+val logic_lexpr : Loc.position * string -> Ptree.lexpr
+
+(** exceptions *)
 
 exception CloseModule

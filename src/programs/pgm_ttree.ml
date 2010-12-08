@@ -200,9 +200,9 @@ and recfun = Term.vsymbol * binder list * rec_variant option * triple
 and triple = pre * expr * post
 
 type decl =
-  | Dlet    of Term.lsymbol * expr
-  | Dletrec of (Term.lsymbol * recfun) list
-  | Dparam  of Term.lsymbol * type_v
+  | Dlet    of Pgm_types.psymbol * expr
+  | Dletrec of (Pgm_types.psymbol * recfun) list
+  | Dparam  of Pgm_types.psymbol * type_v
 
 type file = decl list
 

@@ -130,25 +130,6 @@ let empty_env uc = {
   ls_add   = find_ls uc ["infix +"];
 }
 
-(* parsing LOGIC strings using functions from src/parser/
-   requires proper relocation *)
-
-let reloc loc lb =
-  lb.Lexing.lex_curr_p <- loc;
-  lb.Lexing.lex_abs_pos <- loc.Lexing.pos_cnum + 1
-
-let parse_string f loc s =
-  let lb = Lexing.from_string s in
-  reloc loc lb;
-  f lb
-
-let logic_lexpr ((pos, _), s) =
-  parse_string Lexer.parse_lexpr pos s
-
-let logic_decls ((loc, _), s) e env =
-  let parse = Lexer.parse_list0_decl e Mnm.empty env.uc in
-  { env with uc = parse_string parse loc s }
-
 (* addition *)
 
 let add_global id tyv env =
