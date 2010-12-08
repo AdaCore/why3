@@ -40,7 +40,8 @@ type 'a tool = {
 
 type 'a prob = {
   ptask  : env -> task -> ('a * task) list; (** needed for tenv and tuse *)
-  ptrans : task list trans;
+  ptrans : env -> task list trans; (** perhaps should be merged in
+                                       ptask *)
 }
 
 

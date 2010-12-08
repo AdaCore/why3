@@ -104,6 +104,8 @@ val get_int  : ?default:int      -> section -> string -> int
     @raise Multiple_value if the key appears multiple time.
 *)
 
+val get_into : section -> string -> int option
+
 val get_intl : ?default:int list -> section -> string -> int list
 (** [get_intl ~default section key] one key to many value
 
@@ -131,6 +133,8 @@ val get_bool  : ?default:bool       -> section -> string -> bool
 val get_booll  : ?default:bool list -> section -> string -> bool list
 (** Same as {!get_intl} but on bool *)
 
+val get_boolo : section -> string -> bool option
+
 val set_bool : section -> string -> bool -> section
 (** Same as {!set_int} but on bool *)
 
@@ -143,6 +147,8 @@ val get_string  : ?default:string       -> section -> string -> string
 
 val get_stringl  : ?default:string list -> section -> string -> string list
 (** Same as {!get_intl} but on string *)
+
+val get_stringo : section -> string -> string option
 
 val set_string : section -> string -> string -> section
 (** Same as {!set_int} but on string *)

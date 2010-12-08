@@ -148,17 +148,25 @@ let set_family t sname sections =
     let set (arg,section) = (Some arg,section) in
     Mstr.add sname (List.map set sections) t
 
+let get_value read section key =
+  let l = Mstr.find key section in
+  match l with
+    | []  -> assert false
+    | [v] -> read key v
+    | v1::v2::_ -> raise (DuplicateField (key,v1,v2))
+
 let get_value read ?default section key =
   try
-    let l = Mstr.find key section in
-    match l with
-      | []  -> assert false
-      | [v] -> read key v
-      | v1::v2::_ -> raise (DuplicateField (key,v1,v2))
+    get_value read section key
   with Not_found ->
     match default with
       | None -> raise (MissingField key)
       | Some v -> v
+
+let get_valueo read section key =
+  try
+    Some (get_value read section key)
+  with Not_found -> None
 
 let get_valuel read ?default section key =
   try
@@ -196,16 +204,20 @@ let wstring s = RCstring s
 
 let get_int = get_value rint
 let get_intl = get_valuel rint
+let get_into = get_valueo rint
+
 let set_int = set_value wint
 let set_intl = set_valuel wint
 
 let get_bool = get_value rbool
 let get_booll = get_valuel rbool
+let get_boolo = get_valueo rbool
 let set_bool = set_value wbool
 let set_booll = set_valuel wbool
 
 let get_string = get_value rstring
 let get_stringl = get_valuel rstring
+let get_stringo = get_valueo rstring
 let set_string = set_value wstring
 let set_stringl = set_valuel wstring
 

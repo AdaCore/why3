@@ -40,7 +40,7 @@ type 'a tool = {
 
 type 'a prob = {
   ptask  : env -> task -> ('a * task) list; (** needed for tenv *)
-  ptrans : task list trans;
+  ptrans : env -> task list trans;
 }
 
 type ('a,'b) result = {tool   : 'a;
@@ -103,7 +103,8 @@ let call s callback tool prob =
   (** Apply trans *)
   let iter_task (pval,task) =
     MTask.start s;
-    let trans = Trans.compose_l prob.ptrans (Trans.singleton tool.ttrans) in
+    let trans = Trans.compose_l (prob.ptrans tool.tenv)
+      (Trans.singleton tool.ttrans) in
     apply_transformation_l ~callback:(trans_cb pval) trans task in
   (** Split *)
   let ths = prob.ptask tool.tenv tool.tuse in

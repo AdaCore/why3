@@ -118,6 +118,9 @@ let list_compare cmp l1 l2 = match l1,l2 with
   | a1::l1, a2::l2 ->
       let c = cmp a1 a2 in if c = 0 then compare l1 l2 else c
 
+let list_flatten_rev fl =
+  List.fold_left (fun acc l -> List.rev_append l acc) [] fl
+
 (* boolean fold accumulators *)
 
 exception FoldSkip
@@ -128,6 +131,16 @@ let any_fn pr _ t = pr t && raise FoldSkip
 (* constant boolean function *)
 let ttrue _ = true
 let ffalse _ = false
+
+(* useful function on string *)
+let split_string_rev s c =
+  let rec aux acc i =
+    try
+      let j = String.index_from s i c in
+      aux ((String.sub s i (j-i))::acc) (j + 1)
+    with Not_found -> (String.sub s i (String.length s - i))::acc
+      | Invalid_argument _ -> ""::acc in
+  aux [] 0
 
 (* Set and Map on ints and strings *)
 

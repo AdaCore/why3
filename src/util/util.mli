@@ -89,6 +89,8 @@ val list_fold_product_l :
 
 val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
 
+val list_flatten_rev : 'a list list -> 'a list
+
 (* boolean fold accumulators *)
 
 exception FoldSkip
@@ -104,6 +106,9 @@ val ffalse : 'a -> bool
 
 val ttrue : 'a -> bool
 (** [ttrue] constant function [true] *)
+
+(* useful function on string *)
+val split_string_rev : string -> char -> string list
 
 (* Set and Map on ints and strings *)
 

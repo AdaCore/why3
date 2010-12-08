@@ -331,9 +331,8 @@ let () =
       (*   let memo = Trans.store (fun task -> gen env task) in *)
       (*   Trans.apply memo) in *)
       let gen _ _  = tlist in
-      let gen env task = Scheduler.do_why_sync (gen env) task in
       { B.ptask   = gen;
-        ptrans   = transl;
+        ptrans   = fun _ -> transl;
       }::acc in
   probs := Queue.fold fold_prob [] opt_queue
 
