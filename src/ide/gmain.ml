@@ -710,7 +710,6 @@ let intro_transformation = Trans.lookup_transform "introduce_premises"
   gconfig.env
 
 
-
 let rec reimport_any_goal parent gname t db_goal goal_obsolete =
   let goal = Helpers.add_goal_row parent gname t db_goal in
   let proved = ref false in
@@ -747,6 +746,61 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
        let subgoals = Trans.apply split_transformation t in
        let mtr = Helpers.add_transformation_row goal tr in
        let db_subgoals = Db.subgoals tr in
+       let reimported_goals,db_subgoals,_ =
+         List.fold_left
+           (fun (acc,db_subgoals,count) subtask ->
+              let _id = (Task.task_goal subtask).Decl.pr_name in
+              let subgoal_name = gname ^ "." ^ (string_of_int count) in
+              let sum = task_checksum subtask in
+              let subtask_db,db_subgoals =
+                try 
+		  let g = Util.Mstr.find sum db_subgoals in
+		  (* a subgoal has the same check sum *)
+		  (Some g, Util.Mstr.remove sum db_subgoals)
+                with Not_found -> None,db_subgoals
+              in
+              ((count,subgoal_name,subtask,sum,subtask_db) :: acc, 
+	       db_subgoals,
+	       count+1))
+           ([],db_subgoals,1) subgoals
+       in
+       let other_goals =
+	 Util.Mstr.fold
+	   (fun _ g acc -> (Db.goal_name g,g)::acc)
+	   db_subgoals
+	   []
+       in
+       let other_goals = 
+	 List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2) other_goals
+       in
+       let rec merge_goals new_goals old_goals proved acc =
+	 match new_goals with
+	   | [] -> acc, proved
+	   | (_,subgoal_name,subtask,sum,g_opt)::rem -> 
+	       let db_g,subgoal_obsolete,old_goals =
+		 match g_opt with
+		   | Some g -> g,false,old_goals
+		   | None ->
+		       match old_goals with
+			 | [] ->
+			     (* create a new goal in db *)
+			     Db.add_subgoal tr subgoal_name sum, 
+			     false, old_goals
+			 | (_goal_name,g) :: r ->
+			     g, true, r
+	       in
+               let subgoal,subgoal_proved =
+                 reimport_any_goal
+                   (Model.Transf mtr) subgoal_name subtask db_g
+                   subgoal_obsolete 
+              in
+              merge_goals rem old_goals (proved && subgoal_proved) 
+		(subgoal :: acc)
+       in
+       let goals, subgoals_proved =
+	 merge_goals (List.rev reimported_goals) other_goals true []
+       in
+(*
        let goals,_,subgoals_proved =
          List.fold_left
            (fun (acc,count,proved) subtask ->
@@ -768,6 +822,7 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
               (subgoal :: acc, count+1,proved && subgoal_proved))
            ([],1,true) subgoals
        in
+*)
        mtr.Model.subgoals <- List.rev goals;
        if subgoals_proved (* TODO : && not obsolete *)
        then proved := true
