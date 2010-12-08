@@ -28,7 +28,26 @@ let fmla2 : Term.fmla = Term.f_implies (Term.f_and atom_A atom_B) atom_A
 let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_fmla fmla2
 
 
-(* To build tasks and call prover, we need to access the Why configuration *)
+(* building the task for formula 1 alone *)
+let task1 : Task.task = None (* empty task *)
+let goal_id1 : Decl.prsymbol = Decl.create_prsymbol (Ident.id_fresh "goal1") 
+let task1 : Task.task = Task.add_prop_decl task1 Decl.Pgoal goal_id1 fmla1
+
+(* printing the task *)
+let () = printf "@[task 1 is:@\n%a@]@." Pretty.print_task task1
+
+(* task for formula 2 *)
+let task2 = None
+let task2 = Task.add_logic_decl task2 [prop_var_A, None] 
+let task2 = Task.add_logic_decl task2 [prop_var_B, None] 
+let goal_id2 = Decl.create_prsymbol (Ident.id_fresh "goal2") 
+let task2 = Task.add_prop_decl task2 Decl.Pgoal goal_id2 fmla2
+
+let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
+
+
+
+(* To call a prover, we need to access the Why configuration *)
 
 (* reads the config file *)
 let config = Whyconf.read_config None
@@ -53,14 +72,6 @@ let alt_ergo =
 (* loading the Alt-Ergo driver *)
 let alt_ergo_driver = Driver.load_driver env alt_ergo.Whyconf.driver
 
-(* building the task for formula 1 alone *)
-let task1 = None (* empty task *)
-let goal_id1 = Decl.create_prsymbol (Ident.id_fresh "goal1") 
-let task1 = Task.add_prop_decl task1 Decl.Pgoal goal_id1 fmla1
-
-(* printing the task *)
-let () = printf "@[task 1 is:@\n%a@]@." Pretty.print_task task1
-
 (* call Alt-Ergo *)
 let result1 = 
   Driver.prove_task ~command:alt_ergo.Whyconf.command
@@ -69,14 +80,6 @@ let result1 =
 (* prints Alt-Ergo answer *)
 let () = printf "@[On task 1, alt-ergo answers %a@."
   Call_provers.print_prover_result result1
-
-let task2 = None
-let task2 = Task.add_logic_decl task2 [prop_var_A, None] 
-let task2 = Task.add_logic_decl task2 [prop_var_B, None] 
-let goal_id2 = Decl.create_prsymbol (Ident.id_fresh "goal2") 
-let task2 = Task.add_prop_decl task2 Decl.Pgoal goal_id2 fmla2
-
-let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
 
 let result2 = 
   Driver.prove_task ~command:alt_ergo.Whyconf.command

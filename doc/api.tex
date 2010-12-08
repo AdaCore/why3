@@ -68,8 +68,70 @@ As expected, the output is as follows.
 \begin{verbatim}
 formula 2 is: A and B -> A
 \end{verbatim}
+Notice that the concrete syntax of Why3 forbids predicate identifiers
+to start with a capital letter. This constraint does not exist when
+building those directly using library calls.
 
-\section{Buildings Tasks and calling External Provers}
+\section{Buildings Tasks}
+
+Let's see how we can call a prover to prove a formula. As said in
+previous chapters, a prover must be given a task, so we need to build
+tasks from our formulas. Task can be build incrementally from an empty
+task by adding declaration to it, using the functions
+\texttt{add\_*\_decl} of module \texttt{Task}. For the formula $true and
+false$ above, this is done as follows.
+\begin{verbatim}
+let task1 : Task.task = None (* empty task *)
+let goal_id1 : Decl.prsymbol = Decl.create_prsymbol (Ident.id_fresh "goal1") 
+let task1 : Task.task = Task.add_prop_decl task1 Decl.Pgoal goal_id1 fmla1
+\end{verbatim}
+To make the formula a goal, we must give a name to it, here "goal1". A
+goal name has type \texttt{prsymbol}, for identifiers denoting
+propositions in a theory or a task. Notice again that the concrete
+syntax of Why3 requires these symbol to be capitalized, but it is not
+mandatory when using the library. The second argument of
+\texttt{add\_prop\_decl} is the kind of the proposition:
+\texttt{Paxiom}, \texttt{Plemma} or \texttt{Pgoal}.
+
+
+Once such a task is built, it can be printed.
+\begin{verbatim}
+(* printing the task *)
+let () = printf "@[task 1 is:@\n%a@]@." Pretty.print_task task1
+\end{verbatim}
+
+The task for our second formula is a bit more complex to build, because the variables A and B must be add as logic declaration in the task.
+\begin{verbatim}
+(* task for formula 2 *)
+let task2 = None
+let task2 = Task.add_logic_decl task2 [prop_var_A, None] 
+let task2 = Task.add_logic_decl task2 [prop_var_B, None] 
+let goal_id2 = Decl.create_prsymbol (Ident.id_fresh "goal2") 
+let task2 = Task.add_prop_decl task2 Decl.Pgoal goal_id2 fmla2
+let () = printf "@[task 2 is:@\n%a@]@." Pretty.print_task task2
+\end{verbatim}
+The argument \texttt{None} is the declarations of logic symbols means
+that they do not have any definition.
+
+Execution of our OCaml program now outputs:
+\begin{verbatim}
+task 1 is:
+theory Task
+  goal Goal1 : true or false
+end
+
+task 2 is:
+theory Task
+  logic A
+  
+  logic B
+  
+  goal Goal2 : A and B -> A
+end
+\end{verbatim}
+
+\section{Calling External Provers}
+
 
 \section{Building Terms and First-Order Formulas}
 
