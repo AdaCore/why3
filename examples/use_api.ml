@@ -52,7 +52,7 @@ let () = printf "@[task 1 created:@\n%a@]@." Pretty.print_task task1
 
 let result1 = 
   Driver.prove_task ~command:alt_ergo.Whyconf.command
-    alt_ergo_driver task1 ()
+    alt_ergo_driver task1 () ()
 
 let () = printf "@[On task 1, alt-ergo answers %a@."
   Call_provers.print_prover_result result1
@@ -80,7 +80,7 @@ let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
 
 let result2 = 
   Driver.prove_task ~command:alt_ergo.Whyconf.command
-    alt_ergo_driver task2 ()
+    alt_ergo_driver task2 () ()
 
 let () = printf "@[On task 2, alt-ergo answers %a@."
   Call_provers.print_prover_result result2
@@ -116,7 +116,7 @@ let () = printf "@[task 3 created@]@."
 
 let result3 = 
   Driver.prove_task ~command:alt_ergo.Whyconf.command
-    alt_ergo_driver task3 ()
+    alt_ergo_driver task3 () ()
 
 let () = printf "@[On task 3, alt-ergo answers %a@."
   Call_provers.print_prover_result result3
