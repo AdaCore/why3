@@ -133,12 +133,14 @@ let specialize_global loc x uc =
   let p = ns_find_pr (namespace uc) x in
   p.p_ls, specialize_type_v ~loc (Htv.create 17) p.p_tv
 
-let print_qualid = print_list dot pp_print_string
+let print_qualids = print_list dot pp_print_string
+let print_qualid fmt q = 
+  print_list dot pp_print_string fmt (Typing.string_list_of_qualid [] q)
 
 let specialize_exception loc x uc =
   let s = 
     try ns_find_ex (namespace uc) x
-    with Not_found -> errorm ~loc "unbound exception %a" print_qualid x
+    with Not_found -> errorm ~loc "unbound exception %a" print_qualids x
   in
   match Denv.specialize_lsymbol ~loc s with
     | tyl, Some ty -> s, tyl, ty
@@ -186,23 +188,25 @@ let check_reference_type uc loc ty =
     errorm ~loc "this expression has type %a, but is expected to be a reference"
       print_dty ty
 
-let dreference env id =
-  if Typing.mem_var id.id env.denv then
-    (* local variable *)
-    let ty = Typing.find_var id.id env.denv in
-    check_reference_type env.uc id.id_loc ty;
-    DRlocal id.id
-  else
-    let p = Qident id in
-    let s, _, ty = Typing.specialize_fsymbol p (theory_uc env.uc) in
-    check_reference_type env.uc id.id_loc ty;
-    DRglobal s
+let dreference env = function
+  | Qident id when Typing.mem_var id.id env.denv ->
+      (* local variable *)
+      let ty = Typing.find_var id.id env.denv in
+      check_reference_type env.uc id.id_loc ty;
+      DRlocal id.id
+  | p ->
+      let loc = Typing.qloc p in
+      let s, _, ty = Typing.specialize_fsymbol p (theory_uc env.uc) in
+      check_reference_type env.uc loc ty;
+      DRglobal s
 
-let dexception env id =
-  let _, _, ty as r = specialize_exception id.id_loc [id.id] env.uc in
+let dexception env qid =
+  let sl = Typing.string_list_of_qualid [] qid in
+  let loc = Typing.qloc qid in
+  let _, _, ty as r = specialize_exception loc sl env.uc in
   let ty_exn = dty_app (find_ts env.uc "exn", []) in
   if not (Denv.unify ty ty_exn) then
-    errorm ~loc:id.id_loc
+    errorm ~loc
       "this expression has type %a, but is expected to be an exception"
       print_dty ty;
   r
@@ -400,16 +404,16 @@ and dexpr_desc env loc = function
       DElogic (fs_tuple 0), dty_unit env.uc
   | Pgm_ptree.Eabsurd ->
       DEabsurd, create_type_var loc
-  | Pgm_ptree.Eraise (id, e) ->
-      let ls, tyl, _ = dexception env id in
+  | Pgm_ptree.Eraise (qid, e) ->
+      let ls, tyl, _ = dexception env qid in
       let e = match e, tyl with
 	| None, [] ->
 	    None
 	| Some _, [] ->
-	    errorm ~loc "expection %s has no argument" id.id
+	    errorm ~loc "expection %a has no argument" print_qualid qid
 	| None, [ty] ->
-	    errorm ~loc "exception %s is expecting an argument of type %a"
-	      id.id print_dty ty;
+	    errorm ~loc "exception %a is expecting an argument of type %a"
+	      print_qualid qid print_dty ty;
 	| Some e, [ty] ->
 	    let e = dexpr env e in
 	    expected_type e ty;
@@ -424,12 +428,12 @@ and dexpr_desc env loc = function
 	let ls, tyl, _ = dexception env id in
 	let x, env = match x, tyl with
 	  | Some _, [] ->
-	      errorm ~loc "expection %s has no argument" id.id
+	      errorm ~loc "expection %a has no argument" print_qualid id
 	  | None, [] ->
 	      None, env
 	  | None, [ty] ->
-	      errorm ~loc "exception %s is expecting an argument of type %a"
-		id.id print_dty ty;
+	      errorm ~loc "exception %a is expecting an argument of type %a"
+		print_qualid id print_dty ty;
 	  | Some x, [ty] ->
 	      Some x.id, add_local env x.id (DTpure ty)
 	  | _ ->
@@ -1300,7 +1304,18 @@ let cannot_be_generalized gl = function
   | Tpure _ | Tarrow _ ->
       false
 
-let decl env uc = function
+let find_module lmod q id = match q with
+  | [] ->
+      (* local module *)
+      Mstr.find id lmod
+      (* TODO? with Not_found -> find_theory env [] id end *)
+  | _ :: _ ->
+      (* theory in file f *)
+      assert false (*TODO*)
+
+(* env = to retrieve theories from the loadpath
+   lmod = local modules *)
+let decl env lmod uc = function
   | Pgm_ptree.Dlogic dl ->
       Pgm_module.parse_logic_decls env dl uc
   | Pgm_ptree.Dlet (id, e) ->
@@ -1338,6 +1353,35 @@ let decl env uc = function
   | Pgm_ptree.Dexn (id, ty) ->
       let ty = option_map (type_type uc) ty in
       add_exception id.id_loc id.id ty uc
+  (* modules *) 
+  | Pgm_ptree.Duse (qid, imp_exp, use_as) ->
+      let loc = Typing.qloc qid in
+      let q, id = Typing.split_qualid qid in
+      let m =
+	try
+	  find_module lmod q id
+	with Not_found -> 
+	  errorm ~loc "unbound module %a" print_qualid qid
+      in
+      let n = match use_as with
+	| None -> Some (m.m_name.id_string)
+	| Some x -> Some x.id
+      in
+      begin try match imp_exp with
+	| Nothing ->
+	    (* use T = namespace T use_export T end *)
+	    let uc = open_namespace uc in
+	    let uc = use_export uc m in
+	    close_namespace uc false n
+	| Import ->
+	    (* use import T = namespace T use_export T end import T *)
+	    let uc = open_namespace uc in
+	    let uc = use_export uc m in
+	    close_namespace uc true n
+	| Export ->
+	    use_export uc m
+      with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s
+      end
 
 (*
 Local Variables:

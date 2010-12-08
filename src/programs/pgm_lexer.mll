@@ -50,12 +50,14 @@
 	"done", DONE;
  	"downto", DOWNTO;
         "else", ELSE;
+	"export", EXPORT;
 	"end", END;
 	"exception", EXCEPTION;
 	"for", FOR;
 	"fun", FUN;
 	"ghost", GHOST;
 	"if", IF;
+	"import", IMPORT;
 	"in", IN;
 	"invariant", INVARIANT;
 	"label", LABEL;
@@ -73,6 +75,7 @@
 	"to", TO;
 	"try", TRY;
 	"type", TYPE;
+	"use", USE;
 	"variant", VARIANT;
 	"while", WHILE;
 	"with", WITH;

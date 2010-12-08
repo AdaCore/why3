@@ -71,6 +71,7 @@ val dfmla : ?localize:bool -> denv -> Ptree.lexpr -> Denv.dfmla
 val dpat : denv -> Ptree.pattern -> denv * Denv.dpattern
 val dpat_list : denv -> Denv.dty -> Ptree.pattern -> denv * Denv.dpattern
 
+val split_qualid : Ptree.qualid -> string list * string
 val string_list_of_qualid : string list -> Ptree.qualid -> string list
 val qloc : Ptree.qualid -> Loc.position
 

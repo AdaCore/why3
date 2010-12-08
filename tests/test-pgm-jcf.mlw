@@ -1,11 +1,30 @@
 
+module A 
+
+  { use import programs.Prelude }
+
+  parameter x : int
+
+  exception E
+
+  exception F of int
+
+  parameter f : int -> int
+
+end
+
 module P
 
-  { use import list.List }
+  { use import programs.Prelude
+    use import list.List }
 
-  parameter x : list int
+  use module import A as B
 
-  let f (x : unit) = ()
+  { logic n : int }
+
+  let f x = x + B.f 2
+
+  let g x = { x >= 0 } f (x+2) { result >= 0 }
 
 end
 

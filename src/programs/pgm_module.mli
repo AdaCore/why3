@@ -23,13 +23,20 @@ val namespace : uc -> namespace
 val theory_uc : uc -> Theory.theory_uc
 
 (** a module *)
-type t
+type t = private {
+  m_name   : ident;
+  m_th     : Theory.theory;
+  m_decls  : Pgm_ttree.decl list;
+  m_export : namespace;
+}
 
 val create_module : preid -> uc
 val close_module : uc -> t
 
 val open_namespace  : uc -> uc
 val close_namespace : uc -> bool -> string option -> uc
+
+val use_export : uc -> t -> uc
 
 (** insertion *)
 

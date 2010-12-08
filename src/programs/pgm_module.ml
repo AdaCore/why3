@@ -86,9 +86,7 @@ let add_pervasives uc =
 
 let create_module n =
   let uc = Theory.create_theory n in
-  (* let th = Env.find_theory env ["programs"] "Prelude" in *)
-  (* let uc = Theory.use_export uc th in *)
-  let uc = add_pervasives uc in
+  (* let uc = add_pervasives uc in *)
   { uc_name = id_register n;
     uc_th = uc;
     uc_decls = [];
@@ -156,6 +154,15 @@ let close_module uc = match uc.uc_export with
 	m_th = close_theory uc.uc_th; }
   | _ ->
       raise CloseModule
+
+(** Use *)
+
+let use_export uc m =
+  match uc.uc_import, uc.uc_export with
+  | i0 :: sti, e0 :: ste -> { uc with
+      uc_import = merge_ns false m.m_export i0 :: sti;
+      uc_export = merge_ns true  m.m_export e0 :: ste }
+  | _ -> assert false
 
 (* parsing LOGIC strings using functions from src/parser/
    requires proper relocation *)
