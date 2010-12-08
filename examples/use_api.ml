@@ -50,30 +50,27 @@ let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
 (* To call a prover, we need to access the Why configuration *)
 
 (* reads the config file *)
-let config = Whyconf.read_config None
-
+let config : Whyconf.config = Whyconf.read_config None
 (* the [main] section of the config file *)
-let main = Whyconf.get_main config
-
-(* builds the environment from the [loadpath] *)
-let env = Env.create_env (Lexer.retrieve (Whyconf.loadpath main)) 
-
-(* the [provers] of the config file *)
-let provers = Whyconf.get_provers config
+let main : Whyconf.main = Whyconf.get_main config
+(* all the provers detected, from the config file *)
+let provers : Whyconf.config_prover Util.Mstr.t = Whyconf.get_provers config
 
 (* the [prover alt-ergo] section of the config file *)
-let alt_ergo = 
+let alt_ergo : Whyconf.config_prover = 
   try
     Util.Mstr.find "alt-ergo" provers 
   with Not_found ->
     eprintf "Prover alt-ergo not installed or not configured@.";
     exit 0
 
+(* builds the environment from the [loadpath] *)
+let env : Env.env = Env.create_env (Lexer.retrieve (Whyconf.loadpath main)) 
 (* loading the Alt-Ergo driver *)
-let alt_ergo_driver = Driver.load_driver env alt_ergo.Whyconf.driver
+let alt_ergo_driver : Driver.driver = Driver.load_driver env alt_ergo.Whyconf.driver
 
 (* call Alt-Ergo *)
-let result1 = 
+let result1 : Call_provers.prover_result = 
   Driver.prove_task ~command:alt_ergo.Whyconf.command
     alt_ergo_driver task1 () ()
 
@@ -81,12 +78,14 @@ let result1 =
 let () = printf "@[On task 1, alt-ergo answers %a@."
   Call_provers.print_prover_result result1
 
-let result2 = 
+let result2 : Call_provers.prover_result = 
   Driver.prove_task ~command:alt_ergo.Whyconf.command
+    ~timelimit:10
     alt_ergo_driver task2 () ()
 
-let () = printf "@[On task 2, alt-ergo answers %a@."
-  Call_provers.print_prover_result result2
+let () = printf "@[On task 2, alt-ergo answers %a in %5.2f seconds@."
+  Call_provers.print_prover_answer result1.Call_provers.pr_answer
+  result1.Call_provers.pr_time
 
 
 
@@ -96,16 +95,15 @@ An arithmetic goal: 2+2 = 4
 
 *)
 
-let two = Term.t_const (Term.ConstInt "2")
-let four = Term.t_const (Term.ConstInt "4")
-
-let int_theory = Env.find_theory env ["int"] "Int"
-
-let plus_symbol = Theory.ns_find_ls int_theory.Theory.th_export ["infix +"]
-
-let two_plus_two = Term.t_app plus_symbol [two;two] Ty.ty_int
-
-let fmla3 = Term.f_equ two_plus_two four
+let two : Term.term = Term.t_const (Term.ConstInt "2")
+let four : Term.term = Term.t_const (Term.ConstInt "4")
+let int_theory : Theory.theory = 
+  Env.find_theory env ["int"] "Int"
+let plus_symbol : Term.lsymbol = 
+  Theory.ns_find_ls int_theory.Theory.th_export ["infix +"]
+let two_plus_two : Term.term = Term.t_app plus_symbol [two;two] Ty.ty_int
+let two_plus_two : Term.term = Term.t_app_infer plus_symbol [two;two] 
+let fmla3 : Term.fmla = Term.f_equ two_plus_two four
 
 let task3 = None
 let task3 = Task.use_export task3 int_theory
@@ -124,6 +122,36 @@ let result3 =
 let () = printf "@[On task 3, alt-ergo answers %a@."
   Call_provers.print_prover_result result3
 
+(* quantifiers: let's build "forall x:int. x*x >= 0" *)
+let zero : Term.term = Term.t_const (Term.ConstInt "0")
+let mult_symbol : Term.lsymbol = 
+  Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
+let ge_symbol : Term.lsymbol = 
+  Theory.ns_find_ls int_theory.Theory.th_export ["infix >="]
+
+let var_x : Term.vsymbol = 
+  Term.create_vsymbol (Ident.id_fresh "x") Ty.ty_int
+let x : Term.term = Term.t_var var_x
+let x_times_x : Term.term = 
+  Term.t_app_infer mult_symbol [x;x] 
+let fmla4_aux : Term.fmla = 
+  Term.f_app ge_symbol [x_times_x;zero]
+let fmla4_quant : Term.fmla_quant = 
+  Term.f_close_quant [var_x] [] fmla4_aux
+let fmla4 : Term.fmla =
+  Term.f_forall fmla4_quant
+
+let task4 = None
+let task4 = Task.use_export task4 int_theory
+let goal_id4 = Decl.create_prsymbol (Ident.id_fresh "goal4") 
+let task4 = Task.add_prop_decl task4 Decl.Pgoal goal_id4 fmla4
+
+let result4 = 
+  Driver.prove_task ~command:alt_ergo.Whyconf.command
+    alt_ergo_driver task4 () ()
+
+let () = printf "@[On task 4, alt-ergo answers %a@."
+  Call_provers.print_prover_result result4
 
 (* build a theory with all these goals *)
 

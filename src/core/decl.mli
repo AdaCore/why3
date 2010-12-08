@@ -54,7 +54,7 @@ val check_termination : logic_decl list -> (int list) Mls.t
     symbol defined in [ldl] to a list of its argument positions
     (numbered from 0) that ensures a lexicographical structural
     descent for every recursive call. Triggers are ignored.
-    @raise [NoTerminationProof ls] when no such list is found for [ls] *)
+    @raise NoTerminationProof [ls] when no such list is found for [ls] *)
 
 (** {2 Inductive predicate declaration} *)
 

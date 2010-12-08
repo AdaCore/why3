@@ -5,9 +5,11 @@ This chapter is a tutorial for the users who wants to link their own
 OCaml code with the Why3 library. We progressively introduce the way
 one can use the library to build terms, formulas, theories, proof
 tasks, call external provers on tasks, and apply transformations on
-tasks.
+tasks. The complete documentation for API calls is given in
+Chapter~\ref{chap:apidoc}.
 
-We naturally assume here a fair knowledge of the OCaml language.
+We assume the reader has a fair knowledge of the OCaml language. 
+
 
 \section{Building Propositional Formulas}
 
@@ -82,8 +84,10 @@ task by adding declaration to it, using the functions
 false$ above, this is done as follows.
 \begin{verbatim}
 let task1 : Task.task = None (* empty task *)
-let goal_id1 : Decl.prsymbol = Decl.create_prsymbol (Ident.id_fresh "goal1") 
-let task1 : Task.task = Task.add_prop_decl task1 Decl.Pgoal goal_id1 fmla1
+let goal_id1 : Decl.prsymbol = 
+  Decl.create_prsymbol (Ident.id_fresh "goal1") 
+let task1 : Task.task = 
+  Task.add_prop_decl task1 Decl.Pgoal goal_id1 fmla1
 \end{verbatim}
 To make the formula a goal, we must give a name to it, here "goal1". A
 goal name has type \texttt{prsymbol}, for identifiers denoting
@@ -132,16 +136,174 @@ end
 
 \section{Calling External Provers}
 
+To call an external prover, we need to access the Why configuration
+file \texttt{.whyrc}, as it was build using the \texttt{why3config}
+command line tool or the \textsf{Detect Provers} menu of the graphical
+IDE. The following API calls allow to access the content of this
+configuration file.
+\begin{verbatim}
+(* reads the config file *)
+let config : Whyconf.config = Whyconf.read_config None
+(* the [main] section of the config file *)
+let main : Whyconf.main = Whyconf.get_main config
+(* all the provers detected, from the config file *)
+let provers : Whyconf.config_prover Util.Mstr.t = 
+  Whyconf.get_provers config
+\end{verbatim}
+The type \texttt{'a Util.Mstr.t} is a map index by strings. This map
+can provide the set of existing provers. In the following, we directly
+attempy to access the prover Alt-Ergo, which is known to be identified with id
+\texttt{"alt-ergo"}. 
+\begin{verbatim}
+(* the [prover alt-ergo] section of the config file *)
+let alt_ergo : Whyconf.config_prover = 
+  try
+    Util.Mstr.find "alt-ergo" provers 
+  with Not_found ->
+    eprintf "Prover alt-ergo not installed or not configured@.";
+    exit 0
+\end{verbatim}
 
-\section{Building Terms and First-Order Formulas}
+The next step is to obtain the driver associated to this prover. A driver typically depends on the standard theories so these should be loaded first.
+\begin{verbatim}
+(* builds the environment from the [loadpath] *)
+let env : Env.env = 
+  Env.create_env (Lexer.retrieve (Whyconf.loadpath main)) 
+(* loading the Alt-Ergo driver *)
+let alt_ergo_driver : Driver.driver = 
+  Driver.load_driver env alt_ergo.Whyconf.driver
+\end{verbatim}
+
+We are now ready to call the prover on the tasks. This is done by a
+function call that launches the external executable and waits for its
+termination. Here is a simple way to proceed
+\begin{verbatim}
+(* call Alt-Ergo *)
+let result1 : Call_provers.prover_result = 
+  Driver.prove_task ~command:alt_ergo.Whyconf.command
+    alt_ergo_driver task1 () ()
+(* prints Alt-Ergo answer *)
+let () = printf "@[On task 1, alt-ergo answers %a@."
+  Call_provers.print_prover_result result1
+\end{verbatim}
+This way to call a prover is in general to naive, since it will never return
+of the prover runs without time limit. The function \texttt{prove\_task} has two option parameters: \texttt{timelimit} is the maximum allowed running time in seconds, and \texttt{memlimit} is the maximum allowed memory in megabytes. 
+The type \texttt{prover\_result} is a record with three fields:
+\begin{itemize}
+\item \texttt{pr\_answer}: the prover answer, detailed below.
+\item \texttt{pr\_output}: the output of the prover, i.e. both standard output and the standard error of the process
+\item \texttt{pr\_time} : the time taken by the prover, in seconds
+\end{itemize}
+a \texttt{pr\_answer} is a sum of several kind of answers:
+\begin{itemize}
+\item \texttt{Valid}: the task is valid according to the prover.
+\item \texttt{Invalid}: the task is invalid.
+\item \texttt{Timeout}: the task timeouts, i.e. it takes more time than specified.
+\item \texttt{Unknown} $msg$: the prover can't determine if the task is valid. the string parameter $msg$ indicates some extra information.
+\item \texttt{Failure} $msg$: the prover reports a failure, i.e. it was unable to read correctly its input task.
+\item \texttt{HighFailure}: an error occurred while trying to call the prover,
+or the prover answer was not understood (i.e. none of the given regexps in the driver file match the output of the prover).
+\end{itemize}
+Here is thus another way of calling the Alt-Ergo prover, on our second task.
+\begin{verbatim}
+let result2 : Call_provers.prover_result = 
+  Driver.prove_task ~command:alt_ergo.Whyconf.command
+    ~timelimit:10
+    alt_ergo_driver task2 () ()
+
+let () = 
+  printf "@[On task 2, alt-ergo answers %a in %5.2f seconds@."
+    Call_provers.print_prover_answer 
+    result1.Call_provers.pr_answer
+    result1.Call_provers.pr_time
+\end{verbatim}
+The output of our program is now as follows.
+\begin{verbatim}
+On task 1, alt-ergo answers Valid (0.01s)
+On task 2, alt-ergo answers Valid in  0.01 seconds
+\end{verbatim}
+
+\section{Building Terms}
 
 An important feature of the functions for building terms and formulas
 is that they statically guarantee that only well-typed terms can be
 constructed.
 
+Here is the way we build the formula $2+2=4$. The main difficult is to
+access the internal identifier for addition: it must retrieved from
+the standard theory \texttt{Int} of the file \texttt{int.why}.
+\begin{verbatim}
+let two : Term.term = Term.t_const (Term.ConstInt "2")
+let four : Term.term = Term.t_const (Term.ConstInt "4")
+let int_theory : Theory.theory = 
+  Env.find_theory env ["int"] "Int"
+let plus_symbol : Term.lsymbol = 
+  Theory.ns_find_ls int_theory.Theory.th_export ["infix +"]
+let two_plus_two : Term.term = 
+  Term.t_app_infer plus_symbol [two;two] 
+let fmla3 : Term.fmla = Term.f_equ two_plus_two four
+\end{verbatim}
+An important point to notice as that when building the application of
+$+$ to the arguments, it is checked that the types are correct. Indeed
+the constructor \texttt{t\_app\_infer} infers the type of the resulting
+term. One could also provide the expected term as follows.
+\begin{verbatim}
+let two_plus_two : Term.term = 
+  Term.t_app plus_symbol [two;two] Ty.ty_int
+\end{verbatim}
+
+When building a task with this formula, we need to declare that we use the Int theory, as follows.
+\begin{verbatim}
+let task3 = None
+let task3 = Task.use_export task3 int_theory
+let goal_id3 = Decl.create_prsymbol (Ident.id_fresh "goal3") 
+let task3 = Task.add_prop_decl task3 Decl.Pgoal goal_id3 fmla3
+\end{verbatim}
+
+\section{Building Quantified Formulas}
+
+To illustrate how to build quantified formulas, let's build $\forall x:int. x*x \geq 0$. The first step is to obtain the symbols from the int theory.
+\begin{verbatim}
+let zero : Term.term = Term.t_const (Term.ConstInt "0")
+let mult_symbol : Term.lsymbol = 
+  Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
+let ge_symbol : Term.lsymbol = 
+  Theory.ns_find_ls int_theory.Theory.th_export ["infix >="]
+\end{verbatim}
+The next step is to introduce the variable $x$ with the type int.
+\begin{verbatim}
+let var_x : Term.vsymbol = 
+  Term.create_vsymbol (Ident.id_fresh "x") Ty.ty_int
+\end{verbatim}
+The formula $x*x \geq 0$ is obtained similarly as the previous example.
+\begin{verbatim}
+let x : Term.term = Term.t_var var_x
+let x_times_x : Term.term = 
+  Term.t_app_infer mult_symbol [x;x] 
+let fmla4_aux : Term.fmla = 
+  Term.f_app ge_symbol [x_times_x;zero]
+\end{verbatim}
+To quantify on $x$, it is mandatory to first build an intermediate
+value of type \texttt{fmla\_quant}.
+\begin{verbatim}
+let fmla4_quant : Term.fmla_quant = 
+  Term.f_close_quant [var_x] [] fmla4_aux
+let fmla4 : Term.fmla =
+  Term.f_forall fmla4_quant
+\end{verbatim}
+The second argument of \texttt{f\_close\_quant} is a list of triggers.
+
 \section{Building Theories}
 
+TODO
+
 \section{Applying transformations}
+
+TODO
+
+\section{Writing new functions on term}
+
+TODO: pattern-matching on terms, opening a quantifier
 
 %%% Local Variables:
 %%% mode: latex
