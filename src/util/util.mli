@@ -61,6 +61,10 @@ val option_map_fold :
 val foldi : ('a -> int -> 'a) -> 'a -> int -> int -> 'a
 val mapi : (int -> 'a) -> int -> int -> 'a list
 
+(* useful float iterator *)
+val iterf : (float -> unit) -> float -> float -> float -> unit
+(** [iterf f min max step] *)
+
 (* useful list combinators *)
 
 val rev_map_fold_left :

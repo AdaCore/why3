@@ -71,6 +71,11 @@ let rec foldi f acc min max =
   if min > max then acc else foldi f (f acc min) (succ min) max
 let rec mapi f = foldi (fun acc i -> f i::acc) []
 
+(* useful iterator on float *)
+let rec iterf f min max step =
+  if min > max then () else
+    (f min; iterf f (min+.step) max step)
+
 (* useful list combinators *)
 
 let rev_map_fold_left f acc l =

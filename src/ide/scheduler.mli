@@ -76,8 +76,8 @@ val create_proof_attempt :  debug:bool -> timelimit:int -> memlimit:int ->
   Task.task -> attempt
 
 val transfer_proof_attempts : attempt Queue.t -> unit
-(** same as the iteration of {!schedule_proof_attempt} but runs in
-    constant time. The given queue is cleared. *)
+(** same as the iteration of {!schedule_proof_attempt}.
+    The given queue is cleared. *)
 
 
 val schedule_some_proof_attempts :

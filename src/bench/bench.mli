@@ -64,3 +64,56 @@ val all_array :
 val any :
   ?callback:('a,'b) callback ->
   ('a tool * 'b prob) list -> ('a,'b) result list
+
+
+val all_list_tools :
+  ?callback:('a,'b) callback ->
+  'a tool list -> 'b prob list -> ('a * ('a,'b) result list) list
+
+type output =
+  (** on stdout *)
+  |Average
+  |Timeline
+  (** In a file *)
+  |Csv
+
+type ('a,'b) bench =
+    {
+      btools : 'a tool list;
+      bprobs : 'b prob list;
+      boutputs : output list;
+    }
+
+val run_bench :
+  ?callback:('a,'b) callback -> ('a,'b) bench  -> ('a,'b) result list
+
+
+val run_benchs :
+  ?callback:('a,'b) callback -> ('a,'b) bench list ->
+  (('a,'b) bench * ('a,'b) result list) list
+
+val run_benchs_tools :
+  ?callback:('a,'b) callback -> ('a,'b) bench list ->
+  (('a,'b) bench * ('a * ('a,'b) result list) list) list
+
+
+type nb_avg = int * float
+
+val print_nb_avg : Format.formatter -> nb_avg -> unit
+
+type tool_res =
+    { valid : nb_avg;
+      timeout : nb_avg;
+      unknown : nb_avg;
+      invalid : nb_avg;
+      failure : nb_avg}
+
+val print_tool_res : Format.formatter -> tool_res -> unit
+
+val compute_average : ('a,'b) result list -> tool_res
+val compute_timeline :
+  float -> float -> float -> ('a,'b) result list -> int list
+
+val filter_timeline : ('a,'b) result list -> ('a,'b) result list
+
+val max_time : ('a,'b) result list -> float

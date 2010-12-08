@@ -1,0 +1,15 @@
+[tools fast]
+prover = "alt-ergo"
+prover = "cvc3"
+timelimit = 5
+
+[tools tptp]
+prover = "spass"
+
+[probs funny]
+file = "talk290.mlw"
+transform = "split_goal"
+
+[bench fast_and_funny]
+tools = fast
+probs = funny

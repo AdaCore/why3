@@ -97,6 +97,7 @@ let opt_output = ref None
 let opt_timelimit = ref None
 let opt_memlimit = ref None
 let opt_task = ref None
+let opt_benchrc = ref []
 
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
@@ -131,7 +132,9 @@ let option_list = Arg.align [
   "-I", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
       " same as -L (obsolete)";
   "-P", Arg.String (fun s -> opt_prover := s::!opt_prover),
-      "Add <prover> in the bench";
+      "<prover> Add <prover> in the bench";
+  "-B", Arg.String (fun s -> opt_benchrc := s::!opt_benchrc),
+      "<bench> Read one bench configuration file from <bench>";
   "--prover", Arg.String (fun s -> opt_prover := s::!opt_prover),
       " same as -P";
   "-F", Arg.String (fun s -> opt_parser := Some s),
@@ -181,6 +184,7 @@ let option_list = Arg.align [
 
 let tools = ref []
 let probs = ref []
+let benchs = ref []
 
 let () =
   try
@@ -261,11 +265,6 @@ let () =
   end;
   if !opt_list then exit 0;
 
-  if Queue.is_empty opt_queue then begin
-    Arg.usage option_list usage_msg;
-    exit 1
-  end;
-
   (* Someting else using rc file intead of driver will be added later *)
   (* if !opt_prover <> None && !opt_driver <> None then begin *)
   (*   eprintf "Options '-P'/'--prover' and \ *)
@@ -273,9 +272,12 @@ let () =
   (*   exit 1 *)
   (* end; *)
 
-  if !opt_prover = [] then begin
-      eprintf "At least one prover is required.@.";
-      exit 1 end;
+  if !opt_benchrc = [] && (!opt_prover = [] || Queue.is_empty opt_queue) then
+    begin
+      eprintf "At least one bench is required or one prover and one file.@.";
+      Arg.usage option_list usage_msg;
+      exit 1
+    end;
 
   opt_loadpath := List.rev_append !opt_loadpath (Whyconf.loadpath main);
   if !opt_timelimit = None then opt_timelimit := Some (Whyconf.timelimit main);
@@ -291,7 +293,7 @@ let () =
     let prover = try Mstr.find s (get_provers config) with
       | Not_found -> eprintf "Prover %s not found.@." s; exit 1
     in
-    { B.tval   = s;
+    { B.tval   = "cmdline",s;
       ttrans   = Trans.identity;
       tdriver  = load_driver env prover.driver;
       tcommand = prover.command;
@@ -309,7 +311,6 @@ let () =
       in
       List.fold_left lookup Trans.identity_l !opt_trans in
 
-
   let fold_prob acc = function
     | None, _ -> acc
     | Some f, _ ->
@@ -325,7 +326,7 @@ let () =
         let th = Mnm.bindings m in
         let map (name,th) = name,Task.split_theory th None task in
         let fold acc (n,l) =
-          List.rev_append (List.map (fun v -> (n,v)) l) acc in
+          List.rev_append (List.map (fun v -> (("cmdline","",n),v)) l) acc in
         th |> List.map map |> List.fold_left fold [] in
       (* let gen = Env.Wenv.memoize 3 (fun env -> *)
       (*   let memo = Trans.store (fun task -> gen env task) in *)
@@ -334,83 +335,66 @@ let () =
       { B.ptask   = gen;
         ptrans   = fun _ -> transl;
       }::acc in
-  probs := Queue.fold fold_prob [] opt_queue
+  probs := Queue.fold fold_prob [] opt_queue;
+
+  benchs := List.map (Benchrc.read_file config) !opt_benchrc
 
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
-(** valid * timeout * unknown * invalid  *)
-type nb_avg = int * float
-
-let add_nb_avg (nb,avg) time =
-  (succ nb, ((float nb) *. avg +. time) /. (float (succ nb)))
-let empty_nb_avg = (0,0.)
-let print_nb_avg fmt (nb,avg) = fprintf fmt "%i : %.2f" nb avg
-type tool_res =
-    { valid : nb_avg;
-      timeout : nb_avg;
-      unknown : nb_avg;
-      invalid : nb_avg;
-      failure : nb_avg}
-
-let empty_tool_res =
-  { valid   = empty_nb_avg;
-    timeout = empty_nb_avg;
-    unknown = empty_nb_avg;
-    invalid = empty_nb_avg;
-    failure = empty_nb_avg;
-  }
-
-let count_result =
-  let m = Mnm.empty in
-  let fold m res =
-    let tr = Mnm.find_default res.B.tool empty_tool_res m in
-    let r = res.B.result in
-    let tr = match r.C.pr_answer with
-      | C.Valid -> {tr with valid = add_nb_avg tr.valid r.C.pr_time}
-      | C.Timeout -> {tr with timeout = add_nb_avg tr.timeout r.C.pr_time}
-      | C.Invalid -> {tr with invalid = add_nb_avg tr.invalid r.C.pr_time}
-      | C.Unknown _ -> {tr with unknown = add_nb_avg tr.unknown r.C.pr_time}
-      | C.Failure _ | C.HighFailure ->
-        {tr with failure = add_nb_avg tr.failure r.C.pr_time} in
-    Mnm.add res.B.tool tr m in
-  List.fold_left fold m
-
 let () = Scheduler.async := (fun f v -> ignore (Thread.create f v))
+
+let print_result l =
+  let tool_res = List.map (fun (t,l) -> t,B.compute_average l) l in
+  let print_tool_res ((_,tool_name),tool_res) =
+    printf "%a - %s@." B.print_tool_res tool_res tool_name in
+  printf "(v,t,u,f,i) - valid, unknown, timeout, invalid, failure@.";
+  List.iter print_tool_res tool_res
+
+let print_timeline l =
+  let l = List.map (fun (t,l) -> t,B.filter_timeline l) l in
+  let max = List.fold_left (fun acc (_,l) -> max acc (B.max_time l)) 0. l in
+  let step = max/.10. in
+  let tl = List.map (fun (t,l) -> t,B.compute_timeline 0. max step l) l in
+  let print_timeline ((_,tool_name),timeline) =
+    printf "@[%a - %s@]@."
+      (Pp.print_list Pp.comma (fun fmt -> fprintf fmt "%.3i")) 
+      timeline tool_name in
+  printf "@[%a@]@."
+    (Pp.print_iter1 (fun f -> iterf f 0. max)
+       Pp.comma (fun fmt -> fprintf fmt "%.3f"))
+    step;
+  List.iter print_timeline tl
 
 
 let () =
   let m = Mutex.create () in
-  let callback tool prob task i res =
+  let callback (_,tool) (_,_,prob) task i res =
     Mutex.lock m;
     printf "%s %a %i with %s : %a@."
       prob Pretty.print_pr (task_goal task) i tool
       Scheduler.print_pas res;
     Mutex.unlock m
   in
-  let l = B.all_list ~callback !tools !probs in
-  (* let print_result fmt res = *)
-  (*   fprintf fmt "%s %a %i with %s : %a@." *)
-  (*     res.B.prob Pretty.print_pr *)
-  (*     (task_goal res.B.task) res.B.idtask res.B.tool *)
-  (*     C.print_prover_result res.B.result in *)
-  (* eprintf "Done :@.%a@." *)
-  (*   (Pp.print_list Pp.newline print_result) l *)
-  let tool_res = count_result l in
-  let print_tool_res tool_name tool_res =
-    printf "(%a, %a, %a, %a, %a) - %s@."
-      print_nb_avg tool_res.valid
-      print_nb_avg tool_res.unknown
-      print_nb_avg tool_res.timeout
-      print_nb_avg tool_res.invalid
-      print_nb_avg tool_res.failure
-      tool_name in
-  printf "(v,t,u,f,i) - valid, unknown, timeout, invalid, failure@.";
-  Mnm.iter print_tool_res tool_res
+  let l = B.all_list_tools ~callback !tools !probs in
+  print_result l;
+  let callback (_,tool) (_,file,prob) task i res =
+    Mutex.lock m;
+    printf "%s.%s %a %i with %s : %a@."
+      file prob Pretty.print_pr (task_goal task) i tool
+      Scheduler.print_pas res;
+    Mutex.unlock m
+  in
+  let benchs =
+    List.map (fun b -> List.map snd (Mstr.bindings b.Benchrc.benchs))
+      !benchs in
+  let bl = B.run_benchs_tools ~callback (list_flatten_rev benchs) in
+  List.iter (fun (_,l) -> print_result l) bl;
+    List.iter (fun (_,l) -> print_timeline l) bl
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/whybench.byte"
+compile-command: "unset LANG; make -j -C ../.. bin/whybench.byte"
 End:
 *)

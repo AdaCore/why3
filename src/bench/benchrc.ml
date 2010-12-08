@@ -23,31 +23,25 @@ open Why
 open Util
 open Theory
 
-type output =
-  (** on stdout *)
-  |Average
-  |Timeline
-  (** In a file *)
-  |Csv
 
-type bench =
-    {
-      (* tool_name, prover_name *)
-      btools : (string * string) tool list;
-      (* prob_name, file_name, theory name *)
-      bprobs : (string * string * string) prob list;
-      boutputs : output list;
-    }
+type id_tool = (string * string)
+type id_prob = (string * string * string)
 
-type benchrc = { tools : (string * string) tool list Mstr.t;
-                 probs : (string * string * string) prob Mstr.t;
-                 benchs : bench Mstr.t;
+type benchrc = { tools : id_tool tool list Mstr.t;
+                 probs : id_prob prob Mstr.t;
+                 benchs : (id_tool,id_prob) bench Mstr.t
                }
 
 open Whyconf
 open Rc
 
-let read_tools wc map (name,section) =
+let absolute_filename dirname f =
+  if Filename.is_relative f then
+    Filename.concat dirname f
+  else
+    f
+
+let read_tools absf wc map (name,section) =
   (* loadpath *)
   let wc_main = get_main wc in
   let loadpath = get_stringl ~default:[] section "loadpath" in
@@ -84,7 +78,7 @@ let read_tools wc map (name,section) =
     try
       let driver = get_string section "driver" in
       let command = get_string section "command" in
-      ("driver",driver,command) :: provers
+      ("driver",absf driver,command) :: provers
     with MissingField _ -> provers in
   let load_driver (n,d,c) = n,Driver.load_driver env d,c in
   let provers = List.map load_driver provers in
@@ -100,7 +94,7 @@ let read_tools wc map (name,section) =
     } in
   Mstr.add name (List.map create_tool provers) map
 
-let read_probs map (name,section) =
+let read_probs absf map (name,section) =
   (* transformations *)
   let transforms = get_stringl ~default:[] section "transform" in
   let gen_trans env =
@@ -117,50 +111,57 @@ let read_probs map (name,section) =
   let files = get_stringl ~default:[] section "file" in
   let gen env task =
     let fwhy () =
-      let read_one fname =
-        let cin = open_in fname in
-        let m = Env.read_channel ?format:format env fname cin in
-        close_in cin;
-        let ths = Mnm.bindings m in
-        List.rev_map (fun (n,th) -> ((name,fname,n),th)) ths
-      in
-      let map (name,th) = name,Task.split_theory th None task in
-      let fold acc (n,l) =
-        List.rev_append (List.rev_map (fun v -> (n,v)) l) acc in
-      files |> List.map read_one |> list_flatten_rev
-               |> List.rev_map map |> List.fold_left fold [] in
+      try
+        let read_one fname =
+          let cin = open_in (absf fname) in
+          let m = Env.read_channel ?format:format env fname cin in
+          close_in cin;
+          let ths = Mnm.bindings m in
+          List.rev_map (fun (n,th) -> ((name,fname,n),th)) ths
+        in
+        let map (name,th) = name,Task.split_theory th None task in
+        let fold acc (n,l) =
+          List.rev_append (List.rev_map (fun v -> (n,v)) l) acc in
+        files |> List.map read_one |> list_flatten_rev
+               |> List.rev_map map |> List.fold_left fold []
+      with exn -> eprintf "%a@." Exn_printer.exn_printer exn; exit 1
+    in
     Scheduler.do_why_sync fwhy () in
   Mstr.add name { ptask   = gen; ptrans   = gen_trans} map
 
 let read_bench mtools mprobs map (name,section) =
   let tools = get_stringl section "tools" in
   let lookup s =
-    try Mstr.find s mtools with Not_found -> eprintf "Undefined tools %s@." s;
+    try Mstr.find s mtools
+    with Not_found -> eprintf "Undefined tools %s@." s;
       exit 1 in
   let tools = list_flatten_rev (List.map lookup tools) in
   let probs = get_stringl section "probs" in
   let lookup s =
-    try Mstr.find s mprobs with Not_found -> eprintf "Undefined probs %s@." s;
+    try Mstr.find s mprobs
+    with Not_found -> eprintf "Undefined probs %s@." s;
       exit 1 in
   let probs = List.map lookup probs in
-  let outputs = get_stringl ~default:[] section "probs" in
+  let outputs = get_stringl ~default:[] section "outputs" in
   let check = function
     | "average" -> Average
     | "timeline" -> Timeline
     | "csv" -> Csv
-    | s -> eprintf "Unknown output %s" s; exit 1 in
+    | s -> eprintf "Unknown output %s@." s; exit 1 in
   let outputs = List.map check outputs in
   Mstr.add name { btools = tools; bprobs = probs; boutputs = outputs} map
 
 
 let read_file wc f =
   let rc = from_file f in
+  let absf = absolute_filename (Filename.dirname f) in
   let tools = get_family rc "tools" in
-  let tools = List.fold_left (read_tools wc) Mstr.empty tools in
+  let tools = List.fold_left (read_tools absf wc) Mstr.empty tools in
   let probs = get_family rc "probs" in
-  let probs = List.fold_left read_probs Mstr.empty probs in
+  let probs = List.fold_left (read_probs absf) Mstr.empty probs in
   let benchs = get_family rc "bench" in
-  let benchs = List.fold_left (read_bench tools probs) Mstr.empty benchs in
+  let benchs = List.fold_left (read_bench tools probs)
+    Mstr.empty benchs in
   {tools = tools;
    probs = probs;
    benchs = benchs}

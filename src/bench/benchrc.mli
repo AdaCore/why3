@@ -43,26 +43,16 @@ open Bench
 open Why
 open Util
 
-type output =
-  (** on stdout *)
-  |Average
-  |Timeline
-  (** In a file *)
-  |Csv
 
+type id_tool = (string * string)
+(* tool_name, prover_name *)
 
-type bench =
-    {
-      (* tool_name, prover_name *)
-      btools : (string * string) tool list;
-      (* prob_name, file_name, theory name *)
-      bprobs : (string * string * string) prob list;
-      boutputs : output list;
-    }
+type id_prob = (string * string * string)
+(* prob_name, file_name, theory name *)
 
-type benchrc = { tools : (string * string) tool list Mstr.t;
-                 probs : (string * string * string) prob Mstr.t;
-                 benchs : bench Mstr.t
+type benchrc = { tools : id_tool tool list Mstr.t;
+                 probs : id_prob prob Mstr.t;
+                 benchs : (id_tool,id_prob) bench Mstr.t
                }
 
 val read_file : Whyconf.config -> string -> benchrc

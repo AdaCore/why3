@@ -166,7 +166,7 @@ let get_value read ?default section key =
 let get_valueo read section key =
   try
     Some (get_value read section key)
-  with Not_found -> None
+  with MissingField _ -> None
 
 let get_valuel read ?default section key =
   try

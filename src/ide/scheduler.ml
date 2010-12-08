@@ -183,7 +183,6 @@ let event_handler () =
           !scheduled_proofs !maximum_running_proofs;
         Mutex.unlock queue_lock;
         (* build the prover task from goal in [a] *)
-        !async (fun () -> callback Scheduled) ();
         try
           let call_prover : unit -> unit -> Call_provers.prover_result =
 (*
@@ -255,6 +254,7 @@ let (_scheduler_thread : Thread.t) =
 let schedule_proof_attempt ~debug ~timelimit ~memlimit ?old
     ~command ~driver ~callback
     goal =
+  !async (fun () -> callback Scheduled) ();
   Mutex.lock queue_lock;
   Queue.push (debug,timelimit,memlimit,old,command,driver,callback,goal)
     prover_attempts_queue;
@@ -267,6 +267,8 @@ let create_proof_attempt  ~debug ~timelimit ~memlimit ?old
   (debug,timelimit,memlimit,old,command,driver,callback,goal)
 
 let transfer_proof_attempts q =
+  Queue.iter (fun (_,_,_,_,_,_,callback,_) ->
+    !async (fun () -> callback Scheduled) ()) q;
   Mutex.lock queue_lock;
   Queue.transfer q prover_attempts_queue;
   Condition.signal queue_condition;

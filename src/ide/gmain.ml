@@ -1001,7 +1001,6 @@ let redo_external_proof q g a =
     in
     Db.set_status a.Model.proof_db db_res time
   in
-  GtkThread.sync (callback Model.Scheduled 0.0) "";
   let old = if a.Model.edited_as = "" then None else
     begin
       eprintf "Info: proving using edited file %s@." a.Model.edited_as;
