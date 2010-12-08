@@ -1,11 +1,83 @@
 \chapter{The Why3 Application Programming Interface}
 \label{chap:api}
 
-\section{Building Terms and Formulas}
+This chapter is a tutorial for the users who wants to link their own
+OCaml code with the Why3 library. We progressively introduce the way
+one can use the library to build terms, formulas, theories, proof
+tasks, call external provers on tasks, and apply transformations on
+tasks.
 
-\section{Building Theories}
+We naturally assume here a fair knowledge of the OCaml language.
+
+\section{Building Propositional Formulas}
+
+The first step is to know how to build propositional formulas. The
+module \texttt{Term} gives a few functions for building these. Here is
+a piece of OCaml code for building the formula $true \lor false$.
+\begin{verbatim}
+(* opening the Why3 library *)
+open Why
+
+(* a ground propositional goal: true or false *)
+let fmla_true : Term.fmla = Term.f_true
+let fmla_false : Term.fmla = Term.f_false
+let fmla1 : Term.fmla = Term.f_or fmla_true fmla_false
+\end{verbatim}
+As one can guess, the type \texttt{fmla} is the type of formulas in
+the library.
+
+Such a formula can be printed using the module \texttt{Pretty}
+providing pretty-printers.
+\begin{verbatim}
+(* printing the formula *)
+open Format
+let () = printf "@[formula 1 is:@ %a@]@." Pretty.print_fmla fmla1
+\end{verbatim}
+
+Assuming the lines above are written in a file \texttt{f.ml}, it can
+be compiled using
+\begin{verbatim}
+ocamlc str.cma unix.cma nums.cma dynlink.cma \
+        -I +ocamlgraph -I +why3 graph.cma why.cma f.ml -o f
+\end{verbatim}
+Running the generated executable \texttt{f} results in the following output.
+\begin{verbatim}
+formula 1 is: true or false
+\end{verbatim}
+
+Let's now build a formula with propositional variables: $A \land B
+\rightarrow A$. Propositional variables must be declared first before
+using them in formulas. This is done as follows.
+\begin{verbatim}
+let prop_var_A : Term.lsymbol = 
+  Term.create_psymbol (Ident.id_fresh "A") []
+let prop_var_B : Term.lsymbol = 
+  Term.create_psymbol (Ident.id_fresh "B") []
+\end{verbatim}
+The type \texttt{lsymbol} is the type of logic symbols. The atoms $A$ and $B$
+must be built by the general function for applying a predicate symbol to a list of terms. Here we just need the empty list of arguments.
+\begin{verbatim}
+let atom_A : Term.fmla = Term.f_app prop_var_A []
+let atom_B : Term.fmla = Term.f_app prop_var_B []
+let fmla2 : Term.fmla = 
+  Term.f_implies (Term.f_and atom_A atom_B) atom_A
+let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_fmla fmla2
+\end{verbatim}
+
+As expected, the output is as follows.
+\begin{verbatim}
+formula 2 is: A and B -> A
+\end{verbatim}
 
 \section{Buildings Tasks and calling External Provers}
+
+\section{Building Terms and First-Order Formulas}
+
+An important feature of the functions for building terms and formulas
+is that they statically guarantee that only well-typed terms can be
+constructed.
+
+\section{Building Theories}
 
 \section{Applying transformations}
 

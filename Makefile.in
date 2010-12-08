@@ -229,6 +229,8 @@ install_no_local::
 	mkdir -p $(DATADIR)/why3/theories
 	mkdir -p $(DATADIR)/why3/theories/transform
 	mkdir -p $(DATADIR)/why3/drivers
+	mkdir -p $(OCAMLLIB)/why3
+	cp -f src/why.cmi src/why.cma src/why.cmxa $(OCAMLLIB)/why3
 	cp -f theories/*.why $(DATADIR)/why3/theories
 	cp -f theories/transform/*.why $(DATADIR)/why3/theories/transform
 	cp -f drivers/*.drv $(DATADIR)/why3/drivers

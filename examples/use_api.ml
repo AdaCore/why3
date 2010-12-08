@@ -1,12 +1,3 @@
-
-
-(*
-*)
-
-
-open Why
-open Format
-
 (***************
 
 This file builds some goals using the API and calls
@@ -14,14 +5,44 @@ the alt-ergo prover to check them
 
 ******************)
 
-(* First, we need to access the Why configuration *)
+(* opening the Why3 library *)
+open Why
 
+(* a ground propositional goal: true or false *)
+let fmla_true : Term.fmla = Term.f_true
+let fmla_false : Term.fmla = Term.f_false
+let fmla1 : Term.fmla = Term.f_or fmla_true fmla_false
+
+(* printing it *)
+open Format
+let () = printf "@[formula 1 is:@ %a@]@." Pretty.print_fmla fmla1
+
+
+(* a propositional goal: A and B implies A *)
+
+let prop_var_A : Term.lsymbol = Term.create_psymbol (Ident.id_fresh "A") []
+let prop_var_B : Term.lsymbol = Term.create_psymbol (Ident.id_fresh "B") []
+let atom_A : Term.fmla = Term.f_app prop_var_A []
+let atom_B : Term.fmla = Term.f_app prop_var_B []
+let fmla2 : Term.fmla = Term.f_implies (Term.f_and atom_A atom_B) atom_A
+let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_fmla fmla2
+
+
+(* To build tasks and call prover, we need to access the Why configuration *)
+
+(* reads the config file *)
 let config = Whyconf.read_config None
+
+(* the [main] section of the config file *)
 let main = Whyconf.get_main config
+
+(* builds the environment from the [loadpath] *)
 let env = Env.create_env (Lexer.retrieve (Whyconf.loadpath main)) 
 
+(* the [provers] of the config file *)
 let provers = Whyconf.get_provers config
 
+(* the [prover alt-ergo] section of the config file *)
 let alt_ergo = 
   try
     Util.Mstr.find "alt-ergo" provers 
@@ -29,46 +50,25 @@ let alt_ergo =
     eprintf "Prover alt-ergo not installed or not configured@.";
     exit 0
 
+(* loading the Alt-Ergo driver *)
 let alt_ergo_driver = Driver.load_driver env alt_ergo.Whyconf.driver
 
-
-(*
-
-a ground propositional goal: True or False
-
-*)
-
-let fmla_true = Term.f_true
-let fmla_false = Term.f_false
-let fmla1 = Term.f_or fmla_true fmla_false
-let () = printf "@[formula 1 created:@ %a@]@." Pretty.print_fmla fmla1
-
-let task1 = None
-
+(* building the task for formula 1 alone *)
+let task1 = None (* empty task *)
 let goal_id1 = Decl.create_prsymbol (Ident.id_fresh "goal1") 
 let task1 = Task.add_prop_decl task1 Decl.Pgoal goal_id1 fmla1
 
-let () = printf "@[task 1 created:@\n%a@]@." Pretty.print_task task1
+(* printing the task *)
+let () = printf "@[task 1 is:@\n%a@]@." Pretty.print_task task1
 
+(* call Alt-Ergo *)
 let result1 = 
   Driver.prove_task ~command:alt_ergo.Whyconf.command
     alt_ergo_driver task1 () ()
 
+(* prints Alt-Ergo answer *)
 let () = printf "@[On task 1, alt-ergo answers %a@."
   Call_provers.print_prover_result result1
-
-(*
-
-a propositional goal: A and B implies B
-
-*)
-
-let prop_var_A = Term.create_psymbol (Ident.id_fresh "A") []
-let prop_var_B = Term.create_psymbol (Ident.id_fresh "B") []
-let fmla_A = Term.f_app prop_var_A []
-let fmla_B = Term.f_app prop_var_B []
-let fmla2 = Term.f_implies (Term.f_and fmla_A fmla_B) fmla_B
-let () = printf "@[formula 2 created:@ %a@]@." Pretty.print_fmla fmla2
 
 let task2 = None
 let task2 = Task.add_logic_decl task2 [prop_var_A, None] 
