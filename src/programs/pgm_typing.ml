@@ -68,7 +68,7 @@ let find_ls uc s = ns_find_ls (get_namespace (theory_uc uc)) [s]
 (* TODO: improve efficiency *)
 let dty_bool uc = dty_app (find_ts uc "bool", [])
 let dty_int _uc = dty_app (Ty.ts_int, [])
-let dty_unit uc = dty_app (find_ts uc "unit", [])
+let dty_unit _uc = dty_app (ts_tuple 0, [])
 let dty_label uc = dty_app (find_ts uc "label", [])
 
 (* note: local variables are simultaneously in locals (to type programs)
@@ -397,7 +397,7 @@ and dexpr_desc env loc = function
       let bl = List.map branch bl in
       DEmatch (e1, bl), ty
   | Pgm_ptree.Eskip ->
-      DElogic (find_ls env.uc "Tuple0"), dty_unit env.uc
+      DElogic (fs_tuple 0), dty_unit env.uc
   | Pgm_ptree.Eabsurd ->
       DEabsurd, create_type_var loc
   | Pgm_ptree.Eraise (id, e) ->
@@ -600,8 +600,11 @@ let make_logic_app gl loc ty ls el =
   in
   make [] el
 
+let is_ts_ref gl ts =
+  try ts_equal ts (find_ts gl "ref") with Not_found -> false
+
 let is_reference_type gl ty  = match ty.ty_node with
-  | Ty.Tyapp (ts, _) -> Ty.ts_equal ts (find_ts gl "ref")
+  | Ty.Tyapp (ts, _) -> is_ts_ref gl ts
   | _ -> false
 
 (* same thing, but for an abritrary expression f (not an application)
@@ -686,7 +689,7 @@ and iexpr_desc gl env loc ty = function
       IEletrec (dl, e1)
 
   | DEsequence (e1, e2) ->
-      let vs = create_vsymbol (id_fresh "_") (ty_app (find_ts gl "unit") []) in
+      let vs = create_vsymbol (id_fresh "_") (ty_app (ts_tuple 0) []) in
       IElet (vs, iexpr gl env e1, iexpr gl env e2)
   | DEif (e1, e2, e3) ->
       IEif (iexpr gl env e1, iexpr gl env e2, iexpr gl env e3)
@@ -916,7 +919,7 @@ let mk_true  loc gl = mk_bool_constant loc gl (find_ls gl "True")
 let rec check_type ?(noref=false) gl loc ty = match ty.ty_node with
   | Ty.Tyapp (ts, tyl) when ts_equal ts ts_arrow ->
       List.iter (check_type gl loc) tyl
-  | Ty.Tyapp (ts, _) when noref && ts_equal ts (find_ts gl "ref") ->
+  | Ty.Tyapp (ts, _) when noref && is_ts_ref gl ts ->
       errorm ~loc "inner reference types are not allowed"
   | Ty.Tyapp (_, tyl) ->
       List.iter (check_type ~noref:true gl loc) tyl
@@ -947,7 +950,7 @@ let saturation loc ef (a,al) =
   in
   (a, List.map set_post (Sls.elements xs))
 
-let type_v_unit env = tpure (ty_app (find_ts env "unit") [])
+let type_v_unit _env = tpure (ty_app (ts_tuple 0) [])
 
 (* [expr] translates iexpr into expr
    [env : type_v Mvs.t] maps local variables to their types *)
@@ -1290,8 +1293,7 @@ let rec polymorphic_pure_type ty = match ty.ty_node with
   | Ty.Tyapp (_, tyl) -> List.exists polymorphic_pure_type tyl
 
 let cannot_be_generalized gl = function
-  | Tpure { ty_node = Ty.Tyapp (ts, [ty]) } 
-    when ts_equal ts (find_ts gl "ref") ->
+  | Tpure { ty_node = Ty.Tyapp (ts, [ty]) } when is_ts_ref gl ts ->
       polymorphic_pure_type ty
   | Tpure { ty_node = Ty.Tyvar _ } ->
       true
@@ -1332,7 +1334,7 @@ let decl env uc = function
       if cannot_be_generalized uc tyv then errorm ~loc "cannot be generalized";
       let ps, uc = add_global loc id.id tyv uc in
       let uc = add_global_if_pure uc ps in
-      add_decl (Dparam (ps, tyv)) uc
+      add_decl (Dparam (ps, tyv)) uc (* TODO: is it really needed? *)
   | Pgm_ptree.Dexn (id, ty) ->
       let ty = option_map (type_type uc) ty in
       add_exception id.id_loc id.id ty uc

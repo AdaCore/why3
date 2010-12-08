@@ -77,10 +77,18 @@ type uc = {
 let namespace uc = List.hd uc.uc_import
 let theory_uc uc = uc.uc_th
 
+let add_pervasives uc =
+  (* type unit = () *)
+  let ts = 
+    Ty.create_tysymbol (id_fresh "unit") [] (Some (Ty.ty_app (Ty.ts_tuple 0) []))
+  in
+  add_ty_decl uc [ts, Decl.Tabstract]
+
 let create_module n =
   let uc = Theory.create_theory n in
   (* let th = Env.find_theory env ["programs"] "Prelude" in *)
   (* let uc = Theory.use_export uc th in *)
+  let uc = add_pervasives uc in
   { uc_name = id_register n;
     uc_th = uc;
     uc_decls = [];

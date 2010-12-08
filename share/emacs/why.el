@@ -30,7 +30,7 @@
    ;; '("(\\*\\([^*)]\\([^*]\\|\\*[^)]\\)*\\)?\\*)" . font-lock-comment-face)
    '("{\\([^}]*\\)}" . font-lock-type-face)
    `(,(why-regexp-opt '("use" "clone" "namespace" "import" "export" "inductive" "external" "logic" "parameter" "exception" "axiom" "lemma" "goal" "type")) . font-lock-builtin-face)
-   `(,(why-regexp-opt '("and" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "invariant" "variant" "for" "to" "downto" "do" "done" "label" "assert" "absurd" "assume" "check" "ghost" "try" "with" "theory" "uses")) . font-lock-keyword-face)
+   `(,(why-regexp-opt '("and" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "invariant" "variant" "for" "to" "downto" "do" "done" "label" "assert" "absurd" "assume" "check" "ghost" "try" "with" "theory" "uses" "module")) . font-lock-keyword-face)
    ; `(,(why-regexp-opt '("unit" "bool" "int" "float" "prop" "array")) . font-lock-type-face)
    )
   "Minimal highlighting for Why mode")

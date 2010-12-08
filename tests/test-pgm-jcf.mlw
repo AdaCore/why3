@@ -1,46 +1,13 @@
 
-(* for loop with invariant *)
-let test () =
-  let x = ref 0 in
-  for i = 1 to 10 do
-    invariant { !x = i-1 }
-    x := !x + 1
-  done;
-  assert { !x = 10 }
+module P
 
-(* we don't even enter *)
-let test2 () =
-  let x = ref 0 in
-  for i = 2 to 1 do
-    x := 1
-  done;
-  assert { !x = 0 }
+  { use import list.List }
 
-exception E
+  parameter x : list int
 
-(* the body raises an exception (for sure)
-   subtle: the invariant is required *)
-let test3 () =
-  { }
-  for i = 1 to 10 do invariant { i >= 2 -> false }
-    raise E
-  done
-  { false } | E -> { true }
+  let f (x : unit) = ()
 
-(* the body may raise an exception *)
-let test4 x =
-  { }
-  try
-    for i = 0 to 10 do
-      invariant { x < 0 or x >= i }
-      if i = x then raise E
-    done;
-    False
-  with E ->
-    True
-  end
-  { result=True <-> 0 <= x <= 10 }
-  
+end
 
 (*
 Local Variables: 

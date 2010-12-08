@@ -21,35 +21,37 @@
 
 open Format
 open Why
-open Pgm_env
+open Ptree
+open Pgm_ptree
+open Pgm_module
 
-let type_and_wp ?(type_only=false) env gl dl =
-  let decl gl d = if type_only then gl else Pgm_wp.decl gl d in
-  let add gl d =
-    let gl, dl = Pgm_typing.decl env gl d in
-    List.fold_left decl gl dl
-  in
-  List.fold_left add gl dl
+let add_module ?(type_only=false) env tm m =
+  ignore (type_only);
+  let id = m.mod_name in
+  let uc = create_module (Ident.id_user id.id id.id_loc) in
+  let _uc = List.fold_left (Pgm_typing.decl env) uc m.mod_decl in
+  tm
 
 let read_channel env file c =
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
-  let dl = Pgm_lexer.parse_file lb in
+  let ml = Pgm_lexer.parse_file lb in
   if Debug.test_flag Typing.debug_parse_only then
     Theory.Mnm.empty
   else begin
     let type_only = Debug.test_flag Typing.debug_type_only in
-    let uc = Theory.create_theory (Ident.id_fresh "Pgm") in
-    let th = Env.find_theory env ["programs"] "Prelude" in
-    let uc = Theory.use_export uc th in
-    let gl = empty_env uc in
-    let gl = type_and_wp ~type_only env gl dl in
-    if type_only then
-      Theory.Mnm.empty
-    else begin
-      let th = Theory.close_theory gl.uc in
-      Theory.Mnm.add "Pgm" th Theory.Mnm.empty
-    end
+    List.fold_left (add_module ~type_only env) Theory.Mnm.empty ml
+  (*   let uc = Theory.create_theory (Ident.id_fresh "Pgm") in *)
+  (*   let th = Env.find_theory env ["programs"] "Prelude" in *)
+  (*   let uc = Theory.use_export uc th in *)
+  (*   let gl = empty_env uc in *)
+  (*   let gl = type_and_wp ~type_only env gl dl in *)
+  (*   if type_only then *)
+  (*     Theory.Mnm.empty *)
+  (*   else begin *)
+  (*     let th = Theory.close_theory gl.uc in *)
+  (*     Theory.Mnm.add "Pgm" th Theory.Mnm.empty *)
+  (*   end *)
   end
 
 let () = Env.register_format "whyml" ["mlw"] read_channel
