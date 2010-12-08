@@ -1,0 +1,132 @@
+
+open Why
+open Util
+open Ident
+open Theory
+open Term
+
+open Pgm_types
+open Pgm_ttree
+
+module Mnm = Mstr
+
+type namespace = {
+  ns_pr : psymbol   Mnm.t;  (* program symbols *)
+  ns_ex : esymbol   Mnm.t;  (* exceptions*)
+  ns_ns : namespace Mnm.t;  (* inner namespaces *)
+}
+
+let empty_ns = {
+  ns_pr = Mnm.empty;
+  ns_ex = Mnm.empty;
+  ns_ns = Mnm.empty;
+}
+
+exception ClashSymbol of string
+
+let ns_replace eq chk x vo vn =
+  if not chk then vn else
+  if eq vo vn then vo else
+  raise (ClashSymbol x)
+
+let ns_union eq chk =
+  Mnm.union (fun x vn vo -> Some (ns_replace eq chk x vo vn))
+
+let pr_equal p1 p2 = ls_equal p1.p_ls p2.p_ls
+
+let rec merge_ns chk ns1 ns2 =
+  let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
+  { ns_pr = ns_union pr_equal chk ns1.ns_pr ns2.ns_pr;
+    ns_ex = ns_union ls_equal chk ns1.ns_ex ns2.ns_ex;
+    ns_ns = Mnm.union fusion      ns1.ns_ns ns2.ns_ns; }
+
+let nm_add chk x ns m = Mnm.change x (function
+  | None -> Some ns
+  | Some os -> Some (merge_ns chk ns os)) m
+
+let ns_add eq chk x v m = Mnm.change x (function
+  | None -> Some v
+  | Some vo -> Some (ns_replace eq chk x vo v)) m
+
+let pr_add = ns_add pr_equal
+let ex_add = ns_add ls_equal
+
+let add_pr chk x ts ns = { ns with ns_pr = pr_add chk x ts ns.ns_pr }
+let add_ex chk x ls ns = { ns with ns_ex = ex_add chk x ls ns.ns_ex }
+let add_ns chk x nn ns = { ns with ns_ns = nm_add chk x nn ns.ns_ns }
+
+let rec ns_find get_map ns = function
+  | []   -> assert false
+  | [a]  -> Mnm.find a (get_map ns)
+  | a::l -> ns_find get_map (Mnm.find a ns.ns_ns) l
+
+let ns_find_pr = ns_find (fun ns -> ns.ns_pr)
+let ns_find_ex = ns_find (fun ns -> ns.ns_ex)
+let ns_find_ns = ns_find (fun ns -> ns.ns_ns)
+
+(* modules under construction *)
+
+type uc = {
+  uc_name   : Ident.ident;
+  uc_th     : theory_uc; (* the logic theory used to type annotations *)
+  uc_decls  : decl list; (* the program declarations *)
+  uc_import : namespace list;
+  uc_export : namespace list;
+}
+
+let create_module n =
+  let uc = Theory.create_theory n in
+  (* let th = Env.find_theory env ["programs"] "Prelude" in *)
+  (* let uc = Theory.use_export uc th in *)
+  { uc_name = id_register n;
+    uc_th = uc;
+    uc_decls = [];
+    uc_import = [empty_ns];
+    uc_export = [empty_ns];
+  }
+
+let open_namespace uc = match uc.uc_import with
+  | ns :: _ -> { uc with
+      uc_import =       ns :: uc.uc_import;
+      uc_export = empty_ns :: uc.uc_export; }
+  | [] -> assert false
+
+exception NoOpenedNamespace
+
+let close_namespace uc import s =
+  match uc.uc_import, uc.uc_export with
+  | _ :: i1 :: sti, e0 :: e1 :: ste ->
+      let i1 = if import then merge_ns false e0 i1 else i1 in
+      let _  = if import then merge_ns true  e0 e1 else e1 in
+      let i1 = match s with Some s -> add_ns false s e0 i1 | _ -> i1 in
+      let e1 = match s with Some s -> add_ns true  s e0 e1 | _ -> e1 in
+      { uc with uc_import = i1 :: sti; uc_export = e1 :: ste; }
+  | [_], [_] -> raise NoOpenedNamespace
+  | _ -> assert false
+
+type t = {
+  m_name   : Ident.ident;
+  m_th     : theory;
+  m_decls  : decl list;
+  m_export : namespace;
+}
+
+exception CloseModule
+
+let close_module uc = match uc.uc_export with
+  | [e] ->
+      { m_name = uc.uc_name;
+	m_decls = List.rev uc.uc_decls;
+	m_export = e;
+	m_th = close_theory uc.uc_th; }
+  | _ ->
+      raise CloseModule
+
+
+
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. testl"
+End: 
+*)
