@@ -79,6 +79,10 @@ let call_prover command opt_cout buffer =
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   ret, out, time
 
+type post_prover_call = unit -> prover_result
+
+type bare_prover_call = unit -> post_prover_call
+
 let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
                    ~regexps ~exitcodes ~filename buffer =
   let on_stdin = ref true in
@@ -92,42 +96,36 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
     | _ -> failwith "unknown format specifier, use %%f, %%t or %%m"
   in
   let cmd = Str.global_substitute cmd_regexp (replace "") command in
-  let f = if !on_stdin then
-    fun () -> call_prover cmd None buffer
-  else begin
-      let fout,cout = Filename.open_temp_file "why_" ("_" ^ filename) in
-      try
-        let cmd = Str.global_substitute cmd_regexp (replace fout) command in
-        fun () ->
-        let res = call_prover cmd (Some cout) buffer in
-        if Debug.nottest_flag debug then Sys.remove fout;
-        res
-      with e ->
-        close_out cout;
-        if Debug.nottest_flag debug then Sys.remove fout;
-        raise e
-    end
+  let on_stdin = !on_stdin in
+  let cmd,fout,cout = if on_stdin then cmd, "", None else
+    let fout,cout = Filename.open_temp_file "why_" ("_" ^ filename) in
+    let cmd =
+      try Str.global_substitute cmd_regexp (replace fout) command
+      with e -> close_out cout; Sys.remove fout; raise e
+    in
+    cmd, fout, Some cout
   in
   fun () ->
-    let ret,out,time = f () in
+    let ret,out,time = call_prover cmd cout buffer in
     fun () ->
-  let ans = match ret with
-    | Unix.WSTOPPED n ->
-        Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
-        HighFailure
-    | Unix.WSIGNALED n ->
-        Debug.dprintf debug "Call_provers: killed by signal %d@." n;
-        HighFailure
-    | Unix.WEXITED n ->
-        Debug.dprintf debug "Call_provers: exited with status %d@." n;
-        (try List.assoc n exitcodes with Not_found -> grep out regexps)
-  in
-  let ans = match ans with
-    | HighFailure when !on_timelimit && timelimit > 0
-      && time >= (0.9 *. float timelimit) -> Timeout
-    | _ -> ans
-  in
-  { pr_answer = ans;
-    pr_output = out;
-    pr_time   = time }
+      if not on_stdin && Debug.nottest_flag debug then Sys.remove fout;
+      let ans = match ret with
+        | Unix.WSTOPPED n ->
+            Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
+            HighFailure
+        | Unix.WSIGNALED n ->
+            Debug.dprintf debug "Call_provers: killed by signal %d@." n;
+            HighFailure
+        | Unix.WEXITED n ->
+            Debug.dprintf debug "Call_provers: exited with status %d@." n;
+            (try List.assoc n exitcodes with Not_found -> grep out regexps)
+      in
+      let ans = match ans with
+        | HighFailure when !on_timelimit && timelimit > 0
+          && time >= (0.9 *. float timelimit) -> Timeout
+        | _ -> ans
+      in
+      { pr_answer = ans;
+        pr_output = out;
+        pr_time   = time }
 

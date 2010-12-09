@@ -52,11 +52,18 @@ val print_prover_result : Format.formatter -> prover_result -> unit
     a [HighFailure] *)
 
 val debug : Debug.flag
-(** debug flag for the calling procedure (option "--debug
-    call_prover")
+(** debug flag for the calling procedure (option "--debug call_prover")
     If set [call_on_buffer] prints on stderr the commandline called
-    and the output of the prover.
-*)
+    and the output of the prover. *)
+
+type post_prover_call = unit -> prover_result
+(** Thread-unsafe closure that processes a prover's output
+    and returns the final result. Once again: this closure
+    may use internal Why structures and is therefore not
+    thread-safe. *)
+
+type bare_prover_call = unit -> post_prover_call
+(** Thread-safe closure that executes a prover on a task. *)
 
 val call_on_buffer :
   command    : string ->
@@ -65,23 +72,22 @@ val call_on_buffer :
   regexps    : (Str.regexp * prover_answer) list ->
   exitcodes  : (int * prover_answer) list ->
   filename   : string ->
-  Buffer.t -> unit -> unit -> prover_result
+  Buffer.t -> bare_prover_call
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
-    Only the computation between the two [unit] is parallelisable.
 
-    @param timelimit : set the available time limit (default 0 : unlimited)
-    @param memlimit : set the available time limit (default 0 :
-    unlimited)
+    @param timelimit : set the available time limit (def. 0 : unlimited)
+    @param memlimit : set the available time limit (def. 0 : unlimited)
 
-    @param regexps : if the first field match the prover output the
-    second field is the answer. Regexp groups present in the first field are
-    substituted in the second field (\0,\1,...). The regexp are tested in the
-    order of the list.
-    @param exitcodes : if the first field is the exit code the second
-    field is the answer. No subtitution are done. Exit codes are tested
-    in the order of the list and before the regexps.
+    @param regexps : if the first field matches the prover output,
+    the second field is the answer. Regexp groups present in
+    the first field are substituted in the second field (\0,\1,...).
+    The regexps are tested in the order of the list.
+
+    @param exitcodes : if the first field is the exit code, then
+    the second field is the answer. Exit codes are tested in the order
+    of the list and before the regexps.
 
     @param filename : if the prover doesn't accept stdin, a temporary
-    file is used. In the case the suffix of the temporary file is
-    [filename] *)
+    file is used. In this case the suffix of the temporary file is
+    [filename]. *)
 
