@@ -1,15 +1,11 @@
 
-module A 
+module R
 
   { use import programs.Prelude }
 
-  parameter x : int
+  parameter ref : v:'a -> {} ref 'a { !result = v }
 
-  exception E
-
-  exception F of int
-
-  parameter f : x:int -> {} int { result > x }
+  parameter set : r:ref 'a -> v:'a -> {} unit writes r { !r = v }
 
 end
 
@@ -17,9 +13,14 @@ module P
 
   { use import programs.Prelude }
 
-  use module A
+  use module R
 
-  let g x = { x >= 0 } A.f x { result > 0 }
+  let test () =
+    { true }
+    let r = R.ref 0 in
+    R.set r 1;
+    !r
+    { result > 0 }
 
 end
 
