@@ -230,8 +230,9 @@ is that they statically guarantee that only well-typed terms can be
 constructed.
 
 Here is the way we build the formula $2+2=4$. The main difficult is to
-access the internal identifier for addition: it must retrieved from
-the standard theory \texttt{Int} of the file \texttt{int.why}.
+access the internal identifier for addition: it must be retrieved from
+the standard theory \texttt{Int} of the file \texttt{int.why} (see
+Section~\ref{theory:Int}).
 \begin{verbatim}
 let two : Term.term = Term.t_const (Term.ConstInt "2")
 let four : Term.term = Term.t_const (Term.ConstInt "4")
@@ -246,7 +247,7 @@ let fmla3 : Term.fmla = Term.f_equ two_plus_two four
 An important point to notice as that when building the application of
 $+$ to the arguments, it is checked that the types are correct. Indeed
 the constructor \texttt{t\_app\_infer} infers the type of the resulting
-term. One could also provide the expected term as follows.
+term. One could also provide the expected type as follows.
 \begin{verbatim}
 let two_plus_two : Term.term = 
   Term.t_app plus_symbol [two;two] Ty.ty_int

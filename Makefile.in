@@ -845,12 +845,12 @@ FILESTODOC = $(addsuffix .mli, $(addprefix src/, $(MODULESTODOC)))
 apidoc: $(FILESTODOC)
 	mkdir -p apidoc
 	$(OCAMLDOC) -d apidoc -html -keep-code $(INCLUDES) \
-		$(LIBINCLUDES) $(FILESTODOC)
+		$(LIBINCLUDES) -I src $(FILESTODOC)
 # $(LIBML)
 
 doc/apidoc.tex: $(FILESTODOC)
 	$(OCAMLDOC) -o doc/apidoc.tex -latex -noheader -notrailer $(INCLUDES) \
-		$(LIBINCLUDES) $(FILESTODOC)
+		$(LIBINCLUDES) -I src $(FILESTODOC)
 # $(LIBML)
 
 clean::

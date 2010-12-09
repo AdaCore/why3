@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Why
+
 (** Proof database *)
 
 (** {2 data types} *)
@@ -105,11 +107,11 @@ val parent_goal : transf -> goal
 (*
 val transf_id : transf -> transf_id
 *)
-val subgoals : transf -> goal Why.Util.Mstr.t
+val subgoals : transf -> goal Util.Mstr.t
 
 (** theory accessors *)
 val theory_name : theory -> string
-val goals : theory -> goal Why.Util.Mstr.t
+val goals : theory -> goal Util.Mstr.t
 (*
 val verified : theory -> bool
 *)
@@ -118,7 +120,7 @@ val verified : theory -> bool
 (*
 val file_name : file -> string
 *)
-val theories : file -> theory Why.Util.Mstr.t
+val theories : file -> theory Util.Mstr.t
 
 (** {2 The persistent database} *)
 

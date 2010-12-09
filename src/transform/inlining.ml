@@ -132,6 +132,52 @@ let t ?(use_meta=true) ~notdeft ~notdeff ~notls =
       trans notls)
   else trans notls
 
+(*
+let fold_on_logic f task env =
+  match task.Task.task_decl with
+    | { Theory.td_node = Theory.Decl d } ->
+        begin
+          match d.d_node with
+            | Dlogic dl ->
+                List.fold_left
+                  (fun acc (ls,ld) -> f ls ld acc)
+                  env dl
+            | _ -> env
+        end
+    | _ -> env
+*)
+
+let get_goal task =
+  match task.Task.task_decl with
+    | { Theory.td_node = Theory.Decl d } ->
+        begin
+          match d.d_node with
+            | Dprop(Pgoal,_pr,f) ->
+                begin
+                  match f.f_node with
+                    | Fapp(ps,_tl) ->
+                        try
+                          match
+                            (Mid.find ps.ls_name task.Task.task_known).d_node
+                          with
+                            | Dlogic dl ->
+                                let def = List.assoc ps dl in
+                                begin
+                                  match def with
+                                    | Some _def -> assert false (* TODO *)
+                                    | None ->
+                                        Printer.unsupportedFmla f "has no definition"
+                                end
+                            | Dind _ ->
+                                Printer.unsupportedFmla f
+                                  "inductive def cannot be inlined"
+                            | Dprop _ | Dtype _ -> assert false
+                        with Not_found -> assert false
+                end
+            | _ -> assert false
+        end
+    | _ -> assert false
+
 let all = t ~use_meta:true ~notdeft:ffalse ~notdeff:ffalse ~notls:ffalse
 
 (** TODO : restrict to linear substitution,
