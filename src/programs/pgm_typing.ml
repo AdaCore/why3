@@ -1315,7 +1315,7 @@ let find_module lmod q id = match q with
 
 (* env = to retrieve theories from the loadpath
    lmod = local modules *)
-let decl env lmod uc = function
+let rec decl env lmod uc = function
   | Pgm_ptree.Dlogic dl ->
       Pgm_module.parse_logic_decls env dl uc
   | Pgm_ptree.Dlet (id, e) ->
@@ -1380,8 +1380,15 @@ let decl env lmod uc = function
 	    close_namespace uc true n
 	| Export ->
 	    use_export uc m
-      with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s
+      with ClashSymbol s -> 
+	errorm ~loc "clash with previous symbol %s" s
       end
+  | Pgm_ptree.Dnamespace (id, import, dl) ->
+      let loc = id.id_loc in
+      let uc = open_namespace uc in
+      let uc = List.fold_left (decl env lmod) uc dl in
+      begin try close_namespace uc import (Some id.id)
+      with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
 
 (*
 Local Variables:

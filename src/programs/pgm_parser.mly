@@ -118,7 +118,8 @@
 
 %token ABSURD AND ANY AS ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO ELSE END
 %token EXCEPTION EXPORT FOR
-%token FUN GHOST IF IMPORT IN INVARIANT LABEL LET MATCH MODULE NOT OF PARAMETER
+%token FUN GHOST IF IMPORT IN INVARIANT LABEL LET MATCH MODULE 
+%token NAMESPACE NOT OF PARAMETER
 %token RAISE RAISES READS REC
 %token THEN TO TRY TYPE USE VARIANT WHILE WITH WRITES
 
@@ -231,6 +232,8 @@ decl:
     { Dexn (add_lab $2 $3, Some $5) }
 | USE MODULE use
     { $3 }
+| NAMESPACE opt_import uident list0_decl END
+    { Dnamespace ($3, $2, $4) }
 ;
 
 use:
@@ -244,6 +247,11 @@ imp_exp:
 | IMPORT        { Import }
 | EXPORT        { Export }
 | /* epsilon */ { Nothing }
+;
+
+opt_import:
+| /* epsilon */  { false }
+| IMPORT         { true }
 ;
 
 list1_recfun_sep_and:

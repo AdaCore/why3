@@ -15,16 +15,19 @@ end
 
 module P
 
-  { use import programs.Prelude
-    use import list.List }
+  { use import programs.Prelude }
 
   use module import A as B
 
   { logic n : int }
 
-  let f x = x + B.f 2
+  namespace N
+    { use import list.List }    
+    { logic c : list int }
+    let h (x:int) = Cons x c
+  end
 
-  let g x = { x >= 0 } f (x+2) { result >= 0 }
+  let g x = { x >= 0 } N.c { true }
 
 end
 

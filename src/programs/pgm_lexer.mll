@@ -64,6 +64,7 @@
 	"let", LET;
 	"match", MATCH;
 	"module", MODULE;
+	"namespace", NAMESPACE;
 	"not", NOT;
 	"of", OF;
 	"parameter", PARAMETER;

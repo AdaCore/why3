@@ -96,6 +96,7 @@ let create_module n =
 
 let open_namespace uc = match uc.uc_import with
   | ns :: _ -> { uc with
+      uc_th     = Theory.open_namespace uc.uc_th;
       uc_import =       ns :: uc.uc_import;
       uc_export = empty_ns :: uc.uc_export; }
   | [] -> assert false
@@ -109,7 +110,8 @@ let close_namespace uc import s =
       let _  = if import then merge_ns true  e0 e1 else e1 in
       let i1 = match s with Some s -> add_ns false s e0 i1 | _ -> i1 in
       let e1 = match s with Some s -> add_ns true  s e0 e1 | _ -> e1 in
-      { uc with uc_import = i1 :: sti; uc_export = e1 :: ste; }
+      let th = Theory.close_namespace uc.uc_th import s in
+      { uc with uc_th = th; uc_import = i1 :: sti; uc_export = e1 :: ste; }
   | [_], [_] -> raise NoOpenedNamespace
   | _ -> assert false
 
