@@ -27,7 +27,8 @@ open Decl
 open Theory
 open Pretty
 open Pgm_ttree
-open Pgm_env
+open Pgm_types
+open Pgm_module
 
 module E = Pgm_effect
 
@@ -48,16 +49,22 @@ let wp_ands ?(sym=false) fl =
 
 let wp_implies = f_implies_simp
 
-let is_ref_ty env ty = match ty.ty_node with
-  | Tyapp (ts, _) -> ts_equal ts env.ts_ref
+let find_ts uc s = ns_find_ts (get_namespace (theory_uc uc)) [s]
+let find_ls uc s = ns_find_ls (get_namespace (theory_uc uc)) [s]
+
+let is_ts_ref uc ts =
+  try ts_equal ts (find_ts uc "ref") with Not_found -> false
+
+let is_ref_ty uc ty = match ty.ty_node with
+  | Tyapp (ts, _) -> is_ts_ref uc ts
   | _ -> false
 
-let is_arrow_ty env ty = match ty.ty_node with
-  | Tyapp (ts, _) -> ts_equal ts env.ts_arrow
+let is_arrow_ty ty = match ty.ty_node with
+  | Tyapp (ts, _) -> ts_equal ts ts_arrow
   | _ -> false
 
-let wp_forall env v f =
-  if is_arrow_ty env v.vs_ty then f else match f.f_node with
+let wp_forall v f =
+  if is_arrow_ty v.vs_ty then f else match f.f_node with
     | Fbinop (Fimplies, {f_node = Fapp (s,[{t_node = Tvar u};r])},h)
       when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) ->
         f_subst_single v r h
@@ -73,23 +80,23 @@ let wp_forall env v f =
 (* utility functions for building WPs *)
 
 let fresh_label env =
-  let ty = ty_app env.ts_label [] in
+  let ty = ty_app (find_ts env "label") [] in
   create_vsymbol (id_fresh "label") ty
 
-let wp_binder env (x, tv) f = match tv with
-  | Tpure _ -> wp_forall env x f
+let wp_binder (x, tv) f = match tv with
+  | Tpure _ -> wp_forall x f
   | Tarrow _ -> f
 
-let wp_binders env = List.fold_right (wp_binder env)
+let wp_binders = List.fold_right wp_binder
 
 (* replace old(t) with at(t,lab) everywhere in formula f *)
 let rec old_label env lab f =
   f_map (old_label_term env lab) (old_label env lab) f
 
 and old_label_term env lab t = match t.t_node with
-  | Tapp (ls, [t]) when ls_equal ls env.ls_old ->
+  | Tapp (ls, [t]) when ls_equal ls (find_ls env "old") ->
       let t = old_label_term env lab t in (* NECESSARY? *)
-      t_app env.ls_at [t; t_var lab] t.t_ty
+      t_app (find_ls env "at") [t; t_var lab] t.t_ty
   | _ ->
       t_map (old_label_term env lab) (old_label env lab) t
 
@@ -99,13 +106,13 @@ let rec erase_label env lab f =
 
 and erase_label_term env lab t = match t.t_node with
   | Tapp (ls, [t; {t_node = Tvar l}])
-    when ls_equal ls env.ls_at && vs_equal l lab ->
+    when ls_equal ls (find_ls env "at") && vs_equal l lab ->
       erase_label_term env lab t
   | _ ->
       t_map (erase_label_term env lab) (erase_label env lab) t
 
 let unref_ty env ty = match ty.ty_node with
-  | Tyapp (ts, [ty]) when ts_equal ts env.ts_ref -> ty
+  | Tyapp (ts, [ty]) when is_ts_ref env ts -> ty
   | _ -> assert false
 
 (* replace !r by v everywhere in formula f *)
@@ -113,12 +120,13 @@ let rec unref env r v f =
   f_map (unref_term env r v) (unref env r v) f
 
 and unref_term env r v t = match t.t_node with
-  | Tapp (ls, [u]) when ls_equal ls env.ls_bang ->
+  | Tapp (ls, [u]) when ls_equal ls (find_ls env "prefix !") ->
       let rt = E.reference_of_term u in
       if E.ref_equal rt r then t_var v else t
-  | Tapp (ls, _) when ls_equal ls env.ls_old ->
+  | Tapp (ls, _) when ls_equal ls (find_ls env "old") ->
       assert false
-  | Tapp (ls, _) when ls_equal ls env.ls_at -> (* do not recurse in at(...) *)
+  | Tapp (ls, _) when ls_equal ls (find_ls env "at") -> 
+      (* do not recurse in at(...) *)
       t
   | _ ->
       t_map (unref_term env r v) (unref env r v) t
@@ -130,7 +138,7 @@ let quantify ?(all=false) env ef f =
     let ty = unref_ty env (E.type_of_reference r) in
     let v = create_vsymbol (id_clone (E.name_of_reference r)) ty in
     let f = unref env r v f in
-    wp_forall env v f
+    wp_forall v f
   in
   let s = ef.E.writes in
   let s = if all then E.Sref.union ef.E.reads s else s in
@@ -143,9 +151,9 @@ let abstract_wp env ef (q',ql') (q,ql) =
     let f = match res with
       | Some v when is_ref_ty env v.vs_ty ->
 	  let v' = create_vsymbol (id_clone v.vs_name) (unref_ty env v.vs_ty) in
-	  wp_forall env v' (unref env (E.Rlocal v) v' f)
+	  wp_forall v' (unref env (E.Rlocal v) v' f)
       | Some v ->
-	  wp_forall env v f
+	  wp_forall v f
       | None ->
 	  f
     in
@@ -223,7 +231,7 @@ let default_exns_post ef =
   List.map default_exn_post xs
 
 let term_at env lab t =
-  t_app env.ls_at [t; t_var lab] t.t_ty
+  t_app (find_ls env "at") [t; t_var lab] t.t_ty
 
 let while_post_block env inv var lab e =
   let decphi = match var with
@@ -250,6 +258,9 @@ let well_founded_rel = function
 let propose_label l f =
   if f.f_label = [] then f_label [l] f else f
 
+let t_True env =
+  t_app (find_ls env "True") [] (ty_app (find_ts env "bool") [])
+
 let rec wp_expr env e q =
   (* if Debug.test_flag debug then  *)
   (*   eprintf "@[wp_expr: q=%a@]@." Pretty.print_fmla (snd (fst q)); *)
@@ -271,7 +282,7 @@ and wp_desc env e q = match e.expr_desc with
   | Efun (bl, t) ->
       let (_, q), _ = q in
       let f = wp_triple env t in
-      wp_and q (wp_binders env bl f)
+      wp_and q (wp_binders bl f)
   | Elet (x, e1, e2) ->
       let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
       let v1 = v_result e1.expr_type in
@@ -363,14 +374,17 @@ and wp_desc env e q = match e.expr_desc with
 	                               and I(v2+1) -> Q                    *)
       let (res, q1), _ = q in
       let gt, le, incr = match d with
-	| Pgm_ptree.To     -> env.ls_gt, env.ls_le, t_int_const  "1"
-	| Pgm_ptree.Downto -> env.ls_lt, env.ls_ge, t_int_const "-1"
+	| Pgm_ptree.To     -> 
+	    find_ls env "infix >", find_ls env "infix <=", t_int_const  "1"
+	| Pgm_ptree.Downto -> 
+	    find_ls env "infix <", find_ls env "infix >=", t_int_const "-1"
       in
       let v1_gt_v2 = f_app gt [t_var v1; t_var v2] in
       let v1_le_v2 = f_app le [t_var v1; t_var v2] in
       let inv = match inv with Some inv -> inv | None -> f_true in
+      let add = find_ls env "infix +" in
       let wp1 =
-	let xp1 = t_app env.ls_add [t_var x; incr] ty_int in
+	let xp1 = t_app add [t_var x; incr] ty_int in
 	let post = f_subst (subst1 x xp1) inv in
 	let q1 = saturate_post e1.expr_effect (res, post) q in
 	wp_expr env e1 q1
@@ -379,11 +393,11 @@ and wp_desc env e q = match e.expr_desc with
 	(f_subst (subst1 x (t_var v1)) inv)
 	(quantify env e.expr_effect
 	   (wp_and ~sym:true
-	      (wp_forall env x
+	      (wp_forall x
 	         (wp_implies (wp_and (f_app le [t_var v1; t_var x])
 			             (f_app le [t_var x;  t_var v2]))
                  (wp_implies inv wp1)))
-	      (let sv2 = t_app env.ls_add [t_var v2; incr] ty_int in
+	      (let sv2 = t_app add [t_var v2; incr] ty_int in
 	       wp_implies (f_subst (subst1 x sv2) inv) q1)))
       in
       wp_and ~sym:true (wp_implies v1_gt_v2 q1) (wp_implies v1_le_v2 f)
@@ -413,7 +427,7 @@ and wp_triple env (p, e, q) =
 
 and wp_recfun env (_, bl, _var, t) =
   let f = wp_triple env t in
-  wp_binders env bl f
+  wp_binders bl f
 
 let wp env e =
   wp_expr env e (default_post e.expr_type e.expr_effect)
@@ -421,54 +435,53 @@ let wp env e =
 let rec t_btop env t = match t.t_node with
   | Tif (f,t1,t2) -> let f = f_btop env f in
       f_label t.t_label (f_if_simp f (t_btop env t1) (t_btop env t2))
-  | Tapp (ls, [t1;t2]) when ls_equal ls env.ls_andb ->
+  | Tapp (ls, [t1;t2]) when ls_equal ls (find_ls env "andb") ->
       f_label t.t_label (f_and_simp (t_btop env t1) (t_btop env t2))
-  | Tapp (ls, [t1;t2]) when ls_equal ls env.ls_orb ->
+  | Tapp (ls, [t1;t2]) when ls_equal ls (find_ls env "orb") ->
       f_label t.t_label (f_or_simp (t_btop env t1) (t_btop env t2))
-  | Tapp (ls, [t1]) when ls_equal ls env.ls_notb ->
+  | Tapp (ls, [t1]) when ls_equal ls (find_ls env "notb") ->
       f_label t.t_label (f_not_simp (t_btop env t1))
-  | Tapp (ls, []) when ls_equal ls env.ls_True ->
+  | Tapp (ls, []) when ls_equal ls (find_ls env "True") ->
       f_label t.t_label f_true
-  | Tapp (ls, []) when ls_equal ls env.ls_False ->
+  | Tapp (ls, []) when ls_equal ls (find_ls env "False") ->
       f_label t.t_label f_false
   | _ ->
       f_equ t (t_True env)
 
 and f_btop env f = match f.f_node with
   | Fapp (ls, [{t_ty = {ty_node = Tyapp (ts, [])}} as l; r])
-  when ls_equal ls ps_equ && ts_equal ts env.ts_bool ->
+  when ls_equal ls ps_equ && ts_equal ts (find_ts env "bool") ->
       f_label_copy f (f_iff_simp (t_btop env l) (t_btop env r))
   | _ -> f_map (fun t -> t) (f_btop env) f
 
-let add_wp_decl l f env =
+let add_wp_decl l f uc =
   let s = "WP_" ^ l.ls_name.id_string in
   let id = match id_from_user l.ls_name with
     | None -> id_fresh s
     | Some loc -> id_user s loc
   in
-  let f = f_btop env f in
+  let f = f_btop uc f in
   let pr = create_prsymbol id in
   let d = create_prop_decl Pgoal pr f in
-  add_decl d env
+  add_logic_decl d uc
 
-let decl env = function
-  | Pgm_ttree.Dlet (ls, e) ->
+let decl uc = function
+  | Pgm_ttree.Dlet ({ p_ls = ls }, e) ->
       Debug.dprintf debug "@[--effect %a-----@\n  %a@]@\n----------------@."
 	  Pretty.print_ls ls print_type_v e.expr_type_v;
-      let f = wp env e in
+      let f = wp uc e in
       Debug.dprintf debug "wp = %a@\n----------------@." Pretty.print_fmla f;
-      let env = add_wp_decl ls f env in
-      env
+      add_wp_decl ls f uc
   | Pgm_ttree.Dletrec dl ->
-      let add_one env (ls, def) =
-	let f = wp_recfun env def in
+      let add_one uc ({ p_ls = ls }, def) =
+	let f = wp_recfun uc def in
 	Debug.dprintf debug "wp %a = %a@\n----------------@."
 	    print_ls ls Pretty.print_fmla f;
-	add_wp_decl ls f env
+	add_wp_decl ls f uc
       in
-      List.fold_left add_one env dl
+      List.fold_left add_one uc dl
   | Pgm_ttree.Dparam _ ->
-      env
+      uc
 
 (*
 Local Variables:

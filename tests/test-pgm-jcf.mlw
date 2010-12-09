@@ -9,7 +9,7 @@ module A
 
   exception F of int
 
-  parameter f : int -> int
+  parameter f : x:int -> {} int { result > x }
 
 end
 
@@ -17,17 +17,9 @@ module P
 
   { use import programs.Prelude }
 
-  use module import A as B
+  use module A
 
-  { logic n : int }
-
-  namespace N
-    { use import list.List }    
-    { logic c : list int }
-    let h (x:int) = Cons x c
-  end
-
-  let g x = { x >= 0 } N.c { true }
+  let g x = { x >= 0 } A.f x { result > 0 }
 
 end
 

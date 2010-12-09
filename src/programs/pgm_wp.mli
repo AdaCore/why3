@@ -21,7 +21,7 @@ open Why
 
 val debug : Debug.flag
 
-val decl : Pgm_env.env -> Pgm_ttree.decl -> Pgm_env.env
-  (** takes as input the result of [Pgm_typing.file] and produces
-      a theory containing the verification conditions as goals,
-      one for each function *)
+val decl : Pgm_module.uc -> Pgm_ttree.decl -> Pgm_module.uc
+  (** weakest preconditions: takes a module (under construction) as argument,
+      and a program declaration, and adds the verification conditions for that
+      declaration as goals (in the logic theory contained in the module). *)

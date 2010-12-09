@@ -1315,7 +1315,7 @@ let find_module lmod q id = match q with
 
 (* env = to retrieve theories from the loadpath
    lmod = local modules *)
-let rec decl env lmod uc = function
+let rec decl ~wp env lmod uc = function
   | Pgm_ptree.Dlogic dl ->
       Pgm_module.parse_logic_decls env dl uc
   | Pgm_ptree.Dlet (id, e) ->
@@ -1323,7 +1323,9 @@ let rec decl env lmod uc = function
       Debug.dprintf debug "@[--typing %s-----@\n  %a@\n%a@]@."
 	id.id print_expr e print_type_v e.expr_type_v;
       let ls, uc = add_global id.id_loc id.id e.expr_type_v uc in
-      add_decl (Dlet (ls, e)) uc
+      let d = Dlet (ls, e) in
+      let uc = add_decl d uc in
+      if wp then Pgm_wp.decl uc d else uc
   | Pgm_ptree.Dletrec dl ->
       let denv = create_denv uc in
       let _, dl = dletrec denv dl in
@@ -1340,7 +1342,9 @@ let rec decl env lmod uc = function
 	uc, (ls, d)
       in
       let uc, dl = map_fold_left one uc dl in
-      add_decl (Dletrec dl) uc
+      let d = Dletrec dl in
+      let uc = add_decl d uc in
+      if wp then Pgm_wp.decl uc d else uc
   | Pgm_ptree.Dparam (id, tyv) ->
       let loc = id.id_loc in
       let denv = create_denv uc in
@@ -1386,7 +1390,7 @@ let rec decl env lmod uc = function
   | Pgm_ptree.Dnamespace (id, import, dl) ->
       let loc = id.id_loc in
       let uc = open_namespace uc in
-      let uc = List.fold_left (decl env lmod) uc dl in
+      let uc = List.fold_left (decl ~wp env lmod) uc dl in
       begin try close_namespace uc import (Some id.id)
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
 

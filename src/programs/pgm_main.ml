@@ -22,15 +22,16 @@
 open Format
 open Why
 open Util
+open Ident
 open Ptree
 open Pgm_ptree
 open Pgm_module
 
 let add_module ?(type_only=false) env lmod m =
-  ignore (type_only);
+  let wp = not type_only in
   let id = m.mod_name in
   let uc = create_module (Ident.id_user id.id id.id_loc) in
-  let uc = List.fold_left (Pgm_typing.decl env lmod) uc m.mod_decl in
+  let uc = List.fold_left (Pgm_typing.decl ~wp env lmod) uc m.mod_decl in
   let m = close_module uc in
   Mstr.add id.id m lmod
 
@@ -42,8 +43,10 @@ let read_channel env file c =
     Theory.Mnm.empty
   else begin
     let type_only = Debug.test_flag Typing.debug_type_only in
-    let _mm = List.fold_left (add_module ~type_only env) Mstr.empty ml in
-    Theory.Mnm.empty
+    let mm = List.fold_left (add_module ~type_only env) Mstr.empty ml in
+    Mstr.fold 
+      (fun _ m tm -> Theory.Mnm.add m.m_name.id_string m.m_th tm) 
+      mm Theory.Mnm.empty
   end
 
 let () = Env.register_format "whyml" ["mlw"] read_channel
