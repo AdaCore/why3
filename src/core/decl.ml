@@ -592,6 +592,14 @@ let find_inductive_cases kn ps =
   match (Mid.find ps.ls_name kn).d_node with
   | Dind dl -> List.assq ps dl
   | Dlogic _ -> []
+  | Dtype _ -> []
+  | _ -> assert false
+
+let find_logic_definition kn ls =
+  match (Mid.find ls.ls_name kn).d_node with
+  | Dlogic dl -> List.assq ls dl
+  | Dind _ -> None
+  | Dtype _ -> None
   | _ -> assert false
 
 let find_prop kn pr =

@@ -17,8 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
-(** Inline the definitions not recursive *)
+(** Inline non-recursive definitions *)
 
 val meta : Theory.meta
 
@@ -26,20 +25,26 @@ val meta : Theory.meta
 
 val t :
   ?use_meta:bool ->
+  ?in_goal:bool ->
   notdeft:(Term.term -> bool) ->
   notdeff:(Term.fmla -> bool) ->
   notls  :(Term.lsymbol -> bool) ->
   Task.task Trans.trans
-(** [t ~use_meta ~notdeft ~notdeff ~notls] returns a transformation which
-    inlines a symbol definition in the other definitions and propositions when
-    it verifies all of these conditions :
-    - Its definitions doesn't verify [notdeft] in case of a logic function or
-    [notdeff] in case of a predicate
-    - Its logic symbol doesn't verify [notls]
-    - use_meta is not set or its logic symbol is not tagged by "inline : no"
+
+(** [t ~use_meta ~in_goal ~notdeft ~notdeff ~notls] returns a transformation
+    that expands a symbol [ls] in the subsequent declarations unless [ls]
+    satisfies one of the following conditions:
+    - [ls] is defined via a (mutually) recursive definition;
+    - [ls] is an inductive predicate or an algebraic type constructor;
+    - [ls] is a function symbol and [notdeft] returns true on its definition;
+    - [ls] is a predicate symbol and [notdeff] returns true on its definition;
+    - [notls ls] returns [true];
+    - [use_meta] is set and [ls] is tagged by "inline : no"
 
     Notice that [use_meta], [notdeft], [notdeff], [notls] restrict only which
     symbols are inlined not when.
+
+    If [in_goal] is set, only the top-most symbols in the goal are expanded.
 *)
 
 (** {2 Registered Transformation} *)
@@ -47,7 +52,8 @@ val t :
 val all : Task.task Trans.trans
 (** [all] corresponds to the transformation "inline_all" *)
 
-
+val goal : Task.task Trans.trans
+(** [goal] corresponds to the transformation "inline_goal" *)
 
 val trivial : Task.task Trans.trans
 (** [trivial] corresponds to the transformation "inline_trivial"
@@ -55,6 +61,7 @@ val trivial : Task.task Trans.trans
     logic c : t = a
     logic f(x : t,...., ) : t = g(y : t2,...) *)
 
+(*
 (** Functions to use in other transformations if inlining is needed *)
 
 type env
@@ -69,3 +76,4 @@ val addps : env -> Term.lsymbol -> Term.vsymbol list -> Term.fmla -> env
 
 val replacet : env -> Term.term -> Term.term
 val replacep : env -> Term.fmla -> Term.fmla
+*)
