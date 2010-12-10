@@ -22,7 +22,10 @@ open Theory
 
 (** Environment *)
 
+type retrieve_channel = string list -> in_channel
+
 type env = {
+  env_ret_chan : retrieve_channel;
   env_retrieve : retrieve_theory;
   env_memo     : (string list, theory Mnm.t) Hashtbl.t;
   env_tag      : Hashweak.tag;
@@ -35,7 +38,8 @@ let create_memo () =
   Hashtbl.add ht [] Mnm.empty;
   ht
 
-let create_env = let c = ref (-1) in fun retrieve -> {
+let create_env = let c = ref (-1) in fun ret_chan retrieve -> {
+  env_ret_chan = ret_chan;
   env_retrieve = retrieve;
   env_memo     = create_memo ();
   env_tag      = (incr c; Hashweak.create_tag !c) }
@@ -72,7 +76,7 @@ let find_theory env sl s =
 
 let env_tag env = env.env_tag
 
-module Wenv = Hashweak.Make(struct type t = env let tag = env_tag end)
+(* module Wenv = Hashweak.Make(struct type t = env let tag = env_tag end) *)
 
 (** Parsers *)
 

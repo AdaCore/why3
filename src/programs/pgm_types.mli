@@ -49,7 +49,7 @@ type esymbol = lsymbol
 
 val ts_arrow : tysymbol
 
-val purify :type_v -> ty
+val purify : type_v -> ty
 
 (* operations on program types *)
 

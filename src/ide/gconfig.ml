@@ -93,10 +93,10 @@ let load_config config =
   let provers = get_provers config in
 *)
 (*
-  let env = Env.create_env (Lexer.retrieve main.loadpath) in
+  let env = Lexer.create_env main.loadpath in
 *)
   (* temporary sets env to empty *)
-  let env = Env.create_env (Lexer.retrieve []) in
+  let env = Lexer.create_env [] in
   { window_height = ide.ide_window_height;
     window_width  = ide.ide_window_width;
     tree_width    = ide.ide_tree_width;

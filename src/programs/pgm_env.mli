@@ -1,55 +1,14 @@
 
 open Why
-open Util
-open Ident
-open Ty
-open Theory
-open Term
-open Decl
 
+type t
 
-(* environments *)
+val tag : t -> Hashweak.tag
 
-type env = private {
-  uc      : theory_uc;
-  globals : (lsymbol * type_v) Mstr.t;
-  exceptions : lsymbol Mstr.t;
-  (* predefined symbols *)
-  ts_arrow: tysymbol;
-  ts_bool : tysymbol;
-  ts_label: tysymbol;
-  ts_ref  : tysymbol;
-  ts_exn  : tysymbol;
-  ts_unit : tysymbol;
-  ls_at   : lsymbol;
-  ls_bang : lsymbol;
-  ls_old  : lsymbol;
-  ls_True : lsymbol;
-  ls_False: lsymbol;
-  ls_andb : lsymbol;
-  ls_orb  : lsymbol;
-  ls_notb : lsymbol;
-  ls_unit : lsymbol;
-  ls_lt   : lsymbol;
-  ls_gt   : lsymbol;
-  ls_le   : lsymbol;
-  ls_ge   : lsymbol;
-  ls_add  : lsymbol;
-}
+val create : Env.env -> t
 
-val empty_env : theory_uc -> env
+exception ModuleNotFound of string list * string
 
-val add_global : preid -> type_v -> env -> lsymbol * env
-
-val add_decl : decl -> env -> env
-
-val logic_lexpr : Loc.position * string -> Ptree.lexpr
-
-val logic_decls : Loc.position * string -> Env.env -> env -> env
-
-val add_exception : preid -> ty option -> env -> lsymbol * env
-
-val t_True : env -> term
-
-val type_v_unit : env -> type_v
-
+val find_module : t -> string list -> string -> Pgm_module.t
+  (** [find_module e p n] finds the module named [p.n] in environment [e]
+      @raise ModuleNotFound if module not present in env [e] *)

@@ -94,7 +94,7 @@ let source_text fname =
 let gconfig =
   let c = Gconfig.config in
   let loadpath = (get_main ()).loadpath @ List.rev !includes in
-  c.env <- Env.create_env (Lexer.retrieve loadpath);
+  c.env <- Lexer.create_env loadpath;
   let provers = Whyconf.get_provers c.Gconfig.config in
   c.provers <- Util.Mstr.fold (Gconfig.get_prover_data c.env) provers Util.Mstr.empty;
   c

@@ -25,11 +25,13 @@ type env
 
 val env_tag : env -> Hashweak.tag
 
-module Wenv : Hashweak.S with type key = env
+(* module Wenv : Hashweak.S with type key = env *)
 
-type retrieve_theory = env -> string list -> theory Mnm.t
+type retrieve_channel = string list -> in_channel
 
-val create_env : retrieve_theory -> env
+type retrieve_theory  = env -> string list -> theory Mnm.t
+
+val create_env : retrieve_channel -> retrieve_theory -> env
 
 exception TheoryNotFound of string list * string
 

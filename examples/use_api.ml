@@ -65,7 +65,7 @@ let alt_ergo : Whyconf.config_prover =
     exit 0
 
 (* builds the environment from the [loadpath] *)
-let env : Env.env = Env.create_env (Lexer.retrieve (Whyconf.loadpath main)) 
+let env : Env.env = Lexer.create_env (Whyconf.loadpath main)
 (* loading the Alt-Ergo driver *)
 let alt_ergo_driver : Driver.driver = Driver.load_driver env alt_ergo.Whyconf.driver
 
