@@ -1304,18 +1304,18 @@ let cannot_be_generalized gl = function
   | Tpure _ | Tarrow _ ->
       false
 
-let find_module lmod q id = match q with
+let find_module penv lmod q id = match q with
   | [] ->
       (* local module *)
       Mstr.find id lmod
-      (* TODO? with Not_found -> find_theory env [] id end *)
   | _ :: _ ->
       (* theory in file f *)
-      assert false (*TODO*)
+      Pgm_env.find_module penv q id
 
 (* env = to retrieve theories from the loadpath
+   penv = to retrieve modules from the loadpath
    lmod = local modules *)
-let rec decl ~wp env lmod uc = function
+let rec decl ~wp env penv lmod uc = function
   | Pgm_ptree.Dlogic dl ->
       Pgm_module.parse_logic_decls env dl uc
   | Pgm_ptree.Dlet (id, e) ->
@@ -1363,7 +1363,7 @@ let rec decl ~wp env lmod uc = function
       let q, id = Typing.split_qualid qid in
       let m =
 	try
-	  find_module lmod q id
+	  find_module penv lmod q id
 	with Not_found -> 
 	  errorm ~loc "unbound module %a" print_qualid qid
       in
@@ -1390,7 +1390,7 @@ let rec decl ~wp env lmod uc = function
   | Pgm_ptree.Dnamespace (id, import, dl) ->
       let loc = id.id_loc in
       let uc = open_namespace uc in
-      let uc = List.fold_left (decl ~wp env lmod) uc dl in
+      let uc = List.fold_left (decl ~wp env penv lmod) uc dl in
       begin try close_namespace uc import (Some id.id)
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
 

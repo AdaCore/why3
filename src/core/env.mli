@@ -25,7 +25,7 @@ type env
 
 val env_tag : env -> Hashweak.tag
 
-(* module Wenv : Hashweak.S with type key = env *)
+module Wenv : Hashweak.S with type key = env
 
 type retrieve_channel = string list -> in_channel
 
@@ -38,6 +38,8 @@ exception TheoryNotFound of string list * string
 val find_theory : env -> string list -> string -> theory
   (** [find_theory e p n] finds the theory named [p.n] in environment [e]
       @raise TheoryNotFound if theory not present in env [e] *)
+
+val find_channel : env -> string list -> in_channel
 
 (** Parsers *)
 

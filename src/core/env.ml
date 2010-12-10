@@ -74,9 +74,11 @@ let find_theory env sl s =
   else try Mnm.find s (find_library env sl)
   with Not_found -> raise (TheoryNotFound (sl, s))
 
+let find_channel env = env.env_ret_chan
+
 let env_tag env = env.env_tag
 
-(* module Wenv = Hashweak.Make(struct type t = env let tag = env_tag end) *)
+module Wenv = Hashweak.Make(struct type t = env let tag = env_tag end)
 
 (** Parsers *)
 

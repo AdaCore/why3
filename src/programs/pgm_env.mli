@@ -1,11 +1,14 @@
 
 open Why
+open Pgm_module
 
 type t
 
-val tag : t -> Hashweak.tag
+val get_env : t -> Env.env
 
-val create : Env.env -> t
+type retrieve_module = t -> in_channel -> Pgm_module.t Mnm.t
+
+val create : Env.env -> retrieve_module -> t
 
 exception ModuleNotFound of string list * string
 
