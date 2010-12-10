@@ -46,7 +46,9 @@ let wp_and ?(sym=false) f1 f2 =
 let wp_ands ?(sym=false) fl =
   List.fold_left (wp_and ~sym) f_true fl
 
-let wp_implies = f_implies_simp
+let wp_implies f1 f2 = match f2.f_node with
+  | Ffalse -> f_implies f1 f2
+  | _ -> f_implies_simp f1 f2
 
 let is_ref_ty env ty = match ty.ty_node with
   | Tyapp (ts, _) -> ts_equal ts env.ts_ref

@@ -1819,8 +1819,8 @@ let f_not_simp f = match f.f_node with
 let f_and_simp f1 f2 = match f1.f_node, f2.f_node with
   | Ftrue, _  -> f2
   | _, Ftrue  -> f1
-  | Ffalse, _ -> f1
-  | _, Ffalse -> f2
+  | Ffalse, _ -> f1 (* more efficient than f_false *)
+  | _, Ffalse -> f2 (* more efficient than f_false *)
   | _, _      -> if f_equal f1 f2 then f1 else f_and f1 f2
 
 let f_and_simp_l l = List.fold_left f_and_simp f_true l
@@ -1837,7 +1837,7 @@ let f_or_simp_l l = List.fold_left f_or_simp f_false l
 let f_implies_simp f1 f2 = match f1.f_node, f2.f_node with
   | Ftrue, _  -> f2
   | _, Ftrue  -> f2
-  | Ffalse, _ -> f_not_simp f1
+  | Ffalse, _ -> f_true
   | _, Ffalse -> f_not_simp f1
   | _, _      -> if f_equal f1 f2 then f_true else f_implies f1 f2
 

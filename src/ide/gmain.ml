@@ -704,11 +704,31 @@ end
 (*  read previous data from db   *)
 (*********************************)
 
+(*
+type trans = 
+  | Trans_one of Task.task Trans.trans
+  | Trans_list of Task.task Trans.tlist
+
+let lookup_trans name =
+  try
+    let t = Trans.lookup_transform name gconfig.env in
+    Trans_one t
+  with Trans.UnknownTrans _ ->
+    let t = Trans.lookup_transform_l name gconfig.env in
+    Trans_list t
+
+let split_transformation = lookup_trans "split_goal"
+let unfold_transformation = lookup_trans "inline_goal"
+let intro_transformation = lookup_trans "introduce_premises"
+
+let apply_trans t task = 
+  match t with
+    | Trans_one t -> [Trans.apply t task]
+    | Trans_list t -> Trans.apply t task
+*)
 
 let split_transformation = Trans.lookup_transform_l "split_goal" gconfig.env
-let intro_transformation = Trans.lookup_transform "introduce_premises"
-  gconfig.env
-
+let intro_transformation = Trans.lookup_transform "introduce_premises" gconfig.env
 
 let rec reimport_any_goal parent gname t db_goal goal_obsolete =
   let goal = Helpers.add_goal_row parent gname t db_goal in

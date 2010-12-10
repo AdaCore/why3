@@ -28,6 +28,16 @@ theory TestInt
 
 end
 
+theory TestSplit
+
+  logic aa int
+
+  logic bb int
+
+  goal G : aa 0 /\ bb 1 -> false
+
+end
+
 theory TestDiv
 
    use import int.Int
