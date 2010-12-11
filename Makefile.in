@@ -819,6 +819,9 @@ doc: $(DOC)
 
 doc/manual.pdf: doc/apidoc.tex doc/manual.tex doc/version.tex
 	cd doc; pdflatex manual
+	cd doc; makeglossaries manual
+	cd doc; pdflatex manual
+	cd doc; makeglossaries manual
 	cd doc; pdflatex manual
 
 doc/manual.html: doc/manual.tex doc/version.tex

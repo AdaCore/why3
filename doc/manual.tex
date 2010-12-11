@@ -4,6 +4,9 @@
 %\usepackage{url}
 \usepackage[a4paper,pdftex,colorlinks=true,urlcolor=blue,pdfstartview=FitH]{hyperref}
 
+\usepackage[toc,nonumberlist]{glossaries}
+\makeglossaries
+
 % for ocamldoc generated pages
 \usepackage{ocamldoc}
 \let\tt\ttfamily
@@ -26,9 +29,9 @@
 
 \vfill
 
-{\Large F. Bobot$^{1,2}$ \\ 
-J.-C. Filli\^atre$^{2,1}$  \\ 
-C. March\'e$^{3,1}$ \\ 
+{\Large F. Bobot$^{1,2}$ \\
+J.-C. Filli\^atre$^{2,1}$  \\
+C. March\'e$^{3,1}$ \\
 A. Paskevich$^{1,2}$}
 
 \vfill
@@ -36,7 +39,7 @@ A. Paskevich$^{1,2}$}
 \begin{tabular}{l}
 $^1$ Univ Paris-Sud, Orsay, F-91405 \\
 $^2$ LRI, CNRS, Orsay, F-91405 \\
-$^3$ INRIA Saclay - \^Ile-de-France, ProVal, Orsay, F-91893 
+$^3$ INRIA Saclay - \^Ile-de-France, ProVal, Orsay, F-91893
 \end{tabular}
 
 \vfill
@@ -82,6 +85,8 @@ We gratefully thank all the people who contributed to this document:
 \input{whyml.tex}
 
 \input{api.tex}
+
+\input{glossary.tex}
 
 \input{manpages.tex}
 
