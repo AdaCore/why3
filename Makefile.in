@@ -229,8 +229,6 @@ install_no_local::
 	mkdir -p $(DATADIR)/why3/theories
 	mkdir -p $(DATADIR)/why3/theories/transform
 	mkdir -p $(DATADIR)/why3/drivers
-	mkdir -p $(OCAMLLIB)/why3
-	cp -f src/why.cmi src/why.cma src/why.cmxa $(OCAMLLIB)/why3
 	cp -f theories/*.why $(DATADIR)/why3/theories
 	cp -f theories/transform/*.why $(DATADIR)/why3/theories/transform
 	cp -f drivers/*.drv $(DATADIR)/why3/drivers
@@ -239,13 +237,21 @@ install_no_local::
 	cp -f share/emacs/why.el $(DATADIR)/why3/emacs/why.el
 	cp -f share/lang/why.lang $(DATADIR)/why3/lang/why.lang
 
+install_no_local_lib::
+	mkdir -p $(OCAMLLIB)/why3
+	cp -f src/why.cm* $(OCAMLLIB)/why3
+	if test -f src/why.a; then cp -f src/why.a $(OCAMLLIB)/why3; fi
+
 ifeq ("@ENABLE_LOCAL@","no")
 install: install_no_local
+install-lib: install_no_local_lib
 else
-install:
+install install-lib:
 	@echo "You use a local configuration you can't install with it."
 	@echo "Run ./configure without --enable-local"
 endif
+
+install-all: install install-lib
 
 
 ##################
@@ -739,74 +745,6 @@ clean::
 	rm -f $(PLUGDIR)/*.annot $(PLUGDIR)/*~
 	rm -f $(PLUGGENERATED)
 	rm -f .depend.plug
-
-## install: install-binary install-lib install-man
-##
-## BINARYFILES = $(BINARY) bin/whyide.$(OCAMLBEST)
-##
-## # install-binary should not depend on $(BINARYFILES); otherwise it
-## # enforces the compilation of whyide, even when lablgtk2 is not installed
-## install-binary:
-## 	mkdir -p $(BINDIR)
-## 	cp -f $(BINARY) $(BINDIR)/why$(EXE)
-## 	if test -f bin/whyide.$(OCAMLBEST); then \
-## 		cp -f bin/whyide.$(OCAMLBEST) $(BINDIR)/whyide-bin$(EXE); \
-## 	fi
-##
-## install-lib:
-## 	mkdir -p $(LIBDIR)/why/why
-##
-## install-man:
-## 	mkdir -p $(MANDIR)/man1
-## 	cp -f doc/*.1 $(MANDIR)/man1
-##
-## install-coq-no:
-## install-coq-yes: install-coq-@COQVER@
-## install-coq-v7:
-## 	mkdir -p $(LIBDIR)/why/coq7
-## 	cp -f $(V7FILES) $(LIBDIR)/why/coq7
-## 	cp -f $(VO7) $(LIBDIR)/why/coq7
-## install-coq-v8 install-coq-v8.1:
-## 	if test -w $(COQLIB) ; then \
-## 	 mkdir -p $(COQLIB)/user-contrib ; \
-## 	 cp -f $(V8FILES) $(COQLIB)/user-contrib ; \
-## 	 cp -f $(VO8) $(COQLIB)/user-contrib ; \
-## 	else \
-## 	echo "Cannot copy to Coq standard library. Add $(LIBDIR)/why/coq to Coq include path." ;\
-## 	mkdir -p $(LIBDIR)/why/coq ;\
-## 	cp -f $(VO8) $(V8FILES) $(LIBDIR)/why/coq ;\
-## 	fi
-##
-## install-pvs-no:
-## install-pvs-yes: $(PVSFILES)
-## 	mkdir -p $(PVSLIB)/why
-## 	cp $(PVSFILES) $(PVSFILES:.pvs=.prf) $(PVSLIB)/why
-## 	cp lib/pvs/top.pvs lib/pvs/pvscontext.el $(PVSLIB)/why
-## 	@echo "======  Compiling PVS theories, this may take some time ======"
-## 	(cd $(PVSLIB)/why ; @PVSC@ -batch -l pvscontext.el -q -v 2 > top.out)
-## 	@echo "======  Done compiling PVS theories ======"
-##
-## install-mizar-no:
-## install-mizar-yes:
-## 	mkdir -p @MIZARLIB@/mml/dict
-## 	cp lib/mizar/why.miz @MIZARLIB@/mml
-## 	cp lib/mizar/dict/why.voc @MIZARLIB@/mml/dict
-##
-## local-install: $(BINARY) $(WHYCONFIG) $(JESSIE) bin/whyide.$(OCAMLBEST) byte bin/whyide.byte
-## 	cp $(BINARY) $$HOME/bin/why
-## 	cp $(WHYCONFIG) $$HOME/bin/why
-## 	cp $(JESSIE) $$HOME/bin/jessie
-## 	if test -f bin/whyide.$(OCAMLBEST); then \
-## 	  cp -f bin/whyide.$(OCAMLBEST) $$HOME/bin/whyide; \
-## 	fi
-##
-## local: install
-##
-## win: why.nsi
-## 	"/cygdrive/c/Program Files (x86)/NSIS/makensis" /DVERSION=$(VERSION) why.nsi
-##
-## zip:
-## 	zip -A -r why-$(VERSION).zip c:/why/bin c:/why/lib c:/coq/lib/contrib/why c:/coq/lib/contrib7/why
 
 ################
 # documentation
