@@ -4,14 +4,16 @@
 %\usepackage{url}
 \usepackage[a4paper,pdftex,colorlinks=true,urlcolor=blue,pdfstartview=FitH]{hyperref}
 
-\usepackage[toc,nonumberlist]{glossaries}
-\makeglossaries
+%\usepackage[toc,nonumberlist]{glossaries}
+%\makeglossaries
 
 % for ocamldoc generated pages
 \usepackage{ocamldoc}
 \let\tt\ttfamily
 \let\bf\bfseries
 
+\newcommand{\why}{\textsf{Why3}}
+\newcommand{\eg}{\emph{e.g.}}
 
 \begin{document}
 \sloppy
@@ -88,7 +90,7 @@ We gratefully thank all the people who contributed to this document:
 
 \part{Reference Manual}
 
-\input{glossary.tex}
+% \input{glossary.tex}
 
 \input{syntaxref.tex}
 

@@ -1,14 +1,91 @@
-\chapter{Syntax}
+\chapter{Why3 Language}
 \label{chap:syntax}
 
 This chapter describes the input syntax, and informally gives its semantics,
 illustrated by examples.
 
-\section{Terms and Formulas}
+A \why\ text contains a list of \emph{theories}. 
+A theory is a list of \emph{declarations}. Declarations introduce new
+types, functions and predicates, state axioms, lemmas and goals. 
+These declarations can be directly written in the theory or taken from
+existing theories. The base logic of \why\ is a first-order
+polymorphic logic.
 
-\section{Declarations, Theories}
+The Figure~\ref{fig:tutorial1} contains an example of \why\ input
+text, containing three theories. The first theory, \texttt{List}, 
+declares a new algebraic type for polymorphic lists, \texttt{list 'a}.
+As in ML, \texttt{'a} stands for a type variable.
+The type \texttt{list 'a} has two constructors, \texttt{Nil} and
+\texttt{Cons}. Both constructors can be used as usual function
+symbols, respectively of type \texttt{list 'a} and \texttt{'a
+  $\times$ list 'a $\rightarrow$ list 'a}.
+We deliberately make this theory that short, for reasons which will be
+discussed later.
 
-\section{Using and Cloning Theories}
+\begin{figure}
+  \centering
+\begin{verbatim}
+theory List
+
+  type list 'a = Nil | Cons 'a (list 'a)
+
+end
+
+theory Length
+
+  use import List
+  use import int.Int
+
+  logic length (l : list 'a) : int = 
+    match l with
+    | Nil      -> 0
+    | Cons _ r -> 1 + length r
+    end
+
+  lemma Length_nonnegative : forall l:list 'a. length(l) >= 0
+
+end
+
+theory Sorted
+
+  use import List
+  use import int.Int
+ 
+  inductive sorted (l : list int) =
+    | Sorted_Nil : 
+        sorted Nil
+    | Sorted_One : 
+        forall x:int. sorted (Cons x Nil)
+    | Sorted_Two : 
+        forall x y : int, l : list int. 
+        x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
+ 
+end
+\end{verbatim}
+\caption{Example of Why3 text.}
+\label{fig:tutorial1}
+\end{figure}
+
+The next theory, \texttt{Length}, introduces the notion of list
+length. The \texttt{use import List} command indicates that this new
+theory may refer to symbols from theory \texttt{List}. These symbols
+are accessible in a qualified form, such as \texttt{List.list} or
+\texttt{List.Cons}. The \texttt{import} qualifier additionally allows
+use to use them without qualification.
+
+Similarly, the next command \texttt{use import int.Int} adds to our
+context the theory \texttt{int.Int} from the standard library. The
+prefix \texttt{int} indicates the file in the standard library
+containing theory \texttt{Int}. Theories referred to without prefix
+either appear earlier in the current file, \eg\ \texttt{List}, or are
+predefined. 
+
+% \section{Terms and Formulas} *)
+
+% \section{Declarations, Theories} *)
+
+% \section{Using and Cloning Theories} *)
+
 
 %%% Local Variables:
 %%% mode: latex
