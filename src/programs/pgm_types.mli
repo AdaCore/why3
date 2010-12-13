@@ -45,6 +45,16 @@ val create_psymbol : preid -> type_v -> psymbol
 
 type esymbol = lsymbol
 
+type mtsymbol = private {
+  mt_name  : ident;
+  mt_args  : tvsymbol list;
+  mt_model : ty option;
+}
+
+val create_mtsymbol : preid -> tvsymbol list -> ty option -> mtsymbol
+
+val mt_equal : mtsymbol -> mtsymbol -> bool
+
 (* program types -> logic types *)
 
 val ts_arrow : tysymbol

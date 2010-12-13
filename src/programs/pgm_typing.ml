@@ -1394,6 +1394,8 @@ let rec decl ~wp env penv lmod uc = function
       let uc = List.fold_left (decl ~wp env penv lmod) uc dl in
       begin try close_namespace uc import (Some id.id)
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
+  | Pgm_ptree.Dmutable_type _ ->
+      assert false (*TODO*)
 
 (*
 Local Variables:

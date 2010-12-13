@@ -68,6 +68,20 @@ let create_psymbol id v =
 
 type esymbol = lsymbol
 
+type mtsymbol = {
+  mt_name  : ident;
+  mt_args  : tvsymbol list;
+  mt_model : ty option;
+}
+
+let create_mtsymbol name args model = { 
+  mt_name  = id_register name;
+  mt_args  = args;
+  mt_model = model; 
+}
+
+let mt_equal = (==)
+
 (* misc. functions *)
 
 let v_result ty = create_vsymbol (id_fresh "result") ty

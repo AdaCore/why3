@@ -13,12 +13,14 @@ module Mnm = Mstr
 type namespace = {
   ns_pr : psymbol   Mnm.t;  (* program symbols *)
   ns_ex : esymbol   Mnm.t;  (* exceptions*)
+  ns_mt : mtsymbol  Mnm.t;  (* mutable types *)
   ns_ns : namespace Mnm.t;  (* inner namespaces *)
 }
 
 let empty_ns = {
   ns_pr = Mnm.empty;
   ns_ex = Mnm.empty;
+  ns_mt = Mnm.empty;
   ns_ns = Mnm.empty;
 }
 
@@ -38,6 +40,7 @@ let rec merge_ns chk ns1 ns2 =
   let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
   { ns_pr = ns_union pr_equal chk ns1.ns_pr ns2.ns_pr;
     ns_ex = ns_union ls_equal chk ns1.ns_ex ns2.ns_ex;
+    ns_mt = ns_union mt_equal chk ns1.ns_mt ns2.ns_mt;
     ns_ns = Mnm.union fusion      ns1.ns_ns ns2.ns_ns; }
 
 let nm_add chk x ns m = Mnm.change x (function
@@ -50,9 +53,11 @@ let ns_add eq chk x v m = Mnm.change x (function
 
 let pr_add = ns_add pr_equal
 let ex_add = ns_add ls_equal
+let mt_add = ns_add mt_equal
 
 let add_pr chk x ts ns = { ns with ns_pr = pr_add chk x ts ns.ns_pr }
 let add_ex chk x ls ns = { ns with ns_ex = ex_add chk x ls ns.ns_ex }
+let add_mt chk x mt ns = { ns with ns_mt = mt_add chk x mt ns.ns_mt }
 let add_ns chk x nn ns = { ns with ns_ns = nm_add chk x nn ns.ns_ns }
 
 let rec ns_find get_map ns = function
@@ -62,6 +67,7 @@ let rec ns_find get_map ns = function
 
 let ns_find_pr = ns_find (fun ns -> ns.ns_pr)
 let ns_find_ex = ns_find (fun ns -> ns.ns_ex)
+let ns_find_mt = ns_find (fun ns -> ns.ns_mt)
 let ns_find_ns = ns_find (fun ns -> ns.ns_ns)
 
 (* modules under construction *)
@@ -129,6 +135,9 @@ let add_psymbol ps uc =
 
 let add_esymbol ls uc =
   add_symbol add_ex ls.ls_name ls uc
+
+let add_mtsymbol mt uc =
+  add_symbol add_mt mt.mt_name mt uc
 
 let add_decl d uc =
   { uc with uc_decls = d :: uc.uc_decls }

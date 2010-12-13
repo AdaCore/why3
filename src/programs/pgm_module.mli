@@ -9,11 +9,13 @@ module Mnm : Map.S with type key = string
 type namespace = private {
   ns_pr : psymbol   Mnm.t;  (* program symbols *)
   ns_ex : esymbol   Mnm.t;  (* exception symbols *)
+  ns_mt : mtsymbol  Mnm.t;  (* mutable types *)
   ns_ns : namespace Mnm.t;  (* inner namespaces *)
 }
 
 val ns_find_pr : namespace -> string list -> psymbol
 val ns_find_ex : namespace -> string list -> esymbol
+val ns_find_mt : namespace -> string list -> mtsymbol
 val ns_find_ns : namespace -> string list -> namespace
 
 (** a module under construction *)
@@ -44,6 +46,7 @@ exception ClashSymbol of string
 
 val add_psymbol : psymbol -> uc -> uc
 val add_esymbol : esymbol -> uc -> uc
+val add_mtsymbol : mtsymbol -> uc -> uc
 val add_decl : Pgm_ttree.decl -> uc -> uc
 val add_logic_decl : Decl.decl -> uc -> uc
 

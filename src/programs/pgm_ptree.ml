@@ -110,6 +110,7 @@ type decl =
   (* modules *)
   | Duse    of qualid * Ptree.imp_exp * (*as:*) ident option
   | Dnamespace of ident * (* import: *) bool * decl list
+  | Dmutable_type of ident * ident list * Ptree.pty option
 
 type module_ = {
   mod_name : ident;

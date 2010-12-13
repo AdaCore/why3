@@ -118,7 +118,7 @@
 
 %token ABSURD AND ANY AS ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO ELSE END
 %token EXCEPTION EXPORT FOR
-%token FUN GHOST IF IMPORT IN INVARIANT LABEL LET MATCH MODULE 
+%token FUN GHOST IF IMPORT IN INVARIANT LABEL LET MATCH MODEL MODULE MUTABLE
 %token NAMESPACE NOT OF PARAMETER
 %token RAISE RAISES READS REC
 %token THEN TO TRY TYPE USE VARIANT WHILE WITH WRITES
@@ -234,6 +234,8 @@ decl:
     { $3 }
 | NAMESPACE opt_import uident list0_decl END
     { Dnamespace ($3, $2, $4) }
+| MUTABLE TYPE lident type_args model
+    { Dmutable_type ($3, $4, $5) }
 ;
 
 use:
@@ -252,6 +254,20 @@ imp_exp:
 opt_import:
 | /* epsilon */  { false }
 | IMPORT         { true }
+;
+
+type_args:
+| /* epsilon */      { [] }
+| type_var type_args { $1 :: $2 }
+;
+
+model:
+| /* epsilon */   { None }
+| MODEL pure_type { Some $2 }
+;
+
+type_var:
+| QUOTE ident { $2 }
 ;
 
 list1_recfun_sep_and:

@@ -63,7 +63,9 @@
 	"label", LABEL;
 	"let", LET;
 	"match", MATCH;
+	"model", MODEL;
 	"module", MODULE;
+	"mutable", MUTABLE;
 	"namespace", NAMESPACE;
 	"not", NOT;
 	"of", OF;
