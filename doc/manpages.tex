@@ -2,6 +2,7 @@
 \label{chap:manpages}
 
 \section{Compilation, Installation}
+\label{sec:install}
 
 Compilation of Why3 must start with a configuration phase which is run as
 \begin{verbatim}
@@ -29,28 +30,78 @@ liblablgtk2-ocaml-dev liblablgtksourceview2-ocaml-dev
 \end{verbatim}
 It is also installable from sources, available from the site \url{http://wwwfun.kurims.kyoto-u.ac.jp/soft/olabl/lablgtk.html}
 
-\item TODO Claude: sqlite3
+\item The Ocaml bindings of the sqlite3 library
+For debian-based Linux distributions, you can install the package
+\begin{verbatim}
+libsqlite3-ocaml-dev
+\end{verbatim}
+It is also installable from sources, available from the site
+\url{http://ocaml.info/home/ocaml_sources.html#ocaml-sqlite3}
 \end{itemize}
 
 \subsection{Local use, without installation}
 
+It is not mandatory to install Why3 to use it. Local use is obtained via
 \begin{verbatim}
 ./configure --enable-local
 make
 \end{verbatim}
-commands are available in subdirectory \texttt{bin/}.
+The Why3 executables are then available in subdirectory \texttt{bin/}.
 
 \section{Installation of external provers}
 
-why-config
+Why3 can use a wide range of external theorem provers. These need to
+be installed separately, and then Why3 needs to be configured to use
+them. There is no need to install these provers before compiling and
+installing Why. 
 
-ou 
+For installation of external provers, please look at the Why provers
+tips page \url{http://why.lri.fr/provers.en.html}.
 
-IDE/Detect provers
+For configuring Why3 to use the provers, follow intructions given in
+Section~\ref{sec:why3config}.
 
-Provers which are auto-detected: (share/prover-detection-data)
+\section{The \texttt{why3config} command-line tool}
+\label{sec:why3config}.
 
-pour chaque prouveur:  lien sur page why/prover tips.
+Why3 must be configured to access external provers. Typically, this is done
+by running either the command line tool
+\begin{verbatim}
+why3config
+\end{verbatim}
+or using the menu
+\begin{verbatim}
+File/Detect provers
+\end{verbatim}
+of the IDE. This must be done again each time a new prover is installed.
+
+The set of all provers which are attempted to detect is described in
+the readable configuration file \texttt{provers-detection-data.conf}
+of the Why3 data directory (\eg{}
+\texttt{/usr/local/share/why3}). Advanced users may try to modify this
+file to add support for detection of other provers. (In that case,
+please consider submitting a new prover configuration on the bug
+tracking system).
+
+The result of the prover detection is stored in the user's
+configuration file (\eg{} \texttt{~/.why.conf}). Again, this file is
+human readable, and advanced users may modify it in order to
+experiment different ways of calling provers, \eg{} different versions
+of the same prover, or with different options.
+
+The provers which are typically attemped for detection are
+\begin{itemize}
+\item Alt-Ergo~\cite{conchon08smt,ergo}: \url{}
+\item CVC3~\cite{BarTin-CAV-07}: \url{}
+\item Coq~\cite{CoqArt}: \url{}
+\item Eprover~: \url{}
+\item Gappa~\cite{melquiond08rnc}: \url{}
+\item Simplify~\cite{simplify05}: \url{}
+\item Spass~: \url{}
+\item veriT~: \url{}
+\item Yices~\cite{DM06}: \url{}
+\item Z3~\cite{z3}: \url{}
+\end{itemize}
 
 \section{The \texttt{why3} command-line tool}
 
@@ -92,11 +143,12 @@ pour chaque prouveur:  lien sur page why/prover tips.
 \item[File/Detect provers] 
 
 \end{description}
+
 \subsection{Preferences}
 
 \subsection{Structure of the database file}
 
-TODO
+[TODO]
 
 \section{The \texttt{why.conf} configuration file}
 

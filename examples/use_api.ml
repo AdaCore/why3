@@ -17,6 +17,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(*******************
+
 This file builds some goals using the API and calls
 the alt-ergo prover to check them
 

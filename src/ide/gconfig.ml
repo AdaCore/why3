@@ -290,17 +290,16 @@ let show_about_window () =
   let about_dialog =
     GWindow.about_dialog
       ~name:"Why"
-      ~authors:["Francois Bobot";
-                "Jean-Christophe Filliatre";
-                "Johannes Kanig";
-                "Claude Marche";
+      ~authors:["François Bobot";
+                "Jean-Christophe Filliâtre";
+                "Claude Marché";
                 "Andrei Paskevich"
                ]
-      ~copyright:"Copyright 2010"
+      ~copyright:"Copyright 2010 Univ Paris-Sud, CNRS, INRIA"
       ~license:"Gnu Lesser General Public License"
-      ~website:"http://why.lri.fr"
-      ~website_label:"Click here for the web site"
-      ~version:"3.0 alpha"
+      ~website:"https://gforge.inria.fr/projects/why3"
+      ~website_label:"Project web site"
+      ~version:Config.version
       ()
   in
   let ( _ : GWindow.Buttons.about) = about_dialog#run () in
