@@ -28,7 +28,7 @@ val maximum_running_proofs: int ref
 (** bound on the number of prover processes running in parallel.
     default is 2 *)
 
-
+val debug : Debug.flag
 
 type proof_attempt_status =
   | Scheduled (** external proof attempt is scheduled *)

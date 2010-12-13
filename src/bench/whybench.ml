@@ -110,6 +110,8 @@ let opt_list_flags = ref false
 
 let opt_debug_all = ref false
 
+let opt_quiet = ref false
+
 let option_list = Arg.align [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
       " Read the input file from stdin";
@@ -180,7 +182,9 @@ let option_list = Arg.align [
   "--debug-all", Arg.Set opt_debug_all,
       " Set all debug flags (except parse_only and type_only)";
   "--debug", Arg.String add_opt_debug,
-      "<flag> Set a debug flag" ]
+      "<flag> Set a debug flag";
+  "--quiet", Arg.Set opt_quiet, " Print only what asked"
+ ]
 
 let tools = ref []
 let probs = ref []
@@ -360,9 +364,23 @@ let () = Scheduler.async := (fun f v -> ignore (Thread.create f v))
 
 let () =
   let m = Mutex.create () in
+  let nb_scheduled = ref 0 in
+  let nb_done = ref 0 in
+  let nb_valid = ref 0 in
   let callback (_,tool) (_,file,prob) task i res =
     Mutex.lock m;
-    printf "%s.%s %a %i with %s : %a@."
+    if not !opt_quiet then
+      begin match res with
+        | Scheduler.Scheduled -> incr nb_scheduled
+        | Scheduler.Done {Call_provers.pr_answer = ans} -> incr nb_done;
+          begin match ans with
+            | Call_provers.Valid -> incr nb_valid
+            | _     -> () end
+        | _ -> ();
+          Format.printf "\027[0G(%i/%i) valid : %i%!"
+            !nb_done !nb_scheduled !nb_valid
+      end;
+    Debug.dprintf Scheduler.debug "%s.%s %a %i with %s : %a@."
       file prob Pretty.print_pr (task_goal task) i tool
       Scheduler.print_pas res;
     Mutex.unlock m
