@@ -70,15 +70,17 @@ val all_list_tools :
   ?callback:('a,'b) callback ->
   'a tool list -> 'b prob list -> ('a * ('a,'b) result list) list
 
+
 type output =
   (** on stdout *)
-  |Average
-  |Timeline
+  |Average of string
+  |Timeline of string
   (** In a file *)
-  |Csv
+  |Csv of string
 
 type ('a,'b) bench =
     {
+      bname  : string;
       btools : 'a tool list;
       bprobs : 'b prob list;
       boutputs : output list;
@@ -117,3 +119,18 @@ val compute_timeline :
 val filter_timeline : ('a,'b) result list -> ('a,'b) result list
 
 val max_time : ('a,'b) result list -> float
+
+open Format
+
+val print_csv :
+  ('b -> 'b -> int)         ->
+  (formatter -> 'a -> unit) ->
+  (formatter -> 'b -> unit) ->
+  formatter ->
+  ('a * ('a,'b) result list) list -> unit
+
+val print_output :
+  ('b -> 'b -> int)         ->
+  (formatter -> 'a -> unit) ->
+  (formatter -> 'b -> unit) ->
+  ('a,'b) bench * ('a * ('a,'b) result list) list -> unit

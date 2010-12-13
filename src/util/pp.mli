@@ -122,3 +122,5 @@ val print_list_opt :
 val string_of : (Format.formatter -> 'a -> unit) -> 'a -> string
 val string_of_wnl : (Format.formatter -> 'a -> unit) -> 'a -> string
   (** same as {!string_of} but without newline *)
+
+val wnl : Format.formatter -> unit

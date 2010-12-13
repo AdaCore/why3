@@ -337,7 +337,20 @@ let () =
       }::acc in
   probs := Queue.fold fold_prob [] opt_queue;
 
-  benchs := List.map (Benchrc.read_file config) !opt_benchrc
+  let cmdl = "commandline" in
+  let bench = List.map (Benchrc.read_file config) !opt_benchrc in
+  let bench = if !tools <> [] && !probs <> [] then
+      let b_cmdl = {
+        B.bname = cmdl;
+        btools = !tools; bprobs = !probs;
+        boutputs = [B.Timeline "-";B.Average "-"]} in
+      { Benchrc.tools = Mstr.empty;
+        probs = Mstr.empty;
+        benchs = Mstr.singleton cmdl b_cmdl}
+      ::bench
+    else bench in
+  benchs := bench
+
 
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
@@ -345,40 +358,8 @@ let () =
 
 let () = Scheduler.async := (fun f v -> ignore (Thread.create f v))
 
-let print_result l =
-  let tool_res = List.map (fun (t,l) -> t,B.compute_average l) l in
-  let print_tool_res ((_,tool_name),tool_res) =
-    printf "%a - %s@." B.print_tool_res tool_res tool_name in
-  printf "(v,t,u,f,i) - valid, unknown, timeout, invalid, failure@.";
-  List.iter print_tool_res tool_res
-
-let print_timeline l =
-  let l = List.map (fun (t,l) -> t,B.filter_timeline l) l in
-  let max = List.fold_left (fun acc (_,l) -> max acc (B.max_time l)) 0. l in
-  let step = max/.10. in
-  let tl = List.map (fun (t,l) -> t,B.compute_timeline 0. max step l) l in
-  let print_timeline ((_,tool_name),timeline) =
-    printf "@[%a - %s@]@."
-      (Pp.print_list Pp.comma (fun fmt -> fprintf fmt "%.3i")) 
-      timeline tool_name in
-  printf "@[%a@]@."
-    (Pp.print_iter1 (fun f -> iterf f 0. max)
-       Pp.comma (fun fmt -> fprintf fmt "%.3f"))
-    step;
-  List.iter print_timeline tl
-
-
 let () =
   let m = Mutex.create () in
-  let callback (_,tool) (_,_,prob) task i res =
-    Mutex.lock m;
-    printf "%s %a %i with %s : %a@."
-      prob Pretty.print_pr (task_goal task) i tool
-      Scheduler.print_pas res;
-    Mutex.unlock m
-  in
-  let l = B.all_list_tools ~callback !tools !probs in
-  print_result l;
   let callback (_,tool) (_,file,prob) task i res =
     Mutex.lock m;
     printf "%s.%s %a %i with %s : %a@."
@@ -390,8 +371,10 @@ let () =
     List.map (fun b -> List.map snd (Mstr.bindings b.Benchrc.benchs))
       !benchs in
   let bl = B.run_benchs_tools ~callback (list_flatten_rev benchs) in
-  List.iter (fun (_,l) -> print_result l) bl;
-    List.iter (fun (_,l) -> print_timeline l) bl
+  let print_tool fmt (t,s) = fprintf fmt "%s.%s" t s in
+  let print_prob fmt (b,f,t) = fprintf fmt "%s.%s.%s" b f t in
+  let cmp = compare in
+  List.iter (B.print_output cmp print_tool print_prob) bl
 
 (*
 Local Variables:

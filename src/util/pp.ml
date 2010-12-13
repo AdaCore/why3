@@ -154,13 +154,16 @@ let string_of p x =
   fprintf fmt "%a@?" p x;
   Buffer.contents b
 
+let wnl fmt =
+  let out,flush,_newline,spaces =
+    pp_get_all_formatter_output_functions fmt () in
+  pp_set_all_formatter_output_functions fmt
+    ~out ~flush ~newline:(fun () -> spaces 1) ~spaces
+
 
 let string_of_wnl p x =
   let b = Buffer.create 100 in
   let fmt = formatter_of_buffer b in
-  let out,flush,_newline,spaces =
-    pp_get_all_formatter_output_functions fmt () in
-  pp_set_all_formatter_output_functions fmt
-    ~out ~flush ~newline:(fun () -> spaces 1) ~spaces;
+  wnl fmt;
   fprintf fmt "%a@?" p x;
   Buffer.contents b

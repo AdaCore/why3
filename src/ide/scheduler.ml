@@ -179,7 +179,7 @@ let event_handler () =
         in
         incr scheduled_proofs;
         Debug.dprintf debug
-          "scheduled_proofs = %i; maximum_running_proofs = %i@."
+          "scheduled_proofs = %i; maximum_running_proofs = %i;@."
           !scheduled_proofs !maximum_running_proofs;
         Mutex.unlock queue_lock;
         (* build the prover task from goal in [a] *)

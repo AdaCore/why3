@@ -161,13 +161,14 @@ let all_list_tools ?callback tools probs =
 
 type output =
   (** on stdout *)
-  |Average
-  |Timeline
+  |Average of string
+  |Timeline of string
   (** In a file *)
-  |Csv
+  |Csv of string
 
 type ('a,'b) bench =
     {
+      bname  : string;
       btools : 'a tool list;
       bprobs : 'b prob list;
       boutputs : output list;
@@ -261,3 +262,87 @@ let empty_tool_res =
 
   let max_time l =
     List.fold_left (fun acc {result={pr_time = t}} -> max acc t) 0. l
+
+  open Format
+(**
+answer output time
+
+*)
+
+
+  let print_prover_answer fmt = function
+    | Valid -> fprintf fmt "Valid"
+    | Invalid -> fprintf fmt "Invalid"
+    | Timeout -> fprintf fmt "Timeout"
+    | Unknown s -> fprintf fmt "Unknown: %S" s
+    | Failure s -> fprintf fmt "Failure: %S" s
+    | HighFailure -> fprintf fmt "HighFailure"
+
+  let print_newline fmt () = fprintf fmt "\n"
+
+  let print_csv cmp print_tool print_probs fmt l =
+    let cmp x y =
+      let c = cmp x.prob y.prob in
+      if c <> 0 then c else
+        let id x = (Task.task_goal x.task).Decl.pr_name.Ident.id_string in
+        let c = String.compare (id x) (id y) in
+        if c <> 0 then c else compare x.idtask y.idtask in
+    let l = List.map (fun (p,l) -> p,List.fast_sort cmp l) l in
+    fprintf fmt "prover ,";
+    let print_header fmt e = fprintf fmt "%a, " print_probs e.prob in
+    begin match l with
+      | [] -> ()
+      | (_,r)::_ -> Pp.print_list Pp.comma print_header fmt r
+    end;
+    print_newline fmt ();
+    let print_cell fmt r =
+      fprintf fmt "%a, %.3f" (*"%a, %S, %.3f"*)
+        print_prover_answer r.result.pr_answer (*r.result.pr_output*)
+        r.result.pr_time in
+    let print_line fmt (p,l) =
+      fprintf fmt "%a ," print_tool p;
+      Pp.print_list Pp.comma print_cell fmt l in
+    Pp.print_list print_newline print_line fmt l
+
+  let print_timeline print_tool fmt l =
+    let l = List.map (fun (t,l) -> t,filter_timeline l) l in
+    let max = List.fold_left (fun acc (_,l) -> max acc (max_time l)) 0. l in
+    let max = max +. 0.1 in
+    let step = max /. 10. in
+    let tl = List.map (fun (t,l) -> t,compute_timeline 0. max step l) l in
+    let print_timeline (tool_val,timeline) =
+      fprintf fmt "@[%a - %a@]@."
+        (Pp.print_list Pp.comma (fun fmt -> fprintf fmt "%4i"))
+        timeline print_tool tool_val in
+    fprintf fmt "@[%a@]@."
+      (Pp.print_iter1 (fun f -> Util.iterf f 0. max)
+         Pp.comma (fun fmt -> fprintf fmt "%3.2f"))
+      step;
+    List.iter print_timeline tl
+
+
+  let print_average print_tool fmt l =
+    let tool_res = List.map (fun (t,l) -> t,compute_average l) l in
+    let print_tool_res (tool_val,tool_res) =
+      fprintf fmt "%a - %a@." print_tool_res tool_res print_tool tool_val in
+    fprintf fmt "(v,t,u,f,i) - valid, unknown, timeout, invalid, failure@.";
+    List.iter print_tool_res tool_res
+
+
+  let print_output cmp print_tool print_probs (b,l) =
+    let open_std f s =
+      if s = "-"
+      then begin f std_formatter;pp_print_flush std_formatter () end
+      else
+        let cout = (open_out s) in
+        let fmt = (formatter_of_out_channel cout) in
+        f fmt;
+        pp_print_flush fmt ();
+        close_out cout in
+    List.iter (function
+      | Average s -> open_std (fun fmt -> print_average print_tool fmt l) s
+      | Timeline s -> open_std (fun fmt -> print_timeline print_tool fmt l) s
+      | Csv s ->
+        open_std (fun fmt -> Pp.wnl fmt;
+          print_csv cmp print_tool print_probs fmt l) s
+    ) b.boutputs

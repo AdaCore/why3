@@ -36,6 +36,7 @@ open Whyconf
 open Rc
 
 let absolute_filename dirname f =
+  if f = "-" then f else
   if Filename.is_relative f then
     Filename.concat dirname f
   else
@@ -129,7 +130,7 @@ let read_probs absf map (name,section) =
     Scheduler.do_why_sync fwhy () in
   Mstr.add name { ptask   = gen; ptrans   = gen_trans} map
 
-let read_bench mtools mprobs map (name,section) =
+let read_bench absf mtools mprobs map (name,section) =
   let tools = get_stringl section "tools" in
   let lookup s =
     try Mstr.find s mtools
@@ -142,14 +143,20 @@ let read_bench mtools mprobs map (name,section) =
     with Not_found -> eprintf "Undefined probs %s@." s;
       exit 1 in
   let probs = List.map lookup probs in
-  let outputs = get_stringl ~default:[] section "outputs" in
-  let check = function
-    | "average" -> Average
-    | "timeline" -> Timeline
-    | "csv" -> Csv
-    | s -> eprintf "Unknown output %s@." s; exit 1 in
-  let outputs = List.map check outputs in
-  Mstr.add name { btools = tools; bprobs = probs; boutputs = outputs} map
+  let averages = get_stringl ~default:[] section "average" in
+  let outputs = List.fold_left
+    (cons (fun s -> Average (absf s)))
+    [] averages in
+  let timelines = get_stringl ~default:[] section "timeline" in
+  let outputs = List.fold_left
+    (cons (fun s -> Timeline (absf s)))
+    outputs timelines in
+  let csvs = get_stringl ~default:[] section "csv" in
+  let outputs = List.fold_left
+    (cons (fun s -> Csv (absf s)))
+    outputs csvs in
+  Mstr.add name
+    { bname = name; btools = tools; bprobs = probs; boutputs = outputs} map
 
 
 let read_file wc f =
@@ -160,7 +167,7 @@ let read_file wc f =
   let probs = get_family rc "probs" in
   let probs = List.fold_left (read_probs absf) Mstr.empty probs in
   let benchs = get_family rc "bench" in
-  let benchs = List.fold_left (read_bench tools probs)
+  let benchs = List.fold_left (read_bench absf tools probs)
     Mstr.empty benchs in
   {tools = tools;
    probs = probs;
