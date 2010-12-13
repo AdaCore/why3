@@ -1,13 +1,21 @@
-(***************************************************************
-
-  Copyright 2010
-
-  This module was poorly designed by Claude Marché, with the
-  enormous help of Jean-Christophe Filliatre and Andrei Paskevich
-  for finding the right functions in the Why3 API
-
-**************************************************************)
-
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (C) 2010-                                                   *)
+(*    François Bobot                                                     *)
+(*    Jean-Christophe Filliâtre                                          *)
+(*    Claude Marché                                                      *)
+(*    Andrei Paskevich                                                    *)
+(*                                                                        *)
+(*  This software is free software; you can redistribute it and/or        *)
+(*  modify it under the terms of the GNU Library General Public           *)
+(*  License version 2.1, with the special exception on linking            *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(*  This software is distributed in the hope that it will be useful,      *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
+(*                                                                        *)
+(**************************************************************************)
 
 (** Introduction of premises *)
 

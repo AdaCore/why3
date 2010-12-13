@@ -1,9 +1,9 @@
 /**************************************************************************/
 /*                                                                        */
 /*  Copyright (C) 2010-                                                   */
-/*    Francois Bobot                                                      */
-/*    Jean-Christophe Filliatre                                           */
-/*    Johannes Kanig                                                      */
+/*    François Bobot                                                     */
+/*    Jean-Christophe Filliâtre                                          */
+/*    Claude Marché                                                      */
 /*    Andrei Paskevich                                                    */
 /*                                                                        */
 /*  This software is free software; you can redistribute it and/or        */
