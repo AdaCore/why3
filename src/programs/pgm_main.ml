@@ -36,6 +36,7 @@ let add_module ?(type_only=false) env penv lmod m =
   Mstr.add id.id m lmod
 
 let retrieve penv c =
+  assert false (*TODO*)
 
 let pgm_env_of_env =
   let h = Env.Wenv.create 17 in
