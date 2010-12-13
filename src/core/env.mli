@@ -27,7 +27,9 @@ val env_tag : env -> Hashweak.tag
 
 module Wenv : Hashweak.S with type key = env
 
-type retrieve_channel = string list -> in_channel
+type retrieve_channel = string list -> string * in_channel
+  (** retrieves a channel from a given path; a filename is also returned, 
+      for printing purposes only *)
 
 type retrieve_theory  = env -> string list -> theory Mnm.t
 
@@ -39,7 +41,7 @@ val find_theory : env -> string list -> string -> theory
   (** [find_theory e p n] finds the theory named [p.n] in environment [e]
       @raise TheoryNotFound if theory not present in env [e] *)
 
-val find_channel : env -> string list -> in_channel
+val find_channel : env -> string list -> string * in_channel
 
 (** Parsers *)
 

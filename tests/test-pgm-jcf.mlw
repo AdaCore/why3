@@ -1,24 +1,14 @@
 
-module R
-
-  { use import programs.Prelude }
-
-  parameter ref : v:'a -> {} ref 'a { !result = v }
-
-  parameter set : r:ref 'a -> v:'a -> {} unit writes r { !r = v }
-
-end
-
 module P
 
   { use import programs.Prelude }
 
-  use module R
+  use module import pervasives.Ref 
 
   let test () =
     { true }
-    let r = R.ref 0 in
-    R.set r 1;
+    let r = ref 0 in
+    set r 1;
     !r
     { result > 0 }
 

@@ -33,10 +33,18 @@ let add_module ?(type_only=false) env penv lmod m =
   let uc = create_module (Ident.id_user id.id id.id_loc) in
   let uc = List.fold_left (Pgm_typing.decl ~wp env penv lmod) uc m.mod_decl in
   let m = close_module uc in
-  Mstr.add id.id m lmod
+  Mnm.add id.id m lmod
 
-let retrieve penv c =
-  assert false (*TODO*)
+let retrieve penv file c =
+  let lb = Lexing.from_channel c in
+  Loc.set_file file lb;
+  let ml = Pgm_lexer.parse_file lb in
+  if Debug.test_flag Typing.debug_parse_only then
+    Mnm.empty
+  else
+    let type_only = Debug.test_flag Typing.debug_type_only in
+    let env = Pgm_env.get_env penv in
+    List.fold_left (add_module ~type_only env penv) Mnm.empty ml
 
 let pgm_env_of_env =
   let h = Env.Wenv.create 17 in
@@ -49,19 +57,11 @@ let pgm_env_of_env =
       penv
 
 let read_channel env file c =
-  let lb = Lexing.from_channel c in
-  Loc.set_file file lb;
-  let ml = Pgm_lexer.parse_file lb in
-  if Debug.test_flag Typing.debug_parse_only then
-    Theory.Mnm.empty
-  else begin
-    let type_only = Debug.test_flag Typing.debug_type_only in
-    let penv = pgm_env_of_env env in
-    let mm = List.fold_left (add_module ~type_only env penv) Mstr.empty ml in
-    Mstr.fold 
-      (fun _ m tm -> Theory.Mnm.add m.m_name.id_string m.m_th tm) 
-      mm Theory.Mnm.empty
-  end
+  let penv = pgm_env_of_env env in
+  let mm = retrieve penv file c in
+  Mnm.fold 
+    (fun _ m tm -> Theory.Mnm.add m.m_name.id_string m.m_th tm) 
+    mm Theory.Mnm.empty
 
 let () = Env.register_format "whyml" ["mlw"] read_channel
 

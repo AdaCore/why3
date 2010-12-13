@@ -133,6 +133,7 @@ let specialize_global loc x uc =
   let p = ns_find_pr (namespace uc) x in
   p.p_ls, specialize_type_v ~loc (Htv.create 17) p.p_tv
 
+let dot fmt () = pp_print_string fmt "."
 let print_qualids = print_list dot pp_print_string
 let print_qualid fmt q = 
   print_list dot pp_print_string fmt (Typing.string_list_of_qualid [] q)
@@ -140,7 +141,7 @@ let print_qualid fmt q =
 let specialize_exception loc x uc =
   let s = 
     try ns_find_ex (namespace uc) x
-    with Not_found -> errorm ~loc "unbound exception %a" print_qualids x
+    with Not_found -> errorm ~loc "@[unbound exception %a@]" print_qualids x
   in
   match Denv.specialize_lsymbol ~loc s with
     | tyl, Some ty -> s, tyl, ty
@@ -1307,7 +1308,7 @@ let cannot_be_generalized gl = function
 let find_module penv lmod q id = match q with
   | [] ->
       (* local module *)
-      Mstr.find id lmod
+      Mnm.find id lmod
   | _ :: _ ->
       (* theory in file f *)
       Pgm_env.find_module penv q id
@@ -1364,8 +1365,8 @@ let rec decl ~wp env penv lmod uc = function
       let m =
 	try
 	  find_module penv lmod q id
-	with Not_found -> 
-	  errorm ~loc "unbound module %a" print_qualid qid
+	with Not_found | Pgm_env.ModuleNotFound _ -> 
+	  errorm ~loc "@[unbound module %a@]" print_qualid qid
       in
       let n = match use_as with
 	| None -> Some (m.m_name.id_string)

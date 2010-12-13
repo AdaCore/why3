@@ -282,7 +282,8 @@ and string = parse
   let create_env lp =
     let ret_chan sl = 
       let f = List.fold_left Filename.concat "" sl in
-      open_in (locate_file lp f)
+      let file = locate_file lp f in
+      file, open_in file
     in
     let retrieve env sl =
       let f = List.fold_left Filename.concat "" sl ^ ".why" in

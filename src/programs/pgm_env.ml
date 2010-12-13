@@ -8,7 +8,7 @@ type t = {
   memo     : (string list, Pgm_module.t Mnm.t) Hashtbl.t;
 }
 
-and retrieve_module = t -> in_channel -> Pgm_module.t Mnm.t
+and retrieve_module = t -> string -> in_channel -> Pgm_module.t Mnm.t
 
 let get_env penv = penv.env
 
@@ -29,8 +29,8 @@ let find_library penv sl =
   try Hashtbl.find penv.memo sl
   with Not_found ->
     Hashtbl.add penv.memo sl Mnm.empty;
-    let c = Env.find_channel penv.env (add_suffix sl) in
-    let m = penv.retrieve penv c in
+    let file, c = Env.find_channel penv.env (add_suffix sl) in
+    let m = penv.retrieve penv file c in
     close_in c;
     Hashtbl.replace penv.memo sl m;
     m

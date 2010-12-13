@@ -22,7 +22,7 @@ open Theory
 
 (** Environment *)
 
-type retrieve_channel = string list -> in_channel
+type retrieve_channel = string list -> string * in_channel
 
 type env = {
   env_ret_chan : retrieve_channel;

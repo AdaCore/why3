@@ -6,7 +6,7 @@ type t
 
 val get_env : t -> Env.env
 
-type retrieve_module = t -> in_channel -> Pgm_module.t Mnm.t
+type retrieve_module = t -> string -> in_channel -> Pgm_module.t Mnm.t
 
 val create : Env.env -> retrieve_module -> t
 
