@@ -57,6 +57,46 @@ pour chaque prouveur:  lien sur page why/prover tips.
 \section{The \texttt{why3ml} tool}
 
 \section{The \texttt{why3ide} tool}
+\label{sec:ideref}
+
+\subsection{Command-line options}
+
+\begin{description}
+\item[-I] $d$: adds $d$ in the load path, to search for theories.
+\end{description}
+
+\subsection{Left toolbar}
+
+\begin{description}
+\item[Provers] To each detected prover corresponds to a button in this
+  prover framed box. Clicking on this button starts the prover on the
+  selected goal(s).
+
+\item[Edit] Start an editor on the selected task.
+
+  For automatic provers, this allows to see the file sent to the
+  prover.
+
+  For interactive provers, this also allows to add or modify the
+  corresponding proof script. The modifications are saved, and can be
+  retrieved later even if the goal was modified.
+
+\item[Split] This splits the current goal into subgoals if it is a
+  conjunction of two or more goals.
+
+\end{description}
+
+\subsection{Menus}
+
+\begin{description}
+\item[File/Detect provers] 
+
+\end{description}
+\subsection{Preferences}
+
+\subsection{Structure of the database file}
+
+TODO
 
 \section{The \texttt{why.conf} configuration file}
 
