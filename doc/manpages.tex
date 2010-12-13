@@ -18,7 +18,10 @@ ocaml ocaml-native-compilers
 \end{verbatim}
 It is also installable from sources, downloadable from the Web site
 \url{http://caml.inria.fr/ocaml/}
+\end{itemize}
 
+For the IDE, additional Ocaml libraries are needed:
+\begin{itemize}
 \item The Lablgtk2 library for Ocaml bindings of the gtk2 graphical library.
  For debian-based Linux distributions, you can install the packages
 \begin{verbatim}
@@ -26,10 +29,28 @@ liblablgtk2-ocaml-dev liblablgtksourceview2-ocaml-dev
 \end{verbatim}
 It is also installable from sources, available from the site \url{http://wwwfun.kurims.kyoto-u.ac.jp/soft/olabl/lablgtk.html}
 
-\item TODO: sqlite3
+\item TODO Claude: sqlite3
 \end{itemize}
 
+\subsection{Local use, without installation}
+
+\begin{verbatim}
+./configure --enable-local
+make
+\end{verbatim}
+commands are available in subdirectory \texttt{bin/}.
+
 \section{Installation of external provers}
+
+why-config
+
+ou 
+
+IDE/Detect provers
+
+Provers which are auto-detected: (share/prover-detection-data)
+
+pour chaque prouveur:  lien sur page why/prover tips.
 
 \section{The \texttt{why3} command-line tool}
 
