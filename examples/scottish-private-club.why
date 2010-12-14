@@ -1,0 +1,48 @@
+(*
+
+The classical example of the Scottish private club puzzle
+
+The club follows six rules:
+
+ - every non-scottish members wear red socks
+
+ - every member wears a kilt or doesn't wear socks
+
+ - the married members don't go out on sunday
+
+ - a member goes out on sunday if and only if he is scottish
+
+ - every member who wears a kilt is scottish and married
+
+ - every scottish member wears a kilt
+
+Problem: prove that there is nobody in this club !
+
+*)
+
+theory ScottishClubProblem "the Scottish private club puzzle"
+
+type member
+
+logic is_scottish member
+logic wears_red_socks member
+logic wears_kilt member
+logic is_married member
+logic goes_out_on_sunday member
+
+axiom R1: forall m:member. not (is_scottish m) -> wears_red_socks m
+
+axiom R2: forall m:member. wears_kilt m or not (wears_red_socks m)
+
+axiom R3: forall m:member. is_married m -> not (goes_out_on_sunday m)
+
+axiom R4: forall m:member. goes_out_on_sunday m <-> is_scottish m 
+
+axiom R5: forall m:member. wears_kilt m -> is_scottish m and is_married m
+
+axiom R6: forall m:member. is_scottish m -> wears_kilt m 
+
+goal ThereIsNobodyInTheClub: false
+
+end
+
