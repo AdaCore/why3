@@ -4,7 +4,7 @@ The classical example of the Scottish private club puzzle
 
 The club follows six rules:
 
- - every non-scottish members wear red socks
+ - every non-scotti``sh members wear red socks
 
  - every member wears a kilt or doesn't wear socks
 
@@ -22,25 +22,25 @@ Problem: prove that there is nobody in this club !
 
 theory ScottishClubProblem "the Scottish private club puzzle"
 
-logic is_scottish
-logic wears_red_socks
-logic wears_kilt
-logic is_married
-logic goes_out_on_sunday
+  logic is_scottish
+  logic wears_red_socks
+  logic wears_kilt
+  logic is_married
+  logic goes_out_on_sunday
 
-axiom R1: not is_scottish -> wears_red_socks
+  axiom R1: not is_scottish -> wears_red_socks
 
-axiom R2: wears_kilt or not wears_red_socks
+  axiom R2: wears_kilt or not wears_red_socks
 
-axiom R3: is_married -> not goes_out_on_sunday
+  axiom R3: is_married -> not goes_out_on_sunday
 
-axiom R4: goes_out_on_sunday <-> is_scottish
+  axiom R4: goes_out_on_sunday <-> is_scottish
 
-axiom R5: wears_kilt -> is_scottish and is_married
+  axiom R5: wears_kilt -> is_scottish and is_married
 
-axiom R6: is_scottish -> wears_kilt
+  axiom R6: is_scottish -> wears_kilt
 
-goal ThereIsNobodyInTheClub: false
+  goal ThereIsNobodyInTheClub: false
 
 end
 

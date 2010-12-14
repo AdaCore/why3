@@ -1,5 +1,9 @@
 theory TestProp
 
+  goal Test0 : true
+
+  goal Test0_5 : true -> false
+
   logic a
 
   logic b
@@ -11,10 +15,6 @@ end
 theory TestInt
 
    use import int.Int
-
-   goal Test0 : true
-
-   goal Test0_5 : true -> false
 
    goal Test1: 2+2 = 4
 
