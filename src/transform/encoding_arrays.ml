@@ -234,9 +234,7 @@ let fold_map task_hd ((env:env),task) =
   match task_hd.task_decl.td_node with
     | Use _ | Clone _ | Meta _ -> env,add_tdecl task task_hd.task_decl
     | Decl d -> match d.d_node with
-    | Dtype [_,Tabstract] -> (env,task)
-    (* Nothing here since the type kept are already defined and the other
-       will be lazily defined *)
+    | Dtype [_,Tabstract] -> env,add_tdecl task task_hd.task_decl
     | Dtype _ -> Printer.unsupportedDecl
         d "encoding_decorate : I can work only on abstract\
             type which are not in recursive bloc."
