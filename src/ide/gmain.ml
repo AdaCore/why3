@@ -406,34 +406,44 @@ let accel_group = factory#accel_group
 
 let hb = GPack.hbox ~packing:vbox#add ()
 
-(*
-let tools_window =
-  GWindow.window
-    ~title: "Why3 tool box"
-    ()
-
-let tools_window_vbox =
-  GPack.vbox ~homogeneous:false ~packing:tools_window#add ()
-*)
-
 let tools_window_vbox =
   try
     GPack.vbox ~packing:(hb#pack ~expand:false)  ()
   with Gtk.Error _ -> assert false
 
-let tools_frame = GBin.frame ~label:"Provers"
-  ~packing:(tools_window_vbox#pack ~expand:false) ()
+let context_frame = 
+  GBin.frame ~label:"Context"
+    ~packing:(tools_window_vbox#pack ~expand:false) ()
 
-(*
-let tools_frame = tools_window_vbox
-*)
+let context_box = 
+  GPack.button_box `VERTICAL ~border_width:5
+    ~spacing:5
+    ~packing:context_frame#add ()
+
+let context_unproved_goals_only = ref true
+
+let () =
+  let b1 = GButton.radio_button 
+    ~packing:context_box#add ~label:"Unproved goals only" () 
+  in
+  let (_ : GtkSignal.id) =
+    b1#connect#clicked 
+      ~callback:(fun () -> context_unproved_goals_only := true)
+  in
+  let b2 = GButton.radio_button 
+    ~group:b1#group ~packing:context_box#add ~label:"All goals" () 
+  in
+  let (_ : GtkSignal.id) =
+    b2#connect#clicked 
+      ~callback:(fun () -> context_unproved_goals_only := false)
+  in ()
+
+
+let tools_frame = 
+  GBin.frame ~label:"Provers"
+    ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 let tools_box = GPack.button_box `VERTICAL ~border_width:5
-(*
-  ~layout
-  ~child_height
-  ~child_width
-*)
   ~spacing:5
   ~packing:tools_frame#add ()
 
@@ -1021,7 +1031,7 @@ let rec prover_on_goal q p g =
     g.Model.transformations
 
 let rec prover_on_goal_or_children q p g =
-  if not g.Model.proved then
+  if not (g.Model.proved && !context_unproved_goals_only) then
     begin
       match g.Model.transformations with
         | [] -> prover_on_goal q p g
