@@ -22,25 +22,23 @@ Problem: prove that there is nobody in this club !
 
 theory ScottishClubProblem "the Scottish private club puzzle"
 
-type member
+logic is_scottish
+logic wears_red_socks
+logic wears_kilt
+logic is_married
+logic goes_out_on_sunday
 
-logic is_scottish member
-logic wears_red_socks member
-logic wears_kilt member
-logic is_married member
-logic goes_out_on_sunday member
+axiom R1: not is_scottish -> wears_red_socks
 
-axiom R1: forall m:member. not (is_scottish m) -> wears_red_socks m
+axiom R2: wears_kilt or not wears_red_socks
 
-axiom R2: forall m:member. wears_kilt m or not (wears_red_socks m)
+axiom R3: is_married -> not goes_out_on_sunday
 
-axiom R3: forall m:member. is_married m -> not (goes_out_on_sunday m)
+axiom R4: goes_out_on_sunday <-> is_scottish
 
-axiom R4: forall m:member. goes_out_on_sunday m <-> is_scottish m 
+axiom R5: wears_kilt -> is_scottish and is_married
 
-axiom R5: forall m:member. wears_kilt m -> is_scottish m and is_married m
-
-axiom R6: forall m:member. is_scottish m -> wears_kilt m 
+axiom R6: is_scottish -> wears_kilt
 
 goal ThereIsNobodyInTheClub: false
 
