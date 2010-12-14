@@ -875,50 +875,37 @@ dep: depend
 # distrib
 #########
 
-# NAME=why-$(VERSION)
-# EXPORT=export/$(NAME)
-#
-# WWW = /users/www-perso/projets/why
-# FTP = $(WWW)/download
-# WWWKRAKATOA = /users/www-perso/projets/krakatoa
-#
-# FILES =src/*.ml* c/*.ml* jc/*.ml* java/*.ml* ml/*.ml* ml/*/*.ml* intf/*.ml* tools/*.ml* tools/*.c bin/whyide.sh \
-#       mix/*.ml* \
-#       version.sh Version Makefile.in configure.in configure .depend .depend.coq \
-#       config/check_ocamlgraph.ml \
-#       README INSTALL COPYING LICENSE CHANGES \
-#       doc/Makefile doc/manual.ps doc/why.1 \
-# 	examples-c/*/*.h examples-c/*/*.c \
-# 	examples-c/Makefile examples-c/*/Makefile \
-# 	examples-c/*/coq/*.v \
-# 	examples/Makefile* \
-# 	examples/*/*.mlw examples/*/*.why examples/*/*.v examples/*/*.sx \
-# 	examples/*/.depend examples/*/Makefile \
-# 	bench/bench.in bench/good*/*.mlw bench/good*/*.v \
-#	bench/c/bench bench/c/bench-files bench/c/*/*.c bench/c/*/*/*.c \
-# 	bench/jc/bench bench/jc/good/*.jc \
-# 	bench/java/bench bench/java/*/*.java bench/provers/*.mlw \
-# 	tests/regtest.sh tests/java/*.java \
-# 	tests/java/coq/*.v \
-# 	tests/java/result/README tests/java/oracle/*.oracle \
-# 	lib/coq*/*.v \
-# 	lib/pvs/pvscontext.el lib/pvs/*.pvs lib/pvs/*.prf \
-# 	lib/mizar/why.miz lib/mizar/dict/why.voc \
-# 	lib/why/*.why lib/isabelle/*.thy lib/hol4/*.ml lib/harvey/*.rv \
-# 	lib/java_api/java/*/*.java \
-# 	lib/javacard_api/java/lang/*.java \
-# 	lib/javacard_api/javacard/*/*.java \
-# 	lib/javacard_api/javacardx/crypto/*.java \
-# 	lib/javacard_api/com/sun/javacard/impl/*.java \
-# 	lib/images/*.png \
-# 	atp/*.ml atp/LICENSE.txt atp/Makefile atp/Mk_ml_file \
-# 	ocamlgraph/configure.in ocamlgraph/configure ocamlgraph/.depend \
-# 	ocamlgraph/Makefile.in ocamlgraph/META.in ocamlgraph/*/*.ml* \
-#	frama-c-plugin/Makefile frama-c-plugin/configure \
-# 	frama-c-plugin/*.ml* frama-c-plugin/share/jessie/*.h
-#
-# # ne pas distribuer ces tests-la	frama-c-plugin/tests/jessie/*.c
-#
+NAME = why3-$(VERSION)
+DISTRIB_DIR = distrib/$(NAME)
+DISTRIB_TAR = $(DISTRIB_DIR).tar.gz
+
+DISTRIB_FILES = Version Makefile.in configure.in configure .depend.* \
+      README INSTALL OCAML-LICENSE LICENSE CHANGES \
+      src/*.ml* src/*/*.ml* src/*/*.c \
+      src/config.sh.in \
+      doc/version.tex.in doc/manual.pdf \
+      drivers/*.drv \
+      examples/*.why \
+      theories/*.why theories/*/*.why \
+      share/*.conf \
+      share/emacs/why.el share/images/*.png share/lang/*.lang
+
+# TODO?
+# share/zsh ?
+# symbolic links in share/ ?
+
+distrib:: $(DISTRIB_TAR)
+
+$(DISTRIB_TAR): doc/manual.pdf
+	@if test -d $(DISTRIB_DIR); then \
+	  echo "Hum... there is already a directory $(NAME)"; \
+	  echo "Please increase the version number"; exit 1; \
+        fi
+	mkdir -p $(DISTRIB_DIR)
+	mkdir -p $(DISTRIB_DIR)/bin
+	cp --parents $(DISTRIB_FILES) $(DISTRIB_DIR)
+	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
+
 # distrib export: source export-doc export-www export-examples export-examples-c linux
 #
 # export-www:
@@ -926,19 +913,6 @@ dep: depend
 # 	echo "<#def cversion>$(CVERSION)</#def>" >> /users/demons/filliatr/www/why/version.prehtml
 # 	$(MAKE) -C /users/demons/filliatr/www/why install
 #
-# source: export/$(NAME).tar.gz
-# 	cp CHANGES CHANGES.caduceus export/$(NAME).tar.gz $(FTP)
-#
-# export/$(NAME).tar.gz: $(FILES)
-# 	rm -rf $(EXPORT)
-# 	mkdir -p $(EXPORT)/bin
-# 	cp --parents $(FILES) $(EXPORT)
-# 	cd $(EXPORT); rm -f $(GENERATED)
-# 	cd export; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
-#
-# tarball-for-framac:
-# 	$(MAKE) tarball
-# 	cp export/$(NAME).tar.gz export/why-for-framac.tar.gz
 #
 # tarball:
 # 	mkdir -p export
