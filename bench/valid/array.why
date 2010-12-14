@@ -1,4 +1,5 @@
 theory Test_simplify_array
+  use import int.Int
   use import array.Array
   goal G1 : forall x y:int. forall m: t int int.
     get (set m y x) y = x
@@ -7,8 +8,8 @@ theory Test_simplify_array
     get m z = y ->
     get (set m x t) z = y
   goal G3 : forall y t:int. forall m: t int int.
-    get m 1 = y ->
-    get (set m 2 t) 1 = y
+    get m 0 = y ->
+    get (set m 1 t) 0 = y
   goal G4 : forall x y:int. forall m: t int int.
-    get (set (set m 2 y) 1 x) 2 = y
+    get (set (set m 1 y) 0 x) 1 = y
 end
