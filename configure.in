@@ -334,6 +334,20 @@ else
    ENABLE_LOCAL=yes
 fi
 
+#For the META
+if test "$enable_hypothesis_selection" = yes; then
+   META_OCAMLGRAPH="ocamlgraph"
+else
+   META_OCAMLGRAPH=""
+fi
+
+if test "$enable_plugins" = yes; then
+  META_DYNLINK="dynlink"
+else
+  META_DYNLINK=""
+fi
+
+
 #Viewer for ps and pdf
 dnl AC_CHECK_PROGS(PSVIEWER,gv evince)
 dnl AC_CHECK_PROGS(PDFVIEWER,xpdf acroread evince)
@@ -373,8 +387,11 @@ AC_SUBST(CAMLP5O)
 AC_SUBST(enable_ide)
 AC_SUBST(enable_plugins)
 AC_SUBST(DYNLINK)
+AC_SUBST(META_DYNLINK)
+AC_SUBST(META_OCAMLGRAPH)
 
 AC_SUBST(enable_coq_support)
+
 AC_SUBST(COQC)
 AC_SUBST(COQDEP)
 AC_SUBST(COQLIB)
@@ -393,7 +410,7 @@ dnl AC_SUBST(PDFVIEWER)
 
 # Finally create the Makefile from Makefile.in
 dnl AC_OUTPUT(Makefile)
-AC_CONFIG_FILES(Makefile src/config.sh doc/version.tex)
+AC_CONFIG_FILES(Makefile src/config.sh doc/version.tex META)
 AC_CONFIG_COMMANDS([chmod],
 chmod a-w Makefile src/config.sh doc/version.tex;
 chmod u+x src/config.sh)

@@ -83,14 +83,8 @@ endif
 
 # external libraries common to all binaries
 
-ifeq (@enable_plugins@,yes)
-  DYNLINK = dynlink
-else
-  DYNLINK =
-endif
-
 EXTOBJS =
-EXTLIBS = str unix nums $(DYNLINK)
+EXTLIBS = str unix nums @META_DYNLINK@
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
 EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
@@ -240,6 +234,7 @@ install_no_local::
 install_no_local_lib::
 	mkdir -p $(OCAMLLIB)/why3
 	cp -f src/why.cm* $(OCAMLLIB)/why3
+	cp -f META  $(OCAMLLIB)/why3
 	if test -f src/why.a; then cp -f src/why.a $(OCAMLLIB)/why3; fi
 
 ifeq ("@ENABLE_LOCAL@","no")
@@ -982,6 +977,11 @@ doc/version.tex: doc/version.tex.in config.status
 
 config.status: configure Version
 	./config.status --recheck
+
+opt byte : META
+
+META: META.in config.status
+	./config.status chmod --file $@
 
 configure: configure.in
 	autoconf
