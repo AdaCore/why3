@@ -114,6 +114,9 @@ val ttrue : 'a -> bool
 (* useful function on string *)
 val split_string_rev : string -> char -> string list
 
+(* useful function on char *)
+val is_uppercase : char -> bool
+
 (* Set and Map on ints and strings *)
 
 module Mint : Map.S with type key = int

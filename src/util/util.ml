@@ -147,6 +147,9 @@ let split_string_rev s c =
       | Invalid_argument _ -> ""::acc in
   aux [] 0
 
+(** usefule function on char *)
+let is_uppercase c = 'A' <= c && c <= 'Z'
+
 (* Set and Map on ints and strings *)
 
 module Int  = struct type t = int let compare = Pervasives.compare end

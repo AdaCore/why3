@@ -583,9 +583,13 @@ and dfmla_node ~localize loc env = function
   | PPnamed (x, f1) ->
       let f1 = dfmla ~localize env f1 in
       Fnamed (x, f1)
-  | PPvar x ->
+  | PPvar (Qident s | Qdot (_,s) as x) when is_uppercase s.id.[0] ->
       let pr = find_prop x env.uc in
       Fvar (Decl.find_prop (Theory.get_known env.uc) pr)
+  | PPvar x ->
+      let s, tyl = specialize_psymbol x env.uc in
+      let tl = dtype_args s.ls_name loc env tyl [] in
+      Fapp (s, tl)
   | PPeps _ | PPconst _ | PPcast _ | PPtuple _ ->
       error ~loc PredicateExpected
 
