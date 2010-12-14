@@ -167,3 +167,9 @@ let string_of_wnl p x =
   wnl fmt;
   fprintf fmt "%a@?" p x;
   Buffer.contents b
+
+module Ansi =
+  struct
+
+    let set_column fmt n = fprintf fmt "\027[%iG" n
+end

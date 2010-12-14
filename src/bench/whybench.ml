@@ -377,7 +377,8 @@ let () =
             | Call_provers.Valid -> incr nb_valid
             | _     -> () end
         | _ -> ();
-          Format.printf "\027[0G(%i/%i) valid : %i%!"
+          Format.printf "%a(%i/%i) valid : %i%!"
+            Pp.Ansi.set_column 0
             !nb_done !nb_scheduled !nb_valid
       end;
     Debug.dprintf Scheduler.debug "%s.%s %a %i with %s : %a@."

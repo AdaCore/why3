@@ -124,3 +124,8 @@ val string_of_wnl : (Format.formatter -> 'a -> unit) -> 'a -> string
   (** same as {!string_of} but without newline *)
 
 val wnl : Format.formatter -> unit
+
+module Ansi :
+sig
+  val set_column : Format.formatter -> int -> unit
+end
