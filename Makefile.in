@@ -574,8 +574,8 @@ $(TPTPCMO) $(TPTPCMX): INCLUDES += -I src/tptp2why
 # build targets
 
 ifeq (@enable_whytptp@,yes)
-byte: plugins/whytptp.cmo
-opt:  plugins/whytptp.cmxs
+plugins.byte byte: plugins/whytptp.cmo
+plugins.opt  opt :  plugins/whytptp.cmxs
 endif
 
 plugins/whytptp.cmxs plugins/whytptp.cmo: EXTOBJS += $(MENHIRLIB)
@@ -664,12 +664,12 @@ comp_bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS)
 test2: bin/why.byte $(TOOLS)
 	bin/why.byte tests/test-jcf.why
 
-test: bin/why.byte $(TOOLS)
+test: bin/why.byte plugins.byte $(TOOLS)
 	mkdir -p output_why3
 	bin/why.byte -D drivers/why3.drv -o output_why3 tests/test-jcf.why
-	bin/why.byte -D drivers/alt_ergo.drv tests/test-jcf.why -T Test -G G
-	bin/why.byte -P alt-ergo --timelimit 3 tests/test-jcf.why -T Test -G G
-	bin/why.byte -D drivers/coq.drv tests/test-jcf.why -T Test -G G
+	# bin/why.byte -D drivers/alt_ergo.drv tests/test-jcf.why -T Test -G G
+	# bin/why.byte -P alt-ergo --timelimit 3 tests/test-jcf.why -T Test -G G
+	# bin/why.byte -D drivers/coq.drv tests/test-jcf.why -T Test -G G
 	echo bin/why.byte -P alt-ergo --timelimit 1 --prove theories/real.why
 	@printf "*** Checking Coq file generation ***\\n"
 	@mkdir -p output_coq
