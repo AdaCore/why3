@@ -176,12 +176,32 @@ let expected_type e ty =
 
 let pure_type env = Typing.dty env.denv
 
-let rec dpurify env = function
-  | DTpure ty ->
+let dmodel_type = function
+  | Tyapp (ts, tyl) as ty ->
+      let mt = get_mtsymbol ts in
+      begin match mt.mt_model with
+	| None -> 
+	    ty
+	| Some ty ->
+	    let h = Htv.create 17 in
+	    List.iter2 (Htv.add h) mt.mt_args tyl;
+	    let rec inst ty = match ty.ty_node with
+	      | Ty.Tyvar tv -> Htv.find h tv
+	      | Ty.Tyapp (ts, tyl) -> Denv.Tyapp (ts, List.map inst tyl)
+	    in
+	    inst ty
+      end
+  | Tyvar _ as ty -> 
       ty
+
+let rec dpurify ?(logic=false) = function
+  | DTpure ty when not logic ->
+      ty
+  | DTpure ty ->
+      begin try dmodel_type ty with NotMutable -> ty end
   | DTarrow (bl, c) ->
-      dcurrying (List.map (fun (_,ty) -> dpurify env ty) bl)
-	(dpurify env c.dc_result_type)
+      dcurrying (List.map (fun (_,ty) -> dpurify ~logic ty) bl)
+	(dpurify c.dc_result_type)
 
 let check_reference_type uc loc ty =
   let ty_ref = dty_app (find_ts uc "ref", [create_type_var loc]) in
@@ -239,7 +259,7 @@ let add_local_top env x tyv =
   { env with locals = Mstr.add x tyv env.locals }
 
 let add_local env x tyv =
-  let ty = dpurify env tyv in
+  let ty = dpurify ~logic:true tyv in
   { env with locals = Mstr.add x tyv env.locals;
              denv = add_pure_var x ty env }
 
@@ -256,7 +276,7 @@ and dtype_c env c =
   { dc_result_type = ty;
     dc_effect      = deffect env c.Pgm_ptree.pc_effect;
     dc_pre         = dfmla env.denv c.Pgm_ptree.pc_pre;
-    dc_post        = dpost env (dpurify env ty) c.Pgm_ptree.pc_post;
+    dc_post        = dpost env (dpurify ty) c.Pgm_ptree.pc_post;
   }
 
 and dbinder env ({id=x; id_loc=loc} as id, v) =
@@ -304,13 +324,13 @@ and dexpr_desc env loc = function
   | Pgm_ptree.Eident (Qident {id=x}) when Mstr.mem x env.locals ->
       (* local variable *)
       let tyv = Mstr.find x env.locals in
-      DElocal (x, tyv), dpurify env tyv
+      DElocal (x, tyv), dpurify tyv
   | Pgm_ptree.Eident p ->
       begin try
 	(* global variable *)
 	let x = Typing.string_list_of_qualid [] p in
 	let s, tyv = specialize_global loc x env.uc in
-	DEglobal (s, tyv), dpurify env tyv
+	DEglobal (s, tyv), dpurify tyv
       with Not_found ->
 	let s,tyl,ty = Typing.specialize_lsymbol p (theory_uc env.uc) in
 	let ty = match ty with
@@ -472,7 +492,7 @@ and dexpr_desc env loc = function
       e1.dexpr_desc, ty
   | Pgm_ptree.Eany c ->
       let c = dtype_c env c in
-      DEany c, dpurify env c.dc_result_type
+      DEany c, dpurify c.dc_result_type
 
 and dletrec env dl =
   (* add all functions into environment *)
@@ -565,7 +585,7 @@ and type_c gl env c =
 
 and binder gl env (x, tyv) =
   let tyv = type_v gl env tyv in
-  let v = create_vsymbol (id_user x.id x.id_loc) (purify tyv) in
+  let v = create_vsymbol (id_user x.id x.id_loc) (purify ~logic:true tyv) in
   let env = Mstr.add x.id v env in
   env, (v, tyv)
 
@@ -1305,6 +1325,19 @@ let cannot_be_generalized gl = function
   | Tpure _ | Tarrow _ ->
       false
 
+let check_type_vars ~loc vars ty =
+  let h = Htv.create 17 in
+  List.iter (fun v -> Htv.add h v ()) vars;
+  let rec check ty = match ty.ty_node with
+    | Ty.Tyvar v when not (Htv.mem h v) -> 
+	errorm ~loc "unbound type variable '%s" v.tv_name.id_string
+    | Ty.Tyvar _ ->
+	()
+    | Ty.Tyapp (_, tyl) ->
+	List.iter check tyl
+  in
+  check ty
+
 let find_module penv lmod q id = match q with
   | [] ->
       (* local module *)
@@ -1394,8 +1427,27 @@ let rec decl ~wp env penv lmod uc = function
       let uc = List.fold_left (decl ~wp env penv lmod) uc dl in
       begin try close_namespace uc import (Some id.id)
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
-  | Pgm_ptree.Dmutable_type _ ->
-      assert false (*TODO*)
+  | Pgm_ptree.Dmutable_type (id, args, model) ->
+      let loc = id.id_loc in
+      let id = id_user id.id loc in
+      let denv = Typing.create_denv (theory_uc uc) in
+      let args = 
+	List.map 
+	  (fun x -> tvsymbol_of_type_var (Typing.find_user_type_var x.id denv))
+	  args
+      in
+      let model = 
+	option_map 
+	  (fun ty -> let dty = Typing.dty denv ty in Denv.ty_of_dty dty)
+	  model 
+      in
+      option_iter (check_type_vars ~loc args) model;
+      let mt = create_mtsymbol id args model in
+      let uc = 
+	let d = Decl.create_ty_decl [mt.mt_abstr, Decl.Tabstract] in
+	Pgm_module.add_logic_decl d uc 
+      in
+      add_mtsymbol mt uc
 
 (*
 Local Variables:

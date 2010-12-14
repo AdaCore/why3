@@ -8,6 +8,50 @@ open Term
 open Decl
 module E = Pgm_effect
 
+(* mutable types *)
+
+type mtsymbol = {
+  mt_name  : ident;
+  mt_args  : tvsymbol list;
+  mt_model : ty option;
+  mt_abstr : tysymbol;
+}
+
+let mt_equal = (==)
+
+let mutable_types = Hts.create 17
+
+let create_mtsymbol name args model = 
+  let id = id_register name in
+  let ts = create_tysymbol name args None in
+  let mt = 
+    { mt_name  = id;
+      mt_args  = args;
+      mt_model = model; 
+      mt_abstr = ts; }
+  in
+  Hts.add mutable_types ts mt;
+  mt
+
+exception NotMutable
+
+let get_mtsymbol ts = 
+  try Hts.find mutable_types ts with Not_found -> raise NotMutable
+
+let model_type ty = match ty.ty_node with
+  | Tyapp (ts, tyl) when Hts.mem mutable_types ts ->
+      let mt = Hts.find mutable_types ts in
+      begin match mt.mt_model with
+	| None -> 
+	    ty
+	| Some ty ->
+	    let add mtv tv ty = Mtv.add tv ty mtv in
+	    let mtv = List.fold_left2 add Mtv.empty mt.mt_args tyl in
+	    ty_inst mtv ty
+      end
+  | Tyvar _ | Tyapp _ -> 
+      raise NotMutable
+
 (* types *)
 
 type effect = Pgm_effect.t
@@ -21,8 +65,8 @@ type exn_post_fmla = Term.vsymbol (* result *) option * Term.fmla
 type post = post_fmla * (Term.lsymbol * exn_post_fmla) list
 
 type type_v =
-  | Tpure of Ty.ty
-  | Tarrow of binder list * type_c
+  | Tpure    of Ty.ty
+  | Tarrow   of binder list * type_c
 
 and type_c =
   { c_result_type : type_v;
@@ -42,16 +86,18 @@ let make_arrow_type tyl ty =
   let arrow ty1 ty2 = Ty.ty_app ts_arrow [ty1; ty2] in
   List.fold_right arrow tyl ty
 
-let rec uncurry_type = function
-  | Tpure ty ->
+let rec uncurry_type ?(logic=false) = function
+  | Tpure ty when not logic ->
       [], ty
+  | Tpure ty ->
+      [], begin try model_type ty with NotMutable -> ty end
   | Tarrow (bl, c) ->
       let tyl1 = List.map (fun (v,_) -> v.vs_ty) bl in
-      let tyl2, ty = uncurry_type c.c_result_type in
-      tyl1 @ tyl2, ty (* TODO: improve? *)
+      let tyl2, ty = uncurry_type ~logic c.c_result_type in
+      tyl1 @ tyl2, ty (* TODO: improve efficiency? *)
 
-let purify v =
-  let tyl, ty = uncurry_type v in
+let purify ?(logic=false) v =
+  let tyl, ty = uncurry_type ~logic v in
   make_arrow_type tyl ty
 
 (* symbols *)
@@ -67,20 +113,6 @@ let create_psymbol id v =
   { p_ls = ls; p_tv = v }
 
 type esymbol = lsymbol
-
-type mtsymbol = {
-  mt_name  : ident;
-  mt_args  : tvsymbol list;
-  mt_model : ty option;
-}
-
-let create_mtsymbol name args model = { 
-  mt_name  = id_register name;
-  mt_args  = args;
-  mt_model = model; 
-}
-
-let mt_equal = (==)
 
 (* misc. functions *)
 

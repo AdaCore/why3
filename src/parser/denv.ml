@@ -50,6 +50,8 @@ and type_var = {
   type_var_loc : loc option;
 }
 
+let tvsymbol_of_type_var tv = tv.tvsymbol
+
 let rec print_dty fmt = function
   | Tyvar { type_val = Some t } ->
       print_dty fmt t
@@ -58,10 +60,9 @@ let rec print_dty fmt = function
   | Tyapp (s, []) ->
       fprintf fmt "%s" s.ts_name.id_string
   | Tyapp (s, [t]) ->
-      fprintf fmt "%a %s" print_dty t s.ts_name.id_string
+      fprintf fmt "%s %a" s.ts_name.id_string print_dty t
   | Tyapp (s, l) ->
-      fprintf fmt "(%a) %s"
-	(print_list comma print_dty) l s.ts_name.id_string
+      fprintf fmt "%s %a" s.ts_name.id_string (print_list comma print_dty) l
 
 let create_ty_decl_var =
   let t = ref 0 in

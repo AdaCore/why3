@@ -7,7 +7,25 @@ open Theory
 open Term
 open Decl
 
-(* types *)
+(* mutable type symbols *)
+
+type mtsymbol = private {
+  mt_name  : ident;
+  mt_args  : tvsymbol list;
+  mt_model : ty option;
+  mt_abstr : tysymbol;
+}
+
+val create_mtsymbol : preid -> tvsymbol list -> ty option -> mtsymbol
+
+val mt_equal : mtsymbol -> mtsymbol -> bool
+
+exception NotMutable
+
+val get_mtsymbol : tysymbol -> mtsymbol
+  (** raises [NotMutable] if [ts] is not a mutable type *)
+
+(* program types *)
 
 type effect = Pgm_effect.t
 type reference = Pgm_effect.reference
@@ -20,8 +38,8 @@ type exn_post_fmla = Term.vsymbol (* result *) option * Term.fmla
 type post = post_fmla * (Term.lsymbol * exn_post_fmla) list
 
 type type_v = private
-  | Tpure of Ty.ty
-  | Tarrow of binder list * type_c
+  | Tpure    of Ty.ty
+  | Tarrow   of binder list * type_c
 
 and type_c =
   { c_result_type : type_v;
@@ -34,7 +52,7 @@ and binder = Term.vsymbol * type_v
 val tpure : Ty.ty -> type_v
 val tarrow : binder list -> type_c -> type_v
 
-(* symbols *)
+(* program symbols *)
 
 type psymbol = private {
   p_ls : lsymbol;
@@ -43,23 +61,16 @@ type psymbol = private {
 
 val create_psymbol : preid -> type_v -> psymbol
 
+(* exception symbols *)
+
 type esymbol = lsymbol
-
-type mtsymbol = private {
-  mt_name  : ident;
-  mt_args  : tvsymbol list;
-  mt_model : ty option;
-}
-
-val create_mtsymbol : preid -> tvsymbol list -> ty option -> mtsymbol
-
-val mt_equal : mtsymbol -> mtsymbol -> bool
 
 (* program types -> logic types *)
 
 val ts_arrow : tysymbol
 
-val purify : type_v -> ty
+val purify : ?logic:bool -> type_v -> ty
+  (** when [logic] is [true], mutable types are turned into their models *)
 
 (* operations on program types *)
 

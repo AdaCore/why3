@@ -3,14 +3,19 @@ module P
 
   { use import programs.Prelude }
 
-  use module import pervasives.Ref 
+  use module import pervasives.Ref
 
-  let test () =
-    { true }
-    let r = ref 0 in
-    set r 1;
-    !r
-    { result > 0 }
+  let test (r : ref int) = 
+    { !r = 0 }
+    set r 1 
+    { !r = 1 }
+
+  mutable type t model int
+
+  let f (x : t) =
+    { x = 0 }
+    if x = 1 then ()
+    { x = 1 }
 
 end
 
