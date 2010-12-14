@@ -439,20 +439,35 @@ let () =
   in ()
 
 
-let tools_frame = 
+let provers_frame = 
   GBin.frame ~label:"Provers"
+    ~packing:(tools_window_vbox#pack ~expand:false) ()
+
+let provers_box = GPack.button_box `VERTICAL ~border_width:5
+  ~spacing:5
+  ~packing:provers_frame#add ()
+
+let transf_frame =
+  GBin.frame ~label:"Transformations"
+    ~packing:(tools_window_vbox#pack ~expand:false) ()
+
+let transf_box =
+  GPack.button_box `VERTICAL ~border_width:5 ~packing:transf_frame#add ()
+
+let tools_frame = 
+  GBin.frame ~label:"Tools"
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 let tools_box = GPack.button_box `VERTICAL ~border_width:5
   ~spacing:5
   ~packing:tools_frame#add ()
 
-let others_frame =
-  GBin.frame ~label:"Other"
+let cleaning_frame =
+  GBin.frame ~label:"Cleaning"
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
-let others_box =
-  GPack.button_box `VERTICAL ~border_width:5 ~packing:others_frame#add ()
+let cleaning_box =
+  GPack.button_box `VERTICAL ~border_width:5 ~packing:cleaning_frame#add ()
 
 
 (* horizontal paned *)
@@ -1274,6 +1289,10 @@ let select_file () =
   end ;
   d#destroy ()
 
+
+let not_implemented () =
+  info_window `INFO "This feature is not yet implemented, sorry"
+
 (*************)
 (* File menu *)
 (*************)
@@ -1318,22 +1337,6 @@ let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._E
     ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
 
-
-
-(*
-let view_tools_box = ref true
-
-let set_view_tools_box b =
-  view_tools_box := b;
-  if b then tools_window#show() else tools_window#hide ()
-
-let () = set_view_tools_box true
-
-let (_ : GMenu.check_menu_item) = view_factory#add_check_item
-  ~active:!view_tool_box
-  ~callback:set_view_tools_box
-  "Show tool box"
-*)
 
 
 let rec collapse_proved_goal g =
@@ -1460,7 +1463,7 @@ let (_ : GMenu.check_menu_item) = view_factory#add_check_item
 
 
 let () = add_refresh_provers (fun () ->
-  List.iter (fun item -> item#destroy ()) tools_box#all_children)
+  List.iter (fun item -> item#destroy ()) provers_box#all_children)
 
 let tools_menu = factory#add_submenu "_Tools"
 let tools_factory = new GMenu.factory tools_menu ~accel_group
@@ -1473,19 +1476,12 @@ let () =
     Util.Mstr.iter
       (fun _ p ->
          let n = p.prover_name ^ " " ^ p.prover_version in
-(*
          let (_ : GMenu.image_menu_item) =
-           tools_factory#add_image_item ~label:(n ^ " on all unproved goals")
-             ~callback:(fun () -> prover_on_unproved_goals p)
-             ()
-         in
-*)
-         let (_ : GMenu.image_menu_item) =
-           tools_factory#add_image_item ~label:(n ^ " on selection")
+           tools_factory#add_image_item ~label:n
              ~callback:(fun () -> prover_on_selected_goals p)
              ()
          in
-         let b = GButton.button ~packing:tools_box#add ~label:n () in
+         let b = GButton.button ~packing:provers_box#add ~label:n () in
          let i = GMisc.image ~pixbuf:(!image_prover) ()in
          let () = b#set_image i#coerce in
          let (_ : GtkSignal.id) =
@@ -1508,11 +1504,19 @@ let () =
 
 
 let () =
-  let b = GButton.button ~packing:others_box#add ~label:"Split" () in
+  let b = GButton.button ~packing:transf_box#add ~label:"Split" () in
   let i = GMisc.image ~pixbuf:(!image_transf) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:split_selected_goals
+  in ()
+
+let () =
+  let b = GButton.button ~packing:transf_box#add ~label:"Inline" () in
+  let i = GMisc.image ~pixbuf:(!image_transf) () in
+  let () = b#set_image i#coerce in
+  let (_ : GtkSignal.id) =
+    b#connect#pressed ~callback:not_implemented
   in ()
 
 
@@ -1799,11 +1803,35 @@ let () =
 
 
 let () =
-  let b = GButton.button ~packing:others_box#add ~label:"Edit" () in
+  let b = GButton.button ~packing:tools_box#add ~label:"Edit" () in
   let i = GMisc.image ~pixbuf:(!image_editor) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:edit_current_proof
+  in ()
+
+let () =
+  let b = GButton.button ~packing:tools_box#add ~label:"Replay" () in
+(*
+  let i = GMisc.image ~pixbuf:(!image_replay) () in
+  let () = b#set_image i#coerce in
+*)
+  let (_ : GtkSignal.id) =
+    b#connect#pressed ~callback:not_implemented
+  in ()
+
+(************)
+(* cleaning *)
+(************)
+
+let () =
+  let b = GButton.button ~packing:cleaning_box#add ~label:"Remove" () in
+(*
+  let i = GMisc.image ~pixbuf:(!image_replay) () in
+  let () = b#set_image i#coerce in
+*)
+  let (_ : GtkSignal.id) =
+    b#connect#pressed ~callback:not_implemented
   in ()
 
 
