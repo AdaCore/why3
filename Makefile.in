@@ -777,9 +777,9 @@ clean::
 MODULESTODOC = util/util \
 	core/ident core/ty core/term core/decl core/theory \
 	core/env core/task \
-	driver/whyconf driver/driver \
-	transform/introduction \
-	ide/db
+	driver/whyconf driver/driver 
+#	transform/introduction \
+#	ide/db
 
 FILESTODOC = $(addsuffix .mli, $(addprefix src/, $(MODULESTODOC)))
 
