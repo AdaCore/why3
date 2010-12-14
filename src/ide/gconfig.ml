@@ -206,6 +206,7 @@ let iconname_file = "file32"
 let iconname_prover = "wizard32"
 let iconname_transf = "cutb32"
 let iconname_editor = "edit32"
+let iconname_remove = "deletefile32"
 
 let image_default = ref (image ~size:20 iconname_default)
 let image_scheduled = ref !image_default
@@ -222,6 +223,7 @@ let image_file = ref !image_default
 let image_prover = ref !image_default
 let image_transf = ref !image_default
 let image_editor = ref !image_default
+let image_remove = ref !image_default
 
 let resize_images size =
   image_default := image ~size iconname_default;
@@ -239,6 +241,7 @@ let resize_images size =
   image_prover := image ~size iconname_prover;
   image_transf := image ~size iconname_transf;
   image_editor := image ~size iconname_editor;
+  image_remove := image ~size iconname_remove;
   ()
 
 let () =

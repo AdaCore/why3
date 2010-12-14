@@ -503,18 +503,25 @@ let task_checksum t =
 
 
 let info_window mt s =
+  let buttons = match mt with
+    | `INFO -> GWindow.Buttons.close
+    | `WARNING -> GWindow.Buttons.close
+    | `QUESTION -> GWindow.Buttons.ok_cancel
+    | `ERROR -> GWindow.Buttons.close
+  in
   let d = GWindow.message_dialog
     ~message:s
     ~message_type:mt
-    ~buttons:GWindow.Buttons.close
+    ~buttons
     ~title:"Why3 info or error"
     ~show:true ()
   in
+  let r = ref false in
   let (_ : GtkSignal.id) =
     d#connect#response
-      ~callback:(function `CLOSE | `DELETE_EVENT -> d#destroy ())
+      ~callback:(function x -> r := x = `OK; d#destroy ())
   in
-  ()
+  !r
 
 module Helpers = struct
 
@@ -1283,7 +1290,7 @@ let select_file () =
                   "@[Error while reading file@ '%s':@ %a@]" f
                   Exn_printer.exn_printer e;
 	        let msg = flush_str_formatter () in
-	        info_window `ERROR msg
+	        let (_:bool) = info_window `ERROR msg in ()
       end
   | `DELETE_EVENT | `CANCEL -> ()
   end ;
@@ -1291,7 +1298,7 @@ let select_file () =
 
 
 let not_implemented () =
-  info_window `INFO "This feature is not yet implemented, sorry"
+  let (_:bool) = info_window `INFO "This feature is not yet implemented, sorry" in ()
 
 (*************)
 (* File menu *)
@@ -1482,8 +1489,10 @@ let () =
              ()
          in
          let b = GButton.button ~packing:provers_box#add ~label:n () in
-         let i = GMisc.image ~pixbuf:(!image_prover) ()in
+(* prend de la place pour rien
+         let i = GMisc.image ~pixbuf:(!image_prover) () in
          let () = b#set_image i#coerce in
+*)
          let (_ : GtkSignal.id) =
            b#connect#pressed
              ~callback:(fun () -> prover_on_selected_goals p)
@@ -1788,7 +1797,9 @@ let edit_current_proof () =
     | [] -> ()
     | [r] -> edit_selected_row r
     | _ ->
-	info_window `INFO "Please select exactly one proof to edit"
+	let (_:bool) =
+          info_window `INFO "Please select exactly one proof to edit"
+        in ()
 
 
 let add_item_edit () =
@@ -1820,18 +1831,46 @@ let () =
     b#connect#pressed ~callback:not_implemented
   in ()
 
-(************)
-(* cleaning *)
-(************)
+(*************)
+(* removing  *)
+(*************)
+
+let confirm_remove_row r =
+  let row = filter_model#get_iter r in
+  match filter_model#get ~row ~column:Model.index_column with
+    | Model.Row_goal _g ->
+	let (_:bool) = info_window `ERROR "Cannot remove a goal" in ()
+    | Model.Row_theory _th ->
+	let (_:bool) = info_window `ERROR "Cannot remove a theory" in ()
+    | Model.Row_file _file ->
+	let (_:bool) = info_window `ERROR "Cannot remove a file" in ()
+    | Model.Row_proof_attempt _a ->
+	let (_:bool) = info_window `INFO "Proof attempt removal not implemented" in ()
+    | Model.Row_transformation _tr ->
+	let (_:bool) = info_window `INFO "Transformation removal not implemented" in ()
+(*
+  let b =
+    info_window `QUESTION
+      "Do you really want to remove the current selection?"
+  in
+  if b then remove_selection
+*)
+
+let confirm_remove_selection () =
+  match goals_view#selection#get_selected_rows with
+    | [] -> ()
+    | [r] -> confirm_remove_row r
+    | _ ->
+	let (_:bool) =
+          info_window `INFO "Please select exactly one item to remove"
+        in ()
 
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"Remove" () in
-(*
-  let i = GMisc.image ~pixbuf:(!image_replay) () in
+  let i = GMisc.image ~pixbuf:(!image_remove) () in
   let () = b#set_image i#coerce in
-*)
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:not_implemented
+    b#connect#pressed ~callback:confirm_remove_selection
   in ()
 
 
