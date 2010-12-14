@@ -280,7 +280,16 @@ answer output time
 
   let print_newline fmt () = fprintf fmt "\n"
 
-  let print_csv cmp print_tool print_probs fmt l =
+  let transpose_sorted = function
+    | [] -> []
+    | (_,lres)::_ as l ->
+    let lref = List.map (fun r -> r.prob,ref []) lres in
+    let l = List.rev l in
+    let add (_,lr) res = lr := res :: !lr in
+    List.iter (fun (_,lres) -> List.iter2 add lref lres) l;
+    List.map (fun (b,lr) -> b,!lr) lref
+
+  let print_csv cmp print_tool print_prob fmt l =
     let cmp x y =
       let c = cmp x.prob y.prob in
       if c <> 0 then c else
@@ -288,19 +297,17 @@ answer output time
         let c = String.compare (id x) (id y) in
         if c <> 0 then c else compare x.idtask y.idtask in
     let l = List.map (fun (p,l) -> p,List.fast_sort cmp l) l in
-    fprintf fmt "prover ,";
-    let print_header fmt e = fprintf fmt "%a, " print_probs e.prob in
-    begin match l with
-      | [] -> ()
-      | (_,r)::_ -> Pp.print_list Pp.comma print_header fmt r
-    end;
+    fprintf fmt " ,";
+    let print_header fmt (p,_) = fprintf fmt "%a, " print_tool p in
+    Pp.print_list Pp.comma print_header fmt l;
     print_newline fmt ();
+    let l = transpose_sorted l in
     let print_cell fmt r =
       fprintf fmt "%a, %.3f" (*"%a, %S, %.3f"*)
         print_prover_answer r.result.pr_answer (*r.result.pr_output*)
         r.result.pr_time in
-    let print_line fmt (p,l) =
-      fprintf fmt "%a ," print_tool p;
+    let print_line fmt (b,l) =
+      fprintf fmt "%a ," print_prob b;
       Pp.print_list Pp.comma print_cell fmt l in
     Pp.print_list print_newline print_line fmt l
 
@@ -311,10 +318,10 @@ answer output time
     let step = max /. 10. in
     let tl = List.map (fun (t,l) -> t,compute_timeline 0. max step l) l in
     let print_timeline (tool_val,timeline) =
-      fprintf fmt "@[%a - %a@]@."
+      fprintf fmt "%a - %a\n"
         (Pp.print_list Pp.comma (fun fmt -> fprintf fmt "%4i"))
         timeline print_tool tool_val in
-    fprintf fmt "@[%a@]@."
+    fprintf fmt "%a\n"
       (Pp.print_iter1 (fun f -> Util.iterf f 0. max)
          Pp.comma (fun fmt -> fprintf fmt "%3.2f"))
       step;
@@ -324,8 +331,8 @@ answer output time
   let print_average print_tool fmt l =
     let tool_res = List.map (fun (t,l) -> t,compute_average l) l in
     let print_tool_res (tool_val,tool_res) =
-      fprintf fmt "%a - %a@." print_tool_res tool_res print_tool tool_val in
-    fprintf fmt "(v,t,u,f,i) - valid, unknown, timeout, invalid, failure@.";
+      fprintf fmt "%a - %a\n" print_tool_res tool_res print_tool tool_val in
+    fprintf fmt "(v,u,t,i,f) - valid, unknown, timeout, invalid, failure@.";
     List.iter print_tool_res tool_res
 
 
@@ -340,8 +347,12 @@ answer output time
         pp_print_flush fmt ();
         close_out cout in
     List.iter (function
-      | Average s -> open_std (fun fmt -> print_average print_tool fmt l) s
-      | Timeline s -> open_std (fun fmt -> print_timeline print_tool fmt l) s
+      | Average s -> open_std (fun fmt ->
+        Pp.wnl fmt;
+        print_average print_tool fmt l) s
+      | Timeline s -> open_std (fun fmt ->
+        Pp.wnl fmt;
+        print_timeline print_tool fmt l) s
       | Csv s ->
         open_std (fun fmt -> Pp.wnl fmt;
           print_csv cmp print_tool print_probs fmt l) s
