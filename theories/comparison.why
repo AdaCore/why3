@@ -40,10 +40,16 @@ theory MinMax
   lemma Min_sym: forall x y:t. ge x y -> min x y = min y x
 
 (*
-  logic min (x y : t) : t 
-  axiom Min_def : if ge x y then min x y = y else min x y = x 
+  logic min (x y : t) : t
+  axiom Min_def : if ge x y then min x y = y else min x y = x
   logic max (x y : t) : t
-  axiom Max_def : if ge x y then max x y = x else max x y = y 
+  axiom Max_def : if ge x y then max x y = x else max x y = y
 *)
+
+(*
+  logic min (x y : t) : t = if ge x y then y else x
+  logic max (x y : t) : t = if ge x y then x else y
+*)
+
 
 end
