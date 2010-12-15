@@ -17,7 +17,7 @@
        | "match" ("," term)+ "with" ;
          "|"? ("|" formula-case)+ "end" ; pattern matching
        | quantifier ("," binders )+ ;
-         triggers "." formula  ; quantifier
+         triggers? "." formula  ; quantifier
        | label formula ; label
        | "(" formula ")" ; parentheses
        \
@@ -25,5 +25,9 @@
        \
    binders ::= lident+ ":" type
        \
+   triggers ::= "[" ("|" trigger)+ "]" ;
+     \
+   trigger ::= ("," (term | formula))+;
+     \
    formula-case ::= pattern "->" formula ; %
 \end{syntax}

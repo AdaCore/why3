@@ -28,12 +28,26 @@ The syntax for constants is given Figure~\ref{fig:bnf:constant}.
 \label{fig:bnf:constant}
 \end{figure}
 
+\paragraph{Operators.} Prefix operators have greater priority than
+infix operators. Infix operators are left associative and have
+priorities set as follows, from greatest to lowest priorities:
+\begin{itemize}
+\item operators containing only characters from
+\textit{op-char-4};
+\item those containing
+ characters from \textit{op-char-3} or \textit{op-char-4};
+\item those containing
+ characters from \textit{op-char-2}, \textit{op-char-3} or
+ \textit{op-char-4}; 
+\item all other operators.
+\end{itemize}
+
+\begin{center}\framebox{\input{./operator_bnf.tex}}\end{center}
+
 \paragraph{Terms.}
 The syntax for terms is given Figure~\ref{fig:bnf:term}.
 Note the curryfied syntax for function application, though partial
 application is not allowed (rejected at typing).
-
-% TODO: prefix and infix operators
 
 \begin{figure}[p]
   \begin{center}\framebox{\input{./term_bnf.tex}}\end{center}
@@ -53,8 +67,6 @@ The syntax for formulas is given Figure~\ref{fig:bnf:formula}.
   \caption{Syntax for formulas.}
 \label{fig:bnf:formula}
 \end{figure}
-
-% TODO: triggers
 
 \paragraph{Theories.}
 The syntax for theories is given Figure~\ref{fig:bnf:theory}.
