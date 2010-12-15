@@ -329,13 +329,13 @@ theory Hyperbolic
   logic cosh (x : real) : real = 0.5 * (exp x + exp (-x))
   logic tanh (x : real) : real = sinh x / cosh x
 
-  logic arsinh (x : real) : real = log (x + sqrt (sqr x + 1.0))
-  logic arcosh (x : real) : real
-  axiom Arcosh_def:
-    forall x:real. x >= 1.0 -> arcosh x = log (x + sqrt (sqr x - 1.0))
-  logic artanh (x : real) : real
-  axiom Artanh_def:
-    forall x:real. -1.0 < x < 1.0 -> artanh x = 0.5 * log ((1.0+x)/(1.0-x))
+  logic asinh (x : real) : real = log (x + sqrt (sqr x + 1.0))
+  logic acosh (x : real) : real
+  axiom Acosh_def:
+    forall x:real. x >= 1.0 -> acosh x = log (x + sqrt (sqr x - 1.0))
+  logic atanh (x : real) : real
+  axiom Atanh_def:
+    forall x:real. -1.0 < x < 1.0 -> atanh x = 0.5 * log ((1.0+x)/(1.0-x))
 
 end
 

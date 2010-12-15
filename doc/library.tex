@@ -1,40 +1,143 @@
 \chapter{Standard Library}
 \label{chap:library}
 
+We provide here a short description of logic symbols defined in the
+standard library. Only the most general-purpose ones are
+described. For more details, one shoudl directly read the
+corresponding file.
+
+For each library, we describe the symbols of each theories.
+
+\section{Library bool}
+
 \begin{description}
 
-\item[algebra]
+\item[Bool] boolean data type \verb|bool| with constructors \verb|True| and
+  \verb|False| ; operations \verb|andb|, \verb|orb|, \verb|xorb|, \verb|notb|
 
-\item[int]
-
-division: Euclidean versus Computer
-
-
-\item[array]
-
-\item[bool]
-
-\item[comparison]
-
-\item[floating\_point]
-
-\cite{ayad10ijcar}
-
-\item[graph]
-
-\item[list]
-
-\item[option]
-
-\item[real]
-
-\item[relations]
-
-\item[set]
-
-\item[sum]
+\item[Ite] polymorphic if-then-else operator written as \verb|ite|
 
 \end{description}
+
+\section{Library int}
+
+\begin{description}
+
+\item[Int] basic operations \verb|+|, \verb|-| and \verb|*| ; comparison
+  operators \verb|<|, \verb|>|, \verb|>=| and \verb|<=|.
+
+\item[Abs] absolute value written as \verb|abs|
+
+\item[EuclideanDivision] division and modulo, where division rounds
+  down, written as \verb|div| and \verb|mod|
+
+\item[ComputerDivision] division and modulo, where division rounds to
+  zero, alsos written as \verb|div| and \verb|mod|
+
+\item[MinMax] \verb|min| and \verb|max| operators
+
+\end{description}
+
+\section{Library real}
+
+\begin{description}
+
+\item[Real] basic operations \verb|+|, \verb|-|, \verb|*| and \verb|/| ;
+  comparison operators
+
+\item[RealInfix] basic operations with alternative syntax \verb|+.|,
+  \verb|-.|, \verb|*.|, \verb|/.|, \verb|<.|, \verb|>.|, \verb|<=.| and \verb|>=.|, to
+  allow a simultaneous use of integer and real operators.
+
+\item[Abs] absolute value written as \verb|abs|
+
+\item[MinMax] \verb|min| and \verb|max| operators
+
+\item[FromInt] operator \verb|from_int| to convert an integer to a real.
+
+\item[Truncate] conversion operators from real to integers:
+  \verb|truncate| rounds to 0, \verb|floor| rounds down and
+  \verb|ceil| rounds up
+
+\item[Square] operators \verb|sqr| and \verb|sqrt| for square and square root
+
+\item[ExpLog] functions \verb|exp|, \verb|log|, \verb|log2|, and \verb|log10|
+
+\item[Power] function \verb|pow| with two real parameters.
+
+\item[Trigonometry] functions \verb|cos|, \verb|sin|, \verb|tan|, and
+  \verb|atan|. Constant \verb|pi|.
+
+\item[Hyperbolic] functions \verb|cosh|, \verb|sinh|, \verb|tanh|,
+  \verb|acosh|, \verb|asinh|, \verb|atanh|.
+
+\item[Polar] functions \verb|hypot| and \verb|atan2|.
+
+\end{description}
+
+\section{Library floating\_point}
+
+This library provides a theory of IEEE-754 floating-point numbers. It
+is inspired from~\cite{ayad10ijcar}.
+
+\begin{description}
+\item[Rounding] type \verb|mode| with 5 constants
+  \verb|NearestTiesToEven|, \verb|ToZero|, \verb|Up|, \verb|Down| and
+  \verb|NearTiesToAway|.
+\item[SpecialValues] handling of infinities and NaN
+\item[GenFloat] generic floats parameterized by the maximal
+  representable number. Functions \verb|round|, \verb|value|,
+  \verb|exact|, \verb|model|, predicate \verb|no_overflow|.
+\item[Single] instance of GenFloat for 32-bits single precision numbers
+\item[Double] instance of GenFloat for 64-bits double precision numbers
+\end{description}
+
+
+\section{Library Array}
+
+\begin{description}
+
+\item[Array] polymorphic arrays, a.k.a maps. Type \verb|t|
+  parameterized by both the type of indices and the type of
+  data. Functions \verb|get| and \verb|set| to access and update
+  arrays. Function \verb|create_const| to produce an array initialized
+  by a given constant.
+
+\item[ArrayLength] arrays indexed by integers and holding their
+  length. Function \verb|length|.
+
+\item[ArrayRich] additional functions on arrays indexed by
+  integers. Functions \verb|sub| and \verb|app| to extract a sub-array
+  and append arrays.
+
+\end{description}
+
+\section{Library option}
+
+\begin{description}
+\item[Option] data type \verb|option 'a| with constructors \verb|None| and
+  \verb|Some|.
+\end{description}
+
+
+\section{Library list}
+
+\begin{description}
+\item[List] data type \verb|list 'a| with constructors \verb|Nil| and
+  \verb|Cons|.
+\item[Length] function \verb|length|
+\item[Mem] function \verb|mem| for testing for list membership.
+\item[Nth] function \verb|nth| for extract the $n$-th element.
+\item[HdTl] functions \verb|hd| and \verb|tl|.
+\item[Append] function \verb|append|, concatenation of lists.
+\item[Reverse] function \verb|reverse| for list reversal.
+\item[Sorted] predicate \verb|sorted| for lists of integers.
+\item[NumOcc] number of occurrences in a list
+\item[Permut] list permutations
+\item[Induction] structural induction on lists
+\item[Map] list map operator
+\end{description}
+
 
 
 
