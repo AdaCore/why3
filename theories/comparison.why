@@ -31,13 +31,13 @@ theory MinMax
   axiom Min_is_le   : forall x y:t. ge x (min x y) and ge y (min x y)
   axiom Min_is_some : forall x y:t. min x y = x or min x y = y
 
-(*
   axiom Max_x : forall x y:t. ge x y -> max x y = x
   axiom Max_y : forall x y:t. ge y x -> max x y = y
-  axiom Min_y : forall x y:t. ge x y -> min x y = y
   axiom Min_x : forall x y:t. ge y x -> min x y = x
-*)
+  axiom Min_y : forall x y:t. ge x y -> min x y = y
 
+  lemma Max_sym: forall x y:t. ge x y -> max x y = max y x
+  lemma Min_sym: forall x y:t. ge x y -> min x y = min y x
 
 (*
   logic min (x y : t) : t 

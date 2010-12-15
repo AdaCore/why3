@@ -86,6 +86,13 @@ theory int.Abs
 
 end
 
+theory int.MinMax
+
+  syntax logic min "(Zmin %1 %2)"
+  syntax logic max "(Zmax %1 %2)"
+
+end
+
 theory int.EuclideanDivision
 
   prelude "Require Import Zdiv."
