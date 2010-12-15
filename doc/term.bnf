@@ -9,9 +9,9 @@
          "else" term              ; conditional
        | "let" pattern "=" term "in" term 
                                   ; local binding
-       | "match" ("," term)+ "with" ;
-         "|"? ("|" term-case)+ "end" ; pattern matching
-       | "(" term ("," term)* ")" ; tuple
+       | "match" term ("," term)* "with" ;
+         ("|" term-case)+ "end"          ; pattern matching
+       | "(" term ("," term)+ ")" ; tuple
        | term ":" type 	          ; cast
        | label term 	      	  ; label
        | "(" term ")" 	      	  ; parentheses

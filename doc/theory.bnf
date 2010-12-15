@@ -1,9 +1,9 @@
 \begin{syntax}
   theory ::= "theory" uident label* decl* "end" 
   \
-  decl ::= "type" ("with" type-decl)+	   ;
-    | "logic" ("with" logic-decl)+         ;
-    | "inductive" ("with" inductive-decl)+ ;
+  decl ::= "type" type-decl ("with" type-decl)*	   ;
+    | "logic" logic-decl ("with" logic-decl)*         ;
+    | "inductive" inductive-decl ("with" inductive-decl)* ;
     | "axiom" uident ":" formula 	   ;
     | "lemma" uident ":" formula 	   ;
     | "goal"  uident ":" formula 	   ;
@@ -23,5 +23,5 @@
     | "lemma" uqualid 	  		   ;
     | "goal"  uqualid			   ;
   \
-  tqualid ::= uident | ("." ident)+ "." uident ; %
+  tqualid ::= uident | ident ("." ident)* "." uident ; %
 \end{syntax}

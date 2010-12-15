@@ -14,10 +14,10 @@
        | "if" formula "then" formula ;
          "else" formula        ; conditional
        | "let" pattern "=" term "in" formula ; local binding
-       | "match" ("," term)+ "with" ;
-         "|"? ("|" formula-case)+ "end" ; pattern matching
-       | quantifier ("," binders )+ ;
-         triggers? "." formula  ; quantifier
+       | "match" term ("," term)+ "with" ;
+         ("|" formula-case)+ "end" ; pattern matching
+       | quantifier binders ("," binders )* ;
+         triggers? "." formula              ; quantifier
        | label formula ; label
        | "(" formula ")" ; parentheses
        \
@@ -25,9 +25,11 @@
        \
    binders ::= lident+ ":" type
        \
-   triggers ::= "[" ("|" trigger)+ "]" ;
+   triggers ::= "[" trigger ("|" trigger)* "]" ;
      \
-   trigger ::= ("," (term | formula))+;
+   trigger ::= tr-term ("," tr-term)*	;
+     \
+   tr-term ::= term | formula	;
      \
    formula-case ::= pattern "->" formula ; %
 \end{syntax}

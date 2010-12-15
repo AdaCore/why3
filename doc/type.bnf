@@ -1,6 +1,7 @@
 \begin{syntax}
   type ::= lqualid type*     ; type symbol
        | "'" lident          ; type variable
-       | "(" ("," type)* ")" ; tuple type
+       | "()"		     ; empty tuple type
+       | "(" type ("," type)+ ")" ; tuple type
        | "(" type ")"        ; parentheses %
 \end{syntax}
