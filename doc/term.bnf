@@ -1,15 +1,28 @@
 \begin{syntax}
-  term ::= integer ; integer constant
-       | real ; real constant
-       | qualid ; symbol
-       | prefix-op term ;
-       | term infix-op term ;
-       | lqualid term+ ; function application
-       | "if" formula "then" term "else" term ; conditional
-       | "let" pattern "=" term "in" term ; local binding
-       | "match" ("," term)+ "with" "|"? match-cases "end" ;
+  term ::= integer                ; integer constant
+       | real 			  ; real constant
+       | lqualid 		  ; symbol
+       | prefix-op term 	  ;
+       | term infix-op term 	  ;
+       | lqualid term+ 		  ; function application
+       | "if" formula "then" term ;
+         "else" term              ; conditional
+       | "let" pattern "=" term "in" term 
+                                  ; local binding
+       | "match" ("," term)+ "with" ;
+         "|"? ("|" term-case)+ "end" ; pattern matching
        | "(" term ("," term)* ")" ; tuple
-       | term ":" type ; cast
-       | label term ; label
-       | "(" term ")" ; parentheses%
+       | term ":" type 	          ; cast
+       | label term 	      	  ; label
+       | "(" term ")" 	      	  ; parentheses
+  \
+  term-case ::= pattern "->" term ; 
+  \
+  pattern ::= pattern "|" pattern ; or pattern
+            | pattern "," pattern ; tuple 
+	    | "_"                 ; catch-all
+	    | lident              ; variable
+	    | uident pattern*     ; constructor
+	    | "(" pattern ")" 	  ; parentheses
+	    | pattern "as" lident ; binding %
 \end{syntax}

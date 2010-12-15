@@ -1,0 +1,29 @@
+\begin{syntax}
+  formula ::= "true" | "false" ;
+       | formula "->"  formula ; implication
+       | formula "<->" formula ; equivalence
+       | formula "and" formula ; conjunction
+       | formula "/\"  formula ; asymmetric conjunction
+       | formula "or"  formula ; disjunction
+       | formula "\/"  formula ; asymmetric disjunction
+       | "not" formula         ; negation
+       | lqualid 	       ; symbol
+       | prefix-op term        ;
+       | term infix-op term    ;
+       | lqualid term+         ; predicate application
+       | "if" formula "then" formula ;
+         "else" formula        ; conditional
+       | "let" pattern "=" term "in" formula ; local binding
+       | "match" ("," term)+ "with" ;
+         "|"? ("|" formula-case)+ "end" ; pattern matching
+       | quantifier ("," binders )+ ;
+         triggers "." formula  ; quantifier
+       | label formula ; label
+       | "(" formula ")" ; parentheses
+       \
+   quantifier ::= "forall" | "exists"
+       \
+   binders ::= lident+ ":" type
+       \
+   formula-case ::= pattern "->" formula ; %
+\end{syntax}

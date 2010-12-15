@@ -1,0 +1,13 @@
+\begin{syntax}
+  lalpha ::= "a"-"z" | "_"
+  \
+  ualpha ::= "A"-"Z"
+  \
+  lident ::= lalpha (alpha | digit | "'")*
+  \
+  uident ::= ualpha (alpha | digit | "'")*
+  \
+  lqualid ::= lident | uqualid "." lident ;
+  \
+  uqualid ::= uident | uqualid "." uident ;%
+\end{syntax}

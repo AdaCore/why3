@@ -1,9 +1,32 @@
 \chapter{Syntax Reference}
 \label{chap:syntaxref}
 
-This chapter gives the grammar for the input files
+This chapter gives the grammar for the input files.
 
-\framebox{\input{./term_bnf.tex}}
+TODO: constants
+
+\paragraph{Identifiers.} 
+\begin{center}\framebox{\input{./qualid_bnf.tex}}\end{center}
+
+\paragraph{Terms.}
+The syntax of terms is given Figure~\ref{fig:bnf:term}.
+
+TODO: prefix and infix operators
+
+\begin{figure}
+  \begin{center}\framebox{\input{./term_bnf.tex}}\end{center}
+  \caption{Syntax of terms.}
+\label{fig:bnf:term}
+\end{figure}
+
+\paragraph{Formulas.}
+The syntax of terms is given Figure~\ref{fig:bnf:formula}.
+
+\begin{figure}
+  \begin{center}\framebox{\input{./formula_bnf.tex}}\end{center}
+  \caption{Syntax of formulas.}
+\label{fig:bnf:formula}
+\end{figure}
 
 %%% Local Variables:
 %%% mode: latex

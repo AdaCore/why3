@@ -749,7 +749,8 @@ clean::
 DOC = doc/manual.pdf
 # doc/manual.html
 
-BNF=doc/term_bnf.tex
+BNF = qualid term formula
+BNFTEX = $(addprefix doc/, $(addsuffix _bnf.tex, $(BNF)))
 
 doc/%_bnf.tex: doc/%.bnf doc/bnf
 	doc/bnf $< > $@
@@ -762,7 +763,7 @@ doc: $(DOC)
 
 .PHONY:$(DOC)
 
-doc/manual.pdf: $(BNF) doc/apidoc.tex doc/manual.tex doc/version.tex
+doc/manual.pdf: $(BNFTEX) doc/apidoc.tex doc/manual.tex doc/version.tex
 	cd doc; rubber -d manual.tex
 
 # doc/manual.html: doc/manual.tex doc/version.tex
