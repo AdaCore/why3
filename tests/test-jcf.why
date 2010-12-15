@@ -4,11 +4,6 @@ theory List
 
   type list 'a = Nil | Cons 'a (list 'a)
 
-  use import bool.Bool
-
-  logic x : int = match 1,2 with X u,y -> 3 end
-
-
 end
 
 theory Length

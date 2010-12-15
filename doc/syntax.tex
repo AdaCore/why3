@@ -80,6 +80,18 @@ containing theory \texttt{Int}. Theories referred to without prefix
 either appear earlier in the current file, \eg\ \texttt{List}, or are
 predefined. 
 
+The next declaration defines a recursive function, \emph{length},
+which computes the length of a list. The \texttt{logic} keyword is
+used to introduce or define both function and predicate symbols. 
+\why\ checks every recursive, or mutually recursive, definition for
+termination. Basically, we require a lexicographic and structural
+descent for every recursive call for some reordering of arguments. 
+Note that matching must be exhaustive and that every \texttt{match}
+expression must be terminated by the \texttt{end} keyword.
+
+The last declaration in theory \texttt{Length} is a lemma stating that
+the length of a list is non-negative. 
+
 % \section{Terms and Formulas} *)
 
 % \section{Declarations, Theories} *)
