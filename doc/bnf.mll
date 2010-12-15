@@ -61,6 +61,11 @@ and syntax = parse
       print_string s;
       print_string "} \\sep{}";
       syntax lexbuf }
+  | ";" ([^ '\n']* as s) "%\n" {
+      print_string "& \\textrm{";
+      print_string s;
+      print_string "}";
+      syntax lexbuf }
   | ";" ([^ '\n']* as s) '\n' {
       print_string "& \\textrm{";
       print_string s;

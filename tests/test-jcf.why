@@ -4,6 +4,10 @@ theory List
 
   type list 'a = Nil | Cons 'a (list 'a)
 
+  use import bool.Bool
+
+  logic x : int = if true then 1 else 3
+
 end
 
 theory Length
