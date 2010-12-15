@@ -44,6 +44,7 @@
 	"valid", VALID;
 	"invalid", INVALID;
         "timeout", TIMEOUT;
+        "time",    TIME;
 	"unknown", UNKNOWN;
 	"fail", FAIL;
         "logic", LOGIC;

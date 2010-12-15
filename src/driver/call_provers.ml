@@ -59,6 +59,16 @@ let rec grep out l = match l with
         | HighFailure -> assert false
       with Not_found -> grep out l end
 
+let rec grep_time out = function
+  | [] -> None
+  | (re,pa) :: l ->
+    begin try
+            ignore (Str.search_forward re out 0);
+            let stime = (Str.replace_matched pa out) in
+            Some (Scanf.sscanf stime "%f:%f:%f"
+                    (fun h m s -> h *. 3600. +. m *. 60. +. s))
+      with _ -> grep_time out l end
+
 
 let debug = Debug.register_flag "call_prover"
 
@@ -84,7 +94,7 @@ type post_prover_call = unit -> prover_result
 type bare_prover_call = unit -> post_prover_call
 
 let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
-                   ~regexps ~exitcodes ~filename buffer =
+                   ~regexps ~regexpstime ~exitcodes ~filename buffer =
   let on_stdin = ref true in
   let on_timelimit = ref false in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
@@ -120,9 +130,10 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
             Debug.dprintf debug "Call_provers: exited with status %d@." n;
             (try List.assoc n exitcodes with Not_found -> grep out regexps)
       in
+      let time = Util.default_option time (grep_time out regexpstime) in
       let ans = match ans with
         | HighFailure when !on_timelimit && timelimit > 0
-          && time >= (0.9 *. float timelimit) -> Timeout
+          && time >= (float timelimit -. 0.1) -> Timeout
         | _ -> ans
       in
       { pr_answer = ans;

@@ -33,16 +33,17 @@ open Call_provers
 (** drivers *)
 
 type driver = {
-  drv_env       : Env.env;
-  drv_printer   : string option;
-  drv_filename  : string option;
-  drv_transform : string list;
-  drv_prelude   : prelude;
-  drv_thprelude : prelude_map;
-  drv_meta      : (theory * Stdecl.t) Mid.t;
-  drv_meta_cl   : (theory * Stdecl.t) Mid.t;
-  drv_regexps   : (Str.regexp * prover_answer) list;
-  drv_exitcodes : (int * prover_answer) list;
+  drv_env         : Env.env;
+  drv_printer     : string option;
+  drv_filename    : string option;
+  drv_transform   : string list;
+  drv_prelude     : prelude;
+  drv_thprelude   : prelude_map;
+  drv_meta        : (theory * Stdecl.t) Mid.t;
+  drv_meta_cl     : (theory * Stdecl.t) Mid.t;
+  drv_regexps     : (Str.regexp * prover_answer) list;
+  drv_regexpstime : (Str.regexp * string) list;
+  drv_exitcodes   : (int * prover_answer) list;
 }
 
 (** parse a driver file *)
@@ -71,6 +72,7 @@ exception UnknownProp  of (string list * string list)
 let load_driver = let driver_tag = ref (-1) in fun env file ->
   let prelude   = ref [] in
   let regexps   = ref [] in
+  let regexpstime   = ref [] in
   let exitcodes = ref [] in
   let filename  = ref None in
   let printer   = ref None in
@@ -88,6 +90,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     | RegexpTimeout s -> add_to_list regexps (Str.regexp s, Timeout)
     | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown t)
     | RegexpFailure (s,t) -> add_to_list regexps (Str.regexp s, Failure t)
+    | RegexpTime (r,s) -> add_to_list regexpstime (Str.regexp r,s)
     | ExitCodeValid s -> add_to_list exitcodes (s, Valid)
     | ExitCodeInvalid s -> add_to_list exitcodes (s, Invalid)
     | ExitCodeTimeout s -> add_to_list exitcodes (s, Timeout)
@@ -159,16 +162,17 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
   transform := List.rev !transform;
   incr driver_tag;
   {
-    drv_env       = env;
-    drv_printer   = !printer;
-    drv_prelude   = !prelude;
-    drv_filename  = !filename;
-    drv_transform = !transform;
-    drv_thprelude = !thprelude;
-    drv_meta      = !meta;
-    drv_meta_cl   = !meta_cl;
-    drv_regexps   = List.rev !regexps;
-    drv_exitcodes = List.rev !exitcodes;
+    drv_env         = env;
+    drv_printer     = !printer;
+    drv_prelude     = !prelude;
+    drv_filename    = !filename;
+    drv_transform   = !transform;
+    drv_thprelude   = !thprelude;
+    drv_meta        = !meta;
+    drv_meta_cl     = !meta_cl;
+    drv_regexps     = List.rev !regexps;
+    drv_regexpstime = List.rev !regexpstime;
+    drv_exitcodes   = List.rev !exitcodes;
   }
 
 (** apply drivers *)
@@ -196,10 +200,12 @@ let file_of_task drv input_file theory_name task =
 
 let call_on_buffer ~command ?timelimit ?memlimit drv buffer =
   let regexps = drv.drv_regexps in
+  let regexpstime = drv.drv_regexpstime in
   let exitcodes = drv.drv_exitcodes in
   let filename = get_filename drv "" "" "" in
   Call_provers.call_on_buffer
-    ~command ?timelimit ?memlimit ~regexps ~exitcodes ~filename buffer
+    ~command ?timelimit ?memlimit ~regexps ~regexpstime
+    ~exitcodes ~filename buffer
 
 (** print'n'prove *)
 

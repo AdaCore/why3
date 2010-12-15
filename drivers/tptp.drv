@@ -10,6 +10,9 @@ timeout "Resource limit exceeded"
 timeout "CPU time limit exceeded"
 unknown "No Proof Found"            "Unknown"
 fail    "Failure.*"                   "\"\\0\""
+time    "\\([0-9]+:[0-9]+:[0-9]+.[0-9]*\\) on the problem" "\\1"
+time    "Total time[ ]*: \\([0-9]+.[0-9]*\\) s" "0:0:\\1"
+
 
 (* to be improved *)
 

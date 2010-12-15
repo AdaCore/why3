@@ -66,12 +66,13 @@ type bare_prover_call = unit -> post_prover_call
 (** Thread-safe closure that executes a prover on a task. *)
 
 val call_on_buffer :
-  command    : string ->
-  ?timelimit : int ->
-  ?memlimit  : int ->
-  regexps    : (Str.regexp * prover_answer) list ->
-  exitcodes  : (int * prover_answer) list ->
-  filename   : string ->
+  command     : string ->
+  ?timelimit  : int ->
+  ?memlimit   : int ->
+  regexps     : (Str.regexp * prover_answer) list ->
+  regexpstime : (Str.regexp * string) list ->
+  exitcodes   : (int * prover_answer) list ->
+  filename    : string ->
   Buffer.t -> bare_prover_call
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
 
@@ -82,6 +83,11 @@ val call_on_buffer :
     the second field is the answer. Regexp groups present in
     the first field are substituted in the second field (\0,\1,...).
     The regexps are tested in the order of the list.
+
+    @param regexpstime : if the first field matches the prover output,
+    the second field is the time in the format "%f:%f:%f" (h:m:s)
+    after substitution of matching groups. Otherwise wallclock is
+    used. The regexps are tested in the order of the list.
 
     @param exitcodes : if the first field is the exit code, then
     the second field is the answer. Exit codes are tested in the order
