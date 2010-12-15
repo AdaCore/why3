@@ -622,11 +622,14 @@ clean::
 # tools
 #######
 
-TOOLS = bin/why3-cpulimit
+TOOLS = bin/why3-cpulimit bin/why3-cpulimit_time
 
 byte opt: $(TOOLS)
 
 bin/why3-cpulimit: src/tools/@CPULIMIT@.c
+	$(CC) -Wall -o $@ $^
+
+bin/why3-cpulimit_time: src/tools/@CPULIMIT@_time.c
 	$(CC) -Wall -o $@ $^
 
 clean::
@@ -634,6 +637,7 @@ clean::
 
 install_no_local::
 	cp -f bin/why3-cpulimit $(BINDIR)
+	cp -f bin/why3-cpulimit_time $(BINDIR)
 
 ########
 # bench
