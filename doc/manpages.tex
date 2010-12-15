@@ -103,8 +103,64 @@ The provers which are typically attemped for detection are
 \item Z3~\cite{z3}: \url{}
 \end{itemize}
 
+\texttt{why3config} also detects the plugin installed in the Why3
+plugins directory (\eg{} \texttt{/usr/local/lib/why3/plugins}). A
+plugin must register itself as a parser, a transformation or a
+printer, as explained in the corresponding section.
+
+If the user's configuration file is already present,
+\texttt{why3config} will only reset unset variables to default value.
+The option \texttt{autodetect-provers} will detect again the available
+provers and will replace them in the file configuration.
+\texttt{autodetect-plugins} will do the same for plugins.
+
 \section{The \texttt{why3} command-line tool}
 \label{sec:why3ref}
+
+Why3 is primarily used to call provers on goals contains by file in
+why3 format \texttt{.why} extension. However plugins can register
+parser which can extend the known format. \texttt{why3ml} apply the
+following steps :
+\begin{enumerate}
+\item Parse the command line and report error if needed
+\item Read the configuration file using the priority defined in
+  section\ref{sec:whyconffile}
+\item Load the plugins mentionned in the configuration. It will not
+  stop if a plugin fail to load.
+\item Parse and type the given files using the correct parser in order
+  to obtain a set of why theory for each files. It uses
+  the filename extension or the \texttt{--format} options to choose
+  among the available parsers. \texttt{--list-format} gives the list
+  of them.
+\item Extract the selected goals inside each selected theories into
+  tasks. The goals and theories are selected using the options
+  \texttt{-G/--goal} and \texttt{-T/--theory}. One
+  \texttt{-T/--theory} applies to the last file appearing on the
+  commandline, one \texttt{-G/--goal} applies to the last theory
+  appearing on the commandline. If none theories are selected in one
+  file, they are all selected. If none goals are selected inside one
+  selected theory, they are all selected.
+\item Apply the transformation requested
+  with \texttt{-a/--apply-transform} in the order they appear on the
+  command line. \texttt{--list-transforms} list the known
+  transformations, plugins can add more of them.
+\item Apply the driver selected with the \texttt{-D/--driver} option,
+  or the driver of the prover selected with \texttt{-P/--prover}
+  option. \texttt{--list-provers} lists the known provers, ie the one
+  which appear in the configuration file.
+\item Print the result of the standard output if \texttt{-D/--driver}
+  is used or call the prover and print the result if
+  \texttt{-P/--prover} is used.
+\end{enumerate}
+
+\texttt{why3} call the prover sequentially, use \texttt{why3bench} if
+you want to call the provers concurrently. \texttt{Why3} can also be
+used to provide other informations :
+\begin{itemize}
+\item \texttt{print-namespace} print the namespace of the selected
+  theories
+\item TODO
+\end{itemize}
 
 \section{The \texttt{why3ml} tool}
 
@@ -151,9 +207,76 @@ The provers which are typically attemped for detection are
 
 [TODO]
 
+\section{The \texttt{why3bench} tool}
+
 \section{The \texttt{why.conf} configuration file}
+\label{sec:whyconffile}
+One can defined more than one configuration file. \texttt{why3config}
+and all the others \texttt{why3}'s tools use priorities for which
+user's configuration file to consider:
+\begin{itemize}
+\item the file specified by the \texttt{-C} or \texttt{--config} options,
+\item the file specified by the environment variable
+  \texttt{\$WHY\_CONFIG} if set.
+\item the file \texttt{why.conf} or \texttt{.why.conf} in the current
+  directory.
+\item the file \texttt{\$HOME/.why.conf} or \texttt{\$USERPROFILE/.why.conf}
+\end{itemize}
+If none of this file exists a built-in default configuration is used
+which is saved in a default configuration filename, which is usually
+\texttt{\$HOME/.why.conf}.
+
+The configuration file is a human-readable text file, which is
+composed by association pairs arranged by sections. Here an example of
+a configuration file.
+
+\begin{verbatim}
+[main ]
+datadir = "/usr/local/share/why3"
+libdir = "/usr/local/lib/why3"
+loadpath = "/usr/local/share/why3/theories"
+memlimit = 0
+running_provers_max = 2
+timelimit = 10
+
+[ide ]
+default_editor = "emacs"
+task_height = 384
+tree_width = 438
+verbose = 0
+window_height = 779
+window_width = 638
+
+[prover coq]
+command = "coqc %f"
+driver = "/usr/local/share/why3/drivers/coq.drv"
+editor = "coqide"
+name = "Coq"
+version = "8.2pl2"
+
+[prover alt-ergo]
+command = "why3-cpulimit %t %m alt-ergo %f"
+driver = "/usr/local/share/why3/drivers/alt_ergo.drv"
+editor = ""
+name = "Alt-Ergo"
+version = "0.91"
+\end{verbatim}
+
+A section begin with an header inside square brackets and end at the
+next square brackets. Sections can't be nested. The header of a
+section can be only one identifier, \texttt{main} and \texttt{ide} in
+the example, or it can be composed by a family name and one family
+argument, \texttt{prover} is one family name, \texttt{coq} and
+\texttt{alt-ergo} are the family argument.
+
+
+Inside a section, one key can be associated to an integer (.eg -555),
+a boolean (true, false) or a string (.eg "emacs"). One key can appear
+only once except if its a multi-value key. The order of apparition of
+the keys inside a section matter only for the multi-value key.
 
 \section{Drivers of external provers}
+The drivers of external provers are 
 
 \section{Transformations}
 
