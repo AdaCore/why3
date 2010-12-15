@@ -749,11 +749,20 @@ clean::
 DOC = doc/manual.pdf
 # doc/manual.html
 
+BNF=doc/term_bnf.tex
+
+doc/%_bnf.tex: doc/%.bnf doc/bnf
+	doc/bnf $< > $@
+
+doc/bnf: doc/bnf.mll
+	$(OCAMLLEX) $<
+	$(OCAMLOPT) -o $@ doc/bnf.ml
+
 doc: $(DOC)
 
 .PHONY:$(DOC)
 
-doc/manual.pdf: doc/apidoc.tex doc/manual.tex doc/version.tex
+doc/manual.pdf: $(BNF) doc/apidoc.tex doc/manual.tex doc/version.tex
 	cd doc; rubber -d manual.tex
 
 # doc/manual.html: doc/manual.tex doc/version.tex
