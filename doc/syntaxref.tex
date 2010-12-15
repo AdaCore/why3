@@ -5,27 +5,44 @@ This chapter gives the grammar for the input files.
 
 TODO: constants
 
-\paragraph{Identifiers.} 
+\paragraph{Identifiers.} The syntax distinguishes lowercase and
+uppercase identifiers and, consequently, lowercase and uppercase
+qualified identifiers.
+ 
 \begin{center}\framebox{\input{./qualid_bnf.tex}}\end{center}
 
-\paragraph{Terms.}
-The syntax of terms is given Figure~\ref{fig:bnf:term}.
+\paragraph{Type Expressions.} The syntax for type
+expressions notably differs from the usual ML syntax.
+\begin{center}\framebox{\input{./type_bnf.tex}}\end{center}
+
+\paragraph{Terms and Types.}
+The syntax for terms is given Figure~\ref{fig:bnf:term}.
+Note the curryfied syntax for function application, though partial
+application is not allowed (rejected at typing).
 
 TODO: prefix and infix operators
 
 \begin{figure}
   \begin{center}\framebox{\input{./term_bnf.tex}}\end{center}
-  \caption{Syntax of terms.}
+  \caption{Syntax for terms.}
 \label{fig:bnf:term}
 \end{figure}
 
 \paragraph{Formulas.}
-The syntax of terms is given Figure~\ref{fig:bnf:formula}.
+The syntax for formulas is given Figure~\ref{fig:bnf:formula}.
 
 \begin{figure}
   \begin{center}\framebox{\input{./formula_bnf.tex}}\end{center}
-  \caption{Syntax of formulas.}
+  \caption{Syntax for formulas.}
 \label{fig:bnf:formula}
+\end{figure}
+
+\paragraph{Theories.}
+
+\begin{figure}
+  \begin{center}\framebox{\input{./theory_bnf.tex}}\end{center}
+  \caption{Syntax for theories.}
+\label{fig:bnf:theory}
 \end{figure}
 
 %%% Local Variables:

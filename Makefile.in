@@ -749,7 +749,7 @@ clean::
 DOC = doc/manual.pdf
 # doc/manual.html
 
-BNF = qualid term formula
+BNF = qualid type term formula theory
 BNFTEX = $(addprefix doc/, $(addsuffix _bnf.tex, $(BNF)))
 
 doc/%_bnf.tex: doc/%.bnf doc/bnf
