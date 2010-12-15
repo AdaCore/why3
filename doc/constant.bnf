@@ -1,0 +1,28 @@
+\begin{syntax}
+  digit ::= "0" - "9" ; 
+  \
+  hex-digit ::= digit | "a" - "f" | "A" - "F" ;
+  \ 
+  oct-digit ::= "0" - "7" 
+  \ 
+  bin-digit ::= "0" | "1" 
+  \ 
+  integer ::= digit (digit | "_")*               ; decimal
+    | ("0x" | "0X") hex-digit (hex-digit | "_")* ; hexadecimal
+    | ("0o" | "0O") oct-digit (oct-digit | "_")* ; octal
+    | ("0b" | "0B") bin-digit (bin-digit | "_")* ; octal
+  \
+  real ::= digit+ exponent        ; decimal
+    | digit+ "." digit* exponent? ;
+    | digit* "." digit+ exponent? ;
+    | ("0x" | "0X") hex-real h-exponent ; hexadecimal
+  \
+  hex-real ::= hex-digit+ ;
+    | hex-digit+ "." hex-digit* ;
+    | hex-digit* "." hex-digit+ ;
+    \
+  exponent ::= ("e" | "E") ("-" | "+")? digit+ ;
+  \
+  h-exponent ::= ("p" | "P") ("-" | "+")? digit+ ;
+    |   ; %
+\end{syntax}

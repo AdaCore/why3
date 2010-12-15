@@ -1,5 +1,27 @@
 \begin{syntax}
   theory ::= "theory" uident label* decl* "end" 
   \
-  decl ::= %
+  decl ::= "type" ("with" type-decl)+	   ;
+    | "logic" ("with" logic-decl)+         ;
+    | "inductive" ("with" inductive-decl)+ ;
+    | "axiom" uident ":" formula 	   ;
+    | "lemma" uident ":" formula 	   ;
+    | "goal"  uident ":" formula 	   ;
+    | "use" imp-exp tqualid ("as" uident-opt)?     ; 
+    | "clone" imp-exp tqualid ("as" uident-opt)? subst? ;	   
+    | "namespace" "import"? uident-opt decl* "end" ;
+  \
+  imp-exp ::= ("import" | "export")?
+  \
+  uident-opt ::= uident | "_"
+  \
+  subst ::= "with" ("," subst-elt)+
+  \
+  subst-elt ::= "type" lqualid "=" lqualid ;
+    | "logic" lqualid "=" lqualid          ;
+    | "namespace" (uqualid | ".") "=" (uqualid | ".")  ;
+    | "lemma" uqualid 	  		   ;
+    | "goal"  uqualid			   ;
+  \
+  tqualid ::= uident | ("." ident)+ "." uident ; %
 \end{syntax}

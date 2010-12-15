@@ -1,45 +1,65 @@
 \chapter{Syntax Reference}
 \label{chap:syntaxref}
 
-This chapter gives the grammar for the input files.
+This chapter gives the grammar for \why\ input files.
 
-TODO: constants
+% TODO: blanks
+
+\paragraph{Comments.}
+Comments are enclosed by \texttt{(*} and \texttt{*)} and can be nested.
+
+\paragraph{Strings.}
+Strings are enclosed by double quotes (\verb!"!).
+
+% TODO: escape sequences for strings
 
 \paragraph{Identifiers.} The syntax distinguishes lowercase and
-uppercase identifiers and, consequently, lowercase and uppercase
+uppercase identifiers and, similarly, lowercase and uppercase
 qualified identifiers.
  
 \begin{center}\framebox{\input{./qualid_bnf.tex}}\end{center}
 
-\paragraph{Type Expressions.} The syntax for type
-expressions notably differs from the usual ML syntax.
-\begin{center}\framebox{\input{./type_bnf.tex}}\end{center}
+\paragraph{Constants.}
+The syntax for constants is given Figure~\ref{fig:bnf:constant}.
 
-\paragraph{Terms and Types.}
+\begin{figure}[p]
+\begin{center}\framebox{\input{./constant_bnf.tex}}\end{center}
+  \caption{Syntax for constants.}
+\label{fig:bnf:constant}
+\end{figure}
+
+\paragraph{Terms.}
 The syntax for terms is given Figure~\ref{fig:bnf:term}.
 Note the curryfied syntax for function application, though partial
 application is not allowed (rejected at typing).
 
-TODO: prefix and infix operators
+% TODO: prefix and infix operators
 
-\begin{figure}
+\begin{figure}[p]
   \begin{center}\framebox{\input{./term_bnf.tex}}\end{center}
   \caption{Syntax for terms.}
 \label{fig:bnf:term}
 \end{figure}
 
+\paragraph{Type Expressions.} The syntax for type
+expressions notably differs from the usual ML syntax.
+\begin{center}\framebox{\input{./type_bnf.tex}}\end{center}
+
 \paragraph{Formulas.}
 The syntax for formulas is given Figure~\ref{fig:bnf:formula}.
 
-\begin{figure}
+\begin{figure}[p]
   \begin{center}\framebox{\input{./formula_bnf.tex}}\end{center}
   \caption{Syntax for formulas.}
 \label{fig:bnf:formula}
 \end{figure}
 
-\paragraph{Theories.}
+% TODO: triggers
 
-\begin{figure}
+\paragraph{Theories.}
+The syntax for theories is given Figure~\ref{fig:bnf:theory}.
+
+\begin{figure}[p]
   \begin{center}\framebox{\input{./theory_bnf.tex}}\end{center}
   \caption{Syntax for theories.}
 \label{fig:bnf:theory}

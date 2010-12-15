@@ -3,9 +3,13 @@
   \
   ualpha ::= "A"-"Z"
   \
+  alpha ::= lalpha | ualpha
+  \
   lident ::= lalpha (alpha | digit | "'")*
   \
   uident ::= ualpha (alpha | digit | "'")*
+  \
+  ident ::= lident | uident
   \
   lqualid ::= lident | uqualid "." lident ;
   \
