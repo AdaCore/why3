@@ -91,28 +91,28 @@ of the same prover, or with different options.
 
 The provers which are typically attemped for detection are
 \begin{itemize}
-\item Alt-Ergo~\cite{conchon08smt,ergo}: \url{}
-\item CVC3~\cite{BarTin-CAV-07}: \url{}
-\item Coq~\cite{CoqArt}: \url{}
-\item Eprover~: \url{}
-\item Gappa~\cite{melquiond08rnc}: \url{}
-\item Simplify~\cite{simplify05}: \url{}
-\item Spass~: \url{}
-\item veriT~: \url{}
-\item Yices~\cite{DM06}: \url{}
-\item Z3~\cite{z3}: \url{}
+\item Alt-Ergo~\cite{conchon08smt,ergo}: \url{http://alt-ergo.lri.fr}
+\item CVC3~\cite{BarTin-CAV-07}: \url{http://cs.nyu.edu/acsys/cvc3/}
+\item Coq~\cite{CoqArt}: \url{http://coq.inria.fr}
+\item Eprover~\cite{schulz04ijcar}: \url{http://www4.informatik.tu-muenchen.de/~schulz/WORK/eprover.html}
+\item Gappa~\cite{melquiond08rnc}: \url{http://gappa.gforge.inria.fr/}
+\item Simplify~\cite{simplify05}: \url{http://secure.ucd.ie/products/opensource/Simplify/}
+\item Spass~: \url{http://www.spass-prover.org/}
+\item veriT~: \url{http://www.verit-solver.org/}
+\item Yices~\cite{DM06}: \url{http://yices.csl.sri.com/}
+\item Z3~\cite{z3}: \url{http://research.microsoft.com/en-us/um/redmond/projects/z3/}
 \end{itemize}
 
-\texttt{why3config} also detects the plugin installed in the Why3
+\texttt{why3config} also detects the plugins installed in the Why3
 plugins directory (\eg{} \texttt{/usr/local/lib/why3/plugins}). A
 plugin must register itself as a parser, a transformation or a
 printer, as explained in the corresponding section.
 
 If the user's configuration file is already present,
 \texttt{why3config} will only reset unset variables to default value.
-The option \texttt{autodetect-provers} will detect again the available
+The option \texttt{--autodetect-provers} will detect again the available
 provers and will replace them in the file configuration.
-\texttt{autodetect-plugins} will do the same for plugins.
+\texttt{--autodetect-plugins} will do the same for plugins.
 
 \section{The \texttt{why3} command-line tool}
 \label{sec:why3ref}
@@ -173,12 +173,24 @@ used to provide other informations :
 \item[-I] $d$: adds $d$ in the load path, to search for theories.
 \end{description}
 
-\subsection{Left toolbar}
+\subsection{Left toolbar actions}
 
 \begin{description}
+\item[Context] The context in which the other tools below will
+  apply. If ``only unproved goals'' is selected, no action will ever
+  be applied to an already proved goal.  If ``all goals'', then
+  actions are performed even if the goal is already proved. The second
+  choice allows to compare provers on the same goal.
+
 \item[Provers] To each detected prover corresponds to a button in this
   prover framed box. Clicking on this button starts the prover on the
   selected goal(s).
+
+\item[Split] This splits the current goal into subgoals if it is a
+  conjunction of two or more goals.
+
+\item[Inline] If the goal is headed by a defined predicate symbol,
+  expands it with this definition. [NOT YET AVAILABLE]
 
 \item[Edit] Start an editor on the selected task.
 
@@ -189,23 +201,34 @@ used to provide other informations :
   corresponding proof script. The modifications are saved, and can be
   retrieved later even if the goal was modified.
 
-\item[Split] This splits the current goal into subgoals if it is a
-  conjunction of two or more goals.
+\item[Replay] replay all obsolete proofs [NOT YET AVAILABLE]
+
+\item[Remove] Remove a proof attempt or a transformation. [NOT YET AVAILABLE]
 
 \end{description}
 
 \subsection{Menus}
 
 \begin{description}
-\item[File/Detect provers] 
-
+\item[File/Detect provers] runs provers auto-detection
+\item[File/Preferences] opens a window for modifying preferred configuration
 \end{description}
 
 \subsection{Preferences}
 
+The preferences window allows you customize
+\begin{itemize}
+\item the default editor to use when the \textsf{Edit} button is
+  pressed. This might be overidden for a specific prover (the only way
+  to do that for the moment is to manually edit the config file)
+\item the time limit given to provers, in seconds
+\item the maximal number of simultaneous provers allowed to run in parallel. 
+\end{itemize}
+
+
 \subsection{Structure of the database file}
 
-[TODO]
+[TO BE COMPLETED]
 
 \section{The \texttt{why3bench} tool}
 
@@ -279,6 +302,7 @@ the keys inside a section matter only for the multi-value key.
 The drivers of external provers are 
 
 \section{Transformations}
+\label{sec:transformations}
 
 \subsection{Non-splitting transformations}
 

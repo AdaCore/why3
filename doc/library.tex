@@ -3,10 +3,25 @@
 
 We provide here a short description of logic symbols defined in the
 standard library. Only the most general-purpose ones are
-described. For more details, one shoudl directly read the
-corresponding file.
+described. For more details, one should directly read the
+corresponding file, or alternatively, use the \verb|why3| with option \verb|-T| and a qualified theory name, \eg
+\begin{verbatim}
+> why3 -T bool.Ite
+theory Ite
+  (* use BuiltIn *)
+  
+  (* use Bool *)
+  
+  logic ite (b:bool) (x:'a) (y:'a) : 'a =
+    match b with
+    | True -> x
+    | False -> y
+    end
+end
+\end{verbatim}
 
-For each library, we describe the symbols of each theories.
+In the following, for each library, we describe the (main) symbols of
+each theories defined
 
 \section{Library bool}
 
@@ -32,7 +47,7 @@ For each library, we describe the symbols of each theories.
   down, written as \verb|div| and \verb|mod|
 
 \item[ComputerDivision] division and modulo, where division rounds to
-  zero, alsos written as \verb|div| and \verb|mod|
+  zero, also written as \verb|div| and \verb|mod|
 
 \item[MinMax] \verb|min| and \verb|max| operators
 

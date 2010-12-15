@@ -10,7 +10,7 @@
   integer ::= digit (digit | "_")*               ; decimal
     | ("0x" | "0X") hex-digit (hex-digit | "_")* ; hexadecimal
     | ("0o" | "0O") oct-digit (oct-digit | "_")* ; octal
-    | ("0b" | "0B") bin-digit (bin-digit | "_")* ; octal
+    | ("0b" | "0B") bin-digit (bin-digit | "_")* ; binary
   \
   real ::= digit+ exponent        ; decimal
     | digit+ "." digit* exponent? ;
