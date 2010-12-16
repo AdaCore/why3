@@ -8,21 +8,21 @@ theory Bijection
   type t
   type u
 
-  logic _of t : u
-  logic _to u : t
+  logic of t : u
+  logic to u : t
 
-  axiom To_of : forall x : t. _to(_of(x)) = x
-  axiom Of_to : forall y : u. _of(_to(y)) = y
+  axiom To_of : forall x : t. to (of x) = x
+  axiom Of_to : forall y : u. of (to y) = y
 end
 
 theory Einstein "Einstein's problem"
   (* Types *)
-  type house = H1 | H2 | H3 | H4 | H5
-  type color = Blue | Green | Red | White | Yellow
+  type house  = H1 | H2 | H3 | H4 | H5
+  type color  = Blue | Green | Red | White | Yellow
   type person = Dane | Englishman | German | Norwegian | Swede
-  type drink = Beer | Coffee | Milk | Tea | Water
-  type cigar = Blend | BlueMaster | Dunhill | PallMall | Prince
-  type pet = Birds | Cats | Dogs | Fish | Horse
+  type drink  = Beer | Coffee | Milk | Tea | Water
+  type cigar  = Blend | BlueMaster | Dunhill | PallMall | Prince
+  type pet    = Birds | Cats | Dogs | Fish | Horse
   
   (* Each house is associated bijectively to a color and a person *)
   clone Bijection as Color with type t = house, type u = color
@@ -31,76 +31,76 @@ theory Einstein "Einstein's problem"
   (* Each drink, cigar brand and pet are associated bijectively to a person *)
   clone Bijection as Drink with type t = person, type u = drink
   clone Bijection as Cigar with type t = person, type u = cigar
-  clone Bijection as Pet with type t = person, type u = pet
+  clone Bijection as Pet   with type t = person, type u = pet
 
   (* Relative positions of the houses *)
-  logic left_of (h1 h2 : house) =
+  logic leftof (h1 h2 : house) =
     match h1, h2 with
-    | H1, H2 -> true
-    | H2, H3 -> true
-    | H3, H4 -> true
+    | H1, H2 
+    | H2, H3 
+    | H3, H4 
     | H4, H5 -> true
-    | _, _ -> false
+    | _      -> false
     end
-  logic right_of (h1 h2 : house) =
-    left_of h2 h1
+  logic rightof (h1 h2 : house) =
+    leftof h2 h1
   logic neighbour (h1 h2 : house) =
-    left_of h1 h2 \/ right_of h1 h2
+    leftof h1 h2 or rightof h1 h2
 end
 
 theory EinsteinHints "Hints"
   use import Einstein
 
   (* The Englishman lives in a red house *)
-  axiom Hint1: Color._of (Owner._to Englishman) = Red
+  axiom Hint1: Color.of (Owner.to Englishman) = Red
 
   (* The Swede has dogs *)
-  axiom Hint2: Pet._of Swede = Dogs
+  axiom Hint2: Pet.of Swede = Dogs
 
   (* The Dane drinks tea *)
-  axiom Hint3: Drink._of Dane = Tea
+  axiom Hint3: Drink.of Dane = Tea
 
   (* The green house is on the left of the white one *)
-  axiom Hint4: left_of (Color._to Green) (Color._to White)
+  axiom Hint4: leftof (Color.to Green) (Color.to White)
 
   (* The green house's owner drinks coffee *)
-  axiom Hint5: Drink._of (Owner._of (Color._to Green)) = Coffee
+  axiom Hint5: Drink.of (Owner.of (Color.to Green)) = Coffee
 
   (* The person who smokes Pall Mall has birds *)
-  axiom Hint6: Pet._of (Cigar._to PallMall) = Birds
+  axiom Hint6: Pet.of (Cigar.to PallMall) = Birds
 
   (* The yellow house's owner smokes Dunhill *)
-  axiom Hint7: Cigar._of (Owner._of (Color._to Yellow)) = Dunhill
+  axiom Hint7: Cigar.of (Owner.of (Color.to Yellow)) = Dunhill
 
   (* In the house in the center lives someone who drinks milk *)
-  axiom  Hint8: Drink._of (Owner._of H3) = Milk
+  axiom  Hint8: Drink.of (Owner.of H3) = Milk
 
   (* The Norwegian lives in the first house *)
-  axiom Hint9: Owner._of H1 = Norwegian
+  axiom Hint9: Owner.of H1 = Norwegian
 
   (* The man who smokes Blends lives next to the one who has cats *)
   axiom Hint10: neighbour 
-    (Owner._to (Cigar._to Blend)) (Owner._to (Pet._to Cats))
+    (Owner.to (Cigar.to Blend)) (Owner.to (Pet.to Cats))
 
   (* The man who owns a horse lives next to the one who smokes Dunhills *)
   axiom Hint11: neighbour
-    (Owner._to (Pet._to Horse)) (Owner._to (Cigar._to Dunhill))
+    (Owner.to (Pet.to Horse)) (Owner.to (Cigar.to Dunhill))
 
   (* The man who smokes Blue Masters drinks beer *)
   axiom Hint12:
-    Drink._of (Cigar._to BlueMaster) = Beer
+    Drink.of (Cigar.to BlueMaster) = Beer
 
   (* The German smokes Prince *)
   axiom Hint13:
-    Cigar._of German = Prince
+    Cigar.of German = Prince
 
   (* The Norwegian lives next to the blue house *)
   axiom Hint14:
-    neighbour (Owner._to Norwegian) (Color._to Blue)
+    neighbour (Owner.to Norwegian) (Color.to Blue)
 
   (* The man who smokes Blends has a neighbour who drinks water *)
   axiom Hint15:
-    neighbour (Owner._to (Cigar._to Blend)) (Owner._to (Drink._to Water))
+    neighbour (Owner.to (Cigar.to Blend)) (Owner.to (Drink.to Water))
 
 end
 
@@ -108,20 +108,20 @@ theory Goals "Goals about Einstein's problem"
   use import Einstein
   use import EinsteinHints
 
-  (* lemma First_House_Not_White: Color._of H1 <> White *)
-  (* lemma Last_House_Not_Green: Color._of H5 <> Green *)
+  (* lemma First_House_Not_White: Color.of H1 <> White *)
+  (* lemma Last_House_Not_Green: Color.of H5 <> Green *)
 
   (* lemma Blue_not_Red: Blue <> Red *)
-  (* lemma Englishman_not_H2: Owner._to Englishman <> H2 *)
-  (* lemma Englishman_not_H1: Owner._to Englishman <> H1 *)
+  (* lemma Englishman_not_H2: Owner.to Englishman <> H2 *)
+  (* lemma Englishman_not_H1: Owner.to Englishman <> H1 *)
 
-  (* lemma Second_House_Blue: Color._of H2 = Blue *)
-  (* lemma Green_H4 : Color._of H4 = Green *)
-  (* lemma White_H5 : Color._of H5 = White *)
-  (* lemma Red_H3 : Color._of H3 = Red *)
-  (* lemma Yellow_H1 : Color._of H1 = Yellow *)
+  (* lemma Second_House_Blue: Color.of H2 = Blue *)
+  (* lemma Green_H4 : Color.of H4 = Green *)
+  (* lemma White_H5 : Color.of H5 = White *)
+  (* lemma Red_H3 : Color.of H3 = Red *)
+  (* lemma Yellow_H1 : Color.of H1 = Yellow *)
 
-  goal G: Pet._to Fish = German
+  goal G: Pet.to Fish = German
 
 end
 

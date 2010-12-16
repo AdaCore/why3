@@ -1,5 +1,7 @@
 \documentclass[a4paper,11pt,twoside,openright]{memoir}
 
+% rubber: module index
+
 \usepackage[T1]{fontenc}
 %\usepackage{url}
 \usepackage[a4paper,pdftex,colorlinks=true,urlcolor=blue,pdfstartview=FitH]{hyperref}
@@ -23,6 +25,8 @@
 \input{./macros.tex}
 
 \input{./version.tex}
+
+\makeindex
 
 \begin{document}
 \sloppy
@@ -166,14 +170,17 @@ Initial release.
 
 \input{manpages.tex}
 
-\chapter{Complete API documentation}
-\label{chap:apidoc}
+% \chapter{Complete API documentation} *)
+% \label{chap:apidoc} *)
 
-\input{./apidoc.tex}
+% \input{./apidoc.tex} *)
 
 \bibliographystyle{abbrv}
 \bibliography{manual}
 %\input{biblio-demons}
+
+\cleardoublepage
+\printindex
 
 \end{document}
 
