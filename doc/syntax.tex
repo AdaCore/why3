@@ -51,7 +51,7 @@ theory Sorted
   use import List
   use import int.Int
  
-  inductive sorted (l : list int) =
+  inductive sorted (list int) =
     | Sorted_Nil : 
         sorted Nil
     | Sorted_One : 
@@ -92,11 +92,22 @@ expression must be terminated by the \texttt{end} keyword.
 The last declaration in theory \texttt{Length} is a lemma stating that
 the length of a list is non-negative. 
 
-% \section{Terms and Formulas} *)
+The third theory, \texttt{Sorted}, demonstrates the definition of
+an inductive predicate. Every such definition is a list of clauses:
+universally closed implications where the consequent is an instance
+of the defined predicate. Moreover, the defined predicate may only
+occur in positive positions in the antecedent. For example, a clause:
+\begin{verbatim}
+  | Sorted_Bad :
+      forall x y : int, l : list int.
+      (sorted (Cons y l) -> y > x) -> sorted (Cons x (Cons y l))
+\end{verbatim}
+would not be allowed. This positivity condition assures the logical
+soundness of an inductive definition.
 
-% \section{Declarations, Theories} *)
-
-% \section{Using and Cloning Theories} *)
+Note that the type signature of \texttt{sorted} predicate does not
+include the name of a parameter (see \texttt{l} in the definition
+of \texttt{length}): it is unused and therefore optional.
 
 \section*{Another Example}
 \index{Einstein's logic problem}

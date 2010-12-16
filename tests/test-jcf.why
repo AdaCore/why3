@@ -25,7 +25,7 @@ theory Sorted
   use import List
   use import int.Int
  
-  inductive sorted (l : list int) =
+  inductive sorted (list int) =
     | Sorted_Nil : 
         sorted Nil
     | Sorted_One : 
