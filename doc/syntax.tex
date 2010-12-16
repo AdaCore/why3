@@ -98,6 +98,117 @@ the length of a list is non-negative.
 
 % \section{Using and Cloning Theories} *)
 
+\section*{Another Example}
+\index{Einstein's logic problem}
+
+We now consider another, slightly more complex example: to use \why\
+to solve a little puzzle known as ``Einstein's logic
+problem''\footnote{This was contributed by St\'ephane Lescuyer.}.
+The problem is stated as follows. 
+\begin{itemize}
+\item TODO
+\end{itemize}
+The question is: what is the nationality of the fish's owner?
+
+We start by introducing a general-purpose theory defining the notion
+of \emph{bijection}, as two abstract types together with two functions from
+one to the other and two axioms stating that these functions are
+inverse of each other.
+\begin{verbatim}
+theory Bijection
+  type t
+  type u
+
+  logic of t : u
+  logic to u : t
+
+  axiom To_of : forall x : t. to (of x) = x
+  axiom Of_to : forall y : u. of (to y) = y
+end
+\end{verbatim}
+
+We now start a new theory, \texttt{Einstein}, which will contain all
+the individuals of the problem.
+\begin{verbatim}
+theory Einstein "Einstein's problem"
+\end{verbatim}
+First we introduce enumeration types for houses, colors, persons,
+drinks, cigars and pets.
+\begin{verbatim}
+  type house  = H1 | H2 | H3 | H4 | H5
+  type color  = Blue | Green | Red | White | Yellow
+  type person = Dane | Englishman | German | Norwegian | Swede
+  type drink  = Beer | Coffee | Milk | Tea | Water
+  type cigar  = Blend | BlueMaster | Dunhill | PallMall | Prince
+  type pet    = Birds | Cats | Dogs | Fish | Horse
+\end{verbatim}
+We now express that each house is associated bijectively to a color,
+by cloning the \texttt{Bijection} theory appropriately.
+\begin{verbatim}
+  clone Bijection as Color with type t = house, type u = color
+\end{verbatim}
+It introduces two functions, namely \texttt{Color.of} and
+\texttt{Color.to}, from houses to colors and colors to houses,
+respectively, and the two axioms relating them.
+Similarly, we express that each house is associated bijectively to a
+person
+\begin{verbatim}
+  clone Bijection as Owner with type t = house, type u = person
+\end{verbatim}
+and that drinks, cigars and pets are all associated bijectively to persons:
+\begin{verbatim}
+  clone Bijection as Drink with type t = person, type u = drink
+  clone Bijection as Cigar with type t = person, type u = cigar
+  clone Bijection as Pet   with type t = person, type u = pet
+\end{verbatim}
+Next we need a way to state that a person lives next to another. We
+first define a predicate \texttt{leftof} over two houses.
+\begin{verbatim}
+  logic leftof (h1 h2 : house) =
+    match h1, h2 with
+    | H1, H2 
+    | H2, H3 
+    | H3, H4 
+    | H4, H5 -> true
+    | _      -> false
+    end
+\end{verbatim}
+Note how we advantageously used pattern-matching, with a or-pattern
+for the four positive cases and a universal pattern for the remaining
+21 cases. It is then immediate to define a \texttt{neighbour}
+predicate over two houses, which completes theory \texttt{Einstein}.
+\begin{verbatim}
+  logic rightof (h1 h2 : house) =
+    leftof h2 h1
+  logic neighbour (h1 h2 : house) =
+    leftof h1 h2 or rightof h1 h2
+end
+\end{verbatim}
+
+The next theory contains the 15 hypotheses. It starts by importing
+theory \texttt{Einstein}.
+\begin{verbatim}
+theory EinsteinHints "Hints"
+  use import Einstein
+\end{verbatim}
+Then each hypothesis is stated in terms of \texttt{to} and \texttt{of}
+functions. For instance, the hypothesis ``The Englishman lives in a
+red house'' is declared as the following axiom.
+\begin{verbatim}
+  axiom Hint1: Color.of (Owner.to Englishman) = Red
+\end{verbatim}
+And so on for all other hypotheses, up to
+``The man who smokes Blends has a neighbour who drinks water'', which completes
+this theory.
+\begin{verbatim}
+  ...
+  axiom Hint15:
+    neighbour (Owner.to (Cigar.to Blend)) (Owner.to (Drink.to Water))
+end
+\end{verbatim}
+
+TODO
+
 
 %%% Local Variables:
 %%% mode: latex

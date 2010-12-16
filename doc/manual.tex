@@ -1,5 +1,7 @@
 \documentclass[a4paper,11pt,twoside,openright]{memoir}
 
+% rubber: module index
+
 \usepackage[T1]{fontenc}
 %\usepackage{url}
 \usepackage[a4paper,pdftex,colorlinks=true,urlcolor=blue,pdfstartview=FitH]{hyperref}
@@ -17,6 +19,8 @@
 \input{./macros.tex}
 
 \input{./version.tex}
+
+\makeindex
 
 \begin{document}
 \sloppy
@@ -150,6 +154,9 @@ Johannes Kanig, St\'ephane Lescuyer, Sim\~ao Melo de Sousa.
 \bibliographystyle{abbrv}
 \bibliography{manual}
 %\input{biblio-demons}
+
+\cleardoublepage
+\printindex
 
 \end{document}
 
