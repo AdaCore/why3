@@ -622,14 +622,11 @@ clean::
 # tools
 #######
 
-TOOLS = bin/why3-cpulimit bin/why3-cpulimit_time
+TOOLS = bin/why3-cpulimit
 
 byte opt: $(TOOLS)
 
 bin/why3-cpulimit: src/tools/@CPULIMIT@.c
-	$(CC) -Wall -o $@ $^
-
-bin/why3-cpulimit_time: src/tools/@CPULIMIT@_time.c
 	$(CC) -Wall -o $@ $^
 
 clean::
