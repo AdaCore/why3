@@ -8,7 +8,9 @@ tasks, call external provers on tasks, and apply transformations on
 tasks. The complete documentation for API calls is given in
 Chapter~\ref{chap:apidoc}.
 
-We assume the reader has a fair knowledge of the OCaml language. 
+We assume the reader has a fair knowledge of the OCaml
+language. Notice also that the Why3 library is installed: see
+Section~\ref{sec:installlib}.
 
 
 \section{Building Propositional Formulas}
@@ -150,10 +152,10 @@ let main : Whyconf.main = Whyconf.get_main config
 let provers : Whyconf.config_prover Util.Mstr.t = 
   Whyconf.get_provers config
 \end{verbatim}
-The type \texttt{'a Util.Mstr.t} is a map index by strings. This map
+The type \texttt{'a Util.Mstr.t} is a map indexed by strings. This map
 can provide the set of existing provers. In the following, we directly
-attempy to access the prover Alt-Ergo, which is known to be identified with id
-\texttt{"alt-ergo"}. 
+attempt to access the prover Alt-Ergo, which is known to be identified
+with id \texttt{"alt-ergo"}.
 \begin{verbatim}
 (* the [prover alt-ergo] section of the config file *)
 let alt_ergo : Whyconf.config_prover = 
@@ -164,7 +166,9 @@ let alt_ergo : Whyconf.config_prover =
     exit 0
 \end{verbatim}
 
-The next step is to obtain the driver associated to this prover. A driver typically depends on the standard theories so these should be loaded first.
+The next step is to obtain the driver associated to this prover. A
+driver typically depends on the standard theories so these should be
+loaded first.
 \begin{verbatim}
 (* builds the environment from the [loadpath] *)
 let env : Env.env = 
@@ -186,25 +190,35 @@ let result1 : Call_provers.prover_result =
 let () = printf "@[On task 1, alt-ergo answers %a@."
   Call_provers.print_prover_result result1
 \end{verbatim}
-This way to call a prover is in general to naive, since it will never return
-of the prover runs without time limit. The function \texttt{prove\_task} has two option parameters: \texttt{timelimit} is the maximum allowed running time in seconds, and \texttt{memlimit} is the maximum allowed memory in megabytes. 
-The type \texttt{prover\_result} is a record with three fields:
+This way to call a prover is in general to naive, since it may never
+return if the prover runs without time limit. The function
+\texttt{prove\_task} has two optional parameters: \texttt{timelimit}
+is the maximum allowed running time in seconds, and \texttt{memlimit}
+is the maximum allowed memory in megabytes.  The type
+\texttt{prover\_result} is a record with three fields:
 \begin{itemize}
 \item \texttt{pr\_answer}: the prover answer, detailed below.
-\item \texttt{pr\_output}: the output of the prover, i.e. both standard output and the standard error of the process
+\item \texttt{pr\_output}: the output of the prover, i.e. both
+  standard output and the standard error of the process
 \item \texttt{pr\_time} : the time taken by the prover, in seconds
 \end{itemize}
 a \texttt{pr\_answer} is a sum of several kind of answers:
 \begin{itemize}
 \item \texttt{Valid}: the task is valid according to the prover.
 \item \texttt{Invalid}: the task is invalid.
-\item \texttt{Timeout}: the task timeouts, i.e. it takes more time than specified.
-\item \texttt{Unknown} $msg$: the prover can't determine if the task is valid. the string parameter $msg$ indicates some extra information.
-\item \texttt{Failure} $msg$: the prover reports a failure, i.e. it was unable to read correctly its input task.
-\item \texttt{HighFailure}: an error occurred while trying to call the prover,
-or the prover answer was not understood (i.e. none of the given regexps in the driver file match the output of the prover).
+\item \texttt{Timeout}: the task timeouts, i.e. it takes more time
+  than specified.
+\item \texttt{Unknown} $msg$: the prover can't determine if the task
+  is valid. the string parameter $msg$ indicates some extra
+  information.
+\item \texttt{Failure} $msg$: the prover reports a failure, i.e. it
+  was unable to read correctly its input task.
+\item \texttt{HighFailure}: an error occurred while trying to call the
+  prover, or the prover answer was not understood (i.e. none of the
+  given regexps in the driver file match the output of the prover).
 \end{itemize}
-Here is thus another way of calling the Alt-Ergo prover, on our second task.
+Here is thus another way of calling the Alt-Ergo prover, on our second
+task.
 \begin{verbatim}
 let result2 : Call_provers.prover_result = 
   Driver.prove_task ~command:alt_ergo.Whyconf.command
