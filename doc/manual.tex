@@ -7,6 +7,12 @@
 \usepackage[a4paper,pdftex,colorlinks=true,urlcolor=blue,pdfstartview=FitH]{hyperref}
 \usepackage{graphicx}
 
+% \setlrmargins{20mm}{*}{*}
+% \setulmargins{1.0in}{*}{*}
+% %\setheadfoot{13pt}{26pt}
+% %\setheaderspaces{*}{13pt}{*}
+% \checkandfixthelayout
+
 %\usepackage[toc,nonumberlist]{glossaries}
 %\makeglossaries
 
@@ -117,6 +123,24 @@ Report any bug to the Why3 Bug Tracking System:
 We gratefully thank the people who contributed to Why3: Simon Cruanes,
 Johannes Kanig, St\'ephane Lescuyer, Sim\~ao Melo de Sousa.
 
+\section*{Release notes}
+
+\paragraph{Version 0.10}
+Initial release. 
+\begin{itemize}
+\item New syntax for terms and formulas
+\item Algebraic data types, pattern-matching
+\item Recursive definitions
+\item Inductive predicates
+\item Declaration encapsulated in theories. Using and cloning theories.
+\item Concept of goal transformation
+\item Generic communication with provers
+\item Ocaml Library with documented API
+\item New GUI with session save and restore
+\item New syntax for programs, new VC generator, intentionaly left
+  undocumented, since the syntax is likely to evolve significantly in
+  the future.
+\end{itemize}
 \cleardoublepage
 
 \tableofcontents

@@ -152,7 +152,7 @@ val add_proof_attempt : goal -> prover_id -> proof_attempt
     @raise AlreadyExist if an attempt for the same prover
     is already there *)
 
-(* todo: remove_proof_attempt *)
+val remove_proof_attempt : proof_attempt -> unit
 
 val set_obsolete : proof_attempt -> unit
 (** marks this proof as obsolete *)

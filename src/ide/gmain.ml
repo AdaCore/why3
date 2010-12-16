@@ -618,6 +618,15 @@ module Helpers = struct
     set_proof_status ~obsolete a status time;
     a
 
+  let remove_proof_row a =
+    let (_:bool) = goals_model#remove a.Model.proof_row in
+    (* let g = a.Model.proof_goal in
+       remove a from g.Model.external_proofs
+       and update g.Model.proved
+    *)
+    ()
+
+
   let add_goal_row parent name t db_goal =
     let parent_row = match parent with
       | Theory mth -> mth.theory_row
@@ -1164,94 +1173,6 @@ let split_selected_goals () =
       goals_view#selection#get_selected_rows) ())
 
 
-(*****************************************************)
-(* method: split all unproved goals *)
-(*****************************************************)
-
-(*
-
-let split_unproved_goals () =
-  let transf_id_split = Db.transf_from_name "split_goal" in
-  List.iter
-    (fun th ->
-       List.iter
-         (fun g ->
-            if not g.Model.proved then
-              let row = g.Model.goal_row in
-              let goal_name = goals_model#get ~row ~column:Model.name_column in
-              let callback subgoals =
-                if List.length subgoals >= 2 then
-                  let split_row = goals_model#append ~parent:row () in
-                  goals_model#set ~row:split_row ~column:Model.visible_column
-                    true;
-                  goals_model#set ~row:split_row ~column:Model.name_column
-                    "split";
-                  goals_model#set ~row:split_row ~column:Model.icon_column
-                    !image_transf;
-                  let db_transf =
-                    Db.add_transformation g.Model.goal_db transf_id_split
-                  in
-                  let tr =
-                    { Model.parent_goal = g;
-(*
-                      Model.transf = split_transformation;
-*)
-                      Model.transf_row = split_row;
-                      Model.transf_db = db_transf;
-                      subgoals = [];
-                    }
-                  in
-                  goals_model#set ~row:split_row ~column:Model.index_column
-                    (Model.Row_transformation tr);
-                  g.Model.transformations <- tr :: g.Model.transformations;
-                  let goals,_ = List.fold_left
-                    (fun (acc,count) subtask ->
-                       let _id = (Task.task_goal subtask).Decl.pr_name in
-                       let subgoal_name =
-                         goal_name ^ "." ^ (string_of_int count)
-                       in
-                       let subtask_row =
-                         goals_model#append ~parent:split_row ()
-                       in
-                       let sum = task_checksum subtask in
-                       let subtask_db = Db.add_subgoal db_transf
-  subgoal_name sum in
-                       (* TODO: call add_goal_row *)
-                       let goal = {
-			 Model.goal_name = subgoal_name;
-			 Model.parent = Model.Transf tr;
-                         Model.task = subtask ;
-                         Model.goal_row = subtask_row;
-                         Model.goal_db = subtask_db;
-                         Model.external_proofs = Hashtbl.create 7;
-                         Model.transformations = [];
-                         Model.proved = false;
-                       }
-                       in
-                       goals_model#set ~row:subtask_row
-                         ~column:Model.index_column (Model.Row_goal goal);
-                       goals_model#set ~row:subtask_row
-                         ~column:Model.visible_column true;
-                       goals_model#set ~row:subtask_row
-                         ~column:Model.name_column subgoal_name;
-                       goals_model#set ~row:subtask_row
-                         ~column:Model.icon_column !image_file;
-                       (goal :: acc, count+1))
-                    ([],1) subgoals
-                  in
-                  tr.Model.subgoals <- List.rev goals;
-                  goals_view#expand_row (goals_model#get_path row)
-              in
-
-              Scheduler.apply_transformation_l ~callback
-                split_transformation g.Model.task
-         )
-         th.Model.goals
-    )
-    [] (* !Model.all *)
-*)
-
-
 (*********************************)
 (* add a new file in the project *)
 (*********************************)
@@ -1522,8 +1443,10 @@ let () =
 
 let () =
   let b = GButton.button ~packing:transf_box#add ~label:"Inline" () in
+(*
   let i = GMisc.image ~pixbuf:(!image_transf) () in
   let () = b#set_image i#coerce in
+*)
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:not_implemented
   in ()
@@ -1835,6 +1758,10 @@ let () =
 (* removing  *)
 (*************)
 
+let remove_proof_attempt a =
+  Db.remove_proof_attempt a.Model.proof_db;
+  Helpers.remove_proof_row a
+
 let confirm_remove_row r =
   let row = filter_model#get_iter r in
   match filter_model#get ~row ~column:Model.index_column with
@@ -1844,17 +1771,14 @@ let confirm_remove_row r =
 	let (_:bool) = info_window `ERROR "Cannot remove a theory" in ()
     | Model.Row_file _file ->
 	let (_:bool) = info_window `ERROR "Cannot remove a file" in ()
-    | Model.Row_proof_attempt _a ->
-	let (_:bool) = info_window `INFO "Proof attempt removal not implemented" in ()
+    | Model.Row_proof_attempt a ->
+	let b =
+	  info_window `QUESTION
+	    "Do you really want to remove the selected proof attempt?"
+	in
+	if b then remove_proof_attempt a
     | Model.Row_transformation _tr ->
 	let (_:bool) = info_window `INFO "Transformation removal not implemented" in ()
-(*
-  let b =
-    info_window `QUESTION
-      "Do you really want to remove the current selection?"
-  in
-  if b then remove_selection
-*)
 
 let confirm_remove_selection () =
   match goals_view#selection#get_selected_rows with
