@@ -219,12 +219,19 @@ let gen_tvar su =
     Ssubst.fold fold su su in
   Ssubst.fold aux su (Ssubst.singleton (Mtv.empty))
 
+(* find all the possible instantiation which can give a type of env.keep *)
 let ty_quant env =
   let rec add_vs s ty =
     let s = ty_fold add_vs s ty in
     match ty.ty_node with
       | Tyapp(app,_) when ts_equal app env.poly_ts  ->
-        Mty.fold (fun uty _ s -> Ssubst.add (ty_match Mtv.empty ty uty) s)
+        Mty.fold (fun uty _ s ->
+          try
+            Ssubst.add (ty_match Mtv.empty ty uty) s
+          with Ty.TypeMismatch _ ->
+            (* No instantiation possible *)
+            s
+        )
           env.keep s
       | _ -> s in
   f_ty_fold add_vs Ssubst.empty
@@ -320,7 +327,7 @@ let collect_arrays poly_ts tds =
   Sts.fold extract tds Mty.empty
 
 let meta_mono_array = register_meta "encoding_arrays : mono_arrays"
-  [MTtysymbol;MTtysymbol;MTtysymbol]
+  [MTtysymbol;MTty;MTty]
 
 (* Some general env creation function *)
 let create_env env task thpoly tds =

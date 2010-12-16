@@ -133,8 +133,11 @@ theory int.EuclideanDivision
 end
 
 theory transform.array.Array
-   syntax logic get "(select %1 %2)"
-   syntax logic get "(store %1 %2)"
+  syntax logic get "(select %1 %2)"
+  syntax logic set "(store %1 %2)"
+  remove prop Select_eq
+  remove prop Select_neq
+
 end
 
 (*

@@ -150,7 +150,7 @@ let fold tenv taskpre task =
             | ls, None -> conv_ls tenv ud ls, None
             | _ -> Printer.unsupportedDecl d "use eliminate_definition"
           in
-          decl_ud ud (add_logic_decl task (List.map conv ll))
+          add_logic_decl (decl_ud ud task) (List.map conv ll)
         | Dind _ ->
           Printer.unsupportedDecl d "use eliminate_inductive"
         | Dprop _ ->
@@ -165,12 +165,13 @@ let fold tenv taskpre task =
           | MAty ty -> MAty (conv_ty tenv ud ty)
           | MAts {ts_name = name; ts_args = []; ts_def = Some ty} ->
             MAts (conv_ts tenv ud name ty)
+          | MAts {ts_args = []; ts_def = None} as x -> x
           | MAts _ -> raise Exit
           | MAls ls -> MAls (conv_ls tenv ud ls)
           | MApr _ -> raise Exit
           | MAstr _ as s -> s
           | MAint _ as i -> i in
-        decl_ud ud (add_meta task meta (List.map map ml))
+        add_meta (decl_ud ud task) meta (List.map map ml)
       with
         | Printer.UnsupportedType _
         | Exit -> add_tdecl task taskpre.task_decl
