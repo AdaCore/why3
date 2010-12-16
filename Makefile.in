@@ -599,6 +599,12 @@ plugins/whytptp.cmxs: plugins src/tptp2why/whytptp.cmxs
 plugins/whytptp.cmo: plugins src/tptp2why/whytptp.cmo
 	@cp src/tptp2why/whytptp.cmo $@
 
+
+install_no_local::
+	mkdir -p $(LIBDIR)/why3/plugins
+	cp -f plugins/whytptp.cm* $(LIBDIR)/why3/plugins
+
+
 # depend and clean targets
 
 ifeq (@enable_whytptp@,yes)

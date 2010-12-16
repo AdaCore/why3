@@ -332,7 +332,7 @@ answer output time
     let tool_res = List.map (fun (t,l) -> t,compute_average l) l in
     let print_tool_res (tool_val,tool_res) =
       fprintf fmt "%a - %a\n" print_tool_res tool_res print_tool tool_val in
-    fprintf fmt "(v,u,t,i,f) - valid, unknown, timeout, invalid, failure@.";
+    fprintf fmt "(v,u,t,i,f) - valid, unknown, timeout, invalid, failure\n";
     List.iter print_tool_res tool_res
 
 
