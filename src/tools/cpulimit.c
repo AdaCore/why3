@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "usage: %s <time limit in seconds> \
 <virtual memory limit in MiB> <print time yes|no> <command>\n\
 a null value sets no limit (keeps the actual limit)\n", argv[0]);
-    return 1;
+    return EXIT_FAILURE;
   }
 
   /* Fork if requested */
