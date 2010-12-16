@@ -104,9 +104,42 @@ the length of a list is non-negative.
 We now consider another, slightly more complex example: to use \why\
 to solve a little puzzle known as ``Einstein's logic
 problem''\footnote{This was contributed by St\'ephane Lescuyer.}.
-The problem is stated as follows. 
+The problem is stated as follows. Five persons, of five
+different nationalities, live in five houses in a row, all
+painted with different colors.
+These five persones own different pets, drink different beverages and
+smoke different brands of cigars.
+We are given the following information:
 \begin{itemize}
-\item TODO
+\item The Englishman lives in a red house;
+
+\item The Swede has dogs;
+
+\item The Dane drinks tea;
+
+\item The green house is on the left of the white one;
+
+\item The green house's owner drinks coffee;
+
+\item The person who smokes Pall Mall has birds;
+
+\item The yellow house's owner smokes Dunhill;
+
+\item In the house in the center lives someone who drinks milk;
+
+\item The Norwegian lives in the first house;
+
+\item The man who smokes Blends lives next to the one who has cats;
+
+\item The man who owns a horse lives next to the one who smokes Dunhills;
+
+\item The man who smokes Blue Masters drinks beer;
+
+\item The German smokes Prince;
+
+\item The Norwegian lives next to the blue house;
+
+\item The man who smokes Blends has a neighbour who drinks water.
 \end{itemize}
 The question is: what is the nationality of the fish's owner?
 
@@ -206,9 +239,17 @@ this theory.
     neighbour (Owner.to (Cigar.to Blend)) (Owner.to (Drink.to Water))
 end
 \end{verbatim}
+Finally, we declare the goal in a fourth theory
+\begin{verbatim}
+theory Problem "Goal of Einstein's problem"
+  use import Einstein
+  use import EinsteinHints
 
-TODO
-
+  goal G: Pet.to Fish = German
+end
+\end{verbatim}
+and we are ready to use \why\ to discharge this goal with any prover
+of our choice.
 
 %%% Local Variables:
 %%% mode: latex
