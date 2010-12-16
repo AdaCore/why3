@@ -7,7 +7,8 @@ filename "%f-%t-%g.smt"
 
 valid "^unsat"
 unknown "^\\(unknown\\|sat\\|Fail\\)" "Unknown"
-time "cpulimit_time : \\([0-9]+.[0-9]*\\) s" "0:0:\\1"
+time "cpulimit_time : %s s"
+
 
 (* À discuter *)
 transformation "simplify_recursive_definition"
@@ -133,8 +134,11 @@ theory int.EuclideanDivision
 end
 
 theory transform.array.Array
-   syntax logic get "(select %1 %2)"
-   syntax logic get "(store %1 %2)"
+  syntax logic get "(select %1 %2)"
+  syntax logic set "(store %1 %2)"
+  remove prop Select_eq
+  remove prop Select_neq
+
 end
 
 (*

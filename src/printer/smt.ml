@@ -65,15 +65,16 @@ type info = {
 
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar _ -> unsupported "smt : you must encode the polymorphism"
-  | Tyapp (ts, tl) -> begin match query_syntax info.info_syn ts.ts_name with
-      | Some s -> syntax_arguments s (print_type info) fmt tl
-      | None -> fprintf fmt "%a%a" (print_tyapp info) tl print_ident ts.ts_name
-    end
+  | Tyapp (ts, []) -> begin match query_syntax info.info_syn ts.ts_name with
+      | Some s -> syntax_arguments s (print_type info) fmt []
+      | None -> fprintf fmt "%a" print_ident ts.ts_name
+  end
+  | Tyapp (_, _) -> unsupported "smt : you must encode the complexe type"
 
-and print_tyapp info fmt = function
-  | [] -> ()
-  | [ty] -> fprintf fmt "%a " (print_type info) ty
-  | tl -> fprintf fmt "(%a) " (print_list comma (print_type info)) tl
+(* and print_tyapp info fmt = function *)
+(*   | [] -> () *)
+(*   | [ty] -> fprintf fmt "%a " (print_type info) ty *)
+(*   | tl -> fprintf fmt "(%a) " (print_list comma (print_type info)) tl *)
 
 let print_type info fmt = catch_unsupportedType (print_type info fmt)
 
@@ -223,15 +224,15 @@ let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 let barrays task =
   let fold barrays =
     function
-      | [MAts tst;MAts tsk;MAts tse] ->
-        let extract_ty ts =
-          if ts.ts_args <> [] then
-            unsupported "smtv1 : type with argument are not supported";
-          match ts.ts_def with
-            | Some ty -> ty
-            | None -> ty_app ts [] in
-        Mts.add tst (extract_ty tsk,extract_ty tse) barrays
-      | _ -> barrays in
+      | [MAts tst;MAty tyk;MAty tye] ->
+        (* let extract_ty ts = *)
+        (*   if ts.ts_args <> [] then *)
+        (*     unsupported "smtv1 : type with argument are not supported"; *)
+        (*   match ts.ts_def with *)
+        (*     | Some ty -> ty *)
+        (*     | None -> ty_app ts [] in *)
+        Mts.add tst (tyk,tye) barrays
+      | _ -> assert false in
   Task.on_meta Encoding_arrays.meta_mono_array fold Mts.empty task
 
 let print_task pr thpr fmt task =

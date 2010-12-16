@@ -56,6 +56,11 @@ val debug : Debug.flag
     If set [call_on_buffer] prints on stderr the commandline called
     and the output of the prover. *)
 
+(** time parser *)
+type regexptime
+val regexptime : string -> regexptime
+(** *)
+
 type post_prover_call = unit -> prover_result
 (** Thread-unsafe closure that processes a prover's output
     and returns the final result. Once again: this closure
@@ -70,7 +75,7 @@ val call_on_buffer :
   ?timelimit  : int ->
   ?memlimit   : int ->
   regexps     : (Str.regexp * prover_answer) list ->
-  regexpstime : (Str.regexp * string) list ->
+  regexpstime : regexptime list ->
   exitcodes   : (int * prover_answer) list ->
   filename    : string ->
   Buffer.t -> bare_prover_call

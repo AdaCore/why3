@@ -20,6 +20,54 @@
 open Format
 open Sysutil
 
+(** time regexp "%h:%m:%s" *)
+type timeunit =
+  | Hour
+  | Min
+  | Sec
+  | Msec
+
+type regexptime = {
+  re : Str.regexp;
+  group : timeunit array; (*ieme corresponds to the group i + 1*)
+}
+
+let regexptime s =
+  let cmd_regexp = Str.regexp "%\\(.\\)" in
+  let nb = ref 0 in
+  let l = ref [] in
+  let add_unit x = l := (!nb,x) :: !l; incr nb; "\\([0-9]+.?[0-9]*\\)" in
+  let replace s = match Str.matched_group 1 s with
+    | "%" -> "%"
+    | "h" -> add_unit Hour
+    | "m" -> add_unit Min
+    | "s" -> add_unit Sec
+    | "i" -> add_unit Msec
+    | _ -> failwith "unknown format specifier, use %%h, %%m, %%s, %%i"
+  in
+  let s = Str.global_substitute cmd_regexp replace s in
+  let group = Array.make !nb Hour in
+  List.iter (fun (i,u) -> group.(i) <- u) !l;
+  { re = Str.regexp s; group = group}
+
+let rec grep_time out = function
+  | [] -> None
+  | re :: l ->
+    begin try
+            ignore (Str.search_forward re.re out 0);
+            let t = ref 0. in
+            Array.iteri (fun i u ->
+              let v = float_of_string (Str.matched_group (succ i) out) in
+              match u with
+                | Hour -> t := !t +. v *. 3600.
+                | Min  -> t := !t +. v *. 60.
+                | Sec  -> t := !t +. v
+                | Msec -> t := !t +. v /. 1000.) re.group;
+            Some !t
+      with _ -> grep_time out l end
+
+(** *)
+
 type prover_answer =
   | Valid
   | Invalid
@@ -59,16 +107,6 @@ let rec grep out l = match l with
         | HighFailure -> assert false
       with Not_found -> grep out l end
 
-let rec grep_time out = function
-  | [] -> None
-  | (re,pa) :: l ->
-    begin try
-            ignore (Str.search_forward re out 0);
-            let stime = (Str.replace_matched pa out) in
-            Some (Scanf.sscanf stime "%f:%f:%f"
-                    (fun h m s -> h *. 3600. +. m *. 60. +. s))
-      with _ -> grep_time out l end
-
 
 let debug = Debug.register_flag "call_prover"
 
@@ -103,7 +141,8 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
     | "f" -> on_stdin := false; file
     | "t" -> on_timelimit := true; string_of_int timelimit
     | "m" -> string_of_int memlimit
-    | _ -> failwith "unknown format specifier, use %%f, %%t or %%m"
+    | "b" -> string_of_int (memlimit * 1024)
+    | _ -> failwith "unknown format specifier, use %%f, %%t, %%m or %%b"
   in
   let cmd = Str.global_substitute cmd_regexp (replace "") command in
   let on_stdin = !on_stdin in
@@ -133,7 +172,7 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
       let time = Util.default_option time (grep_time out regexpstime) in
       let ans = match ans with
         | HighFailure when !on_timelimit && timelimit > 0
-          && time >= (float timelimit -. 0.1) -> Timeout
+          && time >= (0.9 *. float timelimit) -> Timeout
         | _ -> ans
       in
       { pr_answer = ans;

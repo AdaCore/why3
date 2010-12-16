@@ -13,3 +13,10 @@ theory Test
   goal SquareNonNeg : forall x : int. 0 <= x * x
   goal ZeroLessOne : 0 <= 1
 end
+
+theory MinMax
+  use import int.MinMax
+
+  goal G : min 1 (min 3 2) = 1
+
+end

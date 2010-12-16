@@ -42,7 +42,7 @@ type driver = {
   drv_meta        : (theory * Stdecl.t) Mid.t;
   drv_meta_cl     : (theory * Stdecl.t) Mid.t;
   drv_regexps     : (Str.regexp * prover_answer) list;
-  drv_regexpstime : (Str.regexp * string) list;
+  drv_regexpstime : Call_provers.regexptime list;
   drv_exitcodes   : (int * prover_answer) list;
 }
 
@@ -90,7 +90,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     | RegexpTimeout s -> add_to_list regexps (Str.regexp s, Timeout)
     | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown t)
     | RegexpFailure (s,t) -> add_to_list regexps (Str.regexp s, Failure t)
-    | RegexpTime (r,s) -> add_to_list regexpstime (Str.regexp r,s)
+    | RegexpTime r -> add_to_list regexpstime (Call_provers.regexptime r)
     | ExitCodeValid s -> add_to_list exitcodes (s, Valid)
     | ExitCodeInvalid s -> add_to_list exitcodes (s, Invalid)
     | ExitCodeTimeout s -> add_to_list exitcodes (s, Timeout)
