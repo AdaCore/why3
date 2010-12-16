@@ -22,31 +22,54 @@ qualified identifiers.
 
 \paragraph{Constants.}
 The syntax for constants is given Figure~\ref{fig:bnf:constant}.
-
+Integer and real constants have arbitrary precision.
+Integer constants may be given in base 16, 10, 8 or 2.
+Real constants may be given in base 16 or 10.
+ 
 \begin{figure}[p]
 \begin{center}\framebox{\input{./constant_bnf.tex}}\end{center}
   \caption{Syntax for constants.}
 \label{fig:bnf:constant}
 \end{figure}
 
-\paragraph{Operators.} Prefix operators have greater priority than
-infix operators. Infix operators are left associative and have
-priorities set as follows, from greatest to lowest priorities:
+\paragraph{Operators.} 
+Prefix and infix operators are built from characters organized in four
+categories (\textsl{op-char-1} to \textsl{op-char-4}).
+\begin{center}\framebox{\input{./operator_bnf.tex}}\end{center}
+Infix operators are classified into 4 categories, according to the
+characters they are built from:
 \begin{itemize}
-\item operators containing only characters from
+\item level 4: operators containing only characters from
 \textit{op-char-4};
-\item those containing
+\item level 3: those containing
  characters from \textit{op-char-3} or \textit{op-char-4};
-\item those containing
+\item level 2: those containing
  characters from \textit{op-char-2}, \textit{op-char-3} or
  \textit{op-char-4}; 
-\item all other operators.
+\item level 1: all other operators.
 \end{itemize}
-
-\begin{center}\framebox{\input{./operator_bnf.tex}}\end{center}
 
 \paragraph{Terms.}
 The syntax for terms is given Figure~\ref{fig:bnf:term}.
+The various constructs have the following priorities and
+associativities, from lowest to greatest priority:
+\begin{center}
+  \begin{tabular}{|l|l|}
+    \hline
+    construct & associativity \\
+    \hline\hline
+    \texttt{if then else} / \texttt{let in} & -- \\
+    label & -- \\
+    cast  & -- \\
+    infix level 1 & left \\
+    infix level 2 & left \\
+    infix level 3 & left \\
+    infix level 4 & left \\
+    prefix        & --   \\
+    \hline
+  \end{tabular}
+\end{center}
+
 Note the curryfied syntax for function application, though partial
 application is not allowed (rejected at typing).
 
@@ -62,6 +85,29 @@ expressions notably differs from the usual ML syntax.
 
 \paragraph{Formulas.}
 The syntax for formulas is given Figure~\ref{fig:bnf:formula}.
+The various constructs have the following priorities and
+associativities, from lowest to greatest priority:
+\begin{center}
+  \begin{tabular}{|l|l|}
+    \hline
+    construct & associativity \\
+    \hline\hline
+    \texttt{if then else} / \texttt{let in} & -- \\
+    label & -- \\
+    \texttt{->} / \texttt{<->} & right \\
+    \texttt{or} / \verb!\/! & right \\
+    \texttt{and} / \verb!/\! & right \\
+    \texttt{not}  & -- \\
+    infix level 1 & left \\
+    infix level 2 & left \\
+    infix level 3 & left \\
+    infix level 4 & left \\
+    prefix        & --   \\
+    \hline
+  \end{tabular}
+\end{center}
+Note that infix symbols of level 1 include equality (\texttt{=}) and
+disequality (\texttt{<>}).
 
 \begin{figure}[p]
   \begin{center}\framebox{\input{./formula_bnf.tex}}\end{center}
