@@ -498,15 +498,10 @@ module External_proof = struct
     in
     db_must_ok db (fun () -> Sqlite3.exec db.raw_db sql)
 
-(*
   let delete db e =
-    let id = e.external_proof_id in
-    assert (id <> 0L);
     let sql = "DELETE FROM external_proofs WHERE external_proof_id=?" in
-    let stmt = bind db sql [ Sqlite3.Data.INT id ] in
-    ignore(step_fold db stmt (fun _ -> ()));
-    e.external_proof_id <- 0L
-*)
+    let stmt = bind db sql [ Sqlite3.Data.INT e ] in
+    ignore(step_fold db stmt (fun _ -> ()))
 
   let add db (g : goal) (p: prover_id) =
     transaction db
@@ -608,6 +603,8 @@ end
 let status_and_time p = External_proof.status_and_time (current()) p
 
 let external_proofs g = External_proof.of_goal (current()) g
+
+let remove_proof_attempt e = External_proof.delete (current()) e
 
 module Goal = struct
 
