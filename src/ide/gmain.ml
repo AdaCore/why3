@@ -411,11 +411,11 @@ let tools_window_vbox =
     GPack.vbox ~packing:(hb#pack ~expand:false)  ()
   with Gtk.Error _ -> assert false
 
-let context_frame = 
+let context_frame =
   GBin.frame ~label:"Context"
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
-let context_box = 
+let context_box =
   GPack.button_box `VERTICAL ~border_width:5
     ~spacing:5
     ~packing:context_frame#add ()
@@ -423,23 +423,23 @@ let context_box =
 let context_unproved_goals_only = ref true
 
 let () =
-  let b1 = GButton.radio_button 
-    ~packing:context_box#add ~label:"Unproved goals only" () 
+  let b1 = GButton.radio_button
+    ~packing:context_box#add ~label:"Unproved goals only" ()
   in
   let (_ : GtkSignal.id) =
-    b1#connect#clicked 
+    b1#connect#clicked
       ~callback:(fun () -> context_unproved_goals_only := true)
   in
-  let b2 = GButton.radio_button 
-    ~group:b1#group ~packing:context_box#add ~label:"All goals" () 
+  let b2 = GButton.radio_button
+    ~group:b1#group ~packing:context_box#add ~label:"All goals" ()
   in
   let (_ : GtkSignal.id) =
-    b2#connect#clicked 
+    b2#connect#clicked
       ~callback:(fun () -> context_unproved_goals_only := false)
   in ()
 
 
-let provers_frame = 
+let provers_frame =
   GBin.frame ~label:"Provers"
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
@@ -454,7 +454,7 @@ let transf_frame =
 let transf_box =
   GPack.button_box `VERTICAL ~border_width:5 ~packing:transf_frame#add ()
 
-let tools_frame = 
+let tools_frame =
   GBin.frame ~label:"Tools"
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
@@ -745,7 +745,7 @@ end
 (*********************************)
 
 (*
-type trans = 
+type trans =
   | Trans_one of Task.task Trans.trans
   | Trans_list of Task.task Trans.tlist
 
@@ -761,7 +761,7 @@ let split_transformation = lookup_trans "split_goal"
 let unfold_transformation = lookup_trans "inline_goal"
 let intro_transformation = lookup_trans "introduce_premises"
 
-let apply_trans t task = 
+let apply_trans t task =
   match t with
     | Trans_one t -> [Trans.apply t task]
     | Trans_list t -> Trans.apply t task
@@ -776,25 +776,29 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
   let external_proofs = Db.external_proofs db_goal in
   Db.Hprover.iter
     (fun pid a ->
-       let p =
-         Util.Mstr.find (Db.prover_name pid) gconfig.provers
-       in
-       let s,t,o,edit = Db.status_and_time a in
-       if goal_obsolete && not o then Db.set_obsolete a;
-       let obsolete = goal_obsolete or o in
-       let s = match s with
-         | Db.Undone -> Model.HighFailure
-         | Db.Success ->
-             if not obsolete then proved := true;
-             Model.Success
-         | Db.Unknown -> Model.Unknown
-         | Db.Timeout -> Model.Timeout
-         | Db.Failure -> Model.HighFailure
-       in
-       let (_pa : Model.proof_attempt) =
-         Helpers.add_external_proof_row ~obsolete ~edit goal p a s t
-       in
-       ((* something TODO ?*))
+       let pname = Db.prover_name pid in
+       try
+         let p = Util.Mstr.find pname gconfig.provers in
+         let s,t,o,edit = Db.status_and_time a in
+         if goal_obsolete && not o then Db.set_obsolete a;
+         let obsolete = goal_obsolete or o in
+         let s = match s with
+           | Db.Undone -> Model.HighFailure
+           | Db.Success ->
+               if not obsolete then proved := true;
+               Model.Success
+           | Db.Unknown -> Model.Unknown
+           | Db.Timeout -> Model.Timeout
+           | Db.Failure -> Model.HighFailure
+         in
+         let (_pa : Model.proof_attempt) =
+           Helpers.add_external_proof_row ~obsolete ~edit goal p a s t
+         in
+         ((* something TODO ?*))
+       with Not_found ->
+         eprintf
+           "Warning: prover %s appears in database but is not installed.@."
+           pname
     )
     external_proofs;
   let transformations = Db.transformations db_goal in
@@ -813,13 +817,13 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
               let subgoal_name = gname ^ "." ^ (string_of_int count) in
               let sum = task_checksum subtask in
               let subtask_db,db_subgoals =
-                try 
+                try
 		  let g = Util.Mstr.find sum db_subgoals in
 		  (* a subgoal has the same check sum *)
 		  (Some g, Util.Mstr.remove sum db_subgoals)
                 with Not_found -> None,db_subgoals
               in
-              ((count,subgoal_name,subtask,sum,subtask_db) :: acc, 
+              ((count,subgoal_name,subtask,sum,subtask_db) :: acc,
 	       db_subgoals,
 	       count+1))
            ([],db_subgoals,1) subgoals
@@ -830,13 +834,13 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
 	   db_subgoals
 	   []
        in
-       let other_goals = 
+       let other_goals =
 	 List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2) other_goals
        in
        let rec merge_goals new_goals old_goals proved acc =
 	 match new_goals with
 	   | [] -> acc, proved
-	   | (_,subgoal_name,subtask,sum,g_opt)::rem -> 
+	   | (_,subgoal_name,subtask,sum,g_opt)::rem ->
 	       let db_g,subgoal_obsolete,old_goals =
 		 match g_opt with
 		   | Some g -> g,false,old_goals
@@ -844,7 +848,7 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
 		       match old_goals with
 			 | [] ->
 			     (* create a new goal in db *)
-			     Db.add_subgoal tr subgoal_name sum, 
+			     Db.add_subgoal tr subgoal_name sum,
 			     false, old_goals
 			 | (_goal_name,g) :: r ->
 			     g, true, r
@@ -852,9 +856,9 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
                let subgoal,subgoal_proved =
                  reimport_any_goal
                    (Model.Transf mtr) subgoal_name subtask db_g
-                   subgoal_obsolete 
+                   subgoal_obsolete
               in
-              merge_goals rem old_goals (proved && subgoal_proved) 
+              merge_goals rem old_goals (proved && subgoal_proved)
 		(subgoal :: acc)
        in
        let goals, subgoals_proved =
@@ -1769,7 +1773,7 @@ let confirm_remove_row r =
     | Model.Row_file _file ->
 	info_window `ERROR "Cannot remove a file"
     | Model.Row_proof_attempt a ->
-	info_window 
+	info_window
 	  ~callback:(fun () -> remove_proof_attempt a)
 	  `QUESTION
 	  "Do you really want to remove the selected proof attempt?"

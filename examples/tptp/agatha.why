@@ -3,61 +3,50 @@ theory Agatha
 
   type person = Agatha | Butler | Charles
 
-  logic hates(person, person)
-  logic richer(person, person)
-  logic lives(person)
-  logic killed(person, person)
+  logic hates person person
+  logic richer person person
+  logic lives person
+  logic killed person person
 
-  axiom Lives1 : lives(Agatha)
-  axiom Lives2 : lives(Charles)
-  axiom Lives3 : lives(Butler)
+  axiom Lives1 : lives Agatha
+  axiom Lives2 : lives Charles
+  axiom Lives3 : lives Butler
   axiom NoOneLivesForever :
     forall x:person.
-    lives(x) -> x = Agatha or x = Charles or x = Butler
+    lives x -> x = Agatha or x = Charles or x = Butler
 
   axiom MURDER :
     exists x:person.
-    lives(x) and killed(x, Agatha)
+    lives x and killed x Agatha
 
   axiom Hate_and_killed :
-    forall p1:person. forall p2:person.
-    killed(p1, p2) -> hates(p1, p2)
+    forall p1 p2:person. killed p1 p2 -> hates p1 p2
 
   axiom Killed_and_wealth :
-    forall p1:person. forall p2:person.
-    killed(p1, p2) -> not (richer(p1, p2))
+    forall p1 p2:person. killed p1 p2 -> not (richer p1 p2)
 
-  axiom Diff1 :
-    Agatha <> Butler
-  axiom Diff2 :
-    Agatha <> Charles
-  axiom Diff3 :
-    Charles <> Butler
+  lemma Diff1 : Agatha <> Butler
 
+  lemma Diff2 : Agatha <> Charles
+
+  lemma Diff3 : Charles <> Butler
 
   axiom H1 :
-    forall x:person.
-    hates(Agatha, x) -> not (hates(Charles, x))
+    forall x:person. hates Agatha x -> not (hates Charles x)
 
   axiom H2 :
-    forall x:person.
-    x <> Butler -> hates(Agatha, x)
+    forall x:person. x <> Butler -> hates Agatha x
 
   axiom H3 :
-    forall x:person.
-    not (richer(x, Agatha)) -> hates(Butler, x)
+    forall x:person. not (richer x Agatha) -> hates Butler x
 
   axiom H4 :
-    forall x:person.
-    hates(Agatha, x) -> hates(Butler, x)
+    forall x:person. hates Agatha x -> hates Butler x
 
   axiom H5 :
-    forall x:person.
-    exists y:person.
-    not (hates(x,y))
+    forall x:person. exists y:person. not (hates x y)
 
-  goal Enigma:
-    killed(Agatha, Agatha)
+  goal Enigma: killed Agatha Agatha
 
 
 end
