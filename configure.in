@@ -318,8 +318,12 @@ fi
 
 if test "$CAMLP5O" = no; then
    enable_coq_support=no
-   reason_coq_support=" ($CAMLP5O not found)"
+   reason_coq_support=" (camlp5o not found)"
 fi
+
+# coq-plugin currently disabled
+enable_coq_support=no
+reason_coq_support=
 
 # hypothesis_selection
 
