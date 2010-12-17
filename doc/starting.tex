@@ -3,24 +3,24 @@
 
 \section{Hello Proofs}
 
-The first and basic step in using Why3 is to write a suitable input
+The first and basic step in using \why\ is to write a suitable input
 file. When one wants to learn a programming language, you start by
 writing a basic program. Here we start by writing a file containing a
 basic set of goals. 
 
-Here is our first Why3 file, which is the file
+Here is our first \why\ file, which is the file
 \texttt{examples/hello\_proof.why} of the distribution.
 \verbatiminput{../examples/hello_proof.why} Any declaration must occur
 inside a theory, which is in that example called TheoryProof and
 labelled with a comment inside double quotes. It contains three goals
 named $G_1,G_2,G_3$. The first two are basic propositional goals,
 whereas the third involves some integer arithmetic, and thus it
-requires to import the theory of integer arithmetic from the Why3
+requires to import the theory of integer arithmetic from the \why\
 standard library, which is done by the \texttt{use} declaration above.
 
 We don't give more details here about the syntax and refer to
 Chapter~\ref{chap:syntax} for detailed explanations. In the following,
-we show how this file is handled in the Why3 GUI
+we show how this file is handled in the \why\ GUI
 (Section~\ref{sec:gui}) then in batch mode using the \texttt{why3}
 executable (Section~\ref{sec:batch}). 
 
@@ -164,7 +164,7 @@ shown but marked with "(obsolete)" so that you know the results are
 not accurate. You can now retry to prove all what remains unproved
 using any of the provers.
 
-\section{Getting Started with the Why3 Command}
+\section{Getting Started with the \why\ Command}
 \label{sec:batch}
 
 The why3 command allows to check the validity of goals with external

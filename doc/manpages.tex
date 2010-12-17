@@ -1,10 +1,10 @@
-\chapter{Reference manuals for the Why3 tools}
+\chapter{Reference manuals for the \why\ tools}
 \label{chap:manpages}
 
 \section{Compilation, Installation}
 \label{sec:install}
 
-Compilation of Why3 must start with a configuration phase which is run as
+Compilation of \why\ must start with a configuration phase which is run as
 \begin{verbatim}
 ./configure
 \end{verbatim}
@@ -41,17 +41,17 @@ It is also installable from sources, available from the site
 
 \subsection{Local use, without installation}
 
-It is not mandatory to install Why3 to use it. Local use is obtained via
+It is not mandatory to install \why\ to use it. Local use is obtained via
 \begin{verbatim}
 ./configure --enable-local
 make
 \end{verbatim}
-The Why3 executables are then available in subdirectory \texttt{bin/}.
+The \why\ executables are then available in subdirectory \texttt{bin/}.
 
-\subsection{Installation of the Why3 library}
+\subsection{Installation of the \why\ library}
 \label{sec:installlib}
 
-By default, the Why3 library is not installed. It can be installed using
+By default, the \why\ library is not installed. It can be installed using
 \begin{verbatim}
 make byte opt
 make install_lib
@@ -59,21 +59,21 @@ make install_lib
 
 \section{Installation of external provers}
 
-Why3 can use a wide range of external theorem provers. These need to
-be installed separately, and then Why3 needs to be configured to use
+\why\ can use a wide range of external theorem provers. These need to
+be installed separately, and then \why\ needs to be configured to use
 them. There is no need to install these provers before compiling and
 installing Why. 
 
 For installation of external provers, please look at the Why provers
 tips page \url{http://why.lri.fr/provers.en.html}.
 
-For configuring Why3 to use the provers, follow intructions given in
+For configuring \why\ to use the provers, follow intructions given in
 Section~\ref{sec:why3config}.
 
 \section{The \texttt{why3config} command-line tool}
 \label{sec:why3config}.
 
-Why3 must be configured to access external provers. Typically, this is done
+\why\ must be configured to access external provers. Typically, this is done
 by running either the command line tool
 \begin{verbatim}
 why3config
@@ -86,7 +86,7 @@ of the IDE. This must be done again each time a new prover is installed.
 
 The set of all provers which are attempted to detect is described in
 the readable configuration file \texttt{provers-detection-data.conf}
-of the Why3 data directory (\eg{}
+of the \why\ data directory (\eg{}
 \texttt{/usr/local/share/why3}). Advanced users may try to modify this
 file to add support for detection of other provers. (In that case,
 please consider submitting a new prover configuration on the bug
@@ -112,7 +112,7 @@ The provers which are typically attemped for detection are
 \item Z3~\cite{z3}: \url{http://research.microsoft.com/en-us/um/redmond/projects/z3/}
 \end{itemize}
 
-\texttt{why3config} also detects the plugins installed in the Why3
+\texttt{why3config} also detects the plugins installed in the \why\
 plugins directory (\eg{} \texttt{/usr/local/lib/why3/plugins}). A
 plugin must register itself as a parser, a transformation or a
 printer, as explained in the corresponding section.
@@ -126,7 +126,7 @@ provers and will replace them in the file configuration.
 \section{The \texttt{why3} command-line tool}
 \label{sec:why3ref}
 
-Why3 is primarily used to call provers on goals contains by file in
+\why\ is primarily used to call provers on goals contains by file in
 why3 format \texttt{.why} extension. However plugins can register
 parser which can extend the known format. \texttt{why3ml} apply the
 following steps :
@@ -163,7 +163,7 @@ following steps :
 \end{enumerate}
 
 \texttt{why3} call the prover sequentially, use \texttt{why3bench} if
-you want to call the provers concurrently. \texttt{Why3} can also be
+you want to call the provers concurrently. \why\ can also be
 used to provide other informations :
 \begin{itemize}
 \item \texttt{print-namespace} print the namespace of the selected
@@ -243,7 +243,7 @@ The preferences window allows you customize
 
 \section{The \texttt{why3ml} tool}
 
-The \texttt{why3ml} is an additional layer on Why3 library for
+The \texttt{why3ml} is an additional layer on \why\ library for
 generating verification conditions from WhyML programs. This tool and
 the syntax of WhyML programs is intentionally left undocumented since
 it might evolve significantly in the near future.
