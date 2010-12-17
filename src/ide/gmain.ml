@@ -502,7 +502,7 @@ let task_checksum t =
   Digest.to_hex (Digest.string s)
 
 
-let info_window mt s =
+let info_window ?(callback=(fun () -> ())) mt s =
   let buttons = match mt with
     | `INFO -> GWindow.Buttons.close
     | `WARNING -> GWindow.Buttons.close
@@ -516,12 +516,11 @@ let info_window mt s =
     ~title:"Why3 info or error"
     ~show:true ()
   in
-  let r = ref false in
   let (_ : GtkSignal.id) =
     d#connect#response
-      ~callback:(function x -> r := x = `OK; d#destroy ())
-  in
-  !r
+      ~callback:(function x -> d#destroy ();
+		   if x = `OK then callback ())
+  in ()
 
 module Helpers = struct
 
@@ -1211,7 +1210,7 @@ let select_file () =
                   "@[Error while reading file@ '%s':@ %a@]" f
                   Exn_printer.exn_printer e;
 	        let msg = flush_str_formatter () in
-	        let (_:bool) = info_window `ERROR msg in ()
+	        info_window `ERROR msg
       end
   | `DELETE_EVENT | `CANCEL -> ()
   end ;
@@ -1219,7 +1218,7 @@ let select_file () =
 
 
 let not_implemented () =
-  let (_:bool) = info_window `INFO "This feature is not yet implemented, sorry" in ()
+  info_window `INFO "This feature is not yet implemented, sorry"
 
 (*************)
 (* File menu *)
@@ -1442,7 +1441,7 @@ let () =
   in ()
 
 let () =
-  let b = GButton.button ~packing:transf_box#add ~label:"Inline" () in
+  let b = GButton.button ~packing:transf_box#add ~label:"(Inline)" () in
 (*
   let i = GMisc.image ~pixbuf:(!image_transf) () in
   let () = b#set_image i#coerce in
@@ -1720,9 +1719,7 @@ let edit_current_proof () =
     | [] -> ()
     | [r] -> edit_selected_row r
     | _ ->
-	let (_:bool) =
-          info_window `INFO "Please select exactly one proof to edit"
-        in ()
+	info_window `INFO "Please select exactly one proof to edit"
 
 
 let add_item_edit () =
@@ -1745,7 +1742,7 @@ let () =
   in ()
 
 let () =
-  let b = GButton.button ~packing:tools_box#add ~label:"Replay" () in
+  let b = GButton.button ~packing:tools_box#add ~label:"(Replay)" () in
 (*
   let i = GMisc.image ~pixbuf:(!image_replay) () in
   let () = b#set_image i#coerce in
@@ -1766,28 +1763,25 @@ let confirm_remove_row r =
   let row = filter_model#get_iter r in
   match filter_model#get ~row ~column:Model.index_column with
     | Model.Row_goal _g ->
-	let (_:bool) = info_window `ERROR "Cannot remove a goal" in ()
+	info_window `ERROR "Cannot remove a goal"
     | Model.Row_theory _th ->
-	let (_:bool) = info_window `ERROR "Cannot remove a theory" in ()
+	info_window `ERROR "Cannot remove a theory"
     | Model.Row_file _file ->
-	let (_:bool) = info_window `ERROR "Cannot remove a file" in ()
+	info_window `ERROR "Cannot remove a file"
     | Model.Row_proof_attempt a ->
-	let b =
-	  info_window `QUESTION
-	    "Do you really want to remove the selected proof attempt?"
-	in
-	if b then remove_proof_attempt a
+	info_window 
+	  ~callback:(fun () -> remove_proof_attempt a)
+	  `QUESTION
+	  "Do you really want to remove the selected proof attempt?"
     | Model.Row_transformation _tr ->
-	let (_:bool) = info_window `INFO "Transformation removal not implemented" in ()
+	info_window `INFO "Transformation removal not yet available, sorry"
 
 let confirm_remove_selection () =
   match goals_view#selection#get_selected_rows with
     | [] -> ()
     | [r] -> confirm_remove_row r
     | _ ->
-	let (_:bool) =
-          info_window `INFO "Please select exactly one item to remove"
-        in ()
+        info_window `INFO "Please select exactly one item to remove"
 
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"Remove" () in
