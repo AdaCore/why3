@@ -168,12 +168,8 @@ used to provide other informations :
 \begin{itemize}
 \item \texttt{print-namespace} print the namespace of the selected
   theories
-\item TODO
+\item [TO BE COMPLETED]
 \end{itemize}
-
-% \section{The \texttt{why3ml} tool}
-
-% [TO BE COMPLETED LATER]
 
 \section{The \texttt{why3ide} GUI}
 \label{sec:ideref}
@@ -241,12 +237,26 @@ The preferences window allows you customize
 \item the maximal number of simultaneous provers allowed to run in parallel. 
 \end{itemize}
 
-
 \subsection{Structure of the database file}
 
-[TO BE COMPLETED]
+[TO BE COMPLETED LATER]
+
+\section{The \texttt{why3ml} tool}
+
+The \texttt{why3ml} is an additional layer on Why3 library for
+generating verification conditions from WhyML programs. This tool and
+the syntax of WhyML programs is intentionally left undocumented since
+it might evolve significantly in the near future.
+
+For those who want to experiment with it, examples are provided in
+\texttt{examples/programs}. The files \texttt{*.mlw} can be loaded in
+the GUI.
+
+[TO BE COMPLETED LATER]
 
 \section{The \texttt{why3bench} tool}
+
+[TO BE COMPLETED LATER]
 
 \section{The \texttt{why.conf} configuration file}
 \label{sec:whyconffile}
@@ -315,48 +325,73 @@ only once except if its a multi-value key. The order of apparition of
 the keys inside a section matter only for the multi-value key.
 
 \section{Drivers of external provers}
-The drivers of external provers are 
+
+The drivers of external provers are readable files, in directory
+\texttt{drivers}. Experimented users can modify them to change the way
+the external provers are called, in particular which transformations
+are applied to goals.
+
+[TO BE COMPLETED LATER]
 
 \section{Transformations}
 \label{sec:transformations}
 
+Here is a quick documentation of provided transformations. We give
+first the non-splitting ones, \eg{} those which produce one goal as
+result, and others which produces any number of goals.
+
 \subsection{Non-splitting transformations}
 
 \begin{description}
+
 \item[eliminate\_algebraic] Replaces algebraic data types by first-order
 definitions~\cite{paskevich09rr}
+
 \item[eliminate\_builtin] Suppress definitions of symbols which are
   declared as builtin in the driver, i.e. with a ``syntax'' rule.
   
 \item[eliminate\_definition]
 \item[eliminate\_definition\_func]
 \item[eliminate\_definition\_pred]
+
 \item[eliminate\_if\_fmla] replaces formulas of the form if f1 then f2
   else f3 by an equivalent formula using implications and other
-  connectives. (TODO: detail)
+  connectives. [TO BE COMPLETED LATER]
+
 \item[eliminate\_if\_term] replaces terms of the form if formula then
-  t2 else t3 by lift it at the level of the formula (TODO: detail)
+  t2 else t3 by lift it at the level of the formula [TO BE COMPLETED
+  LATER]
+
 \item[eliminate\_if]
   apply both two above transformations
+
 \item[eliminate\_inductive] replaces inductive predicates by
   (incomplete) axiomatic definitions, i.e construction axioms and an
-  inversion axiom (TODO: detail)
+  inversion axiom [TO BE COMPLETED LATER]
+
 \item[eliminate\_let\_fmla]
 \item[eliminate\_let\_term]
 \item[eliminate\_let]
   apply both two above transformations
+
 \item[eliminate\_mutual\_recursion]
 \item[eliminate\_recursion]
 \item[encoding\_decorate\_mono]
 \item[encoding\_enumeration]
 \item[encoding\_simple2]
+
 \item[encoding\_smt]
-Should we cite \cite{conchon08smt} here?
+  Encode polymorphic types into monomorphic type~\cite{conchon08smt}.
+
 \item[encoding\_tptp]
+  Encode theories into unsorted logic~\cite{cruanes10}.
+
 \item[filter\_trigger]
 \item[filter\_trigger\_builtin]
 \item[filter\_trigger\_no\_predicate]
 \item[hypothesis\_selection]
+  Filter hypothesis of goals~\cite{cruanes10}.
+
 \item[inline\_all]
 \item[inline\_trivial]
   removes definitions of the form
@@ -367,12 +402,15 @@ when each $e_i$ is either a constant or one of the $x_j$, and
 each $x_1$ .. $x_n$ occur at most once in the $e_i$ 
 
 \item[remove\_triggers]
+
 \item[simplify\_array]
+
 \item[simplify\_formula] reduces trivial equalities $t=t$ to True and
   then simplifies propositional structure: removes True, False, ``f
   and f'' to ``f'', etc.
-\item[simplify\_recursive\_definition]
-  reduces mutually recursive definitions if they are not really mutually recursive, e.g.:
+
+\item[simplify\_recursive\_definition] reduces mutually recursive
+  definitions if they are not really mutually recursive, e.g.:
 \begin{verbatim}
 logic f : ... = .... g ...
 
@@ -403,7 +441,9 @@ P(t)
   in a negative position.
   
 \item[simplify\_trivial\_quantification\_in\_goal]
+
 \item[split\_premise]
+
 \end{description}
 
 \subsection{Splitting transformations}
@@ -412,7 +452,10 @@ P(t)
 \item[right\_split]
 \item[simplify\_formula\_and\_task]
 \item[split\_all]
-\item[split\_goal]
+
+\item[split\_goal] if the goal is a conjunction of goals, returns the
+  corresponding set of subgoals.
+
 \item[split\_goal\_pos\_all]
 \item[split\_goal\_pos\_axiom]
 \item[split\_goal\_pos\_goal]
