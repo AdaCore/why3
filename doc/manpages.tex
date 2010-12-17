@@ -162,14 +162,16 @@ following steps :
   \texttt{-P/--prover} is used.
 \end{enumerate}
 
-\texttt{why3} call the prover sequentially, use \texttt{why3bench} if
-you want to call the provers concurrently. \why\ can also be
-used to provide other informations :
-\begin{itemize}
-\item \texttt{print-namespace} print the namespace of the selected
-  theories
-\item [TO BE COMPLETED]
-\end{itemize}
+% \texttt{why3} call the prover sequentially, use \texttt{why3bench} if *)
+% you want to call the provers concurrently.  *)
+
+% \why\ can also be *)
+% used to provide other informations : *)
+% \begin{itemize} *)
+% \item \texttt{print-namespace} print the namespace of the selected *)
+%   theories *)
+% \item TO BE COMPLETED *)
+% \end{itemize} *)
 
 \section{The \texttt{why3ide} GUI}
 \label{sec:ideref}
@@ -318,9 +320,8 @@ the example, or it can be composed by a family name and one family
 argument, \texttt{prover} is one family name, \texttt{coq} and
 \texttt{alt-ergo} are the family argument.
 
-
 Inside a section, one key can be associated to an integer (.eg -555),
-a boolean (true, false) or a string (.eg "emacs"). One key can appear
+a boolean (true, false) or a string (\eg{} "emacs"). One key can appear
 only once except if its a multi-value key. The order of apparition of
 the keys inside a section matter only for the multi-value key.
 
@@ -349,64 +350,86 @@ definitions~\cite{paskevich09rr}
 
 \item[eliminate\_builtin] Suppress definitions of symbols which are
   declared as builtin in the driver, i.e. with a ``syntax'' rule.
-  
-\item[eliminate\_definition]
 \item[eliminate\_definition\_func]
+  Replaces all function definitions with axioms.
 \item[eliminate\_definition\_pred]
+  Replaces all predicate definitions with axioms.
+\item[eliminate\_definition]
+  Apply both transformations above.
+\item[eliminate\_mutual\_recursion]
+  Replaces mutually recursive definitions with axioms.
+\item[eliminate\_recursion]
+  Replaces all recursive definitions with axioms.
 
-\item[eliminate\_if\_fmla] replaces formulas of the form if f1 then f2
-  else f3 by an equivalent formula using implications and other
-  connectives. [TO BE COMPLETED LATER]
+\item[eliminate\_if\_term] replaces terms of the form \texttt{if
+    formula then t2 else t3} by lifting them at the level of formulas.
+  This may introduce \texttt{if then else } in formulas.
 
-\item[eliminate\_if\_term] replaces terms of the form if formula then
-  t2 else t3 by lift it at the level of the formula [TO BE COMPLETED
-  LATER]
+\item[eliminate\_if\_fmla] replaces formulas of the form \texttt{if f1 then f2
+  else f3} by an equivalent formula using implications and other
+  connectives. 
 
 \item[eliminate\_if]
-  apply both two above transformations
+  Apply both transformations above.
 
 \item[eliminate\_inductive] replaces inductive predicates by
-  (incomplete) axiomatic definitions, i.e construction axioms and an
-  inversion axiom [TO BE COMPLETED LATER]
+  (incomplete) axiomatic definitions, i.e. construction axioms and
+  an inversion axiom.
 
 \item[eliminate\_let\_fmla]
-\item[eliminate\_let\_term]
-\item[eliminate\_let]
-  apply both two above transformations
+  Eliminates \texttt{let} by substitution, at the predicate level.
 
-\item[eliminate\_mutual\_recursion]
-\item[eliminate\_recursion]
-\item[encoding\_decorate\_mono]
-\item[encoding\_enumeration]
-\item[encoding\_simple2]
+\item[eliminate\_let\_term]
+  Eliminates \texttt{let} by substitution, at the term level.
+
+\item[eliminate\_let]
+  Apply both transformations above.
+
+% \item[encoding\_decorate\_mono]
+
+% \item[encoding\_enumeration]
 
 \item[encoding\_smt]
   Encode polymorphic types into monomorphic type~\cite{conchon08smt}.
 
 \item[encoding\_tptp]
-  Encode theories into unsorted logic~\cite{cruanes10}.
+  Encode theories into unsorted logic. %~\cite{cruanes10}.
 
-\item[filter\_trigger]
-\item[filter\_trigger\_builtin]
-\item[filter\_trigger\_no\_predicate]
-\item[hypothesis\_selection]
-  Filter hypothesis of goals~\cite{cruanes10}.
+% \item[filter\_trigger] *)
+
+% \item[filter\_trigger\_builtin] *)
+
+% \item[filter\_trigger\_no\_predicate] *)
+
+% \item[hypothesis\_selection] *)
+%   Filter hypothesis of goals~\cite{couchot07ftp,cruanes10}. *)
 
 \item[inline\_all]
+  expands all non-recursive definitions.
+
+\item[inline\_goal] Expands all outermost symbols of the goal that
+  have a non-recursive definition.
+
 \item[inline\_trivial]
   removes definitions of the form
+
 \begin{verbatim}
 logic f x_1 .. x_n = (g e_1 .. e_k)
 \end{verbatim}
-when each $e_i$ is either a constant or one of the $x_j$, and
-each $x_1$ .. $x_n$ occur at most once in the $e_i$ 
+when each $e_i$ is either a ground term or one of the $x_j$, and
+each $x_1$ .. $x_n$ occur at most once in the $e_i$
 
-\item[remove\_triggers]
+\item[introduce\_premises] moves antecedents of implications and
+  universal quantifications of the goal into the premises of the task.
 
-\item[simplify\_array]
+% \item[remove\_triggers] *)
+%   removes the triggers in all quantifications. *)
 
-\item[simplify\_formula] reduces trivial equalities $t=t$ to True and
-  then simplifies propositional structure: removes True, False, ``f
+\item[simplify\_array] Automatically rewrites the task using the lemma
+  \verb|Select_eq| of theory \verb|array.Array|.
+
+\item[simplify\_formula] reduces trivial equalities $t=t$ to true and
+  then simplifies propositional structure: removes true, false, ``f
   and f'' to ``f'', etc.
 
 \item[simplify\_recursive\_definition] reduces mutually recursive
@@ -441,27 +464,37 @@ P(t)
   in a negative position.
   
 \item[simplify\_trivial\_quantification\_in\_goal]
+  same as above but applies only in the goal.
 
 \item[split\_premise]
+  splits conjunctive premises.
 
 \end{description}
 
 \subsection{Splitting transformations}
 
 \begin{description}
-\item[right\_split]
-\item[simplify\_formula\_and\_task]
+
+\item[full\_split\_all]
+  composition of \texttt{split\_premise} and \texttt{full\_split\_goal}.
+
+\item[full\_split\_goal] puts the goal in a conjunctive form,
+  returns the corresponding set of subgoals. The number of subgoals
+  generated may be exponential in the size of the initial goal.
+
+\item[simplify\_formula\_and\_task] same as \texttt{simplify\_formula}
+  but also removes the goal if it is equivalent to true.
+
 \item[split\_all]
+  composition of \texttt{split\_premise} and \texttt{split\_goal}.
 
 \item[split\_goal] if the goal is a conjunction of goals, returns the
-  corresponding set of subgoals.
+  corresponding set of subgoals. The number of subgoals generated is linear in
+  the size of the initial goal.
 
-\item[split\_goal\_pos\_all]
-\item[split\_goal\_pos\_axiom]
-\item[split\_goal\_pos\_goal]
-\item[split\_goal\_pos\_neg\_all]
-\item[split\_goal\_pos\_neg\_axiom]
-\item[split\_goal\_pos\_neg\_goal]
+\item[split\_intro]
+  when a goal is an implication, moves the antecedents into the premises.
+
 \end{description}
 
 
