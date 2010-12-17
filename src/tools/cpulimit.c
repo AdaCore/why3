@@ -43,19 +43,19 @@ int main(int argc, char *argv[]) {
 
   if (argc < 5) {
     fprintf(stderr, "usage: %s <time limit in seconds> \
-<virtual memory limit in MiB> <print time yes|no> <command>\n\
+<virtual memory limit in MiB> <-s|-h> <command>\n\
 a null value sets no limit (keeps the actual limit)\n", argv[0]);
     return EXIT_FAILURE;
   }
 
   /* Fork if requested */
-  if(strcmp("yes",argv[3]) == 0){
+  if(strcmp("-s",argv[3]) == 0){
       int pid = fork ();
       if (pid == -1){
           perror("fork");
           exit(EXIT_FAILURE);
       } else if (pid == 0){
-          /* The child continue to execute the program */
+          /* The child continues to execute the program */
       } else {
           /* The parent will not exit this condition */
           int status;
@@ -64,8 +64,12 @@ a null value sets no limit (keeps the actual limit)\n", argv[0]);
           times(&tms);
           double time = (double)((tms.tms_cutime + tms.tms_cstime + 0.0)
                                  / sysconf(_SC_CLK_TCK));
-          fprintf(stdout, "cpulimit_time : %f s\n",time);
-          return status;
+          fprintf(stdout, "why3cpulimit time : %f s\n",time);
+          if (WIFEXITED(status)){
+              return WEXITSTATUS(status);
+          }
+
+          kill(getpid(),SIGTERM);
       }
   }
 

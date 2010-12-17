@@ -8,7 +8,8 @@ filename "%f-%t-%g.gappa"
 
 valid 0
 unknown "no contradiction was found\\|some enclosures were not satisfied" "Unknown"
-time "cpulimit_time : %s s"
+time "why3cpulimit time : %s s"
+fail "Error: \\(.*\\)" "\\1"
 
 transformation "simplify_recursive_definition"
 transformation "inline_trivial"
@@ -95,7 +96,7 @@ theory real.Real
   meta "inline : no" logic (<=)
   meta "inline : no" logic (>=)
   meta "inline : no" logic (>)
-
+  
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
   remove prop CommutativeGroup.Unit_def

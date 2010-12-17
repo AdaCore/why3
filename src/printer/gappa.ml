@@ -74,6 +74,7 @@ let get_info =
             let real_ge = find_real "infix >=" in
             let real_lt = find_real "infix <" in
             let real_gt = find_real "infix >" in
+            let real_inv = find_real "inv" in
             let find_real_abs = find_th env "real" "Abs" in
             let real_abs = find_real_abs "abs" in
 	    let find_rounding_theory = find_th env "floating_point" "Rounding" in
@@ -90,7 +91,7 @@ let get_info =
                  int_add; int_sub; int_mul;
                  int_le; int_ge; int_lt; int_gt;
 		 int_abs;
-		 real_add; real_sub; real_mul; real_div;
+		 real_add; real_sub; real_mul; real_div; real_inv;
                  real_le; real_ge; real_lt; real_gt;
                  real_abs;
 		 !round_single;
