@@ -27,11 +27,16 @@ let usage_msg =
 $WHY3LIB and $WHYDATA are used only when a configuration file is created"
     (Filename.basename Sys.argv.(0))
 
+let version_msg = sprintf
+  "Why3 configuration utility, version %s (build date: %s)"
+  Config.version Config.builddate
+
 (* let libdir = ref None *)
 (* let datadir = ref None *)
 let conf_file = ref None
 let autoprovers = ref false
 let autoplugins = ref false
+let opt_version = ref false
 
 let save = ref true
 
@@ -54,9 +59,11 @@ let option_list = Arg.align [
   "--autodetect-plugins", Arg.Set autoplugins,
   " autodetect the plugins in the default library directories";
   "--install-plugin", Arg.String add_plugin,
-  "install a plugin to the actual libdir";
+  " install a plugin to the actual libdir";
   "--dont-save", Arg.Clear save,
-  "dont modify the config file"
+  " dont modify the config file";
+  "--version", Arg.Set opt_version,
+  " print version information"
 ]
 
 let anon_file _ = Arg.usage option_list usage_msg; exit 1
@@ -94,6 +101,10 @@ let plugins_auto_detection config =
 
 let () =
   Arg.parse option_list anon_file usage_msg;
+  if !opt_version then begin
+    printf "%s@." version_msg;
+    exit 0
+  end;
   let config =
     try read_config !conf_file
     with Not_found ->

@@ -30,6 +30,9 @@ let usage_msg = sprintf
   "Usage: %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]..."
   (Filename.basename Sys.argv.(0))
 
+let version_msg = sprintf "Why3 platform, version %s (build date: %s)"
+  Config.version Config.builddate
+
 let opt_queue = Queue.create ()
 
 let opt_input = ref None
@@ -109,6 +112,7 @@ let opt_list_flags = ref false
 let opt_parse_only = ref false
 let opt_type_only = ref false
 let opt_debug_all = ref false
+let opt_version = ref false
 
 let option_list = Arg.align [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
@@ -186,7 +190,9 @@ let option_list = Arg.align [
   "--debug-all", Arg.Set opt_debug_all,
       " Set all debug flags (except parse_only and type_only)";
   "--debug", Arg.String add_opt_debug,
-      "<flag> Set a debug flag" ]
+      "<flag> Set a debug flag";
+  "--version", Arg.Set opt_version,
+      " Print version information" ]
 
 let () =
   try
@@ -218,6 +224,10 @@ let () =
   (** listings*)
 
   let opt_list = ref false in
+  if !opt_version then begin
+    opt_list := true;
+    printf "%s@." version_msg
+  end;
   if !opt_list_transforms then begin
     opt_list := true;
     printf "@[<hov 2>Known non-splitting transformations:@\n%a@]@\n@."
@@ -225,7 +235,7 @@ let () =
       (List.sort String.compare (Trans.list_transforms ()));
     printf "@[<hov 2>Known splitting transformations:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Trans.list_transforms_l ()));
+      (List.sort String.compare (Trans.list_transforms_l ()))
   end;
   if !opt_list_printers then begin
     opt_list := true;

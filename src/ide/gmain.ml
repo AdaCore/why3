@@ -92,6 +92,7 @@ open Gconfig
 
 let includes = ref []
 let file = ref None
+let opt_version = ref false
 
 let spec = Arg.align [
   ("-I",
@@ -102,9 +103,18 @@ let spec = Arg.align [
    Arg.String (fun s -> input_files := s :: !input_files),
    "<f> add file f to the project (ignored if it is already there)") ;
 *)
+  ("-v",
+   Arg.Set opt_version,
+   " print version information") ;
 ]
 
-let usage_str = "whydb [options] [<file.why>|<project directory>]"
+let version_msg = sprintf "Why3 IDE, version %s (build date: %s)"
+  Config.version Config.builddate
+
+let usage_str = sprintf
+  "Usage: %s [options] [<file.why>|<project directory>]"
+  (Filename.basename Sys.argv.(0))
+
 let set_file f = match !file with
   | Some _ ->
       raise (Arg.Bad "only one parameter")
@@ -112,6 +122,12 @@ let set_file f = match !file with
       file := Some f
 
 let () = Arg.parse spec set_file usage_str
+
+let () =
+  if !opt_version then begin
+    printf "%s@." version_msg;
+    exit 0
+  end
 
 let fname = match !file with
   | None ->

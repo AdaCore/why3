@@ -299,7 +299,7 @@ let show_about_window () =
                 "Andrei Paskevich"
                ]
       ~copyright:"Copyright 2010 Univ Paris-Sud, CNRS, INRIA"
-      ~license:"Gnu Lesser General Public License"
+      ~license:"GNU Lesser General Public License"
       ~website:"https://gforge.inria.fr/projects/why3"
       ~website_label:"Project web site"
       ~version:Config.version
