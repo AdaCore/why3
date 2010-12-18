@@ -978,7 +978,9 @@ $(DISTRIB_TAR): doc/manual.pdf
 
 headers:
 	headache -c misc/headache_config.txt -h misc/header.txt \
-	    Makefile.in configure.in */*.ml */*/*.ml */*/*.ml[ily4]
+	    Makefile.in configure.in src/*.ml* src/*/*.ml* \
+	    src/tools/cpulimit.c
+
 
 #########
 # myself
