@@ -75,6 +75,10 @@ val image_valid : GdkPixbuf.pixbuf ref
 val image_timeout : GdkPixbuf.pixbuf ref
 val image_unknown : GdkPixbuf.pixbuf ref
 val image_failure : GdkPixbuf.pixbuf ref
+val image_valid_obs : GdkPixbuf.pixbuf ref
+val image_timeout_obs : GdkPixbuf.pixbuf ref
+val image_unknown_obs : GdkPixbuf.pixbuf ref
+val image_failure_obs : GdkPixbuf.pixbuf ref
 
 (*************************)
 (* miscellaneous dialogs *)

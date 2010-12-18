@@ -420,11 +420,11 @@ let factory = new GMenu.factory menubar
 
 let accel_group = factory#accel_group
 
-let hb = GPack.hbox ~packing:vbox#add ()
+let hb = GPack.hbox ~packing:vbox#add ~border_width:2 ()
 
 let tools_window_vbox =
   try
-    GPack.vbox ~packing:(hb#pack ~expand:false)  ()
+    GPack.vbox ~packing:(hb#pack ~expand:false) ~border_width:2 ()
   with Gtk.Error _ -> assert false
 
 let context_frame =
@@ -432,15 +432,14 @@ let context_frame =
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 let context_box =
-  GPack.button_box `VERTICAL ~border_width:5
-    ~spacing:5
+  GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
     ~packing:context_frame#add ()
 
 let context_unproved_goals_only = ref true
 
 let () =
   let b1 = GButton.radio_button
-    ~packing:context_box#add ~label:"Unproved goals only" ()
+    ~packing:context_box#add ~label:"Unproved goals" ()
   in
   let (_ : GtkSignal.id) =
     b1#connect#clicked
@@ -459,23 +458,26 @@ let provers_frame =
   GBin.frame ~label:"Provers"
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
-let provers_box = GPack.button_box `VERTICAL ~border_width:5
-  ~spacing:5
+let provers_box =
+  GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
   ~packing:provers_frame#add ()
+
+let () = provers_frame#set_resize_mode `PARENT
 
 let transf_frame =
   GBin.frame ~label:"Transformations"
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 let transf_box =
-  GPack.button_box `VERTICAL ~border_width:5 ~packing:transf_frame#add ()
+  GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+  ~packing:transf_frame#add ()
 
 let tools_frame =
   GBin.frame ~label:"Tools"
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
-let tools_box = GPack.button_box `VERTICAL ~border_width:5
-  ~spacing:5
+let tools_box =
+  GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
   ~packing:tools_frame#add ()
 
 let cleaning_frame =
@@ -483,12 +485,13 @@ let cleaning_frame =
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 let cleaning_box =
-  GPack.button_box `VERTICAL ~border_width:5 ~packing:cleaning_frame#add ()
+  GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+  ~packing:cleaning_frame#add ()
 
 
 (* horizontal paned *)
 
-let hp = GPack.paned `HORIZONTAL  ~border_width:3 ~packing:hb#add ()
+let hp = GPack.paned `HORIZONTAL ~packing:hb#add ()
 
 
 (* tree view *)
@@ -542,13 +545,18 @@ module Helpers = struct
 
   open Model
 
-  let image_of_result = function
-    | Scheduled -> !image_scheduled
-    | Running -> !image_running
-    | Success -> !image_valid
-    | Timeout -> !image_timeout
-    | Unknown -> !image_unknown
-    | HighFailure -> !image_failure
+  let image_of_result ~obsolete result =
+    match obsolete,result with
+    | _, Scheduled -> !image_scheduled
+    | _, Running -> !image_running
+    | false, Success -> !image_valid
+    | false, Timeout -> !image_timeout
+    | false, Unknown -> !image_unknown
+    | false, HighFailure -> !image_failure
+    | true, Success -> !image_valid_obs
+    | true, Timeout -> !image_timeout_obs
+    | true, Unknown -> !image_unknown_obs
+    | true, HighFailure -> !image_failure_obs
 
   let set_file_verified f =
     f.file_verified <- true;
@@ -596,7 +604,8 @@ module Helpers = struct
   let set_proof_status ~obsolete a s time  =
     a.status <- s;
     let row = a.proof_row in
-    goals_model#set ~row ~column:status_column (image_of_result s);
+    goals_model#set ~row ~column:status_column
+      (image_of_result ~obsolete s);
     let t = if time > 0.0 then
       begin
         a.Model.time <- time;
@@ -1499,9 +1508,8 @@ let (_ : GMenu.image_menu_item) =
 
 let vp =
   try
-    GPack.paned `VERTICAL  ~border_width:3 ~packing:hp#add ()
+    GPack.paned `VERTICAL ~packing:hp#add ()
   with Gtk.Error _ -> assert false
-
 
 (******************)
 (* goal text view *)
@@ -1510,6 +1518,8 @@ let vp =
 let scrolled_task_view = GBin.scrolled_window
   ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
   ~packing:vp#add ()
+
+let () = scrolled_task_view#set_shadow_type `ETCHED_OUT
 
 let (_ : GtkSignal.id) =
   scrolled_task_view#misc#connect#size_allocate
@@ -1536,6 +1546,8 @@ let scrolled_source_view = GBin.scrolled_window
   ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
   ~packing:vp#add
   ()
+
+let () = scrolled_source_view#set_shadow_type `ETCHED_OUT
 
 let source_view =
   GSourceView2.source_view

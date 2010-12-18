@@ -199,6 +199,11 @@ let iconname_unknown = "help32"
 let iconname_invalid = "delete32"
 let iconname_timeout = "clock32"
 let iconname_failure = "bug32"
+let iconname_valid_obs = "obsaccept32"
+let iconname_unknown_obs = "obshelp32"
+let iconname_invalid_obs = "obsdelete32"
+let iconname_timeout_obs = "obsclock32"
+let iconname_failure_obs = "obsbug32"
 let iconname_yes = "accept32"
 let iconname_no = "delete32"
 let iconname_directory = "folder32"
@@ -216,6 +221,11 @@ let image_unknown = ref !image_default
 let image_invalid = ref !image_default
 let image_timeout = ref !image_default
 let image_failure = ref !image_default
+let image_valid_obs = ref !image_default
+let image_unknown_obs = ref !image_default
+let image_invalid_obs = ref !image_default
+let image_timeout_obs = ref !image_default
+let image_failure_obs = ref !image_default
 let image_yes = ref !image_default
 let image_no = ref !image_default
 let image_directory = ref !image_default
@@ -234,6 +244,11 @@ let resize_images size =
   image_invalid := image ~size iconname_invalid;
   image_timeout := image ~size iconname_timeout;
   image_failure := image ~size iconname_failure;
+  image_valid_obs := image ~size iconname_valid_obs;
+  image_unknown_obs := image ~size iconname_unknown_obs;
+  image_invalid_obs := image ~size iconname_invalid_obs;
+  image_timeout_obs := image ~size iconname_timeout_obs;
+  image_failure_obs := image ~size iconname_failure_obs;
   image_yes := image ~size iconname_yes;
   image_no := image ~size iconname_no;
   image_directory := image ~size iconname_directory;
@@ -249,42 +264,46 @@ let () =
   resize_images 20;
   eprintf " done.@."
 
-
-
 let show_legend_window () =
   let dialog = GWindow.dialog ~title:"Why: legend of icons" () in
   let vbox = dialog#vbox in
-  let text = GText.view ~packing:vbox#add () in
+  let text = GText.view ~packing:vbox#add
+    ~editable:false ~cursor_visible:false () in
   let b = text#buffer in
+  let tt = b#create_tag [`WEIGHT `BOLD; `JUSTIFICATION `CENTER;
+    `PIXELS_ABOVE_LINES 15; `PIXELS_BELOW_LINES 3; ] in
   let i s = b#insert ~iter:b#end_iter s in
+  let it s = b#insert ~iter:b#end_iter ~tags:[tt] s in
   let ib i = b#insert_pixbuf ~iter:b#end_iter ~pixbuf:!i in
-  i "== icons in the tree view on the left ==\n";
-  i "\n";
+  it "Tree view\n";
   ib image_directory;
-  i "A theory, containing a set of goals\n";
+  i "   Theory, containing a set of goals\n";
   ib image_file;
-  i "A goal\n";
+  i "   Goal\n";
   ib image_prover;
-  i "An external prover\n";
+  i "   External prover\n";
   ib image_transf;
-  i "A split transformation\n";
-  i "\n";
-  i "== icons in the status column ==\n";
-  i "\n";
+  i "   Split transformation\n";
+  it "Status column\n";
   ib image_scheduled;
-  i "external proof scheduled by not started yet\n";
+  i "   Scheduled external proof attempt\n";
   ib image_running;
-  i "external proof is running\n";
+  i "   Running external proof attempt\n";
   ib image_valid;
-  i "goal is proved/theory is fully verified\n";
+  i "   Goal is proved / Theory is fully verified\n";
+(*
+  ib image_invalid;
+  i "   External prover disproved the goal\n";
+*)
   ib image_timeout;
-  i "external prover reached the time limit\n";
+  i "   External prover reached the time limit\n";
   ib image_unknown;
-  i "external prover answer was not conclusive\n";
+  i "   External prover answer not conclusive\n";
   ib image_failure;
-  i "external prover call failed\n";
-  i "\n";
+  i "   External prover call failed\n";
   dialog#add_button "Close" `CLOSE ;
+  let t = b#create_tag [`LEFT_MARGIN 10; `RIGHT_MARGIN 10 ] in
+  b#apply_tag t ~start:b#start_iter ~stop:b#end_iter;
   let ( _ : GWindow.Buttons.about) = dialog#run () in
   dialog#destroy ()
 
