@@ -502,7 +502,7 @@ install_no_local::
 ##############
 # Coq plugin
 ##############
-
+ifeq (@enable_coq_support@,yes)
 COQGENERATED = src/coq-plugin/g_whytac.ml
 
 COQ_FILES = whytac g_whytac
@@ -518,10 +518,8 @@ COQINCLUDES = -I src/coq-plugin $(addprefix -I @COQLIB@/, $(COQTREES))
 
 $(COQCMO) $(COQCMX): INCLUDES += $(COQINCLUDES)
 
-ifeq (@enable_coq_support@,yes)
 byte: src/coq-plugin/whytac.cma
 opt:  src/coq-plugin/whytac.cmxs
-endif
 
 src/coq-plugin/whytac.cma:  BFLAGS+=-rectypes -I +camlp5
 src/coq-plugin/whytac.cmxs: OFLAGS+=-rectypes -I +camlp5
@@ -537,14 +535,12 @@ src/coq-plugin/g_whytac.ml: src/coq-plugin/g_whytac.ml4
 
 # depend and clean targets
 
-ifeq (@enable_coq_support@,yes)
 include .depend.coq
 
 .depend.coq: $(COQGENERATED)
 	$(OCAMLDEP) -slash -I src -I src/coq-plugin $(COQML) > $@
 
 depend: .depend.coq
-endif
 
 clean::
 	rm -f src/coq-plugin/*.cm[iox] src/coq-plugin/*.o
@@ -553,10 +549,11 @@ clean::
 	rm -f $(COQGENERATED)
 	rm -f .depend.coq
 
+endif
 ########
 # Tptp2why
 ########
-
+ifeq (@enable_whytptp@,yes)
 TPTPGENERATED = src/tptp2why/tptpLexer.ml \
 	src/tptp2why/tptpParser.ml src/tptp2why/tptpParser.mli
 
@@ -574,10 +571,8 @@ $(TPTPCMO) $(TPTPCMX): INCLUDES += -I src/tptp2why
 
 # build targets
 
-ifeq (@enable_whytptp@,yes)
 plugins.byte byte: plugins/whytptp.cmo
 plugins.opt  opt :  plugins/whytptp.cmxs
-endif
 
 plugins/whytptp.cmxs plugins/whytptp.cmo: EXTOBJS += $(MENHIRLIB)
 plugins/whytptp.cmxs plugins/whytptp.cmo: INCLUDES += $(MENHIRINC)
@@ -607,14 +602,12 @@ install_no_local::
 
 # depend and clean targets
 
-ifeq (@enable_whytptp@,yes)
 include .depend.tptp2why
 
 .depend.tptp2why: $(TPTPGENERATED)
 	$(OCAMLDEP) -slash -I src -I src/tptp2why $(TPTPML) $(TPTPMLI) > $@
 
 depend: .depend.tptp2why
-endif
 
 clean::
 	rm -f $(TPTPGENERATED)
@@ -624,6 +617,7 @@ clean::
 	rm -f bin/whytptp.byte bin/whytptp.opt
 	rm -f .depend.tptp2why
 
+endif
 #######
 # tools
 #######
@@ -706,7 +700,7 @@ test-api: src/why.cma
 
 
 ## Examples : Plugins ##
-
+ifeq (@enable_plugins@,yes)
 PLUGDIR = examples/plugins/
 PLUG_FILES = genequlin
 
@@ -732,14 +726,12 @@ examples_plugins.opt : $(PLUGCMXS)
 
 # depend and clean targets
 
-ifeq (@enable_plugins@,yes)
 include .depend.plug
 
 .depend.plug: $(PLUGGENERATED)
 	$(OCAMLDEP) -slash -I src -I $(PLUGDIR) $(PLUGML) | sed "s/cmx/cmxs/" > $@
 
 depend: .depend.plug
-endif
 
 clean::
 	rm -f $(PLUGDIR)/*.cm[iox] $(PLUGDIR)/*.o
@@ -747,6 +739,7 @@ clean::
 	rm -f $(PLUGDIR)/*.annot $(PLUGDIR)/*~
 	rm -f $(PLUGGENERATED)
 	rm -f .depend.plug
+endif
 
 ################
 # documentation
