@@ -1,0 +1,60 @@
+
+theory Genealogy
+
+  type person
+
+  type gender = Male | Female
+  
+  logic gender person : gender
+
+  logic father person : person
+  logic mother person : person
+
+  axiom Father_gender : forall p : person. gender (father p) = Male
+  axiom Mother_gender : forall p : person. gender (mother p) = Female
+
+  logic parent (p : person) (c : person) = p = father c or p = mother c
+
+  logic son (s : person) (p : person) = gender s = Male and parent p s
+  logic daughter (d : person) (p : person) = gender d = Female and parent p d
+
+  logic child (c : person) (p : person) = parent p c
+
+  goal Child_is_son_or_daughter: 
+    forall c p : person. child c p <-> son c p or daughter c p
+
+  logic sibling (p1 : person) (p2 : person) =
+    p1 <> p2 and (father p1 = father p2 or mother p1 = mother p2)
+
+  goal Sibling_sym : forall p1 p2 : person. sibling p1 p2 -> sibling p2 p1
+
+  logic brother (b : person) (p : person) = sibling b p and gender b = Male
+  logic sister  (s : person) (p : person) = sibling s p and gender s = Female
+
+  goal Sibling_is_brother_or_sister:
+    forall p1 p2 : person. sibling p1 p2 <-> brother p1 p2 or sister p1 p2
+
+  logic grandparent (g : person) ( p : person) =
+    parent g (father p) or parent g (mother p)
+
+  logic grandfather (g : person) (p : person) =
+    g = father (father p) or g = father (mother p)
+  logic grandmother (g : person) (p : person) =
+    g = mother (father p) or g = mother (mother p)
+
+  goal Grandparent_is_grandfather_or_grandmother:
+    forall g p : person. grandparent g p <-> grandfather g p or grandmother g p
+
+  goal Grandfather_male: 
+    forall g p : person. grandfather g p -> gender g = Male
+  goal Grandmother_female: 
+    forall g p : person. grandmother g p -> gender g = Female
+
+  goal Only_two_grandfathers:
+     forall g1 g2 g3 p : person.
+     grandfather g1 p -> 
+     grandfather g2 p ->
+     grandfather g3 p ->
+     (g1 = g2 or g2 = g3 or g1 = g3)
+
+end
