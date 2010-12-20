@@ -222,10 +222,29 @@ the actions of the various menus and buttons of the interface.
 
 \subsection{Menus}
 
+\paragraph{Menu \textsf{File}}
 \begin{description}
-\item[File/Detect provers] runs provers auto-detection
-\item[File/Preferences] opens a window for modifying preferred configuration
+\item[Add File] adds a file in the GUI
+\item[Detect provers] runs provers auto-detection
+\item[Preferences] opens a window for modifying preferred
+  configuration, see details below
+\item[Quit] exits the GUI
 \end{description}
+
+\paragraph{Menu \textsf{View}}
+\begin{description}
+\item[Expand All] expands all the rows of the tree view
+\item[Collapse proved goals] closes all the rows of the tree view
+  which are proved.
+\item[Hide proved goals] completely hides the proved rows of the tree
+  view [EXPERIMENTAL]
+\end{description}
+
+\paragraph{Menu \textsf{Tools}}
+A copy of the tools already available in the left toolbar
+
+\paragraph{Menu \textsf{Help}}
+A very short online help, and some information about this software.
 
 \subsection{Preferences}
 
@@ -339,6 +358,12 @@ are applied to goals.
 Here is a quick documentation of provided transformations. We give
 first the non-splitting ones, \eg{} those which produce one goal as
 result, and others which produces any number of goals.
+
+Notice that the set of available transformations in your own
+installation is given by
+\begin{verbatim}
+why3 --list-transforms
+\end{verbatim}
 
 \subsection{Non-splitting transformations}
 
