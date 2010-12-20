@@ -26,7 +26,7 @@ Integer and real constants have arbitrary precision.
 Integer constants may be given in base 16, 10, 8 or 2.
 Real constants may be given in base 16 or 10.
  
-\begin{figure}[p]
+\begin{figure}
 \begin{center}\framebox{\input{./constant_bnf.tex}}\end{center}
   \caption{Syntax for constants.}
 \label{fig:bnf:constant}
@@ -73,7 +73,7 @@ associativities, from lowest to greatest priority:
 Note the curryfied syntax for function application, though partial
 application is not allowed (rejected at typing).
 
-\begin{figure}[p]
+\begin{figure}
   \begin{center}\framebox{\input{./term_bnf.tex}}\end{center}
   \caption{Syntax for terms.}
 \label{fig:bnf:term}
@@ -109,11 +109,18 @@ associativities, from lowest to greatest priority:
 Note that infix symbols of level 1 include equality (\texttt{=}) and
 disequality (\texttt{<>}).
 
-\begin{figure}[p]
+\begin{figure}
   \begin{center}\framebox{\input{./formula_bnf.tex}}\end{center}
   \caption{Syntax for formulas.}
 \label{fig:bnf:formula}
 \end{figure}
+
+Notice that there are two symbols for the conjunction: \texttt{and}
+and \verb|/\|, and similarly for disjunction. There are logically
+equivalent, but may be treated slightly differently by some
+transformation, \eg{} the \texttt{split} transformation transforms
+$A~\texttt{and}~B$ into subgoals $A$ and $B$, whereas it transforms
+$A~\verb|/\|~B$ into subgoals $A$ and $A\rightarrow B$.
 
 \paragraph{Theories.}
 The syntax for theories is given Figure~\ref{fig:bnf:theory}.
