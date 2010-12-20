@@ -777,7 +777,7 @@ clean::
 
 .PHONY: apidoc
 
-MODULESTODOC = util/util \
+MODULESTODOC = util/util util/hashweak \
 	core/ident core/ty core/term core/decl core/theory \
 	core/env core/task \
 	driver/whyconf driver/driver 
@@ -791,6 +791,9 @@ apidoc: $(FILESTODOC)
 	$(OCAMLDOC) -d apidoc -html -keep-code $(INCLUDES) \
 		$(LIBINCLUDES) -I src $(FILESTODOC)
 # $(LIBML)
+
+install_apidoc: apidoc
+	rsync -av apidoc/ marche@scm.gforge.inria.fr:/home/groups/why3/htdocs/apidoc/
 
 doc/apidoc.tex: $(FILESTODOC)
 	$(OCAMLDOC) -o doc/apidoc.tex -latex -noheader -notrailer $(INCLUDES) \
