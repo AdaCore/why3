@@ -94,13 +94,14 @@ $^2$ INRIA Saclay - \^Ile-de-France, ProVal, Orsay, F-91893
 
 This is the manual for the Why platform version 3, or \why\ for
 short. \why\ is a complete reimplementation of the former Why
-platform~\cite{filliatre07cav} for program verification.  The major
-change is a completely new design of the architecture for calling
-external provers. An important emphasis is put on the genericity,
-which allows for the end user to easily add the support for a new
-external prover if wanted.  A major new feature is also the ability
-to use Why programmatically, via a well-designed API.
-
+platform~\cite{filliatre07cav} for program verification. Among
+the new features are: numerous extensions to the input language,
+a new architecture for calling external provers, and a
+well-designed API, allowing to use \why\ as a software library.
+An important emphasis is put on modularity and genericity,
+giving the end user a possibility to easily reuse \why\
+formalisations or to add support for a new external
+prover if wanted.
 
 \subsection*{Availability}
 
@@ -132,17 +133,17 @@ Johannes Kanig, St\'ephane Lescuyer, Sim\~ao Melo de Sousa.
 
 \section*{Release notes}
 
-\paragraph{Version 0.10}
-Initial release. 
+\paragraph{Version 0.63}
+Initial release.
 \begin{itemize}
 \item New syntax for terms and formulas
-\item Algebraic data types, pattern-matching
+\item Algebraic data types, pattern matching
 \item Recursive definitions
 \item Inductive predicates
 \item Declaration encapsulated in theories. Using and cloning theories.
-\item Concept of goal transformation
+\item Concept of proof task transformation
 \item Generic communication with provers
-\item Ocaml Library with documented API
+\item OCaml library with documented API
 \item New GUI with session save and restore
 % \item New syntax for programs, new VC generator, intentionaly left *)
 %   undocumented, since the syntax is likely to evolve significantly in *)
@@ -153,7 +154,7 @@ Initial release.
 \tableofcontents
 
 
-\input{intro.tex}
+%\input{intro.tex}
 
 \part{Tutorial}
 

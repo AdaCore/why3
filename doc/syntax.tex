@@ -9,7 +9,7 @@ A theory is a list of \emph{declarations}. Declarations introduce new
 types, functions and predicates, state axioms, lemmas and goals.
 These declarations can be directly written in the theory or taken from
 existing theories. The base logic of \why\ is a first-order
-polymorphic logic.
+logic with polymorphic types.
 
 \subsection{Example 1: lists}
 
@@ -41,7 +41,7 @@ theory Length
     | Cons _ r -> 1 + length r
     end
 
-  lemma Length_nonnegative : forall l:list 'a. length(l) >= 0
+  lemma Length_nonnegative : forall l:list 'a. length l >= 0
 end
 
 theory Sorted
@@ -296,7 +296,7 @@ this feature is rarely used.
 \subsection{Example 2: Einstein's problem}
 \index{Einstein's logic problem}
 
-We now consider another, slightly more complex example: to use \why\
+We now consider another, slightly more complex example: how to use \why\
 to solve a little puzzle known as ``Einstein's logic
 problem''\footnote{This \why\ example was contributed by St\'ephane Lescuyer.}.
 The problem is stated as follows. Five persons, of five
@@ -401,7 +401,7 @@ first define a predicate \texttt{leftof} over two houses.
     | _      -> false
     end
 \end{verbatim}
-Note how we advantageously used pattern-matching, with a or-pattern
+Note how we advantageously used pattern matching, with an or-pattern
 for the four positive cases and a universal pattern for the remaining
 21 cases. It is then immediate to define a \texttt{neighbour}
 predicate over two houses, which completes theory \texttt{Einstein}.
@@ -434,7 +434,7 @@ this theory.
     neighbour (Owner.to (Cigar.to Blend)) (Owner.to (Drink.to Water))
 end
 \end{verbatim}
-Finally, we declare the goal in a fourth theory
+Finally, we declare the goal in the fourth theory:
 \begin{verbatim}
 theory Problem "Goal of Einstein's problem"
   use import Einstein

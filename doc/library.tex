@@ -20,17 +20,17 @@ theory Ite
 end
 \end{verbatim}
 
-In the following, for each library, we describe the (main) symbols of
-each theories defined
+In the following, for each library, we describe the (main) symbols
+defined in it.
 
 \section{Library \texttt{bool}}
 
 \begin{description}
 
 \item[Bool] boolean data type \verb|bool| with constructors \verb|True| and
-  \verb|False| ; operations \verb|andb|, \verb|orb|, \verb|xorb|, \verb|notb|
+  \verb|False|; operations \verb|andb|, \verb|orb|, \verb|xorb|, \verb|notb|.
 
-\item[Ite] polymorphic if-then-else operator written as \verb|ite|
+\item[Ite] polymorphic if-then-else operator written as \verb|ite|.
 
 \end{description}
 
@@ -38,18 +38,18 @@ each theories defined
 
 \begin{description}
 
-\item[Int] basic operations \verb|+|, \verb|-| and \verb|*| ; comparison
+\item[Int] basic operations \verb|+|, \verb|-| and \verb|*|; comparison
   operators \verb|<|, \verb|>|, \verb|>=| and \verb|<=|.
 
-\item[Abs] absolute value written as \verb|abs|
+\item[Abs] absolute value written as \verb|abs|.
 
 \item[EuclideanDivision] division and modulo, where division rounds
-  down, written as \verb|div| and \verb|mod|
+  down, written as \verb|div| and \verb|mod|.
 
 \item[ComputerDivision] division and modulo, where division rounds to
-  zero, also written as \verb|div| and \verb|mod|
+  zero, also written as \verb|div| and \verb|mod|.
 
-\item[MinMax] \verb|min| and \verb|max| operators
+\item[MinMax] \verb|min| and \verb|max| operators.
 
 \end{description}
 
@@ -57,26 +57,26 @@ each theories defined
 
 \begin{description}
 
-\item[Real] basic operations \verb|+|, \verb|-|, \verb|*| and \verb|/| ;
-  comparison operators
+\item[Real] basic operations \verb|+|, \verb|-|, \verb|*| and \verb|/|;
+  comparison operators.
 
 \item[RealInfix] basic operations with alternative syntax \verb|+.|,
   \verb|-.|, \verb|*.|, \verb|/.|, \verb|<.|, \verb|>.|, \verb|<=.| and \verb|>=.|, to
-  allow a simultaneous use of integer and real operators.
+  allow simultaneous use of integer and real operators.
 
-\item[Abs] absolute value written as \verb|abs|
+\item[Abs] absolute value written as \verb|abs|.
 
-\item[MinMax] \verb|min| and \verb|max| operators
+\item[MinMax] \verb|min| and \verb|max| operators.
 
 \item[FromInt] operator \verb|from_int| to convert an integer to a real.
 
 \item[Truncate] conversion operators from real to integers:
   \verb|truncate| rounds to 0, \verb|floor| rounds down and
-  \verb|ceil| rounds up
+  \verb|ceil| rounds up.
 
-\item[Square] operators \verb|sqr| and \verb|sqrt| for square and square root
+\item[Square] operators \verb|sqr| and \verb|sqrt| for square and square root.
 
-\item[ExpLog] functions \verb|exp|, \verb|log|, \verb|log2|, and \verb|log10|
+\item[ExpLog] functions \verb|exp|, \verb|log|, \verb|log2|, and \verb|log10|.
 
 \item[Power] function \verb|pow| with two real parameters.
 
@@ -93,18 +93,18 @@ each theories defined
 \section{Library \texttt{floating\_point}}
 
 This library provides a theory of IEEE-754 floating-point numbers. It
-is inspired from~\cite{ayad10ijcar}.
+is inspired by~\cite{ayad10ijcar}.
 
 \begin{description}
 \item[Rounding] type \verb|mode| with 5 constants
   \verb|NearestTiesToEven|, \verb|ToZero|, \verb|Up|, \verb|Down| and
   \verb|NearTiesToAway|.
-\item[SpecialValues] handling of infinities and NaN
+\item[SpecialValues] handling of infinities and NaN.
 \item[GenFloat] generic floats parameterized by the maximal
   representable number. Functions \verb|round|, \verb|value|,
   \verb|exact|, \verb|model|, predicate \verb|no_overflow|.
-\item[Single] instance of GenFloat for 32-bits single precision numbers
-\item[Double] instance of GenFloat for 64-bits double precision numbers
+\item[Single] instance of GenFloat for 32-bits single precision numbers.
+\item[Double] instance of GenFloat for 64-bits double precision numbers.
 \end{description}
 
 
@@ -147,10 +147,10 @@ is inspired from~\cite{ayad10ijcar}.
 \item[Append] function \verb|append|, concatenation of lists.
 \item[Reverse] function \verb|reverse| for list reversal.
 \item[Sorted] predicate \verb|sorted| for lists of integers.
-\item[NumOcc] number of occurrences in a list
-\item[Permut] list permutations
-\item[Induction] structural induction on lists
-\item[Map] list map operator
+\item[NumOcc] number of occurrences in a list.
+\item[Permut] list permutations.
+\item[Induction] structural induction on lists.
+\item[Map] list map operator.
 \end{description}
 
 

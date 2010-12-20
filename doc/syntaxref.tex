@@ -9,7 +9,7 @@ This chapter gives the grammar for \why\ input files.
 Comments are enclosed by \texttt{(*} and \texttt{*)} and can be nested.
 
 \paragraph{Strings.}
-Strings are enclosed by double quotes (\verb!"!). Double quotes can be
+Strings are enclosed in double quotes (\verb!"!). Double quotes can be
 inserted in strings using the backslash character (\verb!\!).
 
 % TODO: escape sequences for strings
@@ -17,22 +17,22 @@ inserted in strings using the backslash character (\verb!\!).
 \paragraph{Identifiers.} The syntax distinguishes lowercase and
 uppercase identifiers and, similarly, lowercase and uppercase
 qualified identifiers.
- 
+
 \begin{center}\framebox{\input{./qualid_bnf.tex}}\end{center}
 
 \paragraph{Constants.}
-The syntax for constants is given Figure~\ref{fig:bnf:constant}.
+The syntax for constants is given in Figure~\ref{fig:bnf:constant}.
 Integer and real constants have arbitrary precision.
 Integer constants may be given in base 16, 10, 8 or 2.
 Real constants may be given in base 16 or 10.
- 
+
 \begin{figure}
 \begin{center}\framebox{\input{./constant_bnf.tex}}\end{center}
   \caption{Syntax for constants.}
 \label{fig:bnf:constant}
 \end{figure}
 
-\paragraph{Operators.} 
+\paragraph{Operators.}
 Prefix and infix operators are built from characters organized in four
 categories (\textsl{op-char-1} to \textsl{op-char-4}).
 \begin{center}\framebox{\input{./operator_bnf.tex}}\end{center}
@@ -45,12 +45,12 @@ characters they are built from:
  characters from \textit{op-char-3} or \textit{op-char-4};
 \item level 2: those containing
  characters from \textit{op-char-2}, \textit{op-char-3} or
- \textit{op-char-4}; 
+ \textit{op-char-4};
 \item level 1: all other operators.
 \end{itemize}
 
 \paragraph{Terms.}
-The syntax for terms is given Figure~\ref{fig:bnf:term}.
+The syntax for terms is given in Figure~\ref{fig:bnf:term}.
 The various constructs have the following priorities and
 associativities, from lowest to greatest priority:
 \begin{center}

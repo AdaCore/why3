@@ -10,7 +10,9 @@ basic set of goals.
 
 Here is our first \why\ file, which is the file
 \texttt{examples/hello\_proof.why} of the distribution.
-\verbatiminput{../examples/hello_proof.why} Any declaration must occur
+\verbatiminput{../examples/hello_proof.why}
+
+Any declaration must occur
 inside a theory, which is in that example called TheoryProof and
 labelled with a comment inside double quotes. It contains three goals
 named $G_1,G_2,G_3$. The first two are basic propositional goals,
@@ -45,14 +47,14 @@ why3ide hello_proof.why
 \end{verbatim}
 When the GUI is started for the first time, you should get a window
 which looks like the screenshot of Figure~\ref{fig:gui1}. First of
-all, the left row is a tool bar which provide different actions to
+all, the left column is a tool bar which provides different actions to
 apply on goals. In this case, the section ``Provers'' is empty, which
-means that you did not perform prover detection yet. You should do it
+means that you have not performed prover detection yet. You should do it
 now using the menu \textsf{File/Detect provers}. Second, the middle
 part is a tree view that allows to browse inside the
-theories. Initially, the item of this tree are closed. You should now
+theories. Initially, the item of this tree are closed. We can
 expand this view using the menu \textsf{View/Expand all} or its
-shortcut \textsf{Ctrl-E}. This should result is something like the
+shortcut \textsf{Ctrl-E}. This will result is something like the
 screenshot of Figure~\ref{fig:gui2}.
 
 \begin{figure}[tbp]
@@ -68,8 +70,8 @@ goal $G_1$. The \emph{task} associated with this goal is then
 displayed on the top right, and the corresponding part of the input
 file is shown on the bottom right part.
 
-Notice also that three provers where detected, and are now shown as
-button in the ``provers'' section of the left toolbar. In that case,
+Notice also that three provers were detected, and are now shown
+in the ``provers'' section of the left toolbar. In this example,
 detected provers are Alt-Ergo~\cite{ergo}, Coq~\cite{CoqArt} and
 Simplify~\cite{simplify05}. 
 
@@ -77,7 +79,7 @@ Simplify~\cite{simplify05}.
 
 You are now ready to call these provers on the goals. Whenever you
 click on a prover button, this prover is called on the goal selected
-in the tree view. You can even select several goals at a time, either
+in the tree view. You can select several goals at a time, either
 by using multi-selection (typically by clicking while pressing the
 \textsf{Shift} or \textsf{Ctrl} key) or by selecting the parent theory
 or the parent file. Let us now select the theory ``HelloProof'' and
@@ -157,12 +159,14 @@ Starting the IDE on the modified file and expanding everything with
 \end{figure}
 
 The important feature to notice first is that all the previous proof
-attempts and transformations where saved in some database. Then, for
+attempts and transformations were saved in a database --- an SQLite3
+file created when the \why\ file was opened in the GUI for the first
+time. Then, for
 all the goals that remain unchanged, the previous proofs are shown
 again. For the parts that changed, the previous proofs attempts are
 shown but marked with "(obsolete)" so that you know the results are
 not accurate. You can now retry to prove all what remains unproved
-using any of the provers.
+using any of the provers, using the button ``Replay''.
 
 \section{Getting Started with the \why\ Command}
 \label{sec:batch}
@@ -173,12 +177,14 @@ tool. Refer to Section~\ref{sec:why3ref} for a more complete
 description of this tool and all its command-line options.
 
 The very first time you want to use Why, you should proceed with
-autodetection of external provers. This is done as follows, where ``>'' is the prompt.
+autodetection of external provers. We have already seen how to do
+it in the \why\ GUI. On the command line, this is done as follows
+(here ``\texttt{>}'' is the prompt):
 \begin{verbatim}
 > why3config --autodetect-provers
 \end{verbatim}
 This prints some information messages on what detections are attempted. To know which
-provers have been successfully detected, you can run do as follows.
+provers have been successfully detected, you can do as follows.
 \begin{verbatim}
 > why3 --list-provers
 Known provers:
@@ -192,15 +198,18 @@ Simplify~\cite{simplify05}.
 
 Let's assume now we want to run Simplify on the HelloProof
 example. The command to type and its output are as follows, where the
-\verb|-P| option is follow by the unique identifier as shown as above.
+\verb|-P| option is followed by the unique prover identifier (as shown
+by \texttt{--list-provers} option).
 \begin{verbatim}
 > why3 -P simplify hello_proof.why
 hello_proof.why HelloProof G1 : Valid (0.10s)
 hello_proof.why HelloProof G2 : Unknown: Unknown (0.01s)
 hello_proof.why HelloProof G3 : Unknown: Unknown (0.00s)
 \end{verbatim}
+Unlike \why GUI, the command-line tool does not save the proof attempts
+or applied transformations in a database.
 
-We can also specify which goal(s) to prove. This is done by giving
+We can also specify which goal or goals to prove. This is done by giving
 first a theory identifier, then goal identifier(s). Here is the way to
 call Alt-Ergo on goals $G_2$ and $G_3$.
 \begin{verbatim}
@@ -211,7 +220,7 @@ hello_proof.why HelloProof G3 : Valid (0.01s)
 
 Finally, a transformation to apply to goals before proving them can be
 specified. To know the unique identifier associated to
-transformations, do as follows.
+a transformation, do as follows.
 \begin{verbatim}
 > why3 --list-transforms
 Known non-splitting transformations:
@@ -231,8 +240,6 @@ hello_proof.why HelloProof G2 : Valid (0.00s)
 \end{verbatim}
 Section~\ref{sec:transformations} gives the description of the various
 transformations available.
-
-
 
 %%% Local Variables:
 %%% mode: latex

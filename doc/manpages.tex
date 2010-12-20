@@ -8,30 +8,31 @@ Compilation of \why\ must start with a configuration phase which is run as
 \begin{verbatim}
 ./configure
 \end{verbatim}
-This analyzes you current configuration and check if requirements hold.
+This analyzes your current configuration and checks if requirements hold.
 Compilation requires:
 \begin{itemize}
 \item The Objective Caml compiler, version 3.10 or higher. It is
   available as a binary package for most Unix distributions. For
-  debian-based Linux distributions, you can install the packages
+  Debian-based Linux distributions, you can install the packages
 \begin{verbatim}
 ocaml ocaml-native-compilers
 \end{verbatim}
-It is also installable from sources, downloadable from the Web site
+It is also installable from sources, downloadable from the site
 \url{http://caml.inria.fr/ocaml/}
 \end{itemize}
 
-For the IDE, additional Ocaml libraries are needed:
+For the IDE, additional OCaml libraries are needed:
 \begin{itemize}
-\item The Lablgtk2 library for Ocaml bindings of the gtk2 graphical library.
- For debian-based Linux distributions, you can install the packages
+\item The Lablgtk2 library for OCaml bindings of the gtk2 graphical library.
+For Debian-based Linux distributions, you can install the packages
 \begin{verbatim}
 liblablgtk2-ocaml-dev liblablgtksourceview2-ocaml-dev
 \end{verbatim}
-It is also installable from sources, available from the site \url{http://wwwfun.kurims.kyoto-u.ac.jp/soft/olabl/lablgtk.html}
+It is also installable from sources, available from the site
+\url{http://wwwfun.kurims.kyoto-u.ac.jp/soft/olabl/lablgtk.html}
 
-\item The Ocaml bindings of the sqlite3 library
-For debian-based Linux distributions, you can install the package
+\item The OCaml bindings of the sqlite3 library.
+For Debian-based Linux distributions, you can install the package
 \begin{verbatim}
 libsqlite3-ocaml-dev
 \end{verbatim}
@@ -39,9 +40,15 @@ It is also installable from sources, available from the site
 \url{http://ocaml.info/home/ocaml_sources.html#ocaml-sqlite3}
 \end{itemize}
 
+When configuration is finished, you can compile \why.
+\begin{verbatim}
+make
+\end{verbatim}
+
 \subsection{Local use, without installation}
 
-It is not mandatory to install \why\ to use it. Local use is obtained via
+It is not mandatory to install \why\ into system directories.
+\why\ can be configured and compiled for local use as follows:
 \begin{verbatim}
 ./configure --enable-local
 make
@@ -67,7 +74,7 @@ installing Why.
 For installation of external provers, please look at the Why provers
 tips page \url{http://why.lri.fr/provers.en.html}.
 
-For configuring \why\ to use the provers, follow intructions given in
+For configuring \why\ to use the provers, follow instructions given in
 Section~\ref{sec:why3config}.
 
 \section{The \texttt{why3config} command-line tool}
@@ -82,9 +89,9 @@ or using the menu
 \begin{verbatim}
 File/Detect provers
 \end{verbatim}
-of the IDE. This must be done again each time a new prover is installed.
+of the IDE. This must be redone each time a new prover is installed.
 
-The set of all provers which are attempted to detect is described in
+The provers which \why\ attempts to detect are described in
 the readable configuration file \texttt{provers-detection-data.conf}
 of the \why\ data directory (\eg{}
 \texttt{/usr/local/share/why3}). Advanced users may try to modify this
@@ -93,12 +100,12 @@ please consider submitting a new prover configuration on the bug
 tracking system).
 
 The result of the prover detection is stored in the user's
-configuration file (\eg{} \texttt{~/.why.conf}). Again, this file is
-human readable, and advanced users may modify it in order to
-experiment different ways of calling provers, \eg{} different versions
-of the same prover, or with different options.
+configuration file (\eg{} \verb+~/.why.conf+). Again, this file
+is human-readable, and advanced users may modify it in order to
+experiment with different ways of calling provers, \eg{} different 
+versions of the same prover, or with different options.
 
-The provers which are typically attemped for detection are
+The provers which are typically looked for are
 \begin{itemize}
 \item Alt-Ergo~\cite{conchon08smt,ergo}: \url{http://alt-ergo.lri.fr}
 \item CVC3~\cite{BarTin-CAV-07}: \url{http://cs.nyu.edu/acsys/cvc3/}
@@ -118,54 +125,60 @@ plugin must register itself as a parser, a transformation or a
 printer, as explained in the corresponding section.
 
 If the user's configuration file is already present,
-\texttt{why3config} will only reset unset variables to default value.
-The option \texttt{--autodetect-provers} will detect again the available
-provers and will replace them in the file configuration.
+\texttt{why3config} will only reset unset variables to default value,
+but will not try to detect provers. 
+The option \texttt{--autodetect-provers} should be used to force
+\why\ to detect again the available
+provers and to replace them in the configuration file. The option
 \texttt{--autodetect-plugins} will do the same for plugins.
 
 \section{The \texttt{why3} command-line tool}
 \label{sec:why3ref}
 
-\why\ is primarily used to call provers on goals contains by file in
-why3 format \texttt{.why} extension. However plugins can register
-parser which can extend the known format. \texttt{why3ml} apply the
-following steps :
+\why\ is primarily used to call provers on goals contained in an
+input file. By default, such a file must be written in \why language
+and have the extension \texttt{.why}. However, a dynamically loaded
+plugin can register a parser for some other format of logical problems,
+\eg{} TPTP or SMTlib.
+
+The \texttt{why3} tool executes the following steps:
 \begin{enumerate}
-\item Parse the command line and report error if needed
+\item Parse the command line and report errors if needed.
 \item Read the configuration file using the priority defined in
-  section\ref{sec:whyconffile}
-\item Load the plugins mentionned in the configuration. It will not
-  stop if a plugin fail to load.
-\item Parse and type the given files using the correct parser in order
-  to obtain a set of why theory for each files. It uses
-  the filename extension or the \texttt{--format} options to choose
-  among the available parsers. \texttt{--list-format} gives the list
-  of them.
-\item Extract the selected goals inside each selected theories into
-  tasks. The goals and theories are selected using the options
-  \texttt{-G/--goal} and \texttt{-T/--theory}. One
+  Section~\ref{sec:whyconffile}.
+\item Load the plugins mentioned in the configuration. It will not
+  stop if some plugin fails to load.
+\item Parse and typecheck the given files using the correct parser in order
+  to obtain a set of \why\ theories for each file. It uses
+  the filename extension or the \texttt{--format} option to choose
+  among the available parsers. The \texttt{--list-format} option gives 
+  the list of registered parsers.
+\item Extract the selected goals inside each of the selected theories 
+  into tasks. The goals and theories are selected using the options
+  \texttt{-G/--goal} and \texttt{-T/--theory}. The option
   \texttt{-T/--theory} applies to the last file appearing on the
-  commandline, one \texttt{-G/--goal} applies to the last theory
-  appearing on the commandline. If none theories are selected in one
-  file, they are all selected. If none goals are selected inside one
-  selected theory, they are all selected.
+  command line, the option \texttt{-G/--goal} applies to the last theory
+  appearing on the command line. If no theories are selected in a file,
+  then every theory is considered as selected. If no goals are selected
+  in a theory, then every goal is considered as selected.
 \item Apply the transformation requested
-  with \texttt{-a/--apply-transform} in the order they appear on the
+  with \texttt{-a/--apply-transform} in their order of appearance on the
   command line. \texttt{--list-transforms} list the known
   transformations, plugins can add more of them.
 \item Apply the driver selected with the \texttt{-D/--driver} option,
   or the driver of the prover selected with \texttt{-P/--prover}
-  option. \texttt{--list-provers} lists the known provers, ie the one
+  option. \texttt{--list-provers} lists the known provers, i.e.~the ones
   which appear in the configuration file.
-\item Print the result of the standard output if \texttt{-D/--driver}
-  is used or call the prover and print the result if
-  \texttt{-P/--prover} is used.
+\item If the option \texttt{-P/--prover} is given, call the selected prover
+  on each generated task and print the results. If the option
+  \texttt{-D/--driver} is given, print each generated task using
+  the format specified in the selected driver.
 \end{enumerate}
 
-\texttt{why3} call the prover sequentially, use \texttt{why3bench} if *)
-you want to call the provers concurrently.  *)
+%\texttt{why3} calls the provers sequentially, use \texttt{why3bench} if *)
+%you want to call the provers concurrently.  *)
 
-The provers can answer the following output :
+The provers can answer the following output:
 \begin{itemize}
 \item[Valid] the goal is proved in the given context,
 \item[Unknown] the prover stop by itself to search,
