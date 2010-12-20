@@ -14,7 +14,7 @@
 \ifthenelse{\equal{#2}{}}{}{\indexttbase{#2}{#1}}}\spacetrue}
 \newcommand{\nonterm}[2]{%
   \ifthenelse{\equal{#2}{}}%
-             {\addspace\hbox{\textsl{#1}\ifnewentry\index{grammar entries!\textsl{#1}}\fi}\spacetrue}%
+             {\addspace\hbox{\textsl{#1}\ifnewentry\index{#1@\textsl{#1}}\fi}\spacetrue}%
              {\addspace\hbox{\textsl{#1}\footnote{#2}\ifnewentry\index{grammar entries!\textsl{#1}}\fi}\spacetrue}}
 \newcommand{\repetstar}{$^*$\spacetrue}
 \newcommand{\repetplus}{$^+$\spacetrue}
