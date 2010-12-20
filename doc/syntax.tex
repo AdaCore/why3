@@ -4,15 +4,17 @@
 This chapter describes the input syntax, and informally gives its semantics,
 illustrated by examples.
 
-A \why\ text contains a list of \emph{theories}. 
+A \why\ text contains a list of \emph{theories}.
 A theory is a list of \emph{declarations}. Declarations introduce new
-types, functions and predicates, state axioms, lemmas and goals. 
+types, functions and predicates, state axioms, lemmas and goals.
 These declarations can be directly written in the theory or taken from
 existing theories. The base logic of \why\ is a first-order
 polymorphic logic.
 
+\subsection{Example 1: lists}
+
 The Figure~\ref{fig:tutorial1} contains an example of \why\ input
-text, containing three theories. The first theory, \texttt{List}, 
+text, containing three theories. The first theory, \texttt{List},
 declares a new algebraic type for polymorphic lists, \texttt{list 'a}.
 As in ML, \texttt{'a} stands for a type variable.
 The type \texttt{list 'a} has two constructors, \texttt{Nil} and
@@ -23,43 +25,37 @@ We deliberately make this theory that short, for reasons which will be
 discussed later.
 
 \begin{figure}
-  \centering
+\centering
 \begin{verbatim}
 theory List
-
   type list 'a = Nil | Cons 'a (list 'a)
-
 end
 
 theory Length
-
   use import List
   use import int.Int
 
-  logic length (l : list 'a) : int = 
+  logic length (l : list 'a) : int =
     match l with
     | Nil      -> 0
     | Cons _ r -> 1 + length r
     end
 
   lemma Length_nonnegative : forall l:list 'a. length(l) >= 0
-
 end
 
 theory Sorted
-
   use import List
   use import int.Int
- 
+
   inductive sorted (list int) =
-    | Sorted_Nil : 
+    | Sorted_Nil :
         sorted Nil
-    | Sorted_One : 
+    | Sorted_One :
         forall x:int. sorted (Cons x Nil)
-    | Sorted_Two : 
-        forall x y : int, l : list int. 
+    | Sorted_Two :
+        forall x y : int, l : list int.
         x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
- 
 end
 \end{verbatim}
 \caption{Example of Why3 text.}
@@ -78,19 +74,22 @@ context the theory \texttt{int.Int} from the standard library. The
 prefix \texttt{int} indicates the file in the standard library
 containing theory \texttt{Int}. Theories referred to without prefix
 either appear earlier in the current file, \eg\ \texttt{List}, or are
-predefined. 
+predefined.
 
 The next declaration defines a recursive function, \emph{length},
 which computes the length of a list. The \texttt{logic} keyword is
-used to introduce or define both function and predicate symbols. 
+used to introduce or define both function and predicate symbols.
 \why\ checks every recursive, or mutually recursive, definition for
 termination. Basically, we require a lexicographic and structural
-descent for every recursive call for some reordering of arguments. 
-Note that matching must be exhaustive and that every \texttt{match}
+descent for every recursive call for some reordering of arguments.
+Notice that matching must be exhaustive and that every \texttt{match}
 expression must be terminated by the \texttt{end} keyword.
 
+Despite using higher-order ``curried'' syntax, \why\ does not permit
+partial application: function and predicate arities must be respected.
+
 The last declaration in theory \texttt{Length} is a lemma stating that
-the length of a list is non-negative. 
+the length of a list is non-negative.
 
 The third theory, \texttt{Sorted}, demonstrates the definition of
 an inductive predicate. Every such definition is a list of clauses:
@@ -109,7 +108,192 @@ Note that the type signature of \texttt{sorted} predicate does not
 include the name of a parameter (see \texttt{l} in the definition
 of \texttt{length}): it is unused and therefore optional.
 
-\section*{Another Example}
+\subsection{Example 1 (continued): lists and abstract orderings}
+
+In the previous section we have seen how a theory can reuse the
+declarations of another theory, coming either from the same input
+text or from the library. Another way to referring to a theory is
+by <<cloning>>. A \texttt{clone} declaration constructs a local
+copy of the cloned theory, possibly instantiating some of its
+abstract (i.e.~declared but not defined) symbols.
+
+\begin{figure}
+\centering
+\begin{verbatim}
+theory Order
+  type t
+  logic (<=) t t
+
+  axiom Le_refl : forall x : t. x <= x
+  axiom Le_asym : forall x y : t. x <= y -> y <= x -> x = y
+  axiom Le_trans: forall x y z : t. x <= y -> y <= z -> x <= z
+end
+
+theory SortedGen
+  use import List
+  clone import Order as O
+
+  inductive sorted (l : list t) =
+    | Sorted_Nil :
+        sorted Nil
+    | Sorted_One :
+        forall x:t. sorted (Cons x Nil)
+    | Sorted_Two :
+        forall x y : t, l : list t.
+        x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
+end
+
+theory SortedIntList
+  use import int.Int
+  clone SortedGen with type O.t = int, logic O.(<=) = (<=)
+end
+\end{verbatim}
+\caption{Example of Why3 text (continued).}
+\label{fig:tutorial2}
+\end{figure}
+
+Consider the continued example in Figure~\ref{fig:tutorial2}.
+We write an abstract theory of partial orders, declaring an
+abstract type \texttt{t} and an abstract binary predicate
+\texttt{<=}. Notice that an infix operation must be enclosed
+in parentheses when used outside a term. We also specify
+three axioms of a partial order.
+
+There is little value in \texttt{use}'ing such a theory: this
+would constrain us to stay with the type \texttt{t}. However,
+we can construct an instance of theory \texttt{Order} for
+any suitable type and predicate. Moreover, we can build some
+further abstract theories using order, and then instantiate
+those theories.
+
+Consider theory \texttt{SortedGen}. In the beginning, we
+\texttt{use} the earlier theory \texttt{List}. Then we
+make a simple \texttt{clone} theory \texttt{Order}.
+This is pretty much equivalent to copy-pasting every
+declaration from \texttt{Order} to \texttt{SortedGen};
+the only difference is that \why\ traces the history
+of cloning and transformations and drivers often make
+use of it (see Section~\ref{sec:drivers}).
+
+Notice an important difference between \texttt{use}
+and \texttt{clone}. If we \texttt{use} a theory, say
+\texttt{List}, twice (directly or indirectly: e.g.~by
+making \texttt{use} of both \texttt{Length} and
+\texttt{Sorted}), there is no duplication: there is
+still only one type of lists and a unique pair
+of constructors. On the contrary, when we \texttt{clone}
+a theory, we create a local copy of every cloned
+declaration, and the newly created symbols, despite
+having the same names, are different from their originals.
+
+Returning to the example, we finish theory \texttt{SortedGen}
+with a familiar definition of predicate \texttt{sorted};
+this time we use the abstract order on the values of type
+\texttt{t}.
+
+Now, we can instantiate theory \texttt{SortedGen} to any
+ordered type, without having to retype the definition of
+\texttt{sorted}. For example, theory \texttt{SortedIntList}
+makes \texttt{clone} of \texttt{SortedGen} (i.e.~copies its
+declarations) substituting type \texttt{int} for type
+\texttt{O.t} of \texttt{SortedGen} and the default order
+on integers for predicate \texttt{O.(<=)}. \why\ will
+control that the result of cloning is well-typed.
+
+Several remarks ought to be made here. First of all, why should
+we clone theory \texttt{Order} in \texttt{SortedGen} if we make
+no instantiation? Couldn't we write \texttt{use import Order as O}
+instead? The answer is no, we could not. When cloning a theory,
+we only can instantiate the symbols declared locally in this theory,
+not the symbols imported with \texttt{use}. Therefore, we create
+a local copy of \texttt{Order} in \texttt{SortedGen} to be able
+to instantiate \texttt{t} and \texttt{(<=)} later.
+
+Secondly, when we instantiate an abstract symbol, its declaration
+is not copied from the theory being cloned. Thus, we will not create
+a second declaration of type \texttt{int} in \texttt{SortedIntList}.
+
+The mechanism of cloning bears some resemblance to modules and functors
+of ML-like languages. Unlike those languages, \why\ makes no distinction
+between modules and module signatures, modules and functors. Any \why\
+theory can be \texttt{use}'d directly or instantiated in any of its
+abstract symbols.
+
+The command-line tool \texttt{why3} (described in
+Section~\ref{sec:batch}), allows us to see the effect of cloning.
+If the input file containing our example is called \texttt{lists.why},
+we can launch the following command:
+\begin{verbatim}
+> why3 lists.why -T SortedIntList
+\end{verbatim}
+to see the resulting theory \texttt{SortedIntList}:
+\begin{verbatim}
+theory SortedIntList
+  (* use BuiltIn *)
+  (* use Int *)
+  (* use List *)
+
+  axiom Le_refl : forall x:int. x <= x
+  axiom Le_asym : forall x:int, y:int. x <= y -> y <= x -> x = y
+  axiom Le_trans : forall x:int, y:int, z:int. x <= y -> y <= z
+    -> x <= z
+
+  (* clone Order with type t = int, logic (<=) = (<=),
+    prop Le_trans1 = Le_trans, prop Le_asym1 = Le_asym,
+    prop Le_refl1 = Le_refl *)
+
+  inductive sorted (list int) =
+    | Sorted_Nil : sorted (Nil:list int)
+    | Sorted_One : forall x:int. sorted (Cons x (Nil:list int))
+    | Sorted_Two : forall x:int, y:int, l:list int. x <= y ->
+        sorted (Cons y l) -> sorted (Cons x (Cons y l))
+
+  (* clone SortedGen with type t1 = int, logic sorted1 = sorted,
+    logic (<=) = (<=), prop Sorted_Two1 = Sorted_Two,
+    prop Sorted_One1 = Sorted_One, prop Sorted_Nil1 = Sorted_Nil,
+    prop Le_trans2 = Le_trans, prop Le_asym2 = Le_asym,
+    prop Le_refl2 = Le_refl *)
+end
+\end{verbatim}
+
+In conclusion, let us briefly explain the concept of namespaces
+in \why. Both \texttt{use} and \texttt{clone} instructions can
+be used in three forms (the examples below are given for \texttt{use},
+the semantics for \texttt{clone} is the same):
+\begin{itemize}
+\item \texttt{use List as L} --- every symbol $s$ of theory \texttt{List}
+is accessible under the name \texttt{L.$s$}. The \texttt{as L} part is
+optional, if it is omitted, the name of the symbol is \texttt{List.$s$}.
+
+\item \texttt{use import List as L} --- every symbol $s$ from
+\texttt{List} is accessible under the name \texttt{L.$s$}. It is also
+accessible simply as \texttt{$s$}, but only up to the end of the current
+namespace, e.g.~the current theory. If the current theory, that is the
+one making \texttt{use}, is later used under the name \texttt{T},
+the name of the symbol would be \texttt{T.L.$s$}. (This is why we
+could refer directly to the symbols of \texttt{Order} in theory
+\texttt{SortedGen}, but had to qualify them with \texttt{O.}
+in \texttt{SortedIntList}.)
+As in the previous case, \texttt{as L} part is optional.
+
+\item \texttt{use export List} --- every symbol $s$ from \texttt{List}
+is accessible simply as \texttt{$s$}. If the current theory
+is later used under the name \texttt{T}, the name of the symbol
+would be \texttt{T.$s$}.
+\end{itemize}
+
+\why\ allows to open new namespaces explicitly in the text. In particular,
+the instruction ``\texttt{clone import Order as O}'' can be equivalently
+written as:
+\begin{verbatim}
+    namespace import O
+      clone export Order
+    end
+\end{verbatim}
+However, since \why\ favours short theories over long and complex ones,
+this feature is rarely used.
+
+\subsection{Example 2: Einstein's problem}
 \index{Einstein's logic problem}
 
 We now consider another, slightly more complex example: to use \why\
@@ -210,9 +394,9 @@ first define a predicate \texttt{leftof} over two houses.
 \begin{verbatim}
   logic leftof (h1 h2 : house) =
     match h1, h2 with
-    | H1, H2 
-    | H2, H3 
-    | H3, H4 
+    | H1, H2
+    | H2, H3
+    | H3, H4
     | H4, H5 -> true
     | _      -> false
     end
