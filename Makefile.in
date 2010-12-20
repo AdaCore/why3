@@ -635,6 +635,50 @@ clean::
 install_no_local::
 	cp -f bin/why3-cpulimit $(BINDIR)
 
+#########
+# why3doc
+#########
+
+WHY3DOC_FILES = doc_html doc_main
+
+WHY3DOCMODULES = $(addprefix src/why3doc/, $(WHY3DOC_FILES))
+
+WHY3DOCML  = $(addsuffix .ml,  $(WHY3DOCMODULES))
+WHY3DOCMLI = $(addsuffix .mli, $(WHY3DOCMODULES))
+WHY3DOCCMO = $(addsuffix .cmo, $(WHY3DOCMODULES))
+WHY3DOCCMX = $(addsuffix .cmx, $(WHY3DOCMODULES))
+
+$(WHY3DOCCMO) $(WHY3DOCCMX): INCLUDES += -I src/why3doc
+
+# build targets
+
+byte: bin/why3doc.byte
+opt:  bin/why3doc.opt
+
+bin/why3doc.opt: src/why.cmxa $(WHY3DOCCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	$(STRIP) $@
+
+bin/why3doc.byte: src/why.cma $(WHY3DOCCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+# depend and clean targets
+
+include .depend.why3doc
+
+.depend.why3doc:
+	$(OCAMLDEP) -slash -I src -I src/why3doc $(WHY3DOCML) $(WHY3DOCMLI) > $@
+
+depend: .depend.why3doc
+
+clean::
+	rm -f src/why3doc/*.cm[iox] src/why3doc/*.o
+	rm -f src/why3doc/*.annot src/why3doc/*~
+	rm -f bin/why3doc.byte bin/why3doc.opt
+	rm -f .depend.why3doc
+
 ########
 # bench
 ########
