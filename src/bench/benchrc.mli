@@ -34,9 +34,9 @@ tools = "mytools"
 tools = ...
 probs = "myprobs"
 probs = ...
-output = "csv"
-output = "average"
-output = "timeline"
+timeline = "prgbench.time"
+average = "prgbench.avg"
+csv = "prgbench.csv"
 *)
 
 open Bench

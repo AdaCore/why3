@@ -162,9 +162,17 @@ following steps :
   \texttt{-P/--prover} is used.
 \end{enumerate}
 
-% \texttt{why3} call the prover sequentially, use \texttt{why3bench} if *)
-% you want to call the provers concurrently.  *)
+\texttt{why3} call the prover sequentially, use \texttt{why3bench} if *)
+you want to call the provers concurrently.  *)
 
+The provers can answer the following output :
+\begin{itemize}
+\item[Valid] the goal is proved in the given context,
+\item[Unknown] the prover stop by itself to search,
+\item[Timeout] the prover doesn't have enough time,
+\item[Failure] an error occured,
+\item[Invalid] the prover know the goal can't be proved
+\end{itemize}
 % \why\ can also be *)
 % used to provide other informations : *)
 % \begin{itemize} *)
@@ -275,8 +283,79 @@ the GUI.
 [TO BE COMPLETED LATER]
 
 \section{The \texttt{why3bench} tool}
+The \texttt{why3bench} tool add a scheduler on top of the \why\
+library. \texttt{why3bench} is designed to compare various composants
+of automatic proofs : automatic provers, transformations, definitions
+of one theory. For that goal it tries to prove predefined goals using
+each composants to compare. \texttt{why3bench} allows to output the
+comparison in various formats :
+\begin{itemize}
+\item csv : the simpler and more informative format, the results are
+  represented in an array, the rows corresponds to the
+  compared composants, the columns corresponds to the result
+  (Valid,Unknown,Timout,Failure,Invalid) and the cpu time taken in seconds.
+\item average : summarize the number of the five differents answers
+  for each composants. It also gives the average time taken.
+\item timeline : for each composants it gives the number of goal valid
+  along the time (10 slices between 0 and the longest time a composant
+  take to prove a goal)
+\end{itemize}
 
-[TO BE COMPLETED LATER]
+The compared composants can be defined in an \emph{rc-file},
+\texttt{examples/programs/prgbench.rc} is such an example. More
+generally a bench configuration file  :
+\begin{verbatim}
+[probs "myprobs"]
+   file = "examples/monbut.why" #relatives to the rc file
+   file = "examples/monprogram.mlw"
+   theory = "monprogram.T"
+   goal = "monbut.T.G"
+
+   transform = "split_goal" #applied in this order
+   transform = "..."
+   transform = "..."
+
+[tools "mytools"]
+   prover = cvc3
+   prover = altergo
+   #or only one
+   driver = "..."
+   command = "..."
+
+   loadpath = "..." #added to the one in why.conf
+   loadpath = "..."
+
+   timelimit = 30
+   memlimit = 300
+
+   use = "toto.T" #use the theory toto (allow to add metas)
+
+   transform = "simplify_array" #only 1 to 1 transformation
+
+[bench "mybench"]
+   tools = "mytools"
+   tools = ...
+   probs = "myprobs"
+   probs = ...
+   timeline = "prgbench.time"
+   average = "prgbench.avg"
+   csv = "prgbench.csv"
+\end{verbatim}
+
+Such file can defined three famillies \texttt{tools,probs,bench}. the
+sections \texttt{tools} define a set of composants to compare, the
+sections \texttt{probs} define a set of goal on which compare some
+composants and the sections \texttt{bench} define which composants to
+compare using which goals. It refer by name to the sections
+\texttt{tools} and \texttt{probs} defined in the same file. The order
+of the definitions is irrelevant. Notice that \texttt{loadpath} in a family
+\texttt{tools} can be used to compare differents axiomatisation.
+
+One can run all the bench given in one bench configuration file with
+\texttt{why3bench} :
+\begin{verbatim}
+why3bench -B path_to_my_bench.rc
+\end{verbatim}
 
 \section{The \texttt{why.conf} configuration file}
 \label{sec:whyconffile}
