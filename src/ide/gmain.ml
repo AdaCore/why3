@@ -276,11 +276,12 @@ module Model = struct
         goal_db : Db.goal;
         mutable proved : bool;
         external_proofs: (string, proof_attempt) Hashtbl.t;
-        mutable transformations : transf list;
+        transformations : (string, transf) Hashtbl.t;
       }
 
   and transf =
       { parent_goal : goal;
+	mutable transf_proved : bool;
 (*
         transf : Task.task Trans.trans;
 *)
@@ -558,6 +559,65 @@ module Helpers = struct
     | true, Unknown -> !image_unknown_obs
     | true, HighFailure -> !image_failure_obs
 
+  let set_row_status b row =
+    if b then 
+      begin
+	goals_view#collapse_row (goals_model#get_path row);
+	goals_model#set ~row ~column:status_column !image_yes;
+	if !toggle_hide_proved_goals then
+	  goals_model#set ~row ~column:visible_column false
+      end
+    else
+      begin
+	goals_model#set ~row ~column:status_column !image_unknown;
+	if !toggle_hide_proved_goals then
+	  goals_model#set ~row ~column:visible_column true
+      end
+
+  let check_file_verified f =
+    let b = List.for_all (fun t -> t.verified) f.theories in
+    if f.file_verified <> b then
+      begin
+	f.file_verified <- b;
+	set_row_status b f.file_row
+      end
+
+  let check_theory_proved t =
+    let b = List.for_all (fun g -> g.proved) t.goals in
+    if t.verified <> b then
+      begin
+	t.verified <- b;
+	set_row_status b t.theory_row;
+	check_file_verified t.theory_parent
+      end
+
+  let rec check_goal_proved g =
+    let b1 = Hashtbl.fold 
+      (fun _ a acc -> acc || a.status = Success) g.external_proofs false
+    in
+    let b = Hashtbl.fold 
+      (fun _ t acc -> acc || t.transf_proved) g.transformations b1
+    in
+    if g.proved <> b then
+      begin
+	g.proved <- b;
+	set_row_status b g.goal_row;
+	match g.parent with
+          | Theory t -> check_theory_proved t
+          | Transf t -> check_transf_proved t
+      end
+
+  and check_transf_proved t =
+    let b = List.for_all (fun g -> g.proved) t.subgoals in
+    if t.transf_proved <> b then
+      begin
+	t.transf_proved <- b;
+	set_row_status b t.transf_row;
+	check_goal_proved t.parent_goal
+      end
+    
+
+  (* deprecated *)
   let set_file_verified f =
     f.file_verified <- true;
     let row = f.file_row in
@@ -566,6 +626,7 @@ module Helpers = struct
     if !toggle_hide_proved_goals then
       goals_model#set ~row ~column:visible_column false
 
+  (* deprecated *)
   let set_theory_proved ~propagate  t =
     t.verified <- true;
     let row = t.theory_row in
@@ -642,14 +703,6 @@ module Helpers = struct
     set_proof_status ~obsolete a status time;
     a
 
-  let remove_proof_row a =
-    let (_:bool) = goals_model#remove a.Model.proof_row in
-    (* let g = a.Model.proof_goal in
-       remove a from g.Model.external_proofs
-       and update g.Model.proved
-    *)
-    ()
-
 
   let add_goal_row parent name t db_goal =
     let parent_row = match parent with
@@ -663,7 +716,7 @@ module Helpers = struct
                  goal_row = row;
                  goal_db = db_goal;
                  external_proofs = Hashtbl.create 7;
-                 transformations = [];
+                 transformations = Hashtbl.create 3;
                  proved = false;
                }
     in
@@ -678,6 +731,7 @@ module Helpers = struct
     let parent = g.Model.goal_row in
     let row = goals_model#append ~parent () in
     let tr = { Model.parent_goal = g;
+               Model.transf_proved = false;
                Model.transf_row = row;
                Model.transf_db = db_transf;
                subgoals = [];
@@ -1084,19 +1138,20 @@ let rec prover_on_goal q p g =
 	g p db_pa Model.Scheduled 0.0) ()
   in
   redo_external_proof q g a;
-  List.iter
-    (fun t -> List.iter (prover_on_goal q p) t.Model.subgoals)
+  Hashtbl.iter
+    (fun _ t -> List.iter (prover_on_goal q p) t.Model.subgoals)
     g.Model.transformations
 
 let rec prover_on_goal_or_children q p g =
   if not (g.Model.proved && !context_unproved_goals_only) then
     begin
-      match g.Model.transformations with
-        | [] -> prover_on_goal q p g
-        | l ->
-            List.iter (fun t ->
-                         List.iter (prover_on_goal_or_children q p)
-                           t.Model.subgoals) l
+      let r = ref true in
+      Hashtbl.iter
+	(fun _ t ->
+	   r := false;
+           List.iter (prover_on_goal_or_children q p)
+             t.Model.subgoals) g.Model.transformations;
+      if !r then prover_on_goal q p g
     end
 
 let prover_on_selected_goal_or_children q pr row =
@@ -1160,7 +1215,7 @@ let split_goal g =
         let goals,_ = List.fold_left (GtkThread.sync fold) ([],1) subgoals
         in
         tr.Model.subgoals <- List.rev goals;
-        g.Model.transformations <- tr :: g.Model.transformations) subgoals)
+        Hashtbl.add g.Model.transformations "split" tr) subgoals)
     in
     Scheduler.apply_transformation_l ~callback
       split_transformation g.Model.task
@@ -1168,12 +1223,13 @@ let split_goal g =
 let rec split_goal_or_children g =
   if not g.Model.proved then
     begin
-      match g.Model.transformations with
-        | [] -> split_goal g
-        | l ->
-            List.iter (fun t ->
-                         List.iter split_goal_or_children
-                           t.Model.subgoals) l
+      let r = ref true in
+      Hashtbl.iter 
+	(fun _ t ->
+	   r := false;
+           List.iter split_goal_or_children
+             t.Model.subgoals) g.Model.transformations;
+      if !r then split_goal g
     end
 
 let split_selected_goal_or_children row =
@@ -1302,8 +1358,8 @@ let rec collapse_proved_goal g =
       goals_view#collapse_row (goals_model#get_path row);
     end
   else
-    List.iter
-      (fun t -> List.iter collapse_proved_goal t.Model.subgoals)
+    Hashtbl.iter
+      (fun _ t -> List.iter collapse_proved_goal t.Model.subgoals)
       g.Model.transformations
 
 let collapse_verified_theory th =
@@ -1341,8 +1397,8 @@ let rec hide_proved_in_goal g =
       goals_model#set ~row ~column:Model.visible_column false
     end
   else
-    List.iter
-      (fun t -> List.iter hide_proved_in_goal t.Model.subgoals)
+    Hashtbl.iter
+      (fun _ t -> List.iter hide_proved_in_goal t.Model.subgoals)
       g.Model.transformations
 
 let hide_proved_in_theory th =
@@ -1375,8 +1431,8 @@ let rec show_all_in_goal g =
     goals_view#collapse_row (goals_model#get_path row)
   else
     goals_view#expand_row (goals_model#get_path row);
-  List.iter
-    (fun t -> List.iter show_all_in_goal t.Model.subgoals)
+  Hashtbl.iter
+    (fun _ t -> List.iter show_all_in_goal t.Model.subgoals)
     g.Model.transformations
 
 let show_all_in_theory th =
@@ -1789,7 +1845,19 @@ let () =
 
 let remove_proof_attempt a =
   Db.remove_proof_attempt a.Model.proof_db;
-  Helpers.remove_proof_row a
+  let (_:bool) = goals_model#remove a.Model.proof_row in
+  let g = a.Model.proof_goal in
+  Hashtbl.remove g.Model.external_proofs a.Model.prover.prover_id;
+  Helpers.check_goal_proved g
+
+let remove_transf t =
+  (* TODO: remove subgoals first !!! *)
+  Db.remove_transformation t.Model.transf_db;
+  let (_:bool) = goals_model#remove t.Model.transf_row in
+  let g = t.Model.parent_goal in
+  Hashtbl.remove g.Model.transformations "split" (* hack !! *);
+  Helpers.check_goal_proved g
+  
 
 let confirm_remove_row r =
   let row = filter_model#get_iter r in
@@ -1805,8 +1873,11 @@ let confirm_remove_row r =
 	  ~callback:(fun () -> remove_proof_attempt a)
 	  `QUESTION
 	  "Do you really want to remove the selected proof attempt?"
-    | Model.Row_transformation _tr ->
-	info_window `INFO "Transformation removal not yet available, sorry"
+    | Model.Row_transformation tr ->
+	info_window
+	  ~callback:(fun () -> remove_transf tr)
+	  `QUESTION
+	  "Do you really want to remove the selected transformation and all its subgoals?"
 
 let confirm_remove_selection () =
   match goals_view#selection#get_selected_rows with

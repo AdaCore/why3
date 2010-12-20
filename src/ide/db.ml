@@ -774,6 +774,11 @@ module Transf = struct
 	 db_must_done db (fun () -> Sqlite3.step stmt);
 	 Sqlite3.last_insert_rowid db.raw_db)
 
+  let delete db t =
+    let sql = "DELETE FROM transformations WHERE transf_id=?" in
+    let stmt = bind db sql [ Sqlite3.Data.INT t ] in
+    ignore(step_fold db stmt (fun _ -> ()))
+
   let of_goal db g =
     let sql="SELECT transf_id,transf_id_id FROM transformations \
        WHERE transformations.parent_goal=?"
@@ -792,6 +797,8 @@ module Transf = struct
 end
 
 let transformations g = Transf.of_goal (current()) g
+
+let remove_transformation t = Transf.delete (current()) t
 
 module Theory = struct
 
