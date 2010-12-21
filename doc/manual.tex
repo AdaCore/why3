@@ -135,21 +135,60 @@ Lescuyer, Sim\~ao Melo de Sousa, Asma Tafat.
 \section*{Release notes}
 
 \paragraph{Version 0.63}
-Initial release.
-\begin{itemize}
-\item New syntax for terms and formulas
-\item Algebraic data types, pattern matching
-\item Recursive definitions
-\item Inductive predicates
-\item Declaration encapsulated in theories. Using and cloning theories.
-\item Concept of proof task transformation
-\item Generic communication with provers
-\item OCaml library with documented API
-\item New GUI with session save and restore
-% \item New syntax for programs, new VC generator, intentionaly left *)
-%   undocumented, since the syntax is likely to evolve significantly in *)
-%   the future. Examples are available in \texttt{examples/programs}. *)
-\end{itemize}
+First public release. The main new features with respect to Why 2.xx
+are the following.
+\begin{enumerate}
+\item Completely redesigned input syntax for logic declarations
+  \begin{itemize}
+  \item new syntax for terms and formulas
+  \item enumerated and algebraic data types, pattern matching
+  \item recursive definitions of logic functions and predicates, with
+    termination checking
+  \item inductive definitions of predicates
+  \item declarations are structured in components called "theories",
+    which can be reused and instantiated
+  \end{itemize}
+
+\item More generic handling of goals and lemmas to prove
+  \begin{itemize}
+  \item concept of proof task 
+  \item generic concept of task transformation
+  \item generic approach for communicating with external provers
+  \end{itemize}
+\item Source code organized as a library with a documented API, to
+  allow access to Why3 features programmatically.
+
+\item GUI with new features w.r.t. the former GWhy
+  \begin{itemize}
+  \item session save and restore
+  \item prover calls in parallel
+  \item splitting, and more generally applying task transformations,
+    on demand
+  \item ability to edit proofs for interactive provers (Coq only for
+    the moment) on any subtask
+  \end{itemize}
+\item Extensible architecture via plugins
+  \begin{itemize}
+  \item users can define new transformations
+  \item users can add connections to additional provers
+  \end{itemize}
+\end{enumerate}
+
+% \begin{itemize}
+% \item New syntax for terms and formulas
+% \item Algebraic data types, pattern matching
+% \item Recursive definitions
+% \item Inductive predicates
+% \item Declaration encapsulated in theories. Using and cloning theories.
+% \item Concept of proof task transformation
+% \item Generic communication with provers
+% \item OCaml library with documented API
+% \item New GUI with session save and restore
+% % \item New syntax for programs, new VC generator, intentionaly left *)
+% %   undocumented, since the syntax is likely to evolve significantly in *)
+% %   the future. Examples are available in \texttt{examples/programs}. *)
+% \end{itemize}
+
 \cleardoublepage
 
 \tableofcontents
@@ -188,6 +227,9 @@ Initial release.
 \bibliography{manual}
 %\input{biblio-demons}
 
+
+\cleardoublepage
+\listoffigures
 \cleardoublepage
 \printindex
 
