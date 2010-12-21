@@ -86,7 +86,7 @@ sig
   val tag : t -> tag
 end
 
-module MakeWeak (S : Weakey) = struct
+module Make (S : Weakey) = struct
 
   type key = S.t
 
@@ -129,8 +129,7 @@ module MakeWeak (S : Weakey) = struct
       tbl_set = H.create n;
       tbl_tag = (incr c; !c) }
     in
-    (** Buggy with thread, modify an external data structure *)
-    (* Gc.finalise tbl_final t; *)
+    Gc.finalise tbl_final t;
     t
 
   let clear t = tbl_final t; H.clear t.tbl_set
@@ -160,39 +159,3 @@ module MakeWeak (S : Weakey) = struct
 
 end
 
-(* without weak but same interface *)
-module MakeSimple (S : Weakey) = struct
-
-  module H = Hashtbl.Make (struct
-    type t = S.t
-    let hash k = (S.tag k).tag_tag
-    let equal k1 k2 = S.tag k1 == S.tag k2
-  end)
-
-  include H
-
-  let iterk f = iter (fun k _ -> f k)
-  let foldk f = fold (fun k _ -> f k)
-
-  let set = replace
-
-  let memoize n fn =
-    let h = create n in fun e ->
-      try find h e
-      with Not_found ->
-        let v = fn e in
-        replace h e v;
-        v
-
-  let memoize_option n fn =
-    let v = lazy (fn None) in
-    let fn e = fn (Some e) in
-    let fn = memoize n fn in
-    function
-      | Some e -> fn e
-      | None -> Lazy.force v
-
-end
-
-module Make = MakeWeak
-(* module Make = MakeSimple *)
