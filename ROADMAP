@@ -75,7 +75,12 @@ We are happy to announce the first public release of Why3, also known
 as the Why platform next generation. It is a new project, independent
 from Why.
 
-The home web page of Why3 is http://why3.gforge.inria.fr/, where you
+This is an alpha release that may contain bugs or lack some features.
+Its purpose is to present the new architecture of the Why3 platform,
+to introduce the revised input language, and to call for comments 
+and bug reports.
+
+The home web page of Why3 is http://why3.gforge.inria.fr, where you
 can find the source distribution and the manual. See the manual for 
 installation instructions and contact information.
 
@@ -84,11 +89,12 @@ The main new features with respect to Why are the following.
 1) Completely redesigned input syntax for logic declarations
 
 * new syntax for terms and formulas
-* definitions of algebraic data types, definitions by pattern-matching
-* recursive definitions of logic functions and predicate, which are
-  checked terminating
+* enumerated and algebraic data types, pattern matching
+* recursive definitions of logic functions and predicates,
+  with termination checking
 * inductive definitions of predicates
-* declarations are structured in components called theories. 
+* declarations are structured in components called "theories",
+  which can be reused and instantiated
 
 2) More generic handling of goals and lemmas to prove
 
@@ -96,8 +102,8 @@ The main new features with respect to Why are the following.
 * generic concept of task transformation
 * generic approach for communicating with external provers
 
-3) Source code organized as a library with a documented API, to allow
-   access to Why3 features programmatically by linking.
+3) Source code organized as a library with a documented API,
+to allow access to Why3 features programmatically by linking.
 
 4) GUI with new features w.r.t. the former GWhy
 
@@ -113,11 +119,11 @@ The main new features with respect to Why are the following.
 * users can add connections to additional provers
 
 
-Beware that some Why features are not available in Why3:
+Beware that some Why features are not yet available in Why3:
 
 * There is a VC generator distributed in Why3 in an experimental stage
-  and intentionally undocumented (the input syntax for programs may
-  change a lot in the future).  
+  and intentionally undocumented in the current documentation (the input
+  syntax for programs may change a lot in the future).
 
 * There is no front-end for other languages like C or Java. However,
   the last release Why 2.28 is able to use Why3 as a back-end
