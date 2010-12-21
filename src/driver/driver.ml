@@ -42,7 +42,7 @@ type driver = {
   drv_meta        : (theory * Stdecl.t) Mid.t;
   drv_meta_cl     : (theory * Stdecl.t) Mid.t;
   drv_regexps     : (Str.regexp * prover_answer) list;
-  drv_regexpstime : Call_provers.regexptime list;
+  drv_timeregexps : Call_provers.timeregexp list;
   drv_exitcodes   : (int * prover_answer) list;
 }
 
@@ -72,11 +72,11 @@ exception UnknownProp  of (string list * string list)
 let load_driver = let driver_tag = ref (-1) in fun env file ->
   let prelude   = ref [] in
   let regexps   = ref [] in
-  let regexpstime   = ref [] in
   let exitcodes = ref [] in
   let filename  = ref None in
   let printer   = ref None in
   let transform = ref [] in
+  let timeregexps = ref [] in
 
   let set_or_raise loc r v error = match !r with
     | Some _ -> raise (Loc.Located (loc, Duplicate error))
@@ -90,7 +90,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     | RegexpTimeout s -> add_to_list regexps (Str.regexp s, Timeout)
     | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown t)
     | RegexpFailure (s,t) -> add_to_list regexps (Str.regexp s, Failure t)
-    | RegexpTime r -> add_to_list regexpstime (Call_provers.regexptime r)
+    | TimeRegexp r -> add_to_list timeregexps (Call_provers.timeregexp r)
     | ExitCodeValid s -> add_to_list exitcodes (s, Valid)
     | ExitCodeInvalid s -> add_to_list exitcodes (s, Invalid)
     | ExitCodeTimeout s -> add_to_list exitcodes (s, Timeout)
@@ -171,7 +171,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     drv_meta        = !meta;
     drv_meta_cl     = !meta_cl;
     drv_regexps     = List.rev !regexps;
-    drv_regexpstime = List.rev !regexpstime;
+    drv_timeregexps = List.rev !timeregexps;
     drv_exitcodes   = List.rev !exitcodes;
   }
 
@@ -200,11 +200,11 @@ let file_of_task drv input_file theory_name task =
 
 let call_on_buffer ~command ?timelimit ?memlimit drv buffer =
   let regexps = drv.drv_regexps in
-  let regexpstime = drv.drv_regexpstime in
+  let timeregexps = drv.drv_timeregexps in
   let exitcodes = drv.drv_exitcodes in
   let filename = get_filename drv "" "" "" in
   Call_provers.call_on_buffer
-    ~command ?timelimit ?memlimit ~regexps ~regexpstime
+    ~command ?timelimit ?memlimit ~regexps ~timeregexps
     ~exitcodes ~filename buffer
 
 (** print'n'prove *)

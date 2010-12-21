@@ -56,10 +56,12 @@ val debug : Debug.flag
     If set [call_on_buffer] prints on stderr the commandline called
     and the output of the prover. *)
 
-(** time parser *)
-type regexptime
-val regexptime : string -> regexptime
-(** *)
+type timeregexp
+(** The type of precompiled regular expressions for time parsing *)
+
+val timeregexp : string -> timeregexp
+(** Converts a regular expression with special markers '%h','%m',
+    '%s','%i' (for milliseconds) into a value of type [timeregexp] *)
 
 type post_prover_call = unit -> prover_result
 (** Thread-unsafe closure that processes a prover's output
@@ -75,7 +77,7 @@ val call_on_buffer :
   ?timelimit  : int ->
   ?memlimit   : int ->
   regexps     : (Str.regexp * prover_answer) list ->
-  regexpstime : regexptime list ->
+  timeregexps : timeregexp list ->
   exitcodes   : (int * prover_answer) list ->
   filename    : string ->
   Buffer.t -> bare_prover_call
@@ -89,10 +91,11 @@ val call_on_buffer :
     the first field are substituted in the second field (\0,\1,...).
     The regexps are tested in the order of the list.
 
-    @param regexpstime : if the first field matches the prover output,
-    the second field is the time in the format "%f:%f:%f" (h:m:s)
-    after substitution of matching groups. Otherwise wallclock is
-    used. The regexps are tested in the order of the list.
+    @param timeregexps : a list of regular expressions with special
+    markers '%h','%m','%s','%i' (for milliseconds), constructed with
+    [timeregexp] function, and used to extract the time usage from
+    the prover's output. If the list is empty, wallclock is used.
+    The regexps are tested in the order of the list.
 
     @param exitcodes : if the first field is the exit code, then
     the second field is the answer. Exit codes are tested in the order

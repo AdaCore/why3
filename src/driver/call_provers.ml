@@ -27,12 +27,12 @@ type timeunit =
   | Sec
   | Msec
 
-type regexptime = {
-  re : Str.regexp;
-  group : timeunit array; (*ieme corresponds to the group i + 1*)
+type timeregexp = {
+  re    : Str.regexp;
+  group : timeunit array; (* i-th corresponds to the group i+1 *)
 }
 
-let regexptime s =
+let timeregexp s =
   let cmd_regexp = Str.regexp "%\\(.\\)" in
   let nb = ref 0 in
   let l = ref [] in
@@ -132,7 +132,7 @@ type post_prover_call = unit -> prover_result
 type bare_prover_call = unit -> post_prover_call
 
 let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
-                   ~regexps ~regexpstime ~exitcodes ~filename buffer =
+                   ~regexps ~timeregexps ~exitcodes ~filename buffer =
   let on_stdin = ref true in
   let on_timelimit = ref false in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
@@ -169,7 +169,7 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
             Debug.dprintf debug "Call_provers: exited with status %d@." n;
             (try List.assoc n exitcodes with Not_found -> grep out regexps)
       in
-      let time = Util.default_option time (grep_time out regexpstime) in
+      let time = Util.default_option time (grep_time out timeregexps) in
       let ans = match ans with
         | HighFailure when !on_timelimit && timelimit > 0
           && time >= (0.9 *. float timelimit) -> Timeout

@@ -57,7 +57,7 @@ global:
 | VALID STRING { RegexpValid $2 }
 | INVALID STRING { RegexpInvalid $2 }
 | TIMEOUT STRING { RegexpTimeout $2 }
-| TIME STRING  { RegexpTime ($2) }
+| TIME STRING  { TimeRegexp $2 }
 | UNKNOWN STRING STRING { RegexpUnknown ($2, $3) }
 | FAIL STRING STRING { RegexpFailure ($2, $3) }
 | VALID INTEGER { ExitCodeValid $2 }

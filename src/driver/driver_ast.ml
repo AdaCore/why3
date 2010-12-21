@@ -50,7 +50,7 @@ type global =
   | RegexpTimeout of string
   | RegexpUnknown of string * string
   | RegexpFailure of string * string
-  | RegexpTime of string
+  | TimeRegexp of string
   | ExitCodeValid of int
   | ExitCodeInvalid of int
   | ExitCodeTimeout of int
