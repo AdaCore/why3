@@ -1,0 +1,38 @@
+[tools fast]
+prover = "alt-ergo"
+prover = "cvc3"
+prover = "z3"
+prover = "simplify"
+prover = "spass"
+prover = "yices"
+prover = "eprover"
+timelimit = 1
+
+[tools instantiate]
+prover = "cvc3"
+prover = "z3"
+prover = "spass"
+prover = "yices"
+prover = "eprover"
+timelimit = 1
+loadpath = "examples/programs"
+use = "meta.Partial"
+
+[probs funny]
+file = "talk290.mlw"
+file = "course.mlw"
+file = "vstte10_aqueue.mlw"
+file = "isqrt.mlw"
+file = "insertion_sort_list.mlw"
+file = "vacid_0_sparse_array.mlw"
+file = "vacid_0_red_black_trees_harness.mlw"
+file = "bresenham.mlw"
+transform = "split_goal"
+
+[bench fast_and_funny]
+tools = fast
+tools = instantiate
+probs = funny
+timeline = "prgbench.time"
+average = "prgbench.avg"
+csv = "prgbench.csv"
