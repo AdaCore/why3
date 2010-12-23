@@ -32,6 +32,8 @@ let create_mtsymbol name args model =
   Hts.add mutable_types ts mt;
   mt
 
+let is_mutable_type = Hts.mem mutable_types
+
 exception NotMutable
 
 let get_mtsymbol ts = 

@@ -12,11 +12,21 @@ let rec f91 (n:int) : int variant { 101-n } =
     n - 10
   { (n <= 100 and result = 91) or (n >= 101 and result = n - 10) }
 
-  mutable type t 'a model 'a
+  mutable type ref 'a model 'a
 
-  let f (r : t int) =
+  parameter get : r:ref 'a -> {} 'a reads r { result=r }
+
+  parameter set : r:ref 'a -> v:'a -> {} unit writes r { r=v }
+
+  let incr (r : ref int) =
+    {}
+    set r (get r + 1)
+    { r = old r + 1 }
+
+  let f (r : ref int) =
     { r = 0 }
-    if (*r*)0 <= 1 then 1 else 2
+    incr r;
+    get r
     { result = 1 }
 
 end

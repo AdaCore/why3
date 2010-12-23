@@ -207,17 +207,19 @@ let expected_type e ty =
 
 let pure_type env = Typing.dty env.denv
 
-let check_reference_type uc loc ty =
-  let ty_ref = dty_app (find_ts uc "ref", [create_type_var loc]) in
-  if not (Denv.unify ty ty_ref) then
-    errorm ~loc "this expression has type %a, but is expected to be a reference"
-      print_dty ty
+let check_mutable_type loc = function
+  | Denv.Tyapp (ts, _) when is_mutable_type ts -> 
+      ()
+  | ty ->
+      errorm ~loc 
+	"this expression has type %a, but is expected to have a mutable type"
+	print_dty ty
 
 let dreference env = function
-  | Qident id when Typing.mem_var id.id env.denv ->
+  | Qident id when Mstr.mem id.id env.locals ->
       (* local variable *)
-      let ty = Typing.find_var id.id env.denv in
-      check_reference_type env.uc id.id_loc ty;
+      let ty = Mstr.find id.id env.locals in
+      check_mutable_type id.id_loc ty;
       DRlocal id.id
   | qid ->
       let loc = Typing.qloc qid in
@@ -329,7 +331,7 @@ and dexpr_desc env loc = function
   | Pgm_ptree.Eident (Qident {id=x}) when Mstr.mem x env.locals ->
       (* local variable *)
       let tyv = Mstr.find x env.locals in
-      DElocal (x, tyv), dpurify tyv
+      DElocal (x, tyv), tyv
   | Pgm_ptree.Eident p ->
       begin try
 	(* global variable *)
@@ -640,13 +642,6 @@ let make_logic_app gl loc ty ls el =
 	IElet (v, e, d)
   in
   make [] el
-
-let is_ts_ref gl ts =
-  try ts_equal ts (find_ts gl "ref") with Not_found -> false
-
-let is_reference_type gl ty  = match ty.ty_node with
-  | Ty.Tyapp (ts, _) -> is_ts_ref gl ts
-  | _ -> false
 
 (* same thing, but for an abritrary expression f (not an application)
    f [e1; e2; ...; en]
@@ -1055,7 +1050,7 @@ let mk_true  loc gl = mk_bool_constant loc gl (find_ls gl "True")
 let rec check_type ?(noref=false) gl loc ty = match ty.ty_node with
   | Ty.Tyapp (ts, tyl) when ts_equal ts ts_arrow ->
       List.iter (check_type gl loc) tyl
-  | Ty.Tyapp (ts, _) when noref && is_ts_ref gl ts ->
+  | Ty.Tyapp (ts, _) when noref && is_mutable_type ts ->
       errorm ~loc "inner reference types are not allowed"
   | Ty.Tyapp (_, tyl) ->
       List.iter (check_type ~noref:true gl loc) tyl
@@ -1446,9 +1441,9 @@ let rec polymorphic_pure_type ty = match ty.ty_node with
   | Ty.Tyvar _ -> true
   | Ty.Tyapp (_, tyl) -> List.exists polymorphic_pure_type tyl
 
-let cannot_be_generalized gl = function
-  | Tpure { ty_node = Ty.Tyapp (ts, [ty]) } when is_ts_ref gl ts ->
-      polymorphic_pure_type ty
+let cannot_be_generalized = function
+  | Tpure { ty_node = Ty.Tyapp (ts, tyl) } when is_mutable_type ts ->
+      List.for_all polymorphic_pure_type tyl
   | Tpure { ty_node = Ty.Tyvar _ } ->
       true
   | Tpure _ | Tarrow _ ->
@@ -1514,7 +1509,7 @@ let rec decl ~wp env penv lmod uc = function
       let tyv = dtype_v denv tyv in
       let tyv = itype_v uc Mstr.empty tyv in
       let tyv = type_v Mvs.empty tyv in
-      if cannot_be_generalized uc tyv then errorm ~loc "cannot be generalized";
+      if cannot_be_generalized tyv then errorm ~loc "cannot be generalized";
       let ps, uc = add_global loc id.id tyv uc in
       let uc = add_global_if_pure uc ps in
       add_decl (Dparam (ps, tyv)) uc (* TODO: is it really needed? *)

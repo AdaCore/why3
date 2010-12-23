@@ -25,6 +25,8 @@ exception NotMutable
 val get_mtsymbol : tysymbol -> mtsymbol
   (** raises [NotMutable] if [ts] is not a mutable type *)
 
+val is_mutable_type : tysymbol -> bool
+
 val ts_arrow : tysymbol
     
 (* program types *)

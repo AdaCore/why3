@@ -51,13 +51,6 @@ let wp_implies = f_implies_simp
 let find_ts uc s = ns_find_ts (get_namespace (theory_uc uc)) [s]
 let find_ls uc s = ns_find_ls (get_namespace (theory_uc uc)) [s]
 
-let is_ts_ref uc ts =
-  try ts_equal ts (find_ts uc "ref") with Not_found -> false
-
-let is_ref_ty uc ty = match ty.ty_node with
-  | Tyapp (ts, _) -> is_ts_ref uc ts
-  | _ -> false
-
 let is_arrow_ty ty = match ty.ty_node with
   | Tyapp (ts, _) -> ts_equal ts ts_arrow
   | _ -> false
@@ -110,21 +103,17 @@ and erase_label_term env lab t = match t.t_node with
   | _ ->
       t_map (erase_label_term env lab) (erase_label env lab) t
 
-let unref_ty env ty = match ty.ty_node with
-  | Tyapp (ts, [ty]) when is_ts_ref env ts -> ty
-  | _ -> assert false
-
-(* replace !r by v everywhere in formula f *)
 let rec unref env r v f =
   f_map (unref_term env r v) (unref env r v) f
 
-and unref_term env r v t = match t.t_node with
-  (* | Tapp (ls, [u]) when ls_equal ls (find_ls env "prefix !") -> *)
-  (*     let rt = E.reference_of_term u in *)
-  (*     if E.ref_equal rt r then t_var v else t *)
-  | Tapp (ls, _) when ls_equal ls (find_ls env "old") ->
+and unref_term env r v t = match r, t.t_node with
+  | R.Rglobal {p_ls=ls1}, Tapp (ls2, _) when ls_equal ls1 ls2 ->
+      t_var v
+  | R.Rlocal {pv_vs=vs1}, Tvar vs2 when vs_equal vs1 vs2 ->
+      t_var v
+  | _, Tapp (ls, _) when ls_equal ls (find_ls env "old") ->
       assert false
-  | Tapp (ls, _) when ls_equal ls (find_ls env "at") -> 
+  | _, Tapp (ls, _) when ls_equal ls (find_ls env "at") -> 
       (* do not recurse in at(...) *)
       t
   | _ ->
@@ -134,7 +123,7 @@ and unref_term env r v t = match t.t_node with
 let quantify ?(all=false) env ef f =
   (* eprintf "quantify: ef=%a f=%a@." E.print ef Pretty.print_fmla f; *)
   let quantify1 r f =
-    let ty = unref_ty env (R.type_of r) in
+    let ty = R.type_of r in
     let v = create_vsymbol (id_clone (R.name_of r)) ty in
     let f = unref env r v f in
     wp_forall v f
