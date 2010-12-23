@@ -4,25 +4,20 @@ module P
   { use import programs.Prelude }
   { use import int.Int }
 
-  parameter id : x:'a -> { true } 'a { result = x }
+let rec f91 (n:int) : int variant { 101-n } =
+  { }
+  if n <= 100 then
+    f91 (f91 (n + 11))
+  else
+    n - 10
+  { (n <= 100 and result = 91) or (n >= 101 and result = n - 10) }
 
-  parameter succ : x:int -> { true } int { result = x+1 }
+  mutable type t 'a model 'a
 
-  let f x = 
-    { x=0 } 
-    let y = succ (id 1) in
-    id y + id y
-    { result=2 }
-
-  { use import list.List }
-  
-  let head (x:int) l = 
-    { x = 0 }
-    match l with
-    | Nil -> x
-    | Cons h _ -> h
-    end
-    { l = Nil -> result = 0 }
+  let f (r : t int) =
+    { r = 0 }
+    if (*r*)0 <= 1 then 1 else 2
+    { result = 1 }
 
 end
 

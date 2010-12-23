@@ -104,8 +104,9 @@ let specialize_post ~loc htv ((v, f), ql) =
   let f = specialize_fmla ~loc htv f in
   (ty, f), List.map specialize_exn ql
 
-let loc_of_id id = match id.id_origin with
+let rec loc_of_id id = match id.id_origin with
   | User loc -> loc
+  | Derived id -> loc_of_id id
   | _ -> assert false
 
 let loc_of_ls ls = match ls.ls_name.id_origin with
@@ -137,10 +138,8 @@ let dcurrying tyl ty =
   List.fold_right make_arrow_type tyl ty
 
 let rec dpurify_type_v ?(logic=false) = function
-  | DTpure ty when not logic ->
-      ty
   | DTpure ty ->
-      dpurify ty
+      if logic then dpurify ty else ty
   | DTarrow (bl, c) ->
       dcurrying (List.map (fun (_,ty,_) -> if logic then dpurify ty else ty) bl)
 	(dpurify_type_v c.dc_result_type)
@@ -532,11 +531,11 @@ and dtriple env (p, e, q) =
 
 (* phase 2: remove destructive types and type annotations *****************)
 
-let create_ivsymbol id ty = {
-  i_name = id;
-  i_ty   = ty;
-  i_vs   = create_vsymbol id (purify ty);
-}
+let create_ivsymbol id ty = 
+  let vs = create_vsymbol id ty in
+  let ty' = purify ty in
+  if ty_equal ty ty' then { i_pgm   = vs; i_logic = vs }
+  else { i_pgm = vs; i_logic = create_vsymbol id ty'; }
 
 let iadd_local env x ty =
   let v = create_ivsymbol (id_user x.id x.id_loc) ty in 
@@ -553,7 +552,7 @@ let ieffect env e = {
   ie_raises = e.de_raises;
 }
 
-let lenv = Mstr.map (fun x -> x.i_vs)
+let lenv = Mstr.map (fun x -> x.i_logic)
 
 let pre env = Denv.fmla (lenv env) 
 
@@ -632,12 +631,12 @@ let make_logic_app gl loc ty ls el =
     | ({ iexpr_desc = IElogic t }, _) :: r ->
 	make (t :: args) r
     | ({ iexpr_desc = IElocal v }, _) :: r ->
-	make (t_var v.i_vs :: args) r
+	make (t_var v.i_pgm :: args) r
     | ({ iexpr_desc = IEglobal s; iexpr_type = ty }, _) :: r ->
 	make (t_app s.p_ls [] ty :: args) r
     | (e, _) :: r ->
 	let v = create_ivsymbol (id_user "x" loc) e.iexpr_type in
-	let d = mk_iexpr loc ty (make (t_var v.i_vs :: args) r) in
+	let d = mk_iexpr loc ty (make (t_var v.i_pgm :: args) r) in
 	IElet (v, e, d)
   in
   make [] el
@@ -688,7 +687,9 @@ let rec ipattern env p =
 and ipattern_node env p = 
   let add1 env vs = 
     (* TODO: incorrect when vs is not pure ? *)
-    let i = { i_name = id_clone vs.vs_name; i_ty = vs.vs_ty; i_vs = vs } in
+    let i = 
+      { i_pgm = create_vsymbol (id_clone vs.vs_name) vs.vs_ty; i_logic = vs } 
+    in
     Mstr.add vs.vs_name.id_string i env, i
   in
   match p with
@@ -822,7 +823,7 @@ and iexpr_desc gl env loc ty = function
       let ty = Ty.ty_app (find_ts gl "label") [] in
       let v = create_ivsymbol (id_fresh s) ty in
       let env = Mstr.add s v env in
-      IElabel (v.i_vs, iexpr gl env e1)
+      IElabel (v.i_pgm, iexpr gl env e1)
   | DEany c ->
       let c = itype_c gl env c in
       IEany c
@@ -899,17 +900,17 @@ let rec print_iexpr fmt e = match e.iexpr_desc with
   | IElogic t ->
       print_term fmt t
   | IElocal v ->
-      fprintf fmt "<local %a>" print_vs v.i_vs
+      fprintf fmt "<local %a>" print_vs v.i_pgm
   | IEglobal s ->
       fprintf fmt "<global %a>" print_ls s.p_ls
   | IEapply (e, v) ->
-      fprintf fmt "@[((%a) %a)@]" print_iexpr e print_vs v.i_vs
+      fprintf fmt "@[((%a) %a)@]" print_iexpr e print_vs v.i_pgm
   (* | IEapply_ref (e, r) -> *)
   (*     fprintf fmt "@[((%a) <ref %a>)@]" print_iexpr e print_reference r *)
   | IEfun (_, (_,e,_)) ->
       fprintf fmt "@[fun _ ->@ %a@]" print_iexpr e
   | IElet (v, e1, e2) ->
-      fprintf fmt "@[let %a = %a in@ %a@]" print_vs v.i_vs
+      fprintf fmt "@[let %a = %a in@ %a@]" print_vs v.i_pgm
 	print_iexpr e1 print_iexpr e2
 
   | _ ->
@@ -937,7 +938,7 @@ let post_effect env ef ((v,q),ql) =
   E.filter not_result ef
 
 let reference env = function
-  | IRlocal  i -> R.Rlocal (Mvs.find i.i_vs env)
+  | IRlocal  i -> R.Rlocal (Mvs.find i.i_pgm env)
   | IRglobal s -> R.Rglobal s 
 
 let effect env e =
@@ -949,8 +950,8 @@ let effect env e =
   List.fold_left raises ef e.ie_raises
 
 let add_local env i v =
-  let vs = create_pvsymbol i.i_name ~vs:i.i_vs v in
-  Mvs.add i.i_vs vs env, vs
+  let vs = create_pvsymbol (id_clone i.i_pgm.vs_name) ~vs:i.i_logic v in
+  Mvs.add i.i_pgm vs env, vs
 
 let rec type_v env = function
   | ITpure ty ->
@@ -980,8 +981,11 @@ let rec pattern env p =
 
 and pattern_node env p = 
   let add1 env i = 
-    let v = create_pvsymbol i.i_name ~vs:i.i_vs (tpure i.i_ty) in
-    Mvs.add i.i_vs v env, v
+    let v = 
+      create_pvsymbol (id_clone i.i_pgm.vs_name) ~vs:i.i_logic 
+	(tpure i.i_pgm.vs_ty) 
+    in
+    Mvs.add i.i_pgm v env, v
   in
   match p with
   | IPwild -> 
@@ -1100,14 +1104,14 @@ and expr_desc gl env loc ty = function
       let ef = term_effect gl E.empty t in
       Elogic t, tpure ty, ef
   | IElocal vs ->
-      let vs = Mvs.find vs.i_vs env in
+      let vs = Mvs.find vs.i_pgm env in
       Elocal vs, vs.pv_tv, E.empty
   | IEglobal s ->
       Eglobal s, s.p_tv, E.empty
   | IEapply (e1, vs) ->
       let e1 = expr gl env e1 in
       (* printf "e1 : %a@." print_type_v e1.expr_type_v; *)
-      let vs = Mvs.find vs.i_vs env in
+      let vs = Mvs.find vs.i_pgm env in
       let c = apply_type_v_var e1.expr_type_v vs in
       make_apply loc e1 ty c
   (* | IEapply_ref (e1, r) -> *)
@@ -1180,7 +1184,7 @@ and expr_desc gl env loc ty = function
       in
       d, tpure ty, ef
   | IEmatch (i, bl) ->
-      let v = Mvs.find i.i_vs env in
+      let v = Mvs.find i.i_pgm env in
       (* if is_reference_type gl v.vs_ty then *)
       (* 	errorm ~loc "cannot match over a reference"; *)
       let branch ef (p, e) =
@@ -1220,8 +1224,8 @@ and expr_desc gl env loc ty = function
       in
       Etry (e1, hl), tpure ty, ef
   | IEfor (x, v1, d, v2, inv, e3) ->
-      let v1 = Mvs.find v1.i_vs env in
-      let v2 = Mvs.find v2.i_vs env in
+      let v1 = Mvs.find v1.i_pgm env in
+      let v2 = Mvs.find v2.i_pgm env in
       let env, x = add_local env x (tpure v1.pv_vs.vs_ty) in
       let e3 = expr gl env e3 in
       let ef = match inv with
@@ -1257,7 +1261,8 @@ and letrec gl env dl = (* : env * recfun list *)
   let binders (i, bl, var, t) =
     let env, bl = add_binders env bl in
     let variant (i, t, ls) = 
-      (create_pvsymbol i.i_name ~vs:i.i_vs (tpure i.i_ty), t, ls)
+      (create_pvsymbol (id_clone i.i_pgm.vs_name) ~vs:i.i_logic 
+	 (tpure i.i_pgm.vs_ty), t, ls)
     in
     (i, bl, env, option_map variant var, t)
   in
@@ -1266,7 +1271,7 @@ and letrec gl env dl = (* : env * recfun list *)
      [m] maps each function to its current effect *)
   let make_env env ?decvar m =
     let add1 env (i, bl, _, var, _) =
-      let c = Mvs.find i.i_vs m in
+      let c = Mvs.find i.i_pgm m in
       let c = match decvar, var with
 	| Some phi0, Some (_, phi, r) ->
 	    let decphi = f_app r [phi; t_var phi0] in
@@ -1284,25 +1289,26 @@ and letrec gl env dl = (* : env * recfun list *)
       let decvar = option_map (fun (v,_,_) -> v.pv_vs) var in
       let env = make_env env ?decvar m0 in
       let t, c = triple gl env t in
-      let v = create_pvsymbol i.i_name ~vs:i.i_vs (tarrow bl c) in
-      Mvs.add i.i_vs c m, (v, bl, var, t)
+      let v = create_pvsymbol (id_clone i.i_pgm.vs_name) ~vs:i.i_logic
+	(tarrow bl c) in
+      Mvs.add i.i_pgm c m, (v, bl, var, t)
     in
     map_fold_left type1 Mvs.empty dl
   in
   let rec fixpoint m =
     let m', dl' = one_step m in
     let same_effect (i,_,_,_,_) =
-      E.equal (Mvs.find i.i_vs m).c_effect (Mvs.find i.i_vs m').c_effect
+      E.equal (Mvs.find i.i_pgm m).c_effect (Mvs.find i.i_pgm m').c_effect
     in
     if List.for_all same_effect dl then m, dl' else fixpoint m'
   in
   let add_empty_effect m (i, bl, _, _, (p, _, q)) =
-    let tyl, ty = uncurrying i.i_ty in
+    let tyl, ty = uncurrying i.i_pgm.vs_ty in
     assert (List.length bl = List.length tyl);
     let c = { c_result_type = tpure ty;
 	      c_pre = p; c_effect = E.empty; c_post = q; }
     in
-    Mvs.add i.i_vs c m
+    Mvs.add i.i_pgm c m
   in
   let m0 = List.fold_left add_empty_effect Mvs.empty dl in
   let m, dl = fixpoint m0 in

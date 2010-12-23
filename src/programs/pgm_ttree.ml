@@ -117,10 +117,11 @@ type pre = T.pre
 
 type post = T.post
 
+(* each program variable is materialized by two logic variables (vsymbol):
+   one for typing programs and another for typing annotations *)
 type ivsymbol = { 
-  i_name : Ident.preid;
-  i_ty   : Ty.ty;
-  i_vs   : Term.vsymbol;
+  i_pgm   : Term.vsymbol; (* in programs *)
+  i_logic : Term.vsymbol; (* in annotations *)
 }
 
 type ireference =
