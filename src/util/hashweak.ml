@@ -17,6 +17,39 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module ProdConsume :
+sig
+  type 'a t
+  val create : unit -> 'a t
+  val add : 'a -> 'a t -> unit
+  val iter_remove : ('a -> unit) -> 'a t -> unit
+end
+= struct
+  (* One thing can produce, one thing can consume concurrently *)
+
+  type 'a cell =
+    | Empty
+    | Cons of 'a * 'a list
+  and 'a list = 'a cell ref
+
+  let rec iter f = function
+    | Empty -> ()
+    | Cons (x,l) -> f x; iter f !l
+
+  (* a reference on a mutable singly linked list *)
+  type 'a t = 'a list ref
+
+  let create () = ref (ref (Empty))
+  let add x t = t := ref (Cons(x,!t))
+  let iter_remove f t =
+    if !(!t) = Empty then () else
+    let r = !t in (* atomic one cell of the list *)
+    let l = !r in (* the content of the cell *)
+    r := Empty; (* Work even if there are some production,
+                   just not anymore the head *)
+    iter f l
+end
+
 module type S = sig
 
   type key
@@ -124,19 +157,34 @@ module Make (S : Weakey) = struct
 
   let tbl_final t = iterk (fun k -> Hashtbl.remove (tag_map k) t.tbl_tag) t
 
+  (** All the hashweak that can be collected. When a hashweak is
+      garbage collected we need to remove its tag from the key
+      hashtable. Since finalisation can be triggered at anytime even
+      when the key hashtable are in an inconsistent state, we need to
+      delay the actual removing until it can be done safely.
+      t_collected contains the delayed hashweak *)
+  let t_collected = ProdConsume.create ()
+
+  (** Do really the removing *)
+  let collect () = ProdConsume.iter_remove tbl_final t_collected
+
   let create = let c = ref (-1) in fun n ->
     let t = {
       tbl_set = H.create n;
       tbl_tag = (incr c; !c) }
     in
-    Gc.finalise tbl_final t;
+    Gc.finalise (fun t -> ProdConsume.add t t_collected) t;
     t
 
-  let clear t = tbl_final t; H.clear t.tbl_set
+  let find x y = collect (); find x y
+  let set x y z = collect (); set x y z
+
+  let clear t = collect (); tbl_final t; H.clear t.tbl_set
 
   let length t = H.count t.tbl_set
 
   let copy t =
+    collect ();
     let t' = create (length t) in
     iter (set t') t;
     t'
