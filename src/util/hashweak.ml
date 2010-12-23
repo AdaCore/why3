@@ -143,7 +143,7 @@ module Make (S : Weakey) = struct
 
   let set (t : 'a t) k (v : 'a) =
     Hashtbl.replace (tag_map k) t.tbl_tag (Obj.repr v);
-    H.add t.tbl_set k
+    ignore (H.merge t.tbl_set k)
 
   let remove t k =
     Hashtbl.remove (tag_map k) t.tbl_tag;
