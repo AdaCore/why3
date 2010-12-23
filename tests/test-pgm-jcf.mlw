@@ -2,20 +2,27 @@
 module P
 
   { use import programs.Prelude }
+  { use import int.Int }
 
-  use module import pervasives.Ref
+  parameter id : x:'a -> { true } 'a { result = x }
 
-  let test (r : ref int) = 
-    { !r = 0 }
-    set r 1 
-    { !r = 1 }
+  parameter succ : x:int -> { true } int { result = x+1 }
 
-  mutable type t model int
+  let f x = 
+    { x=0 } 
+    let y = succ (id 1) in
+    id y + id y
+    { result=2 }
 
-  let f (x : t) =
+  { use import list.List }
+  
+  let head (x:int) l = 
     { x = 0 }
-    if x = 1 then ()
-    { x = 1 }
+    match l with
+    | Nil -> x
+    | Cons h _ -> h
+    end
+    { l = Nil -> result = 0 }
 
 end
 

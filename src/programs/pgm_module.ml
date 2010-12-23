@@ -6,6 +6,7 @@ open Theory
 open Term
 
 open Pgm_types
+open Pgm_types.T
 open Pgm_ttree
 
 module Mnm = Mstr
@@ -34,11 +35,9 @@ let ns_replace eq chk x vo vn =
 let ns_union eq chk =
   Mnm.union (fun x vn vo -> Some (ns_replace eq chk x vo vn))
 
-let pr_equal p1 p2 = ls_equal p1.p_ls p2.p_ls
-
 let rec merge_ns chk ns1 ns2 =
   let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
-  { ns_pr = ns_union pr_equal chk ns1.ns_pr ns2.ns_pr;
+  { ns_pr = ns_union p_equal  chk ns1.ns_pr ns2.ns_pr;
     ns_ex = ns_union ls_equal chk ns1.ns_ex ns2.ns_ex;
     ns_mt = ns_union mt_equal chk ns1.ns_mt ns2.ns_mt;
     ns_ns = Mnm.union fusion      ns1.ns_ns ns2.ns_ns; }
@@ -51,7 +50,7 @@ let ns_add eq chk x v m = Mnm.change x (function
   | None -> Some v
   | Some vo -> Some (ns_replace eq chk x vo v)) m
 
-let pr_add = ns_add pr_equal
+let pr_add = ns_add p_equal
 let ex_add = ns_add ls_equal
 let mt_add = ns_add mt_equal
 
@@ -131,7 +130,7 @@ let add_symbol add id v uc =
   | _ -> assert false
 
 let add_psymbol ps uc =
-  add_symbol add_pr ps.p_ls.ls_name ps uc
+  add_symbol add_pr ps.p_name ps uc
 
 let add_esymbol ls uc =
   add_symbol add_ex ls.ls_name ls uc

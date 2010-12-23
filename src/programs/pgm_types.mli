@@ -25,72 +25,134 @@ exception NotMutable
 val get_mtsymbol : tysymbol -> mtsymbol
   (** raises [NotMutable] if [ts] is not a mutable type *)
 
-(* program types *)
-
-type effect = Pgm_effect.t
-type reference = Pgm_effect.reference
-
-type pre = Term.fmla
-
-type post_fmla = Term.vsymbol (* result *) * Term.fmla
-type exn_post_fmla = Term.vsymbol (* result *) option * Term.fmla
-
-type post = post_fmla * (Term.lsymbol * exn_post_fmla) list
-
-type type_v = private
-  | Tpure    of Ty.ty
-  | Tarrow   of binder list * type_c
-
-and type_c =
-  { c_result_type : type_v;
-    c_effect      : effect;
-    c_pre         : pre;
-    c_post        : post; }
-
-and binder = Term.vsymbol * type_v
-
-val tpure : Ty.ty -> type_v
-val tarrow : binder list -> type_c -> type_v
-
-(* program symbols *)
-
-type psymbol = private {
-  p_ls : lsymbol;
-  p_tv : type_v;
-}
-
-val create_psymbol : preid -> type_v -> psymbol
-
-(* exception symbols *)
-
-type esymbol = lsymbol
-
-(* program types -> logic types *)
-
 val ts_arrow : tysymbol
+    
+(* program types *)
+module rec T : sig
 
-val purify : ?logic:bool -> type_v -> ty
-  (** when [logic] is [true], mutable types are turned into their models *)
+  type pre = Term.fmla
 
-(* operations on program types *)
+  type post_fmla = Term.vsymbol (* result *) * Term.fmla
+  type exn_post_fmla = Term.vsymbol (* result *) option * Term.fmla
+      
+  type esymbol = lsymbol
 
-val apply_type_v     : type_v -> vsymbol   -> type_c
-val apply_type_v_ref : type_v -> reference -> type_c
+  type post = post_fmla * (esymbol * exn_post_fmla) list
+      
+  type type_v = private
+  | Tpure    of ty
+  | Tarrow   of pvsymbol list * type_c
 
-val occur_type_v : reference -> type_v -> bool
+  and type_c = { 
+    c_result_type : type_v;
+    c_effect      : E.t;
+    c_pre         : pre;
+    c_post        : post; 
+  }
 
-val v_result : ty -> vsymbol
-val exn_v_result : Why.Term.lsymbol -> Why.Term.vsymbol option
+  and pvsymbol = private {
+    pv_name : ident;
+    pv_tv   : type_v;
+    pv_ty   : ty;      (* as a logic type, for typing purposes only *)
+    pv_vs   : vsymbol; (* for use in the logic *)
+  }
 
-val post_map : (fmla -> fmla) -> post -> post
+  val tpure  : ty -> type_v
+  val tarrow : pvsymbol list -> type_c -> type_v
 
-val subst1 : vsymbol -> term -> term Mvs.t
+  val create_pvsymbol : preid -> ?vs:vsymbol -> type_v -> pvsymbol
 
-val eq_type_v : type_v -> type_v -> bool
+  (* program symbols *)
 
-(* pretty-printers *)
+  type psymbol = private {
+    p_name : ident;
+    p_tv   : type_v;
+    p_ty   : ty;      (* as a logic type, for typing purposes only *)
+    p_ls   : lsymbol; (* for use in the logic *) 
+  }
+      
+  val create_psymbol : preid -> type_v -> psymbol
 
-val print_type_v : Format.formatter -> type_v -> unit
-val print_type_c : Format.formatter -> type_c -> unit
-val print_post   : Format.formatter -> post   -> unit
+  val p_equal : psymbol -> psymbol -> bool
+
+  (* program types -> logic types *)
+
+  val purify : ty -> ty
+  val purify_type_v : ?logic:bool -> type_v -> ty
+    (** when [logic] is [true], mutable types are turned into their models *)
+    
+  (* operations on program types *)
+    
+  val apply_type_v_var : type_v -> pvsymbol -> type_c
+  val apply_type_v_sym : type_v -> psymbol  -> type_c
+    
+  val occur_type_v : R.t -> type_v -> bool
+    
+  val v_result : ty -> vsymbol
+  val exn_v_result : Why.Term.lsymbol -> Why.Term.vsymbol option
+    
+  val post_map : (fmla -> fmla) -> post -> post
+    
+  val subst1 : vsymbol -> term -> term Mvs.t
+    
+  val eq_type_v : type_v -> type_v -> bool
+
+  (* pretty-printers *)
+
+  val print_type_v : Format.formatter -> type_v -> unit
+  val print_type_c : Format.formatter -> type_c -> unit
+  val print_post   : Format.formatter -> post   -> unit
+
+end 
+
+and Mpv :  sig include Map.S with type key = T.pvsymbol end
+
+(* references *)
+and R : sig
+
+  type t = 
+    | Rlocal  of T.pvsymbol
+    | Rglobal of T.psymbol
+
+  val type_of : t -> ty
+
+  val name_of : t -> ident
+
+end 
+and Sref : sig include Set.S with type elt = R.t end
+and Mref : sig include Map.S with type key = R.t end
+and Sexn : sig include Set.S with type elt = T.esymbol end
+
+(* effects *)
+and E : sig
+
+  type t = private {
+    reads  : Sref.t;
+    writes : Sref.t;
+    raises : Sexn.t;
+  }
+
+  val empty : t
+
+  val add_read  : R.t -> t -> t
+  val add_write : R.t -> t -> t
+  val add_raise : T.esymbol -> t -> t
+
+  val remove_reference : R.t -> t -> t    
+  val filter : (R.t -> bool) -> t -> t
+
+  val remove_raise : T.esymbol -> t -> t
+
+  val union : t -> t -> t
+
+  val equal : t -> t -> bool
+    
+  val no_side_effect : t -> bool
+    
+  val subst : R.t Mpv.t -> t -> t
+
+  val occur : R.t -> t -> bool
+
+end 
+
 

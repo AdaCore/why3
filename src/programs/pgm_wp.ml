@@ -28,9 +28,8 @@ open Theory
 open Pretty
 open Pgm_ttree
 open Pgm_types
+open Pgm_types.T
 open Pgm_module
-
-module E = Pgm_effect
 
 let debug = Debug.register_flag "program_wp"
 
@@ -83,8 +82,8 @@ let fresh_label env =
   let ty = ty_app (find_ts env "label") [] in
   create_vsymbol (id_fresh "label") ty
 
-let wp_binder (x, tv) f = match tv with
-  | Tpure _ -> wp_forall x f
+let wp_binder x f = match x.pv_tv with
+  | Tpure _ -> wp_forall x.pv_vs f
   | Tarrow _ -> f
 
 let wp_binders = List.fold_right wp_binder
@@ -120,9 +119,9 @@ let rec unref env r v f =
   f_map (unref_term env r v) (unref env r v) f
 
 and unref_term env r v t = match t.t_node with
-  | Tapp (ls, [u]) when ls_equal ls (find_ls env "prefix !") ->
-      let rt = E.reference_of_term u in
-      if E.ref_equal rt r then t_var v else t
+  (* | Tapp (ls, [u]) when ls_equal ls (find_ls env "prefix !") -> *)
+  (*     let rt = E.reference_of_term u in *)
+  (*     if E.ref_equal rt r then t_var v else t *)
   | Tapp (ls, _) when ls_equal ls (find_ls env "old") ->
       assert false
   | Tapp (ls, _) when ls_equal ls (find_ls env "at") -> 
@@ -135,23 +134,23 @@ and unref_term env r v t = match t.t_node with
 let quantify ?(all=false) env ef f =
   (* eprintf "quantify: ef=%a f=%a@." E.print ef Pretty.print_fmla f; *)
   let quantify1 r f =
-    let ty = unref_ty env (E.type_of_reference r) in
-    let v = create_vsymbol (id_clone (E.name_of_reference r)) ty in
+    let ty = unref_ty env (R.type_of r) in
+    let v = create_vsymbol (id_clone (R.name_of r)) ty in
     let f = unref env r v f in
     wp_forall v f
   in
   let s = ef.E.writes in
-  let s = if all then E.Sref.union ef.E.reads s else s in
-  E.Sref.fold quantify1 s f
+  let s = if all then Sref.union ef.E.reads s else s in
+  Sref.fold quantify1 s f
 
 let abstract_wp env ef (q',ql') (q,ql) =
   assert (List.length ql' = List.length ql);
   let quantify_res f' f res =
     let f = wp_implies f' f in
     let f = match res with
-      | Some v when is_ref_ty env v.vs_ty ->
-	  let v' = create_vsymbol (id_clone v.vs_name) (unref_ty env v.vs_ty) in
-	  wp_forall v' (unref env (E.Rlocal v) v' f)
+      (* | Some v when is_ref_ty env v.vs_ty -> *)
+      (* 	  let v' = create_vsymbol (id_clone v.vs_name) (unref_ty env v.vs_ty) in *)
+      (* 	  wp_forall v' (unref env (R.Rlocal v) v' f) *)
       | Some v ->
 	  wp_forall v f
       | None ->
@@ -185,7 +184,7 @@ let opaque_wp env ef q' q =
     appear in effect [ef] *)
 
 let filter_post ef (q, ql) =
-  let keep (ls, _) = Sls.mem ls ef.E.raises in
+  let keep (ls, _) = Sexn.mem ls ef.E.raises in
   q, List.filter keep ql
 
 let rec ls_assoc ls = function
@@ -197,7 +196,7 @@ let default_exn_post ls = ls, (exn_v_result ls, f_true)
 
 let default_post ty ef =
   (v_result ty, f_true),
-  List.map default_exn_post (Sls.elements ef.E.raises)
+  List.map default_exn_post (Sexn.elements ef.E.raises)
 
 let rec assoc_handler x = function
   | [] -> raise Not_found
@@ -209,7 +208,7 @@ let rec assoc_handler x = function
 
 let saturate_post ef q (_, ql) =
   let set_post x = try x, ls_assoc x ql with Not_found -> default_exn_post x in
-  let xs = Sls.elements ef.E.raises in
+  let xs = Sexn.elements ef.E.raises in
   (q, List.map set_post xs)
 
 (* maximum *)
@@ -227,7 +226,7 @@ let sup ((q, ql) : post) (_, ql') =
 (* post-condition for a loop body *)
 
 let default_exns_post ef =
-  let xs = Sls.elements ef.E.raises in
+  let xs = Sexn.elements ef.E.raises in
   List.map default_exn_post xs
 
 let term_at env lab t =
@@ -276,7 +275,7 @@ and wp_desc env e q = match e.expr_desc with
       f_subst_single v t q
   | Elocal v ->
       let (res, q), _ = q in
-      f_subst (subst1 res (t_var v)) q
+      f_subst (subst1 res (t_var v.pv_vs)) q
   | Eglobal _ ->
       let (_, q), _ = q in q
   | Efun (bl, t) ->
@@ -287,7 +286,7 @@ and wp_desc env e q = match e.expr_desc with
       let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
       let v1 = v_result e1.expr_type in
       let t1 = t_label_add (label ~loc:e1.expr_loc "let") (t_var v1) in
-      let q1 = v1, f_subst (subst1 x t1) w2 in
+      let q1 = v1, f_subst (subst1 x.pv_vs t1) w2 in
       let q1 = saturate_post e1.expr_effect q1 q in
       wp_expr env e1 q1
   | Eletrec (dl, e1) ->
@@ -324,13 +323,13 @@ and wp_desc env e q = match e.expr_desc with
 	in
 	w
   (* optimization for the particular case let _ = y in e *)
-  | Ematch (_, [{pat_node = Pwild}, e]) ->
+  | Ematch (_, [{ppat_pat = {pat_node = Term.Pwild}}, e]) ->
       wp_expr env e (filter_post e.expr_effect q)
   | Ematch (x, bl) ->
       let branch (p, e) =
-        f_close_branch p (wp_expr env e (filter_post e.expr_effect q))
+        f_close_branch p.ppat_pat (wp_expr env e (filter_post e.expr_effect q))
       in
-      let t = t_var x in
+      let t = t_var x.pv_vs in
       f_case t (List.map branch bl)
   | Eabsurd ->
       f_false
@@ -353,6 +352,7 @@ and wp_desc env e q = match e.expr_desc with
 	List.map
 	  (fun (x, v, h) ->
 	     let w = wp_expr env h (filter_post h.expr_effect q) in
+	     let v = option_map (fun v -> v.pv_vs) v in
 	     x, (v, w))
 	  hl
       in
@@ -379,26 +379,27 @@ and wp_desc env e q = match e.expr_desc with
 	| Pgm_ptree.Downto -> 
 	    find_ls env "infix <", find_ls env "infix >=", t_int_const "-1"
       in
-      let v1_gt_v2 = f_app gt [t_var v1; t_var v2] in
-      let v1_le_v2 = f_app le [t_var v1; t_var v2] in
+      let v1_gt_v2 = f_app gt [t_var v1.pv_vs; t_var v2.pv_vs] in
+      let v1_le_v2 = f_app le [t_var v1.pv_vs; t_var v2.pv_vs] in
       let inv = match inv with Some inv -> inv | None -> f_true in
       let add = find_ls env "infix +" in
       let wp1 =
-	let xp1 = t_app add [t_var x; incr] ty_int in
-	let post = f_subst (subst1 x xp1) inv in
+	let xp1 = t_app add [t_var x.pv_vs; incr] ty_int in
+	let post = f_subst (subst1 x.pv_vs xp1) inv in
 	let q1 = saturate_post e1.expr_effect (res, post) q in
 	wp_expr env e1 q1
       in
       let f = wp_and ~sym:true
-	(f_subst (subst1 x (t_var v1)) inv)
+	(f_subst (subst1 x.pv_vs (t_var v1.pv_vs)) inv)
 	(quantify env e.expr_effect
 	   (wp_and ~sym:true
-	      (wp_forall x
-	         (wp_implies (wp_and (f_app le [t_var v1; t_var x])
-			             (f_app le [t_var x;  t_var v2]))
+	      (wp_forall x.pv_vs
+	         (wp_implies 
+		    (wp_and (f_app le [t_var v1.pv_vs; t_var x.pv_vs])
+		            (f_app le [t_var x.pv_vs;  t_var v2.pv_vs]))
                  (wp_implies inv wp1)))
-	      (let sv2 = t_app add [t_var v2; incr] ty_int in
-	       wp_implies (f_subst (subst1 x sv2) inv) q1)))
+	      (let sv2 = t_app add [t_var v2.pv_vs; incr] ty_int in
+	       wp_implies (f_subst (subst1 x.pv_vs sv2) inv) q1)))
       in
       wp_and ~sym:true (wp_implies v1_gt_v2 q1) (wp_implies v1_le_v2 f)
 
@@ -454,9 +455,9 @@ and f_btop env f = match f.f_node with
       f_label_copy f (f_iff_simp (t_btop env l) (t_btop env r))
   | _ -> f_map (fun t -> t) (f_btop env) f
 
-let add_wp_decl l f uc =
-  let s = "WP_" ^ l.ls_name.id_string in
-  let id = match id_from_user l.ls_name with
+let add_wp_decl ps f uc =
+  let s = "WP_" ^ ps.p_name.id_string in
+  let id = match id_from_user ps.p_name with
     | None -> id_fresh s
     | Some loc -> id_user s loc
   in
@@ -466,18 +467,18 @@ let add_wp_decl l f uc =
   add_logic_decl d uc
 
 let decl uc = function
-  | Pgm_ttree.Dlet ({ p_ls = ls }, e) ->
-      Debug.dprintf debug "@[--effect %a-----@\n  %a@]@\n----------------@."
-	  Pretty.print_ls ls print_type_v e.expr_type_v;
+  | Pgm_ttree.Dlet ({ p_name = n } as ps, e) ->
+      Debug.dprintf debug "@[--effect %s-----@\n  %a@]@\n----------------@."
+	  n.id_string print_type_v e.expr_type_v;
       let f = wp uc e in
       Debug.dprintf debug "wp = %a@\n----------------@." Pretty.print_fmla f;
-      add_wp_decl ls f uc
+      add_wp_decl ps f uc
   | Pgm_ttree.Dletrec dl ->
-      let add_one uc ({ p_ls = ls }, def) =
+      let add_one uc ({ p_name = n } as ps, def) =
 	let f = wp_recfun uc def in
-	Debug.dprintf debug "wp %a = %a@\n----------------@."
-	    print_ls ls Pretty.print_fmla f;
-	add_wp_decl ls f uc
+	Debug.dprintf debug "wp %s = %a@\n----------------@."
+	   n.id_string Pretty.print_fmla f;
+	add_wp_decl ps f uc
       in
       List.fold_left add_one uc dl
   | Pgm_ttree.Dparam _ ->

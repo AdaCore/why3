@@ -3,6 +3,7 @@ open Why
 open Ident
 open Term
 open Pgm_types
+open Pgm_types.T
 
 module Mnm : Map.S with type key = string
 
