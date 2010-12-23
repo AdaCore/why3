@@ -155,7 +155,24 @@ module Make (S : Weakey) = struct
   let iter  fn t = H.iter (fun k -> fn k (find t k)) t.tbl_set
   let fold  fn t = H.fold (fun k -> fn k (find t k)) t.tbl_set
 
-  let tbl_final t = iterk (fun k -> Hashtbl.remove (tag_map k) t.tbl_tag) t
+  (** This table is just a hack to keep alive the weak hashset :
+      Indeed that circunvent a strange behavior/bug of weak hashset,
+      when a weak hashset is garbage collected it will not anymore
+      remove the dead elements from it. So during finalize or if the
+      hashset is keep alive, we can acces invalid pointer...
+
+      So to summarize we keep alive the weak hashset until we don't need them
+      anymore.
+  *)
+  let gen_table = Hashtbl.create 5
+
+  let tbl_final_aux t =
+    iterk (fun k -> Hashtbl.remove (tag_map k) t.tbl_tag) t
+
+  let tbl_final t =
+    tbl_final_aux t;
+    (** We don't need anymore the weak hashset, we can release it *)
+    Hashtbl.remove gen_table t.tbl_tag
 
   (** All the hashweak that can be collected. When a hashweak is
       garbage collected we need to remove its tag from the key
@@ -173,13 +190,14 @@ module Make (S : Weakey) = struct
       tbl_set = H.create n;
       tbl_tag = (incr c; !c) }
     in
+    Hashtbl.add gen_table t.tbl_tag t.tbl_set;
     Gc.finalise (fun t -> ProdConsume.add t t_collected) t;
     t
 
   let find x y = collect (); find x y
   let set x y z = collect (); set x y z
 
-  let clear t = collect (); tbl_final t; H.clear t.tbl_set
+  let clear t = collect (); tbl_final_aux t; H.clear t.tbl_set
 
   let length t = H.count t.tbl_set
 
