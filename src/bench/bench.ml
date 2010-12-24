@@ -43,11 +43,16 @@ type 'a prob = {
   ptrans : env -> task list trans;
 }
 
+
+type why_result =
+  | InternalFailure of exn
+  | Done of prover_result
+
 type ('a,'b) result = {tool   : 'a;
                        prob   : 'b;
                        task   : task;
                        idtask : int;
-                       result : prover_result}
+                       result : why_result}
 
 type ('a,'b) callback = 'a -> 'b -> task -> int -> proof_attempt_status -> unit
 
@@ -95,7 +100,8 @@ let call s callback tool prob =
   let iter q pval i task =
     MTask.start s;
     let cb res = callback pval i task res;
-      match res with Done _ | InternalFailure _ -> MTask.stop s | _ -> () in
+      match res with Scheduler.Done _
+        | Scheduler.InternalFailure _ -> MTask.stop s | _ -> () in
     call q cb task; succ i in
   let trans_cb pval tl =
     let q = Queue.create () in
@@ -120,9 +126,14 @@ let general ?(callback=fun _ _ _ _ _ -> ()) iter add =
     let cb pval i task res =
       callback tool.tval pval task i res;
       match res with
-        | Done r -> MTask.lock s;
+        | Scheduler.InternalFailure _ | Scheduler.Done _ -> MTask.lock s;
           add v {tool = tool.tval; prob = pval; task = task;
-                 idtask = i; result = r};
+                 idtask = i;
+                 result = match res with
+                   | Scheduler.InternalFailure exn -> InternalFailure exn
+                   | Scheduler.Done r -> Done r
+                   | _ -> assert false
+                };
           MTask.unlock s
         | _ -> () in
     call s cb tool prob);
@@ -234,19 +245,28 @@ let empty_tool_res =
   let compute_average l =
   let fold tr res =
     let r = res.result in
-    match r.pr_answer with
-      | Valid -> {tr with valid = add_nb_avg tr.valid r.pr_time}
-      | Timeout -> {tr with timeout = add_nb_avg tr.timeout r.pr_time}
-      | Invalid -> {tr with invalid = add_nb_avg tr.invalid r.pr_time}
-      | Unknown _ -> {tr with unknown = add_nb_avg tr.unknown r.pr_time}
-      | Failure _ | HighFailure ->
-        {tr with failure = add_nb_avg tr.failure r.pr_time} in
+    match r with
+      | Done r ->
+        begin match r.pr_answer with
+          | Valid -> {tr with valid = add_nb_avg tr.valid r.pr_time}
+          | Timeout -> {tr with timeout = add_nb_avg tr.timeout r.pr_time}
+          | Invalid -> {tr with invalid = add_nb_avg tr.invalid r.pr_time}
+          | Unknown _ -> {tr with unknown = add_nb_avg tr.unknown r.pr_time}
+          | Failure _ | HighFailure ->
+            {tr with failure = add_nb_avg tr.failure r.pr_time}
+        end
+      | InternalFailure _ ->
+        {tr with failure = add_nb_avg tr.failure 0.} in
     List.fold_left fold empty_tool_res l
 
+  let extract_done = function Done r -> r | InternalFailure _ -> assert false
+
   let filter_timeline l =
-    let l = List.filter (fun r -> r.result.pr_answer = Valid) l in
+    let l = List.filter (function {result = Done r} -> r.pr_answer = Valid
+      | _ -> false) l in
     let compare_valid x y =
-      let c = compare x.result.pr_time y.result.pr_time in
+      let c = compare (extract_done x.result).pr_time
+        (extract_done y.result).pr_time in
       if c <> 0 then c else compare x y in
     let l = List.fast_sort compare_valid l in
     l
@@ -255,14 +275,17 @@ let empty_tool_res =
     let rec aux acc cur next = function
       | _ when next > max -> List.rev acc
       | [] -> aux (cur::acc) cur (next+.step) []
-      | {result={pr_time = t}}::_ as l when t >= next ->
+      | {result= InternalFailure _}::l -> aux acc cur next l
+      | {result= Done {pr_time = t}}::_ as l when t >= next ->
         aux (cur::acc) cur (next+.step) l
       | _::l -> aux acc (cur+1) next l in
     aux [] 0 min
 
   let max_time l =
-    List.fold_left (fun acc {result={pr_time = t}} -> max acc t) 0. l
-
+    List.fold_left (fun acc {result=r} ->
+      match r with
+        | Done {pr_time = t} -> max acc t
+        | InternalFailure _ -> acc ) 0. l
   open Format
 (**
 answer output time
@@ -302,10 +325,14 @@ answer output time
     Pp.print_list Pp.comma print_header fmt l;
     print_newline fmt ();
     let l = transpose_sorted l in
-    let print_cell fmt r =
-      fprintf fmt "%a, %.3f" (*"%a, %S, %.3f"*)
-        print_prover_answer r.result.pr_answer (*r.result.pr_output*)
-        r.result.pr_time in
+    let print_cell fmt {result= r} =
+      match r with
+        | Done r ->
+          fprintf fmt "%a, %.3f" (*"%a, %S, %.3f"*)
+            print_prover_answer r.pr_answer (*r.result.pr_output*)
+            r.pr_time
+        | InternalFailure _ -> fprintf fmt "InternalFailure, \"\""
+in
     let print_line fmt (b,l) =
       fprintf fmt "%a ," print_prob b;
       Pp.print_list Pp.comma print_cell fmt l in

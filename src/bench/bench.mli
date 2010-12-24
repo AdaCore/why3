@@ -44,12 +44,15 @@ type 'a prob = {
                                        ptask *)
 }
 
+type why_result =
+  | InternalFailure of exn
+  | Done of prover_result
 
 type ('a,'b) result = {tool   : 'a;
                        prob   : 'b;
                        task   : task;
                        idtask : int;
-                       result : prover_result}
+                       result : why_result}
 
 type ('a,'b) callback = 'a -> 'b -> task -> int -> proof_attempt_status -> unit
 
