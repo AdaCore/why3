@@ -117,6 +117,7 @@ val create_prop_decl : prop_kind -> prsymbol -> fmla -> decl
 (* exceptions *)
 
 exception IllegalTypeAlias of tysymbol
+exception NonPositiveTypeDecl of tysymbol * lsymbol * tysymbol
 
 exception InvalidIndDecl of lsymbol * prsymbol
 exception TooSpecificIndDecl of lsymbol * prsymbol * term

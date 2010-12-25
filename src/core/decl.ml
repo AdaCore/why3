@@ -373,6 +373,8 @@ exception EmptyDecl
 exception EmptyAlgDecl of tysymbol
 exception EmptyIndDecl of lsymbol
 
+exception NonPositiveTypeDecl of tysymbol * lsymbol * tysymbol
+
 let news_id s id = Sid.add_new id (ClashIdent id) s
 
 let syms_ts s ts = Sid.add ts.ts_name s
@@ -384,7 +386,9 @@ let syms_fmla s f = f_s_fold syms_ts syms_ls s f
 
 let create_ty_decl tdl =
   if tdl = [] then raise EmptyDecl;
-  let check_constr ty (syms,news) fs =
+  let add s (ts,_) = Sts.add ts s in
+  let tss = List.fold_left add Sts.empty tdl in
+  let check_constr tys ty (syms,news) fs =
     let vty = of_option fs.ls_value in
     ignore (ty_match Mtv.empty vty ty);
     let add s ty = match ty.ty_node with
@@ -392,12 +396,18 @@ let create_ty_decl tdl =
       | _ -> assert false
     in
     let vs = ty_fold add Stv.empty vty in
-    let rec check s ty = match ty.ty_node with
+    let rec check seen s ty = match ty.ty_node with
       | Tyvar v when Stv.mem v vs -> s
       | Tyvar v -> raise (UnboundTypeVar v)
-      | Tyapp (ts,_) -> Sid.add ts.ts_name (ty_fold check s ty)
+      | Tyapp (ts,_) ->
+          let now = Sts.mem ts tss in
+          if seen && now then
+            raise (NonPositiveTypeDecl (tys,fs,ts))
+          else
+            let s = ty_fold (check (seen || now)) s ty in
+            Sid.add ts.ts_name s
     in
-    let syms = List.fold_left check syms fs.ls_args in
+    let syms = List.fold_left (check false) syms fs.ls_args in
     syms, news_id news fs.ls_name
   in
   let check_decl (syms,news) (ts,td) = match td with
@@ -409,7 +419,7 @@ let create_ty_decl tdl =
         if ts.ts_def <> None then raise (IllegalTypeAlias ts);
         let news = news_id news ts.ts_name in
         let ty = ty_app ts (List.map ty_var ts.ts_args) in
-        List.fold_left (check_constr ty) (syms,news) cl
+        List.fold_left (check_constr ts ty) (syms,news) cl
   in
   let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) tdl in
   mk_decl (Dtype tdl) syms news
