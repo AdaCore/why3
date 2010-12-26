@@ -84,10 +84,17 @@ int main(int argc, char *argv[]) {
   memlimit = atol(argv[2]);
 
   if (memlimit > 0) {
-    /* set the CPU time limit */
+    /* set the CPU memory limit */
     getrlimit(RLIMIT_AS,&res);
     res.rlim_cur = memlimit * 1024 * 1024;
     setrlimit(RLIMIT_AS,&res);
+  }
+
+  if (timelimit > 0 || memlimit > 0) {
+    /* do not generate core dumps */
+    getrlimit(RLIMIT_CORE,&res);
+    res.rlim_cur = 0;
+    setrlimit(RLIMIT_CORE,&res);
   }
 
   /* execute the command */
