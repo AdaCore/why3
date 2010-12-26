@@ -32,6 +32,8 @@ let debug = Debug.register_flag "transform"
 type 'a trans = task -> 'a
 type 'a tlist = 'a list trans
 
+let apply f x = f x
+
 let identity   x =  x
 let identity_l x = [x]
 
@@ -41,18 +43,6 @@ let singleton f x = [f x]
 
 let compose   f g x =            g (f x)
 let compose_l f g x = list_apply g (f x)
-
-exception TransFailure of (string * exn)
-
-let apply f x = f x
-
-let apply_named s f x =
-  Debug.dprintf debug "Apply transformation %s@." s;
-  try apply f x with
-    | e when not (Debug.test_flag Debug.stack_trace) ->
-      raise (TransFailure (s,e))
-
-let catch_named = apply_named
 
 module Wtask = Hashweak.Make (struct
   type t = task_hd
@@ -224,13 +214,11 @@ let on_tagged_pr t fn =
 
 (** debug *)
 let print_meta f m task =
-  if Debug.test_flag f then
-    (let fmt = Debug.get_debug_formatter () in
-     Pp.print_iter1 Stdecl.iter Pp.newline
-       Pretty.print_tdecl
-       fmt
-       (find_meta_tds task m).tds_set;
-     (Pp.add_flush Pp.newline) fmt ());
+  let print_tds fmt m =
+    Pp.print_iter1 Stdecl.iter Pp.newline Pretty.print_tdecl fmt
+      (find_meta_tds task m).tds_set
+  in
+  Debug.dprintf f "%a@." print_tds m;
   task
 
 (** register transformations *)
@@ -244,25 +232,31 @@ end)
 
 exception UnknownTrans of string
 exception KnownTrans of string
+exception TransFailure of (string * exn)
+
+let named s f (x : task) =
+  Debug.dprintf debug "Apply transformation %s@." s;
+  if Debug.test_flag Debug.stack_trace then f x
+  else try f x with e -> raise (TransFailure (s,e))
 
 let transforms   : (string, env -> task trans) Hashtbl.t = Hashtbl.create 17
 let transforms_l : (string, env -> task tlist) Hashtbl.t = Hashtbl.create 17
 
 let register_transform s p =
   if Hashtbl.mem transforms s then raise (KnownTrans s);
-  Hashtbl.replace transforms s (fun _ -> p)
+  Hashtbl.replace transforms s (fun _ -> named s p)
 
 let register_transform_l s p =
   if Hashtbl.mem transforms_l s then raise (KnownTrans s);
-  Hashtbl.replace transforms_l s (fun _ -> p)
+  Hashtbl.replace transforms_l s (fun _ -> named s p)
 
 let register_env_transform s p =
   if Hashtbl.mem transforms s then raise (KnownTrans s);
-  Hashtbl.replace transforms s (Wenv.memoize 3 p)
+  Hashtbl.replace transforms s (Wenv.memoize 3 (fun e -> named s (p e)))
 
 let register_env_transform_l s p =
   if Hashtbl.mem transforms_l s then raise (KnownTrans s);
-  Hashtbl.replace transforms_l s (Wenv.memoize 3 p)
+  Hashtbl.replace transforms_l s (Wenv.memoize 3 (fun e -> named s (p e)))
 
 let lookup_transform s =
   try Hashtbl.find transforms s with Not_found -> raise (UnknownTrans s)

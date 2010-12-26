@@ -246,9 +246,9 @@ let print_task ?old drv fmt task =
   in
   let lookup_transform t = t, lookup_transform t drv.drv_env in
   let transl = List.map lookup_transform drv.drv_transform in
-  let apply task (t, tr) =
+  let apply task (_t, tr) =
 (*  Format.printf "@\n@\n[%f] %s@." (Sys.time ()) t; *)
-    Trans.apply_named t tr task
+    Trans.apply tr task
   in
 (*Format.printf "@\n@\nTASK";*)
   let task = update_task drv task in

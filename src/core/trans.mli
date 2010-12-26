@@ -39,9 +39,6 @@ val singleton : 'a trans -> 'a tlist
 val compose   : task trans -> 'a trans -> 'a trans
 val compose_l : task tlist -> 'a tlist -> 'a tlist
 
-(* Should be only used with functions working in constant time *)
-(* val conv_res : ('a -> 'b) -> 'a trans -> 'b trans *)
-
 val fold   : (task_hd -> 'a -> 'a     ) -> 'a -> 'a trans
 val fold_l : (task_hd -> 'a -> 'a list) -> 'a -> 'a tlist
 
@@ -81,12 +78,12 @@ val on_tagged_pr : meta -> (Spr.t -> 'a trans) -> 'a trans
 
 (** debug transformation *)
 val print_meta : Debug.flag -> meta -> task trans
-(** [print_meta f m] if [d] is set pretty_print on the debug
-    formatter. In all the case the transformation is indeed the
-    identity *)
+(** [print_meta f m] is an identity transformation that
+    prints every meta [m] in the task if flag [d] is set *)
 
 (** {2 Registration} *)
 
+exception TransFailure of (string * exn)
 exception UnknownTrans of string
 exception KnownTrans of string
 
@@ -102,9 +99,6 @@ val lookup_transform_l : string -> Env.env -> task tlist
 val list_transforms   : unit -> string list
 val list_transforms_l : unit -> string list
 
-exception TransFailure of (string * exn)
+val named : string -> 'a trans -> 'a trans
+(** give transformation a name without registering *)
 
-val apply_named : string -> 'a trans -> (task -> 'a)
-
-val catch_named : string -> 'a trans -> 'a trans
-(** catch the error, and reraise with TransFailure *)

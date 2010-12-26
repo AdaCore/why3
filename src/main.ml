@@ -375,13 +375,13 @@ let do_task drv fname tname (th : Why.Theory.theory) (task : Task.task) =
 
 let do_tasks env drv fname tname th task =
   let lookup acc t =
-    (try t, Trans.singleton (Trans.lookup_transform t env) with
-       Trans.UnknownTrans _ -> t, Trans.lookup_transform_l t env) :: acc
+    (try Trans.singleton (Trans.lookup_transform t env) with
+       Trans.UnknownTrans _ -> Trans.lookup_transform_l t env) :: acc
   in
   let trans = List.fold_left lookup [] !opt_trans in
-  let apply tasks (s, tr) =
+  let apply tasks tr =
     List.rev (List.fold_left (fun acc task ->
-      List.rev_append (Trans.apply_named s tr task) acc) [] tasks)
+      List.rev_append (Trans.apply tr task) acc) [] tasks)
   in
   let tasks = List.fold_left apply [task] trans in
   List.iter (do_task drv fname tname th) tasks

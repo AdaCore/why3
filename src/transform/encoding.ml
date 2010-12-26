@@ -53,7 +53,7 @@ let enco_gen opt env =
       | Some [MAstr s] -> s
       | _ -> assert false in
     try
-      Trans.catch_named s ((Hashtbl.find opt.table s) env)
+      Trans.named s ((Hashtbl.find opt.table s) env)
     with Not_found -> failwith
       (Format.sprintf "encoding : %s wrong argument %s" opt.meta.meta_name s))
 
