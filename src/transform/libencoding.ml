@@ -204,14 +204,3 @@ let d_monomorph ty_base kept lsmap d =
   in
   let add ls acc = create_logic_decl [ls,None] :: acc in
   Sls.fold add !consts dl
-
-(* convert tysymbols tagged with meta_kept to a set of types *)
-let get_kept_types tss =
-  let add ts acc =
-    if ts.ts_args <> [] then acc
-    else match ts.ts_def with
-    | Some ty -> Sty.add ty acc
-    | None -> Sty.add (ty_app ts []) acc
-  in
-  Sts.fold add tss (Sty.singleton ty_type)
-

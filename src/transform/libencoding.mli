@@ -47,7 +47,3 @@ val lsdecl_of_tydecl : ty_decl list -> decl list
 
 (* monomorphise wrt the base type, the set of kept types, and a symbol map *)
 val d_monomorph : ty -> Sty.t -> (lsymbol -> lsymbol) -> decl -> decl list
-
-(* convert tysymbols tagged with meta_kept to a set of types *)
-val get_kept_types : Sts.t -> Sty.t
-

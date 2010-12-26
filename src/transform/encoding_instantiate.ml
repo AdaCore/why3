@@ -441,29 +441,16 @@ let monomorphise_goal =
     acc)
 
 
-let collect_green_part sts =
-  let extract ts tys =
-    assert (ts.ts_args = []); (* UnsupportedTySymbol? *)
-    Mty.add (match ts.ts_def with
-      | None -> ty_app ts []
-      | Some ty -> ty) ts tys in
-  Sts.fold extract sts Mty.empty
-
-
-
 (* Some general env creation function *)
-let create_env task tenv kept =
-  let keep = collect_green_part kept in
-  let projty = Mty.fold (fun ty _ ty_ty ->
+let create_env task tenv keep =
+  let projty = Sty.fold (fun ty ty_ty ->
     Mty.add ty ty ty_ty)
     keep Mty.empty in
-  let task = Mty.fold (fun ty ts task ->
+  let task = Sty.fold (fun ty task ->
     let add_ts task ts = add_ty_decl task [ts,Tabstract] in
     let task = ty_s_fold add_ts task ty in
-    let task = add_ts task ts in
     task (* the meta is yet here *)) keep task in
-  let keep = Mty.fold (fun ty _ sty -> Sty.add ty sty) keep Sty.empty in
-    task,{
+  task,{
     etenv = tenv;
     ekeep = keep;
     eprojty = projty;
@@ -492,7 +479,7 @@ let create_trans_complete kept complete =
   Trans.fold_map fold_map env init_task
 
 let encoding_instantiate =
-  Trans.on_tagged_ts meta_kept (fun kept ->
+  Trans.on_tagged_ty meta_kept (fun kept ->
   Trans.on_meta_excl meta_complete (fun complete ->
   create_trans_complete kept complete))
 
@@ -508,10 +495,7 @@ let find_mono ~only_mono sty f =
       ty_add sty ty else sty in
   f_ty_fold add sty f
 
-let create_meta_ty ty =
-  let name = id_fresh "meta_ty" in
-  let ts = create_tysymbol name [] (Some ty) in
-  (create_meta meta_kept [MAts ts])
+let create_meta_ty ty = create_meta meta_kept [MAty ty]
 
 
 let create_meta_ty = Wty.memoize 17 create_meta_ty
@@ -553,51 +537,6 @@ let () =
       "goal", mono_in_goal;
       "mono", mono_in_mono;
       "all", mono_in_def]
-
-
-(* Select array *)
-let meta_kept_array = register_meta "encoding : kept_array" [MTtysymbol]
-
-(* select the type array which appear as argument of set and get.
-  set and get must be in sls *)
-let find_mono_array ~only_mono sls sty f =
-  let add sty ls tyl _ =
-    match tyl with
-      | ty::_ when Sls.mem ls sls && is_ty_mono ~only_mono ty ->
-        Sty.add ty sty
-      | _ -> sty in
-  f_app_fold add sty f
-
-let create_meta_ty ty =
-  let name = id_fresh "meta_ty" in
-  let ts = create_tysymbol name [] (Some ty) in
-  (create_meta meta_kept_array [MAts ts])
-
-let create_meta_ty = Wty.memoize 17 create_meta_ty
-
-let create_meta_tyl sty d =
-  Sty.fold (flip $ cons create_meta_ty) sty [create_decl d]
-
-let mono_in_goal sls pr f =
-  let sty = (try find_mono_array ~only_mono:true sls Sty.empty f
-    with Exit -> assert false) (*monomorphise goal should have been used*) in
-   create_meta_tyl sty (create_prop_decl Pgoal pr f)
-
-let mono_in_goal sls = Trans.tgoal (mono_in_goal sls)
-
-let trans_array th_array =
-  let set = ns_find_ls th_array.th_export ["set"] in
-  let get = ns_find_ls th_array.th_export ["get"] in
-  let sls = Sls.add set (Sls.add get Sls.empty) in
-  mono_in_goal sls
-
-let trans_array env =
-  let th_array = Env.find_theory env ["array"] "Array" in
-  Trans.on_used_theory th_array (fun used ->
-    if not used then Trans.identity else trans_array th_array)
-
-let () = Trans.register_env_transform "use_builtin_array" trans_array
-
 
 (*
 Local Variables:

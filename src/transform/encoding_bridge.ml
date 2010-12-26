@@ -67,11 +67,7 @@ let load_prelude kept env =
       specials = specials;
       trans_lsymbol = Hls.create 17;
       trans_tsymbol = trans_tsymbol} in
-  let clone_builtin ts (task,sty) =
-    let ty = match ts.ts_def with
-      | Some ty -> ty
-      | None -> try ty_app ts [] with BadTypeArity(_,_,_) ->
-        failwith "kept without definition must be constant"  in
+  let clone_builtin ty (task,sty) =
     let add_ts task ts = add_ty_decl task [ts,Tabstract] in
     let task = ty_s_fold add_ts task ty in
     let is_constant =
@@ -82,7 +78,6 @@ let load_prelude kept env =
       match ty.ty_node with
         | Tyapp (ts,_) -> ts
         | _ -> assert false in
-    let task = add_ts task ts in
     let tb = create_tysymbol (id_clone ts_head.ts_name) []
       (if is_constant then None else Some (ty_of_ty tenv_tmp ty)) in
     let task = add_ts task tb in
@@ -91,6 +86,8 @@ let load_prelude kept env =
     let t2tb = create_fsymbol (id_clone logic_t2tb.ls_name) [ty] tytb in
     let task = add_logic_decl task [tb2t,None] in
     let task = add_logic_decl task [t2tb,None] in
+    let name = id_fresh "meta_ty" in
+    let ts = create_tysymbol name [] (Some ty) in
     let th_inst = create_inst
       ~ts:[type_t,ts;type_tb,tb]
       ~ls:[logic_t2tb,t2tb;logic_tb2t,tb2t] ~lemma:[] ~goal:[] in
@@ -100,7 +97,7 @@ let load_prelude kept env =
     if is_constant then Hts.add trans_tsymbol ts_head tb;
     Hty.add specials ty lconv;
     task,Sty.add ty sty in
-  let task,kept = Sts.fold clone_builtin kept (task,Sty.empty) in
+  let task,kept = Sty.fold clone_builtin kept (task,Sty.empty) in
   task, { tenv_tmp with kept = kept}
 
 
@@ -279,7 +276,7 @@ let decl tenv d =
   res
 *)
 
-let t env = Trans.on_tagged_ts meta_kept (fun s ->
+let t env = Trans.on_tagged_ty meta_kept (fun s ->
   let init_task,tenv = load_prelude s env in
   Trans.tdecl (decl tenv) init_task)
 

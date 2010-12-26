@@ -152,8 +152,8 @@ let lsmap tyb kept = Wls.memoize 63 (fun ls ->
 
 let d_ts_base = create_ty_decl [ts_base, Tabstract]
 
-let monomorph tyb = Trans.on_tagged_ts Encoding.meta_kept (fun tss ->
-  let kept = Libencoding.get_kept_types tss in
+let monomorph tyb = Trans.on_tagged_ty Encoding.meta_kept (fun kept ->
+  let kept = Sty.add ty_type kept in
   let tyb = match tyb.ty_node with
     | Tyapp (_,[]) when not (Sty.mem tyb kept) -> tyb
     | _ -> ty_base
