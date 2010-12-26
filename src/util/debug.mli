@@ -40,6 +40,10 @@ val nottest_flag : flag -> bool
 val set_debug_formatter : Format.formatter -> unit
 (** Set the formatter used when printing debug material *)
 
+val get_debug_formatter : unit -> Format.formatter
+(** Get the formatter used when printing debug material *)
+
+
 val dprintf : flag -> ('a, Format.formatter, unit) format -> 'a
 (** Print only if the flag is set *)
 

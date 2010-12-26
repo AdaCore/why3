@@ -52,6 +52,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
 let stack_trace = register_flag "stack_trace"
 
 let set_debug_formatter = (:=) formatter
+let get_debug_formatter () = !formatter
 
 let dprintf flag =
   if !flag then Format.fprintf !formatter else Format.ifprintf !formatter

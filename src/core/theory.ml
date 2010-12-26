@@ -684,7 +684,7 @@ let create_meta m al =
     (* we allow "constant tysymbol <=> ty" conversion *)
     let a = match at,a with
       | MTtysymbol, MAty ({ ty_node = Tyapp (ts,[]) }) -> MAts ts
-      | MTty, MAts ts when ts.ts_args = [] -> MAty (ty_app ts [])
+      | MTty, MAts ({ts_args = []} as ts) -> MAty (ty_app ts [])
       | _, _ -> a
     in
     let mt = get_meta_arg_type a in

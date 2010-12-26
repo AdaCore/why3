@@ -25,6 +25,8 @@ open Decl
 open Theory
 open Task
 
+let debug = Debug.register_flag "transform"
+
 (** Task transformation *)
 
 type 'a trans = task -> 'a
@@ -44,9 +46,13 @@ exception TransFailure of (string * exn)
 
 let apply f x = f x
 
-let apply_named s f x = try apply f x with
-  | e when not (Debug.test_flag Debug.stack_trace) ->
+let apply_named s f x =
+  Debug.dprintf debug "Apply transformation %s@." s;
+  try apply f x with
+    | e when not (Debug.test_flag Debug.stack_trace) ->
       raise (TransFailure (s,e))
+
+let catch_named = apply_named
 
 module Wtask = Hashweak.Make (struct
   type t = task_hd
@@ -215,6 +221,17 @@ let on_tagged_pr t fn =
     | _ -> assert false
   in
   on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set Spr.empty))
+
+(** debug *)
+let print_meta f m task =
+  if Debug.test_flag f then
+    (let fmt = Debug.get_debug_formatter () in
+     Pp.print_iter1 Stdecl.iter Pp.newline
+       Pretty.print_tdecl
+       fmt
+       (find_meta_tds task m).tds_set;
+     (Pp.add_flush Pp.newline) fmt ());
+  task
 
 (** register transformations *)
 

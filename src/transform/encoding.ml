@@ -22,8 +22,10 @@ open Theory
 open Task
 open Trans
 
-let meta_kept = register_meta "encoding : kept" [MTtysymbol]
+let meta_kept = register_meta "encoding : kept" [MTty]
 let meta_base = register_meta_excl "encoding : base" [MTtysymbol]
+
+let debug = Debug.register_flag "encoding"
 
 type enco_opt =
     { meta : meta;
@@ -51,11 +53,12 @@ let enco_gen opt env =
       | Some [MAstr s] -> s
       | _ -> assert false in
     try
-      (Hashtbl.find opt.table s) env
+      Trans.catch_named s ((Hashtbl.find opt.table s) env)
     with Not_found -> failwith
       (Format.sprintf "encoding : %s wrong argument %s" opt.meta.meta_name s))
 
-let enco_select = enco_gen select_opt
+let print_kept = print_meta debug meta_kept
+let enco_select env = compose (enco_gen select_opt env) print_kept
 let enco_kept = enco_gen kept_opt
 let enco_poly_smt = enco_gen poly_smt_opt
 let enco_poly_tptp = enco_gen poly_tptp_opt

@@ -79,6 +79,12 @@ val on_tagged_ts : meta -> (Sts.t -> 'a trans) -> 'a trans
 val on_tagged_ls : meta -> (Sls.t -> 'a trans) -> 'a trans
 val on_tagged_pr : meta -> (Spr.t -> 'a trans) -> 'a trans
 
+(** debug transformation *)
+val print_meta : Debug.flag -> meta -> task trans
+(** [print_meta f m] if [d] is set pretty_print on the debug
+    formatter. In all the case the transformation is indeed the
+    identity *)
+
 (** {2 Registration} *)
 
 exception UnknownTrans of string
@@ -96,5 +102,9 @@ val lookup_transform_l : string -> Env.env -> task tlist
 val list_transforms   : unit -> string list
 val list_transforms_l : unit -> string list
 
+exception TransFailure of (string * exn)
+
 val apply_named : string -> 'a trans -> (task -> 'a)
 
+val catch_named : string -> 'a trans -> 'a trans
+(** catch the error, and reraise with TransFailure *)
