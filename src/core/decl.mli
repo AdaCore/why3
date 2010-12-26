@@ -153,6 +153,7 @@ exception KnownIdent of ident
 exception UnknownIdent of ident
 exception RedeclaredIdent of ident
 exception NonExhaustiveExpr of (pattern list * expr)
+exception NonFoundedTypeDecl of tysymbol
 
 val find_constructors : known_map -> tysymbol -> lsymbol list
 val find_inductive_cases : known_map -> lsymbol -> (prsymbol * fmla) list

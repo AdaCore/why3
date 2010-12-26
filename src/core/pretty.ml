@@ -512,19 +512,21 @@ let () = Exn_printer.register
       fprintf fmt
         "Type symbol %a is a type alias and cannot be declared as algebraic"
         print_ts ts
+  | Decl.NonFoundedTypeDecl ts ->
+      fprintf fmt "Cannot construct a value of type %a" print_ts ts
   | Decl.NonPositiveTypeDecl (_ts, ls, ts1) ->
       fprintf fmt "Constructor %a \
           contains a non strictly positive occurrence of type symbol %a"
         print_ls ls print_ts ts1
   | Decl.InvalidIndDecl (_ls, pr) ->
-      fprintf fmt "Ill-formed clause %a in inductive predicate declaration"
+      fprintf fmt "Ill-formed inductive clause %a"
         print_pr pr
   | Decl.TooSpecificIndDecl (_ls, pr, t) ->
-      fprintf fmt "Clause %a in inductive predicate declaration \
-          has too type-specific conclusion %a"
+      fprintf fmt "Inductive clause %a has too type-specific conclusion %a"
         print_pr pr print_term t
   | Decl.NonPositiveIndDecl (_ls, pr, ls1) ->
-      fprintf fmt "Clause %a contains a negative occurrence of symbol %a"
+      fprintf fmt "Inductive clause %a contains \
+          a negative occurrence of symbol %a"
         print_pr pr print_ls ls1
   | Decl.BadLogicDecl (ls1,ls2) ->
       fprintf fmt "Ill-formed definition: symbols %a and %a are different"

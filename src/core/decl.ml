@@ -648,8 +648,36 @@ and check_matchF kn () f = match f.f_node with
 
 let check_match kn d = decl_fold (check_matchT kn) (check_matchF kn) () d
 
+exception NonFoundedTypeDecl of tysymbol
+
+let rec check_foundness kn d =
+  let rec check_constr s ty ls =
+    let vty = of_option ls.ls_value in
+    let m = ty_match Mtv.empty vty ty in
+    let check ty = check_type s (ty_inst m ty) in
+    List.for_all check ls.ls_args
+  and check_type s ty = match ty.ty_node with
+    | Tyvar _ -> true
+    | Tyapp (ts,_) ->
+        if Sts.mem ts s then false else
+        let cl = find_constructors kn ts in
+        if cl == [] then true else
+        let s = Sts.add ts s in
+        List.exists (check_constr s ty) cl
+  in
+  match d.d_node with
+  | Dtype tdl ->
+      let check () (ts,_) =
+        let tl = List.map ty_var ts.ts_args in
+        if check_type Sts.empty (ty_app ts tl)
+        then () else raise (NonFoundedTypeDecl ts)
+      in
+      List.fold_left check () tdl
+  | _ -> ()
+
 let known_add_decl kn d =
   let kn = known_add_decl kn d in
-  ignore (check_match kn d);
+  check_foundness kn d;
+  check_match kn d;
   kn
 

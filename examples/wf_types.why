@@ -1,0 +1,15 @@
+theory Test
+    type t 'a
+
+    type test 'a = Test (t (test 'a))
+end
+
+theory Main
+    type id 'a = 'a
+    type shell 'a = Shell 'a
+    type option 'a = Some 'a | None
+
+    clone Test as T1 with type t = id
+    clone Test as T2 with type t = shell
+    clone Test as T3 with type t = option
+end
