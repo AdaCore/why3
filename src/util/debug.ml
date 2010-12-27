@@ -39,7 +39,7 @@ let lookup_flag s =
 let list_flags () = Hashtbl.fold (fun s v acc -> (s,v,!v)::acc) flag_table []
 
 let test_flag s = !s
-let nottest_flag s = !s
+let nottest_flag s = not !s
 
 let set_flag s = s := true
 let unset_flag s = s := false
