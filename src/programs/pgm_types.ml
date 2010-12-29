@@ -316,7 +316,8 @@ end = struct
 	let ts = ty_match Mtv.empty x.pv_ty s.p_ty in
 	let c = type_c_of_type_v (Tarrow (bl, c)) in
 	let ef = Mpv.add x (R.Rglobal s) Mpv.empty in
-	subst_type_c ef ts (subst1 x.pv_vs (t_app s.p_ls [] x.pv_vs.vs_ty)) c
+	let t = t_app s.p_ls [] (ty_inst ts x.pv_vs.vs_ty) in
+	subst_type_c ef ts (subst1 x.pv_vs t) c
     | _ ->
 	assert false
 

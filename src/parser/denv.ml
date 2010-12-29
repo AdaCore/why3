@@ -38,17 +38,22 @@ let () = Exn_printer.register (fun fmt e -> match e with
 
 (** types with destructive type variables *)
 
-type dty =
+type dty_view =
   | Tyvar of type_var
-  | Tyapp of tysymbol * dty list
+  | Tyapp of tysymbol * dty_view list
 
 and type_var = {
   tag : int;
   user : bool;
   tvsymbol : tvsymbol;
-  mutable type_val : dty option;
+  mutable type_val : dty_view option;
   type_var_loc : loc option;
 }
+
+let tyvar v = Tyvar v
+let tyapp (s, tyl) = Tyapp (s, tyl)
+
+type dty = dty_view
 
 let tvsymbol_of_type_var tv = tv.tvsymbol
 
@@ -63,6 +68,10 @@ let rec print_dty fmt = function
       fprintf fmt "%s %a" s.ts_name.id_string print_dty t
   | Tyapp (s, l) ->
       fprintf fmt "%s %a" s.ts_name.id_string (print_list comma print_dty) l
+
+let rec view_dty = function
+  | Tyvar { type_val = Some dty } -> view_dty dty
+  | dty -> dty
 
 let create_ty_decl_var =
   let t = ref 0 in

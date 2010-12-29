@@ -59,7 +59,7 @@ let id_result = "result"
 
 (* phase 1: typing programs (using destructive type inference) **************)
 
-let dty_app (ts, tyl) = assert (ts.ts_def = None); Tyapp (ts, tyl)
+let dty_app (ts, tyl) = assert (ts.ts_def = None); tyapp (ts, tyl)
 
 let find_ts uc s = ns_find_ts (get_namespace (theory_uc uc)) [s]
 let find_ls uc s = ns_find_ls (get_namespace (theory_uc uc)) [s]
@@ -113,23 +113,23 @@ let loc_of_ls ls = match ls.ls_name.id_origin with
   | User loc -> Some loc
   | _ -> None (* FIXME: loc for recursive functions *)
 
-let dmodel_type = function
-  | Tyapp (ts, tyl) as ty ->
+let dmodel_type dty = match view_dty dty with
+  | Tyapp (ts, tyl) ->
       let mt = get_mtsymbol ts in
       begin match mt.mt_model with
 	| None -> 
-	    ty
+	    dty
 	| Some ty ->
 	    let h = Htv.create 17 in
 	    List.iter2 (Htv.add h) mt.mt_args tyl;
 	    let rec inst ty = match ty.ty_node with
 	      | Ty.Tyvar tv -> Htv.find h tv
-	      | Ty.Tyapp (ts, tyl) -> Denv.Tyapp (ts, List.map inst tyl)
+	      | Ty.Tyapp (ts, tyl) -> Denv.tyapp (ts, List.map inst tyl)
 	    in
 	    inst ty
       end
-  | Tyvar _ as ty -> 
-      ty
+  | Tyvar _ -> 
+      dty
 
 let dpurify ty = try dmodel_type ty with NotMutable -> ty
 
@@ -184,9 +184,9 @@ let specialize_exception loc x uc =
 
 let create_type_var loc =
   let tv = Ty.create_tvsymbol (id_user "a" loc) in
-  Tyvar (create_ty_decl_var ~loc ~user:false tv)
+  tyvar (create_ty_decl_var ~loc ~user:false tv)
 
-let add_pure_var id ty denv = match ty with
+let add_pure_var id ty denv = match view_dty ty with
   | Tyapp (ts, _) when Ty.ts_equal ts ts_arrow -> denv
   | _ -> Typing.add_var id ty denv
 
@@ -207,13 +207,13 @@ let expected_type e ty =
 
 let pure_type env = Typing.dty env.denv
 
-let check_mutable_type loc = function
+let check_mutable_type loc dty = match view_dty dty with
   | Denv.Tyapp (ts, _) when is_mutable_ts ts -> 
       ()
-  | ty ->
+  | _ ->
       errorm ~loc 
 	"this expression has type %a, but is expected to have a mutable type"
-	print_dty ty
+	print_dty dty
 
 let dreference env = function
   | Qident id when Mstr.mem id.id env.locals ->

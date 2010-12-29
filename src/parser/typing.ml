@@ -196,11 +196,11 @@ let add_prop_decl = with_tuples ~reset:true add_prop_decl
 
 let rec type_inst s ty = match ty.ty_node with
   | Ty.Tyvar n -> Mtv.find n s
-  | Ty.Tyapp (ts, tyl) -> Tyapp (ts, List.map (type_inst s) tyl)
+  | Ty.Tyapp (ts, tyl) -> tyapp (ts, List.map (type_inst s) tyl)
 
 let rec dty env = function
   | PPTtyvar {id=x} ->
-      Tyvar (find_user_type_var x env)
+      tyvar (find_user_type_var x env)
   | PPTtyapp (p, x) ->
       let loc = qloc x in
       let ts, a = specialize_tysymbol loc x env.uc in
@@ -209,7 +209,7 @@ let rec dty env = function
       let tyl = List.map (dty env) p in
       begin match ts.ts_def with
 	| None ->
-	    Tyapp (ts, tyl)
+	    tyapp (ts, tyl)
 	| Some ty ->
 	    let add m v t = Mtv.add v t m in
             let s = List.fold_left2 add Mtv.empty ts.ts_args tyl in
@@ -217,7 +217,7 @@ let rec dty env = function
       end
   | PPTtuple tyl ->
       let ts = ts_tuple (List.length tyl) in
-      Tyapp (ts, List.map (dty env) tyl)
+      tyapp (ts, List.map (dty env) tyl)
 
 let find_ns find p ns =
   let loc = qloc p in
@@ -291,7 +291,7 @@ let check_pat_linearity p =
 
 let fresh_type_var loc =
   let tv = create_tvsymbol (id_user "a" loc) in
-  Tyvar (create_ty_decl_var ~loc ~user:false tv)
+  tyvar (create_ty_decl_var ~loc ~user:false tv)
 
 let rec dpat env pat =
   let env, n, ty = dpat_node pat.pat_loc env pat.pat_desc in
@@ -314,7 +314,7 @@ and dpat_node loc env = function
       let s = fs_tuple n in
       let tyl = List.map (fun _ -> fresh_type_var loc) pl in
       let env, pl = dpat_args s.ls_name loc env tyl pl in
-      let ty = Tyapp (ts_tuple n, tyl) in
+      let ty = tyapp (ts_tuple n, tyl) in
       env, Papp (s, pl), ty
   | PPpas (p, x) ->
       let env, p = dpat env p in
@@ -400,16 +400,16 @@ and dterm_node ~localize loc env = function
       let s = fs_tuple n in
       let tyl = List.map (fun _ -> fresh_type_var loc) tl in
       let tl = dtype_args s.ls_name loc env tyl tl in
-      let ty = Tyapp (ts_tuple n, tyl) in
+      let ty = tyapp (ts_tuple n, tyl) in
       Tapp (s, tl), ty
   | PPinfix (e1, x, e2) ->
       let s, tyl, ty = specialize_fsymbol (Qident x) env.uc in
       let tl = dtype_args s.ls_name loc env tyl [e1; e2] in
       Tapp (s, tl), ty
   | PPconst (ConstInt _ as c) ->
-      Tconst c, Tyapp (Ty.ts_int, [])
+      Tconst c, tyapp (Ty.ts_int, [])
   | PPconst (ConstReal _ as c) ->
-      Tconst c, Tyapp (Ty.ts_real, [])
+      Tconst c, tyapp (Ty.ts_real, [])
   | PPlet (x, e1, e2) ->
       let e1 = dterm ~localize env e1 in
       let ty = e1.dt_ty in
@@ -479,7 +479,7 @@ and dterm_node ~localize loc env = function
         | TRterm t ->
             let id = { id = "fc"; id_lab = []; id_loc = loc } in
             let tyl,ty = List.fold_right (fun (_,uty) (tyl,ty) ->
-              let nty = Tyapp (ts_func, [uty;ty]) in ty :: tyl, nty)
+              let nty = tyapp (ts_func, [uty;ty]) in ty :: tyl, nty)
               uqu ([],t.dt_ty)
             in
             let h = { dt_node = Tvar id.id ; dt_ty = ty } in
@@ -496,8 +496,8 @@ and dterm_node ~localize loc env = function
               | [] -> assert false
             in
             let tyl,ty = List.fold_right (fun (_,uty) (tyl,ty) ->
-              let nty = Tyapp (ts_func, [uty;ty]) in ty :: tyl, nty)
-              uqu ([],Tyapp (ts_pred, [uty]))
+              let nty = tyapp (ts_func, [uty;ty]) in ty :: tyl, nty)
+              uqu ([],tyapp (ts_pred, [uty]))
             in
             let h = { dt_node = Tvar id.id ; dt_ty = ty } in
             let h = List.fold_left2 (fun h (uid,uty) ty ->

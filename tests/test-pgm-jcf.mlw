@@ -11,17 +11,16 @@ module P
     set r (get r + 1)
     { r = old r + 1 }
 
-  (* parameter r : ref int *)
+  parameter r : ref int
 
   let foo (x : int) = 
     { x = 1 }
     if x = 1 || absurd then 2 else 3
     { result = 2 }
 
-  let f () =
-    { }
-    let r = ref 0 in
-    (* assert { r = 0 }; *)
+  let f (r : ref int) =
+    { r = 0 }
+    assert { r = 0 };
     incr r;
     get r
     { result = 1 }
