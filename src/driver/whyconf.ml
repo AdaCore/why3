@@ -30,7 +30,8 @@ let compilation_datadir =
     (fun d -> Filename.concat d "share") Config.localdir
 
 let compilation_loadpath =
-  Filename.concat compilation_datadir "theories"
+  [ Filename.concat compilation_datadir "theories";
+    Filename.concat compilation_datadir "modules"; ]
 
 let default_conf_file =
   match Config.localdir with
@@ -121,7 +122,7 @@ let default_main =
   {
     private_libdir = compilation_libdir;
     private_datadir = compilation_datadir;
-    loadpath = [compilation_loadpath];
+    loadpath = compilation_loadpath;
     timelimit = 10;
     memlimit = 0;
     running_provers_max = 2;

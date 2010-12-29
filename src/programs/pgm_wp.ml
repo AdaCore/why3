@@ -453,7 +453,7 @@ let add_wp_decl ps f uc =
     | Some loc -> id_user s loc
   in
   let f = f_btop uc f in
-  printf "wp: f=%a@." print_fmla f;
+  (* printf "wp: f=%a@." print_fmla f; *)
   let pr = create_prsymbol id in
   let d = create_prop_decl Pgoal pr f in
   add_logic_decl d uc

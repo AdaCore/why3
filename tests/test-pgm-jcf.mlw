@@ -1,24 +1,10 @@
 
-module Ref
-
-  { use import programs.Prelude }
-
-  mutable type ref 'a model 'a
-
-  parameter create : v:'a -> {} ref 'a { result=v }
-
-  parameter get : r:ref 'a -> {} 'a reads r { result=r }
-
-  parameter set : r:ref 'a -> v:'a -> {} unit writes r { r=v }
-
-end
-
 module P
 
   { use import programs.Prelude }
   { use import int.Int }
   
-  use module export Ref
+  use module export stdlib.Ref
 
   let incr (r : ref int) : unit =
     {}
@@ -29,7 +15,7 @@ module P
 
   let f () =
     { true }
-    let r = create 0 in
+    let r = ref 0 in
     (* assert { r = 0 }; *)
     incr r;
     get r
