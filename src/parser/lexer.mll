@@ -271,21 +271,32 @@ and string = parse
     Loc.set_file file lb;
     parse_logic_file env lb
 
-  let retrieve lp env sl =
-    let f = List.fold_left Filename.concat "" sl ^ ".why" in
+  (* searches file [f] in loadpath [lp] *)
+  let locate_file lp f =
     let fl = List.map (fun dir -> Filename.concat dir f) lp in
-    let file = match List.filter Sys.file_exists fl with
+    match List.filter Sys.file_exists fl with
       | [] -> raise Not_found
       | [file] -> file
       | file1 :: file2 :: _ -> raise (AmbiguousPath (file1, file2))
+
+  let create_env lp =
+    let ret_chan sl = 
+      let f = List.fold_left Filename.concat "" sl in
+      let file = locate_file lp f in
+      file, open_in file
     in
-    let c = open_in file in
-    try
-      let tl = read_channel env file c in
-      close_in c;
-      tl
-    with
-      | e -> close_in c; raise e
+    let retrieve env sl =
+      let f = List.fold_left Filename.concat "" sl ^ ".why" in
+      let file = locate_file lp f in
+      let c = open_in file in
+      try
+	let tl = read_channel env file c in
+	close_in c;
+	tl
+      with
+	| e -> close_in c; raise e
+    in
+    Env.create_env ret_chan retrieve
 
   let () = Env.register_format "why" ["why"] read_channel
 }

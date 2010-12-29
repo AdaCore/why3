@@ -6,11 +6,6 @@ theory Prelude
   type unit = ()
   logic ignore 'a : unit
 
-  type arrow 'a 'b 
-
-  type  ref 'a
-  logic (!) (ref 'a) : 'a
-
   type  label
   logic at  'a label : 'a
   logic old 'a       : 'a

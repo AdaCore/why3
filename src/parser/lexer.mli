@@ -21,7 +21,7 @@ open Theory
 
 (** parsing entry points *)
 
-val retrieve : string list -> Env.retrieve_theory
+val create_env : string list -> Env.env
   (** creates a new typing environment for a given loadpath *)
 
 val parse_list0_decl :

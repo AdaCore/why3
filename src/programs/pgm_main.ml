@@ -21,36 +21,47 @@
 
 open Format
 open Why
-open Pgm_env
+open Util
+open Ident
+open Ptree
+open Pgm_ptree
+open Pgm_module
 
-let type_and_wp ?(type_only=false) env gl dl =
-  let decl gl d = if type_only then gl else Pgm_wp.decl gl d in
-  let add gl d =
-    let gl, dl = Pgm_typing.decl env gl d in
-    List.fold_left decl gl dl
-  in
-  List.fold_left add gl dl
+let add_module ?(type_only=false) env penv lmod m =
+  let wp = not type_only in
+  let id = m.mod_name in
+  let uc = create_module (Ident.id_user id.id id.id_loc) in
+  let uc = List.fold_left (Pgm_typing.decl ~wp env penv lmod) uc m.mod_decl in
+  let m = close_module uc in
+  Mnm.add id.id m lmod
 
-let read_channel env file c =
+let retrieve penv file c =
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
-  let dl = Pgm_lexer.parse_file lb in
+  let ml = Pgm_lexer.parse_file lb in
   if Debug.test_flag Typing.debug_parse_only then
-    Theory.Mnm.empty
-  else begin
+    Mnm.empty
+  else
     let type_only = Debug.test_flag Typing.debug_type_only in
-    let uc = Theory.create_theory (Ident.id_fresh "Pgm") in
-    let th = Env.find_theory env ["programs"] "Prelude" in
-    let uc = Theory.use_export uc th in
-    let gl = empty_env uc in
-    let gl = type_and_wp ~type_only env gl dl in
-    if type_only then
-      Theory.Mnm.empty
-    else begin
-      let th = Theory.close_theory gl.uc in
-      Theory.Mnm.add "Pgm" th Theory.Mnm.empty
-    end
-  end
+    let env = Pgm_env.get_env penv in
+    List.fold_left (add_module ~type_only env penv) Mnm.empty ml
+
+let pgm_env_of_env =
+  let h = Env.Wenv.create 17 in
+  fun env -> 
+    try 
+      Env.Wenv.find h env 
+    with Not_found -> 
+      let penv = Pgm_env.create env retrieve in 
+      Env.Wenv.set h env penv; 
+      penv
+
+let read_channel env file c =
+  let penv = pgm_env_of_env env in
+  let mm = retrieve penv file c in
+  Mnm.fold 
+    (fun _ m tm -> Theory.Mnm.add m.m_name.id_string m.m_th tm) 
+    mm Theory.Mnm.empty
 
 let () = Env.register_format "whyml" ["mlw"] read_channel
 

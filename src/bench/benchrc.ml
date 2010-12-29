@@ -51,7 +51,7 @@ let read_tools absf wc map (name,section) =
   let timelimit = get_int ~default:(timelimit wc_main) section "timelimit" in
   let memlimit = get_int ~default:(memlimit wc_main) section "memlimit" in
   (* env *)
-  let env = Env.create_env (Lexer.retrieve loadpath) in
+  let env = Lexer.create_env loadpath in
   (* transformations *)
   let transforms = get_stringl ~default:[] section "transform" in
   let lookup acc t = Trans.compose (Trans.lookup_transform t env) acc in

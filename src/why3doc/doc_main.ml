@@ -60,7 +60,7 @@ let do_file env fname =
 
 let () =
   try
-    let env = Env.create_env (Lexer.retrieve !opt_loadpath) in
+    let env = Lexer.create_env !opt_loadpath in
     Queue.iter (do_file env) opt_queue
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;

@@ -95,3 +95,6 @@ val specialize_term : loc:Ptree.loc -> type_var Htv.t -> term -> dterm
 
 val specialize_fmla : loc:Ptree.loc -> type_var Htv.t -> fmla -> dfmla
 
+(** exported for programs *)
+
+val tvsymbol_of_type_var : type_var -> tvsymbol

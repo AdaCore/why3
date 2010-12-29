@@ -303,7 +303,7 @@ let () =
   in
   opt_task := List.fold_left add_meta !opt_task !opt_metas;
 
-  let env = Env.create_env (Lexer.retrieve !opt_loadpath) in
+  let env = Lexer.create_env !opt_loadpath in
   let map_prover s =
     let prover = try Mstr.find s (get_provers config) with
       | Not_found -> eprintf "Prover %s not found.@." s; exit 1

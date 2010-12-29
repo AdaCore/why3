@@ -1,46 +1,41 @@
 
-(* for loop with invariant *)
-let test () =
-  let x = ref 0 in
-  for i = 1 to 10 do
-    invariant { !x = i-1 }
-    x := !x + 1
-  done;
-  assert { !x = 10 }
+module Ref
 
-(* we don't even enter *)
-let test2 () =
-  let x = ref 0 in
-  for i = 2 to 1 do
-    x := 1
-  done;
-  assert { !x = 0 }
+  { use import programs.Prelude }
 
-exception E
+  mutable type ref 'a model 'a
 
-(* the body raises an exception (for sure)
-   subtle: the invariant is required *)
-let test3 () =
-  { }
-  for i = 1 to 10 do invariant { i >= 2 -> false }
-    raise E
-  done
-  { false } | E -> { true }
+  parameter create : v:'a -> {} ref 'a { result=v }
 
-(* the body may raise an exception *)
-let test4 x =
-  { }
-  try
-    for i = 0 to 10 do
-      invariant { x < 0 or x >= i }
-      if i = x then raise E
-    done;
-    False
-  with E ->
-    True
-  end
-  { result=True <-> 0 <= x <= 10 }
+  parameter get : r:ref 'a -> {} 'a reads r { result=r }
+
+  parameter set : r:ref 'a -> v:'a -> {} unit writes r { r=v }
+
+end
+
+module P
+
+  { use import programs.Prelude }
+  { use import int.Int }
   
+  use module export Ref
+
+  let incr (r : ref int) : unit =
+    {}
+    set r (get r + 1)
+    { r = old r + 1 }
+
+  (* parameter r : ref int *)
+
+  let f () =
+    { true }
+    let r = create 0 in
+    (* assert { r = 0 }; *)
+    incr r;
+    get r
+    { result = 1 }
+
+end
 
 (*
 Local Variables: 

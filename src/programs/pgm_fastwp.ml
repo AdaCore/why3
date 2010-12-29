@@ -29,7 +29,7 @@ open Theory
 open Pgm_ttree
 open Pgm_typing
 
-module E = Pgm_effect
+module E = Pgm_types.E
 
 module State : sig
   type t

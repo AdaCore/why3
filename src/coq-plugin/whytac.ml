@@ -46,7 +46,7 @@ let cprovers = Whyconf.get_provers config
 
 let timelimit = timelimit main
 
-let env = Env.create_env (Lexer.retrieve (loadpath main))
+let env = Lexer.create_env (loadpath main)
 
 let provers = Hashtbl.create 17
 

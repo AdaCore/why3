@@ -45,14 +45,14 @@ type loop_annotation = {
 type for_direction = To | Downto
 
 type effect = {
-  pe_reads  : ident list;
-  pe_writes : ident list;
-  pe_raises : ident list;
+  pe_reads  : qualid list;
+  pe_writes : qualid list;
+  pe_raises : qualid list;
 }
 
 type pre = lexpr
 
-type post = lexpr * (ident * lexpr) list
+type post = lexpr * (qualid * lexpr) list
 
 type type_v =
   | Tpure of Ptree.pty
@@ -88,8 +88,8 @@ and expr_desc =
   | Ematch of expr * (Ptree.pattern * expr) list
   | Eskip
   | Eabsurd
-  | Eraise of ident * expr option
-  | Etry of expr * (ident * ident option * expr) list
+  | Eraise of qualid * expr option
+  | Etry of expr * (qualid * ident option * expr) list
   | Efor of ident * expr * for_direction * expr * lexpr option * expr
   (* annotations *)
   | Eassert of assertion_kind * lexpr
@@ -107,6 +107,15 @@ type decl =
   | Dlogic  of logic
   | Dparam  of ident * type_v
   | Dexn    of ident * Ptree.pty option
+  (* modules *)
+  | Duse    of qualid * Ptree.imp_exp * (*as:*) ident option
+  | Dnamespace of ident * (* import: *) bool * decl list
+  | Dmutable_type of ident * ident list * Ptree.pty option
 
-type file = decl list
+type module_ = {
+  mod_name : ident;
+  mod_decl : decl list;
+}
+
+type file = module_ list
 

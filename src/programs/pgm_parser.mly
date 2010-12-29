@@ -82,7 +82,7 @@
   let id_unit () = { id = "unit"; id_lab = []; id_loc = loc () }
   let id_result () = { id = "result"; id_lab = []; id_loc = loc () }
   let id_anonymous () = { id = "_"; id_lab = []; id_loc = loc () }
-  let exit_exn () = { id = "%Exit"; id_lab = []; id_loc = loc () }
+  let exit_exn () = Qident { id = "%Exit"; id_lab = []; id_loc = loc () }
 
   let id_lt_nat () = Qident { id = "lt_nat"; id_lab = []; id_loc = loc () }
 
@@ -117,10 +117,11 @@
 /* keywords */
 
 %token ABSURD AND ANY AS ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO ELSE END
-%token EXCEPTION FOR
-%token FUN GHOST IF IN INVARIANT LABEL LET MATCH NOT OF PARAMETER
+%token EXCEPTION EXPORT FOR
+%token FUN GHOST IF IMPORT IN INVARIANT LABEL LET MATCH MODEL MODULE MUTABLE
+%token NAMESPACE NOT OF PARAMETER
 %token RAISE RAISES READS REC
-%token THEN TO TRY TYPE VARIANT WHILE WITH WRITES
+%token THEN TO TRY TYPE USE VARIANT WHILE WITH WRITES
 
 /* symbols */
 
@@ -178,7 +179,26 @@
 %%
 
 file:
-| list0_decl EOF { $1 }
+| list0_module_ EOF { $1 }
+;
+
+list0_module_:
+| /* epsilon */
+   { [] }
+| list1_module_
+   { $1 }
+;
+
+list1_module_:
+| module_
+   { [$1] }
+| module_ list1_module_
+   { $1 :: $2 }
+;
+
+module_:
+| MODULE uident list0_decl END
+   { { mod_name = $2; mod_decl = $3 } }
 ;
 
 list0_decl:
@@ -210,6 +230,44 @@ decl:
     { Dexn (add_lab $2 $3, None) }
 | EXCEPTION uident labels OF pure_type
     { Dexn (add_lab $2 $3, Some $5) }
+| USE MODULE use
+    { $3 }
+| NAMESPACE opt_import uident list0_decl END
+    { Dnamespace ($3, $2, $4) }
+| MUTABLE TYPE lident type_args model
+    { Dmutable_type ($3, $4, $5) }
+;
+
+use:
+| imp_exp tqualid
+    { Duse ($2, $1, None) }
+| imp_exp tqualid AS uident
+    { Duse ($2, $1, Some $4) }
+;
+
+imp_exp:
+| IMPORT        { Import }
+| EXPORT        { Export }
+| /* epsilon */ { Nothing }
+;
+
+opt_import:
+| /* epsilon */  { false }
+| IMPORT         { true }
+;
+
+type_args:
+| /* epsilon */      { [] }
+| type_var type_args { $1 :: $2 }
+;
+
+model:
+| /* epsilon */   { None }
+| MODEL pure_type { Some $2 }
+;
+
+type_var:
+| QUOTE ident { $2 }
 ;
 
 list1_recfun_sep_and:
@@ -255,6 +313,16 @@ lqualid:
 uqualid:
 | uident             { Qident $1 }
 | uqualid DOT uident { Qdot ($1, $3) }
+;
+
+any_qualid:
+| ident                { Qident $1 }
+| any_qualid DOT ident { Qdot ($1, $3) }
+;
+
+tqualid:
+| uident                { Qident $1 }
+| any_qualid DOT uident { Qdot ($1, $3) }
 ;
 
 expr:
@@ -323,9 +391,9 @@ expr:
    { mk_expr Eabsurd }
 | expr COLON pure_type
    { mk_expr (Ecast ($1, $3)) }
-| RAISE uident
+| RAISE uqualid
    { mk_expr (Eraise ($2, None)) }
-| RAISE LEFTPAR uident expr RIGHTPAR
+| RAISE LEFTPAR uqualid expr RIGHTPAR
    { mk_expr (Eraise ($3, Some $4)) }
 | TRY expr WITH option_bar list1_handler_sep_bar END
    { mk_expr (Etry ($2, $5)) }
@@ -380,9 +448,9 @@ list1_handler_sep_bar:
 ;
 
 handler:
-| ident ARROW expr            { ($1, None, $3) }
-| ident ident ARROW expr      { ($1, Some $2, $4) }
-| ident UNDERSCORE ARROW expr { ($1, Some (id_anonymous ()), $4) }
+| uqualid ARROW expr            { ($1, None, $3) }
+| uqualid ident ARROW expr      { ($1, Some $2, $4) }
+| uqualid UNDERSCORE ARROW expr { ($1, Some (id_anonymous ()), $4) }
 ;
 
 match_cases:
@@ -563,7 +631,7 @@ list1_post_exn:
 ;
 
 post_exn:
-| BAR uident ARROW LOGIC { $2, $4 }
+| BAR uqualid ARROW LOGIC { $2, $4 }
 ;
 
 effects:
@@ -573,17 +641,17 @@ effects:
 
 opt_reads:
 | /* epsilon */               { [] }
-| READS list0_lident_sep_comma { $2 }
+| READS list0_lqualid_sep_comma { $2 }
 ;
 
 opt_writes:
 | /* epsilon */                { [] }
-| WRITES list0_lident_sep_comma { $2 }
+| WRITES list0_lqualid_sep_comma { $2 }
 ;
 
 opt_raises:
 | /* epsilon */                { [] }
-| RAISES list0_uident_sep_comma { $2 }
+| RAISES list0_uqualid_sep_comma { $2 }
 ;
 
 opt_variant:
@@ -597,24 +665,24 @@ opt_cast:
 | COLON pure_type { Some $2 }
 ;
 
-list0_lident_sep_comma:
-| /* epsilon */          { [] }
-| list1_lident_sep_comma { $1 }
+list0_lqualid_sep_comma:
+| /* epsilon */           { [] }
+| list1_lqualid_sep_comma { $1 }
 ;
 
-list1_lident_sep_comma:
-| lident                              { [$1] }
-| lident COMMA list1_lident_sep_comma { $1 :: $3 }
+list1_lqualid_sep_comma:
+| lqualid                               { [$1] }
+| lqualid COMMA list1_lqualid_sep_comma { $1 :: $3 }
 ;
 
-list0_uident_sep_comma:
-| /* epsilon */          { [] }
-| list1_uident_sep_comma { $1 }
+list0_uqualid_sep_comma:
+| /* epsilon */           { [] }
+| list1_uqualid_sep_comma { $1 }
 ;
 
-list1_uident_sep_comma:
-| uident                              { [$1] }
-| uident COMMA list1_uident_sep_comma { $1 :: $3 }
+list1_uqualid_sep_comma:
+| uqualid                               { [$1] }
+| uqualid COMMA list1_uqualid_sep_comma { $1 :: $3 }
 ;
 
 label:

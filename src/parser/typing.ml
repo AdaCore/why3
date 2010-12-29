@@ -146,6 +146,9 @@ let mem_var x denv = Mstr.mem x denv.dvars
 let find_var x denv = Mstr.find x denv.dvars
 let add_var x ty denv = { denv with dvars = Mstr.add x ty denv.dvars }
 
+let print_denv fmt denv =
+  Mstr.iter (fun x ty -> fprintf fmt "%s:%a,@ " x print_dty ty) denv.dvars
+
 (* parsed types -> intermediate types *)
 
 let rec qloc = function
