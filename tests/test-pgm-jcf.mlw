@@ -13,6 +13,11 @@ module P
 
   (* parameter r : ref int *)
 
+  let foo (x : int) = 
+    { x = 1 }
+    if x = 1 || absurd then 2 else 3
+    { result = 2 }
+
   let f () =
     { }
     let r = ref 0 in

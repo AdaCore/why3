@@ -351,6 +351,12 @@ and dexpr_desc env loc = function
 	in
 	DElogic s, dcurrying tyl ty
       end
+  | Ptree.Elazy (op, e1, e2) ->
+      let e1 = dexpr env e1 in
+      expected_type e1 (dty_bool env.uc);
+      let e2 = dexpr env e2 in
+      expected_type e2 (dty_bool env.uc);
+      DElazy (op, e1, e2), dty_bool env.uc
   | Ptree.Eapply (e1, e2) ->
       let e1 = dexpr env e1 in
       let e2 = dexpr env e2 in
@@ -413,12 +419,6 @@ and dexpr_desc env loc = function
       let e1 = dexpr env e1 in
       expected_type e1 (dty_unit env.uc);
       DEloop (dloop_annotation env a, e1), dty_unit env.uc
-  | Ptree.Elazy (op, e1, e2) ->
-      let e1 = dexpr env e1 in
-      expected_type e1 (dty_bool env.uc);
-      let e2 = dexpr env e2 in
-      expected_type e2 (dty_bool env.uc);
-      DElazy (op, e1, e2), dty_bool env.uc
   | Ptree.Ematch (e1, bl) ->
       let e1 = dexpr env e1 in
       let ty1 = e1.dexpr_type in

@@ -163,7 +163,7 @@
 
 /* symbols */
 
-%token ARROW ASYM_AND ASYM_OR
+%token ARROW 
 %token BACKQUOTE BAR
 %token COLON COMMA
 %token DOT EQUAL FUNC LAMBDA LTGT
@@ -177,7 +177,7 @@
 
 /* program symbols */
 
-%token LEFTBRC RIGHTBRC SEMICOLON
+%token AMPAMP BARBAR LEFTBRC RIGHTBRC SEMICOLON
 
 /* Precedences */
 
@@ -195,8 +195,8 @@
 %nonassoc COLON
 
 %right ARROW LRARROW
-%right OR ASYM_OR
-%right AND ASYM_AND
+%right OR BARBAR
+%right AND AMPAMP
 %nonassoc NOT
 %left EQUAL LTGT OP1
 %left OP2
@@ -494,11 +494,11 @@ lexpr:
    { infix_pp $1 PPiff $3 }
 | lexpr OR lexpr
    { infix_pp $1 PPor $3 }
-| lexpr ASYM_OR lexpr
+| lexpr BARBAR lexpr
    { mk_pp (PPnamed (Ident.label "asym_split", infix_pp $1 PPor $3)) }
 | lexpr AND lexpr
    { infix_pp $1 PPand $3 }
-| lexpr ASYM_AND lexpr
+| lexpr AMPAMP lexpr
    { mk_pp (PPnamed (Ident.label "asym_split", infix_pp $1 PPand $3)) }
 | NOT lexpr
    { prefix_pp PPnot $2 }
@@ -931,12 +931,10 @@ expr:
    { mk_expr (Esequence ($1, $3)) }
 | assertion_kind annotation
    { mk_expr (Eassert ($1, $2)) }
-/*
 | expr AMPAMP expr
    { mk_expr (Elazy (LazyAnd, $1, $3)) }
 | expr BARBAR expr
    { mk_expr (Elazy (LazyOr, $1, $3)) }
-*/
 | LET pattern EQUAL expr IN expr
    { match $2.pat_desc with
        | PPpvar id -> mk_expr (Elet (id, $4, $6))

@@ -220,10 +220,10 @@ rule token = parse
       { ARROW }
   | "<->"
       { LRARROW }
-  | "/\\"
-      { ASYM_AND }
-  | "\\/"
-      { ASYM_OR }
+  | "&&"
+      { AMPAMP }
+  | "||"
+      { BARBAR }
   | "\\"
       { LAMBDA }
   | "\\?"
