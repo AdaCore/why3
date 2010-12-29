@@ -27,11 +27,11 @@ type ident = Ptree.ident
 
 type constant = Term.constant
 
-type assertion_kind = Pgm_ptree.assertion_kind
+type assertion_kind = Ptree.assertion_kind
 
-type lazy_op = Pgm_ptree.lazy_op
+type lazy_op = Ptree.lazy_op
 
-type for_direction = Pgm_ptree.for_direction
+type for_direction = Ptree.for_direction
 
 (*****************************************************************************)
 (* phase 1: introduction of destructive types *)

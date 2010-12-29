@@ -240,14 +240,14 @@ let dexception env qid =
   r
 
 let deffect env e =
-  { de_reads  = List.map (dreference env) e.Pgm_ptree.pe_reads;
-    de_writes = List.map (dreference env) e.Pgm_ptree.pe_writes;
+  { de_reads  = List.map (dreference env) e.Ptree.pe_reads;
+    de_writes = List.map (dreference env) e.Ptree.pe_writes;
     de_raises =
       List.map (fun id -> let ls,_,_ = dexception env id in ls)
-	e.Pgm_ptree.pe_raises; }
+	e.Ptree.pe_raises; }
 
-let dterm env l = Typing.dterm ~localize:true env (Pgm_module.logic_lexpr l)
-let dfmla env l = Typing.dfmla ~localize:true env (Pgm_module.logic_lexpr l)
+let dterm env l = Typing.dterm ~localize:true env l
+let dfmla env l = Typing.dfmla ~localize:true env l
 
 let dpost env ty (q, ql) =
   let dexn (id, l) =
@@ -274,19 +274,19 @@ let add_local env x ty =
              denv = add_pure_var x (dpurify ty) env.denv }
 
 let rec dtype_v env = function
-  | Pgm_ptree.Tpure pt ->
+  | Ptree.Tpure pt ->
       DTpure (pure_type env pt)
-  | Pgm_ptree.Tarrow (bl, c) ->
+  | Ptree.Tarrow (bl, c) ->
       let env, bl = map_fold_left dbinder env bl in
       let c = dtype_c env c in
       DTarrow (bl, c)
 
 and dtype_c env c =
-  let ty = dtype_v env c.Pgm_ptree.pc_result_type in
+  let ty = dtype_v env c.Ptree.pc_result_type in
   { dc_result_type = ty;
-    dc_effect      = deffect env c.Pgm_ptree.pc_effect;
-    dc_pre         = dfmla env.denv c.Pgm_ptree.pc_pre;
-    dc_post        = dpost env (dpurify_type_v ty) c.Pgm_ptree.pc_post;
+    dc_effect      = deffect env c.Ptree.pc_effect;
+    dc_pre         = dfmla env.denv c.Ptree.pc_pre;
+    dc_post        = dpost env (dpurify_type_v ty) c.Ptree.pc_post;
   }
 
 and dbinder env ({id=x; id_loc=loc} as id, v) =
@@ -317,26 +317,26 @@ let dvariant env (l, p) =
   dterm env.denv l, s
 
 let dloop_annotation env a =
-  { dloop_invariant = option_map (dfmla env.denv) a.Pgm_ptree.loop_invariant;
-    dloop_variant   = option_map (dvariant env) a.Pgm_ptree.loop_variant; }
+  { dloop_invariant = option_map (dfmla env.denv) a.Ptree.loop_invariant;
+    dloop_variant   = option_map (dvariant env) a.Ptree.loop_variant; }
 
 (* [dexpr] translates ptree into dexpr *)
 
 let rec dexpr env e =
-  let d, ty = dexpr_desc env e.Pgm_ptree.expr_loc e.Pgm_ptree.expr_desc in
-  { dexpr_desc = d; dexpr_loc = e.Pgm_ptree.expr_loc;
+  let d, ty = dexpr_desc env e.Ptree.expr_loc e.Ptree.expr_desc in
+  { dexpr_desc = d; dexpr_loc = e.Ptree.expr_loc;
     dexpr_denv = env.denv; dexpr_type = ty; }
 
 and dexpr_desc env loc = function
-  | Pgm_ptree.Econstant (ConstInt _ as c) ->
+  | Ptree.Econstant (ConstInt _ as c) ->
       DEconstant c, dty_app (Ty.ts_int, [])
-  | Pgm_ptree.Econstant (ConstReal _ as c) ->
+  | Ptree.Econstant (ConstReal _ as c) ->
       DEconstant c, dty_app (Ty.ts_real, [])
-  | Pgm_ptree.Eident (Qident {id=x}) when Mstr.mem x env.locals ->
+  | Ptree.Eident (Qident {id=x}) when Mstr.mem x env.locals ->
       (* local variable *)
       let tyv = Mstr.find x env.locals in
       DElocal (x, tyv), tyv
-  | Pgm_ptree.Eident p ->
+  | Ptree.Eident p ->
       begin try
 	(* global variable *)
 	let x = Typing.string_list_of_qualid [] p in
@@ -351,7 +351,7 @@ and dexpr_desc env loc = function
 	in
 	DElogic s, dcurrying tyl ty
       end
-  | Pgm_ptree.Eapply (e1, e2) ->
+  | Ptree.Eapply (e1, e2) ->
       let e1 = dexpr env e1 in
       let e2 = dexpr env e2 in
       let ty2 = create_type_var loc and ty = create_type_var loc in
@@ -360,23 +360,23 @@ and dexpr_desc env loc = function
 	errorm ~loc:e1.dexpr_loc "this expression is not a function";
       expected_type e2 ty2;
       DEapply (e1, e2), ty
-  | Pgm_ptree.Efun (bl, t) ->
+  | Ptree.Efun (bl, t) ->
       let env, bl = map_fold_left dbinder env bl in
       let (_,e,_) as t = dtriple env t in
       let tyl = List.map (fun (_,ty,_) -> ty) bl in
       let ty = dcurrying tyl e.dexpr_type in
       DEfun (bl, t), ty
-  | Pgm_ptree.Elet (x, e1, e2) ->
+  | Ptree.Elet (x, e1, e2) ->
       let e1 = dexpr env e1 in
       let ty1 = e1.dexpr_type in
       let env = add_local env x.id ty1 in
       let e2 = dexpr env e2 in
       DElet (x, e1, e2), e2.dexpr_type
-  | Pgm_ptree.Eletrec (dl, e1) ->
+  | Ptree.Eletrec (dl, e1) ->
       let env, dl = dletrec env dl in
       let e1 = dexpr env e1 in
       DEletrec (dl, e1), e1.dexpr_type
-  | Pgm_ptree.Etuple el ->
+  | Ptree.Etuple el ->
       let n = List.length el in
       let s = Typing.fs_tuple n in
       let tyl = List.map (fun _ -> create_type_var loc) el in
@@ -397,29 +397,29 @@ and dexpr_desc env loc = function
       let e = List.fold_left2 apply e el tyl in
       e.dexpr_desc, ty
 
-  | Pgm_ptree.Esequence (e1, e2) ->
+  | Ptree.Esequence (e1, e2) ->
       let e1 = dexpr env e1 in
       expected_type e1 (dty_unit env.uc);
       let e2 = dexpr env e2 in
       DEsequence (e1, e2), e2.dexpr_type
-  | Pgm_ptree.Eif (e1, e2, e3) ->
+  | Ptree.Eif (e1, e2, e3) ->
       let e1 = dexpr env e1 in
       expected_type e1 (dty_bool env.uc);
       let e2 = dexpr env e2 in
       let e3 = dexpr env e3 in
       expected_type e3 e2.dexpr_type;
       DEif (e1, e2, e3), e2.dexpr_type
-  | Pgm_ptree.Eloop (a, e1) ->
+  | Ptree.Eloop (a, e1) ->
       let e1 = dexpr env e1 in
       expected_type e1 (dty_unit env.uc);
       DEloop (dloop_annotation env a, e1), dty_unit env.uc
-  | Pgm_ptree.Elazy (op, e1, e2) ->
+  | Ptree.Elazy (op, e1, e2) ->
       let e1 = dexpr env e1 in
       expected_type e1 (dty_bool env.uc);
       let e2 = dexpr env e2 in
       expected_type e2 (dty_bool env.uc);
       DElazy (op, e1, e2), dty_bool env.uc
-  | Pgm_ptree.Ematch (e1, bl) ->
+  | Ptree.Ematch (e1, bl) ->
       let e1 = dexpr env e1 in
       let ty1 = e1.dexpr_type in
       let ty = create_type_var loc in (* the type of all branches *)
@@ -433,11 +433,11 @@ and dexpr_desc env loc = function
       in
       let bl = List.map branch bl in
       DEmatch (e1, bl), ty
-  | Pgm_ptree.Eskip ->
+  | Ptree.Eskip ->
       DElogic (fs_tuple 0), dty_unit env.uc
-  | Pgm_ptree.Eabsurd ->
+  | Ptree.Eabsurd ->
       DEabsurd, create_type_var loc
-  | Pgm_ptree.Eraise (qid, e) ->
+  | Ptree.Eraise (qid, e) ->
       let ls, tyl, _ = dexception env qid in
       let e = match e, tyl with
 	| None, [] ->
@@ -455,7 +455,7 @@ and dexpr_desc env loc = function
 	    assert false
       in
       DEraise (ls, e), create_type_var loc
-  | Pgm_ptree.Etry (e1, hl) ->
+  | Ptree.Etry (e1, hl) ->
       let e1 = dexpr env e1 in
       let handler (id, x, h) =
 	let ls, tyl, _ = dexception env id in
@@ -477,7 +477,7 @@ and dexpr_desc env loc = function
 	(ls, x, h)
       in
       DEtry (e1, List.map handler hl), e1.dexpr_type
-  | Pgm_ptree.Efor (x, e1, d, e2, inv, e3) ->
+  | Ptree.Efor (x, e1, d, e2, inv, e3) ->
       let e1 = dexpr env e1 in
       expected_type e1 (dty_int env.uc);
       let e2 = dexpr env e2 in
@@ -488,21 +488,21 @@ and dexpr_desc env loc = function
       expected_type e3 (dty_unit env.uc);
       DEfor (x, e1, d, e2, inv, e3), dty_unit env.uc
 
-  | Pgm_ptree.Eassert (k, le) ->
+  | Ptree.Eassert (k, le) ->
       DEassert (k, dfmla env.denv le), dty_unit env.uc
-  | Pgm_ptree.Elabel ({id=s}, e1) ->
+  | Ptree.Elabel ({id=s}, e1) ->
       if Typing.mem_var s env.denv then
 	errorm ~loc "clash with previous label %s" s;
       let ty = dty_label env.uc in
       let env = { env with denv = add_pure_var s ty env.denv } in
       let e1 = dexpr env e1 in
       DElabel (s, e1), e1.dexpr_type
-  | Pgm_ptree.Ecast (e1, ty) ->
+  | Ptree.Ecast (e1, ty) ->
       let e1 = dexpr env e1 in
       let ty = pure_type env ty in
       expected_type e1 ty;
       e1.dexpr_desc, ty
-  | Pgm_ptree.Eany c ->
+  | Ptree.Eany c ->
       let c = dtype_c env c in
       DEany c, dpurify_type_v c.dc_result_type
 
@@ -1171,8 +1171,8 @@ and expr_desc gl env loc ty = function
       let d =
 	if is_pure_expr e2 then
 	  let ls = match op with
-	    | Pgm_ptree.LazyAnd -> find_ls gl "andb"
-	    | Pgm_ptree.LazyOr  -> find_ls gl "orb"
+	    | Ptree.LazyAnd -> find_ls gl "andb"
+	    | Ptree.LazyOr  -> find_ls gl "orb"
 	  in
 	  let v1 = create_pvsymbol (id_fresh "lazy") (tpure ty) in
 	  let v2 = create_pvsymbol (id_fresh "lazy") (tpure ty) in
@@ -1181,9 +1181,9 @@ and expr_desc gl env loc ty = function
 		mk_expr loc ty ef
 		  (Elet (v2, e2, mk_simple_expr loc ty (Elogic t))))
 	else match op with
-	  | Pgm_ptree.LazyAnd ->
+	  | Ptree.LazyAnd ->
 	      Eif (e1, e2, mk_false loc gl)
-	  | Pgm_ptree.LazyOr ->
+	  | Ptree.LazyOr ->
 	      Eif (e1, mk_true loc gl, e2)
       in
       d, tpure ty, ef
@@ -1486,9 +1486,9 @@ let find_module penv lmod q id = match q with
    penv = to retrieve modules from the loadpath
    lmod = local modules *)
 let rec decl ~wp env penv lmod uc = function
-  | Pgm_ptree.Dlogic dl ->
-      Pgm_module.parse_logic_decls env dl uc
-  | Pgm_ptree.Dlet (id, e) ->
+  | Ptree.Dlogic d ->
+      Pgm_module.add_logic_pdecl env d uc
+  | Ptree.Dlet (id, e) ->
       let e = type_expr uc e in
       Debug.dprintf debug "@[--typing %s-----@\n  %a@\n%a@]@."
 	id.id print_expr e print_type_v e.expr_type_v;
@@ -1496,7 +1496,7 @@ let rec decl ~wp env penv lmod uc = function
       let d = Dlet (ls, e) in
       let uc = add_decl d uc in
       if wp then Pgm_wp.decl uc d else uc
-  | Pgm_ptree.Dletrec dl ->
+  | Ptree.Dletrec dl ->
       let denv = create_denv uc in
       let _, dl = dletrec denv dl in
       let _, dl = iletrec uc Mstr.empty dl in
@@ -1515,7 +1515,7 @@ let rec decl ~wp env penv lmod uc = function
       let d = Dletrec dl in
       let uc = add_decl d uc in
       if wp then Pgm_wp.decl uc d else uc
-  | Pgm_ptree.Dparam (id, tyv) ->
+  | Ptree.Dparam (id, tyv) ->
       let loc = id.id_loc in
       let denv = create_denv uc in
       let tyv = dtype_v denv tyv in
@@ -1525,11 +1525,11 @@ let rec decl ~wp env penv lmod uc = function
       let ps, uc = add_global loc id.id tyv uc in
       let uc = add_global_if_pure uc ps in
       add_decl (Dparam (ps, tyv)) uc (* TODO: is it really needed? *)
-  | Pgm_ptree.Dexn (id, ty) ->
+  | Ptree.Dexn (id, ty) ->
       let ty = option_map (type_type uc) ty in
       add_exception id.id_loc id.id ty uc
   (* modules *) 
-  | Pgm_ptree.Duse (qid, imp_exp, use_as) ->
+  | Ptree.Duse (qid, imp_exp, use_as) ->
       let loc = Typing.qloc qid in
       let q, id = Typing.split_qualid qid in
       let m =
@@ -1558,13 +1558,13 @@ let rec decl ~wp env penv lmod uc = function
       with ClashSymbol s -> 
 	errorm ~loc "clash with previous symbol %s" s
       end
-  | Pgm_ptree.Dnamespace (id, import, dl) ->
+  | Ptree.Dnamespace (id, import, dl) ->
       let loc = id.id_loc in
       let uc = open_namespace uc in
       let uc = List.fold_left (decl ~wp env penv lmod) uc dl in
       begin try close_namespace uc import (Some id.id)
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
-  | Pgm_ptree.Dmutable_type (id, args, model) ->
+  | Ptree.Dmutable_type (id, args, model) ->
       let loc = id.id_loc in
       let id = id_user id.id loc in
       let denv = Typing.create_denv (theory_uc uc) in

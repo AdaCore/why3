@@ -1,20 +1,20 @@
 
 module P
 
-  { use import programs.Prelude }
-  { use import int.Int }
+  use import programs.Prelude
+  use import int.Int
   
-  use module export stdlib.Ref
+  use export module stdlib.Ref
 
   let incr (r : ref int) : unit =
-    {}
+    { }
     set r (get r + 1)
     { r = old r + 1 }
 
   (* parameter r : ref int *)
 
   let f () =
-    { true }
+    { }
     let r = ref 0 in
     (* assert { r = 0 }; *)
     incr r;

@@ -29,6 +29,8 @@ val parse_list0_decl :
 
 val parse_lexpr : Lexing.lexbuf -> Ptree.lexpr
 
+val parse_program_file : Lexing.lexbuf -> Ptree.program_file
+
 (** other functions to be re-used in other lexers/parsers *)
 
 val newline : Lexing.lexbuf -> unit

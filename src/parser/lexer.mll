@@ -301,6 +301,8 @@ and string = parse
 
   let parse_lexpr = with_location (lexpr_eof token)
 
+  let parse_program_file = with_location (program_file token)
+
   let read_channel env file c =
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;

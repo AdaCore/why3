@@ -29,7 +29,7 @@ val is_mutable_ts : tysymbol -> bool
 val is_mutable_ty : ty       -> bool
 
 val ts_arrow : tysymbol
-    
+
 (* program types *)
 module rec T : sig
 

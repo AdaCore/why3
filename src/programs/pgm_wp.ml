@@ -74,7 +74,7 @@ let wp_forall v f =
 (* utility functions for building WPs *)
 
 let fresh_label env =
-  let ty = ty_app (find_ts env "label") [] in
+  let ty = ty_app (find_ts env "label_") [] in
   create_vsymbol (id_fresh "label") ty
 
 let wp_binder x f = match x.pv_tv with
@@ -365,9 +365,9 @@ and wp_desc env e q = match e.expr_desc with
 	                               and I(v2+1) -> Q                    *)
       let (res, q1), _ = q in
       let gt, le, incr = match d with
-	| Pgm_ptree.To     -> 
+	| Ptree.To     -> 
 	    find_ls env "infix >", find_ls env "infix <=", t_int_const  "1"
-	| Pgm_ptree.Downto -> 
+	| Ptree.Downto -> 
 	    find_ls env "infix <", find_ls env "infix >=", t_int_const "-1"
       in
       let v1_gt_v2 = f_app gt [t_var v1.pv_vs; t_var v2.pv_vs] in
@@ -394,13 +394,13 @@ and wp_desc env e q = match e.expr_desc with
       in
       wp_and ~sym:true (wp_implies v1_gt_v2 q1) (wp_implies v1_le_v2 f)
 
-  | Eassert (Pgm_ptree.Aassert, f) ->
+  | Eassert (Ptree.Aassert, f) ->
       let (_, q), _ = q in
       wp_and f q
-  | Eassert (Pgm_ptree.Acheck, f) ->
+  | Eassert (Ptree.Acheck, f) ->
       let (_, q), _ = q in
       wp_and ~sym:true f q
-  | Eassert (Pgm_ptree.Aassume, f) ->
+  | Eassert (Ptree.Aassume, f) ->
       let (_, q), _ = q in
       wp_implies f q
   | Elabel (lab, e1) ->

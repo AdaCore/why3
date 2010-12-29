@@ -175,24 +175,11 @@ let use_export uc m =
       uc_th = Theory.use_export uc.uc_th m.m_th; }
   | _ -> assert false
 
-(* parsing LOGIC strings using functions from src/parser/
-   requires proper relocation *)
+let use_export_theory uc th =
+  { uc with uc_th = Theory.use_export uc.uc_th th }
 
-let reloc loc lb =
-  lb.Lexing.lex_curr_p <- loc;
-  lb.Lexing.lex_abs_pos <- loc.Lexing.pos_cnum + 1
-
-let parse_string f loc s =
-  let lb = Lexing.from_string s in
-  reloc loc lb;
-  f lb
-
-let logic_lexpr ((pos, _), s) =
-  parse_string Lexer.parse_lexpr pos s
-
-let parse_logic_decls env ((loc, _), s) uc =
-  let parse = Lexer.parse_list0_decl env Theory.Mnm.empty uc.uc_th in
-  { uc with uc_th = parse_string parse loc s }
+let add_logic_pdecl env d uc =
+  { uc with uc_th = Typing.add_decl env Theory.Mnm.empty  uc.uc_th d }
 
 
 

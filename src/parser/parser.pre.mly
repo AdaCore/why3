@@ -1144,6 +1144,7 @@ simple_type_c:
 ;
 
 annotation:
+| LEFTBRC RIGHTBRC       { mk_pp PPtrue }
 | LEFTBRC lexpr RIGHTBRC { $2 }
 ;
 

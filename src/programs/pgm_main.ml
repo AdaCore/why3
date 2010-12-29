@@ -24,13 +24,14 @@ open Why
 open Util
 open Ident
 open Ptree
-open Pgm_ptree
 open Pgm_module
 
 let add_module ?(type_only=false) env penv lmod m =
   let wp = not type_only in
   let id = m.mod_name in
   let uc = create_module (Ident.id_user id.id id.id_loc) in
+  let prelude = Env.find_theory env ["programs"] "Prelude" in
+  let uc = use_export_theory uc prelude in
   let uc = List.fold_left (Pgm_typing.decl ~wp env penv lmod) uc m.mod_decl in
   let m = close_module uc in
   Mnm.add id.id m lmod
@@ -38,7 +39,7 @@ let add_module ?(type_only=false) env penv lmod m =
 let retrieve penv file c =
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
-  let ml = Pgm_lexer.parse_file lb in
+  let ml = Lexer.parse_program_file lb in
   if Debug.test_flag Typing.debug_parse_only then
     Mnm.empty
   else

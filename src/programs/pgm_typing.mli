@@ -24,7 +24,7 @@ val debug : Debug.flag
 
 val decl : 
   wp:bool -> Env.env -> Pgm_env.t -> Pgm_module.t Pgm_module.Mnm.t -> 
-  Pgm_module.uc -> Pgm_ptree.decl -> Pgm_module.uc
+  Pgm_module.uc -> Ptree.program_decl -> Pgm_module.uc
 
 val print_post : Format.formatter -> Pgm_ttree.post -> unit
 

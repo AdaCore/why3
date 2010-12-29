@@ -40,6 +40,7 @@ val open_namespace  : uc -> uc
 val close_namespace : uc -> bool -> string option -> uc
 
 val use_export : uc -> t -> uc
+val use_export_theory : uc -> Theory.theory -> uc
 
 (** insertion *)
 
@@ -51,9 +52,7 @@ val add_mtsymbol : mtsymbol -> uc -> uc
 val add_decl : Pgm_ttree.decl -> uc -> uc
 val add_logic_decl : Decl.decl -> uc -> uc
 
-(** TODO: *)
-val parse_logic_decls : Env.env -> Loc.position * string -> uc -> uc
-val logic_lexpr : Loc.position * string -> Ptree.lexpr
+val add_logic_pdecl : Env.env -> Ptree.decl -> uc -> uc
 
 (** exceptions *)
 
