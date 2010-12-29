@@ -1,5 +1,4 @@
-
-{
+module M
 
   (* preliminaries *)
 
@@ -26,8 +25,6 @@
   logic valid_array (a:first_free_addr) (n:int) (m:int) (r:array pointer) =
      forall i:int. n <= i <= m -> valid a (A.get r i)
 
-}
-
 parameter alloc : ref first_free_addr
 
 parameter new_pointer : tt:unit ->
@@ -44,14 +41,10 @@ record Student =
 end
 *)
 
-{
-
   type student = (string, int)
 
   logic invStudent (this:student) =
      let (_,m) = this in 0 <= m <= 100
-
-}
 
 (*
 record Course =
@@ -68,8 +61,6 @@ record Course =
   }
 end
 *)
-
-{
 
   type course = (region student, array pointer, int, int)
 
@@ -118,8 +109,6 @@ end
      injective 0 (count - 1) students
      and
      sum = markSum rStud 0 (count-1) students
-
-}
 
 (*
 fun CreateCourse(R:[Course]): [R]
@@ -187,10 +176,7 @@ fun SetMark(R:Course, c:[R], s: [c.Rstud], mark: int) : unit
 
 *)
 
-
-
-
-
+end
 
 
 

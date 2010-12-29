@@ -1,3 +1,4 @@
+module M
 
 (* WCET example 
 
@@ -6,7 +7,6 @@
    the body of the inner loop is executed.
 *)
 
-{
   use array.ArrayLength as A
 
   type array 'a = A.t int 'a
@@ -15,7 +15,6 @@
 
   logic n : int
   axiom N_non_negative : n >= 0
-}
 
 let hull a b =
   let j = ref 0 in 
@@ -32,6 +31,7 @@ let hull a b =
   done;
   assert { 0 <= !t <= n }
 
+end
   
 (*
 Local Variables: 

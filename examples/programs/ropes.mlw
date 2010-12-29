@@ -1,5 +1,5 @@
+module M
 
-{
   type char
   clone array.ArrayRich as S
   type string = S.t int char
@@ -24,8 +24,6 @@
     S.length s1 = S.length s2 and
     forall i:int. 0 <= i < S.length s1 -> S.get s1 i = S.get s2 i
 
-}
-
 let empty () = 
   {} 
   Str (S.create_length 0) 0 0 
@@ -47,6 +45,7 @@ let rec get r i =
   end
   { result = S.get (model r) i }
 
+end
 
 (*
 Local Variables: 

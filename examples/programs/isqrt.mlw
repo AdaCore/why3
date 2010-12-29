@@ -1,9 +1,6 @@
-
-{
+module M
 
 logic sqr (x:int) : int = x * x
-
-}
 
 let isqrt (x:int) =
   { x >= 0 }
@@ -20,4 +17,5 @@ let isqrt (x:int) =
   !count
   { result >= 0 and sqr result <= x and x < sqr (result + 1) }
 
+end
 

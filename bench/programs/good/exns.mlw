@@ -1,3 +1,4 @@
+module M
 
 (* exception without argument *)
 
@@ -114,6 +115,8 @@ let p15 () =
 let p16 () = {} if !x = 0 then (x:=1; raise E) { !x<>0 } | E -> { !x=1 }
 
 let p17 () = {} (x := 0; (raise E; x := 1)) { false } | E -> { !x=0 }
+
+end
 
 (*
 Local Variables: 

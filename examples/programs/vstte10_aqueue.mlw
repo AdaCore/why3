@@ -1,7 +1,7 @@
+module M
 (* VSTTE'10 competition http://www.macs.hw.ac.uk/vstte10/Competition.html
    Problem 5: amortized queue *)
 
-{
   use export list.List
   use export list.Length
   use export list.Append
@@ -18,7 +18,6 @@
 
   logic model (q : queue 'a) : list 'a =
     append (front q) (reverse (rear q))
-}
 
 let create f lf r lr =
   { lf = length f and lr = length r }
@@ -55,6 +54,8 @@ let enqueue (x : 'a) (q : queue 'a) =
   { inv q }
   create (front q) (lenf q) (Cons x (rear q)) (lenr q + 1) 
   { inv result and model result = append (model q) (Cons x Nil) }
+
+end
 
 (*
 Local Variables: 

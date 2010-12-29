@@ -1,3 +1,4 @@
+module M
 
 (* Side effect in expressions (Bart Jacobs' tricky example) *)
 
@@ -16,6 +17,8 @@ let k () =
     b2 := (f ()) * (1 - (f ())) 
   end
   { !b1 = 0 and !b2 = 1 }
+
+end
 
 (*
 Local Variables: 

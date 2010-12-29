@@ -1,7 +1,7 @@
-{
+module M
+
   use set.Fset as S
   use array.Array as M
-}
 
 (* iteration on a set *)
 
@@ -17,7 +17,6 @@ parameter set_next :
     'a writes s 
     { S.mem result (old !s) and !s = S.remove result (old !s) }
 
-{
 (* the graph *)
 
 type vertex
@@ -32,7 +31,7 @@ axiom G_succ_sound :
 logic weight vertex vertex : int (* edge weight, if there is an edge *)
 
 axiom Weight_nonneg : forall x y:vertex. weight x y >= 0
-}
+
 
 parameter eq_vertex : 
   x:vertex -> y:vertex -> {} bool { if result=True then x=y else x<>y }
@@ -61,7 +60,7 @@ parameter q_is_empty :
 parameter init :
   src:vertex ->
     {} 
-    unit writes visited, q, d 
+    unit writes visited q d 
     { S.is_empty !visited and 
       !q = S.add src S.empty and 
       !d = M.set (old !d) src 0  }
@@ -87,11 +86,9 @@ let relax u v =
     (not S.mem v !visited and not S.mem v (old !q) and !q = S.add v (old !q) and
         !d = M.set (old !d) v (M.get (old !d) u + weight u v)) }	
 
-{
 logic min (m:vertex) (q:S.t vertex) (d:M.t vertex int) =
   S.mem m q and 
   forall x:vertex. S.mem x q -> M.get d m <= M.get d x
-}
 
 parameter q_extract_min :
   unit ->
@@ -105,7 +102,6 @@ parameter q_extract_min :
    shortest_path x y d = 
 	there is a path from x to y of length d, and no shorter path *)
 
-{ 
 inductive path vertex vertex int = 
   | Path_nil  : 
       forall x:vertex. path x x 0
@@ -181,7 +177,6 @@ logic inv_succ2 (src:vertex) (s q : S.t vertex)
   (forall x:vertex. S.mem x s -> 
      forall y:vertex. S.mem y (g_succ x) -> 
        (x<>u or (x=u and not S.mem y su)) -> S.mem y s or S.mem y q)
-}
 
 (* code *)
 
@@ -209,6 +204,8 @@ let shortest_path_code (src:vertex) (dst:vertex) =
     and
     (forall v:vertex. 
        not S.mem v !visited -> forall dv:int. not path src v dv) }
+
+end
 
 (*
 Local Variables: 

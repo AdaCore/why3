@@ -332,6 +332,9 @@ clean::
 %.gui: %.why bin/whyide.opt
 	bin/whyide.opt $*.why
 
+%: %.mlw bin/whyml.opt
+	bin/whyml.opt $*.mlw
+
 %.gui: %.mlw bin/whyide.opt
 	bin/whyide.opt $*.mlw
 

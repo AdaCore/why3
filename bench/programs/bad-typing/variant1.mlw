@@ -1,8 +1,11 @@
 
+module M
+
 (* missing variant *)
 
 let rec even (x:int) : int variant {x} =
   odd (x-1) 
-and odd (x:int) : int =
+with odd (x:int) : int =
   even (x-1)
 
+end

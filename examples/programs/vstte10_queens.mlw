@@ -1,14 +1,12 @@
+module M
 (* VSTTE'10 competition http://www.macs.hw.ac.uk/vstte10/Competition.html
    Problem 4: N-queens *)
 
-{
   use array.ArrayLength as A
 
   type array 'a = A.t int 'a
 
   logic (#) (a : array 'a) (i : int) : 'a = A.get a i
-
-}
 
 let array_get (a : ref (array 'a)) i = 
   { 0 <= i < A.length !a } A.get !a i { result = A.get !a i }
@@ -16,7 +14,6 @@ let array_get (a : ref (array 'a)) i =
 let array_set (a : ref (array 'a)) i v = 
   { 0 <= i < A.length !a } a := A.set !a i v { !a = A.set (old !a) i v }
 
-{ 
   logic consistent_row (board : array int) (pos : int) (q : int) = 
     board#q <> board#pos and
     board#q - board#pos <> pos - q and
@@ -28,7 +25,6 @@ let array_set (a : ref (array 'a)) i v =
   lemma Is_consistent_set :
     forall board : array int, pos q i : int.
     is_consistent board pos -> pos < q -> is_consistent (A.set board q i) pos
-}
 
 exception Inconsistent
 
@@ -52,7 +48,6 @@ let check_is_consistent board pos =
   end
   { result=True <-> is_consistent !board pos }
 
-{ 
   logic is_board (board : array int) (pos : int) =
     forall q:int. 0 <= q < pos -> 0 <= board#q < A.length board
 
@@ -82,7 +77,6 @@ let check_is_consistent board pos =
   lemma Eq_board_trans :
     forall b1 b2 b3 : array int, pos : int.
     eq_board b1 b2 pos -> eq_board b2 b3 pos -> eq_board b1 b3 pos
-}
 
 exception Solution
 
@@ -112,6 +106,8 @@ let queens board n =
   bt_queens board n 0
   { forall b:array int. A.length b = n -> is_board b n -> not (solution b n) }
   | Solution -> { solution !board n }
+
+end
 
 (*
 Local Variables: 

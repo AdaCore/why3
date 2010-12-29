@@ -1,3 +1,4 @@
+module M
 
 let foo (x : ref int) (y : ref int) = 
   x := 1;
@@ -7,3 +8,5 @@ parameter r : ref int
 
 let test () =
   foo r r
+
+end

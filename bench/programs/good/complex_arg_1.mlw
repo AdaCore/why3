@@ -1,3 +1,5 @@
+module M
+
 exception Exception
 
 parameter f0 : tt:unit ->
@@ -15,6 +17,8 @@ let f () =
   { }
   f0 (f1 ())
   { true } | Exception -> { true }
+
+end
 
 (*
 Local Variables: 

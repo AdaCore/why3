@@ -1,8 +1,7 @@
+module M
 
-{
   use import list.List
   use import list.Length
-}
 
 let rec length_ (l : list 'a) variant { length l } = 
   {}
@@ -20,6 +19,7 @@ let rec append (l1 : list 'a) (l2 : list 'a) variant { length l1 } =
   end
   { length result = length l1 + length l2 }
 
+end
 
 (*
 Local Variables: 

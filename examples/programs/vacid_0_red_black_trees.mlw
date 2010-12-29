@@ -1,7 +1,7 @@
+module M
 
 (* Red-black trees *)
 
-{
   type key = int
   type value = int
 
@@ -16,7 +16,6 @@
     | Leaf -> false
     | Node _ l k' v' r -> (k = k' and v = v') or memt l k v or memt r k v
     end
-}
 
 exception Not_found
 
@@ -36,7 +35,6 @@ parameter add :
 
 (* the VACID-0 interface = mutable map with default value*)
 
-{
   type rbt = (value, tree)
 
   logic default (r : rbt) : value =
@@ -45,7 +43,6 @@ parameter add :
   logic mem (r : rbt) (k : key) (v : value) =
     let (d, t) = r in 
     memt t k v or (v = d and forall v':value. not (memt t k v'))
-}
 
 let create d =
   { }
@@ -74,6 +71,8 @@ let remove m k =
   { default !m = default (old !m) and
     forall k':key, v':value. 
     mem !m k' v' <-> if k' = k then v' = default !m else mem (old !m) k' v' }
+
+end
 
 (*
 Local Variables: 

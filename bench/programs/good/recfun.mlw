@@ -1,3 +1,4 @@
+module M
 
 (** Recursive functions *)
 
@@ -38,10 +39,10 @@ let rec f5 (a b:ref int) variant { !a } =
 let test_f5 () = 
   { !x >= 0 } let f = f5 x in let b = ref 0 in f b { result = old !x }
 
+end
 
 (*
 Local Variables: 
 compile-command: "unset LANG; make -C ../../.. bench/programs/good/recfun"
 End: 
 *)
-

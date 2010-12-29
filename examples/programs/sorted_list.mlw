@@ -1,7 +1,7 @@
+module M
 
 (* find a value in a sorted list *)
 
-{
   use import list.Mem
   use import list.Sorted
 
@@ -12,8 +12,6 @@
     forall x y : int, l : list int. 
     x < y -> sorted (Cons y l) -> not mem x (Cons y l)
 
-}
-
 let rec find x l = 
   { sorted l }
   match l with   
@@ -21,6 +19,8 @@ let rec find x l =
   | Cons y r -> x = y || x > y && find x r
   end 
   { result=True <-> mem x l }
+
+end
 
 (*
 Local Variables: 

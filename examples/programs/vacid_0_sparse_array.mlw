@@ -1,3 +1,4 @@
+module M
 
 (*
       If the sparse array contains three elements x y z, at index
@@ -19,7 +20,6 @@ back  +-+-+-+-------------------+
 
 *)
 
-{
   use array.ArrayLength as A
 
   logic maxlen : int = 1000
@@ -49,7 +49,7 @@ back  +-+-+-+-------------------+
     else
       default
 
-  logic invariant (a : sparse_array) =
+  logic invariant_ (a : sparse_array) =
     let (SA val idx back sz n) = a in
     0 <= n <= sz <= maxlen and
     A.length val = sz and A.length idx = sz and A.length back = sz and
@@ -77,14 +77,12 @@ back  +-+-+-+-------------------+
             a # dirichlet n a i = i)
 
   lemma Inter6 :
-    forall a : sparse_array . invariant a ->
+    forall a : sparse_array . invariant_ a ->
         let (SA val idx back sz n) = a in
         n = sz ->
-            permutation sz back /\
+            permutation sz back &&
             forall i : int. 0 <= i < sz ->
-                idx#i = dirichlet sz back i /\ is_elt a i
-}
-
+                idx#i = dirichlet sz back i && is_elt a i
 
 (*
 parameter create :
@@ -99,7 +97,7 @@ parameter malloc : n:int -> {} array 'a { A.length result = n }
 let create sz =
   { 0 <= sz <= maxlen }
   ref (SA (malloc sz) (malloc sz) (malloc sz) sz 0)
-  { invariant !result and
+  { invariant_ !result and
     sa_sz !result = sz and forall i:int. model !result i = default }
 
 let array_get (a : array 'a) i =
@@ -109,7 +107,7 @@ let array_set (a : array 'a) i v =
   { 0 <= i < A.length a } A.set a i v { result = A.set a i v }
 
 let test a i =
-  { 0 <= i < sa_sz !a and invariant !a }
+  { 0 <= i < sa_sz !a and invariant_ !a }
   let idx = sa_idx !a in
   let back = sa_back !a in
   let n = sa_n !a in
@@ -125,7 +123,7 @@ parameter get :
     { result = model !a i }
 *)
 let get a i =
-  { 0 <= i < sa_sz !a and invariant !a }
+  { 0 <= i < sa_sz !a and invariant_ !a }
   let val = sa_val !a in
   if test a i then
     array_get val i
@@ -144,7 +142,7 @@ parameter set :
       forall j:int. j <> i -> model !a j = model (old !a) j }
 *)
 let set a i v =
-  { 0 <= i < sa_sz !a and invariant !a }
+  { 0 <= i < sa_sz !a and invariant_ !a }
   (* let SA val idx back sz n = !a in *)
   let val = sa_val !a in
   let idx = sa_idx !a in
@@ -160,7 +158,7 @@ let set a i v =
     let back = array_set back n i in
     a := SA val idx back sz (n+1)
   end
-  { invariant !a and
+  { invariant_ !a and
     sa_sz !a = sa_sz (old !a) and
     model !a i = v and
     forall j:int. j <> i -> model !a j = model (old !a) j }
@@ -180,6 +178,8 @@ let harness () =
   let get_b_0 = get b 0 in assert { get_b_0 = default };
   ()
 
+
+end
 
 (*
 Local Variables:

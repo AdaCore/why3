@@ -1,9 +1,9 @@
+module M
 (* How many integers 0 <= n < 10^18 have the property that the sum 
    of the digits of n equals the sum of digits of 137n? *)
 
 (* answer: 20444710234716473 *)
 
-{ 
   use import int.EuclideanDivision
   use import int.Power
 
@@ -50,11 +50,7 @@
     forall m : int. m > 0 ->
     solution a' b' (m-1) = num_of_modc (a,b,c) 0 (power 10 m)
 
-}
-
-{
   use import int.ComputerDivision
-}
 
 let rec sd n =
   { n >= 0 }
@@ -84,6 +80,7 @@ let rec f m a b =
   end
   { result = solution a b m }
     
+end
 
 (*
 Local Variables: 

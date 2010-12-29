@@ -1,5 +1,4 @@
-
-{
+module M
 
   use array.ArrayLength as A
 
@@ -40,8 +39,6 @@
   axiom OneClass :
     forall u:uf. num u = 1 -> 
     forall x y:int. 0 <= x < size u -> 0 <= y < size u -> same u x y
-
-}
 
 let get_num_classes (u:ref uf) =
   {} num !u { result = num !u }
@@ -127,6 +124,8 @@ let union (u:ref uf) (a b:int) =
       same (old !u) x b and same (old !u) a y }
 
 ***)
+
+end
 
 (*
 Local Variables: 

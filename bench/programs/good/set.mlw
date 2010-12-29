@@ -1,3 +1,4 @@
+module M
 
 (* side effects in tests *)
 
@@ -37,9 +38,10 @@ let p4 (y:ref int) =
   done 
   { !y = 0 }
 
+end
+
 (*
 Local Variables: 
 compile-command: "unset LANG; make -C ../../.. bench/programs/good/set"
 End: 
 *)
-

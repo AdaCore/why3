@@ -1,13 +1,10 @@
-
-{
+module M
 
   use import real.RealInfix
   use import real.Abs
   use import real.Trigonometry
   use import floating_point.Rounding
   use import floating_point.Single
-
-}
 
 parameter single_of_real_exact : x:real ->
   { }
@@ -39,10 +36,10 @@ let my_cosine (x:single) : single =
       (mul (mul x x) (single_of_real_exact 0.5))
 { abs (value result -. cos (value x)) <=. 0x1p-23 }
 
+end
+
 (*
 Local Variables:
 compile-command: "../../bin/whyide.byte my_cosine.mlw"
 End:
 *)
-
-

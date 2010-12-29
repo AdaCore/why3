@@ -1,7 +1,7 @@
+module M
 (* VSTTE'10 competition http://www.macs.hw.ac.uk/vstte10/Competition.html
    Problem 2: inverting an injection *)
 
-{
   use array.ArrayLength as A
 
   type array 'a = A.t int 'a
@@ -20,7 +20,6 @@
   lemma Injective_surjective :
     forall a : array int, n : int.
     injective a n -> range a n -> surjective a n
-}
 
 let array_get (a : ref (array 'a)) i = 
   { 0 <= i < A.length !a } A.get !a i { result = A.get !a i }
@@ -37,6 +36,8 @@ let inverting a b n =
     array_set b (array_get a i) i
   done
   { injective !b n }
+
+end
 
 (*
 Local Variables: 

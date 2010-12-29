@@ -1,3 +1,4 @@
+module M
 
 (**** McCarthy's ``91'' function. *)
 
@@ -12,7 +13,6 @@ let rec f91 (n:int) : int variant { 101-n } =
 
 (* non-recursive version *)
 
-{
   logic f (x:int) : int =
     if x >= 101 then x-10 else 91
 
@@ -24,7 +24,6 @@ let rec f91 (n:int) : int variant { 101-n } =
 
   clone import relations.Lex with type t1 = int, type t2 = int,
     logic rel1 = lt_nat, logic rel2 = lt_nat
-}
 
 let f91_nonrec (n x : ref int) =
   { !n >= 1 }
@@ -43,6 +42,7 @@ let f91_nonrec (n x : ref int) =
   !x
   { result = iter_f (old !n) (old !x) }
 
+end
 
 (*
 Local Variables: 

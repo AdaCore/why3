@@ -1,7 +1,7 @@
+module M
 (* VSTTE'10 competition http://www.macs.hw.ac.uk/vstte10/Competition.html
    Problem 3: searching a linked list *)
 
-{
   use export list.List
   use export list.Length
   use export list.Nth
@@ -11,7 +11,6 @@
 
   logic no_zero (l : list int) =
     forall j:int. 0 <= j < length l -> nth j l <> Some 0
-}
 
 let rec search i l variant { length l } = 
   {}
@@ -33,9 +32,7 @@ let search_list l =
 
 (* imperative version, with a loop *)
 
-{
   use import list.HdTl
-}
 
 let head (l : list 'a) = 
   { l <> Nil } 
@@ -64,6 +61,8 @@ let search_loop l =
   { (0 <= result < length l and zero_at l result)
     or 
     (result = length l and no_zero l) }
+
+end
 
 (*
 Local Variables: 

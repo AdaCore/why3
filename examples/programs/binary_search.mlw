@@ -1,3 +1,4 @@
+module M
 
 (* Binary search
 
@@ -6,14 +7,12 @@
 
 (* the usual array modeling *)
 
-{
   use array.ArrayLength as A
   use import int.ComputerDivision
 
   type array = A.t int int
 
   logic (#) (a : array) (i : int) : int = A.get a i
-}
 
 let array_get (a : ref array) i = 
   { 0 <= i < A.length !a } A.get !a i { result = A.get !a i }
@@ -55,6 +54,7 @@ let binary_search (a : ref array) (v : int) =
   { 0 <= result < A.length !a and !a#result = v }
   | Not_found -> { forall i:int. 0 <= i < A.length !a -> !a#i <> v }
 
+end
 
 (*
 Local Variables: 

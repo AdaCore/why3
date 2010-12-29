@@ -1,5 +1,9 @@
+module M
 
-parameter incr : x:ref int -> { } unit writes x { !x = old !x + 1 }
+use import int.Int
+use import module stdlib.Ref
+
+parameter incr : x:ref int -> { } unit writes x { x = old x + 1 }
 
 parameter x : ref int
 
@@ -44,9 +48,7 @@ let test_all_1 () =
 
 (* from Cesar Munoz's CD3D *)
 
-{
   logic d : int
-}
 
 parameter vx : ref int
 parameter vy : ref int
@@ -58,6 +60,7 @@ let test_cd3d () =
  if !vx=0 && !vy=0 && sq !vx + sq !vy < sq d  then 1 else 2
  { result=1 -> !vx=0 and !vy=0 }
 
+end
 
 (*
 Local Variables: 

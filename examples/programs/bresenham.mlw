@@ -1,5 +1,8 @@
+module M
 
 (* Bresenham line drawing algorithm. *)
+
+use import int.Int
 
 (*  Parameters. 
     Without loss of generality, we can take [x1=0] and [y1=0]. 
@@ -9,11 +12,9 @@
     [0 <= y2 <= x2]. The seven other cases can be easily
     deduced by symmetry. *)
 
-{
 logic x2 : int
 logic y2 : int
 axiom First_octant : 0 <= y2 <= x2
-}
 
 (* The code.
     [(best x y)] expresses that the point [(x,y)] is the best
@@ -21,25 +22,23 @@ axiom First_octant : 0 <= y2 <= x2
     The invariant relates [x], [y] and [e] and
     gives lower and upper bound for [e] (see the Coq file). *)
 
-{
 use import int.Abs
 
 logic best (x y:int) =
   forall y':int. abs (x2 * y - x * y2) <= abs (x2 * y' - x * y2)
 
-logic invariant (x y e:int) =
+logic invariant_ (x y e:int) =
   e = 2 * (x + 1) * y2 - (2 * y + 1) * x2 and
   2 * (y2 - x2) <= e <= 2 * y2
 
-lemma Invariant_is_ok : forall x y e:int. invariant x y e -> best x y
-}
+lemma Invariant_is_ok : forall x y e:int. invariant_ x y e -> best x y
 
 let bresenham () =
   let x = ref 0 in
   let y = ref 0 in
   let e = ref (2 * y2 - x2) in
   while !x <= x2 do
-    invariant {0 <= !x and !x <= x2 + 1 and invariant !x !y !e }
+    invariant {0 <= !x and !x <= x2 + 1 and invariant_ !x !y !e }
     variant   { x2 + 1 - !x }
     (* here we would plot (x, y) *) 
     assert { best !x !y };
@@ -52,6 +51,7 @@ let bresenham () =
     x := !x + 1
   done
 
+end
 
 (*
 Local Variables: 

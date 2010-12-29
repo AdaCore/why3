@@ -1,9 +1,8 @@
+module M
 
-{
   use import list.Length
   use import list.Sorted
   use import list.Permut
-}
 
 let rec insert x l variant { length l } = 
   { sorted l }
@@ -20,6 +19,8 @@ let rec insertion_sort l variant { length l } =
   | Cons x r -> insert x (insertion_sort r)
   end
   { sorted result and permut l result }
+
+end
 
 (*
 Local Variables: 

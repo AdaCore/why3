@@ -1,11 +1,10 @@
+module M
 
-{
   type key = int
   type value = int
   type rbt
   logic default rbt : value
   logic mem rbt key value
-}
 
 parameter create :
   d:value ->
@@ -51,6 +50,8 @@ let harness () =
   let b2  = lookup b 2  in assert { b2  = 1 };
   let b42 = lookup b 42 in assert { b42 = 1 };
   ()
+
+end
 
 (*
 Local Variables:

@@ -1,11 +1,10 @@
+module M
 
 (* Tests for proof obligations. *)
 
 parameter x : ref int
 
-{
-  logic q(int)
-}
+  logic q int
 
 (* basic stuff: assignment, sequence and local variables *)
 
@@ -60,6 +59,8 @@ let p13a () = {} incrx (incrx ()) { !x = old(!x) + 2 }
 parameter incrx2 : unit -> { } int writes x { !x = old(!x) + 1 and result = !x }
 
 let p14 () = { !x = 0 } incrx2 () { result = 1 }
+
+end
 
 (*
 Local Variables: 

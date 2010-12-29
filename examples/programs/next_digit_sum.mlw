@@ -1,3 +1,4 @@
+module M
 
 (*
    ACM Portugese National Programming Contest (MIUP) 2010
@@ -8,7 +9,6 @@
    Ocaml code given at the end of file.
 *)
 
-{
   use array.ArrayLength as A
   use import int.MinMax
   use import int.EuclideanDivision
@@ -64,8 +64,6 @@
     forall x : array, i j : int.
     i < j -> interp9 (A.set x i 9) i j = interp9 x (i+1) j
 
-}
-
 let array_get (a : ref array) i = 
   { 0 <= i < A.length !a } A.get !a i { result = A.get !a i }
 
@@ -74,7 +72,6 @@ let array_set (a : ref array) i v =
 
 parameter x : ref (array)
 
-{ 
   (* the number of digis of X *)
   logic n : int
 
@@ -84,8 +81,6 @@ parameter x : ref (array)
   axiom Hypotheses: n >= 0 and y > 0
   
   logic m : int = 1 + max n (div y 9)
-
-}
 
 exception Success
 
@@ -123,11 +118,9 @@ let search_safety () =
 (* 2. Correctness, part 1: when Sucess is raised, x contains an integer
       with digit sum y *)
 
-{
   (* x[0..m-1] is a well-formed integer i.e. has digits in 0..9 *)
   logic is_integer (x : array) =
     forall k : int. 0 <= k < m -> 0 <= x#k <= 9
-}
 
 let search () =
   { A.length !x = m and is_integer !x }
@@ -174,7 +167,6 @@ let search () =
 
    4. Completeness: we always raise the Success exception *)
 
-{
   (* x1 > x2 since x1[d] > x2[d] and x1[d+1..m-1] = x2[d+1..m-1] *)
   logic gt_digit (x1 x2 : array) (d : int) =
     is_integer x1 and is_integer x2 and 0 <= d < m and 
@@ -250,7 +242,6 @@ let search () =
   lemma Completeness: 
     m >= smallest_size y and (* cut *)
     exists u : int. nb_digits u = m and sum_digits u = y
-}
 
 let search_smallest () =
   { A.length !x = m and is_integer !x and
@@ -314,6 +305,8 @@ let search_smallest () =
                                  sum_digits u <> y }
 
 
+end
+
 (*
 Local Variables: 
 compile-command: "unset LANG; make -C ../.. examples/programs/next_digit_sum"
@@ -355,3 +348,4 @@ let () =
     s := !s - x.(d)
   done
 *)
+

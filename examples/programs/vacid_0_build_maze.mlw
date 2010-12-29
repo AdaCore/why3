@@ -1,5 +1,4 @@
-
-{
+module M
 
   type uf
 
@@ -23,8 +22,6 @@
   axiom OneClass :
     forall u:uf. num u = 1 -> 
     forall x y:int. 0 <= x < size u -> 0 <= y < size u -> same u x y
-
-}
 
 parameter create : 
   n:int -> 
@@ -58,12 +55,9 @@ parameter get_num_classes :
 
 parameter rand : s:int -> { 0 < s } int { 0 <= result < s }
 
-{
   lemma Ineq1 :
     forall n x y:int. 0 <= n -> 0 <= x < n -> 0 <= y < n -> 0 <= x*n+y < n*n
-}
 
-{   
   type graph
   
   (*clone import graph.Path with type graph = graph, type vertex = int*)
@@ -75,7 +69,6 @@ parameter rand : s:int -> { 0 < s } int { 0 <= result < s }
     forall g:graph, x y z:int. path g x y -> path g y z -> path g x z
 
   logic select (d:int) (x y:'a) : 'a = if d = 0 then x else y
-}
 
 parameter graph : ref graph
 
@@ -84,7 +77,7 @@ parameter num_edges : ref int
 parameter add_edge : 
   a:int -> b:int -> 
     { not path !graph a b } 
-    unit writes num_edges, graph 
+    unit writes num_edges graph 
     { !num_edges = old !num_edges + 1 and
       (forall x y:int. 
           path !graph x y <->
@@ -117,7 +110,7 @@ let build_maze (n:int) =
   }
     let u = create (n*n) in
     assert { forall x y:int. 0 <= x < n*n -> 0 <= y < n*n ->
-             same !u x y -> (repr !u x y /\ repr !u x x /\ x = y) };
+             same !u x y -> (repr !u x y && repr !u x x && x = y) };
     while get_num_classes u > 1 do
       invariant 
         { 1 <= num !u and num !u + !num_edges = size !u = n*n and
@@ -141,6 +134,8 @@ let build_maze (n:int) =
   { !num_edges = n*n-1 and
     forall x y:int. 0 <= x < n*n -> 0 <= y < n*n -> 
       path !graph x y }
+
+end
 
 (*
 Local Variables: 
