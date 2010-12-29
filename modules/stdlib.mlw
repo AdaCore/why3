@@ -1,0 +1,20 @@
+
+module Ref
+
+  { use import programs.Prelude }
+
+  mutable type ref 'a model 'a
+
+  parameter ref : v:'a -> {} ref 'a { result=v }
+
+  parameter get : r:ref 'a -> {} 'a reads r { result=r }
+
+  parameter set : r:ref 'a -> v:'a -> {} unit writes r { r=v }
+
+end
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C .."
+End: 
+*)
