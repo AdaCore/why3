@@ -25,7 +25,8 @@ exception NotMutable
 val get_mtsymbol : tysymbol -> mtsymbol
   (** raises [NotMutable] if [ts] is not a mutable type *)
 
-val is_mutable_type : tysymbol -> bool
+val is_mutable_ts : tysymbol -> bool
+val is_mutable_ty : ty       -> bool
 
 val ts_arrow : tysymbol
     
@@ -87,6 +88,7 @@ module rec T : sig
     
   val apply_type_v_var : type_v -> pvsymbol -> type_c
   val apply_type_v_sym : type_v -> psymbol  -> type_c
+  val apply_type_v_ref : type_v -> R.t      -> type_c
     
   val occur_type_v : R.t -> type_v -> bool
     

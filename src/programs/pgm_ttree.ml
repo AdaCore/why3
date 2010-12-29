@@ -178,7 +178,7 @@ and iexpr_desc =
   | IElocal of ivsymbol
   | IEglobal of psymbol
   | IEapply of iexpr * ivsymbol
-  (* | IEapply_ref of iexpr * reference *)
+  | IEapply_ref of iexpr * ireference
   | IEfun of ibinder list * itriple
   | IElet of ivsymbol * iexpr * iexpr
   | IEletrec of irecfun list * iexpr

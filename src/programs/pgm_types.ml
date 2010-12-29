@@ -32,7 +32,11 @@ let create_mtsymbol name args model =
   Hts.add mutable_types ts mt;
   mt
 
-let is_mutable_type = Hts.mem mutable_types
+let is_mutable_ts = Hts.mem mutable_types
+
+let is_mutable_ty ty = match ty.ty_node with
+  | Ty.Tyapp (ts, _) -> is_mutable_ts ts
+  | Ty.Tyvar _ -> false
 
 exception NotMutable
 
@@ -121,6 +125,7 @@ module rec T : sig
     
   val apply_type_v_var : type_v -> pvsymbol -> type_c
   val apply_type_v_sym : type_v -> psymbol  -> type_c
+  val apply_type_v_ref : type_v -> R.t      -> type_c
     
   val occur_type_v : R.t -> type_v -> bool
     
@@ -311,9 +316,13 @@ end = struct
 	let ts = ty_match Mtv.empty x.pv_ty s.p_ty in
 	let c = type_c_of_type_v (Tarrow (bl, c)) in
 	let ef = Mpv.add x (R.Rglobal s) Mpv.empty in
-	subst_type_c ef ts (subst1 x.pv_vs (t_app s.p_ls [] s.p_ty)) c
+	subst_type_c ef ts (subst1 x.pv_vs (t_app s.p_ls [] x.pv_vs.vs_ty)) c
     | _ ->
 	assert false
+
+  let apply_type_v_ref v = function
+    | R.Rlocal pv -> apply_type_v_var v pv
+    | R.Rglobal s -> apply_type_v_sym v s
 	  
   let occur_formula r f = match r with
     | R.Rlocal  v -> f_occurs_single v.pv_vs f

@@ -171,7 +171,8 @@ let use_export uc m =
   match uc.uc_import, uc.uc_export with
   | i0 :: sti, e0 :: ste -> { uc with
       uc_import = merge_ns false m.m_export i0 :: sti;
-      uc_export = merge_ns true  m.m_export e0 :: ste }
+      uc_export = merge_ns true  m.m_export e0 :: ste;
+      uc_th = Theory.use_export uc.uc_th m.m_th; }
   | _ -> assert false
 
 (* parsing LOGIC strings using functions from src/parser/

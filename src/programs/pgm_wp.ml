@@ -121,7 +121,7 @@ and unref_term env r v t = match r, t.t_node with
 
 (* quantify over all references in ef *)
 let quantify ?(all=false) env ef f =
-  (* eprintf "quantify: ef=%a f=%a@." E.print ef Pretty.print_fmla f; *)
+  (* eprintf "quantify: ef= f=%a@." (\* E.print ef *\) Pretty.print_fmla f; *)
   let quantify1 r f =
     let ty = R.type_of r in
     let v = create_vsymbol (id_clone (R.name_of r)) ty in
@@ -137,7 +137,7 @@ let abstract_wp env ef (q',ql') (q,ql) =
   let quantify_res f' f res =
     let f = wp_implies f' f in
     let f = match res with
-      (* | Some v when is_ref_ty env v.vs_ty -> *)
+      (* | Some v when is_mutable_ty v.vs_ty -> *)
       (* 	  let v' = create_vsymbol (id_clone v.vs_name) (unref_ty env v.vs_ty) in *)
       (* 	  wp_forall v' (unref env (R.Rlocal v) v' f) *)
       | Some v ->
@@ -273,7 +273,7 @@ and wp_desc env e q = match e.expr_desc with
       wp_and q (wp_binders bl f)
   | Elet (x, e1, e2) ->
       let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
-      let v1 = v_result e1.expr_type in
+      let v1 = v_result x.pv_vs.vs_ty in
       let t1 = t_label_add (label ~loc:e1.expr_loc "let") (t_var v1) in
       let q1 = v1, f_subst (subst1 x.pv_vs t1) w2 in
       let q1 = saturate_post e1.expr_effect q1 q in
@@ -451,6 +451,7 @@ let add_wp_decl ps f uc =
     | Some loc -> id_user s loc
   in
   let f = f_btop uc f in
+  printf "wp: f=%a@." print_fmla f;
   let pr = create_prsymbol id in
   let d = create_prop_decl Pgoal pr f in
   add_logic_decl d uc
