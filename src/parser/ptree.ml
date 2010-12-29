@@ -148,3 +148,95 @@ type decl =
   | UseClone of loc * use * clone_subst list option
   | Meta of loc * ident * metarg list
 
+
+(* program files *)
+
+type assertion_kind = Aassert | Aassume | Acheck
+
+type lazy_op = LazyAnd | LazyOr
+
+type variant = lexpr * qualid
+
+type loop_annotation = {
+  loop_invariant : lexpr option;
+  loop_variant   : variant option;
+}
+
+type for_direction = To | Downto
+
+type effect = {
+  pe_reads  : qualid list;
+  pe_writes : qualid list;
+  pe_raises : qualid list;
+}
+
+type pre = lexpr
+
+type post = lexpr * (qualid * lexpr) list
+
+type type_v =
+  | Tpure of pty
+  | Tarrow of binder list * type_c
+
+and type_c =
+  { pc_result_type : type_v;
+    pc_effect      : effect;
+    pc_pre         : pre;
+    pc_post        : post; }
+
+and binder = ident * type_v option
+
+type expr = {
+  expr_desc : expr_desc;
+  expr_loc  : loc;
+}
+
+and expr_desc =
+  (* lambda-calculus *)
+  | Econstant of constant
+  | Eident of qualid
+  | Eapply of expr * expr
+  | Efun of binder list * triple
+  | Elet of ident * expr * expr
+  | Eletrec of (ident * binder list * variant option * triple) list * expr
+  | Etuple of expr list
+  (* control *)
+  | Esequence of expr * expr
+  | Eif of expr * expr * expr
+  | Eloop of loop_annotation * expr
+  | Elazy of lazy_op * expr * expr
+  | Ematch of expr * (pattern * expr) list
+  | Eskip
+  | Eabsurd
+  | Eraise of qualid * expr option
+  | Etry of expr * (qualid * ident option * expr) list
+  | Efor of ident * expr * for_direction * expr * lexpr option * expr
+  (* annotations *)
+  | Eassert of assertion_kind * lexpr
+  | Elabel of ident * expr
+  | Ecast of expr * pty
+  | Eany of type_c
+
+  (* TODO: ghost *)
+
+and triple = pre * expr * post
+
+type program_decl =
+  | Dlet    of ident * expr
+  | Dletrec of (ident * binder list * variant option * triple) list
+  | Dlogic  of decl
+  | Dparam  of ident * type_v
+  | Dexn    of ident * pty option
+  (* modules *)
+  | Duse    of qualid * imp_exp * (*as:*) ident option
+  | Dnamespace of ident * (* import: *) bool * program_decl list
+  | Dmutable_type of ident * ident list * pty option
+
+type module_ = {
+  mod_name   : ident;
+  mod_labels : Ident.label list;
+  mod_decl   : program_decl list;
+}
+
+type program_file = module_ list
+

@@ -75,6 +75,35 @@
 	"type", TYPE;
 	"use", USE;
 	"with", WITH;
+	(* programs *)
+	"absurd", ABSURD;
+	"any", ANY;
+	"assert", ASSERT;
+	"assume", ASSUME;
+	"begin", BEGIN;
+        "check", CHECK;
+	"do", DO;
+	"done", DONE;
+ 	"downto", DOWNTO;
+	"exception", EXCEPTION;
+	"for", FOR;
+	"fun", FUN;
+	"ghost", GHOST;
+	"invariant", INVARIANT;
+	"label", LABEL;
+	"model", MODEL;
+	"module", MODULE;
+	"mutable", MUTABLE;
+	"parameter", PARAMETER;
+	"raise", RAISE;
+	"raises", RAISES;
+	"reads", READS;
+	"rec", REC;
+	"to", TO;
+	"try", TRY;
+	"variant", VARIANT;
+	"while", WHILE;
+        "writes", WRITES;
       ]
 
   let newline lexbuf =
@@ -179,8 +208,14 @@ rule token = parse
       { LEFTPAR }
   | ")"
       { RIGHTPAR }
+  | "{"
+      { LEFTBRC }
+  | "}"
+      { RIGHTBRC }
   | ":"
       { COLON }
+  | ";"
+      { SEMICOLON }
   | "->"
       { ARROW }
   | "<->"
