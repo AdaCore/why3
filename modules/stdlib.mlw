@@ -7,9 +7,9 @@ module Ref
 
   parameter ref : v:'a -> {} ref 'a { result=v }
 
-  parameter get : r:ref 'a -> {} 'a reads r { result=r }
+  parameter (!) : r:ref 'a -> {} 'a reads r { result=r }
 
-  parameter set : r:ref 'a -> v:'a -> {} unit writes r { r=v }
+  parameter (:=) : r:ref 'a -> v:'a -> {} unit writes r { r=v }
 
 end
 

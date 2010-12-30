@@ -855,13 +855,13 @@ list1_program_decl:
 program_decl:
 | decl
     { Dlogic $1 }
-| LET lident labels list1_type_v_binder opt_cast EQUAL triple
+| LET lident_rich labels list1_type_v_binder opt_cast EQUAL triple
     { Dlet (add_lab $2 $3, mk_expr_i 7 (Efun ($4, cast_body $5 $7))) }
-| LET lident labels EQUAL FUN list1_type_v_binder ARROW triple
+| LET lident_rich labels EQUAL FUN list1_type_v_binder ARROW triple
     { Dlet (add_lab $2 $3, mk_expr_i 8 (Efun ($6, $8))) }
 | LET REC list1_recfun_sep_and
     { Dletrec $3 }
-| PARAMETER lident labels COLON type_v
+| PARAMETER lident_rich labels COLON type_v
     { Dparam (add_lab $2 $3, $5) }
 | EXCEPTION uident labels
     { Dexn (add_lab $2 $3, None) }
@@ -893,7 +893,7 @@ list1_recfun_sep_and:
 ;
 
 recfun:
-| lident labels list1_type_v_binder opt_cast opt_variant EQUAL triple
+| lident_rich labels list1_type_v_binder opt_cast opt_variant EQUAL triple
    { add_lab $1 $2, $3, $5, cast_body $4 $7 }
 ;
 

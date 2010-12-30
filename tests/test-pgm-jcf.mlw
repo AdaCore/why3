@@ -8,21 +8,19 @@ module P
 
   let incr (r : ref int) : unit =
     { }
-    set r (get r + 1)
+    r := !r + 1
     { r = old r + 1 }
 
   parameter r : ref int
 
-  let foo (x : int) = 
-    { x = 1 }
-    if x = 1 || absurd then 2 else 3
-    { result = 2 }
+  let rec (!!) (x : ref int) = 
+    { x>=0 } if !x > 0 then  begin x := !x - 1; !! x end { x=0 }
 
-  let f (r : ref int) =
+  let test (r : ref int) =
     { r = 0 }
     assert { r = 0 };
     incr r;
-    get r
+    !r
     { result = 1 }
 
 end
