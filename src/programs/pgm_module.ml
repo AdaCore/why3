@@ -89,16 +89,6 @@ let add_pervasives uc =
   in
   add_ty_decl uc [ts, Decl.Tabstract]
 
-let create_module n =
-  let uc = Theory.create_theory n in
-  (* let uc = add_pervasives uc in *)
-  { uc_name = id_register n;
-    uc_th = uc;
-    uc_decls = [];
-    uc_import = [empty_ns];
-    uc_export = [empty_ns];
-  }
-
 let open_namespace uc = match uc.uc_import with
   | ns :: _ -> { uc with
       uc_th     = Theory.open_namespace uc.uc_th;
@@ -144,6 +134,20 @@ let add_decl d uc =
 let add_logic_decl d uc =
   let th = Typing.with_tuples Theory.add_decl uc.uc_th d in
   { uc with uc_th = th }
+
+let ls_Exit = create_lsymbol (id_fresh "%Exit") [] (Some ty_exn)
+
+let create_module n =
+  let uc = Theory.create_theory n in
+  (* let uc = add_pervasives uc in *)
+  let m = { 
+    uc_name = id_register n;
+    uc_th = uc;
+    uc_decls = [];
+    uc_import = [empty_ns];
+    uc_export = [empty_ns]; } 
+  in
+  add_esymbol ls_Exit m
 
 (** Modules *)
 

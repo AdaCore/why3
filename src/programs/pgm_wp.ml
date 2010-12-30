@@ -227,7 +227,12 @@ let while_post_block env inv var lab e =
   let decphi = match var with
     | None ->
 	f_true
-    | Some (phi, r) ->
+    | Some (phi, None) ->
+	let old_phi = term_at env lab phi in
+	(* 0 <= old_phi and phi < old_phi *)
+	wp_and (f_app (find_ls env "infix <=") [t_int_const "0"; old_phi])
+	       (f_app (find_ls env "infix <")  [phi; old_phi])
+    | Some (phi, Some r) ->
 	f_app r [phi; term_at env lab phi]
   in
   let ql = default_exns_post e.expr_effect in

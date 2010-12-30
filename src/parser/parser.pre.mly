@@ -1190,8 +1190,8 @@ opt_raises:
 
 opt_variant:
 | /* epsilon */                   { None }
-| VARIANT annotation              { Some ($2, id_lt_nat ()) }
-| VARIANT annotation WITH lqualid { Some ($2, $4) }
+| VARIANT annotation              { Some ($2, None) }
+| VARIANT annotation WITH lqualid { Some ($2, Some $4) }
 ;
 
 opt_cast:

@@ -38,7 +38,7 @@ let test_not_1 () =
 
 let test_not_2 () =
   { x <= 0 }
-  while not (!x = 0) do invariant { !x <= 0 } incr x done
+  while not (!x = 0) do invariant { x <= 0 } incr x done
   { x = 0 }
 
 let test_all_1 () =

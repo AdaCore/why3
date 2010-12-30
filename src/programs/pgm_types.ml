@@ -59,6 +59,9 @@ let model_type ty = match ty.ty_node with
 
 (* types *)
 
+let ts_exn = Ty.create_tysymbol (id_fresh "exn") [] None
+let ty_exn = Ty.ty_app ts_exn []
+
 let ts_arrow = 
   let v = List.map (fun s -> create_tvsymbol (Ident.id_fresh s)) ["a"; "b"] in
   Ty.create_tysymbol (Ident.id_fresh "arrow") v None

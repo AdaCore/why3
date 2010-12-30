@@ -155,7 +155,7 @@ type assertion_kind = Aassert | Aassume | Acheck
 
 type lazy_op = LazyAnd | LazyOr
 
-type variant = lexpr * qualid
+type variant = lexpr * qualid option
 
 type loop_annotation = {
   loop_invariant : lexpr option;

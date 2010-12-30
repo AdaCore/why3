@@ -64,7 +64,7 @@ and dtype_c =
 
 and dbinder = ident * Denv.dty * dtype_v
 
-type dvariant = Denv.dterm * Term.lsymbol
+type dvariant = Denv.dterm * Term.lsymbol option
 
 type dloop_annotation = {
   dloop_invariant : Denv.dfmla option;
@@ -109,7 +109,7 @@ and dtriple = dpre * dexpr * dpost
 (*****************************************************************************)
 (* phase 2: removal of destructive types *)
 
-type variant = Term.term * Term.lsymbol
+type variant = Term.term * Term.lsymbol option
 
 type reference = R.t
 
@@ -153,7 +153,7 @@ type loop_annotation = {
 
 type label = Term.vsymbol
 
-type irec_variant = ivsymbol * Term.term * Term.lsymbol
+type irec_variant = ivsymbol * Term.term * Term.lsymbol option
 
 type ipattern = {
   ipat_pat  : Term.pattern;
@@ -205,7 +205,7 @@ and itriple = pre * iexpr * post
 (*****************************************************************************)
 (* phase 3: effect inference *)
 
-type rec_variant = pvsymbol * Term.term * Term.lsymbol
+type rec_variant = pvsymbol * Term.term * Term.lsymbol option
 
 type pattern = {
   ppat_pat  : Term.pattern;

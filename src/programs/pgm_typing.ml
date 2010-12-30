@@ -232,7 +232,7 @@ let dexception env qid =
   let sl = Typing.string_list_of_qualid [] qid in
   let loc = Typing.qloc qid in
   let _, _, ty as r = specialize_exception loc sl env.uc in
-  let ty_exn = dty_app (find_ts env.uc "exn", []) in
+  let ty_exn = dty_app (ts_exn, []) in
   if not (Denv.unify ty ty_exn) then
     errorm ~loc
       "this expression has type %a, but is expected to be an exception"
@@ -305,16 +305,23 @@ let rec add_local_pat env p = match p.dp_node with
   | Denv.Por (p, q) -> add_local_pat (add_local_pat env p) q
 
 let dvariant env (l, p) =
-  let s, _ = Typing.specialize_psymbol p (theory_uc env.uc) in
-  let loc = Typing.qloc p in
-  begin match s.ls_args with
-    | [t1; t2] when Ty.ty_equal t1 t2 ->
-	()
-    | _ ->
-	errorm ~loc "predicate %s should be a binary relation"
-	  s.ls_name.id_string
-  end;
-  dterm env.denv l, s
+  let t = dterm env.denv l in
+  match p with
+    | None ->
+	if not (Denv.unify t.dt_ty (dty_int env.uc)) then
+	  errorm ~loc:l.pp_loc "variant should have type int";
+	t, None
+    | Some p ->
+	let s, _ = Typing.specialize_psymbol p (theory_uc env.uc) in
+	let loc = Typing.qloc p in
+	begin match s.ls_args with
+	  | [t1; t2] when Ty.ty_equal t1 t2 ->
+	      ()
+	  | _ ->
+	      errorm ~loc "predicate %s should be a binary relation"
+		s.ls_name.id_string
+	end;
+	t, Some s
 
 let dloop_annotation env a =
   { dloop_invariant = option_map (dfmla env.denv) a.Ptree.loop_invariant;
@@ -583,10 +590,12 @@ let post env ((ty, f), ql) =
 
 let variant loc env (t, ps) =
   let t = Denv.term env t in
-  match ps.ls_args with
-    | [t1; _] when Ty.ty_equal t1 t.t_ty ->
+  match ps with
+    | None ->
 	t, ps
-    | [t1; _] ->
+    | Some { ls_args = [t1; _] } when Ty.ty_equal t1 t.t_ty ->
+	t, ps
+    | Some { ls_args = [t1; _] } ->
 	errorm ~loc "@[variant has type %a, but is expected to have type %a@]"
 	  Pretty.print_ty t.t_ty Pretty.print_ty t1
     | _ ->
@@ -873,9 +882,14 @@ and iletrec gl env dl =
 	let check_no_variant (_,_,var,(_,e,_)) = if var <> None then error e in
 	List.iter check_no_variant r
     | (_, _, Some (_, _, ps), _) :: r ->
+	let r_equal r1 r2 = match r1, r2 with
+	  | None, None -> true
+	  | Some ls1, Some ls2 -> ls_equal ls1 ls2
+	  | _ -> false
+	in
 	let check_variant (_,_,var,(_,e,_)) = match var with
 	  | None -> error e
-	  | Some (_, _, ps') -> if not (ls_equal ps ps') then
+	  | Some (_, _, ps') -> if not (r_equal ps ps') then
 	      errorm ~loc:e.iexpr_loc
 		"variants must share the same order relation"
 	in
@@ -1278,7 +1292,14 @@ and letrec gl env dl = (* : env * recfun list *)
       let c = Mvs.find i.i_pgm m in
       let c = match decvar, var with
 	| Some phi0, Some (_, phi, r) ->
-	    let decphi = f_app r [phi; t_var phi0] in
+	    let decphi = match r with
+	      | None -> (* 0 <= phi0 and phi < phi0 *)
+		  f_and (f_app (find_ls gl "infix <=") 
+			   [t_int_const "0"; t_var phi0])
+		    (f_app (find_ls gl "infix <")  [phi; t_var phi0])
+	      | Some r -> 
+		  f_app r [phi; t_var phi0] 
+	    in
 	    { c with c_pre = f_and decphi c.c_pre }
 	| _ ->
 	    c
@@ -1444,7 +1465,7 @@ let add_exception loc x ty uc =
   try
     let tyl = match ty with None -> [] | Some ty -> [ty] in
     let id = id_user x loc in
-    let ls = create_lsymbol id tyl (Some (ty_app (find_ts uc "exn") [])) in
+    let ls = create_lsymbol id tyl (Some (ty_app ts_exn [])) in
     add_esymbol ls uc
   with ClashSymbol _ ->
     errorm ~loc "clash with previous exception %s" x

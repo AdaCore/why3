@@ -1,5 +1,8 @@
 module M
 
+use import int.Int
+use import module stdlib.Ref
+
 exception Break
 
 let f (n : int) : int  =
@@ -8,7 +11,7 @@ let f (n : int) : int  =
   try
     while (!i > 0) do
       invariant { true }
-      variant { !i }
+      variant { i }
       if (!i <= 10) then raise Break;
       i := !i - 1
     done
