@@ -1,5 +1,7 @@
 module M
 
+  use import module stdlib.Ref
+
 (* Red-black trees *)
 
   type key = int
@@ -47,30 +49,30 @@ parameter add :
 let create d =
   { }
   let x = (d, Leaf) in ref x (* BUG: ref (d, Leaf) *)
-  { default !result = d and
-    forall k:key, v:value. mem !result k v <-> v = d }
+  { default result = d and
+    forall k:key, v:value. mem result k v <-> v = d }
 
-let replace m k v =
+let replace (m : ref rbt) k v =
   {} 
   let (d, t) = !m in
   m := (d, add t k v)
-  { default !m = default (old !m) and
+  { default m = default (old m) and
     forall k':key, v':value. 
-    mem !m k' v' <-> if k' = k then v' = v else mem (old !m) k' v' }
+    mem m k' v' <-> if k' = k then v' = v else mem (old m) k' v' }
 
-let lookup m k =
+let lookup (m : ref rbt) k =
   {} 
   let (d, t) = !m in
   try find t k with Not_found -> d end
-  { mem !m k result }
+  { mem m k result }
 
 (* the easy way: implements "remove" using "replace" *)
-let remove m k =
+let remove (m : ref rbt) k =
   { } 
   replace m k (default !m)
-  { default !m = default (old !m) and
+  { default m = default (old m) and
     forall k':key, v':value. 
-    mem !m k' v' <-> if k' = k then v' = default !m else mem (old !m) k' v' }
+    mem m k' v' <-> if k' = k then v' = default m else mem (old m) k' v' }
 
 end
 

@@ -1,13 +1,16 @@
 module M
 
+use import int.Int
+use import module stdlib.Ref
+
 (* for loop with invariant *)
 let test1 () =
   let x = ref 0 in
   for i = 1 to 10 do
-    invariant { !x = i-1 }
+    invariant { x = i-1 }
     x := !x + 1
   done;
-  assert { !x = 10 }
+  assert { x = 10 }
 
 (* we don't even enter *)
 let test2 () =
@@ -15,7 +18,7 @@ let test2 () =
   for i = 2 to 1 do
     x := 1
   done;
-  assert { !x = 0 }
+  assert { x = 0 }
 
 exception E
 
@@ -47,17 +50,17 @@ let test4 x =
 let test1d () =
   let x = ref 11 in
   for i = 10 downto 1 do
-    invariant { !x = i+1 }
+    invariant { x = i+1 }
     x := !x - 1
   done;
-  assert { !x = 1 }
+  assert { x = 1 }
 
 let test2d () =
   let x = ref 0 in
   for i = 1 downto 2 do
     x := 1
   done;
-  assert { !x = 0 }
+  assert { x = 0 }
 
 let test3d () =
   { }

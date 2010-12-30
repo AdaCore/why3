@@ -1,5 +1,7 @@
 module M
 
+  use import int.Int
+  use import module stdlib.Ref
   use array.ArrayLength as A
 
   type array 'a = A.t int 'a
@@ -41,35 +43,35 @@ module M
     forall x y:int. 0 <= x < size u -> 0 <= y < size u -> same u x y
 
 let get_num_classes (u:ref uf) =
-  {} num !u { result = num !u }
+  {} num !u { result = num u }
 
 let create (n:int) =
   { 0 <= n } 
   let l = ref (A.create_const_length 0 n) in
   let i = ref 0 in
   while !i < n do
-    invariant { 0 <= !i <= n and
-                forall j:int. 0 <= j < !i -> !l#j = j } 
-    variant { n - !i }
+    invariant { 0 <= i <= n and
+                forall j:int. 0 <= j < i -> l#j = j } 
+    variant { n - i }
     l := A.set !l !i !i;
     i := !i + 1
   done;
   ref (UF !l (A.create_const_length 0 n) n n)
-  { inv !result and
-    num !result = n and size !result = n and
-    forall x:int. 0 <= x < n -> repr !result x x }
+  { inv result and
+    num result = n and size result = n and
+    forall x:int. 0 <= x < n -> repr result x x }
 
-let path_compression u x r =
-  { inv !u and 0 <= x < size !u and dist !u # x > 0 and repr !u x r }
+let path_compression (u : ref uf) x r =
+  { inv u and 0 <= x < size u and dist u # x > 0 and repr u x r }
   let UF l d s n = !u in
   let l = A.set l x r in
   let d = A.set d x 1 in
   u := UF l d s n
-  { inv !u and size !u = size (old !u) and 
-    num !u = num (old !u) and same_reprs (old !u) !u }
+  { inv u and size u = size (old u) and 
+    num u = num (old u) and same_reprs (old u) u }
  
-let rec find (u:ref uf) (x:int) variant { dist !u # x } =
-  { inv !u and 0 <= x < size !u } 
+let rec find (u:ref uf) (x:int) variant { dist u # x } =
+  { inv u and 0 <= x < size u } 
   let y = A.get (link !u) x in
   if y <> x then begin
     let r = find u y in
@@ -77,10 +79,10 @@ let rec find (u:ref uf) (x:int) variant { dist !u # x } =
     r
   end else
     x
-  { inv !u and
-    repr !u x result and 
-    size !u = size (old !u) and num !u = num (old !u) and
-    same_reprs !u (old !u) } 
+  { inv u and
+    repr u x result and 
+    size u = size (old u) and num u = num (old u) and
+    same_reprs u (old u) } 
 
 (***
 

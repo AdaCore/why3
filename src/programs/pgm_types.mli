@@ -33,6 +33,8 @@ val ts_arrow : tysymbol
 val ts_exn : tysymbol
 val ty_exn : ty
 
+(* val ts_label : tysymbol *)
+
 (* program types *)
 module rec T : sig
 
@@ -159,6 +161,8 @@ and E : sig
   val subst : R.t Mpv.t -> t -> t
 
   val occur : R.t -> t -> bool
+
+  val print : Format.formatter -> t -> unit
 
 end 
 

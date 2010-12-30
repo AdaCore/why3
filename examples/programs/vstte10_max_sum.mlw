@@ -2,6 +2,8 @@ module M
 (* VSTTE'10 competition http://www.macs.hw.ac.uk/vstte10/Competition.html
    Problem 1: max and sum of an array *)
 
+  use import int.Int
+  use import module stdlib.Ref
   use array.ArrayLength as A
 
   type array 'a = A.t int 'a
@@ -13,7 +15,7 @@ let max_sum a n =
   let sum = ref 0 in
   let max = ref 0 in
   for i = 0 to n-1 do
-    invariant { !sum <= i * !max and forall j:int. 0 <= j < i -> a#j <= !max }
+    invariant { sum <= i * max and forall j:int. 0 <= j < i -> a#j <= max }
     if !max < a#i then max := a#i;
     sum := !sum + a#i
   done;

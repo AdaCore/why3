@@ -58,10 +58,10 @@ drivers () {
 programs () {
     for f in $1/*.mlw; do
 	echo -n "  "$f"... "
-	if ! $pgml $pgml_options $f > /dev/null 2>&1; then 
+	if ! $pgml -L modules $pgml_options $f > /dev/null 2>&1; then 
 	    echo 
 	    echo "$pgml $pgml_options $f"
-	    $pgml $pgml_options $f
+	    $pgml -L modules $pgml_options $f
 	    echo "FAILED!"
 	    exit 1 
         else 
@@ -73,7 +73,7 @@ programs () {
 bad_programs () {
     for f in $1/*.mlw; do
 	echo -n "  "$f"... "
-	if $pgml $pgml_options $f > /dev/null 2>&1; then 
+	if $pgml -L modules $pgml_options $f > /dev/null 2>&1; then 
 	    echo 
 	    echo "$pgml $pgml_options $f"
 	    echo "SHOULD FAIL!"
@@ -87,10 +87,10 @@ bad_programs () {
 valid_goals () {
     for f in $1/*.mlw; do
 	echo -n "  "$f"... "
-	if $pgml -P alt-ergo $f | grep -q -v Valid; then
+	if $pgml -L modules -P alt-ergo $f | grep -q -v Valid; then
 	    echo "valid test $f failed!"
 	    echo "$pgml -P alt-ergo $f"
-	    $pgml -P alt-ergo $f
+	    $pgml -L modules -P alt-ergo $f
 	    exit 1
        else 
 	    echo "ok"
@@ -102,7 +102,7 @@ valid_goals () {
 test_provers () {
     for f in $1/*.mlw; do
 	echo -n "  "$f"... "
-	if $pgml -P alt-ergo $f | grep -q -v Valid; then
+	if $pgml -L modules -P alt-ergo $f | grep -q -v Valid; then
 	    echo "valid test $f failed!"
 	    exit 1
        else 
@@ -121,10 +121,6 @@ test_prover () {
 
 echo "=== Checking drivers ==="
 drivers drivers
-echo ""
-
-echo "=== Checking valid goals ==="
-valid_goals bench/valid
 echo ""
 
 echo "=== Parsing good files  ==="
@@ -167,6 +163,10 @@ echo "=== VC generation on good programs ==="
 pgml_options=
 programs bench/programs/good
 programs examples/programs
+echo ""
+
+echo "=== Checking valid goals ==="
+valid_goals bench/valid
 echo ""
 
 echo "=== Checking provers ==="

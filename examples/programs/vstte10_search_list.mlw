@@ -2,6 +2,8 @@ module M
 (* VSTTE'10 competition http://www.macs.hw.ac.uk/vstte10/Competition.html
    Problem 3: searching a linked list *)
 
+  use import int.Int
+  use import module stdlib.Ref
   use export list.List
   use export list.Length
   use export list.Nth
@@ -50,10 +52,10 @@ let search_loop l =
   let s = ref l in
   while !s <> Nil && head !s <> 0 do
     invariant { 
-      0 <= !i and !i + length !s = length l and
-      (forall j:int. 0 <= j -> nth j !s = nth (!i + j) l) and
-      forall j:int. 0 <= j < !i -> nth j l <> Some 0 }
-    variant { length !s }
+      0 <= i and i + length s = length l and
+      (forall j:int. 0 <= j -> nth j s = nth (i + j) l) and
+      forall j:int. 0 <= j < i -> nth j l <> Some 0 }
+    variant { length s }
     i := !i + 1;
     s := tail !s
   done;

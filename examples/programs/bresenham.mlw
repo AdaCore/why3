@@ -3,6 +3,7 @@ module M
 (* Bresenham line drawing algorithm. *)
 
 use import int.Int
+use import module stdlib.Ref
 
 (*  Parameters. 
     Without loss of generality, we can take [x1=0] and [y1=0]. 
@@ -38,10 +39,10 @@ let bresenham () =
   let y = ref 0 in
   let e = ref (2 * y2 - x2) in
   while !x <= x2 do
-    invariant {0 <= !x and !x <= x2 + 1 and invariant_ !x !y !e }
-    variant   { x2 + 1 - !x }
+    invariant {0 <= x and x <= x2 + 1 and invariant_ x y e }
+    variant   { x2 + 1 - x }
     (* here we would plot (x, y) *) 
-    assert { best !x !y };
+    assert { best x y };
     if !e < 0 then
       e := !e + 2 * y2
     else begin

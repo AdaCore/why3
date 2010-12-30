@@ -68,7 +68,7 @@ let find_ls uc s = ns_find_ls (get_namespace (theory_uc uc)) [s]
 let dty_bool uc = dty_app (find_ts uc "bool", [])
 let dty_int _uc = dty_app (Ty.ts_int, [])
 let dty_unit _uc = dty_app (ts_tuple 0, [])
-let dty_label uc = dty_app (find_ts uc "label", [])
+let dty_label uc = dty_app (find_ts uc "label_", [])
 
 (* note: local variables are simultaneously in locals (to type programs)
    and in denv (to type logic elements) *)
@@ -827,7 +827,7 @@ and iexpr_desc gl env loc ty = function
       let f = Denv.fmla (lenv env) f in
       IEassert (k, f)
   | DElabel (s, e1) ->
-      let ty = Ty.ty_app (find_ts gl "label") [] in
+      let ty = Ty.ty_app (find_ts gl "label_") [] in
       let v = create_ivsymbol (id_fresh s) ty in
       let env = Mstr.add s v env in
       IElabel (v.i_pgm, iexpr gl env e1)

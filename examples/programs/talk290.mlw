@@ -4,6 +4,8 @@ module M
 
 (* answer: 20444710234716473 *)
 
+  use import int.Int
+  use import module stdlib.Ref
   use import int.EuclideanDivision
   use import int.Power
 
@@ -68,8 +70,8 @@ let rec f m a b =
     let sum = ref 0 in
     let c = ref 0 in
     while !c <= 9 do (* n = 10n' + c *)
-      invariant { 0 <= !c <= 10 and !sum = P.num_of (a,b,!c) 0 (power 10 m) } 
-      variant   { 10 - !c }
+      invariant { 0 <= c <= 10 and sum = P.num_of (a,b,c) 0 (power 10 m) } 
+      variant   { 10 - c }
       let x = 137 * !c + a in
       let q = div x 10 in
       let r = mod x 10 in

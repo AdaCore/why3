@@ -1,5 +1,7 @@
 module M
 
+  use import module stdlib.Ref
+
   type key = int
   type value = int
   type rbt
@@ -10,30 +12,30 @@ parameter create :
   d:value ->
   {}
   ref rbt
-  { default !result = d and
-    forall k:key, v:value. mem !result k v <-> v = d }
+  { default result = d and
+    forall k:key, v:value. mem result k v <-> v = d }
 
 parameter replace :
   m:ref rbt -> k:key -> v:value ->
   {}
   unit writes m
-  { default !m = default (old !m) and
+  { default m = default (old m) and
     forall k':key, v':value.
-    mem !m k' v' <-> if k' = k then v' = v else mem (old !m) k' v' }
+    mem m k' v' <-> if k' = k then v' = v else mem (old m) k' v' }
 
 parameter lookup :
   m:ref rbt -> k:key ->
   {}
   value reads m
-  { mem !m k result }
+  { mem m k result }
 
 parameter remove :
   m:ref rbt -> k:key ->
   {}
   unit writes m
-  { default !m = default (old !m) and
+  { default m = default (old m) and
     forall k':key, v':value.
-    mem !m k' v' <-> if k' = k then v' = default !m else mem (old !m) k' v' }
+    mem m k' v' <-> if k' = k then v' = default m else mem (old m) k' v' }
 
 let harness () =
   let a = create 0 in

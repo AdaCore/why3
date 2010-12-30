@@ -2,6 +2,8 @@ module M
 (* VSTTE'10 competition http://www.macs.hw.ac.uk/vstte10/Competition.html
    Problem 4: N-queens *)
 
+  use import int.Int
+  use import module stdlib.Ref
   use array.ArrayLength as A
 
   type array 'a = A.t int 'a
@@ -9,10 +11,10 @@ module M
   logic (#) (a : array 'a) (i : int) : 'a = A.get a i
 
 let array_get (a : ref (array 'a)) i = 
-  { 0 <= i < A.length !a } A.get !a i { result = A.get !a i }
+  { 0 <= i < A.length a } A.get !a i { result = A.get a i }
 
 let array_set (a : ref (array 'a)) i v = 
-  { 0 <= i < A.length !a } a := A.set !a i v { !a = A.set (old !a) i v }
+  { 0 <= i < A.length a } a := A.set !a i v { a = A.set (old a) i v }
 
   logic consistent_row (board : array int) (pos : int) (q : int) = 
     board#q <> board#pos and
@@ -28,15 +30,15 @@ let array_set (a : ref (array 'a)) i v =
 
 exception Inconsistent
 
-let check_is_consistent board pos =
-  { 0 <= pos < A.length !board }
+let check_is_consistent (board : ref (array int)) pos =
+  { 0 <= pos < A.length board }
   try
     for q = 0 to pos-1 do
-      invariant { forall j:int. 0 <= j < q -> consistent_row !board pos j }
+      invariant { forall j:int. 0 <= j < q -> consistent_row board pos j }
       let bq   = array_get board q   in
       let bpos = array_get board pos in
       if bq = bpos then begin
-        assert { not (consistent_row !board pos q) }; (* to help the provers *)
+        assert { not (consistent_row board pos q) }; (* to help the provers *)
 	raise Inconsistent 
       end;
       if bq - bpos = pos - q then raise Inconsistent;
@@ -46,7 +48,7 @@ let check_is_consistent board pos =
   with Inconsistent ->
     False
   end
-  { result=True <-> is_consistent !board pos }
+  { result=True <-> is_consistent board pos }
 
   logic is_board (board : array int) (pos : int) =
     forall q:int. 0 <= q < pos -> 0 <= board#q < A.length board
@@ -81,31 +83,31 @@ let check_is_consistent board pos =
 exception Solution
 
 let rec bt_queens (board : ref (array int)) n pos variant { n - pos } =
-  { A.length !board = n and 0 <= pos <= n and solution !board pos }
-  label Init:
+  { A.length board = n and 0 <= pos <= n and solution board pos }
+  label Init:( (* FIXME *)
   if pos = n then raise Solution;
   for i = 0 to n - 1 do
     invariant { 
-      A.length !board = n and eq_board !board (at !board Init) pos and
+      A.length board = n and eq_board board (at board Init) pos and
       forall b:array int. A.length b = n -> is_board b n -> 
-        eq_board !board b pos -> 0 <= b#pos < i -> not (solution b n) }
+        eq_board board b pos -> 0 <= b#pos < i -> not (solution b n) }
     array_set board pos i;
-    assert { eq_board !board (at !board Init) pos };
+    assert { eq_board board (at board Init) pos };
     if check_is_consistent board pos then bt_queens board n (pos+1)
-  done
+  done)
   { (* no solution *) 
-    A.length !board = n and eq_board !board (old !board) pos and
+    A.length board = n and eq_board board (old board) pos and
     forall b:array int. A.length b = n -> is_board b n -> 
-      eq_board !board b pos -> not (solution b n) }
+      eq_board board b pos -> not (solution b n) }
   | Solution -> 
   { (* a solution *)
-    solution !board n }
+    solution board n }
 
-let queens board n =
-  { A.length !board = n }
+let queens (board : ref (array int)) n =
+  { A.length board = n }
   bt_queens board n 0
   { forall b:array int. A.length b = n -> is_board b n -> not (solution b n) }
-  | Solution -> { solution !board n }
+  | Solution -> { solution board n }
 
 end
 

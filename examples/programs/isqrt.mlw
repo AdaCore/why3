@@ -1,5 +1,8 @@
 module M
 
+  use import int.Int
+  use import module stdlib.Ref
+
 logic sqr (x:int) : int = x * x
 
 let isqrt (x:int) =
@@ -7,10 +10,10 @@ let isqrt (x:int) =
   let count = ref 0 in
   let sum = ref 1 in
   while !sum <= x do
-    invariant { !count >= 0 and
-                x >= sqr !count and
-                !sum = sqr (!count+1) }
-    variant { x - !sum }
+    invariant { count >= 0 and
+                x >= sqr count and
+                sum = sqr (count+1) }
+    variant { x - sum }
     count := !count + 1;
     sum := !sum + 2 * !count + 1
   done;
@@ -19,3 +22,8 @@ let isqrt (x:int) =
 
 end
 
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/isqrt"
+End: 
+*)

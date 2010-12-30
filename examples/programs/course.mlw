@@ -1,5 +1,8 @@
 module M
 
+  use import int.Int
+  use import module stdlib.Ref
+ 
   (* preliminaries *)
 
   use array.Array as A
@@ -31,7 +34,7 @@ parameter new_pointer : tt:unit ->
   { }
   pointer
   writes alloc
-  { !alloc = old !alloc + 1 and result = old !alloc }
+  { alloc = old alloc + 1 and result = old alloc }
 
 (*
 record Student =
@@ -128,9 +131,9 @@ let createCourse (r: (ref (region course))) : pointer =
     let (rStud,student,count,sum) = A.get !r c in
     let newc = (rStud,student,0,0) in
     r := A.set !r c newc;
-    assert { invCourse !alloc newc };
+    assert { invCourse alloc newc };
     c
-  { valid !alloc result }
+  { valid alloc result }
 
 (*
 fun RegisterStudent(R:[Course], c: [R], name: string): [R.Rstud]
@@ -149,15 +152,15 @@ fun RegisterStudent(R:[Course], c: [R], name: string): [R.Rstud]
 
 let registerStudent
     (r: (ref (region course))) (c:pointer) (name:string) : pointer =
-{ valid !alloc c and invCourse !alloc (A.get !r c) }
+{ valid alloc c and invCourse alloc (A.get r c) }
   let s = new_pointer () in
   let (rStud,student,count,sum) = A.get !r c in
   let newstud = (name,0) in
   let newc = (A.set rStud s newstud,A.set student count s,count+1,sum) in
   r := A.set !r c newc;
-  assert { invCourse !alloc newc };
+  assert { invCourse alloc newc };
   s
-{ valid !alloc result }
+{ valid alloc result }
 
 (*
 
@@ -178,8 +181,8 @@ fun SetMark(R:Course, c:[R], s: [c.Rstud], mark: int) : unit
 
 end
 
-
-
-
-
-
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/course"
+End: 
+*)

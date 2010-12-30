@@ -41,7 +41,9 @@ let debug = Debug.register_flag "program_wp"
 let wp_and ?(sym=false) f1 f2 =
 (*   if sym then f_and_simp f1 f2 else f_and_simp f1 (f_implies_simp f1 f2)  *)
   let f = f_and_simp f1 f2 in
-  if sym then f else f_label_add (Split_goal.asym_split) f
+  match f.f_node with
+    | Fbinop (Fand, _, _) when not sym -> f_label_add Split_goal.asym_split f
+    | _ -> f
 
 let wp_ands ?(sym=false) fl =
   List.fold_left (wp_and ~sym) f_true fl
@@ -123,7 +125,7 @@ and unref_term env r v t = match r, t.t_node with
 
 (* quantify over all references in ef *)
 let quantify ?(all=false) env ef f =
-  (* eprintf "quantify: ef= f=%a@." (\* E.print ef *\) Pretty.print_fmla f; *)
+  (* eprintf "quantify: ef=%a f=%a@." E.print ef Pretty.print_fmla f; *)
   let quantify1 r f =
     let ty = R.type_of r in
     let v = create_vsymbol (id_clone (R.name_of r)) ty in
@@ -257,8 +259,8 @@ let t_True env =
   t_app (find_ls env "True") [] (ty_app (find_ts env "bool") [])
 
 let rec wp_expr env e q =
-  (* if Debug.test_flag debug then  *)
-  (*   eprintf "@[wp_expr: q=%a@]@." Pretty.print_fmla (snd (fst q)); *)
+  if Debug.test_flag debug then
+    eprintf "@[wp_expr: q=%a@]@." Pretty.print_fmla (snd (fst q));
   let lab = fresh_label env in
   let q = post_map (old_label env lab) q in
   let f = wp_desc env e q in

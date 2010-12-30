@@ -1,5 +1,8 @@
 module M
 
+  use import int.Int
+  use import module stdlib.Ref
+
 (* Fibonacci function with memoisation *)
 
 (*
@@ -25,7 +28,7 @@ parameter table : ref table
 
 parameter add : 
   x:int -> y:int -> 
-    {} unit writes table { !table = A.set (old !table) x (Some y) }
+    {} unit writes table { table = A.set (old table) x (Some y) }
 
 exception Not_found
 
@@ -33,22 +36,22 @@ parameter find :
   x:int -> 
    {} 
    int reads table raises Not_found 
-   { A.get !table x = Some result } 
-   | Not_found -> { A.get !table x = None }
+   { A.get table x = Some result } 
+   | Not_found -> { A.get table x = None }
   
 let rec fibo n =
-  { 0 <= n and inv !table }
+  { 0 <= n and inv table }
   if n <= 1 then
     1
   else 
     memo_fibo (n-1) + memo_fibo (n-2)
-  { result = fib n and inv !table }
+  { result = fib n and inv table }
 
 with memo_fibo n =
-  { 0 <= n and inv !table }
+  { 0 <= n and inv table }
   try  find n
   with Not_found -> let fn = fibo n in add n fn; fn end
-  { result = fib n and inv !table }
+  { result = fib n and inv table }
 
 end
 

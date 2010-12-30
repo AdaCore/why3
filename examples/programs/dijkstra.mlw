@@ -1,5 +1,7 @@
 module M
 
+  use import int.Int
+  use import module stdlib.Ref
   use set.Fset as S
   use array.Array as M
 
@@ -9,13 +11,13 @@ parameter set_has_next :
   s:ref (S.t 'a) -> 
     {} 
     bool reads s 
-    { if result=True then S.is_empty !s else not S.is_empty !s }
+    { if result=True then S.is_empty s else not S.is_empty s }
 
 parameter set_next :
   s:ref (S.t 'a) -> 
-    { not S.is_empty !s }
+    { not S.is_empty s }
     'a writes s 
-    { S.mem result (old !s) and !s = S.remove result (old !s) }
+    { S.mem result (old s) and s = S.remove result (old s) }
 
 (* the graph *)
 
@@ -41,7 +43,7 @@ parameter eq_vertex :
 parameter visited : ref (S.t vertex)
 
 parameter visited_add : 
-  x:vertex -> {} unit writes visited { !visited = S.add x (old !visited) }
+  x:vertex -> {} unit writes visited { visited = S.add x (old visited) }
 
 (* current distances *)
 
@@ -55,15 +57,15 @@ parameter q_is_empty :
   unit -> 
     {} 
     bool reads q 
-    { if result=True then S.is_empty !q else not S.is_empty !q }
+    { if result=True then S.is_empty q else not S.is_empty q }
 
 parameter init :
   src:vertex ->
     {} 
     unit writes visited q d 
-    { S.is_empty !visited and 
-      !q = S.add src S.empty and 
-      !d = M.set (old !d) src 0  }
+    { S.is_empty visited and 
+      q = S.add src S.empty and 
+      d = M.set (old d) src 0  }
 
 let relax u v =
   {}
@@ -75,16 +77,16 @@ let relax u v =
       q := S.add v !q;
       d := M.set !d v x
     end
-  { (S.mem v !visited and !q = old !q and !d = old !d) 
+  { (S.mem v visited and q = old q and d = old d) 
     or
-    (S.mem v !q and M.get !d u + weight u v >= M.get !d v and 
-        !q = old !q and !d = old !d) 
+    (S.mem v q and M.get d u + weight u v >= M.get d v and 
+        q = old q and d = old d) 
     or	
-    (S.mem v !q  and M.get (old !d) u + weight u v < M.get (old !d) v and 
-        !q = old !q and !d = M.set (old !d) v (M.get (old !d) u + weight u v))
+    (S.mem v q  and M.get (old d) u + weight u v < M.get (old d) v and 
+        q = old q and d = M.set (old d) v (M.get (old d) u + weight u v))
     or
-    (not S.mem v !visited and not S.mem v (old !q) and !q = S.add v (old !q) and
-        !d = M.set (old !d) v (M.get (old !d) u + weight u v)) }	
+    (not S.mem v visited and not S.mem v (old q) and q = S.add v (old q) and
+        d = M.set (old d) v (M.get (old d) u + weight u v)) }	
 
 logic min (m:vertex) (q:S.t vertex) (d:M.t vertex int) =
   S.mem m q and 
@@ -92,9 +94,9 @@ logic min (m:vertex) (q:S.t vertex) (d:M.t vertex int) =
 
 parameter q_extract_min :
   unit ->
-    { not S.is_empty !q } 
+    { not S.is_empty q } 
     vertex reads d writes q 
-    { min result (old !q) !d and !q = S.remove result (old !q) }
+    { min result (old q) d and q = S.remove result (old q) }
 
 (* paths and shortest paths 
    path x y d = 
@@ -184,26 +186,26 @@ let shortest_path_code (src:vertex) (dst:vertex) =
   { S.mem src v and S.mem dst v }
   init src;
   while not (q_is_empty ()) do
-    invariant { inv src !visited !q !d and inv_succ src !visited !q }
-    variant   { S.cardinal v - S.cardinal !visited }
+    invariant { inv src visited q d and inv_succ src visited q }
+    variant   { S.cardinal v - S.cardinal visited }
     let u = q_extract_min () in
-    assert { shortest_path src u (M.get !d u) };
+    assert { shortest_path src u (M.get d u) };
     visited_add u;
     let su = ref (g_succ u) in
     while not (set_has_next su) do 
       invariant 
-	{  S.subset !su (g_succ u) and
- 	   inv src !visited !q !d and inv_succ2 src !visited !q u !su }
-      variant { S.cardinal !su }
+	{  S.subset su (g_succ u) and
+ 	   inv src visited q d and inv_succ2 src visited q u su }
+      variant { S.cardinal su }
       let v = set_next su in
       relax u v
     done
   done
   { (forall v:vertex. 
-       S.mem v !visited -> shortest_path src v (M.get !d v)) 
+       S.mem v visited -> shortest_path src v (M.get d v)) 
     and
     (forall v:vertex. 
-       not S.mem v !visited -> forall dv:int. not path src v dv) }
+       not S.mem v visited -> forall dv:int. not path src v dv) }
 
 end
 

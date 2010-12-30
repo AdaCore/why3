@@ -1,5 +1,7 @@
 module M
 
+  use import int.Int
+
 (**** McCarthy's ``91'' function. *)
 
 let rec f91 (n:int) : int variant { 101-n } =
@@ -13,6 +15,8 @@ let rec f91 (n:int) : int variant { 101-n } =
 
 (* non-recursive version *)
 
+  use import module stdlib.Ref
+
   logic f (x:int) : int =
     if x >= 101 then x-10 else 91
 
@@ -22,15 +26,17 @@ let rec f91 (n:int) : int variant { 101-n } =
   axiom Iter_def : forall n x : int. iter_f n x =
     if n <= 0 then x else iter_f (n-1) (f x)
 
+  logic lt_nat (x y:int) = 0 <= y and x < y
+
   clone import relations.Lex with type t1 = int, type t2 = int,
     logic rel1 = lt_nat, logic rel2 = lt_nat
 
 let f91_nonrec (n x : ref int) =
-  { !n >= 1 }
+  { n >= 1 }
   label L:
   while !n > 0 do
-    invariant { !n >= 0 and iter_f !n !x = iter_f (at !n L) (at !x L) }
-    variant { (101 - !x + 10 * !n, !n) } with lex 
+    invariant { n >= 0 and iter_f n x = iter_f (at n L) (at x L) }
+    variant { (101 - x + 10 * n, n) } with lex 
     if !x > 100 then begin
       x := !x - 10;
       n := !n - 1
@@ -40,7 +46,7 @@ let f91_nonrec (n x : ref int) =
     end
   done;
   !x
-  { result = iter_f (old !n) (old !x) }
+  { result = iter_f (old n) (old x) }
 
 end
 

@@ -10,7 +10,7 @@ parameter b1 : ref int
 parameter b2 : ref int
 
 let f () = 
-  {} b := 1 - !b; !b { result = !b and !b = 1 - old(!b) }
+  {} b := 1 - !b; !b { result = b and b = 1 - old b }
 
 let k () = 
   {} 
@@ -19,7 +19,7 @@ let k () =
     b1 := (1 - (f ())) + (f ());
     b2 := (f ()) * (1 - (f ())) 
   end
-  { !b1 = 0 and !b2 = 1 }
+  { b1 = 0 and b2 = 1 }
 
 end
 

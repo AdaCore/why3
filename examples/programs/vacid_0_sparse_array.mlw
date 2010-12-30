@@ -20,6 +20,8 @@ back  +-+-+-+-------------------+
 
 *)
 
+  use import int.Int
+  use import module stdlib.Ref
   use array.ArrayLength as A
 
   logic maxlen : int = 1000
@@ -97,8 +99,8 @@ parameter malloc : n:int -> {} array 'a { A.length result = n }
 let create sz =
   { 0 <= sz <= maxlen }
   ref (SA (malloc sz) (malloc sz) (malloc sz) sz 0)
-  { invariant_ !result and
-    sa_sz !result = sz and forall i:int. model !result i = default }
+  { invariant_ result and
+    sa_sz result = sz and forall i:int. model result i = default }
 
 let array_get (a : array 'a) i =
   { 0 <= i < A.length a } A.get a i { result = A.get a i }
@@ -106,14 +108,14 @@ let array_get (a : array 'a) i =
 let array_set (a : array 'a) i v =
   { 0 <= i < A.length a } A.set a i v { result = A.set a i v }
 
-let test a i =
-  { 0 <= i < sa_sz !a and invariant_ !a }
+let test (a : ref sparse_array) i =
+  { 0 <= i < sa_sz a and invariant_ a }
   let idx = sa_idx !a in
   let back = sa_back !a in
   let n = sa_n !a in
   0 <= array_get idx i && array_get idx i < n &&
   array_get back (array_get idx i) = i
-  { result=True <-> is_elt !a i }
+  { result=True <-> is_elt a i }
 
 (*
 parameter get :
@@ -122,14 +124,14 @@ parameter get :
     elt reads a
     { result = model !a i }
 *)
-let get a i =
-  { 0 <= i < sa_sz !a and invariant_ !a }
+let get (a : ref sparse_array) i =
+  { 0 <= i < sa_sz a and invariant_ a }
   let val = sa_val !a in
   if test a i then
     array_get val i
   else
     default
-  { result = model !a i }
+  { result = model a i }
 
 (*
 parameter set :
@@ -141,8 +143,8 @@ parameter set :
       model !a i = v and
       forall j:int. j <> i -> model !a j = model (old !a) j }
 *)
-let set a i v =
-  { 0 <= i < sa_sz !a and invariant_ !a }
+let set (a : ref sparse_array) i v =
+  { 0 <= i < sa_sz a and invariant_ a }
   (* let SA val idx back sz n = !a in *)
   let val = sa_val !a in
   let idx = sa_idx !a in
@@ -158,10 +160,10 @@ let set a i v =
     let back = array_set back n i in
     a := SA val idx back sz (n+1)
   end
-  { invariant_ !a and
-    sa_sz !a = sa_sz (old !a) and
-    model !a i = v and
-    forall j:int. j <> i -> model !a j = model (old !a) j }
+  { invariant_ a and
+    sa_sz a = sa_sz (old a) and
+    model a i = v and
+    forall j:int. j <> i -> model a j = model (old a) j }
 
 let harness () =
   let a = create 10 in

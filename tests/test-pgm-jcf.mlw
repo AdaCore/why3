@@ -1,27 +1,20 @@
 
 module P
 
-  use import programs.Prelude
   use import int.Int
-  
-  use export module stdlib.Ref
+  use import module stdlib.Ref
 
-  let incr (r : ref int) : unit =
-    { }
-    r := !r + 1
-    { r = old r + 1 }
+  parameter b : ref int
 
-  parameter r : ref int
+  let f () = 
+    { b>0 } !b + 1 { result > b }
 
-  let rec (!!) (x : ref int) = 
-    { x>=0 } if !x > 0 then  begin x := !x - 1; !! x end { x=0 }
+  use import module stdlib.Array
 
-  let test (r : ref int) =
-    { r = 0 }
-    assert { r = 0 };
-    incr r;
-    !r
-    { result = 1 }
+  let test (a : array int) =
+    { A.length a >= 1 }
+    Array.get a 0
+    { result = a#0 }
 
 end
 

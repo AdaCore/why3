@@ -62,6 +62,8 @@ let model_type ty = match ty.ty_node with
 let ts_exn = Ty.create_tysymbol (id_fresh "exn") [] None
 let ty_exn = Ty.ty_app ts_exn []
 
+(* let ts_label = Ty.create_tysymbol (id_fresh "label") [] None *)
+
 let ts_arrow = 
   let v = List.map (fun s -> create_tvsymbol (Ident.id_fresh s)) ["a"; "b"] in
   Ty.create_tysymbol (Ident.id_fresh "arrow") v None
@@ -441,8 +443,8 @@ end = struct
   open Format
 
   let print fmt = function
-    | Rlocal  v -> Pretty.print_vs fmt v.T.pv_vs
-    | Rglobal s -> Pretty.print_ls fmt s.T.p_ls
+    | Rlocal  v -> fprintf fmt "%a(l)" Pretty.print_vs v.T.pv_vs
+    | Rglobal s -> fprintf fmt "%a(g)" Pretty.print_ls s.T.p_ls
 
 end
 

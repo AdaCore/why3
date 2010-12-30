@@ -1,7 +1,7 @@
 
-module Ref
+(* References *)
 
-  use import programs.Prelude
+module Ref
 
   mutable type ref 'a model 'a
 
@@ -10,6 +10,27 @@ module Ref
   parameter (!) : r:ref 'a -> {} 'a reads r { result=r }
 
   parameter (:=) : r:ref 'a -> v:'a -> {} unit writes r { r=v }
+
+end
+
+(* Arrays *)
+
+module Array
+
+  use import int.Int
+  use array.ArrayLength as A
+
+  mutable type array 'a model A.t int 'a
+
+  logic (#) (a : A.t int 'a) (i : int) : 'a = A.get a i
+
+  parameter get : a : array 'a -> i:int ->
+    { 0 <= i < A.length a } 'a reads a { result = A.get a i }
+
+  parameter set : a : array 'a -> i:int -> v:'a ->
+    { 0 <= i < A.length a } unit writes a { a = A.set (old a) i v }
+
+  parameter length : a : array 'a -> {} int reads a { result = A.length a }
 
 end
 

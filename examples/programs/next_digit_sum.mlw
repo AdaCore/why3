@@ -9,6 +9,8 @@ module M
    Ocaml code given at the end of file.
 *)
 
+  use import int.Int
+  use import module stdlib.Ref
   use array.ArrayLength as A
   use import int.MinMax
   use import int.EuclideanDivision
@@ -65,10 +67,10 @@ module M
     i < j -> interp9 (A.set x i 9) i j = interp9 x (i+1) j
 
 let array_get (a : ref array) i = 
-  { 0 <= i < A.length !a } A.get !a i { result = A.get !a i }
+  { 0 <= i < A.length a } A.get !a i { result = A.get a i }
 
 let array_set (a : ref array) i v = 
-  { 0 <= i < A.length !a } a := A.set !a i v { !a = A.set (old !a) i v }
+  { 0 <= i < A.length a } a := A.set !a i v { a = A.set (old a) i v }
 
 parameter x : ref (array)
 
@@ -88,22 +90,22 @@ exception Success
    (and termination, implicitely proved since we only have for loops) *)
 
 let search_safety () = 
-  { A.length !x = m }
+  { A.length x = m }
   label Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
     s := !s + array_get x i 
   done;
   for d = 0 to m - 1 do
-    invariant { A.length !x = m } 
+    invariant { A.length x = m } 
     for c = array_get x d + 1 to 9 do
-      invariant { A.length !x = m } 
+      invariant { A.length x = m } 
       let delta = y - !s - c + array_get x d in
       if 0 <= delta && delta <= 9 * d then begin
         array_set x d c;
 	let k = div delta 9 in
         for i = 0 to d - 1 do 
-          invariant { A.length !x = m } 
+          invariant { A.length x = m } 
           if i < k then array_set x i 9
 	  else if i = k then array_set x i (mod delta 9)
           else array_set x i 0
@@ -123,44 +125,44 @@ let search_safety () =
     forall k : int. 0 <= k < m -> 0 <= x#k <= 9
 
 let search () =
-  { A.length !x = m and is_integer !x }
+  { A.length x = m and is_integer x }
   label Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
-    invariant { !s = sum !x 0 i } 
+    invariant { s = sum x 0 i } 
     s := !s + array_get x i 
   done;
-  assert { !s = sum !x 0 m };
+  assert { s = sum x 0 m };
   for d = 0 to m - 1 do
     invariant { 
-      !x = at !x Init and
-      !s = sum !x d m 
+      x = at x Init and
+      s = sum x d m 
     } 
     for c = array_get x d + 1 to 9 do
-      invariant { !x = at !x Init } 
+      invariant { x = at x Init } 
       let delta = y - !s - c + array_get x d in
       if 0 <= delta && delta <= 9 * d then begin
         array_set x d c;
-        assert { sum !x d m = y - delta };
+        assert { sum x d m = y - delta };
 	let k = div delta 9 in
         assert { k <= d };
         for i = 0 to d - 1 do 
-          invariant { A.length !x = m and is_integer !x and
-                      sum !x d m = y - delta and
-                      sum !x 0 i = if i <= k then 9*i else delta } 
+          invariant { A.length x = m and is_integer x and
+                      sum x d m = y - delta and
+                      sum x 0 i = if i <= k then 9*i else delta } 
           if i < k then array_set x i 9
 	  else if i = k then array_set x i (mod delta 9)
           else array_set x i 0
         done;
         (* assume { sum !x 0 d = delta }; *)
-        assert { sum !x 0 d = delta };
+        assert { sum x 0 d = delta };
         raise Success
       end
     done;
     s := !s - array_get x d
   done
   { true } 
-  | Success -> { is_integer !x and sum !x 0 m = y }
+  | Success -> { is_integer x and sum x 0 m = y }
 
 (* 3. Correctness, part 2: we now prove that, on success, x contains the
    smallest integer > old(x) with digit sum y 
@@ -244,64 +246,64 @@ let search () =
     exists u : int. nb_digits u = m and sum_digits u = y
 
 let search_smallest () =
-  { A.length !x = m and is_integer !x and
+  { A.length x = m and is_integer x and
     (* x has at most n digits *) 
-    forall k : int. n <= k < m -> !x # k = 0
+    forall k : int. n <= k < m -> x # k = 0
   }
   label Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
-    invariant { !s = sum !x 0 i } 
+    invariant { s = sum x 0 i } 
     s := !s + array_get x i 
   done;
-  assert { !s = sum !x 0 m };
+  assert { s = sum x 0 m };
   for d = 0 to m - 1 do
     invariant { 
-      !x = at !x Init and
-      !s = sum !x d m and
+      x = at x Init and
+      s = sum x d m and
       forall u : int. 
-         interp (at !x Init) 0 m < u <= interp9 !x d m -> sum_digits u <> y
+         interp (at x Init) 0 m < u <= interp9 x d m -> sum_digits u <> y
     } 
     for c = array_get x d + 1 to 9 do
       invariant { 
-        !x = at !x Init and
-	forall c' : int. !x # d < c' < c -> 
+        x = at x Init and
+	forall c' : int. x # d < c' < c -> 
           forall u : int. 
-          interp (at !x Init) 0 m < u <= interp9 (A.set !x d c') d m -> 
+          interp (at x Init) 0 m < u <= interp9 (A.set x d c') d m -> 
   	  sum_digits u <> y } 
       let delta = y - !s - c + array_get x d in
       if 0 <= delta && delta <= 9 * d then begin
         assert { smallest_size delta <= d };
         array_set x d c;
-        assert { sum !x d m = y - delta };
-        assert { gt_digit !x (at !x Init) d };
+        assert { sum x d m = y - delta };
+        assert { gt_digit x (at x Init) d };
 	let k = div delta 9 in
         assert { k <= d };
         for i = 0 to d - 1 do 
           invariant { 
-	     A.length !x = m and is_integer !x and
-             sum !x d m = y - delta and
-             sum !x 0 i = (if i <= k then 9*i else delta) and 
+	     A.length x = m and is_integer x and
+             sum x d m = y - delta and
+             sum x 0 i = (if i <= k then 9*i else delta) and 
              (forall j : int. 0 <= j < i -> 
-                (j <  smallest_size delta -> !x # j = smallest delta # j) and
-                (j >= smallest_size delta -> !x # j = 0)) and
-             gt_digit !x (at !x Init) d } 
+                (j <  smallest_size delta -> x # j = smallest delta # j) and
+                (j >= smallest_size delta -> x # j = 0)) and
+             gt_digit x (at x Init) d } 
           if i < k then array_set x i 9
 	  else if i = k then array_set x i (mod delta 9)
           else array_set x i 0;
-          assert { is_integer !x }
+          assert { is_integer x }
         done;
-        assert { sum !x 0 d = delta };
-        assert { interp !x 0 d = interp (smallest delta) 0 d };
+        assert { sum x 0 d = delta };
+        assert { interp x 0 d = interp (smallest delta) 0 d };
         raise Success
       end
     done;
     s := !s - array_get x d
   done
   { false } 
-  | Success -> { is_integer !x and sum !x 0 m = y and
-                 interp !x 0 m > interp (old !x) 0 m and
-                 forall u : int. interp (old !x) 0 m < u < interp !x 0 m ->
+  | Success -> { is_integer x and sum x 0 m = y and
+                 interp x 0 m > interp (old x) 0 m and
+                 forall u : int. interp (old x) 0 m < u < interp x 0 m ->
                                  sum_digits u <> y }
 
 
