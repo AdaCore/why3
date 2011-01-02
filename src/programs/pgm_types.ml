@@ -68,6 +68,10 @@ let ts_arrow =
   let v = List.map (fun s -> create_tvsymbol (Ident.id_fresh s)) ["a"; "b"] in
   Ty.create_tysymbol (Ident.id_fresh "arrow") v None
 
+let make_arrow_type tyl ty =
+  let arrow ty1 ty2 = Ty.ty_app ts_arrow [ty1; ty2] in
+  List.fold_right arrow tyl ty
+      
 module Sexn = Term.Sls
 
 module rec T : sig
@@ -182,10 +186,6 @@ end = struct
 
   let purify ty = try model_type ty with NotMutable -> ty
 
-  let make_arrow_type tyl ty =
-    let arrow ty1 ty2 = Ty.ty_app ts_arrow [ty1; ty2] in
-    List.fold_right arrow tyl ty
-      
   let rec uncurry_type ?(logic=false) = function
     | Tpure ty when not logic ->
 	[], ty

@@ -29,6 +29,7 @@ val is_mutable_ts : tysymbol -> bool
 val is_mutable_ty : ty       -> bool
 
 val ts_arrow : tysymbol
+val make_arrow_type : ty list -> ty -> ty
 
 val ts_exn : tysymbol
 val ty_exn : ty

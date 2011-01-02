@@ -89,7 +89,7 @@ parameter add_edge :
           path (old graph) x b and path (old graph) a y) 
    }
 
-let add_edge_and_union (u:ref uf) (a:int) (b:int) =
+let add_edge_and_union u (a:int) (b:int) =
   { 0 <= a < size u and 0 <= b < size u and
     not same u a b and not path graph a b and
     forall x y:int. 

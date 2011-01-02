@@ -46,7 +46,7 @@ parameter add :
     let (d, t) = r in 
     memt t k v or (v = d and forall v':value. not (memt t k v'))
 
-let create d =
+let create (d : int) =
   { }
   let x = (d, Leaf) in ref x (* BUG: ref (d, Leaf) *)
   { default result = d and

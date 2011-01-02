@@ -91,7 +91,7 @@ parameter ghost_find : u:ref uf -> x:int ->
   int reads u
   { repr !u x result }
 
-let increment (u : ref uf) (r : int) =
+let increment u r =
   { inv !u and 0 <= r < size !u }
   let i = ref 0 in
   let d = ref (dist !u) in
@@ -108,7 +108,7 @@ let increment (u : ref uf) (r : int) =
   { forall i:int. 0 <= i < size !u ->
       result#i = (dist !u)#i + if repr !u i r then 1 else 0 }
 
-let union (u:ref uf) (a b:int) =
+let union u a b =
   { inv !u and 
     0 <= a < size !u and 0 <= b < size !u and not same !u a b }
   let ra = find u a in

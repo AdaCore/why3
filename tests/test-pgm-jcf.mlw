@@ -4,17 +4,17 @@ module P
   use import int.Int
   use import module stdlib.Ref
 
-  parameter b : ref int
+  (* parameter b : ref int *)
 
-  let f () = 
-    { b>0 } !b + 1 { result > b }
+  (* let f () =  *)
+  (*   { b>0 } !b + 1 { result > b } *)
 
-  use import module stdlib.Array
-
-  let test (a : array int) =
-    { A.length a >= 1 }
-    Array.get a 0
-    { result = a#0 }
+  let test r =
+    { r = 1 }
+    assert { r = 1 };
+    r := !r + 1;
+    assert { r = 2 }
+    { true }
 
 end
 

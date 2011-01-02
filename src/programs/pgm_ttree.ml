@@ -46,12 +46,7 @@ type deffect = {
   de_raises : esymbol list;
 }
 
-type dpre = Denv.dfmla
-
-type dpost_fmla = Denv.dty * Denv.dfmla
-type dexn_post_fmla = Denv.dty option * Denv.dfmla
-type dpost = dpost_fmla * (Term.lsymbol * dexn_post_fmla) list
-
+(* specialized type_v *)
 type dtype_v =
   | DTpure  of Denv.dty
   | DTarrow of dbinder list * dtype_c
@@ -59,15 +54,35 @@ type dtype_v =
 and dtype_c =
   { dc_result_type : dtype_v;
     dc_effect      : deffect;
-    dc_pre         : dpre;
-    dc_post        : dpost; }
+    dc_pre         : Denv.dfmla;
+    dc_post        : (Denv.dty * Denv.dfmla) * 
+                     (Term.lsymbol * (Denv.dty option * Denv.dfmla)) list; }
 
 and dbinder = ident * Denv.dty * dtype_v
 
-type dvariant = Denv.dterm * Term.lsymbol option
+(* user type_v *)
+
+type dpre = Ptree.pre
+type dpost_fmla = Ptree.lexpr 
+type dexn_post_fmla = Ptree.lexpr
+type dpost = dpost_fmla * (Term.lsymbol * dexn_post_fmla) list
+
+type dutype_v =
+  | DUTpure  of Denv.dty
+  | DUTarrow of dubinder list * dutype_c
+
+and dutype_c =
+  { duc_result_type : dutype_v;
+    duc_effect      : deffect;
+    duc_pre         : Ptree.lexpr;
+    duc_post        : Ptree.lexpr * (Term.lsymbol * Ptree.lexpr) list; }
+
+and dubinder = ident * Denv.dty * dutype_v
+
+type dvariant = Ptree.lexpr * Term.lsymbol option
 
 type dloop_annotation = {
-  dloop_invariant : Denv.dfmla option;
+  dloop_invariant : Ptree.lexpr option;
   dloop_variant   : dvariant option;
 }
 
@@ -84,7 +99,7 @@ and dexpr_desc =
   | DEglobal of psymbol * dtype_v
   | DElogic of Term.lsymbol
   | DEapply of dexpr * dexpr
-  | DEfun of dbinder list * dtriple
+  | DEfun of dubinder list * dtriple
   | DElet of ident * dexpr * dexpr
   | DEletrec of drecfun list * dexpr
 
@@ -96,13 +111,13 @@ and dexpr_desc =
   | DEabsurd
   | DEraise of esymbol * dexpr option
   | DEtry of dexpr * (esymbol * string option * dexpr) list
-  | DEfor of ident * dexpr * for_direction * dexpr * Denv.dfmla option * dexpr
+  | DEfor of ident * dexpr * for_direction * dexpr * Ptree.lexpr option * dexpr
 
-  | DEassert of assertion_kind * Denv.dfmla
+  | DEassert of assertion_kind * Ptree.lexpr
   | DElabel of string * dexpr
-  | DEany of dtype_c
+  | DEany of dutype_c
 
-and drecfun = (ident * Denv.dty) * dbinder list * dvariant option * dtriple
+and drecfun = (ident * Denv.dty) * dubinder list * dvariant option * dtriple
 
 and dtriple = dpre * dexpr * dpost
 
@@ -111,15 +126,18 @@ and dtriple = dpre * dexpr * dpost
 
 type variant = Term.term * Term.lsymbol option
 
-type reference = R.t
+type loop_annotation = {
+  loop_invariant : Term.fmla option;
+  loop_variant   : variant option;
+}
 
-type pre = T.pre
+type ipre = T.pre
 
-type post = T.post
+type ipost = T.post
 
 (* each program variable is materialized by two logic variables (vsymbol):
    one for typing programs and another for typing annotations *)
-type ivsymbol = { 
+type ivsymbol (* = Term.vsymbol *) = {
   i_pgm   : Term.vsymbol; (* in programs *)
   i_logic : Term.vsymbol; (* in annotations *)
 }
@@ -141,15 +159,10 @@ type itype_v =
 and itype_c =
   { ic_result_type : itype_v;
     ic_effect      : ieffect;
-    ic_pre         : pre;
-    ic_post        : post; }
+    ic_pre         : T.pre;
+    ic_post        : T.post; }
 
 and ibinder = ivsymbol * itype_v
-
-type loop_annotation = {
-  loop_invariant : Term.fmla option;
-  loop_variant   : variant option;
-}
 
 type label = Term.vsymbol
 
@@ -160,7 +173,7 @@ type ipattern = {
   ipat_node : ipat_node;
 }
 
-and ipat_node = 
+and ipat_node =
   | IPwild
   | IPvar  of ivsymbol
   | IPapp  of Term.lsymbol * ipattern list
@@ -199,11 +212,17 @@ and iexpr_desc =
 
 and irecfun = ivsymbol * ibinder list * irec_variant option * itriple
 
-and itriple = pre * iexpr * post
+and itriple = ipre * iexpr * ipost
 
 
 (*****************************************************************************)
 (* phase 3: effect inference *)
+
+type reference = R.t
+
+type pre = T.pre
+
+type post = T.post
 
 type rec_variant = pvsymbol * Term.term * Term.lsymbol option
 
