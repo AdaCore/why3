@@ -169,7 +169,7 @@ type label = Term.vsymbol
 type irec_variant = ivsymbol * Term.term * Term.lsymbol option
 
 type ipattern = {
-  ipat_pat  : Term.pattern;
+  ipat_pat  : Term.pattern; (* program variables *)
   ipat_node : ipat_node;
 }
 
@@ -227,7 +227,7 @@ type post = T.post
 type rec_variant = pvsymbol * Term.term * Term.lsymbol option
 
 type pattern = {
-  ppat_pat  : Term.pattern;
+  ppat_pat  : Term.pattern; (* logic variables *)
   ppat_node : ppat_node;
 }
 

@@ -111,6 +111,7 @@ module rec T : sig
 
   val print_type_v : Format.formatter -> type_v -> unit
   val print_type_c : Format.formatter -> type_c -> unit
+  val print_pre    : Format.formatter -> pre    -> unit
   val print_post   : Format.formatter -> post   -> unit
 
 end 

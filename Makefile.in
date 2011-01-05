@@ -737,7 +737,7 @@ testl: bin/whyml.byte
 	ocamlrun -bt bin/whyml.byte -P alt-ergo tests/test-pgm-jcf.mlw
 
 testl-debug: bin/whyml.byte
-	ocamlrun -bt bin/whyml.byte --debug-all tests/test-pgm-jcf.mlw
+	ocamlrun -bt bin/whyml.byte --debug-all --debug program_typing tests/test-pgm-jcf.mlw
 
 testl-ide: bin/whyide.opt
 	bin/whyide.opt tests/test-pgm-jcf.mlw

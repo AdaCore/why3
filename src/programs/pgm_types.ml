@@ -151,6 +151,7 @@ module rec T : sig
 
   val print_type_v : Format.formatter -> type_v -> unit
   val print_type_c : Format.formatter -> type_c -> unit
+  val print_pre    : Format.formatter -> pre    -> unit
   val print_post   : Format.formatter -> post   -> unit
 
 end = struct
@@ -371,11 +372,19 @@ end = struct
   open Format
   open Pretty
 	  
-  let print_post fmt ((_,q), el) =
-    let print_exn_post fmt (l,(_,q)) =
-      fprintf fmt "| %a -> {%a}" print_ls l print_fmla q
+  let print_pre fmt f =
+    fprintf fmt "@[{ %a }@]" Pretty.print_fmla f
+
+  and print_post fmt ((v,q), _) =
+  fprintf fmt "@[{%a | %a}@]" Pretty.print_vs v Pretty.print_fmla q
+
+  let print_post fmt ((v, q), el) =
+    let print_exn_post fmt (l, (v, q)) =
+      fprintf fmt "@[<hov 2>| %a %a->@ {%a}@]" 
+	print_ls l (print_option print_vs) v print_fmla q
     in
-    fprintf fmt "{%a} %a" print_fmla q (print_list space print_exn_post) el
+    fprintf fmt "@[{%a | %a}@ %a@]" print_vs v print_fmla q 
+      (print_list space print_exn_post) el
       
   let rec print_type_v fmt = function
     | Tpure ty ->

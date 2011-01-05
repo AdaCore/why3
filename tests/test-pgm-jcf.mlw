@@ -4,6 +4,17 @@ module P
   use import int.Int
   use import module stdlib.Ref
 
+  use import list.List
+  use import list.Length
+
+let rec length_ (l : list 'a) variant { length l } = 
+  {}
+  match l with
+  | Nil -> 0
+  | Cons _ r -> 1 + length_ r
+  end
+  { result = length l }
+
   (* parameter b : ref int *)
 
   (* let f () =  *)

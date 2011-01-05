@@ -1474,15 +1474,16 @@ and fresh_triple gl (_, e, _) =
 
 let rec print_expr fmt e = match e.expr_desc with
   | Elogic t ->
-      print_term fmt t
-  | Elocal vs ->
-      fprintf fmt "<local %a>" print_vs vs.pv_vs
+      fprintf fmt "@[<hov 2><term: %a>@]" Pretty.print_term t
+  | Elocal v ->
+      fprintf fmt "%a" print_pv v
   | Eglobal ls ->
       fprintf fmt "<global %a>" print_ls ls.p_ls
-  | Efun (_, t) ->
-      fprintf fmt "@[fun _ ->@ %a@]" print_triple t
+  | Efun (bl, t) ->
+      fprintf fmt "@[fun %a ->@ %a@]" 
+	(print_list space print_pv) bl print_triple t
   | Elet (v, e1, e2) ->
-      fprintf fmt "@[let %a = %a in@ %a@]" print_vs v.pv_vs
+      fprintf fmt "@[<hv 0>@[<hov 2>let %a =@ %a in@]@ %a@]" print_vs v.pv_vs
 	print_expr e1 print_expr e2
 
   | Eif (e1, e2, e3) ->
@@ -1492,20 +1493,42 @@ let rec print_expr fmt e = match e.expr_desc with
   | Eany c ->
       fprintf fmt "@[[any %a]@]" print_type_c c
 
-  | _ ->
-      fprintf fmt "<other>"
+  | Elabel (_, _)  ->
+      fprintf fmt "<todo: Elabel>"
+  | Eassert (_, _) ->
+      fprintf fmt "<todo: Eassert>"
+  | Efor (_, _, _, _, _, _) ->
+      fprintf fmt "<todo: Efor>"
+  | Etry (_, _) ->
+      fprintf fmt "<todo: Etry>"
+  | Eraise (_, _)  ->
+      fprintf fmt "<todo: Eraise>"
+  | Ematch (v, cl) ->
+      fprintf fmt "@[<hov 2>match %a with@ %a@]" print_pv v
+	(print_list newline print_branch) cl
+  | Eloop (_, _) ->
+      fprintf fmt "<todo: Eloop>"
+  | Eletrec (_, _)  ->
+      fprintf fmt "<todo: Eletrec>"
+  | Eabsurd ->
+      fprintf fmt "absurd"
+
+and print_pv fmt v =
+  fprintf fmt "<%s : %a/%a>" 
+    v.pv_name.id_string print_ty v.pv_ty print_vs v.pv_vs
 
 and print_triple fmt (p, e, q) =
-  fprintf fmt "@[{%a}@ %a@ {%a}@]" print_pre p print_expr e print_post q
+  fprintf fmt "@[<hv 0>%a@ %a@ %a@]" T.print_pre p print_expr e T.print_post q
 
-and print_pre fmt _ =
-  fprintf fmt "<pre>"
+and print_recfun fmt (v, bl, _, t) =
+  fprintf fmt "@[<hov 2>rec %a@ %a =@ %a@]" 
+    print_pv v (print_list space print_pv) bl print_triple t
 
-and print_post fmt _ =
-  fprintf fmt "<post>"
+and print_branch fmt (p, e) =
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pattern p print_expr e
 
-and print_recfun fmt (v, _bl, _, t) =
-  fprintf fmt "@[rec %a _ = %a@]" print_vs v print_triple t
+and print_pattern fmt p = 
+  Pretty.print_pat fmt p.ppat_pat
 
 (* typing declarations (combines the three phases together) *)
 
@@ -1602,8 +1625,9 @@ let rec decl ~wp env penv lmod uc = function
       Pgm_module.add_logic_pdecl env d uc
   | Ptree.Dlet (id, e) ->
       let e = type_expr uc e in
-      Debug.dprintf debug "@[--typing %s-----@\n  %a@\n%a@]@."
-	id.id print_expr e print_type_v e.expr_type_v;
+      if Debug.test_flag debug then
+	eprintf "@[--typing %s-----@\n  %a@\n%a@]@."
+	  id.id print_expr e print_type_v e.expr_type_v;
       let ls, uc = add_global id.id_loc id.id e.expr_type_v uc in
       let d = Dlet (ls, e) in
       let uc = add_decl d uc in
@@ -1617,9 +1641,9 @@ let rec decl ~wp env penv lmod uc = function
 	let tyv = v.pv_tv in
 	let loc = loc_of_id v.pv_name in
 	let id = v.pv_name.id_string in
-	(* if Debug.test_flag debug then *)
-        (*   eprintf "@[--typing %s-----@\n  %a@.%a@]@." *)
-	(*     id print_recfun d print_type_v tyv; *)
+	if Debug.test_flag debug then
+          eprintf "@[--typing %s-----@\n  %a@.%a@]@."
+	    id print_recfun d print_type_v tyv;
 	let ps, uc = add_global loc id tyv uc in
 	uc, (ps, d)
       in
