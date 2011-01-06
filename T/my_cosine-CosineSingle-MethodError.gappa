@@ -1,0 +1,494 @@
+# this is a prelude for Gappa
+# this is a prelude for Gappa real arithmetic
+# this is a prelude for Gappa integer arithmetic
+@rnd_ieee32_ne=float<ieee_32,ne>;
+theory Task
+  (* use BuiltIn *)
+  
+  logic infix_ls real real
+  
+  (* clone Assoc with type t = real, logic op = infix_pl,
+    prop Assoc = Assoc1 *)
+  
+  (* clone Group with type t1 = real, logic inv = prefix_mn,
+    logic op1 = infix_pl, logic unit = zero, prop Inv_def = Inv_def1,
+    prop Assoc2 = Assoc1, prop Unit_def = Unit_def1 *)
+  
+  (* clone Comm with type t2 = real, logic op2 = infix_pl,
+    prop Comm = Comm1 *)
+  
+  (* meta AC logic infix_pl *)
+  
+  (* clone CommutativeGroup with type t3 = real, logic inv1 = prefix_mn,
+    logic op3 = infix_pl, logic unit1 = zero, prop Comm2 = Comm1,
+    prop Inv_def2 = Inv_def1, prop Assoc3 = Assoc1,
+    prop Unit_def2 = Unit_def1 *)
+  
+  (* clone Assoc with type t = real, logic op = infix_as,
+    prop Assoc = Assoc4 *)
+  
+  (* clone Ring with type t4 = real, logic infix_mn = infix_mn1,
+    logic infix_as1 = infix_as, logic prefix_mn1 = prefix_mn,
+    logic infix_pl1 = infix_pl, logic zero1 = zero,
+    prop Mul_distr = Mul_distr1, prop Assoc5 = Assoc4, prop Comm3 = Comm1,
+    prop Inv_def3 = Inv_def1, prop Assoc6 = Assoc1,
+    prop Unit_def3 = Unit_def1 *)
+  
+  (* clone Comm with type t2 = real, logic op2 = infix_as,
+    prop Comm = Comm4 *)
+  
+  (* meta AC logic infix_as *)
+  
+  (* clone CommutativeRing with type t5 = real, logic infix_mn2 = infix_mn1,
+    logic infix_as2 = infix_as, logic prefix_mn2 = prefix_mn,
+    logic infix_pl2 = infix_pl, logic zero2 = zero, prop Comm5 = Comm4,
+    prop Mul_distr2 = Mul_distr1, prop Assoc7 = Assoc4, prop Comm6 = Comm1,
+    prop Inv_def4 = Inv_def1, prop Assoc8 = Assoc1,
+    prop Unit_def4 = Unit_def1 *)
+  
+  axiom NonTrivialRing : not (0.0 = 1.0)
+  
+  (* clone UnitaryCommutativeRing with type t6 = real, logic one = one1,
+    logic infix_mn3 = infix_mn1, logic infix_as3 = infix_as,
+    logic prefix_mn3 = prefix_mn, logic infix_pl3 = infix_pl,
+    logic zero3 = zero, prop NonTrivialRing1 = NonTrivialRing,
+    prop Unitary = Unitary1, prop Comm7 = Comm4,
+    prop Mul_distr3 = Mul_distr1, prop Assoc9 = Assoc4, prop Comm8 = Comm1,
+    prop Inv_def5 = Inv_def1, prop Assoc10 = Assoc1,
+    prop Unit_def5 = Unit_def1 *)
+  
+  (* clone Field with type t7 = real, logic infix_sl = infix_sl1,
+    logic inv2 = inv3, logic one2 = one1, logic infix_mn4 = infix_mn1,
+    logic infix_as4 = infix_as, logic prefix_mn4 = prefix_mn,
+    logic infix_pl4 = infix_pl, logic zero4 = zero, prop Inverse = Inverse1,
+    prop NonTrivialRing2 = NonTrivialRing, prop Unitary2 = Unitary1,
+    prop Comm9 = Comm4, prop Mul_distr4 = Mul_distr1, prop Assoc11 = Assoc4,
+    prop Comm10 = Comm1, prop Inv_def6 = Inv_def1, prop Assoc12 = Assoc1,
+    prop Unit_def6 = Unit_def1 *)
+  
+  (* clone EndoRelation with type t8 = real, logic rel = infix_lseq,  *)
+  
+  (* clone Reflexive with type t9 = real, logic rel1 = infix_lseq,
+    prop Refl = Refl1 *)
+  
+  (* clone EndoRelation with type t8 = real, logic rel = infix_lseq,  *)
+  
+  (* clone Transitive with type t10 = real, logic rel2 = infix_lseq,
+    prop Trans = Trans1 *)
+  
+  (* clone PreOrder with type t11 = real, logic rel3 = infix_lseq,
+    prop Trans2 = Trans1, prop Refl2 = Refl1 *)
+  
+  (* clone EndoRelation with type t8 = real, logic rel = infix_lseq,  *)
+  
+  (* clone Antisymmetric with type t12 = real, logic rel4 = infix_lseq,
+    prop Antisymm = Antisymm1 *)
+  
+  (* clone PartialOrder with type t13 = real, logic rel5 = infix_lseq,
+    prop Antisymm2 = Antisymm1, prop Trans3 = Trans1, prop Refl3 = Refl1 *)
+  
+  (* clone EndoRelation with type t8 = real, logic rel = infix_lseq,  *)
+  
+  (* clone Total with type t14 = real, logic rel6 = infix_lseq,
+    prop Total = Total1 *)
+  
+  (* clone TotalOrder with type t15 = real, logic rel7 = infix_lseq,
+    prop Total2 = Total1, prop Antisymm3 = Antisymm1, prop Trans4 = Trans1,
+    prop Refl4 = Refl1 *)
+  
+  axiom CompatOrderAdd : forall x:real, y:real, z:real. infix_ls x y or
+    (x = y) -> infix_ls (x + z) (y + z) or ((x + z) = (y + z))
+  
+  axiom CompatOrderMult : forall x:real, y:real, z:real. infix_ls x y or
+    (x = y) -> infix_ls 0.0 z or (0.0 = z) -> infix_ls (x * z) (y * z) or
+    ((x * z) = (y * z))
+  
+  (* clone OrderedField with type t16 = real, logic infix_gteq = infix_gteq1,
+    logic infix_lseq1 = infix_lseq, logic infix_sl2 = infix_sl1,
+    logic inv4 = inv3, logic one3 = one1, logic infix_mn5 = infix_mn1,
+    logic infix_as5 = infix_as, logic prefix_mn5 = prefix_mn,
+    logic infix_pl5 = infix_pl, logic zero5 = zero,
+    prop CompatOrderMult1 = CompatOrderMult,
+    prop CompatOrderAdd1 = CompatOrderAdd, prop Total3 = Total1,
+    prop Antisymm4 = Antisymm1, prop Trans5 = Trans1, prop Refl5 = Refl1,
+    prop Inverse2 = Inverse1, prop NonTrivialRing3 = NonTrivialRing,
+    prop Unitary3 = Unitary1, prop Comm11 = Comm4,
+    prop Mul_distr5 = Mul_distr1, prop Assoc13 = Assoc4, prop Comm12 = Comm1,
+    prop Inv_def7 = Inv_def1, prop Assoc14 = Assoc1,
+    prop Unit_def7 = Unit_def1 *)
+  
+  (* use Real *)
+  
+  axiom Abs_le : forall x:real, y:real. infix_ls | x | y or (| x | = y) <->
+    (infix_ls (-y) x or ((-y) = x)) and (infix_ls x y or (x = y))
+  
+  axiom Abs_pos : forall x:real. infix_ls 0.0 | x | or (0.0 = | x |)
+  
+  (* use Abs *)
+  
+  logic sqr (x:real) : real = (x * x)
+  
+  logic sqrt real : real
+  
+  axiom Sqrt_positive : forall x:real. infix_ls 0.0 x or (0.0 = x) ->
+    infix_ls 0.0 (sqrt x) or (0.0 = sqrt x)
+  
+  axiom Sqrt_square : forall x:real. infix_ls 0.0 x or (0.0 = x) -> (sqr
+    (sqrt x) = x)
+  
+  axiom Square_sqrt : forall x:real. infix_ls 0.0 x or (0.0 = x) -> (sqrt
+    (x * x) = x)
+  
+  (* use Square *)
+  
+  logic cos real : real
+  
+  logic sin real : real
+  
+  axiom Pythagorean_identity : forall x:real. ((sqr (cos x) + sqr (sin
+    x)) = 1.0)
+  
+  axiom Cos_le_one : forall x:real. infix_ls | cos x | 1.0 or (| cos
+    x | = 1.0)
+  
+  axiom Sin_le_one : forall x:real. infix_ls | sin x | 1.0 or (| sin
+    x | = 1.0)
+  
+  axiom Cos_0 : (cos 0.0 = 1.0)
+  
+  axiom Sin_0 : (sin 0.0 = 0.0)
+  
+  logic pi : real
+  
+  axiom Pi_interval : infix_ls
+    3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196
+    pi and infix_ls pi
+    3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038197
+  
+  axiom Cos_pi : (cos pi = (-1.0))
+  
+  axiom Sin_pi : (sin pi = 0.0)
+  
+  axiom Cos_pi2 : (cos (0.5 * pi) = 0.0)
+  
+  axiom Sin_pi2 : (sin (0.5 * pi) = 1.0)
+  
+  axiom Cos_plus_pi : forall x:real. (cos (x + pi) = (-cos x))
+  
+  axiom Sin_plus_pi : forall x:real. (sin (x + pi) = (-sin x))
+  
+  axiom Cos_plus_pi2 : forall x:real. (cos (x + (0.5 * pi)) = (-sin x))
+  
+  axiom Sin_plus_pi2 : forall x:real. (sin (x + (0.5 * pi)) = cos x)
+  
+  axiom Cos_neg : forall x:real. (cos (-x) = cos x)
+  
+  axiom Sin_neg : forall x:real. (sin (-x) = (-sin x))
+  
+  axiom Cos_sum : forall x:real, y:real. (cos (x + y) = ((cos x * cos
+    y) - (sin x * sin y)))
+  
+  axiom Sin_sum : forall x:real, y:real. (sin (x + y) = ((sin x * cos
+    y) + (cos x * sin y)))
+  
+  logic tan (x:real) : real = (sin x / cos x)
+  
+  logic atan real : real
+  
+  axiom Tan_atan : forall x:real. (tan (atan x) = x)
+  
+  (* use Trigonometry *)
+  
+  type mode =
+    | NearestTiesToEven
+    | ToZero
+    | Up
+    | Down
+    | NearTiesToAway
+  
+  (* use Rounding *)
+  
+  type single
+  
+  logic max_single : real = 0x1.FFFFFEp127
+  
+  logic max_int : int = 16777216
+  
+  logic infix_ls1 int int
+  
+  (* clone Assoc with type t = int, logic op = infix_pl6,
+    prop Assoc = Assoc15 *)
+  
+  (* clone Group with type t1 = int, logic inv = prefix_mn6,
+    logic op1 = infix_pl6, logic unit = zero6, prop Inv_def = Inv_def8,
+    prop Assoc2 = Assoc15, prop Unit_def = Unit_def8 *)
+  
+  (* clone Comm with type t2 = int, logic op2 = infix_pl6,
+    prop Comm = Comm13 *)
+  
+  (* meta AC logic infix_pl6 *)
+  
+  (* clone CommutativeGroup with type t3 = int, logic inv1 = prefix_mn6,
+    logic op3 = infix_pl6, logic unit1 = zero6, prop Comm2 = Comm13,
+    prop Inv_def2 = Inv_def8, prop Assoc3 = Assoc15,
+    prop Unit_def2 = Unit_def8 *)
+  
+  (* clone Assoc with type t = int, logic op = infix_as6,
+    prop Assoc = Assoc16 *)
+  
+  (* clone Ring with type t4 = int, logic infix_mn = infix_mn6,
+    logic infix_as1 = infix_as6, logic prefix_mn1 = prefix_mn6,
+    logic infix_pl1 = infix_pl6, logic zero1 = zero6,
+    prop Mul_distr = Mul_distr6, prop Assoc5 = Assoc16, prop Comm3 = Comm13,
+    prop Inv_def3 = Inv_def8, prop Assoc6 = Assoc15,
+    prop Unit_def3 = Unit_def8 *)
+  
+  (* clone Comm with type t2 = int, logic op2 = infix_as6,
+    prop Comm = Comm14 *)
+  
+  (* meta AC logic infix_as6 *)
+  
+  (* clone CommutativeRing with type t5 = int, logic infix_mn2 = infix_mn6,
+    logic infix_as2 = infix_as6, logic prefix_mn2 = prefix_mn6,
+    logic infix_pl2 = infix_pl6, logic zero2 = zero6, prop Comm5 = Comm14,
+    prop Mul_distr2 = Mul_distr6, prop Assoc7 = Assoc16, prop Comm6 = Comm13,
+    prop Inv_def4 = Inv_def8, prop Assoc8 = Assoc15,
+    prop Unit_def4 = Unit_def8 *)
+  
+  axiom NonTrivialRing4 : not (0 = 1)
+  
+  (* clone UnitaryCommutativeRing with type t6 = int, logic one = one4,
+    logic infix_mn3 = infix_mn6, logic infix_as3 = infix_as6,
+    logic prefix_mn3 = prefix_mn6, logic infix_pl3 = infix_pl6,
+    logic zero3 = zero6, prop NonTrivialRing1 = NonTrivialRing4,
+    prop Unitary = Unitary4, prop Comm7 = Comm14,
+    prop Mul_distr3 = Mul_distr6, prop Assoc9 = Assoc16, prop Comm8 = Comm13,
+    prop Inv_def5 = Inv_def8, prop Assoc10 = Assoc15,
+    prop Unit_def5 = Unit_def8 *)
+  
+  (* clone EndoRelation with type t8 = int, logic rel = infix_lseq2,  *)
+  
+  (* clone Reflexive with type t9 = int, logic rel1 = infix_lseq2,
+    prop Refl = Refl6 *)
+  
+  (* clone EndoRelation with type t8 = int, logic rel = infix_lseq2,  *)
+  
+  (* clone Transitive with type t10 = int, logic rel2 = infix_lseq2,
+    prop Trans = Trans6 *)
+  
+  (* clone PreOrder with type t11 = int, logic rel3 = infix_lseq2,
+    prop Trans2 = Trans6, prop Refl2 = Refl6 *)
+  
+  (* clone EndoRelation with type t8 = int, logic rel = infix_lseq2,  *)
+  
+  (* clone Antisymmetric with type t12 = int, logic rel4 = infix_lseq2,
+    prop Antisymm = Antisymm5 *)
+  
+  (* clone PartialOrder with type t13 = int, logic rel5 = infix_lseq2,
+    prop Antisymm2 = Antisymm5, prop Trans3 = Trans6, prop Refl3 = Refl6 *)
+  
+  (* clone EndoRelation with type t8 = int, logic rel = infix_lseq2,  *)
+  
+  (* clone Total with type t14 = int, logic rel6 = infix_lseq2,
+    prop Total = Total4 *)
+  
+  (* clone TotalOrder with type t15 = int, logic rel7 = infix_lseq2,
+    prop Total2 = Total4, prop Antisymm3 = Antisymm5, prop Trans4 = Trans6,
+    prop Refl4 = Refl6 *)
+  
+  axiom CompatOrderAdd2 : forall x:int, y:int, z:int. infix_ls1 x y or
+    (x = y) -> infix_ls1 (x + z) (y + z) or ((x + z) = (y + z))
+  
+  axiom CompatOrderMult2 : forall x:int, y:int, z:int. infix_ls1 x y or
+    (x = y) -> infix_ls1 0 z or (0 = z) -> infix_ls1 (x * z) (y * z) or
+    ((x * z) = (y * z))
+  
+  (* clone OrderedUnitaryCommutativeRing with type t17 = int,
+    logic infix_gteq2 = infix_gteq3, logic infix_lseq3 = infix_lseq2,
+    logic one5 = one4, logic infix_mn7 = infix_mn6,
+    logic infix_as7 = infix_as6, logic prefix_mn7 = prefix_mn6,
+    logic infix_pl7 = infix_pl6, logic zero7 = zero6,
+    prop CompatOrderMult3 = CompatOrderMult2,
+    prop CompatOrderAdd3 = CompatOrderAdd2, prop Total5 = Total4,
+    prop Antisymm6 = Antisymm5, prop Trans7 = Trans6, prop Refl7 = Refl6,
+    prop NonTrivialRing5 = NonTrivialRing4, prop Unitary5 = Unitary4,
+    prop Comm15 = Comm14, prop Mul_distr7 = Mul_distr6,
+    prop Assoc17 = Assoc16, prop Comm16 = Comm13, prop Inv_def9 = Inv_def8,
+    prop Assoc18 = Assoc15, prop Unit_def9 = Unit_def8 *)
+  
+  (* use Int *)
+  
+  logic from_int int : real
+  
+  axiom Zero : (from_int 0 = 0.0)
+  
+  axiom One : (from_int 1 = 1.0)
+  
+  axiom Add : forall x:int, y:int. (from_int (x + y) = (from_int x + from_int
+    y))
+  
+  axiom Sub : forall x:int, y:int. (from_int (x - y) = (from_int x - from_int
+    y))
+  
+  axiom Mul : forall x:int, y:int. (from_int (x * y) = (from_int x * from_int
+    y))
+  
+  axiom Neg : forall x:int, y:int. (from_int (-x) = (-from_int x))
+  
+  (* use FromInt *)
+  
+  logic round mode real : real
+  
+  logic round_logic mode real : single
+  
+  logic value single : real
+  
+  logic exact single : real
+  
+  logic model single : real
+  
+  logic round_error (x:single) : real = | (value x - exact x) |
+  
+  logic total_error (x:single) : real = | (value x - model x) |
+  
+  logic no_overflow (m:mode) (x:real) = infix_ls | round m x | max_single or
+    (| round m x | = max_single)
+  
+  axiom Bounded_real_no_overflow : forall m:mode, x:real. infix_ls | x |
+    max_single or (| x | = max_single) -> no_overflow m x
+  
+  axiom Round_monotonic : forall m:mode, x:real, y:real. infix_ls x y or
+    (x = y) -> infix_ls (round m x) (round m y) or (round m x = round m y)
+  
+  axiom Exact_rounding_for_integers : forall m:mode, i:int. (infix_ls1
+    (-max_int) i or ((-max_int) = i)) and (infix_ls1 i max_int or
+    (i = max_int)) -> (round m (from_int i) = from_int i)
+  
+  axiom Round_down_le : forall x:real. infix_ls (round Down x) x or (round
+    Down x = x)
+  
+  axiom Round_up_ge : forall x:real. infix_ls x (round Up x) or (x = round Up
+    x)
+  
+  axiom Round_down_neg : forall x:real. (round Down (-x) = (-round Up x))
+  
+  axiom Round_up_neg : forall x:real. (round Up (-x) = (-round Down x))
+  
+  (* clone GenFloat with type t18 = single,
+    logic max_representable_integer = max_int,
+    logic no_overflow1 = no_overflow, logic max = max_single,
+    logic total_error1 = total_error, logic round_error1 = round_error,
+    logic model1 = model, logic exact1 = exact, logic value1 = value,
+    logic round_logic1 = round_logic, logic round1 = round,
+    prop Round_up_neg1 = Round_up_neg, prop Round_down_neg1 = Round_down_neg,
+    prop Round_up_ge1 = Round_up_ge, prop Round_down_le1 = Round_down_le,
+    prop Exact_rounding_for_integers1 = Exact_rounding_for_integers,
+    prop Round_monotonic1 = Round_monotonic,
+    prop Bounded_real_no_overflow1 = Bounded_real_no_overflow *)
+  
+  (* use Single *)
+  
+  (* meta syntax_type type int, "int" *)
+  
+  (* meta syntax_type type real, "real" *)
+  
+  (* meta syntax_logic logic infix_eq, "(%1 = %2)" *)
+  
+  (* meta syntax_logic logic zero6, "0" *)
+  
+  (* meta syntax_logic logic one4, "1" *)
+  
+  (* meta syntax_logic logic infix_pl6, "(%1 + %2)" *)
+  
+  (* meta syntax_logic logic infix_mn6, "(%1 - %2)" *)
+  
+  (* meta syntax_logic logic infix_as6, "(%1 * %2)" *)
+  
+  (* meta syntax_logic logic prefix_mn6, "(-%1)" *)
+  
+  (* meta inline : no logic infix_lseq2 *)
+  
+  (* meta inline : no logic infix_gteq3 *)
+  
+  (* meta inline : no logic infix_gt *)
+  
+  (* meta remove_prop prop Comm13 *)
+  
+  (* meta remove_prop prop Assoc15 *)
+  
+  (* meta remove_prop prop Unit_def8 *)
+  
+  (* meta remove_prop prop Inv_def8 *)
+  
+  (* meta remove_prop prop Assoc16 *)
+  
+  (* meta remove_prop prop Mul_distr6 *)
+  
+  (* meta remove_prop prop Comm14 *)
+  
+  (* meta remove_prop prop Unitary4 *)
+  
+  (* meta remove_prop prop Refl6 *)
+  
+  (* meta remove_prop prop Trans6 *)
+  
+  (* meta remove_prop prop Total4 *)
+  
+  (* meta remove_prop prop Antisymm5 *)
+  
+  (* meta syntax_logic logic zero, "0.0" *)
+  
+  (* meta syntax_logic logic one1, "1.0" *)
+  
+  (* meta syntax_logic logic infix_pl, "(%1 + %2)" *)
+  
+  (* meta syntax_logic logic infix_mn1, "(%1 - %2)" *)
+  
+  (* meta syntax_logic logic infix_as, "(%1 * %2)" *)
+  
+  (* meta syntax_logic logic infix_sl1, "(%1 / %2)" *)
+  
+  (* meta syntax_logic logic prefix_mn, "(-%1)" *)
+  
+  (* meta syntax_logic logic inv3, "(1.0 / %1)" *)
+  
+  (* meta inline : no logic infix_lseq *)
+  
+  (* meta inline : no logic infix_gteq1 *)
+  
+  (* meta inline : no logic infix_gt1 *)
+  
+  (* meta remove_prop prop Comm1 *)
+  
+  (* meta remove_prop prop Assoc1 *)
+  
+  (* meta remove_prop prop Unit_def1 *)
+  
+  (* meta remove_prop prop Inv_def1 *)
+  
+  (* meta remove_prop prop Assoc4 *)
+  
+  (* meta remove_prop prop Mul_distr1 *)
+  
+  (* meta remove_prop prop Comm4 *)
+  
+  (* meta remove_prop prop Unitary1 *)
+  
+  (* meta remove_prop prop Refl1 *)
+  
+  (* meta remove_prop prop Trans1 *)
+  
+  (* meta remove_prop prop Total1 *)
+  
+  (* meta remove_prop prop Antisymm1 *)
+  
+  (* meta remove_prop prop Inverse1 *)
+  
+  (* meta syntax_logic logic abs, "| %1 |" *)
+  
+  goal MethodError : forall x:real. infix_ls | x | 0x1.p-5 or
+    (| x | = 0x1.p-5) -> infix_ls | ((1.0 - ((x * x) * 0.5)) - cos x) |
+    0x1.p-24 or (| ((1.0 - ((x * x) * 0.5)) - cos x) | = 0x1.p-24)
+  
+  
+end
