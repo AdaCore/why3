@@ -284,8 +284,8 @@ install_no_local::
 
 PGMGENERATED = 
 
-PGM_FILES = pgm_ttree \
-	    pgm_types pgm_module pgm_wp pgm_env pgm_typing pgm_main
+PGM_FILES = pgm_ttree pgm_types pgm_pretty \
+	    pgm_module pgm_wp pgm_env pgm_typing pgm_main
 
 PGMMODULES = $(addprefix src/programs/, $(PGM_FILES))
 

@@ -259,13 +259,16 @@ let t_True env =
   t_app (find_ls env "True") [] (ty_app (find_ts env "bool") [])
 
 let rec wp_expr env e q =
-  if Debug.test_flag debug then
-    eprintf "@[wp_expr: q=%a@]@." Pretty.print_fmla (snd (fst q));
   let lab = fresh_label env in
   let q = post_map (old_label env lab) q in
   let f = wp_desc env e q in
   let f = erase_label env lab f in
-  propose_label (label ~loc:e.expr_loc "WP") f
+  let f = propose_label (label ~loc:e.expr_loc "WP") f in
+  if Debug.test_flag debug then
+    eprintf "@[--------@\n@[<hov 2>e = %a@]@\n@[<hov 2>q = %a@]@\n----@]@." 
+      Pgm_pretty.print_expr e
+      Pretty.print_fmla (snd (fst q));
+  f
 
 and wp_desc env e q = match e.expr_desc with
   | Elogic t ->
