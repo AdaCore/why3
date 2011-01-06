@@ -1075,10 +1075,11 @@ and add_binder env (i, v) =
   env, vs
 
 let rec pattern env p = 
-  let env, n = pattern_node env p.ipat_node in
-  env, { ppat_pat = p.ipat_pat; ppat_node = n }
+  let ty = purify p.ipat_pat.pat_ty in
+  let env, (lp, n) = pattern_node env ty p.ipat_node in
+  env, { ppat_pat = lp; ppat_node = n }
 
-and pattern_node env p = 
+and pattern_node env ty p = 
   let add1 env i = 
     let v = 
       create_pvsymbol (id_clone i.i_pgm.vs_name) ~vs:i.i_logic 
@@ -1088,21 +1089,22 @@ and pattern_node env p =
   in
   match p with
   | IPwild -> 
-      env, Pwild
+      env, (pat_wild ty, Pwild)
   | IPapp (ls, pl) -> 
       let env, pl = map_fold_left pattern env pl in
-      env, Papp (ls, pl)
+      let lpl = List.map (fun p -> p.ppat_pat) pl in
+      env, (pat_app ls lpl ty, Papp (ls, pl))
   | IPor (p1, p2) -> 
       let env, p1 = pattern env p1 in
       let _  , p2 = pattern env p2 in
-      env, Por (p1, p2)
+      env, (pat_or p1.ppat_pat p2.ppat_pat, Por (p1, p2))
   | IPvar vs ->
       let env, v = add1 env vs in
-      env, Pvar v
+      env, (pat_var v.pv_vs, Pvar v)
   | IPas (p, vs) ->
       let env, v = add1 env vs in
       let env, p = pattern env p in
-      env, Pas (p, v)
+      env, (pat_as p.ppat_pat v.pv_vs, Pas (p, v))
 
 let make_apply loc e1 ty c =
   let x = create_pvsymbol (id_fresh "f") (tpure e1.expr_type) in
