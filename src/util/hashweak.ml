@@ -94,6 +94,9 @@ module type S = sig
 
 end
 
+let new_tbl_tag = let c = ref (-1) in
+  fun () -> (incr c; !c)
+
 type tag = {
   tag_map : ((int,Obj.t) Hashtbl.t) Lazy.t;
   tag_tag : int;
@@ -185,10 +188,10 @@ module Make (S : Weakey) = struct
   (** Do really the removing *)
   let collect () = ProdConsume.iter_remove tbl_final t_collected
 
-  let create = let c = ref (-1) in fun n ->
+  let create n =
     let t = {
       tbl_set = H.create n;
-      tbl_tag = (incr c; !c) }
+      tbl_tag = new_tbl_tag () }
     in
     Hashtbl.add gen_table t.tbl_tag t.tbl_set;
     Gc.finalise (fun t -> ProdConsume.add t t_collected) t;
