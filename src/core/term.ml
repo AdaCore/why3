@@ -156,23 +156,23 @@ let mk_pattern n vs ty = Hspat.hashcons {
 exception UncoveredVar of vsymbol
 exception DuplicateVar of vsymbol
 
-let add_no_dup vs s =
-  if Svs.mem vs s then raise (DuplicateVar vs) else Svs.add vs s
-
 let pat_wild ty = mk_pattern Pwild Svs.empty ty
 let pat_var v   = mk_pattern (Pvar v) (Svs.singleton v) v.vs_ty
-let pat_as p v  = mk_pattern (Pas (p,v)) (add_no_dup v p.pat_vars) v.vs_ty
+
+let pat_as p v =
+  let s = Svs.add_new v (DuplicateVar v) p.pat_vars in
+  mk_pattern (Pas (p,v)) s v.vs_ty
 
 let pat_or p q =
   if Svs.equal p.pat_vars q.pat_vars then
     mk_pattern (Por (p,q)) p.pat_vars p.pat_ty
   else
-    let s1, s2 = p.pat_vars, q.pat_vars in
-    let vs = Svs.choose (Svs.union (Svs.diff s1 s2) (Svs.diff s2 s1)) in
-    raise (UncoveredVar vs)
+    let s = Mvs.union (fun _ _ _ -> None) p.pat_vars q.pat_vars in
+    raise (UncoveredVar (Svs.choose s))
 
 let pat_app f pl ty =
-  let merge s p = Svs.fold add_no_dup s p.pat_vars in
+  let dup v () () = raise (DuplicateVar v) in
+  let merge s p = Mvs.union dup s p.pat_vars in
   mk_pattern (Papp (f,pl)) (List.fold_left merge Svs.empty pl) ty
 
 (* generic traversal functions *)
