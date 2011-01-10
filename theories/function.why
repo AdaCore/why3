@@ -1,0 +1,30 @@
+theory Injective
+  type a
+  type v
+  logic f a : v
+  logic f_1 v : a
+
+  axiom Inj : forall x : a. f_1(f x) = x
+
+  goal G1 : forall x y : a. f(x)=f(y) -> x = y
+  goal G2 : forall y : a. exists x : v. f_1(x)=y
+
+end
+
+theory Surjective
+  type a
+  type v
+  logic f a : v
+  logic f_1 v : a
+
+  clone import Injective with type v = a, type a = v,
+    logic f = f_1, logic f_1 = f
+
+end
+
+theory Bijective
+
+  use import Injective
+  clone Surjective with namespace . = .
+
+end
