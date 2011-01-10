@@ -408,7 +408,7 @@ module Hsterm = Hashcons.Make (struct
     | _ -> false
 
   let equal t1 t2 =
-    t_equal t1.t_ty t2.t_ty &&
+    ty_equal t1.t_ty t2.t_ty &&
     t_equal_node t1.t_node t2.t_node &&
     list_all2 (=) t1.t_label t2.t_label
 
