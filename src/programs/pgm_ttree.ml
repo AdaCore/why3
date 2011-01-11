@@ -189,7 +189,7 @@ type iexpr = {
 and iexpr_desc =
   | IElogic of Term.term
   | IElocal of ivsymbol
-  | IEglobal of psymbol
+  | IEglobal of psymbol * itype_v
   | IEapply of iexpr * ivsymbol
   | IEapply_ref of iexpr * ireference
   | IEfun of ibinder list * itriple

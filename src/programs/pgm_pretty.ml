@@ -18,7 +18,7 @@ let rec print_expr fmt e = match e.expr_desc with
   | Eglobal ls ->
       fprintf fmt "<global %a>" print_ls ls.p_ls
   | Efun (bl, t) ->
-      fprintf fmt "@[fun %a ->@ %a@]" 
+      fprintf fmt "@[<hov 2>fun %a ->@ %a@]" 
 	(print_list space print_pv) bl print_triple t
   | Elet (v, e1, e2) ->
       fprintf fmt "@[<hv 0>@[<hov 2>let %a =@ %a in@]@ %a@]" print_vs v.pv_vs

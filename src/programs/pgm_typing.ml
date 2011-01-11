@@ -640,22 +640,22 @@ let ivariant loc env (t, ps) =
     | _ ->
 	assert false
 
-let rec itype_v gl env = function
+let rec itype_v env = function
   | DTpure ty ->
       ITpure (Denv.ty_of_dty ty)
   | DTarrow (bl, c) ->
-      let env, bl = map_fold_left (ibinder gl) env bl in
-      ITarrow (bl, itype_c gl env c)
+      let env, bl = map_fold_left ibinder env bl in
+      ITarrow (bl, itype_c env c)
 
-and itype_c gl env c =
-  let tyv = itype_v gl env c.dc_result_type in
+and itype_c env c =
+  let tyv = itype_v env c.dc_result_type in
   { ic_result_type = tyv;
     ic_effect      = ieffect env c.dc_effect;
     ic_pre         = pre env c.dc_pre;
     ic_post        = post env c.dc_post; }
 
-and ibinder gl env (x, ty, tyv) =
-  let tyv = itype_v gl env tyv in
+and ibinder env (x, ty, tyv) =
+  let tyv = itype_v env tyv in
   let ty = Denv.ty_of_dty ty in
   let env, v = iadd_local env (id_user x.id x.id_loc) ty in
   env, (v, tyv)
@@ -737,7 +737,7 @@ let make_logic_app gl loc ty ls el =
 	make (t :: args) r
     | ({ iexpr_desc = IElocal v }, _) :: r ->
 	make (t_var v.i_pgm :: args) r
-    | ({ iexpr_desc = IEglobal s; iexpr_type = ty }, _) :: r ->
+    | ({ iexpr_desc = IEglobal (s, _); iexpr_type = ty }, _) :: r ->
 	make (t_app s.p_ls [] ty :: args) r
     | (e, _) :: r ->
 	let v = create_ivsymbol (id_user "x" loc) e.iexpr_type in
@@ -758,7 +758,7 @@ let make_app _gl loc ty f el =
 	begin match e.iexpr_desc with
 	  | IElocal v ->
 	      make (fun f -> mk_iexpr loc tye (IEapply_ref (k f, IRlocal v))) r
-	  | IEglobal v ->
+	  | IEglobal (v, _) ->
 	      make (fun f -> mk_iexpr loc tye (IEapply_ref (k f, IRglobal v))) r
 	  | _ ->
 	      let v = create_ivsymbol (id_user "x" loc) e.iexpr_type in
@@ -816,8 +816,8 @@ and iexpr_desc gl env loc ty = function
       IElogic (t_const c)
   | DElocal (x, _tyv) ->
       IElocal (Mstr.find x env.i_locals)
-  | DEglobal (s, _tyv) ->
-      IEglobal s
+  | DEglobal (s, tyv) ->
+      IEglobal (s, itype_v env tyv)
   | DElogic ls ->
       begin match ls.ls_args, ls.ls_value with
 	| [], Some _ ->
@@ -1000,7 +1000,7 @@ let rec print_iexpr fmt e = match e.iexpr_desc with
       print_term fmt t
   | IElocal v ->
       fprintf fmt "<local %a>" print_vs v.i_pgm
-  | IEglobal s ->
+  | IEglobal (s, _) ->
       fprintf fmt "<global %a>" print_ls s.p_ls
   | IEapply (e, v) ->
       fprintf fmt "@[((%a) %a)@]" print_iexpr e print_vs v.i_pgm
@@ -1207,8 +1207,9 @@ and expr_desc gl env loc ty = function
   | IElocal vs ->
       let vs = Mvs.find vs.i_pgm env in
       Elocal vs, vs.pv_tv, E.empty
-  | IEglobal s ->
-      Eglobal s, s.p_tv, E.empty
+  | IEglobal (s, tv) ->
+      let tv = type_v env tv in
+      Eglobal s, tv, E.empty
   | IEapply (e1, vs) ->
       let e1 = expr gl env e1 in
       (* printf "e1 : %a@." print_type_v e1.expr_type_v; *)
@@ -1565,7 +1566,7 @@ let rec decl ~wp env penv lmod uc = function
   | Ptree.Dlet (id, e) ->
       let e = type_expr uc e in
       if Debug.test_flag debug then
-	eprintf "@[--typing %s-----@\n  %a@\n%a@]@."
+	eprintf "@[--typing %s-----@\n  @[<hov 2>%a@]@\n@[<hov 2>: %a@]@]@."
 	  id.id Pgm_pretty.print_expr e print_type_v e.expr_type_v;
       let ls, uc = add_global id.id_loc id.id e.expr_type_v uc in
       let d = Dlet (ls, e) in

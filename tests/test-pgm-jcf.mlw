@@ -3,12 +3,16 @@ module P
 
   use import int.Int
   use import module stdlib.Ref
+  use array.ArrayLength as A
 
-(* let create sz = *)
-(*   { 0 <= sz <= maxlen } *)
-(*   ref (SA (malloc sz) (malloc sz) (malloc sz) sz 0) *)
-(*   { invariant_ result and *)
-(*     sa_sz result = sz and forall i:int. model result i = default } *)
+  parameter malloc : n:int -> {} A.t int 'a { A.length result = n }
+  parameter id     : x:'a  -> {} 'a         { result = x }
+
+  let create () =
+    { true }
+    malloc 1 : A.t int int
+    { true }
+
 end
 
 (*
