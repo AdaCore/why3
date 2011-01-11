@@ -4,12 +4,8 @@ module P
   use import int.Int
   use import module stdlib.Ref
 
-  let f (a : ref int) = a
-
-(*   let rec f5 (a b:ref int) variant { a } =  *)
-(*     { a >= 0 }  *)
-(*     if !a = 0 then !b else begin a := !a - 1; b := !b + 1; f5 a b end  *)
-(*     { result = old a + old b } *)
+  let rec f5 (a b : ref int) =
+    if True then !b else f5 a b
 
 end
 

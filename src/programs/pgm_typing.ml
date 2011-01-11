@@ -1360,6 +1360,7 @@ and letrec gl env dl = (* : env * recfun list *)
     map_fold_left type1 Mvs.empty dl
   in
   let rec fixpoint m =
+    (*     printf "fixpoint...@\n"; *)
     let m', dl' = one_step m in
     let same_effect (i,_,_,_,_) =
       E.equal (Mvs.find i.i_pgm m).c_effect (Mvs.find i.i_pgm m').c_effect
