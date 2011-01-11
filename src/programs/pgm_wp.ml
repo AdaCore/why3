@@ -264,10 +264,11 @@ let rec wp_expr env e q =
   let f = wp_desc env e q in
   let f = erase_label env lab f in
   let f = propose_label (label ~loc:e.expr_loc "WP") f in
-  if Debug.test_flag debug then
-    eprintf "@[--------@\n@[<hov 2>e = %a@]@\n@[<hov 2>q = %a@]@\n----@]@." 
-      Pgm_pretty.print_expr e
-      Pretty.print_fmla (snd (fst q));
+  if Debug.test_flag debug then begin
+    eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Pgm_pretty.print_expr e;
+    eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_fmla (snd (fst q));
+    eprintf "@[<hov 2>f = %a@]@\n----@]@\n" Pretty.print_fmla f;
+  end;
   f
 
 and wp_desc env e q = match e.expr_desc with

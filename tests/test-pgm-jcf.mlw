@@ -4,18 +4,11 @@ module P
   use import int.Int
   use import module stdlib.Ref
 
-  (* parameter b : ref int *)
-
-  (* let f () =  *)
-  (*   { b>0 } !b + 1 { result > b } *)
-
-  let test r =
-    { r = 1 }
-    assert { r = 1 };
-    r := !r + 1;
-    assert { r = 2 }
-    { true }
-
+(* let create sz = *)
+(*   { 0 <= sz <= maxlen } *)
+(*   ref (SA (malloc sz) (malloc sz) (malloc sz) sz 0) *)
+(*   { invariant_ result and *)
+(*     sa_sz result = sz and forall i:int. model result i = default } *)
 end
 
 (*

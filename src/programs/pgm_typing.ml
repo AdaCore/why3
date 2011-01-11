@@ -1495,8 +1495,7 @@ let type_type uc ty =
   let dty = Typing.dty denv.denv ty in
   Denv.ty_of_dty dty
 
-let add_logic_decl uc loc id ty =
-  let ls = create_lsymbol id [] (Some ty) in
+let add_logic_decl uc loc ls =
   try
     Pgm_module.add_logic_decl (Decl.create_logic_decl [ls, None]) uc
   with Theory.ClashSymbol _ ->
@@ -1509,13 +1508,11 @@ let add_global loc x tyv uc =
   with Pgm_module.ClashSymbol _ ->
     errorm ~loc "clash with previous symbol %s" x
 
-let add_global_if_pure gl { p_ls = ls } = match ls.ls_args, ls.ls_value with
-  | [], Some { ty_node = Ty.Tyapp (ts, _) } when ts_equal ts ts_arrow -> 
+let add_global_if_pure gl { p_ls = ls; p_ty = ty } = match ty with
+  | { ty_node = Ty.Tyapp (ts, _) } when ts_equal ts ts_arrow -> 
       gl
-  | [], Some ty -> 
-      let ty = purify ty in
-      add_logic_decl gl (loc_of_ls ls) (id_dup ls.ls_name) ty
-  | _ -> gl
+  | _ ->
+      add_logic_decl gl (loc_of_ls ls) ls
 
 let add_exception loc x ty uc =
   try
