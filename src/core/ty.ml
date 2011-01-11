@@ -68,8 +68,8 @@ module Mts = Tsym.M
 module Hts = Tsym.H
 module Wts = Tsym.W
 
-let ts_equal = (==)
-let ty_equal = (==)
+let ts_equal : tysymbol -> tysymbol -> bool = (==)
+let ty_equal : ty       -> ty       -> bool = (==)
 
 let ts_hash ts = id_hash ts.ts_name
 let ty_hash ty = Hashweak.tag_hash ty.ty_tag

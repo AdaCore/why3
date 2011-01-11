@@ -328,8 +328,8 @@ and expr =
 
 (* term and fmla equality *)
 
-let t_equal = (==)
-let f_equal = (==)
+let t_equal : term -> term -> bool = (==)
+let f_equal : fmla -> fmla -> bool = (==)
 
 let t_hash t = t.t_tag
 let f_hash f = f.f_tag
@@ -1702,7 +1702,7 @@ exception NoMatch
 
 let rec t_match s t1 t2 =
   if t_equal t1 t2 then s else
-  if not (t_equal t1.t_ty t2.t_ty) then raise NoMatch else
+  if not (ty_equal t1.t_ty t2.t_ty) then raise NoMatch else
   match t1.t_node, t2.t_node with
     | Tconst c1, Tconst c2 when c1 = c2 -> s
     | Tvar v1, _ ->
