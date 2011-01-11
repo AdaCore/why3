@@ -116,6 +116,7 @@ module rec T : sig
 
 end 
 
+and Spv :  sig include Set.S with type elt = T.pvsymbol end
 and Mpv :  sig include Map.S with type key = T.pvsymbol end
 
 (* references *)

@@ -1,12 +1,14 @@
 module M
 
-let foo (x : ref int) (y : ref int) = 
-  x := 1;
-  y := 2
+  use import module stdlib.Ref
 
-parameter r : ref int
+  let foo (x : ref int) (y : ref int) = 
+    x := 1;
+    y := 2
 
-let test () =
-  foo r r
+  parameter r : ref int
+
+  let test () =
+    foo r r
 
 end

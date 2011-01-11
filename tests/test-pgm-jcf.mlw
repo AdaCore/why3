@@ -3,15 +3,13 @@ module P
 
   use import int.Int
   use import module stdlib.Ref
-  use array.ArrayLength as A
 
-  parameter malloc : n:int -> {} A.t int 'a { A.length result = n }
-  parameter id     : x:'a  -> {} 'a         { result = x }
+  let f (a : ref int) = a
 
-  let create () =
-    { true }
-    malloc 1 : A.t int int
-    { true }
+(*   let rec f5 (a b:ref int) variant { a } =  *)
+(*     { a >= 0 }  *)
+(*     if !a = 0 then !b else begin a := !a - 1; b := !b + 1; f5 a b end  *)
+(*     { result = old a + old b } *)
 
 end
 

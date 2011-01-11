@@ -1,11 +1,13 @@
 
 module M
 
-(* missing variant *)
+  use import int.Int
 
-let rec even (x:int) : int variant {x} =
-  odd (x-1) 
-with odd (x:int) : int =
-  even (x-1)
+  (* missing variant *)
+
+  let rec even (x:int) : int variant {x} =
+    odd (x-1) 
+  with odd (x:int) : int =
+    even (x-1)
 
 end

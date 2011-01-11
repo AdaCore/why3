@@ -554,6 +554,9 @@ end = struct
 
 end 
 
+and Spv : sig include Set.S with type elt = T.pvsymbol end = 
+  Set.Make(struct type t = T.pvsymbol let compare = T.compare_pvsymbol end)
+
 and Mpv : sig include Map.S with type key = T.pvsymbol end = 
   Map.Make(struct type t = T.pvsymbol let compare = T.compare_pvsymbol end)
 
