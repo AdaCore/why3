@@ -98,8 +98,6 @@ let rec t_monomorph ty_base kept lsmap consts vmap t =
   let t_mono = t_monomorph ty_base kept lsmap consts in
   let f_mono = f_monomorph ty_base kept lsmap consts in
   t_label_copy t (match t.t_node with
-    | Tbvar _ ->
-        assert false
     | Tvar v ->
         Mvs.find v vmap
     | Tconst _ when Sty.mem t.t_ty kept ->

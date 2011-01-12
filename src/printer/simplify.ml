@@ -61,8 +61,6 @@ type info = {
 }
 
 let rec print_term info fmt t = match t.t_node with
-  | Tbvar _ ->
-      assert false
   | Tconst (ConstInt n) ->
       begin try
 	let n64 = Int64.of_string n in

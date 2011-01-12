@@ -79,7 +79,6 @@ let rec print_type info fmt ty = match ty.ty_node with
 let print_type info fmt = catch_unsupportedType (print_type info fmt)
 
 let rec print_term info fmt t = match t.t_node with
-  | Tbvar _ -> assert false
   | Tconst (ConstInt n) -> fprintf fmt "%s" n
   | Tconst (ConstReal c) ->
       Print_real.print_with_integers

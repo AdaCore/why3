@@ -202,8 +202,6 @@ and print_lrfmla opl opr info fmt f = match f.f_label with
       (print_list space print_label) ll (print_fnode false false info) f
 
 and print_tnode opl opr info fmt t = match t.t_node with
-  | Tbvar _ ->
-      assert false
   | Tvar v ->
       print_vs fmt v
   | Tconst (ConstInt n) -> fprintf fmt "%s%%Z" n

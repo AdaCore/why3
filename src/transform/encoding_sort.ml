@@ -96,7 +96,7 @@ let rec rewrite_term tenv ud vm t =
       let t1' = fnT vm t1 in
       let t2' = fnT (Mvs.add u (t_var u') vm) t2 in
       t_let t1' (close u' t2')
-  | Tcase _ | Teps _ | Tbvar _ ->
+  | Tcase _ | Teps _ ->
       Printer.unsupportedTerm t "unsupported term"
 
 and rewrite_fmla tenv ud vm f =

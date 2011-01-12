@@ -55,7 +55,6 @@ type info = {
 }
 
 let rec print_term info fmt t = match t.t_node with
-  | Tbvar _ -> assert false
   | Tconst c -> fprintf fmt "'%a'"
       Pretty.print_const c
   | Tvar v -> print_var fmt v

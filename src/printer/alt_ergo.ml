@@ -72,8 +72,6 @@ and print_tyapp info fmt = function
   | tl -> fprintf fmt "(%a) " (print_list comma (print_type info)) tl
 
 let rec print_term info fmt t = match t.t_node with
-  | Tbvar _ ->
-      assert false
   | Tconst c ->
       Pretty.print_const fmt c
   | Tvar { vs_name = id } ->

@@ -162,7 +162,6 @@ let rec rewrite_term tenv vsvar t =
   let fnT = rewrite_term tenv in
   let fnF = rewrite_fmla tenv in
   let t = match t.t_node with
-    | Tbvar _ -> assert false
     | Tvar vs -> Mvs.find vs vsvar
     | Tconst _ -> t
     | Tapp(p,tl) ->

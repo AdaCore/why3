@@ -313,8 +313,6 @@ let rec specialize_term ~loc htv t =
   List.fold_left (fun t l -> { t with dt_node = Tnamed (l, t) }) dt t.t_label
 
 and specialize_term_node ~loc htv = function
-  | Term.Tbvar _ ->
-      assert false
   | Term.Tvar v ->
       Tvar v.vs_name.id_string (* TODO: correct? is capture possible? *)
   | Term.Tconst c ->

@@ -165,7 +165,7 @@ let rec rewrite_term menv tvar vsvar t =
       let (vsvar',u) = conv_vs menv tvar vsvar u in
       let t1 = fnT vsvar t1 in let t2 = fnT vsvar' t2 in
       t_let t1 (cb u t2)
-    | Tcase _ | Teps _ | Tbvar _ ->
+    | Tcase _ | Teps _ ->
       Printer.unsupportedTerm t
         "Encoding instantiate : I can't encode this term" in
   (* Format.eprintf "@[<hov 2>Term : => %a : %a@\n@?" *)

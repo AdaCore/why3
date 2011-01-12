@@ -28,7 +28,7 @@ open Ty
 
 type vsymbol = private {
   vs_name : ident;
-  vs_ty : ty;
+  vs_ty   : ty;
 }
 
 module Mvs : Map.S with type key = vsymbol
@@ -127,20 +127,21 @@ type constant =
   | ConstReal of real_constant
 
 type term = private {
-  t_node : term_node;
+  t_node  : term_node;
   t_label : label list;
-  t_ty : ty;
-  t_tag : int;
+  t_vars  : Svs.t;
+  t_ty    : ty;
+  t_tag   : int;
 }
 
 and fmla = private {
-  f_node : fmla_node;
+  f_node  : fmla_node;
   f_label : label list;
-  f_tag : int;
+  f_vars  : Svs.t;
+  f_tag   : int;
 }
 
 and term_node = private
-  | Tbvar of int
   | Tvar of vsymbol
   | Tconst of constant
   | Tapp of lsymbol * term list
@@ -354,7 +355,7 @@ val f_s_any : (tysymbol -> bool) -> (lsymbol -> bool) -> fmla -> bool
 val t_ty_fold : ('a -> ty -> 'a) -> 'a -> term -> 'a
 val f_ty_fold : ('a -> ty -> 'a) -> 'a -> fmla -> 'a
 
-(* fold over applications in terms and formulas *)
+(* fold over applications in terms and formulas (but not in patterns!) *)
 
 val t_app_fold :
   ('a -> lsymbol -> ty list -> ty option -> 'a) -> 'a -> term -> 'a

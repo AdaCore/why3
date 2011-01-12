@@ -173,8 +173,6 @@ let get_mode info m =
 let rec print_term info fmt t =
   let term = print_term info in
   match t.t_node with
-  | Tbvar _ ->
-      assert false
   | Tconst c ->
       Pretty.print_const fmt c
   | Tvar { vs_name = id }

@@ -221,8 +221,6 @@ and print_app pri ls fmt tl = match extract_op ls, tl with
         print_ls ls (print_list space (print_lterm 6)) tl
 
 and print_tnode pri fmt t = match t.t_node with
-  | Tbvar _ ->
-      assert false
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->

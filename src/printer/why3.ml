@@ -195,8 +195,6 @@ and print_tapp pri fs fmt tl =
         end
 
 and print_tnode pri fmt t = match t.t_node with
-  | Tbvar _ ->
-      assert false
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
