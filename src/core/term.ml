@@ -37,7 +37,7 @@ module Svs = Vsym.S
 module Mvs = Vsym.M
 module Hvs = Vsym.H
 
-let vs_equal = (==)
+let vs_equal : vsymbol -> vsymbol -> bool = (==)
 
 let vs_hash vs = id_hash vs.vs_name
 
@@ -66,7 +66,7 @@ module Mls = Lsym.M
 module Hls = Lsym.H
 module Wls = Lsym.W
 
-let ls_equal = (==)
+let ls_equal : lsymbol -> lsymbol -> bool = (==)
 
 let ls_hash ls = id_hash ls.ls_name
 
@@ -102,7 +102,7 @@ and pattern_node =
   | Por  of pattern * pattern
   | Pas  of pattern * vsymbol
 
-let pat_equal = (==)
+let pat_equal : pattern -> pattern -> bool = (==)
 
 let pat_hash p = p.pat_tag
 

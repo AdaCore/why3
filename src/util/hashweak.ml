@@ -112,7 +112,7 @@ let dummy_tag = {
   tag_tag = -1;
 }
 
-let tag_equal = (==)
+let tag_equal : tag -> tag -> bool = (==)
 
 let tag_hash k = assert (k != dummy_tag); k.tag_tag
 

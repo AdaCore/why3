@@ -51,7 +51,7 @@ module Hid = Id.H
 
 type preid = ident
 
-let id_equal = (==)
+let id_equal : ident -> ident -> bool = (==)
 
 let id_hash id = Hashweak.tag_hash id.id_tag
 

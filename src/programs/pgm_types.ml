@@ -16,7 +16,7 @@ type mtsymbol = {
   mt_abstr : tysymbol;
 }
 
-let mt_equal = (==)
+let mt_equal : mtsymbol -> mtsymbol -> bool = (==)
 
 let mutable_types = Hts.create 17
 
@@ -221,7 +221,7 @@ end = struct
 	let tyl, ty = uncurry_type ~logic:true v in
 	create_lsymbol name tyl (Some ty); }
       
-  let p_equal = (==)
+  let p_equal : psymbol -> psymbol -> bool = (==)
 
   let create_pvsymbol name ?vs v = 
     { pv_name = id_register name;

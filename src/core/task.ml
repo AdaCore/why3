@@ -48,7 +48,7 @@ let tds_empty = mk_tds Stdecl.empty
 let tds_add td s = mk_tds (Stdecl.add td s.tds_set)
 let tds_singleton td = mk_tds (Stdecl.singleton td)
 
-let tds_equal = (==)
+let tds_equal : tdecl_set -> tdecl_set -> bool = (==)
 let tds_hash tds = Hashweak.tag_hash tds.tds_tag
 
 type clone_map = tdecl_set Mid.t
@@ -79,7 +79,7 @@ and task_hd = {
   task_tag   : Hashweak.tag; (* unique magical tag *)
 }
 
-let task_hd_equal = (==)
+let task_hd_equal : task_hd -> task_hd -> bool = (==)
 
 let task_hd_hash t = Hashweak.tag_hash t.task_tag
 

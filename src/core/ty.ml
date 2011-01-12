@@ -35,7 +35,7 @@ module Stv = Tvar.S
 module Mtv = Tvar.M
 module Htv = Tvar.H
 
-let tv_equal = (==)
+let tv_equal : tvsymbol -> tvsymbol -> bool = (==)
 
 let tv_hash tv = id_hash tv.tv_name
 

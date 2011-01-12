@@ -256,7 +256,7 @@ module Mpr = Prop.M
 module Hpr = Prop.H
 module Wpr = Prop.W
 
-let pr_equal = (==)
+let pr_equal : prsymbol -> prsymbol -> bool = (==)
 
 let pr_hash pr = id_hash pr.pr_name
 
@@ -352,7 +352,7 @@ module Sdecl = Decl.S
 module Mdecl = Decl.M
 module Wdecl = Decl.W
 
-let d_equal = (==)
+let d_equal : decl -> decl -> bool = (==)
 
 let d_hash d = Hashweak.tag_hash d.d_tag
 

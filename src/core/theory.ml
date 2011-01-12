@@ -118,7 +118,7 @@ module Smeta = SMmeta.S
 module Mmeta = SMmeta.M
 module Hmeta = SMmeta.H
 
-let meta_equal = (==)
+let meta_equal : meta -> meta -> bool = (==)
 
 let meta_hash m = m.meta_tag
 
@@ -251,7 +251,7 @@ module Stdecl = Tdecl.S
 module Mtdecl = Tdecl.M
 module Htdecl = Tdecl.H
 
-let td_equal = (==)
+let td_equal : tdecl -> tdecl -> bool = (==)
 let td_hash td = td.td_tag
 
 (** Constructors and utilities *)
