@@ -1493,7 +1493,7 @@ let f_subst_single v t1 f = f_subst (Mvs.singleton v t1) f
 let t_freevars s t = Svs.union s t.t_vars
 let f_freevars s f = Svs.union s f.f_vars
 
-(* alpha-equality on patterns *)
+(* alpha-equality *)
 
 let vs_rename_alpha c h vs = incr c; Mvs.add vs !c h
 
@@ -1517,46 +1517,14 @@ let rec pat_equal_alpha p1 p2 =
       pat_equal_alpha p1 p2 && pat_equal_alpha q1 q2
   | _ -> false
 
-(* alpha-equality on terms and formulas *)
-
-(*
-let bound_equal_alpha fnE m1 m2 (v1,b1,e1) (v2,b2,e2) =
-  ty_equal v1.vs_ty v2.vs_ty &&
-  let vn = t_var (fresh_vsymbol v1) in
-  let m1 = bound_inst m1.bv_subst m1.bv_bound b1 in
-  let m2 = bound_inst m2.bv_subst m2.bv_bound b2 in
-  let m1 = { m1 with bv_subst = Mint.add 0 vn m1.bv_subst } in
-  let m2 = { m2 with bv_subst = Mint.add 0 vn m2.bv_subst } in
-  fnE m1 m2 e1 e2
-
-let branch_equal_alpha fnE m1 m2 (p1,b1,e1) (p2,b2,e2) =
-  pat_equal_alpha p1 p2 &&
-  let mn,_ = pat_substs p1 Mint.empty in
-  let m1 = bound_inst m1.bv_subst m1.bv_bound b1 in
-  let m2 = bound_inst m2.bv_subst m2.bv_bound b2 in
-  let m1 = { m1 with bv_subst = Mint.fold Mint.add mn m1.bv_subst } in
-  let m2 = { m2 with bv_subst = Mint.fold Mint.add mn m2.bv_subst } in
-  fnE m1 m2 e1 e2
-
-let quant_equal_alpha fnF m1 m2 (vl1,b1,_,f1) (vl2,b2,_,f2) =
-  list_all2 (fun v1 v2 -> ty_equal v1.vs_ty v2.vs_ty) vl1 vl2 &&
-  let mn,_ = quant_vars vl1 Mint.empty in
-  let m1 = bound_inst m1.bv_subst m1.bv_bound b1 in
-  let m2 = bound_inst m2.bv_subst m2.bv_bound b2 in
-  let m1 = { m1 with bv_subst = Mint.fold Mint.add mn m1.bv_subst } in
-  let m2 = { m2 with bv_subst = Mint.fold Mint.add mn m2.bv_subst } in
-  fnF m1 m2 f1 f2
-
-let rec t_equal_alpha m1 m2 t1 t2 =
+let rec t_equal_alpha c1 c2 m1 m2 t1 t2 =
   t_equal t1 t2 || ty_equal t1.t_ty t2.t_ty &&
-  let t_eq = t_equal_alpha m1 m2 in
-  let f_eq = f_equal_alpha m1 m2 in
+  let t_eq = t_equal_alpha c1 c2 m1 m2 in
+  let f_eq = f_equal_alpha c1 c2 m1 m2 in
   match t1.t_node, t2.t_node with
-    | Tbvar i, _ ->
-        t_equal_alpha (bnd_new 0) m2 (bnd_find i m1.bv_subst) t2
-    | _, Tbvar i ->
-        t_equal_alpha m1 (bnd_new 0) t1 (bnd_find i m2.bv_subst)
-    | Tvar v1, Tvar v2 ->
+    | Tvar v1, Tvar v2 when Mvs.mem v1 m1 ->
+        Mvs.mem v2 m2 && Mvs.find v1 m1 = Mvs.find v2 m2
+    | Tvar v1, Tvar v2 when not (Mvs.mem v2 m2) ->
         vs_equal v1 v2
     | Tconst c1, Tconst c2 ->
         c1 = c2
@@ -1564,23 +1532,47 @@ let rec t_equal_alpha m1 m2 t1 t2 =
         ls_equal s1 s2 && List.for_all2 t_eq l1 l2
     | Tif (f1,t1,e1), Tif (f2,t2,e2) ->
         f_eq f1 f2 && t_eq t1 t2 && t_eq e1 e2
-    | Tlet (t1,tb1), Tlet (t2,tb2) ->
-        t_eq t1 t2 && bound_equal_alpha t_equal_alpha m1 m2 tb1 tb2
-    | Tcase (t1,b1), Tcase (t2,b2) ->
-        t_eq t1 t2 && list_all2 (branch_equal_alpha t_equal_alpha m1 m2) b1 b2
-    | Teps fb1, Teps fb2 ->
-        bound_equal_alpha f_equal_alpha m1 m2 fb1 fb2
+    | Tlet (t1,b1), Tlet (t2,b2) ->
+        t_eq t1 t2 &&
+        let u1,e1 = t_open_bound b1 in
+        let u2,e2 = t_open_bound b2 in
+        let m1 = vs_rename_alpha c1 m1 u1 in
+        let m2 = vs_rename_alpha c2 m2 u2 in
+        t_equal_alpha c1 c2 m1 m2 e1 e2
+    | Tcase (t1,bl1), Tcase (t2,bl2) ->
+        t_eq t1 t2 &&
+        let br_eq ((p1,_,_) as b1) ((p2,_,_) as b2) =
+          pat_equal_alpha p1 p2 &&
+          let p1,e1 = t_open_branch b1 in
+          let p2,e2 = t_open_branch b2 in
+          let m1 = pat_rename_alpha c1 m1 p1 in
+          let m2 = pat_rename_alpha c2 m2 p2 in
+          t_equal_alpha c1 c2 m1 m2 e1 e2
+        in
+        list_all2 br_eq bl1 bl2
+    | Teps b1, Teps b2 ->
+        let u1,e1 = f_open_bound b1 in
+        let u2,e2 = f_open_bound b2 in
+        let m1 = vs_rename_alpha c1 m1 u1 in
+        let m2 = vs_rename_alpha c2 m2 u2 in
+        f_equal_alpha c1 c2 m1 m2 e1 e2
     | _ -> false
 
-and f_equal_alpha m1 m2 f1 f2 =
+and f_equal_alpha c1 c2 m1 m2 f1 f2 =
   f_equal f1 f2 ||
-  let t_eq = t_equal_alpha m1 m2 in
-  let f_eq = f_equal_alpha m1 m2 in
+  let t_eq = t_equal_alpha c1 c2 m1 m2 in
+  let f_eq = f_equal_alpha c1 c2 m1 m2 in
   match f1.f_node, f2.f_node with
     | Fapp (s1,l1), Fapp (s2,l2) ->
         ls_equal s1 s2 && List.for_all2 t_eq l1 l2
-    | Fquant (q1,b1), Fquant (q2,b2) ->
-        q1 = q2 && quant_equal_alpha f_equal_alpha m1 m2 b1 b2
+    | Fquant (q1,((vl1,_,_,_) as b1)), Fquant (q2,((vl2,_,_,_) as b2)) ->
+        q1 = q2 &&
+        list_all2 (fun v1 v2 -> ty_equal v1.vs_ty v2.vs_ty) vl1 vl2 &&
+        let vl1,_,e1 = f_open_quant b1 in
+        let vl2,_,e2 = f_open_quant b2 in
+        let m1 = vl_rename_alpha c1 m1 vl1 in
+        let m2 = vl_rename_alpha c2 m2 vl2 in
+        f_equal_alpha c1 c2 m1 m2 e1 e2
     | Fbinop (a,f1,g1), Fbinop (b,f2,g2) ->
         a = b && f_eq f1 f2 && f_eq g1 g2
     | Fnot f1, Fnot f2 ->
@@ -1589,18 +1581,28 @@ and f_equal_alpha m1 m2 f1 f2 =
         true
     | Fif (f1,g1,h1), Fif (f2,g2,h2) ->
         f_eq f1 f2 && f_eq g1 g2 && f_eq h1 h2
-    | Flet (t1,fb1), Flet (t2,fb2) ->
-        t_eq t1 t2 && bound_equal_alpha f_equal_alpha m1 m2 fb1 fb2
-    | Fcase (t1,b1), Fcase (t2,b2) ->
-        t_eq t1 t2 && list_all2 (branch_equal_alpha f_equal_alpha m1 m2) b1 b2
+    | Flet (t1,b1), Flet (t2,b2) ->
+        t_eq t1 t2 &&
+        let u1,e1 = f_open_bound b1 in
+        let u2,e2 = f_open_bound b2 in
+        let m1 = vs_rename_alpha c1 m1 u1 in
+        let m2 = vs_rename_alpha c2 m2 u2 in
+        f_equal_alpha c1 c2 m1 m2 e1 e2
+    | Fcase (t1,bl1), Fcase (t2,bl2) ->
+        t_eq t1 t2 &&
+        let br_eq ((p1,_,_) as b1) ((p2,_,_) as b2) =
+          pat_equal_alpha p1 p2 &&
+          let p1,e1 = f_open_branch b1 in
+          let p2,e2 = f_open_branch b2 in
+          let m1 = pat_rename_alpha c1 m1 p1 in
+          let m2 = pat_rename_alpha c2 m2 p2 in
+          f_equal_alpha c1 c2 m1 m2 e1 e2
+        in
+        list_all2 br_eq bl1 bl2
     | _ -> false
 
-let t_equal_alpha = t_equal_alpha (bnd_new 0) (bnd_new 0)
-let f_equal_alpha = f_equal_alpha (bnd_new 0) (bnd_new 0)
-*)
-
-let t_equal_alpha _ _ = assert false
-let f_equal_alpha _ _ = assert false
+let t_equal_alpha = t_equal_alpha (ref (-1)) (ref (-1)) Mvs.empty Mvs.empty
+let f_equal_alpha = f_equal_alpha (ref (-1)) (ref (-1)) Mvs.empty Mvs.empty
 
 (* hash modulo alpha *)
 
@@ -1616,8 +1618,6 @@ let rec pat_hash_alpha p =
       Hashcons.combine
         (Hashcons.combine 4 (pat_hash_alpha p)) (pat_hash_alpha q)
 
-(* hash modulo alpha of terms and formulas *)
-
 let rec t_hash_alpha c m t =
   let fn_t = t_hash_alpha c m in
   let fn_f = f_hash_alpha c m in
@@ -1631,20 +1631,20 @@ let rec t_hash_alpha c m t =
       Hashcons.combine_list fn_t acc l
   | Tif (f,t1,t2) ->
       Hashcons.combine3 3 (fn_f f) (fn_t t1) (fn_t t2)
-  | Tlet (t1,(u,b,t2)) ->
-      let m = gen_bnd_combine fn_t m b in
+  | Tlet (t1,b) ->
+      let u,t2 = t_open_bound b in
       let m = vs_rename_alpha c m u in
       Hashcons.combine2 4 (fn_t t1) (t_hash_alpha c m t2)
   | Tcase (t1,bl) ->
-      let hash_br (p,b,t2) =
-        let m = gen_bnd_combine fn_t m b in
+      let hash_br b =
+        let p,t2 = t_open_branch b in
         let m = pat_rename_alpha c m p in
         t_hash_alpha c m t2
       in
       let acc = Hashcons.combine 5 (fn_t t1) in
       Hashcons.combine_list hash_br acc bl
-  | Teps (u,b,f) ->
-      let m = gen_bnd_combine fn_t m b in
+  | Teps b ->
+      let u,f = f_open_bound b in
       let m = vs_rename_alpha c m u in
       Hashcons.combine 6 (f_hash_alpha c m f)
 
@@ -1655,16 +1655,11 @@ and f_hash_alpha c m f =
   | Fapp (s,l) ->
       let acc = Hashcons.combine 0 (ls_hash s) in
       Hashcons.combine_list fn_t acc l
-  | Fquant (q,(vl,b,tl,f1)) ->
-      let m = gen_bnd_combine fn_t m b in
+  | Fquant (q,b) ->
+      let vl,_,f1 = f_open_quant b in
       let m = vl_rename_alpha c m vl in
-      let eh = function
-        | Term t -> t_hash_alpha c m t
-        | Fmla f -> f_hash_alpha c m f
-      in
       let hq = match q with Fforall -> 1 | Fexists -> 2 in
-      let hf = Hashcons.combine2 1 hq (f_hash_alpha c m f1) in
-      List.fold_left (Hashcons.combine_list eh) hf tl
+      Hashcons.combine2 1 hq (f_hash_alpha c m f1)
   | Fbinop (o,f,g) ->
       let ho = match o with
         | Fand -> 3 | For -> 4 | Fimplies -> 5 | Fiff -> 7
@@ -1676,13 +1671,13 @@ and f_hash_alpha c m f =
   | Ffalse -> 5
   | Fif (f1,f2,f3) ->
       Hashcons.combine3 6 (fn_f f1) (fn_f f2) (fn_f f3)
-  | Flet (t,(u,b,f1)) ->
-      let m = gen_bnd_combine fn_t m b in
+  | Flet (t,b) ->
+      let u,f1 = f_open_bound b in
       let m = vs_rename_alpha c m u in
       Hashcons.combine2 7 (fn_t t) (f_hash_alpha c m f1)
   | Fcase (t,bl) ->
-      let hash_br (p,b,f1) =
-        let m = gen_bnd_combine fn_t m b in
+      let hash_br b =
+        let p,f1 = f_open_branch b in
         let m = pat_rename_alpha c m p in
         f_hash_alpha c m f1
       in
