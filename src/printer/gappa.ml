@@ -41,6 +41,9 @@ type info = {
 }
 
 let round_single = ref ps_equ
+let round_double = ref ps_equ
+let int_minus = ref ps_equ
+let real_minus = ref ps_equ
 
 let find_th env file th =
   let theory = Env.find_theory env [file] th in
@@ -58,6 +61,7 @@ let get_info =
             let find_int = find_th env "int" "Int" in
             let int_add = find_int "infix +" in
             let int_sub = find_int "infix -" in
+            int_minus := find_int "prefix -";
             let int_mul = find_int "infix *" in
             let int_le = find_int "infix <=" in
             let int_ge = find_int "infix >=" in
@@ -68,6 +72,7 @@ let get_info =
             let find_real = find_th env "real" "Real" in
             let real_add = find_real "infix +" in
             let real_sub = find_real "infix -" in
+            real_minus := find_real "prefix -";
             let real_mul = find_real "infix *" in
             let real_div = find_real "infix /" in
             let real_le = find_real "infix <=" in
@@ -77,10 +82,14 @@ let get_info =
             let real_inv = find_real "inv" in
             let find_real_abs = find_th env "real" "Abs" in
             let real_abs = find_real_abs "abs" in
+            let find_real_square = find_th env "real" "Square" in
+            let real_sqrt = find_real_square "sqrt" in
 	    let find_rounding_theory = find_th env "floating_point" "Rounding" in
 	    let round_ne = find_rounding_theory "NearestTiesToEven" in
 	    let find_single_theory = find_th env "floating_point" "Single" in
 	    round_single := find_single_theory "round";
+	    let find_double_theory = find_th env "floating_point" "Double" in
+	    round_double := find_double_theory "round";
 (*
 	    let no_overflow_single = find_single_theory "no_overflow" in
 *)
@@ -88,13 +97,13 @@ let get_info =
             let l =
               List.fold_right Sls.add
                 [ps_equ;
-                 int_add; int_sub; int_mul;
+                 int_add; int_sub; !int_minus; int_mul;
                  int_le; int_ge; int_lt; int_gt;
 		 int_abs;
-		 real_add; real_sub; real_mul; real_div; real_inv;
+		 real_add; real_sub; !real_minus; real_mul; real_div; real_inv;
                  real_le; real_ge; real_lt; real_gt;
-                 real_abs;
-		 !round_single;
+                 real_abs; real_sqrt ;
+		 !round_single; !round_double;
 		] Sls.empty
             in
             arith_symbols := Some l;
@@ -158,6 +167,10 @@ let constant_value t =
     | Tconst c ->
 	fprintf str_formatter "%a" Pretty.print_const c;
 	flush_str_formatter ()
+    | Tapp(ls, [{ t_node = Tconst c}])
+        when ls_equal ls !int_minus || ls_equal ls !real_minus ->
+	fprintf str_formatter "-%a" Pretty.print_const c;
+	flush_str_formatter ()
     | _ -> raise Not_found
 
 (* terms *)
@@ -180,6 +193,8 @@ let rec print_term info fmt t =
       print_ident fmt id
   | Tapp (ls, [m;t]) when ls_equal ls !round_single ->
       fprintf fmt "rnd_ieee32_%s(%a)" (get_mode info m) term t
+  | Tapp (ls, [m;t]) when ls_equal ls !round_double ->
+      fprintf fmt "rnd_ieee64_%s(%a)" (get_mode info m) term t
   | Tapp (ls, tl) ->
       begin match query_syntax info.info_syn ls.ls_name with
 	| Some s -> syntax_arguments s term fmt tl
@@ -381,44 +396,6 @@ let print_goal info fmt g =
 let print_task env pr thpr ?old:_ fmt task =
   forget_all ident_printer;
   let info = get_info env task in
-(* Updated upstream *)
-  (* let isnotinlinedt _t = true in *)
-  (* let isnotinlinedf f = match f.f_node with *)
-  (*   | Fapp (ps,_) when Sls.mem ps info.info_inline ->  *)
-  (*       eprintf "inlining no_overflow_single!!@."; *)
-  (*       false *)
-  (*   | Fapp (ps,_) ->  *)
-  (*       eprintf "NOT inlining symbol %a@." print_ident ps.ls_name; *)
-  (*       false *)
-  (*   | _ -> true *)
-  (* in *)
-  (* let task = Trans.apply (Inlining.t ~isnotinlinedt ~isnotinlinedf) task in *)
-(* ======= *)
-(*
-  let isnotinlinedt t =
-    match t.t_node with
-      | Tapp (ls,_) when Sls.mem ls info.info_inline ->
-          eprintf "NOT inlining symbol %a@." print_ident ls.ls_name;
-          true
-      | Tapp (ls,_) ->
-          eprintf "inlining symbol %a@." print_ident ls.ls_name;
-          false
-      | _ -> true
-  in
-  let isnotinlinedf f = match f.f_node with
-    | Fapp (ps,_) when Sls.mem ps info.info_inline ->
-        eprintf "NOT inlining symbol %a@." print_ident ps.ls_name;
-        true
-    | Fapp (ps,_) ->
-        eprintf "inlining symbol %a@." print_ident ps.ls_name;
-        false
-    | _ -> true
-  in
-  eprintf "Before inlining: @\n%a@." Pretty.print_task task;
-  let task = Trans.apply (Inlining.t ~isnotinlinedt ~isnotinlinedf) task in
-  eprintf "Inlining: @\n%a@." Pretty.print_task task;
-*)
-(* > Stashed changes *)
   let task =
     Abstraction.abstraction
       (fun f -> Sls.mem f info.info_symbols)
