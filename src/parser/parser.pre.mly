@@ -286,11 +286,11 @@ decl:
     { LogicDecl $2 }
 | INDUCTIVE list1_inductive_decl
     { IndDecl $2 }
-| AXIOM uident labels COLON lexpr
+| AXIOM ident labels COLON lexpr
     { PropDecl (loc (), Kaxiom, add_lab $2 $3, $5) }
-| LEMMA uident labels COLON lexpr
+| LEMMA ident labels COLON lexpr
     { PropDecl (loc (), Klemma, add_lab $2 $3, $5) }
-| GOAL uident labels COLON lexpr
+| GOAL ident labels COLON lexpr
     { PropDecl (loc (), Kgoal, add_lab $2 $3, $5) }
 | USE use
     { UseClone (loc (), $2, None) }
@@ -438,7 +438,7 @@ indcases:
 ;
 
 indcase:
-| uident labels COLON lexpr { (loc (), add_lab $1 $2, $4) }
+| ident labels COLON lexpr { (loc (), add_lab $1 $2, $4) }
 ;
 
 /* Type expressions */
