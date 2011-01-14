@@ -46,8 +46,6 @@ let create_vsymbol name ty = {
   vs_ty   = ty;
 }
 
-let fresh_vsymbol v = create_vsymbol (id_dup v.vs_name) v.vs_ty
-
 (** Function and predicate symbols *)
 
 type lsymbol = {
@@ -233,7 +231,7 @@ let pat_or p q =
 (* symbol-wise map/fold *)
 
 let rec pat_gen_map fnT fnL m pat =
-  let fn p = pat_gen_map fnT fnL m p in
+  let fn = pat_gen_map fnT fnL m in
   let ty = fnT pat.pat_ty in
   match pat.pat_node with
     | Pwild -> pat_wild ty
@@ -805,23 +803,26 @@ let f_close_quant vl tl f =
 
 (* open bindings *)
 
-let vs_rename h v =
-  let u = fresh_vsymbol v in
+let gen_fresh_vsymbol fnT v =
+  create_vsymbol (id_dup v.vs_name) (fnT v.vs_ty)
+
+let gen_vs_rename fnT h v =
+  let u = gen_fresh_vsymbol fnT v in
   Mvs.add v (t_var u) h, u
 
-let vl_rename h vl =
-  Util.map_fold_left vs_rename h vl
+let gen_vl_rename fnT h vl =
+  Util.map_fold_left (gen_vs_rename fnT) h vl
 
-let pat_rename h p =
-  let add_vs v () = fresh_vsymbol v in
+let gen_pat_rename fnT fnL h p =
+  let add_vs v () = gen_fresh_vsymbol fnT v in
   let m = Mvs.mapi add_vs p.pat_vars in
-  let rec rename p = match p.pat_node with
-    | Pvar v -> pat_var (Mvs.find v m)
-    | Pas (p, v) -> pat_as (rename p) (Mvs.find v m)
-    | _ -> pat_map rename p
-  in
-  let m = Mvs.map t_var m in
-  Mvs.union (fun _ _ t -> Some t) h m, rename p
+  let p = pat_gen_map fnT fnL m p in
+  Mvs.union (fun _ _ t -> Some t) h (Mvs.map t_var m), p
+
+let fresh_vsymbol = gen_fresh_vsymbol (fun ty -> ty)
+let vs_rename = gen_vs_rename (fun ty -> ty)
+let vl_rename = gen_vl_rename (fun ty -> ty)
+let pat_rename = gen_pat_rename (fun ty -> ty) (fun ls -> ls)
 
 let t_open_bound (v,b,t) =
   let m,v = vs_rename b.bv_subst v in
@@ -1037,22 +1038,6 @@ let t_tuple tl =
 (** Term library *)
 
 (* generic map over types, symbols and variables *)
-
-let gen_fresh_vsymbol fnT v =
-  create_vsymbol (id_dup v.vs_name) (fnT v.vs_ty)
-
-let gen_vs_rename fnT h v =
-  let u = gen_fresh_vsymbol fnT v in
-  Mvs.add v (t_var u) h, u
-
-let gen_vl_rename fnT h vl =
-  Util.map_fold_left (gen_vs_rename fnT) h vl
-
-let gen_pat_rename fnT fnL h p =
-  let add_vs v () = gen_fresh_vsymbol fnT v in
-  let m = Mvs.mapi add_vs p.pat_vars in
-  let p = pat_gen_map fnT fnL m p in
-  Mvs.union (fun _ _ t -> Some t) h (Mvs.map t_var m), p
 
 let gen_bnd_combine fn_t m { bv_subst = h } =
   Mvs.union (fun _ _ t -> Some t) m (Mvs.map fn_t h)
