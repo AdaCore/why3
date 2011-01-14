@@ -653,10 +653,11 @@ let add_projections th d = match d.td_def with
           | Some t -> t
         in
         let per_param acc ty (n,_) = match n with
-          | Some id when not (Mstr.mem id.id acc) ->
-              let fn = id_user id.id id.id_loc in
+          | Some { id = id ; id_lab = labels ; id_loc = loc }
+            when not (Mstr.mem id acc) ->
+              let fn = id_user ~labels id loc in
               let fs = create_fsymbol fn [tc] ty in
-              Mstr.add id.id (fs,tc,ty) acc
+              Mstr.add id (fs,tc,ty) acc
           | _ -> acc
         in
         List.fold_left2 per_param acc cs.ls_args pl
@@ -690,15 +691,14 @@ let add_types dl th =
       let vars = Hashtbl.create 17 in
       let vl =
 	List.map
-	  (fun v ->
-	     if Hashtbl.mem vars v.id then
-	       error ~loc:v.id_loc (DuplicateTypeVar v.id);
-	     let i = create_tvsymbol (id_user v.id v.id_loc) in
-	     Hashtbl.add vars v.id i;
+	  (fun { id = v ; id_lab = labels ; id_loc = loc } ->
+	     if Hashtbl.mem vars v then error ~loc (DuplicateTypeVar v);
+	     let i = create_tvsymbol (id_user ~labels v loc) in
+	     Hashtbl.add vars v i;
 	     i)
 	  d.td_params
       in
-      let id = id_user id d.td_loc in
+      let id = id_user id ~labels:d.td_ident.id_lab d.td_loc in
       let ts = match d.td_def with
 	| TDalias ty ->
 	    let rec apply = function
@@ -754,11 +754,11 @@ let add_types dl th =
 	  Tabstract
       | TDalgebraic cl ->
 	  let ty = ty_app ts (List.map ty_var ts.ts_args) in
-	  let constructor (loc, id, pl) =
+	  let constructor (loc, { id = id ; id_lab = labels }, pl) =
 	    let param (_,t) = ty_of_dty (dty th' t) in
 	    let tyl = List.map param pl in
-	    Hashtbl.replace csymbols id.id loc;
-	    create_fsymbol (id_user id.id loc) tyl ty
+	    Hashtbl.replace csymbols id loc;
+	    create_fsymbol (id_user ~labels id loc) tyl ty
 	  in
 	  Talgebraic (List.map constructor cl)
     in
@@ -779,7 +779,7 @@ let add_logics dl th =
   (* 1. create all symbols and make an environment with these symbols *)
   let create_symbol th d =
     let id = d.ld_ident.id in
-    let v = id_user id d.ld_loc in
+    let v = id_user ~labels:d.ld_ident.id_lab id d.ld_loc in
     let denv = create_denv th in
     Hashtbl.add denvs id denv;
     let type_ty (_,t) = ty_of_dty (dty denv t) in
@@ -810,7 +810,7 @@ let add_logics dl th =
     let create_var (x, _) ty =
       let id = match x with
 	| None -> id_fresh "%x"
-	| Some id -> id_user id.id id.id_loc
+	| Some id -> id_user ~labels:id.id_lab id.id id.id_loc
       in
       create_vsymbol id ty
     in
@@ -862,7 +862,7 @@ let type_fmla denv env f =
 let fmla uc = type_fmla (create_denv uc) Mstr.empty
 
 let add_prop k loc s f th =
-  let pr = create_prsymbol (id_user s.id loc) in
+  let pr = create_prsymbol (id_user ~labels:s.id_lab s.id loc) in
   try add_prop_decl th k pr (fmla th f)
   with ClashSymbol s -> error ~loc (Clash s)
 
@@ -875,7 +875,7 @@ let add_inductives dl th =
   let psymbols = Hashtbl.create 17 in
   let create_symbol th d =
     let id = d.in_ident.id in
-    let v = id_user id d.in_loc in
+    let v = id_user ~labels:d.in_ident.id_lab id d.in_loc in
     let denv = create_denv th in
     let type_ty (_,t) = ty_of_dty (dty denv t) in
     let pl = List.map type_ty d.in_params in
@@ -890,9 +890,9 @@ let add_inductives dl th =
   let type_decl d =
     let id = d.in_ident.id in
     let ps = Hashtbl.find psymbols id in
-    let clause (loc, id, f) =
-      Hashtbl.replace propsyms id.id loc;
-      create_prsymbol (id_user id.id loc), fmla th' f
+    let clause (loc, { id = id ; id_lab = labels }, f) =
+      Hashtbl.replace propsyms id loc;
+      create_prsymbol (id_user ~labels id loc), fmla th' f
     in
     ps, List.map clause d.in_def
   in

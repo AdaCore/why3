@@ -133,13 +133,13 @@ let rec pattern_env env p = match p.dp_node with
   | Pwild -> env
   | Papp (_, pl) -> List.fold_left pattern_env env pl
   | Por (p, _) -> pattern_env env p
-  | Pvar { id = x ; id_loc = loc } ->
+  | Pvar { id = x ; id_lab = labels ; id_loc = loc } ->
       let ty = ty_of_dty p.dp_ty in
-      let vs = create_vsymbol (id_user x loc) ty in
+      let vs = create_vsymbol (id_user ~labels x loc) ty in
       Mstr.add x vs env
-  | Pas (p, { id = x ; id_loc = loc }) ->
+  | Pas (p, { id = x ; id_lab = labels ; id_loc = loc }) ->
       let ty = ty_of_dty p.dp_ty in
-      let vs = create_vsymbol (id_user x loc) ty in
+      let vs = create_vsymbol (id_user ~labels x loc) ty in
       pattern_env (Mstr.add x vs env) p
 
 let get_pat_var env p x = try Mstr.find x env with Not_found ->
@@ -194,10 +194,10 @@ let rec term env t = match t.dt_node with
       t_app s (List.map (term env) tl) (ty_of_dty t.dt_ty)
   | Tif (f, t1, t2) ->
       t_if (fmla env f) (term env t1) (term env t2)
-  | Tlet (e1, { id = x ; id_loc = loc }, e2) ->
+  | Tlet (e1, { id = x ; id_lab = labels ; id_loc = loc }, e2) ->
       let ty = ty_of_dty e1.dt_ty in
       let e1 = term env e1 in
-      let v = create_vsymbol (id_user x loc) ty in
+      let v = create_vsymbol (id_user ~labels x loc) ty in
       let env = Mstr.add x v env in
       let e2 = term env e2 in
       t_let_close v e1 e2
@@ -209,9 +209,9 @@ let rec term env t = match t.dt_node with
   | Tnamed (x, e1) ->
       let e1 = term env e1 in
       t_label_add x e1
-  | Teps ({ id = x ; id_loc = loc }, ty, e1) ->
+  | Teps ({ id = x ; id_lab = labels ; id_loc = loc }, ty, e1) ->
       let ty = ty_of_dty ty in
-      let v = create_vsymbol (id_user x loc) ty in
+      let v = create_vsymbol (id_user ~labels x loc) ty in
       let env = Mstr.add x v env in
       let e1 = fmla env e1 in
       t_eps_close v e1
@@ -228,9 +228,9 @@ and fmla env = function
   | Fif (f1, f2, f3) ->
       f_if (fmla env f1) (fmla env f2) (fmla env f3)
   | Fquant (q, uqu, trl, f1) ->
-      let uquant env ({ id = x ; id_loc = loc },ty) =
+      let uquant env ({ id = x ; id_lab = labels ; id_loc = loc },ty) =
         let ty = ty_of_dty ty in
-        let v = create_vsymbol (id_user x loc) ty in
+        let v = create_vsymbol (id_user ~labels x loc) ty in
         Mstr.add x v env, v
       in
       let env, vl = map_fold_left uquant env uqu in
@@ -242,10 +242,10 @@ and fmla env = function
       f_quant_close q vl trl (fmla env f1)
   | Fapp (s, tl) ->
       f_app s (List.map (term env) tl)
-  | Flet (e1, { id = x ; id_loc = loc }, f2) ->
+  | Flet (e1, { id = x ; id_lab = labels ; id_loc = loc }, f2) ->
       let ty = ty_of_dty e1.dt_ty in
       let e1 = term env e1 in
-      let v = create_vsymbol (id_user x loc) ty in
+      let v = create_vsymbol (id_user ~labels x loc) ty in
       let env = Mstr.add x v env in
       let f2 = fmla env f2 in
       f_let_close v e1 f2

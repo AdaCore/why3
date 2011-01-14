@@ -286,12 +286,12 @@ decl:
     { LogicDecl $2 }
 | INDUCTIVE list1_inductive_decl
     { IndDecl $2 }
-| AXIOM uident COLON lexpr
-    { PropDecl (loc (), Kaxiom, $2, $4) }
-| LEMMA uident COLON lexpr
-    { PropDecl (loc (), Klemma, $2, $4) }
-| GOAL uident COLON lexpr
-    { PropDecl (loc (), Kgoal, $2, $4) }
+| AXIOM uident labels COLON lexpr
+    { PropDecl (loc (), Kaxiom, add_lab $2 $3, $5) }
+| LEMMA uident labels COLON lexpr
+    { PropDecl (loc (), Klemma, add_lab $2 $3, $5) }
+| GOAL uident labels COLON lexpr
+    { PropDecl (loc (), Kgoal, add_lab $2 $3, $5) }
 | USE use
     { UseClone (loc (), $2, None) }
 | CLONE use clone_subst
