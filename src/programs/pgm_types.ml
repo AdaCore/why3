@@ -236,13 +236,11 @@ end = struct
       
   let rec subst_var ts s vs =
     let ty' = ty_inst ts vs.vs_ty in
-    let vs' =
-      if ty_equal ty' vs.vs_ty then
-	vs
-      else
-	create_vsymbol (id_clone vs.vs_name) ty' 
-    in
-    Mvs.add vs (t_var vs') s, vs'
+    if ty_equal ty' vs.vs_ty then
+      s, vs
+    else
+      let vs' = create_vsymbol (id_clone vs.vs_name) ty' in
+      Mvs.add vs (t_var vs') s, vs'
 	
   and subst_post ts s ((v, q), ql) =
     let vq = let s, v = subst_var ts s v in v, f_ty_subst ts s q in
