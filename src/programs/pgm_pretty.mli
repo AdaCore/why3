@@ -1,5 +1,8 @@
 
+open Format
 
-val print_expr : Format.formatter -> Pgm_ttree.expr -> unit
+val print_pv : formatter -> Pgm_types.T.pvsymbol -> unit
 
-val print_recfun : Format.formatter -> Pgm_ttree.recfun -> unit
+val print_expr : formatter -> Pgm_ttree.expr -> unit
+
+val print_recfun : formatter -> Pgm_ttree.recfun -> unit

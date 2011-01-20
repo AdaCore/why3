@@ -962,7 +962,9 @@ let rec print_iexpr fmt e = match e.iexpr_desc with
   | IElet (v, e1, e2) ->
       fprintf fmt "@[let %a = %a in@ %a@]" print_vs v.i_pgm
 	print_iexpr e1 print_iexpr e2
-
+  | IEif (e1, e2, e3) ->
+      fprintf fmt "@[if %a then %a else %a@]"
+	print_iexpr e1 print_iexpr e2 print_iexpr e3
   | _ ->
       fprintf fmt "<other>"
 
@@ -1360,10 +1362,15 @@ and letrec gl env dl = (* : env * recfun list *)
     map_fold_left type1 Mvs.empty dl
   in
   let rec fixpoint m =
-    (*     printf "fixpoint...@\n"; *)
+    (* printf "fixpoint...@\n"; *)
     let m', dl' = one_step m in
-    let same_effect (i,_,_,_,_) =
-      E.equal (Mvs.find i.i_pgm m).c_effect (Mvs.find i.i_pgm m').c_effect
+    let same_effect (i,bl,_,_,_) =
+      let c = Mvs.find i.i_pgm m and c' = Mvs.find i.i_pgm m' in
+      let v = tarrow bl c and v' = tarrow bl c' in
+      (* printf "  v = %a@." print_type_v v; *)
+      (* printf "  v'= %a@." print_type_v v'; *)
+      eq_type_v v v'
+      (* E.equal c.c_effect c'.c_effect *)
     in
     if List.for_all same_effect dl then m, dl' else fixpoint m'
   in

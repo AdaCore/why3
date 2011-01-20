@@ -361,10 +361,19 @@ end = struct
   let rec eq_type_v v1 v2 = match v1, v2 with
     | Tpure ty1, Tpure ty2 ->
 	ty_equal ty1 ty2
-    | Tarrow _, Tarrow _ ->
-	false (* TODO? *)
+    | Tarrow (bl1, c1), Tarrow (bl2, c2) ->
+	assert (List.length bl1 = List.length bl2); (* FIXME? *)
+	let s = 
+	  List.fold_left2 (fun s v1 v2 -> Mpv.add v1 (R.Rlocal v2) s) 
+	    Mpv.empty bl1 bl2
+	in
+	eq_type_c (subst_type_c s Mtv.empty Mvs.empty c1) c2
     | _ ->
-	assert false
+	false
+
+  and eq_type_c c1 c2 =
+    eq_type_v c1.c_result_type c2.c_result_type &&
+    E.equal   c1.c_effect      c2.c_effect
 
   (* pretty-printers *)
 

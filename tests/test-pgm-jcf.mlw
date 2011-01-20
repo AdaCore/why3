@@ -4,8 +4,9 @@ module P
   use import int.Int
   use import module stdlib.Ref
 
-  let rec f5 (a b : ref int) =
-    if True then !b else f5 a b
+  let f1 () (a : ref int) = !a
+
+  let f2 (a : ref int) = f1 () a
 
 end
 
