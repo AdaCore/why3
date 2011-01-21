@@ -371,7 +371,10 @@ let () =
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
-let () = Scheduler.async := (fun f v -> ignore (Thread.create f v))
+let () =
+  let m = B.MainWorker.create (fun (f,v) -> f v) in
+  let async f v = B.MainWorker.add_work m (f,v) in
+  Scheduler.async := async
 
 let () =
   let m = Mutex.create () in

@@ -384,3 +384,44 @@ in
         open_std (fun fmt -> Pp.wnl fmt;
           print_csv cmp print_tool print_probs fmt l) s
     ) b.boutputs
+
+
+  (** Create and manage one main working thread *)
+module MainWorker =
+struct
+  type 'a t = { queue : 'a Queue.t;
+                mutex : Mutex.t;
+                condition : Condition.t;
+              }
+
+  let create f =
+    let t = { queue = Queue.create ();
+              mutex = Mutex.create ();
+              condition = Condition.create ();
+            } in
+    let rec main () =
+      Mutex.lock t.mutex;
+      while Queue.is_empty t.queue do
+        Condition.wait t.condition t.mutex
+      done;
+      let v = Queue.pop t.queue in
+      Mutex.unlock t.mutex;
+      f v;
+      main () in
+    let _ = Thread.create main () in
+    t
+
+  let add_work t x =
+    Mutex.lock t.mutex;
+    Queue.push x t.queue;
+    Condition.signal t.condition;
+    Mutex.unlock t.mutex
+
+  let add_works t q =
+    Mutex.lock t.mutex;
+    Queue.transfer q t.queue;
+    Condition.signal t.condition;
+    Mutex.unlock t.mutex
+
+
+end
