@@ -137,11 +137,3 @@ val print_output :
   (formatter -> 'a -> unit) ->
   (formatter -> 'b -> unit) ->
   ('a,'b) bench * ('a * ('a,'b) result list) list -> unit
-
-module MainWorker :
-sig
-  type 'a t
-  val create : ('a -> unit) -> 'a t
-  val add_work : 'a t -> 'a -> unit
-  val add_works : 'a t -> 'a Queue.t -> unit
-end

@@ -59,36 +59,75 @@ type ('a,'b) callback = 'a -> 'b -> task -> int -> proof_attempt_status -> unit
 let debug_call = Debug.register_flag "call"
 let debug = Debug.register_flag "bench_core"
 
-module MTask :
+  (** Create and manage one main worker which
+      wait for the remaining works *)
+module MainWorker :
 sig
-  type shared
-  val create : unit -> shared
-  val start : shared -> unit
-  val stop : shared -> unit
-  val lock : shared -> unit
-  val unlock : shared -> unit
-  val wait : shared -> unit
+  type 'a t
+  val create : unit -> 'a t
+  val treat : 'a t -> ('b -> 'a -> 'b) -> 'b -> 'b
+  val start_work : 'a t -> unit
+  val stop_work : 'a t -> unit
+  val add_work : 'a t -> 'a -> unit
+  val add_works : 'a t -> 'a Queue.t -> unit
 end
 =
 struct
-  type shared =
-      { m : Mutex.t; c : Condition.t;
-        mutable nb_task : int;
-      }
+  type 'a t = { queue : 'a Queue.t;
+                mutex : Mutex.t;
+                condition : Condition.t;
+                mutable remaining : int;
+              }
 
   let create () =
-    { m = Mutex.create ();
-      c = Condition.create ();
-      nb_task = 0}
+    { queue = Queue.create ();
+      mutex = Mutex.create ();
+      condition = Condition.create ();
+      remaining = 0;
+    }
 
-  let test s = s.nb_task = 0
-  let start s = Mutex.lock s.m; s.nb_task <- s.nb_task + 1; Mutex.unlock s.m
-  let stop s = Mutex.lock s.m; s.nb_task <- s.nb_task - 1;
-    if test s then Condition.signal s.c; Mutex.unlock s.m
-  let wait s = Mutex.lock s.m;
-    if not (test s) then Condition.wait s.c s.m
-  let lock s = Mutex.lock s.m
-  let unlock s = Mutex.unlock s.m
+  let treat t f acc =
+    let rec main acc =
+      Mutex.lock t.mutex;
+      while Queue.is_empty t.queue && t.remaining > 0 do
+        Condition.wait t.condition t.mutex
+      done;
+      if Queue.is_empty t.queue
+      then begin (* t.remaining < 0 *) Mutex.unlock t.mutex;acc end
+      else
+        begin
+          let v = Queue.pop t.queue in
+          Mutex.unlock t.mutex;
+          let acc = f acc v in
+          Thread.yield ();
+          main acc
+        end in
+    main acc
+
+  let start_work t =
+    Mutex.lock t.mutex;
+    t.remaining <- t.remaining + 1;
+    Mutex.unlock t.mutex
+
+  let stop_work t =
+    Mutex.lock t.mutex;
+    t.remaining <- t.remaining - 1;
+    if t.remaining = 0 then Condition.signal t.condition;
+    Mutex.unlock t.mutex
+
+  let add_work t x =
+    Mutex.lock t.mutex;
+    Queue.push x t.queue;
+    Condition.signal t.condition;
+    Mutex.unlock t.mutex
+
+  let add_works t q =
+    Mutex.lock t.mutex;
+    Queue.transfer q t.queue;
+    Condition.signal t.condition;
+    Mutex.unlock t.mutex
+
+
 end
 
 let call s callback tool prob =
@@ -99,48 +138,54 @@ let call s callback tool prob =
       ~command:(tool.tcommand) ~driver:(tool.tdriver)
       ~callback:cb task) q in
   let iter q pval i task =
-    MTask.start s;
+    MainWorker.start_work s;
     let cb res = callback pval i task res;
       match res with Scheduler.Done _
-        | Scheduler.InternalFailure _ -> MTask.stop s | _ -> () in
+        | Scheduler.InternalFailure _ -> MainWorker.stop_work s | _ -> () in
     call q cb task; succ i in
   let trans_cb pval tl =
     let q = Queue.create () in
     ignore (List.fold_left (iter q pval) 0 (List.rev tl));
     transfer_proof_attempts q;
-    MTask.stop s in
+    MainWorker.stop_work s in
   (** Apply trans *)
   let iter_task (pval,task) =
-    MTask.start s;
+    MainWorker.start_work s;
     let trans = Trans.compose_l (prob.ptrans tool.tenv)
       (Trans.singleton tool.ttrans) in
     apply_transformation_l ~callback:(trans_cb pval) trans task in
   (** Split *)
   let ths = do_why_sync (prob.ptask tool.tenv) tool.tuse in
-  MTask.start s;
+  MainWorker.start_work s;
   List.iter iter_task ths;
-  MTask.stop s
+  MainWorker.stop_work s
 
 let general ?(callback=fun _ _ _ _ _ -> ()) iter add =
   Debug.dprintf debug "Start one general@.";
-  let s = MTask.create () in
-  iter (fun v tool prob ->
+  (** Main worker *)
+  let t = MainWorker.create () in
+  (** Start all *)
+  MainWorker.start_work t;
+  let _ = Thread.create (fun () ->
+    iter (fun v tool prob ->
     let cb pval i task res =
-      callback tool.tval pval task i res;
-      match res with
-        | Scheduler.InternalFailure _ | Scheduler.Done _ -> MTask.lock s;
-          add v {tool = tool.tval; prob = pval; task = task;
-                 idtask = i;
-                 result = match res with
-                   | Scheduler.InternalFailure exn -> InternalFailure exn
-                   | Scheduler.Done r -> Done r
-                   | _ -> assert false
-                };
-          MTask.unlock s
-        | _ -> () in
-    call s cb tool prob);
-  MTask.wait s;
-  MTask.unlock s
+      MainWorker.add_work t (fun () ->
+        callback tool.tval pval task i res;
+        match res with
+          | Scheduler.InternalFailure _ | Scheduler.Done _ ->
+            add v {tool = tool.tval; prob = pval; task = task;
+                   idtask = i;
+                   result = match res with
+                     | Scheduler.InternalFailure exn -> InternalFailure exn
+                     | Scheduler.Done r -> Done r
+                     | _ -> assert false
+                  }
+          | _ -> ()) in
+    call t cb tool prob);
+    MainWorker.stop_work t;
+  ) () in
+  (** Treat the work done and wait *)
+  MainWorker.treat t (fun () f -> f ()) ()
 
 let any ?callback toolprob =
   let l = ref [] in
@@ -388,43 +433,3 @@ in
     ) b.boutputs
 
 
-  (** Create and manage one main working thread *)
-module MainWorker =
-struct
-  type 'a t = { queue : 'a Queue.t;
-                mutex : Mutex.t;
-                condition : Condition.t;
-              }
-
-  let create f =
-    let t = { queue = Queue.create ();
-              mutex = Mutex.create ();
-              condition = Condition.create ();
-            } in
-    let rec main () =
-      Mutex.lock t.mutex;
-      while Queue.is_empty t.queue do
-        Condition.wait t.condition t.mutex
-      done;
-      let v = Queue.pop t.queue in
-      Mutex.unlock t.mutex;
-      f v;
-      Thread.yield ();
-      main () in
-    let _ = Thread.create main () in
-    t
-
-  let add_work t x =
-    Mutex.lock t.mutex;
-    Queue.push x t.queue;
-    Condition.signal t.condition;
-    Mutex.unlock t.mutex
-
-  let add_works t q =
-    Mutex.lock t.mutex;
-    Queue.transfer q t.queue;
-    Condition.signal t.condition;
-    Mutex.unlock t.mutex
-
-
-end

@@ -375,11 +375,6 @@ let () =
     exit 1
 
 let () =
-  let m = B.MainWorker.create (fun (f,v) -> f v) in
-  let async f v = B.MainWorker.add_work m (f,v) in
-  Scheduler.async := async
-
-let () =
   let nb_scheduled = ref 0 in
   let nb_done = ref 0 in
   let nb_valid = ref 0 in
