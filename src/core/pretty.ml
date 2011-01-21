@@ -27,6 +27,8 @@ open Decl
 open Theory
 open Task
 
+let debug_print_labels = Debug.register_flag "print_labels"
+
 let iprinter,tprinter,lprinter,pprinter =
   let bl = ["theory"; "type"; "logic"; "inductive"; "meta";
             "axiom"; "lemma"; "goal"; "use"; "clone"; "prop";
@@ -189,11 +191,15 @@ let rec print_term fmt t = print_lterm 0 fmt t
 and     print_fmla fmt f = print_lfmla 0 fmt f
 
 and print_lterm pri fmt t = match t.t_label with
+  | _ when Debug.nottest_flag debug_print_labels
+       -> print_tnode pri fmt t
   | [] -> print_tnode pri fmt t
   | ll -> fprintf fmt (protect_on (pri > 0) "%a %a")
       (print_list space print_label) ll (print_tnode 0) t
 
 and print_lfmla pri fmt f = match f.f_label with
+  | _ when Debug.nottest_flag debug_print_labels
+       -> print_fnode pri fmt f
   | [] -> print_fnode pri fmt f
   | ll -> fprintf fmt (protect_on (pri > 0) "%a %a")
       (print_list space print_label) ll (print_fnode 0) f
