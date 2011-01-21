@@ -175,7 +175,7 @@ provers=$($pgm --list-provers | cut -d " " -f 3 |grep -v "^$")
 good_provers=""
 bad_provers=""
 for prover in $(echo $provers); do 
-    if bin/why.opt -P $prover bench/true_goal.why | grep -q -v Valid; then
+    if $pgm -P $prover bench/true_goal.why | grep -q -v Valid; then
         #echo "$i : Fail"
         bad_provers="$bad_provers $prover"
     else
