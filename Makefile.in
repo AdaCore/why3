@@ -97,7 +97,11 @@ EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
 
 all: @OCAMLBEST@
 
-.PHONY: byte opt clean depend all install install_no_local
+ifeq (@enable_local@,yes)
+all: install_local
+endif
+
+.PHONY: byte opt clean depend all install install_local install_no_local
 
 #############
 # Why library
@@ -258,27 +262,32 @@ install-all: install install-lib
 # Why binary
 ##################
 
-byte: bin/why.byte
-opt:  bin/why.opt
+byte: bin/why3.byte
+opt:  bin/why3.opt
 
-bin/why.opt: src/why.cmxa src/main.cmx
+bin/why3.opt: src/why.cmxa src/main.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why.byte: src/why.cma src/main.cmo
+bin/why3.byte: src/why.cma src/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+bin/why3: bin/why3.@OCAMLBEST@
+	ln -sf why3.@OCAMLBEST@ $@
 
 src/main.cmo: src/why.cma
 src/main.cmx: src/why.cmxa
 
 clean::
 	rm -f src/main.cm[iox] src/main.annot src/main.o
-	rm -f bin/why.byte bin/why.opt
+	rm -f bin/why3.byte bin/why3.opt bin/why3
 
 install_no_local::
-	cp -f bin/why.@OCAMLBEST@ $(BINDIR)/why3
+	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3
+
+install_local: bin/why3
 
 ########
 # Whyml
@@ -300,17 +309,20 @@ $(PGMCMO) $(PGMCMX): INCLUDES += -I src/programs
 
 # build targets
 
-byte: bin/whyml.byte
-opt:  bin/whyml.opt
+byte: bin/why3ml.byte
+opt:  bin/why3ml.opt
 
-bin/whyml.opt: src/why.cmxa $(PGMCMX) src/main.cmx
+bin/why3ml.opt: src/why.cmxa $(PGMCMX) src/main.cmx
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/whyml.byte: src/why.cma $(PGMCMO) src/main.cmo
+bin/why3ml.byte: src/why.cma $(PGMCMO) src/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+bin/why3ml: bin/why3ml.@OCAMLBEST@
+	ln -sf why3ml.@OCAMLBEST@ $@
 
 # depend and clean targets
 
@@ -326,27 +338,27 @@ clean::
 	rm -f src/programs/*.cm[iox] src/programs/*.o
 	rm -f src/programs/*.annot src/programs/*~
 	rm -f src/programs/*.output src/programs/*.automaton
-	rm -f bin/whyml.byte bin/whyml.opt
+	rm -f bin/why3ml.byte bin/why3ml.opt bin/why3ml
 	rm -f .depend.programs
 
 # test target
 
-%.gui: %.why bin/whyide.opt
-	bin/whyide.opt $*.why
+%.gui: %.why bin/why3ide.opt
+	bin/why3ide.opt $*.why
 
-%: %.mlw bin/whyml.opt
-	bin/whyml.opt $*.mlw
+%: %.mlw bin/why3ml.opt
+	bin/why3ml.opt $*.mlw
 
+%: %.why bin/why3.opt
+	bin/why3.opt $*.why
 
-%: %.why bin/why.opt
-	bin/why.opt $*.why
-
-%.gui: %.mlw bin/whyide.opt
-	bin/whyide.opt $*.mlw
+%.gui: %.mlw bin/why3ide.opt
+	bin/why3ide.opt $*.mlw
 
 install_no_local::
-	cp -f bin/whyml.@OCAMLBEST@ $(BINDIR)/why3ml
+	cp -f bin/why3ml.@OCAMLBEST@ $(BINDIR)/why3ml
 
+install_local: bin/why3ml
 
 ########
 # Config
@@ -365,17 +377,20 @@ $(CONFIGCMO) $(CONFIGCMX): INCLUDES += -I src/programs
 
 # build targets
 
-byte: bin/whyconfig.byte
-opt:  bin/whyconfig.opt
+byte: bin/why3config.byte
+opt:  bin/why3config.opt
 
-bin/whyconfig.opt: src/why.cmxa $(CONFIGCMX)
+bin/why3config.opt: src/why.cmxa $(CONFIGCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/whyconfig.byte: src/why.cma $(CONFIGCMO)
+bin/why3config.byte: src/why.cma $(CONFIGCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+bin/why3config: bin/why3config.@OCAMLBEST@
+	ln -sf why3config.@OCAMLBEST@ $@
 
 # depend and clean targets
 
@@ -390,16 +405,18 @@ clean::
 	rm -f src/config/*.cm[iox] src/config/*.o
 	rm -f src/config/*.annot src/config/*~
 	rm -f src/config/*.output src/config/*.automaton
-	rm -f bin/whyconfig.byte bin/whyconfig.opt
+	rm -f bin/why3config.byte bin/why3config.opt bin/why3config
 	rm -f .why.conf
 	rm -f .depend.config
 
-local_config: bin/whyconfig.@OCAMLBEST@
-	WHY3LIB=$(PWD) WHY3DATA=$(PWD)/share bin/whyconfig.@OCAMLBEST@ --autodetect-provers --conf_file .why.conf
+local_config: bin/why3config.@OCAMLBEST@
+	WHY3LIB=$(PWD) WHY3DATA=$(PWD)/share bin/why3config.@OCAMLBEST@ \
+		--autodetect-provers --conf_file .why.conf
 
 install_no_local::
-	cp -f bin/whyconfig.@OCAMLBEST@ $(BINDIR)/why3config
+	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config
 
+install_local: bin/why3config
 
 ###############
 # IDE
@@ -420,21 +437,24 @@ $(IDECMO) $(IDECMX): INCLUDES += -I src/ide -I +sqlite3
 
 # build targets
 
-byte: bin/whyide.byte
-opt:  bin/whyide.opt
+byte: bin/why3ide.byte
+opt:  bin/why3ide.opt
 
-bin/whyide.opt bin/whyide.byte: INCLUDES += -thread -I +threads -I +lablgtk2 -I +sqlite3
-bin/whyide.opt bin/whyide.byte: EXTOBJS += gtkThread
-bin/whyide.opt bin/whyide.byte: EXTLIBS += threads lablgtk lablgtksourceview2 sqlite3
+bin/why3ide.opt bin/why3ide.byte: INCLUDES += -thread -I +threads -I +lablgtk2 -I +sqlite3
+bin/why3ide.opt bin/why3ide.byte: EXTOBJS += gtkThread
+bin/why3ide.opt bin/why3ide.byte: EXTLIBS += threads lablgtk lablgtksourceview2 sqlite3
 
-bin/whyide.opt: src/why.cmxa $(PGMCMX) $(IDECMX)
+bin/why3ide.opt: src/why.cmxa $(PGMCMX) $(IDECMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/whyide.byte: src/why.cma $(PGMCMO) $(IDECMO)
+bin/why3ide.byte: src/why.cma $(PGMCMO) $(IDECMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+bin/why3ide: bin/why3ide.@OCAMLBEST@
+	ln -sf why3ide.@OCAMLBEST@ $@
 
 # depend and clean targets
 
@@ -448,11 +468,13 @@ depend: .depend.ide
 clean::
 	rm -f src/ide/*.cm[iox] src/ide/*.o
 	rm -f src/ide/*.annot src/ide/*~
-	rm -f bin/whyide.byte bin/whyide.opt
+	rm -f bin/why3ide.byte bin/why3ide.opt bin/why3ide
 	rm -f .depend.ide
 
 install_no_local::
-	cp -f bin/whyide.@OCAMLBEST@ $(BINDIR)/why3ide
+	cp -f bin/why3ide.@OCAMLBEST@ $(BINDIR)/why3ide
+
+install_local: bin/why3ide
 
 endif
 
@@ -478,20 +500,23 @@ $(BENCHCMO) $(BENCHCMX): INCLUDES += -I src/ide -I src/bench -I +sqlite3
 
 # build targets
 
-byte: bin/whybench.byte
-opt:  bin/whybench.opt
+byte: bin/why3bench.byte
+opt:  bin/why3bench.opt
 
-bin/whybench.opt bin/whybench.byte: INCLUDES += -thread -I +threads
-bin/whybench.opt bin/whybench.byte: EXTLIBS += threads
+bin/why3bench.opt bin/why3bench.byte: INCLUDES += -thread -I +threads
+bin/why3bench.opt bin/why3bench.byte: EXTLIBS += threads
 
-bin/whybench.opt: src/why.cmxa $(PGMCMX) $(BENCHCMX)
+bin/why3bench.opt: src/why.cmxa $(PGMCMX) $(BENCHCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/whybench.byte: src/why.cma  $(PGMCMO) $(BENCHCMO)
+bin/why3bench.byte: src/why.cma  $(PGMCMO) $(BENCHCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+bin/why3bench: bin/why3bench.@OCAMLBEST@
+	ln -sf why3bench.@OCAMLBEST@ $@
 
 # depend and clean targets
 
@@ -505,11 +530,13 @@ depend: .depend.bench
 clean::
 	rm -f src/bench/*.cm[iox] src/bench/*.o
 	rm -f src/bench/*.annot src/bench/*~
-	rm -f bin/whybench.byte bin/whybench.opt
+	rm -f bin/why3bench.byte bin/why3bench.opt bin/why3bench
 	rm -f .depend.bench
 
 install_no_local::
-	cp -f bin/whybench.@OCAMLBEST@ $(BINDIR)/why3bench
+	cp -f bin/why3bench.@OCAMLBEST@ $(BINDIR)/why3bench
+
+install_local: bin/why3bench
 
 endif
 
@@ -682,6 +709,9 @@ bin/why3doc.byte: src/why.cma $(WHY3DOCCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
+bin/why3doc: bin/why3doc.@OCAMLBEST@
+	ln -sf why3doc.@OCAMLBEST@ $@
+
 # depend and clean targets
 
 include .depend.why3doc
@@ -694,8 +724,10 @@ depend: .depend.why3doc
 clean::
 	rm -f src/why3doc/*.cm[iox] src/why3doc/*.o
 	rm -f src/why3doc/*.annot src/why3doc/*~
-	rm -f bin/why3doc.byte bin/why3doc.opt
+	rm -f bin/why3doc.byte bin/why3doc.opt bin/why3doc
 	rm -f .depend.why3doc
+
+install_local: bin/why3doc
 
 ########
 # bench
@@ -703,10 +735,10 @@ clean::
 
 .PHONY: bench test comp_bench_plugins
 
-bench:: bin/why.@OCAMLBEST@ bin/whyml.@OCAMLBEST@ $(TOOLS) $(DRIVERS) test-api
+bench:: bin/why3.@OCAMLBEST@ bin/why3ml.@OCAMLBEST@ $(TOOLS) $(DRIVERS) test-api
 	sh bench/bench \
-	    "bin/why.@OCAMLBEST@" \
-	    "bin/whyml.@OCAMLBEST@"
+	    "bin/why3.@OCAMLBEST@" \
+	    "bin/why3ml.@OCAMLBEST@"
 
 BENCH_PLUGINS_CMO := helloworld.cmo
 BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))
@@ -715,7 +747,7 @@ BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
 comp_bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS)
 
 # bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) byte $(TOOLS)
-# 	bin/why.byte -D bench/plugins/helloworld.drv \
+# 	bin/why3.byte -D bench/plugins/helloworld.drv \
 # 	tests/test-jcf.why -T Test -G G
 # 	bin/why.$(OCAMLBEST) -D bench/plugins/helloworld.drv  \
 # 	tests/test-jcf.why -T Test -G G
@@ -724,16 +756,16 @@ comp_bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS)
 # test targets
 ###############
 
-test2: bin/why.byte $(TOOLS)
-	bin/why.byte tests/test-jcf.why
+test2: bin/why3.byte $(TOOLS)
+	bin/why3.byte tests/test-jcf.why
 
-test: bin/why.byte plugins.byte $(TOOLS)
+test: bin/why3.byte plugins.byte $(TOOLS)
 	mkdir -p output_why3
-	bin/why.byte -D drivers/why3.drv -o output_why3 tests/test-jcf.why
-	# bin/why.byte -D drivers/alt_ergo.drv tests/test-jcf.why -T Test -G G
-	# bin/why.byte -P alt-ergo --timelimit 3 tests/test-jcf.why -T Test -G G
-	# bin/why.byte -D drivers/coq.drv tests/test-jcf.why -T Test -G G
-	echo bin/why.byte -P alt-ergo --timelimit 1 --prove theories/real.why
+	bin/why3.byte -D drivers/why3.drv -o output_why3 tests/test-jcf.why
+	# bin/why3.byte -D drivers/alt_ergo.drv tests/test-jcf.why -T Test -G G
+	# bin/why3.byte -P alt-ergo --timelimit 3 tests/test-jcf.why -T Test -G G
+	# bin/why3.byte -D drivers/coq.drv tests/test-jcf.why -T Test -G G
+	echo bin/why3.byte -P alt-ergo --timelimit 1 --prove theories/real.why
 	@printf "*** Checking Coq file generation ***\\n"
 	@mkdir -p output_coq
 	@for i in int.Abs int.EuclideanDivision int.ComputerDivision  \
@@ -742,22 +774,22 @@ test: bin/why.byte plugins.byte $(TOOLS)
 		floating_point.Test array.TestBv32 \
 		; do \
 	  printf "Generating Coq file for $$i\\n" && \
-	  	bin/why.byte -P coq -o output_coq -T $$i ; done
+	  	bin/why3.byte -P coq -o output_coq -T $$i ; done
 	@printf "*** Checking Coq compilation ***\\n"
 	@for i in output_coq/*.v; do printf "coq $$i\\n" && coqc $$i ; done
 
-testl: bin/whyml.byte
-	ocamlrun -bt bin/whyml.byte tests/test-pgm-jcf.mlw
-	ocamlrun -bt bin/whyml.byte -P alt-ergo tests/test-pgm-jcf.mlw
+testl: bin/why3ml.byte
+	ocamlrun -bt bin/why3ml.byte tests/test-pgm-jcf.mlw
+	ocamlrun -bt bin/why3ml.byte -P alt-ergo tests/test-pgm-jcf.mlw
 
-testl-debug: bin/whyml.byte
-	ocamlrun -bt bin/whyml.byte --debug-all --debug program_typing tests/test-pgm-jcf.mlw
+testl-debug: bin/why3ml.byte
+	ocamlrun -bt bin/why3ml.byte --debug-all --debug program_typing tests/test-pgm-jcf.mlw
 
-testl-ide: bin/whyide.opt
-	bin/whyide.opt tests/test-pgm-jcf.mlw
+testl-ide: bin/why3ide.opt
+	bin/why3ide.opt tests/test-pgm-jcf.mlw
 
-testl-type: bin/whyml.byte
-	ocamlrun -bt bin/whyml.byte --type-only tests/test-pgm-jcf.mlw
+testl-type: bin/why3ml.byte
+	ocamlrun -bt bin/why3ml.byte --type-only tests/test-pgm-jcf.mlw
 
 test-api: src/why.cma
 	ocaml $(EXTCMA)	src/why.cma -I src examples/use_api.ml \
@@ -1058,7 +1090,6 @@ headers:
 	headache -c misc/headache_config.txt -h misc/header.txt \
 	    Makefile.in configure.in src/*.ml* src/*/*.ml* \
 	    src/tools/cpulimit.c
-
 
 #########
 # myself
