@@ -115,12 +115,13 @@ let call s callback tool prob =
       (Trans.singleton tool.ttrans) in
     apply_transformation_l ~callback:(trans_cb pval) trans task in
   (** Split *)
-  let ths = prob.ptask tool.tenv tool.tuse in
+  let ths = do_why_sync (prob.ptask tool.tenv) tool.tuse in
   MTask.start s;
   List.iter iter_task ths;
   MTask.stop s
 
 let general ?(callback=fun _ _ _ _ _ -> ()) iter add =
+  Debug.dprintf debug "Start one general@.";
   let s = MTask.create () in
   iter (fun v tool prob ->
     let cb pval i task res =
@@ -407,6 +408,7 @@ struct
       let v = Queue.pop t.queue in
       Mutex.unlock t.mutex;
       f v;
+      Thread.yield ();
       main () in
     let _ = Thread.create main () in
     t

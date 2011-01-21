@@ -28,6 +28,8 @@ open Trans
 module B = Bench
 module C = Call_provers
 
+let debug = Debug.register_flag "main"
+
 let usage_msg = sprintf
   "Usage: %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]...
   [-P <prover> ]..."
@@ -317,8 +319,10 @@ let () =
       ttime    = of_option !opt_timelimit;
       tmem     = of_option !opt_memlimit;
     } in
+  Debug.dprintf debug "Load provers@.";
   tools := List.map map_prover !opt_prover;
 
+  Debug.dprintf debug "Load transformations@.";
   let transl =
       let lookup acc t = Trans.compose_l
     (try Trans.singleton (Trans.lookup_transform t env) with
@@ -329,9 +333,7 @@ let () =
   let fold_prob acc = function
     | None, _ -> acc
     | Some f, _ ->
-      let env = env in
-      let task = !opt_task in
-      let tlist =
+      let gen env task  =
         let fname, cin = match f with
           | "-" -> "stdin", stdin
           | f   -> f, open_in f
@@ -343,15 +345,16 @@ let () =
         let fold acc (n,l) =
           List.rev_append (List.map (fun v -> (("cmdline","",n),v)) l) acc in
         th |> List.map map |> List.fold_left fold [] in
-      (* let gen = Env.Wenv.memoize 3 (fun env -> *)
-      (*   let memo = Trans.store (fun task -> gen env task) in *)
-      (*   Trans.apply memo) in *)
-      let gen _ _  = tlist in
+      let gen = Env.Wenv.memoize 3 (fun env ->
+        let memo = Trans.store (fun task -> gen env task) in
+        Trans.apply memo) in
       { B.ptask   = gen;
         ptrans   = fun _ -> transl;
       }::acc in
+  Debug.dprintf debug "Load problems@.";
   probs := Queue.fold fold_prob [] opt_queue;
 
+  Debug.dprintf debug "Load bench@.";
   let cmdl = "commandline" in
   let bench = List.map (Benchrc.read_file config) !opt_benchrc in
   let bench = if !tools <> [] && !probs <> [] then
