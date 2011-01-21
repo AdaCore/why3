@@ -56,7 +56,8 @@ type ('a,'b) result = {tool   : 'a;
 
 type ('a,'b) callback = 'a -> 'b -> task -> int -> proof_attempt_status -> unit
 
-let debug = Debug.register_flag "call"
+let debug_call = Debug.register_flag "call"
+let debug = Debug.register_flag "bench_core"
 
 module MTask :
 sig
@@ -93,7 +94,7 @@ end
 let call s callback tool prob =
   (** Prove goal *)
   let call q cb task =
-    Queue.add (create_proof_attempt ~debug:(Debug.test_flag debug)
+    Queue.add (create_proof_attempt ~debug:(Debug.test_flag debug_call)
       ~timelimit:(tool.ttime) ~memlimit:(tool.tmem)
       ~command:(tool.tcommand) ~driver:(tool.tdriver)
       ~callback:cb task) q in

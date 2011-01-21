@@ -380,12 +380,10 @@ let () =
   Scheduler.async := async
 
 let () =
-  let m = Mutex.create () in
   let nb_scheduled = ref 0 in
   let nb_done = ref 0 in
   let nb_valid = ref 0 in
   let callback (_,tool) (_,file,prob) task i res =
-    Mutex.lock m;
     if not !opt_quiet then
       begin match res with
         | Scheduler.Scheduled -> incr nb_scheduled
@@ -401,7 +399,6 @@ let () =
     Debug.dprintf Scheduler.debug "%s.%s %a %i with %s : %a@."
       file prob Pretty.print_pr (task_goal task) i tool
       Scheduler.print_pas res;
-    Mutex.unlock m
   in
   let benchs =
     List.map (fun b -> List.map snd (Mstr.bindings b.Benchrc.benchs))

@@ -88,6 +88,10 @@ let running_proofs = ref 0
 let running_lock = Mutex.create ()
 let running_condition = Condition.create ()
 
+let print_debug_nb_running () =
+  Debug.dprintf debug
+    "scheduled_proofs = %i; running_proofs = %i;@."
+    !scheduled_proofs !running_proofs
 
 (***** handler of events *****)
 
@@ -119,11 +123,11 @@ let event_handler () =
           !async callback ()
   end
   with Queue.Empty ->
-    Thread.yield ();
     try
       (* priority 2: apply transformations *)
       let k = Queue.pop transf_queue in
       Mutex.unlock queue_lock;
+      Thread.yield ();
       match k with
       | TaskL (cb, tf, task) ->
           let subtasks : Task.task list = Trans.apply tf task in
@@ -178,12 +182,14 @@ let event_handler () =
           Queue.pop prover_attempts_queue
         in
         incr scheduled_proofs;
-        Debug.dprintf debug
-          "scheduled_proofs = %i; maximum_running_proofs = %i;@."
-          !scheduled_proofs !maximum_running_proofs;
+        print_debug_nb_running ();
         Mutex.unlock queue_lock;
+        Thread.yield ();
         (* build the prover task from goal in [a] *)
         try
+          Debug.dprintf debug
+            "%a is sent to driver;@."
+            (fun fmt g -> Pretty.print_pr fmt (Task.task_goal g)) goal;
           let call_prover : unit -> unit -> Call_provers.prover_result =
 (*
             if debug then
@@ -204,12 +210,14 @@ let event_handler () =
               decr scheduled_proofs;
               Condition.signal queue_condition;
               Mutex.unlock queue_lock;
+              print_debug_nb_running ();
               !async (fun () -> callback Running) ();
                let r = call_prover () in
                Mutex.lock running_lock;
                decr running_proofs;
                Condition.signal running_condition;
                Mutex.unlock running_lock;
+               print_debug_nb_running ();
                Mutex.lock queue_lock;
                Queue.push
                  (Prover_answer (callback,r)) answers_queue ;
