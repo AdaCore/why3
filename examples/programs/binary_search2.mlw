@@ -20,8 +20,8 @@ module BinarySearch
         binary_search target lo mid
     else
       hi
-    { f result = target and
-      forall x : int. x < result -> f x <> target }
+    { f result >= target and
+      forall x : int. x < result -> f x < target }
 
 end
 
