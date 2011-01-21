@@ -347,7 +347,7 @@ let do_why_sync funct argument =
   let c = Condition.create () in
   let r = ref None in
   let cb res =
-    Mutex.lock m; r := Some res; Mutex.unlock m; Condition.signal c in
+    Mutex.lock m; r := Some res; Condition.signal c; Mutex.unlock m in
   do_why ~callback:cb funct argument;
-  Mutex.lock m; Condition.wait c m;
+  Mutex.lock m; while !r = None do Condition.wait c m done;
   Util.of_option !r
