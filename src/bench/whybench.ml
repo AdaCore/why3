@@ -391,7 +391,7 @@ let () =
             Pp.Ansi.set_column 0
             !nb_done !nb_scheduled !nb_valid
       end;
-    Debug.dprintf Scheduler.debug "%s.%s %a %i with %s : %a@."
+    Debug.dprintf debug "%s.%s %a %i with %s : %a@."
       file prob Pretty.print_pr (task_goal task) i tool
       Scheduler.print_pas res;
   in

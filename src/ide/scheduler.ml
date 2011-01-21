@@ -183,13 +183,13 @@ let event_handler () =
         in
         incr scheduled_proofs;
         print_debug_nb_running ();
+        Debug.dprintf debug
+          "%a is sent to driver;@."
+          (fun fmt g -> Pretty.print_pr fmt (Task.task_goal g)) goal;
         Mutex.unlock queue_lock;
         Thread.yield ();
         (* build the prover task from goal in [a] *)
         try
-          Debug.dprintf debug
-            "%a is sent to driver;@."
-            (fun fmt g -> Pretty.print_pr fmt (Task.task_goal g)) goal;
           let call_prover : unit -> unit -> Call_provers.prover_result =
 (*
             if debug then
