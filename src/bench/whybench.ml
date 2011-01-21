@@ -374,6 +374,8 @@ let () =
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
+let () = Scheduler.set_priority Scheduler.intensive
+
 let () =
   let nb_scheduled = ref 0 in
   let nb_done = ref 0 in

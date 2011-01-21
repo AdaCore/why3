@@ -113,6 +113,15 @@ val edit_proof :
   driver:Why.Driver.driver ->
   callback:(unit->unit) -> Why.Task.task -> unit
 
+
+(** Set priority *)
+type priority
+
+val interactive : priority
+val intensive : priority
+
+val set_priority : priority -> unit
+
 (*
 Local Variables:
 compile-command: "make -C ../.. bin/whyide.byte"
