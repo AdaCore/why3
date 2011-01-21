@@ -60,7 +60,10 @@ let is_arrow_ty ty = match ty.ty_node with
   | _ -> false
 
 let wp_forall v f =
-  if is_arrow_ty v.vs_ty then f else match f.f_node with
+  if is_arrow_ty v.vs_ty then f else
+  if f_occurs_single v f then f_forall_close_simp [v] [] f else f
+(*
+  match f.f_node with
     | Fbinop (Fimplies, {f_node = Fapp (s,[{t_node = Tvar u};r])},h)
       when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) ->
         f_subst_single v r h
@@ -72,6 +75,7 @@ let wp_forall v f =
         f_forall_close_simp [v] [] f
     | _ ->
         f
+*)
 
 (* utility functions for building WPs *)
 
