@@ -192,14 +192,20 @@ and print_opr_term info fmt t = print_lrterm false true  info fmt t
 and print_opr_fmla info fmt f = print_lrfmla false true  info fmt f
 
 and print_lrterm opl opr info fmt t = match t.t_label with
+  | _ -> print_tnode opl opr info fmt t
+(*
   | [] -> print_tnode opl opr info fmt t
   | ll -> fprintf fmt "(%a %a)"
       (print_list space print_label) ll (print_tnode false false info) t
+*)
 
 and print_lrfmla opl opr info fmt f = match f.f_label with
+  | _ -> print_fnode opl opr info fmt f
+(*
   | [] -> print_fnode opl opr info fmt f
   | ll -> fprintf fmt "(%a %a)"
       (print_list space print_label) ll (print_fnode false false info) f
+*)
 
 and print_tnode opl opr info fmt t = match t.t_node with
   | Tvar v ->
