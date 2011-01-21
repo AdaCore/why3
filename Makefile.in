@@ -1,4 +1,3 @@
-
 ##########################################################################
 #                                                                        #
 #  Copyright (C) 2010-                                                   #
@@ -71,13 +70,15 @@ else
   MENHIRLIB =
 endif
 
+RUBBER = @RUBBER@
+
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
 BFLAGS = -w Ae -dtypes -g -I src $(INCLUDES)
 OFLAGS = -w Ae -dtypes    -I src $(INCLUDES)
 
-ifeq (@ENABLE_PROFILING@,yes)
+ifeq (@enable_profiling@,yes)
 OFLAGS += -g -p
 STRIP = true
 endif
@@ -215,6 +216,7 @@ clean::
 ###############
 # installation
 ###############
+
 install_no_local::
 	mkdir -p $(BINDIR)
 	mkdir -p $(LIBDIR)/why3
@@ -240,13 +242,13 @@ install_no_local_lib::
 	cp -f META  $(OCAMLLIB)/why3
 	if test -f src/why.a; then cp -f src/why.a $(OCAMLLIB)/why3; fi
 
-ifeq ("@ENABLE_LOCAL@","no")
+ifeq (@enable_local@,yes)
+install install-lib:
+	@echo "Why is configured in local installation mode."
+	@echo "To install Why, run ./configure --disable-local ; make ; make install"
+else
 install: install_no_local
 install-lib: install_no_local_lib
-else
-install install-lib:
-	@echo "You use a local configuration you can't install with it."
-	@echo "Run ./configure without --enable-local"
 endif
 
 install-all: install install-lib
@@ -282,7 +284,7 @@ install_no_local::
 # Whyml
 ########
 
-PGMGENERATED = 
+PGMGENERATED =
 
 PGM_FILES = pgm_ttree pgm_types pgm_pretty \
 	    pgm_module pgm_wp pgm_env pgm_typing pgm_main
@@ -459,6 +461,8 @@ endif
 # BENCH
 ###############
 
+ifeq (@enable_bench@,yes)
+
 BENCH_FILES = bench benchrc whybench
 
 BENCHMODULES := $(addprefix src/bench/, $(BENCH_FILES))
@@ -507,10 +511,14 @@ clean::
 install_no_local::
 	cp -f bin/whybench.@OCAMLBEST@ $(BINDIR)/why3bench
 
+endif
+
 ##############
 # Coq plugin
 ##############
+
 ifeq (@enable_coq_support@,yes)
+
 COQGENERATED = src/coq-plugin/g_whytac.ml
 
 COQ_FILES = whytac g_whytac
@@ -558,10 +566,13 @@ clean::
 	rm -f .depend.coq
 
 endif
+
 ########
 # Tptp2why
 ########
+
 ifeq (@enable_whytptp@,yes)
+
 TPTPGENERATED = src/tptp2why/tptpLexer.ml \
 	src/tptp2why/tptpParser.ml src/tptp2why/tptpParser.mli
 
@@ -580,7 +591,7 @@ $(TPTPCMO) $(TPTPCMX): INCLUDES += -I src/tptp2why
 # build targets
 
 plugins.byte byte: plugins/whytptp.cmo
-plugins.opt  opt :  plugins/whytptp.cmxs
+plugins.opt  opt : plugins/whytptp.cmxs
 
 plugins/whytptp.cmxs plugins/whytptp.cmo: EXTOBJS += $(MENHIRLIB)
 plugins/whytptp.cmxs plugins/whytptp.cmo: INCLUDES += $(MENHIRINC)
@@ -602,11 +613,9 @@ plugins/whytptp.cmxs: plugins src/tptp2why/whytptp.cmxs
 plugins/whytptp.cmo: plugins src/tptp2why/whytptp.cmo
 	@cp src/tptp2why/whytptp.cmo $@
 
-
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/plugins
 	cp -f plugins/whytptp.cm* $(LIBDIR)/why3/plugins
-
 
 # depend and clean targets
 
@@ -626,6 +635,7 @@ clean::
 	rm -f .depend.tptp2why
 
 endif
+
 #######
 # tools
 #######
@@ -755,7 +765,9 @@ test-api: src/why.cma
 
 
 ## Examples : Plugins ##
+
 ifeq (@enable_plugins@,yes)
+
 PLUGDIR = examples/plugins/
 PLUG_FILES = genequlin
 
@@ -794,13 +806,18 @@ clean::
 	rm -f $(PLUGDIR)/*.annot $(PLUGDIR)/*~
 	rm -f $(PLUGGENERATED)
 	rm -f .depend.plug
+
 endif
 
 ################
 # documentation
 ################
 
-DOC = doc/manual.pdf
+.PHONY: doc
+
+ifeq (@enable_doc@,yes)
+
+doc: doc/manual.pdf
 # doc/manual.html
 
 BNF = qualid constant operator term type formula theory
@@ -815,16 +832,20 @@ doc/bnf: doc/bnf.mll
 
 doc: $(DOC)
 
-.PHONY:$(DOC)
-
 doc/manual.pdf: $(BNFTEX) doc/apidoc.tex doc/manual.tex doc/version.tex
-	cd doc; rubber -d manual.tex
+	cd doc; $(RUBBER) -d manual.tex
 
 # doc/manual.html: doc/manual.tex doc/version.tex
 # 	$(MAKE) -C doc manual.html
 
 clean::
-	cd doc; rubber -d --clean manual.tex
+	cd doc; $(RUBBER) -d --clean manual.tex
+
+else
+
+doc:
+
+endif
 
 ##########
 # API DOC
@@ -835,7 +856,7 @@ clean::
 MODULESTODOC = util/util util/hashweak \
 	core/ident core/ty core/term core/decl core/theory \
 	core/env core/task \
-	driver/whyconf driver/driver 
+	driver/whyconf driver/driver
 #	transform/introduction \
 #	ide/db
 
@@ -960,7 +981,7 @@ DISTRIB_FILES = Version Makefile.in configure.in META.in configure .depend.* \
 
 distrib:: $(DISTRIB_TAR)
 
-rmdistrib: 
+rmdistrib:
 	rm -rf $(DISTRIB_DIR)
 
 redistrib: rmdistrib distrib
@@ -972,6 +993,10 @@ $(DISTRIB_TAR): doc/manual.pdf
         fi
 	mkdir -p $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bin
+	mkdir -p $(DISTRIB_DIR)/share
+	ln -s ../drivers $(DISTRIB_DIR)/share/drivers
+	ln -s ../modules $(DISTRIB_DIR)/share/modules
+	ln -s ../theories $(DISTRIB_DIR)/share/theories
 	cp --parents $(DISTRIB_FILES) $(DISTRIB_DIR)
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
 

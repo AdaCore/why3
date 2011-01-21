@@ -51,6 +51,7 @@
 
 # check for one particular file of the sources
 # ADAPT THE FOLLOWING LINE TO YOUR SOURCES!
+
 AC_INIT(src/)
 
 # verbosemake
@@ -62,15 +63,20 @@ AC_ARG_ENABLE(verbose-make,
 # LOCAL_CONF
 
 AC_ARG_ENABLE(local,
-    [  --enable-local            use only WHY3 in the build directory],,
-    ENABLE_LOCAL=no)
-
+    [  --enable-local          use Why3 in the build directory (no installation)],,
+    enable_local=no)
 
 # IDE
 
 AC_ARG_ENABLE(ide,
     [  --enable-ide            enable Why3 IDE],,
     enable_ide=yes)
+
+# Bench
+
+AC_ARG_ENABLE(bench,
+    [  --enable-bench          enable Why3 benchmarking tool],,
+    enable_bench=yes)
 
 # dynlink
 
@@ -102,11 +108,17 @@ AC_ARG_ENABLE(hypothesis-selection,
     [  --enable-hypothesis-selection    enable hypothesis selection support],,
     enable_hypothesis_selection=yes)
 
+# documentation
+
+AC_ARG_ENABLE(doc,
+    [  --enable-doc            build documentation],,
+    enable_doc=yes)
+
 # profiling
-ENABLE_PROFILING=yes
+
 AC_ARG_ENABLE(profiling,
     [  --enable-profiling      enable profiling],,
-    ENABLE_PROFILING=no)
+    enable_profiling=no)
 
 # Check for arch/OS
 
@@ -250,16 +262,25 @@ if test "$enable_menhirlib" = yes ; then
 AC_CHECK_FILE($OCAMLLIB/menhirLib,,enable_menhirlib=no)
 fi
 
+# checking for rubber
+AC_CHECK_PROG(RUBBER,rubber,rubber,no)
+if test "$enable_doc" = yes ; then
+if test "$RUBBER" = no ; then
+    enable_doc=no
+    AC_MSG_WARN(cannot find rubber, documentation building disabled.)
+fi
+fi
+
 # checking for lablgtk2
 if test "$enable_ide" = yes ; then
 AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtk.cma,,enable_ide=no)
 if test "$enable_ide" = no; then
-   AC_MSG_WARN("Lib lablgtk2 not found, IDE disabled.)
+   AC_MSG_WARN(Lib lablgtk2 not found, IDE disabled.)
    reason_ide=" (lablgtk2 not found)"
 else
    AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtksourceview2.cma,,enable_ide=no)
    if test "$enable_ide" = no; then
-     AC_MSG_WARN("Lib lablgtksourceview2 not found, IDE disabled.)
+     AC_MSG_WARN(Lib lablgtksourceview2 not found, IDE disabled.)
    reason_ide=" (lablgtksourceview2 not found)"
    fi
 fi
@@ -269,11 +290,18 @@ fi
 if test "$enable_ide" = yes ; then
    AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_ide=no)
    if test "$enable_ide" = no; then
-     AC_MSG_WARN("Lib sqlite3 not found, IDE disabled.)
+     AC_MSG_WARN(Lib sqlite3 not found, IDE disabled.)
    reason_ide=" (sqlite3 not found)"
    fi
 fi
 
+# checking for sqlite3
+if test "$enable_bench" = yes ; then
+   AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_bench=no)
+   if test "$enable_bench" = no; then
+     AC_MSG_WARN(Lib sqlite3 not found, why3bench disabled.)
+   fi
+fi
 
 dnl AC_CHECK_PROG(enable_ide,lablgtk2,yes,no) not always available (Win32)
 
@@ -328,14 +356,13 @@ reason_coq_support=" (not yet implemented)"
 # hypothesis_selection
 
 if test "$enable_hypothesis_selection" = yes; then
-  AC_CHECK_FILE($OCAMLLIB/ocamlgraph/,enable_hypothesis_selection=yes,enable_hypothesis_selection=no)
+  AC_CHECK_FILE($OCAMLLIB/ocamlgraph/,,enable_hypothesis_selection=no)
 fi
 
-if test "$ENABLE_LOCAL" = no; then
-   LOCALDIR=None
+if test "$enable_local" = no; then
+   LOCALDIR='None'
 else
    LOCALDIR='Some \"$PWD\"'
-   ENABLE_LOCAL=yes
 fi
 
 #For the META
@@ -380,15 +407,17 @@ AC_SUBST(OCAMLDOC)
 AC_SUBST(OCAMLBEST)
 AC_SUBST(OCAMLVERSION)
 AC_SUBST(OCAMLLIB)
-AC_SUBST(ENABLE_PROFILING)
 dnl AC_SUBST(OCAMLV)
 dnl AC_SUBST(FORPACK)
 dnl AC_SUBST(OCAMLGRAPHLIB)
 dnl AC_SUBST(OCAMLWEB)
 
+AC_SUBST(enable_profiling)
+
 AC_SUBST(CAMLP5O)
 
 AC_SUBST(enable_ide)
+AC_SUBST(enable_bench)
 AC_SUBST(enable_plugins)
 AC_SUBST(DYNLINK)
 AC_SUBST(META_DYNLINK)
@@ -406,8 +435,11 @@ AC_SUBST(enable_menhirlib)
 
 AC_SUBST(enable_hypothesis_selection)
 
+AC_SUBST(enable_doc)
+AC_SUBST(RUBBER)
+
+AC_SUBST(enable_local)
 AC_SUBST(LOCALDIR)
-AC_SUBST(ENABLE_LOCAL)
 
 dnl AC_SUBST(PSVIEWER)
 dnl AC_SUBST(PDFVIEWER)
@@ -431,6 +463,8 @@ echo "OCaml version           : $OCAMLVERSION"
 echo "OCaml library path      : $OCAMLLIB"
 echo "Verbose make            : $enable_verbose_make"
 echo "Why IDE                 : $enable_ide $reason_ide"
+echo "Why bench tool          : $enable_bench"
+echo "Why documentation       : $enable_doc"
 echo "Why plugins             : $enable_plugins"
 echo "Coq plugin support      : $enable_coq_support $reason_coq_support"
 if test "$enable_coq_support" = "yes" ; then
@@ -440,5 +474,5 @@ fi
 echo "TPTP parser             : $enable_whytptp"
 echo "Menhir library          : $enable_menhirlib"
 echo "hypothesis selection    : $enable_hypothesis_selection"
-echo "profiling               : $ENABLE_PROFILING"
-echo "localdir                : $ENABLE_LOCAL"
+echo "profiling               : $enable_profiling"
+echo "localdir                : $enable_local"
