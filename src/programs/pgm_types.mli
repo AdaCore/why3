@@ -130,6 +130,8 @@ and R : sig
 
   val name_of : t -> ident
 
+  val print : Format.formatter -> t -> unit
+
 end 
 and Sref : sig include Set.S with type elt = R.t end
 and Mref : sig include Map.S with type key = R.t end

@@ -6,7 +6,9 @@ module P
 
   let f1 () (a : ref int) = !a
 
-  let f2 (a : ref int) = f1 () a
+  parameter r : ref int
+
+  let f2 () = f1 () r
 
 end
 

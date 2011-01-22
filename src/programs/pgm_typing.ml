@@ -1176,7 +1176,10 @@ and expr_desc gl env loc ty = function
       let r = reference env r in
       if occur_type_v r e1.expr_type_v then
   	errorm ~loc "this application would create an alias";
+      (* printf "e1 : %a@." print_type_v e1.expr_type_v; *)
+      (* printf "r = %a@." R.print r; *)
       let c = apply_type_v_ref e1.expr_type_v r in
+      (* printf "c = %a@." print_type_c c; *)
       make_apply loc e1 ty c
   | IEfun (bl, t) ->
       let env, bl = add_binders env bl in

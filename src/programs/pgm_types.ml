@@ -260,14 +260,15 @@ end = struct
     | Tpure ty ->
 	Tpure (ty_inst ts ty)
     | Tarrow (bl, c) ->
-	let s, bl = Util.map_fold_left (subst_binder ef ts) s bl in
+	let (ef, s), bl = Util.map_fold_left (subst_binder ts) (ef, s) bl in
 	Tarrow (bl, subst_type_c ef ts s c)
 	  
-  and subst_binder ef ts s pv =
+  and subst_binder ts (ef, s) pv =
     let v' = subst_type_v ef ts s pv.pv_tv in
     let s, vs' = subst_var ts s pv.pv_vs in
     let pv' = create_pvsymbol (id_clone pv.pv_name) ~vs:vs' v' in
-    s, pv'
+    let ef' = Mpv.add pv (R.Rlocal pv') ef in
+    (ef', s), pv'
 
   let tpure ty = Tpure ty
     

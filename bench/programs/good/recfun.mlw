@@ -34,15 +34,13 @@ let rec f4 (a:ref int) : unit variant { a } =
 (** 5. The acid test: 
        partial application of a recursive function with effects *)
 
-(* FIXME
 let rec f5 (a b:ref int) variant { a } = 
   { a >= 0 } 
   if !a = 0 then !b else begin a := !a - 1; b := !b + 1; f5 a b end 
   { result = old a + old b }
 
 let test_f5 () = 
-  { x >= 0 } let f = f5 x in let b = ref 0 in f b { result = old !x }
-*)
+  { x >= 0 } let f = f5 x in let b = ref 0 in f b { result = old x }
 
 end
 
