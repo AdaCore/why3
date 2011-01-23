@@ -157,7 +157,8 @@
 
 /* program keywords */
 
-%token ABSURD ANY ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO EXCEPTION FOR 
+%token ABSTRACT ABSURD ANY ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO 
+%token EXCEPTION FOR 
 %token FUN GHOST INVARIANT LABEL MODEL MODULE MUTABLE PARAMETER RAISE 
 %token RAISES READS REC TO TRY VARIANT WHILE WRITES
 
@@ -871,8 +872,10 @@ program_decl:
     { $2 }
 | NAMESPACE namespace_import uident list0_program_decl END
     { Dnamespace ($3, $2, $4) }
+| ABSTRACT TYPE lident type_args model
+    { Dmodel_type (false, $3, $4, $5) }
 | MUTABLE TYPE lident type_args model
-    { Dmutable_type ($3, $4, $5) }
+    { Dmodel_type (true, $3, $4, $5) }
 ;
 
 use_module:

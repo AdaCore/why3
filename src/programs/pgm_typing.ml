@@ -1604,7 +1604,7 @@ let rec decl ~wp env penv lmod uc = function
       let uc = List.fold_left (decl ~wp env penv lmod) uc dl in
       begin try close_namespace uc import (Some id.id)
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
-  | Ptree.Dmutable_type (id, args, model) ->
+  | Ptree.Dmodel_type (mut, id, args, model) ->
       let loc = id.id_loc in
       let id = id_user id.id loc in
       let denv = Typing.create_denv (theory_uc uc) in
@@ -1619,7 +1619,7 @@ let rec decl ~wp env penv lmod uc = function
 	  model 
       in
       option_iter (check_type_vars ~loc args) model;
-      let mt = create_mtsymbol id args model in
+      let mt = create_mtsymbol ~mut id args model in
       let uc = 
 	let d = Decl.create_ty_decl [mt.mt_abstr, Decl.Tabstract] in
 	Pgm_module.add_logic_decl d uc 

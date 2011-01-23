@@ -2,13 +2,10 @@
 module P
 
   use import int.Int
-  use import module stdlib.Ref
+  use import module string.String
 
-  let f1 () (a : ref int) = !a
+  let foo (s:string) = { S.length s = 1 } get s 0 { true }
 
-  parameter r : ref int
-
-  let f2 () = f1 () r
 
 end
 

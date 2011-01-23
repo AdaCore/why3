@@ -7,23 +7,25 @@ open Theory
 open Term
 open Decl
 
-(* mutable type symbols *)
+(* model type symbols *)
 
 type mtsymbol = private {
-  mt_name  : ident;
-  mt_args  : tvsymbol list;
-  mt_model : ty option;
-  mt_abstr : tysymbol;
+  mt_name   : ident;
+  mt_args   : tvsymbol list;
+  mt_model  : ty option;
+  mt_abstr  : tysymbol;
+  mt_mutable: bool;
 }
 
-val create_mtsymbol : preid -> tvsymbol list -> ty option -> mtsymbol
+val create_mtsymbol : 
+  mut:bool -> preid -> tvsymbol list -> ty option -> mtsymbol
 
 val mt_equal : mtsymbol -> mtsymbol -> bool
 
-exception NotMutable
+exception NotModelType
 
 val get_mtsymbol : tysymbol -> mtsymbol
-  (** raises [NotMutable] if [ts] is not a mutable type *)
+  (** raises [NotModelType] if [ts] is not a model type *)
 
 val is_mutable_ts : tysymbol -> bool
 val is_mutable_ty : ty       -> bool

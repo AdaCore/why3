@@ -166,7 +166,10 @@ let abstract_wp env ef (q',ql') (q,ql) =
   in
   let f =
     let res, f = q and res', f' = q' in
-    let f' = f_subst (subst1 res' (t_var res)) f' in
+    let f' = 
+      if is_arrow_ty res'.vs_ty then f' 
+      else f_subst (subst1 res' (t_var res)) f' 
+    in
     quantify_res f' f (Some res)
   in
   wp_ands (f :: List.map2 quantify_h ql' ql)

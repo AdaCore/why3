@@ -1,0 +1,24 @@
+
+module Char
+
+  abstract type char model int
+
+end
+
+module String
+
+  use import int.Int
+  use import module Char
+  use array.ArrayLength as S
+
+  mutable type string model S.t int char
+
+  parameter get : s:string -> i:int ->
+    { 0 <= i < S.length s } char reads s { result = S.get s i }
+
+  parameter set : s:string -> i:int -> v:char ->
+    { 0 <= i < S.length s } unit writes s { s = S.set (old s) i v }
+
+  parameter length : s:string -> {} int reads s { result = S.length s }
+
+end

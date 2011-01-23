@@ -76,6 +76,7 @@
 	"use", USE;
 	"with", WITH;
 	(* programs *)
+	"abstract", ABSTRACT;
 	"absurd", ABSURD;
 	"any", ANY;
 	"assert", ASSERT;

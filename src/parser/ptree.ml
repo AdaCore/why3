@@ -230,7 +230,7 @@ type program_decl =
   (* modules *)
   | Duse    of qualid * imp_exp * (*as:*) ident option
   | Dnamespace of ident * (* import: *) bool * program_decl list
-  | Dmutable_type of ident * ident list * pty option
+  | Dmodel_type of bool * ident * ident list * pty option
 
 type module_ = {
   mod_name   : ident;

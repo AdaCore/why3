@@ -7,55 +7,63 @@ open Theory
 open Term
 open Decl
 
-(* mutable types *)
+(* model types *)
 
 type mtsymbol = {
-  mt_name  : ident;
-  mt_args  : tvsymbol list;
-  mt_model : ty option;
-  mt_abstr : tysymbol;
+  mt_name   : ident;
+  mt_args   : tvsymbol list;
+  mt_model  : ty option;
+  mt_abstr  : tysymbol;
+  mt_mutable: bool;
 }
 
 let mt_equal : mtsymbol -> mtsymbol -> bool = (==)
 
-let mutable_types = Hts.create 17
+let model_types = Hts.create 17
 
-let create_mtsymbol name args model = 
+let create_mtsymbol ~mut name args model = 
   let id = id_register name in
   let ts = create_tysymbol name args None in
   let mt = 
     { mt_name  = id;
       mt_args  = args;
       mt_model = model; 
-      mt_abstr = ts; }
+      mt_abstr = ts;
+      mt_mutable = mut; }
   in
-  Hts.add mutable_types ts mt;
+  Hts.add model_types ts mt;
   mt
 
-let is_mutable_ts = Hts.mem mutable_types
+let is_mutable_ts ts = 
+  try (Hts.find model_types ts).mt_mutable with Not_found -> false
 
 let is_mutable_ty ty = match ty.ty_node with
   | Ty.Tyapp (ts, _) -> is_mutable_ts ts
   | Ty.Tyvar _ -> false
 
-exception NotMutable
+exception NotModelType
 
 let get_mtsymbol ts = 
-  try Hts.find mutable_types ts with Not_found -> raise NotMutable
+  try Hts.find model_types ts with Not_found -> raise NotModelType
 
-let model_type ty = match ty.ty_node with
-  | Tyapp (ts, tyl) when Hts.mem mutable_types ts ->
-      let mt = Hts.find mutable_types ts in
-      begin match mt.mt_model with
-	| None -> 
-	    ty
-	| Some ty ->
-	    let add mtv tv ty = Mtv.add tv ty mtv in
-	    let mtv = List.fold_left2 add Mtv.empty mt.mt_args tyl in
-	    ty_inst mtv ty
+let rec model_type ty = match ty.ty_node with
+  | Tyapp (ts, tyl) ->
+      let tyl = List.map model_type tyl in
+      begin try
+	let mt = Hts.find model_types ts in
+	begin match mt.mt_model with
+	  | None -> 
+	      ty
+	  | Some ty ->
+	      let add mtv tv ty = Mtv.add tv ty mtv in
+	      let mtv = List.fold_left2 add Mtv.empty mt.mt_args tyl in
+	      model_type (ty_inst mtv ty) (* FIXME: could be optimized? *)
+	end
+      with Not_found ->
+	ty_app ts tyl
       end
-  | Tyvar _ | Tyapp _ -> 
-      raise NotMutable
+  | Tyvar _ ->
+      ty
 
 (* types *)
 
@@ -185,7 +193,7 @@ end = struct
 
   (* purify: turns program types into logic types *)
 
-  let purify ty = try model_type ty with NotMutable -> ty
+  let purify ty = model_type ty
 
   let rec uncurry_type ?(logic=false) = function
     | Tpure ty when not logic ->
