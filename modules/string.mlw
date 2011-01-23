@@ -1,7 +1,13 @@
 
 module Char
 
+  use import int.Int
+
   abstract type char model int
+
+  parameter chr : x:int -> { 0 <= x <= 255 } char { result = x }
+
+  parameter code : c:char -> {} int { result = c }
 
 end
 
@@ -9,9 +15,11 @@ module String
 
   use import int.Int
   use import module Char
-  use array.ArrayLength as S
+  use array.ArrayRich as S
 
   mutable type string model S.t int char
+
+  parameter create : len:int -> { len >= 0 } string { S.length result = len }
 
   parameter get : s:string -> i:int ->
     { 0 <= i < S.length s } char reads s { result = S.get s i }
@@ -22,3 +30,56 @@ module String
   parameter length : s:string -> {} int reads s { result = S.length s }
 
 end
+
+module Buffer
+
+  use import int.Int
+  use import module Char
+  use import module String
+
+  mutable type t model S.t int char
+
+  parameter create : size:int -> { size >= 0 } t { S.length result = 0 }
+    (** [size] is only given as a hint for the initial size *)
+
+  parameter contents : b:t -> { } string { result = b }
+
+  parameter add_char : 
+    b:t -> c:char -> 
+    { } 
+    unit writes b 
+    { S.length b = old (S.length b) + 1 and
+      S.sub b 0 (S.length b - 1) = old b and
+      S.get b (S.length b - 1) = c }
+
+  parameter add_string : 
+    b:t -> s:string -> 
+    { } 
+    unit reads s writes b 
+    { S.length b = old (S.length b) + S.length s and
+      S.sub b 0 (old (S.length b)) = old b and
+      S.sub b (old (S.length b)) (S.length s) = s }
+
+end
+
+module Test
+
+  use module Char
+  use module String
+  use module Buffer
+ 
+  let test () =
+    let b = Buffer.create 1024 in
+    let c = Char.chr 65 in
+    Buffer.add_char b c;
+    let s = String.create 100 in
+    Buffer.add_string b s;
+    assert { String.S.length b = 101 }
+
+end
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C .. modules/string"
+End: 
+*)
