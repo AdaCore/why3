@@ -256,7 +256,7 @@ let escape = ['\\''"''n''t''r']
 rule record = parse
   | space
       { record lexbuf }
-  | '#' [^'\n']* '\n'
+  | '#' [^'\n']* ('\n' | eof)
       { record lexbuf }
   | '[' (ident as key) space*
       { header [key] lexbuf }
