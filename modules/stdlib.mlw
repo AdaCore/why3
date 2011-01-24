@@ -18,19 +18,17 @@ end
 module Array
 
   use import int.Int
-  use array.ArrayLength as A
+  use export array.ArrayLength
 
-  mutable type array 'a model A.t int 'a
+  mutable type array 'a model t int 'a
 
-  logic (#) (a : A.t int 'a) (i : int) : 'a = A.get a i
+  parameter ([]) : a : array 'a -> i:int ->
+    { 0 <= i < length a } 'a reads a { result = a[i] }
 
-  parameter get : a : array 'a -> i:int ->
-    { 0 <= i < A.length a } 'a reads a { result = A.get a i }
+  parameter ([<-]) : a : array 'a -> i:int -> v:'a ->
+    { 0 <= i < length a } unit writes a { a = (old a)[i <- v] }
 
-  parameter set : a : array 'a -> i:int -> v:'a ->
-    { 0 <= i < A.length a } unit writes a { a = A.set (old a) i v }
-
-  parameter length : a : array 'a -> {} int reads a { result = A.length a }
+  parameter length : a : array 'a -> {} int reads a { result = length a }
 
 end
 

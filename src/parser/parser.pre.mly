@@ -69,8 +69,9 @@
   let prefix_ppl loc p a = mk_ppl loc (PPunop (p, a))
   let prefix_pp p a = prefix_ppl (loc ()) p a
 
-  let infix s = "infix " ^ s
+  let infix  s = "infix "  ^ s
   let prefix s = "prefix " ^ s
+  let misfix s = "misfix " ^ s
 
   let mk_id id loc = { id = id; id_lab = []; id_loc = loc }
 
@@ -114,6 +115,14 @@
       { expr_desc = Eident (Qident id); expr_loc = id.id_loc }
     in
     mk_apply e
+
+  let mk_misfix2 op e1 e2 =
+    let id = { id = misfix op; id_lab = []; id_loc = loc_i 2 } in
+    mk_expr (mk_apply_id id [e1; e2])
+
+  let mk_misfix3 op e1 e2 e3 =
+    let id = { id = misfix op; id_lab = []; id_loc = loc_i 2 } in
+    mk_expr (mk_apply_id id [e1; e2; e3])
 
   let mk_infix e1 op e2 =
     let id = { id = infix op; id_lab = []; id_loc = loc_i 2 } in
@@ -200,11 +209,14 @@
 %right AND AMPAMP
 %nonassoc NOT
 %left EQUAL LTGT OP1
+%nonassoc RIGHTSQ    /* stronger than OP1 for e1[e2 op1 e3] */
 %left OP2
 %left OP3
 %left OP4
 %nonassoc prefix_op
 %left prec_app
+%nonassoc LEFTSQ
+%nonassoc OPPREF
 
 /* Entry points */
 
@@ -570,6 +582,11 @@ lexpr_arg:
    { mk_pp (PPtuple ($2 :: $4)) }
 | OPPREF lexpr_arg
    { mk_pp (PPapp (Qident (mk_id (prefix $1) (loc_i 2)), [$2])) }
+| lexpr_arg LEFTSQ lexpr RIGHTSQ
+   { mk_pp (PPapp (Qident (mk_id (misfix "[]") (loc ())), [$1; $3])) }
+| lexpr_arg LEFTSQ lexpr OP1 lexpr RIGHTSQ
+   { let op = "[" ^ $4 ^ "]" in
+     mk_pp (PPapp (Qident (mk_id (misfix op) (loc ())), [$1; $3; $5])) }
 ;
 
 quant:
@@ -733,6 +750,10 @@ lident_rich:
     { mk_id (prefix $2) (loc ()) }
 | LEFTPAR OPPREF RIGHTPAR
     { mk_id (prefix $2) (loc ()) }
+| LEFTPAR LEFTSQ RIGHTSQ RIGHTPAR
+    { mk_id (misfix "[]") (loc ()) }
+| LEFTPAR LEFTSQ OP1 RIGHTSQ RIGHTPAR
+    { mk_id (misfix ("[" ^ $3 ^ "]")) (loc ()) }
 ;
 
 lident:
@@ -1002,6 +1023,10 @@ simple_expr:
     { mk_expr Eskip }
 | OPPREF simple_expr
     { mk_prefix $1 $2 }
+| simple_expr LEFTSQ expr RIGHTSQ
+    { mk_misfix2 "[]" $1 $3 }
+| simple_expr LEFTSQ expr OP1 expr RIGHTSQ
+    { let op = "[" ^ $4 ^ "]" in mk_misfix3 op $1 $3 $5 }
 ;
 
 list1_simple_expr:

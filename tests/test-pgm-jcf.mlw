@@ -1,11 +1,18 @@
 
+(* theory T *)
+(*   type t *)
+(* end *)
+
 module P
 
   use import int.Int
-  use import module string.String
+  use import module stdlib.Array
 
-  let foo (s:string) = { S.length s = 1 } get s 0 { true }
-
+  let foo (t : array int) = 
+    { A.length t >= 1 && t[0] = 1 }
+    t[0 <- 1];
+    t[0] + 3
+    { result = 3 }
 
 end
 

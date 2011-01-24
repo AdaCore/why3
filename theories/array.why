@@ -6,6 +6,10 @@ theory Array "Theory of arrays"
   logic get (t 'a 'b) 'a : 'b
   logic set (t 'a 'b) 'a 'b : t 'a 'b
 
+  (* syntactic sugar *)
+  logic ([]) (a : t 'a 'b) (i : 'a) : 'b = get a i
+  logic ([<-]) (a : t 'a 'b) (i : 'a) (v : 'b) : t 'a 'b = set a i v
+
   axiom Select_eq :
     forall m : t 'a 'b. forall a1 a2 : 'a.
     forall b : 'b [get (set m a1 b) a2].
@@ -182,6 +186,6 @@ end
 
 (*
 Local Variables: 
-compile-command: "cd ..; bin/why.opt theories/array.why"
+compile-command: "make -C .. theories/array"
 End: 
 *)

@@ -3,7 +3,10 @@
        | real 			  ; real constant
        | lqualid 		  ; symbol
        | prefix-op term 	  ;
+       | bang-op term 	  ;
        | term infix-op term 	  ;
+       | term "[" term "]"	  ; brackets
+       | term "[" term infix-op-1 term "]" 	  ; ternary brackets
        | lqualid term+ 		  ; function application
        | "if" formula "then" term ;
          "else" term              ; conditional

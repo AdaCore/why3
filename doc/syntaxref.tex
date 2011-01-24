@@ -46,7 +46,7 @@ characters they are built from:
 \item level 2: those containing
  characters from \textit{op-char-2}, \textit{op-char-3} or
  \textit{op-char-4};
-\item level 1: all other operators.
+\item level 1: all other operators (non-terminal \textit{infix-op-1}).
 \end{itemize}
 
 \paragraph{Terms.}
@@ -61,11 +61,14 @@ associativities, from lowest to greatest priority:
     \texttt{if then else} / \texttt{let in} & -- \\
     label & -- \\
     cast  & -- \\
-    infix level 1 & left \\
-    infix level 2 & left \\
-    infix level 3 & left \\
-    infix level 4 & left \\
-    prefix        & --   \\
+    infix-op level 1 & left \\
+    infix-op level 2 & left \\
+    infix-op level 3 & left \\
+    infix-op level 4 & left \\
+    prefix-op     & --   \\
+    function application & left \\
+    brackets / ternary brackets & -- \\
+    bang-op       & --   \\
     \hline
   \end{tabular}
 \end{center}

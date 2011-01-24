@@ -7,7 +7,7 @@ module Char
 
   parameter chr : x:int -> { 0 <= x <= 255 } char { result = x }
 
-  parameter code : c:char -> {} int { result = c }
+  parameter code : c:char -> {} int { result = c and 0 <= c <= 255 }
 
 end
 

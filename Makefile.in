@@ -864,7 +864,7 @@ doc/bnf: doc/bnf.mll
 
 doc: $(DOC)
 
-doc/manual.pdf: $(BNFTEX) doc/apidoc.tex doc/manual.tex doc/version.tex
+doc/manual.pdf: $(BNFTEX) doc/*.tex doc/manual.tex doc/version.tex
 	cd doc; $(RUBBER) -d manual.tex
 
 # doc/manual.html: doc/manual.tex doc/version.tex
