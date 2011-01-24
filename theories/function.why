@@ -1,24 +1,24 @@
 theory Injective
   type a
   type v
-  logic f a : v
-  logic f_1 v : a
+  logic to_ a : v
+  logic from v : a
 
-  axiom Inj : forall x : a. f_1(f x) = x
+  axiom Inj : forall x : a. from(to_ x) = x
 
-  goal G1 : forall x y : a. f(x)=f(y) -> x = y
-  goal G2 : forall y : a. exists x : v. f_1(x)=y
+  goal G1 : forall x y : a. to_(x)=to_(y) -> x = y
+  goal G2 : forall y : a. exists x : v. from(x)=y
 
 end
 
 theory Surjective
   type a
   type v
-  logic f a : v
-  logic f_1 v : a
+  logic to_ a : v
+  logic from v : a
 
   clone import Injective with type v = a, type a = v,
-    logic f = f_1, logic f_1 = f
+    logic to_ = from, logic from = to_
 
 end
 
