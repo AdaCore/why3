@@ -1,23 +1,20 @@
-module M
 (* VSTTE'10 competition http://www.macs.hw.ac.uk/vstte10/Competition.html
    Problem 1: max and sum of an array *)
 
+module M
+
   use import int.Int
   use import module stdlib.Ref
-  use array.ArrayLength as A
+  use import module stdlib.Array
 
-  type array 'a = A.t int 'a
-
-  logic (#) (a : array 'a) (i : int) : 'a = A.get a i
-
-let max_sum a n =
-  { n >= 0 and forall i:int. 0 <= i < n -> a#i >= 0 }
+  let max_sum a n =
+  { n >= 0 and length a = n and forall i:int. 0 <= i < n -> a[i] >= 0 }
   let sum = ref 0 in
   let max = ref 0 in
   for i = 0 to n-1 do
-    invariant { sum <= i * max and forall j:int. 0 <= j < i -> a#j <= max }
-    if !max < a#i then max := a#i;
-    sum := !sum + a#i
+    invariant { sum <= i * max and forall j:int. 0 <= j < i -> a[j] <= max }
+    if !max < a[i] then max := a[i];
+    sum := !sum + a[i]
   done;
   (!sum, !max)
   { let (sum, max) = result in sum <= n * max }

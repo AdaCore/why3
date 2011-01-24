@@ -1,43 +1,33 @@
-module M
 (* VSTTE'10 competition http://www.macs.hw.ac.uk/vstte10/Competition.html
    Problem 2: inverting an injection *)
 
+module M
+
   use import int.Int
-  use import module stdlib.Ref
-  use array.ArrayLength as A
+  use import module stdlib.Array
 
-  type array 'a = A.t int 'a
+  logic injective (a : t int int) (n : int) =
+    forall i j : int. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
 
-  logic (#) (a : array 'a) (i : int) : 'a = A.get a i
+  logic surjective (a : t int int) (n : int) =
+    forall i : int [i]. 0 <= i < n -> exists j : int. (0 <= j < n and a[j] = i)
 
-  logic injective (a : array int) (n : int) =
-    forall i j : int. 0 <= i < n -> 0 <= j < n -> i <> j -> a#i <> a#j
-
-  logic surjective (a : array int) (n : int) =
-    forall i : int [i]. 0 <= i < n -> exists j : int. (0 <= j < n and a#j = i)
-
-  logic range (a : array int) (n : int) =
-    forall i : int. 0 <= i < n -> 0 <= a#i < n
+  logic range (a : t int int) (n : int) =
+    forall i : int. 0 <= i < n -> 0 <= a[i] < n
 
   lemma Injective_surjective :
-    forall a : array int, n : int.
+    forall a : t int int, n : int.
     injective a n -> range a n -> surjective a n
 
-let array_get (a : ref (array 'a)) i = 
-  { 0 <= i < A.length a } A.get !a i { result = A.get a i }
-
-let array_set (a : ref (array 'a)) i v = 
-  { 0 <= i < A.length a } a := A.set !a i v { a = A.set (old a) i v }
-
-let inverting (a : ref (array int)) (b : ref (array int)) n =
-  { n >= 0 and A.length a = n and A.length b = n and 
-    injective a n and range a n }
-  for i = 0 to n-1 do
-    invariant 
-      { A.length b = n and forall j : int. 0 <= j < i -> b#(a#j) = j }
-    array_set b (array_get a i) i
-  done
-  { injective b n }
+  let inverting (a : array int) (b : array int) n =
+    { n >= 0 and length a = n and length b = n and 
+      injective a n and range a n }
+    for i = 0 to n-1 do
+      invariant 
+        { length b = n and forall j : int. 0 <= j < i -> b[a[j]] = j }
+        b[a[i] <- i]
+    done
+    { injective b n }
 
 end
 

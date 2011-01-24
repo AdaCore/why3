@@ -1,0 +1,41 @@
+
+module M
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import int.Power
+
+  let rec fast_exp x n variant { n } =
+    { 0 <= n }
+    if n = 0 then
+      1
+    else begin
+      let r = fast_exp x (div n 2) in
+      if mod n 2 = 0 then r * r else r * r * x
+    end
+    { result = power x n }
+
+  use import module stdlib.Ref
+
+  let fast_exp_imperative x n =
+    { 0 <= n }
+    let r = ref 1 in
+    let p = ref x in
+    let e = ref n in
+    while !e > 0 do
+      invariant { r * power x e = power x n }
+      variant   { e }
+      if mod !e 2 = 1 then r := !r * !p;
+      p := !p * !p;
+      e := div !e 2      
+    done;
+    !r
+    { result = power x n }
+
+end
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/power"
+End: 
+*)

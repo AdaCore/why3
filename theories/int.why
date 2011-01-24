@@ -96,15 +96,17 @@ theory Power
 
   use import Int
 
-(*
-  logic power (x n : int) : int =
-    if n = 0 then 1 else x * power x (n-1)
-*)
   logic power int int : int
 
-(* FIXME: should we give a partial definition? *)
-  axiom Power_def : forall x n : int. power x n =
-    if n <= 0 then 1 else x * power x (n-1)
+  axiom Power_0 : forall x : int. power x 0 = 1
+
+  axiom Power_s : forall x n : int. 0 < n -> power x n = x * power x (n-1)
+
+  lemma Power_sum : forall x n m : int. 0 <= n -> 0 <= m ->
+    power x (n + m) = power x n * power x m
+
+  lemma Power_mult : forall x n m : int. 0 <= n -> 0 <= m ->
+    power x (n * m) = power (power x n) m
 
 end
 
@@ -206,6 +208,6 @@ end
 
 (*
 Local Variables:
-compile-command: "../bin/why.opt int.why"
+compile-command: "make -C .. theories/int.gui"
 End:
 *)
