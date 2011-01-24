@@ -1524,9 +1524,9 @@ let find_module penv lmod q id = match q with
 (* env = to retrieve theories from the loadpath
    penv = to retrieve modules from the loadpath
    lmod = local modules *)
-let rec decl ~wp env penv lmod uc = function
+let rec decl ~wp env penv ltm lmod uc = function
   | Ptree.Dlogic d ->
-      Pgm_module.add_logic_pdecl env d uc
+      Pgm_module.add_logic_pdecl env ltm d uc
   | Ptree.Dlet (id, e) ->
       let e = type_expr uc e in
       if Debug.test_flag debug then
@@ -1598,11 +1598,11 @@ let rec decl ~wp env penv lmod uc = function
       with ClashSymbol s -> 
 	errorm ~loc "clash with previous symbol %s" s
       end
-  | Ptree.Dnamespace (id, import, dl) ->
-      let loc = id.id_loc in
+  | Ptree.Dnamespace (loc, id, import, dl) ->
       let uc = open_namespace uc in
-      let uc = List.fold_left (decl ~wp env penv lmod) uc dl in
-      begin try close_namespace uc import (Some id.id)
+      let uc = List.fold_left (decl ~wp env penv ltm lmod) uc dl in
+      let id = option_map (fun id -> id.id) id in
+      begin try close_namespace uc import id
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
   | Ptree.Dmodel_type (mut, id, args, model) ->
       let loc = id.id_loc in

@@ -18,15 +18,18 @@
 (**************************************************************************)
 
 open Why
+open Theory
 open Pgm_module
+
+type module_file = Theory.theory Mnm.t * Pgm_module.t Mnm.t
 
 type t = {
   env      : Env.env;
   retrieve : retrieve_module;
-  memo     : (string list, Pgm_module.t Mnm.t) Hashtbl.t;
+  memo     : (string list, module_file) Hashtbl.t;
 }
 
-and retrieve_module = t -> string -> in_channel -> Pgm_module.t Mnm.t
+and retrieve_module = t -> string -> in_channel -> module_file
 
 let get_env penv = penv.env
 
@@ -44,15 +47,16 @@ let rec add_suffix = function
   | p :: f -> p :: add_suffix f
 
 let find_library penv sl =
-  try Hashtbl.find penv.memo sl
+  try 
+    Hashtbl.find penv.memo sl
   with Not_found ->
-    Hashtbl.add penv.memo sl Mnm.empty;
+    Hashtbl.add penv.memo sl (Mnm.empty, Mnm.empty);
     let file, c = Env.find_channel penv.env (add_suffix sl) in
-    let m = penv.retrieve penv file c in
+    let r = penv.retrieve penv file c in
     close_in c;
-    Hashtbl.replace penv.memo sl m;
-    m
+    Hashtbl.replace penv.memo sl r;
+    r
 
 let find_module penv sl s =
-  try Mnm.find s (find_library penv sl)
+  try Mnm.find s (snd (find_library penv sl))
   with Not_found -> raise (ModuleNotFound (sl, s))

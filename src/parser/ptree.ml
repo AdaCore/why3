@@ -229,7 +229,7 @@ type program_decl =
   | Dexn    of ident * pty option
   (* modules *)
   | Duse    of qualid * imp_exp * (*as:*) ident option
-  | Dnamespace of ident * (* import: *) bool * program_decl list
+  | Dnamespace of loc * ident option * (* import: *) bool * program_decl list
   | Dmodel_type of bool * ident * ident list * pty option
 
 type module_ = {

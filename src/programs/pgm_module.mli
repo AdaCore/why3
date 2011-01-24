@@ -2,10 +2,9 @@
 open Why
 open Ident
 open Term
+open Theory
 open Pgm_types
 open Pgm_types.T
-
-module Mnm : Map.S with type key = string
 
 type namespace = private {
   ns_pr : psymbol   Mnm.t;  (* program symbols *)
@@ -52,7 +51,8 @@ val add_mtsymbol : mtsymbol -> uc -> uc
 val add_decl : Pgm_ttree.decl -> uc -> uc
 val add_logic_decl : Decl.decl -> uc -> uc
 
-val add_logic_pdecl : Env.env -> Ptree.decl -> uc -> uc
+val add_logic_pdecl : 
+  Env.env -> Theory.theory Theory.Mnm.t -> Ptree.decl -> uc -> uc
 
 (** exceptions *)
 

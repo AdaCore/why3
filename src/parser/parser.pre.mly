@@ -838,26 +838,49 @@ bar_:
 /****************************************************************************/
 
 program_file:
-| list0_module_ EOF { $1 }
+| list0_theory_or_module_ EOF { $1 }
 ;
 
-list0_module_:
+list0_theory_or_module_:
 | /* epsilon */
    { [] }
-| list1_module_
+| list1_theory_or_module_
    { $1 }
 ;
 
-list1_module_:
-| module_
+list1_theory_or_module_:
+| theory_or_module_
    { [$1] }
-| module_ list1_module_
+| theory_or_module_ list1_theory_or_module_
    { $1 :: $2 }
 ;
 
-module_:
+theory_or_module_:
+| THEORY uident labels list0_full_decl END
+   { { mod_name = $2; mod_labels = $3; mod_decl = $4 } }
 | MODULE uident labels list0_program_decl END
    { { mod_name = $2; mod_labels = $3; mod_decl = $4 } }
+;
+
+list0_full_decl:
+| /* epsilon */
+   { [] }
+| list1_full_decl
+   { $1 }
+;
+
+list1_full_decl:
+| full_decl
+   { [$1] }
+| full_decl list1_full_decl
+   { $1 :: $2 }
+;
+
+full_decl:
+| NAMESPACE namespace_import namespace_name list0_full_decl END
+   { Dnamespace (loc_i 3, $3, $2, $4) }
+| decl
+   { Dlogic $1 }
 ;
 
 list0_program_decl:
@@ -891,8 +914,8 @@ program_decl:
     { Dexn (add_lab $2 $3, Some $4) }
 | USE use_module
     { $2 }
-| NAMESPACE namespace_import uident list0_program_decl END
-    { Dnamespace ($3, $2, $4) }
+| NAMESPACE namespace_import namespace_name list0_program_decl END
+    { Dnamespace (loc_i 3, $3, $2, $4) }
 | ABSTRACT TYPE lident type_args model
     { Dmodel_type (false, $3, $4, $5) }
 | MUTABLE TYPE lident type_args model

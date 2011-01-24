@@ -9,8 +9,6 @@ open Pgm_types
 open Pgm_types.T
 open Pgm_ttree
 
-module Mnm = Mstr
-
 type namespace = {
   ns_pr : psymbol   Mnm.t;  (* program symbols *)
   ns_ex : esymbol   Mnm.t;  (* exceptions*)
@@ -182,8 +180,8 @@ let use_export uc m =
 let use_export_theory uc th =
   { uc with uc_th = Theory.use_export uc.uc_th th }
 
-let add_logic_pdecl env d uc =
-  { uc with uc_th = Typing.add_decl env Theory.Mnm.empty  uc.uc_th d }
+let add_logic_pdecl env ltm d uc =
+  { uc with uc_th = Typing.add_decl env ltm uc.uc_th d }
 
 
 

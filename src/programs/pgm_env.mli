@@ -18,13 +18,16 @@
 (**************************************************************************)
 
 open Why
+open Theory
 open Pgm_module
 
 type t
 
 val get_env : t -> Env.env
 
-type retrieve_module = t -> string -> in_channel -> Pgm_module.t Mnm.t
+type module_file = Theory.theory Mnm.t * Pgm_module.t Mnm.t
+
+type retrieve_module = t -> string -> in_channel -> module_file
 
 val create : Env.env -> retrieve_module -> t
 

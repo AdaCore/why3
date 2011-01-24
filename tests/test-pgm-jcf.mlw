@@ -1,20 +1,24 @@
 
-(* theory T *)
-(*   type t *)
-(* end *)
+theory A
+  type t
+end
 
 module P
 
+  use import module A
   use import int.Int
   use import module stdlib.Array
 
+  logic c : int
+
   let foo (t : array int) = 
-    { A.length t >= 1 && t[0] = 1 }
+    { length t >= 1 && t[0] = 1 }
     t[0 <- 1];
     t[0] + 3
     { result = 3 }
 
 end
+
 
 (*
 Local Variables: 
