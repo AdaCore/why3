@@ -102,11 +102,14 @@ theory Power
 
   axiom Power_s : forall x n : int. 0 < n -> power x n = x * power x (n-1)
 
+  lemma Power_1 : forall x : int. power x 1 = x
+
   lemma Power_sum : forall x n m : int. 0 <= n -> 0 <= m ->
     power x (n + m) = power x n * power x m
 
   lemma Power_mult : forall x n m : int. 0 <= n -> 0 <= m ->
     power x (n * m) = power (power x n) m
+
 
 end
 
