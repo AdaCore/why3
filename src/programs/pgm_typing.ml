@@ -195,6 +195,12 @@ let check_mutable_type loc dty = match view_dty dty with
 	"this expression has type %a, but is expected to have a mutable type"
 	print_dty dty
 
+let check_mutable_dtype_v loc = function
+  | DTpure dty -> check_mutable_type loc dty
+  | DTarrow _ -> 
+      errorm ~loc 
+	"this expression is a function, but is expected to have a mutable type"
+
 let dreference env = function
   | Qident id when Mstr.mem id.id env.locals ->
       (* local variable *)
@@ -204,9 +210,12 @@ let dreference env = function
   | qid ->
       let loc = Typing.qloc qid in
       let sl = Typing.string_list_of_qualid [] qid in
-      let s, _ty = specialize_global loc sl env.uc in
-      (* TODO check_reference_type env.uc loc ty; *)
-      DRglobal s
+      try
+	let s, ty = specialize_global loc sl env.uc in
+	check_mutable_dtype_v loc ty;
+	DRglobal s
+      with Not_found ->
+	errorm ~loc "unbound variable %a" print_qualid qid
 
 let dexception uc qid =
   let sl = Typing.string_list_of_qualid [] qid in

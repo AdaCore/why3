@@ -1,0 +1,10 @@
+
+module M
+
+  use import module stdlib.Ref
+
+  parameter foo : int -> int
+
+  parameter f : x:int -> {} unit writes foo {}
+
+end

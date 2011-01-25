@@ -1,21 +1,16 @@
 
-theory A
-  type t
-end
-
 module P
 
-  use import module A
   use import int.Int
+  use import module stdlib.Ref
   use import module stdlib.Array
 
-  logic c : int
+  parameter foo : int -> int
 
-  let foo (t : array int) = 
-    { length t >= 1 && t[0] = 1 }
-    t[0 <- 1];
-    t[0] + 3
-    { result = 3 }
+  parameter f : x:int -> {} unit writes x {}
+
+  let g (y:int) =
+    y
 
 end
 
