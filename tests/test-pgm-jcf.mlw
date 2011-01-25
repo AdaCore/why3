@@ -5,17 +5,22 @@ module P
   use import module stdlib.Ref
   use import module stdlib.Array
 
-  parameter x : ghost int
+  parameter c : ghost int
 
-  let gid (x:int) = {} ghost x { result=x }
+  axiom a : c = 1
+
+  let gid (x:int) = {} ghost (c + x) { result=c+x }
+
+  (* FIXME *)
+  (* let gid (x:int) = {} (x, ghost x) { let a,b = result in a=x and b=x } *)
+
+  (* FIXME : make c a first parameter of gid => then to type gid c y inside
+     ghost we should not insert unghost *)
 
   let g (x : int) (y : ghost int) =
     let z = ghost (1 + gid y) in
-    assert { z = 1 + y };
+    assert { z = 2 + y };
     x + 1
-
-  (* FIXME *)
-  (* let gid (x:int) = {} (x, ghost_ x) { let a,b = result in a=x and b=x } *)
 
 end
 

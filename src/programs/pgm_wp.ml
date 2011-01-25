@@ -285,8 +285,11 @@ and wp_desc env e q = match e.expr_desc with
   | Elocal v ->
       let (res, q), _ = q in
       f_subst (subst1 res (t_var v.pv_vs)) q
-  | Eglobal _ ->
+  | Eglobal s when is_arrow_ty s.p_ty ->
       let (_, q), _ = q in q
+  | Eglobal s ->
+      let (v, q), _ = q in
+      f_subst_single v (t_app_infer s.p_ls []) q
   | Efun (bl, t) ->
       let (_, q), _ = q in
       let f = wp_triple env t in
