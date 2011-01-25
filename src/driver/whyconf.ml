@@ -189,9 +189,7 @@ let load_main dirname section =
 let read_config_rc conf_file =
   let filename = match conf_file with
     | Some filename -> filename
-    | None -> begin try Sys.getenv "WHY_CONFIG" with Not_found ->
-          if Sys.file_exists "why.conf" then "why.conf" else
-          if Sys.file_exists ".why.conf" then ".why.conf" else
+    | None -> begin try Sys.getenv "WHY3CONFIG" with Not_found ->
           if Sys.file_exists default_conf_file then default_conf_file
           else raise Exit
         end
