@@ -1,9 +1,30 @@
 
+theory Power
+
+  use import int.Int
+
+  logic power int int : int
+
+  axiom Power_0 : forall x : int. power x 0 = 1
+
+  axiom Power_s : forall x n : int. 0 < n -> power x n = x * power x (n-1)
+
+  lemma Power_1 : forall x : int. power x 1 = x
+
+  lemma Power_sum : forall x n m : int. 0 <= n -> 0 <= m ->
+    power x (n + m) = power x n * power x m
+
+  lemma Power_mult : forall x n m : int. 0 <= n -> 0 <= m ->
+    power x (n * m) = power (power x n) m
+
+
+end
+
 module M
 
   use import int.Int
   use import int.ComputerDivision
-  use import int.Power
+  use import Power
 
   let rec fast_exp x n variant { n } =
     { 0 <= n }
@@ -27,7 +48,7 @@ module M
       variant   { e }
       if mod !e 2 = 1 then r := !r * !p;
       p := !p * !p;
-      e := div !e 2      
+      e := div !e 2
     done;
     !r
     { result = power x n }
