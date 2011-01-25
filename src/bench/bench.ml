@@ -353,7 +353,7 @@ answer output time
   let transpose_sorted = function
     | [] -> []
     | (_,lres)::_ as l ->
-    let lref = List.map (fun r -> r.prob,ref []) lres in
+    let lref = List.map (fun r -> (r.prob,r.task,r.idtask),ref []) lres in
     let l = List.rev l in
     let add (_,lr) res = lr := res :: !lr in
     List.iter (fun (_,lres) -> List.iter2 add lref lres) l;
@@ -380,8 +380,12 @@ answer output time
             r.pr_time
         | InternalFailure _ -> fprintf fmt "InternalFailure, \"\""
 in
-    let print_line fmt (b,l) =
-      fprintf fmt "%a ," print_prob b;
+    let print_line fmt ((b,t,id),l) =
+      (* No printer for task since we want the same name evenif its
+         the same file with different environnement (loaded two times) *)
+      fprintf fmt "%a|%s|%i ," print_prob b
+        (Task.task_goal t).Decl.pr_name.Ident.id_string
+        id;
       Pp.print_list Pp.comma print_cell fmt l in
     Pp.print_list print_newline print_line fmt l
 

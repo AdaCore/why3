@@ -380,18 +380,20 @@ let () =
   let nb_scheduled = ref 0 in
   let nb_done = ref 0 in
   let nb_valid = ref 0 in
+  let nb_failure = ref 0 in
   let callback (_,tool) (_,file,prob) task i res =
     if not !opt_quiet then
-      begin match res with
+      begin begin match res with
         | Scheduler.Scheduled -> incr nb_scheduled
         | Scheduler.Done {Call_provers.pr_answer = ans} -> incr nb_done;
           begin match ans with
             | Call_provers.Valid -> incr nb_valid
             | _     -> () end
-        | _ -> ();
-          Format.printf "%a(%i/%i) valid : %i%!"
-            Pp.Ansi.set_column 0
-            !nb_done !nb_scheduled !nb_valid
+        | Scheduler.InternalFailure _ -> incr nb_done; incr nb_failure
+        | Scheduler.Running _ -> () end;
+        Format.printf "%a(%i/%i) valid : %i failure : %i%!"
+          Pp.Ansi.set_column 0
+          !nb_done !nb_scheduled !nb_valid !nb_failure
       end;
     Debug.dprintf debug "%s.%s %a %i with %s : %a@."
       file prob Pretty.print_pr (task_goal task) i tool
@@ -408,6 +410,6 @@ let () =
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -j -C ../.. bin/whybench.byte"
+compile-command: "unset LANG; make -j -C ../.. bin/why3bench.byte"
 End:
 *)
