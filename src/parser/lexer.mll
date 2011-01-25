@@ -89,7 +89,7 @@
 	"exception", EXCEPTION;
 	"for", FOR;
 	"fun", FUN;
-	"ghost", GHOST;
+	(* "ghost", GHOST; *)
 	"invariant", INVARIANT;
 	"label", LABEL;
 	"model", MODEL;

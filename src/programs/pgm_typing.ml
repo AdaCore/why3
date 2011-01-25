@@ -302,14 +302,39 @@ let dloop_annotation env a =
   { dloop_invariant = a.Ptree.loop_invariant;
     dloop_variant   = option_map (dvariant env) a.Ptree.loop_variant; }
 
+let is_ps_ghost e = match e.dexpr_desc with
+  | DEglobal (ps, _) -> T.p_equal ps ps_ghost
+  | _ -> false
+
 (* [dexpr] translates ptree into dexpr *)
 
-let rec dexpr env e =
-  let d, ty = dexpr_desc env e.Ptree.expr_loc e.Ptree.expr_desc in
-  { dexpr_desc = d; dexpr_loc = e.Ptree.expr_loc;
+let rec dexpr ~ghost env e =
+  let d, ty = dexpr_desc ~ghost env e.Ptree.expr_loc e.Ptree.expr_desc in
+  let loc = e.Ptree.expr_loc in
+  let e = { 
+    dexpr_desc = d; dexpr_loc = loc;
     dexpr_denv = env.denv; dexpr_type = ty; }
+  in
+  match view_dty ty with
+    (* if below ghost and e has ghost type, then unghost it *)
+    | Denv.Tyapp (ts, [ty']) when ghost && ts_equal ts mt_ghost.mt_abstr ->
+	let unghost = 
+	  let tv = specialize_type_v ~loc (Htv.create 17) ps_unghost.p_tv in
+	  match tv with
+	    | DTarrow ([_,tyx,_], _) ->
+		if not (Denv.unify ty tyx) then assert false;
+		let dtv = dpurify_type_v tv in
+		{ dexpr_desc = DEglobal (ps_unghost, tv);
+		  dexpr_loc = loc; dexpr_denv = env.denv; dexpr_type = dtv; }
+	    | _ -> 
+		assert false
+	in
+	{ dexpr_desc = DEapply (unghost, e); dexpr_loc = e.dexpr_loc;
+	  dexpr_denv = env.denv; dexpr_type = ty'; }
+    | _ ->
+	e
 
-and dexpr_desc env loc = function
+and dexpr_desc ~ghost env loc = function
   | Ptree.Econstant (ConstInt _ as c) ->
       DEconstant c, dty_app (Ty.ts_int, [])
   | Ptree.Econstant (ConstReal _ as c) ->
@@ -334,14 +359,15 @@ and dexpr_desc env loc = function
 	DElogic s, dcurrying tyl ty
       end
   | Ptree.Elazy (op, e1, e2) ->
-      let e1 = dexpr env e1 in
+      let e1 = dexpr ~ghost env e1 in
       expected_type e1 (dty_bool env.uc);
-      let e2 = dexpr env e2 in
+      let e2 = dexpr ~ghost env e2 in
       expected_type e2 (dty_bool env.uc);
       DElazy (op, e1, e2), dty_bool env.uc
   | Ptree.Eapply (e1, e2) ->
-      let e1 = dexpr env e1 in
-      let e2 = dexpr env e2 in
+      let e1 = dexpr ~ghost env e1 in
+      let ghost = ghost || is_ps_ghost e1 in
+      let e2 = dexpr ~ghost env e2 in
       let ty2 = create_type_var loc and ty = create_type_var loc in
       if not (Denv.unify e1.dexpr_type (dty_app (ts_arrow, [ty2; ty])))
       then
@@ -350,19 +376,19 @@ and dexpr_desc env loc = function
       DEapply (e1, e2), ty
   | Ptree.Efun (bl, t) ->
       let env, bl = map_fold_left dubinder env bl in
-      let (_,e,_) as t = dtriple env t in
+      let (_,e,_) as t = dtriple ~ghost env t in
       let tyl = List.map (fun (_,ty,_) -> ty) bl in
       let ty = dcurrying tyl e.dexpr_type in
       DEfun (bl, t), ty
   | Ptree.Elet (x, e1, e2) ->
-      let e1 = dexpr env e1 in
+      let e1 = dexpr ~ghost env e1 in
       let ty1 = e1.dexpr_type in
       let env = add_local env x.id ty1 in
-      let e2 = dexpr env e2 in
+      let e2 = dexpr ~ghost env e2 in
       DElet (x, e1, e2), e2.dexpr_type
   | Ptree.Eletrec (dl, e1) ->
-      let env, dl = dletrec env dl in
-      let e1 = dexpr env e1 in
+      let env, dl = dletrec ~ghost env dl in
+      let e1 = dexpr ~ghost env e1 in
       DEletrec (dl, e1), e1.dexpr_type
   | Ptree.Etuple el ->
       let n = List.length el in
@@ -374,7 +400,7 @@ and dexpr_desc env loc = function
 	  dexpr_type = ty; dexpr_loc = loc }
       in
       let apply e1 e2 ty2 =
-	let e2 = dexpr env e2 in
+	let e2 = dexpr ~ghost env e2 in
 	assert (Denv.unify e2.dexpr_type ty2);
 	let ty = create_type_var loc in
 	assert (Denv.unify e1.dexpr_type
@@ -386,30 +412,30 @@ and dexpr_desc env loc = function
       e.dexpr_desc, ty
 
   | Ptree.Esequence (e1, e2) ->
-      let e1 = dexpr env e1 in
+      let e1 = dexpr ~ghost env e1 in
       expected_type e1 (dty_unit env.uc);
-      let e2 = dexpr env e2 in
+      let e2 = dexpr ~ghost env e2 in
       DEsequence (e1, e2), e2.dexpr_type
   | Ptree.Eif (e1, e2, e3) ->
-      let e1 = dexpr env e1 in
+      let e1 = dexpr ~ghost env e1 in
       expected_type e1 (dty_bool env.uc);
-      let e2 = dexpr env e2 in
-      let e3 = dexpr env e3 in
+      let e2 = dexpr ~ghost env e2 in
+      let e3 = dexpr ~ghost env e3 in
       expected_type e3 e2.dexpr_type;
       DEif (e1, e2, e3), e2.dexpr_type
   | Ptree.Eloop (a, e1) ->
-      let e1 = dexpr env e1 in
+      let e1 = dexpr ~ghost env e1 in
       expected_type e1 (dty_unit env.uc);
       DEloop (dloop_annotation env a, e1), dty_unit env.uc
   | Ptree.Ematch (e1, bl) ->
-      let e1 = dexpr env e1 in
+      let e1 = dexpr ~ghost env e1 in
       let ty1 = e1.dexpr_type in
       let ty = create_type_var loc in (* the type of all branches *)
       let branch (p, e) =
 	let denv, p = Typing.dpat_list env.denv ty1 p in
 	let env = { env with denv = denv } in
 	let env = add_local_pat env p in
-	let e = dexpr env e in
+	let e = dexpr ~ghost env e in
 	expected_type e ty;
 	p, e
       in
@@ -430,7 +456,7 @@ and dexpr_desc env loc = function
 	    errorm ~loc "exception %a is expecting an argument of type %a"
 	      print_qualid qid print_dty ty;
 	| Some e, [ty] ->
-	    let e = dexpr env e in
+	    let e = dexpr ~ghost env e in
 	    expected_type e ty;
 	    Some e
 	| _ ->
@@ -438,7 +464,7 @@ and dexpr_desc env loc = function
       in
       DEraise (ls, e), create_type_var loc
   | Ptree.Etry (e1, hl) ->
-      let e1 = dexpr env e1 in
+      let e1 = dexpr ~ghost env e1 in
       let handler (id, x, h) =
 	let ls, tyl, _ = dexception env.uc id in
 	let x, env = match x, tyl with
@@ -454,19 +480,19 @@ and dexpr_desc env loc = function
 	  | _ ->
 	      assert false
 	in
-	let h = dexpr env h in
+	let h = dexpr ~ghost env h in
 	expected_type h e1.dexpr_type;
 	(ls, x, h)
       in
       DEtry (e1, List.map handler hl), e1.dexpr_type
   | Ptree.Efor (x, e1, d, e2, inv, e3) ->
-      let e1 = dexpr env e1 in
+      let e1 = dexpr ~ghost env e1 in
       expected_type e1 (dty_int env.uc);
-      let e2 = dexpr env e2 in
+      let e2 = dexpr ~ghost env e2 in
       expected_type e2 (dty_int env.uc);
       let env = add_local env x.id (dty_int env.uc) in
       (* let inv = option_map (dfmla env.denv) inv in *)
-      let e3 = dexpr env e3 in
+      let e3 = dexpr ~ghost env e3 in
       expected_type e3 (dty_unit env.uc);
       DEfor (x, e1, d, e2, inv, e3), dty_unit env.uc
 
@@ -477,10 +503,10 @@ and dexpr_desc env loc = function
 	errorm ~loc "clash with previous label %s" s;
       let ty = dty_label env.uc in
       let env = { env with denv = add_pure_var s ty env.denv } in
-      let e1 = dexpr env e1 in
+      let e1 = dexpr ~ghost env e1 in
       DElabel (s, e1), e1.dexpr_type
   | Ptree.Ecast (e1, ty) ->
-      let e1 = dexpr env e1 in
+      let e1 = dexpr ~ghost env e1 in
       let ty = pure_type env ty in
       expected_type e1 ty;
       e1.dexpr_desc, ty
@@ -488,7 +514,7 @@ and dexpr_desc env loc = function
       let c = dutype_c env c in
       DEany c, dpurify_utype_v c.duc_result_type
 
-and dletrec env dl =
+and dletrec ~ghost env dl =
   (* add all functions into environment *)
   let add_one env (id, bl, var, t) =
     let ty = create_type_var id.id_loc in
@@ -500,7 +526,7 @@ and dletrec env dl =
   let type_one ((id, tyres), bl, v, t) =
     let env, bl = map_fold_left dubinder env bl in
     let v = option_map (dvariant env) v in
-    let (_,e,_) as t = dtriple env t in
+    let (_,e,_) as t = dtriple ~ghost env t in
     let tyl = List.map (fun (_,ty,_) -> ty) bl in
     let ty = dcurrying tyl e.dexpr_type in
     if not (Denv.unify ty tyres) then
@@ -511,8 +537,8 @@ and dletrec env dl =
   in
   env, List.map type_one dl
 
-and dtriple env (p, e, q) =
-  let e = dexpr env e in
+and dtriple ~ghost env (p, e, q) =
+  let e = dexpr ~ghost env e in
   let q = dpost env.uc q in
   (p, e, q)
 
@@ -1457,7 +1483,7 @@ let create_ienv denv = {
 
 let type_expr gl e =
   let denv = create_denv gl in
-  let e = dexpr denv e in
+  let e = dexpr ~ghost:false denv e in
   let ienv = create_ienv denv in
   let e = iexpr gl ienv e in
   let e = expr gl Mvs.empty e in
@@ -1547,7 +1573,7 @@ let rec decl ~wp env penv ltm lmod uc = function
       if wp then Pgm_wp.decl uc d else uc
   | Ptree.Dletrec dl ->
       let denv = create_denv uc in
-      let _, dl = dletrec denv dl in
+      let _, dl = dletrec ~ghost:false denv dl in
       let _, dl = iletrec uc (create_ienv denv) dl in
       let _, dl = letrec uc Mvs.empty dl in
       let one uc (v, _, _, _ as d) =
@@ -1629,10 +1655,10 @@ let rec decl ~wp env penv ltm lmod uc = function
       in
       option_iter (check_type_vars ~loc args) model;
       let mt = create_mtsymbol ~mut id args model in
-      let uc = 
-	let d = Decl.create_ty_decl [mt.mt_abstr, Decl.Tabstract] in
-	Pgm_module.add_logic_decl d uc 
-      in
+      (* let uc =  *)
+      (* 	let d = Decl.create_ty_decl [mt.mt_abstr, Decl.Tabstract] in *)
+      (* 	Pgm_module.add_logic_decl d uc  *)
+      (* in *)
       add_mtsymbol mt uc
 
 (*

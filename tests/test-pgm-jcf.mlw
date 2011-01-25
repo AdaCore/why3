@@ -5,12 +5,17 @@ module P
   use import module stdlib.Ref
   use import module stdlib.Array
 
-  parameter foo : int -> int
+  parameter x : ghost int
 
-  parameter f : x:int -> {} unit writes x {}
+  let gid (x:int) = {} ghost x { result=x }
 
-  let g (y:int) =
-    y
+  let g (x : int) (y : ghost int) =
+    let z = ghost (1 + gid y) in
+    assert { z = 1 + y };
+    x + 1
+
+  (* FIXME *)
+  (* let gid (x:int) = {} (x, ghost_ x) { let a,b = result in a=x and b=x } *)
 
 end
 

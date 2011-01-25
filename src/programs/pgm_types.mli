@@ -173,4 +173,8 @@ and E : sig
 
 end 
 
+(* ghost code *)
 
+val mt_ghost   : mtsymbol
+val ps_ghost   : T.psymbol
+val ps_unghost : T.psymbol

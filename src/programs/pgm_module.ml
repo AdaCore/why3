@@ -123,9 +123,6 @@ let add_psymbol ps uc =
 let add_esymbol ls uc =
   add_symbol add_ex ls.ls_name ls uc
 
-let add_mtsymbol mt uc =
-  add_symbol add_mt mt.mt_name mt uc
-
 let add_decl d uc =
   { uc with uc_decls = d :: uc.uc_decls }
 
@@ -133,11 +130,18 @@ let add_logic_decl d uc =
   let th = Typing.with_tuples Theory.add_decl uc.uc_th d in
   { uc with uc_th = th }
 
+let add_mtsymbol mt uc =
+  (* added in the logic as an abstract type *)
+  let uc = 
+    let d = Decl.create_ty_decl [mt.mt_abstr, Decl.Tabstract] in
+    add_logic_decl d uc 
+  in
+  add_symbol add_mt mt.mt_name mt uc
+
 let ls_Exit = create_lsymbol (id_fresh "%Exit") [] (Some ty_exn)
 
 let create_module n =
   let uc = Theory.create_theory n in
-  (* let uc = add_pervasives uc in *)
   let m = { 
     uc_name = id_register n;
     uc_th = uc;
@@ -145,7 +149,12 @@ let create_module n =
     uc_import = [empty_ns];
     uc_export = [empty_ns]; } 
   in
-  add_esymbol ls_Exit m
+  (* pervasives *)
+  let m = add_esymbol  ls_Exit    m in
+  let m = add_mtsymbol mt_ghost   m in
+  let m = add_psymbol  ps_ghost   m in
+  let m = add_psymbol  ps_unghost m in
+  m
 
 (** Modules *)
 

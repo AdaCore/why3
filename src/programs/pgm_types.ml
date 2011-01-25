@@ -582,6 +582,41 @@ and Sref : sig include Set.S with type elt = R.t end = Set.Make(R)
 
 and Mref : sig include Map.S with type key = R.t end = Map.Make(R)
 
+(* ghost code 
+
+  abstract type ghost_ 'a model 'a
+  parameter ghost_ : x:'a -> {} ghost_ 'a {result=x}
+  parameter unghost: x:ghost_ 'a -> {} 'a {result=x}
+*)
+
+let mt_ghost = 
+  let a = create_tvsymbol (id_fresh "a") in
+  create_mtsymbol ~mut:false (id_fresh "ghost") [a] (Some (ty_var a))
+
+let ps_ghost = 
+  let a = create_tvsymbol (id_fresh "a") in
+  let x = T.create_pvsymbol (id_fresh "x") (T.tpure (ty_var a)) in
+  let ty = ty_app mt_ghost.mt_abstr [ty_var a] in
+  let result = create_vsymbol (id_fresh "result") (ty_var a) in
+  let eq_result_x = f_equ (t_var result) (t_var x.T.pv_vs) in
+  let c = { T.c_result_type = T.tpure ty;
+	    T.c_effect = E.empty; T.c_pre = f_true;
+	    T.c_post = (result, eq_result_x), []; }
+  in
+  T.create_psymbol (id_fresh "ghost") (T.tarrow [x] c)
+					 
+let ps_unghost =
+  let a = create_tvsymbol (id_fresh "a") in
+  let ty = ty_app mt_ghost.mt_abstr [ty_var a] in
+  let x = T.create_pvsymbol (id_fresh "x") (T.tpure ty) in
+  let result = create_vsymbol (id_fresh "result") (ty_var a) in
+  let eq_result_x = f_equ (t_var result) (t_var x.T.pv_vs) in
+  let c = { T.c_result_type = T.tpure (ty_var a);
+	    T.c_effect = E.empty; T.c_pre = f_true;
+	    T.c_post = (result, eq_result_x), []; }
+  in
+  T.create_psymbol (id_fresh "unghost") (T.tarrow [x] c)
+
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.. testl"
