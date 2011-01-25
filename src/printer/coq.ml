@@ -28,23 +28,14 @@ open Term
 open Decl
 open Printer
 
-let iprinter,tprinter,lprinter,pprinter =
+let iprinter =
   let bl = [ "at"; "cofix"; "exists2"; "fix"; "IF"; "mod"; "Prop";
 	     "return"; "Set"; "Type"; "using"; "where"]
   in
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
-  let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
-  let usanitize = sanitizer char_to_ualpha char_to_alnumus in
-  create_ident_printer bl ~sanitizer:isanitize,
-  create_ident_printer bl ~sanitizer:lsanitize,
-  create_ident_printer bl ~sanitizer:lsanitize,
-  create_ident_printer bl ~sanitizer:usanitize
+  create_ident_printer bl ~sanitizer:isanitize
 
-let forget_all () =
-  forget_all iprinter;
-  forget_all tprinter;
-  forget_all lprinter;
-  forget_all pprinter
+let forget_all () = forget_all iprinter
 
 let tv_set = ref Sid.empty
 
@@ -90,13 +81,13 @@ let print_vs fmt vs =
 let forget_var vs = forget_id iprinter vs.vs_name
 
 let print_ts fmt ts =
-  fprintf fmt "%s" (id_unique tprinter ts.ts_name)
+  fprintf fmt "%s" (id_unique iprinter ts.ts_name)
 
 let print_ls fmt ls =
-  fprintf fmt "%s" (id_unique lprinter ls.ls_name)
+  fprintf fmt "%s" (id_unique iprinter ls.ls_name)
 
 let print_pr fmt pr =
-  fprintf fmt "%s" (id_unique pprinter pr.pr_name)
+  fprintf fmt "%s" (id_unique iprinter pr.pr_name)
 
 (* info *)
 
@@ -344,12 +335,12 @@ let print_type_decl info fmt (ts,def) =
               print_ts ts print_params_list ts.ts_args
         | Some ty ->
             fprintf fmt "@[<hov 2>Definition %a %a :=@ %a.@]@\n@\n"
-              print_ts ts (print_arrow_list print_tv) ts.ts_args
+              print_ts ts (print_arrow_list print_tv_binder) ts.ts_args
 	      (print_ty info) ty
       end
     | Talgebraic csl ->
         fprintf fmt "@[<hov 2>Inductive %a %a :=@\n@[<hov>%a@].@]@\n"
-          print_ts ts (print_list space print_tv) ts.ts_args
+          print_ts ts (print_list space print_tv_binder) ts.ts_args
           (print_list newline (print_constr info ts)) csl;
         List.iter
           (fun cs ->
