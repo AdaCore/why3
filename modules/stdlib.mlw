@@ -42,8 +42,6 @@ module Array
       (forall i:int. 0 <= i < length a1 -> result[i] = a1[i]) and
       (forall i:int. 0 <= i < length a2 -> result[length a1 + i] = a2[i]) }
 
-  (* concat : 'a array list -> 'a array *)
-
   parameter sub : a:array 'a -> ofs:int -> len:int ->
     { 0 <= ofs and ofs + len <= length a }
     array 'a
@@ -61,13 +59,28 @@ module Array
    unit
    writes a
    { (forall i:int. 
-       (0 <= i < ofs or ofs + len <= i < length a) -> a[i] = (old a)[i]) and 
+       (0 <= i < ofs or ofs + len <= i < length a) -> a[i] = (old a)[i]) 
+     and 
      (forall i:int.
        ofs <= i < ofs + len -> a[i] = v) }
 
-  (* blit : 'a array -> int -> 'a array -> int -> int -> unit *)
+  parameter blit : 
+   a1:array 'a -> ofs1:int -> a2:array 'a -> ofs2:int -> len:int ->
+   { 0 <= ofs1 and ofs1 + len <= length a1 and
+     0 <= ofs2 and ofs2 + len <= length a2 }
+   unit
+   writes a2
+   { (forall i:int. 
+       (0 <= i < ofs2 or ofs2 + len <= i < length a2) -> a2[i] = (old a2)[i]) 
+     and 
+     (forall i:int.
+       ofs2 <= i < ofs2 + len -> a2[i] = a1[ofs1 + i - ofs2]) }
   
-  (* to_list / of_list *)
+  (* TODO?
+     - concat : 'a array list -> 'a array
+     - to_list
+     - of_list 
+  *)
 
 end
 
@@ -76,7 +89,7 @@ module TestArray
   use import int.Int
   use import module Array
 
-  let test1 () =
+  let test_append () =
     let a1 = make 17 2 in
     assert { a1[3] = 2 };
     a1[3 <- 4];
@@ -89,15 +102,25 @@ module TestArray
     assert { a[17] = 3 };
     ()
 
-  let test2 () =
+  let test_fill () =
     let a = make 17 True in
     fill a 10 4 False;
     assert { a[10] = False }
+
+  let test_blit () =
+    let a1 = make 17 True in
+    let a2 = make 25 False in
+    blit a1 10 a2 17 7;
+    assert { a1[10] = True  };
+    assert { a2[16] = False };
+    assert { a2[17] = True  };
+    assert { a2[23] = True  };
+    assert { a2[24] = False }
 
 end
 
 (*
 Local Variables: 
-compile-command: "unset LANG; make -C .."
+compile-command: "unset LANG; make -C .. modules/stdlib"
 End: 
 *)

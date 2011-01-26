@@ -9,6 +9,26 @@ module Char
 
   parameter code : c:char -> {} int { result = c and 0 <= c <= 255 }
 
+  logic uppercase int : int
+  logic lowercase int : int
+
+  axiom uppercase_alpha:
+    forall c:int. 97 <= c <= 122 -> uppercase c = c - 32
+  axiom uppercase_other:
+    forall c:int. 0 <= c < 97 or 122 < c <= 127 -> uppercase c = c
+
+  axiom lowercase_alpha:
+    forall c:int. 65 <= c <= 90 -> lowercase c = c + 32
+  axiom lowercase_other:
+    forall c:int. 0 <= c < 65 or 90 < c <= 127 -> lowercase c = c
+
+  parameter uppercase : c:char -> {} char { result = uppercase c }
+  parameter lowercase : c:char -> {} char { result = lowercase c }
+
+  (* TODO
+     - compare ?
+   *)
+
 end
 
 module String
@@ -21,6 +41,12 @@ module String
 
   parameter create : len:int -> { len >= 0 } string { S.length result = len }
 
+  parameter make : len:int -> c:char -> 
+    { len >= 0 } 
+    string 
+    { S.length result = len and 
+      forall i:int. 0 <= i < len -> S.get result i = c }
+
   parameter get : s:string -> i:int ->
     { 0 <= i < S.length s } char reads s { result = S.get s i }
 
@@ -28,6 +54,37 @@ module String
     { 0 <= i < S.length s } unit writes s { s = S.set (old s) i v }
 
   parameter length : s:string -> {} int reads s { result = S.length s }
+
+  parameter copy : s:string -> 
+    {} 
+    string
+    { S.length result = S.length s and 
+      forall i:int. 0 <= i < S.length result -> S.get result i = S.get s i }
+
+  parameter uppercase : s:string ->
+    {} 
+    string
+    { S.length result = S.length s and 
+      forall i:int. 0 <= i < S.length result -> 
+        S.get result i = Char.uppercase (S.get s i) }
+
+  parameter lowercase : s:string ->
+    {} 
+    string
+    { S.length result = S.length s and 
+      forall i:int. 0 <= i < S.length result -> 
+        S.get result i = Char.lowercase (S.get s i) }
+
+  (* TODO
+     - copy
+     - sub
+     - fill
+     - blit
+     - concat
+     - index / rindex / index_from / rindex_from
+     - contains / contains_from / rcontains_from
+     - capitalize / uncapitalize
+  *)
 
 end
 
@@ -60,21 +117,35 @@ module Buffer
       S.sub b 0 (old (S.length b)) = old b and
       S.sub b (old (S.length b)) (S.length s) = s }
 
+  (* TODO
+     - add_substring
+     - add_buffer
+  *)
+
 end
 
 module Test
 
   use module Char
   use module String
+  use array.ArrayRich as S
   use module Buffer
  
-  let test () =
+  let test1 () =
     let b = Buffer.create 1024 in
     let c = Char.chr 65 in
     Buffer.add_char b c;
     let s = String.create 100 in
     Buffer.add_string b s;
-    assert { String.S.length b = 101 }
+    assert { S.length b = 101 }
+
+  let test2 () =
+    let s = String.make 100 (Char.chr 65) in
+    assert { S.get s 42 = 65 }; (* 'A' *)
+    let c = Char.lowercase (String.get s 42) in
+    assert { c = 97 }; (* 'a' *)
+    let u = String.lowercase s in
+    assert { S.get u 41 = 97 }
 
 end
 
