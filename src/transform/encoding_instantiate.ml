@@ -31,6 +31,15 @@ open Encoding
 let meta_complete = register_meta_excl
   "encoding_instantiate : complete" [MTstring]
 
+exception TooMuchInstantiation of int
+let max_instantiation = 500 (* 7 ** 3 = 343 *)
+
+let () = Exn_printer.register (fun fmt exn ->
+  match exn with
+    | TooMuchInstantiation i -> Format.fprintf fmt
+      "encoding_instantiate : %i instantiation to create, it is limited to %i"
+      i max_instantiation
+    | _ -> raise exn)
 
 (* Ce type est utiliser pour indiquer un alpha *)
 let tv_dumb = create_tvsymbol (id_fresh "instantiate_alpha")
@@ -388,6 +397,8 @@ Perhaps you could use eliminate_definition"
       assert (k <> Pgoal || Ty.Stv.is_empty tvl);
       let tvarl = gen_tvar env tvl in
       let tvarl_len = List.length tvarl in
+      if tvarl_len > max_instantiation then
+        raise (TooMuchInstantiation tvarl_len);
       let menv =  {
         tenv = env.etenv;
         keep = env.ekeep;
