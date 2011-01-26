@@ -22,13 +22,77 @@ module Array
 
   mutable type array 'a model t int 'a
 
-  parameter ([]) : a : array 'a -> i:int ->
+  parameter ([]) : a:array 'a -> i:int ->
     { 0 <= i < length a } 'a reads a { result = a[i] }
 
-  parameter ([<-]) : a : array 'a -> i:int -> v:'a ->
+  parameter ([<-]) : a:array 'a -> i:int -> v:'a ->
     { 0 <= i < length a } unit writes a { a = (old a)[i <- v] }
 
-  parameter length : a : array 'a -> {} int reads a { result = length a }
+  parameter length : a:array 'a -> {} int reads a { result = length a }
+
+  parameter make : n:int -> v:'a -> 
+    {} 
+    array 'a 
+    { length result = n and forall i:int. 0 <= i < n -> result[i] = v}
+
+  parameter append : a1:array 'a -> a2:array 'a ->
+    {}
+    array 'a
+    { length result = length a1 + length a2 and
+      (forall i:int. 0 <= i < length a1 -> result[i] = a1[i]) and
+      (forall i:int. 0 <= i < length a2 -> result[length a1 + i] = a2[i]) }
+
+  (* concat : 'a array list -> 'a array *)
+
+  parameter sub : a:array 'a -> ofs:int -> len:int ->
+    { 0 <= ofs and ofs + len <= length a }
+    array 'a
+    { length result = len and
+      forall i:int. 0 <= i < len -> result[i] = a[ofs + i] }
+
+  parameter copy : a:array 'a -> 
+    {} 
+    array 'a  
+    { length result = length a and 
+      forall i:int. 0 <= i < length result -> result[i] = a[i] }
+
+  parameter fill : a:array 'a -> ofs:int -> len:int -> v:'a ->
+   { 0 <= ofs and ofs + len <= length a }
+   unit
+   writes a
+   { (forall i:int. 
+       (0 <= i < ofs or ofs + len <= i < length a) -> a[i] = (old a)[i]) and 
+     (forall i:int.
+       ofs <= i < ofs + len -> a[i] = v) }
+
+  (* blit : 'a array -> int -> 'a array -> int -> int -> unit *)
+  
+  (* to_list / of_list *)
+
+end
+
+module TestArray
+
+  use import int.Int
+  use import module Array
+
+  let test1 () =
+    let a1 = make 17 2 in
+    assert { a1[3] = 2 };
+    a1[3 <- 4];
+    assert { a1[3] = 4 };
+    let a2 = make 25 3 in
+    assert { a2[0] = 3 }; (* needed to prove a[17]=3 below *)
+    let a  = append a1 a2 in
+    assert { length a = 42 };
+    assert { a[3] = 4 };
+    assert { a[17] = 3 };
+    ()
+
+  let test2 () =
+    let a = make 17 True in
+    fill a 10 4 False;
+    assert { a[10] = False }
 
 end
 

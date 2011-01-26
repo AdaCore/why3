@@ -1,9 +1,14 @@
-
 module P
 
   use import int.Int
   use import module stdlib.Ref
   use import module stdlib.Array
+
+  let foo () =
+    {}
+    let a = make 17 42 in
+    a[0]
+    {result=42}
 
   parameter c : ghost int
 
