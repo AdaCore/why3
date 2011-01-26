@@ -52,7 +52,7 @@ let rec print_expr fmt e = match e.expr_desc with
       fprintf fmt "absurd"
 
 and print_pv fmt v =
-  fprintf fmt "<%s : %a/%a>" 
+  fprintf fmt "<@[%s : %a/%a@]>" 
     v.pv_name.id_string print_ty v.pv_ty print_vs v.pv_vs
 
 and print_triple fmt (p, e, q) =
