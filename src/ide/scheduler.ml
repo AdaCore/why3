@@ -20,6 +20,7 @@
 
 open Format
 open Why
+open Worker
 
 (** max scheduled proofs / max running proofs *)
 let coef_buf = 2
@@ -165,7 +166,26 @@ let edit_proof () =
    prover_attempts_queue is non empty and
    scheduled_proofs < maximum_running_proofs * coef_buf
 *)
-let new_external_proof () =
+
+let new_external_proof =
+  let run_external (call_prover,callback) =
+    Mutex.lock queue_lock;
+    decr scheduled_proofs;
+    incr running_proofs;
+    print_debug_nb_running ();
+    Condition.signal queue_condition;
+    Mutex.unlock queue_lock;
+    !async (fun () -> callback Running) ();
+    let r = call_prover () in
+    Mutex.lock queue_lock;
+    decr running_proofs;
+    print_debug_nb_running ();
+    Queue.push (Prover_answer (callback,r)) answers_queue ;
+    Condition.signal queue_condition;
+    Mutex.unlock queue_lock in
+  let external_workers =
+    ManyWorkers.create maximum_running_proofs run_external in
+  fun () ->
   if !scheduled_proofs >= !maximum_running_proofs * coef_buf
   then raise Queue.Empty;
   let (_debug,timelimit,memlimit,old,command,driver,callback,goal) =
@@ -188,35 +208,7 @@ let new_external_proof () =
             *)
       Driver.prove_task ?old ~command ~timelimit ~memlimit driver goal
     in
-    let (_ : Thread.t) = Thread.create
-      (fun () ->
-        Mutex.lock running_lock;
-        while !running_proofs >= !maximum_running_proofs; do
-          Condition.wait running_condition running_lock
-        done;
-        incr running_proofs;
-        Mutex.unlock running_lock;
-        Mutex.lock queue_lock;
-        decr scheduled_proofs;
-        Condition.signal queue_condition;
-        Mutex.unlock queue_lock;
-        print_debug_nb_running ();
-        !async (fun () -> callback Running) ();
-        let r = call_prover () in
-        Mutex.lock running_lock;
-        decr running_proofs;
-        Condition.signal running_condition;
-        Mutex.unlock running_lock;
-        print_debug_nb_running ();
-        Mutex.lock queue_lock;
-        Queue.push
-          (Prover_answer (callback,r)) answers_queue ;
-        Condition.signal queue_condition;
-        Mutex.unlock queue_lock;
-        ()
-      )
-      ()
-    in ()
+    ManyWorkers.add_work external_workers (call_prover,callback);
   with
     | e ->
       eprintf "%a@." Exn_printer.exn_printer e;

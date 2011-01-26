@@ -424,7 +424,7 @@ install_local: bin/why3config
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = gconfig scheduler db gmain
+IDE_FILES = gconfig worker scheduler db gmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
@@ -489,7 +489,7 @@ BENCH_FILES = bench benchrc whybench
 
 BENCHMODULES := $(addprefix src/bench/, $(BENCH_FILES))
 
-BENCHMODULES := src/ide/scheduler $(BENCHMODULES)
+BENCHMODULES := src/ide/worker src/ide/scheduler $(BENCHMODULES)
 
 BENCHML  = $(addsuffix .ml,  $(BENCHMODULES))
 BENCHMLI = $(addsuffix .mli, $(BENCHMODULES))

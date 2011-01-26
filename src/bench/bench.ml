@@ -59,76 +59,7 @@ type ('a,'b) callback = 'a -> 'b -> task -> int -> proof_attempt_status -> unit
 let debug_call = Debug.register_flag "call"
 let debug = Debug.register_flag "bench_core"
 
-  (** Create and manage one main worker which
-      wait for the remaining works *)
-module MainWorker :
-sig
-  type 'a t
-  val create : unit -> 'a t
-  val treat : 'a t -> ('b -> 'a -> 'b) -> 'b -> 'b
-  val start_work : 'a t -> unit
-  val stop_work : 'a t -> unit
-  val add_work : 'a t -> 'a -> unit
-  val add_works : 'a t -> 'a Queue.t -> unit
-end
-=
-struct
-  type 'a t = { queue : 'a Queue.t;
-                mutex : Mutex.t;
-                condition : Condition.t;
-                mutable remaining : int;
-              }
-
-  let create () =
-    { queue = Queue.create ();
-      mutex = Mutex.create ();
-      condition = Condition.create ();
-      remaining = 0;
-    }
-
-  let treat t f acc =
-    let rec main acc =
-      Mutex.lock t.mutex;
-      while Queue.is_empty t.queue && t.remaining > 0 do
-        Condition.wait t.condition t.mutex
-      done;
-      if Queue.is_empty t.queue
-      then begin (* t.remaining < 0 *) Mutex.unlock t.mutex;acc end
-      else
-        begin
-          let v = Queue.pop t.queue in
-          Mutex.unlock t.mutex;
-          let acc = f acc v in
-          Thread.yield ();
-          main acc
-        end in
-    main acc
-
-  let start_work t =
-    Mutex.lock t.mutex;
-    t.remaining <- t.remaining + 1;
-    Mutex.unlock t.mutex
-
-  let stop_work t =
-    Mutex.lock t.mutex;
-    t.remaining <- t.remaining - 1;
-    if t.remaining = 0 then Condition.signal t.condition;
-    Mutex.unlock t.mutex
-
-  let add_work t x =
-    Mutex.lock t.mutex;
-    Queue.push x t.queue;
-    Condition.signal t.condition;
-    Mutex.unlock t.mutex
-
-  let add_works t q =
-    Mutex.lock t.mutex;
-    Queue.transfer q t.queue;
-    Condition.signal t.condition;
-    Mutex.unlock t.mutex
-
-
-end
+open Worker
 
 let call s callback tool prob =
   (** Prove goal *)
