@@ -73,11 +73,40 @@ let maybe_encoding_enumeration =
     then Encoding_enumeration.encoding_enumeration
     else identity)
 
-let encoding_smt env = compose maybe_encoding_enumeration
-  (compose (enco_select env) (compose (enco_kept env) (enco_poly_smt env)))
 
-let encoding_tptp env = compose Encoding_enumeration.encoding_enumeration
-  (compose (enco_select env) (compose (enco_kept env) (enco_poly_tptp env)))
+open Ty
+open Term
+
+let ty_all_quant =
+  let rec add_vs s ty = match ty.ty_node with
+    | Tyvar vs -> Stv.add vs s
+    | _ -> ty_fold add_vs s ty in
+  f_ty_fold add_vs Stv.empty
+
+let monomorphise_goal =
+  Trans.goal (fun pr f ->
+    let stv = ty_all_quant f in
+    let mty,ltv = Stv.fold (fun tv (mty,ltv) ->
+      let ts = create_tysymbol (Ident.id_clone tv.tv_name) [] None in
+      Mtv.add tv (ty_app ts []) mty,ts::ltv) stv (Mtv.empty,[]) in
+    let f = f_ty_subst mty Mvs.empty f in
+    let acc = [Decl.create_prop_decl Decl.Pgoal pr f] in
+    let acc = List.fold_left
+      (fun acc ts -> (Decl.create_ty_decl [ts,Decl.Tabstract]) :: acc)
+      acc ltv in
+    acc)
+
+let encoding_smt env =
+  compose monomorphise_goal
+    (compose maybe_encoding_enumeration
+       (compose (enco_select env)
+          (compose (enco_kept env) (enco_poly_smt env))))
+
+let encoding_tptp env =
+  compose monomorphise_goal
+    (compose Encoding_enumeration.encoding_enumeration
+       (compose (enco_select env)
+          (compose (enco_kept env) (enco_poly_tptp env))))
 
 let () =
   register_env_transform "encoding_smt" encoding_smt;

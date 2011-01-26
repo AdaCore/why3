@@ -292,25 +292,6 @@ Perhaps you could use eliminate_definition"
       let task = Ssubst.fold conv_f tvarl task in
       {env with edefined_lsymbol = menv.defined_lsymbol}, task
 
-let ty_all_quant =
-  let rec add_vs s ty = match ty.ty_node with
-    | Tyvar vs -> Stv.add vs s
-    | _ -> ty_fold add_vs s ty in
-  f_ty_fold add_vs Stv.empty
-
-let monomorphise_goal =
-  Trans.goal (fun pr f ->
-    let stv = ty_all_quant f in
-    let mty,ltv = Stv.fold (fun tv (mty,ltv) ->
-      let ts = create_tysymbol (id_clone tv.tv_name) [] None in
-      Mtv.add tv (ty_app ts []) mty,ts::ltv) stv (Mtv.empty,[]) in
-    let f = f_ty_subst mty Mvs.empty f in
-    let acc = [create_prop_decl Pgoal pr f] in
-    let acc = List.fold_left
-      (fun acc ts -> (create_ty_decl [ts,Tabstract]) :: acc)
-      acc ltv in
-    acc)
-
 let meta_kept_array = register_meta "encoding : kept_array" [MTtysymbol]
 
 let collect_arrays poly_ts tds =

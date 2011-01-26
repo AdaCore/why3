@@ -385,6 +385,7 @@ Perhaps you could use eliminate_definition"
         (* [create_ind_decl (List.map fn l)] *)
     | Dprop (k,pr,f) ->
       let tvl = ty_quant f in
+      assert (k <> Pgoal || Ty.Stv.is_empty tvl);
       let tvarl = gen_tvar env tvl in
       let tvarl_len = List.length tvarl in
       let menv =  {
