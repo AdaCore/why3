@@ -717,18 +717,18 @@ let make_logic_app gl loc ty ls el =
   let rec make args = function
     | [] ->
         begin match ls.ls_value with
-          | Some _ -> IElogic (t_app ls (List.rev args) ty)
+          | Some _ -> IElogic (t_app ls (List.rev args) (purify ty))
           | None -> IElogic (mk_t_if gl (f_app ls (List.rev args)))
         end
     | ({ iexpr_desc = IElogic t }, _) :: r ->
 	make (t :: args) r
     | ({ iexpr_desc = IElocal v }, _) :: r ->
-	make (t_var v.i_pgm :: args) r
+	make (t_var v.i_logic :: args) r
     | ({ iexpr_desc = IEglobal (s, _); iexpr_type = ty }, _) :: r ->
 	make (t_app s.p_ls [] ty :: args) r
     | (e, _) :: r ->
 	let v = create_ivsymbol (id_user "x" loc) e.iexpr_type in
-	let d = mk_iexpr loc ty (make (t_var v.i_pgm :: args) r) in
+	let d = mk_iexpr loc ty (make (t_var v.i_logic :: args) r) in
 	IElet (v, e, d)
   in
   make [] el
@@ -1069,13 +1069,7 @@ let rec pattern env p =
   env, { ppat_pat = lp; ppat_node = n }
 
 and pattern_node env ty p = 
-  let add1 env i = 
-    let v = 
-      create_pvsymbol (id_clone i.i_pgm.vs_name) ~vs:i.i_logic 
-	(tpure i.i_pgm.vs_ty) 
-    in
-    Mvs.add i.i_pgm v env, v
-  in
+  let add1 env i = add_local env i (tpure i.i_pgm.vs_ty) in
   match p with
   | IPwild -> 
       env, (pat_wild ty, Pwild)

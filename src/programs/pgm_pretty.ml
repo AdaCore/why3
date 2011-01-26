@@ -12,7 +12,8 @@ open Pgm_ttree
 
 let rec print_expr fmt e = match e.expr_desc with
   | Elogic t ->
-      fprintf fmt "@[<hov 2><term: %a>@]" Pretty.print_term t
+      fprintf fmt "@[<hov 2><term %a : %a>@]" Pretty.print_term t
+	Pretty.print_ty t.t_ty
   | Elocal v ->
       fprintf fmt "%a" print_pv v
   | Eglobal ls ->
@@ -33,8 +34,8 @@ let rec print_expr fmt e = match e.expr_desc with
 
   | Elabel (_, _)  ->
       fprintf fmt "<todo: Elabel>"
-  | Eassert (_, _) ->
-      fprintf fmt "<todo: Eassert>"
+  | Eassert (_, f) ->
+      fprintf fmt "@[assert {%a}@]" print_fmla f
   | Efor (_, _, _, _, _, _) ->
       fprintf fmt "<todo: Efor>"
   | Etry (_, _) ->
@@ -52,8 +53,7 @@ let rec print_expr fmt e = match e.expr_desc with
       fprintf fmt "absurd"
 
 and print_pv fmt v =
-  fprintf fmt "<@[%s : %a/%a@]>" 
-    v.pv_name.id_string print_ty v.pv_ty print_vs v.pv_vs
+  fprintf fmt "<@[%a : %a@]>" print_vs v.pv_vs print_ty v.pv_ty
 
 and print_triple fmt (p, e, q) =
   fprintf fmt "@[<hv 0>%a@ %a@ %a@]" print_pre p print_expr e print_post q
