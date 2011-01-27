@@ -44,7 +44,7 @@ theory TestSplit
 
   logic bb int
 
-  goal G : aa 0 /\ bb 1 -> false
+  goal G : aa 0 && bb 1 -> false
 
 end
 
@@ -116,3 +116,14 @@ end
 
 
 
+theory TestRealize
+
+  type t
+
+  logic f t : t
+
+  logic p t t
+
+  axiom A : forall x:t. p (f x) x
+
+end

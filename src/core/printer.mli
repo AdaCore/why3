@@ -43,6 +43,7 @@ val list_printers : unit -> string list
 
 val print_prelude : prelude pp
 val print_th_prelude : task -> prelude_map pp
+val print_prelude_for_theory : theory -> prelude_map pp
 
 val meta_syntax_type : meta
 val meta_syntax_logic : meta

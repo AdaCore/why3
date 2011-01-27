@@ -111,14 +111,24 @@ let print_prelude fmt pl =
   let println fmt s = fprintf fmt "%s@\n" s in
   print_list nothing println fmt pl
 
+let print_prelude_of_theories th_used fmt pm =
+  List.iter (fun th ->
+	       let prel = Mid.find_default th.th_name [] pm in
+	       print_prelude fmt prel) th_used
+
 let print_th_prelude task fmt pm =
   let th_used = task_fold (fun acc -> function
     | { td_node = Clone (th,sm) } when is_empty_sm sm -> th::acc
     | _ -> acc) [] task
   in
-  List.iter (fun th ->
-    let prel = Mid.find_default th.th_name [] pm in
-    print_prelude fmt prel) th_used
+  print_prelude_of_theories th_used fmt pm
+
+let print_prelude_for_theory th fmt pm =
+  let th_used = List.fold_left (fun acc -> function
+    | { td_node = Clone (th,sm) } when is_empty_sm sm -> th::acc
+    | _ -> acc) [] th.th_decls
+  in
+  print_prelude_of_theories th_used fmt pm
 
 exception KnownTypeSyntax of tysymbol
 exception KnownLogicSyntax of lsymbol
