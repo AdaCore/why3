@@ -92,7 +92,7 @@ let add_opt_meta meta =
 let opt_config = ref None
 let opt_parser = ref None
 let opt_prover = ref None
-let opt_coq_realization = ref false
+let opt_coq_realization = ref None
 let opt_loadpath = ref []
 let opt_driver = ref None
 let opt_output = ref None
@@ -140,8 +140,8 @@ let option_list = Arg.align [
       "<prover> Prove or print (with -o) the selected goals";
   "--prover", Arg.String (fun s -> opt_prover := Some s),
       " same as -P";
-  "--coq-realize", Arg.Set opt_coq_realization,
-      " produce a Coq realization of theory given using -T";
+  "--coq-realize", Arg.String (fun s -> opt_coq_realization := Some s),
+      " produce, in given file, a Coq realization of the theory given using -T";
   "-F", Arg.String (fun s -> opt_parser := Some s),
       "<format> Select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
@@ -423,12 +423,24 @@ let do_local_theory env drv fname m (tname,_,t,glist) =
   in
   do_theory env drv fname tname th glist
 
-let do_coq_realize_theory env _drv fname m (tname,_,t,_glist) =
+let do_coq_realize_theory env _drv oldf fname m (tname,_,t,_glist) =
   let th = try Mnm.find t m with Not_found ->
     eprintf "Theory '%s' not found in file '%s'.@." tname fname;
     exit 1
   in
-  Coq.print_theory env [] Ident.Mid.empty std_formatter th
+  let old =
+    if Sys.file_exists oldf
+    then
+      begin
+	let backup = oldf ^ ".bak" in
+        Sys.rename oldf backup;
+        Some(open_in backup)
+      end
+    else None
+  in
+  let ch = open_out oldf in
+  let fmt = formatter_of_out_channel ch in
+  Coq.print_theory ~old env [] Ident.Mid.empty fmt th
 
 let do_input env drv = function
   | None, _ when !opt_parse_only || !opt_type_only ->
@@ -444,15 +456,18 @@ let do_input env drv = function
       close_in cin;
       if !opt_type_only then
         ()
-      else if !opt_coq_realization then
-	Queue.iter (do_coq_realize_theory env drv fname m) tlist
-      else if Queue.is_empty tlist then
-        let glist = Queue.create () in
-        let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-        let do_th _ (t,th) = do_theory env drv fname t th glist in
-        Ident.Mid.iter do_th (Mnm.fold add_th m Ident.Mid.empty)
-      else
-        Queue.iter (do_local_theory env drv fname m) tlist
+      else 
+	match !opt_coq_realization with
+	  | Some f ->
+	      Queue.iter (do_coq_realize_theory env drv f fname m) tlist
+	  | None ->
+	      if Queue.is_empty tlist then
+		let glist = Queue.create () in
+		let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
+		let do_th _ (t,th) = do_theory env drv fname t th glist in
+		Ident.Mid.iter do_th (Mnm.fold add_th m Ident.Mid.empty)
+	      else
+		Queue.iter (do_local_theory env drv fname m) tlist
 
 let () =
   try

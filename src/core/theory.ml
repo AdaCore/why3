@@ -713,6 +713,32 @@ let clone_meta tdt sm = match tdt.td_node with
       mk_tdecl (Meta (t, List.map cl_marg al))
   | _ -> invalid_arg "clone_meta"
 
+(** access to meta *)
+
+(*
+let theory_meta  = option_apply Mmeta.empty (fun t -> t.task_meta)
+
+let find_meta_tds th (t : meta) = mm_find (theory_meta th) t
+
+let on_meta meta fn acc theory =
+  let add td acc = match td.td_node with
+    | Meta (_,ma) -> fn acc ma
+    | _ -> assert false
+  in
+  let tds = find_meta_tds theory meta in
+  Stdecl.fold add tds.tds_set acc
+*)
+
+let on_meta meta fn acc theory =
+  let tdecls = theory.th_decls in
+  List.fold_left
+    (fun acc td ->
+       match td.td_node with
+	 | Meta (_,ma) -> fn acc ma
+	 | _ -> acc)
+    acc tdecls
+
+
 
 (** Base theories *)
 

@@ -114,8 +114,8 @@ let task_known = option_apply Mid.empty (fun t -> t.task_known)
 let task_clone = option_apply Mid.empty (fun t -> t.task_clone)
 let task_meta  = option_apply Mmeta.empty (fun t -> t.task_meta)
 
-let find_clone_tds task th = cm_find (task_clone task) th
-let find_meta_tds  task t  = mm_find (task_meta  task) t
+let find_clone_tds task (th : theory) = cm_find (task_clone task) th
+let find_meta_tds task (t : meta) = mm_find (task_meta task) t
 
 (* constructors with checks *)
 

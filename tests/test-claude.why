@@ -124,6 +124,10 @@ theory TestRealize
 
   logic p t t
 
+  axiom P_sym: forall x y:t. p x y <-> p y x
+
   axiom A : forall x:t. p (f x) x
+
+  lemma B : forall x:t. p x (f x)
 
 end

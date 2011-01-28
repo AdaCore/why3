@@ -148,7 +148,7 @@ let syntax_logic ls s =
 let remove_prop pr =
   create_meta meta_remove_prop [MApr pr]
 
-let get_syntax_map task =
+let get_syntax_map, get_syntax_map_of_theory =
   let add_ts m = function
     | [MAts ts; MAstr s] ->
         Mid.add_new ts.ts_name s (KnownTypeSyntax ts) m
@@ -159,10 +159,17 @@ let get_syntax_map task =
         Mid.add_new ls.ls_name s (KnownLogicSyntax ls) m
     | _ -> assert false
   in
-  let m = Mid.empty in
-  let m = Task.on_meta meta_syntax_logic add_ls m task in
-  let m = Task.on_meta meta_syntax_type add_ts m task in
-  m
+  (fun task ->
+    let m = Mid.empty in
+    let m = Task.on_meta meta_syntax_logic add_ls m task in
+    let m = Task.on_meta meta_syntax_type add_ts m task in
+    m),
+  (fun theory ->
+    let m = Mid.empty in
+    let m = Theory.on_meta meta_syntax_logic add_ls m theory in
+    let m = Theory.on_meta meta_syntax_type add_ts m theory in
+    m)
+
 
 let get_remove_set task =
   let add_ts s = function

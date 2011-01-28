@@ -56,6 +56,8 @@ val remove_prop : prsymbol -> tdecl
 val get_syntax_map : task -> string Mid.t
 val get_remove_set : task -> Sid.t
 
+val get_syntax_map_of_theory : theory -> string Mid.t
+
 val query_syntax : string Mid.t -> ident -> string option
 
 val syntax_arguments : string -> 'a pp -> 'a list pp

@@ -358,16 +358,16 @@ let print_next_proof ?def ch fmt =
     | End_of_file -> print_empty_proof ?def fmt
     | Exit -> fprintf fmt "@\n"
 
-let realization ?old ?def fmt info =
+let realization ~old ?def fmt info =
   if info.realization then
     begin match old with
-      | None -> print_empty_proof ?def fmt
+      | None -> assert false; print_empty_proof ?def fmt
       | Some ch -> print_next_proof ?def ch fmt
     end
   else
     fprintf fmt "@\n"
 
-let print_type_decl ?old info fmt (ts,def) =
+let print_type_decl ~old info fmt (ts,def) =
   if is_ts_tuple ts then () else
   match def with
     | Tabstract -> begin match ts.ts_def with
@@ -375,7 +375,7 @@ let print_type_decl ?old info fmt (ts,def) =
             fprintf fmt "@[<hov 2>%a %a : %aType.@]@\n%a"
 	      definition info
               print_ts ts print_params_list ts.ts_args
-	      (realization ?old ~def:true) info
+	      (realization ~old ~def:true) info
         | Some ty ->
             fprintf fmt "@[<hov 2>Definition %a %a :=@ %a.@]@\n@\n"
               print_ts ts (print_arrow_list print_tv_binder) ts.ts_args
@@ -392,9 +392,9 @@ let print_type_decl ?old info fmt (ts,def) =
           csl;
         fprintf fmt "@\n"
 
-let print_type_decl info fmt d =
+let print_type_decl ~old info fmt d =
   if not (Sid.mem (fst d).ts_name info.info_rem) then
-    (print_type_decl info fmt d; forget_tvs ())
+    (print_type_decl ~old info fmt d; forget_tvs ())
 
 let print_ls_type ?(arrow=false) info fmt ls =
   if arrow then fprintf fmt " ->@ ";
@@ -402,7 +402,7 @@ let print_ls_type ?(arrow=false) info fmt ls =
   | None -> fprintf fmt "Prop"
   | Some ty -> print_ty info fmt ty
 
-let print_logic_decl ?old info fmt (ls,ld) =
+let print_logic_decl ~old info fmt (ls,ld) =
   let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars ls in
   begin
     match ld with
@@ -422,15 +422,15 @@ let print_logic_decl ?old info fmt (ls,ld) =
             print_params all_ty_params
             (print_arrow_list (print_ty info)) ls.ls_args
             (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
-	    (realization ?old ~def:true) info
+	    (realization ~old ~def:true) info
   end;
   print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params;
   fprintf fmt "@\n"
 
 
-let print_logic_decl info fmt d =
+let print_logic_decl ~old info fmt d =
   if not (Sid.mem (fst d).ls_name info.info_rem) then
-    (print_logic_decl info fmt d; forget_tvs ())
+    (print_logic_decl ~old info fmt d; forget_tvs ())
 
 let print_ind info fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr (print_fmla info) f
@@ -455,7 +455,7 @@ let print_pkind info fmt = function
   | Pgoal  -> fprintf fmt "Theorem"
   | Pskip  -> assert false (* impossible *)
 
-let print_proof ?old info fmt = function
+let print_proof ~old info fmt = function
   | Plemma | Pgoal ->
       begin match old with
         | None -> print_empty_proof fmt
@@ -469,9 +469,9 @@ let print_proof ?old info fmt = function
 	end
   | Pskip -> ()
 
-let print_decl ?old info fmt d = match d.d_node with
-  | Dtype tl  -> print_list nothing (print_type_decl info) fmt tl
-  | Dlogic ll -> print_list nothing (print_logic_decl info) fmt ll
+let print_decl ~old info fmt d = match d.d_node with
+  | Dtype tl  -> print_list nothing (print_type_decl ~old info) fmt tl
+  | Dlogic ll -> print_list nothing (print_logic_decl ~old info) fmt ll
   | Dind il   -> print_list nothing (print_ind_decl info) fmt il
   | Dprop (_,pr,_) when Sid.mem pr.pr_name info.info_rem -> ()
   | Dprop (k,pr,f) ->
@@ -484,11 +484,11 @@ let print_decl ?old info fmt d = match d.d_node with
         (print_pkind info) k
         print_pr pr
         print_params params
-        (print_fmla info) f (print_proof ?old info) k;
+        (print_fmla info) f (print_proof ~old info) k;
       forget_tvs ()
 
-let print_decls ?old info fmt dl =
-  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl ?old info)) dl
+let print_decls ~old info fmt dl =
+  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl ~old info)) dl
 
 let print_task _env pr thpr ?old fmt task =
   forget_all ();
@@ -499,7 +499,7 @@ let print_task _env pr thpr ?old fmt task =
     info_rem = get_remove_set task;
     realization = false;
   } in
-  print_decls ?old info fmt (Task.task_decls task)
+  print_decls ~old info fmt (Task.task_decls task)
 
 let () = register_printer "coq" print_task
 
@@ -510,16 +510,16 @@ let () = register_printer "coq" print_task
 
 open Theory
 
-let print_tdecl ?old info fmt d = match d.td_node with
-  | Decl d -> print_decl ?old info fmt d
+let print_tdecl ~old info fmt d = match d.td_node with
+  | Decl d -> print_decl ~old info fmt d
   | Use _ -> ()
   | Meta _ -> ()
   | Clone _ -> ()
 
-let print_tdecls ?old info fmt dl =
-  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_tdecl ?old info)) dl
+let print_tdecls ~old info fmt dl =
+  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_tdecl ~old info)) dl
 
-let print_theory _env pr thpr ?old fmt th =
+let print_theory _env pr thpr ~old fmt th =
   forget_all ();
   print_prelude fmt pr;
   print_prelude_for_theory th fmt thpr;
@@ -529,12 +529,12 @@ let print_theory _env pr thpr ?old fmt th =
     info_rem = get_remove_set th} in
 *)
   let info = {
-    info_syn = Mid.empty;
+    info_syn = Mid.empty (* get_syntax_map_of_theory th *);
     info_rem = Mid.empty;
     realization = true;
   } 
   in
-  print_tdecls ?old info fmt th.th_decls
+  print_tdecls ~old info fmt th.th_decls
 
 
 (*

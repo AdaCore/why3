@@ -135,11 +135,11 @@ let edit_proof () =
   let (_debug,editor,file,driver,callback,goal) =
     Queue.pop proof_edition_queue in
   Mutex.unlock queue_lock;
-  let backup = file ^ ".bak" in
   let old =
     if Sys.file_exists file
     then
       begin
+	let backup = file ^ ".bak" in
         Sys.rename file backup;
         Some(open_in backup)
       end
