@@ -32,7 +32,7 @@ let meta_complete = register_meta_excl
   "encoding_instantiate : complete" [MTstring]
 
 exception TooMuchInstantiation of int
-let max_instantiation = 500 (* 7 ** 3 = 343 *)
+let max_instantiation = 512 (* 7 ** 3 = 343 *)
 
 let () = Exn_printer.register (fun fmt exn ->
   match exn with

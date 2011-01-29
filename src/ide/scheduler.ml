@@ -23,7 +23,7 @@ open Why
 open Worker
 
 (** max scheduled proofs / max running proofs *)
-let coef_buf = 2
+let coef_buf = 1
 
 let async = ref (fun f () -> f ())
 
