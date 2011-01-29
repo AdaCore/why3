@@ -50,7 +50,7 @@ type why_result =
 
 type ('a,'b) result = {tool   : 'a;
                        prob   : 'b;
-                       task   : task;
+                       task   : Decl.prsymbol;
                        idtask : int;
                        result : why_result}
 
@@ -104,7 +104,8 @@ let general ?(callback=fun _ _ _ _ _ -> ()) iter add =
         callback tool.tval pval task i res;
         match res with
           | Scheduler.InternalFailure _ | Scheduler.Done _ ->
-            add v {tool = tool.tval; prob = pval; task = task;
+            add v {tool = tool.tval; prob = pval;
+                   task = Task.task_goal task;
                    idtask = i;
                    result = match res with
                      | Scheduler.InternalFailure exn -> InternalFailure exn
@@ -125,10 +126,17 @@ let any ?callback toolprob =
   !l
 
 
-let all_list ?callback tools probs =
+let all_list_tp ?callback tools probs =
   let l = ref [] in
   general ?callback (fun f ->
     List.iter (fun t -> List.iter (fun p -> f () t p) probs) tools)
+    (fun () r -> l:=r::!l);
+  !l
+
+let all_list_pt ?callback tools probs =
+  let l = ref [] in
+  general ?callback (fun f ->
+    List.iter (fun p -> List.iter (fun t -> f () t p) tools) probs)
     (fun () r -> l:=r::!l);
   !l
 
@@ -164,7 +172,7 @@ type ('a,'b) bench =
     }
 
 let run_bench ?callback bench =
-  all_list ?callback bench.btools bench.bprobs
+  all_list_pt ?callback bench.btools bench.bprobs
 
 let run_benchs ?callback benchs =
   let benchs = List.map (fun b -> (b,ref [])) benchs in
@@ -180,10 +188,11 @@ let run_benchs_tools ?callback benchs =
     b, List.map (fun t -> t,ref []) b.btools) benchs in
   general ?callback (fun f ->
     List.iter (fun (b,l) ->
-    List.iter (fun (t,l) -> List.iter (fun p -> f l t p) b.bprobs)
-      l) benchs)
+    List.iter (fun p -> List.iter (fun (t,l) -> f l t p) l)
+      b.bprobs) benchs)
     (fun l r -> l:=r::!l);
   List.map (fun (b,l) -> b,List.map (fun (t,l) -> t.tval,!l) l) benchs
+
 
 
 (** average *)
@@ -294,7 +303,7 @@ answer output time
     let cmp x y =
       let c = cmp x.prob y.prob in
       if c <> 0 then c else
-        let id x = (Task.task_goal x.task).Decl.pr_name.Ident.id_string in
+        let id x = x.task.Decl.pr_name.Ident.id_string in
         let c = String.compare (id x) (id y) in
         if c <> 0 then c else compare x.idtask y.idtask in
     let l = List.map (fun (p,l) -> p,List.fast_sort cmp l) l in
@@ -315,7 +324,7 @@ in
       (* No printer for task since we want the same name evenif its
          the same file with different environnement (loaded two times) *)
       fprintf fmt "%a|%s|%i ," print_prob b
-        (Task.task_goal t).Decl.pr_name.Ident.id_string
+        t.Decl.pr_name.Ident.id_string
         id;
       Pp.print_list Pp.comma print_cell fmt l in
     Pp.print_list print_newline print_line fmt l

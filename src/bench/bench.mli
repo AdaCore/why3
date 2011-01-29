@@ -50,13 +50,17 @@ type why_result =
 
 type ('a,'b) result = {tool   : 'a;
                        prob   : 'b;
-                       task   : task;
+                       task   : Decl.prsymbol;
                        idtask : int;
                        result : why_result}
 
 type ('a,'b) callback = 'a -> 'b -> task -> int -> proof_attempt_status -> unit
 
-val all_list :
+val all_list_tp :
+  ?callback:('a,'b) callback ->
+  'a tool list -> 'b prob list -> ('a,'b) result list
+
+val all_list_pt :
   ?callback:('a,'b) callback ->
   'a tool list -> 'b prob list -> ('a,'b) result list
 

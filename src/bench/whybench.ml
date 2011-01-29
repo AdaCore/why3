@@ -345,9 +345,6 @@ let () =
         let fold acc (n,l) =
           List.rev_append (List.map (fun v -> (("cmdline","",n),v)) l) acc in
         th |> List.map map |> List.fold_left fold [] in
-      let gen = Env.Wenv.memoize 3 (fun env ->
-        let memo = Trans.store (fun task -> gen env task) in
-        Trans.apply memo) in
       { B.ptask   = gen;
         ptrans   = fun _ -> transl;
       }::acc in
