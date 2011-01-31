@@ -39,7 +39,7 @@ type 'a tool = {
 }
 
 type 'a prob = {
-  ptask  : env -> task -> ('a * task) list; (** needed for tenv *)
+  ptask  : (env -> task -> ('a * task) list) list; (** needed for tenv *)
   ptrans : env -> task list trans;
 }
 
@@ -99,19 +99,18 @@ let call s callback tool prob =
       (Trans.singleton tool.ttrans) in
     MainWorker.add_work MainWorker.level2 s
       (fun () ->
+        MainWorker.stop_work MainWorker.level2 s;
         MainWorker.start_work MainWorker.level3 s;
         apply_transformation_l ~callback:(trans_cb pval) trans task) in
   (** Split *)
-  MainWorker.start_work MainWorker.level1 s;
-  MainWorker.add_work MainWorker.level1 s
-    (fun () ->
-      MainWorker.start_work MainWorker.level2 s;
-      let cb ths =
-        List.iter iter_task ths;
-        MainWorker.stop_work MainWorker.level2 s;
-        MainWorker.stop_work MainWorker.level1 s in
-      do_why ~callback:cb (prob.ptask tool.tenv) tool.tuse
-    )
+  List.iter (fun create_task ->
+    MainWorker.start_work MainWorker.level1 s;
+    MainWorker.add_work MainWorker.level1 s
+      (fun () ->
+        let cb ths = List.iter iter_task ths;
+          MainWorker.stop_work MainWorker.level1 s in
+        do_why ~callback:cb (create_task tool.tenv) tool.tuse
+      )) prob.ptask
 
 let general ?(callback=fun _ _ _ _ _ -> ()) iter add =
   Debug.dprintf debug "Start one general@.";
@@ -139,7 +138,8 @@ let general ?(callback=fun _ _ _ _ _ -> ()) iter add =
     MainWorker.stop_work MainWorker.level1 t;
   ) () in
   (** Treat the work done and wait *)
-  MainWorker.treat ~maxlevel2:(!Scheduler.maximum_running_proofs * 3)
+  MainWorker.treat
+    ~maxlevel2:(!Scheduler.maximum_running_proofs * 3)
     ~maxlevel3:(!Scheduler.maximum_running_proofs * 3)
     t (fun () f -> f ()) ()
 

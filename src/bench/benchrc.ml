@@ -110,7 +110,7 @@ let read_probs absf map (name,section) =
   let format = get_stringo section "format" in
   (* files *)
   let files = get_stringl ~default:[] section "file" in
-  let gen env task =
+  let gen fname env task =
     try
       let read_one fname =
         let cin = open_in (absf fname) in
@@ -122,11 +122,10 @@ let read_probs absf map (name,section) =
       let map (name,th) = name,Task.split_theory th None task in
       let fold acc (n,l) =
         List.rev_append (List.rev_map (fun v -> (n,v)) l) acc in
-      files |> List.map read_one |> list_flatten_rev
-               |> List.rev_map map |> List.fold_left fold []
+      read_one fname |> List.rev_map map |> List.fold_left fold []
     with exn -> eprintf "%a@." Exn_printer.exn_printer exn; exit 1
   in
-  Mstr.add name { ptask   = gen; ptrans   = gen_trans} map
+  Mstr.add name { ptask   = List.map gen files; ptrans   = gen_trans} map
 
 let read_bench absf mtools mprobs map (name,section) =
   let tools = get_stringl section "tools" in

@@ -345,7 +345,7 @@ let () =
         let fold acc (n,l) =
           List.rev_append (List.map (fun v -> (("cmdline","",n),v)) l) acc in
         th |> List.map map |> List.fold_left fold [] in
-      { B.ptask   = gen;
+      { B.ptask   = [gen];
         ptrans   = fun _ -> transl;
       }::acc in
   Debug.dprintf debug "Load problems@.";
