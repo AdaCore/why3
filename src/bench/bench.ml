@@ -61,6 +61,12 @@ let debug = Debug.register_flag "bench_core"
 
 open Worker
 
+(**
+   level1 : read file -> split task
+   level2 : apply transformations
+   level3 : driver -> call prover
+*)
+
 let call s callback tool prob =
   (** Prove goal *)
   let call q cb task =
@@ -69,38 +75,54 @@ let call s callback tool prob =
       ~command:(tool.tcommand) ~driver:(tool.tdriver)
       ~callback:cb task) q in
   let iter q pval i task =
-    MainWorker.start_work s;
+    MainWorker.start_work MainWorker.level3 s;
     let cb res = callback pval i task res;
       match res with Scheduler.Done _
-        | Scheduler.InternalFailure _ -> MainWorker.stop_work s | _ -> () in
+        | Scheduler.InternalFailure _ ->
+          MainWorker.stop_work MainWorker.level3 s
+        | _ -> () in
     call q cb task; succ i in
   let trans_cb pval tl =
     let q = Queue.create () in
     ignore (List.fold_left (iter q pval) 0 (List.rev tl));
-    transfer_proof_attempts q;
-    MainWorker.stop_work s in
+    MainWorker.stop_work MainWorker.level3 s;
+    MainWorker.add_work MainWorker.level3 s
+      (fun () ->
+        transfer_proof_attempts q;
+        MainWorker.stop_work MainWorker.level2 s
+      )
+  in
   (** Apply trans *)
   let iter_task (pval,task) =
-    MainWorker.start_work s;
+    MainWorker.start_work MainWorker.level2 s;
     let trans = Trans.compose_l (prob.ptrans tool.tenv)
       (Trans.singleton tool.ttrans) in
-    apply_transformation_l ~callback:(trans_cb pval) trans task in
+    MainWorker.add_work MainWorker.level2 s
+      (fun () ->
+        MainWorker.start_work MainWorker.level3 s;
+        apply_transformation_l ~callback:(trans_cb pval) trans task) in
   (** Split *)
-  let ths = do_why_sync (prob.ptask tool.tenv) tool.tuse in
-  MainWorker.start_work s;
-  List.iter iter_task ths;
-  MainWorker.stop_work s
+  MainWorker.start_work MainWorker.level1 s;
+  MainWorker.add_work MainWorker.level1 s
+    (fun () ->
+      MainWorker.start_work MainWorker.level2 s;
+      let cb ths =
+        List.iter iter_task ths;
+        MainWorker.stop_work MainWorker.level2 s;
+        MainWorker.stop_work MainWorker.level1 s in
+      do_why ~callback:cb (prob.ptask tool.tenv) tool.tuse
+    )
 
 let general ?(callback=fun _ _ _ _ _ -> ()) iter add =
   Debug.dprintf debug "Start one general@.";
   (** Main worker *)
   let t = MainWorker.create () in
   (** Start all *)
-  MainWorker.start_work t;
+  MainWorker.start_work MainWorker.level1 t;
   let _ = Thread.create (fun () ->
     iter (fun v tool prob ->
     let cb pval i task res =
-      MainWorker.add_work t (fun () ->
+      MainWorker.add_work MainWorker.level3 t (fun () ->
         callback tool.tval pval task i res;
         match res with
           | Scheduler.InternalFailure _ | Scheduler.Done _ ->
@@ -114,10 +136,12 @@ let general ?(callback=fun _ _ _ _ _ -> ()) iter add =
                   }
           | _ -> ()) in
     call t cb tool prob);
-    MainWorker.stop_work t;
+    MainWorker.stop_work MainWorker.level1 t;
   ) () in
   (** Treat the work done and wait *)
-  MainWorker.treat t (fun () f -> f ()) ()
+  MainWorker.treat ~maxlevel2:(!Scheduler.maximum_running_proofs * 3)
+    ~maxlevel3:(!Scheduler.maximum_running_proofs * 3)
+    t (fun () f -> f ()) ()
 
 let any ?callback toolprob =
   let l = ref [] in

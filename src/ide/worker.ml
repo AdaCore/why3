@@ -4,65 +4,114 @@ module MainWorker :
 sig
   type 'a t
   val create : unit -> 'a t
-  val treat : 'a t -> ('b -> 'a -> 'b) -> 'b -> 'b
-  val start_work : 'a t -> unit
-  val stop_work : 'a t -> unit
-  val add_work : 'a t -> 'a -> unit
-  val add_works : 'a t -> 'a Queue.t -> unit
+  val treat :
+    maxlevel2:int -> maxlevel3:int -> 'a t -> ('b -> 'a -> 'b) -> 'b -> 'b
+  type level
+  val level1 :level val level2 : level val level3 : level
+  val start_work : level -> 'a t -> unit
+  val stop_work : level -> 'a t -> unit
+  val add_work : level -> 'a t -> 'a -> unit
+  val add_works : level -> 'a t -> 'a Queue.t -> unit
 end
   =
 struct
-  type 'a t = { queue : 'a Queue.t;
+  type level = int
+  let level1 = 1 and level2 = 2 and level3 = 3
+  type 'a levels = {level1 : 'a; level2 : 'a; level3 : 'a}
+  let map_level level f x =
+    match level with
+      | 1 -> {x with level1 = f x.level1}
+      | 2 -> {x with level2 = f x.level2}
+      | 3 -> {x with level3 = f x.level3}
+      | _ -> assert false
+  let iter_level level f x =
+    match level with
+      | 1 -> f x.level1
+      | 2 -> f x.level2
+      | 3 -> f x.level3
+      | _ -> assert false
+
+  type 'a t = { queue : 'a Queue.t levels;
                 mutex : Mutex.t;
                 condition : Condition.t;
-                mutable remaining : int;
+                mutable remaining : int levels;
               }
 
   let create () =
-    { queue = Queue.create ();
+    { queue = {level1 = Queue.create ();
+               level2 = Queue.create ();
+               level3 = Queue.create ()};
       mutex = Mutex.create ();
       condition = Condition.create ();
-      remaining = 0;
+      remaining = {level1 = 0; level2 = 0; level3 = 0}
     }
 
-  let treat t f acc =
+  let treat ~maxlevel2 ~maxlevel3 t f acc =
     let rec main acc =
       Mutex.lock t.mutex;
-      while Queue.is_empty t.queue && t.remaining > 0 do
+      while
+        Queue.is_empty t.queue.level3
+        && (Queue.is_empty t.queue.level2
+            || t.remaining.level3 > maxlevel3)
+        && (Queue.is_empty t.queue.level1
+            || t.remaining.level2 > maxlevel2)
+        && t.remaining.level1 + t.remaining.level2 + t.remaining.level3 > 0
+      do
         Condition.wait t.condition t.mutex
       done;
-      if Queue.is_empty t.queue
-      then begin (* t.remaining < 0 *) Mutex.unlock t.mutex;acc end
-      else
-        begin
-          let v = Queue.pop t.queue in
-          Mutex.unlock t.mutex;
-          let acc = f acc v in
-          Thread.yield ();
-          main acc
-        end in
+      let for_one queue =
+        let v = Queue.pop queue in
+        Mutex.unlock t.mutex;
+        let acc = f acc v in
+        Thread.yield ();
+        main acc
+      in
+      try
+        (* Format.printf "level3 : l1=%i;l2=%i;l3=%i@." *)
+        (*   t.remaining.level1 *)
+        (*   t.remaining.level2 *)
+        (*   t.remaining.level3 ; *)
+        for_one t.queue.level3
+      with Queue.Empty ->
+      try
+        (* Format.printf "level2 : l1=%i;l2=%i;l3=%i@." *)
+        (*   t.remaining.level1 *)
+        (*   t.remaining.level2 *)
+        (*   t.remaining.level3 ; *)
+        for_one t.queue.level2
+      with Queue.Empty ->
+      try
+        (* Format.printf "level1 : l1=%i;l2=%i;l3=%i@." *)
+        (*   t.remaining.level1 *)
+        (*   t.remaining.level2 *)
+        (*   t.remaining.level3 ; *)
+        for_one t.queue.level1
+      with Queue.Empty ->
+        (* t.remaining.level1 + t.remaining.level2 + t.remaining.level3 = 0 *)
+        Mutex.unlock t.mutex;
+        acc in
     main acc
 
-  let start_work t =
+  let start_work level t =
     Mutex.lock t.mutex;
-    t.remaining <- t.remaining + 1;
+    t.remaining <- map_level level succ t.remaining;
     Mutex.unlock t.mutex
 
-  let stop_work t =
+  let stop_work level t =
     Mutex.lock t.mutex;
-    t.remaining <- t.remaining - 1;
-    if t.remaining = 0 then Condition.signal t.condition;
-    Mutex.unlock t.mutex
-
-  let add_work t x =
-    Mutex.lock t.mutex;
-    Queue.push x t.queue;
+    t.remaining <- map_level level pred t.remaining;
     Condition.signal t.condition;
     Mutex.unlock t.mutex
 
-  let add_works t q =
+  let add_work level t x =
     Mutex.lock t.mutex;
-    Queue.transfer q t.queue;
+    iter_level level (Queue.push x) t.queue;
+    Condition.signal t.condition;
+    Mutex.unlock t.mutex
+
+  let add_works level t q =
+    Mutex.lock t.mutex;
+    iter_level level (Queue.transfer q) t.queue;
     Condition.signal t.condition;
     Mutex.unlock t.mutex
 
