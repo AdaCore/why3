@@ -358,14 +358,40 @@ let print_next_proof ?def ch fmt =
     | End_of_file -> print_empty_proof ?def fmt
     | Exit -> fprintf fmt "@\n"
 
-let realization ~old ?def fmt info =
-  if info.realization then
+let produce_remaining_proofs ~old fmt =
+  match old with
+    | None -> ()
+    | Some ch ->
+  try
+    while true do
+      let s = input_line ch in
+      if s = proof_begin then
+        begin
+          fprintf fmt "(* OBSOLETE PROOF *)@\n";
+          try while true do
+            let s = input_line ch in
+            if s = proof_end then 
+	      begin
+		fprintf fmt "(* END OF OBSOLETE PROOF *)@\n@\n";
+		raise Exit
+	      end;
+            fprintf fmt "%s@\n" s;
+          done
+	  with Exit -> ()
+        end
+    done
+  with
+    | End_of_file -> fprintf fmt "@\n"
+
+let realization ~old ?def fmt produce_realization =
+  if produce_realization then
     begin match old with
-      | None -> assert false; print_empty_proof ?def fmt
+      | None -> print_empty_proof ?def fmt
       | Some ch -> print_next_proof ?def ch fmt
     end
   else
     fprintf fmt "@\n"
+
 
 let print_type_decl ~old info fmt (ts,def) =
   if is_ts_tuple ts then () else
@@ -375,7 +401,7 @@ let print_type_decl ~old info fmt (ts,def) =
             fprintf fmt "@[<hov 2>%a %a : %aType.@]@\n%a"
 	      definition info
               print_ts ts print_params_list ts.ts_args
-	      (realization ~old ~def:true) info
+	      (realization ~old ~def:true) info.realization
         | Some ty ->
             fprintf fmt "@[<hov 2>Definition %a %a :=@ %a.@]@\n@\n"
               print_ts ts (print_arrow_list print_tv_binder) ts.ts_args
@@ -422,7 +448,7 @@ let print_logic_decl ~old info fmt (ls,ld) =
             print_params all_ty_params
             (print_arrow_list (print_ty info)) ls.ls_args
             (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
-	    (realization ~old ~def:true) info
+	    (realization ~old ~def:true) info.realization
   end;
   print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params;
   fprintf fmt "@\n"
@@ -457,16 +483,9 @@ let print_pkind info fmt = function
 
 let print_proof ~old info fmt = function
   | Plemma | Pgoal ->
-      begin match old with
-        | None -> print_empty_proof fmt
-        | Some ch -> print_next_proof ch fmt
-      end
+      realization ~old fmt true
   | Paxiom ->
-      if info.realization then
-	begin match old with
-          | None -> print_empty_proof fmt
-          | Some ch -> print_next_proof ch fmt
-	end
+      realization ~old fmt info.realization 
   | Pskip -> ()
 
 let print_decl ~old info fmt d = match d.d_node with
@@ -475,10 +494,6 @@ let print_decl ~old info fmt d = match d.d_node with
   | Dind il   -> print_list nothing (print_ind_decl info) fmt il
   | Dprop (_,pr,_) when Sid.mem pr.pr_name info.info_rem -> ()
   | Dprop (k,pr,f) ->
- (*
-     fprintf fmt "@\n@\n(* YOU MAY EDIT BELOW *)@\n@\n@\n";
-      fprintf fmt "(* DO NOT EDIT BELOW *)@\n@\@\n";
- *)
       let params = f_ty_freevars Stv.empty f in
       fprintf fmt "@[<hov 2>%a %a : %a%a.@]@\n%a"
         (print_pkind info) k
@@ -512,9 +527,10 @@ open Theory
 
 let print_tdecl ~old info fmt d = match d.td_node with
   | Decl d -> print_decl ~old info fmt d
-  | Use _ -> ()
-  | Meta _ -> ()
-  | Clone _ -> ()
+  | Use t -> 
+      fprintf fmt "Require Import %s.@\n@\n" (id_unique iprinter t.th_name)
+  | Meta _ -> assert false (* TODO ? *)
+  | Clone _ -> assert false (* TODO *)
 
 let print_tdecls ~old info fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_tdecl ~old info)) dl
@@ -534,7 +550,8 @@ let print_theory _env pr thpr ~old fmt th =
     realization = true;
   } 
   in
-  print_tdecls ~old info fmt th.th_decls
+  print_tdecls ~old info fmt th.th_decls;
+  produce_remaining_proofs ~old fmt
 
 
 (*

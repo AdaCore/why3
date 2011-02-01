@@ -1,26 +1,30 @@
 
-
-
-
-
-
-
 = Roadmap for second release, as early as possible in 2011 =
 
 * fix local installation
-* ajouter "invalid" comme cas de resultats de preuve
-* utiliser call_provers.proof_result dans gmain
-* file names in DB
-** use only file names relative to the db file
-** ou alors interdire d'avoir plusieurs fichiers dans la meme base
+** fix local executables names (DONE)
+
+* fix problems with .why.conf
+** if we distribute the current state, users who already have a ~/.why.conf
+will get a error message because of missing loadpath to modules
+** generally speaking, we should rethink the design of that .why.conf: avoid
+   absolute paths,
+  
 * proof replay
-** in IDE
+** in IDE: replay all obsolete but previously successful proofs
 ** in whybench
 ** add replay of existing proofs in "make bench" to detect regression
 
+* IDE: implement "inline" (use transformation inline_goal)
+** partially done
+** problem 1: detect that transformation did nothing
 
+* IDE: debug "hide proved goals" feature
 
+* IDE: ajouter "invalid" comme cas de resultats de preuve
+  (utiliser call_provers.proof_result dans gmain)
 
+* IDE, file names in DB: use only file names relative to the db file (DONE)
 
 
 
@@ -33,10 +37,6 @@
 * Coq realizations of theories
 
 
-
-
-
-
 = Papers to write =
 
 * Encodings and transformations (Andrei+Francois, CADE 2011, deadline January 2011)
@@ -46,6 +46,12 @@
 * VACID-0
 * system description (e.g. at CAD, TACAS)
 * rapports recherche ?
+
+
+
+
+
+
 
 
 

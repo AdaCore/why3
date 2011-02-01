@@ -16,7 +16,7 @@ module M
   exception Not_found (* raised to signal a search failure *)
 
   let binary_search (a :array int) (v : int) =
-    { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
+    { (* forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] *) }
     try
       let l = ref 0 in
       let u = ref (length a - 1) in

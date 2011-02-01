@@ -20,24 +20,6 @@
 
 (* TODO:
 
-* bug: the file names are stored as relative, so if you restart
-from another directory, they are not found
-  but on the other hand, storing them as relative helps if you change
-   the machine
-  Solution: store the name relative to the database, e.g if
-
-  dir/file.why
-  dir/T/project.db
-
-  then project.db should store "../file.why", and running the interface
-  from any dir as
-
-  > why3db foo/dir/T
-
-  should read the file by concating foo/dir to ../file.why
-
-* When DB contains an edited proof, use the file for the run
-
 * when proof attempt is finished and is it the one currently selected,
 the new output should be displayed on upper-right window
 
@@ -196,7 +178,8 @@ let project_dir, file_to_read =
             with Invalid_argument _ -> fname
           in
           eprintf "Info: using '%s' as directory for the project@." d;
-          d, Some fname
+          d, Some (Filename.concat Filename.parent_dir_name
+		     (Filename.basename fname))
         end
     end
   else
@@ -206,7 +189,7 @@ let () =
   if not (Sys.file_exists project_dir) then
     begin
       eprintf "Info: '%s' does not exists. Creating directory of that name \
- for the project@." fname;
+ for the project@." project_dir;
       Unix.mkdir project_dir 0o777
     end
 
@@ -221,6 +204,7 @@ let () =
 
 
 let read_file fn =
+  let fn = Filename.concat project_dir fn in 
   let theories = Env.read_file gconfig.env fn in
   let theories =
     Theory.Mnm.fold
@@ -243,6 +227,7 @@ let read_file fn =
 
 module Model = struct
 
+(* TODO: remove, see below *)
   type proof_attempt_status =
     | Scheduled (** external proof attempt is scheduled *)
     | Running (** external proof attempt is in progress *)
@@ -258,9 +243,12 @@ module Model = struct
         proof_row : Gtk.tree_iter;
         proof_db : Db.proof_attempt;
         mutable status : proof_attempt_status;
-        mutable proof_obsolete : bool;
         mutable time : float;
         mutable output : string;
+(* TODO: replace the 3 fields above with
+	mutable proof_result : Call_provers.prover_result
+*)
+        mutable proof_obsolete : bool;
         mutable edited_as : string;
       }
 
@@ -727,7 +715,7 @@ module Helpers = struct
     goal
 
 
-  let add_transformation_row g db_transf (*subgoals*) =
+  let add_transformation_row g db_transf tr_name =
     let parent = g.Model.goal_row in
     let row = goals_model#append ~parent () in
     let tr = { Model.parent_goal = g;
@@ -737,7 +725,7 @@ module Helpers = struct
                subgoals = [];
              }
     in
-    goals_model#set ~row ~column:Model.name_column "split";
+    goals_model#set ~row ~column:Model.name_column tr_name;
     goals_model#set ~row ~column:Model.icon_column !image_transf;
     goals_model#set ~row ~column:Model.index_column
       (Model.Row_transformation tr);
@@ -847,6 +835,7 @@ let apply_trans t task =
 *)
 
 let split_transformation = Trans.lookup_transform_l "split_goal" gconfig.env
+let inline_transformation = Trans.lookup_transform "inline_goal" gconfig.env
 let intro_transformation = Trans.lookup_transform "introduce_premises" gconfig.env
 
 let rec reimport_any_goal parent gname t db_goal goal_obsolete =
@@ -885,9 +874,8 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
     (fun tr_id tr ->
        let trname = Db.transf_name tr_id in
        eprintf "Reimporting transformation %s for goal %s @." trname gname;
-       assert (trname = "split_goal"); (* TODO *)
        let subgoals = Trans.apply split_transformation t in
-       let mtr = Helpers.add_transformation_row goal tr in
+       let mtr = Helpers.add_transformation_row goal tr trname in
        let db_subgoals = Db.subgoals tr in
        let reimported_goals,db_subgoals,_ =
          List.fold_left
@@ -1197,8 +1185,9 @@ let split_goal g =
           (GtkThread.sync Db.add_transformation)
             g.Model.goal_db transf_id_split
         in
-        let tr = (GtkThread.sync Helpers.add_transformation_row) g db_transf
- (* subgoals *) in
+        let tr = (GtkThread.sync Helpers.add_transformation_row) 
+	  g db_transf "split_goal" 
+	in
         let goal_name = g.Model.goal_name in
         let fold = (fun (acc,count) subtask ->
              let _id = (Task.task_goal subtask).Decl.pr_name in
@@ -1220,6 +1209,41 @@ let split_goal g =
     Scheduler.apply_transformation_l ~callback
       split_transformation g.Model.task
 
+let inline_goal g =
+  if not g.Model.proved then
+    let callback subgoal =
+      ignore (Thread.create (fun subgoal ->
+	(* if List.length subgoals >= 2 then *)
+        let transf_id_inline =
+          (GtkThread.sync Db.transf_from_name) "inline_goal" in
+        let db_transf =
+          (GtkThread.sync Db.add_transformation)
+            g.Model.goal_db transf_id_inline
+        in
+        let tr = (GtkThread.sync Helpers.add_transformation_row) 
+	  g db_transf "inline_goal"
+	in
+        let goal_name = g.Model.goal_name in
+        let fold = (fun (acc,count) subtask ->
+             let _id = (Task.task_goal subtask).Decl.pr_name in
+             let subgoal_name =
+               goal_name ^ "." ^ (string_of_int count)
+             in
+             let sum = task_checksum subtask in
+             let subtask_db = Db.add_subgoal db_transf subgoal_name sum in
+             let goal =
+               Helpers.add_goal_row (Model.Transf tr) subgoal_name subtask
+                 subtask_db
+             in
+             (goal :: acc, count+1)) in
+        let goals,_ = List.fold_left (GtkThread.sync fold) ([],1) [subgoal]
+        in
+        tr.Model.subgoals <- List.rev goals;
+        Hashtbl.add g.Model.transformations "inline" tr) subgoal)
+    in
+    Scheduler.apply_transformation ~callback
+      inline_transformation g.Model.task
+
 let rec split_goal_or_children g =
   if not g.Model.proved then
     begin
@@ -1230,6 +1254,18 @@ let rec split_goal_or_children g =
            List.iter split_goal_or_children
              t.Model.subgoals) g.Model.transformations;
       if !r then split_goal g
+    end
+
+let rec inline_goal_or_children g =
+  if not g.Model.proved then
+    begin
+      let r = ref true in
+      Hashtbl.iter 
+	(fun _ t ->
+	   r := false;
+           List.iter inline_goal_or_children
+             t.Model.subgoals) g.Model.transformations;
+      if !r then inline_goal g
     end
 
 let split_selected_goal_or_children row =
@@ -1250,10 +1286,34 @@ let split_selected_goal_or_children row =
         List.iter split_goal_or_children tr.Model.subgoals
 
 
+let inline_selected_goal_or_children row =
+  let row = filter_model#get_iter row in
+  match filter_model#get ~row ~column:Model.index_column with
+    | Model.Row_goal g ->
+        inline_goal_or_children g
+    | Model.Row_theory th ->
+        List.iter inline_goal_or_children th.Model.goals
+    | Model.Row_file file ->
+        List.iter
+          (fun th ->
+             List.iter inline_goal_or_children th.Model.goals)
+          file.Model.theories
+    | Model.Row_proof_attempt a ->
+        inline_goal_or_children a.Model.proof_goal
+    | Model.Row_transformation tr ->
+        List.iter inline_goal_or_children tr.Model.subgoals
+
 let split_selected_goals () =
   ignore (Thread.create (fun () ->
     List.iter
       split_selected_goal_or_children
+      goals_view#selection#get_selected_rows) ())
+
+
+let inline_selected_goals () =
+  ignore (Thread.create (fun () ->
+    List.iter
+      inline_selected_goal_or_children
       goals_view#selection#get_selected_rows) ())
 
 
@@ -1271,7 +1331,65 @@ let filter_why_files () =
     ~name:"Why3 source files"
     ~patterns:[ "*.why"; "*.mlw"] ()
 
+(* return the absolute path of a given file name.
+   this code has been designed to be architecture-independant so
+   be very careful if you modify this *)
+let path_of_file f =
+  let rec aux acc f =
+(*
+    Format.printf "aux %s@." f;
+    let _ = read_line () in
+*)
+    let d = Filename.dirname f in
+    if d = Filename.current_dir_name then
+      (* f is relative to the current dir *)
+      aux (f::acc) (Sys.getcwd ())
+    else
+      let b = Filename.basename f in
+      if b=Filename.current_dir_name then acc else
+	if f=b then b::acc else
+	  aux (b::acc) d
+  in
+  aux [] f
 
+(*
+let test x = (Filename.dirname x, Filename.basename x)
+
+let _ = test "file"
+let _ = test "/file"
+let _ = test "/"
+let _ = test "f1/f2"
+let _ = test "/f1/f2"
+
+let p1 = path_of_file "/bin/bash"
+
+let p1 = path_of_file "../src/f.why"
+  *)
+
+let relativize_filename base f =
+  let rec aux ab af =
+    match ab,af with	
+      | x::rb, y::rf when x=y -> aux rb rf
+      | _ -> 
+	  let rec aux2 acc p =
+	    match p with
+	      | [] -> acc
+	      | _::rb -> aux2 (Filename.parent_dir_name::acc) rb
+	  in aux2 af ab
+  in
+  let rec rebuild l =
+    match l with
+      | [] -> ""
+      | [x] -> x
+      | x::l -> Filename.concat x (rebuild l)
+  in
+  rebuild (aux (path_of_file base) (path_of_file f))
+
+(*
+let p1 = relativize_filename "/bin/bash" "src/f.why"
+
+let p1 = relativize_filename "test" "/home/cmarche/recherche/why3/src/ide/f.why"
+*)
 let select_file () =
   let d = GWindow.file_chooser_dialog ~action:`OPEN
     ~title:"Why3: Add file in project"
@@ -1287,6 +1405,7 @@ let select_file () =
         match d#filename with
           | None -> ()
           | Some f ->
+	      let f = relativize_filename project_dir f in
               eprintf "Adding file '%s'@." f;
               try
                 Helpers.add_file f
@@ -1303,7 +1422,7 @@ let select_file () =
 
 
 let not_implemented () =
-  info_window `INFO "This feature is not yet implemented, sorry"
+  info_window `INFO "This feature is not yet implemented, sorry."
 
 (*************)
 (* File menu *)
@@ -1526,13 +1645,13 @@ let () =
   in ()
 
 let () =
-  let b = GButton.button ~packing:transf_box#add ~label:"(Inline)" () in
-(*
+  let b = GButton.button ~packing:transf_box#add ~label:"Inline" () in
+(**)
   let i = GMisc.image ~pixbuf:(!image_transf) () in
   let () = b#set_image i#coerce in
-*)
+(**)
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:not_implemented
+    b#connect#pressed ~callback:inline_selected_goals
   in ()
 
 
@@ -1918,6 +2037,6 @@ let () = GtkThread.main ()
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/whyide.byte"
+compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"
 End:
 *)

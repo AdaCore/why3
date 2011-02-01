@@ -209,7 +209,7 @@ let iconname_no = "delete32"
 let iconname_directory = "folder32"
 let iconname_file = "file32"
 let iconname_prover = "wizard32"
-let iconname_transf = "cutb32"
+let iconname_transf = "configure32"
 let iconname_editor = "edit32"
 let iconname_remove = "deletefile32"
 
@@ -401,6 +401,6 @@ let () = eprintf "end of configuration initialization@."
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/whyide.opt"
+compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"
 End:
 *)

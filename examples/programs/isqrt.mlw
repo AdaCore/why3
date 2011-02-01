@@ -5,13 +5,13 @@ module M
 
   logic sqr (x:int) : int = x * x
 
-  let isqrt (x:int) =
+  let isqrt (x:int) : int =
     { x >= 0 }
     let count = ref 0 in
     let sum = ref 1 in
     while !sum <= x do
       invariant { count >= 0 and x >= sqr count and sum = sqr (count+1) }
-      variant   { x - sum }
+      variant   { x - count }
       count := !count + 1;
       sum := !sum + 2 * !count + 1
     done;
