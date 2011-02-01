@@ -39,7 +39,7 @@ type 'a tool = {
 }
 
 type 'a prob = {
-  ptask  : (env -> task -> ('a * task) list) list; (** needed for tenv *)
+  ptask  : env -> task -> ('a * task) list; (** needed for tenv *)
   ptrans : env -> task list trans;
 }
 
@@ -76,21 +76,19 @@ let call s callback tool prob =
       ~callback:cb task) q in
   let iter q pval i task =
     MainWorker.start_work MainWorker.level3 s;
-    let cb res = callback pval i task res;
-      match res with Scheduler.Done _
-        | Scheduler.InternalFailure _ ->
-          MainWorker.stop_work MainWorker.level3 s
-        | _ -> () in
+    let cb res =
+      MainWorker.add_work MainWorker.level3 s (fun () ->
+        callback pval i task res;
+        match res with Scheduler.Done _
+          | Scheduler.InternalFailure _ ->
+            MainWorker.stop_work MainWorker.level3 s
+          | _ -> ()) in
     call q cb task; succ i in
   let trans_cb pval tl =
     let q = Queue.create () in
     ignore (List.fold_left (iter q pval) 0 (List.rev tl));
-    MainWorker.stop_work MainWorker.level3 s;
-    MainWorker.add_work MainWorker.level3 s
-      (fun () ->
-        transfer_proof_attempts q;
-        MainWorker.stop_work MainWorker.level2 s
-      )
+    transfer_proof_attempts q;
+    MainWorker.stop_work MainWorker.level3 s
   in
   (** Apply trans *)
   let iter_task (pval,task) =
@@ -103,14 +101,15 @@ let call s callback tool prob =
         MainWorker.start_work MainWorker.level3 s;
         apply_transformation_l ~callback:(trans_cb pval) trans task) in
   (** Split *)
-  List.iter (fun create_task ->
-    MainWorker.start_work MainWorker.level1 s;
-    MainWorker.add_work MainWorker.level1 s
-      (fun () ->
-        let cb ths = List.iter iter_task ths;
-          MainWorker.stop_work MainWorker.level1 s in
-        do_why ~callback:cb (create_task tool.tenv) tool.tuse
-      )) prob.ptask
+  MainWorker.start_work MainWorker.level1 s;
+  MainWorker.add_work MainWorker.level1 s
+    (fun () ->
+    MainWorker.start_work MainWorker.level2 s;
+      let cb ths = List.iter iter_task ths;
+        MainWorker.stop_work MainWorker.level2 s;
+        MainWorker.stop_work MainWorker.level1 s in
+      do_why ~callback:cb (prob.ptask tool.tenv) tool.tuse
+      )
 
 let general ?(callback=fun _ _ _ _ _ -> ()) iter add =
   Debug.dprintf debug "Start one general@.";
@@ -121,7 +120,6 @@ let general ?(callback=fun _ _ _ _ _ -> ()) iter add =
   let _ = Thread.create (fun () ->
     iter (fun v tool prob ->
     let cb pval i task res =
-      MainWorker.add_work MainWorker.level3 t (fun () ->
         callback tool.tval pval task i res;
         match res with
           | Scheduler.InternalFailure _ | Scheduler.Done _ ->
@@ -133,14 +131,14 @@ let general ?(callback=fun _ _ _ _ _ -> ()) iter add =
                      | Scheduler.Done r -> Done r
                      | _ -> assert false
                   }
-          | _ -> ()) in
+          | _ -> () in
     call t cb tool prob);
     MainWorker.stop_work MainWorker.level1 t;
   ) () in
   (** Treat the work done and wait *)
   MainWorker.treat
-    ~maxlevel2:(!Scheduler.maximum_running_proofs * 3)
-    ~maxlevel3:(!Scheduler.maximum_running_proofs * 3)
+    ~maxlevel2:(!Scheduler.maximum_running_proofs * 2)
+    ~maxlevel3:(!Scheduler.maximum_running_proofs * 4)
     t (fun () f -> f ()) ()
 
 let any ?callback toolprob =

@@ -28,7 +28,7 @@ type id_tool = (string * string)
 type id_prob = (string * string * string)
 
 type benchrc = { tools : id_tool tool list Mstr.t;
-                 probs : id_prob prob Mstr.t;
+                 probs : id_prob prob list Mstr.t;
                  benchs : (id_tool,id_prob) bench Mstr.t
                }
 
@@ -125,7 +125,10 @@ let read_probs absf map (name,section) =
       read_one fname |> List.rev_map map |> List.fold_left fold []
     with exn -> eprintf "%a@." Exn_printer.exn_printer exn; exit 1
   in
-  Mstr.add name { ptask   = List.map gen files; ptrans   = gen_trans} map
+  Mstr.add name
+    (List.rev_map
+       (fun file -> { ptask   = gen file; ptrans   = gen_trans}) files)
+    map
 
 let read_bench absf mtools mprobs map (name,section) =
   let tools = get_stringl section "tools" in
@@ -139,7 +142,7 @@ let read_bench absf mtools mprobs map (name,section) =
     try Mstr.find s mprobs
     with Not_found -> eprintf "Undefined probs %s@." s;
       exit 1 in
-  let probs = List.map lookup probs in
+  let probs = list_flatten_rev (List.map lookup probs) in
   let averages = get_stringl ~default:[] section "average" in
   let outputs = List.fold_left
     (cons (fun s -> Average (absf s)))

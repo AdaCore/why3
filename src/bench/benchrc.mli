@@ -51,7 +51,7 @@ type id_prob = (string * string * string)
 (* prob_name, file_name, theory name *)
 
 type benchrc = { tools : id_tool tool list Mstr.t;
-                 probs : id_prob prob Mstr.t;
+                 probs : id_prob prob list Mstr.t;
                  benchs : (id_tool,id_prob) bench Mstr.t
                }
 
