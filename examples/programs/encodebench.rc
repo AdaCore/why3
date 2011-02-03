@@ -8,6 +8,13 @@ prover = "yices"
 prover = "eprover"
 timelimit = 1
 
+[tools array]
+command = "why3-cpulimit %t %m -s z3 -smt %f 2>&1"
+driver = "/usr/local/share/why3/drivers/z3_array.drv"
+#loadpath = "examples/programs"
+#use = "meta.Partial_incomplete"
+timelimit = 1
+
 [tools instantiate]
 prover = "cvc3"
 prover = "z3"
@@ -31,6 +38,7 @@ transform = "split_goal"
 
 [bench fast_and_funny]
 tools = fast
+tools = array
 tools = instantiate
 probs = funny
 timeline = "encodebench.time"

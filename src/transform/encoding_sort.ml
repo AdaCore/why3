@@ -171,7 +171,8 @@ let fold tenv taskpre task =
           | MApr _ -> raise Exit
           | MAstr _ as s -> s
           | MAint _ as i -> i in
-        add_meta (decl_ud ud task) meta (List.map map ml)
+        let arg = List.map map ml in
+        add_meta (decl_ud ud task) meta arg
       with
         | Printer.UnsupportedType _
         | Exit -> add_tdecl task taskpre.task_decl

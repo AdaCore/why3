@@ -27,6 +27,7 @@ open Task
 open Decl
 open Encoding
 
+(*
 (* Ce type est utiliser pour indiquer un underscore *)
 let tv_dumb = create_tvsymbol (id_fresh "Dumb")
 let ty_dumb = ty_var tv_dumb
@@ -306,10 +307,10 @@ let collect_arrays poly_ts tds =
       | Some ty -> ty)
       ts tys in
   Sts.fold extract tds Mty.empty
-
+*)
 let meta_mono_array = register_meta "encoding_arrays : mono_arrays"
   [MTtysymbol;MTty;MTty]
-
+(*
 (* Some general env creation function *)
 let create_env env task thpoly tds =
   let pget = ns_find_ls thpoly.th_export ["get"] in
@@ -388,7 +389,7 @@ let encoding_arrays env =
   Trans.on_used_theory thpoly (fun used ->
     if not used then Trans.identity
     else Trans.on_tagged_ts meta_kept_array (create_trans_complete env thpoly))
-
+*)
 (* This one take use the tag but also all the type which appear in the goal *)
 let is_ty_mono ~only_mono ty =
   try
@@ -399,7 +400,7 @@ let is_ty_mono ~only_mono ty =
     true
   with Exit when not only_mono -> false
 
-
+(*
 (* select the type array which appear as argument of set and get.
   set and get must be in sls *)
 let find_mono_array ~only_mono sls sty f =
@@ -442,7 +443,150 @@ let trans_array env =
 let trans_array env = Trans.compose (trans_array env) (encoding_arrays env)
 
 let () = Trans.register_env_transform "encoding_array" trans_array
+*)
+(*********************************)
+(** Another way *)
+(** Use partial on the subtype of arrays and twin on arrays
+    (just add the twin) *)
 
+(* select the type array which appear as argument of set and get.
+  set and get must be in sls. After that take the subtype of them *)
+let find_mono_array ~only_mono sls sty f =
+  let add sty ls tyl _ =
+    match tyl with
+      | ty::_ when Sls.mem ls sls && is_ty_mono ~only_mono ty ->
+        Sty.add ty sty
+      | _ -> sty in
+  f_app_fold add sty f
+
+let create_meta_ty meta ty = create_meta meta [MAty ty]
+
+let create_meta_ty meta = Wty.memoize 17 (create_meta_ty meta)
+
+let create_meta_tyl meta =
+  let cmty = create_meta_ty meta in
+  fun sty d ->
+    Sty.fold (flip $ cons cmty) sty d
+
+let create_meta_tyl_arrays = create_meta_tyl meta_kept_array
+let create_meta_tyl_kept = create_meta_tyl meta_kept
+
+let subtype ty acc =
+  let rec ty_add sty ty = ty_fold ty_add (Sty.add ty sty) ty in
+  (* don't add the top type, only the subtype *)
+  ty_fold ty_add acc ty
+
+let mono_in_goal sls pr f =
+  let sty = (try find_mono_array ~only_mono:true sls Sty.empty f
+    with Exit -> assert false) (*monomorphise goal should have been used*) in
+  let decls = create_meta_tyl_arrays sty
+    [create_decl (create_prop_decl Pgoal pr f)] in
+  let sty = Sty.fold subtype sty Sty.empty in
+  create_meta_tyl_kept sty decls
+
+let mono_in_goal sls = Trans.tgoal (mono_in_goal sls)
+
+let select_subterm_array th_array =
+  let set = ns_find_ls th_array.th_export ["set"] in
+  let get = ns_find_ls th_array.th_export ["get"] in
+  let sls = Sls.add set (Sls.add get Sls.empty) in
+  mono_in_goal sls
+
+(** Were all is tide together *)
+open Trans
+open Encoding_instantiate
+let meta_arrays_to_meta_kept =
+  Trans.on_tagged_ty meta_kept_array (fun sty ->
+    Trans.store (function
+    | Some { task_decl = td; task_prev = prev } ->
+      let add ty task = add_meta task meta_kept [Theory.MAty ty] in
+      let task = Sty.fold add sty prev in
+      add_tdecl task td
+    | _ -> assert false
+    ))
+
+(* Some general env creation function *)
+let create_env_array env thpoly task tenv kept kept_array =
+  let pget = ns_find_ls thpoly.th_export ["get"] in
+  let pset = ns_find_ls thpoly.th_export ["set"] in
+   let pt = ns_find_ts thpoly.th_export ["t"] in
+  (* let pkey = ns_find_ts thpoly.th_export ["key"] in *)
+  (* let pvalue = ns_find_ts thpoly.th_export ["value"] in *)
+  (* Clonable theories of arrays *)
+  let thclone = Env.find_theory env ["transform";"array"] "Array" in
+  let cget = ns_find_ls thclone.th_export ["get"] in
+  let cset = ns_find_ls thclone.th_export ["set"] in
+  let ct = ns_find_ts thclone.th_export ["t"] in
+  let ckey = ns_find_ts thclone.th_export ["key"] in
+  let celt = ns_find_ts thclone.th_export ["elt"] in
+  let clone_arrays ty (task,tenv) =
+    let key,elt =
+      match ty.ty_node with
+        | Tyapp (_,[key;elt]) -> key,elt
+        | _ -> assert false in
+    (** create needed alias for the instantiation *)
+    let add_ty task ty =
+      match ty.ty_node with
+        | Tyapp (ts,[]) -> task,ts
+        | _ ->
+          let ts = create_tysymbol (id_fresh "alias for clone") [] (Some ty) in
+          add_ty_decl task [ts,Tabstract],ts in
+    let task,tskey = add_ty task key in
+    let task,tselt = add_ty task elt in
+    let ts_name = "bta_"^(Pp.string_of_wnl Pretty.print_ty ty) in
+    let ts = create_tysymbol (id_fresh ts_name) [] None in
+    let task = add_ty_decl task [ts,Tabstract] in
+    let th_inst = create_inst ~ts:[ct,ts; ckey,tskey; celt,tselt] ~ls:[]
+      ~lemma:[] ~goal:[] in
+    let task = Task.clone_export task thclone th_inst in
+    (** Recover the subtitution *)
+    let sls = match task with
+      | Some {task_decl = {td_node = Clone(_,{sm_ls=sls})}} -> sls
+      | _ -> assert false in
+    (** type *)
+    (* let tsy = ty_app ts [] in *)
+    (** add get to lsymbol *)
+    (** Warning its the instanciation, so [elt;key] is really not a
+        safe way to define the instancition (depend on variable
+        order...) *)
+    let add s = Mtyl.add [elt;key] (Mls.find cget sls) s in
+    let edefined_lsymbol = Mls.change pget
+      (function | None -> Some (add Mtyl.empty) | Some s -> Some (add s))
+      tenv.edefined_lsymbol in
+    (** add set to lsymbol *)
+    let add s = Mtyl.add [elt;key] (Mls.find cset sls) s in
+    let edefined_lsymbol = Mls.change pset
+      (function | None -> Some (add Mtyl.empty) | Some s -> Some (add s))
+      edefined_lsymbol in
+    (** add arrays to tsymbol *)
+    let add s = Mtyl.add [key;elt] ts s in
+    let edefined_tsymbol = Mts.change pt
+      (function | None -> Some (add Mtyl.empty) | Some s -> Some (add s))
+      tenv.edefined_tsymbol in
+    task,{tenv with edefined_lsymbol = edefined_lsymbol;
+      edefined_tsymbol = edefined_tsymbol
+         } in
+  (** add the type which compose keep *)
+  let task_tenv = create_env task tenv kept in
+  (** add the clone *)
+  Sty.fold clone_arrays kept_array task_tenv
+
+let encoding_smt_array env =
+  let th_array = Env.find_theory env ["array"] "Array" in
+  Trans.on_used_theory th_array (fun used ->
+    if not used then Encoding.encoding_smt env else
+      compose Encoding.monomorphise_goal
+        (compose Encoding.maybe_encoding_enumeration
+           (compose (select_subterm_array th_array)
+              (compose Encoding.print_kept
+                 (compose (Encoding_instantiate.t
+                             (create_env_array env th_array))
+                    (compose meta_arrays_to_meta_kept
+                       (compose Encoding.print_kept
+                          (compose (Encoding_bridge.t env)
+                             (Encoding.enco_poly_smt env)))))))))
+
+let () = Trans.register_env_transform "encoding_smt_array" encoding_smt_array
 
 (*
 Local Variables:

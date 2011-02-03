@@ -23,6 +23,7 @@ open Task
 open Trans
 
 let meta_kept = register_meta "encoding : kept" [MTty]
+let meta_kept_array = register_meta "encoding : kept_array" [MTty]
 let meta_base = register_meta_excl "encoding : base" [MTtysymbol]
 
 let debug = Debug.register_flag "encoding"

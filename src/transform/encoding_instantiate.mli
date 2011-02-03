@@ -17,24 +17,29 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Env
-open Theory
+open Ty
+open Term
+open Decl
+open Stdlib
 open Task
-open Trans
 
-val meta_kept : meta
-val meta_kept_array : meta
-val meta_base : meta
+module Mtyl : Map.S with type key = ty list
 
-val register_enco_select : string -> (env -> task trans) -> unit
-val register_enco_kept : string -> (env -> task trans) -> unit
-val register_enco_poly : string -> (env -> task trans) -> unit
+type tenv =
+  | Complete (* The transformation keep the polymorphism *)
+  | Incomplete (* The environnement when the transformation isn't complete*)
 
+type env = {
+  etenv : tenv;
+  ekeep : Sty.t;
+  prop_toremove : ty Mtv.t Mpr.t;
+  eprojty : ty Mty.t;
+  edefined_lsymbol : lsymbol Mtyl.t Mls.t;
+  edefined_tsymbol : tysymbol Mtyl.t Mts.t;
+}
 
-val monomorphise_goal : Task.task Trans.trans
-val maybe_encoding_enumeration : Task.task Trans.trans
+type auto_clone =  task -> tenv -> Sty.t -> Sty.t -> task * env
 
-val enco_poly_smt : Env.env -> Task.task Trans.trans
-val print_kept : Task.task Trans.trans
+val create_env : task -> tenv -> Sty.t -> task * env
 
-val encoding_smt : Env.env ->  Task.task Trans.trans
+val t : auto_clone -> Task.task Trans.trans

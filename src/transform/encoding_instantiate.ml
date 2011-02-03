@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
+open Stdlib
 open Util
 open Ident
 open Ty
@@ -56,13 +56,6 @@ end)
 
 module Mtyl = Map.Make(OHTyl)
 module Htyl = Hashtbl.Make(OHTyl)
-
-type tenv_aux = {
-  deco : ty;
-  undeco : ty;
-  sort : lsymbol;
-  ty : ty;
-}
 
 type tenv =
   | Complete (* The transformation keep the polymorphism *)
@@ -105,10 +98,13 @@ let reduce_to_real = function
 type env = {
   etenv : tenv;
   ekeep : Sty.t;
+  prop_toremove : ty Mtv.t Mpr.t;
   eprojty : ty Mty.t;
   edefined_lsymbol : lsymbol Mtyl.t Mls.t;
   edefined_tsymbol : tysymbol Mtyl.t Mts.t;
 }
+
+type auto_clone = task -> tenv -> Sty.t -> Sty.t -> task * env
 
 (* The environnement of the transformation during
    the transformation of a formula *)
@@ -367,10 +363,51 @@ let ty_quant =
     | _ -> ty_fold add_vs s ty in
   f_ty_fold add_vs Stv.empty
 
+let add_decl_ud menv task =
+  let task = Sts.fold
+    (fun ts task -> add_ty_decl task [ts,Tabstract])
+    menv.undef_tsymbol task in
+  let task = Sls.fold
+    (fun ls task -> add_logic_decl task [ls,None])
+    menv.undef_lsymbol task in
+  task
+
+
 (* The Core of the transformation *)
 let fold_map task_hd ((env:env),task) =
   match task_hd.task_decl.td_node with
-    | Use _ | Clone _ | Meta _ -> env,add_tdecl task task_hd.task_decl
+    | Use _ | Clone _ -> env,add_tdecl task task_hd.task_decl
+    | Meta(meta,ml) ->
+      begin try
+        let menv =  {
+          tenv = env.etenv;
+          keep = env.ekeep;
+          projty = env.eprojty;
+          defined_lsymbol = env.edefined_lsymbol;
+          defined_tsymbol = env.edefined_tsymbol;
+          undef_lsymbol = Sls.empty;
+          undef_tsymbol = Sts.empty;
+        } in
+        let map = function
+          | MAty ty -> MAty (projty_real menv Mtv.empty ty)
+          (* | MAts {ts_name = name; ts_args = []; ts_def = Some ty} -> *)
+          (*   MAts (conv_ts tenv ud name ty) *)
+          (* | MAts {ts_args = []; ts_def = None} as x -> x *)
+          | MAts _ -> raise Exit
+          | MAls _ -> raise Exit
+          | MApr _ -> raise Exit
+          | MAstr _ as s -> s
+          | MAint _ as i -> i in
+        let arg = (List.map map ml) in
+        let task = add_meta (add_decl_ud menv task) meta arg in
+        {env with edefined_lsymbol = menv.defined_lsymbol;
+          edefined_tsymbol = menv.defined_tsymbol;
+          eprojty = menv.projty;
+        }, task
+      with
+        | Printer.UnsupportedType _
+        | Exit -> env,add_tdecl task task_hd.task_decl
+      end
     | Decl d -> match d.d_node with
     | Dtype [_,Tabstract] -> (env,task)
     (* Nothing here since the type kept are already defined and the other
@@ -409,6 +446,11 @@ Perhaps you could use eliminate_definition"
         undef_tsymbol = Sts.empty;
       } in
       let conv_f task tvar =
+        if begin
+          try (Mtv.equal ty_equal) tvar (Mpr.find pr env.prop_toremove)
+          with Not_found -> false end
+        then task
+        else
         (* Format.eprintf "f0 : %a@. env : %a@." Pretty.print_fmla *)
         (*   (f_ty_subst tvar Mvs.empty f) *)
         (*   print_env menv; *)
@@ -423,12 +465,7 @@ Perhaps you could use eliminate_definition"
         (*   menv.undef_lsymbol *)
         (*   (Pp.print_iter1 Sts.iter Pp.comma Pretty.print_ts) *)
         (*   menv.undef_tsymbol; *)
-        let task = Sts.fold
-          (fun ts task -> add_ty_decl task [ts,Tabstract])
-          menv.undef_tsymbol task in
-        let task = Sls.fold
-          (fun ls task -> add_logic_decl task [ls,None])
-          menv.undef_lsymbol task in
+        let task = add_decl_ud menv task in
         let task = add_prop_decl task k pr f in
         task
       in
@@ -465,6 +502,7 @@ let create_env task tenv keep =
   task,{
     etenv = tenv;
     ekeep = keep;
+    prop_toremove = Mpr.empty;
     eprojty = projty;
     edefined_lsymbol = Mls.empty;
     edefined_tsymbol = Mts.empty
@@ -493,10 +531,27 @@ let create_trans_complete kept complete =
 let encoding_instantiate =
   Trans.on_tagged_ty meta_kept (fun kept ->
   Trans.on_meta_excl meta_complete (fun complete ->
-  create_trans_complete kept complete))
+    create_trans_complete kept complete))
 
 let () =
   register_enco_kept "instantiate" (fun _ -> encoding_instantiate)
+
+
+let create_trans_complete create_env kept kept_array complete =
+  let task = use_export None builtin_theory in
+  let tenv = match complete with
+    | None | Some [MAstr "yes"] -> Complete
+    | Some [MAstr "no"] ->  Incomplete
+    | _ -> failwith "instantiate complete wrong argument" in
+  let init_task,env = create_env task tenv kept kept_array in
+  Trans.fold_map fold_map env init_task
+
+let t create_env =
+  Trans.on_tagged_ty meta_kept (fun kept ->
+  Trans.on_meta_excl meta_complete (fun complete ->
+    Trans.on_tagged_ty meta_kept_array (fun kept_array ->
+      create_trans_complete create_env kept kept_array complete)))
+
 
 
 (* Select *)

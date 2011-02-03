@@ -6,13 +6,17 @@ theory Array
   logic get t key : elt
   logic set t key elt : t
 
+  (** just temporary *)
+  meta "syntax_logic" logic get, "(select %1 %2)"
+  meta "syntax_logic" logic set, "(store %1 %2 %3)"
+
   axiom Select_eq :
     forall m : t. forall a1 a2 : key.
     forall b : elt [get (set m a1 b) a2].
     a1 = a2 -> get (set m a1 b) a2  = b
 
-  axiom Select_neq : 
-    forall m : t. forall a1 a2 : key. 
+  axiom Select_neq :
+    forall m : t. forall a1 a2 : key.
     forall b : elt [get (set m a1 b) a2].
     a1 <> a2 -> get (set m a1 b) a2 = get m a2
 
