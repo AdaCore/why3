@@ -57,8 +57,7 @@ let rec split_pos ro acc f = match f.f_node with
       apply_append2 f_implies acc (split_neg ro [] f1) (split_pos ro [] f2)
   | Fbinop (Fiff,f1,f2) ->
       split_pos ro (split_pos ro acc (f_implies f2 f1)) (f_implies f1 f2)
-  | Fbinop (For,f1,f2) when ro ->
-      apply_append (f_or f1) acc (split_pos ro [] f2)
+  | Fbinop (For,_,_) when ro -> f::acc
   | Fbinop (For,f1,f2) ->
       apply_append2 f_or acc (split_pos ro [] f1) (split_pos ro [] f2)
   | Fnot f ->
@@ -79,8 +78,7 @@ and split_neg ro acc f = match f.f_node with
   | Ftrue -> f::acc
   | Ffalse -> acc
   | Fapp _ -> f::acc
-  | Fbinop (Fand,f1,f2) when ro ->
-      apply_append (f_and f1) acc (split_neg ro [] f2)
+  | Fbinop (Fand,_,_) when ro -> f::acc
   | Fbinop (Fand,f1,f2) ->
       apply_append2 f_and acc (split_neg ro [] f1) (split_neg ro [] f2)
   | Fbinop (Fimplies,f1,f2) when to_split f ->
