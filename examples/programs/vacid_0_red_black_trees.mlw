@@ -21,6 +21,10 @@ module M
     | Node _ l k' v' r -> (k = k' and v = v') or memt l k v or memt r k v
     end
 
+  lemma memt_color :
+    forall l r : tree, k k' : key, v v' : value, c c' : color.
+    memt (Node c l k v r) k' v' -> memt (Node c' l k v r) k' v'
+
   (* binary search tree *)
 
   use import int.Int
@@ -63,6 +67,9 @@ module M
     end
 
   lemma rbtree_Leaf   : rbtree 0 Leaf
+
+  lemma rbtree_Node1  : 
+    forall k:key, v:value. rbtree 0 (Node Red Leaf k v Leaf)
 
   (* lookup *)
 
@@ -136,11 +143,39 @@ module M
         if k' = k then v' = v else (memt l k' v' or memt r k' v')
     }
 
-  parameter add :
-    t : tree -> k : key -> v : value ->
-    { bst t and exists n : int. rbtree n t }
-    tree
-    { bst result and (exists n : int. rbtree n result) and
+  (* [insert x s] inserts [x] in tree [s], resulting in a possible top red-red
+     conflict when [s] is red. *)
+
+  let rec insert (t : tree) (k : key) (v : value) : tree =
+    { bst t }
+    match t with
+    | Leaf ->
+        Node Red Leaf k v Leaf
+    | Node Red l k' v' r ->
+        if k < k' then Node Red (insert l k v) k' v' r
+        else if k' < k then Node Red l k' v' (insert r k v)
+        else (* k = k' *) Node Red l k' v r
+    | Node Black l k' v' r ->
+        if k < k' then lbalance (insert l k v) k' v' r
+        else if k' < k then rbalance l k' v' (insert r k v)
+        else (* k = k' *) Node Black l k' v r
+    end
+    { bst result and
+      (forall n : int. rbtree n t -> almost_rbtree n result and
+         (is_not_red t -> rbtree n result)) and
+      memt result k v and
+      forall k':key, v':value. 
+      memt result k' v' <-> if k' = k then v' = v else memt t k' v' }
+
+  (* finally [add x s] calls [insert] and recolors the root as black *)
+
+  let add (t : tree) (k : key) (v : value) : tree =
+    { bst t and exists n:int. rbtree n t }
+    match insert t k v with 
+    | Node _ l k' v' r -> Node Black l k' v' r
+    | Leaf -> absurd
+    end
+    { bst result and (exists n:int. rbtree n result) and
       memt result k v and
       forall k':key, v':value. 
       memt result k' v' <-> if k' = k then v' = v else memt t k' v' }
@@ -181,7 +216,7 @@ module M
     try find t k with Not_found -> d end
     { mem m k result }
 
-  (* the easy way: implements "remove" using "replace" *)
+  (* the easy way: implements [remove] using [replace] *)
   let remove (m : ref rbt) k =
     { inv m } 
     replace m k (default !m)
