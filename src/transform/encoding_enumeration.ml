@@ -41,11 +41,19 @@ let add_proj tenv ts =
   Hts.add tenv.projs ts fs;
   fs
 
-let proj tenv t = match t.t_ty.ty_node with
+let proj tenv t ty = match ty.ty_node with
   | Tyapp (ts,_) when Sts.mem ts tenv.enum ->
       let fs = Hts.find tenv.projs ts in
       t_app fs [t] t.t_ty
   | _ -> t
+
+let proj tenv t = match t.t_node with
+  | Tapp (ls,_) ->
+      proj tenv t (of_option ls.ls_value)
+  | Tvar _ | Tconst _ | Teps _ ->
+      proj tenv t t.t_ty
+  | Tif _  | Tcase _  | Tlet _ ->
+      t
 
 let rec rewrite_term tenv t = match t.t_node with
   | Tapp (fs,tl) ->
