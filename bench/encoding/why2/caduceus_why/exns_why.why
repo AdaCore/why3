@@ -1,0 +1,127 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+goal p4_po_1:
+  forall result:int.
+  (((true = true) and (result = 1)) or ((false = true) and (result = 2))) ->
+  (result = 1)
+
+goal p5_po_1:
+  (false = true) ->
+  false
+
+goal p6_po_1:
+  forall result:int.
+  ((true = false) and (result = 1)) ->
+  false
+
+goal p7_po_1:
+  forall x0:int.
+  forall x2:int.
+  ((x0 = 1) and (x2 = x0)) ->
+  (x2 = 1)
+
+goal p8_po_1:
+  forall x3:int.
+  forall x5:int.
+  forall result:int.
+  (((x3 = 1) and (result = x3)) and (x5 = x3)) ->
+  ((x5 = 1) and (result = 1))
+
+goal p9_po_1:
+  forall x6:int.
+  forall result:int.
+  ((x6 = 1) and (result = x6)) ->
+  ((x6 = 1) and (result = 1))
+
+goal p11_po_1:
+  forall x:int.
+  forall result:int.
+  ((x = 1) and (result = x)) ->
+  (result = 1)
+
+goal p13_po_1:
+  forall x10:int.
+  forall x11:int.
+  forall x8:int.
+  (((x8 = 2) and (x10 = x8)) and (x11 = x10)) ->
+  (x11 = 2)
+
+goal p13a_po_1:
+  forall x:int.
+  forall x12:int.
+  forall x13:int.
+  ((((x <> 1) and true) and (x13 = x)) or
+   ((((x = 1) and (x = 1)) and (x12 = 0)) and (x13 = x12))) ->
+  (x13 <> 1)
+
+goal p14_po_1:
+  forall x:int.
+  ((x <> 1) and ((x <> 2) and (x = 3))) ->
+  (x = 3)
+
+goal p15_po_1:
+  forall x:int.
+  forall x14:int.
+  forall x15:int.
+  forall x17:int.
+  forall x18:int.
+  forall result:int.
+  ((((x <> 0) and (((x14 = 0) and (result = x14)) and (x15 = x14))) and
+    (x17 = x15)) and
+   (x18 = x17)) ->
+  (result = 0)
+
+goal p16_po_1:
+  forall x:int.
+  forall x21:int.
+  ((x <> 0) and (x21 = x)) ->
+  (x21 <> 0)
+
+goal p16_po_2:
+  forall x:int.
+  forall x19:int.
+  forall x20:int.
+  forall x22:int.
+  forall x23:int.
+  ((((x = 0) and ((x19 = 1) and (x20 = x19))) and (x22 = x20)) and
+   (x23 = x22)) ->
+  (x23 = 1)
+
+goal p17_po_1:
+  forall x24:int.
+  forall x26:int.
+  ((x24 = 0) and (x26 = x24)) ->
+  (x26 = 0)
+

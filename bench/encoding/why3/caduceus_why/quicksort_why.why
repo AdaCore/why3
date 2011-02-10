@@ -1,0 +1,2305 @@
+theory Why2
+  use Tuple0
+  use int.Int
+  use int.ComputerDivision
+  use real.Real
+  use bool.Bool
+  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic eq_bool Bool.bool Bool.bool
+
+  logic neq_bool Bool.bool Bool.bool
+
+  logic lt_int int int
+
+  logic le_int int int
+
+  logic gt_int int int
+
+  logic ge_int int int
+
+  logic eq_int int int
+
+  logic neq_int int int
+
+  logic add_int int int : int
+
+  logic sub_int int int : int
+
+  logic mul_int int int : int
+
+  logic div_int int int : int
+
+  logic mod_int int int : int
+
+  logic neg_int int : int
+
+  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+
+  type farray 'a
+
+  logic access (farray 'a1) int : 'a1
+
+  logic update (farray 'a1) int 'a1 : (farray 'a1)
+
+  axiom Access_update:
+    (forall a:(farray 'a1).
+      (forall i:int.
+        (forall v:'a1. ((access (update a i v : (farray 'a1)) i : 'a1) = v))))
+
+  axiom Access_update_neq:
+    (forall a:(farray 'a1).
+      (forall i:int.
+        (forall j:int.
+          (forall v:'a1.
+            ((i <> j) ->
+             ((access (update a i v : (farray 'a1)) j : 'a1) = (access a j : 'a1)))))))
+
+  logic array_length (farray 'a1) : int
+
+  logic sorted_array (t : (farray int)) (i : int) (j : int) =
+    (forall k1:int.
+      (forall k2:int.
+        ((((Int.(<=) i k1) and (Int.(<=) k1 k2)) and (Int.(<=) k2 j)) ->
+         (Int.(<=) (access t k1 : int) (access t k2 : int)))))
+
+  logic exchange (a1 : (farray 'a1)) (a2 : (farray 'a1)) (i : int) (j : int) =
+    (((array_length a1 : int) = (array_length a2 : int)) and
+     (((access a1 i : 'a1) = (access a2 j : 'a1)) and
+      (((access a2 i : 'a1) = (access a1 j : 'a1)) and
+       (forall k:int.
+         (((k <> i) and (k <> j)) ->
+          ((access a1 k : 'a1) = (access a2 k : 'a1)))))))
+
+  logic permut (farray 'a1) (farray 'a1) int int
+
+  axiom Permut_refl:
+    (forall t:(farray 'a1). (forall l:int. (forall u:int. (permut t t l u))))
+
+  axiom Permut_sym:
+    (forall t1:(farray 'a1).
+      (forall t2:(farray 'a1).
+        (forall l:int.
+          (forall u:int. ((permut t1 t2 l u) -> (permut t2 t1 l u))))))
+
+  axiom Permut_trans:
+    (forall t1:(farray 'a1).
+      (forall t2:(farray 'a1).
+        (forall t3:(farray 'a1).
+          (forall l:int.
+            (forall u:int.
+              ((permut t1 t2 l u) ->
+               ((permut t2 t3 l u) -> (permut t1 t3 l u))))))))
+
+  axiom Permut_exchange:
+    (forall a1:(farray 'a1).
+      (forall a2:(farray 'a1).
+        (forall l:int.
+          (forall u:int.
+            (forall i:int.
+              (forall j:int.
+                (((Int.(<=) l i) and (Int.(<=) i u)) ->
+                 (((Int.(<=) l j) and (Int.(<=) j u)) ->
+                  ((exchange a1 a2 i j) -> (permut a1 a2 l u))))))))))
+
+  axiom Exchange_upd:
+    (forall a:(farray 'a1).
+      (forall i:int.
+        (forall j:int.
+          (exchange a (update (update a i (access a j : 'a1) : (farray 'a1)) j (access a i : 'a1) : (farray 'a1)) i j))))
+
+  axiom Permut_weakening:
+    (forall a1:(farray 'a1).
+      (forall a2:(farray 'a1).
+        (forall l1:int.
+          (forall r1:int.
+            (forall l2:int.
+              (forall r2:int.
+                ((((Int.(<=) l1 l2) and (Int.(<=) l2 r2)) and
+                  (Int.(<=) r2 r1)) ->
+                 ((permut a1 a2 l2 r2) -> (permut a1 a2 l1 r1)))))))))
+
+  axiom Permut_eq:
+    (forall a1:(farray 'a1).
+      (forall a2:(farray 'a1).
+        (forall l:int.
+          (forall u:int.
+            ((Int.(<=) l u) ->
+             ((permut a1 a2 l u) ->
+              (forall i:int.
+                (((Int.(<) i l) or (Int.(<) u i)) ->
+                 ((access a2 i : 'a1) = (access a1 i : 'a1))))))))))
+
+  logic permutation (a1 : (farray 'a1)) (a2 : (farray 'a1)) =
+    (permut a1 a2 0 (Int.(-) (array_length a1 : int) 1 : int))
+
+  axiom Array_length_update:
+    (forall a:(farray 'a1).
+      (forall i:int.
+        (forall v:'a1.
+          ((array_length (update a i v : (farray 'a1)) : int) = (array_length a : int)))))
+
+  axiom Permut_array_length:
+    (forall a1:(farray 'a1).
+      (forall a2:(farray 'a1).
+        (forall l:int.
+          (forall u:int.
+            ((permut a1 a2 l u) ->
+             ((array_length a1 : int) = (array_length a2 : int)))))))
+
+  goal Swap_po_1:
+    (forall i:int.
+      (forall j:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) and
+            ((Int.(<=) 0 j) and (Int.(<) j (array_length t : int)))) ->
+           (Int.(<=) 0 i)))))
+
+  goal Swap_po_2:
+    (forall i:int.
+      (forall j:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) and
+            ((Int.(<=) 0 j) and (Int.(<) j (array_length t : int)))) ->
+           (Int.(<) i (array_length t : int))))))
+
+  goal Swap_po_3:
+    (forall i:int.
+      (forall j:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) and
+            ((Int.(<=) 0 j) and (Int.(<) j (array_length t : int)))) ->
+           (((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t i : int)) -> (Int.(<=) 0 j))))))))
+
+  goal Swap_po_4:
+    (forall i:int.
+      (forall j:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) and
+            ((Int.(<=) 0 j) and (Int.(<) j (array_length t : int)))) ->
+           (((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t i : int)) ->
+               (Int.(<) j (array_length t : int)))))))))
+
+  goal Swap_po_5:
+    (forall i:int.
+      (forall j:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) and
+            ((Int.(<=) 0 j) and (Int.(<) j (array_length t : int)))) ->
+           (((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t i : int)) ->
+               (((Int.(<=) 0 j) and (Int.(<) j (array_length t : int))) ->
+                (forall result0:int.
+                  ((result0 = (access t j : int)) ->
+                   (((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) ->
+                    (forall t0:(farray int).
+                      ((t0 = (update t i result0 : (farray int))) ->
+                       (Int.(<) j (array_length t0 : int)))))))))))))))
+
+  goal Swap_po_6:
+    (forall i:int.
+      (forall j:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) and
+            ((Int.(<=) 0 j) and (Int.(<) j (array_length t : int)))) ->
+           (((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t i : int)) ->
+               (((Int.(<=) 0 j) and (Int.(<) j (array_length t : int))) ->
+                (forall result0:int.
+                  ((result0 = (access t j : int)) ->
+                   (((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) ->
+                    (forall t0:(farray int).
+                      ((t0 = (update t i result0 : (farray int))) ->
+                       (((Int.(<=) 0 j) and
+                         (Int.(<) j (array_length t0 : int))) ->
+                        (forall t1:(farray int).
+                          ((t1 = (update t0 j result : (farray int))) ->
+                           (exchange t1 t i j)))))))))))))))))
+
+  logic array_le (a : (farray int)) (l : int) (r : int) (v : int) =
+    (forall i:int.
+      (((Int.(<=) l i) and (Int.(<=) i r)) -> (Int.(<=) (access a i : int) v)))
+
+  logic array_ge (a : (farray int)) (l : int) (r : int) (v : int) =
+    (forall i:int.
+      (((Int.(<=) l i) and (Int.(<=) i r)) -> (Int.(<=) v (access a i : int))))
+
+  logic partition_p (a : (farray int)) (l : int) (r : int) (p : int) =
+    (((Int.(<=) l p) and (Int.(<=) p r)) and
+     ((array_le a l (Int.(-) p 1 : int) (access a p : int)) and
+      (array_ge a (Int.(+) p 1 : int) r (access a p : int))))
+
+  goal Partition_po_1:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (Int.(<=) 0 l)))))
+
+  goal Partition_po_2:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (Int.(<) l (array_length t : int))))))
+
+  goal Partition_po_3:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (Int.(<=) (Int.(+) l 1 : int) (Int.(+) l 1 : int)))))))))
+
+  goal Partition_po_4:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (Int.(<=) (Int.(+) l 1 : int) r))))))))
+
+  goal Partition_po_5:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) -> (Int.(<=) r r))))))))
+
+  goal Partition_po_6:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (array_le t (Int.(+) l 1 : int) (Int.(-) (Int.(+) l 1 : int) 1 : int) result))))))))
+
+  goal Partition_po_7:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (array_ge t (Int.(+) r 1 : int) r result))))))))
+
+  goal Partition_po_8:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) -> (permut t t l r))))))))
+
+  goal Partition_po_9:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) -> (Int.(<=) i i)))))))))))))
+
+  goal Partition_po_10:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) -> (Int.(<=) i r)))))))))))))
+
+  goal Partition_po_11:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result)))))))))))))
+
+  goal Partition_po_12:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (Int.(<=) 0 i0)))))))))))))))
+
+  goal Partition_po_13:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (Int.(<) i0 (array_length t0 : int))))))))))))))))
+
+  goal Partition_po_14:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(<=) result0 result) and (Int.(<) i0 j)) ->
+                               (forall i1:int.
+                                 ((i1 = (Int.(+) i0 1 : int)) ->
+                                  (Int.(<=) i i1)))))))))))))))))))))
+
+  goal Partition_po_15:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(<=) result0 result) and (Int.(<) i0 j)) ->
+                               (forall i1:int.
+                                 ((i1 = (Int.(+) i0 1 : int)) ->
+                                  (Int.(<=) i1 r)))))))))))))))))))))
+
+  goal Partition_po_16:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(<=) result0 result) and (Int.(<) i0 j)) ->
+                               (forall i1:int.
+                                 ((i1 = (Int.(+) i0 1 : int)) ->
+                                  (array_le t0 (Int.(+) l 1 : int) (Int.(-) i1 1 : int) result)))))))))))))))))))))
+
+  goal Partition_po_17:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(<=) result0 result) and (Int.(<) i0 j)) ->
+                               (forall i1:int.
+                                 ((i1 = (Int.(+) i0 1 : int)) ->
+                                  (Int.(<=) 0 (Int.(-) r i0 : int))))))))))))))))))))))
+
+  goal Partition_po_18:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(<=) result0 result) and (Int.(<) i0 j)) ->
+                               (forall i1:int.
+                                 ((i1 = (Int.(+) i0 1 : int)) ->
+                                  (Int.(<) (Int.(-) r i1 : int) (Int.(-) r i0 : int))))))))))))))))))))))
+
+  goal Partition_po_19:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (Int.(<=) l j)))))))))))))))))))
+
+  goal Partition_po_20:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (Int.(<=) j j)))))))))))))))))))
+
+  goal Partition_po_21:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (array_ge t0 (Int.(+) j 1 : int) r result)))))))))))))))))))
+
+  goal Partition_po_22:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (Int.(<=) 0 j0)))))))))))))))))))))
+
+  goal Partition_po_23:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (Int.(<) j0 (array_length t0 : int))))))))))))))))))))))
+
+  goal Partition_po_24:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(>=) result1 result) and
+                                        (Int.(<) i0 j0)) ->
+                                       (forall j1:int.
+                                         ((j1 = (Int.(-) j0 1 : int)) ->
+                                          (Int.(<=) l j1)))))))))))))))))))))))))))
+
+  goal Partition_po_25:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(>=) result1 result) and
+                                        (Int.(<) i0 j0)) ->
+                                       (forall j1:int.
+                                         ((j1 = (Int.(-) j0 1 : int)) ->
+                                          (Int.(<=) j1 j)))))))))))))))))))))))))))
+
+  goal Partition_po_26:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(>=) result1 result) and
+                                        (Int.(<) i0 j0)) ->
+                                       (forall j1:int.
+                                         ((j1 = (Int.(-) j0 1 : int)) ->
+                                          (array_ge t0 (Int.(+) j1 1 : int) r result)))))))))))))))))))))))))))
+
+  goal Partition_po_27:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(>=) result1 result) and
+                                        (Int.(<) i0 j0)) ->
+                                       (forall j1:int.
+                                         ((j1 = (Int.(-) j0 1 : int)) ->
+                                          (Int.(<) j1 j0)))))))))))))))))))))))))))
+
+  goal Partition_po_28:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(<) i0 j0) ->
+                                        ((((Int.(<=) 0 i0) and
+                                           (Int.(<) i0 (array_length t0 : int))) and
+                                          ((Int.(<=) 0 j0) and
+                                           (Int.(<) j0 (array_length t0 : int)))) ->
+                                         (forall t1:(farray int).
+                                           ((exchange t1 t0 i0 j0) ->
+                                            (forall i1:int.
+                                              ((i1 = (Int.(+) i0 1 : int)) ->
+                                               (forall j1:int.
+                                                 ((j1 = (Int.(-) j0 1 : int)) ->
+                                                  (Int.(<=) (Int.(+) l 1 : int) i1)))))))))))))))))))))))))))))))))
+
+  goal Partition_po_29:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(<) i0 j0) ->
+                                        ((((Int.(<=) 0 i0) and
+                                           (Int.(<) i0 (array_length t0 : int))) and
+                                          ((Int.(<=) 0 j0) and
+                                           (Int.(<) j0 (array_length t0 : int)))) ->
+                                         (forall t1:(farray int).
+                                           ((exchange t1 t0 i0 j0) ->
+                                            (forall i1:int.
+                                              ((i1 = (Int.(+) i0 1 : int)) ->
+                                               (forall j1:int.
+                                                 ((j1 = (Int.(-) j0 1 : int)) ->
+                                                  (Int.(<=) i1 r)))))))))))))))))))))))))))))))))
+
+  goal Partition_po_30:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(<) i0 j0) ->
+                                        ((((Int.(<=) 0 i0) and
+                                           (Int.(<) i0 (array_length t0 : int))) and
+                                          ((Int.(<=) 0 j0) and
+                                           (Int.(<) j0 (array_length t0 : int)))) ->
+                                         (forall t1:(farray int).
+                                           ((exchange t1 t0 i0 j0) ->
+                                            (forall i1:int.
+                                              ((i1 = (Int.(+) i0 1 : int)) ->
+                                               (forall j1:int.
+                                                 ((j1 = (Int.(-) j0 1 : int)) ->
+                                                  (Int.(<=) j1 r)))))))))))))))))))))))))))))))))
+
+  goal Partition_po_31:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(<) i0 j0) ->
+                                        ((((Int.(<=) 0 i0) and
+                                           (Int.(<) i0 (array_length t0 : int))) and
+                                          ((Int.(<=) 0 j0) and
+                                           (Int.(<) j0 (array_length t0 : int)))) ->
+                                         (forall t1:(farray int).
+                                           ((exchange t1 t0 i0 j0) ->
+                                            (forall i1:int.
+                                              ((i1 = (Int.(+) i0 1 : int)) ->
+                                               (forall j1:int.
+                                                 ((j1 = (Int.(-) j0 1 : int)) ->
+                                                  (array_le t1 (Int.(+) l 1 : int) (Int.(-) i1 1 : int) result)))))))))))))))))))))))))))))))))
+
+  goal Partition_po_32:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(<) i0 j0) ->
+                                        ((((Int.(<=) 0 i0) and
+                                           (Int.(<) i0 (array_length t0 : int))) and
+                                          ((Int.(<=) 0 j0) and
+                                           (Int.(<) j0 (array_length t0 : int)))) ->
+                                         (forall t1:(farray int).
+                                           ((exchange t1 t0 i0 j0) ->
+                                            (forall i1:int.
+                                              ((i1 = (Int.(+) i0 1 : int)) ->
+                                               (forall j1:int.
+                                                 ((j1 = (Int.(-) j0 1 : int)) ->
+                                                  (array_ge t1 (Int.(+) j1 1 : int) r result)))))))))))))))))))))))))))))))))
+
+  goal Partition_po_33:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(<) i0 j0) ->
+                                        ((((Int.(<=) 0 i0) and
+                                           (Int.(<) i0 (array_length t0 : int))) and
+                                          ((Int.(<=) 0 j0) and
+                                           (Int.(<) j0 (array_length t0 : int)))) ->
+                                         (forall t1:(farray int).
+                                           ((exchange t1 t0 i0 j0) ->
+                                            (forall i1:int.
+                                              ((i1 = (Int.(+) i0 1 : int)) ->
+                                               (forall j1:int.
+                                                 ((j1 = (Int.(-) j0 1 : int)) ->
+                                                  (permut t1 t l r)))))))))))))))))))))))))))))))))
+
+  goal Partition_po_34:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(<) i0 j0) ->
+                                        ((((Int.(<=) 0 i0) and
+                                           (Int.(<) i0 (array_length t0 : int))) and
+                                          ((Int.(<=) 0 j0) and
+                                           (Int.(<) j0 (array_length t0 : int)))) ->
+                                         (forall t1:(farray int).
+                                           ((exchange t1 t0 i0 j0) ->
+                                            (forall i1:int.
+                                              ((i1 = (Int.(+) i0 1 : int)) ->
+                                               (forall j1:int.
+                                                 ((j1 = (Int.(-) j0 1 : int)) ->
+                                                  ((access t1 l : int) = (access t l : int))))))))))))))))))))))))))))))))))
+
+  goal Partition_po_35:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(<) i0 j0) ->
+                                        ((((Int.(<=) 0 i0) and
+                                           (Int.(<) i0 (array_length t0 : int))) and
+                                          ((Int.(<=) 0 j0) and
+                                           (Int.(<) j0 (array_length t0 : int)))) ->
+                                         (forall t1:(farray int).
+                                           ((exchange t1 t0 i0 j0) ->
+                                            (forall i1:int.
+                                              ((i1 = (Int.(+) i0 1 : int)) ->
+                                               (forall j1:int.
+                                                 ((j1 = (Int.(-) j0 1 : int)) ->
+                                                  (Int.(<=) 0 (Int.(-) (Int.(+) (Int.(+) (array_length t0 : int) 2 : int) j : int) i : int))))))))))))))))))))))))))))))))))
+
+  goal Partition_po_36:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(<) i0 j0) ->
+                                        ((((Int.(<=) 0 i0) and
+                                           (Int.(<) i0 (array_length t0 : int))) and
+                                          ((Int.(<=) 0 j0) and
+                                           (Int.(<) j0 (array_length t0 : int)))) ->
+                                         (forall t1:(farray int).
+                                           ((exchange t1 t0 i0 j0) ->
+                                            (forall i1:int.
+                                              ((i1 = (Int.(+) i0 1 : int)) ->
+                                               (forall j1:int.
+                                                 ((j1 = (Int.(-) j0 1 : int)) ->
+                                                  (Int.(<) (Int.(-) (Int.(+) (Int.(+) (array_length t1 : int) 2 : int) j1 : int) i1 : int) (Int.(-) (Int.(+) (Int.(+) (array_length t0 : int) 2 : int) j : int) i : int))))))))))))))))))))))))))))))))))
+
+  goal Partition_po_37:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(>=) i0 j0) ->
+                                        (Int.(<=) (Int.(+) l 1 : int) i0))))))))))))))))))))))))))
+
+  goal Partition_po_38:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(>=) i0 j0) -> (Int.(<=) i0 r))))))))))))))))))))))))))
+
+  goal Partition_po_39:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(>=) i0 j0) -> (Int.(<=) j0 r))))))))))))))))))))))))))
+
+  goal Partition_po_40:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(>=) i0 j0) -> (permut t0 t l r))))))))))))))))))))))))))
+
+  goal Partition_po_41:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(>=) i0 j0) ->
+                                        ((access t0 l : int) = (access t l : int)))))))))))))))))))))))))))
+
+  goal Partition_po_42:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(>=) i0 j0) ->
+                                        (Int.(<=) 0 (Int.(-) (Int.(+) (Int.(+) (array_length t0 : int) 2 : int) j : int) i : int)))))))))))))))))))))))))))
+
+  goal Partition_po_43:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(<) i j) ->
+                       (forall i0:int.
+                         ((((Int.(<=) i i0) and (Int.(<=) i0 r)) and
+                           (array_le t0 (Int.(+) l 1 : int) (Int.(-) i0 1 : int) result)) ->
+                          (((Int.(<=) 0 i0) and
+                            (Int.(<) i0 (array_length t0 : int))) ->
+                           (forall result0:int.
+                             ((result0 = (access t0 i0 : int)) ->
+                              (((Int.(>) result0 result) or
+                                ((Int.(<=) result0 result) and
+                                 (Int.(>=) i0 j))) ->
+                               (forall j0:int.
+                                 ((((Int.(<=) l j0) and (Int.(<=) j0 j)) and
+                                   (array_ge t0 (Int.(+) j0 1 : int) r result)) ->
+                                  (((Int.(<=) 0 j0) and
+                                    (Int.(<) j0 (array_length t0 : int))) ->
+                                   (forall result1:int.
+                                     ((result1 = (access t0 j0 : int)) ->
+                                      (((Int.(<) result1 result) or
+                                        ((Int.(>=) result1 result) and
+                                         (Int.(>=) i0 j0))) ->
+                                       ((Int.(>=) i0 j0) ->
+                                        (Int.(<) (Int.(-) (Int.(+) (Int.(+) (array_length t0 : int) 2 : int) j0 : int) i0 : int) (Int.(-) (Int.(+) (Int.(+) (array_length t0 : int) 2 : int) j : int) i : int)))))))))))))))))))))))))))
+
+  goal Partition_po_44:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(>=) i j) -> (Int.(<=) 0 i)))))))))))))
+
+  goal Partition_po_45:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(>=) i j) -> (Int.(<) i (array_length t0 : int))))))))))))))
+
+  goal Partition_po_46:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(>=) i j) ->
+                       (((Int.(<=) 0 i) and
+                         (Int.(<) i (array_length t0 : int))) ->
+                        (forall result0:int.
+                          ((result0 = (access t0 i : int)) ->
+                           ((Int.(<) result0 result) ->
+                            (Int.(<) l (array_length t0 : int))))))))))))))))))
+
+  goal Partition_po_47:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(>=) i j) ->
+                       (((Int.(<=) 0 i) and
+                         (Int.(<) i (array_length t0 : int))) ->
+                        (forall result0:int.
+                          ((result0 = (access t0 i : int)) ->
+                           ((Int.(<) result0 result) ->
+                            ((((Int.(<=) 0 l) and
+                               (Int.(<) l (array_length t0 : int))) and
+                              ((Int.(<=) 0 i) and
+                               (Int.(<) i (array_length t0 : int)))) ->
+                             (forall t1:(farray int).
+                               ((exchange t1 t0 l i) -> (Int.(<=) l i))))))))))))))))))))
+
+  goal Partition_po_48:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(>=) i j) ->
+                       (((Int.(<=) 0 i) and
+                         (Int.(<) i (array_length t0 : int))) ->
+                        (forall result0:int.
+                          ((result0 = (access t0 i : int)) ->
+                           ((Int.(<) result0 result) ->
+                            ((((Int.(<=) 0 l) and
+                               (Int.(<) l (array_length t0 : int))) and
+                              ((Int.(<=) 0 i) and
+                               (Int.(<) i (array_length t0 : int)))) ->
+                             (forall t1:(farray int).
+                               ((exchange t1 t0 l i) -> (Int.(<=) i r))))))))))))))))))))
+
+  goal Partition_po_49:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(>=) i j) ->
+                       (((Int.(<=) 0 i) and
+                         (Int.(<) i (array_length t0 : int))) ->
+                        (forall result0:int.
+                          ((result0 = (access t0 i : int)) ->
+                           ((Int.(<) result0 result) ->
+                            ((((Int.(<=) 0 l) and
+                               (Int.(<) l (array_length t0 : int))) and
+                              ((Int.(<=) 0 i) and
+                               (Int.(<) i (array_length t0 : int)))) ->
+                             (forall t1:(farray int).
+                               ((exchange t1 t0 l i) ->
+                                (partition_p t1 l r i))))))))))))))))))))
+
+  goal Partition_po_50:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(>=) i j) ->
+                       (((Int.(<=) 0 i) and
+                         (Int.(<) i (array_length t0 : int))) ->
+                        (forall result0:int.
+                          ((result0 = (access t0 i : int)) ->
+                           ((Int.(<) result0 result) ->
+                            ((((Int.(<=) 0 l) and
+                               (Int.(<) l (array_length t0 : int))) and
+                              ((Int.(<=) 0 i) and
+                               (Int.(<) i (array_length t0 : int)))) ->
+                             (forall t1:(farray int).
+                               ((exchange t1 t0 l i) -> (permut t1 t l r))))))))))))))))))))
+
+  goal Partition_po_51:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(>=) i j) ->
+                       (((Int.(<=) 0 i) and
+                         (Int.(<) i (array_length t0 : int))) ->
+                        (forall result0:int.
+                          ((result0 = (access t0 i : int)) ->
+                           ((Int.(>=) result0 result) ->
+                            (Int.(<) l (array_length t0 : int))))))))))))))))))
+
+  goal Partition_po_52:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(>=) i j) ->
+                       (((Int.(<=) 0 i) and
+                         (Int.(<) i (array_length t0 : int))) ->
+                        (forall result0:int.
+                          ((result0 = (access t0 i : int)) ->
+                           ((Int.(>=) result0 result) ->
+                            (Int.(<=) 0 (Int.(-) i 1 : int))))))))))))))))))
+
+  goal Partition_po_53:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(>=) i j) ->
+                       (((Int.(<=) 0 i) and
+                         (Int.(<) i (array_length t0 : int))) ->
+                        (forall result0:int.
+                          ((result0 = (access t0 i : int)) ->
+                           ((Int.(>=) result0 result) ->
+                            (Int.(<) (Int.(-) i 1 : int) (array_length t0 : int))))))))))))))))))
+
+  goal Partition_po_54:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(>=) i j) ->
+                       (((Int.(<=) 0 i) and
+                         (Int.(<) i (array_length t0 : int))) ->
+                        (forall result0:int.
+                          ((result0 = (access t0 i : int)) ->
+                           ((Int.(>=) result0 result) ->
+                            ((((Int.(<=) 0 l) and
+                               (Int.(<) l (array_length t0 : int))) and
+                              ((Int.(<=) 0 (Int.(-) i 1 : int)) and
+                               (Int.(<) (Int.(-) i 1 : int) (array_length t0 : int)))) ->
+                             (forall t1:(farray int).
+                               ((exchange t1 t0 l (Int.(-) i 1 : int)) ->
+                                (Int.(<=) l (Int.(-) i 1 : int)))))))))))))))))))))
+
+  goal Partition_po_55:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(>=) i j) ->
+                       (((Int.(<=) 0 i) and
+                         (Int.(<) i (array_length t0 : int))) ->
+                        (forall result0:int.
+                          ((result0 = (access t0 i : int)) ->
+                           ((Int.(>=) result0 result) ->
+                            ((((Int.(<=) 0 l) and
+                               (Int.(<) l (array_length t0 : int))) and
+                              ((Int.(<=) 0 (Int.(-) i 1 : int)) and
+                               (Int.(<) (Int.(-) i 1 : int) (array_length t0 : int)))) ->
+                             (forall t1:(farray int).
+                               ((exchange t1 t0 l (Int.(-) i 1 : int)) ->
+                                (Int.(<=) (Int.(-) i 1 : int) r))))))))))))))))))))
+
+  goal Partition_po_56:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(>=) i j) ->
+                       (((Int.(<=) 0 i) and
+                         (Int.(<) i (array_length t0 : int))) ->
+                        (forall result0:int.
+                          ((result0 = (access t0 i : int)) ->
+                           ((Int.(>=) result0 result) ->
+                            ((((Int.(<=) 0 l) and
+                               (Int.(<) l (array_length t0 : int))) and
+                              ((Int.(<=) 0 (Int.(-) i 1 : int)) and
+                               (Int.(<) (Int.(-) i 1 : int) (array_length t0 : int)))) ->
+                             (forall t1:(farray int).
+                               ((exchange t1 t0 l (Int.(-) i 1 : int)) ->
+                                (partition_p t1 l r (Int.(-) i 1 : int)))))))))))))))))))))
+
+  goal Partition_po_57:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+            (Int.(<) r (array_length t : int))) ->
+           (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (forall result:int.
+              ((result = (access t l : int)) ->
+               (forall i:int.
+                 (forall j:int.
+                   (forall t0:(farray int).
+                     ((((Int.(<=) (Int.(+) l 1 : int) i) and (Int.(<=) i r)) and
+                       ((Int.(<=) j r) and
+                        ((array_le t0 (Int.(+) l 1 : int) (Int.(-) i 1 : int) result) and
+                         ((array_ge t0 (Int.(+) j 1 : int) r result) and
+                          ((permut t0 t l r) and
+                           ((access t0 l : int) = (access t l : int))))))) ->
+                      ((Int.(>=) i j) ->
+                       (((Int.(<=) 0 i) and
+                         (Int.(<) i (array_length t0 : int))) ->
+                        (forall result0:int.
+                          ((result0 = (access t0 i : int)) ->
+                           ((Int.(>=) result0 result) ->
+                            ((((Int.(<=) 0 l) and
+                               (Int.(<) l (array_length t0 : int))) and
+                              ((Int.(<=) 0 (Int.(-) i 1 : int)) and
+                               (Int.(<) (Int.(-) i 1 : int) (array_length t0 : int)))) ->
+                             (forall t1:(farray int).
+                               ((exchange t1 t0 l (Int.(-) i 1 : int)) ->
+                                (permut t1 t l r))))))))))))))))))))
+
+  goal Quick_rec_po_1:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+           ((Int.(<) l r) ->
+            ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+              (Int.(<) r (array_length t : int))) ->
+             (forall result:int.
+               (forall t0:(farray int).
+                 ((((Int.(<=) l result) and (Int.(<=) result r)) and
+                   ((partition_p t0 l r result) and (permut t0 t l r))) ->
+                  (Int.(<=) 0 (Int.(-) r l : int)))))))))))
+
+  goal Quick_rec_po_2:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+           ((Int.(<) l r) ->
+            ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+              (Int.(<) r (array_length t : int))) ->
+             (forall result:int.
+               (forall t0:(farray int).
+                 ((((Int.(<=) l result) and (Int.(<=) result r)) and
+                   ((partition_p t0 l r result) and (permut t0 t l r))) ->
+                  (Int.(<) (Int.(-) (Int.(-) result 1 : int) l : int) (Int.(-) r l : int)))))))))))
+
+  goal Quick_rec_po_3:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+           ((Int.(<) l r) ->
+            ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+              (Int.(<) r (array_length t : int))) ->
+             (forall result:int.
+               (forall t0:(farray int).
+                 ((((Int.(<=) l result) and (Int.(<=) result r)) and
+                   ((partition_p t0 l r result) and (permut t0 t l r))) ->
+                  (((Int.(<=) 0 (Int.(-) r l : int)) and
+                    (Int.(<) (Int.(-) (Int.(-) result 1 : int) l : int) (Int.(-) r l : int))) ->
+                   (Int.(<) (Int.(-) result 1 : int) (array_length t0 : int))))))))))))
+
+  goal Quick_rec_po_4:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+           ((Int.(<) l r) ->
+            ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+              (Int.(<) r (array_length t : int))) ->
+             (forall result:int.
+               (forall t0:(farray int).
+                 ((((Int.(<=) l result) and (Int.(<=) result r)) and
+                   ((partition_p t0 l r result) and (permut t0 t l r))) ->
+                  (((Int.(<=) 0 (Int.(-) r l : int)) and
+                    (Int.(<) (Int.(-) (Int.(-) result 1 : int) l : int) (Int.(-) r l : int))) ->
+                   (((Int.(<=) 0 l) and
+                     (Int.(<) (Int.(-) result 1 : int) (array_length t0 : int))) ->
+                    (forall t1:(farray int).
+                      (((sorted_array t1 l (Int.(-) result 1 : int)) and
+                        (permut t1 t0 l (Int.(-) result 1 : int))) ->
+                       (Int.(<=) 0 (Int.(-) r l : int)))))))))))))))
+
+  goal Quick_rec_po_5:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+           ((Int.(<) l r) ->
+            ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+              (Int.(<) r (array_length t : int))) ->
+             (forall result:int.
+               (forall t0:(farray int).
+                 ((((Int.(<=) l result) and (Int.(<=) result r)) and
+                   ((partition_p t0 l r result) and (permut t0 t l r))) ->
+                  (((Int.(<=) 0 (Int.(-) r l : int)) and
+                    (Int.(<) (Int.(-) (Int.(-) result 1 : int) l : int) (Int.(-) r l : int))) ->
+                   (((Int.(<=) 0 l) and
+                     (Int.(<) (Int.(-) result 1 : int) (array_length t0 : int))) ->
+                    (forall t1:(farray int).
+                      (((sorted_array t1 l (Int.(-) result 1 : int)) and
+                        (permut t1 t0 l (Int.(-) result 1 : int))) ->
+                       (Int.(<) (Int.(-) r (Int.(+) result 1 : int) : int) (Int.(-) r l : int)))))))))))))))
+
+  goal Quick_rec_po_6:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+           ((Int.(<) l r) ->
+            ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+              (Int.(<) r (array_length t : int))) ->
+             (forall result:int.
+               (forall t0:(farray int).
+                 ((((Int.(<=) l result) and (Int.(<=) result r)) and
+                   ((partition_p t0 l r result) and (permut t0 t l r))) ->
+                  (((Int.(<=) 0 (Int.(-) r l : int)) and
+                    (Int.(<) (Int.(-) (Int.(-) result 1 : int) l : int) (Int.(-) r l : int))) ->
+                   (((Int.(<=) 0 l) and
+                     (Int.(<) (Int.(-) result 1 : int) (array_length t0 : int))) ->
+                    (forall t1:(farray int).
+                      (((sorted_array t1 l (Int.(-) result 1 : int)) and
+                        (permut t1 t0 l (Int.(-) result 1 : int))) ->
+                       (((Int.(<=) 0 (Int.(-) r l : int)) and
+                         (Int.(<) (Int.(-) r (Int.(+) result 1 : int) : int) (Int.(-) r l : int))) ->
+                        (Int.(<=) 0 (Int.(+) result 1 : int))))))))))))))))
+
+  goal Quick_rec_po_7:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+           ((Int.(<) l r) ->
+            ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+              (Int.(<) r (array_length t : int))) ->
+             (forall result:int.
+               (forall t0:(farray int).
+                 ((((Int.(<=) l result) and (Int.(<=) result r)) and
+                   ((partition_p t0 l r result) and (permut t0 t l r))) ->
+                  (((Int.(<=) 0 (Int.(-) r l : int)) and
+                    (Int.(<) (Int.(-) (Int.(-) result 1 : int) l : int) (Int.(-) r l : int))) ->
+                   (((Int.(<=) 0 l) and
+                     (Int.(<) (Int.(-) result 1 : int) (array_length t0 : int))) ->
+                    (forall t1:(farray int).
+                      (((sorted_array t1 l (Int.(-) result 1 : int)) and
+                        (permut t1 t0 l (Int.(-) result 1 : int))) ->
+                       (((Int.(<=) 0 (Int.(-) r l : int)) and
+                         (Int.(<) (Int.(-) r (Int.(+) result 1 : int) : int) (Int.(-) r l : int))) ->
+                        (Int.(<) r (array_length t1 : int))))))))))))))))
+
+  goal Quick_rec_po_8:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+           ((Int.(<) l r) ->
+            ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+              (Int.(<) r (array_length t : int))) ->
+             (forall result:int.
+               (forall t0:(farray int).
+                 ((((Int.(<=) l result) and (Int.(<=) result r)) and
+                   ((partition_p t0 l r result) and (permut t0 t l r))) ->
+                  (((Int.(<=) 0 (Int.(-) r l : int)) and
+                    (Int.(<) (Int.(-) (Int.(-) result 1 : int) l : int) (Int.(-) r l : int))) ->
+                   (((Int.(<=) 0 l) and
+                     (Int.(<) (Int.(-) result 1 : int) (array_length t0 : int))) ->
+                    (forall t1:(farray int).
+                      (((sorted_array t1 l (Int.(-) result 1 : int)) and
+                        (permut t1 t0 l (Int.(-) result 1 : int))) ->
+                       (((Int.(<=) 0 (Int.(-) r l : int)) and
+                         (Int.(<) (Int.(-) r (Int.(+) result 1 : int) : int) (Int.(-) r l : int))) ->
+                        (((Int.(<=) 0 (Int.(+) result 1 : int)) and
+                          (Int.(<) r (array_length t1 : int))) ->
+                         (forall t2:(farray int).
+                           (((sorted_array t2 (Int.(+) result 1 : int) r) and
+                             (permut t2 t1 (Int.(+) result 1 : int) r)) ->
+                            (sorted_array t2 l r))))))))))))))))))
+
+  goal Quick_rec_po_9:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+           ((Int.(<) l r) ->
+            ((((Int.(<=) 0 l) and (Int.(<) l r)) and
+              (Int.(<) r (array_length t : int))) ->
+             (forall result:int.
+               (forall t0:(farray int).
+                 ((((Int.(<=) l result) and (Int.(<=) result r)) and
+                   ((partition_p t0 l r result) and (permut t0 t l r))) ->
+                  (((Int.(<=) 0 (Int.(-) r l : int)) and
+                    (Int.(<) (Int.(-) (Int.(-) result 1 : int) l : int) (Int.(-) r l : int))) ->
+                   (((Int.(<=) 0 l) and
+                     (Int.(<) (Int.(-) result 1 : int) (array_length t0 : int))) ->
+                    (forall t1:(farray int).
+                      (((sorted_array t1 l (Int.(-) result 1 : int)) and
+                        (permut t1 t0 l (Int.(-) result 1 : int))) ->
+                       (((Int.(<=) 0 (Int.(-) r l : int)) and
+                         (Int.(<) (Int.(-) r (Int.(+) result 1 : int) : int) (Int.(-) r l : int))) ->
+                        (((Int.(<=) 0 (Int.(+) result 1 : int)) and
+                          (Int.(<) r (array_length t1 : int))) ->
+                         (forall t2:(farray int).
+                           (((sorted_array t2 (Int.(+) result 1 : int) r) and
+                             (permut t2 t1 (Int.(+) result 1 : int) r)) ->
+                            (permut t2 t l r))))))))))))))))))
+
+  goal Quick_rec_po_10:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+           ((Int.(>=) l r) -> (sorted_array t l r))))))
+
+  goal Quick_rec_po_11:
+    (forall l:int.
+      (forall r:int.
+        (forall t:(farray int).
+          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+           ((Int.(>=) l r) -> (permut t t l r))))))
+
+  goal Quicksort_po_1:
+    (forall t:(farray int).
+      (forall result:int.
+        ((result = (array_length t : int)) -> (Int.(<=) 0 0))))
+
+  goal Quicksort_po_2:
+    (forall t:(farray int).
+      (forall result:int.
+        ((result = (array_length t : int)) ->
+         (Int.(<) (Int.(-) result 1 : int) (array_length t : int)))))
+
+  goal Quicksort_po_3:
+    (forall t:(farray int).
+      (forall result:int.
+        ((result = (array_length t : int)) ->
+         (((Int.(<=) 0 0) and
+           (Int.(<) (Int.(-) result 1 : int) (array_length t : int))) ->
+          (forall t0:(farray int).
+            (((sorted_array t0 0 (Int.(-) result 1 : int)) and
+              (permut t0 t 0 (Int.(-) result 1 : int))) ->
+             (sorted_array t0 0 (Int.(-) (array_length t0 : int) 1 : int))))))))
+
+  goal Quicksort_po_4:
+    (forall t:(farray int).
+      (forall result:int.
+        ((result = (array_length t : int)) ->
+         (((Int.(<=) 0 0) and
+           (Int.(<) (Int.(-) result 1 : int) (array_length t : int))) ->
+          (forall t0:(farray int).
+            (((sorted_array t0 0 (Int.(-) result 1 : int)) and
+              (permut t0 t 0 (Int.(-) result 1 : int))) ->
+             (permutation t0 t)))))))
+
+
+end

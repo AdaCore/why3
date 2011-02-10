@@ -1,0 +1,222 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+goal f91_po_1:
+  forall n:int.
+  (n <= 100) ->
+  (0 <= (101 - n))
+
+goal f91_po_2:
+  forall n:int.
+  (n <= 100) ->
+  ((101 - (n + 11)) < (101 - n))
+
+goal f91_po_3:
+  forall n:int.
+  (n <= 100) ->
+  ((0 <= (101 - n)) and ((101 - (n + 11)) < (101 - n))) ->
+  forall result:int.
+  ((((n + 11) <= 100) and (result = 91)) or
+   (((n + 11) >= 101) and (result = ((n + 11) - 10)))) ->
+  (0 <= (101 - n))
+
+goal f91_po_4:
+  forall n:int.
+  (n <= 100) ->
+  ((0 <= (101 - n)) and ((101 - (n + 11)) < (101 - n))) ->
+  forall result:int.
+  ((((n + 11) <= 100) and (result = 91)) or
+   (((n + 11) >= 101) and (result = ((n + 11) - 10)))) ->
+  ((101 - result) < (101 - n))
+
+goal f91_po_5:
+  forall n:int.
+  (n <= 100) ->
+  ((0 <= (101 - n)) and ((101 - (n + 11)) < (101 - n))) ->
+  forall result:int.
+  ((((n + 11) <= 100) and (result = 91)) or
+   (((n + 11) >= 101) and (result = ((n + 11) - 10)))) ->
+  ((0 <= (101 - n)) and ((101 - result) < (101 - n))) ->
+  forall result0:int.
+  (((result <= 100) and (result0 = 91)) or
+   ((result >= 101) and (result0 = (result - 10)))) ->
+  (((n <= 100) and (result0 = 91)) or ((n >= 101) and (result0 = (n - 10))))
+
+goal f91_po_6:
+  forall n:int.
+  (n > 100) ->
+  (((n <= 100) and ((n - 10) = 91)) or ((n >= 101) and ((n - 10) = (n - 10))))
+
+logic f : int -> int
+
+axiom f_def1: (forall x:int. ((x >= 101) -> (f(x) = (x - 10))))
+
+axiom f_def2: (forall x:int. ((x <= 101) -> (f(x) = 91)))
+
+logic iter_f : int, int -> int
+
+axiom iter_f_def1: (forall x:int. (iter_f(0, x) = x))
+
+axiom iter_f_def2:
+  (forall n:int.
+    (forall x:int. ((n > 0) -> (iter_f(n, x) = iter_f((n - 1), f(x))))))
+
+type pair_type
+
+logic pair : int, int -> pair_type
+
+inductive lex: pair_type, pair_type -> prop =
+  | lex_1: (forall x1:int.
+             (forall y1:int.
+               (forall x2:int.
+                 (forall y2:int.
+                   (((0 <= x2) and (x1 < x2)) -> lex(pair(x1, y1), pair(x2,
+                    y2)))))))
+  | lex_2: (forall x:int.
+             (forall y1:int.
+               (forall y2:int.
+                 (((0 <= y2) and (y1 < y2)) -> lex(pair(x, y1), pair(x, y2))))))
+
+
+
+goal f91_nonrec_po_1:
+  forall n:int.
+  (n >= 1) ->
+  false (* was well_founded(...) *)
+
+goal f91_nonrec_po_2:
+  forall n:int.
+  (n >= 1) ->
+  (n >= 0)
+
+goal f91_nonrec_po_3:
+  forall n:int.
+  forall x:int.
+  (n >= 1) ->
+  forall n0:int.
+  forall x0:int.
+  ((n0 >= 0) and (iter_f(n0, x0) = iter_f(n, x))) ->
+  (n0 > 0) ->
+  (x0 > 100) ->
+  forall x1:int.
+  (x1 = (x0 - 10)) ->
+  forall n1:int.
+  (n1 = (n0 - 1)) ->
+  (n1 >= 0)
+
+goal f91_nonrec_po_4:
+  forall n:int.
+  forall x:int.
+  (n >= 1) ->
+  forall n0:int.
+  forall x0:int.
+  ((n0 >= 0) and (iter_f(n0, x0) = iter_f(n, x))) ->
+  (n0 > 0) ->
+  (x0 > 100) ->
+  forall x1:int.
+  (x1 = (x0 - 10)) ->
+  forall n1:int.
+  (n1 = (n0 - 1)) ->
+  (iter_f(n1, x1) = iter_f(n, x))
+
+goal f91_nonrec_po_5:
+  forall n:int.
+  forall x:int.
+  (n >= 1) ->
+  forall n0:int.
+  forall x0:int.
+  ((n0 >= 0) and (iter_f(n0, x0) = iter_f(n, x))) ->
+  (n0 > 0) ->
+  (x0 > 100) ->
+  forall x1:int.
+  (x1 = (x0 - 10)) ->
+  forall n1:int.
+  (n1 = (n0 - 1)) ->
+  lex(pair(((101 - x1) + (10 * n1)), n1), pair(((101 - x0) + (10 * n0)), n0))
+
+goal f91_nonrec_po_6:
+  forall n:int.
+  forall x:int.
+  (n >= 1) ->
+  forall n0:int.
+  forall x0:int.
+  ((n0 >= 0) and (iter_f(n0, x0) = iter_f(n, x))) ->
+  (n0 > 0) ->
+  (x0 <= 100) ->
+  forall x1:int.
+  (x1 = (x0 + 11)) ->
+  forall n1:int.
+  (n1 = (n0 + 1)) ->
+  (n1 >= 0)
+
+goal f91_nonrec_po_7:
+  forall n:int.
+  forall x:int.
+  (n >= 1) ->
+  forall n0:int.
+  forall x0:int.
+  ((n0 >= 0) and (iter_f(n0, x0) = iter_f(n, x))) ->
+  (n0 > 0) ->
+  (x0 <= 100) ->
+  forall x1:int.
+  (x1 = (x0 + 11)) ->
+  forall n1:int.
+  (n1 = (n0 + 1)) ->
+  (iter_f(n1, x1) = iter_f(n, x))
+
+goal f91_nonrec_po_8:
+  forall n:int.
+  forall x:int.
+  (n >= 1) ->
+  forall n0:int.
+  forall x0:int.
+  ((n0 >= 0) and (iter_f(n0, x0) = iter_f(n, x))) ->
+  (n0 > 0) ->
+  (x0 <= 100) ->
+  forall x1:int.
+  (x1 = (x0 + 11)) ->
+  forall n1:int.
+  (n1 = (n0 + 1)) ->
+  lex(pair(((101 - x1) + (10 * n1)), n1), pair(((101 - x0) + (10 * n0)), n0))
+
+goal f91_nonrec_po_9:
+  forall n:int.
+  forall x:int.
+  (n >= 1) ->
+  forall n0:int.
+  forall x0:int.
+  ((n0 >= 0) and (iter_f(n0, x0) = iter_f(n, x))) ->
+  (n0 <= 0) ->
+  (x0 = iter_f(n, x))
+

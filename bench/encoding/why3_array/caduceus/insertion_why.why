@@ -1,0 +1,2630 @@
+theory Why2
+use array.Array as A
+  use Tuple0
+  use int.Int
+  use int.ComputerDivision
+  use real.Real
+  use bool.Bool
+  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic eq_bool Bool.bool Bool.bool
+
+  logic neq_bool Bool.bool Bool.bool
+
+  logic lt_int int int
+
+  logic le_int int int
+
+  logic gt_int int int
+
+  logic ge_int int int
+
+  logic eq_int int int
+
+  logic neq_int int int
+
+  logic add_int int int : int
+
+  logic sub_int int int : int
+
+  logic mul_int int int : int
+
+  logic div_int int int : int
+
+  logic mod_int int int : int
+
+  logic neg_int int : int
+
+  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+
+  logic bw_compl int : int
+
+  logic bw_and int int : int
+
+  logic bw_xor int int : int
+
+  logic bw_or int int : int
+
+  logic lsl int int : int
+
+  logic lsr int int : int
+
+  type pointer 'z
+
+  type addr 'z
+
+  type alloc_table
+
+  logic block_length alloc_table (pointer 'a1) : int
+
+  logic base_addr (pointer 'a1) : (addr 'a1)
+
+  logic offset (pointer 'a1) : int
+
+  logic shift (pointer 'a1) int : (pointer 'a1)
+
+  logic sub_pointer (pointer 'a1) (pointer 'a1) : int
+
+  logic lt_pointer (p1 : (pointer 'a1)) (p2 : (pointer 'a1)) =
+    (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) and
+     (Int.(<) (offset p1 : int) (offset p2 : int)))
+
+  logic le_pointer (p1 : (pointer 'a1)) (p2 : (pointer 'a1)) =
+    (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) and
+     (Int.(<=) (offset p1 : int) (offset p2 : int)))
+
+  logic gt_pointer (p1 : (pointer 'a1)) (p2 : (pointer 'a1)) =
+    (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) and
+     (Int.(>) (offset p1 : int) (offset p2 : int)))
+
+  logic ge_pointer (p1 : (pointer 'a1)) (p2 : (pointer 'a1)) =
+    (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) and
+     (Int.(>=) (offset p1 : int) (offset p2 : int)))
+
+  logic valid (a : alloc_table) (p : (pointer 'a1)) =
+    ((Int.(<=) 0 (offset p : int)) and
+     (Int.(<) (offset p : int) (block_length a p : int)))
+
+  logic valid_index (a : alloc_table) (p : (pointer 'a1)) (i : int) =
+    ((Int.(<=) 0 (Int.(+) (offset p : int) i : int)) and
+     (Int.(<) (Int.(+) (offset p : int) i : int) (block_length a p : int)))
+
+  logic valid_range (a : alloc_table) (p : (pointer 'a1)) (i : int) (j : int) =
+    ((Int.(<=) 0 (Int.(+) (offset p : int) i : int)) and
+     (Int.(<) (Int.(+) (offset p : int) j : int) (block_length a p : int)))
+
+  axiom Offset_shift:
+    (forall p:(pointer 'a1).
+      (forall i:int [(offset (shift p i : (pointer 'a1)) : int)].
+        ((offset (shift p i : (pointer 'a1)) : int) = (Int.(+) (offset p : int) i : int))))
+
+  axiom Shift_zero:
+    (forall p:(pointer 'a1) [(shift p 0 : (pointer 'a1))].
+      ((shift p 0 : (pointer 'a1)) = p))
+
+  axiom Shift_shift:
+    (forall p:(pointer 'a1).
+      (forall i:int.
+        (forall j:int [(shift (shift p i : (pointer 'a1)) j : (pointer 'a1))].
+          ((shift (shift p i : (pointer 'a1)) j : (pointer 'a1)) = (shift p (Int.(+) i j : int) : (pointer 'a1))))))
+
+  axiom Base_addr_shift:
+    (forall p:(pointer 'a1).
+      (forall i:int [(base_addr (shift p i : (pointer 'a1)) : (addr 'a1))].
+        ((base_addr (shift p i : (pointer 'a1)) : (addr 'a1)) = (base_addr p : (addr 'a1)))))
+
+  axiom Block_length_shift:
+    (forall a:alloc_table.
+      (forall p:(pointer 'a1).
+        (forall i:int [(block_length a (shift p i : (pointer 'a1)) : int)].
+          ((block_length a (shift p i : (pointer 'a1)) : int) = (block_length a p : int)))))
+
+  axiom Base_addr_block_length:
+    (forall a:alloc_table.
+      (forall p1:(pointer 'a1).
+        (forall p2:(pointer 'a1).
+          (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) ->
+           ((block_length a p1 : int) = (block_length a p2 : int))))))
+
+  axiom Pointer_pair_1:
+    (forall p1:(pointer 'a1).
+      (forall p2:(pointer 'a1).
+        ((((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) and
+          ((offset p1 : int) = (offset p2 : int))) ->
+         (p1 = p2))))
+
+  axiom Pointer_pair_2:
+    (forall p1:(pointer 'a1).
+      (forall p2:(pointer 'a1).
+        ((p1 = p2) ->
+         (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) and
+          ((offset p1 : int) = (offset p2 : int))))))
+
+  axiom Neq_base_addr_neq_shift:
+    (forall p1:(pointer 'a1).
+      (forall p2:(pointer 'a1).
+        (forall i:int.
+          (forall j:int.
+            (((base_addr p1 : (addr 'a1)) <> (base_addr p2 : (addr 'a1))) ->
+             ((shift p1 i : (pointer 'a1)) <> (shift p2 j : (pointer 'a1))))))))
+
+  axiom Neq_offset_neq_shift:
+    (forall p1:(pointer 'a1).
+      (forall p2:(pointer 'a1).
+        (forall i:int.
+          (forall j:int.
+            (((Int.(+) (offset p1 : int) i : int) <> (Int.(+) (offset p2 : int) j : int)) ->
+             ((shift p1 i : (pointer 'a1)) <> (shift p2 j : (pointer 'a1))))))))
+
+  axiom Eq_offset_eq_shift:
+    (forall p1:(pointer 'a1).
+      (forall p2:(pointer 'a1).
+        (forall i:int.
+          (forall j:int.
+            (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) ->
+             (((Int.(+) (offset p1 : int) i : int) = (Int.(+) (offset p2 : int) j : int)) ->
+              ((shift p1 i : (pointer 'a1)) = (shift p2 j : (pointer 'a1)))))))))
+
+  axiom Valid_index_valid_shift:
+    (forall a:alloc_table.
+      (forall p:(pointer 'a1).
+        (forall i:int.
+          ((valid_index a p i) -> (valid a (shift p i : (pointer 'a1)))))))
+
+  axiom Valid_range_valid_shift:
+    (forall a:alloc_table.
+      (forall p:(pointer 'a1).
+        (forall i:int.
+          (forall j:int.
+            (forall k:int.
+              ((valid_range a p i j) ->
+               (((Int.(<=) i k) and (Int.(<=) k j)) ->
+                (valid a (shift p k : (pointer 'a1))))))))))
+
+  axiom Valid_range_valid:
+    (forall a:alloc_table.
+      (forall p:(pointer 'a1).
+        (forall i:int.
+          (forall j:int.
+            ((valid_range a p i j) ->
+             (((Int.(<=) i 0) and (Int.(<=) 0 j)) -> (valid a p)))))))
+
+  axiom Valid_range_valid_index:
+    (forall a:alloc_table.
+      (forall p:(pointer 'a1).
+        (forall i:int.
+          (forall j:int.
+            (forall k:int.
+              ((valid_range a p i j) ->
+               (((Int.(<=) i k) and (Int.(<=) k j)) -> (valid_index a p k))))))))
+
+  axiom Sub_pointer_def:
+    (forall p1:(pointer 'a1).
+      (forall p2:(pointer 'a1).
+        (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) ->
+         ((sub_pointer p1 p2 : int) = (Int.(-) (offset p1 : int) (offset p2 : int) : int)))))
+
+  type memory 'a 'z = A.t (pointer 'z) 'a
+
+  logic acc (m:memory 'a1 'a2) (k:pointer 'a2) : 'a1 = A.get m k
+
+  logic upd (m:memory 'a1 'a2) (k:pointer 'a2) (v:'a1) : (memory 'a1 'a2) = A.set m k v
+
+
+
+  axiom False_not_true: (Bool.False <> Bool.True)
+
+  type pset 'z
+
+  logic pset_empty  : (pset 'a1)
+
+  logic pset_singleton (pointer 'a1) : (pset 'a1)
+
+  logic pset_star (pset 'a2) (memory (pointer 'a1) 'a2) : (pset 'a1)
+
+  logic pset_all (pset 'a1) : (pset 'a1)
+
+  logic pset_range (pset 'a1) int int : (pset 'a1)
+
+  logic pset_range_left (pset 'a1) int : (pset 'a1)
+
+  logic pset_range_right (pset 'a1) int : (pset 'a1)
+
+  logic pset_acc_all (pset 'a2) (memory (pointer 'a1) 'a2) : (pset 'a1)
+
+  logic pset_acc_range (pset 'a2) (memory (pointer 'a1) 'a2) int int : (pset 'a1)
+
+  logic pset_acc_range_left (pset 'a2) (memory (pointer 'a1) 'a2) int : (pset 'a1)
+
+  logic pset_acc_range_right (pset 'a2) (memory (pointer 'a1) 'a2) int : (pset 'a1)
+
+  logic pset_union (pset 'a1) (pset 'a1) : (pset 'a1)
+
+  logic not_in_pset (pointer 'a1) (pset 'a1)
+
+  logic not_assigns (a : alloc_table) (m1 : (memory 'a1 'a2)) (m2 : (memory 'a1 'a2)) (l : (pset 'a2)) =
+    (forall p:(pointer 'a2).
+      ((valid a p) ->
+       ((not_in_pset p l) -> ((acc m2 p : 'a1) = (acc m1 p : 'a1)))))
+
+  axiom Pset_empty_intro:
+    (forall p:(pointer 'a1). (not_in_pset p (pset_empty : (pset 'a1))))
+
+  axiom Pset_singleton_intro:
+    (forall p1:(pointer 'a1).
+      (forall p2:(pointer 'a1) [(not_in_pset p1 (pset_singleton p2 : (pset 'a1)))].
+        ((p1 <> p2) -> (not_in_pset p1 (pset_singleton p2 : (pset 'a1))))))
+
+  axiom Pset_singleton_elim:
+    (forall p1:(pointer 'a1).
+      (forall p2:(pointer 'a1) [(not_in_pset p1 (pset_singleton p2 : (pset 'a1)))].
+        ((not_in_pset p1 (pset_singleton p2 : (pset 'a1))) -> (p1 <> p2))))
+
+  axiom Not_not_in_singleton:
+    (forall p:(pointer 'a1).
+      (not (not_in_pset p (pset_singleton p : (pset 'a1)))))
+
+  axiom Pset_union_intro:
+    (forall l1:(pset 'a1).
+      (forall l2:(pset 'a1).
+        (forall p:(pointer 'a1) [(not_in_pset p (pset_union l1 l2 : (pset 'a1)))].
+          (((not_in_pset p l1) and (not_in_pset p l2)) ->
+           (not_in_pset p (pset_union l1 l2 : (pset 'a1)))))))
+
+  axiom Pset_union_elim1:
+    (forall l1:(pset 'a1).
+      (forall l2:(pset 'a1).
+        (forall p:(pointer 'a1) [(not_in_pset p (pset_union l1 l2 : (pset 'a1)))].
+          ((not_in_pset p (pset_union l1 l2 : (pset 'a1))) ->
+           (not_in_pset p l1)))))
+
+  axiom Pset_union_elim2:
+    (forall l1:(pset 'a1).
+      (forall l2:(pset 'a1).
+        (forall p:(pointer 'a1) [(not_in_pset p (pset_union l1 l2 : (pset 'a1)))].
+          ((not_in_pset p (pset_union l1 l2 : (pset 'a1))) ->
+           (not_in_pset p l2)))))
+
+  axiom Pset_star_intro:
+    (forall l:(pset 'a1).
+      (forall m:(memory (pointer 'a2) 'a1).
+        (forall p:(pointer 'a2) [(not_in_pset p (pset_star l m : (pset 'a2)))].
+          ((forall p1:(pointer 'a1).
+             ((p = (acc m p1 : (pointer 'a2))) -> (not_in_pset p1 l))) ->
+           (not_in_pset p (pset_star l m : (pset 'a2)))))))
+
+  axiom Pset_star_elim:
+    (forall l:(pset 'a1).
+      (forall m:(memory (pointer 'a2) 'a1).
+        (forall p:(pointer 'a2) [(not_in_pset p (pset_star l m : (pset 'a2)))].
+          ((not_in_pset p (pset_star l m : (pset 'a2))) ->
+           (forall p1:(pointer 'a1).
+             ((p = (acc m p1 : (pointer 'a2))) -> (not_in_pset p1 l)))))))
+
+  axiom Pset_all_intro:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a1) [(not_in_pset p (pset_all l : (pset 'a1)))].
+        ((forall p1:(pointer 'a1).
+           ((not (not_in_pset p1 l)) ->
+            ((base_addr p : (addr 'a1)) <> (base_addr p1 : (addr 'a1))))) ->
+         (not_in_pset p (pset_all l : (pset 'a1))))))
+
+  axiom Pset_all_elim:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a1) [(not_in_pset p (pset_all l : (pset 'a1)))].
+        ((not_in_pset p (pset_all l : (pset 'a1))) ->
+         (forall p1:(pointer 'a1).
+           ((not (not_in_pset p1 l)) ->
+            ((base_addr p : (addr 'a1)) <> (base_addr p1 : (addr 'a1))))))))
+
+  axiom Pset_range_intro:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a1).
+        (forall a:int.
+          (forall b:int [(not_in_pset p (pset_range l a b : (pset 'a1)))].
+            ((forall p1:(pointer 'a1).
+               ((not_in_pset p1 l) or
+                (forall i:int.
+                  (((Int.(<=) a i) and (Int.(<=) i b)) ->
+                   (p <> (shift p1 i : (pointer 'a1))))))) ->
+             (not_in_pset p (pset_range l a b : (pset 'a1))))))))
+
+  axiom Pset_range_elim:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a1).
+        (forall a:int.
+          (forall b:int [(not_in_pset p (pset_range l a b : (pset 'a1)))].
+            ((not_in_pset p (pset_range l a b : (pset 'a1))) ->
+             (forall p1:(pointer 'a1).
+               ((not (not_in_pset p1 l)) ->
+                (forall i:int.
+                  (((Int.(<=) a i) and (Int.(<=) i b)) ->
+                   ((shift p1 i : (pointer 'a1)) <> p))))))))))
+
+  axiom Pset_range_left_intro:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a1).
+        (forall a:int [(not_in_pset p (pset_range_left l a : (pset 'a1)))].
+          ((forall p1:(pointer 'a1).
+             ((not_in_pset p1 l) or
+              (forall i:int.
+                ((Int.(<=) i a) -> (p <> (shift p1 i : (pointer 'a1))))))) ->
+           (not_in_pset p (pset_range_left l a : (pset 'a1)))))))
+
+  axiom Pset_range_left_elim:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a1).
+        (forall a:int [(not_in_pset p (pset_range_left l a : (pset 'a1)))].
+          ((not_in_pset p (pset_range_left l a : (pset 'a1))) ->
+           (forall p1:(pointer 'a1).
+             ((not (not_in_pset p1 l)) ->
+              (forall i:int.
+                ((Int.(<=) i a) -> ((shift p1 i : (pointer 'a1)) <> p)))))))))
+
+  axiom Pset_range_right_intro:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a1).
+        (forall a:int [(not_in_pset p (pset_range_right l a : (pset 'a1)))].
+          ((forall p1:(pointer 'a1).
+             ((not_in_pset p1 l) or
+              (forall i:int.
+                ((Int.(<=) a i) -> (p <> (shift p1 i : (pointer 'a1))))))) ->
+           (not_in_pset p (pset_range_right l a : (pset 'a1)))))))
+
+  axiom Pset_range_right_elim:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a1).
+        (forall a:int [(not_in_pset p (pset_range_right l a : (pset 'a1)))].
+          ((not_in_pset p (pset_range_right l a : (pset 'a1))) ->
+           (forall p1:(pointer 'a1).
+             ((not (not_in_pset p1 l)) ->
+              (forall i:int.
+                ((Int.(<=) a i) -> ((shift p1 i : (pointer 'a1)) <> p)))))))))
+
+  axiom Pset_acc_all_intro:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a2).
+        (forall m:(memory (pointer 'a1) 'a2) [(not_in_pset p (pset_acc_all l m : (pset 'a1)))].
+          ((forall p1:(pointer 'a2).
+             ((not (not_in_pset p1 l)) ->
+              (forall i:int.
+                (p <> (acc m (shift p1 i : (pointer 'a2)) : (pointer 'a1)))))) ->
+           (not_in_pset p (pset_acc_all l m : (pset 'a1)))))))
+
+  axiom Pset_acc_all_elim:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a2).
+        (forall m:(memory (pointer 'a1) 'a2) [(not_in_pset p (pset_acc_all l m : (pset 'a1)))].
+          ((not_in_pset p (pset_acc_all l m : (pset 'a1))) ->
+           (forall p1:(pointer 'a2).
+             ((not (not_in_pset p1 l)) ->
+              (forall i:int.
+                ((acc m (shift p1 i : (pointer 'a2)) : (pointer 'a1)) <> p))))))))
+
+  axiom Pset_acc_range_intro:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a2).
+        (forall m:(memory (pointer 'a1) 'a2).
+          (forall a:int.
+            (forall b:int [(not_in_pset p (pset_acc_range l m a b : (pset 'a1)))].
+              ((forall p1:(pointer 'a2).
+                 ((not (not_in_pset p1 l)) ->
+                  (forall i:int.
+                    (((Int.(<=) a i) and (Int.(<=) i b)) ->
+                     (p <> (acc m (shift p1 i : (pointer 'a2)) : (pointer 'a1))))))) ->
+               (not_in_pset p (pset_acc_range l m a b : (pset 'a1)))))))))
+
+  axiom Pset_acc_range_elim:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a2).
+        (forall m:(memory (pointer 'a1) 'a2).
+          (forall a:int.
+            (forall b:int.
+              ((not_in_pset p (pset_acc_range l m a b : (pset 'a1))) ->
+               (forall p1:(pointer 'a2).
+                 ((not (not_in_pset p1 l)) ->
+                  (forall i:int.
+                    (((Int.(<=) a i) and (Int.(<=) i b)) ->
+                     ((acc m (shift p1 i : (pointer 'a2)) : (pointer 'a1)) <> p)))))))))))
+
+  axiom Pset_acc_range_left_intro:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a2).
+        (forall m:(memory (pointer 'a1) 'a2).
+          (forall a:int [(not_in_pset p (pset_acc_range_left l m a : (pset 'a1)))].
+            ((forall p1:(pointer 'a2).
+               ((not (not_in_pset p1 l)) ->
+                (forall i:int.
+                  ((Int.(<=) i a) ->
+                   (p <> (acc m (shift p1 i : (pointer 'a2)) : (pointer 'a1))))))) ->
+             (not_in_pset p (pset_acc_range_left l m a : (pset 'a1))))))))
+
+  axiom Pset_acc_range_left_elim:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a2).
+        (forall m:(memory (pointer 'a1) 'a2).
+          (forall a:int [(not_in_pset p (pset_acc_range_left l m a : (pset 'a1)))].
+            ((not_in_pset p (pset_acc_range_left l m a : (pset 'a1))) ->
+             (forall p1:(pointer 'a2).
+               ((not (not_in_pset p1 l)) ->
+                (forall i:int.
+                  ((Int.(<=) i a) ->
+                   ((acc m (shift p1 i : (pointer 'a2)) : (pointer 'a1)) <> p))))))))))
+
+  axiom Pset_acc_range_right_intro:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a2).
+        (forall m:(memory (pointer 'a1) 'a2).
+          (forall a:int [(not_in_pset p (pset_acc_range_right l m a : (pset 'a1)))].
+            ((forall p1:(pointer 'a2).
+               ((not (not_in_pset p1 l)) ->
+                (forall i:int.
+                  ((Int.(<=) a i) ->
+                   (p <> (acc m (shift p1 i : (pointer 'a2)) : (pointer 'a1))))))) ->
+             (not_in_pset p (pset_acc_range_right l m a : (pset 'a1))))))))
+
+  axiom Pset_acc_range_right_elim:
+    (forall p:(pointer 'a1).
+      (forall l:(pset 'a2).
+        (forall m:(memory (pointer 'a1) 'a2).
+          (forall a:int [(not_in_pset p (pset_acc_range_right l m a : (pset 'a1)))].
+            ((not_in_pset p (pset_acc_range_right l m a : (pset 'a1))) ->
+             (forall p1:(pointer 'a2).
+               ((not (not_in_pset p1 l)) ->
+                (forall i:int.
+                  ((Int.(<=) a i) ->
+                   ((acc m (shift p1 i : (pointer 'a2)) : (pointer 'a1)) <> p))))))))))
+
+  axiom Not_assigns_trans:
+    (forall a:alloc_table.
+      (forall l:(pset 'a1).
+        (forall m1:(memory 'a2 'a1).
+          (forall m2:(memory 'a2 'a1).
+            (forall m3:(memory 'a2 'a1).
+              ((not_assigns a m1 m2 l) ->
+               ((not_assigns a m2 m3 l) -> (not_assigns a m1 m3 l))))))))
+
+  axiom Not_assigns_refl:
+    (forall a:alloc_table.
+      (forall l:(pset 'a1).
+        (forall m:(memory 'a2 'a1). (not_assigns a m m l))))
+
+  logic valid_acc (m1 : (memory (pointer 'a1) 'a2)) =
+    (forall p:(pointer 'a2).
+      (forall a:alloc_table.
+        ((valid a p) -> (valid a (acc m1 p : (pointer 'a1))))))
+
+  logic valid_acc_range (m1 : (memory (pointer 'a1) 'a2)) (size : int) =
+    (forall p:(pointer 'a2).
+      (forall a:alloc_table.
+        ((valid a p) ->
+         (valid_range a (acc m1 p : (pointer 'a1)) 0 (Int.(-) size 1 : int)))))
+
+  axiom Valid_acc_range_valid:
+    (forall m1:(memory (pointer 'a1) 'a2).
+      (forall size:int.
+        (forall p:(pointer 'a2).
+          (forall a:alloc_table.
+            ((valid_acc_range m1 size) ->
+             ((valid a p) -> (valid a (acc m1 p : (pointer 'a1)))))))))
+
+  logic separation1 (m1 : (memory (pointer 'a1) 'a2)) (m2 : (memory (pointer 'a1) 'a2)) =
+    (forall p:(pointer 'a2).
+      (forall a:alloc_table.
+        ((valid a p) ->
+         ((base_addr (acc m1 p : (pointer 'a1)) : (addr 'a1)) <> (base_addr (acc m2 p : (pointer 'a1)) : (addr 'a1))))))
+
+  logic separation1_range1 (m1 : (memory (pointer 'a1) 'a2)) (m2 : (memory (pointer 'a1) 'a2)) (size : int) =
+    (forall p:(pointer 'a2).
+      (forall a:alloc_table.
+        ((valid a p) ->
+         (forall i1:int.
+           (forall i2:int.
+             (((Int.(<=) 0 i1) and (Int.(<) i1 size)) ->
+              (((Int.(<=) 0 i2) and (Int.(<) i2 size)) ->
+               ((base_addr (acc m1 (shift p i1 : (pointer 'a2)) : (pointer 'a1)) : (addr 'a1)) <> (base_addr (acc m2 (shift p i2 : (pointer 'a2)) : (pointer 'a1)) : (addr 'a1))))))))))
+
+  logic separation1_range (m : (memory (pointer 'a1) 'a2)) (size : int) =
+    (forall p:(pointer 'a2).
+      (forall a:alloc_table.
+        ((valid a p) ->
+         (forall i1:int.
+           (((Int.(<=) 0 i1) and (Int.(<) i1 size)) ->
+            ((base_addr (acc m (shift p i1 : (pointer 'a2)) : (pointer 'a1)) : (addr 'a1)) <> (base_addr (acc m p : (pointer 'a1)) : (addr 'a1))))))))
+
+  logic separation2 (m1 : (memory (pointer 'a1) 'a2)) (m2 : (memory (pointer 'a1) 'a2)) =
+    (forall p1:(pointer 'a2).
+      (forall p2:(pointer 'a2).
+        ((p1 <> p2) ->
+         ((base_addr (acc m1 p1 : (pointer 'a1)) : (addr 'a1)) <> (base_addr (acc m2 p2 : (pointer 'a1)) : (addr 'a1))))))
+
+  logic separation2_range1 (m1 : (memory (pointer 'a1) 'a2)) (m2 : (memory (pointer 'a1) 'a2)) (size : int) =
+    (forall p:(pointer 'a2).
+      (forall q:(pointer 'a2).
+        (forall a:alloc_table.
+          (forall i:int.
+            (((Int.(<=) 0 i) and (Int.(<) i size)) ->
+             ((base_addr (acc m1 (shift p i : (pointer 'a2)) : (pointer 'a1)) : (addr 'a1)) <> (base_addr (acc m2 q : (pointer 'a1)) : (addr 'a1))))))))
+
+  logic on_heap alloc_table (pointer 'a1)
+
+  logic on_stack alloc_table (pointer 'a1)
+
+  logic fresh alloc_table (pointer 'a1)
+
+  axiom Fresh_not_valid:
+    (forall a:alloc_table.
+      (forall p:(pointer 'a1). ((fresh a p) -> (not (valid a p)))))
+
+  axiom Fresh_not_valid_shift:
+    (forall a:alloc_table.
+      (forall p:(pointer 'a1).
+        ((fresh a p) ->
+         (forall i:int. (not (valid a (shift p i : (pointer 'a1))))))))
+
+  logic alloc_extends alloc_table alloc_table
+
+  axiom Alloc_extends_valid:
+    (forall a1:alloc_table.
+      (forall a2:alloc_table.
+        ((alloc_extends a1 a2) ->
+         (forall q:(pointer 'a1). ((valid a1 q) -> (valid a2 q))))))
+
+  axiom Alloc_extends_valid_index:
+    (forall a1:alloc_table.
+      (forall a2:alloc_table.
+        ((alloc_extends a1 a2) ->
+         (forall q:(pointer 'a1).
+           (forall i:int. ((valid_index a1 q i) -> (valid_index a2 q i)))))))
+
+  axiom Alloc_extends_valid_range:
+    (forall a1:alloc_table.
+      (forall a2:alloc_table.
+        ((alloc_extends a1 a2) ->
+         (forall q:(pointer 'a1).
+           (forall i:int.
+             (forall j:int.
+               ((valid_range a1 q i j) -> (valid_range a2 q i j))))))))
+
+  axiom Alloc_extends_refl: (forall a:alloc_table. (alloc_extends a a))
+
+  axiom Alloc_extends_trans:
+    (forall a1:alloc_table.
+      (forall a2:alloc_table.
+        (forall a3:alloc_table [(alloc_extends a1 a2),
+          (alloc_extends a2 a3)].
+          ((alloc_extends a1 a2) ->
+           ((alloc_extends a2 a3) -> (alloc_extends a1 a3))))))
+
+  logic free_stack alloc_table alloc_table alloc_table
+
+  axiom Free_stack_heap:
+    (forall a1:alloc_table.
+      (forall a2:alloc_table.
+        (forall a3:alloc_table.
+          ((free_stack a1 a2 a3) ->
+           (forall p:(pointer 'a1).
+             ((valid a2 p) -> ((on_heap a2 p) -> (valid a3 p))))))))
+
+  axiom Free_stack_stack:
+    (forall a1:alloc_table.
+      (forall a2:alloc_table.
+        (forall a3:alloc_table.
+          ((free_stack a1 a2 a3) ->
+           (forall p:(pointer 'a1).
+             ((valid a1 p) -> ((on_stack a1 p) -> (valid a3 p))))))))
+
+  logic null  : (pointer 'a1)
+
+  axiom Null_not_valid:
+    (forall a:alloc_table. (not (valid a (null : (pointer 'a1)))))
+
+  type a_0
+
+  type a_1
+
+  type a_2
+
+  type a_3
+
+  type a_4
+
+  type a_5
+
+  type int_array
+
+  logic why3_Permut int_array int_array int int
+
+  axiom Permut_refl:
+    ("CADUCEUS_5"
+    (forall a:int_array.
+      (forall l:int. (forall h:int. (why3_Permut a a l h)))))
+
+  logic access int_array int : int
+
+  logic why3_Swap (a1 : int_array) (a2 : int_array) (i : int) (j : int) =
+    ("CADUCEUS_4"
+    ((((access a1 i : int) = (access a2 j : int)) and
+      ((access a1 j : int) = (access a2 i : int))) and
+     (forall k:int.
+       ((k <> i) -> ((k <> j) -> ((access a1 k : int) = (access a2 k : int)))))))
+
+  axiom Permut_swap:
+    ("CADUCEUS_8"
+    (forall a1:int_array.
+      (forall a2:int_array.
+        (forall l:int.
+          (forall h:int.
+            (forall i:int.
+              (forall j:int.
+                (((Int.(<=) l i) and (Int.(<=) i h)) ->
+                 (((Int.(<=) l j) and (Int.(<=) j h)) ->
+                  ((why3_Swap a1 a2 i j) -> (why3_Permut a1 a2 l h)))))))))))
+
+  axiom Permut_sym:
+    ("CADUCEUS_6"
+    (forall a1:int_array.
+      (forall a2:int_array.
+        (forall l:int.
+          (forall h:int.
+            ((why3_Permut a1 a2 l h) -> (why3_Permut a2 a1 l h)))))))
+
+  axiom Permut_trans:
+    ("CADUCEUS_7"
+    (forall a1:int_array.
+      (forall a2:int_array.
+        (forall a3:int_array.
+          (forall l:int.
+            (forall h:int.
+              ((why3_Permut a1 a2 l h) ->
+               ((why3_Permut a2 a3 l h) -> (why3_Permut a1 a3 l h)))))))))
+
+  logic why3_Sorted (intM_a_2 : (memory int 'a1)) (a : (pointer 'a1)) (l : int) (h : int) =
+    ("CADUCEUS_9"
+    (forall i:int.
+      (((Int.(<=) l i) and (Int.(<) i h)) ->
+       (Int.(<=) (acc intM_a_2 (shift a i : (pointer 'a1)) : int) (acc intM_a_2 (shift a (Int.(+) i 1 : int) : (pointer 'a1)) : int)))))
+
+  logic contents (memory int 'a1) (pointer 'a1) : int_array
+
+  axiom Access_contents:
+    (forall intM_a_1:(memory int 'a1).
+      ("CADUCEUS_3"
+      (forall a:(pointer 'a1).
+        (forall i:int.
+          ((access (contents intM_a_1 a : int_array) i : int) = (acc intM_a_1 (shift a i : (pointer 'a1)) : int))))))
+
+  logic update int_array int int : int_array
+
+  axiom Access_update_eq:
+    ("CADUCEUS_1"
+    (forall a:int_array.
+      (forall i:int.
+        (forall v:int. ((access (update a i v : int_array) i : int) = v)))))
+
+  axiom Access_update_neq:
+    ("CADUCEUS_2"
+    (forall a:int_array.
+      (forall i:int.
+        (forall j:int.
+          (forall v:int.
+            ((i <> j) ->
+             ((access (update a i v : int_array) j : int) = (access a j : int))))))))
+
+  goal Insertion_sort_impl_po_1:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(<=) n 1) ->
+              ("CADUCEUS_11"
+              (why3_Permut (contents intM_a_5 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int)))))))))
+
+  goal Insertion_sort_impl_po_2:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(<=) n 1) ->
+              ("CADUCEUS_11" (why3_Sorted intM_a_5 a 0 (Int.(-) n 1 : int)))))))))
+
+  goal Insertion_sort_impl_po_3:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 ("CADUCEUS_13"
+                 ("CADUCEUS_13"
+                 (not_assigns alloc intM_a_5 intM_a_5 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))))))))))))
+
+  goal Insertion_sort_impl_po_4:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (("CADUCEUS_10"
+           ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+           ((Int.(>) n 1) ->
+            (forall i:int. ((i = 1) -> ("CADUCEUS_12" (Int.(<) 0 i)))))))))
+
+  goal Insertion_sort_impl_po_5:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (("CADUCEUS_10"
+           ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+           ((Int.(>) n 1) ->
+            (forall i:int. ((i = 1) -> ("CADUCEUS_12" (Int.(<=) i n)))))))))
+
+  goal Insertion_sort_impl_po_6:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 ("CADUCEUS_12"
+                 (why3_Permut (contents intM_a_5 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int)))))))))))
+
+  goal Insertion_sort_impl_po_7:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 ("CADUCEUS_12"
+                 (why3_Sorted intM_a_5 a 0 (Int.(-) i 1 : int)))))))))))
+
+  goal Insertion_sort_impl_po_8:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          (valid alloc result)))))))))))))))
+
+  goal Insertion_sort_impl_po_9:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              ("CADUCEUS_18"
+                              ("CADUCEUS_18"
+                              (not_assigns alloc intM_a_5_0 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_10:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              ("CADUCEUS_17" (Int.(<=) 0 i0)))))))))))))))))))
+
+  goal Insertion_sort_impl_po_11:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              ("CADUCEUS_17" (Int.(<=) i0 i0)))))))))))))))))))
+
+  goal Insertion_sort_impl_po_12:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              ("CADUCEUS_17"
+                              (why3_Permut (update (contents intM_a_5_0 a : int_array) i0 result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_13:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              ("CADUCEUS_17"
+                              (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_14:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              ("CADUCEUS_17"
+                              (why3_Sorted intM_a_5_0 a (Int.(+) i0 1 : int) i0)))))))))))))))))))
+
+  goal Insertion_sort_impl_po_15:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              ((Int.(<) i0 i0) ->
+                               ("CADUCEUS_17"
+                               (Int.(<) result0 (acc intM_a_5_0 (shift a (Int.(+) i0 1 : int) : (pointer 'a1)) : int)))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_16:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (((Int.(<) 0 i0) and (Int.(<) i0 i0)) ->
+                               ("CADUCEUS_17"
+                               (Int.(<=) (acc intM_a_5_0 (shift a (Int.(-) i0 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_0 (shift a (Int.(+) i0 1 : int) : (pointer 'a1)) : int)))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_17:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       (valid alloc result1))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_18:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(>) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               (forall result4:(pointer 'a1).
+                                                 ((result4 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                                  (valid alloc result4))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_19:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(>) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               (forall result4:(pointer 'a1).
+                                                 ((result4 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                                  ((valid alloc result4) ->
+                                                   (forall result5:int.
+                                                     ((result5 = (acc intM_a_5_1 result4 : int)) ->
+                                                      (valid alloc result3)))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_20:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(>) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               (forall result4:(pointer 'a1).
+                                                 ((result4 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                                  ((valid alloc result4) ->
+                                                   (forall result5:int.
+                                                     ((result5 = (acc intM_a_5_1 result4 : int)) ->
+                                                      ((valid alloc result3) ->
+                                                       (forall intM_a_5_2:(memory int 'a1).
+                                                         ((intM_a_5_2 = (upd intM_a_5_1 result3 result5 : (memory int 'a1))) ->
+                                                          (forall j0:int.
+                                                            ((j0 = (Int.(-) j 1 : int)) ->
+                                                             ("CADUCEUS_18"
+                                                             ("CADUCEUS_18"
+                                                             (not_assigns alloc intM_a_5_0 intM_a_5_2 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1))))))))))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_21:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(>) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               (forall result4:(pointer 'a1).
+                                                 ((result4 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                                  ((valid alloc result4) ->
+                                                   (forall result5:int.
+                                                     ((result5 = (acc intM_a_5_1 result4 : int)) ->
+                                                      ((valid alloc result3) ->
+                                                       (forall intM_a_5_2:(memory int 'a1).
+                                                         ((intM_a_5_2 = (upd intM_a_5_1 result3 result5 : (memory int 'a1))) ->
+                                                          (forall j0:int.
+                                                            ((j0 = (Int.(-) j 1 : int)) ->
+                                                             ("CADUCEUS_17"
+                                                             (Int.(<=) 0 j0)))))))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_22:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(>) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               (forall result4:(pointer 'a1).
+                                                 ((result4 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                                  ((valid alloc result4) ->
+                                                   (forall result5:int.
+                                                     ((result5 = (acc intM_a_5_1 result4 : int)) ->
+                                                      ((valid alloc result3) ->
+                                                       (forall intM_a_5_2:(memory int 'a1).
+                                                         ((intM_a_5_2 = (upd intM_a_5_1 result3 result5 : (memory int 'a1))) ->
+                                                          (forall j0:int.
+                                                            ((j0 = (Int.(-) j 1 : int)) ->
+                                                             ("CADUCEUS_17"
+                                                             (Int.(<=) j0 i0)))))))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_23:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(>) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               (forall result4:(pointer 'a1).
+                                                 ((result4 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                                  ((valid alloc result4) ->
+                                                   (forall result5:int.
+                                                     ((result5 = (acc intM_a_5_1 result4 : int)) ->
+                                                      ((valid alloc result3) ->
+                                                       (forall intM_a_5_2:(memory int 'a1).
+                                                         ((intM_a_5_2 = (upd intM_a_5_1 result3 result5 : (memory int 'a1))) ->
+                                                          (forall j0:int.
+                                                            ((j0 = (Int.(-) j 1 : int)) ->
+                                                             ("CADUCEUS_17"
+                                                             (why3_Permut (update (contents intM_a_5_2 a : int_array) j0 result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))))))))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_24:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(>) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               (forall result4:(pointer 'a1).
+                                                 ((result4 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                                  ((valid alloc result4) ->
+                                                   (forall result5:int.
+                                                     ((result5 = (acc intM_a_5_1 result4 : int)) ->
+                                                      ((valid alloc result3) ->
+                                                       (forall intM_a_5_2:(memory int 'a1).
+                                                         ((intM_a_5_2 = (upd intM_a_5_1 result3 result5 : (memory int 'a1))) ->
+                                                          (forall j0:int.
+                                                            ((j0 = (Int.(-) j 1 : int)) ->
+                                                             ("CADUCEUS_17"
+                                                             (why3_Sorted intM_a_5_2 a 0 (Int.(-) j0 1 : int))))))))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_25:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(>) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               (forall result4:(pointer 'a1).
+                                                 ((result4 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                                  ((valid alloc result4) ->
+                                                   (forall result5:int.
+                                                     ((result5 = (acc intM_a_5_1 result4 : int)) ->
+                                                      ((valid alloc result3) ->
+                                                       (forall intM_a_5_2:(memory int 'a1).
+                                                         ((intM_a_5_2 = (upd intM_a_5_1 result3 result5 : (memory int 'a1))) ->
+                                                          (forall j0:int.
+                                                            ((j0 = (Int.(-) j 1 : int)) ->
+                                                             ("CADUCEUS_17"
+                                                             (why3_Sorted intM_a_5_2 a (Int.(+) j0 1 : int) i0)))))))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_26:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(>) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               (forall result4:(pointer 'a1).
+                                                 ((result4 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                                  ((valid alloc result4) ->
+                                                   (forall result5:int.
+                                                     ((result5 = (acc intM_a_5_1 result4 : int)) ->
+                                                      ((valid alloc result3) ->
+                                                       (forall intM_a_5_2:(memory int 'a1).
+                                                         ((intM_a_5_2 = (upd intM_a_5_1 result3 result5 : (memory int 'a1))) ->
+                                                          (forall j0:int.
+                                                            ((j0 = (Int.(-) j 1 : int)) ->
+                                                             ((Int.(<) j0 i0) ->
+                                                              ("CADUCEUS_17"
+                                                              (Int.(<) result0 (acc intM_a_5_2 (shift a (Int.(+) j0 1 : int) : (pointer 'a1)) : int)))))))))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_27:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(>) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               (forall result4:(pointer 'a1).
+                                                 ((result4 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                                  ((valid alloc result4) ->
+                                                   (forall result5:int.
+                                                     ((result5 = (acc intM_a_5_1 result4 : int)) ->
+                                                      ((valid alloc result3) ->
+                                                       (forall intM_a_5_2:(memory int 'a1).
+                                                         ((intM_a_5_2 = (upd intM_a_5_1 result3 result5 : (memory int 'a1))) ->
+                                                          (forall j0:int.
+                                                            ((j0 = (Int.(-) j 1 : int)) ->
+                                                             (((Int.(<) 0 j0) and
+                                                               (Int.(<) j0 i0)) ->
+                                                              ("CADUCEUS_17"
+                                                              (Int.(<=) (acc intM_a_5_2 (shift a (Int.(-) j0 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_2 (shift a (Int.(+) j0 1 : int) : (pointer 'a1)) : int)))))))))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_28:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(>) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               (forall result4:(pointer 'a1).
+                                                 ((result4 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                                  ((valid alloc result4) ->
+                                                   (forall result5:int.
+                                                     ((result5 = (acc intM_a_5_1 result4 : int)) ->
+                                                      ((valid alloc result3) ->
+                                                       (forall intM_a_5_2:(memory int 'a1).
+                                                         ((intM_a_5_2 = (upd intM_a_5_1 result3 result5 : (memory int 'a1))) ->
+                                                          (forall j0:int.
+                                                            ((j0 = (Int.(-) j 1 : int)) ->
+                                                             (Int.(<=) 0
+                                                             ("CADUCEUS_19"
+                                                             j)))))))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_29:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(>) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               (forall result4:(pointer 'a1).
+                                                 ((result4 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                                  ((valid alloc result4) ->
+                                                   (forall result5:int.
+                                                     ((result5 = (acc intM_a_5_1 result4 : int)) ->
+                                                      ((valid alloc result3) ->
+                                                       (forall intM_a_5_2:(memory int 'a1).
+                                                         ((intM_a_5_2 = (upd intM_a_5_1 result3 result5 : (memory int 'a1))) ->
+                                                          (forall j0:int.
+                                                            ((j0 = (Int.(-) j 1 : int)) ->
+                                                             (Int.(<)
+                                                             ("CADUCEUS_19"
+                                                             j0) ("CADUCEUS_19"
+                                                                 j)))))))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_30:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(<=) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               (valid alloc result3))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_31:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(<=) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               ((valid alloc result3) ->
+                                                (forall intM_a_5_2:(memory int 'a1).
+                                                  ((intM_a_5_2 = (upd intM_a_5_1 result3 result0 : (memory int 'a1))) ->
+                                                   (forall i1:int.
+                                                     ((i1 = (Int.(+) i0 1 : int)) ->
+                                                      ("CADUCEUS_13"
+                                                      ("CADUCEUS_13"
+                                                      (not_assigns alloc intM_a_5 intM_a_5_2 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_32:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(<=) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               ((valid alloc result3) ->
+                                                (forall intM_a_5_2:(memory int 'a1).
+                                                  ((intM_a_5_2 = (upd intM_a_5_1 result3 result0 : (memory int 'a1))) ->
+                                                   (forall i1:int.
+                                                     ((i1 = (Int.(+) i0 1 : int)) ->
+                                                      ("CADUCEUS_12"
+                                                      (Int.(<) 0 i1))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_33:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(<=) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               ((valid alloc result3) ->
+                                                (forall intM_a_5_2:(memory int 'a1).
+                                                  ((intM_a_5_2 = (upd intM_a_5_1 result3 result0 : (memory int 'a1))) ->
+                                                   (forall i1:int.
+                                                     ((i1 = (Int.(+) i0 1 : int)) ->
+                                                      ("CADUCEUS_12"
+                                                      (Int.(<=) i1 n))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_34:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(<=) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               ((valid alloc result3) ->
+                                                (forall intM_a_5_2:(memory int 'a1).
+                                                  ((intM_a_5_2 = (upd intM_a_5_1 result3 result0 : (memory int 'a1))) ->
+                                                   (forall i1:int.
+                                                     ((i1 = (Int.(+) i0 1 : int)) ->
+                                                      ("CADUCEUS_12"
+                                                      (why3_Permut (contents intM_a_5_2 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int)))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_35:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(<=) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               ((valid alloc result3) ->
+                                                (forall intM_a_5_2:(memory int 'a1).
+                                                  ((intM_a_5_2 = (upd intM_a_5_1 result3 result0 : (memory int 'a1))) ->
+                                                   (forall i1:int.
+                                                     ((i1 = (Int.(+) i0 1 : int)) ->
+                                                      ("CADUCEUS_12"
+                                                      (why3_Sorted intM_a_5_2 a 0 (Int.(-) i1 1 : int)))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_36:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(<=) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               ((valid alloc result3) ->
+                                                (forall intM_a_5_2:(memory int 'a1).
+                                                  ((intM_a_5_2 = (upd intM_a_5_1 result3 result0 : (memory int 'a1))) ->
+                                                   (forall i1:int.
+                                                     ((i1 = (Int.(+) i0 1 : int)) ->
+                                                      (Int.(<=) 0 ("CADUCEUS_14"
+                                                                  (Int.(-) n i0 : int)))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_37:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(>) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a (Int.(-) j 1 : int) : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall result2:int.
+                                          ((result2 = (acc intM_a_5_1 result1 : int)) ->
+                                           ((Int.(<=) result2 result0) ->
+                                            (forall result3:(pointer 'a1).
+                                              ((result3 = (shift a j : (pointer 'a1))) ->
+                                               ((valid alloc result3) ->
+                                                (forall intM_a_5_2:(memory int 'a1).
+                                                  ((intM_a_5_2 = (upd intM_a_5_1 result3 result0 : (memory int 'a1))) ->
+                                                   (forall i1:int.
+                                                     ((i1 = (Int.(+) i0 1 : int)) ->
+                                                      (Int.(<) ("CADUCEUS_14"
+                                                               (Int.(-) n i1 : int))
+                                                      ("CADUCEUS_14"
+                                                      (Int.(-) n i0 : int)))))))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_38:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(<=) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a j : (pointer 'a1))) ->
+                                       (valid alloc result1))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_39:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(<=) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a j : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall intM_a_5_2:(memory int 'a1).
+                                          ((intM_a_5_2 = (upd intM_a_5_1 result1 result0 : (memory int 'a1))) ->
+                                           (forall i1:int.
+                                             ((i1 = (Int.(+) i0 1 : int)) ->
+                                              ("CADUCEUS_13"
+                                              ("CADUCEUS_13"
+                                              (not_assigns alloc intM_a_5 intM_a_5_2 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_40:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(<=) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a j : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall intM_a_5_2:(memory int 'a1).
+                                          ((intM_a_5_2 = (upd intM_a_5_1 result1 result0 : (memory int 'a1))) ->
+                                           (forall i1:int.
+                                             ((i1 = (Int.(+) i0 1 : int)) ->
+                                              ("CADUCEUS_12" (Int.(<) 0 i1))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_41:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(<=) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a j : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall intM_a_5_2:(memory int 'a1).
+                                          ((intM_a_5_2 = (upd intM_a_5_1 result1 result0 : (memory int 'a1))) ->
+                                           (forall i1:int.
+                                             ((i1 = (Int.(+) i0 1 : int)) ->
+                                              ("CADUCEUS_12" (Int.(<=) i1 n))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_42:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(<=) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a j : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall intM_a_5_2:(memory int 'a1).
+                                          ((intM_a_5_2 = (upd intM_a_5_1 result1 result0 : (memory int 'a1))) ->
+                                           (forall i1:int.
+                                             ((i1 = (Int.(+) i0 1 : int)) ->
+                                              ("CADUCEUS_12"
+                                              (why3_Permut (contents intM_a_5_2 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int)))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_43:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(<=) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a j : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall intM_a_5_2:(memory int 'a1).
+                                          ((intM_a_5_2 = (upd intM_a_5_1 result1 result0 : (memory int 'a1))) ->
+                                           (forall i1:int.
+                                             ((i1 = (Int.(+) i0 1 : int)) ->
+                                              ("CADUCEUS_12"
+                                              (why3_Sorted intM_a_5_2 a 0 (Int.(-) i1 1 : int)))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_44:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(<=) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a j : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall intM_a_5_2:(memory int 'a1).
+                                          ((intM_a_5_2 = (upd intM_a_5_1 result1 result0 : (memory int 'a1))) ->
+                                           (forall i1:int.
+                                             ((i1 = (Int.(+) i0 1 : int)) ->
+                                              (Int.(<=) 0 ("CADUCEUS_14"
+                                                          (Int.(-) n i0 : int)))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_45:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(<) i0 n) ->
+                       (forall result:(pointer 'a1).
+                         ((result = (shift a i0 : (pointer 'a1))) ->
+                          ((valid alloc result) ->
+                           (forall result0:int.
+                             ((result0 = (acc intM_a_5_0 result : int)) ->
+                              (forall intM_a_5_1:(memory int 'a1).
+                                (forall j:int.
+                                  ((("CADUCEUS_18"
+                                    (not_assigns alloc intM_a_5_0 intM_a_5_1 (pset_range (pset_singleton a : (pset 'a1)) 0 i0 : (pset 'a1)))) and
+                                    ("CADUCEUS_17"
+                                    (((((((Int.(<=) 0 j) and (Int.(<=) j i0)) and
+                                         (why3_Permut (update (contents intM_a_5_1 a : int_array) j result0 : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                                        (why3_Sorted intM_a_5_1 a 0 (Int.(-) j 1 : int))) and
+                                       (why3_Sorted intM_a_5_1 a (Int.(+) j 1 : int) i0)) and
+                                      ((Int.(<) j i0) ->
+                                       (Int.(<) result0 (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))) and
+                                     (((Int.(<) 0 j) and (Int.(<) j i0)) ->
+                                      (Int.(<=) (acc intM_a_5_1 (shift a (Int.(-) j 1 : int) : (pointer 'a1)) : int) (acc intM_a_5_1 (shift a (Int.(+) j 1 : int) : (pointer 'a1)) : int)))))) ->
+                                   ((Int.(<=) j 0) ->
+                                    (forall result1:(pointer 'a1).
+                                      ((result1 = (shift a j : (pointer 'a1))) ->
+                                       ((valid alloc result1) ->
+                                        (forall intM_a_5_2:(memory int 'a1).
+                                          ((intM_a_5_2 = (upd intM_a_5_1 result1 result0 : (memory int 'a1))) ->
+                                           (forall i1:int.
+                                             ((i1 = (Int.(+) i0 1 : int)) ->
+                                              (Int.(<) ("CADUCEUS_14"
+                                                       (Int.(-) n i1 : int))
+                                              ("CADUCEUS_14"
+                                              (Int.(-) n i0 : int)))))))))))))))))))))))))))))))
+
+  goal Insertion_sort_impl_po_46:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(>=) i0 n) ->
+                       ("CADUCEUS_11"
+                       (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int)))))))))))))))
+
+  goal Insertion_sort_impl_po_47:
+    (forall a:(pointer 'a1).
+      (forall n:int.
+        (forall alloc:alloc_table.
+          (forall intM_a_5:(memory int 'a1).
+            (("CADUCEUS_10"
+             ((Int.(<=) 0 n) and (valid_range alloc a 0 (Int.(-) n 1 : int)))) ->
+             ((Int.(>) n 1) ->
+              (forall i:int.
+                ((i = 1) ->
+                 (forall i0:int.
+                   (forall intM_a_5_0:(memory int 'a1).
+                     ((("CADUCEUS_13"
+                       (not_assigns alloc intM_a_5 intM_a_5_0 (pset_range (pset_singleton a : (pset 'a1)) 0 (Int.(-) n 1 : int) : (pset 'a1)))) and
+                       ("CADUCEUS_12"
+                       ((((Int.(<) 0 i0) and (Int.(<=) i0 n)) and
+                         (why3_Permut (contents intM_a_5_0 a : int_array) (contents intM_a_5 a : int_array) 0 (Int.(-) n 1 : int))) and
+                        (why3_Sorted intM_a_5_0 a 0 (Int.(-) i0 1 : int))))) ->
+                      ((Int.(>=) i0 n) ->
+                       ("CADUCEUS_11"
+                       (why3_Sorted intM_a_5_0 a 0 (Int.(-) n 1 : int)))))))))))))))
+
+
+end

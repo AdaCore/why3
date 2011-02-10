@@ -1,0 +1,133 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+goal f1_po_1:
+  (false (* was well_founded(...) *) and
+   (forall x:int.
+     (forall variant1:int.
+       ((x >= 0) ->
+        ((variant1 = x) ->
+         ((true and
+           ((x > 0) ->
+            (((0 <= variant1) and ((x - 1) < variant1)) and ((x - 1) >= 0)))) and
+          (forall result:int.
+            ((((x > 0) and
+               ((((0 <= variant1) and ((x - 1) < variant1)) and
+                 ((x - 1) >= 0)) and
+                (result = 0))) or
+              ((x <= 0) and (result = x))) ->
+             (result = 0)))))))))
+
+goal f2_po_1:
+  (false (* was well_founded(...) *) and
+   (forall variant1_0:int.
+     (forall x:int.
+       (forall x0:int.
+         (forall x1:int.
+           (forall x2:int.
+             ((x >= 0) ->
+              ((variant1_0 = x) ->
+               ((true and
+                 ((x > 0) ->
+                  (true and
+                   ((x0 = (x - 1)) ->
+                    (((0 <= variant1_0) and (x0 < variant1_0)) and (x0 >= 0)))))) and
+                (forall result:unit.
+                  (((((x > 0) and
+                      ((x0 = (x - 1)) and
+                       ((((0 <= variant1_0) and (x0 < variant1_0)) and
+                         (x0 >= 0)) and
+                        (x1 = 0)))) and
+                     (x2 = x1)) or
+                    ((x <= 0) and (x2 = x))) ->
+                   (x2 = 0))))))))))))
+
+goal f3_po_1:
+  (false (* was well_founded(...) *) and
+   (forall a:int.
+     (forall variant1_1:int.
+       (forall x:int.
+         (forall x3:int.
+           (forall x4:int.
+             (forall x5:int.
+               ((a >= 0) ->
+                ((variant1_1 = a) ->
+                 ((true and
+                   ((a > 0) ->
+                    (true and
+                     ((x3 = (x + 1)) ->
+                      (((0 <= variant1_1) and ((a - 1) < variant1_1)) and
+                       ((a - 1) >= 0)))))) and
+                  (forall result:unit.
+                    (((((a > 0) and
+                        ((x3 = (x + 1)) and
+                         ((((0 <= variant1_1) and ((a - 1) < variant1_1)) and
+                           ((a - 1) >= 0)) and
+                          (x4 = (x3 + (a - 1)))))) and
+                       (x5 = x4)) or
+                      ((a <= 0) and (x5 = x))) ->
+                     (x5 = (x + a))))))))))))))
+
+goal f4_po_1:
+  (false (* was well_founded(...) *) and
+   (forall a:int.
+     (forall a0:int.
+       (forall a1:int.
+         (forall a2:int.
+           (forall variant1_2:int.
+             (forall x:int.
+               (forall x6:int.
+                 (forall x7:int.
+                   (forall x8:int.
+                     ((a >= 0) ->
+                      ((variant1_2 = a) ->
+                       ((true and
+                         ((a > 0) ->
+                          (true and
+                           ((x6 = (x + 1)) ->
+                            (true and
+                             ((a0 = (a - 1)) ->
+                              (((0 <= variant1_2) and (a0 < variant1_2)) and
+                               (a0 >= 0)))))))) and
+                        (forall result:unit.
+                          (((((a > 0) and
+                              ((x6 = (x + 1)) and
+                               ((a0 = (a - 1)) and
+                                ((((0 <= variant1_2) and (a0 < variant1_2)) and
+                                  (a0 >= 0)) and
+                                 (x7 = (x6 + a0)))))) and
+                             ((a2 = a1) and (x8 = x7))) or
+                            ((a <= 0) and ((a2 = a) and (x8 = x)))) ->
+                           (x8 = (x + a)))))))))))))))))
+

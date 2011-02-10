@@ -1,0 +1,69 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+axiom mult_1_1: ((1 * 1) = 1)
+
+goal f_po_1:
+  forall b:int.
+  forall b0:int.
+  forall result:int.
+  ((b0 = (1 - b)) and (result = b0)) ->
+  ((result = b0) and (b0 = (1 - b)))
+
+goal k_po_1:
+  forall aux_2:int.
+  forall aux_3:int.
+  forall aux_4:int.
+  forall aux_5:int.
+  forall aux_6:int.
+  forall aux_7:int.
+  forall aux_8:int.
+  forall aux_9:int.
+  forall b1_0:int.
+  forall b2_0:int.
+  forall b3:int.
+  forall b4:int.
+  forall b5:int.
+  forall b6:int.
+  forall b7:int.
+  ((b3 = 0) and
+   ((((((aux_2 = b4) and (b4 = (1 - b3))) and (aux_3 = (1 - aux_2))) and
+      (((aux_4 = b5) and (b5 = (1 - b4))) and (aux_5 = (aux_3 + aux_4)))) and
+     (b1_0 = aux_5)) and
+    ((((aux_6 = b6) and (b6 = (1 - b5))) and
+      ((((aux_7 = b7) and (b7 = (1 - b6))) and (aux_8 = (1 - aux_7))) and
+       (aux_9 = (aux_6 * aux_8)))) and
+     (b2_0 = aux_9)))) ->
+  ((b1_0 = 0) and (b2_0 = 1))
+

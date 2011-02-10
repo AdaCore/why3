@@ -1,0 +1,239 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+type 'a farray
+
+logic access : 'a1 farray, int -> 'a1
+
+logic update : 'a1 farray, int, 'a1 -> 'a1 farray
+
+axiom access_update:
+  (forall a:'a1 farray.
+    (forall i:int. (forall v:'a1. (access(update(a, i, v), i) = v))))
+
+axiom access_update_neq:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int.
+        (forall v:'a1.
+          ((i <> j) -> (access(update(a, i, v), j) = access(a, j)))))))
+
+logic array_length : 'a1 farray -> int
+
+predicate sorted_array(t: int farray, i: int, j: int) =
+  (forall k1:int.
+    (forall k2:int.
+      ((((i <= k1) and (k1 <= k2)) and (k2 <= j)) -> (access(t,
+       k1) <= access(t, k2)))))
+
+predicate exchange(a1: 'a1 farray, a2: 'a1 farray, i: int, j: int) =
+  ((array_length(a1) = array_length(a2)) and
+   ((access(a1, i) = access(a2, j)) and
+    ((access(a2, i) = access(a1, j)) and
+     (forall k:int.
+       (((k <> i) and (k <> j)) -> (access(a1, k) = access(a2, k)))))))
+
+logic permut : 'a1 farray, 'a1 farray, int, int -> prop
+
+axiom permut_refl:
+  (forall t:'a1 farray. (forall l:int. (forall u:int. permut(t, t, l, u))))
+
+axiom permut_sym:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall l:int.
+        (forall u:int. (permut(t1, t2, l, u) -> permut(t2, t1, l, u))))))
+
+axiom permut_trans:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall t3:'a1 farray.
+        (forall l:int.
+          (forall u:int.
+            (permut(t1, t2, l, u) ->
+             (permut(t2, t3, l, u) -> permut(t1, t3, l, u))))))))
+
+axiom permut_exchange:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (forall i:int.
+            (forall j:int.
+              (((l <= i) and (i <= u)) ->
+               (((l <= j) and (j <= u)) ->
+                (exchange(a1, a2, i, j) -> permut(a1, a2, l, u))))))))))
+
+axiom exchange_upd:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int. exchange(a, update(update(a, i, access(a, j)), j,
+        access(a, i)), i, j))))
+
+axiom permut_weakening:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l1:int.
+        (forall r1:int.
+          (forall l2:int.
+            (forall r2:int.
+              ((((l1 <= l2) and (l2 <= r2)) and (r2 <= r1)) ->
+               (permut(a1, a2, l2, r2) -> permut(a1, a2, l1, r1)))))))))
+
+axiom permut_eq:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          ((l <= u) ->
+           (permut(a1, a2, l, u) ->
+            (forall i:int.
+              (((i < l) or (u < i)) -> (access(a2, i) = access(a1, i))))))))))
+
+predicate permutation(a1: 'a1 farray, a2: 'a1 farray) = permut(a1, a2, 0,
+  (array_length(a1) - 1))
+
+axiom array_length_update:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall v:'a1. (array_length(update(a, i, v)) = array_length(a)))))
+
+axiom permut_array_length:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (permut(a1, a2, l, u) -> (array_length(a1) = array_length(a2)))))))
+
+axiom mean:
+  (forall l:int.
+    (forall u:int.
+      ((l < u) -> ((l <= ((l + u) / 2)) and (((l + u) / 2) < u)))))
+
+goal mergesort_po_1:
+  forall l:int.
+  forall u:int.
+  (l < u) ->
+  (2 <> 0)
+
+goal mergesort_po_2:
+  forall l:int.
+  forall u:int.
+  forall a:int farray.
+  (l < u) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((l + u) / 2)) ->
+  forall a0:int farray.
+  (sorted_array(a0, l, result) and permut(a, a0, l, result)) ->
+  permut(a, a0, l, u)
+
+goal mergesort_po_3:
+  forall l:int.
+  forall u:int.
+  forall a:int farray.
+  (l < u) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((l + u) / 2)) ->
+  forall a0:int farray.
+  (sorted_array(a0, l, result) and permut(a, a0, l, result)) ->
+  permut(a, a0, l, u) ->
+  forall a1:int farray.
+  (sorted_array(a1, (result + 1), u) and permut(a0, a1, (result + 1), u)) ->
+  (l <= result)
+
+goal mergesort_po_4:
+  forall l:int.
+  forall u:int.
+  forall a:int farray.
+  (l < u) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((l + u) / 2)) ->
+  forall a0:int farray.
+  (sorted_array(a0, l, result) and permut(a, a0, l, result)) ->
+  permut(a, a0, l, u) ->
+  forall a1:int farray.
+  (sorted_array(a1, (result + 1), u) and permut(a0, a1, (result + 1), u)) ->
+  (result < u)
+
+goal mergesort_po_5:
+  forall l:int.
+  forall u:int.
+  forall a:int farray.
+  (l < u) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((l + u) / 2)) ->
+  forall a0:int farray.
+  (sorted_array(a0, l, result) and permut(a, a0, l, result)) ->
+  permut(a, a0, l, u) ->
+  forall a1:int farray.
+  (sorted_array(a1, (result + 1), u) and permut(a0, a1, (result + 1), u)) ->
+  sorted_array(a1, l, result)
+
+goal mergesort_po_6:
+  forall l:int.
+  forall u:int.
+  forall a:int farray.
+  (l < u) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((l + u) / 2)) ->
+  forall a0:int farray.
+  (sorted_array(a0, l, result) and permut(a, a0, l, result)) ->
+  permut(a, a0, l, u) ->
+  forall a1:int farray.
+  (sorted_array(a1, (result + 1), u) and permut(a0, a1, (result + 1), u)) ->
+  (((l <= result) and (result < u)) and
+   (sorted_array(a1, l, result) and sorted_array(a1, (result + 1), u))) ->
+  forall a2:int farray.
+  (sorted_array(a2, l, u) and permut(a1, a2, l, u)) ->
+  permut(a, a2, l, u)
+
+goal mergesort_po_7:
+  forall l:int.
+  forall u:int.
+  forall a:int farray.
+  (l >= u) ->
+  sorted_array(a, l, u)
+
+goal mergesort_po_8:
+  forall l:int.
+  forall u:int.
+  forall a:int farray.
+  (l >= u) ->
+  permut(a, a, l, u)
+

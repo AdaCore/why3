@@ -1,0 +1,291 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+logic gcd : int, int -> int
+
+axiom gcd_asubb_b:
+  (forall a:int. (forall b:int. (gcd(a, b) = gcd((a - b), b))))
+
+axiom gcd_a_bsuba:
+  (forall a:int. (forall b:int. (gcd(a, b) = gcd(a, (b - a)))))
+
+axiom gcd_a_a: (forall a:int. (gcd(a, a) = a))
+
+axiom gcd_a_0: (forall a:int. (gcd(a, 0) = a))
+
+logic max : int, int -> int
+
+axiom max_def:
+  (forall x:int.
+    (forall y:int.
+      (((max(x, y) = x) or (max(x, y) = y)) and
+       ((max(x, y) >= x) and (max(x, y) >= y)))))
+
+goal gcd1_po_1:
+  forall a:int.
+  forall b:int.
+  ((a > 0) and (b > 0)) ->
+  (0 < a)
+
+goal gcd1_po_2:
+  forall a:int.
+  forall b:int.
+  ((a > 0) and (b > 0)) ->
+  (0 < b)
+
+goal gcd1_po_3:
+  forall a:int.
+  forall b:int.
+  ((a > 0) and (b > 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 < x) and ((0 < y) and (gcd(x, y) = gcd(a, b)))) ->
+  (x <> y) ->
+  (x > y) ->
+  forall x0:int.
+  (x0 = (x - y)) ->
+  (0 < x0)
+
+goal gcd1_po_4:
+  forall a:int.
+  forall b:int.
+  ((a > 0) and (b > 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 < x) and ((0 < y) and (gcd(x, y) = gcd(a, b)))) ->
+  (x <> y) ->
+  (x > y) ->
+  forall x0:int.
+  (x0 = (x - y)) ->
+  (0 < y)
+
+goal gcd1_po_5:
+  forall a:int.
+  forall b:int.
+  ((a > 0) and (b > 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 < x) and ((0 < y) and (gcd(x, y) = gcd(a, b)))) ->
+  (x <> y) ->
+  (x > y) ->
+  forall x0:int.
+  (x0 = (x - y)) ->
+  (gcd(x0, y) = gcd(a, b))
+
+goal gcd1_po_6:
+  forall a:int.
+  forall b:int.
+  ((a > 0) and (b > 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 < x) and ((0 < y) and (gcd(x, y) = gcd(a, b)))) ->
+  (x <> y) ->
+  (x > y) ->
+  forall x0:int.
+  (x0 = (x - y)) ->
+  (0 <= max(x, y))
+
+goal gcd1_po_7:
+  forall a:int.
+  forall b:int.
+  ((a > 0) and (b > 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 < x) and ((0 < y) and (gcd(x, y) = gcd(a, b)))) ->
+  (x <> y) ->
+  (x > y) ->
+  forall x0:int.
+  (x0 = (x - y)) ->
+  (max(x0, y) < max(x, y))
+
+goal gcd1_po_8:
+  forall a:int.
+  forall b:int.
+  ((a > 0) and (b > 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 < x) and ((0 < y) and (gcd(x, y) = gcd(a, b)))) ->
+  (x <> y) ->
+  (x <= y) ->
+  forall y0:int.
+  (y0 = (y - x)) ->
+  (0 < y0)
+
+goal gcd1_po_9:
+  forall a:int.
+  forall b:int.
+  ((a > 0) and (b > 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 < x) and ((0 < y) and (gcd(x, y) = gcd(a, b)))) ->
+  (x <> y) ->
+  (x <= y) ->
+  forall y0:int.
+  (y0 = (y - x)) ->
+  (gcd(x, y0) = gcd(a, b))
+
+goal gcd1_po_10:
+  forall a:int.
+  forall b:int.
+  ((a > 0) and (b > 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 < x) and ((0 < y) and (gcd(x, y) = gcd(a, b)))) ->
+  (x <> y) ->
+  (x <= y) ->
+  forall y0:int.
+  (y0 = (y - x)) ->
+  (0 <= max(x, y))
+
+goal gcd1_po_11:
+  forall a:int.
+  forall b:int.
+  ((a > 0) and (b > 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 < x) and ((0 < y) and (gcd(x, y) = gcd(a, b)))) ->
+  (x <> y) ->
+  (x <= y) ->
+  forall y0:int.
+  (y0 = (y - x)) ->
+  (max(x, y0) < max(x, y))
+
+goal gcd1_po_12:
+  forall a:int.
+  forall b:int.
+  ((a > 0) and (b > 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 < x) and ((0 < y) and (gcd(x, y) = gcd(a, b)))) ->
+  (x = y) ->
+  (x = gcd(a, b))
+
+axiom gcd_a_amodb:
+  (forall a:int. (forall b:int. (gcd(a, b) = gcd(b, (a % b)))))
+
+axiom mod_lt:
+  (forall a:int. (forall b:int. ((0 <= (a % b)) and ((a % b) < b))))
+
+goal gcd2_po_1:
+  forall a:int.
+  forall b:int.
+  ((a >= 0) and (b >= 0)) ->
+  (0 <= a)
+
+goal gcd2_po_2:
+  forall a:int.
+  forall b:int.
+  ((a >= 0) and (b >= 0)) ->
+  (0 <= b)
+
+goal gcd2_po_3:
+  forall a:int.
+  forall b:int.
+  ((a >= 0) and (b >= 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 <= x) and ((0 <= y) and (gcd(x, y) = gcd(a, b)))) ->
+  (y <> 0) ->
+  forall x0:int.
+  (x0 = y) ->
+  forall y0:int.
+  (y0 = (x % y)) ->
+  (0 <= x0)
+
+goal gcd2_po_4:
+  forall a:int.
+  forall b:int.
+  ((a >= 0) and (b >= 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 <= x) and ((0 <= y) and (gcd(x, y) = gcd(a, b)))) ->
+  (y <> 0) ->
+  forall x0:int.
+  (x0 = y) ->
+  forall y0:int.
+  (y0 = (x % y)) ->
+  (0 <= y0)
+
+goal gcd2_po_5:
+  forall a:int.
+  forall b:int.
+  ((a >= 0) and (b >= 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 <= x) and ((0 <= y) and (gcd(x, y) = gcd(a, b)))) ->
+  (y <> 0) ->
+  forall x0:int.
+  (x0 = y) ->
+  forall y0:int.
+  (y0 = (x % y)) ->
+  (gcd(x0, y0) = gcd(a, b))
+
+goal gcd2_po_6:
+  forall a:int.
+  forall b:int.
+  ((a >= 0) and (b >= 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 <= x) and ((0 <= y) and (gcd(x, y) = gcd(a, b)))) ->
+  (y <> 0) ->
+  forall x0:int.
+  (x0 = y) ->
+  forall y0:int.
+  (y0 = (x % y)) ->
+  (0 <= y)
+
+goal gcd2_po_7:
+  forall a:int.
+  forall b:int.
+  ((a >= 0) and (b >= 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 <= x) and ((0 <= y) and (gcd(x, y) = gcd(a, b)))) ->
+  (y <> 0) ->
+  forall x0:int.
+  (x0 = y) ->
+  forall y0:int.
+  (y0 = (x % y)) ->
+  (y0 < y)
+
+goal gcd2_po_8:
+  forall a:int.
+  forall b:int.
+  ((a >= 0) and (b >= 0)) ->
+  forall x:int.
+  forall y:int.
+  ((0 <= x) and ((0 <= y) and (gcd(x, y) = gcd(a, b)))) ->
+  (y = 0) ->
+  (x = gcd(a, b))
+

@@ -1,0 +1,107 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+goal loop1_po_1:
+  forall i:int.
+  forall i0:int.
+  forall i1:int.
+  forall i2:int.
+  (i <= 10) ->
+  (i0 <= 10) ->
+  (((i0 < 10) and (i1 = (i0 + 1))) and (i2 = i1)) ->
+  (i2 <= 10)
+
+goal loop1_po_2:
+  forall i:int.
+  forall i0:int.
+  forall i1:int.
+  forall i2:int.
+  (i <= 10) ->
+  (i0 <= 10) ->
+  (((i0 < 10) and (i1 = (i0 + 1))) and (i2 = i1)) ->
+  ((0 <= (10 - i0)) and ((10 - i2) < (10 - i0)))
+
+goal loop1_po_3:
+  forall i:int.
+  forall i0:int.
+  forall i3:int.
+  (i <= 10) ->
+  (((i0 <= 10) and (i0 >= 10)) and (i3 = i0)) ->
+  (i3 = 10)
+
+goal oppose_po_1:
+  forall x:int.
+  forall x0:int.
+  (x0 = (-x)) ->
+  (x0 = (-x))
+
+goal loop2_po_1:
+  forall x:int.
+  forall x1:int.
+  forall x2:int.
+  forall x3:int.
+  (x <= 10) ->
+  (x1 <= 10) ->
+  (((x1 < 10) and (x2 = (x1 + 1))) and (x3 = x2)) ->
+  (x3 <= 10)
+
+goal loop2_po_2:
+  forall x:int.
+  forall x1:int.
+  forall x2:int.
+  forall x3:int.
+  (x <= 10) ->
+  (x1 <= 10) ->
+  (((x1 < 10) and (x2 = (x1 + 1))) and (x3 = x2)) ->
+  ((0 <= (10 - x1)) and ((10 - x3) < (10 - x1)))
+
+goal loop2_po_3:
+  forall x:int.
+  forall x1:int.
+  forall x4:int.
+  (x <= 10) ->
+  (((x1 <= 10) and (x1 >= 10)) and (x4 = x1)) ->
+  (x4 = 10)
+
+goal loop2_po_4:
+  forall x:int.
+  forall x1:int.
+  forall x4:int.
+  forall x5:int.
+  forall x6:int.
+  (x <= 10) ->
+  (((((x1 <= 10) and (x1 >= 10)) and (x4 = x1)) and (x4 = 10)) and
+   ((((x4 > 0) and (x5 = (-x4))) and (x6 = x5)) or ((x4 <= 0) and (x6 = x4)))) ->
+  (x6 = (-10))
+

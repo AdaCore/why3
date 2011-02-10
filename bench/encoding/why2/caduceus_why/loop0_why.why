@@ -1,0 +1,82 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+goal p_po_1:
+  forall x:int.
+  (x >= 0) ->
+  (0 <= x)
+
+goal p_po_2:
+  forall x:int.
+  (x >= 0) ->
+  (x <= x)
+
+goal p_po_3:
+  forall x:int.
+  (x >= 0) ->
+  forall x0:int.
+  ((0 <= x0) and (x0 <= x)) ->
+  (x0 > 0) ->
+  forall x1:int.
+  (x1 = (x0 - 1)) ->
+  (0 <= x1)
+
+goal p_po_4:
+  forall x:int.
+  (x >= 0) ->
+  forall x0:int.
+  ((0 <= x0) and (x0 <= x)) ->
+  (x0 > 0) ->
+  forall x1:int.
+  (x1 = (x0 - 1)) ->
+  (x1 <= x)
+
+goal p_po_5:
+  forall x:int.
+  (x >= 0) ->
+  forall x0:int.
+  ((0 <= x0) and (x0 <= x)) ->
+  (x0 > 0) ->
+  forall x1:int.
+  (x1 = (x0 - 1)) ->
+  (x1 < x0)
+
+goal p_po_6:
+  forall x:int.
+  (x >= 0) ->
+  forall x0:int.
+  ((0 <= x0) and (x0 <= x)) ->
+  (x0 <= 0) ->
+  (x0 = 0)
+

@@ -1,0 +1,359 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+goal sqrt_po_1:
+  forall x:int.
+  (x >= 0) ->
+  (x = 0) ->
+  ((0 * 0) <= x)
+
+goal sqrt_po_2:
+  forall x:int.
+  (x >= 0) ->
+  (x = 0) ->
+  (x < ((0 + 1) * (0 + 1)))
+
+goal sqrt_po_3:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x <= 3) ->
+  ((1 * 1) <= x)
+
+goal sqrt_po_4:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x <= 3) ->
+  (x < ((1 + 1) * (1 + 1)))
+
+goal sqrt_po_5:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0)
+
+goal sqrt_po_6:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  (result > 0)
+
+goal sqrt_po_7:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  (x > 0)
+
+goal sqrt_po_8:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  (result = (((x / x) + x) / 2))
+
+goal sqrt_po_9:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  (x < ((x + 1) * (x + 1)))
+
+goal sqrt_po_10:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  (x < ((result + 1) * (result + 1)))
+
+goal sqrt_po_11:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  forall y:int.
+  forall z:int.
+  ((z > 0) and
+   ((y > 0) and
+    ((z = (((x / y) + y) / 2)) and
+     ((x < ((y + 1) * (y + 1))) and (x < ((z + 1) * (z + 1))))))) ->
+  (z < y) ->
+  forall y0:int.
+  (y0 = z) ->
+  (z <> 0)
+
+goal sqrt_po_12:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  forall y:int.
+  forall z:int.
+  ((z > 0) and
+   ((y > 0) and
+    ((z = (((x / y) + y) / 2)) and
+     ((x < ((y + 1) * (y + 1))) and (x < ((z + 1) * (z + 1))))))) ->
+  (z < y) ->
+  forall y0:int.
+  (y0 = z) ->
+  (z <> 0) ->
+  forall result0:int.
+  (result0 = (x / z)) ->
+  (2 <> 0) ->
+  forall result1:int.
+  (result1 = ((result0 + z) / 2)) ->
+  forall z0:int.
+  (z0 = result1) ->
+  (z0 > 0)
+
+goal sqrt_po_13:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  forall y:int.
+  forall z:int.
+  ((z > 0) and
+   ((y > 0) and
+    ((z = (((x / y) + y) / 2)) and
+     ((x < ((y + 1) * (y + 1))) and (x < ((z + 1) * (z + 1))))))) ->
+  (z < y) ->
+  forall y0:int.
+  (y0 = z) ->
+  (z <> 0) ->
+  forall result0:int.
+  (result0 = (x / z)) ->
+  (2 <> 0) ->
+  forall result1:int.
+  (result1 = ((result0 + z) / 2)) ->
+  forall z0:int.
+  (z0 = result1) ->
+  (y0 > 0)
+
+goal sqrt_po_14:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  forall y:int.
+  forall z:int.
+  ((z > 0) and
+   ((y > 0) and
+    ((z = (((x / y) + y) / 2)) and
+     ((x < ((y + 1) * (y + 1))) and (x < ((z + 1) * (z + 1))))))) ->
+  (z < y) ->
+  forall y0:int.
+  (y0 = z) ->
+  (z <> 0) ->
+  forall result0:int.
+  (result0 = (x / z)) ->
+  (2 <> 0) ->
+  forall result1:int.
+  (result1 = ((result0 + z) / 2)) ->
+  forall z0:int.
+  (z0 = result1) ->
+  (z0 = (((x / y0) + y0) / 2))
+
+goal sqrt_po_15:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  forall y:int.
+  forall z:int.
+  ((z > 0) and
+   ((y > 0) and
+    ((z = (((x / y) + y) / 2)) and
+     ((x < ((y + 1) * (y + 1))) and (x < ((z + 1) * (z + 1))))))) ->
+  (z < y) ->
+  forall y0:int.
+  (y0 = z) ->
+  (z <> 0) ->
+  forall result0:int.
+  (result0 = (x / z)) ->
+  (2 <> 0) ->
+  forall result1:int.
+  (result1 = ((result0 + z) / 2)) ->
+  forall z0:int.
+  (z0 = result1) ->
+  (x < ((y0 + 1) * (y0 + 1)))
+
+goal sqrt_po_16:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  forall y:int.
+  forall z:int.
+  ((z > 0) and
+   ((y > 0) and
+    ((z = (((x / y) + y) / 2)) and
+     ((x < ((y + 1) * (y + 1))) and (x < ((z + 1) * (z + 1))))))) ->
+  (z < y) ->
+  forall y0:int.
+  (y0 = z) ->
+  (z <> 0) ->
+  forall result0:int.
+  (result0 = (x / z)) ->
+  (2 <> 0) ->
+  forall result1:int.
+  (result1 = ((result0 + z) / 2)) ->
+  forall z0:int.
+  (z0 = result1) ->
+  (x < ((z0 + 1) * (z0 + 1)))
+
+goal sqrt_po_17:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  forall y:int.
+  forall z:int.
+  ((z > 0) and
+   ((y > 0) and
+    ((z = (((x / y) + y) / 2)) and
+     ((x < ((y + 1) * (y + 1))) and (x < ((z + 1) * (z + 1))))))) ->
+  (z < y) ->
+  forall y0:int.
+  (y0 = z) ->
+  (z <> 0) ->
+  forall result0:int.
+  (result0 = (x / z)) ->
+  (2 <> 0) ->
+  forall result1:int.
+  (result1 = ((result0 + z) / 2)) ->
+  forall z0:int.
+  (z0 = result1) ->
+  (0 <= y)
+
+goal sqrt_po_18:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  forall y:int.
+  forall z:int.
+  ((z > 0) and
+   ((y > 0) and
+    ((z = (((x / y) + y) / 2)) and
+     ((x < ((y + 1) * (y + 1))) and (x < ((z + 1) * (z + 1))))))) ->
+  (z < y) ->
+  forall y0:int.
+  (y0 = z) ->
+  (z <> 0) ->
+  forall result0:int.
+  (result0 = (x / z)) ->
+  (2 <> 0) ->
+  forall result1:int.
+  (result1 = ((result0 + z) / 2)) ->
+  forall z0:int.
+  (z0 = result1) ->
+  (y0 < y)
+
+goal sqrt_po_19:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  forall y:int.
+  forall z:int.
+  ((z > 0) and
+   ((y > 0) and
+    ((z = (((x / y) + y) / 2)) and
+     ((x < ((y + 1) * (y + 1))) and (x < ((z + 1) * (z + 1))))))) ->
+  (z >= y) ->
+  ((y * y) <= x)
+
+goal sqrt_po_20:
+  forall x:int.
+  (x >= 0) ->
+  (x <> 0) ->
+  (x > 3) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = ((x + 1) / 2)) ->
+  forall y:int.
+  forall z:int.
+  ((z > 0) and
+   ((y > 0) and
+    ((z = (((x / y) + y) / 2)) and
+     ((x < ((y + 1) * (y + 1))) and (x < ((z + 1) * (z + 1))))))) ->
+  (z >= y) ->
+  (x < ((y + 1) * (y + 1)))
+

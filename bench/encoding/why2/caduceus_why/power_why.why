@@ -1,0 +1,296 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+logic x : int
+
+predicate even(x: int) = (x = (2 * (x / 2)))
+
+predicate odd(x: int) = (x = ((2 * (x / 2)) + 1))
+
+logic power : int, int -> int
+
+axiom power_0: (forall x:int. (power(x, 0) = 1))
+
+axiom power_even:
+  (forall x:int.
+    (forall n:int. ((n >= 0) -> (power(x, (2 * n)) = power((x * x), n)))))
+
+axiom power_odd:
+  (forall x:int.
+    (forall n:int.
+      ((n >= 0) -> (power(x, ((2 * n) + 1)) = (x * power((x * x), n))))))
+
+goal power1_po_1:
+  forall n:int.
+  (n >= 0) ->
+  forall m:int.
+  (m = x) ->
+  forall y:int.
+  (y = 1) ->
+  (power(x, n) = (y * power(m, n)))
+
+goal power1_po_2:
+  forall n:int.
+  (n >= 0) ->
+  forall m:int.
+  (m = x) ->
+  forall y:int.
+  (y = 1) ->
+  forall m0:int.
+  forall n0:int.
+  forall y0:int.
+  ((power(x, n) = (y0 * power(m0, n0))) and (n0 >= 0)) ->
+  (n0 > 0) ->
+  odd(n0) ->
+  forall y1:int.
+  (y1 = (y0 * m0)) ->
+  forall m1:int.
+  (m1 = (m0 * m0)) ->
+  (2 <> 0)
+
+goal power1_po_3:
+  forall n:int.
+  (n >= 0) ->
+  forall m:int.
+  (m = x) ->
+  forall y:int.
+  (y = 1) ->
+  forall m0:int.
+  forall n0:int.
+  forall y0:int.
+  ((power(x, n) = (y0 * power(m0, n0))) and (n0 >= 0)) ->
+  (n0 > 0) ->
+  odd(n0) ->
+  forall y1:int.
+  (y1 = (y0 * m0)) ->
+  forall m1:int.
+  (m1 = (m0 * m0)) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (n0 / 2)) ->
+  forall n1:int.
+  (n1 = result) ->
+  (power(x, n) = (y1 * power(m1, n1)))
+
+goal power1_po_4:
+  forall n:int.
+  (n >= 0) ->
+  forall m:int.
+  (m = x) ->
+  forall y:int.
+  (y = 1) ->
+  forall m0:int.
+  forall n0:int.
+  forall y0:int.
+  ((power(x, n) = (y0 * power(m0, n0))) and (n0 >= 0)) ->
+  (n0 > 0) ->
+  odd(n0) ->
+  forall y1:int.
+  (y1 = (y0 * m0)) ->
+  forall m1:int.
+  (m1 = (m0 * m0)) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (n0 / 2)) ->
+  forall n1:int.
+  (n1 = result) ->
+  (n1 >= 0)
+
+goal power1_po_5:
+  forall n:int.
+  (n >= 0) ->
+  forall m:int.
+  (m = x) ->
+  forall y:int.
+  (y = 1) ->
+  forall m0:int.
+  forall n0:int.
+  forall y0:int.
+  ((power(x, n) = (y0 * power(m0, n0))) and (n0 >= 0)) ->
+  (n0 > 0) ->
+  odd(n0) ->
+  forall y1:int.
+  (y1 = (y0 * m0)) ->
+  forall m1:int.
+  (m1 = (m0 * m0)) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (n0 / 2)) ->
+  forall n1:int.
+  (n1 = result) ->
+  (0 <= n0)
+
+goal power1_po_6:
+  forall n:int.
+  (n >= 0) ->
+  forall m:int.
+  (m = x) ->
+  forall y:int.
+  (y = 1) ->
+  forall m0:int.
+  forall n0:int.
+  forall y0:int.
+  ((power(x, n) = (y0 * power(m0, n0))) and (n0 >= 0)) ->
+  (n0 > 0) ->
+  odd(n0) ->
+  forall y1:int.
+  (y1 = (y0 * m0)) ->
+  forall m1:int.
+  (m1 = (m0 * m0)) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (n0 / 2)) ->
+  forall n1:int.
+  (n1 = result) ->
+  (n1 < n0)
+
+goal power1_po_7:
+  forall n:int.
+  (n >= 0) ->
+  forall m:int.
+  (m = x) ->
+  forall y:int.
+  (y = 1) ->
+  forall m0:int.
+  forall n0:int.
+  forall y0:int.
+  ((power(x, n) = (y0 * power(m0, n0))) and (n0 >= 0)) ->
+  (n0 > 0) ->
+  even(n0) ->
+  forall m1:int.
+  (m1 = (m0 * m0)) ->
+  (2 <> 0)
+
+goal power1_po_8:
+  forall n:int.
+  (n >= 0) ->
+  forall m:int.
+  (m = x) ->
+  forall y:int.
+  (y = 1) ->
+  forall m0:int.
+  forall n0:int.
+  forall y0:int.
+  ((power(x, n) = (y0 * power(m0, n0))) and (n0 >= 0)) ->
+  (n0 > 0) ->
+  even(n0) ->
+  forall m1:int.
+  (m1 = (m0 * m0)) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (n0 / 2)) ->
+  forall n1:int.
+  (n1 = result) ->
+  (power(x, n) = (y0 * power(m1, n1)))
+
+goal power1_po_9:
+  forall n:int.
+  (n >= 0) ->
+  forall m:int.
+  (m = x) ->
+  forall y:int.
+  (y = 1) ->
+  forall m0:int.
+  forall n0:int.
+  forall y0:int.
+  ((power(x, n) = (y0 * power(m0, n0))) and (n0 >= 0)) ->
+  (n0 > 0) ->
+  even(n0) ->
+  forall m1:int.
+  (m1 = (m0 * m0)) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (n0 / 2)) ->
+  forall n1:int.
+  (n1 = result) ->
+  (n1 >= 0)
+
+goal power1_po_10:
+  forall n:int.
+  (n >= 0) ->
+  forall m:int.
+  (m = x) ->
+  forall y:int.
+  (y = 1) ->
+  forall m0:int.
+  forall n0:int.
+  forall y0:int.
+  ((power(x, n) = (y0 * power(m0, n0))) and (n0 >= 0)) ->
+  (n0 > 0) ->
+  even(n0) ->
+  forall m1:int.
+  (m1 = (m0 * m0)) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (n0 / 2)) ->
+  forall n1:int.
+  (n1 = result) ->
+  (0 <= n0)
+
+goal power1_po_11:
+  forall n:int.
+  (n >= 0) ->
+  forall m:int.
+  (m = x) ->
+  forall y:int.
+  (y = 1) ->
+  forall m0:int.
+  forall n0:int.
+  forall y0:int.
+  ((power(x, n) = (y0 * power(m0, n0))) and (n0 >= 0)) ->
+  (n0 > 0) ->
+  even(n0) ->
+  forall m1:int.
+  (m1 = (m0 * m0)) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (n0 / 2)) ->
+  forall n1:int.
+  (n1 = result) ->
+  (n1 < n0)
+
+goal power1_po_12:
+  forall n:int.
+  (n >= 0) ->
+  forall m:int.
+  (m = x) ->
+  forall y:int.
+  (y = 1) ->
+  forall m0:int.
+  forall n0:int.
+  forall y0:int.
+  ((power(x, n) = (y0 * power(m0, n0))) and (n0 >= 0)) ->
+  (n0 <= 0) ->
+  (y0 = power(x, n))
+

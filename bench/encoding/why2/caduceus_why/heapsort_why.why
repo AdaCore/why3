@@ -1,0 +1,2743 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+type 'a farray
+
+logic access : 'a1 farray, int -> 'a1
+
+logic update : 'a1 farray, int, 'a1 -> 'a1 farray
+
+axiom access_update:
+  (forall a:'a1 farray.
+    (forall i:int. (forall v:'a1. (access(update(a, i, v), i) = v))))
+
+axiom access_update_neq:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int.
+        (forall v:'a1.
+          ((i <> j) -> (access(update(a, i, v), j) = access(a, j)))))))
+
+logic array_length : 'a1 farray -> int
+
+predicate sorted_array(t: int farray, i: int, j: int) =
+  (forall k1:int.
+    (forall k2:int.
+      ((((i <= k1) and (k1 <= k2)) and (k2 <= j)) -> (access(t,
+       k1) <= access(t, k2)))))
+
+predicate exchange(a1: 'a1 farray, a2: 'a1 farray, i: int, j: int) =
+  ((array_length(a1) = array_length(a2)) and
+   ((access(a1, i) = access(a2, j)) and
+    ((access(a2, i) = access(a1, j)) and
+     (forall k:int.
+       (((k <> i) and (k <> j)) -> (access(a1, k) = access(a2, k)))))))
+
+logic permut : 'a1 farray, 'a1 farray, int, int -> prop
+
+axiom permut_refl:
+  (forall t:'a1 farray. (forall l:int. (forall u:int. permut(t, t, l, u))))
+
+axiom permut_sym:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall l:int.
+        (forall u:int. (permut(t1, t2, l, u) -> permut(t2, t1, l, u))))))
+
+axiom permut_trans:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall t3:'a1 farray.
+        (forall l:int.
+          (forall u:int.
+            (permut(t1, t2, l, u) ->
+             (permut(t2, t3, l, u) -> permut(t1, t3, l, u))))))))
+
+axiom permut_exchange:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (forall i:int.
+            (forall j:int.
+              (((l <= i) and (i <= u)) ->
+               (((l <= j) and (j <= u)) ->
+                (exchange(a1, a2, i, j) -> permut(a1, a2, l, u))))))))))
+
+axiom exchange_upd:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int. exchange(a, update(update(a, i, access(a, j)), j,
+        access(a, i)), i, j))))
+
+axiom permut_weakening:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l1:int.
+        (forall r1:int.
+          (forall l2:int.
+            (forall r2:int.
+              ((((l1 <= l2) and (l2 <= r2)) and (r2 <= r1)) ->
+               (permut(a1, a2, l2, r2) -> permut(a1, a2, l1, r1)))))))))
+
+axiom permut_eq:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          ((l <= u) ->
+           (permut(a1, a2, l, u) ->
+            (forall i:int.
+              (((i < l) or (u < i)) -> (access(a2, i) = access(a1, i))))))))))
+
+predicate permutation(a1: 'a1 farray, a2: 'a1 farray) = permut(a1, a2, 0,
+  (array_length(a1) - 1))
+
+axiom array_length_update:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall v:'a1. (array_length(update(a, i, v)) = array_length(a)))))
+
+axiom permut_array_length:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (permut(a1, a2, l, u) -> (array_length(a1) = array_length(a2)))))))
+
+goal swap_po_1:
+  forall i:int.
+  forall j:int.
+  forall t:int farray.
+  (((0 <= i) and (i < array_length(t))) and
+   ((0 <= j) and (j < array_length(t)))) ->
+  (0 <= i)
+
+goal swap_po_2:
+  forall i:int.
+  forall j:int.
+  forall t:int farray.
+  (((0 <= i) and (i < array_length(t))) and
+   ((0 <= j) and (j < array_length(t)))) ->
+  (i < array_length(t))
+
+goal swap_po_3:
+  forall i:int.
+  forall j:int.
+  forall t:int farray.
+  (((0 <= i) and (i < array_length(t))) and
+   ((0 <= j) and (j < array_length(t)))) ->
+  ((0 <= i) and (i < array_length(t))) ->
+  forall result:int.
+  (result = access(t, i)) ->
+  (0 <= j)
+
+goal swap_po_4:
+  forall i:int.
+  forall j:int.
+  forall t:int farray.
+  (((0 <= i) and (i < array_length(t))) and
+   ((0 <= j) and (j < array_length(t)))) ->
+  ((0 <= i) and (i < array_length(t))) ->
+  forall result:int.
+  (result = access(t, i)) ->
+  (j < array_length(t))
+
+goal swap_po_5:
+  forall i:int.
+  forall j:int.
+  forall t:int farray.
+  (((0 <= i) and (i < array_length(t))) and
+   ((0 <= j) and (j < array_length(t)))) ->
+  ((0 <= i) and (i < array_length(t))) ->
+  forall result:int.
+  (result = access(t, i)) ->
+  ((0 <= j) and (j < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, j)) ->
+  ((0 <= i) and (i < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, i, result0)) ->
+  (j < array_length(t0))
+
+goal swap_po_6:
+  forall i:int.
+  forall j:int.
+  forall t:int farray.
+  (((0 <= i) and (i < array_length(t))) and
+   ((0 <= j) and (j < array_length(t)))) ->
+  ((0 <= i) and (i < array_length(t))) ->
+  forall result:int.
+  (result = access(t, i)) ->
+  ((0 <= j) and (j < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, j)) ->
+  ((0 <= i) and (i < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, i, result0)) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, j, result)) ->
+  exchange(t1, t, i, j)
+
+predicate select_son(t: int farray, k: int, n: int, j: int) =
+  (((j = ((2 * k) + 1)) and
+    ((((2 * k) + 2) <= n) -> (access(t, j) >= access(t, ((2 * k) + 2))))) or
+   ((j = ((2 * k) + 2)) and
+    ((j <= n) and (access(t, j) >= access(t, ((2 * k) + 1))))))
+
+logic inftree : int farray, int, int, int -> prop
+
+axiom inftree_def:
+  (forall a:int farray.
+    (forall n:int.
+      (forall v:int.
+        (forall k:int.
+          (inftree(a, n, v, k) <->
+           (((0 <= k) and (k <= n)) and
+            ((access(a, k) <= v) and
+             (((((2 * k) + 1) <= n) -> inftree(a, n, v, ((2 * k) + 1))) and
+              ((((2 * k) + 2) <= n) -> inftree(a, n, v, ((2 * k) + 2)))))))))))
+
+logic heap : int farray, int, int -> prop
+
+axiom heap_def:
+  (forall a:int farray.
+    (forall n:int.
+      (forall k:int.
+        (heap(a, n, k) <->
+         (((0 <= k) and (k <= n)) and
+          (((((2 * k) + 1) <= n) -> (access(a, k) >= access(a,
+            ((2 * k) + 1)))) and
+           (((((2 * k) + 1) <= n) -> heap(a, n, ((2 * k) + 1))) and
+            (((((2 * k) + 2) <= n) -> (access(a, k) >= access(a,
+              ((2 * k) + 2)))) and
+             ((((2 * k) + 2) <= n) -> heap(a, n, ((2 * k) + 2)))))))))))
+
+goal downheap_po_1:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  (0 <= ((2 * k) + 1))
+
+goal downheap_po_2:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  (((2 * k) + 1) < array_length(t))
+
+goal downheap_po_3:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  (0 <= (((2 * k) + 1) + 1))
+
+goal downheap_po_4:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((((2 * k) + 1) + 1) < array_length(t))
+
+goal downheap_po_5:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result < result0) ->
+  select_son(t, k, n, (((2 * k) + 1) + 1))
+
+goal downheap_po_6:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result < result0) ->
+  (0 <= k)
+
+goal downheap_po_7:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result < result0) ->
+  (k < array_length(t))
+
+goal downheap_po_8:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result < result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, (((2 * k) + 1) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, (((2 * k) + 1) + 1)) ->
+  (0 <= (n - k))
+
+goal downheap_po_9:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result < result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, (((2 * k) + 1) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, (((2 * k) + 1) + 1)) ->
+  ((n - (((2 * k) + 1) + 1)) < (n - k))
+
+goal downheap_po_10:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result < result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, (((2 * k) + 1) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, (((2 * k) + 1) + 1)) ->
+  ((0 <= (n - k)) and ((n - (((2 * k) + 1) + 1)) < (n - k))) ->
+  (n < array_length(t0))
+
+goal downheap_po_11:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result < result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, (((2 * k) + 1) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, (((2 * k) + 1) + 1)) ->
+  ((0 <= (n - k)) and ((n - (((2 * k) + 1) + 1)) < (n - k))) ->
+  forall i:int.
+  ((((((2 * k) + 1) + 1) + 1) <= i) and (i <= n)) ->
+  heap(t0, n, i)
+
+goal downheap_po_12:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result < result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, (((2 * k) + 1) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, (((2 * k) + 1) + 1)) ->
+  ((0 <= (n - k)) and ((n - (((2 * k) + 1) + 1)) < (n - k))) ->
+  (((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) <= n)) and
+   ((n < array_length(t0)) and
+    (forall i:int.
+      (((((((2 * k) + 1) + 1) + 1) <= i) and (i <= n)) -> heap(t0, n, i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int.
+      ((((((2 * k) + 1) + 1) <= i) and (i <= n)) -> heap(t1, n, i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < (((2 * k) + 1) + 1))) or
+         ((((((2 * k) + 1) + 1) < i) and
+           (i < ((2 * (((2 * k) + 1) + 1)) + 1))) or
+          ((n < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, n, v, (((2 * k) + 1) + 1)) -> inftree(t1, n, v,
+        (((2 * k) + 1) + 1))))))) ->
+  permutation(t1, t)
+
+goal downheap_po_13:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result < result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, (((2 * k) + 1) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, (((2 * k) + 1) + 1)) ->
+  ((0 <= (n - k)) and ((n - (((2 * k) + 1) + 1)) < (n - k))) ->
+  (((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) <= n)) and
+   ((n < array_length(t0)) and
+    (forall i:int.
+      (((((((2 * k) + 1) + 1) + 1) <= i) and (i <= n)) -> heap(t0, n, i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int.
+      ((((((2 * k) + 1) + 1) <= i) and (i <= n)) -> heap(t1, n, i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < (((2 * k) + 1) + 1))) or
+         ((((((2 * k) + 1) + 1) < i) and
+           (i < ((2 * (((2 * k) + 1) + 1)) + 1))) or
+          ((n < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, n, v, (((2 * k) + 1) + 1)) -> inftree(t1, n, v,
+        (((2 * k) + 1) + 1))))))) ->
+  forall i:int.
+  ((k <= i) and (i <= n)) ->
+  heap(t1, n, i)
+
+goal downheap_po_14:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result < result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, (((2 * k) + 1) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, (((2 * k) + 1) + 1)) ->
+  ((0 <= (n - k)) and ((n - (((2 * k) + 1) + 1)) < (n - k))) ->
+  (((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) <= n)) and
+   ((n < array_length(t0)) and
+    (forall i:int.
+      (((((((2 * k) + 1) + 1) + 1) <= i) and (i <= n)) -> heap(t0, n, i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int.
+      ((((((2 * k) + 1) + 1) <= i) and (i <= n)) -> heap(t1, n, i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < (((2 * k) + 1) + 1))) or
+         ((((((2 * k) + 1) + 1) < i) and
+           (i < ((2 * (((2 * k) + 1) + 1)) + 1))) or
+          ((n < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, n, v, (((2 * k) + 1) + 1)) -> inftree(t1, n, v,
+        (((2 * k) + 1) + 1))))))) ->
+  forall i:int.
+  (((0 <= i) and (i < k)) or
+   (((k < i) and (i < ((2 * k) + 1))) or ((n < i) and (i < array_length(t1))))) ->
+  (access(t1, i) = access(t, i))
+
+goal downheap_po_15:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result < result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, (((2 * k) + 1) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, (((2 * k) + 1) + 1)) ->
+  ((0 <= (n - k)) and ((n - (((2 * k) + 1) + 1)) < (n - k))) ->
+  (((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) <= n)) and
+   ((n < array_length(t0)) and
+    (forall i:int.
+      (((((((2 * k) + 1) + 1) + 1) <= i) and (i <= n)) -> heap(t0, n, i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int.
+      ((((((2 * k) + 1) + 1) <= i) and (i <= n)) -> heap(t1, n, i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < (((2 * k) + 1) + 1))) or
+         ((((((2 * k) + 1) + 1) < i) and
+           (i < ((2 * (((2 * k) + 1) + 1)) + 1))) or
+          ((n < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, n, v, (((2 * k) + 1) + 1)) -> inftree(t1, n, v,
+        (((2 * k) + 1) + 1))))))) ->
+  forall v:int.
+  inftree(t, n, v, k) ->
+  inftree(t1, n, v, k)
+
+goal downheap_po_16:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result < result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, (((2 * k) + 1) + 1))) ->
+  (result1 >= result2) ->
+  permutation(t, t)
+
+goal downheap_po_17:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result < result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, (((2 * k) + 1) + 1))) ->
+  (result1 >= result2) ->
+  forall i:int.
+  ((k <= i) and (i <= n)) ->
+  heap(t, n, i)
+
+goal downheap_po_18:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result >= result0) ->
+  select_son(t, k, n, ((2 * k) + 1))
+
+goal downheap_po_19:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result >= result0) ->
+  (0 <= k)
+
+goal downheap_po_20:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result >= result0) ->
+  (k < array_length(t))
+
+goal downheap_po_21:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result >= result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, ((2 * k) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  (0 <= (n - k))
+
+goal downheap_po_22:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result >= result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, ((2 * k) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  ((n - ((2 * k) + 1)) < (n - k))
+
+goal downheap_po_23:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result >= result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, ((2 * k) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  ((0 <= (n - k)) and ((n - ((2 * k) + 1)) < (n - k))) ->
+  (n < array_length(t0))
+
+goal downheap_po_24:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result >= result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, ((2 * k) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  ((0 <= (n - k)) and ((n - ((2 * k) + 1)) < (n - k))) ->
+  forall i:int.
+  (((((2 * k) + 1) + 1) <= i) and (i <= n)) ->
+  heap(t0, n, i)
+
+goal downheap_po_25:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result >= result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, ((2 * k) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  ((0 <= (n - k)) and ((n - ((2 * k) + 1)) < (n - k))) ->
+  (((0 <= ((2 * k) + 1)) and (((2 * k) + 1) <= n)) and
+   ((n < array_length(t0)) and
+    (forall i:int.
+      ((((((2 * k) + 1) + 1) <= i) and (i <= n)) -> heap(t0, n, i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int. (((((2 * k) + 1) <= i) and (i <= n)) -> heap(t1, n, i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < ((2 * k) + 1))) or
+         (((((2 * k) + 1) < i) and (i < ((2 * ((2 * k) + 1)) + 1))) or
+          ((n < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, n, v, ((2 * k) + 1)) -> inftree(t1, n, v, ((2 * k) + 1))))))) ->
+  permutation(t1, t)
+
+goal downheap_po_26:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result >= result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, ((2 * k) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  ((0 <= (n - k)) and ((n - ((2 * k) + 1)) < (n - k))) ->
+  (((0 <= ((2 * k) + 1)) and (((2 * k) + 1) <= n)) and
+   ((n < array_length(t0)) and
+    (forall i:int.
+      ((((((2 * k) + 1) + 1) <= i) and (i <= n)) -> heap(t0, n, i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int. (((((2 * k) + 1) <= i) and (i <= n)) -> heap(t1, n, i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < ((2 * k) + 1))) or
+         (((((2 * k) + 1) < i) and (i < ((2 * ((2 * k) + 1)) + 1))) or
+          ((n < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, n, v, ((2 * k) + 1)) -> inftree(t1, n, v, ((2 * k) + 1))))))) ->
+  forall i:int.
+  ((k <= i) and (i <= n)) ->
+  heap(t1, n, i)
+
+goal downheap_po_27:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result >= result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, ((2 * k) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  ((0 <= (n - k)) and ((n - ((2 * k) + 1)) < (n - k))) ->
+  (((0 <= ((2 * k) + 1)) and (((2 * k) + 1) <= n)) and
+   ((n < array_length(t0)) and
+    (forall i:int.
+      ((((((2 * k) + 1) + 1) <= i) and (i <= n)) -> heap(t0, n, i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int. (((((2 * k) + 1) <= i) and (i <= n)) -> heap(t1, n, i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < ((2 * k) + 1))) or
+         (((((2 * k) + 1) < i) and (i < ((2 * ((2 * k) + 1)) + 1))) or
+          ((n < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, n, v, ((2 * k) + 1)) -> inftree(t1, n, v, ((2 * k) + 1))))))) ->
+  forall i:int.
+  (((0 <= i) and (i < k)) or
+   (((k < i) and (i < ((2 * k) + 1))) or ((n < i) and (i < array_length(t1))))) ->
+  (access(t1, i) = access(t, i))
+
+goal downheap_po_28:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result >= result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, ((2 * k) + 1))) ->
+  (result1 < result2) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  ((0 <= (n - k)) and ((n - ((2 * k) + 1)) < (n - k))) ->
+  (((0 <= ((2 * k) + 1)) and (((2 * k) + 1) <= n)) and
+   ((n < array_length(t0)) and
+    (forall i:int.
+      ((((((2 * k) + 1) + 1) <= i) and (i <= n)) -> heap(t0, n, i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int. (((((2 * k) + 1) <= i) and (i <= n)) -> heap(t1, n, i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < ((2 * k) + 1))) or
+         (((((2 * k) + 1) < i) and (i < ((2 * ((2 * k) + 1)) + 1))) or
+          ((n < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, n, v, ((2 * k) + 1)) -> inftree(t1, n, v, ((2 * k) + 1))))))) ->
+  forall v:int.
+  inftree(t, n, v, k) ->
+  inftree(t1, n, v, k)
+
+goal downheap_po_29:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result >= result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, ((2 * k) + 1))) ->
+  (result1 >= result2) ->
+  permutation(t, t)
+
+goal downheap_po_30:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) <= n) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result:int.
+  (result = access(t, ((2 * k) + 1))) ->
+  ((0 <= (((2 * k) + 1) + 1)) and ((((2 * k) + 1) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, (((2 * k) + 1) + 1))) ->
+  (result >= result0) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result1:int.
+  (result1 = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result2:int.
+  (result2 = access(t, ((2 * k) + 1))) ->
+  (result1 >= result2) ->
+  forall i:int.
+  ((k <= i) and (i <= n)) ->
+  heap(t, n, i)
+
+goal downheap_po_31:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  select_son(t, k, n, ((2 * k) + 1))
+
+goal downheap_po_32:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  (0 <= k)
+
+goal downheap_po_33:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  (k < array_length(t))
+
+goal downheap_po_34:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result:int.
+  (result = access(t, k)) ->
+  (0 <= ((2 * k) + 1))
+
+goal downheap_po_35:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result:int.
+  (result = access(t, k)) ->
+  (((2 * k) + 1) < array_length(t))
+
+goal downheap_po_36:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result:int.
+  (result = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, ((2 * k) + 1))) ->
+  (result < result0) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  (0 <= (n - k))
+
+goal downheap_po_37:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result:int.
+  (result = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, ((2 * k) + 1))) ->
+  (result < result0) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  ((n - ((2 * k) + 1)) < (n - k))
+
+goal downheap_po_38:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result:int.
+  (result = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, ((2 * k) + 1))) ->
+  (result < result0) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  ((0 <= (n - k)) and ((n - ((2 * k) + 1)) < (n - k))) ->
+  (n < array_length(t0))
+
+goal downheap_po_39:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result:int.
+  (result = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, ((2 * k) + 1))) ->
+  (result < result0) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  ((0 <= (n - k)) and ((n - ((2 * k) + 1)) < (n - k))) ->
+  forall i:int.
+  (((((2 * k) + 1) + 1) <= i) and (i <= n)) ->
+  heap(t0, n, i)
+
+goal downheap_po_40:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result:int.
+  (result = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, ((2 * k) + 1))) ->
+  (result < result0) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  ((0 <= (n - k)) and ((n - ((2 * k) + 1)) < (n - k))) ->
+  (((0 <= ((2 * k) + 1)) and (((2 * k) + 1) <= n)) and
+   ((n < array_length(t0)) and
+    (forall i:int.
+      ((((((2 * k) + 1) + 1) <= i) and (i <= n)) -> heap(t0, n, i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int. (((((2 * k) + 1) <= i) and (i <= n)) -> heap(t1, n, i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < ((2 * k) + 1))) or
+         (((((2 * k) + 1) < i) and (i < ((2 * ((2 * k) + 1)) + 1))) or
+          ((n < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, n, v, ((2 * k) + 1)) -> inftree(t1, n, v, ((2 * k) + 1))))))) ->
+  permutation(t1, t)
+
+goal downheap_po_41:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result:int.
+  (result = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, ((2 * k) + 1))) ->
+  (result < result0) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  ((0 <= (n - k)) and ((n - ((2 * k) + 1)) < (n - k))) ->
+  (((0 <= ((2 * k) + 1)) and (((2 * k) + 1) <= n)) and
+   ((n < array_length(t0)) and
+    (forall i:int.
+      ((((((2 * k) + 1) + 1) <= i) and (i <= n)) -> heap(t0, n, i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int. (((((2 * k) + 1) <= i) and (i <= n)) -> heap(t1, n, i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < ((2 * k) + 1))) or
+         (((((2 * k) + 1) < i) and (i < ((2 * ((2 * k) + 1)) + 1))) or
+          ((n < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, n, v, ((2 * k) + 1)) -> inftree(t1, n, v, ((2 * k) + 1))))))) ->
+  forall i:int.
+  ((k <= i) and (i <= n)) ->
+  heap(t1, n, i)
+
+goal downheap_po_42:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result:int.
+  (result = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, ((2 * k) + 1))) ->
+  (result < result0) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  ((0 <= (n - k)) and ((n - ((2 * k) + 1)) < (n - k))) ->
+  (((0 <= ((2 * k) + 1)) and (((2 * k) + 1) <= n)) and
+   ((n < array_length(t0)) and
+    (forall i:int.
+      ((((((2 * k) + 1) + 1) <= i) and (i <= n)) -> heap(t0, n, i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int. (((((2 * k) + 1) <= i) and (i <= n)) -> heap(t1, n, i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < ((2 * k) + 1))) or
+         (((((2 * k) + 1) < i) and (i < ((2 * ((2 * k) + 1)) + 1))) or
+          ((n < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, n, v, ((2 * k) + 1)) -> inftree(t1, n, v, ((2 * k) + 1))))))) ->
+  forall i:int.
+  (((0 <= i) and (i < k)) or
+   (((k < i) and (i < ((2 * k) + 1))) or ((n < i) and (i < array_length(t1))))) ->
+  (access(t1, i) = access(t, i))
+
+goal downheap_po_43:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result:int.
+  (result = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, ((2 * k) + 1))) ->
+  (result < result0) ->
+  (((0 <= k) and (k < array_length(t))) and
+   ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t)))) ->
+  forall t0:int farray.
+  exchange(t0, t, k, ((2 * k) + 1)) ->
+  ((0 <= (n - k)) and ((n - ((2 * k) + 1)) < (n - k))) ->
+  (((0 <= ((2 * k) + 1)) and (((2 * k) + 1) <= n)) and
+   ((n < array_length(t0)) and
+    (forall i:int.
+      ((((((2 * k) + 1) + 1) <= i) and (i <= n)) -> heap(t0, n, i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int. (((((2 * k) + 1) <= i) and (i <= n)) -> heap(t1, n, i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < ((2 * k) + 1))) or
+         (((((2 * k) + 1) < i) and (i < ((2 * ((2 * k) + 1)) + 1))) or
+          ((n < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, n, v, ((2 * k) + 1)) -> inftree(t1, n, v, ((2 * k) + 1))))))) ->
+  forall v:int.
+  inftree(t, n, v, k) ->
+  inftree(t1, n, v, k)
+
+goal downheap_po_44:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result:int.
+  (result = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, ((2 * k) + 1))) ->
+  (result >= result0) ->
+  permutation(t, t)
+
+goal downheap_po_45:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) <= n) ->
+  ((((2 * k) + 1) + 1) > n) ->
+  ((0 <= k) and (k < array_length(t))) ->
+  forall result:int.
+  (result = access(t, k)) ->
+  ((0 <= ((2 * k) + 1)) and (((2 * k) + 1) < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, ((2 * k) + 1))) ->
+  (result >= result0) ->
+  forall i:int.
+  ((k <= i) and (i <= n)) ->
+  heap(t, n, i)
+
+goal downheap_po_46:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) > n) ->
+  permutation(t, t)
+
+goal downheap_po_47:
+  forall k:int.
+  forall n:int.
+  forall t:int farray.
+  (((0 <= k) and (k <= n)) and
+   ((n < array_length(t)) and
+    (forall i:int. ((((k + 1) <= i) and (i <= n)) -> heap(t, n, i))))) ->
+  (((2 * k) + 1) > n) ->
+  forall i:int.
+  ((k <= i) and (i <= n)) ->
+  heap(t, n, i)
+
+axiom div2_1: (forall n:int. ((0 < n) -> ((0 <= (n / 2)) and ((n / 2) < n))))
+
+axiom div2_2:
+  (forall n:int. (((n - 1) <= (2 * (n / 2))) and ((2 * (n / 2)) <= n)))
+
+goal heapsort_po_1:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0)
+
+goal heapsort_po_2:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  ((-1) <= (result0 - 1))
+
+goal heapsort_po_3:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  ((result0 - 1) <= (array_length(t) - 1))
+
+goal heapsort_po_4:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall i:int.
+  ((((result0 - 1) + 1) <= i) and (i <= (array_length(t) - 1))) ->
+  heap(t, (array_length(t) - 1), i)
+
+goal heapsort_po_5:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  permutation(t, t)
+
+goal heapsort_po_6:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k >= 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  (0 <= k)
+
+goal heapsort_po_7:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k >= 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  (k <= (result1 - 1))
+
+goal heapsort_po_8:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k >= 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  ((result1 - 1) < array_length(t0))
+
+goal heapsort_po_9:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k >= 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall i:int.
+  (((k + 1) <= i) and (i <= (result1 - 1))) ->
+  heap(t0, (result1 - 1), i)
+
+goal heapsort_po_10:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k >= 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  (((0 <= k) and (k <= (result1 - 1))) and
+   (((result1 - 1) < array_length(t0)) and
+    (forall i:int.
+      ((((k + 1) <= i) and (i <= (result1 - 1))) -> heap(t0, (result1 - 1),
+       i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int.
+      (((k <= i) and (i <= (result1 - 1))) -> heap(t1, (result1 - 1), i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < k)) or
+         (((k < i) and (i < ((2 * k) + 1))) or
+          (((result1 - 1) < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, (result1 - 1), v, k) -> inftree(t1, (result1 - 1), v, k)))))) ->
+  forall k0:int.
+  (k0 = (k - 1)) ->
+  ((-1) <= k0)
+
+goal heapsort_po_11:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k >= 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  (((0 <= k) and (k <= (result1 - 1))) and
+   (((result1 - 1) < array_length(t0)) and
+    (forall i:int.
+      ((((k + 1) <= i) and (i <= (result1 - 1))) -> heap(t0, (result1 - 1),
+       i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int.
+      (((k <= i) and (i <= (result1 - 1))) -> heap(t1, (result1 - 1), i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < k)) or
+         (((k < i) and (i < ((2 * k) + 1))) or
+          (((result1 - 1) < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, (result1 - 1), v, k) -> inftree(t1, (result1 - 1), v, k)))))) ->
+  forall k0:int.
+  (k0 = (k - 1)) ->
+  (k0 <= (array_length(t1) - 1))
+
+goal heapsort_po_12:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k >= 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  (((0 <= k) and (k <= (result1 - 1))) and
+   (((result1 - 1) < array_length(t0)) and
+    (forall i:int.
+      ((((k + 1) <= i) and (i <= (result1 - 1))) -> heap(t0, (result1 - 1),
+       i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int.
+      (((k <= i) and (i <= (result1 - 1))) -> heap(t1, (result1 - 1), i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < k)) or
+         (((k < i) and (i < ((2 * k) + 1))) or
+          (((result1 - 1) < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, (result1 - 1), v, k) -> inftree(t1, (result1 - 1), v, k)))))) ->
+  forall k0:int.
+  (k0 = (k - 1)) ->
+  forall i:int.
+  (((k0 + 1) <= i) and (i <= (array_length(t1) - 1))) ->
+  heap(t1, (array_length(t1) - 1), i)
+
+goal heapsort_po_13:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k >= 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  (((0 <= k) and (k <= (result1 - 1))) and
+   (((result1 - 1) < array_length(t0)) and
+    (forall i:int.
+      ((((k + 1) <= i) and (i <= (result1 - 1))) -> heap(t0, (result1 - 1),
+       i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int.
+      (((k <= i) and (i <= (result1 - 1))) -> heap(t1, (result1 - 1), i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < k)) or
+         (((k < i) and (i < ((2 * k) + 1))) or
+          (((result1 - 1) < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, (result1 - 1), v, k) -> inftree(t1, (result1 - 1), v, k)))))) ->
+  forall k0:int.
+  (k0 = (k - 1)) ->
+  permutation(t1, t)
+
+goal heapsort_po_14:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k >= 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  (((0 <= k) and (k <= (result1 - 1))) and
+   (((result1 - 1) < array_length(t0)) and
+    (forall i:int.
+      ((((k + 1) <= i) and (i <= (result1 - 1))) -> heap(t0, (result1 - 1),
+       i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int.
+      (((k <= i) and (i <= (result1 - 1))) -> heap(t1, (result1 - 1), i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < k)) or
+         (((k < i) and (i < ((2 * k) + 1))) or
+          (((result1 - 1) < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, (result1 - 1), v, k) -> inftree(t1, (result1 - 1), v, k)))))) ->
+  forall k0:int.
+  (k0 = (k - 1)) ->
+  (0 <= (k + 1))
+
+goal heapsort_po_15:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k >= 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  (((0 <= k) and (k <= (result1 - 1))) and
+   (((result1 - 1) < array_length(t0)) and
+    (forall i:int.
+      ((((k + 1) <= i) and (i <= (result1 - 1))) -> heap(t0, (result1 - 1),
+       i))))) ->
+  forall t1:int farray.
+  (permutation(t1, t0) and
+   ((forall i:int.
+      (((k <= i) and (i <= (result1 - 1))) -> heap(t1, (result1 - 1), i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < k)) or
+         (((k < i) and (i < ((2 * k) + 1))) or
+          (((result1 - 1) < i) and (i < array_length(t1))))) ->
+        (access(t1, i) = access(t0, i)))) and
+     (forall v:int.
+       (inftree(t0, (result1 - 1), v, k) -> inftree(t1, (result1 - 1), v, k)))))) ->
+  forall k0:int.
+  (k0 = (k - 1)) ->
+  ((k0 + 1) < (k + 1))
+
+goal heapsort_po_16:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  heap(t0, (array_length(t0) - 1), 0)
+
+goal heapsort_po_17:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  permutation(t0, t)
+
+goal heapsort_po_18:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  (0 <= (result1 - 1))
+
+goal heapsort_po_19:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  ((result1 - 1) <= (array_length(t0) - 1))
+
+goal heapsort_po_20:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall i:int.
+  ((0 <= i) and (i <= (result1 - 1))) ->
+  heap(t0, (result1 - 1), i)
+
+goal heapsort_po_21:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  (((result1 - 1) + 1) <= (array_length(t0) - 1)) ->
+  (access(t0, 0) <= access(t0, ((result1 - 1) + 1)))
+
+goal heapsort_po_22:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  (((result1 - 1) + 1) <= (array_length(t0) - 1)) ->
+  sorted_array(t0, ((result1 - 1) + 1), (array_length(t0) - 1))
+
+goal heapsort_po_23:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  permutation(t0, t)
+
+goal heapsort_po_24:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (0 <= 0)
+
+goal heapsort_po_25:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (0 < array_length(t1))
+
+goal heapsort_po_26:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (0 <= k0)
+
+goal heapsort_po_27:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (k0 < array_length(t1))
+
+goal heapsort_po_28:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (((0 <= 0) and (0 < array_length(t1))) and
+   ((0 <= k0) and (k0 < array_length(t1)))) ->
+  forall t2:int farray.
+  exchange(t2, t1, 0, k0) ->
+  (0 <= 0)
+
+goal heapsort_po_29:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (((0 <= 0) and (0 < array_length(t1))) and
+   ((0 <= k0) and (k0 < array_length(t1)))) ->
+  forall t2:int farray.
+  exchange(t2, t1, 0, k0) ->
+  (0 <= (k0 - 1))
+
+goal heapsort_po_30:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (((0 <= 0) and (0 < array_length(t1))) and
+   ((0 <= k0) and (k0 < array_length(t1)))) ->
+  forall t2:int farray.
+  exchange(t2, t1, 0, k0) ->
+  ((k0 - 1) < array_length(t2))
+
+goal heapsort_po_31:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (((0 <= 0) and (0 < array_length(t1))) and
+   ((0 <= k0) and (k0 < array_length(t1)))) ->
+  forall t2:int farray.
+  exchange(t2, t1, 0, k0) ->
+  forall i:int.
+  (((0 + 1) <= i) and (i <= (k0 - 1))) ->
+  heap(t2, (k0 - 1), i)
+
+goal heapsort_po_32:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (((0 <= 0) and (0 < array_length(t1))) and
+   ((0 <= k0) and (k0 < array_length(t1)))) ->
+  forall t2:int farray.
+  exchange(t2, t1, 0, k0) ->
+  (((0 <= 0) and (0 <= (k0 - 1))) and
+   (((k0 - 1) < array_length(t2)) and
+    (forall i:int.
+      ((((0 + 1) <= i) and (i <= (k0 - 1))) -> heap(t2, (k0 - 1), i))))) ->
+  forall t3:int farray.
+  (permutation(t3, t2) and
+   ((forall i:int. (((0 <= i) and (i <= (k0 - 1))) -> heap(t3, (k0 - 1), i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < 0)) or
+         (((0 < i) and (i < ((2 * 0) + 1))) or
+          (((k0 - 1) < i) and (i < array_length(t3))))) ->
+        (access(t3, i) = access(t2, i)))) and
+     (forall v:int.
+       (inftree(t2, (k0 - 1), v, 0) -> inftree(t3, (k0 - 1), v, 0)))))) ->
+  forall k1:int.
+  (k1 = (k0 - 1)) ->
+  (0 <= k1)
+
+goal heapsort_po_33:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (((0 <= 0) and (0 < array_length(t1))) and
+   ((0 <= k0) and (k0 < array_length(t1)))) ->
+  forall t2:int farray.
+  exchange(t2, t1, 0, k0) ->
+  (((0 <= 0) and (0 <= (k0 - 1))) and
+   (((k0 - 1) < array_length(t2)) and
+    (forall i:int.
+      ((((0 + 1) <= i) and (i <= (k0 - 1))) -> heap(t2, (k0 - 1), i))))) ->
+  forall t3:int farray.
+  (permutation(t3, t2) and
+   ((forall i:int. (((0 <= i) and (i <= (k0 - 1))) -> heap(t3, (k0 - 1), i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < 0)) or
+         (((0 < i) and (i < ((2 * 0) + 1))) or
+          (((k0 - 1) < i) and (i < array_length(t3))))) ->
+        (access(t3, i) = access(t2, i)))) and
+     (forall v:int.
+       (inftree(t2, (k0 - 1), v, 0) -> inftree(t3, (k0 - 1), v, 0)))))) ->
+  forall k1:int.
+  (k1 = (k0 - 1)) ->
+  (k1 <= (array_length(t3) - 1))
+
+goal heapsort_po_34:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (((0 <= 0) and (0 < array_length(t1))) and
+   ((0 <= k0) and (k0 < array_length(t1)))) ->
+  forall t2:int farray.
+  exchange(t2, t1, 0, k0) ->
+  (((0 <= 0) and (0 <= (k0 - 1))) and
+   (((k0 - 1) < array_length(t2)) and
+    (forall i:int.
+      ((((0 + 1) <= i) and (i <= (k0 - 1))) -> heap(t2, (k0 - 1), i))))) ->
+  forall t3:int farray.
+  (permutation(t3, t2) and
+   ((forall i:int. (((0 <= i) and (i <= (k0 - 1))) -> heap(t3, (k0 - 1), i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < 0)) or
+         (((0 < i) and (i < ((2 * 0) + 1))) or
+          (((k0 - 1) < i) and (i < array_length(t3))))) ->
+        (access(t3, i) = access(t2, i)))) and
+     (forall v:int.
+       (inftree(t2, (k0 - 1), v, 0) -> inftree(t3, (k0 - 1), v, 0)))))) ->
+  forall k1:int.
+  (k1 = (k0 - 1)) ->
+  forall i:int.
+  ((0 <= i) and (i <= k1)) ->
+  heap(t3, k1, i)
+
+goal heapsort_po_35:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (((0 <= 0) and (0 < array_length(t1))) and
+   ((0 <= k0) and (k0 < array_length(t1)))) ->
+  forall t2:int farray.
+  exchange(t2, t1, 0, k0) ->
+  (((0 <= 0) and (0 <= (k0 - 1))) and
+   (((k0 - 1) < array_length(t2)) and
+    (forall i:int.
+      ((((0 + 1) <= i) and (i <= (k0 - 1))) -> heap(t2, (k0 - 1), i))))) ->
+  forall t3:int farray.
+  (permutation(t3, t2) and
+   ((forall i:int. (((0 <= i) and (i <= (k0 - 1))) -> heap(t3, (k0 - 1), i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < 0)) or
+         (((0 < i) and (i < ((2 * 0) + 1))) or
+          (((k0 - 1) < i) and (i < array_length(t3))))) ->
+        (access(t3, i) = access(t2, i)))) and
+     (forall v:int.
+       (inftree(t2, (k0 - 1), v, 0) -> inftree(t3, (k0 - 1), v, 0)))))) ->
+  forall k1:int.
+  (k1 = (k0 - 1)) ->
+  ((k1 + 1) <= (array_length(t3) - 1)) ->
+  (access(t3, 0) <= access(t3, (k1 + 1)))
+
+goal heapsort_po_36:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (((0 <= 0) and (0 < array_length(t1))) and
+   ((0 <= k0) and (k0 < array_length(t1)))) ->
+  forall t2:int farray.
+  exchange(t2, t1, 0, k0) ->
+  (((0 <= 0) and (0 <= (k0 - 1))) and
+   (((k0 - 1) < array_length(t2)) and
+    (forall i:int.
+      ((((0 + 1) <= i) and (i <= (k0 - 1))) -> heap(t2, (k0 - 1), i))))) ->
+  forall t3:int farray.
+  (permutation(t3, t2) and
+   ((forall i:int. (((0 <= i) and (i <= (k0 - 1))) -> heap(t3, (k0 - 1), i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < 0)) or
+         (((0 < i) and (i < ((2 * 0) + 1))) or
+          (((k0 - 1) < i) and (i < array_length(t3))))) ->
+        (access(t3, i) = access(t2, i)))) and
+     (forall v:int.
+       (inftree(t2, (k0 - 1), v, 0) -> inftree(t3, (k0 - 1), v, 0)))))) ->
+  forall k1:int.
+  (k1 = (k0 - 1)) ->
+  ((k1 + 1) <= (array_length(t3) - 1)) ->
+  sorted_array(t3, (k1 + 1), (array_length(t3) - 1))
+
+goal heapsort_po_37:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (((0 <= 0) and (0 < array_length(t1))) and
+   ((0 <= k0) and (k0 < array_length(t1)))) ->
+  forall t2:int farray.
+  exchange(t2, t1, 0, k0) ->
+  (((0 <= 0) and (0 <= (k0 - 1))) and
+   (((k0 - 1) < array_length(t2)) and
+    (forall i:int.
+      ((((0 + 1) <= i) and (i <= (k0 - 1))) -> heap(t2, (k0 - 1), i))))) ->
+  forall t3:int farray.
+  (permutation(t3, t2) and
+   ((forall i:int. (((0 <= i) and (i <= (k0 - 1))) -> heap(t3, (k0 - 1), i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < 0)) or
+         (((0 < i) and (i < ((2 * 0) + 1))) or
+          (((k0 - 1) < i) and (i < array_length(t3))))) ->
+        (access(t3, i) = access(t2, i)))) and
+     (forall v:int.
+       (inftree(t2, (k0 - 1), v, 0) -> inftree(t3, (k0 - 1), v, 0)))))) ->
+  forall k1:int.
+  (k1 = (k0 - 1)) ->
+  permutation(t3, t)
+
+goal heapsort_po_38:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (((0 <= 0) and (0 < array_length(t1))) and
+   ((0 <= k0) and (k0 < array_length(t1)))) ->
+  forall t2:int farray.
+  exchange(t2, t1, 0, k0) ->
+  (((0 <= 0) and (0 <= (k0 - 1))) and
+   (((k0 - 1) < array_length(t2)) and
+    (forall i:int.
+      ((((0 + 1) <= i) and (i <= (k0 - 1))) -> heap(t2, (k0 - 1), i))))) ->
+  forall t3:int farray.
+  (permutation(t3, t2) and
+   ((forall i:int. (((0 <= i) and (i <= (k0 - 1))) -> heap(t3, (k0 - 1), i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < 0)) or
+         (((0 < i) and (i < ((2 * 0) + 1))) or
+          (((k0 - 1) < i) and (i < array_length(t3))))) ->
+        (access(t3, i) = access(t2, i)))) and
+     (forall v:int.
+       (inftree(t2, (k0 - 1), v, 0) -> inftree(t3, (k0 - 1), v, 0)))))) ->
+  forall k1:int.
+  (k1 = (k0 - 1)) ->
+  (0 <= k0)
+
+goal heapsort_po_39:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 >= 1) ->
+  (((0 <= 0) and (0 < array_length(t1))) and
+   ((0 <= k0) and (k0 < array_length(t1)))) ->
+  forall t2:int farray.
+  exchange(t2, t1, 0, k0) ->
+  (((0 <= 0) and (0 <= (k0 - 1))) and
+   (((k0 - 1) < array_length(t2)) and
+    (forall i:int.
+      ((((0 + 1) <= i) and (i <= (k0 - 1))) -> heap(t2, (k0 - 1), i))))) ->
+  forall t3:int farray.
+  (permutation(t3, t2) and
+   ((forall i:int. (((0 <= i) and (i <= (k0 - 1))) -> heap(t3, (k0 - 1), i))) and
+    ((forall i:int.
+       ((((0 <= i) and (i < 0)) or
+         (((0 < i) and (i < ((2 * 0) + 1))) or
+          (((k0 - 1) < i) and (i < array_length(t3))))) ->
+        (access(t3, i) = access(t2, i)))) and
+     (forall v:int.
+       (inftree(t2, (k0 - 1), v, 0) -> inftree(t3, (k0 - 1), v, 0)))))) ->
+  forall k1:int.
+  (k1 = (k0 - 1)) ->
+  (k1 < k0)
+
+goal heapsort_po_40:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 < 1) ->
+  sorted_array(t1, 0, (array_length(t1) - 1))
+
+goal heapsort_po_41:
+  forall t:int farray.
+  (1 <= array_length(t)) ->
+  forall result:int.
+  (result = array_length(t)) ->
+  (2 <> 0) ->
+  forall result0:int.
+  (result0 = (result / 2)) ->
+  forall k:int.
+  forall t0:int farray.
+  ((((-1) <= k) and (k <= (array_length(t0) - 1))) and
+   ((forall i:int.
+      ((((k + 1) <= i) and (i <= (array_length(t0) - 1))) -> heap(t0,
+       (array_length(t0) - 1), i))) and
+    permutation(t0, t))) ->
+  (k < 0) ->
+  forall result1:int.
+  (result1 = array_length(t0)) ->
+  forall k0:int.
+  forall t1:int farray.
+  (((0 <= k0) and (k0 <= (array_length(t1) - 1))) and
+   ((forall i:int. (((0 <= i) and (i <= k0)) -> heap(t1, k0, i))) and
+    ((((k0 + 1) <= (array_length(t1) - 1)) -> (access(t1, 0) <= access(t1,
+      (k0 + 1)))) and
+     ((((k0 + 1) <= (array_length(t1) - 1)) -> sorted_array(t1, (k0 + 1),
+       (array_length(t1) - 1))) and
+      permutation(t1, t))))) ->
+  (k0 < 1) ->
+  permutation(t1, t)
+

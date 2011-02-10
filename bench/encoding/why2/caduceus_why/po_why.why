@@ -1,0 +1,299 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+logic q : int -> prop
+
+goal p1_po_1:
+  forall x:int.
+  forall x0:int.
+  q((x + 1)) ->
+  (x0 = (x + 1)) ->
+  q(x0)
+
+goal p2_po_1:
+  forall x1:int.
+  q(7) ->
+  (x1 = (3 + 4)) ->
+  q(x1)
+
+goal p3_po_1:
+  forall x:int.
+  forall x2:int.
+  forall x3:int.
+  ((x2 = (x + 1)) and (x3 = (x2 + 2))) ->
+  (x3 = (x + 3))
+
+goal p4_po_1:
+  forall x4:int.
+  forall x5:int.
+  ((x4 = 7) and (x5 = (2 * x4))) ->
+  (x5 = 14)
+
+goal p5_po_1:
+  forall result:int.
+  (result = (3 + 4)) ->
+  (result = 7)
+
+goal p6_po_1:
+  forall a:int.
+  forall result:int.
+  ((a = 3) and (result = (a + 4))) ->
+  (result = 7)
+
+goal p7_po_1:
+  forall a0:int.
+  forall aux_1:int.
+  forall result:int.
+  (((a0 = 4) and (aux_1 = (a0 + a0))) and (result = (3 + aux_1))) ->
+  (result = 11)
+
+goal p8_po_1:
+  forall aux_1_0:int.
+  forall x:int.
+  forall x6:int.
+  q((x + 1)) ->
+  forall result:int.
+  (((x6 = (x + 1)) and (aux_1_0 = x6)) and (result = (3 + aux_1_0))) ->
+  (q(x6) and (result = (x + 4)))
+
+goal p9_po_1:
+  forall aux_1_1:int.
+  forall aux_2:int.
+  forall x7:int.
+  forall x8:int.
+  forall result:int.
+  (((x7 = 1) and (aux_1_1 = 1)) and
+   (((x8 = 2) and (aux_2 = 1)) and (result = (aux_1_1 + aux_2)))) ->
+  ((result = 2) and (x8 = 2))
+
+goal p9a_po_1:
+  forall aux_1_2:int.
+  forall x9:int.
+  forall result:int.
+  (((x9 = 1) and (aux_1_2 = 1)) and (result = (aux_1_2 + 1))) ->
+  ((result = 2) and (x9 = 1))
+
+goal p10_po_1:
+  forall result:int.
+  (result = (0 + 1)) ->
+  (result = 1)
+
+goal p11_po_1:
+  forall aux_1_3:int.
+  forall aux_2_0:int.
+  forall result:int.
+  ((aux_1_3 = (0 + 1)) and
+   ((aux_2_0 = (3 + 1)) and (result = (aux_1_3 + aux_2_0)))) ->
+  (result = 5)
+
+goal p11a_po_1:
+  forall a1:int.
+  forall result:int.
+  ((a1 = (1 + 1)) and (result = (a1 + a1))) ->
+  (result = 4)
+
+goal p12_po_1:
+  forall x:int.
+  forall x10:int.
+  (x = 0) ->
+  (x10 = (x + 1)) ->
+  (x10 = 1)
+
+goal p13_po_1:
+  forall x:int.
+  forall x11:int.
+  forall x12:int.
+  ((x11 = (x + 1)) and (x12 = (x11 + 1))) ->
+  (x12 = (x + 2))
+
+goal p13a_po_1:
+  forall x:int.
+  forall x13:int.
+  forall x14:int.
+  ((x13 = (x + 1)) and (x14 = (x13 + 1))) ->
+  (x14 = (x + 2))
+
+goal p14_po_1:
+  forall x:int.
+  forall x15:int.
+  (x = 0) ->
+  forall result:int.
+  ((x15 = (x + 1)) and (result = x15)) ->
+  (result = 1)
+
+type 'a farray
+
+logic access : 'a1 farray, int -> 'a1
+
+logic update : 'a1 farray, int, 'a1 -> 'a1 farray
+
+axiom access_update:
+  (forall a:'a1 farray.
+    (forall i:int. (forall v:'a1. (access(update(a, i, v), i) = v))))
+
+axiom access_update_neq:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int.
+        (forall v:'a1.
+          ((i <> j) -> (access(update(a, i, v), j) = access(a, j)))))))
+
+logic array_length : 'a1 farray -> int
+
+predicate sorted_array(t: int farray, i: int, j: int) =
+  (forall k1:int.
+    (forall k2:int.
+      ((((i <= k1) and (k1 <= k2)) and (k2 <= j)) -> (access(t,
+       k1) <= access(t, k2)))))
+
+predicate exchange(a1: 'a1 farray, a2: 'a1 farray, i: int, j: int) =
+  ((array_length(a1) = array_length(a2)) and
+   ((access(a1, i) = access(a2, j)) and
+    ((access(a2, i) = access(a1, j)) and
+     (forall k:int.
+       (((k <> i) and (k <> j)) -> (access(a1, k) = access(a2, k)))))))
+
+logic permut : 'a1 farray, 'a1 farray, int, int -> prop
+
+axiom permut_refl:
+  (forall t:'a1 farray. (forall l:int. (forall u:int. permut(t, t, l, u))))
+
+axiom permut_sym:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall l:int.
+        (forall u:int. (permut(t1, t2, l, u) -> permut(t2, t1, l, u))))))
+
+axiom permut_trans:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall t3:'a1 farray.
+        (forall l:int.
+          (forall u:int.
+            (permut(t1, t2, l, u) ->
+             (permut(t2, t3, l, u) -> permut(t1, t3, l, u))))))))
+
+axiom permut_exchange:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (forall i:int.
+            (forall j:int.
+              (((l <= i) and (i <= u)) ->
+               (((l <= j) and (j <= u)) ->
+                (exchange(a1, a2, i, j) -> permut(a1, a2, l, u))))))))))
+
+axiom exchange_upd:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int. exchange(a, update(update(a, i, access(a, j)), j,
+        access(a, i)), i, j))))
+
+axiom permut_weakening:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l1:int.
+        (forall r1:int.
+          (forall l2:int.
+            (forall r2:int.
+              ((((l1 <= l2) and (l2 <= r2)) and (r2 <= r1)) ->
+               (permut(a1, a2, l2, r2) -> permut(a1, a2, l1, r1)))))))))
+
+axiom permut_eq:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          ((l <= u) ->
+           (permut(a1, a2, l, u) ->
+            (forall i:int.
+              (((i < l) or (u < i)) -> (access(a2, i) = access(a1, i))))))))))
+
+predicate permutation(a1: 'a1 farray, a2: 'a1 farray) = permut(a1, a2, 0,
+  (array_length(a1) - 1))
+
+axiom array_length_update:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall v:'a1. (array_length(update(a, i, v)) = array_length(a)))))
+
+axiom permut_array_length:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (permut(a1, a2, l, u) -> (array_length(a1) = array_length(a2)))))))
+
+goal p15_po_1:
+  forall t:int farray.
+  (array_length(t) = 10) ->
+  ((0 <= 0) and (0 < array_length(t)))
+
+goal p16_po_1:
+  forall t:int farray.
+  (array_length(t) = 10) ->
+  ((0 <= 9) and (9 < array_length(t)))
+
+goal p17_po_1:
+  forall t:int farray.
+  ((array_length(t) = 10) and ((0 <= access(t, 0)) and (access(t, 0) < 10))) ->
+  ((0 <= 0) and (0 < array_length(t)))
+
+goal p17_po_2:
+  forall aux_1_5:int.
+  forall t:int farray.
+  ((array_length(t) = 10) and ((0 <= access(t, 0)) and (access(t, 0) < 10))) ->
+  (((0 <= 0) and (0 < array_length(t))) and (aux_1_5 = access(t, 0))) ->
+  ((0 <= aux_1_5) and (aux_1_5 < array_length(t)))
+
+goal p18_po_1:
+  forall aux_1_6:int.
+  forall t:int farray.
+  forall x16:int.
+  (array_length(t) = 10) ->
+  ((x16 = 0) and (aux_1_6 = x16)) ->
+  ((0 <= aux_1_6) and (aux_1_6 < array_length(t)))
+
+goal p18_po_2:
+  forall aux_1_6:int.
+  forall t:int farray.
+  forall t2:int farray.
+  forall x16:int.
+  (array_length(t) = 10) ->
+  (((x16 = 0) and (aux_1_6 = x16)) and
+   (((0 <= aux_1_6) and (aux_1_6 < array_length(t))) and (t2 = update(t,
+    aux_1_6, x16)))) ->
+  (access(t2, 0) = x16)
+

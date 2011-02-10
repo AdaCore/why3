@@ -1,0 +1,1336 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+type 'a farray
+
+logic access : 'a1 farray, int -> 'a1
+
+logic update : 'a1 farray, int, 'a1 -> 'a1 farray
+
+axiom access_update:
+  (forall a:'a1 farray.
+    (forall i:int. (forall v:'a1. (access(update(a, i, v), i) = v))))
+
+axiom access_update_neq:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int.
+        (forall v:'a1.
+          ((i <> j) -> (access(update(a, i, v), j) = access(a, j)))))))
+
+logic array_length : 'a1 farray -> int
+
+predicate sorted_array(t: int farray, i: int, j: int) =
+  (forall k1:int.
+    (forall k2:int.
+      ((((i <= k1) and (k1 <= k2)) and (k2 <= j)) -> (access(t,
+       k1) <= access(t, k2)))))
+
+predicate exchange(a1: 'a1 farray, a2: 'a1 farray, i: int, j: int) =
+  ((array_length(a1) = array_length(a2)) and
+   ((access(a1, i) = access(a2, j)) and
+    ((access(a2, i) = access(a1, j)) and
+     (forall k:int.
+       (((k <> i) and (k <> j)) -> (access(a1, k) = access(a2, k)))))))
+
+logic permut : 'a1 farray, 'a1 farray, int, int -> prop
+
+axiom permut_refl:
+  (forall t:'a1 farray. (forall l:int. (forall u:int. permut(t, t, l, u))))
+
+axiom permut_sym:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall l:int.
+        (forall u:int. (permut(t1, t2, l, u) -> permut(t2, t1, l, u))))))
+
+axiom permut_trans:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall t3:'a1 farray.
+        (forall l:int.
+          (forall u:int.
+            (permut(t1, t2, l, u) ->
+             (permut(t2, t3, l, u) -> permut(t1, t3, l, u))))))))
+
+axiom permut_exchange:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (forall i:int.
+            (forall j:int.
+              (((l <= i) and (i <= u)) ->
+               (((l <= j) and (j <= u)) ->
+                (exchange(a1, a2, i, j) -> permut(a1, a2, l, u))))))))))
+
+axiom exchange_upd:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int. exchange(a, update(update(a, i, access(a, j)), j,
+        access(a, i)), i, j))))
+
+axiom permut_weakening:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l1:int.
+        (forall r1:int.
+          (forall l2:int.
+            (forall r2:int.
+              ((((l1 <= l2) and (l2 <= r2)) and (r2 <= r1)) ->
+               (permut(a1, a2, l2, r2) -> permut(a1, a2, l1, r1)))))))))
+
+axiom permut_eq:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          ((l <= u) ->
+           (permut(a1, a2, l, u) ->
+            (forall i:int.
+              (((i < l) or (u < i)) -> (access(a2, i) = access(a1, i))))))))))
+
+predicate permutation(a1: 'a1 farray, a2: 'a1 farray) = permut(a1, a2, 0,
+  (array_length(a1) - 1))
+
+axiom array_length_update:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall v:'a1. (array_length(update(a, i, v)) = array_length(a)))))
+
+axiom permut_array_length:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (permut(a1, a2, l, u) -> (array_length(a1) = array_length(a2)))))))
+
+goal selection_po_1:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  (0 <= 0)
+
+goal selection_po_2:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  (0 <= (array_length(t) - 1))
+
+goal selection_po_3:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  sorted_array(t, 0, (0 - 1))
+
+goal selection_po_4:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  permutation(t, t)
+
+goal selection_po_5:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall k:int.
+  forall l:int.
+  ((0 <= k) and (k < 0)) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  (access(t, k) <= access(t, l))
+
+goal selection_po_6:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  ((i + 1) <= (i + 1))
+
+goal selection_po_7:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  ((i + 1) <= array_length(t0))
+
+goal selection_po_8:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  (i <= i)
+
+goal selection_po_9:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  (i < array_length(t0))
+
+goal selection_po_10:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall k:int.
+  ((i <= k) and (k < (i + 1))) ->
+  (access(t0, i) <= access(t0, k))
+
+goal selection_po_11:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  (0 <= j)
+
+goal selection_po_12:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  (j < array_length(t0))
+
+goal selection_po_13:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  (0 <= min)
+
+goal selection_po_14:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  (min < array_length(t0))
+
+goal selection_po_15:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, min)) ->
+  (result1 < result2) ->
+  forall min0:int.
+  (min0 = j) ->
+  forall j0:int.
+  (j0 = (j + 1)) ->
+  ((i + 1) <= j0)
+
+goal selection_po_16:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, min)) ->
+  (result1 < result2) ->
+  forall min0:int.
+  (min0 = j) ->
+  forall j0:int.
+  (j0 = (j + 1)) ->
+  (j0 <= array_length(t0))
+
+goal selection_po_17:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, min)) ->
+  (result1 < result2) ->
+  forall min0:int.
+  (min0 = j) ->
+  forall j0:int.
+  (j0 = (j + 1)) ->
+  (i <= min0)
+
+goal selection_po_18:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, min)) ->
+  (result1 < result2) ->
+  forall min0:int.
+  (min0 = j) ->
+  forall j0:int.
+  (j0 = (j + 1)) ->
+  (min0 < array_length(t0))
+
+goal selection_po_19:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, min)) ->
+  (result1 < result2) ->
+  forall min0:int.
+  (min0 = j) ->
+  forall j0:int.
+  (j0 = (j + 1)) ->
+  forall k:int.
+  ((i <= k) and (k < j0)) ->
+  (access(t0, min0) <= access(t0, k))
+
+goal selection_po_20:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, min)) ->
+  (result1 < result2) ->
+  forall min0:int.
+  (min0 = j) ->
+  forall j0:int.
+  (j0 = (j + 1)) ->
+  (0 <= (array_length(t0) - j))
+
+goal selection_po_21:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, min)) ->
+  (result1 < result2) ->
+  forall min0:int.
+  (min0 = j) ->
+  forall j0:int.
+  (j0 = (j + 1)) ->
+  ((array_length(t0) - j0) < (array_length(t0) - j))
+
+goal selection_po_22:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, min)) ->
+  (result1 >= result2) ->
+  forall j0:int.
+  (j0 = (j + 1)) ->
+  ((i + 1) <= j0)
+
+goal selection_po_23:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, min)) ->
+  (result1 >= result2) ->
+  forall j0:int.
+  (j0 = (j + 1)) ->
+  (j0 <= array_length(t0))
+
+goal selection_po_24:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, min)) ->
+  (result1 >= result2) ->
+  forall j0:int.
+  (j0 = (j + 1)) ->
+  (i <= min)
+
+goal selection_po_25:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, min)) ->
+  (result1 >= result2) ->
+  forall j0:int.
+  (j0 = (j + 1)) ->
+  forall k:int.
+  ((i <= k) and (k < j0)) ->
+  (access(t0, min) <= access(t0, k))
+
+goal selection_po_26:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, min)) ->
+  (result1 >= result2) ->
+  forall j0:int.
+  (j0 = (j + 1)) ->
+  (0 <= (array_length(t0) - j))
+
+goal selection_po_27:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j < result0) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, min)) ->
+  (result1 >= result2) ->
+  forall j0:int.
+  (j0 = (j + 1)) ->
+  ((array_length(t0) - j0) < (array_length(t0) - j))
+
+goal selection_po_28:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j >= result0) ->
+  (0 <= min)
+
+goal selection_po_29:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j >= result0) ->
+  (min < array_length(t0))
+
+goal selection_po_30:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j >= result0) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, min)) ->
+  (0 <= i)
+
+goal selection_po_31:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j >= result0) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, min)) ->
+  (i < array_length(t0))
+
+goal selection_po_32:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j >= result0) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, min)) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, i)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, min, result2)) ->
+  (i < array_length(t1))
+
+goal selection_po_33:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j >= result0) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, min)) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, i)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, min, result2)) ->
+  ((0 <= i) and (i < array_length(t1))) ->
+  forall t2:int farray.
+  (t2 = update(t1, i, result1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  (0 <= i0)
+
+goal selection_po_34:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j >= result0) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, min)) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, i)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, min, result2)) ->
+  ((0 <= i) and (i < array_length(t1))) ->
+  forall t2:int farray.
+  (t2 = update(t1, i, result1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  (i0 <= (array_length(t2) - 1))
+
+goal selection_po_35:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j >= result0) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, min)) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, i)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, min, result2)) ->
+  ((0 <= i) and (i < array_length(t1))) ->
+  forall t2:int farray.
+  (t2 = update(t1, i, result1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  sorted_array(t2, 0, (i0 - 1))
+
+goal selection_po_36:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j >= result0) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, min)) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, i)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, min, result2)) ->
+  ((0 <= i) and (i < array_length(t1))) ->
+  forall t2:int farray.
+  (t2 = update(t1, i, result1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  permutation(t2, t)
+
+goal selection_po_37:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j >= result0) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, min)) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, i)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, min, result2)) ->
+  ((0 <= i) and (i < array_length(t1))) ->
+  forall t2:int farray.
+  (t2 = update(t1, i, result1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  forall k:int.
+  forall l:int.
+  ((0 <= k) and (k < i0)) ->
+  ((i0 <= l) and (l < array_length(t2))) ->
+  (access(t2, k) <= access(t2, l))
+
+goal selection_po_38:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j >= result0) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, min)) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, i)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, min, result2)) ->
+  ((0 <= i) and (i < array_length(t1))) ->
+  forall t2:int farray.
+  (t2 = update(t1, i, result1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  (0 <= (array_length(t0) - i))
+
+goal selection_po_39:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i < (result - 1)) ->
+  forall j:int.
+  forall min:int.
+  ((((i + 1) <= j) and (j <= array_length(t0))) and
+   (((i <= min) and (min < array_length(t0))) and
+    (forall k:int.
+      (((i <= k) and (k < j)) -> (access(t0, min) <= access(t0, k)))))) ->
+  forall result0:int.
+  (result0 = array_length(t0)) ->
+  (j >= result0) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, min)) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result2:int.
+  (result2 = access(t0, i)) ->
+  ((0 <= min) and (min < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, min, result2)) ->
+  ((0 <= i) and (i < array_length(t1))) ->
+  forall t2:int farray.
+  (t2 = update(t1, i, result1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ((array_length(t2) - i0) < (array_length(t0) - i))
+
+goal selection_po_40:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i >= (result - 1)) ->
+  sorted_array(t0, 0, (array_length(t0) - 1))
+
+goal selection_po_41:
+  forall t:int farray.
+  (array_length(t) >= 1) ->
+  forall i:int.
+  forall t0:int farray.
+  (((0 <= i) and (i <= (array_length(t0) - 1))) and
+   (sorted_array(t0, 0, (i - 1)) and
+    (permutation(t0, t) and
+     (forall k:int.
+       (forall l:int.
+         (((0 <= k) and (k < i)) ->
+          (((i <= l) and (l < array_length(t0))) -> (access(t0,
+           k) <= access(t0, l))))))))) ->
+  forall result:int.
+  (result = array_length(t0)) ->
+  (i >= (result - 1)) ->
+  permutation(t0, t)
+

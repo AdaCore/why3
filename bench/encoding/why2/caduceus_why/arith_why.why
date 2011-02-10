@@ -1,0 +1,237 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+goal mult_po_1:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  ((0 + (x * y)) = (x * y))
+
+goal mult_po_2:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  forall b:int.
+  forall p:int.
+  ((a >= 0) and ((p + (a * b)) = (x * y))) ->
+  (a <> 0) ->
+  ((a % 2) = 1) ->
+  forall p0:int.
+  (p0 = (p + b)) ->
+  (2 <> 0)
+
+goal mult_po_3:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  forall b:int.
+  forall p:int.
+  ((a >= 0) and ((p + (a * b)) = (x * y))) ->
+  (a <> 0) ->
+  ((a % 2) = 1) ->
+  forall p0:int.
+  (p0 = (p + b)) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (a / 2)) ->
+  forall a0:int.
+  (a0 = result) ->
+  forall b0:int.
+  (b0 = (2 * b)) ->
+  (a0 >= 0)
+
+goal mult_po_4:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  forall b:int.
+  forall p:int.
+  ((a >= 0) and ((p + (a * b)) = (x * y))) ->
+  (a <> 0) ->
+  ((a % 2) = 1) ->
+  forall p0:int.
+  (p0 = (p + b)) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (a / 2)) ->
+  forall a0:int.
+  (a0 = result) ->
+  forall b0:int.
+  (b0 = (2 * b)) ->
+  ((p0 + (a0 * b0)) = (x * y))
+
+goal mult_po_5:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  forall b:int.
+  forall p:int.
+  ((a >= 0) and ((p + (a * b)) = (x * y))) ->
+  (a <> 0) ->
+  ((a % 2) = 1) ->
+  forall p0:int.
+  (p0 = (p + b)) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (a / 2)) ->
+  forall a0:int.
+  (a0 = result) ->
+  forall b0:int.
+  (b0 = (2 * b)) ->
+  (0 <= a)
+
+goal mult_po_6:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  forall b:int.
+  forall p:int.
+  ((a >= 0) and ((p + (a * b)) = (x * y))) ->
+  (a <> 0) ->
+  ((a % 2) = 1) ->
+  forall p0:int.
+  (p0 = (p + b)) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (a / 2)) ->
+  forall a0:int.
+  (a0 = result) ->
+  forall b0:int.
+  (b0 = (2 * b)) ->
+  (a0 < a)
+
+goal mult_po_7:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  forall b:int.
+  forall p:int.
+  ((a >= 0) and ((p + (a * b)) = (x * y))) ->
+  (a <> 0) ->
+  ((a % 2) <> 1) ->
+  (2 <> 0)
+
+goal mult_po_8:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  forall b:int.
+  forall p:int.
+  ((a >= 0) and ((p + (a * b)) = (x * y))) ->
+  (a <> 0) ->
+  ((a % 2) <> 1) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (a / 2)) ->
+  forall a0:int.
+  (a0 = result) ->
+  forall b0:int.
+  (b0 = (2 * b)) ->
+  (a0 >= 0)
+
+goal mult_po_9:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  forall b:int.
+  forall p:int.
+  ((a >= 0) and ((p + (a * b)) = (x * y))) ->
+  (a <> 0) ->
+  ((a % 2) <> 1) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (a / 2)) ->
+  forall a0:int.
+  (a0 = result) ->
+  forall b0:int.
+  (b0 = (2 * b)) ->
+  ((p + (a0 * b0)) = (x * y))
+
+goal mult_po_10:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  forall b:int.
+  forall p:int.
+  ((a >= 0) and ((p + (a * b)) = (x * y))) ->
+  (a <> 0) ->
+  ((a % 2) <> 1) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (a / 2)) ->
+  forall a0:int.
+  (a0 = result) ->
+  forall b0:int.
+  (b0 = (2 * b)) ->
+  (0 <= a)
+
+goal mult_po_11:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  forall b:int.
+  forall p:int.
+  ((a >= 0) and ((p + (a * b)) = (x * y))) ->
+  (a <> 0) ->
+  ((a % 2) <> 1) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (a / 2)) ->
+  forall a0:int.
+  (a0 = result) ->
+  forall b0:int.
+  (b0 = (2 * b)) ->
+  (a0 < a)
+
+goal mult_po_12:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  forall b:int.
+  forall p:int.
+  ((a >= 0) and ((p + (a * b)) = (x * y))) ->
+  (a = 0) ->
+  (p = (x * y))
+

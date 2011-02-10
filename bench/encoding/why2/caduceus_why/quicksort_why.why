@@ -1,0 +1,1921 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+type 'a farray
+
+logic access : 'a1 farray, int -> 'a1
+
+logic update : 'a1 farray, int, 'a1 -> 'a1 farray
+
+axiom access_update:
+  (forall a:'a1 farray.
+    (forall i:int. (forall v:'a1. (access(update(a, i, v), i) = v))))
+
+axiom access_update_neq:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int.
+        (forall v:'a1.
+          ((i <> j) -> (access(update(a, i, v), j) = access(a, j)))))))
+
+logic array_length : 'a1 farray -> int
+
+predicate sorted_array(t: int farray, i: int, j: int) =
+  (forall k1:int.
+    (forall k2:int.
+      ((((i <= k1) and (k1 <= k2)) and (k2 <= j)) -> (access(t,
+       k1) <= access(t, k2)))))
+
+predicate exchange(a1: 'a1 farray, a2: 'a1 farray, i: int, j: int) =
+  ((array_length(a1) = array_length(a2)) and
+   ((access(a1, i) = access(a2, j)) and
+    ((access(a2, i) = access(a1, j)) and
+     (forall k:int.
+       (((k <> i) and (k <> j)) -> (access(a1, k) = access(a2, k)))))))
+
+logic permut : 'a1 farray, 'a1 farray, int, int -> prop
+
+axiom permut_refl:
+  (forall t:'a1 farray. (forall l:int. (forall u:int. permut(t, t, l, u))))
+
+axiom permut_sym:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall l:int.
+        (forall u:int. (permut(t1, t2, l, u) -> permut(t2, t1, l, u))))))
+
+axiom permut_trans:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall t3:'a1 farray.
+        (forall l:int.
+          (forall u:int.
+            (permut(t1, t2, l, u) ->
+             (permut(t2, t3, l, u) -> permut(t1, t3, l, u))))))))
+
+axiom permut_exchange:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (forall i:int.
+            (forall j:int.
+              (((l <= i) and (i <= u)) ->
+               (((l <= j) and (j <= u)) ->
+                (exchange(a1, a2, i, j) -> permut(a1, a2, l, u))))))))))
+
+axiom exchange_upd:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int. exchange(a, update(update(a, i, access(a, j)), j,
+        access(a, i)), i, j))))
+
+axiom permut_weakening:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l1:int.
+        (forall r1:int.
+          (forall l2:int.
+            (forall r2:int.
+              ((((l1 <= l2) and (l2 <= r2)) and (r2 <= r1)) ->
+               (permut(a1, a2, l2, r2) -> permut(a1, a2, l1, r1)))))))))
+
+axiom permut_eq:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          ((l <= u) ->
+           (permut(a1, a2, l, u) ->
+            (forall i:int.
+              (((i < l) or (u < i)) -> (access(a2, i) = access(a1, i))))))))))
+
+predicate permutation(a1: 'a1 farray, a2: 'a1 farray) = permut(a1, a2, 0,
+  (array_length(a1) - 1))
+
+axiom array_length_update:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall v:'a1. (array_length(update(a, i, v)) = array_length(a)))))
+
+axiom permut_array_length:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (permut(a1, a2, l, u) -> (array_length(a1) = array_length(a2)))))))
+
+goal swap_po_1:
+  forall i:int.
+  forall j:int.
+  forall t:int farray.
+  (((0 <= i) and (i < array_length(t))) and
+   ((0 <= j) and (j < array_length(t)))) ->
+  (0 <= i)
+
+goal swap_po_2:
+  forall i:int.
+  forall j:int.
+  forall t:int farray.
+  (((0 <= i) and (i < array_length(t))) and
+   ((0 <= j) and (j < array_length(t)))) ->
+  (i < array_length(t))
+
+goal swap_po_3:
+  forall i:int.
+  forall j:int.
+  forall t:int farray.
+  (((0 <= i) and (i < array_length(t))) and
+   ((0 <= j) and (j < array_length(t)))) ->
+  ((0 <= i) and (i < array_length(t))) ->
+  forall result:int.
+  (result = access(t, i)) ->
+  (0 <= j)
+
+goal swap_po_4:
+  forall i:int.
+  forall j:int.
+  forall t:int farray.
+  (((0 <= i) and (i < array_length(t))) and
+   ((0 <= j) and (j < array_length(t)))) ->
+  ((0 <= i) and (i < array_length(t))) ->
+  forall result:int.
+  (result = access(t, i)) ->
+  (j < array_length(t))
+
+goal swap_po_5:
+  forall i:int.
+  forall j:int.
+  forall t:int farray.
+  (((0 <= i) and (i < array_length(t))) and
+   ((0 <= j) and (j < array_length(t)))) ->
+  ((0 <= i) and (i < array_length(t))) ->
+  forall result:int.
+  (result = access(t, i)) ->
+  ((0 <= j) and (j < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, j)) ->
+  ((0 <= i) and (i < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, i, result0)) ->
+  (j < array_length(t0))
+
+goal swap_po_6:
+  forall i:int.
+  forall j:int.
+  forall t:int farray.
+  (((0 <= i) and (i < array_length(t))) and
+   ((0 <= j) and (j < array_length(t)))) ->
+  ((0 <= i) and (i < array_length(t))) ->
+  forall result:int.
+  (result = access(t, i)) ->
+  ((0 <= j) and (j < array_length(t))) ->
+  forall result0:int.
+  (result0 = access(t, j)) ->
+  ((0 <= i) and (i < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, i, result0)) ->
+  ((0 <= j) and (j < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, j, result)) ->
+  exchange(t1, t, i, j)
+
+predicate array_le(a: int farray, l: int, r: int, v: int) =
+  (forall i:int. (((l <= i) and (i <= r)) -> (access(a, i) <= v)))
+
+predicate array_ge(a: int farray, l: int, r: int, v: int) =
+  (forall i:int. (((l <= i) and (i <= r)) -> (v <= access(a, i))))
+
+predicate partition_p(a: int farray, l: int, r: int, p: int) =
+  (((l <= p) and (p <= r)) and
+   (array_le(a, l, (p - 1), access(a, p)) and array_ge(a, (p + 1), r,
+    access(a, p))))
+
+goal partition_po_1:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  (0 <= l)
+
+goal partition_po_2:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  (l < array_length(t))
+
+goal partition_po_3:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  ((l + 1) <= (l + 1))
+
+goal partition_po_4:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  ((l + 1) <= r)
+
+goal partition_po_5:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  (r <= r)
+
+goal partition_po_6:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  array_le(t, (l + 1), ((l + 1) - 1), result)
+
+goal partition_po_7:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  array_ge(t, (r + 1), r, result)
+
+goal partition_po_8:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  permut(t, t, l, r)
+
+goal partition_po_9:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  (i <= i)
+
+goal partition_po_10:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  (i <= r)
+
+goal partition_po_11:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  array_le(t0, (l + 1), (i - 1), result)
+
+goal partition_po_12:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  (0 <= i0)
+
+goal partition_po_13:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  (i0 < array_length(t0))
+
+goal partition_po_14:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 <= result) and (i0 < j)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  (i <= i1)
+
+goal partition_po_15:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 <= result) and (i0 < j)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  (i1 <= r)
+
+goal partition_po_16:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 <= result) and (i0 < j)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  array_le(t0, (l + 1), (i1 - 1), result)
+
+goal partition_po_17:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 <= result) and (i0 < j)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  (0 <= (r - i0))
+
+goal partition_po_18:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 <= result) and (i0 < j)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  ((r - i1) < (r - i0))
+
+goal partition_po_19:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  (l <= j)
+
+goal partition_po_20:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  (j <= j)
+
+goal partition_po_21:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  array_ge(t0, (j + 1), r, result)
+
+goal partition_po_22:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  (0 <= j0)
+
+goal partition_po_23:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  (j0 < array_length(t0))
+
+goal partition_po_24:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 >= result) and (i0 < j0)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  (l <= j1)
+
+goal partition_po_25:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 >= result) and (i0 < j0)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  (j1 <= j)
+
+goal partition_po_26:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 >= result) and (i0 < j0)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  array_ge(t0, (j1 + 1), r, result)
+
+goal partition_po_27:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 >= result) and (i0 < j0)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  (j1 < j0)
+
+goal partition_po_28:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 < j0) ->
+  (((0 <= i0) and (i0 < array_length(t0))) and
+   ((0 <= j0) and (j0 < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, i0, j0) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  ((l + 1) <= i1)
+
+goal partition_po_29:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 < j0) ->
+  (((0 <= i0) and (i0 < array_length(t0))) and
+   ((0 <= j0) and (j0 < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, i0, j0) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  (i1 <= r)
+
+goal partition_po_30:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 < j0) ->
+  (((0 <= i0) and (i0 < array_length(t0))) and
+   ((0 <= j0) and (j0 < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, i0, j0) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  (j1 <= r)
+
+goal partition_po_31:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 < j0) ->
+  (((0 <= i0) and (i0 < array_length(t0))) and
+   ((0 <= j0) and (j0 < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, i0, j0) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  array_le(t1, (l + 1), (i1 - 1), result)
+
+goal partition_po_32:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 < j0) ->
+  (((0 <= i0) and (i0 < array_length(t0))) and
+   ((0 <= j0) and (j0 < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, i0, j0) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  array_ge(t1, (j1 + 1), r, result)
+
+goal partition_po_33:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 < j0) ->
+  (((0 <= i0) and (i0 < array_length(t0))) and
+   ((0 <= j0) and (j0 < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, i0, j0) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  permut(t1, t, l, r)
+
+goal partition_po_34:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 < j0) ->
+  (((0 <= i0) and (i0 < array_length(t0))) and
+   ((0 <= j0) and (j0 < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, i0, j0) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  (access(t1, l) = access(t, l))
+
+goal partition_po_35:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 < j0) ->
+  (((0 <= i0) and (i0 < array_length(t0))) and
+   ((0 <= j0) and (j0 < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, i0, j0) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  (0 <= (((array_length(t0) + 2) + j) - i))
+
+goal partition_po_36:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 < j0) ->
+  (((0 <= i0) and (i0 < array_length(t0))) and
+   ((0 <= j0) and (j0 < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, i0, j0) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  ((((array_length(t1) + 2) + j1) - i1) < (((array_length(t0) + 2) + j) - i))
+
+goal partition_po_37:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 >= j0) ->
+  ((l + 1) <= i0)
+
+goal partition_po_38:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 >= j0) ->
+  (i0 <= r)
+
+goal partition_po_39:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 >= j0) ->
+  (j0 <= r)
+
+goal partition_po_40:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 >= j0) ->
+  permut(t0, t, l, r)
+
+goal partition_po_41:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 >= j0) ->
+  (access(t0, l) = access(t, l))
+
+goal partition_po_42:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 >= j0) ->
+  (0 <= (((array_length(t0) + 2) + j) - i))
+
+goal partition_po_43:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i < j) ->
+  forall i0:int.
+  (((i <= i0) and (i0 <= r)) and array_le(t0, (l + 1), (i0 - 1), result)) ->
+  ((0 <= i0) and (i0 < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i0)) ->
+  ((result0 > result) or ((result0 <= result) and (i0 >= j))) ->
+  forall j0:int.
+  (((l <= j0) and (j0 <= j)) and array_ge(t0, (j0 + 1), r, result)) ->
+  ((0 <= j0) and (j0 < array_length(t0))) ->
+  forall result1:int.
+  (result1 = access(t0, j0)) ->
+  ((result1 < result) or ((result1 >= result) and (i0 >= j0))) ->
+  (i0 >= j0) ->
+  ((((array_length(t0) + 2) + j0) - i0) < (((array_length(t0) + 2) + j) - i))
+
+goal partition_po_44:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i >= j) ->
+  (0 <= i)
+
+goal partition_po_45:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i >= j) ->
+  (i < array_length(t0))
+
+goal partition_po_46:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i >= j) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i)) ->
+  (result0 < result) ->
+  (l < array_length(t0))
+
+goal partition_po_47:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i >= j) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i)) ->
+  (result0 < result) ->
+  (((0 <= l) and (l < array_length(t0))) and
+   ((0 <= i) and (i < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, l, i) ->
+  (l <= i)
+
+goal partition_po_48:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i >= j) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i)) ->
+  (result0 < result) ->
+  (((0 <= l) and (l < array_length(t0))) and
+   ((0 <= i) and (i < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, l, i) ->
+  (i <= r)
+
+goal partition_po_49:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i >= j) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i)) ->
+  (result0 < result) ->
+  (((0 <= l) and (l < array_length(t0))) and
+   ((0 <= i) and (i < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, l, i) ->
+  partition_p(t1, l, r, i)
+
+goal partition_po_50:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i >= j) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i)) ->
+  (result0 < result) ->
+  (((0 <= l) and (l < array_length(t0))) and
+   ((0 <= i) and (i < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, l, i) ->
+  permut(t1, t, l, r)
+
+goal partition_po_51:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i >= j) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i)) ->
+  (result0 >= result) ->
+  (l < array_length(t0))
+
+goal partition_po_52:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i >= j) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i)) ->
+  (result0 >= result) ->
+  (0 <= (i - 1))
+
+goal partition_po_53:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i >= j) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i)) ->
+  (result0 >= result) ->
+  ((i - 1) < array_length(t0))
+
+goal partition_po_54:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i >= j) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i)) ->
+  (result0 >= result) ->
+  (((0 <= l) and (l < array_length(t0))) and
+   ((0 <= (i - 1)) and ((i - 1) < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, l, (i - 1)) ->
+  (l <= (i - 1))
+
+goal partition_po_55:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i >= j) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i)) ->
+  (result0 >= result) ->
+  (((0 <= l) and (l < array_length(t0))) and
+   ((0 <= (i - 1)) and ((i - 1) < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, l, (i - 1)) ->
+  ((i - 1) <= r)
+
+goal partition_po_56:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i >= j) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i)) ->
+  (result0 >= result) ->
+  (((0 <= l) and (l < array_length(t0))) and
+   ((0 <= (i - 1)) and ((i - 1) < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, l, (i - 1)) ->
+  partition_p(t1, l, r, (i - 1))
+
+goal partition_po_57:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  ((0 <= l) and (l < array_length(t))) ->
+  forall result:int.
+  (result = access(t, l)) ->
+  forall i:int.
+  forall j:int.
+  forall t0:int farray.
+  ((((l + 1) <= i) and (i <= r)) and
+   ((j <= r) and
+    (array_le(t0, (l + 1), (i - 1), result) and
+     (array_ge(t0, (j + 1), r, result) and
+      (permut(t0, t, l, r) and (access(t0, l) = access(t, l))))))) ->
+  (i >= j) ->
+  ((0 <= i) and (i < array_length(t0))) ->
+  forall result0:int.
+  (result0 = access(t0, i)) ->
+  (result0 >= result) ->
+  (((0 <= l) and (l < array_length(t0))) and
+   ((0 <= (i - 1)) and ((i - 1) < array_length(t0)))) ->
+  forall t1:int farray.
+  exchange(t1, t0, l, (i - 1)) ->
+  permut(t1, t, l, r)
+
+goal quick_rec_po_1:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  ((0 <= l) and (r < array_length(t))) ->
+  (l < r) ->
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  forall result:int.
+  forall t0:int farray.
+  (((l <= result) and (result <= r)) and
+   (partition_p(t0, l, r, result) and permut(t0, t, l, r))) ->
+  (0 <= (r - l))
+
+goal quick_rec_po_2:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  ((0 <= l) and (r < array_length(t))) ->
+  (l < r) ->
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  forall result:int.
+  forall t0:int farray.
+  (((l <= result) and (result <= r)) and
+   (partition_p(t0, l, r, result) and permut(t0, t, l, r))) ->
+  (((result - 1) - l) < (r - l))
+
+goal quick_rec_po_3:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  ((0 <= l) and (r < array_length(t))) ->
+  (l < r) ->
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  forall result:int.
+  forall t0:int farray.
+  (((l <= result) and (result <= r)) and
+   (partition_p(t0, l, r, result) and permut(t0, t, l, r))) ->
+  ((0 <= (r - l)) and (((result - 1) - l) < (r - l))) ->
+  ((result - 1) < array_length(t0))
+
+goal quick_rec_po_4:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  ((0 <= l) and (r < array_length(t))) ->
+  (l < r) ->
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  forall result:int.
+  forall t0:int farray.
+  (((l <= result) and (result <= r)) and
+   (partition_p(t0, l, r, result) and permut(t0, t, l, r))) ->
+  ((0 <= (r - l)) and (((result - 1) - l) < (r - l))) ->
+  ((0 <= l) and ((result - 1) < array_length(t0))) ->
+  forall t1:int farray.
+  (sorted_array(t1, l, (result - 1)) and permut(t1, t0, l, (result - 1))) ->
+  (0 <= (r - l))
+
+goal quick_rec_po_5:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  ((0 <= l) and (r < array_length(t))) ->
+  (l < r) ->
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  forall result:int.
+  forall t0:int farray.
+  (((l <= result) and (result <= r)) and
+   (partition_p(t0, l, r, result) and permut(t0, t, l, r))) ->
+  ((0 <= (r - l)) and (((result - 1) - l) < (r - l))) ->
+  ((0 <= l) and ((result - 1) < array_length(t0))) ->
+  forall t1:int farray.
+  (sorted_array(t1, l, (result - 1)) and permut(t1, t0, l, (result - 1))) ->
+  ((r - (result + 1)) < (r - l))
+
+goal quick_rec_po_6:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  ((0 <= l) and (r < array_length(t))) ->
+  (l < r) ->
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  forall result:int.
+  forall t0:int farray.
+  (((l <= result) and (result <= r)) and
+   (partition_p(t0, l, r, result) and permut(t0, t, l, r))) ->
+  ((0 <= (r - l)) and (((result - 1) - l) < (r - l))) ->
+  ((0 <= l) and ((result - 1) < array_length(t0))) ->
+  forall t1:int farray.
+  (sorted_array(t1, l, (result - 1)) and permut(t1, t0, l, (result - 1))) ->
+  ((0 <= (r - l)) and ((r - (result + 1)) < (r - l))) ->
+  (0 <= (result + 1))
+
+goal quick_rec_po_7:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  ((0 <= l) and (r < array_length(t))) ->
+  (l < r) ->
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  forall result:int.
+  forall t0:int farray.
+  (((l <= result) and (result <= r)) and
+   (partition_p(t0, l, r, result) and permut(t0, t, l, r))) ->
+  ((0 <= (r - l)) and (((result - 1) - l) < (r - l))) ->
+  ((0 <= l) and ((result - 1) < array_length(t0))) ->
+  forall t1:int farray.
+  (sorted_array(t1, l, (result - 1)) and permut(t1, t0, l, (result - 1))) ->
+  ((0 <= (r - l)) and ((r - (result + 1)) < (r - l))) ->
+  (r < array_length(t1))
+
+goal quick_rec_po_8:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  ((0 <= l) and (r < array_length(t))) ->
+  (l < r) ->
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  forall result:int.
+  forall t0:int farray.
+  (((l <= result) and (result <= r)) and
+   (partition_p(t0, l, r, result) and permut(t0, t, l, r))) ->
+  ((0 <= (r - l)) and (((result - 1) - l) < (r - l))) ->
+  ((0 <= l) and ((result - 1) < array_length(t0))) ->
+  forall t1:int farray.
+  (sorted_array(t1, l, (result - 1)) and permut(t1, t0, l, (result - 1))) ->
+  ((0 <= (r - l)) and ((r - (result + 1)) < (r - l))) ->
+  ((0 <= (result + 1)) and (r < array_length(t1))) ->
+  forall t2:int farray.
+  (sorted_array(t2, (result + 1), r) and permut(t2, t1, (result + 1), r)) ->
+  sorted_array(t2, l, r)
+
+goal quick_rec_po_9:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  ((0 <= l) and (r < array_length(t))) ->
+  (l < r) ->
+  (((0 <= l) and (l < r)) and (r < array_length(t))) ->
+  forall result:int.
+  forall t0:int farray.
+  (((l <= result) and (result <= r)) and
+   (partition_p(t0, l, r, result) and permut(t0, t, l, r))) ->
+  ((0 <= (r - l)) and (((result - 1) - l) < (r - l))) ->
+  ((0 <= l) and ((result - 1) < array_length(t0))) ->
+  forall t1:int farray.
+  (sorted_array(t1, l, (result - 1)) and permut(t1, t0, l, (result - 1))) ->
+  ((0 <= (r - l)) and ((r - (result + 1)) < (r - l))) ->
+  ((0 <= (result + 1)) and (r < array_length(t1))) ->
+  forall t2:int farray.
+  (sorted_array(t2, (result + 1), r) and permut(t2, t1, (result + 1), r)) ->
+  permut(t2, t, l, r)
+
+goal quick_rec_po_10:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  ((0 <= l) and (r < array_length(t))) ->
+  (l >= r) ->
+  sorted_array(t, l, r)
+
+goal quick_rec_po_11:
+  forall l:int.
+  forall r:int.
+  forall t:int farray.
+  ((0 <= l) and (r < array_length(t))) ->
+  (l >= r) ->
+  permut(t, t, l, r)
+
+goal quicksort_po_1:
+  forall t:int farray.
+  forall result:int.
+  (result = array_length(t)) ->
+  (0 <= 0)
+
+goal quicksort_po_2:
+  forall t:int farray.
+  forall result:int.
+  (result = array_length(t)) ->
+  ((result - 1) < array_length(t))
+
+goal quicksort_po_3:
+  forall t:int farray.
+  forall result:int.
+  (result = array_length(t)) ->
+  ((0 <= 0) and ((result - 1) < array_length(t))) ->
+  forall t0:int farray.
+  (sorted_array(t0, 0, (result - 1)) and permut(t0, t, 0, (result - 1))) ->
+  sorted_array(t0, 0, (array_length(t0) - 1))
+
+goal quicksort_po_4:
+  forall t:int farray.
+  forall result:int.
+  (result = array_length(t)) ->
+  ((0 <= 0) and ((result - 1) < array_length(t))) ->
+  forall t0:int farray.
+  (sorted_array(t0, 0, (result - 1)) and permut(t0, t, 0, (result - 1))) ->
+  permutation(t0, t)
+

@@ -1,0 +1,1700 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+logic zwf_zero : int, int -> prop
+
+axiom zwf_zero_def:
+  (forall a0:int.
+    (forall b0:int.
+      (((0 <= b0) and (a0 < b0)) <-> ((0 <= b0) and (a0 < b0)))))
+
+logic bool_and : bool, bool -> bool
+
+logic bool_or : bool, bool -> bool
+
+logic bool_xor : bool, bool -> bool
+
+logic bool_not : bool -> bool
+
+axiom bool_and_def:
+  (forall a:bool.
+    (forall b:bool.
+      ((bool_and(a, b) = true) <-> ((a = true) and (b = true)))))
+
+axiom bool_or_def:
+  (forall a:bool.
+    (forall b:bool. ((bool_or(a, b) = true) <-> ((a = true) or (b = true)))))
+
+axiom bool_xor_def:
+  (forall a:bool. (forall b:bool. ((bool_xor(a, b) = true) <-> (a <> b))))
+
+axiom bool_not_def: (forall a:bool. ((bool_not(a) = true) <-> (a = false)))
+
+logic ite : bool, 'a1, 'a1 -> 'a1
+
+axiom ite_true: (forall x:'a1. (forall y:'a1. (ite(true, x, y) = x)))
+
+axiom ite_false: (forall x:'a1. (forall y:'a1. (ite(false, x, y) = y)))
+
+logic lt_int_bool : int, int -> bool
+
+logic le_int_bool : int, int -> bool
+
+logic gt_int_bool : int, int -> bool
+
+logic ge_int_bool : int, int -> bool
+
+logic eq_int_bool : int, int -> bool
+
+logic neq_int_bool : int, int -> bool
+
+axiom lt_int_bool_axiom:
+  (forall x:int. (forall y:int. ((lt_int_bool(x, y) = true) <-> (x < y))))
+
+axiom le_int_bool_axiom:
+  (forall x:int. (forall y:int. ((le_int_bool(x, y) = true) <-> (x <= y))))
+
+axiom gt_int_bool_axiom:
+  (forall x:int. (forall y:int. ((gt_int_bool(x, y) = true) <-> (x > y))))
+
+axiom ge_int_bool_axiom:
+  (forall x:int. (forall y:int. ((ge_int_bool(x, y) = true) <-> (x >= y))))
+
+axiom eq_int_bool_axiom:
+  (forall x:int. (forall y:int. ((eq_int_bool(x, y) = true) <-> (x = y))))
+
+axiom neq_int_bool_axiom:
+  (forall x:int. (forall y:int. ((neq_int_bool(x, y) = true) <-> (x <> y))))
+
+logic abs_int : int -> int
+
+axiom abs_int_pos: (forall x:int. ((x >= 0) -> (abs_int(x) = x)))
+
+axiom abs_int_neg: (forall x:int. ((x <= 0) -> (abs_int(x) = (-x))))
+
+logic int_max : int, int -> int
+
+logic int_min : int, int -> int
+
+axiom int_max_is_ge:
+  (forall x:int.
+    (forall y:int. ((int_max(x, y) >= x) and (int_max(x, y) >= y))))
+
+axiom int_max_is_some:
+  (forall x:int.
+    (forall y:int. ((int_max(x, y) = x) or (int_max(x, y) = y))))
+
+axiom int_min_is_le:
+  (forall x:int.
+    (forall y:int. ((int_min(x, y) <= x) and (int_min(x, y) <= y))))
+
+axiom int_min_is_some:
+  (forall x:int.
+    (forall y:int. ((int_min(x, y) = x) or (int_min(x, y) = y))))
+
+logic lt_real : real, real -> prop
+
+logic le_real : real, real -> prop
+
+logic gt_real : real, real -> prop
+
+logic ge_real : real, real -> prop
+
+logic eq_real : real, real -> prop
+
+logic neq_real : real, real -> prop
+
+logic add_real : real, real -> real
+
+logic sub_real : real, real -> real
+
+logic mul_real : real, real -> real
+
+logic div_real : real, real -> real
+
+logic neg_real : real -> real
+
+logic real_of_int : int -> real
+
+logic int_of_real : real -> int
+
+logic lt_real_bool : real, real -> bool
+
+logic le_real_bool : real, real -> bool
+
+logic gt_real_bool : real, real -> bool
+
+logic ge_real_bool : real, real -> bool
+
+logic eq_real_bool : real, real -> bool
+
+logic neq_real_bool : real, real -> bool
+
+axiom lt_real_bool_axiom:
+  (forall x:real. (forall y:real. ((lt_real_bool(x, y) = true) <-> (x < y))))
+
+axiom le_real_bool_axiom:
+  (forall x:real.
+    (forall y:real. ((le_real_bool(x, y) = true) <-> (x <= y))))
+
+axiom gt_real_bool_axiom:
+  (forall x:real. (forall y:real. ((gt_real_bool(x, y) = true) <-> (x > y))))
+
+axiom ge_real_bool_axiom:
+  (forall x:real.
+    (forall y:real. ((ge_real_bool(x, y) = true) <-> (x >= y))))
+
+axiom eq_real_bool_axiom:
+  (forall x:real. (forall y:real. ((eq_real_bool(x, y) = true) <-> (x = y))))
+
+axiom neq_real_bool_axiom:
+  (forall x:real.
+    (forall y:real. ((neq_real_bool(x, y) = true) <-> (x <> y))))
+
+logic real_max : real, real -> real
+
+logic real_min : real, real -> real
+
+axiom real_max_is_ge:
+  (forall x:real.
+    (forall y:real. ((real_max(x, y) >= x) and (real_max(x, y) >= y))))
+
+axiom real_max_is_some:
+  (forall x:real.
+    (forall y:real. ((real_max(x, y) = x) or (real_max(x, y) = y))))
+
+axiom real_min_is_le:
+  (forall x:real.
+    (forall y:real. ((real_min(x, y) <= x) and (real_min(x, y) <= y))))
+
+axiom real_min_is_some:
+  (forall x:real.
+    (forall y:real. ((real_min(x, y) = x) or (real_min(x, y) = y))))
+
+logic sqrt_real : real -> real
+
+logic pow_real : real, real -> real
+
+logic abs_real : real -> real
+
+axiom abs_real_pos:
+  (forall x:real [abs_real(x)]. ((x >= 0.0) -> (abs_real(x) = x)))
+
+axiom abs_real_neg:
+  (forall x:real [abs_real(x)]. ((x <= 0.0) -> (abs_real(x) = (-x))))
+
+logic exp : real -> real
+
+logic log : real -> real
+
+logic log10 : real -> real
+
+axiom log_exp: (forall x:real. (log(exp(x)) = x))
+
+logic cos : real -> real
+
+logic sin : real -> real
+
+logic tan : real -> real
+
+logic cosh : real -> real
+
+logic sinh : real -> real
+
+logic tanh : real -> real
+
+logic acos : real -> real
+
+logic asin : real -> real
+
+logic atan : real -> real
+
+logic atan2 : real, real -> real
+
+logic hypot : real, real -> real
+
+type 't alloc_table
+
+type 't pointer
+
+type 't block
+
+logic base_block : 'a1 pointer -> 'a1 block
+
+logic pointer_address : 'a1 pointer -> unit pointer
+
+logic absolute_address : int -> unit pointer
+
+logic address : 'a1 pointer -> int
+
+logic offset_max : 'a1 alloc_table, 'a1 pointer -> int
+
+logic offset_min : 'a1 alloc_table, 'a1 pointer -> int
+
+logic valid : 'a1 alloc_table, 'a1 pointer -> prop
+
+axiom valid_def:
+  (forall a0:'a1 alloc_table.
+    (forall p0:'a1 pointer.
+      (valid(a0, p0) <->
+       ((offset_min(a0, p0) <= 0) and (offset_max(a0, p0) >= 0)))))
+
+logic same_block : 'a1 pointer, 'a1 pointer -> prop
+
+axiom same_block_def:
+  (forall p0:'a1 pointer.
+    (forall q0:'a1 pointer.
+      (same_block(p0, q0) <-> (base_block(p0) = base_block(q0)))))
+
+logic sub_pointer : 'a1 pointer, 'a1 pointer -> int
+
+logic shift : 'a1 pointer, int -> 'a1 pointer
+
+logic null : 'a1 pointer
+
+axiom address_injective:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pointer. ((p = q) <-> (address(p) = address(q)))))
+
+axiom address_null: (address(null) = 0)
+
+axiom address_positive: (forall p:'a1 pointer. (0 <= address(p)))
+
+axiom address_shift_lt:
+  (forall p:'a1 pointer.
+    (forall i:int.
+      (forall j:int [address(shift(p, i)), address(shift(p, j))].
+        ((address(shift(p, i)) < address(shift(p, j))) <-> (i < j)))))
+
+axiom address_shift_le:
+  (forall p:'a1 pointer.
+    (forall i:int.
+      (forall j:int [address(shift(p, i)), address(shift(p, j))].
+        ((address(shift(p, i)) <= address(shift(p, j))) <-> (i <= j)))))
+
+axiom shift_zero: (forall p:'a1 pointer [shift(p, 0)]. (shift(p, 0) = p))
+
+axiom shift_shift:
+  (forall p:'a1 pointer.
+    (forall i:int.
+      (forall j:int [shift(shift(p, i), j)]. (shift(shift(p, i),
+        j) = shift(p, (i + j))))))
+
+axiom offset_max_shift:
+  (forall a:'a1 alloc_table.
+    (forall p:'a1 pointer.
+      (forall i:int. (offset_max(a, shift(p, i)) = (offset_max(a, p) - i)))))
+
+axiom offset_min_shift:
+  (forall a:'a1 alloc_table.
+    (forall p:'a1 pointer.
+      (forall i:int. (offset_min(a, shift(p, i)) = (offset_min(a, p) - i)))))
+
+axiom neq_shift:
+  (forall p:'a1 pointer.
+    (forall i:int.
+      (forall j:int [shift(p, i), shift(p, j)].
+        ((i <> j) -> (shift(p, i) <> shift(p, j))))))
+
+axiom null_not_valid: (forall a:'a1 alloc_table. (not valid(a, null)))
+
+axiom null_pointer:
+  (forall a:'a1 alloc_table.
+    ((offset_min(a, null) >= 0) and (offset_max(a, null) <= (-2))))
+
+logic eq_pointer_bool : 'a1 pointer, 'a1 pointer -> bool
+
+logic neq_pointer_bool : 'a1 pointer, 'a1 pointer -> bool
+
+axiom eq_pointer_bool_def:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer. ((eq_pointer_bool(p1, p2) = true) <-> (p1 = p2))))
+
+axiom neq_pointer_bool_def:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer.
+      ((neq_pointer_bool(p1, p2) = true) <-> (p1 <> p2))))
+
+axiom same_block_shift_right:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pointer.
+      (forall i:int [same_block(p, shift(q, i))].
+        (same_block(p, q) -> same_block(p, shift(q, i))))))
+
+axiom same_block_shift_left:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pointer.
+      (forall i:int [same_block(shift(q, i), p)].
+        (same_block(q, p) -> same_block(shift(q, i), p)))))
+
+axiom sub_pointer_shift:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pointer [sub_pointer(p, q)].
+      (same_block(p, q) -> (p = shift(q, sub_pointer(p, q))))))
+
+axiom sub_pointer_self:
+  (forall p:'a1 pointer [sub_pointer(p, p)]. (sub_pointer(p, p) = 0))
+
+axiom sub_pointer_zero:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pointer [sub_pointer(p, q)].
+      (same_block(p, q) -> ((sub_pointer(p, q) = 0) -> (p = q)))))
+
+axiom sub_pointer_shift_left:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pointer.
+      (forall i:int [sub_pointer(shift(p, i), q)]. (sub_pointer(shift(p, i),
+        q) = (sub_pointer(p, q) + i)))))
+
+axiom sub_pointer_shift_right:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pointer.
+      (forall i:int [sub_pointer(p, shift(q, i))]. (sub_pointer(p, shift(q,
+        i)) = (sub_pointer(p, q) - i)))))
+
+type ('t, 'v) memory
+
+logic select : ('a2, 'a1) memory, 'a2 pointer -> 'a1
+
+logic store : ('a1, 'a2) memory, 'a1 pointer, 'a2 -> ('a1, 'a2) memory
+
+axiom select_store_eq:
+  (forall m:('a1, 'a2) memory.
+    (forall p1:'a1 pointer.
+      (forall p2:'a1 pointer.
+        (forall a:'a2 [store(m, p1, a), p2].
+          ((p1 = p2) -> (select(store(m, p1, a), p2) = a))))))
+
+axiom select_store_neq:
+  (forall m:('a1, 'a2) memory.
+    (forall p1:'a1 pointer.
+      (forall p2:'a1 pointer.
+        (forall a:'a2 [store(m, p1, a), p2].
+          ((p1 <> p2) -> (select(store(m, p1, a), p2) = select(m, p2)))))))
+
+type 't pset
+
+logic pset_empty : 'a1 pset
+
+logic pset_singleton : 'a1 pointer -> 'a1 pset
+
+logic pset_deref : ('a2, 'a1 pointer) memory, 'a2 pset -> 'a1 pset
+
+logic pset_union : 'a1 pset, 'a1 pset -> 'a1 pset
+
+logic pset_all : 'a1 pset -> 'a1 pset
+
+logic pset_range : 'a1 pset, int, int -> 'a1 pset
+
+logic pset_range_left : 'a1 pset, int -> 'a1 pset
+
+logic pset_range_right : 'a1 pset, int -> 'a1 pset
+
+logic in_pset : 'a1 pointer, 'a1 pset -> prop
+
+logic valid_pset : 'a1 alloc_table, 'a1 pset -> prop
+
+logic pset_disjoint : 'a1 pset, 'a1 pset -> prop
+
+axiom pset_disjoint_def:
+  (forall ps1_0:'a1 pset.
+    (forall ps2_0:'a1 pset.
+      (pset_disjoint(ps1_0, ps2_0) <->
+       (forall p:'a1 pointer.
+         (not (in_pset(p, ps1_0) and in_pset(p, ps2_0)))))))
+
+logic pset_included : 'a1 pset, 'a1 pset -> prop
+
+axiom pset_included_def:
+  (forall ps1_0:'a1 pset.
+    (forall ps2_0:'a1 pset.
+      (pset_included(ps1_0, ps2_0) <->
+       (forall p:'a1 pointer. (in_pset(p, ps1_0) -> in_pset(p, ps2_0))))))
+
+axiom pset_included_self: (forall ps:'a1 pset. pset_included(ps, ps))
+
+axiom pset_included_range:
+  (forall ps:'a1 pset.
+    (forall a:int.
+      (forall b:int.
+        (forall c:int.
+          (forall d:int [pset_included(pset_range(ps, a, b), pset_range(ps,
+            c, d))].
+            (((c <= a) and (b <= d)) -> pset_included(pset_range(ps, a, b),
+             pset_range(ps, c, d))))))))
+
+axiom pset_included_range_all:
+  (forall ps:'a1 pset.
+    (forall a:int.
+      (forall b:int.
+        (forall c:int.
+          (forall d:int [pset_included(pset_range(ps, a, b), pset_range(ps,
+            c, d))]. pset_included(pset_range(ps, a, b), pset_all(ps)))))))
+
+axiom in_pset_empty: (forall p:'a1 pointer. (not in_pset(p, pset_empty)))
+
+axiom in_pset_singleton:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pointer. (in_pset(p, pset_singleton(q)) <-> (p = q))))
+
+axiom in_pset_deref:
+  (forall p:'a1 pointer.
+    (forall m:('a2, 'a1 pointer) memory.
+      (forall q:'a2 pset.
+        (in_pset(p, pset_deref(m, q)) <->
+         (exists r:'a2 pointer. (in_pset(r, q) and (p = select(m, r))))))))
+
+axiom in_pset_all:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pset.
+      (in_pset(p, pset_all(q)) <->
+       (exists i:int.
+         (exists r:'a1 pointer. (in_pset(r, q) and (p = shift(r, i))))))))
+
+axiom in_pset_range:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pset.
+      (forall a:int.
+        (forall b:int.
+          (in_pset(p, pset_range(q, a, b)) <->
+           (exists i:int.
+             (exists r:'a1 pointer.
+               ((a <= i) and
+                ((i <= b) and (in_pset(r, q) and (p = shift(r, i))))))))))))
+
+axiom in_pset_range_left:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pset.
+      (forall b:int.
+        (in_pset(p, pset_range_left(q, b)) <->
+         (exists i:int.
+           (exists r:'a1 pointer.
+             ((i <= b) and (in_pset(r, q) and (p = shift(r, i))))))))))
+
+axiom in_pset_range_right:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pset.
+      (forall a:int.
+        (in_pset(p, pset_range_right(q, a)) <->
+         (exists i:int.
+           (exists r:'a1 pointer.
+             ((a <= i) and (in_pset(r, q) and (p = shift(r, i))))))))))
+
+axiom in_pset_union:
+  (forall p:'a1 pointer.
+    (forall s1:'a1 pset.
+      (forall s2:'a1 pset.
+        (in_pset(p, pset_union(s1, s2)) <->
+         (in_pset(p, s1) or in_pset(p, s2))))))
+
+axiom valid_pset_empty: (forall a:'a1 alloc_table. valid_pset(a, pset_empty))
+
+axiom valid_pset_singleton:
+  (forall a:'a1 alloc_table.
+    (forall p:'a1 pointer.
+      (valid_pset(a, pset_singleton(p)) <-> valid(a, p))))
+
+axiom valid_pset_deref:
+  (forall a:'a1 alloc_table.
+    (forall m:('a2, 'a1 pointer) memory.
+      (forall q:'a2 pset.
+        (valid_pset(a, pset_deref(m, q)) <->
+         (forall r:'a2 pointer.
+           (forall p:'a1 pointer.
+             ((in_pset(r, q) and (p = select(m, r))) -> valid(a, p))))))))
+
+axiom valid_pset_range:
+  (forall a:'a1 alloc_table.
+    (forall q:'a1 pset.
+      (forall c:int.
+        (forall d:int.
+          (valid_pset(a, pset_range(q, c, d)) <->
+           (forall i:int.
+             (forall r:'a1 pointer.
+               ((in_pset(r, q) and ((c <= i) and (i <= d))) -> valid(a,
+                shift(r, i))))))))))
+
+axiom valid_pset_union:
+  (forall a:'a1 alloc_table.
+    (forall s1:'a1 pset.
+      (forall s2:'a1 pset.
+        (valid_pset(a, pset_union(s1, s2)) <->
+         (valid_pset(a, s1) and valid_pset(a, s2))))))
+
+logic not_assigns : 'a1 alloc_table, ('a1, 'a2) memory, ('a1, 'a2) memory,
+'a1 pset -> prop
+
+axiom not_assigns_def:
+  (forall a0:'a1 alloc_table.
+    (forall m1_0:('a1, 'a2) memory.
+      (forall m2_0:('a1, 'a2) memory.
+        (forall l0:'a1 pset.
+          (not_assigns(a0, m1_0, m2_0, l0) <->
+           (forall p:'a1 pointer.
+             ((valid(a0, p) and (not in_pset(p, l0))) -> (select(m2_0,
+              p) = select(m1_0, p)))))))))
+
+axiom not_assigns_refl:
+  (forall a:'a1 alloc_table.
+    (forall m:('a1, 'a2) memory.
+      (forall l:'a1 pset. not_assigns(a, m, m, l))))
+
+axiom not_assigns_trans:
+  (forall a:'a1 alloc_table.
+    (forall m1:('a1, 'a2) memory.
+      (forall m2:('a1, 'a2) memory.
+        (forall m3:('a1, 'a2) memory.
+          (forall l:'a1 pset [not_assigns(a, m1, m2, l), not_assigns(a, m1,
+            m3, l)].
+            (not_assigns(a, m1, m2, l) ->
+             (not_assigns(a, m2, m3, l) -> not_assigns(a, m1, m3, l))))))))
+
+logic full_separated : 'a1 pointer, 'a2 pointer -> prop
+
+axiom full_separated_shift1:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pointer.
+      (forall i:int [full_separated(p, q), shift(q, i)].
+        (full_separated(p, q) -> full_separated(p, shift(q, i))))))
+
+axiom full_separated_shift2:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pointer.
+      (forall i:int [full_separated(p, q), shift(q, i)].
+        (full_separated(p, q) -> full_separated(shift(q, i), p)))))
+
+axiom full_separated_shift3:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pointer.
+      (forall i:int [full_separated(q, p), shift(q, i)].
+        (full_separated(q, p) -> full_separated(shift(q, i), p)))))
+
+axiom full_separated_shift4:
+  (forall p:'a1 pointer.
+    (forall q:'a1 pointer.
+      (forall i:int [full_separated(q, p), shift(q, i)].
+        (full_separated(q, p) -> full_separated(p, shift(q, i))))))
+
+type 't tag_table
+
+type 't tag_id
+
+logic int_of_tag : 'a1 tag_id -> int
+
+logic typeof : 'a1 tag_table, 'a1 pointer -> 'a1 tag_id
+
+logic parenttag : 'a1 tag_id, 'a1 tag_id -> prop
+
+logic subtag : 'a1 tag_id, 'a1 tag_id -> prop
+
+logic subtag_bool : 'a1 tag_id, 'a1 tag_id -> bool
+
+axiom subtag_bool_def:
+  (forall t1:'a1 tag_id.
+    (forall t2:'a1 tag_id. ((subtag_bool(t1, t2) = true) <-> subtag(t1, t2))))
+
+axiom subtag_refl: (forall t:'a1 tag_id. subtag(t, t))
+
+axiom subtag_parent:
+  (forall t1:'a1 tag_id.
+    (forall t2:'a1 tag_id.
+      (forall t3:'a1 tag_id.
+        (subtag(t1, t2) -> (parenttag(t2, t3) -> subtag(t1, t3))))))
+
+logic instanceof : 'a1 tag_table, 'a1 pointer, 'a1 tag_id -> prop
+
+axiom instanceof_def:
+  (forall a0:'a1 tag_table.
+    (forall p0:'a1 pointer.
+      (forall t0:'a1 tag_id.
+        (instanceof(a0, p0, t0) <-> subtag(typeof(a0, p0), t0)))))
+
+logic downcast : 'a1 tag_table, 'a1 pointer, 'a1 tag_id -> 'a1 pointer
+
+axiom downcast_instanceof:
+  (forall a:'a1 tag_table.
+    (forall p:'a1 pointer.
+      (forall s:'a1 tag_id. (instanceof(a, p, s) -> (downcast(a, p, s) = p)))))
+
+logic bottom_tag : 'a1 tag_id
+
+axiom bottom_tag_axiom: (forall t:'a1 tag_id. subtag(t, bottom_tag))
+
+logic root_tag : 'a1 tag_id -> prop
+
+axiom root_tag_def:
+  (forall t0:'a1 tag_id. (root_tag(t0) <-> parenttag(t0, bottom_tag)))
+
+axiom root_subtag:
+  (forall a:'a1 tag_id.
+    (forall b:'a1 tag_id.
+      (forall c:'a1 tag_id.
+        (root_tag(a) ->
+         (root_tag(b) -> ((a <> b) -> (subtag(c, a) -> (not subtag(c, b)))))))))
+
+logic fully_packed : 'a1 tag_table, ('a1, 'a1 tag_id) memory,
+'a1 pointer -> prop
+
+axiom fully_packed_def:
+  (forall tag_table0:'a1 tag_table.
+    (forall mutable0:('a1, 'a1 tag_id) memory.
+      (forall this0:'a1 pointer.
+        (fully_packed(tag_table0, mutable0, this0) <-> (select(mutable0,
+         this0) = typeof(tag_table0, this0))))))
+
+logic bw_compl : int -> int
+
+logic bw_and : int, int -> int
+
+axiom bw_and_not_null:
+  (forall a:int.
+    (forall b:int. ((bw_and(a, b) <> 0) -> ((a <> 0) and (b <> 0)))))
+
+logic bw_xor : int, int -> int
+
+logic bw_or : int, int -> int
+
+logic lsl : int, int -> int
+
+axiom lsl_left_positive_returns_positive:
+  (forall a:int.
+    (forall b:int. (((0 <= a) and (0 <= b)) -> (0 <= lsl(a, b)))))
+
+axiom lsl_left_positive_monotone:
+  (forall a1:int.
+    (forall a2:int.
+      (forall b:int.
+        (((0 <= a1) and ((a1 <= a2) and (0 <= b))) -> (lsl(a1, b) <= lsl(a2,
+         b))))))
+
+logic lsr : int, int -> int
+
+axiom lsr_left_positive_returns_positive:
+  (forall a:int.
+    (forall b:int. (((0 <= a) and (0 <= b)) -> (0 <= lsr(a, b)))))
+
+axiom lsr_left_positive_decreases:
+  (forall a:int.
+    (forall b:int. (((0 <= a) and (0 <= b)) -> (lsr(a, b) <= a))))
+
+logic asr : int, int -> int
+
+axiom asr_positive_on_positive:
+  (forall a:int.
+    (forall b:int. (((0 <= a) and (0 <= b)) -> (0 <= asr(a, b)))))
+
+axiom asr_decreases_on_positive:
+  (forall a:int.
+    (forall b:int. (((0 <= a) and (0 <= b)) -> (asr(a, b) <= a))))
+
+axiom asr_lsr_same_on_positive:
+  (forall a:int.
+    (forall b:int. (((0 <= a) and (0 <= b)) -> (asr(a, b) = lsr(a, b)))))
+
+axiom lsl_of_lsr_decreases_on_positive:
+  (forall a:int.
+    (forall b:int. (((0 <= a) and (0 <= b)) -> (lsl(lsr(a, b), b) <= a))))
+
+axiom lsr_of_lsl_identity_on_positive:
+  (forall a:int.
+    (forall b:int. (((0 <= a) and (0 <= b)) -> (lsr(lsl(a, b), b) = a))))
+
+logic alloc_extends : 'a1 alloc_table, 'a1 alloc_table -> prop
+
+logic alloc_fresh : 'a1 alloc_table, 'a1 pointer, int -> prop
+
+axiom alloc_fresh_def:
+  (forall a0:'a1 alloc_table.
+    (forall p0:'a1 pointer.
+      (forall n0:int.
+        (alloc_fresh(a0, p0, n0) <->
+         (forall i:int.
+           (((0 <= i) and (i < n0)) -> (not valid(a0, shift(p0, i)))))))))
+
+axiom alloc_extends_offset_min:
+  (forall a1:'a1 alloc_table.
+    (forall a2:'a1 alloc_table [alloc_extends(a1, a2)].
+      (alloc_extends(a1, a2) ->
+       (forall p:'a1 pointer.
+         (valid(a1, p) -> (offset_min(a1, p) = offset_min(a2, p)))))))
+
+axiom alloc_extends_offset_max:
+  (forall a1:'a1 alloc_table.
+    (forall a2:'a1 alloc_table [alloc_extends(a1, a2)].
+      (alloc_extends(a1, a2) ->
+       (forall p:'a1 pointer.
+         (valid(a1, p) -> (offset_max(a1, p) = offset_max(a2, p)))))))
+
+axiom alloc_extends_not_assigns_empty:
+  (forall a1:'a1 alloc_table.
+    (forall a2:'a1 alloc_table.
+      (forall m1:('a1, 'a2) memory.
+        (forall m2:('a1, 'a2) memory.
+          (forall l:'a1 pset.
+            (forall p:'a1 pointer.
+              (forall n:int [alloc_extends(a1, a2), alloc_fresh(a1, p, n),
+                not_assigns(a2, m1, m2, l)].
+                ((alloc_extends(a1, a2) and
+                  (alloc_fresh(a1, p, n) and
+                   (not_assigns(a2, m1, m2, l) and pset_included(l,
+                    pset_all(pset_singleton(p)))))) ->
+                 not_assigns(a1, m1, m2, pset_empty)))))))))
+
+logic alloc_extends_except : 'a1 alloc_table, 'a1 alloc_table,
+'a1 pset -> prop
+
+axiom alloc_extends_except_offset_min:
+  (forall a1:'a1 alloc_table.
+    (forall a2:'a1 alloc_table.
+      (forall l:'a1 pset [alloc_extends_except(a1, a2, l)].
+        (alloc_extends_except(a1, a2, l) ->
+         (forall p:'a1 pointer.
+           ((valid(a1, p) and (not in_pset(p, l))) -> (offset_min(a1,
+            p) = offset_min(a2, p))))))))
+
+axiom alloc_extends_except_offset_max:
+  (forall a1:'a1 alloc_table.
+    (forall a2:'a1 alloc_table.
+      (forall l:'a1 pset [alloc_extends_except(a1, a2, l)].
+        (alloc_extends_except(a1, a2, l) ->
+         (forall p:'a1 pointer.
+           ((valid(a1, p) and (not in_pset(p, l))) -> (offset_max(a1,
+            p) = offset_max(a2, p))))))))
+
+type bitvector
+
+logic concat_bitvector : bitvector, bitvector -> bitvector
+
+logic offset_min_bytes : 'a1 alloc_table, 'a1 pointer, int -> int
+
+logic offset_max_bytes : 'a1 alloc_table, 'a1 pointer, int -> int
+
+axiom offset_min_bytes_def:
+  (forall a:'a1 alloc_table.
+    (forall p:'a1 pointer.
+      (forall s:int [offset_min_bytes(a, p, s)].
+        ((0 < s) ->
+         ((offset_min(a, p) <= (s * offset_min_bytes(a, p, s))) and
+          (((s * offset_min_bytes(a, p, s)) - s) < offset_min(a, p)))))))
+
+axiom offset_max_bytes_def:
+  (forall a:'a1 alloc_table.
+    (forall p:'a1 pointer.
+      (forall s:int [offset_max_bytes(a, p, s)].
+        ((0 < s) ->
+         (((((s * offset_max_bytes(a, p, s)) + s) - 1) <= offset_max(a,
+          p)) and (offset_max(a, p) < ((((s * offset_max_bytes(a, p,
+          s)) + s) + s) - 1)))))))
+
+logic extract_bytes : bitvector, int, int -> bitvector
+
+logic replace_bytes : bitvector, int, int, bitvector -> bitvector
+
+axiom select_store_eq_union:
+  (forall o1:int.
+    (forall s1:int.
+      (forall o2:int.
+        (forall s2:int.
+          (forall v1:bitvector.
+            (forall v2:bitvector [extract_bytes(replace_bytes(v1, o1, s1,
+              v2), o2, s2)].
+              (((o1 = o2) and (s1 = s2)) -> (extract_bytes(replace_bytes(v1,
+               o1, s1, v2), o2, s2) = v2))))))))
+
+axiom select_store_neq_union:
+  (forall o1:int.
+    (forall s1:int.
+      (forall o2:int.
+        (forall s2:int.
+          (forall v1:bitvector.
+            (forall v2:bitvector [extract_bytes(replace_bytes(v1, o1, s1,
+              v2), o2, s2)].
+              ((((o2 + s2) <= o1) or ((o1 + s2) <= o2)) ->
+               (extract_bytes(replace_bytes(v1, o1, s1, v2), o2,
+               s2) = extract_bytes(v1, o2, s2)))))))))
+
+axiom concat_replace_bytes_up:
+  (forall o1:int.
+    (forall s1:int.
+      (forall o2:int.
+        (forall s2:int.
+          (forall v1:bitvector.
+            (forall v2:bitvector.
+              (forall v3:bitvector [replace_bytes(replace_bytes(v1, o1, s1,
+                v2), o2, s2, v3)].
+                (((o1 + s1) = o2) -> (replace_bytes(replace_bytes(v1, o1, s1,
+                 v2), o2, s2, v3) = replace_bytes(v1, o1, (s1 + s2),
+                 concat_bitvector(v2, v3)))))))))))
+
+axiom concat_replace_bytes_down:
+  (forall o1:int.
+    (forall s1:int.
+      (forall o2:int.
+        (forall s2:int.
+          (forall v1:bitvector.
+            (forall v2:bitvector.
+              (forall v3:bitvector [replace_bytes(replace_bytes(v1, o1, s1,
+                v2), o2, s2, v3)].
+                (((o2 + s2) = o1) -> (replace_bytes(replace_bytes(v1, o1, s1,
+                 v2), o2, s2, v3) = replace_bytes(v1, o2, (s1 + s2),
+                 concat_bitvector(v3, v2)))))))))))
+
+axiom concat_extract_bytes:
+  (forall o1:int.
+    (forall s1:int.
+      (forall o2:int.
+        (forall s2:int.
+          (forall v:bitvector [concat_bitvector(extract_bytes(v, o1, s1),
+            extract_bytes(v, o2, s2))].
+            (((o1 + s1) = o2) -> (concat_bitvector(extract_bytes(v, o1, s1),
+             extract_bytes(v, o2, s2)) = extract_bytes(v, o1, (s1 + s2)))))))))
+
+logic select_bytes : ('a1, bitvector) memory, 'a1 pointer, int,
+int -> bitvector
+
+logic store_bytes : ('a1, bitvector) memory, 'a1 pointer, int, int,
+bitvector -> ('a1, bitvector) memory
+
+axiom select_store_eq_bytes:
+  (forall m:('a1, bitvector) memory.
+    (forall p1:'a1 pointer.
+      (forall p2:'a1 pointer.
+        (forall o1:int.
+          (forall s1:int.
+            (forall o2:int.
+              (forall s2:int.
+                (forall v:bitvector [select_bytes(store_bytes(m, p1, o1, s1,
+                  v), p2, o2, s2)].
+                  (((p1 = p2) and ((o1 = o2) and (s1 = s2))) ->
+                   (select_bytes(store_bytes(m, p1, o1, s1, v), p2, o2,
+                   s2) = v))))))))))
+
+axiom select_store_neq_bytes:
+  (forall m:('a1, bitvector) memory.
+    (forall p1:'a1 pointer.
+      (forall p2:'a1 pointer.
+        (forall o1:int.
+          (forall s1:int.
+            (forall o2:int.
+              (forall s2:int.
+                (forall v:bitvector [select_bytes(store_bytes(m, p1, o1, s1,
+                  v), p2, o2, s2)].
+                  (pset_disjoint(pset_range(pset_singleton(p1), o1,
+                   (o1 + s1)), pset_range(pset_singleton(p2), o2,
+                   (o2 + s2))) -> (select_bytes(store_bytes(m, p1, o1, s1,
+                   v), p2, o2, s2) = select_bytes(m, p2, o2, s2)))))))))))
+
+axiom shift_store_bytes:
+  (forall m:('a1, bitvector) memory.
+    (forall p:'a1 pointer.
+      (forall i:int.
+        (forall o:int.
+          (forall s:int.
+            (forall v:bitvector [store_bytes(m, shift(p, i), o, s, v)].
+              (store_bytes(m, shift(p, i), o, s, v) = store_bytes(m, p,
+              (o + i), s, v))))))))
+
+axiom shift_select_bytes:
+  (forall m:('a1, bitvector) memory.
+    (forall p:'a1 pointer.
+      (forall i:int.
+        (forall o:int.
+          (forall s:int.
+            (forall v:bitvector [select_bytes(m, shift(p, i), o, s)].
+              (select_bytes(m, shift(p, i), o, s) = select_bytes(m, p,
+              (o + i), s))))))))
+
+axiom concat_store_bytes_up:
+  (forall m:('a1, bitvector) memory.
+    (forall p:'a1 pointer.
+      (forall o1:int.
+        (forall s1:int.
+          (forall o2:int.
+            (forall s2:int.
+              (forall v1:bitvector.
+                (forall v2:bitvector [store_bytes(store_bytes(m, p, o1, s1,
+                  v1), p, o2, s2, v2)].
+                  (((o1 + s1) = o2) -> (store_bytes(store_bytes(m, p, o1, s1,
+                   v1), p, o2, s2, v2) = store_bytes(m, p, o1, (s1 + s2),
+                   concat_bitvector(v1, v2))))))))))))
+
+axiom concat_store_bytes_down:
+  (forall m:('a1, bitvector) memory.
+    (forall p:'a1 pointer.
+      (forall o1:int.
+        (forall s1:int.
+          (forall o2:int.
+            (forall s2:int.
+              (forall v1:bitvector.
+                (forall v2:bitvector [store_bytes(store_bytes(m, p, o1, s1,
+                  v1), p, o2, s2, v2)].
+                  (((o2 + s2) = o1) -> (store_bytes(store_bytes(m, p, o1, s1,
+                   v1), p, o2, s2, v2) = store_bytes(m, p, o2, (s1 + s2),
+                   concat_bitvector(v2, v1))))))))))))
+
+axiom concat_select_bytes:
+  (forall m:('a1, bitvector) memory.
+    (forall p:'a1 pointer.
+      (forall o1:int.
+        (forall s1:int.
+          (forall o2:int.
+            (forall s2:int [concat_bitvector(select_bytes(m, p, o1, s1),
+              select_bytes(m, p, o2, s2))].
+              (((o1 + s1) = o2) -> (concat_bitvector(select_bytes(m, p, o1,
+               s1), select_bytes(m, p, o2, s2)) = select_bytes(m, p, o1,
+               (s1 + s2))))))))))
+
+type char_P
+
+type node
+
+type padding
+
+type void_P
+
+logic bitvector_of_char_P : char_P pointer -> bitvector
+
+logic char_P_of_bitvector : bitvector -> char_P pointer
+
+axiom bitvector_of_char_P_of_char_P_of_bitvector:
+  (forall x:bitvector. (bitvector_of_char_P(char_P_of_bitvector(x)) = x))
+
+logic bitvector_of_node : node pointer -> bitvector
+
+logic node_of_bitvector : bitvector -> node pointer
+
+axiom bitvector_of_node_of_node_of_bitvector:
+  (forall x:bitvector. (bitvector_of_node(node_of_bitvector(x)) = x))
+
+logic bitvector_of_void_P : void_P pointer -> bitvector
+
+logic void_P_of_bitvector : bitvector -> void_P pointer
+
+axiom bitvector_of_void_P_of_void_P_of_bitvector:
+  (forall x:bitvector. (bitvector_of_void_P(void_P_of_bitvector(x)) = x))
+
+logic char_P_tag : char_P tag_id
+
+axiom char_P_int: (int_of_tag(char_P_tag) = 1)
+
+axiom char_P_of_bitvector_of_bitvector_of_char_P:
+  (forall x:char_P pointer.
+    (char_P_of_bitvector(bitvector_of_char_P(x)) = x))
+
+logic char_P_of_pointer_address : unit pointer -> char_P pointer
+
+axiom char_P_of_pointer_address_of_pointer_addr:
+  (forall p:char_P pointer.
+    (p = char_P_of_pointer_address(pointer_address(p))))
+
+axiom char_P_parenttag_bottom: parenttag(char_P_tag, bottom_tag)
+
+axiom char_P_tags:
+  (forall x:char_P pointer.
+    (forall char_P_tag_table:char_P tag_table. instanceof(char_P_tag_table,
+      x, char_P_tag)))
+
+logic left_valid_struct_char_P : char_P pointer, int,
+char_P alloc_table -> prop
+
+axiom left_valid_struct_char_P_def:
+  (forall p0:char_P pointer.
+    (forall a0:int.
+      (forall char_P_alloc_table0:char_P alloc_table.
+        (left_valid_struct_char_P(p0, a0, char_P_alloc_table0) <->
+         (offset_min(char_P_alloc_table0, p0) <= a0)))))
+
+logic left_valid_struct_node : node pointer, int, node alloc_table -> prop
+
+axiom left_valid_struct_node_def:
+  (forall p0:node pointer.
+    (forall a0:int.
+      (forall node_alloc_table0:node alloc_table.
+        (left_valid_struct_node(p0, a0, node_alloc_table0) <->
+         (offset_min(node_alloc_table0, p0) <= a0)))))
+
+logic left_valid_struct_void_P : void_P pointer, int,
+void_P alloc_table -> prop
+
+axiom left_valid_struct_void_P_def:
+  (forall p0:void_P pointer.
+    (forall a0:int.
+      (forall void_P_alloc_table0:void_P alloc_table.
+        (left_valid_struct_void_P(p0, a0, void_P_alloc_table0) <->
+         (offset_min(void_P_alloc_table0, p0) <= a0)))))
+
+logic node_tag : node tag_id
+
+axiom node_int: (int_of_tag(node_tag) = 1)
+
+axiom node_of_bitvector_of_bitvector_of_node:
+  (forall x:node pointer. (node_of_bitvector(bitvector_of_node(x)) = x))
+
+logic node_of_pointer_address : unit pointer -> node pointer
+
+axiom node_of_pointer_address_of_pointer_addr:
+  (forall p:node pointer. (p = node_of_pointer_address(pointer_address(p))))
+
+axiom node_parenttag_bottom: parenttag(node_tag, bottom_tag)
+
+axiom node_tags:
+  (forall x:node pointer.
+    (forall node_tag_table:node tag_table. instanceof(node_tag_table, x,
+      node_tag)))
+
+axiom pointer_addr_of_char_P_of_pointer_address:
+  (forall p:unit pointer.
+    (p = pointer_address(char_P_of_pointer_address(p))))
+
+axiom pointer_addr_of_node_of_pointer_address:
+  (forall p:unit pointer. (p = pointer_address(node_of_pointer_address(p))))
+
+logic void_P_of_pointer_address : unit pointer -> void_P pointer
+
+axiom pointer_addr_of_void_P_of_pointer_address:
+  (forall p:unit pointer.
+    (p = pointer_address(void_P_of_pointer_address(p))))
+
+logic right_valid_struct_char_P : char_P pointer, int,
+char_P alloc_table -> prop
+
+axiom right_valid_struct_char_P_def:
+  (forall p0:char_P pointer.
+    (forall b0:int.
+      (forall char_P_alloc_table0:char_P alloc_table.
+        (right_valid_struct_char_P(p0, b0, char_P_alloc_table0) <->
+         (offset_max(char_P_alloc_table0, p0) >= b0)))))
+
+logic right_valid_struct_node : node pointer, int, node alloc_table -> prop
+
+axiom right_valid_struct_node_def:
+  (forall p0:node pointer.
+    (forall b0:int.
+      (forall node_alloc_table0:node alloc_table.
+        (right_valid_struct_node(p0, b0, node_alloc_table0) <->
+         (offset_max(node_alloc_table0, p0) >= b0)))))
+
+logic right_valid_struct_void_P : void_P pointer, int,
+void_P alloc_table -> prop
+
+axiom right_valid_struct_void_P_def:
+  (forall p0:void_P pointer.
+    (forall b0:int.
+      (forall void_P_alloc_table0:void_P alloc_table.
+        (right_valid_struct_void_P(p0, b0, void_P_alloc_table0) <->
+         (offset_max(void_P_alloc_table0, p0) >= b0)))))
+
+logic strict_valid_root_char_P : char_P pointer, int, int,
+char_P alloc_table -> prop
+
+axiom strict_valid_root_char_P_def:
+  (forall p0:char_P pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall char_P_alloc_table0:char_P alloc_table.
+          (strict_valid_root_char_P(p0, a0, b0, char_P_alloc_table0) <->
+           ((offset_min(char_P_alloc_table0, p0) = a0) and
+            (offset_max(char_P_alloc_table0, p0) = b0)))))))
+
+logic strict_valid_root_node : node pointer, int, int,
+node alloc_table -> prop
+
+axiom strict_valid_root_node_def:
+  (forall p0:node pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall node_alloc_table0:node alloc_table.
+          (strict_valid_root_node(p0, a0, b0, node_alloc_table0) <->
+           ((offset_min(node_alloc_table0, p0) = a0) and
+            (offset_max(node_alloc_table0, p0) = b0)))))))
+
+logic strict_valid_root_void_P : void_P pointer, int, int,
+void_P alloc_table -> prop
+
+axiom strict_valid_root_void_P_def:
+  (forall p0:void_P pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall void_P_alloc_table0:void_P alloc_table.
+          (strict_valid_root_void_P(p0, a0, b0, void_P_alloc_table0) <->
+           ((offset_min(void_P_alloc_table0, p0) = a0) and
+            (offset_max(void_P_alloc_table0, p0) = b0)))))))
+
+logic strict_valid_struct_char_P : char_P pointer, int, int,
+char_P alloc_table -> prop
+
+axiom strict_valid_struct_char_P_def:
+  (forall p0:char_P pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall char_P_alloc_table0:char_P alloc_table.
+          (strict_valid_struct_char_P(p0, a0, b0, char_P_alloc_table0) <->
+           ((offset_min(char_P_alloc_table0, p0) = a0) and
+            (offset_max(char_P_alloc_table0, p0) = b0)))))))
+
+logic strict_valid_struct_node : node pointer, int, int,
+node alloc_table -> prop
+
+axiom strict_valid_struct_node_def:
+  (forall p0:node pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall node_alloc_table0:node alloc_table.
+          (strict_valid_struct_node(p0, a0, b0, node_alloc_table0) <->
+           ((offset_min(node_alloc_table0, p0) = a0) and
+            (offset_max(node_alloc_table0, p0) = b0)))))))
+
+logic strict_valid_struct_void_P : void_P pointer, int, int,
+void_P alloc_table -> prop
+
+axiom strict_valid_struct_void_P_def:
+  (forall p0:void_P pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall void_P_alloc_table0:void_P alloc_table.
+          (strict_valid_struct_void_P(p0, a0, b0, void_P_alloc_table0) <->
+           ((offset_min(void_P_alloc_table0, p0) = a0) and
+            (offset_max(void_P_alloc_table0, p0) = b0)))))))
+
+logic valid_bitvector_struct_char_P : unit pointer, int, int,
+unit alloc_table -> prop
+
+axiom valid_bitvector_struct_char_P_def:
+  (forall p0:unit pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall bitvector_alloc_table0:unit alloc_table.
+          (valid_bitvector_struct_char_P(p0, a0, b0,
+           bitvector_alloc_table0) <->
+           ((offset_min(bitvector_alloc_table0, p0) = a0) and
+            (offset_max(bitvector_alloc_table0, p0) = b0)))))))
+
+logic valid_bitvector_struct_node : unit pointer, int, int,
+unit alloc_table -> prop
+
+axiom valid_bitvector_struct_node_def:
+  (forall p0:unit pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall bitvector_alloc_table0:unit alloc_table.
+          (valid_bitvector_struct_node(p0, a0, b0,
+           bitvector_alloc_table0) <->
+           ((offset_min(bitvector_alloc_table0, p0) = a0) and
+            (offset_max(bitvector_alloc_table0, p0) = b0)))))))
+
+logic valid_bitvector_struct_void_P : unit pointer, int, int,
+unit alloc_table -> prop
+
+axiom valid_bitvector_struct_void_P_def:
+  (forall p0:unit pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall bitvector_alloc_table0:unit alloc_table.
+          (valid_bitvector_struct_void_P(p0, a0, b0,
+           bitvector_alloc_table0) <->
+           ((offset_min(bitvector_alloc_table0, p0) = a0) and
+            (offset_max(bitvector_alloc_table0, p0) = b0)))))))
+
+logic valid_root_char_P : char_P pointer, int, int,
+char_P alloc_table -> prop
+
+axiom valid_root_char_P_def:
+  (forall p0:char_P pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall char_P_alloc_table0:char_P alloc_table.
+          (valid_root_char_P(p0, a0, b0, char_P_alloc_table0) <->
+           ((offset_min(char_P_alloc_table0, p0) <= a0) and
+            (offset_max(char_P_alloc_table0, p0) >= b0)))))))
+
+logic valid_root_node : node pointer, int, int, node alloc_table -> prop
+
+axiom valid_root_node_def:
+  (forall p0:node pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall node_alloc_table0:node alloc_table.
+          (valid_root_node(p0, a0, b0, node_alloc_table0) <->
+           ((offset_min(node_alloc_table0, p0) <= a0) and
+            (offset_max(node_alloc_table0, p0) >= b0)))))))
+
+logic valid_root_void_P : void_P pointer, int, int,
+void_P alloc_table -> prop
+
+axiom valid_root_void_P_def:
+  (forall p0:void_P pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall void_P_alloc_table0:void_P alloc_table.
+          (valid_root_void_P(p0, a0, b0, void_P_alloc_table0) <->
+           ((offset_min(void_P_alloc_table0, p0) <= a0) and
+            (offset_max(void_P_alloc_table0, p0) >= b0)))))))
+
+logic valid_struct_char_P : char_P pointer, int, int,
+char_P alloc_table -> prop
+
+axiom valid_struct_char_P_def:
+  (forall p0:char_P pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall char_P_alloc_table0:char_P alloc_table.
+          (valid_struct_char_P(p0, a0, b0, char_P_alloc_table0) <->
+           ((offset_min(char_P_alloc_table0, p0) <= a0) and
+            (offset_max(char_P_alloc_table0, p0) >= b0)))))))
+
+logic valid_struct_node : node pointer, int, int, node alloc_table -> prop
+
+axiom valid_struct_node_def:
+  (forall p0:node pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall node_alloc_table0:node alloc_table.
+          (valid_struct_node(p0, a0, b0, node_alloc_table0) <->
+           ((offset_min(node_alloc_table0, p0) <= a0) and
+            (offset_max(node_alloc_table0, p0) >= b0)))))))
+
+logic valid_struct_void_P : void_P pointer, int, int,
+void_P alloc_table -> prop
+
+axiom valid_struct_void_P_def:
+  (forall p0:void_P pointer.
+    (forall a0:int.
+      (forall b0:int.
+        (forall void_P_alloc_table0:void_P alloc_table.
+          (valid_struct_void_P(p0, a0, b0, void_P_alloc_table0) <->
+           ((offset_min(void_P_alloc_table0, p0) <= a0) and
+            (offset_max(void_P_alloc_table0, p0) >= b0)))))))
+
+logic void_P_tag : void_P tag_id
+
+axiom void_P_int: (int_of_tag(void_P_tag) = 1)
+
+axiom void_P_of_bitvector_of_bitvector_of_void_P:
+  (forall x:void_P pointer.
+    (void_P_of_bitvector(bitvector_of_void_P(x)) = x))
+
+axiom void_P_of_pointer_address_of_pointer_addr:
+  (forall p:void_P pointer.
+    (p = void_P_of_pointer_address(pointer_address(p))))
+
+axiom void_P_parenttag_bottom: parenttag(void_P_tag, bottom_tag)
+
+axiom void_P_tags:
+  (forall x:void_P pointer.
+    (forall void_P_tag_table:void_P tag_table. instanceof(void_P_tag_table,
+      x, void_P_tag)))
+
+goal df_ensures_default_po_1:
+  forall p:node pointer.
+  forall q:node pointer.
+  forall node_alloc_table:node alloc_table.
+  forall node_l:(node, node pointer) memory.
+  forall node_r:(node,
+  node pointer) memory.
+  ((true = true) and
+   ("JC_13":
+   (("JC_8": (select(node_r, p) = select(node_l, q))) and
+    (("JC_9": (offset_min(node_alloc_table, p) <= 0)) and
+     (("JC_10": (offset_max(node_alloc_table, p) >= 0)) and
+      (("JC_11": (offset_min(node_alloc_table, q) <= 0)) and
+       ("JC_12": (offset_max(node_alloc_table, q) >= 0)))))))) ->
+  forall result:node pointer.
+  (result = select(node_l, p)) ->
+  forall tmp:node pointer.
+  (tmp = result) ->
+  forall result0:node pointer.
+  (result0 = select(node_r, q)) ->
+  forall node_l0:(node,
+  node pointer) memory.
+  (node_l0 = store(node_l, p, result0)) ->
+  forall node_l1:(node,
+  node pointer) memory.
+  ((true = true) ->
+   ("JC_20":
+   (("JC_18": (select(node_r, q) = select(node_l1, p))) and
+    ("JC_19": not_assigns(node_alloc_table, node_l0, node_l1, pset_empty))))) ->
+  forall node_l2:(node,
+  node pointer) memory.
+  (node_l2 = store(node_l1, p, tmp)) ->
+  forall node_l3:(node,
+  node pointer) memory.
+  ((true = true) ->
+   ("JC_20":
+   (("JC_18": (select(node_r, p) = select(node_l3, q))) and
+    ("JC_19": not_assigns(node_alloc_table, node_l2, node_l3, pset_empty))))) ->
+  ("JC_17": ("JC_15": ("JC_15": (select(node_r, p) = select(node_l3, q)))))
+
+goal df_ensures_default_po_2:
+  forall p:node pointer.
+  forall q:node pointer.
+  forall node_alloc_table:node alloc_table.
+  forall node_l:(node, node pointer) memory.
+  forall node_r:(node,
+  node pointer) memory.
+  ((true = true) and
+   ("JC_13":
+   (("JC_8": (select(node_r, p) = select(node_l, q))) and
+    (("JC_9": (offset_min(node_alloc_table, p) <= 0)) and
+     (("JC_10": (offset_max(node_alloc_table, p) >= 0)) and
+      (("JC_11": (offset_min(node_alloc_table, q) <= 0)) and
+       ("JC_12": (offset_max(node_alloc_table, q) >= 0)))))))) ->
+  forall result:node pointer.
+  (result = select(node_l, p)) ->
+  forall tmp:node pointer.
+  (tmp = result) ->
+  forall result0:node pointer.
+  (result0 = select(node_r, q)) ->
+  forall node_l0:(node,
+  node pointer) memory.
+  (node_l0 = store(node_l, p, result0)) ->
+  forall node_l1:(node,
+  node pointer) memory.
+  ((true = true) ->
+   ("JC_20":
+   (("JC_18": (select(node_r, q) = select(node_l1, p))) and
+    ("JC_19": not_assigns(node_alloc_table, node_l0, node_l1, pset_empty))))) ->
+  forall node_l2:(node,
+  node pointer) memory.
+  (node_l2 = store(node_l1, p, tmp)) ->
+  forall node_l3:(node,
+  node pointer) memory.
+  ((true = true) ->
+   ("JC_20":
+   (("JC_18": (select(node_r, p) = select(node_l3, q))) and
+    ("JC_19": not_assigns(node_alloc_table, node_l2, node_l3, pset_empty))))) ->
+  ("JC_17":
+  ("JC_16":
+  ("JC_16": not_assigns(node_alloc_table, node_l, node_l3, pset_empty))))
+
+goal df_safety_po_1:
+  forall p:node pointer.
+  forall q:node pointer.
+  forall node_alloc_table:node alloc_table.
+  forall node_l:(node, node pointer) memory.
+  forall node_r:(node,
+  node pointer) memory.
+  ("JC_13":
+  (("JC_8": (select(node_r, p) = select(node_l, q))) and
+   (("JC_9": (offset_min(node_alloc_table, p) <= 0)) and
+    (("JC_10": (offset_max(node_alloc_table, p) >= 0)) and
+     (("JC_11": (offset_min(node_alloc_table, q) <= 0)) and
+      ("JC_12": (offset_max(node_alloc_table, q) >= 0))))))) ->
+  (offset_min(node_alloc_table, p) <= 0)
+
+goal df_safety_po_2:
+  forall p:node pointer.
+  forall q:node pointer.
+  forall node_alloc_table:node alloc_table.
+  forall node_l:(node, node pointer) memory.
+  forall node_r:(node,
+  node pointer) memory.
+  ("JC_13":
+  (("JC_8": (select(node_r, p) = select(node_l, q))) and
+   (("JC_9": (offset_min(node_alloc_table, p) <= 0)) and
+    (("JC_10": (offset_max(node_alloc_table, p) >= 0)) and
+     (("JC_11": (offset_min(node_alloc_table, q) <= 0)) and
+      ("JC_12": (offset_max(node_alloc_table, q) >= 0))))))) ->
+  (0 <= offset_max(node_alloc_table, p))
+
+goal df_safety_po_3:
+  forall p:node pointer.
+  forall q:node pointer.
+  forall node_alloc_table:node alloc_table.
+  forall node_l:(node, node pointer) memory.
+  forall node_r:(node,
+  node pointer) memory.
+  ("JC_13":
+  (("JC_8": (select(node_r, p) = select(node_l, q))) and
+   (("JC_9": (offset_min(node_alloc_table, p) <= 0)) and
+    (("JC_10": (offset_max(node_alloc_table, p) >= 0)) and
+     (("JC_11": (offset_min(node_alloc_table, q) <= 0)) and
+      ("JC_12": (offset_max(node_alloc_table, q) >= 0))))))) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall result:node pointer.
+  (result = select(node_l, p)) ->
+  forall tmp:node pointer.
+  (tmp = result) ->
+  (offset_min(node_alloc_table, q) <= 0)
+
+goal df_safety_po_4:
+  forall p:node pointer.
+  forall q:node pointer.
+  forall node_alloc_table:node alloc_table.
+  forall node_l:(node, node pointer) memory.
+  forall node_r:(node,
+  node pointer) memory.
+  ("JC_13":
+  (("JC_8": (select(node_r, p) = select(node_l, q))) and
+   (("JC_9": (offset_min(node_alloc_table, p) <= 0)) and
+    (("JC_10": (offset_max(node_alloc_table, p) >= 0)) and
+     (("JC_11": (offset_min(node_alloc_table, q) <= 0)) and
+      ("JC_12": (offset_max(node_alloc_table, q) >= 0))))))) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall result:node pointer.
+  (result = select(node_l, p)) ->
+  forall tmp:node pointer.
+  (tmp = result) ->
+  (0 <= offset_max(node_alloc_table, q))
+
+goal df_safety_po_5:
+  forall p:node pointer.
+  forall q:node pointer.
+  forall node_alloc_table:node alloc_table.
+  forall node_l:(node, node pointer) memory.
+  forall node_r:(node,
+  node pointer) memory.
+  ("JC_13":
+  (("JC_8": (select(node_r, p) = select(node_l, q))) and
+   (("JC_9": (offset_min(node_alloc_table, p) <= 0)) and
+    (("JC_10": (offset_max(node_alloc_table, p) >= 0)) and
+     (("JC_11": (offset_min(node_alloc_table, q) <= 0)) and
+      ("JC_12": (offset_max(node_alloc_table, q) >= 0))))))) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall result:node pointer.
+  (result = select(node_l, p)) ->
+  forall tmp:node pointer.
+  (tmp = result) ->
+  ((offset_min(node_alloc_table, q) <= 0) and
+   (0 <= offset_max(node_alloc_table, q))) ->
+  forall result0:node pointer.
+  (result0 = select(node_r, q)) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall node_l0:(node,
+  node pointer) memory.
+  (node_l0 = store(node_l, p, result0)) ->
+  ("JC_6": ("JC_1": ("JC_1": (select(node_r, q) = select(node_l0, p)))))
+
+goal df_safety_po_6:
+  forall p:node pointer.
+  forall q:node pointer.
+  forall node_alloc_table:node alloc_table.
+  forall node_l:(node, node pointer) memory.
+  forall node_r:(node,
+  node pointer) memory.
+  ("JC_13":
+  (("JC_8": (select(node_r, p) = select(node_l, q))) and
+   (("JC_9": (offset_min(node_alloc_table, p) <= 0)) and
+    (("JC_10": (offset_max(node_alloc_table, p) >= 0)) and
+     (("JC_11": (offset_min(node_alloc_table, q) <= 0)) and
+      ("JC_12": (offset_max(node_alloc_table, q) >= 0))))))) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall result:node pointer.
+  (result = select(node_l, p)) ->
+  forall tmp:node pointer.
+  (tmp = result) ->
+  ((offset_min(node_alloc_table, q) <= 0) and
+   (0 <= offset_max(node_alloc_table, q))) ->
+  forall result0:node pointer.
+  (result0 = select(node_r, q)) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall node_l0:(node,
+  node pointer) memory.
+  (node_l0 = store(node_l, p, result0)) ->
+  ("JC_6": ("JC_3": ("JC_3": (offset_max(node_alloc_table, q) >= 0))))
+
+goal df_safety_po_7:
+  forall p:node pointer.
+  forall q:node pointer.
+  forall node_alloc_table:node alloc_table.
+  forall node_l:(node, node pointer) memory.
+  forall node_r:(node,
+  node pointer) memory.
+  ("JC_13":
+  (("JC_8": (select(node_r, p) = select(node_l, q))) and
+   (("JC_9": (offset_min(node_alloc_table, p) <= 0)) and
+    (("JC_10": (offset_max(node_alloc_table, p) >= 0)) and
+     (("JC_11": (offset_min(node_alloc_table, q) <= 0)) and
+      ("JC_12": (offset_max(node_alloc_table, q) >= 0))))))) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall result:node pointer.
+  (result = select(node_l, p)) ->
+  forall tmp:node pointer.
+  (tmp = result) ->
+  ((offset_min(node_alloc_table, q) <= 0) and
+   (0 <= offset_max(node_alloc_table, q))) ->
+  forall result0:node pointer.
+  (result0 = select(node_r, q)) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall node_l0:(node,
+  node pointer) memory.
+  (node_l0 = store(node_l, p, result0)) ->
+  ("JC_6": ("JC_5": ("JC_5": (offset_max(node_alloc_table, p) >= 0))))
+
+goal df_safety_po_8:
+  forall p:node pointer.
+  forall q:node pointer.
+  forall node_alloc_table:node alloc_table.
+  forall node_l:(node, node pointer) memory.
+  forall node_r:(node,
+  node pointer) memory.
+  ("JC_13":
+  (("JC_8": (select(node_r, p) = select(node_l, q))) and
+   (("JC_9": (offset_min(node_alloc_table, p) <= 0)) and
+    (("JC_10": (offset_max(node_alloc_table, p) >= 0)) and
+     (("JC_11": (offset_min(node_alloc_table, q) <= 0)) and
+      ("JC_12": (offset_max(node_alloc_table, q) >= 0))))))) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall result:node pointer.
+  (result = select(node_l, p)) ->
+  forall tmp:node pointer.
+  (tmp = result) ->
+  ((offset_min(node_alloc_table, q) <= 0) and
+   (0 <= offset_max(node_alloc_table, q))) ->
+  forall result0:node pointer.
+  (result0 = select(node_r, q)) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall node_l0:(node,
+  node pointer) memory.
+  (node_l0 = store(node_l, p, result0)) ->
+  ("JC_6":
+  (("JC_1": (select(node_r, q) = select(node_l0, p))) and
+   (("JC_2": (offset_min(node_alloc_table, q) <= 0)) and
+    (("JC_3": (offset_max(node_alloc_table, q) >= 0)) and
+     (("JC_4": (offset_min(node_alloc_table, p) <= 0)) and
+      ("JC_5": (offset_max(node_alloc_table, p) >= 0))))))) ->
+  forall node_l1:(node,
+  node pointer) memory.
+  ((true = true) ->
+   ("JC_20":
+   (("JC_18": (select(node_r, q) = select(node_l1, p))) and
+    ("JC_19": not_assigns(node_alloc_table, node_l0, node_l1, pset_empty))))) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall node_l2:(node,
+  node pointer) memory.
+  (node_l2 = store(node_l1, p, tmp)) ->
+  ("JC_6": ("JC_1": ("JC_1": (select(node_r, p) = select(node_l2, q)))))
+
+goal df_safety_po_9:
+  forall p:node pointer.
+  forall q:node pointer.
+  forall node_alloc_table:node alloc_table.
+  forall node_l:(node, node pointer) memory.
+  forall node_r:(node,
+  node pointer) memory.
+  ("JC_13":
+  (("JC_8": (select(node_r, p) = select(node_l, q))) and
+   (("JC_9": (offset_min(node_alloc_table, p) <= 0)) and
+    (("JC_10": (offset_max(node_alloc_table, p) >= 0)) and
+     (("JC_11": (offset_min(node_alloc_table, q) <= 0)) and
+      ("JC_12": (offset_max(node_alloc_table, q) >= 0))))))) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall result:node pointer.
+  (result = select(node_l, p)) ->
+  forall tmp:node pointer.
+  (tmp = result) ->
+  ((offset_min(node_alloc_table, q) <= 0) and
+   (0 <= offset_max(node_alloc_table, q))) ->
+  forall result0:node pointer.
+  (result0 = select(node_r, q)) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall node_l0:(node,
+  node pointer) memory.
+  (node_l0 = store(node_l, p, result0)) ->
+  ("JC_6":
+  (("JC_1": (select(node_r, q) = select(node_l0, p))) and
+   (("JC_2": (offset_min(node_alloc_table, q) <= 0)) and
+    (("JC_3": (offset_max(node_alloc_table, q) >= 0)) and
+     (("JC_4": (offset_min(node_alloc_table, p) <= 0)) and
+      ("JC_5": (offset_max(node_alloc_table, p) >= 0))))))) ->
+  forall node_l1:(node,
+  node pointer) memory.
+  ((true = true) ->
+   ("JC_20":
+   (("JC_18": (select(node_r, q) = select(node_l1, p))) and
+    ("JC_19": not_assigns(node_alloc_table, node_l0, node_l1, pset_empty))))) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall node_l2:(node,
+  node pointer) memory.
+  (node_l2 = store(node_l1, p, tmp)) ->
+  ("JC_6": ("JC_3": ("JC_3": (offset_max(node_alloc_table, p) >= 0))))
+
+goal df_safety_po_10:
+  forall p:node pointer.
+  forall q:node pointer.
+  forall node_alloc_table:node alloc_table.
+  forall node_l:(node, node pointer) memory.
+  forall node_r:(node,
+  node pointer) memory.
+  ("JC_13":
+  (("JC_8": (select(node_r, p) = select(node_l, q))) and
+   (("JC_9": (offset_min(node_alloc_table, p) <= 0)) and
+    (("JC_10": (offset_max(node_alloc_table, p) >= 0)) and
+     (("JC_11": (offset_min(node_alloc_table, q) <= 0)) and
+      ("JC_12": (offset_max(node_alloc_table, q) >= 0))))))) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall result:node pointer.
+  (result = select(node_l, p)) ->
+  forall tmp:node pointer.
+  (tmp = result) ->
+  ((offset_min(node_alloc_table, q) <= 0) and
+   (0 <= offset_max(node_alloc_table, q))) ->
+  forall result0:node pointer.
+  (result0 = select(node_r, q)) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall node_l0:(node,
+  node pointer) memory.
+  (node_l0 = store(node_l, p, result0)) ->
+  ("JC_6":
+  (("JC_1": (select(node_r, q) = select(node_l0, p))) and
+   (("JC_2": (offset_min(node_alloc_table, q) <= 0)) and
+    (("JC_3": (offset_max(node_alloc_table, q) >= 0)) and
+     (("JC_4": (offset_min(node_alloc_table, p) <= 0)) and
+      ("JC_5": (offset_max(node_alloc_table, p) >= 0))))))) ->
+  forall node_l1:(node,
+  node pointer) memory.
+  ((true = true) ->
+   ("JC_20":
+   (("JC_18": (select(node_r, q) = select(node_l1, p))) and
+    ("JC_19": not_assigns(node_alloc_table, node_l0, node_l1, pset_empty))))) ->
+  ((offset_min(node_alloc_table, p) <= 0) and
+   (0 <= offset_max(node_alloc_table, p))) ->
+  forall node_l2:(node,
+  node pointer) memory.
+  (node_l2 = store(node_l1, p, tmp)) ->
+  ("JC_6": ("JC_5": ("JC_5": (offset_max(node_alloc_table, q) >= 0))))
+

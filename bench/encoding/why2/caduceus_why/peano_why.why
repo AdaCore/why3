@@ -1,0 +1,349 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+goal add1_po_1:
+  forall y:int.
+  (y >= 0) ->
+  (0 <= y)
+
+goal add1_po_2:
+  forall y:int.
+  forall x:int.
+  (y >= 0) ->
+  (x = (x + (y - y)))
+
+goal add1_po_3:
+  forall y:int.
+  forall x:int.
+  (y >= 0) ->
+  forall x0:int.
+  forall z:int.
+  ((0 <= z) and (x0 = (x + (y - z)))) ->
+  (z > 0) ->
+  forall x1:int.
+  (x1 = (x0 + 1)) ->
+  forall z0:int.
+  (z0 = (z - 1)) ->
+  (0 <= z0)
+
+goal add1_po_4:
+  forall y:int.
+  forall x:int.
+  (y >= 0) ->
+  forall x0:int.
+  forall z:int.
+  ((0 <= z) and (x0 = (x + (y - z)))) ->
+  (z > 0) ->
+  forall x1:int.
+  (x1 = (x0 + 1)) ->
+  forall z0:int.
+  (z0 = (z - 1)) ->
+  (x1 = (x + (y - z0)))
+
+goal add1_po_5:
+  forall y:int.
+  forall x:int.
+  (y >= 0) ->
+  forall x0:int.
+  forall z:int.
+  ((0 <= z) and (x0 = (x + (y - z)))) ->
+  (z > 0) ->
+  forall x1:int.
+  (x1 = (x0 + 1)) ->
+  forall z0:int.
+  (z0 = (z - 1)) ->
+  (z0 < z)
+
+goal add1_po_6:
+  forall y:int.
+  forall x:int.
+  (y >= 0) ->
+  forall x0:int.
+  forall z:int.
+  ((0 <= z) and (x0 = (x + (y - z)))) ->
+  (z <= 0) ->
+  (x0 = (x + y))
+
+goal u1_po_1:
+  (7 >= 0)
+
+goal u1_po_2:
+  (7 >= 0) ->
+  forall r:int.
+  (r = (3 + 7)) ->
+  (r = 10)
+
+goal rec_add1_po_1:
+  forall y:int.
+  forall x:int.
+  (y >= 0) ->
+  (0 < y) ->
+  forall x0:int.
+  (x0 = (x + 1)) ->
+  (0 <= y)
+
+goal rec_add1_po_2:
+  forall y:int.
+  forall x:int.
+  (y >= 0) ->
+  (0 < y) ->
+  forall x0:int.
+  (x0 = (x + 1)) ->
+  ((y - 1) < y)
+
+goal rec_add1_po_3:
+  forall y:int.
+  forall x:int.
+  (y >= 0) ->
+  (0 < y) ->
+  forall x0:int.
+  (x0 = (x + 1)) ->
+  ((0 <= y) and ((y - 1) < y)) ->
+  ((y - 1) >= 0)
+
+goal rec_add1_po_4:
+  forall y:int.
+  forall x:int.
+  (y >= 0) ->
+  (0 < y) ->
+  forall x0:int.
+  (x0 = (x + 1)) ->
+  ((0 <= y) and ((y - 1) < y)) ->
+  ((y - 1) >= 0) ->
+  forall x1:int.
+  (x1 = (x0 + (y - 1))) ->
+  (x1 = (x + y))
+
+goal rec_add1_po_5:
+  forall y:int.
+  forall x:int.
+  (y >= 0) ->
+  (0 >= y) ->
+  (x = (x + y))
+
+goal u11_po_1:
+  (7 >= 0)
+
+goal u11_po_2:
+  (7 >= 0) ->
+  forall r:int.
+  (r = (3 + 7)) ->
+  (r = 10)
+
+goal mult1_po_1:
+  forall y:int.
+  forall x:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall x0:int.
+  (x0 = 0) ->
+  ("I": (0 <= y))
+
+goal mult1_po_2:
+  forall y:int.
+  forall x:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall x0:int.
+  (x0 = 0) ->
+  ("I": (x0 = (x * (y - y))))
+
+goal mult1_po_3:
+  forall y:int.
+  forall x:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall x0:int.
+  (x0 = 0) ->
+  forall x1:int.
+  forall z:int.
+  ("I": ((0 <= z) and (x1 = (x * (y - z))))) ->
+  (z > 0) ->
+  (x >= 0) ->
+  forall x2:int.
+  (x2 = (x1 + x)) ->
+  forall z0:int.
+  (z0 = (z - 1)) ->
+  ("I": (0 <= z0))
+
+goal mult1_po_4:
+  forall y:int.
+  forall x:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall x0:int.
+  (x0 = 0) ->
+  forall x1:int.
+  forall z:int.
+  ("I": ((0 <= z) and (x1 = (x * (y - z))))) ->
+  (z > 0) ->
+  (x >= 0) ->
+  forall x2:int.
+  (x2 = (x1 + x)) ->
+  forall z0:int.
+  (z0 = (z - 1)) ->
+  ("I": (x2 = (x * (y - z0))))
+
+goal mult1_po_5:
+  forall y:int.
+  forall x:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall x0:int.
+  (x0 = 0) ->
+  forall x1:int.
+  forall z:int.
+  ("I": ((0 <= z) and (x1 = (x * (y - z))))) ->
+  (z > 0) ->
+  (x >= 0) ->
+  forall x2:int.
+  (x2 = (x1 + x)) ->
+  forall z0:int.
+  (z0 = (z - 1)) ->
+  (z0 < z)
+
+goal mult1_po_6:
+  forall y:int.
+  forall x:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall x0:int.
+  (x0 = 0) ->
+  forall x1:int.
+  forall z:int.
+  ("I": ((0 <= z) and (x1 = (x * (y - z))))) ->
+  (z <= 0) ->
+  (x1 = (x * y))
+
+goal u2_po_1:
+  (4 >= 0)
+
+goal u2_po_2:
+  (6 >= 0)
+
+goal u2_po_3:
+  ((4 >= 0) and (6 >= 0)) ->
+  forall r:int.
+  (r = (4 * 6)) ->
+  (r = 24)
+
+goal mult2_po_1:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  (x = 0) ->
+  (0 = (x * y))
+
+goal mult2_po_2:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  (x <> 0) ->
+  (0 <= x)
+
+goal mult2_po_3:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  (x <> 0) ->
+  ((x - 1) < x)
+
+goal mult2_po_4:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  (x <> 0) ->
+  ((0 <= x) and ((x - 1) < x)) ->
+  ((x - 1) >= 0)
+
+goal mult2_po_5:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  (x <> 0) ->
+  ((0 <= x) and ((x - 1) < x)) ->
+  (((x - 1) >= 0) and (y >= 0)) ->
+  forall result:int.
+  (result = ((x - 1) * y)) ->
+  (y >= 0) ->
+  forall result0:int.
+  (result0 = (y + result)) ->
+  (result0 = (x * y))
+
+goal mult2_po_6:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  forall b:int.
+  (a >= 0) ->
+  (a = 0) ->
+  (b = (a + b))
+
+goal mult2_po_7:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  (a >= 0) ->
+  (a <> 0) ->
+  (0 <= a)
+
+goal mult2_po_8:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  (a >= 0) ->
+  (a <> 0) ->
+  ((a - 1) < a)
+
+goal mult2_po_9:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  (a >= 0) ->
+  (a <> 0) ->
+  ((0 <= a) and ((a - 1) < a)) ->
+  ((a - 1) >= 0)
+
+goal mult2_po_10:
+  forall x:int.
+  forall y:int.
+  ((x >= 0) and (y >= 0)) ->
+  forall a:int.
+  forall b:int.
+  (a >= 0) ->
+  (a <> 0) ->
+  ((0 <= a) and ((a - 1) < a)) ->
+  ((a - 1) >= 0) ->
+  forall result:int.
+  (result = ((a - 1) + (b + 1))) ->
+  (result = (a + b))
+

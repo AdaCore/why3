@@ -1,0 +1,24 @@
+theory Partial
+  meta "enco_kept" "instantiate"
+end
+
+theory Twin
+  meta "enco_kept" "bridge"
+end
+
+theory Partial_incomplete
+  meta "enco_kept" "instantiate"
+  meta "encoding_instantiate : complete" "no"
+end
+
+theory Explicit
+  meta "enco_poly" "explicit"
+end
+
+theory Deco
+  meta "enco_poly" "decorate"
+end
+
+theory Goal
+  meta "enco_select" "goal"
+end

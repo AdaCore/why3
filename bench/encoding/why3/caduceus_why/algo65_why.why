@@ -1,0 +1,850 @@
+theory Why2
+  use Tuple0
+  use int.Int
+  use int.ComputerDivision
+  use real.Real
+  use bool.Bool
+  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic eq_bool Bool.bool Bool.bool
+
+  logic neq_bool Bool.bool Bool.bool
+
+  logic lt_int int int
+
+  logic le_int int int
+
+  logic gt_int int int
+
+  logic ge_int int int
+
+  logic eq_int int int
+
+  logic neq_int int int
+
+  logic add_int int int : int
+
+  logic sub_int int int : int
+
+  logic mul_int int int : int
+
+  logic div_int int int : int
+
+  logic mod_int int int : int
+
+  logic neg_int int : int
+
+  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+
+  type farray 'a
+
+  logic access (farray 'a1) int : 'a1
+
+  logic update (farray 'a1) int 'a1 : (farray 'a1)
+
+  axiom Access_update:
+    (forall a:(farray 'a1).
+      (forall i:int.
+        (forall v:'a1. ((access (update a i v : (farray 'a1)) i : 'a1) = v))))
+
+  axiom Access_update_neq:
+    (forall a:(farray 'a1).
+      (forall i:int.
+        (forall j:int.
+          (forall v:'a1.
+            ((i <> j) ->
+             ((access (update a i v : (farray 'a1)) j : 'a1) = (access a j : 'a1)))))))
+
+  logic array_length (farray 'a1) : int
+
+  logic sorted_array (t : (farray int)) (i : int) (j : int) =
+    (forall k1:int.
+      (forall k2:int.
+        ((((Int.(<=) i k1) and (Int.(<=) k1 k2)) and (Int.(<=) k2 j)) ->
+         (Int.(<=) (access t k1 : int) (access t k2 : int)))))
+
+  logic exchange (a1 : (farray 'a1)) (a2 : (farray 'a1)) (i : int) (j : int) =
+    (((array_length a1 : int) = (array_length a2 : int)) and
+     (((access a1 i : 'a1) = (access a2 j : 'a1)) and
+      (((access a2 i : 'a1) = (access a1 j : 'a1)) and
+       (forall k:int.
+         (((k <> i) and (k <> j)) ->
+          ((access a1 k : 'a1) = (access a2 k : 'a1)))))))
+
+  logic permut (farray 'a1) (farray 'a1) int int
+
+  axiom Permut_refl:
+    (forall t:(farray 'a1). (forall l:int. (forall u:int. (permut t t l u))))
+
+  axiom Permut_sym:
+    (forall t1:(farray 'a1).
+      (forall t2:(farray 'a1).
+        (forall l:int.
+          (forall u:int. ((permut t1 t2 l u) -> (permut t2 t1 l u))))))
+
+  axiom Permut_trans:
+    (forall t1:(farray 'a1).
+      (forall t2:(farray 'a1).
+        (forall t3:(farray 'a1).
+          (forall l:int.
+            (forall u:int.
+              ((permut t1 t2 l u) ->
+               ((permut t2 t3 l u) -> (permut t1 t3 l u))))))))
+
+  axiom Permut_exchange:
+    (forall a1:(farray 'a1).
+      (forall a2:(farray 'a1).
+        (forall l:int.
+          (forall u:int.
+            (forall i:int.
+              (forall j:int.
+                (((Int.(<=) l i) and (Int.(<=) i u)) ->
+                 (((Int.(<=) l j) and (Int.(<=) j u)) ->
+                  ((exchange a1 a2 i j) -> (permut a1 a2 l u))))))))))
+
+  axiom Exchange_upd:
+    (forall a:(farray 'a1).
+      (forall i:int.
+        (forall j:int.
+          (exchange a (update (update a i (access a j : 'a1) : (farray 'a1)) j (access a i : 'a1) : (farray 'a1)) i j))))
+
+  axiom Permut_weakening:
+    (forall a1:(farray 'a1).
+      (forall a2:(farray 'a1).
+        (forall l1:int.
+          (forall r1:int.
+            (forall l2:int.
+              (forall r2:int.
+                ((((Int.(<=) l1 l2) and (Int.(<=) l2 r2)) and
+                  (Int.(<=) r2 r1)) ->
+                 ((permut a1 a2 l2 r2) -> (permut a1 a2 l1 r1)))))))))
+
+  axiom Permut_eq:
+    (forall a1:(farray 'a1).
+      (forall a2:(farray 'a1).
+        (forall l:int.
+          (forall u:int.
+            ((Int.(<=) l u) ->
+             ((permut a1 a2 l u) ->
+              (forall i:int.
+                (((Int.(<) i l) or (Int.(<) u i)) ->
+                 ((access a2 i : 'a1) = (access a1 i : 'a1))))))))))
+
+  logic permutation (a1 : (farray 'a1)) (a2 : (farray 'a1)) =
+    (permut a1 a2 0 (Int.(-) (array_length a1 : int) 1 : int))
+
+  axiom Array_length_update:
+    (forall a:(farray 'a1).
+      (forall i:int.
+        (forall v:'a1.
+          ((array_length (update a i v : (farray 'a1)) : int) = (array_length a : int)))))
+
+  axiom Permut_array_length:
+    (forall a1:(farray 'a1).
+      (forall a2:(farray 'a1).
+        (forall l:int.
+          (forall u:int.
+            ((permut a1 a2 l u) ->
+             ((array_length a1 : int) = (array_length a2 : int)))))))
+
+  goal Find_po_1:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(<=) k j) -> (Int.(<=) 0 (Int.(-) n m : int)))))))))))))
+
+  goal Find_po_2:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(<=) k j) ->
+                      (Int.(<) (Int.(-) j m : int) (Int.(-) n m : int)))))))))))))
+
+  goal Find_po_3:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(<=) k j) ->
+                      (((Int.(<=) 0 (Int.(-) n m : int)) and
+                        (Int.(<) (Int.(-) j m : int) (Int.(-) n m : int))) ->
+                       (((Int.(<=) m k) and (Int.(<=) k j)) ->
+                        (forall a1:(farray int).
+                          (((permut a0 a1 m j) and
+                            ((forall r:int.
+                               (((Int.(<=) m r) and (Int.(<=) r k)) ->
+                                (Int.(<=) (access a1 r : int) (access a1 k : int)))) and
+                             (forall r:int.
+                               (((Int.(<=) k r) and (Int.(<=) r j)) ->
+                                (Int.(<=) (access a1 k : int) (access a1 r : int)))))) ->
+                           ((Int.(<=) i k) ->
+                            (Int.(<=) 0 (Int.(-) n m : int))))))))))))))))))
+
+  goal Find_po_4:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(<=) k j) ->
+                      (((Int.(<=) 0 (Int.(-) n m : int)) and
+                        (Int.(<) (Int.(-) j m : int) (Int.(-) n m : int))) ->
+                       (((Int.(<=) m k) and (Int.(<=) k j)) ->
+                        (forall a1:(farray int).
+                          (((permut a0 a1 m j) and
+                            ((forall r:int.
+                               (((Int.(<=) m r) and (Int.(<=) r k)) ->
+                                (Int.(<=) (access a1 r : int) (access a1 k : int)))) and
+                             (forall r:int.
+                               (((Int.(<=) k r) and (Int.(<=) r j)) ->
+                                (Int.(<=) (access a1 k : int) (access a1 r : int)))))) ->
+                           ((Int.(<=) i k) ->
+                            (Int.(<) (Int.(-) n i : int) (Int.(-) n m : int))))))))))))))))))
+
+  goal Find_po_5:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(<=) k j) ->
+                      (((Int.(<=) 0 (Int.(-) n m : int)) and
+                        (Int.(<) (Int.(-) j m : int) (Int.(-) n m : int))) ->
+                       (((Int.(<=) m k) and (Int.(<=) k j)) ->
+                        (forall a1:(farray int).
+                          (((permut a0 a1 m j) and
+                            ((forall r:int.
+                               (((Int.(<=) m r) and (Int.(<=) r k)) ->
+                                (Int.(<=) (access a1 r : int) (access a1 k : int)))) and
+                             (forall r:int.
+                               (((Int.(<=) k r) and (Int.(<=) r j)) ->
+                                (Int.(<=) (access a1 k : int) (access a1 r : int)))))) ->
+                           ((Int.(<=) i k) ->
+                            (((Int.(<=) 0 (Int.(-) n m : int)) and
+                              (Int.(<) (Int.(-) n i : int) (Int.(-) n m : int))) ->
+                             (((Int.(<=) i k) and (Int.(<=) k n)) ->
+                              (forall a2:(farray int).
+                                (((permut a1 a2 i n) and
+                                  ((forall r:int.
+                                     (((Int.(<=) i r) and (Int.(<=) r k)) ->
+                                      (Int.(<=) (access a2 r : int) (access a2 k : int)))) and
+                                   (forall r:int.
+                                     (((Int.(<=) k r) and (Int.(<=) r n)) ->
+                                      (Int.(<=) (access a2 k : int) (access a2 r : int)))))) ->
+                                 (permut a a2 m n)))))))))))))))))))))
+
+  goal Find_po_6:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(<=) k j) ->
+                      (((Int.(<=) 0 (Int.(-) n m : int)) and
+                        (Int.(<) (Int.(-) j m : int) (Int.(-) n m : int))) ->
+                       (((Int.(<=) m k) and (Int.(<=) k j)) ->
+                        (forall a1:(farray int).
+                          (((permut a0 a1 m j) and
+                            ((forall r:int.
+                               (((Int.(<=) m r) and (Int.(<=) r k)) ->
+                                (Int.(<=) (access a1 r : int) (access a1 k : int)))) and
+                             (forall r:int.
+                               (((Int.(<=) k r) and (Int.(<=) r j)) ->
+                                (Int.(<=) (access a1 k : int) (access a1 r : int)))))) ->
+                           ((Int.(<=) i k) ->
+                            (((Int.(<=) 0 (Int.(-) n m : int)) and
+                              (Int.(<) (Int.(-) n i : int) (Int.(-) n m : int))) ->
+                             (((Int.(<=) i k) and (Int.(<=) k n)) ->
+                              (forall a2:(farray int).
+                                (((permut a1 a2 i n) and
+                                  ((forall r:int.
+                                     (((Int.(<=) i r) and (Int.(<=) r k)) ->
+                                      (Int.(<=) (access a2 r : int) (access a2 k : int)))) and
+                                   (forall r:int.
+                                     (((Int.(<=) k r) and (Int.(<=) r n)) ->
+                                      (Int.(<=) (access a2 k : int) (access a2 r : int)))))) ->
+                                 (forall r:int.
+                                   (((Int.(<=) m r) and (Int.(<=) r k)) ->
+                                    (Int.(<=) (access a2 r : int) (access a2 k : int))))))))))))))))))))))))
+
+  goal Find_po_7:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(<=) k j) ->
+                      (((Int.(<=) 0 (Int.(-) n m : int)) and
+                        (Int.(<) (Int.(-) j m : int) (Int.(-) n m : int))) ->
+                       (((Int.(<=) m k) and (Int.(<=) k j)) ->
+                        (forall a1:(farray int).
+                          (((permut a0 a1 m j) and
+                            ((forall r:int.
+                               (((Int.(<=) m r) and (Int.(<=) r k)) ->
+                                (Int.(<=) (access a1 r : int) (access a1 k : int)))) and
+                             (forall r:int.
+                               (((Int.(<=) k r) and (Int.(<=) r j)) ->
+                                (Int.(<=) (access a1 k : int) (access a1 r : int)))))) ->
+                           ((Int.(<=) i k) ->
+                            (((Int.(<=) 0 (Int.(-) n m : int)) and
+                              (Int.(<) (Int.(-) n i : int) (Int.(-) n m : int))) ->
+                             (((Int.(<=) i k) and (Int.(<=) k n)) ->
+                              (forall a2:(farray int).
+                                (((permut a1 a2 i n) and
+                                  ((forall r:int.
+                                     (((Int.(<=) i r) and (Int.(<=) r k)) ->
+                                      (Int.(<=) (access a2 r : int) (access a2 k : int)))) and
+                                   (forall r:int.
+                                     (((Int.(<=) k r) and (Int.(<=) r n)) ->
+                                      (Int.(<=) (access a2 k : int) (access a2 r : int)))))) ->
+                                 (forall r:int.
+                                   (((Int.(<=) k r) and (Int.(<=) r n)) ->
+                                    (Int.(<=) (access a2 k : int) (access a2 r : int))))))))))))))))))))))))
+
+  goal Find_po_8:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(<=) k j) ->
+                      (((Int.(<=) 0 (Int.(-) n m : int)) and
+                        (Int.(<) (Int.(-) j m : int) (Int.(-) n m : int))) ->
+                       (((Int.(<=) m k) and (Int.(<=) k j)) ->
+                        (forall a1:(farray int).
+                          (((permut a0 a1 m j) and
+                            ((forall r:int.
+                               (((Int.(<=) m r) and (Int.(<=) r k)) ->
+                                (Int.(<=) (access a1 r : int) (access a1 k : int)))) and
+                             (forall r:int.
+                               (((Int.(<=) k r) and (Int.(<=) r j)) ->
+                                (Int.(<=) (access a1 k : int) (access a1 r : int)))))) ->
+                           ((Int.(>) i k) -> (permut a a1 m n)))))))))))))))))
+
+  goal Find_po_9:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(<=) k j) ->
+                      (((Int.(<=) 0 (Int.(-) n m : int)) and
+                        (Int.(<) (Int.(-) j m : int) (Int.(-) n m : int))) ->
+                       (((Int.(<=) m k) and (Int.(<=) k j)) ->
+                        (forall a1:(farray int).
+                          (((permut a0 a1 m j) and
+                            ((forall r:int.
+                               (((Int.(<=) m r) and (Int.(<=) r k)) ->
+                                (Int.(<=) (access a1 r : int) (access a1 k : int)))) and
+                             (forall r:int.
+                               (((Int.(<=) k r) and (Int.(<=) r j)) ->
+                                (Int.(<=) (access a1 k : int) (access a1 r : int)))))) ->
+                           ((Int.(>) i k) ->
+                            (forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r k)) ->
+                               (Int.(<=) (access a1 r : int) (access a1 k : int))))))))))))))))))))
+
+  goal Find_po_10:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(<=) k j) ->
+                      (((Int.(<=) 0 (Int.(-) n m : int)) and
+                        (Int.(<) (Int.(-) j m : int) (Int.(-) n m : int))) ->
+                       (((Int.(<=) m k) and (Int.(<=) k j)) ->
+                        (forall a1:(farray int).
+                          (((permut a0 a1 m j) and
+                            ((forall r:int.
+                               (((Int.(<=) m r) and (Int.(<=) r k)) ->
+                                (Int.(<=) (access a1 r : int) (access a1 k : int)))) and
+                             (forall r:int.
+                               (((Int.(<=) k r) and (Int.(<=) r j)) ->
+                                (Int.(<=) (access a1 k : int) (access a1 r : int)))))) ->
+                           ((Int.(>) i k) ->
+                            (forall r:int.
+                              (((Int.(<=) k r) and (Int.(<=) r n)) ->
+                               (Int.(<=) (access a1 k : int) (access a1 r : int))))))))))))))))))))
+
+  goal Find_po_11:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(>) k j) ->
+                      ((Int.(<=) i k) -> (Int.(<=) 0 (Int.(-) n m : int))))))))))))))
+
+  goal Find_po_12:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(>) k j) ->
+                      ((Int.(<=) i k) ->
+                       (Int.(<) (Int.(-) n i : int) (Int.(-) n m : int))))))))))))))
+
+  goal Find_po_13:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(>) k j) ->
+                      ((Int.(<=) i k) ->
+                       (((Int.(<=) 0 (Int.(-) n m : int)) and
+                         (Int.(<) (Int.(-) n i : int) (Int.(-) n m : int))) ->
+                        (((Int.(<=) i k) and (Int.(<=) k n)) ->
+                         (forall a1:(farray int).
+                           (((permut a0 a1 i n) and
+                             ((forall r:int.
+                                (((Int.(<=) i r) and (Int.(<=) r k)) ->
+                                 (Int.(<=) (access a1 r : int) (access a1 k : int)))) and
+                              (forall r:int.
+                                (((Int.(<=) k r) and (Int.(<=) r n)) ->
+                                 (Int.(<=) (access a1 k : int) (access a1 r : int)))))) ->
+                            (permut a a1 m n)))))))))))))))))
+
+  goal Find_po_14:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(>) k j) ->
+                      ((Int.(<=) i k) ->
+                       (((Int.(<=) 0 (Int.(-) n m : int)) and
+                         (Int.(<) (Int.(-) n i : int) (Int.(-) n m : int))) ->
+                        (((Int.(<=) i k) and (Int.(<=) k n)) ->
+                         (forall a1:(farray int).
+                           (((permut a0 a1 i n) and
+                             ((forall r:int.
+                                (((Int.(<=) i r) and (Int.(<=) r k)) ->
+                                 (Int.(<=) (access a1 r : int) (access a1 k : int)))) and
+                              (forall r:int.
+                                (((Int.(<=) k r) and (Int.(<=) r n)) ->
+                                 (Int.(<=) (access a1 k : int) (access a1 r : int)))))) ->
+                            (forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r k)) ->
+                               (Int.(<=) (access a1 r : int) (access a1 k : int))))))))))))))))))))
+
+  goal Find_po_15:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(>) k j) ->
+                      ((Int.(<=) i k) ->
+                       (((Int.(<=) 0 (Int.(-) n m : int)) and
+                         (Int.(<) (Int.(-) n i : int) (Int.(-) n m : int))) ->
+                        (((Int.(<=) i k) and (Int.(<=) k n)) ->
+                         (forall a1:(farray int).
+                           (((permut a0 a1 i n) and
+                             ((forall r:int.
+                                (((Int.(<=) i r) and (Int.(<=) r k)) ->
+                                 (Int.(<=) (access a1 r : int) (access a1 k : int)))) and
+                              (forall r:int.
+                                (((Int.(<=) k r) and (Int.(<=) r n)) ->
+                                 (Int.(<=) (access a1 k : int) (access a1 r : int)))))) ->
+                            (forall r:int.
+                              (((Int.(<=) k r) and (Int.(<=) r n)) ->
+                               (Int.(<=) (access a1 k : int) (access a1 r : int))))))))))))))))))))
+
+  goal Find_po_16:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(>) k j) -> ((Int.(>) i k) -> (permut a a0 m n)))))))))))))
+
+  goal Find_po_17:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(>) k j) ->
+                      ((Int.(>) i k) ->
+                       (forall r:int.
+                         (((Int.(<=) m r) and (Int.(<=) r k)) ->
+                          (Int.(<=) (access a0 r : int) (access a0 k : int))))))))))))))))
+
+  goal Find_po_18:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(<) m n) ->
+              (forall a0:(farray int).
+                (forall i:int.
+                  (forall j:int.
+                    (((Int.(<=) m j) and
+                      ((Int.(<) j i) and
+                       ((Int.(<=) i n) and
+                        ((permut a a0 m n) and
+                         (exists x:int.
+                           ((forall r:int.
+                              (((Int.(<=) m r) and (Int.(<=) r j)) ->
+                               (Int.(<=) (access a0 r : int) x))) and
+                            ((forall r:int.
+                               (((Int.(<) j r) and (Int.(<) r i)) ->
+                                ((access a0 r : int) = x))) and
+                             (forall r:int.
+                               (((Int.(<=) i r) and (Int.(<=) r n)) ->
+                                (Int.(>=) (access a0 r : int) x)))))))))) ->
+                     ((Int.(>) k j) ->
+                      ((Int.(>) i k) ->
+                       (forall r:int.
+                         (((Int.(<=) k r) and (Int.(<=) r n)) ->
+                          (Int.(<=) (access a0 k : int) (access a0 r : int))))))))))))))))
+
+  goal Find_po_19:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(>=) m n) -> (permut a a m n)))))))
+
+  goal Find_po_20:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(>=) m n) ->
+              (forall r:int.
+                (((Int.(<=) m r) and (Int.(<=) r k)) ->
+                 (Int.(<=) (access a r : int) (access a k : int))))))))))
+
+  goal Find_po_21:
+    (forall m:int.
+      (forall n:int.
+        (forall k:int.
+          (forall a:(farray int).
+            (((Int.(<=) m k) and (Int.(<=) k n)) ->
+             ((Int.(>=) m n) ->
+              (forall r:int.
+                (((Int.(<=) k r) and (Int.(<=) r n)) ->
+                 (Int.(<=) (access a k : int) (access a r : int))))))))))
+
+
+end

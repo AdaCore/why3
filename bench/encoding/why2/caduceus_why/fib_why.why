@@ -1,0 +1,1067 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+logic F : int -> int
+
+axiom F_0: (F(0) = 1)
+
+axiom F_1: (F(1) = 1)
+
+axiom F_n: (forall n:int. ((n >= 2) -> (F(n) = (F((n - 1)) + F((n - 2))))))
+
+goal fib1_po_1:
+  forall n:int.
+  (n >= 0) ->
+  (n <= 1) ->
+  (1 = F(n))
+
+goal fib1_po_2:
+  forall n:int.
+  (n >= 0) ->
+  (n > 1) ->
+  (0 <= n)
+
+goal fib1_po_3:
+  forall n:int.
+  (n >= 0) ->
+  (n > 1) ->
+  ((n - 1) < n)
+
+goal fib1_po_4:
+  forall n:int.
+  (n >= 0) ->
+  (n > 1) ->
+  ((0 <= n) and ((n - 1) < n)) ->
+  ((n - 1) >= 0)
+
+goal fib1_po_5:
+  forall n:int.
+  (n >= 0) ->
+  (n > 1) ->
+  ((0 <= n) and ((n - 1) < n)) ->
+  ((n - 1) >= 0) ->
+  forall result:int.
+  (result = F((n - 1))) ->
+  (0 <= n)
+
+goal fib1_po_6:
+  forall n:int.
+  (n >= 0) ->
+  (n > 1) ->
+  ((0 <= n) and ((n - 1) < n)) ->
+  ((n - 1) >= 0) ->
+  forall result:int.
+  (result = F((n - 1))) ->
+  ((n - 2) < n)
+
+goal fib1_po_7:
+  forall n:int.
+  (n >= 0) ->
+  (n > 1) ->
+  ((0 <= n) and ((n - 1) < n)) ->
+  ((n - 1) >= 0) ->
+  forall result:int.
+  (result = F((n - 1))) ->
+  ((0 <= n) and ((n - 2) < n)) ->
+  ((n - 2) >= 0)
+
+goal fib1_po_8:
+  forall n:int.
+  (n >= 0) ->
+  (n > 1) ->
+  ((0 <= n) and ((n - 1) < n)) ->
+  ((n - 1) >= 0) ->
+  forall result:int.
+  (result = F((n - 1))) ->
+  ((0 <= n) and ((n - 2) < n)) ->
+  ((n - 2) >= 0) ->
+  forall result0:int.
+  (result0 = F((n - 2))) ->
+  ((result + result0) = F(n))
+
+goal fib2_aux_po_1:
+  forall n:int.
+  forall x:int.
+  forall fx:int.
+  forall fx_1:int.
+  (((1 <= x) and (x <= n)) and ((fx = F(x)) and (fx_1 = F((x - 1))))) ->
+  (x = n) ->
+  (fx = F(n))
+
+goal fib2_aux_po_2:
+  forall n:int.
+  forall x:int.
+  forall fx:int.
+  forall fx_1:int.
+  (((1 <= x) and (x <= n)) and ((fx = F(x)) and (fx_1 = F((x - 1))))) ->
+  (x <> n) ->
+  (0 <= (n - x))
+
+goal fib2_aux_po_3:
+  forall n:int.
+  forall x:int.
+  forall fx:int.
+  forall fx_1:int.
+  (((1 <= x) and (x <= n)) and ((fx = F(x)) and (fx_1 = F((x - 1))))) ->
+  (x <> n) ->
+  ((n - (x + 1)) < (n - x))
+
+goal fib2_aux_po_4:
+  forall n:int.
+  forall x:int.
+  forall fx:int.
+  forall fx_1:int.
+  (((1 <= x) and (x <= n)) and ((fx = F(x)) and (fx_1 = F((x - 1))))) ->
+  (x <> n) ->
+  ((0 <= (n - x)) and ((n - (x + 1)) < (n - x))) ->
+  (1 <= (x + 1))
+
+goal fib2_aux_po_5:
+  forall n:int.
+  forall x:int.
+  forall fx:int.
+  forall fx_1:int.
+  (((1 <= x) and (x <= n)) and ((fx = F(x)) and (fx_1 = F((x - 1))))) ->
+  (x <> n) ->
+  ((0 <= (n - x)) and ((n - (x + 1)) < (n - x))) ->
+  ((x + 1) <= n)
+
+goal fib2_aux_po_6:
+  forall n:int.
+  forall x:int.
+  forall fx:int.
+  forall fx_1:int.
+  (((1 <= x) and (x <= n)) and ((fx = F(x)) and (fx_1 = F((x - 1))))) ->
+  (x <> n) ->
+  ((0 <= (n - x)) and ((n - (x + 1)) < (n - x))) ->
+  ((fx + fx_1) = F((x + 1)))
+
+goal fib2_aux_po_7:
+  forall n:int.
+  forall x:int.
+  forall fx:int.
+  forall fx_1:int.
+  (((1 <= x) and (x <= n)) and ((fx = F(x)) and (fx_1 = F((x - 1))))) ->
+  (x <> n) ->
+  ((0 <= (n - x)) and ((n - (x + 1)) < (n - x))) ->
+  (fx = F(((x + 1) - 1)))
+
+goal fib2_po_1:
+  forall n:int.
+  (n >= 0) ->
+  (n <= 1) ->
+  (1 = F(n))
+
+goal fib2_po_2:
+  forall n:int.
+  (n >= 0) ->
+  (n > 1) ->
+  (1 <= 1)
+
+goal fib2_po_3:
+  forall n:int.
+  (n >= 0) ->
+  (n > 1) ->
+  (1 <= n)
+
+goal fib2_po_4:
+  forall n:int.
+  (n >= 0) ->
+  (n > 1) ->
+  (1 = F(1))
+
+goal fib2_po_5:
+  forall n:int.
+  (n >= 0) ->
+  (n > 1) ->
+  (1 = F((1 - 1)))
+
+goal fib2b_po_1:
+  forall n:int.
+  (n > 1) ->
+  (0 <= (n - 1))
+
+goal fib2b_po_2:
+  forall n:int.
+  (n > 1) ->
+  ((n - 1) < n)
+
+goal fib2b_po_3:
+  forall n:int.
+  (n > 1) ->
+  (1 = F((n - (n - 1))))
+
+goal fib2b_po_4:
+  forall n:int.
+  (n > 1) ->
+  (1 = F(((n - (n - 1)) - 1)))
+
+goal fib2b_po_5:
+  forall n:int.
+  forall x:int.
+  forall fx:int.
+  forall fx_1:int.
+  (((0 <= x) and (x < n)) and
+   ((fx = F((n - x))) and (fx_1 = F(((n - x) - 1))))) ->
+  (x = 0) ->
+  (fx = F(n))
+
+goal fib2b_po_6:
+  forall n:int.
+  forall x:int.
+  forall fx:int.
+  forall fx_1:int.
+  (((0 <= x) and (x < n)) and
+   ((fx = F((n - x))) and (fx_1 = F(((n - x) - 1))))) ->
+  (x <> 0) ->
+  (0 <= x)
+
+goal fib2b_po_7:
+  forall n:int.
+  forall x:int.
+  forall fx:int.
+  forall fx_1:int.
+  (((0 <= x) and (x < n)) and
+   ((fx = F((n - x))) and (fx_1 = F(((n - x) - 1))))) ->
+  (x <> 0) ->
+  ((x - 1) < x)
+
+goal fib2b_po_8:
+  forall n:int.
+  forall x:int.
+  forall fx:int.
+  forall fx_1:int.
+  (((0 <= x) and (x < n)) and
+   ((fx = F((n - x))) and (fx_1 = F(((n - x) - 1))))) ->
+  (x <> 0) ->
+  ((0 <= x) and ((x - 1) < x)) ->
+  (0 <= (x - 1))
+
+goal fib2b_po_9:
+  forall n:int.
+  forall x:int.
+  forall fx:int.
+  forall fx_1:int.
+  (((0 <= x) and (x < n)) and
+   ((fx = F((n - x))) and (fx_1 = F(((n - x) - 1))))) ->
+  (x <> 0) ->
+  ((0 <= x) and ((x - 1) < x)) ->
+  ((x - 1) < n)
+
+goal fib2b_po_10:
+  forall n:int.
+  forall x:int.
+  forall fx:int.
+  forall fx_1:int.
+  (((0 <= x) and (x < n)) and
+   ((fx = F((n - x))) and (fx_1 = F(((n - x) - 1))))) ->
+  (x <> 0) ->
+  ((0 <= x) and ((x - 1) < x)) ->
+  ((fx + fx_1) = F((n - (x - 1))))
+
+goal fib2b_po_11:
+  forall n:int.
+  forall x:int.
+  forall fx:int.
+  forall fx_1:int.
+  (((0 <= x) and (x < n)) and
+   ((fx = F((n - x))) and (fx_1 = F(((n - x) - 1))))) ->
+  (x <> 0) ->
+  ((0 <= x) and ((x - 1) < x)) ->
+  (fx = F(((n - (x - 1)) - 1)))
+
+goal fib2c_aux_po_1:
+  forall n:int.
+  forall fx:int.
+  forall fx_1:int.
+  (0 <= n) ->
+  (n = 0) ->
+  forall x:int.
+  (1 <= x) ->
+  (fx = F(x)) ->
+  (fx_1 = F((x - 1))) ->
+  (fx = F((x + n)))
+
+goal fib2c_aux_po_2:
+  forall n:int.
+  (0 <= n) ->
+  (n <> 0) ->
+  ((n - 1) < n)
+
+goal fib2c_aux_po_3:
+  forall n:int.
+  (0 <= n) ->
+  (n <> 0) ->
+  ((0 <= n) and ((n - 1) < n)) ->
+  (0 <= (n - 1))
+
+goal fib2c_aux_po_4:
+  forall n:int.
+  forall fx:int.
+  forall fx_1:int.
+  (0 <= n) ->
+  (n <> 0) ->
+  ((0 <= n) and ((n - 1) < n)) ->
+  (0 <= (n - 1)) ->
+  forall result:int.
+  (forall x:int.
+    ((1 <= x) ->
+     (((fx + fx_1) = F(x)) ->
+      ((fx = F((x - 1))) -> (result = F((x + (n - 1)))))))) ->
+  forall x:int.
+  (1 <= x) ->
+  (fx = F(x)) ->
+  (fx_1 = F((x - 1))) ->
+  (result = F((x + n)))
+
+goal fib2c_po_1:
+  forall n:int.
+  (n >= 0) ->
+  (n <= 1) ->
+  (1 = F(n))
+
+goal fib2c_po_2:
+  forall n:int.
+  (n >= 0) ->
+  (n > 1) ->
+  (0 <= (n - 1))
+
+goal fib2c_po_3:
+  forall n:int.
+  (n >= 0) ->
+  (n > 1) ->
+  (0 <= (n - 1)) ->
+  forall result:int.
+  (forall x:int.
+    ((1 <= x) ->
+     ((1 = F(x)) -> ((1 = F((x - 1))) -> (result = F((x + (n - 1)))))))) ->
+  (result = F(n))
+
+goal fib3_po_1:
+  forall n:int.
+  (n >= 0) ->
+  (n > 0) ->
+  (1 <= 1)
+
+goal fib3_po_2:
+  forall n:int.
+  (n >= 0) ->
+  (n > 0) ->
+  (1 <= n)
+
+goal fib3_po_3:
+  forall n:int.
+  (n >= 0) ->
+  (n > 0) ->
+  (1 = F(1))
+
+goal fib3_po_4:
+  forall n:int.
+  (n >= 0) ->
+  (n > 0) ->
+  (1 = F((1 - 1)))
+
+goal fib3_po_5:
+  forall n:int.
+  (n >= 0) ->
+  (n > 0) ->
+  forall k:int.
+  forall x:int.
+  forall y:int.
+  (((1 <= k) and (k <= n)) and ((x = F(k)) and (y = F((k - 1))))) ->
+  (k < n) ->
+  forall y0:int.
+  (y0 = x) ->
+  forall x0:int.
+  (x0 = (x + y)) ->
+  forall k0:int.
+  (k0 = (k + 1)) ->
+  (1 <= k0)
+
+goal fib3_po_6:
+  forall n:int.
+  (n >= 0) ->
+  (n > 0) ->
+  forall k:int.
+  forall x:int.
+  forall y:int.
+  (((1 <= k) and (k <= n)) and ((x = F(k)) and (y = F((k - 1))))) ->
+  (k < n) ->
+  forall y0:int.
+  (y0 = x) ->
+  forall x0:int.
+  (x0 = (x + y)) ->
+  forall k0:int.
+  (k0 = (k + 1)) ->
+  (k0 <= n)
+
+goal fib3_po_7:
+  forall n:int.
+  (n >= 0) ->
+  (n > 0) ->
+  forall k:int.
+  forall x:int.
+  forall y:int.
+  (((1 <= k) and (k <= n)) and ((x = F(k)) and (y = F((k - 1))))) ->
+  (k < n) ->
+  forall y0:int.
+  (y0 = x) ->
+  forall x0:int.
+  (x0 = (x + y)) ->
+  forall k0:int.
+  (k0 = (k + 1)) ->
+  (x0 = F(k0))
+
+goal fib3_po_8:
+  forall n:int.
+  (n >= 0) ->
+  (n > 0) ->
+  forall k:int.
+  forall x:int.
+  forall y:int.
+  (((1 <= k) and (k <= n)) and ((x = F(k)) and (y = F((k - 1))))) ->
+  (k < n) ->
+  forall y0:int.
+  (y0 = x) ->
+  forall x0:int.
+  (x0 = (x + y)) ->
+  forall k0:int.
+  (k0 = (k + 1)) ->
+  (y0 = F((k0 - 1)))
+
+goal fib3_po_9:
+  forall n:int.
+  (n >= 0) ->
+  (n > 0) ->
+  forall k:int.
+  forall x:int.
+  forall y:int.
+  (((1 <= k) and (k <= n)) and ((x = F(k)) and (y = F((k - 1))))) ->
+  (k < n) ->
+  forall y0:int.
+  (y0 = x) ->
+  forall x0:int.
+  (x0 = (x + y)) ->
+  forall k0:int.
+  (k0 = (k + 1)) ->
+  (0 <= (n - k))
+
+goal fib3_po_10:
+  forall n:int.
+  (n >= 0) ->
+  (n > 0) ->
+  forall k:int.
+  forall x:int.
+  forall y:int.
+  (((1 <= k) and (k <= n)) and ((x = F(k)) and (y = F((k - 1))))) ->
+  (k < n) ->
+  forall y0:int.
+  (y0 = x) ->
+  forall x0:int.
+  (x0 = (x + y)) ->
+  forall k0:int.
+  (k0 = (k + 1)) ->
+  ((n - k0) < (n - k))
+
+goal fib3_po_11:
+  forall n:int.
+  (n >= 0) ->
+  (n > 0) ->
+  forall k:int.
+  forall x:int.
+  forall y:int.
+  (((1 <= k) and (k <= n)) and ((x = F(k)) and (y = F((k - 1))))) ->
+  (k >= n) ->
+  (x = F(n))
+
+goal fib3_po_12:
+  forall n:int.
+  (n >= 0) ->
+  (n <= 0) ->
+  (1 = F(n))
+
+type 'a farray
+
+logic access : 'a1 farray, int -> 'a1
+
+logic update : 'a1 farray, int, 'a1 -> 'a1 farray
+
+axiom access_update:
+  (forall a:'a1 farray.
+    (forall i:int. (forall v:'a1. (access(update(a, i, v), i) = v))))
+
+axiom access_update_neq:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int.
+        (forall v:'a1.
+          ((i <> j) -> (access(update(a, i, v), j) = access(a, j)))))))
+
+logic array_length : 'a1 farray -> int
+
+predicate sorted_array(t: int farray, i: int, j: int) =
+  (forall k1:int.
+    (forall k2:int.
+      ((((i <= k1) and (k1 <= k2)) and (k2 <= j)) -> (access(t,
+       k1) <= access(t, k2)))))
+
+predicate exchange(a1: 'a1 farray, a2: 'a1 farray, i: int, j: int) =
+  ((array_length(a1) = array_length(a2)) and
+   ((access(a1, i) = access(a2, j)) and
+    ((access(a2, i) = access(a1, j)) and
+     (forall k:int.
+       (((k <> i) and (k <> j)) -> (access(a1, k) = access(a2, k)))))))
+
+logic permut : 'a1 farray, 'a1 farray, int, int -> prop
+
+axiom permut_refl:
+  (forall t:'a1 farray. (forall l:int. (forall u:int. permut(t, t, l, u))))
+
+axiom permut_sym:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall l:int.
+        (forall u:int. (permut(t1, t2, l, u) -> permut(t2, t1, l, u))))))
+
+axiom permut_trans:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall t3:'a1 farray.
+        (forall l:int.
+          (forall u:int.
+            (permut(t1, t2, l, u) ->
+             (permut(t2, t3, l, u) -> permut(t1, t3, l, u))))))))
+
+axiom permut_exchange:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (forall i:int.
+            (forall j:int.
+              (((l <= i) and (i <= u)) ->
+               (((l <= j) and (j <= u)) ->
+                (exchange(a1, a2, i, j) -> permut(a1, a2, l, u))))))))))
+
+axiom exchange_upd:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int. exchange(a, update(update(a, i, access(a, j)), j,
+        access(a, i)), i, j))))
+
+axiom permut_weakening:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l1:int.
+        (forall r1:int.
+          (forall l2:int.
+            (forall r2:int.
+              ((((l1 <= l2) and (l2 <= r2)) and (r2 <= r1)) ->
+               (permut(a1, a2, l2, r2) -> permut(a1, a2, l1, r1)))))))))
+
+axiom permut_eq:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          ((l <= u) ->
+           (permut(a1, a2, l, u) ->
+            (forall i:int.
+              (((i < l) or (u < i)) -> (access(a2, i) = access(a1, i))))))))))
+
+predicate permutation(a1: 'a1 farray, a2: 'a1 farray) = permut(a1, a2, 0,
+  (array_length(a1) - 1))
+
+axiom array_length_update:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall v:'a1. (array_length(update(a, i, v)) = array_length(a)))))
+
+axiom permut_array_length:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (permut(a1, a2, l, u) -> (array_length(a1) = array_length(a2)))))))
+
+goal fib4_po_1:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n <= 1) ->
+  (1 = F(n))
+
+goal fib4_po_2:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  (0 <= 0)
+
+goal fib4_po_3:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  (0 < array_length(t))
+
+goal fib4_po_4:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  (0 <= 1)
+
+goal fib4_po_5:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  (1 < array_length(t0))
+
+goal fib4_po_6:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  (2 <= 2)
+
+goal fib4_po_7:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  (2 <= (n + 1))
+
+goal fib4_po_8:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  (array_length(t1) = array_length(t))
+
+goal fib4_po_9:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall i:int.
+  ((0 <= i) and (i < 2)) ->
+  (access(t1, i) = F(i))
+
+goal fib4_po_10:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall k:int.
+  forall t2:int farray.
+  (((2 <= k) and (k <= (n + 1))) and
+   ((array_length(t2) = array_length(t)) and
+    (forall i:int. (((0 <= i) and (i < k)) -> (access(t2, i) = F(i)))))) ->
+  (k <= n) ->
+  (0 <= (k - 1))
+
+goal fib4_po_11:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall k:int.
+  forall t2:int farray.
+  (((2 <= k) and (k <= (n + 1))) and
+   ((array_length(t2) = array_length(t)) and
+    (forall i:int. (((0 <= i) and (i < k)) -> (access(t2, i) = F(i)))))) ->
+  (k <= n) ->
+  ((k - 1) < array_length(t2))
+
+goal fib4_po_12:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall k:int.
+  forall t2:int farray.
+  (((2 <= k) and (k <= (n + 1))) and
+   ((array_length(t2) = array_length(t)) and
+    (forall i:int. (((0 <= i) and (i < k)) -> (access(t2, i) = F(i)))))) ->
+  (k <= n) ->
+  ((0 <= (k - 1)) and ((k - 1) < array_length(t2))) ->
+  forall result:int.
+  (result = access(t2, (k - 1))) ->
+  (0 <= (k - 2))
+
+goal fib4_po_13:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall k:int.
+  forall t2:int farray.
+  (((2 <= k) and (k <= (n + 1))) and
+   ((array_length(t2) = array_length(t)) and
+    (forall i:int. (((0 <= i) and (i < k)) -> (access(t2, i) = F(i)))))) ->
+  (k <= n) ->
+  ((0 <= (k - 1)) and ((k - 1) < array_length(t2))) ->
+  forall result:int.
+  (result = access(t2, (k - 1))) ->
+  ((k - 2) < array_length(t2))
+
+goal fib4_po_14:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall k:int.
+  forall t2:int farray.
+  (((2 <= k) and (k <= (n + 1))) and
+   ((array_length(t2) = array_length(t)) and
+    (forall i:int. (((0 <= i) and (i < k)) -> (access(t2, i) = F(i)))))) ->
+  (k <= n) ->
+  ((0 <= (k - 1)) and ((k - 1) < array_length(t2))) ->
+  forall result:int.
+  (result = access(t2, (k - 1))) ->
+  ((0 <= (k - 2)) and ((k - 2) < array_length(t2))) ->
+  forall result0:int.
+  (result0 = access(t2, (k - 2))) ->
+  (0 <= k)
+
+goal fib4_po_15:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall k:int.
+  forall t2:int farray.
+  (((2 <= k) and (k <= (n + 1))) and
+   ((array_length(t2) = array_length(t)) and
+    (forall i:int. (((0 <= i) and (i < k)) -> (access(t2, i) = F(i)))))) ->
+  (k <= n) ->
+  ((0 <= (k - 1)) and ((k - 1) < array_length(t2))) ->
+  forall result:int.
+  (result = access(t2, (k - 1))) ->
+  ((0 <= (k - 2)) and ((k - 2) < array_length(t2))) ->
+  forall result0:int.
+  (result0 = access(t2, (k - 2))) ->
+  (k < array_length(t2))
+
+goal fib4_po_16:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall k:int.
+  forall t2:int farray.
+  (((2 <= k) and (k <= (n + 1))) and
+   ((array_length(t2) = array_length(t)) and
+    (forall i:int. (((0 <= i) and (i < k)) -> (access(t2, i) = F(i)))))) ->
+  (k <= n) ->
+  ((0 <= (k - 1)) and ((k - 1) < array_length(t2))) ->
+  forall result:int.
+  (result = access(t2, (k - 1))) ->
+  ((0 <= (k - 2)) and ((k - 2) < array_length(t2))) ->
+  forall result0:int.
+  (result0 = access(t2, (k - 2))) ->
+  ((0 <= k) and (k < array_length(t2))) ->
+  forall t3:int farray.
+  (t3 = update(t2, k, (result + result0))) ->
+  forall k0:int.
+  (k0 = (k + 1)) ->
+  (2 <= k0)
+
+goal fib4_po_17:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall k:int.
+  forall t2:int farray.
+  (((2 <= k) and (k <= (n + 1))) and
+   ((array_length(t2) = array_length(t)) and
+    (forall i:int. (((0 <= i) and (i < k)) -> (access(t2, i) = F(i)))))) ->
+  (k <= n) ->
+  ((0 <= (k - 1)) and ((k - 1) < array_length(t2))) ->
+  forall result:int.
+  (result = access(t2, (k - 1))) ->
+  ((0 <= (k - 2)) and ((k - 2) < array_length(t2))) ->
+  forall result0:int.
+  (result0 = access(t2, (k - 2))) ->
+  ((0 <= k) and (k < array_length(t2))) ->
+  forall t3:int farray.
+  (t3 = update(t2, k, (result + result0))) ->
+  forall k0:int.
+  (k0 = (k + 1)) ->
+  (k0 <= (n + 1))
+
+goal fib4_po_18:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall k:int.
+  forall t2:int farray.
+  (((2 <= k) and (k <= (n + 1))) and
+   ((array_length(t2) = array_length(t)) and
+    (forall i:int. (((0 <= i) and (i < k)) -> (access(t2, i) = F(i)))))) ->
+  (k <= n) ->
+  ((0 <= (k - 1)) and ((k - 1) < array_length(t2))) ->
+  forall result:int.
+  (result = access(t2, (k - 1))) ->
+  ((0 <= (k - 2)) and ((k - 2) < array_length(t2))) ->
+  forall result0:int.
+  (result0 = access(t2, (k - 2))) ->
+  ((0 <= k) and (k < array_length(t2))) ->
+  forall t3:int farray.
+  (t3 = update(t2, k, (result + result0))) ->
+  forall k0:int.
+  (k0 = (k + 1)) ->
+  (array_length(t3) = array_length(t))
+
+goal fib4_po_19:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall k:int.
+  forall t2:int farray.
+  (((2 <= k) and (k <= (n + 1))) and
+   ((array_length(t2) = array_length(t)) and
+    (forall i:int. (((0 <= i) and (i < k)) -> (access(t2, i) = F(i)))))) ->
+  (k <= n) ->
+  ((0 <= (k - 1)) and ((k - 1) < array_length(t2))) ->
+  forall result:int.
+  (result = access(t2, (k - 1))) ->
+  ((0 <= (k - 2)) and ((k - 2) < array_length(t2))) ->
+  forall result0:int.
+  (result0 = access(t2, (k - 2))) ->
+  ((0 <= k) and (k < array_length(t2))) ->
+  forall t3:int farray.
+  (t3 = update(t2, k, (result + result0))) ->
+  forall k0:int.
+  (k0 = (k + 1)) ->
+  forall i:int.
+  ((0 <= i) and (i < k0)) ->
+  (access(t3, i) = F(i))
+
+goal fib4_po_20:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall k:int.
+  forall t2:int farray.
+  (((2 <= k) and (k <= (n + 1))) and
+   ((array_length(t2) = array_length(t)) and
+    (forall i:int. (((0 <= i) and (i < k)) -> (access(t2, i) = F(i)))))) ->
+  (k <= n) ->
+  ((0 <= (k - 1)) and ((k - 1) < array_length(t2))) ->
+  forall result:int.
+  (result = access(t2, (k - 1))) ->
+  ((0 <= (k - 2)) and ((k - 2) < array_length(t2))) ->
+  forall result0:int.
+  (result0 = access(t2, (k - 2))) ->
+  ((0 <= k) and (k < array_length(t2))) ->
+  forall t3:int farray.
+  (t3 = update(t2, k, (result + result0))) ->
+  forall k0:int.
+  (k0 = (k + 1)) ->
+  (0 <= ((n + 1) - k))
+
+goal fib4_po_21:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall k:int.
+  forall t2:int farray.
+  (((2 <= k) and (k <= (n + 1))) and
+   ((array_length(t2) = array_length(t)) and
+    (forall i:int. (((0 <= i) and (i < k)) -> (access(t2, i) = F(i)))))) ->
+  (k <= n) ->
+  ((0 <= (k - 1)) and ((k - 1) < array_length(t2))) ->
+  forall result:int.
+  (result = access(t2, (k - 1))) ->
+  ((0 <= (k - 2)) and ((k - 2) < array_length(t2))) ->
+  forall result0:int.
+  (result0 = access(t2, (k - 2))) ->
+  ((0 <= k) and (k < array_length(t2))) ->
+  forall t3:int farray.
+  (t3 = update(t2, k, (result + result0))) ->
+  forall k0:int.
+  (k0 = (k + 1)) ->
+  (((n + 1) - k0) < ((n + 1) - k))
+
+goal fib4_po_22:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall k:int.
+  forall t2:int farray.
+  (((2 <= k) and (k <= (n + 1))) and
+   ((array_length(t2) = array_length(t)) and
+    (forall i:int. (((0 <= i) and (i < k)) -> (access(t2, i) = F(i)))))) ->
+  (k > n) ->
+  (n < array_length(t2))
+
+goal fib4_po_23:
+  forall n:int.
+  forall t:int farray.
+  ((0 <= n) and (n < array_length(t))) ->
+  (n > 1) ->
+  ((0 <= 0) and (0 < array_length(t))) ->
+  forall t0:int farray.
+  (t0 = update(t, 0, 1)) ->
+  ((0 <= 1) and (1 < array_length(t0))) ->
+  forall t1:int farray.
+  (t1 = update(t0, 1, 1)) ->
+  forall k:int.
+  forall t2:int farray.
+  (((2 <= k) and (k <= (n + 1))) and
+   ((array_length(t2) = array_length(t)) and
+    (forall i:int. (((0 <= i) and (i < k)) -> (access(t2, i) = F(i)))))) ->
+  (k > n) ->
+  ((0 <= n) and (n < array_length(t2))) ->
+  forall result:int.
+  (result = access(t2, n)) ->
+  (result = F(n))
+

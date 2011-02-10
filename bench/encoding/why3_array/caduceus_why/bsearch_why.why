@@ -1,0 +1,1339 @@
+theory Why2
+use array.Array as A
+  use Tuple0
+  use int.Int
+  use int.ComputerDivision
+  use real.Real
+  use bool.Bool
+  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic eq_bool Bool.bool Bool.bool
+
+  logic neq_bool Bool.bool Bool.bool
+
+  logic lt_int int int
+
+  logic le_int int int
+
+  logic gt_int int int
+
+  logic ge_int int int
+
+  logic eq_int int int
+
+  logic neq_int int int
+
+  logic add_int int int : int
+
+  logic sub_int int int : int
+
+  logic mul_int int int : int
+
+  logic div_int int int : int
+
+  logic mod_int int int : int
+
+  logic neg_int int : int
+
+  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+
+  type farray 'a = A.t int 'a
+
+  logic access (m:farray 'a1) (k:int) : 'a1 = A.get m k
+
+  logic update (m:farray 'a1) (k:int) (v:'a1) : (farray 'a1) = A.set m k v
+
+
+
+  logic array_length (farray 'a1) : int
+
+  logic sorted_array (t : (farray int)) (i : int) (j : int) =
+    (forall k1:int.
+      (forall k2:int.
+        ((((Int.(<=) i k1) and (Int.(<=) k1 k2)) and (Int.(<=) k2 j)) ->
+         (Int.(<=) (access t k1 : int) (access t k2 : int)))))
+
+  logic exchange (a1 : (farray 'a1)) (a2 : (farray 'a1)) (i : int) (j : int) =
+    (((array_length a1 : int) = (array_length a2 : int)) and
+     (((access a1 i : 'a1) = (access a2 j : 'a1)) and
+      (((access a2 i : 'a1) = (access a1 j : 'a1)) and
+       (forall k:int.
+         (((k <> i) and (k <> j)) ->
+          ((access a1 k : 'a1) = (access a2 k : 'a1)))))))
+
+  logic permut (farray 'a1) (farray 'a1) int int
+
+  axiom Permut_refl:
+    (forall t:(farray 'a1). (forall l:int. (forall u:int. (permut t t l u))))
+
+  axiom Permut_sym:
+    (forall t1:(farray 'a1).
+      (forall t2:(farray 'a1).
+        (forall l:int.
+          (forall u:int. ((permut t1 t2 l u) -> (permut t2 t1 l u))))))
+
+  axiom Permut_trans:
+    (forall t1:(farray 'a1).
+      (forall t2:(farray 'a1).
+        (forall t3:(farray 'a1).
+          (forall l:int.
+            (forall u:int.
+              ((permut t1 t2 l u) ->
+               ((permut t2 t3 l u) -> (permut t1 t3 l u))))))))
+
+  axiom Permut_exchange:
+    (forall a1:(farray 'a1).
+      (forall a2:(farray 'a1).
+        (forall l:int.
+          (forall u:int.
+            (forall i:int.
+              (forall j:int.
+                (((Int.(<=) l i) and (Int.(<=) i u)) ->
+                 (((Int.(<=) l j) and (Int.(<=) j u)) ->
+                  ((exchange a1 a2 i j) -> (permut a1 a2 l u))))))))))
+
+  axiom Exchange_upd:
+    (forall a:(farray 'a1).
+      (forall i:int.
+        (forall j:int.
+          (exchange a (update (update a i (access a j : 'a1) : (farray 'a1)) j (access a i : 'a1) : (farray 'a1)) i j))))
+
+  axiom Permut_weakening:
+    (forall a1:(farray 'a1).
+      (forall a2:(farray 'a1).
+        (forall l1:int.
+          (forall r1:int.
+            (forall l2:int.
+              (forall r2:int.
+                ((((Int.(<=) l1 l2) and (Int.(<=) l2 r2)) and
+                  (Int.(<=) r2 r1)) ->
+                 ((permut a1 a2 l2 r2) -> (permut a1 a2 l1 r1)))))))))
+
+  axiom Permut_eq:
+    (forall a1:(farray 'a1).
+      (forall a2:(farray 'a1).
+        (forall l:int.
+          (forall u:int.
+            ((Int.(<=) l u) ->
+             ((permut a1 a2 l u) ->
+              (forall i:int.
+                (((Int.(<) i l) or (Int.(<) u i)) ->
+                 ((access a2 i : 'a1) = (access a1 i : 'a1))))))))))
+
+  logic permutation (a1 : (farray 'a1)) (a2 : (farray 'a1)) =
+    (permut a1 a2 0 (Int.(-) (array_length a1 : int) 1 : int))
+
+  axiom Array_length_update:
+    (forall a:(farray 'a1).
+      (forall i:int.
+        (forall v:'a1.
+          ((array_length (update a i v : (farray 'a1)) : int) = (array_length a : int)))))
+
+  axiom Permut_array_length:
+    (forall a1:(farray 'a1).
+      (forall a2:(farray 'a1).
+        (forall l:int.
+          (forall u:int.
+            ((permut a1 a2 l u) ->
+             ((array_length a1 : int) = (array_length a2 : int)))))))
+
+  logic v  : int
+
+  logic mean (x : int) (y : int) : int =
+    (ComputerDivision.div (Int.(+) x y : int) 2 : int)
+
+  axiom Mean:
+    (forall x:int.
+      (forall y:int.
+        ((Int.(<=) x y) ->
+         ((Int.(<=) x (mean x y : int)) and (Int.(<=) (mean x y : int) y)))))
+
+  logic why3_In (t : (farray int)) (l : int) (u : int) =
+    (exists i:int.
+      (((Int.(<=) l i) and (Int.(<=) i u)) and
+       ((access t i : int) = (v : int))))
+
+  goal Binary_search_po_1:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int. ((p = 0) -> (Int.(<=) 1 l)))))))))))
+
+  goal Binary_search_po_2:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (Int.(<=) u (Int.(-) (array_length t : int) 1 : int))))))))))))
+
+  goal Binary_search_po_3:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int. ((p = 0) -> (Int.(<=) 0 p)))))))))))
+
+  goal Binary_search_po_4:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (Int.(<=) p (Int.(-) (array_length t : int) 1 : int))))))))))))
+
+  goal Binary_search_po_5:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   ((p = 0) ->
+                    ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                     (why3_In t l u)))))))))))))
+
+  goal Binary_search_po_6:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   ((Int.(>) p 0) -> ((access t p : int) = (v : int)))))))))))))
+
+  goal Binary_search_po_7:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) -> (Int.(<=) l0 m))))))))))))))))))
+
+  goal Binary_search_po_8:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) -> (Int.(<=) m u0))))))))))))))))))
+
+  goal Binary_search_po_9:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (Int.(<=) 0 m)))))))))))))))))))
+
+  goal Binary_search_po_10:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (Int.(<) m (array_length t : int))))))))))))))))))))
+
+  goal Binary_search_po_11:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(<) result0 (v : int)) ->
+                                    (forall l1:int.
+                                      ((l1 = (Int.(+) m 1 : int)) ->
+                                       (Int.(<=) 1 l1)))))))))))))))))))))))))
+
+  goal Binary_search_po_12:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(<) result0 (v : int)) ->
+                                    (forall l1:int.
+                                      ((l1 = (Int.(+) m 1 : int)) ->
+                                       (Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int))))))))))))))))))))))))))
+
+  goal Binary_search_po_13:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(<) result0 (v : int)) ->
+                                    (forall l1:int.
+                                      ((l1 = (Int.(+) m 1 : int)) ->
+                                       (Int.(<=) 0 p0)))))))))))))))))))))))))
+
+  goal Binary_search_po_14:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(<) result0 (v : int)) ->
+                                    (forall l1:int.
+                                      ((l1 = (Int.(+) m 1 : int)) ->
+                                       (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))))))))))))))))))))))))))
+
+  goal Binary_search_po_15:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(<) result0 (v : int)) ->
+                                    (forall l1:int.
+                                      ((l1 = (Int.(+) m 1 : int)) ->
+                                       ((p0 = 0) ->
+                                        ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                         (why3_In t l1 u0)))))))))))))))))))))))))))
+
+  goal Binary_search_po_16:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(<) result0 (v : int)) ->
+                                    (forall l1:int.
+                                      ((l1 = (Int.(+) m 1 : int)) ->
+                                       ((Int.(>) p0 0) ->
+                                        ((access t p0 : int) = (v : int)))))))))))))))))))))))))))
+
+  goal Binary_search_po_17:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(<) result0 (v : int)) ->
+                                    (forall l1:int.
+                                      ((l1 = (Int.(+) m 1 : int)) ->
+                                       (Int.(<=) 0 (Int.(-) (Int.(+) 2 u0 : int) l0 : int))))))))))))))))))))))))))
+
+  goal Binary_search_po_18:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(<) result0 (v : int)) ->
+                                    (forall l1:int.
+                                      ((l1 = (Int.(+) m 1 : int)) ->
+                                       (Int.(<) (Int.(-) (Int.(+) 2 u0 : int) l1 : int) (Int.(-) (Int.(+) 2 u0 : int) l0 : int))))))))))))))))))))))))))
+
+  goal Binary_search_po_19:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(>) result1 (v : int)) ->
+                                         (forall u1:int.
+                                           ((u1 = (Int.(-) m 1 : int)) ->
+                                            (Int.(<=) u1 (Int.(-) (array_length t : int) 1 : int))))))))))))))))))))))))))))))
+
+  goal Binary_search_po_20:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(>) result1 (v : int)) ->
+                                         (forall u1:int.
+                                           ((u1 = (Int.(-) m 1 : int)) ->
+                                            (Int.(<=) 0 p0)))))))))))))))))))))))))))))
+
+  goal Binary_search_po_21:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(>) result1 (v : int)) ->
+                                         (forall u1:int.
+                                           ((u1 = (Int.(-) m 1 : int)) ->
+                                            (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))))))))))))))))))))))))))))))
+
+  goal Binary_search_po_22:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(>) result1 (v : int)) ->
+                                         (forall u1:int.
+                                           ((u1 = (Int.(-) m 1 : int)) ->
+                                            ((p0 = 0) ->
+                                             ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                              (why3_In t l0 u1)))))))))))))))))))))))))))))))
+
+  goal Binary_search_po_23:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(>) result1 (v : int)) ->
+                                         (forall u1:int.
+                                           ((u1 = (Int.(-) m 1 : int)) ->
+                                            ((Int.(>) p0 0) ->
+                                             ((access t p0 : int) = (v : int)))))))))))))))))))))))))))))))
+
+  goal Binary_search_po_24:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(>) result1 (v : int)) ->
+                                         (forall u1:int.
+                                           ((u1 = (Int.(-) m 1 : int)) ->
+                                            (Int.(<=) 0 (Int.(-) (Int.(+) 2 u0 : int) l0 : int))))))))))))))))))))))))))))))
+
+  goal Binary_search_po_25:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(>) result1 (v : int)) ->
+                                         (forall u1:int.
+                                           ((u1 = (Int.(-) m 1 : int)) ->
+                                            (Int.(<) (Int.(-) (Int.(+) 2 u1 : int) l0 : int) (Int.(-) (Int.(+) 2 u0 : int) l0 : int))))))))))))))))))))))))))))))
+
+  goal Binary_search_po_26:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(<=) result1 (v : int)) ->
+                                         (forall p1:int.
+                                           ((p1 = m) ->
+                                            (forall l1:int.
+                                              ((l1 = (Int.(+) u0 1 : int)) ->
+                                               (Int.(<=) 1 l1)))))))))))))))))))))))))))))))
+
+  goal Binary_search_po_27:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(<=) result1 (v : int)) ->
+                                         (forall p1:int.
+                                           ((p1 = m) ->
+                                            (forall l1:int.
+                                              ((l1 = (Int.(+) u0 1 : int)) ->
+                                               (Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int))))))))))))))))))))))))))))))))
+
+  goal Binary_search_po_28:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(<=) result1 (v : int)) ->
+                                         (forall p1:int.
+                                           ((p1 = m) ->
+                                            (forall l1:int.
+                                              ((l1 = (Int.(+) u0 1 : int)) ->
+                                               (Int.(<=) 0 p1)))))))))))))))))))))))))))))))
+
+  goal Binary_search_po_29:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(<=) result1 (v : int)) ->
+                                         (forall p1:int.
+                                           ((p1 = m) ->
+                                            (forall l1:int.
+                                              ((l1 = (Int.(+) u0 1 : int)) ->
+                                               (Int.(<=) p1 (Int.(-) (array_length t : int) 1 : int))))))))))))))))))))))))))))))))
+
+  goal Binary_search_po_30:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(<=) result1 (v : int)) ->
+                                         (forall p1:int.
+                                           ((p1 = m) ->
+                                            (forall l1:int.
+                                              ((l1 = (Int.(+) u0 1 : int)) ->
+                                               ((p1 = 0) ->
+                                                ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                                 (why3_In t l1 u0)))))))))))))))))))))))))))))))))
+
+  goal Binary_search_po_31:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(<=) result1 (v : int)) ->
+                                         (forall p1:int.
+                                           ((p1 = m) ->
+                                            (forall l1:int.
+                                              ((l1 = (Int.(+) u0 1 : int)) ->
+                                               ((Int.(>) p1 0) ->
+                                                ((access t p1 : int) = (v : int)))))))))))))))))))))))))))))))))
+
+  goal Binary_search_po_32:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(<=) result1 (v : int)) ->
+                                         (forall p1:int.
+                                           ((p1 = m) ->
+                                            (forall l1:int.
+                                              ((l1 = (Int.(+) u0 1 : int)) ->
+                                               (Int.(<=) 0 (Int.(-) (Int.(+) 2 u0 : int) l0 : int))))))))))))))))))))))))))))))))
+
+  goal Binary_search_po_33:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(<=) l0 u0) ->
+                           (forall m:int.
+                             ((m = (mean l0 u0 : int)) ->
+                              (((Int.(<=) l0 m) and (Int.(<=) m u0)) ->
+                               (((Int.(<=) 0 m) and
+                                 (Int.(<) m (array_length t : int))) ->
+                                (forall result0:int.
+                                  ((result0 = (access t m : int)) ->
+                                   ((Int.(>=) result0 (v : int)) ->
+                                    (((Int.(<=) 0 m) and
+                                      (Int.(<) m (array_length t : int))) ->
+                                     (forall result1:int.
+                                       ((result1 = (access t m : int)) ->
+                                        ((Int.(<=) result1 (v : int)) ->
+                                         (forall p1:int.
+                                           ((p1 = m) ->
+                                            (forall l1:int.
+                                              ((l1 = (Int.(+) u0 1 : int)) ->
+                                               (Int.(<) (Int.(-) (Int.(+) 2 u0 : int) l1 : int) (Int.(-) (Int.(+) 2 u0 : int) l0 : int))))))))))))))))))))))))))))))))
+
+  goal Binary_search_po_34:
+    (forall t:(farray int).
+      (((Int.(>=) (array_length t : int) 1) and
+        (sorted_array t 1 (Int.(-) (array_length t : int) 1 : int))) ->
+       (forall l:int.
+         ((l = 1) ->
+          (forall result:int.
+            ((result = (array_length t : int)) ->
+             (forall u:int.
+               ((u = (Int.(-) result 1 : int)) ->
+                (forall p:int.
+                  ((p = 0) ->
+                   (forall l0:int.
+                     (forall p0:int.
+                       (forall u0:int.
+                         (((Int.(<=) 1 l0) and
+                           ((Int.(<=) u0 (Int.(-) (array_length t : int) 1 : int)) and
+                            (((Int.(<=) 0 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             (((p0 = 0) ->
+                               ((why3_In t 1 (Int.(-) (array_length t : int) 1 : int)) ->
+                                (why3_In t l0 u0))) and
+                              ((Int.(>) p0 0) ->
+                               ((access t p0 : int) = (v : int))))))) ->
+                          ((Int.(>) l0 u0) ->
+                           ((((Int.(<=) 1 p0) and
+                              (Int.(<=) p0 (Int.(-) (array_length t : int) 1 : int))) and
+                             ((access t p0 : int) = (v : int))) or
+                            ((p0 = 0) and
+                             (not (why3_In t 1 (Int.(-) (array_length t : int) 1 : int))))))))))))))))))))
+
+
+end

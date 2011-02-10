@@ -1,0 +1,4206 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+logic bw_compl : int -> int
+
+logic bw_and : int, int -> int
+
+logic bw_xor : int, int -> int
+
+logic bw_or : int, int -> int
+
+logic lsl : int, int -> int
+
+logic lsr : int, int -> int
+
+type 'z pointer
+
+type 'z addr
+
+type alloc_table
+
+logic block_length : alloc_table, 'a1 pointer -> int
+
+logic base_addr : 'a1 pointer -> 'a1 addr
+
+logic offset : 'a1 pointer -> int
+
+logic shift : 'a1 pointer, int -> 'a1 pointer
+
+logic sub_pointer : 'a1 pointer, 'a1 pointer -> int
+
+predicate lt_pointer(p1: 'a1 pointer, p2: 'a1 pointer) =
+  ((base_addr(p1) = base_addr(p2)) and (offset(p1) < offset(p2)))
+
+predicate le_pointer(p1: 'a1 pointer, p2: 'a1 pointer) =
+  ((base_addr(p1) = base_addr(p2)) and (offset(p1) <= offset(p2)))
+
+predicate gt_pointer(p1: 'a1 pointer, p2: 'a1 pointer) =
+  ((base_addr(p1) = base_addr(p2)) and (offset(p1) > offset(p2)))
+
+predicate ge_pointer(p1: 'a1 pointer, p2: 'a1 pointer) =
+  ((base_addr(p1) = base_addr(p2)) and (offset(p1) >= offset(p2)))
+
+predicate valid(a: alloc_table, p: 'a1 pointer) =
+  ((0 <= offset(p)) and (offset(p) < block_length(a, p)))
+
+predicate valid_index(a: alloc_table, p: 'a1 pointer, i: int) =
+  ((0 <= (offset(p) + i)) and ((offset(p) + i) < block_length(a, p)))
+
+predicate valid_range(a: alloc_table, p: 'a1 pointer, i: int, j: int) =
+  ((0 <= (offset(p) + i)) and ((offset(p) + j) < block_length(a, p)))
+
+axiom offset_shift:
+  (forall p:'a1 pointer.
+    (forall i:int [offset(shift(p, i))]. (offset(shift(p,
+      i)) = (offset(p) + i))))
+
+axiom shift_zero: (forall p:'a1 pointer [shift(p, 0)]. (shift(p, 0) = p))
+
+axiom shift_shift:
+  (forall p:'a1 pointer.
+    (forall i:int.
+      (forall j:int [shift(shift(p, i), j)]. (shift(shift(p, i),
+        j) = shift(p, (i + j))))))
+
+axiom base_addr_shift:
+  (forall p:'a1 pointer.
+    (forall i:int [base_addr(shift(p, i))]. (base_addr(shift(p,
+      i)) = base_addr(p))))
+
+axiom block_length_shift:
+  (forall a:alloc_table.
+    (forall p:'a1 pointer.
+      (forall i:int [block_length(a, shift(p, i))]. (block_length(a, shift(p,
+        i)) = block_length(a, p)))))
+
+axiom base_addr_block_length:
+  (forall a:alloc_table.
+    (forall p1:'a1 pointer.
+      (forall p2:'a1 pointer.
+        ((base_addr(p1) = base_addr(p2)) -> (block_length(a,
+         p1) = block_length(a, p2))))))
+
+axiom pointer_pair_1:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer.
+      (((base_addr(p1) = base_addr(p2)) and (offset(p1) = offset(p2))) ->
+       (p1 = p2))))
+
+axiom pointer_pair_2:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer.
+      ((p1 = p2) ->
+       ((base_addr(p1) = base_addr(p2)) and (offset(p1) = offset(p2))))))
+
+axiom neq_base_addr_neq_shift:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer.
+      (forall i:int.
+        (forall j:int.
+          ((base_addr(p1) <> base_addr(p2)) -> (shift(p1, i) <> shift(p2, j)))))))
+
+axiom neq_offset_neq_shift:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer.
+      (forall i:int.
+        (forall j:int.
+          (((offset(p1) + i) <> (offset(p2) + j)) -> (shift(p1,
+           i) <> shift(p2, j)))))))
+
+axiom eq_offset_eq_shift:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer.
+      (forall i:int.
+        (forall j:int.
+          ((base_addr(p1) = base_addr(p2)) ->
+           (((offset(p1) + i) = (offset(p2) + j)) -> (shift(p1,
+            i) = shift(p2, j))))))))
+
+axiom valid_index_valid_shift:
+  (forall a:alloc_table.
+    (forall p:'a1 pointer.
+      (forall i:int. (valid_index(a, p, i) -> valid(a, shift(p, i))))))
+
+axiom valid_range_valid_shift:
+  (forall a:alloc_table.
+    (forall p:'a1 pointer.
+      (forall i:int.
+        (forall j:int.
+          (forall k:int.
+            (valid_range(a, p, i, j) ->
+             (((i <= k) and (k <= j)) -> valid(a, shift(p, k)))))))))
+
+axiom valid_range_valid:
+  (forall a:alloc_table.
+    (forall p:'a1 pointer.
+      (forall i:int.
+        (forall j:int.
+          (valid_range(a, p, i, j) ->
+           (((i <= 0) and (0 <= j)) -> valid(a, p)))))))
+
+axiom valid_range_valid_index:
+  (forall a:alloc_table.
+    (forall p:'a1 pointer.
+      (forall i:int.
+        (forall j:int.
+          (forall k:int.
+            (valid_range(a, p, i, j) ->
+             (((i <= k) and (k <= j)) -> valid_index(a, p, k))))))))
+
+axiom sub_pointer_def:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer.
+      ((base_addr(p1) = base_addr(p2)) -> (sub_pointer(p1,
+       p2) = (offset(p1) - offset(p2))))))
+
+type ('a, 'z) memory
+
+logic acc : ('a1, 'a2) memory, 'a2 pointer -> 'a1
+
+logic upd : ('a1, 'a2) memory, 'a2 pointer, 'a1 -> ('a1, 'a2) memory
+
+axiom acc_upd:
+  (forall m:('a1, 'a2) memory.
+    (forall p:'a2 pointer.
+      (forall a:'a1 [acc(upd(m, p, a), p)]. (acc(upd(m, p, a), p) = a))))
+
+axiom acc_upd_neq:
+  (forall m:('a1, 'a2) memory.
+    (forall p1:'a2 pointer.
+      (forall p2:'a2 pointer.
+        (forall a:'a1 [acc(upd(m, p1, a), p2)].
+          ((p1 <> p2) -> (acc(upd(m, p1, a), p2) = acc(m, p2)))))))
+
+axiom false_not_true: (false <> true)
+
+type 'z pset
+
+logic pset_empty : 'a1 pset
+
+logic pset_singleton : 'a1 pointer -> 'a1 pset
+
+logic pset_star : 'a2 pset, ('a1 pointer, 'a2) memory -> 'a1 pset
+
+logic pset_all : 'a1 pset -> 'a1 pset
+
+logic pset_range : 'a1 pset, int, int -> 'a1 pset
+
+logic pset_range_left : 'a1 pset, int -> 'a1 pset
+
+logic pset_range_right : 'a1 pset, int -> 'a1 pset
+
+logic pset_acc_all : 'a2 pset, ('a1 pointer, 'a2) memory -> 'a1 pset
+
+logic pset_acc_range : 'a2 pset, ('a1 pointer, 'a2) memory, int,
+int -> 'a1 pset
+
+logic pset_acc_range_left : 'a2 pset, ('a1 pointer, 'a2) memory,
+int -> 'a1 pset
+
+logic pset_acc_range_right : 'a2 pset, ('a1 pointer, 'a2) memory,
+int -> 'a1 pset
+
+logic pset_union : 'a1 pset, 'a1 pset -> 'a1 pset
+
+logic not_in_pset : 'a1 pointer, 'a1 pset -> prop
+
+predicate not_assigns(a: alloc_table, m1: ('a1, 'a2) memory, m2: ('a1,
+  'a2) memory, l: 'a2 pset) =
+  (forall p:'a2 pointer.
+    (valid(a, p) -> (not_in_pset(p, l) -> (acc(m2, p) = acc(m1, p)))))
+
+axiom pset_empty_intro: (forall p:'a1 pointer. not_in_pset(p, pset_empty))
+
+axiom pset_singleton_intro:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer [not_in_pset(p1, pset_singleton(p2))].
+      ((p1 <> p2) -> not_in_pset(p1, pset_singleton(p2)))))
+
+axiom pset_singleton_elim:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer [not_in_pset(p1, pset_singleton(p2))].
+      (not_in_pset(p1, pset_singleton(p2)) -> (p1 <> p2))))
+
+axiom not_not_in_singleton:
+  (forall p:'a1 pointer. (not not_in_pset(p, pset_singleton(p))))
+
+axiom pset_union_intro:
+  (forall l1:'a1 pset.
+    (forall l2:'a1 pset.
+      (forall p:'a1 pointer [not_in_pset(p, pset_union(l1, l2))].
+        ((not_in_pset(p, l1) and not_in_pset(p, l2)) -> not_in_pset(p,
+         pset_union(l1, l2))))))
+
+axiom pset_union_elim1:
+  (forall l1:'a1 pset.
+    (forall l2:'a1 pset.
+      (forall p:'a1 pointer [not_in_pset(p, pset_union(l1, l2))].
+        (not_in_pset(p, pset_union(l1, l2)) -> not_in_pset(p, l1)))))
+
+axiom pset_union_elim2:
+  (forall l1:'a1 pset.
+    (forall l2:'a1 pset.
+      (forall p:'a1 pointer [not_in_pset(p, pset_union(l1, l2))].
+        (not_in_pset(p, pset_union(l1, l2)) -> not_in_pset(p, l2)))))
+
+axiom pset_star_intro:
+  (forall l:'a1 pset.
+    (forall m:('a2 pointer, 'a1) memory.
+      (forall p:'a2 pointer [not_in_pset(p, pset_star(l, m))].
+        ((forall p1:'a1 pointer. ((p = acc(m, p1)) -> not_in_pset(p1, l))) ->
+         not_in_pset(p, pset_star(l, m))))))
+
+axiom pset_star_elim:
+  (forall l:'a1 pset.
+    (forall m:('a2 pointer, 'a1) memory.
+      (forall p:'a2 pointer [not_in_pset(p, pset_star(l, m))].
+        (not_in_pset(p, pset_star(l, m)) ->
+         (forall p1:'a1 pointer. ((p = acc(m, p1)) -> not_in_pset(p1, l)))))))
+
+axiom pset_all_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset [not_in_pset(p, pset_all(l))].
+      ((forall p1:'a1 pointer.
+         ((not not_in_pset(p1, l)) -> (base_addr(p) <> base_addr(p1)))) ->
+       not_in_pset(p, pset_all(l)))))
+
+axiom pset_all_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset [not_in_pset(p, pset_all(l))].
+      (not_in_pset(p, pset_all(l)) ->
+       (forall p1:'a1 pointer.
+         ((not not_in_pset(p1, l)) -> (base_addr(p) <> base_addr(p1)))))))
+
+axiom pset_range_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset.
+      (forall a:int.
+        (forall b:int [not_in_pset(p, pset_range(l, a, b))].
+          ((forall p1:'a1 pointer.
+             (not_in_pset(p1, l) or
+              (forall i:int.
+                (((a <= i) and (i <= b)) -> (p <> shift(p1, i)))))) ->
+           not_in_pset(p, pset_range(l, a, b)))))))
+
+axiom pset_range_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset.
+      (forall a:int.
+        (forall b:int [not_in_pset(p, pset_range(l, a, b))].
+          (not_in_pset(p, pset_range(l, a, b)) ->
+           (forall p1:'a1 pointer.
+             ((not not_in_pset(p1, l)) ->
+              (forall i:int.
+                (((a <= i) and (i <= b)) -> (shift(p1, i) <> p))))))))))
+
+axiom pset_range_left_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset.
+      (forall a:int [not_in_pset(p, pset_range_left(l, a))].
+        ((forall p1:'a1 pointer.
+           (not_in_pset(p1, l) or
+            (forall i:int. ((i <= a) -> (p <> shift(p1, i)))))) ->
+         not_in_pset(p, pset_range_left(l, a))))))
+
+axiom pset_range_left_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset.
+      (forall a:int [not_in_pset(p, pset_range_left(l, a))].
+        (not_in_pset(p, pset_range_left(l, a)) ->
+         (forall p1:'a1 pointer.
+           ((not not_in_pset(p1, l)) ->
+            (forall i:int. ((i <= a) -> (shift(p1, i) <> p)))))))))
+
+axiom pset_range_right_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset.
+      (forall a:int [not_in_pset(p, pset_range_right(l, a))].
+        ((forall p1:'a1 pointer.
+           (not_in_pset(p1, l) or
+            (forall i:int. ((a <= i) -> (p <> shift(p1, i)))))) ->
+         not_in_pset(p, pset_range_right(l, a))))))
+
+axiom pset_range_right_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset.
+      (forall a:int [not_in_pset(p, pset_range_right(l, a))].
+        (not_in_pset(p, pset_range_right(l, a)) ->
+         (forall p1:'a1 pointer.
+           ((not not_in_pset(p1, l)) ->
+            (forall i:int. ((a <= i) -> (shift(p1, i) <> p)))))))))
+
+axiom pset_acc_all_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory [not_in_pset(p, pset_acc_all(l,
+        m))].
+        ((forall p1:'a2 pointer.
+           ((not not_in_pset(p1, l)) ->
+            (forall i:int. (p <> acc(m, shift(p1, i)))))) ->
+         not_in_pset(p, pset_acc_all(l, m))))))
+
+axiom pset_acc_all_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory [not_in_pset(p, pset_acc_all(l,
+        m))].
+        (not_in_pset(p, pset_acc_all(l, m)) ->
+         (forall p1:'a2 pointer.
+           ((not not_in_pset(p1, l)) ->
+            (forall i:int. (acc(m, shift(p1, i)) <> p))))))))
+
+axiom pset_acc_range_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory.
+        (forall a:int.
+          (forall b:int [not_in_pset(p, pset_acc_range(l, m, a, b))].
+            ((forall p1:'a2 pointer.
+               ((not not_in_pset(p1, l)) ->
+                (forall i:int.
+                  (((a <= i) and (i <= b)) -> (p <> acc(m, shift(p1, i))))))) ->
+             not_in_pset(p, pset_acc_range(l, m, a, b))))))))
+
+axiom pset_acc_range_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory.
+        (forall a:int.
+          (forall b:int.
+            (not_in_pset(p, pset_acc_range(l, m, a, b)) ->
+             (forall p1:'a2 pointer.
+               ((not not_in_pset(p1, l)) ->
+                (forall i:int.
+                  (((a <= i) and (i <= b)) -> (acc(m, shift(p1, i)) <> p)))))))))))
+
+axiom pset_acc_range_left_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory.
+        (forall a:int [not_in_pset(p, pset_acc_range_left(l, m, a))].
+          ((forall p1:'a2 pointer.
+             ((not not_in_pset(p1, l)) ->
+              (forall i:int. ((i <= a) -> (p <> acc(m, shift(p1, i))))))) ->
+           not_in_pset(p, pset_acc_range_left(l, m, a)))))))
+
+axiom pset_acc_range_left_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory.
+        (forall a:int [not_in_pset(p, pset_acc_range_left(l, m, a))].
+          (not_in_pset(p, pset_acc_range_left(l, m, a)) ->
+           (forall p1:'a2 pointer.
+             ((not not_in_pset(p1, l)) ->
+              (forall i:int. ((i <= a) -> (acc(m, shift(p1, i)) <> p))))))))))
+
+axiom pset_acc_range_right_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory.
+        (forall a:int [not_in_pset(p, pset_acc_range_right(l, m, a))].
+          ((forall p1:'a2 pointer.
+             ((not not_in_pset(p1, l)) ->
+              (forall i:int. ((a <= i) -> (p <> acc(m, shift(p1, i))))))) ->
+           not_in_pset(p, pset_acc_range_right(l, m, a)))))))
+
+axiom pset_acc_range_right_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory.
+        (forall a:int [not_in_pset(p, pset_acc_range_right(l, m, a))].
+          (not_in_pset(p, pset_acc_range_right(l, m, a)) ->
+           (forall p1:'a2 pointer.
+             ((not not_in_pset(p1, l)) ->
+              (forall i:int. ((a <= i) -> (acc(m, shift(p1, i)) <> p))))))))))
+
+axiom not_assigns_trans:
+  (forall a:alloc_table.
+    (forall l:'a1 pset.
+      (forall m1:('a2, 'a1) memory.
+        (forall m2:('a2, 'a1) memory.
+          (forall m3:('a2, 'a1) memory.
+            (not_assigns(a, m1, m2, l) ->
+             (not_assigns(a, m2, m3, l) -> not_assigns(a, m1, m3, l))))))))
+
+axiom not_assigns_refl:
+  (forall a:alloc_table.
+    (forall l:'a1 pset.
+      (forall m:('a2, 'a1) memory. not_assigns(a, m, m, l))))
+
+predicate valid_acc(m1: ('a1 pointer, 'a2) memory) =
+  (forall p:'a2 pointer.
+    (forall a:alloc_table. (valid(a, p) -> valid(a, acc(m1, p)))))
+
+predicate valid_acc_range(m1: ('a1 pointer, 'a2) memory, size: int) =
+  (forall p:'a2 pointer.
+    (forall a:alloc_table.
+      (valid(a, p) -> valid_range(a, acc(m1, p), 0, (size - 1)))))
+
+axiom valid_acc_range_valid:
+  (forall m1:('a1 pointer, 'a2) memory.
+    (forall size:int.
+      (forall p:'a2 pointer.
+        (forall a:alloc_table.
+          (valid_acc_range(m1, size) -> (valid(a, p) -> valid(a, acc(m1, p))))))))
+
+predicate separation1(m1: ('a1 pointer, 'a2) memory, m2: ('a1 pointer,
+  'a2) memory) =
+  (forall p:'a2 pointer.
+    (forall a:alloc_table.
+      (valid(a, p) -> (base_addr(acc(m1, p)) <> base_addr(acc(m2, p))))))
+
+predicate separation1_range1(m1: ('a1 pointer, 'a2) memory, m2: ('a1 pointer,
+  'a2) memory, size: int) =
+  (forall p:'a2 pointer.
+    (forall a:alloc_table.
+      (valid(a, p) ->
+       (forall i1:int.
+         (forall i2:int.
+           (((0 <= i1) and (i1 < size)) ->
+            (((0 <= i2) and (i2 < size)) -> (base_addr(acc(m1, shift(p,
+             i1))) <> base_addr(acc(m2, shift(p, i2)))))))))))
+
+predicate separation1_range(m: ('a1 pointer, 'a2) memory, size: int) =
+  (forall p:'a2 pointer.
+    (forall a:alloc_table.
+      (valid(a, p) ->
+       (forall i1:int.
+         (((0 <= i1) and (i1 < size)) -> (base_addr(acc(m, shift(p,
+          i1))) <> base_addr(acc(m, p))))))))
+
+predicate separation2(m1: ('a1 pointer, 'a2) memory, m2: ('a1 pointer,
+  'a2) memory) =
+  (forall p1:'a2 pointer.
+    (forall p2:'a2 pointer.
+      ((p1 <> p2) -> (base_addr(acc(m1, p1)) <> base_addr(acc(m2, p2))))))
+
+predicate separation2_range1(m1: ('a1 pointer, 'a2) memory, m2: ('a1 pointer,
+  'a2) memory, size: int) =
+  (forall p:'a2 pointer.
+    (forall q:'a2 pointer.
+      (forall a:alloc_table.
+        (forall i:int.
+          (((0 <= i) and (i < size)) -> (base_addr(acc(m1, shift(p,
+           i))) <> base_addr(acc(m2, q))))))))
+
+logic on_heap : alloc_table, 'a1 pointer -> prop
+
+logic on_stack : alloc_table, 'a1 pointer -> prop
+
+logic fresh : alloc_table, 'a1 pointer -> prop
+
+axiom fresh_not_valid:
+  (forall a:alloc_table.
+    (forall p:'a1 pointer. (fresh(a, p) -> (not valid(a, p)))))
+
+axiom fresh_not_valid_shift:
+  (forall a:alloc_table.
+    (forall p:'a1 pointer.
+      (fresh(a, p) -> (forall i:int. (not valid(a, shift(p, i)))))))
+
+logic alloc_extends : alloc_table, alloc_table -> prop
+
+axiom alloc_extends_valid:
+  (forall a1:alloc_table.
+    (forall a2:alloc_table.
+      (alloc_extends(a1, a2) ->
+       (forall q:'a1 pointer. (valid(a1, q) -> valid(a2, q))))))
+
+axiom alloc_extends_valid_index:
+  (forall a1:alloc_table.
+    (forall a2:alloc_table.
+      (alloc_extends(a1, a2) ->
+       (forall q:'a1 pointer.
+         (forall i:int. (valid_index(a1, q, i) -> valid_index(a2, q, i)))))))
+
+axiom alloc_extends_valid_range:
+  (forall a1:alloc_table.
+    (forall a2:alloc_table.
+      (alloc_extends(a1, a2) ->
+       (forall q:'a1 pointer.
+         (forall i:int.
+           (forall j:int.
+             (valid_range(a1, q, i, j) -> valid_range(a2, q, i, j))))))))
+
+axiom alloc_extends_refl: (forall a:alloc_table. alloc_extends(a, a))
+
+axiom alloc_extends_trans:
+  (forall a1:alloc_table.
+    (forall a2:alloc_table.
+      (forall a3:alloc_table [alloc_extends(a1, a2), alloc_extends(a2, a3)].
+        (alloc_extends(a1, a2) ->
+         (alloc_extends(a2, a3) -> alloc_extends(a1, a3))))))
+
+logic free_stack : alloc_table, alloc_table, alloc_table -> prop
+
+axiom free_stack_heap:
+  (forall a1:alloc_table.
+    (forall a2:alloc_table.
+      (forall a3:alloc_table.
+        (free_stack(a1, a2, a3) ->
+         (forall p:'a1 pointer.
+           (valid(a2, p) -> (on_heap(a2, p) -> valid(a3, p))))))))
+
+axiom free_stack_stack:
+  (forall a1:alloc_table.
+    (forall a2:alloc_table.
+      (forall a3:alloc_table.
+        (free_stack(a1, a2, a3) ->
+         (forall p:'a1 pointer.
+           (valid(a1, p) -> (on_stack(a1, p) -> valid(a3, p))))))))
+
+logic null : 'a1 pointer
+
+axiom null_not_valid: (forall a:alloc_table. (not valid(a, null)))
+
+type queue_0
+
+type queue_1
+
+type queue_2
+
+type Q
+
+logic Ierror : int
+
+logic QmaxSize : Q -> int
+
+axiom Q01: ("CADUCEUS_3": (forall q:Q. (QmaxSize(q) = 10)))
+
+logic Qsize : Q -> int
+
+logic Qenqueue : Q, int -> Q
+
+logic Qerror : Q
+
+axiom Q02:
+  ("CADUCEUS_4":
+  (forall q:Q.
+    (forall x:int. ((10 <= Qsize(q)) -> (Qenqueue(q, x) = Qerror)))))
+
+axiom Q02a:
+  ("CADUCEUS_5":
+  (forall q:Q.
+    (forall x:int. ((Qsize(q) < 10) -> (Qenqueue(q, x) <> Qerror)))))
+
+logic Qdequeue_t : Q -> int
+
+axiom Q02b:
+  ("CADUCEUS_6": (forall q:Q. ((Qsize(q) = 0) -> (Qdequeue_t(q) = Ierror))))
+
+axiom Q02c:
+  ("CADUCEUS_7":
+  (forall q:Q. ((0 < Qsize(q)) -> (not (Qdequeue_t(q) = Ierror)))))
+
+logic Qdequeue_Q : Q -> Q
+
+axiom Q02d:
+  ("CADUCEUS_8": (forall q:Q. ((Qsize(q) = 0) -> (Qdequeue_Q(q) = Qerror))))
+
+axiom Q02e:
+  ("CADUCEUS_9": (forall q:Q. ((0 < Qsize(q)) -> (Qdequeue_Q(q) <> Qerror))))
+
+logic Qnew : Q
+
+axiom Q03: ("CADUCEUS_11": (forall q:Q. (Qsize(Qnew) = 0)))
+
+axiom Q04:
+  ("CADUCEUS_12":
+  (forall q:Q.
+    (forall x:int.
+      ((Qsize(q) < 10) -> (Qsize(Qenqueue(q, x)) = (1 + Qsize(q)))))))
+
+axiom Q04a:
+  ("CADUCEUS_13":
+  (forall q:Q. ((0 < Qsize(q)) -> (Qsize(Qdequeue_Q(q)) = (Qsize(q) - 1)))))
+
+logic Qempty : Q -> int
+
+axiom Q05: ("CADUCEUS_14": (forall q:Q. ((Qsize(q) = 0) -> (Qempty(q) = 1))))
+
+axiom Q06: ("CADUCEUS_15": (forall q:Q. ((0 < Qsize(q)) -> (Qempty(q) = 0))))
+
+logic Qelement : Q, int -> int
+
+axiom Q08:
+  ("CADUCEUS_16":
+  (forall y:int.
+    (forall q:Q.
+      (forall x:int.
+        (((0 <= x) and (x < Qsize(q))) -> (Qelement(Qenqueue(q, y),
+         x) = Qelement(q, x)))))))
+
+axiom Q08a:
+  ("CADUCEUS_17":
+  (forall q:Q.
+    (forall x:int.
+      (((0 <= x) and (x < (Qsize(q) - 1))) -> (Qelement(Qdequeue_Q(q),
+       x) = Qelement(q, (x + 1)))))))
+
+axiom Q08b:
+  ("CADUCEUS_18":
+  (forall q:Q.
+    (forall x:int.
+      (((x = Qsize(q)) and (Qsize(q) < 10)) ->
+       (forall y:int. (Qelement(Qenqueue(q, y), x) = y))))))
+
+axiom Q09:
+  ("CADUCEUS_10":
+  (forall q:Q.
+    (forall x:int. ((x >= Qsize(q)) -> (Qelement(q, x) = Ierror)))))
+
+logic Qhead : Q -> int
+
+axiom Q10: ("CADUCEUS_19": (forall q:Q. (Qhead(q) = Qelement(q, 0))))
+
+axiom Q11: ("CADUCEUS_20": (forall q:Q. (Qdequeue_t(q) = Qelement(q, 0))))
+
+axiom Q12:
+  ("CADUCEUS_21":
+  (forall q:Q.
+    ((Qempty(q) = 1) -> (forall x:int. (Qdequeue_Q(Qenqueue(q, x)) = Qnew)))))
+
+axiom Q13:
+  ("CADUCEUS_22":
+  (forall q:Q.
+    ((Qempty(q) = 0) ->
+     (forall x:int. (Qdequeue_Q(Qenqueue(q, x)) = Qenqueue(Qdequeue_Q(q),
+       x))))))
+
+axiom int_mod_1:
+  ("CADUCEUS_1":
+  (forall x:int. (forall y:int. (((0 <= x) and (x < y)) -> ((x % y) = x)))))
+
+axiom int_mod_2:
+  ("CADUCEUS_2":
+  (forall x:int.
+    (forall y:int.
+      (((y > 0) and ((y <= x) and (x < (y + y)))) -> ((x % y) = (x - y))))))
+
+predicate models(intM_queue_2: (int, queue_2) memory, q_size: int,
+  q_head: int, queue: queue_2 pointer, q: Q) =
+  ("CADUCEUS_23":
+  (((q <> Qerror) and (q_size = Qsize(q))) and
+   (forall i:int.
+     (((0 <= i) and (i < q_size)) -> (Qelement(q, i) = acc(intM_queue_2,
+      shift(queue, ((i + q_head) % 10))))))))
+
+predicate occupied_slot(q_size: int, q_tail: int, q_head: int, i: int) =
+  ("CADUCEUS_25":
+  ((((q_tail > q_head) and ((q_head <= i) and (i < q_tail))) or
+    ((q_tail < q_head) and ((q_head <= i) or (i < q_tail)))) or
+   ((q_head = q_tail) and (q_size = 10))))
+
+predicate valid_slot(queue: queue_2 pointer, alloc: alloc_table, i: int) =
+  ("CADUCEUS_24": (((i >= 0) and (i < 10)) and valid_index(alloc, queue, i)))
+
+goal dequeue_impl_po_1:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38":
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)))
+
+goal dequeue_impl_po_2:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result)
+
+goal dequeue_impl_po_3:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size <> 0) ->
+  forall q_head0:int.
+  (q_head0 = (q_head + 1)) ->
+  (10 <> 0) ->
+  forall result1:int.
+  (result1 = (q_head0 % 10)) ->
+  forall q_head1:int.
+  (q_head1 = result1) ->
+  forall q_size0:int.
+  (q_size0 = (q_size - 1)) ->
+  ("CADUCEUS_35": (tmp = acc(intM_queue_2, shift(queue, q_head))))
+
+goal dequeue_impl_po_4:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size <> 0) ->
+  forall q_head0:int.
+  (q_head0 = (q_head + 1)) ->
+  (10 <> 0) ->
+  forall result1:int.
+  (result1 = (q_head0 % 10)) ->
+  forall q_head1:int.
+  (q_head1 = result1) ->
+  forall q_size0:int.
+  (q_size0 = (q_size - 1)) ->
+  ("CADUCEUS_35": (q_size0 = (q_size - 1)))
+
+goal dequeue_impl_po_5:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size <> 0) ->
+  forall q_head0:int.
+  (q_head0 = (q_head + 1)) ->
+  (10 <> 0) ->
+  forall result1:int.
+  (result1 = (q_head0 % 10)) ->
+  forall q_head1:int.
+  (q_head1 = result1) ->
+  forall q_size0:int.
+  (q_size0 = (q_size - 1)) ->
+  ("CADUCEUS_35": (not occupied_slot(q_size0, q_tail, q_head1, q_head)))
+
+goal dequeue_impl_po_6:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size <> 0) ->
+  forall q_head0:int.
+  (q_head0 = (q_head + 1)) ->
+  (10 <> 0) ->
+  forall result1:int.
+  (result1 = (q_head0 % 10)) ->
+  forall q_head1:int.
+  (q_head1 = result1) ->
+  forall q_size0:int.
+  (q_size0 = (q_size - 1)) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_35": models(intM_queue_2, q_size0, q_head1, queue,
+  Qdequeue_Q(q)))
+
+goal dequeue_impl_po_7:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size <> 0) ->
+  forall q_head0:int.
+  (q_head0 = (q_head + 1)) ->
+  (10 <> 0) ->
+  forall result1:int.
+  (result1 = (q_head0 % 10)) ->
+  forall q_head1:int.
+  (q_head1 = result1) ->
+  forall q_size0:int.
+  (q_size0 = (q_size - 1)) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_35": (Qdequeue_t(q) = tmp))
+
+goal dequeue_impl_po_8:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size <> 0) ->
+  forall q_head0:int.
+  (q_head0 = (q_head + 1)) ->
+  (10 <> 0) ->
+  forall result1:int.
+  (result1 = (q_head0 % 10)) ->
+  forall q_head1:int.
+  (q_head1 = result1) ->
+  forall q_size0:int.
+  (q_size0 = (q_size - 1)) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_35": (Qdequeue_t(q) <> Ierror))
+
+goal dequeue_impl_po_9:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size <> 0) ->
+  forall q_head0:int.
+  (q_head0 = (q_head + 1)) ->
+  (10 <> 0) ->
+  forall result1:int.
+  (result1 = (q_head0 % 10)) ->
+  forall q_head1:int.
+  (q_head1 = result1) ->
+  forall q_size0:int.
+  (q_size0 = (q_size - 1)) ->
+  ("CADUCEUS_31": ("CADUCEUS_31": valid_slot(queue, alloc, q_tail)))
+
+goal dequeue_impl_po_10:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size <> 0) ->
+  forall q_head0:int.
+  (q_head0 = (q_head + 1)) ->
+  (10 <> 0) ->
+  forall result1:int.
+  (result1 = (q_head0 % 10)) ->
+  forall q_head1:int.
+  (q_head1 = result1) ->
+  forall q_size0:int.
+  (q_size0 = (q_size - 1)) ->
+  ("CADUCEUS_30": ("CADUCEUS_30": valid_slot(queue, alloc, q_head1)))
+
+goal dequeue_impl_po_11:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size <> 0) ->
+  forall q_head0:int.
+  (q_head0 = (q_head + 1)) ->
+  (10 <> 0) ->
+  forall result1:int.
+  (result1 = (q_head0 % 10)) ->
+  forall q_head1:int.
+  (q_head1 = result1) ->
+  forall q_size0:int.
+  (q_size0 = (q_size - 1)) ->
+  ("CADUCEUS_29": (0 <= q_size0))
+
+goal dequeue_impl_po_12:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size <> 0) ->
+  forall q_head0:int.
+  (q_head0 = (q_head + 1)) ->
+  (10 <> 0) ->
+  forall result1:int.
+  (result1 = (q_head0 % 10)) ->
+  forall q_head1:int.
+  (q_head1 = result1) ->
+  forall q_size0:int.
+  (q_size0 = (q_size - 1)) ->
+  ("CADUCEUS_29": (q_size0 <= 10))
+
+goal dequeue_impl_po_13:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size <> 0) ->
+  forall q_head0:int.
+  (q_head0 = (q_head + 1)) ->
+  (10 <> 0) ->
+  forall result1:int.
+  (result1 = (q_head0 % 10)) ->
+  forall q_head1:int.
+  (q_head1 = result1) ->
+  forall q_size0:int.
+  (q_size0 = (q_size - 1)) ->
+  (q_tail = q_head1) ->
+  ("CADUCEUS_28": ((q_size0 = 0) or (q_size0 = 10)))
+
+goal dequeue_impl_po_14:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size <> 0) ->
+  forall q_head0:int.
+  (q_head0 = (q_head + 1)) ->
+  (10 <> 0) ->
+  forall result1:int.
+  (result1 = (q_head0 % 10)) ->
+  forall q_head1:int.
+  (q_head1 = result1) ->
+  forall q_size0:int.
+  (q_size0 = (q_size - 1)) ->
+  ((q_size0 = 0) or (q_size0 = 10)) ->
+  ("CADUCEUS_28": (q_tail = q_head1))
+
+goal dequeue_impl_po_15:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size <> 0) ->
+  forall q_head0:int.
+  (q_head0 = (q_head + 1)) ->
+  (10 <> 0) ->
+  forall result1:int.
+  (result1 = (q_head0 % 10)) ->
+  forall q_head1:int.
+  (q_head1 = result1) ->
+  forall q_size0:int.
+  (q_size0 = (q_size - 1)) ->
+  ("CADUCEUS_27":
+  ("CADUCEUS_27":
+  ((q_tail < q_head1) -> (q_size0 = ((10 + q_tail) - q_head1)))))
+
+goal dequeue_impl_po_16:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size <> 0) ->
+  forall q_head0:int.
+  (q_head0 = (q_head + 1)) ->
+  (10 <> 0) ->
+  forall result1:int.
+  (result1 = (q_head0 % 10)) ->
+  forall q_head1:int.
+  (q_head1 = result1) ->
+  forall q_size0:int.
+  (q_size0 = (q_size - 1)) ->
+  ("CADUCEUS_26":
+  ("CADUCEUS_26": ((q_tail > q_head1) -> (q_size0 = (q_tail - q_head1)))))
+
+goal dequeue_impl_po_17:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size = 0) ->
+  ("CADUCEUS_35": (tmp = acc(intM_queue_2, shift(queue, q_head))))
+
+goal dequeue_impl_po_18:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size = 0) ->
+  ("CADUCEUS_35": (q_size = (q_size - 1)))
+
+goal dequeue_impl_po_19:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size = 0) ->
+  ("CADUCEUS_35": (not occupied_slot(q_size, q_tail, q_head, q_head)))
+
+goal dequeue_impl_po_20:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size = 0) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_35": models(intM_queue_2, q_size, q_head, queue, Qdequeue_Q(q)))
+
+goal dequeue_impl_po_21:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size = 0) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_35": (Qdequeue_t(q) = tmp))
+
+goal dequeue_impl_po_22:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size = 0) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_35": (Qdequeue_t(q) <> Ierror))
+
+goal dequeue_impl_po_23:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size = 0) ->
+  ("CADUCEUS_31": ("CADUCEUS_31": valid_slot(queue, alloc, q_tail)))
+
+goal dequeue_impl_po_24:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size = 0) ->
+  ("CADUCEUS_30": ("CADUCEUS_30": valid_slot(queue, alloc, q_head)))
+
+goal dequeue_impl_po_25:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size = 0) ->
+  ("CADUCEUS_29": (0 <= q_size))
+
+goal dequeue_impl_po_26:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size = 0) ->
+  ("CADUCEUS_29": (q_size <= 10))
+
+goal dequeue_impl_po_27:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size = 0) ->
+  (q_tail = q_head) ->
+  ("CADUCEUS_28": ((q_size = 0) or (q_size = 10)))
+
+goal dequeue_impl_po_28:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size = 0) ->
+  ((q_size = 0) or (q_size = 10)) ->
+  ("CADUCEUS_28": (q_tail = q_head))
+
+goal dequeue_impl_po_29:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size = 0) ->
+  ("CADUCEUS_27":
+  ("CADUCEUS_27": ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))))
+
+goal dequeue_impl_po_30:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_32": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_38": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall tmp:int.
+  (tmp = result0) ->
+  (q_size = 0) ->
+  ("CADUCEUS_26":
+  ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))
+
+goal element_impl_po_1:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_57": ((0 <= e) and (e < q_size))) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (10 <> 0) ->
+  forall result:int.
+  (result = ((e + q_head) % 10)) ->
+  forall tmp:int.
+  (tmp = result) ->
+  ("CADUCEUS_62": ("CADUCEUS_62": valid_slot(queue, alloc, tmp)))
+
+goal element_impl_po_2:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_57": ((0 <= e) and (e < q_size))) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (10 <> 0) ->
+  forall result:int.
+  (result = ((e + q_head) % 10)) ->
+  forall tmp:int.
+  (tmp = result) ->
+  ("CADUCEUS_62": valid_slot(queue, alloc, tmp)) ->
+  ("CADUCEUS_61":
+  ("CADUCEUS_61": occupied_slot(q_size, q_tail, q_head, tmp)))
+
+goal element_impl_po_3:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_57": ((0 <= e) and (e < q_size))) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (10 <> 0) ->
+  forall result:int.
+  (result = ((e + q_head) % 10)) ->
+  forall tmp:int.
+  (tmp = result) ->
+  ("CADUCEUS_62": valid_slot(queue, alloc, tmp)) ->
+  ("CADUCEUS_61": occupied_slot(q_size, q_tail, q_head, tmp)) ->
+  forall result0:queue_2 pointer.
+  (result0 = shift(queue, tmp)) ->
+  valid(alloc, result0)
+
+goal element_impl_po_4:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_57": ((0 <= e) and (e < q_size))) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (10 <> 0) ->
+  forall result:int.
+  (result = ((e + q_head) % 10)) ->
+  forall tmp:int.
+  (tmp = result) ->
+  ("CADUCEUS_62": valid_slot(queue, alloc, tmp)) ->
+  ("CADUCEUS_61": occupied_slot(q_size, q_tail, q_head, tmp)) ->
+  forall result0:queue_2 pointer.
+  (result0 = shift(queue, tmp)) ->
+  valid(alloc, result0) ->
+  forall result1:int.
+  (result1 = acc(intM_queue_2, result0)) ->
+  ("CADUCEUS_59":
+  ("CADUCEUS_59":
+  (forall q:Q.
+    (models(intM_queue_2, q_size, q_head, queue, q) -> (Qelement(q,
+     e) = result1)))))
+
+goal element_impl_po_5:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_57": ((0 <= e) and (e < q_size))) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (10 <> 0) ->
+  forall result:int.
+  (result = ((e + q_head) % 10)) ->
+  forall tmp:int.
+  (tmp = result) ->
+  ("CADUCEUS_62": valid_slot(queue, alloc, tmp)) ->
+  ("CADUCEUS_61": occupied_slot(q_size, q_tail, q_head, tmp)) ->
+  forall result0:queue_2 pointer.
+  (result0 = shift(queue, tmp)) ->
+  valid(alloc, result0) ->
+  forall result1:int.
+  (result1 = acc(intM_queue_2, result0)) ->
+  ("CADUCEUS_31": ("CADUCEUS_31": valid_slot(queue, alloc, q_tail)))
+
+goal element_impl_po_6:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_57": ((0 <= e) and (e < q_size))) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (10 <> 0) ->
+  forall result:int.
+  (result = ((e + q_head) % 10)) ->
+  forall tmp:int.
+  (tmp = result) ->
+  ("CADUCEUS_62": valid_slot(queue, alloc, tmp)) ->
+  ("CADUCEUS_61": occupied_slot(q_size, q_tail, q_head, tmp)) ->
+  forall result0:queue_2 pointer.
+  (result0 = shift(queue, tmp)) ->
+  valid(alloc, result0) ->
+  forall result1:int.
+  (result1 = acc(intM_queue_2, result0)) ->
+  ("CADUCEUS_30": ("CADUCEUS_30": valid_slot(queue, alloc, q_head)))
+
+goal element_impl_po_7:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_57": ((0 <= e) and (e < q_size))) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (10 <> 0) ->
+  forall result:int.
+  (result = ((e + q_head) % 10)) ->
+  forall tmp:int.
+  (tmp = result) ->
+  ("CADUCEUS_62": valid_slot(queue, alloc, tmp)) ->
+  ("CADUCEUS_61": occupied_slot(q_size, q_tail, q_head, tmp)) ->
+  forall result0:queue_2 pointer.
+  (result0 = shift(queue, tmp)) ->
+  valid(alloc, result0) ->
+  forall result1:int.
+  (result1 = acc(intM_queue_2, result0)) ->
+  ("CADUCEUS_29": (0 <= q_size))
+
+goal element_impl_po_8:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_57": ((0 <= e) and (e < q_size))) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (10 <> 0) ->
+  forall result:int.
+  (result = ((e + q_head) % 10)) ->
+  forall tmp:int.
+  (tmp = result) ->
+  ("CADUCEUS_62": valid_slot(queue, alloc, tmp)) ->
+  ("CADUCEUS_61": occupied_slot(q_size, q_tail, q_head, tmp)) ->
+  forall result0:queue_2 pointer.
+  (result0 = shift(queue, tmp)) ->
+  valid(alloc, result0) ->
+  forall result1:int.
+  (result1 = acc(intM_queue_2, result0)) ->
+  ("CADUCEUS_29": (q_size <= 10))
+
+goal element_impl_po_9:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_57": ((0 <= e) and (e < q_size))) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (10 <> 0) ->
+  forall result:int.
+  (result = ((e + q_head) % 10)) ->
+  forall tmp:int.
+  (tmp = result) ->
+  ("CADUCEUS_62": valid_slot(queue, alloc, tmp)) ->
+  ("CADUCEUS_61": occupied_slot(q_size, q_tail, q_head, tmp)) ->
+  forall result0:queue_2 pointer.
+  (result0 = shift(queue, tmp)) ->
+  valid(alloc, result0) ->
+  forall result1:int.
+  (result1 = acc(intM_queue_2, result0)) ->
+  (q_tail = q_head) ->
+  ("CADUCEUS_28": ((q_size = 0) or (q_size = 10)))
+
+goal element_impl_po_10:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_57": ((0 <= e) and (e < q_size))) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (10 <> 0) ->
+  forall result:int.
+  (result = ((e + q_head) % 10)) ->
+  forall tmp:int.
+  (tmp = result) ->
+  ("CADUCEUS_62": valid_slot(queue, alloc, tmp)) ->
+  ("CADUCEUS_61": occupied_slot(q_size, q_tail, q_head, tmp)) ->
+  forall result0:queue_2 pointer.
+  (result0 = shift(queue, tmp)) ->
+  valid(alloc, result0) ->
+  forall result1:int.
+  (result1 = acc(intM_queue_2, result0)) ->
+  ((q_size = 0) or (q_size = 10)) ->
+  ("CADUCEUS_28": (q_tail = q_head))
+
+goal element_impl_po_11:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_57": ((0 <= e) and (e < q_size))) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (10 <> 0) ->
+  forall result:int.
+  (result = ((e + q_head) % 10)) ->
+  forall tmp:int.
+  (tmp = result) ->
+  ("CADUCEUS_62": valid_slot(queue, alloc, tmp)) ->
+  ("CADUCEUS_61": occupied_slot(q_size, q_tail, q_head, tmp)) ->
+  forall result0:queue_2 pointer.
+  (result0 = shift(queue, tmp)) ->
+  valid(alloc, result0) ->
+  forall result1:int.
+  (result1 = acc(intM_queue_2, result0)) ->
+  ("CADUCEUS_27":
+  ("CADUCEUS_27": ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))))
+
+goal element_impl_po_12:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_57": ((0 <= e) and (e < q_size))) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (10 <> 0) ->
+  forall result:int.
+  (result = ((e + q_head) % 10)) ->
+  forall tmp:int.
+  (tmp = result) ->
+  ("CADUCEUS_62": valid_slot(queue, alloc, tmp)) ->
+  ("CADUCEUS_61": occupied_slot(q_size, q_tail, q_head, tmp)) ->
+  forall result0:queue_2 pointer.
+  (result0 = shift(queue, tmp)) ->
+  valid(alloc, result0) ->
+  forall result1:int.
+  (result1 = acc(intM_queue_2, result0)) ->
+  ("CADUCEUS_26":
+  ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))
+
+goal empty_impl_po_1:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size = 0) ->
+  (q_size <> 0) ->
+  ("CADUCEUS_40": (1 = 0))
+
+goal empty_impl_po_2:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size = 0) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_40": (1 = Qempty(q)))
+
+goal empty_impl_po_3:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size = 0) ->
+  ("CADUCEUS_31": ("CADUCEUS_31": valid_slot(queue, alloc, q_tail)))
+
+goal empty_impl_po_4:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size = 0) ->
+  ("CADUCEUS_30": ("CADUCEUS_30": valid_slot(queue, alloc, q_head)))
+
+goal empty_impl_po_5:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size = 0) ->
+  ("CADUCEUS_29": (0 <= q_size))
+
+goal empty_impl_po_6:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size = 0) ->
+  ("CADUCEUS_29": (q_size <= 10))
+
+goal empty_impl_po_7:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size = 0) ->
+  (q_tail = q_head) ->
+  ("CADUCEUS_28": ((q_size = 0) or (q_size = 10)))
+
+goal empty_impl_po_8:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size = 0) ->
+  ((q_size = 0) or (q_size = 10)) ->
+  ("CADUCEUS_28": (q_tail = q_head))
+
+goal empty_impl_po_9:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size = 0) ->
+  ("CADUCEUS_27":
+  ("CADUCEUS_27": ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))))
+
+goal empty_impl_po_10:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size = 0) ->
+  ("CADUCEUS_26":
+  ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))
+
+goal empty_impl_po_11:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size <> 0) ->
+  (q_size = 0) ->
+  ("CADUCEUS_40": (0 = 1))
+
+goal empty_impl_po_12:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size <> 0) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_40": (0 = Qempty(q)))
+
+goal empty_impl_po_13:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size <> 0) ->
+  ("CADUCEUS_31": ("CADUCEUS_31": valid_slot(queue, alloc, q_tail)))
+
+goal empty_impl_po_14:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size <> 0) ->
+  ("CADUCEUS_30": ("CADUCEUS_30": valid_slot(queue, alloc, q_head)))
+
+goal empty_impl_po_15:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size <> 0) ->
+  ("CADUCEUS_29": (0 <= q_size))
+
+goal empty_impl_po_16:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size <> 0) ->
+  ("CADUCEUS_29": (q_size <= 10))
+
+goal empty_impl_po_17:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size <> 0) ->
+  (q_tail = q_head) ->
+  ("CADUCEUS_28": ((q_size = 0) or (q_size = 10)))
+
+goal empty_impl_po_18:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size <> 0) ->
+  ((q_size = 0) or (q_size = 10)) ->
+  ("CADUCEUS_28": (q_tail = q_head))
+
+goal empty_impl_po_19:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size <> 0) ->
+  ("CADUCEUS_27":
+  ("CADUCEUS_27": ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))))
+
+goal empty_impl_po_20:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size <> 0) ->
+  ("CADUCEUS_26":
+  ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))
+
+goal enqueue_impl_po_1:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49":
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))))
+
+goal enqueue_impl_po_2:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result)
+
+goal enqueue_impl_po_3:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  (q_size < 10) ->
+  ("CADUCEUS_46": (q_size0 = (q_size + 1)))
+
+goal enqueue_impl_po_4:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  (q_size < 10) ->
+  ("CADUCEUS_46": occupied_slot(q_size0, q_tail1, q_head, q_tail))
+
+goal enqueue_impl_po_5:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  (q_size < 10) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_46": (Qelement(Qenqueue(q, e), Qsize(q)) = acc(intM_queue_2_0,
+  shift(queue, ((Qsize(q) + q_head) % 10)))))
+
+goal enqueue_impl_po_6:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  (q_size < 10) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_46": models(intM_queue_2_0, q_size0, q_head, queue, Qenqueue(q,
+  e)))
+
+goal enqueue_impl_po_7:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  (q_size = 10) ->
+  ("CADUCEUS_46": (1 = 0))
+
+goal enqueue_impl_po_8:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  (q_size = 10) ->
+  ("CADUCEUS_46": (q_size0 = q_size))
+
+goal enqueue_impl_po_9:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  (q_size = 10) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_46": (Qenqueue(q, e) = Qerror))
+
+goal enqueue_impl_po_10:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  ("CADUCEUS_45":
+  ("CADUCEUS_45": not_assigns(alloc, intM_queue_2, intM_queue_2_0,
+  pset_singleton(shift(queue, q_tail)))))
+
+goal enqueue_impl_po_11:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  ("CADUCEUS_31": ("CADUCEUS_31": valid_slot(queue, alloc, q_tail1)))
+
+goal enqueue_impl_po_12:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  ("CADUCEUS_30": ("CADUCEUS_30": valid_slot(queue, alloc, q_head)))
+
+goal enqueue_impl_po_13:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  ("CADUCEUS_29": (0 <= q_size0))
+
+goal enqueue_impl_po_14:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  ("CADUCEUS_29": (q_size0 <= 10))
+
+goal enqueue_impl_po_15:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  (q_tail1 = q_head) ->
+  ("CADUCEUS_28": ((q_size0 = 0) or (q_size0 = 10)))
+
+goal enqueue_impl_po_16:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  ((q_size0 = 0) or (q_size0 = 10)) ->
+  ("CADUCEUS_28": (q_tail1 = q_head))
+
+goal enqueue_impl_po_17:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  ("CADUCEUS_27":
+  ("CADUCEUS_27":
+  ((q_tail1 < q_head) -> (q_size0 = ((10 + q_tail1) - q_head)))))
+
+goal enqueue_impl_po_18:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size < 10) ->
+  ("CADUCEUS_49": (not occupied_slot(q_size, q_tail, q_head, q_tail))) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_tail)) ->
+  valid(alloc, result) ->
+  forall intM_queue_2_0:(int,
+  queue_2) memory.
+  (intM_queue_2_0 = upd(intM_queue_2, result, e)) ->
+  forall q_tail0:int.
+  (q_tail0 = (q_tail + 1)) ->
+  (10 <> 0) ->
+  forall result0:int.
+  (result0 = (q_tail0 % 10)) ->
+  forall q_tail1:int.
+  (q_tail1 = result0) ->
+  forall q_size0:int.
+  (q_size0 = (q_size + 1)) ->
+  ("CADUCEUS_26":
+  ("CADUCEUS_26": ((q_tail1 > q_head) -> (q_size0 = (q_tail1 - q_head)))))
+
+goal enqueue_impl_po_19:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  (q_size < 10) ->
+  ("CADUCEUS_46": (0 = 1))
+
+goal enqueue_impl_po_20:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  (q_size < 10) ->
+  ("CADUCEUS_46": (q_size = (q_size + 1)))
+
+goal enqueue_impl_po_21:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  (q_size < 10) ->
+  ("CADUCEUS_46": occupied_slot(q_size, q_tail, q_head, q_tail))
+
+goal enqueue_impl_po_22:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  (q_size < 10) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_46": (Qelement(Qenqueue(q, e), Qsize(q)) = acc(intM_queue_2,
+  shift(queue, ((Qsize(q) + q_head) % 10)))))
+
+goal enqueue_impl_po_23:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  (q_size < 10) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_46": models(intM_queue_2, q_size, q_head, queue, Qenqueue(q,
+  e)))
+
+goal enqueue_impl_po_24:
+  forall e:int.
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  (q_size = 10) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_46": (Qenqueue(q, e) = Qerror))
+
+goal enqueue_impl_po_25:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  ("CADUCEUS_45":
+  ("CADUCEUS_45": not_assigns(alloc, intM_queue_2, intM_queue_2,
+  pset_singleton(shift(queue, q_tail)))))
+
+goal enqueue_impl_po_26:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  ("CADUCEUS_31": ("CADUCEUS_31": valid_slot(queue, alloc, q_tail)))
+
+goal enqueue_impl_po_27:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  ("CADUCEUS_30": ("CADUCEUS_30": valid_slot(queue, alloc, q_head)))
+
+goal enqueue_impl_po_28:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  ("CADUCEUS_29": (0 <= q_size))
+
+goal enqueue_impl_po_29:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  ("CADUCEUS_29": (q_size <= 10))
+
+goal enqueue_impl_po_30:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  (q_tail = q_head) ->
+  ("CADUCEUS_28": ((q_size = 0) or (q_size = 10)))
+
+goal enqueue_impl_po_31:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  ((q_size = 0) or (q_size = 10)) ->
+  ("CADUCEUS_28": (q_tail = q_head))
+
+goal enqueue_impl_po_32:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  ("CADUCEUS_27":
+  ("CADUCEUS_27": ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))))
+
+goal enqueue_impl_po_33:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_size >= 10) ->
+  ("CADUCEUS_26":
+  ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))
+
+goal head_impl_po_1:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_50": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_54":
+  ("CADUCEUS_54": occupied_slot(q_size, q_tail, q_head, q_head)))
+
+goal head_impl_po_2:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_50": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_54": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result)
+
+goal head_impl_po_3:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_50": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_54": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_52": (Qhead(q) = result0))
+
+goal head_impl_po_4:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_50": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_54": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_52": (Qhead(q) <> Ierror))
+
+goal head_impl_po_5:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_50": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_54": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  ("CADUCEUS_31": ("CADUCEUS_31": valid_slot(queue, alloc, q_tail)))
+
+goal head_impl_po_6:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_50": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_54": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  ("CADUCEUS_30": ("CADUCEUS_30": valid_slot(queue, alloc, q_head)))
+
+goal head_impl_po_7:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_50": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_54": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  ("CADUCEUS_29": (0 <= q_size))
+
+goal head_impl_po_8:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_50": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_54": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  ("CADUCEUS_29": (q_size <= 10))
+
+goal head_impl_po_9:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_50": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_54": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  (q_tail = q_head) ->
+  ("CADUCEUS_28": ((q_size = 0) or (q_size = 10)))
+
+goal head_impl_po_10:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_50": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_54": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  ((q_size = 0) or (q_size = 10)) ->
+  ("CADUCEUS_28": (q_tail = q_head))
+
+goal head_impl_po_11:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_50": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_54": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  ("CADUCEUS_27":
+  ("CADUCEUS_27": ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))))
+
+goal head_impl_po_12:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_50": (q_size > 0)) and
+    (("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+     (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+      (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+       (("CADUCEUS_28":
+        ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+        (("CADUCEUS_27":
+         ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+         ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_54": occupied_slot(q_size, q_tail, q_head, q_head)) ->
+  forall result:queue_2 pointer.
+  (result = shift(queue, q_head)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_queue_2, result)) ->
+  ("CADUCEUS_26":
+  ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))
+
+goal invariants_initially_established_impl_po_1:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  (("CADUCEUS_43":
+   ((forall counter:int.
+      (((0 <= counter) and (counter < 10)) -> (acc(intM_queue_2, shift(queue,
+       counter)) = 0))) and
+    ((q_head = 0) and ((q_tail = 0) and (q_size = 0))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_44": (0 <= q_size))
+
+goal invariants_initially_established_impl_po_2:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  (("CADUCEUS_43":
+   ((forall counter:int.
+      (((0 <= counter) and (counter < 10)) -> (acc(intM_queue_2, shift(queue,
+       counter)) = 0))) and
+    ((q_head = 0) and ((q_tail = 0) and (q_size = 0))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_44": (q_size <= 10))
+
+goal invariants_initially_established_impl_po_3:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  (("CADUCEUS_43":
+   ((forall counter:int.
+      (((0 <= counter) and (counter < 10)) -> (acc(intM_queue_2, shift(queue,
+       counter)) = 0))) and
+    ((q_head = 0) and ((q_tail = 0) and (q_size = 0))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_44": valid_slot(queue, alloc, q_head))
+
+goal invariants_initially_established_impl_po_4:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  (("CADUCEUS_43":
+   ((forall counter:int.
+      (((0 <= counter) and (counter < 10)) -> (acc(intM_queue_2, shift(queue,
+       counter)) = 0))) and
+    ((q_head = 0) and ((q_tail = 0) and (q_size = 0))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_44": valid_slot(queue, alloc, q_tail))
+
+goal invariants_initially_established_impl_po_5:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  (("CADUCEUS_43":
+   ((forall counter:int.
+      (((0 <= counter) and (counter < 10)) -> (acc(intM_queue_2, shift(queue,
+       counter)) = 0))) and
+    ((q_head = 0) and ((q_tail = 0) and (q_size = 0))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_tail > q_head) ->
+  ("CADUCEUS_44": (q_size = (q_tail - q_head)))
+
+goal invariants_initially_established_impl_po_6:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  (("CADUCEUS_43":
+   ((forall counter:int.
+      (((0 <= counter) and (counter < 10)) -> (acc(intM_queue_2, shift(queue,
+       counter)) = 0))) and
+    ((q_head = 0) and ((q_tail = 0) and (q_size = 0))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_tail < q_head) ->
+  ("CADUCEUS_44": (q_size = ((10 + q_tail) - q_head)))
+
+goal invariants_initially_established_impl_po_7:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  (("CADUCEUS_43":
+   ((forall counter:int.
+      (((0 <= counter) and (counter < 10)) -> (acc(intM_queue_2, shift(queue,
+       counter)) = 0))) and
+    ((q_head = 0) and ((q_tail = 0) and (q_size = 0))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_tail = q_head) ->
+  ("CADUCEUS_44": ((q_size = 0) or (q_size = 10)))
+
+goal invariants_initially_established_impl_po_8:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  (("CADUCEUS_43":
+   ((forall counter:int.
+      (((0 <= counter) and (counter < 10)) -> (acc(intM_queue_2, shift(queue,
+       counter)) = 0))) and
+    ((q_head = 0) and ((q_tail = 0) and (q_size = 0))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ((q_size = 0) or (q_size = 10)) ->
+  ("CADUCEUS_44": (q_tail = q_head))
+
+goal maxSize_impl_po_1:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_56": (10 = QmaxSize(q)))
+
+goal maxSize_impl_po_2:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_31": ("CADUCEUS_31": valid_slot(queue, alloc, q_tail)))
+
+goal maxSize_impl_po_3:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_30": ("CADUCEUS_30": valid_slot(queue, alloc, q_head)))
+
+goal maxSize_impl_po_4:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_29": (0 <= q_size))
+
+goal maxSize_impl_po_5:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_29": (q_size <= 10))
+
+goal maxSize_impl_po_6:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_tail = q_head) ->
+  ("CADUCEUS_28": ((q_size = 0) or (q_size = 10)))
+
+goal maxSize_impl_po_7:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ((q_size = 0) or (q_size = 10)) ->
+  ("CADUCEUS_28": (q_tail = q_head))
+
+goal maxSize_impl_po_8:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_27":
+  ("CADUCEUS_27": ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))))
+
+goal maxSize_impl_po_9:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_26":
+  ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))
+
+goal size_impl_po_1:
+  forall alloc:alloc_table.
+  forall intM_queue_2:(int,
+  queue_2) memory.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  forall q:Q.
+  models(intM_queue_2, q_size, q_head, queue, q) ->
+  ("CADUCEUS_42": (q_size = Qsize(q)))
+
+goal size_impl_po_2:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_31": ("CADUCEUS_31": valid_slot(queue, alloc, q_tail)))
+
+goal size_impl_po_3:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_30": ("CADUCEUS_30": valid_slot(queue, alloc, q_head)))
+
+goal size_impl_po_4:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_29": (0 <= q_size))
+
+goal size_impl_po_5:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_29": (q_size <= 10))
+
+goal size_impl_po_6:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  (q_tail = q_head) ->
+  ("CADUCEUS_28": ((q_size = 0) or (q_size = 10)))
+
+goal size_impl_po_7:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ((q_size = 0) or (q_size = 10)) ->
+  ("CADUCEUS_28": (q_tail = q_head))
+
+goal size_impl_po_8:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_27":
+  ("CADUCEUS_27": ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))))
+
+goal size_impl_po_9:
+  forall alloc:alloc_table.
+  forall q_head:int.
+  forall q_size:int.
+  forall q_tail:int.
+  forall queue:queue_2 pointer.
+  ((("CADUCEUS_31": valid_slot(queue, alloc, q_tail)) and
+    (("CADUCEUS_30": valid_slot(queue, alloc, q_head)) and
+     (("CADUCEUS_29": ((0 <= q_size) and (q_size <= 10))) and
+      (("CADUCEUS_28":
+       ((q_tail = q_head) <-> ((q_size = 0) or (q_size = 10)))) and
+       (("CADUCEUS_27":
+        ((q_tail < q_head) -> (q_size = ((10 + q_tail) - q_head)))) and
+        ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head))))))))) and
+   ("CADUCEUS_33": valid_range(alloc, queue, 0, 9))) ->
+  ("CADUCEUS_26":
+  ("CADUCEUS_26": ((q_tail > q_head) -> (q_size = (q_tail - q_head)))))
+

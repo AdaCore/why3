@@ -1,0 +1,220 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+goal sqrt_po_1:
+  forall x:int.
+  (x >= 0) ->
+  ((0 * 0) <= x)
+
+goal sqrt_po_2:
+  forall x:int.
+  (x >= 0) ->
+  (x < ((x + 1) * (x + 1)))
+
+goal sqrt_po_3:
+  forall x:int.
+  (x >= 0) ->
+  (0 < (x + 1))
+
+goal sqrt_po_4:
+  forall x:int.
+  (x >= 0) ->
+  forall inf:int.
+  forall sup:int.
+  (((inf * inf) <= x) and ((x < (sup * sup)) and (inf < sup))) ->
+  ((inf + 1) <> sup) ->
+  (2 <> 0)
+
+goal sqrt_po_5:
+  forall x:int.
+  (x >= 0) ->
+  forall inf:int.
+  forall sup:int.
+  (((inf * inf) <= x) and ((x < (sup * sup)) and (inf < sup))) ->
+  ((inf + 1) <> sup) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (((inf + sup) + 1) / 2)) ->
+  forall mil:int.
+  (mil = result) ->
+  (x < (mil * mil)) ->
+  forall sup0:int.
+  (sup0 = mil) ->
+  (x < (sup0 * sup0))
+
+goal sqrt_po_6:
+  forall x:int.
+  (x >= 0) ->
+  forall inf:int.
+  forall sup:int.
+  (((inf * inf) <= x) and ((x < (sup * sup)) and (inf < sup))) ->
+  ((inf + 1) <> sup) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (((inf + sup) + 1) / 2)) ->
+  forall mil:int.
+  (mil = result) ->
+  (x < (mil * mil)) ->
+  forall sup0:int.
+  (sup0 = mil) ->
+  (inf < sup0)
+
+goal sqrt_po_7:
+  forall x:int.
+  (x >= 0) ->
+  forall inf:int.
+  forall sup:int.
+  (((inf * inf) <= x) and ((x < (sup * sup)) and (inf < sup))) ->
+  ((inf + 1) <> sup) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (((inf + sup) + 1) / 2)) ->
+  forall mil:int.
+  (mil = result) ->
+  (x < (mil * mil)) ->
+  forall sup0:int.
+  (sup0 = mil) ->
+  (0 <= (sup - inf))
+
+goal sqrt_po_8:
+  forall x:int.
+  (x >= 0) ->
+  forall inf:int.
+  forall sup:int.
+  (((inf * inf) <= x) and ((x < (sup * sup)) and (inf < sup))) ->
+  ((inf + 1) <> sup) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (((inf + sup) + 1) / 2)) ->
+  forall mil:int.
+  (mil = result) ->
+  (x < (mil * mil)) ->
+  forall sup0:int.
+  (sup0 = mil) ->
+  ((sup0 - inf) < (sup - inf))
+
+goal sqrt_po_9:
+  forall x:int.
+  (x >= 0) ->
+  forall inf:int.
+  forall sup:int.
+  (((inf * inf) <= x) and ((x < (sup * sup)) and (inf < sup))) ->
+  ((inf + 1) <> sup) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (((inf + sup) + 1) / 2)) ->
+  forall mil:int.
+  (mil = result) ->
+  (x >= (mil * mil)) ->
+  forall inf0:int.
+  (inf0 = mil) ->
+  ((inf0 * inf0) <= x)
+
+goal sqrt_po_10:
+  forall x:int.
+  (x >= 0) ->
+  forall inf:int.
+  forall sup:int.
+  (((inf * inf) <= x) and ((x < (sup * sup)) and (inf < sup))) ->
+  ((inf + 1) <> sup) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (((inf + sup) + 1) / 2)) ->
+  forall mil:int.
+  (mil = result) ->
+  (x >= (mil * mil)) ->
+  forall inf0:int.
+  (inf0 = mil) ->
+  (x < (sup * sup))
+
+goal sqrt_po_11:
+  forall x:int.
+  (x >= 0) ->
+  forall inf:int.
+  forall sup:int.
+  (((inf * inf) <= x) and ((x < (sup * sup)) and (inf < sup))) ->
+  ((inf + 1) <> sup) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (((inf + sup) + 1) / 2)) ->
+  forall mil:int.
+  (mil = result) ->
+  (x >= (mil * mil)) ->
+  forall inf0:int.
+  (inf0 = mil) ->
+  (inf0 < sup)
+
+goal sqrt_po_12:
+  forall x:int.
+  (x >= 0) ->
+  forall inf:int.
+  forall sup:int.
+  (((inf * inf) <= x) and ((x < (sup * sup)) and (inf < sup))) ->
+  ((inf + 1) <> sup) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (((inf + sup) + 1) / 2)) ->
+  forall mil:int.
+  (mil = result) ->
+  (x >= (mil * mil)) ->
+  forall inf0:int.
+  (inf0 = mil) ->
+  (0 <= (sup - inf))
+
+goal sqrt_po_13:
+  forall x:int.
+  (x >= 0) ->
+  forall inf:int.
+  forall sup:int.
+  (((inf * inf) <= x) and ((x < (sup * sup)) and (inf < sup))) ->
+  ((inf + 1) <> sup) ->
+  (2 <> 0) ->
+  forall result:int.
+  (result = (((inf + sup) + 1) / 2)) ->
+  forall mil:int.
+  (mil = result) ->
+  (x >= (mil * mil)) ->
+  forall inf0:int.
+  (inf0 = mil) ->
+  ((sup - inf0) < (sup - inf))
+
+goal sqrt_po_14:
+  forall x:int.
+  (x >= 0) ->
+  forall inf:int.
+  forall sup:int.
+  (((inf * inf) <= x) and ((x < (sup * sup)) and (inf < sup))) ->
+  ((inf + 1) = sup) ->
+  (x < ((inf + 1) * (inf + 1)))
+

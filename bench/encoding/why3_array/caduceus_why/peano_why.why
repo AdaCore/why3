@@ -1,0 +1,335 @@
+theory Why2
+  use Tuple0
+  use int.Int
+  use int.ComputerDivision
+  use real.Real
+  use bool.Bool
+  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic eq_bool Bool.bool Bool.bool
+
+  logic neq_bool Bool.bool Bool.bool
+
+  logic lt_int int int
+
+  logic le_int int int
+
+  logic gt_int int int
+
+  logic ge_int int int
+
+  logic eq_int int int
+
+  logic neq_int int int
+
+  logic add_int int int : int
+
+  logic sub_int int int : int
+
+  logic mul_int int int : int
+
+  logic div_int int int : int
+
+  logic mod_int int int : int
+
+  logic neg_int int : int
+
+  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+
+  goal Add1_po_1:
+    (forall y:int. ((Int.(>=) y 0) -> (Int.(<=) 0 y)))
+
+  goal Add1_po_2:
+    (forall y:int.
+      (forall x:int.
+        ((Int.(>=) y 0) -> (x = (Int.(+) x (Int.(-) y y : int) : int)))))
+
+  goal Add1_po_3:
+    (forall y:int.
+      (forall x:int.
+        ((Int.(>=) y 0) ->
+         (forall x0:int.
+           (forall z:int.
+             (((Int.(<=) 0 z) and
+               (x0 = (Int.(+) x (Int.(-) y z : int) : int))) ->
+              ((Int.(>) z 0) ->
+               (forall x1:int.
+                 ((x1 = (Int.(+) x0 1 : int)) ->
+                  (forall z0:int.
+                    ((z0 = (Int.(-) z 1 : int)) -> (Int.(<=) 0 z0))))))))))))
+
+  goal Add1_po_4:
+    (forall y:int.
+      (forall x:int.
+        ((Int.(>=) y 0) ->
+         (forall x0:int.
+           (forall z:int.
+             (((Int.(<=) 0 z) and
+               (x0 = (Int.(+) x (Int.(-) y z : int) : int))) ->
+              ((Int.(>) z 0) ->
+               (forall x1:int.
+                 ((x1 = (Int.(+) x0 1 : int)) ->
+                  (forall z0:int.
+                    ((z0 = (Int.(-) z 1 : int)) ->
+                     (x1 = (Int.(+) x (Int.(-) y z0 : int) : int)))))))))))))
+
+  goal Add1_po_5:
+    (forall y:int.
+      (forall x:int.
+        ((Int.(>=) y 0) ->
+         (forall x0:int.
+           (forall z:int.
+             (((Int.(<=) 0 z) and
+               (x0 = (Int.(+) x (Int.(-) y z : int) : int))) ->
+              ((Int.(>) z 0) ->
+               (forall x1:int.
+                 ((x1 = (Int.(+) x0 1 : int)) ->
+                  (forall z0:int.
+                    ((z0 = (Int.(-) z 1 : int)) -> (Int.(<) z0 z))))))))))))
+
+  goal Add1_po_6:
+    (forall y:int.
+      (forall x:int.
+        ((Int.(>=) y 0) ->
+         (forall x0:int.
+           (forall z:int.
+             (((Int.(<=) 0 z) and
+               (x0 = (Int.(+) x (Int.(-) y z : int) : int))) ->
+              ((Int.(<=) z 0) -> (x0 = (Int.(+) x y : int)))))))))
+
+  goal U1_po_1:
+    (Int.(>=) 7 0)
+
+  goal U1_po_2:
+    ((Int.(>=) 7 0) ->
+     (forall r:int. ((r = (Int.(+) 3 7 : int)) -> (r = 10))))
+
+  goal Rec_add1_po_1:
+    (forall y:int.
+      (forall x:int.
+        ((Int.(>=) y 0) ->
+         ((Int.(<) 0 y) ->
+          (forall x0:int. ((x0 = (Int.(+) x 1 : int)) -> (Int.(<=) 0 y)))))))
+
+  goal Rec_add1_po_2:
+    (forall y:int.
+      (forall x:int.
+        ((Int.(>=) y 0) ->
+         ((Int.(<) 0 y) ->
+          (forall x0:int.
+            ((x0 = (Int.(+) x 1 : int)) -> (Int.(<) (Int.(-) y 1 : int) y)))))))
+
+  goal Rec_add1_po_3:
+    (forall y:int.
+      (forall x:int.
+        ((Int.(>=) y 0) ->
+         ((Int.(<) 0 y) ->
+          (forall x0:int.
+            ((x0 = (Int.(+) x 1 : int)) ->
+             (((Int.(<=) 0 y) and (Int.(<) (Int.(-) y 1 : int) y)) ->
+              (Int.(>=) (Int.(-) y 1 : int) 0))))))))
+
+  goal Rec_add1_po_4:
+    (forall y:int.
+      (forall x:int.
+        ((Int.(>=) y 0) ->
+         ((Int.(<) 0 y) ->
+          (forall x0:int.
+            ((x0 = (Int.(+) x 1 : int)) ->
+             (((Int.(<=) 0 y) and (Int.(<) (Int.(-) y 1 : int) y)) ->
+              ((Int.(>=) (Int.(-) y 1 : int) 0) ->
+               (forall x1:int.
+                 ((x1 = (Int.(+) x0 (Int.(-) y 1 : int) : int)) ->
+                  (x1 = (Int.(+) x y : int))))))))))))
+
+  goal Rec_add1_po_5:
+    (forall y:int.
+      (forall x:int.
+        ((Int.(>=) y 0) -> ((Int.(>=) 0 y) -> (x = (Int.(+) x y : int))))))
+
+  goal U11_po_1:
+    (Int.(>=) 7 0)
+
+  goal U11_po_2:
+    ((Int.(>=) 7 0) ->
+     (forall r:int. ((r = (Int.(+) 3 7 : int)) -> (r = 10))))
+
+  goal Mult1_po_1:
+    (forall y:int.
+      (forall x:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         (forall x0:int. ((x0 = 0) -> ("I" (Int.(<=) 0 y)))))))
+
+  goal Mult1_po_2:
+    (forall y:int.
+      (forall x:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         (forall x0:int.
+           ((x0 = 0) -> ("I" (x0 = (Int.(*) x (Int.(-) y y : int) : int))))))))
+
+  goal Mult1_po_3:
+    (forall y:int.
+      (forall x:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         (forall x0:int.
+           ((x0 = 0) ->
+            (forall x1:int.
+              (forall z:int.
+                (("I"
+                 ((Int.(<=) 0 z) and
+                  (x1 = (Int.(*) x (Int.(-) y z : int) : int)))) ->
+                 ((Int.(>) z 0) ->
+                  ((Int.(>=) x 0) ->
+                   (forall x2:int.
+                     ((x2 = (Int.(+) x1 x : int)) ->
+                      (forall z0:int.
+                        ((z0 = (Int.(-) z 1 : int)) -> ("I" (Int.(<=) 0 z0))))))))))))))))
+
+  goal Mult1_po_4:
+    (forall y:int.
+      (forall x:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         (forall x0:int.
+           ((x0 = 0) ->
+            (forall x1:int.
+              (forall z:int.
+                (("I"
+                 ((Int.(<=) 0 z) and
+                  (x1 = (Int.(*) x (Int.(-) y z : int) : int)))) ->
+                 ((Int.(>) z 0) ->
+                  ((Int.(>=) x 0) ->
+                   (forall x2:int.
+                     ((x2 = (Int.(+) x1 x : int)) ->
+                      (forall z0:int.
+                        ((z0 = (Int.(-) z 1 : int)) ->
+                         ("I" (x2 = (Int.(*) x (Int.(-) y z0 : int) : int)))))))))))))))))
+
+  goal Mult1_po_5:
+    (forall y:int.
+      (forall x:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         (forall x0:int.
+           ((x0 = 0) ->
+            (forall x1:int.
+              (forall z:int.
+                (("I"
+                 ((Int.(<=) 0 z) and
+                  (x1 = (Int.(*) x (Int.(-) y z : int) : int)))) ->
+                 ((Int.(>) z 0) ->
+                  ((Int.(>=) x 0) ->
+                   (forall x2:int.
+                     ((x2 = (Int.(+) x1 x : int)) ->
+                      (forall z0:int.
+                        ((z0 = (Int.(-) z 1 : int)) -> (Int.(<) z0 z)))))))))))))))
+
+  goal Mult1_po_6:
+    (forall y:int.
+      (forall x:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         (forall x0:int.
+           ((x0 = 0) ->
+            (forall x1:int.
+              (forall z:int.
+                (("I"
+                 ((Int.(<=) 0 z) and
+                  (x1 = (Int.(*) x (Int.(-) y z : int) : int)))) ->
+                 ((Int.(<=) z 0) -> (x1 = (Int.(*) x y : int)))))))))))
+
+  goal U2_po_1:
+    (Int.(>=) 4 0)
+
+  goal U2_po_2:
+    (Int.(>=) 6 0)
+
+  goal U2_po_3:
+    (((Int.(>=) 4 0) and (Int.(>=) 6 0)) ->
+     (forall r:int. ((r = (Int.(*) 4 6 : int)) -> (r = 24))))
+
+  goal Mult2_po_1:
+    (forall x:int.
+      (forall y:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         ((x = 0) -> (0 = (Int.(*) x y : int))))))
+
+  goal Mult2_po_2:
+    (forall x:int.
+      (forall y:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) -> ((x <> 0) -> (Int.(<=) 0 x)))))
+
+  goal Mult2_po_3:
+    (forall x:int.
+      (forall y:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         ((x <> 0) -> (Int.(<) (Int.(-) x 1 : int) x)))))
+
+  goal Mult2_po_4:
+    (forall x:int.
+      (forall y:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         ((x <> 0) ->
+          (((Int.(<=) 0 x) and (Int.(<) (Int.(-) x 1 : int) x)) ->
+           (Int.(>=) (Int.(-) x 1 : int) 0))))))
+
+  goal Mult2_po_5:
+    (forall x:int.
+      (forall y:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         ((x <> 0) ->
+          (((Int.(<=) 0 x) and (Int.(<) (Int.(-) x 1 : int) x)) ->
+           (((Int.(>=) (Int.(-) x 1 : int) 0) and (Int.(>=) y 0)) ->
+            (forall result:int.
+              ((result = (Int.(*) (Int.(-) x 1 : int) y : int)) ->
+               ((Int.(>=) y 0) ->
+                (forall result0:int.
+                  ((result0 = (Int.(+) y result : int)) ->
+                   (result0 = (Int.(*) x y : int)))))))))))))
+
+  goal Mult2_po_6:
+    (forall x:int.
+      (forall y:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         (forall a:int.
+           (forall b:int.
+             ((Int.(>=) a 0) -> ((a = 0) -> (b = (Int.(+) a b : int)))))))))
+
+  goal Mult2_po_7:
+    (forall x:int.
+      (forall y:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         (forall a:int. ((Int.(>=) a 0) -> ((a <> 0) -> (Int.(<=) 0 a)))))))
+
+  goal Mult2_po_8:
+    (forall x:int.
+      (forall y:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         (forall a:int.
+           ((Int.(>=) a 0) -> ((a <> 0) -> (Int.(<) (Int.(-) a 1 : int) a)))))))
+
+  goal Mult2_po_9:
+    (forall x:int.
+      (forall y:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         (forall a:int.
+           ((Int.(>=) a 0) ->
+            ((a <> 0) ->
+             (((Int.(<=) 0 a) and (Int.(<) (Int.(-) a 1 : int) a)) ->
+              (Int.(>=) (Int.(-) a 1 : int) 0))))))))
+
+  goal Mult2_po_10:
+    (forall x:int.
+      (forall y:int.
+        (((Int.(>=) x 0) and (Int.(>=) y 0)) ->
+         (forall a:int.
+           (forall b:int.
+             ((Int.(>=) a 0) ->
+              ((a <> 0) ->
+               (((Int.(<=) 0 a) and (Int.(<) (Int.(-) a 1 : int) a)) ->
+                ((Int.(>=) (Int.(-) a 1 : int) 0) ->
+                 (forall result:int.
+                   ((result = (Int.(+) (Int.(-) a 1 : int) (Int.(+) b 1 : int) : int)) ->
+                    (result = (Int.(+) a b : int)))))))))))))
+
+
+end

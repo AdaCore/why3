@@ -1,0 +1,150 @@
+theory Why2
+  use Tuple0
+  use int.Int
+  use int.ComputerDivision
+  use real.Real
+  use bool.Bool
+  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic eq_bool Bool.bool Bool.bool
+
+  logic neq_bool Bool.bool Bool.bool
+
+  logic lt_int int int
+
+  logic le_int int int
+
+  logic gt_int int int
+
+  logic ge_int int int
+
+  logic eq_int int int
+
+  logic neq_int int int
+
+  logic add_int int int : int
+
+  logic sub_int int int : int
+
+  logic mul_int int int : int
+
+  logic div_int int int : int
+
+  logic mod_int int int : int
+
+  logic neg_int int : int
+
+  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+
+  logic isfib int int
+
+  axiom Isfib_inversion:
+    (forall aux_1:int.
+      (forall aux_2:int [(isfib aux_1 aux_2)].
+        ((isfib aux_1 aux_2) ->
+         (((aux_1 = 0) and (aux_2 = 0)) or
+          (((aux_1 = 1) and (aux_2 = 1)) or
+           (exists n:int.
+             (exists p:int.
+               (exists q:int.
+                 (((Int.(>=) n 0) and
+                   ((isfib n p) and (isfib (Int.(+) n 1 : int) q))) and
+                  ((aux_1 = (Int.(+) n 2 : int)) and
+                   (aux_2 = (Int.(+) p q : int))))))))))))
+
+  axiom Isfib0: (isfib 0 0)
+
+  axiom Isfib1: (isfib 1 1)
+
+  axiom Isfibn:
+    (forall n:int.
+      (forall p:int.
+        (forall q:int.
+          (((Int.(>=) n 0) and
+            ((isfib n p) and (isfib (Int.(+) n 1 : int) q))) ->
+           (isfib (Int.(+) n 2 : int) (Int.(+) p q : int))))))
+
+  goal Fib0:
+    (isfib 0 0)
+
+  goal Fib1:
+    (isfib 1 1)
+
+  goal Fib2:
+    (isfib 2 1)
+
+  goal Fib6:
+    (isfib 6 8)
+
+  goal Neg_fib2:
+    (not (isfib 2 2))
+
+  goal Neg_fib5:
+    (not (isfib 5 6))
+
+  goal Fib_po_1:
+    (false and
+     (forall n:int.
+       (forall aux_10:Bool.bool.
+         (forall aux_11:int.
+           (forall aux_12:int.
+             (forall aux_9:Bool.bool.
+               (forall variant1:int.
+                 ((Int.(>=) n 0) ->
+                  ((variant1 = n) ->
+                   (((true and
+                      ((if aux_9 = Bool.True then (Int.(<=) 0 n) else
+                        (Int.(>) 0 n)) ->
+                       (true and
+                        ((if aux_10 = Bool.True then (Int.(<=) n 1) else
+                          (Int.(>) n 1)) ->
+                         true)))) and
+                     (((if aux_9 = Bool.True then (Int.(<=) 0 n) else
+                        (Int.(>) 0 n)) and
+                       ((if aux_10 = Bool.True then (Int.(<=) n 1) else
+                         (Int.(>) n 1)) and
+                        ((aux_9 = Bool.False) or
+                         ((aux_9 = Bool.True) and (aux_10 = Bool.False))))) ->
+                      ((((Int.(<=) 0 variant1) and
+                         (Int.(<) (Int.(-) n 1 : int) variant1)) and
+                        (Int.(>=) (Int.(-) n 1 : int) 0)) and
+                       (((((Int.(<=) 0 variant1) and
+                           (Int.(<) (Int.(-) n 1 : int) variant1)) and
+                          (Int.(>=) (Int.(-) n 1 : int) 0)) and
+                         (isfib (Int.(-) n 1 : int) aux_11)) ->
+                        ((((Int.(<=) 0 variant1) and
+                           (Int.(<) (Int.(-) n 2 : int) variant1)) and
+                          (Int.(>=) (Int.(-) n 2 : int) 0)) and
+                         (((((Int.(<=) 0 variant1) and
+                             (Int.(<) (Int.(-) n 2 : int) variant1)) and
+                            (Int.(>=) (Int.(-) n 2 : int) 0)) and
+                           (isfib (Int.(-) n 2 : int) aux_12)) ->
+                          true)))))) and
+                    (forall result:int.
+                      (((((if aux_9 = Bool.True then (Int.(<=) 0 n) else
+                           (Int.(>) 0 n)) and
+                          ((if aux_10 = Bool.True then (Int.(<=) n 1) else
+                            (Int.(>) n 1)) and
+                           ((aux_9 = Bool.True) and (aux_10 = Bool.True)))) and
+                         (result = n)) or
+                        (((if aux_9 = Bool.True then (Int.(<=) 0 n) else
+                           (Int.(>) 0 n)) and
+                          ((if aux_10 = Bool.True then (Int.(<=) n 1) else
+                            (Int.(>) n 1)) and
+                           ((aux_9 = Bool.False) or
+                            ((aux_9 = Bool.True) and (aux_10 = Bool.False))))) and
+                         (((((Int.(<=) 0 variant1) and
+                             (Int.(<) (Int.(-) n 1 : int) variant1)) and
+                            (Int.(>=) (Int.(-) n 1 : int) 0)) and
+                           (isfib (Int.(-) n 1 : int) aux_11)) and
+                          (((((Int.(<=) 0 variant1) and
+                              (Int.(<) (Int.(-) n 2 : int) variant1)) and
+                             (Int.(>=) (Int.(-) n 2 : int) 0)) and
+                            (isfib (Int.(-) n 2 : int) aux_12)) and
+                           (result = (Int.(+) aux_11 aux_12 : int)))))) ->
+                       (isfib n result)))))))))))))
+
+
+end

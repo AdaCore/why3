@@ -1,0 +1,2950 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+type 'a farray
+
+logic access : 'a1 farray, int -> 'a1
+
+logic update : 'a1 farray, int, 'a1 -> 'a1 farray
+
+axiom access_update:
+  (forall a:'a1 farray.
+    (forall i:int. (forall v:'a1. (access(update(a, i, v), i) = v))))
+
+axiom access_update_neq:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int.
+        (forall v:'a1.
+          ((i <> j) -> (access(update(a, i, v), j) = access(a, j)))))))
+
+logic array_length : 'a1 farray -> int
+
+predicate sorted_array(t: int farray, i: int, j: int) =
+  (forall k1:int.
+    (forall k2:int.
+      ((((i <= k1) and (k1 <= k2)) and (k2 <= j)) -> (access(t,
+       k1) <= access(t, k2)))))
+
+predicate exchange(a1: 'a1 farray, a2: 'a1 farray, i: int, j: int) =
+  ((array_length(a1) = array_length(a2)) and
+   ((access(a1, i) = access(a2, j)) and
+    ((access(a2, i) = access(a1, j)) and
+     (forall k:int.
+       (((k <> i) and (k <> j)) -> (access(a1, k) = access(a2, k)))))))
+
+logic permut : 'a1 farray, 'a1 farray, int, int -> prop
+
+axiom permut_refl:
+  (forall t:'a1 farray. (forall l:int. (forall u:int. permut(t, t, l, u))))
+
+axiom permut_sym:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall l:int.
+        (forall u:int. (permut(t1, t2, l, u) -> permut(t2, t1, l, u))))))
+
+axiom permut_trans:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall t3:'a1 farray.
+        (forall l:int.
+          (forall u:int.
+            (permut(t1, t2, l, u) ->
+             (permut(t2, t3, l, u) -> permut(t1, t3, l, u))))))))
+
+axiom permut_exchange:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (forall i:int.
+            (forall j:int.
+              (((l <= i) and (i <= u)) ->
+               (((l <= j) and (j <= u)) ->
+                (exchange(a1, a2, i, j) -> permut(a1, a2, l, u))))))))))
+
+axiom exchange_upd:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int. exchange(a, update(update(a, i, access(a, j)), j,
+        access(a, i)), i, j))))
+
+axiom permut_weakening:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l1:int.
+        (forall r1:int.
+          (forall l2:int.
+            (forall r2:int.
+              ((((l1 <= l2) and (l2 <= r2)) and (r2 <= r1)) ->
+               (permut(a1, a2, l2, r2) -> permut(a1, a2, l1, r1)))))))))
+
+axiom permut_eq:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          ((l <= u) ->
+           (permut(a1, a2, l, u) ->
+            (forall i:int.
+              (((i < l) or (u < i)) -> (access(a2, i) = access(a1, i))))))))))
+
+predicate permutation(a1: 'a1 farray, a2: 'a1 farray) = permut(a1, a2, 0,
+  (array_length(a1) - 1))
+
+axiom array_length_update:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall v:'a1. (array_length(update(a, i, v)) = array_length(a)))))
+
+axiom permut_array_length:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (permut(a1, a2, l, u) -> (array_length(a1) = array_length(a2)))))))
+
+logic N : int
+
+logic f : int
+
+axiom f_N_range: ((1 <= f) and (f <= N))
+
+predicate found(A: int farray) =
+  (forall p:int.
+    (forall q:int.
+      (((((1 <= p) and (p <= f)) and (f <= q)) and (q <= N)) ->
+       ((access(A, p) <= access(A, f)) and (access(A, f) <= access(A, q))))))
+
+predicate m_invariant(m: int, A: int farray) =
+  ((m <= f) and
+   (forall p:int.
+     (forall q:int.
+       (((((1 <= p) and (p < m)) and (m <= q)) and (q <= N)) -> (access(A,
+        p) <= access(A, q))))))
+
+predicate n_invariant(n: int, A: int farray) =
+  ((f <= n) and
+   (forall p:int.
+     (forall q:int.
+       (((((1 <= p) and (p <= n)) and (n < q)) and (q <= N)) -> (access(A,
+        p) <= access(A, q))))))
+
+predicate i_invariant(m: int, n: int, i: int, r: int, A: int farray) =
+  ((m <= i) and
+   ((forall p:int. (((1 <= p) and (p < i)) -> (access(A, p) <= r))) and
+    ((i <= n) ->
+     (exists p:int. (((i <= p) and (p <= n)) and (r <= access(A, p)))))))
+
+predicate j_invariant(m: int, n: int, j: int, r: int, A: int farray) =
+  ((j <= n) and
+   ((forall q:int. (((j < q) and (q <= N)) -> (r <= access(A, q)))) and
+    ((m <= j) ->
+     (exists q:int. (((m <= q) and (q <= j)) and (access(A, q) <= r))))))
+
+predicate termination(i: int, j: int, i0: int, j0: int, r: int,
+  A: int farray) =
+  (((i > i0) and (j < j0)) or
+   (((i <= f) and (f <= j)) and (access(A, f) = r)))
+
+goal find_po_1:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  m_invariant(1, A)
+
+goal find_po_2:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  n_invariant(N, A)
+
+goal find_po_3:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  permutation(A, A)
+
+goal find_po_4:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  (1 <= 1)
+
+goal find_po_5:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  (N <= N)
+
+goal find_po_6:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  (0 <= f)
+
+goal find_po_7:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  (f < array_length(A0))
+
+goal find_po_8:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  i_invariant(m, n, m, result, A0)
+
+goal find_po_9:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  j_invariant(m, n, n, result, A0)
+
+goal find_po_10:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  n_invariant(n, A0)
+
+goal find_po_11:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  (0 <= n)
+
+goal find_po_12:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  (m <= (N + 1))
+
+goal find_po_13:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  termination(m, n, m, n, result, A0)
+
+goal find_po_14:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  permutation(A0, A)
+
+goal find_po_15:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  (i <= i)
+
+goal find_po_16:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  (i <= n)
+
+goal find_po_17:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  termination(i, j, m, n, result, A1)
+
+goal find_po_18:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  (0 <= i0)
+
+goal find_po_19:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  (i0 < array_length(A1))
+
+goal find_po_20:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 < result) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  i_invariant(m, n, i1, result, A1)
+
+goal find_po_21:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 < result) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  (i <= i1)
+
+goal find_po_22:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 < result) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  (i1 <= n)
+
+goal find_po_23:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 < result) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  termination(i1, j, m, n, result, A1)
+
+goal find_po_24:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 < result) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  (0 <= ((N + 1) - i0))
+
+goal find_po_25:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 < result) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  (((N + 1) - i1) < ((N + 1) - i0))
+
+goal find_po_26:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  j_invariant(m, n, j, result, A1)
+
+goal find_po_27:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  (j <= j)
+
+goal find_po_28:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  (m <= j)
+
+goal find_po_29:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  termination(i0, j, m, n, result, A1)
+
+goal find_po_30:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  (0 <= j0)
+
+goal find_po_31:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  (j0 < array_length(A1))
+
+goal find_po_32:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result < result1) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  j_invariant(m, n, j1, result, A1)
+
+goal find_po_33:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result < result1) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  (j1 <= j)
+
+goal find_po_34:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result < result1) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  (m <= j1)
+
+goal find_po_35:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result < result1) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  termination(i0, j1, m, n, result, A1)
+
+goal find_po_36:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result < result1) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  (j1 < j0)
+
+goal find_po_37:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  (access(A1, j0) <= result)
+
+goal find_po_38:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  (result <= access(A1, i0))
+
+goal find_po_39:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 <= j0) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result2:int.
+  (result2 = access(A1, i0)) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result3:int.
+  (result3 = access(A1, j0)) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall A2:int farray.
+  (A2 = update(A1, i0, result3)) ->
+  (j0 < array_length(A2))
+
+goal find_po_40:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 <= j0) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result2:int.
+  (result2 = access(A1, i0)) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result3:int.
+  (result3 = access(A1, j0)) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall A2:int farray.
+  (A2 = update(A1, i0, result3)) ->
+  ((0 <= j0) and (j0 < array_length(A2))) ->
+  forall A3:int farray.
+  (A3 = update(A2, j0, result2)) ->
+  exchange(A3, A1, i0, j0)
+
+goal find_po_41:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 <= j0) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result2:int.
+  (result2 = access(A1, i0)) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result3:int.
+  (result3 = access(A1, j0)) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall A2:int farray.
+  (A2 = update(A1, i0, result3)) ->
+  ((0 <= j0) and (j0 < array_length(A2))) ->
+  forall A3:int farray.
+  (A3 = update(A2, j0, result2)) ->
+  exchange(A3, A1, i0, j0) ->
+  (access(A3, i0) <= result)
+
+goal find_po_42:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 <= j0) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result2:int.
+  (result2 = access(A1, i0)) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result3:int.
+  (result3 = access(A1, j0)) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall A2:int farray.
+  (A2 = update(A1, i0, result3)) ->
+  ((0 <= j0) and (j0 < array_length(A2))) ->
+  forall A3:int farray.
+  (A3 = update(A2, j0, result2)) ->
+  exchange(A3, A1, i0, j0) ->
+  (access(A3, i0) <= result) ->
+  (result <= access(A3, j0))
+
+goal find_po_43:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 <= j0) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result2:int.
+  (result2 = access(A1, i0)) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result3:int.
+  (result3 = access(A1, j0)) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall A2:int farray.
+  (A2 = update(A1, i0, result3)) ->
+  ((0 <= j0) and (j0 < array_length(A2))) ->
+  forall A3:int farray.
+  (A3 = update(A2, j0, result2)) ->
+  exchange(A3, A1, i0, j0) ->
+  (access(A3, i0) <= result) ->
+  (result <= access(A3, j0)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  i_invariant(m, n, i1, result, A3)
+
+goal find_po_44:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 <= j0) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result2:int.
+  (result2 = access(A1, i0)) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result3:int.
+  (result3 = access(A1, j0)) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall A2:int farray.
+  (A2 = update(A1, i0, result3)) ->
+  ((0 <= j0) and (j0 < array_length(A2))) ->
+  forall A3:int farray.
+  (A3 = update(A2, j0, result2)) ->
+  exchange(A3, A1, i0, j0) ->
+  (access(A3, i0) <= result) ->
+  (result <= access(A3, j0)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  j_invariant(m, n, j1, result, A3)
+
+goal find_po_45:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 <= j0) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result2:int.
+  (result2 = access(A1, i0)) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result3:int.
+  (result3 = access(A1, j0)) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall A2:int farray.
+  (A2 = update(A1, i0, result3)) ->
+  ((0 <= j0) and (j0 < array_length(A2))) ->
+  forall A3:int farray.
+  (A3 = update(A2, j0, result2)) ->
+  exchange(A3, A1, i0, j0) ->
+  (access(A3, i0) <= result) ->
+  (result <= access(A3, j0)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  m_invariant(m, A3)
+
+goal find_po_46:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 <= j0) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result2:int.
+  (result2 = access(A1, i0)) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result3:int.
+  (result3 = access(A1, j0)) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall A2:int farray.
+  (A2 = update(A1, i0, result3)) ->
+  ((0 <= j0) and (j0 < array_length(A2))) ->
+  forall A3:int farray.
+  (A3 = update(A2, j0, result2)) ->
+  exchange(A3, A1, i0, j0) ->
+  (access(A3, i0) <= result) ->
+  (result <= access(A3, j0)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  n_invariant(n, A3)
+
+goal find_po_47:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 <= j0) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result2:int.
+  (result2 = access(A1, i0)) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result3:int.
+  (result3 = access(A1, j0)) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall A2:int farray.
+  (A2 = update(A1, i0, result3)) ->
+  ((0 <= j0) and (j0 < array_length(A2))) ->
+  forall A3:int farray.
+  (A3 = update(A2, j0, result2)) ->
+  exchange(A3, A1, i0, j0) ->
+  (access(A3, i0) <= result) ->
+  (result <= access(A3, j0)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  (0 <= j1)
+
+goal find_po_48:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 <= j0) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result2:int.
+  (result2 = access(A1, i0)) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result3:int.
+  (result3 = access(A1, j0)) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall A2:int farray.
+  (A2 = update(A1, i0, result3)) ->
+  ((0 <= j0) and (j0 < array_length(A2))) ->
+  forall A3:int farray.
+  (A3 = update(A2, j0, result2)) ->
+  exchange(A3, A1, i0, j0) ->
+  (access(A3, i0) <= result) ->
+  (result <= access(A3, j0)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  (i1 <= (N + 1))
+
+goal find_po_49:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 <= j0) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result2:int.
+  (result2 = access(A1, i0)) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result3:int.
+  (result3 = access(A1, j0)) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall A2:int farray.
+  (A2 = update(A1, i0, result3)) ->
+  ((0 <= j0) and (j0 < array_length(A2))) ->
+  forall A3:int farray.
+  (A3 = update(A2, j0, result2)) ->
+  exchange(A3, A1, i0, j0) ->
+  (access(A3, i0) <= result) ->
+  (result <= access(A3, j0)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  termination(i1, j1, m, n, result, A3)
+
+goal find_po_50:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 <= j0) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result2:int.
+  (result2 = access(A1, i0)) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result3:int.
+  (result3 = access(A1, j0)) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall A2:int farray.
+  (A2 = update(A1, i0, result3)) ->
+  ((0 <= j0) and (j0 < array_length(A2))) ->
+  forall A3:int farray.
+  (A3 = update(A2, j0, result2)) ->
+  exchange(A3, A1, i0, j0) ->
+  (access(A3, i0) <= result) ->
+  (result <= access(A3, j0)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  permutation(A3, A)
+
+goal find_po_51:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 <= j0) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result2:int.
+  (result2 = access(A1, i0)) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result3:int.
+  (result3 = access(A1, j0)) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall A2:int farray.
+  (A2 = update(A1, i0, result3)) ->
+  ((0 <= j0) and (j0 < array_length(A2))) ->
+  forall A3:int farray.
+  (A3 = update(A2, j0, result2)) ->
+  exchange(A3, A1, i0, j0) ->
+  (access(A3, i0) <= result) ->
+  (result <= access(A3, j0)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  (0 <= (((N + 2) + j) - i))
+
+goal find_po_52:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 <= j0) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result2:int.
+  (result2 = access(A1, i0)) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result3:int.
+  (result3 = access(A1, j0)) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall A2:int farray.
+  (A2 = update(A1, i0, result3)) ->
+  ((0 <= j0) and (j0 < array_length(A2))) ->
+  forall A3:int farray.
+  (A3 = update(A2, j0, result2)) ->
+  exchange(A3, A1, i0, j0) ->
+  (access(A3, i0) <= result) ->
+  (result <= access(A3, j0)) ->
+  forall i1:int.
+  (i1 = (i0 + 1)) ->
+  forall j1:int.
+  (j1 = (j0 - 1)) ->
+  ((((N + 2) + j1) - i1) < (((N + 2) + j) - i))
+
+goal find_po_53:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 > j0) ->
+  m_invariant(m, A1)
+
+goal find_po_54:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 > j0) ->
+  n_invariant(n, A1)
+
+goal find_po_55:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 > j0) ->
+  (i0 <= (N + 1))
+
+goal find_po_56:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 > j0) ->
+  termination(i0, j0, m, n, result, A1)
+
+goal find_po_57:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 > j0) ->
+  permutation(A1, A)
+
+goal find_po_58:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 > j0) ->
+  (0 <= (((N + 2) + j) - i))
+
+goal find_po_59:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i <= j) ->
+  forall i0:int.
+  (i_invariant(m, n, i0, result, A1) and
+   ((i <= i0) and ((i0 <= n) and termination(i0, j, m, n, result, A1)))) ->
+  ((0 <= i0) and (i0 < array_length(A1))) ->
+  forall result0:int.
+  (result0 = access(A1, i0)) ->
+  (result0 >= result) ->
+  forall j0:int.
+  (j_invariant(m, n, j0, result, A1) and
+   ((j0 <= j) and ((m <= j0) and termination(i0, j0, m, n, result, A1)))) ->
+  ((0 <= j0) and (j0 < array_length(A1))) ->
+  forall result1:int.
+  (result1 = access(A1, j0)) ->
+  (result >= result1) ->
+  ((access(A1, j0) <= result) and (result <= access(A1, i0))) ->
+  (i0 > j0) ->
+  ((((N + 2) + j0) - i0) < (((N + 2) + j) - i))
+
+goal find_po_60:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  (m < i)
+
+goal find_po_61:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  (j < n)
+
+goal find_po_62:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f <= j) ->
+  forall n0:int.
+  (n0 = j) ->
+  m_invariant(m, A1)
+
+goal find_po_63:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f <= j) ->
+  forall n0:int.
+  (n0 = j) ->
+  n_invariant(n0, A1)
+
+goal find_po_64:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f <= j) ->
+  forall n0:int.
+  (n0 = j) ->
+  permutation(A1, A)
+
+goal find_po_65:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f <= j) ->
+  forall n0:int.
+  (n0 = j) ->
+  (1 <= m)
+
+goal find_po_66:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f <= j) ->
+  forall n0:int.
+  (n0 = j) ->
+  (n0 <= N)
+
+goal find_po_67:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f <= j) ->
+  forall n0:int.
+  (n0 = j) ->
+  (0 <= (n - m))
+
+goal find_po_68:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f <= j) ->
+  forall n0:int.
+  (n0 = j) ->
+  ((n0 - m) < (n - m))
+
+goal find_po_69:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f > j) ->
+  (i <= f) ->
+  forall m0:int.
+  (m0 = i) ->
+  m_invariant(m0, A1)
+
+goal find_po_70:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f > j) ->
+  (i <= f) ->
+  forall m0:int.
+  (m0 = i) ->
+  n_invariant(n, A1)
+
+goal find_po_71:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f > j) ->
+  (i <= f) ->
+  forall m0:int.
+  (m0 = i) ->
+  permutation(A1, A)
+
+goal find_po_72:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f > j) ->
+  (i <= f) ->
+  forall m0:int.
+  (m0 = i) ->
+  (1 <= m0)
+
+goal find_po_73:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f > j) ->
+  (i <= f) ->
+  forall m0:int.
+  (m0 = i) ->
+  (n <= N)
+
+goal find_po_74:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f > j) ->
+  (i <= f) ->
+  forall m0:int.
+  (m0 = i) ->
+  (0 <= (n - m))
+
+goal find_po_75:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f > j) ->
+  (i <= f) ->
+  forall m0:int.
+  (m0 = i) ->
+  ((n - m0) < (n - m))
+
+goal find_po_76:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f > j) ->
+  (i > f) ->
+  forall n0:int.
+  (n0 = f) ->
+  forall m0:int.
+  (m0 = f) ->
+  m_invariant(m0, A1)
+
+goal find_po_77:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f > j) ->
+  (i > f) ->
+  forall n0:int.
+  (n0 = f) ->
+  forall m0:int.
+  (m0 = f) ->
+  n_invariant(n0, A1)
+
+goal find_po_78:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f > j) ->
+  (i > f) ->
+  forall n0:int.
+  (n0 = f) ->
+  forall m0:int.
+  (m0 = f) ->
+  permutation(A1, A)
+
+goal find_po_79:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f > j) ->
+  (i > f) ->
+  forall n0:int.
+  (n0 = f) ->
+  forall m0:int.
+  (m0 = f) ->
+  (1 <= m0)
+
+goal find_po_80:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f > j) ->
+  (i > f) ->
+  forall n0:int.
+  (n0 = f) ->
+  forall m0:int.
+  (m0 = f) ->
+  (n0 <= N)
+
+goal find_po_81:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f > j) ->
+  (i > f) ->
+  forall n0:int.
+  (n0 = f) ->
+  forall m0:int.
+  (m0 = f) ->
+  (0 <= (n - m))
+
+goal find_po_82:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m < n) ->
+  ((0 <= f) and (f < array_length(A0))) ->
+  forall result:int.
+  (result = access(A0, f)) ->
+  forall A1:int farray.
+  forall i:int.
+  forall j:int.
+  (i_invariant(m, n, i, result, A1) and
+   (j_invariant(m, n, j, result, A1) and
+    (m_invariant(m, A1) and
+     (n_invariant(n, A1) and
+      ((0 <= j) and
+       ((i <= (N + 1)) and
+        (termination(i, j, m, n, result, A1) and permutation(A1, A)))))))) ->
+  (i > j) ->
+  ((m < i) and (j < n)) ->
+  (f > j) ->
+  (i > f) ->
+  forall n0:int.
+  (n0 = f) ->
+  forall m0:int.
+  (m0 = f) ->
+  ((n0 - m0) < (n - m))
+
+goal find_po_83:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m >= n) ->
+  found(A0)
+
+goal find_po_84:
+  forall A:int farray.
+  (array_length(A) = (N + 1)) ->
+  forall A0:int farray.
+  forall m:int.
+  forall n:int.
+  (m_invariant(m, A0) and
+   (n_invariant(n, A0) and (permutation(A0, A) and ((1 <= m) and (n <= N))))) ->
+  (m >= n) ->
+  permutation(A0, A)
+

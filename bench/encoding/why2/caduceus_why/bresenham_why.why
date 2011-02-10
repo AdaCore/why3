@@ -1,0 +1,309 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+logic x2 : int
+
+logic y2 : int
+
+axiom first_octant: ((0 <= y2) and (y2 <= x2))
+
+logic abs : int -> int
+
+axiom abs_def:
+  (forall x:int.
+    (((x >= 0) and (abs(x) = x)) or ((x <= 0) and (abs(x) = (-x)))))
+
+predicate best(x: int, y: int) =
+  (forall y':int.
+    (abs(((x2 * y) - (x * y2))) <= abs(((x2 * y') - (x * y2)))))
+
+predicate Invariant(x: int, y: int, e: int) =
+  ((e = (((2 * (x + 1)) * y2) - (((2 * y) + 1) * x2))) and
+   (((2 * (y2 - x2)) <= e) and (e <= (2 * y2))))
+
+axiom invariant_is_ok:
+  (forall x:int.
+    (forall y:int. (forall e:int. (Invariant(x, y, e) -> best(x, y)))))
+
+goal bresenham_po_1:
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 0) ->
+  forall e:int.
+  (e = ((2 * y2) - x2)) ->
+  (0 <= x)
+
+goal bresenham_po_2:
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 0) ->
+  forall e:int.
+  (e = ((2 * y2) - x2)) ->
+  (x <= (x2 + 1))
+
+goal bresenham_po_3:
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 0) ->
+  forall e:int.
+  (e = ((2 * y2) - x2)) ->
+  Invariant(x, y, e)
+
+goal bresenham_po_4:
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 0) ->
+  forall e:int.
+  (e = ((2 * y2) - x2)) ->
+  forall e0:int.
+  forall x0:int.
+  forall y0:int.
+  (((0 <= x0) and (x0 <= (x2 + 1))) and Invariant(x0, y0, e0)) ->
+  (x0 <= x2) ->
+  best(x0, y0)
+
+goal bresenham_po_5:
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 0) ->
+  forall e:int.
+  (e = ((2 * y2) - x2)) ->
+  forall e0:int.
+  forall x0:int.
+  forall y0:int.
+  (((0 <= x0) and (x0 <= (x2 + 1))) and Invariant(x0, y0, e0)) ->
+  (x0 <= x2) ->
+  best(x0, y0) ->
+  (e0 < 0) ->
+  forall e1:int.
+  (e1 = (e0 + (2 * y2))) ->
+  forall x1:int.
+  (x1 = (x0 + 1)) ->
+  (0 <= x1)
+
+goal bresenham_po_6:
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 0) ->
+  forall e:int.
+  (e = ((2 * y2) - x2)) ->
+  forall e0:int.
+  forall x0:int.
+  forall y0:int.
+  (((0 <= x0) and (x0 <= (x2 + 1))) and Invariant(x0, y0, e0)) ->
+  (x0 <= x2) ->
+  best(x0, y0) ->
+  (e0 < 0) ->
+  forall e1:int.
+  (e1 = (e0 + (2 * y2))) ->
+  forall x1:int.
+  (x1 = (x0 + 1)) ->
+  (x1 <= (x2 + 1))
+
+goal bresenham_po_7:
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 0) ->
+  forall e:int.
+  (e = ((2 * y2) - x2)) ->
+  forall e0:int.
+  forall x0:int.
+  forall y0:int.
+  (((0 <= x0) and (x0 <= (x2 + 1))) and Invariant(x0, y0, e0)) ->
+  (x0 <= x2) ->
+  best(x0, y0) ->
+  (e0 < 0) ->
+  forall e1:int.
+  (e1 = (e0 + (2 * y2))) ->
+  forall x1:int.
+  (x1 = (x0 + 1)) ->
+  Invariant(x1, y0, e1)
+
+goal bresenham_po_8:
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 0) ->
+  forall e:int.
+  (e = ((2 * y2) - x2)) ->
+  forall e0:int.
+  forall x0:int.
+  forall y0:int.
+  (((0 <= x0) and (x0 <= (x2 + 1))) and Invariant(x0, y0, e0)) ->
+  (x0 <= x2) ->
+  best(x0, y0) ->
+  (e0 < 0) ->
+  forall e1:int.
+  (e1 = (e0 + (2 * y2))) ->
+  forall x1:int.
+  (x1 = (x0 + 1)) ->
+  (0 <= ((x2 + 1) - x0))
+
+goal bresenham_po_9:
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 0) ->
+  forall e:int.
+  (e = ((2 * y2) - x2)) ->
+  forall e0:int.
+  forall x0:int.
+  forall y0:int.
+  (((0 <= x0) and (x0 <= (x2 + 1))) and Invariant(x0, y0, e0)) ->
+  (x0 <= x2) ->
+  best(x0, y0) ->
+  (e0 < 0) ->
+  forall e1:int.
+  (e1 = (e0 + (2 * y2))) ->
+  forall x1:int.
+  (x1 = (x0 + 1)) ->
+  (((x2 + 1) - x1) < ((x2 + 1) - x0))
+
+goal bresenham_po_10:
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 0) ->
+  forall e:int.
+  (e = ((2 * y2) - x2)) ->
+  forall e0:int.
+  forall x0:int.
+  forall y0:int.
+  (((0 <= x0) and (x0 <= (x2 + 1))) and Invariant(x0, y0, e0)) ->
+  (x0 <= x2) ->
+  best(x0, y0) ->
+  (e0 >= 0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  forall e1:int.
+  (e1 = (e0 + (2 * (y2 - x2)))) ->
+  forall x1:int.
+  (x1 = (x0 + 1)) ->
+  (0 <= x1)
+
+goal bresenham_po_11:
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 0) ->
+  forall e:int.
+  (e = ((2 * y2) - x2)) ->
+  forall e0:int.
+  forall x0:int.
+  forall y0:int.
+  (((0 <= x0) and (x0 <= (x2 + 1))) and Invariant(x0, y0, e0)) ->
+  (x0 <= x2) ->
+  best(x0, y0) ->
+  (e0 >= 0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  forall e1:int.
+  (e1 = (e0 + (2 * (y2 - x2)))) ->
+  forall x1:int.
+  (x1 = (x0 + 1)) ->
+  (x1 <= (x2 + 1))
+
+goal bresenham_po_12:
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 0) ->
+  forall e:int.
+  (e = ((2 * y2) - x2)) ->
+  forall e0:int.
+  forall x0:int.
+  forall y0:int.
+  (((0 <= x0) and (x0 <= (x2 + 1))) and Invariant(x0, y0, e0)) ->
+  (x0 <= x2) ->
+  best(x0, y0) ->
+  (e0 >= 0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  forall e1:int.
+  (e1 = (e0 + (2 * (y2 - x2)))) ->
+  forall x1:int.
+  (x1 = (x0 + 1)) ->
+  Invariant(x1, y1, e1)
+
+goal bresenham_po_13:
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 0) ->
+  forall e:int.
+  (e = ((2 * y2) - x2)) ->
+  forall e0:int.
+  forall x0:int.
+  forall y0:int.
+  (((0 <= x0) and (x0 <= (x2 + 1))) and Invariant(x0, y0, e0)) ->
+  (x0 <= x2) ->
+  best(x0, y0) ->
+  (e0 >= 0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  forall e1:int.
+  (e1 = (e0 + (2 * (y2 - x2)))) ->
+  forall x1:int.
+  (x1 = (x0 + 1)) ->
+  (0 <= ((x2 + 1) - x0))
+
+goal bresenham_po_14:
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 0) ->
+  forall e:int.
+  (e = ((2 * y2) - x2)) ->
+  forall e0:int.
+  forall x0:int.
+  forall y0:int.
+  (((0 <= x0) and (x0 <= (x2 + 1))) and Invariant(x0, y0, e0)) ->
+  (x0 <= x2) ->
+  best(x0, y0) ->
+  (e0 >= 0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  forall e1:int.
+  (e1 = (e0 + (2 * (y2 - x2)))) ->
+  forall x1:int.
+  (x1 = (x0 + 1)) ->
+  (((x2 + 1) - x1) < ((x2 + 1) - x0))
+

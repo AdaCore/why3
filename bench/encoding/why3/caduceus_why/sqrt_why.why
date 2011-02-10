@@ -1,0 +1,362 @@
+theory Why2
+  use Tuple0
+  use int.Int
+  use int.ComputerDivision
+  use real.Real
+  use bool.Bool
+  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic eq_bool Bool.bool Bool.bool
+
+  logic neq_bool Bool.bool Bool.bool
+
+  logic lt_int int int
+
+  logic le_int int int
+
+  logic gt_int int int
+
+  logic ge_int int int
+
+  logic eq_int int int
+
+  logic neq_int int int
+
+  logic add_int int int : int
+
+  logic sub_int int int : int
+
+  logic mul_int int int : int
+
+  logic div_int int int : int
+
+  logic mod_int int int : int
+
+  logic neg_int int : int
+
+  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+
+  goal Sqrt_po_1:
+    (forall x:int.
+      ((Int.(>=) x 0) -> ((x = 0) -> (Int.(<=) (Int.(*) 0 0 : int) x))))
+
+  goal Sqrt_po_2:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x = 0) ->
+        (Int.(<) x (Int.(*) (Int.(+) 0 1 : int) (Int.(+) 0 1 : int) : int)))))
+
+  goal Sqrt_po_3:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) -> ((Int.(<=) x 3) -> (Int.(<=) (Int.(*) 1 1 : int) x)))))
+
+  goal Sqrt_po_4:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(<=) x 3) ->
+         (Int.(<) x (Int.(*) (Int.(+) 1 1 : int) (Int.(+) 1 1 : int) : int))))))
+
+  goal Sqrt_po_5:
+    (forall x:int.
+      ((Int.(>=) x 0) -> ((x <> 0) -> ((Int.(>) x 3) -> (2 <> 0)))))
+
+  goal Sqrt_po_6:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (Int.(>) result 0))))))))
+
+  goal Sqrt_po_7:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (Int.(>) x 0))))))))
+
+  goal Sqrt_po_8:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (result = (ComputerDivision.div (Int.(+) (ComputerDivision.div x x : int) x : int) 2 : int)))))))))
+
+  goal Sqrt_po_9:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (Int.(<) x (Int.(*) (Int.(+) x 1 : int) (Int.(+) x 1 : int) : int)))))))))
+
+  goal Sqrt_po_10:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (Int.(<) x (Int.(*) (Int.(+) result 1 : int) (Int.(+) result 1 : int) : int)))))))))
+
+  goal Sqrt_po_11:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (forall y:int.
+               (forall z:int.
+                 (((Int.(>) z 0) and
+                   ((Int.(>) y 0) and
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                      (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
+                  ((Int.(<) z y) -> (forall y0:int. ((y0 = z) -> (z <> 0))))))))))))))
+
+  goal Sqrt_po_12:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (forall y:int.
+               (forall z:int.
+                 (((Int.(>) z 0) and
+                   ((Int.(>) y 0) and
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                      (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
+                  ((Int.(<) z y) ->
+                   (forall y0:int.
+                     ((y0 = z) ->
+                      ((z <> 0) ->
+                       (forall result0:int.
+                         ((result0 = (ComputerDivision.div x z : int)) ->
+                          ((2 <> 0) ->
+                           (forall result1:int.
+                             ((result1 = (ComputerDivision.div (Int.(+) result0 z : int) 2 : int)) ->
+                              (forall z0:int.
+                                ((z0 = result1) -> (Int.(>) z0 0))))))))))))))))))))))
+
+  goal Sqrt_po_13:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (forall y:int.
+               (forall z:int.
+                 (((Int.(>) z 0) and
+                   ((Int.(>) y 0) and
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                      (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
+                  ((Int.(<) z y) ->
+                   (forall y0:int.
+                     ((y0 = z) ->
+                      ((z <> 0) ->
+                       (forall result0:int.
+                         ((result0 = (ComputerDivision.div x z : int)) ->
+                          ((2 <> 0) ->
+                           (forall result1:int.
+                             ((result1 = (ComputerDivision.div (Int.(+) result0 z : int) 2 : int)) ->
+                              (forall z0:int.
+                                ((z0 = result1) -> (Int.(>) y0 0))))))))))))))))))))))
+
+  goal Sqrt_po_14:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (forall y:int.
+               (forall z:int.
+                 (((Int.(>) z 0) and
+                   ((Int.(>) y 0) and
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                      (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
+                  ((Int.(<) z y) ->
+                   (forall y0:int.
+                     ((y0 = z) ->
+                      ((z <> 0) ->
+                       (forall result0:int.
+                         ((result0 = (ComputerDivision.div x z : int)) ->
+                          ((2 <> 0) ->
+                           (forall result1:int.
+                             ((result1 = (ComputerDivision.div (Int.(+) result0 z : int) 2 : int)) ->
+                              (forall z0:int.
+                                ((z0 = result1) ->
+                                 (z0 = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y0 : int) y0 : int) 2 : int)))))))))))))))))))))))
+
+  goal Sqrt_po_15:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (forall y:int.
+               (forall z:int.
+                 (((Int.(>) z 0) and
+                   ((Int.(>) y 0) and
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                      (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
+                  ((Int.(<) z y) ->
+                   (forall y0:int.
+                     ((y0 = z) ->
+                      ((z <> 0) ->
+                       (forall result0:int.
+                         ((result0 = (ComputerDivision.div x z : int)) ->
+                          ((2 <> 0) ->
+                           (forall result1:int.
+                             ((result1 = (ComputerDivision.div (Int.(+) result0 z : int) 2 : int)) ->
+                              (forall z0:int.
+                                ((z0 = result1) ->
+                                 (Int.(<) x (Int.(*) (Int.(+) y0 1 : int) (Int.(+) y0 1 : int) : int)))))))))))))))))))))))
+
+  goal Sqrt_po_16:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (forall y:int.
+               (forall z:int.
+                 (((Int.(>) z 0) and
+                   ((Int.(>) y 0) and
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                      (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
+                  ((Int.(<) z y) ->
+                   (forall y0:int.
+                     ((y0 = z) ->
+                      ((z <> 0) ->
+                       (forall result0:int.
+                         ((result0 = (ComputerDivision.div x z : int)) ->
+                          ((2 <> 0) ->
+                           (forall result1:int.
+                             ((result1 = (ComputerDivision.div (Int.(+) result0 z : int) 2 : int)) ->
+                              (forall z0:int.
+                                ((z0 = result1) ->
+                                 (Int.(<) x (Int.(*) (Int.(+) z0 1 : int) (Int.(+) z0 1 : int) : int)))))))))))))))))))))))
+
+  goal Sqrt_po_17:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (forall y:int.
+               (forall z:int.
+                 (((Int.(>) z 0) and
+                   ((Int.(>) y 0) and
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                      (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
+                  ((Int.(<) z y) ->
+                   (forall y0:int.
+                     ((y0 = z) ->
+                      ((z <> 0) ->
+                       (forall result0:int.
+                         ((result0 = (ComputerDivision.div x z : int)) ->
+                          ((2 <> 0) ->
+                           (forall result1:int.
+                             ((result1 = (ComputerDivision.div (Int.(+) result0 z : int) 2 : int)) ->
+                              (forall z0:int.
+                                ((z0 = result1) -> (Int.(<=) 0 y))))))))))))))))))))))
+
+  goal Sqrt_po_18:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (forall y:int.
+               (forall z:int.
+                 (((Int.(>) z 0) and
+                   ((Int.(>) y 0) and
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                      (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
+                  ((Int.(<) z y) ->
+                   (forall y0:int.
+                     ((y0 = z) ->
+                      ((z <> 0) ->
+                       (forall result0:int.
+                         ((result0 = (ComputerDivision.div x z : int)) ->
+                          ((2 <> 0) ->
+                           (forall result1:int.
+                             ((result1 = (ComputerDivision.div (Int.(+) result0 z : int) 2 : int)) ->
+                              (forall z0:int.
+                                ((z0 = result1) -> (Int.(<) y0 y))))))))))))))))))))))
+
+  goal Sqrt_po_19:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (forall y:int.
+               (forall z:int.
+                 (((Int.(>) z 0) and
+                   ((Int.(>) y 0) and
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                      (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
+                  ((Int.(>=) z y) -> (Int.(<=) (Int.(*) y y : int) x))))))))))))
+
+  goal Sqrt_po_20:
+    (forall x:int.
+      ((Int.(>=) x 0) ->
+       ((x <> 0) ->
+        ((Int.(>) x 3) ->
+         ((2 <> 0) ->
+          (forall result:int.
+            ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
+             (forall y:int.
+               (forall z:int.
+                 (((Int.(>) z 0) and
+                   ((Int.(>) y 0) and
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                      (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
+                  ((Int.(>=) z y) ->
+                   (Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)))))))))))))
+
+
+end

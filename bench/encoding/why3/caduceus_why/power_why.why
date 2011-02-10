@@ -1,0 +1,311 @@
+theory Why2
+  use Tuple0
+  use int.Int
+  use int.ComputerDivision
+  use real.Real
+  use bool.Bool
+  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic eq_bool Bool.bool Bool.bool
+
+  logic neq_bool Bool.bool Bool.bool
+
+  logic lt_int int int
+
+  logic le_int int int
+
+  logic gt_int int int
+
+  logic ge_int int int
+
+  logic eq_int int int
+
+  logic neq_int int int
+
+  logic add_int int int : int
+
+  logic sub_int int int : int
+
+  logic mul_int int int : int
+
+  logic div_int int int : int
+
+  logic mod_int int int : int
+
+  logic neg_int int : int
+
+  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+
+  logic x  : int
+
+  logic even (x : int) =
+    (x = (Int.(*) 2 (ComputerDivision.div x 2 : int) : int))
+
+  logic odd (x : int) =
+    (x = (Int.(+) (Int.(*) 2 (ComputerDivision.div x 2 : int) : int) 1 : int))
+
+  logic power int int : int
+
+  axiom Power_0: (forall x:int. ((power x 0 : int) = 1))
+
+  axiom Power_even:
+    (forall x:int.
+      (forall n:int.
+        ((Int.(>=) n 0) ->
+         ((power x (Int.(*) 2 n : int) : int) = (power (Int.(*) x x : int) n : int)))))
+
+  axiom Power_odd:
+    (forall x:int.
+      (forall n:int.
+        ((Int.(>=) n 0) ->
+         ((power x (Int.(+) (Int.(*) 2 n : int) 1 : int) : int) = (Int.(*) x (power (Int.(*) x x : int) n : int) : int)))))
+
+  goal Power1_po_1:
+    (forall n:int.
+      ((Int.(>=) n 0) ->
+       (forall m:int.
+         ((m = (x : int)) ->
+          (forall y:int.
+            ((y = 1) ->
+             ((power (x : int) n : int) = (Int.(*) y (power m n : int) : int))))))))
+
+  goal Power1_po_2:
+    (forall n:int.
+      ((Int.(>=) n 0) ->
+       (forall m:int.
+         ((m = (x : int)) ->
+          (forall y:int.
+            ((y = 1) ->
+             (forall m0:int.
+               (forall n0:int.
+                 (forall y0:int.
+                   ((((power (x : int) n : int) = (Int.(*) y0 (power m0 n0 : int) : int)) and
+                     (Int.(>=) n0 0)) ->
+                    ((Int.(>) n0 0) ->
+                     ((odd n0) ->
+                      (forall y1:int.
+                        ((y1 = (Int.(*) y0 m0 : int)) ->
+                         (forall m1:int.
+                           ((m1 = (Int.(*) m0 m0 : int)) -> (2 <> 0)))))))))))))))))
+
+  goal Power1_po_3:
+    (forall n:int.
+      ((Int.(>=) n 0) ->
+       (forall m:int.
+         ((m = (x : int)) ->
+          (forall y:int.
+            ((y = 1) ->
+             (forall m0:int.
+               (forall n0:int.
+                 (forall y0:int.
+                   ((((power (x : int) n : int) = (Int.(*) y0 (power m0 n0 : int) : int)) and
+                     (Int.(>=) n0 0)) ->
+                    ((Int.(>) n0 0) ->
+                     ((odd n0) ->
+                      (forall y1:int.
+                        ((y1 = (Int.(*) y0 m0 : int)) ->
+                         (forall m1:int.
+                           ((m1 = (Int.(*) m0 m0 : int)) ->
+                            ((2 <> 0) ->
+                             (forall result:int.
+                               ((result = (ComputerDivision.div n0 2 : int)) ->
+                                (forall n1:int.
+                                  ((n1 = result) ->
+                                   ((power (x : int) n : int) = (Int.(*) y1 (power m1 n1 : int) : int)))))))))))))))))))))))
+
+  goal Power1_po_4:
+    (forall n:int.
+      ((Int.(>=) n 0) ->
+       (forall m:int.
+         ((m = (x : int)) ->
+          (forall y:int.
+            ((y = 1) ->
+             (forall m0:int.
+               (forall n0:int.
+                 (forall y0:int.
+                   ((((power (x : int) n : int) = (Int.(*) y0 (power m0 n0 : int) : int)) and
+                     (Int.(>=) n0 0)) ->
+                    ((Int.(>) n0 0) ->
+                     ((odd n0) ->
+                      (forall y1:int.
+                        ((y1 = (Int.(*) y0 m0 : int)) ->
+                         (forall m1:int.
+                           ((m1 = (Int.(*) m0 m0 : int)) ->
+                            ((2 <> 0) ->
+                             (forall result:int.
+                               ((result = (ComputerDivision.div n0 2 : int)) ->
+                                (forall n1:int.
+                                  ((n1 = result) -> (Int.(>=) n1 0))))))))))))))))))))))
+
+  goal Power1_po_5:
+    (forall n:int.
+      ((Int.(>=) n 0) ->
+       (forall m:int.
+         ((m = (x : int)) ->
+          (forall y:int.
+            ((y = 1) ->
+             (forall m0:int.
+               (forall n0:int.
+                 (forall y0:int.
+                   ((((power (x : int) n : int) = (Int.(*) y0 (power m0 n0 : int) : int)) and
+                     (Int.(>=) n0 0)) ->
+                    ((Int.(>) n0 0) ->
+                     ((odd n0) ->
+                      (forall y1:int.
+                        ((y1 = (Int.(*) y0 m0 : int)) ->
+                         (forall m1:int.
+                           ((m1 = (Int.(*) m0 m0 : int)) ->
+                            ((2 <> 0) ->
+                             (forall result:int.
+                               ((result = (ComputerDivision.div n0 2 : int)) ->
+                                (forall n1:int.
+                                  ((n1 = result) -> (Int.(<=) 0 n0))))))))))))))))))))))
+
+  goal Power1_po_6:
+    (forall n:int.
+      ((Int.(>=) n 0) ->
+       (forall m:int.
+         ((m = (x : int)) ->
+          (forall y:int.
+            ((y = 1) ->
+             (forall m0:int.
+               (forall n0:int.
+                 (forall y0:int.
+                   ((((power (x : int) n : int) = (Int.(*) y0 (power m0 n0 : int) : int)) and
+                     (Int.(>=) n0 0)) ->
+                    ((Int.(>) n0 0) ->
+                     ((odd n0) ->
+                      (forall y1:int.
+                        ((y1 = (Int.(*) y0 m0 : int)) ->
+                         (forall m1:int.
+                           ((m1 = (Int.(*) m0 m0 : int)) ->
+                            ((2 <> 0) ->
+                             (forall result:int.
+                               ((result = (ComputerDivision.div n0 2 : int)) ->
+                                (forall n1:int.
+                                  ((n1 = result) -> (Int.(<) n1 n0))))))))))))))))))))))
+
+  goal Power1_po_7:
+    (forall n:int.
+      ((Int.(>=) n 0) ->
+       (forall m:int.
+         ((m = (x : int)) ->
+          (forall y:int.
+            ((y = 1) ->
+             (forall m0:int.
+               (forall n0:int.
+                 (forall y0:int.
+                   ((((power (x : int) n : int) = (Int.(*) y0 (power m0 n0 : int) : int)) and
+                     (Int.(>=) n0 0)) ->
+                    ((Int.(>) n0 0) ->
+                     ((even n0) ->
+                      (forall m1:int.
+                        ((m1 = (Int.(*) m0 m0 : int)) -> (2 <> 0)))))))))))))))
+
+  goal Power1_po_8:
+    (forall n:int.
+      ((Int.(>=) n 0) ->
+       (forall m:int.
+         ((m = (x : int)) ->
+          (forall y:int.
+            ((y = 1) ->
+             (forall m0:int.
+               (forall n0:int.
+                 (forall y0:int.
+                   ((((power (x : int) n : int) = (Int.(*) y0 (power m0 n0 : int) : int)) and
+                     (Int.(>=) n0 0)) ->
+                    ((Int.(>) n0 0) ->
+                     ((even n0) ->
+                      (forall m1:int.
+                        ((m1 = (Int.(*) m0 m0 : int)) ->
+                         ((2 <> 0) ->
+                          (forall result:int.
+                            ((result = (ComputerDivision.div n0 2 : int)) ->
+                             (forall n1:int.
+                               ((n1 = result) ->
+                                ((power (x : int) n : int) = (Int.(*) y0 (power m1 n1 : int) : int)))))))))))))))))))))
+
+  goal Power1_po_9:
+    (forall n:int.
+      ((Int.(>=) n 0) ->
+       (forall m:int.
+         ((m = (x : int)) ->
+          (forall y:int.
+            ((y = 1) ->
+             (forall m0:int.
+               (forall n0:int.
+                 (forall y0:int.
+                   ((((power (x : int) n : int) = (Int.(*) y0 (power m0 n0 : int) : int)) and
+                     (Int.(>=) n0 0)) ->
+                    ((Int.(>) n0 0) ->
+                     ((even n0) ->
+                      (forall m1:int.
+                        ((m1 = (Int.(*) m0 m0 : int)) ->
+                         ((2 <> 0) ->
+                          (forall result:int.
+                            ((result = (ComputerDivision.div n0 2 : int)) ->
+                             (forall n1:int.
+                               ((n1 = result) -> (Int.(>=) n1 0))))))))))))))))))))
+
+  goal Power1_po_10:
+    (forall n:int.
+      ((Int.(>=) n 0) ->
+       (forall m:int.
+         ((m = (x : int)) ->
+          (forall y:int.
+            ((y = 1) ->
+             (forall m0:int.
+               (forall n0:int.
+                 (forall y0:int.
+                   ((((power (x : int) n : int) = (Int.(*) y0 (power m0 n0 : int) : int)) and
+                     (Int.(>=) n0 0)) ->
+                    ((Int.(>) n0 0) ->
+                     ((even n0) ->
+                      (forall m1:int.
+                        ((m1 = (Int.(*) m0 m0 : int)) ->
+                         ((2 <> 0) ->
+                          (forall result:int.
+                            ((result = (ComputerDivision.div n0 2 : int)) ->
+                             (forall n1:int.
+                               ((n1 = result) -> (Int.(<=) 0 n0))))))))))))))))))))
+
+  goal Power1_po_11:
+    (forall n:int.
+      ((Int.(>=) n 0) ->
+       (forall m:int.
+         ((m = (x : int)) ->
+          (forall y:int.
+            ((y = 1) ->
+             (forall m0:int.
+               (forall n0:int.
+                 (forall y0:int.
+                   ((((power (x : int) n : int) = (Int.(*) y0 (power m0 n0 : int) : int)) and
+                     (Int.(>=) n0 0)) ->
+                    ((Int.(>) n0 0) ->
+                     ((even n0) ->
+                      (forall m1:int.
+                        ((m1 = (Int.(*) m0 m0 : int)) ->
+                         ((2 <> 0) ->
+                          (forall result:int.
+                            ((result = (ComputerDivision.div n0 2 : int)) ->
+                             (forall n1:int.
+                               ((n1 = result) -> (Int.(<) n1 n0))))))))))))))))))))
+
+  goal Power1_po_12:
+    (forall n:int.
+      ((Int.(>=) n 0) ->
+       (forall m:int.
+         ((m = (x : int)) ->
+          (forall y:int.
+            ((y = 1) ->
+             (forall m0:int.
+               (forall n0:int.
+                 (forall y0:int.
+                   ((((power (x : int) n : int) = (Int.(*) y0 (power m0 n0 : int) : int)) and
+                     (Int.(>=) n0 0)) ->
+                    ((Int.(<=) n0 0) -> (y0 = (power (x : int) n : int)))))))))))))
+
+
+end

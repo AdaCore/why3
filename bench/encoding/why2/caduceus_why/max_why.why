@@ -1,0 +1,703 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+type 'a farray
+
+logic access : 'a1 farray, int -> 'a1
+
+logic update : 'a1 farray, int, 'a1 -> 'a1 farray
+
+axiom access_update:
+  (forall a:'a1 farray.
+    (forall i:int. (forall v:'a1. (access(update(a, i, v), i) = v))))
+
+axiom access_update_neq:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int.
+        (forall v:'a1.
+          ((i <> j) -> (access(update(a, i, v), j) = access(a, j)))))))
+
+logic array_length : 'a1 farray -> int
+
+predicate sorted_array(t: int farray, i: int, j: int) =
+  (forall k1:int.
+    (forall k2:int.
+      ((((i <= k1) and (k1 <= k2)) and (k2 <= j)) -> (access(t,
+       k1) <= access(t, k2)))))
+
+predicate exchange(a1: 'a1 farray, a2: 'a1 farray, i: int, j: int) =
+  ((array_length(a1) = array_length(a2)) and
+   ((access(a1, i) = access(a2, j)) and
+    ((access(a2, i) = access(a1, j)) and
+     (forall k:int.
+       (((k <> i) and (k <> j)) -> (access(a1, k) = access(a2, k)))))))
+
+logic permut : 'a1 farray, 'a1 farray, int, int -> prop
+
+axiom permut_refl:
+  (forall t:'a1 farray. (forall l:int. (forall u:int. permut(t, t, l, u))))
+
+axiom permut_sym:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall l:int.
+        (forall u:int. (permut(t1, t2, l, u) -> permut(t2, t1, l, u))))))
+
+axiom permut_trans:
+  (forall t1:'a1 farray.
+    (forall t2:'a1 farray.
+      (forall t3:'a1 farray.
+        (forall l:int.
+          (forall u:int.
+            (permut(t1, t2, l, u) ->
+             (permut(t2, t3, l, u) -> permut(t1, t3, l, u))))))))
+
+axiom permut_exchange:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (forall i:int.
+            (forall j:int.
+              (((l <= i) and (i <= u)) ->
+               (((l <= j) and (j <= u)) ->
+                (exchange(a1, a2, i, j) -> permut(a1, a2, l, u))))))))))
+
+axiom exchange_upd:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall j:int. exchange(a, update(update(a, i, access(a, j)), j,
+        access(a, i)), i, j))))
+
+axiom permut_weakening:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l1:int.
+        (forall r1:int.
+          (forall l2:int.
+            (forall r2:int.
+              ((((l1 <= l2) and (l2 <= r2)) and (r2 <= r1)) ->
+               (permut(a1, a2, l2, r2) -> permut(a1, a2, l1, r1)))))))))
+
+axiom permut_eq:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          ((l <= u) ->
+           (permut(a1, a2, l, u) ->
+            (forall i:int.
+              (((i < l) or (u < i)) -> (access(a2, i) = access(a1, i))))))))))
+
+predicate permutation(a1: 'a1 farray, a2: 'a1 farray) = permut(a1, a2, 0,
+  (array_length(a1) - 1))
+
+axiom array_length_update:
+  (forall a:'a1 farray.
+    (forall i:int.
+      (forall v:'a1. (array_length(update(a, i, v)) = array_length(a)))))
+
+axiom permut_array_length:
+  (forall a1:'a1 farray.
+    (forall a2:'a1 farray.
+      (forall l:int.
+        (forall u:int.
+          (permut(a1, a2, l, u) -> (array_length(a1) = array_length(a2)))))))
+
+logic l : int
+
+axiom l_pos: (0 < l)
+
+goal pgm_max_end_po_1:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  (0 <= y)
+
+goal pgm_max_end_po_2:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  (y <= l)
+
+goal pgm_max_end_po_3:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  (0 <= x)
+
+goal pgm_max_end_po_4:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  (x < l)
+
+goal pgm_max_end_po_5:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall k:int.
+  ((0 <= k) and (k < y)) ->
+  (access(a, k) <= access(a, x))
+
+goal pgm_max_end_po_6:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  (0 <= y0)
+
+goal pgm_max_end_po_7:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  (y0 < array_length(a))
+
+goal pgm_max_end_po_8:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  (0 <= x0)
+
+goal pgm_max_end_po_9:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  (x0 < array_length(a))
+
+goal pgm_max_end_po_10:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  ((0 <= x0) and (x0 < array_length(a))) ->
+  forall result0:int.
+  (result0 = access(a, x0)) ->
+  (result > result0) ->
+  forall x1:int.
+  (x1 = y0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  (0 <= y1)
+
+goal pgm_max_end_po_11:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  ((0 <= x0) and (x0 < array_length(a))) ->
+  forall result0:int.
+  (result0 = access(a, x0)) ->
+  (result > result0) ->
+  forall x1:int.
+  (x1 = y0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  (y1 <= l)
+
+goal pgm_max_end_po_12:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  ((0 <= x0) and (x0 < array_length(a))) ->
+  forall result0:int.
+  (result0 = access(a, x0)) ->
+  (result > result0) ->
+  forall x1:int.
+  (x1 = y0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  (0 <= x1)
+
+goal pgm_max_end_po_13:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  ((0 <= x0) and (x0 < array_length(a))) ->
+  forall result0:int.
+  (result0 = access(a, x0)) ->
+  (result > result0) ->
+  forall x1:int.
+  (x1 = y0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  (x1 < l)
+
+goal pgm_max_end_po_14:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  ((0 <= x0) and (x0 < array_length(a))) ->
+  forall result0:int.
+  (result0 = access(a, x0)) ->
+  (result > result0) ->
+  forall x1:int.
+  (x1 = y0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  forall k:int.
+  ((0 <= k) and (k < y1)) ->
+  (access(a, k) <= access(a, x1))
+
+goal pgm_max_end_po_15:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  ((0 <= x0) and (x0 < array_length(a))) ->
+  forall result0:int.
+  (result0 = access(a, x0)) ->
+  (result > result0) ->
+  forall x1:int.
+  (x1 = y0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  (0 <= (l - y0))
+
+goal pgm_max_end_po_16:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  ((0 <= x0) and (x0 < array_length(a))) ->
+  forall result0:int.
+  (result0 = access(a, x0)) ->
+  (result > result0) ->
+  forall x1:int.
+  (x1 = y0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  ((l - y1) < (l - y0))
+
+goal pgm_max_end_po_17:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  ((0 <= x0) and (x0 < array_length(a))) ->
+  forall result0:int.
+  (result0 = access(a, x0)) ->
+  (result <= result0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  (0 <= y1)
+
+goal pgm_max_end_po_18:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  ((0 <= x0) and (x0 < array_length(a))) ->
+  forall result0:int.
+  (result0 = access(a, x0)) ->
+  (result <= result0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  (y1 <= l)
+
+goal pgm_max_end_po_19:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  ((0 <= x0) and (x0 < array_length(a))) ->
+  forall result0:int.
+  (result0 = access(a, x0)) ->
+  (result <= result0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  (x0 < l)
+
+goal pgm_max_end_po_20:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  ((0 <= x0) and (x0 < array_length(a))) ->
+  forall result0:int.
+  (result0 = access(a, x0)) ->
+  (result <= result0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  forall k:int.
+  ((0 <= k) and (k < y1)) ->
+  (access(a, k) <= access(a, x0))
+
+goal pgm_max_end_po_21:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  ((0 <= x0) and (x0 < array_length(a))) ->
+  forall result0:int.
+  (result0 = access(a, x0)) ->
+  (result <= result0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  (0 <= (l - y0))
+
+goal pgm_max_end_po_22:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 < l) ->
+  ((0 <= y0) and (y0 < array_length(a))) ->
+  forall result:int.
+  (result = access(a, y0)) ->
+  ((0 <= x0) and (x0 < array_length(a))) ->
+  forall result0:int.
+  (result0 = access(a, x0)) ->
+  (result <= result0) ->
+  forall y1:int.
+  (y1 = (y0 + 1)) ->
+  ((l - y1) < (l - y0))
+
+goal pgm_max_end_po_23:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 >= l) ->
+  (array_length(a) = l) ->
+  forall a0:int farray.
+  ((array_length(a0) = l) and
+   ((access(a0, x0) = access(a, (l - 1))) and
+    ((access(a0, (l - 1)) = access(a, x0)) and
+     (forall k:int.
+       (((0 <= k) and (k < l)) ->
+        ((k <> x0) -> ((k <> (l - 1)) -> (access(a0, k) = access(a, k))))))))) ->
+  forall k:int.
+  ((0 <= k) and (k < (l - 1))) ->
+  (k <> x0) ->
+  (access(a0, k) = access(a, k))
+
+goal pgm_max_end_po_24:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 >= l) ->
+  (array_length(a) = l) ->
+  forall a0:int farray.
+  ((array_length(a0) = l) and
+   ((access(a0, x0) = access(a, (l - 1))) and
+    ((access(a0, (l - 1)) = access(a, x0)) and
+     (forall k:int.
+       (((0 <= k) and (k < l)) ->
+        ((k <> x0) -> ((k <> (l - 1)) -> (access(a0, k) = access(a, k))))))))) ->
+  (access(a0, x0) = access(a, (l - 1)))
+
+goal pgm_max_end_po_25:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 >= l) ->
+  (array_length(a) = l) ->
+  forall a0:int farray.
+  ((array_length(a0) = l) and
+   ((access(a0, x0) = access(a, (l - 1))) and
+    ((access(a0, (l - 1)) = access(a, x0)) and
+     (forall k:int.
+       (((0 <= k) and (k < l)) ->
+        ((k <> x0) -> ((k <> (l - 1)) -> (access(a0, k) = access(a, k))))))))) ->
+  (access(a0, (l - 1)) = access(a, x0))
+
+goal pgm_max_end_po_26:
+  forall a:int farray.
+  (array_length(a) = l) ->
+  forall x:int.
+  (x = 0) ->
+  forall y:int.
+  (y = 1) ->
+  forall x0:int.
+  forall y0:int.
+  (((0 <= y0) and (y0 <= l)) and
+   (((0 <= x0) and (x0 < l)) and
+    (forall k:int.
+      (((0 <= k) and (k < y0)) -> (access(a, k) <= access(a, x0)))))) ->
+  (y0 >= l) ->
+  (array_length(a) = l) ->
+  forall a0:int farray.
+  ((array_length(a0) = l) and
+   ((access(a0, x0) = access(a, (l - 1))) and
+    ((access(a0, (l - 1)) = access(a, x0)) and
+     (forall k:int.
+       (((0 <= k) and (k < l)) ->
+        ((k <> x0) -> ((k <> (l - 1)) -> (access(a0, k) = access(a, k))))))))) ->
+  forall k:int.
+  ((0 <= k) and (k < (l - 1))) ->
+  (access(a0, k) <= access(a0, (l - 1)))
+

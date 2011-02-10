@@ -1,0 +1,124 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+logic isfib : int, int -> prop
+
+axiom isfib_inversion:
+  (forall aux_1:int.
+    (forall aux_2:int [isfib(aux_1, aux_2)].
+      (isfib(aux_1, aux_2) ->
+       (((aux_1 = 0) and (aux_2 = 0)) or
+        (((aux_1 = 1) and (aux_2 = 1)) or
+         (exists n:int.
+           (exists p:int.
+             (exists q:int.
+               (((n >= 0) and (isfib(n, p) and isfib((n + 1), q))) and
+                ((aux_1 = (n + 2)) and (aux_2 = (p + q))))))))))))
+
+axiom isfib0: isfib(0, 0)
+
+axiom isfib1: isfib(1, 1)
+
+axiom isfibn:
+  (forall n:int.
+    (forall p:int.
+      (forall q:int.
+        (((n >= 0) and (isfib(n, p) and isfib((n + 1), q))) -> isfib((n + 2),
+         (p + q))))))
+
+goal fib0:
+  isfib(0, 0)
+
+goal fib1:
+  isfib(1, 1)
+
+goal fib2:
+  isfib(2, 1)
+
+goal fib6:
+  isfib(6, 8)
+
+goal neg_fib2:
+  (not isfib(2, 2))
+
+goal neg_fib5:
+  (not isfib(5, 6))
+
+goal fib_po_1:
+  (false (* was well_founded(...) *) and
+   (forall n:int.
+     (forall aux_10:bool.
+       (forall aux_11:int.
+         (forall aux_12:int.
+           (forall aux_9:bool.
+             (forall variant1:int.
+               ((n >= 0) ->
+                ((variant1 = n) ->
+                 (((true and
+                    ((if aux_9 then (0 <= n) else (0 > n)) ->
+                     (true and
+                      ((if aux_10 then (n <= 1) else (n > 1)) -> true)))) and
+                   (((if aux_9 then (0 <= n) else (0 > n)) and
+                     ((if aux_10 then (n <= 1) else (n > 1)) and
+                      ((aux_9 = false) or
+                       ((aux_9 = true) and (aux_10 = false))))) ->
+                    ((((0 <= variant1) and ((n - 1) < variant1)) and
+                      ((n - 1) >= 0)) and
+                     (((((0 <= variant1) and ((n - 1) < variant1)) and
+                        ((n - 1) >= 0)) and
+                       isfib((n - 1), aux_11)) ->
+                      ((((0 <= variant1) and ((n - 2) < variant1)) and
+                        ((n - 2) >= 0)) and
+                       (((((0 <= variant1) and ((n - 2) < variant1)) and
+                          ((n - 2) >= 0)) and
+                         isfib((n - 2), aux_12)) ->
+                        true)))))) and
+                  (forall result:int.
+                    (((((if aux_9 then (0 <= n) else (0 > n)) and
+                        ((if aux_10 then (n <= 1) else (n > 1)) and
+                         ((aux_9 = true) and (aux_10 = true)))) and
+                       (result = n)) or
+                      (((if aux_9 then (0 <= n) else (0 > n)) and
+                        ((if aux_10 then (n <= 1) else (n > 1)) and
+                         ((aux_9 = false) or
+                          ((aux_9 = true) and (aux_10 = false))))) and
+                       (((((0 <= variant1) and ((n - 1) < variant1)) and
+                          ((n - 1) >= 0)) and
+                         isfib((n - 1), aux_11)) and
+                        (((((0 <= variant1) and ((n - 2) < variant1)) and
+                           ((n - 2) >= 0)) and
+                          isfib((n - 2), aux_12)) and
+                         (result = (aux_11 + aux_12)))))) ->
+                     isfib(n, result)))))))))))))
+

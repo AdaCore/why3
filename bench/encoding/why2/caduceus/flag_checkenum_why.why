@@ -1,0 +1,2384 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+logic bw_compl : int -> int
+
+logic bw_and : int, int -> int
+
+logic bw_xor : int, int -> int
+
+logic bw_or : int, int -> int
+
+logic lsl : int, int -> int
+
+logic lsr : int, int -> int
+
+type 'z pointer
+
+type 'z addr
+
+type alloc_table
+
+logic block_length : alloc_table, 'a1 pointer -> int
+
+logic base_addr : 'a1 pointer -> 'a1 addr
+
+logic offset : 'a1 pointer -> int
+
+logic shift : 'a1 pointer, int -> 'a1 pointer
+
+logic sub_pointer : 'a1 pointer, 'a1 pointer -> int
+
+predicate lt_pointer(p1: 'a1 pointer, p2: 'a1 pointer) =
+  ((base_addr(p1) = base_addr(p2)) and (offset(p1) < offset(p2)))
+
+predicate le_pointer(p1: 'a1 pointer, p2: 'a1 pointer) =
+  ((base_addr(p1) = base_addr(p2)) and (offset(p1) <= offset(p2)))
+
+predicate gt_pointer(p1: 'a1 pointer, p2: 'a1 pointer) =
+  ((base_addr(p1) = base_addr(p2)) and (offset(p1) > offset(p2)))
+
+predicate ge_pointer(p1: 'a1 pointer, p2: 'a1 pointer) =
+  ((base_addr(p1) = base_addr(p2)) and (offset(p1) >= offset(p2)))
+
+predicate valid(a: alloc_table, p: 'a1 pointer) =
+  ((0 <= offset(p)) and (offset(p) < block_length(a, p)))
+
+predicate valid_index(a: alloc_table, p: 'a1 pointer, i: int) =
+  ((0 <= (offset(p) + i)) and ((offset(p) + i) < block_length(a, p)))
+
+predicate valid_range(a: alloc_table, p: 'a1 pointer, i: int, j: int) =
+  ((0 <= (offset(p) + i)) and ((offset(p) + j) < block_length(a, p)))
+
+axiom offset_shift:
+  (forall p:'a1 pointer.
+    (forall i:int [offset(shift(p, i))]. (offset(shift(p,
+      i)) = (offset(p) + i))))
+
+axiom shift_zero: (forall p:'a1 pointer [shift(p, 0)]. (shift(p, 0) = p))
+
+axiom shift_shift:
+  (forall p:'a1 pointer.
+    (forall i:int.
+      (forall j:int [shift(shift(p, i), j)]. (shift(shift(p, i),
+        j) = shift(p, (i + j))))))
+
+axiom base_addr_shift:
+  (forall p:'a1 pointer.
+    (forall i:int [base_addr(shift(p, i))]. (base_addr(shift(p,
+      i)) = base_addr(p))))
+
+axiom block_length_shift:
+  (forall a:alloc_table.
+    (forall p:'a1 pointer.
+      (forall i:int [block_length(a, shift(p, i))]. (block_length(a, shift(p,
+        i)) = block_length(a, p)))))
+
+axiom base_addr_block_length:
+  (forall a:alloc_table.
+    (forall p1:'a1 pointer.
+      (forall p2:'a1 pointer.
+        ((base_addr(p1) = base_addr(p2)) -> (block_length(a,
+         p1) = block_length(a, p2))))))
+
+axiom pointer_pair_1:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer.
+      (((base_addr(p1) = base_addr(p2)) and (offset(p1) = offset(p2))) ->
+       (p1 = p2))))
+
+axiom pointer_pair_2:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer.
+      ((p1 = p2) ->
+       ((base_addr(p1) = base_addr(p2)) and (offset(p1) = offset(p2))))))
+
+axiom neq_base_addr_neq_shift:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer.
+      (forall i:int.
+        (forall j:int.
+          ((base_addr(p1) <> base_addr(p2)) -> (shift(p1, i) <> shift(p2, j)))))))
+
+axiom neq_offset_neq_shift:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer.
+      (forall i:int.
+        (forall j:int.
+          (((offset(p1) + i) <> (offset(p2) + j)) -> (shift(p1,
+           i) <> shift(p2, j)))))))
+
+axiom eq_offset_eq_shift:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer.
+      (forall i:int.
+        (forall j:int.
+          ((base_addr(p1) = base_addr(p2)) ->
+           (((offset(p1) + i) = (offset(p2) + j)) -> (shift(p1,
+            i) = shift(p2, j))))))))
+
+axiom valid_index_valid_shift:
+  (forall a:alloc_table.
+    (forall p:'a1 pointer.
+      (forall i:int. (valid_index(a, p, i) -> valid(a, shift(p, i))))))
+
+axiom valid_range_valid_shift:
+  (forall a:alloc_table.
+    (forall p:'a1 pointer.
+      (forall i:int.
+        (forall j:int.
+          (forall k:int.
+            (valid_range(a, p, i, j) ->
+             (((i <= k) and (k <= j)) -> valid(a, shift(p, k)))))))))
+
+axiom valid_range_valid:
+  (forall a:alloc_table.
+    (forall p:'a1 pointer.
+      (forall i:int.
+        (forall j:int.
+          (valid_range(a, p, i, j) ->
+           (((i <= 0) and (0 <= j)) -> valid(a, p)))))))
+
+axiom valid_range_valid_index:
+  (forall a:alloc_table.
+    (forall p:'a1 pointer.
+      (forall i:int.
+        (forall j:int.
+          (forall k:int.
+            (valid_range(a, p, i, j) ->
+             (((i <= k) and (k <= j)) -> valid_index(a, p, k))))))))
+
+axiom sub_pointer_def:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer.
+      ((base_addr(p1) = base_addr(p2)) -> (sub_pointer(p1,
+       p2) = (offset(p1) - offset(p2))))))
+
+type ('a, 'z) memory
+
+logic acc : ('a1, 'a2) memory, 'a2 pointer -> 'a1
+
+logic upd : ('a1, 'a2) memory, 'a2 pointer, 'a1 -> ('a1, 'a2) memory
+
+axiom acc_upd:
+  (forall m:('a1, 'a2) memory.
+    (forall p:'a2 pointer.
+      (forall a:'a1 [acc(upd(m, p, a), p)]. (acc(upd(m, p, a), p) = a))))
+
+axiom acc_upd_neq:
+  (forall m:('a1, 'a2) memory.
+    (forall p1:'a2 pointer.
+      (forall p2:'a2 pointer.
+        (forall a:'a1 [acc(upd(m, p1, a), p2)].
+          ((p1 <> p2) -> (acc(upd(m, p1, a), p2) = acc(m, p2)))))))
+
+axiom false_not_true: (false <> true)
+
+type 'z pset
+
+logic pset_empty : 'a1 pset
+
+logic pset_singleton : 'a1 pointer -> 'a1 pset
+
+logic pset_star : 'a2 pset, ('a1 pointer, 'a2) memory -> 'a1 pset
+
+logic pset_all : 'a1 pset -> 'a1 pset
+
+logic pset_range : 'a1 pset, int, int -> 'a1 pset
+
+logic pset_range_left : 'a1 pset, int -> 'a1 pset
+
+logic pset_range_right : 'a1 pset, int -> 'a1 pset
+
+logic pset_acc_all : 'a2 pset, ('a1 pointer, 'a2) memory -> 'a1 pset
+
+logic pset_acc_range : 'a2 pset, ('a1 pointer, 'a2) memory, int,
+int -> 'a1 pset
+
+logic pset_acc_range_left : 'a2 pset, ('a1 pointer, 'a2) memory,
+int -> 'a1 pset
+
+logic pset_acc_range_right : 'a2 pset, ('a1 pointer, 'a2) memory,
+int -> 'a1 pset
+
+logic pset_union : 'a1 pset, 'a1 pset -> 'a1 pset
+
+logic not_in_pset : 'a1 pointer, 'a1 pset -> prop
+
+predicate not_assigns(a: alloc_table, m1: ('a1, 'a2) memory, m2: ('a1,
+  'a2) memory, l: 'a2 pset) =
+  (forall p:'a2 pointer.
+    (valid(a, p) -> (not_in_pset(p, l) -> (acc(m2, p) = acc(m1, p)))))
+
+axiom pset_empty_intro: (forall p:'a1 pointer. not_in_pset(p, pset_empty))
+
+axiom pset_singleton_intro:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer [not_in_pset(p1, pset_singleton(p2))].
+      ((p1 <> p2) -> not_in_pset(p1, pset_singleton(p2)))))
+
+axiom pset_singleton_elim:
+  (forall p1:'a1 pointer.
+    (forall p2:'a1 pointer [not_in_pset(p1, pset_singleton(p2))].
+      (not_in_pset(p1, pset_singleton(p2)) -> (p1 <> p2))))
+
+axiom not_not_in_singleton:
+  (forall p:'a1 pointer. (not not_in_pset(p, pset_singleton(p))))
+
+axiom pset_union_intro:
+  (forall l1:'a1 pset.
+    (forall l2:'a1 pset.
+      (forall p:'a1 pointer [not_in_pset(p, pset_union(l1, l2))].
+        ((not_in_pset(p, l1) and not_in_pset(p, l2)) -> not_in_pset(p,
+         pset_union(l1, l2))))))
+
+axiom pset_union_elim1:
+  (forall l1:'a1 pset.
+    (forall l2:'a1 pset.
+      (forall p:'a1 pointer [not_in_pset(p, pset_union(l1, l2))].
+        (not_in_pset(p, pset_union(l1, l2)) -> not_in_pset(p, l1)))))
+
+axiom pset_union_elim2:
+  (forall l1:'a1 pset.
+    (forall l2:'a1 pset.
+      (forall p:'a1 pointer [not_in_pset(p, pset_union(l1, l2))].
+        (not_in_pset(p, pset_union(l1, l2)) -> not_in_pset(p, l2)))))
+
+axiom pset_star_intro:
+  (forall l:'a1 pset.
+    (forall m:('a2 pointer, 'a1) memory.
+      (forall p:'a2 pointer [not_in_pset(p, pset_star(l, m))].
+        ((forall p1:'a1 pointer. ((p = acc(m, p1)) -> not_in_pset(p1, l))) ->
+         not_in_pset(p, pset_star(l, m))))))
+
+axiom pset_star_elim:
+  (forall l:'a1 pset.
+    (forall m:('a2 pointer, 'a1) memory.
+      (forall p:'a2 pointer [not_in_pset(p, pset_star(l, m))].
+        (not_in_pset(p, pset_star(l, m)) ->
+         (forall p1:'a1 pointer. ((p = acc(m, p1)) -> not_in_pset(p1, l)))))))
+
+axiom pset_all_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset [not_in_pset(p, pset_all(l))].
+      ((forall p1:'a1 pointer.
+         ((not not_in_pset(p1, l)) -> (base_addr(p) <> base_addr(p1)))) ->
+       not_in_pset(p, pset_all(l)))))
+
+axiom pset_all_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset [not_in_pset(p, pset_all(l))].
+      (not_in_pset(p, pset_all(l)) ->
+       (forall p1:'a1 pointer.
+         ((not not_in_pset(p1, l)) -> (base_addr(p) <> base_addr(p1)))))))
+
+axiom pset_range_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset.
+      (forall a:int.
+        (forall b:int [not_in_pset(p, pset_range(l, a, b))].
+          ((forall p1:'a1 pointer.
+             (not_in_pset(p1, l) or
+              (forall i:int.
+                (((a <= i) and (i <= b)) -> (p <> shift(p1, i)))))) ->
+           not_in_pset(p, pset_range(l, a, b)))))))
+
+axiom pset_range_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset.
+      (forall a:int.
+        (forall b:int [not_in_pset(p, pset_range(l, a, b))].
+          (not_in_pset(p, pset_range(l, a, b)) ->
+           (forall p1:'a1 pointer.
+             ((not not_in_pset(p1, l)) ->
+              (forall i:int.
+                (((a <= i) and (i <= b)) -> (shift(p1, i) <> p))))))))))
+
+axiom pset_range_left_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset.
+      (forall a:int [not_in_pset(p, pset_range_left(l, a))].
+        ((forall p1:'a1 pointer.
+           (not_in_pset(p1, l) or
+            (forall i:int. ((i <= a) -> (p <> shift(p1, i)))))) ->
+         not_in_pset(p, pset_range_left(l, a))))))
+
+axiom pset_range_left_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset.
+      (forall a:int [not_in_pset(p, pset_range_left(l, a))].
+        (not_in_pset(p, pset_range_left(l, a)) ->
+         (forall p1:'a1 pointer.
+           ((not not_in_pset(p1, l)) ->
+            (forall i:int. ((i <= a) -> (shift(p1, i) <> p)))))))))
+
+axiom pset_range_right_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset.
+      (forall a:int [not_in_pset(p, pset_range_right(l, a))].
+        ((forall p1:'a1 pointer.
+           (not_in_pset(p1, l) or
+            (forall i:int. ((a <= i) -> (p <> shift(p1, i)))))) ->
+         not_in_pset(p, pset_range_right(l, a))))))
+
+axiom pset_range_right_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a1 pset.
+      (forall a:int [not_in_pset(p, pset_range_right(l, a))].
+        (not_in_pset(p, pset_range_right(l, a)) ->
+         (forall p1:'a1 pointer.
+           ((not not_in_pset(p1, l)) ->
+            (forall i:int. ((a <= i) -> (shift(p1, i) <> p)))))))))
+
+axiom pset_acc_all_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory [not_in_pset(p, pset_acc_all(l,
+        m))].
+        ((forall p1:'a2 pointer.
+           ((not not_in_pset(p1, l)) ->
+            (forall i:int. (p <> acc(m, shift(p1, i)))))) ->
+         not_in_pset(p, pset_acc_all(l, m))))))
+
+axiom pset_acc_all_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory [not_in_pset(p, pset_acc_all(l,
+        m))].
+        (not_in_pset(p, pset_acc_all(l, m)) ->
+         (forall p1:'a2 pointer.
+           ((not not_in_pset(p1, l)) ->
+            (forall i:int. (acc(m, shift(p1, i)) <> p))))))))
+
+axiom pset_acc_range_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory.
+        (forall a:int.
+          (forall b:int [not_in_pset(p, pset_acc_range(l, m, a, b))].
+            ((forall p1:'a2 pointer.
+               ((not not_in_pset(p1, l)) ->
+                (forall i:int.
+                  (((a <= i) and (i <= b)) -> (p <> acc(m, shift(p1, i))))))) ->
+             not_in_pset(p, pset_acc_range(l, m, a, b))))))))
+
+axiom pset_acc_range_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory.
+        (forall a:int.
+          (forall b:int.
+            (not_in_pset(p, pset_acc_range(l, m, a, b)) ->
+             (forall p1:'a2 pointer.
+               ((not not_in_pset(p1, l)) ->
+                (forall i:int.
+                  (((a <= i) and (i <= b)) -> (acc(m, shift(p1, i)) <> p)))))))))))
+
+axiom pset_acc_range_left_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory.
+        (forall a:int [not_in_pset(p, pset_acc_range_left(l, m, a))].
+          ((forall p1:'a2 pointer.
+             ((not not_in_pset(p1, l)) ->
+              (forall i:int. ((i <= a) -> (p <> acc(m, shift(p1, i))))))) ->
+           not_in_pset(p, pset_acc_range_left(l, m, a)))))))
+
+axiom pset_acc_range_left_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory.
+        (forall a:int [not_in_pset(p, pset_acc_range_left(l, m, a))].
+          (not_in_pset(p, pset_acc_range_left(l, m, a)) ->
+           (forall p1:'a2 pointer.
+             ((not not_in_pset(p1, l)) ->
+              (forall i:int. ((i <= a) -> (acc(m, shift(p1, i)) <> p))))))))))
+
+axiom pset_acc_range_right_intro:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory.
+        (forall a:int [not_in_pset(p, pset_acc_range_right(l, m, a))].
+          ((forall p1:'a2 pointer.
+             ((not not_in_pset(p1, l)) ->
+              (forall i:int. ((a <= i) -> (p <> acc(m, shift(p1, i))))))) ->
+           not_in_pset(p, pset_acc_range_right(l, m, a)))))))
+
+axiom pset_acc_range_right_elim:
+  (forall p:'a1 pointer.
+    (forall l:'a2 pset.
+      (forall m:('a1 pointer, 'a2) memory.
+        (forall a:int [not_in_pset(p, pset_acc_range_right(l, m, a))].
+          (not_in_pset(p, pset_acc_range_right(l, m, a)) ->
+           (forall p1:'a2 pointer.
+             ((not not_in_pset(p1, l)) ->
+              (forall i:int. ((a <= i) -> (acc(m, shift(p1, i)) <> p))))))))))
+
+axiom not_assigns_trans:
+  (forall a:alloc_table.
+    (forall l:'a1 pset.
+      (forall m1:('a2, 'a1) memory.
+        (forall m2:('a2, 'a1) memory.
+          (forall m3:('a2, 'a1) memory.
+            (not_assigns(a, m1, m2, l) ->
+             (not_assigns(a, m2, m3, l) -> not_assigns(a, m1, m3, l))))))))
+
+axiom not_assigns_refl:
+  (forall a:alloc_table.
+    (forall l:'a1 pset.
+      (forall m:('a2, 'a1) memory. not_assigns(a, m, m, l))))
+
+predicate valid_acc(m1: ('a1 pointer, 'a2) memory) =
+  (forall p:'a2 pointer.
+    (forall a:alloc_table. (valid(a, p) -> valid(a, acc(m1, p)))))
+
+predicate valid_acc_range(m1: ('a1 pointer, 'a2) memory, size: int) =
+  (forall p:'a2 pointer.
+    (forall a:alloc_table.
+      (valid(a, p) -> valid_range(a, acc(m1, p), 0, (size - 1)))))
+
+axiom valid_acc_range_valid:
+  (forall m1:('a1 pointer, 'a2) memory.
+    (forall size:int.
+      (forall p:'a2 pointer.
+        (forall a:alloc_table.
+          (valid_acc_range(m1, size) -> (valid(a, p) -> valid(a, acc(m1, p))))))))
+
+predicate separation1(m1: ('a1 pointer, 'a2) memory, m2: ('a1 pointer,
+  'a2) memory) =
+  (forall p:'a2 pointer.
+    (forall a:alloc_table.
+      (valid(a, p) -> (base_addr(acc(m1, p)) <> base_addr(acc(m2, p))))))
+
+predicate separation1_range1(m1: ('a1 pointer, 'a2) memory, m2: ('a1 pointer,
+  'a2) memory, size: int) =
+  (forall p:'a2 pointer.
+    (forall a:alloc_table.
+      (valid(a, p) ->
+       (forall i1:int.
+         (forall i2:int.
+           (((0 <= i1) and (i1 < size)) ->
+            (((0 <= i2) and (i2 < size)) -> (base_addr(acc(m1, shift(p,
+             i1))) <> base_addr(acc(m2, shift(p, i2)))))))))))
+
+predicate separation1_range(m: ('a1 pointer, 'a2) memory, size: int) =
+  (forall p:'a2 pointer.
+    (forall a:alloc_table.
+      (valid(a, p) ->
+       (forall i1:int.
+         (((0 <= i1) and (i1 < size)) -> (base_addr(acc(m, shift(p,
+          i1))) <> base_addr(acc(m, p))))))))
+
+predicate separation2(m1: ('a1 pointer, 'a2) memory, m2: ('a1 pointer,
+  'a2) memory) =
+  (forall p1:'a2 pointer.
+    (forall p2:'a2 pointer.
+      ((p1 <> p2) -> (base_addr(acc(m1, p1)) <> base_addr(acc(m2, p2))))))
+
+predicate separation2_range1(m1: ('a1 pointer, 'a2) memory, m2: ('a1 pointer,
+  'a2) memory, size: int) =
+  (forall p:'a2 pointer.
+    (forall q:'a2 pointer.
+      (forall a:alloc_table.
+        (forall i:int.
+          (((0 <= i) and (i < size)) -> (base_addr(acc(m1, shift(p,
+           i))) <> base_addr(acc(m2, q))))))))
+
+logic on_heap : alloc_table, 'a1 pointer -> prop
+
+logic on_stack : alloc_table, 'a1 pointer -> prop
+
+logic fresh : alloc_table, 'a1 pointer -> prop
+
+axiom fresh_not_valid:
+  (forall a:alloc_table.
+    (forall p:'a1 pointer. (fresh(a, p) -> (not valid(a, p)))))
+
+axiom fresh_not_valid_shift:
+  (forall a:alloc_table.
+    (forall p:'a1 pointer.
+      (fresh(a, p) -> (forall i:int. (not valid(a, shift(p, i)))))))
+
+logic alloc_extends : alloc_table, alloc_table -> prop
+
+axiom alloc_extends_valid:
+  (forall a1:alloc_table.
+    (forall a2:alloc_table.
+      (alloc_extends(a1, a2) ->
+       (forall q:'a1 pointer. (valid(a1, q) -> valid(a2, q))))))
+
+axiom alloc_extends_valid_index:
+  (forall a1:alloc_table.
+    (forall a2:alloc_table.
+      (alloc_extends(a1, a2) ->
+       (forall q:'a1 pointer.
+         (forall i:int. (valid_index(a1, q, i) -> valid_index(a2, q, i)))))))
+
+axiom alloc_extends_valid_range:
+  (forall a1:alloc_table.
+    (forall a2:alloc_table.
+      (alloc_extends(a1, a2) ->
+       (forall q:'a1 pointer.
+         (forall i:int.
+           (forall j:int.
+             (valid_range(a1, q, i, j) -> valid_range(a2, q, i, j))))))))
+
+axiom alloc_extends_refl: (forall a:alloc_table. alloc_extends(a, a))
+
+axiom alloc_extends_trans:
+  (forall a1:alloc_table.
+    (forall a2:alloc_table.
+      (forall a3:alloc_table [alloc_extends(a1, a2), alloc_extends(a2, a3)].
+        (alloc_extends(a1, a2) ->
+         (alloc_extends(a2, a3) -> alloc_extends(a1, a3))))))
+
+logic free_stack : alloc_table, alloc_table, alloc_table -> prop
+
+axiom free_stack_heap:
+  (forall a1:alloc_table.
+    (forall a2:alloc_table.
+      (forall a3:alloc_table.
+        (free_stack(a1, a2, a3) ->
+         (forall p:'a1 pointer.
+           (valid(a2, p) -> (on_heap(a2, p) -> valid(a3, p))))))))
+
+axiom free_stack_stack:
+  (forall a1:alloc_table.
+    (forall a2:alloc_table.
+      (forall a3:alloc_table.
+        (free_stack(a1, a2, a3) ->
+         (forall p:'a1 pointer.
+           (valid(a1, p) -> (on_stack(a1, p) -> valid(a3, p))))))))
+
+logic null : 'a1 pointer
+
+axiom null_not_valid: (forall a:alloc_table. (not valid(a, null)))
+
+type t_0
+
+type t_1
+
+type t_2
+
+type t_3
+
+type t_4
+
+type t_5
+
+type t_6
+
+logic BLUE : int
+
+logic RED : int
+
+logic WHITE : int
+
+axiom enum_anonymous_0_BLUE: (BLUE = 0)
+
+axiom enum_anonymous_0_RED: (RED = 2)
+
+axiom enum_anonymous_0_WHITE: (WHITE = 1)
+
+predicate isMonochrome(intM_t_0: (int, 'a1) memory, alloc: alloc_table,
+  t: 'a1 pointer, i: int, j: int, c: int) =
+  ("CADUCEUS_1":
+  (valid_range(alloc, t, i, j) and
+   (forall k:int.
+     (((i <= k) and (k <= j)) -> (acc(intM_t_0, shift(t, k)) = c)))))
+
+goal flag_impl_po_1:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  ("CADUCEUS_6":
+  ("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6,
+  pset_range(pset_singleton(t), 0, (n - 1)))))
+
+goal flag_impl_po_2:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  ("CADUCEUS_5": (0 <= n))
+
+goal flag_impl_po_3:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  ("CADUCEUS_5": (n <= n))
+
+goal flag_impl_po_4:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6, alloc, t, 0, (0 - 1), BLUE))
+
+goal flag_impl_po_5:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6, alloc, t, 0, (0 - 1), WHITE))
+
+goal flag_impl_po_6:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6, alloc, t, n, (n - 1), RED))
+
+goal flag_impl_po_7:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result)
+
+goal flag_impl_po_8:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 = BLUE) ->
+  forall b0:int.
+  (b0 = (b + 1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_9": valid_index(alloc, t, b))
+
+goal flag_impl_po_9:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 = BLUE) ->
+  forall b0:int.
+  (b0 = (b + 1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_9": valid_index(alloc, t, i))
+
+goal flag_impl_po_10:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 = BLUE) ->
+  forall b0:int.
+  (b0 = (b + 1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, b) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, b)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, b))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, b)))))) ->
+  ("CADUCEUS_6":
+  ("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_1,
+  pset_range(pset_singleton(t), 0, (n - 1)))))
+
+goal flag_impl_po_11:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 = BLUE) ->
+  forall b0:int.
+  (b0 = (b + 1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, b) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, b)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, b))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, b)))))) ->
+  ("CADUCEUS_5": (0 <= b0))
+
+goal flag_impl_po_12:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 = BLUE) ->
+  forall b0:int.
+  (b0 = (b + 1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, b) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, b)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, b))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, b)))))) ->
+  ("CADUCEUS_5": (b0 <= i0))
+
+goal flag_impl_po_13:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 = BLUE) ->
+  forall b0:int.
+  (b0 = (b + 1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, b) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, b)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, b))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, b)))))) ->
+  ("CADUCEUS_5": (i0 <= r))
+
+goal flag_impl_po_14:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 = BLUE) ->
+  forall b0:int.
+  (b0 = (b + 1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, b) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, b)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, b))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, b)))))) ->
+  ("CADUCEUS_5": (r <= n))
+
+goal flag_impl_po_15:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 = BLUE) ->
+  forall b0:int.
+  (b0 = (b + 1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, b) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, b)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, b))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, b)))))) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6_1, alloc, t, 0, (b0 - 1), BLUE))
+
+goal flag_impl_po_16:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 = BLUE) ->
+  forall b0:int.
+  (b0 = (b + 1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, b) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, b)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, b))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, b)))))) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6_1, alloc, t, b0, (i0 - 1), WHITE))
+
+goal flag_impl_po_17:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 = BLUE) ->
+  forall b0:int.
+  (b0 = (b + 1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, b) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, b)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, b))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, b)))))) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6_1, alloc, t, r, (n - 1), RED))
+
+goal flag_impl_po_18:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 = BLUE) ->
+  forall b0:int.
+  (b0 = (b + 1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, b) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, b)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, b))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, b)))))) ->
+  (0 <= ("CADUCEUS_7": (r - i)))
+
+goal flag_impl_po_19:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 = BLUE) ->
+  forall b0:int.
+  (b0 = (b + 1)) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, b) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, b)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, b))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, b)))))) ->
+  (("CADUCEUS_7": (r - i0)) < ("CADUCEUS_7": (r - i)))
+
+goal flag_impl_po_20:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 = WHITE) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_5": (0 <= b))
+
+goal flag_impl_po_21:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 = WHITE) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_5": (b <= i0))
+
+goal flag_impl_po_22:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 = WHITE) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_5": (i0 <= r))
+
+goal flag_impl_po_23:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 = WHITE) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_5": (r <= n))
+
+goal flag_impl_po_24:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 = WHITE) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE))
+
+goal flag_impl_po_25:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 = WHITE) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6_0, alloc, t, b, (i0 - 1), WHITE))
+
+goal flag_impl_po_26:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 = WHITE) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED))
+
+goal flag_impl_po_27:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 = WHITE) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  (0 <= ("CADUCEUS_7": (r - i)))
+
+goal flag_impl_po_28:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 = WHITE) ->
+  forall i0:int.
+  (i0 = (i + 1)) ->
+  (("CADUCEUS_7": (r - i0)) < ("CADUCEUS_7": (r - i)))
+
+goal flag_impl_po_29:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 = RED) ->
+  forall r0:int.
+  (r0 = (r - 1)) ->
+  ("CADUCEUS_9": valid_index(alloc, t, r0))
+
+goal flag_impl_po_30:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 = RED) ->
+  forall r0:int.
+  (r0 = (r - 1)) ->
+  ("CADUCEUS_9": valid_index(alloc, t, i))
+
+goal flag_impl_po_31:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 = RED) ->
+  forall r0:int.
+  (r0 = (r - 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, r0) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, r0)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, r0))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, r0)))))) ->
+  ("CADUCEUS_6":
+  ("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_1,
+  pset_range(pset_singleton(t), 0, (n - 1)))))
+
+goal flag_impl_po_32:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 = RED) ->
+  forall r0:int.
+  (r0 = (r - 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, r0) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, r0)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, r0))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, r0)))))) ->
+  ("CADUCEUS_5": (0 <= b))
+
+goal flag_impl_po_33:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 = RED) ->
+  forall r0:int.
+  (r0 = (r - 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, r0) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, r0)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, r0))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, r0)))))) ->
+  ("CADUCEUS_5": (b <= i))
+
+goal flag_impl_po_34:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 = RED) ->
+  forall r0:int.
+  (r0 = (r - 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, r0) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, r0)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, r0))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, r0)))))) ->
+  ("CADUCEUS_5": (i <= r0))
+
+goal flag_impl_po_35:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 = RED) ->
+  forall r0:int.
+  (r0 = (r - 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, r0) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, r0)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, r0))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, r0)))))) ->
+  ("CADUCEUS_5": (r0 <= n))
+
+goal flag_impl_po_36:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 = RED) ->
+  forall r0:int.
+  (r0 = (r - 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, r0) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, r0)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, r0))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, r0)))))) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6_1, alloc, t, 0, (b - 1), BLUE))
+
+goal flag_impl_po_37:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 = RED) ->
+  forall r0:int.
+  (r0 = (r - 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, r0) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, r0)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, r0))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, r0)))))) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6_1, alloc, t, b, (i - 1), WHITE))
+
+goal flag_impl_po_38:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 = RED) ->
+  forall r0:int.
+  (r0 = (r - 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, r0) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, r0)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, r0))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, r0)))))) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6_1, alloc, t, r0, (n - 1), RED))
+
+goal flag_impl_po_39:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 = RED) ->
+  forall r0:int.
+  (r0 = (r - 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, r0) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, r0)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, r0))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, r0)))))) ->
+  (0 <= ("CADUCEUS_7": (r - i)))
+
+goal flag_impl_po_40:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 = RED) ->
+  forall r0:int.
+  (r0 = (r - 1)) ->
+  ("CADUCEUS_9": (valid_index(alloc, t, r0) and valid_index(alloc, t, i))) ->
+  forall intM_t_6_1:(int,
+  'a1) memory.
+  (("CADUCEUS_11":
+   ((acc(intM_t_6_1, shift(t, r0)) = acc(intM_t_6_0, shift(t, i))) and
+    (acc(intM_t_6_1, shift(t, i)) = acc(intM_t_6_0, shift(t, r0))))) and
+   ("CADUCEUS_10": not_assigns(alloc, intM_t_6_0, intM_t_6_1,
+   pset_union(pset_singleton(shift(t, i)), pset_singleton(shift(t, r0)))))) ->
+  (("CADUCEUS_7": (r0 - i)) < ("CADUCEUS_7": (r - i)))
+
+goal flag_impl_po_41:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 <> RED) ->
+  ("CADUCEUS_5": (0 <= b))
+
+goal flag_impl_po_42:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 <> RED) ->
+  ("CADUCEUS_5": (b <= i))
+
+goal flag_impl_po_43:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 <> RED) ->
+  ("CADUCEUS_5": (i <= r))
+
+goal flag_impl_po_44:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 <> RED) ->
+  ("CADUCEUS_5": (r <= n))
+
+goal flag_impl_po_45:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 <> RED) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE))
+
+goal flag_impl_po_46:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 <> RED) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE))
+
+goal flag_impl_po_47:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 <> RED) ->
+  ("CADUCEUS_5": isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED))
+
+goal flag_impl_po_48:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 <> RED) ->
+  (0 <= ("CADUCEUS_7": (r - i)))
+
+goal flag_impl_po_49:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i < r) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_6_0, result)) ->
+  (result0 <> BLUE) ->
+  (result0 <> WHITE) ->
+  (result0 <> RED) ->
+  (("CADUCEUS_7": (r - i)) < ("CADUCEUS_7": (r - i)))
+
+goal flag_impl_po_50:
+  forall t:'a1 pointer.
+  forall n:int.
+  forall alloc:alloc_table.
+  forall intM_t_6:(int,
+  'a1) memory.
+  ("CADUCEUS_2": ((n >= 0) and valid_range(alloc, t, 0, (n - 1)))) ->
+  forall b:int.
+  forall i:int.
+  forall intM_t_6_0:(int,
+  'a1) memory.
+  forall r:int.
+  (("CADUCEUS_6": not_assigns(alloc, intM_t_6, intM_t_6_0,
+   pset_range(pset_singleton(t), 0, (n - 1)))) and
+   ("CADUCEUS_5":
+   (((((((0 <= b) and (b <= i)) and (i <= r)) and (r <= n)) and
+      isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE)) and
+     isMonochrome(intM_t_6_0, alloc, t, b, (i - 1), WHITE)) and
+    isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED)))) ->
+  (i >= r) ->
+  ("CADUCEUS_4":
+  ("CADUCEUS_4":
+  (exists b:int.
+    (exists r:int.
+      ((isMonochrome(intM_t_6_0, alloc, t, 0, (b - 1), BLUE) and
+        isMonochrome(intM_t_6_0, alloc, t, b, (r - 1), WHITE)) and
+       isMonochrome(intM_t_6_0, alloc, t, r, (n - 1), RED))))))
+
+goal swap_impl_po_1:
+  forall t:'a1 pointer.
+  forall i:int.
+  forall j:int.
+  forall alloc:alloc_table.
+  ("CADUCEUS_9": (valid_index(alloc, t, i) and valid_index(alloc, t, j))) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result)
+
+goal swap_impl_po_2:
+  forall t:'a1 pointer.
+  forall i:int.
+  forall j:int.
+  forall alloc:alloc_table.
+  forall intM_t_5:(int,
+  'a1) memory.
+  ("CADUCEUS_9": (valid_index(alloc, t, i) and valid_index(alloc, t, j))) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_5, result)) ->
+  forall result1:'a1 pointer.
+  (result1 = shift(t, i)) ->
+  forall result2:'a1 pointer.
+  (result2 = shift(t, j)) ->
+  valid(alloc, result2)
+
+goal swap_impl_po_3:
+  forall t:'a1 pointer.
+  forall i:int.
+  forall j:int.
+  forall alloc:alloc_table.
+  forall intM_t_5:(int,
+  'a1) memory.
+  ("CADUCEUS_9": (valid_index(alloc, t, i) and valid_index(alloc, t, j))) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_5, result)) ->
+  forall result1:'a1 pointer.
+  (result1 = shift(t, i)) ->
+  forall result2:'a1 pointer.
+  (result2 = shift(t, j)) ->
+  valid(alloc, result2) ->
+  forall result3:int.
+  (result3 = acc(intM_t_5, result2)) ->
+  valid(alloc, result1)
+
+goal swap_impl_po_4:
+  forall t:'a1 pointer.
+  forall i:int.
+  forall j:int.
+  forall alloc:alloc_table.
+  forall intM_t_5:(int,
+  'a1) memory.
+  ("CADUCEUS_9": (valid_index(alloc, t, i) and valid_index(alloc, t, j))) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_5, result)) ->
+  forall result1:'a1 pointer.
+  (result1 = shift(t, i)) ->
+  forall result2:'a1 pointer.
+  (result2 = shift(t, j)) ->
+  valid(alloc, result2) ->
+  forall result3:int.
+  (result3 = acc(intM_t_5, result2)) ->
+  valid(alloc, result1) ->
+  forall intM_t_5_0:(int,
+  'a1) memory.
+  (intM_t_5_0 = upd(intM_t_5, result1, result3)) ->
+  forall result4:'a1 pointer.
+  (result4 = shift(t, j)) ->
+  valid(alloc, result4)
+
+goal swap_impl_po_5:
+  forall t:'a1 pointer.
+  forall i:int.
+  forall j:int.
+  forall alloc:alloc_table.
+  forall intM_t_5:(int,
+  'a1) memory.
+  ("CADUCEUS_9": (valid_index(alloc, t, i) and valid_index(alloc, t, j))) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_5, result)) ->
+  forall result1:'a1 pointer.
+  (result1 = shift(t, i)) ->
+  forall result2:'a1 pointer.
+  (result2 = shift(t, j)) ->
+  valid(alloc, result2) ->
+  forall result3:int.
+  (result3 = acc(intM_t_5, result2)) ->
+  valid(alloc, result1) ->
+  forall intM_t_5_0:(int,
+  'a1) memory.
+  (intM_t_5_0 = upd(intM_t_5, result1, result3)) ->
+  forall result4:'a1 pointer.
+  (result4 = shift(t, j)) ->
+  valid(alloc, result4) ->
+  forall intM_t_5_1:(int,
+  'a1) memory.
+  (intM_t_5_1 = upd(intM_t_5_0, result4, result0)) ->
+  ("CADUCEUS_11": (acc(intM_t_5_1, shift(t, i)) = acc(intM_t_5, shift(t,
+  j))))
+
+goal swap_impl_po_6:
+  forall t:'a1 pointer.
+  forall i:int.
+  forall j:int.
+  forall alloc:alloc_table.
+  forall intM_t_5:(int,
+  'a1) memory.
+  ("CADUCEUS_9": (valid_index(alloc, t, i) and valid_index(alloc, t, j))) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_5, result)) ->
+  forall result1:'a1 pointer.
+  (result1 = shift(t, i)) ->
+  forall result2:'a1 pointer.
+  (result2 = shift(t, j)) ->
+  valid(alloc, result2) ->
+  forall result3:int.
+  (result3 = acc(intM_t_5, result2)) ->
+  valid(alloc, result1) ->
+  forall intM_t_5_0:(int,
+  'a1) memory.
+  (intM_t_5_0 = upd(intM_t_5, result1, result3)) ->
+  forall result4:'a1 pointer.
+  (result4 = shift(t, j)) ->
+  valid(alloc, result4) ->
+  forall intM_t_5_1:(int,
+  'a1) memory.
+  (intM_t_5_1 = upd(intM_t_5_0, result4, result0)) ->
+  ("CADUCEUS_11": (acc(intM_t_5_1, shift(t, j)) = acc(intM_t_5, shift(t,
+  i))))
+
+goal swap_impl_po_7:
+  forall t:'a1 pointer.
+  forall i:int.
+  forall j:int.
+  forall alloc:alloc_table.
+  forall intM_t_5:(int,
+  'a1) memory.
+  ("CADUCEUS_9": (valid_index(alloc, t, i) and valid_index(alloc, t, j))) ->
+  forall result:'a1 pointer.
+  (result = shift(t, i)) ->
+  valid(alloc, result) ->
+  forall result0:int.
+  (result0 = acc(intM_t_5, result)) ->
+  forall result1:'a1 pointer.
+  (result1 = shift(t, i)) ->
+  forall result2:'a1 pointer.
+  (result2 = shift(t, j)) ->
+  valid(alloc, result2) ->
+  forall result3:int.
+  (result3 = acc(intM_t_5, result2)) ->
+  valid(alloc, result1) ->
+  forall intM_t_5_0:(int,
+  'a1) memory.
+  (intM_t_5_0 = upd(intM_t_5, result1, result3)) ->
+  forall result4:'a1 pointer.
+  (result4 = shift(t, j)) ->
+  valid(alloc, result4) ->
+  forall intM_t_5_1:(int,
+  'a1) memory.
+  (intM_t_5_1 = upd(intM_t_5_0, result4, result0)) ->
+  ("CADUCEUS_10":
+  ("CADUCEUS_10": not_assigns(alloc, intM_t_5, intM_t_5_1,
+  pset_union(pset_singleton(shift(t, j)), pset_singleton(shift(t, i))))))
+

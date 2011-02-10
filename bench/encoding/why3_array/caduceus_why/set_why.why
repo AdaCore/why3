@@ -1,0 +1,172 @@
+theory Why2
+  use Tuple0
+  use int.Int
+  use int.ComputerDivision
+  use real.Real
+  use bool.Bool
+  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic eq_bool Bool.bool Bool.bool
+
+  logic neq_bool Bool.bool Bool.bool
+
+  logic lt_int int int
+
+  logic le_int int int
+
+  logic gt_int int int
+
+  logic ge_int int int
+
+  logic eq_int int int
+
+  logic neq_int int int
+
+  logic add_int int int : int
+
+  logic sub_int int int : int
+
+  logic mul_int int int : int
+
+  logic div_int int int : int
+
+  logic mod_int int int : int
+
+  logic neg_int int : int
+
+  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+
+  goal P_po_1:
+    (forall x0:int.
+      (forall result:int.
+        (((((x0 = 0) and (x0 = 0)) and (result = 1)) or
+          (((x0 = 0) and (x0 <> 0)) and (result = 2))) ->
+         (result = 1))))
+
+  goal P2_po_1:
+    (forall x2:int.
+      (forall y:int.
+        (forall y0:int.
+          (forall y1:int.
+            (forall y2:int.
+              ((Int.(>=) y 0) ->
+               ((Int.(>=) y0 0) ->
+                (((((x2 = y0) and (x2 <> 0)) and (y1 = (Int.(-) y0 1 : int))) and
+                  (y2 = y1)) ->
+                 (Int.(>=) y2 0)))))))))
+
+  goal P2_po_2:
+    (forall x2:int.
+      (forall y:int.
+        (forall y0:int.
+          (forall y1:int.
+            (forall y2:int.
+              ((Int.(>=) y 0) ->
+               ((Int.(>=) y0 0) ->
+                (((((x2 = y0) and (x2 <> 0)) and (y1 = (Int.(-) y0 1 : int))) and
+                  (y2 = y1)) ->
+                 ((Int.(<=) 0 y0) and (Int.(<) y2 y0))))))))))
+
+  goal P2_po_3:
+    (forall x2:int.
+      (forall x3:int.
+        (forall x4:int.
+          (forall y:int.
+            (forall y0:int.
+              (forall y3:int.
+                ((Int.(>=) y 0) ->
+                 ((((Int.(>=) y0 0) and
+                    (((x2 = y0) and (x2 = 0)) and (x3 = x2))) and
+                   ((x4 = x3) and (y3 = y0))) ->
+                  (y3 = 0)))))))))
+
+  goal P3_po_1:
+    (forall b:Bool.bool.
+      (forall x6:int.
+        (forall y:int.
+          (forall y4:int.
+            (forall y5:int.
+              (forall y6:int.
+                ((Int.(>=) y 0) ->
+                 ((Int.(>=) y4 0) ->
+                  ((((((x6 = y4) and
+                       (if b = Bool.True then (x6 <> 0) else (x6 = 0))) and
+                      (Bool.True = b)) and
+                     (y5 = (Int.(-) y4 1 : int))) and
+                    (y6 = y5)) ->
+                   (Int.(>=) y6 0))))))))))
+
+  goal P3_po_2:
+    (forall b:Bool.bool.
+      (forall x6:int.
+        (forall y:int.
+          (forall y4:int.
+            (forall y5:int.
+              (forall y6:int.
+                ((Int.(>=) y 0) ->
+                 ((Int.(>=) y4 0) ->
+                  ((((((x6 = y4) and
+                       (if b = Bool.True then (x6 <> 0) else (x6 = 0))) and
+                      (Bool.True = b)) and
+                     (y5 = (Int.(-) y4 1 : int))) and
+                    (y6 = y5)) ->
+                   ((Int.(<=) 0 y4) and (Int.(<) y6 y4)))))))))))
+
+  goal P3_po_3:
+    (forall b:Bool.bool.
+      (forall x6:int.
+        (forall x7:int.
+          (forall x8:int.
+            (forall y:int.
+              (forall y4:int.
+                (forall y7:int.
+                  ((Int.(>=) y 0) ->
+                   ((((Int.(>=) y4 0) and
+                      ((((x6 = y4) and
+                         (if b = Bool.True then (x6 <> 0) else (x6 = 0))) and
+                        (Bool.False = b)) and
+                       (x7 = x6))) and
+                     ((x8 = x7) and (y7 = y4))) ->
+                    (y7 = 0))))))))))
+
+  goal P4_po_1:
+    (forall x10:int.
+      (forall y:int.
+        (forall y8:int.
+          (forall y9:int.
+            ((Int.(>=) y 1) ->
+             ((Int.(>=) y8 1) ->
+              (((y9 = (Int.(-) y8 1 : int)) and ((x10 = y9) and (x10 <> 0))) ->
+               (Int.(>=) y9 1))))))))
+
+  goal P4_po_2:
+    (forall x10:int.
+      (forall y:int.
+        (forall y8:int.
+          (forall y9:int.
+            ((Int.(>=) y 1) ->
+             ((Int.(>=) y8 1) ->
+              (((y9 = (Int.(-) y8 1 : int)) and ((x10 = y9) and (x10 <> 0))) ->
+               ((Int.(<=) 0 y8) and (Int.(<) y9 y8)))))))))
+
+  goal P4_po_3:
+    (forall x10:int.
+      (forall x11:int.
+        (forall x12:int.
+          (forall y:int.
+            (forall y10:int.
+              (forall y11:int.
+                (forall y8:int.
+                  (forall y9:int.
+                    ((Int.(>=) y 1) ->
+                     ((((Int.(>=) y8 1) and
+                        (((y9 = (Int.(-) y8 1 : int)) and
+                          ((x10 = y9) and (x10 = 0))) and
+                         ((x11 = x10) and (y10 = y9)))) and
+                       ((x12 = x11) and (y11 = y10))) ->
+                      (y11 = 0)))))))))))
+
+
+end

@@ -1,0 +1,771 @@
+logic eq_unit : unit, unit -> prop
+
+logic neq_unit : unit, unit -> prop
+
+logic eq_bool : bool, bool -> prop
+
+logic neq_bool : bool, bool -> prop
+
+logic lt_int : int, int -> prop
+
+logic le_int : int, int -> prop
+
+logic gt_int : int, int -> prop
+
+logic ge_int : int, int -> prop
+
+logic eq_int : int, int -> prop
+
+logic neq_int : int, int -> prop
+
+logic add_int : int, int -> int
+
+logic sub_int : int, int -> int
+
+logic mul_int : int, int -> int
+
+logic div_int : int, int -> int
+
+logic mod_int : int, int -> int
+
+logic neg_int : int -> int
+
+predicate zwf_zero(a: int, b: int) = ((0 <= b) and (a < b))
+
+type 'a set
+
+logic set_empty : 'a1 set
+
+logic set_add : 'a1, 'a1 set -> 'a1 set
+
+logic set_rmv : 'a1, 'a1 set -> 'a1 set
+
+logic In : 'a1, 'a1 set -> prop
+
+predicate Is_empty(s: 'a1 set) = (forall x:'a1. (not In(x, s)))
+
+predicate Incl(s1: 'a1 set, s2: 'a1 set) =
+  (forall x:'a1. (In(x, s1) -> In(x, s2)))
+
+axiom set_empty_def: Is_empty(set_empty)
+
+axiom set_add_def:
+  (forall x:'a1.
+    (forall y:'a1.
+      (forall s:'a1 set. (In(x, set_add(y, s)) <-> ((x = y) or In(x, s))))))
+
+axiom set_rmv_def:
+  (forall x:'a1.
+    (forall y:'a1.
+      (forall s:'a1 set. (In(x, set_rmv(y, s)) <-> ((x <> y) and In(x, s))))))
+
+logic set_card : 'a1 set -> int
+
+axiom card_nonneg: (forall s:'a1 set. (set_card(s) >= 0))
+
+axiom card_set_add:
+  (forall x:'a1.
+    (forall s:'a1 set.
+      ((not In(x, s)) -> (set_card(set_add(x, s)) = (1 + set_card(s))))))
+
+axiom card_set_rmv:
+  (forall x:'a1.
+    (forall s:'a1 set.
+      (In(x, s) -> (set_card(s) = (1 + set_card(set_rmv(x, s)))))))
+
+axiom card_Incl:
+  (forall s1:'a1 set.
+    (forall s2:'a1 set. (Incl(s1, s2) -> (set_card(s1) <= set_card(s2)))))
+
+type ('a, 'b) map
+
+logic map_get : ('a2, 'a1) map, 'a2 -> 'a1
+
+logic map_set : ('a1, 'a2) map, 'a1, 'a2 -> ('a1, 'a2) map
+
+axiom map_get_set_eq:
+  (forall m:('a1, 'a2) map.
+    (forall i:'a1. (forall v:'a2. (map_get(map_set(m, i, v), i) = v))))
+
+axiom map_get_set_neq:
+  (forall m:('a1, 'a2) map.
+    (forall i:'a1.
+      (forall j:'a1.
+        (forall v:'a2.
+          ((i <> j) -> (map_get(map_set(m, i, v), j) = map_get(m, j)))))))
+
+type vertex
+
+logic V : vertex set
+
+logic g_succ : vertex -> vertex set
+
+axiom g_succ_sound: (forall x:vertex. Incl(g_succ(x), V))
+
+logic weight : vertex, vertex -> int
+
+axiom weight_nonneg:
+  (forall x:vertex. (forall y:vertex. (weight(x, y) >= 0)))
+
+predicate Min(m: vertex, Q: vertex set, d: (vertex, int) map) =
+  (In(m, Q) and
+   (forall x:vertex. (In(x, Q) -> (map_get(d, x) <= map_get(d, m)))))
+
+logic path : vertex, vertex, int -> prop
+
+axiom path_nil: (forall x:vertex. path(x, x, 0))
+
+axiom path_cons:
+  (forall x:vertex.
+    (forall y:vertex.
+      (forall z:vertex.
+        (forall d:int.
+          (path(x, y, d) ->
+           (In(z, g_succ(y)) -> path(x, z, (d + weight(y, z)))))))))
+
+axiom length_nonneg:
+  (forall x:vertex.
+    (forall y:vertex. (forall d:int. (path(x, y, d) -> (d >= 0)))))
+
+predicate shortest_path(x: vertex, y: vertex, d: int) =
+  (path(x, y, d) and (forall d':int. (path(x, y, d') -> (d <= d'))))
+
+axiom path_inversion:
+  (forall src:vertex.
+    (forall v:vertex.
+      (forall d:int.
+        (path(src, v, d) ->
+         (((v = src) and (d = 0)) or
+          (exists v':vertex.
+            (path(src, v', (d - weight(v', v))) and In(v, g_succ(v')))))))))
+
+axiom path_shortest_path:
+  (forall src:vertex.
+    (forall v:vertex.
+      (forall d:int.
+        (path(src, v, d) ->
+         (exists d':int. (shortest_path(src, v, d') and (d' <= d)))))))
+
+axiom main_lemma:
+  (forall src:vertex.
+    (forall v:vertex.
+      (forall d:int.
+        (path(src, v, d) ->
+         ((not shortest_path(src, v, d)) ->
+          (exists v':vertex.
+            (exists d':int.
+              (shortest_path(src, v', d') and
+               (In(v, g_succ(v')) and ((d' + weight(v', v)) < d))))))))))
+
+axiom completeness_lemma:
+  (forall s:vertex set.
+    (forall src:vertex.
+      (forall dst:vertex.
+        (forall d:int.
+          ((forall v:vertex.
+             (In(v, s) -> (forall w:vertex. (In(w, g_succ(v)) -> In(w, s))))) ->
+           (In(src, s) -> (path(src, dst, d) -> In(dst, s))))))))
+
+predicate Inv_src(src: vertex, S: vertex set, Q: vertex set) =
+  (In(src, S) or In(src, Q))
+
+predicate Inv(src: vertex, S: vertex set, Q: vertex set, d: (vertex,
+  int) map) =
+  (Inv_src(src, S, Q) and
+   (Incl(S, V) and
+    (Incl(Q, V) and
+     ((forall v:vertex. (In(v, Q) -> (In(v, S) -> false))) and
+      ((forall v:vertex. (In(v, S) -> shortest_path(src, v, map_get(d, v)))) and
+       ((forall v:vertex. (In(v, Q) -> path(src, v, map_get(d, v)))) and
+        (forall m:vertex.
+          (Min(m, Q, d) ->
+           (forall x:vertex.
+             (forall dx:int.
+               (shortest_path(src, x, dx) ->
+                ((dx < map_get(d, m)) -> In(x, S)))))))))))))
+
+predicate InvSucc(src: vertex, S: vertex set, Q: vertex set) =
+  (forall x:vertex.
+    (In(x, S) ->
+     (forall y:vertex. (In(y, g_succ(x)) -> (In(y, S) or In(y, Q))))))
+
+predicate InvSucc2(src: vertex, S: vertex set, Q: vertex set, u: vertex,
+  su: vertex set) =
+  (forall x:vertex.
+    (In(x, S) ->
+     (forall y:vertex.
+       (In(y, g_succ(x)) ->
+        (((x <> u) or ((x = u) and (not In(y, su)))) ->
+         (In(y, S) or In(y, Q)))))))
+
+goal shortest_path_po_1:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  Inv(src, S, Q, d0)
+
+goal shortest_path_po_2:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  InvSucc(src, S, Q)
+
+goal shortest_path_po_3:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  (not Is_empty(Q0)) ->
+  forall result:vertex.
+  forall Q1:vertex set.
+  (Min(result, Q0, d1) and (Q1 = set_rmv(result, Q0))) ->
+  shortest_path(src, result, map_get(d1, result))
+
+goal shortest_path_po_4:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  (not Is_empty(Q0)) ->
+  forall result:vertex.
+  forall Q1:vertex set.
+  (Min(result, Q0, d1) and (Q1 = set_rmv(result, Q0))) ->
+  shortest_path(src, result, map_get(d1, result)) ->
+  forall S1:vertex set.
+  (S1 = set_add(result, S0)) ->
+  Incl(g_succ(result), g_succ(result))
+
+goal shortest_path_po_5:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  (not Is_empty(Q0)) ->
+  forall result:vertex.
+  forall Q1:vertex set.
+  (Min(result, Q0, d1) and (Q1 = set_rmv(result, Q0))) ->
+  shortest_path(src, result, map_get(d1, result)) ->
+  forall S1:vertex set.
+  (S1 = set_add(result, S0)) ->
+  Inv(src, S1, Q1, d1)
+
+goal shortest_path_po_6:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  (not Is_empty(Q0)) ->
+  forall result:vertex.
+  forall Q1:vertex set.
+  (Min(result, Q0, d1) and (Q1 = set_rmv(result, Q0))) ->
+  shortest_path(src, result, map_get(d1, result)) ->
+  forall S1:vertex set.
+  (S1 = set_add(result, S0)) ->
+  InvSucc2(src, S1, Q1, result, g_succ(result))
+
+goal shortest_path_po_7:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  (not Is_empty(Q0)) ->
+  forall result:vertex.
+  forall Q1:vertex set.
+  (Min(result, Q0, d1) and (Q1 = set_rmv(result, Q0))) ->
+  shortest_path(src, result, map_get(d1, result)) ->
+  forall S1:vertex set.
+  (S1 = set_add(result, S0)) ->
+  forall Q2:vertex set.
+  forall d2:(vertex,
+  int) map.
+  forall su:vertex set.
+  (Incl(su, g_succ(result)) and
+   (Inv(src, S1, Q2, d2) and InvSucc2(src, S1, Q2, result, su))) ->
+  (not Is_empty(su)) ->
+  (not Is_empty(su)) ->
+  forall result0:vertex.
+  forall su0:vertex set.
+  (In(result0, su) and (su0 = set_rmv(result0, su))) ->
+  forall Q3:vertex set.
+  forall d3:(vertex,
+  int) map.
+  ((In(result0, S1) and ((Q3 = Q2) and (d3 = d2))) or
+   ((In(result0, Q3) and
+     (((map_get(d3, result) + weight(result, result0)) >= map_get(d3,
+      result0)) and ((Q3 = Q2) and (d3 = d2)))) or
+    ((In(result0, Q3) and
+      (((map_get(d3, result) + weight(result, result0)) < map_get(d3,
+       result0)) and
+       ((Q3 = Q2) and (d3 = map_set(d2, result0, (map_get(d3,
+        result) + weight(result, result0))))))) or
+     ((not In(result0, S1)) and
+      ((not In(result0, Q3)) and
+       ((Q3 = set_add(result0, Q2)) and (d3 = map_set(d2, result0,
+        (map_get(d3, result) + weight(result, result0)))))))))) ->
+  Incl(su0, g_succ(result))
+
+goal shortest_path_po_8:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  (not Is_empty(Q0)) ->
+  forall result:vertex.
+  forall Q1:vertex set.
+  (Min(result, Q0, d1) and (Q1 = set_rmv(result, Q0))) ->
+  shortest_path(src, result, map_get(d1, result)) ->
+  forall S1:vertex set.
+  (S1 = set_add(result, S0)) ->
+  forall Q2:vertex set.
+  forall d2:(vertex,
+  int) map.
+  forall su:vertex set.
+  (Incl(su, g_succ(result)) and
+   (Inv(src, S1, Q2, d2) and InvSucc2(src, S1, Q2, result, su))) ->
+  (not Is_empty(su)) ->
+  (not Is_empty(su)) ->
+  forall result0:vertex.
+  forall su0:vertex set.
+  (In(result0, su) and (su0 = set_rmv(result0, su))) ->
+  forall Q3:vertex set.
+  forall d3:(vertex,
+  int) map.
+  ((In(result0, S1) and ((Q3 = Q2) and (d3 = d2))) or
+   ((In(result0, Q3) and
+     (((map_get(d3, result) + weight(result, result0)) >= map_get(d3,
+      result0)) and ((Q3 = Q2) and (d3 = d2)))) or
+    ((In(result0, Q3) and
+      (((map_get(d3, result) + weight(result, result0)) < map_get(d3,
+       result0)) and
+       ((Q3 = Q2) and (d3 = map_set(d2, result0, (map_get(d3,
+        result) + weight(result, result0))))))) or
+     ((not In(result0, S1)) and
+      ((not In(result0, Q3)) and
+       ((Q3 = set_add(result0, Q2)) and (d3 = map_set(d2, result0,
+        (map_get(d3, result) + weight(result, result0)))))))))) ->
+  Inv(src, S1, Q3, d3)
+
+goal shortest_path_po_9:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  (not Is_empty(Q0)) ->
+  forall result:vertex.
+  forall Q1:vertex set.
+  (Min(result, Q0, d1) and (Q1 = set_rmv(result, Q0))) ->
+  shortest_path(src, result, map_get(d1, result)) ->
+  forall S1:vertex set.
+  (S1 = set_add(result, S0)) ->
+  forall Q2:vertex set.
+  forall d2:(vertex,
+  int) map.
+  forall su:vertex set.
+  (Incl(su, g_succ(result)) and
+   (Inv(src, S1, Q2, d2) and InvSucc2(src, S1, Q2, result, su))) ->
+  (not Is_empty(su)) ->
+  (not Is_empty(su)) ->
+  forall result0:vertex.
+  forall su0:vertex set.
+  (In(result0, su) and (su0 = set_rmv(result0, su))) ->
+  forall Q3:vertex set.
+  forall d3:(vertex,
+  int) map.
+  ((In(result0, S1) and ((Q3 = Q2) and (d3 = d2))) or
+   ((In(result0, Q3) and
+     (((map_get(d3, result) + weight(result, result0)) >= map_get(d3,
+      result0)) and ((Q3 = Q2) and (d3 = d2)))) or
+    ((In(result0, Q3) and
+      (((map_get(d3, result) + weight(result, result0)) < map_get(d3,
+       result0)) and
+       ((Q3 = Q2) and (d3 = map_set(d2, result0, (map_get(d3,
+        result) + weight(result, result0))))))) or
+     ((not In(result0, S1)) and
+      ((not In(result0, Q3)) and
+       ((Q3 = set_add(result0, Q2)) and (d3 = map_set(d2, result0,
+        (map_get(d3, result) + weight(result, result0)))))))))) ->
+  InvSucc2(src, S1, Q3, result, su0)
+
+goal shortest_path_po_10:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  (not Is_empty(Q0)) ->
+  forall result:vertex.
+  forall Q1:vertex set.
+  (Min(result, Q0, d1) and (Q1 = set_rmv(result, Q0))) ->
+  shortest_path(src, result, map_get(d1, result)) ->
+  forall S1:vertex set.
+  (S1 = set_add(result, S0)) ->
+  forall Q2:vertex set.
+  forall d2:(vertex,
+  int) map.
+  forall su:vertex set.
+  (Incl(su, g_succ(result)) and
+   (Inv(src, S1, Q2, d2) and InvSucc2(src, S1, Q2, result, su))) ->
+  (not Is_empty(su)) ->
+  (not Is_empty(su)) ->
+  forall result0:vertex.
+  forall su0:vertex set.
+  (In(result0, su) and (su0 = set_rmv(result0, su))) ->
+  forall Q3:vertex set.
+  forall d3:(vertex,
+  int) map.
+  ((In(result0, S1) and ((Q3 = Q2) and (d3 = d2))) or
+   ((In(result0, Q3) and
+     (((map_get(d3, result) + weight(result, result0)) >= map_get(d3,
+      result0)) and ((Q3 = Q2) and (d3 = d2)))) or
+    ((In(result0, Q3) and
+      (((map_get(d3, result) + weight(result, result0)) < map_get(d3,
+       result0)) and
+       ((Q3 = Q2) and (d3 = map_set(d2, result0, (map_get(d3,
+        result) + weight(result, result0))))))) or
+     ((not In(result0, S1)) and
+      ((not In(result0, Q3)) and
+       ((Q3 = set_add(result0, Q2)) and (d3 = map_set(d2, result0,
+        (map_get(d3, result) + weight(result, result0)))))))))) ->
+  (0 <= set_card(su))
+
+goal shortest_path_po_11:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  (not Is_empty(Q0)) ->
+  forall result:vertex.
+  forall Q1:vertex set.
+  (Min(result, Q0, d1) and (Q1 = set_rmv(result, Q0))) ->
+  shortest_path(src, result, map_get(d1, result)) ->
+  forall S1:vertex set.
+  (S1 = set_add(result, S0)) ->
+  forall Q2:vertex set.
+  forall d2:(vertex,
+  int) map.
+  forall su:vertex set.
+  (Incl(su, g_succ(result)) and
+   (Inv(src, S1, Q2, d2) and InvSucc2(src, S1, Q2, result, su))) ->
+  (not Is_empty(su)) ->
+  (not Is_empty(su)) ->
+  forall result0:vertex.
+  forall su0:vertex set.
+  (In(result0, su) and (su0 = set_rmv(result0, su))) ->
+  forall Q3:vertex set.
+  forall d3:(vertex,
+  int) map.
+  ((In(result0, S1) and ((Q3 = Q2) and (d3 = d2))) or
+   ((In(result0, Q3) and
+     (((map_get(d3, result) + weight(result, result0)) >= map_get(d3,
+      result0)) and ((Q3 = Q2) and (d3 = d2)))) or
+    ((In(result0, Q3) and
+      (((map_get(d3, result) + weight(result, result0)) < map_get(d3,
+       result0)) and
+       ((Q3 = Q2) and (d3 = map_set(d2, result0, (map_get(d3,
+        result) + weight(result, result0))))))) or
+     ((not In(result0, S1)) and
+      ((not In(result0, Q3)) and
+       ((Q3 = set_add(result0, Q2)) and (d3 = map_set(d2, result0,
+        (map_get(d3, result) + weight(result, result0)))))))))) ->
+  (set_card(su0) < set_card(su))
+
+goal shortest_path_po_12:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  (not Is_empty(Q0)) ->
+  forall result:vertex.
+  forall Q1:vertex set.
+  (Min(result, Q0, d1) and (Q1 = set_rmv(result, Q0))) ->
+  shortest_path(src, result, map_get(d1, result)) ->
+  forall S1:vertex set.
+  (S1 = set_add(result, S0)) ->
+  forall Q2:vertex set.
+  forall d2:(vertex,
+  int) map.
+  forall su:vertex set.
+  (Incl(su, g_succ(result)) and
+   (Inv(src, S1, Q2, d2) and InvSucc2(src, S1, Q2, result, su))) ->
+  Is_empty(su) ->
+  Inv(src, S1, Q2, d2)
+
+goal shortest_path_po_13:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  (not Is_empty(Q0)) ->
+  forall result:vertex.
+  forall Q1:vertex set.
+  (Min(result, Q0, d1) and (Q1 = set_rmv(result, Q0))) ->
+  shortest_path(src, result, map_get(d1, result)) ->
+  forall S1:vertex set.
+  (S1 = set_add(result, S0)) ->
+  forall Q2:vertex set.
+  forall d2:(vertex,
+  int) map.
+  forall su:vertex set.
+  (Incl(su, g_succ(result)) and
+   (Inv(src, S1, Q2, d2) and InvSucc2(src, S1, Q2, result, su))) ->
+  Is_empty(su) ->
+  InvSucc(src, S1, Q2)
+
+goal shortest_path_po_14:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  (not Is_empty(Q0)) ->
+  forall result:vertex.
+  forall Q1:vertex set.
+  (Min(result, Q0, d1) and (Q1 = set_rmv(result, Q0))) ->
+  shortest_path(src, result, map_get(d1, result)) ->
+  forall S1:vertex set.
+  (S1 = set_add(result, S0)) ->
+  forall Q2:vertex set.
+  forall d2:(vertex,
+  int) map.
+  forall su:vertex set.
+  (Incl(su, g_succ(result)) and
+   (Inv(src, S1, Q2, d2) and InvSucc2(src, S1, Q2, result, su))) ->
+  Is_empty(su) ->
+  (0 <= (set_card(V) - set_card(S0)))
+
+goal shortest_path_po_15:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  (not Is_empty(Q0)) ->
+  forall result:vertex.
+  forall Q1:vertex set.
+  (Min(result, Q0, d1) and (Q1 = set_rmv(result, Q0))) ->
+  shortest_path(src, result, map_get(d1, result)) ->
+  forall S1:vertex set.
+  (S1 = set_add(result, S0)) ->
+  forall Q2:vertex set.
+  forall d2:(vertex,
+  int) map.
+  forall su:vertex set.
+  (Incl(su, g_succ(result)) and
+   (Inv(src, S1, Q2, d2) and InvSucc2(src, S1, Q2, result, su))) ->
+  Is_empty(su) ->
+  ((set_card(V) - set_card(S1)) < (set_card(V) - set_card(S0)))
+
+goal shortest_path_po_16:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  Is_empty(Q0) ->
+  forall v:vertex.
+  In(v, S0) ->
+  shortest_path(src, v, map_get(d1, v))
+
+goal shortest_path_po_17:
+  forall src:vertex.
+  forall dst:vertex.
+  forall d:(vertex,
+  int) map.
+  (In(src, V) and In(dst, V)) ->
+  forall Q:vertex set.
+  forall S:vertex set.
+  forall d0:(vertex,
+  int) map.
+  (Is_empty(S) and
+   ((Q = set_add(src, set_empty)) and (d0 = map_set(d, src, 0)))) ->
+  forall Q0:vertex set.
+  forall S0:vertex set.
+  forall d1:(vertex,
+  int) map.
+  (Inv(src, S0, Q0, d1) and InvSucc(src, S0, Q0)) ->
+  Is_empty(Q0) ->
+  forall v:vertex.
+  (not In(v, S0)) ->
+  forall dv:int.
+  (not path(src, v, dv))
+

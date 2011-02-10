@@ -1,0 +1,2151 @@
+theory Why2
+  use Tuple0
+  use int.Int
+  use int.ComputerDivision
+  use real.Real
+  use bool.Bool
+  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+
+  logic eq_bool Bool.bool Bool.bool
+
+  logic neq_bool Bool.bool Bool.bool
+
+  logic lt_int int int
+
+  logic le_int int int
+
+  logic gt_int int int
+
+  logic ge_int int int
+
+  logic eq_int int int
+
+  logic neq_int int int
+
+  logic add_int int int : int
+
+  logic sub_int int int : int
+
+  logic mul_int int int : int
+
+  logic div_int int int : int
+
+  logic mod_int int int : int
+
+  logic neg_int int : int
+
+  logic zwf_zero int int
+
+  axiom Zwf_zero_def:
+    (forall a0:int.
+      (forall b0:int.
+        (((Int.(<=) 0 b0) and (Int.(<) a0 b0)) <->
+         ((Int.(<=) 0 b0) and (Int.(<) a0 b0)))))
+
+  logic bool_and Bool.bool Bool.bool : Bool.bool
+
+  logic bool_or Bool.bool Bool.bool : Bool.bool
+
+  logic bool_xor Bool.bool Bool.bool : Bool.bool
+
+  logic bool_not Bool.bool : Bool.bool
+
+  axiom Bool_and_def:
+    (forall a:Bool.bool.
+      (forall b:Bool.bool.
+        (((bool_and a b : Bool.bool) = Bool.True) <->
+         ((a = Bool.True) and (b = Bool.True)))))
+
+  axiom Bool_or_def:
+    (forall a:Bool.bool.
+      (forall b:Bool.bool.
+        (((bool_or a b : Bool.bool) = Bool.True) <->
+         ((a = Bool.True) or (b = Bool.True)))))
+
+  axiom Bool_xor_def:
+    (forall a:Bool.bool.
+      (forall b:Bool.bool.
+        (((bool_xor a b : Bool.bool) = Bool.True) <-> (a <> b))))
+
+  axiom Bool_not_def:
+    (forall a:Bool.bool.
+      (((bool_not a : Bool.bool) = Bool.True) <-> (a = Bool.False)))
+
+  logic ite Bool.bool 'a1 'a1 : 'a1
+
+  axiom Ite_true:
+    (forall x:'a1. (forall y:'a1. ((ite Bool.True x y : 'a1) = x)))
+
+  axiom Ite_false:
+    (forall x:'a1. (forall y:'a1. ((ite Bool.False x y : 'a1) = y)))
+
+  logic lt_int_bool int int : Bool.bool
+
+  logic le_int_bool int int : Bool.bool
+
+  logic gt_int_bool int int : Bool.bool
+
+  logic ge_int_bool int int : Bool.bool
+
+  logic eq_int_bool int int : Bool.bool
+
+  logic neq_int_bool int int : Bool.bool
+
+  axiom Lt_int_bool_axiom:
+    (forall x:int.
+      (forall y:int.
+        (((lt_int_bool x y : Bool.bool) = Bool.True) <-> (Int.(<) x y))))
+
+  axiom Le_int_bool_axiom:
+    (forall x:int.
+      (forall y:int.
+        (((le_int_bool x y : Bool.bool) = Bool.True) <-> (Int.(<=) x y))))
+
+  axiom Gt_int_bool_axiom:
+    (forall x:int.
+      (forall y:int.
+        (((gt_int_bool x y : Bool.bool) = Bool.True) <-> (Int.(>) x y))))
+
+  axiom Ge_int_bool_axiom:
+    (forall x:int.
+      (forall y:int.
+        (((ge_int_bool x y : Bool.bool) = Bool.True) <-> (Int.(>=) x y))))
+
+  axiom Eq_int_bool_axiom:
+    (forall x:int.
+      (forall y:int.
+        (((eq_int_bool x y : Bool.bool) = Bool.True) <-> (x = y))))
+
+  axiom Neq_int_bool_axiom:
+    (forall x:int.
+      (forall y:int.
+        (((neq_int_bool x y : Bool.bool) = Bool.True) <-> (x <> y))))
+
+  logic abs_int int : int
+
+  axiom Abs_int_pos:
+    (forall x:int. ((Int.(>=) x 0) -> ((abs_int x : int) = x)))
+
+  axiom Abs_int_neg:
+    (forall x:int.
+      ((Int.(<=) x 0) -> ((abs_int x : int) = (Int.(-_) x : int))))
+
+  logic int_max int int : int
+
+  logic int_min int int : int
+
+  axiom Int_max_is_ge:
+    (forall x:int.
+      (forall y:int.
+        ((Int.(>=) (int_max x y : int) x) and
+         (Int.(>=) (int_max x y : int) y))))
+
+  axiom Int_max_is_some:
+    (forall x:int.
+      (forall y:int.
+        (((int_max x y : int) = x) or ((int_max x y : int) = y))))
+
+  axiom Int_min_is_le:
+    (forall x:int.
+      (forall y:int.
+        ((Int.(<=) (int_min x y : int) x) and
+         (Int.(<=) (int_min x y : int) y))))
+
+  axiom Int_min_is_some:
+    (forall x:int.
+      (forall y:int.
+        (((int_min x y : int) = x) or ((int_min x y : int) = y))))
+
+  logic lt_real real real
+
+  logic le_real real real
+
+  logic gt_real real real
+
+  logic ge_real real real
+
+  logic eq_real real real
+
+  logic neq_real real real
+
+  logic add_real real real : real
+
+  logic sub_real real real : real
+
+  logic mul_real real real : real
+
+  logic div_real real real : real
+
+  logic neg_real real : real
+
+  logic real_of_int int : real
+
+  logic int_of_real real : int
+
+  logic lt_real_bool real real : Bool.bool
+
+  logic le_real_bool real real : Bool.bool
+
+  logic gt_real_bool real real : Bool.bool
+
+  logic ge_real_bool real real : Bool.bool
+
+  logic eq_real_bool real real : Bool.bool
+
+  logic neq_real_bool real real : Bool.bool
+
+  axiom Lt_real_bool_axiom:
+    (forall x:real.
+      (forall y:real.
+        (((lt_real_bool x y : Bool.bool) = Bool.True) <-> (Real.(<) x y))))
+
+  axiom Le_real_bool_axiom:
+    (forall x:real.
+      (forall y:real.
+        (((le_real_bool x y : Bool.bool) = Bool.True) <-> (Real.(<=) x y))))
+
+  axiom Gt_real_bool_axiom:
+    (forall x:real.
+      (forall y:real.
+        (((gt_real_bool x y : Bool.bool) = Bool.True) <-> (Real.(>) x y))))
+
+  axiom Ge_real_bool_axiom:
+    (forall x:real.
+      (forall y:real.
+        (((ge_real_bool x y : Bool.bool) = Bool.True) <-> (Real.(>=) x y))))
+
+  axiom Eq_real_bool_axiom:
+    (forall x:real.
+      (forall y:real.
+        (((eq_real_bool x y : Bool.bool) = Bool.True) <-> (x = y))))
+
+  axiom Neq_real_bool_axiom:
+    (forall x:real.
+      (forall y:real.
+        (((neq_real_bool x y : Bool.bool) = Bool.True) <-> (x <> y))))
+
+  logic real_max real real : real
+
+  logic real_min real real : real
+
+  axiom Real_max_is_ge:
+    (forall x:real.
+      (forall y:real.
+        ((Real.(>=) (real_max x y : real) x) and
+         (Real.(>=) (real_max x y : real) y))))
+
+  axiom Real_max_is_some:
+    (forall x:real.
+      (forall y:real.
+        (((real_max x y : real) = x) or ((real_max x y : real) = y))))
+
+  axiom Real_min_is_le:
+    (forall x:real.
+      (forall y:real.
+        ((Real.(<=) (real_min x y : real) x) and
+         (Real.(<=) (real_min x y : real) y))))
+
+  axiom Real_min_is_some:
+    (forall x:real.
+      (forall y:real.
+        (((real_min x y : real) = x) or ((real_min x y : real) = y))))
+
+  logic sqrt_real real : real
+
+  logic pow_real real real : real
+
+  logic abs_real real : real
+
+  axiom Abs_real_pos:
+    (forall x:real [(abs_real x : real)].
+      ((Real.(>=) x 0.0) -> ((abs_real x : real) = x)))
+
+  axiom Abs_real_neg:
+    (forall x:real [(abs_real x : real)].
+      ((Real.(<=) x 0.0) -> ((abs_real x : real) = (Real.(-_) x : real))))
+
+  logic exp real : real
+
+  logic log real : real
+
+  logic log10 real : real
+
+  axiom Log_exp: (forall x:real. ((log (exp x : real) : real) = x))
+
+  logic cos real : real
+
+  logic sin real : real
+
+  logic tan real : real
+
+  logic cosh real : real
+
+  logic sinh real : real
+
+  logic tanh real : real
+
+  logic acos real : real
+
+  logic asin real : real
+
+  logic atan real : real
+
+  logic atan2 real real : real
+
+  logic hypot real real : real
+
+  type alloc_table 't
+
+  type pointer 't
+
+  type block 't
+
+  logic base_block (pointer 'a1) : (block 'a1)
+
+  logic pointer_address (pointer 'a1) : (pointer Tuple0.tuple0)
+
+  logic absolute_address int : (pointer Tuple0.tuple0)
+
+  logic address (pointer 'a1) : int
+
+  logic offset_max (alloc_table 'a1) (pointer 'a1) : int
+
+  logic offset_min (alloc_table 'a1) (pointer 'a1) : int
+
+  logic valid (alloc_table 'a1) (pointer 'a1)
+
+  axiom Valid_def:
+    (forall a0:(alloc_table 'a1).
+      (forall p0:(pointer 'a1).
+        ((valid a0 p0) <->
+         ((Int.(<=) (offset_min a0 p0 : int) 0) and
+          (Int.(>=) (offset_max a0 p0 : int) 0)))))
+
+  logic same_block (pointer 'a1) (pointer 'a1)
+
+  axiom Same_block_def:
+    (forall p0:(pointer 'a1).
+      (forall q0:(pointer 'a1).
+        ((same_block p0 q0) <->
+         ((base_block p0 : (block 'a1)) = (base_block q0 : (block 'a1))))))
+
+  logic sub_pointer (pointer 'a1) (pointer 'a1) : int
+
+  logic shift (pointer 'a1) int : (pointer 'a1)
+
+  logic null  : (pointer 'a1)
+
+  axiom Address_injective:
+    (forall p:(pointer 'a1).
+      (forall q:(pointer 'a1).
+        ((p = q) <-> ((address p : int) = (address q : int)))))
+
+  axiom Address_null: ((address (null : (pointer 'a1)) : int) = 0)
+
+  axiom Address_positive:
+    (forall p:(pointer 'a1). (Int.(<=) 0 (address p : int)))
+
+  axiom Address_shift_lt:
+    (forall p:(pointer 'a1).
+      (forall i:int.
+        (forall j:int [(address (shift p i : (pointer 'a1)) : int),
+          (address (shift p j : (pointer 'a1)) : int)].
+          ((Int.(<) (address (shift p i : (pointer 'a1)) : int) (address (shift p j : (pointer 'a1)) : int)) <->
+           (Int.(<) i j)))))
+
+  axiom Address_shift_le:
+    (forall p:(pointer 'a1).
+      (forall i:int.
+        (forall j:int [(address (shift p i : (pointer 'a1)) : int),
+          (address (shift p j : (pointer 'a1)) : int)].
+          ((Int.(<=) (address (shift p i : (pointer 'a1)) : int) (address (shift p j : (pointer 'a1)) : int)) <->
+           (Int.(<=) i j)))))
+
+  axiom Shift_zero:
+    (forall p:(pointer 'a1) [(shift p 0 : (pointer 'a1))].
+      ((shift p 0 : (pointer 'a1)) = p))
+
+  axiom Shift_shift:
+    (forall p:(pointer 'a1).
+      (forall i:int.
+        (forall j:int [(shift (shift p i : (pointer 'a1)) j : (pointer 'a1))].
+          ((shift (shift p i : (pointer 'a1)) j : (pointer 'a1)) = (shift p (Int.(+) i j : int) : (pointer 'a1))))))
+
+  axiom Offset_max_shift:
+    (forall a:(alloc_table 'a1).
+      (forall p:(pointer 'a1).
+        (forall i:int.
+          ((offset_max a (shift p i : (pointer 'a1)) : int) = (Int.(-) (offset_max a p : int) i : int)))))
+
+  axiom Offset_min_shift:
+    (forall a:(alloc_table 'a1).
+      (forall p:(pointer 'a1).
+        (forall i:int.
+          ((offset_min a (shift p i : (pointer 'a1)) : int) = (Int.(-) (offset_min a p : int) i : int)))))
+
+  axiom Neq_shift:
+    (forall p:(pointer 'a1).
+      (forall i:int.
+        (forall j:int [(shift p i : (pointer 'a1)),
+          (shift p j : (pointer 'a1))].
+          ((i <> j) ->
+           ((shift p i : (pointer 'a1)) <> (shift p j : (pointer 'a1)))))))
+
+  axiom Null_not_valid:
+    (forall a:(alloc_table 'a1). (not (valid a (null : (pointer 'a1)))))
+
+  axiom Null_pointer:
+    (forall a:(alloc_table 'a1).
+      ((Int.(>=) (offset_min a (null : (pointer 'a1)) : int) 0) and
+       (Int.(<=) (offset_max a (null : (pointer 'a1)) : int) (Int.(-_) 2 : int))))
+
+  logic eq_pointer_bool (pointer 'a1) (pointer 'a1) : Bool.bool
+
+  logic neq_pointer_bool (pointer 'a1) (pointer 'a1) : Bool.bool
+
+  axiom Eq_pointer_bool_def:
+    (forall p1:(pointer 'a1).
+      (forall p2:(pointer 'a1).
+        (((eq_pointer_bool p1 p2 : Bool.bool) = Bool.True) <-> (p1 = p2))))
+
+  axiom Neq_pointer_bool_def:
+    (forall p1:(pointer 'a1).
+      (forall p2:(pointer 'a1).
+        (((neq_pointer_bool p1 p2 : Bool.bool) = Bool.True) <-> (p1 <> p2))))
+
+  axiom Same_block_shift_right:
+    (forall p:(pointer 'a1).
+      (forall q:(pointer 'a1).
+        (forall i:int [(same_block p (shift q i : (pointer 'a1)))].
+          ((same_block p q) -> (same_block p (shift q i : (pointer 'a1)))))))
+
+  axiom Same_block_shift_left:
+    (forall p:(pointer 'a1).
+      (forall q:(pointer 'a1).
+        (forall i:int [(same_block (shift q i : (pointer 'a1)) p)].
+          ((same_block q p) -> (same_block (shift q i : (pointer 'a1)) p)))))
+
+  axiom Sub_pointer_shift:
+    (forall p:(pointer 'a1).
+      (forall q:(pointer 'a1) [(sub_pointer p q : int)].
+        ((same_block p q) ->
+         (p = (shift q (sub_pointer p q : int) : (pointer 'a1))))))
+
+  axiom Sub_pointer_self:
+    (forall p:(pointer 'a1) [(sub_pointer p p : int)].
+      ((sub_pointer p p : int) = 0))
+
+  axiom Sub_pointer_zero:
+    (forall p:(pointer 'a1).
+      (forall q:(pointer 'a1) [(sub_pointer p q : int)].
+        ((same_block p q) -> (((sub_pointer p q : int) = 0) -> (p = q)))))
+
+  axiom Sub_pointer_shift_left:
+    (forall p:(pointer 'a1).
+      (forall q:(pointer 'a1).
+        (forall i:int [(sub_pointer (shift p i : (pointer 'a1)) q : int)].
+          ((sub_pointer (shift p i : (pointer 'a1)) q : int) = (Int.(+) (sub_pointer p q : int) i : int)))))
+
+  axiom Sub_pointer_shift_right:
+    (forall p:(pointer 'a1).
+      (forall q:(pointer 'a1).
+        (forall i:int [(sub_pointer p (shift q i : (pointer 'a1)) : int)].
+          ((sub_pointer p (shift q i : (pointer 'a1)) : int) = (Int.(-) (sub_pointer p q : int) i : int)))))
+
+  type memory 't 'v
+
+  logic select (memory 'a2 'a1) (pointer 'a2) : 'a1
+
+  logic store (memory 'a1 'a2) (pointer 'a1) 'a2 : (memory 'a1 'a2)
+
+  axiom Select_store_eq:
+    (forall m:(memory 'a1 'a2).
+      (forall p1:(pointer 'a1).
+        (forall p2:(pointer 'a1).
+          (forall a:'a2 [(store m p1 a : (memory 'a1 'a2)), p2].
+            ((p1 = p2) ->
+             ((select (store m p1 a : (memory 'a1 'a2)) p2 : 'a2) = a))))))
+
+  axiom Select_store_neq:
+    (forall m:(memory 'a1 'a2).
+      (forall p1:(pointer 'a1).
+        (forall p2:(pointer 'a1).
+          (forall a:'a2 [(store m p1 a : (memory 'a1 'a2)), p2].
+            ((p1 <> p2) ->
+             ((select (store m p1 a : (memory 'a1 'a2)) p2 : 'a2) = (select m p2 : 'a2)))))))
+
+  type pset 't
+
+  logic pset_empty  : (pset 'a1)
+
+  logic pset_singleton (pointer 'a1) : (pset 'a1)
+
+  logic pset_deref (memory 'a2 (pointer 'a1)) (pset 'a2) : (pset 'a1)
+
+  logic pset_union (pset 'a1) (pset 'a1) : (pset 'a1)
+
+  logic pset_all (pset 'a1) : (pset 'a1)
+
+  logic pset_range (pset 'a1) int int : (pset 'a1)
+
+  logic pset_range_left (pset 'a1) int : (pset 'a1)
+
+  logic pset_range_right (pset 'a1) int : (pset 'a1)
+
+  logic in_pset (pointer 'a1) (pset 'a1)
+
+  logic valid_pset (alloc_table 'a1) (pset 'a1)
+
+  logic pset_disjoint (pset 'a1) (pset 'a1)
+
+  axiom Pset_disjoint_def:
+    (forall ps1_0:(pset 'a1).
+      (forall ps2_0:(pset 'a1).
+        ((pset_disjoint ps1_0 ps2_0) <->
+         (forall p:(pointer 'a1).
+           (not ((in_pset p ps1_0) and (in_pset p ps2_0)))))))
+
+  logic pset_included (pset 'a1) (pset 'a1)
+
+  axiom Pset_included_def:
+    (forall ps1_0:(pset 'a1).
+      (forall ps2_0:(pset 'a1).
+        ((pset_included ps1_0 ps2_0) <->
+         (forall p:(pointer 'a1). ((in_pset p ps1_0) -> (in_pset p ps2_0))))))
+
+  axiom Pset_included_self: (forall ps:(pset 'a1). (pset_included ps ps))
+
+  axiom Pset_included_range:
+    (forall ps:(pset 'a1).
+      (forall a:int.
+        (forall b:int.
+          (forall c:int.
+            (forall d:int [(pset_included (pset_range ps a b : (pset 'a1)) (pset_range ps c d : (pset 'a1)))].
+              (((Int.(<=) c a) and (Int.(<=) b d)) ->
+               (pset_included (pset_range ps a b : (pset 'a1)) (pset_range ps c d : (pset 'a1)))))))))
+
+  axiom Pset_included_range_all:
+    (forall ps:(pset 'a1).
+      (forall a:int.
+        (forall b:int.
+          (forall c:int.
+            (forall d:int [(pset_included (pset_range ps a b : (pset 'a1)) (pset_range ps c d : (pset 'a1)))].
+              (pset_included (pset_range ps a b : (pset 'a1)) (pset_all ps : (pset 'a1))))))))
+
+  axiom In_pset_empty:
+    (forall p:(pointer 'a1). (not (in_pset p (pset_empty : (pset 'a1)))))
+
+  axiom In_pset_singleton:
+    (forall p:(pointer 'a1).
+      (forall q:(pointer 'a1).
+        ((in_pset p (pset_singleton q : (pset 'a1))) <-> (p = q))))
+
+  axiom In_pset_deref:
+    (forall p:(pointer 'a1).
+      (forall m:(memory 'a2 (pointer 'a1)).
+        (forall q:(pset 'a2).
+          ((in_pset p (pset_deref m q : (pset 'a1))) <->
+           (exists r:(pointer 'a2).
+             ((in_pset r q) and (p = (select m r : (pointer 'a1)))))))))
+
+  axiom In_pset_all:
+    (forall p:(pointer 'a1).
+      (forall q:(pset 'a1).
+        ((in_pset p (pset_all q : (pset 'a1))) <->
+         (exists i:int.
+           (exists r:(pointer 'a1).
+             ((in_pset r q) and (p = (shift r i : (pointer 'a1)))))))))
+
+  axiom In_pset_range:
+    (forall p:(pointer 'a1).
+      (forall q:(pset 'a1).
+        (forall a:int.
+          (forall b:int.
+            ((in_pset p (pset_range q a b : (pset 'a1))) <->
+             (exists i:int.
+               (exists r:(pointer 'a1).
+                 ((Int.(<=) a i) and
+                  ((Int.(<=) i b) and
+                   ((in_pset r q) and (p = (shift r i : (pointer 'a1)))))))))))))
+
+  axiom In_pset_range_left:
+    (forall p:(pointer 'a1).
+      (forall q:(pset 'a1).
+        (forall b:int.
+          ((in_pset p (pset_range_left q b : (pset 'a1))) <->
+           (exists i:int.
+             (exists r:(pointer 'a1).
+               ((Int.(<=) i b) and
+                ((in_pset r q) and (p = (shift r i : (pointer 'a1)))))))))))
+
+  axiom In_pset_range_right:
+    (forall p:(pointer 'a1).
+      (forall q:(pset 'a1).
+        (forall a:int.
+          ((in_pset p (pset_range_right q a : (pset 'a1))) <->
+           (exists i:int.
+             (exists r:(pointer 'a1).
+               ((Int.(<=) a i) and
+                ((in_pset r q) and (p = (shift r i : (pointer 'a1)))))))))))
+
+  axiom In_pset_union:
+    (forall p:(pointer 'a1).
+      (forall s1:(pset 'a1).
+        (forall s2:(pset 'a1).
+          ((in_pset p (pset_union s1 s2 : (pset 'a1))) <->
+           ((in_pset p s1) or (in_pset p s2))))))
+
+  axiom Valid_pset_empty:
+    (forall a:(alloc_table 'a1). (valid_pset a (pset_empty : (pset 'a1))))
+
+  axiom Valid_pset_singleton:
+    (forall a:(alloc_table 'a1).
+      (forall p:(pointer 'a1).
+        ((valid_pset a (pset_singleton p : (pset 'a1))) <-> (valid a p))))
+
+  axiom Valid_pset_deref:
+    (forall a:(alloc_table 'a1).
+      (forall m:(memory 'a2 (pointer 'a1)).
+        (forall q:(pset 'a2).
+          ((valid_pset a (pset_deref m q : (pset 'a1))) <->
+           (forall r:(pointer 'a2).
+             (forall p:(pointer 'a1).
+               (((in_pset r q) and (p = (select m r : (pointer 'a1)))) ->
+                (valid a p))))))))
+
+  axiom Valid_pset_range:
+    (forall a:(alloc_table 'a1).
+      (forall q:(pset 'a1).
+        (forall c:int.
+          (forall d:int.
+            ((valid_pset a (pset_range q c d : (pset 'a1))) <->
+             (forall i:int.
+               (forall r:(pointer 'a1).
+                 (((in_pset r q) and ((Int.(<=) c i) and (Int.(<=) i d))) ->
+                  (valid a (shift r i : (pointer 'a1)))))))))))
+
+  axiom Valid_pset_union:
+    (forall a:(alloc_table 'a1).
+      (forall s1:(pset 'a1).
+        (forall s2:(pset 'a1).
+          ((valid_pset a (pset_union s1 s2 : (pset 'a1))) <->
+           ((valid_pset a s1) and (valid_pset a s2))))))
+
+  logic not_assigns (alloc_table 'a1) (memory 'a1 'a2) (memory 'a1 'a2) (pset 'a1)
+
+  axiom Not_assigns_def:
+    (forall a0:(alloc_table 'a1).
+      (forall m1_0:(memory 'a1 'a2).
+        (forall m2_0:(memory 'a1 'a2).
+          (forall l0:(pset 'a1).
+            ((not_assigns a0 m1_0 m2_0 l0) <->
+             (forall p:(pointer 'a1).
+               (((valid a0 p) and (not (in_pset p l0))) ->
+                ((select m2_0 p : 'a2) = (select m1_0 p : 'a2)))))))))
+
+  axiom Not_assigns_refl:
+    (forall a:(alloc_table 'a1).
+      (forall m:(memory 'a1 'a2).
+        (forall l:(pset 'a1). (not_assigns a m m l))))
+
+  axiom Not_assigns_trans:
+    (forall a:(alloc_table 'a1).
+      (forall m1:(memory 'a1 'a2).
+        (forall m2:(memory 'a1 'a2).
+          (forall m3:(memory 'a1 'a2).
+            (forall l:(pset 'a1) [(not_assigns a m1 m2 l),
+              (not_assigns a m1 m3 l)].
+              ((not_assigns a m1 m2 l) ->
+               ((not_assigns a m2 m3 l) -> (not_assigns a m1 m3 l))))))))
+
+  logic full_separated (pointer 'a1) (pointer 'a2)
+
+  axiom Full_separated_shift1:
+    (forall p:(pointer 'a1).
+      (forall q:(pointer 'a1).
+        (forall i:int [(full_separated p q), (shift q i : (pointer 'a1))].
+          ((full_separated p q) ->
+           (full_separated p (shift q i : (pointer 'a1)))))))
+
+  axiom Full_separated_shift2:
+    (forall p:(pointer 'a1).
+      (forall q:(pointer 'a1).
+        (forall i:int [(full_separated p q), (shift q i : (pointer 'a1))].
+          ((full_separated p q) ->
+           (full_separated (shift q i : (pointer 'a1)) p)))))
+
+  axiom Full_separated_shift3:
+    (forall p:(pointer 'a1).
+      (forall q:(pointer 'a1).
+        (forall i:int [(full_separated q p), (shift q i : (pointer 'a1))].
+          ((full_separated q p) ->
+           (full_separated (shift q i : (pointer 'a1)) p)))))
+
+  axiom Full_separated_shift4:
+    (forall p:(pointer 'a1).
+      (forall q:(pointer 'a1).
+        (forall i:int [(full_separated q p), (shift q i : (pointer 'a1))].
+          ((full_separated q p) ->
+           (full_separated p (shift q i : (pointer 'a1)))))))
+
+  type tag_table 't
+
+  type tag_id 't
+
+  logic int_of_tag (tag_id 'a1) : int
+
+  logic typeof (tag_table 'a1) (pointer 'a1) : (tag_id 'a1)
+
+  logic parenttag (tag_id 'a1) (tag_id 'a1)
+
+  logic subtag (tag_id 'a1) (tag_id 'a1)
+
+  logic subtag_bool (tag_id 'a1) (tag_id 'a1) : Bool.bool
+
+  axiom Subtag_bool_def:
+    (forall t1:(tag_id 'a1).
+      (forall t2:(tag_id 'a1).
+        (((subtag_bool t1 t2 : Bool.bool) = Bool.True) <-> (subtag t1 t2))))
+
+  axiom Subtag_refl: (forall t:(tag_id 'a1). (subtag t t))
+
+  axiom Subtag_parent:
+    (forall t1:(tag_id 'a1).
+      (forall t2:(tag_id 'a1).
+        (forall t3:(tag_id 'a1).
+          ((subtag t1 t2) -> ((parenttag t2 t3) -> (subtag t1 t3))))))
+
+  logic instanceof (tag_table 'a1) (pointer 'a1) (tag_id 'a1)
+
+  axiom Instanceof_def:
+    (forall a0:(tag_table 'a1).
+      (forall p0:(pointer 'a1).
+        (forall t0:(tag_id 'a1).
+          ((instanceof a0 p0 t0) <->
+           (subtag (typeof a0 p0 : (tag_id 'a1)) t0)))))
+
+  logic downcast (tag_table 'a1) (pointer 'a1) (tag_id 'a1) : (pointer 'a1)
+
+  axiom Downcast_instanceof:
+    (forall a:(tag_table 'a1).
+      (forall p:(pointer 'a1).
+        (forall s:(tag_id 'a1).
+          ((instanceof a p s) -> ((downcast a p s : (pointer 'a1)) = p)))))
+
+  logic bottom_tag  : (tag_id 'a1)
+
+  axiom Bottom_tag_axiom:
+    (forall t:(tag_id 'a1). (subtag t (bottom_tag : (tag_id 'a1))))
+
+  logic root_tag (tag_id 'a1)
+
+  axiom Root_tag_def:
+    (forall t0:(tag_id 'a1).
+      ((root_tag t0) <-> (parenttag t0 (bottom_tag : (tag_id 'a1)))))
+
+  axiom Root_subtag:
+    (forall a:(tag_id 'a1).
+      (forall b:(tag_id 'a1).
+        (forall c:(tag_id 'a1).
+          ((root_tag a) ->
+           ((root_tag b) ->
+            ((a <> b) -> ((subtag c a) -> (not (subtag c b)))))))))
+
+  logic fully_packed (tag_table 'a1) (memory 'a1 (tag_id 'a1)) (pointer 'a1)
+
+  axiom Fully_packed_def:
+    (forall tag_table0:(tag_table 'a1).
+      (forall mutable0:(memory 'a1 (tag_id 'a1)).
+        (forall this0:(pointer 'a1).
+          ((fully_packed tag_table0 mutable0 this0) <->
+           ((select mutable0 this0 : (tag_id 'a1)) = (typeof tag_table0 this0 : (tag_id 'a1)))))))
+
+  logic bw_compl int : int
+
+  logic bw_and int int : int
+
+  axiom Bw_and_not_null:
+    (forall a:int.
+      (forall b:int. (((bw_and a b : int) <> 0) -> ((a <> 0) and (b <> 0)))))
+
+  logic bw_xor int int : int
+
+  logic bw_or int int : int
+
+  logic lsl int int : int
+
+  axiom Lsl_left_positive_returns_positive:
+    (forall a:int.
+      (forall b:int.
+        (((Int.(<=) 0 a) and (Int.(<=) 0 b)) -> (Int.(<=) 0 (lsl a b : int)))))
+
+  axiom Lsl_left_positive_monotone:
+    (forall a1:int.
+      (forall a2:int.
+        (forall b:int.
+          (((Int.(<=) 0 a1) and ((Int.(<=) a1 a2) and (Int.(<=) 0 b))) ->
+           (Int.(<=) (lsl a1 b : int) (lsl a2 b : int))))))
+
+  logic lsr int int : int
+
+  axiom Lsr_left_positive_returns_positive:
+    (forall a:int.
+      (forall b:int.
+        (((Int.(<=) 0 a) and (Int.(<=) 0 b)) -> (Int.(<=) 0 (lsr a b : int)))))
+
+  axiom Lsr_left_positive_decreases:
+    (forall a:int.
+      (forall b:int.
+        (((Int.(<=) 0 a) and (Int.(<=) 0 b)) -> (Int.(<=) (lsr a b : int) a))))
+
+  logic asr int int : int
+
+  axiom Asr_positive_on_positive:
+    (forall a:int.
+      (forall b:int.
+        (((Int.(<=) 0 a) and (Int.(<=) 0 b)) -> (Int.(<=) 0 (asr a b : int)))))
+
+  axiom Asr_decreases_on_positive:
+    (forall a:int.
+      (forall b:int.
+        (((Int.(<=) 0 a) and (Int.(<=) 0 b)) -> (Int.(<=) (asr a b : int) a))))
+
+  axiom Asr_lsr_same_on_positive:
+    (forall a:int.
+      (forall b:int.
+        (((Int.(<=) 0 a) and (Int.(<=) 0 b)) ->
+         ((asr a b : int) = (lsr a b : int)))))
+
+  axiom Lsl_of_lsr_decreases_on_positive:
+    (forall a:int.
+      (forall b:int.
+        (((Int.(<=) 0 a) and (Int.(<=) 0 b)) ->
+         (Int.(<=) (lsl (lsr a b : int) b : int) a))))
+
+  axiom Lsr_of_lsl_identity_on_positive:
+    (forall a:int.
+      (forall b:int.
+        (((Int.(<=) 0 a) and (Int.(<=) 0 b)) ->
+         ((lsr (lsl a b : int) b : int) = a))))
+
+  logic alloc_extends (alloc_table 'a1) (alloc_table 'a1)
+
+  logic alloc_fresh (alloc_table 'a1) (pointer 'a1) int
+
+  axiom Alloc_fresh_def:
+    (forall a0:(alloc_table 'a1).
+      (forall p0:(pointer 'a1).
+        (forall n0:int.
+          ((alloc_fresh a0 p0 n0) <->
+           (forall i:int.
+             (((Int.(<=) 0 i) and (Int.(<) i n0)) ->
+              (not (valid a0 (shift p0 i : (pointer 'a1))))))))))
+
+  axiom Alloc_extends_offset_min:
+    (forall a1:(alloc_table 'a1).
+      (forall a2:(alloc_table 'a1) [(alloc_extends a1 a2)].
+        ((alloc_extends a1 a2) ->
+         (forall p:(pointer 'a1).
+           ((valid a1 p) ->
+            ((offset_min a1 p : int) = (offset_min a2 p : int)))))))
+
+  axiom Alloc_extends_offset_max:
+    (forall a1:(alloc_table 'a1).
+      (forall a2:(alloc_table 'a1) [(alloc_extends a1 a2)].
+        ((alloc_extends a1 a2) ->
+         (forall p:(pointer 'a1).
+           ((valid a1 p) ->
+            ((offset_max a1 p : int) = (offset_max a2 p : int)))))))
+
+  axiom Alloc_extends_not_assigns_empty:
+    (forall a1:(alloc_table 'a1).
+      (forall a2:(alloc_table 'a1).
+        (forall m1:(memory 'a1 'a2).
+          (forall m2:(memory 'a1 'a2).
+            (forall l:(pset 'a1).
+              (forall p:(pointer 'a1).
+                (forall n:int [(alloc_extends a1 a2), (alloc_fresh a1 p n),
+                  (not_assigns a2 m1 m2 l)].
+                  (((alloc_extends a1 a2) and
+                    ((alloc_fresh a1 p n) and
+                     ((not_assigns a2 m1 m2 l) and
+                      (pset_included l (pset_all (pset_singleton p : (pset 'a1)) : (pset 'a1)))))) ->
+                   (not_assigns a1 m1 m2 (pset_empty : (pset 'a1)))))))))))
+
+  logic alloc_extends_except (alloc_table 'a1) (alloc_table 'a1) (pset 'a1)
+
+  axiom Alloc_extends_except_offset_min:
+    (forall a1:(alloc_table 'a1).
+      (forall a2:(alloc_table 'a1).
+        (forall l:(pset 'a1) [(alloc_extends_except a1 a2 l)].
+          ((alloc_extends_except a1 a2 l) ->
+           (forall p:(pointer 'a1).
+             (((valid a1 p) and (not (in_pset p l))) ->
+              ((offset_min a1 p : int) = (offset_min a2 p : int))))))))
+
+  axiom Alloc_extends_except_offset_max:
+    (forall a1:(alloc_table 'a1).
+      (forall a2:(alloc_table 'a1).
+        (forall l:(pset 'a1) [(alloc_extends_except a1 a2 l)].
+          ((alloc_extends_except a1 a2 l) ->
+           (forall p:(pointer 'a1).
+             (((valid a1 p) and (not (in_pset p l))) ->
+              ((offset_max a1 p : int) = (offset_max a2 p : int))))))))
+
+  type bitvector
+
+  logic concat_bitvector bitvector bitvector : bitvector
+
+  logic offset_min_bytes (alloc_table 'a1) (pointer 'a1) int : int
+
+  logic offset_max_bytes (alloc_table 'a1) (pointer 'a1) int : int
+
+  axiom Offset_min_bytes_def:
+    (forall a:(alloc_table 'a1).
+      (forall p:(pointer 'a1).
+        (forall s:int [(offset_min_bytes a p s : int)].
+          ((Int.(<) 0 s) ->
+           ((Int.(<=) (offset_min a p : int) (Int.(*) s (offset_min_bytes a p s : int) : int)) and
+            (Int.(<) (Int.(-) (Int.(*) s (offset_min_bytes a p s : int) : int) s : int) (offset_min a p : int)))))))
+
+  axiom Offset_max_bytes_def:
+    (forall a:(alloc_table 'a1).
+      (forall p:(pointer 'a1).
+        (forall s:int [(offset_max_bytes a p s : int)].
+          ((Int.(<) 0 s) ->
+           ((Int.(<=) (Int.(-) (Int.(+) (Int.(*) s (offset_max_bytes a p s : int) : int) s : int) 1 : int) (offset_max a p : int)) and
+            (Int.(<) (offset_max a p : int) (Int.(-) (Int.(+) (Int.(+) (Int.(*) s (offset_max_bytes a p s : int) : int) s : int) s : int) 1 : int)))))))
+
+  logic extract_bytes bitvector int int : bitvector
+
+  logic replace_bytes bitvector int int bitvector : bitvector
+
+  axiom Select_store_eq_union:
+    (forall o1:int.
+      (forall s1:int.
+        (forall o2:int.
+          (forall s2:int.
+            (forall v1:bitvector.
+              (forall v2:bitvector [(extract_bytes (replace_bytes v1 o1 s1 v2 : bitvector) o2 s2 : bitvector)].
+                (((o1 = o2) and (s1 = s2)) ->
+                 ((extract_bytes (replace_bytes v1 o1 s1 v2 : bitvector) o2 s2 : bitvector) = v2))))))))
+
+  axiom Select_store_neq_union:
+    (forall o1:int.
+      (forall s1:int.
+        (forall o2:int.
+          (forall s2:int.
+            (forall v1:bitvector.
+              (forall v2:bitvector [(extract_bytes (replace_bytes v1 o1 s1 v2 : bitvector) o2 s2 : bitvector)].
+                (((Int.(<=) (Int.(+) o2 s2 : int) o1) or
+                  (Int.(<=) (Int.(+) o1 s2 : int) o2)) ->
+                 ((extract_bytes (replace_bytes v1 o1 s1 v2 : bitvector) o2 s2 : bitvector) = (extract_bytes v1 o2 s2 : bitvector)))))))))
+
+  axiom Concat_replace_bytes_up:
+    (forall o1:int.
+      (forall s1:int.
+        (forall o2:int.
+          (forall s2:int.
+            (forall v1:bitvector.
+              (forall v2:bitvector.
+                (forall v3:bitvector [(replace_bytes (replace_bytes v1 o1 s1 v2 : bitvector) o2 s2 v3 : bitvector)].
+                  (((Int.(+) o1 s1 : int) = o2) ->
+                   ((replace_bytes (replace_bytes v1 o1 s1 v2 : bitvector) o2 s2 v3 : bitvector) = (replace_bytes v1 o1 (Int.(+) s1 s2 : int) (concat_bitvector v2 v3 : bitvector) : bitvector))))))))))
+
+  axiom Concat_replace_bytes_down:
+    (forall o1:int.
+      (forall s1:int.
+        (forall o2:int.
+          (forall s2:int.
+            (forall v1:bitvector.
+              (forall v2:bitvector.
+                (forall v3:bitvector [(replace_bytes (replace_bytes v1 o1 s1 v2 : bitvector) o2 s2 v3 : bitvector)].
+                  (((Int.(+) o2 s2 : int) = o1) ->
+                   ((replace_bytes (replace_bytes v1 o1 s1 v2 : bitvector) o2 s2 v3 : bitvector) = (replace_bytes v1 o2 (Int.(+) s1 s2 : int) (concat_bitvector v3 v2 : bitvector) : bitvector))))))))))
+
+  axiom Concat_extract_bytes:
+    (forall o1:int.
+      (forall s1:int.
+        (forall o2:int.
+          (forall s2:int.
+            (forall v:bitvector [(concat_bitvector (extract_bytes v o1 s1 : bitvector) (extract_bytes v o2 s2 : bitvector) : bitvector)].
+              (((Int.(+) o1 s1 : int) = o2) ->
+               ((concat_bitvector (extract_bytes v o1 s1 : bitvector) (extract_bytes v o2 s2 : bitvector) : bitvector) = (extract_bytes v o1 (Int.(+) s1 s2 : int) : bitvector))))))))
+
+  logic select_bytes (memory 'a1 bitvector) (pointer 'a1) int int : bitvector
+
+  logic store_bytes (memory 'a1 bitvector) (pointer 'a1) int int bitvector : (memory 'a1 bitvector)
+
+  axiom Select_store_eq_bytes:
+    (forall m:(memory 'a1 bitvector).
+      (forall p1:(pointer 'a1).
+        (forall p2:(pointer 'a1).
+          (forall o1:int.
+            (forall s1:int.
+              (forall o2:int.
+                (forall s2:int.
+                  (forall v:bitvector [(select_bytes (store_bytes m p1 o1 s1 v : (memory 'a1 bitvector)) p2 o2 s2 : bitvector)].
+                    (((p1 = p2) and ((o1 = o2) and (s1 = s2))) ->
+                     ((select_bytes (store_bytes m p1 o1 s1 v : (memory 'a1 bitvector)) p2 o2 s2 : bitvector) = v))))))))))
+
+  axiom Select_store_neq_bytes:
+    (forall m:(memory 'a1 bitvector).
+      (forall p1:(pointer 'a1).
+        (forall p2:(pointer 'a1).
+          (forall o1:int.
+            (forall s1:int.
+              (forall o2:int.
+                (forall s2:int.
+                  (forall v:bitvector [(select_bytes (store_bytes m p1 o1 s1 v : (memory 'a1 bitvector)) p2 o2 s2 : bitvector)].
+                    ((pset_disjoint (pset_range (pset_singleton p1 : (pset 'a1)) o1 (Int.(+) o1 s1 : int) : (pset 'a1)) (pset_range (pset_singleton p2 : (pset 'a1)) o2 (Int.(+) o2 s2 : int) : (pset 'a1))) ->
+                     ((select_bytes (store_bytes m p1 o1 s1 v : (memory 'a1 bitvector)) p2 o2 s2 : bitvector) = (select_bytes m p2 o2 s2 : bitvector)))))))))))
+
+  axiom Shift_store_bytes:
+    (forall m:(memory 'a1 bitvector).
+      (forall p:(pointer 'a1).
+        (forall i:int.
+          (forall o:int.
+            (forall s:int.
+              (forall v:bitvector [(store_bytes m (shift p i : (pointer 'a1)) o s v : (memory 'a1 bitvector))].
+                ((store_bytes m (shift p i : (pointer 'a1)) o s v : (memory 'a1 bitvector)) = (store_bytes m p (Int.(+) o i : int) s v : (memory 'a1 bitvector)))))))))
+
+  axiom Shift_select_bytes:
+    (forall m:(memory 'a1 bitvector).
+      (forall p:(pointer 'a1).
+        (forall i:int.
+          (forall o:int.
+            (forall s:int.
+              (forall v:bitvector [(select_bytes m (shift p i : (pointer 'a1)) o s : bitvector)].
+                ((select_bytes m (shift p i : (pointer 'a1)) o s : bitvector) = (select_bytes m p (Int.(+) o i : int) s : bitvector))))))))
+
+  axiom Concat_store_bytes_up:
+    (forall m:(memory 'a1 bitvector).
+      (forall p:(pointer 'a1).
+        (forall o1:int.
+          (forall s1:int.
+            (forall o2:int.
+              (forall s2:int.
+                (forall v1:bitvector.
+                  (forall v2:bitvector [(store_bytes (store_bytes m p o1 s1 v1 : (memory 'a1 bitvector)) p o2 s2 v2 : (memory 'a1 bitvector))].
+                    (((Int.(+) o1 s1 : int) = o2) ->
+                     ((store_bytes (store_bytes m p o1 s1 v1 : (memory 'a1 bitvector)) p o2 s2 v2 : (memory 'a1 bitvector)) = (store_bytes m p o1 (Int.(+) s1 s2 : int) (concat_bitvector v1 v2 : bitvector) : (memory 'a1 bitvector))))))))))))
+
+  axiom Concat_store_bytes_down:
+    (forall m:(memory 'a1 bitvector).
+      (forall p:(pointer 'a1).
+        (forall o1:int.
+          (forall s1:int.
+            (forall o2:int.
+              (forall s2:int.
+                (forall v1:bitvector.
+                  (forall v2:bitvector [(store_bytes (store_bytes m p o1 s1 v1 : (memory 'a1 bitvector)) p o2 s2 v2 : (memory 'a1 bitvector))].
+                    (((Int.(+) o2 s2 : int) = o1) ->
+                     ((store_bytes (store_bytes m p o1 s1 v1 : (memory 'a1 bitvector)) p o2 s2 v2 : (memory 'a1 bitvector)) = (store_bytes m p o2 (Int.(+) s1 s2 : int) (concat_bitvector v2 v1 : bitvector) : (memory 'a1 bitvector))))))))))))
+
+  axiom Concat_select_bytes:
+    (forall m:(memory 'a1 bitvector).
+      (forall p:(pointer 'a1).
+        (forall o1:int.
+          (forall s1:int.
+            (forall o2:int.
+              (forall s2:int [(concat_bitvector (select_bytes m p o1 s1 : bitvector) (select_bytes m p o2 s2 : bitvector) : bitvector)].
+                (((Int.(+) o1 s1 : int) = o2) ->
+                 ((concat_bitvector (select_bytes m p o1 s1 : bitvector) (select_bytes m p o2 s2 : bitvector) : bitvector) = (select_bytes m p o1 (Int.(+) s1 s2 : int) : bitvector)))))))))
+
+  type char_P
+
+  type mybag
+
+  type node
+
+  type padding
+
+  type void_P
+
+  logic mybag_add (pointer node) mybag mybag
+
+  logic in_mybag (pointer node) mybag
+
+  axiom U_mybag_add:
+    (forall s_1:mybag.
+      (forall t_0:mybag.
+        (forall p_3:(pointer node).
+          ((mybag_add p_3 t_0 s_1) <->
+           (forall n_1:(pointer node).
+             ((in_mybag n_1 s_1) <-> ((n_1 = p_3) or (in_mybag n_1 t_0))))))))
+
+  logic mybag_all  : mybag
+
+  axiom U_mybag_all:
+    (forall p_2_0:(pointer node). (in_mybag p_2_0 (mybag_all : mybag)))
+
+  logic mybag_empty  : mybag
+
+  axiom U_mybag_empty:
+    (forall p_1_0:(pointer node).
+      (not (in_mybag p_1_0 (mybag_empty : mybag))))
+
+  logic mybag_rem (pointer node) mybag mybag
+
+  axiom U_mybag_rem:
+    (forall s_3:mybag.
+      (forall t_2:mybag.
+        (forall p_4:(pointer node).
+          ((mybag_rem p_4 t_2 s_3) <->
+           (forall n_0_0:(pointer node).
+             ((in_mybag n_0_0 s_3) <->
+              ((n_0_0 <> p_4) and (in_mybag n_0_0 t_2))))))))
+
+  logic bitvector_of_char_P (pointer char_P) : bitvector
+
+  logic char_P_of_bitvector bitvector : (pointer char_P)
+
+  axiom Bitvector_of_char_P_of_char_P_of_bitvector:
+    (forall x:bitvector.
+      ((bitvector_of_char_P (char_P_of_bitvector x : (pointer char_P)) : bitvector) = x))
+
+  logic bitvector_of_node (pointer node) : bitvector
+
+  logic node_of_bitvector bitvector : (pointer node)
+
+  axiom Bitvector_of_node_of_node_of_bitvector:
+    (forall x:bitvector.
+      ((bitvector_of_node (node_of_bitvector x : (pointer node)) : bitvector) = x))
+
+  logic bitvector_of_void_P (pointer void_P) : bitvector
+
+  logic void_P_of_bitvector bitvector : (pointer void_P)
+
+  axiom Bitvector_of_void_P_of_void_P_of_bitvector:
+    (forall x:bitvector.
+      ((bitvector_of_void_P (void_P_of_bitvector x : (pointer void_P)) : bitvector) = x))
+
+  logic char_P_tag  : (tag_id char_P)
+
+  axiom Char_P_int: ((int_of_tag (char_P_tag : (tag_id char_P)) : int) = 1)
+
+  axiom Char_P_of_bitvector_of_bitvector_of_char_P:
+    (forall x:(pointer char_P).
+      ((char_P_of_bitvector (bitvector_of_char_P x : bitvector) : (pointer char_P)) = x))
+
+  logic char_P_of_pointer_address (pointer Tuple0.tuple0) : (pointer char_P)
+
+  axiom Char_P_of_pointer_address_of_pointer_addr:
+    (forall p:(pointer char_P).
+      (p = (char_P_of_pointer_address (pointer_address p : (pointer Tuple0.tuple0)) : (pointer char_P))))
+
+  axiom Char_P_parenttag_bottom:
+    (parenttag (char_P_tag : (tag_id char_P)) (bottom_tag : (tag_id char_P)))
+
+  axiom Char_P_tags:
+    (forall x:(pointer char_P).
+      (forall char_P_tag_table:(tag_table char_P).
+        (instanceof char_P_tag_table x (char_P_tag : (tag_id char_P)))))
+
+  logic ilist (pointer node) (alloc_table node) (memory node (pointer node))
+
+  axiom Ilist_inversion:
+    (forall aux_1_0:(pointer node).
+      (forall aux_2_0:(alloc_table node).
+        (forall aux_3_0:(memory node (pointer node)).
+          ((ilist aux_1_0 aux_2_0 aux_3_0) ->
+           ((exists node_alloc_table_at_L:(alloc_table node).
+              (exists node_tl_at_L:(memory node (pointer node)).
+                ((aux_1_0 = (null : (pointer node))) and
+                 ((aux_2_0 = node_alloc_table_at_L) and
+                  (aux_3_0 = node_tl_at_L))))) or
+            (exists node_alloc_table_at_L:(alloc_table node).
+              (exists node_tl_at_L:(memory node (pointer node)).
+                (exists p_0_0:(pointer node).
+                  ((p_0_0 <> (null : (pointer node))) and
+                   (((Int.(<=) (offset_min node_alloc_table_at_L p_0_0 : int) 0) and
+                     (Int.(>=) (offset_max node_alloc_table_at_L p_0_0 : int) 0)) and
+                    ((ilist (select node_tl_at_L p_0_0 : (pointer node)) node_alloc_table_at_L node_tl_at_L) and
+                     ((aux_1_0 = p_0_0) and
+                      ((aux_2_0 = node_alloc_table_at_L) and
+                       (aux_3_0 = node_tl_at_L))))))))))))))
+
+  axiom Nil:
+    (forall node_alloc_table_at_L:(alloc_table node).
+      (forall node_tl_at_L:(memory node (pointer node)).
+        (ilist (null : (pointer node)) node_alloc_table_at_L node_tl_at_L)))
+
+  axiom Cons:
+    (forall node_alloc_table_at_L:(alloc_table node).
+      (forall node_tl_at_L:(memory node (pointer node)).
+        (forall p_0_0:(pointer node).
+          ((p_0_0 <> (null : (pointer node))) ->
+           (((Int.(<=) (offset_min node_alloc_table_at_L p_0_0 : int) 0) and
+             (Int.(>=) (offset_max node_alloc_table_at_L p_0_0 : int) 0)) ->
+            ((ilist (select node_tl_at_L p_0_0 : (pointer node)) node_alloc_table_at_L node_tl_at_L) ->
+             (ilist p_0_0 node_alloc_table_at_L node_tl_at_L)))))))
+
+  logic ilist_FT (pointer node) (memory node (pointer node)) (memory node (pointer node))
+
+  goal Ilist_frame:
+    (forall node_alloc_table_at_L2:(alloc_table node).
+      (forall node_alloc_table_at_L1:(alloc_table node).
+        (forall node_tl_at_L2:(memory node (pointer node)).
+          (forall node_tl_at_L1:(memory node (pointer node)).
+            (forall p_17:(pointer node).
+              ((ilist_FT p_17 node_tl_at_L2 node_tl_at_L1) ->
+               ((ilist p_17 node_alloc_table_at_L1 node_tl_at_L1) ->
+                (ilist p_17 node_alloc_table_at_L2 node_tl_at_L2))))))))
+
+  axiom Ilist_frame_as_axiom:
+    (forall node_alloc_table_at_L2:(alloc_table node).
+      (forall node_alloc_table_at_L1:(alloc_table node).
+        (forall node_tl_at_L2:(memory node (pointer node)).
+          (forall node_tl_at_L1:(memory node (pointer node)).
+            (forall p_17:(pointer node).
+              ((ilist_FT p_17 node_tl_at_L2 node_tl_at_L1) ->
+               ((ilist p_17 node_alloc_table_at_L1 node_tl_at_L1) ->
+                (ilist p_17 node_alloc_table_at_L2 node_tl_at_L2))))))))
+
+  logic ilist_in_list_notin (pointer node) mybag (memory node (pointer node))
+
+  goal Ilist_ilist_in_list_notin_frame:
+    (forall node_tl_at_L2:(memory node (pointer node)).
+      (forall node_tl_at_L1:(memory node (pointer node)).
+        (forall s_7:mybag.
+          (forall p_18:(pointer node).
+            ((ilist_FT p_18 node_tl_at_L2 node_tl_at_L1) ->
+             ((ilist_in_list_notin p_18 s_7 node_tl_at_L1) ->
+              (ilist_in_list_notin p_18 s_7 node_tl_at_L2)))))))
+
+  axiom Ilist_ilist_in_list_notin_frame_as_axiom:
+    (forall node_tl_at_L2:(memory node (pointer node)).
+      (forall node_tl_at_L1:(memory node (pointer node)).
+        (forall s_7:mybag.
+          (forall p_18:(pointer node).
+            ((ilist_FT p_18 node_tl_at_L2 node_tl_at_L1) ->
+             ((ilist_in_list_notin p_18 s_7 node_tl_at_L1) ->
+              (ilist_in_list_notin p_18 s_7 node_tl_at_L2)))))))
+
+  logic ilist_notin_node (pointer node) (pointer node) (memory node (pointer node))
+
+  goal Ilist_ilist_notin_node_frame:
+    (forall node_tl_at_L2:(memory node (pointer node)).
+      (forall node_tl_at_L1:(memory node (pointer node)).
+        (forall p_19:(pointer node).
+          (forall n_3:(pointer node).
+            ((ilist_FT p_19 node_tl_at_L2 node_tl_at_L1) ->
+             ((ilist_notin_node p_19 n_3 node_tl_at_L1) ->
+              (ilist_notin_node p_19 n_3 node_tl_at_L2)))))))
+
+  axiom Ilist_ilist_notin_node_frame_as_axiom:
+    (forall node_tl_at_L2:(memory node (pointer node)).
+      (forall node_tl_at_L1:(memory node (pointer node)).
+        (forall p_19:(pointer node).
+          (forall n_3:(pointer node).
+            ((ilist_FT p_19 node_tl_at_L2 node_tl_at_L1) ->
+             ((ilist_notin_node p_19 n_3 node_tl_at_L1) ->
+              (ilist_notin_node p_19 n_3 node_tl_at_L2)))))))
+
+  axiom Ilist_in_list_notin_def1:
+    (forall node_tl_at_L:(memory node (pointer node)).
+      (forall p_6:(pointer node).
+        (forall s_5:mybag.
+          ((p_6 = (null : (pointer node))) ->
+           (ilist_in_list_notin p_6 s_5 node_tl_at_L)))))
+
+  axiom Ilist_in_list_notin_def2:
+    (forall node_tl_at_L:(memory node (pointer node)).
+      (forall p_7:(pointer node).
+        (forall s_6:mybag.
+          ((ilist_in_list_notin p_7 s_6 node_tl_at_L) <->
+           ((p_7 <> (null : (pointer node))) ->
+            ((ilist_in_list_notin (select node_tl_at_L p_7 : (pointer node)) s_6 node_tl_at_L) and
+             (in_mybag p_7 s_6)))))))
+
+  axiom Ilist_in_list_notin_def3:
+    (forall node_tl_at_L:(memory node (pointer node)).
+      (forall p_8:(pointer node).
+        (ilist_in_list_notin p_8 (mybag_all : mybag) node_tl_at_L)))
+
+  logic ilist_notin (pointer node) (memory node (pointer node)) : mybag
+
+  axiom Ilist_notin1:
+    (forall node_tl_at_L:(memory node (pointer node)).
+      (forall p_13:(pointer node).
+        ((p_13 = (null : (pointer node))) ->
+         ((ilist_notin p_13 node_tl_at_L : mybag) = (mybag_all : mybag)))))
+
+  axiom Ilist_notin2:
+    (forall node_tl_at_L:(memory node (pointer node)).
+      (forall p_14:(pointer node).
+        (forall n_1_0:(pointer node).
+          ((p_14 <> (null : (pointer node))) ->
+           (mybag_rem p_14 (ilist_notin (select node_tl_at_L p_14 : (pointer node)) node_tl_at_L : mybag) (ilist_notin p_14 node_tl_at_L : mybag))))))
+
+  axiom Ilist_notin_FT:
+    (forall node_tl_at_L2:(memory node (pointer node)).
+      (forall node_tl_at_L1:(memory node (pointer node)).
+        (forall p_16:(pointer node).
+          ((forall n_2:(pointer node).
+             (((select node_tl_at_L1 n_2 : (pointer node)) <> (select node_tl_at_L2 n_2 : (pointer node))) ->
+              (in_mybag n_2 (ilist_notin p_16 node_tl_at_L1 : mybag)))) ->
+           (ilist_FT p_16 node_tl_at_L2 node_tl_at_L1)))))
+
+  goal Ilist_notin_frame:
+    (forall node_tl_at_L2:(memory node (pointer node)).
+      (forall node_tl_at_L1:(memory node (pointer node)).
+        (forall p_20:(pointer node).
+          ((ilist_FT p_20 node_tl_at_L2 node_tl_at_L1) ->
+           ((ilist_notin p_20 node_tl_at_L1 : mybag) = (ilist_notin p_20 node_tl_at_L2 : mybag))))))
+
+  axiom Ilist_notin_frame_as_axiom:
+    (forall node_tl_at_L2:(memory node (pointer node)).
+      (forall node_tl_at_L1:(memory node (pointer node)).
+        (forall p_20:(pointer node).
+          ((ilist_FT p_20 node_tl_at_L2 node_tl_at_L1) ->
+           ((ilist_notin p_20 node_tl_at_L1 : mybag) = (ilist_notin p_20 node_tl_at_L2 : mybag))))))
+
+  axiom Ilist_notin_node_def1:
+    (forall node_tl_at_L:(memory node (pointer node)).
+      (forall p_10:(pointer node).
+        (forall q_0_0:(pointer node).
+          ((p_10 = (null : (pointer node))) ->
+           (ilist_notin_node p_10 q_0_0 node_tl_at_L)))))
+
+  axiom Ilist_notin_node_def2:
+    (forall node_tl_at_L:(memory node (pointer node)).
+      (forall p_11:(pointer node).
+        (forall q_1_0:(pointer node).
+          ((p_11 <> (null : (pointer node))) ->
+           ((ilist_notin_node p_11 q_1_0 node_tl_at_L) <->
+            ((ilist_notin_node (select node_tl_at_L p_11 : (pointer node)) q_1_0 node_tl_at_L) and
+             (p_11 <> q_1_0)))))))
+
+  logic inc_ilist_ilist (pointer node) (pointer node) (memory node (pointer node))
+
+  axiom Inc_ilist_ilist_def:
+    (forall p1_0:(pointer node).
+      (forall p2_0:(pointer node).
+        (forall node_tl_at_L0:(memory node (pointer node)).
+          ((inc_ilist_ilist p1_0 p2_0 node_tl_at_L0) <->
+           (ilist_in_list_notin p1_0 (ilist_notin p2_0 node_tl_at_L0 : mybag) node_tl_at_L0)))))
+
+  logic left_valid_struct_char_P (pointer char_P) int (alloc_table char_P)
+
+  axiom Left_valid_struct_char_P_def:
+    (forall p0:(pointer char_P).
+      (forall a0:int.
+        (forall char_P_alloc_table0:(alloc_table char_P).
+          ((left_valid_struct_char_P p0 a0 char_P_alloc_table0) <->
+           (Int.(<=) (offset_min char_P_alloc_table0 p0 : int) a0)))))
+
+  logic left_valid_struct_node (pointer node) int (alloc_table node)
+
+  axiom Left_valid_struct_node_def:
+    (forall p0:(pointer node).
+      (forall a0:int.
+        (forall node_alloc_table0:(alloc_table node).
+          ((left_valid_struct_node p0 a0 node_alloc_table0) <->
+           (Int.(<=) (offset_min node_alloc_table0 p0 : int) a0)))))
+
+  logic left_valid_struct_void_P (pointer void_P) int (alloc_table void_P)
+
+  axiom Left_valid_struct_void_P_def:
+    (forall p0:(pointer void_P).
+      (forall a0:int.
+        (forall void_P_alloc_table0:(alloc_table void_P).
+          ((left_valid_struct_void_P p0 a0 void_P_alloc_table0) <->
+           (Int.(<=) (offset_min void_P_alloc_table0 p0 : int) a0)))))
+
+  logic sep_node_ilist (pointer node) (pointer node) (memory node (pointer node))
+
+  axiom Sep_node_ilist_def:
+    (forall n_4_0:(pointer node).
+      (forall p_21_0:(pointer node).
+        (forall node_tl_at_L0:(memory node (pointer node)).
+          ((sep_node_ilist n_4_0 p_21_0 node_tl_at_L0) <->
+           ((in_mybag n_4_0 (ilist_notin p_21_0 node_tl_at_L0 : mybag)) and
+            (ilist_notin_node p_21_0 n_4_0 node_tl_at_L0))))))
+
+  goal List_sep:
+    (forall node_alloc_table_at_L:(alloc_table node).
+      (forall node_tl_at_L:(memory node (pointer node)).
+        (forall p_22:(pointer node).
+          ((ilist p_22 node_alloc_table_at_L node_tl_at_L) ->
+           (sep_node_ilist p_22 (select node_tl_at_L p_22 : (pointer node)) node_tl_at_L)))))
+
+  axiom List_sep_as_axiom:
+    (forall node_alloc_table_at_L:(alloc_table node).
+      (forall node_tl_at_L:(memory node (pointer node)).
+        (forall p_22:(pointer node).
+          ((ilist p_22 node_alloc_table_at_L node_tl_at_L) ->
+           (sep_node_ilist p_22 (select node_tl_at_L p_22 : (pointer node)) node_tl_at_L)))))
+
+  logic node_tag  : (tag_id node)
+
+  axiom Node_int: ((int_of_tag (node_tag : (tag_id node)) : int) = 1)
+
+  axiom Node_of_bitvector_of_bitvector_of_node:
+    (forall x:(pointer node).
+      ((node_of_bitvector (bitvector_of_node x : bitvector) : (pointer node)) = x))
+
+  logic node_of_pointer_address (pointer Tuple0.tuple0) : (pointer node)
+
+  axiom Node_of_pointer_address_of_pointer_addr:
+    (forall p:(pointer node).
+      (p = (node_of_pointer_address (pointer_address p : (pointer Tuple0.tuple0)) : (pointer node))))
+
+  axiom Node_parenttag_bottom:
+    (parenttag (node_tag : (tag_id node)) (bottom_tag : (tag_id node)))
+
+  axiom Node_tags:
+    (forall x:(pointer node).
+      (forall node_tag_table:(tag_table node).
+        (instanceof node_tag_table x (node_tag : (tag_id node)))))
+
+  axiom Pointer_addr_of_char_P_of_pointer_address:
+    (forall p:(pointer Tuple0.tuple0).
+      (p = (pointer_address (char_P_of_pointer_address p : (pointer char_P)) : (pointer Tuple0.tuple0))))
+
+  axiom Pointer_addr_of_node_of_pointer_address:
+    (forall p:(pointer Tuple0.tuple0).
+      (p = (pointer_address (node_of_pointer_address p : (pointer node)) : (pointer Tuple0.tuple0))))
+
+  logic void_P_of_pointer_address (pointer Tuple0.tuple0) : (pointer void_P)
+
+  axiom Pointer_addr_of_void_P_of_pointer_address:
+    (forall p:(pointer Tuple0.tuple0).
+      (p = (pointer_address (void_P_of_pointer_address p : (pointer void_P)) : (pointer Tuple0.tuple0))))
+
+  logic right_valid_struct_char_P (pointer char_P) int (alloc_table char_P)
+
+  axiom Right_valid_struct_char_P_def:
+    (forall p0:(pointer char_P).
+      (forall b0:int.
+        (forall char_P_alloc_table0:(alloc_table char_P).
+          ((right_valid_struct_char_P p0 b0 char_P_alloc_table0) <->
+           (Int.(>=) (offset_max char_P_alloc_table0 p0 : int) b0)))))
+
+  logic right_valid_struct_node (pointer node) int (alloc_table node)
+
+  axiom Right_valid_struct_node_def:
+    (forall p0:(pointer node).
+      (forall b0:int.
+        (forall node_alloc_table0:(alloc_table node).
+          ((right_valid_struct_node p0 b0 node_alloc_table0) <->
+           (Int.(>=) (offset_max node_alloc_table0 p0 : int) b0)))))
+
+  logic right_valid_struct_void_P (pointer void_P) int (alloc_table void_P)
+
+  axiom Right_valid_struct_void_P_def:
+    (forall p0:(pointer void_P).
+      (forall b0:int.
+        (forall void_P_alloc_table0:(alloc_table void_P).
+          ((right_valid_struct_void_P p0 b0 void_P_alloc_table0) <->
+           (Int.(>=) (offset_max void_P_alloc_table0 p0 : int) b0)))))
+
+  logic sep_ilist_ilist (pointer node) (pointer node) (memory node (pointer node))
+
+  axiom Sep_ilist_ilist_def:
+    (forall p1_0_0:(pointer node).
+      (forall p2_0_0:(pointer node).
+        (forall node_tl_at_L0:(memory node (pointer node)).
+          ((sep_ilist_ilist p1_0_0 p2_0_0 node_tl_at_L0) <->
+           ((inc_ilist_ilist p1_0_0 p2_0_0 node_tl_at_L0) and
+            (inc_ilist_ilist p2_0_0 p1_0_0 node_tl_at_L0))))))
+
+  logic strict_valid_root_char_P (pointer char_P) int int (alloc_table char_P)
+
+  axiom Strict_valid_root_char_P_def:
+    (forall p0:(pointer char_P).
+      (forall a0:int.
+        (forall b0:int.
+          (forall char_P_alloc_table0:(alloc_table char_P).
+            ((strict_valid_root_char_P p0 a0 b0 char_P_alloc_table0) <->
+             (((offset_min char_P_alloc_table0 p0 : int) = a0) and
+              ((offset_max char_P_alloc_table0 p0 : int) = b0)))))))
+
+  logic strict_valid_root_node (pointer node) int int (alloc_table node)
+
+  axiom Strict_valid_root_node_def:
+    (forall p0:(pointer node).
+      (forall a0:int.
+        (forall b0:int.
+          (forall node_alloc_table0:(alloc_table node).
+            ((strict_valid_root_node p0 a0 b0 node_alloc_table0) <->
+             (((offset_min node_alloc_table0 p0 : int) = a0) and
+              ((offset_max node_alloc_table0 p0 : int) = b0)))))))
+
+  logic strict_valid_root_void_P (pointer void_P) int int (alloc_table void_P)
+
+  axiom Strict_valid_root_void_P_def:
+    (forall p0:(pointer void_P).
+      (forall a0:int.
+        (forall b0:int.
+          (forall void_P_alloc_table0:(alloc_table void_P).
+            ((strict_valid_root_void_P p0 a0 b0 void_P_alloc_table0) <->
+             (((offset_min void_P_alloc_table0 p0 : int) = a0) and
+              ((offset_max void_P_alloc_table0 p0 : int) = b0)))))))
+
+  logic strict_valid_struct_char_P (pointer char_P) int int (alloc_table char_P)
+
+  axiom Strict_valid_struct_char_P_def:
+    (forall p0:(pointer char_P).
+      (forall a0:int.
+        (forall b0:int.
+          (forall char_P_alloc_table0:(alloc_table char_P).
+            ((strict_valid_struct_char_P p0 a0 b0 char_P_alloc_table0) <->
+             (((offset_min char_P_alloc_table0 p0 : int) = a0) and
+              ((offset_max char_P_alloc_table0 p0 : int) = b0)))))))
+
+  logic strict_valid_struct_node (pointer node) int int (alloc_table node)
+
+  axiom Strict_valid_struct_node_def:
+    (forall p0:(pointer node).
+      (forall a0:int.
+        (forall b0:int.
+          (forall node_alloc_table0:(alloc_table node).
+            ((strict_valid_struct_node p0 a0 b0 node_alloc_table0) <->
+             (((offset_min node_alloc_table0 p0 : int) = a0) and
+              ((offset_max node_alloc_table0 p0 : int) = b0)))))))
+
+  logic strict_valid_struct_void_P (pointer void_P) int int (alloc_table void_P)
+
+  axiom Strict_valid_struct_void_P_def:
+    (forall p0:(pointer void_P).
+      (forall a0:int.
+        (forall b0:int.
+          (forall void_P_alloc_table0:(alloc_table void_P).
+            ((strict_valid_struct_void_P p0 a0 b0 void_P_alloc_table0) <->
+             (((offset_min void_P_alloc_table0 p0 : int) = a0) and
+              ((offset_max void_P_alloc_table0 p0 : int) = b0)))))))
+
+  logic valid_bitvector_struct_char_P (pointer Tuple0.tuple0) int int (alloc_table Tuple0.tuple0)
+
+  axiom Valid_bitvector_struct_char_P_def:
+    (forall p0:(pointer Tuple0.tuple0).
+      (forall a0:int.
+        (forall b0:int.
+          (forall bitvector_alloc_table0:(alloc_table Tuple0.tuple0).
+            ((valid_bitvector_struct_char_P p0 a0 b0 bitvector_alloc_table0) <->
+             (((offset_min bitvector_alloc_table0 p0 : int) = a0) and
+              ((offset_max bitvector_alloc_table0 p0 : int) = b0)))))))
+
+  logic valid_bitvector_struct_node (pointer Tuple0.tuple0) int int (alloc_table Tuple0.tuple0)
+
+  axiom Valid_bitvector_struct_node_def:
+    (forall p0:(pointer Tuple0.tuple0).
+      (forall a0:int.
+        (forall b0:int.
+          (forall bitvector_alloc_table0:(alloc_table Tuple0.tuple0).
+            ((valid_bitvector_struct_node p0 a0 b0 bitvector_alloc_table0) <->
+             (((offset_min bitvector_alloc_table0 p0 : int) = a0) and
+              ((offset_max bitvector_alloc_table0 p0 : int) = b0)))))))
+
+  logic valid_bitvector_struct_void_P (pointer Tuple0.tuple0) int int (alloc_table Tuple0.tuple0)
+
+  axiom Valid_bitvector_struct_void_P_def:
+    (forall p0:(pointer Tuple0.tuple0).
+      (forall a0:int.
+        (forall b0:int.
+          (forall bitvector_alloc_table0:(alloc_table Tuple0.tuple0).
+            ((valid_bitvector_struct_void_P p0 a0 b0 bitvector_alloc_table0) <->
+             (((offset_min bitvector_alloc_table0 p0 : int) = a0) and
+              ((offset_max bitvector_alloc_table0 p0 : int) = b0)))))))
+
+  logic valid_root_char_P (pointer char_P) int int (alloc_table char_P)
+
+  axiom Valid_root_char_P_def:
+    (forall p0:(pointer char_P).
+      (forall a0:int.
+        (forall b0:int.
+          (forall char_P_alloc_table0:(alloc_table char_P).
+            ((valid_root_char_P p0 a0 b0 char_P_alloc_table0) <->
+             ((Int.(<=) (offset_min char_P_alloc_table0 p0 : int) a0) and
+              (Int.(>=) (offset_max char_P_alloc_table0 p0 : int) b0)))))))
+
+  logic valid_root_node (pointer node) int int (alloc_table node)
+
+  axiom Valid_root_node_def:
+    (forall p0:(pointer node).
+      (forall a0:int.
+        (forall b0:int.
+          (forall node_alloc_table0:(alloc_table node).
+            ((valid_root_node p0 a0 b0 node_alloc_table0) <->
+             ((Int.(<=) (offset_min node_alloc_table0 p0 : int) a0) and
+              (Int.(>=) (offset_max node_alloc_table0 p0 : int) b0)))))))
+
+  logic valid_root_void_P (pointer void_P) int int (alloc_table void_P)
+
+  axiom Valid_root_void_P_def:
+    (forall p0:(pointer void_P).
+      (forall a0:int.
+        (forall b0:int.
+          (forall void_P_alloc_table0:(alloc_table void_P).
+            ((valid_root_void_P p0 a0 b0 void_P_alloc_table0) <->
+             ((Int.(<=) (offset_min void_P_alloc_table0 p0 : int) a0) and
+              (Int.(>=) (offset_max void_P_alloc_table0 p0 : int) b0)))))))
+
+  logic valid_struct_char_P (pointer char_P) int int (alloc_table char_P)
+
+  axiom Valid_struct_char_P_def:
+    (forall p0:(pointer char_P).
+      (forall a0:int.
+        (forall b0:int.
+          (forall char_P_alloc_table0:(alloc_table char_P).
+            ((valid_struct_char_P p0 a0 b0 char_P_alloc_table0) <->
+             ((Int.(<=) (offset_min char_P_alloc_table0 p0 : int) a0) and
+              (Int.(>=) (offset_max char_P_alloc_table0 p0 : int) b0)))))))
+
+  logic valid_struct_node (pointer node) int int (alloc_table node)
+
+  axiom Valid_struct_node_def:
+    (forall p0:(pointer node).
+      (forall a0:int.
+        (forall b0:int.
+          (forall node_alloc_table0:(alloc_table node).
+            ((valid_struct_node p0 a0 b0 node_alloc_table0) <->
+             ((Int.(<=) (offset_min node_alloc_table0 p0 : int) a0) and
+              (Int.(>=) (offset_max node_alloc_table0 p0 : int) b0)))))))
+
+  logic valid_struct_void_P (pointer void_P) int int (alloc_table void_P)
+
+  axiom Valid_struct_void_P_def:
+    (forall p0:(pointer void_P).
+      (forall a0:int.
+        (forall b0:int.
+          (forall void_P_alloc_table0:(alloc_table void_P).
+            ((valid_struct_void_P p0 a0 b0 void_P_alloc_table0) <->
+             ((Int.(<=) (offset_min void_P_alloc_table0 p0 : int) a0) and
+              (Int.(>=) (offset_max void_P_alloc_table0 p0 : int) b0)))))))
+
+  logic void_P_tag  : (tag_id void_P)
+
+  axiom Void_P_int: ((int_of_tag (void_P_tag : (tag_id void_P)) : int) = 1)
+
+  axiom Void_P_of_bitvector_of_bitvector_of_void_P:
+    (forall x:(pointer void_P).
+      ((void_P_of_bitvector (bitvector_of_void_P x : bitvector) : (pointer void_P)) = x))
+
+  axiom Void_P_of_pointer_address_of_pointer_addr:
+    (forall p:(pointer void_P).
+      (p = (void_P_of_pointer_address (pointer_address p : (pointer Tuple0.tuple0)) : (pointer void_P))))
+
+  axiom Void_P_parenttag_bottom:
+    (parenttag (void_P_tag : (tag_id void_P)) (bottom_tag : (tag_id void_P)))
+
+  axiom Void_P_tags:
+    (forall x:(pointer void_P).
+      (forall void_P_tag_table:(tag_table void_P).
+        (instanceof void_P_tag_table x (void_P_tag : (tag_id void_P)))))
+
+  goal Inconsistent_ensures_default_po_1:
+    (forall p_2:(pointer node).
+      (forall q_1:(pointer node).
+        (forall node_alloc_table:(alloc_table node).
+          (forall node_tl:(memory node (pointer node)).
+            (((Bool.True = Bool.True) and
+              ("JC_64"
+              (("JC_60" (ilist p_2 node_alloc_table node_tl)) and
+               (("JC_61" (ilist q_1 node_alloc_table node_tl)) and
+                (("JC_62" (inc_ilist_ilist p_2 q_1 node_tl)) and
+                 ("JC_63" (p_2 <> (null : (pointer node))))))))) ->
+             (forall node_tl0:(memory node (pointer node)).
+               ((node_tl0 = (store node_tl p_2 q_1 : (memory node (pointer node)))) ->
+                ("JC_66" (Bool.False = Bool.True)))))))))
+
+  goal Inconsistent_safety_po_1:
+    (forall p_2:(pointer node).
+      (forall q_1:(pointer node).
+        (forall node_alloc_table:(alloc_table node).
+          (forall node_tl:(memory node (pointer node)).
+            (("JC_64"
+             (("JC_60" (ilist p_2 node_alloc_table node_tl)) and
+              (("JC_61" (ilist q_1 node_alloc_table node_tl)) and
+               (("JC_62" (inc_ilist_ilist p_2 q_1 node_tl)) and
+                ("JC_63" (p_2 <> (null : (pointer node)))))))) ->
+             (Int.(<=) (offset_min node_alloc_table p_2 : int) 0))))))
+
+  goal Inconsistent_safety_po_2:
+    (forall p_2:(pointer node).
+      (forall q_1:(pointer node).
+        (forall node_alloc_table:(alloc_table node).
+          (forall node_tl:(memory node (pointer node)).
+            (("JC_64"
+             (("JC_60" (ilist p_2 node_alloc_table node_tl)) and
+              (("JC_61" (ilist q_1 node_alloc_table node_tl)) and
+               (("JC_62" (inc_ilist_ilist p_2 q_1 node_tl)) and
+                ("JC_63" (p_2 <> (null : (pointer node)))))))) ->
+             (Int.(<=) 0 (offset_max node_alloc_table p_2 : int)))))))
+
+  goal Rev_ensures_default_po_1:
+    (forall p_1:(pointer node).
+      (forall node_alloc_table:(alloc_table node).
+        (forall node_tl:(memory node (pointer node)).
+          (((Bool.True = Bool.True) and
+            ("JC_13" (ilist p_1 node_alloc_table node_tl))) ->
+           (forall q_1_1:(pointer node).
+             ((q_1_1 = (null : (pointer node))) ->
+              ("JC_41"
+              ("JC_39" ("JC_39" (ilist q_1_1 node_alloc_table node_tl))))))))))
+
+  goal Rev_ensures_default_po_2:
+    (forall p_1:(pointer node).
+      (forall node_alloc_table:(alloc_table node).
+        (forall node_tl:(memory node (pointer node)).
+          (((Bool.True = Bool.True) and
+            ("JC_13" (ilist p_1 node_alloc_table node_tl))) ->
+           (forall q_1_1:(pointer node).
+             ((q_1_1 = (null : (pointer node))) ->
+              ("JC_41"
+              ("JC_40" ("JC_40" (inc_ilist_ilist p_1 q_1_1 node_tl))))))))))
+
+  goal Rev_ensures_default_po_3:
+    (forall p_1:(pointer node).
+      (forall node_alloc_table:(alloc_table node).
+        (forall node_tl:(memory node (pointer node)).
+          (((Bool.True = Bool.True) and
+            ("JC_13" (ilist p_1 node_alloc_table node_tl))) ->
+           (forall q_1_1:(pointer node).
+             ((q_1_1 = (null : (pointer node))) ->
+              (forall mutable_p_1:(pointer node).
+                (forall node_tl0:(memory node (pointer node)).
+                  (forall q_1_1_0:(pointer node).
+                    (("JC_41"
+                     (("JC_38" (ilist mutable_p_1 node_alloc_table node_tl0)) and
+                      (("JC_39" (ilist q_1_1_0 node_alloc_table node_tl0)) and
+                       ("JC_40"
+                       (inc_ilist_ilist mutable_p_1 q_1_1_0 node_tl0))))) ->
+                     (forall result:int.
+                       (((Bool.True = Bool.True) ->
+                         ("JC_7"
+                         (if (neq_int_bool result 0 : Bool.bool) = Bool.True then
+                          (mutable_p_1 <> (null : (pointer node))) else
+                          (mutable_p_1 = (null : (pointer node)))))) ->
+                        (forall tmp_0:int.
+                          ((tmp_0 = result) ->
+                           ((tmp_0 <> 0) ->
+                            ("JC_47"
+                            ("JC_47"
+                            (ilist (select node_tl0 mutable_p_1 : (pointer node)) node_alloc_table node_tl0))))))))))))))))))
+
+  goal Rev_ensures_default_po_4:
+    (forall p_1:(pointer node).
+      (forall node_alloc_table:(alloc_table node).
+        (forall node_tl:(memory node (pointer node)).
+          (((Bool.True = Bool.True) and
+            ("JC_13" (ilist p_1 node_alloc_table node_tl))) ->
+           (forall q_1_1:(pointer node).
+             ((q_1_1 = (null : (pointer node))) ->
+              (forall mutable_p_1:(pointer node).
+                (forall node_tl0:(memory node (pointer node)).
+                  (forall q_1_1_0:(pointer node).
+                    (("JC_41"
+                     (("JC_38" (ilist mutable_p_1 node_alloc_table node_tl0)) and
+                      (("JC_39" (ilist q_1_1_0 node_alloc_table node_tl0)) and
+                       ("JC_40"
+                       (inc_ilist_ilist mutable_p_1 q_1_1_0 node_tl0))))) ->
+                     (forall result:int.
+                       (((Bool.True = Bool.True) ->
+                         ("JC_7"
+                         (if (neq_int_bool result 0 : Bool.bool) = Bool.True then
+                          (mutable_p_1 <> (null : (pointer node))) else
+                          (mutable_p_1 = (null : (pointer node)))))) ->
+                        (forall tmp_0:int.
+                          ((tmp_0 = result) ->
+                           ((tmp_0 <> 0) ->
+                            (("JC_47"
+                             (ilist (select node_tl0 mutable_p_1 : (pointer node)) node_alloc_table node_tl0)) ->
+                             ("JC_50"
+                             ("JC_48"
+                             ("JC_48"
+                             (Int.(<=) (offset_min node_alloc_table mutable_p_1 : int) 0))))))))))))))))))))
+
+  goal Rev_ensures_default_po_5:
+    (forall p_1:(pointer node).
+      (forall node_alloc_table:(alloc_table node).
+        (forall node_tl:(memory node (pointer node)).
+          (((Bool.True = Bool.True) and
+            ("JC_13" (ilist p_1 node_alloc_table node_tl))) ->
+           (forall q_1_1:(pointer node).
+             ((q_1_1 = (null : (pointer node))) ->
+              (forall mutable_p_1:(pointer node).
+                (forall node_tl0:(memory node (pointer node)).
+                  (forall q_1_1_0:(pointer node).
+                    (("JC_41"
+                     (("JC_38" (ilist mutable_p_1 node_alloc_table node_tl0)) and
+                      (("JC_39" (ilist q_1_1_0 node_alloc_table node_tl0)) and
+                       ("JC_40"
+                       (inc_ilist_ilist mutable_p_1 q_1_1_0 node_tl0))))) ->
+                     (forall result:int.
+                       (((Bool.True = Bool.True) ->
+                         ("JC_7"
+                         (if (neq_int_bool result 0 : Bool.bool) = Bool.True then
+                          (mutable_p_1 <> (null : (pointer node))) else
+                          (mutable_p_1 = (null : (pointer node)))))) ->
+                        (forall tmp_0:int.
+                          ((tmp_0 = result) ->
+                           ((tmp_0 <> 0) ->
+                            (("JC_47"
+                             (ilist (select node_tl0 mutable_p_1 : (pointer node)) node_alloc_table node_tl0)) ->
+                             ("JC_50"
+                             ("JC_49"
+                             ("JC_49"
+                             (Int.(>=) (offset_max node_alloc_table mutable_p_1 : int) 0))))))))))))))))))))
+
+  goal Rev_ensures_default_po_6:
+    (forall p_1:(pointer node).
+      (forall node_alloc_table:(alloc_table node).
+        (forall node_tl:(memory node (pointer node)).
+          (((Bool.True = Bool.True) and
+            ("JC_13" (ilist p_1 node_alloc_table node_tl))) ->
+           (forall q_1_1:(pointer node).
+             ((q_1_1 = (null : (pointer node))) ->
+              (forall mutable_p_1:(pointer node).
+                (forall node_tl0:(memory node (pointer node)).
+                  (forall q_1_1_0:(pointer node).
+                    (("JC_41"
+                     (("JC_38" (ilist mutable_p_1 node_alloc_table node_tl0)) and
+                      (("JC_39" (ilist q_1_1_0 node_alloc_table node_tl0)) and
+                       ("JC_40"
+                       (inc_ilist_ilist mutable_p_1 q_1_1_0 node_tl0))))) ->
+                     (forall result:int.
+                       (((Bool.True = Bool.True) ->
+                         ("JC_7"
+                         (if (neq_int_bool result 0 : Bool.bool) = Bool.True then
+                          (mutable_p_1 <> (null : (pointer node))) else
+                          (mutable_p_1 = (null : (pointer node)))))) ->
+                        (forall tmp_0:int.
+                          ((tmp_0 = result) ->
+                           ((tmp_0 <> 0) ->
+                            (("JC_47"
+                             (ilist (select node_tl0 mutable_p_1 : (pointer node)) node_alloc_table node_tl0)) ->
+                             (("JC_50"
+                              (("JC_48"
+                               (Int.(<=) (offset_min node_alloc_table mutable_p_1 : int) 0)) and
+                               ("JC_49"
+                               (Int.(>=) (offset_max node_alloc_table mutable_p_1 : int) 0)))) ->
+                              (forall result0:(pointer node).
+                                ((result0 = (select node_tl0 mutable_p_1 : (pointer node))) ->
+                                 (forall tmp:(pointer node).
+                                   ((tmp = result0) ->
+                                    (forall node_tl1:(memory node (pointer node)).
+                                      ((node_tl1 = (store node_tl0 mutable_p_1 q_1_1_0 : (memory node (pointer node)))) ->
+                                       ("JC_51"
+                                       ("JC_51"
+                                       (ilist_FT tmp node_tl1 node_tl0))))))))))))))))))))))))))
+
+  goal Rev_ensures_default_po_7:
+    (forall p_1:(pointer node).
+      (forall node_alloc_table:(alloc_table node).
+        (forall node_tl:(memory node (pointer node)).
+          (((Bool.True = Bool.True) and
+            ("JC_13" (ilist p_1 node_alloc_table node_tl))) ->
+           (forall q_1_1:(pointer node).
+             ((q_1_1 = (null : (pointer node))) ->
+              (forall mutable_p_1:(pointer node).
+                (forall node_tl0:(memory node (pointer node)).
+                  (forall q_1_1_0:(pointer node).
+                    (("JC_41"
+                     (("JC_38" (ilist mutable_p_1 node_alloc_table node_tl0)) and
+                      (("JC_39" (ilist q_1_1_0 node_alloc_table node_tl0)) and
+                       ("JC_40"
+                       (inc_ilist_ilist mutable_p_1 q_1_1_0 node_tl0))))) ->
+                     (forall result:int.
+                       (((Bool.True = Bool.True) ->
+                         ("JC_7"
+                         (if (neq_int_bool result 0 : Bool.bool) = Bool.True then
+                          (mutable_p_1 <> (null : (pointer node))) else
+                          (mutable_p_1 = (null : (pointer node)))))) ->
+                        (forall tmp_0:int.
+                          ((tmp_0 = result) ->
+                           ((tmp_0 <> 0) ->
+                            (("JC_47"
+                             (ilist (select node_tl0 mutable_p_1 : (pointer node)) node_alloc_table node_tl0)) ->
+                             (("JC_50"
+                              (("JC_48"
+                               (Int.(<=) (offset_min node_alloc_table mutable_p_1 : int) 0)) and
+                               ("JC_49"
+                               (Int.(>=) (offset_max node_alloc_table mutable_p_1 : int) 0)))) ->
+                              (forall result0:(pointer node).
+                                ((result0 = (select node_tl0 mutable_p_1 : (pointer node))) ->
+                                 (forall tmp:(pointer node).
+                                   ((tmp = result0) ->
+                                    (forall node_tl1:(memory node (pointer node)).
+                                      ((node_tl1 = (store node_tl0 mutable_p_1 q_1_1_0 : (memory node (pointer node)))) ->
+                                       (("JC_51"
+                                        (ilist_FT tmp node_tl1 node_tl0)) ->
+                                        ("JC_52"
+                                        ("JC_52"
+                                        (ilist_FT q_1_1_0 node_tl1 node_tl0)))))))))))))))))))))))))))
+
+  goal Rev_ensures_default_po_8:
+    (forall p_1:(pointer node).
+      (forall node_alloc_table:(alloc_table node).
+        (forall node_tl:(memory node (pointer node)).
+          (((Bool.True = Bool.True) and
+            ("JC_13" (ilist p_1 node_alloc_table node_tl))) ->
+           (forall q_1_1:(pointer node).
+             ((q_1_1 = (null : (pointer node))) ->
+              (forall mutable_p_1:(pointer node).
+                (forall node_tl0:(memory node (pointer node)).
+                  (forall q_1_1_0:(pointer node).
+                    (("JC_41"
+                     (("JC_38" (ilist mutable_p_1 node_alloc_table node_tl0)) and
+                      (("JC_39" (ilist q_1_1_0 node_alloc_table node_tl0)) and
+                       ("JC_40"
+                       (inc_ilist_ilist mutable_p_1 q_1_1_0 node_tl0))))) ->
+                     (forall result:int.
+                       (((Bool.True = Bool.True) ->
+                         ("JC_7"
+                         (if (neq_int_bool result 0 : Bool.bool) = Bool.True then
+                          (mutable_p_1 <> (null : (pointer node))) else
+                          (mutable_p_1 = (null : (pointer node)))))) ->
+                        (forall tmp_0:int.
+                          ((tmp_0 = result) ->
+                           ((tmp_0 <> 0) ->
+                            (("JC_47"
+                             (ilist (select node_tl0 mutable_p_1 : (pointer node)) node_alloc_table node_tl0)) ->
+                             (("JC_50"
+                              (("JC_48"
+                               (Int.(<=) (offset_min node_alloc_table mutable_p_1 : int) 0)) and
+                               ("JC_49"
+                               (Int.(>=) (offset_max node_alloc_table mutable_p_1 : int) 0)))) ->
+                              (forall result0:(pointer node).
+                                ((result0 = (select node_tl0 mutable_p_1 : (pointer node))) ->
+                                 (forall tmp:(pointer node).
+                                   ((tmp = result0) ->
+                                    (forall node_tl1:(memory node (pointer node)).
+                                      ((node_tl1 = (store node_tl0 mutable_p_1 q_1_1_0 : (memory node (pointer node)))) ->
+                                       (("JC_51"
+                                        (ilist_FT tmp node_tl1 node_tl0)) ->
+                                        (("JC_52"
+                                         (ilist_FT q_1_1_0 node_tl1 node_tl0)) ->
+                                         ("JC_53"
+                                         ("JC_53"
+                                         (ilist q_1_1_0 node_alloc_table node_tl1))))))))))))))))))))))))))))
+
+  goal Rev_ensures_default_po_9:
+    (forall p_1:(pointer node).
+      (forall node_alloc_table:(alloc_table node).
+        (forall node_tl:(memory node (pointer node)).
+          (((Bool.True = Bool.True) and
+            ("JC_13" (ilist p_1 node_alloc_table node_tl))) ->
+           (forall q_1_1:(pointer node).
+             ((q_1_1 = (null : (pointer node))) ->
+              (forall mutable_p_1:(pointer node).
+                (forall node_tl0:(memory node (pointer node)).
+                  (forall q_1_1_0:(pointer node).
+                    (("JC_41"
+                     (("JC_38" (ilist mutable_p_1 node_alloc_table node_tl0)) and
+                      (("JC_39" (ilist q_1_1_0 node_alloc_table node_tl0)) and
+                       ("JC_40"
+                       (inc_ilist_ilist mutable_p_1 q_1_1_0 node_tl0))))) ->
+                     (forall result:int.
+                       (((Bool.True = Bool.True) ->
+                         ("JC_7"
+                         (if (neq_int_bool result 0 : Bool.bool) = Bool.True then
+                          (mutable_p_1 <> (null : (pointer node))) else
+                          (mutable_p_1 = (null : (pointer node)))))) ->
+                        (forall tmp_0:int.
+                          ((tmp_0 = result) ->
+                           ((tmp_0 <> 0) ->
+                            (("JC_47"
+                             (ilist (select node_tl0 mutable_p_1 : (pointer node)) node_alloc_table node_tl0)) ->
+                             (("JC_50"
+                              (("JC_48"
+                               (Int.(<=) (offset_min node_alloc_table mutable_p_1 : int) 0)) and
+                               ("JC_49"
+                               (Int.(>=) (offset_max node_alloc_table mutable_p_1 : int) 0)))) ->
+                              (forall result0:(pointer node).
+                                ((result0 = (select node_tl0 mutable_p_1 : (pointer node))) ->
+                                 (forall tmp:(pointer node).
+                                   ((tmp = result0) ->
+                                    (forall node_tl1:(memory node (pointer node)).
+                                      ((node_tl1 = (store node_tl0 mutable_p_1 q_1_1_0 : (memory node (pointer node)))) ->
+                                       (("JC_51"
+                                        (ilist_FT tmp node_tl1 node_tl0)) ->
+                                        (("JC_52"
+                                         (ilist_FT q_1_1_0 node_tl1 node_tl0)) ->
+                                         (("JC_53"
+                                          (ilist q_1_1_0 node_alloc_table node_tl1)) ->
+                                          (forall q_1_1_1:(pointer node).
+                                            ((q_1_1_1 = mutable_p_1) ->
+                                             (forall mutable_p_1_0:(pointer node).
+                                               ((mutable_p_1_0 = tmp) ->
+                                                ("JC_41"
+                                                ("JC_38"
+                                                ("JC_38"
+                                                (ilist mutable_p_1_0 node_alloc_table node_tl1))))))))))))))))))))))))))))))))))
+
+  goal Rev_ensures_default_po_10:
+    (forall p_1:(pointer node).
+      (forall node_alloc_table:(alloc_table node).
+        (forall node_tl:(memory node (pointer node)).
+          (((Bool.True = Bool.True) and
+            ("JC_13" (ilist p_1 node_alloc_table node_tl))) ->
+           (forall q_1_1:(pointer node).
+             ((q_1_1 = (null : (pointer node))) ->
+              (forall mutable_p_1:(pointer node).
+                (forall node_tl0:(memory node (pointer node)).
+                  (forall q_1_1_0:(pointer node).
+                    (("JC_41"
+                     (("JC_38" (ilist mutable_p_1 node_alloc_table node_tl0)) and
+                      (("JC_39" (ilist q_1_1_0 node_alloc_table node_tl0)) and
+                       ("JC_40"
+                       (inc_ilist_ilist mutable_p_1 q_1_1_0 node_tl0))))) ->
+                     (forall result:int.
+                       (((Bool.True = Bool.True) ->
+                         ("JC_7"
+                         (if (neq_int_bool result 0 : Bool.bool) = Bool.True then
+                          (mutable_p_1 <> (null : (pointer node))) else
+                          (mutable_p_1 = (null : (pointer node)))))) ->
+                        (forall tmp_0:int.
+                          ((tmp_0 = result) ->
+                           ((tmp_0 <> 0) ->
+                            (("JC_47"
+                             (ilist (select node_tl0 mutable_p_1 : (pointer node)) node_alloc_table node_tl0)) ->
+                             (("JC_50"
+                              (("JC_48"
+                               (Int.(<=) (offset_min node_alloc_table mutable_p_1 : int) 0)) and
+                               ("JC_49"
+                               (Int.(>=) (offset_max node_alloc_table mutable_p_1 : int) 0)))) ->
+                              (forall result0:(pointer node).
+                                ((result0 = (select node_tl0 mutable_p_1 : (pointer node))) ->
+                                 (forall tmp:(pointer node).
+                                   ((tmp = result0) ->
+                                    (forall node_tl1:(memory node (pointer node)).
+                                      ((node_tl1 = (store node_tl0 mutable_p_1 q_1_1_0 : (memory node (pointer node)))) ->
+                                       (("JC_51"
+                                        (ilist_FT tmp node_tl1 node_tl0)) ->
+                                        (("JC_52"
+                                         (ilist_FT q_1_1_0 node_tl1 node_tl0)) ->
+                                         (("JC_53"
+                                          (ilist q_1_1_0 node_alloc_table node_tl1)) ->
+                                          (forall q_1_1_1:(pointer node).
+                                            ((q_1_1_1 = mutable_p_1) ->
+                                             (forall mutable_p_1_0:(pointer node).
+                                               ((mutable_p_1_0 = tmp) ->
+                                                ("JC_41"
+                                                ("JC_39"
+                                                ("JC_39"
+                                                (ilist q_1_1_1 node_alloc_table node_tl1))))))))))))))))))))))))))))))))))
+
+  goal Rev_ensures_default_po_11:
+    (forall p_1:(pointer node).
+      (forall node_alloc_table:(alloc_table node).
+        (forall node_tl:(memory node (pointer node)).
+          (((Bool.True = Bool.True) and
+            ("JC_13" (ilist p_1 node_alloc_table node_tl))) ->
+           (forall q_1_1:(pointer node).
+             ((q_1_1 = (null : (pointer node))) ->
+              (forall mutable_p_1:(pointer node).
+                (forall node_tl0:(memory node (pointer node)).
+                  (forall q_1_1_0:(pointer node).
+                    (("JC_41"
+                     (("JC_38" (ilist mutable_p_1 node_alloc_table node_tl0)) and
+                      (("JC_39" (ilist q_1_1_0 node_alloc_table node_tl0)) and
+                       ("JC_40"
+                       (inc_ilist_ilist mutable_p_1 q_1_1_0 node_tl0))))) ->
+                     (forall result:int.
+                       (((Bool.True = Bool.True) ->
+                         ("JC_7"
+                         (if (neq_int_bool result 0 : Bool.bool) = Bool.True then
+                          (mutable_p_1 <> (null : (pointer node))) else
+                          (mutable_p_1 = (null : (pointer node)))))) ->
+                        (forall tmp_0:int.
+                          ((tmp_0 = result) ->
+                           ((tmp_0 <> 0) ->
+                            (("JC_47"
+                             (ilist (select node_tl0 mutable_p_1 : (pointer node)) node_alloc_table node_tl0)) ->
+                             (("JC_50"
+                              (("JC_48"
+                               (Int.(<=) (offset_min node_alloc_table mutable_p_1 : int) 0)) and
+                               ("JC_49"
+                               (Int.(>=) (offset_max node_alloc_table mutable_p_1 : int) 0)))) ->
+                              (forall result0:(pointer node).
+                                ((result0 = (select node_tl0 mutable_p_1 : (pointer node))) ->
+                                 (forall tmp:(pointer node).
+                                   ((tmp = result0) ->
+                                    (forall node_tl1:(memory node (pointer node)).
+                                      ((node_tl1 = (store node_tl0 mutable_p_1 q_1_1_0 : (memory node (pointer node)))) ->
+                                       (("JC_51"
+                                        (ilist_FT tmp node_tl1 node_tl0)) ->
+                                        (("JC_52"
+                                         (ilist_FT q_1_1_0 node_tl1 node_tl0)) ->
+                                         (("JC_53"
+                                          (ilist q_1_1_0 node_alloc_table node_tl1)) ->
+                                          (forall q_1_1_1:(pointer node).
+                                            ((q_1_1_1 = mutable_p_1) ->
+                                             (forall mutable_p_1_0:(pointer node).
+                                               ((mutable_p_1_0 = tmp) ->
+                                                ("JC_41"
+                                                ("JC_40"
+                                                ("JC_40"
+                                                (inc_ilist_ilist mutable_p_1_0 q_1_1_1 node_tl1))))))))))))))))))))))))))))))))))
+
+  goal Rev_ensures_default_po_12:
+    (forall p_1:(pointer node).
+      (forall node_alloc_table:(alloc_table node).
+        (forall node_tl:(memory node (pointer node)).
+          (((Bool.True = Bool.True) and
+            ("JC_13" (ilist p_1 node_alloc_table node_tl))) ->
+           (forall q_1_1:(pointer node).
+             ((q_1_1 = (null : (pointer node))) ->
+              (forall mutable_p_1:(pointer node).
+                (forall node_tl0:(memory node (pointer node)).
+                  (forall q_1_1_0:(pointer node).
+                    (("JC_41"
+                     (("JC_38" (ilist mutable_p_1 node_alloc_table node_tl0)) and
+                      (("JC_39" (ilist q_1_1_0 node_alloc_table node_tl0)) and
+                       ("JC_40"
+                       (inc_ilist_ilist mutable_p_1 q_1_1_0 node_tl0))))) ->
+                     (forall result:int.
+                       (((Bool.True = Bool.True) ->
+                         ("JC_7"
+                         (if (neq_int_bool result 0 : Bool.bool) = Bool.True then
+                          (mutable_p_1 <> (null : (pointer node))) else
+                          (mutable_p_1 = (null : (pointer node)))))) ->
+                        (forall tmp_0:int.
+                          ((tmp_0 = result) ->
+                           ((tmp_0 = 0) ->
+                            (forall return:(pointer node).
+                              ((return = q_1_1_0) ->
+                               ("JC_15"
+                               (ilist return node_alloc_table node_tl0)))))))))))))))))))
+
+  goal Rev_safety_po_1:
+    (forall p_1:(pointer node).
+      (forall node_alloc_table:(alloc_table node).
+        (forall node_tl:(memory node (pointer node)).
+          (("JC_13" (ilist p_1 node_alloc_table node_tl)) ->
+           (forall q_1_1:(pointer node).
+             ((q_1_1 = (null : (pointer node))) ->
+              (forall mutable_p_1:(pointer node).
+                (forall node_tl0:(memory node (pointer node)).
+                  (forall q_1_1_0:(pointer node).
+                    (("JC_24" true) ->
+                     (("JC_22"
+                      (("JC_19"
+                       (ilist mutable_p_1 node_alloc_table node_tl0)) and
+                       (("JC_20" (ilist q_1_1_0 node_alloc_table node_tl0)) and
+                        ("JC_21"
+                        (inc_ilist_ilist mutable_p_1 q_1_1_0 node_tl0))))) ->
+                      (forall result:int.
+                        (((Bool.True = Bool.True) ->
+                          ("JC_7"
+                          (if (neq_int_bool result 0 : Bool.bool) = Bool.True then
+                           (mutable_p_1 <> (null : (pointer node))) else
+                           (mutable_p_1 = (null : (pointer node)))))) ->
+                         (forall tmp_0:int.
+                           ((tmp_0 = result) ->
+                            ((tmp_0 <> 0) ->
+                             (("JC_28"
+                              (ilist (select node_tl0 mutable_p_1 : (pointer node)) node_alloc_table node_tl0)) ->
+                              (("JC_31"
+                               (("JC_29"
+                                (Int.(<=) (offset_min node_alloc_table mutable_p_1 : int) 0)) and
+                                ("JC_30"
+                                (Int.(>=) (offset_max node_alloc_table mutable_p_1 : int) 0)))) ->
+                               (Int.(<=) 0 (offset_max node_alloc_table mutable_p_1 : int))))))))))))))))))))
+
+
+end
