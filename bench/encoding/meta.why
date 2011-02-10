@@ -22,3 +22,11 @@ end
 theory Goal
   meta "enco_select" "goal"
 end
+
+
+theory KeptIntReal
+  use int.Int
+  use real.Real
+  meta "encoding : kept" type Int.int
+  meta "encoding : kept" type Real.real
+end
