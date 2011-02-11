@@ -330,8 +330,9 @@ and wp_desc env e q = match e.expr_desc with
 	| Some i ->
 	    wp_and wfr
 	      (wp_and ~sym:true
-		 i
-		 (quantify env e.expr_effect (wp_implies i we)))
+		 (f_label_add (label "LoopInvInit") i)
+                 (f_label_add (label "LoopInvPres")
+		    (quantify env e.expr_effect (wp_implies i we))))
 	in
 	w
   (* optimization for the particular case let _ = y in e *)
@@ -417,10 +418,10 @@ and wp_desc env e q = match e.expr_desc with
 
   | Eassert (Ptree.Aassert, f) ->
       let (_, q), _ = q in
-      wp_and f q
+      wp_and (f_label_add (label "Assert") f) q
   | Eassert (Ptree.Acheck, f) ->
       let (_, q), _ = q in
-      wp_and ~sym:true f q
+      wp_and ~sym:true (f_label_add (label "Check") f) q
   | Eassert (Ptree.Aassume, f) ->
       let (_, q), _ = q in
       wp_implies f q

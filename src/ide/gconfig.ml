@@ -45,6 +45,7 @@ type t =
       mutable max_running_processes : int;
       mutable provers : prover_data Util.Mstr.t;
       mutable default_editor : string;
+      mutable show_labels : bool;
       mutable env : Env.env;
       mutable config : Whyconf.config;
     }
@@ -128,6 +129,7 @@ let load_config config =
 *)
     provers = Mstr.empty;
     default_editor = ide.ide_default_editor;
+    show_labels = false;
     config         = config;
     env            = env
   }
@@ -327,6 +329,11 @@ let show_about_window () =
   let ( _ : GWindow.Buttons.about) = about_dialog#run () in
   about_dialog#destroy ()
 
+let set_labels_flag = 
+  let fl = Debug.lookup_flag "print_labels" in
+  fun b ->
+    (if b then Debug.set_flag else Debug.unset_flag) fl
+
 let preferences c =
   let dialog = GWindow.dialog ~title:"Why: preferences" () in
   let vbox = dialog#vbox in
@@ -336,6 +343,16 @@ let preferences c =
   let page1 =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label1#coerce w)) ()
+  in
+  (* toggle show labels in formulas *)
+  let showlabels =
+    GButton.check_button ~label:"show labels in formulas" ~packing:page1#add ()
+      ~active:(set_labels_flag c.show_labels;c.show_labels)
+  in
+  let (_ : GtkSignal.id) =
+    showlabels#connect#toggled ~callback:
+      (fun () -> c.show_labels <- not c.show_labels;
+         set_labels_flag c.show_labels)
   in
   (* editor *)
  let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in

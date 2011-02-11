@@ -40,6 +40,7 @@ type t =
       mutable max_running_processes : int;
       mutable provers : prover_data Util.Mstr.t;
       mutable default_editor : string;
+      mutable show_labels : bool;
       mutable env : Why.Env.env;
       mutable config : Whyconf.config;
     }
