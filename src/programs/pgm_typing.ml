@@ -763,32 +763,39 @@ let make_app _gl loc ty f el =
   in
   make (fun f -> f) el
 
-let rec ipattern env p = 
-  let env, n = ipattern_node env p.pat_node in
-  env, { ipat_pat = p; ipat_node = n }
-
-and ipattern_node env p = 
+let ipattern env p = 
+  let memo = Hvs.create 17 in
   let add1 env vs = 
-    (* TODO: incorrect when vs is not pure ? *)
-    iadd_local env (id_clone vs.vs_name) vs.vs_ty
+    try 
+      env, Hvs.find memo vs
+    with Not_found ->
+      (* TODO: incorrect when vs is not pure ? *)
+      let _, v as r = iadd_local env (id_clone vs.vs_name) vs.vs_ty in
+      Hvs.add memo vs v;
+      r
   in
-  match p with
-  | Term.Pwild -> 
-      env, IPwild
-  | Term.Papp (ls, pl) -> 
-      let env, pl = map_fold_left ipattern env pl in
-      env, IPapp (ls, pl)
-  | Term.Por (p1, p2) -> 
-      let env, p1 = ipattern env p1 in
-      let _  , p2 = ipattern env p2 in
-      env, IPor (p1, p2)
-  | Term.Pvar vs ->
-      let env, v = add1 env vs in
-      env, IPvar v
-  | Term.Pas (p, vs) ->
-      let env, v = add1 env vs in
-      let env, p = ipattern env p in
-      env, IPas (p, v)
+  let rec ipattern env p =
+    let env, n = ipattern_node env p.pat_node in
+    env, { ipat_pat = p; ipat_node = n }
+  and ipattern_node env = function
+    | Term.Pwild -> 
+	env, IPwild
+    | Term.Papp (ls, pl) -> 
+	let env, pl = map_fold_left ipattern env pl in
+	env, IPapp (ls, pl)
+    | Term.Por (p1, p2) -> 
+	let env, p1 = ipattern env p1 in
+	let _  , p2 = ipattern env p2 in
+	env, IPor (p1, p2)
+    | Term.Pvar vs ->
+	let env, v = add1 env vs in
+	env, IPvar v
+    | Term.Pas (p, vs) ->
+	let env, v = add1 env vs in
+	let env, p = ipattern env p in
+	env, IPas (p, v)
+  in
+  ipattern env p
 
 (* [iexpr] translates dexpr into iexpr
    [env : vsymbol Mstr.t] maps strings to vsymbols for local variables *)

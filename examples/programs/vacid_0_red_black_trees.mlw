@@ -114,8 +114,7 @@ module M
   let lbalance (l : tree) (k : key) (v : value) (r : tree) =
     { lt_tree k l and gt_tree k r and bst l and bst r }
     match l with
-    | Node Red (Node Red a kx vx b) ky vy c -> (* BUG or-pattern *)
-	Node Red (Node Black a kx vx b) ky vy (Node Black c k v r)
+    | Node Red (Node Red a kx vx b) ky vy c
     | Node Red a kx vx (Node Red b ky vy c) ->
 	Node Red (Node Black a kx vx b) ky vy (Node Black c k v r)
     | _ -> 
@@ -140,8 +139,7 @@ module M
   let rbalance (l : tree) (k : key) (v : value) (r : tree) =
     { lt_tree k l and gt_tree k r and bst l and bst r }
     match r with
-    | Node Red (Node Red b ky vy c) kz vz d ->
-	Node Red (Node Black l k v b) ky vy (Node Black c kz vz d)
+    | Node Red (Node Red b ky vy c) kz vz d
     | Node Red b ky vy (Node Red c kz vz d) ->
 	Node Red (Node Black l k v b) ky vy (Node Black c kz vz d)
     | _ -> 
