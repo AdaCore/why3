@@ -1,0 +1,75 @@
+
+theory FSet
+
+  type elt
+
+  type t
+
+  logic single elt : t
+
+  logic union t t : t
+
+  logic mem elt t
+
+  (* triggers needed by Alt-Ergo but not Simplify, Z3 or CVC3 *)
+
+  axiom Mem_single : forall x y:elt [mem x (single y)].
+    mem x (single y) <-> x=y
+
+  axiom Mem_union : forall x:elt, s1 s2:t [mem x (union s1 s2)].
+    mem x (union s1 s2) <-> mem x s1 or mem x s2
+
+end
+
+theory Switch
+
+  (* useless 
+    type enum_POSITION = Normal | Reverse | Void
+  *)
+
+  use import int.Int
+
+  logic in_1_3 (x:int) = 1 <= x <= 3
+
+  clone import FSet as S with type elt = int
+
+  logic f2 (m1:int) (m2:int) (m3:int) =
+       "`estimate preconditions in previous components'"
+       in_1_3 m1 and in_1_3 m2 and in_1_3 m3
+
+  logic f3 (m1:int) (m2:int) (m3:int) =
+       "`estimate preconditions in this component'"
+       in_1_3 m1 and in_1_3 m2 and in_1_3 m3 and
+       "`Local hypotheses'"
+       not (m1 = 2) and m1 = 1 and m2 = 2
+
+  logic f4 (m1:int) (m2:int) (m3:int) =
+       "`Check that the invariant (pos$1 = pos & pos$1 = pos) is preserved by the operation - ref 4.4, 5.5'" true
+
+  logic f5 (m1:int) (m2:int) (m3:int) =
+       (mem 1 (union (union (single m1) (single m2)) (single m3)) and
+        not 2 = m1 and not 2 = m2 and not 2 = m3 and
+        3 = 1)
+       or
+        (mem 2 (union (union (single m1) (single m2)) (single m3)) and
+	 not 1 = m1 and not 1 = m2 and not 1 = m3 and
+         3=2)
+       or
+        ((mem 1 (union (union (single m1) (single m2)) (single m3)) ->
+          mem 2 (union (union (single m1) (single m2)) (single m3))) and
+	 (mem 2 (union (union (single m1) (single m2)) (single m3)) ->
+          mem 1 (union (union (single m1) (single m2)) (single m3))))
+
+  goal estimate1 : forall m1 m2 m3: int (* * POSITION *).
+       f2 m1 m2 m3 and f3 m1 m2 m3 -> f5 m1 m2 m3
+
+  logic f6 (m1:int) (m2:int) (m3:int) =
+       "`estimate preconditions in this component'"
+       in_1_3 m1 and in_1_3 m2 and in_1_3 m3 and
+       "`Local hypotheses'"
+       not(m1 = 2) and m1 = 1 and m3 = 2
+
+  goal estimate2 : forall m1 m2 m3: int (* * POSITION *).
+       f2 m1 m2 m3 and f6 m1 m2 m3 -> f5 m1 m2 m3
+
+end
