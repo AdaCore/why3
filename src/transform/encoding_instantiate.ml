@@ -319,7 +319,6 @@ and rewrite_fmla menv tvar vsvar f =
       (* Ici un trigger qui ne match pas assez de variables
          peut être généré *)
       let tl = tr_map (fnT vsvar) (fnF vsvar) tl in
-      let vl = List.rev vl in
       f_quant q (cb vl tl f1)
     | Flet (t1, b) -> let u,f2,cb = f_open_bound_cb b in
       let (vsvar',u) = conv_vs menv tvar vsvar u in
