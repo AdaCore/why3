@@ -45,7 +45,7 @@ let kept_opt,register_enco_kept = enco_opt "kept" "bridge"
 let poly_opt,register_enco_poly = enco_opt "poly" "decorate"
 
 let poly_smt_opt = poly_opt
-let poly_tptp_opt = { poly_opt with default = "explicit" }
+let poly_tptp_opt = poly_opt
 
 let enco_gen opt env =
   Trans.on_meta_excl opt.meta (fun alo ->
@@ -64,15 +64,29 @@ let enco_kept = enco_gen kept_opt
 let enco_poly_smt = enco_gen poly_smt_opt
 let enco_poly_tptp = enco_gen poly_tptp_opt
 
-let maybe_encoding_enumeration =
+let forbid_for_explicit =
+  Encoding_enumeration.forbid_enumeration
+    "explicit is unsound in presence of this finite type"
+
+let maybe_forbid_enumeration =
   Trans.on_meta_excl poly_smt_opt.meta (fun alo ->
     let s = match alo with
       | None -> poly_smt_opt.default
       | Some [MAstr s] -> s
       | _ -> assert false in
     if s = "explicit"
-    then Encoding_enumeration.encoding_enumeration
-    else identity)
+    then forbid_for_explicit
+    else Trans.identity)
+
+let forbid_enumeration =
+  Trans.on_meta_excl poly_smt_opt.meta (fun alo ->
+    let s = match alo with
+      | None -> poly_smt_opt.default
+      | Some [MAstr s] -> s
+      | _ -> assert false in
+    if s = "explicit"
+    then forbid_for_explicit
+    else Encoding_enumeration.encoding_enumeration)
 
 
 open Ty
@@ -99,13 +113,13 @@ let monomorphise_goal =
 
 let encoding_smt env =
   compose monomorphise_goal
-    (compose maybe_encoding_enumeration
+    (compose maybe_forbid_enumeration
        (compose (enco_select env)
           (compose (enco_kept env) (enco_poly_smt env))))
 
 let encoding_tptp env =
   compose monomorphise_goal
-    (compose Encoding_enumeration.encoding_enumeration
+    (compose forbid_enumeration
        (compose (enco_select env)
           (compose (enco_kept env) (enco_poly_tptp env))))
 

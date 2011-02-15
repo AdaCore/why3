@@ -93,5 +93,10 @@ let encoding_enumeration =
     let tenv = { enum = enum ; projs = projs } in
     Trans.decl (decl tenv) None)
 
+let forbid_enumeration s =
+  Trans.on_tagged_ts meta_enum (fun enum ->
+    if Sts.is_empty enum then Trans.identity
+    else Printer.unsupportedTysymbol (Sts.choose enum) s)
+
 let () = Trans.register_transform "encoding_enumeration" encoding_enumeration
 

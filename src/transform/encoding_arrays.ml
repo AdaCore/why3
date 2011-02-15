@@ -576,7 +576,7 @@ let encoding_smt_array env =
   Trans.on_used_theory th_array (fun used ->
     if not used then Encoding.encoding_smt env else
       compose Encoding.monomorphise_goal
-        (compose Encoding.maybe_encoding_enumeration
+        (compose Encoding.maybe_forbid_enumeration
            (compose (select_subterm_array th_array)
               (compose Encoding.print_kept
                  (compose (Encoding_instantiate.t

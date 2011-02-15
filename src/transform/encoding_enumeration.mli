@@ -18,3 +18,6 @@
 (**************************************************************************)
 
 val encoding_enumeration : Task.task Trans.trans
+val forbid_enumeration   : string ->Task.task Trans.trans
+(* [forbid_enumeration s] if the task contains encoded enumeration
+   unsupportedTysymbol is raised with the message [s] *)
