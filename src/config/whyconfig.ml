@@ -61,10 +61,12 @@ let option_list = Arg.align [
 ($WHY_CONFIG), otherwise use the default one";
   "--config", Arg.String (set_oref conf_file),
       " same as -C";
-  "--autodetect-provers", Arg.Set autoprovers,
-  " autodetect the provers in the $PATH";
-  "--autodetect-plugins", Arg.Set autoplugins,
-  " autodetect the plugins in the default library directories";
+  "--detect-provers", Arg.Set autoprovers,
+  " detect the provers in $PATH";
+  "--detect-plugins", Arg.Set autoplugins,
+  " detect the plugins in default library directories";
+  "--detect", Arg.Unit (fun () -> autoprovers := true; autoplugins := true),
+  " detect both provers and plugins";
   "--install-plugin", Arg.String add_plugin,
   " install a plugin to the actual libdir";
   "--dont-save", Arg.Clear save,
@@ -112,7 +114,7 @@ let plugins_auto_detection config =
   let main = Array.fold_left fold main files in
   set_main config main
 
-let () =
+let main () =
   (** Parse the command line *)
   Arg.parse option_list anon_file usage_msg;
 
@@ -142,12 +144,16 @@ let () =
 
   (** Main *)
   let config =
-    try read_config !conf_file
-    with Not_found ->
-      let conf_file = match !conf_file with
-        | None -> Sys.getenv "WHY_CONFIG"
-        | Some f -> f in
-      default_config conf_file in
+    try 
+      read_config !conf_file
+    with 
+      | Rc.CannotOpen (f, s)
+      | Whyconf.ConfigFailure (f, s) ->
+	  autoprovers := true;
+	  autoplugins := true;
+	  eprintf "warning: cannot read config file %s (%s)@." f s;
+	  default_config f
+  in
   let main = get_main config in
   (* let main = option_apply main (fun d -> {main with libdir = d})
      !libdir in *)
@@ -156,19 +162,29 @@ let () =
   let main = try Queue.fold install_plugin main plugins with Exit -> exit 1 in
   let config = set_main config main in
   let conf_file = get_conf_file config in
-  let conf_file_doesnt_exist = not (Sys.file_exists conf_file) in
-  if conf_file_doesnt_exist then
-    printf "Config file %s doesn't exist, \
- so autodetection of provers and plugins is automatically triggered@."
-      conf_file;
+  if not (Sys.file_exists conf_file) then begin
+    autoprovers := true;
+    autoplugins := true;
+  end;
   let config =
-    if !autoprovers || conf_file_doesnt_exist
+    if !autoprovers
     then Autodetection.run_auto_detection config
-    else config in
+    else config
+  in
   let config =
-    if !autoplugins || conf_file_doesnt_exist
+    if !autoplugins
     then plugins_auto_detection config
-    else config in
+    else config
+  in
   if !save then begin
     printf "Save config to %s@." conf_file;
-    save_config config end
+    save_config config 
+  end
+
+let () =
+  try
+    main ()
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    eprintf "%a@." Exn_printer.exn_printer e;
+    exit 1
+

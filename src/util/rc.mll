@@ -251,6 +251,9 @@ let push_record () =
   current_rec := [];
   current_list := []
 
+  exception SyntaxError of string
+  let syntax_error s = raise (SyntaxError s)
+
 }
 
 let space = [' ' '\t' '\r' '\n']+
@@ -275,7 +278,7 @@ rule record = parse
   | (ident as key) space* '=' space*
       { value key lexbuf }
   | _ as c
-      { failwith ("Rc: invalid keyval pair starting with " ^ String.make 1 c) }
+      { syntax_error ("invalid keyval pair starting with " ^ String.make 1 c) }
 
 and header keylist = parse
   | (ident as key) space*
@@ -285,9 +288,9 @@ and header keylist = parse
         current_rec := List.rev keylist;
         record lexbuf }
   | eof
-      { failwith "Rc: unterminated header" }
+      { syntax_error "unterminated header" }
   | _ as c
-      { failwith ("Rc: invalid header starting with " ^ String.make 1 c) }
+      { syntax_error ("invalid header starting with " ^ String.make 1 c) }
 
 and value key = parse
   | integer as i
@@ -309,9 +312,9 @@ and value key = parse
       { push_field key (RCident (*kind_of_ident*) id);
         record lexbuf }
   | eof
-      { failwith "Rc: unterminated keyval pair" }
+      { syntax_error "unterminated keyval pair" }
   | _ as c
-      { failwith ("Rc: invalid value starting with " ^ String.make 1 c) }
+      { syntax_error ("invalid value starting with " ^ String.make 1 c) }
 
 and string_val key = parse
   | '"'
@@ -332,7 +335,7 @@ and string_val key = parse
         Buffer.add_char buf c;
         string_val key lexbuf }
   | eof
-      { failwith "Rc: unterminated string" }
+      { syntax_error "unterminated string" }
 
 
 {
@@ -342,19 +345,25 @@ let from_channel cin =
   record (from_channel cin);
   make_t !current
 
+exception CannotOpen of string * string
+exception SyntaxErrorFile of string * string
+
 let from_file f =
   let c =
-    try open_in f
-    with Sys_error _ -> raise Not_found
-(* TODO: can we catch only the "file not found" errors
-   and let other Sys_error's just come through? *)
-(*
-    Format.eprintf "Cannot open file %s@." f;
-    exit 1
-*)
+    try open_in f with Sys_error s -> raise (CannotOpen (f, s))
   in
-  try let r = from_channel c in close_in c; r
-  with e -> close_in c; raise e
+  try 
+    let r = from_channel c in close_in c; r
+  with 
+    | SyntaxError s -> close_in c; raise (SyntaxErrorFile (f, s))
+    | e -> close_in c; raise e
+
+let () = Exn_printer.register (fun fmt e -> match e with
+  | CannotOpen (_, s) -> 
+      Format.fprintf fmt "system error: `%s'" s
+  | SyntaxErrorFile (f, s) -> 
+      Format.fprintf fmt "syntax error in %s: %s" f s
+  | _ -> raise e)
 
 let to_formatter fmt t =
   let print_kv k fmt v = fprintf fmt "%s = %a" k print_rc_value v in

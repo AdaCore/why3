@@ -185,16 +185,19 @@ val check_exhaustive : section -> Util.Sstr.t -> unit
     @raise UnknownField if it is not the case
 *)
 
+exception CannotOpen of string * string
+exception SyntaxErrorFile of string * string
+
 val from_channel : in_channel -> t
 (** [from_channel cin] returns the Rc of the input channel [cin]
-    @raise Failure "lexing" in case of incorrect syntax
+    @raise SyntaxErrorFile in case of incorrect syntax
     @raise ExtraParameters if a section header has more than one argument
 *)
 
 val from_file : string -> t
 (** [from_file filename] returns the Rc of the file [filename]
-    @raise Not_found is [filename] does not exists
-    @raise Failure "lexing" in case of incorrect syntax
+    @raise CannotOpen is [filename] does not exist
+    @raise SyntaxErrorFile in case of incorrect syntax
     @raise ExtraParameters if a section header has more than one argument
 *)
 

@@ -31,15 +31,17 @@ type config
     which are dealt by it ({!Whyconf.get_main}, {!Whyconf.set_main},
     {!Whyconf.get_provers}, {!Whyconf.set_provers} *)
 
+exception ConfigFailure of string (* filename *) * string
+
 val read_config : string option -> config
 (** [read_config conf_file] :
-    - If conf_file is given and the file doesn't exists Not_found is
+    - If conf_file is given and the file doesn't exist Rc.CannotOpen is
     raised.
-    - If "$WHY_CONFIG" is given and the file doesn't exists Not_found is raised
-    - otherwise tries the following, Not_found is never raised :
-    "./why.conf"; "./.why.conf"; "$HOME/.why.conf";
-    "$USERPROFILE/.why.conf"; the built-in default_config with default
-    configuration filename*)
+    - If "$WHY3CONFIG" is given and the file doesn't exist Rc.CannotOpen
+    is raised
+    - otherwise we try reading "$HOME/.why.conf" (or
+    "$USERPROFILE/.why.conf" under Windows) and, if not present, we return
+    the built-in default_config with default configuration filename *)
 
 val save_config : config -> unit
 (** [save_config config] save the configuration *)

@@ -214,11 +214,15 @@ let () =
   if !opt_type_only then Debug.set_flag Typing.debug_type_only;
 
   (** Configuration *)
-  let config = try read_config !opt_config with Not_found ->
-    option_iter (eprintf "Config file '%s' not found.@.") !opt_config;
-    option_iter
-      (eprintf "No config file found (required by '-P %s').@.") !opt_prover;
-    exit 1;
+  let config = 
+(*     try  *)
+      read_config !opt_config 
+(*     with  *)
+(*       | ConfigFailure (f, s) -> *)
+(*     option_iter (eprintf "Config file '%s' not found.@.") !opt_config; *)
+(*     option_iter *)
+(*       (eprintf "No config file found (required by '-P %s').@.") !opt_prover; *)
+(*     exit 1; *)
   in
 
   let main = get_main config in

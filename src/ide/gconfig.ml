@@ -135,9 +135,12 @@ let load_config config =
   }
 
 let read_config () =
+  try
     let config = Whyconf.read_config None in
     load_config config
-
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    eprintf "@.%a@." Exn_printer.exn_printer e;
+    exit 1
 
 let save_config t =
   let save_prover _ pr acc =
@@ -168,7 +171,7 @@ let save_config t =
 
 let config =
   eprintf "reading IDE config file...@?";
-  let c= read_config () in
+  let c = read_config () in
   eprintf " done.@.";
   c
 

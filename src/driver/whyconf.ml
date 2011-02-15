@@ -28,7 +28,9 @@ open Rc
 If a configuration doesn't contain the actual magic number we don't use it.
 
 *)
+
 let magicnumber = 1
+
 exception WrongMagicNumber
 
 (* lib and shared dirs *)
@@ -141,7 +143,7 @@ let default_main =
 
 let set_main rc main =
   let section = empty_section in
-  let section = set_int section "magicnumber" magicnumber in
+  let section = set_int section "magic" magicnumber in
   let section = set_string ~default:default_main.private_libdir
     section "libdir" main.private_libdir in
   let section = set_string ~default:default_main.private_datadir
@@ -185,8 +187,8 @@ let load_prover dirname provers (id,section) =
     } provers
 
 let load_main dirname section =
-  if get_int ~default:0 section "magicnumber" <> magicnumber
-  then raise WrongMagicNumber;
+  if get_int ~default:0 section "magic" <> magicnumber then
+    raise WrongMagicNumber;
   { private_libdir    = get_string ~default:default_main.private_libdir
       section "libdir";
     private_datadir   = get_string ~default:default_main.private_datadir
@@ -210,15 +212,22 @@ let read_config_rc conf_file =
           else raise Exit
         end
   in
-  filename,Rc.from_file filename
+  filename, Rc.from_file filename
+
+exception ConfigFailure of string (* filename *) * string
+
+let () = Exn_printer.register (fun fmt e -> match e with
+  | ConfigFailure (f, s) -> 
+      Format.fprintf fmt "error in config file %s: %s" f s
+  | _ -> raise e)
 
 let get_config (filename,rc) =
   let dirname = Filename.dirname filename in
   let rc, main =
     match get_section rc "main" with
-      | None -> set_main rc default_main,default_main
-      | Some main ->
-        rc, load_main dirname main in
+      | None      -> raise (ConfigFailure (filename, "no main section"))
+      | Some main -> rc, load_main dirname main 
+  in
   let provers = get_family rc "prover" in
   let provers = List.fold_left (load_prover dirname) Mstr.empty provers in
   { conf_file = filename;
@@ -227,26 +236,26 @@ let get_config (filename,rc) =
     provers   = provers;
   }
 
-let default_config conf_file = get_config (conf_file,Rc.empty)
-
+let default_config conf_file = 
+  get_config (conf_file, set_main Rc.empty default_main)
 
 let read_config conf_file =
-  let filenamerc = try read_config_rc conf_file
-    with
-      | Exit -> (default_conf_file,Rc.empty) in
-  try get_config filenamerc
+  let filenamerc = 
+    try 
+      read_config_rc conf_file
+    with Exit -> 
+      default_conf_file, set_main Rc.empty default_main
+  in
+  try 
+    get_config filenamerc
   with WrongMagicNumber ->
-    let (filename,_) = filenamerc in
-    let bak = filename^".bak" in
-    Format.eprintf
-      "Warning : your configuration file %s doesn't correspond to the \
-current version of Why3. It is moved to %s. The default config is used.@."
-      filename bak;
-    Sys.rename filename bak;
-    default_config filename
+    let filename, _ = filenamerc in
+    raise (ConfigFailure (filename, "outdated config file; rerun why3config"))
 
-
-let save_config config = to_file config.conf_file config.config
+let save_config config = 
+  let filename = config.conf_file in
+  if Sys.file_exists filename then Sys.rename filename (filename ^ ".bak");
+  to_file filename config.config
 
 let get_main config = config.main
 let get_provers config = config.provers
