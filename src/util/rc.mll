@@ -177,12 +177,22 @@ let get_valuel read ?default section key =
       | None -> raise (MissingField key)
       | Some v -> v
 
-let set_value write section key value =
-  Mstr.add key [write value] section
+let set_value write ?default section key value =
+  let actually_write = match default with
+    | None -> true
+    | Some default -> default <> value in
+  if actually_write
+  then Mstr.add key [write value] section
+  else section
 
-let set_valuel write section key valuel =
+let set_valuel write ?default section key valuel =
   if valuel = [] then Mstr.remove key section else
-    Mstr.add key (List.map write valuel) section
+    let actually_write = match default with
+      | None -> true
+      | Some default -> default <> valuel in
+    if actually_write
+    then Mstr.add key (List.map write valuel) section
+    else Mstr.remove key section
 
 let rint k = function
   | RCint n -> n

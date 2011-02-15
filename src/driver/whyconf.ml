@@ -142,9 +142,12 @@ let default_main =
 let set_main rc main =
   let section = empty_section in
   let section = set_int section "magicnumber" magicnumber in
-  let section = set_string section "libdir"    main.private_libdir in
-  let section = set_string section "datadir"    main.private_datadir in
-  let section = set_stringl section "loadpath" main.loadpath in
+  let section = set_string ~default:default_main.private_libdir
+    section "libdir" main.private_libdir in
+  let section = set_string ~default:default_main.private_datadir
+    section "datadir" main.private_datadir in
+  let section = set_stringl ~default:default_main.loadpath
+    section "loadpath" main.loadpath in
   let section = set_int section "timelimit" main.timelimit in
   let section = set_int section "memlimit" main.memlimit in
   let section =

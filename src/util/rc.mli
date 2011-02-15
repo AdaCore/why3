@@ -116,15 +116,16 @@ val get_intl : ?default:int list -> section -> string -> int list
     associated to [key]
 *)
 
-val set_int : section -> string -> int -> section
-(** [set_int section key value] add the association [key] to [value]
-    in the section. Remove all former associations with this [key]
+val set_int :?default:int -> section -> string -> int -> section
+(** [set_int ?default section key value] add the association [key] to [value]
+    in the section if value is not default.
+    Remove all former associations with this [key]
 *)
 
-val set_intl : section -> string -> int list -> section
-(** [set_int section key lvalue] add the associations [key] to all the
-    [lvalue] in the section. Remove all former associations with this
-    [key]
+val set_intl : ?default:int list -> section -> string -> int list -> section
+(** [set_int ?default section key lvalue] add the associations [key] to all the
+    [lvalue] in the section if value is not default.
+    Remove all former associations with this [key]
 *)
 
 val get_bool  : ?default:bool       -> section -> string -> bool
@@ -135,10 +136,10 @@ val get_booll  : ?default:bool list -> section -> string -> bool list
 
 val get_boolo : section -> string -> bool option
 
-val set_bool : section -> string -> bool -> section
+val set_bool : ?default:bool -> section -> string -> bool -> section
 (** Same as {!set_int} but on bool *)
 
-val set_booll : section -> string -> bool list -> section
+val set_booll : ?default:bool list -> section -> string -> bool list -> section
 (** Same as {!set_intl} but on bool *)
 
 
@@ -150,10 +151,11 @@ val get_stringl  : ?default:string list -> section -> string -> string list
 
 val get_stringo : section -> string -> string option
 
-val set_string : section -> string -> string -> section
+val set_string : ?default:string -> section -> string -> string -> section
 (** Same as {!set_int} but on string *)
 
-val set_stringl : section -> string -> string list -> section
+val set_stringl : ?default:string list ->
+  section -> string -> string list -> section
 (** Same as {!set_intl} but on string *)
 
 (* val ident  : ?default:string      -> section -> string -> string *)

@@ -7,9 +7,12 @@
 * fix problems with .why.conf
 ** if we distribute the current state, users who already have a ~/.why.conf
 will get a error message because of missing loadpath to modules
+     Done? - the magic number will force to not use the old ~/.why.conf of
+             the user
 ** generally speaking, we should rethink the design of that .why.conf: avoid
    absolute paths,
-  
+   Partially done - libdir, datadir, loadpath, ... are not written in why.conf
+   if they correspond to the default value.
 * proof replay
 ** in IDE: replay all obsolete but previously successful proofs
 ** in whybench
