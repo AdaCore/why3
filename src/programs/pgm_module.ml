@@ -13,6 +13,7 @@ type namespace = {
   ns_pr : psymbol   Mnm.t;  (* program symbols *)
   ns_ex : esymbol   Mnm.t;  (* exceptions*)
   ns_mt : mtsymbol  Mnm.t;  (* mutable types *)
+  ns_rt : rtsymbol  Mnm.t;  (* record types *)
   ns_ns : namespace Mnm.t;  (* inner namespaces *)
 }
 
@@ -20,6 +21,7 @@ let empty_ns = {
   ns_pr = Mnm.empty;
   ns_ex = Mnm.empty;
   ns_mt = Mnm.empty;
+  ns_rt = Mnm.empty;
   ns_ns = Mnm.empty;
 }
 
@@ -38,6 +40,7 @@ let rec merge_ns chk ns1 ns2 =
   { ns_pr = ns_union p_equal  chk ns1.ns_pr ns2.ns_pr;
     ns_ex = ns_union ls_equal chk ns1.ns_ex ns2.ns_ex;
     ns_mt = ns_union mt_equal chk ns1.ns_mt ns2.ns_mt;
+    ns_rt = ns_union rt_equal chk ns1.ns_rt ns2.ns_rt;
     ns_ns = Mnm.union fusion      ns1.ns_ns ns2.ns_ns; }
 
 let nm_add chk x ns m = Mnm.change x (function
@@ -51,10 +54,12 @@ let ns_add eq chk x v m = Mnm.change x (function
 let pr_add = ns_add p_equal
 let ex_add = ns_add ls_equal
 let mt_add = ns_add mt_equal
+let rt_add = ns_add rt_equal
 
 let add_pr chk x ts ns = { ns with ns_pr = pr_add chk x ts ns.ns_pr }
 let add_ex chk x ls ns = { ns with ns_ex = ex_add chk x ls ns.ns_ex }
 let add_mt chk x mt ns = { ns with ns_mt = mt_add chk x mt ns.ns_mt }
+let add_rt chk x rt ns = { ns with ns_rt = rt_add chk x rt ns.ns_rt }
 let add_ns chk x nn ns = { ns with ns_ns = nm_add chk x nn ns.ns_ns }
 
 let rec ns_find get_map ns = function
@@ -65,6 +70,7 @@ let rec ns_find get_map ns = function
 let ns_find_pr = ns_find (fun ns -> ns.ns_pr)
 let ns_find_ex = ns_find (fun ns -> ns.ns_ex)
 let ns_find_mt = ns_find (fun ns -> ns.ns_mt)
+let ns_find_rt = ns_find (fun ns -> ns.ns_rt)
 let ns_find_ns = ns_find (fun ns -> ns.ns_ns)
 
 (* modules under construction *)
@@ -137,6 +143,14 @@ let add_mtsymbol mt uc =
     add_logic_decl d uc 
   in
   add_symbol add_mt mt.mt_name mt uc
+
+let add_rtsymbol rt uc =
+  (* added in the logic as an abstract type *)
+  let uc = 
+    let d = Decl.create_ty_decl [rt.rt_abstr, Decl.Tabstract] in
+    add_logic_decl d uc 
+  in
+  add_symbol add_rt rt.rt_name rt uc
 
 let ls_Exit = create_lsymbol (id_fresh "%Exit") [] (Some ty_exn)
 

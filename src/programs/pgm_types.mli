@@ -30,6 +30,28 @@ val get_mtsymbol : tysymbol -> mtsymbol
 val is_mutable_ts : tysymbol -> bool
 val is_mutable_ty : ty       -> bool
 
+(* record type symbols *)
+
+type rt_field = private {
+  rf_name   : ident;
+  rf_region : tvsymbol option;
+  rf_type   : ty;
+}
+
+type rtsymbol = private {
+  rt_name   : ident;
+  rt_args   : tvsymbol list;
+  rt_abstr  : tysymbol;
+  rt_fields : rt_field Mstr.t; 
+}
+
+val create_rtsymbol : 
+  preid -> tvsymbol list -> (bool * preid * ty) list -> rtsymbol
+
+val rt_equal : rtsymbol -> rtsymbol -> bool
+
+(* builtin logic symbols for programs *)
+
 val ts_arrow : tysymbol
 val make_arrow_type : ty list -> ty -> ty
 
@@ -39,6 +61,7 @@ val ty_exn : ty
 (* val ts_label : tysymbol *)
 
 (* program types *)
+
 module rec T : sig
 
   type pre = Term.fmla

@@ -7,7 +7,7 @@ open Theory
 open Term
 open Decl
 
-(* model types *)
+(* model type symbols *)
 
 type mtsymbol = {
   mt_name   : ident;
@@ -46,6 +46,59 @@ exception NotModelType
 let get_mtsymbol ts = 
   try Hts.find model_types ts with Not_found -> raise NotModelType
 
+(* record type symbols ***************************************************)
+
+type rt_field = {
+  rf_name   : ident;
+  rf_region : tvsymbol option;
+  rf_type   : ty;
+}
+
+type rtsymbol = {
+  rt_name  : ident;
+  rt_args  : tvsymbol list;
+  rt_abstr : tysymbol;
+  rt_fields: rt_field Mstr.t; 
+}
+
+let record_types = Hts.create 17
+
+let create_rtsymbol name args fields = 
+  let id = id_register name in
+  let args = ref args in
+  let m = 
+    List.fold_left
+      (fun m (mut, id, ty) -> 
+	 let id = id_register id in
+	 if mut then begin
+	   let tv = create_tvsymbol (id_fresh "r") in
+	   args := tv :: !args; 
+	   Mstr.add id.id_string (id, Some tv, ty) m
+	 end else
+	   Mstr.add id.id_string (id, None, ty) m)
+      Mstr.empty fields
+  in
+  let ts = create_tysymbol name !args None in
+  let create_field (id, reg, ty) = 
+    { rf_name   = id;
+      rf_region = reg;
+      rf_type   = ty;
+    }
+  in
+  let m = Mstr.map create_field m in
+  let rt = 
+    { rt_name   = id;
+      rt_args   = !args;
+      rt_abstr  = ts;
+      rt_fields = m; }
+  in
+  Hts.add record_types ts rt;
+  rt
+
+let rt_equal : rtsymbol -> rtsymbol -> bool = (==)
+
+(* model type *************************************************************)
+
 let rec model_type ty = match ty.ty_node with
   | Tyapp (ts, tyl) ->
       let tyl = List.map model_type tyl in
@@ -65,7 +118,7 @@ let rec model_type ty = match ty.ty_node with
   | Tyvar _ ->
       ty
 
-(* types *)
+(* builtin logic symbols ************************************************)
 
 let ts_exn = Ty.create_tysymbol (id_fresh "exn") [] None
 let ty_exn = Ty.ty_app ts_exn []

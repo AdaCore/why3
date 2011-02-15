@@ -920,6 +920,28 @@ program_decl:
     { Dmodel_type (false, $3, $4, $5) }
 | MUTABLE TYPE lident type_args model
     { Dmodel_type (true, $3, $4, $5) }
+| TYPE lident labels type_args EQUAL 
+  LEFTBRC list1_field_decl opt_semicolon RIGHTBRC
+    { Drecord_type (add_lab $2 $3, $4, $7) }
+;
+
+list1_field_decl:
+| field_decl                            { [$1] }
+| list1_field_decl SEMICOLON field_decl { $3 :: $1 }
+;
+
+field_decl:
+| opt_mutable ident COLON pure_type { $1, $2, $4 }
+;
+
+opt_mutable:
+| /* epsilon */ { false }
+| MUTABLE       { true  }
+;
+
+opt_semicolon:
+| /* epsilon */ {}
+| SEMICOLON     {}
 ;
 
 use_module:

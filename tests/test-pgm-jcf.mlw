@@ -1,29 +1,8 @@
 module P
 
   use import int.Int
-  use import module stdlib.Ref
-  use import module stdlib.Array
 
-  abstract type t 'a model 'a
-  parameter t : x:'a -> {} t 'a { result=x }
-
-  let f () = {} (1, t 2) { true }
-
-  parameter c : ghost int
-
-  axiom a : c = 1
-
-  let gid (x:int) = {} ghost (c + x) { result=c+x }
-
-  let foo (x:int) = {} (x, ghost x) { let a,b = result in a=x and b=x }
-
-  (* FIXME : make c a first parameter of gid => then to type gid c y inside
-     ghost we should not insert unghost *)
-
-  let g (x : int) (y : ghost int) =
-    let z = ghost (1 + gid y) in
-    assert { z = 2 + y };
-    x + 1
+  type t 'a = { a : int; mutable b : int; }
 
 end
 

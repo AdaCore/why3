@@ -1656,11 +1656,23 @@ let rec decl ~wp env penv ltm lmod uc = function
       in
       option_iter (check_type_vars ~loc args) model;
       let mt = create_mtsymbol ~mut id args model in
-      (* let uc =  *)
-      (* 	let d = Decl.create_ty_decl [mt.mt_abstr, Decl.Tabstract] in *)
-      (* 	Pgm_module.add_logic_decl d uc  *)
-      (* in *)
       add_mtsymbol mt uc
+  | Ptree.Drecord_type (id, args, fl) ->
+      let loc = id.id_loc in
+      let id = id_user id.id loc in
+      let denv = Typing.create_denv (theory_uc uc) in
+      let args = 
+	List.map 
+	  (fun x -> tvsymbol_of_type_var (Typing.find_user_type_var x.id denv))
+	  args
+      in
+      let field (m, id, ty) = 
+	let ty = let dty = Typing.dty denv ty in Denv.ty_of_dty dty in
+	m, id_user id.id id.id_loc, ty
+      in
+      let fields = List.map field fl in
+      let rt = create_rtsymbol id args fields in
+      add_rtsymbol rt uc
 
 (*
 Local Variables:

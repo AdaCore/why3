@@ -221,6 +221,8 @@ and expr_desc =
 
 and triple = pre * expr * post
 
+type is_mutable = bool
+
 type program_decl =
   | Dlet    of ident * expr
   | Dletrec of (ident * binder list * variant option * triple) list
@@ -230,7 +232,8 @@ type program_decl =
   (* modules *)
   | Duse    of qualid * imp_exp * (*as:*) ident option
   | Dnamespace of loc * ident option * (* import: *) bool * program_decl list
-  | Dmodel_type of bool * ident * ident list * pty option
+  | Dmodel_type of is_mutable * ident * ident list * pty option
+  | Drecord_type of ident * ident list * (is_mutable * ident * pty) list
 
 type module_ = {
   mod_name   : ident;
