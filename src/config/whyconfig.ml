@@ -38,13 +38,18 @@ let autoprovers = ref false
 let autoplugins = ref false
 let opt_version = ref false
 
+let opt_list_flags = ref false
+let opt_debug_all = ref false
+
 let save = ref true
 
 let set_oref r = (fun s -> r := Some s)
 
 let plugins = Queue.create ()
-
 let add_plugin x = Queue.add x plugins
+
+let opt_debug = ref []
+let add_opt_debug x = opt_debug := x::!opt_debug
 
 let option_list = Arg.align [
   (* "--libdir", Arg.String (set_oref libdir), *)
@@ -64,6 +69,12 @@ let option_list = Arg.align [
   " install a plugin to the actual libdir";
   "--dont-save", Arg.Clear save,
   " dont modify the config file";
+  "--list-debug-flags", Arg.Set opt_list_flags,
+      " List known debug flags";
+  "--debug-all", Arg.Set opt_debug_all,
+      " Set all debug flags (except parse_only and type_only)";
+  "--debug", Arg.String add_opt_debug,
+      "<flag> Set a debug flag";
   "--version", Arg.Set opt_version,
   " print version information"
 ]
@@ -102,11 +113,34 @@ let plugins_auto_detection config =
   set_main config main
 
 let () =
+  (** Parse the command line *)
   Arg.parse option_list anon_file usage_msg;
+
+  let opt_list = ref false in
   if !opt_version then begin
-    printf "%s@." version_msg;
-    exit 0
+    opt_list := true;
+    printf "%s@." version_msg
   end;
+
+  (** Debug flag *)
+  if !opt_debug_all then begin
+    List.iter (fun (_,f,_) -> Debug.set_flag f) (Debug.list_flags ());
+    Debug.unset_flag Typing.debug_parse_only;
+    Debug.unset_flag Typing.debug_type_only
+  end;
+
+  List.iter (fun s -> Debug.set_flag (Debug.lookup_flag s)) !opt_debug;
+
+  if !opt_list_flags then begin
+    opt_list := true;
+    let print fmt (p,_,_) = fprintf fmt "%s" p in
+    printf "@[<hov 2>Known debug flags:@\n%a@]@."
+      (Pp.print_list Pp.newline print)
+      (List.sort Pervasives.compare (Debug.list_flags ()))
+  end;
+  if !opt_list then exit 0;
+
+  (** Main *)
   let config =
     try read_config !conf_file
     with Not_found ->

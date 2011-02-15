@@ -22,6 +22,7 @@ open Util
 open Whyconf
 open Rc
 
+let debug = Debug.register_flag "autodetect"
 
 (* auto-detection of provers *)
 
@@ -108,18 +109,18 @@ let sanitize_exec =
   in
   Ident.sanitizer first rest
 
-let detect_prover main acc data =
+let detect_prover main acc0 data =
   let keys = Queue.create () in
   let acc = List.fold_left
     (fun acc com ->
 	let out = Filename.temp_file "out" "" in
         let cmd = sprintf "%s %s" com data.version_switch in
 	let c = sprintf "(%s) > %s 2>&1" cmd out in
-        eprintf "Run : %s@." c;
+        Debug.dprintf debug "Run : %s@." c;
 	let ret = Sys.command c in
 	if ret <> 0 then
 	  begin
-	    eprintf "command '%s' failed@." cmd;
+	    Debug.dprintf debug "command '%s' failed@." cmd;
 	    acc
 	  end
 	else
@@ -169,16 +170,20 @@ let detect_prover main acc data =
 	      eprintf "Answer was `%s'@." s;
 	      acc
 	    end)
-    acc
+    acc0
     data.execs
   in
-  if Queue.length keys = 1 then
-    let key = Queue.take keys in
-    let prv = Mstr.find key acc in
-    let acc = Mstr.remove key acc in
-    Mstr.add data.prover_id prv acc
-  else
-    acc
+  let acc = if Queue.length keys = 1 then
+      let key = Queue.take keys in
+      let prv = Mstr.find key acc in
+      let acc = Mstr.remove key acc in
+      Mstr.add data.prover_id prv acc
+    else
+      acc in
+  (** If the accumulator has not been touched we warn
+      that we don't find the prover *)
+  if acc == acc0 then eprintf "Prover %s not found.@." data.prover_name;
+  acc
 
 let run_auto_detection config =
   let main = get_main config in
