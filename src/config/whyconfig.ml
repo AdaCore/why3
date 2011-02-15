@@ -51,9 +51,11 @@ let option_list = Arg.align [
   (* "<dir> set the lib directory ($WHY3LIB)"; *)
   (* "--datadir", Arg.String (set_oref datadir), *)
   (* "<dir> set the data directory ($WHY3DATA)"; *)
-  "--conf_file", Arg.String (set_oref conf_file),
+  "-C", Arg.String (set_oref conf_file),
   "<file> use this configuration file, create it if it doesn't exist
 ($WHY_CONFIG), otherwise use the default one";
+  "--config", Arg.String (set_oref conf_file),
+      " same as -C";
   "--autodetect-provers", Arg.Set autoprovers,
   " autodetect the provers in the $PATH";
   "--autodetect-plugins", Arg.Set autoplugins,

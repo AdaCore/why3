@@ -21,6 +21,16 @@ open Format
 open Util
 open Rc
 
+(* magicnumber for the configuration :
+  - 0 before the magic number
+  - 1 current
+
+If a configuration doesn't contain the actual magic number we don't use it.
+
+*)
+let magicnumber = 1
+exception WrongMagicNumber
+
 (* lib and shared dirs *)
 
 let compilation_libdir = default_option Config.libdir Config.localdir
@@ -131,6 +141,7 @@ let default_main =
 
 let set_main rc main =
   let section = empty_section in
+  let section = set_int section "magicnumber" magicnumber in
   let section = set_string section "libdir"    main.private_libdir in
   let section = set_string section "datadir"    main.private_datadir in
   let section = set_stringl section "loadpath" main.loadpath in
@@ -171,6 +182,8 @@ let load_prover dirname provers (id,section) =
     } provers
 
 let load_main dirname section =
+  if get_int ~default:0 section "magicnumber" <> magicnumber
+  then raise WrongMagicNumber;
   { private_libdir    = get_string ~default:default_main.private_libdir
       section "libdir";
     private_datadir   = get_string ~default:default_main.private_datadir
@@ -216,8 +229,18 @@ let default_config conf_file = get_config (conf_file,Rc.empty)
 
 let read_config conf_file =
   let filenamerc = try read_config_rc conf_file
-    with Exit -> (default_conf_file,Rc.empty) in
-  get_config filenamerc
+    with
+      | Exit -> (default_conf_file,Rc.empty) in
+  try get_config filenamerc
+  with WrongMagicNumber ->
+    let (filename,_) = filenamerc in
+    let bak = filename^".bak" in
+    Format.eprintf
+      "Warning : your configuration file %s doesn't correspond to the \
+current version of Why3. It is moved to %s. The default config is used.@."
+      filename bak;
+    Sys.rename filename bak;
+    default_config filename
 
 
 let save_config config = to_file config.conf_file config.config
