@@ -2,11 +2,8 @@
 *~
 *.bak
 *.o
-*.svn
 .*.swp
-.why.conf
 why.conf
-.authors
 *.cmx
 *.cmo
 *.cmi
@@ -23,28 +20,11 @@ why.conf
 /.depend.*
 /semantic.cache
 /TAGS
-/depend.pdf
 /output_why3
 /output_coq
-/apidoc
 /dep.pdf
 /distrib
 /META
-
-# /bench/
-/bench/bench
-/bench/programs/good/booleans/
-/bench/programs/good/exceptions/
-/bench/programs/good/for/
-/bench/programs/good/list/
-/bench/programs/good/see/
-/bench/programs/good/set/
-/bench/programs/good/recfun/
-
-# /bench/plugins/
-/bench/plugins/*.cm*
-/bench/plugins/*.annot
-/bench/plugins/config.log
 
 # /bin/
 /bin/why3.byte
@@ -63,8 +43,6 @@ why.conf
 /bin/why3bench.byte
 /bin/why3bench.opt
 /bin/why3bench
-/bin/whytptp.byte
-/bin/whytptp.opt
 /bin/why3doc.byte
 /bin/why3doc.opt
 /bin/why3doc
@@ -89,6 +67,7 @@ why.conf
 /doc/manual.glo
 /doc/manual.gls
 /doc/manual.ist
+/doc/manual.out
 /doc/*.haux
 /doc/*.pdf
 /doc/manual.html
@@ -97,108 +76,54 @@ why.conf
 /doc/bnf
 /doc/bnf.ml
 /doc/*_bnf.tex
+/doc/apidoc.tex
+/doc/apidoc/*.html
 
 # /share/
-/share/*.cm*
-/share/*.annot
 /share/provers-detection-data.conf
-
-# /share/emacs/
 /share/emacs/semantic.cache
 
 # /src/
 /src/config.sh
 /src/config.ml
-/src/*.annot
-/src/*.cm[aiox]
+/src/*.cma
 /src/*.cmxa
-/src/*.[ao]
+/src/*.a
 
 # /src/coq-plugin/
-/src/coq-plugin/*.cm*
-/src/coq-plugin/*.annot
 /src/coq-plugin/g_whytac.ml
 
-# /src/config/
-/src/config/*.cm*
-/src/config/*.annot
-
-# /src/core/
-/src/core/*.cm*
-/src/core/*.annot
-
 # /src/driver/
-/src/driver/*.annot
-/src/driver/*.cm*
-/src/driver/driver_parser.output
 /src/driver/driver_lexer.ml
 /src/driver/driver_parser.ml
 /src/driver/driver_parser.mli
-
-# /src/ide/
-/src/ide/*.annot
-/src/ide/*.cm*
-
-# /src/bench/
-/src/bench/*.annot
-/src/bench/*.cm*
+/src/driver/driver_parser.output
 
 # /src/parser/
-/src/parser/*.annot
-/src/parser/*.cm*
-/src/parser/parser.output
 /src/parser/lexer.ml
 /src/parser/parser.ml
 /src/parser/parser.mli
 /src/parser/parser.pre.ml
 /src/parser/parser.pre.mli
-
-# /src/printer/
-/src/printer/*.cm*
-/src/printer/*.annot
-/src/printer/driver_lexer.ml
-/src/printer/driver_parser.ml
-/src/printer/driver_parser.mli
-/src/printer/*.output
-
-# /src/programs/
-/src/programs/*.cm*
-/src/programs/*.annot
-/src/programs/pgm_parser.mli
-/src/programs/pgm_parser.ml
-/src/programs/pgm_lexer.ml
-/src/programs/*.output
+/src/parser/parser.pre.output
 
 # /src/tptp2why/
-/src/tptp2why/*.cm*
-/src/tptp2why/*.annot
-/src/tptp2why/tptpParser.mli
-/src/tptp2why/tptpParser.ml
-/src/tptp2why/tptpParser.conflicts
-/src/tptp2why/tptpParser.automaton
-/src/tptp2why/*.output
 /src/tptp2why/tptpLexer.ml
-
-# /src/transform/
-/src/transform/*.cm*
-/src/transform/*.annot
+/src/tptp2why/tptpParser.ml
+/src/tptp2why/tptpParser.mli
+/src/tptp2why/tptpParser.output
+/src/tptp2why/tptpParser.automaton
+/src/tptp2why/tptpParser.conflicts
 
 # /src/util/
-/src/util/*.cm*
-/src/util/*.annot
-/src/util/dynlink_compat.ml
 /src/util/rc.ml
-
-# /src/why3doc
-/src/why3doc/*.cm*
-/src/why3doc/*.annot
 
 # /tests/
 /tests/test-jcf/
+/tests/test-pgm-jcf/
 /tests/test-claude/
 
 # /examples/
-/examples/programs/my_cosine/*.gappa
 /examples/my_cosine/
 /examples/scottish-private-club/
 /examples/hello_proof/
@@ -207,13 +132,16 @@ why.conf
 /examples/programs/isqrt/
 /examples/programs/course/
 /examples/programs/wcet_hull/
+/examples/programs/my_cosine/
 /examples/programs/binary_search2/
+/examples/programs/vacid_0_sparse_array/
 /examples/programs/vacid_0_red_black_trees/
 /examples/programs/vacid_0_red_black_trees_harness/
+/examples/programs/next_digit_sum/
+/examples/programs/vstte10_max_sum/
+/examples/programs/vstte10_search_list/
+/examples/programs/vstte10_aqueue/
+/examples/programs/insertion_sort_list/
+/examples/programs/mergesort_list/
+/examples/programs/binary_search/
 
-# theories
-/theories/int/
-
-# modules 
-/modules/stdlib/
-/modules/string/

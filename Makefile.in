@@ -293,8 +293,6 @@ install_local: bin/why3
 # Whyml
 ########
 
-PGMGENERATED =
-
 PGM_FILES = pgm_ttree pgm_types pgm_pretty \
 	    pgm_module pgm_wp pgm_env pgm_typing pgm_main
 
@@ -328,16 +326,14 @@ bin/why3ml: bin/why3ml.@OCAMLBEST@
 
 include .depend.programs
 
-.depend.programs: $(PGMGENERATED)
+.depend.programs:
 	$(OCAMLDEP) -slash -I src -I src/programs $(PGMML) $(PGMMLI) > $@
 
 depend: .depend.programs
 
 clean::
-	rm -f $(PGMGENERATED)
 	rm -f src/programs/*.cm[iox] src/programs/*.o
 	rm -f src/programs/*.annot src/programs/*~
-	rm -f src/programs/*.output src/programs/*.automaton
 	rm -f bin/why3ml.byte bin/why3ml.opt bin/why3ml
 	rm -f .depend.programs
 
@@ -862,9 +858,12 @@ doc/bnf: doc/bnf.mll
 	$(OCAMLLEX) $<
 	$(OCAMLOPT) -o $@ doc/bnf.ml
 
-doc: $(DOC)
+DOC = api glossary ide intro library macros manpages \
+      manual starting syntax syntaxref version whyml
 
-doc/manual.pdf: $(BNFTEX) doc/*.tex doc/manual.tex doc/version.tex
+DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))
+
+doc/manual.pdf: $(BNFTEX) $(DOCTEX)
 	cd doc; $(RUBBER) -d manual.tex
 
 # doc/manual.html: doc/manual.tex doc/version.tex
@@ -895,13 +894,13 @@ MODULESTODOC = util/util util/hashweak \
 FILESTODOC = $(addsuffix .mli, $(addprefix src/, $(MODULESTODOC)))
 
 apidoc: $(FILESTODOC)
-	mkdir -p apidoc
+	mkdir -p doc/apidoc
 	$(OCAMLDOC) -d apidoc -html -keep-code $(INCLUDES) \
 		$(LIBINCLUDES) -I src $(FILESTODOC)
 # $(LIBML)
 
 install_apidoc: apidoc
-	rsync -av apidoc/ marche@scm.gforge.inria.fr:/home/groups/why3/htdocs/apidoc/
+	rsync -av doc/apidoc/ marche@scm.gforge.inria.fr:/home/groups/why3/htdocs/apidoc/
 
 doc/apidoc.tex: $(FILESTODOC)
 	$(OCAMLDOC) -o doc/apidoc.tex -latex -noheader -notrailer $(INCLUDES) \
@@ -909,7 +908,7 @@ doc/apidoc.tex: $(FILESTODOC)
 # $(LIBML)
 
 clean::
-	rm -f apidoc/*
+	rm -f doc/apidoc/*
 
 ################
 # generic rules
