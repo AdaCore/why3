@@ -201,6 +201,11 @@ let () =
   try
   Arg.parse option_list add_opt_file usage_msg;
 
+  if !opt_version then begin
+    printf "%s@." version_msg;
+    exit 0
+  end;
+
   (** Debug flag *)
   if !opt_debug_all then begin
     List.iter (fun (_,f,_) -> Debug.set_flag f) (Debug.list_flags ());
@@ -214,27 +219,13 @@ let () =
   if !opt_type_only then Debug.set_flag Typing.debug_type_only;
 
   (** Configuration *)
-  let config = 
-(*     try  *)
-      read_config !opt_config 
-(*     with  *)
-(*       | ConfigFailure (f, s) -> *)
-(*     option_iter (eprintf "Config file '%s' not found.@.") !opt_config; *)
-(*     option_iter *)
-(*       (eprintf "No config file found (required by '-P %s').@.") !opt_prover; *)
-(*     exit 1; *)
-  in
-
+  let config = read_config !opt_config in
   let main = get_main config in
   Whyconf.load_plugins main;
 
   (** listings*)
 
   let opt_list = ref false in
-  if !opt_version then begin
-    opt_list := true;
-    printf "%s@." version_msg
-  end;
   if !opt_list_transforms then begin
     opt_list := true;
     printf "@[<hov 2>Known non-splitting transformations:@\n%a@]@\n@."
