@@ -47,7 +47,14 @@ theory Test_simplify_array2
   type t2 'a
   goal G1 : forall y:int. forall x:t2 int. forall m: t int (t2 int).
     get (set m y x) y = x
+end
 
+theory Test_guard
+  type t
+  logic f t : t
+  logic a : t
+  logic b : t
+  goal G : forall x:t. f a = x
 end
 
 theory Test_conjunction

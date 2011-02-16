@@ -50,12 +50,15 @@ let rec term_of_ty tvmap ty = match ty.ty_node with
       t_app (ls_of_ts ts) (List.map (term_of_ty tvmap) tl) ty_type
 
 (* rewrite a closed formula modulo its free typevars *)
-let f_type_close fn f =
-  let tvs = f_ty_freevars Stv.empty f in
+let type_close tvs fn f =
   let get_vs tv = create_vsymbol (id_clone tv.tv_name) ty_type in
   let tvm = Stv.fold (fun v m -> Mtv.add v (get_vs v) m) tvs Mtv.empty in
   let vl = Mtv.fold (fun _ vs acc -> vs::acc) tvm [] in
   f_forall_close_simp vl [] (fn tvm f)
+
+let f_type_close fn f =
+  let tvs = f_ty_freevars Stv.empty f in
+  type_close tvs fn f
 
 (* convert a type declaration to a list of lsymbol declarations *)
 let lsdecl_of_tydecl tdl =
@@ -106,8 +109,8 @@ let rec t_monomorph ty_base kept lsmap consts vmap t =
         let ls = ls_of_const ty_base t in
         consts := Sls.add ls !consts;
         t_app ls [] ty_base
-    | Tapp (fs,_) when is_ls_of_ts fs ->
-        t
+    (* | Tapp (fs,_) when is_ls_of_ts fs -> *)
+    (*     t *)
     | Tapp (fs,tl) ->
         let fs = lsmap fs in
         let ty = of_option fs.ls_value in
@@ -176,7 +179,7 @@ let d_monomorph ty_base kept lsmap d =
     | Dlogic ldl ->
         let conv (ls,ld) =
           let ls =
-            if ls_equal ls ps_equ || is_ls_of_ts ls then ls else lsmap ls
+            if ls_equal ls ps_equ (* || is_ls_of_ts ls *) then ls else lsmap ls
           in
           match ld with
           | Some ld ->
