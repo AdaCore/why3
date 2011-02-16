@@ -45,6 +45,8 @@ let proj tenv t ty = match ty.ty_node with
   | Tyapp (ts,_) when Sts.mem ts tenv.enum ->
       let fs = Hts.find tenv.projs ts in
       t_app fs [t] t.t_ty
+  | _ when ty_s_any (fun ts -> Sts.mem ts tenv.enum) t.t_ty ->
+      Printer.unsupportedType ty "complexe finite type"
   | _ -> t
 
 let proj tenv t = match t.t_node with
@@ -92,11 +94,6 @@ let encoding_enumeration =
   Trans.on_tagged_ts meta_enum (fun enum ->
     let tenv = { enum = enum ; projs = projs } in
     Trans.decl (decl tenv) None)
-
-let forbid_enumeration s =
-  Trans.on_tagged_ts meta_enum (fun enum ->
-    if Sts.is_empty enum then Trans.identity
-    else Printer.unsupportedTysymbol (Sts.choose enum) s)
 
 let () = Trans.register_transform "encoding_enumeration" encoding_enumeration
 

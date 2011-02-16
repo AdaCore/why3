@@ -64,30 +64,6 @@ let enco_kept = enco_gen kept_opt
 let enco_poly_smt = enco_gen poly_smt_opt
 let enco_poly_tptp = enco_gen poly_tptp_opt
 
-let forbid_for_explicit =
-  Encoding_enumeration.forbid_enumeration
-    "explicit is unsound in presence of this finite type"
-
-let maybe_forbid_enumeration =
-  Trans.on_meta_excl poly_smt_opt.meta (fun alo ->
-    let s = match alo with
-      | None -> poly_smt_opt.default
-      | Some [MAstr s] -> s
-      | _ -> assert false in
-    if s = "explicit"
-    then forbid_for_explicit
-    else Trans.identity)
-
-let forbid_enumeration =
-  Trans.on_meta_excl poly_smt_opt.meta (fun alo ->
-    let s = match alo with
-      | None -> poly_smt_opt.default
-      | Some [MAstr s] -> s
-      | _ -> assert false in
-    if s = "explicit"
-    then forbid_for_explicit
-    else Encoding_enumeration.encoding_enumeration)
-
 
 open Ty
 open Term
@@ -113,15 +89,15 @@ let monomorphise_goal =
 
 let encoding_smt env =
   compose monomorphise_goal
-    (compose maybe_forbid_enumeration
-       (compose (enco_select env)
-          (compose (enco_kept env) (enco_poly_smt env))))
+    (compose (enco_select env)
+       (compose (enco_kept env) (enco_poly_smt env)))
 
 let encoding_tptp env =
   compose monomorphise_goal
-    (compose forbid_enumeration
-       (compose (enco_select env)
-          (compose (enco_kept env) (enco_poly_tptp env))))
+    (compose (enco_select env)
+       (compose (enco_kept env)
+          (compose (enco_poly_tptp env)
+             Encoding_enumeration.encoding_enumeration)))
 
 let () =
   register_env_transform "encoding_smt" encoding_smt;

@@ -576,15 +576,14 @@ let encoding_smt_array env =
   Trans.on_used_theory th_array (fun used ->
     if not used then Encoding.encoding_smt env else
       compose Encoding.monomorphise_goal
-        (compose Encoding.maybe_forbid_enumeration
-           (compose (select_subterm_array th_array)
-              (compose Encoding.print_kept
-                 (compose (Encoding_instantiate.t
-                             (create_env_array env th_array))
-                    (compose meta_arrays_to_meta_kept
-                       (compose Encoding.print_kept
-                          (compose (Encoding_bridge.t env)
-                             (Encoding.enco_poly_smt env)))))))))
+        (compose (select_subterm_array th_array)
+           (compose Encoding.print_kept
+              (compose (Encoding_instantiate.t
+                          (create_env_array env th_array))
+                 (compose meta_arrays_to_meta_kept
+                    (compose Encoding.print_kept
+                       (compose (Encoding_bridge.t env)
+                          (Encoding.enco_poly_smt env))))))))
 
 let () = Trans.register_env_transform "encoding_smt_array" encoding_smt_array
 

@@ -32,7 +32,6 @@ val register_enco_poly : string -> (env -> task trans) -> unit
 
 
 val monomorphise_goal : Task.task Trans.trans
-val maybe_forbid_enumeration : Task.task Trans.trans
 
 val enco_poly_smt : Env.env -> Task.task Trans.trans
 val print_kept : Task.task Trans.trans

@@ -38,9 +38,11 @@ module Debug = struct
   (** utility to print a list of items *)
   let rec print_list printer fmter = function
     | [] -> Format.fprintf fmter ""
-    | e::es -> if es = []
-        then Format.fprintf fmter "@[%a@] %a" printer e (print_list printer) es
-        else Format.fprintf fmter "@[%a@], %a" printer e (print_list printer) es
+    | e::es ->
+      if es = [] then
+        Format.fprintf fmter "@[%a@] %a" printer e (print_list printer) es
+      else
+        Format.fprintf fmter "@[%a@], %a" printer e (print_list printer) es
 
   let debug x = Format.eprintf "%s@." x
 end
@@ -136,6 +138,15 @@ let decl d = match d.d_node with
   | Dprop prop -> Transform.prop_transform prop
 
 let explicit = Trans.decl decl (Task.add_decl None d_ts_type)
+
+let meta_enum = Eliminate_algebraic.meta_enum
+
+let explicit =
+  Trans.on_tagged_ts meta_enum (fun enum ->
+    if Sts.is_empty enum then explicit
+    else Printer.unsupportedTysymbol (Sts.choose enum)
+      "explicit is unsound in presence of type")
+
 
 (** {2 monomorphise task } *)
 
