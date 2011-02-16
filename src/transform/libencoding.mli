@@ -33,9 +33,6 @@ val d_ts_type : decl
 (* function symbol mapping ty_type^n to ty_type *)
 val ls_of_ts : tysymbol -> lsymbol
 
-(* test whether a function symbol has ty_type as ls_value *)
-val is_ls_of_ts : lsymbol -> bool
-
 (* convert a type to a term of type ty_type *)
 val term_of_ty : vsymbol Mtv.t -> ty -> term
 

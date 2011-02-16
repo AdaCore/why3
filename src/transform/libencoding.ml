@@ -37,11 +37,6 @@ let ls_of_ts = Wts.memoize 63 (fun ts ->
   let args = List.map (const ty_type) ts.ts_args in
   create_fsymbol (id_clone ts.ts_name) args ty_type)
 
-(* test whether a function symbol has ty_type as ls_value *)
-let is_ls_of_ts ls = match ls.ls_value with
-  | Some { ty_node = Tyapp (ts,_) } when ts_equal ts ts_type -> true
-  | _ -> false
-
 (* convert a type to a term of type ty_type *)
 let rec term_of_ty tvmap ty = match ty.ty_node with
   | Tyvar tv ->
@@ -109,8 +104,6 @@ let rec t_monomorph ty_base kept lsmap consts vmap t =
         let ls = ls_of_const ty_base t in
         consts := Sls.add ls !consts;
         t_app ls [] ty_base
-    (* | Tapp (fs,_) when is_ls_of_ts fs -> *)
-    (*     t *)
     | Tapp (fs,tl) ->
         let fs = lsmap fs in
         let ty = of_option fs.ls_value in
@@ -179,7 +172,7 @@ let d_monomorph ty_base kept lsmap d =
     | Dlogic ldl ->
         let conv (ls,ld) =
           let ls =
-            if ls_equal ls ps_equ (* || is_ls_of_ts ls *) then ls else lsmap ls
+            if ls_equal ls ps_equ then ls else lsmap ls
           in
           match ld with
           | Some ld ->
