@@ -184,7 +184,7 @@ let load_main dirname section =
   { libdir    = get_string ~default:default_main.libdir section "libdir";
     datadir   = get_string ~default:default_main.datadir section "datadir";
     loadpath  = List.map (absolute_filename dirname)
-      (get_stringl ~default:default_main.loadpath section "loadpath");
+      (get_stringl ~default:[] section "loadpath");
     timelimit = get_int ~default:default_main.timelimit section "timelimit";
     memlimit  = get_int ~default:default_main.memlimit section "memlimit";
     running_provers_max = get_int ~default:default_main.running_provers_max
