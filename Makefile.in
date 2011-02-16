@@ -223,7 +223,7 @@ clean::
 
 install_no_local::
 	mkdir -p $(BINDIR)
-	mkdir -p $(LIBDIR)/why3
+	mkdir -p $(LIBDIR)/why3/plugins
 	mkdir -p $(DATADIR)/why3/images
 	mkdir -p $(DATADIR)/why3/emacs
 	mkdir -p $(DATADIR)/why3/lang
@@ -243,7 +243,7 @@ install_no_local::
 install_no_local_lib::
 	mkdir -p $(OCAMLLIB)/why3
 	cp -f src/why.cm* $(OCAMLLIB)/why3
-	cp -f META  $(OCAMLLIB)/why3
+	cp -f META $(OCAMLLIB)/why3
 	if test -f src/why.a; then cp -f src/why.a $(OCAMLLIB)/why3; fi
 
 ifeq (@enable_local@,yes)
@@ -476,7 +476,7 @@ endif
 
 
 ###############
-# BENCH
+# Bench
 ###############
 
 ifeq (@enable_bench@,yes)
@@ -619,25 +619,15 @@ plugins.opt  opt : plugins/whytptp.cmxs
 plugins/whytptp.cmxs plugins/whytptp.cmo: EXTOBJS += $(MENHIRLIB)
 plugins/whytptp.cmxs plugins/whytptp.cmo: INCLUDES += $(MENHIRINC)
 
-plugins:
-	@mkdir plugins
-
-src/tptp2why/whytptp.cmxs: $(TPTPCMX)
+plugins/whytptp.cmxs: $(TPTPCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
 
-src/tptp2why/whytptp.cmo: $(TPTPCMO)
+plugins/whytptp.cmo: $(TPTPCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
-plugins/whytptp.cmxs: plugins src/tptp2why/whytptp.cmxs
-	@cp src/tptp2why/whytptp.cmxs $@
-
-plugins/whytptp.cmo: plugins src/tptp2why/whytptp.cmo
-	@cp src/tptp2why/whytptp.cmo $@
-
 install_no_local::
-	mkdir -p $(LIBDIR)/why3/plugins
 	cp -f plugins/whytptp.cm* $(LIBDIR)/why3/plugins
 
 # depend and clean targets
@@ -652,9 +642,9 @@ depend: .depend.tptp2why
 clean::
 	rm -f $(TPTPGENERATED)
 	rm -f src/tptp2why/*.cm[iox] src/tptp2why/*.o
-	rm -f src/tptp2why/*.annot src/tptp2why/*~
+	rm -f src/tptp2why/*.annot src/tptp2why/*.conflicts
 	rm -f src/tptp2why/*.output src/tptp2why/*.automaton
-	rm -f bin/whytptp.byte bin/whytptp.opt
+	rm -f plugins/whytptp.cmxs plugins/whytptp.cmo
 	rm -f .depend.tptp2why
 
 endif
@@ -1025,6 +1015,7 @@ $(DISTRIB_TAR): doc/manual.pdf
 	mkdir -p $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bin
 	mkdir -p $(DISTRIB_DIR)/share
+	mkdir -p $(DISTRIB_DIR)/plugins
 	ln -s ../drivers $(DISTRIB_DIR)/share/drivers
 	ln -s ../modules $(DISTRIB_DIR)/share/modules
 	ln -s ../theories $(DISTRIB_DIR)/share/theories
