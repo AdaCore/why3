@@ -23,13 +23,12 @@ open Rc
 
 (* magicnumber for the configuration :
   - 0 before the magic number
-  - 1 current
+  - 1 when no loadpath meant default loadpath
+  - 2 current
 
-If a configuration doesn't contain the actual magic number we don't use it.
+If a configuration doesn't contain the actual magic number we don't use it.*)
 
-*)
-
-let magicnumber = 1
+let magicnumber = 2
 
 exception WrongMagicNumber
 
