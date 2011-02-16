@@ -111,9 +111,12 @@ let plugins_auto_detection config =
   let dir = Whyconf.pluginsdir main in
   let files = Sys.readdir dir in
   let fold main p =
+    if p.[0] == '.' then main else
     let p = Filename.concat dir p in
     try eprintf "== Found %s ==@." p;
-        install_plugin main p with Exit -> main in
+        install_plugin main p
+    with Exit -> main
+  in
   let main = Array.fold_left fold main files in
   set_main config main
 
@@ -147,9 +150,9 @@ let main () =
 
   (** Main *)
   let config =
-    try 
+    try
       read_config !conf_file
-    with 
+    with
       | Rc.CannotOpen (f, s)
       | Whyconf.ConfigFailure (f, s) ->
 	  autoprovers := true;
@@ -181,7 +184,7 @@ let main () =
   in
   if !save then begin
     printf "Save config to %s@." conf_file;
-    save_config config 
+    save_config config
   end
 
 let () =
