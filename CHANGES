@@ -1,13 +1,29 @@
 
-  o why3config --conf_file is replaced by -C and --config
-  o TPTP : encoding is not anymore the default for tptp provers.
-  It is now forbidden to use explicit with enumeration.
-  o [IDE] source file names are stored in database as relative paths
+  o algebraic types: must be well-founded, non-positive constructors
+    are forbidden, recursive functions and predicates must 
+    structurally terminate
+  o syntax: /\ renamed into && and \/ into ||
+  o accept lowercase names for axioms, lemmas, goals
+  o labels in terms and formulas are not printed anymore
+  o transformation split-goal does not split under disjunction anymore
+  o fixed --enable-local
+  o why.conf is no more looked for in the current directory; use -C or
+    WHY3CONFIG instead
+  o why.conf: when changed, a backup up copy is made in why.conf.bak
+  o why.conf now contains a magic number; configuration must be
+    rebuilt with why3config if the magic number has changed
+  o why3config: --autodetect-provers renamed to --detect-provers
+                --autodetect-plugins renamed to --detect-plugins
+     new option --detect to perform both detections
+  o why3config: --conf_file is replaced by -C and --config
+  o TPTP: encoding by explicit polymorphism is not anymore the 
+    default encoding for TPTP provers. It is now forbidden to use this
+    encoding in presence of finite types.  
+  o IDE: source file names are stored in database with paths relative
     to the database, so that databases are now easier to move from a
     machine to another (e.g when they are stored in source control
     repositories)
-  o better Gappa output: support for sqrt, for
-    negative constants
+  o better Gappa output: support for sqrt, for negative constants
 
 version 0.63, Dec 21, 2010
 ==========================
