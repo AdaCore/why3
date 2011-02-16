@@ -895,7 +895,7 @@ FILESTODOC = $(addsuffix .mli, $(addprefix src/, $(MODULESTODOC)))
 
 apidoc: $(FILESTODOC)
 	mkdir -p doc/apidoc
-	$(OCAMLDOC) -d apidoc -html -keep-code $(INCLUDES) \
+	$(OCAMLDOC) -d doc/apidoc -html -keep-code $(INCLUDES) \
 		$(LIBINCLUDES) -I src $(FILESTODOC)
 # $(LIBML)
 
