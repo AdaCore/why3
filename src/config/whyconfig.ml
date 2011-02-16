@@ -23,9 +23,9 @@ open Util
 open Whyconf
 
 let usage_msg =
-  sprintf "Usage: %s [options]\n\n
-  Environment variables WHY3LIB, WHY3DATA, and WHY3CONFIG\n
-  can be set to change the default paths\n@."
+  sprintf "Usage: %s [options]\n
+  Environment variables WHY3LIB, WHY3DATA, and WHY3CONFIG
+  can be set to change the default paths.@."
     (Filename.basename Sys.argv.(0))
 
 let version_msg = sprintf
