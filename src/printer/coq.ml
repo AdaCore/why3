@@ -527,8 +527,10 @@ open Theory
 
 let print_tdecl ~old info fmt d = match d.td_node with
   | Decl d -> print_decl ~old info fmt d
-  | Use t -> 
+  | Use _t -> ()
+(*
       fprintf fmt "Require Import %s.@\n@\n" (id_unique iprinter t.th_name)
+*)
   | Meta _ -> assert false (* TODO ? *)
   | Clone _ -> assert false (* TODO *)
 

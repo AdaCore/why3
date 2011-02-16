@@ -3,11 +3,12 @@ version 0.64, Feb 16, 2011
 ==========================
 
   o algebraic types: must be well-founded, non-positive constructors
-    are forbidden, recursive functions and predicates must 
+    are forbidden, recursive functions and predicates must
     structurally terminate
   o syntax: /\ renamed into && and \/ into ||
-  o accept lowercase names for axioms, lemmas, goals
-  o labels in terms and formulas are not printed anymore
+  o accept lowercase names for axioms, lemmas, goals, and cases in
+    inductive predicates
+  o labels in terms and formulas are not printed by default. 
   o transformation split-goal does not split under disjunction anymore
   o fixed --enable-local
   o why.conf is no more looked for in the current directory; use -C or
@@ -19,9 +20,9 @@ version 0.64, Feb 16, 2011
                 --autodetect-plugins renamed to --detect-plugins
      new option --detect to perform both detections
   o why3config: --conf_file is replaced by -C and --config
-  o TPTP: encoding by explicit polymorphism is not anymore the 
+  o TPTP: encoding by explicit polymorphism is not anymore the
     default encoding for TPTP provers. It is now forbidden to use this
-    encoding in presence of finite types.  
+    encoding in presence of finite types.
   o IDE: source file names are stored in database with paths relative
     to the database, so that databases are now easier to move from a
     machine to another (e.g when they are stored in source control
