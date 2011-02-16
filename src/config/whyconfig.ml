@@ -23,8 +23,9 @@ open Util
 open Whyconf
 
 let usage_msg =
-  sprintf "Usage: [WHY3LIB=... WHY3DATA=... %s [options]@.\t\
-$WHY3LIB and $WHYDATA are used only when a configuration file is created"
+  sprintf "Usage: %s [options]\n\n
+  Environment variables WHY3LIB, WHY3DATA, and WHY3CONFIG\n
+  can be set to change the default paths\n@."
     (Filename.basename Sys.argv.(0))
 
 let version_msg = sprintf
@@ -57,20 +58,19 @@ let option_list = Arg.align [
   (* "--datadir", Arg.String (set_oref datadir), *)
   (* "<dir> set the data directory ($WHY3DATA)"; *)
   "-C", Arg.String (set_oref conf_file),
-  "<file> use this configuration file, create it if it doesn't exist
-($WHY_CONFIG), otherwise use the default one";
+  "<file> Config file to create";
   "--config", Arg.String (set_oref conf_file),
       " same as -C";
   "--detect-provers", Arg.Set autoprovers,
-  " detect the provers in $PATH";
+  " Search for provers in $PATH";
   "--detect-plugins", Arg.Set autoplugins,
-  " detect the plugins in default library directories";
+  " Search for plugins in the default library directory";
   "--detect", Arg.Unit (fun () -> autoprovers := true; autoplugins := true),
-  " detect both provers and plugins";
+  " Search for both provers and plugins";
   "--install-plugin", Arg.String add_plugin,
-  " install a plugin to the actual libdir";
+  " Install a plugin to the actual libdir";
   "--dont-save", Arg.Clear save,
-  " dont modify the config file";
+  " Do not modify the config file";
   "--list-debug-flags", Arg.Set opt_list_flags,
       " List known debug flags";
   "--debug-all", Arg.Set opt_debug_all,
@@ -78,7 +78,7 @@ let option_list = Arg.align [
   "--debug", Arg.String add_opt_debug,
       "<flag> Set a debug flag";
   "--version", Arg.Set opt_version,
-  " print version information"
+  " Print version information"
 ]
 
 let anon_file _ = Arg.usage option_list usage_msg; exit 1
@@ -97,7 +97,10 @@ and it has not been tested@."
   end;
   let base = Filename.basename p in
   let plugindir = Whyconf.pluginsdir main in
-  if not (Sys.file_exists plugindir) then Unix.mkdir plugindir 0o777;
+  if not (Sys.file_exists plugindir) then begin
+    eprintf "Error: plugin directory %s not found.@." plugindir;
+    raise Exit
+  end;
   let target = (Filename.concat plugindir base) in
   if p <> target then Sysutil.copy_file p target;
   Whyconf.add_plugin main (Filename.chop_extension target)

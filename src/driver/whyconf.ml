@@ -35,15 +35,9 @@ exception WrongMagicNumber
 
 (* lib and shared dirs *)
 
-let compilation_libdir = default_option Config.libdir Config.localdir
-
-let compilation_datadir =
-  option_apply Config.datadir
-    (fun d -> Filename.concat d "share") Config.localdir
-
-let compilation_loadpath =
-  [ Filename.concat compilation_datadir "theories";
-    Filename.concat compilation_datadir "modules"; ]
+let default_loadpath =
+  [ Filename.concat Config.datadir "theories";
+    Filename.concat Config.datadir "modules"; ]
 
 let default_conf_file =
   match Config.localdir with
@@ -61,24 +55,23 @@ type config_prover = {
 }
 
 type main = {
-  private_libdir   : string;      (* "/usr/local/lib/why/" *)
-  private_datadir  : string;      (* "/usr/local/share/why/" *)
+  libdir   : string;      (* "/usr/local/lib/why/" *)
+  datadir  : string;      (* "/usr/local/share/why/" *)
   loadpath  : string list;  (* "/usr/local/lib/why/theories" *)
-  timelimit : int;   (* default prover time limit in seconds
-                               (0 unlimited) *)
+  timelimit : int;
+  (* default prover time limit in seconds (0 unlimited) *)
   memlimit  : int;
   (* default prover memory limit in megabytes (0 unlimited)*)
   running_provers_max : int;
   (* max number of running prover processes *)
   plugins : string list;
-  (* plugins to load, without extension, relative to
-     [private_libdir]/plugins *)
+  (* plugins to load, without extension, relative to [libdir]/plugins *)
 }
 
 let libdir m =
   try
     Sys.getenv "WHY3LIB"
-  with Not_found -> m.private_libdir
+  with Not_found -> m.libdir
 
 let datadir m =
   try
@@ -87,7 +80,7 @@ let datadir m =
     eprintf "[Info] datadir set using WHY3DATA='%s'@." d;
 *)
     d
-  with Not_found -> m.private_datadir
+  with Not_found -> m.datadir
 
 let loadpath m =
   try
@@ -95,7 +88,7 @@ let loadpath m =
 (*
     eprintf "[Info] loadpath set using WHY3LOADPATH='%s'@." d;
 *)
-    [d]
+    Str.split (Str.regexp ":") d
   with Not_found -> m.loadpath
 
 let timelimit m = m.timelimit
@@ -109,12 +102,13 @@ let plugins m = m.plugins
 let set_plugins m pl =
   (* TODO : sanitize? *)
   { m with plugins = pl}
+
 let add_plugin m p =
   if List.mem p m.plugins
   then m
   else { m with plugins = List.rev (p::(List.rev m.plugins))}
 
-let pluginsdir m = Filename.concat m.private_libdir "plugins"
+let pluginsdir m = Filename.concat m.libdir "plugins"
 let load_plugins m =
   let load x =
     try Plugin.load x
@@ -125,16 +119,16 @@ let load_plugins m =
 
 type config = {
   conf_file : string;       (* "/home/innocent_user/.why.conf" *)
-  config    : Rc.t  ;
+  config    : Rc.t;
   main      : main;
   provers   : config_prover Mstr.t;
 }
 
 let default_main =
   {
-    private_libdir = compilation_libdir;
-    private_datadir = compilation_datadir;
-    loadpath = compilation_loadpath;
+    libdir = Config.libdir;
+    datadir = Config.datadir;
+    loadpath = default_loadpath;
     timelimit = 10;
     memlimit = 0;
     running_provers_max = 2;
@@ -144,12 +138,11 @@ let default_main =
 let set_main rc main =
   let section = empty_section in
   let section = set_int section "magic" magicnumber in
-  let section = set_string ~default:default_main.private_libdir
-    section "libdir" main.private_libdir in
-  let section = set_string ~default:default_main.private_datadir
-    section "datadir" main.private_datadir in
-  let section = set_stringl ~default:default_main.loadpath
-    section "loadpath" main.loadpath in
+  let section = set_string ~default:default_main.libdir
+    section "libdir" main.libdir in
+  let section = set_string ~default:default_main.datadir
+    section "datadir" main.datadir in
+  let section = set_stringl section "loadpath" main.loadpath in
   let section = set_int section "timelimit" main.timelimit in
   let section = set_int section "memlimit" main.memlimit in
   let section =
@@ -180,7 +173,6 @@ let load_prover dirname provers (id,section) =
   Mstr.add id
     { name    = get_string section "name";
       command = get_string section "command";
-      (* TODO command : absolute_filename dirname ? *)
       driver  = absolute_filename dirname (get_string section "driver");
       version = get_string ~default:"" section "version";
       editor  = get_string ~default:"" section "editor";
@@ -189,20 +181,16 @@ let load_prover dirname provers (id,section) =
 let load_main dirname section =
   if get_int ~default:0 section "magic" <> magicnumber then
     raise WrongMagicNumber;
-  { private_libdir    = get_string ~default:default_main.private_libdir
-      section "libdir";
-    private_datadir   = get_string ~default:default_main.private_datadir
-      section "datadir";
+  { libdir    = get_string ~default:default_main.libdir section "libdir";
+    datadir   = get_string ~default:default_main.datadir section "datadir";
     loadpath  = List.map (absolute_filename dirname)
       (get_stringl ~default:default_main.loadpath section "loadpath");
     timelimit = get_int ~default:default_main.timelimit section "timelimit";
     memlimit  = get_int ~default:default_main.memlimit section "memlimit";
-    running_provers_max =
-      get_int ~default:default_main.running_provers_max section
-        "running_provers_max";
+    running_provers_max = get_int ~default:default_main.running_provers_max
+      section "running_provers_max";
     plugins = get_stringl ~default:[] section "plugin";
   }
-
 
 let read_config_rc conf_file =
   let filename = match conf_file with
@@ -217,7 +205,7 @@ let read_config_rc conf_file =
 exception ConfigFailure of string (* filename *) * string
 
 let () = Exn_printer.register (fun fmt e -> match e with
-  | ConfigFailure (f, s) -> 
+  | ConfigFailure (f, s) ->
       Format.fprintf fmt "error in config file %s: %s" f s
   | _ -> raise e)
 
@@ -226,7 +214,7 @@ let get_config (filename,rc) =
   let rc, main =
     match get_section rc "main" with
       | None      -> raise (ConfigFailure (filename, "no main section"))
-      | Some main -> rc, load_main dirname main 
+      | Some main -> rc, load_main dirname main
   in
   let provers = get_family rc "prover" in
   let provers = List.fold_left (load_prover dirname) Mstr.empty provers in
@@ -236,23 +224,23 @@ let get_config (filename,rc) =
     provers   = provers;
   }
 
-let default_config conf_file = 
+let default_config conf_file =
   get_config (conf_file, set_main Rc.empty default_main)
 
 let read_config conf_file =
-  let filenamerc = 
-    try 
+  let filenamerc =
+    try
       read_config_rc conf_file
-    with Exit -> 
+    with Exit ->
       default_conf_file, set_main Rc.empty default_main
   in
-  try 
+  try
     get_config filenamerc
   with WrongMagicNumber ->
     let filename, _ = filenamerc in
     raise (ConfigFailure (filename, "outdated config file; rerun why3config"))
 
-let save_config config = 
+let save_config config =
   let filename = config.conf_file in
   if Sys.file_exists filename then Sys.rename filename (filename ^ ".bak");
   to_file filename config.config

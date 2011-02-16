@@ -360,10 +360,10 @@ if test "$enable_hypothesis_selection" = yes; then
 fi
 
 if test "$enable_local" = no; then
-   LOCALDIR='None'
+   LOCALDIR=''
    LOCALBIN=''
 else
-   LOCALDIR='Some \"$PWD\"'
+   LOCALDIR="${PWD}"
    LOCALBIN="${PWD}/bin/"
 fi
 
