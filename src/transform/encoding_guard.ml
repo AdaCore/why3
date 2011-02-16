@@ -65,18 +65,22 @@ module Transform = struct
         List.fold_left2 ty_match2 s l1 l2
       | _ -> assert false
 
-
   let fs_type =
     let alpha = ty_var (create_tvsymbol (id_fresh "a")) in
     create_fsymbol (id_fresh "type_of") [alpha] ty_type
 
   let app_type t = t_app fs_type [t] ty_type
 
+  let type_variable_only_in_value lsymbol =
+    let tvar_val = ty_freevars Stv.empty (of_option lsymbol.ls_value) in
+    let tvar_arg = List.fold_left ty_freevars Stv.empty lsymbol.ls_args in
+    Stv.diff tvar_val tvar_arg
+
   (** creates a new logic symbol, with a different type if the
   given symbol was polymorphic *)
   let findL = Wls.memoize 63 (fun lsymbol ->
     if ls_equal lsymbol ps_equ || lsymbol.ls_value = None then lsymbol else
-    let new_ty = ty_freevars Stv.empty (of_option lsymbol.ls_value) in
+    let new_ty = type_variable_only_in_value lsymbol in
     (* as many t as type vars *)
     if Stv.is_empty new_ty then lsymbol (* same type *) else
       let add _ acc = ty_type :: acc in
@@ -90,8 +94,7 @@ module Transform = struct
   let rec term_transform kept varM t =
     match t.t_node with
     | Tapp(f, terms) ->
-      let terms = args_transform kept varM (of_option f.ls_value)
-        terms t.t_ty in
+      let terms = args_transform kept varM f terms t.t_ty in
       t_app (findL f) terms t.t_ty
     | _ -> (* default case : traverse *)
       t_map (term_transform kept varM) (fmla_transform kept varM) t
@@ -118,9 +121,11 @@ module Transform = struct
       f_map (term_transform kept varM) (fmla_transform kept varM) f(*  in *)
     (* Format.eprintf "fmla_to : %a@." Pretty.print_fmla f;f *)
 
-  and args_transform kept varM fs_value args ty =
+  and args_transform kept varM lsymbol args ty =
     (* Debug.print_list Pretty.print_ty Format.std_formatter type_vars; *)
-    let tv_to_ty = ty_match2 Mtv.empty fs_value ty in
+    let tv_to_ty = ty_match2 Mtv.empty (of_option lsymbol.ls_value) ty in
+    let new_ty = type_variable_only_in_value lsymbol in
+    let tv_to_ty = Mtv.inter (fun _ tv () -> Some tv) tv_to_ty new_ty in
     (* Debug.print_mtv Pretty.print_ty Format.err_formatter tv_to_ty; *)
     let args = List.map (term_transform kept varM) args in
     (* fresh args to be added at the beginning of the list of arguments *)
@@ -137,7 +142,7 @@ module Transform = struct
         let stv = ls_ty_freevars lsymbol in
         let trans varM () =
           let terms = List.map t_var varl in
-          let terms = args_transform kept varM ty_val terms ty_val in
+          let terms = args_transform kept varM lsymbol terms ty_val in
           let fmla =
             f_equ (app_type (t_app (findL lsymbol) terms ty_val))
               (term_of_ty varM ty_val) in
