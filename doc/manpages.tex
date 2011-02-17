@@ -99,9 +99,10 @@ file to add support for detection of other provers. (In that case,
 please consider submitting a new prover configuration on the bug
 tracking system).
 
-The result of the prover detection is stored in the user's
-configuration file (\eg{} \verb+~/.why.conf+). Again, this file
-is human-readable, and advanced users may modify it in order to
+The result of provers detection is stored in the user's
+configuration file (\verb+~/.why.conf+ or, in the case of local
+installation, \verb+why.conf+ in Why3 sources top directory). This file 
+is also human-readable, and advanced users may modify it in order to
 experiment with different ways of calling provers, \eg{} different 
 versions of the same prover, or with different options.
 
@@ -356,14 +357,14 @@ generally a bench configuration file:
    csv = "prgbench.csv"
 \end{verbatim}
 
-Such a file can defined three families \texttt{tools,probs,bench}. The
+Such a file can define three families \texttt{tools,probs,bench}. The
 sections \texttt{tools} define a set of components to compare, the
 sections \texttt{probs} define a set of goals on which to compare some
 components and the sections \texttt{bench} define which components to
 compare using which goals. It refers by name to the sections
 \texttt{tools} and \texttt{probs} defined in the same file. The order
 of the definitions is irrelevant. Notice that \texttt{loadpath} in a family
-\texttt{tools} can be used to compare different axiomatisation.
+\texttt{tools} can be used to compare different axiomatizations.
 
 One can run all the bench given in one bench configuration file with
 \texttt{why3bench} :
@@ -373,30 +374,27 @@ why3bench -B path_to_my_bench.rc
 
 \section{The \texttt{why.conf} configuration file}
 \label{sec:whyconffile}
-One can defined more than one configuration file. \texttt{why3config}
-and all the others \texttt{why3}'s tools use priorities for which
+One can use a custom configuration file. \texttt{why3config}
+and other \texttt{why3} tools use priorities for which
 user's configuration file to consider:
 \begin{itemize}
-\item the file specified by the \texttt{-C} or \texttt{--config} options,
+\item the file specified by the \texttt{-C} or \texttt{-{}-config} options,
 \item the file specified by the environment variable
-  \texttt{\$WHY\_CONFIG} if set.
-\item the file \texttt{why.conf} or \texttt{.why.conf} in the current
-  directory.
-\item the file \texttt{\$HOME/.why.conf} or \texttt{\$USERPROFILE/.why.conf}
+  \texttt{WHY3CONFIG} if set.
+\item the file \texttt{\$HOME/.why.conf}
+  (\texttt{\$USERPROFILE/.why.conf} under Windows) or, in the case of
+  local installation, \texttt{why.conf} in Why3 sources top directory.
 \end{itemize}
-If none of this file exists a built-in default configuration is used
-which is saved in a default configuration filename, which is usually
-\texttt{\$HOME/.why.conf}.
+If none of these files exists, a built-in default configuration is used.
 
-The configuration file is a human-readable text file, which is
-composed by association pairs arranged by sections. Here an example of
-a configuration file.
+The configuration file is a human-readable text file, which consists
+of association pairs arranged in sections. Here follows an example of
+configuration file.
 
 \begin{verbatim}
 [main ]
-datadir = "/usr/local/share/why3"
-libdir = "/usr/local/lib/why3"
 loadpath = "/usr/local/share/why3/theories"
+magic = 2
 memlimit = 0
 running_provers_max = 2
 timelimit = 10
@@ -424,19 +422,19 @@ name = "Alt-Ergo"
 version = "0.91"
 \end{verbatim}
 
-A section begin with an header inside square brackets and end at the
-next square brackets. Sections can't be nested. The header of a
+A section begins with a header inside square brackets and ends at the
+beginning of the next section. The header of a
 section can be only one identifier, \texttt{main} and \texttt{ide} in
 the example, or it can be composed by a family name and one family
 argument, \texttt{prover} is one family name, \texttt{coq} and
 \texttt{alt-ergo} are the family argument.
 
-Inside a section, one key can be associated to an integer (.eg -555),
+Inside a section, one key can be associated with an integer (.eg -555),
 a boolean (true, false) or a string (\eg{} "emacs"). One key can appear
 only once except if its a multi-value key. The order of apparition of
 the keys inside a section matter only for the multi-value key.
 
-\section{Drivers of external provers}
+\section{Drivers of External Provers}
 \label{sec:drivers}
 
 The drivers of external provers are readable files, in directory
