@@ -66,7 +66,7 @@ type prob = {
 
 type why_result =
   | InternalFailure of exn
-  | Done of prover_result
+  | Done of  Db.proof_status * float
 
 val print_why_result : Format.formatter -> why_result -> unit
 type result = {tool   : tool_id;
@@ -75,8 +75,14 @@ type result = {tool   : tool_id;
                idtask : int;
                result : why_result}
 
+type proof_attempt_status =
+  | Runned of why_result
+  | Cached of Db.proof_status * float
+
+val print_pas : Format.formatter -> proof_attempt_status -> unit
+
 type callback = tool_id -> prob_id ->
-    task -> int -> why_result -> unit
+    task -> int -> proof_attempt_status -> unit
 
 val all_list_tp :
   ?callback:callback ->

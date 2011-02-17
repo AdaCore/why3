@@ -59,15 +59,9 @@ type prob = {
   ptrans : env -> (task list trans * (Db.transf_id option)) list;
 }
 
-
 type why_result =
   | InternalFailure of exn
-  | Done of prover_result
-
-let print_why_result fmt = function
-  | InternalFailure exn ->
-    Format.fprintf fmt "InternalFailure %a" Exn_printer.exn_printer exn
-  | Done pr -> Call_provers.print_prover_result fmt pr
+  | Done of Db.proof_status * float
 
 type result = {tool   : tool_id;
                prob   : prob_id;
@@ -75,8 +69,41 @@ type result = {tool   : tool_id;
                idtask : int;
                result : why_result}
 
+
+type proof_attempt_status =
+  | Runned of why_result
+  | Cached of Db.proof_status * float
+
+open Format
+
+let print_prover_answer fmt = function
+  | Db.Success -> fprintf fmt "Valid"
+    (* | Invalid -> fprintf fmt "Invalid" *)
+  | Db.Timeout -> fprintf fmt "Timeout"
+  | Db.Unknown -> fprintf fmt "Unknown"
+  | Db.Failure -> fprintf fmt "Failure"
+  | Db.Undone  -> fprintf fmt "Undone"
+
+let print_why_result fmt = function
+  | InternalFailure exn ->
+    Format.fprintf fmt "InternalFailure %a" Exn_printer.exn_printer exn
+  | Done (pr,_) -> print_prover_answer fmt pr
+
+let print_pas fmt = function
+  | Runned sp -> fprintf fmt "Runned %a" print_why_result sp
+  | Cached (p,t) -> fprintf fmt "Cached (%a,%f)" print_prover_answer p t
+
 type callback = tool_id -> prob_id ->
-    task -> int -> why_result -> unit
+    task -> int ->  proof_attempt_status -> unit
+
+let proof_status_to_db_result pr =
+  match pr with
+      | {pr_answer = Valid} -> (Db.Success,pr.pr_time)
+      | {pr_answer = Invalid} -> (Db.Unknown,pr.pr_time)
+      (* TODO add invalid in Db *)
+      | {pr_answer = Unknown _} -> (Db.Unknown,pr.pr_time)
+      | {pr_answer = Failure _ | HighFailure} -> (Db.Failure,pr.pr_time)
+      | {pr_answer = Timeout } -> (Db.Timeout,pr.pr_time)
 
 let debug_call = Debug.register_flag "call"
 let debug = Debug.register_flag "bench_core"
@@ -136,8 +163,8 @@ let new_external_proof =
 
 (* from Gmain *)
 let task_checksum t =
-  Format.fprintf Format.str_formatter "%a@." Pretty.print_task t;
-  let s = Format.flush_str_formatter () in
+  fprintf str_formatter "%a@." Pretty.print_task t;
+  let s = flush_str_formatter () in
   Digest.to_hex (Digest.string s)
 
 
@@ -189,7 +216,7 @@ let call callback tool prob =
       new_external_proof (call_prover,cb)
     with e ->
       Format.eprintf "%a@." Exn_printer.exn_printer e;
-      callback pval i task (InternalFailure e) in
+      callback pval i task (Runned (InternalFailure e)) in
   let call pval i (task,db_goal) =
     match db_goal,db_tool with
       | Some db_goal, Some db_tool ->
@@ -198,23 +225,23 @@ let call callback tool prob =
             Db.add_proof_attempt db_goal db_tool
           with Db.AlreadyExist ->
             Db.Hprover.find (Db.external_proofs db_goal) db_tool in
-        let (proof_status,_,_,_) = Db.status_and_time proof_attempt in
-        begin match proof_status with
-          | Db.Success -> () (*TODO something else, must use the callback *)
-          | Db.Timeout | Db.Unknown | Db.Failure | Db.Undone ->
-            let cb res = callback pval i task (Done res);
-              let status = match res.pr_answer with
-                | Valid -> Db.Success
-                | Timeout -> Db.Timeout
-                | Unknown _ -> Db.Unknown
-                | Failure _ | HighFailure -> Db.Failure
-                | Invalid -> Db.Failure (* Todo change that one day *) in
-              Db.set_status proof_attempt status res.pr_time
+        let (proof_status,time,_,_) = Db.status_and_time proof_attempt in
+        begin
+          if proof_status = Db.Success ||
+            (proof_status = Db.Timeout && time > float tool.ttime) then
+            callback pval i task (Cached (proof_status,time))
+          else
+            let cb res =
+              let (status,time) = proof_status_to_db_result res in
+              callback pval i task (Runned (Done (status,time)));
+              Db.set_status proof_attempt status time
             in
             new_external_proof pval i cb task
         end
       | _ ->
-        let cb res = callback pval i task (Done res) in
+        let cb res =
+          let (status,time) = proof_status_to_db_result res in
+          callback pval i task (Runned (Done (status,time))) in
         new_external_proof pval i cb task
   in
   (** Apply trans *)
@@ -240,7 +267,9 @@ let general ?(callback=fun _ _ _ _ _ -> ()) iter add =
       add v {tool = tool.tval; prob = pval;
              task = Task.task_goal task;
              idtask = i;
-             result = res
+             result = match res with
+               | Runned res -> res
+               | Cached (res,time) -> Done (res,time)
             } in
     call cb tool prob);
   (** Wait for the last remaining tasks *)
@@ -338,7 +367,7 @@ let add_nb_avg (nb,avg) time =
   (succ nb, ((float nb) *. avg +. time) /. (float (succ nb)))
 let empty_nb_avg = (0,0.)
 
-let print_nb_avg fmt (nb,avg) = Format.fprintf fmt "%i : %.2f" nb avg
+let print_nb_avg fmt (nb,avg) = fprintf fmt "%i : %.2f" nb avg
 
 type tool_res =
     { valid : nb_avg;
@@ -356,7 +385,7 @@ let empty_tool_res =
   }
 
   let print_tool_res fmt tool_res =
-    Format.fprintf fmt "(%a, %a, %a, %a, %a)"
+    fprintf fmt "(%a, %a, %a, %a, %a)"
       print_nb_avg tool_res.valid
       print_nb_avg tool_res.unknown
       print_nb_avg tool_res.timeout
@@ -367,27 +396,29 @@ let empty_tool_res =
   let fold tr res =
     let r = res.result in
     match r with
-      | Done r ->
-        begin match r.pr_answer with
-          | Valid -> {tr with valid = add_nb_avg tr.valid r.pr_time}
-          | Timeout -> {tr with timeout = add_nb_avg tr.timeout r.pr_time}
-          | Invalid -> {tr with invalid = add_nb_avg tr.invalid r.pr_time}
-          | Unknown _ -> {tr with unknown = add_nb_avg tr.unknown r.pr_time}
-          | Failure _ | HighFailure ->
-            {tr with failure = add_nb_avg tr.failure r.pr_time}
+      | Done (answer,time) ->
+        begin match answer with
+          | Db.Success -> {tr with valid = add_nb_avg tr.valid time}
+          | Db.Timeout -> {tr with timeout = add_nb_avg tr.timeout time}
+      (* | Db.Invalid -> {tr with invalid = add_nb_avg tr.invalid time} *)
+          | Db.Undone | Db.Unknown _ ->
+            {tr with unknown = add_nb_avg tr.unknown time}
+          | Db.Failure _ ->
+            {tr with failure = add_nb_avg tr.failure time}
         end
       | InternalFailure _ ->
         {tr with failure = add_nb_avg tr.failure 0.} in
     List.fold_left fold empty_tool_res l
 
-  let extract_done = function Done r -> r | InternalFailure _ -> assert false
+  let extract_time = function Done (_,t) -> t
+    | InternalFailure _ -> assert false
 
   let filter_timeline l =
-    let l = List.filter (function {result = Done r} -> r.pr_answer = Valid
+    let l = List.filter (function {result = Done (Db.Success,_)} -> true
       | _ -> false) l in
     let compare_valid x y =
-      let c = compare (extract_done x.result).pr_time
-        (extract_done y.result).pr_time in
+      let c = compare (extract_time x.result)
+        (extract_time y.result) in
       if c <> 0 then c else compare x y in
     let l = List.fast_sort compare_valid l in
     l
@@ -397,7 +428,7 @@ let empty_tool_res =
       | _ when next > max -> List.rev acc
       | [] -> aux (cur::acc) cur (next+.step) []
       | {result= InternalFailure _}::l -> aux acc cur next l
-      | {result= Done {pr_time = t}}::_ as l when t >= next ->
+      | {result= Done (_,t)}::_ as l when t >= next ->
         aux (cur::acc) cur (next+.step) l
       | _::l -> aux acc (cur+1) next l in
     aux [] 0 min
@@ -405,7 +436,7 @@ let empty_tool_res =
   let max_time l =
     List.fold_left (fun acc {result=r} ->
       match r with
-        | Done {pr_time = t} -> max acc t
+        | Done (_,t) -> max acc t
         | InternalFailure _ -> acc ) 0. l
   open Format
 (**
@@ -413,14 +444,6 @@ answer output time
 
 *)
 
-
-  let print_prover_answer fmt = function
-    | Valid -> fprintf fmt "Valid"
-    | Invalid -> fprintf fmt "Invalid"
-    | Timeout -> fprintf fmt "Timeout"
-    | Unknown s -> fprintf fmt "Unknown: %S" s
-    | Failure s -> fprintf fmt "Failure: %S" s
-    | HighFailure -> fprintf fmt "HighFailure"
 
   let print_newline fmt () = fprintf fmt "\n"
 
@@ -448,10 +471,10 @@ answer output time
     let l = transpose_sorted l in
     let print_cell fmt {result= r} =
       match r with
-        | Done r ->
+        | Done (answer,time) ->
           fprintf fmt "%a, %.3f" (*"%a, %S, %.3f"*)
-            print_prover_answer r.pr_answer (*r.result.pr_output*)
-            r.pr_time
+            print_prover_answer answer (*r.result.pr_output*)
+            time
         | InternalFailure _ -> fprintf fmt "InternalFailure, \"\""
 in
     let print_line fmt ((b,t,id),l) =

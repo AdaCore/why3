@@ -58,7 +58,7 @@ type proof_status =
   | Timeout (** external proof attempt was interrupted *)
   | Unknown (** external prover answered ``don't know'' or equivalent *)
   | Failure (** external prover call failed *)
-
+  
 (** parent of a goal: either a theory (for "toplevel" goals)
     or a transformation (for "subgoals") *)
 (* useful ?

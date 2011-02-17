@@ -404,23 +404,26 @@ let () =
 let () =
   let nb_done = ref 0 in
   let nb_valid = ref 0 in
+  let nb_cached = ref 0 in
   let nb_failure = ref 0 in
   let callback tool_id prob_id task i res =
     if not !opt_quiet then
       begin begin match res with
-        | B.Done {Call_provers.pr_answer = ans} -> incr nb_done;
+        | B.Runned B.Done (ans,_) -> incr nb_done;
           begin match ans with
-            | Call_provers.Valid -> incr nb_valid
+            | Db.Success -> incr nb_valid
             | _     -> () end
-        | B.InternalFailure _ -> incr nb_done; incr nb_failure end;
-        Format.printf "%a%i done with valid : %i failure : %i%!"
+        | B.Runned B.InternalFailure _ -> incr nb_done; incr nb_failure
+        | B.Cached (_,_) -> incr nb_cached
+      end;
+        Format.printf "%a%i done with valid : %i failure : %i cached : %i%!"
           Pp.Ansi.set_column 0
-          !nb_done !nb_valid !nb_failure
+          !nb_done !nb_valid !nb_failure !nb_cached
       end;
     Debug.dprintf debug "%s.%s %a %i with %s : %a@."
       prob_id.B.prob_file prob_id.B.prob_theory
       Pretty.print_pr (task_goal task) i tool_id.B.tool_name
-      B.print_why_result res;
+      B.print_pas res;
   in
   let benchs =
     List.map (fun b -> List.map snd (Mstr.bindings b.Benchrc.benchs))
