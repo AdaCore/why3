@@ -4,11 +4,7 @@ module M
    Problem 5: amortized queue *)
 
   use import int.Int
-  use export list.List
-  use export list.Length
-  use export list.Append
-  use export list.Reverse
-  use export list.HdTl
+  use export list.ListRich
 
   type queue 'a = Q (front : list 'a) (lenf : int)
                     (rear  : list 'a) (lenr : int)

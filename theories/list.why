@@ -58,9 +58,13 @@ theory HdTl "head and tail"
     | Cons _ t -> Some t
   end
 
-  (* TODO: move these lemmas into another theory? *)
-  use import Nth
+end
+
+theory NthHdTl
+
   use import int.Int
+  use import Nth
+  use import HdTl
 
   lemma Nth_tl :
     forall l1 l2 : list 'a. tl l1 = Some l2 ->
@@ -218,4 +222,18 @@ end
 
 theory Fold
   (* TODO (a la Map) *)
+end
+
+theory ListRich
+  use export List
+  use export Length
+  use export Mem
+  use export Nth
+  use export HdTl
+  use export NthHdTl
+  use export Append
+  use export Reverse
+  use export Sorted
+  use export NumOcc
+  use export Permut
 end
