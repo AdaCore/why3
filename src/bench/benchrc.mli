@@ -44,15 +44,9 @@ open Why
 open Util
 
 
-type id_tool = (string * string)
-(* tool_name, prover_name *)
-
-type id_prob = (string * string * string)
-(* prob_name, file_name, theory name *)
-
-type benchrc = { tools : id_tool tool list Mstr.t;
-                 probs : id_prob prob list Mstr.t;
-                 benchs : (id_tool,id_prob) bench Mstr.t
+type benchrc = { tools : tool list Mstr.t;
+                 probs : prob list Mstr.t;
+                 benchs : bench Mstr.t
                }
 
 val read_file : Whyconf.config -> string -> benchrc

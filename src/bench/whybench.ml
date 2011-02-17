@@ -310,12 +310,13 @@ let () =
     let prover = try Mstr.find s (get_provers config) with
       | Not_found -> eprintf "Prover %s not found.@." s; exit 1
     in
-    { B.tval   = "cmdline",s;
-      ttrans   = Trans.identity;
+    { B.tval   = {B.tool_name = "cmdline"; prover_name = s; tool_db = None};
+      ttrans   = [Trans.identity,None];
       tdriver  = load_driver env prover.driver;
       tcommand = prover.command;
       tenv     = env;
       tuse     = !opt_task;
+      tuse_trans = None;
       ttime    = of_option !opt_timelimit;
       tmem     = of_option !opt_memlimit;
     } in
@@ -324,11 +325,11 @@ let () =
 
   Debug.dprintf debug "Load transformations@.";
   let transl =
-      let lookup acc t = Trans.compose_l
-    (try Trans.singleton (Trans.lookup_transform t env) with
-       Trans.UnknownTrans _ -> Trans.lookup_transform_l t env) acc
+      let lookup acc t =
+    ((try Trans.singleton (Trans.lookup_transform t env) with
+       Trans.UnknownTrans _ -> Trans.lookup_transform_l t env),None)::acc
       in
-      List.fold_left lookup Trans.identity_l !opt_trans in
+      List.rev (List.fold_left lookup [] !opt_trans) in
 
   let fold_prob acc = function
     | None, _ -> acc
@@ -343,7 +344,10 @@ let () =
         let th = Mnm.bindings m in
         let map (name,th) = name,Task.split_theory th None task in
         let fold acc (n,l) =
-          List.rev_append (List.map (fun v -> (("cmdline","",n),v)) l) acc in
+          let prob_id =  {B.prob_name = "cmdline";prob_file = "";
+                          prob_theory = n;
+                          prob_db = None} in
+          List.rev_append (List.map (fun v -> (prob_id,v)) l) acc in
         th |> List.map map |> List.fold_left fold [] in
       { B.ptask   = gen;
         ptrans   = fun _ -> transl;
@@ -375,7 +379,7 @@ let () =
   let nb_done = ref 0 in
   let nb_valid = ref 0 in
   let nb_failure = ref 0 in
-  let callback (_,tool) (_,file,prob) task i res =
+  let callback tool_id prob_id task i res =
     if not !opt_quiet then
       begin begin match res with
         | B.Done {Call_provers.pr_answer = ans} -> incr nb_done;
@@ -388,15 +392,18 @@ let () =
           !nb_done !nb_valid !nb_failure
       end;
     Debug.dprintf debug "%s.%s %a %i with %s : %a@."
-      file prob Pretty.print_pr (task_goal task) i tool
+      prob_id.B.prob_file prob_id.B.prob_theory
+      Pretty.print_pr (task_goal task) i tool_id.B.tool_name
       B.print_why_result res;
   in
   let benchs =
     List.map (fun b -> List.map snd (Mstr.bindings b.Benchrc.benchs))
       !benchs in
   let bl = B.run_benchs_tools ~callback (list_flatten_rev benchs) in
-  let print_tool fmt (t,s) = fprintf fmt "%s.%s" t s in
-  let print_prob fmt (b,f,t) = fprintf fmt "%s.%s.%s" b f t in
+  let print_tool fmt tool_id = fprintf fmt "%s.%s"
+    tool_id.B.tool_name tool_id.B.prover_name in
+  let print_prob fmt prob_id = fprintf fmt "%s.%s.%s"
+    prob_id.B.prob_name prob_id.B.prob_file prob_id.B.prob_theory in
   let cmp = compare in
   List.iter (B.print_output cmp print_tool print_prob) bl
 

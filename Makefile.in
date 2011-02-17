@@ -485,7 +485,7 @@ BENCH_FILES = bench benchrc whybench
 
 BENCHMODULES := $(addprefix src/bench/, $(BENCH_FILES))
 
-BENCHMODULES := src/ide/worker $(BENCHMODULES)
+BENCHMODULES := src/ide/worker src/ide/db $(BENCHMODULES)
 
 BENCHML  = $(addsuffix .ml,  $(BENCHMODULES))
 BENCHMLI = $(addsuffix .mli, $(BENCHMODULES))
@@ -499,8 +499,8 @@ $(BENCHCMO) $(BENCHCMX): INCLUDES += -I src/ide -I src/bench -I @SQLITE3LIB@
 byte: bin/why3bench.byte
 opt:  bin/why3bench.opt
 
-bin/why3bench.opt bin/why3bench.byte: INCLUDES += -thread -I +threads
-bin/why3bench.opt bin/why3bench.byte: EXTLIBS += threads
+bin/why3bench.opt bin/why3bench.byte: INCLUDES += -thread -I +threads -I +sqlite3
+bin/why3bench.opt bin/why3bench.byte: EXTLIBS += threads sqlite3
 
 bin/why3bench.opt: src/why.cmxa $(PGMCMX) $(BENCHCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \

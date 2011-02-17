@@ -27,20 +27,36 @@ open Driver
 open Call_provers
 open Scheduler
 
-type 'a tool = {
-  tval     : 'a;
-  ttrans   : task trans;
+type tool_id = {
+  tool_name : string;
+  prover_name : string;
+  tool_db : Db.prover_id option;
+  }
+(* tool_name, prover_name *)
+
+type prob_id = {
+  prob_name : string;
+  prob_file : string;
+  prob_theory : string;
+  prob_db : Db.goal option;
+}
+(* prob_name, file_name, theory name *)
+
+type tool = {
+  tval     : tool_id;
+  ttrans   : (task trans * (Db.transf_id option)) list;
   tdriver  : driver;
   tcommand : string;
   tenv     : env;
   tuse     : task;
+  tuse_trans : Db.transf_id option;
   ttime    : int;
   tmem     : int;
 }
 
-type 'a prob = {
-  ptask  : env -> task -> ('a * task) list; (** needed for tenv *)
-  ptrans : env -> task list trans;
+type prob = {
+  ptask  : env -> task -> (prob_id * task) list; (** needed for tenv *)
+  ptrans : env -> (task list trans * (Db.transf_id option)) list;
 }
 
 
@@ -48,20 +64,19 @@ type why_result =
   | InternalFailure of exn
   | Done of prover_result
 
-
 let print_why_result fmt = function
   | InternalFailure exn ->
     Format.fprintf fmt "InternalFailure %a" Exn_printer.exn_printer exn
   | Done pr -> Call_provers.print_prover_result fmt pr
 
+type result = {tool   : tool_id;
+               prob   : prob_id;
+               task   : Decl.prsymbol;
+               idtask : int;
+               result : why_result}
 
-type ('a,'b) result = {tool   : 'a;
-                       prob   : 'b;
-                       task   : Decl.prsymbol;
-                       idtask : int;
-                       result : why_result}
-
-type ('a,'b) callback = 'a -> 'b -> task -> int -> why_result -> unit
+type callback = tool_id -> prob_id ->
+    task -> int -> why_result -> unit
 
 let debug_call = Debug.register_flag "call"
 let debug = Debug.register_flag "bench_core"
@@ -118,6 +133,23 @@ let new_external_proof =
         Mutex.unlock queue_lock;
     done
 
+
+let apply_trans (task,_db_goal) (trans,_db_trans) =
+  let task = Trans.apply trans task in
+  ((task:task),None)
+
+let apply_transl (task,_db_goal) (trans,_db_trans) =
+  let tasks = Trans.apply trans task in
+  List.map (fun task -> (task:task),None) tasks
+
+let rec apply_transll trl acc (task,db_goal) =
+  match trl with
+    | [] -> (task,db_goal)::acc
+    | tr::trl ->
+      let tl = apply_transl (task,db_goal) tr in
+      List.fold_left (apply_transll trl) acc tl
+
+
 let call callback tool prob =
   (** Prove goal *)
   let call pval i task =
@@ -133,11 +165,12 @@ let call callback tool prob =
   in
   (** Apply trans *)
   let iter_task (pval,task) =
-    let trans = Trans.compose_l (prob.ptrans tool.tenv)
-      (Trans.singleton tool.ttrans) in
-    let tl = Trans.apply trans task in
-    let iter i task = call pval i task; succ i in
-    ignore (List.fold_left iter 0 (List.rev tl)) in
+    let translist = prob.ptrans tool.tenv in
+    let tasks = apply_transll translist [] (task,pval.prob_db) in
+    let tasks = List.map
+      (fun task -> List.fold_left apply_trans task tool.ttrans) tasks in
+    let iter i (task,_db_goal) = call pval i task; succ i in
+    ignore (List.fold_left iter 0 (List.rev tasks)) in
   (** Split *)
   let ths = prob.ptask tool.tenv tool.tuse in
   List.iter iter_task ths
@@ -210,11 +243,11 @@ type output =
   (** In a file *)
   |Csv of string
 
-type ('a,'b) bench =
+type bench =
     {
       bname  : string;
-      btools : 'a tool list;
-      bprobs : 'b prob list;
+      btools : tool list;
+      bprobs : prob list;
       boutputs : output list;
     }
 

@@ -27,9 +27,9 @@ open Theory
 type id_tool = (string * string)
 type id_prob = (string * string * string)
 
-type benchrc = { tools : id_tool tool list Mstr.t;
-                 probs : id_prob prob list Mstr.t;
-                 benchs : (id_tool,id_prob) bench Mstr.t
+type benchrc = { tools : tool list Mstr.t;
+                 probs : prob list Mstr.t;
+                 benchs : bench Mstr.t
                }
 
 open Whyconf
@@ -54,9 +54,9 @@ let read_tools absf wc map (name,section) =
   let env = Lexer.create_env loadpath in
   (* transformations *)
   let transforms = get_stringl ~default:[] section "transform" in
-  let lookup acc t = Trans.compose (Trans.lookup_transform t env) acc in
-  let transforms = List.fold_left lookup Trans.identity transforms
-  in
+  let lookup acc t = (Trans.lookup_transform t env,None)::acc in
+  let transforms = List.fold_left lookup [] transforms in
+  let transforms = List.rev transforms in
   (* use *)
   let use = get_stringl ~default:[] section "use" in
   let load_use task s =
@@ -84,12 +84,13 @@ let read_tools absf wc map (name,section) =
   let load_driver (n,d,c) = n,Driver.load_driver env d,c in
   let provers = List.map load_driver provers in
   let create_tool (n,driver,command) =
-    { tval = name,n ;
+    { tval = {tool_name = name; prover_name = n;tool_db = None} ;
       ttrans = transforms;
       tdriver = driver;
       tcommand = command;
       tenv = env;
       tuse = use;
+      tuse_trans = None;
       ttime = timelimit;
       tmem = memlimit
     } in
@@ -99,12 +100,12 @@ let read_probs absf map (name,section) =
   (* transformations *)
   let transforms = get_stringl ~default:[] section "transform" in
   let gen_trans env =
-    let lookup acc t = Trans.compose_l
-      (try Trans.singleton (Trans.lookup_transform t env) with
-          Trans.UnknownTrans _ -> Trans.lookup_transform_l t env) acc
+    let lookup acc t =
+      ((try Trans.singleton (Trans.lookup_transform t env) with
+          Trans.UnknownTrans _ -> Trans.lookup_transform_l t env),None)::acc
     in
-    let transforms = List.fold_left lookup Trans.identity_l transforms in
-    transforms
+    let transforms = List.fold_left lookup [] transforms in
+    List.rev transforms
   in
   (* format *)
   let format = get_stringo section "format" in
@@ -117,7 +118,9 @@ let read_probs absf map (name,section) =
         let m = Env.read_channel ?format:format env fname cin in
         close_in cin;
         let ths = Mnm.bindings m in
-        List.rev_map (fun (n,th) -> ((name,fname,n),th)) ths
+        let prob_id n = {prob_name = name;prob_file = fname; prob_theory = n;
+                       prob_db = None} in
+        List.rev_map (fun (n,th) -> (prob_id n,th)) ths
       in
       let map (name,th) = name,Task.split_theory th None task in
       let fold acc (n,l) =

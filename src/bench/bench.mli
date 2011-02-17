@@ -31,21 +31,37 @@ val maximum_running_proofs: int ref
 (** bound on the number of prover processes running in parallel.
     default is 2 *)
 
-type 'a tool = {
-  tval     : 'a;
-  ttrans   : task trans;
+type tool_id = {
+  tool_name : string;
+  prover_name : string;
+  tool_db : Db.prover_id option;
+  }
+(* tool_name, prover_name *)
+
+type prob_id = {
+  prob_name : string;
+  prob_file : string;
+  prob_theory : string;
+  prob_db : Db.goal option;
+}
+(* prob_name, file_name, theory name *)
+
+type tool = {
+  tval     : tool_id;
+  ttrans   : (task trans * (Db.transf_id option)) list;
   tdriver  : driver;
   tcommand : string;
   tenv     : env;        (** Allow to compare axiomatic easily *)
   tuse     : task;
+  tuse_trans : Db.transf_id option;
   ttime    : int;
   tmem     : int;
 }
 
-type 'a prob = {
-  ptask  : env -> task -> ('a * task) list; (** needed for tenv and tuse *)
-  ptrans : env -> task list trans; (** perhaps should be merged in
-                                       ptask *)
+type prob = {
+  ptask  : env -> task -> (prob_id * task) list;
+  (** needed for tenv and tuse *)
+  ptrans : env -> (task list trans * (Db.transf_id option)) list;
 }
 
 type why_result =
@@ -53,35 +69,35 @@ type why_result =
   | Done of prover_result
 
 val print_why_result : Format.formatter -> why_result -> unit
+type result = {tool   : tool_id;
+               prob   : prob_id;
+               task   : Decl.prsymbol;
+               idtask : int;
+               result : why_result}
 
-type ('a,'b) result = {tool   : 'a;
-                       prob   : 'b;
-                       task   : Decl.prsymbol;
-                       idtask : int;
-                       result : why_result}
-
-type ('a,'b) callback = 'a -> 'b -> task -> int -> why_result -> unit
+type callback = tool_id -> prob_id ->
+    task -> int -> why_result -> unit
 
 val all_list_tp :
-  ?callback:('a,'b) callback ->
-  'a tool list -> 'b prob list -> ('a,'b) result list
+  ?callback:callback ->
+  tool list -> prob list -> result list
 
 val all_list_pt :
-  ?callback:('a,'b) callback ->
-  'a tool list -> 'b prob list -> ('a,'b) result list
+  ?callback:callback ->
+  tool list -> prob list -> result list
 
 val all_array :
-  ?callback:('a,'b) callback ->
-  'a tool array -> 'b prob array -> ('a,'b) result list array array
+  ?callback:callback ->
+  tool array -> prob array -> result list array array
 
 val any :
-  ?callback:('a,'b) callback ->
-  ('a tool * 'b prob) list -> ('a,'b) result list
+  ?callback:callback ->
+  (tool * prob) list -> result list
 
 
 val all_list_tools :
-  ?callback:('a,'b) callback ->
-  'a tool list -> 'b prob list -> ('a * ('a,'b) result list) list
+  ?callback:callback ->
+  tool list -> prob list -> (tool_id * result list) list
 
 
 type output =
@@ -91,25 +107,25 @@ type output =
   (** In a file *)
   |Csv of string
 
-type ('a,'b) bench =
+type bench =
     {
       bname  : string;
-      btools : 'a tool list;
-      bprobs : 'b prob list;
+      btools : tool list;
+      bprobs : prob list;
       boutputs : output list;
     }
 
 val run_bench :
-  ?callback:('a,'b) callback -> ('a,'b) bench  -> ('a,'b) result list
+  ?callback:callback -> bench  -> result list
 
 
 val run_benchs :
-  ?callback:('a,'b) callback -> ('a,'b) bench list ->
-  (('a,'b) bench * ('a,'b) result list) list
+  ?callback:callback -> bench list ->
+  (bench * result list) list
 
 val run_benchs_tools :
-  ?callback:('a,'b) callback -> ('a,'b) bench list ->
-  (('a,'b) bench * ('a * ('a,'b) result list) list) list
+  ?callback:callback -> bench list ->
+  (bench * (tool_id * result list) list) list
 
 
 type nb_avg = int * float
@@ -125,25 +141,26 @@ type tool_res =
 
 val print_tool_res : Format.formatter -> tool_res -> unit
 
-val compute_average : ('a,'b) result list -> tool_res
+val compute_average : result list -> tool_res
 val compute_timeline :
-  float -> float -> float -> ('a,'b) result list -> int list
+  float -> float -> float -> result list -> int list
+(** [compute_timeline start end step results] *)
 
-val filter_timeline : ('a,'b) result list -> ('a,'b) result list
+val filter_timeline : result list -> result list
 
-val max_time : ('a,'b) result list -> float
+val max_time : result list -> float
 
 open Format
 
 val print_csv :
-  ('b -> 'b -> int)         ->
-  (formatter -> 'a -> unit) ->
-  (formatter -> 'b -> unit) ->
+  (prob_id -> prob_id -> int)         ->
+  (formatter -> tool_id -> unit) ->
+  (formatter -> prob_id -> unit) ->
   formatter ->
-  ('a * ('a,'b) result list) list -> unit
+  (tool_id * result list) list -> unit
 
 val print_output :
-  ('b -> 'b -> int)         ->
-  (formatter -> 'a -> unit) ->
-  (formatter -> 'b -> unit) ->
-  ('a,'b) bench * ('a * ('a,'b) result list) list -> unit
+  (prob_id -> prob_id -> int)         ->
+  (formatter -> tool_id -> unit) ->
+  (formatter -> prob_id -> unit) ->
+  bench * (tool_id * result list) list -> unit
