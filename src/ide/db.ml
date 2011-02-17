@@ -37,6 +37,7 @@ let current () =
     | None -> failwith "Db.current: database not yet initialized"
     | Some x -> x
 
+let is_initialized () = !current_db <> None
 
 let default_busyfn (_db:Sqlite3.db) =
   prerr_endline "Db.default_busyfn WARNING: busy";

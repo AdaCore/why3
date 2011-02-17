@@ -103,6 +103,7 @@ let opt_timelimit = ref None
 let opt_memlimit = ref None
 let opt_task = ref None
 let opt_benchrc = ref []
+let opt_db = ref None
 
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
@@ -143,6 +144,8 @@ let option_list = Arg.align [
       "<prover> Add <prover> in the bench";
   "-B", Arg.String (fun s -> opt_benchrc := s::!opt_benchrc),
       "<bench> Read one bench configuration file from <bench>";
+  "-d", Arg.String (fun s -> opt_db := Some s),
+  "<dir> the directory containing the database";
   "--prover", Arg.String (fun s -> opt_prover := s::!opt_prover),
       " same as -P";
   "-F", Arg.String (fun s -> opt_parser := Some s),
@@ -288,6 +291,29 @@ let () =
   (*     '-D'/'--driver' cannot be used together.@."; *)
   (*   exit 1 *)
   (* end; *)
+
+  begin match !opt_db with
+    | None -> ()
+    | Some db ->
+      if Sys.file_exists db then
+        begin if not (Sys.is_directory db) then
+          eprintf "-d %s; the given database should be a directory" db;
+          exit 1
+        end
+      else
+        begin
+          eprintf "Info: '%s' does not exists. Creating directory of that \
+           name for the project@." db;
+          Unix.mkdir db 0o777
+        end;
+      let dbfname = Filename.concat db "project.db" in
+      try
+        Db.init_base dbfname
+      with e ->
+        eprintf "Error while opening database '%s'@." dbfname;
+        eprintf "Aborting...@.";
+        raise e
+  end;
 
   if !opt_benchrc = [] && (!opt_prover = [] || Queue.is_empty opt_queue) then
     begin

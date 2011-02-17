@@ -134,13 +134,41 @@ let new_external_proof =
     done
 
 
-let apply_trans (task,_db_goal) (trans,_db_trans) =
-  let task = Trans.apply trans task in
-  ((task:task),None)
+(* from Gmain *)
+let task_checksum t =
+  Format.fprintf Format.str_formatter "%a@." Pretty.print_task t;
+  let s = Format.flush_str_formatter () in
+  Digest.to_hex (Digest.string s)
 
-let apply_transl (task,_db_goal) (trans,_db_trans) =
+
+let apply_trans (task,db_goal) (trans,db_trans) =
+  let task = Trans.apply trans task in
+  match db_goal, db_trans with
+    | Some db_goal, Some db_trans ->
+      let transf = try Db.add_transformation db_goal db_trans
+        with Db.AlreadyExist ->
+          Db.Htransf.find (Db.transformations db_goal) db_trans in
+      let db_goal = Db.add_subgoal transf
+        (Task.task_goal task).Decl.pr_name.Ident.id_string
+        (task_checksum task) in
+      (task,Some db_goal)
+    | _ -> ((task:task),None)
+
+let apply_transl (task,db_goal) (trans,db_trans) =
   let tasks = Trans.apply trans task in
-  List.map (fun task -> (task:task),None) tasks
+  match db_goal, db_trans with
+    | Some db_goal, Some db_trans ->
+      let transf = try Db.add_transformation db_goal db_trans
+        with Db.AlreadyExist ->
+          Db.Htransf.find (Db.transformations db_goal) db_trans in
+      let map task =
+        let db_goal = Db.add_subgoal transf
+          (Task.task_goal task).Decl.pr_name.Ident.id_string
+          (task_checksum task) in
+        (task,Some db_goal) in
+      List.map map tasks
+    | _ -> List.map (fun task -> (task:task),None) tasks
+
 
 let rec apply_transll trl acc (task,db_goal) =
   match trl with
@@ -152,16 +180,42 @@ let rec apply_transll trl acc (task,db_goal) =
 
 let call callback tool prob =
   (** Prove goal *)
-  let call pval i task =
-      let cb res = callback pval i task (Done res) in
-      try
-        let call_prover : Call_provers.pre_prover_call =
-          Driver.prove_task ~timelimit:(tool.ttime) ~memlimit:(tool.tmem)
-            ~command:(tool.tcommand) (tool.tdriver) task in
-        new_external_proof (call_prover,cb)
-      with e ->
-        Format.eprintf "%a@." Exn_printer.exn_printer e;
-        callback pval i task (InternalFailure e)
+  let db_tool = tool.tval.tool_db in
+  let new_external_proof pval i cb task =
+    try
+      let call_prover : Call_provers.pre_prover_call =
+        Driver.prove_task ~timelimit:(tool.ttime) ~memlimit:(tool.tmem)
+          ~command:(tool.tcommand) (tool.tdriver) task in
+      new_external_proof (call_prover,cb)
+    with e ->
+      Format.eprintf "%a@." Exn_printer.exn_printer e;
+      callback pval i task (InternalFailure e) in
+  let call pval i (task,db_goal) =
+    match db_goal,db_tool with
+      | Some db_goal, Some db_tool ->
+        let proof_attempt =
+          try
+            Db.add_proof_attempt db_goal db_tool
+          with Db.AlreadyExist ->
+            Db.Hprover.find (Db.external_proofs db_goal) db_tool in
+        let (proof_status,_,_,_) = Db.status_and_time proof_attempt in
+        begin match proof_status with
+          | Db.Success -> () (*TODO something else, must use the callback *)
+          | Db.Timeout | Db.Unknown | Db.Failure | Db.Undone ->
+            let cb res = callback pval i task (Done res);
+              let status = match res.pr_answer with
+                | Valid -> Db.Success
+                | Timeout -> Db.Timeout
+                | Unknown _ -> Db.Unknown
+                | Failure _ | HighFailure -> Db.Failure
+                | Invalid -> Db.Failure (* Todo change that one day *) in
+              Db.set_status proof_attempt status res.pr_time
+            in
+            new_external_proof pval i cb task
+        end
+      | _ ->
+        let cb res = callback pval i task (Done res) in
+        new_external_proof pval i cb task
   in
   (** Apply trans *)
   let iter_task (pval,task) =
@@ -169,7 +223,7 @@ let call callback tool prob =
     let tasks = apply_transll translist [] (task,pval.prob_db) in
     let tasks = List.map
       (fun task -> List.fold_left apply_trans task tool.ttrans) tasks in
-    let iter i (task,_db_goal) = call pval i task; succ i in
+    let iter i task = call pval i task; succ i in
     ignore (List.fold_left iter 0 (List.rev tasks)) in
   (** Split *)
   let ths = prob.ptask tool.tenv tool.tuse in

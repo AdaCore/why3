@@ -127,6 +127,10 @@ val theories : file -> theory Util.Mstr.t
 val init_base : string -> unit
 (** opens or creates the current database, from given file name *)
 
+val is_initialized : unit -> bool
+(** [is_initialized ()] is true if init_base as been called
+    succesively previously *)
+
 val files : unit -> (file * string) list
 (** returns the current set of files, with their filenames *)
 
