@@ -250,6 +250,21 @@ fi
 
 AC_CHECK_PROG(CAMLP5O,camlp5o,camlp5o,no)
 
+## Where are the library we need
+# we look for ocamlfind; if not present, we just don't use it to find
+# libraries
+AC_CHECK_PROG(USEOCAMLFIND,ocamlfind,yes,no)
+
+if test "$USEOCAMLFIND" = yes; then
+   OCAMLFINDLIB=$(ocamlfind printconf stdlib)
+   OCAMLFIND=$(which ocamlfind)
+   if test "$OCAMLFINDLIB" != "$OCAMLLIB"; then
+   USEOCAMLFIND=no;
+   echo "but your ocamlfind is not compatible with your ocamlc:"
+   echo "ocamlfind : $OCAMLFINDLIB, ocamlc : $OCAMLLIB"
+   fi
+fi
+
 AC_CHECK_PROG(MENHIR,menhir,menhir,no)
 if test "$MENHIR" = no ; then
     enable_whytptp=no
@@ -273,25 +288,41 @@ fi
 
 # checking for lablgtk2
 if test "$enable_ide" = yes ; then
-AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtk.cma,,enable_ide=no)
-if test "$enable_ide" = no; then
-   AC_MSG_WARN(Lib lablgtk2 not found, IDE disabled.)
-   reason_ide=" (lablgtk2 not found)"
-else
-   AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtksourceview2.cma,,enable_ide=no)
-   if test "$enable_ide" = no; then
-     AC_MSG_WARN(Lib lablgtksourceview2 not found, IDE disabled.)
-   reason_ide=" (lablgtksourceview2 not found)"
+   if test "$USEOCAMLFIND" == yes; then
+      LABLGTK2LIB=$(ocamlfind query lablgtk2)
    fi
-fi
+   if test -n "$LABLGTK2LIB";then
+      echo "ocamlfind found lablgtk2 in $LABLGTK2LIB"
+   else
+      LABLGTK2LIB="+lablgtk2"
+      AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtk.cma,,enable_ide=no)
+      if test "$enable_ide" = no; then
+      	 AC_MSG_WARN(Lib lablgtk2 not found, IDE disabled.)
+   	 reason_ide=" (lablgtk2 not found)"
+      else
+	 AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtksourceview2.cma,,enable_ide=no)
+      	 if test "$enable_ide" = no; then
+      	    AC_MSG_WARN(Lib lablgtksourceview2 not found, IDE disabled.)
+            reason_ide=" (lablgtksourceview2 not found)"
+         fi
+      fi
+   fi
 fi
 
 # checking for sqlite3
 if test "$enable_ide" = yes ; then
-   AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_ide=no)
-   if test "$enable_ide" = no; then
-     AC_MSG_WARN(Lib sqlite3 not found, IDE disabled.)
-   reason_ide=" (sqlite3 not found)"
+   if test "$USEOCAMLFIND" == yes; then
+      SQLITE3LIB=$(ocamlfind query sqlite3)
+   fi
+   if test -n "$SQLITE3LIB";then
+      echo "ocamlfind found sqlite3 in $SQLITE3LIB"
+   else
+      SQLITE3LIB="+sqlite3"
+      AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_ide=no)
+      if test "$enable_ide" = no; then
+        AC_MSG_WARN(Lib sqlite3 not found, IDE disabled.)
+   	reason_ide=" (sqlite3 not found)"
+      fi
    fi
 fi
 
@@ -419,6 +450,8 @@ AC_SUBST(enable_profiling)
 AC_SUBST(CAMLP5O)
 
 AC_SUBST(enable_ide)
+AC_SUBST(LABLGTK2LIB)
+AC_SUBST(SQLITE3LIB)
 AC_SUBST(enable_bench)
 AC_SUBST(enable_plugins)
 AC_SUBST(DYNLINK)

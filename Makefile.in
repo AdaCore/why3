@@ -429,14 +429,14 @@ IDEMLI = $(addsuffix .mli, $(IDEMODULES))
 IDECMO = $(addsuffix .cmo, $(IDEMODULES))
 IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
-$(IDECMO) $(IDECMX): INCLUDES += -I src/ide -I +sqlite3
+$(IDECMO) $(IDECMX): INCLUDES += -I src/ide -I @SQLITE3LIB@
 
 # build targets
 
 byte: bin/why3ide.byte
 opt:  bin/why3ide.opt
 
-bin/why3ide.opt bin/why3ide.byte: INCLUDES += -thread -I +threads -I +lablgtk2 -I +sqlite3
+bin/why3ide.opt bin/why3ide.byte: INCLUDES += -thread -I +threads -I @LABLGTK2LIB@ -I @SQLITE3LIB@
 bin/why3ide.opt bin/why3ide.byte: EXTOBJS += gtkThread
 bin/why3ide.opt bin/why3ide.byte: EXTLIBS += threads lablgtk lablgtksourceview2 sqlite3
 
@@ -492,7 +492,7 @@ BENCHMLI = $(addsuffix .mli, $(BENCHMODULES))
 BENCHCMO = $(addsuffix .cmo, $(BENCHMODULES))
 BENCHCMX = $(addsuffix .cmx, $(BENCHMODULES))
 
-$(BENCHCMO) $(BENCHCMX): INCLUDES += -I src/ide -I src/bench -I +sqlite3
+$(BENCHCMO) $(BENCHCMX): INCLUDES += -I src/ide -I src/bench -I @SQLITE3LIB@
 
 # build targets
 
