@@ -407,7 +407,7 @@ clean::
 
 local_config: bin/why3config.@OCAMLBEST@
 	WHY3LIB=$(PWD) WHY3DATA=$(PWD)/share bin/why3config.@OCAMLBEST@ \
-		--detect --conf_file .why.conf
+		--detect --conf_file why.conf
 
 install_no_local::
 	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config
