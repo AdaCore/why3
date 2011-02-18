@@ -1055,12 +1055,15 @@ let rec type_v env = function
       let env, bl = add_binders env bl in
       tarrow bl (type_c env c)
 
-and type_c env c = {
-  c_result_type = type_v env c.ic_result_type;
-  c_effect      = effect env c.ic_effect;
-  c_pre         = c.ic_pre;
-  c_post        = c.ic_post; 
-}
+and type_c env c = 
+  let ef = effect env c.ic_effect in
+  let q = c.ic_post in
+  (* saturate effect with exceptions appearing in q *)
+  let ef = List.fold_left (fun ef (e, _) -> E.add_raise e ef) ef (snd q) in
+  { c_result_type = type_v env c.ic_result_type;
+    c_effect      = ef;
+    c_pre         = c.ic_pre;
+    c_post        = q; }
 
 and add_binders env bl =
   map_fold_left add_binder env bl
