@@ -15,17 +15,17 @@ module M
     lenf q >= lenr q
 
   logic model (q : queue 'a) : list 'a =
-    append (front q) (reverse (rear q))
+    front q ++ reverse (rear q)
 
 let create f lf r lr =
   { lf = length f and lr = length r }
   if lf >= lr then
     Q f lf r lr
   else
-    let f = append f (reverse r) in
+    let f = f ++ reverse r in
     Q f (lf + lr) Nil 0
   : queue 'a
-  { inv result and model result = append f (reverse r) }
+  { inv result and model result = f ++ reverse r }
 
 let empty () =
   {}
@@ -51,7 +51,7 @@ let tail (q : queue 'a) =
 let enqueue (x : 'a) (q : queue 'a) =
   { inv q }
   create (front q) (lenf q) (Cons x (rear q)) (lenr q + 1) 
-  { inv result and model result = append (model q) (Cons x Nil) }
+  { inv result and model result = model q ++ Cons x Nil }
 
 end
 

@@ -79,23 +79,23 @@ end
 theory Append
   use export List
 
-  logic append (l1 l2 : list 'a) : list 'a = match l1 with
+  logic (++) (l1 l2 : list 'a) : list 'a = match l1 with
     | Nil -> l2
-    | Cons x1 r1 -> Cons x1 (append r1 l2)
+    | Cons x1 r1 -> Cons x1 (r1 ++ l2)
   end
 
   lemma Append_assoc :
     forall l1 l2 l3 : list 'a.
-    append l1 (append l2 l3) = append (append l1 l2) l3
+    l1 ++ (l2 ++ l3) = (l1 ++ l2) ++ l3
 
   lemma Append_l_nil :
-    forall l : list 'a. append l Nil = l
+    forall l : list 'a. l ++ Nil = l
 
   use import Length
   use import int.Int
 
   lemma Append_length :
-    forall l1 l2 : list 'a. length (append l1 l2) = length l1 + length l2
+    forall l1 l2 : list 'a. length (l1 ++ l2) = length l1 + length l2
 
 end
 
@@ -106,7 +106,7 @@ theory Reverse
 
   logic reverse (l : list 'a) : list 'a = match l with
     | Nil -> Nil
-    | Cons x r -> append (reverse r) (Cons x Nil)
+    | Cons x r -> reverse r ++ Cons x Nil
   end
 
   use import Length
