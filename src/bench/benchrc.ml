@@ -42,6 +42,10 @@ let absolute_filename dirname f =
   else
     f
 
+let lookup_transf t =
+  if Db.is_initialized () then Some (Db.transf_from_name t) else None
+
+
 let read_tools absf wc map (name,section) =
   (* loadpath *)
   let wc_main = get_main wc in
@@ -54,18 +58,20 @@ let read_tools absf wc map (name,section) =
   let env = Lexer.create_env loadpath in
   (* transformations *)
   let transforms = get_stringl ~default:[] section "transform" in
-  let lookup acc t = (Trans.lookup_transform t env,None)::acc in
+  let lookup acc t = (Trans.lookup_transform t env, lookup_transf t)::acc in
   let transforms = List.fold_left lookup [] transforms in
   let transforms = List.rev transforms in
   (* use *)
   let use = get_stringl ~default:[] section "use" in
-  let load_use task s =
+  let load_use s =
     let file,th = match Util.split_string_rev s '.' with
       | [] | [_] -> eprintf "Bad theory qualifier %s" s; exit 1
       | a::l -> List.rev l,a in
-    let th = Env.find_theory env file th in
-    Task.use_export task th in
-  let use = List.fold_left load_use None use in
+    Env.find_theory env file th,
+    if Db.is_initialized () then
+      Some (Db.transf_from_name (Printf.sprintf "use %s" s))
+    else None in
+  let use = List.map load_use use in
   (* provers *)
   let provers = get_stringl ~default:[] section "prover" in
   let find_provers s =
@@ -84,17 +90,76 @@ let read_tools absf wc map (name,section) =
   let load_driver (n,d,c) = n,Driver.load_driver env d,c in
   let provers = List.map load_driver provers in
   let create_tool (n,driver,command) =
-    { tval = {tool_name = name; prover_name = n;tool_db = None} ;
+    { tval = {tool_name = name; prover_name = n; tool_db =
+        if Db.is_initialized () then Some (Db.prover_from_name n) else None};
       ttrans = transforms;
       tdriver = driver;
       tcommand = command;
       tenv = env;
       tuse = use;
-      tuse_trans = None;
       ttime = timelimit;
       tmem = memlimit
     } in
   Mstr.add name (List.map create_tool provers) map
+
+let use_before_goal th = function
+  | Some {Task.task_decl = tdecl; task_prev = task} ->
+    Task.add_tdecl (Task.use_export task th) tdecl
+  | _ -> assert false
+
+let apply_use_before_goal (task,goal_id) (th_use,th_use_id) =
+  let task2 = use_before_goal th_use task in
+  let goal_id = match goal_id, th_use_id with
+    | Some goal_id, Some th_use_id ->
+      Some begin
+        let transf =
+          try Db.add_transformation goal_id th_use_id
+          with Db.AlreadyExist ->
+            Db.Htransf.find (Db.transformations goal_id) th_use_id in
+        let name2 = (Task.task_goal task2).Decl.pr_name.Ident.id_string in
+        let md5_2 = task_checksum task2 in
+        try Db.add_subgoal transf name2 md5_2
+        with Db.AlreadyExist -> Mstr.find md5_2 (Db.subgoals transf)
+      end
+    | _,_ -> None in
+  (task,goal_id)
+
+let gen_from_file ~format ~prob_name ~file_path ~file_name env lth =
+    try
+      let theories =
+        let file_name, cin = match file_path with
+          | "-" -> "stdin", stdin
+          | f   -> file_name, open_in f
+        in
+        let m = Env.read_channel ?format:format env file_name cin in
+        close_in cin;
+        Mnm.bindings m in
+      let file_db = file_name (* TODO relativise it with db file path*) in
+      let file_id = if Db.is_initialized () then Some
+          (try Db.add_file file_db
+          with Db.AlreadyExist ->
+            fst (List.find (fun (_,x) -> file_db = x) (Db.files ())))
+        else None in
+      let map (th_name,th) =
+        let theory_id = option_map (fun file_id ->
+          try Db.add_theory file_id th_name
+          with Db.AlreadyExist -> Mstr.find th_name (Db.theories file_id)
+        ) file_id in
+        (* TODO make DB aware of the env *)
+        let tasks = Task.split_theory th None None in
+        let map task =
+          let goal_id = option_map (fun theory_id ->
+            let name = (Task.task_goal task).Decl.pr_name.Ident.id_string in
+            try Db.add_goal theory_id name (task_checksum task)
+            with Db.AlreadyExist -> Mstr.find name (Db.goals theory_id)
+          ) theory_id in
+          let (task,goal_id) = List.fold_left apply_use_before_goal
+            (task,goal_id) lth in
+          {prob_name = prob_name;prob_file = file_name; prob_theory = th_name;
+           prob_db = goal_id}, task in
+        List.rev_map map tasks in
+      list_flatten_rev (List.rev_map map theories)
+    with exn -> eprintf "%a@." Exn_printer.exn_printer exn; exit 1
 
 let read_probs absf map (name,section) =
   (* transformations *)
@@ -102,7 +167,8 @@ let read_probs absf map (name,section) =
   let gen_trans env =
     let lookup acc t =
       ((try Trans.singleton (Trans.lookup_transform t env) with
-          Trans.UnknownTrans _ -> Trans.lookup_transform_l t env),None)::acc
+          Trans.UnknownTrans _ -> Trans.lookup_transform_l t env),
+       lookup_transf t)::acc
     in
     let transforms = List.fold_left lookup [] transforms in
     List.rev transforms
@@ -111,26 +177,12 @@ let read_probs absf map (name,section) =
   let format = get_stringo section "format" in
   (* files *)
   let files = get_stringl ~default:[] section "file" in
-  let gen fname env task =
-    try
-      let read_one fname =
-        let cin = open_in (absf fname) in
-        let m = Env.read_channel ?format:format env fname cin in
-        close_in cin;
-        let ths = Mnm.bindings m in
-        let prob_id n = {prob_name = name;prob_file = fname; prob_theory = n;
-                       prob_db = None} in
-        List.rev_map (fun (n,th) -> (prob_id n,th)) ths
-      in
-      let map (name,th) = name,Task.split_theory th None task in
-      let fold acc (n,l) =
-        List.rev_append (List.rev_map (fun v -> (n,v)) l) acc in
-      read_one fname |> List.rev_map map |> List.fold_left fold []
-    with exn -> eprintf "%a@." Exn_printer.exn_printer exn; exit 1
-  in
   Mstr.add name
     (List.rev_map
-       (fun file -> { ptask   = gen file; ptrans   = gen_trans}) files)
+       (fun file ->
+         { ptask   = gen_from_file ~format ~prob_name:name
+             ~file_path:(absf file) ~file_name:file;
+           ptrans   = gen_trans}) files)
     map
 
 let read_bench absf mtools mprobs map (name,section) =

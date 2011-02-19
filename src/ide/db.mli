@@ -108,10 +108,12 @@ val parent_goal : transf -> goal
 val transf_id : transf -> transf_id
 *)
 val subgoals : transf -> goal Util.Mstr.t
+(** key are md5sum *)
 
 (** theory accessors *)
 val theory_name : theory -> string
 val goals : theory -> goal Util.Mstr.t
+(** keys are goal name *)
 (*
 val verified : theory -> bool
 *)

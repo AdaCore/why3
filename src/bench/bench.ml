@@ -48,14 +48,17 @@ type tool = {
   tdriver  : driver;
   tcommand : string;
   tenv     : env;
-  tuse     : task;
-  tuse_trans : Db.transf_id option;
+  tuse     : (theory * Db.transf_id option) list;
   ttime    : int;
   tmem     : int;
 }
 
+type gen_task = env -> (theory * Db.transf_id option) list ->
+    (prob_id * task) list
+
 type prob = {
-  ptask  : env -> task -> (prob_id * task) list; (** needed for tenv *)
+  ptask  : gen_task;
+  (** needed for tenv *)
   ptrans : env -> (task list trans * (Db.transf_id option)) list;
 }
 
@@ -226,6 +229,8 @@ let call callback tool prob =
           with Db.AlreadyExist ->
             Db.Hprover.find (Db.external_proofs db_goal) db_tool in
         let (proof_status,time,_,_) = Db.status_and_time proof_attempt in
+        Debug.dprintf debug "Database has %a for the goal@."
+          print_prover_answer proof_status;
         begin
           if proof_status = Db.Success ||
             (proof_status = Db.Timeout && time > float tool.ttime) then

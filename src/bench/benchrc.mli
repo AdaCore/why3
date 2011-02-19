@@ -50,3 +50,11 @@ type benchrc = { tools : tool list Mstr.t;
                }
 
 val read_file : Whyconf.config -> string -> benchrc
+
+
+val gen_from_file :
+  format:string option ->
+  prob_name:string ->
+  file_path:string ->
+  file_name:string ->
+  Bench.gen_task

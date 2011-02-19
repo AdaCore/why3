@@ -52,14 +52,15 @@ type tool = {
   tdriver  : driver;
   tcommand : string;
   tenv     : env;        (** Allow to compare axiomatic easily *)
-  tuse     : task;
-  tuse_trans : Db.transf_id option;
+  tuse     : (theory * Db.transf_id option) list;
   ttime    : int;
   tmem     : int;
 }
+type gen_task = env -> (theory * Db.transf_id option) list ->
+    (prob_id * task) list
 
 type prob = {
-  ptask  : env -> task -> (prob_id * task) list;
+  ptask  : gen_task;
   (** needed for tenv and tuse *)
   ptrans : env -> (task list trans * (Db.transf_id option)) list;
 }
@@ -80,6 +81,8 @@ type proof_attempt_status =
   | Cached of Db.proof_status * float
 
 val print_pas : Format.formatter -> proof_attempt_status -> unit
+
+val task_checksum : Task.task -> string
 
 type callback = tool_id -> prob_id ->
     task -> int -> proof_attempt_status -> unit

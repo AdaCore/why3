@@ -101,7 +101,6 @@ let opt_loadpath = ref []
 let opt_output = ref None
 let opt_timelimit = ref None
 let opt_memlimit = ref None
-let opt_task = ref None
 let opt_benchrc = ref []
 let opt_db = ref None
 
@@ -295,10 +294,13 @@ let () =
   begin match !opt_db with
     | None -> ()
     | Some db ->
+      Debug.dprintf debug "Load database@.";
       if Sys.file_exists db then
         begin if not (Sys.is_directory db) then
-          eprintf "-d %s; the given database should be a directory" db;
-          exit 1
+            begin Format.eprintf
+                "-d %s; the given database should be a directory@." db;
+              exit 1
+            end
         end
       else
         begin
@@ -307,12 +309,13 @@ let () =
           Unix.mkdir db 0o777
         end;
       let dbfname = Filename.concat db "project.db" in
-      try
-        Db.init_base dbfname
+      (try
+         Db.init_base dbfname
       with e ->
         eprintf "Error while opening database '%s'@." dbfname;
         eprintf "Aborting...@.";
-        raise e
+        raise e);
+      Debug.dprintf debug "database loaded@."
   end;
 
   if !opt_benchrc = [] && (!opt_prover = [] || Queue.is_empty opt_queue) then
@@ -325,11 +328,13 @@ let () =
   opt_loadpath := List.rev_append !opt_loadpath (Whyconf.loadpath main);
   if !opt_timelimit = None then opt_timelimit := Some (Whyconf.timelimit main);
   if !opt_memlimit  = None then opt_memlimit  := Some (Whyconf.memlimit main);
-  let add_meta task (meta,s) =
+  let add_meta theory (meta,s) =
     let meta = lookup_meta meta in
-    add_meta task meta [MAstr s]
+    Theory.add_meta theory meta [MAstr s]
   in
-  opt_task := List.fold_left add_meta !opt_task !opt_metas;
+  let opt_theo = Theory.close_theory (List.fold_left add_meta
+    (Theory.create_theory (Ident.id_fresh "cmdline"))
+    !opt_metas) in
 
   let env = Lexer.create_env !opt_loadpath in
   let map_prover s =
@@ -341,8 +346,7 @@ let () =
       tdriver  = load_driver env prover.driver;
       tcommand = prover.command;
       tenv     = env;
-      tuse     = !opt_task;
-      tuse_trans = None;
+      tuse     = [opt_theo,None];
       ttime    = of_option !opt_timelimit;
       tmem     = of_option !opt_memlimit;
     } in
@@ -360,22 +364,8 @@ let () =
   let fold_prob acc = function
     | None, _ -> acc
     | Some f, _ ->
-      let gen env task  =
-        let fname, cin = match f with
-          | "-" -> "stdin", stdin
-          | f   -> f, open_in f
-        in
-        let m = Env.read_channel ?format:!opt_parser env fname cin in
-        close_in cin;
-        let th = Mnm.bindings m in
-        let map (name,th) = name,Task.split_theory th None task in
-        let fold acc (n,l) =
-          let prob_id =  {B.prob_name = "cmdline";prob_file = "";
-                          prob_theory = n;
-                          prob_db = None} in
-          List.rev_append (List.map (fun v -> (prob_id,v)) l) acc in
-        th |> List.map map |> List.fold_left fold [] in
-      { B.ptask   = gen;
+      { B.ptask   = Benchrc.gen_from_file ~format:!opt_parser
+          ~prob_name:"cmdline" ~file_path:f ~file_name:f;
         ptrans   = fun _ -> transl;
       }::acc in
   Debug.dprintf debug "Load problems@.";
