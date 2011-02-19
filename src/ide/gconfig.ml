@@ -151,6 +151,7 @@ let save_config t =
         driver  = pr.driver_name;
         version = pr.prover_version;
         editor  = pr.editor;
+        command_split = Cmdline.cmdline_split pr.command;
       } acc in
   let config = t.config in
   let config = set_main config

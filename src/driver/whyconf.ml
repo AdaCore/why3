@@ -51,6 +51,7 @@ type config_prover = {
   driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
   version : string;   (* "v2.95" *)
   editor  : string;
+  command_split : string list;  (* "why3-cpulimit" "%t" "%m" "alt-ergo" "%f" *)
 }
 
 type main = {
@@ -175,6 +176,7 @@ let load_prover dirname provers (id,section) =
       driver  = absolute_filename dirname (get_string section "driver");
       version = get_string ~default:"" section "version";
       editor  = get_string ~default:"" section "editor";
+      command_split = Cmdline.cmdline_split (get_string section "command");
     } provers
 
 let load_main dirname section =
@@ -206,6 +208,8 @@ exception ConfigFailure of string (* filename *) * string
 let () = Exn_printer.register (fun fmt e -> match e with
   | ConfigFailure (f, s) ->
       Format.fprintf fmt "error in config file %s: %s" f s
+  | WrongMagicNumber ->
+      Format.fprintf fmt "outdated config file; rerun why3config"
   | _ -> raise e)
 
 let get_config (filename,rc) =
@@ -235,9 +239,10 @@ let read_config conf_file =
   in
   try
     get_config filenamerc
-  with WrongMagicNumber ->
-    let filename, _ = filenamerc in
-    raise (ConfigFailure (filename, "outdated config file; rerun why3config"))
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    let b = Buffer.create 40 in
+    Format.bprintf b "%a" Exn_printer.exn_printer e;
+    raise (ConfigFailure (fst filenamerc, Buffer.contents b))
 
 let save_config config =
   let filename = config.conf_file in

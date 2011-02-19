@@ -50,7 +50,6 @@ val default_config : string -> config
 (** [ default_config filename ] create a default configuration which is going
     to be saved in [ filename ]*)
 
-
 val get_conf_file : config -> string
 (** [get_conf_file config] get the rc file corresponding to this
     configuration *)
@@ -89,6 +88,7 @@ type config_prover = {
   driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
   version : string;   (* "v2.95" *)
   editor  : string;   (* Interative theorem prover *)
+  command_split : string list;  (* "why3-cpulimit" "%t" "%m" "alt-ergo" "%f" *)
 }
 
 val get_provers : config  -> config_prover Mstr.t

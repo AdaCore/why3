@@ -155,10 +155,10 @@ let main () =
     with
       | Rc.CannotOpen (f, s)
       | Whyconf.ConfigFailure (f, s) ->
-	  autoprovers := true;
-	  autoplugins := true;
-	  eprintf "warning: cannot read config file %s (%s)@." f s;
-	  default_config f
+         eprintf "warning: cannot read config file %s:@\n  %s@." f s;
+         autoprovers := true;
+         autoplugins := true;
+         default_config f
   in
   let main = get_main config in
   (* let main = option_apply main (fun d -> {main with libdir = d})
