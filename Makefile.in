@@ -1103,7 +1103,7 @@ share/provers-detection-data.conf: share/provers-detection-data.conf.in config.s
 config.status: configure Version
 	./config.status --recheck
 
-opt byte : META
+opt byte : META share/provers-detection-data.conf
 
 META: META.in config.status
 	./config.status chmod --file $@

@@ -28,7 +28,7 @@ open Rc
 
 If a configuration doesn't contain the actual magic number we don't use it.*)
 
-let magicnumber = 3
+let magicnumber = 4
 
 exception WrongMagicNumber
 
