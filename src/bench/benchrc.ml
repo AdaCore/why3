@@ -113,13 +113,14 @@ let apply_use_before_goal (task,goal_id) (th_use,th_use_id) =
     | Some goal_id, Some th_use_id ->
       Some begin
         let transf =
-          try Db.add_transformation goal_id th_use_id
-          with Db.AlreadyExist ->
-            Db.Htransf.find (Db.transformations goal_id) th_use_id in
+          try Db.Htransf.find (Db.transformations goal_id) th_use_id
+          with Not_found ->
+            Db.add_transformation goal_id th_use_id  in
         let name2 = (Task.task_goal task2).Decl.pr_name.Ident.id_string in
         let md5_2 = task_checksum task2 in
-        try Db.add_subgoal transf name2 md5_2
-        with Db.AlreadyExist -> Mstr.find md5_2 (Db.subgoals transf)
+        try Mstr.find md5_2 (Db.subgoals transf)
+        with Not_found ->
+          Db.add_subgoal transf name2 md5_2
       end
     | _,_ -> None in
   (task,goal_id)
@@ -136,22 +137,24 @@ let gen_from_file ~format ~prob_name ~file_path ~file_name env lth =
         Mnm.bindings m in
       let file_db = file_name (* TODO relativise it with db file path*) in
       let file_id = if Db.is_initialized () then Some
-          (try Db.add_file file_db
-          with Db.AlreadyExist ->
-            fst (List.find (fun (_,x) -> file_db = x) (Db.files ())))
+          (try fst (List.find (fun (_,x) -> file_db = x) (Db.files ()))
+           with Not_found ->
+             Db.add_file file_db)
         else None in
       let map (th_name,th) =
         let theory_id = option_map (fun file_id ->
-          try Db.add_theory file_id th_name
-          with Db.AlreadyExist -> Mstr.find th_name (Db.theories file_id)
+          try Mstr.find th_name (Db.theories file_id)
+          with Not_found ->
+            Db.add_theory file_id th_name
         ) file_id in
         (* TODO make DB aware of the env *)
         let tasks = Task.split_theory th None None in
         let map task =
           let goal_id = option_map (fun theory_id ->
             let name = (Task.task_goal task).Decl.pr_name.Ident.id_string in
-            try Db.add_goal theory_id name (task_checksum task)
-            with Db.AlreadyExist -> Mstr.find name (Db.goals theory_id)
+            try Mstr.find name (Db.goals theory_id)
+            with Not_found ->
+              Db.add_goal theory_id name (task_checksum task)
           ) theory_id in
           let (task,goal_id) = List.fold_left apply_use_before_goal
             (task,goal_id) lth in

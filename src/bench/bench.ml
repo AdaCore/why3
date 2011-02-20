@@ -19,6 +19,7 @@
 
 open Thread
 open Why
+open Util
 open Env
 open Theory
 open Task
@@ -175,12 +176,19 @@ let apply_trans (task,db_goal) (trans,db_trans) =
   let task = Trans.apply trans task in
   match db_goal, db_trans with
     | Some db_goal, Some db_trans ->
-      let transf = try Db.add_transformation db_goal db_trans
-        with Db.AlreadyExist ->
-          Db.Htransf.find (Db.transformations db_goal) db_trans in
-      let db_goal = Db.add_subgoal transf
-        (Task.task_goal task).Decl.pr_name.Ident.id_string
-        (task_checksum task) in
+      let transf = try Db.Htransf.find (Db.transformations db_goal) db_trans
+        with Not_found ->
+          Db.add_transformation db_goal db_trans
+      in
+      let md5 = task_checksum task in
+      let db_goal =
+        try
+          Mstr.find md5 (Db.subgoals transf)
+        with Not_found ->
+          Db.add_subgoal transf
+            (Task.task_goal task).Decl.pr_name.Ident.id_string
+            md5
+      in
       (task,Some db_goal)
     | _ -> ((task:task),None)
 
@@ -188,13 +196,19 @@ let apply_transl (task,db_goal) (trans,db_trans) =
   let tasks = Trans.apply trans task in
   match db_goal, db_trans with
     | Some db_goal, Some db_trans ->
-      let transf = try Db.add_transformation db_goal db_trans
-        with Db.AlreadyExist ->
-          Db.Htransf.find (Db.transformations db_goal) db_trans in
+      let transf = try Db.Htransf.find (Db.transformations db_goal) db_trans
+        with Not_found -> Db.add_transformation db_goal db_trans
+      in
       let map task =
-        let db_goal = Db.add_subgoal transf
-          (Task.task_goal task).Decl.pr_name.Ident.id_string
-          (task_checksum task) in
+        let md5 = task_checksum task in
+        let db_goal =
+          try
+            Mstr.find md5 (Db.subgoals transf)
+          with Not_found ->
+            Db.add_subgoal transf
+              (Task.task_goal task).Decl.pr_name.Ident.id_string
+              md5
+        in
         (task,Some db_goal) in
       List.map map tasks
     | _ -> List.map (fun task -> (task:task),None) tasks
@@ -225,23 +239,29 @@ let call callback tool prob =
       | Some db_goal, Some db_tool ->
         let proof_attempt =
           try
+            Db.Hprover.find (Db.external_proofs db_goal) db_tool
+          with Not_found ->
             Db.add_proof_attempt db_goal db_tool
-          with Db.AlreadyExist ->
-            Db.Hprover.find (Db.external_proofs db_goal) db_tool in
+        in
         let (proof_status,time,_,_) = Db.status_and_time proof_attempt in
-        Debug.dprintf debug "Database has %a for the goal@."
-          print_prover_answer proof_status;
+        Debug.dprintf debug "Database has (%a,%f) for the goal@."
+          print_prover_answer proof_status time;
         begin
           if proof_status = Db.Success ||
-            (proof_status = Db.Timeout && time > float tool.ttime) then
+            (proof_status = Db.Timeout && time > (float tool.ttime -. 0.1))
+          then
             callback pval i task (Cached (proof_status,time))
           else
-            let cb res =
-              let (status,time) = proof_status_to_db_result res in
-              callback pval i task (Runned (Done (status,time)));
-              Db.set_status proof_attempt status time
-            in
-            new_external_proof pval i cb task
+            begin
+              Debug.dprintf debug "@.time = %f %i@.@."
+                time tool.ttime;
+              let cb res =
+                let (status,time) = proof_status_to_db_result res in
+                callback pval i task (Runned (Done (status,time)));
+                Db.set_status proof_attempt status time
+              in
+              new_external_proof pval i cb task
+            end
         end
       | _ ->
         let cb res =
