@@ -485,7 +485,7 @@ BENCH_FILES = bench benchrc whybench
 
 BENCHMODULES := $(addprefix src/bench/, $(BENCH_FILES))
 
-BENCHMODULES := src/ide/worker src/ide/scheduler $(BENCHMODULES)
+BENCHMODULES := src/ide/worker $(BENCHMODULES)
 
 BENCHML  = $(addsuffix .ml,  $(BENCHMODULES))
 BENCHMLI = $(addsuffix .mli, $(BENCHMODULES))

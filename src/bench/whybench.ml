@@ -220,7 +220,7 @@ let () =
 
   let main = get_main config in
   Whyconf.load_plugins main;
-  Scheduler.maximum_running_proofs := Whyconf.running_provers_max main;
+  Bench.maximum_running_proofs := Whyconf.running_provers_max main;
   (** listings*)
 
   let opt_list = ref false in
@@ -371,30 +371,25 @@ let () =
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
-let () = Scheduler.set_priority Scheduler.intensive
-
 let () =
-  let nb_scheduled = ref 0 in
   let nb_done = ref 0 in
   let nb_valid = ref 0 in
   let nb_failure = ref 0 in
   let callback (_,tool) (_,file,prob) task i res =
     if not !opt_quiet then
       begin begin match res with
-        | Scheduler.Scheduled -> incr nb_scheduled
-        | Scheduler.Done {Call_provers.pr_answer = ans} -> incr nb_done;
+        | B.Done {Call_provers.pr_answer = ans} -> incr nb_done;
           begin match ans with
             | Call_provers.Valid -> incr nb_valid
             | _     -> () end
-        | Scheduler.InternalFailure _ -> incr nb_done; incr nb_failure
-        | Scheduler.Running _ -> () end;
-        Format.printf "%a(%i/%i) valid : %i failure : %i%!"
+        | B.InternalFailure _ -> incr nb_done; incr nb_failure end;
+        Format.printf "%a%i done with valid : %i failure : %i%!"
           Pp.Ansi.set_column 0
-          !nb_done !nb_scheduled !nb_valid !nb_failure
+          !nb_done !nb_valid !nb_failure
       end;
     Debug.dprintf debug "%s.%s %a %i with %s : %a@."
       file prob Pretty.print_pr (task_goal task) i tool
-      Scheduler.print_pas res;
+      B.print_why_result res;
   in
   let benchs =
     List.map (fun b -> List.map snd (Mstr.bindings b.Benchrc.benchs))

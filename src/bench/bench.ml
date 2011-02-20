@@ -48,98 +48,123 @@ type why_result =
   | InternalFailure of exn
   | Done of prover_result
 
+
+let print_why_result fmt = function
+  | InternalFailure exn ->
+    Format.fprintf fmt "InternalFailure %a" Exn_printer.exn_printer exn
+  | Done pr -> Call_provers.print_prover_result fmt pr
+
+
 type ('a,'b) result = {tool   : 'a;
                        prob   : 'b;
                        task   : Decl.prsymbol;
                        idtask : int;
                        result : why_result}
 
-type ('a,'b) callback = 'a -> 'b -> task -> int -> proof_attempt_status -> unit
+type ('a,'b) callback = 'a -> 'b -> task -> int -> why_result -> unit
 
 let debug_call = Debug.register_flag "call"
 let debug = Debug.register_flag "bench_core"
 
 open Worker
 
-(**
-   level1 : read file -> split task
-   level2 : apply transformations
-   level3 : driver -> call prover
-*)
+(* number of scheduled external proofs *)
+let coef_buf = 2
+let scheduled_proofs = ref 0
+let maximum_running_proofs = ref 2
 
-let call s callback tool prob =
+(* they are protected by a lock *)
+let answers_queue = Queue.create ()
+let queue_lock = Mutex.create ()
+let queue_condition = Condition.create ()
+
+(** Before calling this function queue_lock must be locked *)
+let treat_result () =
+  let q_tmp = Queue.create () in
+  while not (Queue.is_empty answers_queue) do
+    Queue.transfer answers_queue q_tmp;
+    Mutex.unlock queue_lock;
+    let iter (result,callback) = decr scheduled_proofs; callback (result ()) in
+    Queue.iter iter q_tmp;
+    Queue.clear q_tmp;
+    Mutex.lock queue_lock
+  done
+
+let yield () =
+  Thread.yield ();
+  Mutex.lock queue_lock;
+  treat_result ();
+  Mutex.unlock queue_lock
+
+let new_external_proof =
+  let run_external (call_prover,callback) =
+    let r = Call_provers.wait_on_call (call_prover ()) in
+    Mutex.lock queue_lock;
+    Queue.push (r,callback) answers_queue ;
+    Condition.signal queue_condition;
+    Mutex.unlock queue_lock in
+  let external_workers =
+    ManyWorkers.create maximum_running_proofs run_external in
+  fun (call_prover,callback) ->
+    ManyWorkers.add_work external_workers (call_prover,callback);
+    incr scheduled_proofs;
+    (** Stop the computation if too many external proof are scheduled *)
+    while !scheduled_proofs >= !maximum_running_proofs * coef_buf do
+        Mutex.lock queue_lock;
+        while Queue.is_empty answers_queue do
+          Condition.wait queue_condition queue_lock
+        done;
+        treat_result ();
+        Mutex.unlock queue_lock;
+    done
+
+let call callback tool prob =
   (** Prove goal *)
-  let call q cb task =
-    Queue.add (create_proof_attempt ~debug:(Debug.test_flag debug_call)
-      ~timelimit:(tool.ttime) ~memlimit:(tool.tmem)
-      ~command:(tool.tcommand) ~driver:(tool.tdriver)
-      ~callback:cb task) q in
-  let iter q pval i task =
-    MainWorker.start_work MainWorker.level3 s;
-    let cb res =
-      MainWorker.add_work MainWorker.level3 s (fun () ->
-        callback pval i task res;
-        match res with Scheduler.Done _
-          | Scheduler.InternalFailure _ ->
-            MainWorker.stop_work MainWorker.level3 s
-          | _ -> ()) in
-    call q cb task; succ i in
-  let trans_cb pval tl =
-    let q = Queue.create () in
-    ignore (List.fold_left (iter q pval) 0 (List.rev tl));
-    transfer_proof_attempts q;
-    MainWorker.stop_work MainWorker.level3 s
+  let call pval i task =
+      let cb res = callback pval i task (Done res) in
+      try
+        let call_prover : Call_provers.pre_prover_call =
+          Driver.prove_task ~timelimit:(tool.ttime) ~memlimit:(tool.tmem)
+            ~command:(tool.tcommand) (tool.tdriver) task in
+        new_external_proof (call_prover,cb)
+      with e ->
+        Format.eprintf "%a@." Exn_printer.exn_printer e;
+        callback pval i task (InternalFailure e)
   in
   (** Apply trans *)
   let iter_task (pval,task) =
-    MainWorker.start_work MainWorker.level2 s;
     let trans = Trans.compose_l (prob.ptrans tool.tenv)
       (Trans.singleton tool.ttrans) in
-    MainWorker.add_work MainWorker.level2 s
-      (fun () ->
-        MainWorker.stop_work MainWorker.level2 s;
-        MainWorker.start_work MainWorker.level3 s;
-        apply_transformation_l ~callback:(trans_cb pval) trans task) in
+    let tl = Trans.apply trans task in
+    let iter i task = call pval i task; succ i in
+    ignore (List.fold_left iter 0 (List.rev tl)) in
   (** Split *)
-  MainWorker.start_work MainWorker.level1 s;
-  MainWorker.add_work MainWorker.level1 s
-    (fun () ->
-    MainWorker.start_work MainWorker.level2 s;
-      let cb ths = List.iter iter_task ths;
-        MainWorker.stop_work MainWorker.level2 s;
-        MainWorker.stop_work MainWorker.level1 s in
-      do_why ~callback:cb (prob.ptask tool.tenv) tool.tuse
-      )
+  let ths = prob.ptask tool.tenv tool.tuse in
+  List.iter iter_task ths
+
 
 let general ?(callback=fun _ _ _ _ _ -> ()) iter add =
   Debug.dprintf debug "Start one general@.";
   (** Main worker *)
-  let t = MainWorker.create () in
   (** Start all *)
-  MainWorker.start_work MainWorker.level1 t;
-  let _ = Thread.create (fun () ->
-    iter (fun v tool prob ->
+  iter (fun v tool prob ->
     let cb pval i task res =
-        callback tool.tval pval task i res;
-        match res with
-          | Scheduler.InternalFailure _ | Scheduler.Done _ ->
-            add v {tool = tool.tval; prob = pval;
-                   task = Task.task_goal task;
-                   idtask = i;
-                   result = match res with
-                     | Scheduler.InternalFailure exn -> InternalFailure exn
-                     | Scheduler.Done r -> Done r
-                     | _ -> assert false
-                  }
-          | _ -> () in
-    call t cb tool prob);
-    MainWorker.stop_work MainWorker.level1 t;
-  ) () in
-  (** Treat the work done and wait *)
-  MainWorker.treat
-    ~maxlevel2:(!Scheduler.maximum_running_proofs * 2)
-    ~maxlevel3:(!Scheduler.maximum_running_proofs * 4)
-    t (fun () f -> f ()) ()
+      callback tool.tval pval task i res;
+      add v {tool = tool.tval; prob = pval;
+             task = Task.task_goal task;
+             idtask = i;
+             result = res
+            } in
+    call cb tool prob);
+  (** Wait for the last remaining tasks *)
+  Mutex.lock queue_lock;
+  while !scheduled_proofs > 0 do
+    while Queue.is_empty answers_queue do
+      Condition.wait queue_condition queue_lock
+    done;
+    treat_result ();
+  done;
+  Mutex.unlock queue_lock
 
 let any ?callback toolprob =
   let l = ref [] in

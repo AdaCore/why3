@@ -27,6 +27,10 @@ open Call_provers
 open Scheduler
 
 
+val maximum_running_proofs: int ref
+(** bound on the number of prover processes running in parallel.
+    default is 2 *)
+
 type 'a tool = {
   tval     : 'a;
   ttrans   : task trans;
@@ -48,13 +52,15 @@ type why_result =
   | InternalFailure of exn
   | Done of prover_result
 
+val print_why_result : Format.formatter -> why_result -> unit
+
 type ('a,'b) result = {tool   : 'a;
                        prob   : 'b;
                        task   : Decl.prsymbol;
                        idtask : int;
                        result : why_result}
 
-type ('a,'b) callback = 'a -> 'b -> task -> int -> proof_attempt_status -> unit
+type ('a,'b) callback = 'a -> 'b -> task -> int -> why_result -> unit
 
 val all_list_tp :
   ?callback:('a,'b) callback ->
