@@ -156,32 +156,32 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
       let out = Sysutil.channel_contents cout in
       close_in cout;
 
-    fun () ->
-      if Debug.nottest_flag debug then begin
-        Sys.remove fin;
-        Sys.remove fout;
-      end;
-      let ans = match ret with
-        | Unix.WSTOPPED n ->
-            Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
-            HighFailure
-        | Unix.WSIGNALED n ->
-            Debug.dprintf debug "Call_provers: killed by signal %d@." n;
-            HighFailure
-        | Unix.WEXITED n ->
-            Debug.dprintf debug "Call_provers: exited with status %d@." n;
-            (try List.assoc n exitcodes with Not_found -> grep out regexps)
-      in
-      Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
-      let time = Util.default_option time (grep_time out timeregexps) in
-      let ans = match ans with
-        | HighFailure when !on_timelimit && timelimit > 0
-          && time >= (0.9 *. float timelimit) -> Timeout
-        | _ -> ans
-      in
-      { pr_answer = ans;
-        pr_output = out;
-        pr_time   = time }
+      fun () ->
+        if Debug.nottest_flag debug then begin
+          Sys.remove fin;
+          Sys.remove fout;
+        end;
+        let ans = match ret with
+          | Unix.WSTOPPED n ->
+              Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
+              HighFailure
+          | Unix.WSIGNALED n ->
+              Debug.dprintf debug "Call_provers: killed by signal %d@." n;
+              HighFailure
+          | Unix.WEXITED n ->
+              Debug.dprintf debug "Call_provers: exited with status %d@." n;
+              (try List.assoc n exitcodes with Not_found -> grep out regexps)
+        in
+        Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
+        let time = Util.default_option time (grep_time out timeregexps) in
+        let ans = match ans with
+          | HighFailure when !on_timelimit && timelimit > 0
+            && time >= (0.9 *. float timelimit) -> Timeout
+          | _ -> ans
+        in
+        { pr_answer = ans;
+          pr_output = out;
+          pr_time   = time }
 
 let query_call call = try Some (call [Unix.WNOHANG]) with Exit -> None
 
