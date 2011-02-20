@@ -1100,6 +1100,9 @@ doc/version.tex: doc/version.tex.in config.status
 share/provers-detection-data.conf: share/provers-detection-data.conf.in config.status
 	./config.status chmod --file $@
 
+# We want it to be always up-ot-date
+Makefile : share/provers-detection-data.conf
+
 config.status: configure Version
 	./config.status --recheck
 
