@@ -96,7 +96,7 @@ struct
   open Worker
 
 (* number of scheduled external proofs *)
-  let coef_buf = 2
+  let coef_buf = 10
   let scheduled_proofs = ref 0
   let maximum_running_proofs = ref 2
 
@@ -256,7 +256,7 @@ let call callback tool prob =
         begin
           if proof_status = Db.Done Call_provers.Valid ||
             (proof_status = Db.Done Call_provers.Timeout &&
-              time > (float tool.ttime -. 0.1))
+                time > float tool.ttime)
           then
             callback pval i task (Cached (proof_status,time))
           else
