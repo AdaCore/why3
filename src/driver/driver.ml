@@ -259,7 +259,9 @@ let prove_task ~command ?timelimit ?memlimit ?old drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
   print_task ?old drv fmt task; pp_print_flush fmt ();
-  call_on_buffer ~command ?timelimit ?memlimit drv buf
+  let res = call_on_buffer ~command ?timelimit ?memlimit drv buf in
+  Buffer.reset buf;
+  res
 
 (* exception report *)
 
