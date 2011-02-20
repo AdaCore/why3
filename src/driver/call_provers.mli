@@ -105,9 +105,9 @@ val call_on_buffer :
     doesn't accept stdin. *)
 
 val query_call : prover_call -> post_prover_call option
-(** Thread-unsafe non-blocking function that checks if the prover
+(** Thread-safe non-blocking function that checks if the prover
     has finished. *)
 
 val wait_on_call : prover_call -> post_prover_call
-(** Thread-unsafe blocking function that waits until the prover finishes. *)
+(** Thread-safe blocking function that waits until the prover finishes. *)
 
