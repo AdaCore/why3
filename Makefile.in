@@ -1097,6 +1097,9 @@ src/config.ml: src/config.sh
 doc/version.tex: doc/version.tex.in config.status
 	./config.status chmod --file $@
 
+share/provers-detection-data.conf: share/provers-detection-data.conf.in config.status
+	./config.status chmod --file $@
+
 config.status: configure Version
 	./config.status --recheck
 

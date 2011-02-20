@@ -91,6 +91,7 @@ let cmdline_split s =
     | Normal ->
         assert false
     | Blank ->
+        if !argv = [] then raise EmptyCommandLine else
         List.rev !argv
     | Quote ->
         raise (UnclosedQuote s)

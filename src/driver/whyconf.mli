@@ -88,7 +88,6 @@ type config_prover = {
   driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
   version : string;   (* "v2.95" *)
   editor  : string;   (* Interative theorem prover *)
-  command_split : string list;  (* "why3-cpulimit" "%t" "%m" "alt-ergo" "%f" *)
 }
 
 val get_provers : config  -> config_prover Mstr.t

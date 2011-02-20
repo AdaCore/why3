@@ -206,7 +206,10 @@ let new_external_proof =
               Format.eprintf "Task for prover: %a@."
               (Driver.print_task driver) goal;
             *)
-      Driver.prove_task ?old ~command ~timelimit ~memlimit driver goal
+      let pre_call =
+        Driver.prove_task ?old ~command ~timelimit ~memlimit driver goal
+      in
+      fun () -> Call_provers.wait_on_call (pre_call ())
     in
     ManyWorkers.add_work external_workers (call_prover,callback);
   with

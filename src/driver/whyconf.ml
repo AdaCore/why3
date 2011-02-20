@@ -28,7 +28,7 @@ open Rc
 
 If a configuration doesn't contain the actual magic number we don't use it.*)
 
-let magicnumber = 2
+let magicnumber = 3
 
 exception WrongMagicNumber
 
@@ -51,7 +51,6 @@ type config_prover = {
   driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
   version : string;   (* "v2.95" *)
   editor  : string;
-  command_split : string list;  (* "why3-cpulimit" "%t" "%m" "alt-ergo" "%f" *)
 }
 
 type main = {
@@ -176,7 +175,6 @@ let load_prover dirname provers (id,section) =
       driver  = absolute_filename dirname (get_string section "driver");
       version = get_string ~default:"" section "version";
       editor  = get_string ~default:"" section "editor";
-      command_split = Cmdline.cmdline_split (get_string section "command");
     } provers
 
 let load_main dirname section =

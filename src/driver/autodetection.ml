@@ -159,7 +159,6 @@ let detect_prover main acc0 data =
               {name = data.prover_name;
                version = ver;
                command = c;
-               command_split = Cmdline.cmdline_split c;
                driver  = Filename.concat (datadir main) data.prover_driver;
                editor = data.prover_editor} acc
 	  with Not_found ->

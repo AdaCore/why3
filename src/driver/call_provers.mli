@@ -63,14 +63,14 @@ val timeregexp : string -> timeregexp
 (** Converts a regular expression with special markers '%h','%m',
     '%s','%i' (for milliseconds) into a value of type [timeregexp] *)
 
-type post_prover_call = unit -> prover_result
-(** Thread-unsafe closure that processes a prover's output
-    and returns the final result. Once again: this closure
-    may use internal Why structures and is therefore not
-    thread-safe. *)
+type prover_call
+(** Type that represents a single prover run *)
 
-type bare_prover_call = unit -> post_prover_call
-(** Thread-safe closure that executes a prover on a task. *)
+type pre_prover_call = unit -> prover_call
+(** Thread-safe closure that launches the prover *)
+
+type post_prover_call = unit -> prover_result
+(** Thread-unsafe closure that interprets the prover's results *)
 
 val call_on_buffer :
   command     : string ->
@@ -80,7 +80,7 @@ val call_on_buffer :
   timeregexps : timeregexp list ->
   exitcodes   : (int * prover_answer) list ->
   filename    : string ->
-  Buffer.t -> bare_prover_call
+  Buffer.t -> pre_prover_call
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
 
     @param timelimit : set the available time limit (def. 0 : unlimited)
@@ -101,7 +101,13 @@ val call_on_buffer :
     the second field is the answer. Exit codes are tested in the order
     of the list and before the regexps.
 
-    @param filename : if the prover doesn't accept stdin, a temporary
-    file is used. In this case the suffix of the temporary file is
-    [filename]. *)
+    @param filename : the suffix of the proof task's file, if the prover
+    doesn't accept stdin. *)
+
+val query_call : prover_call -> post_prover_call option
+(** Thread-unsafe non-blocking function that checks if the prover
+    has finished. *)
+
+val wait_on_call : prover_call -> post_prover_call
+(** Thread-unsafe blocking function that waits until the prover finishes. *)
 
