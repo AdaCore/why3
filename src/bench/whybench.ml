@@ -103,6 +103,7 @@ let opt_timelimit = ref None
 let opt_memlimit = ref None
 let opt_benchrc = ref []
 let opt_db = ref None
+let opt_redo = ref false
 
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
@@ -145,6 +146,8 @@ let option_list = Arg.align [
       "<bench> Read one bench configuration file from <bench>";
   "-d", Arg.String (fun s -> opt_db := Some s),
   "<dir> the directory containing the database";
+  "--redo-db", Arg.Set opt_redo,
+  "Check that the proof attempts in the database (-d) give the same results";
   "--prover", Arg.String (fun s -> opt_prover := s::!opt_prover),
       " same as -P";
   "-F", Arg.String (fun s -> opt_parser := Some s),
@@ -222,7 +225,7 @@ let () =
 
   let main = get_main config in
   Whyconf.load_plugins main;
-  Bench.maximum_running_proofs := Whyconf.running_provers_max main;
+  Bench.BenchUtil.maximum_running_proofs := Whyconf.running_provers_max main;
   (** listings*)
 
   let opt_list = ref false in
@@ -318,9 +321,12 @@ let () =
       Debug.dprintf debug "database loaded@."
   end;
 
-  if !opt_benchrc = [] && (!opt_prover = [] || Queue.is_empty opt_queue) then
+  if !opt_benchrc = [] && (!opt_prover = [] || Queue.is_empty opt_queue)
+    && (not !opt_redo)
+  then
     begin
-      eprintf "At least one bench is required or one prover and one file.@.";
+      eprintf "At least one bench is required or one prover and one file or 
+      the verification of a database .@.";
       Arg.usage option_list usage_msg;
       exit 1
     end;
@@ -337,6 +343,15 @@ let () =
     !opt_metas) in
 
   let env = Lexer.create_env !opt_loadpath in
+
+  if !opt_redo then
+    begin if not (Db.is_initialized ()) then
+        begin eprintf "--redo-db need the option -d";
+          exit 1 end;
+      Benchdb.db config env
+    end;
+
+
   let map_prover s =
     let prover = try Mstr.find s (get_provers config) with
       | Not_found -> eprintf "Prover %s not found.@." s; exit 1

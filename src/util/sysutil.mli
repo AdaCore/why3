@@ -61,3 +61,10 @@ val call_asynchronous : (unit -> 'a) -> (unit -> 'a)
 
 val copy_file : string -> string -> unit
 (** [copy_file from to] copy the file from [from] to [to] *)
+
+val path_of_file : string -> string list
+(** [path_of_file filename] return the absolute path of [filename] *)
+
+val relativize_filename : string -> string -> string
+(** [relativize_filename base filename] relativize the filename
+    [filename] according to [base] *)

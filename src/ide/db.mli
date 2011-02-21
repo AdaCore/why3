@@ -133,6 +133,9 @@ val is_initialized : unit -> bool
 (** [is_initialized ()] is true if init_base as been called
     succesively previously *)
 
+val db_name : unit -> string
+(** [db_name ()] return the path of the database *)
+
 val files : unit -> (file * string) list
 (** returns the current set of files, with their filenames *)
 
@@ -231,6 +234,6 @@ val add_file :  string -> file
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/whyide.byte"
+compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"
 End:
 *)

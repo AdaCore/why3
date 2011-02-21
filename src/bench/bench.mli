@@ -26,10 +26,48 @@ open Driver
 open Call_provers
 open Scheduler
 
-
-val maximum_running_proofs: int ref
+module BenchUtil : sig
+  val maximum_running_proofs: int ref
 (** bound on the number of prover processes running in parallel.
     default is 2 *)
+
+  val new_external_proof :
+    Call_provers.pre_prover_call * (Call_provers.prover_result -> unit)
+    -> unit
+  (** [new_external_proof pre_prover_call callback] *)
+
+  val wait_remaining_task : unit -> unit
+  (** Wait the completion of the remaining task started by
+      new_external_proof *)
+
+  val task_checksum : Task.task -> string
+
+  val apply_trans :
+    task * Db.goal option ->
+    task trans * Db.transf_id option ->
+    task * Db.goal option
+  (** [apply_transl trans goal] *)
+
+  val apply_transl :
+    task * Db.goal option ->
+    task list trans * Db.transf_id option ->
+    (task * Db.goal option) list
+  (** [apply_transl transl goal] *)
+
+  val apply_transll :
+    (task list trans * Db.transf_id option) list ->
+    (task * Db.goal option) list ->
+    task * Db.goal option ->
+    (task * Db.goal option) list
+  (** [apply_transll transllist acc goal] *)
+
+  val proof_status_to_db_result :
+    Call_provers.prover_result -> Db.proof_status * float
+
+  val print_proof_status :
+    Format.formatter -> Db.proof_status -> unit
+
+end
 
 type tool_id = {
   tool_name : string;
@@ -81,8 +119,6 @@ type proof_attempt_status =
   | Cached of Db.proof_status * float
 
 val print_pas : Format.formatter -> proof_attempt_status -> unit
-
-val task_checksum : Task.task -> string
 
 type callback = tool_id -> prob_id ->
     task -> int -> proof_attempt_status -> unit

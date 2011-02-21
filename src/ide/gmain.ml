@@ -1331,65 +1331,6 @@ let filter_why_files () =
     ~name:"Why3 source files"
     ~patterns:[ "*.why"; "*.mlw"] ()
 
-(* return the absolute path of a given file name.
-   this code has been designed to be architecture-independant so
-   be very careful if you modify this *)
-let path_of_file f =
-  let rec aux acc f =
-(*
-    Format.printf "aux %s@." f;
-    let _ = read_line () in
-*)
-    let d = Filename.dirname f in
-    if d = Filename.current_dir_name then
-      (* f is relative to the current dir *)
-      aux (f::acc) (Sys.getcwd ())
-    else
-      let b = Filename.basename f in
-      if b=Filename.current_dir_name then acc else
-	if f=b then b::acc else
-	  aux (b::acc) d
-  in
-  aux [] f
-
-(*
-let test x = (Filename.dirname x, Filename.basename x)
-
-let _ = test "file"
-let _ = test "/file"
-let _ = test "/"
-let _ = test "f1/f2"
-let _ = test "/f1/f2"
-
-let p1 = path_of_file "/bin/bash"
-
-let p1 = path_of_file "../src/f.why"
-  *)
-
-let relativize_filename base f =
-  let rec aux ab af =
-    match ab,af with	
-      | x::rb, y::rf when x=y -> aux rb rf
-      | _ -> 
-	  let rec aux2 acc p =
-	    match p with
-	      | [] -> acc
-	      | _::rb -> aux2 (Filename.parent_dir_name::acc) rb
-	  in aux2 af ab
-  in
-  let rec rebuild l =
-    match l with
-      | [] -> ""
-      | [x] -> x
-      | x::l -> Filename.concat x (rebuild l)
-  in
-  rebuild (aux (path_of_file base) (path_of_file f))
-
-(*
-let p1 = relativize_filename "/bin/bash" "src/f.why"
-
-let p1 = relativize_filename "test" "/home/cmarche/recherche/why3/src/ide/f.why"
-*)
 let select_file () =
   let d = GWindow.file_chooser_dialog ~action:`OPEN
     ~title:"Why3: Add file in project"
@@ -1405,7 +1346,7 @@ let select_file () =
         match d#filename with
           | None -> ()
           | Some f ->
-	      let f = relativize_filename project_dir f in
+	      let f = Sysutil.relativize_filename project_dir f in
               eprintf "Adding file '%s'@." f;
               try
                 Helpers.add_file f

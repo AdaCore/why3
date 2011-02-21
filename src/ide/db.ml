@@ -28,6 +28,7 @@ type handle = {
   mutable in_transaction: int;
   busyfn: Sqlite3.db -> unit;
   mode: transaction_mode;
+  db_name : string;
 }
 
 let current_db = ref None
@@ -38,6 +39,8 @@ let current () =
     | Some x -> x
 
 let is_initialized () = !current_db <> None
+let db_name () = (current ()).db_name
+
 
 let default_busyfn (_db:Sqlite3.db) =
   prerr_endline "Db.default_busyfn WARNING: busy";
@@ -890,6 +893,7 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
 	  in_transaction = 0;
 	  mode = mode;
 	  busyfn = busyfn;
+          db_name = db_name;
         }
 	in
 	current_db := Some db;
@@ -934,6 +938,6 @@ let add_file f = Main.add (current()) f
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/whyide.byte"
+compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"
 End:
 *)

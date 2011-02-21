@@ -80,126 +80,104 @@ type proof_attempt_status =
 
 open Format
 
-let print_prover_answer fmt = function
-  | Db.Success -> fprintf fmt "Valid"
-    (* | Invalid -> fprintf fmt "Invalid" *)
-  | Db.Timeout -> fprintf fmt "Timeout"
-  | Db.Unknown -> fprintf fmt "Unknown"
-  | Db.Failure -> fprintf fmt "Failure"
-  | Db.Undone  -> fprintf fmt "Undone"
-
-let print_why_result fmt = function
-  | InternalFailure exn ->
-    Format.fprintf fmt "InternalFailure %a" Exn_printer.exn_printer exn
-  | Done (pr,_) -> print_prover_answer fmt pr
-
-let print_pas fmt = function
-  | Runned sp -> fprintf fmt "Runned %a" print_why_result sp
-  | Cached (p,t) -> fprintf fmt "Cached (%a,%f)" print_prover_answer p t
-
 type callback = tool_id -> prob_id ->
     task -> int ->  proof_attempt_status -> unit
-
-let proof_status_to_db_result pr =
-  match pr with
-      | {pr_answer = Valid} -> (Db.Success,pr.pr_time)
-      | {pr_answer = Invalid} -> (Db.Unknown,pr.pr_time)
-      (* TODO add invalid in Db *)
-      | {pr_answer = Unknown _} -> (Db.Unknown,pr.pr_time)
-      | {pr_answer = Failure _ | HighFailure} -> (Db.Failure,pr.pr_time)
-      | {pr_answer = Timeout } -> (Db.Timeout,pr.pr_time)
 
 let debug_call = Debug.register_flag "call"
 let debug = Debug.register_flag "bench_core"
 
-open Worker
+
+module BenchUtil =
+struct
+
+  let print_proof_status fmt = function
+    | Db.Success -> fprintf fmt "Valid"
+  (* | Invalid -> fprintf fmt "Invalid" *)
+    | Db.Timeout -> fprintf fmt "Timeout"
+    | Db.Unknown -> fprintf fmt "Unknown"
+    | Db.Failure -> fprintf fmt "Failure"
+    | Db.Undone  -> fprintf fmt "Undone"
+
+  open Worker
 
 (* number of scheduled external proofs *)
-let coef_buf = 2
-let scheduled_proofs = ref 0
-let maximum_running_proofs = ref 2
+  let coef_buf = 2
+  let scheduled_proofs = ref 0
+  let maximum_running_proofs = ref 2
 
 (* they are protected by a lock *)
-let answers_queue = Queue.create ()
-let queue_lock = Mutex.create ()
-let queue_condition = Condition.create ()
+  let answers_queue = Queue.create ()
+  let queue_lock = Mutex.create ()
+  let queue_condition = Condition.create ()
 
 (** Before calling this function queue_lock must be locked *)
-let treat_result () =
-  let q_tmp = Queue.create () in
-  while not (Queue.is_empty answers_queue) do
-    Queue.transfer answers_queue q_tmp;
-    Mutex.unlock queue_lock;
-    let iter (result,callback) = decr scheduled_proofs; callback (result ()) in
-    Queue.iter iter q_tmp;
-    Queue.clear q_tmp;
-    Mutex.lock queue_lock
-  done
+  let treat_result () =
+    let q_tmp = Queue.create () in
+    while not (Queue.is_empty answers_queue) do
+      Queue.transfer answers_queue q_tmp;
+      Mutex.unlock queue_lock;
+      let iter (result,callback) = decr scheduled_proofs; callback (result ())
+      in
+      Queue.iter iter q_tmp;
+      Queue.clear q_tmp;
+      Mutex.lock queue_lock
+    done
 
-let yield () =
-  Thread.yield ();
-  Mutex.lock queue_lock;
-  treat_result ();
-  Mutex.unlock queue_lock
-
-let new_external_proof =
-  let run_external (call_prover,callback) =
-    let r = Call_provers.wait_on_call (call_prover ()) in
+  let yield () =
+    Thread.yield ();
     Mutex.lock queue_lock;
-    Queue.push (r,callback) answers_queue ;
-    Condition.signal queue_condition;
-    Mutex.unlock queue_lock in
-  let external_workers =
-    ManyWorkers.create maximum_running_proofs run_external in
-  fun (call_prover,callback) ->
-    ManyWorkers.add_work external_workers (call_prover,callback);
-    incr scheduled_proofs;
+    treat_result ();
+    Mutex.unlock queue_lock
+
+  (** Wait for the last remaining tasks *)
+  let wait_remaining_task () =
+    Mutex.lock queue_lock;
+    while !scheduled_proofs > 0 do
+      while Queue.is_empty answers_queue do
+        Condition.wait queue_condition queue_lock
+      done;
+      treat_result ();
+    done;
+    Mutex.unlock queue_lock
+
+  let new_external_proof =
+    let run_external (call_prover,callback) =
+      let r = Call_provers.wait_on_call (call_prover ()) in
+      Mutex.lock queue_lock;
+      Queue.push (r,callback) answers_queue ;
+      Condition.signal queue_condition;
+      Mutex.unlock queue_lock in
+    let external_workers =
+      ManyWorkers.create maximum_running_proofs run_external in
+    fun (call_prover,callback) ->
+      ManyWorkers.add_work external_workers (call_prover,callback);
+      incr scheduled_proofs;
     (** Stop the computation if too many external proof are scheduled *)
-    while !scheduled_proofs >= !maximum_running_proofs * coef_buf do
+      while !scheduled_proofs >= !maximum_running_proofs * coef_buf do
         Mutex.lock queue_lock;
         while Queue.is_empty answers_queue do
           Condition.wait queue_condition queue_lock
         done;
         treat_result ();
         Mutex.unlock queue_lock;
-    done
+      done
 
 
 (* from Gmain *)
-let task_checksum t =
-  fprintf str_formatter "%a@." Pretty.print_task t;
-  let s = flush_str_formatter () in
-  Digest.to_hex (Digest.string s)
+  let task_checksum t =
+    fprintf str_formatter "%a@." Pretty.print_task t;
+    let s = flush_str_formatter () in
+    Digest.to_hex (Digest.string s)
 
 
-let apply_trans (task,db_goal) (trans,db_trans) =
-  let task = Trans.apply trans task in
-  match db_goal, db_trans with
-    | Some db_goal, Some db_trans ->
-      let transf = try Db.Htransf.find (Db.transformations db_goal) db_trans
-        with Not_found ->
-          Db.add_transformation db_goal db_trans
-      in
-      let md5 = task_checksum task in
-      let db_goal =
-        try
-          Mstr.find md5 (Db.subgoals transf)
-        with Not_found ->
-          Db.add_subgoal transf
-            (Task.task_goal task).Decl.pr_name.Ident.id_string
-            md5
-      in
-      (task,Some db_goal)
-    | _ -> ((task:task),None)
-
-let apply_transl (task,db_goal) (trans,db_trans) =
-  let tasks = Trans.apply trans task in
-  match db_goal, db_trans with
-    | Some db_goal, Some db_trans ->
-      let transf = try Db.Htransf.find (Db.transformations db_goal) db_trans
-        with Not_found -> Db.add_transformation db_goal db_trans
-      in
-      let map task =
+  let apply_trans (task,db_goal) (trans,db_trans) =
+    let task = Trans.apply trans task in
+    match db_goal, db_trans with
+      | Some db_goal, Some db_trans ->
+        let transf = try Db.Htransf.find (Db.transformations db_goal) db_trans
+          with Not_found ->
+            Db.add_transformation db_goal db_trans
+        in
         let md5 = task_checksum task in
         let db_goal =
           try
@@ -209,18 +187,60 @@ let apply_transl (task,db_goal) (trans,db_trans) =
               (Task.task_goal task).Decl.pr_name.Ident.id_string
               md5
         in
-        (task,Some db_goal) in
-      List.map map tasks
-    | _ -> List.map (fun task -> (task:task),None) tasks
+        (task,Some db_goal)
+      | _ -> ((task:task),None)
+
+  let apply_transl (task,db_goal) (trans,db_trans) =
+    let tasks = Trans.apply trans task in
+    match db_goal, db_trans with
+      | Some db_goal, Some db_trans ->
+        let transf = try Db.Htransf.find (Db.transformations db_goal) db_trans
+          with Not_found -> Db.add_transformation db_goal db_trans
+        in
+        let map task =
+          let md5 = task_checksum task in
+          let db_goal =
+            try
+              Mstr.find md5 (Db.subgoals transf)
+            with Not_found ->
+              Db.add_subgoal transf
+                (Task.task_goal task).Decl.pr_name.Ident.id_string
+                md5
+          in
+          (task,Some db_goal) in
+        List.map map tasks
+      | _ -> List.map (fun task -> (task:task),None) tasks
 
 
-let rec apply_transll trl acc (task,db_goal) =
-  match trl with
-    | [] -> (task,db_goal)::acc
-    | tr::trl ->
-      let tl = apply_transl (task,db_goal) tr in
-      List.fold_left (apply_transll trl) acc tl
+  let rec apply_transll trl acc (task,db_goal) =
+    match trl with
+      | [] -> (task,db_goal)::acc
+      | tr::trl ->
+        let tl = apply_transl (task,db_goal) tr in
+        List.fold_left (apply_transll trl) acc tl
 
+  let proof_status_to_db_result pr =
+    match pr with
+      | {pr_answer = Valid} -> (Db.Success,pr.pr_time)
+      | {pr_answer = Invalid} -> (Db.Unknown,pr.pr_time)
+      (* TODO add invalid in Db *)
+      | {pr_answer = Unknown _} -> (Db.Unknown,pr.pr_time)
+      | {pr_answer = Failure _ | HighFailure} -> (Db.Failure,pr.pr_time)
+      | {pr_answer = Timeout } -> (Db.Timeout,pr.pr_time)
+
+
+end
+
+
+let print_why_result fmt = function
+  | InternalFailure exn ->
+    Format.fprintf fmt "InternalFailure %a" Exn_printer.exn_printer exn
+  | Done (pr,_) -> BenchUtil.print_proof_status fmt pr
+
+let print_pas fmt = function
+  | Runned sp -> fprintf fmt "Runned %a" print_why_result sp
+  | Cached (p,t) -> fprintf fmt "Cached (%a,%f)"
+    BenchUtil.print_proof_status p t
 
 let call callback tool prob =
   (** Prove goal *)
@@ -230,7 +250,7 @@ let call callback tool prob =
       let call_prover : Call_provers.pre_prover_call =
         Driver.prove_task ~timelimit:(tool.ttime) ~memlimit:(tool.tmem)
           ~command:(tool.tcommand) (tool.tdriver) task in
-      new_external_proof (call_prover,cb)
+      BenchUtil.new_external_proof (call_prover,cb)
     with e ->
       Format.eprintf "%a@." Exn_printer.exn_printer e;
       callback pval i task (Runned (InternalFailure e)) in
@@ -245,7 +265,7 @@ let call callback tool prob =
         in
         let (proof_status,time,_,_) = Db.status_and_time proof_attempt in
         Debug.dprintf debug "Database has (%a,%f) for the goal@."
-          print_prover_answer proof_status time;
+          BenchUtil.print_proof_status proof_status time;
         begin
           if proof_status = Db.Success ||
             (proof_status = Db.Timeout && time > (float tool.ttime -. 0.1))
@@ -256,7 +276,7 @@ let call callback tool prob =
               Debug.dprintf debug "@.time = %f %i@.@."
                 time tool.ttime;
               let cb res =
-                let (status,time) = proof_status_to_db_result res in
+                let (status,time) = BenchUtil.proof_status_to_db_result res in
                 callback pval i task (Runned (Done (status,time)));
                 Db.set_status proof_attempt status time
               in
@@ -265,16 +285,18 @@ let call callback tool prob =
         end
       | _ ->
         let cb res =
-          let (status,time) = proof_status_to_db_result res in
+          let (status,time) = BenchUtil.proof_status_to_db_result res in
           callback pval i task (Runned (Done (status,time))) in
         new_external_proof pval i cb task
   in
   (** Apply trans *)
   let iter_task (pval,task) =
     let translist = prob.ptrans tool.tenv in
-    let tasks = apply_transll translist [] (task,pval.prob_db) in
+    let tasks = BenchUtil.apply_transll translist [] (task,pval.prob_db) in
     let tasks = List.map
-      (fun task -> List.fold_left apply_trans task tool.ttrans) tasks in
+      (fun task -> List.fold_left BenchUtil.apply_trans task tool.ttrans)
+      tasks
+    in
     let iter i task = call pval i task; succ i in
     ignore (List.fold_left iter 0 (List.rev tasks)) in
   (** Split *)
@@ -297,15 +319,7 @@ let general ?(callback=fun _ _ _ _ _ -> ()) iter add =
                | Cached (res,time) -> Done (res,time)
             } in
     call cb tool prob);
-  (** Wait for the last remaining tasks *)
-  Mutex.lock queue_lock;
-  while !scheduled_proofs > 0 do
-    while Queue.is_empty answers_queue do
-      Condition.wait queue_condition queue_lock
-    done;
-    treat_result ();
-  done;
-  Mutex.unlock queue_lock
+  BenchUtil.wait_remaining_task ()
 
 let any ?callback toolprob =
   let l = ref [] in
@@ -498,7 +512,7 @@ answer output time
       match r with
         | Done (answer,time) ->
           fprintf fmt "%a, %.3f" (*"%a, %S, %.3f"*)
-            print_prover_answer answer (*r.result.pr_output*)
+            BenchUtil.print_proof_status answer (*r.result.pr_output*)
             time
         | InternalFailure _ -> fprintf fmt "InternalFailure, \"\""
 in

@@ -224,3 +224,5 @@ let memo_int size f =
   fun x -> try Hashtbl.find h x
   with Not_found -> let y = f x in Hashtbl.add h x y; y
 
+let memo_string = memo_int
+

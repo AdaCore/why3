@@ -126,6 +126,7 @@ module Mstr : Map.S with type key = string
 module Sstr : Mstr.Set
 
 val memo_int : int -> (int -> 'a) -> int -> 'a
+val memo_string : int -> (string -> 'a) -> string -> 'a
 
 (* Set, Map, Hashtbl on structures with a unique tag *)
 
