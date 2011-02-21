@@ -89,18 +89,20 @@ let env : Env.env = Lexer.create_env (Whyconf.loadpath main)
 let alt_ergo_driver : Driver.driver = Driver.load_driver env alt_ergo.Whyconf.driver
 
 (* call Alt-Ergo *)
-let result1 : Call_provers.prover_result = 
-  Driver.prove_task ~command:alt_ergo.Whyconf.command
-    alt_ergo_driver task1 () ()
+let result1 : Call_provers.prover_result =
+  Call_provers.wait_on_call
+    (Driver.prove_task ~command:alt_ergo.Whyconf.command
+    alt_ergo_driver task1 ()) ()
 
 (* prints Alt-Ergo answer *)
 let () = printf "@[On task 1, alt-ergo answers %a@."
   Call_provers.print_prover_result result1
 
 let result2 : Call_provers.prover_result = 
-  Driver.prove_task ~command:alt_ergo.Whyconf.command
+  Call_provers.wait_on_call
+    (Driver.prove_task ~command:alt_ergo.Whyconf.command
     ~timelimit:10
-    alt_ergo_driver task2 () ()
+    alt_ergo_driver task2 ()) ()
 
 let () = printf "@[On task 2, alt-ergo answers %a in %5.2f seconds@."
   Call_provers.print_prover_answer result1.Call_provers.pr_answer
@@ -135,8 +137,9 @@ let () = printf "@[task 3 created:@\n%a@]@." Pretty.print_task task3
 let () = printf "@[task 3 created@]@." 
 
 let result3 = 
-  Driver.prove_task ~command:alt_ergo.Whyconf.command
-    alt_ergo_driver task3 () ()
+  Call_provers.wait_on_call
+    (Driver.prove_task ~command:alt_ergo.Whyconf.command
+    alt_ergo_driver task3 ()) ()
 
 let () = printf "@[On task 3, alt-ergo answers %a@."
   Call_provers.print_prover_result result3
@@ -166,8 +169,9 @@ let goal_id4 = Decl.create_prsymbol (Ident.id_fresh "goal4")
 let task4 = Task.add_prop_decl task4 Decl.Pgoal goal_id4 fmla4
 
 let result4 = 
-  Driver.prove_task ~command:alt_ergo.Whyconf.command
-    alt_ergo_driver task4 () ()
+  Call_provers.wait_on_call
+    (Driver.prove_task ~command:alt_ergo.Whyconf.command
+    alt_ergo_driver task4 ()) ()
 
 let () = printf "@[On task 4, alt-ergo answers %a@."
   Call_provers.print_prover_result result4
