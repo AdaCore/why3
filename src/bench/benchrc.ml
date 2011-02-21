@@ -135,8 +135,10 @@ let gen_from_file ~format ~prob_name ~file_path ~file_name env lth =
         let m = Env.read_channel ?format:format env file_name cin in
         close_in cin;
         Mnm.bindings m in
-      let file_db = file_name (* TODO relativise it with db file path*) in
-      let file_id = if Db.is_initialized () then Some
+      let file_id = if Db.is_initialized () then
+          let file_db = Sysutil.relativize_filename
+            (Filename.dirname (Db.db_name ())) file_path in
+          Some
           (try fst (List.find (fun (_,x) -> file_db = x) (Db.files ()))
            with Not_found ->
              Db.add_file file_db)
