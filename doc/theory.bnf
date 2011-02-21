@@ -11,6 +11,28 @@
     | "clone" imp-exp tqualid ("as" uident-opt)? subst? ;	   
     | "namespace" "import"? uident-opt decl* "end" ;
   \
+  type-decl ::= lident label* ("'" lident label*)* type-defn;
+  \
+  type-defn ::=                                      ; abstract type
+    | "=" type                                       ; alias type
+    | "=" "|"? type-case ("|" type-case)*            ; algebraic type
+    | "=" "{|" record-field (";" record-field)* "|}" ; record type
+  \
+  type-case ::= uident label* type-param*
+  \
+  record-field ::= lident label* ":" type
+  \
+  logic-decl ::= lident label* type-param* ":" type ;
+    | lident label* type-param* ":" type "=" term   ;
+    | lident label* type-param*                     ;
+    | lident label* type-param* "=" formula
+  \
+  type-param ::= "'" lident   ;
+   | lqualid                  ;
+   | "(" lident+ ":" type ")" ;
+   | "(" type ("," type)* ")" ;
+   | "()"
+  \
   imp-exp ::= ("import" | "export")?
   \
   uident-opt ::= uident | "_"

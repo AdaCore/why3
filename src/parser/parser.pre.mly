@@ -406,8 +406,8 @@ list1_record_field:
 ;
 
 record_field:
-| opt_mutable lident COLON primitive_type 
-   { loc (), $1, $2, $4 }
+| opt_mutable lident labels COLON primitive_type 
+   { loc (), $1, add_lab $2 $3, $5 }
 ;
 
 typecases:
