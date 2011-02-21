@@ -103,10 +103,13 @@ type clone_subst =
   | CSlemma of qualid
   | CSgoal  of qualid
 
+type is_mutable = bool
+
 type type_def =
   | TDabstract
   | TDalias     of pty
   | TDalgebraic of (loc * ident * param list) list
+  | TDrecord    of (loc * is_mutable * ident * pty) list
 
 type type_decl = {
   td_loc    : loc;
@@ -220,8 +223,6 @@ and expr_desc =
   (* TODO: ghost *)
 
 and triple = pre * expr * post
-
-type is_mutable = bool
 
 type program_decl =
   | Dlet    of ident * expr

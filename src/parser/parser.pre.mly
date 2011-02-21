@@ -177,10 +177,10 @@
 %token BACKQUOTE BAR
 %token COLON COMMA
 %token DOT EQUAL FUNC LAMBDA LTGT
-%token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
+%token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTREC LEFTSQ
 %token LRARROW
 %token PRED QUOTE
-%token RIGHTPAR RIGHTSQ
+%token RIGHTPAR RIGHTREC RIGHTSQ
 %token UNDERSCORE
 
 %token EOF
@@ -393,6 +393,21 @@ typedefn:
 | EQUAL primitive_type    { TDalias $2 }
 | EQUAL typecases         { TDalgebraic $2 }
 | EQUAL BAR typecases     { TDalgebraic $3 }
+| EQUAL record_type       { TDrecord $2 }
+;
+
+record_type:
+| LEFTREC list1_record_field RIGHTREC { $2 }
+;
+
+list1_record_field:
+| record_field                              { [$1] }
+| record_field SEMICOLON list1_record_field { $1 :: $3 }
+;
+
+record_field:
+| opt_mutable lident COLON primitive_type 
+   { loc (), $1, $2, $4 }
 ;
 
 typecases:

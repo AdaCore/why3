@@ -1,73 +1,16 @@
 
 
-theory List
 
-  type list 'a = Nil | Cons 'a (list 'a)
+theory Records
 
-end
-
-theory Length
+  use import bool.Bool
   use import int.Int
-  use import List
 
-  logic length (l : list 'a) : int = 
-    match l with
-    | Nil      -> 0
-    | Cons _ r -> 1 + length r
-    end
+  type t = {| a:int; b:bool |}
 
-  lemma Length_nonnegative : forall l:list 'a. length(l) >= 0
+  logic inv (t:t) = a t = 0 <-> b t = True
 
-end
-
-theory Sorted
-
-  use import List
-  use import int.Int
- 
-  inductive sorted (list int) =
-    | Sorted_Nil : 
-        sorted Nil
-    | Sorted_One : 
-        forall x:int. sorted (Cons x Nil)
-    | Sorted_Two : 
-        forall x y : int, l : list int. 
-        x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
- 
-end
-
-theory Order
-
-  type t
-  logic (<=) t t
-
-  axiom Le_refl : forall x : t. x <= x
-  axiom Le_asym : forall x y : t. x <= y -> y <= x -> x = y
-  axiom Le_trans: forall x y z : t. x <= y -> y <= z -> x <= z
-
-end
-
-theory SortedGen
-
-  use import List
-
-  clone import Order as O
- 
-  inductive sorted (l : list t) =
-    | Sorted_Nil : 
-        sorted Nil
-    | Sorted_One : 
-        forall x:t. sorted (Cons x Nil)
-    | Sorted_Two : 
-        forall x y : t, l : list t. 
-        x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
- 
-end
-
-theory SortedIntList
-
-  use import int.Int
-  clone SortedGen with type O.t = int, logic O.(<=) = (<=)
+  goal g1 : forall t:t. inv t -> a t = 0 -> b t = True
 
 end
 

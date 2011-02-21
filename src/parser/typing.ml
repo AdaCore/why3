@@ -645,6 +645,7 @@ let add_projection cl p (fs,tyarg,tyval) th =
 
 let add_projections th d = match d.td_def with
   | TDabstract | TDalias _ -> th
+  | TDrecord _ -> assert false
   | TDalgebraic cl ->
       let per_cs acc (_,id,pl) =
         let cs = find_lsymbol (Qident id) th in
@@ -726,6 +727,8 @@ let add_types dl th =
 	    create_tysymbol id vl (Some (apply ty))
 	| TDabstract | TDalgebraic _ ->
 	    create_tysymbol id vl None
+	| TDrecord _ ->
+	    assert false
       in
       Hashtbl.add tysymbols x (Some ts);
       ts
@@ -761,6 +764,8 @@ let add_types dl th =
 	    create_fsymbol (id_user ~labels id loc) tyl ty
 	  in
 	  Talgebraic (List.map constructor cl)
+      | TDrecord _ ->
+	  assert false
     in
     ts, d
   in
@@ -768,6 +773,20 @@ let add_types dl th =
     with ClashSymbol s -> error ~loc:(Hashtbl.find csymbols s) (Clash s)
   in
   List.fold_left add_projections th dl
+
+let record_typedef td = match td.td_def with
+  | TDabstract | TDalgebraic _ | TDalias _ ->
+      td
+  | TDrecord fl ->
+      let field (loc, mut, id, ty) = 
+	if mut then errorm ~loc "a logic record field cannot be mutable";
+	Some id, ty 
+      in
+      let id = { td.td_ident with id = String.capitalize td.td_ident.id } in
+      { td with td_def = TDalgebraic [td.td_loc, id, List.map field fl] }
+
+let add_types dl th =
+  add_types (List.map record_typedef dl) th
 
 let env_of_vsymbol_list vl =
   List.fold_left (fun env v -> Mstr.add v.vs_name.id_string v env) Mstr.empty vl
