@@ -145,10 +145,9 @@ val all_list_tools :
 
 
 type output =
-  (** on stdout *)
+  (** In a file *)
   |Average of string
   |Timeline of string
-  (** In a file *)
   |Csv of string
 
 type bench =
