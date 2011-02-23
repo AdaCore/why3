@@ -390,7 +390,7 @@ let create_ty_decl tdl =
   let tss = List.fold_left add Sts.empty tdl in
   let check_constr tys ty (syms,news) fs =
     let vty = of_option fs.ls_value in
-    ignore (ty_match Mtv.empty vty ty);
+    if not (ty_equal ty vty) then raise (TypeMismatch (ty,vty));
     let add s ty = match ty.ty_node with
       | Tyvar v -> Stv.add v s
       | _ -> assert false
@@ -475,11 +475,11 @@ let create_ind_decl idl =
     let cls, f = clause [] (check_fvs f) in
     match f.f_node with
       | Fapp (s, tl) when ls_equal s ps ->
-          let mtch sb t ty =
-            try ty_match sb (t.t_ty) ty with TypeMismatch _ ->
+          let mtch t ty =
+            if not (ty_equal t.t_ty ty) then
               raise (TooSpecificIndDecl (ps, pr, t))
           in
-          ignore (List.fold_left2 mtch Mtv.empty tl ps.ls_args);
+          List.iter2 mtch tl ps.ls_args;
           (try ignore (List.for_all (f_pos_ps sps (Some true)) cls)
           with Found ls -> raise (NonPositiveIndDecl (ps, pr, ls)));
           syms_fmla syms f, news_id news pr.pr_name

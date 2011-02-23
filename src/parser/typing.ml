@@ -778,9 +778,9 @@ let record_typedef td = match td.td_def with
   | TDabstract | TDalgebraic _ | TDalias _ ->
       td
   | TDrecord fl ->
-      let field (loc, mut, id, ty) = 
+      let field (loc, mut, id, ty) =
 	if mut then errorm ~loc "a logic record field cannot be mutable";
-	Some id, ty 
+	Some id, ty
       in
       let id = { td.td_ident with id = String.capitalize td.td_ident.id } in
       { td with td_def = TDalgebraic [td.td_loc, id, List.map field fl] }
@@ -872,17 +872,13 @@ let type_term denv env t =
   let t = dterm denv t in
   term env t
 
-let term uc = type_term (create_denv uc) Mstr.empty
-
 let type_fmla denv env f =
   let f = dfmla denv f in
   fmla env f
 
-let fmla uc = type_fmla (create_denv uc) Mstr.empty
-
 let add_prop k loc s f th =
   let pr = create_prsymbol (id_user ~labels:s.id_lab s.id loc) in
-  try add_prop_decl th k pr (fmla th f)
+  try add_prop_decl th k pr (type_fmla (create_denv th) Mstr.empty f)
   with ClashSymbol s -> error ~loc (Clash s)
 
 let loc_of_id id = match id.id_origin with
@@ -891,11 +887,11 @@ let loc_of_id id = match id.id_origin with
 
 let add_inductives dl th =
   (* 1. create all symbols and make an environment with these symbols *)
+  let denv = create_denv th in
   let psymbols = Hashtbl.create 17 in
   let create_symbol th d =
     let id = d.in_ident.id in
     let v = id_user ~labels:d.in_ident.id_lab id d.in_loc in
-    let denv = create_denv th in
     let type_ty (_,t) = ty_of_dty (dty denv t) in
     let pl = List.map type_ty d.in_params in
     let ps = create_psymbol v pl in
@@ -904,6 +900,7 @@ let add_inductives dl th =
     with ClashSymbol s -> error ~loc:d.in_loc (Clash s)
   in
   let th' = List.fold_left create_symbol th dl in
+  let denv = { denv with uc = th' } in
   (* 2. then type-check all definitions *)
   let propsyms = Hashtbl.create 17 in
   let type_decl d =
@@ -911,7 +908,8 @@ let add_inductives dl th =
     let ps = Hashtbl.find psymbols id in
     let clause (loc, { id = id ; id_lab = labels }, f) =
       Hashtbl.replace propsyms id loc;
-      create_prsymbol (id_user ~labels id loc), fmla th' f
+      let f = type_fmla denv Mstr.empty f in
+      create_prsymbol (id_user ~labels id loc), f
     in
     ps, List.map clause d.in_def
   in

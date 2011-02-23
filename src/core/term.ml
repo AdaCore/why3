@@ -1023,11 +1023,10 @@ let f_pred_app_l pr tl = match List.rev tl with
   | _ -> Pervasives.invalid_arg "f_pred_app_l"
 
 let fs_tuple = Util.memo_int 17 (fun n ->
-  let tyl = ref [] in
-  for i = 1 to n
-  do tyl := ty_var (create_tvsymbol (id_fresh "a")) :: !tyl done;
-  let ty = ty_tuple !tyl in
-  create_fsymbol (id_fresh ("Tuple" ^ string_of_int n)) !tyl ty)
+  let ts = ts_tuple n in
+  let tl = List.map ty_var ts.ts_args in
+  let ty = ty_app ts tl in
+  create_fsymbol (id_fresh ("Tuple" ^ string_of_int n)) tl ty)
 
 let is_fs_tuple fs = fs == fs_tuple (List.length fs.ls_args)
 
