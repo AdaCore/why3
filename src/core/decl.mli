@@ -120,7 +120,6 @@ exception IllegalTypeAlias of tysymbol
 exception NonPositiveTypeDecl of tysymbol * lsymbol * tysymbol
 
 exception InvalidIndDecl of lsymbol * prsymbol
-exception TooSpecificIndDecl of lsymbol * prsymbol * term
 exception NonPositiveIndDecl of lsymbol * prsymbol * lsymbol
 
 exception NoTerminationProof of lsymbol

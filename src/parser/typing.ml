@@ -920,8 +920,6 @@ let add_inductives dl th =
       "not a clausal form"
   | NonPositiveIndDecl (_,pr,s) -> errorm ~loc:(loc_of_id pr.pr_name)
       "non-positive occurrence of %a" Pretty.print_ls s
-  | TooSpecificIndDecl (_,pr,t) -> errorm ~loc:(loc_of_id pr.pr_name)
-      "term @[%a@] is too specific" Pretty.print_term t
 
 (* parse declarations *)
 

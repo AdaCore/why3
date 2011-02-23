@@ -525,9 +525,6 @@ let () = Exn_printer.register
   | Decl.InvalidIndDecl (_ls, pr) ->
       fprintf fmt "Ill-formed inductive clause %a"
         print_pr pr
-  | Decl.TooSpecificIndDecl (_ls, pr, t) ->
-      fprintf fmt "Inductive clause %a has too type-specific conclusion %a"
-        print_pr pr print_term t
   | Decl.NonPositiveIndDecl (_ls, pr, ls1) ->
       fprintf fmt "Inductive clause %a contains \
           a negative occurrence of symbol %a"

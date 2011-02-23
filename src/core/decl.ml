@@ -44,14 +44,23 @@ let check_fvs f =
   Svs.iter (fun vs -> raise (UnboundVar vs)) fvs;
   f
 
+let check_ty ty ty' =
+  if not (ty_equal ty ty') then raise (TypeMismatch (ty,ty'))
+
+let check_vl ty v = check_ty ty v.vs_ty
+let check_tl ty t = check_ty ty t.t_ty
+
 let make_fs_defn fs vl t =
   let hd = t_app fs (List.map t_var vl) t.t_ty in
   let fd = f_forall_close vl [] (f_equ hd t) in
+  check_ty (of_option fs.ls_value) t.t_ty;
+  List.iter2 check_vl fs.ls_args vl;
   fs, Some (fs, check_fvs fd)
 
 let make_ps_defn ps vl f =
   let hd = f_app ps (List.map t_var vl) in
   let pd = f_forall_close vl [] (f_iff hd f) in
+  List.iter2 check_vl ps.ls_args vl;
   ps, Some (ps, check_fvs pd)
 
 let make_ls_defn ls vl = e_apply (make_fs_defn ls vl) (make_ps_defn ls vl)
@@ -389,13 +398,12 @@ let create_ty_decl tdl =
   let add s (ts,_) = Sts.add ts s in
   let tss = List.fold_left add Sts.empty tdl in
   let check_constr tys ty (syms,news) fs =
-    let vty = of_option fs.ls_value in
-    if not (ty_equal ty vty) then raise (TypeMismatch (ty,vty));
+    check_ty ty (of_option fs.ls_value);
     let add s ty = match ty.ty_node with
       | Tyvar v -> Stv.add v s
       | _ -> assert false
     in
-    let vs = ty_fold add Stv.empty vty in
+    let vs = ty_fold add Stv.empty ty in
     let rec check seen s ty = match ty.ty_node with
       | Tyvar v when Stv.mem v vs -> s
       | Tyvar v -> raise (UnboundTypeVar v)
@@ -441,7 +449,6 @@ let create_logic_decl ldl =
   mk_decl (Dlogic ldl) syms news
 
 exception InvalidIndDecl of lsymbol * prsymbol
-exception TooSpecificIndDecl of lsymbol * prsymbol * term
 exception NonPositiveIndDecl of lsymbol * prsymbol * lsymbol
 
 exception Found of lsymbol
@@ -475,11 +482,7 @@ let create_ind_decl idl =
     let cls, f = clause [] (check_fvs f) in
     match f.f_node with
       | Fapp (s, tl) when ls_equal s ps ->
-          let mtch t ty =
-            if not (ty_equal t.t_ty ty) then
-              raise (TooSpecificIndDecl (ps, pr, t))
-          in
-          List.iter2 mtch tl ps.ls_args;
+          List.iter2 check_tl ps.ls_args tl;
           (try ignore (List.for_all (f_pos_ps sps (Some true)) cls)
           with Found ls -> raise (NonPositiveIndDecl (ps, pr, ls)));
           syms_fmla syms f, news_id news pr.pr_name
