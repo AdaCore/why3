@@ -89,6 +89,9 @@ module type S = sig
   val memoize : int -> (key -> 'a) -> (key -> 'a)
     (* create a memoizing function *)
 
+  val memoize_rec : int -> ((key -> 'a) -> (key -> 'a)) -> (key -> 'a)
+    (* create a memoizing recursive function *)
+
   val memoize_option : int -> (key option -> 'a) -> (key option -> 'a)
     (* memoizing functions on option types *)
 
@@ -217,6 +220,17 @@ module Make (S : Weakey) = struct
         let v = fn e in
         set h e v;
         v
+
+  let memoize_rec n fn =
+    let h = create n in
+    let rec f e =
+      try find h e
+      with Not_found ->
+        let v = fn f e in
+        set h e v;
+        v
+    in
+    f
 
   let memoize_option n fn =
     let v = lazy (fn None) in

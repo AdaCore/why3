@@ -68,6 +68,9 @@ module type S = sig
   val memoize : int -> (key -> 'a) -> (key -> 'a)
     (* create a memoizing function *)
 
+  val memoize_rec : int -> ((key -> 'a) -> (key -> 'a)) -> (key -> 'a)
+    (* create a memoizing recursive function *)
+
   val memoize_option : int -> (key option -> 'a) -> (key option -> 'a)
     (* memoizing functions on option types *)
 
