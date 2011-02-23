@@ -175,7 +175,7 @@ loaded first.
 \begin{verbatim}
 (* builds the environment from the [loadpath] *)
 let env : Env.env =
-  Env.create_env (Lexer.retrieve (Whyconf.loadpath main))
+  Lexer.create_env (Whyconf.loadpath main)
 (* loading the Alt-Ergo driver *)
 let alt_ergo_driver : Driver.driver =
   Driver.load_driver env alt_ergo.Whyconf.driver
@@ -187,8 +187,9 @@ termination. Here is a simple way to proceed:
 \begin{verbatim}
 (* calls Alt-Ergo *)
 let result1 : Call_provers.prover_result =
-  Driver.prove_task ~command:alt_ergo.Whyconf.command
-    alt_ergo_driver task1 () ()
+  Call_provers.wait_on_call
+    (Driver.prove_task ~command:alt_ergo.Whyconf.command
+    alt_ergo_driver task1 ()) ()
 (* prints Alt-Ergo answer *)
 let () = printf "@[On task 1, alt-ergo answers %a@]@."
   Call_provers.print_prover_result result1
@@ -225,9 +226,10 @@ Here is thus another way of calling the Alt-Ergo prover, on our second
 task.
 \begin{verbatim}
 let result2 : Call_provers.prover_result =
-  Driver.prove_task ~command:alt_ergo.Whyconf.command
+   Call_provers.wait_on_call
+    (Driver.prove_task ~command:alt_ergo.Whyconf.command
     ~timelimit:10
-    alt_ergo_driver task2 () ()
+    alt_ergo_driver task2 ()) ()
 
 let () =
   printf "@[On task 2, alt-ergo answers %a in %5.2f seconds@."
