@@ -1,0 +1,22 @@
+
+module Quicksort
+
+  use import int.Int
+  use import module stdlib.Ref
+  use import module stdlib.Array
+  clone import array.ArraySorted with type elt = int, logic le = (<=)
+  use import array.ArrayPermut
+
+  let quicksort (t : array int) =
+    {} 
+    () (*(quick_rec t 0 ((array_length_ t)-1))*)
+    { sorted t and permutation t (old t) }
+
+end
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/quicksort.gui"
+End: 
+*)
+
