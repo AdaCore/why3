@@ -50,6 +50,11 @@ let print_tv_binder fmt tv =
   let n = id_unique iprinter tv.tv_name in
   fprintf fmt "(%s:Type)" n
 
+let print_implicit_tv_binder fmt tv =
+  tv_set := Sid.add tv.tv_name !tv_set;
+  let n = id_unique iprinter tv.tv_name in
+  fprintf fmt "{%s:Type}" n
+
 let print_ne_params fmt stv =
   Stv.iter
     (fun tv -> fprintf fmt "@ %a" print_tv_binder tv)
@@ -63,6 +68,9 @@ let print_ne_params_list fmt ltv =
 let print_params fmt stv =
   if Stv.is_empty stv then () else
     fprintf fmt "forall%a,@ " print_ne_params stv
+
+let print_implicit_params fmt stv =
+  Stv.iter (fun tv -> fprintf fmt "%a@ " print_implicit_tv_binder tv) stv
 
 let print_params_list fmt ltv =
   match ltv with
@@ -461,11 +469,14 @@ let print_logic_decl ~old info fmt d =
 let print_ind info fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr (print_fmla info) f
 
-(* TODO: fix syntax with type parameters *)
 let print_ind_decl info fmt (ps,bl) =
-  fprintf fmt "@[<hov 2>Inductive %a : %a -> Prop :=@ @[<hov>%a@].@]@\n@\n"
-     print_ls ps (print_arrow_list (print_ty info)) ps.ls_args
-     (print_list newline (print_ind info)) bl
+  let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars ps in
+  fprintf fmt "@[<hov 2>Inductive %a%a : %a -> Prop :=@ @[<hov>%a@].@]@\n"
+     print_ls ps print_implicit_params all_ty_params
+    (print_arrow_list (print_ty info)) ps.ls_args
+     (print_list newline (print_ind info)) bl;
+  print_implicits fmt ps ty_vars_args ty_vars_value all_ty_params;
+  fprintf fmt "@\n"
 
 let print_ind_decl info fmt d =
   if not (Sid.mem (fst d).ls_name info.info_rem) then
