@@ -75,8 +75,25 @@ theory ArraySorted
 
   logic le elt elt
 
+  logic sorted_sub (a : t int elt) (l u : int) =
+    forall i1 i2 : int. l <= i1 <= i2 <= u -> le a[i1] a[i2]
+
   logic sorted (a : t int elt) =
-    forall i1 i2 : int. 0 <= i1 <= i2 < length a -> le a[i1] a[i2]
+    sorted_sub a 0 (length a - 1)
+
+end
+
+theory ArrayEq
+
+  use import int.Int
+  use export ArrayLength
+
+  logic array_eq_sub (a1 a2 : t int 'a) (l u : int) = 
+    forall i:int. l <= i <= u -> a1[i] = a2[i]
+
+  logic array_eq (a1 a2 : t int 'a) =
+    length a1 = length a2 and
+    forall i:int. 0 <= i < length a1 -> a1[i] = a2[i]
 
 end
 
@@ -120,8 +137,20 @@ theory ArrayPermut
     forall a1 a2 : t int 'a. forall l u : int.
     permut a1 a2 l u -> length a1 = length a2
 
+  lemma permut_exists :
+    forall a1 a2 : t int 'a. forall l u : int.
+    permut a1 a2 l u -> 
+    forall i : int. l <= i <= u ->
+    exists j : int. l <= j <= u and a2[i] = a1[j]
+
   logic permutation (a1 a2 : t int 'a) =
     permut a1 a2 0 (length a1 - 1)
+
+  use export ArrayEq
+
+  lemma array_eq_permut :
+    forall a1 a2 : t int 'a. forall l u : int.
+    array_eq_sub a1 a2 l u -> permut a1 a2 l u
 
 end
 

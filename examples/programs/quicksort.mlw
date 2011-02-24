@@ -7,9 +7,38 @@ module Quicksort
   clone import array.ArraySorted with type elt = int, logic le = (<=)
   use import array.ArrayPermut
 
+  let swap (t:array int) (i:int) (j:int) =
+    { 0 <= i < length t and 0 <= j < length t }
+    let v = t[i] in
+    begin
+      t[i <- t[j]];
+      t[j <- v]
+    end
+    { exchange t (old t) i j }
+
+  let rec quick_rec (t:array int) (l:int) (r:int) : unit variant { 1+r-l } =
+    { 0 <= l and r < length t }
+    if l < r then begin 
+      let v = t[l] in
+      let m = ref l in
+      label L: begin
+      for i = l + 1 to r do
+	invariant { (forall j:int. l < j <= m -> t[j] < v) and
+                    (forall j:int. m < j <  i -> t[j] >= v) and
+                    permut t (at t L) l r and
+                    t[l] = v and l <= m < i }
+        if t[i] < v then begin m := !m + 1; swap t i !m end
+      done;
+      swap t l !m;
+      quick_rec t l (!m - 1);
+      quick_rec t (!m + 1) r
+    end end
+    { (l <= r and sorted_sub t l r and permut t (old t) l r) or
+      (l > r and array_eq t (old t)) }
+
   let quicksort (t : array int) =
     {} 
-    () (*(quick_rec t 0 ((array_length_ t)-1))*)
+    quick_rec t 0 (length t - 1)
     { sorted t and permutation t (old t) }
 
 end
