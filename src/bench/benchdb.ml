@@ -48,8 +48,8 @@ let rec goal whyconf env path dbgoal wgoal =
         let (res_status,_res_time) = BenchUtil.proof_status_to_db_result res in
         if proof_status <> res_status then
           printf "Diff : %a instead of %a in %a@."
-            BenchUtil.print_proof_status proof_status
             BenchUtil.print_proof_status res_status
+            BenchUtil.print_proof_status proof_status
             print_paths path
         else
           Debug.dprintf debug "Same : %a for %a@."
@@ -64,7 +64,7 @@ let rec goal whyconf env path dbgoal wgoal =
       in
       let call_prover : Call_provers.pre_prover_call =
         Driver.prove_task
-          ~timelimit:(truncate (ceil (time*.1.1)))
+          ~timelimit:(truncate (ceil (0.1 +. time *. 1.1)))
           ~command (load_driver env driver) ?old wgoal in
       BenchUtil.new_external_proof (call_prover,cb)
     with Exit -> ()
