@@ -397,12 +397,12 @@ typedefn:
 ;
 
 record_type:
-| LEFTREC list1_record_field RIGHTREC { $2 }
+| LEFTREC list1_record_field opt_semicolon RIGHTREC { $2 }
 ;
 
 list1_record_field:
 | record_field                              { [$1] }
-| record_field SEMICOLON list1_record_field { $1 :: $3 }
+| list1_record_field SEMICOLON record_field { $3 :: $1 }
 ;
 
 record_field:
@@ -568,6 +568,15 @@ lexpr:
    { $1 }
 ;
 
+list1_field_value:
+| field_value                             { [$1] }
+| list1_field_value SEMICOLON field_value { $3 :: $1 }
+;
+
+field_value:
+| lqualid EQUAL lexpr { $1, $3 }
+;
+
 list1_lexpr_arg:
 | lexpr_arg                 { [$1] }
 | lexpr_arg list1_lexpr_arg { $1::$2 }
@@ -595,6 +604,8 @@ lexpr_arg:
    { mk_pp (PPtuple []) }
 | LEFTPAR lexpr COMMA list1_lexpr_sep_comma RIGHTPAR
    { mk_pp (PPtuple ($2 :: $4)) }
+| LEFTREC list1_field_value opt_semicolon RIGHTREC
+   { mk_pp (PPrecord (List.rev $2)) }
 | OPPREF lexpr_arg
    { mk_pp (PPapp (Qident (mk_id (prefix $1) (loc_i 2)), [$2])) }
 | lexpr_arg LEFTSQ lexpr RIGHTSQ

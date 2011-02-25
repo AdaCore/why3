@@ -366,6 +366,54 @@ let apply_highord loc x tl = match List.rev tl with
   | a::tl -> [{pp_loc = loc; pp_desc = PPapp (x, List.rev tl)}; a]
   | [] -> assert false
 
+(* [is_projection uc ls] returns
+   - [Some (ts, lsc, i)] if [ls] is the i-th projection of an
+     algebraic datatype [ts] with only one constructor [lcs]
+   - [None] otherwise 
+ *)
+let is_projection uc ls = 
+  try
+    let ts = match ls.ls_args, ls.ls_value with
+      | [{ty_node = Ty.Tyapp (ts, _)}], Some _ -> ts
+      | _ -> (* not a function with 1 argument *) raise Exit
+    in
+    let kn = get_known uc in
+    let lsc = match Decl.find_constructors kn ts with
+      | [lsc] -> lsc
+      | _ -> (* 0 or several constructors *) raise Exit
+    in
+    let def = match Decl.find_logic_definition kn ls with
+      | Some def -> def
+      | None -> (* no definition *) raise Exit
+    in
+    let v, t = match Decl.open_fs_defn def with
+      | [v], t -> v, t
+      | _ -> assert false
+    in
+    let b = match t.t_node with
+      | Tcase ({t_node=Term.Tvar v'}, [b]) when vs_equal v' v -> b
+      | _ -> raise Exit
+    in
+    let p, t = t_open_branch b in
+    let pl = match p with
+      | { pat_node = Term.Papp (lsc', pl) } when ls_equal lsc lsc' -> pl
+      | _ -> raise Exit
+    in
+    let i = match t.t_node with 
+      | Term.Tvar xi -> 
+	  let rec index i = function 
+	    | [] -> raise Exit
+	    | { pat_node = Term.Pvar v} :: _ when vs_equal v xi -> i
+	    | _ :: l -> index (i+1) l
+	  in
+	  index 0 pl
+      | _ -> 
+	  raise Exit
+    in
+    Some (ts, lsc, i)
+  with Exit ->
+    None
+
 let rec dterm ?(localize=false) env { pp_loc = loc; pp_desc = t } =
   let n, ty = dterm_node ~localize loc env t in
   let t = { dt_node = n; dt_ty = ty } in
@@ -509,6 +557,45 @@ and dterm_node ~localize loc env = function
             id, ty, Fbinop (Fiff, Fapp (ps_pred_app, [h;u]), f)
       in
       Teps (id, ty, Fquant (Fforall, uqu, trl, f)), ty
+  | PPrecord fl ->
+      let type_field (q, e) = 
+	let loc = qloc q in
+	let ls, tyl, ty = specialize_fsymbol q env.uc in
+	match is_projection env.uc ls, tyl with
+	  | None, _ -> 
+	      errorm ~loc "this is not a record field"
+	  | Some (ts, ls, i), [tya] -> 
+	      let loce = e.pp_loc in
+	      let e = dterm ~localize env e in
+	      if not (unify e.dt_ty ty) then 
+		term_expected_type ~loc:loce e.dt_ty ty;
+	      ts, (loc, ls, i, tya), e
+	  | _ -> 
+	      assert false
+      in
+      let fl = List.map type_field fl in
+      let ts,(_,ls,_,ty),_ = match fl with [] -> assert false | x :: _ -> x in
+      let args = Array.create (List.length ls.ls_args) None in
+      let check_field (ts', (loc, _, i, tye), e) = 
+	if not (ts_equal ts' ts) then 
+	  errorm ~loc "this should be a field for type %a" Pretty.print_ts ts;
+	assert (0 <= i && i < Array.length args);
+	if args.(i) <> None then
+	  errorm ~loc "this record field is defined several times";
+	args.(i) <- Some e;
+	if not (unify tye ty) then 
+	  errorm ~loc 
+	    "@[this is a field for type %a,@ \
+               but a field for type %a is expected@]"
+	    print_dty tye print_dty ty
+      in
+      List.iter check_field fl;
+      let add_arg e acc = match e with
+	| None -> errorm ~loc "some record fields are missing"
+	| Some e -> e :: acc
+      in
+      let fl = Array.fold_right add_arg args [] in
+      Tapp (ls, fl), ty
   | PPquant _ | PPbinop _ | PPunop _ | PPfalse | PPtrue ->
       error ~loc TermExpected
 
@@ -593,7 +680,7 @@ and dfmla_node ~localize loc env = function
       let s, tyl = specialize_psymbol x env.uc in
       let tl = dtype_args s.ls_name loc env tyl [] in
       Fapp (s, tl)
-  | PPeps _ | PPconst _ | PPcast _ | PPtuple _ ->
+  | PPeps _ | PPconst _ | PPcast _ | PPtuple _ | PPrecord _ ->
       error ~loc PredicateExpected
 
 and dpat_list env ty p =
@@ -782,7 +869,8 @@ let record_typedef td = match td.td_def with
 	if mut then errorm ~loc "a logic record field cannot be mutable";
 	Some id, ty
       in
-      let id = { td.td_ident with id = String.capitalize td.td_ident.id } in
+      (* constructor for type t is "mk t" (and not String.capitalize t) *)
+      let id = { td.td_ident with id = "mk " ^ td.td_ident.id } in
       { td with td_def = TDalgebraic [td.td_loc, id, List.map field fl] }
 
 let add_types dl th =

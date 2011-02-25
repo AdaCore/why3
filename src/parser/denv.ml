@@ -67,7 +67,7 @@ let rec print_dty fmt = function
   | Tyapp (s, [t]) ->
       fprintf fmt "%s %a" s.ts_name.id_string print_dty t
   | Tyapp (s, l) ->
-      fprintf fmt "%s %a" s.ts_name.id_string (print_list comma print_dty) l
+      fprintf fmt "%s %a" s.ts_name.id_string (print_list space print_dty) l
 
 let rec view_dty = function
   | Tyvar { type_val = Some dty } -> view_dty dty

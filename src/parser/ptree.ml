@@ -80,6 +80,7 @@ and pp_desc =
   | PPmatch of lexpr * (pattern * lexpr) list
   | PPcast of lexpr * pty
   | PPtuple of lexpr list
+  | PPrecord of (qualid * lexpr) list
 
 (*s Declarations. *)
 

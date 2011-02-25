@@ -12,8 +12,9 @@
     "wait_on_call (prove_task t ()) ()".
   o record types in the logic
     - introduced with syntax "type t = {| a:int; b:bool |}"
-    - actually syntactic sugar for "type t = T (a:int) (b:bool)"
+      actually syntactic sugar for "type t = `mk t' (a:int) (b:bool)"
       i.e. an algebraic with one constructor and projection functions
+    - a record expression is written {| a = 1; b = True |}
 
 version 0.64, Feb 16, 2011
 ==========================

@@ -3,14 +3,13 @@
 
 theory Records
 
+  use import list.List
   use import bool.Bool
   use import int.Int
 
-  type t = {| a:int; b:bool |}
+  type t 'a 'b = {| a : 'a; b : list 'b; |}
 
-  logic inv (t:t) = a t = 0 <-> b t = True
-
-  goal g1 : forall t:t. inv t -> a t = 0 -> b t = True
+  goal g1 : let t = {| b = Cons True Nil; a = 1;  |} in a t = 1
 
 end
 
