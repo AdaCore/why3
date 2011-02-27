@@ -598,6 +598,24 @@ lexpr_arg:
    { mk_pp PPtrue }
 | FALSE
    { mk_pp PPfalse }
+| OPPREF lexpr_arg
+   { mk_pp (PPapp (Qident (mk_id (prefix $1) (loc_i 2)), [$2])) }
+| lexpr_sub
+   { $1 }
+;
+
+lexpr_dot:
+| lqualid_rich
+   { mk_pp (PPvar $1) }
+| OPPREF lexpr_dot
+   { mk_pp (PPapp (Qident (mk_id (prefix $1) (loc_i 2)), [$2])) }
+| lexpr_sub
+   { $1 }
+;
+
+lexpr_sub:
+| lexpr_dot DOT lqualid
+   { mk_pp (PPapp ($3, [$1])) }
 | LEFTPAR lexpr RIGHTPAR
    { $2 }
 | LEFTPAR RIGHTPAR
@@ -606,8 +624,6 @@ lexpr_arg:
    { mk_pp (PPtuple ($2 :: $4)) }
 | LEFTREC list1_field_value opt_semicolon RIGHTREC
    { mk_pp (PPrecord (List.rev $2)) }
-| OPPREF lexpr_arg
-   { mk_pp (PPapp (Qident (mk_id (prefix $1) (loc_i 2)), [$2])) }
 | lexpr_arg LEFTSQ lexpr RIGHTSQ
    { mk_pp (PPapp (Qident (mk_id (misfix "[]") (loc ())), [$1; $3])) }
 | lexpr_arg LEFTSQ lexpr OP1 lexpr RIGHTSQ
@@ -832,6 +848,11 @@ any_qualid:
 tqualid:
 | uident                { Qident $1 }
 | any_qualid DOT uident { Qdot ($1, $3) }
+;
+
+lqualid_rich:
+| lident_rich             { Qident $1 }
+| uqualid DOT lident_rich { Qdot ($1, $3) }
 ;
 
 qualid:

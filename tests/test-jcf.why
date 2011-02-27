@@ -7,9 +7,11 @@ theory Records
   use import bool.Bool
   use import int.Int
 
-  type t 'a 'b = {| a : 'a; b : list 'b; |}
+  namespace import R
+    type t 'a 'b = {| a : 'a; b : list 'b; |}
+  end
 
-  goal g1 : let t = {| b = Cons True Nil; a = 1;  |} in a t = 1
+  goal g1 : let t = {| b = Cons True Nil; a = 1; |} in t.R.a = 1
 
 end
 
