@@ -1,0 +1,12 @@
+theory IntReal
+  use import int.Int
+  use import real.RealInfix
+  use import real.FromInt
+  use import real.Truncate
+
+  goal G1 : from_int 2 = 2.0
+  goal G2 : floor 1.5 = 1
+  goal G3 : ceil 1.5 = 2
+  goal G4 : floor (-. 1.5) = -2
+  goal G5 : ceil (-. 1.5) = -1
+end
