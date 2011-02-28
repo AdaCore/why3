@@ -231,9 +231,11 @@ module Model = struct
   type proof_attempt_status =
     | Scheduled (** external proof attempt is scheduled *)
     | Running (** external proof attempt is in progress *)
-    | Success (** external proof attempt succeeded *)
+    | Valid (** external proof attempt succeeded *)
+    | Invalid (** external proof attempt found a counter-example *)
     | Timeout (** external proof attempt was interrupted *)
     | Unknown (** external prover answered ``don't know'' or equivalent *)
+    | Failure (** external prover call failed *)
     | HighFailure (** external prover call failed *)
 
 
@@ -538,13 +540,17 @@ module Helpers = struct
     match obsolete,result with
     | _, Scheduled -> !image_scheduled
     | _, Running -> !image_running
-    | false, Success -> !image_valid
+    | false, Valid  -> !image_valid
+    | false, Invalid  -> !image_unknown (** TODO change *)
     | false, Timeout -> !image_timeout
     | false, Unknown -> !image_unknown
+    | false, Failure -> !image_failure
     | false, HighFailure -> !image_failure
-    | true, Success -> !image_valid_obs
+    | true, Valid -> !image_valid_obs
+    | true, Invalid  -> !image_unknown (** TODO change *)
     | true, Timeout -> !image_timeout_obs
     | true, Unknown -> !image_unknown_obs
+    | true, Failure -> !image_failure_obs
     | true, HighFailure -> !image_failure_obs
 
   let set_row_status b row =
@@ -581,7 +587,7 @@ module Helpers = struct
 
   let rec check_goal_proved g =
     let b1 = Hashtbl.fold 
-      (fun _ a acc -> acc || a.status = Success) g.external_proofs false
+      (fun _ a acc -> acc || a.status = Valid) g.external_proofs false
     in
     let b = Hashtbl.fold 
       (fun _ t acc -> acc || t.transf_proved) g.transformations b1
@@ -836,7 +842,8 @@ let apply_trans t task =
 
 let split_transformation = Trans.lookup_transform_l "split_goal" gconfig.env
 let inline_transformation = Trans.lookup_transform "inline_goal" gconfig.env
-let intro_transformation = Trans.lookup_transform "introduce_premises" gconfig.env
+let intro_transformation = Trans.lookup_transform "introduce_premises"
+  gconfig.env
 
 let rec reimport_any_goal parent gname t db_goal goal_obsolete =
   let goal = Helpers.add_goal_row parent gname t db_goal in
@@ -852,12 +859,14 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
          let obsolete = goal_obsolete or o in
          let s = match s with
            | Db.Undone -> Model.HighFailure
-           | Db.Success ->
+           | Db.Valid ->
                if not obsolete then proved := true;
-               Model.Success
+               Model.Valid
+           | Db.Invalid -> Model.Invalid
            | Db.Unknown -> Model.Unknown
            | Db.Timeout -> Model.Timeout
-           | Db.Failure -> Model.HighFailure
+           | Db.Failure -> Model.Failure
+           | Db.HighFailure -> Model.HighFailure
          in
          let (_pa : Model.proof_attempt) =
            Helpers.add_external_proof_row ~obsolete ~edit goal p a s t
@@ -1078,11 +1087,12 @@ let callback_of_callback callback = function
     callback Model.HighFailure 0. "Prover call failed"
   | Scheduler.Done r ->
     let res = match r.Call_provers.pr_answer with
-      | Call_provers.Valid -> Model.Success
+      | Call_provers.Valid -> Model.Valid
       | Call_provers.Timeout -> Model.Timeout
-      | Call_provers.Unknown _ | Call_provers.Invalid -> Model.Unknown
-      | Call_provers.Failure _ | Call_provers.HighFailure ->
-        Model.HighFailure in
+      | Call_provers.Unknown _ -> Model.Unknown
+      | Call_provers.Invalid ->  Model.Invalid
+      | Call_provers.Failure _ -> Model.Failure
+      | Call_provers.HighFailure -> Model.HighFailure in
     callback res r.Call_provers.pr_time r.Call_provers.pr_output
 
 (* q is a queue of proof attempt where to put the new one *)
@@ -1091,14 +1101,16 @@ let redo_external_proof q g a =
   let callback result time output =
     a.Model.output <- output;
     Helpers.set_proof_status ~obsolete:false a result time ;
-    if result = Model.Success
+    if result = Model.Valid
     then Helpers.set_proved ~propagate:true a.Model.proof_goal;
     let db_res = match result with
       | Model.Scheduled | Model.Running -> Db.Undone
-      | Model.Success -> Db.Success
+      | Model.Valid -> Db.Valid
+      | Model.Invalid -> Db.Invalid
       | Model.Unknown -> Db.Unknown
       | Model.Timeout -> Db.Timeout
-      | Model.HighFailure -> Db.Failure
+      | Model.HighFailure -> Db.HighFailure
+      | Model.Failure -> Db.Failure
     in
     Db.set_status a.Model.proof_db db_res time
   in
@@ -1937,7 +1949,8 @@ let confirm_remove_row r =
 	info_window
 	  ~callback:(fun () -> remove_transf tr)
 	  `QUESTION
-	  "Do you really want to remove the selected transformation and all its subgoals?"
+	  "Do you really want to remove the selected transformation
+and all its subgoals?"
 
 let confirm_remove_selection () =
   match goals_view#selection#get_selected_rows with

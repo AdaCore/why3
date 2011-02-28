@@ -91,11 +91,12 @@ module BenchUtil =
 struct
 
   let print_proof_status fmt = function
-    | Db.Success -> fprintf fmt "Valid"
-  (* | Invalid -> fprintf fmt "Invalid" *)
+    | Db.Valid -> fprintf fmt "Valid"
+    | Db.Invalid -> fprintf fmt "Invalid"
     | Db.Timeout -> fprintf fmt "Timeout"
     | Db.Unknown -> fprintf fmt "Unknown"
     | Db.Failure -> fprintf fmt "Failure"
+    | Db.HighFailure -> fprintf fmt "HighFailure"
     | Db.Undone  -> fprintf fmt "Undone"
 
   open Worker
@@ -221,11 +222,11 @@ struct
 
   let proof_status_to_db_result pr =
     match pr with
-      | {pr_answer = Valid} -> (Db.Success,pr.pr_time)
-      | {pr_answer = Invalid} -> (Db.Unknown,pr.pr_time)
-      (* TODO add invalid in Db *)
+      | {pr_answer = Valid} -> (Db.Valid,pr.pr_time)
+      | {pr_answer = Invalid} -> (Db.Invalid,pr.pr_time)
       | {pr_answer = Unknown _} -> (Db.Unknown,pr.pr_time)
-      | {pr_answer = Failure _ | HighFailure} -> (Db.Failure,pr.pr_time)
+      | {pr_answer = Failure _} -> (Db.Failure,pr.pr_time)
+      | {pr_answer = HighFailure} -> (Db.HighFailure,pr.pr_time)
       | {pr_answer = Timeout } -> (Db.Timeout,pr.pr_time)
 
 
@@ -267,7 +268,7 @@ let call callback tool prob =
         Debug.dprintf debug "Database has (%a,%f) for the goal@."
           BenchUtil.print_proof_status proof_status time;
         begin
-          if proof_status = Db.Success ||
+          if proof_status = Db.Valid ||
             (proof_status = Db.Timeout && time > (float tool.ttime -. 0.1))
           then
             callback pval i task (Cached (proof_status,time))
@@ -437,12 +438,12 @@ let empty_tool_res =
     match r with
       | Done (answer,time) ->
         begin match answer with
-          | Db.Success -> {tr with valid = add_nb_avg tr.valid time}
+          | Db.Valid -> {tr with valid = add_nb_avg tr.valid time}
           | Db.Timeout -> {tr with timeout = add_nb_avg tr.timeout time}
-      (* | Db.Invalid -> {tr with invalid = add_nb_avg tr.invalid time} *)
+          | Db.Invalid -> {tr with invalid = add_nb_avg tr.invalid time}
           | Db.Undone | Db.Unknown _ ->
             {tr with unknown = add_nb_avg tr.unknown time}
-          | Db.Failure _ ->
+          | Db.Failure _ |Db.HighFailure ->
             {tr with failure = add_nb_avg tr.failure time}
         end
       | InternalFailure _ ->
@@ -453,7 +454,7 @@ let empty_tool_res =
     | InternalFailure _ -> assert false
 
   let filter_timeline l =
-    let l = List.filter (function {result = Done (Db.Success,_)} -> true
+    let l = List.filter (function {result = Done (Db.Valid,_)} -> true
       | _ -> false) l in
     let compare_valid x y =
       let c = compare (extract_time x.result)

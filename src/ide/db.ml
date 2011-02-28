@@ -217,10 +217,12 @@ module Htransf = Hashtbl.Make
 
 type proof_status =
   | Undone (** external proof attempt no done yet *)
-  | Success (** external proof attempt succeeded *)
+  | Valid   (** external proof attempt succeeded *)
+  | Invalid   (** external proof attempt found a counter-example *)
   | Timeout (** external proof attempt was interrupted *)
   | Unknown (** external prover answered ``don't know'' or equivalent *)
   | Failure (** external prover call failed *)
+  | HighFailure (** external prover call failed *)
 
 type proof_attempt = int64
 (*
@@ -471,14 +473,18 @@ let transf_from_name n =
   with Not_found -> TransfId.add db n
 
 
-let status_array = [| Undone; Success; Timeout; Unknown; Failure |]
+let status_array = [| Undone; Valid; Timeout; Unknown; Failure;
+                      Invalid; HighFailure |]
 
 let int64_from_status = function
   | Undone -> 0L
-  | Success -> 1L
+  | Valid -> 1L
+  | Invalid -> 5L
   | Timeout -> 2L
   | Unknown -> 3L
   | Failure -> 4L
+  | HighFailure -> 6L
+
 
 let status_from_int64 i =
   try
