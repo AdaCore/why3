@@ -216,13 +216,8 @@ module Htransf = Hashtbl.Make
 
 
 type proof_status =
-  | Undone (** external proof attempt no done yet *)
-  | Valid   (** external proof attempt succeeded *)
-  | Invalid   (** external proof attempt found a counter-example *)
-  | Timeout (** external proof attempt was interrupted *)
-  | Unknown (** external prover answered ``don't know'' or equivalent *)
-  | Failure (** external prover call failed *)
-  | HighFailure (** external prover call failed *)
+  | Undone                      (** external proof attempt not done yet *)
+  | Done of Call_provers.prover_answer  (** external proof attempt done *)
 
 type proof_attempt = int64
 (*
@@ -473,17 +468,23 @@ let transf_from_name n =
   with Not_found -> TransfId.add db n
 
 
-let status_array = [| Undone; Valid; Timeout; Unknown; Failure;
-                      Invalid; HighFailure |]
+let status_array = [|
+  Undone;
+  Done Call_provers.Valid;
+  Done Call_provers.Timeout;
+  Done (Call_provers.Unknown "");
+  Done (Call_provers.Failure "");
+  Done Call_provers.Invalid;
+  Done Call_provers.HighFailure; |]
 
 let int64_from_status = function
-  | Undone -> 0L
-  | Valid -> 1L
-  | Invalid -> 5L
-  | Timeout -> 2L
-  | Unknown -> 3L
-  | Failure -> 4L
-  | HighFailure -> 6L
+  | Undone                        -> 0L
+  | Done Call_provers.Valid       -> 1L
+  | Done Call_provers.Timeout     -> 2L
+  | Done (Call_provers.Unknown _) -> 3L
+  | Done (Call_provers.Failure _) -> 4L
+  | Done Call_provers.Invalid     -> 5L
+  | Done Call_provers.HighFailure -> 6L
 
 
 let status_from_int64 i =

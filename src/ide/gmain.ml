@@ -231,13 +231,7 @@ module Model = struct
   type proof_attempt_status =
     | Scheduled (** external proof attempt is scheduled *)
     | Running (** external proof attempt is in progress *)
-    | Valid (** external proof attempt succeeded *)
-    | Invalid (** external proof attempt found a counter-example *)
-    | Timeout (** external proof attempt was interrupted *)
-    | Unknown (** external prover answered ``don't know'' or equivalent *)
-    | Failure (** external prover call failed *)
-    | HighFailure (** external prover call failed *)
-
+    | Done of Call_provers.prover_answer (** external proof attempt done *)
 
   type proof_attempt =
       { prover : prover_data;
@@ -540,18 +534,18 @@ module Helpers = struct
     match obsolete,result with
     | _, Scheduled -> !image_scheduled
     | _, Running -> !image_running
-    | false, Valid  -> !image_valid
-    | false, Invalid  -> !image_unknown (** TODO change *)
-    | false, Timeout -> !image_timeout
-    | false, Unknown -> !image_unknown
-    | false, Failure -> !image_failure
-    | false, HighFailure -> !image_failure
-    | true, Valid -> !image_valid_obs
-    | true, Invalid  -> !image_unknown (** TODO change *)
-    | true, Timeout -> !image_timeout_obs
-    | true, Unknown -> !image_unknown_obs
-    | true, Failure -> !image_failure_obs
-    | true, HighFailure -> !image_failure_obs
+    | false, Done Call_provers.Valid -> !image_valid
+    | false, Done Call_provers.Invalid -> !image_unknown (** TODO change *)
+    | false, Done Call_provers.Timeout -> !image_timeout
+    | false, Done (Call_provers.Unknown _) -> !image_unknown
+    | false, Done (Call_provers.Failure _) -> !image_failure
+    | false, Done Call_provers.HighFailure -> !image_failure
+    | true, Done Call_provers.Valid -> !image_valid_obs
+    | true, Done Call_provers.Invalid -> !image_unknown_obs (** TODO change *)
+    | true, Done Call_provers.Timeout -> !image_timeout_obs
+    | true, Done (Call_provers.Unknown _) -> !image_unknown_obs
+    | true, Done (Call_provers.Failure _) -> !image_failure_obs
+    | true, Done Call_provers.HighFailure -> !image_failure_obs
 
   let set_row_status b row =
     if b then 
@@ -587,7 +581,8 @@ module Helpers = struct
 
   let rec check_goal_proved g =
     let b1 = Hashtbl.fold 
-      (fun _ a acc -> acc || a.status = Valid) g.external_proofs false
+      (fun _ a acc -> acc || a.status = Done Call_provers.Valid)
+        g.external_proofs false
     in
     let b = Hashtbl.fold 
       (fun _ t acc -> acc || t.transf_proved) g.transformations b1
@@ -858,15 +853,11 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
          if goal_obsolete && not o then Db.set_obsolete a;
          let obsolete = goal_obsolete or o in
          let s = match s with
-           | Db.Undone -> Model.HighFailure
-           | Db.Valid ->
+           | Db.Undone -> Model.Done Call_provers.HighFailure
+           | Db.Done Call_provers.Valid ->
                if not obsolete then proved := true;
-               Model.Valid
-           | Db.Invalid -> Model.Invalid
-           | Db.Unknown -> Model.Unknown
-           | Db.Timeout -> Model.Timeout
-           | Db.Failure -> Model.Failure
-           | Db.HighFailure -> Model.HighFailure
+               Model.Done Call_provers.Valid
+           | Db.Done a -> Model.Done a
          in
          let (_pa : Model.proof_attempt) =
            Helpers.add_external_proof_row ~obsolete ~edit goal p a s t
@@ -1084,15 +1075,9 @@ let callback_of_callback callback = function
   | Scheduler.Scheduled -> callback Model.Scheduled 0. ""
   | Scheduler.Running   -> callback Model.Running 0. ""
   | Scheduler.InternalFailure _ ->
-    callback Model.HighFailure 0. "Prover call failed"
+    callback (Model.Done Call_provers.HighFailure) 0. "Prover call failed"
   | Scheduler.Done r ->
-    let res = match r.Call_provers.pr_answer with
-      | Call_provers.Valid -> Model.Valid
-      | Call_provers.Timeout -> Model.Timeout
-      | Call_provers.Unknown _ -> Model.Unknown
-      | Call_provers.Invalid ->  Model.Invalid
-      | Call_provers.Failure _ -> Model.Failure
-      | Call_provers.HighFailure -> Model.HighFailure in
+    let res = Model.Done r.Call_provers.pr_answer in
     callback res r.Call_provers.pr_time r.Call_provers.pr_output
 
 (* q is a queue of proof attempt where to put the new one *)
@@ -1101,16 +1086,11 @@ let redo_external_proof q g a =
   let callback result time output =
     a.Model.output <- output;
     Helpers.set_proof_status ~obsolete:false a result time ;
-    if result = Model.Valid
+    if result = Model.Done Call_provers.Valid
     then Helpers.set_proved ~propagate:true a.Model.proof_goal;
     let db_res = match result with
       | Model.Scheduled | Model.Running -> Db.Undone
-      | Model.Valid -> Db.Valid
-      | Model.Invalid -> Db.Invalid
-      | Model.Unknown -> Db.Unknown
-      | Model.Timeout -> Db.Timeout
-      | Model.HighFailure -> Db.HighFailure
-      | Model.Failure -> Db.Failure
+      | Model.Done a -> Db.Done a
     in
     Db.set_status a.Model.proof_db db_res time
   in

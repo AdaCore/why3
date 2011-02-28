@@ -54,13 +54,8 @@ type transf
 (** status of an external proof attempt *)
 
 type proof_status =
-  | Undone (** external proof attempt no done yet *)
-  | Valid   (** external proof attempt succeeded *)
-  | Invalid (** external proof attempt found a counter-example *)
-  | Timeout (** external proof attempt was interrupted *)
-  | Unknown (** external prover answered ``don't know'' or equivalent *)
-  | Failure (** external prover call failed *)
-  | HighFailure (** external prover call failed *)
+  | Undone                      (** external proof attempt not done yet *)
+  | Done of Call_provers.prover_answer  (** external proof attempt done *)
 
 (** parent of a goal: either a theory (for "toplevel" goals)
     or a transformation (for "subgoals") *)

@@ -416,8 +416,8 @@ let () =
       begin begin match res with
         | B.Runned B.Done (ans,_) -> incr nb_done;
           begin match ans with
-            | Db.Valid -> incr nb_valid
-            | _     -> () end
+            | Db.Done Call_provers.Valid -> incr nb_valid
+            | _ -> () end
         | B.Runned B.InternalFailure _ -> incr nb_done; incr nb_failure
         | B.Cached (_,_) -> incr nb_cached
       end;
