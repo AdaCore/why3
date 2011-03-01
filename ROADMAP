@@ -39,6 +39,9 @@
 
   * Encodings and transformations (Andrei+Francois, CADE 2011, 
     deadline January 2011) DONE
+  * Why presentation at the IVL workshop of CADE:
+    (http://research.microsoft.com/en-us/um/people/moskal/boogie2011/)
+    deadline: May 1st
   * Caml code ?
   * logic language for talking to provers
   ** FOL + poly + alg + ind + rec ? + theories
@@ -58,16 +61,17 @@
 * IDE: implement "inline" (use transformation inline_goal)
   ** partially done
   ** problem 1: detect that transformation did nothing
+  ** problem 2: reimport form db does apply inline correctly
 
 * IDE: debug "hide proved goals" feature
+  ** suggested solution: replace model + filter_model by a custom model
 
 * IDE: ajouter "invalid" comme cas de resultats de preuve
   (utiliser call_provers.proof_result dans gmain)
+  DONE
 
-* IDE, file names in DB: use only file names relative to the db file (DONE)
 
-
-=== Roadmap for second release, as early as possible in 2011 ================
+=== Roadmap for second release 0.64 ================
 
 * fix local installation
   ** fix local executables names (DONE)
@@ -83,6 +87,8 @@
      why.conf if they correspond to the default value.
 
 
+* IDE, file names in DB: use only file names relative to the db file 
+  DONE
 
 === Roadmap for December 2010 ================================================
 

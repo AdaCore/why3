@@ -468,15 +468,6 @@ let transf_from_name n =
   with Not_found -> TransfId.add db n
 
 
-let status_array = [|
-  Undone;
-  Done Call_provers.Valid;
-  Done Call_provers.Timeout;
-  Done (Call_provers.Unknown "");
-  Done (Call_provers.Failure "");
-  Done Call_provers.Invalid;
-  Done Call_provers.HighFailure; |]
-
 let int64_from_status = function
   | Undone                        -> 0L
   | Done Call_provers.Valid       -> 1L
@@ -486,6 +477,14 @@ let int64_from_status = function
   | Done Call_provers.Invalid     -> 5L
   | Done Call_provers.HighFailure -> 6L
 
+let status_array = [|
+  Undone;
+  Done Call_provers.Valid;
+  Done Call_provers.Timeout;
+  Done (Call_provers.Unknown "");
+  Done (Call_provers.Failure "");
+  Done Call_provers.Invalid;
+  Done Call_provers.HighFailure; |]
 
 let status_from_int64 i =
   try

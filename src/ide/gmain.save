@@ -227,6 +227,17 @@ let read_file fn =
 
 module Model = struct
 
+(* TODO: remove, see below *)
+(*
+  type proof_attempt_status =
+    | Scheduled (** external proof attempt is scheduled *)
+    | Running (** external proof attempt is in progress *)
+    | Success (** external proof attempt succeeded *)
+    | Timeout (** external proof attempt was interrupted *)
+    | Unknown (** external prover answered ``don't know'' or equivalent *)
+    | HighFailure (** external prover call failed *)
+*)
+
   type proof_attempt =
       { prover : prover_data;
         proof_goal : goal;
@@ -497,16 +508,9 @@ let task_checksum t =
   fprintf str_formatter "%a@." Pretty.print_task t;
   let s = flush_str_formatter () in
 (*
-  let tmp = Filename.temp_file "task" "out" in
-  let c = open_out tmp in
-  output_string c s;
-  close_out c;
+  eprintf "task = %s@." s;
 *)
-  let sum = Digest.to_hex (Digest.string s) in
-(*
-  eprintf "task %s, sum = %s@." tmp sum;
-*)
-  sum
+  Digest.to_hex (Digest.string s)
 
 
 let info_window ?(callback=(fun () -> ())) mt s =
@@ -539,19 +543,20 @@ module Helpers = struct
     | Scheduled -> !image_scheduled
     | Running -> !image_running
     | InternalFailure _ -> !image_failure
-    | Done r -> match r.Call_provers.pr_answer with
-	| Call_provers.Valid -> 
-	    if obsolete then !image_valid else !image_valid_obs
-	| Call_provers.Invalid -> 
-	    if obsolete then !image_invalid else !image_invalid_obs
-	| Call_provers.Timeout -> 
-	    if obsolete then !image_timeout else !image_timeout_obs
-	| Call_provers.Unknown _ -> 
-	    if obsolete then !image_unknown else !image_unknown_obs
-	| Call_provers.Failure _ -> 
-	    if obsolete then !image_failure else !image_failure_obs
-	| Call_provers.HighFailure -> 
-	    if obsolete then !image_failure else !image_failure_obs
+    | Done r ->
+	match obsolete,r.Call_provers.pr_answer with
+	  | false, Call_provers.Valid -> !image_valid
+	  | false, Call_provers.Invalid -> !image_invalid
+	  | false, Call_provers.Timeout -> !image_timeout
+	  | false, Call_provers.Unknown _ -> !image_unknown
+	  | false, Call_provers.Failure _ -> !image_failure
+	  | false, Call_provers.HighFailure -> !image_failure
+	  | true, Call_provers.Valid -> !image_invalid_obs
+	  | true, Call_provers.Invalid -> !image_invalid_obs
+	  | true, Call_provers.Timeout -> !image_timeout_obs
+	  | true, Call_provers.Unknown _ -> !image_unknown_obs
+	  | true, Call_provers.Failure _ -> !image_failure_obs
+	  | true, Call_provers.HighFailure -> !image_failure_obs
 
   let set_row_status b row =
     if b then 
@@ -849,8 +854,7 @@ let apply_trans t task =
 
 let split_transformation = Trans.lookup_transform_l "split_goal" gconfig.env
 let inline_transformation = Trans.lookup_transform "inline_goal" gconfig.env
-let intro_transformation = Trans.lookup_transform "introduce_premises"
-  gconfig.env
+let intro_transformation = Trans.lookup_transform "introduce_premises" gconfig.env
 
 let rec reimport_any_goal parent gname t db_goal goal_obsolete =
   let goal = Helpers.add_goal_row parent gname t db_goal in
@@ -866,10 +870,12 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
          let obsolete = goal_obsolete or o in
          let s = match s with
            | Db.Undone -> Call_provers.HighFailure
-           | Db.Done r ->
-	       if r = Call_provers.Valid then
-		 if not obsolete then proved := true;
-	       r
+           | Db.Success ->
+               if not obsolete then proved := true;
+               Call_provers.Valid
+           | Db.Unknown -> Call_provers.Unknown ""
+           | Db.Timeout -> Call_provers.Timeout
+           | Db.Failure -> Call_provers.Failure ""
          in
 	 let r = { Call_provers.pr_answer = s;
 		   Call_provers.pr_output = "";
@@ -1094,25 +1100,20 @@ let callback_of_callback callback = function
   | Scheduler.Scheduled -> callback Model.Scheduled 0. ""
   | Scheduler.Running   -> callback Model.Running 0. ""
   | Scheduler.InternalFailure _ ->
-    callback (Model.Done Call_provers.HighFailure) 0. "Prover call failed"
+    callback Model.HighFailure 0. "Prover call failed"
   | Scheduler.Done r ->
-    let res = Model.Done r.Call_provers.pr_answer in
+    let res = match r.Call_provers.pr_answer with
+      | Call_provers.Valid -> Model.Success
+      | Call_provers.Timeout -> Model.Timeout
+      | Call_provers.Unknown _ | Call_provers.Invalid -> Model.Unknown
+      | Call_provers.Failure _ | Call_provers.HighFailure ->
+        Model.HighFailure in
     callback res r.Call_provers.pr_time r.Call_provers.pr_output
 *)
 
 (* q is a queue of proof attempt where to put the new one *)
 let redo_external_proof q g a =
   let p = a.Model.prover in
-(*
-  let callback result time output =
-    a.Model.output <- output;
-    Helpers.set_proof_status ~obsolete:false a result time ;
-    if result = Model.Done Call_provers.Valid
-    then Helpers.set_proved ~propagate:true a.Model.proof_goal;
-    let db_res = match result with
-      | Model.Scheduled | Model.Running -> Db.Undone
-      | Model.Done a -> Db.Done a
-*)
   let callback result (* time output *) =
 (* useless: done by set_proof_status
     a.Model.proof_state <- result;
@@ -1120,14 +1121,20 @@ let redo_external_proof q g a =
     Helpers.set_proof_state ~obsolete:false a result (*time*) ;
     let db_res, time = 
       match result with
-	| Scheduler.Scheduled | Scheduler.Running -> 
-	    Db.Undone, 0.0
-	| Scheduler.InternalFailure _ -> 
-	    Db.Done Call_provers.HighFailure, 0.0
+	| Scheduler.Scheduled | Scheduler.Running -> Db.Undone, 0.0
+	| Scheduler.InternalFailure _ -> Db.Failure, 0.0
 	| Scheduler.Done r ->
-	    if r.Call_provers.pr_answer = Call_provers.Valid then
-	      Helpers.set_proved ~propagate:true a.Model.proof_goal;
-	    Db.Done r.Call_provers.pr_answer, r.Call_provers.pr_time
+	    let res = 
+	      match r.Call_provers.pr_answer with
+		| Call_provers.Valid -> 
+		    Helpers.set_proved ~propagate:true a.Model.proof_goal;
+		    Db.Success
+		| Call_provers.Unknown _ -> Db.Unknown
+		| Call_provers.Invalid -> Db.Invalid
+		| Call_provers.Timeout -> Db.Timeout
+		| Call_provers.Failure _ -> Db.Failure
+		| Call_provers.HighFailure -> Db.Failure
+	    in res, r.Call_provers.pr_time
     in
     Db.set_status a.Model.proof_db db_res time
   in
@@ -1971,8 +1978,7 @@ let confirm_remove_row r =
 	info_window
 	  ~callback:(fun () -> remove_transf tr)
 	  `QUESTION
-	  "Do you really want to remove the selected transformation
-and all its subgoals?"
+	  "Do you really want to remove the selected transformation and all its subgoals?"
 
 let confirm_remove_selection () =
   match goals_view#selection#get_selected_rows with

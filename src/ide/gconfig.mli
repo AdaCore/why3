@@ -73,10 +73,12 @@ val image_remove : GdkPixbuf.pixbuf ref
 val image_scheduled : GdkPixbuf.pixbuf ref
 val image_running : GdkPixbuf.pixbuf ref
 val image_valid : GdkPixbuf.pixbuf ref
+val image_invalid : GdkPixbuf.pixbuf ref
 val image_timeout : GdkPixbuf.pixbuf ref
 val image_unknown : GdkPixbuf.pixbuf ref
 val image_failure : GdkPixbuf.pixbuf ref
 val image_valid_obs : GdkPixbuf.pixbuf ref
+val image_invalid_obs : GdkPixbuf.pixbuf ref
 val image_timeout_obs : GdkPixbuf.pixbuf ref
 val image_unknown_obs : GdkPixbuf.pixbuf ref
 val image_failure_obs : GdkPixbuf.pixbuf ref
