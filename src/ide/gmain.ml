@@ -501,9 +501,16 @@ let task_checksum t =
   fprintf str_formatter "%a@." Pretty.print_task t;
   let s = flush_str_formatter () in
 (*
-  eprintf "task = %s@." s;
+  let tmp = Filename.temp_file "task" "out" in
+  let c = open_out tmp in
+  output_string c s;
+  close_out c;
 *)
-  Digest.to_hex (Digest.string s)
+  let sum = Digest.to_hex (Digest.string s) in
+(*
+  eprintf "task %s, sum = %s@." tmp sum;
+*)
+  sum
 
 
 let info_window ?(callback=(fun () -> ())) mt s =
