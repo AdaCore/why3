@@ -59,11 +59,13 @@ let compile_match = Trans.fold comp None
 type state = {
   mt_map : lsymbol Mts.t;       (* from type symbols to selector functions *)
   pj_map : lsymbol list Mls.t;  (* from constructors to projections *)
+  tp_map : (tysymbol * lsymbol list) Mid.t; (* skipped tuple symbols *)
 }
 
 let empty_state = {
   mt_map = Mts.empty;
   pj_map = Mls.empty;
+  tp_map = Mid.empty;
 }
 
 let uncompiled = "eliminate_algebraic: compile_match required"
@@ -220,7 +222,7 @@ let add_type (state, task) ts csl =
   let enum = List.for_all (fun ls -> ls.ls_args = []) csl in
   let task = if enum then add_meta task meta_enum [MAts ts] else task in
   (* return the updated state and task *)
-  { mt_map = mtmap; pj_map = pjmap }, task
+  { state with mt_map = mtmap; pj_map = pjmap }, task
 
 let comp t (state,task) = match t.task_decl.td_node with
   | Decl { d_node = Dtype dl } ->
@@ -239,6 +241,22 @@ let comp t (state,task) = match t.task_decl.td_node with
       state, add_decl task (decl_map fnT fnF d)
   | _ ->
       state, add_tdecl task t.task_decl
+
+let comp t (state,task) = match t.task_decl.td_node with
+  | Decl { d_node = Dtype [ts, Talgebraic csl] } when is_ts_tuple ts ->
+      let tp_map = Mid.add ts.ts_name (ts,csl) state.tp_map in
+      { state with tp_map = tp_map }, task
+  | Decl d ->
+      let rstate,rtask = ref state, ref task in
+      let add _ (ts,csl) () =
+        let task = add_ty_decl !rtask [ts,Tabstract] in
+        let state,task = add_type (!rstate,task) ts csl in
+        rstate := state ; rtask := task ; None
+      in
+      let tp_map = Mid.diff add state.tp_map d.d_syms in
+      comp t ({ !rstate with tp_map = tp_map }, !rtask)
+  | _ ->
+      comp t (state,task)
 
 let eliminate_compiled_algebraic = Trans.fold_map comp empty_state None
 

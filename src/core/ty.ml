@@ -235,5 +235,5 @@ let ts_tuple = Util.memo_int 17 (fun n ->
 
 let ty_tuple tyl = ty_app (ts_tuple (List.length tyl)) tyl
 
-let is_ts_tuple ts = ts == ts_tuple (List.length ts.ts_args)
+let is_ts_tuple ts = ts_equal ts (ts_tuple (List.length ts.ts_args))
 
