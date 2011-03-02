@@ -95,9 +95,12 @@ let rec rewriteT kn state t = match t.t_node with
         | Tyapp (ts,_) -> ts
         | _ -> Printer.unsupportedTerm t uncompiled
       in
-      let tl = List.map find (find_constructors kn ts) in
-      t_app (Mts.find ts state.mt_map) (t1::tl) t.t_ty
-  | _ -> t_map (rewriteT kn state) (rewriteF kn state Svs.empty true) t
+      begin match List.map find (find_constructors kn ts) with
+        | [t] -> t
+        | tl  -> t_app (Mts.find ts state.mt_map) (t1::tl) t.t_ty
+      end
+  | _ ->
+      t_map (rewriteT kn state) (rewriteF kn state Svs.empty true) t
 
 and rewriteF kn state av sign f = match f.f_node with
   | Fcase (t1,bl) ->
@@ -156,12 +159,11 @@ and rewriteF kn state av sign f = match f.f_node with
   | _ ->
       f_map_sign (rewriteT kn state) (rewriteF kn state Svs.empty) sign f
 
-let add_selector (state,task) ts csl =
+let add_selector (state,task) ts ty csl =
   (* declare the selector function *)
   let mt_id = id_derive ("match_" ^ ts.ts_name.id_string) ts.ts_name in
-  let mt_hd = ty_app ts (List.map ty_var ts.ts_args) in
   let mt_ty = ty_var (create_tvsymbol (id_fresh "a")) in
-  let mt_al = mt_hd :: List.rev_map (fun _ -> mt_ty) csl in
+  let mt_al = ty :: List.rev_map (fun _ -> mt_ty) csl in
   let mt_ls = create_fsymbol mt_id mt_al mt_ty in
   let mtmap = Mts.add ts mt_ls state.mt_map in
   let task  = add_decl task (create_logic_decl [mt_ls, None]) in
@@ -182,7 +184,11 @@ let add_selector (state,task) ts csl =
   let task = List.fold_left2 mt_add task csl mt_tl in
   { state with mt_map = mtmap }, task
 
-let add_projections (state,task) ts csl =
+let add_selector (state,task) ts ty = function
+  | [_] -> state, task
+  | csl -> add_selector (state,task) ts ty csl
+
+let add_projections (state,task) _ts _ty csl =
   (* declare and define the projection functions *)
   let pj_add (m,tsk) cs =
     let id = cs.ls_name.id_string ^ "_proj_" in
@@ -206,17 +212,16 @@ let add_projections (state,task) ts csl =
   let pjmap, task = List.fold_left pj_add (state.pj_map, task) csl in
   { state with pj_map = pjmap }, task
 
-let add_inversion (state,task) ts csl =
+let add_inversion (state,task) ts ty csl =
   (* add the inversion axiom *)
   let ax_id = ts.ts_name.id_string ^ "_inversion" in
   let ax_pr = create_prsymbol (id_derive ax_id ts.ts_name) in
-  let mt_hd = ty_app ts (List.map ty_var ts.ts_args) in
-  let ax_vs = create_vsymbol (id_fresh "u") mt_hd in
+  let ax_vs = create_vsymbol (id_fresh "u") ty in
   let ax_hd = t_var ax_vs in
   let mk_cs cs =
     let pjl = Mls.find cs state.pj_map in
     let app pj = t_app_infer pj [ax_hd] in
-    f_equ ax_hd (t_app cs (List.map app pjl) mt_hd)
+    f_equ ax_hd (t_app cs (List.map app pjl) ty)
   in
   let ax_f = map_join_left mk_cs f_or csl in
   let ax_f = f_forall_close [ax_vs] [] ax_f in
@@ -228,9 +233,10 @@ let add_type (state,task) ts csl =
   let cs_add tsk cs = add_decl tsk (create_logic_decl [cs, None]) in
   let task = List.fold_left cs_add task csl in
   (* add selector, projections, and inversion axiom *)
-  let state,task = add_selector (state,task) ts csl in
-  let state,task = add_projections (state,task) ts csl in
-  let state,task = add_inversion (state,task) ts csl in
+  let ty = ty_app ts (List.map ty_var ts.ts_args) in
+  let state,task = add_selector (state,task) ts ty csl in
+  let state,task = add_projections (state,task) ts ty csl in
+  let state,task = add_inversion (state,task) ts ty csl in
   (* add the tag for enumeration if the type is one *)
   let enum = List.for_all (fun ls -> ls.ls_args = []) csl in
   let task = if enum then add_meta task meta_enum [MAts ts] else task in
