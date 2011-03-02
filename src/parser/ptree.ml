@@ -56,6 +56,7 @@ and pat_desc =
   | PPpwild
   | PPpvar of ident
   | PPpapp of qualid * pattern list
+  | PPprec of (qualid * pattern) list
   | PPptuple of pattern list
   | PPpor of pattern * pattern
   | PPpas of pattern * ident

@@ -397,7 +397,7 @@ typedefn:
 ;
 
 record_type:
-| LEFTREC list1_record_field opt_semicolon RIGHTREC { $2 }
+| LEFTREC list1_record_field opt_semicolon RIGHTREC { List.rev $2 }
 ;
 
 list1_record_field:
@@ -703,6 +703,16 @@ pat_arg:
 | uqualid                   { mk_pat (PPpapp ($1, [])) }
 | LEFTPAR RIGHTPAR          { mk_pat (PPptuple []) }
 | LEFTPAR pattern RIGHTPAR  { $2 }
+| LEFTREC pfields RIGHTREC  { mk_pat (PPprec $2) }
+;
+
+pfields:
+| pat_field opt_semicolon       { [$1] }
+| pat_field SEMICOLON pfields   { $1::$3 }
+;
+
+pat_field:
+| lqualid EQUAL pattern   { ($1, $3) }
 ;
 
 /* Parameters */

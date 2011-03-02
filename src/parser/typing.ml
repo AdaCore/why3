@@ -116,6 +116,9 @@ let term_expected_type ~loc ty1 ty2 =
     "@[This term has type %a@ but is expected to have type@ %a@]"
     print_dty ty1 print_dty ty2
 
+let unify_raise ~loc ty1 ty2 =
+  if not (unify ty1 ty2) then term_expected_type ~loc ty1 ty2
+
 (** Destructive typing environment, that is
     environment + local variables.
     It is only local to this module and created with [create_denv] below. *)
@@ -258,6 +261,80 @@ let is_psymbol p uc =
   let s = find_lsymbol p uc in
   s.ls_value = None
 
+(* [is_projection uc ls] returns
+   - [Some (ts, lsc, i)] if [ls] is the i-th projection of an
+     algebraic datatype [ts] with only one constructor [lcs]
+   - [None] otherwise
+ *)
+let is_projection uc ls =
+  try
+    let ts,tl = match ls.ls_args, ls.ls_value with
+      | [{ty_node = Ty.Tyapp (ts, tl)}], Some _ -> ts,tl
+      | _ -> (* not a function with 1 argument *) raise Exit
+    in
+    ignore (List.fold_left (fun tvs t -> match t.ty_node with
+      | Ty.Tyvar tv -> Stv.add_new tv Exit tvs
+      | _ -> (* not a generic type *) raise Exit) Stv.empty tl);
+    let kn = get_known uc in
+    let lsc = match Decl.find_constructors kn ts with
+      | [lsc] -> lsc
+      | _ -> (* 0 or several constructors *) raise Exit
+    in
+    let def = match Decl.find_logic_definition kn ls with
+      | Some def -> def
+      | None -> (* no definition *) raise Exit
+    in
+    let v, t = match Decl.open_fs_defn def with
+      | [v], t -> v, t
+      | _ -> assert false
+    in
+    let b = match t.t_node with
+      | Tcase ({t_node=Term.Tvar v'}, [b]) when vs_equal v' v -> b
+      | _ -> raise Exit
+    in
+    let p, t = t_open_branch b in
+    let pl = match p with
+      | { pat_node = Term.Papp (lsc', pl) } when ls_equal lsc lsc' -> pl
+      | _ -> raise Exit
+    in
+    let i = match t.t_node with
+      | Term.Tvar xi ->
+	  let rec index i = function
+	    | [] -> raise Exit
+	    | { pat_node = Term.Pvar v} :: _ when vs_equal v xi -> i
+	    | _ :: l -> index (i+1) l
+	  in
+	  index 0 pl
+      | _ ->
+	  raise Exit
+    in
+    Some (ts, lsc, i)
+  with Exit ->
+    None
+
+let list_fields uc fl =
+  let type_field (q, e) =
+    let loc = qloc q in
+    let ls = find_lsymbol q uc in
+    match is_projection uc ls with
+      | None -> errorm ~loc "this is not a record field"
+      | Some pr -> pr, loc, e
+  in
+  let fl = List.map type_field fl in
+  let (ts,cs,_),_,_ = List.hd fl in
+  let n = List.length cs.ls_args in
+  let args = Array.create n None in
+  let check_field ((ts',_,i),loc,e) =
+    if not (ts_equal ts' ts) then
+      errorm ~loc "this should be a field for type %a" Pretty.print_ts ts;
+    assert (0 <= i && i < n);
+    if args.(i) <> None then
+      errorm ~loc "this record field is defined several times";
+    args.(i) <- Some (loc,e);
+  in
+  List.iter check_field fl;
+  ts,cs,Array.to_list args
+
 
 (** Typing types *)
 
@@ -284,6 +361,7 @@ let check_pat_linearity p =
     | PPpwild -> ()
     | PPpvar id -> add id
     | PPpapp (_, pl) | PPptuple pl -> List.iter check pl
+    | PPprec pfl -> List.iter (fun (_,p) -> check p) pfl
     | PPpas (p, id) -> check p; add id
     | PPpor (p, _) -> check p
   in
@@ -309,6 +387,20 @@ and dpat_node loc env = function
       let s, tyl, ty = specialize_fsymbol x env.uc in
       let env, pl = dpat_args s.ls_name loc env tyl pl in
       env, Papp (s, pl), ty
+  | PPprec fl ->
+      let renv = ref env in
+      let _,cs,fl = list_fields env.uc fl in
+      let tyl,ty = Denv.specialize_lsymbol ~loc cs in
+      let al = List.map2 (fun f ty -> match f with
+        | Some (_,e) ->
+            let loc = e.pat_loc in
+            let env,e = dpat !renv e in
+            unify_raise ~loc e.dp_ty ty;
+            renv := env;
+            e
+        | None -> { dp_node = Pwild; dp_ty = ty }) fl tyl
+      in
+      !renv, Papp (cs,al), Util.of_option ty
   | PPptuple pl ->
       let n = List.length pl in
       let s = fs_tuple n in
@@ -323,8 +415,7 @@ and dpat_node loc env = function
   | PPpor (p, q) ->
       let env, p = dpat env p in
       let env, q = dpat env q in
-      if not (unify p.dp_ty q.dp_ty)
-        then term_expected_type ~loc p.dp_ty q.dp_ty;
+      unify_raise ~loc p.dp_ty q.dp_ty;
       env, Por (p,q), p.dp_ty
 
 and dpat_args s loc env el pl =
@@ -336,7 +427,7 @@ and dpat_args s loc env el pl =
     | a :: al, p :: pl ->
 	let loc = p.pat_loc in
 	let env, p = dpat env p in
-	if not (unify a p.dp_ty) then term_expected_type ~loc p.dp_ty a;
+	unify_raise ~loc p.dp_ty a;
 	let env, pl = check_arg env (al, pl) in
 	env, p :: pl
     | _ ->
@@ -365,54 +456,6 @@ let apply_highord loc x tl = match List.rev tl with
   | a::[] -> [{pp_loc = loc; pp_desc = PPvar x}; a]
   | a::tl -> [{pp_loc = loc; pp_desc = PPapp (x, List.rev tl)}; a]
   | [] -> assert false
-
-(* [is_projection uc ls] returns
-   - [Some (ts, lsc, i)] if [ls] is the i-th projection of an
-     algebraic datatype [ts] with only one constructor [lcs]
-   - [None] otherwise 
- *)
-let is_projection uc ls = 
-  try
-    let ts = match ls.ls_args, ls.ls_value with
-      | [{ty_node = Ty.Tyapp (ts, _)}], Some _ -> ts
-      | _ -> (* not a function with 1 argument *) raise Exit
-    in
-    let kn = get_known uc in
-    let lsc = match Decl.find_constructors kn ts with
-      | [lsc] -> lsc
-      | _ -> (* 0 or several constructors *) raise Exit
-    in
-    let def = match Decl.find_logic_definition kn ls with
-      | Some def -> def
-      | None -> (* no definition *) raise Exit
-    in
-    let v, t = match Decl.open_fs_defn def with
-      | [v], t -> v, t
-      | _ -> assert false
-    in
-    let b = match t.t_node with
-      | Tcase ({t_node=Term.Tvar v'}, [b]) when vs_equal v' v -> b
-      | _ -> raise Exit
-    in
-    let p, t = t_open_branch b in
-    let pl = match p with
-      | { pat_node = Term.Papp (lsc', pl) } when ls_equal lsc lsc' -> pl
-      | _ -> raise Exit
-    in
-    let i = match t.t_node with 
-      | Term.Tvar xi -> 
-	  let rec index i = function 
-	    | [] -> raise Exit
-	    | { pat_node = Term.Pvar v} :: _ when vs_equal v xi -> i
-	    | _ :: l -> index (i+1) l
-	  in
-	  index 0 pl
-      | _ -> 
-	  raise Exit
-    in
-    Some (ts, lsc, i)
-  with Exit ->
-    None
 
 let rec dterm ?(localize=false) env { pp_loc = loc; pp_desc = t } =
   let n, ty = dterm_node ~localize loc env t in
@@ -472,7 +515,7 @@ and dterm_node ~localize loc env = function
         let env, p = dpat_list env ty1 p in
         let loc = e.pp_loc in
 	let e = dterm ~localize env e in
-	if not (unify e.dt_ty tb) then term_expected_type ~loc e.dt_ty tb;
+	unify_raise ~loc e.dt_ty tb;
         p, e
       in
       let bl = List.map branch bl in
@@ -485,14 +528,13 @@ and dterm_node ~localize loc env = function
       let loc = e1.pp_loc in
       let e1 = dterm ~localize env e1 in
       let ty = dty env ty in
-      if not (unify e1.dt_ty ty) then term_expected_type ~loc e1.dt_ty ty;
+      unify_raise ~loc e1.dt_ty ty;
       e1.dt_node, ty
   | PPif (e1, e2, e3) ->
       let loc = e3.pp_loc in
       let e2 = dterm ~localize env e2 in
       let e3 = dterm ~localize env e3 in
-      if not (unify e2.dt_ty e3.dt_ty) then
-        term_expected_type ~loc e3.dt_ty e2.dt_ty;
+      unify_raise ~loc e3.dt_ty e2.dt_ty;
       Tif (dfmla ~localize env e1, e2, e3), e2.dt_ty
   | PPeps (x, ty, e1) ->
       let ty = dty env ty in
@@ -558,44 +600,17 @@ and dterm_node ~localize loc env = function
       in
       Teps (id, ty, Fquant (Fforall, uqu, trl, f)), ty
   | PPrecord fl ->
-      let type_field (q, e) = 
-	let loc = qloc q in
-	let ls, tyl, ty = specialize_fsymbol q env.uc in
-	match is_projection env.uc ls, tyl with
-	  | None, _ -> 
-	      errorm ~loc "this is not a record field"
-	  | Some (ts, ls, i), [tya] -> 
-	      let loce = e.pp_loc in
-	      let e = dterm ~localize env e in
-	      if not (unify e.dt_ty ty) then 
-		term_expected_type ~loc:loce e.dt_ty ty;
-	      ts, (loc, ls, i, tya), e
-	  | _ -> 
-	      assert false
+      let _,cs,fl = list_fields env.uc fl in
+      let tyl,ty = Denv.specialize_lsymbol ~loc cs in
+      let al = List.map2 (fun f ty -> match f with
+        | Some (_,e) ->
+            let loc = e.pp_loc in
+            let e = dterm ~localize env e in
+            unify_raise ~loc e.dt_ty ty;
+            e
+        | None -> errorm ~loc "some record fields are missing") fl tyl
       in
-      let fl = List.map type_field fl in
-      let ts,(_,ls,_,ty),_ = match fl with [] -> assert false | x :: _ -> x in
-      let args = Array.create (List.length ls.ls_args) None in
-      let check_field (ts', (loc, _, i, tye), e) = 
-	if not (ts_equal ts' ts) then 
-	  errorm ~loc "this should be a field for type %a" Pretty.print_ts ts;
-	assert (0 <= i && i < Array.length args);
-	if args.(i) <> None then
-	  errorm ~loc "this record field is defined several times";
-	args.(i) <- Some e;
-	if not (unify tye ty) then 
-	  errorm ~loc 
-	    "@[this is a field for type %a,@ \
-               but a field for type %a is expected@]"
-	    print_dty tye print_dty ty
-      in
-      List.iter check_field fl;
-      let add_arg e acc = match e with
-	| None -> errorm ~loc "some record fields are missing"
-	| Some e -> e :: acc
-      in
-      let fl = Array.fold_right add_arg args [] in
-      Tapp (ls, fl), ty
+      Tapp (cs,al), Util.of_option ty
   | PPquant _ | PPbinop _ | PPunop _ | PPfalse | PPtrue ->
       error ~loc TermExpected
 
@@ -687,8 +702,7 @@ and dpat_list env ty p =
   check_pat_linearity p;
   let loc = p.pat_loc in
   let env, p = dpat env p in
-  if not (unify p.dp_ty ty)
-    then term_expected_type ~loc p.dp_ty ty;
+  unify_raise ~loc p.dp_ty ty;
   env, p
 
 and dtype_args s loc env el tl =
@@ -700,7 +714,7 @@ and dtype_args s loc env el tl =
     | a :: al, t :: bl ->
 	let loc = t.pp_loc in
 	let t = dterm env t in
-	if not (unify a t.dt_ty) then term_expected_type ~loc t.dt_ty a;
+	unify_raise ~loc t.dt_ty a;
 	t :: check_arg (al, bl)
     | _ ->
 	assert false
@@ -944,8 +958,7 @@ let add_logics dl th =
 	      let loc = t.pp_loc in
 	      let ty = dty denv ty in
 	      let t = dterm denv t in
-	      if not (unify t.dt_ty ty) then
-		term_expected_type ~loc t.dt_ty ty;
+	      unify_raise ~loc t.dt_ty ty;
               let vl = match fs.ls_value with
                 | Some _ -> mk_vlist fs.ls_args
                 | _ -> assert false

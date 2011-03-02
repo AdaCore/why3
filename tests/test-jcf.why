@@ -11,7 +11,12 @@ theory Records
     type t 'a 'b = {| a : 'a; b : list 'b; |}
   end
 
-  goal g1 : let t = {| b = Cons True Nil; a = 1; |} in t.R.a = 1
+  goal g1 :
+    let t = {| b = Cons True Nil; a = 1; |} in
+    match t with
+    | {| R.b = Cons x _ |} -> x = True
+    | {| a = a |} -> a = 1
+    end
 
 end
 
