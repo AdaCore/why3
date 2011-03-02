@@ -188,6 +188,31 @@ let add_selector (state,task) ts ty = function
   | [_] -> state, task
   | csl -> add_selector (state,task) ts ty csl
 
+let add_indexer (state,task) ts ty csl =
+  (* declare the indexer function *)
+  let mt_id = id_derive ("index_" ^ ts.ts_name.id_string) ts.ts_name in
+  let mt_ls = create_fsymbol mt_id [ty] ty_int in
+  let task  = add_decl task (create_logic_decl [mt_ls, None]) in
+  (* define the indexer function *)
+  let index = ref (-1) in
+  let mt_add tsk cs =
+    incr index;
+    let id = mt_ls.ls_name.id_string ^ "_" ^ cs.ls_name.id_string in
+    let pr = create_prsymbol (id_derive id cs.ls_name) in
+    let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
+    let hd = t_app cs (List.rev_map t_var vl) (of_option cs.ls_value) in
+    let ix = t_const (ConstInt (string_of_int !index)) in
+    let ax = f_equ (t_app mt_ls [hd] ty_int) ix in
+    let ax = f_forall_close (List.rev vl) [[Term hd]] ax in
+    add_decl tsk (create_prop_decl Paxiom pr ax)
+  in
+  let task = List.fold_left mt_add task csl in
+  state, task
+
+let add_indexer (state,task) ts ty = function
+  | [_] -> state, task
+  | csl -> add_indexer (state,task) ts ty csl
+
 let add_projections (state,task) _ts _ty csl =
   (* declare and define the projection functions *)
   let pj_add (m,tsk) cs =
@@ -235,6 +260,7 @@ let add_type (state,task) ts csl =
   (* add selector, projections, and inversion axiom *)
   let ty = ty_app ts (List.map ty_var ts.ts_args) in
   let state,task = add_selector (state,task) ts ty csl in
+  let state,task = add_indexer (state,task) ts ty csl in
   let state,task = add_projections (state,task) ts ty csl in
   let state,task = add_inversion (state,task) ts ty csl in
   (* add the tag for enumeration if the type is one *)
