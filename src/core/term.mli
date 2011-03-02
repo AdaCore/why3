@@ -304,8 +304,10 @@ val f_iff_simp : fmla -> fmla -> fmla
 val f_not_simp : fmla -> fmla
 val t_if_simp : fmla -> term -> term -> term
 val f_if_simp : fmla -> fmla -> fmla -> fmla
+val t_let_simp : term -> term_bound -> term
 val f_let_simp : term -> fmla_bound -> fmla
 
+val t_let_close_simp : vsymbol -> term -> term -> term
 val f_let_close_simp : vsymbol -> term -> fmla -> fmla
 val f_quant_close_simp : quant -> vsymbol list -> trigger list -> fmla -> fmla
 val f_forall_close_simp : vsymbol list -> trigger list -> fmla -> fmla

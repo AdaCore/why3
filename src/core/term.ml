@@ -1855,20 +1855,34 @@ let f_if_simp f1 f2 f3 = match f1.f_node, f2.f_node, f3.f_node with
   | _, _, Ffalse -> f_and_simp f1 f2
   | _, _, _      -> if f_equal f2 f3 then f2 else f_if f1 f2 f3
 
-let f_let_simp t ((_,_,f) as bf) = match f.f_node with
-  | Ftrue | Ffalse -> f | _ -> f_let t bf
+let t_let_simp e ((v,_,t) as bt) = match e.t_node with
+  | _ when not (Svs.mem v t.t_vars) -> t
+  | Tvar _ -> t_subst_single v e t
+  | _ -> t_let e bt
 
-let f_let_close_simp v t f = match f.f_node with
-  | Ftrue | Ffalse -> f | _ -> f_let_close v t f
+let f_let_simp e ((v,_,f) as bf) = match e.t_node with
+  | _ when not (Svs.mem v f.f_vars) -> f
+  | Tvar _ -> f_subst_single v e f
+  | _ -> f_let e bf
 
-let f_quant_simp q ((_,_,_,f) as qf) = match f.f_node with
-  | Ftrue | Ffalse -> f | _ -> f_quant q qf
+let t_let_close_simp v e t = t_let_simp e (t_close_bound v t)
+let f_let_close_simp v e f = f_let_simp e (f_close_bound v f)
+
+let f_quant_simp q ((vl,_,tl,f) as qf) =
+  if List.for_all (fun v -> Svs.mem v f.f_vars) vl then
+    f_quant q qf
+  else
+    let vl = List.filter (fun v -> Svs.mem v f.f_vars) vl in
+    let e_vars = e_apply (fun t -> t.t_vars) (fun f -> f.f_vars) in
+    let tl = List.filter
+      (List.for_all (fun e -> Svs.subset (e_vars e) f.f_vars)) tl
+    in
+    f_quant_close q vl tl f
 
 let f_forall_simp = f_quant_simp Fforall
 let f_exists_simp = f_quant_simp Fexists
 
-let f_quant_close_simp q vl tl f = match f.f_node with
-  | Ftrue | Ffalse -> f | _ -> f_quant_close q vl tl f
+let f_quant_close_simp q vl tl f = f_quant_simp q (f_close_quant vl tl f)
 
 let f_forall_close_simp = f_quant_close_simp Fforall
 let f_exists_close_simp = f_quant_close_simp Fexists

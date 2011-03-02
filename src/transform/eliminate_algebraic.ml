@@ -79,7 +79,7 @@ let rec rewriteT kn state t = match t.t_node with
         match p with
         | { pat_node = Papp (cs,pl) } ->
             let add_var e p pj = match p.pat_node with
-              | Pvar v -> t_let_close v (t_app pj [t1] v.vs_ty) e
+              | Pvar v -> t_let_close_simp v (t_app pj [t1] v.vs_ty) e
               | _ -> Printer.unsupportedTerm t uncompiled
             in
             let pjl = Mls.find cs state.pj_map in
@@ -130,7 +130,7 @@ and rewriteF kn state av sign f = match f.f_node with
         let hd = t_app cs (List.map t_var vl) t1.t_ty in
         match t1.t_node with
         | Tvar v when Svs.mem v av ->
-            let hd = f_let_close v hd e in if sign
+            let hd = f_let_close_simp v hd e in if sign
             then f_forall_close_simp vl [] hd
             else f_exists_close_simp vl [] hd
         | _ ->
@@ -150,7 +150,7 @@ and rewriteF kn state av sign f = match f.f_node with
                       (rewriteF kn state Svs.empty sign) tr in
       let av = List.fold_left (fun s v -> Svs.add v s) av vl in
       let f1 = rewriteF kn state av sign f1 in
-      f_quant q (close vl tr f1)
+      f_quant_simp q (close vl tr f1)
   | Fbinop (o, _, _) when (o = Fand && sign) || (o = For && not sign) ->
       f_map_sign (rewriteT kn state) (rewriteF kn state av) sign f
   | Flet (t1, _) ->
