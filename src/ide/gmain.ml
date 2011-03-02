@@ -824,7 +824,6 @@ end
 (*  read previous data from db   *)
 (*********************************)
 
-(*
 type trans =
   | Trans_one of Task.task Trans.trans
   | Trans_list of Task.task Trans.tlist
@@ -837,20 +836,41 @@ let lookup_trans name =
     let t = Trans.lookup_transform_l name gconfig.env in
     Trans_list t
 
-let split_transformation = lookup_trans "split_goal"
-let unfold_transformation = lookup_trans "inline_goal"
-let intro_transformation = lookup_trans "introduce_premises"
+let trans_list =
+  ["split_goal"; "inline_goal" ; "introduce_premises" ]
+
+let trans_of_name =
+  let h = Hashtbl.create 13 in
+  List.iter 
+    (fun n -> Hashtbl.add h n (lookup_trans n))
+    trans_list;
+  Hashtbl.find h
+
+let split_transformation = trans_of_name "split_goal"
+let inline_transformation = trans_of_name "inline_goal"
+let intro_transformation = trans_of_name "introduce_premises"
+
+
+exception Not_applicable
 
 let apply_trans t task =
   match t with
-    | Trans_one t -> [Trans.apply t task]
-    | Trans_list t -> Trans.apply t task
-*)
+    | Trans_one t -> 
+	let t' = Trans.apply t task in
+	if task == t' then raise Not_applicable; [t']
+    | Trans_list t -> 
+	match Trans.apply t task with
+	  | [t'] as l -> if task == t' then raise Not_applicable; l
+	  | l -> l
 
-let split_transformation = Trans.lookup_transform_l "split_goal" gconfig.env
-let inline_transformation = Trans.lookup_transform "inline_goal" gconfig.env
-let intro_transformation = Trans.lookup_transform "introduce_premises"
-  gconfig.env
+let apply_transformation ~callback t task =
+   match t with
+    | Trans_one t -> 
+	let callback t = callback [t] in
+	Scheduler.apply_transformation ~callback t task
+    | Trans_list t -> 
+	Scheduler.apply_transformation_l ~callback t task
+
 
 let rec reimport_any_goal parent gname t db_goal goal_obsolete =
   let goal = Helpers.add_goal_row parent gname t db_goal in
@@ -892,7 +912,8 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
     (fun tr_id tr ->
        let trname = Db.transf_name tr_id in
        eprintf "Reimporting transformation %s for goal %s @." trname gname;
-       let subgoals = Trans.apply split_transformation t in
+       let trans = trans_of_name trname in
+       let subgoals = apply_trans trans t in
        let mtr = Helpers.add_transformation_row goal tr trname in
        let db_subgoals = Db.subgoals tr in
        let reimported_goals,db_subgoals,_ =
@@ -1203,75 +1224,56 @@ let prover_on_selected_goals pr =
 (* method: split selected goals *)
 (*****************************************************)
 
-let split_goal g =
+let transformation_on_goal g trans_name trans =
   if not g.Model.proved then
     let callback subgoals =
-      ignore (Thread.create (fun subgoals ->
-      if List.length subgoals >= 2 then
-        let transf_id_split =
-          (GtkThread.sync Db.transf_from_name) "split_goal" in
-        let db_transf =
-          (GtkThread.sync Db.add_transformation)
-            g.Model.goal_db transf_id_split
-        in
-        let tr = (GtkThread.sync Helpers.add_transformation_row) 
-	  g db_transf "split_goal" 
-	in
-        let goal_name = g.Model.goal_name in
-        let fold = (fun (acc,count) subtask ->
-             let _id = (Task.task_goal subtask).Decl.pr_name in
-             let subgoal_name =
-               goal_name ^ "." ^ (string_of_int count)
-             in
-             let sum = task_checksum subtask in
-             let subtask_db = Db.add_subgoal db_transf subgoal_name sum in
-             let goal =
-               Helpers.add_goal_row (Model.Transf tr) subgoal_name subtask
-                 subtask_db
-             in
-             (goal :: acc, count+1)) in
-        let goals,_ = List.fold_left (GtkThread.sync fold) ([],1) subgoals
-        in
-        tr.Model.subgoals <- List.rev goals;
-        Hashtbl.add g.Model.transformations "split" tr) subgoals)
+      ignore 
+	(Thread.create 
+	   (fun subgoals ->
+	      let b =
+ 		match subgoals with
+		  | [task] -> task != g.Model.task
+		  | _ -> true
+	      in
+	      if b then
+		let transf_id =
+		  (GtkThread.sync Db.transf_from_name) trans_name in
+		let db_transf =
+		  (GtkThread.sync Db.add_transformation)
+		    g.Model.goal_db transf_id
+		in
+		let tr = (GtkThread.sync Helpers.add_transformation_row) 
+		  g db_transf trans_name 
+		in
+		let goal_name = g.Model.goal_name in
+		let fold = 
+		  fun (acc,count) subtask ->
+		    let _id = (Task.task_goal subtask).Decl.pr_name in
+		    let subgoal_name =
+		      goal_name ^ "." ^ (string_of_int count)
+		    in
+		    let sum = task_checksum subtask in
+		    let subtask_db = 
+		      Db.add_subgoal db_transf subgoal_name sum 
+		    in
+		    let goal =
+		      Helpers.add_goal_row (Model.Transf tr) 
+			subgoal_name subtask subtask_db
+		    in
+		    (goal :: acc, count+1) 
+		in
+		let goals,_ = 
+		  List.fold_left (GtkThread.sync fold) ([],1) subgoals
+		in
+		tr.Model.subgoals <- List.rev goals;
+		Hashtbl.add g.Model.transformations trans_name tr) subgoals)
     in
-    Scheduler.apply_transformation_l ~callback
-      split_transformation g.Model.task
+    apply_transformation ~callback
+      trans g.Model.task
 
-let inline_goal g =
-  if not g.Model.proved then
-    let callback subgoal =
-      ignore (Thread.create (fun subgoal ->
-	(* if List.length subgoals >= 2 then *)
-        let transf_id_inline =
-          (GtkThread.sync Db.transf_from_name) "inline_goal" in
-        let db_transf =
-          (GtkThread.sync Db.add_transformation)
-            g.Model.goal_db transf_id_inline
-        in
-        let tr = (GtkThread.sync Helpers.add_transformation_row) 
-	  g db_transf "inline_goal"
-	in
-        let goal_name = g.Model.goal_name in
-        let fold = (fun (acc,count) subtask ->
-             let _id = (Task.task_goal subtask).Decl.pr_name in
-             let subgoal_name =
-               goal_name ^ "." ^ (string_of_int count)
-             in
-             let sum = task_checksum subtask in
-             let subtask_db = Db.add_subgoal db_transf subgoal_name sum in
-             let goal =
-               Helpers.add_goal_row (Model.Transf tr) subgoal_name subtask
-                 subtask_db
-             in
-             (goal :: acc, count+1)) in
-        let goals,_ = List.fold_left (GtkThread.sync fold) ([],1) [subgoal]
-        in
-        tr.Model.subgoals <- List.rev goals;
-        Hashtbl.add g.Model.transformations "inline" tr) subgoal)
-    in
-    Scheduler.apply_transformation ~callback
-      inline_transformation g.Model.task
+let split_goal g = transformation_on_goal g "split_goal" split_transformation
+
+let inline_goal g = transformation_on_goal g "inline_goal" inline_transformation
 
 let rec split_goal_or_children g =
   if not g.Model.proved then
@@ -1797,7 +1799,10 @@ let select_row p =
   match filter_model#get ~row ~column:Model.index_column with
     | Model.Row_goal g ->
         let t = g.Model.task in
-        let t = Trans.apply intro_transformation t in
+        let t = match apply_trans intro_transformation t with
+	  | [t] -> t
+	  | _ -> assert false
+	in
         let task_text = Pp.string_of Pretty.print_task t in
         task_view#source_buffer#set_text task_text;
         task_view#scroll_to_mark `INSERT;
