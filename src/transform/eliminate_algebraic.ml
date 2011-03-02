@@ -156,10 +156,7 @@ and rewriteF kn state av sign f = match f.f_node with
   | _ ->
       f_map_sign (rewriteT kn state) (rewriteF kn state Svs.empty) sign f
 
-let add_type (state, task) ts csl =
-  (* declare constructors as abstract functions *)
-  let cs_add tsk cs = add_decl tsk (create_logic_decl [cs, None]) in
-  let task = List.fold_left cs_add task csl in
+let add_selector (state,task) ts csl =
   (* declare the selector function *)
   let mt_id = id_derive ("match_" ^ ts.ts_name.id_string) ts.ts_name in
   let mt_hd = ty_app ts (List.map ty_var ts.ts_args) in
@@ -179,10 +176,13 @@ let add_type (state, task) ts csl =
     let hd = t_app cs (List.rev_map t_var vl) (of_option cs.ls_value) in
     let hd = t_app mt_ls (hd::mt_tl) mt_ty in
     let vl = List.rev_append mt_vl (List.rev vl) in
-    let ax = f_forall_close vl [[Term hd]] (f_equ hd t) in
+    let ax = f_forall_close vl [] (f_equ hd t) in
     add_decl tsk (create_prop_decl Paxiom pr ax)
   in
   let task = List.fold_left2 mt_add task csl mt_tl in
+  { state with mt_map = mtmap }, task
+
+let add_projections (state,task) ts csl =
   (* declare and define the projection functions *)
   let pj_add (m,tsk) cs =
     let id = cs.ls_name.id_string ^ "_proj_" in
@@ -197,32 +197,45 @@ let add_type (state, task) ts csl =
       let id = id_derive (ls.ls_name.id_string ^ "_def") ls.ls_name in
       let pr = create_prsymbol id in
       let hh = t_app ls [hd] t.t_ty in
-      let ax = f_forall_close (List.rev vl) [[Term hd]] (f_equ hh t) in
+      let ax = f_forall_close (List.rev vl) [] (f_equ hh t) in
       ls::pjl, add_decl tsk (create_prop_decl Paxiom pr ax)
     in
     let pjl,tsk = List.fold_left add ([],tsk) tl in
     Mls.add cs (List.rev pjl) m, tsk
   in
   let pjmap, task = List.fold_left pj_add (state.pj_map, task) csl in
+  { state with pj_map = pjmap }, task
+
+let add_inversion (state,task) ts csl =
   (* add the inversion axiom *)
   let ax_id = ts.ts_name.id_string ^ "_inversion" in
   let ax_pr = create_prsymbol (id_derive ax_id ts.ts_name) in
+  let mt_hd = ty_app ts (List.map ty_var ts.ts_args) in
   let ax_vs = create_vsymbol (id_fresh "u") mt_hd in
   let ax_hd = t_var ax_vs in
   let mk_cs cs =
-    let pjl = Mls.find cs pjmap in
+    let pjl = Mls.find cs state.pj_map in
     let app pj = t_app_infer pj [ax_hd] in
     f_equ ax_hd (t_app cs (List.map app pjl) mt_hd)
   in
   let ax_f = map_join_left mk_cs f_or csl in
-  let trgl = t_app mt_ls (ax_hd :: mt_tl) mt_ty in
-  let ax_f = f_forall_close (ax_vs :: mt_vl) [[Term trgl]] ax_f in
+  let ax_f = f_forall_close [ax_vs] [] ax_f in
   let task = add_decl task (create_prop_decl Paxiom ax_pr ax_f) in
+  state, task
+
+let add_type (state,task) ts csl =
+  (* declare constructors as abstract functions *)
+  let cs_add tsk cs = add_decl tsk (create_logic_decl [cs, None]) in
+  let task = List.fold_left cs_add task csl in
+  (* add selector, projections, and inversion axiom *)
+  let state,task = add_selector (state,task) ts csl in
+  let state,task = add_projections (state,task) ts csl in
+  let state,task = add_inversion (state,task) ts csl in
   (* add the tag for enumeration if the type is one *)
   let enum = List.for_all (fun ls -> ls.ls_args = []) csl in
   let task = if enum then add_meta task meta_enum [MAts ts] else task in
   (* return the updated state and task *)
-  { state with mt_map = mtmap; pj_map = pjmap }, task
+  state, task
 
 let comp t (state,task) = match t.task_decl.td_node with
   | Decl { d_node = Dtype dl } ->
