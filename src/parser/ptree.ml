@@ -82,6 +82,7 @@ and pp_desc =
   | PPcast of lexpr * pty
   | PPtuple of lexpr list
   | PPrecord of (qualid * lexpr) list
+  | PPupdate of lexpr * (qualid * lexpr) list
 
 (*s Declarations. *)
 

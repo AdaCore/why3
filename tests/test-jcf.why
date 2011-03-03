@@ -12,8 +12,8 @@ theory Records
   end
 
   goal g1 :
-    let t = {| b = Cons True Nil; a = 1; |} in
-    match t with
+    let t = {| b = Cons True Nil; a = 1.0; |} in
+    match {| t with a = 1 |} with
     | {| R.b = Cons x _ |} -> x = True
     | {| a = a |} -> a = 1
     end

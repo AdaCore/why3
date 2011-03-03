@@ -519,8 +519,7 @@ and dterm_node ~localize loc env = function
         p, e
       in
       let bl = List.map branch bl in
-      let ty = (snd (List.hd bl)).dt_ty in
-      Tmatch (t1, bl), ty
+      Tmatch (t1, bl), tb
   | PPnamed (x, e1) ->
       let e1 = dterm ~localize env e1 in
       Tnamed (x, e1), e1.dt_ty
@@ -611,6 +610,39 @@ and dterm_node ~localize loc env = function
         | None -> errorm ~loc "some record fields are missing") fl tyl
       in
       Tapp (cs,al), Util.of_option ty
+  | PPupdate (e,fl) ->
+      let n = ref (-1) in
+      let q = Queue.create () in
+      let e = dterm ~localize env e in
+      let _,cs,fl = list_fields env.uc fl in
+      (* prepare the pattern *)
+      let tyl,ty = Denv.specialize_lsymbol ~loc cs in
+      unify_raise ~loc e.dt_ty (Util.of_option ty);
+      let pl = List.map2 (fun f ty -> match f with
+        | Some _ ->
+            { dp_node = Pwild ; dp_ty = ty }
+        | None ->
+            let x = (incr n; "x:" ^ string_of_int !n) in
+            let i = { id = x ; id_lab = []; id_loc = loc } in
+            Queue.add (x,ty) q;
+            { dp_node = Pvar i ; dp_ty = ty }) fl tyl
+      in
+      let p = { dp_node = Papp (cs,pl) ; dp_ty = e.dt_ty } in
+      (* prepare the result *)
+      let tyl,ty = Denv.specialize_lsymbol ~loc cs in
+      let al = List.map2 (fun f ty -> match f with
+        | Some (_,e) ->
+            let loc = e.pp_loc in
+            let e = dterm ~localize env e in
+            unify_raise ~loc:loc e.dt_ty ty;
+            e
+        | None ->
+            let (x,xty) = Queue.take q in
+            unify_raise ~loc xty ty;
+            { dt_node = Tvar x ; dt_ty = ty }) fl tyl
+      in
+      let t = { dt_node = Tapp (cs,al) ; dt_ty = Util.of_option ty } in
+      Tmatch (e,[p,t]), t.dt_ty
   | PPquant _ | PPbinop _ | PPunop _ | PPfalse | PPtrue ->
       error ~loc TermExpected
 
@@ -682,7 +714,8 @@ and dfmla_node ~localize loc env = function
       let t1 = dterm ~localize env e1 in
       let ty1 = t1.dt_ty in
       let branch (p, e) =
-        let env, p = dpat_list env ty1 p in p, dfmla ~localize env e
+        let env, p = dpat_list env ty1 p in
+        p, dfmla ~localize env e
       in
       Fmatch (t1, List.map branch bl)
   | PPnamed (x, f1) ->
@@ -695,7 +728,7 @@ and dfmla_node ~localize loc env = function
       let s, tyl = specialize_psymbol x env.uc in
       let tl = dtype_args s.ls_name loc env tyl [] in
       Fapp (s, tl)
-  | PPeps _ | PPconst _ | PPcast _ | PPtuple _ | PPrecord _ ->
+  | PPeps _ | PPconst _ | PPcast _ | PPtuple _ | PPrecord _ | PPupdate _ ->
       error ~loc PredicateExpected
 
 and dpat_list env ty p =

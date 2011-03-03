@@ -624,6 +624,8 @@ lexpr_sub:
    { mk_pp (PPtuple ($2 :: $4)) }
 | LEFTREC list1_field_value opt_semicolon RIGHTREC
    { mk_pp (PPrecord (List.rev $2)) }
+| LEFTREC lexpr_arg WITH list1_field_value opt_semicolon RIGHTREC
+   { mk_pp (PPupdate ($2, List.rev $4)) }
 | lexpr_arg LEFTSQ lexpr RIGHTSQ
    { mk_pp (PPapp (Qident (mk_id (misfix "[]") (loc ())), [$1; $3])) }
 | lexpr_arg LEFTSQ lexpr OP1 lexpr RIGHTSQ
