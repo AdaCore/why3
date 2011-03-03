@@ -67,8 +67,42 @@ let create_ident name origin labels = {
   id_tag    = Hashweak.dummy_tag;
 }
 
+let file_regexp = Str.regexp "file:\\(.*\\)"
+let line_regexp = Str.regexp "line:\\([0-9]+\\)"
+let begin_regexp = Str.regexp "begin:\\([0-9]+\\)"
+let end_regexp = Str.regexp "end:\\([0-9]+\\)"
+
 let id_fresh ?(labels = []) nm = create_ident nm Fresh labels
-let id_user ?(labels = []) nm loc = create_ident nm (User loc) labels
+let id_user ?(labels = []) nm loc =
+  let (f,li,b,e) = Loc.extract loc in
+  let f = ref f in
+  let li = ref li in
+  let b = ref b in
+  let e = ref e in
+  let l = List.fold_left
+    (fun acc ((s,_) as lab) ->
+       if Str.string_match file_regexp s 0 then
+         (f := Str.matched_group 1 s; acc)
+       else
+       if Str.string_match line_regexp s 0 then
+         (li := int_of_string (Str.matched_group 1 s); acc)
+       else
+       if Str.string_match begin_regexp s 0 then
+         (b := int_of_string (Str.matched_group 1 s); acc)
+       else
+       if Str.string_match end_regexp s 0 then
+         (e := int_of_string (Str.matched_group 1 s); acc)
+       else lab :: acc)
+    [] labels
+  in
+  let loc =
+    ({Lexing.pos_fname = !f; Lexing.pos_lnum = !li;
+      Lexing.pos_bol = 0; Lexing.pos_cnum = !b},
+     {Lexing.pos_fname = !f; Lexing.pos_lnum = !li;
+      Lexing.pos_bol = 0; Lexing.pos_cnum = !e})
+  in
+  create_ident nm (User loc) l
+
 let id_derive ?(labels = []) nm id = create_ident nm (Derived id) labels
 
 let id_clone ?(labels = []) id =

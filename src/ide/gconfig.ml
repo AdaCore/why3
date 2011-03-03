@@ -359,7 +359,7 @@ let preferences c =
   in
   (* editor *)
  let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
- let _ = GMisc.label ~text:"Default editor" ~packing:hb#add () in
+ let _ = GMisc.label ~text:"Default editor: " ~packing:(hb#pack ~expand:false) () in
  let editor_entry = GEdit.entry ~text:c.default_editor ~packing:hb#add () in
  let (_ : GtkSignal.id) =
     editor_entry#connect#changed ~callback:
@@ -378,7 +378,7 @@ let preferences c =
 *)
   (* timelimit ? *)
   let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
-  let _ = GMisc.label ~text:"Time limit" ~packing:hb#add () in
+  let _ = GMisc.label ~text:"Time limit: " ~packing:(hb#pack ~expand:false) () in
   let timelimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   timelimit_spin#adjustment#set_bounds ~lower:2. ~upper:300. ~step_incr:1. ();
   timelimit_spin#adjustment#set_value (float_of_int c.time_limit);
@@ -388,7 +388,7 @@ let preferences c =
   in
   (* nb of processes ? *)
   let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
-  let _ = GMisc.label ~text:"Nb of processes" ~packing:hb#add () in
+  let _ = GMisc.label ~text:"Nb of processes: " ~packing:(hb#pack ~expand:false) () in
   let nb_processes_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   nb_processes_spin#adjustment#set_bounds
     ~lower:1. ~upper:16. ~step_incr:1. ();

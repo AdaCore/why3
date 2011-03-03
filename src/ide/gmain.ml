@@ -1661,10 +1661,23 @@ let (_ : GMenu.image_menu_item) =
 (* vertical paned on the right*)
 (******************************)
 
+let right_vb = GPack.vbox ~packing:hp#add ()
+
 let vp =
   try
-    GPack.paned `VERTICAL ~packing:hp#add ()
+    GPack.paned `VERTICAL ~packing:right_vb#add ()
   with Gtk.Error _ -> assert false
+
+let right_hb = GPack.hbox ~packing:(right_vb#pack ~expand:false) ()
+
+let file_info = GMisc.label ~text:""
+  ~packing:(right_hb#pack ~fill:true) ()
+
+let current_file = ref ""
+
+let set_current_file f =
+  current_file := f;
+  file_info#set_text ("file: " ^ !current_file)
 
 (******************)
 (* goal text view *)
@@ -1714,8 +1727,6 @@ let source_view =
     ~packing:scrolled_source_view#add
     ()
 
-let current_file = ref ""
-
 (*
   source_view#misc#modify_font_by_name font_name;
 *)
@@ -1754,7 +1765,7 @@ let scroll_to_id id =
         if f <> !current_file then
           begin
             source_view#source_buffer#set_text (source_text f);
-            current_file := f;
+            set_current_file f;
           end;
         move_to_line source_view (l-1);
         erase_color_loc source_view;
@@ -1762,11 +1773,11 @@ let scroll_to_id id =
     | Ident.Fresh ->
         source_view#source_buffer#set_text
           "Fresh ident (no position available)\n";
-        current_file := ""
+        set_current_file ""
     | Ident.Derived _ ->
         source_view#source_buffer#set_text
           "Derived ident (no position available)\n";
-        current_file := ""
+        set_current_file ""
 
 let color_label = function
   | _, Some loc when (fst loc).Lexing.pos_fname = !current_file ->
