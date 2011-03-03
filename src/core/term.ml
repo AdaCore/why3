@@ -1856,33 +1856,49 @@ let f_if_simp f1 f2 f3 = match f1.f_node, f2.f_node, f3.f_node with
   | _, _, _      -> if f_equal f2 f3 then f2 else f_if f1 f2 f3
 
 let t_let_simp e ((v,_,t) as bt) = match e.t_node with
-  | _ when not (Svs.mem v t.t_vars) -> t
-  | Tvar _ -> t_subst_single v e t
+  | _ when not (Svs.mem v t.t_vars) -> snd (t_open_bound bt)
+  | Tvar _ -> let v,t = t_open_bound bt in t_subst_single v e t
   | _ -> t_let e bt
 
 let f_let_simp e ((v,_,f) as bf) = match e.t_node with
-  | _ when not (Svs.mem v f.f_vars) -> f
-  | Tvar _ -> f_subst_single v e f
+  | _ when not (Svs.mem v f.f_vars) -> snd (f_open_bound bf)
+  | Tvar _ -> let v,f = f_open_bound bf in f_subst_single v e f
   | _ -> f_let e bf
 
-let t_let_close_simp v e t = t_let_simp e (t_close_bound v t)
-let f_let_close_simp v e f = f_let_simp e (f_close_bound v f)
+let t_let_close_simp v e t = match e.t_node with
+  | _ when not (Svs.mem v t.t_vars) -> t
+  | Tvar _ -> t_subst_single v e t
+  | _ -> t_let_close v e t
 
-let f_quant_simp q ((vl,_,tl,f) as qf) =
+let f_let_close_simp v e f = match e.t_node with
+  | _ when not (Svs.mem v f.f_vars) -> f
+  | Tvar _ -> f_subst_single v e f
+  | _ -> f_let_close v e f
+
+let vl_filter f vl =
+  List.filter (fun v -> Svs.mem v f.f_vars) vl
+
+let tr_filter f tl =
+  let e_vars = e_apply (fun t -> t.t_vars) (fun f -> f.f_vars) in
+  List.filter (List.for_all (fun e -> Svs.subset (e_vars e) f.f_vars)) tl
+
+let f_quant_simp q ((vl,_,_,f) as qf) =
   if List.for_all (fun v -> Svs.mem v f.f_vars) vl then
     f_quant q qf
   else
-    let vl = List.filter (fun v -> Svs.mem v f.f_vars) vl in
-    let e_vars = e_apply (fun t -> t.t_vars) (fun f -> f.f_vars) in
-    let tl = List.filter
-      (List.for_all (fun e -> Svs.subset (e_vars e) f.f_vars)) tl
-    in
+    let vl,tl,f = f_open_quant qf in
+    let vl = vl_filter f vl in if vl = [] then f else
+    f_quant_close q vl (tr_filter f tl) f
+
+let f_quant_close_simp q vl tl f =
+  if List.for_all (fun v -> Svs.mem v f.f_vars) vl then
     f_quant_close q vl tl f
+  else
+    let vl = vl_filter f vl in if vl = [] then f else
+    f_quant_close q vl (tr_filter f tl) f
 
 let f_forall_simp = f_quant_simp Fforall
 let f_exists_simp = f_quant_simp Fexists
-
-let f_quant_close_simp q vl tl f = f_quant_simp q (f_close_quant vl tl f)
 
 let f_forall_close_simp = f_quant_close_simp Fforall
 let f_exists_close_simp = f_quant_close_simp Fexists
