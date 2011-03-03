@@ -1232,7 +1232,15 @@ let transformation_on_goal g trans_name trans =
 	   (fun subgoals ->
 	      let b =
  		match subgoals with
-		  | [task] -> task != g.Model.task
+		  | [task] -> 
+                      let s1 = task_checksum g.Model.task in
+                      let s2 = task_checksum task in
+(*
+                      eprintf "Transformation returned only one task. sum before = %s, sum after = %s@." (task_checksum g.Model.task) (task_checksum task);
+                      eprintf "addresses: %x %x@." (Obj.magic g.Model.task) (Obj.magic task);
+*)
+                      s1 <> s2 
+                        (* task != g.Model.task *)
 		  | _ -> true
 	      in
 	      if b then

@@ -431,7 +431,7 @@ and wp_desc env e q = match e.expr_desc with
   | Eany c ->
       (* TODO: propagate call labels into c.c_post *)
       let w = opaque_wp env c.c_effect c.c_post q in
-      let p = f_label_add (label ~loc:e.expr_loc "call pre") c.c_pre in
+      let p = f_label_add (label ~loc:e.expr_loc "Pre") c.c_pre in
       wp_and p w
 
 and wp_triple env (p, e, q) =

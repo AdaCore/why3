@@ -121,8 +121,9 @@ theory Test
   use Single
   use Double
 
-  lemma Round_single_01: Single.round NearestTiesToEven 0.1 = 0x0.199999Ap0
-  lemma Round_double_01: Double.round NearestTiesToEven 0.1 = 0x0.199999Ap0
+  lemma Round_single_01: Single.round NearestTiesToEven 0.1 = 0x1.99999ap-4
+
+  lemma Round_double_01: Double.round NearestTiesToEven 0.1 = 0x1.999999999999ap-4
 
 end
 
