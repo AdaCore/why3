@@ -29,12 +29,12 @@ let apply_append2 fn acc l1 l2 =
     acc (List.rev l1) (List.rev l2)
 
 let split_case spl c acc tl bl =
-  let bl = List.rev_map f_open_branch bl in
-  let bll,_ = List.fold_left (fun (bll,el) (pl,f) ->
+  let bl = List.rev_map f_open_branch_cb bl in
+  let bll,_ = List.fold_left (fun (bll,el) (pl,f,close) ->
     let spf = spl [] f in
     let brc = f_close_branch pl c in
     let bll = List.map (fun rl -> brc::rl) bll in
-    let bll = apply_append (fun f -> f_close_branch pl f :: el) bll spf in
+    let bll = apply_append (fun f -> close pl f :: el) bll spf in
     bll, brc::el) ([],[]) bl
   in
   apply_append (f_case tl) acc bll
@@ -65,13 +65,16 @@ let rec split_pos ro acc f = match f.f_node with
   | Fif (fif,fthen,felse) ->
       let acc = split_pos ro acc (f_implies (f_not fif) felse) in
       split_pos ro acc (f_implies fif fthen)
-  | Flet (t,fb) -> let vs,f = f_open_bound fb in
-      apply_append (f_let_close vs t) acc (split_pos ro [] f)
+  | Flet (t,fb) ->
+      let vs,f,close = f_open_bound_cb fb in
+      let close f = f_let t (close vs f) in
+      apply_append close acc (split_pos ro [] f)
   | Fcase (tl,bl) ->
       split_case (split_pos ro) f_true acc tl bl
-  | Fquant (Fforall,fq) -> let vsl,trl,f = f_open_quant fq in
-      (* TODO : Remove unused variable *)
-      apply_append (f_forall_close vsl trl) acc (split_pos ro [] f)
+  | Fquant (Fforall,fq) ->
+      let vsl,trl,f,close = f_open_quant_cb fq in
+      let close f = f_forall (close vsl trl f) in
+      apply_append close acc (split_pos ro [] f)
   | Fquant (Fexists,_) -> f::acc
 
 and split_neg ro acc f = match f.f_node with
@@ -97,13 +100,16 @@ and split_neg ro acc f = match f.f_node with
   | Fif (fif,fthen,felse) ->
       let acc = split_neg ro acc (f_and (f_not fif) felse) in
       split_neg ro acc (f_and fif fthen)
-  | Flet (t,fb) -> let vs,f = f_open_bound fb in
-      apply_append (f_let_close vs t) acc (split_neg ro [] f)
+  | Flet (t,fb) ->
+      let vs,f,close = f_open_bound_cb fb in
+      let close f = f_let t (close vs f) in
+      apply_append close acc (split_neg ro [] f)
   | Fcase (tl,bl) ->
       split_case (split_neg ro) f_false acc tl bl
-  | Fquant (Fexists,fq) -> let vsl,trl,f = f_open_quant fq in
-      (* TODO : Remove unused variable *)
-      apply_append (f_exists_close vsl trl) acc (split_neg ro [] f)
+  | Fquant (Fexists,fq) ->
+      let vsl,trl,f,close = f_open_quant_cb fq in
+      let close f = f_exists (close vsl trl f) in
+      apply_append close acc (split_neg ro [] f)
   | Fquant (Fforall,_) -> f::acc
 
 let split_goal ro pr f =
