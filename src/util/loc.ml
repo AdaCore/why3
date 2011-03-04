@@ -53,8 +53,8 @@ exception Located of position * exn
 
 let dummy_position = ("",0,0,0)
 
-let join (f1,l1,b1,_) (f2,l2,_,e2) =
-  assert (f1 == f2 && l1 == l2); (f1,l1,b1,e2)
+let join (f1,l1,b1,e1) (f2,_,b2,e2) =
+  assert (f1 = f2); (f1,l1,b1,e1+e2-b2)
 
 let extract (b,e) =
   let f = b.pos_fname in
