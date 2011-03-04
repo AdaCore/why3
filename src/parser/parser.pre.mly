@@ -54,20 +54,24 @@
   open Parsing
 
   let loc () = (symbol_start_pos (), symbol_end_pos ())
+  let floc () = Loc.extract (loc ())
+
   let loc_i i = (rhs_start_pos i, rhs_end_pos i)
+  let floc_i i = Loc.extract (loc_i i)
   let loc_ij i j = (rhs_start_pos i, rhs_end_pos j)
+  let floc_ij i j = Loc.extract (loc_ij i j)
 
   let mk_ppl loc d = { pp_loc = loc; pp_desc = d }
-  let mk_pp d = mk_ppl (loc ()) d
-  let mk_pp_i i d = mk_ppl (loc_i i) d
+  let mk_pp d = mk_ppl (floc ()) d
+  let mk_pp_i i d = mk_ppl (floc_i i) d
 
-  let mk_pat p = { pat_loc = loc (); pat_desc = p }
+  let mk_pat p = { pat_loc = floc (); pat_desc = p }
 
   let infix_ppl loc a i b = mk_ppl loc (PPbinop (a, i, b))
-  let infix_pp a i b = infix_ppl (loc ()) a i b
+  let infix_pp a i b = infix_ppl (floc ()) a i b
 
   let prefix_ppl loc p a = mk_ppl loc (PPunop (p, a))
-  let prefix_pp p a = prefix_ppl (loc ()) p a
+  let prefix_pp p a = prefix_ppl (floc ()) p a
 
   let infix  s = "infix "  ^ s
   let prefix s = "prefix " ^ s
@@ -77,29 +81,18 @@
 
   let add_lab id l = { id with id_lab = l }
 
-  let user_loc fname lnum bol cnum1 cnum2 =
-    let pos = {
-      Lexing.pos_fname = fname;
-      Lexing.pos_lnum = lnum;
-      Lexing.pos_bol = bol;
-      Lexing.pos_cnum = cnum1 }
-    in
-    pos, { pos with Lexing.pos_cnum = cnum2 }
-
   let () = Exn_printer.register
     (fun fmt exn -> match exn with
       | Parsing.Parse_error -> Format.fprintf fmt "syntax error"
       | _ -> raise exn
     )
 
-  let mk_expr d = { expr_loc = loc (); expr_desc = d }
-  let mk_expr_i i d = { expr_loc = loc_i i; expr_desc = d }
+  let mk_expr d = { expr_loc = floc (); expr_desc = d }
+  let mk_expr_i i d = { expr_loc = floc_i i; expr_desc = d }
 
   let cast_body c ((p,e,q) as t) = match c with
     | None -> t
     | Some pt -> p, { e with expr_desc = Ecast (e, pt) }, q
-
-  let join (b,_) (_,e) = (b,e)
 
   let rec mk_apply f = function
     | [] ->
@@ -107,7 +100,7 @@
     | [a] ->
 	Eapply (f, a)
     | a :: l ->
-	let loc = join f.expr_loc a.expr_loc in
+	let loc = Loc.join f.expr_loc a.expr_loc in
 	mk_apply { expr_loc = loc; expr_desc = Eapply (f, a) } l
 
   let mk_apply_id id =
@@ -117,27 +110,27 @@
     mk_apply e
 
   let mk_misfix2 op e1 e2 =
-    let id = { id = misfix op; id_lab = []; id_loc = loc_i 2 } in
+    let id = { id = misfix op; id_lab = []; id_loc = floc_i 2 } in
     mk_expr (mk_apply_id id [e1; e2])
 
   let mk_misfix3 op e1 e2 e3 =
-    let id = { id = misfix op; id_lab = []; id_loc = loc_i 2 } in
+    let id = { id = misfix op; id_lab = []; id_loc = floc_i 2 } in
     mk_expr (mk_apply_id id [e1; e2; e3])
 
   let mk_infix e1 op e2 =
-    let id = { id = infix op; id_lab = []; id_loc = loc_i 2 } in
+    let id = { id = infix op; id_lab = []; id_loc = floc_i 2 } in
     mk_expr (mk_apply_id id [e1; e2])
 
   let mk_prefix op e1 =
-    let id = { id = prefix op; id_lab = []; id_loc = loc_i 1 } in
+    let id = { id = prefix op; id_lab = []; id_loc = floc_i 1 } in
     mk_expr (mk_apply_id id [e1])
 
-  let exit_exn () = Qident { id = "%Exit"; id_lab = []; id_loc = loc () }
-  let id_anonymous () = { id = "_"; id_lab = []; id_loc = loc () }
-  let id_unit () = { id = "unit"; id_lab = []; id_loc = loc () }
+  let exit_exn () = Qident { id = "%Exit"; id_lab = []; id_loc = floc () }
+  let id_anonymous () = { id = "_"; id_lab = []; id_loc = floc () }
+  let id_unit () = { id = "unit"; id_lab = []; id_loc = floc () }
   let ty_unit () = Tpure (PPTtyapp ([], Qident (id_unit ())))
 
-  let id_lt_nat () = Qident { id = "lt_nat"; id_lab = []; id_loc = loc () }
+  let id_lt_nat () = Qident { id = "lt_nat"; id_lab = []; id_loc = floc () }
 
   let empty_effect = { pe_reads = []; pe_writes = []; pe_raises = [] }
 
@@ -272,7 +265,7 @@ new_decl:
    { let env = ref_get env_ref in let lenv = ref_get lenv_ref in
      ref_set uc_ref (Typing.add_decl env lenv (ref_get uc_ref) $1) }
 | namespace_head namespace_import namespace_name list0_decl END
-   { ref_set uc_ref (Typing.close_namespace (loc ()) $2 $3 (ref_get uc_ref)) }
+   { ref_set uc_ref (Typing.close_namespace (floc ()) $2 $3 (ref_get uc_ref)) }
 ;
 
 namespace_head:
@@ -300,19 +293,19 @@ decl:
 | INDUCTIVE list1_inductive_decl
     { IndDecl $2 }
 | AXIOM ident labels COLON lexpr
-    { PropDecl (loc (), Kaxiom, add_lab $2 $3, $5) }
+    { PropDecl (floc (), Kaxiom, add_lab $2 $3, $5) }
 | LEMMA ident labels COLON lexpr
-    { PropDecl (loc (), Klemma, add_lab $2 $3, $5) }
+    { PropDecl (floc (), Klemma, add_lab $2 $3, $5) }
 | GOAL ident labels COLON lexpr
-    { PropDecl (loc (), Kgoal, add_lab $2 $3, $5) }
+    { PropDecl (floc (), Kgoal, add_lab $2 $3, $5) }
 | USE use
-    { UseClone (loc (), $2, None) }
+    { UseClone (floc (), $2, None) }
 | CLONE use clone_subst
-    { UseClone (loc (), $2, Some $3) }
+    { UseClone (floc (), $2, Some $3) }
 | META ident list1_meta_arg_sep_comma
-    { Meta (loc (), $2, $3) }
+    { Meta (floc (), $2, $3) }
 | META STRING list1_meta_arg_sep_comma
-    { Meta (loc (), mk_id $2 (loc_i 2), $3) }
+    { Meta (floc (), mk_id $2 (floc_i 2), $3) }
 ;
 
 /* Use and clone */
@@ -379,7 +372,7 @@ list1_type_decl:
 
 type_decl:
 | lident labels type_args typedefn
-  { { td_loc = loc (); td_ident = add_lab $1 $2;
+  { { td_loc = floc (); td_ident = add_lab $1 $2;
       td_params = $3; td_def = $4 } }
 ;
 
@@ -407,7 +400,7 @@ list1_record_field:
 
 record_field:
 | opt_mutable lident labels COLON primitive_type 
-   { loc (), $1, add_lab $2 $3, $5 }
+   { floc (), $1, add_lab $2 $3, $5 }
 ;
 
 typecases:
@@ -416,7 +409,7 @@ typecases:
 ;
 
 typecase:
-| uident labels params   { (loc (), add_lab $1 $2, $3) }
+| uident labels params   { (floc (), add_lab $1 $2, $3) }
 ;
 
 /* Logic declarations */
@@ -428,7 +421,7 @@ list1_logic_decl:
 
 logic_decl:
 | lident_rich labels params logic_type_option logic_def_option
-  { { ld_loc = loc (); ld_ident = add_lab $1 $2;
+  { { ld_loc = floc (); ld_ident = add_lab $1 $2;
       ld_params = $3; ld_type = $4; ld_def = $5 } }
 ;
 
@@ -451,7 +444,7 @@ list1_inductive_decl:
 
 inductive_decl:
 | lident_rich labels params inddefn
-  { { in_loc = loc (); in_ident = add_lab $1 $2;
+  { { in_loc = floc (); in_ident = add_lab $1 $2;
       in_params = $3; in_def = $4 } }
 ;
 
@@ -466,7 +459,7 @@ indcases:
 ;
 
 indcase:
-| ident labels COLON lexpr { (loc (), add_lab $1 $2, $4) }
+| ident labels COLON lexpr { (floc (), add_lab $1 $2, $4) }
 ;
 
 /* Type expressions */
@@ -531,19 +524,19 @@ lexpr:
 | NOT lexpr
    { prefix_pp PPnot $2 }
 | lexpr EQUAL lexpr
-   { mk_pp (PPinfix ($1, mk_id (infix "=") (loc_i 2), $3)) }
+   { mk_pp (PPinfix ($1, mk_id (infix "=") (floc_i 2), $3)) }
 | lexpr LTGT lexpr
-   { prefix_pp PPnot (mk_pp (PPinfix ($1, mk_id (infix "=") (loc_i 2), $3))) }
+   { prefix_pp PPnot (mk_pp (PPinfix ($1, mk_id (infix "=") (floc_i 2), $3))) }
 | lexpr OP1 lexpr
-   { mk_pp (PPinfix ($1, mk_id (infix $2) (loc_i 2), $3)) }
+   { mk_pp (PPinfix ($1, mk_id (infix $2) (floc_i 2), $3)) }
 | lexpr OP2 lexpr
-   { mk_pp (PPinfix ($1, mk_id (infix $2) (loc_i 2), $3)) }
+   { mk_pp (PPinfix ($1, mk_id (infix $2) (floc_i 2), $3)) }
 | lexpr OP3 lexpr
-   { mk_pp (PPinfix ($1, mk_id (infix $2) (loc_i 2), $3)) }
+   { mk_pp (PPinfix ($1, mk_id (infix $2) (floc_i 2), $3)) }
 | lexpr OP4 lexpr
-   { mk_pp (PPinfix ($1, mk_id (infix $2) (loc_i 2), $3)) }
+   { mk_pp (PPinfix ($1, mk_id (infix $2) (floc_i 2), $3)) }
 | any_op lexpr %prec prefix_op
-   { mk_pp (PPapp (Qident (mk_id (prefix $1) (loc_i 2)), [$2])) }
+   { mk_pp (PPapp (Qident (mk_id (prefix $1) (floc_i 2)), [$2])) }
 | qualid list1_lexpr_arg
    { mk_pp (PPapp ($1, $2)) }
 | IF lexpr THEN lexpr ELSE lexpr
@@ -599,7 +592,7 @@ lexpr_arg:
 | FALSE
    { mk_pp PPfalse }
 | OPPREF lexpr_arg
-   { mk_pp (PPapp (Qident (mk_id (prefix $1) (loc_i 2)), [$2])) }
+   { mk_pp (PPapp (Qident (mk_id (prefix $1) (floc_i 2)), [$2])) }
 | lexpr_sub
    { $1 }
 ;
@@ -608,7 +601,7 @@ lexpr_dot:
 | lqualid_rich
    { mk_pp (PPvar $1) }
 | OPPREF lexpr_dot
-   { mk_pp (PPapp (Qident (mk_id (prefix $1) (loc_i 2)), [$2])) }
+   { mk_pp (PPapp (Qident (mk_id (prefix $1) (floc_i 2)), [$2])) }
 | lexpr_sub
    { $1 }
 ;
@@ -627,10 +620,10 @@ lexpr_sub:
 | LEFTREC lexpr_arg WITH list1_field_value opt_semicolon RIGHTREC
    { mk_pp (PPupdate ($2, List.rev $4)) }
 | lexpr_arg LEFTSQ lexpr RIGHTSQ
-   { mk_pp (PPapp (Qident (mk_id (misfix "[]") (loc ())), [$1; $3])) }
+   { mk_pp (PPapp (Qident (mk_id (misfix "[]") (floc ())), [$1; $3])) }
 | lexpr_arg LEFTSQ lexpr OP1 lexpr RIGHTSQ
    { let op = "[" ^ $4 ^ "]" in
-     mk_pp (PPapp (Qident (mk_id (misfix op) (loc ())), [$1; $3; $5])) }
+     mk_pp (PPapp (Qident (mk_id (misfix op) (floc ())), [$1; $3; $5])) }
 ;
 
 quant:
@@ -797,22 +790,22 @@ lident_rich:
 | lident
     { $1 }
 | LEFTPAR lident_op RIGHTPAR
-    { mk_id (infix $2) (loc ()) }
+    { mk_id (infix $2) (floc ()) }
 | LEFTPAR_STAR_RIGHTPAR
-    { mk_id (infix "*") (loc ()) }
+    { mk_id (infix "*") (floc ()) }
 | LEFTPAR lident_op UNDERSCORE RIGHTPAR
-    { mk_id (prefix $2) (loc ()) }
+    { mk_id (prefix $2) (floc ()) }
 | LEFTPAR OPPREF RIGHTPAR
-    { mk_id (prefix $2) (loc ()) }
+    { mk_id (prefix $2) (floc ()) }
 | LEFTPAR LEFTSQ RIGHTSQ RIGHTPAR
-    { mk_id (misfix "[]") (loc ()) }
+    { mk_id (misfix "[]") (floc ()) }
 | LEFTPAR LEFTSQ OP1 RIGHTSQ RIGHTPAR
-    { mk_id (misfix ("[" ^ $3 ^ "]")) (loc ()) }
+    { mk_id (misfix ("[" ^ $3 ^ "]")) (floc ()) }
 ;
 
 lident:
-| LIDENT { mk_id $1 (loc ()) }
-| MODEL  { mk_id "model" (loc ()) }
+| LIDENT { mk_id $1 (floc ()) }
+| MODEL  { mk_id "model" (floc ()) }
 ;
 
 lident_op:
@@ -831,7 +824,7 @@ any_op:
 ;
 
 uident:
-| UIDENT { mk_id $1 (loc ()) }
+| UIDENT { mk_id $1 (floc ()) }
 ;
 
 lq_lident:
@@ -878,10 +871,10 @@ label:
 | STRING
    { Ident.label $1 }
 | STRING BACKQUOTE INTEGER BACKQUOTE INTEGER
-         BACKQUOTE INTEGER BACKQUOTE INTEGER BACKQUOTE STRING
-   { let loc = user_loc $11 (int_of_string $3) (int_of_string $5)
-                            (int_of_string $7) (int_of_string $9) in
-     Ident.label ~loc $1 }
+         BACKQUOTE INTEGER BACKQUOTE STRING
+   { let loc = Loc.user_position $9 (int_of_string $3) (int_of_string $5)
+                            (int_of_string $7) 
+     in Ident.label ~loc $1 }
 ;
 
 labels:
@@ -937,7 +930,7 @@ list1_full_decl:
 
 full_decl:
 | NAMESPACE namespace_import namespace_name list0_full_decl END
-   { Dnamespace (loc_i 3, $3, $2, $4) }
+   { Dnamespace (floc_i 3, $3, $2, $4) }
 | decl
    { Dlogic $1 }
 ;
@@ -974,7 +967,7 @@ program_decl:
 | USE use_module
     { $2 }
 | NAMESPACE namespace_import namespace_name list0_program_decl END
-    { Dnamespace (loc_i 3, $3, $2, $4) }
+    { Dnamespace (floc_i 3, $3, $2, $4) }
 | ABSTRACT TYPE lident type_args model
     { Dmodel_type (false, $3, $4, $5) }
 | MUTABLE TYPE lident type_args model
@@ -1032,7 +1025,7 @@ expr:
    { mk_infix $1 "=" $3 }
 | expr LTGT expr
    { let t = mk_infix $1 "=" $3 in
-     mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = loc () } [t]) }
+     mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = floc () } [t]) }
 | expr OP1 expr
    { mk_infix $1 $2 $3 }
 | expr OP2 expr
@@ -1042,7 +1035,7 @@ expr:
 | expr OP4 expr
    { mk_infix $1 $2 $3 }
 | NOT expr %prec prefix_op
-   { mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = loc () } [$2]) }
+   { mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = floc () } [$2]) }
 | any_op expr %prec prefix_op
    { mk_prefix $1 $2 }
 /*

@@ -136,7 +136,7 @@
     let n = String.length s in
     if n > 0 && s.[0] = '+' then String.sub s 1 (n-1) else s
 
-  let loc lb = (lexeme_start_p lb, lexeme_end_p lb)
+  let loc lb = Loc.extract (lexeme_start_p lb, lexeme_end_p lb)
 
 }
 

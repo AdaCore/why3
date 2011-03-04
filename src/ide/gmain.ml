@@ -204,14 +204,14 @@ let () =
 
 
 let read_file fn =
-  let fn = Filename.concat project_dir fn in 
+  let fn = Filename.concat project_dir fn in
   let theories = Env.read_file gconfig.env fn in
   let theories =
     Theory.Mnm.fold
       (fun name th acc ->
          match th.Theory.th_name.Ident.id_origin with
-           | Ident.User l -> (Loc.extract l,name,th)::acc
-           | _ -> (Loc.dummy_floc,name,th)::acc)
+           | Ident.User l -> (l,name,th)::acc
+           | _ -> (Loc.dummy_position,name,th)::acc)
       theories []
   in
   let theories = List.sort
@@ -554,21 +554,21 @@ module Helpers = struct
     | Running -> !image_running
     | InternalFailure _ -> !image_failure
     | Done r -> match r.Call_provers.pr_answer with
-	| Call_provers.Valid -> 
-	    if obsolete then !image_valid else !image_valid_obs
-	| Call_provers.Invalid -> 
-	    if obsolete then !image_invalid else !image_invalid_obs
-	| Call_provers.Timeout -> 
-	    if obsolete then !image_timeout else !image_timeout_obs
-	| Call_provers.Unknown _ -> 
-	    if obsolete then !image_unknown else !image_unknown_obs
-	| Call_provers.Failure _ -> 
-	    if obsolete then !image_failure else !image_failure_obs
-	| Call_provers.HighFailure -> 
-	    if obsolete then !image_failure else !image_failure_obs
+	| Call_provers.Valid ->
+	    if obsolete then !image_valid_obs else !image_valid
+	| Call_provers.Invalid ->
+	    if obsolete then !image_invalid_obs else !image_invalid
+	| Call_provers.Timeout ->
+	    if obsolete then !image_timeout_obs else !image_timeout
+	| Call_provers.Unknown _ ->
+	    if obsolete then !image_unknown_obs else !image_unknown
+	| Call_provers.Failure _ ->
+	    if obsolete then !image_failure_obs else !image_failure
+	| Call_provers.HighFailure ->
+	    if obsolete then !image_failure_obs else !image_failure
 
   let set_row_status b row =
-    if b then 
+    if b then
       begin
 	goals_view#collapse_row (goals_model#get_path row);
 	goals_model#set ~row ~column:status_column !image_yes;
@@ -600,13 +600,13 @@ module Helpers = struct
       end
 
   let rec check_goal_proved g =
-    let b1 = Hashtbl.fold 
-      (fun _ a acc -> acc || 
+    let b1 = Hashtbl.fold
+      (fun _ a acc -> acc ||
 	 match a.proof_state with
 	   | Done { Call_provers.pr_answer = Call_provers.Valid} -> true
 	   | _ -> false) g.external_proofs false
     in
-    let b = Hashtbl.fold 
+    let b = Hashtbl.fold
       (fun _ t acc -> acc || t.transf_proved) g.transformations b1
     in
     if g.proved <> b then
@@ -626,7 +626,7 @@ module Helpers = struct
 	set_row_status b t.transf_row;
 	check_goal_proved t.parent_goal
       end
-    
+
 
   (* deprecated *)
   let set_file_verified f =
@@ -678,9 +678,9 @@ module Helpers = struct
     let row = a.proof_row in
     goals_model#set ~row ~column:status_column
       (image_of_result ~obsolete res);
-    
+
     let t = match res with
-      | Done { Call_provers.pr_time = time } -> 
+      | Done { Call_provers.pr_time = time } ->
           Format.sprintf "%.2f" time
       | _ -> ""
     in
@@ -859,7 +859,7 @@ let trans_list =
 
 let trans_of_name =
   let h = Hashtbl.create 13 in
-  List.iter 
+  List.iter
     (fun n -> Hashtbl.add h n (lookup_trans n))
     trans_list;
   Hashtbl.find h
@@ -873,20 +873,20 @@ exception Not_applicable
 
 let apply_trans t task =
   match t with
-    | Trans_one t -> 
+    | Trans_one t ->
 	let t' = Trans.apply t task in
 	if task == t' then raise Not_applicable; [t']
-    | Trans_list t -> 
+    | Trans_list t ->
 	match Trans.apply t task with
 	  | [t'] as l -> if task == t' then raise Not_applicable; l
 	  | l -> l
 
 let apply_transformation ~callback t task =
    match t with
-    | Trans_one t -> 
+    | Trans_one t ->
 	let callback t = callback [t] in
 	Scheduler.apply_transformation ~callback t task
-    | Trans_list t -> 
+    | Trans_list t ->
 	Scheduler.apply_transformation_l ~callback t task
 
 
@@ -916,8 +916,8 @@ let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
 		 }
 	 in
          let (_pa : Model.proof_attempt) =
-           Helpers.add_external_proof_row ~obsolete ~edit goal p a 
-	     (Scheduler.Done r) 
+           Helpers.add_external_proof_row ~obsolete ~edit goal p a
+	     (Scheduler.Done r)
          in
          ((* something TODO ?*))
        with Not_found ->
@@ -1158,11 +1158,11 @@ let redo_external_proof q g a =
     a.Model.proof_state <- result;
 *)
     Helpers.set_proof_state ~obsolete:false a result (*time*) ;
-    let db_res, time = 
+    let db_res, time =
       match result with
-	| Scheduler.Scheduled | Scheduler.Running -> 
+	| Scheduler.Scheduled | Scheduler.Running ->
 	    Db.Undone, 0.0
-	| Scheduler.InternalFailure _ -> 
+	| Scheduler.InternalFailure _ ->
 	    Db.Done Call_provers.HighFailure, 0.0
 	| Scheduler.Done r ->
 	    if r.Call_provers.pr_answer = Call_provers.Valid then
@@ -1246,19 +1246,19 @@ let prover_on_selected_goals pr =
 let transformation_on_goal g trans_name trans =
   if not g.Model.proved then
     let callback subgoals =
-      ignore 
-	(Thread.create 
+      ignore
+	(Thread.create
 	   (fun subgoals ->
 	      let b =
  		match subgoals with
-		  | [task] -> 
+		  | [task] ->
                       let s1 = task_checksum g.Model.task in
                       let s2 = task_checksum task in
 (*
                       eprintf "Transformation returned only one task. sum before = %s, sum after = %s@." (task_checksum g.Model.task) (task_checksum task);
                       eprintf "addresses: %x %x@." (Obj.magic g.Model.task) (Obj.magic task);
 *)
-                      s1 <> s2 
+                      s1 <> s2
                         (* task != g.Model.task *)
 		  | _ -> true
 	      in
@@ -1269,27 +1269,27 @@ let transformation_on_goal g trans_name trans =
 		  (GtkThread.sync Db.add_transformation)
 		    g.Model.goal_db transf_id
 		in
-		let tr = (GtkThread.sync Helpers.add_transformation_row) 
-		  g db_transf trans_name 
+		let tr = (GtkThread.sync Helpers.add_transformation_row)
+		  g db_transf trans_name
 		in
 		let goal_name = g.Model.goal_name in
-		let fold = 
+		let fold =
 		  fun (acc,count) subtask ->
 		    let _id = (Task.task_goal subtask).Decl.pr_name in
 		    let subgoal_name =
 		      goal_name ^ "." ^ (string_of_int count)
 		    in
 		    let sum = task_checksum subtask in
-		    let subtask_db = 
-		      Db.add_subgoal db_transf subgoal_name sum 
+		    let subtask_db =
+		      Db.add_subgoal db_transf subgoal_name sum
 		    in
 		    let goal =
-		      Helpers.add_goal_row (Model.Transf tr) 
+		      Helpers.add_goal_row (Model.Transf tr)
 			subgoal_name None subtask subtask_db
 		    in
-		    (goal :: acc, count+1) 
+		    (goal :: acc, count+1)
 		in
-		let goals,_ = 
+		let goals,_ =
 		  List.fold_left (GtkThread.sync fold) ([],1) subgoals
 		in
 		tr.Model.subgoals <- List.rev goals;
@@ -1306,7 +1306,7 @@ let rec split_goal_or_children g =
   if not g.Model.proved then
     begin
       let r = ref true in
-      Hashtbl.iter 
+      Hashtbl.iter
 	(fun _ t ->
 	   r := false;
            List.iter split_goal_or_children
@@ -1318,7 +1318,7 @@ let rec inline_goal_or_children g =
   if not g.Model.proved then
     begin
       let r = ref true in
-      Hashtbl.iter 
+      Hashtbl.iter
 	(fun _ t ->
 	   r := false;
            List.iter inline_goal_or_children
@@ -1780,7 +1780,7 @@ let color_loc (v:GSourceView2.source_view) l b e =
 let scroll_to_id id =
   match id.Ident.id_origin with
     | Ident.User loc ->
-        let (f,l,b,e) = Loc.extract loc in
+        let (f,l,b,e) = Loc.get loc in
         if f <> !current_file then
           begin
             source_view#source_buffer#set_text (source_text f);
@@ -1799,9 +1799,10 @@ let scroll_to_id id =
         set_current_file ""
 
 let color_label = function
-  | _, Some loc when (fst loc).Lexing.pos_fname = !current_file ->
-      let _, l, b, e = Loc.extract loc in
-      color_loc source_view l b e
+  | _, Some loc ->
+      let f, l, b, e = Loc.get loc in
+      if f = !current_file then
+        color_loc source_view l b e
   | _ ->
       ()
 
@@ -1994,7 +1995,7 @@ let remove_transf t =
   let g = t.Model.parent_goal in
   Hashtbl.remove g.Model.transformations "split" (* hack !! *);
   Helpers.check_goal_proved g
-  
+
 
 let confirm_remove_row r =
   let row = filter_model#get_iter r in

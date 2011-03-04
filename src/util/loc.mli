@@ -19,46 +19,31 @@
 
 open Format
 
-(*s Line number for an absolute position *)
-
-val report_line : formatter -> Lexing.position -> unit
-
-(* Lexing positions *)
-
-type position = Lexing.position * Lexing.position
-
-exception Located of position * exn
-
-val set_file : string -> Lexing.lexbuf -> unit
-
-val string : position -> string
-val parse : string -> position
-
-val dummy_position : position
-
-type floc = string * int * int * int
-
-val compare : floc -> floc -> int
-
-val dummy_floc : floc
-
-val extract :  position -> floc
-val gen_report_line : formatter -> floc -> unit
-val gen_report_position : formatter -> position -> unit
-val report_position : formatter -> position -> unit
-val report_obligation_position : ?onlybasename:bool -> formatter -> floc -> unit
-
-
-(* for both type [t] and [position] *)
-
-val join : 'a * 'b -> 'a * 'b -> 'a * 'b
+(* Lexing locations *)
 
 val current_offset : int ref
 val reloc : Lexing.position -> Lexing.position
+val set_file : string -> Lexing.lexbuf -> unit
 
-(*
-(* Identifiers localization *)
+(* locations in files *)
 
-val add_ident : string -> floc -> unit
-val ident : string -> floc
-*)
+type position
+
+val extract : Lexing.position * Lexing.position -> position
+val join : position -> position -> position
+
+exception Located of position * exn
+
+val string : position -> string
+
+val dummy_position : position
+
+val user_position : string -> int -> int -> int -> position
+
+val get : position -> string * int * int * int
+
+val compare : position -> position -> int
+
+val gen_report_position : formatter -> position -> unit
+
+

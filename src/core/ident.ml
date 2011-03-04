@@ -74,6 +74,7 @@ let end_regexp = Str.regexp "end:\\([0-9]+\\)"
 
 let id_fresh ?(labels = []) nm = create_ident nm Fresh labels
 let id_user ?(labels = []) nm loc =
+(*
   let (f,li,b,e) = Loc.extract loc in
   let f = ref f in
   let li = ref li in
@@ -101,6 +102,8 @@ let id_user ?(labels = []) nm loc =
      {Lexing.pos_fname = !f; Lexing.pos_lnum = !li;
       Lexing.pos_bol = 0; Lexing.pos_cnum = !e})
   in
+*)
+  let l = labels in
   create_ident nm (User loc) l
 
 let id_derive ?(labels = []) nm id = create_ident nm (Derived id) labels
