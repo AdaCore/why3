@@ -187,6 +187,11 @@ let prio_binop = function
 let print_label fmt (l,_) =
   if l = "" then () else fprintf fmt "\"%s\"" l
 
+let print_ident_labels fmt id =
+  if Debug.test_flag debug_print_labels && id.id_label <> []
+  then fprintf fmt " %a" (print_list space print_label) id.id_label
+  else ()
+
 let rec print_term fmt t = print_lterm 0 fmt t
 and     print_fmla fmt f = print_lfmla 0 fmt f
 
@@ -347,7 +352,8 @@ let print_logic_decl fst fmt (ls,ld) = match ld with
 let print_logic_decl fst fmt d = print_logic_decl fst fmt d; forget_tvs ()
 
 let print_ind fmt (pr,f) =
-  fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr print_fmla f
+  fprintf fmt "@[<hov 4>| %a%a : %a@]"
+    print_pr pr print_ident_labels pr.pr_name print_fmla f
 
 let print_ind_decl fst fmt (ps,bl) =
   fprintf fmt "@[<hov 2>%s %a%a =@ @[<hov>%a@]@]"
@@ -365,14 +371,8 @@ let sprint_pkind = function
 let print_pkind fmt k = pp_print_string fmt (sprint_pkind k)
 
 let print_prop_decl fmt (k,pr,f) =
-  let labels =
-    if Debug.nottest_flag debug_print_labels then [] else 
-      pr.pr_name.id_label
-  in
-  fprintf fmt "@[<hov 2>%a %a %a: %a@]" print_pkind k
-    print_pr pr 
-    (print_list space print_label) labels
-    print_fmla f;
+  fprintf fmt "@[<hov 2>%a %a%a : %a@]" print_pkind k
+    print_pr pr print_ident_labels pr.pr_name print_fmla f;
   forget_tvs ()
 
 let print_list_next sep print fmt = function
@@ -439,8 +439,9 @@ let print_tdecl fmt td = match td.td_node with
         m.meta_name (print_list comma print_meta_arg) al
 
 let print_theory fmt th =
-  fprintf fmt "@[<hov 2>theory %a@\n%a@]@\nend@."
-    print_th th (print_list newline2 print_tdecl) th.th_decls
+  fprintf fmt "@[<hov 2>theory %a%a@\n%a@]@\nend@."
+    print_th th print_ident_labels th.th_name
+    (print_list newline2 print_tdecl) th.th_decls
 
 let print_task fmt task =
   forget_all ();
