@@ -365,8 +365,14 @@ let sprint_pkind = function
 let print_pkind fmt k = pp_print_string fmt (sprint_pkind k)
 
 let print_prop_decl fmt (k,pr,f) =
-  fprintf fmt "@[<hov 2>%a %a : %a@]" print_pkind k
-    print_pr pr print_fmla f;
+  let labels =
+    if Debug.nottest_flag debug_print_labels then [] else 
+      pr.pr_name.id_label
+  in
+  fprintf fmt "@[<hov 2>%a %a %a: %a@]" print_pkind k
+    print_pr pr 
+    (print_list space print_label) labels
+    print_fmla f;
   forget_tvs ()
 
 let print_list_next sep print fmt = function

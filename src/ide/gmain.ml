@@ -529,6 +529,20 @@ let info_window ?(callback=(fun () -> ())) mt s =
 		   if x = `OK then callback ())
   in ()
 
+
+
+  let expl_regexp = Str.regexp "expl:\\(.*\\)"
+
+  let get_explanation id =
+    let r = ref None in
+    List.iter
+      (fun (s,_) ->
+         if Str.string_match expl_regexp s 0 then
+           r := Some (Str.matched_group 1 s))
+      id.Ident.id_label;
+    !r
+
+
 module Helpers = struct
 
   open Model
@@ -705,7 +719,7 @@ module Helpers = struct
     a
 
 
-  let add_goal_row parent name t db_goal =
+  let add_goal_row parent name info t db_goal =
     let parent_row = match parent with
       | Theory mth -> mth.theory_row
       | Transf mtr -> mtr.transf_row
@@ -721,7 +735,11 @@ module Helpers = struct
                  proved = false;
                }
     in
-    goals_model#set ~row ~column:name_column name;
+    let text = match info with
+      | None -> name
+      | Some s -> s
+    in
+    goals_model#set ~row ~column:name_column text;
     goals_model#set ~row ~column:icon_column !image_file;
     goals_model#set ~row ~column:index_column (Row_goal goal);
     goals_model#set ~row ~column:visible_column true;
@@ -764,7 +782,6 @@ module Helpers = struct
     goals_model#set ~row ~column:visible_column true;
     mth
 
-
   let add_theory mfile th =
     let tasks = List.rev (Task.split_theory th None None) in
     let tname = th.Theory.th_name.Ident.id_string in
@@ -775,9 +792,10 @@ module Helpers = struct
         (fun acc t ->
            let id = (Task.task_goal t).Decl.pr_name in
            let name = id.Ident.id_string in
+           let expl = get_explanation id in
            let sum = task_checksum t in
            let db_goal = Db.add_goal db_theory name sum in
-           let goal = add_goal_row (Theory mth) name t db_goal in
+           let goal = add_goal_row (Theory mth) name expl t db_goal in
            goal :: acc)
         []
         tasks
@@ -872,8 +890,9 @@ let apply_transformation ~callback t task =
 	Scheduler.apply_transformation_l ~callback t task
 
 
-let rec reimport_any_goal parent gname t db_goal goal_obsolete =
-  let goal = Helpers.add_goal_row parent gname t db_goal in
+let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
+  let info = get_explanation gid in
+  let goal = Helpers.add_goal_row parent gname info t db_goal in
   let proved = ref false in
   let external_proofs = Db.external_proofs db_goal in
   Db.Hprover.iter
@@ -919,7 +938,7 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
        let reimported_goals,db_subgoals,_ =
          List.fold_left
            (fun (acc,db_subgoals,count) subtask ->
-              let _id = (Task.task_goal subtask).Decl.pr_name in
+              let id = (Task.task_goal subtask).Decl.pr_name in
               let subgoal_name = gname ^ "." ^ (string_of_int count) in
               let sum = task_checksum subtask in
               let subtask_db,db_subgoals =
@@ -929,7 +948,7 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
 		  (Some g, Util.Mstr.remove sum db_subgoals)
                 with Not_found -> None,db_subgoals
               in
-              ((count,subgoal_name,subtask,sum,subtask_db) :: acc,
+              ((count,id,subgoal_name,subtask,sum,subtask_db) :: acc,
 	       db_subgoals,
 	       count+1))
            ([],db_subgoals,1) subgoals
@@ -946,7 +965,7 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
        let rec merge_goals new_goals old_goals proved acc =
 	 match new_goals with
 	   | [] -> acc, proved
-	   | (_,subgoal_name,subtask,sum,g_opt)::rem ->
+	   | (_,id,subgoal_name,subtask,sum,g_opt)::rem ->
 	       let db_g,subgoal_obsolete,old_goals =
 		 match g_opt with
 		   | Some g -> g,false,old_goals
@@ -961,8 +980,8 @@ let rec reimport_any_goal parent gname t db_goal goal_obsolete =
 	       in
                let subgoal,subgoal_proved =
                  reimport_any_goal
-                   (Model.Transf mtr) subgoal_name subtask db_g
-                   subgoal_obsolete
+                   (Model.Transf mtr) id
+                   subgoal_name subtask db_g subgoal_obsolete
               in
               merge_goals rem old_goals (proved && subgoal_proved)
 		(subgoal :: acc)
@@ -1007,8 +1026,8 @@ let reimport_root_goal mth tname goals t : Model.goal * bool =
      goals is a table, indexed by names of DB goals formerly known to be
      a in theory mth.  returns true whenever the task t is known to be
      proved *)
-  let gname =
-    (Task.task_goal t).Decl.pr_name.Ident.id_string
+  let id = (Task.task_goal t).Decl.pr_name in
+  let gname = id.Ident.id_string
   in
   let sum = task_checksum t in
   let db_goal,goal_obsolete =
@@ -1026,7 +1045,7 @@ let reimport_root_goal mth tname goals t : Model.goal * bool =
       let dbg = Db.add_goal mth.Model.theory_db gname sum in
       dbg,false
   in
-  reimport_any_goal (Model.Theory mth) gname t db_goal goal_obsolete
+  reimport_any_goal (Model.Theory mth) id gname t db_goal goal_obsolete
 
 (* reimports all files *)
 let files_in_db = Db.files ()
@@ -1266,7 +1285,7 @@ let transformation_on_goal g trans_name trans =
 		    in
 		    let goal =
 		      Helpers.add_goal_row (Model.Transf tr) 
-			subgoal_name subtask subtask_db
+			subgoal_name None subtask subtask_db
 		    in
 		    (goal :: acc, count+1) 
 		in
