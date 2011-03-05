@@ -196,7 +196,7 @@ let () =
 let () =
   let dbfname = Filename.concat project_dir "project.db" in
   try
-    Db.init_base dbfname
+    Dbsync.init_base dbfname
   with e ->
     eprintf "Error while opening database '%s'@." dbfname;
     eprintf "Aborting...@.";
@@ -785,7 +785,7 @@ module Helpers = struct
   let add_theory mfile th =
     let tasks = List.rev (Task.split_theory th None None) in
     let tname = th.Theory.th_name.Ident.id_string in
-    let db_theory = Db.add_theory mfile.file_db tname in
+    let db_theory = Dbsync.add_theory mfile.file_db tname in
     let mth = add_theory_row mfile th db_theory in
     let goals =
       List.fold_left
@@ -794,7 +794,7 @@ module Helpers = struct
            let name = id.Ident.id_string in
            let expl = get_explanation id in
            let sum = task_checksum t in
-           let db_goal = Db.add_goal db_theory name sum in
+           let db_goal = Dbsync.add_goal db_theory name sum in
            let goal = add_goal_row (Theory mth) name expl t db_goal in
            goal :: acc)
         []
@@ -822,7 +822,7 @@ module Helpers = struct
 
   let add_file f =
     let theories = read_file f in
-    let dbfile = Db.add_file f in
+    let dbfile = Dbsync.add_file f in
     let mfile = add_file_row f dbfile in
     let mths =
       List.fold_left
@@ -894,14 +894,14 @@ let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
   let info = get_explanation gid in
   let goal = Helpers.add_goal_row parent gname info t db_goal in
   let proved = ref false in
-  let external_proofs = Db.external_proofs db_goal in
+  let external_proofs = Dbsync.external_proofs db_goal in
   Db.Hprover.iter
     (fun pid a ->
-       let pname = Db.prover_name pid in
+       let pname = Dbsync.prover_name pid in
        try
          let p = Util.Mstr.find pname gconfig.provers in
-         let s,t,o,edit = Db.status_and_time a in
-         if goal_obsolete && not o then Db.set_obsolete a;
+         let s,t,o,edit = Dbsync.status_and_time a in
+         if goal_obsolete && not o then Dbsync.set_obsolete a;
          let obsolete = goal_obsolete or o in
          let s = match s with
            | Db.Undone -> Call_provers.HighFailure
@@ -926,15 +926,15 @@ let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
            pname
     )
     external_proofs;
-  let transformations = Db.transformations db_goal in
+  let transformations = Dbsync.transformations db_goal in
   Db.Htransf.iter
     (fun tr_id tr ->
-       let trname = Db.transf_name tr_id in
+       let trname = Dbsync.transf_name tr_id in
        eprintf "Reimporting transformation %s for goal %s @." trname gname;
        let trans = trans_of_name trname in
        let subgoals = apply_trans trans t in
        let mtr = Helpers.add_transformation_row goal tr trname in
-       let db_subgoals = Db.subgoals tr in
+       let db_subgoals = Dbsync.subgoals tr in
        let reimported_goals,db_subgoals,_ =
          List.fold_left
            (fun (acc,db_subgoals,count) subtask ->
@@ -955,7 +955,7 @@ let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
        in
        let other_goals =
 	 Util.Mstr.fold
-	   (fun _ g acc -> (Db.goal_name g,g)::acc)
+	   (fun _ g acc -> (Dbsync.goal_name g,g)::acc)
 	   db_subgoals
 	   []
        in
@@ -973,7 +973,7 @@ let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
 		       match old_goals with
 			 | [] ->
 			     (* create a new goal in db *)
-			     Db.add_subgoal tr subgoal_name sum,
+			     Dbsync.add_subgoal tr subgoal_name sum,
 			     false, old_goals
 			 | (_goal_name,g) :: r ->
 			     g, true, r
@@ -1001,7 +1001,7 @@ let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
 		  (* a subgoal has the same check sum *)
                 with Not_found ->
 		  (* otherwise, create a new one *)
-                  Db.add_subgoal tr subgoal_name sum
+                  Dbsync.add_subgoal tr subgoal_name sum
               in
               let subgoal,subgoal_proved =
                 reimport_any_goal
@@ -1033,22 +1033,22 @@ let reimport_root_goal mth tname goals t : Model.goal * bool =
   let db_goal,goal_obsolete =
     try
       let dbg = Util.Mstr.find gname goals in
-      let db_sum = Db.task_checksum dbg in
+      let db_sum = Dbsync.task_checksum dbg in
       let goal_obsolete = sum <> db_sum in
       if goal_obsolete then
         begin
           eprintf "Goal %s.%s has changed@." tname gname;
-          Db.change_checksum dbg sum
+          Dbsync.change_checksum dbg sum
         end;
       dbg,goal_obsolete
     with Not_found ->
-      let dbg = Db.add_goal mth.Model.theory_db gname sum in
+      let dbg = Dbsync.add_goal mth.Model.theory_db gname sum in
       dbg,false
   in
   reimport_any_goal (Model.Theory mth) id gname t db_goal goal_obsolete
 
 (* reimports all files *)
-let files_in_db = Db.files ()
+let files_in_db = Dbsync.files ()
 
 let () =
   List.iter
@@ -1057,7 +1057,7 @@ let () =
        let mfile = Helpers.add_file_row fn f in
        try
 	 let theories = read_file fn in
-	 let ths = Db.theories f in
+	 let ths = Dbsync.theories f in
 	 let (mths,file_proved) =
 	   List.fold_left
              (fun (acc,file_proved) (_,tname,th) ->
@@ -1065,10 +1065,10 @@ let () =
 		let db_th =
 		  try
                     Util.Mstr.find tname ths
-		  with Not_found -> Db.add_theory f tname
+		  with Not_found -> Dbsync.add_theory f tname
 		in
 		let mth = Helpers.add_theory_row mfile th db_th in
-		let goals = Db.goals db_th in
+		let goals = Dbsync.goals db_th in
 		let tasks = List.rev (Task.split_theory th None None) in
 		let goals,proved = List.fold_left
 		  (fun (acc,proved) t ->
@@ -1150,8 +1150,8 @@ let redo_external_proof q g a =
     if result = Model.Done Call_provers.Valid
     then Helpers.set_proved ~propagate:true a.Model.proof_goal;
     let db_res = match result with
-      | Model.Scheduled | Model.Running -> Db.Undone
-      | Model.Done a -> Db.Done a
+      | Model.Scheduled | Model.Running -> Dbsync.Undone
+      | Model.Done a -> Dbsync.Done a
 *)
   let callback result (* time output *) =
 (* useless: done by set_proof_status
@@ -1169,7 +1169,7 @@ let redo_external_proof q g a =
 	      Helpers.set_proved ~propagate:true a.Model.proof_goal;
 	    Db.Done r.Call_provers.pr_answer, r.Call_provers.pr_time
     in
-    Db.set_status a.Model.proof_db db_res time
+    Dbsync.set_status a.Model.proof_db db_res time
   in
   let old = if a.Model.edited_as = "" then None else
     begin
@@ -1189,8 +1189,8 @@ let rec prover_on_goal q p g =
     try Hashtbl.find g.Model.external_proofs id
     with Not_found ->
       GtkThread.sync (fun () ->
-      let db_prover = Db.prover_from_name id in
-      let db_pa = Db.add_proof_attempt g.Model.goal_db db_prover in
+      let db_prover = Dbsync.prover_from_name id in
+      let db_pa = Dbsync.add_proof_attempt g.Model.goal_db db_prover in
       Helpers.add_external_proof_row ~obsolete:false ~edit:""
 	g p db_pa Scheduler.Scheduled) ()
   in
@@ -1264,9 +1264,9 @@ let transformation_on_goal g trans_name trans =
 	      in
 	      if b then
 		let transf_id =
-		  (GtkThread.sync Db.transf_from_name) trans_name in
+		  (GtkThread.sync Dbsync.transf_from_name) trans_name in
 		let db_transf =
-		  (GtkThread.sync Db.add_transformation)
+		  (GtkThread.sync Dbsync.add_transformation)
 		    g.Model.goal_db transf_id
 		in
 		let tr = (GtkThread.sync Helpers.add_transformation_row)
@@ -1281,7 +1281,7 @@ let transformation_on_goal g trans_name trans =
 		    in
 		    let sum = task_checksum subtask in
 		    let subtask_db =
-		      Db.add_subgoal db_transf subgoal_name sum
+		      Dbsync.add_subgoal db_transf subgoal_name sum
 		    in
 		    let goal =
 		      Helpers.add_goal_row (Model.Transf tr)
@@ -1914,7 +1914,7 @@ let edit_selected_row p =
 		done;
 		let file = name ^ "_" ^ (string_of_int !i) ^ ext in
 		a.Model.edited_as <- file;
-		Db.set_edited_as a.Model.proof_db file;
+		Dbsync.set_edited_as a.Model.proof_db file;
 		file
 	    | f -> f
 	in
@@ -1978,7 +1978,7 @@ let () =
 (*************)
 
 let remove_proof_attempt a =
-  Db.remove_proof_attempt a.Model.proof_db;
+  Dbsync.remove_proof_attempt a.Model.proof_db;
   let (_:bool) = goals_model#remove a.Model.proof_row in
   let g = a.Model.proof_goal in
   Hashtbl.remove g.Model.external_proofs a.Model.prover.prover_id;
@@ -1986,7 +1986,7 @@ let remove_proof_attempt a =
 
 let remove_transf t =
   (* TODO: remove subgoals first !!! *)
-  Db.remove_transformation t.Model.transf_db;
+  Dbsync.remove_transformation t.Model.transf_db;
   let (_:bool) = goals_model#remove t.Model.transf_row in
   let g = t.Model.parent_goal in
   Hashtbl.remove g.Model.transformations "split" (* hack !! *);
