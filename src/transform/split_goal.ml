@@ -41,14 +41,21 @@ let split_case forig spl c acc tl bl =
   apply_append fn acc bll
 
 let asym_split = "asym_split"
+let stop_split = "stop_split"
 
-let to_split f = List.mem asym_split f.f_label
+let asym f = List.mem asym_split f.f_label
+let stop f = List.mem stop_split f.f_label
+
+let unstop f =
+  let ll = List.filter ((<>) stop_split) f.f_label in
+  f_label ?loc:f.f_loc ll f
 
 let rec split_pos ro acc f = match f.f_node with
+  | _ when ro && stop f -> unstop f :: acc
   | Ftrue -> acc
   | Ffalse -> f::acc
   | Fapp _ -> f::acc
-  | Fbinop (Fand,f1,f2) when to_split f ->
+  | Fbinop (Fand,f1,f2) when asym f ->
       split_pos ro (split_pos ro acc (f_implies f1 f2)) f1
   | Fbinop (Fand,f1,f2) ->
       split_pos ro (split_pos ro acc f2) f1
@@ -86,6 +93,7 @@ let rec split_pos ro acc f = match f.f_node with
   | Fquant (Fexists,_) -> f::acc
 
 and split_neg ro acc f = match f.f_node with
+  | _ when ro && stop f -> unstop f :: acc
   | Ftrue -> f::acc
   | Ffalse -> acc
   | Fapp _ -> f::acc
@@ -93,7 +101,7 @@ and split_neg ro acc f = match f.f_node with
   | Fbinop (Fand,f1,f2) ->
       let fn f1 f2 = f_label_copy f (f_and f1 f2) in
       apply_append2 fn acc (split_neg ro [] f1) (split_neg ro [] f2)
-  | Fbinop (Fimplies,f1,f2) when to_split f ->
+  | Fbinop (Fimplies,f1,f2) when asym f ->
       split_neg ro (split_neg ro acc (f_and f1 f2)) (f_not f1)
   | Fbinop (Fimplies,f1,f2) ->
       split_neg ro (split_neg ro acc f2) (f_not f1)
@@ -101,7 +109,7 @@ and split_neg ro acc f = match f.f_node with
       let f12 = f_label_copy f (f_and f1 f2) in
       let f21 = f_label_copy f (f_and (f_not f1) (f_not f2)) in
       split_neg ro (split_neg ro acc f21) f12
-  | Fbinop (For,f1,f2) when to_split f ->
+  | Fbinop (For,f1,f2) when asym f ->
       split_neg ro (split_neg ro acc (f_and (f_not f1) f2)) f1
   | Fbinop (For,f1,f2) ->
       split_neg ro (split_neg ro acc f2) f1
@@ -173,7 +181,7 @@ let rec split_intro pr dl acc f =
   let rsp = split_intro pr dl in
   match f.f_node with
   | Ftrue -> acc
-  | Fbinop (Fand,f1,f2) when to_split f ->
+  | Fbinop (Fand,f1,f2) when asym f ->
       rsp (rsp acc (f_implies f1 f2)) f1
   | Fbinop (Fand,f1,f2) ->
       rsp (rsp acc f2) f1

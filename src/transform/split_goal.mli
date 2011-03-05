@@ -18,6 +18,7 @@
 (**************************************************************************)
 
 val asym_split : Ident.label
+val stop_split : Ident.label
 
 val split_pos : Term.fmla -> Term.fmla list
 (** [split_pos f] returns a list [[g1;..;gk]] such that
