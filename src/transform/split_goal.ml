@@ -28,7 +28,7 @@ let apply_append2 fn acc l1 l2 =
   Util.list_fold_product (fun l e1 e2 -> fn e1 e2 :: l)
     acc (List.rev l1) (List.rev l2)
 
-let split_case spl c acc tl bl =
+let split_case forig spl c acc tl bl =
   let bl = List.rev_map f_open_branch_cb bl in
   let bll,_ = List.fold_left (fun (bll,el) (pl,f,close) ->
     let spf = spl [] f in
@@ -37,7 +37,8 @@ let split_case spl c acc tl bl =
     let bll = apply_append (fun f -> close pl f :: el) bll spf in
     bll, brc::el) ([],[]) bl
   in
-  apply_append (f_case tl) acc bll
+  let fn bl = f_label_copy forig (f_case tl bl) in
+  apply_append fn acc bll
 
 let asym_split = "asym_split"
 
@@ -52,29 +53,36 @@ let rec split_pos ro acc f = match f.f_node with
   | Fbinop (Fand,f1,f2) ->
       split_pos ro (split_pos ro acc f2) f1
   | Fbinop (Fimplies,f1,f2) when ro ->
-      apply_append (f_implies f1) acc (split_pos ro [] f2)
+      let fn f2 = f_label_copy f (f_implies f1 f2) in
+      apply_append fn acc (split_pos ro [] f2)
   | Fbinop (Fimplies,f1,f2) ->
-      apply_append2 f_implies acc (split_neg ro [] f1) (split_pos ro [] f2)
+      let fn f1 f2 = f_label_copy f (f_implies f1 f2) in
+      apply_append2 fn acc (split_neg ro [] f1) (split_pos ro [] f2)
   | Fbinop (Fiff,f1,f2) ->
-      split_pos ro (split_pos ro acc (f_implies f2 f1)) (f_implies f1 f2)
+      let f12 = f_label_copy f (f_implies f1 f2) in
+      let f21 = f_label_copy f (f_implies f2 f1) in
+      split_pos ro (split_pos ro acc f21) f12
   | Fbinop (For,_,_) when ro -> f::acc
   | Fbinop (For,f1,f2) ->
-      apply_append2 f_or acc (split_pos ro [] f1) (split_pos ro [] f2)
-  | Fnot f ->
-      apply_append f_not acc (split_neg ro [] f)
+      let fn f1 f2 = f_label_copy f (f_or f1 f2) in
+      apply_append2 fn acc (split_pos ro [] f1) (split_pos ro [] f2)
+  | Fnot f1 ->
+      let fn f1 = f_label_copy f (f_not f1) in
+      apply_append fn acc (split_neg ro [] f1)
   | Fif (fif,fthen,felse) ->
-      let acc = split_pos ro acc (f_implies (f_not fif) felse) in
-      split_pos ro acc (f_implies fif fthen)
+      let fit = f_label_copy f (f_implies fif fthen) in
+      let fie = f_label_copy f (f_implies (f_not fif) felse) in
+      split_pos ro (split_pos ro acc fie) fit
   | Flet (t,fb) ->
-      let vs,f,close = f_open_bound_cb fb in
-      let close f = f_let t (close vs f) in
-      apply_append close acc (split_pos ro [] f)
+      let vs,f1,close = f_open_bound_cb fb in
+      let fn f1 = f_label_copy f (f_let t (close vs f1)) in
+      apply_append fn acc (split_pos ro [] f1)
   | Fcase (tl,bl) ->
-      split_case (split_pos ro) f_true acc tl bl
+      split_case f (split_pos ro) f_true acc tl bl
   | Fquant (Fforall,fq) ->
-      let vsl,trl,f,close = f_open_quant_cb fq in
-      let close f = f_forall (close vsl trl f) in
-      apply_append close acc (split_pos ro [] f)
+      let vsl,trl,f1,close = f_open_quant_cb fq in
+      let fn f1 = f_label_copy f (f_forall (close vsl trl f1)) in
+      apply_append fn acc (split_pos ro [] f1)
   | Fquant (Fexists,_) -> f::acc
 
 and split_neg ro acc f = match f.f_node with
@@ -83,33 +91,37 @@ and split_neg ro acc f = match f.f_node with
   | Fapp _ -> f::acc
   | Fbinop (Fand,_,_) when ro -> f::acc
   | Fbinop (Fand,f1,f2) ->
-      apply_append2 f_and acc (split_neg ro [] f1) (split_neg ro [] f2)
+      let fn f1 f2 = f_label_copy f (f_and f1 f2) in
+      apply_append2 fn acc (split_neg ro [] f1) (split_neg ro [] f2)
   | Fbinop (Fimplies,f1,f2) when to_split f ->
       split_neg ro (split_neg ro acc (f_and f1 f2)) (f_not f1)
   | Fbinop (Fimplies,f1,f2) ->
       split_neg ro (split_neg ro acc f2) (f_not f1)
   | Fbinop (Fiff,f1,f2) ->
-      let acc = split_neg ro acc (f_and (f_not f1) (f_not f2)) in
-      split_neg ro acc (f_and f1 f2)
+      let f12 = f_label_copy f (f_and f1 f2) in
+      let f21 = f_label_copy f (f_and (f_not f1) (f_not f2)) in
+      split_neg ro (split_neg ro acc f21) f12
   | Fbinop (For,f1,f2) when to_split f ->
       split_neg ro (split_neg ro acc (f_and (f_not f1) f2)) f1
   | Fbinop (For,f1,f2) ->
       split_neg ro (split_neg ro acc f2) f1
-  | Fnot f ->
-      apply_append f_not acc (split_pos ro [] f)
+  | Fnot f1 ->
+      let fn f1 = f_label_copy f (f_not f1) in
+      apply_append fn acc (split_pos ro [] f1)
   | Fif (fif,fthen,felse) ->
-      let acc = split_neg ro acc (f_and (f_not fif) felse) in
-      split_neg ro acc (f_and fif fthen)
+      let fit = f_label_copy f (f_and fif fthen) in
+      let fie = f_label_copy f (f_and (f_not fif) felse) in
+      split_neg ro (split_neg ro acc fie) fit
   | Flet (t,fb) ->
-      let vs,f,close = f_open_bound_cb fb in
-      let close f = f_let t (close vs f) in
-      apply_append close acc (split_neg ro [] f)
+      let vs,f1,close = f_open_bound_cb fb in
+      let fn f1 = f_label_copy f (f_let t (close vs f1)) in
+      apply_append fn acc (split_neg ro [] f1)
   | Fcase (tl,bl) ->
-      split_case (split_neg ro) f_false acc tl bl
+      split_case f (split_neg ro) f_false acc tl bl
   | Fquant (Fexists,fq) ->
-      let vsl,trl,f,close = f_open_quant_cb fq in
-      let close f = f_exists (close vsl trl f) in
-      apply_append close acc (split_neg ro [] f)
+      let vsl,trl,f1,close = f_open_quant_cb fq in
+      let fn f1 = f_label_copy f (f_exists (close vsl trl f1)) in
+      apply_append fn acc (split_neg ro [] f1)
   | Fquant (Fforall,_) -> f::acc
 
 let split_goal ro pr f =
