@@ -259,8 +259,9 @@ let well_founded_rel = function
 
 (* Recursive computation of the weakest precondition *)
 
-let propose_label l f =
-  if f.f_label = [] then f_label [l] f else f
+let wp_label ?loc f =
+  if List.mem "WP" f.f_label then f
+  else f_label ?loc ("WP"::f.f_label) f
 
 let t_True env =
   t_app (find_ls env "True") [] (ty_app (find_ts env "bool") [])
@@ -270,7 +271,7 @@ let rec wp_expr env e q =
   let q = post_map (old_label env lab) q in
   let f = wp_desc env e q in
   let f = erase_label env lab f in
-  let f = propose_label (label ~loc:e.expr_loc "WP") f in
+  let f = wp_label ~loc:e.expr_loc f in
   if Debug.test_flag debug then begin
     eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Pgm_pretty.print_expr e;
     eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_fmla (snd (fst q));
@@ -297,7 +298,7 @@ and wp_desc env e q = match e.expr_desc with
   | Elet (x, e1, e2) ->
       let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
       let v1 = v_result x.pv_vs.vs_ty in
-      let t1 = t_label_add (label ~loc:e1.expr_loc "let") (t_var v1) in
+      let t1 = t_label ~loc:e1.expr_loc ["let"] (t_var v1) in
       let q1 = v1, f_subst (subst1 x.pv_vs t1) w2 in
       let q1 = saturate_post e1.expr_effect q1 q in
       wp_expr env e1 q1
@@ -305,14 +306,13 @@ and wp_desc env e q = match e.expr_desc with
       let w1 = wp_expr env e1 q in
       let wl = List.map (wp_recfun env) dl in
       wp_ands ~sym:true (w1 :: wl)
-
   | Eif (e1, e2, e3) ->
       let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
       let w3 = wp_expr env e3 (filter_post e3.expr_effect q) in
       let q1 = (* if result=True then w2 else w3 *)
 	let res = v_result e1.expr_type in
 	let test = f_equ (t_var res) (t_True env) in
-	let test = f_label_add (label ~loc:e1.expr_loc "WP") test in
+	let test = wp_label ~loc:e1.expr_loc test in
 	let q1 = f_if test w2 w3 in
 	saturate_post e1.expr_effect (res, q1) q
       in
@@ -330,8 +330,8 @@ and wp_desc env e q = match e.expr_desc with
 	| Some i ->
 	    wp_and wfr
 	      (wp_and ~sym:true
-		 (f_label_add (label "expl:Loop invariant init") i)
-                 (f_label_add (label "expl:Loop invariant preservation")
+		 (f_label_add "expl:Loop invariant init" i)
+                 (f_label_add "expl:Loop invariant preservation"
 		    (quantify env e.expr_effect (wp_implies i we))))
 	in
 	w
@@ -418,10 +418,10 @@ and wp_desc env e q = match e.expr_desc with
 
   | Eassert (Ptree.Aassert, f) ->
       let (_, q), _ = q in
-      wp_and (f_label_add (label "expl:assertion") f) q
+      wp_and (f_label_add "expl:assertion" f) q
   | Eassert (Ptree.Acheck, f) ->
       let (_, q), _ = q in
-      wp_and ~sym:true (f_label_add (label "expl:check") f) q
+      wp_and ~sym:true (f_label_add "expl:check" f) q
   | Eassert (Ptree.Aassume, f) ->
       let (_, q), _ = q in
       wp_implies f q
@@ -431,7 +431,8 @@ and wp_desc env e q = match e.expr_desc with
   | Eany c ->
       (* TODO: propagate call labels into c.c_post *)
       let w = opaque_wp env c.c_effect c.c_post q in
-      let p = f_label_add (label ~loc:e.expr_loc "expl:precondition") c.c_pre in
+      let l = "expl:precondition" :: c.c_pre.f_label in
+      let p = f_label ~loc:e.expr_loc l c.c_pre in
       wp_and p w
 
 and wp_triple env (p, e, q) =

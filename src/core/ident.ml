@@ -22,9 +22,7 @@ open Util
 
 (** Labels *)
 
-type label = string * Loc.position option
-
-let label ?loc s = (s,loc)
+type label = string
 
 (** Identifiers *)
 
@@ -68,21 +66,7 @@ let create_ident name origin labels = {
 }
 
 let id_fresh ?(labels = []) nm = create_ident nm Fresh labels
-let id_user ?(labels = []) nm loc =
-  let new_loc = ref loc in
-  let new_labels = List.fold_left
-    (fun acc ((s,l) as lab) ->
-       match l with
-	 | None -> lab :: acc
-	 | Some loc -> 
-	     new_loc := loc; 
-	     match s with
-	       | "" -> acc
-	       | _ -> lab :: acc)
-    [] labels
-  in
-  create_ident nm (User !new_loc) new_labels
-
+let id_user ?(labels = []) nm loc = create_ident nm (User loc) labels
 let id_derive ?(labels = []) nm id = create_ident nm (Derived id) labels
 
 let id_clone ?(labels = []) id =

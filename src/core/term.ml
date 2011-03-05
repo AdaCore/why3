@@ -272,6 +272,7 @@ type constant =
 type term = {
   t_node  : term_node;
   t_label : label list;
+  t_loc   : Loc.position option;
   t_vars  : Svs.t;
   t_ty    : ty;
   t_tag   : int;
@@ -280,6 +281,7 @@ type term = {
 and fmla = {
   f_node  : fmla_node;
   f_label : label list;
+  f_loc   : Loc.position option;
   f_vars  : Svs.t;
   f_tag   : int;
 }
@@ -547,6 +549,7 @@ module Hfmla = Fmla.H
 let mk_term n ty = Hsterm.hashcons {
   t_node  = n;
   t_label = [];
+  t_loc   = None;
   t_vars  = Svs.empty;
   t_ty    = ty;
   t_tag   = -1
@@ -562,17 +565,19 @@ let t_let t1 bt ty  = mk_term (Tlet (t1, bt)) ty
 let t_case t1 bl ty = mk_term (Tcase (t1, bl)) ty
 let t_eps bf ty     = mk_term (Teps bf) ty
 
-let t_label     l t = Hsterm.hashcons { t with t_label = l }
-let t_label_add l t = Hsterm.hashcons { t with t_label = l :: t.t_label }
+let t_label ?loc l t = Hsterm.hashcons { t with t_label = l; t_loc = loc }
+let t_label_add  l t = Hsterm.hashcons { t with t_label = l :: t.t_label }
 
-let t_label_copy { t_label = l } t =
-  if t.t_label = [] && l <> [] then t_label l t else t
+let t_label_copy { t_label = l; t_loc = p } t =
+  if t.t_label = [] && t.t_loc = None && (l <> [] || p <> None)
+  then t_label ?loc:p l t else t
 
 (* hash-consing constructors for formulas *)
 
 let mk_fmla n = Hsfmla.hashcons {
   f_node  = n;
   f_label = [];
+  f_loc   = None;
   f_vars  = Svs.empty;
   f_tag   = -1
 }
@@ -587,11 +592,12 @@ let f_if f1 f2 f3     = mk_fmla (Fif (f1, f2, f3))
 let f_let t bf        = mk_fmla (Flet (t, bf))
 let f_case t bl       = mk_fmla (Fcase (t, bl))
 
-let f_label     l f = Hsfmla.hashcons { f with f_label = l }
-let f_label_add l f = Hsfmla.hashcons { f with f_label = l :: f.f_label }
+let f_label ?loc l f = Hsfmla.hashcons { f with f_label = l; f_loc = loc }
+let f_label_add  l f = Hsfmla.hashcons { f with f_label = l :: f.f_label }
 
-let f_label_copy { f_label = l } f =
-  if f.f_label = [] && l <> [] then f_label l f else f
+let f_label_copy { f_label = l; f_loc = p } f =
+  if f.f_label = [] && f.f_loc = None && (l <> [] || p <> None)
+  then f_label ?loc:p l f else f
 
 let f_and     = f_binary Fand
 let f_or      = f_binary For

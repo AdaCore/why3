@@ -184,7 +184,7 @@ let prio_binop = function
   | Fimplies -> 1
   | Fiff -> 1
 
-let print_label fmt (l,_) =
+let print_label fmt l =
   if l = "" then () else fprintf fmt "\"%s\"" l
 
 let print_ident_labels fmt id =

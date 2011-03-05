@@ -138,9 +138,14 @@ and specialize_type_c ~loc htv c =
     dc_post        = specialize_post ~loc htv c.c_post; }
 
 and specialize_binder ~loc htv v =
-  let id = { id = v.pv_name.id_string;
-             id_lab = v.pv_name.id_label;
-             id_loc = loc } in
+  let id = {
+    id = v.pv_name.id_string;
+    id_lab = List.map (fun l -> Lstr l) v.pv_name.id_label;
+    (* FIXME? We do the same here as in Denv.ident_of_vs *)
+    id_loc = match v.pv_name.id_origin with
+      | User loc -> loc
+      | _ -> loc }
+  in
   let v = specialize_type_v ~loc htv v.pv_tv in
   id, dpurify_type_v v, v
 

@@ -148,6 +148,7 @@
 %token <string> OP1 OP2 OP3 OP4 OPPREF
 %token <Ptree.real_constant> FLOAT
 %token <string> STRING
+%token <Loc.position> POSITION
 
 /* keywords */
 
@@ -244,8 +245,8 @@ list0_theory:
 
 theory_head:
 | THEORY uident labels
-   { let id = add_lab $2 $3 and labels = $3 in
-     let name = Ident.id_user ~labels id.id id.id_loc in
+   { let id = add_lab $2 $3 in
+     let name = Denv.create_user_id id in
      ref_push uc_ref (create_theory name); id }
 ;
 
@@ -516,11 +517,11 @@ lexpr:
 | lexpr OR lexpr
    { infix_pp $1 PPor $3 }
 | lexpr BARBAR lexpr
-   { mk_pp (PPnamed (Ident.label "asym_split", infix_pp $1 PPor $3)) }
+   { mk_pp (PPnamed (Lstr "asym_split", infix_pp $1 PPor $3)) }
 | lexpr AND lexpr
    { infix_pp $1 PPand $3 }
 | lexpr AMPAMP lexpr
-   { mk_pp (PPnamed (Ident.label "asym_split", infix_pp $1 PPand $3)) }
+   { mk_pp (PPnamed (Lstr "asym_split", infix_pp $1 PPand $3)) }
 | NOT lexpr
    { prefix_pp PPnot $2 }
 | lexpr EQUAL lexpr
@@ -869,12 +870,9 @@ qualid:
 
 label:
 | STRING
-   { Ident.label $1 }
-| STRING BACKQUOTE INTEGER BACKQUOTE INTEGER
-         BACKQUOTE INTEGER BACKQUOTE STRING
-   { let loc = Loc.user_position $9 (int_of_string $3) (int_of_string $5)
-                            (int_of_string $7) 
-     in Ident.label ~loc $1 }
+   { Lstr $1 }
+| POSITION
+   { Lpos $1 }
 ;
 
 labels:

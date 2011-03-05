@@ -129,6 +129,7 @@ type constant =
 type term = private {
   t_node  : term_node;
   t_label : label list;
+  t_loc   : Loc.position option;
   t_vars  : Svs.t;
   t_ty    : ty;
   t_tag   : int;
@@ -137,6 +138,7 @@ type term = private {
 and fmla = private {
   f_node  : fmla_node;
   f_label : label list;
+  f_loc   : Loc.position option;
   f_vars  : Svs.t;
   f_tag   : int;
 }
@@ -258,7 +260,7 @@ val t_eps_close : vsymbol -> fmla -> term
 
 val t_app_infer : lsymbol -> term list -> term
 
-val t_label : label list -> term -> term
+val t_label : ?loc:Loc.position -> label list -> term -> term
 val t_label_add : label -> term -> term
 val t_label_copy : term -> term -> term
 
@@ -285,7 +287,7 @@ val f_quant_close : quant -> vsymbol list -> trigger list -> fmla -> fmla
 val f_forall_close : vsymbol list -> trigger list -> fmla -> fmla
 val f_exists_close : vsymbol list -> trigger list -> fmla -> fmla
 
-val f_label : label list -> fmla -> fmla
+val f_label : ?loc:Loc.position -> label list -> fmla -> fmla
 val f_label_add : label -> fmla -> fmla
 val f_label_copy : fmla -> fmla -> fmla
 

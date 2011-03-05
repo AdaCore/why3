@@ -39,9 +39,9 @@ let split_case spl c acc tl bl =
   in
   apply_append (f_case tl) acc bll
 
-let asym_split = Ident.label "asym_split"
+let asym_split = "asym_split"
 
-let to_split f = List.exists (fun (l,_) -> l = "asym_split") f.f_label
+let to_split f = List.mem asym_split f.f_label
 
 let rec split_pos ro acc f = match f.f_node with
   | Ftrue -> acc

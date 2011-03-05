@@ -536,7 +536,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
   let get_explanation id =
     let r = ref None in
     List.iter
-      (fun (s,_) ->
+      (fun s ->
          if Str.string_match expl_regexp s 0 then
            r := Some (Str.matched_group 1 s))
       id.Ident.id_label;
@@ -1798,21 +1798,17 @@ let scroll_to_id id =
           "Derived ident (no position available)\n";
         set_current_file ""
 
-let color_label = function
-  | _, Some loc ->
-      let f, l, b, e = Loc.get loc in
-      if f = !current_file then
-        color_loc source_view l b e
-  | _ ->
-      ()
+let color_loc loc =
+  let f, l, b, e = Loc.get loc in
+  if f = !current_file then color_loc source_view l b e
 
-let rec color_f_labels () f =
-  List.iter color_label f.Term.f_label;
-  Term.f_fold color_t_labels color_f_labels () f
+let rec color_f_locs () f =
+  Util.option_iter color_loc f.Term.f_loc;
+  Term.f_fold color_t_locs color_f_locs () f
 
-and color_t_labels () t =
-  List.iter color_label t.Term.t_label;
-  Term.t_fold color_t_labels color_f_labels () t
+and color_t_locs () t =
+  Util.option_iter color_loc t.Term.t_loc;
+  Term.t_fold color_t_locs color_f_locs () t
 
 let scroll_to_source_goal g =
   let t = g.Model.task in
@@ -1823,7 +1819,7 @@ let scroll_to_source_goal g =
         { Task.task_decl =
             { Theory.td_node =
                 Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
-        color_f_labels () f
+        color_f_locs () f
     | _ ->
         assert false
 

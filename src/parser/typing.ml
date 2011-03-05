@@ -460,11 +460,12 @@ let apply_highord loc x tl = match List.rev tl with
 let rec dterm ?(localize=false) env { pp_loc = loc; pp_desc = t } =
   let n, ty = dterm_node ~localize loc env t in
   let t = { dt_node = n; dt_ty = ty } in
-  if localize then
-    let n = Tnamed (Ident.label ~loc "", t) in
-    { dt_node = n; dt_ty = ty }
-  else
-    t
+  let rec down e = match e.dt_node with
+    | Tnamed (Lstr _, e) -> down e
+    | Tnamed (Lpos _, _) -> t
+    | _ -> { dt_node = Tnamed (Lpos loc, t); dt_ty = ty }
+  in
+  if localize then down t else t
 
 and dterm_node ~localize loc env = function
   | PPvar (Qident {id=x}) when Mstr.mem x env.dvars ->
@@ -521,6 +522,10 @@ and dterm_node ~localize loc env = function
       let bl = List.map branch bl in
       Tmatch (t1, bl), tb
   | PPnamed (x, e1) ->
+      let localize = match x with
+        | Lpos _ -> false
+        | Lstr _ -> true
+      in
       let e1 = dterm ~localize env e1 in
       Tnamed (x, e1), e1.dt_ty
   | PPcast (e1, ty) ->
@@ -647,8 +652,13 @@ and dterm_node ~localize loc env = function
       error ~loc TermExpected
 
 and dfmla ?(localize=false) env { pp_loc = loc; pp_desc = f } =
-  let n = dfmla_node ~localize loc env f in
-  if localize then Fnamed (Ident.label ~loc "", n) else n
+  let f = dfmla_node ~localize loc env f in
+  let rec down e = match e with
+    | Fnamed (Lstr _, e) -> down e
+    | Fnamed (Lpos _, _) -> f
+    | _ -> Fnamed (Lpos loc, f)
+  in
+  if localize then down f else f
 
 and dfmla_node ~localize loc env = function
   | PPtrue ->
@@ -719,6 +729,10 @@ and dfmla_node ~localize loc env = function
       in
       Fmatch (t1, List.map branch bl)
   | PPnamed (x, f1) ->
+      let localize = match x with
+        | Lpos _ -> false
+        | Lstr _ -> true
+      in
       let f1 = dfmla ~localize env f1 in
       Fnamed (x, f1)
   | PPvar (Qident s | Qdot (_,s) as x) when is_uppercase s.id.[0] ->
@@ -788,11 +802,10 @@ let add_projections th d = match d.td_def with
           | Some t -> t
         in
         let per_param acc ty (n,_) = match n with
-          | Some { id = id ; id_lab = labels ; id_loc = loc }
-            when not (Mstr.mem id acc) ->
-              let fn = id_user ~labels id loc in
+          | Some id when not (Mstr.mem id.id acc) ->
+              let fn = create_user_id id in
               let fs = create_fsymbol fn [tc] ty in
-              Mstr.add id (fs,tc,ty) acc
+              Mstr.add id.id (fs,tc,ty) acc
           | _ -> acc
         in
         List.fold_left2 per_param acc cs.ls_args pl
@@ -822,18 +835,15 @@ let add_types dl th =
     with Not_found ->
       Hashtbl.add tysymbols x None;
       let d = Mstr.find x def in
-      let id = d.td_ident.id in
       let vars = Hashtbl.create 17 in
-      let vl =
-	List.map
-	  (fun { id = v ; id_lab = labels ; id_loc = loc } ->
-	     if Hashtbl.mem vars v then error ~loc (DuplicateTypeVar v);
-	     let i = create_tvsymbol (id_user ~labels v loc) in
-	     Hashtbl.add vars v i;
-	     i)
-	  d.td_params
+      let vl = List.map (fun id ->
+        if Hashtbl.mem vars id.id then
+          error ~loc:id.id_loc (DuplicateTypeVar id.id);
+        let i = create_tvsymbol (create_user_id id) in
+        Hashtbl.add vars id.id i;
+        i) d.td_params
       in
-      let id = id_user id ~labels:d.td_ident.id_lab d.td_loc in
+      let id = create_user_id d.td_ident in
       let ts = match d.td_def with
 	| TDalias ty ->
 	    let rec apply = function
@@ -891,11 +901,11 @@ let add_types dl th =
 	  Tabstract
       | TDalgebraic cl ->
 	  let ty = ty_app ts (List.map ty_var ts.ts_args) in
-	  let constructor (loc, { id = id ; id_lab = labels }, pl) =
+	  let constructor (loc, id, pl) =
 	    let param (_,t) = ty_of_dty (dty th' t) in
 	    let tyl = List.map param pl in
-	    Hashtbl.replace csymbols id loc;
-	    create_fsymbol (id_user ~labels id loc) tyl ty
+	    Hashtbl.replace csymbols id.id loc;
+	    create_fsymbol (create_user_id id) tyl ty
 	  in
 	  Talgebraic (List.map constructor cl)
       | TDrecord _ ->
@@ -933,7 +943,7 @@ let add_logics dl th =
   (* 1. create all symbols and make an environment with these symbols *)
   let create_symbol th d =
     let id = d.ld_ident.id in
-    let v = id_user ~labels:d.ld_ident.id_lab id d.ld_loc in
+    let v = create_user_id d.ld_ident in
     let denv = create_denv th in
     Hashtbl.add denvs id denv;
     let type_ty (_,t) = ty_of_dty (dty denv t) in
@@ -964,7 +974,7 @@ let add_logics dl th =
     let create_var (x, _) ty =
       let id = match x with
 	| None -> id_fresh "%x"
-	| Some id -> id_user ~labels:id.id_lab id.id id.id_loc
+	| Some id -> create_user_id id
       in
       create_vsymbol id ty
     in
@@ -1011,7 +1021,7 @@ let type_fmla denv env f =
   fmla env f
 
 let add_prop k loc s f th =
-  let pr = create_prsymbol (id_user ~labels:s.id_lab s.id loc) in
+  let pr = create_prsymbol (create_user_id s) in
   try add_prop_decl th k pr (type_fmla (create_denv th) Mstr.empty f)
   with ClashSymbol s -> error ~loc (Clash s)
 
@@ -1025,7 +1035,7 @@ let add_inductives dl th =
   let psymbols = Hashtbl.create 17 in
   let create_symbol th d =
     let id = d.in_ident.id in
-    let v = id_user ~labels:d.in_ident.id_lab id d.in_loc in
+    let v = create_user_id d.in_ident in
     let type_ty (_,t) = ty_of_dty (dty denv t) in
     let pl = List.map type_ty d.in_params in
     let ps = create_psymbol v pl in
@@ -1040,10 +1050,10 @@ let add_inductives dl th =
   let type_decl d =
     let id = d.in_ident.id in
     let ps = Hashtbl.find psymbols id in
-    let clause (loc, { id = id ; id_lab = labels }, f) =
-      Hashtbl.replace propsyms id loc;
+    let clause (loc, id, f) =
+      Hashtbl.replace propsyms id.id loc;
       let f = type_fmla denv Mstr.empty f in
-      create_prsymbol (id_user ~labels id loc), f
+      create_prsymbol (create_user_id id), f
     in
     ps, List.map clause d.in_def
   in

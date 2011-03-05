@@ -171,9 +171,14 @@ let op_char_1234 = op_char_1 | op_char_234
 let op_char_pref = ['!' '?']
 
 rule token = parse
-  | "#" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
-    space* (digit+ as line) space* (digit+ as char) space* "#"
+  | "##" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
+    space* (digit+ as line) space* (digit+ as char) space* "##"
       { update_loc lexbuf file line char; token lexbuf }
+  | "#" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\""
+    space* (digit+ as line) space* (digit+ as bchar) space*
+    (digit+ as echar) space* "#"
+      { POSITION (Loc.user_position file (int_of_string line)
+                 (int_of_string bchar) (int_of_string echar)) }
   | newline
       { newline lexbuf; token lexbuf }
   | space+

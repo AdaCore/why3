@@ -23,9 +23,7 @@ open Stdlib
 
 (** {2 Labels} *)
 
-type label = string * Loc.position option
-
-val label : ?loc:Loc.position -> string -> label
+type label = string
 
 (** {2 Identifiers} *)
 

@@ -25,7 +25,10 @@ type loc = Loc.position
 
 type real_constant = Term.real_constant
 type constant = Term.constant
-type label = Ident.label
+
+type label =
+  | Lstr of Ident.label
+  | Lpos of Loc.position
 
 type pp_quant =
   | PPforall | PPexists | PPlambda | PPfunc | PPpred
@@ -241,7 +244,7 @@ type program_decl =
 
 type module_ = {
   mod_name   : ident;
-  mod_labels : Ident.label list;
+  mod_labels : label list;
   mod_decl   : program_decl list;
 }
 

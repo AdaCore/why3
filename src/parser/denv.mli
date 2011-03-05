@@ -47,6 +47,8 @@ val ty_of_dty : dty -> ty
 
 type ident = Ptree.ident
 
+val create_user_id : Ptree.ident -> Ident.preid
+
 type dpattern = { dp_node : dpattern_node; dp_ty : dty }
 
 and dpattern_node =
@@ -67,7 +69,7 @@ and dterm_node =
   | Tif of dfmla * dterm * dterm
   | Tlet of dterm * ident * dterm
   | Tmatch of dterm * (dpattern * dterm) list
-  | Tnamed of Ident.label * dterm
+  | Tnamed of Ptree.label * dterm
   | Teps of ident * dty * dfmla
 
 and dfmla =
@@ -80,7 +82,7 @@ and dfmla =
   | Fif of dfmla * dfmla * dfmla
   | Flet of dterm * ident * dfmla
   | Fmatch of dterm * (dpattern * dfmla) list
-  | Fnamed of Ident.label * dfmla
+  | Fnamed of Ptree.label * dfmla
   | Fvar of fmla
 
 and dtrigger =
@@ -95,8 +97,7 @@ val fmla : vsymbol Mstr.t -> dfmla -> fmla
 
 val specialize_ty : loc:Ptree.loc -> type_var Htv.t -> ty -> dty
 
-val specialize_lsymbol  :
-  loc:Ptree.loc -> lsymbol -> dty list * dty option
+val specialize_lsymbol : loc:Ptree.loc -> lsymbol -> dty list * dty option
 
 val specialize_term : loc:Ptree.loc -> type_var Htv.t -> term -> dterm
 
