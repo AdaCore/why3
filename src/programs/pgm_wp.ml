@@ -330,8 +330,8 @@ and wp_desc env e q = match e.expr_desc with
 	| Some i ->
 	    wp_and wfr
 	      (wp_and ~sym:true
-		 (f_label_add (label "LoopInvInit") i)
-                 (f_label_add (label "LoopInvPres")
+		 (f_label_add (label "expl:Loop invariant init") i)
+                 (f_label_add (label "expl:Loop invariant preservation")
 		    (quantify env e.expr_effect (wp_implies i we))))
 	in
 	w
@@ -418,10 +418,10 @@ and wp_desc env e q = match e.expr_desc with
 
   | Eassert (Ptree.Aassert, f) ->
       let (_, q), _ = q in
-      wp_and (f_label_add (label "Assert") f) q
+      wp_and (f_label_add (label "expl:assertion") f) q
   | Eassert (Ptree.Acheck, f) ->
       let (_, q), _ = q in
-      wp_and ~sym:true (f_label_add (label "Check") f) q
+      wp_and ~sym:true (f_label_add (label "expl:check") f) q
   | Eassert (Ptree.Aassume, f) ->
       let (_, q), _ = q in
       wp_implies f q
@@ -431,7 +431,7 @@ and wp_desc env e q = match e.expr_desc with
   | Eany c ->
       (* TODO: propagate call labels into c.c_post *)
       let w = opaque_wp env c.c_effect c.c_post q in
-      let p = f_label_add (label ~loc:e.expr_loc "Pre") c.c_pre in
+      let p = f_label_add (label ~loc:e.expr_loc "expl:precondition") c.c_pre in
       wp_and p w
 
 and wp_triple env (p, e, q) =
