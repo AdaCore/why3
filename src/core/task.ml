@@ -125,11 +125,16 @@ exception GoalFound
 exception GoalNotFound
 
 let find_goal = function
-  | Some {task_decl = {td_node = Decl {d_node = Dprop (Pgoal,p,_)}}} -> Some p
+  | Some {task_decl = {td_node = Decl {d_node = Dprop (Pgoal,p,f)}}} -> 
+      Some(p,f)
   | _ -> None
 
 let task_goal task  = match find_goal task with
-  | Some pr -> pr
+  | Some(pr,_) -> pr
+  | None    -> raise GoalNotFound
+
+let task_goal_fmla task  = match find_goal task with
+  | Some(_,f) -> f
   | None    -> raise GoalNotFound
 
 let check_task task = match find_goal task with

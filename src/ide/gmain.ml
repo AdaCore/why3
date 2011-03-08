@@ -533,13 +533,28 @@ let info_window ?(callback=(fun () -> ())) mt s =
 
   let expl_regexp = Str.regexp "expl:\\(.*\\)"
 
-  let get_explanation id =
+  let rec get_labels f =
+    f.Term.f_label @
+    match f.Term.f_node with
+      | Term.Fbinop(Term.Fimplies,_,f) -> get_labels f
+      | Term.Fquant(Term.Fforall,fq) ->
+	  let (_,_,f) = Term.f_open_quant fq in get_labels f
+      | _ -> []
+
+  let get_explanation id fmla =
     let r = ref None in
+    let fl = Debug.lookup_flag "print_labels" in
+    Debug.set_flag fl;
+    Format.eprintf "searching expl in formula '%a'@." Pretty.print_fmla fmla;
     List.iter
       (fun s ->
          if Str.string_match expl_regexp s 0 then
-           r := Some (Str.matched_group 1 s))
-      id.Ident.id_label;
+           begin
+	     let e = Str.matched_group 1 s in
+	     Format.eprintf "found explanation: '%s'" e;
+	     r := Some e
+	   end)
+      (get_labels fmla @ id.Ident.id_label);
     !r
 
 
@@ -792,7 +807,7 @@ module Helpers = struct
         (fun acc t ->
            let id = (Task.task_goal t).Decl.pr_name in
            let name = id.Ident.id_string in
-           let expl = get_explanation id in
+           let expl = get_explanation id (Task.task_goal_fmla t) in
            let sum = task_checksum t in
            let db_goal = Dbsync.add_goal db_theory name sum in
            let goal = add_goal_row (Theory mth) name expl t db_goal in
@@ -891,7 +906,7 @@ let apply_transformation ~callback t task =
 
 
 let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
-  let info = get_explanation gid in
+  let info = get_explanation gid (Task.task_goal_fmla t) in
   let goal = Helpers.add_goal_row parent gname info t db_goal in
   let proved = ref false in
   let external_proofs = Dbsync.external_proofs db_goal in

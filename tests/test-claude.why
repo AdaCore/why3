@@ -44,7 +44,13 @@ theory TestSplit
 
   logic bb int
 
-  goal G : aa 0 && bb 1 -> false
+  goal G1 : ("stop_split" aa 0 and bb 1) and ("stop_split" aa 1 and bb 2)
+
+  goal G2 : ("stop_split" aa 0 && bb 1) && ("stop_split" aa 1 && bb 2)
+
+  goal G3 : forall x:int. ("stop_split" aa x and bb 1) and ("stop_split" aa 1 and bb 2)
+
+  goal G4 : forall x:int. ("stop_split" aa x && bb 1) && ("stop_split" aa 1 && bb 2)
 
 end
 

@@ -41,6 +41,9 @@ let debug = Debug.register_flag "program_wp"
 let wp_and ?(sym=false) f1 f2 =
 (*   if sym then f_and_simp f1 f2 else f_and_simp f1 (f_implies_simp f1 f2)  *)
   let f = f_and_simp f1 f2 in
+(* experiment, but does not work
+  let f = f_label_add Split_goal.stop_split f in
+*)
   match f.f_node with
     | Fbinop (Fand, _, _) when not sym -> f_label_add Split_goal.asym_split f
     | _ -> f
@@ -269,6 +272,9 @@ let wp_expl l f =
 let t_True env =
   t_app (find_ls env "True") [] (ty_app (find_ts env "bool") [])
 
+let add_expl msg f =
+  f_label_add Split_goal.stop_split (f_label_add ("expl:"^msg) f) 
+
 let rec wp_expr env e q =
   let lab = fresh_label env in
   let q = post_map (old_label env lab) q in
@@ -440,6 +446,9 @@ and wp_desc env e q = match e.expr_desc with
 
 and wp_triple env (p, e, q) =
   let f = wp_expr env e q in
+(* does not not work, should be on q instead
+  let f = add_expl "Postcondition" f in
+*)
   let f = wp_implies p f in
   quantify ~all:true env e.expr_effect f
 

@@ -95,6 +95,7 @@ val task_tdecls : task -> tdecl list
 val task_decls  : task -> decl list
 
 val task_goal  : task -> prsymbol
+val task_goal_fmla  : task -> fmla
 
 (** {2 selectors} *)
 
