@@ -1,8 +1,19 @@
 module P
 
   use import int.Int
+  use import module stdlib.Ref
 
-  type t 'a = { a : int; mutable b : int; }
+  parameter r : ref int
+  parameter fresh : unit -> {} unit writes r { r = old r + 1 }
+
+  let rec f () =
+    {}
+    if any bool then
+      fresh ()
+    else begin
+      f (); f ()
+    end
+    { r > old r }
 
 end
 
