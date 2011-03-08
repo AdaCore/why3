@@ -235,6 +235,9 @@ let default_exns_post ef =
 let term_at env lab t =
   t_app (find_ls env "at") [t; t_var lab] t.t_ty
 
+let wp_expl l f =
+  f_label ?loc:f.f_loc (("expl:"^l)::Split_goal.stop_split::f.f_label) f
+
 let while_post_block env inv var lab e =
   let decphi = match var with
     | None ->
@@ -247,13 +250,14 @@ let while_post_block env inv var lab e =
     | Some (phi, Some r) ->
 	f_app r [phi; term_at env lab phi]
   in
+  let decphi = wp_expl "loop variant decreases" decphi in
   let ql = default_exns_post e.expr_effect in
   let res = v_result e.expr_type in
   match inv with
     | None ->
 	(res, decphi), ql
     | Some i ->
-	(res, wp_and i decphi), ql
+	(res, wp_and (wp_expl "loop invariant preservation" i) decphi), ql
 
 let well_founded_rel = function
   | None -> f_true
@@ -266,14 +270,14 @@ let wp_label ?loc f =
   if List.mem "WP" f.f_label then f
   else f_label ?loc ("WP"::f.f_label) f
 
-let wp_expl l f =
-  f_label ?loc:f.f_loc (l::Split_goal.stop_split::f.f_label) f
 
 let t_True env =
   t_app (find_ls env "True") [] (ty_app (find_ts env "bool") [])
 
+(*
 let add_expl msg f =
   f_label_add Split_goal.stop_split (f_label_add ("expl:"^msg) f) 
+*)
 
 let rec wp_expr env e q =
   let lab = fresh_label env in
@@ -339,9 +343,8 @@ and wp_desc env e q = match e.expr_desc with
 	| Some i ->
 	    wp_and wfr
 	      (wp_and ~sym:true
-		 (wp_expl "expl:Loop invariant init" i)
-                 (wp_expl "expl:Loop invariant preservation"
-		    (quantify env e.expr_effect (wp_implies i we))))
+		 (wp_expl "loop invariant init" i)
+		 (quantify env e.expr_effect (wp_implies i we)))
 	in
 	w
   (* optimization for the particular case let _ = y in e *)
@@ -427,10 +430,10 @@ and wp_desc env e q = match e.expr_desc with
 
   | Eassert (Ptree.Aassert, f) ->
       let (_, q), _ = q in
-      wp_and (wp_expl "expl:assertion" f) q
+      wp_and (wp_expl "assertion" f) q
   | Eassert (Ptree.Acheck, f) ->
       let (_, q), _ = q in
-      wp_and ~sym:true (wp_expl "expl:check" f) q
+      wp_and ~sym:true (wp_expl "check" f) q
   | Eassert (Ptree.Aassume, f) ->
       let (_, q), _ = q in
       wp_implies f q
@@ -440,15 +443,19 @@ and wp_desc env e q = match e.expr_desc with
   | Eany c ->
       (* TODO: propagate call labels into c.c_post *)
       let w = opaque_wp env c.c_effect c.c_post q in
-      let p = wp_expl "expl:precondition" c.c_pre in
+      let p = wp_expl "precondition" c.c_pre in
       let p = f_label ~loc:e.expr_loc p.f_label p in
       wp_and p w
 
 and wp_triple env (p, e, q) =
+  let q =
+    match q with
+      | ((v,q),l) ->
+          (v,wp_expl "normal postcondition" q),
+          List.map (fun (e,(v,q)) ->
+                      e,(v,wp_expl "exceptional postcondition" q)) l
+  in
   let f = wp_expr env e q in
-(* does not not work, should be on q instead
-  let f = add_expl "Postcondition" f in
-*)
   let f = wp_implies p f in
   quantify ~all:true env e.expr_effect f
 
