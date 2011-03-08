@@ -358,7 +358,7 @@ let apply_transformation ~callback transf goal =
 let apply_transformation_l ~callback transf goal =
   callback (Trans.apply transf goal)
 
-let edit_proof ~debug ~editor ~file ~driver ~callback goal =
+let edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
   let old =
     if Sys.file_exists file
     then
