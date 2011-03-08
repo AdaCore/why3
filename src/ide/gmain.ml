@@ -543,15 +543,19 @@ let info_window ?(callback=(fun () -> ())) mt s =
 
   let get_explanation id fmla =
     let r = ref None in
+(*
     let fl = Debug.lookup_flag "print_labels" in
     Debug.set_flag fl;
     Format.eprintf "searching expl in formula '%a'@." Pretty.print_fmla fmla;
+*)
     List.iter
       (fun s ->
          if Str.string_match expl_regexp s 0 then
            begin
 	     let e = Str.matched_group 1 s in
+(*
 	     Format.eprintf "found explanation: '%s'" e;
+*)
 	     r := Some e
 	   end)
       (get_labels fmla @ id.Ident.id_label);
@@ -1290,7 +1294,10 @@ let transformation_on_goal g trans_name trans =
 		let goal_name = g.Model.goal_name in
 		let fold =
 		  fun (acc,count) subtask ->
-		    let _id = (Task.task_goal subtask).Decl.pr_name in
+		    let id = (Task.task_goal subtask).Decl.pr_name in
+                    let expl = 
+                      get_explanation id (Task.task_goal_fmla subtask)
+                    in
 		    let subgoal_name =
 		      goal_name ^ "." ^ (string_of_int count)
 		    in
@@ -1300,7 +1307,7 @@ let transformation_on_goal g trans_name trans =
 		    in
 		    let goal =
 		      Helpers.add_goal_row (Model.Transf tr)
-			subgoal_name None subtask subtask_db
+			subgoal_name expl subtask subtask_db
 		    in
 		    (goal :: acc, count+1)
 		in
