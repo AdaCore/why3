@@ -16,9 +16,9 @@ module Relabel
   lemma labels_Leaf : 
    forall x y : 'a. mem x (labels (Leaf y)) <-> x=y
 
-  lemma labels_Node : 
-   forall x : 'a, l r : tree 'a. 
-     mem x (labels (Node l r)) <-> mem x (labels l) or mem x (labels r)
+  lemma labels_Node :
+   forall x : 'a, l r : tree 'a.
+     mem x (labels (Node l r)) <-> (mem x (labels l) or mem x (labels r))
 
   inductive same_shape (t1 : tree 'a) (t2 : tree 'b) =
     | same_shape_Leaf : 
@@ -32,6 +32,9 @@ module Relabel
   inductive distinct (l : list 'a) =
     | distinct_zero : distinct (Nil : list 'a)
     | distinct_one  : forall x:'a. distinct (Cons x Nil)
+    | distinct_many : 
+        forall x :'a, l : list 'a. 
+        not (mem x l) -> distinct l -> distinct (Cons x l)
 
   use import int.Int
   use import module stdlib.Ref
@@ -46,8 +49,8 @@ module Relabel
     | Leaf _   -> Leaf (fresh ())
     | Node l r -> Node (relabel l) (relabel r)
     end   
-    { (* same_shape t result and distinct (labels result) and *)
-      (forall x:int. mem x (labels result) -> old r < x <= r) }
+    { (* same_shape t result and *) distinct (labels result) and
+      old r <= r and (forall x:int. mem x (labels result) -> old r < x <= r) }
 
 end
 
