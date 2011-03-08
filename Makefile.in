@@ -420,7 +420,7 @@ install_local: bin/why3config
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = gconfig worker scheduler db dbsync gmain
+IDE_FILES = gconfig gScheduler db gmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
@@ -436,9 +436,9 @@ $(IDECMO) $(IDECMX): INCLUDES += -I src/ide -I @SQLITE3LIB@
 byte: bin/why3ide.byte
 opt:  bin/why3ide.opt
 
-bin/why3ide.opt bin/why3ide.byte: INCLUDES += -thread -I +threads -I @LABLGTK2LIB@ -I @SQLITE3LIB@
-bin/why3ide.opt bin/why3ide.byte: EXTOBJS += gtkThread
-bin/why3ide.opt bin/why3ide.byte: EXTLIBS += threads lablgtk lablgtksourceview2 sqlite3
+bin/why3ide.opt bin/why3ide.byte: INCLUDES += -I @LABLGTK2LIB@ -I @SQLITE3LIB@
+bin/why3ide.opt bin/why3ide.byte: EXTOBJS += 
+bin/why3ide.opt bin/why3ide.byte: EXTLIBS += lablgtk lablgtksourceview2 sqlite3
 
 bin/why3ide.opt: src/why.cmxa $(PGMCMX) $(IDECMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \

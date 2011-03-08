@@ -196,7 +196,7 @@ let () =
 let () =
   let dbfname = Filename.concat project_dir "project.db" in
   try
-    Dbsync.init_base dbfname
+    Db.init_base dbfname
   with e ->
     eprintf "Error while opening database '%s'@." dbfname;
     eprintf "Aborting...@.";
@@ -219,6 +219,165 @@ let read_file fn =
     theories
   in theories
 
+(*******************************************)
+(* Scheduler for long-running computations *)
+(*******************************************)
+
+(*
+
+This home made scheduler allows to run long computations "in background"
+that is without freezing the GUI for too long time.
+
+It works by using: 
+* a queue Qa of atomic actions to process:
+   One element of Qa is processed whenever the GUI is idle. Actions can be
+   of 3 kinds:
+   . production of an external proof attempt
+   . application of a transformation
+   . editing a proof
+* a queue Qp of prover calls ready to start
+   one element is queued by an action of kind "add proof attempt"
+* a set E of prover calls to check for termination:
+   all elements of E are check at regular time steps.
+   if there are less elements than a given maximum number of parallel 
+   processes then a new prover_call is extracted from Qp
+
+*)
+
+module Gscheduler = struct
+
+type proof_attempt_status =
+  | Scheduled (** external proof attempt is scheduled *)
+  | Running (** external proof attempt is in progress *)
+  | Done of Call_provers.prover_result (** external proof done *)
+  | InternalFailure of exn (** external proof aborted by internal error *)
+
+
+(* timeout handler *)
+
+let maximum_running_proofs = ref 2
+let running_proofs = ref []
+
+let proof_attempts_queue = Queue.create ()
+
+let timeout_handler_activated = ref false
+let timeout_handler_running = ref false
+
+let timeout_handler () =
+  assert (not !timeout_handler_running);
+  timeout_handler_running := true;
+  let l = List.fold_left
+    (fun acc ((callback,call) as c) ->
+       match Call_provers.query_call call with
+	 | None -> c::acc
+	 | Some post ->
+	     let res = post () in callback (Done res);
+	     acc)
+    [] !running_proofs
+  in
+  let l =
+    if List.length l < !maximum_running_proofs then
+      begin try 
+	let (callback,pre_call) = Queue.pop proof_attempts_queue in
+	callback Running;
+	let call = pre_call () in
+	(callback,call)::l
+      with Queue.Empty -> l
+      end
+    else l
+  in
+  running_proofs := l;
+  let continue = match l with | [] -> false | _ -> true in
+  timeout_handler_activated := continue; 
+  timeout_handler_running := false;
+  continue
+      
+
+let run_timeout_handler () =
+  if !timeout_handler_activated then () else
+    begin
+      timeout_handler_activated := true;
+      let (_ : GMain.Timeout.id) = 
+	GMain.Timeout.add ~ms:100 ~callback:timeout_handler 
+      in ()
+    end
+	     
+(* idle handler *)
+
+
+type action =
+  | Proof_attempt of bool * int * int * in_channel option * string * Driver.driver *
+    (proof_attempt_status -> unit) * Task.task
+
+let actions_queue = Queue.create ()
+
+let idle_handler_activated = ref false
+
+let idle_handler () =
+  try
+    begin
+      match Queue.pop actions_queue with
+	| Proof_attempt(debug,timelimit,memlimit,old,command,driver,
+			callback,goal) ->
+	    callback Scheduled;
+	    if debug then
+	      Format.eprintf "Task for prover: %a@."
+		(Driver.print_task driver) goal;
+	    let pre_call =
+	      Driver.prove_task ?old ~command ~timelimit ~memlimit driver goal
+	    in
+	    Queue.push (callback,pre_call) proof_attempts_queue;
+	    run_timeout_handler ()
+    end;
+    true
+  with Queue.Empty ->
+    idle_handler_activated := false;
+    false
+
+let run_idle_handler () =
+  if !idle_handler_activated then () else
+    begin
+      idle_handler_activated := true;
+      let (_ : GMain.Idle.id) = GMain.Idle.add idle_handler in
+      ()
+    end
+
+(* main scheduling functions *)
+
+let schedule_proof_attempt ~debug ~timelimit ~memlimit ?old
+    ~command ~driver ~callback goal =
+  Queue.push 
+    (Proof_attempt(debug,timelimit,memlimit,old,command,driver,
+			callback,goal))
+    actions_queue;
+  run_idle_handler ()
+
+let apply_transformation ~callback transf goal =
+  callback (Trans.apply transf goal)
+
+let apply_transformation_l ~callback transf goal =
+  callback (Trans.apply transf goal)
+
+let edit_proof ~debug ~editor ~file ~driver ~callback goal =
+  let old =
+    if Sys.file_exists file
+    then
+      begin
+	let backup = file ^ ".bak" in
+        Sys.rename file backup;
+        Some(open_in backup)
+      end
+    else None
+  in
+  let ch = open_out file in
+  let fmt = formatter_of_out_channel ch in
+  Driver.print_task ?old driver fmt goal;
+  Util.option_iter close_in old;
+  close_out ch;
+  let _ = Sys.command(editor ^ " " ^ file) in
+  callback ()
+
+end
 
 (****************)
 (* goals widget *)
@@ -232,14 +391,7 @@ module Model = struct
         proof_goal : goal;
         proof_row : Gtk.tree_iter;
         proof_db : Db.proof_attempt;
-(*
-        mutable status : proof_attempt_status;
-        mutable time : float;
-        mutable output : string;
-*)
-(* TODO: replace the 3 fields above with *)
-	mutable proof_state : Scheduler.proof_attempt_status;
-(**)
+	mutable proof_state : Gscheduler.proof_attempt_status;
         mutable proof_obsolete : bool;
         mutable edited_as : string;
       }
@@ -565,7 +717,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
 module Helpers = struct
 
   open Model
-  open Scheduler
+  open Gscheduler
 
   let image_of_result ~obsolete result =
     match result with
@@ -804,7 +956,7 @@ module Helpers = struct
   let add_theory mfile th =
     let tasks = List.rev (Task.split_theory th None None) in
     let tname = th.Theory.th_name.Ident.id_string in
-    let db_theory = Dbsync.add_theory mfile.file_db tname in
+    let db_theory = Db.add_theory mfile.file_db tname in
     let mth = add_theory_row mfile th db_theory in
     let goals =
       List.fold_left
@@ -813,7 +965,7 @@ module Helpers = struct
            let name = id.Ident.id_string in
            let expl = get_explanation id (Task.task_goal_fmla t) in
            let sum = task_checksum t in
-           let db_goal = Dbsync.add_goal db_theory name sum in
+           let db_goal = Db.add_goal db_theory name sum in
            let goal = add_goal_row (Theory mth) name expl t db_goal in
            goal :: acc)
         []
@@ -841,7 +993,7 @@ module Helpers = struct
 
   let add_file f =
     let theories = read_file f in
-    let dbfile = Dbsync.add_file f in
+    let dbfile = Db.add_file f in
     let mfile = add_file_row f dbfile in
     let mths =
       List.fold_left
@@ -904,23 +1056,23 @@ let apply_transformation ~callback t task =
    match t with
     | Trans_one t ->
 	let callback t = callback [t] in
-	Scheduler.apply_transformation ~callback t task
+	Gscheduler.apply_transformation ~callback t task
     | Trans_list t ->
-	Scheduler.apply_transformation_l ~callback t task
+	Gscheduler.apply_transformation_l ~callback t task
 
 
 let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
   let info = get_explanation gid (Task.task_goal_fmla t) in
   let goal = Helpers.add_goal_row parent gname info t db_goal in
   let proved = ref false in
-  let external_proofs = Dbsync.external_proofs db_goal in
+  let external_proofs = Db.external_proofs db_goal in
   Db.Hprover.iter
     (fun pid a ->
-       let pname = Dbsync.prover_name pid in
+       let pname = Db.prover_name pid in
        try
          let p = Util.Mstr.find pname gconfig.provers in
-         let s,t,o,edit = Dbsync.status_and_time a in
-         if goal_obsolete && not o then Dbsync.set_obsolete a;
+         let s,t,o,edit = Db.status_and_time a in
+         if goal_obsolete && not o then Db.set_obsolete a;
          let obsolete = goal_obsolete or o in
          let s = match s with
            | Db.Undone -> Call_provers.HighFailure
@@ -936,7 +1088,7 @@ let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
 	 in
          let (_pa : Model.proof_attempt) =
            Helpers.add_external_proof_row ~obsolete ~edit goal p a
-	     (Scheduler.Done r)
+	     (Gscheduler.Done r)
          in
          ((* something TODO ?*))
        with Not_found ->
@@ -945,15 +1097,15 @@ let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
            pname
     )
     external_proofs;
-  let transformations = Dbsync.transformations db_goal in
+  let transformations = Db.transformations db_goal in
   Db.Htransf.iter
     (fun tr_id tr ->
-       let trname = Dbsync.transf_name tr_id in
+       let trname = Db.transf_name tr_id in
        eprintf "Reimporting transformation %s for goal %s @." trname gname;
        let trans = trans_of_name trname in
        let subgoals = apply_trans trans t in
        let mtr = Helpers.add_transformation_row goal tr trname in
-       let db_subgoals = Dbsync.subgoals tr in
+       let db_subgoals = Db.subgoals tr in
        let reimported_goals,db_subgoals,_ =
          List.fold_left
            (fun (acc,db_subgoals,count) subtask ->
@@ -974,7 +1126,7 @@ let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
        in
        let other_goals =
 	 Util.Mstr.fold
-	   (fun _ g acc -> (Dbsync.goal_name g,g)::acc)
+	   (fun _ g acc -> (Db.goal_name g,g)::acc)
 	   db_subgoals
 	   []
        in
@@ -992,7 +1144,7 @@ let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
 		       match old_goals with
 			 | [] ->
 			     (* create a new goal in db *)
-			     Dbsync.add_subgoal tr subgoal_name sum,
+			     Db.add_subgoal tr subgoal_name sum,
 			     false, old_goals
 			 | (_goal_name,g) :: r ->
 			     g, true, r
@@ -1020,7 +1172,7 @@ let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
 		  (* a subgoal has the same check sum *)
                 with Not_found ->
 		  (* otherwise, create a new one *)
-                  Dbsync.add_subgoal tr subgoal_name sum
+                  Db.add_subgoal tr subgoal_name sum
               in
               let subgoal,subgoal_proved =
                 reimport_any_goal
@@ -1052,22 +1204,22 @@ let reimport_root_goal mth tname goals t : Model.goal * bool =
   let db_goal,goal_obsolete =
     try
       let dbg = Util.Mstr.find gname goals in
-      let db_sum = Dbsync.task_checksum dbg in
+      let db_sum = Db.task_checksum dbg in
       let goal_obsolete = sum <> db_sum in
       if goal_obsolete then
         begin
           eprintf "Goal %s.%s has changed@." tname gname;
-          Dbsync.change_checksum dbg sum
+          Db.change_checksum dbg sum
         end;
       dbg,goal_obsolete
     with Not_found ->
-      let dbg = Dbsync.add_goal mth.Model.theory_db gname sum in
+      let dbg = Db.add_goal mth.Model.theory_db gname sum in
       dbg,false
   in
   reimport_any_goal (Model.Theory mth) id gname t db_goal goal_obsolete
 
 (* reimports all files *)
-let files_in_db = Dbsync.files ()
+let files_in_db = Db.files ()
 
 let () =
   List.iter
@@ -1076,7 +1228,7 @@ let () =
        let mfile = Helpers.add_file_row fn f in
        try
 	 let theories = read_file fn in
-	 let ths = Dbsync.theories f in
+	 let ths = Db.theories f in
 	 let (mths,file_proved) =
 	   List.fold_left
              (fun (acc,file_proved) (_,tname,th) ->
@@ -1084,10 +1236,10 @@ let () =
 		let db_th =
 		  try
                     Util.Mstr.find tname ths
-		  with Not_found -> Dbsync.add_theory f tname
+		  with Not_found -> Db.add_theory f tname
 		in
 		let mth = Helpers.add_theory_row mfile th db_th in
-		let goals = Dbsync.goals db_th in
+		let goals = Db.goals db_th in
 		let tasks = List.rev (Task.split_theory th None None) in
 		let goals,proved = List.fold_left
 		  (fun (acc,proved) t ->
@@ -1140,55 +1292,31 @@ let () =
 
 let () =
   begin
-    Scheduler.async := GtkThread.async;
-    Scheduler.maximum_running_proofs := gconfig.max_running_processes
+    Gscheduler.maximum_running_proofs := gconfig.max_running_processes
   end
+
 
 (*****************************************************)
 (* method: run a given prover on each unproved goals *)
 (*****************************************************)
 
-(*
-let callback_of_callback callback = function
-  | Scheduler.Scheduled -> callback Model.Scheduled 0. ""
-  | Scheduler.Running   -> callback Model.Running 0. ""
-  | Scheduler.InternalFailure _ ->
-    callback (Model.Done Call_provers.HighFailure) 0. "Prover call failed"
-  | Scheduler.Done r ->
-    let res = Model.Done r.Call_provers.pr_answer in
-    callback res r.Call_provers.pr_time r.Call_provers.pr_output
-*)
-
 (* q is a queue of proof attempt where to put the new one *)
-let redo_external_proof q g a =
+let redo_external_proof g a =
   let p = a.Model.prover in
-(*
-  let callback result time output =
-    a.Model.output <- output;
-    Helpers.set_proof_status ~obsolete:false a result time ;
-    if result = Model.Done Call_provers.Valid
-    then Helpers.set_proved ~propagate:true a.Model.proof_goal;
-    let db_res = match result with
-      | Model.Scheduled | Model.Running -> Dbsync.Undone
-      | Model.Done a -> Dbsync.Done a
-*)
-  let callback result (* time output *) =
-(* useless: done by set_proof_status
-    a.Model.proof_state <- result;
-*)
+  let callback result =
     Helpers.set_proof_state ~obsolete:false a result (*time*) ;
     let db_res, time =
       match result with
-	| Scheduler.Scheduled | Scheduler.Running ->
+	| Gscheduler.Scheduled | Gscheduler.Running ->
 	    Db.Undone, 0.0
-	| Scheduler.InternalFailure _ ->
+	| Gscheduler.InternalFailure _ ->
 	    Db.Done Call_provers.HighFailure, 0.0
-	| Scheduler.Done r ->
+	| Gscheduler.Done r ->
 	    if r.Call_provers.pr_answer = Call_provers.Valid then
 	      Helpers.set_proved ~propagate:true a.Model.proof_goal;
 	    Db.Done r.Call_provers.pr_answer, r.Call_provers.pr_time
     in
-    Dbsync.set_status a.Model.proof_db db_res time
+    Db.set_status a.Model.proof_db db_res time
   in
   let old = if a.Model.edited_as = "" then None else
     begin
@@ -1196,64 +1324,60 @@ let redo_external_proof q g a =
       (Some (open_in a.Model.edited_as))
     end
   in
-  Scheduler.schedule_some_proof_attempts
+  Gscheduler.schedule_proof_attempt
     ~debug:(gconfig.verbose > 0) ~timelimit:gconfig.time_limit ~memlimit:0
     ?old ~command:p.command ~driver:p.driver
     ~callback
-    g.Model.task q
+    g.Model.task
 
-let rec prover_on_goal q p g =
+let rec prover_on_goal p g =
   let id = p.prover_id in
   let a =
     try Hashtbl.find g.Model.external_proofs id
     with Not_found ->
-      GtkThread.sync (fun () ->
-      let db_prover = Dbsync.prover_from_name id in
-      let db_pa = Dbsync.add_proof_attempt g.Model.goal_db db_prover in
+      let db_prover = Db.prover_from_name id in
+      let db_pa = Db.add_proof_attempt g.Model.goal_db db_prover in
       Helpers.add_external_proof_row ~obsolete:false ~edit:""
-	g p db_pa Scheduler.Scheduled) ()
+	g p db_pa Gscheduler.Scheduled
   in
-  redo_external_proof q g a;
+  let () = redo_external_proof g a in
   Hashtbl.iter
-    (fun _ t -> List.iter (prover_on_goal q p) t.Model.subgoals)
+    (fun _ t -> List.iter (prover_on_goal p) t.Model.subgoals)
     g.Model.transformations
 
-let rec prover_on_goal_or_children q p g =
+let rec prover_on_goal_or_children p g =
   if not (g.Model.proved && !context_unproved_goals_only) then
     begin
       let r = ref true in
       Hashtbl.iter
 	(fun _ t ->
 	   r := false;
-           List.iter (prover_on_goal_or_children q p)
+           List.iter (prover_on_goal_or_children p)
              t.Model.subgoals) g.Model.transformations;
-      if !r then prover_on_goal q p g
+      if !r then prover_on_goal p g
     end
 
-let prover_on_selected_goal_or_children q pr row =
+let prover_on_selected_goal_or_children pr row =
   let row = filter_model#get_iter row in
   match filter_model#get ~row ~column:Model.index_column with
     | Model.Row_goal g ->
-        prover_on_goal_or_children q pr g
+        prover_on_goal_or_children pr g
     | Model.Row_theory th ->
-        List.iter (prover_on_goal_or_children q pr) th.Model.goals
+        List.iter (prover_on_goal_or_children pr) th.Model.goals
     | Model.Row_file file ->
         List.iter
           (fun th ->
-             List.iter (prover_on_goal_or_children q pr) th.Model.goals)
+             List.iter (prover_on_goal_or_children pr) th.Model.goals)
           file.Model.theories
     | Model.Row_proof_attempt a ->
-        prover_on_goal_or_children q pr a.Model.proof_goal
+        prover_on_goal_or_children pr a.Model.proof_goal
     | Model.Row_transformation tr ->
-        List.iter (prover_on_goal_or_children q pr) tr.Model.subgoals
+        List.iter (prover_on_goal_or_children pr) tr.Model.subgoals
 
 let prover_on_selected_goals pr =
-  ignore (Thread.create (fun pr ->
-    let q = Queue.create () in
-    List.iter
-      (prover_on_selected_goal_or_children q pr)
-      goals_view#selection#get_selected_rows;
-    Scheduler.transfer_proof_attempts q ) pr)
+  List.iter
+    (prover_on_selected_goal_or_children pr)
+    goals_view#selection#get_selected_rows
 
 
 
@@ -1265,57 +1389,48 @@ let prover_on_selected_goals pr =
 let transformation_on_goal g trans_name trans =
   if not g.Model.proved then
     let callback subgoals =
-      ignore
-	(Thread.create
-	   (fun subgoals ->
-	      let b =
- 		match subgoals with
-		  | [task] ->
-                      let s1 = task_checksum g.Model.task in
-                      let s2 = task_checksum task in
-(*
-                      eprintf "Transformation returned only one task. sum before = %s, sum after = %s@." (task_checksum g.Model.task) (task_checksum task);
-                      eprintf "addresses: %x %x@." (Obj.magic g.Model.task) (Obj.magic task);
-*)
-                      s1 <> s2
-                        (* task != g.Model.task *)
-		  | _ -> true
-	      in
-	      if b then
-		let transf_id =
-		  (GtkThread.sync Dbsync.transf_from_name) trans_name in
-		let db_transf =
-		  (GtkThread.sync Dbsync.add_transformation)
-		    g.Model.goal_db transf_id
-		in
-		let tr = (GtkThread.sync Helpers.add_transformation_row)
-		  g db_transf trans_name
-		in
-		let goal_name = g.Model.goal_name in
-		let fold =
-		  fun (acc,count) subtask ->
-		    let id = (Task.task_goal subtask).Decl.pr_name in
-                    let expl = 
-                      get_explanation id (Task.task_goal_fmla subtask)
-                    in
-		    let subgoal_name =
-		      goal_name ^ "." ^ (string_of_int count)
-		    in
-		    let sum = task_checksum subtask in
-		    let subtask_db =
-		      Dbsync.add_subgoal db_transf subgoal_name sum
-		    in
-		    let goal =
-		      Helpers.add_goal_row (Model.Transf tr)
-			subgoal_name expl subtask subtask_db
-		    in
-		    (goal :: acc, count+1)
-		in
-		let goals,_ =
-		  List.fold_left (GtkThread.sync fold) ([],1) subgoals
-		in
-		tr.Model.subgoals <- List.rev goals;
-		Hashtbl.add g.Model.transformations trans_name tr) subgoals)
+      let b =
+ 	match subgoals with
+	  | [task] ->
+              let s1 = task_checksum g.Model.task in
+              let s2 = task_checksum task in
+	      (*
+                eprintf "Transformation returned only one task. sum before = %s, sum after = %s@." (task_checksum g.Model.task) (task_checksum task);
+                eprintf "addresses: %x %x@." (Obj.magic g.Model.task) (Obj.magic task);
+	      *)
+              s1 <> s2
+                (* task != g.Model.task *)
+	  | _ -> true
+      in
+      if b then
+	let transf_id = Db.transf_from_name trans_name in
+	let db_transf = Db.add_transformation g.Model.goal_db transf_id	in
+	let tr = Helpers.add_transformation_row g db_transf trans_name in
+	let goal_name = g.Model.goal_name in
+	let fold =
+	  fun (acc,count) subtask ->
+	    let id = (Task.task_goal subtask).Decl.pr_name in
+            let expl = 
+              get_explanation id (Task.task_goal_fmla subtask)
+            in
+	    let subgoal_name =
+	      goal_name ^ "." ^ (string_of_int count)
+	    in
+	    let sum = task_checksum subtask in
+	    let subtask_db =
+	      Db.add_subgoal db_transf subgoal_name sum
+	    in
+	    let goal =
+	      Helpers.add_goal_row (Model.Transf tr)
+		subgoal_name expl subtask subtask_db
+	    in
+	    (goal :: acc, count+1)
+	in
+	let goals,_ =
+	  List.fold_left fold ([],1) subgoals
+	in
+	tr.Model.subgoals <- List.rev goals;
+	Hashtbl.add g.Model.transformations trans_name tr
     in
     apply_transformation ~callback
       trans g.Model.task
@@ -1384,17 +1499,15 @@ let inline_selected_goal_or_children row =
         List.iter inline_goal_or_children tr.Model.subgoals
 
 let split_selected_goals () =
-  ignore (Thread.create (fun () ->
-    List.iter
-      split_selected_goal_or_children
-      goals_view#selection#get_selected_rows) ())
+  List.iter
+    split_selected_goal_or_children
+    goals_view#selection#get_selected_rows
 
 
 let inline_selected_goals () =
-  ignore (Thread.create (fun () ->
-    List.iter
-      inline_selected_goal_or_children
-      goals_view#selection#get_selected_rows) ())
+  List.iter
+    inline_selected_goal_or_children
+    goals_view#selection#get_selected_rows
 
 
 (*********************************)
@@ -1461,7 +1574,7 @@ let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~label:"_Preferences" ~callback:
     (fun () ->
        Gconfig.preferences gconfig;
-       Scheduler.maximum_running_proofs := gconfig.max_running_processes)
+       Gscheduler.maximum_running_proofs := gconfig.max_running_processes)
     ()
 
 let refresh_provers = ref (fun () -> ())
@@ -1873,7 +1986,7 @@ let select_row p =
     | Model.Row_proof_attempt a ->
 	let o =
           match a.Model.proof_state with
-	    | Scheduler.Done r -> r.Call_provers.pr_output;
+	    | Gscheduler.Done r -> r.Call_provers.pr_output;
 	    | _ -> "No information available"
 	in
 	task_view#source_buffer#set_text o;
@@ -1936,12 +2049,12 @@ let edit_selected_row p =
 		done;
 		let file = name ^ "_" ^ (string_of_int !i) ^ ext in
 		a.Model.edited_as <- file;
-		Dbsync.set_edited_as a.Model.proof_db file;
+		Db.set_edited_as a.Model.proof_db file;
 		file
 	    | f -> f
 	in
         let old_status = a.Model.proof_state in
-        Helpers.set_proof_state ~obsolete:false a Scheduler.Running;
+        Helpers.set_proof_state ~obsolete:false a Gscheduler.Running;
         let callback () =
           Helpers.set_proof_state ~obsolete:false a old_status;
         in
@@ -1950,7 +2063,7 @@ let edit_selected_row p =
             | "" -> gconfig.default_editor
             | _ -> a.Model.prover.editor
         in
-        Scheduler.edit_proof ~debug:false ~editor
+        Gscheduler.edit_proof ~debug:false ~editor
           ~file
           ~driver
           ~callback
@@ -2000,7 +2113,7 @@ let () =
 (*************)
 
 let remove_proof_attempt a =
-  Dbsync.remove_proof_attempt a.Model.proof_db;
+  Db.remove_proof_attempt a.Model.proof_db;
   let (_:bool) = goals_model#remove a.Model.proof_row in
   let g = a.Model.proof_goal in
   Hashtbl.remove g.Model.external_proofs a.Model.prover.prover_id;
@@ -2008,7 +2121,7 @@ let remove_proof_attempt a =
 
 let remove_transf t =
   (* TODO: remove subgoals first !!! *)
-  Dbsync.remove_transformation t.Model.transf_db;
+  Db.remove_transformation t.Model.transf_db;
   let (_:bool) = goals_model#remove t.Model.transf_row in
   let g = t.Model.parent_goal in
   Hashtbl.remove g.Model.transformations "split" (* hack !! *);
@@ -2068,10 +2181,7 @@ let (_ : GtkSignal.id) =
 
 let () = w#add_accel_group accel_group
 let () = w#show ()
-(*
-let () = tools_window#show ()
-*)
-let () = GtkThread.main ()
+let () = GMain.main ()
 
 (*
 Local Variables:
