@@ -24,7 +24,6 @@ open Task
 open Trans
 open Driver
 open Call_provers
-open Scheduler
 
 module BenchUtil : sig
   val maximum_running_proofs: int ref

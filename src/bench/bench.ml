@@ -26,7 +26,6 @@ open Task
 open Trans
 open Driver
 open Call_provers
-open Scheduler
 
 type tool_id = {
   tool_name : string;
