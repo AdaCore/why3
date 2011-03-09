@@ -4,6 +4,11 @@ module Relabel
   use import list.Mem
   use import list.Append
 
+  (* should be moved to the library *)
+  lemma mem_append :
+    forall x : 'a, l1 l2 : list 'a.
+    mem x (l1 ++ l2) <-> mem x l1 or mem x l2
+
   type tree 'a =
     | Leaf 'a
     | Node (tree 'a) (tree 'a)
@@ -29,12 +34,18 @@ module Relabel
         same_shape l1 l2 -> same_shape r1 r2 ->
         same_shape (Node l1 r1) (Node l2 r2)
 
+  (* should be in the library? *)
   inductive distinct (l : list 'a) =
     | distinct_zero : distinct (Nil : list 'a)
     | distinct_one  : forall x:'a. distinct (Cons x Nil)
     | distinct_many : 
         forall x :'a, l : list 'a. 
         not (mem x l) -> distinct l -> distinct (Cons x l)
+
+  lemma distinct_append :
+    forall l1 l2 : list 'a.
+    distinct l1 -> distinct l2 -> (forall x:'a. mem x l1 -> not (mem x l2)) ->
+    distinct (l1 ++ l2)
 
   use import int.Int
   use import module stdlib.Ref
@@ -49,7 +60,7 @@ module Relabel
     | Leaf _   -> Leaf (fresh ())
     | Node l r -> Node (relabel l) (relabel r)
     end   
-    { (* same_shape t result and *) distinct (labels result) and
+    { same_shape t result and distinct (labels result) and
       old r <= r and (forall x:int. mem x (labels result) -> old r < x <= r) }
 
 end
