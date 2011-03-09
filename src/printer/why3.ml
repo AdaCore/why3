@@ -29,7 +29,7 @@ open Decl
 open Printer
 open Theory
 
-let iprinter,tprinter,lprinter,pprinter =
+let iprinter,tprinter,pprinter =
   let bl = ["theory"; "type"; "logic"; "inductive"; "meta";
             "axiom"; "lemma"; "goal"; "use"; "clone"; "prop";
             "namespace"; "import"; "export"; "end";
@@ -42,13 +42,11 @@ let iprinter,tprinter,lprinter,pprinter =
   let usanitize = sanitizer char_to_ualpha char_to_alnumus in
   create_ident_printer bl ~sanitizer:isanitize,
   create_ident_printer bl ~sanitizer:lsanitize,
-  create_ident_printer bl ~sanitizer:lsanitize,
   create_ident_printer bl ~sanitizer:usanitize
 
 let forget_all () =
   forget_all iprinter;
   forget_all tprinter;
-  forget_all lprinter;
   forget_all pprinter
 
 let tv_set = ref Sid.empty
@@ -79,11 +77,11 @@ let print_ts fmt ts =
   fprintf fmt "%s" (id_unique tprinter ts.ts_name)
 
 let print_ls fmt ls =
-  fprintf fmt "%s" (id_unique lprinter ls.ls_name)
+  fprintf fmt "%s" (id_unique iprinter ls.ls_name)
 
 let print_cs fmt ls =
   let sanitizer = String.capitalize in
-  fprintf fmt "%s" (id_unique lprinter ~sanitizer ls.ls_name)
+  fprintf fmt "%s" (id_unique iprinter ~sanitizer ls.ls_name)
 
 let print_pr fmt pr =
   fprintf fmt "%s" (id_unique pprinter pr.pr_name)
