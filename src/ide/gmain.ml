@@ -691,6 +691,10 @@ let info_window ?(callback=(fun () -> ())) mt s =
       | Term.Fbinop(Term.Fimplies,_,f) -> get_labels f
       | Term.Fquant(Term.Fforall,fq) ->
 	  let (_,_,f) = Term.f_open_quant fq in get_labels f
+      | Term.Flet(_,fb) -> 
+	  let (_,f) = Term.f_open_bound fb in get_labels f
+      | Term.Fcase(_,[fb]) -> 
+	  let (_,f) = Term.f_open_branch fb in get_labels f
       | _ -> []
 
   let get_explanation id fmla =
