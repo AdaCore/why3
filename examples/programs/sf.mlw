@@ -1,0 +1,76 @@
+
+(* Program verification examples from the book "Software Foundations"
+   http://www.cis.upenn.edu/~bcpierce/sf/
+
+   Note: we are using int (not nat), so we need extra precondition (e.g. x >= 0)
+   Note: we are also proving termination
+*)
+
+module SF
+
+  use import int.Int
+  use import module stdlib.Ref
+
+  (* Example: Slow Subtraction *)
+
+  let slow_subtraction x z =
+    { x >= 0 }
+    label L:
+    while !x <> 0 do
+      invariant { 0 <= x and z - x = at z L - at x L } variant { x }
+      z := !z - 1;
+      x := !x - 1
+    done
+    { z = old z - old x }
+
+  (* Example: Reduce to Zero *)
+
+  let reduce_to_zero x =
+    { x >= 0 }
+    while !x <> 0 do invariant { x >= 0 } variant { x } x := !x - 1 done
+    { x = 0 }
+
+  (* Exercise: Slow Addition *)
+
+  let slow_addition x z =
+    { x >= 0 }
+    label L:
+    while !x <> 0 do
+      invariant { 0 <= x and z + x = at z L + at x L } variant { x }
+      z := !z + 1;
+      x := !x - 1
+    done
+    { z = old z + old x }
+
+  (* Example: Parity *)
+
+  inductive even int =
+    | even_0 : even 0
+    | even_odd : forall x:int. even x -> even (x+2)
+
+  lemma even_not_odd : forall x:int. even x -> even (x+1) -> false
+
+  let parity x y =
+    { x >= 0 }
+    y := 0;
+    label L:
+    while !x <> 0 do
+      invariant { 0 <= x and (y=0 and even (at x L - x) or
+                              y=1 and even (at x L - x + 1)) }
+      variant { x }
+      y := 1 - !y;
+      x := !x - 1
+    done
+    { y=0 <-> even (old x) }
+
+  (* Example: Finding Square Roots *)
+
+  (* Exercise: Factorial *)
+
+end
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/sf.gui"
+End: 
+*)
