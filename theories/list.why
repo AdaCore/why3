@@ -97,6 +97,12 @@ theory Append
   lemma Append_length :
     forall l1 l2 : list 'a. length (l1 ++ l2) = length l1 + length l2
 
+  use import Mem
+
+  lemma mem_append :
+    forall x : 'a, l1 l2 : list 'a.
+    mem x (l1 ++ l2) <-> mem x l1 or mem x l2
+
 end
 
 theory Reverse

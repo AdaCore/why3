@@ -6,7 +6,7 @@
    Note: we are also proving termination
 *)
 
-module SF
+module HoareLogic
 
   use import int.Int
   use import module stdlib.Ref
@@ -15,9 +15,8 @@ module SF
 
   let slow_subtraction x z =
     { x >= 0 }
-    label L:
     while !x <> 0 do
-      invariant { 0 <= x and z - x = at z L - at x L } variant { x }
+      invariant { 0 <= x and z - x = at z Init - at x Init } variant { x }
       z := !z - 1;
       x := !x - 1
     done
@@ -34,9 +33,8 @@ module SF
 
   let slow_addition x z =
     { x >= 0 }
-    label L:
     while !x <> 0 do
-      invariant { 0 <= x and z + x = at z L + at x L } variant { x }
+      invariant { 0 <= x and z + x = at z Init + at x Init } variant { x }
       z := !z + 1;
       x := !x - 1
     done
@@ -53,10 +51,9 @@ module SF
   let parity x y =
     { x >= 0 }
     y := 0;
-    label L:
     while !x <> 0 do
-      invariant { 0 <= x and (y=0 and even (at x L - x) or
-                              y=1 and even (at x L - x + 1)) }
+      invariant { 0 <= x and (y=0 and even (at x Init - x) or
+                              y=1 and even (at x Init - x + 1)) }
       variant { x }
       y := 1 - !y;
       x := !x - 1
@@ -65,7 +62,79 @@ module SF
 
   (* Example: Finding Square Roots *)
 
+  let sqrt x z =
+    { x >= 0 }
+    z := 0;
+    while (!z + 1) * (!z + 1) <= !x do
+      invariant { 0 <= z and z*z <= x } variant { x - z*z }
+      z := !z + 1
+    done
+    { z*z <= x < (z+1)*(z+1) } 
+
   (* Exercise: Factorial *)
+
+  logic fact int : int
+  axiom fact_0 : fact 0 = 1
+  axiom fact_n : forall n:int. 0 < n -> fact n = n * fact (n-1)
+
+  let factorial x y z =
+    { x >= 0 }
+    y := 1;
+    z := !x;
+    while !z <> 0 do
+      invariant { 0 <= z and y * fact z = fact x } variant { z }
+      y := !y * !z;
+      z := !z - 1
+    done
+    { y = fact x }
+
+end
+
+module MoreHoareLogic
+
+  use import int.Int
+  use import module stdlib.Ref
+  use import list.List
+  use import list.HdTl
+  use import list.Length
+
+  logic sum (l : list int) : int = match l with
+  | Nil -> 0
+  | Cons x r -> x + sum r
+  end
+
+  parameter head : l:list 'a -> { l<>Nil } 'a { Some result = hd l }
+  parameter tail : l:list 'a -> { l<>Nil } list 'a { Some result = tl l }
+
+  let list_sum l y =
+    {}
+    y := 0;
+    while !l <> Nil do
+      invariant { length l <= length (at l Init) and 
+                  y + sum l = sum (at l Init) } 
+      variant { length l }
+      y := !y + head !l;
+      l := tail !l
+    done
+    { y = sum (old l) }
+
+  use import list.Mem
+  use import list.Append
+
+  (* note: we avoid the use of an existential quantifier in the invariant *)
+  let list_member (x : ref (list 'a)) y z =
+    {}
+    z := 0;
+    while !x <> Nil do
+      invariant { length x <= length (at x Init) and 
+                  (mem y x -> mem y (at x Init)) and
+                  (z=1 and mem y (at x Init) or
+                   z=0 and (mem y (at x Init) -> mem y x)) }
+      variant { length x }
+      if y = head !x then z := 1;
+      x := tail !x
+    done
+    { z=1 <-> mem y (old x) }
 
 end
 

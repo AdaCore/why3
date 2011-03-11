@@ -139,6 +139,11 @@
       pc_effect      = ef;
       pc_pre         = p;
       pc_post        = q; }
+
+  let add_init_label e =
+    let init = { id = "Init"; id_lab = []; id_loc = e.expr_loc } in
+    { e with expr_desc = Elabel (init, e) }
+
 %}
 
 /* Tokens */
@@ -1098,9 +1103,9 @@ expr:
 
 triple:
 | pre expr post
-  { $1, $2, $3 }
+  { $1, add_init_label $2, $3 }
 | expr %prec prec_triple
-  { mk_pp PPtrue, $1, (mk_pp PPtrue, []) }
+  { mk_pp PPtrue, add_init_label $1, (mk_pp PPtrue, []) }
 ;
 
 simple_expr:

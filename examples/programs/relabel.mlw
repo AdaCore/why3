@@ -4,11 +4,6 @@ module Relabel
   use import list.Mem
   use import list.Append
 
-  (* should be moved to the library *)
-  lemma mem_append :
-    forall x : 'a, l1 l2 : list 'a.
-    mem x (l1 ++ l2) <-> mem x l1 or mem x l2
-
   type tree 'a =
     | Leaf 'a
     | Node (tree 'a) (tree 'a)
