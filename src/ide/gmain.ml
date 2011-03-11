@@ -287,7 +287,13 @@ let timeout_handler () =
     else l
   in
   running_proofs := l;
-  let continue = match l with | [] -> false | _ -> true in
+  let continue = 
+    match l with 
+      | [] -> 
+          eprintf "Info: timeout_handler stopped@.";
+          false 
+      | _ -> true 
+  in
   timeout_handler_activated := continue; 
   timeout_handler_running := false;
   continue
@@ -297,6 +303,7 @@ let run_timeout_handler () =
   if !timeout_handler_activated then () else
     begin
       timeout_handler_activated := true;
+      eprintf "Info: timeout_handler started@.";
       let (_ : GMain.Timeout.id) = 
 	GMain.Timeout.add ~ms:100 ~callback:timeout_handler 
       in ()
@@ -334,12 +341,14 @@ let idle_handler () =
     true
   with Queue.Empty ->
     idle_handler_activated := false;
+    eprintf "Info: idle_handler stopped@.";
     false
 
 let run_idle_handler () =
   if !idle_handler_activated then () else
     begin
       idle_handler_activated := true;
+      eprintf "Info: idle_handler started@.";
       let (_ : GMain.Idle.id) = GMain.Idle.add idle_handler in
       ()
     end
@@ -354,6 +363,15 @@ let schedule_proof_attempt ~debug ~timelimit ~memlimit ?old
     actions_queue;
   run_idle_handler ()
 
+let schedule_edition command callback =
+  let precall =
+    Call_provers.call_on_buffer ~command ~regexps:[] ~timeregexps:[]
+      ~exitcodes:[(0,Call_provers.Unknown "")] ~filename:"" (Buffer.create 1)
+  in
+  callback Running;
+  running_proofs := (callback, precall ()) :: !running_proofs;
+  run_timeout_handler ()
+  
 let schedule_delayed_action callback =
   Queue.push (Delayed callback) actions_queue;
   run_idle_handler ()
@@ -380,8 +398,12 @@ let edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
   Driver.print_task ?old driver fmt goal;
   Util.option_iter close_in old;
   close_out ch;
-  let _ = Sys.command(editor ^ " " ^ file) in
+  let command = editor ^ " " ^ file in
+  (*
+  let _ = Sys.command command in
   callback ()
+  *)
+  schedule_edition command callback
 
 end
 
@@ -692,8 +714,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
   let expl_regexp = Str.regexp "expl:\\(.*\\)"
 
   let rec get_labels f =
-    f.Term.f_label @
-    match f.Term.f_node with
+    (match f.Term.f_node with
       | Term.Fbinop(Term.Fimplies,_,f) -> get_labels f
       | Term.Fquant(Term.Fforall,fq) ->
 	  let (_,_,f) = Term.f_open_quant fq in get_labels f
@@ -701,7 +722,8 @@ let info_window ?(callback=(fun () -> ())) mt s =
 	  let (_,f) = Term.f_open_bound fb in get_labels f
       | Term.Fcase(_,[fb]) -> 
 	  let (_,f) = Term.f_open_branch fb in get_labels f
-      | _ -> []
+      | _ -> [])
+    @ f.Term.f_label
 
   let get_explanation id fmla =
     let r = ref None in
@@ -720,7 +742,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
 *)
 	     r := Some e
 	   end)
-      (get_labels fmla @ id.Ident.id_label);
+      (id.Ident.id_label @ get_labels fmla);
     !r
 
 
@@ -1312,6 +1334,16 @@ let () =
 
 (* q is a queue of proof attempt where to put the new one *)
 let redo_external_proof g a =
+  (* check that the state is not Scheduled or Running *)
+(*
+  let running = match a.Model.proof_state with
+    | Gscheduler.Scheduled | Gscheduler.Running -> true
+    | Gscheduler.Done _ | Gscheduler.InternalFailure _ -> false
+  in
+  if running then ()
+    (* info_window `ERROR "Proof already in progress" *)
+  else
+*)
   let p = a.Model.prover in
   let callback result =
     Helpers.set_proof_state ~obsolete:false a result (*time*) ;
@@ -2038,8 +2070,15 @@ let edit_selected_row p =
     | Model.Row_file _file ->
         ()
     | Model.Row_proof_attempt a ->
+        (* check that the state is not Scheduled or Running *)
+        let running = match a.Model.proof_state with
+          | Gscheduler.Scheduled | Gscheduler.Running -> true
+          | Gscheduler.Done _ | Gscheduler.InternalFailure _ -> false
+        in
+        if running then
+          info_window `ERROR "Edition already in progress"
+        else
         let g = a.Model.proof_goal in
-        (* TODO: check that the state is not Scheduled or Running *)
 	let t = g.Model.task in
 	let driver = a.Model.prover.driver in
 	let file =
@@ -2068,9 +2107,12 @@ let edit_selected_row p =
 	    | f -> f
 	in
         let old_status = a.Model.proof_state in
-        Helpers.set_proof_state ~obsolete:false a Gscheduler.Running;
-        let callback () =
-          Helpers.set_proof_state ~obsolete:false a old_status;
+        let callback res =
+          match res with
+            | Gscheduler.Done _ ->
+                Helpers.set_proof_state ~obsolete:false a old_status
+            | _ -> 
+                Helpers.set_proof_state ~obsolete:false a res
         in
         let editor =
           match a.Model.prover.editor with
