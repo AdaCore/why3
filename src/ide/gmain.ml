@@ -308,6 +308,7 @@ let run_timeout_handler () =
 type action =
   | Proof_attempt of bool * int * int * in_channel option * string * Driver.driver *
     (proof_attempt_status -> unit) * Task.task
+  | Delayed of (unit -> unit)
 
 let actions_queue = Queue.create ()
 
@@ -328,6 +329,7 @@ let idle_handler () =
 	    in
 	    Queue.push (callback,pre_call) proof_attempts_queue;
 	    run_timeout_handler ()
+        | Delayed callback -> callback ()
     end;
     true
   with Queue.Empty ->
@@ -350,6 +352,10 @@ let schedule_proof_attempt ~debug ~timelimit ~memlimit ?old
     (Proof_attempt(debug,timelimit,memlimit,old,command,driver,
 			callback,goal))
     actions_queue;
+  run_idle_handler ()
+
+let schedule_delayed_action callback =
+  Queue.push (Delayed callback) actions_queue;
   run_idle_handler ()
 
 let apply_transformation ~callback transf goal =
@@ -1439,7 +1445,10 @@ let transformation_on_goal g trans_name trans =
     apply_transformation ~callback
       trans g.Model.task
 
-let split_goal g = transformation_on_goal g "split_goal" split_transformation
+let split_goal g = 
+  Gscheduler.schedule_delayed_action 
+    (fun () ->
+       transformation_on_goal g "split_goal" split_transformation)
 
 let inline_goal g = transformation_on_goal g "inline_goal" inline_transformation
 
@@ -2030,6 +2039,7 @@ let edit_selected_row p =
         ()
     | Model.Row_proof_attempt a ->
         let g = a.Model.proof_goal in
+        (* TODO: check that the state is not Scheduled or Running *)
 	let t = g.Model.task in
 	let driver = a.Model.prover.driver in
 	let file =
