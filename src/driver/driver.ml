@@ -236,14 +236,7 @@ let update_task drv task =
   in
   add_tdecl task goal
 
-let print_task ?old drv fmt task =
-  let p = match drv.drv_printer with
-    | None -> raise NoPrinter
-    | Some p -> p
-  in
-  let printer =
-    lookup_printer p drv.drv_env drv.drv_prelude drv.drv_thprelude
-  in
+let prepare_task drv task =
   let lookup_transform t = t, lookup_transform t drv.drv_env in
   let transl = List.map lookup_transform drv.drv_transform in
   let apply task (_t, tr) =
@@ -253,15 +246,36 @@ let print_task ?old drv fmt task =
 (*Format.printf "@\n@\nTASK";*)
   let task = update_task drv task in
   let task = List.fold_left apply task transl in
+  task
+
+
+let print_task_prepared ?old drv fmt task =
+  let p = match drv.drv_printer with
+    | None -> raise NoPrinter
+    | Some p -> p
+  in
+  let printer =
+    lookup_printer p drv.drv_env drv.drv_prelude drv.drv_thprelude
+  in
   fprintf fmt "@[%a@]@?" (printer ?old) task
 
-let prove_task ~command ?timelimit ?memlimit ?old drv task =
+
+let print_task ?old drv fmt task =
+  let task = prepare_task drv task in
+  print_task_prepared ?old drv fmt task
+
+let prove_task_prepared ~command ?timelimit ?memlimit ?old drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
-  print_task ?old drv fmt task; pp_print_flush fmt ();
+  print_task_prepared ?old drv fmt task; pp_print_flush fmt ();
   let res = call_on_buffer ~command ?timelimit ?memlimit drv buf in
   Buffer.reset buf;
   res
+
+
+let prove_task ~command ?timelimit ?memlimit ?old drv task =
+  let task = prepare_task drv task in
+  prove_task_prepared ~command ?timelimit ?memlimit ?old drv task
 
 (* exception report *)
 

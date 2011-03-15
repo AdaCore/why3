@@ -43,6 +43,7 @@ val call_on_buffer :
   ?memlimit  : int ->
   driver -> Buffer.t -> Call_provers.pre_prover_call
 
+
 val print_task :
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> unit
@@ -53,4 +54,19 @@ val prove_task :
   ?memlimit  : int ->
   ?old       : in_channel ->
   driver -> Task.task -> Call_provers.pre_prover_call
+
+
+(** Split the previous function in two simpler function *)
+val prepare_task : driver -> Task.task -> Task.task
+val print_task_prepared :
+  ?old       : in_channel ->
+  driver -> Format.formatter -> Task.task -> unit
+
+val prove_task_prepared :
+  command    : string ->
+  ?timelimit : int ->
+  ?memlimit  : int ->
+  ?old       : in_channel ->
+  driver -> Task.task -> Call_provers.pre_prover_call
+(***)
 

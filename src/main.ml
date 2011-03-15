@@ -100,6 +100,7 @@ let opt_timelimit = ref None
 let opt_memlimit = ref None
 let opt_command = ref None
 let opt_task = ref None
+let opt_bisect = ref false
 
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
@@ -141,7 +142,8 @@ let option_list = Arg.align [
   "--prover", Arg.String (fun s -> opt_prover := Some s),
       " same as -P";
   "--coq-realize", Arg.String (fun s -> opt_coq_realization := Some s),
-      " produce, in given file, a Coq realization of the theory given using -T";
+      " produce, in given file, a Coq realization of the theory given \
+        using -T";
   "-F", Arg.String (fun s -> opt_parser := Some s),
       "<format> Select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
@@ -170,6 +172,9 @@ let option_list = Arg.align [
       "<dir> Print the selected goals to separate files in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),
       " same as -o";
+  "--bisect", Arg.Set opt_bisect,
+  " Reduce the set of needed axioms which prove a goal, \
+    and output the resulting task";
   "--print-theory", Arg.Set opt_print_theory,
       " Print selected theories";
   "--print-namespace", Arg.Set opt_print_namespace,
@@ -304,9 +309,19 @@ let () =
       eprintf "Option '-m'/'--memlimit' requires a prover.@.";
       exit 1
     end;
+    if !opt_bisect then begin
+      eprintf "Option '--bisect' requires a prover.@.";
+      exit 1
+    end;
     if !opt_driver = None && not !opt_print_namespace then
       opt_print_theory := true
   end;
+
+  if !opt_bisect && !opt_output = None then begin
+    eprintf "Option '--bisect' require a directory to output the result.@.";
+    exit 1
+  end;
+
 
   opt_loadpath := List.rev_append !opt_loadpath (Whyconf.loadpath main);
   if !opt_timelimit = None then opt_timelimit := Some (Whyconf.timelimit main);
@@ -345,8 +360,53 @@ let print_th_namespace fmt th =
 
 let fname_printer = ref (Ident.create_ident_printer [])
 
+let output_task drv fname _tname th task dir =
+  let fname = Filename.basename fname in
+  let fname =
+    try Filename.chop_extension fname with _ -> fname
+  in
+  let tname = th.th_name.Ident.id_string in
+  let dest = Driver.file_of_task drv fname tname task in
+  (* Uniquify the filename before the extension if it exists*)
+  let i = try String.rindex dest '.' with _ -> String.length dest in
+  let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
+  let ext = String.sub dest i (String.length dest - i) in
+  let cout = open_out (Filename.concat dir (name ^ ext)) in
+  Driver.print_task drv (formatter_of_out_channel cout) task;
+  close_out cout
+
+
+let output_task_prepared drv fname _tname th task dir =
+  let fname = Filename.basename fname in
+  let fname =
+    try Filename.chop_extension fname with _ -> fname
+  in
+  let tname = th.th_name.Ident.id_string in
+  let dest = Driver.file_of_task drv fname tname task in
+  (* Uniquify the filename before the extension if it exists*)
+  let i = try String.rindex dest '.' with _ -> String.length dest in
+  let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
+  let ext = String.sub dest i (String.length dest - i) in
+  let cout = open_out (Filename.concat dir (name ^ ext)) in
+  Driver.print_task_prepared drv (formatter_of_out_channel cout) task;
+  close_out cout
+
+
 let do_task drv fname tname (th : Why.Theory.theory) (task : Task.task) =
   match !opt_output, !opt_command with
+    | Some dir, Some command when !opt_bisect ->
+      (* Should we test that the full task in proved? *)
+      let test task =
+        let call = Driver.prove_task_prepared
+          ~command ~timelimit ~memlimit drv task in
+        let res = Call_provers.wait_on_call (call ()) () in
+        printf "%s %s %s : %a@." fname tname
+          (task_goal task).Decl.pr_name.Ident.id_string
+          Call_provers.print_prover_result res;
+        res.Call_provers.pr_answer = Call_provers.Valid in
+      let prepared_task = Driver.prepare_task drv task in
+      let prepared_task = Task.bisect test prepared_task in
+      output_task_prepared drv fname tname th prepared_task dir
     | None, Some command ->
         let call = Driver.prove_task ~command ~timelimit ~memlimit drv task in
         let res = Call_provers.wait_on_call (call ()) () in
@@ -355,20 +415,7 @@ let do_task drv fname tname (th : Why.Theory.theory) (task : Task.task) =
           Call_provers.print_prover_result res
     | None, None ->
         Driver.print_task drv std_formatter task
-    | Some dir, _ ->
-        let fname = Filename.basename fname in
-        let fname =
-          try Filename.chop_extension fname with _ -> fname
-        in
-        let tname = th.th_name.Ident.id_string in
-        let dest = Driver.file_of_task drv fname tname task in
-        (* Uniquify the filename before the extension if it exists*)
-        let i = try String.rindex dest '.' with _ -> String.length dest in
-        let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
-        let ext = String.sub dest i (String.length dest - i) in
-        let cout = open_out (Filename.concat dir (name ^ ext)) in
-        Driver.print_task drv (formatter_of_out_channel cout) task;
-        close_out cout
+    | Some dir, _ -> output_task drv fname tname th task dir
 
 let do_tasks env drv fname tname th task =
   let lookup acc t =

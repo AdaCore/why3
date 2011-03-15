@@ -120,3 +120,8 @@ exception GoalFound
 exception SkipFound
 exception LemmaFound
 
+val bisect : (task -> bool) -> task -> task
+   (** [bisect test task] return a task included in [task] which is at
+       the limit of truthness of the function test. The returned task is
+       included in [task] and if any declarations are removed from it the
+       task doesn't verify test anymore *)

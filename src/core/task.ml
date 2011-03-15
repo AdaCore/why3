@@ -316,3 +316,49 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       Format.fprintf fmt "Metaproperty '%s' is not exclusive" m.meta_name
   | _ -> raise exn)
 
+(* task1 : prefix
+   lt : to reduce
+   lk : suffix (reverse order)
+   i : length of lt
+*)
+
+let rec split i l acc = match i,l with
+  | 0, l -> List.rev acc, l
+  | _, [] -> assert false
+  | n, a::l -> split (pred n) l (a::acc)
+
+let merge task l = List.fold_left add_tdecl task l
+
+let rec bisect_aux f task lt i lk =
+  if i < 2 then
+    if try f (merge task lk) with UnknownIdent _ -> false then [] else
+        (assert (List.length lt = 1); lt)
+  else
+    let i1 = i/2 in
+    let i2 =  i/2 + i mod 2 in
+    let lt1,lt2 = split i1 lt [] in
+    let task1 = merge task lt1 in (** Can't fail *)
+    (** These "if then else" allow to remove big chunck with one call to f *)
+    if try f (merge task1 lk) with UnknownIdent _ -> false
+    then bisect_aux f task lt1 i1 lk
+    else
+      if try f (merge (merge task lt2) lk) with UnknownIdent _ -> false
+      then bisect_aux f task lt2 i2 lk
+      else
+        let lt2 = bisect_aux f task1 lt2 i2 lk in
+        let lk2 = List.append lt2 lk in
+        let lt1 = bisect_aux f task lt1 i1 lk2 in
+        List.append lt1 lt2
+
+let bisect f task =
+  let task,goal = match task with
+    | Some {task_decl = {td_node = Decl {d_node = Dprop (Pgoal,_,_)}} as td;
+            task_prev = task} -> task,td
+    | _ -> raise GoalNotFound in
+  let lt,i,tacc = task_fold (fun (acc,i,tacc) td ->
+    match td.td_node with
+      | Decl _ -> (td::acc,succ i,tacc)
+      | _ -> (acc,i,td::tacc)) ([],0,[]) task in
+  let task = merge None tacc in
+  let lt = bisect_aux f task lt i [goal] in
+  add_tdecl (merge task lt) goal
