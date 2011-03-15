@@ -1075,6 +1075,8 @@ expr:
    { mk_expr (Ematch (mk_expr (Etuple ($2::$4)), $7)) }
 | LABEL uident COLON expr
    { mk_expr (Elabel ($2, $4)) }
+| DO loop_annotation expr DONE
+   { mk_expr (Eloop ($2, $3)) }
 | WHILE expr DO loop_annotation expr DONE
    { mk_expr
        (Etry
@@ -1103,9 +1105,9 @@ expr:
 
 triple:
 | pre expr post
-  { $1, add_init_label $2, $3 }
+  { $1, (* add_init_label *) $2, $3 }
 | expr %prec prec_triple
-  { mk_pp PPtrue, add_init_label $1, (mk_pp PPtrue, []) }
+  { mk_pp PPtrue, (* add_init_label *) $1, (mk_pp PPtrue, []) }
 ;
 
 simple_expr:

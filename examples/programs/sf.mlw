@@ -15,6 +15,7 @@ module HoareLogic
 
   let slow_subtraction x z =
     { x >= 0 }
+    label Init:
     while !x <> 0 do
       invariant { 0 <= x and z - x = at z Init - at x Init } variant { x }
       z := !z - 1;
@@ -33,6 +34,7 @@ module HoareLogic
 
   let slow_addition x z =
     { x >= 0 }
+    label Init:
     while !x <> 0 do
       invariant { 0 <= x and z + x = at z Init + at x Init } variant { x }
       z := !z + 1;
@@ -51,6 +53,7 @@ module HoareLogic
   let parity x y =
     { x >= 0 }
     y := 0;
+    label Init:
     while !x <> 0 do
       invariant { 0 <= x and (y=0 and even (at x Init - x) or
                               y=1 and even (at x Init - x + 1)) }
@@ -109,6 +112,7 @@ module MoreHoareLogic
   let list_sum l y =
     {}
     y := 0;
+    label Init:
     while !l <> Nil do
       invariant { length l <= length (at l Init) and 
                   y + sum l = sum (at l Init) } 
@@ -125,6 +129,7 @@ module MoreHoareLogic
   let list_member (x : ref (list 'a)) y z =
     {}
     z := 0;
+    label Init:
     while !x <> Nil do
       invariant { length x <= length (at x Init) and 
                   (mem y x -> mem y (at x Init)) and

@@ -15,6 +15,17 @@ module P
     end
     { r > old r }
 
+  exception Exit int
+
+  let foo () =
+    {} 
+    let x = ref 0 in
+    do 
+      x := !x + 1;
+      if !x = 100 then raise (Exit !x)
+    done
+    { false } | Exit -> { result = 100 }
+
 end
 
 
