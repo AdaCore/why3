@@ -180,13 +180,13 @@ The \texttt{why3} tool executes the following steps:
 %you want to call the provers concurrently.  *)
 
 The provers can answer the following output:
-\begin{itemize}
+\begin{description}
 \item[Valid] the goal is proved in the given context,
 \item[Unknown] the prover stop by itself to search,
 \item[Timeout] the prover doesn't have enough time,
 \item[Failure] an error occured,
 \item[Invalid] the prover know the goal can't be proved
-\end{itemize}
+\end{description}
 % \why\ can also be *)
 % used to provide other informations : *)
 % \begin{itemize} *)
@@ -194,6 +194,16 @@ The provers can answer the following output:
 %   theories *)
 % \item TO BE COMPLETED *)
 % \end{itemize} *)
+
+The option \texttt{--bisect} change the behaviors of why3. With this
+option, \texttt{-P/--prover} and \texttt{-o/--output} must be given
+and a valid goal must be selected. The last step executed by why3 is
+replaced by computing a minimal set (in the great majority of the
+case) of declarations which still prove the goal. Currently it doesn't
+use any information provided by the prover, it call the prover
+multiple time with reduced context. The minimal set of declarations is
+then written in the prover syntax into a file located in the directory
+given to the \texttt{-o/--output} option.
 
 \section{The \texttt{why3ide} GUI}
 \label{sec:ideref}
