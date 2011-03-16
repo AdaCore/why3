@@ -2191,7 +2191,7 @@ let () =
   in ()
 
 let () =
-  let b = GButton.button ~packing:tools_box#add ~label:"(Replay)" () in
+  let b = GButton.button ~packing:tools_box#add ~label:"Replay" () in
   let i = GMisc.image ~pixbuf:(!image_replay) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =

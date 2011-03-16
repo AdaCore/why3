@@ -80,7 +80,7 @@ parameter x : ref (array)
   (* the target digit sum *)
   logic y : int
 
-  axiom Hypotheses: n > 0 and y > 0
+  axiom Hypotheses: n >= 0 and y > 0
 
   logic m : int = 1 + max n (div y 9)
 
