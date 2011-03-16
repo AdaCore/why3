@@ -86,9 +86,21 @@ theory ComputerDivision
   lemma Rounds_toward_zero:
     forall x y:int. y <> 0 -> abs (div x y * y) <= abs x
 
+  lemma Div_1: forall x:int. div x 1 = x
+
   lemma Mod_1: forall x:int. mod x 1 = 0
 
-  lemma Div_1: forall x:int. div x 1 = x
+  lemma Div_inf: forall x y:int. 0 <= x < y -> div x y = 0
+
+  lemma Mod_inf: forall x y:int. 0 <= x < y -> mod x y = x
+
+  lemma Div_mult: forall x y z:int [div (x * y + z) x]. 
+          x > 0 and y >= 0 and z >= 0 ->
+          div (x * y + z) x = y + div z x
+
+  lemma Mod_mult: forall x y z:int [mod (x * y + z) x]. 
+          x > 0 and y >= 0 and z >= 0 ->
+          mod (x * y + z) x = mod z x
 
 end
 
