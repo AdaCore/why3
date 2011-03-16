@@ -19,8 +19,4 @@
 
 val compile_match : Task.task Trans.trans
 
-val eliminate_compiled_algebraic : Task.task Trans.trans
-
-val eliminate_algebraic : Task.task Trans.trans
-
 val meta_enum : Theory.meta

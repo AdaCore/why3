@@ -60,12 +60,14 @@ type state = {
   mt_map : lsymbol Mts.t;       (* from type symbols to selector functions *)
   pj_map : lsymbol list Mls.t;  (* from constructors to projections *)
   tp_map : (tysymbol * lsymbol list) Mid.t; (* skipped tuple symbols *)
+  in_smt : bool;                (* generate indexing funcitons *)
 }
 
-let empty_state = {
+let empty_state smt = {
   mt_map = Mts.empty;
   pj_map = Mls.empty;
   tp_map = Mid.empty;
+  in_smt = smt;
 }
 
 let uncompiled = "eliminate_algebraic: compile_match required"
@@ -211,6 +213,7 @@ let add_indexer (state,task) ts ty csl =
 
 let add_indexer (state,task) ts ty = function
   | [_] -> state, task
+  | _ when not state.in_smt -> state, task
   | csl -> add_indexer (state,task) ts ty csl
 
 let add_projections (state,task) _ts _ty csl =
@@ -303,10 +306,15 @@ let comp t (state,task) = match t.task_decl.td_node with
   | _ ->
       comp t (state,task)
 
-let eliminate_compiled_algebraic = Trans.fold_map comp empty_state None
+let eliminate_algebraic_smt = Trans.compose compile_match
+  (Trans.fold_map comp (empty_state true) None)
 
-let eliminate_algebraic =
-  Trans.compose compile_match eliminate_compiled_algebraic
+let eliminate_algebraic = Trans.compose compile_match
+  (Trans.fold_map comp (empty_state false) None)
 
-let () = Trans.register_transform "eliminate_algebraic" eliminate_algebraic
+let () =
+  Trans.register_transform "eliminate_algebraic_smt" eliminate_algebraic_smt
+
+let () =
+  Trans.register_transform "eliminate_algebraic" eliminate_algebraic
 
