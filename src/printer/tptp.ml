@@ -27,15 +27,7 @@ open Task
 open Printer
 
 let ident_printer =
-  (* let bls = ["and";" benchmark";" distinct";"exists";"false";"flet";"forall";
-     "if then else";"iff";"implies";"ite";"let";"logic";"not";"or";
-     "sat";"theory";"true";"unknown";"unsat";"xor";
-     "assumption";"axioms";"defintion";"extensions";"formula";
-     "funs";"extrafuns";"extrasorts";"extrapreds";"language";
-     "notes";"preds";"sorts";"status";"theory";"Int";"Real";"Bool";
-     "Array";"U";"select";"store"] in *)
-  let bls = ["fof"; "axiom"; "conjecture"; "&"; "="; "!="; "!"; "|"; "=>";
-      "~"; "?"; "itef"] in
+  let bls = ["fof"; "axiom"; "conjecture"; "itef"] in
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
 
@@ -55,8 +47,6 @@ type info = {
 }
 
 let rec print_term info fmt t = match t.t_node with
-  | Tconst c -> fprintf fmt "'%a'"
-      Pretty.print_const c
   | Tvar v -> print_var fmt v
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
@@ -66,6 +56,8 @@ let rec print_term info fmt t = match t.t_node with
                 (print_list comma (print_term info)) tl
           end
       end
+  | Tconst _ -> unsupportedTerm t
+      "tptp : you must eliminate constants"
   | Tlet (_,_) -> unsupportedTerm t
       "tptp : you must eliminate let"
   | Tif (f1,t1,t2) ->
@@ -87,7 +79,6 @@ and print_fmla info fmt f = match f.f_node with
   | Fquant (q, fq) ->
       let q = match q with Fforall -> "!" | Fexists -> "?" in
       let vl, _tl, f = f_open_quant fq in
-      (* TODO trigger *)
       fprintf fmt "%s [%a] :@ %a" q (print_list comma print_var) vl (print_fmla info) f;
       List.iter forget_var vl
   | Fbinop (Fand, f1, f2) ->
@@ -115,11 +106,6 @@ and print_fmla info fmt f = match f.f_node with
       forget_var v *)
   | Fcase _ -> unsupportedFmla f
       "tptp : you must eliminate match"
-
-and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
-
-and print_triggers info fmt tl = print_list comma (print_expr info) fmt tl
-
 
 let print_logic_decl _ _ (_,ld) = match ld with
   | None -> ()
@@ -150,6 +136,14 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
+let dao_ax =
+  let pr = create_prsymbol (id_fresh "dao") in
+  let yi = create_vsymbol (id_fresh "ying") ty_int in
+  let ya = create_vsymbol (id_fresh "yang") ty_int in
+  let f = f_neq (t_var yi) (t_var ya) in
+  let f = f_exists_close [yi;ya] [] f in
+  create_prop_decl Paxiom pr f
+
 let print_task pr thpr fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
@@ -157,7 +151,7 @@ let print_task pr thpr fmt task =
     info_syn = get_syntax_map task;
     info_rem = get_remove_set task }
   in
-  let decls = Task.task_decls task in
+  let decls = dao_ax :: Task.task_decls task in
   ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)
 
 let () = register_printer "tptp"
