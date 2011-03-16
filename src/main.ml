@@ -395,7 +395,6 @@ let output_task_prepared drv fname _tname th task dir =
 let do_task drv fname tname (th : Why.Theory.theory) (task : Task.task) =
   match !opt_output, !opt_command with
     | Some dir, Some command when !opt_bisect ->
-      (* Should we test that the full task in proved? *)
       let test task =
         let call = Driver.prove_task_prepared
           ~command ~timelimit ~memlimit drv task in
@@ -405,8 +404,12 @@ let do_task drv fname tname (th : Why.Theory.theory) (task : Task.task) =
           Call_provers.print_prover_result res;
         res.Call_provers.pr_answer = Call_provers.Valid in
       let prepared_task = Driver.prepare_task drv task in
-      let prepared_task = Task.bisect test prepared_task in
-      output_task_prepared drv fname tname th prepared_task dir
+      if not (test prepared_task)
+      then printf "I can't bisect %s %s %s which is not valid@." fname tname
+        (task_goal task).Decl.pr_name.Ident.id_string
+      else
+        let prepared_task = Task.bisect test prepared_task in
+        output_task_prepared drv fname tname th prepared_task dir
     | None, Some command ->
         let call = Driver.prove_task ~command ~timelimit ~memlimit drv task in
         let res = Call_provers.wait_on_call (call ()) () in
