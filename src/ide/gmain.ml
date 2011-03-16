@@ -959,6 +959,7 @@ module Helpers = struct
                subgoals = [];
              }
     in
+    Hashtbl.add g.Model.transformations tr_name tr;
     goals_model#set ~row ~column:Model.name_column tr_name;
     goals_model#set ~row ~column:Model.icon_column !image_transf;
     goals_model#set ~row ~column:Model.index_column
@@ -1335,7 +1336,7 @@ let () =
 (* q is a queue of proof attempt where to put the new one *)
 let redo_external_proof g a =
   (* check that the state is not Scheduled or Running *)
-(*
+(**)
   let running = match a.Model.proof_state with
     | Gscheduler.Scheduled | Gscheduler.Running -> true
     | Gscheduler.Done _ | Gscheduler.InternalFailure _ -> false
@@ -1343,7 +1344,7 @@ let redo_external_proof g a =
   if running then ()
     (* info_window `ERROR "Proof already in progress" *)
   else
-*)
+(**)
   let p = a.Model.prover in
   let callback result =
     Helpers.set_proof_state ~obsolete:false a result (*time*) ;
@@ -1380,7 +1381,7 @@ let rec prover_on_goal p g =
       let db_prover = Db.prover_from_name id in
       let db_pa = Db.add_proof_attempt g.Model.goal_db db_prover in
       Helpers.add_external_proof_row ~obsolete:false ~edit:""
-	g p db_pa Gscheduler.Scheduled
+	g p db_pa (Gscheduler.InternalFailure Not_found)
   in
   let () = redo_external_proof g a in
   Hashtbl.iter
