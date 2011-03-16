@@ -197,6 +197,27 @@ theory Permut
 
 end
 
+theory Distinct
+
+  use import List
+  use import Mem
+
+  inductive distinct (l : list 'a) =
+    | distinct_zero : distinct (Nil : list 'a)
+    | distinct_one  : forall x:'a. distinct (Cons x Nil)
+    | distinct_many : 
+        forall x :'a, l : list 'a. 
+        not (mem x l) -> distinct l -> distinct (Cons x l)
+
+  use import Append
+
+  lemma distinct_append :
+    forall l1 l2 : list 'a.
+    distinct l1 -> distinct l2 -> (forall x:'a. mem x l1 -> not (mem x l2)) ->
+    distinct (l1 ++ l2)
+
+end
+
 theory Induction
   use import List
 
@@ -243,3 +264,9 @@ theory ListRich
   use export NumOcc
   use export Permut
 end
+
+(*
+Local Variables: 
+compile-command: "make -C .. theories/list"
+End: 
+*)

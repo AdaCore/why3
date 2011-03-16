@@ -2,7 +2,6 @@
 (* graph theory *)
 
 theory Path
-  use import list.Mem
 
   type graph
 
@@ -18,18 +17,39 @@ theory Path
       path g src v1 -> edge g v1 v2 -> path g v2 dst -> 
       path g src dst
 
+  lemma path_left_extension :
+    forall g : graph, v1 v2 v3 : vertex.
+    edge g v1 v2 -> path g v2 v3 -> path g v1 v3
+
+  lemma path_right_extension :
+    forall g : graph, v1 v2 v3 : vertex.
+    path g v1 v2 -> edge g v2 v3 -> path g v1 v3
+
 end
 
-(*
+theory SimplePath
+
+  use import list.List
+  use import list.Mem
+
+  type graph
+
+  type vertex
+
+  logic edge graph vertex vertex
+
+  (* [simple_path g src [x1;...;xn] dst] is a path 
+     src --> x1 --> x2 --> ... --> xn --> dst without repetition. *)
   inductive simple_path graph vertex (list vertex) vertex =
   | Path_empty : 
       forall g:graph, v:vertex. simple_path g v (Nil : list vertex) v
   | Path_cons  : 
       forall g:graph, src v dst : vertex, l : list vertex.
-      simple_path g v l dst -> edge g src v -> not mem v l ->
+      edge g src v -> src <> v ->
+      simple_path g v l dst -> not mem src l ->
       simple_path g src (Cons v l) dst
 
-  logic simple_cycle(g : graph, v : vertex) =
+  logic simple_cycle (g : graph) (v : vertex) =
     exists l : list vertex. l <> Nil and simple_path g v l v
 
-*)
+end

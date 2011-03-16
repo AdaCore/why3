@@ -1,8 +1,15 @@
 
+(* Tree relabelling.
+
+   Given a tree t, with values at the leaves, build a new tree with the
+   same structure and leaves labelled with distinct integers.
+ *)
+
 module Relabel
 
   use import list.Mem
   use import list.Append
+  use import list.Distinct
 
   type tree 'a =
     | Leaf 'a
@@ -14,11 +21,11 @@ module Relabel
   end
 
   lemma labels_Leaf : 
-   forall x y : 'a. mem x (labels (Leaf y)) <-> x=y
+    forall x y : 'a. mem x (labels (Leaf y)) <-> x=y
 
   lemma labels_Node :
-   forall x : 'a, l r : tree 'a.
-     mem x (labels (Node l r)) <-> (mem x (labels l) or mem x (labels r))
+    forall x : 'a, l r : tree 'a.
+      mem x (labels (Node l r)) <-> (mem x (labels l) or mem x (labels r))
 
   inductive same_shape (t1 : tree 'a) (t2 : tree 'b) =
     | same_shape_Leaf : 
@@ -29,25 +36,13 @@ module Relabel
         same_shape l1 l2 -> same_shape r1 r2 ->
         same_shape (Node l1 r1) (Node l2 r2)
 
-  (* should be in the library? *)
-  inductive distinct (l : list 'a) =
-    | distinct_zero : distinct (Nil : list 'a)
-    | distinct_one  : forall x:'a. distinct (Cons x Nil)
-    | distinct_many : 
-        forall x :'a, l : list 'a. 
-        not (mem x l) -> distinct l -> distinct (Cons x l)
-
-  lemma distinct_append :
-    forall l1 l2 : list 'a.
-    distinct l1 -> distinct l2 -> (forall x:'a. mem x l1 -> not (mem x l2)) ->
-    distinct (l1 ++ l2)
-
   use import int.Int
   use import module stdlib.Ref
  
   parameter r : ref int
 
-  let fresh () = {} r := !r + 1; !r { r = old r + 1 and result = r }
+  let fresh () = 
+    {} r := !r + 1; !r { r = old r + 1 and result = r }
 
   let rec relabel (t : tree 'a) : tree int = 
     {}
