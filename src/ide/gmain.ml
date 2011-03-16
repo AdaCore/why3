@@ -1421,6 +1421,42 @@ let prover_on_selected_goals pr =
     (prover_on_selected_goal_or_children pr)
     goals_view#selection#get_selected_rows
 
+(**********************************)
+(* method: replay obsolete proofs *)
+(**********************************)
+
+let rec replay_on_goal_or_children g =
+  Hashtbl.iter
+    (fun _ a -> 
+       if a.Model.proof_obsolete then redo_external_proof g a)
+    g.Model.external_proofs;
+  Hashtbl.iter
+    (fun _ t ->
+       List.iter replay_on_goal_or_children
+         t.Model.subgoals)
+    g.Model.transformations
+
+let replay_on_selected_goal_or_children row =
+  let row = filter_model#get_iter row in
+  match filter_model#get ~row ~column:Model.index_column with
+    | Model.Row_goal g ->
+        replay_on_goal_or_children g
+    | Model.Row_theory th ->
+        List.iter replay_on_goal_or_children th.Model.goals
+    | Model.Row_file file ->
+        List.iter
+          (fun th ->
+             List.iter replay_on_goal_or_children th.Model.goals)
+          file.Model.theories
+    | Model.Row_proof_attempt a ->
+        replay_on_goal_or_children a.Model.proof_goal
+    | Model.Row_transformation tr ->
+        List.iter replay_on_goal_or_children tr.Model.subgoals
+
+let replay_obsolete_proofs () =
+  List.iter
+    replay_on_selected_goal_or_children
+    goals_view#selection#get_selected_rows
 
 
 
@@ -2156,12 +2192,10 @@ let () =
 
 let () =
   let b = GButton.button ~packing:tools_box#add ~label:"(Replay)" () in
-(*
   let i = GMisc.image ~pixbuf:(!image_replay) () in
   let () = b#set_image i#coerce in
-*)
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:not_implemented
+    b#connect#pressed ~callback:replay_obsolete_proofs
   in ()
 
 (*************)
