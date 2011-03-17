@@ -228,7 +228,7 @@ let read_file fn =
 This home made scheduler allows to run long computations "in background"
 that is without freezing the GUI for too long time.
 
-It works by using: 
+It works by using:
 * a queue Qa of atomic actions to process:
    One element of Qa is processed whenever the GUI is idle. Actions can be
    of 3 kinds:
@@ -239,7 +239,7 @@ It works by using:
    one element is queued by an action of kind "add proof attempt"
 * a set E of prover calls to check for termination:
    all elements of E are check at regular time steps.
-   if there are less elements than a given maximum number of parallel 
+   if there are less elements than a given maximum number of parallel
    processes then a new prover_call is extracted from Qp
 
 *)
@@ -277,7 +277,7 @@ let timeout_handler () =
   in
   let l =
     if List.length l < !maximum_running_proofs then
-      begin try 
+      begin try
 	let (callback,pre_call) = Queue.pop proof_attempts_queue in
 	callback Running;
 	let call = pre_call () in
@@ -287,28 +287,28 @@ let timeout_handler () =
     else l
   in
   running_proofs := l;
-  let continue = 
-    match l with 
-      | [] -> 
+  let continue =
+    match l with
+      | [] ->
           eprintf "Info: timeout_handler stopped@.";
-          false 
-      | _ -> true 
+          false
+      | _ -> true
   in
-  timeout_handler_activated := continue; 
+  timeout_handler_activated := continue;
   timeout_handler_running := false;
   continue
-      
+
 
 let run_timeout_handler () =
   if !timeout_handler_activated then () else
     begin
       timeout_handler_activated := true;
       eprintf "Info: timeout_handler started@.";
-      let (_ : GMain.Timeout.id) = 
-	GMain.Timeout.add ~ms:100 ~callback:timeout_handler 
+      let (_ : GMain.Timeout.id) =
+	GMain.Timeout.add ~ms:100 ~callback:timeout_handler
       in ()
     end
-	     
+
 (* idle handler *)
 
 
@@ -357,7 +357,7 @@ let run_idle_handler () =
 
 let schedule_proof_attempt ~debug ~timelimit ~memlimit ?old
     ~command ~driver ~callback goal =
-  Queue.push 
+  Queue.push
     (Proof_attempt(debug,timelimit,memlimit,old,command,driver,
 			callback,goal))
     actions_queue;
@@ -371,7 +371,7 @@ let schedule_edition command callback =
   callback Running;
   running_proofs := (callback, precall ()) :: !running_proofs;
   run_timeout_handler ()
-  
+
 let schedule_delayed_action callback =
   Queue.push (Delayed callback) actions_queue;
   run_idle_handler ()
@@ -720,9 +720,9 @@ let info_window ?(callback=(fun () -> ())) mt s =
       | Term.Fbinop(Term.Fimplies,_,f) -> get_labels f
       | Term.Fquant(Term.Fforall,fq) ->
 	  let (_,_,f) = Term.f_open_quant fq in get_labels f
-      | Term.Flet(_,fb) -> 
+      | Term.Flet(_,fb) ->
 	  let (_,f) = Term.f_open_bound fb in get_labels f
-      | Term.Fcase(_,[fb]) -> 
+      | Term.Fcase(_,[fb]) ->
 	  let (_,f) = Term.f_open_branch fb in get_labels f
       | _ -> [])
     @ f.Term.f_label
@@ -1428,14 +1428,18 @@ let prover_on_selected_goals pr =
 (* method: replay obsolete proofs *)
 (**********************************)
 
+let proof_successful a =
+  match a.Model.proof_state with
+    | Gscheduler.Done { Call_provers.pr_answer = Call_provers.Valid }
+      -> true
+    | _ -> false
+
 let rec replay_on_goal_or_children g =
   Hashtbl.iter
-    (fun _ a -> 
-       if a.Model.proof_obsolete then 
-         match a.Model.proof_state with
-           | Gscheduler.Done { Call_provers.pr_answer = Call_provers.Valid } 
-             -> redo_external_proof g a
-           | _ -> ())
+    (fun _ a ->
+       if a.Model.proof_obsolete then
+         if not !context_unproved_goals_only || proof_successful a
+         then redo_external_proof g a)
     g.Model.external_proofs;
   Hashtbl.iter
     (fun _ t ->
@@ -1495,7 +1499,7 @@ let transformation_on_goal g trans_name trans =
 	let fold =
 	  fun (acc,count) subtask ->
 	    let id = (Task.task_goal subtask).Decl.pr_name in
-            let expl = 
+            let expl =
               get_explanation id (Task.task_goal_fmla subtask)
             in
 	    let subgoal_name =
@@ -1520,8 +1524,8 @@ let transformation_on_goal g trans_name trans =
     apply_transformation ~callback
       trans g.Model.task
 
-let split_goal g = 
-  Gscheduler.schedule_delayed_action 
+let split_goal g =
+  Gscheduler.schedule_delayed_action
     (fun () ->
        transformation_on_goal g "split_goal" split_transformation)
 
@@ -2159,7 +2163,7 @@ let edit_selected_row p =
           match res with
             | Gscheduler.Done _ ->
                 Helpers.set_proof_state ~obsolete:false a old_status
-            | _ -> 
+            | _ ->
                 Helpers.set_proof_state ~obsolete:false a res
         in
         let editor =
@@ -2271,13 +2275,52 @@ let () =
     b#connect#pressed ~callback:confirm_remove_selection
   in ()
 
+let rec clean_goal g =
+  if g.Model.proved then
+    begin
+      Hashtbl.iter
+        (fun _ a ->
+           if a.Model.proof_obsolete || not (proof_successful a) then
+             remove_proof_attempt a)
+        g.Model.external_proofs;
+      Hashtbl.iter
+        (fun _ t ->
+           if not t.Model.transf_proved then
+             remove_transf t)
+        g.Model.transformations
+    end
+  else
+    Hashtbl.iter
+      (fun _ t -> List.iter clean_goal t.Model.subgoals)
+      g.Model.transformations
+
+
+let clean_row r =
+  let row = filter_model#get_iter r in
+  match filter_model#get ~row ~column:Model.index_column with
+    | Model.Row_goal g -> clean_goal g
+    | Model.Row_theory th ->
+        List.iter clean_goal th.Model.goals
+    | Model.Row_file file ->
+        List.iter
+          (fun th ->
+             List.iter clean_goal th.Model.goals)
+          file.Model.theories
+    | Model.Row_proof_attempt a ->
+        clean_goal a.Model.proof_goal
+    | Model.Row_transformation tr ->
+        List.iter clean_goal tr.Model.subgoals
+
+let clean_selection () =
+  List.iter clean_row goals_view#selection#get_selected_rows
+
 let () =
-  let b = GButton.button ~packing:cleaning_box#add ~label:"(clean)" () in
-  b#misc#set_tooltip_markup "Not yet implemented";
+  let b = GButton.button ~packing:cleaning_box#add ~label:"Clean" () in
+  b#misc#set_tooltip_markup "Removes non successful proof_attempts\nassociated to a proved goal";
   let i = GMisc.image ~pixbuf:(!image_cleaning) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:not_implemented
+    b#connect#pressed ~callback:clean_selection
   in ()
 
 
