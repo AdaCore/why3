@@ -602,6 +602,7 @@ let () =
   let b1 = GButton.radio_button
     ~packing:context_box#add ~label:"Unproved goals" ()
   in
+  b1#misc#set_tooltip_markup "When selected, tools below are applied\nonly on <b>unproved</b> goals";
   let (_ : GtkSignal.id) =
     b1#connect#clicked
       ~callback:(fun () -> context_unproved_goals_only := true)
@@ -609,6 +610,7 @@ let () =
   let b2 = GButton.radio_button
     ~group:b1#group ~packing:context_box#add ~label:"All goals" ()
   in
+  b2#misc#set_tooltip_markup "When selected, tools below are applied\nto all goals";
   let (_ : GtkSignal.id) =
     b2#connect#clicked
       ~callback:(fun () -> context_unproved_goals_only := false)
@@ -1829,6 +1831,8 @@ let () =
              ()
          in
          let b = GButton.button ~packing:provers_box#add ~label:n () in
+         b#misc#set_tooltip_markup "Click to start this prover\non the <b>selected</b> goal(s)";
+
 (* prend de la place pour rien
          let i = GMisc.image ~pixbuf:(!image_prover) () in
          let () = b#set_image i#coerce in
@@ -1854,6 +1858,8 @@ let () =
 
 let () =
   let b = GButton.button ~packing:transf_box#add ~label:"Split" () in
+  b#misc#set_tooltip_markup "Click to apply transformation <tt>split_goal</tt> to the <b>selected goals</b>";
+
   let i = GMisc.image ~pixbuf:(!image_transf) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
@@ -1862,6 +1868,7 @@ let () =
 
 let () =
   let b = GButton.button ~packing:transf_box#add ~label:"Inline" () in
+  b#misc#set_tooltip_markup "Click to apply transformation <tt>inline_goal</tt> to the <b>selected goals</b>";
 (**)
   let i = GMisc.image ~pixbuf:(!image_transf) () in
   let () = b#set_image i#coerce in
@@ -2185,6 +2192,8 @@ let () =
 
 let () =
   let b = GButton.button ~packing:tools_box#add ~label:"Edit" () in
+  b#misc#set_tooltip_markup "Click to edit the <b>selected proof</b>\nwith the appropriate editor";
+
   let i = GMisc.image ~pixbuf:(!image_editor) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
@@ -2193,6 +2202,8 @@ let () =
 
 let () =
   let b = GButton.button ~packing:tools_box#add ~label:"Replay" () in
+  b#misc#set_tooltip_markup "Replay all the <b>successful</b> but <b>obsolete</b> proofs below the current selection";
+
   let i = GMisc.image ~pixbuf:(!image_replay) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
@@ -2249,10 +2260,22 @@ let confirm_remove_selection () =
 
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"Remove" () in
+  b#misc#set_tooltip_markup "Removes the selected\n<b>proof</b> or <b>transformation</b>";
   let i = GMisc.image ~pixbuf:(!image_remove) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:confirm_remove_selection
+  in ()
+
+let () =
+  let b = GButton.button ~packing:cleaning_box#add ~label:"(clean)" () in
+  b#misc#set_tooltip_markup "Not yet implemented";
+(*
+  let i = GMisc.image ~pixbuf:(!image_remove) () in
+  let () = b#set_image i#coerce in
+*)
+  let (_ : GtkSignal.id) =
+    b#connect#pressed ~callback:not_implemented
   in ()
 
 
