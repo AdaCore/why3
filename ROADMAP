@@ -8,7 +8,7 @@
   ** ghost code
   ** extraction of Ocaml code 
 * Jessie3
-* traceability
+* traceability: Partially done
   (Claude)
 * Coq plugin
 * Coq realization of theories
@@ -19,8 +19,7 @@
 * IDE: edition, navigation
   (?)
 * HOL
-* IDE: no more threads
-  (qui ?)
+
 * IDE: custom model
   (JC + ?)
 * why3bench sur examples/ dans make bench
@@ -52,8 +51,11 @@
 
 === Roadmap for third release =================================================
 
+* (DONE) IDE: no more threads
+  
+
 * proof replay
-  ** in IDE: replay all obsolete but previously successful proofs
+  ** (DONE) IDE: replay all obsolete but previously successful proofs
   ** in whybench
   ** add replay of existing proofs in "make bench" to detect regression
   ** add automatic recompilation, install and bench every night on moloch
@@ -61,7 +63,7 @@
 * IDE: implement "inline" (use transformation inline_goal)
   ** partially done
   ** problem 1: detect that transformation did nothing
-  ** problem 2: reimport form db does apply inline correctly
+  ** (DONE) problem 2: reimport from db does apply inline correctly
 
 * IDE: debug "hide proved goals" feature
   ** suggested solution: replace model + filter_model by a custom model
