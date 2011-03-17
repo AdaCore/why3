@@ -69,6 +69,7 @@ val image_transf : GdkPixbuf.pixbuf ref
 val image_editor : GdkPixbuf.pixbuf ref
 val image_replay : GdkPixbuf.pixbuf ref
 val image_remove : GdkPixbuf.pixbuf ref
+val image_cleaning : GdkPixbuf.pixbuf ref
 
 (* status icons *)
 val image_scheduled : GdkPixbuf.pixbuf ref

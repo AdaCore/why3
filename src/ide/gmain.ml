@@ -1431,7 +1431,11 @@ let prover_on_selected_goals pr =
 let rec replay_on_goal_or_children g =
   Hashtbl.iter
     (fun _ a -> 
-       if a.Model.proof_obsolete then redo_external_proof g a)
+       if a.Model.proof_obsolete then 
+         match a.Model.proof_state with
+           | Gscheduler.Done { Call_provers.pr_answer = Call_provers.Valid } 
+             -> redo_external_proof g a
+           | _ -> ())
     g.Model.external_proofs;
   Hashtbl.iter
     (fun _ t ->
@@ -2270,10 +2274,8 @@ let () =
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"(clean)" () in
   b#misc#set_tooltip_markup "Not yet implemented";
-(*
-  let i = GMisc.image ~pixbuf:(!image_remove) () in
+  let i = GMisc.image ~pixbuf:(!image_cleaning) () in
   let () = b#set_image i#coerce in
-*)
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:not_implemented
   in ()

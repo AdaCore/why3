@@ -218,6 +218,7 @@ let iconname_transf = "configure32"
 let iconname_editor = "edit32"
 let iconname_replay = "refresh32"
 let iconname_remove = "deletefile32"
+let iconname_cleaning = "trashb32"
 
 let image_default = ref (image ~size:20 iconname_default)
 let image_scheduled = ref !image_default
@@ -241,6 +242,7 @@ let image_transf = ref !image_default
 let image_editor = ref !image_default
 let image_replay = ref !image_default
 let image_remove = ref !image_default
+let image_cleaning = ref !image_default
 
 let resize_images size =
   image_default := image ~size iconname_default;
@@ -265,6 +267,7 @@ let resize_images size =
   image_editor := image ~size iconname_editor;
   image_replay := image ~size iconname_replay;
   image_remove := image ~size iconname_remove;
+  image_cleaning := image ~size iconname_cleaning;
   ()
 
 let () =
