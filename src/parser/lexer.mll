@@ -92,6 +92,7 @@
 	(* "ghost", GHOST; *)
 	"invariant", INVARIANT;
 	"label", LABEL;
+	"loop", LOOP;
 	"model", MODEL;
 	"module", MODULE;
 	"mutable", MUTABLE;

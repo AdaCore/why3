@@ -20,10 +20,10 @@ module P
   let foo () =
     {} 
     let x = ref 0 in
-    do 
+    loop 
       x := !x + 1;
       if !x = 100 then raise (Exit !x)
-    done
+    end
     { false } | Exit -> { result = 100 }
 
 end

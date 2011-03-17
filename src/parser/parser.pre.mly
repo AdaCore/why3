@@ -167,7 +167,7 @@
 
 %token ABSTRACT ABSURD ANY ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO 
 %token EXCEPTION FOR 
-%token FUN INVARIANT LABEL MODEL MODULE MUTABLE PARAMETER RAISE 
+%token FUN INVARIANT LABEL LOOP MODEL MODULE MUTABLE PARAMETER RAISE 
 %token RAISES READS REC TO TRY VARIANT WHILE WRITES
 
 /* symbols */
@@ -1075,7 +1075,7 @@ expr:
    { mk_expr (Ematch (mk_expr (Etuple ($2::$4)), $7)) }
 | LABEL uident COLON expr
    { mk_expr (Elabel ($2, $4)) }
-| DO loop_annotation expr DONE
+| LOOP loop_annotation expr END
    { mk_expr (Eloop ($2, $3)) }
 | WHILE expr DO loop_annotation expr DONE
    { mk_expr
