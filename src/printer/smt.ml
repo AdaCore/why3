@@ -36,7 +36,7 @@ let use_builtin_array = Theory.register_meta_excl "Smt : builtin array" []
 (** *)
 
 let ident_printer =
-  let bls = ["and";" benchmark";" distinct";"exists";"false";"flet";"forall";
+  let bls = ["and";"benchmark";"distinct";"exists";"false";"flet";"forall";
      "if then else";"iff";"implies";"ite";"let";"logic";"not";"or";
      "sat";"theory";"true";"unknown";"unsat";"xor";
      "assumption";"axioms";"defintion";"extensions";"formula";
