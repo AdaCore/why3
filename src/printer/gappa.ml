@@ -221,6 +221,9 @@ let rec print_fmla info fmt f =
   | Fapp ({ ls_name = id }, []) ->
       print_ident fmt id
   | Fapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
+      (* TODO: distinguish between type of t1 and t2 
+         the following is OK only for real of integer
+      *)
       begin try
         let c1 = constant_value t1 in
         fprintf fmt "%a in [%s,%s]" term t2 c1 c1
@@ -329,6 +332,9 @@ let print_decls ?old info fmt dl =
 let filter_hyp info eqs hyps pr f =
   match f.f_node with
     | Fapp(ls,[t1;t2]) when ls == ps_equ ->
+        (* TODO: if type of t! and T2 is single or double, then
+           replace by (value t1) = (value t2) and (exact t1 = exact t2)
+        *)
 	begin match t1.t_node with
 	  | Tapp(_,[]) ->
 	      ((pr,t1,t2)::eqs,hyps)
