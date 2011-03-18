@@ -1,42 +1,34 @@
-module M
 (* VSTTE'10 competition http://www.macs.hw.ac.uk/vstte10/Competition.html
    Problem 4: N-queens *)
 
+module M
+
   use import int.Int
-  use import module stdlib.Ref
-  use array.ArrayLength as A
+  use import module stdlib.Array
 
-  type array 'a = A.t int 'a
+  type map 'a = t int 'a
 
-  logic (#) (a : array 'a) (i : int) : 'a = A.get a i
+  logic consistent_row (board : map int) (pos : int) (q : int) = 
+    board[q] <> board[pos] and
+    board[q] - board[pos] <> pos - q and
+    board[pos] - board[q] <> pos - q
 
-let array_get (a : ref (array 'a)) i = 
-  { 0 <= i < A.length a } A.get !a i { result = A.get a i }
-
-let array_set (a : ref (array 'a)) i v = 
-  { 0 <= i < A.length a } a := A.set !a i v { a = A.set (old a) i v }
-
-  logic consistent_row (board : array int) (pos : int) (q : int) = 
-    board#q <> board#pos and
-    board#q - board#pos <> pos - q and
-    board#pos - board#q <> pos - q
-
-  logic is_consistent (board : array int) (pos : int) =
+  logic is_consistent (board : map int) (pos : int) =
     forall q:int. 0 <= q < pos -> consistent_row board pos q
 
   lemma Is_consistent_set :
-    forall board : array int, pos q i : int.
-    is_consistent board pos -> pos < q -> is_consistent (A.set board q i) pos
+    forall board : map int, pos q i : int.
+    is_consistent board pos -> pos < q -> is_consistent board[q <- i] pos
 
 exception Inconsistent
 
-let check_is_consistent (board : ref (array int)) pos =
-  { 0 <= pos < A.length board }
+let check_is_consistent (board : array int) pos =
+  { 0 <= pos < length board }
   try
     for q = 0 to pos-1 do
       invariant { forall j:int. 0 <= j < q -> consistent_row board pos j }
-      let bq   = array_get board q   in
-      let bpos = array_get board pos in
+      let bq   = board[q]   in
+      let bpos = board[pos] in
       if bq = bpos then begin
         assert { not (consistent_row board pos q) }; (* to help the provers *)
 	raise Inconsistent 
@@ -50,63 +42,63 @@ let check_is_consistent (board : ref (array int)) pos =
   end
   { result=True <-> is_consistent board pos }
 
-  logic is_board (board : array int) (pos : int) =
-    forall q:int. 0 <= q < pos -> 0 <= board#q < A.length board
+  logic is_board (board : map int) (pos : int) =
+    forall q:int. 0 <= q < pos -> 0 <= board[q] < length board
 
-  logic solution (board : array int) (pos : int) =
+  logic solution (board : map int) (pos : int) =
     is_board board pos and
     forall q:int. 0 <= q < pos -> is_consistent board q
 
-  logic eq_board (b1 b2 : array int) (pos : int) =
-    forall q:int. 0 <= q < pos -> b2#q = b1#q
+  logic eq_board (b1 b2 : map int) (pos : int) =
+    forall q:int. 0 <= q < pos -> b2[q] = b1[q]
 
   lemma Is_consistent_eq :
-    forall b1 b2 : array int, pos : int.
+    forall b1 b2 : map int, pos : int.
     eq_board b1 b2 (pos+1) -> is_consistent b1 pos -> is_consistent b2 pos
 
   lemma Solution_eq_board :
-    forall b1 b2 : array int, pos : int. A.length b1 = A.length b2 ->
+    forall b1 b2 : map int, pos : int. length b1 = length b2 ->
     eq_board b2 b1 pos -> solution b1 pos -> solution b2 pos
 
   lemma Eq_board_set :
-    forall b : array int, pos q i : int.
-    pos <= q -> eq_board b (A.set b q i) pos
+    forall b : map int, pos q i : int.
+    pos <= q -> eq_board b b[q <- i] pos
 
   lemma Eq_board_sym :
-    forall b1 b2 : array int, pos : int.
+    forall b1 b2 : map int, pos : int.
     eq_board b1 b2 pos -> eq_board b2 b1 pos
 
   lemma Eq_board_trans :
-    forall b1 b2 b3 : array int, pos : int.
+    forall b1 b2 b3 : map int, pos : int.
     eq_board b1 b2 pos -> eq_board b2 b3 pos -> eq_board b1 b3 pos
 
 exception Solution
 
-let rec bt_queens (board : ref (array int)) n pos variant { n - pos } =
-  { A.length board = n and 0 <= pos <= n and solution board pos }
+let rec bt_queens (board : array int) n pos variant { n - pos } =
+  { length board = n and 0 <= pos <= n and solution board pos }
   label Init:( (* FIXME *)
   if pos = n then raise Solution;
   for i = 0 to n - 1 do
     invariant { 
-      A.length board = n and eq_board board (at board Init) pos and
-      forall b:array int. A.length b = n -> is_board b n -> 
-        eq_board board b pos -> 0 <= b#pos < i -> not (solution b n) }
-    array_set board pos i;
+      length board = n and eq_board board (at board Init) pos and
+      forall b:map int. length b = n -> is_board b n -> 
+        eq_board board b pos -> 0 <= b[pos] < i -> not (solution b n) }
+    board[pos <- i];
     assert { eq_board board (at board Init) pos };
     if check_is_consistent board pos then bt_queens board n (pos+1)
   done)
   { (* no solution *) 
-    A.length board = n and eq_board board (old board) pos and
-    forall b:array int. A.length b = n -> is_board b n -> 
+    length board = n and eq_board board (old board) pos and
+    forall b:map int. length b = n -> is_board b n -> 
       eq_board board b pos -> not (solution b n) }
   | Solution -> 
   { (* a solution *)
     solution board n }
 
-let queens (board : ref (array int)) n =
-  { A.length board = n }
+let queens (board : array int) n =
+  { length board = n }
   bt_queens board n 0
-  { forall b:array int. A.length b = n -> is_board b n -> not (solution b n) }
+  { forall b:map int. length b = n -> is_board b n -> not (solution b n) }
   | Solution -> { solution board n }
 
 end
