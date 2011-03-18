@@ -6,8 +6,6 @@ module M
   use import int.Int
   use import module stdlib.Array
 
-  type map 'a = t int 'a
-
   logic consistent_row (board : map int) (pos : int) (q : int) = 
     board[q] <> board[pos] and
     board[q] - board[pos] <> pos - q and
@@ -50,7 +48,14 @@ let check_is_consistent (board : array int) pos =
     forall q:int. 0 <= q < pos -> is_consistent board q
 
   logic eq_board (b1 b2 : map int) (pos : int) =
-    forall q:int. 0 <= q < pos -> b2[q] = b1[q]
+    forall q:int. 0 <= q < pos -> b1[q] = b2[q]
+
+  lemma eq_board_extension :
+    forall b1 b2 : map int, pos : int.
+    eq_board b1 b2 pos -> b1[pos] = b2[pos] -> eq_board b1 b2 (pos+1)
+
+  lemma arith1 : forall x y : int. x < y+1 -> x <= y
+  lemma arith2 : forall x y : int. x < y -> x+1 <= y
 
   lemma Is_consistent_eq :
     forall b1 b2 : map int, pos : int.
@@ -58,7 +63,7 @@ let check_is_consistent (board : array int) pos =
 
   lemma Solution_eq_board :
     forall b1 b2 : map int, pos : int. length b1 = length b2 ->
-    eq_board b2 b1 pos -> solution b1 pos -> solution b2 pos
+    eq_board b1 b2 pos -> solution b1 pos -> solution b2 pos
 
   lemma Eq_board_set :
     forall b : map int, pos q i : int.

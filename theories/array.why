@@ -34,16 +34,18 @@ theory ArrayLength "Theory of arrays with length"
 
   use export Array
 
-  logic length (t int 'a) : int
+  type map 'a = t int 'a
+
+  logic length (map 'a) : int
 
   axiom Length_non_negative (* "Array length is always non negative" *):
-    forall a : t int 'a. length a >= 0
+    forall a : map 'a. length a >= 0
 
   axiom Length_set : 
-    forall a : t int 'a. forall k : int. forall v : 'a.
+    forall a : map 'a. forall k : int. forall v : 'a.
     length (set a k v) = length a
 
-  logic create_const_length 'a int : t int 'a
+  logic create_const_length 'a int : map 'a
     (* [create_const_length x n] is the array of length n
        with all cells initialized to x 
        (not specified if n is negative)
@@ -57,12 +59,12 @@ theory ArrayLength "Theory of arrays with length"
       (* premise needed to guaranty length >= 0 invariant *)
        n >= 0 -> length (create_const_length a n) = n
 
-  logic create_length int : t int 'a
+  logic create_length int : map 'a
 
   axiom Create_length_length : 
     forall n : int. 
       (* premise needed to guaranty length >= 0 invariant *)
-      n >=0 -> length (create_length n : t int 'a) = n
+      n >=0 -> length (create_length n : map 'a) = n
 
 end
 
@@ -75,10 +77,10 @@ theory ArraySorted
 
   logic le elt elt
 
-  logic sorted_sub (a : t int elt) (l u : int) =
+  logic sorted_sub (a : map elt) (l u : int) =
     forall i1 i2 : int. l <= i1 <= i2 <= u -> le a[i1] a[i2]
 
-  logic sorted (a : t int elt) =
+  logic sorted (a : map elt) =
     sorted_sub a 0 (length a - 1)
 
 end
@@ -88,10 +90,10 @@ theory ArrayEq
   use import int.Int
   use export ArrayLength
 
-  logic array_eq_sub (a1 a2 : t int 'a) (l u : int) = 
+  logic array_eq_sub (a1 a2 : map 'a) (l u : int) = 
     forall i:int. l <= i <= u -> a1[i] = a2[i]
 
-  logic array_eq (a1 a2 : t int 'a) =
+  logic array_eq (a1 a2 : map 'a) =
     length a1 = length a2 and
     forall i:int. 0 <= i < length a1 -> a1[i] = a2[i]
 
@@ -102,54 +104,54 @@ theory ArrayPermut
   use import int.Int
   use export ArrayLength
 
-  logic exchange (a1 a2 : t int 'a) (i j : int) = 
+  logic exchange (a1 a2 : map 'a) (i j : int) = 
     length a1 = length a2 and
     a1[i] = a2[j] and a2[i] = a1[j] and
     forall k:int. (k <> i and k <> j) -> a1[k] = a2[k]
 
   lemma exchange_set :
-    forall a : t int 'a. forall i j : int.
+    forall a : map 'a. forall i j : int.
     exchange a (set (set a i a[j]) j a[i]) i j
 
-  inductive permut (t int 'a) (t int 'a) int int =
+  inductive permut (map 'a) (map 'a) int int =
   | permut_refl :
-      forall a : t int 'a. forall l u : int. permut a a l u
+      forall a : map 'a. forall l u : int. permut a a l u
   | permut_sym :
-      forall a1 a2 : t int 'a. forall l u : int.
+      forall a1 a2 : map 'a. forall l u : int.
       permut a1 a2 l u -> permut a2 a1 l u
   | permut_trans :
-      forall a1 a2 a3 : t int 'a. forall l u : int.
+      forall a1 a2 a3 : map 'a. forall l u : int.
       permut a1 a2 l u -> permut a2 a3 l u -> permut a1 a3 l u
   | permut_exchange :
-      forall a1 a2 : t int 'a. forall l u i j : int.
+      forall a1 a2 : map 'a. forall l u i j : int.
       l <= i <= u -> l <= j <= u -> exchange a1 a2 i j -> permut a1 a2 l u
 
   lemma permut_weakening :
-    forall a1 a2 : t int 'a. forall l1 r1 l2 r2 : int.
+    forall a1 a2 : map 'a. forall l1 r1 l2 r2 : int.
     l1 <= l2 <= r2 <= r1 -> permut a1 a2 l2 r2 -> permut a1 a2 l1 r1
 
   lemma permut_eq :
-    forall a1 a2 : t int 'a. forall l u : int.
+    forall a1 a2 : map 'a. forall l u : int.
     l <= u -> permut a1 a2 l u ->
     forall i:int. (i < l or u < i) -> a2[i] = a1[i]
 
   lemma permut_length :
-    forall a1 a2 : t int 'a. forall l u : int.
+    forall a1 a2 : map 'a. forall l u : int.
     permut a1 a2 l u -> length a1 = length a2
 
   lemma permut_exists :
-    forall a1 a2 : t int 'a. forall l u : int.
+    forall a1 a2 : map 'a. forall l u : int.
     permut a1 a2 l u -> 
     forall i : int. l <= i <= u ->
     exists j : int. l <= j <= u and a2[i] = a1[j]
 
-  logic permutation (a1 a2 : t int 'a) =
+  logic permutation (a1 a2 : map 'a) =
     permut a1 a2 0 (length a1 - 1)
 
   use export ArrayEq
 
   lemma array_eq_permut :
-    forall a1 a2 : t int 'a. forall l u : int.
+    forall a1 a2 : map 'a. forall l u : int.
     array_eq_sub a1 a2 l u -> permut a1 a2 l u
 
 end
@@ -160,22 +162,22 @@ theory ArrayRich
   
   use export ArrayLength
 
-  logic sub (t int 'a) int int : t int 'a
+  logic sub (map 'a) int int : map 'a
 
   axiom Sub_length : 
-    forall s : t int 'a, ofs len : int. length (sub s ofs len) = len
+    forall s : map 'a, ofs len : int. length (sub s ofs len) = len
 
   axiom Sub_get :
-    forall s : t int 'a, ofs len i : int. 
+    forall s : map 'a, ofs len i : int. 
     get (sub s ofs len) i = get s (ofs + i)
 
-  logic app (t int 'a) (t int 'a) : t int 'a
+  logic app (map 'a) (map 'a) : map 'a
 
   axiom App_length : 
-    forall s1 s2 : t int 'a. length (app s1 s2) = length s1 + length s2
+    forall s1 s2 : map 'a. length (app s1 s2) = length s1 + length s2
 
   axiom App_get :
-    forall s1 s2 : t int 'a, i : int. 
+    forall s1 s2 : map 'a, i : int. 
     get (app s1 s2) i = 
       if i < length s1 then get s1 i else get s2 (i - length s1)
 
