@@ -79,17 +79,37 @@ Axiom Create_length_length : forall (a:Type), forall (n:Z), (0%Z <= n)%Z ->
 
 Parameter array : forall (a:Type), Type.
 
+Definition eq_board(b1:(t Z Z)) (b2:(t Z Z)) (pos:Z): Prop := forall (q:Z),
+  ((0%Z <= q)%Z /\ (q <  pos)%Z) -> ((get b1 q) = (get b2 q)).
+
+Axiom eq_board_set : forall (b:(t Z Z)) (pos:Z) (q:Z) (i:Z), (pos <= q)%Z ->
+  (eq_board b (set b q i) pos).
+
+Axiom eq_board_sym : forall (b1:(t Z Z)) (b2:(t Z Z)) (pos:Z), (eq_board b1
+  b2 pos) -> (eq_board b2 b1 pos).
+
+Axiom eq_board_trans : forall (b1:(t Z Z)) (b2:(t Z Z)) (b3:(t Z Z)) (pos:Z),
+  (eq_board b1 b2 pos) -> ((eq_board b2 b3 pos) -> (eq_board b1 b3 pos)).
+
+Axiom eq_board_extension : forall (b1:(t Z Z)) (b2:(t Z Z)) (pos:Z),
+  (eq_board b1 b2 pos) -> (((get b1 pos) = (get b2 pos)) -> (eq_board b1 b2
+  (pos + 1%Z)%Z)).
+
 Definition consistent_row(board:(t Z Z)) (pos:Z) (q:Z): Prop :=
   (~ ((get board q) = (get board pos))) /\ ((~ (((get board q) - (get board
   pos))%Z = (pos - q)%Z)) /\ ~ (((get board pos) - (get board
   q))%Z = (pos - q)%Z)).
 
+Axiom consistent_row_eq : forall (b1:(t Z Z)) (b2:(t Z Z)) (pos:Z) (q:Z),
+  ((0%Z <= q)%Z /\ (q <  pos)%Z) -> ((eq_board b1 b2 (pos + 1%Z)%Z) ->
+  ((consistent_row b1 pos q) -> (consistent_row b2 pos q))).
+
 Definition is_consistent(board:(t Z Z)) (pos:Z): Prop := forall (q:Z),
   ((0%Z <= q)%Z /\ (q <  pos)%Z) -> (consistent_row board pos q).
 
-Axiom Is_consistent_set : forall (board:(t Z Z)) (pos:Z) (q:Z) (i:Z),
-  (is_consistent board pos) -> ((pos <  q)%Z -> (is_consistent (set board q
-  i) pos)).
+Axiom is_consistent_eq : forall (b1:(t Z Z)) (b2:(t Z Z)) (pos:Z),
+  (eq_board b1 b2 (pos + 1%Z)%Z) -> ((is_consistent b1 pos) ->
+  (is_consistent b2 pos)).
 
 Definition is_board(board:(t Z Z)) (pos:Z): Prop := forall (q:Z),
   ((0%Z <= q)%Z /\ (q <  pos)%Z) -> ((0%Z <= (get board q))%Z /\ ((get board
@@ -98,29 +118,19 @@ Definition is_board(board:(t Z Z)) (pos:Z): Prop := forall (q:Z),
 Definition solution(board:(t Z Z)) (pos:Z): Prop := (is_board board pos) /\
   forall (q:Z), ((0%Z <= q)%Z /\ (q <  pos)%Z) -> (is_consistent board q).
 
-Definition eq_board(b1:(t Z Z)) (b2:(t Z Z)) (pos:Z): Prop := forall (q:Z),
-  ((0%Z <= q)%Z /\ (q <  pos)%Z) -> ((get b1 q) = (get b2 q)).
-
-Axiom eq_board_extension : forall (b1:(t Z Z)) (b2:(t Z Z)) (pos:Z),
-  (eq_board b1 b2 pos) -> (((get b1 pos) = (get b2 pos)) -> (eq_board b1 b2
-  (pos + 1%Z)%Z)).
-
-Theorem Is_consistent_eq : forall (b1:(t Z Z)) (b2:(t Z Z)) (pos:Z),
-  (eq_board b1 b2 (pos + 1%Z)%Z) -> ((is_consistent b1 pos) ->
-  (is_consistent b2 pos)).
+Theorem solution_eq_board : forall (b1:(t Z Z)) (b2:(t Z Z)) (pos:Z),
+  ((length b1) = (length b2)) -> ((eq_board b1 b2 pos) -> ((solution b1
+  pos) -> (solution b2 pos))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-unfold is_consistent, eq_board, consistent_row.
-intros.
-destruct (H0 q); intuition.
-apply H2.
-rewrite H; intuition.
-rewrite H; intuition.
-apply H1.
-rewrite H; intuition.
-rewrite H; intuition.
-apply H6.
-rewrite H; intuition.
-rewrite H; intuition.
+unfold eq_board, solution, is_board.
+intuition.
+rewrite <- H0; intuition.
+destruct (H2 q); intuition.
+rewrite <- H0; intuition.
+destruct (H2 q); intuition.
+apply is_consistent_eq with b1; intuition.
+red; intros.
+intuition.
 Qed.
 (* DO NOT EDIT BELOW *)
 
