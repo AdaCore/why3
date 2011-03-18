@@ -84,6 +84,20 @@ module ARM
 
 end
 
+(*
+@@ logic separation (fp : int) = a+10 < fp-24
+
+main:
+    @@ assume separation fp
+
+.L2:@@ invariant ...
+
+.L3:
+
+.L4:@@ invariant ...
+
+*)
+
 module InsertionSortExample
 
   use import module ARM
