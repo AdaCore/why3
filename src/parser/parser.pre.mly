@@ -190,6 +190,7 @@
 
 /* Precedences */
 
+%nonassoc prec_label
 %nonassoc prec_post
 %nonassoc BAR
 
@@ -1073,7 +1074,7 @@ expr:
    { mk_expr (Ematch ($2, $5)) }
 | MATCH expr COMMA list1_expr_sep_comma WITH bar_ program_match_cases END
    { mk_expr (Ematch (mk_expr (Etuple ($2::$4)), $7)) }
-| LABEL uident COLON expr
+| LABEL uident COLON expr %prec prec_label
    { mk_expr (Elabel ($2, $4)) }
 | LOOP loop_annotation expr END
    { mk_expr (Eloop ($2, $3)) }
