@@ -31,8 +31,9 @@ module M
     board[pos] - board[q] <> pos - q
 
   lemma consistent_row_eq :
-    forall b1 b2 : map int, pos q : int. 0 <= q < pos ->
-    eq_board b1 b2 (pos+1) -> consistent_row b1 pos q -> consistent_row b2 pos q
+    forall b1 b2 : map int, pos : int.
+    eq_board b1 b2 (pos+1) -> forall q : int. 0 <= q < pos ->
+      consistent_row b1 pos q -> consistent_row b2 pos q
 
   logic is_consistent (board : map int) (pos : int) =
     forall q:int. 0 <= q < pos -> consistent_row board pos q
@@ -41,7 +42,7 @@ module M
     forall b1 b2 : map int, pos : int.
     eq_board b1 b2 (pos+1) -> is_consistent b1 pos -> is_consistent b2 pos
 
-  exception Inconsistent
+  exception Inconsistent int
 
   let check_is_consistent (board : array int) pos =
     { 0 <= pos < length board }
@@ -50,15 +51,13 @@ module M
         invariant { forall j:int. 0 <= j < q -> consistent_row board pos j }
         let bq   = board[q]   in
         let bpos = board[pos] in
-        if bq = bpos then begin
-          assert { not (consistent_row board pos q) }; (* to help the provers *)
-  	  raise Inconsistent 
-        end;
-        if bq - bpos = pos - q then raise Inconsistent;
-        if bpos - bq = pos - q then raise Inconsistent 
+        if bq        = bpos    then raise (Inconsistent q);
+        if bq - bpos = pos - q then raise (Inconsistent q);
+        if bpos - bq = pos - q then raise (Inconsistent q)
       done;
       True
-    with Inconsistent ->
+    with Inconsistent q ->
+      assert { not (consistent_row board pos q) };
       False
     end
     { result=True <-> is_consistent board pos }
