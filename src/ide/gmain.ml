@@ -247,6 +247,7 @@ It works by using:
 module Gscheduler = struct
 
 type proof_attempt_status =
+  | Undone
   | Scheduled (** external proof attempt is scheduled *)
   | Running (** external proof attempt is in progress *)
   | Done of Call_provers.prover_result (** external proof done *)
@@ -755,6 +756,7 @@ module Helpers = struct
 
   let image_of_result ~obsolete result =
     match result with
+      | Undone -> !image_scheduled (* TODO *)
     | Scheduled -> !image_scheduled
     | Running -> !image_running
     | InternalFailure _ -> !image_failure
@@ -1341,7 +1343,7 @@ let redo_external_proof g a =
 (**)
   let running = match a.Model.proof_state with
     | Gscheduler.Scheduled | Gscheduler.Running -> true
-    | Gscheduler.Done _ | Gscheduler.InternalFailure _ -> false
+    | Gscheduler.Done _ | Gscheduler.Undone | Gscheduler.InternalFailure _ -> false
   in
   if running then ()
     (* info_window `ERROR "Proof already in progress" *)
@@ -1352,7 +1354,7 @@ let redo_external_proof g a =
     Helpers.set_proof_state ~obsolete:false a result (*time*) ;
     let db_res, time =
       match result with
-	| Gscheduler.Scheduled | Gscheduler.Running ->
+	| Gscheduler.Undone | Gscheduler.Scheduled | Gscheduler.Running ->
 	    Db.Undone, 0.0
 	| Gscheduler.InternalFailure _ ->
 	    Db.Done Call_provers.HighFailure, 0.0
@@ -1383,7 +1385,7 @@ let rec prover_on_goal p g =
       let db_prover = Db.prover_from_name id in
       let db_pa = Db.add_proof_attempt g.Model.goal_db db_prover in
       Helpers.add_external_proof_row ~obsolete:false ~edit:""
-	g p db_pa (Gscheduler.InternalFailure Not_found)
+	g p db_pa Gscheduler.Undone
   in
   let () = redo_external_proof g a in
   Hashtbl.iter
@@ -2125,7 +2127,7 @@ let edit_selected_row p =
         (* check that the state is not Scheduled or Running *)
         let running = match a.Model.proof_state with
           | Gscheduler.Scheduled | Gscheduler.Running -> true
-          | Gscheduler.Done _ | Gscheduler.InternalFailure _ -> false
+          | Gscheduler.Undone | Gscheduler.Done _ | Gscheduler.InternalFailure _ -> false
         in
         if running then
           info_window `ERROR "Edition already in progress"
