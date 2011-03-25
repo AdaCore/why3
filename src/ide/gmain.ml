@@ -486,7 +486,9 @@ module Model = struct
 
   let all_files : file list ref = ref []
 
+(*
   let toggle_hide_proved_goals = ref false
+*)
 
   let cols = new GTree.column_list
   let name_column = cols#add Gobject.Data.string
@@ -494,7 +496,9 @@ module Model = struct
   let index_column : any_row GTree.column = cols#add Gobject.Data.caml
   let status_column = cols#add Gobject.Data.gobject
   let time_column = cols#add Gobject.Data.string
+(*
   let visible_column = cols#add Gobject.Data.boolean
+*)
 (*
   let bg_column = cols#add (Gobject.Data.unsafe_boxed
   (Gobject.Type.from_name "GdkColor"))
@@ -538,9 +542,7 @@ module Model = struct
 
   let create ~packing () =
     let model = GTree.tree_store cols in
-    let model_filter = GTree.model_filter model in
-    model_filter#set_visible_column visible_column;
-    let view = GTree.view ~model:model_filter ~packing () in
+    let view = GTree.view ~model ~packing () in
 (*
     let () = view#selection#set_mode `SINGLE in
 *)
@@ -549,7 +551,7 @@ module Model = struct
     ignore (view#append_column view_name_column);
     ignore (view#append_column view_status_column);
     ignore (view#append_column view_time_column);
-    model,model_filter,view
+    model,view
 
   let clear model = model#clear ()
 
@@ -681,7 +683,7 @@ let (_ : GtkSignal.id) =
     (fun {Gtk.width=w;Gtk.height=_h} ->
        gconfig.tree_width <- w)
 
-let goals_model,filter_model,goals_view =
+let goals_model,goals_view =
   Model.create ~packing:scrollview#add ()
 
 let task_checksum t =
@@ -787,14 +789,18 @@ module Helpers = struct
       begin
 	goals_view#collapse_row (goals_model#get_path row);
 	goals_model#set ~row ~column:status_column !image_yes;
+(*
 	if !toggle_hide_proved_goals then
 	  goals_model#set ~row ~column:visible_column false
+*)
       end
     else
       begin
 	goals_model#set ~row ~column:status_column !image_unknown;
+(*
 	if !toggle_hide_proved_goals then
 	  goals_model#set ~row ~column:visible_column true
+*)
       end
 
   let check_file_verified f =
@@ -848,9 +854,11 @@ module Helpers = struct
     f.file_verified <- true;
     let row = f.file_row in
     goals_view#collapse_row (goals_model#get_path row);
-    goals_model#set ~row ~column:status_column !image_yes;
+    goals_model#set ~row ~column:status_column !image_yes
+(*
     if !toggle_hide_proved_goals then
       goals_model#set ~row ~column:visible_column false
+*)
 
   (* deprecated *)
   let set_theory_proved ~propagate  t =
@@ -858,8 +866,10 @@ module Helpers = struct
     let row = t.theory_row in
     goals_view#collapse_row (goals_model#get_path row);
     goals_model#set ~row ~column:status_column !image_yes;
+(*
     if !toggle_hide_proved_goals then
       goals_model#set ~row ~column:visible_column false;
+*)
     let f = t.theory_parent in
     if propagate then
       if List.for_all (fun t ->
@@ -875,8 +885,10 @@ module Helpers = struct
     g.proved <- true;
     goals_view#collapse_row (goals_model#get_path row);
     goals_model#set ~row ~column:status_column !image_yes;
+(*
     if !toggle_hide_proved_goals then
       goals_model#set ~row ~column:visible_column false;
+*)
     if propagate then
       match g.parent with
         | Theory t ->
@@ -910,7 +922,9 @@ module Helpers = struct
     goals_model#set ~row ~column:icon_column !image_prover;
     goals_model#set ~row ~column:name_column
       (name ^ " " ^ p.prover_version);
+(*
     goals_model#set ~row ~column:visible_column true;
+*)
     goals_view#expand_row (goals_model#get_path parent);
     let a = { prover = p;
               proof_goal = g;
@@ -957,7 +971,9 @@ module Helpers = struct
     goals_model#set ~row ~column:name_column text;
     goals_model#set ~row ~column:icon_column !image_file;
     goals_model#set ~row ~column:index_column (Row_goal goal);
+(*
     goals_model#set ~row ~column:visible_column true;
+*)
     goal
 
 
@@ -976,7 +992,9 @@ module Helpers = struct
     goals_model#set ~row ~column:Model.icon_column !image_transf;
     goals_model#set ~row ~column:Model.index_column
       (Model.Row_transformation tr);
+(*
     goals_model#set ~row ~column:Model.visible_column true;
+*)
     goals_view#expand_row (goals_model#get_path parent);
     tr
 
@@ -995,7 +1013,9 @@ module Helpers = struct
     goals_model#set ~row ~column:name_column tname;
     goals_model#set ~row ~column:icon_column !image_directory;
     goals_model#set ~row ~column:index_column (Row_theory mth);
+(*
     goals_model#set ~row ~column:visible_column true;
+*)
     mth
 
   let add_theory mfile th =
@@ -1033,7 +1053,9 @@ module Helpers = struct
       goals_model#set ~row:parent ~column:name_column name;
       goals_model#set ~row:parent ~column:icon_column !image_directory;
       goals_model#set ~row:parent ~column:index_column (Row_file mfile);
+(*
       goals_model#set ~row:parent ~column:visible_column true;
+*)
       mfile
 
   let add_file f =
@@ -1413,8 +1435,8 @@ let rec prover_on_goal_or_children p g =
     end
 
 let prover_on_selected_goal_or_children pr row =
-  let row = filter_model#get_iter row in
-  match filter_model#get ~row ~column:Model.index_column with
+  let row = goals_model#get_iter row in
+  match goals_model#get ~row ~column:Model.index_column with
     | Model.Row_goal g ->
         prover_on_goal_or_children pr g
     | Model.Row_theory th ->
@@ -1458,8 +1480,8 @@ let rec replay_on_goal_or_children g =
     g.Model.transformations
 
 let replay_on_selected_goal_or_children row =
-  let row = filter_model#get_iter row in
-  match filter_model#get ~row ~column:Model.index_column with
+  let row = goals_model#get_iter row in
+  match goals_model#get ~row ~column:Model.index_column with
     | Model.Row_goal g ->
         replay_on_goal_or_children g
     | Model.Row_theory th ->
@@ -1566,8 +1588,8 @@ let rec inline_goal_or_children g =
     end
 
 let split_selected_goal_or_children row =
-  let row = filter_model#get_iter row in
-  match filter_model#get ~row ~column:Model.index_column with
+  let row = goals_model#get_iter row in
+  match goals_model#get ~row ~column:Model.index_column with
     | Model.Row_goal g ->
         split_goal_or_children g
     | Model.Row_theory th ->
@@ -1584,8 +1606,8 @@ let split_selected_goal_or_children row =
 
 
 let inline_selected_goal_or_children row =
-  let row = filter_model#get_iter row in
-  match filter_model#get ~row ~column:Model.index_column with
+  let row = goals_model#get_iter row in
+  match goals_model#get ~row ~column:Model.index_column with
     | Model.Row_goal g ->
         inline_goal_or_children g
     | Model.Row_theory th ->
@@ -1744,12 +1766,15 @@ let (_ : GMenu.image_menu_item) =
     ~callback:collapse_all_verified_things
     ()
 
+(*
 let rec hide_proved_in_goal g =
   if g.Model.proved then
     begin
       let row = g.Model.goal_row in
       goals_view#collapse_row (goals_model#get_path row);
+(*
       goals_model#set ~row ~column:Model.visible_column false
+*)
     end
   else
     Hashtbl.iter
@@ -1823,6 +1848,7 @@ let (_ : GMenu.check_menu_item) = view_factory#add_check_item
                else show_all_in_files ())
   "Hide proved goals"
 
+*)
 
 (**************)
 (* Tools menu *)
@@ -2072,8 +2098,8 @@ let scroll_to_theory th =
 
 (* to be run when a row in the tree view is selected *)
 let select_row p =
-  let row = filter_model#get_iter p in
-  match filter_model#get ~row ~column:Model.index_column with
+  let row = goals_model#get_iter p in
+  match goals_model#get ~row ~column:Model.index_column with
     | Model.Row_goal g ->
         let t = g.Model.task in
         let t = match apply_trans intro_transformation t with
@@ -2123,8 +2149,8 @@ let ft_of_pa a =
   ft_of_goal a.Model.proof_goal
 
 let edit_selected_row p =
-  let row = filter_model#get_iter p in
-  match filter_model#get ~row ~column:Model.index_column with
+  let row = goals_model#get_iter p in
+  match goals_model#get ~row ~column:Model.index_column with
     | Model.Row_goal _g ->
         ()
     | Model.Row_theory _th ->
@@ -2249,8 +2275,8 @@ let remove_transf t =
 
 
 let confirm_remove_row r =
-  let row = filter_model#get_iter r in
-  match filter_model#get ~row ~column:Model.index_column with
+  let row = goals_model#get_iter r in
+  match goals_model#get ~row ~column:Model.index_column with
     | Model.Row_goal _g ->
 	info_window `ERROR "Cannot remove a goal"
     | Model.Row_theory _th ->
@@ -2306,8 +2332,8 @@ let rec clean_goal g =
 
 
 let clean_row r =
-  let row = filter_model#get_iter r in
-  match filter_model#get ~row ~column:Model.index_column with
+  let row = goals_model#get_iter r in
+  match goals_model#get ~row ~column:Model.index_column with
     | Model.Row_goal g -> clean_goal g
     | Model.Row_theory th ->
         List.iter clean_goal th.Model.goals
