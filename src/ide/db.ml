@@ -674,6 +674,12 @@ module Goal = struct
 	 db_must_done db (fun () -> Sqlite3.step stmt);
 	 Sqlite3.last_insert_rowid db.raw_db)
 
+  let delete db e =
+    let sql = "DELETE FROM goals WHERE goal_id=?" in
+    let stmt = bind db sql [ Sqlite3.Data.INT e ] in
+    ignore(step_fold db stmt (fun _ -> ()))
+
+
   let set_task_checksum db g s =
     transaction db
       (fun () ->
@@ -746,6 +752,8 @@ let change_checksum g s = Goal.set_task_checksum (current()) g s
 let goals th = Goal.of_theory (current()) th
 
 let subgoals tr = Goal.of_transf (current()) tr
+
+let remove_subgoal g = Goal.delete (current()) g
 
 
 

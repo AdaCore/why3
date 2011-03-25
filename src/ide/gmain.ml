@@ -291,7 +291,9 @@ let timeout_handler () =
   let continue =
     match l with
       | [] ->
+(*
           eprintf "Info: timeout_handler stopped@.";
+*)
           false
       | _ -> true
   in
@@ -304,7 +306,9 @@ let run_timeout_handler () =
   if !timeout_handler_activated then () else
     begin
       timeout_handler_activated := true;
+(*
       eprintf "Info: timeout_handler started@.";
+*)
       let (_ : GMain.Timeout.id) =
 	GMain.Timeout.add ~ms:100 ~callback:timeout_handler
       in ()
@@ -342,14 +346,18 @@ let idle_handler () =
     true
   with Queue.Empty ->
     idle_handler_activated := false;
+(*
     eprintf "Info: idle_handler stopped@.";
+*)
     false
 
 let run_idle_handler () =
   if !idle_handler_activated then () else
     begin
       idle_handler_activated := true;
+(*
       eprintf "Info: idle_handler started@.";
+*)
       let (_ : GMain.Idle.id) = GMain.Idle.add idle_handler in
       ()
     end
@@ -442,10 +450,8 @@ module Model = struct
 
   and transf =
       { parent_goal : goal;
+        transf_name : string;
 	mutable transf_proved : bool;
-(*
-        transf : Task.task Trans.trans;
-*)
         transf_row : Gtk.tree_iter;
         transf_db : Db.transf;
         mutable subgoals : goal list;
@@ -957,6 +963,7 @@ module Helpers = struct
     let parent = g.Model.goal_row in
     let row = goals_model#append ~parent () in
     let tr = { Model.parent_goal = g;
+               Model.transf_name = tr_name;
                Model.transf_proved = false;
                Model.transf_row = row;
                Model.transf_db = db_transf;
@@ -2227,17 +2234,34 @@ let () =
 let remove_proof_attempt a =
   Db.remove_proof_attempt a.Model.proof_db;
   let (_:bool) = goals_model#remove a.Model.proof_row in
+  ()
+
+let rec remove_transf t =
+  List.iter remove_subgoal t.Model.subgoals;
+  Db.remove_transformation t.Model.transf_db;
+  let (_:bool) = goals_model#remove t.Model.transf_row in
+  ()
+
+and remove_subgoal g =
+  Hashtbl.iter (fun _ a -> remove_proof_attempt a) g.Model.external_proofs;
+  Hashtbl.iter (fun _ t -> remove_transf t) g.Model.transformations;
+  Db.remove_subgoal g.Model.goal_db;
+  let (_:bool) = goals_model#remove g.Model.goal_row in
+  ()
+
+
+let remove_proof_attempt_and_check a =
+  remove_proof_attempt a;
   let g = a.Model.proof_goal in
   Hashtbl.remove g.Model.external_proofs a.Model.prover.prover_id;
   Helpers.check_goal_proved g
 
-let remove_transf t =
-  (* TODO: remove subgoals first !!! *)
-  Db.remove_transformation t.Model.transf_db;
-  let (_:bool) = goals_model#remove t.Model.transf_row in
+let remove_transf_and_check t =
+  remove_transf t;
   let g = t.Model.parent_goal in
-  Hashtbl.remove g.Model.transformations "split" (* hack !! *);
+  Hashtbl.remove g.Model.transformations t.Model.transf_name;
   Helpers.check_goal_proved g
+
 
 
 let confirm_remove_row r =
@@ -2251,12 +2275,12 @@ let confirm_remove_row r =
 	info_window `ERROR "Cannot remove a file"
     | Model.Row_proof_attempt a ->
 	info_window
-	  ~callback:(fun () -> remove_proof_attempt a)
+	  ~callback:(fun () -> remove_proof_attempt_and_check a)
 	  `QUESTION
 	  "Do you really want to remove the selected proof attempt?"
     | Model.Row_transformation tr ->
 	info_window
-	  ~callback:(fun () -> remove_transf tr)
+	  ~callback:(fun () -> remove_transf_and_check tr)
 	  `QUESTION
 	  "Do you really want to remove the selected transformation
 and all its subgoals?"
@@ -2280,16 +2304,22 @@ let () =
 let rec clean_goal g =
   if g.Model.proved then
     begin
-      Hashtbl.iter
-        (fun _ a ->
+      let l = Hashtbl.fold
+        (fun key a acc ->
            if a.Model.proof_obsolete || not (proof_successful a) then
-             remove_proof_attempt a)
-        g.Model.external_proofs;
-      Hashtbl.iter
-        (fun _ t ->
+             (remove_proof_attempt a; key::acc)
+           else acc)
+        g.Model.external_proofs
+        []
+      in List.iter (Hashtbl.remove g.Model.external_proofs) l;
+      let l = Hashtbl.fold
+        (fun key t acc ->
            if not t.Model.transf_proved then
-             remove_transf t)
+             (remove_transf t; key::acc)
+         else acc)
         g.Model.transformations
+        []
+      in  List.iter (Hashtbl.remove g.Model.transformations) l;
     end
   else
     Hashtbl.iter

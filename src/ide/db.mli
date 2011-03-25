@@ -204,7 +204,8 @@ val add_subgoal : transf -> string -> string -> goal
     @raise AlreadyExist if a goal with the same id already exists
     as subgoal of this transf *)
 
-(* todo: remove_goal *)
+val remove_subgoal:  goal -> unit
+(** [remove_subgoal g] removes the subgoal [g] from db. *)
 
 (** {3 theories} *)
 
