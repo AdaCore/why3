@@ -10,6 +10,10 @@
 * Jessie3
 * traceability: Partially done
   (Claude)
+  TODO: traceability des hyp comme path dans le prog (depuis
+  Frama-C en particulier)
+  afficher les explications dans les outils en ligne de
+  commande why3 et why3bench + le path
 * Coq plugin
 * Coq realization of theories
   (Andrei)
@@ -28,6 +32,14 @@
   (?)
 * BD : se passer de sqlite3
   (Claude)
+  Solution: un unique fichier XML, qui est ecrit mais pas
+  tres souvent (pas plus d'une fois par seconde)
+  ne pas oublier neanmoins de mettre une action dans Timeout
+  qui enregistre au bout d'un moment
+  pb: n'est pas independant de l'IDE, peut-on faire un module
+  independant de l'IDE ? qui serait utilisé par why3bench ?
+  
+
 * IDE: avoir des transformations non codees en dur
   (Claude d'abord)
 
@@ -68,6 +80,8 @@
 * IDE: debug "hide proved goals" feature
   ** suggested solution: replace model + filter_model by a custom model
 
+* IDE: debug "remove" et "clean" qui provoquent des segfaults !!
+ 
 * IDE: ajouter "invalid" comme cas de resultats de preuve
   (utiliser call_provers.proof_result dans gmain)
   DONE

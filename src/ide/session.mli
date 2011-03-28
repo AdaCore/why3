@@ -18,13 +18,35 @@
 (**************************************************************************)
 
 
-open Why3
+open Why
+
+type prover_data = private
+    { prover_id : string;
+      prover_name : string;
+      prover_version : string;
+      command : string;
+      driver_name : string;
+      driver : Driver.driver;
+      mutable editor : string;
+    }
+
+type proof_attempt_status = private
+    | Undone
+    | Scheduled (** external proof attempt is scheduled *)
+    | Running (** external proof attempt is in progress *)
+    | Done of Call_provers.prover_result (** external proof done *)
+    | InternalFailure of exn (** external proof aborted by internal error *)
 
 module type OBSERVER = sig
+
   type key
   val create: ?parent:key -> unit -> key
   val notify: key -> unit
   val remove: key -> unit
+
+  val timeout: ms:int -> (unit -> bool) -> unit
+  val idle: (unit -> bool) -> unit
+
 end
 
 module Make(O: OBSERVER) : sig
@@ -34,13 +56,6 @@ module Make(O: OBSERVER) : sig
 (* static state of a session *)
 (*                           *)
 (*****************************)
-
-  type proof_attempt_status =
-    | Undone
-    | Scheduled (** external proof attempt is scheduled *)
-    | Running (** external proof attempt is in progress *)
-    | Done of Call_provers.prover_result (** external proof done *)
-    | InternalFailure of exn (** external proof aborted by internal error *)
 
   type proof_attempt = private
       { prover : prover_data;
@@ -52,11 +67,12 @@ module Make(O: OBSERVER) : sig
       }
 
   and goal_parent =
-    | Theory of theory
-    | Transf of transf
+    | Parent_theory of theory
+    | Parent_transf of transf
 
   and goal = private
       { goal_name : string;
+	goal_expl : string option;
 	parent : goal_parent;
         task: Task.task;
         goal_key : O.key;
@@ -108,22 +124,6 @@ module Make(O: OBSERVER) : sig
         Opening a session must be done prior to any other actions.
         And it cannot be done twice.
 
-        TODO: some scheduling functions might be needed as argument, e.g
-
-        add_idle: (unit -> bool) -> unit
-
-        that will allow to install a handler when context is idle
-
-        add_timeout: ms:int -> (unit -> bool) -> unit
-
-        that will allow to install a handler when a timeout of ms
-        milliseconds occurs
-
-        in both cases, the bool returned indicates whether the handler
-        should be removed or not
-
-        the parameter OBSERVER could also be used for that purpose
-
     *)
 
     (* 
@@ -132,13 +132,16 @@ module Make(O: OBSERVER) : sig
        this is not necessary since the session manager handles this itself
        using add_timeout *)
 
-  val add_file : string -> unit
-    (** adds a new file in the proof session
-    *)
+  val add_file : string -> Theory.theory Theory.Mnm.t -> unit
+    (** [add_file f ths] adds a new file in the proof session, that is
+	a collection of name [f] of theories [ths] *)
 
-  val reload_files : unit -> unit 
-    (** reloads all the files in the state, and performs the proper
-        mergind of old proof attemps and transformations *)
+
+  (*
+    val reload_files : unit -> unit 
+  (** reloads all the files in the state, and performs the proper
+    merging of old proof attemps and transformations *)
+*)
 
 (*****************************)
 (*                           *)
@@ -146,25 +149,26 @@ module Make(O: OBSERVER) : sig
 (*                           *)
 (*****************************)
 
-(* attempt a new proof using an external prover *)
 
-  val add_proof_attempt : goal  -> unit
-    (** TODO: proper arguments missing *)
+  val run_prover : context_unproved_goals_only:bool -> 
+    prover_data -> any -> unit
+    (** [run_prover p a] runs prover [p] on all goals under [a] *)
 
-  val add_transformation : goal -> unit
-    (** TODO: proper arguments missing *)
+  val replay : context_unproved_goals_only:bool -> any -> unit
+    (** [replay a] reruns all valid but obsolete proofs under [a] *)
 
-  val remove_proof_attempf : proof_attempt -> unit
+(*
+
+  val remove_proof_attempt : proof_attempt -> unit
 
   val remove_transformation : transf -> unit
 
   val clean : any -> unit
     (** [clean a] removes failed attempts below [a] where
-        other successful attempts exist *)
+        there at least one successful attempt or transformation *)
 
-  val redo_obsolete : any -> unit
-    (** [redo_obsolete a] rerun obsolete proofs below [a] *)
-
+    *) 
+end
 
 
 
