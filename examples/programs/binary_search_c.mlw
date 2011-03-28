@@ -147,11 +147,11 @@ module M3
         to_int (get mem t k1) <= to_int (get mem t k2) }
     try
       let l = ref (of_int 0) in
-      let u = ref (of_int (to_int n - 1)) in
+      let u = ref (of_int (to_int n - to_int (of_int 1))) in
       while to_int !l <= to_int !u do 
         invariant { 0 <= to_int l and to_int u <= to_int n - 1 and
             forall k:int. 0 <= k < to_int n -> 
-            to_int (get mem t k) = to_int v -> to_int l <= k <= to_int u }
+              to_int (get mem t k) = to_int v -> to_int l <= k <= to_int u }
   	variant { to_int u - to_int l }
         let m = of_int (to_int !l 
                         + 
@@ -168,8 +168,11 @@ module M3
     with Return r ->
       r
     end
-    { (to_int result >= 0 and to_int (get mem t (to_int result)) = to_int v) or
-      (to_int result = -1 and forall k:int. 0<=k<to_int n -> get mem t k <> v) }
+    { (to_int result >= 0 and 
+       to_int (get mem t (to_int result)) = to_int v) 
+      or 
+      (to_int result = -1 and 
+       forall k:int. 0<=k<to_int n -> to_int (get mem t k) <> to_int v) }
 end
 
 
