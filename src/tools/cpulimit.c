@@ -30,7 +30,7 @@
 #include <sys/wait.h>
 
 int main(int argc, char *argv[]) {
-  int timelimit, memlimit;
+  long timelimit, memlimit;
   int showtime, hidetime;
   struct rlimit res;
 
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
   }
 
   /* get time limit in seconds from command line */
-  timelimit = atoi(argv[1]);
+  timelimit = atol(argv[1]);
 
   if (timelimit > 0) {
     /* set the CPU time limit */
