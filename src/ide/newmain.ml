@@ -295,15 +295,15 @@ let name_column = cols#add Gobject.Data.string
 let icon_column = cols#add Gobject.Data.gobject
 let status_column = cols#add Gobject.Data.gobject
 let time_column = cols#add Gobject.Data.string
-  
+
 let name_renderer = GTree.cell_renderer_text [`XALIGN 0.]
 let renderer = GTree.cell_renderer_text [`XALIGN 0.]
 let image_renderer = GTree.cell_renderer_pixbuf [ ]
 let icon_renderer = GTree.cell_renderer_pixbuf [ ]
-  
+
 let view_name_column =
   GTree.view_column ~title:"Theories/Goals" ()
-    
+
 let () =
   view_name_column#pack icon_renderer ;
   view_name_column#add_attribute icon_renderer "pixbuf" icon_column ;
@@ -312,24 +312,25 @@ let () =
   view_name_column#set_resizable true;
   view_name_column#set_max_width 400;
   ()
-    
+
 let view_status_column =
   GTree.view_column ~title:"Status"
     ~renderer:(image_renderer, ["pixbuf", status_column])
     ()
-    
+
 let view_time_column =
   GTree.view_column ~title:"Time"
     ~renderer:(renderer, ["text", time_column]) ()
-    
+
 let () =
   view_status_column#set_resizable false;
   view_status_column#set_visible true;
   view_time_column#set_resizable false;
   view_time_column#set_visible true
-    
+
 
 let goals_model,goals_view =
+  eprintf "Creating tree model...@?";
   let model = GTree.tree_store cols in
   let view = GTree.view ~model ~packing:scrollview#add () in
   (*
@@ -340,8 +341,9 @@ let goals_model,goals_view =
   ignore (view#append_column view_name_column);
   ignore (view#append_column view_status_column);
   ignore (view#append_column view_time_column);
+  eprintf " done@.";
   model,view
-    
+
 let clear model = model#clear ()
 
 let image_of_result ~obsolete result =
@@ -363,26 +365,31 @@ let image_of_result ~obsolete result =
 	    if obsolete then !image_failure_obs else !image_failure
 	| Call_provers.HighFailure ->
 	    if obsolete then !image_failure_obs else !image_failure
-	
+
 
 module M = Session.Make
   (struct
      type key = Gtk.tree_iter
 
-     let create ?parent () = goals_model#append ?parent () 
+     let create ?parent () = goals_model#append ?parent ()
 
-     let remove row = 
+     let remove row =
        let (_:bool) = goals_model#remove row in ()
 
-     let idle f = 
+     let idle f =
        let (_ : GMain.Idle.id) = GMain.Idle.add f in
        ()
 
-     let timeout ~ms f = 
+     let timeout ~ms f =
        let (_ : GMain.Timeout.id) = GMain.Timeout.add ~ms ~callback:f in
        ()
 
    end)
+
+let index_column : M.any GTree.column = 
+  eprintf "index column...@?";
+  let c = cols#add Gobject.Data.caml in
+  eprintf " done@."; c
 
 let set_row_status row b =
   if b then
@@ -408,23 +415,29 @@ let set_proof_state ~obsolete a =
   let t = if obsolete then t ^ " (obsolete)" else t in
   goals_model#set ~row ~column:time_column t
 
-let notify any = 
+let init row any = 
+  goals_model#set ~row ~column:index_column any;
+  goals_model#set ~row ~column:icon_column 
+    (match any with
+    | M.Goal _ -> !image_file
+    | M.Theory _ | M.File _ -> !image_directory
+    | M.Proof_attempt _ -> !image_prover
+    | M.Transformation _ -> !image_transf)
+
+let notify any =
   match any with
-    | M.Goal g -> 
+    | M.Goal g ->
 	set_row_status g.M.goal_key g.M.proved
-    | M.Theory th -> 
+    | M.Theory th ->
 	set_row_status th.M.theory_key th.M.verified
-    | M.File file -> 
+    | M.File file ->
 	set_row_status file.M.file_key file.M.file_verified
     | M.Proof_attempt a ->
-	set_proof_state ~obsolete:false a 
+	set_proof_state ~obsolete:false a
     | M.Transformation tr ->
 	set_row_status tr.M.transf_key tr.M.transf_proved
-	  
-(*
-let index_column : M.any GTree.column = cols#add Gobject.Data.caml
-*)
-   
+
+
 (********************)
 (* opening database *)
 (********************)
@@ -463,17 +476,19 @@ let () =
 let () =
   let dbfname = Filename.concat project_dir "project.xml" in
   try
-    M.open_session ~notify dbfname;
-    M.maximum_running_proofs := gconfig.max_running_processes
+    eprintf "Opening session...@?";
+    M.open_session ~init ~notify dbfname;
+    M.maximum_running_proofs := gconfig.max_running_processes;
+    eprintf " done@."
   with e ->
-    eprintf "Error while opening database '%s'@." dbfname;
+    eprintf "Error while opening session with database '%s'@." dbfname;
     eprintf "Aborting...@.";
     raise e
 
 
 let read_file fn =
   let fn = Filename.concat project_dir fn in
-  Env.read_file gconfig.env fn 
+  Env.read_file gconfig.env fn
 
 
 
@@ -844,216 +859,10 @@ let apply_transformation ~callback t task =
    match t with
     | Trans_one t ->
 	let callback t = callback [t] in
-	Gscheduler.apply_transformation ~callback t task
+	M.apply_transformation ~callback t task
     | Trans_list t ->
-	Gscheduler.apply_transformation_l ~callback t task
+	M.apply_transformation_l ~callback t task
 
-
-let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
-  let info = get_explanation gid (Task.task_goal_fmla t) in
-  let goal = Helpers.add_goal_row parent gname info t db_goal in
-  let proved = ref false in
-  let external_proofs = Db.external_proofs db_goal in
-  Db.Hprover.iter
-    (fun pid a ->
-       let pname = Db.prover_name pid in
-       try
-         let p = Util.Mstr.find pname gconfig.provers in
-         let s,t,o,edit = Db.status_and_time a in
-         if goal_obsolete && not o then Db.set_obsolete a;
-         let obsolete = goal_obsolete or o in
-         let s = match s with
-           | Db.Undone -> Call_provers.HighFailure
-           | Db.Done r ->
-	       if r = Call_provers.Valid then
-		 if not obsolete then proved := true;
-	       r
-         in
-	 let r = { Call_provers.pr_answer = s;
-		   Call_provers.pr_output = "";
-		   Call_provers.pr_time = t;
-		 }
-	 in
-         let (_pa : Model.proof_attempt) =
-           Helpers.add_external_proof_row ~obsolete ~edit goal p a
-	     (Gscheduler.Done r)
-         in
-         ((* something TODO ?*))
-       with Not_found ->
-         eprintf
-           "Warning: prover %s appears in database but is not installed.@."
-           pname
-    )
-    external_proofs;
-  let transformations = Db.transformations db_goal in
-  Db.Htransf.iter
-    (fun tr_id tr ->
-       let trname = Db.transf_name tr_id in
-       eprintf "Reimporting transformation %s for goal %s @." trname gname;
-       let trans = trans_of_name trname in
-       let subgoals = apply_trans trans t in
-       let mtr = Helpers.add_transformation_row goal tr trname in
-       let db_subgoals = Db.subgoals tr in
-       let reimported_goals,db_subgoals,_ =
-         List.fold_left
-           (fun (acc,db_subgoals,count) subtask ->
-              let id = (Task.task_goal subtask).Decl.pr_name in
-              let subgoal_name = gname ^ "." ^ (string_of_int count) in
-              let sum = task_checksum subtask in
-              let subtask_db,db_subgoals =
-                try
-		  let g = Util.Mstr.find sum db_subgoals in
-		  (* a subgoal has the same check sum *)
-		  (Some g, Util.Mstr.remove sum db_subgoals)
-                with Not_found -> None,db_subgoals
-              in
-              ((count,id,subgoal_name,subtask,sum,subtask_db) :: acc,
-	       db_subgoals,
-	       count+1))
-           ([],db_subgoals,1) subgoals
-       in
-       let other_goals =
-	 Util.Mstr.fold
-	   (fun _ g acc -> (Db.goal_name g,g)::acc)
-	   db_subgoals
-	   []
-       in
-       let other_goals =
-	 List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2) other_goals
-       in
-       let rec merge_goals new_goals old_goals proved acc =
-	 match new_goals with
-	   | [] -> acc, proved
-	   | (_,id,subgoal_name,subtask,sum,g_opt)::rem ->
-	       let db_g,subgoal_obsolete,old_goals =
-		 match g_opt with
-		   | Some g -> g,false,old_goals
-		   | None ->
-		       match old_goals with
-			 | [] ->
-			     (* create a new goal in db *)
-			     Db.add_subgoal tr subgoal_name sum,
-			     false, old_goals
-			 | (_goal_name,g) :: r ->
-			     g, true, r
-	       in
-               let subgoal,subgoal_proved =
-                 reimport_any_goal
-                   (Model.Transf mtr) id
-                   subgoal_name subtask db_g subgoal_obsolete
-              in
-              merge_goals rem old_goals (proved && subgoal_proved)
-		(subgoal :: acc)
-       in
-       let goals, subgoals_proved =
-	 merge_goals (List.rev reimported_goals) other_goals true []
-       in
-(*
-       let goals,_,subgoals_proved =
-         List.fold_left
-           (fun (acc,count,proved) subtask ->
-              let _id = (Task.task_goal subtask).Decl.pr_name in
-              let subgoal_name = gname ^ "." ^ (string_of_int count) in
-              let sum = task_checksum subtask in
-              let subtask_db =
-                try Util.Mstr.find sum db_subgoals
-		  (* a subgoal has the same check sum *)
-                with Not_found ->
-		  (* otherwise, create a new one *)
-                  Db.add_subgoal tr subgoal_name sum
-              in
-              let subgoal,subgoal_proved =
-                reimport_any_goal
-                  (Model.Transf mtr) subgoal_name subtask subtask_db
-                  false (* subgoal_obsolete *)
-              in
-              (subgoal :: acc, count+1,proved && subgoal_proved))
-           ([],1,true) subgoals
-       in
-*)
-       mtr.Model.subgoals <- List.rev goals;
-       if subgoals_proved (* TODO : && not obsolete *)
-       then proved := true
-    )
-    transformations;
-  if !proved then Helpers.set_proved ~propagate:false goal;
-  goal,!proved
-
-
-let reimport_root_goal mth tname goals t : Model.goal * bool =
-  (* re-imports DB informations of a goal in theory mth (named tname)
-     goals is a table, indexed by names of DB goals formerly known to be
-     a in theory mth.  returns true whenever the task t is known to be
-     proved *)
-  let id = (Task.task_goal t).Decl.pr_name in
-  let gname = id.Ident.id_string
-  in
-  let sum = task_checksum t in
-  let db_goal,goal_obsolete =
-    try
-      let dbg = Util.Mstr.find gname goals in
-      let db_sum = Db.task_checksum dbg in
-      let goal_obsolete = sum <> db_sum in
-      if goal_obsolete then
-        begin
-          eprintf "Goal %s.%s has changed@." tname gname;
-          Db.change_checksum dbg sum
-        end;
-      dbg,goal_obsolete
-    with Not_found ->
-      let dbg = Db.add_goal mth.Model.theory_db gname sum in
-      dbg,false
-  in
-  reimport_any_goal (Model.Theory mth) id gname t db_goal goal_obsolete
-
-(* reimports all files *)
-let files_in_db = Db.files ()
-
-let () =
-  List.iter
-    (fun (f,fn) ->
-       eprintf "Reimporting file '%s'@." fn;
-       let mfile = Helpers.add_file_row fn f in
-       try
-	 let theories = read_file fn in
-	 let ths = Db.theories f in
-	 let (mths,file_proved) =
-	   List.fold_left
-             (fun (acc,file_proved) (_,tname,th) ->
-		eprintf "Reimporting theory '%s'@."tname;
-		let db_th =
-		  try
-                    Util.Mstr.find tname ths
-		  with Not_found -> Db.add_theory f tname
-		in
-		let mth = Helpers.add_theory_row mfile th db_th in
-		let goals = Db.goals db_th in
-		let tasks = List.rev (Task.split_theory th None None) in
-		let goals,proved = List.fold_left
-		  (fun (acc,proved) t ->
-                     let (g,p) = reimport_root_goal mth tname goals t in
-                     (g::acc,proved && p))
-		  ([],true) tasks
-		in
-		mth.Model.goals <- List.rev goals;
-		(* TODO: what to do with remaining tasks in Db ???
-		   for the moment they remain in the db, but they are not shown
-		*)
-		if proved then Helpers.set_theory_proved ~propagate:false mth;
-		(mth::acc,file_proved && proved))
-             ([],true) theories
-	 in
-	 (* TODO: detecter d'eventuelles vieilles theories, qui seraient donc
-            dans [ths] mais pas dans [theories]
-	 *)
-	 mfile.Model.theories <- List.rev mths;
-	 if file_proved then Helpers.set_file_verified mfile
-      with e ->
-	eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
-          Exn_printer.exn_printer e;
-	exit 1
-    )
-    files_in_db
 
 (**********************************)
 (* add new file from command line *)
@@ -1063,11 +872,11 @@ let () =
   match file_to_read with
     | None -> ()
     | Some fn ->
-        if List.exists (fun (_,f) -> f = fn) files_in_db then
+        if M.file_exists fn then
           eprintf "Info: file %s already in database@." fn
         else
           try
-            Helpers.add_file fn
+            M.add_file fn (read_file fn)
           with e ->
 	    eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
               Exn_printer.exn_printer e;
@@ -1082,52 +891,25 @@ let () =
 
 let prover_on_selected_goals pr =
   List.iter
-    (M.run_prover pr)
+    (fun row ->
+       let row = goals_model#get_iter row in
+       let a = goals_model#get ~row ~column:index_column in
+        M.run_prover
+          ~context_unproved_goals_only:!context_unproved_goals_only
+          pr a)
     goals_view#selection#get_selected_rows
 
 (**********************************)
 (* method: replay obsolete proofs *)
 (**********************************)
 
-let proof_successful a =
-  match a.Model.proof_state with
-    | Gscheduler.Done { Call_provers.pr_answer = Call_provers.Valid }
-      -> true
-    | _ -> false
-
-let rec replay_on_goal_or_children g =
-  Hashtbl.iter
-    (fun _ a ->
-       if a.Model.proof_obsolete then
-         if not !context_unproved_goals_only || proof_successful a
-         then redo_external_proof g a)
-    g.Model.external_proofs;
-  Hashtbl.iter
-    (fun _ t ->
-       List.iter replay_on_goal_or_children
-         t.Model.subgoals)
-    g.Model.transformations
-
-let replay_on_selected_goal_or_children row =
-  let row = goals_model#get_iter row in
-  match goals_model#get ~row ~column:Model.index_column with
-    | Model.Row_goal g ->
-        replay_on_goal_or_children g
-    | Model.Row_theory th ->
-        List.iter replay_on_goal_or_children th.Model.goals
-    | Model.Row_file file ->
-        List.iter
-          (fun th ->
-             List.iter replay_on_goal_or_children th.Model.goals)
-          file.Model.theories
-    | Model.Row_proof_attempt a ->
-        replay_on_goal_or_children a.Model.proof_goal
-    | Model.Row_transformation tr ->
-        List.iter replay_on_goal_or_children tr.Model.subgoals
 
 let replay_obsolete_proofs () =
   List.iter
-    replay_on_selected_goal_or_children
+    (fun row ->
+       let row = goals_model#get_iter row in
+       let a = goals_model#get ~row ~column:index_column in
+       M.replay ~context_unproved_goals_only:!context_unproved_goals_only a)
     goals_view#selection#get_selected_rows
 
 
@@ -1136,6 +918,7 @@ let replay_obsolete_proofs () =
 (* method: split selected goals *)
 (*****************************************************)
 
+(*
 let transformation_on_goal g trans_name trans =
   if not g.Model.proved then
     let callback subgoals =
@@ -1261,6 +1044,7 @@ let inline_selected_goals () =
   List.iter
     inline_selected_goal_or_children
     goals_view#selection#get_selected_rows
+*)
 
 
 (*********************************)
@@ -1295,7 +1079,7 @@ let select_file () =
 	      let f = Sysutil.relativize_filename project_dir f in
               eprintf "Adding file '%s'@." f;
               try
-                Helpers.add_file f
+                M.add_file f (read_file f)
               with e ->
 	        fprintf str_formatter
                   "@[Error while reading file@ '%s':@ %a@]" f
@@ -1327,7 +1111,7 @@ let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~label:"_Preferences" ~callback:
     (fun () ->
        Gconfig.preferences gconfig;
-       Gscheduler.maximum_running_proofs := gconfig.max_running_processes)
+       M.maximum_running_proofs := gconfig.max_running_processes)
     ()
 
 let refresh_provers = ref (fun () -> ())
@@ -1358,36 +1142,36 @@ let (_ : GMenu.image_menu_item) =
 
 
 let rec collapse_proved_goal g =
-  if g.Model.proved then
+  if g.M.proved then
     begin
-      let row = g.Model.goal_row in
+      let row = g.M.goal_key in
       goals_view#collapse_row (goals_model#get_path row);
     end
   else
     Hashtbl.iter
-      (fun _ t -> List.iter collapse_proved_goal t.Model.subgoals)
-      g.Model.transformations
+      (fun _ t -> List.iter collapse_proved_goal t.M.subgoals)
+      g.M.transformations
 
 let collapse_verified_theory th =
-  if th.Model.verified then
+  if th.M.verified then
     begin
-      let row = th.Model.theory_row in
+      let row = th.M.theory_key in
       goals_view#collapse_row (goals_model#get_path row);
     end
   else
-    List.iter collapse_proved_goal th.Model.goals
+    List.iter collapse_proved_goal th.M.goals
 
 let collapse_verified_file f =
-  if f.Model.file_verified then
+  if f.M.file_verified then
     begin
-      let row = f.Model.file_row in
+      let row = f.M.file_key in
       goals_view#collapse_row (goals_model#get_path row);
     end
   else
-    List.iter collapse_verified_theory f.Model.theories
+    List.iter collapse_verified_theory f.M.theories
 
 let collapse_all_verified_things () =
-  List.iter collapse_verified_file !Model.all_files
+  List.iter collapse_verified_file (M.get_all_files ())
 
 let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._C
@@ -1397,82 +1181,82 @@ let (_ : GMenu.image_menu_item) =
 
 (*
 let rec hide_proved_in_goal g =
-  if g.Model.proved then
+  if g.M.proved then
     begin
-      let row = g.Model.goal_row in
+      let row = g.M.goal_row in
       goals_view#collapse_row (goals_model#get_path row);
 (*
-      goals_model#set ~row ~column:Model.visible_column false
+      goals_model#set ~row ~column:M.visible_column false
 *)
     end
   else
     Hashtbl.iter
-      (fun _ t -> List.iter hide_proved_in_goal t.Model.subgoals)
-      g.Model.transformations
+      (fun _ t -> List.iter hide_proved_in_goal t.M.subgoals)
+      g.M.transformations
 
 let hide_proved_in_theory th =
-  if th.Model.verified then
+  if th.M.verified then
     begin
-      let row = th.Model.theory_row in
+      let row = th.M.theory_row in
       goals_view#collapse_row (goals_model#get_path row);
-      goals_model#set ~row ~column:Model.visible_column false
+      goals_model#set ~row ~column:M.visible_column false
     end
   else
-    List.iter hide_proved_in_goal th.Model.goals
+    List.iter hide_proved_in_goal th.M.goals
 
 let hide_proved_in_file f =
-  if f.Model.file_verified then
+  if f.M.file_verified then
     begin
-      let row = f.Model.file_row in
+      let row = f.M.file_row in
       goals_view#collapse_row (goals_model#get_path row);
-      goals_model#set ~row ~column:Model.visible_column false
+      goals_model#set ~row ~column:M.visible_column false
     end
   else
-    List.iter hide_proved_in_theory f.Model.theories
+    List.iter hide_proved_in_theory f.M.theories
 
 let hide_proved_in_files () =
-  List.iter hide_proved_in_file !Model.all_files
+  List.iter hide_proved_in_file !M.all_files
 
 let rec show_all_in_goal g =
-  let row = g.Model.goal_row in
-  goals_model#set ~row ~column:Model.visible_column true;
-  if g.Model.proved then
+  let row = g.M.goal_row in
+  goals_model#set ~row ~column:M.visible_column true;
+  if g.M.proved then
     goals_view#collapse_row (goals_model#get_path row)
   else
     goals_view#expand_row (goals_model#get_path row);
   Hashtbl.iter
-    (fun _ t -> List.iter show_all_in_goal t.Model.subgoals)
-    g.Model.transformations
+    (fun _ t -> List.iter show_all_in_goal t.M.subgoals)
+    g.M.transformations
 
 let show_all_in_theory th =
-  let row = th.Model.theory_row in
-  goals_model#set ~row ~column:Model.visible_column true;
-  if th.Model.verified then
+  let row = th.M.theory_row in
+  goals_model#set ~row ~column:M.visible_column true;
+  if th.M.verified then
     goals_view#collapse_row (goals_model#get_path row)
   else
     begin
       goals_view#expand_row (goals_model#get_path row);
-      List.iter show_all_in_goal th.Model.goals
+      List.iter show_all_in_goal th.M.goals
     end
 
 let show_all_in_file f =
-  let row = f.Model.file_row in
-  goals_model#set ~row ~column:Model.visible_column true;
-  if f.Model.file_verified then
+  let row = f.M.file_row in
+  goals_model#set ~row ~column:M.visible_column true;
+  if f.M.file_verified then
     goals_view#collapse_row (goals_model#get_path row)
   else
     begin
       goals_view#expand_row (goals_model#get_path row);
-      List.iter show_all_in_theory f.Model.theories
+      List.iter show_all_in_theory f.M.theories
     end
 
 let show_all_in_files () =
-  List.iter show_all_in_file !Model.all_files
+  List.iter show_all_in_file !M.all_files
 
 
 let (_ : GMenu.check_menu_item) = view_factory#add_check_item
   ~callback:(fun b ->
-               Model.toggle_hide_proved_goals := b;
+               M.toggle_hide_proved_goals := b;
                if b then hide_proved_in_files ()
                else show_all_in_files ())
   "Hide proved goals"
@@ -1519,6 +1303,7 @@ let () =
   add_refresh_provers add_item_provers;
   add_item_provers ()
 
+(*
 let () =
   let add_item_split () =
     ignore(tools_factory#add_image_item
@@ -1527,6 +1312,7 @@ let () =
              () : GMenu.image_menu_item) in
   add_refresh_provers add_item_split;
   add_item_split ()
+*)
 
 
 let () =
@@ -1535,9 +1321,12 @@ let () =
 
   let i = GMisc.image ~pixbuf:(!image_transf) () in
   let () = b#set_image i#coerce in
+(*
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:split_selected_goals
-  in ()
+  in
+*)
+  ()
 
 let () =
   let b = GButton.button ~packing:transf_box#add ~label:"Inline" () in
@@ -1546,9 +1335,12 @@ let () =
   let i = GMisc.image ~pixbuf:(!image_transf) () in
   let () = b#set_image i#coerce in
 (**)
+(*
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:inline_selected_goals
-  in ()
+  in 
+*)
+()
 
 
 
@@ -1708,7 +1500,7 @@ and color_t_locs () t =
   Term.t_fold color_t_locs color_f_locs () t
 
 let scroll_to_source_goal g =
-  let t = g.Model.task in
+  let t = g.M.task in
   let id = (Task.task_goal t).Decl.pr_name in
   scroll_to_id id;
   match t with
@@ -1721,16 +1513,16 @@ let scroll_to_source_goal g =
         assert false
 
 let scroll_to_theory th =
-  let t = th.Model.theory in
+  let t = th.M.theory in
   let id = t.Theory.th_name in
   scroll_to_id id
 
 (* to be run when a row in the tree view is selected *)
 let select_row p =
   let row = goals_model#get_iter p in
-  match goals_model#get ~row ~column:Model.index_column with
-    | Model.Row_goal g ->
-        let t = g.Model.task in
+  match goals_model#get ~row ~column:index_column with
+    | M.Goal g ->
+        let t = g.M.task in
         let t = match apply_trans intro_transformation t with
 	  | [t] -> t
 	  | _ -> assert false
@@ -1739,23 +1531,23 @@ let select_row p =
         task_view#source_buffer#set_text task_text;
         task_view#scroll_to_mark `INSERT;
         scroll_to_source_goal g
-    | Model.Row_theory th ->
+    | M.Theory th ->
         task_view#source_buffer#set_text "";
         scroll_to_theory th
-    | Model.Row_file _file ->
+    | M.File _file ->
         task_view#source_buffer#set_text "";
         (* scroll_to_file file *)
-    | Model.Row_proof_attempt a ->
+    | M.Proof_attempt a ->
 	let o =
-          match a.Model.proof_state with
-	    | Gscheduler.Done r -> r.Call_provers.pr_output;
+          match a.M.proof_state with
+	    | Session.Done r -> r.Call_provers.pr_output;
 	    | _ -> "No information available"
 	in
 	task_view#source_buffer#set_text o;
-        scroll_to_source_goal a.Model.proof_goal
-    | Model.Row_transformation tr ->
+        scroll_to_source_goal a.M.proof_goal
+    | M.Transformation tr ->
         task_view#source_buffer#set_text "";
-        scroll_to_source_goal tr.Model.parent_goal
+        scroll_to_source_goal tr.M.parent_goal
 
 
 
@@ -1764,85 +1556,19 @@ let select_row p =
 (* method: edit current goal *)
 (*****************************)
 
-
-let ft_of_th th =
-  (Filename.basename th.Model.theory_parent.Model.file_name,
-   th.Model.theory.Theory.th_name.Ident.id_string)
-
-let rec ft_of_goal g =
-  match g.Model.parent with
-    | Model.Transf tr -> ft_of_goal tr.Model.parent_goal
-    | Model.Theory th -> ft_of_th th
-
-let ft_of_pa a =
-  ft_of_goal a.Model.proof_goal
-
 let edit_selected_row p =
   let row = goals_model#get_iter p in
-  match goals_model#get ~row ~column:Model.index_column with
-    | Model.Row_goal _g ->
+  match goals_model#get ~row ~column:index_column with
+    | M.Goal _g ->
         ()
-    | Model.Row_theory _th ->
+    | M.Theory _th ->
         ()
-    | Model.Row_file _file ->
+    | M.File _file ->
         ()
-    | Model.Row_proof_attempt a ->
-        (* check that the state is not Scheduled or Running *)
-        let running = match a.Model.proof_state with
-          | Gscheduler.Scheduled | Gscheduler.Running -> true
-          | Gscheduler.Undone | Gscheduler.Done _ | Gscheduler.InternalFailure _ -> false
-        in
-        if running then
-          info_window `ERROR "Edition already in progress"
-        else
-        let g = a.Model.proof_goal in
-	let t = g.Model.task in
-	let driver = a.Model.prover.driver in
-	let file =
-          match a.Model.edited_as with
-            | "" ->
-		let (fn,tn) = ft_of_pa a in
-		let file = Driver.file_of_task driver
-                  (Filename.concat project_dir fn) tn t
-		in
-		(* Uniquify the filename if it exists on disk *)
-		let i =
-                  try String.rindex file '.'
-                  with _ -> String.length file
-		in
-		let name = String.sub file 0 i in
-		let ext = String.sub file i (String.length file - i) in
-		let i = ref 1 in
-		while Sys.file_exists
-		  (name ^ "_" ^ (string_of_int !i) ^ ext) do
-		    incr i
-		done;
-		let file = name ^ "_" ^ (string_of_int !i) ^ ext in
-		a.Model.edited_as <- file;
-		Db.set_edited_as a.Model.proof_db file;
-		file
-	    | f -> f
-	in
-        let old_status = a.Model.proof_state in
-        let callback res =
-          match res with
-            | Gscheduler.Done _ ->
-                Helpers.set_proof_state ~obsolete:false a old_status
-            | _ ->
-                Helpers.set_proof_state ~obsolete:false a res
-        in
-        let editor =
-          match a.Model.prover.editor with
-            | "" -> gconfig.default_editor
-            | _ -> a.Model.prover.editor
-        in
-        Gscheduler.edit_proof ~debug:false ~editor
-          ~file
-          ~driver
-          ~callback
-          t
-    | Model.Row_transformation _tr ->
-        ()
+    | M.Proof_attempt a ->
+        M.edit_proof ~default_editor:gconfig.default_editor
+          ~project_dir a
+    | M.Transformation _ -> ()
 
 let edit_current_proof () =
   match goals_view#selection#get_selected_rows with
@@ -1887,37 +1613,23 @@ let () =
 (* removing  *)
 (*************)
 
-let remove_proof_attempt a =
-  Db.remove_proof_attempt a.Model.proof_db;
-  let (_:bool) = goals_model#remove a.Model.proof_row in
-  let g = a.Model.proof_goal in
-  Hashtbl.remove g.Model.external_proofs a.Model.prover.prover_id;
-  Helpers.check_goal_proved g
-
-let remove_transf t =
-  (* TODO: remove subgoals first !!! *)
-  Db.remove_transformation t.Model.transf_db;
-  let (_:bool) = goals_model#remove t.Model.transf_row in
-  let g = t.Model.parent_goal in
-  Hashtbl.remove g.Model.transformations "split" (* hack !! *);
-  Helpers.check_goal_proved g
-
+(*
 
 let confirm_remove_row r =
   let row = goals_model#get_iter r in
-  match goals_model#get ~row ~column:Model.index_column with
-    | Model.Row_goal _g ->
+  match goals_model#get ~row ~column:M.index_column with
+    | M.Row_goal _g ->
 	info_window `ERROR "Cannot remove a goal"
-    | Model.Row_theory _th ->
+    | M.Row_theory _th ->
 	info_window `ERROR "Cannot remove a theory"
-    | Model.Row_file _file ->
+    | M.Row_file _file ->
 	info_window `ERROR "Cannot remove a file"
-    | Model.Row_proof_attempt a ->
+    | M.Row_proof_attempt a ->
 	info_window
 	  ~callback:(fun () -> remove_proof_attempt a)
 	  `QUESTION
 	  "Do you really want to remove the selected proof attempt?"
-    | Model.Row_transformation tr ->
+    | M.Row_transformation tr ->
 	info_window
 	  ~callback:(fun () -> remove_transf tr)
 	  `QUESTION
@@ -1941,40 +1653,40 @@ let () =
   in ()
 
 let rec clean_goal g =
-  if g.Model.proved then
+  if g.M.proved then
     begin
       Hashtbl.iter
         (fun _ a ->
-           if a.Model.proof_obsolete || not (proof_successful a) then
+           if a.M.proof_obsolete || not (proof_successful a) then
              remove_proof_attempt a)
-        g.Model.external_proofs;
+        g.M.external_proofs;
       Hashtbl.iter
         (fun _ t ->
-           if not t.Model.transf_proved then
+           if not t.M.transf_proved then
              remove_transf t)
-        g.Model.transformations
+        g.M.transformations
     end
   else
     Hashtbl.iter
-      (fun _ t -> List.iter clean_goal t.Model.subgoals)
-      g.Model.transformations
+      (fun _ t -> List.iter clean_goal t.M.subgoals)
+      g.M.transformations
 
 
 let clean_row r =
   let row = goals_model#get_iter r in
-  match goals_model#get ~row ~column:Model.index_column with
-    | Model.Row_goal g -> clean_goal g
-    | Model.Row_theory th ->
-        List.iter clean_goal th.Model.goals
-    | Model.Row_file file ->
+  match goals_model#get ~row ~column:M.index_column with
+    | M.Row_goal g -> clean_goal g
+    | M.Row_theory th ->
+        List.iter clean_goal th.M.goals
+    | M.Row_file file ->
         List.iter
           (fun th ->
-             List.iter clean_goal th.Model.goals)
-          file.Model.theories
-    | Model.Row_proof_attempt a ->
-        clean_goal a.Model.proof_goal
-    | Model.Row_transformation tr ->
-        List.iter clean_goal tr.Model.subgoals
+             List.iter clean_goal th.M.goals)
+          file.M.theories
+    | M.Row_proof_attempt a ->
+        clean_goal a.M.proof_goal
+    | M.Row_transformation tr ->
+        List.iter clean_goal tr.M.subgoals
 
 let clean_selection () =
   List.iter clean_row goals_view#selection#get_selected_rows
@@ -1988,6 +1700,7 @@ let () =
     b#connect#pressed ~callback:clean_selection
   in ()
 
+*)
 
 (***************)
 (* Bind events *)

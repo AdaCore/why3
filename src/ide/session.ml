@@ -21,7 +21,9 @@
 open Why
 open Format
 
-type prover_data =
+type prover_data = Gconfig.prover_data
+
+(*
     { prover_id : string;
       prover_name : string;
       prover_version : string;
@@ -30,6 +32,7 @@ type prover_data =
       driver : Driver.driver;
       mutable editor : string;
     }
+*)
 
 type proof_attempt_status =
   | Undone
@@ -105,10 +108,14 @@ type any =
 
 let all_files : file list ref = ref []
 
+let get_all_files () = !all_files
+
+let init_fun = ref (fun (_:O.key) (_:any) -> ())
+
 let notify_fun = ref (fun (_:any) -> ())
-  
-let open_session ~notify _ = 
-  notify_fun := notify
+
+let open_session ~init ~notify _ = 
+  init_fun := init; notify_fun := notify
 
 let check_file_verified f =
   let b = List.for_all (fun t -> t.verified) f.theories in
@@ -328,7 +335,7 @@ let apply_transformation_l ~callback transf goal =
   callback (Trans.apply transf goal)
 
 
-let edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
+let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
   let old =
     if Sys.file_exists file
     then
@@ -407,7 +414,7 @@ let raw_add_external_proof ~obsolete ~edit g p result =
             edited_as = edit;
           }
   in
-  Hashtbl.add g.external_proofs p.prover_name a;
+  Hashtbl.add g.external_proofs p.Gconfig.prover_name a;
   !notify_fun (Proof_attempt a);
   (* !notify_fun (Goal g) ? *)
   a
@@ -519,6 +526,9 @@ let add_file f theories =
   mfile.theories <- List.rev mths;
   if theories = [] then set_file_verified mfile
 
+
+let file_exists fn =
+  List.exists (fun f -> f.file_name = fn) !all_files
 
 
 
@@ -766,12 +776,12 @@ let redo_external_proof g a =
     in
     schedule_proof_attempt
       ~debug:false ~timelimit:10 ~memlimit:0
-      ?old ~command:p.command ~driver:p.driver
+      ?old ~command:p.Gconfig.command ~driver:p.Gconfig.driver
       ~callback
       g.task
 
 let rec prover_on_goal p g =
-  let id = p.prover_id in
+  let id = p.Gconfig.prover_id in
   let a =
     try Hashtbl.find g.external_proofs id
     with Not_found ->
@@ -1002,7 +1012,6 @@ let inline_selected_goals () =
 (* method: edit current goal *)
 (*****************************)
 
-(*
 
 let ft_of_th th =
   (Filename.basename th.theory_parent.file_name,
@@ -1010,80 +1019,68 @@ let ft_of_th th =
 
 let rec ft_of_goal g =
   match g.parent with
-    | Transf tr -> ft_of_goal tr.parent_goal
-    | Theory th -> ft_of_th th
+    | Parent_transf tr -> ft_of_goal tr.parent_goal
+    | Parent_theory th -> ft_of_th th
 
 let ft_of_pa a =
   ft_of_goal a.proof_goal
 
-let edit_selected_row p =
-  let row = goals_model#get_iter p in
-  match goals_model#get ~row ~column:index_column with
-    | Row_goal _g ->
-        ()
-    | Row_theory _th ->
-        ()
-    | Row_file _file ->
-        ()
-    | Row_proof_attempt a ->
-        (* check that the state is not Scheduled or Running *)
-        let running = match a.proof_state with
-          | Gscheduler.Scheduled | Gscheduler.Running -> true
-          | Gscheduler.Undone | Gscheduler.Done _ | Gscheduler.InternalFailure _ -> false
-        in
-        if running then
-          info_window `ERROR "Edition already in progress"
-        else
-        let g = a.proof_goal in
-	let t = g.task in
-	let driver = a.prover.driver in
-	let file =
-          match a.edited_as with
-            | "" ->
-		let (fn,tn) = ft_of_pa a in
-		let file = Driver.file_of_task driver
-                  (Filename.concat project_dir fn) tn t
-		in
-		(* Uniquify the filename if it exists on disk *)
-		let i =
-                  try String.rindex file '.'
-                  with _ -> String.length file
-		in
-		let name = String.sub file 0 i in
-		let ext = String.sub file i (String.length file - i) in
-		let i = ref 1 in
-		while Sys.file_exists
-		  (name ^ "_" ^ (string_of_int !i) ^ ext) do
-		    incr i
-		done;
-		let file = name ^ "_" ^ (string_of_int !i) ^ ext in
-		a.edited_as <- file;
-		Db.set_edited_as a.proof_db file;
-		file
-	    | f -> f
-	in
-        let old_status = a.proof_state in
-        let callback res =
-          match res with
-            | Gscheduler.Done _ ->
-                Helpers.set_proof_state ~obsolete:false a old_status
-            | _ ->
-                Helpers.set_proof_state ~obsolete:false a res
-        in
-        let editor =
-          match a.prover.editor with
-            | "" -> gconfig.default_editor
-            | _ -> a.prover.editor
-        in
-        Gscheduler.edit_proof ~debug:false ~editor
-          ~file
-          ~driver
-          ~callback
-          t
-    | Row_transformation _tr ->
-        ()
-
+let edit_proof ~default_editor ~project_dir a =
+  (* check that the state is not Scheduled or Running *)
+  let running = match a.proof_state with
+    | Scheduled | Running -> true
+    | Undone | Done _ | InternalFailure _ -> false
+  in
+  if running then ()
+(*
+    info_window `ERROR "Edition already in progress"
 *)
+  else
+    let g = a.proof_goal in
+    let t = g.task in
+    let driver = a.prover.Gconfig.driver in
+    let file =
+      match a.edited_as with
+        | "" ->
+	    let (fn,tn) = ft_of_pa a in
+	    let file = Driver.file_of_task driver
+              (Filename.concat project_dir fn) tn t
+	    in
+	    (* Uniquify the filename if it exists on disk *)
+	    let i =
+              try String.rindex file '.'
+              with _ -> String.length file
+	    in
+	    let name = String.sub file 0 i in
+	    let ext = String.sub file i (String.length file - i) in
+	    let i = ref 1 in
+	    while Sys.file_exists
+	      (name ^ "_" ^ (string_of_int !i) ^ ext) do
+		incr i
+	    done;
+	    let file = name ^ "_" ^ (string_of_int !i) ^ ext in
+	    a.edited_as <- file;
+	    file
+	| f -> f
+    in
+    let old_status = a.proof_state in
+    let callback res =
+      match res with
+        | Done _ ->
+            set_proof_state ~obsolete:false a old_status
+        | _ ->
+            set_proof_state ~obsolete:false a res
+    in
+    let editor =
+      match a.prover.Gconfig.editor with
+        | "" -> default_editor
+        | s -> s
+    in
+    schedule_edit_proof ~debug:false ~editor
+      ~file
+      ~driver
+      ~callback
+      t
 
 (*************)
 (* removing  *)

@@ -20,7 +20,10 @@
 
 open Why
 
-type prover_data = private
+
+type prover_data = Gconfig.prover_data
+
+(*
     { prover_id : string;
       prover_name : string;
       prover_version : string;
@@ -29,6 +32,7 @@ type prover_data = private
       driver : Driver.driver;
       mutable editor : string;
     }
+*)
 
 type proof_attempt_status = private
     | Undone
@@ -116,12 +120,17 @@ module Make(O: OBSERVER) : sig
   (*                           *)
   (*****************************)
 
-  val open_session : notify:(any -> unit) -> string -> unit
+  val open_session : 
+    init:(O.key -> any -> unit) ->
+    notify:(any -> unit) -> string -> unit
     (** starts a new proof session, using directory given as argument 
         this reloads the previous session if any.
 
         Opening a session must be done prior to any other actions.
         And it cannot be done twice.
+
+	the [init] function is a function that will be called at each
+	creation of element of the state
 
 	the [notify] function is a function that will be called at each
 	update of element of the state
@@ -135,10 +144,14 @@ module Make(O: OBSERVER) : sig
        this is not necessary since the session manager handles this itself
        using add_timeout *)
 
+  val file_exists : string -> bool
+
   val add_file : string -> Theory.theory Theory.Mnm.t -> unit
     (** [add_file f ths] adds a new file in the proof session, that is
 	a collection of name [f] of theories [ths] *)
 
+
+  val get_all_files : unit -> file list
 
   (*
     val reload_files : unit -> unit 
@@ -152,15 +165,24 @@ module Make(O: OBSERVER) : sig
 (*                           *)
 (*****************************)
 
+  val apply_transformation : 
+    callback:('a -> 'b) -> 'a Why.Trans.trans -> Why.Task.task -> 'b
+
+  val apply_transformation_l : 
+    callback:('a -> 'b) -> 'a Why.Trans.trans -> Why.Task.task -> 'b
 
   val run_prover : context_unproved_goals_only:bool -> 
     prover_data -> any -> unit
     (** [run_prover p a] runs prover [p] on all goals under [a] *)
 
+  val edit_proof : 
+    default_editor:string -> project_dir:string -> proof_attempt -> unit
+
   val replay : context_unproved_goals_only:bool -> any -> unit
     (** [replay a] reruns all valid but obsolete proofs under [a] *)
 
 (*
+
 
   val remove_proof_attempt : proof_attempt -> unit
 
