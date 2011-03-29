@@ -42,7 +42,6 @@ type proof_attempt_status =
 module type OBSERVER = sig
   type key
   val create: ?parent:key -> unit -> key
-  val notify: key -> unit
   val remove: key -> unit
 
   val timeout: ms:int -> (unit -> bool) -> unit
@@ -104,17 +103,19 @@ type any =
   | Proof_attempt of proof_attempt
   | Transformation of transf
 
-
 let all_files : file list ref = ref []
 
-let open_session _ = ()
+let notify_fun = ref (fun (_:any) -> ())
+  
+let open_session ~notify _ = 
+  notify_fun := notify
 
 let check_file_verified f =
   let b = List.for_all (fun t -> t.verified) f.theories in
   if f.file_verified <> b then
     begin
       f.file_verified <- b;
-      O.notify f.file_key
+      !notify_fun (File f)
     end
 
 let check_theory_proved t =
@@ -122,7 +123,7 @@ let check_theory_proved t =
   if t.verified <> b then
     begin
       t.verified <- b;
-      O.notify t.theory_key;
+      !notify_fun (Theory t);
       check_file_verified t.theory_parent
     end
 
@@ -139,7 +140,7 @@ let rec check_goal_proved g =
   if g.proved <> b then
     begin
       g.proved <- b;
-      O.notify g.goal_key;
+      !notify_fun (Goal g);
       match g.parent with
         | Parent_theory t -> check_theory_proved t
         | Parent_transf t -> check_transf_proved t
@@ -150,18 +151,18 @@ and check_transf_proved t =
   if t.transf_proved <> b then
     begin
       t.transf_proved <- b;
-      O.notify t.transf_key;
+      !notify_fun (Transformation t);
       check_goal_proved t.parent_goal
     end
 
 
 let set_file_verified f =
   f.file_verified <- true;
-  O.notify f.file_key
+  !notify_fun (File f)
 
 let set_theory_proved ~propagate t =
   t.verified <- true;
-  O.notify t.theory_key;
+  !notify_fun (Theory t);
   let f = t.theory_parent in
   if propagate then
     if List.for_all (fun t ->
@@ -170,7 +171,7 @@ let set_theory_proved ~propagate t =
 
 let rec set_proved ~propagate g =
   g.proved <- true;
-  O.notify g.goal_key;
+  !notify_fun (Goal g);
   if propagate then
     match g.parent with
       | Parent_theory t ->
@@ -185,7 +186,7 @@ let rec set_proved ~propagate g =
 let set_proof_state ~obsolete a res =
   a.proof_state <- res;
   a.proof_obsolete <- obsolete;
-  O.notify a.proof_key
+  !notify_fun (Proof_attempt a)
 
 (*************************)
 (*         Scheduler     *)
@@ -407,8 +408,8 @@ let raw_add_external_proof ~obsolete ~edit g p result =
           }
   in
   Hashtbl.add g.external_proofs p.prover_name a;
-  O.notify key;
-  (* notify g.goal_key ? *)
+  !notify_fun (Proof_attempt a);
+  (* !notify_fun (Goal g) ? *)
   a
 
 (* [raw_add_goal parent name expl t] adds a goal to the given parent
@@ -430,7 +431,7 @@ let raw_add_goal parent name expl t =
                proved = false;
              }
   in
-  O.notify key;
+  !notify_fun (Goal goal);
   goal
 
 

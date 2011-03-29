@@ -364,47 +364,12 @@ let image_of_result ~obsolete result =
 	| Call_provers.HighFailure ->
 	    if obsolete then !image_failure_obs else !image_failure
 	
-let set_row_status b row =
-  if b then
-    begin
-      goals_view#collapse_row (goals_model#get_path row);
-      goals_model#set ~row ~column:status_column !image_yes;
-    end
-  else
-    begin
-      goals_model#set ~row ~column:status_column !image_unknown;
-    end
-
-let set_proof_state ~obsolete row a =
-  let res = a.M.proof_state in
-  goals_model#set ~row ~column:status_column
-    (image_of_result ~obsolete res);
-  let t = match res with
-    | M.Done { Call_provers.pr_time = time } ->
-	Format.sprintf "%.2f" time
-    | _ -> ""
-  in
-  let t = if obsolete then t ^ " (obsolete)" else t in
-  goals_model#set ~row ~column:Model.time_column t
 
 module M = Session.Make
   (struct
      type key = Gtk.tree_iter
 
      let create ?parent () = goals_model#append ?parent () 
-
-     let notify row = 
-       match goals_model#get ~row ~column:Model.index_column with
-	 | M.Goal g -> 
-	     set_row_status row g.M.proved
-	 | M.Theory th -> 
-	     set_row_status row th.M.verified
-	 | M.File file -> 
-	     set_row_status row file.M.file_verified
-	 | M.Proof_attempt a ->
-	     set_proof_state ~obsolete:false a row
-	 | M.Transformation tr ->
-	     set_row_status row tr.M.transf_proved
 
      let remove row = 
        let (_:bool) = goals_model#remove row in ()
@@ -418,8 +383,47 @@ module M = Session.Make
        ()
 
    end)
-    
+
+let set_row_status row b =
+  if b then
+    begin
+      goals_view#collapse_row (goals_model#get_path row);
+      goals_model#set ~row ~column:status_column !image_yes;
+    end
+  else
+    begin
+      goals_model#set ~row ~column:status_column !image_unknown;
+    end
+
+let set_proof_state ~obsolete a =
+  let row = a.M.proof_key in
+  let res = a.M.proof_state in
+  goals_model#set ~row ~column:status_column
+    (image_of_result ~obsolete res);
+  let t = match res with
+    | Session.Done { Call_provers.pr_time = time } ->
+	Format.sprintf "%.2f" time
+    | _ -> ""
+  in
+  let t = if obsolete then t ^ " (obsolete)" else t in
+  goals_model#set ~row ~column:time_column t
+
+let notify any = 
+  match any with
+    | M.Goal g -> 
+	set_row_status g.M.goal_key g.M.proved
+    | M.Theory th -> 
+	set_row_status th.M.theory_key th.M.verified
+    | M.File file -> 
+	set_row_status file.M.file_key file.M.file_verified
+    | M.Proof_attempt a ->
+	set_proof_state ~obsolete:false a 
+    | M.Transformation tr ->
+	set_row_status tr.M.transf_key tr.M.transf_proved
+	  
+(*
 let index_column : M.any GTree.column = cols#add Gobject.Data.caml
+*)
    
 (********************)
 (* opening database *)
@@ -459,7 +463,8 @@ let () =
 let () =
   let dbfname = Filename.concat project_dir "project.xml" in
   try
-    M.open_session dbfname
+    M.open_session ~notify dbfname;
+    M.maximum_running_proofs := gconfig.max_running_processes
   with e ->
     eprintf "Error while opening database '%s'@." dbfname;
     eprintf "Aborting...@.";
@@ -515,11 +520,12 @@ let info_window ?(callback=(fun () -> ())) mt s =
 
 
 
+(*
   let check_file_verified f =
     let b = List.for_all (fun t -> t.M.verified) f.M.theories in
-    if f.file_verified <> b then
+    if f.M.file_verified <> b then
       begin
-	f.file_verified <- b;
+	f.M.file_verified <- b;
 	set_row_status b f.file_row
       end
 
@@ -560,6 +566,9 @@ let info_window ?(callback=(fun () -> ())) mt s =
 	check_goal_proved t.parent_goal
       end
 
+*)
+
+(*
 
   (* deprecated *)
   let set_file_verified f =
@@ -786,6 +795,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
     mfile.theories <- List.rev mths;
     if theories = [] then set_file_verified mfile
 
+*)
 
 (*********************************)
 (*  read previous data from db   *)
@@ -1064,107 +1074,15 @@ let () =
 	    exit 1
 
 
-(**********************)
-(* set up scheduler   *)
-(**********************)
-
-let () =
-  begin
-    Gscheduler.maximum_running_proofs := gconfig.max_running_processes
-  end
 
 
 (*****************************************************)
 (* method: run a given prover on each unproved goals *)
 (*****************************************************)
 
-(* q is a queue of proof attempt where to put the new one *)
-let redo_external_proof g a =
-  (* check that the state is not Scheduled or Running *)
-(**)
-  let running = match a.Model.proof_state with
-    | Gscheduler.Scheduled | Gscheduler.Running -> true
-    | Gscheduler.Done _ | Gscheduler.Undone | Gscheduler.InternalFailure _ -> false
-  in
-  if running then ()
-    (* info_window `ERROR "Proof already in progress" *)
-  else
-(**)
-  let p = a.Model.prover in
-  let callback result =
-    Helpers.set_proof_state ~obsolete:false a result (*time*) ;
-    let db_res, time =
-      match result with
-	| Gscheduler.Undone | Gscheduler.Scheduled | Gscheduler.Running ->
-	    Db.Undone, 0.0
-	| Gscheduler.InternalFailure _ ->
-	    Db.Done Call_provers.HighFailure, 0.0
-	| Gscheduler.Done r ->
-	    if r.Call_provers.pr_answer = Call_provers.Valid then
-	      Helpers.set_proved ~propagate:true a.Model.proof_goal;
-	    Db.Done r.Call_provers.pr_answer, r.Call_provers.pr_time
-    in
-    Db.set_status a.Model.proof_db db_res time
-  in
-  let old = if a.Model.edited_as = "" then None else
-    begin
-      eprintf "Info: proving using edited file %s@." a.Model.edited_as;
-      (Some (open_in a.Model.edited_as))
-    end
-  in
-  Gscheduler.schedule_proof_attempt
-    ~debug:(gconfig.verbose > 0) ~timelimit:gconfig.time_limit ~memlimit:0
-    ?old ~command:p.command ~driver:p.driver
-    ~callback
-    g.Model.task
-
-let rec prover_on_goal p g =
-  let id = p.prover_id in
-  let a =
-    try Hashtbl.find g.Model.external_proofs id
-    with Not_found ->
-      let db_prover = Db.prover_from_name id in
-      let db_pa = Db.add_proof_attempt g.Model.goal_db db_prover in
-      Helpers.add_external_proof_row ~obsolete:false ~edit:""
-	g p db_pa Gscheduler.Undone
-  in
-  let () = redo_external_proof g a in
-  Hashtbl.iter
-    (fun _ t -> List.iter (prover_on_goal p) t.Model.subgoals)
-    g.Model.transformations
-
-let rec prover_on_goal_or_children p g =
-  if not (g.Model.proved && !context_unproved_goals_only) then
-    begin
-      let r = ref true in
-      Hashtbl.iter
-	(fun _ t ->
-	   r := false;
-           List.iter (prover_on_goal_or_children p)
-             t.Model.subgoals) g.Model.transformations;
-      if !r then prover_on_goal p g
-    end
-
-let prover_on_selected_goal_or_children pr row =
-  let row = goals_model#get_iter row in
-  match goals_model#get ~row ~column:Model.index_column with
-    | Model.Row_goal g ->
-        prover_on_goal_or_children pr g
-    | Model.Row_theory th ->
-        List.iter (prover_on_goal_or_children pr) th.Model.goals
-    | Model.Row_file file ->
-        List.iter
-          (fun th ->
-             List.iter (prover_on_goal_or_children pr) th.Model.goals)
-          file.Model.theories
-    | Model.Row_proof_attempt a ->
-        prover_on_goal_or_children pr a.Model.proof_goal
-    | Model.Row_transformation tr ->
-        List.iter (prover_on_goal_or_children pr) tr.Model.subgoals
-
 let prover_on_selected_goals pr =
   List.iter
-    (prover_on_selected_goal_or_children pr)
+    (M.run_prover pr)
     goals_view#selection#get_selected_rows
 
 (**********************************)

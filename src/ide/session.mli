@@ -41,7 +41,6 @@ module type OBSERVER = sig
 
   type key
   val create: ?parent:key -> unit -> key
-  val notify: key -> unit
   val remove: key -> unit
 
   val timeout: ms:int -> (unit -> bool) -> unit
@@ -117,14 +116,18 @@ module Make(O: OBSERVER) : sig
   (*                           *)
   (*****************************)
 
-  val open_session : string -> unit
+  val open_session : notify:(any -> unit) -> string -> unit
     (** starts a new proof session, using directory given as argument 
         this reloads the previous session if any.
 
         Opening a session must be done prior to any other actions.
         And it cannot be done twice.
 
+	the [notify] function is a function that will be called at each
+	update of element of the state
     *)
+
+  val maximum_running_proofs : int ref
 
     (* 
   val save_session : unit -> unit
