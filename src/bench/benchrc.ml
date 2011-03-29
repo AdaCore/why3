@@ -108,7 +108,7 @@ let use_before_goal th = function
   | _ -> assert false
 
 let apply_use_before_goal (task,goal_id) (th_use,th_use_id) =
-  let task2 = use_before_goal th_use task in
+  let task = use_before_goal th_use task in
   let goal_id = match goal_id, th_use_id with
     | Some goal_id, Some th_use_id ->
       Some begin
@@ -116,8 +116,8 @@ let apply_use_before_goal (task,goal_id) (th_use,th_use_id) =
           try Db.Htransf.find (Db.transformations goal_id) th_use_id
           with Not_found ->
             Db.add_transformation goal_id th_use_id  in
-        let name2 = (Task.task_goal task2).Decl.pr_name.Ident.id_string in
-        let md5_2 = BenchUtil.task_checksum task2 in
+        let name2 = (Task.task_goal task).Decl.pr_name.Ident.id_string in
+        let md5_2 = BenchUtil.task_checksum task in
         try Mstr.find md5_2 (Db.subgoals transf)
         with Not_found ->
           Db.add_subgoal transf name2 md5_2
