@@ -20,7 +20,6 @@
 
 open Why
 
-
 type prover_data = private
     { prover_id : string;
       prover_name : string;
@@ -35,9 +34,12 @@ val get_prover_data :
   Env.env -> Util.Mstr.key -> Whyconf.config_prover ->
   prover_data Util.Mstr.t -> prover_data Util.Mstr.t
 
+(* transformations *)
 type transformation_data 
 
 val transformation_id : transformation_data -> string
+
+val lookup_transformation : Env.env -> string -> transformation_data
 
 type proof_attempt_status = private
     | Undone
@@ -171,15 +173,25 @@ module Make(O: OBSERVER) : sig
 (*                           *)
 (*****************************)
 
+(*
   val apply_transformation : 
     callback:('a -> 'b) -> 'a Why.Trans.trans -> Why.Task.task -> 'b
 
   val apply_transformation_l : 
     callback:('a -> 'b) -> 'a Why.Trans.trans -> Why.Task.task -> 'b
+*)
+
+val apply_transformation : callback:(Task.task list -> unit) ->
+  transformation_data -> Task.task -> unit
 
   val run_prover : context_unproved_goals_only:bool -> 
     prover_data -> any -> unit
     (** [run_prover p a] runs prover [p] on all goals under [a] *)
+
+  val transform : context_unproved_goals_only:bool -> 
+    transformation_data -> any -> unit
+    (** [apply_transformation tr a] applies transformation [trp] 
+	on all goals under [a] *)
 
   val edit_proof : 
     default_editor:string -> project_dir:string -> proof_attempt -> unit

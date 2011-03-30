@@ -170,7 +170,7 @@ let w = GWindow.window
   ~allow_grow:true ~allow_shrink:true
   ~width:gconfig.window_width
   ~height:gconfig.window_height
-  ~title:"why GUI with database" ()
+  ~title:"Why Graphical session manager" ()
 
 let (_ : GtkSignal.id) = w#connect#destroy ~callback:exit_function
 
@@ -833,57 +833,6 @@ let info_window ?(callback=(fun () -> ())) mt s =
 
 *)
 
-(*********************************)
-(*  read previous data from db   *)
-(*********************************)
-
-type trans =
-  | Trans_one of Task.task Trans.trans
-  | Trans_list of Task.task Trans.tlist
-
-let lookup_trans name =
-  try
-    let t = Trans.lookup_transform name gconfig.env in
-    Trans_one t
-  with Trans.UnknownTrans _ ->
-    let t = Trans.lookup_transform_l name gconfig.env in
-    Trans_list t
-
-let trans_list =
-  ["split_goal"; "inline_goal" ; "introduce_premises" ]
-
-let trans_of_name =
-  let h = Hashtbl.create 13 in
-  List.iter
-    (fun n -> Hashtbl.add h n (lookup_trans n))
-    trans_list;
-  Hashtbl.find h
-
-let split_transformation = trans_of_name "split_goal"
-let inline_transformation = trans_of_name "inline_goal"
-let intro_transformation = trans_of_name "introduce_premises"
-
-
-exception Not_applicable
-
-let apply_trans t task =
-  match t with
-    | Trans_one t ->
-	let t' = Trans.apply t task in
-	if task == t' then raise Not_applicable; [t']
-    | Trans_list t ->
-	match Trans.apply t task with
-	  | [t'] as l -> if task == t' then raise Not_applicable; l
-	  | l -> l
-
-let apply_transformation ~callback t task =
-   match t with
-    | Trans_one t ->
-	let callback t = callback [t] in
-	M.apply_transformation ~callback t task
-    | Trans_list t ->
-	M.apply_transformation_l ~callback t task
-
 
 (**********************************)
 (* add new file from command line *)
@@ -923,7 +872,6 @@ let prover_on_selected_goals pr =
 (* method: replay obsolete proofs *)
 (**********************************)
 
-
 let replay_obsolete_proofs () =
   List.iter
     (fun row ->
@@ -937,133 +885,21 @@ let replay_obsolete_proofs () =
 (* method: split selected goals *)
 (*****************************************************)
 
-(*
-let transformation_on_goal g trans_name trans =
-  if not g.Model.proved then
-    let callback subgoals =
-      let b =
- 	match subgoals with
-	  | [task] ->
-              let s1 = task_checksum g.Model.task in
-              let s2 = task_checksum task in
-	      (*
-                eprintf "Transformation returned only one task. sum before = %s, sum after = %s@." (task_checksum g.Model.task) (task_checksum task);
-                eprintf "addresses: %x %x@." (Obj.magic g.Model.task) (Obj.magic task);
-	      *)
-              s1 <> s2
-                (* task != g.Model.task *)
-	  | _ -> true
-      in
-      if b then
-	let transf_id = Db.transf_from_name trans_name in
-	let db_transf = Db.add_transformation g.Model.goal_db transf_id	in
-	let tr = Helpers.add_transformation_row g db_transf trans_name in
-	let goal_name = g.Model.goal_name in
-	let fold =
-	  fun (acc,count) subtask ->
-	    let id = (Task.task_goal subtask).Decl.pr_name in
-            let expl =
-              get_explanation id (Task.task_goal_fmla subtask)
-            in
-	    let subgoal_name =
-	      goal_name ^ "." ^ (string_of_int count)
-	    in
-	    let sum = task_checksum subtask in
-	    let subtask_db =
-	      Db.add_subgoal db_transf subgoal_name sum
-	    in
-	    let goal =
-	      Helpers.add_goal_row (Model.Transf tr)
-		subgoal_name expl subtask subtask_db
-	    in
-	    (goal :: acc, count+1)
-	in
-	let goals,_ =
-	  List.fold_left fold ([],1) subgoals
-	in
-	tr.Model.subgoals <- List.rev goals;
-	Hashtbl.add g.Model.transformations trans_name tr
-    in
-    apply_transformation ~callback
-      trans g.Model.task
-
-let split_goal g =
-  Gscheduler.schedule_delayed_action
-    (fun () ->
-       transformation_on_goal g "split_goal" split_transformation)
-
-let inline_goal g = transformation_on_goal g "inline_goal" inline_transformation
-
-let rec split_goal_or_children g =
-  if not g.Model.proved then
-    begin
-      let r = ref true in
-      Hashtbl.iter
-	(fun _ t ->
-	   r := false;
-           List.iter split_goal_or_children
-             t.Model.subgoals) g.Model.transformations;
-      if !r then split_goal g
-    end
-
-let rec inline_goal_or_children g =
-  if not g.Model.proved then
-    begin
-      let r = ref true in
-      Hashtbl.iter
-	(fun _ t ->
-	   r := false;
-           List.iter inline_goal_or_children
-             t.Model.subgoals) g.Model.transformations;
-      if !r then inline_goal g
-    end
-
-let split_selected_goal_or_children row =
-  let row = goals_model#get_iter row in
-  match goals_model#get ~row ~column:Model.index_column with
-    | Model.Row_goal g ->
-        split_goal_or_children g
-    | Model.Row_theory th ->
-        List.iter split_goal_or_children th.Model.goals
-    | Model.Row_file file ->
-        List.iter
-          (fun th ->
-             List.iter split_goal_or_children th.Model.goals)
-          file.Model.theories
-    | Model.Row_proof_attempt a ->
-        split_goal_or_children a.Model.proof_goal
-    | Model.Row_transformation tr ->
-        List.iter split_goal_or_children tr.Model.subgoals
+let lookup_trans = Session.lookup_transformation gconfig.env
+let split_transformation = lookup_trans "split_goal"
+let inline_transformation = lookup_trans "inline_goal"
+let intro_transformation = lookup_trans "introduce_premises"
 
 
-let inline_selected_goal_or_children row =
-  let row = goals_model#get_iter row in
-  match goals_model#get ~row ~column:Model.index_column with
-    | Model.Row_goal g ->
-        inline_goal_or_children g
-    | Model.Row_theory th ->
-        List.iter inline_goal_or_children th.Model.goals
-    | Model.Row_file file ->
-        List.iter
-          (fun th ->
-             List.iter inline_goal_or_children th.Model.goals)
-          file.Model.theories
-    | Model.Row_proof_attempt a ->
-        inline_goal_or_children a.Model.proof_goal
-    | Model.Row_transformation tr ->
-        List.iter inline_goal_or_children tr.Model.subgoals
-
-let split_selected_goals () =
+let apply_trans_on_selection tr =
   List.iter
-    split_selected_goal_or_children
+    (fun row ->
+       let a = get_any row in
+        M.transform
+          ~context_unproved_goals_only:!context_unproved_goals_only
+	  tr
+          a)
     goals_view#selection#get_selected_rows
-
-
-let inline_selected_goals () =
-  List.iter
-    inline_selected_goal_or_children
-    goals_view#selection#get_selected_rows
-*)
 
 
 (*********************************)
@@ -1322,7 +1158,12 @@ let () =
   add_refresh_provers add_item_provers;
   add_item_provers ()
 
-(*
+let split_selected_goals () =
+  apply_trans_on_selection split_transformation
+
+let inline_selected_goals () =
+  apply_trans_on_selection inline_transformation
+
 let () =
   let add_item_split () =
     ignore(tools_factory#add_image_item
@@ -1331,7 +1172,6 @@ let () =
              () : GMenu.image_menu_item) in
   add_refresh_provers add_item_split;
   add_item_split ()
-*)
 
 
 let () =
@@ -1340,26 +1180,20 @@ let () =
 
   let i = GMisc.image ~pixbuf:(!image_transf) () in
   let () = b#set_image i#coerce in
-(*
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:split_selected_goals
   in
-*)
   ()
 
 let () =
   let b = GButton.button ~packing:transf_box#add ~label:"Inline" () in
   b#misc#set_tooltip_markup "Click to apply transformation <tt>inline_goal</tt> to the <b>selected goals</b>";
-(**)
   let i = GMisc.image ~pixbuf:(!image_transf) () in
   let () = b#set_image i#coerce in
-(**)
-(*
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:inline_selected_goals
   in 
-*)
-()
+  ()
 
 
 
@@ -1541,15 +1375,16 @@ let select_row p =
   let a = get_any p in
   match a with
     | M.Goal g ->
-        let t = g.M.task in
-        let t = match apply_trans intro_transformation t with
-	  | [t] -> t
+	let callback = function
+	  | [t] -> 
+              let task_text = Pp.string_of Pretty.print_task t in
+              task_view#source_buffer#set_text task_text;
+              task_view#scroll_to_mark `INSERT;
+              scroll_to_source_goal g
 	  | _ -> assert false
-	in
-        let task_text = Pp.string_of Pretty.print_task t in
-        task_view#source_buffer#set_text task_text;
-        task_view#scroll_to_mark `INSERT;
-        scroll_to_source_goal g
+	in	
+        M.apply_transformation ~callback intro_transformation g.M.task
+
     | M.Theory th ->
         task_view#source_buffer#set_text "";
         scroll_to_theory th

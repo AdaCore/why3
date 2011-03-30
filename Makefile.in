@@ -421,6 +421,7 @@ install_local: bin/why3config
 ifeq (@enable_ide@,yes)
 
 IDE_FILES = session gconfig db gmain
+# IDE_FILES = session gconfig newmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 

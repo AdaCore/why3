@@ -54,60 +54,30 @@ type trans =
   | Trans_one of Task.task Trans.trans
   | Trans_list of Task.task Trans.tlist
 
-(*
-let lookup_trans name =
-  try
-    let t = Trans.lookup_transform name gconfig.env in
-    Trans_one t
-  with Trans.UnknownTrans _ ->
-    let t = Trans.lookup_transform_l name gconfig.env in
-    Trans_list t
-*)
-
-(*
-let trans_list =
-  ["split_goal"; "inline_goal" ; "introduce_premises" ]
-
-let trans_of_name =
-  let h = Hashtbl.create 13 in
-  List.iter
-    (fun n -> Hashtbl.add h n (lookup_trans n))
-    trans_list;
-  Hashtbl.find h
-
-let split_transformation = trans_of_name "split_goal"
-let inline_transformation = trans_of_name "inline_goal"
-let intro_transformation = trans_of_name "introduce_premises"
-*)
-
-exception Not_applicable
-
-let apply_trans t task =
-  match t with
-    | Trans_one t ->
-	let t' = Trans.apply t task in
-	if task == t' then raise Not_applicable; [t']
-    | Trans_list t ->
-	match Trans.apply t task with
-	  | [t'] as l -> if task == t' then raise Not_applicable; l
-	  | l -> l
-
-(*
-let apply_transformation ~callback t task =
-   match t with
-    | Trans_one t ->
-	let callback t = callback [t] in
-	Gscheduler.apply_transformation ~callback t task
-    | Trans_list t ->
-	Gscheduler.apply_transformation_l ~callback t task
-*)
-
 type transformation_data = 
     { transformation_name : string;
       transformation : trans;
     }
 
 let transformation_id t = t.transformation_name
+
+let lookup_trans env name =
+  try
+    let t = Trans.lookup_transform name env in
+    Trans_one t
+  with Trans.UnknownTrans _ ->
+    let t = Trans.lookup_transform_l name env in
+    Trans_list t
+
+let lookup_transformation env =
+  let h = Hashtbl.create 13 in
+  fun name ->
+    try 
+      Hashtbl.find h name
+    with Not_found ->
+      let t = {transformation_name = name;
+	       transformation = lookup_trans env name }
+      in Hashtbl.add h name t; t
 
 type proof_attempt_status =
   | Undone
@@ -404,12 +374,12 @@ let schedule_delayed_action callback =
   Queue.push (Action_delayed callback) actions_queue;
   run_idle_handler ()
 
-let apply_transformation ~callback transf goal =
-  callback (Trans.apply transf goal)
-
-let apply_transformation_l ~callback transf goal =
-  callback (Trans.apply transf goal)
-
+let apply_transformation ~callback t task =
+   match t.transformation with
+    | Trans_one t ->
+	callback [Trans.apply t task]
+    | Trans_list t ->
+	callback (Trans.apply t task)
 
 let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
   let old =
@@ -428,10 +398,6 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
   Util.option_iter close_in old;
   close_out ch;
   let command = editor ^ " " ^ file in
-  (*
-  let _ = Sys.command command in
-  callback ()
-  *)
   schedule_edition command callback
 
 
@@ -962,9 +928,22 @@ let replay ~context_unproved_goals_only a =
 (* method: split selected goals *)
 (*****************************************************)
 
+let task_checksum t =
+  fprintf str_formatter "%a@." Pretty.print_task t;
+  let s = flush_str_formatter () in
 (*
+  let tmp = Filename.temp_file "task" "out" in
+  let c = open_out tmp in
+  output_string c s;
+  close_out c;
+*)
+  let sum = Digest.to_hex (Digest.string s) in
+(*
+  eprintf "task %s, sum = %s@." tmp sum;
+*)
+  sum
 
-let transformation_on_goal g trans_name trans =
+let transformation_on_goal g tr =
   if not g.proved then
     let callback subgoals =
       let b =
@@ -981,9 +960,7 @@ let transformation_on_goal g trans_name trans =
 	  | _ -> true
       in
       if b then
-	let transf_id = Db.transf_from_name trans_name in
-	let db_transf = Db.add_transformation g.goal_db transf_id	in
-	let tr = Helpers.add_transformation_row g db_transf trans_name in
+	let tr = raw_add_transformation g tr in
 	let goal_name = g.goal_name in
 	let fold =
 	  fun (acc,count) subtask ->
@@ -994,104 +971,47 @@ let transformation_on_goal g trans_name trans =
 	    let subgoal_name =
 	      goal_name ^ "." ^ (string_of_int count)
 	    in
-	    let sum = task_checksum subtask in
-	    let subtask_db =
-	      Db.add_subgoal db_transf subgoal_name sum
-	    in
 	    let goal =
-	      Helpers.add_goal_row (Transf tr)
-		subgoal_name expl subtask subtask_db
+	      raw_add_goal (Parent_transf tr)
+		subgoal_name expl subtask 
 	    in
 	    (goal :: acc, count+1)
 	in
 	let goals,_ =
 	  List.fold_left fold ([],1) subgoals
 	in
-	tr.subgoals <- List.rev goals;
-	Hashtbl.add g.transformations trans_name tr
+	tr.subgoals <- List.rev goals
     in
-    apply_transformation ~callback
-      trans g.task
+    apply_transformation ~callback tr g.task
 
-let split_goal g =
-  Gscheduler.schedule_delayed_action
-    (fun () ->
-       transformation_on_goal g "split_goal" split_transformation)
-
-let inline_goal g = transformation_on_goal g "inline_goal" inline_transformation
-
-let rec split_goal_or_children g =
+let rec transform_goal_or_children ~context_unproved_goals_only tr g =
   if not g.proved then
     begin
       let r = ref true in
       Hashtbl.iter
 	(fun _ t ->
 	   r := false;
-           List.iter split_goal_or_children
-             t.subgoals) g.transformations;
-      if !r then split_goal g
+           List.iter 
+	     (transform_goal_or_children ~context_unproved_goals_only tr)
+             t.subgoals) 
+	g.transformations;
+      if !r then 
+	schedule_delayed_action (fun () -> transformation_on_goal g tr)
     end
 
-let rec inline_goal_or_children g =
-  if not g.proved then
-    begin
-      let r = ref true in
-      Hashtbl.iter
-	(fun _ t ->
-	   r := false;
-           List.iter inline_goal_or_children
-             t.subgoals) g.transformations;
-      if !r then inline_goal g
-    end
 
-let split_selected_goal_or_children row =
-  let row = goals_model#get_iter row in
-  match goals_model#get ~row ~column:index_column with
-    | Row_goal g ->
-        split_goal_or_children g
-    | Row_theory th ->
-        List.iter split_goal_or_children th.goals
-    | Row_file file ->
+let transform ~context_unproved_goals_only tr a =
+  let tr = transform_goal_or_children ~context_unproved_goals_only tr in
+  match a with
+    | Goal g -> tr g
+    | Theory th -> List.iter tr th.goals
+    | File file ->
         List.iter
-          (fun th ->
-             List.iter split_goal_or_children th.goals)
+          (fun th -> List.iter tr th.goals)
           file.theories
-    | Row_proof_attempt a ->
-        split_goal_or_children a.proof_goal
-    | Row_transformation tr ->
-        List.iter split_goal_or_children tr.subgoals
+    | Proof_attempt a -> tr a.proof_goal
+    | Transformation t -> List.iter tr t.subgoals
 
-
-let inline_selected_goal_or_children row =
-  let row = goals_model#get_iter row in
-  match goals_model#get ~row ~column:index_column with
-    | Row_goal g ->
-        inline_goal_or_children g
-    | Row_theory th ->
-        List.iter inline_goal_or_children th.goals
-    | Row_file file ->
-        List.iter
-          (fun th ->
-             List.iter inline_goal_or_children th.goals)
-          file.theories
-    | Row_proof_attempt a ->
-        inline_goal_or_children a.proof_goal
-    | Row_transformation tr ->
-        List.iter inline_goal_or_children tr.subgoals
-
-let split_selected_goals () =
-  List.iter
-    split_selected_goal_or_children
-    goals_view#selection#get_selected_rows
-
-
-let inline_selected_goals () =
-  List.iter
-    inline_selected_goal_or_children
-    goals_view#selection#get_selected_rows
-
-
-*)
 
 
 (*****************************)
