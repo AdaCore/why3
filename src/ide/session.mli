@@ -21,9 +21,7 @@
 open Why
 
 
-type prover_data = Gconfig.prover_data
-
-(*
+type prover_data = private
     { prover_id : string;
       prover_name : string;
       prover_version : string;
@@ -32,7 +30,10 @@ type prover_data = Gconfig.prover_data
       driver : Driver.driver;
       mutable editor : string;
     }
-*)
+
+type transformation_data 
+
+val transformation_id : transformation_data -> string
 
 type proof_attempt_status = private
     | Undone
@@ -85,7 +86,8 @@ module Make(O: OBSERVER) : sig
       }
 
   and transf = private
-      { parent_goal : goal;
+      { transf : transformation_data;
+	parent_goal : goal;
 	mutable transf_proved : bool;
         transf_key : O.key;
         mutable subgoals : goal list;

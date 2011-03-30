@@ -295,6 +295,7 @@ let name_column = cols#add Gobject.Data.string
 let icon_column = cols#add Gobject.Data.gobject
 let status_column = cols#add Gobject.Data.gobject
 let time_column = cols#add Gobject.Data.string
+let index_column = cols#add Gobject.Data.int
 
 let name_renderer = GTree.cell_renderer_text [`XALIGN 0.]
 let renderer = GTree.cell_renderer_text [`XALIGN 0.]
@@ -386,11 +387,6 @@ module M = Session.Make
 
    end)
 
-let index_column : M.any GTree.column = 
-  eprintf "index column...@?";
-  let c = cols#add Gobject.Data.caml in
-  eprintf " done@."; c
-
 let set_row_status row b =
   if b then
     begin
@@ -415,15 +411,40 @@ let set_proof_state ~obsolete a =
   let t = if obsolete then t ^ " (obsolete)" else t in
   goals_model#set ~row ~column:time_column t
 
-let init row any = 
-  goals_model#set ~row ~column:index_column any;
-  goals_model#set ~row ~column:icon_column 
-    (match any with
-    | M.Goal _ -> !image_file
-    | M.Theory _ | M.File _ -> !image_directory
-    | M.Proof_attempt _ -> !image_prover
-    | M.Transformation _ -> !image_transf)
+let model_index = Hashtbl.create 17
 
+let get_any row = 
+  try 
+    let row = goals_model#get_iter row in
+    let idx = goals_model#get ~row ~column:index_column in
+    Hashtbl.find model_index idx
+  with Not_found -> invalid_arg "Gmain.get_index"
+
+let init = 
+  let cpt = ref 0 in 
+  fun row any ->
+    incr cpt;
+    Hashtbl.add model_index !cpt any;
+    goals_model#set ~row ~column:index_column !cpt;
+    goals_model#set ~row ~column:icon_column 
+      (match any with
+	 | M.Goal _ -> !image_file
+	 | M.Theory _ 
+	 | M.File _ -> !image_directory
+	 | M.Proof_attempt _ -> !image_prover
+	 | M.Transformation _ -> !image_transf);
+    goals_model#set ~row ~column:name_column 
+      (match any with
+	 | M.Goal g -> 
+	     (match g.M.goal_expl with 
+		| None -> g.M.goal_name
+		| Some s -> s)
+	 | M.Theory th -> th.M.theory.Theory.th_name.Ident.id_string
+	 | M.File f -> Filename.basename f.M.file_name
+	 | M.Proof_attempt a -> let p = a.M.prover in
+	   p.prover_name ^ " " ^ p.prover_version
+	 | M.Transformation tr -> Session.transformation_id tr.M.transf)
+      
 let notify any =
   match any with
     | M.Goal g ->
@@ -892,8 +913,7 @@ let () =
 let prover_on_selected_goals pr =
   List.iter
     (fun row ->
-       let row = goals_model#get_iter row in
-       let a = goals_model#get ~row ~column:index_column in
+       let a = get_any row in
         M.run_prover
           ~context_unproved_goals_only:!context_unproved_goals_only
           pr a)
@@ -907,8 +927,7 @@ let prover_on_selected_goals pr =
 let replay_obsolete_proofs () =
   List.iter
     (fun row ->
-       let row = goals_model#get_iter row in
-       let a = goals_model#get ~row ~column:index_column in
+       let a = get_any row in
        M.replay ~context_unproved_goals_only:!context_unproved_goals_only a)
     goals_view#selection#get_selected_rows
 
@@ -1519,8 +1538,8 @@ let scroll_to_theory th =
 
 (* to be run when a row in the tree view is selected *)
 let select_row p =
-  let row = goals_model#get_iter p in
-  match goals_model#get ~row ~column:index_column with
+  let a = get_any p in
+  match a with
     | M.Goal g ->
         let t = g.M.task in
         let t = match apply_trans intro_transformation t with
@@ -1557,8 +1576,7 @@ let select_row p =
 (*****************************)
 
 let edit_selected_row p =
-  let row = goals_model#get_iter p in
-  match goals_model#get ~row ~column:index_column with
+  match get_any p with
     | M.Goal _g ->
         ()
     | M.Theory _th ->

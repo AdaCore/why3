@@ -21,9 +21,7 @@
 open Why
 open Format
 
-type prover_data = Gconfig.prover_data
-
-(*
+type prover_data = 
     { prover_id : string;
       prover_name : string;
       prover_version : string;
@@ -32,7 +30,65 @@ type prover_data = Gconfig.prover_data
       driver : Driver.driver;
       mutable editor : string;
     }
+
+type trans =
+  | Trans_one of Task.task Trans.trans
+  | Trans_list of Task.task Trans.tlist
+
+(*
+let lookup_trans name =
+  try
+    let t = Trans.lookup_transform name gconfig.env in
+    Trans_one t
+  with Trans.UnknownTrans _ ->
+    let t = Trans.lookup_transform_l name gconfig.env in
+    Trans_list t
 *)
+
+(*
+let trans_list =
+  ["split_goal"; "inline_goal" ; "introduce_premises" ]
+
+let trans_of_name =
+  let h = Hashtbl.create 13 in
+  List.iter
+    (fun n -> Hashtbl.add h n (lookup_trans n))
+    trans_list;
+  Hashtbl.find h
+
+let split_transformation = trans_of_name "split_goal"
+let inline_transformation = trans_of_name "inline_goal"
+let intro_transformation = trans_of_name "introduce_premises"
+*)
+
+exception Not_applicable
+
+let apply_trans t task =
+  match t with
+    | Trans_one t ->
+	let t' = Trans.apply t task in
+	if task == t' then raise Not_applicable; [t']
+    | Trans_list t ->
+	match Trans.apply t task with
+	  | [t'] as l -> if task == t' then raise Not_applicable; l
+	  | l -> l
+
+(*
+let apply_transformation ~callback t task =
+   match t with
+    | Trans_one t ->
+	let callback t = callback [t] in
+	Gscheduler.apply_transformation ~callback t task
+    | Trans_list t ->
+	Gscheduler.apply_transformation_l ~callback t task
+*)
+
+type transformation_data = 
+    { transformation_name : string;
+      transformation : trans;
+    }
+
+let transformation_id t = t.transformation_name
 
 type proof_attempt_status =
   | Undone
@@ -78,7 +134,8 @@ and goal =
     }
 
 and transf =
-    { parent_goal : goal;
+    { transf : transformation_data;
+      parent_goal : goal;
       mutable transf_proved : bool;
       transf_key : O.key;
       mutable subgoals : goal list;
@@ -414,8 +471,10 @@ let raw_add_external_proof ~obsolete ~edit g p result =
             edited_as = edit;
           }
   in
-  Hashtbl.add g.external_proofs p.Gconfig.prover_name a;
-  !notify_fun (Proof_attempt a);
+  Hashtbl.add g.external_proofs p.prover_name a;
+  let any = Proof_attempt a in
+  !init_fun key any;
+  !notify_fun any;
   (* !notify_fun (Goal g) ? *)
   a
 
@@ -438,23 +497,29 @@ let raw_add_goal parent name expl t =
                proved = false;
              }
   in
-  !notify_fun (Goal goal);
+  let any = Goal goal in
+  !init_fun key any;
+  !notify_fun any;
   goal
 
 
 (* [raw_add_transformation g name adds a transformation to the given goal g
    Adds no subgoals, thus this should not be exported
 *)
-let raw_add_transformation g tr_name =
+let raw_add_transformation g trans =
   let parent = g.goal_key in
   let key = O.create ~parent () in
-  let tr = { parent_goal = g;
+  let tr = { transf = trans;
+	     parent_goal = g;
              transf_proved = false;
              transf_key = key;
              subgoals = [];
            }
   in
-  Hashtbl.add g.transformations tr_name tr;
+  Hashtbl.add g.transformations trans.transformation_name tr;
+  let any = Transformation tr in
+  !init_fun key any;
+  !notify_fun any;
   tr
 
 let raw_add_theory mfile th =
@@ -466,11 +531,10 @@ let raw_add_theory mfile th =
               goals = [] ;
               verified = false }
   in
+  let any = Theory mth in
+  !init_fun key any;
+  !notify_fun any;
   mth
-
-
-
-
 
 
 
@@ -493,13 +557,16 @@ let add_theory mfile th =
   mth
 
 let raw_add_file f =
-  let parent = O.create () in
+  let key = O.create () in
   let mfile = { file_name = f;
-                file_key = parent;
+                file_key = key;
                 theories = [] ;
                 file_verified = false }
   in
   all_files := !all_files @ [mfile];
+  let any = File mfile in
+  !init_fun key any;
+  !notify_fun any;
   mfile
 
 let add_file f theories =
@@ -776,12 +843,12 @@ let redo_external_proof g a =
     in
     schedule_proof_attempt
       ~debug:false ~timelimit:10 ~memlimit:0
-      ?old ~command:p.Gconfig.command ~driver:p.Gconfig.driver
+      ?old ~command:p.command ~driver:p.driver
       ~callback
       g.task
 
 let rec prover_on_goal p g =
-  let id = p.Gconfig.prover_id in
+  let id = p.prover_id in
   let a =
     try Hashtbl.find g.external_proofs id
     with Not_found ->
@@ -1038,7 +1105,7 @@ let edit_proof ~default_editor ~project_dir a =
   else
     let g = a.proof_goal in
     let t = g.task in
-    let driver = a.prover.Gconfig.driver in
+    let driver = a.prover.driver in
     let file =
       match a.edited_as with
         | "" ->
@@ -1072,7 +1139,7 @@ let edit_proof ~default_editor ~project_dir a =
             set_proof_state ~obsolete:false a res
     in
     let editor =
-      match a.prover.Gconfig.editor with
+      match a.prover.editor with
         | "" -> default_editor
         | s -> s
     in
