@@ -151,7 +151,7 @@ let gconfig =
   c.env <- Lexer.create_env loadpath;
   let provers = Whyconf.get_provers c.Gconfig.config in
   c.provers <-
-    Util.Mstr.fold (Gconfig.get_prover_data c.env) provers Util.Mstr.empty;
+    Util.Mstr.fold (Session.get_prover_data c.env) provers Util.Mstr.empty;
   c
 
 let () =
@@ -917,11 +917,11 @@ module Helpers = struct
 
   let add_external_proof_row ~obsolete ~edit g p db_proof result (*_time*) =
     let parent = g.goal_row in
-    let name = p.prover_name in
+    let name = p.Session.prover_name in
     let row = goals_model#prepend ~parent () in
     goals_model#set ~row ~column:icon_column !image_prover;
     goals_model#set ~row ~column:name_column
-      (name ^ " " ^ p.prover_version);
+      (name ^ " " ^ p.Session.prover_version);
 (*
     goals_model#set ~row ~column:visible_column true;
 *)
@@ -943,7 +943,7 @@ module Helpers = struct
             }
     in
     goals_model#set ~row ~column:index_column (Row_proof_attempt a);
-    Hashtbl.add g.external_proofs p.prover_id a;
+    Hashtbl.add g.external_proofs p.Session.prover_id a;
     set_proof_state ~obsolete a result;
     a
 
@@ -1403,12 +1403,12 @@ let redo_external_proof g a =
   in
   Gscheduler.schedule_proof_attempt
     ~debug:(gconfig.verbose > 0) ~timelimit:gconfig.time_limit ~memlimit:0
-    ?old ~command:p.command ~driver:p.driver
+    ?old ~command:p.Session.command ~driver:p.Session.driver
     ~callback
     g.Model.task
 
 let rec prover_on_goal p g =
-  let id = p.prover_id in
+  let id = p.Session.prover_id in
   let a =
     try Hashtbl.find g.Model.external_proofs id
     with Not_found ->
@@ -1868,7 +1868,7 @@ let () =
   let add_item_provers () =
     Util.Mstr.iter
       (fun _ p ->
-         let n = p.prover_name ^ " " ^ p.prover_version in
+         let n = p.Session.prover_name ^ " " ^ p.Session.prover_version in
          let (_ : GMenu.image_menu_item) =
            tools_factory#add_image_item ~label:n
              ~callback:(fun () -> prover_on_selected_goals p)
@@ -2168,7 +2168,7 @@ let edit_selected_row p =
         else
         let g = a.Model.proof_goal in
 	let t = g.Model.task in
-	let driver = a.Model.prover.driver in
+	let driver = a.Model.prover.Session.driver in
 	let file =
           match a.Model.edited_as with
             | "" ->
@@ -2203,9 +2203,9 @@ let edit_selected_row p =
                 Helpers.set_proof_state ~obsolete:false a res
         in
         let editor =
-          match a.Model.prover.editor with
+          match a.Model.prover.Session.editor with
             | "" -> gconfig.default_editor
-            | _ -> a.Model.prover.editor
+            | s -> s
         in
         Gscheduler.edit_proof ~debug:false ~editor
           ~file
@@ -2262,11 +2262,11 @@ let remove_proof_attempt a =
   Db.remove_proof_attempt a.Model.proof_db;
   let (_:bool) = goals_model#remove a.Model.proof_row in
   let g = a.Model.proof_goal in
-  Hashtbl.remove g.Model.external_proofs a.Model.prover.prover_id;
+  Hashtbl.remove g.Model.external_proofs a.Model.prover.Session.prover_id;
   Helpers.check_goal_proved g
 
+
 let remove_transf t =
-  (* TODO: remove subgoals first !!! *)
   Db.remove_transformation t.Model.transf_db;
   let (_:bool) = goals_model#remove t.Model.transf_row in
   let g = t.Model.parent_goal in

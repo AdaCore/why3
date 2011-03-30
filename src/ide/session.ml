@@ -31,6 +31,25 @@ type prover_data =
       mutable editor : string;
     }
 
+let get_prover_data env id pr acc =
+  try
+    let dr = Driver.load_driver env pr.Whyconf.driver in
+    Util.Mstr.add id
+      { prover_id = id ;
+      prover_name = pr.Whyconf.name;
+      prover_version = pr.Whyconf.version;
+      command = pr.Whyconf.command;
+      driver_name = pr.Whyconf.driver;
+      driver = dr;
+      editor = pr.Whyconf.editor;
+    }
+      acc
+  with _e ->
+    eprintf "Failed to load driver %s for prover %s. prover disabled@."
+      pr.Whyconf.driver pr.Whyconf.name;
+    acc
+
+
 type trans =
   | Trans_one of Task.task Trans.trans
   | Trans_list of Task.task Trans.tlist

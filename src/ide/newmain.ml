@@ -149,7 +149,7 @@ let gconfig =
   c.env <- Lexer.create_env loadpath;
   let provers = Whyconf.get_provers c.Gconfig.config in
   c.provers <-
-    Util.Mstr.fold (Gconfig.get_prover_data c.env) provers Util.Mstr.empty;
+    Util.Mstr.fold (Session.get_prover_data c.env) provers Util.Mstr.empty;
   c
 
 let () =
@@ -442,7 +442,7 @@ let init =
 	 | M.Theory th -> th.M.theory.Theory.th_name.Ident.id_string
 	 | M.File f -> Filename.basename f.M.file_name
 	 | M.Proof_attempt a -> let p = a.M.prover in
-	   p.prover_name ^ " " ^ p.prover_version
+	   p.Session.prover_name ^ " " ^ p.Session.prover_version
 	 | M.Transformation tr -> Session.transformation_id tr.M.transf)
       
 let notify any =
@@ -1300,7 +1300,7 @@ let () =
   let add_item_provers () =
     Util.Mstr.iter
       (fun _ p ->
-         let n = p.prover_name ^ " " ^ p.prover_version in
+         let n = p.Session.prover_name ^ " " ^ p.Session.prover_version in
          let (_ : GMenu.image_menu_item) =
            tools_factory#add_image_item ~label:n
              ~callback:(fun () -> prover_on_selected_goals p)

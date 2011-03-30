@@ -31,6 +31,10 @@ type prover_data = private
       mutable editor : string;
     }
 
+val get_prover_data : 
+  Env.env -> Util.Mstr.key -> Whyconf.config_prover ->
+  prover_data Util.Mstr.t -> prover_data Util.Mstr.t
+
 type transformation_data 
 
 val transformation_id : transformation_data -> string

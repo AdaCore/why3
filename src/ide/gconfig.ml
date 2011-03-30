@@ -24,7 +24,8 @@ open Rc
 open Whyconf
 
 
-type prover_data =
+type prover_data = Session.prover_data
+(*
     { prover_id : string;
       prover_name : string;
       prover_version : string;
@@ -33,6 +34,7 @@ type prover_data =
       driver : Driver.driver;
       mutable editor : string;
     }
+*)
 
 type t =
     { mutable window_width : int;
@@ -85,24 +87,6 @@ let load_ide section =
         "default_editor";
   }
 
-let get_prover_data env id pr acc =
-  try
-    let dr = Driver.load_driver env pr.Whyconf.driver in
-    Mstr.add id
-      { prover_id = id ;
-      prover_name = pr.Whyconf.name;
-      prover_version = pr.Whyconf.version;
-      command = pr.Whyconf.command;
-      driver_name = pr.Whyconf.driver;
-      driver = dr;
-      editor = pr.Whyconf.editor;
-    }
-      acc
-  with _e ->
-    eprintf "Failed to load driver %s for prover %s. prover disabled@."
-      pr.Whyconf.driver pr.Whyconf.name;
-    acc
-
 let load_config config =
   let main = get_main config in
   let ide  = match get_section config "ide" with
@@ -144,13 +128,13 @@ let read_config () =
 
 let save_config t =
   let save_prover _ pr acc =
-    Mstr.add pr.prover_id
+    Mstr.add pr.Session.prover_id
       {
-        Whyconf.name    = pr.prover_name;
-        command = pr.command;
-        driver  = pr.driver_name;
-        version = pr.prover_version;
-        editor  = pr.editor;
+        Whyconf.name    = pr.Session.prover_name;
+        command = pr.Session.command;
+        driver  = pr.Session.driver_name;
+        version = pr.Session.prover_version;
+        editor  = pr.Session.editor;
       } acc in
   let config = t.config in
   let config = set_main config
@@ -420,7 +404,7 @@ let run_auto_detection gconfig =
   let config = Autodetection.run_auto_detection gconfig.config in
   gconfig.config <- config;
   let provers = get_provers config in
-  gconfig.provers <- Mstr.fold (get_prover_data gconfig.env) provers Mstr.empty
+  gconfig.provers <- Mstr.fold (Session.get_prover_data gconfig.env) provers Mstr.empty
 
 
 let () = eprintf "end of configuration initialization@."

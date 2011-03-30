@@ -19,7 +19,8 @@
 
 open Why
 
-type prover_data =
+type prover_data = Session.prover_data
+(*
     { prover_id : string;
       prover_name : string;
       prover_version : string;
@@ -28,6 +29,7 @@ type prover_data =
       driver : Driver.driver;
       mutable editor : string;
     }
+*)
 
 type t =
     { mutable window_width : int;
@@ -45,9 +47,11 @@ type t =
       mutable config : Whyconf.config;
     }
 
+(*
 val get_prover_data : Why.Env.env -> string ->
   Why.Whyconf.config_prover ->
   prover_data Why.Util.Mstr.t -> prover_data Why.Util.Mstr.t
+*)
 
 val save_config : unit -> unit
 
@@ -97,6 +101,6 @@ val run_auto_detection : t -> unit
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/whyide.opt"
+compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"
 End:
 *)
