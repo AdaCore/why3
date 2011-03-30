@@ -415,14 +415,16 @@ and wp_desc env e q = match e.expr_desc with
 	wp_expr env e1 q1
       in
       let f = wp_and ~sym:true
-	(f_subst (subst1 x.pv_vs (t_var v1.pv_vs)) inv)
+	(wp_expl "for loop initialization"
+	   (f_subst (subst1 x.pv_vs (t_var v1.pv_vs)) inv))
 	(quantify env e.expr_effect
 	   (wp_and ~sym:true
-	      (wp_forall x.pv_vs
+	      (wp_expl "for loop preservation"
+		(wp_forall x.pv_vs
 	         (wp_implies 
 		    (wp_and (f_app le [t_var v1.pv_vs; t_var x.pv_vs])
 		            (f_app le [t_var x.pv_vs;  t_var v2.pv_vs]))
-                 (wp_implies inv wp1)))
+                 (wp_implies inv wp1))))
 	      (let sv2 = t_app add [t_var v2.pv_vs; incr] ty_int in
 	       wp_implies (f_subst (subst1 x.pv_vs sv2) inv) q1)))
       in
