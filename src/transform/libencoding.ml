@@ -198,3 +198,18 @@ let d_monomorph ty_base kept lsmap d =
   in
   let add ls acc = create_logic_decl [ls,None] :: acc in
   Sls.fold add !consts dl
+
+(** close by subterm *)
+let close_kept =
+  Trans.on_tagged_ty Encoding.meta_kept (fun kept ->
+    let fold ty acc =
+      let rec add acc ty = ty_fold add (Sty.add ty acc) ty in
+      add acc ty in
+    let kept' = Sty.fold fold kept kept in
+    if kept == kept' then Trans.identity
+    else
+      let kept' = Sty.diff kept' kept in
+      let fold ty acc =
+        Theory.create_meta Encoding.meta_kept [Theory.MAty ty] :: acc in
+      Trans.add_tdecls (Sty.fold fold kept' [])
+  )

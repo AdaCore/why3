@@ -64,6 +64,9 @@ val tgoal_l : (prsymbol -> fmla -> tdecl list list) -> task tlist
 
 val rewrite : (term -> term) -> (fmla -> fmla) -> task -> task trans
 
+val add_decls  : decl list -> task trans
+val add_tdecls : tdecl list -> task trans
+
 (* dependent transformatons *)
 
 val on_meta : meta -> (meta_arg list list -> 'a trans) -> 'a trans

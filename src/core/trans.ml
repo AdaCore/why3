@@ -129,6 +129,14 @@ let tgoal_l = gen_goal_l add_tdecl
 
 let rewrite fnT fnF = decl (fun d -> [decl_map fnT fnF d])
 
+let gen_add_decl add decls = function
+  | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
+    add_decl (List.fold_left add prev decls) d
+  | _ -> assert false
+
+let add_decls  = gen_add_decl add_decl
+let add_tdecls = gen_add_decl add_tdecl
+
 (** dependent transformations *)
 
 module Wtds = Hashweak.Make (struct

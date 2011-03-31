@@ -275,9 +275,11 @@ let decl tenv d =
   res
 *)
 
-let t env = Trans.on_tagged_ty meta_kept (fun s ->
-  let init_task,tenv = load_prelude s env in
-  Trans.tdecl (decl tenv) init_task)
+let t env =
+  Trans.compose Libencoding.close_kept
+  (Trans.on_tagged_ty meta_kept (fun s ->
+    let init_task,tenv = load_prelude s env in
+    Trans.tdecl (decl tenv) init_task))
 
 let () = register_enco_kept "bridge" t
 

@@ -528,9 +528,10 @@ let create_trans_complete kept complete =
   Trans.fold_map fold_map env init_task
 
 let encoding_instantiate =
-  Trans.on_tagged_ty meta_kept (fun kept ->
-  Trans.on_meta_excl meta_complete (fun complete ->
-    create_trans_complete kept complete))
+  Trans.compose Libencoding.close_kept
+  (Trans.on_tagged_ty meta_kept (fun kept ->
+    Trans.on_meta_excl meta_complete (fun complete ->
+      create_trans_complete kept complete)))
 
 let () =
   register_enco_kept "instantiate" (fun _ -> encoding_instantiate)
