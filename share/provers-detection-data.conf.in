@@ -14,6 +14,18 @@ version_old = "0.8"
 command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
 driver = "drivers/alt_ergo.drv"
 
+[ATP alt-ergo]
+name = "Alt-Ergo"
+exec = "ergo"
+exec = "alt-ergo"
+exec = "alt-ergo-0.91"
+version_switch = "-version"
+version_regexp = ".*Ergo \\([^ \n]*\\)"
+version_ok = "0.92.3"
+command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
+driver = "drivers/alt_ergo_trunk.drv"
+
+
 [ATP cvc3]
 name = "CVC3"
 exec = "cvc3"
@@ -89,7 +101,7 @@ command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
 driver = "drivers/verit.drv"
 
 [ATP z3_smtv1]
-name = "Z3"
+name = "Z3_smtv1"
 exec = "z3"
 exec = "z3-2.2"
 version_switch = "-version"
