@@ -179,40 +179,60 @@ let get_all_files () = !all_files
 (* saving state on disk *)
 (************************)
 
-let save_proof_attempt fmt _ _a =
-  fprintf fmt "<proof TODO/>@\n"
+let save_result fmt r =
+  fprintf fmt "<%s time=\"%.2f\"/>@\n"
+    (match r.Call_provers.pr_answer with
+       | Call_provers.Valid -> "valid"
+       | Call_provers.Failure _ -> "failure"
+       | Call_provers.Unknown _ -> "unknown"
+       | Call_provers.HighFailure -> "highfailure"
+       | Call_provers.Timeout -> "timeout"
+       | Call_provers.Invalid -> "invalid")
+    r.Call_provers.pr_time
+
+let save_status fmt s =
+  match s with
+    | Undone | Scheduled | Running | InternalFailure _ -> ()
+    | Done r -> save_result fmt r
+
+let save_proof_attempt fmt _key a =
+  fprintf fmt "@[<v 1><proof prover=\"%s\" edited=\"%s\">@\n" 
+    a.prover.prover_id
+    a.edited_as;
+  save_status fmt a.proof_state;
+  fprintf fmt "</proof>@]@\n"
 
 let opt lab fmt = function
   | None -> ()
   | Some s -> fprintf fmt "%s=\"%s\" " lab s
 
 let rec save_goal fmt g =
-  fprintf fmt "<goal name=\"%s\" %aproved=%b>@\n" 
+  fprintf fmt "@[<v 1><goal name=\"%s\" %aproved=\"%b\">@\n" 
     g.goal_name (opt "expl") g.goal_expl g.proved;
   Hashtbl.iter (save_proof_attempt fmt) g.external_proofs;
-  fprintf fmt "</goal>@\n"
+  fprintf fmt "</goal>@]@\n"
 
 (*
 and save_trans fmt t =
 *)
 
 let save_theory fmt t =
-  fprintf fmt "<theory name=\"%s\" verified=%b>@\n" "todo" t.verified;
+  fprintf fmt "@[<v 1><theory name=\"%s\" verified=\"%b\">@\n" "todo" t.verified;
   List.iter (save_goal fmt) t.goals;
-  fprintf fmt "</theory>@\n"
+  fprintf fmt "</theory>@]@\n"
 
 let save_file fmt f =
-  fprintf fmt "<file name=\"%s\" verified=%b>@\n" f.file_name f.file_verified;
+  fprintf fmt "@[<v 1><file name=\"%s\" verified=\"%b\">@\n" f.file_name f.file_verified;
   List.iter (save_theory fmt) f.theories;
-  fprintf fmt "</file>@\n"
+  fprintf fmt "</file>@]@\n"
   
 let save fname =
   let ch = open_out fname in
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
-  fprintf fmt "<project name=\"%s\">@\n" (Filename.basename fname);
+  fprintf fmt "@[<v 1><project name=\"%s\">@\n" (Filename.basename fname);
   List.iter (save_file fmt) (get_all_files());
-  fprintf fmt "</project>@.";
+  fprintf fmt "</project>@]@.";
   close_out ch
 
 let test_save () = save "essai.xml"
