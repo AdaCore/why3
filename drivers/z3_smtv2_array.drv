@@ -164,6 +164,7 @@ theory array.Array
   meta "encoding : lskept" logic get
   meta "encoding : lskept" logic set
   meta "encoding : lskept" logic create_const
+
   meta "smt_dist_syntax" logic get, "(select %1 %2)"
   meta "smt_dist_syntax" logic set, "(store %1 %2 %3)"
   meta "smt_dist_syntax" logic create_const, "(const[%t0] %1)"

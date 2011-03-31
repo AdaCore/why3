@@ -301,7 +301,7 @@ let env_from_kept_lskept kept lskept =
           try
             let subst = ty_match subst ty tykept in
             aux insts (tykept::tydisl) subst tyl
-          with Not_found -> insts
+          with TypeMismatch _ -> insts
         in
         Sty.fold fold_ty kept insts
     in
@@ -344,18 +344,20 @@ let env_of_metas metas =
   in
   List.fold_left fold Mls.empty metas
 
-let env_from_fold lskept env ls tyl tyv =
+let env_from_fold lskept (env,kept) ls tyl tyv =
   if Sls.mem ls lskept &&
     List.for_all is_ty_mono tyl && option_apply true is_ty_mono tyv then
     let tydisl = option_apply tyl (fun e -> e::tyl) tyv
     in
     let lsdis = create_lsymbol (id_clone ls.ls_name) tyl tyv in
     let insts = Mls.find_default ls Mtyl.empty env in
-    Mls.add ls (Mtyl.add tydisl lsdis insts) env
-  else env
+    Mls.add ls (Mtyl.add tydisl lsdis insts) env,
+    List.fold_left (fun acc ty -> Sty.add ty acc) kept tydisl
+  else (env,kept)
 
-let mono_in_goal sls pr f =
-  let env = f_app_fold (env_from_fold sls) Mls.empty f in
+let mono_in_goal lskept pr f =
+  let _,kept = f_app_fold (env_from_fold lskept) (Mls.empty,Sty.empty) f in
+  let env = env_from_kept_lskept kept lskept in
   (* Format.eprintf "mono_in_goal %a@." print_env env; *)
   metas_of_env env [create_decl (create_prop_decl Pgoal pr f)]
 

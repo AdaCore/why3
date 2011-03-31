@@ -189,6 +189,6 @@ let run_auto_detection config =
   let main = get_main config in
   let l = read_auto_detection_data main in
   let detect = List.fold_left (detect_prover main) Mstr.empty l in
-  let length = Mstr.fold (fun _ _ i -> i+1) detect 0 in
+  let length = Mstr.cardinal detect in
   eprintf "%d provers detected.@." length;
   set_provers config detect
