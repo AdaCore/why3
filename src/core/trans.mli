@@ -35,6 +35,7 @@ val identity   : task trans
 val identity_l : task tlist
 
 val singleton : 'a trans -> 'a tlist
+val return    : 'a -> 'a trans
 
 val compose   : task trans -> 'a trans -> 'a trans
 val compose_l : task tlist -> 'a tlist -> 'a tlist

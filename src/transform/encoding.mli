@@ -22,6 +22,8 @@ open Theory
 open Task
 open Trans
 
+val debug : Debug.flag
+
 val meta_kept : meta
 val meta_kept_array : meta
 val meta_base : meta

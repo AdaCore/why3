@@ -27,7 +27,7 @@ open Task
 open Decl
 open Encoding
 
-(*
+
 (* Ce type est utiliser pour indiquer un underscore *)
 let tv_dumb = create_tvsymbol (id_fresh "Dumb")
 let ty_dumb = ty_var tv_dumb
@@ -50,26 +50,14 @@ module Mtyl = Map.Make(OHTyl)
 module Htyl = Hashtbl.Make(OHTyl)
 
 (* The environnement of the transformation between two decl (* unmutable *) *)
-type env = {
-  keep : ty Mty.t;
-  poly_ts : tysymbol;
-  edefined_lsymbol : lsymbol Mtyl.t Mls.t;
-}
-
-(* The environnement of the transformation during
-   the transformation of a formula *)
-type menv = {
-  env : env;
-  mutable defined_lsymbol : lsymbol Mtyl.t Mls.t;
-  mutable undef_lsymbol : Sls.t;
-}
+type env = lsymbol Mtyl.t Mls.t
 
 let print_env fmt menv =
   Format.fprintf fmt "defined_lsymbol (%a)@."
     (Pp.print_iter2 Mls.iter Pp.semi Pp.comma Pretty.print_ls
        (Pp.print_iter2 Mtyl.iter Pp.semi Pp.arrow
           (Pp.print_list Pp.space Pretty.print_ty)
-          Pretty.print_ls)) menv.defined_lsymbol
+          Pretty.print_ls)) menv
 
 (* let create_arrays th = *)
 (*   { *)
@@ -103,97 +91,107 @@ let find_arrays menv ty =
   (*   arrays *)
 *)
 
-let projty menv ty = Mty.find_default ty ty menv.env.keep
+let find_logic env p tl tyv =
+  if ls_equal p ps_equ then p else
+    try
+      let insts = Mls.find p env in
+      let inst = option_apply tl (fun e -> e::tl) tyv in
+      Mtyl.find inst insts
+    with Not_found -> p
 
-let conv_vs menv tvar vsvar vs =
-  let ty = projty menv (ty_inst tvar vs.vs_ty) in
+(* let find_logic env p tl tyv = *)
+(*   let p2 = find_logic env p tl tyv in *)
+(*   Format.eprintf "p : %a, tl : %a, tv : %a,  p2 : %a@." *)
+(*     Pretty.print_ls p *)
+(*     (Pp.print_list Pp.space Pretty.print_ty) tl *)
+(*     (Pp.print_option Pretty.print_ty) tyv *)
+(*     Pretty.print_ls p2; *)
+(*   p2 *)
+
+(* let find_logic menv tvar p tl tyv = *)
+(*   if ls_equal p ps_equ then p else begin *)
+(*     (\** project the type on : keep + {dumb} *\) *)
+(*     let to_dumb {t_ty = ty} = *)
+(*       let ty = ty_inst tvar ty in *)
+(*       Mty.find_default ty ty_dumb menv.env.keep in *)
+(*     let inst_l = List.map to_dumb tl in *)
+(*     let inst_tyv = option_map to_dumb tyv in *)
+(*     let inst_l_tyv = option_apply inst_l (fun e -> e::inst_l) inst_tyv in *)
+(*     (\* Format.eprintf "env : %ap : %a | arg : %a| tyl = %a | inst_l : %a@."
+ *\) *)
+(*     (\*   print_env menv *\) *)
+(*     (\*   Pretty.print_ls p *\) *)
+(*     (\*   (Pp.print_list Pp.comma Pretty.print_ty) p.ls_args *\) *)
+(*     (\*   (Pp.print_list Pp.comma Pretty.print_ty) *\) *)
+(*     (\*   (List.map (fun t -> ty_inst tvar t.t_ty) tl) *\) *)
+(*     (\*   (Pp.print_list Pp.comma Pretty.print_ty) inst_l_tyv; *\) *)
+(*     try *)
+(*       let insts = Mls.find p menv.defined_lsymbol in *)
+(*       Mtyl.find inst_l_tyv insts *)
+(*     with Not_found -> *)
+(*       let insts = Mls.find_default p Mtyl.empty menv.defined_lsymbol in *)
+(*       let to_new tyd ty = if ty_equal tyd ty_dumb then ty else tyd in *)
+(*       let arg = List.map2 to_new inst_l p.ls_args in *)
+(*       let value = option_map2 to_new inst_tyv p.ls_value in *)
+(*       let ls = if List.for_all2 ty_equal arg p.ls_args && *)
+(*           option_eq ty_equal value p.ls_value *)
+(*         then p else clone_lsymbol p arg value in *)
+(*       let insts = Mtyl.add inst_l_tyv ls insts in *)
+(*       menv.defined_lsymbol <- Mls.add p insts menv.defined_lsymbol; *)
+(*       menv.undef_lsymbol <- Sls.add ls menv.undef_lsymbol; *)
+(*       ls *)
+(*   end *)
+
+let conv_vs tvar vsvar vs =
+  let ty = ty_inst tvar vs.vs_ty in
   let vs' = if ty_equal ty vs.vs_ty then vs else
       create_vsymbol (id_clone vs.vs_name) ty in
   Mvs.add vs (t_var vs') vsvar,vs'
 
-
-(* Weakmemo only on the symbols *)
-let clone_lsymbol p arg result = create_lsymbol (id_clone p.ls_name) arg result
-
-let find_logic menv tvar p tl tyv =
-  if ls_equal p ps_equ then p else begin
-    (** project the type on : keep + {dumb} *)
-    let to_dumb {t_ty = ty} =
-      let ty = ty_inst tvar ty in
-      Mty.find_default ty ty_dumb menv.env.keep in
-    let inst_l = List.map to_dumb tl in
-    let inst_tyv = option_map to_dumb tyv in
-    let inst_l_tyv = option_apply inst_l (fun e -> e::inst_l) inst_tyv in
-    (* Format.eprintf "env : %ap : %a | arg : %a| tyl = %a | inst_l : %a@." *)
-    (*   print_env menv *)
-    (*   Pretty.print_ls p *)
-    (*   (Pp.print_list Pp.comma Pretty.print_ty) p.ls_args *)
-    (*   (Pp.print_list Pp.comma Pretty.print_ty) *)
-    (*   (List.map (fun t -> ty_inst tvar t.t_ty) tl) *)
-    (*   (Pp.print_list Pp.comma Pretty.print_ty) inst_l_tyv; *)
-    try
-      let insts = Mls.find p menv.defined_lsymbol in
-      Mtyl.find inst_l_tyv insts
-    with Not_found ->
-      let insts = Mls.find_default p Mtyl.empty menv.defined_lsymbol in
-      let to_new tyd ty = if ty_equal tyd ty_dumb then ty else tyd in
-      let arg = List.map2 to_new inst_l p.ls_args in
-      let value = option_map2 to_new inst_tyv p.ls_value in
-      let ls = if List.for_all2 ty_equal arg p.ls_args &&
-          option_eq ty_equal value p.ls_value
-        then p else clone_lsymbol p arg value in
-      let insts = Mtyl.add inst_l_tyv ls insts in
-      menv.defined_lsymbol <- Mls.add p insts menv.defined_lsymbol;
-      menv.undef_lsymbol <- Sls.add ls menv.undef_lsymbol;
-      ls
-  end
-
 (* The convertion of term and formula *)
-let rec rewrite_term menv tvar vsvar t =
-  let fnT = rewrite_term menv tvar in
-  let fnF = rewrite_fmla menv tvar in
+let rec rewrite_term env tvar vsvar t =
+  let fnT = rewrite_term env tvar in
+  let fnF = rewrite_fmla env tvar in
   (* Format.eprintf "@[<hov 2>Term : %a =>@\n@?" Pretty.print_term t; *)
   let t = match t.t_node with
     | Tconst _ -> t
     | Tvar x -> Mvs.find x vsvar
     | Tapp(p,tl) ->
-      let tl' = List.map (fnT vsvar) tl in
-      let p = find_logic menv tvar p tl (Some t) in
-      t_app p tl' (projty menv (ty_inst tvar t.t_ty))
+      let tl = List.map (fnT vsvar) tl in
+      let p = find_logic env p (List.map (fun t -> t.t_ty) tl)
+        (Some (ty_inst tvar t.t_ty)) in
+      t_app p tl (ty_inst tvar t.t_ty)
     | Tif(f, t1, t2) ->
       t_if (fnF vsvar f) (fnT vsvar t1) (fnT vsvar t2)
-    | Tlet (t1, b) -> let u,t2,cb = t_open_bound_cb b in
-      let (vsvar',u) = conv_vs menv tvar vsvar u in
+    | Tlet (t1, b) ->
+      let u,t2,cb = t_open_bound_cb b in
+      let (vsvar',u) = conv_vs tvar vsvar u in
       let t1 = fnT vsvar t1 in let t2 = fnT vsvar' t2 in
       t_let t1 (cb u t2)
     | Tcase _ | Teps _ ->
       Printer.unsupportedTerm t
-        "Encoding instantiate : I can't encode this term" in
+        "Encoding arrays : I can't encode this term" in
   (* Format.eprintf "@[<hov 2>Term : => %a : %a@\n@?" *)
   (*   Pretty.print_term t Pretty.print_ty t.t_ty; *)
   t
 
-and rewrite_fmla menv tvar vsvar f =
-  let fnT = rewrite_term menv tvar in
-  let fnF = rewrite_fmla menv tvar in
+and rewrite_fmla env tvar vsvar f =
+  let fnT = rewrite_term env tvar in
+  let fnF = rewrite_fmla env tvar in
   (* Format.eprintf "@[<hov 2>Fmla : %a =>@\n@?" Pretty.print_fmla f; *)
   match f.f_node with
     | Fapp(p, tl) ->
-      let tl' = List.map (fnT vsvar) tl in
-      let p = find_logic menv tvar p tl None in
-      f_app p tl'
+      let tl = List.map (fnT vsvar) tl in
+      let p = find_logic env p (List.map (fun t -> t.t_ty) tl) None in
+      f_app p tl
     | Fquant(q, b) ->
       let vl, tl, f1, cb = f_open_quant_cb b in
-      let vsvar,vl = map_fold_left (conv_vs menv tvar) vsvar vl in
-
+      let vsvar,vl = map_fold_left (conv_vs tvar) vsvar vl in
       let f1 = fnF vsvar f1 in
-      (* Ici un trigger qui ne match pas assez de variables
-         peut être généré *)
       let tl = tr_map (fnT vsvar) (fnF vsvar) tl in
-      let vl = List.rev vl in
       f_quant q (cb vl tl f1)
     | Flet (t1, b) -> let u,f2,cb = f_open_bound_cb b in
-      let (vsvar',u) = conv_vs menv tvar vsvar u in
+      let (vsvar',u) = conv_vs tvar vsvar u in
       let t1 = fnT vsvar t1 and f2 = fnF vsvar' f2 in
       (* Format.eprintf "u.vs_ty : %a == t1.t_ty : %a@." *)
       (*    Pretty.print_ty u.vs_ty Pretty.print_ty t1.t_ty; *)
@@ -207,42 +205,45 @@ module Ssubst =
                   let compare = Mtv.compare OHTy.compare end)
 
 
-(* Generation of all the possible instantiation of a formula *)
-let gen_tvar su =
-  (* Try to apply one subst on all the other subst generated until then
-     (ie. in su), that give newly generated subst (ie to put in su)*)
-  let aux subst su =
-    (* filter the possible application of substitution *)
-    let disj_union m1 m2 = Mtv.union (fun _ ty1 ty2 ->
-      if ty_equal ty1 ty2 then Some ty1 else raise Exit) m1 m2 in
-    let fold subst1 acc =
-      try Ssubst.add (disj_union subst1 subst) acc with Exit -> acc in
-    Ssubst.fold fold su su in
-  Ssubst.fold aux su (Ssubst.singleton (Mtv.empty))
+(* (\* Generation of all the possible instantiation of a formula *\) *)
+(* let gen_tvar su = *)
+(*   (\* Try to apply one subst on all the other subst generated until then *)
+(*      (ie. in su), that give newly generated subst (ie to put in su)*\) *)
+(*   let aux subst su = *)
+(*     (\* filter the possible application of substitution *\) *)
+(*     let disj_union m1 m2 = Mtv.union (fun _ ty1 ty2 -> *)
+(*       if ty_equal ty1 ty2 then Some ty1 else raise Exit) m1 m2 in *)
+(*     let fold subst1 acc = *)
+(*       try Ssubst.add (disj_union subst1 subst) acc with Exit -> acc in *)
+(*     Ssubst.fold fold su su in *)
+(*   Ssubst.fold aux su (Ssubst.singleton (Mtv.empty)) *)
 
-(* find all the possible instantiation which can give a type of env.keep *)
+(* find all the possible instantiation which can create a kept instantiation *)
 let ty_quant env =
-  let rec add_vs s ty =
-    let s = ty_fold add_vs s ty in
-    match ty.ty_node with
-      | Tyapp(app,_) when ts_equal app env.poly_ts  ->
-        Mty.fold (fun uty _ s ->
-          try
-            Ssubst.add (ty_match Mtv.empty ty uty) s
-          with Ty.TypeMismatch _ ->
-            (* No instantiation possible *)
-            s
-        )
-          env.keep s
-      | _ -> s in
-  f_ty_fold add_vs Ssubst.empty
+  let rec add_vs acc0 ls tyl tyv =
+    if ls_equal ls ps_equ then acc0 else
+      try
+        let insts = Mls.find ls env in
+        let tyl = option_apply tyl (fun e -> e::tyl) tyv in
+        let fold_inst inst _ acc =
+          let fold_subst subst acc =
+            try
+              let subst = List.fold_left2 ty_match subst tyl inst  in
+              Ssubst.add subst acc
+            with TypeMismatch _ -> acc
+          in
+          (* fold on acc0 *)
+          Ssubst.fold fold_subst acc0 acc
+        in
+        Mtyl.fold fold_inst insts acc0
+      with Not_found (* no such p *) -> acc0
+  in
+  f_app_fold add_vs (Ssubst.singleton (Mtv.empty))
 
 (* The Core of the transformation *)
-let fold_map task_hd ((env:env),task) =
-  match task_hd.task_decl.td_node with
-    | Use _ | Clone _ | Meta _ -> env,add_tdecl task task_hd.task_decl
-    | Decl d -> match d.d_node with
-    | Dtype [_,Tabstract] -> env,add_tdecl task task_hd.task_decl
+let map env d =
+    match d.d_node with
+    | Dtype [_,Tabstract] -> [d]
     | Dtype _ -> Printer.unsupportedDecl
         d "encoding_decorate : I can work only on abstract\
             type which are not in recursive bloc."
@@ -253,61 +254,153 @@ let fold_map task_hd ((env:env),task) =
                 d "encoding_decorate : I can't encode definition. \
 Perhaps you could use eliminate_definition"
           | _, None -> () in
-            (* Noting here since the logics are lazily defined *)
-            List.iter fn l; (env,task)
+            List.iter fn l; [d]
     | Dind _ -> Printer.unsupportedDecl
         d "encoding_decorate : I can't work on inductive"
         (* let fn (pr,f) = pr, fnF f in *)
         (* let fn (ps,l) = ps, List.map fn l in *)
         (* [create_ind_decl (List.map fn l)] *)
     | Dprop (k,pr,f) ->
-      let tvl = ty_quant env f in
-      let tvarl = gen_tvar tvl in
-      let tvarl_len = Ssubst.cardinal tvarl in
-      let menv =  {
-        env = env;
-        defined_lsymbol = env.edefined_lsymbol;
-        undef_lsymbol = Sls.empty;
-      } in
+      let substs = ty_quant env f in
+      let substs_len = Ssubst.cardinal substs in
       let conv_f tvar task =
         (* Format.eprintf "f0 : %a@. env : %a@." Pretty.print_fmla *)
         (*   (f_ty_subst tvar Mvs.empty f) *)
-        (*   print_env menv; *)
-        let f = rewrite_fmla menv tvar Mvs.empty f in
+        (*   print_env env; *)
+        let f = rewrite_fmla env tvar Mvs.empty f in
         (* Format.eprintf "f : %a@. env : %a@." Pretty.print_fmla f *)
         (*   print_env menv; *)
         let pr =
-          if tvarl_len = 1 then pr
+          if substs_len = 1 then pr
           else create_prsymbol (id_clone pr.pr_name) in
         (* Format.eprintf "undef ls : %a, ts : %a@." *)
         (*   (Pp.print_iter1 Sls.iter Pp.comma Pretty.print_ls) *)
         (*   menv.undef_lsymbol *)
         (*   (Pp.print_iter1 Sts.iter Pp.comma Pretty.print_ts) *)
         (*   menv.undef_tsymbol; *)
-        let task = Sls.fold
-          (fun ls task -> add_logic_decl task [ls,None])
-          menv.undef_lsymbol task in
-        let task = add_prop_decl task k pr f in
-        task
+        create_prop_decl k pr f :: task
       in
-      let task = Ssubst.fold conv_f tvarl task in
-      {env with edefined_lsymbol = menv.defined_lsymbol}, task
+      let task = Ssubst.fold conv_f substs [] in
+      task
 
-let meta_kept_array = register_meta "encoding : kept_array" [MTtysymbol]
+let meta_lskept = register_meta "encoding : lskept" [MTlsymbol]
 
-let collect_arrays poly_ts tds =
-  let extract ts tys =
-    assert (ts.ts_args = []); (* UnsupportedTySymbol : TODO *)
-    Mty.add (match ts.ts_def with
-      | None -> Printer.unsupportedType (ty_app ts [])
-        "Encoding_arrays : apply only on alias for array"
-      | Some ({ty_node = Tyapp (app,_)} as ty)
-          when not (ts_equal app poly_ts) ->
-        Printer.unsupportedType ty "Encoding_arrays : apply only on array"
-      | Some ty -> ty)
-      ts tys in
-  Sts.fold extract tds Mty.empty
-*)
+let env_from_kept_lskept kept lskept =
+  let fold_ls ls env =
+    let rec aux insts tydisl subst = function
+      | [] ->
+        let tydisl = List.rev tydisl in
+        let tyl,tyv = match tydisl, ls.ls_value with
+          | tyv::tyl, Some _ -> tyl,Some tyv
+          | tyl, None -> tyl,None
+          | _ -> assert false in
+        let lsdis = create_lsymbol (id_clone ls.ls_name) tyl tyv in
+        Mtyl.add tydisl lsdis insts
+      | ty::tyl ->
+        let fold_ty tykept insts =
+          try
+            let subst = ty_match subst ty tykept in
+            aux insts (tykept::tydisl) subst tyl
+          with Not_found -> insts
+        in
+        Sty.fold fold_ty kept insts
+    in
+    let lsty = option_apply ls.ls_args (fun e -> e::ls.ls_args) ls.ls_value in
+    let insts = aux Mtyl.empty  [] Mtv.empty lsty in
+    Mls.add ls insts env
+  in
+  Sls.fold fold_ls lskept Mls.empty
+
+let is_ty_mono ty =
+  try
+    let rec check () ty = match ty.ty_node with
+      | Tyvar _ -> raise Exit
+      | Tyapp _ -> ty_fold check () ty in
+    check () ty;
+    true
+  with Exit -> false
+
+let meta_lsdis = register_meta "encoding : lsdis" [MTlsymbol;MTlsymbol]
+
+let metas_of_env env decls =
+  let fold_ls ls insts metas =
+    let fold_inst _ lsdis metas =
+      create_meta meta_lsdis [Theory.MAls ls;Theory.MAls lsdis] :: metas
+    in
+    Mtyl.fold fold_inst insts metas
+  in
+  Mls.fold fold_ls env decls
+
+let env_of_metas metas =
+  let fold env args =
+    match args with
+      | [MAls ls;MAls lsdis] ->
+        let tydisl = option_apply lsdis.ls_args (fun e -> e::lsdis.ls_args)
+          lsdis.ls_value
+        in
+        let insts = Mls.find_default ls Mtyl.empty env in
+        Mls.add ls (Mtyl.add tydisl lsdis insts) env
+      | _ -> assert false
+  in
+  List.fold_left fold Mls.empty metas
+
+let env_from_fold lskept env ls tyl tyv =
+  if Sls.mem ls lskept &&
+    List.for_all is_ty_mono tyl && option_apply true is_ty_mono tyv then
+    let tydisl = option_apply tyl (fun e -> e::tyl) tyv
+    in
+    let lsdis = create_lsymbol (id_clone ls.ls_name) tyl tyv in
+    let insts = Mls.find_default ls Mtyl.empty env in
+    Mls.add ls (Mtyl.add tydisl lsdis insts) env
+  else env
+
+let mono_in_goal sls pr f =
+  let env = f_app_fold (env_from_fold sls) Mls.empty f in
+  (* Format.eprintf "mono_in_goal %a@." print_env env; *)
+  metas_of_env env [create_decl (create_prop_decl Pgoal pr f)]
+
+let mono_in_goal sls = Trans.tgoal (mono_in_goal sls)
+
+let definition_of_env env =
+  let fold_ls _ insts task =
+    let fold_inst inst lsdis task =
+      let fold_ty task ty =
+        let add_ts task ts = add_ty_decl task ([ts,Tabstract]) in
+        let task = ty_s_fold add_ts task ty in
+        add_meta task Encoding.meta_kept [MAty ty] in
+      let task = List.fold_left fold_ty task inst in
+      add_logic_decl task [lsdis,None]
+    in
+    Mtyl.fold fold_inst insts task
+  in
+  Mls.fold fold_ls env (Task.use_export None (Theory.builtin_theory))
+
+let select_array_symbol_in_goal =
+  Trans.compose Encoding.monomorphise_goal
+  (Trans.on_tagged_ls meta_lskept (fun lskept ->
+    if not (Sls.is_empty lskept)
+    then mono_in_goal lskept
+    else Trans.identity))
+
+let () = Trans.register_transform
+  "select_array_symbol_in_goal" select_array_symbol_in_goal
+
+
+let instantiate_lsymbol =
+  Trans.on_meta meta_lsdis (fun metas ->
+    if metas = [] then Trans.identity
+    else
+      let env = env_of_metas metas in
+      (* Format.eprintf "instantiate %a@." print_env env; *)
+      Trans.decl (map env) (definition_of_env env))
+
+let instantiate_lsymbol =
+  Trans.compose (Trans.print_meta Encoding.debug meta_lsdis)
+    instantiate_lsymbol
+
+let () = Trans.register_transform
+  "instantiate_lsymbol" instantiate_lsymbol
+
 let meta_mono_array = register_meta "encoding_arrays : mono_arrays"
   [MTtysymbol;MTty;MTty]
 (*
@@ -391,14 +484,7 @@ let encoding_arrays env =
     else Trans.on_tagged_ts meta_kept_array (create_trans_complete env thpoly))
 *)
 (* This one take use the tag but also all the type which appear in the goal *)
-let is_ty_mono ~only_mono ty =
-  try
-    let rec check () ty = match ty.ty_node with
-      | Tyvar _ -> raise Exit
-      | Tyapp _ -> ty_fold check () ty in
-    check () ty;
-    true
-  with Exit when not only_mono -> false
+
 
 (*
 (* select the type array which appear as argument of set and get.
@@ -451,10 +537,10 @@ let () = Trans.register_env_transform "encoding_array" trans_array
 
 (* select the type array which appear as argument of set and get.
   set and get must be in sls. After that take the subtype of them *)
-let find_mono_array ~only_mono sls sty f =
+let find_mono_array sls sty f =
   let add sty ls tyl _ =
     match tyl with
-      | ty::_ when Sls.mem ls sls && is_ty_mono ~only_mono ty ->
+      | ty::_ when Sls.mem ls sls && is_ty_mono ty ->
         Sty.add ty sty
       | _ -> sty in
   f_app_fold add sty f
@@ -477,7 +563,7 @@ let subtype ty acc =
   ty_fold ty_add acc ty
 
 let mono_in_goal sls pr f =
-  let sty = (try find_mono_array ~only_mono:true sls Sty.empty f
+  let sty = (try find_mono_array sls Sty.empty f
     with Exit -> assert false) (*monomorphise goal should have been used*) in
   let decls = create_meta_tyl_arrays sty
     [create_decl (create_prop_decl Pgoal pr f)] in

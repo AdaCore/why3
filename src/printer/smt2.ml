@@ -53,7 +53,7 @@ let ident_printer =
       "get-option"; "get-proof"; "get-unsat-core"; "get-value"; "pop"; "push";
       "set-logic"; "set-info"; "set-option";
        (** for security *)
-      "Bool";"unsat";"sat";"true";"false"]
+      "Bool";"unsat";"sat";"true";"false";"select";"store"]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
@@ -67,6 +67,7 @@ type info = {
   info_rem : Sid.t;
   use_trigger : bool;
   barrays : (ty*ty) Mts.t;
+  complex_type : ty Hty.t;
 }
 
 let rec print_type info fmt ty = match ty.ty_node with
@@ -75,14 +76,41 @@ let rec print_type info fmt ty = match ty.ty_node with
       | Some s -> syntax_arguments s (print_type info) fmt []
       | None -> fprintf fmt "%a" print_ident ts.ts_name
   end
-  | Tyapp (_, _) -> unsupported "smt : you must encode the complexe type"
+  | Tyapp (ts, l) ->
+     begin match query_syntax info.info_syn ts.ts_name with
+      | Some s -> syntax_arguments s (print_type info) fmt l
+      | None -> fprintf fmt "(%a %a)" print_ident ts.ts_name
+        (print_list space (print_type info)) l
+     end
+
+let find_complex_type info fmt f =
+  let iter () ty =
+    match ty.ty_node with
+      | Tyapp (_,_::_) when not (Hty.mem info.complex_type ty) ->
+        let id = id_fresh (Pp.string_of_wnl Pretty.print_ty ty) in
+        let ts = create_tysymbol id [] None in
+        let cty = ty_app ts [] in
+        fprintf fmt "(define-sorts ((%a %a)))@."
+          print_ident ts.ts_name
+          (print_type info) ty;
+        Hty.add info.complex_type ty cty
+      | _ -> ()
+  in
+  f_ty_fold iter () f
+
+let print_type info fmt ty =
+  print_type info fmt
+    (try
+       Hty.find info.complex_type ty
+     with Not_found -> ty)
 
 (* and print_tyapp info fmt = function *)
 (*   | [] -> () *)
 (*   | [ty] -> fprintf fmt "%a " (print_type info) ty *)
 (*   | tl -> fprintf fmt "(%a) " (print_list comma (print_type info)) tl *)
 
-let print_type info fmt = catch_unsupportedType (print_type info fmt)
+let print_type info fmt =
+  catch_unsupportedType (print_type info fmt)
 
 let print_type_value info fmt = function
   | None -> fprintf fmt "Bool"
@@ -96,7 +124,8 @@ let print_var fmt {vs_name = id} =
   fprintf fmt "%s" n
 
 let print_typed_var info fmt vs =
-  fprintf fmt "(%a %a)" print_var vs (print_type info) vs.vs_ty
+  fprintf fmt "(%a %a)" print_var vs
+    (print_type info) vs.vs_ty
 
 let print_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
@@ -109,7 +138,8 @@ let rec print_term info fmt t = match t.t_node with
 	"%s.0" "(* %s.0 %s.0)" "(/ %s.0 %s.0)" fmt c
   | Tvar v -> print_var fmt v
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
-      | Some s -> syntax_arguments s (print_term info) fmt tl
+      | Some s -> syntax_arguments_typed s (print_term info)
+        (print_type info) (Some t) fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] -> fprintf fmt "@[%a@]" print_ident ls.ls_name
           | _ -> fprintf fmt "@[(%a@ %a)@]"
@@ -132,7 +162,8 @@ and print_fmla info fmt f = match f.f_node with
   | Fapp ({ ls_name = id }, []) ->
       print_ident fmt id
   | Fapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
-      | Some s -> syntax_arguments s (print_term info) fmt tl
+      | Some s -> syntax_arguments_typed s (print_term info)
+        (print_type info) None fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] -> fprintf fmt "%a" print_ident ls.ls_name
           | _ -> fprintf fmt "(%a@ %a)"
@@ -144,12 +175,12 @@ and print_fmla info fmt f = match f.f_node with
       (* TODO trigger dépend des capacités du prover : 2 printers?
       smtwithtriggers/smtstrict *)
       if tl = [] then
-        fprintf fmt "@[(%s (%a) %a)@]"
+        fprintf fmt "@[(%s@ (%a)@ %a)@]"
           q
           (print_var_list info) vl
           (print_fmla info) f
       else
-        fprintf fmt "@[(%s (%a) (! %a %a))@]"
+        fprintf fmt "@[(%s@ (%a)@ (! %a %a))@]"
           q
           (print_var_list info) vl
           (print_fmla info) f
@@ -192,24 +223,31 @@ and print_triggers info fmt = function
     (print_triggers info) l
 
 let print_logic_binder info fmt v =
-  fprintf fmt "%a: %a" print_ident v.vs_name (print_type info) v.vs_ty
+  fprintf fmt "%a: %a" print_ident v.vs_name
+    (print_type info) v.vs_ty
 
 let print_type_decl info fmt = function
   | ts, Tabstract when Sid.mem ts.ts_name info.info_rem -> false
   | ts, Tabstract when ts.ts_args = [] ->
     begin try
+      (* keep this hack for compatibility with smtv1 *)
       let key,elt = Mts.find ts info.barrays in
-      fprintf fmt "(define-sort ((%a  (array %a %a))))"
+      fprintf fmt "(define-sorts (%a  (Array %a %a)))"
         print_ident ts.ts_name
-        (print_type info) key (print_type info) elt; true
+        (print_type info) key
+        (print_type info) elt; true
     with Not_found ->
       fprintf fmt "(declare-sort %a 0)" print_ident ts.ts_name; true end
-  | _, Tabstract -> unsupported
-          "smtv2 : type with argument are not supported"
+  | ts, Tabstract when ts.ts_def = None ->
+    let len = List.length ts.ts_args in
+    fprintf fmt "(declare-sort %a %i)" print_ident ts.ts_name len; true
+  | _, Tabstract -> false
   | _, Talgebraic _ -> unsupported
           "smtv2 : algebraic type are not supported"
 
-let print_logic_decl info fmt (ls,ld) = match ld with
+let print_logic_decl info fmt (ls,ld) =
+  if not (Mid.mem ls.ls_name info.info_syn) then
+  match ld with
   | None ->
     fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a)@]@\n"
       print_ident ls.ls_name
@@ -236,10 +274,12 @@ let print_decl info fmt d = match d.d_node with
       "smt : inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Sid.mem pr.pr_name info.info_rem -> false
   | Dprop (Paxiom, pr, f) ->
+    find_complex_type info fmt f;
       fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n"
         pr.pr_name.id_string
         (print_fmla info) f; true
   | Dprop (Pgoal, pr, f) ->
+    find_complex_type info fmt f;
       fprintf fmt "@[(assert@\n";
       fprintf fmt "@[;; %a@]@\n" print_ident pr.pr_name;
       (match id_from_user pr.pr_name with
@@ -267,14 +307,35 @@ let barrays task =
       | _ -> assert false in
   Task.on_meta Encoding_arrays.meta_mono_array fold Mts.empty task
 
+let meta_dist_syntax =
+  Theory.register_meta "smt_dist_syntax" [MTlsymbol;MTstring]
+
+let distingued =
+  let dist_syntax mls = function
+    | [MAls ls;MAstr s] -> Mls.add ls s mls
+    | _ -> assert false in
+  let dist_dist syntax mls = function
+    | [MAls ls;MAls lsdis] ->
+      begin try
+              Mid.add lsdis.ls_name (Mls.find ls syntax) mls
+        with Not_found -> mls end
+    | _ -> assert false in
+  Trans.on_meta meta_dist_syntax (fun syntax ->
+    let syntax = List.fold_left dist_syntax Mls.empty syntax in
+    Trans.on_meta Encoding_arrays.meta_lsdis (fun dis ->
+      let dis2 = List.fold_left (dist_dist syntax) Mid.empty dis in
+      Trans.return dis2))
+
 let print_task pr thpr fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   let info = {
-    info_syn = get_syntax_map task;
+    info_syn = Mid.union (fun _ _ s -> Some s)
+      (get_syntax_map task) (Trans.apply distingued task);
     info_rem = get_remove_set task;
     use_trigger = false;
     barrays = barrays task;
+    complex_type = Hty.create 5;
   }
   in
   let decls = Task.task_decls task in

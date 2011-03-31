@@ -86,6 +86,7 @@ let iter_group expr iter_fun text =
   iter 0 false
 
 let regexp_arg_pos = Str.regexp "%\\([0-9]+\\)"
+let regexp_arg_pos_typed = Str.regexp "%\\([t]?[0-9]+\\)"
 
 exception BadSyntaxIndex of int
 exception BadSyntaxArity of int * int
@@ -98,12 +99,45 @@ let check_syntax s len =
   in
   iter_group regexp_arg_pos arg s
 
+
+let check_syntax_typed s len ret =
+  let arg s =
+    let grp = (Str.matched_group 1 s) in
+    if grp.[0] = 't'
+    then
+      let grp = String.sub grp 1 (String.length grp - 1) in
+      let i = int_of_string grp in
+      if i < 0 || (not ret && i = 0) then raise (BadSyntaxIndex i);
+      if i > len then raise (BadSyntaxArity (len,i));
+    else
+      let i = int_of_string grp in
+      if i <= 0 then raise (BadSyntaxIndex i);
+      if i > len then raise (BadSyntaxArity (len,i));
+  in
+  iter_group regexp_arg_pos_typed arg s
+
 let syntax_arguments s print fmt l =
   let args = Array.of_list l in
   let repl_fun s fmt =
     let i = int_of_string (Str.matched_group 1 s) in
     print fmt args.(i-1) in
   global_substitute_fmt regexp_arg_pos repl_fun s fmt
+
+let syntax_arguments_typed s print_arg print_type t fmt l =
+  let args = Array.of_list l in
+  let repl_fun s fmt =
+    let grp = (Str.matched_group 1 s) in
+    if grp.[0] = 't'
+    then
+      let grp = String.sub grp 1 (String.length grp - 1) in
+      let i = int_of_string grp in
+      if i = 0
+      then print_type fmt (Util.of_option t).t_ty
+      else print_type fmt args.(i-1).t_ty
+    else
+      let i = int_of_string grp in
+      print_arg fmt args.(i-1) in
+  global_substitute_fmt regexp_arg_pos_typed repl_fun s fmt
 
 (** {2 use printers} *)
 
@@ -142,7 +176,7 @@ let syntax_type ts s =
   create_meta meta_syntax_type [MAts ts; MAstr s]
 
 let syntax_logic ls s =
-  check_syntax s (List.length ls.ls_args);
+  check_syntax_typed s (List.length ls.ls_args) (ls.ls_value <> None);
   create_meta meta_syntax_logic [MAls ls; MAstr s]
 
 let remove_prop pr =

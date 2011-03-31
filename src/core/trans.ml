@@ -37,6 +37,8 @@ let apply f x = f x
 let identity   x =  x
 let identity_l x = [x]
 
+let return x = fun _ -> x
+
 let conv_res c f x = c (f x)
 
 let singleton f x = [f x]

@@ -18,4 +18,5 @@
 (**************************************************************************)
 
 
+val meta_lsdis : Theory.meta
 val meta_mono_array : Theory.meta
