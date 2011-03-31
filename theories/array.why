@@ -165,7 +165,9 @@ theory ArrayRich
   logic sub (map 'a) int int : map 'a
 
   axiom Sub_length : 
-    forall s : map 'a, ofs len : int. length (sub s ofs len) = len
+    forall s : map 'a, ofs len : int.
+    len >= 0 ->
+    length (sub s ofs len) = len
 
   axiom Sub_get :
     forall s : map 'a, ofs len i : int. 
