@@ -161,18 +161,11 @@ let () =
 (* Main window *)
 (***************)
 
-let exit_function () =
-  eprintf "saving IDE config file@.";
-  save_config ();
-  GMain.quit ()
-
 let w = GWindow.window
   ~allow_grow:true ~allow_shrink:true
   ~width:gconfig.window_width
   ~height:gconfig.window_height
   ~title:"Why Graphical session manager" ()
-
-let (_ : GtkSignal.id) = w#connect#destroy ~callback:exit_function
 
 let (_ : GtkSignal.id) =
   w#misc#connect#size_allocate
@@ -329,15 +322,11 @@ let () =
   view_time_column#set_resizable false;
   view_time_column#set_visible true
 
-
 let goals_model,goals_view =
   eprintf "Creating tree model...@?";
   let model = GTree.tree_store cols in
   let view = GTree.view ~model ~packing:scrollview#add () in
-  (*
-    let () = view#selection#set_mode `SINGLE in
-  *)
-  let () = view#selection#set_mode `MULTIPLE in
+  let () = view#selection#set_mode (* `SINGLE *) `MULTIPLE in
   let () = view#set_rules_hint true in
   ignore (view#append_column view_name_column);
   ignore (view#append_column view_status_column);
@@ -515,8 +504,7 @@ let read_file fn =
 
 
 
-(* *)
-
+(* 
 let task_checksum t =
   fprintf str_formatter "%a@." Pretty.print_task t;
   let s = flush_str_formatter () in
@@ -531,7 +519,7 @@ let task_checksum t =
   eprintf "task %s, sum = %s@." tmp sum;
 *)
   sum
-
+*)
 
 let info_window ?(callback=(fun () -> ())) mt s =
   let buttons = match mt with
@@ -552,286 +540,6 @@ let info_window ?(callback=(fun () -> ())) mt s =
       ~callback:(function x -> d#destroy ();
 		   if x = `OK then callback ())
   in ()
-
-
-
-
-(*
-  let check_file_verified f =
-    let b = List.for_all (fun t -> t.M.verified) f.M.theories in
-    if f.M.file_verified <> b then
-      begin
-	f.M.file_verified <- b;
-	set_row_status b f.file_row
-      end
-
-  let check_theory_proved t =
-    let b = List.for_all (fun g -> g.proved) t.goals in
-    if t.verified <> b then
-      begin
-	t.verified <- b;
-	set_row_status b t.theory_row;
-	check_file_verified t.theory_parent
-      end
-
-  let rec check_goal_proved g =
-    let b1 = Hashtbl.fold
-      (fun _ a acc -> acc ||
-	 match a.proof_state with
-	   | Done { Call_provers.pr_answer = Call_provers.Valid} -> true
-	   | _ -> false) g.external_proofs false
-    in
-    let b = Hashtbl.fold
-      (fun _ t acc -> acc || t.transf_proved) g.transformations b1
-    in
-    if g.proved <> b then
-      begin
-	g.proved <- b;
-	set_row_status b g.goal_row;
-	match g.parent with
-          | Theory t -> check_theory_proved t
-          | Transf t -> check_transf_proved t
-      end
-
-  and check_transf_proved t =
-    let b = List.for_all (fun g -> g.proved) t.subgoals in
-    if t.transf_proved <> b then
-      begin
-	t.transf_proved <- b;
-	set_row_status b t.transf_row;
-	check_goal_proved t.parent_goal
-      end
-
-*)
-
-(*
-
-  (* deprecated *)
-  let set_file_verified f =
-    f.file_verified <- true;
-    let row = f.file_row in
-    goals_view#collapse_row (goals_model#get_path row);
-    goals_model#set ~row ~column:status_column !image_yes
-(*
-    if !toggle_hide_proved_goals then
-      goals_model#set ~row ~column:visible_column false
-*)
-
-  (* deprecated *)
-  let set_theory_proved ~propagate  t =
-    t.verified <- true;
-    let row = t.theory_row in
-    goals_view#collapse_row (goals_model#get_path row);
-    goals_model#set ~row ~column:status_column !image_yes;
-(*
-    if !toggle_hide_proved_goals then
-      goals_model#set ~row ~column:visible_column false;
-*)
-    let f = t.theory_parent in
-    if propagate then
-      if List.for_all (fun t ->
-(*
-                         let tname = t.theory.Theory.th_name.Ident.id_string in
-                         eprintf "checking theory %s@." tname;
-*)
-                         t.verified) f.theories then
-        set_file_verified f
-
-  let rec set_proved ~propagate g =
-    let row = g.goal_row in
-    g.proved <- true;
-    goals_view#collapse_row (goals_model#get_path row);
-    goals_model#set ~row ~column:status_column !image_yes;
-(*
-    if !toggle_hide_proved_goals then
-      goals_model#set ~row ~column:visible_column false;
-*)
-    if propagate then
-      match g.parent with
-        | Theory t ->
-            if List.for_all (fun g -> g.proved) t.goals then
-              set_theory_proved ~propagate t
-        | Transf t ->
-            if List.for_all (fun g -> g.proved) t.subgoals then
-              begin
-                set_proved ~propagate t.parent_goal;
-              end
-
-  let set_proof_state ~obsolete a res =
-    a.proof_state <- res;
-    let row = a.proof_row in
-    goals_model#set ~row ~column:status_column
-      (image_of_result ~obsolete res);
-
-    let t = match res with
-      | Done { Call_provers.pr_time = time } ->
-          Format.sprintf "%.2f" time
-      | _ -> ""
-    in
-    let t = if obsolete then t ^ " (obsolete)" else t in
-    goals_model#set ~row:a.Model.proof_row ~column:Model.time_column t
-
-
-  let add_external_proof_row ~obsolete ~edit g p db_proof result (*_time*) =
-    let parent = g.goal_row in
-    let name = p.prover_name in
-    let row = goals_model#prepend ~parent () in
-    goals_model#set ~row ~column:icon_column !image_prover;
-    goals_model#set ~row ~column:name_column
-      (name ^ " " ^ p.prover_version);
-(*
-    goals_model#set ~row ~column:visible_column true;
-*)
-    goals_view#expand_row (goals_model#get_path parent);
-    let a = { prover = p;
-              proof_goal = g;
-              proof_row = row;
-              proof_db = db_proof;
-(*
-              status = status;
-*)
-              proof_obsolete = obsolete;
-(*
-              time = time;
-              output = "";
-*)
-	      proof_state = result;
-              edited_as = edit;
-            }
-    in
-    goals_model#set ~row ~column:index_column (Row_proof_attempt a);
-    Hashtbl.add g.external_proofs p.prover_id a;
-    set_proof_state ~obsolete a result;
-    a
-
-
-  let add_goal_row parent name info t db_goal =
-    let parent_row = match parent with
-      | Theory mth -> mth.theory_row
-      | Transf mtr -> mtr.transf_row
-    in
-    let row = goals_model#append ~parent:parent_row () in
-    let goal = { goal_name = name;
-		 parent = parent;
-                 task = t ;
-                 goal_row = row;
-                 goal_db = db_goal;
-                 external_proofs = Hashtbl.create 7;
-                 transformations = Hashtbl.create 3;
-                 proved = false;
-               }
-    in
-    let text = match info with
-      | None -> name
-      | Some s -> s
-    in
-    goals_model#set ~row ~column:name_column text;
-    goals_model#set ~row ~column:icon_column !image_file;
-    goals_model#set ~row ~column:index_column (Row_goal goal);
-(*
-    goals_model#set ~row ~column:visible_column true;
-*)
-    goal
-
-
-  let add_transformation_row g db_transf tr_name =
-    let parent = g.Model.goal_row in
-    let row = goals_model#append ~parent () in
-    let tr = { Model.parent_goal = g;
-               Model.transf_proved = false;
-               Model.transf_row = row;
-               Model.transf_db = db_transf;
-               subgoals = [];
-             }
-    in
-    Hashtbl.add g.Model.transformations tr_name tr;
-    goals_model#set ~row ~column:Model.name_column tr_name;
-    goals_model#set ~row ~column:Model.icon_column !image_transf;
-    goals_model#set ~row ~column:Model.index_column
-      (Model.Row_transformation tr);
-(*
-    goals_model#set ~row ~column:Model.visible_column true;
-*)
-    goals_view#expand_row (goals_model#get_path parent);
-    tr
-
-
-  let add_theory_row mfile th db_theory =
-    let tname = th.Theory.th_name.Ident.id_string in
-    let parent = mfile.file_row in
-    let row = goals_model#append ~parent () in
-    let mth = { theory = th;
-                theory_row = row;
-                theory_db = db_theory;
-                theory_parent = mfile;
-                goals = [] ;
-                verified = false }
-    in
-    goals_model#set ~row ~column:name_column tname;
-    goals_model#set ~row ~column:icon_column !image_directory;
-    goals_model#set ~row ~column:index_column (Row_theory mth);
-(*
-    goals_model#set ~row ~column:visible_column true;
-*)
-    mth
-
-  let add_theory mfile th =
-    let tasks = List.rev (Task.split_theory th None None) in
-    let tname = th.Theory.th_name.Ident.id_string in
-    let db_theory = Db.add_theory mfile.file_db tname in
-    let mth = add_theory_row mfile th db_theory in
-    let goals =
-      List.fold_left
-        (fun acc t ->
-           let id = (Task.task_goal t).Decl.pr_name in
-           let name = id.Ident.id_string in
-           let expl = get_explanation id (Task.task_goal_fmla t) in
-           let sum = task_checksum t in
-           let db_goal = Db.add_goal db_theory name sum in
-           let goal = add_goal_row (Theory mth) name expl t db_goal in
-           goal :: acc)
-        []
-        tasks
-    in
-    mth.goals <- List.rev goals;
-    if goals = [] then set_theory_proved ~propagate:false mth;
-    mth
-
-  let add_file_row f dbfile =
-      let parent = goals_model#append () in
-      let mfile = { file_name = f;
-                    file_row = parent;
-                    file_db = dbfile;
-                    theories = [] ;
-                    file_verified = false }
-      in
-      all_files := !all_files @ [mfile];
-      let name = Filename.basename f in
-      goals_model#set ~row:parent ~column:name_column name;
-      goals_model#set ~row:parent ~column:icon_column !image_directory;
-      goals_model#set ~row:parent ~column:index_column (Row_file mfile);
-(*
-      goals_model#set ~row:parent ~column:visible_column true;
-*)
-      mfile
-
-  let add_file f =
-    let theories = read_file f in
-    let dbfile = Db.add_file f in
-    let mfile = add_file_row f dbfile in
-    let mths =
-      List.fold_left
-        (fun acc (_,thname,t) ->
-           eprintf "Adding theory '%s'@." thname;
-           let mth = add_theory mfile t in
-           mth :: acc
-        )
-        [] theories
-    in
-    mfile.theories <- List.rev mths;
-    if theories = [] then set_file_verified mfile
-
-*)
 
 
 (**********************************)
@@ -979,6 +687,15 @@ let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~label:"_Detect provers" ~callback:
     (fun () -> Gconfig.run_auto_detection gconfig; !refresh_provers () )
     ()
+
+let exit_function () =
+  eprintf "saving IDE config file@.";
+  save_config ();
+  eprintf "saving session@.";
+  M.test_save ();
+  GMain.quit ()
+
+let (_ : GtkSignal.id) = w#connect#destroy ~callback:exit_function
 
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit"

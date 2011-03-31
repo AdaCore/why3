@@ -21,6 +21,10 @@
 open Why
 open Format
 
+(***************************)
+(*     provers             *)
+(***************************)
+
 type prover_data = 
     { prover_id : string;
       prover_name : string;
@@ -49,6 +53,9 @@ let get_prover_data env id pr acc =
       pr.Whyconf.driver pr.Whyconf.name;
     acc
 
+(***************************)
+(*      transformations    *)
+(***************************)
 
 type trans =
   | Trans_one of Task.task Trans.trans
@@ -79,6 +86,10 @@ let lookup_transformation env =
 	       transformation = lookup_trans env name }
       in Hashtbl.add h name t; t
 
+(***************************)
+(*     proof status        *)
+(***************************)
+
 type proof_attempt_status =
   | Undone
   | Scheduled (** external proof attempt is scheduled *)
@@ -86,6 +97,10 @@ type proof_attempt_status =
   | Done of Call_provers.prover_result (** external proof done *)
   | InternalFailure of exn (** external proof aborted by internal error *)
 
+
+(***************************)
+(*     main functor        *)
+(***************************)
 
 module type OBSERVER = sig
   type key
@@ -97,6 +112,10 @@ module type OBSERVER = sig
 end
 
 module Make(O : OBSERVER) = struct
+
+(***************************)
+(*     session state       *)
+(***************************)
 
 type proof_attempt =
     { prover : prover_data;
@@ -156,12 +175,62 @@ let all_files : file list ref = ref []
 
 let get_all_files () = !all_files
 
+(************************)
+(* saving state on disk *)
+(************************)
+
+let save_proof_attempt fmt _ _a =
+  fprintf fmt "<proof TODO/>@\n"
+
+let opt lab fmt = function
+  | None -> ()
+  | Some s -> fprintf fmt "%s=\"%s\" " lab s
+
+let rec save_goal fmt g =
+  fprintf fmt "<goal name=\"%s\" %aproved=%b>@\n" 
+    g.goal_name (opt "expl") g.goal_expl g.proved;
+  Hashtbl.iter (save_proof_attempt fmt) g.external_proofs;
+  fprintf fmt "</goal>@\n"
+
+(*
+and save_trans fmt t =
+*)
+
+let save_theory fmt t =
+  fprintf fmt "<theory name=\"%s\" verified=%b>@\n" "todo" t.verified;
+  List.iter (save_goal fmt) t.goals;
+  fprintf fmt "</theory>@\n"
+
+let save_file fmt f =
+  fprintf fmt "<file name=\"%s\" verified=%b>@\n" f.file_name f.file_verified;
+  List.iter (save_theory fmt) f.theories;
+  fprintf fmt "</file>@\n"
+  
+let save fname =
+  let ch = open_out fname in
+  let fmt = formatter_of_out_channel ch in
+  fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
+  fprintf fmt "<project name=\"%s\">@\n" (Filename.basename fname);
+  List.iter (save_file fmt) (get_all_files());
+  fprintf fmt "</project>@.";
+  close_out ch
+
+let test_save () = save "essai.xml"
+
+(****************************)
+(*     session opening      *)
+(****************************)
+
 let init_fun = ref (fun (_:O.key) (_:any) -> ())
 
 let notify_fun = ref (fun (_:any) -> ())
 
 let open_session ~init ~notify _ = 
   init_fun := init; notify_fun := notify
+
+(************************)
+(*     actions          *)
+(************************)
 
 let check_file_verified f =
   let b = List.for_all (fun t -> t.verified) f.theories in
