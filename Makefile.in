@@ -356,6 +356,27 @@ install_no_local::
 
 install_local: bin/why3ml
 
+##########
+# gallery
+##########
+
+%.gallery: %.mlw bin/why3doc
+	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
+	mkdir -p $(GALLERYDIR)/`basename $*`
+	bin/why3doc -b -o $(GALLERYDIR)/`basename $*` $*.mlw
+
+GALLERYPGMS = vstte10_aqueue \
+	vstte10_inverting \
+	vstte10_max_sum \
+	vstte10_queens \
+	vstte10_search_list
+GALLERYFILES = $(addprefix examples/programs/, $(GALLERYPGMS))
+GALLERY = $(addsuffix .gallery, $(GALLERYFILES))
+
+.PHONY: gallery
+
+gallery:: $(GALLERY)
+
 ########
 # Config
 ########
@@ -671,7 +692,8 @@ install_no_local::
 # why3doc
 #########
 
-WHY3DOC_FILES = doc_html doc_main
+# WHY3DOC_FILES = doc_html doc_main
+WHY3DOC_FILES = to_html
 
 WHY3DOCMODULES = $(addprefix src/why3doc/, $(WHY3DOC_FILES))
 
@@ -701,14 +723,17 @@ bin/why3doc: bin/why3doc.@OCAMLBEST@
 
 # depend and clean targets
 
+WHY3DOCGENERATED=src/why3doc/to_html.ml
+
 include .depend.why3doc
 
-.depend.why3doc:
+.depend.why3doc: $(WHY3DOCGENERATED)
 	$(OCAMLDEP) -slash -I src -I src/why3doc $(WHY3DOCML) $(WHY3DOCMLI) > $@
 
 depend: .depend.why3doc
 
 clean::
+	rm -f $(WHY3DOCGENERATED)
 	rm -f src/why3doc/*.cm[iox] src/why3doc/*.o
 	rm -f src/why3doc/*.annot src/why3doc/*~
 	rm -f bin/why3doc.byte bin/why3doc.opt bin/why3doc
