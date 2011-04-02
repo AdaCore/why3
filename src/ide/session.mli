@@ -84,7 +84,7 @@ module Make(O: OBSERVER) : sig
       { goal_name : string;
 	goal_expl : string option;
 	parent : goal_parent;
-        task: Task.task;
+        task: Task.task option;
         goal_key : O.key;
         mutable proved : bool;
         external_proofs: (string, proof_attempt) Hashtbl.t;
@@ -100,7 +100,8 @@ module Make(O: OBSERVER) : sig
       }
 
   and theory = private
-      { theory : Theory.theory;
+      { theory_name : string;
+	theory : Theory.theory option;
         theory_key : O.key;
         theory_parent : file;
         mutable goals : goal list;
@@ -121,6 +122,10 @@ module Make(O: OBSERVER) : sig
     | Proof_attempt of proof_attempt
     | Transformation of transf
 
+
+  val get_theory : theory -> Theory.theory
+
+  val get_task : goal -> Task.task
 
   (*****************************)
   (*                           *)
@@ -149,11 +154,11 @@ module Make(O: OBSERVER) : sig
   val test_save : unit -> unit
   val test_load : unit -> Xml.element list
 
-    (* 
   val save_session : unit -> unit
-    (** enforces to save the session state on disk. *)
-       this is not necessary since the session manager handles this itself
-       using add_timeout *)
+    (** enforces to save the session state on disk. 
+	this it supposed to be called only at exit, 
+	since the session manager also performs automatic saving 
+	some time to time *)
 
   val file_exists : string -> bool
 

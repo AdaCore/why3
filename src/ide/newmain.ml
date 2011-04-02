@@ -428,7 +428,10 @@ let init =
 	     (match g.M.goal_expl with 
 		| None -> g.M.goal_name
 		| Some s -> s)
-	 | M.Theory th -> th.M.theory.Theory.th_name.Ident.id_string
+	 | M.Theory th -> th.M.theory_name
+	     (*
+	       th.M.theory.Theory.th_name.Ident.id_string
+	     *)
 	 | M.File f -> Filename.basename f.M.file_name
 	 | M.Proof_attempt a -> let p = a.M.prover in
 	   p.Session.prover_name ^ " " ^ p.Session.prover_version
@@ -482,6 +485,7 @@ let () =
  for the project@." project_dir;
       Unix.mkdir project_dir 0o777
     end
+
 
 let () =
   let dbfname = Filename.concat project_dir "project.xml" in
@@ -673,6 +677,7 @@ let (_ : GMenu.image_menu_item) =
 let exit_function () =
   eprintf "saving IDE config file@.";
   save_config ();
+  (*
   eprintf "saving session (testing only)@.";
   begin
     M.test_save ();
@@ -690,6 +695,8 @@ let exit_function () =
   end;
   let ret = Sys.command "xmllint --noout --dtdvalid share/why3session.dtd essai.xml" in
   if ret = 0 then eprintf "DTD validation succeeded, good!@."; 
+  *)
+  M.save_session ();
   GMain.quit ()
 
 let (_ : GtkSignal.id) = w#connect#destroy ~callback:exit_function
@@ -1067,22 +1074,26 @@ and color_t_locs () t =
   Term.t_fold color_t_locs color_f_locs () t
 
 let scroll_to_source_goal g =
-  let t = g.M.task in
-  let id = (Task.task_goal t).Decl.pr_name in
-  scroll_to_id id;
-  match t with
-    | Some
-        { Task.task_decl =
-            { Theory.td_node =
-                Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
-        color_f_locs () f
-    | _ ->
-        assert false
+  try
+    let t = M.get_task g in
+    let id = (Task.task_goal t).Decl.pr_name in
+    scroll_to_id id;
+    match t with
+      | Some
+          { Task.task_decl =
+              { Theory.td_node =
+                  Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
+          color_f_locs () f
+      | _ ->
+          assert false
+  with Not_found -> ()
 
 let scroll_to_theory th =
-  let t = th.M.theory in
-  let id = t.Theory.th_name in
-  scroll_to_id id
+  try
+    let t = M.get_theory th in
+    let id = t.Theory.th_name in
+    scroll_to_id id
+  with Not_found -> ()
 
 (* to be run when a row in the tree view is selected *)
 let select_row p =
@@ -1097,7 +1108,7 @@ let select_row p =
               scroll_to_source_goal g
 	  | _ -> assert false
 	in	
-        M.apply_transformation ~callback intro_transformation g.M.task
+        M.apply_transformation ~callback intro_transformation (M.get_task g)
 
     | M.Theory th ->
         task_view#source_buffer#set_text "";

@@ -4,11 +4,9 @@
 
   open Lexing
 
-  open Why.Rc
-
   type element =
     { name : string;
-      attributes : (string * rc_value) list;
+      attributes : (string * string) list;
       elements : element list;
     }
 
@@ -97,27 +95,32 @@ and attributes groupe_stack element_stack elem acc = parse
 and value = parse
   | space+ 
       { value lexbuf }
+(*
   | integer as i
       { RCint (int_of_string i) }
   | real as r
       { RCfloat (float_of_string r) }
+*)
   | '"' 
       { Buffer.clear buf;
 	string_val lexbuf } 
+(*
   | "true"
       { RCbool true }
   | "false"
       { RCbool false }
   | ident as id
       { RCident id }
+*)
   | _ as c
-      { failwith ("[Xml error] invalid value starting with " ^ String.make 1 c) }
+      { failwith ("[Xml error] invalid value starting with " 
+		  ^ String.make 1 c) }
   | eof
       { failwith "[Xml error] unterminated keyval pair" }
 
 and string_val = parse 
   | '"' 
-      { RCstring (Buffer.contents buf) }
+      { Buffer.contents buf }
   | [^ '\\' '"'] as c
       { Buffer.add_char buf c;
         string_val lexbuf }

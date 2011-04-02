@@ -134,7 +134,7 @@ and goal =
     { goal_name : string;
       goal_expl : string option;
       parent : goal_parent;
-      task: Task.task;
+      task: Task.task option;
       goal_key : O.key;
       mutable proved : bool;
       external_proofs: (string, proof_attempt) Hashtbl.t;
@@ -150,7 +150,8 @@ and transf =
     }
 
 and theory =
-    { theory : Theory.theory;
+    { theory_name : string;
+      theory : Theory.theory option;
       theory_key : O.key;
       theory_parent : file;
       mutable goals : goal list;
@@ -171,10 +172,20 @@ type any =
   | Proof_attempt of proof_attempt
   | Transformation of transf
 
+let get_theory t = 
+  match t.theory with 
+    | None -> raise Not_found
+    | Some t -> t
+
+let get_task g = 
+  match g.task with 
+    | None -> raise Not_found
+    | Some t -> t
+
 let all_files : file list ref = ref []
 
 let get_all_files () = !all_files
-
+ 
 (************************)
 (* saving state on disk *)
 (************************)
@@ -220,7 +231,8 @@ and save_trans fmt _ t =
   fprintf fmt "</transf>@\n"
 
 let save_theory fmt t =
-  fprintf fmt "@[<v 1><theory name=\"%s\" verified=\"%b\">@\n" "todo" t.verified;
+  fprintf fmt "@[<v 1><theory name=\"%s\" verified=\"%b\">@\n" 
+    t.theory_name t.verified;
   List.iter (save_goal fmt) t.goals;
   fprintf fmt "</theory>@]@\n"
 
@@ -246,20 +258,14 @@ let test_save () = save "essai.xml"
 
 let test_load () = Xml.from_file "essai.xml"
 
-(****************************)
-(*     session opening      *)
-(****************************)
-
-let init_fun = ref (fun (_:O.key) (_:any) -> ())
-
-let notify_fun = ref (fun (_:any) -> ())
-
-let open_session ~init ~notify _ = 
-  init_fun := init; notify_fun := notify
 
 (************************)
 (*     actions          *)
 (************************)
+
+let init_fun = ref (fun (_:O.key) (_:any) -> ())
+
+let notify_fun = ref (fun (_:any) -> ())
 
 let check_file_verified f =
   let b = List.for_all (fun t -> t.verified) f.theories in
@@ -564,7 +570,7 @@ let raw_add_external_proof ~obsolete ~edit g p result =
 (* [raw_add_goal parent name expl t] adds a goal to the given parent
    DOES NOT record the new goal in its parent, thus this should not be exported
 *)
-let raw_add_goal parent name expl t =
+let raw_add_goal parent name expl topt =
   let parent_key = match parent with
     | Parent_theory mth -> mth.theory_key
     | Parent_transf mtr -> mtr.transf_key
@@ -573,7 +579,7 @@ let raw_add_goal parent name expl t =
   let goal = { goal_name = name;
                goal_expl = expl;
 	       parent = parent;
-               task = t ;
+               task = topt ;
                goal_key = key;
                external_proofs = Hashtbl.create 7;
                transformations = Hashtbl.create 3;
@@ -605,10 +611,11 @@ let raw_add_transformation g trans =
   !notify_fun any;
   tr
 
-let raw_add_theory mfile th =
+let raw_add_theory mfile thopt thname =
   let parent = mfile.file_key in
   let key = O.create ~parent () in
-  let mth = { theory = th;
+  let mth = { theory_name = thname;
+	      theory = thopt;
               theory_key = key;
               theory_parent = mfile;
               goals = [] ;
@@ -621,16 +628,16 @@ let raw_add_theory mfile th =
 
 
 
-let add_theory mfile th =
+let add_theory mfile name th =
   let tasks = List.rev (Task.split_theory th None None) in
-  let mth = raw_add_theory mfile th in
+  let mth = raw_add_theory mfile (Some th) name in
   let goals =
     List.fold_left
       (fun acc t ->
          let id = (Task.task_goal t).Decl.pr_name in
          let name = id.Ident.id_string in
          let expl = get_explanation id (Task.task_goal_fmla t) in
-         let goal = raw_add_goal (Parent_theory mth) name expl t in
+         let goal = raw_add_goal (Parent_theory mth) name expl (Some t) in
          goal :: acc)
       []
       tasks
@@ -668,8 +675,8 @@ let add_file f theories =
   let mfile = raw_add_file f in
   let mths =
     List.fold_left
-      (fun acc (_,_,t) ->
-         let mth = add_theory mfile t in
+      (fun acc (_,name,t) ->
+         let mth = add_theory mfile name t in
          mth :: acc)
       [] theories
   in
@@ -679,6 +686,8 @@ let add_file f theories =
 
 let file_exists fn =
   List.exists (fun f -> f.file_name = fn) !all_files
+
+
 
 
 
@@ -896,6 +905,58 @@ let () =
 *)
 
 
+(****************************)
+(*     session opening      *)
+(****************************)
+
+let load_goal mth acc g = 
+  assert (g.Xml.name = "goal");
+  let gname = 
+    try List.assoc "name" g.Xml.attributes
+    with Not_found -> assert false
+  in
+  let expl = 
+    try Some (List.assoc "expl" g.Xml.attributes)
+    with Not_found -> None
+  in
+  let mg = raw_add_goal (Parent_theory mth) gname expl None in
+  (* TODO add proofs and transformations *)
+  mg::acc
+
+let load_theory mf acc th =
+  assert (th.Xml.name = "theory");
+  let thname = 
+    try List.assoc "name" th.Xml.attributes
+    with Not_found -> assert false
+  in
+  let mth = raw_add_theory mf None thname in
+  mth.goals <- List.rev (List.fold_left (load_goal mth) [] th.Xml.elements);
+  mth::acc
+
+let load_file f =
+  assert (f.Xml.name = "file");
+  let fn = 
+    try List.assoc "name" f.Xml.attributes
+    with Not_found -> assert false
+  in
+  let mf = raw_add_file fn in
+  mf.theories <- List.rev (List.fold_left (load_theory mf) [] f.Xml.elements)
+  
+let db_file = ref ""
+
+let open_session ~init ~notify file = 
+  init_fun := init; notify_fun := notify; db_file := file;
+  try
+    let l = Xml.from_file file in
+    List.iter load_file l;
+    (* TODO reload the files *)
+    ()
+  with Sys_error _ -> 
+    (* xml does not exist yet *)
+    ()
+
+let save_session () = save !db_file
+
 (*****************************************************)
 (* method: run a given prover on each unproved goals *)
 (*****************************************************)
@@ -928,7 +989,7 @@ let redo_external_proof g a =
       ~debug:false ~timelimit:10 ~memlimit:0
       ?old ~command:p.command ~driver:p.driver
       ~callback
-      g.task
+      (get_task g)
 
 let rec prover_on_goal p g =
   let id = p.prover_id in
@@ -1047,7 +1108,7 @@ let transformation_on_goal g tr =
       let b =
  	match subgoals with
 	  | [task] ->
-              let s1 = task_checksum g.task in
+              let s1 = task_checksum (get_task g) in
               let s2 = task_checksum task in
 	      (*
                 eprintf "Transformation returned only one task. sum before = %s, sum after = %s@." (task_checksum g.task) (task_checksum task);
@@ -1071,7 +1132,7 @@ let transformation_on_goal g tr =
 	    in
 	    let goal =
 	      raw_add_goal (Parent_transf tr)
-		subgoal_name expl subtask 
+		subgoal_name expl (Some subtask)
 	    in
 	    (goal :: acc, count+1)
 	in
@@ -1080,7 +1141,7 @@ let transformation_on_goal g tr =
 	in
 	tr.subgoals <- List.rev goals
     in
-    apply_transformation ~callback tr g.task
+    apply_transformation ~callback tr (get_task g)
 
 let rec transform_goal_or_children ~context_unproved_goals_only tr g =
   if not g.proved then
@@ -1119,7 +1180,11 @@ let transform ~context_unproved_goals_only tr a =
 
 let ft_of_th th =
   (Filename.basename th.theory_parent.file_name,
-   th.theory.Theory.th_name.Ident.id_string)
+   (*
+     th.theory.Theory.th_name.Ident.id_string
+   *)
+   th.theory_name
+  )
 
 let rec ft_of_goal g =
   match g.parent with
@@ -1141,7 +1206,7 @@ let edit_proof ~default_editor ~project_dir a =
 *)
   else
     let g = a.proof_goal in
-    let t = g.task in
+    let t = (get_task g) in
     let driver = a.prover.driver in
     let file =
       match a.edited_as with

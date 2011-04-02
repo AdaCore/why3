@@ -2,7 +2,7 @@
 
 type element =
     { name : string;
-      attributes : (string * Why.Rc.rc_value) list;
+      attributes : (string * string) list;
       elements : element list;
     }
 
