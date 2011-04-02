@@ -491,7 +491,7 @@ let () =
   let dbfname = Filename.concat project_dir "project.xml" in
   try
     eprintf "Opening session...@?";
-    M.open_session ~init ~notify dbfname;
+    M.open_session ~provers:gconfig.provers ~init ~notify dbfname;
     M.maximum_running_proofs := gconfig.max_running_processes;
     eprintf " done@."
   with e ->

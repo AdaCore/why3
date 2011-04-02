@@ -134,6 +134,7 @@ module Make(O: OBSERVER) : sig
   (*****************************)
 
   val open_session : 
+    provers:prover_data Util.Mstr.t ->
     init:(O.key -> any -> unit) ->
     notify:(any -> unit) -> string -> unit
     (** starts a new proof session, using directory given as argument 

@@ -191,7 +191,7 @@ let get_all_files () = !all_files
 (************************)
 
 let save_result fmt r =
-  fprintf fmt "<%s time=\"%.2f\"/>@\n"
+  fprintf fmt "<result status=\"%s\" time=\"%.2f\"/>@\n"
     (match r.Call_provers.pr_answer with
        | Call_provers.Valid -> "valid"
        | Call_provers.Failure _ -> "failure"
@@ -909,7 +909,36 @@ let () =
 (*     session opening      *)
 (****************************)
 
-let load_goal mth acc g = 
+let load_result r =
+  match r.Xml.name with
+    | "result" ->
+	let status = 
+	  try List.assoc "status" r.Xml.attributes
+	  with Not_found -> assert false
+	in
+	let answer = 
+	  match status with
+	    | "valid" -> Call_provers.Valid
+	    | "invalid" -> Call_provers.Invalid
+	    | "unknown" -> Call_provers.Unknown ""
+	    | "timeout" -> Call_provers.Timeout
+	    | "failure" -> Call_provers.Failure ""
+	    | "highfailure" -> Call_provers.Failure ""
+	    | _ -> assert false
+	in
+	let time =
+	  try float_of_string (List.assoc "time" r.Xml.attributes)
+	  with Not_found -> 0.0
+	in
+	{ Call_provers.pr_answer = answer;
+	  Call_provers.pr_time = time;
+	  Call_provers.pr_output = "";
+	}
+    | s -> 
+	failwith ("Session.load_result: unexpected element " ^ s)
+    
+  
+let rec load_goal ~provers mth acc g = 
   assert (g.Xml.name = "goal");
   let gname = 
     try List.assoc "name" g.Xml.attributes
@@ -920,35 +949,67 @@ let load_goal mth acc g =
     with Not_found -> None
   in
   let mg = raw_add_goal (Parent_theory mth) gname expl None in
-  (* TODO add proofs and transformations *)
+  List.iter (load_proof_or_transf ~provers mg) g.Xml.elements;
   mg::acc
 
-let load_theory mf acc th =
+and load_proof_or_transf ~provers mg a =
+  match a.Xml.name with
+    | "proof" -> 
+	let prover = 
+	  try List.assoc "prover" a.Xml.attributes
+	  with Not_found -> assert false
+	in
+        let p = 
+	  try
+	    Util.Mstr.find prover provers 
+	  with Not_found -> assert false (* TODO *)
+	in
+	let res = match a.Xml.elements with
+	  | [r] -> Done (load_result r)
+	  | [] -> Undone
+	  | _ -> assert false
+	in
+	let pa = raw_add_external_proof ~obsolete:false 
+	  ~edit:"" (* TODO *)
+	  mg p res
+	in
+	Hashtbl.add mg.external_proofs prover pa
+    | "transf" -> 
+	()
+	(* TODO *)
+	(*
+	  Hashtbl.add mg.transformations tr_name tr
+	*)
+    | _ -> assert false 
+
+let load_theory ~provers mf acc th =
   assert (th.Xml.name = "theory");
   let thname = 
     try List.assoc "name" th.Xml.attributes
     with Not_found -> assert false
   in
   let mth = raw_add_theory mf None thname in
-  mth.goals <- List.rev (List.fold_left (load_goal mth) [] th.Xml.elements);
+  mth.goals <- 
+    List.rev (List.fold_left (load_goal ~provers mth) [] th.Xml.elements);
   mth::acc
 
-let load_file f =
+let load_file ~provers f =
   assert (f.Xml.name = "file");
   let fn = 
     try List.assoc "name" f.Xml.attributes
     with Not_found -> assert false
   in
   let mf = raw_add_file fn in
-  mf.theories <- List.rev (List.fold_left (load_theory mf) [] f.Xml.elements)
+  mf.theories <- 
+    List.rev (List.fold_left (load_theory ~provers mf) [] f.Xml.elements)
   
 let db_file = ref ""
 
-let open_session ~init ~notify file = 
+let open_session ~provers ~init ~notify file = 
   init_fun := init; notify_fun := notify; db_file := file;
   try
     let l = Xml.from_file file in
-    List.iter load_file l;
+    List.iter (load_file ~provers) l;
     (* TODO reload the files *)
     ()
   with Sys_error _ -> 
