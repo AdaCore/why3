@@ -1,0 +1,24 @@
+<!ELEMENT file (theory*)>
+<!ATTLIST file name CDATA #REQUIRED>
+<!ATTLIST file verified CDATA #REQUIRED>
+
+<!ELEMENT theory (goal*)>
+<!ATTLIST theory name CDATA #REQUIRED>
+<!ATTLIST theory verified CDATA #REQUIRED>
+
+<!ELEMENT goal (proof*, transf*)>
+<!ATTLIST goal name CDATA #REQUIRED>
+<!ATTLIST goal expl CDATA #IMPLIED>
+<!ATTLIST goal proved CDATA #REQUIRED>
+
+<!ELEMENT proof (result)>
+<!ATTLIST proof prover CDATA #REQUIRED>
+
+<!ELEMENT result EMPTY>
+<!ATTLIST result status (valid|invalid|unknown|timeout|failure) #REQUIRED>
+<!ATTLIST result time CDATA #IMPLIED>
+
+<!ELEMENT transf (goal*)>
+<!ATTLIST transf name CDATA #REQUIRED>
+<!ATTLIST transf proved CDATA #REQUIRED>
+

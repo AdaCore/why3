@@ -441,8 +441,8 @@ install_local: bin/why3config
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = session gconfig db gmain
-# IDE_FILES = session gconfig newmain
+IDE_FILES = xml session gconfig db gmain
+# IDE_FILES = xml session gconfig newmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
@@ -478,7 +478,7 @@ bin/why3ide: bin/why3ide.@OCAMLBEST@
 
 include .depend.ide
 
-.depend.ide:
+.depend.ide: src/ide/xml.ml
 	$(OCAMLDEP) -slash -I src -I src/ide $(IDEML) $(IDEMLI) > $@
 
 depend: .depend.ide

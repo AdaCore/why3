@@ -165,7 +165,7 @@ let w = GWindow.window
   ~allow_grow:true ~allow_shrink:true
   ~width:gconfig.window_width
   ~height:gconfig.window_height
-  ~title:"Why3: graphical session manager" ()
+  ~title:"Why3 Interactive Proof Session" ()
 
 let (_ : GtkSignal.id) =
   w#misc#connect#size_allocate
@@ -673,8 +673,23 @@ let (_ : GMenu.image_menu_item) =
 let exit_function () =
   eprintf "saving IDE config file@.";
   save_config ();
-  eprintf "saving session@.";
-  M.test_save ();
+  eprintf "saving session (testing only)@.";
+  begin
+    M.test_save ();
+    try
+      let l = M.test_load () in
+      eprintf "reloaded successfully %d elements@." (List.length l);
+      match l with
+	| [] -> ()
+	| f :: _ ->
+	    eprintf "first element is a '%s' with %d sub-elements@." 
+	      f.Xml.name (List.length f.Xml.elements);
+	    
+    with e -> eprintf "test reloading failed with exception %s@."
+      (Printexc.to_string e)
+  end;
+  let ret = Sys.command "xmllint --noout --dtdvalid share/why3session.dtd essai.xml" in
+  if ret = 0 then eprintf "DTD validation succeeded, good!@."; 
   GMain.quit ()
 
 let (_ : GtkSignal.id) = w#connect#destroy ~callback:exit_function

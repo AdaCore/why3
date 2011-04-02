@@ -210,11 +210,14 @@ let rec save_goal fmt g =
   fprintf fmt "@[<v 1><goal name=\"%s\" %aproved=\"%b\">@\n" 
     g.goal_name (opt "expl") g.goal_expl g.proved;
   Hashtbl.iter (save_proof_attempt fmt) g.external_proofs;
+  Hashtbl.iter (save_trans fmt) g.transformations;
   fprintf fmt "</goal>@]@\n"
 
-(*
-and save_trans fmt t =
-*)
+and save_trans fmt _ t =
+  fprintf fmt "<transf name=\"%s\" proved=\"%b\">@\n" 
+    t.transf.transformation_name t.transf_proved;
+  List.iter (save_goal fmt) t.subgoals;
+  fprintf fmt "</transf>@\n"
 
 let save_theory fmt t =
   fprintf fmt "@[<v 1><theory name=\"%s\" verified=\"%b\">@\n" "todo" t.verified;
@@ -230,12 +233,18 @@ let save fname =
   let ch = open_out fname in
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
+(*
   fprintf fmt "@[<v 1><project name=\"%s\">@\n" (Filename.basename fname);
+*)
   List.iter (save_file fmt) (get_all_files());
+(*
   fprintf fmt "</project>@]@.";
+*)
   close_out ch
 
 let test_save () = save "essai.xml"
+
+let test_load () = Xml.from_file "essai.xml"
 
 (****************************)
 (*     session opening      *)

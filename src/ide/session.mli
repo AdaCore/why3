@@ -147,6 +147,8 @@ module Make(O: OBSERVER) : sig
   val maximum_running_proofs : int ref
 
   val test_save : unit -> unit
+  val test_load : unit -> Xml.element list
+
     (* 
   val save_session : unit -> unit
     (** enforces to save the session state on disk. *)
