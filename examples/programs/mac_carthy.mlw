@@ -1,19 +1,21 @@
+(* McCarthy's ``91'' function. *)
+
 module M
 
   use import int.Int
 
-(**** McCarthy's ``91'' function. *)
+  (* traditional recursive implementation *)
 
-let rec f91 (n:int) : int variant { 101-n } =
-  { }
-  if n <= 100 then
-    f91 (f91 (n + 11))
-  else
-    n - 10
-  { (n <= 100 and result = 91) or (n >= 101 and result = n - 10) }
+  let rec f91 (n:int) : int variant { 101-n } =
+    { }
+    if n <= 100 then
+      f91 (f91 (n + 11))
+    else
+      n - 10
+    { (n <= 100 and result = 91) or (n >= 101 and result = n - 10) }
 
 
-(* non-recursive version *)
+  (* non-recursive implementation using a while loop *)
 
   use import module stdlib.Ref
 
@@ -31,22 +33,22 @@ let rec f91 (n:int) : int variant { 101-n } =
   clone import relations.Lex with type t1 = int, type t2 = int,
     logic rel1 = lt_nat, logic rel2 = lt_nat
 
-let f91_nonrec (n x : ref int) =
-  { n >= 1 }
-  label L:
-  while !n > 0 do
-    invariant { n >= 0 and iter_f n x = iter_f (at n L) (at x L) }
-    variant { (101 - x + 10 * n, n) } with lex 
-    if !x > 100 then begin
-      x := !x - 10;
-      n := !n - 1
-    end else begin
-      x := !x + 11;
-      n := !n + 1
-    end
-  done;
-  !x
-  { result = iter_f (old n) (old x) }
+  let f91_nonrec (n x : ref int) =
+    { n >= 1 }
+    label L:
+    while !n > 0 do
+      invariant { n >= 0 and iter_f n x = iter_f (at n L) (at x L) }
+      variant { (101 - x + 10 * n, n) } with lex 
+      if !x > 100 then begin
+        x := !x - 10;
+        n := !n - 1
+      end else begin
+        x := !x + 11;
+        n := !n + 1
+      end
+    done;
+    !x
+    { result = iter_f (old n) (old x) }
 
 end
 

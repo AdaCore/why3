@@ -1,4 +1,10 @@
 
+(* Sorting an array using quicksort, with partitioning a la Bentley. 
+
+   We simply scan the segment l..r from left ro right, maintaining values
+   smaller than t[l] on the left part of it (in l+1..m).
+   Then we swap t[l] and t[m] and we are done. *)
+
 module Quicksort
 
   use import int.Int

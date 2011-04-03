@@ -17,7 +17,6 @@ theory Power
   lemma Power_mult : forall x n m : int. 0 <= n -> 0 <= m ->
     power x (n * m) = power (power x n) m
 
-
 end
 
 module M
@@ -25,6 +24,8 @@ module M
   use import int.Int
   use import int.ComputerDivision
   use import Power
+
+  (* recursive implementation *)
 
   let rec fast_exp x n variant { n } =
     { 0 <= n }
@@ -35,6 +36,8 @@ module M
       if mod n 2 = 0 then r * r else r * r * x
     end
     { result = power x n }
+
+  (* non-recursive implementation using a while loop *)
 
   use import module stdlib.Ref
 

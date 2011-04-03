@@ -46,7 +46,7 @@
 
 	"as"; "assert"; "begin";
         "do"; "done"; "downto"; "else";
-        "exception"; "for"; "fun";
+        "exception"; "parameter"; "for"; "fun";
         "if"; "in"; 
         "module"; "mutable";
         "rec"; "then"; "to"; 
