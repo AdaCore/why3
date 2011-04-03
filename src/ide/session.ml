@@ -151,7 +151,7 @@ and transf =
 
 and theory =
     { theory_name : string;
-      theory : Theory.theory option;
+      mutable theory : Theory.theory option;
       theory_key : O.key;
       theory_parent : file;
       mutable goals : goal list;
@@ -172,12 +172,26 @@ type any =
   | Proof_attempt of proof_attempt
   | Transformation of transf
 
+let theory_name t = t.theory_name
+let theory_key t = t.theory_key
+let verified t = t.verified
+let goals t = t.goals
+
 let get_theory t = 
   match t.theory with 
     | None -> 
 	eprintf "Session: theory not yet reimported, this should not happen@.";
 	assert false
     | Some t -> t
+
+let goal_name g = g.goal_name
+let goal_expl g = 
+  match g.goal_expl with 
+    | None -> g.goal_name
+    | Some s -> s
+let goal_key g = g.goal_key
+let goal_proved g = g.proved
+let transformations g = g.transformations
 
 let get_task g = 
   match g.task with 
@@ -256,11 +270,6 @@ let save fname =
   fprintf fmt "@.";
   close_out ch
 
-let test_save () = save "essai.xml"
-
-let test_load () = Xml.from_file "essai.xml"
-
-
 (************************)
 (*     actions          *)
 (************************)
@@ -314,38 +323,14 @@ and check_transf_proved t =
       check_goal_proved t.parent_goal
     end
 
-
-let set_file_verified f =
-  f.file_verified <- true;
-  !notify_fun (File f)
-
-let set_theory_proved ~propagate t =
-  t.verified <- true;
-  !notify_fun (Theory t);
-  let f = t.theory_parent in
-  if propagate then
-    if List.for_all (fun t ->
-                       t.verified) f.theories 
-    then set_file_verified f
-
-let rec set_proved ~propagate g =
-  g.proved <- true;
-  !notify_fun (Goal g);
-  if propagate then
-    match g.parent with
-      | Parent_theory t ->
-          if List.for_all (fun g -> g.proved) t.goals then
-            set_theory_proved ~propagate t
-      | Parent_transf t ->
-          if List.for_all (fun g -> g.proved) t.subgoals then
-            begin
-              set_proved ~propagate t.parent_goal;
-            end
-
 let set_proof_state ~obsolete a res =
   a.proof_state <- res;
   a.proof_obsolete <- obsolete;
-  !notify_fun (Proof_attempt a)
+  !notify_fun (Proof_attempt a);
+  match res with
+    | Done _ ->
+	check_goal_proved a.proof_goal
+    | _ -> ()
 
 (*************************)
 (*         Scheduler     *)
@@ -645,7 +630,7 @@ let add_theory mfile name th =
       tasks
   in
   mth.goals <- List.rev goals;
-  if goals = [] then set_theory_proved ~propagate:false mth;
+  check_theory_proved mth;
   mth
 
 let raw_add_file f =
@@ -661,7 +646,15 @@ let raw_add_file f =
   !notify_fun any;
   mfile
 
-let add_file f theories =
+let current_env = ref None
+let project_dir = ref ""
+
+let read_file fn =
+  let fn = Filename.concat !project_dir fn in
+  let env = match !current_env with 
+    | None -> assert false | Some e -> e 
+  in
+  let theories = Env.read_file env fn in
   let theories =
     Theory.Mnm.fold
       (fun name th acc ->
@@ -670,10 +663,12 @@ let add_file f theories =
            | _ -> (Loc.dummy_position,name,th)::acc)
       theories []
   in
-  let theories = List.sort
+  List.sort
     (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
     theories
-  in
+
+let add_file f =
+  let theories = read_file f in
   let mfile = raw_add_file f in
   let mths =
     List.fold_left
@@ -683,7 +678,7 @@ let add_file f theories =
       [] theories
   in
   mfile.theories <- List.rev mths;
-  if theories = [] then set_file_verified mfile
+  check_file_verified mfile
 
 
 let file_exists fn =
@@ -855,57 +850,63 @@ let reimport_root_goal mth tname goals t : Model.goal * bool =
   in
   reimport_any_goal (Model.Theory mth) id gname t db_goal goal_obsolete
 
-(* reimports all files *)
-let files_in_db = Db.files ()
-
-let () =
-  List.iter
-    (fun (f,fn) ->
-       eprintf "Reimporting file '%s'@." fn;
-       let mfile = Helpers.add_file_row fn f in
-       try
-	 let theories = read_file fn in
-	 let ths = Db.theories f in
-	 let (mths,file_proved) =
-	   List.fold_left
-             (fun (acc,file_proved) (_,tname,th) ->
-		eprintf "Reimporting theory '%s'@."tname;
-		let db_th =
-		  try
-                    Util.Mstr.find tname ths
-		  with Not_found -> Db.add_theory f tname
-		in
-		let mth = Helpers.add_theory_row mfile th db_th in
-		let goals = Db.goals db_th in
-		let tasks = List.rev (Task.split_theory th None None) in
-		let goals,proved = List.fold_left
-		  (fun (acc,proved) t ->
-                     let (g,p) = reimport_root_goal mth tname goals t in
-                     (g::acc,proved && p))
-		  ([],true) tasks
-		in
-		mth.Model.goals <- List.rev goals;
-		(* TODO: what to do with remaining tasks in Db ???
-		   for the moment they remain in the db, but they are not shown
-		*)
-		if proved then Helpers.set_theory_proved ~propagate:false mth;
-		(mth::acc,file_proved && proved))
-             ([],true) theories
-	 in
-	 (* TODO: detecter d'eventuelles vieilles theories, qui seraient donc
-            dans [ths] mais pas dans [theories]
-	 *)
-	 mfile.Model.theories <- List.rev mths;
-	 if file_proved then Helpers.set_file_verified mfile
-      with e ->
-	eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
-          Exn_printer.exn_printer e;
-	exit 1
-    )
-    files_in_db
-
 *)
 
+(* reloads a file *)
+
+let reload_file mf =
+  eprintf "[Reload] file '%s'@." mf.file_name;
+  try
+    let theories = read_file mf.file_name in
+    let old_theories = List.fold_left
+      (fun acc t -> Util.Mstr.add t.theory_name t acc)
+      Util.Mstr.empty
+      mf.theories 
+    in
+    let mths =
+      List.fold_left
+        (fun acc (_,tname,th) ->
+	   eprintf "[Reload] theory '%s'@."tname;
+	   let mth =
+	     try
+               let mth = Util.Mstr.find tname old_theories in
+	       mth.theory <- Some th;
+	       mth
+	     with Not_found -> 
+	       raw_add_theory mf (Some th) tname
+	   in
+(*
+	   let goals = Db.goals db_th in
+	   let tasks = List.rev (Task.split_theory th None None) in
+	   let goals,proved = List.fold_left
+	     (fun (acc,proved) t ->
+                let (g,p) = reimport_root_goal mth tname goals t in
+                (g::acc,proved && p))
+	     ([],true) tasks
+	   in
+	   mth.Model.goals <- List.rev goals;
+*)
+	   (* TODO: what to do with remaining old theories?
+	      for the moment they remain in the session
+	   *)
+	   check_theory_proved mth;
+	   mth::acc
+	)
+        [] theories
+    in
+    (* TODO: detecter d'eventuelles vieilles theories, qui seraient donc
+       dans [old_theories] mais pas dans [theories]
+    *)
+    mf.theories <- List.rev mths;
+    check_file_verified mf
+  with e ->
+    eprintf "@[Error while reading file@ '%s':@ %a@.@]" mf.file_name
+      Exn_printer.exn_printer e;
+    exit 1
+      
+
+(* reloads all files *)
+let reload_all () = List.iter reload_file !all_files
 
 (****************************)
 (*     session opening      *)
@@ -1058,18 +1059,17 @@ let load_session ~env ~provers xml =
 	eprintf "Session.load_session: unexpected element '%s'@."  s;
 	assert false
   
-let db_file = ref None
+let db_filename = "why3session.xml"
 
-let open_session ~env ~provers ~init ~notify file = 
-  match !db_file with
+let open_session ~env ~provers ~init ~notify dir = 
+  match !current_env with
     | None ->
 	init_fun := init; notify_fun := notify; 
-	db_file := Some file;
+	project_dir := dir; current_env := Some env;
 	begin try
-	  let xml = Xml.from_file file in
+	  let xml = Xml.from_file (Filename.concat dir db_filename) in
 	  load_session ~env ~provers xml;
-	  (* TODO reload the files *)
-	  ()
+	  reload_all ()
 	with 
 	  | Sys_error _ -> 
 	      (* xml does not exist yet *)
@@ -1083,8 +1083,8 @@ let open_session ~env ~provers ~init ~notify file =
 	assert false
 
 let save_session () = 
-  match !db_file with
-    | Some f -> save f
+  match !current_env with
+    | Some _ -> save (Filename.concat !project_dir db_filename)
     | None ->
 	eprintf "Session.save_session: no session opened@.";
 	assert false
@@ -1105,11 +1105,6 @@ let redo_external_proof g a =
     let p = a.prover in
     let callback result =
       set_proof_state ~obsolete:false a result;
-      match result with
-	| Done r ->
-	    if r.Call_provers.pr_answer = Call_provers.Valid then
-	      set_proved ~propagate:true a.proof_goal
-	| _ -> ()
     in
     let old = if a.edited_as = "" then None else
       begin
@@ -1364,11 +1359,10 @@ let edit_proof ~default_editor ~project_dir a =
 	    file
 	| f -> f
     in
-    let old_status = a.proof_state in
     let callback res =
       match res with
         | Done _ ->
-            set_proof_state ~obsolete:false a old_status
+            set_proof_state ~obsolete:false a Undone
         | _ ->
             set_proof_state ~obsolete:false a res
     in

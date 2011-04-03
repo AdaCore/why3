@@ -338,7 +338,7 @@ let clear model = model#clear ()
 
 let image_of_result ~obsolete result =
   match result with
-    | Session.Undone -> !image_scheduled (* TODO *)
+    | Session.Undone -> !image_undone
     | Session.Scheduled -> !image_scheduled
     | Session.Running -> !image_running
     | Session.InternalFailure _ -> !image_failure
@@ -424,14 +424,8 @@ let init =
 	 | M.Transformation _ -> !image_transf);
     goals_model#set ~row ~column:name_column 
       (match any with
-	 | M.Goal g -> 
-	     (match g.M.goal_expl with 
-		| None -> g.M.goal_name
-		| Some s -> s)
-	 | M.Theory th -> th.M.theory_name
-	     (*
-	       th.M.theory.Theory.th_name.Ident.id_string
-	     *)
+	 | M.Goal g -> M.goal_expl g
+	 | M.Theory th -> M.theory_name th
 	 | M.File f -> Filename.basename f.M.file_name
 	 | M.Proof_attempt a -> let p = a.M.prover in
 	   p.Session.prover_name ^ " " ^ p.Session.prover_version
@@ -440,9 +434,9 @@ let init =
 let notify any =
   match any with
     | M.Goal g ->
-	set_row_status g.M.goal_key g.M.proved
+	set_row_status (M.goal_key g) (M.goal_proved g)
     | M.Theory th ->
-	set_row_status th.M.theory_key th.M.verified
+	set_row_status (M.theory_key th) (M.verified th)
     | M.File file ->
 	set_row_status file.M.file_key file.M.file_verified
     | M.Proof_attempt a ->
@@ -488,22 +482,18 @@ let () =
 
 
 let () =
-  let dbfname = Filename.concat project_dir "project.xml" in
   try
     eprintf "Opening session...@?";
     M.open_session ~env:gconfig.env ~provers:gconfig.provers 
-      ~init ~notify dbfname;
+      ~init ~notify project_dir;
     M.maximum_running_proofs := gconfig.max_running_processes;
     eprintf " done@."
   with e ->
-    eprintf "Error while opening session with database '%s'@." dbfname;
+    eprintf "Error while opening session with database '%s'@." project_dir;
     eprintf "Aborting...@.";
     raise e
 
 
-let read_file fn =
-  let fn = Filename.concat project_dir fn in
-  Env.read_file gconfig.env fn
 
 
 
@@ -541,7 +531,7 @@ let () =
           eprintf "Info: file %s already in database@." fn
         else
           try
-            M.add_file fn (read_file fn)
+            M.add_file fn
           with e ->
 	    eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
               Exn_printer.exn_printer e;
@@ -629,7 +619,7 @@ let select_file () =
 	      let f = Sysutil.relativize_filename project_dir f in
               eprintf "Adding file '%s'@." f;
               try
-                M.add_file f (read_file f)
+                M.add_file f
               with e ->
 	        fprintf str_formatter
                   "@[Error while reading file@ '%s':@ %a@]" f
@@ -719,24 +709,24 @@ let (_ : GMenu.image_menu_item) =
 
 
 let rec collapse_proved_goal g =
-  if g.M.proved then
+  if M.goal_proved g then
     begin
-      let row = g.M.goal_key in
+      let row = M.goal_key g in
       goals_view#collapse_row (goals_model#get_path row);
     end
   else
     Hashtbl.iter
       (fun _ t -> List.iter collapse_proved_goal t.M.subgoals)
-      g.M.transformations
+      (M.transformations g)
 
 let collapse_verified_theory th =
-  if th.M.verified then
+  if M.verified th then
     begin
-      let row = th.M.theory_key in
+      let row = M.theory_key th in
       goals_view#collapse_row (goals_model#get_path row);
     end
   else
-    List.iter collapse_proved_goal th.M.goals
+    List.iter collapse_proved_goal (M.goals th)
 
 let collapse_verified_file f =
   if f.M.file_verified then

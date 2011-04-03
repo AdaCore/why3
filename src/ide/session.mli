@@ -20,6 +20,7 @@
 
 open Why
 
+(** {Prover's data} *)
 type prover_data = private
     { prover_id : string;
       prover_name : string;
@@ -29,18 +30,24 @@ type prover_data = private
       driver : Driver.driver;
       mutable editor : string;
     }
+    (** record of necessary data for a given external prover *)
 
 val get_prover_data : 
   Env.env -> Util.Mstr.key -> Whyconf.config_prover ->
   prover_data Util.Mstr.t -> prover_data Util.Mstr.t
+  (** loads all provers from the current configuration *)
 
-(* transformations *)
+(** {Transformation's data} *)
 type transformation_data 
+  (** record data for transformations *)
 
 val transformation_id : transformation_data -> string
+  (** Why3 name of a transformation *)
 
 val lookup_transformation : Env.env -> string -> transformation_data
+  (** returns a transformation from its Why3 name *)
 
+(** {Proof attempts} *)
 type proof_attempt_status = private
     | Undone
     | Scheduled (** external proof attempt is scheduled *)
@@ -48,24 +55,55 @@ type proof_attempt_status = private
     | Done of Call_provers.prover_result (** external proof done *)
     | InternalFailure of exn (** external proof aborted by internal error *)
 
+(** {Observers signature} *)
 module type OBSERVER = sig
 
   type key
+    (** type key allowing to uniquely identify an element of
+	of session: a goal, a transformation, a proof attempt,
+	a theory or a file. See type [any] below *)
+
   val create: ?parent:key -> unit -> key
+    (** returns a fresh key, a new child of the given parent if any *)
+
   val remove: key -> unit
+    (** removes a key *)
 
   val timeout: ms:int -> (unit -> bool) -> unit
+    (** a handler for functions that must be called after a given time
+	elapsed, in milliseconds. When the given function returns
+	true, it must be rescheduled *)
+
   val idle: (unit -> bool) -> unit
+    (** a handler for a delayed function, that can be called when
+	there is nothing else to do. When the given function returns
+	true, it must be rescheduled *)
 
 end
 
+(** {Main functor} *)
 module Make(O: OBSERVER) : sig
 
-(*****************************)
-(*                           *)
-(* static state of a session *)
-(*                           *)
-(*****************************)
+(** {static state of a session} *)
+
+  type goal
+    (** a goal *)
+
+  type transf = private
+      { transf : transformation_data;
+	parent_goal : goal;
+	mutable transf_proved : bool;
+        transf_key : O.key;
+        mutable subgoals : goal list;
+      }
+    (** a transformation of a given goal *)
+
+  val goal_name : goal -> string
+  val goal_expl : goal -> string
+  val get_task : goal -> Task.task
+  val goal_key : goal -> O.key
+  val goal_proved : goal -> bool
+  val transformations : goal -> (string, transf) Hashtbl.t
 
   type proof_attempt = private
       { prover : prover_data;
@@ -75,40 +113,18 @@ module Make(O: OBSERVER) : sig
         mutable proof_obsolete : bool;
         mutable edited_as : string;
       }
+    (** a proof attempt for a given goal *)
 
-  and goal_parent =
-    | Parent_theory of theory
-    | Parent_transf of transf
+  type theory 
+    (** a theory, holding a collection of goals *)
 
-  and goal = private
-      { goal_name : string;
-	goal_expl : string option;
-	parent : goal_parent;
-        task: Task.task option;
-        goal_key : O.key;
-        mutable proved : bool;
-        external_proofs: (string, proof_attempt) Hashtbl.t;
-        transformations : (string, transf) Hashtbl.t;
-      }
+  val theory_name : theory -> string
+  val get_theory : theory -> Theory.theory
+  val theory_key : theory -> O.key
+  val verified : theory -> bool
+  val goals : theory -> goal list
 
-  and transf = private
-      { transf : transformation_data;
-	parent_goal : goal;
-	mutable transf_proved : bool;
-        transf_key : O.key;
-        mutable subgoals : goal list;
-      }
-
-  and theory = private
-      { theory_name : string;
-	theory : Theory.theory option;
-        theory_key : O.key;
-        theory_parent : file;
-        mutable goals : goal list;
-        mutable verified : bool;
-      }
-
-  and file = private
+  type file = private
       { file_name : string;
         file_key : O.key;
         mutable theories: theory list;
@@ -123,10 +139,6 @@ module Make(O: OBSERVER) : sig
     | Transformation of transf
 
 
-  val get_theory : theory -> Theory.theory
-
-  val get_task : goal -> Task.task
-
   (*****************************)
   (*                           *)
   (*      save/load state      *)
@@ -139,7 +151,7 @@ module Make(O: OBSERVER) : sig
     init:(O.key -> any -> unit) ->
     notify:(any -> unit) -> string -> unit
     (** starts a new proof session, using directory given as argument 
-        this reloads the previous session if any.
+        this reloads the previous session database if any.
 
         Opening a session must be done prior to any other actions.
         And it cannot be done twice.
@@ -153,11 +165,6 @@ module Make(O: OBSERVER) : sig
 
   val maximum_running_proofs : int ref
 
-(*
-  val test_save : unit -> unit
-  val test_load : unit -> Xml.t
-*)
-
   val save_session : unit -> unit
     (** enforces to save the session state on disk. 
 	this it supposed to be called only at exit, 
@@ -166,14 +173,15 @@ module Make(O: OBSERVER) : sig
 
   val file_exists : string -> bool
 
-  val add_file : string -> Theory.theory Theory.Mnm.t -> unit
-    (** [add_file f ths] adds a new file in the proof session, that is
-	a collection of name [f] of theories [ths] *)
+  val add_file : string -> unit
+    (** [add_file adds the file [f] in the proof session,
+	the file name must be given relatively to the session dir
+	given to [open_session] *)
 
 
   val get_all_files : unit -> file list
 
-  (*
+  (* TODO
     val reload_files : unit -> unit 
   (** reloads all the files in the state, and performs the proper
     merging of old proof attemps and transformations *)
@@ -185,16 +193,8 @@ module Make(O: OBSERVER) : sig
 (*                           *)
 (*****************************)
 
-(*
-  val apply_transformation : 
-    callback:('a -> 'b) -> 'a Why.Trans.trans -> Why.Task.task -> 'b
-
-  val apply_transformation_l : 
-    callback:('a -> 'b) -> 'a Why.Trans.trans -> Why.Task.task -> 'b
-*)
-
-val apply_transformation : callback:(Task.task list -> unit) ->
-  transformation_data -> Task.task -> unit
+  val apply_transformation : callback:(Task.task list -> unit) ->
+    transformation_data -> Task.task -> unit
 
   val run_prover : context_unproved_goals_only:bool -> 
     prover_data -> any -> unit
@@ -212,7 +212,7 @@ val apply_transformation : callback:(Task.task list -> unit) ->
     (** [replay a] reruns all valid but obsolete proofs under [a] *)
 
 (*
-
+TODO
 
   val remove_proof_attempt : proof_attempt -> unit
 

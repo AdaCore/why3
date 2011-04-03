@@ -76,6 +76,7 @@ val image_remove : GdkPixbuf.pixbuf ref
 val image_cleaning : GdkPixbuf.pixbuf ref
 
 (* status icons *)
+val image_undone : GdkPixbuf.pixbuf ref
 val image_scheduled : GdkPixbuf.pixbuf ref
 val image_running : GdkPixbuf.pixbuf ref
 val image_valid : GdkPixbuf.pixbuf ref

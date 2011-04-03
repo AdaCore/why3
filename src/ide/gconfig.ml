@@ -180,7 +180,8 @@ let image ?size f =
     | Some s ->
         GdkPixbuf.from_file_at_size ~width:s ~height:s n
 
-let iconname_default = "pausehalf32"
+let iconname_default = "undone32"
+let iconname_undone = "undone32"
 let iconname_scheduled = "pausehalf32"
 let iconname_running = "play32"
 let iconname_valid = "accept32"
@@ -205,6 +206,7 @@ let iconname_remove = "deletefile32"
 let iconname_cleaning = "trashb32"
 
 let image_default = ref (image ~size:20 iconname_default)
+let image_undone = ref !image_default
 let image_scheduled = ref !image_default
 let image_running = ref !image_default
 let image_valid = ref !image_default
@@ -230,6 +232,7 @@ let image_cleaning = ref !image_default
 
 let resize_images size =
   image_default := image ~size iconname_default;
+  image_undone := image ~size iconname_undone;
   image_scheduled := image ~size iconname_scheduled;
   image_running := image ~size iconname_running;
   image_valid := image ~size iconname_valid;
@@ -278,7 +281,7 @@ let show_legend_window () =
   ib image_prover;
   i "   External prover\n";
   ib image_transf;
-  i "   Split transformation\n";
+  i "   Transformation\n";
   it "Status column\n";
   ib image_scheduled;
   i "   Scheduled external proof attempt\n";
@@ -306,13 +309,13 @@ let show_legend_window () =
 let show_about_window () =
   let about_dialog =
     GWindow.about_dialog
-      ~name:"Why"
+      ~name:"Why3"
       ~authors:["François Bobot";
                 "Jean-Christophe Filliâtre";
                 "Claude Marché";
                 "Andrei Paskevich"
                ]
-      ~copyright:"Copyright 2010 Univ Paris-Sud, CNRS, INRIA"
+      ~copyright:"Copyright 2010-2011 Univ Paris-Sud, CNRS, INRIA"
       ~license:"GNU Lesser General Public License"
       ~website:"https://gforge.inria.fr/projects/why3"
       ~website_label:"Project web site"
