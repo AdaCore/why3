@@ -134,6 +134,7 @@ module Make(O: OBSERVER) : sig
   (*****************************)
 
   val open_session : 
+    env:Env.env ->
     provers:prover_data Util.Mstr.t ->
     init:(O.key -> any -> unit) ->
     notify:(any -> unit) -> string -> unit
@@ -152,8 +153,10 @@ module Make(O: OBSERVER) : sig
 
   val maximum_running_proofs : int ref
 
+(*
   val test_save : unit -> unit
-  val test_load : unit -> Xml.element list
+  val test_load : unit -> Xml.t
+*)
 
   val save_session : unit -> unit
     (** enforces to save the session state on disk. 

@@ -491,7 +491,8 @@ let () =
   let dbfname = Filename.concat project_dir "project.xml" in
   try
     eprintf "Opening session...@?";
-    M.open_session ~provers:gconfig.provers ~init ~notify dbfname;
+    M.open_session ~env:gconfig.env ~provers:gconfig.provers 
+      ~init ~notify dbfname;
     M.maximum_running_proofs := gconfig.max_running_processes;
     eprintf " done@."
   with e ->
@@ -1074,26 +1075,22 @@ and color_t_locs () t =
   Term.t_fold color_t_locs color_f_locs () t
 
 let scroll_to_source_goal g =
-  try
-    let t = M.get_task g in
-    let id = (Task.task_goal t).Decl.pr_name in
-    scroll_to_id id;
-    match t with
-      | Some
-          { Task.task_decl =
-              { Theory.td_node =
-                  Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
-          color_f_locs () f
-      | _ ->
-          assert false
-  with Not_found -> ()
+  let t = M.get_task g in
+  let id = (Task.task_goal t).Decl.pr_name in
+  scroll_to_id id;
+  match t with
+    | Some
+        { Task.task_decl =
+            { Theory.td_node =
+                Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
+        color_f_locs () f
+    | _ ->
+        assert false
 
 let scroll_to_theory th =
-  try
-    let t = M.get_theory th in
-    let id = t.Theory.th_name in
-    scroll_to_id id
-  with Not_found -> ()
+  let t = M.get_theory th in
+  let id = t.Theory.th_name in
+  scroll_to_id id
 
 (* to be run when a row in the tree view is selected *)
 let select_row p =

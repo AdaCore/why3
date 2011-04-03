@@ -174,12 +174,16 @@ type any =
 
 let get_theory t = 
   match t.theory with 
-    | None -> raise Not_found
+    | None -> 
+	eprintf "Session: theory not yet reimported, this should not happen@.";
+	assert false
     | Some t -> t
 
 let get_task g = 
   match g.task with 
-    | None -> raise Not_found
+    | None -> 
+	(* TODO: recompute the task from the parent transformation *)
+	assert false
     | Some t -> t
 
 let all_files : file list ref = ref []
@@ -191,7 +195,7 @@ let get_all_files () = !all_files
 (************************)
 
 let save_result fmt r =
-  fprintf fmt "<result status=\"%s\" time=\"%.2f\"/>@\n"
+  fprintf fmt "@\n<result status=\"%s\" time=\"%.2f\"/>"
     (match r.Call_provers.pr_answer with
        | Call_provers.Valid -> "valid"
        | Call_provers.Failure _ -> "failure"
@@ -207,51 +211,49 @@ let save_status fmt s =
     | Done r -> save_result fmt r
 
 let save_proof_attempt fmt _key a =
-  fprintf fmt "@[<v 1><proof prover=\"%s\" edited=\"%s\">@\n" 
+  fprintf fmt "@\n@[<v 1><proof prover=\"%s\" edited=\"%s\">" 
     a.prover.prover_id
     a.edited_as;
   save_status fmt a.proof_state;
-  fprintf fmt "</proof>@]@\n"
+  fprintf fmt "@]@\n</proof>"
 
 let opt lab fmt = function
   | None -> ()
   | Some s -> fprintf fmt "%s=\"%s\" " lab s
 
 let rec save_goal fmt g =
-  fprintf fmt "@[<v 1><goal name=\"%s\" %aproved=\"%b\">@\n" 
+  fprintf fmt "@\n@[<v 1><goal name=\"%s\" %aproved=\"%b\">" 
     g.goal_name (opt "expl") g.goal_expl g.proved;
   Hashtbl.iter (save_proof_attempt fmt) g.external_proofs;
   Hashtbl.iter (save_trans fmt) g.transformations;
-  fprintf fmt "</goal>@]@\n"
+  fprintf fmt "@]@\n</goal>"
 
 and save_trans fmt _ t =
-  fprintf fmt "<transf name=\"%s\" proved=\"%b\">@\n" 
+  fprintf fmt "@\n@[<v 1><transf name=\"%s\" proved=\"%b\">" 
     t.transf.transformation_name t.transf_proved;
   List.iter (save_goal fmt) t.subgoals;
-  fprintf fmt "</transf>@\n"
+  fprintf fmt "@]@\n</transf>"
 
 let save_theory fmt t =
-  fprintf fmt "@[<v 1><theory name=\"%s\" verified=\"%b\">@\n" 
+  fprintf fmt "@\n@[<v 1><theory name=\"%s\" verified=\"%b\">" 
     t.theory_name t.verified;
   List.iter (save_goal fmt) t.goals;
-  fprintf fmt "</theory>@]@\n"
+  fprintf fmt "@]@\n</theory>"
 
 let save_file fmt f =
-  fprintf fmt "@[<v 1><file name=\"%s\" verified=\"%b\">@\n" f.file_name f.file_verified;
+  fprintf fmt "@\n@[<v 1><file name=\"%s\" verified=\"%b\">" f.file_name f.file_verified;
   List.iter (save_theory fmt) f.theories;
-  fprintf fmt "</file>@]@\n"
+  fprintf fmt "@]@\n</file>"
   
 let save fname =
   let ch = open_out fname in
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
-(*
-  fprintf fmt "@[<v 1><project name=\"%s\">@\n" (Filename.basename fname);
-*)
+  fprintf fmt "<!DOCTYPE why3session SYSTEM \"why3session.dtd\">@\n";
+  fprintf fmt "@[<v 1><why3session name=\"%s\">" fname;
   List.iter (save_file fmt) (get_all_files());
-(*
-  fprintf fmt "</project>@]@.";
-*)
+  fprintf fmt "@]@\n</why3session>";
+  fprintf fmt "@.";
   close_out ch
 
 let test_save () = save "essai.xml"
@@ -924,7 +926,9 @@ let load_result r =
 	    | "timeout" -> Call_provers.Timeout
 	    | "failure" -> Call_provers.Failure ""
 	    | "highfailure" -> Call_provers.Failure ""
-	    | _ -> assert false
+	    | s -> 
+		eprintf "Session.load_result: unexpected status '%s'@."  s;
+		assert false
 	in
 	let time =
 	  try float_of_string (List.assoc "time" r.Xml.attributes)
@@ -935,24 +939,30 @@ let load_result r =
 	  Call_provers.pr_output = "";
 	}
     | s -> 
-	failwith ("Session.load_result: unexpected element " ^ s)
+	eprintf "Session.load_result: unexpected element '%s'@."  s;
+	assert false
     
   
-let rec load_goal ~provers mth acc g = 
-  assert (g.Xml.name = "goal");
-  let gname = 
-    try List.assoc "name" g.Xml.attributes
-    with Not_found -> assert false
-  in
-  let expl = 
-    try Some (List.assoc "expl" g.Xml.attributes)
-    with Not_found -> None
-  in
-  let mg = raw_add_goal (Parent_theory mth) gname expl None in
-  List.iter (load_proof_or_transf ~provers mg) g.Xml.elements;
-  mg::acc
+let rec load_goal ~env ~provers parent acc g = 
+  match g.Xml.name with
+    | "goal" ->
+	let gname = 
+	  try List.assoc "name" g.Xml.attributes
+	  with Not_found -> assert false
+	in
+	let expl = 
+	  try Some (List.assoc "expl" g.Xml.attributes)
+	  with Not_found -> None
+	in
+	let mg = raw_add_goal parent gname expl None in
+	List.iter (load_proof_or_transf ~env ~provers mg) g.Xml.elements;
+	mg::acc
+    | s -> 
+	eprintf "Session.load_goal: unexpected element '%s'@."  s;
+	assert false
+	  
 
-and load_proof_or_transf ~provers mg a =
+and load_proof_or_transf ~env ~provers mg a =
   match a.Xml.name with
     | "proof" -> 
 	let prover = 
@@ -969,54 +979,115 @@ and load_proof_or_transf ~provers mg a =
 	  | [] -> Undone
 	  | _ -> assert false
 	in
-	let pa = raw_add_external_proof ~obsolete:false 
-	  ~edit:"" (* TODO *)
-	  mg p res
+	let edit = 
+	  try List.assoc "edited" a.Xml.attributes
+	  with Not_found -> assert false
 	in
-	Hashtbl.add mg.external_proofs prover pa
-    | "transf" -> 
+	let _pa = raw_add_external_proof ~obsolete:false 
+	  ~edit mg p res
+	in
+	(* already done by raw_add_external_proof
+	   Hashtbl.add mg.external_proofs prover pa *)
 	()
-	(* TODO *)
-	(*
-	  Hashtbl.add mg.transformations tr_name tr
-	*)
-    | _ -> assert false 
+    | "transf" -> 
+	let trname = 
+	  try List.assoc "name" a.Xml.attributes
+	  with Not_found -> assert false
+	in
+        let tr = 
+	  try 
+	    lookup_transformation env trname 
+	  with Not_found -> assert false (* TODO *)
+	in
+	let _proved = 
+	  try List.assoc "proved" a.Xml.attributes
+	  with Not_found -> assert false
+	in
+	let mtr = raw_add_transformation mg tr in
+	mtr.subgoals <-
+	  List.rev 
+	  (List.fold_left 
+	     (load_goal ~env ~provers (Parent_transf mtr)) 
+	     [] a.Xml.elements);
+	(* already done by raw_add_transformation
+	   Hashtbl.add mg.transformations trname mtr *)
+	()
+    | s -> 
+	eprintf "Session.load_proof_or_transf: unexpected element '%s'@."  s;
+	assert false
 
-let load_theory ~provers mf acc th =
-  assert (th.Xml.name = "theory");
-  let thname = 
-    try List.assoc "name" th.Xml.attributes
-    with Not_found -> assert false
-  in
-  let mth = raw_add_theory mf None thname in
-  mth.goals <- 
-    List.rev (List.fold_left (load_goal ~provers mth) [] th.Xml.elements);
-  mth::acc
+let load_theory ~env ~provers mf acc th =
+  match th.Xml.name with
+    | "theory" ->
+	let thname = 
+	  try List.assoc "name" th.Xml.attributes
+	  with Not_found -> assert false
+	in
+	let mth = raw_add_theory mf None thname in
+	mth.goals <- 
+	  List.rev 
+	  (List.fold_left 
+	     (load_goal ~env ~provers (Parent_theory mth)) 
+	     [] th.Xml.elements);
+	mth::acc
+    | s -> 
+	eprintf "Session.load_theory: unexpected element '%s'@."  s;
+	assert false
 
-let load_file ~provers f =
-  assert (f.Xml.name = "file");
-  let fn = 
-    try List.assoc "name" f.Xml.attributes
-    with Not_found -> assert false
-  in
-  let mf = raw_add_file fn in
-  mf.theories <- 
-    List.rev (List.fold_left (load_theory ~provers mf) [] f.Xml.elements)
+let load_file ~env ~provers f =
+  match f.Xml.name with
+    | "file" ->
+	let fn = 
+	  try List.assoc "name" f.Xml.attributes
+	  with Not_found -> assert false
+	in
+	let mf = raw_add_file fn in
+	mf.theories <- 
+	  List.rev 
+	  (List.fold_left (load_theory ~env ~provers mf) [] f.Xml.elements)
+    | s -> 
+	eprintf "Session.load_file: unexpected element '%s'@."  s;
+	assert false
+
+let load_session ~env ~provers xml =
+  let cont = xml.Xml.content in
+  match cont.Xml.name with
+    | "why3session" ->
+	List.iter (load_file ~env ~provers) cont.Xml.elements
+    | s -> 
+	eprintf "Session.load_session: unexpected element '%s'@."  s;
+	assert false
   
-let db_file = ref ""
+let db_file = ref None
 
-let open_session ~provers ~init ~notify file = 
-  init_fun := init; notify_fun := notify; db_file := file;
-  try
-    let l = Xml.from_file file in
-    List.iter (load_file ~provers) l;
-    (* TODO reload the files *)
-    ()
-  with Sys_error _ -> 
-    (* xml does not exist yet *)
-    ()
+let open_session ~env ~provers ~init ~notify file = 
+  match !db_file with
+    | None ->
+	init_fun := init; notify_fun := notify; 
+	db_file := Some file;
+	begin try
+	  let xml = Xml.from_file file in
+	  load_session ~env ~provers xml;
+	  (* TODO reload the files *)
+	  ()
+	with 
+	  | Sys_error _ -> 
+	      (* xml does not exist yet *)
+	      ()
+	  | Xml.Parse_error s ->
+	      Format.eprintf "XML database corrupted, ignored (%s)@." s;
+	      ()
+	end
+    | _ -> 
+	eprintf "Session.open_session: session already opened@.";
+	assert false
 
-let save_session () = save !db_file
+let save_session () = 
+  match !db_file with
+    | Some f -> save f
+    | None ->
+	eprintf "Session.save_session: no session opened@.";
+	assert false
 
 (*****************************************************)
 (* method: run a given prover on each unproved goals *)
