@@ -1,0 +1,38 @@
+
+(***
+
+Algorithm 63
+   	
+C. A. R. Hoare 	 
+Elliott Brothers Ltd., Hertfordshire, England, U.K.
+
+Communications of the ACM  archive
+Volume 4 ,  Issue 7  (July 1961) table of contents
+Pages: 321 - 322   
+
+***)
+
+module Algo63
+
+  use import int.Int
+  use import module stdlib.Ref
+  use import module stdlib.Array
+  use import array.ArrayPermut
+
+  parameter partition : 
+    a : array int -> m:int -> n:int -> i:ref int -> j:ref int ->
+    { m < n } 
+    unit writes a i j
+    { m <= j and j < i and i <= n and permut (old a) a m n and
+      exists x:int.
+        (forall r:int. m <= r <= j -> a[r] <= x) and
+        (forall r:int. j < r < i -> a[r] = x) and
+        (forall r:int. i <= r <= n -> a[r] >= x) }
+
+end
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/algo63.gui"
+End: 
+*)
