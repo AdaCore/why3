@@ -162,6 +162,10 @@ theory NumOfParam
     forall p : param, a b : int.
     (forall n : int. a <= n < b -> not pr p n) -> num_of p a b = 0
 
+  lemma num_of_strictly_increasing:
+    forall p : param, i j k l : int.
+    i <= j <= k < l -> pr p k -> num_of p i j < num_of p i l
+
 end
 
 theory NumOf
