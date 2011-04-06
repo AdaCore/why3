@@ -133,19 +133,12 @@ theory NumOfParam
 
   logic pr param int
 
-  (* number of n st a <= n < b and pr(p,n) *)
+  (** number of [n] such that [a <= n < b] and [pr(p,n)] *)
   logic num_of (p : param) (a b : int) : int
 
   axiom Num_of_empty :
     forall p : param, a b : int.
     b <= a -> num_of p a b = 0
-
-  axiom Num_of_left_no_add :
-    forall p : param, a b : int.
-    a < b -> not pr p a -> num_of p a b = num_of p (a+1) b
-  axiom Num_of_left_add :
-    forall p : param, a b : int.
-    a < b -> pr p a -> num_of p a b = 1 + num_of p (a+1) b
 
   axiom Num_of_right_no_add :
     forall p : param, a b : int.
@@ -154,17 +147,38 @@ theory NumOfParam
     forall p : param, a b : int.
     a < b -> pr p (b-1) -> num_of p a b = 1 + num_of p a (b-1)
 
-  axiom Num_of_append :
+  lemma Num_of_non_negative :
+    forall p : param, a b : int. 0 <= num_of p a b
+    (* direct when a>=b, by induction on b when a <= b *)
+
+  lemma Num_of_append :
     forall p : param, a b c : int.
     a <= b <= c -> num_of p a c = num_of p a b + num_of p b c
+    (* by induction on c *)
 
-  axiom Empty :
+  lemma Num_of_left_no_add :
+    forall p : param, a b : int.
+    a < b -> not pr p a -> num_of p a b = num_of p (a+1) b
+    (* by Num_of_append *)
+  lemma Num_of_left_add :
+    forall p : param, a b : int.
+    a < b -> pr p a -> num_of p a b = 1 + num_of p (a+1) b
+    (* by Num_of_append *)
+
+  lemma Empty :
     forall p : param, a b : int.
     (forall n : int. a <= n < b -> not pr p n) -> num_of p a b = 0
+    (* by induction on b *)
+
+  lemma num_of_increasing:
+    forall p : param, i j k : int.
+    i <= j <= k -> num_of p i j <= num_of p i k
+    (* by Num_of_append and Num_of_non_negative *)
 
   lemma num_of_strictly_increasing:
     forall p : param, i j k l : int.
     i <= j <= k < l -> pr p k -> num_of p i j < num_of p i l
+    (* by Num_of_append and num_of_increasing *)
 
 end
 
