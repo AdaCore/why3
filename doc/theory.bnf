@@ -4,9 +4,9 @@
   decl ::= "type" type-decl ("with" type-decl)*	   ;
     | "logic" logic-decl ("with" logic-decl)*         ;
     | "inductive" inductive-decl ("with" inductive-decl)* ;
-    | "axiom" uident ":" formula 	   ;
-    | "lemma" uident ":" formula 	   ;
-    | "goal"  uident ":" formula 	   ;
+    | "axiom" ident ":" formula 	   ;
+    | "lemma" ident ":" formula 	   ;
+    | "goal"  ident ":" formula 	   ;
     | "use" imp-exp tqualid ("as" uident-opt)?     ; 
     | "clone" imp-exp tqualid ("as" uident-opt)? subst? ;	   
     | "namespace" "import"? uident-opt decl* "end" ;
@@ -32,6 +32,11 @@
    | "(" lident+ ":" type ")" ;
    | "(" type ("," type)* ")" ;
    | "()"
+  \
+  inductive-decl ::= lident label* type-param* "=" ;
+                     "|"? ind-case ("|" ind-case)* ;
+  \
+  ind-case ::= ident label* ":" formula ;
   \
   imp-exp ::= ("import" | "export")?
   \
