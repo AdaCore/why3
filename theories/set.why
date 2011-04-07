@@ -71,6 +71,15 @@ theory Fset
 
 end
 
+theory FsetExt
+ 
+  use export Fset
+
+  axiom ext: forall s1 s2 : t 'a.
+    s1 = s2 <-> (forall x : 'a. mem x s1 <-> mem x s2)
+
+end
+
 theory SetArray
   use import array.Array as A
   use import bool.Bool

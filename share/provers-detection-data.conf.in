@@ -95,6 +95,14 @@ version_regexp = "SPASS V \\([^ \n\t]+\\)"
 command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -TPTP -PGiven=0 -PProblem=0 -TimeLimit=%t %f"
 driver = "drivers/tptp.drv"
 
+[ATP vampire]
+name = "Vampire"
+exec = "vampire"
+version_switch = "--version"
+version_regexp = "Vampire \\([0-9.]+\\)"
+command = "@LOCALBIN@why3-cpulimit %t %m -s %e"
+driver = "drivers/vampire.drv"
+
 [ATP verit]
 name = "veriT"
 exec = "veriT"
