@@ -1,0 +1,42 @@
+
+theory Fibonacci
+
+  use import int.Int
+
+  inductive isfib int int =
+   | isfib0: isfib 0 0
+   | isfib1: isfib 1 1	
+   | isfibn: 
+    forall n r p: int.
+     n >= 2 && isfib (n-2) r && isfib (n-1) p -> isfib n (p+r)
+ 
+
+ lemma isfib_2_1 : isfib 2 1 
+ lemma isfib_6_8 : isfib 6 8
+
+ (* provable only if def is inductive (least fix point) *)
+ lemma not_isfib_2_2 : not (isfib 2 2)
+
+end
+
+module FibonacciLinear
+
+  use import Fibonacci
+  use import int.Int
+  use import module stdlib.Ref
+
+  let fib (n:int) : int =
+    { n >= 0 }
+    let y = ref 0 in
+    let x = ref 1 in
+
+    for i=0 to n-1 do
+      invariant { 0 <= i <= n && isfib (i+1) x && isfib i y }
+      let aux = !y in
+      y := !x; 
+      x := !x + aux
+    done;
+    !y
+    { isfib n result}
+
+end
