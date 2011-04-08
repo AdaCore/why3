@@ -19,36 +19,37 @@ module M
 
   use import module stdlib.Ref
 
-  logic f (x:int) : int =
+  logic f (x: int) : int =
     if x >= 101 then x-10 else 91
 
-  (* iter_f(n,x) = f^n(x) *)
+  (* iter_f k x = f^k(x) *)
   logic iter_f int int : int
 
-  axiom Iter_def : forall n x : int. iter_f n x =
-    if n <= 0 then x else iter_f (n-1) (f x)
+  axiom iter_f_0: forall x: int. iter_f 0 x = x
+  axiom iter_f_s: forall k x: int. 0 < k -> iter_f k x = iter_f (k-1) (f x)
 
-  logic lt_nat (x y:int) = 0 <= y and x < y
+  logic lt_nat (x y: int) = 0 <= y and x < y
 
   clone import relations.Lex with type t1 = int, type t2 = int,
     logic rel1 = lt_nat, logic rel2 = lt_nat
 
-  let f91_nonrec (n x : ref int) =
-    { n >= 1 }
-    label L:
-    while !n > 0 do
-      invariant { n >= 0 and iter_f n x = iter_f (at n L) (at x L) }
-      variant { (101 - x + 10 * n, n) } with lex 
-      if !x > 100 then begin
-        x := !x - 10;
-        n := !n - 1
+  let f91_nonrec (n0: int) =
+    { }
+    let e = ref 1 in
+    let n = ref n0 in
+    while !e > 0 do
+      invariant { e >= 0 and iter_f e n = f n0 }
+      variant   { (101 - n + 10 * e, e) } with lex 
+      if !n > 100 then begin
+        n := !n - 10;
+        e := !e - 1
       end else begin
-        x := !x + 11;
-        n := !n + 1
+        n := !n + 11;
+        e := !e + 1
       end
     done;
-    !x
-    { result = iter_f (old n) (old x) }
+    !n
+    { result = f n0 }
 
 end
 
