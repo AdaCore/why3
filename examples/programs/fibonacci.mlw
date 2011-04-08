@@ -39,3 +39,79 @@ module FibonacciLinear
     { isfib n result}
 
 end
+
+theory Mat22 "2x2 integer matrices"
+
+  use import int.Int
+
+  type t = M (a11: int) (a12: int) (a21: int) (a22: int)
+
+  logic id : t = M 1 0 0 1
+
+  logic mult (x: t) (y: t) : t =
+    let M x11 x12 
+          x21 x22 = x 
+    in
+    let M y11 y12 
+          y21 y22 = y
+    in
+    M (x11 * y11 + x12 * y21) (x11 * y12 + x12 * y22)
+      (x21 * y11 + x22 * y21) (x21 * y12 + x22 * y22)
+
+  clone algebra.Assoc with type t = t, logic op = mult, lemma Assoc
+
+  logic power t int : t
+
+  axiom power_0 : 
+    forall m: t. power m 0 = id
+
+  axiom power_n : 
+    forall m: t, n: int. n > 0 -> power m n = mult (power m (n-1)) m
+
+  lemma power_square :
+    forall m: t, n: int. n >= 0 -> mult (power m n) (power m n) = power m (2*n)
+
+end
+
+module FibonacciLogarithmic
+
+  use import Fibonacci
+  use import int.Int
+  use import int.EuclideanDivision
+  use Mat22 as M
+
+  logic m1110 : M.t = M.M 1 1 1 0
+
+  lemma fib_m : 
+    forall n: int. n >= 0 ->
+    let M.M a11 a12 a21 a22 = M.power m1110 n in
+    isfib a11 (n+1) and isfib a12 n and isfib a21 n and
+    (n = 0 -> a22 = 1) and (n > 0 -> isfib a22 (n-1))
+
+  let rec logfib n =
+    { n >= 0 }
+    if n = 0 then 
+      (1, 1)
+    else begin
+      let a, b = logfib (div n 2) in
+      let c = a + b in
+      assert { isfib c (2 * (div n 2) + 1) };
+      if mod n 2 = 0 then
+        (a*a + b*b, b * (a + c))
+      else
+        (b * (a + c), c*c + b*b)
+    end
+    { let a, b = result in M.power m1110 n = M.M (a+b) b b a }
+
+  let fibo n =
+    { n >= 0 }
+    let _, b = logfib n in b
+    { isfib result n }
+
+end
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/fibonacci.gui"
+End: 
+*)
