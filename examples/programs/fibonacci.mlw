@@ -7,10 +7,9 @@ theory Fibonacci
    | isfib0: isfib 0 0
    | isfib1: isfib 1 1	
    | isfibn: 
-    forall n r p: int.
-     n >= 2 && isfib (n-2) r && isfib (n-1) p -> isfib n (p+r)
+       forall n r p: int.
+       n >= 2 && isfib (n-2) r && isfib (n-1) p -> isfib n (p+r)
  
-
  lemma isfib_2_1 : isfib 2 1 
  lemma isfib_6_8 : isfib 6 8
 

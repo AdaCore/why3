@@ -42,7 +42,6 @@ let do_file env fname =
   let m = Env.read_file env fname in
   let base = 
     let f = Filename.basename fname in
-    let f = try Filename.chop_extension f with _ -> f in
     match !opt_output with
       | None -> f
       | Some dir -> Filename.concat dir f

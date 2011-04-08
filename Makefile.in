@@ -360,23 +360,22 @@ install_local: bin/why3ml
 # gallery
 ##########
 
-%.gallery: %.mlw bin/why3doc
-	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
-	mkdir -p $(GALLERYDIR)/`basename $*`
-	bin/why3doc -b -o $(GALLERYDIR)/`basename $*` $*.mlw
-
 GALLERYPGMS = binary_search bresenham sf same_fringe relabel quicksort \
         power mergesort_list mac_carthy isqrt insertion_sort_list flag \
-	distance muller \
+	distance muller fib_memo fibonacci \
         vstte10_aqueue vstte10_inverting vstte10_max_sum \
 	vstte10_queens vstte10_search_list \
         vacid_0_sparse_array
-GALLERYFILES = $(addprefix examples/programs/, $(GALLERYPGMS))
-GALLERY = $(addsuffix .gallery, $(GALLERYFILES))
 
 .PHONY: gallery
 
-gallery:: $(GALLERY)
+gallery::
+	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
+	@for f in $(GALLERYPGMS); do \
+	  echo "exporting $$f"; \
+	  mkdir -p $(GALLERYDIR)/$$f; \
+	  cp examples/programs/$$f.mlw $(GALLERYDIR)/$$f/; \
+	done
 
 ########
 # Config
@@ -721,6 +720,9 @@ bin/why3doc.byte: src/why.cma $(WHY3DOCCMO)
 
 bin/why3doc: bin/why3doc.@OCAMLBEST@
 	ln -sf why3doc.@OCAMLBEST@ $@
+
+install_no_local::
+	cp -f bin/why3doc.@OCAMLBEST@ $(BINDIR)/why3doc
 
 # depend and clean targets
 

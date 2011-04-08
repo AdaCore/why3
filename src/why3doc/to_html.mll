@@ -166,7 +166,6 @@ div.sig_block {margin-left: 2em}";
     (* output *)
     let f = Filename.basename fname in
     let base = 
-      let f = try Filename.chop_extension f with _ -> f in
       match !opt_output with
 	| None -> f
 	| Some dir -> Filename.concat dir f
