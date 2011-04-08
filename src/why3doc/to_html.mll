@@ -59,6 +59,7 @@
 let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']*
 
 rule scan fmt = parse
+  | "(*)"  { fprintf fmt "(*)"; scan fmt lexbuf }
   | "(*"   { fprintf fmt "<font color=\"990000\">(*"; 
              comment fmt lexbuf; 
              fprintf fmt "</font>";

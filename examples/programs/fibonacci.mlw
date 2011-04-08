@@ -86,16 +86,10 @@ module FibonacciLogarithmic
   logic m1110 : t = {| a11 = 1; a12 = 1;
                        a21 = 1; a22 = 0 |}
 
-  lemma fib_m : 
-    forall n: int. n >= 0 ->
-    let p = power m1110 n in
-    isfib p.a11 (n+1) and isfib p.a12 n and isfib p.a21 n and
-    (n = 0 -> p.a22 = 1) and (n > 0 -> isfib p.a22 (n-1))
-
   let rec logfib n =
     { n >= 0 }
     if n = 0 then 
-      (1, 1)
+      (1, 0)
     else begin
       let a, b = logfib (div n 2) in
       let c = a + b in
@@ -107,10 +101,19 @@ module FibonacciLogarithmic
     { let a, b = result in 
       power m1110 n = {| a11 = a+b; a12 = b; a21 = b; a22 = a |} }
 
+  logic p (n:int) = 
+    let p = power m1110 n in
+    isfib (n+1) p.a11 and isfib n p.a21
+  clone int.Induction with logic p = p
+  lemma fib_m : 
+    forall n: int. n >= 0 ->
+    let p = power m1110 n in
+    isfib (n+1) p.a11 and isfib n p.a21
+
   let fibo n =
     { n >= 0 }
     let _, b = logfib n in b
-    { isfib result n }
+    { isfib n result }
 
 end
 
