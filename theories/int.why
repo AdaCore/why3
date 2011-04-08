@@ -104,15 +104,27 @@ theory ComputerDivision
 
 end
 
+theory Exponentiation
+  use import Int
+
+  type t
+  logic one : t
+  logic (*) t t : t
+  
+  logic power t int : t
+
+  axiom Power_0 : forall x: t. power x 0 = one
+
+  axiom Power_s : forall x: t, n: int. n >= 0 -> power x (n+1) = x * power x n
+
+end
+
 theory Power
 
   use import Int
 
-  logic power int int : int
-
-  axiom Power_0 : forall x : int. power x 0 = 1
-
-  axiom Power_s : forall x n : int. 0 < n -> power x n = x * power x (n-1)
+  clone export 
+    Exponentiation with type t = int, logic one = one, logic (*) = (*)
 
   lemma Power_1 : forall x : int. power x 1 = x
 
@@ -236,6 +248,17 @@ theory Gcd
   lemma Gcd_euclidean_mod : 
     forall a b g : int [gcd a (EuclideanDivision.mod a b) g]. 
       b <> 0 -> gcd a (EuclideanDivision.mod a b) g -> gcd a b g
+
+end
+
+theory Induction
+  use import Int
+
+  logic p int
+
+  axiom Induction :
+    (forall n:int. 0 <= n -> (forall k:int. 0 <= k < n -> p k) -> p n) ->
+    forall n:int. 0 <= n -> p n
 
 end
 

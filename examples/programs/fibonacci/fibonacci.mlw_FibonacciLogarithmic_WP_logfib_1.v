@@ -85,8 +85,8 @@ Parameter power: t -> Z  -> t.
 
 Axiom power_0 : forall (m:t), ((power m 0%Z) = (M 1%Z 0%Z 0%Z 1%Z)).
 
-Axiom power_n : forall (m:t) (n:Z), (0%Z <  n)%Z -> ((power m
-  n) = (mult (power m (n - 1%Z)%Z) m)).
+Axiom power_n : forall (m:t) (n:Z), (0%Z <= n)%Z -> ((power m
+  (n + 1%Z)%Z) = (mult (power m n) m)).
 
 Axiom power_square : forall (m:t) (n:Z), (0%Z <= n)%Z -> ((mult (power m n)
   (power m n)) = (power m (2%Z * n)%Z)).
