@@ -256,9 +256,16 @@ theory Induction
 
   logic p int
 
-  axiom Induction :
+  lemma Induction :
     (forall n:int. 0 <= n -> (forall k:int. 0 <= k < n -> p k) -> p n) ->
     forall n:int. 0 <= n -> p n
+
+  logic bound : int
+
+  lemma Induction_bound :
+    (forall n:int. bound <= n -> 
+      (forall k:int. bound <= k < n -> p k) -> p n) ->
+    forall n:int. bound <= n -> p n
 
 end
 
