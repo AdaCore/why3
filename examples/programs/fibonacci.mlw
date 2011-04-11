@@ -1,20 +1,24 @@
 
-theory Fibonacci
+theory Fibonacci "Fibonacci numbers"
 
-  use import int.Int
+  use export int.Int
 
-  inductive isfib int int =
-   | isfib0: isfib 0 0
-   | isfib1: isfib 1 1	
-   | isfibn: 
-       forall n r p: int.
-       n >= 2 && isfib (n-2) r && isfib (n-1) p -> isfib n (p+r)
- 
-  lemma isfib_2_1 : isfib 2 1 
-  lemma isfib_6_8 : isfib 6 8
+  logic fib int : int
 
-  (* provable only if def is inductive (least fix point) *)
-  lemma not_isfib_2_2 : not (isfib 2 2)
+  axiom fib0: fib 0 = 0
+  axiom fib1: fib 1 = 1
+  axiom fibn: forall n:int [fib n]. n >= 2 -> fib n = fib (n-1) + fib (n-2)
+
+end
+
+theory FibonacciTest
+
+  use import Fibonacci
+
+  lemma isfib_2_1 : fib 2 = 1 
+  lemma isfib_6_8 : fib 6 = 8
+
+  lemma not_isfib_2_2 : fib 2 <> 2
 
 end
 
@@ -29,14 +33,14 @@ module FibonacciLinear
     let y = ref 0 in
     let x = ref 1 in
 
-    for i=0 to n-1 do
-      invariant { 0 <= i <= n && isfib (i+1) x && isfib i y }
+    for i = 0 to n - 1 do
+      invariant { 0 <= i <= n and fib (i+1) = x and fib i = y }
       let aux = !y in
       y := !x; 
       x := !x + aux
     done;
     !y
-    { isfib n result}
+    { fib n = result}
 
 end
 
@@ -51,24 +55,14 @@ theory Mat22 "2x2 integer matrices"
   logic mult (x: t) (y: t) : t =
     {| 
     a11 = x.a11 * y.a11 + x.a12 * y.a21; a12 = x.a11 * y.a12 + x.a12 * y.a22;
-    a21 = x.a21 * y.a11 + x.a22 * y.a21; a22 = x.a21 * y.a12 + x.a22 * y.a22
+    a21 = x.a21 * y.a11 + x.a22 * y.a21; a22 = x.a21 * y.a12 + x.a22 * y.a22;
     |}
 
-  clone algebra.Assoc with type t = t, logic op = mult, lemma Assoc
+  (* holds, but not useful *)
+  (* clone algebra.Assoc with type t = t, logic op = mult, lemma Assoc *)
 
   clone export 
     int.Exponentiation with type t = t, logic one = id, logic (*) = mult
-
-(* to prove power_sum below, we would also need
-
-  lemma mult_id : forall m: t. mult m id = m 
-  lemma id_mult : forall m: t. mult id m = m
-
-  logic p (n:int) = 
-    forall x: t, m: int.
-    m >= 0 -> power x (n + m) = mult (power x n) (power x m)
-  clone int.Induction with logic p = p
-*)
 
   lemma power_sum : 
     forall x: t, n m: int.
@@ -79,7 +73,6 @@ end
 module FibonacciLogarithmic
 
   use import Fibonacci
-  use import int.Int
   use import int.EuclideanDivision
   use import Mat22
 
@@ -91,7 +84,7 @@ module FibonacciLogarithmic
      since it is a matrix of the shape ((a+b b) (b a)), 
      we only return the pair (a, b) *)
 
-  let rec logfib n =
+  let rec logfib n variant { n } =
     { n >= 0 }
     if n = 0 then 
       (1, 0)
@@ -99,9 +92,9 @@ module FibonacciLogarithmic
       let a, b = logfib (div n 2) in
       let c = a + b in
       if mod n 2 = 0 then
-        (a*a + b*b, b * (a + c))
+        (a*a + b*b, b*(a + c))
       else
-        (b * (a + c), c*c + b*b)
+        (b*(a + c), c*c + b*b)
     end
     { let a, b = result in 
       power m1110 n = {| a11 = a+b; a12 = b; a21 = b; a22 = a |} }
@@ -114,19 +107,14 @@ module FibonacciLogarithmic
     thus, we can compute F(n) in O(log(n)) using funtion logfib above
   *)
 
-  logic p (n:int) = 
-    let p = power m1110 n in
-    isfib (n+1) p.a11 and isfib n p.a21
-  clone int.Induction with logic p = p
   lemma fib_m : 
     forall n: int. n >= 0 ->
-    let p = power m1110 n in
-    isfib (n+1) p.a11 and isfib n p.a21
+    let p = power m1110 n in fib (n+1) = p.a11 and fib n = p.a21
 
   let fibo n =
     { n >= 0 }
     let _, b = logfib n in b
-    { isfib n result }
+    { result = fib n }
 
 end
 

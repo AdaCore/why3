@@ -21,17 +21,15 @@ Parameter old: forall (a:Type), a  -> a.
 
 Implicit Arguments old.
 
-Inductive isfib : Z -> Z -> Prop :=
-  | isfib0 : (isfib 0%Z 0%Z)
-  | isfib1 : (isfib 1%Z 1%Z)
-  | isfibn : forall (n:Z) (r:Z) (p:Z), ((2%Z <= n)%Z /\ ((isfib (n - 2%Z)%Z
-      r) /\ (isfib (n - 1%Z)%Z p))) -> (isfib n (p + r)%Z).
+Parameter fib: Z  -> Z.
 
-Axiom isfib_2_1 : (isfib 2%Z 1%Z).
 
-Axiom isfib_6_8 : (isfib 6%Z 8%Z).
+Axiom fib0 : ((fib 0%Z) = 0%Z).
 
-Axiom not_isfib_2_2 : ~ (isfib 2%Z 2%Z).
+Axiom fib1 : ((fib 1%Z) = 1%Z).
+
+Axiom fibn : forall (n:Z), (2%Z <= n)%Z ->
+  ((fib n) = ((fib (n - 1%Z)%Z) + (fib (n - 2%Z)%Z))%Z).
 
 Axiom Abs_pos : forall (x:Z), (0%Z <= (Zabs x))%Z.
 
@@ -73,9 +71,6 @@ Definition mult(x:t) (y:t): t :=
   (((a21 x) * (a11 y))%Z + ((a22 x) * (a21 y))%Z)%Z
   (((a21 x) * (a12 y))%Z + ((a22 x) * (a22 y))%Z)%Z).
 
-Axiom Assoc : forall (x:t) (y:t) (z:t), ((mult (mult x y) z) = (mult x
-  (mult y z))).
-
 Parameter power: t -> Z  -> t.
 
 
@@ -87,20 +82,14 @@ Axiom Power_s : forall (x:t) (n:Z), (0%Z <= n)%Z -> ((power x
 Axiom power_sum : forall (x:t) (n:Z) (m:Z), (0%Z <= n)%Z -> ((0%Z <= m)%Z ->
   ((power x (n + m)%Z) = (mult (power x n) (power x m)))).
 
-Definition p(n:Z): Prop := let p1 := (power (mk_t 1%Z 1%Z 1%Z 0%Z) n) in
-  ((isfib (n + 1%Z)%Z (a11 p1)) /\ (isfib n (a21 p1))).
-
-Axiom Induction : (forall (n:Z), (0%Z <= n)%Z -> ((forall (k:Z),
-  ((0%Z <= k)%Z /\ (k <  n)%Z) -> (p k)) -> (p n))) -> forall (n:Z),
-  (0%Z <= n)%Z -> (p n).
-
-Theorem fib_m : forall (n:Z), (0%Z <= n)%Z -> let p2 := (power (mk_t 1%Z 1%Z
-  1%Z 0%Z) n) in ((isfib (n + 1%Z)%Z (a11 p2)) /\ (isfib n (a21 p2))).
+Theorem fib_m : forall (n:Z), (0%Z <= n)%Z -> let p := (power (mk_t 1%Z 1%Z
+  1%Z 0%Z) n) in (((fib (n + 1%Z)%Z) = (a11 p)) /\ ((fib n) = (a21 p))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-Hint Constructors isfib.
+Require Import Zwf.
+Hint Resolve fib0 fib1 fibn.
 intuition.
-apply Induction; auto.
-unfold p; intros.
+pattern n; apply Zlt_0_ind; auto.
+intro n0; intros.
 assert (h: (n0 = 0 \/ n0>0)%Z) by omega.
 destruct h.
 subst n0.
@@ -109,8 +98,8 @@ intuition.
 replace (n0)%Z with ((n0-1) + 1)%Z by omega.
 rewrite Power_s; [idtac | omega].
 assert (h: (0 <= n0-1 < n0)%Z) by omega.
-generalize (H1 (n0-1)%Z h).
-clear H1.
+generalize (H0 (n0-1)%Z h).
+clear H0.
 destruct (power (mk_t 1 1 1 0) (n0 - 1)).
 replace (n0-1+1)%Z with n0 by omega.
 replace (a11 (mk_t z z0 z1 z2)) with z by auto.
@@ -118,12 +107,11 @@ replace (a21 (mk_t z z0 z1 z2)) with z1 by auto.
 replace (a21 (mult (mk_t 1 1 1 0) (mk_t z z0 z1 z2))) with z.
 intuition.
 replace (a11 (mult (mk_t 1 1 1 0) (mk_t z z0 z1 z2))) with (z+z1)%Z.
-apply (isfibn (n0+1)%Z).
-intuition.
+rewrite (fibn (n0+1)%Z).
+replace (n0+1-1)%Z with n0 by omega.
 replace (n0 + 1 - 2)%Z with (n0-1)%Z by omega.
-trivial.
-replace (n0 + 1 - 1)%Z with (n0)%Z by omega.
-trivial.
+intuition.
+omega.
 unfold mult, a11, a12, a21, a22.
 omega.
 unfold mult, a11, a12, a21, a22.

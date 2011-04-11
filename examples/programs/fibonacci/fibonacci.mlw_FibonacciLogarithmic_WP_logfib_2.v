@@ -21,17 +21,15 @@ Parameter old: forall (a:Type), a  -> a.
 
 Implicit Arguments old.
 
-Inductive isfib : Z -> Z -> Prop :=
-  | isfib0 : (isfib 0%Z 0%Z)
-  | isfib1 : (isfib 1%Z 1%Z)
-  | isfibn : forall (n:Z) (r:Z) (p:Z), ((2%Z <= n)%Z /\ ((isfib (n - 2%Z)%Z
-      r) /\ (isfib (n - 1%Z)%Z p))) -> (isfib n (p + r)%Z).
+Parameter fib: Z  -> Z.
 
-Axiom isfib_2_1 : (isfib 2%Z 1%Z).
 
-Axiom isfib_6_8 : (isfib 6%Z 8%Z).
+Axiom fib0 : ((fib 0%Z) = 0%Z).
 
-Axiom not_isfib_2_2 : ~ (isfib 2%Z 2%Z).
+Axiom fib1 : ((fib 1%Z) = 1%Z).
+
+Axiom fibn : forall (n:Z), (2%Z <= n)%Z ->
+  ((fib n) = ((fib (n - 1%Z)%Z) + (fib (n - 2%Z)%Z))%Z).
 
 Axiom Abs_pos : forall (x:Z), (0%Z <= (Zabs x))%Z.
 
@@ -88,7 +86,8 @@ Axiom power_sum : forall (x:t) (n:Z) (m:Z), (0%Z <= n)%Z -> ((0%Z <= m)%Z ->
   ((power x (n + m)%Z) = (mult (power x n) (power x m)))).
 
 Theorem WP_logfib : forall (n:Z), (0%Z <= n)%Z -> ((~ (n = 0%Z)) ->
-  ((0%Z <= (Zdiv n 2%Z))%Z -> forall (result:(Z* Z)%type),
+  ((((0%Z <= n)%Z /\ ((Zdiv n 2%Z) <  n)%Z) /\ (0%Z <= (Zdiv n 2%Z))%Z) ->
+  forall (result:(Z* Z)%type),
   match result with
   | (a, b) => ((power (mk_t 1%Z 1%Z 1%Z 0%Z) (Zdiv n 2%Z)) = (mk_t (a + b)%Z
       b b a))
@@ -107,11 +106,11 @@ intro.
 assert (n mod 2 = 1)%Z.
 generalize (Mod_bound n 2).
 intuition.
-simpl in H6.
+simpl in H8.
 omega.
 assert (n = 2 * (n/2) + 1)%Z.
 generalize (Div_mod n 2); intuition.
-rewrite H5.
+rewrite H7.
 rewrite Power_s. 2:omega.
 replace (2 * (n/2))%Z with (n/2 + n/2)%Z by omega.
 rewrite power_sum; try omega.
