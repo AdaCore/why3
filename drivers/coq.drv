@@ -142,6 +142,10 @@ theory real.Real
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
   remove prop CompatOrderMult
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
 
 end
 
@@ -150,8 +154,8 @@ theory real.RealInfix
   syntax logic (+.)  "(%1 + %2)%R"
   syntax logic (-.)  "(%1 - %2)%R"
   syntax logic (-._) "(-%1)%R"
-  syntax logic ( *.)  "(%1 * %2)%R"
-  syntax logic (/.)  "(Rdiv %1 %2)%R"
+  syntax logic ( *.) "(%1 * %2)%R"
+  syntax logic (/.)  "(%1 / %2)%R"
 
   syntax logic (<=.) "(%1 <= %2)%R"
   syntax logic (<.)  "(%1 <  %2)%R"
@@ -165,6 +169,8 @@ theory real.Abs
   prelude "Require Import Rbasic_fun."
 
   syntax logic abs "(Rabs %1)"
+
+  remove prop Abs_pos
 
 end
 
@@ -191,6 +197,13 @@ theory real.ExpLog
 
   syntax logic exp "(exp %1)"
   syntax logic log "(ln %1)"
+
+  remove prop Exp_zero
+  remove prop Exp_sum
+  remove prop Log_one
+  remove prop Log_mul
+  remove prop Log_exp
+  remove prop Exp_log
 
 end
 
