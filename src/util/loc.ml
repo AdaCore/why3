@@ -86,6 +86,6 @@ let string =
 let () = Exn_printer.register
   (fun fmt exn -> match exn with
     | Located (loc,e) ->
-      fprintf fmt "%a%a@\n" gen_report_position loc Exn_printer.exn_printer e
+      fprintf fmt "%a:@\n%a@\n" gen_report_position loc Exn_printer.exn_printer e
     | _ -> raise exn)
 
