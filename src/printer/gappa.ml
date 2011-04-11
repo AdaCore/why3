@@ -86,6 +86,10 @@ let get_info =
             let real_sqrt = find_real_square "sqrt" in
 	    let find_rounding_theory = find_th env "floating_point" "Rounding" in
 	    let round_ne = find_rounding_theory "NearestTiesToEven" in
+            let round_zr = find_rounding_theory "ToZero" in
+            let round_up = find_rounding_theory "Up" in
+            let round_dn = find_rounding_theory "Down" in
+            let round_na = find_rounding_theory "NearTiesToAway" in
 	    let find_single_theory = find_th env "floating_point" "Single" in
 	    round_single := find_single_theory "round";
 	    let find_double_theory = find_th env "floating_point" "Double" in
@@ -124,7 +128,11 @@ let get_info =
 	      List.fold_left
 		(fun acc (ls,s) -> Mls.add ls s acc)
 		Mls.empty
-		[ round_ne,"ne" ;
+                [ round_ne, "ne" ;
+                  round_zr, "zr" ;
+                  round_up, "up" ;
+                  round_dn, "dn" ;
+                  round_na, "na" ;
 		];
 (*
 	    inline :=
