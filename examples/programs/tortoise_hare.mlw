@@ -1,0 +1,73 @@
+
+(* Floyd's ``the tortoise and the hare'' algorithm. *)
+
+module TortoiseHare
+
+  use import int.Int
+
+  (* We consider a function f over an abstract type t *)
+
+  type t
+
+  logic f t : t
+
+  (* Given some x0 in t, we consider the sequence of the repeated calls 
+     to f starting from x0. *)
+
+  logic x int : t
+
+  axiom xdef: forall n:int. n >= 0 -> x (n+1) = f (x n)
+
+  logic x0 : t = x 0
+
+  (* If t is finite, this sequence will eventually end up on a cycle.
+     Let us simply assume the existence of this cycle, that is
+     x (i + lambda) = x i, for some lambda > 0 and i large enough. *)
+
+  logic mu : int
+  axiom mu: mu >= 0
+
+  logic lambda : int
+  axiom lambda: lambda >= 1
+
+  axiom cycle: forall i:int. mu <= i -> x (i + lambda) = x i
+
+  lemma cycle_gen: 
+    forall i:int. mu <= i -> forall k:int. 0 <= k -> x (i + lambda * k) = x i
+
+  (* The challenge is to prove that the recursive function
+    
+       let rec run x1 x2 = if x1 <> x2 then run (f x1) (f (f x2))
+
+     terminates when called on x0 and (f x0).
+  *)
+
+  logic dist int int : int
+
+  axiom dist_def1: 
+    forall n m: int. 0 <= n <= m -> 
+    x (n + dist n m) = x m
+  axiom dist_def2:
+    forall n m: int. 0 <= n <= m -> 
+    forall k: int. x (n + k) = x m -> dist n m <= k
+
+  logic r (x12 : (t, t)) (x'12 : (t, t)) =
+    let x1, x2 = x12 in 
+    let x'1, x'2 = x'12 in
+    exists m:int. 
+    x1 = x (m+1) and x2 = x (2*m+2) and x'1 = x m and x'2 = x (2*m) and
+    m < mu or (mu <= m and dist (m+1) (2*m+2) < dist m (2*m))
+  
+  let rec run x1 x2 variant { (x1, x2) } with r =
+    { exists m:int [x m]. x1 = x m and x2 = x (2*m) }
+    if x1 <> x2 then
+      run (f x1) (f (f x2))
+    { }
+
+end
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/tortoise_hare.gui"
+End: 
+*)

@@ -102,8 +102,11 @@ let rec print_fmla info fmt f = match f.f_node with
                     (print_list comma (print_term info)) tl
     end
   | Fquant (q, fq) ->
-      let q = match q with Fforall -> "forall" | Fexists -> "exists" in
       let vl, tl, f = f_open_quant fq in
+      let q, tl = match q with 
+	| Fforall -> "forall", tl 
+	| Fexists -> "exists", [] (* Alt-ergo has no triggers for exists *)
+      in
       let forall fmt v =
 	fprintf fmt "%s %a:%a" q print_ident v.vs_name (print_type info) v.vs_ty
       in
@@ -141,8 +144,7 @@ and print_triggers info fmt tl =
     | Term _ -> true
     | Fmla {f_node = Fapp (ps,_)} -> not (ls_equal ps ps_equ)
     | _ -> false in
-  let tl = List.map (List.filter filter)
-    tl in
+  let tl = List.map (List.filter filter) tl in
   let tl = List.filter (function [] -> false | _::_ -> true) tl in
   if tl = [] then () else fprintf fmt "@ [%a]"
     (print_list alt (print_list comma (print_expr info))) tl
