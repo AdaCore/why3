@@ -32,10 +32,9 @@ open Task
 (* Gappa pre-compilation *)
 
 type info = {
-  info_symbols : Sls.t;
+  info_symbols : Sid.t;
   info_ops_of_rel : (bool * string * string) Mls.t;
   rounding_modes : string Mls.t;
-  info_inline : Sls.t;
   info_syn : string Mid.t;
   info_rem : Sid.t;
 }
@@ -104,7 +103,7 @@ let get_info =
 *)
             (* sets of known symbols *)
             let l =
-              List.fold_right Sls.add
+              List.fold_right (fun ls -> Sid.add ls.ls_name)
                 [ps_equ;
                  int_add; int_sub; !int_minus; int_mul;
                  int_le; int_ge; int_lt; int_gt;
@@ -115,7 +114,7 @@ let get_info =
                  real_truncate; real_floor; real_ceil;
                  real_from_int;
 		 !round_single; !round_double;
-		] Sls.empty
+		] Sid.empty
             in
             arith_symbols := Some l;
 	    ops_of_rels :=
@@ -156,7 +155,6 @@ let get_info =
       info_symbols = l;
       info_ops_of_rel = !ops_of_rels;
       rounding_modes = !modes;
-      info_inline = l (* !inline*);
       info_syn = get_syntax_map task;
       info_rem = get_remove_set task;
     }
@@ -360,7 +358,7 @@ let filter_hyp info eqs hyps pr f =
 		| _ -> (eqs, (pr,f)::hyps)
 	end
 	  (* todo: support more kinds of hypotheses *)
-    | Fapp(ls,_) when Sls.mem ls info.info_symbols ->
+    | Fapp(ls,_) when Sid.mem ls.ls_name info.info_symbols ->
 	(eqs, (pr,f)::hyps)
     | _ -> (eqs,hyps)
 
@@ -419,7 +417,7 @@ let print_task env pr thpr ?old:_ fmt task =
   let info = get_info env task in
   let task =
     Abstraction.abstraction
-      (fun f -> Sls.mem f info.info_symbols)
+      (fun ls -> Sid.mem ls.ls_name info.info_symbols)
       task
   in
 (*
