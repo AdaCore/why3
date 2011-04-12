@@ -41,7 +41,7 @@ type info = {
 let int_minus = ref ps_equ
 let real_minus = ref ps_equ
 
-(** lsymbol, ""/"not", op, rev_op *)
+(** lsymbol, ""/"not ", op, rev_op *)
 let arith_meta = register_meta "gappa arith"
   [MTlsymbol;MTstring;MTstring;MTstring]
 
