@@ -151,25 +151,13 @@ end
 
 theory floating_point.Single
 
-  syntax logic round "rnd_ieee32_%1(%2)"
-
-  prelude "@rnd_ieee32_ne=float<ieee_32,ne>;"
-  prelude "@rnd_ieee32_zr=float<ieee_32,zr>;"
-  prelude "@rnd_ieee32_up=float<ieee_32,up>;"
-  prelude "@rnd_ieee32_dn=float<ieee_32,dn>;"
-  prelude "@rnd_ieee32_na=float<ieee_32,na>;"
+  syntax logic round "float<ieee_32,%1>(%2)"
 
 end
 
 theory floating_point.Double
 
-  syntax logic round "rnd_ieee64_%1(%2)"
-
-  prelude "@rnd_ieee64_ne=float<ieee_64,ne>;"
-  prelude "@rnd_ieee64_zr=float<ieee_64,zr>;"
-  prelude "@rnd_ieee64_up=float<ieee_64,up>;"
-  prelude "@rnd_ieee64_dn=float<ieee_64,dn>;"
-  prelude "@rnd_ieee64_na=float<ieee_64,na>;"
+  syntax logic round "float<ieee_64,%1>(%2)"
 
 end
 
@@ -180,6 +168,7 @@ theory floating_point.Rounding
   syntax logic Up "up"
   syntax logic Down "dn"
   syntax logic NearTiesToAway "na"
+
 end
 
 (*
