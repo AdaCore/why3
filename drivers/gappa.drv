@@ -42,6 +42,11 @@ theory int.Int
   syntax logic (*)  "(%1 * %2)"
   syntax logic (-_) "(-%1)"
 
+  meta "gappa arith" logic (<=), "", "<=", ">="
+  meta "gappa arith" logic (>=), "", ">=", "<="
+  meta "gappa arith" logic (<), "not", ">=", "<="
+  meta "gappa arith" logic (>), "not", "<=", ">="
+
   meta "inline : no" logic (<=)
   meta "inline : no" logic (>=)
   meta "inline : no" logic (>)
@@ -92,6 +97,11 @@ theory real.Real
   syntax logic (/)  "(%1 / %2)"
   syntax logic (-_) "(-%1)"
   syntax logic inv  "(1.0 / %1)"
+
+  meta "gappa arith" logic (<=), "", "<=", ">="
+  meta "gappa arith" logic (>=), "", ">=", "<="
+  meta "gappa arith" logic (<), "not", ">=", "<="
+  meta "gappa arith" logic (>), "not", "<=", ">="
 
   meta "inline : no" logic (<=)
   meta "inline : no" logic (>=)

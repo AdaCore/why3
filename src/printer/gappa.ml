@@ -33,13 +33,18 @@ open Task
 
 type info = {
   info_symbols : Sid.t;
-  info_ops_of_rel : (bool * string * string) Mls.t;
+  info_ops_of_rel : (string * string * string) Mls.t;
   info_syn : string Mid.t;
   info_rem : Sid.t;
 }
 
 let int_minus = ref ps_equ
 let real_minus = ref ps_equ
+
+(** lsymbol, ""/"not", op, rev_op *)
+let arith_meta = register_meta "gappa arith"
+  [MTlsymbol;MTstring;MTstring;MTstring]
+
 
 let find_th env file th =
   let theory = Env.find_theory env [file] th in
@@ -56,42 +61,26 @@ let get_info =
 	| None ->
             let find_int = find_th env "int" "Int" in
             int_minus := find_int "prefix -";
-            let int_le = find_int "infix <=" in
-            let int_ge = find_int "infix >=" in
-            let int_lt = find_int "infix <" in
-            let int_gt = find_int "infix >" in
             let find_real = find_th env "real" "Real" in
             real_minus := find_real "prefix -";
-            let real_le = find_real "infix <=" in
-            let real_ge = find_real "infix >=" in
-            let real_lt = find_real "infix <" in
-            let real_gt = find_real "infix >" in
 (*
 	    let no_overflow_single = find_single_theory "no_overflow" in
 *)
-            (* sets of known symbols *)
+            let ops = on_meta arith_meta
+              (fun acc meta_arg ->
+                match meta_arg with
+                  | [MAls ls;MAstr s;MAstr op;MAstr rev_op] ->
+                    Mls.add ls (s,op,rev_op) acc
+                  | _ -> assert false) Mls.empty task in
+	    ops_of_rels := ops;
+           (* sets of known symbols *)
             let l = Mid.map (Util.const ()) syn in
+            let l = Mls.fold (fun ls _ acc -> Sid.add ls.ls_name acc) ops l in
             let l =
               List.fold_right (fun ls -> Sid.add ls.ls_name)
-                [ps_equ;
-                 int_le; int_ge; int_lt; int_gt;
-                 real_le; real_ge; real_lt; real_gt;
-                ] l
+                [ps_equ] l
             in
             arith_symbols := Some l;
-	    ops_of_rels :=
-	      List.fold_left
-		(fun acc (ls,b,op,rev_op) -> Mls.add ls (b,op,rev_op) acc)
-		Mls.empty
-		[ int_le,true,"<=",">=" ;
-		  int_ge,true,">=","<=" ;
-		  int_lt,false,">=","<=" ;
-		  int_gt,false,"<=",">=" ;
-		  real_le,true,"<=",">=" ;
-		  real_ge,true,">=","<=" ;
-		  real_lt,false,">=","<=" ;
-		  real_gt,false,"<=",">=" ;
-		];
 (*
 	    inline :=
 	      List.fold_left
@@ -194,10 +183,9 @@ let rec print_fmla info fmt f =
           fprintf fmt "%a - %a in [0,0]" term t1 term t2
       end
   | Fapp (ls, [t1;t2]) when Mls.mem ls info.info_ops_of_rel ->
-      let b,op,rev_op = try Mls.find ls info.info_ops_of_rel
+      let s,op,rev_op = try Mls.find ls info.info_ops_of_rel
 	with Not_found -> assert false
       in
-      let s=if b then "" else "not " in
       begin try
         let c1 = constant_value t1 in
         fprintf fmt "%s%a %s %s" s term t2 rev_op c1
