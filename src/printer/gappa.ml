@@ -88,6 +88,7 @@ let get_info =
             let real_truncate = find_real_truncate "truncate" in
             let real_floor = find_real_truncate "floor" in
             let real_ceil = find_real_truncate "ceil" in
+            let real_from_int = find_th env "real" "FromInt" "from_int" in
 	    let find_rounding_theory = find_th env "floating_point" "Rounding" in
 	    let round_ne = find_rounding_theory "NearestTiesToEven" in
             let round_zr = find_rounding_theory "ToZero" in
@@ -112,6 +113,7 @@ let get_info =
                  real_le; real_ge; real_lt; real_gt;
                  real_abs; real_sqrt ;
                  real_truncate; real_floor; real_ceil;
+                 real_from_int;
 		 !round_single; !round_double;
 		] Sls.empty
             in
