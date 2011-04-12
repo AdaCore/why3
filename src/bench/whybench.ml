@@ -147,7 +147,7 @@ let option_list = Arg.align [
   "-d", Arg.String (fun s -> opt_db := Some s),
   "<dir> the directory containing the database";
   "--redo-db", Arg.Set opt_redo,
-  "Check that the proof attempts in the database (-d) give the same results";
+  " Check that the proof attempts in the database (-d) give the same results";
   "--prover", Arg.String (fun s -> opt_prover := s::!opt_prover),
       " same as -P";
   "-F", Arg.String (fun s -> opt_parser := Some s),
