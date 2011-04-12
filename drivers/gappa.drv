@@ -125,6 +125,14 @@ theory real.Square
 
 end
 
+theory real.Truncate
+
+  syntax logic truncate "int<zr>(%1)"
+  syntax logic floor    "int<dn>(%1)"
+  syntax logic ceil     "int<up>(%1)"
+
+end
+
 theory floating_point.Single
 
   prelude "@rnd_ieee32_ne=float<ieee_32,ne>;"
