@@ -54,40 +54,22 @@ let get_info =
   let modes = ref Mls.empty in
   let _inline = ref Sls.empty in
   fun env task ->
+    let syn = get_syntax_map task in
     let l =
       match !arith_symbols with
 	| None ->
             let find_int = find_th env "int" "Int" in
-            let int_add = find_int "infix +" in
-            let int_sub = find_int "infix -" in
             int_minus := find_int "prefix -";
-            let int_mul = find_int "infix *" in
             let int_le = find_int "infix <=" in
             let int_ge = find_int "infix >=" in
             let int_lt = find_int "infix <" in
             let int_gt = find_int "infix >" in
-            let find_int_abs = find_th env "int" "Abs" in
-            let int_abs = find_int_abs "abs" in
             let find_real = find_th env "real" "Real" in
-            let real_add = find_real "infix +" in
-            let real_sub = find_real "infix -" in
             real_minus := find_real "prefix -";
-            let real_mul = find_real "infix *" in
-            let real_div = find_real "infix /" in
             let real_le = find_real "infix <=" in
             let real_ge = find_real "infix >=" in
             let real_lt = find_real "infix <" in
             let real_gt = find_real "infix >" in
-            let real_inv = find_real "inv" in
-            let find_real_abs = find_th env "real" "Abs" in
-            let real_abs = find_real_abs "abs" in
-            let find_real_square = find_th env "real" "Square" in
-            let real_sqrt = find_real_square "sqrt" in
-            let find_real_truncate = find_th env "real" "Truncate" in
-            let real_truncate = find_real_truncate "truncate" in
-            let real_floor = find_real_truncate "floor" in
-            let real_ceil = find_real_truncate "ceil" in
-            let real_from_int = find_th env "real" "FromInt" "from_int" in
 	    let find_rounding_theory = find_th env "floating_point" "Rounding" in
 	    let round_ne = find_rounding_theory "NearestTiesToEven" in
             let round_zr = find_rounding_theory "ToZero" in
@@ -102,19 +84,14 @@ let get_info =
 	    let no_overflow_single = find_single_theory "no_overflow" in
 *)
             (* sets of known symbols *)
+            let l = Mid.fold (fun id _ -> Sid.add id) syn Sid.empty in
             let l =
               List.fold_right (fun ls -> Sid.add ls.ls_name)
                 [ps_equ;
-                 int_add; int_sub; !int_minus; int_mul;
                  int_le; int_ge; int_lt; int_gt;
-		 int_abs;
-		 real_add; real_sub; !real_minus; real_mul; real_div; real_inv;
                  real_le; real_ge; real_lt; real_gt;
-                 real_abs; real_sqrt ;
-                 real_truncate; real_floor; real_ceil;
-                 real_from_int;
 		 !round_single; !round_double;
-		] Sid.empty
+                ] l
             in
             arith_symbols := Some l;
 	    ops_of_rels :=
@@ -155,7 +132,7 @@ let get_info =
       info_symbols = l;
       info_ops_of_rel = !ops_of_rels;
       rounding_modes = !modes;
-      info_syn = get_syntax_map task;
+      info_syn = syn;
       info_rem = get_remove_set task;
     }
 
