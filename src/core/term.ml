@@ -810,7 +810,7 @@ let f_close_quant vl tl f =
 (* open bindings *)
 
 let gen_fresh_vsymbol fnT v =
-  create_vsymbol (id_dup v.vs_name) (fnT v.vs_ty)
+  create_vsymbol (id_clone v.vs_name) (fnT v.vs_ty)
 
 let gen_vs_rename fnT h v =
   let u = gen_fresh_vsymbol fnT v in

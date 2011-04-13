@@ -104,14 +104,9 @@ let specialize_post ~loc htv ((v, f), ql) =
   let f = specialize_fmla ~loc htv f in
   (ty, f), List.map specialize_exn ql
 
-let rec loc_of_id id = match id.id_origin with
-  | User loc -> loc
-  | Derived id -> loc_of_id id
-  | _ -> assert false
+let loc_of_id id = Util.of_option id.Ident.id_loc
 
-let loc_of_ls ls = match ls.ls_name.id_origin with
-  | User loc -> Some loc
-  | _ -> None (* FIXME: loc for recursive functions *)
+let loc_of_ls ls = ls.ls_name.Ident.id_loc
 
 let dcurrying tyl ty =
   let make_arrow_type ty1 ty2 = dty_app (ts_arrow, [ty1; ty2]) in
@@ -142,9 +137,7 @@ and specialize_binder ~loc htv v =
     id = v.pv_name.id_string;
     id_lab = List.map (fun l -> Lstr l) v.pv_name.id_label;
     (* FIXME? We do the same here as in Denv.ident_of_vs *)
-    id_loc = match v.pv_name.id_origin with
-      | User loc -> loc
-      | _ -> loc }
+    id_loc = Util.default_option loc v.pv_name.Ident.id_loc }
   in
   let v = specialize_type_v ~loc htv v.pv_tv in
   id, dpurify_type_v v, v

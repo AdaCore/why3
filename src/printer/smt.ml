@@ -211,7 +211,7 @@ let print_decl info fmt d = match d.d_node with
   | Dprop (Pgoal, pr, f) ->
       fprintf fmt "@[:formula@\n";
       fprintf fmt "@[;; %a@]@\n" print_ident pr.pr_name;
-      (match id_from_user pr.pr_name with
+      (match pr.pr_name.id_loc with
         | None -> ()
         | Some loc -> fprintf fmt " @[;; %a@]@\n"
             Loc.gen_report_position loc);

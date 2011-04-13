@@ -28,16 +28,11 @@ type label = string
 (** {2 Identifiers} *)
 
 type ident = private {
-  id_string : string;       (* non-unique name *)
-  id_origin : origin;       (* origin of the ident *)
-  id_label  : label list;   (* identifier labels *)
-  id_tag    : Hashweak.tag; (* unique magical tag *)
+  id_string : string;               (* non-unique name *)
+  id_label  : label list;           (* identifier labels *)
+  id_loc    : Loc.position option;  (* optional location *)
+  id_tag    : Hashweak.tag;         (* unique magical tag *)
 }
-
-and origin =
-  | User of Loc.position
-  | Derived of ident
-  | Fresh
 
 module Mid : Map.S with type key = ident
 module Sid : Mid.Set
@@ -50,29 +45,21 @@ val id_hash : ident -> int
 (* a user-created type of unregistered identifiers *)
 type preid
 
-(* register a pre-ident (never use this function) *)
+(* register a pre-ident (you should never use this function) *)
 val id_register : preid -> ident
 
 (* create a fresh pre-ident *)
-val id_fresh : ?labels:(label list) -> string -> preid
+val id_fresh : ?label:(label list) -> ?loc:Loc.position -> string -> preid
 
 (* create a localized pre-ident *)
-val id_user : ?labels:(label list) -> string -> Loc.position -> preid
-
-(* create a derived pre-ident *)
-val id_derive : ?labels:(label list) -> string -> ident -> preid
-
-(* create a derived pre-ident with the same name and labels *)
-val id_clone : ?labels:(label list) -> ident -> preid
+val id_user : ?label:(label list) -> string -> Loc.position -> preid
 
 (* create a duplicate pre-ident *)
-val id_dup : ?labels:(label list) -> ident -> preid
+val id_clone : ?label:(label list) -> ident -> preid
 
-(* id_derived_from i1 i2 <=> i1 is derived from i2 *)
-val id_derived_from : ident -> ident -> bool
+(* create a derived pre-ident (inherit labels and location) *)
+val id_derive : ?label:(label list) -> string -> ident -> preid
 
-(* id_derived_from i1 i2 <=> i1 is derived from i2 *)
-val id_from_user : ident -> Loc.position option
 
 (** Unique persistent names for pretty printing *)
 

@@ -20,8 +20,8 @@
 open Util
 open Format
 open Pp
-open Ptree
 open Ident
+open Ptree
 open Ty
 open Term
 open Decl
@@ -1025,9 +1025,7 @@ let add_prop k loc s f th =
   try add_prop_decl th k pr (type_fmla (create_denv th) Mstr.empty f)
   with ClashSymbol s -> error ~loc (Clash s)
 
-let loc_of_id id = match id.id_origin with
-  | User loc -> loc
-  | _ -> assert false
+let loc_of_id id = of_option id.Ident.id_loc
 
 let add_inductives dl th =
   (* 1. create all symbols and make an environment with these symbols *)

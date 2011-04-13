@@ -134,8 +134,8 @@ let create_user_id { id = x ; id_lab = ll ; id_loc = loc } =
     | Lstr l -> l::ll, p
     | Lpos p -> ll, Some p
   in
-  let labels,p = List.fold_left get_labels ([],None) ll in
-  id_user ~labels x (default_option loc p)
+  let label,p = List.fold_left get_labels ([],None) ll in
+  id_user ~label x (default_option loc p)
 
 let create_user_vs id ty = create_vsymbol (create_user_id id) ty
 
@@ -297,10 +297,8 @@ let specialize_lsymbol ~loc s =
 let ident_of_vs ~loc vs =
   { id     = vs.vs_name.id_string;
     id_lab = List.map (fun l -> Lstr l) vs.vs_name.id_label;
-    id_loc = match vs.vs_name.id_origin with
-      (* FIXME: should we add this loc to id_lab? *)
-      | User loc -> loc
-      | _ -> loc }
+    (* FIXME: should we add this loc to id_lab? *)
+    id_loc = Util.default_option loc vs.vs_name.Ident.id_loc }
 
 let rec specialize_pattern ~loc htv p =
   { dp_node = specialize_pattern_node  ~loc htv p.pat_node;

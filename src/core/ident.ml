@@ -27,16 +27,11 @@ type label = string
 (** Identifiers *)
 
 type ident = {
-  id_string : string;       (* non-unique name *)
-  id_origin : origin;       (* origin of the ident *)
-  id_label  : label list;   (* identifier labels *)
-  id_tag    : Hashweak.tag; (* unique magical tag *)
+  id_string : string;               (* non-unique name *)
+  id_label  : label list;           (* identifier labels *)
+  id_loc    : Loc.position option;  (* optional location *)
+  id_tag    : Hashweak.tag;         (* unique magical tag *)
 }
-
-and origin =
-  | User of Loc.position
-  | Derived of ident
-  | Fresh
 
 module Id = WeakStructMake (struct
   type t = ident
@@ -58,33 +53,24 @@ let id_hash id = Hashweak.tag_hash id.id_tag
 let id_register = let r = ref 0 in fun id ->
   { id with id_tag = (incr r; Hashweak.create_tag !r) }
 
-let create_ident name origin labels = {
+let create_ident name labels loc = {
   id_string = name;
-  id_origin = origin;
   id_label  = labels;
+  id_loc    = loc;
   id_tag    = Hashweak.dummy_tag;
 }
 
-let id_fresh ?(labels = []) nm = create_ident nm Fresh labels
-let id_user ?(labels = []) nm loc = create_ident nm (User loc) labels
-let id_derive ?(labels = []) nm id = create_ident nm (Derived id) labels
+let id_fresh ?(label = []) ?loc nm =
+  create_ident nm label loc
 
-let id_clone ?(labels = []) id =
-  create_ident id.id_string (Derived id) (labels @ id.id_label)
+let id_user ?(label = []) nm loc =
+  create_ident nm label (Some loc)
 
-let id_dup ?(labels = []) id =
-  create_ident id.id_string id.id_origin (labels @ id.id_label)
+let id_clone ?(label = []) id =
+  create_ident id.id_string (label @ id.id_label) id.id_loc
 
-let rec id_derived_from i1 i2 = id_equal i1 i2 ||
-  (match i1.id_origin with
-    | Derived i3 -> id_derived_from i3 i2
-    | _ -> false)
-
-let rec id_from_user i =
-  match i.id_origin with
-    | Derived i -> id_from_user i
-    | User l -> Some l
-    | Fresh -> None
+let id_derive ?(label = []) nm id =
+  create_ident nm (label @ id.id_label) id.id_loc
 
 (** Unique names for pretty printing *)
 

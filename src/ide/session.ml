@@ -658,9 +658,9 @@ let read_file fn =
   let theories =
     Theory.Mnm.fold
       (fun name th acc ->
-         match th.Theory.th_name.Ident.id_origin with
-           | Ident.User l -> (l,name,th)::acc
-           | _ -> (Loc.dummy_position,name,th)::acc)
+         match th.Theory.th_name.Ident.id_loc with
+           | Some l -> (l,name,th)::acc
+           | None   -> (Loc.dummy_position,name,th)::acc)
       theories []
   in
   List.sort

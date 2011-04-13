@@ -492,11 +492,8 @@ and f_btop env f = match f.f_node with
 
 let add_wp_decl ps f uc =
   let s = "WP_" ^ ps.p_name.id_string in
-  let labels = ["expl:correctness of " ^ ps.p_name.id_string] in
-  let id = match id_from_user ps.p_name with
-    | None -> id_fresh ~labels s
-    | Some loc -> id_user ~labels s loc
-  in
+  let label = ["expl:correctness of " ^ ps.p_name.id_string] in
+  let id = id_fresh ~label ?loc:ps.p_name.id_loc s in
   let f = f_btop uc f in
   (* printf "wp: f=%a@." print_fmla f; *)
   let pr = create_prsymbol id in

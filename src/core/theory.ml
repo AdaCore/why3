@@ -443,7 +443,7 @@ let rec cl_find_ts cl ts =
   else try Mts.find ts cl.ts_table
   with Not_found ->
     let td' = option_map (cl_trans_ty cl) ts.ts_def in
-    let ts' = create_tysymbol (id_dup ts.ts_name) ts.ts_args td' in
+    let ts' = create_tysymbol (id_clone ts.ts_name) ts.ts_args td' in
     cl.ts_table <- Mts.add ts ts' cl.ts_table;
     ts'
 
@@ -455,7 +455,7 @@ let cl_find_ls cl ls =
   with Not_found ->
     let ta' = List.map (cl_trans_ty cl) ls.ls_args in
     let vt' = option_map (cl_trans_ty cl) ls.ls_value in
-    let ls' = create_lsymbol (id_dup ls.ls_name) ta' vt' in
+    let ls' = create_lsymbol (id_clone ls.ls_name) ta' vt' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     ls'
 
@@ -465,7 +465,7 @@ let cl_find_pr cl pr =
   if not (Sid.mem pr.pr_name cl.cl_local) then pr
   else try Mpr.find pr cl.pr_table
   with Not_found ->
-    let pr' = create_prsymbol (id_dup pr.pr_name) in
+    let pr' = create_prsymbol (id_clone pr.pr_name) in
     cl.pr_table <- Mpr.add pr pr' cl.pr_table;
     pr'
 

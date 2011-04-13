@@ -112,7 +112,7 @@ let conv_ty tenv ty =
 let conv_vs tenv vs =
   let ty = conv_ty tenv vs.vs_ty in
   if ty_equal ty vs.vs_ty then vs else
-      create_vsymbol (id_dup vs.vs_name) ty
+      create_vsymbol (id_clone vs.vs_name) ty
 
 (* Convert a logic symbols to the encoded one *)
 let conv_ls tenv ls =

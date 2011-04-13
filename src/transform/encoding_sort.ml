@@ -41,7 +41,7 @@ let conv_ts tenv undefined name ty =
     try
       Hty.find tenv.specials ty
     with Not_found ->
-      let ts = create_tysymbol (id_dup name) [] None in
+      let ts = create_tysymbol (id_clone name) [] None in
       Hty.add tenv.specials ty ts;
       ts in
   Hts.replace undefined ts ();
@@ -60,7 +60,7 @@ let conv_ty tenv undefined ty =
 let conv_vs tenv ud vs =
   let ty = conv_ty tenv ud vs.vs_ty in
   if ty_equal ty vs.vs_ty then vs else
-  create_vsymbol (id_dup vs.vs_name) ty
+  create_vsymbol (id_clone vs.vs_name) ty
 
 (* Convert a logic symbol to the encoded one *)
 let conv_ls tenv ud ls =
