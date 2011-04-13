@@ -50,54 +50,27 @@ let find_th env file th =
   let theory = Env.find_theory env [file] th in
   fun id -> Theory.ns_find_ls theory.Theory.th_export [id]
 
-let get_info =
-  let arith_symbols = ref None in
-  let ops_of_rels = ref Mls.empty in
-  let _inline = ref Sls.empty in
-  fun env task ->
-    let syn = get_syntax_map task in
-    let l =
-      match !arith_symbols with
-	| None ->
-            let find_int = find_th env "int" "Int" in
-            int_minus := find_int "prefix -";
-            let find_real = find_th env "real" "Real" in
-            real_minus := find_real "prefix -";
-(*
-	    let no_overflow_single = find_single_theory "no_overflow" in
-*)
-            let ops = on_meta arith_meta
-              (fun acc meta_arg ->
-                match meta_arg with
-                  | [MAls ls;MAstr s;MAstr op;MAstr rev_op] ->
-                    Mls.add ls (s,op,rev_op) acc
-                  | _ -> assert false) Mls.empty task in
-	    ops_of_rels := ops;
-           (* sets of known symbols *)
-            let l = Mid.map (Util.const ()) syn in
-            let l = Mls.fold (fun ls _ acc -> Sid.add ls.ls_name acc) ops l in
-            let l =
-              List.fold_right (fun ls -> Sid.add ls.ls_name)
-                [ps_equ] l
-            in
-            arith_symbols := Some l;
-(*
-	    inline :=
-	      List.fold_left
-		(fun acc ls -> Sls.add ls acc)
-		Sls.empty
-		[ real_lei ;
-		];
-*)
-            l
-        | Some l -> l
-    in
-    {
-      info_symbols = l;
-      info_ops_of_rel = !ops_of_rels;
-      info_syn = syn;
-      info_rem = get_remove_set task;
-    }
+let get_info env task =
+  (* unary minus for constants *)
+  int_minus := find_th env "int" "Int" "prefix -";
+  real_minus := find_th env "real" "Real" "prefix -";
+  (* handling of inequalities *)
+  let ops = on_meta arith_meta (fun acc meta_arg ->
+    match meta_arg with
+    | [MAls ls; MAstr s; MAstr op; MAstr rev_op] ->
+        Mls.add ls (s,op,rev_op) acc
+    | _ -> assert false) Mls.empty task in
+  (* sets of known symbols *)
+  let syn = get_syntax_map task in
+  let symb = Mid.map (Util.const ()) syn in
+  let symb = Mls.fold (fun ls _ acc -> Sid.add ls.ls_name acc) ops symb in
+  let symb = Sid.add ps_equ.ls_name symb in
+  {
+    info_symbols = symb;
+    info_ops_of_rel = ops;
+    info_syn = syn;
+    info_rem = get_remove_set task;
+  }
 
 (* Gappa printing *)
 
