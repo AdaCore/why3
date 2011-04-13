@@ -76,8 +76,11 @@ let get_info env task =
 
 let ident_printer =
   let bls = [
-  ]
-  in
+      "sqrt"; "fma";
+      "float"; "fixed"; "int";
+      "homogen80x"; "homogen80x_init"; "float80x";
+      "add_rel"; "sub_rel"; "mul_rel"; "fma_rel";
+    ] in
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
 
