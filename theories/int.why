@@ -6,7 +6,7 @@ theory Int
 
   logic (< ) int int
   logic (> ) (x y : int) = y < x
-  logic (<=) (x y : int) = x < y or x = y
+  logic (<=) (x y : int) = x < y \/ x = y
 
   clone export algebra.OrderedUnitaryCommutativeRing with
      type t = int, logic zero = zero, logic one = one, logic (<=) = (<=)
@@ -43,7 +43,7 @@ theory EuclideanDivision
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
 
   axiom Div_bound:
-    forall x y:int. x >= 0 and y > 0 -> 0 <= div x y <= x
+    forall x y:int. x >= 0 /\ y > 0 -> 0 <= div x y <= x
 
   axiom Mod_bound:
     forall x y:int. y <> 0 -> 0 <= mod x y < abs y
@@ -66,22 +66,22 @@ theory ComputerDivision
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
 
   axiom Div_bound:
-    forall x y:int. x >= 0 and y > 0 -> 0 <= div x y <= x
+    forall x y:int. x >= 0 /\ y > 0 -> 0 <= div x y <= x
 
   axiom Mod_bound:
     forall x y:int. y <> 0 -> - abs y < mod x y < abs y
 
   axiom Div_sign_pos:
-    forall x y:int. x >= 0 and y > 0 -> div x y >= 0
+    forall x y:int. x >= 0 /\ y > 0 -> div x y >= 0
 
   axiom Div_sign_neg:
-    forall x y:int. x <= 0 and y > 0 -> div x y <= 0
+    forall x y:int. x <= 0 /\ y > 0 -> div x y <= 0
 
   axiom Mod_sign_pos:
-    forall x y:int. x >= 0 and y <> 0 -> mod x y >= 0
+    forall x y:int. x >= 0 /\ y <> 0 -> mod x y >= 0
 
   axiom Mod_sign_neg:
-    forall x y:int. x <= 0 and y <> 0 -> mod x y <= 0
+    forall x y:int. x <= 0 /\ y <> 0 -> mod x y <= 0
 
   lemma Rounds_toward_zero:
     forall x y:int. y <> 0 -> abs (div x y * y) <= abs x
@@ -95,11 +95,11 @@ theory ComputerDivision
   lemma Mod_inf: forall x y:int. 0 <= x < y -> mod x y = x
 
   lemma Div_mult: forall x y z:int [div (x * y + z) x]. 
-          x > 0 and y >= 0 and z >= 0 ->
+          x > 0 /\ y >= 0 /\ z >= 0 ->
           div (x * y + z) x = y + div z x
 
   lemma Mod_mult: forall x y z:int [mod (x * y + z) x]. 
-          x > 0 and y >= 0 and z >= 0 ->
+          x > 0 /\ y >= 0 /\ z >= 0 ->
           mod (x * y + z) x = mod z x
 
 end
@@ -227,8 +227,8 @@ theory Gcd
   use import Divisibility
 
   logic gcd (a b g : int) =
-    divides g a and
-    divides g b and
+    divides g a /\
+    divides g b /\
     forall x : int. divides x a -> divides x b -> divides x g
 
   lemma Gcd_sym : forall a b g : int. gcd a b g -> gcd b a g

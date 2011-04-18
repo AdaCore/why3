@@ -57,6 +57,8 @@
 	"forall", FORALL;
 	"goal", GOAL;
 	"if", IF;
+	"iff", IFF;
+	"implies", IMPLIES;
 	"import", IMPORT;
 	"in", IN;
 	"inductive", INDUCTIVE;
@@ -235,7 +237,11 @@ rule token = parse
       { AMPAMP }
   | "||"
       { BARBAR }
-  | "\\"
+  | "/\\"
+      { AND }
+  | "\\/"
+      { OR }
+   | "\\"
       { LAMBDA }
   | "\\?"
       { PRED }
@@ -253,6 +259,8 @@ rule token = parse
       { LEFTSQ }
   | "]"
       { RIGHTSQ }
+  | "~"
+      { TILDE }
   | op_char_pref op_char_4* as s
       { OPPREF s }
   | op_char_1234* op_char_1 op_char_1234* as s

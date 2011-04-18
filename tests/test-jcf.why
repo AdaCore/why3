@@ -1,5 +1,44 @@
 
+theory T
 
+  type answer = Yes | No | MayBe
+
+  type tree 'a = Leaf | Node (tree 'a) 'a (tree 'a)
+
+  type answer_tree 'a = (tree 'a, answer)
+
+  use import int.Int
+  use import int.MinMax
+
+  logic height (t: tree 'a) : int = match t with
+    | Leaf -> 0
+    | Node l _ r -> 1 + max (height l) (height r)
+  end
+
+  logic sorted (t: tree int) (min: int) (max: int) = match t with
+    | Leaf -> true
+    | Node l x r -> sorted l min x /\ min <= x <= max /\ sorted r x max
+  end
+
+  use import list.List
+
+  inductive sub (list 'a) (list 'a) =
+    | empty: sub (Nil: list 'a) (Nil: list 'a)
+    | cons : forall x: 'a, s1 s2: list 'a. 
+             sub s1 s2 -> sub (Cons x s1) (Cons x s2)
+    | dive : forall x: 'a, s1 s2: list 'a. 
+             sub s1 s2 -> sub s1 (Cons x s2)
+
+  logic abs (x: int) : int = if x >= 0 then x else -x
+
+end
+
+theory T2 
+
+  type tree = Node int forest
+  with forest = Empty | Cons tree forest
+
+end
 
 theory Records
 

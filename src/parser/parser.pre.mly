@@ -159,7 +159,7 @@
 
 %token AND AS AXIOM CLONE
 %token ELSE END EPSILON EXISTS EXPORT FALSE FORALL
-%token GOAL IF IMPORT IN INDUCTIVE LEMMA
+%token GOAL IF IFF IMPLIES IMPORT IN INDUCTIVE LEMMA
 %token LET LOGIC MATCH META NAMESPACE NOT PROP OR
 %token THEN THEORY TRUE TYPE USE WITH
 
@@ -180,7 +180,7 @@
 %token LRARROW
 %token PRED QUOTE
 %token RIGHTPAR RIGHTREC RIGHTSQ
-%token UNDERSCORE
+%token TILDE UNDERSCORE
 
 %token EOF
 
@@ -204,7 +204,7 @@
 %nonassoc prec_named
 %nonassoc COLON
 
-%right ARROW LRARROW
+%right ARROW IMPLIES LRARROW IFF
 %right OR BARBAR
 %right AND AMPAMP
 %nonassoc NOT
@@ -518,7 +518,11 @@ type_var:
 lexpr:
 | lexpr ARROW lexpr
    { infix_pp $1 PPimplies $3 }
+| lexpr IMPLIES lexpr
+   { infix_pp $1 PPimplies $3 }
 | lexpr LRARROW lexpr
+   { infix_pp $1 PPiff $3 }
+| lexpr IFF lexpr
    { infix_pp $1 PPiff $3 }
 | lexpr OR lexpr
    { infix_pp $1 PPor $3 }
@@ -528,6 +532,8 @@ lexpr:
    { infix_pp $1 PPand $3 }
 | lexpr AMPAMP lexpr
    { mk_pp (PPnamed (Lstr "asym_split", infix_pp $1 PPand $3)) }
+| TILDE lexpr
+   { prefix_pp PPnot $2 }
 | NOT lexpr
    { prefix_pp PPnot $2 }
 | lexpr EQUAL lexpr
