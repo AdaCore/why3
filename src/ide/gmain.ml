@@ -600,7 +600,7 @@ let tools_window_vbox =
   with Gtk.Error _ -> assert false
 
 let context_frame =
-  GBin.frame ~label:"Context"
+  GBin.frame ~label:"Apply provers to"
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 let context_box =
