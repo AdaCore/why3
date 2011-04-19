@@ -23,15 +23,16 @@ open Term
 open Decl
 open Task
 
-let term_table = Hterm_alpha.create 257
-let fmla_table = Hfmla_alpha.create 257
-let extra_decls = ref []
+let abstraction (keep : lsymbol -> bool) =
+  let term_table = Hterm_alpha.create 257 in
+  let fmla_table = Hfmla_alpha.create 257 in
+  let extra_decls = ref [] in
 
-let rec abstract_term keep t : term =
-  match t.t_node with
+  let rec abstract_term t : term =
+    match t.t_node with
     | Tconst _ | Tapp(_,[]) -> t
     | Tapp(ls,_) when keep ls ->
-        t_map (abstract_term keep) (abstract_fmla keep) t
+        t_map abstract_term abstract_fmla t
     | _ ->
         begin try Hterm_alpha.find term_table t with Not_found ->
           let ls = create_fsymbol (id_fresh "abstr") [] t.t_ty in
@@ -41,13 +42,13 @@ let rec abstract_term keep t : term =
           tabs
         end
 
-and abstract_fmla keep f =
-  match f.f_node with
+  and abstract_fmla f =
+    match f.f_node with
     | Ftrue | Ffalse -> f
     | Fnot _ | Fbinop _ ->
-        f_map (abstract_term keep) (abstract_fmla keep) f
+        f_map abstract_term abstract_fmla f
     | Fapp(ls,_) when keep ls ->
-        f_map (abstract_term keep) (abstract_fmla keep) f
+        f_map abstract_term abstract_fmla f
     | _ ->
         begin try Hfmla_alpha.find fmla_table f with Not_found ->
           let ls = create_psymbol (id_fresh "abstr") [] in
@@ -55,20 +56,12 @@ and abstract_fmla keep f =
           extra_decls := ls :: !extra_decls;
           Hfmla_alpha.add fmla_table f fabs;
           fabs
-        end
+        end in
 
-
-let abstract_decl keep (d : decl) : decl list =
-  let d = decl_map (abstract_term keep) (abstract_fmla keep) d in
-  let l =
+  let abstract_decl (d : decl) : decl list =
+    let d = decl_map abstract_term abstract_fmla d in
     List.fold_left
       (fun acc ls -> create_logic_decl [ls,None] :: acc)
-      [d]
-      !extra_decls
-  in
-  extra_decls := []; l
+      [d] !extra_decls in
 
-let abstraction (keep : lsymbol -> bool) (t: task) : task =
-  Hfmla_alpha.clear fmla_table;
-  Hterm_alpha.clear term_table;
-  Trans.apply (Trans.decl (abstract_decl keep) None) t
+  Trans.decl abstract_decl None

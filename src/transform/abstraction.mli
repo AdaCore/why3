@@ -20,7 +20,7 @@
 
 
 
-val abstraction : (Term.lsymbol -> bool) -> Task.task -> Task.task
+val abstraction : (Term.lsymbol -> bool) -> Task.task Trans.trans
 (** [abstract keep t] applies variable abstraction of the task [t],
     that is replaces subterms or subformulas headed by a logic symbol
     f that do not satisfies [keep f] into a fresh variable.
