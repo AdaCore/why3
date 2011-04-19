@@ -21,12 +21,15 @@ transformation "eliminate_algebraic_smt"
 transformation "eliminate_if"
 transformation "eliminate_let"
 transformation "simplify_formula"
+transformation "simplify_unknown_lsymbols"
 transformation "simplify_trivial_quantification"
+transformation "introduce_premises"
+transformation "abstract_unknown_lsymbols"
 
 theory BuiltIn
   syntax type int   "int"
   syntax type real  "real"
-  syntax logic (=)  "(%1 = %2)"
+  syntax logic (=)  "dummy"
 end
 
 theory int.Int
@@ -40,6 +43,11 @@ theory int.Int
   syntax logic (-)  "(%1 - %2)"
   syntax logic (*)  "(%1 * %2)"
   syntax logic (-_) "(-%1)"
+
+  syntax logic (<=) "dummy"
+  syntax logic (>=) "dummy"
+  syntax logic (<)  "dummy"
+  syntax logic (>)  "dummy"
 
   meta "gappa arith" logic (<=), "", "<=", ">="
   meta "gappa arith" logic (>=), "", ">=", "<="
@@ -96,6 +104,11 @@ theory real.Real
   syntax logic (/)  "(%1 / %2)"
   syntax logic (-_) "(-%1)"
   syntax logic inv  "(1.0 / %1)"
+
+  syntax logic (<=) "dummy"
+  syntax logic (>=) "dummy"
+  syntax logic (<)  "dummy"
+  syntax logic (>)  "dummy"
 
   meta "gappa arith" logic (<=), "", "<=", ">="
   meta "gappa arith" logic (>=), "", ">=", "<="

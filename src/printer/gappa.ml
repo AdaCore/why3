@@ -29,6 +29,26 @@ open Decl
 open Theory
 open Task
 
+let syntactic_transform transf =
+  Trans.on_meta meta_syntax_logic (fun metas ->
+    let symbols = List.fold_left (fun acc meta_arg ->
+      match meta_arg with
+      | [MAls ls; MAstr _] -> Sls.add ls acc
+      | _ -> assert false) Sls.empty metas in
+    transf (fun ls -> Sls.mem ls symbols))
+
+let () =
+  Trans.register_transform "abstract_unknown_lsymbols"
+    (syntactic_transform Abstraction.abstraction);
+  Trans.register_transform "simplify_unknown_lsymbols"
+    (syntactic_transform (fun check_ls -> Trans.goal (fun pr f ->
+      [create_prop_decl Pgoal pr (Simplify_formula.fmla_cond_subst
+        (fun t _ -> match t.t_node with
+          | Tconst _ | Tapp(_,[]) -> false
+          | Tapp(ls,_) -> not (check_ls ls)
+          | _ -> true) true f)
+      ])))
+
 (* Gappa pre-compilation *)
 
 type info = {
@@ -325,20 +345,6 @@ let print_goal info fmt g =
 let print_task env pr thpr ?old:_ fmt task =
   forget_all ident_printer;
   let info = get_info env task in
-  let task = Trans.apply (Trans.goal (fun pr f ->
-    [create_prop_decl Pgoal pr (Simplify_formula.fmla_cond_subst
-      (fun t _ -> match t.t_node with
-        | Tconst _ | Tapp(_,[]) -> false
-        | Tapp(ls,_) -> not (Sid.mem ls.ls_name info.info_symbols)
-        | _ -> true) true f)
-    ])) task in
-  let task = Trans.apply (Trans.lookup_transform "introduce_premises" env) task in
-  let task = Trans.apply (Abstraction.abstraction
-      (fun ls -> Sid.mem ls.ls_name info.info_symbols)
-    ) task in
-(*
-  eprintf "Abstraction: @\n%a@." Pretty.print_task task;
-*)
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   let equations,hyps,goal =
