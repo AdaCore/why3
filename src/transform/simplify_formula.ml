@@ -137,3 +137,80 @@ let simplify_trivial_quantification_in_goal =
 let () = Trans.register_transform
   "simplify_trivial_quantification_in_goal"
    simplify_trivial_quantification_in_goal
+
+(** linearize all the subformulas with the given connector (conj/disj);
+    the returned array also contains the sign of each subformula *)
+let fmla_flatten conj sign f =
+  let terms = ref [] in
+  let conj = (conj = sign) in
+  let rec aux sign f =
+    match f.f_node with
+    | Fnot f -> aux (not sign) f
+    | Fbinop (For, f1, f2) when sign <> conj ->
+        aux sign f2; aux sign f1
+    | Fbinop (Fand, f1, f2) when sign = conj ->
+        aux sign f2; aux sign f1
+    | Fbinop (Fimplies, f1, f2) when sign <> conj ->
+        aux sign f2; aux (not sign) f1
+    | _ -> terms := (f, sign)::!terms in
+  aux sign f;
+  Array.of_list !terms
+
+(** recreate the structure of a given formula with linearized subformulas *)
+let fmla_unflatten conj sign f formulas =
+  let i = ref 0 in
+  let conj = (conj = sign) in
+  let rec aux sign f = f_label_copy f (match f.f_node with
+    | Fnot f -> f_not (aux (not sign) f)
+    | Fbinop (For, f1, f2) when sign <> conj ->
+        let f1' = aux sign f1 in f_or f1' (aux sign f2)
+    | Fbinop (Fand, f1, f2) when sign = conj ->
+        let f1' = aux sign f1 in f_and f1' (aux sign f2)
+    | Fbinop (Fimplies, f1, f2) when sign <> conj ->
+        let f1' = aux (not sign) f1 in f_implies f1' (aux sign f2)
+    | _ ->
+        let (t, s) = formulas.(!i) in
+        assert (sign = s);
+        incr i;
+        t) in
+  aux sign f
+
+(** substitute all the terms that appear as a side of an equality/disequality
+    and that match the given filter
+
+    in a positive formula, equal terms can be substituted in all the terms of
+    surrounding conjunctions, while disequal terms can be substituted in
+    all the terms of surrounding disjunctions
+
+    substitutions are not exported outside quantifiers (even if their free
+    variables are untouched), so the transformation is possibly incomplete
+    (but still correct) on formulas that have inner quantifiers *)
+let rec fmla_cond_subst filter sign f =
+  let rec aux sign f =
+    match f.f_node with
+    | Fbinop (o, _, _) when o <> Fiff ->
+        let conj = match o with
+          Fand -> true | For | Fimplies -> false | Fiff -> assert false in
+        let subf = fmla_flatten conj sign f in
+        let subl = Array.length subf in
+        for i = 0 to subl - 1 do
+          let (f, s) = subf.(i) in
+          subf.(i) <- (aux s f, s);
+        done;
+        for i = 0 to subl - 1 do
+          let do_subst t1 t2 =
+            for j = 0 to subl - 1 do
+              if j <> i then
+                let (f, s) = subf.(j) in
+                subf.(j) <- (f_subst_term t1 t2 f, s);
+            done in
+          let (f, s) = subf.(i) in
+          match f.f_node with
+          | Fapp (ls,[t1;t2]) when ls_equal ls ps_equ && s = (conj = sign) ->
+              if filter t1 t2 then do_subst t1 t2 else
+              if filter t2 t1 then do_subst t2 t1
+          | _ -> ()
+        done;
+        fmla_unflatten conj sign f subf
+    | _ -> f_map_sign (fun t -> t) aux sign f in
+  aux sign f
