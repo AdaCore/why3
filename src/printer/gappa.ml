@@ -332,10 +332,10 @@ let print_task env pr thpr ?old:_ fmt task =
         | Tapp(ls,_) -> not (Sid.mem ls.ls_name info.info_symbols)
         | _ -> true) true f)
     ])) task in
+  let task = Trans.apply (Trans.lookup_transform "introduce_premises" env) task in
   let task = Trans.apply (Abstraction.abstraction
       (fun ls -> Sid.mem ls.ls_name info.info_symbols)
     ) task in
-  let task = Trans.apply (Trans.lookup_transform "introduce_premises" env) task in
 (*
   eprintf "Abstraction: @\n%a@." Pretty.print_task task;
 *)
