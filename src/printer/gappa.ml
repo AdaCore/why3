@@ -325,11 +325,18 @@ let print_goal info fmt g =
 let print_task env pr thpr ?old:_ fmt task =
   forget_all ident_printer;
   let info = get_info env task in
+  let task = Trans.apply (Trans.goal (fun pr f ->
+    [create_prop_decl Pgoal pr (Simplify_formula.fmla_cond_subst
+      (fun t _ -> match t.t_node with
+        | Tconst _ | Tapp(_,[]) -> false
+        | Tapp(ls,_) -> not (Sid.mem ls.ls_name info.info_symbols)
+        | _ -> true) true f)
+    ])) task in
   let task =
     Abstraction.abstraction
       (fun ls -> Sid.mem ls.ls_name info.info_symbols)
-      task
-  in
+      task in
+  let task = Trans.apply (Trans.lookup_transform "introduce_premises" env) task in
 (*
   eprintf "Abstraction: @\n%a@." Pretty.print_task task;
 *)
