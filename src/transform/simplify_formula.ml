@@ -140,9 +140,8 @@ let () = Trans.register_transform
 
 (** linearize all the subformulas with the given connector (conj/disj);
     the returned array also contains the sign of each subformula *)
-let fmla_flatten conj sign f =
+let fmla_flatten conj f =
   let terms = ref [] in
-  let conj = (conj = sign) in
   let rec aux sign f =
     match f.f_node with
     | Fnot f -> aux (not sign) f
@@ -153,13 +152,12 @@ let fmla_flatten conj sign f =
     | Fbinop (Fimplies, f1, f2) when sign <> conj ->
         aux sign f2; aux (not sign) f1
     | _ -> terms := (f, sign)::!terms in
-  aux sign f;
+  aux true f;
   Array.of_list !terms
 
 (** recreate the structure of a given formula with linearized subformulas *)
-let fmla_unflatten conj sign f formulas =
+let fmla_unflatten conj f formulas =
   let i = ref 0 in
-  let conj = (conj = sign) in
   let rec aux sign f = f_label_copy f (match f.f_node with
     | Fnot f -> f_not (aux (not sign) f)
     | Fbinop (For, f1, f2) when sign <> conj ->
@@ -173,29 +171,29 @@ let fmla_unflatten conj sign f formulas =
         assert (sign = s);
         incr i;
         t) in
-  aux sign f
+  aux true f
 
 (** substitute all the terms that appear as a side of an equality/disequality
     and that match the given filter
 
-    in a positive formula, equal terms can be substituted in all the terms of
-    surrounding conjunctions, while disequal terms can be substituted in
-    all the terms of surrounding disjunctions
+    equal terms can be substituted in all the terms of surrounding
+    conjunctions, while disequal terms can be substituted in all the terms
+    of surrounding disjunctions
 
     substitutions are not exported outside quantifiers (even if their free
     variables are untouched), so the transformation is possibly incomplete
     (but still correct) on formulas that have inner quantifiers *)
-let rec fmla_cond_subst filter sign f =
-  let rec aux sign f =
+let rec fmla_cond_subst filter f =
+  let rec aux f =
     match f.f_node with
     | Fbinop (o, _, _) when o <> Fiff ->
         let conj = match o with
           Fand -> true | For | Fimplies -> false | Fiff -> assert false in
-        let subf = fmla_flatten conj sign f in
+        let subf = fmla_flatten conj f in
         let subl = Array.length subf in
         for i = 0 to subl - 1 do
           let (f, s) = subf.(i) in
-          subf.(i) <- (aux s f, s);
+          subf.(i) <- (aux f, s);
         done;
         for i = 0 to subl - 1 do
           let do_subst t1 t2 =
@@ -206,11 +204,11 @@ let rec fmla_cond_subst filter sign f =
             done in
           let (f, s) = subf.(i) in
           match f.f_node with
-          | Fapp (ls,[t1;t2]) when ls_equal ls ps_equ && s = (conj = sign) ->
+          | Fapp (ls,[t1;t2]) when ls_equal ls ps_equ && s = conj ->
               if filter t1 t2 then do_subst t1 t2 else
               if filter t2 t1 then do_subst t2 t1
           | _ -> ()
         done;
-        fmla_unflatten conj sign f subf
-    | _ -> f_map_sign (fun t -> t) aux sign f in
-  aux sign f
+        fmla_unflatten conj f subf
+    | _ -> f_map (fun t -> t) aux f in
+  aux f

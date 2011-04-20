@@ -46,7 +46,7 @@ let () =
         (fun t _ -> match t.t_node with
           | Tconst _ | Tapp(_,[]) -> false
           | Tapp(ls,_) -> not (check_ls ls)
-          | _ -> true) true f)
+          | _ -> true) f)
       ])))
 
 (* Gappa pre-compilation *)
