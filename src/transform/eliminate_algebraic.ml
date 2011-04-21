@@ -211,10 +211,30 @@ let add_indexer (state,task) ts ty csl =
   let task = List.fold_left mt_add task csl in
   state, task
 
+let add_discriminator (state,task) ts ty csl =
+  let d_add c1 task c2 =
+    let id = c1.ls_name.id_string ^ "_" ^ c2.ls_name.id_string in
+    let pr = create_prsymbol (id_derive id ts.ts_name) in
+    let ul = List.rev_map (create_vsymbol (id_fresh "u")) c1.ls_args in
+    let vl = List.rev_map (create_vsymbol (id_fresh "v")) c2.ls_args in
+    let t1 = t_app c1 (List.rev_map t_var ul) ty in
+    let t2 = t_app c2 (List.rev_map t_var vl) ty in
+    let ax = f_neq t1 t2 in
+    let ax = f_forall_close (List.rev vl) [[Term t2]] ax in
+    let ax = f_forall_close (List.rev ul) [[Term t1]] ax in
+    add_decl task (create_prop_decl Paxiom pr ax)
+  in
+  let rec dl_add task = function
+    | c :: cl -> List.fold_left (d_add c) task cl
+    | _ -> task
+  in
+  state, dl_add task csl
+
 let add_indexer (state,task) ts ty = function
   | [_] -> state, task
-  | _ when not state.in_smt -> state, task
-  | csl -> add_indexer (state,task) ts ty csl
+  | csl when state.in_smt -> add_indexer (state,task) ts ty csl
+  | csl when List.length csl <= 16 -> add_discriminator (state,task) ts ty csl
+  | _ -> state, task
 
 let add_projections (state,task) _ts _ty csl =
   (* declare and define the projection functions *)

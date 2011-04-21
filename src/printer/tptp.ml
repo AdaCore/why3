@@ -136,14 +136,6 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
-let dao_ax =
-  let pr = create_prsymbol (id_fresh "dao") in
-  let yi = create_vsymbol (id_fresh "ying") ty_int in
-  let ya = create_vsymbol (id_fresh "yang") ty_int in
-  let f = f_neq (t_var yi) (t_var ya) in
-  let f = f_exists_close [yi;ya] [] f in
-  create_prop_decl Paxiom pr f
-
 let print_task pr thpr fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
@@ -151,8 +143,8 @@ let print_task pr thpr fmt task =
     info_syn = get_syntax_map task;
     info_rem = get_remove_set task }
   in
-  let decls = dao_ax :: Task.task_decls task in
-  ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)
+  ignore (print_list_opt (add_flush newline2)
+    (print_decl info) fmt (Task.task_decls task))
 
 let () = register_printer "tptp"
   (fun _env pr thpr ?old:_ fmt task ->
