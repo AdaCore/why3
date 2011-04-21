@@ -28,6 +28,8 @@ theory BuiltIn
   syntax type int   "Int"
   syntax type real  "Real"
   syntax logic (=)  "(= %1 %2)"
+
+  meta "encoding : kept" type int
 end
 
 theory int.Int
@@ -61,8 +63,6 @@ theory int.Int
   remove prop Total
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
-
-  meta "encoding : kept" type int
 
 end
 
