@@ -75,8 +75,8 @@ RUBBER = @RUBBER@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-BFLAGS = -w Ae -dtypes -g -I src $(INCLUDES)
-OFLAGS = -w Ae -dtypes    -I src $(INCLUDES)
+BFLAGS = -w Aer-29 -dtypes -g -I src $(INCLUDES)
+OFLAGS = -w Aer-29 -dtypes    -I src $(INCLUDES)
 
 ifeq (@enable_profiling@,yes)
 OFLAGS += -g -p
