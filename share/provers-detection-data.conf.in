@@ -37,7 +37,7 @@ version_switch = "-version"
 version_regexp = "This is CVC3 version \\([^ \n]+\\)"
 version_ok = "2.2"
 version_old = "2.1"
-command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -timeout %t -lang smt %f"
+command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -timeout %t %f"
 driver = "drivers/cvc3.drv"
 
 [ATP yices]

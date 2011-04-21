@@ -24,11 +24,12 @@ open Rc
 (* magicnumber for the configuration :
   - 0 before the magic number
   - 1 when no loadpath meant default loadpath
-  - 2 current
+  - 2
+  - 5 cvc3 native
 
 If a configuration doesn't contain the actual magic number we don't use it.*)
 
-let magicnumber = 4
+let magicnumber = 5
 
 exception WrongMagicNumber
 
