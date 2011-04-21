@@ -1,0 +1,9 @@
+theory Test
+      use import bool.Bool
+
+      goal G1 : True <> False
+      goal G2 : forall x:bool. x = True or x = False
+      goal G3 : forall x y z:bool. x<>y and y<>z and z<>x -> false
+
+end
+

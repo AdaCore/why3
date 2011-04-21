@@ -32,6 +32,15 @@ transformation "encoding_tptp"
 
 theory BuiltIn
   syntax logic (=)  "(EQ %1 %2)"
+
+  (* use with explicit polymorphism *)
+  (* meta "enco_poly" "explicit" *)
+  meta "encoding : base" type int
+
+  (* use with encoding_decorate *)
+  meta "enco_poly" "decorate"
+  meta "encoding : kept" type int
+
 end
 
 theory int.Int
@@ -65,14 +74,6 @@ theory int.Int
   remove prop Total
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
-
-  (* use with explicit polymorphism *)
-  (* meta "enco_poly" "explicit" *)
-  meta "encoding : base" type int
-
-  (* use with encoding_decorate *)
-  meta "enco_poly" "decorate"
-  meta "encoding : kept" type int
 
 end
 
