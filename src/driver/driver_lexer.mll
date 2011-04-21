@@ -92,6 +92,8 @@ rule token = parse
       { OPERATOR op }
   | "\""
       { STRING (string lexbuf) }
+  | "import" space*  "\""
+      { INPUT (string lexbuf) }
   | eof
       { EOF }
   | _ as c
@@ -103,5 +105,21 @@ rule token = parse
   let with_location f lb =
     try f lb with e -> raise (Loc.Located (loc lb, e))
 
-  let parse_file = with_location (Driver_parser.file token)
+  let parse_file input_lexbuf lexbuf =
+    let s = Stack.create () in
+    Stack.push lexbuf s;
+    let rec multifile lex_dumb =
+      let lexbuf = Stack.top s in
+      let tok = token lexbuf in
+      Loc.transfer_loc lexbuf lex_dumb;
+      match tok with
+        | INPUT filename ->
+          Stack.push (input_lexbuf filename) s;
+          multifile lex_dumb
+        | EOF -> ignore (Stack.pop s);
+          if Stack.is_empty s then EOF else multifile lex_dumb
+        | _ -> tok in
+    let lex_dumb = Lexing.from_function (fun _ _ -> assert false) in
+    Loc.transfer_loc lexbuf lex_dumb;
+    with_location (Driver_parser.file multifile) lex_dumb
 }

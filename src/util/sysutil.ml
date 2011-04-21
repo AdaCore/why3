@@ -174,6 +174,12 @@ let relativize_filename base f =
   in
   rebuild (aux (path_of_file base) (path_of_file f))
 
+let absolutize_filename dirname f =
+  if Filename.is_relative f then
+    Filename.concat dirname f
+  else
+    f
+
 (*
 let p1 = relativize_filename "/bin/bash" "src/f.why"
 

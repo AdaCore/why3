@@ -30,6 +30,11 @@ let set_file file lb =
   lb.Lexing.lex_curr_p <-
     { lb.Lexing.lex_curr_p with Lexing.pos_fname = file }
 
+let transfer_loc lb_from lb_to =
+  lb_to.lex_start_p <- lb_from.lex_start_p;
+  lb_to.lex_curr_p <- lb_from.lex_curr_p
+
+
 (*s Error locations. *)
 
 let finally ff f x =
@@ -86,6 +91,7 @@ let string =
 let () = Exn_printer.register
   (fun fmt exn -> match exn with
     | Located (loc,e) ->
-      fprintf fmt "%a:@\n%a@\n" gen_report_position loc Exn_printer.exn_printer e
+      fprintf fmt "%a:@\n%a@\n" gen_report_position loc
+        Exn_printer.exn_printer e
     | _ -> raise exn)
 

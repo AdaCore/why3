@@ -68,3 +68,7 @@ val path_of_file : string -> string list
 val relativize_filename : string -> string -> string
 (** [relativize_filename base filename] relativize the filename
     [filename] according to [base] *)
+
+val absolutize_filename : string -> string -> string
+(** [absolutize_filename base filename] absolutize the filename
+    [filename] according to [base] *)

@@ -25,6 +25,8 @@ val current_offset : int ref
 val reloc : Lexing.position -> Lexing.position
 val set_file : string -> Lexing.lexbuf -> unit
 
+val transfer_loc : Lexing.lexbuf -> Lexing.lexbuf -> unit
+
 (* locations in files *)
 
 type position

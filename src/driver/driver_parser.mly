@@ -26,6 +26,8 @@
   let prefix s = "prefix " ^ s
 %}
 
+%token <string> INPUT /* never reaches the parser */
+
 %token <int> INTEGER
 %token <string> IDENT
 %token <string> STRING

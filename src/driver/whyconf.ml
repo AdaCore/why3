@@ -163,11 +163,7 @@ let set_provers rc provers =
   let family = Mstr.fold set_prover provers [] in
   set_family rc "prover" family
 
-let absolute_filename dirname f =
-  if Filename.is_relative f then
-    Filename.concat dirname f
-  else
-    f
+let absolute_filename = Sysutil.absolutize_filename
 
 let load_prover dirname provers (id,section) =
   Mstr.add id

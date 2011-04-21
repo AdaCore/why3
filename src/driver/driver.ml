@@ -57,11 +57,22 @@ let load_plugin dir (byte,nat) =
   Config.Dynlink.loadfile_private file
 
 let load_file file =
+  let basename = Filename.dirname file in
   let c = open_in file in
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
-  let f = Driver_lexer.parse_file lb in
-  close_in c;
+  let to_close = Stack.create () in
+  Stack.push c to_close;
+  let input_lexer s =
+    let filename = Sysutil.absolutize_filename basename s in
+    let c = open_in filename in
+    Stack.push c to_close;
+    let lb = Lexing.from_channel c in
+    Loc.set_file filename lb;
+    lb
+  in
+  let f = Driver_lexer.parse_file input_lexer lb in
+  Stack.iter close_in to_close;
   f
 
 exception Duplicate    of string
@@ -124,8 +135,8 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
   in
   let add_local th = function
     | Rprelude s ->
-        let l = try Mid.find th.th_name !thprelude with Not_found -> [] in
-        thprelude := Mid.add th.th_name (l @ [s]) !thprelude
+        let l = Mid.find_default th.th_name [] !thprelude in
+        thprelude := Mid.add th.th_name (s::l) !thprelude
     | Rsyntaxts (c,q,s) ->
         let td = syntax_type (find_ts th q) s in
         add_meta th td (if c then meta_cl else meta)
@@ -159,15 +170,14 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     List.iter (add_local th) trl
   in
   List.iter add_theory f.f_rules;
-  transform := List.rev !transform;
   incr driver_tag;
   {
     drv_env         = env;
     drv_printer     = !printer;
-    drv_prelude     = !prelude;
+    drv_prelude     = List.rev !prelude;
     drv_filename    = !filename;
-    drv_transform   = !transform;
-    drv_thprelude   = !thprelude;
+    drv_transform   = List.rev !transform;
+    drv_thprelude   = Mid.map List.rev !thprelude;
     drv_meta        = !meta;
     drv_meta_cl     = !meta_cl;
     drv_regexps     = List.rev !regexps;
