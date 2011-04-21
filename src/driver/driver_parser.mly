@@ -44,13 +44,16 @@
 %%
 
 file:
-| list0_global list0_theory EOF
-    { { f_global = $1; f_rules = $2 } }
+| list0_global_theory EOF
+    { $1 }
 ;
 
-list0_global:
-| /* epsilon */       { [] }
-| global list0_global { (loc_i 1, $1) :: $2 }
+list0_global_theory:
+| /* epsilon */      { { f_global = []; f_rules = [] } }
+| global list0_global_theory
+    { {$2 with f_global = (loc_i 1, $1) :: ($2.f_global)} }
+| theory list0_global_theory
+    { {$2 with f_rules = $1 :: ($2.f_rules)} }
 ;
 
 global:
@@ -70,11 +73,6 @@ global:
 | FILENAME STRING { Filename $2 }
 | TRANSFORM STRING { Transform $2 }
 | PLUGIN STRING STRING { Plugin ($2,$3) }
-;
-
-list0_theory:
-| /* epsilon */       { [] }
-| theory list0_theory { $1 :: $2 }
 ;
 
 theory:

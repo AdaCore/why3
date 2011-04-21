@@ -1,0 +1,175 @@
+(* Why driver for SMT syntax *)
+
+prelude ";;; this is a prelude for Z3"
+prelude "(set-logic AUFNIRA)"
+
+printer "smtv2"
+filename "%f-%t-%g.smt"
+
+valid "^unsat"
+unknown "^\\(unknown\\|sat\\|Fail\\)" "Unknown"
+time "why3cpulimit time : %s s"
+
+
+(* À discuter *)
+transformation "simplify_recursive_definition"
+transformation "inline_trivial"
+
+transformation "eliminate_builtin"
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic_smt"
+
+transformation "simplify_formula"
+(*transformation "simplify_trivial_quantification"*)
+
+theory BuiltIn
+  syntax type int   "Int"
+  syntax type real  "Real"
+  syntax logic (=)  "(= %1 %2)"
+
+  meta "encoding : kept" type int
+end
+
+theory int.Int
+
+  prelude ";;; this is a prelude for Z3 integer arithmetic"
+
+  syntax logic zero "0"
+  syntax logic one  "1"
+
+  syntax logic (+)  "(+ %1 %2)"
+  syntax logic (-)  "(- %1 %2)"
+  syntax logic (*)  "(* %1 %2)"
+  syntax logic (-_) "(- %1)"
+
+  syntax logic (<=) "(<= %1 %2)"
+  syntax logic (<)  "(< %1 %2)"
+  syntax logic (>=) "(>= %1 %2)"
+  syntax logic (>)  "(> %1 %2)"
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc.Assoc
+  remove prop CommutativeGroup.Unit_def
+  remove prop CommutativeGroup.Inv_def
+  remove prop Assoc.Assoc
+  remove prop Mul_distr
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+
+end
+
+
+theory real.Real
+
+  prelude ";;; this is a prelude for Z3 real arithmetic"
+
+  syntax logic zero "0.0"
+  syntax logic one  "1.0"
+
+  syntax logic (+)  "(+ %1 %2)"
+  syntax logic (-)  "(- %1 %2)"
+  syntax logic (*)  "(* %1 %2)"
+  syntax logic (/)  "(/ %1 %2)"
+  syntax logic (-_) "(- %1)"
+  syntax logic inv  "(/ 1.0 %1)"
+
+  syntax logic (<=) "(<= %1 %2)"
+  syntax logic (<)  "(< %1 %2)"
+  syntax logic (>=) "(>= %1 %2)"
+  syntax logic (>)  "(> %1 %2)"
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc.Assoc
+  remove prop CommutativeGroup.Unit_def
+  remove prop CommutativeGroup.Inv_def
+  remove prop Inverse
+  remove prop Assoc.Assoc
+  remove prop Mul_distr
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+
+  meta "encoding : kept" type real
+
+end
+
+(*
+(* L'encodage des types sommes bloquent cette théorie builtin *)
+theory bool.Bool
+   syntax type bool   "bool"
+   syntax logic True  "true"
+   syntax logic False "false"
+   syntax logic andb  "(and %1 %2)"
+   syntax logic orb   "(or %1 %2)"
+   syntax logic xorb  "(xor %1 %2)"
+   syntax logic notb  "(not %1)"
+   meta cloned "encoding_decorate : kept" type bool
+end
+*)
+
+
+theory int.EuclideanDivision
+   syntax logic div "(div %1 %2)"
+   syntax logic mod "(mod %1 %2)"
+   remove prop Mod_bound
+   remove prop Div_mod
+   remove prop Mod_1
+   remove prop Div_1
+end
+
+theory transform.array.Array
+  syntax cloned logic get "(select %1 %2)"
+  syntax cloned logic set "(store %1 %2 %3)"
+  remove cloned prop Select_eq
+  remove cloned prop Select_neq
+
+end
+
+(*
+theory real.FromInt
+  syntax logic from_int "(from_int %1)"
+  remove prop Add
+  remove prop Sub
+  remove prop Mul
+  remove prop Neg
+end
+*)
+
+(*
+theory real.Truncate
+  syntax logic floor "(to_int %1)"
+  remove prop Floor_down
+  remove prop Floor_monotonic
+end
+*)
+
+theory array.Array
+  syntax type t "(Array %1 %2)"
+  meta "encoding : lskept" logic get
+  meta "encoding : lskept" logic set
+  meta "encoding : lskept" logic create_const
+
+  meta "smt_dist_syntax" logic get, "(select %1 %2)"
+  meta "smt_dist_syntax" logic set, "(store %1 %2 %3)"
+  meta "smt_dist_syntax" logic create_const, "(const[%t0] %1)"
+end
+
+
+(*
+Local Variables:
+mode: why
+compile-command: "unset LANG; make -C .. bench"
+End:
+*)
