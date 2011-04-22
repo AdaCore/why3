@@ -36,6 +36,7 @@ type prover_autodetection_data =
       version_regexp : string;
       versions_ok : string list;
       versions_old : string list;
+      versions_bad : string list;
       prover_command : string;
       prover_driver : string;
       prover_editor : string;
@@ -45,7 +46,7 @@ let prover_keys =
   let add acc k = Sstr.add k acc in
   List.fold_left add Sstr.empty
     ["name";"exec";"version_switch";"version_regexp";
-     "version_ok";"version_old";"command";
+     "version_ok";"version_old";"version_bad";"command";
      "editor";"driver"]
 
 let load_prover kind (id,section) =
@@ -58,14 +59,16 @@ let load_prover kind (id,section) =
     version_regexp = get_string section ~default:"" "version_regexp";
     versions_ok = get_stringl section ~default:[] "version_ok";
     versions_old = get_stringl section ~default:[] "version_old";
+    versions_bad = get_stringl section ~default:[] "version_bad";
     prover_command = get_string section "command";
     prover_driver = get_string section "driver";
     prover_editor = get_string section ~default:"" "editor";
   }
 
+(** returned in reverse order *)
 let load rc =
   let atps = get_family rc "ATP" in
-  let atps = List.map (load_prover ATP) atps in
+  let atps = List.rev_map (load_prover ATP) atps in
   let itps = get_family rc "ITP" in
   let tps = List.fold_left (cons (load_prover ITP)) atps itps in
   tps
@@ -109,85 +112,82 @@ let sanitize_exec =
   in
   Ident.sanitizer first rest
 
-let detect_prover main acc0 data =
-  let keys = Queue.create () in
-  let acc = List.fold_left
-    (fun acc com ->
-	let out = Filename.temp_file "out" "" in
-        let cmd = sprintf "%s %s" com data.version_switch in
-	let c = sprintf "(%s) > %s 2>&1" cmd out in
-        Debug.dprintf debug "Run : %s@." c;
-	let ret = Sys.command c in
-	if ret <> 0 then
-	  begin
-	    Debug.dprintf debug "command '%s' failed@." cmd;
-	    acc
-	  end
-	else
-	  let s =
-            try
-              let ch = open_in out in
-              let c = Sysutil.channel_contents ch in
-              close_in ch;
-	      Sys.remove out;
-              c
-            with Not_found | End_of_file  -> ""
-          in
-	  let re = Str.regexp data.version_regexp in
-	  try
-            ignore (Str.search_forward re s 0);
-	    let nam = data.prover_name in
-	    let ver = Str.matched_group 1 s in
-            if List.mem ver data.versions_ok then
-	      eprintf "Found prover %s version %s, OK.@." nam ver
+let detect_exec main data com =
+  let out = Filename.temp_file "out" "" in
+  let cmd = sprintf "%s %s" com data.version_switch in
+  let c = sprintf "(%s) > %s 2>&1" cmd out in
+  Debug.dprintf debug "Run : %s@." c;
+  let ret = Sys.command c in
+  if ret <> 0 then
+    begin
+      Debug.dprintf debug "command '%s' failed@." cmd;
+      None
+    end
+  else
+    let s =
+      try
+        let ch = open_in out in
+        let c = Sysutil.channel_contents ch in
+        close_in ch;
+	Sys.remove out;
+        c
+      with Not_found | End_of_file  -> ""
+    in
+    let re = Str.regexp data.version_regexp in
+    try
+      ignore (Str.search_forward re s 0);
+      let nam = data.prover_name in
+      let ver = Str.matched_group 1 s in
+      if List.mem ver data.versions_bad then
+        None
+      else begin
+        if List.mem ver data.versions_ok then
+	  eprintf "Found prover %s version %s, OK.@." nam ver
+        else
+          begin
+            prover_tips_info := true;
+            if List.mem ver data.versions_old then
+              eprintf "Warning: prover %s version %s is quite old, please \
+                     consider upgrading to a newer version.@."
+                nam ver
             else
-              begin
-                prover_tips_info := true;
-                if List.mem ver data.versions_old then
-                  eprintf "Warning: prover %s version %s is quite old, please \
-                           consider upgrading to a newer version.@."
-                    nam ver
-                else
-                  eprintf "Warning: prover %s version %s is not known to be \
-                           supported, use it at your own risk!@." nam ver
-              end;
-            incr provers_found;
-            let c = make_command com data.prover_command in
-            let key = sanitize_exec com in
-            Queue.add key keys;
-            Mstr.add key
-              {name = data.prover_name;
-               version = ver;
-               command = c;
-               driver  = Filename.concat (datadir main) data.prover_driver;
-               editor = data.prover_editor} acc
-	  with Not_found ->
-	    begin
-              prover_tips_info := true;
-	      eprintf "Warning: found prover %s but name/version not \
+              eprintf "Warning: prover %s version %s is not known to be \
+                     supported, use it at your own risk!@." nam ver
+          end;
+        let c = make_command com data.prover_command in
+        Some {name = data.prover_name;
+              version = ver;
+              command = c;
+              driver  = Filename.concat (datadir main) data.prover_driver;
+              editor = data.prover_editor}
+      end
+    with Not_found ->
+      begin
+        prover_tips_info := true;
+	eprintf "Warning: found prover %s but name/version not \
                        recognized by regexp `%s'@."
-                data.prover_name data.version_regexp;
-	      eprintf "Answer was `%s'@." s;
-	      acc
-	    end)
-    acc0
-    data.execs
-  in
-  let acc = if Queue.length keys = 1 then
-      let key = Queue.take keys in
-      let prv = Mstr.find key acc in
-      let acc = Mstr.remove key acc in
-      Mstr.add data.prover_id prv acc
-    else
-      acc in
-  (** If the accumulator has not been touched we warn
-      that we don't find the prover *)
-  if acc == acc0 then eprintf "Prover %s not found.@." data.prover_name;
-  acc
+          data.prover_name data.version_regexp;
+	eprintf "Answer was `%s'@." s;
+	None
+      end
+
+let detect_prover main acc l =
+  let prover_id = (List.hd l).prover_id in
+  try
+    let detect_execs data =
+      try Some (Util.list_first (detect_exec main data) data.execs)
+      with Not_found -> None in
+    let prover = Util.list_first detect_execs l in
+    Mstr.add prover_id prover acc
+  with Not_found ->
+    eprintf "Prover %s not found.@." prover_id;
+    acc
 
 let run_auto_detection config =
   let main = get_main config in
   let l = read_auto_detection_data main in
+  let cmp p q = String.compare p.prover_id q.prover_id in
+  let l = Util.list_part cmp l in
   let detect = List.fold_left (detect_prover main) Mstr.empty l in
   let length = Mstr.cardinal detect in
   eprintf "%d provers detected.@." length;

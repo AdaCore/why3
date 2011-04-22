@@ -107,7 +107,7 @@ let empty_section = Mstr.empty
 
 let make_t tl =
   let add_key acc (key,value) =
-    let l = try Mstr.find key acc with Not_found -> [] in
+    let l = Mstr.find_default key [] acc in
     Mstr.add key (value::l) acc in
   let add_section t (args,sectionl) =
     let sname,arg = match args with
@@ -117,7 +117,7 @@ let make_t tl =
       | sname::_     -> raise (ExtraParameters sname) in
     let m = List.fold_left add_key empty_section sectionl in
     let m = Mstr.map List.rev m in
-    let l = try Mstr.find sname t with Not_found -> [] in
+    let l = Mstr.find_default sname [] t in
     Mstr.add sname ((arg,m)::l) t in
   List.fold_left add_section empty tl
 

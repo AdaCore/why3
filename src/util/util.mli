@@ -95,6 +95,15 @@ val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
 
 val list_flatten_rev : 'a list list -> 'a list
 
+val list_part : ('a -> 'a -> int) -> 'a list -> 'a list list
+(** [list_part cmp l] returns the list of the congruence classes with
+    respect to [cmp]. They are returned in reverse order *)
+
+val list_first : ('a -> 'b option) -> 'a list -> 'b
+(** [list_first f l] returns the first result of the application of
+    [f] to an element of [l] which doesn't return [None]. [raise
+    Not_found] if all the element of [l] return [None] *)
+
 (* boolean fold accumulators *)
 
 exception FoldSkip

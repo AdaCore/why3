@@ -1,4 +1,20 @@
-[ATP alt-ergo-old]
+[ATP alt-ergo]
+name = "Alt-Ergo"
+exec = "alt-ergo"
+version_switch = "-version"
+version_regexp = ".*Ergo \\([^ \n]*\\)"
+version_ok = "0.93"
+version_bad = "0.92.3"
+version_bad = "0.92.2"
+version_bad = "0.92.1"
+version_bad = "0.92"
+version_bad = "0.91"
+version_bad = "0.9"
+version_bad = "0.8"
+command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
+driver = "drivers/alt_ergo_trunk.drv"
+
+[ATP alt-ergo]
 name = "Alt-Ergo (no arrays)"
 exec = "ergo"
 exec = "alt-ergo"
@@ -13,22 +29,6 @@ version_old = "0.9"
 version_old = "0.8"
 command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
 driver = "drivers/alt_ergo.drv"
-
-[ATP alt-ergo]
-name = "Alt-Ergo"
-exec = "alt-ergo"
-version_switch = "-version"
-version_regexp = ".*Ergo \\([^ \n]*\\)"
-version_ok = "0.93"
-version_old = "0.92.3"
-version_old = "0.92.2"
-version_old = "0.92.1"
-version_old = "0.92"
-version_old = "0.91"
-version_old = "0.9"
-version_old = "0.8"
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
-driver = "drivers/alt_ergo_trunk.drv"
 
 [ATP cvc3]
 name = "CVC3"

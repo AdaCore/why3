@@ -126,6 +126,23 @@ let list_compare cmp l1 l2 = match l1,l2 with
 let list_flatten_rev fl =
   List.fold_left (fun acc l -> List.rev_append l acc) [] fl
 
+let list_part cmp l =
+  let l = List.stable_sort cmp l in
+  match l with
+    | [] -> []
+    | e::l ->
+      let rec aux acc curr last = function
+        | [] -> ((last::curr)::acc)
+        | a::l when cmp last a = 0 -> aux acc (last::curr) a l
+        | a::l -> aux ((last::curr)::acc) [] a l in
+      aux [] [] e l
+
+let rec list_first f = function
+  | [] -> raise Not_found
+  | a::l -> match f a with
+      | None -> list_first f l
+      | Some r -> r
+
 (* boolean fold accumulators *)
 
 exception FoldSkip
