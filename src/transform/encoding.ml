@@ -28,41 +28,16 @@ let meta_base = register_meta_excl "encoding : base" [MTtysymbol]
 
 let debug = Debug.register_flag "encoding"
 
-type enco_opt =
-    { meta : meta;
-      default : string;
-      table : (string,env -> task trans) Hashtbl.t}
+let select_pr = Trans.create_private_register "enco_select" "kept"
+let kept_pr = Trans.create_private_register "enco_kept" "bridge"
+let poly_pr = Trans.create_private_register "enco_poly" "decorate"
 
-let enco_opt s d =
-  let table = Hashtbl.create 17 in
-  { meta = register_meta_excl (Format.sprintf "enco_%s" s) [MTstring];
-    table = table;
-    default = d},
-  Hashtbl.add table
-
-let select_opt,register_enco_select = enco_opt "select" "kept"
-let kept_opt,register_enco_kept = enco_opt "kept" "bridge"
-let poly_opt,register_enco_poly = enco_opt "poly" "decorate"
-
-let poly_smt_opt = poly_opt
-let poly_tptp_opt = poly_opt
-
-let enco_gen opt env =
-  Trans.on_meta_excl opt.meta (fun alo ->
-    let s = match alo with
-      | None -> opt.default
-      | Some [MAstr s] -> s
-      | _ -> assert false in
-    try
-      Trans.named s ((Hashtbl.find opt.table s) env)
-    with Not_found -> failwith
-      (Format.sprintf "encoding : %s wrong argument %s" opt.meta.meta_name s))
+let poly_smt_pr = poly_pr
+let poly_tptp_pr = poly_pr
 
 let print_kept = print_meta debug meta_kept
-let enco_select env = compose (enco_gen select_opt env) print_kept
-let enco_kept = enco_gen kept_opt
-let enco_poly_smt = enco_gen poly_smt_opt
-let enco_poly_tptp = enco_gen poly_tptp_opt
+let enco_select env =
+  compose (apply_private_register_env select_pr env) print_kept
 
 
 open Ty
@@ -88,16 +63,19 @@ let monomorphise_goal =
     acc)
 
 let encoding_smt env =
-  compose monomorphise_goal
-    (compose (enco_select env)
-       (compose (enco_kept env) (enco_poly_smt env)))
+  Trans.seq [
+    monomorphise_goal;
+    enco_select env;
+    apply_private_register_env kept_pr env;
+    apply_private_register_env poly_smt_pr env]
 
 let encoding_tptp env =
-  compose monomorphise_goal
-    (compose (enco_select env)
-       (compose (enco_kept env)
-          (compose (enco_poly_tptp env)
-             Encoding_enumeration.encoding_enumeration)))
+  Trans.seq [
+    monomorphise_goal;
+    enco_select env;
+    apply_private_register_env kept_pr env;
+    apply_private_register_env poly_tptp_pr env;
+    Encoding_enumeration.encoding_enumeration]
 
 let () =
   register_env_transform "encoding_smt" encoding_smt;

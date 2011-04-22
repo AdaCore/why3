@@ -183,6 +183,6 @@ let monomorph = Trans.on_meta_excl Encoding.meta_base (fun alo ->
   in
   monomorph tyb)
 
-let () = Encoding.register_enco_poly "explicit"
+let () = Trans.private_register_env Encoding.poly_pr "explicit"
     (fun _ -> Trans.compose explicit monomorph)
 

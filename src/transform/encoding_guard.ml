@@ -257,5 +257,5 @@ let monomorph = Trans.on_meta_excl Encoding.meta_base (fun alo ->
   in
   monomorph tyb)
 
-let () = Encoding.register_enco_poly "guard"
+let () = Trans.private_register_env Encoding.poly_pr "guard"
     (fun _ -> Trans.compose guard monomorph)

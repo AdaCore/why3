@@ -46,6 +46,9 @@ let singleton f x = [f x]
 let compose   f g x =            g (f x)
 let compose_l f g x = list_apply g (f x)
 
+let seq l x = List.fold_left (|>) x l
+let seq_l l x = List.fold_left (fun x f -> list_apply f x) [x] l
+
 module Wtask = Hashweak.Make (struct
   type t = task_hd
   let tag t = t.task_tag
@@ -277,11 +280,53 @@ let lookup_transform_l s =
 let list_transforms ()   = Hashtbl.fold (fun k _ acc -> k::acc) transforms []
 let list_transforms_l () = Hashtbl.fold (fun k _ acc -> k::acc) transforms_l []
 
+(** private register *)
+
+type ('a,'b) private_register =
+    { pr_meta : meta;
+      pr_default : string;
+      pr_table : (string,'a -> 'b trans) Hashtbl.t}
+
+type empty (* A type with no value *)
+
+exception UnknownTransPrivate of (empty,empty) private_register * string
+
+let create_private_register meta_name d =
+  { pr_meta = register_meta_excl meta_name [MTstring];
+    pr_table = Hashtbl.create 17;
+    pr_default = d}
+
+let private_register_env pr name tr =
+  Hashtbl.add pr.pr_table name (fun e -> named name (tr e))
+
+let private_register pr name tr =
+  Hashtbl.add pr.pr_table name (fun () -> named name tr)
+
+let apply_private_register_env pr env =
+  on_meta_excl pr.pr_meta (fun alo ->
+    let s = match alo with
+      | None -> pr.pr_default
+      | Some [MAstr s] -> s
+      | _ -> assert false in
+    try
+      (Hashtbl.find pr.pr_table s) env
+    with Not_found ->
+      raise (UnknownTransPrivate (Obj.magic pr,s)))
+
+let apply_private_register opt = apply_private_register_env opt ()
+
+
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | KnownTrans s ->
       Format.fprintf fmt "Transformation '%s' is already registered" s
   | UnknownTrans s ->
       Format.fprintf fmt "Unknown transformation '%s'" s
+  | UnknownTransPrivate (pr,arg) ->
+      Format.fprintf fmt "Wrong parameter %s@ for@ the@ meta@ %s, only@ the@ \
+following@ parameters@ can@ be given@ (default: %s):@ %a"
+        arg pr.pr_meta.meta_name pr.pr_default
+        (Pp.print_iter2 Hashtbl.iter Pp.comma Pp.nothing Pp.string
+           Pp.nothing) pr.pr_table
   | TransFailure (s,e) ->
       Format.fprintf fmt "Failure in transformation %s@\n%a" s
         Exn_printer.exn_printer e

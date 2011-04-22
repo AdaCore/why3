@@ -37,9 +37,14 @@ val identity_l : task tlist
 val singleton : 'a trans -> 'a tlist
 val return    : 'a -> 'a trans
 
+(** Compose transformation *)
 val compose   : task trans -> 'a trans -> 'a trans
 val compose_l : task tlist -> 'a tlist -> 'a tlist
 
+val seq   : task trans list -> task trans
+val seq_l : task tlist list -> task tlist
+
+(** Create Transformation *)
 val fold   : (task_hd -> 'a -> 'a     ) -> 'a -> 'a trans
 val fold_l : (task_hd -> 'a -> 'a list) -> 'a -> 'a tlist
 
@@ -106,3 +111,32 @@ val list_transforms_l : unit -> string list
 val named : string -> 'a trans -> 'a trans
 (** give transformation a name without registering *)
 
+(** {3 Private Registration} *)
+(** Can be used for chosing a transformation from a meta *)
+
+
+type ('a,'b) private_register = private
+    { pr_meta : meta;
+      pr_default : string;
+      pr_table : (string,'a -> 'b trans) Hashtbl.t}
+
+type empty
+ (* A type without value, an (empty,empty) private_register can't be used. *)
+
+exception UnknownTransPrivate of (empty,empty) private_register * string
+
+val create_private_register :
+  string -> string -> ('a, 'b) private_register
+(** [create_provate_register meta_name default] *)
+
+val private_register_env :
+  ('a, 'b) private_register -> string -> ('a -> 'b trans) -> unit
+
+val private_register :
+  (unit, 'b) private_register -> string -> 'b trans -> unit
+
+val apply_private_register_env :
+  ('a, 'b) private_register -> 'a -> 'b trans
+
+val apply_private_register :
+  (unit, 'b) private_register -> 'b trans
