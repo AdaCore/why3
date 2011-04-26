@@ -37,18 +37,51 @@ let ls_of_ts = Wts.memoize 63 (fun ts ->
   let args = List.map (const ty_type) ts.ts_args in
   create_fsymbol (id_clone ts.ts_name) args ty_type)
 
+(* function symbol selecting ty_type from ty_type^n *)
+let ls_selects_of_ts = Wts.memoize 63 (fun ts ->
+  let create_select _ =
+    let preid = id_fresh ("select_"^ts.ts_name.id_string) in
+    create_fsymbol preid [ty_type] ty_type in
+  List.rev_map create_select ts.ts_args)
+
+(** definition of the previous selecting functions *)
+let ls_selects_def_of_ts acc ts =
+  let ls = ls_of_ts ts in
+  let ls_selects = ls_selects_of_ts ts in
+  let vars = List.rev_map
+    (fun _ -> create_vsymbol (id_fresh "x") ty_type) ls_selects
+  in
+  let tvars = List.map t_var vars in
+  let fmlas = List.rev_map2
+    (fun ls_select value ->
+      let t = t_app ls tvars ty_type in
+      let f = f_equ (t_app ls_select [t] ty_type) value in
+      let f = f_forall_close vars [] f in
+      f)
+    ls_selects tvars in
+  let create_props ls_select fmla =
+    let prsymbol = create_prsymbol (id_clone ls_select.ls_name) in
+    create_prop_decl Paxiom prsymbol fmla in
+  let props =
+    List.fold_left2 (fun acc x y -> create_props x y::acc)
+      acc ls_selects fmlas in
+  let add acc fs = create_logic_decl [fs,None] :: acc in
+  List.fold_left add props ls_selects
+
+
 (* convert a type to a term of type ty_type *)
 let rec term_of_ty tvmap ty = match ty.ty_node with
   | Tyvar tv ->
-      t_var (Mtv.find tv tvmap)
+      Mtv.find tv tvmap
   | Tyapp (ts,tl) ->
       t_app (ls_of_ts ts) (List.map (term_of_ty tvmap) tl) ty_type
 
 (* rewrite a closed formula modulo its free typevars *)
 let type_close tvs fn f =
   let get_vs tv = create_vsymbol (id_clone tv.tv_name) ty_type in
-  let tvm = Stv.fold (fun v m -> Mtv.add v (get_vs v) m) tvs Mtv.empty in
-  let vl = Mtv.fold (fun _ vs acc -> vs::acc) tvm [] in
+  let tvm = Mtv.mapi (fun v () -> get_vs v) tvs in
+  let vl = Mtv.values tvm in
+  let tvm = Mtv.map t_var tvm in
   f_forall_close_simp vl [] (fn tvm f)
 
 let f_type_close fn f =
@@ -56,15 +89,28 @@ let f_type_close fn f =
   type_close tvs fn f
 
 (* convert a type declaration to a list of lsymbol declarations *)
-let lsdecl_of_tydecl tdl =
-  let add td acc = match td with
+let lsdecl_of_tydecl acc td = match td with
     | ts, Talgebraic _ ->
         let ty = ty_app ts (List.map ty_var ts.ts_args) in
         Printer.unsupportedType ty "no algebraic types at this point"
     | { ts_def = Some _ }, _ -> acc
     | ts, _ -> create_logic_decl [ls_of_ts ts, None] :: acc
+
+
+
+(* convert a type declaration to a list of lsymbol declarations *)
+let lsdecl_of_tydecl_select tdl =
+  let add acc td = match td with
+    | ts, Talgebraic _ ->
+        let ty = ty_app ts (List.map ty_var ts.ts_args) in
+        Printer.unsupportedType ty "no algebraic types at this point"
+    | { ts_def = Some _ }, _ -> acc
+    | ts, _ -> ls_selects_def_of_ts acc ts
   in
-  List.fold_right add tdl []
+  let defs = List.fold_left add [] tdl in
+  List.fold_left lsdecl_of_tydecl defs tdl
+
+let lsdecl_of_tydecl tdl = List.fold_left lsdecl_of_tydecl [] tdl
 
 (* convert a constant to a functional symbol of type ty_base *)
 let ls_of_const ty_base =

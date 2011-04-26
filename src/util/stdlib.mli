@@ -240,6 +240,18 @@ module type S =
     (** [add_new x v e m] binds [x] to [v] in [m] if [x] is not bound,
         and raises [exn] otherwise. *)
 
+    val keys: 'a t -> key list
+    (** Return the list of all keys of the given map.
+        The returned list is sorted in increasing order with respect
+        to the ordering [Ord.compare], where [Ord] is the argument
+        given to {!Map.Make}. *)
+
+    val values: 'a t -> 'a list
+    (** Return the list of all values of the given map.
+        The returned list is sorted in increasing order with respect
+        to the ordering [Ord.compare] of the keys, where [Ord] is the argument
+        given to {!Map.Make}. *)
+
     module type Set =
     sig
       type elt = key

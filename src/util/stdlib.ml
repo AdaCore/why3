@@ -67,6 +67,8 @@ module type S =
     val mapi_filter_fold:
       (key -> 'a -> 'acc -> 'acc * 'b option) -> 'a t -> 'acc -> 'acc * 'b t
     val add_new : key -> 'a -> exn -> 'a t -> 'a t
+    val keys: 'a t -> key list
+    val values: 'a t -> 'a list
 
     module type Set =
     sig
@@ -376,6 +378,13 @@ module Make(Ord: OrderedType) = struct
 
     let bindings s =
       bindings_aux [] s
+
+    let rec values_aux accu = function
+        Empty -> accu
+      | Node(l, _, v, r, _) -> values_aux (v :: values_aux accu r) l
+
+    let values s =
+      values_aux [] s
 
     let choose = min_binding
 

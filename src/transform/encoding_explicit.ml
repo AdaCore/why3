@@ -101,7 +101,7 @@ module Transform = struct
       let vars,expr = open_ls_defn ldef in
       let add v (vl,vm) =
         let vs = Term.create_vsymbol (id_fresh "t") ty_type in
-        vs :: vl, Mtv.add v vs vm
+        vs :: vl, Mtv.add v (t_var vs) vm
       in
       let vars,varM = Stv.fold add (ls_ty_freevars lsymbol) (vars,Mtv.empty) in
       (match expr with

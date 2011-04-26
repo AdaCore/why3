@@ -65,11 +65,35 @@ module Transform = struct
         List.fold_left2 ty_match2 s l1 l2
       | _ -> assert false
 
+
+  (** type_of *)
   let fs_type =
     let alpha = ty_var (create_tvsymbol (id_fresh "a")) in
     create_fsymbol (id_fresh "type_of") [alpha] ty_type
 
   let app_type t = t_app fs_type [t] ty_type
+
+  (** rewrite a closed formula modulo its free typevars
+      using selection functions *)
+  let rec extract_tvar acc t ty = match ty.ty_node with
+    | Tyvar tvar when Mtv.mem tvar acc -> acc
+    | Tyvar tvar -> Mtv.add tvar t acc
+    | Tyapp (ts,tyl) ->
+      let fold acc ls_select ty =
+        extract_tvar acc (t_app ls_select [t] ty_type) ty in
+      List.fold_left2 fold acc (ls_selects_of_ts ts) tyl
+
+  let type_close_select tvs ts fn f =
+    let fold acc t = extract_tvar acc (app_type t) t.t_ty in
+    let tvm = List.fold_left fold Mtv.empty ts in
+    let tvs = Mtv.diff (const3 None) tvs tvm in
+    let get_vs tv = create_vsymbol (id_clone tv.tv_name) ty_type in
+    let tvm' = Mtv.mapi (fun v () -> get_vs v) tvs in
+    let vl = Mtv.values tvm' in
+    let tvm' = Mtv.map t_var tvm' in
+    let tvm = Mtv.union (fun _ _ _ -> assert false) tvm tvm' in
+    f_forall_close_simp vl [] (fn tvm f)
+
 
   let type_variable_only_in_value lsymbol =
     let tvar_val = ty_freevars Stv.empty (of_option lsymbol.ls_value) in
@@ -108,18 +132,24 @@ module Transform = struct
       f_app (findL p) terms
     | Fquant(q,b) ->
       let vsl,trl,fmla,cb = f_open_quant_cb b in
+      let fmla = fmla_transform kept varM fmla in
+      let fmla2 = guard q kept varM fmla vsl in
         (* TODO : how to modify the triggers? *)
-      let guard fmla vs =
-        if Sty.mem vs.vs_ty kept then fmla else
-          let g = f_equ (app_type (t_var vs)) (term_of_ty varM vs.vs_ty) in
-          f_implies g fmla in
-      let fmla2 = List.fold_left guard (fmla_transform kept varM fmla) vsl in
       let trl = tr_map (term_transform kept varM)
         (fmla_transform kept varM) trl in
       f_quant q (cb vsl trl fmla2)
     | _ -> (* otherwise : just traverse and translate *)
-      f_map (term_transform kept varM) (fmla_transform kept varM) f(*  in *)
+      f_map (term_transform kept varM) (fmla_transform kept varM) f(*   in *)
     (* Format.eprintf "fmla_to : %a@." Pretty.print_fmla f;f *)
+
+  and guard q kept varM fmla vsl =
+    let aux fmla vs =
+      if Sty.mem vs.vs_ty kept then fmla else
+        let g = f_equ (app_type (t_var vs)) (term_of_ty varM vs.vs_ty) in
+        match q with
+          | Fforall -> f_implies g fmla
+          | Fexists -> f_and g fmla in
+    List.fold_left aux fmla vsl
 
   and args_transform kept varM lsymbol args ty =
     (* Debug.print_list Pretty.print_ty Format.std_formatter type_vars; *)
@@ -132,6 +162,27 @@ module Transform = struct
     let add _ ty acc = term_of_ty varM ty :: acc in
     Mtv.fold add tv_to_ty args
 
+  and f_type_close_select kept f' =
+    let tvs = f_ty_freevars Stv.empty f' in
+    let rec trans fn acc f = match f.f_node with
+      | Fquant(Fforall as q,b) -> (* Exists same thing? *)
+        let vsl,trl,fmla,cb = f_open_quant_cb b in
+        let add acc vs = (t_var vs)::acc in
+        let acc = List.fold_left add acc vsl in
+        let fn varM f =
+          let fmla2 = guard q kept varM f vsl in
+          (* TODO : how to modify the triggers? *)
+          let trl = tr_map (term_transform kept varM)
+            (fmla_transform kept varM) trl in
+          fn varM (f_quant q (cb vsl trl fmla2))
+        in
+        let fn varM f = fn varM (fmla_transform kept varM f) in
+        type_close_select tvs acc fn fmla
+      | _ ->
+        let fn varM f = fn varM (fmla_transform kept varM f) in
+        type_close_select tvs acc fn f in
+    trans (fun _ f -> f) [] f'
+
   let logic_guard kept acc lsymbol =
     match lsymbol.ls_value with
       | None -> acc
@@ -139,7 +190,6 @@ module Transform = struct
       | Some ty_val ->
         let varl = List.map (fun v -> create_vsymbol (id_fresh "x") v)
           lsymbol.ls_args in
-        let stv = ls_ty_freevars lsymbol in
         let trans varM () =
           let terms = List.map t_var varl in
           let terms = args_transform kept varM lsymbol terms ty_val in
@@ -153,7 +203,9 @@ module Transform = struct
           let fmla = List.fold_left guard fmla varl in
           f_forall_close_simp varl [] fmla
         in
-        let fmla = Libencoding.type_close stv trans () in
+        let stv = ls_ty_freevars lsymbol in
+        let tl = List.rev_map (t_var) varl in
+        let fmla = type_close_select stv tl trans () in
         Decl.create_prop_decl Paxiom
           (create_prsymbol (id_clone lsymbol.ls_name)) fmla::acc
 
@@ -169,7 +221,7 @@ module Transform = struct
       let vars,expr = open_ls_defn ldef in
       let add v (vl,vm) =
         let vs = Term.create_vsymbol (id_fresh "t") ty_type in
-        vs :: vl, Mtv.add v vs vm
+        vs :: vl, Mtv.add v (t_var vs) vm
       in
       let vars,varM =
         match lsymbol.ls_value with
@@ -193,13 +245,13 @@ module Transform = struct
 
   (** transform an inductive declaration *)
   let ind_transform kept idl =
-    let iconv (pr,f) = pr, Libencoding.f_type_close (fmla_transform kept) f in
+    let iconv (pr,f) = pr, f_type_close_select kept f in
     let conv (ls,il) = findL ls, List.map iconv il in
     [Decl.create_ind_decl (List.map conv idl)]
 
   (** transforms a proposition into another (mostly a substitution) *)
   let prop_transform kept (prop_kind, prop_name, f) =
-    let quantified_fmla = Libencoding.f_type_close (fmla_transform kept) f in
+    let quantified_fmla = f_type_close_select kept f in
     [Decl.create_prop_decl prop_kind prop_name quantified_fmla]
 
 end
@@ -207,7 +259,7 @@ end
 (** {2 main part} *)
 
 let decl kept d = match d.d_node with
-  | Dtype tdl -> d :: Libencoding.lsdecl_of_tydecl tdl
+  | Dtype tdl -> d :: Libencoding.lsdecl_of_tydecl_select tdl
   | Dlogic ldl -> Transform.logic_transform kept ldl
   | Dind idl -> Transform.ind_transform kept idl
   | Dprop prop -> Transform.prop_transform kept prop

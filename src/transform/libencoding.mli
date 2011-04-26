@@ -33,17 +33,23 @@ val d_ts_type : decl
 (* function symbol mapping ty_type^n to ty_type *)
 val ls_of_ts : tysymbol -> lsymbol
 
+(* function symbol selecting ty_type from ty_type^n *)
+val ls_selects_of_ts : tysymbol -> lsymbol list
+
 (* convert a type to a term of type ty_type *)
-val term_of_ty : vsymbol Mtv.t -> ty -> term
+val term_of_ty : term Mtv.t -> ty -> term
 
 (* rewrite a closed formula modulo the given free typevars *)
-val type_close : Stv.t -> (vsymbol Mtv.t -> 'a -> fmla) -> 'a -> fmla
+val type_close : Stv.t -> (term Mtv.t -> 'a -> fmla) -> 'a -> fmla
 
 (* rewrite a closed formula modulo its free typevars *)
-val f_type_close : (vsymbol Mtv.t -> fmla -> fmla) -> fmla -> fmla
+val f_type_close : (term Mtv.t -> fmla -> fmla) -> fmla -> fmla
 
 (* convert a type declaration to a list of lsymbol declarations *)
 val lsdecl_of_tydecl : ty_decl list -> decl list
+
+(* convert a type declaration to a list of lsymbol declarations *)
+val lsdecl_of_tydecl_select : ty_decl list -> decl list
 
 (* monomorphise wrt the base type, the set of kept types, and a symbol map *)
 val d_monomorph : ty -> Sty.t -> (lsymbol -> lsymbol) -> decl -> decl list
