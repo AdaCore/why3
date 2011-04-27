@@ -659,18 +659,20 @@ let create_env_array env thpoly task tenv kept kept_array =
   (** add the clone *)
   Sty.fold clone_arrays kept_array task_tenv
 
+let meta_enco_poly = register_meta_excl "enco_poly" [MTstring]
+
 let encoding_smt_array env =
   let th_array = Env.find_theory env ["array"] "Array" in
   Trans.on_used_theory th_array (fun used ->
     if not used then Encoding.encoding_smt env else
       seq [Encoding.monomorphise_goal;
            select_subterm_array th_array;
-           Encoding.print_kept;
+           Trans.print_meta Encoding.debug Encoding.meta_kept;
            Encoding_instantiate.t (create_env_array env th_array);
            meta_arrays_to_meta_kept;
-           Encoding.print_kept;
+           Trans.print_meta Encoding.debug Encoding.meta_kept;
            Encoding_bridge.t env;
-           Trans.apply_private_register_env Encoding.poly_pr env])
+           Trans.on_flag meta_enco_poly Encoding.ft_enco_poly "decorate" env])
 
 let () = Trans.register_env_transform "encoding_smt_array" encoding_smt_array
 

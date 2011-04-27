@@ -108,5 +108,5 @@ let t = Trans.on_tagged_ty Encoding.meta_kept (fun kept ->
   let kept = Sty.add ty_type kept in
   Trans.compose (deco kept) (mono kept))
 
-let () = Trans.private_register_env Encoding.poly_pr "decorate" (const t)
+let () = Hashtbl.replace Encoding.ft_enco_poly "decorate" (const t)
 

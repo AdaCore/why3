@@ -631,7 +631,7 @@ let find_prop_decl kn pr =
   | Dprop (k,_,f) -> k,f
   | _ -> assert false
 
-exception NonExhaustiveExpr of (pattern list * expr)
+exception NonExhaustiveExpr of pattern list * expr
 
 let rec check_matchT kn () t = match t.t_node with
   | Tcase (t1,bl) ->

@@ -245,7 +245,7 @@ end)
 
 exception UnknownTrans of string
 exception KnownTrans of string
-exception TransFailure of (string * exn)
+exception TransFailure of string * exn
 
 let named s f (x : task) =
   Debug.dprintf debug "Apply transformation %s@." s;
@@ -280,40 +280,26 @@ let lookup_transform_l s =
 let list_transforms ()   = Hashtbl.fold (fun k _ acc -> k::acc) transforms []
 let list_transforms_l () = Hashtbl.fold (fun k _ acc -> k::acc) transforms_l []
 
-(** private register *)
+(** Flag-dependent transformations *)
 
-type ('a,'b) private_register =
-    { pr_meta : meta;
-      pr_default : string;
-      pr_table : (string,'a -> 'b trans) Hashtbl.t}
+exception UnknownFlagTrans of meta * string * string list
+exception IllegalFlagTrans of meta
 
-type empty (* A type with no value *)
+type ('a,'b) flag_trans = (string, 'a -> 'b trans) Hashtbl.t
 
-exception UnknownTransPrivate of (empty,empty) private_register * string
-
-let create_private_register meta_name d =
-  { pr_meta = register_meta_excl meta_name [MTstring];
-    pr_table = Hashtbl.create 17;
-    pr_default = d}
-
-let private_register_env pr name tr =
-  Hashtbl.add pr.pr_table name (fun e -> named name (tr e))
-
-let private_register pr name tr =
-  Hashtbl.add pr.pr_table name (fun () -> named name tr)
-
-let apply_private_register_env pr env =
-  on_meta_excl pr.pr_meta (fun alo ->
+let on_flag m ft def arg =
+  on_meta_excl m (fun alo ->
     let s = match alo with
-      | None -> pr.pr_default
+      | None -> def
       | Some [MAstr s] -> s
-      | _ -> assert false in
-    try
-      (Hashtbl.find pr.pr_table s) env
-    with Not_found ->
-      raise (UnknownTransPrivate (Obj.magic pr,s)))
-
-let apply_private_register opt = apply_private_register_env opt ()
+      | _ -> raise (IllegalFlagTrans m)
+    in
+    let t = try Hashtbl.find ft s with
+      | Not_found ->
+          let l = Hashtbl.fold (fun s _ l -> s :: l) ft [] in
+          raise (UnknownFlagTrans (m,s,l))
+    in
+    named s (t arg))
 
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
@@ -321,12 +307,12 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       Format.fprintf fmt "Transformation '%s' is already registered" s
   | UnknownTrans s ->
       Format.fprintf fmt "Unknown transformation '%s'" s
-  | UnknownTransPrivate (pr,arg) ->
-      Format.fprintf fmt "Wrong parameter %s@ for@ the@ meta@ %s, only@ the@ \
-following@ parameters@ can@ be given@ (default: %s):@ %a"
-        arg pr.pr_meta.meta_name pr.pr_default
-        (Pp.print_iter2 Hashtbl.iter Pp.comma Pp.nothing Pp.string
-           Pp.nothing) pr.pr_table
+  | UnknownFlagTrans (m,s,l) ->
+      Format.fprintf fmt "Bad parameter %s for the meta %s@." s m.meta_name;
+      Format.fprintf fmt "Known parameters: %a"
+        (Pp.print_list Pp.space Pp.string) l
+  | IllegalFlagTrans m ->
+      Format.fprintf fmt "Meta %s must be exclusive string-valued" m.meta_name
   | TransFailure (s,e) ->
       Format.fprintf fmt "Failure in transformation %s@\n%a" s
         Exn_printer.exn_printer e

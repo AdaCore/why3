@@ -28,30 +28,28 @@ let meta_base = register_meta_excl "encoding : base" [MTtysymbol]
 
 let debug = Debug.register_flag "encoding"
 
-let select_pr = Trans.create_private_register "enco_select" "kept"
-let kept_pr = Trans.create_private_register "enco_kept" "bridge"
-let poly_pr = Trans.create_private_register "enco_poly" "decorate"
+let meta_enco_select = register_meta_excl "enco_select" [MTstring]
+let meta_enco_kept   = register_meta_excl "enco_kept" [MTstring]
+let meta_enco_poly   = register_meta_excl "enco_poly" [MTstring]
 
-let poly_smt_pr = poly_pr
-let poly_tptp_pr = poly_pr
+let def_enco_select_smt = "kept"
+let def_enco_kept_smt   = "bridge"
+let def_enco_poly_smt   = "decorate"
 
-let print_kept = print_meta debug meta_kept
-let enco_select env =
-  compose (apply_private_register_env select_pr env) print_kept
+let def_enco_select_tptp = "kept"
+let def_enco_kept_tptp   = "bridge"
+let def_enco_poly_tptp   = "decorate"
 
+let ft_enco_select = ((Hashtbl.create 17) : (env,task) Trans.flag_trans)
+let ft_enco_kept   = ((Hashtbl.create 17) : (env,task) Trans.flag_trans)
+let ft_enco_poly   = ((Hashtbl.create 17) : (env,task) Trans.flag_trans)
 
 open Ty
 open Term
 
-let ty_all_quant =
-  let rec add_vs s ty = match ty.ty_node with
-    | Tyvar vs -> Stv.add vs s
-    | _ -> ty_fold add_vs s ty in
-  f_ty_fold add_vs Stv.empty
-
 let monomorphise_goal =
   Trans.goal (fun pr f ->
-    let stv = ty_all_quant f in
+    let stv = f_ty_freevars Stv.empty f in
     let mty,ltv = Stv.fold (fun tv (mty,ltv) ->
       let ts = create_tysymbol (Ident.id_clone tv.tv_name) [] None in
       Mtv.add tv (ty_app ts []) mty,ts::ltv) stv (Mtv.empty,[]) in
@@ -62,20 +60,20 @@ let monomorphise_goal =
       acc ltv in
     acc)
 
-let encoding_smt env =
-  Trans.seq [
-    monomorphise_goal;
-    enco_select env;
-    apply_private_register_env kept_pr env;
-    apply_private_register_env poly_smt_pr env]
+let encoding_smt env = Trans.seq [
+  monomorphise_goal;
+  Trans.on_flag meta_enco_select ft_enco_select def_enco_select_smt env;
+  Trans.print_meta debug meta_kept;
+  Trans.on_flag meta_enco_kept ft_enco_kept def_enco_kept_smt env;
+  Trans.on_flag meta_enco_poly ft_enco_poly def_enco_poly_smt env]
 
-let encoding_tptp env =
-  Trans.seq [
-    monomorphise_goal;
-    enco_select env;
-    apply_private_register_env kept_pr env;
-    apply_private_register_env poly_tptp_pr env;
-    Encoding_enumeration.encoding_enumeration]
+let encoding_tptp env = Trans.seq [
+  monomorphise_goal;
+  Trans.on_flag meta_enco_select ft_enco_select def_enco_select_tptp env;
+  Trans.print_meta debug meta_kept;
+  Trans.on_flag meta_enco_kept ft_enco_kept def_enco_kept_tptp env;
+  Trans.on_flag meta_enco_poly ft_enco_poly def_enco_poly_tptp env;
+  Encoding_enumeration.encoding_enumeration]
 
 let () =
   register_env_transform "encoding_smt" encoding_smt;

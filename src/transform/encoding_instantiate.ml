@@ -527,15 +527,14 @@ let create_trans_complete kept complete =
   let init_task,env = create_env task tenv kept in
   Trans.fold_map fold_map env init_task
 
-let encoding_instantiate _ =
+let encoding_instantiate =
   Trans.compose Libencoding.close_kept
   (Trans.on_tagged_ty meta_kept (fun kept ->
     Trans.on_meta_excl meta_complete (fun complete ->
       create_trans_complete kept complete)))
 
-let () =
-  Trans.private_register_env Encoding.kept_pr
-    "instantiate" encoding_instantiate
+let () = Hashtbl.replace Encoding.ft_enco_kept "instantiate"
+  (const encoding_instantiate)
 
 
 let create_trans_complete create_env kept kept_array complete =
@@ -601,7 +600,7 @@ let mono_in_mono = Trans.tdecl mono_in_mono None
 
 let () =
   List.iter (fun (name,t) ->
-    Trans.private_register_env Encoding.select_pr name (fun _ -> t))
+    Hashtbl.replace Encoding.ft_enco_select name (const t))
     [ "kept", Trans.identity;
       "goal", mono_in_goal;
       "mono", mono_in_mono;

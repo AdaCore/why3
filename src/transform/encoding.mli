@@ -28,13 +28,11 @@ val meta_kept : meta
 val meta_kept_array : meta
 val meta_base : meta
 
-val select_pr : (env,task) Trans.private_register
-val kept_pr   : (env,task) Trans.private_register
-val poly_pr   : (env,task) Trans.private_register
-
+val ft_enco_select : (env,task) Trans.flag_trans
+val ft_enco_kept   : (env,task) Trans.flag_trans
+val ft_enco_poly   : (env,task) Trans.flag_trans
 
 val monomorphise_goal : Task.task Trans.trans
+val encoding_smt  : Env.env -> Task.task Trans.trans
+val encoding_tptp : Env.env -> Task.task Trans.trans
 
-val print_kept : Task.task Trans.trans
-
-val encoding_smt : Env.env ->  Task.task Trans.trans

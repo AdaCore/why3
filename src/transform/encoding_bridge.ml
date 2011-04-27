@@ -281,5 +281,5 @@ let t env =
     let init_task,tenv = load_prelude s env in
     Trans.tdecl (decl tenv) init_task))
 
-let () = Trans.private_register_env Encoding.kept_pr "bridge" t
+let () = Hashtbl.replace Encoding.ft_enco_kept "bridge" t
 

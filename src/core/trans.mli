@@ -72,7 +72,7 @@ val rewrite : (term -> term) -> (fmla -> fmla) -> task -> task trans
 val add_decls  : decl list -> task trans
 val add_tdecls : tdecl list -> task trans
 
-(* dependent transformatons *)
+(* Dependent Transformatons *)
 
 val on_meta : meta -> (meta_arg list list -> 'a trans) -> 'a trans
 val on_theory : theory -> (symbol_map list -> 'a trans) -> 'a trans
@@ -85,14 +85,31 @@ val on_tagged_ts : meta -> (Sts.t -> 'a trans) -> 'a trans
 val on_tagged_ls : meta -> (Sls.t -> 'a trans) -> 'a trans
 val on_tagged_pr : meta -> (Spr.t -> 'a trans) -> 'a trans
 
-(** debug transformation *)
+(* Flag-dependent Transformations *)
+
+exception UnknownFlagTrans of meta * string * string list
+exception IllegalFlagTrans of meta
+
+type ('a,'b) flag_trans = (string, 'a -> 'b trans) Hashtbl.t
+
+val on_flag : meta -> ('a,'b) flag_trans -> string -> 'a -> 'b trans
+(** [on_flag m ft def arg] takes an exclusive meta [m] of type [[MTstring]],
+    a hash table [ft], a default flag value [def], and an argument [arg].
+    Returns a transformation that is associated in [ft] to the value of [m]
+    in a given task. If the meta [m] is not set in the task, returns the
+    transformation associated to [def]. Raises [UnknownFlagTrans] if [ft]
+    does not have a requested association. Raises [IllegalFlagTrans] if
+    the type of [m] is not [[MTstring]]. *)
+
+(** Debug Transformations *)
+
 val print_meta : Debug.flag -> meta -> task trans
 (** [print_meta f m] is an identity transformation that
     prints every meta [m] in the task if flag [d] is set *)
 
 (** {2 Registration} *)
 
-exception TransFailure of (string * exn)
+exception TransFailure of string * exn
 exception UnknownTrans of string
 exception KnownTrans of string
 
@@ -111,32 +128,3 @@ val list_transforms_l : unit -> string list
 val named : string -> 'a trans -> 'a trans
 (** give transformation a name without registering *)
 
-(** {3 Private Registration} *)
-(** Can be used for chosing a transformation from a meta *)
-
-
-type ('a,'b) private_register = private
-    { pr_meta : meta;
-      pr_default : string;
-      pr_table : (string,'a -> 'b trans) Hashtbl.t}
-
-type empty
- (* A type without value, an (empty,empty) private_register can't be used. *)
-
-exception UnknownTransPrivate of (empty,empty) private_register * string
-
-val create_private_register :
-  string -> string -> ('a, 'b) private_register
-(** [create_provate_register meta_name default] *)
-
-val private_register_env :
-  ('a, 'b) private_register -> string -> ('a -> 'b trans) -> unit
-
-val private_register :
-  (unit, 'b) private_register -> string -> 'b trans -> unit
-
-val apply_private_register_env :
-  ('a, 'b) private_register -> 'a -> 'b trans
-
-val apply_private_register :
-  (unit, 'b) private_register -> 'b trans
