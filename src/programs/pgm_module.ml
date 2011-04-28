@@ -165,9 +165,11 @@ let create_module n =
   in
   (* pervasives *)
   let m = add_esymbol  ls_Exit    m in
+(*
   let m = add_mtsymbol mt_ghost   m in
   let m = add_psymbol  ps_ghost   m in
   let m = add_psymbol  ps_unghost m in
+*)
   m
 
 (** Modules *)
