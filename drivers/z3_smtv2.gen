@@ -22,6 +22,7 @@ transformation "eliminate_algebraic_smt"
 
 transformation "simplify_formula"
 (*transformation "simplify_trivial_quantification"*)
+transformation "encoding_smt"
 
 theory BuiltIn
   syntax type int   "Int"
@@ -127,14 +128,6 @@ theory int.EuclideanDivision
    remove prop Div_mod
    remove prop Mod_1
    remove prop Div_1
-end
-
-theory transform.array.Array
-  syntax cloned logic get "(select %1 %2)"
-  syntax cloned logic set "(store %1 %2 %3)"
-  remove cloned prop Select_eq
-  remove cloned prop Select_neq
-
 end
 
 (*

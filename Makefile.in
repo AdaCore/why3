@@ -126,11 +126,12 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula \
 		inlining split_goal \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
+		encoding_distinction \
 		encoding_enumeration encoding encoding_decorate_mono \
-		libencoding encoding_decorate encoding_bridge \
+		libencoding encoding_select \
+		encoding_decorate encoding_bridge \
 		encoding_explicit encoding_guard encoding_sort \
 		encoding_instantiate simplify_array filter_trigger \
-		encoding_arrays \
 		introduction abstraction close_epsilon lift_epsilon
 
 LIB_PRINTER = print_real alt_ergo why3 smt smt2 coq tptp simplify gappa cvc3

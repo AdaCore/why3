@@ -104,7 +104,7 @@ type env = {
   edefined_tsymbol : tysymbol Mtyl.t Mts.t;
 }
 
-type auto_clone = task -> tenv -> Sty.t -> Sty.t -> task * env
+type auto_clone = task -> tenv -> Sty.t -> task * env
 
 (* The environnement of the transformation during
    the transformation of a formula *)
@@ -537,74 +537,19 @@ let () = Hashtbl.replace Encoding.ft_enco_kept "instantiate"
   (const encoding_instantiate)
 
 
-let create_trans_complete create_env kept kept_array complete =
+let create_trans_complete create_env kept complete =
   let task = use_export None builtin_theory in
   let tenv = match complete with
     | None | Some [MAstr "yes"] -> Complete
     | Some [MAstr "no"] ->  Incomplete
     | _ -> failwith "instantiate complete wrong argument" in
-  let init_task,env = create_env task tenv kept kept_array in
+  let init_task,env = create_env task tenv kept in
   Trans.fold_map fold_map env init_task
 
 let t create_env =
-  Trans.on_tagged_ty meta_kept (fun kept ->
+  Trans.on_tagged_ty Encoding.meta_kept (fun kept ->
   Trans.on_meta_excl meta_complete (fun complete ->
-    Trans.on_tagged_ty meta_kept_array (fun kept_array ->
-      create_trans_complete create_env kept kept_array complete)))
-
-
-
-(* Select *)
-
-let find_mono ~only_mono sty f =
-  let rec ty_add sty ty = ty_fold ty_add (Sty.add ty sty) ty in
-  let add sty ty = if is_ty_mono ~only_mono ty then
-      ty_add sty ty else sty in
-  f_ty_fold add sty f
-
-let create_meta_ty ty = create_meta meta_kept [MAty ty]
-
-
-let create_meta_ty = Wty.memoize 17 create_meta_ty
-
-let create_meta_tyl sty d =
-  Sty.fold (flip $ cons create_meta_ty) sty [create_decl d]
-
-let mono_in_goal pr f =
-  let sty = (try find_mono ~only_mono:true Sty.empty f
-    with Exit -> assert false) (*monomorphise goal should have been used*) in
-   create_meta_tyl sty (create_prop_decl Pgoal pr f)
-
-let mono_in_goal = Trans.tgoal mono_in_goal
-
-(* This one use the tag and also all the type in all the definition *)
-let mono_in_def d =
-  match d.d_node with
-    | Dprop (_,_,f) -> let sty = find_mono ~only_mono:false Sty.empty f in
-                       create_meta_tyl sty d
-    | _ -> [create_decl d]
-
-let mono_in_def = Trans.tdecl mono_in_def None
-
-(* This one use the tag and also all ther type in all the
-   monomorphic definition*)
-let mono_in_mono d =
-  match d.d_node with
-    | Dprop (_,_,f) ->
-        (try let sty = find_mono ~only_mono:true Sty.empty f in
-             create_meta_tyl sty d
-         with Exit -> [create_decl d])
-    | _ -> [create_decl d]
-
-let mono_in_mono = Trans.tdecl mono_in_mono None
-
-let () =
-  List.iter (fun (name,t) ->
-    Hashtbl.replace Encoding.ft_enco_select name (const t))
-    [ "kept", Trans.identity;
-      "goal", mono_in_goal;
-      "mono", mono_in_mono;
-      "all", mono_in_def]
+      create_trans_complete create_env kept complete))
 
 (*
 Local Variables:

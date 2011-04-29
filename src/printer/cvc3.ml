@@ -303,7 +303,7 @@ let distingued =
     | _ -> assert false in
   Trans.on_meta meta_dist_syntax (fun syntax ->
     let syntax = List.fold_left dist_syntax Mls.empty syntax in
-    Trans.on_meta Encoding_arrays.meta_lsdis (fun dis ->
+    Trans.on_meta Encoding.meta_lsinst (fun dis ->
       let dis2 = List.fold_left (dist_dist syntax) Mid.empty dis in
       Trans.return dis2))
 

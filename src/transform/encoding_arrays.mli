@@ -18,5 +18,6 @@
 (**************************************************************************)
 
 
-val meta_lsdis : Theory.meta
-val meta_mono_array : Theory.meta
+val lsymbol_distinction : Task.task Trans.trans
+
+val phase0 : Task.task Trans.trans

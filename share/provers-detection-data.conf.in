@@ -38,7 +38,7 @@ version_regexp = "This is CVC3 version \\([^ \n]+\\)"
 version_ok = "2.2"
 version_old = "2.1"
 command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -timeout %t %f"
-driver = "drivers/cvc3.drv"
+driver = "drivers/cvc3_array.drv"
 
 [ATP yices]
 name = "Yices"
@@ -112,18 +112,6 @@ version_regexp = "Version: \\([^ \n\r]+\\)"
 command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
 driver = "drivers/verit.drv"
 
-[ATP z3_smtv1]
-name = "Z3_smtv1"
-exec = "z3"
-exec = "z3-2.2"
-version_switch = "-version"
-version_regexp = "Z3 version \\([^ \n\r]+\\)"
-version_old = "2.2"
-version_old = "2.1"
-version_old = "1.3"
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e -smt %f"
-driver = "drivers/z3.drv"
-
 [ATP z3]
 name = "Z3"
 exec = "z3"
@@ -133,8 +121,23 @@ version_ok = "2.19"
 version_old = "2.18"
 version_old = "2.17"
 version_old = "2.16"
+version_bad = "2.2"
+version_bad = "2.1"
+version_bad = "1.3"
 command = "@LOCALBIN@why3-cpulimit %t %m -s %e -smt2 %f"
 driver = "drivers/z3_smtv2_array.drv"
+
+[ATP z3]
+name = "Z3 smtv1 no arrays"
+exec = "z3"
+exec = "z3-2.2"
+version_switch = "-version"
+version_regexp = "Z3 version \\([^ \n\r]+\\)"
+version_old = "2.2"
+version_old = "2.1"
+version_old = "1.3"
+command = "@LOCALBIN@why3-cpulimit %t %m -s %e -smt %f"
+driver = "drivers/z3.drv"
 
 [ITP coq]
 name = "Coq"

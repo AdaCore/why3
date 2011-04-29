@@ -38,7 +38,7 @@ type env = {
   edefined_tsymbol : tysymbol Mtyl.t Mts.t;
 }
 
-type auto_clone =  task -> tenv -> Sty.t -> Sty.t -> task * env
+type auto_clone =  task -> tenv -> Sty.t -> task * env
 
 val create_env : task -> tenv -> Sty.t -> task * env
 

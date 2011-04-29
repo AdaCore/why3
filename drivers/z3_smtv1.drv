@@ -1,8 +1,9 @@
 (* Why driver for SMT syntax *)
 
 prelude ";;; this is a prelude for Z3"
+prelude "(set-logic AUFNIRA)"
 
-printer "smtv1"
+printer "smtv2"
 filename "%f-%t-%g.smt"
 
 valid "^unsat"
@@ -22,15 +23,12 @@ transformation "eliminate_algebraic_smt"
 transformation "simplify_formula"
 (*transformation "simplify_trivial_quantification"*)
 
-transformation "encoding_smt_array"
-transformation "encoding_sort"
+transformation "encoding_smt"
 
 theory BuiltIn
   syntax type int   "Int"
   syntax type real  "Real"
   syntax logic (=)  "(= %1 %2)"
-
-  meta "encoding : kept" type int
 end
 
 theory int.Int
@@ -64,6 +62,8 @@ theory int.Int
   remove prop Total
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
+
+  meta "encoding : kept" type int
 
 end
 
@@ -131,12 +131,33 @@ theory int.EuclideanDivision
    remove prop Div_1
 end
 
-theory transform.array.Array
-  syntax cloned logic get "(select %1 %2)"
-  syntax cloned logic set "(store %1 %2 %3)"
-  remove cloned prop Select_eq
-  remove cloned prop Select_neq
+(*
+theory real.FromInt
+  syntax logic from_int "(from_int %1)"
+  remove prop Add
+  remove prop Sub
+  remove prop Mul
+  remove prop Neg
+end
+*)
 
+(*
+theory real.Truncate
+  syntax logic floor "(to_int %1)"
+  remove prop Floor_down
+  remove prop Floor_monotonic
+end
+*)
+
+theory array.Array
+  syntax type t "(Array %1 %2)"
+  meta "encoding : lskept" logic get
+  meta "encoding : lskept" logic set
+  meta "encoding : lskept" logic create_const
+
+  meta "smt_dist_syntax" logic get, "(select %1 %2)"
+  meta "smt_dist_syntax" logic set, "(store %1 %2 %3)"
+  meta "smt_dist_syntax" logic create_const, "(const[%t0] %1)"
 end
 
 (*

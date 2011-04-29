@@ -1,9 +1,9 @@
 (**************************************************************************)
 (*                                                                        *)
 (*  Copyright (C) 2010-                                                   *)
-(*    François Bobot                                                     *)
-(*    Jean-Christophe Filliâtre                                          *)
-(*    Claude Marché                                                      *)
+(*    FranÃ§ois Bobot                                                     *)
+(*    Jean-Christophe FilliÃ¢tre                                          *)
+(*    Claude MarchÃ©                                                      *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -17,27 +17,25 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Env
-open Theory
-open Task
-open Trans
 
-val debug : Debug.flag
+val meta_lsinst : Theory.meta
+val meta_kept   : Theory.meta
 
-val meta_base          : Theory.meta
-val meta_lsinst        : Theory.meta
-val meta_kept          : Theory.meta
-val meta_lskept        : Theory.meta
+module Env : sig
+  module Mtyl : Map.S with type key = Ty.ty list
+  module Htyl : Hashtbl.S with type key = Ty.ty list
 
-val ft_select_lsinst    : (env,task) Trans.flag_trans
-val ft_select_kept      : (env,task) Trans.flag_trans
-val ft_select_lskept    : (env,task) Trans.flag_trans
-val ft_completion_mode  : (env,task) Trans.flag_trans
+  type env = Term.lsymbol Mtyl.t Term.Mls.t
 
-val ft_enco_kept : (env,task) Trans.flag_trans
-val ft_enco_poly : (env,task) Trans.flag_trans
+  val empty_env : env
 
-val monomorphise_goal : Task.task Trans.trans
+  val print_env : Format.formatter -> env -> unit
 
-val encoding_smt  : Env.env -> Task.task Trans.trans
-val encoding_tptp : Env.env -> Task.task Trans.trans
+  val metas_of_env :
+    Term.lsymbol Mtyl.t Term.Mls.t -> Theory.tdecl list -> Theory.tdecl list
+  val env_of_metas :
+    Theory.meta_arg list list -> Term.lsymbol Mtyl.t Term.Mls.t
+
+end
+
+val lsymbol_distinction : Task.task Trans.trans

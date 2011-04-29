@@ -138,7 +138,7 @@ let () = Exn_printer.register
   begin fun fmt exn -> match exn with
   | TheoryNotFound (sl, s) ->
       Format.fprintf fmt "Theory not found: %a.%s"
-        (Pp.print_list Pp.dot Format.pp_print_string) sl s
+        (Pp.print_list (Pp.constant_string ".") Format.pp_print_string) sl s
   | UnknownFormat s ->
       Format.fprintf fmt "Unknown input format: %s" s
   | UnknownExtension s ->

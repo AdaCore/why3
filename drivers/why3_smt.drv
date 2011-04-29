@@ -9,8 +9,7 @@ transformation "eliminate_definition"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic_smt"
 
-transformation "encoding_smt_array"
-transformation "encoding_sort"
+transformation "encoding_smt"
 
 theory BuiltIn
   syntax type  int  "int"
@@ -19,4 +18,10 @@ theory BuiltIn
 
   meta "encoding : kept" type int
   meta "encoding : kept" type real
+
+
+  meta "select_inst" "goal"
+  meta "select_kept" "goal"
+  meta "select_lskept" "nothing"
+  meta "completion_mode" "only_kept"
 end

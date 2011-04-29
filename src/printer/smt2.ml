@@ -66,7 +66,6 @@ type info = {
   info_syn : string Mid.t;
   info_rem : Sid.t;
   use_trigger : bool;
-  barrays : (ty*ty) Mts.t;
   complex_type : ty Hty.t;
 }
 
@@ -236,15 +235,7 @@ let print_logic_binder info fmt v =
 let print_type_decl info fmt = function
   | ts, Tabstract when Sid.mem ts.ts_name info.info_rem -> false
   | ts, Tabstract when ts.ts_args = [] ->
-    begin try
-      (* keep this hack for compatibility with smtv1 *)
-      let key,elt = Mts.find ts info.barrays in
-      fprintf fmt "(define-sorts (%a  (Array %a %a)))"
-        print_ident ts.ts_name
-        (print_type info) key
-        (print_type info) elt; true
-    with Not_found ->
-      fprintf fmt "(declare-sort %a 0)" print_ident ts.ts_name; true end
+      fprintf fmt "(declare-sort %a 0)" print_ident ts.ts_name; true
   | ts, Tabstract when ts.ts_def = None ->
     let len = List.length ts.ts_args in
     fprintf fmt "(declare-sort %a %i)" print_ident ts.ts_name len; true
@@ -301,20 +292,6 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
-let barrays task =
-  let fold barrays =
-    function
-      | [MAts tst;MAty tyk;MAty tye] ->
-        (* let extract_ty ts = *)
-        (*   if ts.ts_args <> [] then *)
-        (*     unsupported "smtv2 : type with argument are not supported"; *)
-        (*   match ts.ts_def with *)
-        (*     | Some ty -> ty *)
-        (*     | None -> ty_app ts [] in *)
-        Mts.add tst (tyk,tye) barrays
-      | _ -> assert false in
-  Task.on_meta Encoding_arrays.meta_mono_array fold Mts.empty task
-
 let meta_dist_syntax =
   Theory.register_meta "smt_dist_syntax" [MTlsymbol;MTstring]
 
@@ -330,7 +307,7 @@ let distingued =
     | _ -> assert false in
   Trans.on_meta meta_dist_syntax (fun syntax ->
     let syntax = List.fold_left dist_syntax Mls.empty syntax in
-    Trans.on_meta Encoding_arrays.meta_lsdis (fun dis ->
+    Trans.on_meta Encoding.meta_lsinst (fun dis ->
       let dis2 = List.fold_left (dist_dist syntax) Mid.empty dis in
       Trans.return dis2))
 
@@ -342,7 +319,6 @@ let print_task pr thpr fmt task =
       (get_syntax_map task) (Trans.apply distingued task);
     info_rem = get_remove_set task;
     use_trigger = false;
-    barrays = barrays task;
     complex_type = Hty.create 5;
   }
   in

@@ -38,6 +38,7 @@ let identity   x =  x
 let identity_l x = [x]
 
 let return x = fun _ -> x
+let bind f g task = g (f task) task
 
 let conv_res c f x = c (f x)
 
@@ -299,7 +300,8 @@ let on_flag m ft def arg =
           let l = Hashtbl.fold (fun s _ l -> s :: l) ft [] in
           raise (UnknownFlagTrans (m,s,l))
     in
-    named s (t arg))
+    let tr_name = Printf.sprintf "%s : %s" m.meta_name s in
+    named tr_name (t arg))
 
 
 let () = Exn_printer.register (fun fmt exn -> match exn with

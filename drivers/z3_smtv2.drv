@@ -1,7 +1,11 @@
 import "z3_smtv2.gen"
 
-transformation "encoding_smt"
-transformation "encoding_sort"
+theory BuiltIn
+  meta "select_inst" "nothing"
+  meta "select_kept" "nothing"
+  meta "select_lskept" "nothing"
+  meta "completion_mode" "nothing"
+end
 
 (*
 Local Variables:
