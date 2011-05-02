@@ -101,7 +101,10 @@ ifeq (@enable_local@,yes)
 all: install_local
 endif
 
+plugins: plugins.@OCAMLBEST@
+
 .PHONY: byte opt clean depend all install install_local install_no_local
+.PHONY: plugins plugins.byte plugins.opt
 
 #############
 # Why library
@@ -127,7 +130,7 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
 		encoding_distinction \
-		encoding_enumeration encoding encoding_decorate_mono \
+		encoding_enumeration encoding \
 		libencoding encoding_select \
 		encoding_decorate encoding_bridge \
 		encoding_explicit encoding_guard encoding_sort \
@@ -460,7 +463,7 @@ byte: bin/why3ide.byte
 opt:  bin/why3ide.opt
 
 bin/why3ide.opt bin/why3ide.byte: INCLUDES += -I @LABLGTK2LIB@ -I @SQLITE3LIB@
-bin/why3ide.opt bin/why3ide.byte: EXTOBJS += 
+bin/why3ide.opt bin/why3ide.byte: EXTOBJS +=
 bin/why3ide.opt bin/why3ide.byte: EXTLIBS += lablgtk lablgtksourceview2 sqlite3
 
 bin/why3ide.opt: src/why.cmxa $(PGMCMX) $(IDECMX)
@@ -664,10 +667,10 @@ depend: .depend.tptp2why
 
 clean::
 	rm -f $(TPTPGENERATED)
-	rm -f src/tptp2why/*.cm[iox] src/tptp2why/*.o
+	rm -f src/tptp2why/*.cm* src/tptp2why/*.o
 	rm -f src/tptp2why/*.annot src/tptp2why/*.conflicts
 	rm -f src/tptp2why/*.output src/tptp2why/*.automaton
-	rm -f plugins/whytptp.cmxs plugins/whytptp.cmo
+	rm -f plugins/whytptp.cm* plugins/whytptp.o
 	rm -f .depend.tptp2why
 
 endif
@@ -751,7 +754,8 @@ install_local: bin/why3doc
 
 .PHONY: bench test comp_bench_plugins
 
-bench:: bin/why3.@OCAMLBEST@ bin/why3ml.@OCAMLBEST@ $(TOOLS) $(DRIVERS) test-api
+bench:: bin/why3.@OCAMLBEST@ bin/why3ml.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS)
+	$(MAKE) test-api
 	sh bench/bench \
 	    "bin/why3.@OCAMLBEST@" \
 	    "bin/why3ml.@OCAMLBEST@"
