@@ -33,6 +33,9 @@ val d_ts_type : decl
 (* function symbol mapping ty_type^n to ty_type *)
 val ls_of_ts : tysymbol -> lsymbol
 
+(* function symbol mapping ty_type^n to int *)
+val ls_int_of_ty : lsymbol
+
 (* function symbol selecting ty_type from ty_type^n *)
 val ls_selects_of_ts : tysymbol -> lsymbol list
 

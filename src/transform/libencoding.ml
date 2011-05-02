@@ -44,19 +44,32 @@ let ls_selects_of_ts = Wts.memoize 63 (fun ts ->
     create_fsymbol preid [ty_type] ty_type in
   List.rev_map create_select ts.ts_args)
 
+let ls_int_of_ty = create_fsymbol (id_fresh "int_of_ty") [ty_type] ty_int
+
 (** definition of the previous selecting functions *)
 let ls_selects_def_of_ts acc ts =
   let ls = ls_of_ts ts in
-  let ls_selects = ls_selects_of_ts ts in
   let vars = List.rev_map
-    (fun _ -> create_vsymbol (id_fresh "x") ty_type) ls_selects
+    (fun _ -> create_vsymbol (id_fresh "x") ty_type) ts.ts_args
   in
   let tvars = List.map t_var vars in
+  (** type to int *)
+  let id = string_of_int (id_hash ts.ts_name) in
+  let acc =
+    let t = t_app ls tvars ty_type in
+    let f = f_equ (t_app ls_int_of_ty [t] ty_int) (t_int_const id) in
+    let f = f_forall_close vars [[Term t]] f in
+    let prsymbol = create_prsymbol (id_clone ts.ts_name) in
+    create_prop_decl Paxiom prsymbol f :: acc
+  in
+  (** select *)
+  let ls_selects = ls_selects_of_ts ts in
   let fmlas = List.rev_map2
     (fun ls_select value ->
       let t = t_app ls tvars ty_type in
-      let f = f_equ (t_app ls_select [t] ty_type) value in
-      let f = f_forall_close vars [] f in
+      let t = t_app ls_select [t] ty_type in
+      let f = f_equ t value in
+      let f = f_forall_close vars [[Term t]] f in
       f)
     ls_selects tvars in
   let create_props ls_select fmla =

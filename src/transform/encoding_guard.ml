@@ -267,6 +267,7 @@ let decl kept d = match d.d_node with
 let empty_th =
   let task = use_export None Theory.builtin_theory in
   let task = Task.add_decl task d_ts_type in
+  let task = Task.add_logic_decl task [ls_int_of_ty,None] in
   let task = Task.add_logic_decl task [Transform.fs_type,None] in
   task
 
