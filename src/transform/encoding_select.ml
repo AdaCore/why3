@@ -184,6 +184,7 @@ let inst_nothing _env = Trans.identity
 
 (** goal *)
 let inst_goal _env =
+  Trans.compose (inst_nothing _env) $
   Trans.tgoal (fun pr f ->
     let env = f_app_fold add_mono_instantiation Mls.empty f in
     metas_of_env env [create_decl (create_prop_decl Pgoal pr f)])
@@ -191,6 +192,7 @@ let inst_goal _env =
 
 (** goal + context *)
 let inst_all _env =
+  Trans.compose (inst_nothing _env) $
   Trans.bind (Trans.fold fold_add_instantion Mls.empty)
     (fun env -> Trans.add_tdecls (metas_of_env env []))
 
