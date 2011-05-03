@@ -234,8 +234,7 @@ let definition_of_env env =
     let fold_inst inst lsinst task =
       let fold_ty task ty =
         let add_ts task ts = add_ty_decl task ([ts,Tabstract]) in
-        let task = ty_s_fold add_ts task ty in
-        add_meta task meta_kept [MAty ty] in
+        ty_s_fold add_ts task ty in
       let task = List.fold_left fold_ty task inst in
       add_logic_decl task [lsinst,None]
     in

@@ -89,6 +89,19 @@ module Env = struct
   include Encoding_distinction.Env
 
 (** creation functions *)
+(** find type in env *)
+  let meta_kept_from_env decls env =
+    let fold_ls _ insts decls =
+      let fold_inst inst _ decls =
+        let fold_ty decls ty =
+          create_meta meta_kept [MAty ty] :: decls in
+        List.fold_left fold_ty decls inst
+      in
+      Mtyl.fold fold_inst insts decls
+    in
+    Mls.fold fold_ls env decls
+
+
 (** Using an lskept *)
   let env_from_fold lskept (env,kept) ls tyl tyv =
     if Sls.mem ls lskept &&
@@ -172,14 +185,18 @@ let inst_goal _env =
   Trans.compose (inst_nothing _env) $
   Trans.tgoal (fun pr f ->
     let env = f_app_fold add_mono_instantiation Mls.empty f in
-    metas_of_env env [create_decl (create_prop_decl Pgoal pr f)])
+    let decls = [create_decl (create_prop_decl Pgoal pr f)] in
+    let decls = meta_kept_from_env decls env in
+    metas_of_env env decls)
 
 
 (** goal + context *)
 let inst_all _env =
   Trans.compose (inst_nothing _env) $
   Trans.bind (Trans.fold fold_add_instantion Mls.empty)
-    (fun env -> Trans.add_tdecls (metas_of_env env []))
+    (fun env ->
+      let decls = meta_kept_from_env [] env in
+      Trans.add_tdecls (metas_of_env env decls))
 
 (** register *)
 let () = register ft_select_lsinst inst_nothing inst_goal inst_all
