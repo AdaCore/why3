@@ -269,7 +269,7 @@ let () =
     let print fmt m = fprintf fmt "@[%s %s%a@]"
       (let s = m.meta_name in
         if String.contains s ' ' then "\"" ^ s ^ "\"" else s)
-      (if m.meta_excl then "* " else "")
+      (if m.meta_excl then "(flag) " else "")
       (Pp.print_list Pp.space Pretty.print_meta_arg_type) m.meta_type
     in
     let cmp m1 m2 = Pervasives.compare m1.meta_name m2.meta_name in
