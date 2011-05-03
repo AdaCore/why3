@@ -74,8 +74,10 @@ let monomorphise_goal =
 
 
 let lsymbol_distinction =
-  Trans.compose (Trans.print_meta debug meta_lsinst)
-    Encoding_distinction.lsymbol_distinction
+  Trans.seq
+    [Trans.print_meta debug meta_lskept;
+     Trans.print_meta debug meta_lsinst;
+     Encoding_distinction.lsymbol_distinction]
 
 let phase0 env = Trans.seq [
   Trans.on_flag meta_select_lsinst   ft_select_lsinst   "nothing" env;

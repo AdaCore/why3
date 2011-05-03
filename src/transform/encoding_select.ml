@@ -50,14 +50,13 @@ let good_for_env ls =
 module Lskept = struct
   type lskept = Sls.t
 
-  let add_mono_lskept lskept ls _ _ = Sls.add ls lskept
   (** Hunting lskept... *)
+  let add_mono_lskept lskept ls _ _ =
+    if good_for_env ls then Sls.add ls lskept else lskept
 
   let fold_add_lskept task lskept = match task.task_decl.td_node with
     | Decl { d_node = Dlogic l } ->
-      let accum lskept (ls,_) =
-        if good_for_env ls then Sls.add ls lskept else lskept
-      in
+      let accum lskept (ls,_) = add_mono_lskept lskept ls () () in
       List.fold_left accum lskept l
     | _ -> lskept
 
@@ -145,26 +144,12 @@ module Env = struct
     Sls.fold fold_ls lskept env
 
   let env_from_not_only_kept_lskept env kept lskept =
-    let fold_ls ls env =
-      let rec aux env subst = function
-        | [] ->
-          let tyl = List.map (ty_inst subst) ls.ls_args in
-          let tyv = option_map (ty_inst subst) ls.ls_value in
-          add_mono_instantiation env ls tyl tyv
-        | ty::tyl ->
-          let fold_ty tykept env =
-            try
-              let subst = ty_match subst ty tykept in
-              aux env subst tyl
-            with TypeMismatch _ -> env
-          in
-          Sty.fold fold_ty kept env
-      in
-      let lsty = option_apply ls.ls_args (fun e -> e::ls.ls_args) ls.ls_value
-      in
-      aux env Mtv.empty lsty
-    in
-    Sls.fold fold_ls lskept env
+    (** complete by subterm *)
+    let fold ty acc =
+      let rec add acc ty = ty_fold add (Sty.add ty acc) ty in
+      add acc ty in
+    let kept = Sty.fold fold kept kept in
+    env_from_only_kept_lskept env kept lskept
 
 end
 
