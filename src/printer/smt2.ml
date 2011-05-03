@@ -292,9 +292,6 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
-let meta_dist_syntax =
-  Theory.register_meta "smt_dist_syntax" [MTlsymbol;MTstring]
-
 let distingued =
   let dist_syntax mls = function
     | [MAls ls;MAstr s] -> Mls.add ls s mls
@@ -305,7 +302,7 @@ let distingued =
               Mid.add lsdis.ls_name (Mls.find ls syntax) mls
         with Not_found -> mls end
     | _ -> assert false in
-  Trans.on_meta meta_dist_syntax (fun syntax ->
+  Trans.on_meta meta_syntax_logic (fun syntax ->
     let syntax = List.fold_left dist_syntax Mls.empty syntax in
     Trans.on_meta Encoding.meta_lsinst (fun dis ->
       let dis2 = List.fold_left (dist_dist syntax) Mid.empty dis in

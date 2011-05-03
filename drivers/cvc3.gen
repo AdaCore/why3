@@ -137,8 +137,8 @@ theory array.Array
   meta "encoding : lskept" logic get
   meta "encoding : lskept" logic set
 
-  meta "smt_dist_syntax" logic get, "(%1[%2])"
-  meta "smt_dist_syntax" logic set, "(%1 WITH [%2] := %3)"
+  syntax logic get "(%1[%2])"
+  syntax logic set "(%1 WITH [%2] := %3)"
 end
 
 (*
