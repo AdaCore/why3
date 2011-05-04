@@ -367,8 +367,7 @@ module M = Session.Make
        let (_:bool) = goals_model#remove row in ()
 
      let idle f =
-       let (_ : GMain.Idle.id) = GMain.Idle.add f in
-       ()
+       let (_ : GMain.Idle.id) = GMain.Idle.add f in ()
 
      let timeout ~ms f =
        let (_ : GMain.Timeout.id) = GMain.Timeout.add ~ms ~callback:f in
@@ -1032,8 +1031,8 @@ let color_loc (v:GSourceView2.source_view) l b e =
   buf#apply_tag ~start ~stop orange_bg
 
 let scroll_to_id id =
-  match id.Ident.id_origin with
-    | Ident.User loc ->
+  match id.Ident.id_loc with
+    | Some loc ->
         let (f,l,b,e) = Loc.get loc in
         if f <> !current_file then
           begin
@@ -1043,13 +1042,9 @@ let scroll_to_id id =
         move_to_line source_view (l-1);
         erase_color_loc source_view;
         color_loc source_view l b e
-    | Ident.Fresh ->
+    | None ->
         source_view#source_buffer#set_text
-          "Fresh ident (no position available)\n";
-        set_current_file ""
-    | Ident.Derived _ ->
-        source_view#source_buffer#set_text
-          "Derived ident (no position available)\n";
+          "Non-localized ident (no position available)\n";
         set_current_file ""
 
 let color_loc loc =

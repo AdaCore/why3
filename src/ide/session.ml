@@ -134,7 +134,8 @@ and goal =
     { goal_name : string;
       goal_expl : string option;
       parent : goal_parent;
-      task: Task.task option;
+      mutable task: Task.task option;
+      checksum : string;
       goal_key : O.key;
       mutable proved : bool;
       external_proofs: (string, proof_attempt) Hashtbl.t;
@@ -196,8 +197,14 @@ let transformations g = g.transformations
 let get_task g = 
   match g.task with 
     | None -> 
-	(* TODO: recompute the task from the parent transformation *)
-	assert false
+	begin
+	  match g.parent with
+	    | Parent_theory _th ->
+		assert false (* should not happen *)
+	    | Parent_transf _tr ->
+		(* TODO: recompute the task from the parent transformation *)
+		assert false
+	end
     | Some t -> t
 
 let all_files : file list ref = ref []
@@ -222,9 +229,9 @@ let save_result fmt r =
 let save_status fmt s =
   match s with
     | Undone | Scheduled | Running ->
-        fprintf fmt "<undone>@\n" 
+        fprintf fmt "<undone/>@\n" 
     | InternalFailure msg -> 
-        fprintf fmt "<internalfailure reason=\"%s\">@\n" 
+        fprintf fmt "<internalfailure reason=\"%s\"/>@\n" 
           (Printexc.to_string msg)
     | Done r -> save_result fmt r
 
@@ -536,6 +543,26 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
     !r
 
 
+(**********************)
+(*     check sum      *)
+(**********************)
+
+let task_checksum t =
+  fprintf str_formatter "%a@." Pretty.print_task t;
+  let s = flush_str_formatter () in
+(*
+  let tmp = Filename.temp_file "task" "out" in
+  let c = open_out tmp in
+  output_string c s;
+  close_out c;
+*)
+  let sum = Digest.to_hex (Digest.string s) in
+(*
+  eprintf "task %s, sum = %s@." tmp sum;
+*)
+  sum
+
+
 
 (******************************)
 (* raw additions to the model *)
@@ -558,6 +585,7 @@ let raw_add_external_proof ~obsolete ~edit g p result =
   (* !notify_fun (Goal g) ? *)
   a
 
+
 (* [raw_add_goal parent name expl t] adds a goal to the given parent
    DOES NOT record the new goal in its parent, thus this should not be exported
 *)
@@ -567,10 +595,15 @@ let raw_add_goal parent name expl topt =
     | Parent_transf mtr -> mtr.transf_key
   in
   let key = O.create ~parent:parent_key () in
+  let sum = match topt with
+    | None -> ""
+    | Some t -> task_checksum t
+  in
   let goal = { goal_name = name;
                goal_expl = expl;
 	       parent = parent;
                task = topt ;
+	       checksum = sum;
                goal_key = key;
                external_proofs = Hashtbl.create 7;
                transformations = Hashtbl.create 3;
@@ -696,9 +729,11 @@ let file_exists fn =
 (* reload a file                  *)
 (**********************************)
 
+let rec reimport_any_goal _parent gid _gname t goal __goal_obsolete =
+  let _info = get_explanation gid (Task.task_goal_fmla t) in
+  goal.task <- Some t;
+  goal
 (*
-let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
-  let info = get_explanation gid (Task.task_goal_fmla t) in
   let goal = raw_add_goal parent gname info t in
   let proved = ref false in
   let external_proofs = Db.external_proofs db_goal in
@@ -827,9 +862,10 @@ let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
   if !proved then Helpers.set_proved ~propagate:false goal;
   goal,!proved
 
+*)
 
-let reimport_root_goal mth tname goals t : Model.goal * bool =
-  (* re-imports DB informations of a goal in theory mth (named tname)
+let reimport_root_goal mth tname goals t : goal =
+  (* re-imports database informations of a goal in theory mth (named tname)
      goals is a table, indexed by names of DB goals formerly known to be
      a in theory mth.  returns true whenever the task t is known to be
      proved *)
@@ -837,24 +873,27 @@ let reimport_root_goal mth tname goals t : Model.goal * bool =
   let gname = id.Ident.id_string
   in
   let sum = task_checksum t in
-  let db_goal,goal_obsolete =
+  let goal, goal_obsolete =
     try
       let dbg = Util.Mstr.find gname goals in
-      let db_sum = Db.task_checksum dbg in
+      let db_sum = dbg.checksum in
       let goal_obsolete = sum <> db_sum in
       if goal_obsolete then
         begin
           eprintf "Goal %s.%s has changed@." tname gname;
+(*
           Db.change_checksum dbg sum
+*)
         end;
       dbg,goal_obsolete
     with Not_found ->
+      assert false (* TODO *)
+(*
       let dbg = Db.add_goal mth.Model.theory_db gname sum in
       dbg,false
-  in
-  reimport_any_goal (Model.Theory mth) id gname t db_goal goal_obsolete
-
 *)
+  in
+  reimport_any_goal (Parent_theory mth) id gname t goal goal_obsolete
 
 (* reloads a file *)
 
@@ -879,17 +918,18 @@ let reload_file mf =
 	     with Not_found -> 
 	       raw_add_theory mf (Some th) tname
 	   in
-(*
-	   let goals = Db.goals db_th in
-	   let tasks = List.rev (Task.split_theory th None None) in
-	   let goals,proved = List.fold_left
-	     (fun (acc,proved) t ->
-                let (g,p) = reimport_root_goal mth tname goals t in
-                (g::acc,proved && p))
-	     ([],true) tasks
+	   let goals = List.fold_left
+	     (fun acc g -> Util.Mstr.add g.goal_name g acc)
+	     Util.Mstr.empty mth.goals 
 	   in
-	   mth.Model.goals <- List.rev goals;
-*)
+	   let tasks = List.rev (Task.split_theory th None None) in
+	   let goals = List.fold_left
+	     (fun acc t ->
+                let g = reimport_root_goal mth tname goals t in
+                g::acc)
+	     [] tasks
+	   in
+	   mth.goals <- List.rev goals;
 	   (* TODO: what to do with remaining old theories?
 	      for the moment they remain in the session
 	   *)
