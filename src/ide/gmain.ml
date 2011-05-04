@@ -426,7 +426,7 @@ module Model = struct
   type proof_attempt =
       { prover : prover_data;
         proof_goal : goal;
-        proof_row : Gtk.tree_iter;
+        proof_row : GTree.row_reference;
         proof_db : Db.proof_attempt;
 	mutable proof_state : Gscheduler.proof_attempt_status;
         mutable proof_obsolete : bool;
@@ -441,7 +441,7 @@ module Model = struct
       { goal_name : string;
 	parent : goal_parent;
         task: Task.task;
-        goal_row : Gtk.tree_iter;
+        goal_row : GTree.row_reference;
         goal_db : Db.goal;
         mutable proved : bool;
         external_proofs: (string, proof_attempt) Hashtbl.t;
@@ -449,19 +449,20 @@ module Model = struct
       }
 
   and transf =
-      { parent_goal : goal;
+      { transf_name : string;
+	parent_goal : goal;
 	mutable transf_proved : bool;
 (*
         transf : Task.task Trans.trans;
 *)
-        transf_row : Gtk.tree_iter;
+        transf_row : GTree.row_reference;
         transf_db : Db.transf;
         mutable subgoals : goal list;
       }
 
   and theory =
       { theory : Theory.theory;
-        theory_row : Gtk.tree_iter;
+        theory_row : GTree.row_reference;
         theory_db : Db.theory;
         theory_parent : file;
         mutable goals : goal list;
@@ -470,7 +471,7 @@ module Model = struct
 
   and file =
       { file_name : string;
-        file_row : Gtk.tree_iter;
+        file_row : GTree.row_reference;
         file_db : Db.file;
         mutable theories: theory list;
         mutable file_verified : bool;
@@ -784,11 +785,11 @@ module Helpers = struct
 	| Call_provers.HighFailure ->
 	    if obsolete then !image_failure_obs else !image_failure
 
-  let set_row_status b row =
+  let set_row_status b (row : GTree.row_reference) =
     if b then
       begin
-	goals_view#collapse_row (goals_model#get_path row);
-	goals_model#set ~row ~column:status_column !image_yes;
+	goals_view#collapse_row row#path;
+	goals_model#set ~row:row#iter ~column:status_column !image_yes;
 (*
 	if !toggle_hide_proved_goals then
 	  goals_model#set ~row ~column:visible_column false
@@ -796,7 +797,7 @@ module Helpers = struct
       end
     else
       begin
-	goals_model#set ~row ~column:status_column !image_unknown;
+	goals_model#set ~row:row#iter ~column:status_column !image_unknown;
 (*
 	if !toggle_hide_proved_goals then
 	  goals_model#set ~row ~column:visible_column true
@@ -853,8 +854,8 @@ module Helpers = struct
   let set_file_verified f =
     f.file_verified <- true;
     let row = f.file_row in
-    goals_view#collapse_row (goals_model#get_path row);
-    goals_model#set ~row ~column:status_column !image_yes
+    goals_view#collapse_row row#path;
+    goals_model#set ~row:row#iter ~column:status_column !image_yes
 (*
     if !toggle_hide_proved_goals then
       goals_model#set ~row ~column:visible_column false
@@ -864,8 +865,8 @@ module Helpers = struct
   let set_theory_proved ~propagate  t =
     t.verified <- true;
     let row = t.theory_row in
-    goals_view#collapse_row (goals_model#get_path row);
-    goals_model#set ~row ~column:status_column !image_yes;
+    goals_view#collapse_row row#path;
+    goals_model#set ~row:row#iter ~column:status_column !image_yes;
 (*
     if !toggle_hide_proved_goals then
       goals_model#set ~row ~column:visible_column false;
@@ -883,8 +884,8 @@ module Helpers = struct
   let rec set_proved ~propagate g =
     let row = g.goal_row in
     g.proved <- true;
-    goals_view#collapse_row (goals_model#get_path row);
-    goals_model#set ~row ~column:status_column !image_yes;
+    goals_view#collapse_row row#path;
+    goals_model#set ~row:row#iter ~column:status_column !image_yes;
 (*
     if !toggle_hide_proved_goals then
       goals_model#set ~row ~column:visible_column false;
@@ -903,7 +904,7 @@ module Helpers = struct
   let set_proof_state ~obsolete a res =
     a.proof_state <- res;
     let row = a.proof_row in
-    goals_model#set ~row ~column:status_column
+    goals_model#set ~row:row#iter ~column:status_column
       (image_of_result ~obsolete res);
 
     let t = match res with
@@ -912,23 +913,24 @@ module Helpers = struct
       | _ -> ""
     in
     let t = if obsolete then t ^ " (obsolete)" else t in
-    goals_model#set ~row:a.Model.proof_row ~column:Model.time_column t
+    goals_model#set ~row:a.Model.proof_row#iter ~column:Model.time_column t
 
+  let get_row_ref model r = model#get_row_reference (model#get_path r)
 
   let add_external_proof_row ~obsolete ~edit g p db_proof result (*_time*) =
     let parent = g.goal_row in
     let name = p.Session.prover_name in
-    let row = goals_model#prepend ~parent () in
+    let row = goals_model#prepend ~parent:parent#iter () in
     goals_model#set ~row ~column:icon_column !image_prover;
     goals_model#set ~row ~column:name_column
       (name ^ " " ^ p.Session.prover_version);
 (*
     goals_model#set ~row ~column:visible_column true;
 *)
-    goals_view#expand_row (goals_model#get_path parent);
+    goals_view#expand_row parent#path;
     let a = { prover = p;
               proof_goal = g;
-              proof_row = row;
+              proof_row = get_row_ref goals_model row;
               proof_db = db_proof;
 (*
               status = status;
@@ -953,11 +955,11 @@ module Helpers = struct
       | Theory mth -> mth.theory_row
       | Transf mtr -> mtr.transf_row
     in
-    let row = goals_model#append ~parent:parent_row () in
+    let row = goals_model#append ~parent:parent_row#iter () in
     let goal = { goal_name = name;
 		 parent = parent;
                  task = t ;
-                 goal_row = row;
+                 goal_row = get_row_ref goals_model row;
                  goal_db = db_goal;
                  external_proofs = Hashtbl.create 7;
                  transformations = Hashtbl.create 3;
@@ -979,10 +981,11 @@ module Helpers = struct
 
   let add_transformation_row g db_transf tr_name =
     let parent = g.Model.goal_row in
-    let row = goals_model#append ~parent () in
-    let tr = { Model.parent_goal = g;
+    let row = goals_model#append ~parent:parent#iter () in
+    let tr = { Model.transf_name = tr_name;
+	       Model.parent_goal = g;
                Model.transf_proved = false;
-               Model.transf_row = row;
+               Model.transf_row = get_row_ref goals_model row;
                Model.transf_db = db_transf;
                subgoals = [];
              }
@@ -995,16 +998,16 @@ module Helpers = struct
 (*
     goals_model#set ~row ~column:Model.visible_column true;
 *)
-    goals_view#expand_row (goals_model#get_path parent);
+    goals_view#expand_row parent#path;
     tr
 
 
   let add_theory_row mfile th db_theory =
     let tname = th.Theory.th_name.Ident.id_string in
     let parent = mfile.file_row in
-    let row = goals_model#append ~parent () in
+    let row = goals_model#append ~parent:parent#iter () in
     let mth = { theory = th;
-                theory_row = row;
+                theory_row = get_row_ref goals_model row;
                 theory_db = db_theory;
                 theory_parent = mfile;
                 goals = [] ;
@@ -1043,7 +1046,7 @@ module Helpers = struct
   let add_file_row f dbfile =
       let parent = goals_model#append () in
       let mfile = { file_name = f;
-                    file_row = parent;
+                    file_row = get_row_ref goals_model parent;
                     file_db = dbfile;
                     theories = [] ;
                     file_verified = false }
@@ -1732,7 +1735,7 @@ let rec collapse_proved_goal g =
   if g.Model.proved then
     begin
       let row = g.Model.goal_row in
-      goals_view#collapse_row (goals_model#get_path row);
+      goals_view#collapse_row row#path;
     end
   else
     Hashtbl.iter
@@ -1743,7 +1746,7 @@ let collapse_verified_theory th =
   if th.Model.verified then
     begin
       let row = th.Model.theory_row in
-      goals_view#collapse_row (goals_model#get_path row);
+      goals_view#collapse_row row#path;
     end
   else
     List.iter collapse_proved_goal th.Model.goals
@@ -1752,7 +1755,7 @@ let collapse_verified_file f =
   if f.Model.file_verified then
     begin
       let row = f.Model.file_row in
-      goals_view#collapse_row (goals_model#get_path row);
+      goals_view#collapse_row row#path;
     end
   else
     List.iter collapse_verified_theory f.Model.theories
@@ -2256,7 +2259,7 @@ let () =
 
 let remove_proof_attempt a =
   Db.remove_proof_attempt a.Model.proof_db;
-  let (_:bool) = goals_model#remove a.Model.proof_row in
+  let (_:bool) = goals_model#remove a.Model.proof_row#iter in
   let g = a.Model.proof_goal in
   Hashtbl.remove g.Model.external_proofs a.Model.prover.Session.prover_id;
   Helpers.check_goal_proved g
@@ -2264,9 +2267,10 @@ let remove_proof_attempt a =
 
 let remove_transf t =
   Db.remove_transformation t.Model.transf_db;
-  let (_:bool) = goals_model#remove t.Model.transf_row in
+  let (_:bool) = goals_model#remove t.Model.transf_row#iter in
   let g = t.Model.parent_goal in
-  Hashtbl.remove g.Model.transformations "split" (* hack !! *);
+  let trname = t.Model.transf_name in
+  Hashtbl.remove g.Model.transformations trname;
   Helpers.check_goal_proved g
 
 
