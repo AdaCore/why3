@@ -330,6 +330,8 @@ and string_val key = parse
   | '\\' 'n'
       { Buffer.add_char buf '\n';
         string_val key lexbuf }
+  | '\\' '\n'
+      { string_val key lexbuf }
   | '\\' (_ as c)
       { Buffer.add_char buf '\\';
         Buffer.add_char buf c;
