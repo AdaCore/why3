@@ -359,12 +359,19 @@ let image_of_result ~obsolete result =
 
 module M = Session.Make
   (struct
-     type key = Gtk.tree_iter
+     type key = GTree.row_reference
 
-     let create ?parent () = goals_model#append ?parent ()
+     let create ?parent () =
+       let parent = match parent with
+         | None -> None
+         | Some r -> Some r#iter
+       in
+       let iter = goals_model#append ?parent () in
+       goals_model#get_row_reference (goals_model#get_path iter)
+
 
      let remove row =
-       let (_:bool) = goals_model#remove row in ()
+       let (_:bool) = goals_model#remove row#iter in ()
 
      let idle f =
        let (_ : GMain.Idle.id) = GMain.Idle.add f in ()
@@ -378,18 +385,18 @@ module M = Session.Make
 let set_row_status row b =
   if b then
     begin
-      goals_view#collapse_row (goals_model#get_path row);
-      goals_model#set ~row ~column:status_column !image_yes;
+      goals_view#collapse_row row#path;
+      goals_model#set ~row:row#iter ~column:status_column !image_yes;
     end
   else
     begin
-      goals_model#set ~row ~column:status_column !image_unknown;
+      goals_model#set ~row:row#iter ~column:status_column !image_unknown;
     end
 
 let set_proof_state ~obsolete a =
   let row = a.M.proof_key in
   let res = a.M.proof_state in
-  goals_model#set ~row ~column:status_column
+  goals_model#set ~row:row#iter ~column:status_column
     (image_of_result ~obsolete res);
   let t = match res with
     | Session.Done { Call_provers.pr_time = time } ->
@@ -397,7 +404,7 @@ let set_proof_state ~obsolete a =
     | _ -> ""
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
-  goals_model#set ~row ~column:time_column t
+  goals_model#set ~row:row#iter ~column:time_column t
 
 let model_index = Hashtbl.create 17
 
@@ -413,15 +420,15 @@ let init =
   fun row any ->
     incr cpt;
     Hashtbl.add model_index !cpt any;
-    goals_model#set ~row ~column:index_column !cpt;
-    goals_model#set ~row ~column:icon_column 
+    goals_model#set ~row:row#iter ~column:index_column !cpt;
+    goals_model#set ~row:row#iter ~column:icon_column 
       (match any with
 	 | M.Goal _ -> !image_file
 	 | M.Theory _ 
 	 | M.File _ -> !image_directory
 	 | M.Proof_attempt _ -> !image_prover
 	 | M.Transformation _ -> !image_transf);
-    goals_model#set ~row ~column:name_column 
+    goals_model#set ~row:row#iter ~column:name_column 
       (match any with
 	 | M.Goal g -> M.goal_expl g
 	 | M.Theory th -> M.theory_name th
@@ -711,7 +718,7 @@ let rec collapse_proved_goal g =
   if M.goal_proved g then
     begin
       let row = M.goal_key g in
-      goals_view#collapse_row (goals_model#get_path row);
+      goals_view#collapse_row row#path;
     end
   else
     Hashtbl.iter
@@ -722,7 +729,7 @@ let collapse_verified_theory th =
   if M.verified th then
     begin
       let row = M.theory_key th in
-      goals_view#collapse_row (goals_model#get_path row);
+      goals_view#collapse_row row#path;
     end
   else
     List.iter collapse_proved_goal (M.goals th)
@@ -731,7 +738,7 @@ let collapse_verified_file f =
   if f.M.file_verified then
     begin
       let row = f.M.file_key in
-      goals_view#collapse_row (goals_model#get_path row);
+      goals_view#collapse_row row#path;
     end
   else
     List.iter collapse_verified_theory f.M.theories
