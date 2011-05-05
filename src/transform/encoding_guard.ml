@@ -113,6 +113,18 @@ module Transform = struct
       Term.create_lsymbol (id_clone lsymbol.ls_name) args lsymbol.ls_value)
 
   (** {1 transformations} *)
+    (** todo use callback for this one *)
+  let rec f_open_all_quant q f = match f.f_node with
+    | Fquant (q', f) when q' = q ->
+      let vl, tr, f = f_open_quant f in
+      begin match tr with
+        | [] ->
+          let vl', tr, f = f_open_all_quant q f in
+          vl@vl', tr, f
+        | _ -> vl, tr, f
+      end
+    | _ -> [], [], f
+
 
   (** translation of terms *)
   let rec term_transform kept varM t =
@@ -130,14 +142,14 @@ module Transform = struct
     | Fapp(p,terms) ->
       let terms = List.map (term_transform kept varM) terms in
       f_app (findL p) terms
-    | Fquant(q,b) ->
-      let vsl,trl,fmla,cb = f_open_quant_cb b in
+    | Fquant(q,_) ->
+      let vsl,trl,fmla = f_open_all_quant q f in
       let fmla = fmla_transform kept varM fmla in
       let fmla2 = guard q kept varM fmla vsl in
         (* TODO : how to modify the triggers? *)
       let trl = tr_map (term_transform kept varM)
         (fmla_transform kept varM) trl in
-      f_quant q (cb vsl trl fmla2)
+      f_quant q (f_close_quant vsl trl fmla2)
     | _ -> (* otherwise : just traverse and translate *)
       f_map (term_transform kept varM) (fmla_transform kept varM) f(*   in *)
     (* Format.eprintf "fmla_to : %a@." Pretty.print_fmla f;f *)
@@ -165,8 +177,8 @@ module Transform = struct
   and f_type_close_select kept f' =
     let tvs = f_ty_freevars Stv.empty f' in
     let rec trans fn acc f = match f.f_node with
-      | Fquant(Fforall as q,b) -> (* Exists same thing? *)
-        let vsl,trl,fmla,cb = f_open_quant_cb b in
+      | Fquant(Fforall as q,_) -> (* Exists same thing? *)
+        let vsl,trl,fmla = f_open_all_quant q f in
         let add acc vs = (t_var vs)::acc in
         let acc = List.fold_left add acc vsl in
         let fn varM f =
@@ -174,7 +186,7 @@ module Transform = struct
           (* TODO : how to modify the triggers? *)
           let trl = tr_map (term_transform kept varM)
             (fmla_transform kept varM) trl in
-          fn varM (f_quant q (cb vsl trl fmla2))
+          fn varM (f_quant q (f_close_quant vsl trl fmla2))
         in
         let fn varM f = fn varM (fmla_transform kept varM f) in
         type_close_select tvs acc fn fmla
