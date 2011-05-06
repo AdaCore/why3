@@ -1,0 +1,52 @@
+
+module M
+
+  use import int.Int
+  use import module stdlib.Ref
+  use import array.Array
+
+  type pointer
+
+  logic null : pointer
+
+  parameter value : ref (t pointer int)
+  parameter next : ref (t pointer pointer)
+
+  inductive is_list (next : t pointer pointer) (p : pointer) =
+    | is_list_null: 
+        forall next : t pointer pointer, p : pointer. 
+        p = null -> is_list next p
+    | is_list_next: 
+        forall next : t pointer pointer, p : pointer. 
+        p <> null -> is_list next (get next p) -> is_list next p
+
+  logic sep_list_list (next : t pointer pointer) (p1 p2 : pointer)
+
+  axiom sep_list_list_p_null:
+    forall next : t pointer pointer, p : pointer. 
+    sep_list_list next p null
+
+  axiom sep_list_list_null_p:
+    forall next : t pointer pointer, p : pointer. 
+    sep_list_list next null p
+
+  let list_rev (p : ref pointer) =
+    { is_list next p }
+    let q = ref null in
+    while !p <> null do
+      invariant { is_list next p /\ is_list next q /\ sep_list_list next p q }
+      let tmp = get !next !p in
+      next := set !next !p !q;
+      q := !p;
+      p:= tmp
+    done;
+    q
+    { is_list next result }
+
+end
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/list_rev.gui"
+End: 
+*)
