@@ -436,7 +436,7 @@ let init =
 	 | M.Proof_attempt a -> let p = a.M.prover in
 	   p.Session.prover_name ^ " " ^ p.Session.prover_version
 	 | M.Transformation tr -> Session.transformation_id tr.M.transf)
-      
+
 let notify any =
   match any with
     | M.Goal g ->

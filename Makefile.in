@@ -502,6 +502,59 @@ endif
 
 
 ###############
+# Replayer
+###############
+
+REPLAYER_FILES = xml session replay
+
+REPLAYERMODULES = $(addprefix src/ide/, $(REPLAYER_FILES))
+
+REPLAYERML  = $(addsuffix .ml,  $(REPLAYERMODULES))
+REPLAYERMLI = $(addsuffix .mli, $(REPLAYERMODULES))
+REPLAYERCMO = $(addsuffix .cmo, $(REPLAYERMODULES))
+REPLAYERCMX = $(addsuffix .cmx, $(REPLAYERMODULES))
+
+$(REPLAYERCMO) $(REPLAYERCMX): INCLUDES += -I src/ide 
+
+# build targets
+
+byte: bin/why3replayer.byte
+opt:  bin/why3replayer.opt
+
+bin/why3replayer.opt: src/why.cmxa $(PGMCMX) $(REPLAYERCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	$(STRIP) $@
+
+bin/why3replayer.byte: src/why.cma $(PGMCMO) $(REPLAYERCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+bin/why3replayer: bin/why3replayer.@OCAMLBEST@
+	ln -sf why3replayer.@OCAMLBEST@ $@
+
+# depend and clean targets
+
+include .depend.replayer
+
+.depend.replayer: src/ide/xml.ml
+	$(OCAMLDEP) -slash -I src -I src/ide $(REPLAYERML) $(REPLAYERMLI) > $@
+
+depend: .depend.replayer
+
+clean::
+	rm -f src/ide/*.cm[iox] src/ide/*.o
+	rm -f src/ide/*.annot src/ide/*~
+	rm -f bin/why3replayer.byte bin/why3replayer.opt bin/why3replayer
+	rm -f .depend.replayer
+
+install_no_local::
+	cp -f bin/why3replayer.@OCAMLBEST@ $(BINDIR)/why3replayer
+
+install_local: bin/why3replayer
+
+
+###############
 # Bench
 ###############
 
