@@ -5,6 +5,6 @@ module M
 
   parameter foo : int -> int
 
-  parameter f : x:int -> {} unit writes foo {}
+  parameter f : x:int -> {} unit writes foo.contents {}
 
 end

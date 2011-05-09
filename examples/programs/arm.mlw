@@ -4,11 +4,12 @@
 module M
 
   use import module stdlib.Refint
+  use import array.ArrayLength
   use import module stdlib.Array
 
   parameter a : array int
 
-  logic inv (a : t int int) = 
+  logic inv (a : map int) = 
     a[0] = 0 and length a = 11 and forall k:int. 1 <= k <= 10 -> 0 < a[k]
 
   parameter loop1 : ref int
@@ -30,8 +31,8 @@ module M
 	variant { j }
         (* ghost *) incr loop2;
         let temp = a[!j] in
-        a[!j <- a[!j - 1]];
-        a[!j - 1 <- temp];
+        set a !j a[!j - 1];
+        set a (!j - 1) temp;
         decr j
       done;
       incr i
@@ -48,9 +49,9 @@ module ARM
 
   (* memory *)
   parameter mem : ref (t int int)
-  parameter mem_ldr : a:int -> {} int reads mem { result = mem[a] }
+  parameter mem_ldr : a:int -> {} int reads mem.contents { result = mem[a] }
   parameter mem_str : a:int -> v:int -> 
-    {} int writes mem { mem = (old mem)[a <- v] }
+    {} int writes mem.contents { mem = (old mem)[a <- v] }
 
   (* data segment *)
   (*
@@ -70,16 +71,16 @@ module ARM
   parameter pc : ref int (* pc *)
 
   parameter ldr : 
-    r:ref int -> a:int -> {} unit reads mem writes r { r = mem[a] }
+    r:ref int -> a:int -> {} unit reads mem.contents writes r.contents { r = mem[a] }
   parameter str : 
-    r:ref int -> a:int -> {} unit reads r writes mem { mem = (old mem)[a <- r] }
+    r:ref int -> a:int -> {} unit reads r.contents writes mem.contents { mem = (old mem)[a <- r] }
 
   (* condition flags *)
   parameter le : ref bool
 
   parameter cmp : r:ref int -> v:int -> 
     {} 
-    unit reads r writes le 
+    unit reads r.contents writes le.contents 
     { le=True <-> r <= v }
 
 end

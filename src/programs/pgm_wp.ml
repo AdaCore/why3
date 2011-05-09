@@ -55,8 +55,10 @@ let wp_implies f1 f2 = match f2.f_node with
   | Ffalse -> f_implies f1 f2
   | _ -> f_implies_simp f1 f2
 
-let find_ts uc s = ns_find_ts (get_namespace (theory_uc uc)) [s]
-let find_ls uc s = ns_find_ls (get_namespace (theory_uc uc)) [s]
+let find_ts ~pure uc s = 
+  ns_find_ts (get_namespace (if pure then pure_uc uc else impure_uc uc)) [s]
+let find_ls ~pure uc s =
+  ns_find_ls (get_namespace (if pure then pure_uc uc else impure_uc uc)) [s]
 
 let is_arrow_ty ty = match ty.ty_node with
   | Tyapp (ts, _) -> ts_equal ts ts_arrow
@@ -83,23 +85,34 @@ let wp_forall v f =
 (* utility functions for building WPs *)
 
 let fresh_label env =
-  let ty = ty_app (find_ts env "label_") [] in
+  let ty = ty_app (find_ts ~pure:true env "label_") [] in
   create_vsymbol (id_fresh "label") ty
 
 let wp_binder x f = match x.pv_tv with
-  | Tpure _ -> wp_forall x.pv_vs f
+  | Tpure _ -> wp_forall x.pv_pure f
   | Tarrow _ -> f
 
 let wp_binders = List.fold_right wp_binder
+
+let add_binder x rm =
+  let add r rm = 
+    let spv = 
+      try Spv.add x (Mreg.find r rm) with Not_found -> Spv.singleton x 
+    in
+    Mreg.add r spv rm 
+  in
+  Sreg.fold add x.pv_regions rm
+
+let add_binders = List.fold_right add_binder
 
 (* replace old(t) with at(t,lab) everywhere in formula f *)
 let rec old_label env lab f =
   f_map (old_label_term env lab) (old_label env lab) f
 
 and old_label_term env lab t = match t.t_node with
-  | Tapp (ls, [t]) when ls_equal ls (find_ls env "old") ->
+  | Tapp (ls, [t]) when ls_equal ls (find_ls ~pure:true env "old") ->
       let t = old_label_term env lab t in (* NECESSARY? *)
-      t_app (find_ls env "at") [t; t_var lab] t.t_ty
+      t_app (find_ls ~pure:true env "at") [t; t_var lab] t.t_ty
   | _ ->
       t_map (old_label_term env lab) (old_label env lab) t
 
@@ -109,41 +122,102 @@ let rec erase_label env lab f =
 
 and erase_label_term env lab t = match t.t_node with
   | Tapp (ls, [t; {t_node = Tvar l}])
-    when ls_equal ls (find_ls env "at") && vs_equal l lab ->
+    when ls_equal ls (find_ls ~pure:true env "at") && vs_equal l lab ->
       erase_label_term env lab t
   | _ ->
       t_map (erase_label_term env lab) (erase_label env lab) t
 
-let rec unref env r v f =
-  f_map (unref_term env r v) (unref env r v) f
+let rec unref env s f =
+  f_map (unref_term env s) (unref env s) f
 
-and unref_term env r v t = match r, t.t_node with
+and unref_term env s t = match t.t_node with
+(***
   | R.Rglobal {p_ls=ls1}, Tapp (ls2, _) when ls_equal ls1 ls2 ->
       t_var v
   | R.Rlocal {pv_vs=vs1}, Tvar vs2 when vs_equal vs1 vs2 ->
       t_var v
-  | _, Tapp (ls, _) when ls_equal ls (find_ls env "old") ->
+***)
+  | Tvar vs ->
+      begin try t_var (Mvs.find vs s) with Not_found -> t end
+  | Tapp (ls, _) when ls_equal ls (find_ls ~pure:true env "old") ->
       assert false
-  | _, Tapp (ls, _) when ls_equal ls (find_ls env "at") -> 
+  | Tapp (ls, _) when ls_equal ls (find_ls ~pure:true env "at") -> 
       (* do not recurse in at(...) *)
       t
   | _ ->
-      t_map (unref_term env r v) (unref env r v) t
+      t_map (unref_term env s) (unref env s) t
 
-(* quantify over all references in ef *)
-let quantify ?(all=false) env ef f =
-  (* eprintf "quantify: ef=%a f=%a@." E.print ef Pretty.print_fmla f; *)
-  let quantify1 r f =
-    let ty = R.type_of r in
-    let v = create_vsymbol (id_clone (R.name_of r)) ty in
-    let f = unref env r v f in
-    wp_forall v f
+let has_singleton_type pv = is_singleton_ty pv.pv_effect.vs_ty
+
+(* quantify over all references in ef 
+   ef : effect
+   rm : region -> pvsymbol set
+   f  : formula
+
+   let ef = { rho1, ..., rhon }
+   we collect in vars all variables involving these regions
+   let vars = { v1, ..., vm }
+
+     forall r1:ty(rho1). ... forall rn:ty(rhon).
+     forall v'1. v'1 = update v1 r ->
+     ...
+     forall v'm. v'm = update vm r ->
+     f[vi <- v'i]
+
+  an optimization is performed for singleton types
+  instead of
+     forall r. forall v'. v' = r -> f[v <- v']
+  we build
+     forall v'. f[v <- v']
+
+*)
+let quantify ?(all=false) env rm ef f =
+(*   eprintf "@[<hov 2>quantify: all=%b ef=%a f=@[%a@]@]@."  *)
+(*     all E.print ef Pretty.print_fmla f; *)
+  let sreg = ef.E.writes in
+  let sreg =
+    if all then 
+      Spv.fold (fun pv s -> Sreg.union pv.pv_regions s)
+	ef.E.globals (Sreg.union ef.E.reads sreg) 
+    else 
+      sreg 
   in
-  let s = ef.E.writes in
-  let s = if all then Sref.union ef.E.reads s else s in
-  Sref.fold quantify1 s f
+  (* mreg: rho -> rho' *)
+  let mreg =
+    let add r m = 
+      let v = create_vsymbol (id_clone r.R.r_tv.tv_name) r.R.r_ty in
+      Mreg.add r v m
+    in
+    Sreg.fold add sreg Mreg.empty
+  in
+  (* all program variables involving these regions *)
+  let vars = 
+    let add r _ s = try Spv.union (Mreg.find r rm) s with Not_found -> s in
+    Mreg.fold add mreg Spv.empty
+  in
+  (* s: v -> r'/v' and vars': pv -> v' *)
+  let mreg, s, vv' =
+    let add pv (mreg, s, vv') = 
+      if has_singleton_type pv then begin
+	assert (Sreg.cardinal pv.pv_regions = 1);
+	let r = Sreg.choose pv.pv_regions in
+	let v = create_vsymbol (id_clone pv.pv_name) r.R.r_ty in
+	let mreg = Mreg.add r v mreg in
+	mreg, Mvs.add pv.pv_pure v s, vv'
+      end else
+	assert false (*TODO*) 
+    in
+    Spv.fold add vars (mreg, Mvs.empty, Mpv.empty)
+  in
+  let f = unref env s f in
+  let quantify_v' _pv _v' _f = 
+    assert false (*TODO: update*)
+  in
+  let f = Mpv.fold quantify_v' vv' f in
+  let quantify_r _ r' f = wp_forall r' f in
+  Mreg.fold quantify_r mreg f
 
-let abstract_wp env ef (q',ql') (q,ql) =
+let abstract_wp env rm ef (q',ql') (q,ql) =
   assert (List.length ql' = List.length ql);
   let quantify_res f' f res =
     let f = wp_implies f' f in
@@ -156,7 +230,7 @@ let abstract_wp env ef (q',ql') (q,ql) =
       | None ->
 	  f
     in
-    quantify env ef f
+    quantify env rm ef f
   in
   let quantify_h (e',(x',f')) (e,(x,f)) =
     assert (ls_equal e' e);
@@ -177,10 +251,10 @@ let abstract_wp env ef (q',ql') (q,ql) =
   in
   wp_ands (f :: List.map2 quantify_h ql' ql)
 
-let opaque_wp env ef q' q =
+let opaque_wp env rm ef q' q =
   let lab = fresh_label env in
   let q' = post_map (old_label env lab) q' in
-  let f = abstract_wp env ef q' q in
+  let f = abstract_wp env rm ef q' q in
   erase_label env lab f
 
 (*s [filter_post k q] removes exc. postconditions from [q] which do not
@@ -233,7 +307,7 @@ let default_exns_post ef =
   List.map default_exn_post xs
 
 let term_at env lab t =
-  t_app (find_ls env "at") [t; t_var lab] t.t_ty
+  t_app (find_ls ~pure:true env "at") [t; t_var lab] t.t_ty
 
 let wp_expl l f =
   f_label ?loc:f.f_loc (("expl:"^l)::Split_goal.stop_split::f.f_label) f
@@ -245,8 +319,9 @@ let while_post_block env inv var lab e =
     | Some (phi, None) ->
 	let old_phi = term_at env lab phi in
 	(* 0 <= old_phi and phi < old_phi *)
-	wp_and (f_app (find_ls env "infix <=") [t_int_const "0"; old_phi])
-	       (f_app (find_ls env "infix <")  [phi; old_phi])
+	wp_and (f_app (find_ls ~pure:true env "infix <=") 
+		  [t_int_const "0"; old_phi])
+	       (f_app (find_ls ~pure:true env "infix <")  [phi; old_phi])
     | Some (phi, Some r) ->
 	f_app r [phi; term_at env lab phi]
   in
@@ -263,26 +338,30 @@ let well_founded_rel = function
   | None -> f_true
   | Some (_,_r) -> f_true (* TODO: Papp (well_founded, [Tvar r], []) *)
 
-
 (* Recursive computation of the weakest precondition *)
 
 let wp_label ?loc f =
   if List.mem "WP" f.f_label then f
   else f_label ?loc ("WP"::f.f_label) f
 
-
 let t_True env =
-  t_app (find_ls env "True") [] (ty_app (find_ts env "bool") [])
+  t_app (find_ls ~pure:true env "True") [] 
+    (ty_app (find_ts ~pure:true env "bool") [])
 
 (*
 let add_expl msg f =
   f_label_add Split_goal.stop_split (f_label_add ("expl:"^msg) f) 
 *)
 
-let rec wp_expr env e q =
+(* 
+  env : module_uc
+  rm  : Spv.t Mreg.t (maps regions to pvsymbol sets)
+*)
+
+let rec wp_expr env rm e q =
   let lab = fresh_label env in
   let q = post_map (old_label env lab) q in
-  let f = wp_desc env e q in
+  let f = wp_desc env rm e q in
   let f = erase_label env lab f in
   let f = wp_label ~loc:e.expr_loc f in
   if Debug.test_flag debug then begin
@@ -292,36 +371,36 @@ let rec wp_expr env e q =
   end;
   f
 
-and wp_desc env e q = match e.expr_desc with
+and wp_desc env rm e q = match e.expr_desc with
   | Elogic t ->
       let (v, q), _ = q in
       f_subst_single v t q
   | Elocal v ->
       let (res, q), _ = q in
-      f_subst (subst1 res (t_var v.pv_vs)) q
-  | Eglobal s when is_arrow_ty s.p_ty ->
+      f_subst (subst1 res (t_var v.pv_pure)) q
+  | Eglobal (PSfun _) ->
       let (_, q), _ = q in q
-  | Eglobal s ->
+  | Eglobal (PSvar pv) ->
       let (v, q), _ = q in
-      f_subst_single v (t_app_infer s.p_ls []) q
+      f_subst_single v (t_var pv.pv_pure) q
   | Efun (bl, t) ->
       let (_, q), _ = q in
-      let f = wp_triple env t in
-      wp_and q (wp_binders bl f)
+      let f = wp_triple env rm bl t in
+      wp_and q f
   | Elet (x, e1, e2) ->
-      let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
-      let v1 = v_result x.pv_vs.vs_ty in
+      let w2 = wp_expr env rm e2 (filter_post e2.expr_effect q) in
+      let v1 = v_result x.pv_pure.vs_ty in
       let t1 = t_label ~loc:e1.expr_loc ["let"] (t_var v1) in
-      let q1 = v1, f_subst (subst1 x.pv_vs t1) w2 in
+      let q1 = v1, f_subst (subst1 x.pv_pure t1) w2 in
       let q1 = saturate_post e1.expr_effect q1 q in
-      wp_expr env e1 q1
+      wp_expr env rm e1 q1
   | Eletrec (dl, e1) ->
-      let w1 = wp_expr env e1 q in
-      let wl = List.map (wp_recfun env) dl in
+      let w1 = wp_expr env rm e1 q in
+      let wl = List.map (wp_recfun env rm) dl in
       wp_ands ~sym:true (w1 :: wl)
   | Eif (e1, e2, e3) ->
-      let w2 = wp_expr env e2 (filter_post e2.expr_effect q) in
-      let w3 = wp_expr env e3 (filter_post e3.expr_effect q) in
+      let w2 = wp_expr env rm e2 (filter_post e2.expr_effect q) in
+      let w3 = wp_expr env rm e3 (filter_post e3.expr_effect q) in
       let q1 = (* if result=True then w2 else w3 *)
 	let res = v_result e1.expr_type in
 	let test = f_equ (t_var res) (t_True env) in
@@ -329,32 +408,33 @@ and wp_desc env e q = match e.expr_desc with
 	let q1 = f_if test w2 w3 in
 	saturate_post e1.expr_effect (res, q1) q
       in
-      wp_expr env e1 q1
+      wp_expr env rm e1 q1
   | Eloop ({ loop_invariant = inv; loop_variant = var }, e1) ->
       let wfr = well_founded_rel var in
       let lab = fresh_label env in
       let q1 = while_post_block env inv var lab e1 in
       let q1 = sup q1 q in (* exc. posts taken from [q] *)
-      let we = wp_expr env e1 q1 in
+      let we = wp_expr env rm e1 q1 in
       let we = erase_label env lab we in
       let w = match inv with
 	| None ->
-	    wp_and wfr (quantify env e.expr_effect we)
+	    wp_and wfr (quantify env rm e.expr_effect we)
 	| Some i ->
 	    wp_and wfr
 	      (wp_and ~sym:true
 		 (wp_expl "loop invariant init" i)
-		 (quantify env e.expr_effect (wp_implies i we)))
+		 (quantify env rm e.expr_effect (wp_implies i we)))
 	in
 	w
   (* optimization for the particular case let _ = y in e *)
   | Ematch (_, [{ppat_pat = {pat_node = Term.Pwild}}, e]) ->
-      wp_expr env e (filter_post e.expr_effect q)
+      wp_expr env rm e (filter_post e.expr_effect q)
   | Ematch (x, bl) ->
       let branch (p, e) =
-        f_close_branch p.ppat_pat (wp_expr env e (filter_post e.expr_effect q))
+        f_close_branch p.ppat_pat 
+	  (wp_expr env rm e (filter_post e.expr_effect q))
       in
-      let t = t_var x.pv_vs in
+      let t = t_var x.pv_pure in
       f_case t (List.map branch bl)
   | Eabsurd ->
       f_false
@@ -370,14 +450,14 @@ and wp_desc env e q = match e.expr_desc with
 	| None, _ -> assert false
       in
       let q1 = filter_post e1.expr_effect q1 in
-      wp_expr env e1 q1
+      wp_expr env rm e1 q1
   | Etry (e1, hl) ->
       (* $wp(try e1 with E -> e2, Q, R) = wp(e1, Q, wp(e2, Q, R))$ *)
       let hwl =
 	List.map
 	  (fun (x, v, h) ->
-	     let w = wp_expr env h (filter_post h.expr_effect q) in
-	     let v = option_map (fun v -> v.pv_vs) v in
+	     let w = wp_expr env rm h (filter_post h.expr_effect q) in
+	     let v = option_map (fun v -> v.pv_pure) v in
 	     x, (v, w))
 	  hl
       in
@@ -389,7 +469,7 @@ and wp_desc env e q = match e.expr_desc with
       in
       let q1 = saturate_post e1.expr_effect (fst q) q in
       let q1 = filter_post e1.expr_effect (make_post q1) in
-      wp_expr env e1 q1
+      wp_expr env rm e1 q1
   | Efor (x, v1, d, v2, inv, e1) ->
       (* wp(for x = v1 to v2 do inv { I(x) } e1, Q, R) =
              v1 > v2  -> Q
@@ -400,33 +480,35 @@ and wp_desc env e q = match e.expr_desc with
       let (res, q1), _ = q in
       let gt, le, incr = match d with
 	| Ptree.To     -> 
-	    find_ls env "infix >", find_ls env "infix <=", t_int_const  "1"
+	    find_ls ~pure:true env "infix >", 
+	    find_ls ~pure:true env "infix <=", t_int_const  "1"
 	| Ptree.Downto -> 
-	    find_ls env "infix <", find_ls env "infix >=", t_int_const "-1"
+	    find_ls ~pure:true env "infix <", 
+	    find_ls ~pure:true env "infix >=", t_int_const "-1"
       in
-      let v1_gt_v2 = f_app gt [t_var v1.pv_vs; t_var v2.pv_vs] in
-      let v1_le_v2 = f_app le [t_var v1.pv_vs; t_var v2.pv_vs] in
+      let v1_gt_v2 = f_app gt [t_var v1.pv_pure; t_var v2.pv_pure] in
+      let v1_le_v2 = f_app le [t_var v1.pv_pure; t_var v2.pv_pure] in
       let inv = match inv with Some inv -> inv | None -> f_true in
-      let add = find_ls env "infix +" in
+      let add = find_ls~pure:true env "infix +" in
       let wp1 =
-	let xp1 = t_app add [t_var x.pv_vs; incr] ty_int in
-	let post = f_subst (subst1 x.pv_vs xp1) inv in
+	let xp1 = t_app add [t_var x.pv_pure; incr] ty_int in
+	let post = f_subst (subst1 x.pv_pure xp1) inv in
 	let q1 = saturate_post e1.expr_effect (res, post) q in
-	wp_expr env e1 q1
+	wp_expr env rm e1 q1
       in
       let f = wp_and ~sym:true
 	(wp_expl "for loop initialization"
-	   (f_subst (subst1 x.pv_vs (t_var v1.pv_vs)) inv))
-	(quantify env e.expr_effect
+	   (f_subst (subst1 x.pv_pure (t_var v1.pv_pure)) inv))
+	(quantify env rm e.expr_effect
 	   (wp_and ~sym:true
 	      (wp_expl "for loop preservation"
-		(wp_forall x.pv_vs
+		(wp_forall x.pv_pure
 	         (wp_implies 
-		    (wp_and (f_app le [t_var v1.pv_vs; t_var x.pv_vs])
-		            (f_app le [t_var x.pv_vs;  t_var v2.pv_vs]))
+		    (wp_and (f_app le [t_var v1.pv_pure; t_var x.pv_pure])
+		            (f_app le [t_var x.pv_pure;  t_var v2.pv_pure]))
                  (wp_implies inv wp1))))
-	      (let sv2 = t_app add [t_var v2.pv_vs; incr] ty_int in
-	       wp_implies (f_subst (subst1 x.pv_vs sv2) inv) q1)))
+	      (let sv2 = t_app add [t_var v2.pv_pure; incr] ty_int in
+	       wp_implies (f_subst (subst1 x.pv_pure sv2) inv) q1)))
       in
       wp_and ~sym:true (wp_implies v1_gt_v2 q1) (wp_implies v1_le_v2 f)
 
@@ -440,53 +522,58 @@ and wp_desc env e q = match e.expr_desc with
       let (_, q), _ = q in
       wp_implies f q
   | Elabel (lab, e1) ->
-      let w1 = wp_expr env e1 q in
+      let w1 = wp_expr env rm e1 q in
       erase_label env lab w1
   | Eany c ->
       (* TODO: propagate call labels into c.c_post *)
-      let w = opaque_wp env c.c_effect c.c_post q in
+      let w = opaque_wp env rm c.c_effect c.c_post q in
       let p = wp_expl "precondition" c.c_pre in
       let p = f_label ~loc:e.expr_loc p.f_label p in
       wp_and p w
 
-and wp_triple env (p, e, q) =
+and wp_triple env rm bl (p, e, q) =
+  let rm = add_binders bl rm in
   let q =
-    match q with
-      | ((v,q),l) ->
-          (v,wp_expl "normal postcondition" q),
-          List.map (fun (e,(v,q)) ->
-                      e,(v,wp_expl "exceptional postcondition" q)) l
+    let (v, q), l = q in
+    (v, wp_expl "normal postcondition" q),
+    List.map (fun (e, (v, q)) ->
+                e, (v, wp_expl "exceptional postcondition" q)) l
   in
-  let f = wp_expr env e q in
+  let f = wp_expr env rm e q in
   let f = wp_implies p f in
-  quantify ~all:true env e.expr_effect f
-
-and wp_recfun env (_, bl, _var, t) =
-  let f = wp_triple env t in
+  let f = quantify ~all:true env rm e.expr_effect f in
   wp_binders bl f
 
+and wp_recfun env rm (_, bl, _var, t) =
+  wp_triple env rm bl t
+
+let global_regions = ref Mreg.empty
+
+let declare_global_regions pv = global_regions := add_binder pv !global_regions
+
 let wp env e =
-  wp_expr env e (default_post e.expr_type e.expr_effect)
+  let rm = !global_regions in
+  wp_expr env rm e (default_post e.expr_type e.expr_effect)
 
 let rec t_btop env t = match t.t_node with
   | Tif (f,t1,t2) -> let f = f_btop env f in
       f_label t.t_label (f_if_simp f (t_btop env t1) (t_btop env t2))
-  | Tapp (ls, [t1;t2]) when ls_equal ls (find_ls env "andb") ->
+  | Tapp (ls, [t1;t2]) when ls_equal ls (find_ls ~pure:true env "andb") ->
       f_label t.t_label (f_and_simp (t_btop env t1) (t_btop env t2))
-  | Tapp (ls, [t1;t2]) when ls_equal ls (find_ls env "orb") ->
+  | Tapp (ls, [t1;t2]) when ls_equal ls (find_ls ~pure:true env "orb") ->
       f_label t.t_label (f_or_simp (t_btop env t1) (t_btop env t2))
-  | Tapp (ls, [t1]) when ls_equal ls (find_ls env "notb") ->
+  | Tapp (ls, [t1]) when ls_equal ls (find_ls ~pure:true env "notb") ->
       f_label t.t_label (f_not_simp (t_btop env t1))
-  | Tapp (ls, []) when ls_equal ls (find_ls env "True") ->
+  | Tapp (ls, []) when ls_equal ls (find_ls ~pure:true env "True") ->
       f_label t.t_label f_true
-  | Tapp (ls, []) when ls_equal ls (find_ls env "False") ->
+  | Tapp (ls, []) when ls_equal ls (find_ls ~pure:true env "False") ->
       f_label t.t_label f_false
   | _ ->
       f_equ t (t_True env)
 
 and f_btop env f = match f.f_node with
   | Fapp (ls, [{t_ty = {ty_node = Tyapp (ts, [])}} as l; r])
-  when ls_equal ls ps_equ && ts_equal ts (find_ts env "bool") ->
+  when ls_equal ls ps_equ && ts_equal ts (find_ts ~pure:true env "bool") ->
       f_label_copy f (f_iff_simp (t_btop env l) (t_btop env r))
   | _ -> f_map (fun t -> t) (f_btop env) f
 
@@ -498,7 +585,7 @@ let add_wp_decl ps f uc =
   (* printf "wp: f=%a@." print_fmla f; *)
   let pr = create_prsymbol id in
   let d = create_prop_decl Pgoal pr f in
-  add_logic_decl d uc
+  add_pure_decl d uc
 
 let decl uc = function
   | Pgm_ttree.Dlet ({ p_name = n } as ps, e) ->
@@ -509,7 +596,7 @@ let decl uc = function
       add_wp_decl ps f uc
   | Pgm_ttree.Dletrec dl ->
       let add_one uc ({ p_name = n } as ps, def) =
-	let f = wp_recfun uc def in
+	let f = wp_recfun uc Mreg.empty def in
 	Debug.dprintf debug "wp %s = %a@\n----------------@."
 	   n.id_string Pretty.print_fmla f;
 	add_wp_decl ps f uc

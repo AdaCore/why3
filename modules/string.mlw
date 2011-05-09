@@ -3,7 +3,7 @@ module Char
 
   use import int.Int
 
-  abstract type char model int
+  type char model int
 
   parameter chr : x:int -> { 0 <= x <= 255 } char { result = x }
 
@@ -35,9 +35,9 @@ module String
 
   use import int.Int
   use import module Char
-  use array.ArrayRich as S
+  use array.Array as S
 
-  mutable type string model S.t int char
+  type string model {| length : int; mutable chars : S.t int char |}
 
   parameter create : len:int -> { len >= 0 } string { S.length result = len }
 
@@ -94,9 +94,9 @@ module Buffer
   use import module Char
   use import module String
 
-  mutable type t model S.t int char
+  type t model {| length : int; mutable contents : S.t int char |}
 
-  parameter create : size:int -> { size >= 0 } t { S.length result = 0 }
+  parameter create : size:int -> { size >= 0 } t { result.length = 0 }
     (** [size] is only given as a hint for the initial size *)
 
   parameter contents : b:t -> { } string { result = b }

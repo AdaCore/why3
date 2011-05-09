@@ -26,6 +26,7 @@ open Theory
 
 type type_var
 
+val find_type_var : loc:Ptree.loc -> type_var Htv.t -> tvsymbol -> type_var
 val create_ty_decl_var : ?loc:Ptree.loc -> user:bool -> tvsymbol -> type_var
 
 type dty

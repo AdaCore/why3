@@ -25,3 +25,5 @@ val decl : Pgm_module.uc -> Pgm_ttree.decl -> Pgm_module.uc
   (** weakest preconditions: takes a module (under construction) as argument,
       and a program declaration, and adds the verification conditions for that
       declaration as goals (in the logic theory contained in the module). *)
+
+val declare_global_regions : Pgm_types.T.pvsymbol -> unit

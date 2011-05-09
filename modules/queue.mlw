@@ -7,7 +7,7 @@ module Queue
   use import list.Append
   use import list.Length
 
-  mutable type t 'a model list 'a
+  type t 'a model {| mutable contents : list 'a |}
 
   parameter create : unit -> {} t 'a { result = Nil }
 

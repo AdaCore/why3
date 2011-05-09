@@ -104,6 +104,18 @@ val list_first : ('a -> 'b option) -> 'a list -> 'b
     [f] to an element of [l] which doesn't return [None]. [raise
     Not_found] if all the element of [l] return [None] *)
 
+val list_mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
+val list_iteri : (int -> 'a -> unit) -> 'a list -> unit
+val list_fold_lefti : ('a -> int -> 'b -> 'a) -> 'a -> 'b list -> 'a
+  (** similar to List.map, List.iter and List.fold_left, 
+      but with element index passed as extra argument (in 0..len-1) *)
+
+val prefix : int -> 'a list -> 'a list
+  (** the first n elements of a list *)
+val chop : int -> 'a list -> 'a list
+  (** removes the first n elements of a list; 
+      raises Invalid_argument if the list is not long enough *)
+
 (* boolean fold accumulators *)
 
 exception FoldSkip

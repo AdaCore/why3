@@ -135,13 +135,16 @@ let create_denv uc = {
   dvars = Mstr.empty;
 }
 
+let create_user_type_var x =
+  (* TODO: shouldn't we localize this ident? *)
+  let v = create_tvsymbol (id_fresh x) in
+  create_ty_decl_var ~user:true v
+
 let find_user_type_var x env =
   try
     Hashtbl.find env.utyvars x
   with Not_found ->
-    (* TODO: shouldn't we localize this ident? *)
-    let v = create_tvsymbol (id_fresh x) in
-    let v = create_ty_decl_var ~user:true v in
+    let v = create_user_type_var x in
     Hashtbl.add env.utyvars x v;
     v
 
@@ -828,13 +831,13 @@ let add_types dl th =
   in
   let tysymbols = Hashtbl.create 17 in
   let rec visit x =
+    let d = Mstr.find x def in
     try
       match Hashtbl.find tysymbols x with
-	| None -> error CyclicTypeDef
+	| None -> error ~loc:d.td_loc CyclicTypeDef
 	| Some ts -> ts
     with Not_found ->
       Hashtbl.add tysymbols x None;
-      let d = Mstr.find x def in
       let vars = Hashtbl.create 17 in
       let vl = List.map (fun id ->
         if Hashtbl.mem vars id.id then
@@ -918,7 +921,10 @@ let add_types dl th =
   in
   List.fold_left add_projections th dl
 
-let record_typedef td = match td.td_def with
+let prepare_typedef td = 
+  if td.td_model then 
+    errorm ~loc:td.td_loc "model types are not allowed in the logic";
+  match td.td_def with
   | TDabstract | TDalgebraic _ | TDalias _ ->
       td
   | TDrecord fl ->
@@ -931,7 +937,7 @@ let record_typedef td = match td.td_def with
       { td with td_def = TDalgebraic [td.td_loc, id, List.map field fl] }
 
 let add_types dl th =
-  add_types (List.map record_typedef dl) th
+  add_types (List.map prepare_typedef dl) th
 
 let env_of_vsymbol_list vl =
   List.fold_left (fun env v -> Mstr.add v.vs_name.id_string v env) Mstr.empty vl

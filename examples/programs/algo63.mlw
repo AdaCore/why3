@@ -22,7 +22,7 @@ module Algo63
   parameter partition : 
     a : array int -> m:int -> n:int -> i:ref int -> j:ref int ->
     { m < n } 
-    unit writes a i j
+    unit writes a.contents i.contents j.contents
     { m <= j and j < i and i <= n and permut (old a) a m n and
       exists x:int.
         (forall r:int. m <= r <= j -> a[r] <= x) and

@@ -1,33 +1,73 @@
-module P
+
+module TestRef
 
   use import int.Int
   use import module stdlib.Ref
 
-  parameter r : ref int
-  parameter fresh : unit -> {} unit writes r { r = old r + 1 }
+  let f1 (x : ref int) (y : ref int) =
+     {}
+     x := !x + 1;
+     y := 2
+     { x = 1 and y = 2 }
 
-  let rec f () =
-    {}
-    if any bool then
-      fresh ()
-    else begin
-      f (); f ()
-    end
-    { r > old r }
+  let f2 (x: ref int) = {} x := 1 { x=1 }
 
-  exception Exit int
+  let g (n: ref int) =
+    n := 1;
+    assert { n = 1 };
+    n := 2;
+    assert { n = 2 }
 
-  let foo () =
-    {} 
-    let x = ref 0 in
-    loop 
-      x := !x + 1;
-      if !x = 100 then raise (Exit !x)
-    end
-    { false } | Exit -> { result = 100 }
+  parameter a : ref int
+
+  parameter havoc : unit -> {} unit writes a.contents {a=1}
+
+  let foo () = { a=0 } havoc(); 1 { a=1 and result=1 }
+
+  let bar () = { a=0 } a := 1 { a=1 }
+
+  (* TODO: 
+     le programme "let f n = n := 1" 
+     provoque "undefined type variable" (la région) 
+     problème : comment faire l'inférence du type de n
+  *)
+end
+
+module Array
+
+  type t
+
+  logic get t : int
+
+  let foo (x : t) = get x
 
 end
 
+(***
+
+module TestArray
+
+  use import int.Int
+  use import module stdlib.Array
+
+  (* TODO: update *)
+  let f (x: array int) = 
+    { x.length = 2 } 
+    set x 0 1; 
+    set x 1 2
+    { x[1] = 2 and x.length = 2 }
+
+end
+
+module Q 
+
+  use import list.List
+
+  type queue model {| mutable contents : list int |}
+
+end
+
+***)
 
 (*
 Local Variables: 

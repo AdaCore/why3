@@ -177,7 +177,7 @@
 %token COLON COMMA
 %token DOT EQUAL FUNC LAMBDA LTGT
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTREC LEFTSQ
-%token LRARROW
+%token LARROW LRARROW
 %token PRED QUOTE
 %token RIGHTPAR RIGHTREC RIGHTSQ
 %token TILDE UNDERSCORE
@@ -207,13 +207,14 @@
 %right ARROW IMPLIES LRARROW IFF
 %right OR BARBAR
 %right AND AMPAMP
-%nonassoc NOT
+%nonassoc NOT TILDE
 %left EQUAL LTGT OP1
-%nonassoc RIGHTSQ    /* stronger than OP1 for e1[e2 op1 e3] */
+%nonassoc LARROW
+%nonassoc RIGHTSQ    /* stronger than <- for e1[e2 <- e3] */
 %left OP2
 %left OP3
 %left OP4
-%nonassoc prefix_op
+%nonassoc prec_prefix_op
 %left prec_app
 %nonassoc LEFTSQ
 %nonassoc OPPREF
@@ -379,8 +380,9 @@ list1_type_decl:
 
 type_decl:
 | lident labels type_args typedefn
-  { { td_loc = floc (); td_ident = add_lab $1 $2;
-      td_params = $3; td_def = $4 } }
+  { let model, def = $4 in
+    { td_loc = floc (); td_ident = add_lab $1 $2;
+      td_params = $3; td_model = model; td_def = def } }
 ;
 
 type_args:
@@ -389,11 +391,16 @@ type_args:
 ;
 
 typedefn:
-| /* epsilon */           { TDabstract }
-| EQUAL primitive_type    { TDalias $2 }
-| EQUAL typecases         { TDalgebraic $2 }
-| EQUAL BAR typecases     { TDalgebraic $3 }
-| EQUAL record_type       { TDrecord $2 }
+| /* epsilon */                 { false, TDabstract }
+| equal_model primitive_type    { $1, TDalias $2 }
+| equal_model typecases         { $1, TDalgebraic $2 }
+| equal_model BAR typecases     { $1, TDalgebraic $3 }
+| equal_model record_type       { $1, TDrecord $2 }
+;
+
+equal_model:
+| EQUAL { false }
+| MODEL { true }
 ;
 
 record_type:
@@ -548,7 +555,7 @@ lexpr:
    { mk_pp (PPinfix ($1, mk_id (infix $2) (floc_i 2), $3)) }
 | lexpr OP4 lexpr
    { mk_pp (PPinfix ($1, mk_id (infix $2) (floc_i 2), $3)) }
-| any_op lexpr %prec prefix_op
+| prefix_op lexpr %prec prec_prefix_op
    { mk_pp (PPapp (Qident (mk_id (prefix $1) (floc_i 2)), [$2])) }
 | qualid list1_lexpr_arg
    { mk_pp (PPapp ($1, $2)) }
@@ -611,7 +618,7 @@ lexpr_arg:
 ;
 
 lexpr_dot:
-| lqualid_rich
+| lqualid_poor
    { mk_pp (PPvar $1) }
 | OPPREF lexpr_dot
    { mk_pp (PPapp (Qident (mk_id (prefix $1) (floc_i 2)), [$2])) }
@@ -620,7 +627,7 @@ lexpr_dot:
 ;
 
 lexpr_sub:
-| lexpr_dot DOT lqualid
+| lexpr_dot DOT lqualid_rich
    { mk_pp (PPapp ($3, [$1])) }
 | LEFTPAR lexpr RIGHTPAR
    { $2 }
@@ -634,9 +641,8 @@ lexpr_sub:
    { mk_pp (PPupdate ($2, List.rev $4)) }
 | lexpr_arg LEFTSQ lexpr RIGHTSQ
    { mk_pp (PPapp (Qident (mk_id (misfix "[]") (floc ())), [$1; $3])) }
-| lexpr_arg LEFTSQ lexpr OP1 lexpr RIGHTSQ
-   { let op = "[" ^ $4 ^ "]" in
-     mk_pp (PPapp (Qident (mk_id (misfix op) (floc ())), [$1; $3; $5])) }
+| lexpr_arg LEFTSQ lexpr LARROW lexpr RIGHTSQ
+   { mk_pp (PPapp (Qident (mk_id (misfix "[<-]") (floc ())), [$1; $3; $5])) }
 ;
 
 quant:
@@ -806,14 +812,14 @@ lident_rich:
     { mk_id (infix $2) (floc ()) }
 | LEFTPAR_STAR_RIGHTPAR
     { mk_id (infix "*") (floc ()) }
-| LEFTPAR lident_op UNDERSCORE RIGHTPAR
+| LEFTPAR prefix_op UNDERSCORE RIGHTPAR
     { mk_id (prefix $2) (floc ()) }
 | LEFTPAR OPPREF RIGHTPAR
     { mk_id (prefix $2) (floc ()) }
 | LEFTPAR LEFTSQ RIGHTSQ RIGHTPAR
     { mk_id (misfix "[]") (floc ()) }
-| LEFTPAR LEFTSQ OP1 RIGHTSQ RIGHTPAR
-    { mk_id (misfix ("[" ^ $3 ^ "]")) (floc ()) }
+| LEFTPAR LEFTSQ LARROW RIGHTSQ RIGHTPAR
+    { mk_id (misfix "[<-]") (floc ()) }
 ;
 
 lident:
@@ -822,14 +828,14 @@ lident:
 ;
 
 lident_op:
-| OP1   { $1 }
-| OP2   { $1 }
-| OP3   { $1 }
-| OP4   { $1 }
-| EQUAL { "=" }
+| OP1    { $1 }
+| OP2    { $1 }
+| OP3    { $1 }
+| OP4    { $1 }
+| EQUAL  { "=" }
 ;
 
-any_op:
+prefix_op:
 | OP1   { $1 }
 | OP2   { $1 }
 | OP3   { $1 }
@@ -871,6 +877,11 @@ tqualid:
 lqualid_rich:
 | lident_rich             { Qident $1 }
 | uqualid DOT lident_rich { Qdot ($1, $3) }
+;
+
+lqualid_poor:
+| lident             { Qident $1 }
+| uqualid DOT lident { Qdot ($1, $3) }
 ;
 
 qualid:
@@ -968,7 +979,7 @@ program_decl:
     { Dlet (add_lab $2 $3, mk_expr_i 8 (Efun ($6, $8))) }
 | LET REC list1_recfun_sep_and
     { Dletrec $3 }
-| PARAMETER lident_rich labels COLON type_v
+| PARAMETER lident_rich_pgm labels COLON type_v
     { Dparam (add_lab $2 $3, $5) }
 | EXCEPTION uident labels
     { Dexn (add_lab $2 $3, None) }
@@ -978,22 +989,13 @@ program_decl:
     { $2 }
 | NAMESPACE namespace_import namespace_name list0_program_decl END
     { Dnamespace (floc_i 3, $3, $2, $4) }
-| ABSTRACT TYPE lident type_args model
-    { Dmodel_type (false, $3, $4, $5) }
-| MUTABLE TYPE lident type_args model
-    { Dmodel_type (true, $3, $4, $5) }
-| TYPE lident labels type_args EQUAL 
-  LEFTBRC list1_field_decl opt_semicolon RIGHTBRC
-    { Drecord_type (add_lab $2 $3, $4, $7) }
 ;
 
-list1_field_decl:
-| field_decl                            { [$1] }
-| list1_field_decl SEMICOLON field_decl { $3 :: $1 }
-;
-
-field_decl:
-| opt_mutable ident COLON pure_type { $1, $2, $4 }
+lident_rich_pgm:
+| lident_rich
+    { $1 }
+| LEFTPAR LEFTSQ RIGHTSQ LARROW RIGHTPAR
+    { mk_id (misfix "[]<-") (floc ()) }
 ;
 
 opt_mutable:
@@ -1011,11 +1013,6 @@ use_module:
     { Duse ($3, $1, None) }
 | imp_exp MODULE tqualid AS uident
     { Duse ($3, $1, Some $5) }
-;
-
-model:
-| /* epsilon */   { None }
-| MODEL pure_type { Some $2 }
 ;
 
 list1_recfun_sep_and:
@@ -1036,6 +1033,8 @@ expr:
 | expr LTGT expr
    { let t = mk_infix $1 "=" $3 in
      mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = floc () } [t]) }
+| expr LARROW expr
+    { mk_infix $1 "<-" $3 }
 | expr OP1 expr
    { mk_infix $1 $2 $3 }
 | expr OP2 expr
@@ -1044,14 +1043,10 @@ expr:
    { mk_infix $1 $2 $3 }
 | expr OP4 expr
    { mk_infix $1 $2 $3 }
-| NOT expr %prec prefix_op
+| NOT expr %prec prec_prefix_op
    { mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = floc () } [$2]) }
-| any_op expr %prec prefix_op
+| prefix_op expr %prec prec_prefix_op
    { mk_prefix $1 $2 }
-/*
-| expr COLONEQUAL expr
-   { mk_infix $1 ":=" $3 }
-*/
 | simple_expr list1_simple_expr %prec prec_app
    { mk_expr (mk_apply $1 $2) }
 | IF expr THEN expr ELSE expr
@@ -1134,8 +1129,8 @@ simple_expr:
     { mk_prefix $1 $2 }
 | simple_expr LEFTSQ expr RIGHTSQ
     { mk_misfix2 "[]" $1 $3 }
-| simple_expr LEFTSQ expr OP1 expr RIGHTSQ
-    { let op = "[" ^ $4 ^ "]" in mk_misfix3 op $1 $3 $5 }
+| simple_expr LEFTSQ expr LARROW expr RIGHTSQ
+    { mk_misfix3 "[<-]" $1 $3 $5 }
 ;
 
 list1_simple_expr:
@@ -1311,18 +1306,18 @@ effects:
 ;
 
 opt_reads:
-| /* epsilon */       { [] }
-| READS list0_lqualid { $2 }
+| /* epsilon */         { [] }
+| READS list1_lexpr_arg { $2 }
 ;
 
 opt_writes:
-| /* epsilon */        { [] }
-| WRITES list0_lqualid { $2 }
+| /* epsilon */          { [] }
+| WRITES list1_lexpr_arg { $2 }
 ;
 
 opt_raises:
 | /* epsilon */        { [] }
-| RAISES list0_uqualid { $2 }
+| RAISES list1_uqualid { $2 }
 ;
 
 opt_variant:
@@ -1334,21 +1329,6 @@ opt_variant:
 opt_cast:
 | /* epsilon */   { None }
 | COLON pure_type { Some $2 }
-;
-
-list0_lqualid:
-| /* epsilon */ { [] }
-| list1_lqualid { $1 }
-;
-
-list1_lqualid:
-| lqualid               { [$1] }
-| lqualid list1_lqualid { $1 :: $2 }
-;
-
-list0_uqualid:
-| /* epsilon */ { [] }
-| list1_uqualid { $1 }
 ;
 
 list1_uqualid:

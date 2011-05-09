@@ -33,6 +33,7 @@ open Pgm_types.T
 open Pgm_module
 
 let debug = Debug.register_flag "program_typing"
+let is_debug () = Debug.test_flag debug
 
 exception Message of string
 
@@ -61,36 +62,29 @@ let id_result = "result"
 
 let dty_app (ts, tyl) = assert (ts.ts_def = None); tyapp (ts, tyl)
 
-let find_ts uc s = ns_find_ts (get_namespace (theory_uc uc)) [s]
-let find_ls uc s = ns_find_ls (get_namespace (theory_uc uc)) [s]
+let find_ts ~pure uc s = 
+  ns_find_ts (get_namespace (if pure then pure_uc uc else impure_uc uc)) [s]
+let find_ls ~pure uc s = 
+  ns_find_ls (get_namespace (if pure then pure_uc uc else impure_uc uc)) [s]
 
 (* TODO: improve efficiency *)
-let dty_bool uc = dty_app (find_ts uc "bool", [])
+let dty_bool uc = dty_app (find_ts ~pure:true uc "bool", [])
 let dty_int _uc = dty_app (Ty.ts_int, [])
 let dty_unit _uc = dty_app (ts_tuple 0, [])
-let dty_label uc = dty_app (find_ts uc "label_", [])
+let dty_label uc = dty_app (find_ts ~pure:true uc "label_", [])
 
 (* note: local variables are simultaneously in locals (to type programs)
    and in denv (to type logic elements) *)
 type denv = {
-  uc    : uc;
-  locals: Denv.dty Mstr.t;
+  uc         : uc;
+  locals     : Denv.dty Mstr.t;
   denv  : Typing.denv; (* for user type variables only *)
 }
 
-let create_denv uc =
+let create_denv uc = 
   { uc = uc;
     locals = Mstr.empty;
-    denv = Typing.create_denv (theory_uc uc); }
-
-let specialize_effect e =
-  let reference r acc = match r with
-    | R.Rlocal v -> DRlocal v.pv_name.id_string :: acc
-    | R.Rglobal l -> DRglobal l :: acc
-  in
-  { de_reads  = Sref.fold reference e.E.reads  [];
-    de_writes = Sref.fold reference e.E.writes [];
-    de_raises = Sexn.elements e.E.raises; }
+    denv = Typing.create_denv (pure_uc uc); }
 
 let specialize_post ~loc htv ((v, f), ql) =
   assert (v.vs_name.id_string = "result"); (* TODO *)
@@ -119,16 +113,80 @@ let rec dpurify_type_v = function
       dcurrying (List.map (fun (_,ty,_) -> ty) bl)
 	(dpurify_type_v c.dc_result_type)
 
-let rec specialize_type_v ~loc htv = function
+type region_policy = Region_var | Region_ret | Region_glob
+
+let rec create_regions n =
+  if n = 0 then 
+    []
+  else 
+    tyvar (Typing.create_user_type_var "rho") :: create_regions (n - 1)
+
+let region_vars = ref []
+
+let push_region_var tv vloc = match !region_vars with
+  | [] -> assert false
+  | h :: _ -> Htv.replace h tv vloc
+
+let check_region_vars () =
+  let values = Htv.create 17 in
+  let check tv (v, loc) = match view_dty (tyvar v) with
+    | Tyvar v'  -> 
+	let tv' = tvsymbol_of_type_var v' in
+	begin try
+	  let tv'' = Htv.find values tv' in
+	  if not (tv_equal tv tv'') then
+	    errorm ~loc "this application would create an alias";
+	with Not_found ->
+	  Htv.add values tv' tv
+	end
+    | Tyapp _ -> 
+	assert false
+  in
+  List.iter (fun h -> Htv.clear values; Htv.iter check h) !region_vars;
+  region_vars := []
+
+let rec specialize_ty ?(policy=Region_var) ~loc htv ty = match ty.ty_node with
+  | Ty.Tyvar _ ->
+      Denv.specialize_ty ~loc htv ty
+  | Ty.Tyapp (ts, tl) ->
+      let n = (get_mtsymbol ts).mt_regions in
+      let mk_region ty = match ty.ty_node with 
+	| Ty.Tyvar _ when policy = Region_ret -> 
+	    tyvar (Typing.create_user_type_var "rho")
+	| Ty.Tyvar tv when policy = Region_var -> 
+	    let v = Denv.find_type_var ~loc htv tv in
+	    push_region_var tv (v, loc);
+	    tyvar v
+	| Ty.Tyvar tv (* policy = Region_glob *) ->
+	    tyvar (create_ty_decl_var ~user:true tv)
+	| Ty.Tyapp _ -> 
+	    assert false
+      in
+      let regions = List.map mk_region (Util.prefix n tl) in
+      let tl = List.map (specialize_ty ~policy ~loc htv) (Util.chop n tl) in
+      tyapp (ts, regions @ tl)
+
+let specialize_effect ~loc htv e =
+  let region r acc = 
+    let tv = find_type_var ~loc htv r.R.r_tv in
+    let ty = specialize_ty ~loc htv r.R.r_ty in
+    { dr_tv = tv; dr_ty = ty } :: acc 
+  in
+  { de_reads  = Sreg.fold region e.E.reads  [];
+    de_writes = Sreg.fold region e.E.writes [];
+    de_raises = Sexn.elements e.E.raises; }
+
+let rec specialize_type_v ?(policy=Region_var) ~loc htv = function
   | Tpure ty ->
-      DTpure (Denv.specialize_ty ~loc htv ty)
+      DTpure (specialize_ty ~policy ~loc htv ty)
   | Tarrow (bl, c) ->
       DTarrow (List.map (specialize_binder ~loc htv) bl,
 	       specialize_type_c ~loc htv c)
 
 and specialize_type_c ~loc htv c =
-  { dc_result_type = specialize_type_v ~loc htv c.c_result_type;
-    dc_effect      = specialize_effect c.c_effect;
+  { dc_result_type = 
+      specialize_type_v ~policy:Region_ret ~loc htv c.c_result_type;
+    dc_effect      = specialize_effect ~loc htv c.c_effect;
     dc_pre         = specialize_fmla ~loc htv c.c_pre;
     dc_post        = specialize_post ~loc htv c.c_post; }
 
@@ -143,8 +201,13 @@ and specialize_binder ~loc htv v =
   id, dpurify_type_v v, v
 
 let specialize_global loc x uc =
+  region_vars := Htv.create 17 :: !region_vars;
   let p = ns_find_pr (namespace uc) x in
-  p, specialize_type_v ~loc (Htv.create 17) p.p_tv
+  match p with
+    | PSvar v ->
+	p, specialize_type_v ~loc ~policy:Region_glob (Htv.create 17) v.pv_tv
+    | PSfun f ->
+	p, specialize_type_v ~loc (Htv.create 17) f.p_tv
 
 let dot fmt () = pp_print_string fmt "."
 let print_qualids = print_list dot pp_print_string
@@ -183,8 +246,6 @@ let expected_type e ty =
       "this expression has type %a, but is expected to have type %a"
       print_dty e.dexpr_type print_dty ty
 
-let pure_type env = Typing.dty env.denv
-
 let check_mutable_type loc dty = match view_dty dty with
   | Denv.Tyapp (ts, _) when is_mutable_ts ts -> 
       ()
@@ -199,22 +260,6 @@ let check_mutable_dtype_v loc = function
       errorm ~loc 
 	"this expression is a function, but is expected to have a mutable type"
 
-let dreference env = function
-  | Qident id when Mstr.mem id.id env.locals ->
-      (* local variable *)
-      let ty = Mstr.find id.id env.locals in
-      check_mutable_type id.id_loc ty;
-      DRlocal id.id
-  | qid ->
-      let loc = Typing.qloc qid in
-      let sl = Typing.string_list_of_qualid [] qid in
-      try
-	let s, ty = specialize_global loc sl env.uc in
-	check_mutable_dtype_v loc ty;
-	DRglobal s
-      with Not_found ->
-	errorm ~loc "unbound variable %a" print_qualid qid
-
 let dexception uc qid =
   let sl = Typing.string_list_of_qualid [] qid in
   let loc = Typing.qloc qid in
@@ -226,10 +271,10 @@ let dexception uc qid =
       print_dty ty;
   r
 
-let deffect env e =
-  { de_reads  = List.map (dreference env) e.Ptree.pe_reads;
-    de_writes = List.map (dreference env) e.Ptree.pe_writes;
-    de_raises =
+let dueffect env e =
+  { du_reads  = e.Ptree.pe_reads;
+    du_writes = e.Ptree.pe_writes;
+    du_raises =
       List.map (fun id -> let ls,_,_ = dexception env.uc id in ls)
 	e.Ptree.pe_raises; }
 
@@ -252,9 +297,35 @@ let rec dpurify_utype_v = function
       dcurrying (List.map (fun (_,ty,_) -> ty) bl)
 	(dpurify_utype_v c.duc_result_type)
 
+let rec dtype env = function
+  | PPTtyvar {id=x} ->
+      tyvar (Typing.find_user_type_var x env.denv)
+  | PPTtyapp (p, x) ->
+      let loc = Typing.qloc x in
+      let ts, a = Typing.specialize_tysymbol loc x (impure_uc env.uc) in
+      let mt = get_mtsymbol ts in
+      let np = List.length p in
+      if np <> a - mt.mt_regions then 
+	errorm ~loc "@[the type %a expects %d argument(s),@ 
+                       but is applied to %d argument(s)@]"  
+	  print_qualid x (a - mt.mt_regions) np;
+      let tyl = List.map (dtype env) p in
+      let tyl = create_regions mt.mt_regions @ tyl in
+      begin match ts.ts_def with
+	| None ->
+	    tyapp (ts, tyl)
+	| Some ty ->
+	    let add m v t = Mtv.add v t m in
+	    let s = List.fold_left2 add Mtv.empty ts.ts_args tyl in
+	    Typing.type_inst s ty
+      end
+  | PPTtuple tyl ->
+      let ts = ts_tuple (List.length tyl) in
+      tyapp (ts, List.map (dtype env) tyl)
+
 let rec dutype_v env = function
   | Ptree.Tpure pt ->
-      DUTpure (pure_type env pt)
+      DUTpure (dtype env pt)
   | Ptree.Tarrow (bl, c) ->
       let env, bl = map_fold_left dubinder env bl in
       let c = dutype_c env c in
@@ -263,7 +334,7 @@ let rec dutype_v env = function
 and dutype_c env c =
   let ty = dutype_v env c.Ptree.pc_result_type in
   { duc_result_type = ty;
-    duc_effect      = deffect env c.Ptree.pc_effect;
+    duc_effect      = dueffect env c.Ptree.pc_effect;
     duc_pre         = c.Ptree.pc_pre;
     duc_post        = dpost env.uc c.Ptree.pc_post;
   }
@@ -285,7 +356,7 @@ let rec add_local_pat env p = match p.dp_node with
 
 let dvariant env (l, p) =
   let relation p = 
-    let s, _ = Typing.specialize_psymbol p (theory_uc env.uc) in
+    let s, _ = Typing.specialize_psymbol p (pure_uc env.uc) in
     let loc = Typing.qloc p in
     match s.ls_args with
       | [t1; t2] when Ty.ty_equal t1 t2 ->
@@ -300,9 +371,11 @@ let dloop_annotation env a =
   { dloop_invariant = a.Ptree.loop_invariant;
     dloop_variant   = option_map (dvariant env) a.Ptree.loop_variant; }
 
+(***
 let is_ps_ghost e = match e.dexpr_desc with
   | DEglobal (ps, _) -> T.p_equal ps ps_ghost
   | _ -> false
+***)
 
 (* [dexpr] translates ptree into dexpr *)
 
@@ -311,8 +384,9 @@ let rec dexpr ~ghost env e =
   let loc = e.Ptree.expr_loc in
   let e = { 
     dexpr_desc = d; dexpr_loc = loc;
-    dexpr_denv = env.denv; dexpr_type = ty; }
+    (* dexpr_denv = env.denv;  *)dexpr_type = ty; }
   in
+  (****
   match view_dty ty with
     (* if below ghost and e has ghost type, then unghost it *)
     | Denv.Tyapp (ts, [ty']) when ghost && ts_equal ts mt_ghost.mt_abstr ->
@@ -330,7 +404,8 @@ let rec dexpr ~ghost env e =
 	{ dexpr_desc = DEapply (unghost, e); dexpr_loc = e.dexpr_loc;
 	  dexpr_denv = env.denv; dexpr_type = ty'; }
     | _ ->
-	e
+  ****)
+  e
 
 and dexpr_desc ~ghost env loc = function
   | Ptree.Econstant (ConstInt _ as c) ->
@@ -349,7 +424,7 @@ and dexpr_desc ~ghost env loc = function
 	let dty = dpurify_type_v tyv in
 	DEglobal (s, tyv), dty
       with Not_found ->
-	let s,tyl,ty = Typing.specialize_lsymbol p (theory_uc env.uc) in
+	let s,tyl,ty = Typing.specialize_lsymbol p (pure_uc env.uc) in
 	let ty = match ty with
           | Some ty -> ty
           | None -> dty_bool env.uc
@@ -364,11 +439,10 @@ and dexpr_desc ~ghost env loc = function
       DElazy (op, e1, e2), dty_bool env.uc
   | Ptree.Eapply (e1, e2) ->
       let e1 = dexpr ~ghost env e1 in
-      let ghost = ghost || is_ps_ghost e1 in
+      let ghost = ghost (* || is_ps_ghost e1 *) in
       let e2 = dexpr ~ghost env e2 in
       let ty2 = create_type_var loc and ty = create_type_var loc in
-      if not (Denv.unify e1.dexpr_type (dty_app (ts_arrow, [ty2; ty])))
-      then
+      if not (Denv.unify e1.dexpr_type (dty_app (ts_arrow, [ty2; ty]))) then
 	errorm ~loc:e1.dexpr_loc "this expression is not a function";
       expected_type e2 ty2;
       DEapply (e1, e2), ty
@@ -394,7 +468,7 @@ and dexpr_desc ~ghost env loc = function
       let tyl = List.map (fun _ -> create_type_var loc) el in
       let ty = dty_app (Typing.ts_tuple n, tyl) in
       let create d ty =
-	{ dexpr_desc = d; dexpr_denv = env.denv;
+	{ dexpr_desc = d; (* dexpr_denv = env.denv; *)
 	  dexpr_type = ty; dexpr_loc = loc }
       in
       let apply e1 e2 ty2 =
@@ -505,7 +579,7 @@ and dexpr_desc ~ghost env loc = function
       DElabel (s, e1), e1.dexpr_type
   | Ptree.Ecast (e1, ty) ->
       let e1 = dexpr ~ghost env e1 in
-      let ty = pure_type env ty in
+      let ty = dtype env ty in
       expected_type e1 ty;
       e1.dexpr_desc, ty
   | Ptree.Eany c ->
@@ -540,23 +614,68 @@ and dtriple ~ghost env (p, e, q) =
   let q = dpost env.uc q in
   (p, e, q)
 
+(*** regions tables ********************************************************)
+
+let region_types = Hts.create 17 (* ts -> int -> ty *)
+
+let declare_region_type ts i ty = 
+  let h = 
+    try 
+      Hts.find region_types ts 
+    with Not_found -> 
+      let h = Hashtbl.create 17 in Hts.add region_types ts h; h
+  in
+  Hashtbl.add h i ty
+
+let region_type ts i =
+(*   eprintf "region_type: ts=%a i=%d@." Pretty.print_ts ts i; *)
+(*   let mt = get_mtsymbol ts in *)
+(*   eprintf "%a@." print_mt_symbol mt; *)
+  Hashtbl.find (Hts.find region_types ts) i
+
+let mutable_fields = Hts.create 17 (* ts -> field:int -> region:int *)
+
+let declare_mutable_field ts i j = 
+  let h = 
+    try 
+      Hts.find mutable_fields ts 
+    with Not_found -> 
+      let h = Hashtbl.create 17 in Hts.add mutable_fields ts h; h
+  in
+  Hashtbl.add h i j
+
+let mutable_field ts i =
+  Hashtbl.find (Hts.find mutable_fields ts) i
+
+let regions_tyapp ts nregions tyl = 
+  let tymatch s tv ty = Ty.ty_match s (ty_var tv) ty in
+  let s = List.fold_left2 tymatch Mtv.empty ts.ts_args tyl in
+  let mk i ty = match ty.ty_node with
+    | Ty.Tyvar r -> R.create r (ty_inst s (region_type ts i))
+    | Ty.Tyapp _ -> assert false
+  in
+  list_mapi mk (Util.prefix nregions tyl)
+
 (* phase 2: remove destructive types and type annotations *****************)
 
 let dterm env l = Typing.dterm ~localize:true env l
 let dfmla env l = Typing.dfmla ~localize:true env l
 
 type ienv = { 
-  i_uc     : uc;
-  i_denv   : Typing.denv;
-  i_locals : ivsymbol Mstr.t;
-  i_logics : vsymbol Mstr.t;
+  i_uc      : uc;
+  i_denv : Typing.denv;
+  i_impures : ivsymbol Mstr.t;
+  i_effects : vsymbol Mstr.t;
+  i_pures   : vsymbol Mstr.t;
 }
 
 let create_ivsymbol id ty =
   let vs = create_vsymbol id ty in
-  let ty' = purify ty in
-  if ty_equal ty ty' then { i_pgm = vs; i_logic = vs }
-  else { i_pgm = vs; i_logic = create_vsymbol id ty'; }
+  let vse = create_vsymbol id (effectify ty) in
+  let vsp = 
+    let ty' = purify ty in if ty_equal ty ty' then vs else create_vsymbol id ty'
+  in
+  { i_impure = vs; i_effect = vse; i_pure = vsp }
 
 let rec dty_of_ty denv ty = match ty.ty_node with
   | Ty.Tyvar v -> 
@@ -566,28 +685,95 @@ let rec dty_of_ty denv ty = match ty.ty_node with
 
 let iadd_local env x ty =
   let v = create_ivsymbol x ty in 
-  let s = v.i_pgm.vs_name.id_string in
-  let dty = dty_of_ty env.i_denv v.i_logic.vs_ty in
-  let env = { env with i_denv   = add_pure_var s dty env.i_denv;
-		       i_locals = Mstr.add s v env.i_locals;
-	               i_logics = Mstr.add s v.i_logic env.i_logics; } 
+  let s = v.i_impure.vs_name.id_string in
+  let env = { env with 
+    i_denv = 
+      (let dty = dty_of_ty env.i_denv v.i_pure.vs_ty in
+       add_pure_var s dty env.i_denv);
+(*     i_denv_effect =  *)
+(*       (let dty = dty_of_ty env.i_denv_effect v.i_effect.vs_ty in *)
+(*        add_pure_var s dty env.i_denv_effect); *)
+    i_impures = Mstr.add s v env.i_impures;
+    i_effects = Mstr.add s v.i_effect env.i_effects;
+    i_pures = Mstr.add s v.i_pure env.i_pures; } 
   in
   env, v
-  
-let ireference env = function
-  | DRlocal x -> IRlocal (Mstr.find x env.i_locals)
-  | DRglobal ls -> IRglobal ls
 
-let ieffect env e = {
-  ie_reads  = List.map (ireference env) e.de_reads;
-  ie_writes = List.map (ireference env) e.de_writes;
-  ie_raises = e.de_raises;
+let rec type_effect_term env { pp_loc = loc; pp_desc = d } = match d with
+  | PPvar (Qident x) when Mstr.mem x.id env.i_effects ->
+      let v = Mstr.find x.id env.i_effects in
+      v.vs_ty
+  | PPvar q ->
+      let x = Typing.string_list_of_qualid [] q in
+      begin try
+	let ls = ns_find_ls (get_namespace (effect_uc env.i_uc)) x in
+	of_option ls.ls_value
+      with Not_found ->
+	errorm ~loc "unbound symbol %a" print_qualid q
+      end
+  | _ ->
+      errorm ~loc "unsupported effect syntax"
+
+let iuregion env { pp_loc = loc; pp_desc = d } = match d with
+  | PPapp (f, [t]) ->
+      let th = effect_uc env.i_uc in
+      let ls, _, _ = Typing.specialize_lsymbol f th in
+      begin match Typing.is_projection th ls with
+	| Some (ts, _, i) ->
+	    let j = 
+	      try 
+		mutable_field ts i
+	      with Not_found ->
+		errorm ~loc "not a mutable record field"
+	    in
+	    let tloc = t.pp_loc in
+	    let ty = type_effect_term env t in
+	    begin match ty.ty_node with
+	      | Ty.Tyapp (ts', tyl) when ts_equal ts ts' ->
+		  let mt = get_mtsymbol ts in
+		  let r = regions_tyapp ts mt.mt_regions tyl in
+		  List.nth r j
+	      | _ ->
+		  errorm ~loc:tloc
+	    "@[this expression has type %a,@ but is expected to have type %a@]"
+		    Pretty.print_ty ty Pretty.print_ts ts
+	    end
+	| None ->
+	    errorm ~loc "not a record field"
+      end
+  | _ ->
+      errorm ~loc "unsupported effect syntax"
+(***
+  | Qident id when Mstr.mem id.id env.locals ->
+      (* local variable *)
+      let ty = Mstr.find id.id env.locals in
+      check_mutable_type id.id_loc ty;
+      DRlocal id.id
+  | qid ->
+      let loc = Typing.qloc qid in
+      let sl = Typing.string_list_of_qualid [] qid in
+      try
+	let s, ty = specialize_global loc sl env.uc in
+	check_mutable_dtype_v loc ty;
+	DRglobal s
+      with Not_found ->
+	errorm ~loc "unbound variable %a" print_qualid qid
+***)
+(***
+  | DRlocal x -> IRlocal (Mstr.find x env.i_impures)
+  | DRglobal ls -> IRglobal ls
+***)
+
+let iueffect env e = {
+  ie_reads  = List.map (iuregion env) e.du_reads;
+  ie_writes = List.map (iuregion env) e.du_writes;
+  ie_raises = e.du_raises;
 }
 
-let pre env = Denv.fmla env.i_logics
+let pre env = Denv.fmla env.i_pures
 
 let post env ((ty, f), ql) =
-  let env = env.i_logics in
+  let env = env.i_pures in
   let exn (ls, (ty, f)) =
     let v, env = match ty with
       | None ->
@@ -606,7 +792,7 @@ let post env ((ty, f), ql) =
 
 let iterm env l =
   let t = dterm env.i_denv l in
-  Denv.term env.i_logics t
+  Denv.term env.i_pures t
 
 (* TODO: should we admit an instsance of a polymorphic order relation *)
 let ivariant env (t, ps) =
@@ -625,6 +811,17 @@ let ivariant env (t, ps) =
     | _ ->
 	assert false
 
+let iregion r = match view_dty (tyvar r.dr_tv) with
+  | Tyvar tv -> 
+      R.create (tvsymbol_of_type_var tv) (Denv.ty_of_dty r.dr_ty)
+  | Tyapp _  -> 
+      assert false
+
+let ieffect e = 
+  { ie_reads  = List.map iregion e.de_reads;
+    ie_writes = List.map iregion e.de_writes;
+    ie_raises = e.de_raises }
+
 let rec itype_v env = function
   | DTpure ty ->
       ITpure (Denv.ty_of_dty ty)
@@ -635,7 +832,7 @@ let rec itype_v env = function
 and itype_c env c =
   let tyv = itype_v env c.dc_result_type in
   { ic_result_type = tyv;
-    ic_effect      = ieffect env c.dc_effect;
+    ic_effect      = ieffect c.dc_effect;
     ic_pre         = pre env c.dc_pre;
     ic_post        = post env c.dc_post; }
 
@@ -647,7 +844,7 @@ and ibinder env (x, ty, tyv) =
 
 let ifmla env l =
   let f = dfmla env.i_denv l in
-  Denv.fmla env.i_logics f
+  Denv.fmla env.i_pures f
 
 let id_result loc = id_user id_result loc
 
@@ -658,20 +855,21 @@ let iupost env ty (q, ql) =
     	  None, env
       | [ty] ->
 	  let env, v = iadd_local env (id_result l.pp_loc) ty in
-    	  Some v.i_logic, env
+    	  Some v.i_pure, env
       | _ -> assert false
     in
     s, (v, ifmla env l)
   in
   let env, v = iadd_local env (id_result q.pp_loc) ty in
-  (v.i_logic, ifmla env q), List.map dexn ql
+  let q = ifmla env q in
+  (v.i_pure, q), List.map dexn ql
 
 let rec purify_itype_v  = function
   | ITpure ty ->
       ty
   | ITarrow (bl, c) ->
       make_arrow_type
-	(List.map (fun (v,_) -> v.i_pgm.vs_ty) bl)
+	(List.map (fun (v,_) -> v.i_impure.vs_ty) bl)
 	(purify_itype_v c.ic_result_type)
 
 let rec iutype_v gl env = function
@@ -685,7 +883,7 @@ and iutype_c gl env c =
   let tyv = iutype_v gl env c.duc_result_type in
   let ty = purify_itype_v tyv in
   { ic_result_type = tyv;
-    ic_effect      = ieffect env c.duc_effect;
+    ic_effect      = iueffect env c.duc_effect;
     ic_pre         = ifmla env c.duc_pre;
     ic_post        = iupost env ty c.duc_post; }
 
@@ -698,8 +896,9 @@ and iubinder gl env (x, ty, tyv) =
 let mk_iexpr loc ty d = { iexpr_desc = d; iexpr_loc = loc; iexpr_type = ty }
 
 let mk_t_if gl f =
-  let ty = ty_app (find_ts gl "bool") [] in
-  t_if f (t_app (find_ls gl "True") [] ty) (t_app (find_ls gl "False") [] ty)
+  let ty = ty_app (find_ts ~pure:true gl "bool") [] in
+  t_if f (t_app (find_ls ~pure:true gl "True")  [] ty) 
+         (t_app (find_ls ~pure:true gl "False") [] ty)
 
 (* apply ls to a list of expressions, introducing let's if necessary
 
@@ -721,12 +920,12 @@ let make_logic_app gl loc ty ls el =
     | ({ iexpr_desc = IElogic t }, _) :: r ->
 	make (t :: args) r
     | ({ iexpr_desc = IElocal v }, _) :: r ->
-	make (t_var v.i_logic :: args) r
-    | ({ iexpr_desc = IEglobal (s, _); iexpr_type = ty }, _) :: r ->
-	make (t_app s.p_ls [] ty :: args) r
+	make (t_var v.i_pure :: args) r
+    | ({ iexpr_desc = IEglobal (PSvar v, _) }, _) :: r ->
+	make (t_var v.pv_pure :: args) r
     | (e, _) :: r ->
 	let v = create_ivsymbol (id_user "x" loc) e.iexpr_type in
-	let d = mk_iexpr loc ty (make (t_var v.i_logic :: args) r) in
+	let d = mk_iexpr loc ty (make (t_var v.i_pure :: args) r) in
 	IElet (v, e, d)
   in
   make [] el
@@ -742,13 +941,15 @@ let make_app _gl loc ty f el =
     | ({ iexpr_type = ty } as e, tye) :: r when is_mutable_ty ty ->
 	begin match e.iexpr_desc with
 	  | IElocal v ->
-	      make (fun f -> mk_iexpr loc tye (IEapply_ref (k f, IRlocal v))) r
-	  | IEglobal (v, _) ->
-	      make (fun f -> mk_iexpr loc tye (IEapply_ref (k f, IRglobal v))) r
+	      make (fun f -> mk_iexpr loc tye (IEapply_var (k f, v))) r
+	  | IEglobal (PSvar v, _) ->
+	      make (fun f -> mk_iexpr loc tye (IEapply_glob (k f, v))) r
+	  | IEglobal (PSfun _, _) ->
+	      errorm ~loc "higher-order programs not yet implemented"
 	  | _ ->
 	      let v = create_ivsymbol (id_user "x" loc) e.iexpr_type in
 	      let d =
-		make (fun f -> mk_iexpr loc tye (IEapply_ref (k f, IRlocal v))) r
+		make (fun f -> mk_iexpr loc tye (IEapply_var (k f, v))) r
 	      in
 	      mk_iexpr loc ty (IElet (v, e, d))
 	end
@@ -807,7 +1008,7 @@ and iexpr_desc gl env loc ty = function
   | DEconstant c ->
       IElogic (t_const c)
   | DElocal (x, _tyv) ->
-      IElocal (Mstr.find x env.i_locals)
+      IElocal (Mstr.find x env.i_impures)
   | DEglobal (s, tyv) ->
       IEglobal (s, itype_v env tyv)
   | DElogic ls ->
@@ -863,7 +1064,7 @@ and iexpr_desc gl env loc ty = function
   | DEmatch (e1, bl) ->
       let e1 = iexpr gl env e1 in
       let branch (p, e) =
-        let _, p = Denv.pattern env.i_logics p in 
+        let _, p = Denv.pattern env.i_pures p in 
 	let env, p = ipattern env p in
 	(p, iexpr gl env e)
       in
@@ -903,9 +1104,9 @@ and iexpr_desc gl env loc ty = function
       let f = ifmla env f in
       IEassert (k, f)
   | DElabel (s, e1) ->
-      let ty = Ty.ty_app (find_ts gl "label_") [] in
+      let ty = Ty.ty_app (find_ts ~pure:true gl "label_") [] in
       let env, v = iadd_local env (id_fresh s) ty in
-      IElabel (v.i_pgm, iexpr gl env e1)
+      IElabel (v.i_impure, iexpr gl env e1)
   | DEany c ->
       let c = iutype_c gl env c in
       IEany c
@@ -982,25 +1183,27 @@ and itriple gl env (p, e, q) =
 open Pp
 open Pretty
 
-let print_ireference fmt = function
-  | IRlocal pv -> fprintf fmt "%a(local)" print_vs pv.i_pgm
-  | IRglobal s -> fprintf fmt "%a(global)" print_ls s.p_ls
+let print_iregion = R.print
 
 let rec print_iexpr fmt e = match e.iexpr_desc with
   | IElogic t ->
       print_term fmt t
   | IElocal v ->
-      fprintf fmt "<local %a>" print_vs v.i_pgm
-  | IEglobal (s, _) ->
+      fprintf fmt "<local %a>" print_vs v.i_impure
+  | IEglobal (PSvar v, _) ->
+      fprintf fmt "<global var %a>" print_vs v.pv_effect
+  | IEglobal (PSfun s, _) ->
       fprintf fmt "<global %a>" print_ls s.p_ls
   | IEapply (e, v) ->
-      fprintf fmt "@[((%a) %a)@]" print_iexpr e print_vs v.i_pgm
-  | IEapply_ref (e, r) ->
-      fprintf fmt "@[((%a) <ref %a>)@]" print_iexpr e print_ireference r
+      fprintf fmt "@[((%a) %a)@]" print_iexpr e print_vs v.i_impure
+  | IEapply_var (e, v) ->
+      fprintf fmt "@[((%a) <var %a>)@]" print_iexpr e print_vs v.i_impure
+  | IEapply_glob (e, v) ->
+      fprintf fmt "@[((%a) <glob %a>)@]" print_iexpr e print_vs v.pv_effect
   | IEfun (_, (_,e,_)) ->
       fprintf fmt "@[fun _ ->@ %a@]" print_iexpr e
   | IElet (v, e1, e2) ->
-      fprintf fmt "@[let %a = %a in@ %a@]" print_vs v.i_pgm
+      fprintf fmt "@[let %a = %a in@ %a@]" print_vs v.i_impure
 	print_iexpr e1 print_iexpr e2
   | IEif (e1, e2, e3) ->
       fprintf fmt "@[if %a then %a else %a@]"
@@ -1010,41 +1213,69 @@ let rec print_iexpr fmt e = match e.iexpr_desc with
 
 (* phase 3: effect inference **********)
 
-let rec term_effect uc ef t = match t.t_node with
-  (* TODO: read effects for terms *)
-  (* | Term.Tapp (ls, [t]) when ls_equal ls (find_ls uc "prefix !") -> *)
-  (*     let r = reference_of_term t in *)
-  (*     E.add_read r ef *)
+let rec ty_effect ef ty = match ty.ty_node with
+  | Ty.Tyvar _ -> 
+      ef
+  | Ty.Tyapp (ts, tyl) ->
+      let mt = get_mtsymbol ts in
+      let rl = regions_tyapp ts mt.mt_regions tyl in
+      let ef = List.fold_right Sreg.add rl ef in
+      List.fold_left ty_effect ef (Util.chop mt.mt_regions tyl)
+
+let globals = Hls.create 17
+
+let declare_global ls pv = 
+  Pgm_wp.declare_global_regions pv;
+  Hls.add globals ls pv
+
+let rec fmla_effect ef f = 
+  f_map_fold term_effect fmla_effect ef f
+
+and term_effect ef t = match t.t_node with
+  | Term.Tapp (ls, []) when Hls.mem globals ls ->
+      let pv = Hls.find globals ls in
+      E.add_glob pv ef, t_var pv.pv_pure
   | _ ->
-      t_fold (term_effect uc) (fmla_effect uc) ef t
+      t_map_fold term_effect fmla_effect ef t
 
-and fmla_effect uc ef f =
-  f_fold (term_effect uc) (fmla_effect uc) ef f
-
-let post_effect env ef ((v,q),ql) =
-  let exn_effect ef (_,(_,q)) = fmla_effect env ef q in
-  let ef = List.fold_left exn_effect (fmla_effect env ef q) ql in
-  let not_result = function
-    | R.Rlocal vs -> not (vs_equal vs.pv_vs v)
-    | R.Rglobal _ -> true
+let post_effect ef ((v, q), ql) =
+  let exn_effect ef (e, (x, q)) = 
+    let ef, q = fmla_effect ef q in ef, (e, (x, q)) 
   in
-  E.filter not_result ef
+  let ef, q = fmla_effect ef q in
+  let ef, ql = map_fold_left exn_effect ef ql in
+  ef, ((v, q), ql) 
+(* TODO? *)
+(*   let not_result = function *)
+(*     | R.Rlocal vs -> not (vs_equal vs.pv_vs v) *)
+(*     | R.Rglobal _ -> true *)
+(*   in *)
+(*   E.filter not_result ef *)
 
-let reference env = function
-  | IRlocal  i -> R.Rlocal (Mvs.find i.i_pgm env)
-  | IRglobal s -> R.Rglobal s 
-
-let effect env e =
-  let reads ef r = E.add_read (reference env r) ef in
-  let writes ef r = E.add_write (reference env r) ef in
+let effect e =
+  let reads ef r = E.add_read r ef in
+  let writes ef r = E.add_write r ef in
   let raises ef l = E.add_raise l ef in
   let ef = List.fold_left reads E.empty e.ie_reads in
   let ef = List.fold_left writes ef e.ie_writes in
   List.fold_left raises ef e.ie_raises
 
+let create_pvsymbol id v ~effect ~pure =
+  let regions = ty_effect Sreg.empty effect.vs_ty in
+  create_pvsymbol id v ~effect ~pure ~regions
+
+let create_pvsymbol_i i v =
+  create_pvsymbol (id_clone i.i_impure.vs_name) 
+    ~effect:i.i_effect ~pure:i.i_pure v
+
+let create_pvsymbol_v id v =
+  create_pvsymbol id v
+    ~effect:(create_vsymbol id (purify_type_v             v))
+    ~pure:  (create_vsymbol id (purify_type_v ~logic:true v))
+    
 let add_local env i v =
-  let vs = create_pvsymbol (id_clone i.i_pgm.vs_name) ~vs:i.i_logic v in
-  Mvs.add i.i_pgm vs env, vs
+  let vs = create_pvsymbol_i i v in
+  Mvs.add i.i_impure vs env, vs
 
 let rec type_v env = function
   | ITpure ty ->
@@ -1054,13 +1285,14 @@ let rec type_v env = function
       tarrow bl (type_c env c)
 
 and type_c env c = 
-  let ef = effect env c.ic_effect in
-  let q = c.ic_post in
+  let ef = effect c.ic_effect in
+  let ef, p = fmla_effect ef c.ic_pre in
+  let ef, q = post_effect ef c.ic_post in
   (* saturate effect with exceptions appearing in q *)
   let ef = List.fold_left (fun ef (e, _) -> E.add_raise e ef) ef (snd q) in
   { c_result_type = type_v env c.ic_result_type;
     c_effect      = ef;
-    c_pre         = c.ic_pre;
+    c_pre         = p;
     c_post        = q; }
 
 and add_binders env bl =
@@ -1077,7 +1309,7 @@ let rec pattern env p =
   env, { ppat_pat = lp; ppat_node = n }
 
 and pattern_node env ty p = 
-  let add1 env i = add_local env i (tpure i.i_pgm.vs_ty) in
+  let add1 env i = add_local env i (tpure i.i_impure.vs_ty) in
   match p with
   | IPwild -> 
       env, (pat_wild ty, Pwild)
@@ -1091,14 +1323,14 @@ and pattern_node env ty p =
       env, (pat_or p1.ppat_pat p2.ppat_pat, Por (p1, p2))
   | IPvar vs ->
       let env, v = add1 env vs in
-      env, (pat_var v.pv_vs, Pvar v)
+      env, (pat_var v.pv_pure, Pvar v)
   | IPas (p, vs) ->
       let env, v = add1 env vs in
       let env, p = pattern env p in
-      env, (pat_as p.ppat_pat v.pv_vs, Pas (p, v))
+      env, (pat_as p.ppat_pat v.pv_pure, Pas (p, v))
 
 let make_apply loc e1 ty c =
-  let x = create_pvsymbol (id_fresh "f") (tpure e1.expr_type) in
+  let x = create_pvsymbol_v (id_fresh "f") (tpure e1.expr_type) in
   let v = c.c_result_type and ef = c.c_effect in
   let any_c = { expr_desc = Eany c; expr_type = ty;
 		expr_type_v = v; expr_effect = ef; expr_loc = loc } in
@@ -1135,12 +1367,12 @@ let mk_expr loc ty ef d =
 let mk_simple_expr loc ty d = mk_expr loc ty E.empty d
 
 let mk_bool_constant loc gl ls =
-  let ty = ty_app (find_ts gl "bool") [] in
+  let ty = ty_app (find_ts ~pure:true gl "bool") [] in
   { expr_desc = Elogic (t_app ls [] ty); expr_type = ty; expr_type_v = tpure ty;
     expr_effect = E.empty; expr_loc = loc }
 
-let mk_false loc gl = mk_bool_constant loc gl (find_ls gl "False")
-let mk_true  loc gl = mk_bool_constant loc gl (find_ls gl "True")
+let mk_false loc gl = mk_bool_constant loc gl (find_ls ~pure:true gl "False")
+let mk_true  loc gl = mk_bool_constant loc gl (find_ls ~pure:true gl "True")
 
 (* types do not contain inner reference types *)
 
@@ -1193,10 +1425,10 @@ let rec expr gl env e =
 
 and expr_desc gl env loc ty = function
   | IElogic t ->
-      let ef = term_effect gl E.empty t in
+      let ef, t = term_effect E.empty t in
       Elogic t, tpure ty, ef
   | IElocal vs ->
-      let vs = Mvs.find vs.i_pgm env in
+      let vs = Mvs.find vs.i_impure env in
       Elocal vs, vs.pv_tv, E.empty
   | IEglobal (s, tv) ->
       let tv = type_v env tv in
@@ -1204,19 +1436,24 @@ and expr_desc gl env loc ty = function
   | IEapply (e1, vs) ->
       let e1 = expr gl env e1 in
       (* printf "e1 : %a@." print_type_v e1.expr_type_v; *)
-      let vs = Mvs.find vs.i_pgm env in
+      let vs = Mvs.find vs.i_impure env in
       let c = apply_type_v_var e1.expr_type_v vs in
       (* printf "c : %a / ty = %a@." print_type_c c print_ty ty; *)
       make_apply loc e1 ty c
-  | IEapply_ref (e1, r) ->
+  | IEapply_var (e1, v) ->
       let e1 = expr gl env e1 in
-      let r = reference env r in
-      if occur_type_v r e1.expr_type_v then
-  	errorm ~loc "this application would create an alias";
-      (* printf "e1 : %a@." print_type_v e1.expr_type_v; *)
-      (* printf "r = %a@." R.print r; *)
-      let c = apply_type_v_ref e1.expr_type_v r in
+      let vs = Mvs.find v.i_impure env in
+      (* TODO: alias detection *)
+(*       printf "e1 : %a@." print_type_v e1.expr_type_v; *)
+(*       printf "vs = %a@." T.print_pvsymbol vs; *)
+(*       if Sreg.exists (fun r -> occur_type_v r e1.expr_type_v) vs.pv_regions then *)
+(*   	errorm ~loc "this application would create an alias"; *)
+      let c = apply_type_v_var e1.expr_type_v vs in
       (* printf "c = %a@." print_type_c c; *)
+      make_apply loc e1 ty c
+  | IEapply_glob (e1, v) ->
+      let e1 = expr gl env e1 in
+      let c = apply_type_v_var e1.expr_type_v v in
       make_apply loc e1 ty c
   | IEfun (bl, t) ->
       let env, bl = add_binders env bl in
@@ -1227,10 +1464,9 @@ and expr_desc gl env loc ty = function
       let env, v = add_local env v e1.expr_type_v in
       let e2 = expr gl env e2 in
       let ef = E.union e1.expr_effect e2.expr_effect in
-      let r = R.Rlocal v in
-      if occur_type_v r e2.expr_type_v then
+      if Sreg.exists (fun r -> occur_type_v r e2.expr_type_v) v.pv_regions then
 	errorm ~loc "local reference would escape its scope";
-      let ef = E.remove_reference r ef in
+(*       let ef = E.remove_reference r ef in *)
       Elet (v, e1, e2), e2.expr_type_v, ef
   | IEletrec (dl, e1) ->
       let env, dl = letrec gl env dl in
@@ -1249,14 +1485,12 @@ and expr_desc gl env loc ty = function
   | IEloop (a, e1) ->
       let e1 = expr gl env e1 in
       let ef = e1.expr_effect in
-      let ef = match a.loop_invariant with
-	| Some f -> fmla_effect gl ef f
-	| None -> ef
+      let ef, inv = option_map_fold fmla_effect ef a.loop_invariant in
+      let ef, var = match a.loop_variant with
+	| Some (t, ls) -> let ef, t = term_effect ef t in ef, Some (t, ls)
+	| None         -> ef, None
       in
-      let ef = match a.loop_variant with
-	| Some (t, _) -> term_effect gl ef t
-	| None        -> ef
-      in
+      let a = { loop_invariant = inv; loop_variant = var } in
       Eloop (a, e1), type_v_unit gl, ef
   | IElazy (op, e1, e2) ->
       let e1 = expr gl env e1 in
@@ -1265,12 +1499,12 @@ and expr_desc gl env loc ty = function
       let d =
 	if is_pure_expr e2 then
 	  let ls = match op with
-	    | Ptree.LazyAnd -> find_ls gl "andb"
-	    | Ptree.LazyOr  -> find_ls gl "orb"
+	    | Ptree.LazyAnd -> find_ls ~pure:true gl "andb"
+	    | Ptree.LazyOr  -> find_ls ~pure:true gl "orb"
 	  in
-	  let v1 = create_pvsymbol (id_fresh "lazy") (tpure ty) in
-	  let v2 = create_pvsymbol (id_fresh "lazy") (tpure ty) in
-	  let t = t_app ls [t_var v1.pv_vs; t_var v2.pv_vs] ty in
+	  let v1 = create_pvsymbol_v (id_fresh "lazy") (tpure ty) in
+	  let v2 = create_pvsymbol_v (id_fresh "lazy") (tpure ty) in
+	  let t = t_app ls [t_var v1.pv_pure; t_var v2.pv_pure] ty in
 	  Elet (v1, e1,
 		mk_expr loc ty ef
 		  (Elet (v2, e2, mk_simple_expr loc ty (Elogic t))))
@@ -1282,10 +1516,9 @@ and expr_desc gl env loc ty = function
       in
       d, tpure ty, ef
   | IEmatch (i, bl) ->
-      let v = Mvs.find i.i_pgm env in
-      (* TODO *)
-      (* if is_reference_type gl v.vs_ty then *)
-      (* 	errorm ~loc "cannot match over a reference"; *)
+      if is_mutable_ty i.i_impure.vs_ty then
+      	errorm ~loc "cannot match over a reference";
+      let v = Mvs.find i.i_impure env in
       let branch ef (p, e) =
 	let env, p = pattern env p in
 	let e = expr gl env e in
@@ -1323,18 +1556,16 @@ and expr_desc gl env loc ty = function
       in
       Etry (e1, hl), tpure ty, ef
   | IEfor (x, v1, d, v2, inv, e3) ->
-      let v1 = Mvs.find v1.i_pgm env in
-      let v2 = Mvs.find v2.i_pgm env in
-      let env, x = add_local env x (tpure v1.pv_vs.vs_ty) in
+      let v1 = Mvs.find v1.i_impure env in
+      let v2 = Mvs.find v2.i_impure env in
+      let env, x = add_local env x (tpure v1.pv_pure.vs_ty) in
       let e3 = expr gl env e3 in
-      let ef = match inv with
-	| Some f -> fmla_effect gl e3.expr_effect f
-	| None -> e3.expr_effect
-      in
+      let ef = e3.expr_effect in
+      let ef, inv = option_map_fold fmla_effect ef inv in
       Efor (x, v1, d, v2, inv, e3), type_v_unit gl, ef
 
   | IEassert (k, f) ->
-      let ef = fmla_effect gl E.empty f in
+      let ef, f = fmla_effect E.empty f in
       Eassert (k, f), tpure ty, ef
   | IElabel (lab, e1) ->
       let e1 = expr gl env e1 in
@@ -1346,7 +1577,10 @@ and expr_desc gl env loc ty = function
 and triple gl env (p, e, q) =
   let e = expr gl env e in
   let q = saturation e.expr_loc e.expr_effect q in
-  let ef = post_effect gl (fmla_effect gl e.expr_effect p) q in
+  let ef = e.expr_effect in
+  let ef, p = fmla_effect ef p in
+  let ef, q = post_effect ef q in
+  (* eprintf "triple: p = %a ef = %a@." Pretty.print_fmla p E.print ef; *)
   let e = { e with expr_effect = ef } in
   let c =
     { c_result_type = e.expr_type_v;
@@ -1360,8 +1594,9 @@ and letrec gl env dl = (* : env * recfun list *)
   let binders (i, bl, var, t) =
     let env, bl = add_binders env bl in
     let variant (i, t, ls) = 
-      (create_pvsymbol (id_clone i.i_pgm.vs_name) ~vs:i.i_logic 
-	 (tpure i.i_pgm.vs_ty), t, ls)
+      (create_pvsymbol (id_clone i.i_impure.vs_name) 
+	 ~effect:i.i_effect ~pure:i.i_pure 
+	 (tpure i.i_impure.vs_ty), t, ls)
     in
     (i, bl, env, option_map variant var, t)
   in
@@ -1370,14 +1605,14 @@ and letrec gl env dl = (* : env * recfun list *)
      [m] maps each function to its current effect *)
   let make_env env ?decvar m =
     let add1 env (i, bl, _, var, _) =
-      let c = Mvs.find i.i_pgm m in
+      let c = Mvs.find i.i_impure m in
       let c = match decvar, var with
 	| Some phi0, Some (_, phi, r) ->
 	    let decphi = match r with
 	      | None -> (* 0 <= phi0 and phi < phi0 *)
-		  f_and (f_app (find_ls gl "infix <=") 
+		  f_and (f_app (find_ls ~pure:true gl "infix <=") 
 			   [t_int_const "0"; t_var phi0])
-		    (f_app (find_ls gl "infix <")  [phi; t_var phi0])
+		    (f_app (find_ls ~pure:true gl "infix <")  [phi; t_var phi0])
 	      | Some r -> 
 		  f_app r [phi; t_var phi0] 
 	    in
@@ -1392,12 +1627,13 @@ and letrec gl env dl = (* : env * recfun list *)
   in
   let one_step m0 =
     let type1 m (i, bl, env, var, t) =
-      let decvar = option_map (fun (v,_,_) -> v.pv_vs) var in
+      let decvar = option_map (fun (v,_,_) -> v.pv_pure) var in
       let env = make_env env ?decvar m0 in
       let t, c = triple gl env t in
-      let v = create_pvsymbol (id_clone i.i_pgm.vs_name) ~vs:i.i_logic
-	(tarrow bl c) in
-      Mvs.add i.i_pgm c m, (v, bl, var, t)
+      let v = create_pvsymbol (id_clone i.i_impure.vs_name) (tarrow bl c) 
+	~effect:i.i_effect ~pure:i.i_pure 
+      in
+      Mvs.add i.i_impure c m, (v, bl, var, t)
     in
     map_fold_left type1 Mvs.empty dl
   in
@@ -1405,7 +1641,7 @@ and letrec gl env dl = (* : env * recfun list *)
     (* printf "fixpoint...@\n"; *)
     let m', dl' = one_step m in
     let same_effect (i,bl,_,_,_) =
-      let c = Mvs.find i.i_pgm m and c' = Mvs.find i.i_pgm m' in
+      let c = Mvs.find i.i_impure m and c' = Mvs.find i.i_impure m' in
       let v = tarrow bl c and v' = tarrow bl c' in
       (* printf "  v = %a@." print_type_v v; *)
       (* printf "  v'= %a@." print_type_v v'; *)
@@ -1415,12 +1651,12 @@ and letrec gl env dl = (* : env * recfun list *)
     if List.for_all same_effect dl then m, dl' else fixpoint m'
   in
   let add_empty_effect m (i, bl, _, _, (p, _, q)) =
-    let tyl, ty = uncurrying i.i_pgm.vs_ty in
+    let tyl, ty = uncurrying i.i_impure.vs_ty in
     assert (List.length bl = List.length tyl);
     let c = { c_result_type = tpure ty;
 	      c_pre = p; c_effect = E.empty; c_post = q; }
     in
-    Mvs.add i.i_pgm c m
+    Mvs.add i.i_impure c m
   in
   let m0 = List.fold_left add_empty_effect Mvs.empty dl in
   let m, dl = fixpoint m0 in
@@ -1433,7 +1669,7 @@ and letrec gl env dl = (* : env * recfun list *)
    (to allow functions to return fresh references) *)
 
 let rec fresh_expr gl ~term locals e = match e.expr_desc with
-  | Elocal vs when is_mutable_ty vs.pv_ty
+  | Elocal vs when is_mutable_ty vs.pv_effect.vs_ty
     && (not term || not (Spv.mem vs locals)) ->
       errorm ~loc:e.expr_loc "not a fresh reference (could create an alias)"
   | Elogic _ | Elocal _ | Eglobal _ ->
@@ -1479,8 +1715,10 @@ and fresh_triple gl (_, e, _) =
 let create_ienv denv = {
   i_uc = denv.uc; 
   i_denv = denv.denv; 
-  i_locals = Mstr.empty; 
-  i_logics = Mstr.empty;
+  i_impures = Mstr.empty; 
+  i_effects = Mstr.empty;
+  i_pures = Hls.fold (fun _ pv m -> Mstr.add pv.pv_name.id_string pv.pv_pure m)
+    globals Mstr.empty;
 }
 
 let type_expr gl e =
@@ -1489,6 +1727,7 @@ let type_expr gl e =
   let ienv = create_ienv denv in
   let e = iexpr gl ienv e in
   let e = expr gl Mvs.empty e in
+  check_region_vars ();
   fresh_expr gl ~term:true Spv.empty e;
   e
 
@@ -1497,24 +1736,21 @@ let type_type uc ty =
   let dty = Typing.dty denv.denv ty in
   Denv.ty_of_dty dty
 
-let add_logic_decl uc loc ls =
+let add_pure_decl uc ?loc ls =
   try
-    Pgm_module.add_logic_decl (Decl.create_logic_decl [ls, None]) uc
+    Pgm_module.add_pure_decl (Decl.create_logic_decl [ls, None]) uc
   with Theory.ClashSymbol _ ->
     errorm ?loc "clash with previous symbol %s" ls.ls_name.id_string
 
-let add_global loc x tyv uc =
-  try
-    let ps = create_psymbol (id_user x loc) tyv in
-    ps, add_psymbol ps uc
+let add_effect_decl uc ls =
+  Pgm_module.add_effect_decl (Decl.create_logic_decl [ls, None]) uc
+
+let add_global_fun loc x tyv uc =
+  try 
+    let ps = create_psymbol_fun (id_user x loc) tyv in
+    ps, add_psymbol (PSfun ps) uc
   with Pgm_module.ClashSymbol _ ->
     errorm ~loc "clash with previous symbol %s" x
-
-let add_global_if_pure gl { p_ls = ls; p_ty = ty } = match ty with
-  | { ty_node = Ty.Tyapp (ts, _) } when ts_equal ts ts_arrow -> 
-      gl
-  | _ ->
-      add_logic_decl gl (loc_of_ls ls) ls
 
 let add_exception loc x ty uc =
   try
@@ -1550,6 +1786,202 @@ let check_type_vars ~loc vars ty =
   in
   check ty
 
+let make_immutable_type td = 
+  let td = { td with td_model = false } in
+  let make_immutable_field (loc, _, id, ty) = (loc, false, id, ty) in
+  match td.td_def with
+    | TDrecord [_, _, _, ty] -> (* singleton record *)
+	{ td with td_def = TDalias ty }
+    | TDrecord fl -> 
+	{ td with td_def = TDrecord (List.map make_immutable_field fl) }
+    | TDabstract | TDalias _ | TDalgebraic _ -> 
+	td
+
+let add_types env ltm uc dl =
+  (* 1. type check the pure def, to have all sanity checks performed *)
+  let dlp = List.map make_immutable_type dl in
+  let uc = Pgm_module.add_pure_pdecl env ltm (TypeDecl dlp) uc in
+  (* 2. compute number of regions for each type *)
+  let def = List.fold_left
+    (fun def d -> Mstr.add d.td_ident.id d def) Mstr.empty dl
+  in
+  let nregions = Hashtbl.create 17 in (* name -> int *)
+  let mutable_field = Hashtbl.create 17 in (* name, field -> region *)
+  let singletons = Hashtbl.create 17 in
+  let rec visit x =
+    try
+      match Hashtbl.find nregions x with
+	| None -> assert false (* cyclic def already checked *)
+	| Some n -> n
+    with Not_found ->
+      Hashtbl.add nregions x None;
+      let d = Mstr.find x def in
+      let n = match d.td_def with
+	| TDabstract ->
+	    0
+	| TDalias ty ->
+	    nregions_of_type ty
+	| TDalgebraic _ ->
+	    assert false (*TODO*)
+	| TDrecord fl ->
+	    let nf = List.length fl in
+	    List.fold_left
+	      (fun n (loc, mut, _, ty) ->
+		 if mut && nf = 1 then Hashtbl.add singletons x ();
+		 let nty = nregions_of_type ty in
+		 if mut then begin
+		   if nty > 0 then 
+		     errorm ~loc "inner mutable types not yet implemented";
+		   n + 1
+		 end else
+		   n + nty)
+	      0 fl
+      in
+      Hashtbl.add nregions x (Some n);
+      n
+  and nregions_of_type = function
+    | PPTtyvar _ ->
+	0
+    | PPTtyapp (tyl, q) ->
+	let n = nregions_of_qualid q in
+	n + nregions_of_types tyl
+    | PPTtuple tyl ->
+	nregions_of_types tyl
+  and nregions_of_types tyl =
+    List.fold_left (fun n ty -> n + nregions_of_type ty) 0 tyl
+  and nregions_of_qualid q = match q with
+    | Qident x when Mstr.mem x.id def ->
+	visit x.id
+    | Qident _ | Qdot _ ->
+	try 
+	  let p = Typing.string_list_of_qualid [] q in
+	  let mt = ns_find_mt (namespace uc) p in
+	  mt.mt_regions 
+	with Not_found -> 
+	  0 (* TODO: should have a mt already? *)
+  in
+  List.iter (fun d -> ignore (visit d.td_ident.id)) dl;
+  (* 3. build new type declarations with regions for program/effect types *)
+  let add_regions ~effect d =
+    let x = d.td_ident.id in
+    let n = of_option (Hashtbl.find nregions x) in
+    let loc = d.td_loc in
+    let regions = 
+      Array.init n 
+	(fun i -> { id = "r" ^ string_of_int i; id_lab = []; id_loc = loc })
+    in
+    let params = Array.to_list regions @ d.td_params in
+    let region = 
+      let c = ref (-1) in fun () -> incr c; assert (!c < n); !c, regions.(!c) 
+    in
+    let rec add_regions_to_type = function
+      | PPTtyvar _ as ty -> 
+	  ty
+      | PPTtyapp (tyl, q) ->
+	  let n = nregions_of_qualid q in
+	  let reg = ref [] in
+	  for i = 1 to n do reg := PPTtyvar (snd (region ())) :: !reg done;
+	  PPTtyapp (List.rev !reg @ List.map add_regions_to_type tyl, q)
+      | PPTtuple tyl -> 
+	  PPTtuple (List.map add_regions_to_type tyl)
+    in
+    let def = match d.td_def with
+      | _ when d.td_model && not effect ->
+	  TDabstract
+      | TDabstract ->
+	  TDabstract
+      | TDalias ty ->
+	  TDalias (add_regions_to_type ty)
+      | TDalgebraic cl ->
+	  let add (_loc, _id, _pl) = assert false (*TODO*) in
+	  TDalgebraic (List.map add cl)
+      | TDrecord fl ->
+	  let add i (loc, mut, id, ty) =
+	    if mut then begin
+	      let j, _ = region () in
+	      if effect then Hashtbl.add mutable_field (x, i) j
+	    end;
+	    (loc, false, id, add_regions_to_type ty)
+	  in
+	  TDrecord (list_mapi add fl)
+    in
+    { d with td_params = params; td_model = false; td_def = def }
+  in
+  let dli = List.map (add_regions ~effect:false) dl in
+  let uc = Pgm_module.add_impure_typedecl env dli uc in
+  let dle = List.map (add_regions ~effect:true) dl in
+  let uc = Pgm_module.add_effect_typedecl env dle uc in
+  (* 4. add mtsymbols in module *)
+  let add_mt uc d =
+    let x = d.td_ident.id in
+    let get th = ns_find_ts (get_namespace th) [x] in
+    let impure = get (impure_uc uc) in
+    let effect = get (effect_uc uc) in
+    let pure   = get (pure_uc   uc) in
+    let singleton = Hashtbl.mem singletons x in
+    add_mtsymbol (create_mtsymbol ~impure ~effect ~pure ~singleton) uc
+  in
+  let uc = List.fold_left add_mt uc dl in
+  (* 5. declare region types *)
+  let visited = Hashtbl.create 17 in
+  let th = effect_uc uc in
+  let km = get_known th in
+  let rec visit x =
+    if not (Hashtbl.mem visited x) then begin
+      Hashtbl.add visited x ();
+      if is_debug () then 
+	eprintf "@[type %s: %d regions@\n" x
+          (of_option (Hashtbl.find nregions x));
+      let ts = ns_find_ts (get_namespace th) [x] in
+      Hashtbl.iter 
+	(fun (y, i) j -> if y = x then begin
+	   if is_debug () then eprintf "  field %d = region %d@\n" i j;
+	   declare_mutable_field ts i j
+	 end)
+	mutable_field;
+      let region = ref (-1) in
+      let declare_region_type ty =
+	incr region; declare_region_type ts !region ty
+      in
+      let rec visit_type ty = match ty.ty_node with
+	| Ty.Tyvar _ ->
+	    ()
+	| Ty.Tyapp (ts, tyl) ->
+	    let y = ts.ts_name.id_string in
+	    let n = 
+	      if Mstr.mem y def then begin 
+		visit y; of_option (Hashtbl.find nregions y)
+	      end else
+		(get_mtsymbol ts).mt_regions
+	    in
+	    let rl = regions_tyapp ts n tyl in
+	    List.iter (fun r -> declare_region_type r.R.r_ty) rl;
+	    List.iter visit_type tyl
+      in
+      begin match ts.ts_def with
+	| None -> (* abstract or algebraic *)
+	    begin match Decl.find_constructors km ts with
+	      | [] -> (* abstract *)
+		  ()
+	      | [ls] -> (* record *)
+		  let field i ty =
+		    if Hashtbl.mem mutable_field (x, i) then 
+		      declare_region_type ty;
+		    visit_type ty
+		  in
+		  list_iteri field ls.ls_args
+	      | _ -> (* algebraic *)
+		  assert false (*TODO*)
+	    end
+	| Some ty -> (* alias *)
+	    visit_type ty
+      end;
+      if is_debug () then eprintf "@]"
+    end
+  in
+  List.iter (fun d -> visit d.td_ident.id) dl;
+  uc
+
 let find_module penv lmod q id = match q with
   | [] ->
       (* local module *)
@@ -1558,18 +1990,16 @@ let find_module penv lmod q id = match q with
       (* theory in file f *)
       Pgm_env.find_module penv q id
 
-(* env = to retrieve theories from the loadpath
+(* env  = to retrieve theories from the loadpath
    penv = to retrieve modules from the loadpath
    lmod = local modules *)
 let rec decl ~wp env penv ltm lmod uc = function
-  | Ptree.Dlogic d ->
-      Pgm_module.add_logic_pdecl env ltm d uc
   | Ptree.Dlet (id, e) ->
       let e = type_expr uc e in
       if Debug.test_flag debug then
 	eprintf "@[--typing %s-----@\n  @[<hov 2>%a@]@\n@[<hov 2>: %a@]@]@."
 	  id.id Pgm_pretty.print_expr e print_type_v e.expr_type_v;
-      let ls, uc = add_global id.id_loc id.id e.expr_type_v uc in
+      let ls, uc = add_global_fun id.id_loc id.id e.expr_type_v uc in
       let d = Dlet (ls, e) in
       let uc = add_decl d uc in
       if wp then Pgm_wp.decl uc d else uc
@@ -1585,7 +2015,7 @@ let rec decl ~wp env penv ltm lmod uc = function
 	if Debug.test_flag debug then
           eprintf "@[--typing %s-----@\n  %a@.%a@]@."
 	    id Pgm_pretty.print_recfun d print_type_v tyv;
-	let ps, uc = add_global loc id tyv uc in
+	let ps, uc = add_global_fun loc id tyv uc in
 	uc, (ps, d)
       in
       let uc, dl = map_fold_left one uc dl in
@@ -1599,8 +2029,21 @@ let rec decl ~wp env penv ltm lmod uc = function
       let tyv = iutype_v uc (create_ienv denv) tyv in
       let tyv = type_v Mvs.empty tyv in
       if cannot_be_generalized tyv then errorm ~loc "cannot be generalized";
-      let ps, uc = add_global loc id.id tyv uc in
-      let uc = add_global_if_pure uc ps in
+      let ps, uc = match tyv with
+	| Tarrow _ -> 
+	    let ps, uc = add_global_fun loc id.id tyv uc in
+	    PSfun ps, uc
+	| Tpure _ ->
+	    let id = id_user id.id loc in
+	    let pv = create_pvsymbol_v id tyv in
+	    let uc = add_psymbol (PSvar pv) uc in
+	    let ls = create_lsymbol id [] (Some pv.pv_pure.vs_ty) in
+	    let uc = add_pure_decl uc ~loc ls in
+	    declare_global ls pv;
+	    let ls = create_lsymbol id [] (Some pv.pv_effect.vs_ty) in
+	    let uc = add_effect_decl uc ls in
+	    PSvar pv, uc
+      in
       add_decl (Dparam (ps, tyv)) uc (* TODO: is it really needed? *)
   | Ptree.Dexn (id, ty) ->
       let ty = option_map (type_type uc) ty in
@@ -1641,14 +2084,16 @@ let rec decl ~wp env penv ltm lmod uc = function
       let id = option_map (fun id -> id.id) id in
       begin try close_namespace uc import id
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
-  | Ptree.Dmodel_type (mut, id, args, model) ->
-      let loc = id.id_loc in
-      let id = id_user id.id loc in
+  | Ptree.Dlogic (TypeDecl d) ->
+      add_types env ltm uc d
+(* TODO
+      let loc = td.td_loc in
+      let id = let id = td.td_ident in id_user id.id id.id_loc in
       let denv = Typing.create_denv (theory_uc uc) in
       let args = 
 	List.map 
 	  (fun x -> tvsymbol_of_type_var (Typing.find_user_type_var x.id denv))
-	  args
+	  td.td_params
       in
       let model = 
 	option_map 
@@ -1658,6 +2103,8 @@ let rec decl ~wp env penv ltm lmod uc = function
       option_iter (check_type_vars ~loc args) model;
       let mt = create_mtsymbol ~mut id args model in
       add_mtsymbol mt uc
+*)
+(*
   | Ptree.Drecord_type (id, args, fl) ->
       let loc = id.id_loc in
       let id = id_user id.id loc in
@@ -1674,6 +2121,11 @@ let rec decl ~wp env penv ltm lmod uc = function
       let fields = List.map field fl in
       let rt = create_rtsymbol id args fields in
       add_rtsymbol rt uc
+*)
+  | Ptree.Dlogic (LogicDecl _ | IndDecl _ | PropDecl _ | Meta _ as d) ->
+      Pgm_module.add_pure_pdecl env ltm d uc
+  | Ptree.Dlogic d ->
+      Pgm_module.add_pdecl env ltm d uc
 
 (*
 Local Variables:

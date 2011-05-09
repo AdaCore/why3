@@ -7,48 +7,31 @@ open Theory
 open Term
 open Decl
 
-(* model type symbols *)
+(* program type symbols *)
 
 type mtsymbol = private {
-  mt_name   : ident;
-  mt_args   : tvsymbol list;
-  mt_model  : ty option;
-  mt_abstr  : tysymbol;
-  mt_mutable: bool;
+  mt_impure   : tysymbol;
+  mt_effect   : tysymbol;
+  mt_pure     : tysymbol;
+  mt_regions  : int;
+  mt_singleton: bool;
 }
 
-val create_mtsymbol : 
-  mut:bool -> preid -> tvsymbol list -> ty option -> mtsymbol
+val create_mtsymbol :
+  impure:tysymbol -> effect:tysymbol -> pure:tysymbol -> singleton:bool ->
+  mtsymbol
 
 val mt_equal : mtsymbol -> mtsymbol -> bool
 
-exception NotModelType
-
 val get_mtsymbol : tysymbol -> mtsymbol
-  (** raises [NotModelType] if [ts] is not a model type *)
+
+val print_mt_symbol : Format.formatter -> mtsymbol -> unit
 
 val is_mutable_ts : tysymbol -> bool
 val is_mutable_ty : ty       -> bool
 
-(* record type symbols *)
-
-type rt_field = private {
-  rf_name   : ident;
-  rf_region : tvsymbol option;
-  rf_type   : ty;
-}
-
-type rtsymbol = private {
-  rt_name   : ident;
-  rt_args   : tvsymbol list;
-  rt_abstr  : tysymbol;
-  rt_fields : rt_field Mstr.t; 
-}
-
-val create_rtsymbol : 
-  preid -> tvsymbol list -> (bool * preid * ty) list -> rtsymbol
-
-val rt_equal : rtsymbol -> rtsymbol -> bool
+val is_singleton_ts : tysymbol -> bool
+val is_singleton_ty : ty       -> bool
 
 (* builtin logic symbols for programs *)
 
@@ -68,68 +51,78 @@ module rec T : sig
 
   type post_fmla = Term.vsymbol (* result *) * Term.fmla
   type exn_post_fmla = Term.vsymbol (* result *) option * Term.fmla
-      
+
   type esymbol = lsymbol
 
   type post = post_fmla * (esymbol * exn_post_fmla) list
-      
+
   type type_v = private
   | Tpure    of ty
   | Tarrow   of pvsymbol list * type_c
 
-  and type_c = { 
+  and type_c = {
     c_result_type : type_v;
     c_effect      : E.t;
     c_pre         : pre;
-    c_post        : post; 
+    c_post        : post;
   }
 
   and pvsymbol = private {
-    pv_name : ident;
-    pv_tv   : type_v;
-    pv_ty   : ty;      (* as a logic type, for typing purposes only *)
-    pv_vs   : vsymbol; (* for use in the logic *)
+    pv_name   : ident;
+    pv_tv     : type_v;
+    pv_effect : vsymbol; 
+    pv_pure   : vsymbol;
+    pv_regions: Sreg.t;
   }
 
   val tpure  : ty -> type_v
   val tarrow : pvsymbol list -> type_c -> type_v
 
-  val create_pvsymbol : preid -> ?vs:vsymbol -> type_v -> pvsymbol
+  val create_pvsymbol : 
+    preid -> type_v -> 
+    effect:vsymbol -> pure:vsymbol -> regions:Sreg.t -> pvsymbol
 
   (* program symbols *)
 
-  type psymbol = private {
+  type psymbol_fun = private {
     p_name : ident;
     p_tv   : type_v;
     p_ty   : ty;      (* as a logic type, for typing purposes only *)
-    p_ls   : lsymbol; (* for use in the logic *) 
+    p_ls   : lsymbol; (* for use in the logic *)
   }
-      
-  val create_psymbol : preid -> type_v -> psymbol
 
-  val p_equal : psymbol -> psymbol -> bool
+  type psymbol =
+    | PSvar of pvsymbol
+    | PSfun of psymbol_fun
+
+  val create_psymbol_fun : preid -> type_v -> psymbol_fun
+
+  val ps_name : psymbol -> ident
+  val ps_equal : psymbol -> psymbol -> bool
 
   (* program types -> logic types *)
 
   val purify : ty -> ty
+  val effectify : ty -> ty
+
   val purify_type_v : ?logic:bool -> type_v -> ty
     (** when [logic] is [true], mutable types are turned into their models *)
-    
+
   (* operations on program types *)
-    
+
   val apply_type_v_var : type_v -> pvsymbol -> type_c
-  val apply_type_v_sym : type_v -> psymbol  -> type_c
-  val apply_type_v_ref : type_v -> R.t      -> type_c
-    
+(*   val apply_type_v_sym : type_v -> psymbol  -> type_c *)
+(*   val apply_type_v_ref : type_v -> R.t      -> type_c *)
+
   val occur_type_v : R.t -> type_v -> bool
-    
+
   val v_result : ty -> vsymbol
   val exn_v_result : Why.Term.lsymbol -> Why.Term.vsymbol option
-    
+
   val post_map : (fmla -> fmla) -> post -> post
-    
+
   val subst1 : vsymbol -> term -> term Mvs.t
-    
+
   val eq_type_v : type_v -> type_v -> bool
 
   (* pretty-printers *)
@@ -138,46 +131,48 @@ module rec T : sig
   val print_type_c : Format.formatter -> type_c -> unit
   val print_pre    : Format.formatter -> pre    -> unit
   val print_post   : Format.formatter -> post   -> unit
+  val print_pvsymbol : Format.formatter -> pvsymbol -> unit
 
-end 
+end
 
 and Spv :  sig include Set.S with type elt = T.pvsymbol end
 and Mpv :  sig include Map.S with type key = T.pvsymbol end
 
-(* references *)
+(* regions *)
 and R : sig
 
-  type t = 
-    | Rlocal  of T.pvsymbol
-    | Rglobal of T.psymbol
+  type t = private {
+    r_tv : tvsymbol;
+    r_ty : Ty.ty;
+  }
 
-  val type_of : t -> ty
-
-  val name_of : t -> ident
+  val create : tvsymbol -> Ty.ty -> t
 
   val print : Format.formatter -> t -> unit
 
-end 
-and Sref : sig include Set.S with type elt = R.t end
-and Mref : sig include Map.S with type key = R.t end
+end
+and Sreg : sig include Set.S with type elt = R.t end
+and Mreg : sig include Map.S with type key = R.t end
 and Sexn : sig include Set.S with type elt = T.esymbol end
 
 (* effects *)
 and E : sig
 
   type t = private {
-    reads  : Sref.t;
-    writes : Sref.t;
+    reads  : Sreg.t;
+    writes : Sreg.t;
     raises : Sexn.t;
+    globals: Spv.t;
   }
 
   val empty : t
 
   val add_read  : R.t -> t -> t
+  val add_glob  : T.pvsymbol -> t -> t
   val add_write : R.t -> t -> t
   val add_raise : T.esymbol -> t -> t
 
-  val remove_reference : R.t -> t -> t    
+  val remove_reference : R.t -> t -> t
   val filter : (R.t -> bool) -> t -> t
 
   val remove_raise : T.esymbol -> t -> t
@@ -185,19 +180,20 @@ and E : sig
   val union : t -> t -> t
 
   val equal : t -> t -> bool
-    
+
   val no_side_effect : t -> bool
-    
-  val subst : R.t Mpv.t -> t -> t
+
+  val subst : Ty.ty Mtv.t -> t -> t
 
   val occur : R.t -> t -> bool
 
   val print : Format.formatter -> t -> unit
 
-end 
+end
 
 (* ghost code *)
-
+(****
 val mt_ghost   : mtsymbol
 val ps_ghost   : T.psymbol
 val ps_unghost : T.psymbol
+****)

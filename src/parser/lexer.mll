@@ -231,6 +231,8 @@ rule token = parse
       { SEMICOLON }
   | "->"
       { ARROW }
+  | "<-"
+      { LARROW }
   | "<->"
       { LRARROW }
   | "&&"

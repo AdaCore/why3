@@ -56,7 +56,10 @@ type denv
 
 val create_denv : theory_uc -> denv
 
+val create_user_type_var : string -> Denv.type_var
 val find_user_type_var : string -> denv -> Denv.type_var
+
+val type_inst : Denv.dty Ty.Mtv.t -> Ty.ty -> Denv.dty
 
 val mem_var : string -> denv -> bool
 val find_var : string -> denv -> Denv.dty
@@ -77,9 +80,14 @@ val split_qualid : Ptree.qualid -> string list * string
 val string_list_of_qualid : string list -> Ptree.qualid -> string list
 val qloc : Ptree.qualid -> Loc.position
 
-val ts_tuple : int -> Ty.tysymbol
-val fs_tuple : int -> Term.lsymbol
+val ts_tuple : int -> tysymbol
+val fs_tuple : int -> lsymbol
 
 val with_tuples :
   ?reset:bool -> (theory_uc -> 'a -> 'b) -> theory_uc -> 'a -> 'b
 
+val is_projection : theory_uc -> lsymbol -> (tysymbol * lsymbol * int) option
+  (** [is_projection uc ls] returns
+      - [Some (ts, lsc, i)] if [ls] is the i-th projection of an
+        algebraic datatype [ts] with only one constructor [lcs]
+      - [None] otherwise *)

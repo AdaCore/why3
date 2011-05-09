@@ -143,6 +143,37 @@ let rec list_first f = function
       | None -> list_first f l
       | Some r -> r
 
+let list_iteri f l =
+  let rec iter i = function
+    | [] -> ()
+    | x :: l -> f i x; iter (i + 1) l
+  in
+  iter 0 l
+
+let list_mapi f l =
+  let rec map i = function
+    | [] -> []
+    | x :: l -> let v = f i x in v :: map (i + 1) l
+  in
+  map 0 l
+
+let list_fold_lefti f acc l =
+  let rec fold_left acc i = function
+    | [] -> acc
+    | a :: l -> fold_left (f acc i a) (i + 1) l
+  in
+  fold_left acc 0 l
+
+let rec prefix n l = 
+  if n = 0 then []
+  else if n < 0 || l = [] then invalid_arg "Util.chop"
+  else List.hd l :: prefix (n - 1) l
+
+let rec chop n l = 
+  if n = 0 then l 
+  else if n < 0 || l = [] then invalid_arg "Util.chop"
+  else chop (n - 1) (List.tl l)
+
 (* boolean fold accumulators *)
 
 exception FoldSkip

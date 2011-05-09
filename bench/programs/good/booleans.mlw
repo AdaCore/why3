@@ -3,7 +3,7 @@ module M
 use import int.Int
 use import module stdlib.Ref
 
-parameter incr : x:ref int -> { } unit writes x { x = old x + 1 }
+parameter incr : x:ref int -> { } unit writes x.contents { x = old x + 1 }
 
 parameter x : ref int
 

@@ -6,7 +6,7 @@ module Stack
   use import list.List
   use import list.Length
 
-  mutable type t 'a model list 'a
+  type t 'a model {| mutable contents : list 'a |}
 
   parameter create : unit -> {} t 'a { result = Nil }
 

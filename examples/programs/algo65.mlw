@@ -24,7 +24,7 @@ module Algo65
   parameter partition : 
     a : array int -> m:int -> n:int -> i:ref int -> j:ref int ->
     { 0 <= m < n < length a } 
-    unit writes a i j
+    unit writes a.contents i.contents j.contents
     { m <= j < i <= n and permut (old a) a m n and
       exists x:int.
         (forall r:int. m <= r <= j -> a[r] <= x) and

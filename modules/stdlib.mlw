@@ -3,13 +3,13 @@
 
 module Ref
 
-  mutable type ref 'a model 'a
+  type ref 'a = {| mutable contents : 'a |}
 
   parameter ref : v:'a -> {} ref 'a { result=v }
 
-  parameter (!) : r:ref 'a -> {} 'a reads r { result=r }
+  parameter (!) : r:ref 'a -> {} 'a reads r.contents { result=r }
 
-  parameter (:=) : r:ref 'a -> v:'a -> {} unit writes r { r=v }
+  parameter (:=) : r:ref 'a -> v:'a -> {} unit writes r.contents { r=v }
 
 end
 
@@ -18,33 +18,62 @@ module Refint
   use export int.Int
   use export module Ref
 
-  parameter incr : r:ref int -> {} unit writes r { r = old r + 1 }
+  parameter incr : r:ref int -> {} unit writes r.contents { r = old r + 1 }
 
-  parameter decr : r:ref int -> {} unit writes r { r = old r - 1 }
+  parameter decr : r:ref int -> {} unit writes r.contents { r = old r - 1 }
 
 end
 
 (* Arrays *)
-
 module Array
 
   use import int.Int
-  use export array.ArrayLength
+  use import array.ArrayLength as A
+  use import module Ref
+  type map 'a = t int 'a
 
-  mutable type array 'a model t int 'a
+  type array 'a model ref (map 'a)
+
+  logic length (a : array 'a) : int = A.length a
+  logic ([]) (a : array 'a) (i : int) : 'a = get a i
 
   parameter ([]) : a:array 'a -> i:int ->
-    { 0 <= i < length a } 'a reads a { result = a[i] }
+    { 0 <= i < length a } 'a reads a.contents { result = a[i] }
 
-  parameter ([<-]) : a:array 'a -> i:int -> v:'a ->
-    { 0 <= i < length a } unit writes a { a = (old a)[i <- v] }
+  parameter set : a:array 'a -> i:int -> v:'a ->
+    { 0 <= i < length a } unit writes a.contents { a = (old a)[i <- v] }
 
-  parameter length : a:array 'a -> {} int reads a { result = length a }
+  parameter length : a:array 'a -> {} int { result = length a }
 
-  parameter make : n:int -> v:'a ->
-    {}
-    array 'a
+  parameter make : n:int -> v:'a -> 
+    {} 
+    array 'a 
     { length result = n and forall i:int. 0 <= i < n -> result[i] = v}
+end
+
+(***
+module Array
+
+  use import int.Int
+  use import array.Array
+  type map 'a = t int 'a
+
+  type array 'a model {| length : int; mutable elts : map 'a |}
+
+  logic ([]) (a : array 'a) (i : int) : 'a = get a.elts i
+
+  parameter ([]) : a:array 'a -> i:int ->
+    { 0 <= i < a.length } 'a reads a.elts { result = a[i] }
+
+  parameter set : a:array 'a -> i:int -> v:'a ->
+    { 0 <= i < a.length } unit writes a.elts { a.elts = (old a.elts)[i <- v] }
+
+  parameter length : a:array 'a -> {} int { result = a.length }
+
+  parameter make : n:int -> v:'a -> 
+    {} 
+    array 'a 
+    { result.length = n and forall i:int. 0 <= i < n -> result[i] = v}
 
   parameter append : a1:array 'a -> a2:array 'a ->
     {}
@@ -68,10 +97,10 @@ module Array
   parameter fill : a:array 'a -> ofs:int -> len:int -> v:'a ->
    { 0 <= ofs and ofs + len <= length a }
    unit
-   writes a
-   { (forall i:int.
-       (0 <= i < ofs or ofs + len <= i < length a) -> a[i] = (old a)[i])
-     and
+   writes a.elts
+   { (forall i:int. 
+       (0 <= i < ofs or ofs + len <= i < length a) -> a[i] = (old a)[i]) 
+     and 
      (forall i:int.
        ofs <= i < ofs + len -> a[i] = v) }
 
@@ -80,10 +109,10 @@ module Array
    { 0 <= ofs1 and ofs1 + len <= length a1 and
      0 <= ofs2 and ofs2 + len <= length a2 }
    unit
-   writes a2
-   { (forall i:int.
-       (0 <= i < ofs2 or ofs2 + len <= i < length a2) -> a2[i] = (old a2)[i])
-     and
+   writes a2.elts
+   { (forall i:int. 
+       (0 <= i < ofs2 or ofs2 + len <= i < length a2) -> a2[i] = (old a2)[i]) 
+     and 
      (forall i:int.
        ofs2 <= i < ofs2 + len -> a2[i] = a1[ofs1 + i - ofs2]) }
 
@@ -103,7 +132,7 @@ module TestArray
   let test_append () =
     let a1 = make 17 2 in
     assert { a1[3] = 2 };
-    a1[3 <- 4];
+    set a1 3 4;
     assert { a1[3] = 4 };
     let a2 = make 25 3 in
     assert { a2[0] = 3 }; (* needed to prove a[17]=3 below *)
@@ -129,6 +158,7 @@ module TestArray
     assert { a2[24] = False }
 
 end
+***)
 
 (*
 Local Variables:

@@ -29,7 +29,7 @@ theory SortedList
         forall x y : t, l : list t.
         x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
 
-  lemma sorted_Cons: 
+  lemma sorted_mem: 
     forall x: t, l: list t. sorted (Cons x l) -> 
     forall y: t. mem y l -> x <= y
 end
@@ -41,10 +41,4 @@ theory SortedIntList
 
   goal sorted123: sorted (Cons 1 (Cons 2 (Cons 3 Nil)))
 end
-
-(*
-Local Variables: 
-compile-command: "make -C .. tests/test-jcf.gui"
-End: 
-*)
 

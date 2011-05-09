@@ -16,13 +16,16 @@ let rec print_expr fmt e = match e.expr_desc with
 	Pretty.print_ty t.t_ty
   | Elocal v ->
       fprintf fmt "%a" print_pv v
-  | Eglobal ls ->
-      fprintf fmt "<global %a>" print_ls ls.p_ls
+  | Eglobal (PSvar v) ->
+      fprintf fmt "<global var %a>" print_pv v
+  | Eglobal (PSfun f) ->
+      fprintf fmt "<global %a>" print_ls f.p_ls
   | Efun (bl, t) ->
       fprintf fmt "@[<hov 2>fun %a ->@ %a@]" 
 	(print_list space print_pv) bl print_triple t
   | Elet (v, e1, e2) ->
-      fprintf fmt "@[<hv 0>@[<hov 2>let %a =@ %a in@]@ %a@]" print_vs v.pv_vs
+      fprintf fmt "@[<hv 0>@[<hov 2>let %a =@ %a in@]@ %a@]" 
+	print_vs v.pv_effect
 	print_expr e1 print_expr e2
 
   | Eif (e1, e2, e3) ->
@@ -53,7 +56,7 @@ let rec print_expr fmt e = match e.expr_desc with
       fprintf fmt "absurd"
 
 and print_pv fmt v =
-  fprintf fmt "<@[%a : %a@]>" print_vs v.pv_vs print_ty v.pv_ty
+  fprintf fmt "<@[%a : %a@]>" print_vs v.pv_effect print_ty v.pv_pure.vs_ty
 
 and print_triple fmt (p, e, q) =
   fprintf fmt "@[<hv 0>%a@ %a@ %a@]" print_pre p print_expr e print_post q

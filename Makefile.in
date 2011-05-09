@@ -855,8 +855,8 @@ testl: bin/why3ml.byte
 	ocamlrun -bt bin/why3ml.byte tests/test-pgm-jcf.mlw
 	ocamlrun -bt bin/why3ml.byte -P alt-ergo tests/test-pgm-jcf.mlw
 
-testl-debug: bin/why3ml.byte
-	ocamlrun -bt bin/why3ml.byte --debug-all --debug program_typing tests/test-pgm-jcf.mlw
+testl-debug: bin/why3ml.opt
+	bin/why3ml.opt --debug program_typing tests/test-pgm-jcf.mlw
 
 testl-ide: bin/why3ide.opt
 	bin/why3ide.opt tests/test-pgm-jcf.mlw

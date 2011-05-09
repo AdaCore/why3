@@ -36,13 +36,14 @@ type for_direction = Ptree.for_direction
 (*****************************************************************************)
 (* phase 1: introduction of destructive types *)
 
-type dreference =
-  | DRlocal  of string
-  | DRglobal of psymbol
+type dregion = { 
+  dr_tv : Denv.type_var;
+  dr_ty : Denv.dty;
+}
 
 type deffect = {
-  de_reads  : dreference list;
-  de_writes : dreference list;
+  de_reads  : dregion list;
+  de_writes : dregion list;
   de_raises : esymbol list;
 }
 
@@ -67,13 +68,19 @@ type dpost_fmla = Ptree.lexpr
 type dexn_post_fmla = Ptree.lexpr
 type dpost = dpost_fmla * (Term.lsymbol * dexn_post_fmla) list
 
+type dueffect = {
+  du_reads  : Ptree.lexpr list;
+  du_writes : Ptree.lexpr list;
+  du_raises : esymbol list;
+}
+
 type dutype_v =
   | DUTpure  of Denv.dty
   | DUTarrow of dubinder list * dutype_c
 
 and dutype_c =
   { duc_result_type : dutype_v;
-    duc_effect      : deffect;
+    duc_effect      : dueffect;
     duc_pre         : Ptree.lexpr;
     duc_post        : Ptree.lexpr * (Term.lsymbol * Ptree.lexpr) list; }
 
@@ -88,7 +95,7 @@ type dloop_annotation = {
 
 type dexpr = {
   dexpr_desc : dexpr_desc;
-  dexpr_denv : Typing.denv;
+(*   dexpr_denv : Typing.denv; *)
   dexpr_type : Denv.dty;
   dexpr_loc  : loc;
 }
@@ -137,18 +144,17 @@ type ipost = T.post
 
 (* each program variable is materialized by two logic variables (vsymbol):
    one for typing programs and another for typing annotations *)
-type ivsymbol (* = Term.vsymbol *) = {
-  i_pgm   : Term.vsymbol; (* in programs *)
-  i_logic : Term.vsymbol; (* in annotations *)
+type ivsymbol = {
+  i_impure : Term.vsymbol; (* in programs *)
+  i_effect : Term.vsymbol; (* in effect *)
+  i_pure   : Term.vsymbol; (* in annotations *)
 }
 
-type ireference =
-  | IRlocal  of ivsymbol
-  | IRglobal of psymbol
+type iregion = R.t
 
 type ieffect = {
-  ie_reads  : ireference list;
-  ie_writes : ireference list;
+  ie_reads  : iregion list;
+  ie_writes : iregion list;
   ie_raises : esymbol list;
 }
 
@@ -191,7 +197,8 @@ and iexpr_desc =
   | IElocal of ivsymbol
   | IEglobal of psymbol * itype_v
   | IEapply of iexpr * ivsymbol
-  | IEapply_ref of iexpr * ireference
+  | IEapply_var of iexpr * ivsymbol
+  | IEapply_glob of iexpr * pvsymbol
   | IEfun of ibinder list * itriple
   | IElet of ivsymbol * iexpr * iexpr
   | IEletrec of irecfun list * iexpr
@@ -272,8 +279,8 @@ and recfun = pvsymbol * pvsymbol list * rec_variant option * triple
 and triple = pre * expr * post
 
 type decl =
-  | Dlet    of T.psymbol * expr
-  | Dletrec of (T.psymbol * recfun) list
+  | Dlet    of T.psymbol_fun * expr
+  | Dletrec of (T.psymbol_fun * recfun) list
   | Dparam  of T.psymbol * type_v
 
 type file = decl list

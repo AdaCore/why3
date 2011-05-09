@@ -5,7 +5,7 @@ use import module stdlib.Ref
 
 parameter x : ref int
 
-parameter f : unit -> { } unit writes x { x = 1 - old x }
+parameter f : unit -> { } unit writes x.contents { x = 1 - old x }
 
 let p () =
   begin

@@ -9,8 +9,7 @@ open Pgm_types.T
 type namespace = private {
   ns_pr : psymbol   Mnm.t;  (* program symbols *)
   ns_ex : esymbol   Mnm.t;  (* exception symbols *)
-  ns_mt : mtsymbol  Mnm.t;  (* mutable types *)
-  ns_rt : rtsymbol  Mnm.t;  (* record types *)
+  ns_mt : mtsymbol  Mnm.t;  (* types *)
   ns_ns : namespace Mnm.t;  (* inner namespaces *)
 }
 
@@ -23,12 +22,16 @@ val ns_find_ns : namespace -> string list -> namespace
 type uc
 
 val namespace : uc -> namespace
-val theory_uc : uc -> Theory.theory_uc
+val impure_uc : uc -> Theory.theory_uc
+val effect_uc : uc -> Theory.theory_uc
+val pure_uc   : uc -> Theory.theory_uc
 
 (** a module *)
 type t = private {
   m_name   : ident;
-  m_th     : Theory.theory;
+  m_impure : Theory.theory;
+  m_effect : Theory.theory;
+  m_pure   : Theory.theory;
   m_decls  : Pgm_ttree.decl list;
   m_export : namespace;
 }
@@ -49,11 +52,16 @@ exception ClashSymbol of string
 val add_psymbol : psymbol -> uc -> uc
 val add_esymbol : esymbol -> uc -> uc
 val add_mtsymbol : mtsymbol -> uc -> uc
-val add_rtsymbol : rtsymbol -> uc -> uc
 val add_decl : Pgm_ttree.decl -> uc -> uc
-val add_logic_decl : Decl.decl -> uc -> uc
+val add_pure_decl : Decl.decl -> uc -> uc
+val add_effect_decl : Decl.decl -> uc -> uc
 
-val add_logic_pdecl : 
+val add_impure_typedecl : Env.env -> Ptree.type_decl list -> uc -> uc
+val add_effect_typedecl : Env.env -> Ptree.type_decl list -> uc -> uc
+
+val add_pure_pdecl : 
+  Env.env -> Theory.theory Theory.Mnm.t -> Ptree.decl -> uc -> uc
+val add_pdecl : 
   Env.env -> Theory.theory Theory.Mnm.t -> Ptree.decl -> uc -> uc
 
 (** exceptions *)

@@ -121,6 +121,7 @@ type type_decl = {
   td_loc    : loc;
   td_ident  : ident;
   td_params : ident list;
+  td_model  : bool;
   td_def    : type_def;
 }
 
@@ -174,8 +175,8 @@ type loop_annotation = {
 type for_direction = To | Downto
 
 type effect = {
-  pe_reads  : qualid list;
-  pe_writes : qualid list;
+  pe_reads  : lexpr list;
+  pe_writes : lexpr list;
   pe_raises : qualid list;
 }
 
@@ -239,8 +240,6 @@ type program_decl =
   (* modules *)
   | Duse    of qualid * imp_exp * (*as:*) ident option
   | Dnamespace of loc * ident option * (* import: *) bool * program_decl list
-  | Dmodel_type of is_mutable * ident * ident list * pty option
-  | Drecord_type of ident * ident list * (is_mutable * ident * pty) list
 
 type module_ = {
   mod_name   : ident;

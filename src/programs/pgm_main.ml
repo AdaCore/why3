@@ -45,7 +45,7 @@ let add_module ?(type_only=false) env penv (ltm, lmod) m =
     List.fold_left (Pgm_typing.decl ~wp env penv ltm lmod) uc m.mod_decl 
   in
   let m = close_module uc in
-  Mnm.add id.id m.m_th ltm,
+  Mnm.add id.id m.m_pure ltm,
   Mnm.add id.id m lmod
 
 let retrieve penv file c =
