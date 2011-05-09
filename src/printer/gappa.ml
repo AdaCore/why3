@@ -273,25 +273,30 @@ let print_decls ?old info fmt dl =
   fprintf fmt "@[<hov>{ %a }@\n@]" (print_list nothing (print_decl ?old info)) dl
 *)
 
-let filter_hyp info eqs hyps pr f =
+exception AlreadyDefined
+
+let filter_hyp info defs eqs hyps pr f =
   match f.f_node with
-    | Fapp(ls,[t1;t2]) when ls == ps_equ ->
-        (* TODO: if type of t! and T2 is single or double, then
-           replace by (value t1) = (value t2) and (exact t1 = exact t2)
-        *)
-	begin match t1.t_node with
-	  | Tapp(_,[]) ->
-	      ((pr,t1,t2)::eqs,hyps)
-	  | _ ->
-	      match t2.t_node with
-		| Tapp(_,[]) ->
-		    ((pr,t2,t1)::eqs,hyps)
-		| _ -> (eqs, (pr,f)::hyps)
-	end
-	  (* todo: support more kinds of hypotheses *)
-    | Fapp(ls,_) when Sid.mem ls.ls_name info.info_symbols ->
-	(eqs, (pr,f)::hyps)
-    | _ -> (eqs,hyps)
+  | Fapp(ls,[t1;t2]) when ls == ps_equ ->
+      let try_equality t1 t2 =
+        match t1.t_node with
+          | Tapp(l,[]) ->
+              if Hid.mem defs l.ls_name then raise AlreadyDefined;
+              Hid.add defs l.ls_name ();
+              t_s_fold (fun _ _ -> ()) (fun _ ls -> Hid.replace defs ls.ls_name ()) () t2;
+              ((pr,t1,t2)::eqs, hyps)
+          | _ -> raise AlreadyDefined in
+      begin try
+        try_equality t1 t2
+      with AlreadyDefined -> try
+        try_equality t2 t1
+      with AlreadyDefined ->
+        (eqs, (pr,f)::hyps)
+      end
+  (* todo: support more kinds of hypotheses *)
+  | Fapp(ls,_) when Sid.mem ls.ls_name info.info_symbols ->
+      (eqs, (pr,f)::hyps)
+  | _ -> (eqs,hyps)
 
 type filter_goal =
   | Goal_good of Decl.prsymbol * fmla
@@ -304,7 +309,7 @@ let filter_goal pr f =
 	(* todo: filter more goals *)
     | _ -> Goal_good(pr,f)
 
-let prepare info ((eqs,hyps,goal) as acc) d =
+let prepare info defs ((eqs,hyps,goal) as acc) d =
   match d.d_node with
     | Dtype _ -> acc
     | Dlogic _ -> acc
@@ -312,7 +317,7 @@ let prepare info ((eqs,hyps,goal) as acc) d =
 	unsupportedDecl d
 	  "please remove inductive definitions before calling gappa printer"
     | Dprop (Paxiom, pr, f) ->
-	let (eqs,hyps) = filter_hyp info eqs hyps pr f in (eqs,hyps,goal)
+	let (eqs,hyps) = filter_hyp info defs eqs hyps pr f in (eqs,hyps,goal)
     | Dprop (Pgoal, pr, f) ->
 	begin
 	  match goal with
@@ -349,7 +354,7 @@ let print_task env pr thpr ?old:_ fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   let equations,hyps,goal =
-    List.fold_left (prepare info) ([],[],Goal_none) (Task.task_decls task)
+    List.fold_left (prepare info (Hid.create 17)) ([],[],Goal_none) (Task.task_decls task)
   in
   List.iter (print_equation info fmt) (List.rev equations);
   fprintf fmt "@[<v 2>{ %a%a}@\n@]" (print_list nothing (print_hyp info)) hyps
