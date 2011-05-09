@@ -714,7 +714,7 @@ let rec type_effect_term env { pp_loc = loc; pp_desc = d } = match d with
   | _ ->
       errorm ~loc "unsupported effect syntax"
 
-let iuregion env { pp_loc = loc; pp_desc = d } = match d with
+let iuregion env ({ pp_loc = loc; pp_desc = d } as t) = match d with
   | PPapp (f, [t]) ->
       let th = effect_uc env.i_uc in
       let ls, _, _ = Typing.specialize_lsymbol f th in
@@ -742,7 +742,24 @@ let iuregion env { pp_loc = loc; pp_desc = d } = match d with
 	    errorm ~loc "not a record field"
       end
   | _ ->
-      errorm ~loc "unsupported effect syntax"
+      let ty = type_effect_term env t in
+      let not_mutable () = errorm ~loc 
+	"this expression has type %a,@ but is expected to have a mutable type@]"
+	Pretty.print_ty ty
+      in
+      begin match ty.ty_node with
+	| Ty.Tyapp (ts, tyl)  ->
+	    let mt = get_mtsymbol ts in
+	    let n = mt.mt_regions in
+	    if n = 0 then not_mutable ();
+	    if n > 1 then errorm ~loc
+	      "ambiguous effect term (more than one region)";
+	    let r = regions_tyapp ts mt.mt_regions tyl in
+	    List.nth r 0
+	| _ ->
+	    not_mutable ()
+      end
+
 (***
   | Qident id when Mstr.mem id.id env.locals ->
       (* local variable *)

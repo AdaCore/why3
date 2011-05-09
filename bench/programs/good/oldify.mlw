@@ -7,7 +7,7 @@ module M
   parameter r : ref int
 
   parameter f1 : y:int ->
-             {} unit writes r.contents { q1 r (old r) y }
+             {} unit writes r { q1 r (old r) y }
 
   let g1 () = {} f1 !r { q1 r (old r) (old r) }
 
@@ -15,7 +15,7 @@ module M
   logic q int int int
 
   parameter f : t:ref int -> x:int -> 
-             {} unit writes t.contents { q t (old t) x }
+             {} unit writes t { q t (old t) x }
 
   let g (t:ref int) =
     {}

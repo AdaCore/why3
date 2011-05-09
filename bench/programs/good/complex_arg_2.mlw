@@ -8,7 +8,7 @@ parameter t : ref int
 
 parameter m : a:int -> b:int ->
     { }
-    unit reads t.contents raises Exception
+    unit reads t raises Exception
     { true } | Exception -> { true }
 
 let test () =

@@ -10,7 +10,7 @@ module M
   parameter set_and_test_zero : 
     v:int -> 
       {} 
-      bool writes x.contents 
+      bool writes x 
       { x = v and if result=True then x = 0 else x <> 0 }
 
   let p () = {} if set_and_test_zero 0 then 1 else 2 { result = 1 }
@@ -18,7 +18,7 @@ module M
   parameter set_and_test_nzero : 
     v:int -> 
       {} 
-      bool writes x.contents 
+      bool writes x 
       { x = v and if result=True then x <> 0 else x = 0 }
 
   let p2 (y:ref int) = 

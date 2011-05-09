@@ -1,0 +1,8 @@
+
+module M
+
+  type t = {| mutable a : int; mutable b : int |}
+
+  parameter f : x:t -> {} unit writes x {}
+
+end

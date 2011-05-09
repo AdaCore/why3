@@ -49,7 +49,7 @@ let p11a () = {} let a = (fsucc 1) in a + a { result = 4 }
 
 (* function with a post-condition and side-effects *)
 
-parameter incrx : unit -> { } unit writes x.contents { x = (old x) + 1 }
+parameter incrx : unit -> { } unit writes x { x = (old x) + 1 }
 
 let p12 () = { x = 0 } incrx () { x = 1 }
 
@@ -59,7 +59,7 @@ let p13a () = {} incrx (incrx ()) { x = (old x) + 2 }
 
 (* function with side-effects, result and post-condition *)
 
-parameter incrx2 : unit -> { } int writes x.contents { x = old x + 1 and result = x }
+parameter incrx2 : unit -> { } int writes x { x = old x + 1 and result = x }
 
 let p14 () = { x = 0 } incrx2 () { result = 1 }
 

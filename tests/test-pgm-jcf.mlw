@@ -6,7 +6,7 @@ module TestRef
 
   let f1 (x : ref int) (y : ref int) =
      {}
-     x := !x + 1;
+     x := 1;
      y := 2
      { x = 1 and y = 2 }
 
@@ -20,7 +20,7 @@ module TestRef
 
   parameter a : ref int
 
-  parameter havoc : unit -> {} unit writes a.contents {a=1}
+  parameter havoc : unit -> {} unit writes a {a=1}
 
   let foo () = { a=0 } havoc(); 1 { a=1 and result=1 }
 
@@ -31,7 +31,13 @@ module TestRef
      provoque "undefined type variable" (la région) 
      problème : comment faire l'inférence du type de n
   *)
+
+  type t2 = {| mutable fa : int; mutable fb : int |}
+  parameter ft2 : x:t2 -> {} unit writes x.fa x.fb {}
+
 end
+
+(***
 
 module Array
 
@@ -42,8 +48,6 @@ module Array
   let foo (x : t) = get x
 
 end
-
-(***
 
 module TestArray
 
