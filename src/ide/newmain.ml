@@ -567,7 +567,8 @@ let replay_obsolete_proofs () =
   List.iter
     (fun row ->
        let a = get_any row in
-       M.replay ~context_unproved_goals_only:!context_unproved_goals_only a)
+       M.replay ~obsolete_only:true 
+         ~context_unproved_goals_only:!context_unproved_goals_only a)
     goals_view#selection#get_selected_rows
 
 

@@ -1217,40 +1217,40 @@ let proof_successful a =
     | Done { Call_provers.pr_answer = Call_provers.Valid } -> true
     | _ -> false
 
-let rec replay_on_goal_or_children ~context_unproved_goals_only g =
+let rec replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only g =
   Hashtbl.iter
     (fun _ a ->
-       if a.proof_obsolete then
+       if not obsolete_only || a.proof_obsolete then
          if not context_unproved_goals_only || proof_successful a
          then redo_external_proof g a)
     g.external_proofs;
   Hashtbl.iter
     (fun _ t -> 
        List.iter 
-	 (replay_on_goal_or_children ~context_unproved_goals_only) 
+	 (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only) 
 	 t.subgoals)
     g.transformations
 
-let replay ~context_unproved_goals_only a =
+let replay ~obsolete_only ~context_unproved_goals_only a =
   match a with
     | Goal g ->
-        replay_on_goal_or_children ~context_unproved_goals_only g
+        replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only g
     | Theory th ->
         List.iter 
-	  (replay_on_goal_or_children ~context_unproved_goals_only)
+	  (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only)
 	  th.goals
     | File file ->
         List.iter
           (fun th ->
              List.iter 
-	       (replay_on_goal_or_children ~context_unproved_goals_only)
+	       (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only)
 	       th.goals)
           file.theories
     | Proof_attempt a ->
-        replay_on_goal_or_children ~context_unproved_goals_only a.proof_goal
+        replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only a.proof_goal
     | Transformation tr ->
         List.iter 
-	  (replay_on_goal_or_children ~context_unproved_goals_only)
+	  (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only)
 	  tr.subgoals
 
 

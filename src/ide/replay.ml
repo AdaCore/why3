@@ -119,7 +119,7 @@ let main_loop () =
             begin 
               let ms = 
                 match !timeout_handler with
-                  | None -> 0.1
+                  | None -> raise Exit
                   | Some(ms,_) -> ms
               in
               usleep (ms -. time)
@@ -223,8 +223,14 @@ let main () =
     M.maximum_running_proofs := 
       Whyconf.running_provers_max (Whyconf.get_main config);
     eprintf " done@.";
-    (* for each file f *) let _ = M.replay (* f *) in
-    main_loop ()
+    let files = M.get_all_files () in
+    List.iter 
+      (fun f -> 
+         eprintf "Replaying file '%s'@." f.M.file_name;
+         M.replay ~obsolete_only:false
+           ~context_unproved_goals_only:false (M.File f)) files;
+    try main_loop ()
+    with Exit -> eprintf "Everything done@."
   with e ->
     eprintf "Error while opening session with database '%s'@." project_dir;
     eprintf "Aborting...@.";

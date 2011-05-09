@@ -208,8 +208,13 @@ module Make(O: OBSERVER) : sig
   val edit_proof : 
     default_editor:string -> project_dir:string -> proof_attempt -> unit
 
-  val replay : context_unproved_goals_only:bool -> any -> unit
-    (** [replay a] reruns all valid but obsolete proofs under [a] *)
+  val replay : 
+    obsolete_only:bool -> 
+    context_unproved_goals_only:bool -> any -> unit
+    (** [replay a] reruns proofs under [a] 
+        if obsolete_only is set then does not rerun non-obsolete proofs
+        if context_unproved_goals_only is set then reruns only proofs with result was 'valid'
+    *)
 
 (*
 TODO
