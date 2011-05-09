@@ -1,4 +1,5 @@
 theory Why2
+use array.Array as A
   use Tuple0
   use int.Int
   use int.ComputerDivision
@@ -463,27 +464,13 @@ theory Why2
         (forall i:int [(sub_pointer p (shift q i : (pointer 'a1)) : int)].
           ((sub_pointer p (shift q i : (pointer 'a1)) : int) = (Int.(-) (sub_pointer p q : int) i : int)))))
 
-  type memory 't 'v
+  type memory 't 'v = A.t (pointer 't) 'v
 
-  logic select (memory 'a2 'a1) (pointer 'a2) : 'a1
+  logic select (m:memory 'a1 'a2) (k:pointer 'a1) : 'a2 = A.get m k
 
-  logic store (memory 'a1 'a2) (pointer 'a1) 'a2 : (memory 'a1 'a2)
+  logic store (m:memory 'a1 'a2) (k:pointer 'a1) (v:'a2) : (memory 'a1 'a2) = A.set m k v
 
-  axiom Select_store_eq:
-    (forall m:(memory 'a1 'a2).
-      (forall p1:(pointer 'a1).
-        (forall p2:(pointer 'a1).
-          (forall a:'a2 [(store m p1 a : (memory 'a1 'a2)), p2].
-            ((p1 = p2) ->
-             ((select (store m p1 a : (memory 'a1 'a2)) p2 : 'a2) = a))))))
 
-  axiom Select_store_neq:
-    (forall m:(memory 'a1 'a2).
-      (forall p1:(pointer 'a1).
-        (forall p2:(pointer 'a1).
-          (forall a:'a2 [(store m p1 a : (memory 'a1 'a2)), p2].
-            ((p1 <> p2) ->
-             ((select (store m p1 a : (memory 'a1 'a2)) p2 : 'a2) = (select m p2 : 'a2)))))))
 
   type pset 't
 

@@ -1,10 +1,15 @@
+How to reproduce the bench for "Expressing Polymorphic Types in a Many-Sorted Language" of FROCOS'11
+
 The result of this bench can be reproduce using Why3 in the following way:
 
-- You need for that purpose to configure and install why3.
+- You need to come back to version acbaa9b711b41e10d3815e3 with
+  git checkout acbaa9b711b41e10d3815e3, and
+- You need to configure and install why3.
 - After that you should run why3config and set in ~/.why.conf in the
   section [main] the variable "running_provers_max" to your own
-  number of core.
-- Run ./run_bench.sh  (it takes 10 hours with 7 core). It creates four files :
-partial_deco.csv twin_deco.csv partial_explicit.csv  twin_explicit.csv
-- Run ./compute_result.sh (it takes 10seconds) to compute the
-  differences between the four transformations. It needs csvtool.
+  number of core. You need CVC3, Z3 and Yices.
+- Run ./gen_allbench.sh generates one file, bench, by possible set of parameters
+- Run ./run_bench.sh  (it takes 10 hours with 7 core). It runs the benchs used in the paper
+- Run ./compute_result.sh (it takes 10seconds) to compute the comparison tables. It needs csvtool.
+
+nb: bool_inf and unit_inf are used in order to be able to use explicit

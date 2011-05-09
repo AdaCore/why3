@@ -1,8 +1,8 @@
-theory Partial
+theory Kept_partial
   meta "enco_kept" "instantiate"
 end
 
-theory Twin
+theory Kept_twin
   meta "enco_kept" "bridge"
 end
 
@@ -11,18 +11,65 @@ theory Partial_incomplete
   meta "encoding_instantiate : complete" "no"
 end
 
-theory Explicit
+theory Poly_explicit
   meta "enco_poly" "explicit"
 end
 
-theory Deco
+theory Poly_guard
+  meta "enco_poly" "guard"
+end
+
+theory Poly_deco
   meta "enco_poly" "decorate"
 end
 
-theory Goal
-  meta "enco_select" "goal"
+theory Inst_nothing
+  meta "select_inst" "nothing"
 end
 
+theory Inst_goal
+  meta "select_inst" "goal"
+end
+
+theory Inst_context
+  meta "select_inst" "all"
+end
+
+theory Kept_nothing
+  meta "select_kept" "nothing"
+end
+
+theory Kept_goal
+  meta "select_kept" "goal"
+end
+
+theory Kept_context
+  meta "select_kept" "all"
+end
+
+theory Lskept_nothing
+  meta "select_lskept" "nothing"
+end
+
+theory Lskept_goal
+  meta "select_lskept" "goal"
+end
+
+theory Lskept_context
+  meta "select_lskept" "all"
+end
+
+theory Product_nothing
+  meta "completion_mode" "nothing"
+end
+
+theory Product_only_kept
+  meta "completion_mode" "only_kept"
+end
+
+theory Product_some_kept
+  meta "completion_mode" "some_kept"
+end
 
 theory KeptIntReal
   use int.Int

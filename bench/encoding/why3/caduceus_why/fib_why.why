@@ -1,4 +1,5 @@
 theory Why2
+use array.Array as A
   use Tuple0
   use int.Int
   use int.ComputerDivision
@@ -514,24 +515,13 @@ theory Why2
     (forall n:int.
       ((Int.(>=) n 0) -> ((Int.(<=) n 0) -> (1 = (why3_F n : int)))))
 
-  type farray 'a
+  type farray 'a = A.t int 'a
 
-  logic access (farray 'a1) int : 'a1
+  logic access (m:farray 'a1) (k:int) : 'a1 = A.get m k
 
-  logic update (farray 'a1) int 'a1 : (farray 'a1)
+  logic update (m:farray 'a1) (k:int) (v:'a1) : (farray 'a1) = A.set m k v
 
-  axiom Access_update:
-    (forall a:(farray 'a1).
-      (forall i:int.
-        (forall v:'a1. ((access (update a i v : (farray 'a1)) i : 'a1) = v))))
 
-  axiom Access_update_neq:
-    (forall a:(farray 'a1).
-      (forall i:int.
-        (forall j:int.
-          (forall v:'a1.
-            ((i <> j) ->
-             ((access (update a i v : (farray 'a1)) j : 'a1) = (access a j : 'a1)))))))
 
   logic array_length (farray 'a1) : int
 

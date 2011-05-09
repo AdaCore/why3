@@ -1,4 +1,5 @@
 theory Why2
+use array.Array as A
   use Tuple0
   use int.Int
   use int.ComputerDivision
@@ -205,25 +206,13 @@ theory Why2
         (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) ->
          ((sub_pointer p1 p2 : int) = (Int.(-) (offset p1 : int) (offset p2 : int) : int)))))
 
-  type memory 'a 'z
+  type memory 'a 'z = A.t (pointer 'z) 'a
 
-  logic acc (memory 'a1 'a2) (pointer 'a2) : 'a1
+  logic acc (m:memory 'a1 'a2) (k:pointer 'a2) : 'a1 = A.get m k
 
-  logic upd (memory 'a1 'a2) (pointer 'a2) 'a1 : (memory 'a1 'a2)
+  logic upd (m:memory 'a1 'a2) (k:pointer 'a2) (v:'a1) : (memory 'a1 'a2) = A.set m k v
 
-  axiom Acc_upd:
-    (forall m:(memory 'a1 'a2).
-      (forall p:(pointer 'a2).
-        (forall a:'a1 [(acc (upd m p a : (memory 'a1 'a2)) p : 'a1)].
-          ((acc (upd m p a : (memory 'a1 'a2)) p : 'a1) = a))))
 
-  axiom Acc_upd_neq:
-    (forall m:(memory 'a1 'a2).
-      (forall p1:(pointer 'a2).
-        (forall p2:(pointer 'a2).
-          (forall a:'a1 [(acc (upd m p1 a : (memory 'a1 'a2)) p2 : 'a1)].
-            ((p1 <> p2) ->
-             ((acc (upd m p1 a : (memory 'a1 'a2)) p2 : 'a1) = (acc m p2 : 'a1)))))))
 
   axiom False_not_true: (Bool.False <> Bool.True)
 

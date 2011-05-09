@@ -1,6 +1,10 @@
 #!/bin/sh
 
-benchs=$(echo partial_deco.csv partial_explicit.csv twin_deco.csv twin_explicit.csv)
+echo "Z3:"
+./diff_all2.sh z3 lines columns
 
-./clean.sh $benchs
-./see_result.sh $benchs
+echo "CVC3:"
+./diff_all2.sh cvc3 lines columns
+
+echo "Yices:"
+./diff_all2.sh yices lines_yices columns_yices
