@@ -50,9 +50,17 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | _ -> raise e)
 
 let stack_trace = register_flag "stack_trace"
+let timestamp = register_flag "timestamp"
+let time_start = Unix.gettimeofday ()
 
 let set_debug_formatter = (:=) formatter
 let get_debug_formatter () = !formatter
 
-let dprintf flag =
-  if !flag then Format.fprintf !formatter else Format.ifprintf !formatter
+let dprintf flag s =
+  if !flag then
+    begin
+      if !timestamp then Format.fprintf !formatter "<%f>"
+        (Unix.gettimeofday () -. time_start);
+      Format.fprintf !formatter s
+    end
+  else Format.ifprintf !formatter s
