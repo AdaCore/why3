@@ -1,12 +1,12 @@
 theory Why2
-  use Tuple0
+  use unit_inf.Unit
   use int.Int
   use int.ComputerDivision
   use real.Real
-  use bool.Bool
-  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+  use bool_inf.Bool
+  logic eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+  logic neq_unit Unit.unit Unit.unit
 
   logic eq_bool Bool.bool Bool.bool
 
@@ -92,8 +92,8 @@ theory Why2
                 ((Int.(>=) y 0) ->
                  ((Int.(>=) y4 0) ->
                   ((((((x6 = y4) and
-                       (if b = Bool.True then (x6 <> 0) else (x6 = 0))) and
-                      (Bool.True = b)) and
+                       (if b = Bool.ttrue then (x6 <> 0) else (x6 = 0))) and
+                      (Bool.ttrue = b)) and
                      (y5 = (Int.(-) y4 1 : int))) and
                     (y6 = y5)) ->
                    (Int.(>=) y6 0))))))))))
@@ -108,8 +108,8 @@ theory Why2
                 ((Int.(>=) y 0) ->
                  ((Int.(>=) y4 0) ->
                   ((((((x6 = y4) and
-                       (if b = Bool.True then (x6 <> 0) else (x6 = 0))) and
-                      (Bool.True = b)) and
+                       (if b = Bool.ttrue then (x6 <> 0) else (x6 = 0))) and
+                      (Bool.ttrue = b)) and
                      (y5 = (Int.(-) y4 1 : int))) and
                     (y6 = y5)) ->
                    ((Int.(<=) 0 y4) and (Int.(<) y6 y4)))))))))))
@@ -125,8 +125,8 @@ theory Why2
                   ((Int.(>=) y 0) ->
                    ((((Int.(>=) y4 0) and
                       ((((x6 = y4) and
-                         (if b = Bool.True then (x6 <> 0) else (x6 = 0))) and
-                        (Bool.False = b)) and
+                         (if b = Bool.ttrue then (x6 <> 0) else (x6 = 0))) and
+                        (Bool.ffalse = b)) and
                        (x7 = x6))) and
                      ((x8 = x7) and (y7 = y4))) ->
                     (y7 = 0))))))))))

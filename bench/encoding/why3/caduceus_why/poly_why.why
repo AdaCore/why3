@@ -1,12 +1,12 @@
 theory Why2
-  use Tuple0
+  use unit_inf.Unit
   use int.Int
   use int.ComputerDivision
   use real.Real
-  use bool.Bool
-  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+  use bool_inf.Bool
+  logic eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+  logic neq_unit Unit.unit Unit.unit
 
   logic eq_bool Bool.bool Bool.bool
 
@@ -44,8 +44,8 @@ theory Why2
 
   goal P_po_1:
     (forall result:int.
-      ((((Bool.True = Bool.True) and (result = 1)) or
-        ((Bool.False = Bool.True) and (result = 2))) ->
+      ((((Bool.ttrue = Bool.ttrue) and (result = 1)) or
+        ((Bool.ffalse = Bool.ttrue) and (result = 2))) ->
        (result = 1)))
 
 

@@ -1,13 +1,13 @@
 theory Why2
 use array.Array as A
-  use Tuple0
+  use unit_inf.Unit
   use int.Int
   use int.ComputerDivision
   use real.Real
-  use bool.Bool
-  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+  use bool_inf.Bool
+  logic eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+  logic neq_unit Unit.unit Unit.unit
 
   logic eq_bool Bool.bool Bool.bool
 
@@ -80,32 +80,32 @@ use array.Array as A
   axiom Lt_real_bool_axiom:
     (forall x:real.
       (forall y:real.
-        (((lt_real_bool x y : Bool.bool) = Bool.True) <-> (Real.(<) x y))))
+        (((lt_real_bool x y : Bool.bool) = Bool.ttrue) <-> (Real.(<) x y))))
 
   axiom Le_real_bool_axiom:
     (forall x:real.
       (forall y:real.
-        (((le_real_bool x y : Bool.bool) = Bool.True) <-> (Real.(<=) x y))))
+        (((le_real_bool x y : Bool.bool) = Bool.ttrue) <-> (Real.(<=) x y))))
 
   axiom Gt_real_bool_axiom:
     (forall x:real.
       (forall y:real.
-        (((gt_real_bool x y : Bool.bool) = Bool.True) <-> (Real.(>) x y))))
+        (((gt_real_bool x y : Bool.bool) = Bool.ttrue) <-> (Real.(>) x y))))
 
   axiom Ge_real_bool_axiom:
     (forall x:real.
       (forall y:real.
-        (((ge_real_bool x y : Bool.bool) = Bool.True) <-> (Real.(>=) x y))))
+        (((ge_real_bool x y : Bool.bool) = Bool.ttrue) <-> (Real.(>=) x y))))
 
   axiom Eq_real_bool_axiom:
     (forall x:real.
       (forall y:real.
-        (((eq_real_bool x y : Bool.bool) = Bool.True) <-> (x = y))))
+        (((eq_real_bool x y : Bool.bool) = Bool.ttrue) <-> (x = y))))
 
   axiom Neq_real_bool_axiom:
     (forall x:real.
       (forall y:real.
-        (((neq_real_bool x y : Bool.bool) = Bool.True) <-> (x <> y))))
+        (((neq_real_bool x y : Bool.bool) = Bool.ttrue) <-> (x <> y))))
 
   logic real_max real real : real
 
@@ -298,37 +298,37 @@ use array.Array as A
   axiom Lt_double_bool_axiom:
     (forall x:double.
       (forall y:double.
-        (((lt_double_bool x y : Bool.bool) = Bool.True) <->
+        (((lt_double_bool x y : Bool.bool) = Bool.ttrue) <->
          (Real.(<) (d_to_r x : real) (d_to_r y : real)))))
 
   axiom Le_double_bool_axiom:
     (forall x:double.
       (forall y:double.
-        (((le_double_bool x y : Bool.bool) = Bool.True) <->
+        (((le_double_bool x y : Bool.bool) = Bool.ttrue) <->
          (Real.(<=) (d_to_r x : real) (d_to_r y : real)))))
 
   axiom Gt_double_bool_axiom:
     (forall x:double.
       (forall y:double.
-        (((gt_double_bool x y : Bool.bool) = Bool.True) <->
+        (((gt_double_bool x y : Bool.bool) = Bool.ttrue) <->
          (Real.(>) (d_to_r x : real) (d_to_r y : real)))))
 
   axiom Ge_double_bool_axiom:
     (forall x:double.
       (forall y:double.
-        (((ge_double_bool x y : Bool.bool) = Bool.True) <->
+        (((ge_double_bool x y : Bool.bool) = Bool.ttrue) <->
          (Real.(>=) (d_to_r x : real) (d_to_r y : real)))))
 
   axiom Eq_double_bool_axiom:
     (forall x:double.
       (forall y:double.
-        (((eq_double_bool x y : Bool.bool) = Bool.True) <->
+        (((eq_double_bool x y : Bool.bool) = Bool.ttrue) <->
          ((d_to_r x : real) = (d_to_r y : real)))))
 
   axiom Neq_double_bool_axiom:
     (forall x:double.
       (forall y:double.
-        (((neq_double_bool x y : Bool.bool) = Bool.True) <->
+        (((neq_double_bool x y : Bool.bool) = Bool.ttrue) <->
          ((d_to_r x : real) <> (d_to_r y : real)))))
 
   type quad
@@ -550,7 +550,7 @@ use array.Array as A
 
 
 
-  axiom False_not_true: (Bool.False <> Bool.True)
+
 
   type pset 'z
 

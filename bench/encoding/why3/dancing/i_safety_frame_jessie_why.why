@@ -1,13 +1,13 @@
 theory Why2
 use array.Array as A
-  use Tuple0
+  use unit_inf.Unit
   use int.Int
   use int.ComputerDivision
   use real.Real
-  use bool.Bool
-  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+  use bool_inf.Bool
+  logic eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+  logic neq_unit Unit.unit Unit.unit
 
   logic eq_bool Bool.bool Bool.bool
 
@@ -56,31 +56,31 @@ use array.Array as A
   axiom Bool_and_def:
     (forall a:Bool.bool.
       (forall b:Bool.bool.
-        (((bool_and a b : Bool.bool) = Bool.True) <->
-         ((a = Bool.True) and (b = Bool.True)))))
+        (((bool_and a b : Bool.bool) = Bool.ttrue) <->
+         ((a = Bool.ttrue) and (b = Bool.ttrue)))))
 
   axiom Bool_or_def:
     (forall a:Bool.bool.
       (forall b:Bool.bool.
-        (((bool_or a b : Bool.bool) = Bool.True) <->
-         ((a = Bool.True) or (b = Bool.True)))))
+        (((bool_or a b : Bool.bool) = Bool.ttrue) <->
+         ((a = Bool.ttrue) or (b = Bool.ttrue)))))
 
   axiom Bool_xor_def:
     (forall a:Bool.bool.
       (forall b:Bool.bool.
-        (((bool_xor a b : Bool.bool) = Bool.True) <-> (a <> b))))
+        (((bool_xor a b : Bool.bool) = Bool.ttrue) <-> (a <> b))))
 
   axiom Bool_not_def:
     (forall a:Bool.bool.
-      (((bool_not a : Bool.bool) = Bool.True) <-> (a = Bool.False)))
+      (((bool_not a : Bool.bool) = Bool.ttrue) <-> (a = Bool.ffalse)))
 
   logic ite Bool.bool 'a1 'a1 : 'a1
 
   axiom Ite_true:
-    (forall x:'a1. (forall y:'a1. ((ite Bool.True x y : 'a1) = x)))
+    (forall x:'a1. (forall y:'a1. ((ite Bool.ttrue x y : 'a1) = x)))
 
   axiom Ite_false:
-    (forall x:'a1. (forall y:'a1. ((ite Bool.False x y : 'a1) = y)))
+    (forall x:'a1. (forall y:'a1. ((ite Bool.ffalse x y : 'a1) = y)))
 
   logic lt_int_bool int int : Bool.bool
 
@@ -97,32 +97,32 @@ use array.Array as A
   axiom Lt_int_bool_axiom:
     (forall x:int.
       (forall y:int.
-        (((lt_int_bool x y : Bool.bool) = Bool.True) <-> (Int.(<) x y))))
+        (((lt_int_bool x y : Bool.bool) = Bool.ttrue) <-> (Int.(<) x y))))
 
   axiom Le_int_bool_axiom:
     (forall x:int.
       (forall y:int.
-        (((le_int_bool x y : Bool.bool) = Bool.True) <-> (Int.(<=) x y))))
+        (((le_int_bool x y : Bool.bool) = Bool.ttrue) <-> (Int.(<=) x y))))
 
   axiom Gt_int_bool_axiom:
     (forall x:int.
       (forall y:int.
-        (((gt_int_bool x y : Bool.bool) = Bool.True) <-> (Int.(>) x y))))
+        (((gt_int_bool x y : Bool.bool) = Bool.ttrue) <-> (Int.(>) x y))))
 
   axiom Ge_int_bool_axiom:
     (forall x:int.
       (forall y:int.
-        (((ge_int_bool x y : Bool.bool) = Bool.True) <-> (Int.(>=) x y))))
+        (((ge_int_bool x y : Bool.bool) = Bool.ttrue) <-> (Int.(>=) x y))))
 
   axiom Eq_int_bool_axiom:
     (forall x:int.
       (forall y:int.
-        (((eq_int_bool x y : Bool.bool) = Bool.True) <-> (x = y))))
+        (((eq_int_bool x y : Bool.bool) = Bool.ttrue) <-> (x = y))))
 
   axiom Neq_int_bool_axiom:
     (forall x:int.
       (forall y:int.
-        (((neq_int_bool x y : Bool.bool) = Bool.True) <-> (x <> y))))
+        (((neq_int_bool x y : Bool.bool) = Bool.ttrue) <-> (x <> y))))
 
   logic abs_int int : int
 
@@ -200,32 +200,32 @@ use array.Array as A
   axiom Lt_real_bool_axiom:
     (forall x:real.
       (forall y:real.
-        (((lt_real_bool x y : Bool.bool) = Bool.True) <-> (Real.(<) x y))))
+        (((lt_real_bool x y : Bool.bool) = Bool.ttrue) <-> (Real.(<) x y))))
 
   axiom Le_real_bool_axiom:
     (forall x:real.
       (forall y:real.
-        (((le_real_bool x y : Bool.bool) = Bool.True) <-> (Real.(<=) x y))))
+        (((le_real_bool x y : Bool.bool) = Bool.ttrue) <-> (Real.(<=) x y))))
 
   axiom Gt_real_bool_axiom:
     (forall x:real.
       (forall y:real.
-        (((gt_real_bool x y : Bool.bool) = Bool.True) <-> (Real.(>) x y))))
+        (((gt_real_bool x y : Bool.bool) = Bool.ttrue) <-> (Real.(>) x y))))
 
   axiom Ge_real_bool_axiom:
     (forall x:real.
       (forall y:real.
-        (((ge_real_bool x y : Bool.bool) = Bool.True) <-> (Real.(>=) x y))))
+        (((ge_real_bool x y : Bool.bool) = Bool.ttrue) <-> (Real.(>=) x y))))
 
   axiom Eq_real_bool_axiom:
     (forall x:real.
       (forall y:real.
-        (((eq_real_bool x y : Bool.bool) = Bool.True) <-> (x = y))))
+        (((eq_real_bool x y : Bool.bool) = Bool.ttrue) <-> (x = y))))
 
   axiom Neq_real_bool_axiom:
     (forall x:real.
       (forall y:real.
-        (((neq_real_bool x y : Bool.bool) = Bool.True) <-> (x <> y))))
+        (((neq_real_bool x y : Bool.bool) = Bool.ttrue) <-> (x <> y))))
 
   logic real_max real real : real
 
@@ -344,9 +344,9 @@ use array.Array as A
 
   logic null  : (pointer 'a1)
 
-  logic pointer_address (pointer 'a1) : (pointer Tuple0.tuple0)
+  logic pointer_address (pointer 'a1) : (pointer Unit.unit)
 
-  logic absolute_address int : (pointer Tuple0.tuple0)
+  logic absolute_address int : (pointer Unit.unit)
 
   logic address (pointer 'a1) : int
 
@@ -418,12 +418,12 @@ use array.Array as A
   axiom Eq_pointer_bool_def:
     (forall p1:(pointer 'a1).
       (forall p2:(pointer 'a1).
-        (((eq_pointer_bool p1 p2 : Bool.bool) = Bool.True) <-> (p1 = p2))))
+        (((eq_pointer_bool p1 p2 : Bool.bool) = Bool.ttrue) <-> (p1 = p2))))
 
   axiom Neq_pointer_bool_def:
     (forall p1:(pointer 'a1).
       (forall p2:(pointer 'a1).
-        (((neq_pointer_bool p1 p2 : Bool.bool) = Bool.True) <-> (p1 <> p2))))
+        (((neq_pointer_bool p1 p2 : Bool.bool) = Bool.ttrue) <-> (p1 <> p2))))
 
   axiom Same_block_shift_right:
     (forall p:(pointer 'a1).
@@ -703,7 +703,7 @@ use array.Array as A
   axiom Subtag_bool_def:
     (forall t1:(tag_id 'a1).
       (forall t2:(tag_id 'a1).
-        (((subtag_bool t1 t2 : Bool.bool) = Bool.True) <-> (subtag t1 t2))))
+        (((subtag_bool t1 t2 : Bool.bool) = Bool.ttrue) <-> (subtag t1 t2))))
 
   axiom Subtag_refl: (forall t:(tag_id 'a1). (subtag t t))
 
@@ -1096,11 +1096,11 @@ use array.Array as A
     (forall x:(pointer char_P).
       ((char_P_of_bitvector (bitvector_of_char_P x : bitvector) : (pointer char_P)) = x))
 
-  logic char_P_of_pointer_address (pointer Tuple0.tuple0) : (pointer char_P)
+  logic char_P_of_pointer_address (pointer Unit.unit) : (pointer char_P)
 
   axiom Char_P_of_pointer_address_of_pointer_addr:
     (forall p:(pointer char_P).
-      (p = (char_P_of_pointer_address (pointer_address p : (pointer Tuple0.tuple0)) : (pointer char_P))))
+      (p = (char_P_of_pointer_address (pointer_address p : (pointer Unit.unit)) : (pointer char_P))))
 
   axiom Char_P_parenttag_bottom:
     (parenttag (char_P_tag : (tag_id char_P)) (bottom_tag : (tag_id char_P)))
@@ -1187,7 +1187,7 @@ use array.Array as A
     (forall n_0_0:(pointer node).
       (forall p_4_0:(pointer node).
         (forall q_1_0:(pointer node).
-          ((sep_node_idlist n_0_0 p_4_0 q_1_0) <-> (Bool.True = Bool.True)))))
+          ((sep_node_idlist n_0_0 p_4_0 q_1_0) <-> (Bool.ttrue = Bool.ttrue)))))
 
   goal Idlist_sep1:
     (forall node_alloc_table_at_L:(alloc_table node).
@@ -1215,7 +1215,7 @@ use array.Array as A
     (forall n_1_0:(pointer node).
       (forall p_5_0:(pointer node).
         (forall q_2_0:(pointer node).
-          ((sep_node_r_idlist n_1_0 p_5_0 q_2_0) <-> (Bool.True = Bool.True)))))
+          ((sep_node_r_idlist n_1_0 p_5_0 q_2_0) <-> (Bool.ttrue = Bool.ttrue)))))
 
   goal Idlist_sep2:
     (forall node_alloc_table_at_L:(alloc_table node).
@@ -1243,7 +1243,7 @@ use array.Array as A
     (forall n_2_0:(pointer node).
       (forall p_6_0:(pointer node).
         (forall q_3_0:(pointer node).
-          ((sep_node_l_idlist n_2_0 p_6_0 q_3_0) <-> (Bool.True = Bool.True)))))
+          ((sep_node_l_idlist n_2_0 p_6_0 q_3_0) <-> (Bool.ttrue = Bool.ttrue)))))
 
   goal Idlist_sep3:
     (forall node_alloc_table_at_L:(alloc_table node).
@@ -1300,11 +1300,11 @@ use array.Array as A
     (forall x:(pointer node).
       ((node_of_bitvector (bitvector_of_node x : bitvector) : (pointer node)) = x))
 
-  logic node_of_pointer_address (pointer Tuple0.tuple0) : (pointer node)
+  logic node_of_pointer_address (pointer Unit.unit) : (pointer node)
 
   axiom Node_of_pointer_address_of_pointer_addr:
     (forall p:(pointer node).
-      (p = (node_of_pointer_address (pointer_address p : (pointer Tuple0.tuple0)) : (pointer node))))
+      (p = (node_of_pointer_address (pointer_address p : (pointer Unit.unit)) : (pointer node))))
 
   axiom Node_parenttag_bottom:
     (parenttag (node_tag : (tag_id node)) (bottom_tag : (tag_id node)))
@@ -1315,18 +1315,18 @@ use array.Array as A
         (instanceof node_tag_table x (node_tag : (tag_id node)))))
 
   axiom Pointer_addr_of_char_P_of_pointer_address:
-    (forall p:(pointer Tuple0.tuple0).
-      (p = (pointer_address (char_P_of_pointer_address p : (pointer char_P)) : (pointer Tuple0.tuple0))))
+    (forall p:(pointer Unit.unit).
+      (p = (pointer_address (char_P_of_pointer_address p : (pointer char_P)) : (pointer Unit.unit))))
 
   axiom Pointer_addr_of_node_of_pointer_address:
-    (forall p:(pointer Tuple0.tuple0).
-      (p = (pointer_address (node_of_pointer_address p : (pointer node)) : (pointer Tuple0.tuple0))))
+    (forall p:(pointer Unit.unit).
+      (p = (pointer_address (node_of_pointer_address p : (pointer node)) : (pointer Unit.unit))))
 
-  logic void_P_of_pointer_address (pointer Tuple0.tuple0) : (pointer void_P)
+  logic void_P_of_pointer_address (pointer Unit.unit) : (pointer void_P)
 
   axiom Pointer_addr_of_void_P_of_pointer_address:
-    (forall p:(pointer Tuple0.tuple0).
-      (p = (pointer_address (void_P_of_pointer_address p : (pointer void_P)) : (pointer Tuple0.tuple0))))
+    (forall p:(pointer Unit.unit).
+      (p = (pointer_address (void_P_of_pointer_address p : (pointer void_P)) : (pointer Unit.unit))))
 
   logic right_valid_struct_char_P (pointer char_P) int (alloc_table char_P)
 
@@ -1360,7 +1360,7 @@ use array.Array as A
   axiom Sep_node_iclist_def:
     (forall n0:(pointer node).
       (forall p_3_0:(pointer node).
-        ((sep_node_iclist n0 p_3_0) <-> (Bool.True = Bool.True))))
+        ((sep_node_iclist n0 p_3_0) <-> (Bool.ttrue = Bool.ttrue))))
 
   logic strict_valid_root_char_P (pointer char_P) int int (alloc_table char_P)
 
@@ -1428,35 +1428,35 @@ use array.Array as A
              (((offset_min void_P_alloc_table0 p0 : int) = a0) and
               ((offset_max void_P_alloc_table0 p0 : int) = b0)))))))
 
-  logic valid_bitvector_struct_char_P (pointer Tuple0.tuple0) int int (alloc_table Tuple0.tuple0)
+  logic valid_bitvector_struct_char_P (pointer Unit.unit) int int (alloc_table Unit.unit)
 
   axiom Valid_bitvector_struct_char_P_def:
-    (forall p0:(pointer Tuple0.tuple0).
+    (forall p0:(pointer Unit.unit).
       (forall a0:int.
         (forall b0:int.
-          (forall bitvector_alloc_table0:(alloc_table Tuple0.tuple0).
+          (forall bitvector_alloc_table0:(alloc_table Unit.unit).
             ((valid_bitvector_struct_char_P p0 a0 b0 bitvector_alloc_table0) <->
              (((offset_min bitvector_alloc_table0 p0 : int) = a0) and
               ((offset_max bitvector_alloc_table0 p0 : int) = b0)))))))
 
-  logic valid_bitvector_struct_node (pointer Tuple0.tuple0) int int (alloc_table Tuple0.tuple0)
+  logic valid_bitvector_struct_node (pointer Unit.unit) int int (alloc_table Unit.unit)
 
   axiom Valid_bitvector_struct_node_def:
-    (forall p0:(pointer Tuple0.tuple0).
+    (forall p0:(pointer Unit.unit).
       (forall a0:int.
         (forall b0:int.
-          (forall bitvector_alloc_table0:(alloc_table Tuple0.tuple0).
+          (forall bitvector_alloc_table0:(alloc_table Unit.unit).
             ((valid_bitvector_struct_node p0 a0 b0 bitvector_alloc_table0) <->
              (((offset_min bitvector_alloc_table0 p0 : int) = a0) and
               ((offset_max bitvector_alloc_table0 p0 : int) = b0)))))))
 
-  logic valid_bitvector_struct_void_P (pointer Tuple0.tuple0) int int (alloc_table Tuple0.tuple0)
+  logic valid_bitvector_struct_void_P (pointer Unit.unit) int int (alloc_table Unit.unit)
 
   axiom Valid_bitvector_struct_void_P_def:
-    (forall p0:(pointer Tuple0.tuple0).
+    (forall p0:(pointer Unit.unit).
       (forall a0:int.
         (forall b0:int.
-          (forall bitvector_alloc_table0:(alloc_table Tuple0.tuple0).
+          (forall bitvector_alloc_table0:(alloc_table Unit.unit).
             ((valid_bitvector_struct_void_P p0 a0 b0 bitvector_alloc_table0) <->
              (((offset_min bitvector_alloc_table0 p0 : int) = a0) and
               ((offset_max bitvector_alloc_table0 p0 : int) = b0)))))))
@@ -1537,7 +1537,7 @@ use array.Array as A
 
   axiom Void_P_of_pointer_address_of_pointer_addr:
     (forall p:(pointer void_P).
-      (p = (void_P_of_pointer_address (pointer_address p : (pointer Tuple0.tuple0)) : (pointer void_P))))
+      (p = (void_P_of_pointer_address (pointer_address p : (pointer Unit.unit)) : (pointer void_P))))
 
   axiom Void_P_parenttag_bottom:
     (parenttag (void_P_tag : (tag_id void_P)) (bottom_tag : (tag_id void_P)))
@@ -1552,7 +1552,7 @@ use array.Array as A
       (forall node_alloc_table:(alloc_table node).
         (forall node_l:(memory node (pointer node)).
           (forall node_r:(memory node (pointer node)).
-            (((Bool.True = Bool.True) and
+            (((Bool.ttrue = Bool.ttrue) and
               ("JC_57"
               (("JC_53"
                (iclist (select node_r p_0_0 : (pointer node)) node_alloc_table node_r node_l)) and
@@ -1581,7 +1581,7 @@ use array.Array as A
       (forall node_alloc_table:(alloc_table node).
         (forall node_l:(memory node (pointer node)).
           (forall node_r:(memory node (pointer node)).
-            (((Bool.True = Bool.True) and
+            (((Bool.ttrue = Bool.ttrue) and
               ("JC_57"
               (("JC_53"
                (iclist (select node_r p_0_0 : (pointer node)) node_alloc_table node_r node_l)) and
@@ -1610,7 +1610,7 @@ use array.Array as A
       (forall node_alloc_table:(alloc_table node).
         (forall node_l:(memory node (pointer node)).
           (forall node_r:(memory node (pointer node)).
-            (((Bool.True = Bool.True) and
+            (((Bool.ttrue = Bool.ttrue) and
               ("JC_57"
               (("JC_53"
                (iclist (select node_r p_0_0 : (pointer node)) node_alloc_table node_r node_l)) and
@@ -1639,7 +1639,7 @@ use array.Array as A
       (forall node_alloc_table:(alloc_table node).
         (forall node_l:(memory node (pointer node)).
           (forall node_r:(memory node (pointer node)).
-            (((Bool.True = Bool.True) and
+            (((Bool.ttrue = Bool.ttrue) and
               ("JC_57"
               (("JC_53"
                (iclist (select node_r p_0_0 : (pointer node)) node_alloc_table node_r node_l)) and
@@ -1796,7 +1796,7 @@ use array.Array as A
       (forall node_alloc_table:(alloc_table node).
         (forall node_l:(memory node (pointer node)).
           (forall node_r:(memory node (pointer node)).
-            (((Bool.True = Bool.True) and
+            (((Bool.ttrue = Bool.ttrue) and
               ("JC_7"
               (("JC_5" (iclist p_0 node_alloc_table node_r node_l)) and
                ("JC_6" (p_0 <> (select node_l p_0 : (pointer node))))))) ->
@@ -1809,7 +1809,7 @@ use array.Array as A
       (forall node_alloc_table:(alloc_table node).
         (forall node_l:(memory node (pointer node)).
           (forall node_r:(memory node (pointer node)).
-            (((Bool.True = Bool.True) and
+            (((Bool.ttrue = Bool.ttrue) and
               ("JC_7"
               (("JC_5" (iclist p_0 node_alloc_table node_r node_l)) and
                ("JC_6" (p_0 <> (select node_l p_0 : (pointer node))))))) ->
@@ -1822,7 +1822,7 @@ use array.Array as A
       (forall node_alloc_table:(alloc_table node).
         (forall node_l:(memory node (pointer node)).
           (forall node_r:(memory node (pointer node)).
-            (((Bool.True = Bool.True) and
+            (((Bool.ttrue = Bool.ttrue) and
               ("JC_7"
               (("JC_5" (iclist p_0 node_alloc_table node_r node_l)) and
                ("JC_6" (p_0 <> (select node_l p_0 : (pointer node))))))) ->
@@ -1850,7 +1850,7 @@ use array.Array as A
       (forall node_alloc_table:(alloc_table node).
         (forall node_l:(memory node (pointer node)).
           (forall node_r:(memory node (pointer node)).
-            (((Bool.True = Bool.True) and
+            (((Bool.ttrue = Bool.ttrue) and
               ("JC_7"
               (("JC_5" (iclist p_0 node_alloc_table node_r node_l)) and
                ("JC_6" (p_0 <> (select node_l p_0 : (pointer node))))))) ->
@@ -1882,7 +1882,7 @@ use array.Array as A
       (forall node_alloc_table:(alloc_table node).
         (forall node_l:(memory node (pointer node)).
           (forall node_r:(memory node (pointer node)).
-            (((Bool.True = Bool.True) and
+            (((Bool.ttrue = Bool.ttrue) and
               ("JC_7"
               (("JC_5" (iclist p_0 node_alloc_table node_r node_l)) and
                ("JC_6" (p_0 <> (select node_l p_0 : (pointer node))))))) ->
@@ -1914,7 +1914,7 @@ use array.Array as A
       (forall node_alloc_table:(alloc_table node).
         (forall node_l:(memory node (pointer node)).
           (forall node_r:(memory node (pointer node)).
-            (((Bool.True = Bool.True) and
+            (((Bool.ttrue = Bool.ttrue) and
               ("JC_7"
               (("JC_5" (iclist p_0 node_alloc_table node_r node_l)) and
                ("JC_6" (p_0 <> (select node_l p_0 : (pointer node))))))) ->
@@ -1946,7 +1946,7 @@ use array.Array as A
       (forall node_alloc_table:(alloc_table node).
         (forall node_l:(memory node (pointer node)).
           (forall node_r:(memory node (pointer node)).
-            (((Bool.True = Bool.True) and
+            (((Bool.ttrue = Bool.ttrue) and
               ("JC_7"
               (("JC_5" (iclist p_0 node_alloc_table node_r node_l)) and
                ("JC_6" (p_0 <> (select node_l p_0 : (pointer node))))))) ->
@@ -1978,7 +1978,7 @@ use array.Array as A
       (forall node_alloc_table:(alloc_table node).
         (forall node_l:(memory node (pointer node)).
           (forall node_r:(memory node (pointer node)).
-            (((Bool.True = Bool.True) and
+            (((Bool.ttrue = Bool.ttrue) and
               ("JC_7"
               (("JC_5" (iclist p_0 node_alloc_table node_r node_l)) and
                ("JC_6" (p_0 <> (select node_l p_0 : (pointer node))))))) ->

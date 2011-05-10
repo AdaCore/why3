@@ -1,12 +1,12 @@
 theory Why2
-  use Tuple0
+  use unit_inf.Unit
   use int.Int
   use int.ComputerDivision
   use real.Real
-  use bool.Bool
-  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+  use bool_inf.Bool
+  logic eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+  logic neq_unit Unit.unit Unit.unit
 
   logic eq_bool Bool.bool Bool.bool
 
@@ -95,18 +95,18 @@ theory Why2
                  ((Int.(>=) n 0) ->
                   ((variant1 = n) ->
                    (((true and
-                      ((if aux_9 = Bool.True then (Int.(<=) 0 n) else
+                      ((if aux_9 = Bool.ttrue then (Int.(<=) 0 n) else
                         (Int.(>) 0 n)) ->
                        (true and
-                        ((if aux_10 = Bool.True then (Int.(<=) n 1) else
+                        ((if aux_10 = Bool.ttrue then (Int.(<=) n 1) else
                           (Int.(>) n 1)) ->
                          true)))) and
-                     (((if aux_9 = Bool.True then (Int.(<=) 0 n) else
+                     (((if aux_9 = Bool.ttrue then (Int.(<=) 0 n) else
                         (Int.(>) 0 n)) and
-                       ((if aux_10 = Bool.True then (Int.(<=) n 1) else
+                       ((if aux_10 = Bool.ttrue then (Int.(<=) n 1) else
                          (Int.(>) n 1)) and
-                        ((aux_9 = Bool.False) or
-                         ((aux_9 = Bool.True) and (aux_10 = Bool.False))))) ->
+                        ((aux_9 = Bool.ffalse) or
+                         ((aux_9 = Bool.ttrue) and (aux_10 = Bool.ffalse))))) ->
                       ((((Int.(<=) 0 variant1) and
                          (Int.(<) (Int.(-) n 1 : int) variant1)) and
                         (Int.(>=) (Int.(-) n 1 : int) 0)) and
@@ -123,18 +123,18 @@ theory Why2
                            (isfib (Int.(-) n 2 : int) aux_12)) ->
                           true)))))) and
                     (forall result:int.
-                      (((((if aux_9 = Bool.True then (Int.(<=) 0 n) else
+                      (((((if aux_9 = Bool.ttrue then (Int.(<=) 0 n) else
                            (Int.(>) 0 n)) and
-                          ((if aux_10 = Bool.True then (Int.(<=) n 1) else
+                          ((if aux_10 = Bool.ttrue then (Int.(<=) n 1) else
                             (Int.(>) n 1)) and
-                           ((aux_9 = Bool.True) and (aux_10 = Bool.True)))) and
+                           ((aux_9 = Bool.ttrue) and (aux_10 = Bool.ttrue)))) and
                          (result = n)) or
-                        (((if aux_9 = Bool.True then (Int.(<=) 0 n) else
+                        (((if aux_9 = Bool.ttrue then (Int.(<=) 0 n) else
                            (Int.(>) 0 n)) and
-                          ((if aux_10 = Bool.True then (Int.(<=) n 1) else
+                          ((if aux_10 = Bool.ttrue then (Int.(<=) n 1) else
                             (Int.(>) n 1)) and
-                           ((aux_9 = Bool.False) or
-                            ((aux_9 = Bool.True) and (aux_10 = Bool.False))))) and
+                           ((aux_9 = Bool.ffalse) or
+                            ((aux_9 = Bool.ttrue) and (aux_10 = Bool.ffalse))))) and
                          (((((Int.(<=) 0 variant1) and
                              (Int.(<) (Int.(-) n 1 : int) variant1)) and
                             (Int.(>=) (Int.(-) n 1 : int) 0)) and

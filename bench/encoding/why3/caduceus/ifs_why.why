@@ -1,13 +1,13 @@
 theory Why2
 use array.Array as A
-  use Tuple0
+  use unit_inf.Unit
   use int.Int
   use int.ComputerDivision
   use real.Real
-  use bool.Bool
-  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+  use bool_inf.Bool
+  logic eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+  logic neq_unit Unit.unit Unit.unit
 
   logic eq_bool Bool.bool Bool.bool
 
@@ -214,7 +214,7 @@ use array.Array as A
 
 
 
-  axiom False_not_true: (Bool.False <> Bool.True)
+
 
   type pset 'z
 
@@ -804,7 +804,7 @@ use array.Array as A
                                          ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                           (forall result4:int.
                                             ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                             (((Bool.True = Bool.False) and
+                                             (((Bool.ttrue = Bool.ffalse) and
                                                (result4 = 0)) ->
                                               (forall intM_VC_1_21_0:(memory int 'a3).
                                                 ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -825,7 +825,7 @@ use array.Array as A
                                                                     (result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     (
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 1 : (memory int 'a3))) ->
@@ -844,7 +844,7 @@ use array.Array as A
                                                                     (forall result16:int.
                                                                     ((result16 = (acc intM_SPMEP_16 result15 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result16 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result12 1 : (memory int 'a3))) ->
@@ -894,7 +894,7 @@ use array.Array as A
                                          ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                           (forall result4:int.
                                             ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                             (((Bool.True = Bool.False) and
+                                             (((Bool.ttrue = Bool.ffalse) and
                                                (result4 = 0)) ->
                                               (forall intM_VC_1_21_0:(memory int 'a3).
                                                 ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -915,7 +915,7 @@ use array.Array as A
                                                                     (result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     (
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 1 : (memory int 'a3))) ->
@@ -934,9 +934,9 @@ use array.Array as A
                                                                     (forall result16:int.
                                                                     ((result16 = (acc intM_SPMEP_16 result15 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result16 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result12 0 : (memory int 'a3))) ->
@@ -985,7 +985,7 @@ use array.Array as A
                                        ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                         (forall result4:int.
                                           ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                           (((Bool.True = Bool.False) and
+                                           (((Bool.ttrue = Bool.ffalse) and
                                              (result4 = 0)) ->
                                             (forall intM_VC_1_21_0:(memory int 'a3).
                                               ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -1004,7 +1004,7 @@ use array.Array as A
                                                                 (forall result10:int.
                                                                   ((result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                    ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 1 : (memory int 'a3))) ->
@@ -1059,7 +1059,7 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ffalse) and
                                                  (result4 = 0)) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -1078,7 +1078,7 @@ use array.Array as A
                                                                     (forall result10:int.
                                                                     ((result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 1 : (memory int 'a3))) ->
@@ -1156,7 +1156,7 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ffalse) and
                                                  (result4 = 0)) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -1175,7 +1175,7 @@ use array.Array as A
                                                                     (forall result10:int.
                                                                     ((result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 1 : (memory int 'a3))) ->
@@ -1251,7 +1251,7 @@ use array.Array as A
                                          ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                           (forall result4:int.
                                             ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                             (((Bool.True = Bool.False) and
+                                             (((Bool.ttrue = Bool.ffalse) and
                                                (result4 = 0)) ->
                                               (forall intM_VC_1_21_0:(memory int 'a3).
                                                 ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -1272,9 +1272,9 @@ use array.Array as A
                                                                     (result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     (
                                                                     (
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 0 : (memory int 'a3))) ->
@@ -1293,7 +1293,7 @@ use array.Array as A
                                                                     (forall result16:int.
                                                                     ((result16 = (acc intM_SPMEP_16 result15 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result16 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result12 1 : (memory int 'a3))) ->
@@ -1343,7 +1343,7 @@ use array.Array as A
                                          ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                           (forall result4:int.
                                             ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                             (((Bool.True = Bool.False) and
+                                             (((Bool.ttrue = Bool.ffalse) and
                                                (result4 = 0)) ->
                                               (forall intM_VC_1_21_0:(memory int 'a3).
                                                 ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -1364,9 +1364,9 @@ use array.Array as A
                                                                     (result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     (
                                                                     (
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 0 : (memory int 'a3))) ->
@@ -1385,9 +1385,9 @@ use array.Array as A
                                                                     (forall result16:int.
                                                                     ((result16 = (acc intM_SPMEP_16 result15 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result16 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result12 0 : (memory int 'a3))) ->
@@ -1436,7 +1436,7 @@ use array.Array as A
                                        ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                         (forall result4:int.
                                           ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                           (((Bool.True = Bool.False) and
+                                           (((Bool.ttrue = Bool.ffalse) and
                                              (result4 = 0)) ->
                                             (forall intM_VC_1_21_0:(memory int 'a3).
                                               ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -1455,9 +1455,9 @@ use array.Array as A
                                                                 (forall result10:int.
                                                                   ((result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                    ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 0 : (memory int 'a3))) ->
@@ -1512,7 +1512,7 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ffalse) and
                                                  (result4 = 0)) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -1531,9 +1531,9 @@ use array.Array as A
                                                                     (forall result10:int.
                                                                     ((result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 0 : (memory int 'a3))) ->
@@ -1611,7 +1611,7 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ffalse) and
                                                  (result4 = 0)) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -1630,9 +1630,9 @@ use array.Array as A
                                                                     (forall result10:int.
                                                                     ((result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 0 : (memory int 'a3))) ->
@@ -1707,7 +1707,7 @@ use array.Array as A
                                        ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                         (forall result4:int.
                                           ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                           (((Bool.True = Bool.False) and
+                                           (((Bool.ttrue = Bool.ffalse) and
                                              (result4 = 0)) ->
                                             (forall intM_VC_1_21_0:(memory int 'a3).
                                               ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -1762,7 +1762,7 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ffalse) and
                                                  (result4 = 0)) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -1806,7 +1806,7 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 1 : (memory int 'a3))) ->
@@ -1860,7 +1860,7 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ffalse) and
                                                  (result4 = 0)) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -1904,9 +1904,9 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 0 : (memory int 'a3))) ->
@@ -1956,7 +1956,7 @@ use array.Array as A
                                          ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                           (forall result4:int.
                                             ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                             (((Bool.True = Bool.False) and
+                                             (((Bool.ttrue = Bool.ffalse) and
                                                (result4 = 0)) ->
                                               (forall intM_VC_1_21_0:(memory int 'a3).
                                                 ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -2035,7 +2035,7 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ffalse) and
                                                  (result4 = 0)) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -2138,7 +2138,7 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ffalse) and
                                                  (result4 = 0)) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -2243,7 +2243,7 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ffalse) and
                                                  (result4 = 0)) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -2289,7 +2289,7 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 1 : (memory int 'a3))) ->
@@ -2343,7 +2343,7 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ffalse) and
                                                  (result4 = 0)) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -2389,9 +2389,9 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 0 : (memory int 'a3))) ->
@@ -2441,7 +2441,7 @@ use array.Array as A
                                          ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                           (forall result4:int.
                                             ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                             (((Bool.True = Bool.False) and
+                                             (((Bool.ttrue = Bool.ffalse) and
                                                (result4 = 0)) ->
                                               (forall intM_VC_1_21_0:(memory int 'a3).
                                                 ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -2522,7 +2522,7 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ffalse) and
                                                  (result4 = 0)) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -2627,7 +2627,7 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ffalse) and
                                                  (result4 = 0)) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 1 : (memory int 'a3))) ->
@@ -2730,8 +2730,8 @@ use array.Array as A
                                          ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                           (forall result4:int.
                                             ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                             (((Bool.True = Bool.True) or
-                                               ((Bool.True = Bool.False) and
+                                             (((Bool.ttrue = Bool.ttrue) or
+                                               ((Bool.ttrue = Bool.ffalse) and
                                                 (result4 <> 0))) ->
                                               (forall intM_VC_1_21_0:(memory int 'a3).
                                                 ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -2752,7 +2752,7 @@ use array.Array as A
                                                                     (result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     (
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 1 : (memory int 'a3))) ->
@@ -2771,7 +2771,7 @@ use array.Array as A
                                                                     (forall result16:int.
                                                                     ((result16 = (acc intM_SPMEP_16 result15 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result16 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result12 1 : (memory int 'a3))) ->
@@ -2821,8 +2821,8 @@ use array.Array as A
                                          ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                           (forall result4:int.
                                             ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                             (((Bool.True = Bool.True) or
-                                               ((Bool.True = Bool.False) and
+                                             (((Bool.ttrue = Bool.ttrue) or
+                                               ((Bool.ttrue = Bool.ffalse) and
                                                 (result4 <> 0))) ->
                                               (forall intM_VC_1_21_0:(memory int 'a3).
                                                 ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -2843,7 +2843,7 @@ use array.Array as A
                                                                     (result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     (
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 1 : (memory int 'a3))) ->
@@ -2862,9 +2862,9 @@ use array.Array as A
                                                                     (forall result16:int.
                                                                     ((result16 = (acc intM_SPMEP_16 result15 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result16 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result12 0 : (memory int 'a3))) ->
@@ -2913,8 +2913,8 @@ use array.Array as A
                                        ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                         (forall result4:int.
                                           ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                           (((Bool.True = Bool.True) or
-                                             ((Bool.True = Bool.False) and
+                                           (((Bool.ttrue = Bool.ttrue) or
+                                             ((Bool.ttrue = Bool.ffalse) and
                                               (result4 <> 0))) ->
                                             (forall intM_VC_1_21_0:(memory int 'a3).
                                               ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -2933,7 +2933,7 @@ use array.Array as A
                                                                 (forall result10:int.
                                                                   ((result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                    ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 1 : (memory int 'a3))) ->
@@ -2988,8 +2988,8 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.True) or
-                                                 ((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ttrue) or
+                                                 ((Bool.ttrue = Bool.ffalse) and
                                                   (result4 <> 0))) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -3008,7 +3008,7 @@ use array.Array as A
                                                                     (forall result10:int.
                                                                     ((result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 1 : (memory int 'a3))) ->
@@ -3086,8 +3086,8 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.True) or
-                                                 ((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ttrue) or
+                                                 ((Bool.ttrue = Bool.ffalse) and
                                                   (result4 <> 0))) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -3106,7 +3106,7 @@ use array.Array as A
                                                                     (forall result10:int.
                                                                     ((result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 1 : (memory int 'a3))) ->
@@ -3182,8 +3182,8 @@ use array.Array as A
                                          ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                           (forall result4:int.
                                             ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                             (((Bool.True = Bool.True) or
-                                               ((Bool.True = Bool.False) and
+                                             (((Bool.ttrue = Bool.ttrue) or
+                                               ((Bool.ttrue = Bool.ffalse) and
                                                 (result4 <> 0))) ->
                                               (forall intM_VC_1_21_0:(memory int 'a3).
                                                 ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -3204,9 +3204,9 @@ use array.Array as A
                                                                     (result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     (
                                                                     (
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 0 : (memory int 'a3))) ->
@@ -3225,7 +3225,7 @@ use array.Array as A
                                                                     (forall result16:int.
                                                                     ((result16 = (acc intM_SPMEP_16 result15 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result16 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result12 1 : (memory int 'a3))) ->
@@ -3275,8 +3275,8 @@ use array.Array as A
                                          ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                           (forall result4:int.
                                             ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                             (((Bool.True = Bool.True) or
-                                               ((Bool.True = Bool.False) and
+                                             (((Bool.ttrue = Bool.ttrue) or
+                                               ((Bool.ttrue = Bool.ffalse) and
                                                 (result4 <> 0))) ->
                                               (forall intM_VC_1_21_0:(memory int 'a3).
                                                 ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -3297,9 +3297,9 @@ use array.Array as A
                                                                     (result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     (
                                                                     (
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 0 : (memory int 'a3))) ->
@@ -3318,9 +3318,9 @@ use array.Array as A
                                                                     (forall result16:int.
                                                                     ((result16 = (acc intM_SPMEP_16 result15 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result16 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result12 0 : (memory int 'a3))) ->
@@ -3369,8 +3369,8 @@ use array.Array as A
                                        ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                         (forall result4:int.
                                           ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                           (((Bool.True = Bool.True) or
-                                             ((Bool.True = Bool.False) and
+                                           (((Bool.ttrue = Bool.ttrue) or
+                                             ((Bool.ttrue = Bool.ffalse) and
                                               (result4 <> 0))) ->
                                             (forall intM_VC_1_21_0:(memory int 'a3).
                                               ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -3389,9 +3389,9 @@ use array.Array as A
                                                                 (forall result10:int.
                                                                   ((result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                    ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 0 : (memory int 'a3))) ->
@@ -3446,8 +3446,8 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.True) or
-                                                 ((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ttrue) or
+                                                 ((Bool.ttrue = Bool.ffalse) and
                                                   (result4 <> 0))) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -3466,9 +3466,9 @@ use array.Array as A
                                                                     (forall result10:int.
                                                                     ((result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 0 : (memory int 'a3))) ->
@@ -3546,8 +3546,8 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.True) or
-                                                 ((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ttrue) or
+                                                 ((Bool.ttrue = Bool.ffalse) and
                                                   (result4 <> 0))) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -3566,9 +3566,9 @@ use array.Array as A
                                                                     (forall result10:int.
                                                                     ((result10 = (acc intM_SPMEP_16 result9 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result10 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result6 0 : (memory int 'a3))) ->
@@ -3643,8 +3643,8 @@ use array.Array as A
                                        ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                         (forall result4:int.
                                           ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                           (((Bool.True = Bool.True) or
-                                             ((Bool.True = Bool.False) and
+                                           (((Bool.ttrue = Bool.ttrue) or
+                                             ((Bool.ttrue = Bool.ffalse) and
                                               (result4 <> 0))) ->
                                             (forall intM_VC_1_21_0:(memory int 'a3).
                                               ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -3699,8 +3699,8 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.True) or
-                                                 ((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ttrue) or
+                                                 ((Bool.ttrue = Bool.ffalse) and
                                                   (result4 <> 0))) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -3744,7 +3744,7 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 1 : (memory int 'a3))) ->
@@ -3798,8 +3798,8 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.True) or
-                                                 ((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ttrue) or
+                                                 ((Bool.ttrue = Bool.ffalse) and
                                                   (result4 <> 0))) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -3843,9 +3843,9 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 0 : (memory int 'a3))) ->
@@ -3895,8 +3895,8 @@ use array.Array as A
                                          ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                           (forall result4:int.
                                             ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                             (((Bool.True = Bool.True) or
-                                               ((Bool.True = Bool.False) and
+                                             (((Bool.ttrue = Bool.ttrue) or
+                                               ((Bool.ttrue = Bool.ffalse) and
                                                 (result4 <> 0))) ->
                                               (forall intM_VC_1_21_0:(memory int 'a3).
                                                 ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -3975,8 +3975,8 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.True) or
-                                                 ((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ttrue) or
+                                                 ((Bool.ttrue = Bool.ffalse) and
                                                   (result4 <> 0))) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -4079,8 +4079,8 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.True) or
-                                                 ((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ttrue) or
+                                                 ((Bool.ttrue = Bool.ffalse) and
                                                   (result4 <> 0))) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -4185,8 +4185,8 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.True) or
-                                                 ((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ttrue) or
+                                                 ((Bool.ttrue = Bool.ffalse) and
                                                   (result4 <> 0))) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -4232,7 +4232,7 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 1 : (memory int 'a3))) ->
@@ -4286,8 +4286,8 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.True) or
-                                                 ((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ttrue) or
+                                                 ((Bool.ttrue = Bool.ffalse) and
                                                   (result4 <> 0))) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -4333,9 +4333,9 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 0 : (memory int 'a3))) ->
@@ -4385,8 +4385,8 @@ use array.Array as A
                                          ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                           (forall result4:int.
                                             ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                             (((Bool.True = Bool.True) or
-                                               ((Bool.True = Bool.False) and
+                                             (((Bool.ttrue = Bool.ttrue) or
+                                               ((Bool.ttrue = Bool.ffalse) and
                                                 (result4 <> 0))) ->
                                               (forall intM_VC_1_21_0:(memory int 'a3).
                                                 ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -4467,8 +4467,8 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.True) or
-                                                 ((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ttrue) or
+                                                 ((Bool.ttrue = Bool.ffalse) and
                                                   (result4 <> 0))) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -4573,8 +4573,8 @@ use array.Array as A
                                            ((result3 = (shift why3_SPMEP 0 : (pointer why3_SPMEP_16))) ->
                                             (forall result4:int.
                                               ((result4 = (acc intM_SPMEP_16 result3 : int)) ->
-                                               (((Bool.True = Bool.True) or
-                                                 ((Bool.True = Bool.False) and
+                                               (((Bool.ttrue = Bool.ttrue) or
+                                                 ((Bool.ttrue = Bool.ffalse) and
                                                   (result4 <> 0))) ->
                                                 (forall intM_VC_1_21_0:(memory int 'a3).
                                                   ((intM_VC_1_21_0 = (upd intM_VC_1_21 result0 0 : (memory int 'a3))) ->
@@ -4735,7 +4735,7 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 1 : (memory int 'a3))) ->
@@ -4754,7 +4754,7 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 1 : (memory int 'a3))) ->
@@ -4832,7 +4832,7 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 1 : (memory int 'a3))) ->
@@ -4851,9 +4851,9 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 0 : (memory int 'a3))) ->
@@ -4929,7 +4929,7 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 1 : (memory int 'a3))) ->
@@ -5008,7 +5008,7 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 1 : (memory int 'a3))) ->
@@ -5110,7 +5110,7 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 1 : (memory int 'a3))) ->
@@ -5214,9 +5214,9 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 0 : (memory int 'a3))) ->
@@ -5235,7 +5235,7 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 1 : (memory int 'a3))) ->
@@ -5313,9 +5313,9 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 0 : (memory int 'a3))) ->
@@ -5334,9 +5334,9 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 0 : (memory int 'a3))) ->
@@ -5412,9 +5412,9 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 0 : (memory int 'a3))) ->
@@ -5493,9 +5493,9 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 0 : (memory int 'a3))) ->
@@ -5597,9 +5597,9 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 0 : (memory int 'a3))) ->
@@ -5785,7 +5785,7 @@ use array.Array as A
                                                                     (forall result20:int.
                                                                     ((result20 = (acc intM_SPMEP_16 result19 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result20 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result16 1 : (memory int 'a3))) ->
@@ -5887,9 +5887,9 @@ use array.Array as A
                                                                     (forall result20:int.
                                                                     ((result20 = (acc intM_SPMEP_16 result19 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result20 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result16 0 : (memory int 'a3))) ->
@@ -6291,7 +6291,7 @@ use array.Array as A
                                                                     (forall result20:int.
                                                                     ((result20 = (acc intM_SPMEP_16 result19 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result20 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result16 1 : (memory int 'a3))) ->
@@ -6395,9 +6395,9 @@ use array.Array as A
                                                                     (forall result20:int.
                                                                     ((result20 = (acc intM_SPMEP_16 result19 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result20 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result16 0 : (memory int 'a3))) ->
@@ -6780,7 +6780,7 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 1 : (memory int 'a3))) ->
@@ -6799,7 +6799,7 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 1 : (memory int 'a3))) ->
@@ -6878,7 +6878,7 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 1 : (memory int 'a3))) ->
@@ -6897,9 +6897,9 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 0 : (memory int 'a3))) ->
@@ -6976,7 +6976,7 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 1 : (memory int 'a3))) ->
@@ -7056,7 +7056,7 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 1 : (memory int 'a3))) ->
@@ -7159,7 +7159,7 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 = 0)) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 1 : (memory int 'a3))) ->
@@ -7264,9 +7264,9 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 0 : (memory int 'a3))) ->
@@ -7285,7 +7285,7 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 1 : (memory int 'a3))) ->
@@ -7364,9 +7364,9 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 0 : (memory int 'a3))) ->
@@ -7385,9 +7385,9 @@ use array.Array as A
                                                                     (forall result18:int.
                                                                     ((result18 = (acc intM_SPMEP_16 result17 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result18 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result14 0 : (memory int 'a3))) ->
@@ -7464,9 +7464,9 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 0 : (memory int 'a3))) ->
@@ -7546,9 +7546,9 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 0 : (memory int 'a3))) ->
@@ -7651,9 +7651,9 @@ use array.Array as A
                                                                     (forall result12:int.
                                                                     ((result12 = (acc intM_SPMEP_16 result11 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result12 <> 0))) ->
                                                                     (forall intM_VC_1_21_1:(memory int 'a3).
                                                                     ((intM_VC_1_21_1 = (upd intM_VC_1_21_0 result8 0 : (memory int 'a3))) ->
@@ -7841,7 +7841,7 @@ use array.Array as A
                                                                     (forall result20:int.
                                                                     ((result20 = (acc intM_SPMEP_16 result19 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result20 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result16 1 : (memory int 'a3))) ->
@@ -7944,9 +7944,9 @@ use array.Array as A
                                                                     (forall result20:int.
                                                                     ((result20 = (acc intM_SPMEP_16 result19 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result20 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result16 0 : (memory int 'a3))) ->
@@ -8352,7 +8352,7 @@ use array.Array as A
                                                                     (forall result20:int.
                                                                     ((result20 = (acc intM_SPMEP_16 result19 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result20 = 0)) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result16 1 : (memory int 'a3))) ->
@@ -8457,9 +8457,9 @@ use array.Array as A
                                                                     (forall result20:int.
                                                                     ((result20 = (acc intM_SPMEP_16 result19 : int)) ->
                                                                     ((
-                                                                    (Bool.True = Bool.True) or
+                                                                    (Bool.ttrue = Bool.ttrue) or
                                                                     (
-                                                                    (Bool.True = Bool.False) and
+                                                                    (Bool.ttrue = Bool.ffalse) and
                                                                     (result20 <> 0))) ->
                                                                     (forall intM_VC_1_21_2:(memory int 'a3).
                                                                     ((intM_VC_1_21_2 = (upd intM_VC_1_21_1 result16 0 : (memory int 'a3))) ->

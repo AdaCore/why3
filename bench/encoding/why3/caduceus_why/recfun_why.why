@@ -1,12 +1,12 @@
 theory Why2
-  use Tuple0
+  use unit_inf.Unit
   use int.Int
   use int.ComputerDivision
   use real.Real
-  use bool.Bool
-  logic eq_unit Tuple0.tuple0 Tuple0.tuple0
+  use bool_inf.Bool
+  logic eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Tuple0.tuple0 Tuple0.tuple0
+  logic neq_unit Unit.unit Unit.unit
 
   logic eq_bool Bool.bool Bool.bool
 
@@ -73,7 +73,7 @@ theory Why2
                      ((x0 = (Int.(-) x 1 : int)) ->
                       (((Int.(<=) 0 variant1_0) and (Int.(<) x0 variant1_0)) and
                        (Int.(>=) x0 0)))))) and
-                  (forall result:Tuple0.tuple0.
+                  (forall result:Unit.unit.
                     (((((Int.(>) x 0) and
                         ((x0 = (Int.(-) x 1 : int)) and
                          ((((Int.(<=) 0 variant1_0) and
@@ -101,7 +101,7 @@ theory Why2
                         (((Int.(<=) 0 variant1_1) and
                           (Int.(<) (Int.(-) a 1 : int) variant1_1)) and
                          (Int.(>=) (Int.(-) a 1 : int) 0)))))) and
-                    (forall result:Tuple0.tuple0.
+                    (forall result:Unit.unit.
                       (((((Int.(>) a 0) and
                           ((x3 = (Int.(+) x 1 : int)) and
                            ((((Int.(<=) 0 variant1_1) and
@@ -134,7 +134,7 @@ theory Why2
                                 (((Int.(<=) 0 variant1_2) and
                                   (Int.(<) a0 variant1_2)) and
                                  (Int.(>=) a0 0)))))))) and
-                          (forall result:Tuple0.tuple0.
+                          (forall result:Unit.unit.
                             (((((Int.(>) a 0) and
                                 ((x6 = (Int.(+) x 1 : int)) and
                                  ((a0 = (Int.(-) a 1 : int)) and
