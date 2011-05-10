@@ -162,18 +162,25 @@ module rec T : sig
 
   (* program symbols *)
 
-  type psymbol_fun = private {
-    p_name : ident;
-    p_tv   : type_v;
-    p_ty   : ty;      (* as a logic type, for typing purposes only *)
-    p_ls   : lsymbol; (* for use in the logic *) 
-  }
-      
-  type psymbol =
-    | PSvar of pvsymbol
-    | PSfun of psymbol_fun
+  type psymbol_kind =
+    | PSvar   of pvsymbol
+    | PSfun   of type_v
+    | PSlogic
 
-  val create_psymbol_fun : preid -> type_v -> psymbol_fun
+  type psymbol = {
+    ps_impure : lsymbol;
+    ps_effect : lsymbol;
+    ps_pure   : lsymbol;
+    ps_kind   : psymbol_kind;
+  }
+
+  val create_psymbol: 
+    impure:lsymbol -> effect:lsymbol -> pure:lsymbol -> kind:psymbol_kind ->
+    psymbol
+  val create_psymbol_fun: preid -> type_v -> psymbol
+  val create_psymbol_var: pvsymbol -> psymbol
+
+  val get_psymbol: lsymbol -> psymbol
 
   val ps_name : psymbol -> ident
   val ps_equal : psymbol -> psymbol -> bool
@@ -183,8 +190,7 @@ module rec T : sig
   val purify : ty -> ty
   val effectify : ty -> ty
 
-  val purify_type_v : ?logic:bool -> type_v -> ty
-    (** when [logic] is [true], mutable types are turned into their models *)
+  val trans_type_v : ?effect:bool -> ?pure:bool -> type_v -> ty
     
   (* operations on program types *)
     
@@ -258,52 +264,87 @@ end = struct
   let purify = purify
   let effectify = effectify
 
-  let rec uncurry_type ?(logic=false) = function
+  let rec uncurry_type ?(effect=false) ?(pure=false) = function
     | Tpure ty ->
-	[], if logic then purify ty else effectify ty
+	[], if pure then purify ty else if effect then effectify ty else ty
     | Tarrow (bl, c) ->
 	let tyl1 = 
 	  List.map 
-	    (fun v -> if logic then v.pv_pure.vs_ty else v.pv_effect.vs_ty) 
+	    (fun v -> 
+	       if pure then v.pv_pure.vs_ty 
+	       else if effect then v.pv_effect.vs_ty
+	       else trans_type_v ~effect ~pure v.pv_tv) 
 	    bl 
 	in
-	let tyl2, ty = uncurry_type ~logic c.c_result_type in
+	let tyl2, ty = uncurry_type ~effect ~pure c.c_result_type in
 	tyl1 @ tyl2, ty (* TODO: improve efficiency? *)
 	  
-  let purify_type_v ?(logic=false) v =
-    let tyl, ty = uncurry_type ~logic v in
+  and trans_type_v ?(effect=false) ?(pure=false) v =
+    if effect && pure then invalid_arg "trans_type_v";
+    let tyl, ty = uncurry_type ~effect ~pure v in
     make_arrow_type tyl ty
       
   (* symbols *)
 
-  type psymbol_fun = {
-    p_name : ident;
-    p_tv   : type_v;
-    p_ty   : ty;      (* program type, as a logic type *)
-    p_ls   : lsymbol; (* for use in the logic *) 
+  type psymbol_kind =
+    | PSvar   of pvsymbol
+    | PSfun   of type_v
+    | PSlogic
+
+  type psymbol = {
+    ps_impure : lsymbol;
+    ps_effect : lsymbol;
+    ps_pure   : lsymbol;
+    ps_kind   : psymbol_kind;
   }
 
-  type psymbol =
-    | PSvar of pvsymbol
-    | PSfun of psymbol_fun
+  let psymbols = Hls.create 17
 
-  let create_psymbol_fun name v = 
-    { 
-      p_name  = id_register name; 
-      p_tv    = v;
-      p_ty    = purify_type_v v;
-      p_ls    = 
-	let tyl, ty = uncurry_type ~logic:true v in
-	create_lsymbol name tyl (Some ty); }
-      
-  let ps_name = function
-    | PSvar v -> v.pv_name
-    | PSfun f -> f.p_name
+  let create_psymbol ~impure ~effect ~pure ~kind =
+    let ps = { 
+      ps_impure = impure;
+      ps_effect = effect;
+      ps_pure   = pure;
+      ps_kind   = kind;
+    } 
+    in
+    Hls.add psymbols impure ps;
+    Hls.add psymbols effect ps;
+    Hls.add psymbols pure   ps;
+    ps
 
-  let ps_equal ps1 ps2 = match ps1, ps2 with
-    | PSvar v1, PSvar v2 -> equal_pvsymbol v1 v2
-    | PSfun s1, PSfun s2 -> s1 == s2
-    | _ -> false
+  let create_psymbol_fun id v =
+    let create ?effect ?pure v =
+      let tyl, ty = uncurry_type ?effect ?pure v in
+      create_lsymbol id tyl (Some ty)
+    in
+    let impure = create              v in
+    let effect = create ~effect:true v in
+    let pure   = create ~pure:  true v in
+    create_psymbol ~impure ~effect ~pure ~kind:(PSfun v)
+
+  let create_psymbol_var pv =
+    let name = pv.pv_name in
+    let tv = trans_type_v pv.pv_tv in
+    let impure = create_lsymbol (id_clone name) [] (Some tv) in
+    let effect = create_lsymbol (id_clone name) [] (Some pv.pv_effect.vs_ty) in
+    let pure   = create_lsymbol (id_clone name) [] (Some pv.pv_pure.vs_ty) in
+    create_psymbol ~impure ~effect ~pure ~kind:(PSvar pv)
+
+  let get_psymbol ls =
+    try
+      Hls.find psymbols ls
+    with Not_found ->
+      (* Format.eprintf "ls = %a@." Pretty.print_ls ls; *)
+      let ps = { ps_impure = ls; ps_effect = ls; 
+		 ps_pure = ls; ps_kind = PSlogic } 
+      in
+      Hls.add psymbols ls ps;
+      ps
+
+  let ps_name ps = ps.ps_impure.ls_name
+
+  let ps_equal ps1 ps2 = ls_equal ps1.ps_impure ps2.ps_impure
 
   let rec subst_var ts s vs =
     let ty' = ty_inst ts vs.vs_ty in
@@ -378,7 +419,7 @@ end = struct
     | Tarrow ([], c) ->
 	c
     | v ->
-	let ty = purify_type_v v in
+	let ty = trans_type_v v in
 	{ c_result_type = v;
 	  c_effect      = E.empty;
 	  c_pre         = f_true;

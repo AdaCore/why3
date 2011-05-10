@@ -378,11 +378,13 @@ and wp_desc env rm e q = match e.expr_desc with
   | Elocal v ->
       let (res, q), _ = q in
       f_subst (subst1 res (t_var v.pv_pure)) q
-  | Eglobal (PSfun _) ->
+  | Eglobal { ps_kind = PSfun _ } ->
       let (_, q), _ = q in q
-  | Eglobal (PSvar pv) ->
+  | Eglobal { ps_kind = PSvar pv } ->
       let (v, q), _ = q in
       f_subst_single v (t_var pv.pv_pure) q
+  | Eglobal { ps_kind = PSlogic } ->
+      assert false
   | Efun (bl, t) ->
       let (_, q), _ = q in
       let f = wp_triple env rm bl t in
@@ -578,9 +580,10 @@ and f_btop env f = match f.f_node with
   | _ -> f_map (fun t -> t) (f_btop env) f
 
 let add_wp_decl ps f uc =
-  let s = "WP_" ^ ps.p_name.id_string in
-  let label = ["expl:correctness of " ^ ps.p_name.id_string] in
-  let id = id_fresh ~label ?loc:ps.p_name.id_loc s in
+  let name = ps.ps_impure.ls_name in
+  let s = "WP_" ^ name.id_string in
+  let label = ["expl:correctness of " ^ name.id_string] in
+  let id = id_fresh ~label ?loc:name.id_loc s in
   let f = f_btop uc f in
   (* printf "wp: f=%a@." print_fmla f; *)
   let pr = create_prsymbol id in
@@ -588,17 +591,17 @@ let add_wp_decl ps f uc =
   add_pure_decl d uc
 
 let decl uc = function
-  | Pgm_ttree.Dlet ({ p_name = n } as ps, e) ->
+  | Pgm_ttree.Dlet (ps, e) ->
       Debug.dprintf debug "@[--effect %s-----@\n  %a@]@\n----------------@."
-	  n.id_string print_type_v e.expr_type_v;
+	  ps.ps_impure.ls_name.id_string print_type_v e.expr_type_v;
       let f = wp uc e in
       Debug.dprintf debug "wp = %a@\n----------------@." Pretty.print_fmla f;
       add_wp_decl ps f uc
   | Pgm_ttree.Dletrec dl ->
-      let add_one uc ({ p_name = n } as ps, def) =
+      let add_one uc (ps, def) =
 	let f = wp_recfun uc Mreg.empty def in
 	Debug.dprintf debug "wp %s = %a@\n----------------@."
-	   n.id_string Pretty.print_fmla f;
+	   ps.ps_impure.ls_name.id_string Pretty.print_fmla f;
 	add_wp_decl ps f uc
       in
       List.fold_left add_one uc dl

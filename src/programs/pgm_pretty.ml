@@ -16,10 +16,12 @@ let rec print_expr fmt e = match e.expr_desc with
 	Pretty.print_ty t.t_ty
   | Elocal v ->
       fprintf fmt "%a" print_pv v
-  | Eglobal (PSvar v) ->
+  | Eglobal { ps_kind = PSvar v } ->
       fprintf fmt "<global var %a>" print_pv v
-  | Eglobal (PSfun f) ->
-      fprintf fmt "<global %a>" print_ls f.p_ls
+  | Eglobal { ps_kind = PSfun tv } ->
+      fprintf fmt "<global %a>" print_type_v tv
+  | Eglobal { ps_kind = PSlogic } ->
+      assert false
   | Efun (bl, t) ->
       fprintf fmt "@[<hov 2>fun %a ->@ %a@]" 
 	(print_list space print_pv) bl print_triple t

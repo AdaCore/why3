@@ -279,9 +279,9 @@ and recfun = pvsymbol * pvsymbol list * rec_variant option * triple
 and triple = pre * expr * post
 
 type decl =
-  | Dlet    of T.psymbol_fun * expr
-  | Dletrec of (T.psymbol_fun * recfun) list
-  | Dparam  of T.psymbol * type_v
+  | Dlet    of T.psymbol * expr
+  | Dletrec of (T.psymbol * recfun) list
+  | Dparam  of T.psymbol
 
 type file = decl list
 

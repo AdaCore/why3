@@ -84,18 +84,25 @@ module rec T : sig
 
   (* program symbols *)
 
-  type psymbol_fun = private {
-    p_name : ident;
-    p_tv   : type_v;
-    p_ty   : ty;      (* as a logic type, for typing purposes only *)
-    p_ls   : lsymbol; (* for use in the logic *)
+  type psymbol_kind =
+    | PSvar   of pvsymbol
+    | PSfun   of type_v
+    | PSlogic
+
+  type psymbol = {
+    ps_impure : lsymbol;
+    ps_effect : lsymbol;
+    ps_pure   : lsymbol;
+    ps_kind   : psymbol_kind;
   }
 
-  type psymbol =
-    | PSvar of pvsymbol
-    | PSfun of psymbol_fun
+  val create_psymbol: 
+    impure:lsymbol -> effect:lsymbol -> pure:lsymbol -> kind:psymbol_kind ->
+    psymbol
+  val create_psymbol_fun: preid -> type_v -> psymbol
+  val create_psymbol_var: pvsymbol -> psymbol
 
-  val create_psymbol_fun : preid -> type_v -> psymbol_fun
+  val get_psymbol: lsymbol -> psymbol
 
   val ps_name : psymbol -> ident
   val ps_equal : psymbol -> psymbol -> bool
@@ -105,8 +112,7 @@ module rec T : sig
   val purify : ty -> ty
   val effectify : ty -> ty
 
-  val purify_type_v : ?logic:bool -> type_v -> ty
-    (** when [logic] is [true], mutable types are turned into their models *)
+  val trans_type_v : ?effect:bool -> ?pure:bool -> type_v -> ty
 
   (* operations on program types *)
 

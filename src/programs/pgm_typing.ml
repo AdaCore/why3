@@ -200,14 +200,17 @@ and specialize_binder ~loc htv v =
   let v = specialize_type_v ~loc htv v.pv_tv in
   id, dpurify_type_v v, v
 
-let specialize_global loc x uc =
-  region_vars := Htv.create 17 :: !region_vars;
-  let p = ns_find_pr (namespace uc) x in
-  match p with
-    | PSvar v ->
-	p, specialize_type_v ~loc ~policy:Region_glob (Htv.create 17) v.pv_tv
-    | PSfun f ->
-	p, specialize_type_v ~loc (Htv.create 17) f.p_tv
+(* let specialize_global loc x uc = *)
+(*   region_vars := Htv.create 17 :: !region_vars; *)
+(*   let ls = ns_find_ls (get_namespace (impure_uc uc)) x in *)
+(*   let ps = get_psymbol ls in *)
+(*   match ps.ps_kind with *)
+(*     | PSvar v -> *)
+(* 	ps, specialize_type_v ~loc ~policy:Region_glob (Htv.create 17) v.pv_tv *)
+(*     | PSfun tv -> *)
+(* 	ps, specialize_type_v ~loc (Htv.create 17) tv *)
+(*     | PSlogic -> *)
+(* 	ps,  *)
 
 let dot fmt () = pp_print_string fmt "."
 let print_qualids = print_list dot pp_print_string
@@ -417,19 +420,30 @@ and dexpr_desc ~ghost env loc = function
       let tyv = Mstr.find x env.locals in
       DElocal (x, tyv), tyv
   | Ptree.Eident p ->
-      begin try
-	(* global variable *)
-	let x = Typing.string_list_of_qualid [] p in
-	let s, tyv = specialize_global loc x env.uc in
-	let dty = dpurify_type_v tyv in
-	DEglobal (s, tyv), dty
-      with Not_found ->
-	let s,tyl,ty = Typing.specialize_lsymbol p (pure_uc env.uc) in
-	let ty = match ty with
-          | Some ty -> ty
-          | None -> dty_bool env.uc
-	in
-	DElogic s, dcurrying tyl ty
+      (* global variable *)
+      region_vars := Htv.create 17 :: !region_vars;
+      let x = Typing.string_list_of_qualid [] p in
+      let ls = 
+	try ns_find_ls (get_namespace (impure_uc env.uc)) x 
+	with Not_found -> errorm ~loc "unbound symbol %a" print_qualid p
+      in
+      let ps = get_psymbol ls in
+      begin match ps.ps_kind with
+	| PSvar v ->
+	    let tyv = 
+	      specialize_type_v ~loc ~policy:Region_glob (Htv.create 17) v.pv_tv
+	    in
+	    DEglobal (ps, tyv), dpurify_type_v tyv
+	| PSfun tv ->
+	    let tyv = specialize_type_v ~loc (Htv.create 17) tv in
+	    DEglobal (ps, tyv), dpurify_type_v tyv 
+	| PSlogic ->
+	    let tyl, ty = Denv.specialize_lsymbol ~loc ps.ps_pure in
+	    let ty = match ty with
+              | Some ty -> ty
+              | None -> dty_bool env.uc
+	    in
+	    DElogic ps.ps_pure, dcurrying tyl ty
       end
   | Ptree.Elazy (op, e1, e2) ->
       let e1 = dexpr ~ghost env e1 in
@@ -938,7 +952,7 @@ let make_logic_app gl loc ty ls el =
 	make (t :: args) r
     | ({ iexpr_desc = IElocal v }, _) :: r ->
 	make (t_var v.i_pure :: args) r
-    | ({ iexpr_desc = IEglobal (PSvar v, _) }, _) :: r ->
+    | ({ iexpr_desc = IEglobal ({ ps_kind = PSvar v }, _) }, _) :: r ->
 	make (t_var v.pv_pure :: args) r
     | (e, _) :: r ->
 	let v = create_ivsymbol (id_user "x" loc) e.iexpr_type in
@@ -959,9 +973,9 @@ let make_app _gl loc ty f el =
 	begin match e.iexpr_desc with
 	  | IElocal v ->
 	      make (fun f -> mk_iexpr loc tye (IEapply_var (k f, v))) r
-	  | IEglobal (PSvar v, _) ->
+	  | IEglobal ({ ps_kind = PSvar v }, _) ->
 	      make (fun f -> mk_iexpr loc tye (IEapply_glob (k f, v))) r
-	  | IEglobal (PSfun _, _) ->
+	  | IEglobal ({ ps_kind = PSfun _ }, _) ->
 	      errorm ~loc "higher-order programs not yet implemented"
 	  | _ ->
 	      let v = create_ivsymbol (id_user "x" loc) e.iexpr_type in
@@ -1207,10 +1221,10 @@ let rec print_iexpr fmt e = match e.iexpr_desc with
       print_term fmt t
   | IElocal v ->
       fprintf fmt "<local %a>" print_vs v.i_impure
-  | IEglobal (PSvar v, _) ->
+  | IEglobal ({ ps_kind = PSvar v }, _) ->
       fprintf fmt "<global var %a>" print_vs v.pv_effect
-  | IEglobal (PSfun s, _) ->
-      fprintf fmt "<global %a>" print_ls s.p_ls
+  | IEglobal ({ ps_kind = PSfun _ } as ps, _) ->
+      fprintf fmt "<global %a>" print_ls ps.ps_impure
   | IEapply (e, v) ->
       fprintf fmt "@[((%a) %a)@]" print_iexpr e print_vs v.i_impure
   | IEapply_var (e, v) ->
@@ -1287,8 +1301,8 @@ let create_pvsymbol_i i v =
 
 let create_pvsymbol_v id v =
   create_pvsymbol id v
-    ~effect:(create_vsymbol id (purify_type_v             v))
-    ~pure:  (create_vsymbol id (purify_type_v ~logic:true v))
+    ~effect:(create_vsymbol id (trans_type_v ~effect:true v))
+    ~pure:  (create_vsymbol id (trans_type_v ~pure:  true v))
     
 let add_local env i v =
   let vs = create_pvsymbol_i i v in
@@ -1762,10 +1776,14 @@ let add_pure_decl uc ?loc ls =
 let add_effect_decl uc ls =
   Pgm_module.add_effect_decl (Decl.create_logic_decl [ls, None]) uc
 
+let add_impure_decl uc ls =
+  Pgm_module.add_impure_decl (Decl.create_logic_decl [ls, None]) uc
+
 let add_global_fun loc x tyv uc =
   try 
     let ps = create_psymbol_fun (id_user x loc) tyv in
-    ps, add_psymbol (PSfun ps) uc
+    let d = Decl.create_logic_decl [ps.ps_impure, None] in
+    ps, Pgm_module.add_impure_decl d uc
   with Pgm_module.ClashSymbol _ ->
     errorm ~loc "clash with previous symbol %s" x
 
@@ -1872,8 +1890,8 @@ let add_types env ltm uc dl =
     | Qident _ | Qdot _ ->
 	try 
 	  let p = Typing.string_list_of_qualid [] q in
-	  let mt = ns_find_mt (namespace uc) p in
-	  mt.mt_regions 
+	  let ts = ns_find_ts (get_namespace (impure_uc uc)) p in
+	  (get_mtsymbol ts).mt_regions 
 	with Not_found -> 
 	  0 (* TODO: should have a mt already? *)
   in
@@ -1929,16 +1947,16 @@ let add_types env ltm uc dl =
   let dle = List.map (add_regions ~effect:true) dl in
   let uc = Pgm_module.add_effect_typedecl env dle uc in
   (* 4. add mtsymbols in module *)
-  let add_mt uc d =
+  let add_mt d =
     let x = d.td_ident.id in
     let get th = ns_find_ts (get_namespace th) [x] in
     let impure = get (impure_uc uc) in
     let effect = get (effect_uc uc) in
     let pure   = get (pure_uc   uc) in
     let singleton = Hashtbl.mem singletons x in
-    add_mtsymbol (create_mtsymbol ~impure ~effect ~pure ~singleton) uc
+    ignore (create_mtsymbol ~impure ~effect ~pure ~singleton)
   in
-  let uc = List.fold_left add_mt uc dl in
+  List.iter add_mt dl;
   (* 5. declare region types *)
   let visited = Hashtbl.create 17 in
   let th = effect_uc uc in
@@ -2049,19 +2067,18 @@ let rec decl ~wp env penv ltm lmod uc = function
       let ps, uc = match tyv with
 	| Tarrow _ -> 
 	    let ps, uc = add_global_fun loc id.id tyv uc in
-	    PSfun ps, uc
+	    ps, uc
 	| Tpure _ ->
 	    let id = id_user id.id loc in
 	    let pv = create_pvsymbol_v id tyv in
-	    let uc = add_psymbol (PSvar pv) uc in
-	    let ls = create_lsymbol id [] (Some pv.pv_pure.vs_ty) in
-	    let uc = add_pure_decl uc ~loc ls in
-	    declare_global ls pv;
-	    let ls = create_lsymbol id [] (Some pv.pv_effect.vs_ty) in
-	    let uc = add_effect_decl uc ls in
-	    PSvar pv, uc
+	    let ps = create_psymbol_var pv in
+	    let uc = add_pure_decl   uc ~loc ps.ps_pure in
+	    let uc = add_effect_decl uc ps.ps_effect in
+	    let uc = add_impure_decl uc ps.ps_impure in
+	    declare_global ps.ps_pure pv;
+	    ps, uc
       in
-      add_decl (Dparam (ps, tyv)) uc (* TODO: is it really needed? *)
+      add_decl (Dparam ps) uc (* TODO: is it really needed? *)
   | Ptree.Dexn (id, ty) ->
       let ty = option_map (type_type uc) ty in
       add_exception id.id_loc id.id ty uc
@@ -2103,45 +2120,12 @@ let rec decl ~wp env penv ltm lmod uc = function
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
   | Ptree.Dlogic (TypeDecl d) ->
       add_types env ltm uc d
-(* TODO
-      let loc = td.td_loc in
-      let id = let id = td.td_ident in id_user id.id id.id_loc in
-      let denv = Typing.create_denv (theory_uc uc) in
-      let args = 
-	List.map 
-	  (fun x -> tvsymbol_of_type_var (Typing.find_user_type_var x.id denv))
-	  td.td_params
-      in
-      let model = 
-	option_map 
-	  (fun ty -> let dty = Typing.dty denv ty in Denv.ty_of_dty dty)
-	  model 
-      in
-      option_iter (check_type_vars ~loc args) model;
-      let mt = create_mtsymbol ~mut id args model in
-      add_mtsymbol mt uc
-*)
-(*
-  | Ptree.Drecord_type (id, args, fl) ->
-      let loc = id.id_loc in
-      let id = id_user id.id loc in
-      let denv = Typing.create_denv (theory_uc uc) in
-      let args = 
-	List.map 
-	  (fun x -> tvsymbol_of_type_var (Typing.find_user_type_var x.id denv))
-	  args
-      in
-      let field (m, id, ty) = 
-	let ty = let dty = Typing.dty denv ty in Denv.ty_of_dty dty in
-	m, id_user id.id id.id_loc, ty
-      in
-      let fields = List.map field fl in
-      let rt = create_rtsymbol id args fields in
-      add_rtsymbol rt uc
-*)
-  | Ptree.Dlogic (LogicDecl _ | IndDecl _ | PropDecl _ | Meta _ as d) ->
+  | Ptree.Dlogic (LogicDecl _ | IndDecl _ as d) ->
       Pgm_module.add_pure_pdecl env ltm d uc
-  | Ptree.Dlogic d ->
+      (* TODO: add in impure and effect as well, with extra args for regions *)
+  | Ptree.Dlogic (PropDecl _ | Meta _ as d) ->
+      Pgm_module.add_pure_pdecl env ltm d uc
+  | Ptree.Dlogic (UseClone _ as d) ->
       Pgm_module.add_pdecl env ltm d uc
 
 (*
