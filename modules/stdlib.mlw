@@ -118,7 +118,7 @@ module ArrayEq
   logic array_eq_sub (a1 a2: array 'a) (l u: int) =
     map_eq_sub a1.elts a2.elts l u
 
-  logic array_eq (a1 a2 : array 'a) =
+  logic array_eq (a1 a2: array 'a) =
     a1.length = a2.length and
     array_eq_sub a1 a2 0 a1.length
 
@@ -129,10 +129,10 @@ module ArrayPermut
   use import module Array
   clone import map.MapPermut as M
 
-  logic permut_sub (a1 a2 : array 'a) (l u: int) =
+  logic permut_sub (a1 a2: array 'a) (l u: int) =
     M.permut_sub a1.elts a2.elts l u
 
-  logic permut (a1 a2 : array 'a) =
+  logic permut (a1 a2: array 'a) =
     a1.length = a2.length and M.permut_sub a1.elts a2.elts 0 a1.length
 
 end

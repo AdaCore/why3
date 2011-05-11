@@ -4,12 +4,11 @@
 module M
 
   use import module stdlib.Refint
-  use import array.ArrayLength
   use import module stdlib.Array
 
   parameter a : array int
 
-  logic inv (a : map int) = 
+  logic inv (a : array int) = 
     a[0] = 0 and length a = 11 and forall k:int. 1 <= k <= 10 -> 0 < a[k]
 
   parameter loop1 : ref int
@@ -44,11 +43,11 @@ end
 module ARM
 
   use export int.Int
-  use export array.Array
+  use export map.Map
   use export module stdlib.Ref
 
   (* memory *)
-  parameter mem : ref (t int int)
+  parameter mem : ref (map int int)
   parameter mem_ldr : a:int -> {} int reads mem.contents { result = mem[a] }
   parameter mem_str : a:int -> v:int -> 
     {} int writes mem.contents { mem = (old mem)[a <- v] }
@@ -115,10 +114,10 @@ module InsertionSortExample
   (* stack and data segment do not overlap *)
   logic separation (fp : int) = a+10 < fp-24
 
-  logic inv (mem : t int int) = 
+  logic inv (mem: map int int) = 
     mem[a] = 0 and forall k:int. 1 <= k <= 10 -> 0 < mem[a + k]
 
-  logic inv_l2 (mem : t int int) (fp : int) (l4 : int) =
+  logic inv_l2 (mem: map int int) (fp : int) (l4 : int) =
     2 <= mem[fp - 16] <= 11 and l4 = mem[fp-16] - 2 and inv mem
   
   let path_init_l2 () = 

@@ -187,8 +187,8 @@ and specialize_type_c ~loc htv c =
   { dc_result_type = 
       specialize_type_v ~policy:Region_ret ~loc htv c.c_result_type;
     dc_effect      = specialize_effect ~loc htv c.c_effect;
-    dc_pre         = specialize_fmla ~loc htv c.c_pre;
-    dc_post        = specialize_post ~loc htv c.c_post; }
+    dc_pre         = specialize_fmla   ~loc htv c.c_pre;
+    dc_post        = specialize_post   ~loc htv c.c_post; }
 
 and specialize_binder ~loc htv v =
   let id = {
@@ -282,9 +282,7 @@ let dueffect env e =
 	e.Ptree.pe_raises; }
 
 let dpost uc (q, ql) =
-  let dexn (id, l) =
-    let s, _, _ = dexception uc id in s, l
-  in
+  let dexn (id, l) = let s, _, _ = dexception uc id in s, l in
   q, List.map dexn ql
 
 let add_local_top env x tyv =
@@ -814,7 +812,7 @@ let post env ((ty, f), ql) =
 	  let v_result = create_vsymbol (id_fresh id_result) ty in
 	  Some v_result, Mstr.add id_result v_result env
     in
-    (ls, (v, Denv.fmla env f))
+    ls, (v, Denv.fmla env f)
   in
   let ty = Denv.ty_of_dty ty in
   let v_result = create_vsymbol (id_fresh id_result) ty in
@@ -825,7 +823,7 @@ let iterm env l =
   let t = dterm env.i_denv l in
   Denv.term env.i_pures t
 
-(* TODO: should we admit an instsance of a polymorphic order relation *)
+(* TODO: should we admit an instance of a polymorphic order relation? *)
 let ivariant env (t, ps) =
   let loc = t.pp_loc in
   let t = iterm env t in
@@ -1029,6 +1027,39 @@ let ipattern env p =
   in
   ipattern env p
 
+(* pretty-printing (for debugging) *)
+
+open Pp
+open Pretty
+
+let print_iregion = R.print
+
+let rec print_iexpr fmt e = match e.iexpr_desc with
+  | IElogic t ->
+      print_term fmt t
+  | IElocal v ->
+      fprintf fmt "<local %a>" print_vs v.i_impure
+  | IEglobal ({ ps_kind = PSvar v }, _) ->
+      fprintf fmt "<global var %a>" print_vs v.pv_effect
+  | IEglobal ({ ps_kind = PSfun v } as ps, _) ->
+      fprintf fmt "<global %a : %a>" print_ls ps.ps_impure T.print_type_v v
+  | IEapply (e, v) ->
+      fprintf fmt "@[((%a) %a)@]" print_iexpr e print_vs v.i_impure
+  | IEapply_var (e, v) ->
+      fprintf fmt "@[((%a) <var %a>)@]" print_iexpr e print_vs v.i_impure
+  | IEapply_glob (e, v) ->
+      fprintf fmt "@[((%a) <glob %a>)@]" print_iexpr e print_vs v.pv_effect
+  | IEfun (_, (_,e,_)) ->
+      fprintf fmt "@[fun _ ->@ %a@]" print_iexpr e
+  | IElet (v, e1, e2) ->
+      fprintf fmt "@[let %a = %a in@ %a@]" print_vs v.i_impure
+	print_iexpr e1 print_iexpr e2
+  | IEif (e1, e2, e3) ->
+      fprintf fmt "@[if %a then %a else %a@]"
+	print_iexpr e1 print_iexpr e2 print_iexpr e3
+  | _ ->
+      fprintf fmt "<other>"
+
 (* [iexpr] translates dexpr into iexpr
    [env : vsymbol Mstr.t] maps strings to vsymbols for local variables *)
 
@@ -1211,39 +1242,6 @@ and itriple gl env (p, e, q) =
   let ty = e.iexpr_type in
   let q = iupost env ty q in
   (p, e, q)
-
-(* pretty-printing (for debugging) *)
-
-open Pp
-open Pretty
-
-let print_iregion = R.print
-
-let rec print_iexpr fmt e = match e.iexpr_desc with
-  | IElogic t ->
-      print_term fmt t
-  | IElocal v ->
-      fprintf fmt "<local %a>" print_vs v.i_impure
-  | IEglobal ({ ps_kind = PSvar v }, _) ->
-      fprintf fmt "<global var %a>" print_vs v.pv_effect
-  | IEglobal ({ ps_kind = PSfun _ } as ps, _) ->
-      fprintf fmt "<global %a>" print_ls ps.ps_impure
-  | IEapply (e, v) ->
-      fprintf fmt "@[((%a) %a)@]" print_iexpr e print_vs v.i_impure
-  | IEapply_var (e, v) ->
-      fprintf fmt "@[((%a) <var %a>)@]" print_iexpr e print_vs v.i_impure
-  | IEapply_glob (e, v) ->
-      fprintf fmt "@[((%a) <glob %a>)@]" print_iexpr e print_vs v.pv_effect
-  | IEfun (_, (_,e,_)) ->
-      fprintf fmt "@[fun _ ->@ %a@]" print_iexpr e
-  | IElet (v, e1, e2) ->
-      fprintf fmt "@[let %a = %a in@ %a@]" print_vs v.i_impure
-	print_iexpr e1 print_iexpr e2
-  | IEif (e1, e2, e3) ->
-      fprintf fmt "@[if %a then %a else %a@]"
-	print_iexpr e1 print_iexpr e2 print_iexpr e3
-  | _ ->
-      fprintf fmt "<other>"
 
 (* phase 3: effect inference **********)
 
@@ -1483,7 +1481,7 @@ and expr_desc gl env loc ty = function
 (*       if Sreg.exists (fun r -> occur_type_v r e1.expr_type_v) vs.pv_regions then *)
 (*   	errorm ~loc "this application would create an alias"; *)
       let c = apply_type_v_var e1.expr_type_v vs in
-      (* printf "c = %a@." print_type_c c; *)
+      (*  printf "c = %a@." print_type_c c; *)
       make_apply loc e1 ty c
   | IEapply_glob (e1, v) ->
       let e1 = expr gl env e1 in

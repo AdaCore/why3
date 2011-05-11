@@ -17,13 +17,13 @@ module Algo63
   use import int.Int
   use import module stdlib.Ref
   use import module stdlib.Array
-  use import array.ArrayPermut
+  use import module stdlib.ArrayPermut
 
   parameter partition : 
     a : array int -> m:int -> n:int -> i:ref int -> j:ref int ->
     { m < n } 
-    unit writes a.contents i.contents j.contents
-    { m <= j and j < i and i <= n and permut (old a) a m n and
+    unit writes a i j
+    { m <= j and j < i and i <= n and permut_sub (old a) a m n and
       exists x:int.
         (forall r:int. m <= r <= j -> a[r] <= x) and
         (forall r:int. j < r < i -> a[r] = x) and
