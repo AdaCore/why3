@@ -844,7 +844,7 @@ test: bin/why3.byte plugins.byte $(TOOLS)
 	@for i in int.Abs int.EuclideanDivision int.ComputerDivision  \
 		real.Abs real.FromIntTest real.SquareTest \
 		real.ExpLogTest real.PowerTest real.TrigonometryTest \
-		floating_point.Test array.TestBv32 \
+		floating_point.Test map.TestBv32 \
 		; do \
 	  printf "Generating Coq file for $$i\\n" && \
 	  	bin/why3.byte -P coq -o output_coq -T $$i ; done

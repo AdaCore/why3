@@ -1,4 +1,12 @@
 
+module Alg
+
+  type t = A
+
+  let foo (x: t) = match x with A -> 0 end
+
+end
+
 (**
 module M
 
@@ -13,6 +21,7 @@ module M
 end
 **)
 
+(**
 module TestRef
 
   use import int.Int
@@ -50,16 +59,7 @@ module TestRef
   parameter ft2 : x:t2 -> {} unit writes x.fa x.fb {}
 
 end
-
-module Array
-
-  type t
-
-  logic get t : int
-
-  let foo (x : t) = get x
-
-end
+**)
 
 (**
 module TestArray

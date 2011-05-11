@@ -84,7 +84,7 @@ type denv = {
 let create_denv uc = 
   { uc = uc;
     locals = Mstr.empty;
-    denv = Typing.create_denv (pure_uc uc); }
+    denv = Typing.create_denv (); }
 
 let specialize_post ~loc htv ((v, f), ql) =
   assert (v.vs_name.id_string = "result"); (* TODO *)
@@ -516,7 +516,7 @@ and dexpr_desc ~ghost env loc = function
       let ty1 = e1.dexpr_type in
       let ty = create_type_var loc in (* the type of all branches *)
       let branch (p, e) =
-	let denv, p = Typing.dpat_list env.denv ty1 p in
+	let denv, p = Typing.dpat_list (effect_uc env.uc) env.denv ty1 p in
 	let env = { env with denv = denv } in
 	let env = add_local_pat env p in
 	let e = dexpr ~ghost env e in
@@ -820,7 +820,7 @@ let post env ((ty, f), ql) =
   (v_result, Denv.fmla env f), List.map exn ql
 
 let iterm env l =
-  let t = dterm env.i_denv l in
+  let t = dterm (pure_uc env.i_uc) env.i_denv l in
   Denv.term env.i_pures t
 
 (* TODO: should we admit an instance of a polymorphic order relation? *)
@@ -872,7 +872,7 @@ and ibinder env (x, ty, tyv) =
   env, (v, tyv)
 
 let ifmla env l =
-  let f = dfmla env.i_denv l in
+  let f = dfmla (pure_uc env.i_uc) env.i_denv l in
   Denv.fmla env.i_pures f
 
 let id_result loc = id_user id_result loc
@@ -1129,7 +1129,8 @@ and iexpr_desc gl env loc ty = function
   | DEmatch (e1, bl) ->
       let e1 = iexpr gl env e1 in
       let branch (p, e) =
-        let _, p = Denv.pattern env.i_pures p in 
+	let envi = Mstr.map (fun v -> v.i_impure) env.i_impures in
+        let _, p = Denv.pattern envi p in 
 	let env, p = ipattern env p in
 	(p, iexpr gl env e)
       in
@@ -1765,7 +1766,7 @@ let type_expr gl e =
 
 let type_type uc ty =
   let denv = create_denv uc in
-  let dty = Typing.dty denv.denv ty in
+  let dty = Typing.dty (impure_uc uc) denv.denv ty in
   Denv.ty_of_dty dty
 
 let add_pure_decl uc ?loc ls =
@@ -1833,6 +1834,17 @@ let make_immutable_type td =
     | TDabstract | TDalias _ | TDalgebraic _ -> 
 	td
 
+let add_logic_ps ?(nofail=false) uc x =
+  try
+    let get th = ns_find_ls (get_namespace th) [x] in
+    let impure = get (impure_uc uc) in
+    let effect = get (effect_uc uc) in
+    let pure   = get (pure_uc   uc) in
+    ignore (create_psymbol ~impure ~effect ~pure ~kind:PSlogic)
+  with Not_found ->
+    (* can fail if x is a constructor of a model type (record or algebraic) *)
+    assert nofail
+
 let add_types env ltm uc dl =
   (* 1. type check the pure def, to have all sanity checks performed *)
   let dlp = List.map make_immutable_type dl in
@@ -1847,7 +1859,7 @@ let add_types env ltm uc dl =
   let rec visit x =
     try
       match Hashtbl.find nregions x with
-	| None -> assert false (* cyclic def already checked *)
+	| None -> 0 (* for recursive data types *)
 	| Some n -> n
     with Not_found ->
       Hashtbl.add nregions x None;
@@ -1857,8 +1869,10 @@ let add_types env ltm uc dl =
 	    0
 	| TDalias ty ->
 	    nregions_of_type ty
-	| TDalgebraic _ ->
-	    assert false (*TODO*)
+	| TDalgebraic cl ->
+	    let param n (_, ty) = n + nregions_of_type ty in
+	    let constructor n (_, _, pl) = List.fold_left param n pl in
+	    List.fold_left constructor 0 cl
 	| TDrecord fl ->
 	    let nf = List.length fl in
 	    List.fold_left
@@ -1929,8 +1943,9 @@ let add_types env ltm uc dl =
       | TDalias ty ->
 	  TDalias (add_regions_to_type ty)
       | TDalgebraic cl ->
-	  let add (_loc, _id, _pl) = assert false (*TODO*) in
-	  TDalgebraic (List.map add cl)
+	  let add (x, ty) = x, add_regions_to_type ty in
+	  let constructor (loc, id, pl) = (loc, id, List.map add pl) in
+	  TDalgebraic (List.map constructor cl)
       | TDrecord fl ->
 	  let add i (loc, mut, id, ty) =
 	    if mut then begin
@@ -2000,14 +2015,19 @@ let add_types env ltm uc dl =
 	      | [] -> (* abstract *)
 		  ()
 	      | [ls] -> (* record *)
+		  add_logic_ps ~nofail:true uc ls.ls_name.id_string;
 		  let field i ty =
 		    if Hashtbl.mem mutable_field (x, i) then 
 		      declare_region_type ty;
 		    visit_type ty
 		  in
 		  list_iteri field ls.ls_args
-	      | _ -> (* algebraic *)
-		  assert false (*TODO*)
+	      | cl -> (* algebraic *)
+		  let constructor ls = 
+		    add_logic_ps ~nofail:true uc ls.ls_name.id_string;
+		    List.iter visit_type ls.ls_args 
+		  in
+		  List.iter constructor cl
 	    end
 	| Some ty -> (* alias *)
 	    visit_type ty
@@ -2046,19 +2066,11 @@ let add_logics env ltm uc d =
 	ld_type   = option_map add_regions_to_type d.ld_type;
 	ld_def    = None; }
   in
-  let add_ps uc d =
-    let x = d.ld_ident.id in
-    let get th = ns_find_ls (get_namespace th) [x] in
-    let impure = get (impure_uc uc) in
-    let effect = get (effect_uc uc) in
-    let pure   = get (pure_uc   uc) in
-    ignore (create_psymbol ~impure ~effect ~pure ~kind:PSlogic)
-  in
   let add uc d0 =
     let d = LogicDecl [add_regions d0] in
     let uc = Pgm_module.add_impure_pdecl env ltm d uc in
     let uc = Pgm_module.add_effect_pdecl env ltm d uc in
-    add_ps uc d0;
+    add_logic_ps uc d0.ld_ident.id;
     uc
   in
   let addi uc d =

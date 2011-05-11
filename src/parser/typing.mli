@@ -54,7 +54,7 @@ val specialize_tysymbol :
 
 type denv
 
-val create_denv : theory_uc -> denv
+val create_denv : unit -> denv
 
 val create_user_type_var : string -> Denv.type_var
 val find_user_type_var : string -> denv -> Denv.type_var
@@ -65,14 +65,14 @@ val mem_var : string -> denv -> bool
 val find_var : string -> denv -> Denv.dty
 val add_var : string -> Denv.dty -> denv -> denv
 
-val type_term : denv -> vsymbol Mstr.t -> Ptree.lexpr -> term
-val type_fmla : denv -> vsymbol Mstr.t -> Ptree.lexpr -> fmla
+val type_term : theory_uc -> denv -> vsymbol Mstr.t -> Ptree.lexpr -> term
+val type_fmla : theory_uc -> denv -> vsymbol Mstr.t -> Ptree.lexpr -> fmla
 
-val dty : denv -> Ptree.pty -> Denv.dty
-val dterm : ?localize:bool -> denv -> Ptree.lexpr -> Denv.dterm
-val dfmla : ?localize:bool -> denv -> Ptree.lexpr -> Denv.dfmla
-val dpat : denv -> Ptree.pattern -> denv * Denv.dpattern
-val dpat_list : denv -> Denv.dty -> Ptree.pattern -> denv * Denv.dpattern
+val dty : theory_uc -> denv -> Ptree.pty -> Denv.dty
+val dterm : ?localize:bool -> theory_uc -> denv -> Ptree.lexpr -> Denv.dterm
+val dfmla : ?localize:bool -> theory_uc -> denv -> Ptree.lexpr -> Denv.dfmla
+val dpat : theory_uc -> denv -> Ptree.pattern -> denv * Denv.dpattern
+val dpat_list : theory_uc -> denv -> Denv.dty -> Ptree.pattern -> denv * Denv.dpattern
 
 val print_denv : Format.formatter -> denv -> unit
 

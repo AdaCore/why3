@@ -124,13 +124,11 @@ let unify_raise ~loc ty1 ty2 =
     It is only local to this module and created with [create_denv] below. *)
 
 type denv = {
-  uc : theory_uc; (* the theory under construction *)
   utyvars : (string, type_var) Hashtbl.t; (* user type variables *)
   dvars : dty Mstr.t; (* local variables, to be bound later *)
 }
 
-let create_denv uc = {
-  uc = uc;
+let create_denv () = {
   utyvars = Hashtbl.create 17;
   dvars = Mstr.empty;
 }
@@ -204,15 +202,15 @@ let rec type_inst s ty = match ty.ty_node with
   | Ty.Tyvar n -> Mtv.find n s
   | Ty.Tyapp (ts, tyl) -> tyapp (ts, List.map (type_inst s) tyl)
 
-let rec dty env = function
+let rec dty uc env = function
   | PPTtyvar {id=x} ->
       tyvar (find_user_type_var x env)
   | PPTtyapp (p, x) ->
       let loc = qloc x in
-      let ts, a = specialize_tysymbol loc x env.uc in
+      let ts, a = specialize_tysymbol loc x uc in
       let np = List.length p in
       if np <> a then error ~loc (TypeArity (x, a, np));
-      let tyl = List.map (dty env) p in
+      let tyl = List.map (dty uc env) p in
       begin match ts.ts_def with
 	| None ->
 	    tyapp (ts, tyl)
@@ -223,7 +221,7 @@ let rec dty env = function
       end
   | PPTtuple tyl ->
       let ts = ts_tuple (List.length tyl) in
-      tyapp (ts, List.map (dty env) tyl)
+      tyapp (ts, List.map (dty uc env) tyl)
 
 let find_ns find p ns =
   let loc = qloc p in
@@ -374,11 +372,11 @@ let fresh_type_var loc =
   let tv = create_tvsymbol (id_user "a" loc) in
   tyvar (create_ty_decl_var ~loc ~user:false tv)
 
-let rec dpat env pat =
-  let env, n, ty = dpat_node pat.pat_loc env pat.pat_desc in
+let rec dpat uc env pat =
+  let env, n, ty = dpat_node pat.pat_loc uc env pat.pat_desc in
   env, { dp_node = n; dp_ty = ty }
 
-and dpat_node loc env = function
+and dpat_node loc uc env = function
   | PPpwild ->
       let ty = fresh_type_var loc in
       env, Pwild, ty
@@ -387,17 +385,17 @@ and dpat_node loc env = function
       let env = { env with dvars = Mstr.add x.id ty env.dvars } in
       env, Pvar x, ty
   | PPpapp (x, pl) ->
-      let s, tyl, ty = specialize_fsymbol x env.uc in
-      let env, pl = dpat_args s.ls_name loc env tyl pl in
+      let s, tyl, ty = specialize_fsymbol x uc in
+      let env, pl = dpat_args s.ls_name loc uc env tyl pl in
       env, Papp (s, pl), ty
   | PPprec fl ->
       let renv = ref env in
-      let _,cs,fl = list_fields env.uc fl in
+      let _,cs,fl = list_fields uc fl in
       let tyl,ty = Denv.specialize_lsymbol ~loc cs in
       let al = List.map2 (fun f ty -> match f with
         | Some (_,e) ->
             let loc = e.pat_loc in
-            let env,e = dpat !renv e in
+            let env,e = dpat uc !renv e in
             unify_raise ~loc e.dp_ty ty;
             renv := env;
             e
@@ -408,20 +406,20 @@ and dpat_node loc env = function
       let n = List.length pl in
       let s = fs_tuple n in
       let tyl = List.map (fun _ -> fresh_type_var loc) pl in
-      let env, pl = dpat_args s.ls_name loc env tyl pl in
+      let env, pl = dpat_args s.ls_name loc uc env tyl pl in
       let ty = tyapp (ts_tuple n, tyl) in
       env, Papp (s, pl), ty
   | PPpas (p, x) ->
-      let env, p = dpat env p in
+      let env, p = dpat uc env p in
       let env = { env with dvars = Mstr.add x.id p.dp_ty env.dvars } in
       env, Pas (p,x), p.dp_ty
   | PPpor (p, q) ->
-      let env, p = dpat env p in
-      let env, q = dpat env q in
+      let env, p = dpat uc env p in
+      let env, q = dpat uc env q in
       unify_raise ~loc p.dp_ty q.dp_ty;
       env, Por (p,q), p.dp_ty
 
-and dpat_args s loc env el pl =
+and dpat_args s loc uc env el pl =
   let n = List.length el and m = List.length pl in
   if n <> m then error ~loc (BadNumberOfArguments (s, m, n));
   let rec check_arg env = function
@@ -429,7 +427,7 @@ and dpat_args s loc env el pl =
 	env, []
     | a :: al, p :: pl ->
 	let loc = p.pat_loc in
-	let env, p = dpat env p in
+	let env, p = dpat uc env p in
 	unify_raise ~loc p.dp_ty a;
 	let env, pl = check_arg env (al, pl) in
 	env, p :: pl
@@ -451,17 +449,17 @@ let check_quant_linearity uqu =
   in
   List.iter (fun (idl, _) -> Util.option_iter check idl) uqu
 
-let check_highord env x tl = match x with
+let check_highord uc env x tl = match x with
   | Qident { id = x } when Mstr.mem x env.dvars -> true
-  | _ -> List.length tl > List.length ((find_lsymbol x env.uc).ls_args)
+  | _ -> List.length tl > List.length ((find_lsymbol x uc).ls_args)
 
 let apply_highord loc x tl = match List.rev tl with
   | a::[] -> [{pp_loc = loc; pp_desc = PPvar x}; a]
   | a::tl -> [{pp_loc = loc; pp_desc = PPapp (x, List.rev tl)}; a]
   | [] -> assert false
 
-let rec dterm ?(localize=false) env { pp_loc = loc; pp_desc = t } =
-  let n, ty = dterm_node ~localize loc env t in
+let rec dterm ?(localize=false) uc env { pp_loc = loc; pp_desc = t } =
+  let n, ty = dterm_node ~localize loc uc env t in
   let t = { dt_node = n; dt_ty = ty } in
   let rec down e = match e.dt_node with
     | Tnamed (Lstr _, e) -> down e
@@ -470,55 +468,55 @@ let rec dterm ?(localize=false) env { pp_loc = loc; pp_desc = t } =
   in
   if localize then down t else t
 
-and dterm_node ~localize loc env = function
+and dterm_node ~localize loc uc env = function
   | PPvar (Qident {id=x}) when Mstr.mem x env.dvars ->
       (* local variable *)
       let ty = Mstr.find x env.dvars in
       Tvar x, ty
   | PPvar x ->
       (* 0-arity symbol (constant) *)
-      let s, tyl, ty = specialize_fsymbol x env.uc in
+      let s, tyl, ty = specialize_fsymbol x uc in
       let n = List.length tyl in
       if n > 0 then error ~loc (BadNumberOfArguments (s.ls_name, 0, n));
       Tapp (s, []), ty
-  | PPapp (x, tl) when check_highord env x tl ->
+  | PPapp (x, tl) when check_highord uc env x tl ->
       let tl = apply_highord loc x tl in
       let atyl, aty = Denv.specialize_lsymbol ~loc fs_func_app in
-      let tl = dtype_args fs_func_app.ls_name loc env atyl tl in
+      let tl = dtype_args fs_func_app.ls_name loc uc env atyl tl in
       Tapp (fs_func_app, tl), Util.of_option aty
   | PPapp (x, tl) ->
-      let s, tyl, ty = specialize_fsymbol x env.uc in
-      let tl = dtype_args s.ls_name loc env tyl tl in
+      let s, tyl, ty = specialize_fsymbol x uc in
+      let tl = dtype_args s.ls_name loc uc env tyl tl in
       Tapp (s, tl), ty
   | PPtuple tl ->
       let n = List.length tl in
       let s = fs_tuple n in
       let tyl = List.map (fun _ -> fresh_type_var loc) tl in
-      let tl = dtype_args s.ls_name loc env tyl tl in
+      let tl = dtype_args s.ls_name loc uc env tyl tl in
       let ty = tyapp (ts_tuple n, tyl) in
       Tapp (s, tl), ty
   | PPinfix (e1, x, e2) ->
-      let s, tyl, ty = specialize_fsymbol (Qident x) env.uc in
-      let tl = dtype_args s.ls_name loc env tyl [e1; e2] in
+      let s, tyl, ty = specialize_fsymbol (Qident x) uc in
+      let tl = dtype_args s.ls_name loc uc env tyl [e1; e2] in
       Tapp (s, tl), ty
   | PPconst (ConstInt _ as c) ->
       Tconst c, tyapp (Ty.ts_int, [])
   | PPconst (ConstReal _ as c) ->
       Tconst c, tyapp (Ty.ts_real, [])
   | PPlet (x, e1, e2) ->
-      let e1 = dterm ~localize env e1 in
+      let e1 = dterm ~localize uc env e1 in
       let ty = e1.dt_ty in
       let env = { env with dvars = Mstr.add x.id ty env.dvars } in
-      let e2 = dterm ~localize env e2 in
+      let e2 = dterm ~localize uc env e2 in
       Tlet (e1, x, e2), e2.dt_ty
   | PPmatch (e1, bl) ->
-      let t1 = dterm ~localize env e1 in
+      let t1 = dterm ~localize uc env e1 in
       let ty1 = t1.dt_ty in
       let tb = fresh_type_var loc in (* the type of all branches *)
       let branch (p, e) =
-        let env, p = dpat_list env ty1 p in
+        let env, p = dpat_list uc env ty1 p in
         let loc = e.pp_loc in
-	let e = dterm ~localize env e in
+	let e = dterm ~localize uc env e in
 	unify_raise ~loc e.dt_ty tb;
         p, e
       in
@@ -529,29 +527,29 @@ and dterm_node ~localize loc env = function
         | Lpos _ -> false
         | Lstr _ -> true
       in
-      let e1 = dterm ~localize env e1 in
+      let e1 = dterm ~localize uc env e1 in
       Tnamed (x, e1), e1.dt_ty
   | PPcast (e1, ty) ->
       let loc = e1.pp_loc in
-      let e1 = dterm ~localize env e1 in
-      let ty = dty env ty in
+      let e1 = dterm ~localize uc env e1 in
+      let ty = dty uc env ty in
       unify_raise ~loc e1.dt_ty ty;
       e1.dt_node, ty
   | PPif (e1, e2, e3) ->
       let loc = e3.pp_loc in
-      let e2 = dterm ~localize env e2 in
-      let e3 = dterm ~localize env e3 in
+      let e2 = dterm ~localize uc env e2 in
+      let e3 = dterm ~localize uc env e3 in
       unify_raise ~loc e3.dt_ty e2.dt_ty;
-      Tif (dfmla ~localize env e1, e2, e3), e2.dt_ty
+      Tif (dfmla ~localize uc env e1, e2, e3), e2.dt_ty
   | PPeps (x, ty, e1) ->
-      let ty = dty env ty in
+      let ty = dty uc env ty in
       let env = { env with dvars = Mstr.add x.id ty env.dvars } in
-      let e1 = dfmla ~localize env e1 in
+      let e1 = dfmla ~localize uc env e1 in
       Teps (x, ty, e1), ty
   | PPquant ((PPlambda|PPfunc|PPpred) as q, uqu, trl, a) ->
       check_quant_linearity uqu;
       let uquant env (idl,ty) =
-        let ty = dty env ty in
+        let ty = dty uc env ty in
         let id = match idl with
           | Some id -> id
           | None -> assert false
@@ -561,14 +559,14 @@ and dterm_node ~localize loc env = function
       let env, uqu = map_fold_left uquant env uqu in
       let trigger e =
 	try
-	  TRterm (dterm ~localize env e)
+	  TRterm (dterm ~localize uc env e)
 	with exn when trigger_not_a_term_exn exn ->
-	  TRfmla (dfmla ~localize env e)
+	  TRfmla (dfmla ~localize uc env e)
       in
       let trl = List.map (List.map trigger) trl in
       let e = match q with
-        | PPfunc -> TRterm (dterm ~localize env a)
-        | PPpred -> TRfmla (dfmla ~localize env a)
+        | PPfunc -> TRterm (dterm ~localize uc env a)
+        | PPpred -> TRfmla (dfmla ~localize uc env a)
         | PPlambda -> trigger a
         | _ -> assert false
       in
@@ -607,12 +605,12 @@ and dterm_node ~localize loc env = function
       in
       Teps (id, ty, Fquant (Fforall, uqu, trl, f)), ty
   | PPrecord fl ->
-      let _,cs,fl = list_fields env.uc fl in
+      let _,cs,fl = list_fields uc fl in
       let tyl,ty = Denv.specialize_lsymbol ~loc cs in
       let al = List.map2 (fun f ty -> match f with
         | Some (_,e) ->
             let loc = e.pp_loc in
-            let e = dterm ~localize env e in
+            let e = dterm ~localize uc env e in
             unify_raise ~loc e.dt_ty ty;
             e
         | None -> errorm ~loc "some record fields are missing") fl tyl
@@ -621,8 +619,8 @@ and dterm_node ~localize loc env = function
   | PPupdate (e,fl) ->
       let n = ref (-1) in
       let q = Queue.create () in
-      let e = dterm ~localize env e in
-      let _,cs,fl = list_fields env.uc fl in
+      let e = dterm ~localize uc env e in
+      let _,cs,fl = list_fields uc fl in
       (* prepare the pattern *)
       let tyl,ty = Denv.specialize_lsymbol ~loc cs in
       unify_raise ~loc e.dt_ty (Util.of_option ty);
@@ -641,7 +639,7 @@ and dterm_node ~localize loc env = function
       let al = List.map2 (fun f ty -> match f with
         | Some (_,e) ->
             let loc = e.pp_loc in
-            let e = dterm ~localize env e in
+            let e = dterm ~localize uc env e in
             unify_raise ~loc:loc e.dt_ty ty;
             e
         | None ->
@@ -654,8 +652,8 @@ and dterm_node ~localize loc env = function
   | PPquant _ | PPbinop _ | PPunop _ | PPfalse | PPtrue ->
       error ~loc TermExpected
 
-and dfmla ?(localize=false) env { pp_loc = loc; pp_desc = f } =
-  let f = dfmla_node ~localize loc env f in
+and dfmla ?(localize=false) uc env { pp_loc = loc; pp_desc = f } =
+  let f = dfmla_node ~localize loc uc env f in
   let rec down e = match e with
     | Fnamed (Lstr _, e) -> down e
     | Fnamed (Lpos _, _) -> f
@@ -663,21 +661,22 @@ and dfmla ?(localize=false) env { pp_loc = loc; pp_desc = f } =
   in
   if localize then down f else f
 
-and dfmla_node ~localize loc env = function
+and dfmla_node ~localize loc uc env = function
   | PPtrue ->
       Ftrue
   | PPfalse ->
       Ffalse
   | PPunop (PPnot, a) ->
-      Fnot (dfmla ~localize env a)
+      Fnot (dfmla ~localize uc env a)
   | PPbinop (a, (PPand | PPor | PPimplies | PPiff as op), b) ->
-      Fbinop (binop op, dfmla ~localize env a, dfmla ~localize env b)
+      Fbinop (binop op, dfmla ~localize uc env a, dfmla ~localize uc env b)
   | PPif (a, b, c) ->
-      Fif (dfmla ~localize env a, dfmla ~localize env b, dfmla ~localize env c)
+      Fif (dfmla ~localize uc env a, 
+	   dfmla ~localize uc env b, dfmla ~localize uc env c)
   | PPquant (q, uqu, trl, a) ->
       check_quant_linearity uqu;
       let uquant env (idl,ty) =
-        let ty = dty env ty in
+        let ty = dty uc env ty in
         let id = match idl with
           | Some id -> id
           | None -> assert false
@@ -687,9 +686,9 @@ and dfmla_node ~localize loc env = function
       let env, uqu = map_fold_left uquant env uqu in
       let trigger e =
 	try
-	  TRterm (dterm ~localize env e)
+	  TRterm (dterm ~localize uc env e)
 	with exn when trigger_not_a_term_exn exn ->
-	  TRfmla (dfmla ~localize env e)
+	  TRfmla (dfmla ~localize uc env e)
       in
       let trl = List.map (List.map trigger) trl in
       let q = match q with
@@ -697,38 +696,39 @@ and dfmla_node ~localize loc env = function
         | PPexists -> Fexists
         | _ -> error ~loc PredicateExpected
       in
-      Fquant (q, uqu, trl, dfmla ~localize env a)
-  | PPapp (x, tl) when check_highord env x tl ->
+      Fquant (q, uqu, trl, dfmla ~localize uc env a)
+  | PPapp (x, tl) when check_highord uc env x tl ->
       let tl = apply_highord loc x tl in
       let atyl, _ = Denv.specialize_lsymbol ~loc ps_pred_app in
-      let tl = dtype_args ps_pred_app.ls_name loc env atyl tl in
+      let tl = dtype_args ps_pred_app.ls_name loc uc env atyl tl in
       Fapp (ps_pred_app, tl)
   | PPapp (x, tl) ->
-      let s, tyl = specialize_psymbol x env.uc in
-      let tl = dtype_args s.ls_name loc env tyl tl in
+      let s, tyl = specialize_psymbol x uc in
+      let tl = dtype_args s.ls_name loc uc env tyl tl in
       Fapp (s, tl)
   | PPinfix (e12, op2, e3) ->
       begin match e12.pp_desc with
-	| PPinfix (_, op1, e2) when is_psymbol (Qident op1) env.uc ->
+	| PPinfix (_, op1, e2) when is_psymbol (Qident op1) uc ->
 	    let e23 = { pp_desc = PPinfix (e2, op2, e3); pp_loc = loc } in
-	    Fbinop (Fand, dfmla ~localize env e12, dfmla ~localize env e23)
+	    Fbinop (Fand, dfmla ~localize uc env e12, 
+		    dfmla ~localize uc env e23)
 	| _ ->
-	    let s, tyl = specialize_psymbol (Qident op2) env.uc in
-	    let tl = dtype_args s.ls_name loc env tyl [e12; e3] in
+	    let s, tyl = specialize_psymbol (Qident op2) uc in
+	    let tl = dtype_args s.ls_name loc uc env tyl [e12; e3] in
 	    Fapp (s, tl)
       end
   | PPlet (x, e1, e2) ->
-      let e1 = dterm ~localize env e1 in
+      let e1 = dterm ~localize uc env e1 in
       let ty = e1.dt_ty in
       let env = { env with dvars = Mstr.add x.id ty env.dvars } in
-      let e2 = dfmla ~localize env e2 in
+      let e2 = dfmla ~localize uc env e2 in
       Flet (e1, x, e2)
   | PPmatch (e1, bl) ->
-      let t1 = dterm ~localize env e1 in
+      let t1 = dterm ~localize uc env e1 in
       let ty1 = t1.dt_ty in
       let branch (p, e) =
-        let env, p = dpat_list env ty1 p in
-        p, dfmla ~localize env e
+        let env, p = dpat_list uc env ty1 p in
+        p, dfmla ~localize uc env e
       in
       Fmatch (t1, List.map branch bl)
   | PPnamed (x, f1) ->
@@ -736,26 +736,26 @@ and dfmla_node ~localize loc env = function
         | Lpos _ -> false
         | Lstr _ -> true
       in
-      let f1 = dfmla ~localize env f1 in
+      let f1 = dfmla ~localize uc env f1 in
       Fnamed (x, f1)
   | PPvar (Qident s | Qdot (_,s) as x) when is_uppercase s.id.[0] ->
-      let pr = find_prop x env.uc in
-      Fvar (Decl.find_prop (Theory.get_known env.uc) pr)
+      let pr = find_prop x uc in
+      Fvar (Decl.find_prop (Theory.get_known uc) pr)
   | PPvar x ->
-      let s, tyl = specialize_psymbol x env.uc in
-      let tl = dtype_args s.ls_name loc env tyl [] in
+      let s, tyl = specialize_psymbol x uc in
+      let tl = dtype_args s.ls_name loc uc env tyl [] in
       Fapp (s, tl)
   | PPeps _ | PPconst _ | PPcast _ | PPtuple _ | PPrecord _ | PPupdate _ ->
       error ~loc PredicateExpected
 
-and dpat_list env ty p =
+and dpat_list uc env ty p =
   check_pat_linearity p;
   let loc = p.pat_loc in
-  let env, p = dpat env p in
+  let env, p = dpat uc env p in
   unify_raise ~loc p.dp_ty ty;
   env, p
 
-and dtype_args s loc env el tl =
+and dtype_args s loc uc env el tl =
   let n = List.length el and m = List.length tl in
   if n <> m then error ~loc (BadNumberOfArguments (s, m, n));
   let rec check_arg = function
@@ -763,7 +763,7 @@ and dtype_args s loc env el tl =
 	[]
     | a :: al, t :: bl ->
 	let loc = t.pp_loc in
-	let t = dterm env t in
+	let t = dterm uc env t in
 	unify_raise ~loc t.dt_ty a;
 	t :: check_arg (al, bl)
     | _ ->
@@ -886,18 +886,18 @@ let add_types dl th =
   in
   let csymbols = Hashtbl.create 17 in
   let decl d =
-    let ts, th' = match Hashtbl.find tysymbols d.td_ident.id with
+    let ts, denv' = match Hashtbl.find tysymbols d.td_ident.id with
       | None ->
 	  assert false
       | Some ts ->
-	  let th' = create_denv th' in
-	  let vars = th'.utyvars in
+	  let denv' = create_denv () in
+	  let vars = denv'.utyvars in
 	  List.iter
 	    (fun v ->
 	       Hashtbl.add vars v.tv_name.id_string
                   (create_ty_decl_var ~user:true v))
 	    ts.ts_args;
-	  ts, th'
+	  ts, denv'
     in
     let d = match d.td_def with
       | TDabstract | TDalias _ ->
@@ -905,7 +905,7 @@ let add_types dl th =
       | TDalgebraic cl ->
 	  let ty = ty_app ts (List.map ty_var ts.ts_args) in
 	  let constructor (loc, id, pl) =
-	    let param (_,t) = ty_of_dty (dty th' t) in
+	    let param (_,t) = ty_of_dty (dty th' denv' t) in
 	    let tyl = List.map param pl in
 	    Hashtbl.replace csymbols id.id loc;
 	    create_fsymbol (create_user_id id) tyl ty
@@ -950,9 +950,9 @@ let add_logics dl th =
   let create_symbol th d =
     let id = d.ld_ident.id in
     let v = create_user_id d.ld_ident in
-    let denv = create_denv th in
+    let denv = create_denv () in
     Hashtbl.add denvs id denv;
-    let type_ty (_,t) = ty_of_dty (dty denv t) in
+    let type_ty (_,t) = ty_of_dty (dty th denv t) in
     let pl = List.map type_ty d.ld_params in
     try match d.ld_type with
       | None -> (* predicate *)
@@ -972,10 +972,10 @@ let add_logics dl th =
     let id = d.ld_ident.id in
     let dadd_var denv (x, ty) = match x with
       | None -> denv
-      | Some id -> { denv with dvars = Mstr.add id.id (dty denv ty) denv.dvars }
+      | Some id -> 
+	  { denv with dvars = Mstr.add id.id (dty th' denv ty) denv.dvars }
     in
     let denv = Hashtbl.find denvs id in
-    let denv = { denv with uc = th' } in
     let denv = List.fold_left dadd_var denv d.ld_params in
     let create_var (x, _) ty =
       let id = match x with
@@ -991,7 +991,7 @@ let add_logics dl th =
         begin match d.ld_def with
 	  | None -> ps,None
 	  | Some f ->
-	      let f = dfmla denv f in
+	      let f = dfmla th' denv f in
               let vl = match ps.ls_value with
                 | None -> mk_vlist ps.ls_args
                 | _ -> assert false
@@ -1005,8 +1005,8 @@ let add_logics dl th =
 	  | None -> fs,None
 	  | Some t ->
 	      let loc = t.pp_loc in
-	      let ty = dty denv ty in
-	      let t = dterm denv t in
+	      let ty = dty th' denv ty in
+	      let t = dterm th' denv t in
 	      unify_raise ~loc t.dt_ty ty;
               let vl = match fs.ls_value with
                 | Some _ -> mk_vlist fs.ls_args
@@ -1018,29 +1018,29 @@ let add_logics dl th =
   in
   add_logic_decls th (List.map type_decl dl)
 
-let type_term denv env t =
-  let t = dterm denv t in
+let type_term uc denv env t =
+  let t = dterm uc denv t in
   term env t
 
-let type_fmla denv env f =
-  let f = dfmla denv f in
+let type_fmla uc denv env f =
+  let f = dfmla uc denv f in
   fmla env f
 
 let add_prop k loc s f th =
   let pr = create_prsymbol (create_user_id s) in
-  try add_prop_decl th k pr (type_fmla (create_denv th) Mstr.empty f)
+  try add_prop_decl th k pr (type_fmla th (create_denv ()) Mstr.empty f)
   with ClashSymbol s -> error ~loc (Clash s)
 
 let loc_of_id id = of_option id.Ident.id_loc
 
 let add_inductives dl th =
   (* 1. create all symbols and make an environment with these symbols *)
-  let denv = create_denv th in
+  let denv = create_denv () in
   let psymbols = Hashtbl.create 17 in
   let create_symbol th d =
     let id = d.in_ident.id in
     let v = create_user_id d.in_ident in
-    let type_ty (_,t) = ty_of_dty (dty denv t) in
+    let type_ty (_,t) = ty_of_dty (dty th denv t) in
     let pl = List.map type_ty d.in_params in
     let ps = create_psymbol v pl in
     Hashtbl.add psymbols id ps;
@@ -1048,7 +1048,6 @@ let add_inductives dl th =
     with ClashSymbol s -> error ~loc:d.in_loc (Clash s)
   in
   let th' = List.fold_left create_symbol th dl in
-  let denv = { denv with uc = th' } in
   (* 2. then type-check all definitions *)
   let propsyms = Hashtbl.create 17 in
   let type_decl d =
@@ -1056,7 +1055,7 @@ let add_inductives dl th =
     let ps = Hashtbl.find psymbols id in
     let clause (loc, id, f) =
       Hashtbl.replace propsyms id.id loc;
-      let f = type_fmla denv Mstr.empty f in
+      let f = type_fmla th' denv Mstr.empty f in
       create_prsymbol (create_user_id id), f
     in
     ps, List.map clause d.in_def
