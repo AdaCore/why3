@@ -217,12 +217,10 @@ let use_export_theory uc th =
   add_ns th.th_export uc
 
 let add_impure_pdecl env ltm d uc =
-  { uc with uc_impure = 
-      Typing.add_decl env ltm uc.uc_impure d }
+  { uc with uc_impure = Typing.add_decl env ltm uc.uc_impure d }
 
 let add_effect_pdecl env ltm d uc =
-  { uc with uc_effect = 
-      Typing.add_decl env ltm uc.uc_effect d; }
+  { uc with uc_effect = Typing.add_decl env ltm uc.uc_effect d; }
 
 let add_pure_pdecl env ltm d uc =
   { uc with uc_pure = Typing.add_decl env ltm uc.uc_pure d; }

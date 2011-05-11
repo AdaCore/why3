@@ -1,49 +1,49 @@
 
 theory Set
 
-  type t 'a 
+  type set 'a 
 
-  logic mem 'a (t 'a)
+  logic mem 'a (set 'a)
 
-  logic empty : t 'a
+  logic empty : set 'a
 
-  logic is_empty (s : t 'a) = forall x : 'a. not mem x s
+  logic is_empty (s : set 'a) = forall x : 'a. not mem x s
 
-  axiom Empty_def1 : is_empty(empty : t 'a)
+  axiom Empty_def1 : is_empty(empty : set 'a)
 
-  logic add 'a (t 'a) : t 'a
+  logic add 'a (set 'a) : set 'a
 
   axiom Add_def1 : 
-    forall x y : 'a. forall s : t 'a.
+    forall x y : 'a. forall s : set 'a.
     mem x (add y s) <-> x = y or mem x s
 
-  logic remove 'a (t 'a) : t 'a
+  logic remove 'a (set 'a) : set 'a
 
   axiom Remove_def1 :
-    forall x y : 'a. forall s : t 'a.
+    forall x y : 'a. forall s : set 'a.
     mem x (remove y s) <-> x <> y and mem x s
 
-  logic union (t 'a) (t 'a) : t 'a
+  logic union (set 'a) (set 'a) : set 'a
 
   axiom Union_def1 : 
-    forall s1 s2 : t 'a. forall x : 'a.
+    forall s1 s2 : set 'a. forall x : 'a.
     mem x (union s1 s2) <-> mem x s1 or mem x s2
 
-  logic inter (t 'a) (t 'a) : t 'a
+  logic inter (set 'a) (set 'a) : set 'a
 
   axiom Inter_def1 : 
-    forall s1 s2 : t 'a. forall x : 'a.
+    forall s1 s2 : set 'a. forall x : 'a.
     mem x (inter s1 s2) <-> mem x s1 and mem x s2
 
-  logic diff (t 'a) (t 'a) : t 'a
+  logic diff (set 'a) (set 'a) : set 'a
 
   axiom Diff_def1 : 
-    forall s1 s2 : t 'a. forall x : 'a.
+    forall s1 s2 : set 'a. forall x : 'a.
     mem x (diff s1 s2) <-> mem x s1 and not mem x s2
 
-  logic equal(s1 s2 : t 'a) = forall x : 'a. mem x s1 <-> mem x s2
+  logic equal(s1 s2 : set 'a) = forall x : 'a. mem x s1 <-> mem x s2
 
-  logic subset(s1 s2 : t 'a) = forall x : 'a. mem x s1 -> mem x s2
+  logic subset(s1 s2 : set 'a) = forall x : 'a. mem x s1 -> mem x s2
 
 end
 
@@ -52,22 +52,22 @@ theory Fset
   use import int.Int
   clone export Set
   
-  logic cardinal (t 'a) : int
+  logic cardinal (set 'a) : int
 
-  axiom Cardinal_nonneg : forall s : t 'a. cardinal s >= 0
+  axiom Cardinal_nonneg : forall s : set 'a. cardinal s >= 0
 
-  axiom Cardinal_empty : cardinal(empty : t 'a) = 0
+  axiom Cardinal_empty : cardinal(empty : set 'a) = 0
 
   axiom Cardinal_add : 
-    forall x : 'a. forall s : t 'a. 
+    forall x : 'a. forall s : set 'a. 
     not mem x s -> cardinal (add x s) = 1 + cardinal s
 
   axiom Cardinal_remove : 
-    forall x : 'a. forall s : t 'a. 
+    forall x : 'a. forall s : set 'a. 
     mem x s -> cardinal s = 1 + cardinal (remove x s)
 
   axiom Cardinal_subset :
-    forall s1 s2 : t 'a. subset s1 s2 -> cardinal s1 <= cardinal s2
+    forall s1 s2 : set 'a. subset s1 s2 -> cardinal s1 <= cardinal s2
 
 end
 
@@ -75,57 +75,64 @@ theory FsetExt
  
   use export Fset
 
-  axiom ext: forall s1 s2 : t 'a.
+  axiom ext: forall s1 s2 : set 'a.
     s1 = s2 <-> (forall x : 'a. mem x s1 <-> mem x s2)
 
 end
 
-theory SetArray
-  use import array.Array as A
+theory SetMap
+  use import map.Map
   use import bool.Bool
 
-  type t 'a = A.t 'a bool
+  type set 'a = map 'a bool
 
-  logic mem (x:'a) (s:t 'a) = get s x = True
+  logic mem (x:'a) (s:set 'a) = s[x] = True
 
-  logic empty : t 'a = create_const False
+  logic empty : set 'a = create_const False
 
-  logic is_empty (s : t 'a) = forall x : 'a. not mem x s
+  logic is_empty (s : set 'a) = forall x : 'a. not mem x s
 
-  goal Empty_def1 : is_empty(empty : t 'a)
+  goal Empty_def1 : is_empty(empty : set 'a)
 
-  logic add (x:'a) (s:t 'a) : t 'a = set s x True
+  logic add (x:'a) (s:set 'a) : set 'a = s[x <- True]
 
-  logic remove (x:'a) (s:t 'a) : t 'a =  set s x False
+  logic remove (x:'a) (s:set 'a) : set 'a =  s[x <- False]
 
-  logic union (t 'a) (t 'a) : t 'a
+  logic union (set 'a) (set 'a) : set 'a
 
   axiom Union_def :
-    forall s1 s2 : t 'a. forall x : 'a.
-    get (union s1 s2) x = orb (get s1 x) (get s2 x)
+    forall s1 s2 : set 'a. forall x : 'a.
+    (union s1 s2)[x] = orb s1[x] s2[x]
 
-  logic inter (t 'a) (t 'a) : t 'a
+  logic inter (set 'a) (set 'a) : set 'a
 
   axiom Inter_def :
-    forall s1 s2 : t 'a. forall x : 'a.
-    get (inter s1 s2) x = andb (get s1 x) (get s2 x)
+    forall s1 s2 : set 'a. forall x : 'a.
+    (inter s1 s2)[x] = andb s1[x] s2[x]
 
-  logic diff (t 'a) (t 'a) : t 'a
+  logic diff (set 'a) (set 'a) : set 'a
 
   axiom Diff_def1 :
-    forall s1 s2 : t 'a. forall x : 'a.
-    get (diff s1 s2) x = xorb (get s1 x) (get s2 x)
+    forall s1 s2 : set 'a. forall x : 'a.
+    (diff s1 s2)[x] = xorb s1[x] s2[x]
 
-  logic equal(s1 s2 : t 'a) = forall x : 'a. get s1 x = get s2 x
+  logic equal(s1 s2 : set 'a) = forall x : 'a. s1[x] = s2[x]
 
-  axiom Equal_is_eq : forall s1 s2 : t 'a. equal s1 s2 -> s1 = s2
+  axiom Equal_is_eq : forall s1 s2 : set 'a. equal s1 s2 -> s1 = s2
 
-  logic subset(s1 s2 : t 'a) = forall x : 'a. mem x s1 -> mem x s2
+  logic subset(s1 s2 : set 'a) = forall x : 'a. mem x s1 -> mem x s2
 
-  logic complement (t 'a) : t 'a
+  logic complement (set 'a) : set 'a
 
   axiom Complement_def :
-    forall s : t 'a. forall x : 'a.
-    get (complement s) x = notb (get s x)
+    forall s : set 'a. forall x : 'a.
+    (complement s)[x] = notb s[x]
 
 end
+
+
+(*
+Local Variables: 
+compile-command: "make -C .. theories/set"
+End: 
+*)

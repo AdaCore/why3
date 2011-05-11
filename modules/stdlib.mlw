@@ -29,12 +29,11 @@ end
 module Array
 
   use import int.Int
-  use import array.Array
-  type map 'a = t int 'a
+  use import map.Map as M
 
-  type array 'a model {| length : int; mutable elts : map 'a |}
+  type array 'a model {| length : int; mutable elts : map int 'a |}
 
-  logic ([]) (a: array 'a) (i :int) : 'a = get a.elts i
+  logic ([]) (a: array 'a) (i :int) : 'a = M.([]) a.elts i
 
   parameter get : a:array 'a -> i:int ->
     { 0 <= i < length a } 'a reads a { result = a[i] }
@@ -95,6 +94,46 @@ module Array
      - to_list
      - of_list
   *)
+
+end
+
+module ArraySorted
+
+  use import module Array
+  clone import map.MapSorted as M
+
+  logic sorted_sub (a : array elt) (l u : int) =
+    M.sorted_sub a.elts l u
+
+  logic sorted (a : array elt) =
+    M.sorted_sub a.elts 0 a.length
+
+end
+
+module ArrayEq
+
+  use import module Array
+  clone import map.MapEq as M
+
+  logic array_eq_sub (a1 a2: array 'a) (l u: int) =
+    map_eq_sub a1.elts a2.elts l u
+
+  logic array_eq (a1 a2 : array 'a) =
+    a1.length = a2.length and
+    array_eq_sub a1 a2 0 a1.length
+
+end
+
+module ArrayPermut
+
+  use import module Array
+  clone import map.MapPermut as M
+
+  logic permut_sub (a1 a2 : array 'a) (l u: int) =
+    M.permut_sub a1.elts a2.elts l u
+
+  logic permut (a1 a2 : array 'a) =
+    a1.length = a2.length and M.permut_sub a1.elts a2.elts 0 a1.length
 
 end
 
