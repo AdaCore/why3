@@ -75,11 +75,27 @@
 
   let infix  s = "infix "  ^ s
   let prefix s = "prefix " ^ s
-  let misfix s = "misfix " ^ s
+  let mixfix s = "mixfix " ^ s
 
   let mk_id id loc = { id = id; id_lab = []; id_loc = loc }
 
   let add_lab id l = { id with id_lab = l }
+
+  let mk_l_prefix op e1 =
+    let id = mk_id (prefix op) (floc_i 1) in
+    mk_pp (PPapp (Qident id, [e1]))
+
+  let mk_l_infix e1 op e2 =
+    let id = mk_id (infix op) (floc_i 2) in
+    mk_pp (PPinfix (e1, id, e2))
+
+  let mk_l_mixfix2 op e1 e2 =
+    let id = mk_id (mixfix op) (floc_i 2) in
+    mk_pp (PPapp (Qident id, [e1;e2]))
+
+  let mk_l_mixfix3 op e1 e2 e3 =
+    let id = mk_id (mixfix op) (floc_i 2) in
+    mk_pp (PPapp (Qident id, [e1;e2;e3]))
 
   let () = Exn_printer.register
     (fun fmt exn -> match exn with
@@ -109,28 +125,28 @@
     in
     mk_apply e
 
-  let mk_misfix2 op e1 e2 =
-    let id = { id = misfix op; id_lab = []; id_loc = floc_i 2 } in
+  let mk_mixfix2 op e1 e2 =
+    let id = mk_id (mixfix op) (floc_i 2) in
     mk_expr (mk_apply_id id [e1; e2])
 
-  let mk_misfix3 op e1 e2 e3 =
-    let id = { id = misfix op; id_lab = []; id_loc = floc_i 2 } in
+  let mk_mixfix3 op e1 e2 e3 =
+    let id = mk_id (mixfix op) (floc_i 2) in
     mk_expr (mk_apply_id id [e1; e2; e3])
 
   let mk_infix e1 op e2 =
-    let id = { id = infix op; id_lab = []; id_loc = floc_i 2 } in
+    let id = mk_id (infix op) (floc_i 2) in
     mk_expr (mk_apply_id id [e1; e2])
 
   let mk_prefix op e1 =
-    let id = { id = prefix op; id_lab = []; id_loc = floc_i 1 } in
+    let id = mk_id (prefix op) (floc_i 1) in
     mk_expr (mk_apply_id id [e1])
 
-  let exit_exn () = Qident { id = "%Exit"; id_lab = []; id_loc = floc () }
-  let id_anonymous () = { id = "_"; id_lab = []; id_loc = floc () }
-  let id_unit () = { id = "unit"; id_lab = []; id_loc = floc () }
+  let exit_exn () = Qident (mk_id "%Exit" (floc ()))
+  let id_anonymous () = mk_id "_" (floc ())
+  let id_unit () = mk_id "unit" (floc ())
   let ty_unit () = Tpure (PPTtyapp ([], Qident (id_unit ())))
 
-  let id_lt_nat () = Qident { id = "lt_nat"; id_lab = []; id_loc = floc () }
+  let id_lt_nat () = Qident (mk_id "lt_nat" (floc ()))
 
   let empty_effect = { pe_reads = []; pe_writes = []; pe_raises = [] }
 
@@ -484,8 +500,8 @@ primitive_type:
 ;
 
 primitive_type_non_lident:
-| primitive_type_arg_non_lident  { $1 }
-| lq_uident primitive_type_args  { PPTtyapp ($2, $1) }
+| primitive_type_arg_non_lident           { $1 }
+| uqualid DOT lident primitive_type_args  { PPTtyapp ($4, Qdot ($1, $3)) }
 ;
 
 primitive_type_args:
@@ -494,13 +510,13 @@ primitive_type_args:
 ;
 
 primitive_type_arg:
-| lq_lident                      { PPTtyapp ([], $1) }
+| lident                         { PPTtyapp ([], Qident $1) }
 | primitive_type_arg_non_lident  { $1 }
 ;
 
 primitive_type_arg_non_lident:
-| lq_uident
-   { PPTtyapp ([], $1) }
+| uqualid DOT lident
+   { PPTtyapp ([], Qdot ($1, $3)) }
 | type_var
    { PPTtyvar $1 }
 | LEFTPAR primitive_type COMMA list1_primitive_type_sep_comma RIGHTPAR
@@ -544,19 +560,19 @@ lexpr:
 | NOT lexpr
    { prefix_pp PPnot $2 }
 | lexpr EQUAL lexpr
-   { mk_pp (PPinfix ($1, mk_id (infix "=") (floc_i 2), $3)) }
+   { mk_l_infix $1 "=" $3 }
 | lexpr LTGT lexpr
-   { prefix_pp PPnot (mk_pp (PPinfix ($1, mk_id (infix "=") (floc_i 2), $3))) }
+   { prefix_pp PPnot (mk_l_infix $1 "=" $3) }
 | lexpr OP1 lexpr
-   { mk_pp (PPinfix ($1, mk_id (infix $2) (floc_i 2), $3)) }
+   { mk_l_infix $1 $2 $3 }
 | lexpr OP2 lexpr
-   { mk_pp (PPinfix ($1, mk_id (infix $2) (floc_i 2), $3)) }
+   { mk_l_infix $1 $2 $3 }
 | lexpr OP3 lexpr
-   { mk_pp (PPinfix ($1, mk_id (infix $2) (floc_i 2), $3)) }
+   { mk_l_infix $1 $2 $3 }
 | lexpr OP4 lexpr
-   { mk_pp (PPinfix ($1, mk_id (infix $2) (floc_i 2), $3)) }
+   { mk_l_infix $1 $2 $3 }
 | prefix_op lexpr %prec prec_prefix_op
-   { mk_pp (PPapp (Qident (mk_id (prefix $1) (floc_i 2)), [$2])) }
+   { mk_l_prefix $1 $2 }
 | qualid list1_lexpr_arg
    { mk_pp (PPapp ($1, $2)) }
 | IF lexpr THEN lexpr ELSE lexpr
@@ -596,34 +612,23 @@ list1_lexpr_arg:
 ;
 
 constant:
-| INTEGER
-   { Term.ConstInt $1 }
-| FLOAT
-   { Term.ConstReal $1 }
+| INTEGER   { Term.ConstInt $1 }
+| FLOAT     { Term.ConstReal $1 }
 ;
 
 lexpr_arg:
-| qualid
-   { mk_pp (PPvar $1) }
-| constant
-   { mk_pp (PPconst $1) }
-| TRUE
-   { mk_pp PPtrue }
-| FALSE
-   { mk_pp PPfalse }
-| OPPREF lexpr_arg
-   { mk_pp (PPapp (Qident (mk_id (prefix $1) (floc_i 2)), [$2])) }
-| lexpr_sub
-   { $1 }
+| qualid            { mk_pp (PPvar $1) }
+| constant          { mk_pp (PPconst $1) }
+| TRUE              { mk_pp PPtrue }
+| FALSE             { mk_pp PPfalse }
+| OPPREF lexpr_arg  { mk_l_prefix $1 $2 }
+| lexpr_sub         { $1 }
 ;
 
 lexpr_dot:
-| lqualid_poor
-   { mk_pp (PPvar $1) }
-| OPPREF lexpr_dot
-   { mk_pp (PPapp (Qident (mk_id (prefix $1) (floc_i 2)), [$2])) }
-| lexpr_sub
-   { $1 }
+| lqualid_copy      { mk_pp (PPvar $1) }
+| OPPREF lexpr_dot  { mk_l_prefix $1 $2 }
+| lexpr_sub         { $1 }
 ;
 
 lexpr_sub:
@@ -640,9 +645,9 @@ lexpr_sub:
 | LEFTREC lexpr_arg WITH list1_field_value opt_semicolon RIGHTREC
    { mk_pp (PPupdate ($2, List.rev $4)) }
 | lexpr_arg LEFTSQ lexpr RIGHTSQ
-   { mk_pp (PPapp (Qident (mk_id (misfix "[]") (floc ())), [$1; $3])) }
+   { mk_l_mixfix2 "[]" $1 $3 }
 | lexpr_arg LEFTSQ lexpr LARROW lexpr RIGHTSQ
-   { mk_pp (PPapp (Qident (mk_id (misfix "[<-]") (floc ())), [$1; $3; $5])) }
+   { mk_l_mixfix3 "[<-]" $1 $3 $5 }
 ;
 
 quant:
@@ -800,39 +805,39 @@ ident:
 | lident { $1 }
 ;
 
+uident:
+| UIDENT          { mk_id $1 (floc ()) }
+;
+
+lident:
+| LIDENT          { mk_id $1 (floc ()) }
+| lident_keyword  { mk_id $1 (floc ()) }
+;
+
+lident_keyword:
+| MODEL           { "model" }
+;
+
+/* Idents + symbolic operations' names */
+
 ident_rich:
 | uident      { $1 }
 | lident_rich { $1 }
 ;
 
 lident_rich:
-| lident
-    { $1 }
-| LEFTPAR lident_op RIGHTPAR
-    { mk_id (infix $2) (floc ()) }
-| LEFTPAR_STAR_RIGHTPAR
-    { mk_id (infix "*") (floc ()) }
-| LEFTPAR prefix_op UNDERSCORE RIGHTPAR
-    { mk_id (prefix $2) (floc ()) }
-| LEFTPAR OPPREF RIGHTPAR
-    { mk_id (prefix $2) (floc ()) }
-| LEFTPAR LEFTSQ RIGHTSQ RIGHTPAR
-    { mk_id (misfix "[]") (floc ()) }
-| LEFTPAR LEFTSQ LARROW RIGHTSQ RIGHTPAR
-    { mk_id (misfix "[<-]") (floc ()) }
-;
-
-lident:
-| LIDENT { mk_id $1 (floc ()) }
-| MODEL  { mk_id "model" (floc ()) }
+| lident                      { $1 }
+| LEFTPAR lident_op RIGHTPAR  { mk_id $2 (floc ()) }
+| LEFTPAR_STAR_RIGHTPAR       { mk_id (infix "*") (floc ()) }
 ;
 
 lident_op:
-| OP1    { $1 }
-| OP2    { $1 }
-| OP3    { $1 }
-| OP4    { $1 }
-| EQUAL  { "=" }
+| prefix_op             { infix $1 }
+| prefix_op UNDERSCORE  { prefix $1 }
+| EQUAL                 { infix "=" }
+| OPPREF                { prefix $1 }
+| LEFTSQ RIGHTSQ        { mixfix "[]" }
+| LEFTSQ LARROW RIGHTSQ { mixfix "[<-]" }
 ;
 
 prefix_op:
@@ -842,36 +847,11 @@ prefix_op:
 | OP4   { $1 }
 ;
 
-uident:
-| UIDENT { mk_id $1 (floc ()) }
-;
+/* Qualified idents */
 
-lq_lident:
-| lident             { Qident $1 }
-;
-
-lq_uident:
-| uqualid DOT lident { Qdot ($1, $3) }
-;
-
-lqualid:
-| lq_lident { $1 }
-| lq_uident { $1 }
-;
-
-uqualid:
-| uident             { Qident $1 }
-| uqualid DOT uident { Qdot ($1, $3) }
-;
-
-any_qualid:
-| ident                { Qident $1 }
-| any_qualid DOT ident { Qdot ($1, $3) }
-;
-
-tqualid:
-| uident                { Qident $1 }
-| any_qualid DOT uident { Qdot ($1, $3) }
+qualid:
+| ident_rich              { Qident $1 }
+| uqualid DOT ident_rich  { Qdot ($1, $3) }
 ;
 
 lqualid_rich:
@@ -879,23 +859,39 @@ lqualid_rich:
 | uqualid DOT lident_rich { Qdot ($1, $3) }
 ;
 
-lqualid_poor:
-| lident             { Qident $1 }
-| uqualid DOT lident { Qdot ($1, $3) }
+lqualid:
+| lident              { Qident $1 }
+| uqualid DOT lident  { Qdot ($1, $3) }
 ;
 
-qualid:
-| ident_rich             { Qident $1 }
-| uqualid DOT ident_rich { Qdot ($1, $3) }
+/* copy of lqualid to avoid yacc conflicts */
+lqualid_copy:
+| lident              { Qident $1 }
+| uqualid DOT lident  { Qdot ($1, $3) }
+;
+
+uqualid:
+| uident              { Qident $1 }
+| uqualid DOT uident  { Qdot ($1, $3) }
+;
+
+/* Theory/Module names */
+
+tqualid:
+| uident                { Qident $1 }
+| any_qualid DOT uident { Qdot ($1, $3) }
+;
+
+any_qualid:
+| ident                 { Qident $1 }
+| any_qualid DOT ident  { Qdot ($1, $3) }
 ;
 
 /* Misc */
 
 label:
-| STRING
-   { Lstr $1 }
-| POSITION
-   { Lpos $1 }
+| STRING    { Lstr $1 }
+| POSITION  { Lpos $1 }
 ;
 
 labels:
@@ -995,7 +991,7 @@ lident_rich_pgm:
 | lident_rich
     { $1 }
 | LEFTPAR LEFTSQ RIGHTSQ LARROW RIGHTPAR
-    { mk_id (misfix "[]<-") (floc ()) }
+    { mk_id (mixfix "[]<-") (floc ()) }
 ;
 
 opt_mutable:
@@ -1128,9 +1124,9 @@ simple_expr:
 | OPPREF simple_expr
     { mk_prefix $1 $2 }
 | simple_expr LEFTSQ expr RIGHTSQ
-    { mk_misfix2 "[]" $1 $3 }
+    { mk_mixfix2 "[]" $1 $3 }
 | simple_expr LEFTSQ expr LARROW expr RIGHTSQ
-    { mk_misfix3 "[<-]" $1 $3 $5 }
+    { mk_mixfix3 "[<-]" $1 $3 $5 }
 ;
 
 list1_simple_expr:
