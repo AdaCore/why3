@@ -346,7 +346,13 @@ end = struct
 
   let ps_equal ps1 ps2 = ls_equal ps1.ps_impure ps2.ps_impure
 
-  let rec subst_var ts s vs =
+  let subst_var ?(effect=false) ?(pure=false) ts s vs =
+    if effect && pure then invalid_arg "subst_var";
+    let ts = 
+      if effect then Mtv.map effectify ts 
+      else if pure then Mtv.map purify ts
+      else ts
+    in
     let ty' = ty_inst ts vs.vs_ty in
     if ty_equal ty' vs.vs_ty then
       s, vs
@@ -354,11 +360,14 @@ end = struct
       let vs' = create_vsymbol (id_clone vs.vs_name) ty' in
       Mvs.add vs (t_var vs') s, vs'
 	
-  and subst_post ts s ((v, q), ql) =
-    let vq = let s, v = subst_var ts s v in v, f_ty_subst ts s q in
+  let subst_post ts s ((v, q), ql) =
+    let vq = let s, v = subst_var ~pure:true ts s v in v, f_ty_subst ts s q in
     let handler (e, (v, q)) = match v with
-      | None -> e, (v, f_ty_subst ts s q)
-      | Some v -> let s, v = subst_var ts s v in e, (Some v, f_ty_subst ts s q)
+      | None -> 
+	  e, (v, f_ty_subst ts s q)
+      | Some v -> 
+	  let s, v = subst_var ~pure:true ts s v in 
+	  e, (Some v, f_ty_subst ts s q)
     in
     vq, List.map handler ql
       
@@ -377,8 +386,8 @@ end = struct
 	  
   and subst_binder ts s pv =
     let v' = subst_type_v ts s pv.pv_tv in
-    let s, effect = subst_var ts s pv.pv_effect in
-    let s, pure = subst_var ts s pv.pv_pure in
+    let s, effect = subst_var ~effect:true ts s pv.pv_effect in
+    let s, pure   = subst_var ~pure:true   ts s pv.pv_pure in
     let regions = E.subst_set ts pv.pv_regions in
     let pv' = create_pvsymbol (id_clone pv.pv_name) v' ~effect ~pure ~regions in
     s, pv'
