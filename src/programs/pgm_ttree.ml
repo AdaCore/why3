@@ -193,7 +193,7 @@ type iexpr = {
 }
 
 and iexpr_desc =
-  | IElogic of Term.term
+  | IElogic of Term.term (* pure *)
   | IElocal of ivsymbol
   | IEglobal of psymbol * itype_v
   | IEapply of iexpr * ivsymbol

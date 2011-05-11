@@ -438,7 +438,7 @@ and dexpr_desc ~ghost env loc = function
 	    let tyv = specialize_type_v ~loc (Htv.create 17) tv in
 	    DEglobal (ps, tyv), dpurify_type_v tyv 
 	| PSlogic ->
-	    let tyl, ty = Denv.specialize_lsymbol ~loc ps.ps_pure in
+	    let tyl, ty = Denv.specialize_lsymbol ~loc ps.ps_impure in
 	    let ty = match ty with
               | Some ty -> ty
               | None -> dty_bool env.uc
@@ -945,7 +945,9 @@ let make_logic_app gl loc ty ls el =
   let rec make args = function
     | [] ->
         begin match ls.ls_value with
-          | Some _ -> IElogic (t_app ls (List.rev args) (purify ty))
+          | Some _ -> 
+	      let t = t_app ls (List.rev args) (purify ty) in
+	      IElogic t
           | None -> IElogic (mk_t_if gl (f_app ls (List.rev args)))
         end
     | ({ iexpr_desc = IElogic t }, _) :: r ->
@@ -1045,7 +1047,7 @@ and iexpr_desc gl env loc ty = function
   | DElogic ls ->
       begin match ls.ls_args, ls.ls_value with
 	| [], Some _ ->
-	    IElogic (t_app ls [] ty)
+	    IElogic (t_app ls [] (purify ty))
 	| [], None ->
             IElogic (mk_t_if gl (f_app ls []))
 	| al, _ ->
@@ -1063,7 +1065,8 @@ and iexpr_desc gl env loc ty = function
 	    make_logic_app gl loc ty ls args
 	| _ ->
 	    let f = iexpr gl env f in
-	    (make_app gl loc ty f args).iexpr_desc
+	    let e = make_app gl loc ty f args in
+	    e.iexpr_desc
       end
   | DEfun (bl, e1) ->
       let env, bl = map_fold_left (iubinder gl) env bl in
@@ -1943,9 +1946,9 @@ let add_types env ltm uc dl =
     { d with td_params = params; td_model = false; td_def = def }
   in
   let dli = List.map (add_regions ~effect:false) dl in
-  let uc = Pgm_module.add_impure_typedecl env dli uc in
+  let uc = Pgm_module.add_impure_pdecl env ltm (Ptree.TypeDecl dli) uc in
   let dle = List.map (add_regions ~effect:true) dl in
-  let uc = Pgm_module.add_effect_typedecl env dle uc in
+  let uc = Pgm_module.add_effect_pdecl env ltm (Ptree.TypeDecl dle) uc in
   (* 4. add mtsymbols in module *)
   let add_mt d =
     let x = d.td_ident.id in
@@ -2016,6 +2019,59 @@ let add_types env ltm uc dl =
   in
   List.iter (fun d -> visit d.td_ident.id) dl;
   uc
+
+let add_logics env ltm uc d =
+  let uc = Pgm_module.add_pure_pdecl env ltm d uc in
+  let region = 
+    let c = ref (-1) in 
+    fun loc -> 
+      incr c; { id = "r" ^ string_of_int !c; id_lab = []; id_loc = loc }
+  in
+  let rec add_regions_to_type = function
+    | PPTtyvar _ as ty -> 
+	ty
+    | PPTtyapp (tyl, q) ->
+	let loc = Typing.qloc q in
+	let p = Typing.string_list_of_qualid [] q in
+	let ts = ns_find_ts (get_namespace (impure_uc uc)) p in
+	let n = (get_mtsymbol ts).mt_regions in
+	let reg = ref [] in
+	for i = 1 to n do reg := PPTtyvar (region loc) :: !reg done;
+	PPTtyapp (List.rev !reg @ List.map add_regions_to_type tyl, q)
+    | PPTtuple tyl -> 
+	PPTtuple (List.map add_regions_to_type tyl)
+  in
+  let add_param (x, ty) = (x, add_regions_to_type ty) in
+  let add_regions d = 
+    { d with
+	ld_params = List.map add_param d.ld_params;
+	ld_type   = option_map add_regions_to_type d.ld_type;
+	ld_def    = None; }
+  in
+  let add_ps uc d =
+    let x = d.ld_ident.id in
+    let get th = ns_find_ls (get_namespace th) [x] in
+    let impure = get (impure_uc uc) in
+    let effect = get (effect_uc uc) in
+    let pure   = get (pure_uc   uc) in
+    ignore (create_psymbol ~impure ~effect ~pure ~kind:PSlogic)
+  in
+  let add uc d0 =
+    let d = LogicDecl [add_regions d0] in
+    let uc = Pgm_module.add_impure_pdecl env ltm d uc in
+    let uc = Pgm_module.add_effect_pdecl env ltm d uc in
+    add_ps uc d0;
+    uc
+  in
+  let addi uc d =
+    add uc { ld_loc = d.in_loc; ld_ident = d.in_ident;
+	     ld_params = List.map add_param d.in_params;
+	     ld_type = None; ld_def = None; }
+  in
+  match d with
+    | LogicDecl dl -> List.fold_left add uc dl
+    | IndDecl dl -> List.fold_left addi uc dl
+    | Meta _ | UseClone _ | PropDecl _ | TypeDecl _ -> assert false
 
 let find_module penv lmod q id = match q with
   | [] ->
@@ -2121,8 +2177,7 @@ let rec decl ~wp env penv ltm lmod uc = function
   | Ptree.Dlogic (TypeDecl d) ->
       add_types env ltm uc d
   | Ptree.Dlogic (LogicDecl _ | IndDecl _ as d) ->
-      Pgm_module.add_pure_pdecl env ltm d uc
-      (* TODO: add in impure and effect as well, with extra args for regions *)
+      add_logics env ltm uc d
   | Ptree.Dlogic (PropDecl _ | Meta _ as d) ->
       Pgm_module.add_pure_pdecl env ltm d uc
   | Ptree.Dlogic (UseClone _ as d) ->

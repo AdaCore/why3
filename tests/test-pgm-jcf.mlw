@@ -1,11 +1,16 @@
 module M
 
-  logic d : int
+  type pointer model int
 
-  let test_cd3d () = d
+  logic null : pointer
+
+  parameter f : 'a -> 'a
+
+  let foo () = f null
 
 end
 
+(***
 module TestRef
 
   use import int.Int
@@ -43,8 +48,6 @@ module TestRef
   parameter ft2 : x:t2 -> {} unit writes x.fa x.fb {}
 
 end
-
-(***
 
 module Array
 

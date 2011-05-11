@@ -54,13 +54,16 @@ val add_impure_decl : Decl.decl -> uc -> uc
 val add_effect_decl : Decl.decl -> uc -> uc
 val add_pure_decl : Decl.decl -> uc -> uc
 
-val add_impure_typedecl : Env.env -> Ptree.type_decl list -> uc -> uc
-val add_effect_typedecl : Env.env -> Ptree.type_decl list -> uc -> uc
-
+val add_impure_pdecl : 
+  Env.env -> Theory.theory Theory.Mnm.t -> Ptree.decl -> uc -> uc
+val add_effect_pdecl : 
+  Env.env -> Theory.theory Theory.Mnm.t -> Ptree.decl -> uc -> uc
 val add_pure_pdecl : 
   Env.env -> Theory.theory Theory.Mnm.t -> Ptree.decl -> uc -> uc
+
 val add_pdecl : 
   Env.env -> Theory.theory Theory.Mnm.t -> Ptree.decl -> uc -> uc
+  (** add in impure, effect and pure *)
 
 (** exceptions *)
 

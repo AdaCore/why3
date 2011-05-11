@@ -36,10 +36,10 @@ module Array
 
   logic ([]) (a: array 'a) (i :int) : 'a = get a.elts i
 
-  parameter ([]) : a:array 'a -> i:int ->
+  parameter get : a:array 'a -> i:int ->
     { 0 <= i < length a } 'a reads a { result = a[i] }
 
-  parameter ([<-]) : a:array 'a -> i:int -> v:'a ->
+  parameter set : a:array 'a -> i:int -> v:'a ->
     { 0 <= i < length a } unit writes a { a.elts = (old a.elts)[i <- v] }
 
   parameter length : a:array 'a -> {} int { result = a.length }
@@ -106,7 +106,7 @@ module TestArray
   let test_append () =
     let a1 = make 17 2 in
     assert { a1[3] = 2 };
-    a1[3 <- 4];
+    set a1 3 4;
     assert { a1[3] = 4 };
     let a2 = make 25 3 in
     assert { a2[0] = 3 }; (* needed to prove a[17]=3 below *)
