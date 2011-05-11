@@ -114,7 +114,7 @@ theory SetMap
 
   axiom Diff_def1 :
     forall s1 s2 : set 'a. forall x : 'a.
-    (diff s1 s2)[x] = xorb s1[x] s2[x]
+    (diff s1 s2)[x] = andb s1[x] (notb s2[x])
 
   logic equal(s1 s2 : set 'a) = forall x : 'a. s1[x] = s2[x]
 
