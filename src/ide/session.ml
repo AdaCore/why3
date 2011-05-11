@@ -48,9 +48,12 @@ let get_prover_data env id pr acc =
       editor = pr.Whyconf.editor;
     }
       acc
-  with _e ->
-    eprintf "Failed to load driver %s for prover %s. prover disabled@."
-      pr.Whyconf.driver pr.Whyconf.name;
+  with e ->
+    eprintf "Failed to load driver %s for prover %s (%a). prover disabled@."
+      pr.Whyconf.driver 
+      pr.Whyconf.name
+      Exn_printer.exn_printer e
+      ;
     acc
 
 (***************************)
