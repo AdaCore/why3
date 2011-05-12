@@ -223,8 +223,9 @@ module Make(O: OBSERVER) : sig
 
   val reload_all: prover_data Util.Mstr.t -> unit
     (** reloads all the files 
-        If for a given file, the parsing or typing fails, then
-        then old version is kept, but marked obsolete
+        If for one of the file, the parsing or typing fails, then
+        the complete old session state is kept, and an exception
+	is raised
     *)
 (*
 TODO

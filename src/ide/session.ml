@@ -862,9 +862,6 @@ let reload_root_goal ~provers mth tname old_goals t : goal =
   let id = (Task.task_goal t).Decl.pr_name in
   let gname = id.Ident.id_string in
   let sum = task_checksum t in
-(*
-  let goal = raw_add_goal (Parent_theory mth) gname expl sum (Some t) in
-*)
   let old_goal, goal_obsolete =
     try
       let old_goal = Util.Mstr.find gname old_goals in
@@ -903,7 +900,8 @@ let reload_theory ~provers mfile old_theories (_,tname,th) =
 
 
 (* reloads a file *)
-let reload_file ~provers mf =
+let reload_file ~provers mf theories =
+(*
   eprintf "[Reload] file '%s'@." mf.file_name;
   let theories = 
     try
@@ -914,6 +912,7 @@ let reload_file ~provers mf =
       (* TODO: do something clever than that! *)
       exit 1
   in
+*)
   let new_mf = raw_add_file mf.file_name in
   let old_theories = List.fold_left
     (fun acc t -> Util.Mstr.add t.theory_name t acc)
@@ -931,9 +930,15 @@ let reload_file ~provers mf =
 (* reloads all files *)
 let reload_all provers =
   let files = !all_files in
+  let all_theories =
+    List.map (fun mf -> 
+		eprintf "[Reload] file '%s'@." mf.file_name;
+		(mf,read_file mf.file_name)) 
+      files
+  in
   all_files := [];
   O.reset ();
-  List.iter (reload_file ~provers) files
+  List.iter (fun (mf,ths) -> reload_file ~provers mf ths) all_theories
 
 (****************************)
 (*     session opening      *)

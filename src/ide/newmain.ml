@@ -508,13 +508,9 @@ let () =
     M.maximum_running_proofs := gconfig.max_running_processes;
     eprintf " done@."
   with e ->
-    eprintf "Error while opening session with database '%s'@." project_dir;
-    eprintf "Aborting...@.";
-    raise e
-
-
-
-
+    eprintf "@[Error while opening session:@ %a@.@]" 
+      Exn_printer.exn_printer e;
+    exit 1
 
 
 let info_window ?(callback=(fun () -> ())) mt s =
@@ -1051,18 +1047,20 @@ let color_loc (v:GSourceView2.source_view) l b e =
   let stop = start#forward_chars (e-b) in
   buf#apply_tag ~start ~stop orange_bg
 
+let scroll_to_loc loc =
+  let (f,l,b,e) = Loc.get loc in
+  if f <> !current_file then
+    begin
+      source_view#source_buffer#set_text (source_text f);
+      set_current_file f;
+    end;
+  move_to_line source_view (l-1);
+  erase_color_loc source_view;
+  color_loc source_view l b e
+
 let scroll_to_id id =
   match id.Ident.id_loc with
-    | Some loc ->
-        let (f,l,b,e) = Loc.get loc in
-        if f <> !current_file then
-          begin
-            source_view#source_buffer#set_text (source_text f);
-            set_current_file f;
-          end;
-        move_to_line source_view (l-1);
-        erase_color_loc source_view;
-        color_loc source_view l b e
+    | Some loc -> scroll_to_loc loc
     | None ->
         source_view#source_buffer#set_text
           "Non-localized ident (no position available)\n";
@@ -1190,6 +1188,24 @@ let () =
     b#connect#pressed ~callback:replay_obsolete_proofs
   in ()
 
+let reload () =
+  try
+    M.reload_all gconfig.provers;
+    current_file := ""
+  with
+    | Loc.Located(loc,Parsing.Parse_error) -> 
+	fprintf str_formatter
+	  "@[Syntax error:@ %a@]" Loc.gen_report_position loc;
+	let msg = flush_str_formatter () in
+	scroll_to_loc loc;
+	info_window `ERROR msg	
+    | e ->
+	fprintf str_formatter
+	  "@[Error while reading file:@ %a@]" Exn_printer.exn_printer e;
+	let msg = flush_str_formatter () in
+	info_window `ERROR msg
+
+ 
 let () =
   let b = GButton.button ~packing:tools_box#add ~label:"Reload" () in
   b#misc#set_tooltip_markup "Reloads the files";
@@ -1197,9 +1213,7 @@ let () =
   let i = GMisc.image ~pixbuf:(!image_reload) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:(fun () -> 
-                                   current_file := "";
-                                   M.reload_all gconfig.provers)
+    b#connect#pressed ~callback:reload
   in ()
 
 (*************)
