@@ -1798,17 +1798,25 @@ let add_exception loc x ty uc =
   with ClashSymbol _ ->
     errorm ~loc "clash with previous exception %s" x
 
-let rec polymorphic_pure_type ty = match ty.ty_node with
-  | Ty.Tyvar _ -> true
-  | Ty.Tyapp (_, tyl) -> List.exists polymorphic_pure_type tyl
+(* [cannot_be_generalized_ty ty] returns a pair (t, m) where
+   [t = true] iff [ty] contains a type variable
+   [m = true] iff [ty] contains a polymorphic mutable type *)
+let rec cannot_be_generalized_ty ty = match ty.ty_node with
+  | Ty.Tyapp (ts, tyl) ->
+      let n = (get_mtsymbol ts).mt_regions in
+      let t, m = List.fold_left 
+	(fun (acct, accm) ty ->
+	   let t, m = cannot_be_generalized_ty ty in acct || t, accm || m)
+	(false, false)
+	(Util.chop n tyl)
+      in
+      t, m || n > 0 && t
+  | Ty.Tyvar _ ->
+      true, false
 
 let cannot_be_generalized = function
-  | Tpure { ty_node = Ty.Tyapp (ts, tyl) } when is_mutable_ts ts ->
-      List.for_all polymorphic_pure_type tyl
-  | Tpure { ty_node = Ty.Tyvar _ } ->
-      true
-  | Tpure _ | Tarrow _ ->
-      false
+  | Tpure ty -> let _, m = cannot_be_generalized_ty ty in m
+  | Tarrow _ -> false
 
 let check_type_vars ~loc vars ty =
   let h = Htv.create 17 in
