@@ -202,6 +202,7 @@ let iconname_prover = "wizard32"
 let iconname_transf = "configure32"
 let iconname_editor = "edit32"
 let iconname_replay = "refresh32"
+let iconname_reload = "movefile32"
 let iconname_remove = "deletefile32"
 let iconname_cleaning = "trashb32"
 
@@ -227,6 +228,7 @@ let image_prover = ref !image_default
 let image_transf = ref !image_default
 let image_editor = ref !image_default
 let image_replay = ref !image_default
+let image_reload = ref !image_default
 let image_remove = ref !image_default
 let image_cleaning = ref !image_default
 
@@ -253,6 +255,7 @@ let resize_images size =
   image_transf := image ~size iconname_transf;
   image_editor := image ~size iconname_editor;
   image_replay := image ~size iconname_replay;
+  image_reload := image ~size iconname_reload;
   image_remove := image ~size iconname_remove;
   image_cleaning := image ~size iconname_cleaning;
   ()

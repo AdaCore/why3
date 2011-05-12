@@ -25,7 +25,7 @@ open Format
 (*     provers             *)
 (***************************)
 
-type prover_data = 
+type prover_data =
     { prover_id : string;
       prover_name : string;
       prover_version : string;
@@ -50,7 +50,7 @@ let get_prover_data env id pr acc =
       acc
   with e ->
     eprintf "Failed to load driver %s for prover %s (%a). prover disabled@."
-      pr.Whyconf.driver 
+      pr.Whyconf.driver
       pr.Whyconf.name
       Exn_printer.exn_printer e
       ;
@@ -64,7 +64,7 @@ type trans =
   | Trans_one of Task.task Trans.trans
   | Trans_list of Task.task Trans.tlist
 
-type transformation_data = 
+type transformation_data =
     { transformation_name : string;
       transformation : trans;
     }
@@ -82,7 +82,7 @@ let lookup_trans env name =
 let lookup_transformation env =
   let h = Hashtbl.create 13 in
   fun name ->
-    try 
+    try
       Hashtbl.find h name
     with Not_found ->
       let t = {transformation_name = name;
@@ -109,6 +109,7 @@ module type OBSERVER = sig
   type key
   val create: ?parent:key -> unit -> key
   val remove: key -> unit
+  val reset: unit -> unit
 
   val timeout: ms:int -> (unit -> bool) -> unit
   val idle: (unit -> bool) -> unit
@@ -138,7 +139,7 @@ and goal =
       goal_expl : string option;
       parent : goal_parent;
       mutable task: Task.task option;
-      checksum : string;
+      mutable checksum : string;
       goal_key : O.key;
       mutable proved : bool;
       external_proofs: (string, proof_attempt) Hashtbl.t;
@@ -181,25 +182,25 @@ let theory_key t = t.theory_key
 let verified t = t.verified
 let goals t = t.goals
 
-let get_theory t = 
-  match t.theory with 
-    | None -> 
+let get_theory t =
+  match t.theory with
+    | None ->
 	eprintf "Session: theory not yet reimported, this should not happen@.";
 	assert false
     | Some t -> t
 
 let goal_name g = g.goal_name
-let goal_expl g = 
-  match g.goal_expl with 
+let goal_expl g =
+  match g.goal_expl with
     | None -> g.goal_name
     | Some s -> s
 let goal_key g = g.goal_key
 let goal_proved g = g.proved
 let transformations g = g.transformations
 
-let get_task g = 
-  match g.task with 
-    | None -> 
+let get_task g =
+  match g.task with
+    | None ->
 	begin
 	  match g.parent with
 	    | Parent_theory _th ->
@@ -213,7 +214,7 @@ let get_task g =
 let all_files : file list ref = ref []
 
 let get_all_files () = !all_files
- 
+
 (************************)
 (* saving state on disk *)
 (************************)
@@ -232,14 +233,14 @@ let save_result fmt r =
 let save_status fmt s =
   match s with
     | Undone | Scheduled | Running ->
-        fprintf fmt "<undone/>@\n" 
-    | InternalFailure msg -> 
-        fprintf fmt "<internalfailure reason=\"%s\"/>@\n" 
+        fprintf fmt "<undone/>@\n"
+    | InternalFailure msg ->
+        fprintf fmt "<internalfailure reason=\"%s\"/>@\n"
           (Printexc.to_string msg)
     | Done r -> save_result fmt r
 
 let save_proof_attempt fmt _key a =
-  fprintf fmt "@\n@[<v 1><proof prover=\"%s\" edited=\"%s\">" 
+  fprintf fmt "@\n@[<v 1><proof prover=\"%s\" edited=\"%s\">"
     a.prover.prover_id
     a.edited_as;
   save_status fmt a.proof_state;
@@ -250,20 +251,20 @@ let opt lab fmt = function
   | Some s -> fprintf fmt "%s=\"%s\" " lab s
 
 let rec save_goal fmt g =
-  fprintf fmt "@\n@[<v 1><goal name=\"%s\" %aproved=\"%b\">" 
-    g.goal_name (opt "expl") g.goal_expl g.proved;
+  fprintf fmt "@\n@[<v 1><goal name=\"%s\" %asum=\"%s\" proved=\"%b\">"
+    g.goal_name (opt "expl") g.goal_expl g.checksum g.proved;
   Hashtbl.iter (save_proof_attempt fmt) g.external_proofs;
   Hashtbl.iter (save_trans fmt) g.transformations;
   fprintf fmt "@]@\n</goal>"
 
 and save_trans fmt _ t =
-  fprintf fmt "@\n@[<v 1><transf name=\"%s\" proved=\"%b\">" 
+  fprintf fmt "@\n@[<v 1><transf name=\"%s\" proved=\"%b\">"
     t.transf.transformation_name t.transf_proved;
   List.iter (save_goal fmt) t.subgoals;
   fprintf fmt "@]@\n</transf>"
 
 let save_theory fmt t =
-  fprintf fmt "@\n@[<v 1><theory name=\"%s\" verified=\"%b\">" 
+  fprintf fmt "@\n@[<v 1><theory name=\"%s\" verified=\"%b\">"
     t.theory_name t.verified;
   List.iter (save_goal fmt) t.goals;
   fprintf fmt "@]@\n</theory>"
@@ -272,7 +273,7 @@ let save_file fmt f =
   fprintf fmt "@\n@[<v 1><file name=\"%s\" verified=\"%b\">" f.file_name f.file_verified;
   List.iter (save_theory fmt) f.theories;
   fprintf fmt "@]@\n</file>"
-  
+
 let save fname =
   let ch = open_out fname in
   let fmt = formatter_of_out_channel ch in
@@ -348,7 +349,7 @@ let set_proof_state ~obsolete a res =
 
 (*************************)
 (*         Scheduler     *)
-(*************************) 
+(*************************)
 
 
 (* timeout handler *)
@@ -581,25 +582,24 @@ let raw_add_external_proof ~obsolete ~edit g p result =
             edited_as = edit;
           }
   in
-  Hashtbl.add g.external_proofs p.prover_name a;
+  Hashtbl.add g.external_proofs p.prover_id a;
   let any = Proof_attempt a in
   !init_fun key any;
   !notify_fun any;
-  (* !notify_fun (Goal g) ? *)
   a
 
 
-(* [raw_add_goal parent name expl t] adds a goal to the given parent
+(* [raw_add_goal parent name expl sum t] adds a goal to the given parent
    DOES NOT record the new goal in its parent, thus this should not be exported
 *)
-let raw_add_goal parent name expl topt =
+let raw_add_goal parent name expl sum topt =
   let parent_key = match parent with
     | Parent_theory mth -> mth.theory_key
     | Parent_transf mtr -> mtr.transf_key
   in
   let key = O.create ~parent:parent_key () in
   let sum = match topt with
-    | None -> ""
+    | None -> sum
     | Some t -> task_checksum t
   in
   let goal = { goal_name = name;
@@ -664,7 +664,7 @@ let add_theory mfile name th =
          let id = (Task.task_goal t).Decl.pr_name in
          let name = id.Ident.id_string in
          let expl = get_explanation id (Task.task_goal_fmla t) in
-         let goal = raw_add_goal (Parent_theory mth) name expl (Some t) in
+         let goal = raw_add_goal (Parent_theory mth) name expl "" (Some t) in
          goal :: acc)
       []
       tasks
@@ -691,8 +691,8 @@ let project_dir = ref ""
 
 let read_file fn =
   let fn = Filename.concat !project_dir fn in
-  let env = match !current_env with 
-    | None -> assert false | Some e -> e 
+  let env = match !current_env with
+    | None -> assert false | Some e -> e
   in
   let theories = Env.read_file env fn in
   let theories =
@@ -732,48 +732,38 @@ let file_exists fn =
 (* reload a file                  *)
 (**********************************)
 
-let rec reimport_any_goal _parent gid _gname t goal __goal_obsolete =
-  let _info = get_explanation gid (Task.task_goal_fmla t) in
+let reload_proof ~provers obsolete goal pid old_a =
+  try
+    let p = Util.Mstr.find pid provers in
+    let old_res = old_a.proof_state in
+    let obsolete = obsolete or old_a.proof_obsolete in
+    eprintf "proof_obsolete : %b@." obsolete;
+    let _a =
+      raw_add_external_proof ~obsolete ~edit:old_a.edited_as goal p old_res 
+    in
+    ((* something TODO ?*))
+  with Not_found ->
+    eprintf
+      "Warning: prover %s appears in database but is not installed.@."
+      pid
+
+let rec reload_any_goal ~provers parent gid gname sum t old_goal goal_obsolete =
+  let info = get_explanation gid (Task.task_goal_fmla t) in
+  let goal = raw_add_goal parent gname info sum (Some t) in
   goal.task <- Some t;
+  begin
+    match old_goal with
+      | None -> ()
+      | Some g ->
+          Hashtbl.iter (reload_proof ~provers goal_obsolete goal) g.external_proofs;
+          Hashtbl.iter (reload_trans ~provers goal_obsolete goal) g.transformations
+  end;
   goal
+
+
+and reload_trans ~provers:_ _goal_obsolete _goal _tr_id _tr =
+  ()
 (*
-  let goal = raw_add_goal parent gname info t in
-  let proved = ref false in
-  let external_proofs = Db.external_proofs db_goal in
-  Db.Hprover.iter
-    (fun pid a ->
-       let pname = Db.prover_name pid in
-       try
-         let p = Util.Mstr.find pname gconfig.provers in
-         let s,t,o,edit = Db.status_and_time a in
-         if goal_obsolete && not o then Db.set_obsolete a;
-         let obsolete = goal_obsolete or o in
-         let s = match s with
-           | Db.Undone -> Call_provers.HighFailure
-           | Db.Done r ->
-	       if r = Call_provers.Valid then
-		 if not obsolete then proved := true;
-	       r
-         in
-	 let r = { Call_provers.pr_answer = s;
-		   Call_provers.pr_output = "";
-		   Call_provers.pr_time = t;
-		 }
-	 in
-         let (_pa : Model.proof_attempt) =
-           Helpers.add_external_proof_row ~obsolete ~edit goal p a
-	     (Gscheduler.Done r)
-         in
-         ((* something TODO ?*))
-       with Not_found ->
-         eprintf
-           "Warning: prover %s appears in database but is not installed.@."
-           pname
-    )
-    external_proofs;
-  let transformations = Db.transformations db_goal in
-  Db.Htransf.iter
-    (fun tr_id tr ->
        let trname = Db.transf_name tr_id in
        eprintf "Reimporting transformation %s for goal %s @." trname gname;
        let trans = trans_of_name trname in
@@ -867,93 +857,83 @@ let rec reimport_any_goal _parent gid _gname t goal __goal_obsolete =
 
 *)
 
-let reimport_root_goal mth tname goals t : goal =
-  (* re-imports database informations of a goal in theory mth (named tname)
-     goals is a table, indexed by names of DB goals formerly known to be
-     a in theory mth.  returns true whenever the task t is known to be
-     proved *)
+(* reloads the task [t] in theory mth (named tname) *)
+let reload_root_goal ~provers mth tname old_goals t : goal =
   let id = (Task.task_goal t).Decl.pr_name in
-  let gname = id.Ident.id_string
-  in
+  let gname = id.Ident.id_string in
   let sum = task_checksum t in
-  let goal, goal_obsolete =
+(*
+  let goal = raw_add_goal (Parent_theory mth) gname expl sum (Some t) in
+*)
+  let old_goal, goal_obsolete =
     try
-      let dbg = Util.Mstr.find gname goals in
-      let db_sum = dbg.checksum in
-      let goal_obsolete = sum <> db_sum in
-      if goal_obsolete then
-        begin
-          eprintf "Goal %s.%s has changed@." tname gname;
-(*
-          Db.change_checksum dbg sum
-*)
-        end;
-      dbg,goal_obsolete
-    with Not_found ->
-      assert false (* TODO *)
-(*
-      let dbg = Db.add_goal mth.Model.theory_db gname sum in
-      dbg,false
-*)
+      let old_goal = Util.Mstr.find gname old_goals in
+      let old_sum = old_goal.checksum in
+      (Some old_goal,sum <> old_sum)
+    with Not_found -> (None,false)
   in
-  reimport_any_goal (Parent_theory mth) id gname t goal goal_obsolete
+  if goal_obsolete then
+    eprintf "Goal %s.%s has changed@." tname gname;
+  reload_any_goal ~provers (Parent_theory mth) id gname sum t old_goal goal_obsolete
+
+(* reloads a theory *)
+let reload_theory ~provers mfile old_theories (_,tname,th) =
+  eprintf "[Reload] theory '%s'@."tname;
+  let tasks = List.rev (Task.split_theory th None None) in
+  let mth = raw_add_theory mfile (Some th) tname in
+  let old_goals =
+    try
+      let old_mth = Util.Mstr.find tname old_theories in
+      old_mth.goals
+    with Not_found -> []
+  in
+  let goalsmap = List.fold_left
+    (fun goalsmap g -> Util.Mstr.add g.goal_name g goalsmap)
+    Util.Mstr.empty old_goals
+  in
+  let new_goals = List.fold_left
+    (fun acc t ->
+       let g = reload_root_goal ~provers mth tname goalsmap t in
+       g::acc)
+    [] tasks
+  in
+  mth.goals <- List.rev new_goals;
+  check_theory_proved mth;
+  mth
+
 
 (* reloads a file *)
-
-let reload_file mf =
+let reload_file ~provers mf =
   eprintf "[Reload] file '%s'@." mf.file_name;
-  try
-    let theories = read_file mf.file_name in
-    let old_theories = List.fold_left
-      (fun acc t -> Util.Mstr.add t.theory_name t acc)
-      Util.Mstr.empty
-      mf.theories 
-    in
-    let mths =
-      List.fold_left
-        (fun acc (_,tname,th) ->
-	   eprintf "[Reload] theory '%s'@."tname;
-	   let mth =
-	     try
-               let mth = Util.Mstr.find tname old_theories in
-	       mth.theory <- Some th;
-	       mth
-	     with Not_found -> 
-	       raw_add_theory mf (Some th) tname
-	   in
-	   let goals = List.fold_left
-	     (fun acc g -> Util.Mstr.add g.goal_name g acc)
-	     Util.Mstr.empty mth.goals 
-	   in
-	   let tasks = List.rev (Task.split_theory th None None) in
-	   let goals = List.fold_left
-	     (fun acc t ->
-                let g = reimport_root_goal mth tname goals t in
-                g::acc)
-	     [] tasks
-	   in
-	   mth.goals <- List.rev goals;
-	   (* TODO: what to do with remaining old theories?
-	      for the moment they remain in the session
-	   *)
-	   check_theory_proved mth;
-	   mth::acc
-	)
-        [] theories
-    in
-    (* TODO: detecter d'eventuelles vieilles theories, qui seraient donc
-       dans [old_theories] mais pas dans [theories]
-    *)
-    mf.theories <- List.rev mths;
-    check_file_verified mf
-  with e ->
-    eprintf "@[Error while reading file@ '%s':@ %a@.@]" mf.file_name
-      Exn_printer.exn_printer e;
-    exit 1
-      
+  let theories = 
+    try
+      read_file mf.file_name 
+    with e ->
+      eprintf "@[Error while reading file@ '%s':@ %a@.@]" mf.file_name
+        Exn_printer.exn_printer e;
+      (* TODO: do something clever than that! *)
+      exit 1
+  in
+  let new_mf = raw_add_file mf.file_name in
+  let old_theories = List.fold_left
+    (fun acc t -> Util.Mstr.add t.theory_name t acc)
+    Util.Mstr.empty
+    mf.theories
+  in
+  let mths = List.fold_left
+    (fun acc th -> reload_theory ~provers new_mf old_theories th :: acc)
+    [] theories
+  in
+  new_mf.theories <- List.rev mths;
+  check_file_verified new_mf
+
 
 (* reloads all files *)
-let reload_all () = List.iter reload_file !all_files
+let reload_all provers =
+  let files = !all_files in
+  all_files := [];
+  O.reset ();
+  List.iter (reload_file ~provers) files
 
 (****************************)
 (*     session opening      *)
@@ -962,11 +942,11 @@ let reload_all () = List.iter reload_file !all_files
 let load_result r =
   match r.Xml.name with
     | "result" ->
-	let status = 
+	let status =
 	  try List.assoc "status" r.Xml.attributes
 	  with Not_found -> assert false
 	in
-	let answer = 
+	let answer =
 	  match status with
 	    | "valid" -> Call_provers.Valid
 	    | "invalid" -> Call_provers.Invalid
@@ -974,7 +954,7 @@ let load_result r =
 	    | "timeout" -> Call_provers.Timeout
 	    | "failure" -> Call_provers.Failure ""
 	    | "highfailure" -> Call_provers.Failure ""
-	    | s -> 
+	    | s ->
 		eprintf "Session.load_result: unexpected status '%s'@."  s;
 		assert false
 	in
@@ -986,40 +966,44 @@ let load_result r =
 	  Call_provers.pr_time = time;
 	  Call_provers.pr_output = "";
 	}
-    | s -> 
+    | s ->
 	eprintf "Session.load_result: unexpected element '%s'@."  s;
 	assert false
-    
-  
-let rec load_goal ~env ~provers parent acc g = 
+
+
+let rec load_goal ~env ~provers parent acc g =
   match g.Xml.name with
     | "goal" ->
-	let gname = 
+	let gname =
 	  try List.assoc "name" g.Xml.attributes
 	  with Not_found -> assert false
 	in
-	let expl = 
+	let expl =
 	  try Some (List.assoc "expl" g.Xml.attributes)
 	  with Not_found -> None
 	in
-	let mg = raw_add_goal parent gname expl None in
+	let sum =
+	  try List.assoc "sum" g.Xml.attributes
+	  with Not_found -> ""
+	in
+	let mg = raw_add_goal parent gname expl sum None in
 	List.iter (load_proof_or_transf ~env ~provers mg) g.Xml.elements;
 	mg::acc
-    | s -> 
+    | s ->
 	eprintf "Session.load_goal: unexpected element '%s'@."  s;
 	assert false
-	  
+
 
 and load_proof_or_transf ~env ~provers mg a =
   match a.Xml.name with
-    | "proof" -> 
-	let prover = 
+    | "proof" ->
+	let prover =
 	  try List.assoc "prover" a.Xml.attributes
 	  with Not_found -> assert false
 	in
-        let p = 
+        let p =
 	  try
-	    Util.Mstr.find prover provers 
+	    Util.Mstr.find prover provers
 	  with Not_found -> assert false (* TODO *)
 	in
 	let res = match a.Xml.elements with
@@ -1027,73 +1011,73 @@ and load_proof_or_transf ~env ~provers mg a =
 	  | [] -> Undone
 	  | _ -> assert false
 	in
-	let edit = 
+	let edit =
 	  try List.assoc "edited" a.Xml.attributes
 	  with Not_found -> assert false
 	in
-	let _pa = raw_add_external_proof ~obsolete:false 
+	let _pa = raw_add_external_proof ~obsolete:false
 	  ~edit mg p res
 	in
 	(* already done by raw_add_external_proof
 	   Hashtbl.add mg.external_proofs prover pa *)
 	()
-    | "transf" -> 
-	let trname = 
+    | "transf" ->
+	let trname =
 	  try List.assoc "name" a.Xml.attributes
 	  with Not_found -> assert false
 	in
-        let tr = 
-	  try 
-	    lookup_transformation env trname 
+        let tr =
+	  try
+	    lookup_transformation env trname
 	  with Not_found -> assert false (* TODO *)
 	in
-	let _proved = 
+	let _proved =
 	  try List.assoc "proved" a.Xml.attributes
 	  with Not_found -> assert false
 	in
 	let mtr = raw_add_transformation mg tr in
 	mtr.subgoals <-
-	  List.rev 
-	  (List.fold_left 
-	     (load_goal ~env ~provers (Parent_transf mtr)) 
+	  List.rev
+	  (List.fold_left
+	     (load_goal ~env ~provers (Parent_transf mtr))
 	     [] a.Xml.elements);
 	(* already done by raw_add_transformation
 	   Hashtbl.add mg.transformations trname mtr *)
 	()
-    | s -> 
+    | s ->
 	eprintf "Session.load_proof_or_transf: unexpected element '%s'@."  s;
 	assert false
 
 let load_theory ~env ~provers mf acc th =
   match th.Xml.name with
     | "theory" ->
-	let thname = 
+	let thname =
 	  try List.assoc "name" th.Xml.attributes
 	  with Not_found -> assert false
 	in
 	let mth = raw_add_theory mf None thname in
-	mth.goals <- 
-	  List.rev 
-	  (List.fold_left 
-	     (load_goal ~env ~provers (Parent_theory mth)) 
+	mth.goals <-
+	  List.rev
+	  (List.fold_left
+	     (load_goal ~env ~provers (Parent_theory mth))
 	     [] th.Xml.elements);
 	mth::acc
-    | s -> 
+    | s ->
 	eprintf "Session.load_theory: unexpected element '%s'@."  s;
 	assert false
 
 let load_file ~env ~provers f =
   match f.Xml.name with
     | "file" ->
-	let fn = 
+	let fn =
 	  try List.assoc "name" f.Xml.attributes
 	  with Not_found -> assert false
 	in
 	let mf = raw_add_file fn in
-	mf.theories <- 
-	  List.rev 
+	mf.theories <-
+	  List.rev
 	  (List.fold_left (load_theory ~env ~provers mf) [] f.Xml.elements)
-    | s -> 
+    | s ->
 	eprintf "Session.load_file: unexpected element '%s'@."  s;
 	assert false
 
@@ -1102,13 +1086,13 @@ let load_session ~env ~provers xml =
   match cont.Xml.name with
     | "why3session" ->
 	List.iter (load_file ~env ~provers) cont.Xml.elements
-    | s -> 
+    | s ->
 	eprintf "Session.load_session: unexpected element '%s'@."  s;
 	assert false
-  
+
 let db_filename = "why3session.xml"
 
-let open_session ~env ~provers ~init ~notify dir = 
+let open_session ~env ~provers ~init ~notify dir =
   match !current_env with
     | None ->
 	init_fun := init; notify_fun := notify; 
@@ -1116,20 +1100,20 @@ let open_session ~env ~provers ~init ~notify dir =
 	begin try
 	  let xml = Xml.from_file (Filename.concat dir db_filename) in
 	  load_session ~env ~provers xml;
-	  reload_all ()
-	with 
-	  | Sys_error _ -> 
+	  reload_all provers
+	with
+	  | Sys_error _ ->
 	      (* xml does not exist yet *)
 	      ()
 	  | Xml.Parse_error s ->
 	      Format.eprintf "XML database corrupted, ignored (%s)@." s;
 	      ()
 	end
-    | _ -> 
+    | _ ->
 	eprintf "Session.open_session: session already opened@.";
 	assert false
 
-let save_session () = 
+let save_session () =
   match !current_env with
     | Some _ -> save (Filename.concat !project_dir db_filename)
     | None ->
@@ -1191,24 +1175,24 @@ let rec prover_on_goal_or_children ~context_unproved_goals_only p g =
 
 let run_prover ~context_unproved_goals_only pr a =
   match a with
-    | Goal g -> 
+    | Goal g ->
 	prover_on_goal_or_children ~context_unproved_goals_only pr g
-    | Theory th -> 
-	List.iter 
-	  (prover_on_goal_or_children ~context_unproved_goals_only pr) 
+    | Theory th ->
+	List.iter
+	  (prover_on_goal_or_children ~context_unproved_goals_only pr)
 	  th.goals
-    | File file -> 
+    | File file ->
         List.iter
           (fun th ->
-             List.iter 
+             List.iter
 	       (prover_on_goal_or_children ~context_unproved_goals_only pr)
 	       th.goals)
           file.theories
     | Proof_attempt a ->
         prover_on_goal_or_children ~context_unproved_goals_only pr a.proof_goal
     | Transformation tr ->
-        List.iter 
-	  (prover_on_goal_or_children ~context_unproved_goals_only pr) 
+        List.iter
+	  (prover_on_goal_or_children ~context_unproved_goals_only pr)
 	  tr.subgoals
 
 (**********************************)
@@ -1228,9 +1212,9 @@ let rec replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only g
          then redo_external_proof g a)
     g.external_proofs;
   Hashtbl.iter
-    (fun _ t -> 
-       List.iter 
-	 (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only) 
+    (fun _ t ->
+       List.iter
+	 (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only)
 	 t.subgoals)
     g.transformations
 
@@ -1239,20 +1223,20 @@ let replay ~obsolete_only ~context_unproved_goals_only a =
     | Goal g ->
         replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only g
     | Theory th ->
-        List.iter 
+        List.iter
 	  (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only)
 	  th.goals
     | File file ->
         List.iter
           (fun th ->
-             List.iter 
+             List.iter
 	       (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only)
 	       th.goals)
           file.theories
     | Proof_attempt a ->
         replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only a.proof_goal
     | Transformation tr ->
-        List.iter 
+        List.iter
 	  (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only)
 	  tr.subgoals
 
@@ -1306,7 +1290,7 @@ let transformation_on_goal g tr =
 	    in
 	    let goal =
 	      raw_add_goal (Parent_transf tr)
-		subgoal_name expl (Some subtask)
+		subgoal_name expl "" (Some subtask)
 	    in
 	    (goal :: acc, count+1)
 	in
@@ -1324,11 +1308,11 @@ let rec transform_goal_or_children ~context_unproved_goals_only tr g =
       Hashtbl.iter
 	(fun _ t ->
 	   r := false;
-           List.iter 
+           List.iter
 	     (transform_goal_or_children ~context_unproved_goals_only tr)
-             t.subgoals) 
+             t.subgoals)
 	g.transformations;
-      if !r then 
+      if !r then
 	schedule_delayed_action (fun () -> transformation_on_goal g tr)
     end
 

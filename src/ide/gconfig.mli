@@ -72,6 +72,7 @@ val image_prover : GdkPixbuf.pixbuf ref
 val image_transf : GdkPixbuf.pixbuf ref
 val image_editor : GdkPixbuf.pixbuf ref
 val image_replay : GdkPixbuf.pixbuf ref
+val image_reload : GdkPixbuf.pixbuf ref
 val image_remove : GdkPixbuf.pixbuf ref
 val image_cleaning : GdkPixbuf.pixbuf ref
 

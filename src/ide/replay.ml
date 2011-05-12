@@ -56,7 +56,7 @@ let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
 
 let env = Lexer.create_env loadpath
 
-let provers = Whyconf.get_provers config 
+let provers = Whyconf.get_provers config
 
 let provers =
   Util.Mstr.fold (Session.get_prover_data env) provers Util.Mstr.empty
@@ -71,12 +71,14 @@ module M = Session.Make
   (struct
      type key = int
 
-     let create ?parent () = 
+     let create ?parent () =
        match parent with
          | None -> 0
          | Some  n -> n+1
 
      let remove _row = ()
+
+     let reset () = ()
 
      let idle f =
        match !idle_handler with
@@ -115,16 +117,16 @@ let main_loop () =
     else
       (* attempt to run the idle handler *)
       match !idle_handler with
-        | None -> 
-            begin 
-              let ms = 
+        | None ->
+            begin
+              let ms =
                 match !timeout_handler with
                   | None -> raise Exit
                   | Some(ms,_) -> ms
               in
               usleep (ms -. time)
             end
-        | Some f -> 
+        | Some f ->
             let b = f () in
             if b then () else
               begin
@@ -136,8 +138,8 @@ open Format
 
 let model_index = Hashtbl.create 257
 
-let init = 
-  let cpt = ref 0 in 
+let init =
+  let cpt = ref 0 in
   fun _row any ->
     incr cpt;
     Hashtbl.add model_index !cpt any;
@@ -152,7 +154,7 @@ let init =
     in
     printf "Item '%s' loaded@." name
 
-let string_of_result result = 
+let string_of_result result =
   match result with
     | Session.Undone -> "undone"
     | Session.Scheduled -> "scheduled"
@@ -166,7 +168,7 @@ let string_of_result result =
 	| Call_provers.Failure _ -> "failure"
 	| Call_provers.HighFailure -> "high failure"
 
-let print_result fmt res = 
+let print_result fmt res =
   let t = match res with
     | Session.Done { Call_provers.pr_time = time } ->
 	Format.sprintf "(%.2f)" time
@@ -186,8 +188,8 @@ let notify any =
           file.M.file_verified
     | M.Proof_attempt a ->
         let p = a.M.prover in
-	printf "Proof with '%s %s' gives %a@." 
-	  p.Session.prover_name p.Session.prover_version 
+	printf "Proof with '%s %s' gives %a@."
+	  p.Session.prover_name p.Session.prover_version
           print_result a.M.proof_state
     | M.Transformation tr ->
 	printf "Transformation '%s' proved: %b@."
@@ -220,12 +222,12 @@ let main () =
   try
     eprintf "Opening session...@?";
     M.open_session ~env ~provers ~init ~notify project_dir;
-    M.maximum_running_proofs := 
+    M.maximum_running_proofs :=
       Whyconf.running_provers_max (Whyconf.get_main config);
     eprintf " done@.";
     let files = M.get_all_files () in
-    List.iter 
-      (fun f -> 
+    List.iter
+      (fun f ->
          eprintf "Replaying file '%s'@." f.M.file_name;
          M.replay ~obsolete_only:false
            ~context_unproved_goals_only:false (M.File f)) files;

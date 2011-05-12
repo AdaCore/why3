@@ -367,11 +367,14 @@ module M = Session.Make
          | Some r -> Some r#iter
        in
        let iter = goals_model#append ?parent () in
+       goals_model#set ~row:iter ~column:index_column (-1);
        goals_model#get_row_reference (goals_model#get_path iter)
 
 
      let remove row =
        let (_:bool) = goals_model#remove row#iter in ()
+
+     let reset () = goals_model#clear ()
 
      let idle f =
        let (_ : GMain.Idle.id) = GMain.Idle.add f in ()
@@ -408,34 +411,12 @@ let set_proof_state ~obsolete a =
 
 let model_index = Hashtbl.create 17
 
-let get_any row = 
-  try 
+let get_any row =
+  try
     let row = goals_model#get_iter row in
     let idx = goals_model#get ~row ~column:index_column in
     Hashtbl.find model_index idx
   with Not_found -> invalid_arg "Gmain.get_index"
-
-let init = 
-  let cpt = ref 0 in 
-  fun row any ->
-    incr cpt;
-    Hashtbl.add model_index !cpt any;
-    goals_model#set ~row:row#iter ~column:index_column !cpt;
-    goals_model#set ~row:row#iter ~column:icon_column 
-      (match any with
-	 | M.Goal _ -> !image_file
-	 | M.Theory _ 
-	 | M.File _ -> !image_directory
-	 | M.Proof_attempt _ -> !image_prover
-	 | M.Transformation _ -> !image_transf);
-    goals_model#set ~row:row#iter ~column:name_column 
-      (match any with
-	 | M.Goal g -> M.goal_expl g
-	 | M.Theory th -> M.theory_name th
-	 | M.File f -> Filename.basename f.M.file_name
-	 | M.Proof_attempt a -> let p = a.M.prover in
-	   p.Session.prover_name ^ " " ^ p.Session.prover_version
-	 | M.Transformation tr -> Session.transformation_id tr.M.transf)
 
 let notify any =
   match any with
@@ -446,9 +427,41 @@ let notify any =
     | M.File file ->
 	set_row_status file.M.file_key file.M.file_verified
     | M.Proof_attempt a ->
-	set_proof_state ~obsolete:false a
+	set_proof_state ~obsolete:a.M.proof_obsolete a
     | M.Transformation tr ->
 	set_row_status tr.M.transf_key tr.M.transf_proved
+
+let init =
+  let cpt = ref (-1) in
+  fun row any ->
+    let ind = goals_model#get ~row:row#iter ~column:index_column in
+    if ind < 0 then
+      begin
+        incr cpt;
+        Hashtbl.add model_index !cpt any;
+        goals_model#set ~row:row#iter ~column:index_column !cpt
+      end
+    else
+      begin
+        Hashtbl.replace model_index ind any;
+      end;
+    goals_model#set ~row:row#iter ~column:icon_column
+      (match any with
+	 | M.Goal _ -> !image_file
+	 | M.Theory _
+	 | M.File _ -> !image_directory
+	 | M.Proof_attempt _ -> !image_prover
+	 | M.Transformation _ -> !image_transf);
+    goals_model#set ~row:row#iter ~column:name_column
+      (match any with
+	 | M.Goal g -> M.goal_expl g
+	 | M.Theory th -> M.theory_name th
+	 | M.File f -> Filename.basename f.M.file_name
+	 | M.Proof_attempt a -> let p = a.M.prover in
+	   p.Session.prover_name ^ " " ^ p.Session.prover_version
+	 | M.Transformation tr -> Session.transformation_id tr.M.transf);
+    notify any
+
 
 
 (********************)
@@ -490,7 +503,7 @@ let () =
 let () =
   try
     eprintf "Opening session...@?";
-    M.open_session ~env:gconfig.env ~provers:gconfig.provers 
+    M.open_session ~env:gconfig.env ~provers:gconfig.provers
       ~init ~notify project_dir;
     M.maximum_running_proofs := gconfig.max_running_processes;
     eprintf " done@."
@@ -567,7 +580,7 @@ let replay_obsolete_proofs () =
   List.iter
     (fun row ->
        let a = get_any row in
-       M.replay ~obsolete_only:true 
+       M.replay ~obsolete_only:true
          ~context_unproved_goals_only:!context_unproved_goals_only a)
     goals_view#selection#get_selected_rows
 
@@ -685,14 +698,14 @@ let exit_function () =
       match l with
 	| [] -> ()
 	| f :: _ ->
-	    eprintf "first element is a '%s' with %d sub-elements@." 
+	    eprintf "first element is a '%s' with %d sub-elements@."
 	      f.Xml.name (List.length f.Xml.elements);
-	    
+
     with e -> eprintf "test reloading failed with exception %s@."
       (Printexc.to_string e)
   end;
   let ret = Sys.command "xmllint --noout --dtdvalid share/why3session.dtd essai.xml" in
-  if ret = 0 then eprintf "DTD validation succeeded, good!@."; 
+  if ret = 0 then eprintf "DTD validation succeeded, good!@.";
   *)
   M.save_session ();
   GMain.quit ()
@@ -911,7 +924,7 @@ let () =
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:inline_selected_goals
-  in 
+  in
   ()
 
 
@@ -1091,13 +1104,13 @@ let select_row p =
   match a with
     | M.Goal g ->
 	let callback = function
-	  | [t] -> 
+	  | [t] ->
               let task_text = Pp.string_of Pretty.print_task t in
               task_view#source_buffer#set_text task_text;
               task_view#scroll_to_mark `INSERT;
               scroll_to_source_goal g
 	  | _ -> assert false
-	in	
+	in
         M.apply_transformation ~callback intro_transformation (M.get_task g)
 
     | M.Theory th ->
@@ -1175,6 +1188,18 @@ let () =
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:replay_obsolete_proofs
+  in ()
+
+let () =
+  let b = GButton.button ~packing:tools_box#add ~label:"Reload" () in
+  b#misc#set_tooltip_markup "Reloads the files";
+
+  let i = GMisc.image ~pixbuf:(!image_reload) () in
+  let () = b#set_image i#coerce in
+  let (_ : GtkSignal.id) =
+    b#connect#pressed ~callback:(fun () -> 
+                                   current_file := "";
+                                   M.reload_all gconfig.provers)
   in ()
 
 (*************)

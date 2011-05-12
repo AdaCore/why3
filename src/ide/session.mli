@@ -69,6 +69,9 @@ module type OBSERVER = sig
   val remove: key -> unit
     (** removes a key *)
 
+  val reset: unit -> unit
+    (** deletes all keys *)
+
   val timeout: ms:int -> (unit -> bool) -> unit
     (** a handler for functions that must be called after a given time
 	elapsed, in milliseconds. When the given function returns
@@ -149,18 +152,20 @@ module Make(O: OBSERVER) : sig
     env:Env.env ->
     provers:prover_data Util.Mstr.t ->
     init:(O.key -> any -> unit) ->
-    notify:(any -> unit) -> string -> unit
+    notify:(any -> unit) -> 
+    string -> unit
     (** starts a new proof session, using directory given as argument 
         this reloads the previous session database if any.
 
         Opening a session must be done prior to any other actions.
         And it cannot be done twice.
 
+	the [notify] function is a function that will be called at each
+	update of element of the state
+
 	the [init] function is a function that will be called at each
 	creation of element of the state
 
-	the [notify] function is a function that will be called at each
-	update of element of the state
     *)
 
   val maximum_running_proofs : int ref
@@ -216,6 +221,11 @@ module Make(O: OBSERVER) : sig
         if context_unproved_goals_only is set then reruns only proofs with result was 'valid'
     *)
 
+  val reload_all: prover_data Util.Mstr.t -> unit
+    (** reloads all the files 
+        If for a given file, the parsing or typing fails, then
+        then old version is kept, but marked obsolete
+    *)
 (*
 TODO
 
