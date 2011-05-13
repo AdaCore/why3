@@ -784,101 +784,99 @@ let rec reload_any_goal ~provers parent gid gname sum t old_goal goal_obsolete =
   goal
 
 
-and reload_trans ~provers:_ _goal_obsolete _goal _tr_id _tr =
-  ()
-(*
-       let trname = Db.transf_name tr_id in
-       eprintf "Reimporting transformation %s for goal %s @." trname gname;
-       let trans = trans_of_name trname in
-       let subgoals = apply_trans trans t in
-       let mtr = Helpers.add_transformation_row goal tr trname in
-       let db_subgoals = Db.subgoals tr in
-       let reimported_goals,db_subgoals,_ =
-         List.fold_left
-           (fun (acc,db_subgoals,count) subtask ->
-              let id = (Task.task_goal subtask).Decl.pr_name in
-              let subgoal_name = gname ^ "." ^ (string_of_int count) in
-              let sum = task_checksum subtask in
-              let subtask_db,db_subgoals =
-                try
-		  let g = Util.Mstr.find sum db_subgoals in
-		  (* a subgoal has the same check sum *)
-		  (Some g, Util.Mstr.remove sum db_subgoals)
-                with Not_found -> None,db_subgoals
-              in
-              ((count,id,subgoal_name,subtask,sum,subtask_db) :: acc,
-	       db_subgoals,
-	       count+1))
-           ([],db_subgoals,1) subgoals
-       in
-       let other_goals =
-	 Util.Mstr.fold
-	   (fun _ g acc -> (Db.goal_name g,g)::acc)
-	   db_subgoals
-	   []
-       in
-       let other_goals =
-	 List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2) other_goals
-       in
-       let rec merge_goals new_goals old_goals proved acc =
-	 match new_goals with
-	   | [] -> acc, proved
-	   | (_,id,subgoal_name,subtask,sum,g_opt)::rem ->
-	       let db_g,subgoal_obsolete,old_goals =
-		 match g_opt with
-		   | Some g -> g,false,old_goals
-		   | None ->
-		       match old_goals with
-			 | [] ->
-			     (* create a new goal in db *)
-			     Db.add_subgoal tr subgoal_name sum,
-			     false, old_goals
-			 | (_goal_name,g) :: r ->
-			     g, true, r
-	       in
-               let subgoal,subgoal_proved =
-                 reimport_any_goal
-                   (Model.Transf mtr) id
-                   subgoal_name subtask db_g subgoal_obsolete
-              in
-              merge_goals rem old_goals (proved && subgoal_proved)
-		(subgoal :: acc)
-       in
-       let goals, subgoals_proved =
-	 merge_goals (List.rev reimported_goals) other_goals true []
-       in
-(*
-       let goals,_,subgoals_proved =
-         List.fold_left
-           (fun (acc,count,proved) subtask ->
-              let _id = (Task.task_goal subtask).Decl.pr_name in
-              let subgoal_name = gname ^ "." ^ (string_of_int count) in
-              let sum = task_checksum subtask in
-              let subtask_db =
-                try Util.Mstr.find sum db_subgoals
-		  (* a subgoal has the same check sum *)
-                with Not_found ->
-		  (* otherwise, create a new one *)
-                  Db.add_subgoal tr subgoal_name sum
-              in
-              let subgoal,subgoal_proved =
-                reimport_any_goal
-                  (Model.Transf mtr) subgoal_name subtask subtask_db
-                  false (* subgoal_obsolete *)
-              in
-              (subgoal :: acc, count+1,proved && subgoal_proved))
-           ([],1,true) subgoals
-       in
-*)
-       mtr.Model.subgoals <- List.rev goals;
-       if subgoals_proved (* TODO : && not obsolete *)
-       then proved := true
-    )
-    transformations;
-  if !proved then Helpers.set_proved ~propagate:false goal;
-  goal,!proved
+and reload_trans ~provers _goal_obsolete goal _ tr =
+  let trname = tr.transf.transformation_name in
+  let gname = goal.goal_name in
+  eprintf "[Reload] transformation %s for goal %s @." trname gname;
+  let mtr = raw_add_transformation goal tr.transf tr.transf_expanded in
+  let old_subgoals =
+    List.fold_left
+      (fun acc g -> Util.Mstr.add g.checksum g acc)
+      Util.Mstr.empty tr.subgoals
+  in
+  let callback subgoals =
+    (* we have an ordered list of new subgoals
 
-*)
+           subgoals = [g1; g2; g3; ...]
+
+       and a map of old subgoals indexed by their checksum
+
+           old_subgoals = [s1,h1 ; s2, h2 ; ... ]
+
+       we first associate each new goals for which there is an old goal 
+       with the same checksum. E.g, imagine checksum of g2 is s1 :
+
+       new_goals_map = [ (g1, None) ; (g2, Some h1) ; (g3, None) ; ]
+       remaining = [ s2, h2 ; ... ]
+
+    *)
+    let new_goals_map,_remaining,_ =
+      List.fold_left
+        (fun (new_goals_map,old_subgoals,count) subtask ->
+           let id = (Task.task_goal subtask).Decl.pr_name in
+           let subgoal_name = gname ^ "." ^ (string_of_int count) in
+           let sum = task_checksum subtask in
+           let old_subgoal,old_subgoals =
+             try
+	       let g = Util.Mstr.find sum old_subgoals in
+	       (* an old subgoal has the same checksum *)
+	       (Some g, Util.Mstr.remove sum old_subgoals)
+             with Not_found -> None,old_subgoals
+           in
+           ((count,id,subgoal_name,subtask,sum,old_subgoal) :: new_goals_map,
+	    old_subgoals, count+1))
+        ([],old_subgoals,1) subgoals
+    in
+    (* careful : new_goals is now in reverse order *)
+    (* we now turn remaining back into a list in the same order as original *)
+    let remaining =
+      Util.Mstr.fold
+        (fun _ g acc -> (g.goal_name,g)::acc)
+        old_subgoals
+        []
+    in
+    let remaining =
+      List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2) remaining
+    in
+    (* we now associate to each new goal which does not have an 
+       associated old goal yet to an old goal in the same order 
+       (arbitrary choice) 
+
+       new_new_goals_map = [ [ (g1, h2) ; (g2, h1) ; (g3, fresh) ; ]
+
+    *)
+    let rec associate_remaining_goals new_goals_map remaining acc =
+      match new_goals_map with
+        | [] -> acc
+        | (_,id,subgoal_name,subtask,sum,old_subgoal)::new_rem ->
+            let ((obsolete,old_goal,rem) : bool * goal option * (string * goal) list) =
+              match old_subgoal with
+                | Some _ -> false,old_subgoal,remaining
+                | None ->
+                    match remaining with
+                      | [] -> false,None,[]
+                      | (_goal_name,g) :: rem -> true,Some g,rem
+            in
+            associate_remaining_goals new_rem rem 
+              ((id,subgoal_name,sum,subtask,old_goal,obsolete)::acc)
+    in
+    let goals =
+      associate_remaining_goals (List.rev new_goals_map) remaining []
+    in
+    let goals = List.fold_left
+      (fun acc (id,subgoal_name,sum,subtask,old_g, subgoal_obsolete) ->
+         let mg = 
+           reload_any_goal ~provers
+             (Parent_transf mtr) id
+             subgoal_name sum subtask old_g subgoal_obsolete 
+         in mg::acc)
+      [] goals
+    in
+    mtr.subgoals <- goals;
+    check_goal_proved goal
+  in
+  apply_transformation ~callback tr.transf (get_task goal)
+
 
 (* reloads the task [t] in theory mth (named tname) *)
 let reload_root_goal ~provers mth tname old_goals t : goal =

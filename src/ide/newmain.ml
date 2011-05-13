@@ -382,16 +382,24 @@ let get_any (row:Gtk.tree_path) : M.any =
 let row_expanded b iter _path = 
   match get_any_from_iter iter with
     | M.File f -> 
+(*
 	eprintf "file_expanded <- %b@." b;
+*)
 	M.set_file_expanded f b
     | M.Theory t -> 
+(*
 	eprintf "theory_expanded <- %b@." b;
+*)
 	M.set_theory_expanded t b
     | M.Goal g ->
+(*
 	eprintf "goal_expanded <- %b@." b;
+*)
 	M.set_goal_expanded g b
     | M.Transformation tr ->
+(*
 	eprintf "transf_expanded <- %b@." b;
+*)
 	M.set_transf_expanded tr b
     | M.Proof_attempt _ -> ()
 
@@ -406,6 +414,7 @@ let notify any =
   let row,exp =
     match any with
       | M.Goal g -> 
+(*
           if M.goal_expanded g then
             begin
               let n = 
@@ -413,6 +422,7 @@ let notify any =
               in
               eprintf "expand_row on a goal with %d proofs@." n;
             end;
+*)
           (M.goal_key g),(M.goal_expanded g)
       | M.Theory t -> (M.theory_key t),(M.theory_expanded t)
       | M.File f -> f.M.file_key,f.M.file_expanded
