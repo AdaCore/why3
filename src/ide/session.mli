@@ -98,8 +98,11 @@ module Make(O: OBSERVER) : sig
 	mutable transf_proved : bool;
         transf_key : O.key;
         mutable subgoals : goal list;
+        mutable transf_expanded : bool;
       }
     (** a transformation of a given goal *)
+
+  val set_transf_expanded : transf -> bool -> unit
 
   val goal_name : goal -> string
   val goal_expl : goal -> string
@@ -107,6 +110,8 @@ module Make(O: OBSERVER) : sig
   val goal_key : goal -> O.key
   val goal_proved : goal -> bool
   val transformations : goal -> (string, transf) Hashtbl.t
+  val goal_expanded : goal -> bool
+  val set_goal_expanded : goal -> bool -> unit
 
   type proof_attempt = private
       { prover : prover_data;
@@ -117,6 +122,8 @@ module Make(O: OBSERVER) : sig
         mutable edited_as : string;
       }
     (** a proof attempt for a given goal *)
+
+  val external_proofs : goal -> (string, proof_attempt) Hashtbl.t
 
   type theory 
     (** a theory, holding a collection of goals *)

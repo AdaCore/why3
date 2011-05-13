@@ -351,14 +351,9 @@ module M = Session.Make
 
 let set_row_status row b =
   if b then
-    begin
-      (* goals_view#collapse_row row#path; *)
-      goals_model#set ~row:row#iter ~column:status_column !image_yes;
-    end
+    goals_model#set ~row:row#iter ~column:status_column !image_yes
   else
-    begin
-      goals_model#set ~row:row#iter ~column:status_column !image_unknown;
-    end
+    goals_model#set ~row:row#iter ~column:status_column !image_unknown
 
 let set_proof_state ~obsolete a =
   let row = a.M.proof_key in
@@ -392,7 +387,14 @@ let row_expanded b iter _path =
     | M.Theory t -> 
 	eprintf "theory_expanded <- %b@." b;
 	M.set_theory_expanded t b
-    | _ -> ()
+    | M.Goal g ->
+	eprintf "goal_expanded <- %b@." b;
+	M.set_goal_expanded g b
+    | M.Transformation tr ->
+	eprintf "transf_expanded <- %b@." b;
+	M.set_transf_expanded tr b
+    | M.Proof_attempt _ -> ()
+
 
 let (_:GtkSignal.id) = 
   goals_view#connect#row_collapsed ~callback:(row_expanded false)
@@ -403,16 +405,22 @@ let (_:GtkSignal.id) =
 let notify any =
   let row,exp =
     match any with
-      | M.Goal g -> (M.goal_key g),false (* g.M.file_expanded *)
+      | M.Goal g -> 
+          if M.goal_expanded g then
+            begin
+              let n = 
+                Hashtbl.fold (fun _ _ acc -> acc+1) (M.external_proofs g) 0
+              in
+              eprintf "expand_row on a goal with %d proofs@." n;
+            end;
+          (M.goal_key g),(M.goal_expanded g)
       | M.Theory t -> (M.theory_key t),(M.theory_expanded t)
       | M.File f -> f.M.file_key,f.M.file_expanded
       | M.Proof_attempt a -> a.M.proof_key,false
-      | M.Transformation tr -> tr.M.transf_key,false
+      | M.Transformation tr -> tr.M.transf_key,tr.M.transf_expanded
   in
-  if exp then 
-    (eprintf "exp@."; goals_view#expand_row row#path)
-  else
-    ((*eprintf "col@.";*) goals_view#collapse_row row#path);
+  if exp then goals_view#expand_to_path row#path else 
+    goals_view#collapse_row row#path;
   match any with
     | M.Goal g ->
 	set_row_status row (M.goal_proved g)
@@ -439,7 +447,7 @@ let init =
       begin
         Hashtbl.replace model_index ind any;
       end;
-    goals_view#expand_row row#path;
+    (* useless since it has no child: goals_view#expand_row row#path; *)
     goals_model#set ~row:row#iter ~column:icon_column
       (match any with
 	 | M.Goal _ -> !image_file
@@ -1130,12 +1138,15 @@ let save_file () =
   let f = !current_file in
   if f <> "" then
     begin
+      M.save_session ();
       let s = source_view#source_buffer#get_text () in
       let c = open_out f in
       output_string c s;
       close_out c;
       reload ()
     end
+  else
+    info_window `ERROR "No file currently edited"
 
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~key:GdkKeysyms._S

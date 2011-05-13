@@ -440,13 +440,74 @@ install_no_local::
 install_local: bin/why3config
 
 ###############
+# GUI
+###############
+
+ifeq (@enable_ide@,yes)
+
+GUI_FILES = xml session gconfig db gmain
+
+GUIMODULES = $(addprefix src/ide/, $(GUI_FILES))
+
+GUIML  = $(addsuffix .ml,  $(GUIMODULES))
+GUIMLI = $(addsuffix .mli, $(GUIMODULES))
+GUICMO = $(addsuffix .cmo, $(GUIMODULES))
+GUICMX = $(addsuffix .cmx, $(GUIMODULES))
+
+$(GUICMO) $(GUICMX): INCLUDES += -I src/ide -I @SQLITE3LIB@
+
+# build targets
+
+byte: bin/why3gui.byte
+opt:  bin/why3gui.opt
+
+bin/why3gui.opt bin/why3gui.byte: INCLUDES += -I @LABLGTK2LIB@ -I @SQLITE3LIB@
+bin/why3gui.opt bin/why3gui.byte: EXTOBJS +=
+bin/why3gui.opt bin/why3gui.byte: EXTLIBS += lablgtk lablgtksourceview2 sqlite3
+
+bin/why3gui.opt: src/why.cmxa $(PGMCMX) $(GUICMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	$(STRIP) $@
+
+bin/why3gui.byte: src/why.cma $(PGMCMO) $(GUICMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+bin/why3gui: bin/why3gui.@OCAMLBEST@
+	ln -sf why3gui.@OCAMLBEST@ $@
+
+# depend and clean targets
+
+include .depend.gui
+
+.depend.gui: src/ide/xml.ml
+	$(OCAMLDEP) -slash -I src -I src/ide $(GUIML) $(GUIMLI) > $@
+
+depend: .depend.gui
+
+clean::
+	rm -f src/ide/*.cm[iox] src/ide/*.o
+	rm -f src/ide/*.annot src/ide/*~
+	rm -f bin/why3gui.byte bin/why3gui.opt bin/why3gui
+	rm -f .depend.gui
+
+install_no_local::
+	cp -f bin/why3gui.@OCAMLBEST@ $(BINDIR)/why3gui
+
+install_local: bin/why3gui
+
+endif
+
+
+###############
 # IDE
 ###############
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = xml session gconfig db gmain
-# IDE_FILES = xml session gconfig newmain
+# IDE_FILES = xml session gconfig db gmain
+IDE_FILES = xml session gconfig newmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
@@ -455,16 +516,16 @@ IDEMLI = $(addsuffix .mli, $(IDEMODULES))
 IDECMO = $(addsuffix .cmo, $(IDEMODULES))
 IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
-$(IDECMO) $(IDECMX): INCLUDES += -I src/ide -I @SQLITE3LIB@
+$(IDECMO) $(IDECMX): INCLUDES += -I src/ide
 
 # build targets
 
 byte: bin/why3ide.byte
 opt:  bin/why3ide.opt
 
-bin/why3ide.opt bin/why3ide.byte: INCLUDES += -I @LABLGTK2LIB@ -I @SQLITE3LIB@
+bin/why3ide.opt bin/why3ide.byte: INCLUDES += -I @LABLGTK2LIB@
 bin/why3ide.opt bin/why3ide.byte: EXTOBJS +=
-bin/why3ide.opt bin/why3ide.byte: EXTLIBS += lablgtk lablgtksourceview2 sqlite3
+bin/why3ide.opt bin/why3ide.byte: EXTLIBS += lablgtk lablgtksourceview2 
 
 bin/why3ide.opt: src/why.cmxa $(PGMCMX) $(IDECMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \

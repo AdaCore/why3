@@ -153,6 +153,7 @@ and transf =
       mutable transf_proved : bool;
       transf_key : O.key;
       mutable subgoals : goal list;
+      mutable transf_expanded : bool;
     }
 
 and theory =
@@ -185,7 +186,6 @@ let theory_key t = t.theory_key
 let verified t = t.verified
 let goals t = t.goals
 let theory_expanded t = t.theory_expanded
-let set_theory_expanded t b = t.theory_expanded <- b
 
 
 let get_theory t =
@@ -203,6 +203,8 @@ let goal_expl g =
 let goal_key g = g.goal_key
 let goal_proved g = g.proved
 let transformations g = g.transformations
+let external_proofs g = g.external_proofs
+let goal_expanded g = g.goal_expanded
 
 let get_task g =
   match g.task with
@@ -217,7 +219,26 @@ let get_task g =
 	end
     | Some t -> t
 
-let set_file_expanded f b = f.file_expanded <- b
+
+let rec set_goal_expanded g b = 
+  g.goal_expanded <- b;
+  if not b then
+    Hashtbl.iter (fun _ tr -> set_transf_expanded tr b) g.transformations
+
+and set_transf_expanded tr b = 
+  tr.transf_expanded <- b;
+  if not b then
+    List.iter (fun g -> set_goal_expanded g b) tr.subgoals
+
+let set_theory_expanded t b = 
+  t.theory_expanded <- b;
+  if not b then
+    List.iter (fun th -> set_goal_expanded th b) t.goals
+
+let set_file_expanded f b =
+  f.file_expanded <- b;
+  if not b then
+    List.iter (fun th -> set_theory_expanded th b) f.theories
 
 let all_files : file list ref = ref []
 
@@ -248,9 +269,8 @@ let save_status fmt s =
     | Done r -> save_result fmt r
 
 let save_proof_attempt fmt _key a =
-  fprintf fmt "@\n@[<v 1><proof prover=\"%s\" edited=\"%s\">"
-    a.prover.prover_id
-    a.edited_as;
+  fprintf fmt "@\n@[<v 1><proof prover=\"%s\" edited=\"%s\" obsolete=\"%b\">"
+    a.prover.prover_id a.edited_as a.proof_obsolete;
   save_status fmt a.proof_state;
   fprintf fmt "@]@\n</proof>"
 
@@ -259,15 +279,15 @@ let opt lab fmt = function
   | Some s -> fprintf fmt "%s=\"%s\" " lab s
 
 let rec save_goal fmt g =
-  fprintf fmt "@\n@[<v 1><goal name=\"%s\" %asum=\"%s\" proved=\"%b\">"
-    g.goal_name (opt "expl") g.goal_expl g.checksum g.proved;
+  fprintf fmt "@\n@[<v 1><goal name=\"%s\" %asum=\"%s\" proved=\"%b\" expanded=\"%b\">"
+    g.goal_name (opt "expl") g.goal_expl g.checksum g.proved  g.goal_expanded;
   Hashtbl.iter (save_proof_attempt fmt) g.external_proofs;
   Hashtbl.iter (save_trans fmt) g.transformations;
   fprintf fmt "@]@\n</goal>"
 
 and save_trans fmt _ t =
-  fprintf fmt "@\n@[<v 1><transf name=\"%s\" proved=\"%b\">"
-    t.transf.transformation_name t.transf_proved;
+  fprintf fmt "@\n@[<v 1><transf name=\"%s\" proved=\"%b\" expanded=\"%b\">"
+    t.transf.transformation_name t.transf_proved t.transf_expanded;
   List.iter (save_goal fmt) t.subgoals;
   fprintf fmt "@]@\n</transf>"
 
@@ -303,25 +323,14 @@ let notify_fun = ref (fun (_:any) -> ())
 
 let check_file_verified f =
   let b = List.for_all (fun t -> t.verified) f.theories in
-  if f.file_verified <> b then
-    begin
-      f.file_verified <- b;
-      !notify_fun (File f)
-    end
-  else
-    !notify_fun (File f)
+  f.file_verified <- b;
+  !notify_fun (File f)
 
 let check_theory_proved t =
   let b = List.for_all (fun g -> g.proved) t.goals in
-  if t.verified <> b then
-    begin
-      t.verified <- b;
-      !notify_fun (Theory t);
-      check_file_verified t.theory_parent
-    end
-  else
-    !notify_fun (Theory t)
-    
+  t.verified <- b;
+  !notify_fun (Theory t);
+  check_file_verified t.theory_parent
 
 let rec check_goal_proved g =
   let b1 = Hashtbl.fold
@@ -333,34 +342,23 @@ let rec check_goal_proved g =
   let b = Hashtbl.fold
     (fun _ t acc -> acc || t.transf_proved) g.transformations b1
   in
-  if g.proved <> b then
-    begin
-      g.proved <- b;
-      !notify_fun (Goal g);
-      match g.parent with
-        | Parent_theory t -> check_theory_proved t
-        | Parent_transf t -> check_transf_proved t
-    end
-  else
-    !notify_fun (Goal g);
+  g.proved <- b;
+  !notify_fun (Goal g);
+  match g.parent with
+    | Parent_theory t -> check_theory_proved t
+    | Parent_transf t -> check_transf_proved t
 
 and check_transf_proved t =
   let b = List.for_all (fun g -> g.proved) t.subgoals in
-  if t.transf_proved <> b then
-    begin
-      t.transf_proved <- b;
-      !notify_fun (Transformation t);
-      check_goal_proved t.parent_goal
-    end
+  t.transf_proved <- b;
+  !notify_fun (Transformation t);
+  check_goal_proved t.parent_goal
 
 let set_proof_state ~obsolete a res =
   a.proof_state <- res;
   a.proof_obsolete <- obsolete;
   !notify_fun (Proof_attempt a);
-  match res with
-    | Done _ ->
-	check_goal_proved a.proof_goal
-    | _ -> ()
+  check_goal_proved a.proof_goal
 
 (*************************)
 (*         Scheduler     *)
@@ -587,7 +585,7 @@ let task_checksum t =
 (* raw additions to the model *)
 (******************************)
 
-let raw_add_external_proof ~obsolete ~edit g p result =
+let raw_add_external_proof ~obsolete ~edit (g:goal) p result =
   let key = O.create ~parent:g.goal_key () in
   let a = { prover = p;
             proof_goal = g;
@@ -607,7 +605,7 @@ let raw_add_external_proof ~obsolete ~edit g p result =
 (* [raw_add_goal parent name expl sum t] adds a goal to the given parent
    DOES NOT record the new goal in its parent, thus this should not be exported
 *)
-let raw_add_goal parent name expl sum topt =
+let raw_add_goal parent name expl sum topt exp =
   let parent_key = match parent with
     | Parent_theory mth -> mth.theory_key
     | Parent_transf mtr -> mtr.transf_key
@@ -626,19 +624,19 @@ let raw_add_goal parent name expl sum topt =
                external_proofs = Hashtbl.create 7;
                transformations = Hashtbl.create 3;
                proved = false;
-	       goal_expanded = false;
+	       goal_expanded = exp;
              }
   in
   let any = Goal goal in
   !init_fun key any;
-  !notify_fun any;
+  !notify_fun any; (*useless ? *)
   goal
 
 
 (* [raw_add_transformation g name adds a transformation to the given goal g
    Adds no subgoals, thus this should not be exported
 *)
-let raw_add_transformation g trans =
+let raw_add_transformation g trans exp =
   let parent = g.goal_key in
   let key = O.create ~parent () in
   let tr = { transf = trans;
@@ -646,6 +644,7 @@ let raw_add_transformation g trans =
              transf_proved = false;
              transf_key = key;
              subgoals = [];
+             transf_expanded = exp;
            }
   in
   Hashtbl.add g.transformations trans.transformation_name tr;
@@ -682,7 +681,7 @@ let add_theory mfile name th =
          let id = (Task.task_goal t).Decl.pr_name in
          let name = id.Ident.id_string in
          let expl = get_explanation id (Task.task_goal_fmla t) in
-         let goal = raw_add_goal (Parent_theory mth) name expl "" (Some t) in
+         let goal = raw_add_goal (Parent_theory mth) name expl "" (Some t) true in
          goal :: acc)
       []
       tasks
@@ -760,10 +759,10 @@ let reload_proof ~provers obsolete goal pid old_a =
     let old_res = old_a.proof_state in
     let obsolete = obsolete or old_a.proof_obsolete in
     (* eprintf "proof_obsolete : %b@." obsolete; *)
-    let _a =
-      raw_add_external_proof ~obsolete ~edit:old_a.edited_as goal p old_res 
+    let a =
+      raw_add_external_proof ~obsolete ~edit:old_a.edited_as goal p old_res
     in
-    ((* something TODO ?*))
+    !notify_fun (Goal a.proof_goal)
   with Not_found ->
     eprintf
       "Warning: prover %s appears in database but is not installed.@."
@@ -771,7 +770,8 @@ let reload_proof ~provers obsolete goal pid old_a =
 
 let rec reload_any_goal ~provers parent gid gname sum t old_goal goal_obsolete =
   let info = get_explanation gid (Task.task_goal_fmla t) in
-  let goal = raw_add_goal parent gname info sum (Some t) in
+  let exp = match old_goal with None -> true | Some g -> g.goal_expanded in
+  let goal = raw_add_goal parent gname info sum (Some t) exp in
   goal.task <- Some t;
   begin
     match old_goal with
@@ -780,6 +780,7 @@ let rec reload_any_goal ~provers parent gid gname sum t old_goal goal_obsolete =
           Hashtbl.iter (reload_proof ~provers goal_obsolete goal) g.external_proofs;
           Hashtbl.iter (reload_trans ~provers goal_obsolete goal) g.transformations
   end;
+  check_goal_proved goal;
   goal
 
 
@@ -910,6 +911,7 @@ let reload_theory ~provers mfile old_theories (_,tname,th) =
     (fun goalsmap g -> Util.Mstr.add g.goal_name g goalsmap)
     Util.Mstr.empty old_goals
   in
+  !notify_fun (Theory mth);
   let new_goals = List.fold_left
     (fun acc t ->
        let g = reload_root_goal ~provers mth tname goalsmap t in
@@ -929,6 +931,7 @@ let reload_file ~provers mf theories =
     Util.Mstr.empty
     mf.theories
   in
+  !notify_fun (File new_mf);
   let mths = List.fold_left
     (fun acc th -> reload_theory ~provers new_mf old_theories th :: acc)
     [] theories
@@ -941,9 +944,9 @@ let reload_file ~provers mf theories =
 let reload_all provers =
   let files = !all_files in
   let all_theories =
-    List.map (fun mf -> 
+    List.map (fun mf ->
 		eprintf "[Reload] file '%s'@." mf.file_name;
-		(mf,read_file mf.file_name)) 
+		(mf,read_file mf.file_name))
       files
   in
   all_files := [];
@@ -1009,7 +1012,8 @@ let rec load_goal ~env ~provers parent acc g =
 	  try List.assoc "sum" g.Xml.attributes
 	  with Not_found -> ""
 	in
-	let mg = raw_add_goal parent gname expl sum None in
+	let exp = bool_attribute "expanded" g true in
+	let mg = raw_add_goal parent gname expl sum None exp in
 	List.iter (load_proof_or_transf ~env ~provers mg) g.Xml.elements;
 	mg::acc
     | s ->
@@ -1038,9 +1042,8 @@ and load_proof_or_transf ~env ~provers mg a =
 	  try List.assoc "edited" a.Xml.attributes
 	  with Not_found -> assert false
 	in
-	let _pa = raw_add_external_proof ~obsolete:false
-	  ~edit mg p res
-	in
+        let obsolete = bool_attribute "obsolete" a true in
+	let _pa = raw_add_external_proof ~obsolete ~edit mg p res in
 	(* already done by raw_add_external_proof
 	   Hashtbl.add mg.external_proofs prover pa *)
 	()
@@ -1058,7 +1061,8 @@ and load_proof_or_transf ~env ~provers mg a =
 	  try List.assoc "proved" a.Xml.attributes
 	  with Not_found -> assert false
 	in
-	let mtr = raw_add_transformation mg tr in
+	let exp = bool_attribute "expanded" a true in
+	let mtr = raw_add_transformation mg tr exp in
 	mtr.subgoals <-
 	  List.rev
 	  (List.fold_left
@@ -1120,7 +1124,7 @@ let db_filename = "why3session.xml"
 let open_session ~env ~provers ~init ~notify dir =
   match !current_env with
     | None ->
-	init_fun := init; notify_fun := notify; 
+	init_fun := init; notify_fun := notify;
 	project_dir := dir; current_env := Some env;
 	begin try
 	  let xml = Xml.from_file (Filename.concat dir db_filename) in
@@ -1302,7 +1306,7 @@ let transformation_on_goal g tr =
 	  | _ -> true
       in
       if b then
-	let tr = raw_add_transformation g tr in
+	let tr = raw_add_transformation g tr true in
 	let goal_name = g.goal_name in
 	let fold =
 	  fun (acc,count) subtask ->
@@ -1315,7 +1319,7 @@ let transformation_on_goal g tr =
 	    in
 	    let goal =
 	      raw_add_goal (Parent_transf tr)
-		subgoal_name expl "" (Some subtask)
+		subgoal_name expl "" (Some subtask) true
 	    in
 	    (goal :: acc, count+1)
 	in
