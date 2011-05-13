@@ -17,10 +17,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Proof sessions *)
 
 open Why
 
-(** {Prover's data} *)
+(** {2 Prover's data} *)
+
 type prover_data = private
     { prover_id : string;
       prover_name : string;
@@ -32,13 +34,14 @@ type prover_data = private
     }
     (** record of necessary data for a given external prover *)
 
-val get_prover_data : 
+val get_prover_data :
   Env.env -> Util.Mstr.key -> Whyconf.config_prover ->
   prover_data Util.Mstr.t -> prover_data Util.Mstr.t
   (** loads all provers from the current configuration *)
 
-(** {Transformation's data} *)
-type transformation_data 
+(** {2 Transformation's data} *)
+
+type transformation_data
   (** record data for transformations *)
 
 val transformation_id : transformation_data -> string
@@ -47,7 +50,8 @@ val transformation_id : transformation_data -> string
 val lookup_transformation : Env.env -> string -> transformation_data
   (** returns a transformation from its Why3 name *)
 
-(** {Proof attempts} *)
+(** {2 Proof attempts} *)
+
 type proof_attempt_status = private
     | Undone
     | Scheduled (** external proof attempt is scheduled *)
@@ -55,7 +59,8 @@ type proof_attempt_status = private
     | Done of Call_provers.prover_result (** external proof done *)
     | InternalFailure of exn (** external proof aborted by internal error *)
 
-(** {Observers signature} *)
+(** {2 Observers signature} *)
+
 module type OBSERVER = sig
 
   type key
@@ -84,10 +89,11 @@ module type OBSERVER = sig
 
 end
 
-(** {Main functor} *)
+(** {2 Main functor} *)
+
 module Make(O: OBSERVER) : sig
 
-(** {static state of a session} *)
+(** {2 static state of a session} *)
 
   type goal
     (** a goal *)
@@ -125,7 +131,7 @@ module Make(O: OBSERVER) : sig
 
   val external_proofs : goal -> (string, proof_attempt) Hashtbl.t
 
-  type theory 
+  type theory
     (** a theory, holding a collection of goals *)
 
   val theory_name : theory -> string
@@ -154,19 +160,15 @@ module Make(O: OBSERVER) : sig
     | Transformation of transf
 
 
-  (*****************************)
-  (*                           *)
-  (*      save/load state      *)
-  (*                           *)
-  (*****************************)
+(** {2 Save and load a state}      *)
 
-  val open_session : 
+  val open_session :
     env:Env.env ->
     provers:prover_data Util.Mstr.t ->
     init:(O.key -> any -> unit) ->
-    notify:(any -> unit) -> 
+    notify:(any -> unit) ->
     string -> unit
-    (** starts a new proof session, using directory given as argument 
+    (** starts a new proof session, using directory given as argument
         this reloads the previous session database if any.
 
         Opening a session must be done prior to any other actions.
@@ -183,64 +185,55 @@ module Make(O: OBSERVER) : sig
   val maximum_running_proofs : int ref
 
   val save_session : unit -> unit
-    (** enforces to save the session state on disk. 
-	this it supposed to be called only at exit, 
-	since the session manager also performs automatic saving 
+    (** enforces to save the session state on disk.
+	this it supposed to be called only at exit,
+	since the session manager also performs automatic saving
 	some time to time *)
 
   val file_exists : string -> bool
 
   val add_file : string -> unit
-    (** [add_file adds the file [f] in the proof session,
+    (** [add_file f] adds the file [f] in the proof session,
 	the file name must be given relatively to the session dir
 	given to [open_session] *)
 
 
   val get_all_files : unit -> file list
 
-  (* TODO
-    val reload_files : unit -> unit 
-  (** reloads all the files in the state, and performs the proper
-    merging of old proof attemps and transformations *)
-*)
+(** {2 Actions} *)
 
-(*****************************)
-(*                           *)
-(*      actions              *)
-(*                           *)
-(*****************************)
 
   val apply_transformation : callback:(Task.task list -> unit) ->
     transformation_data -> Task.task -> unit
 
-  val run_prover : context_unproved_goals_only:bool -> 
+  val run_prover : context_unproved_goals_only:bool ->
     prover_data -> any -> unit
     (** [run_prover p a] runs prover [p] on all goals under [a] *)
 
-  val transform : context_unproved_goals_only:bool -> 
+  val transform : context_unproved_goals_only:bool ->
     transformation_data -> any -> unit
-    (** [apply_transformation tr a] applies transformation [trp] 
+    (** [apply_transformation tr a] applies transformation [trp]
 	on all goals under [a] *)
 
-  val edit_proof : 
+  val edit_proof :
     default_editor:string -> project_dir:string -> proof_attempt -> unit
+    (** edit the given proof attempt using the appropriate editor *)
 
-  val replay : 
-    obsolete_only:bool -> 
+  val replay :
+    obsolete_only:bool ->
     context_unproved_goals_only:bool -> any -> unit
-    (** [replay a] reruns proofs under [a] 
+    (** [replay a] reruns proofs under [a]
         if obsolete_only is set then does not rerun non-obsolete proofs
-        if context_unproved_goals_only is set then reruns only proofs with result was 'valid'
+        if context_unproved_goals_only is set then reruns only proofs 
+        with result was 'valid'
     *)
 
   val reload_all: prover_data Util.Mstr.t -> unit
-    (** reloads all the files 
+    (** reloads all the files
         If for one of the file, the parsing or typing fails, then
         the complete old session state is kept, and an exception
 	is raised
     *)
-(*
-TODO
 
   val remove_proof_attempt : proof_attempt -> unit
 
@@ -250,7 +243,6 @@ TODO
     (** [clean a] removes failed attempts below [a] where
         there at least one successful attempt or transformation *)
 
-    *) 
 end
 
 

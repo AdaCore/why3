@@ -1441,52 +1441,17 @@ let edit_proof ~default_editor ~project_dir a =
 (* removing  *)
 (*************)
 
-(*
-
 let remove_proof_attempt a =
-  Db.remove_proof_attempt a.proof_db;
-  let (_:bool) = goals_model#remove a.proof_row in
+  O.remove a.proof_key;
   let g = a.proof_goal in
   Hashtbl.remove g.external_proofs a.prover.prover_id;
-  Helpers.check_goal_proved g
+  check_goal_proved g
 
-let remove_transf t =
-  (* TODO: remove subgoals first !!! *)
-  Db.remove_transformation t.transf_db;
-  let (_:bool) = goals_model#remove t.transf_row in
+let remove_transformation t = 
+  O.remove t.transf_key;
   let g = t.parent_goal in
-  Hashtbl.remove g.transformations "split" (* hack !! *);
-  Helpers.check_goal_proved g
-
-
-let confirm_remove_row r =
-  let row = goals_model#get_iter r in
-  match goals_model#get ~row ~column:index_column with
-    | Row_goal _g ->
-	info_window `ERROR "Cannot remove a goal"
-    | Row_theory _th ->
-	info_window `ERROR "Cannot remove a theory"
-    | Row_file _file ->
-	info_window `ERROR "Cannot remove a file"
-    | Row_proof_attempt a ->
-	info_window
-	  ~callback:(fun () -> remove_proof_attempt a)
-	  `QUESTION
-	  "Do you really want to remove the selected proof attempt?"
-    | Row_transformation tr ->
-	info_window
-	  ~callback:(fun () -> remove_transf tr)
-	  `QUESTION
-	  "Do you really want to remove the selected transformation
-and all its subgoals?"
-
-let confirm_remove_selection () =
-  match goals_view#selection#get_selected_rows with
-    | [] -> ()
-    | [r] -> confirm_remove_row r
-    | _ ->
-        info_window `INFO "Please select exactly one item to remove"
-
+  Hashtbl.remove g.transformations t.transf.transformation_name;
+  check_goal_proved g
 
 let rec clean_goal g =
   if g.proved then
@@ -1499,7 +1464,7 @@ let rec clean_goal g =
       Hashtbl.iter
         (fun _ t ->
            if not t.transf_proved then
-             remove_transf t)
+             remove_transformation t)
         g.transformations
     end
   else
@@ -1508,24 +1473,19 @@ let rec clean_goal g =
       g.transformations
 
 
-let clean_row r =
-  let row = goals_model#get_iter r in
-  match goals_model#get ~row ~column:index_column with
-    | Row_goal g -> clean_goal g
-    | Row_theory th ->
-        List.iter clean_goal th.goals
-    | Row_file file ->
+let clean a =
+  match a with
+    | Goal g -> clean_goal g
+    | Theory th -> List.iter clean_goal th.goals
+    | File file ->
         List.iter
           (fun th ->
              List.iter clean_goal th.goals)
           file.theories
-    | Row_proof_attempt a ->
+    | Proof_attempt a ->
         clean_goal a.proof_goal
-    | Row_transformation tr ->
+    | Transformation tr ->
         List.iter clean_goal tr.subgoals
-
-
-*)
 
 end
 

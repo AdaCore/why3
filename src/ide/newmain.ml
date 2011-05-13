@@ -1250,25 +1250,22 @@ let () =
 (* removing  *)
 (*************)
 
-(*
-
 let confirm_remove_row r =
-  let row = goals_model#get_iter r in
-  match goals_model#get ~row ~column:M.index_column with
-    | M.Row_goal _g ->
+  match get_any r with
+    | M.Goal _g ->
 	info_window `ERROR "Cannot remove a goal"
-    | M.Row_theory _th ->
+    | M.Theory _th ->
 	info_window `ERROR "Cannot remove a theory"
-    | M.Row_file _file ->
+    | M.File _file ->
 	info_window `ERROR "Cannot remove a file"
-    | M.Row_proof_attempt a ->
+    | M.Proof_attempt a ->
 	info_window
-	  ~callback:(fun () -> remove_proof_attempt a)
+	  ~callback:(fun () -> M.remove_proof_attempt a)
 	  `QUESTION
 	  "Do you really want to remove the selected proof attempt?"
-    | M.Row_transformation tr ->
+    | M.Transformation tr ->
 	info_window
-	  ~callback:(fun () -> remove_transf tr)
+	  ~callback:(fun () -> M.remove_transformation tr)
 	  `QUESTION
 	  "Do you really want to remove the selected transformation
 and all its subgoals?"
@@ -1280,6 +1277,7 @@ let confirm_remove_selection () =
     | _ ->
         info_window `INFO "Please select exactly one item to remove"
 
+
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"Remove" () in
   b#misc#set_tooltip_markup "Removes the selected\n<b>proof</b> or <b>transformation</b>";
@@ -1289,44 +1287,9 @@ let () =
     b#connect#pressed ~callback:confirm_remove_selection
   in ()
 
-let rec clean_goal g =
-  if g.M.proved then
-    begin
-      Hashtbl.iter
-        (fun _ a ->
-           if a.M.proof_obsolete || not (proof_successful a) then
-             remove_proof_attempt a)
-        g.M.external_proofs;
-      Hashtbl.iter
-        (fun _ t ->
-           if not t.M.transf_proved then
-             remove_transf t)
-        g.M.transformations
-    end
-  else
-    Hashtbl.iter
-      (fun _ t -> List.iter clean_goal t.M.subgoals)
-      g.M.transformations
-
-
-let clean_row r =
-  let row = goals_model#get_iter r in
-  match goals_model#get ~row ~column:M.index_column with
-    | M.Row_goal g -> clean_goal g
-    | M.Row_theory th ->
-        List.iter clean_goal th.M.goals
-    | M.Row_file file ->
-        List.iter
-          (fun th ->
-             List.iter clean_goal th.M.goals)
-          file.M.theories
-    | M.Row_proof_attempt a ->
-        clean_goal a.M.proof_goal
-    | M.Row_transformation tr ->
-        List.iter clean_goal tr.M.subgoals
-
 let clean_selection () =
-  List.iter clean_row goals_view#selection#get_selected_rows
+  List.iter (fun r -> M.clean (get_any r))
+    goals_view#selection#get_selected_rows
 
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"Clean" () in
@@ -1337,7 +1300,6 @@ let () =
     b#connect#pressed ~callback:clean_selection
   in ()
 
-*)
 
 (***************)
 (* Bind events *)
