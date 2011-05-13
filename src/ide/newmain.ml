@@ -646,6 +646,7 @@ let select_file () =
 let not_implemented () =
   info_window `INFO "This feature is not yet implemented, sorry."
 
+
 (*************)
 (* File menu *)
 (*************)
@@ -954,15 +955,6 @@ let vp =
 
 let right_hb = GPack.hbox ~packing:(right_vb#pack ~expand:false) ()
 
-let file_info = GMisc.label ~text:""
-  ~packing:(right_hb#pack ~fill:true) ()
-
-let current_file = ref ""
-
-let set_current_file f =
-  current_file := f;
-  file_info#set_text ("file: " ^ !current_file)
-
 (******************)
 (* goal text view *)
 (******************)
@@ -1011,6 +1003,8 @@ let source_view =
     ~packing:scrolled_source_view#add
     ()
 
+
+
 (*
   source_view#misc#modify_font_by_name font_name;
 *)
@@ -1020,6 +1014,16 @@ let () = source_view#set_highlight_current_line true
 let () = source_view#source_buffer#set_text (source_text fname)
 *)
 
+let current_file = ref ""
+
+let file_info = GMisc.label ~text:""
+  ~packing:(right_hb#pack ~fill:true) ()
+
+let set_current_file f =
+  current_file := f;
+  file_info#set_text ("file: " ^ !current_file)
+
+
 let move_to_line ~yalign (v : GSourceView2.source_view) line =
   let line = max 0 line in
   let line = min line v#buffer#line_count in
@@ -1028,22 +1032,26 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
   v#scroll_to_mark ~use_align:true ~yalign mark
 
 
-let orange_bg = source_view#buffer#create_tag
-  ~name:"orange_bg" [`BACKGROUND "orange"]
+let location_tag = source_view#buffer#create_tag
+  ~name:"location_tag" [`BACKGROUND "green"]
+
+let error_tag = source_view#buffer#create_tag
+  ~name:"error_tag" [`BACKGROUND "orange"]
 
 let erase_color_loc (v:GSourceView2.source_view) =
   let buf = v#buffer in
-  buf#remove_tag orange_bg ~start:buf#start_iter ~stop:buf#end_iter
+  buf#remove_tag location_tag ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag error_tag ~start:buf#start_iter ~stop:buf#end_iter
 
-let color_loc (v:GSourceView2.source_view) l b e =
+let color_loc (v:GSourceView2.source_view) ~color l b e =
   let buf = v#buffer in
   let top = buf#start_iter in
   let start = top#forward_lines (l-1) in
   let start = start#forward_chars b in
   let stop = start#forward_chars (e-b) in
-  buf#apply_tag ~start ~stop orange_bg
+  buf#apply_tag ~start ~stop color
 
-let scroll_to_loc ?(yalign=0.0) loc =
+let scroll_to_loc ?(yalign=0.0) ~color loc =
   let (f,l,b,e) = Loc.get loc in
   if f <> !current_file then
     begin
@@ -1052,32 +1060,32 @@ let scroll_to_loc ?(yalign=0.0) loc =
     end;
   move_to_line ~yalign source_view (l-1);
   erase_color_loc source_view;
-  color_loc source_view l b e
+  color_loc source_view ~color l b e
 
-let scroll_to_id id =
+let scroll_to_id ~color id =
   match id.Ident.id_loc with
-    | Some loc -> scroll_to_loc loc
+    | Some loc -> scroll_to_loc ~color loc
     | None ->
         source_view#source_buffer#set_text
           "Non-localized ident (no position available)\n";
         set_current_file ""
 
-let color_loc loc =
+let color_loc ~color loc =
   let f, l, b, e = Loc.get loc in
-  if f = !current_file then color_loc source_view l b e
+  if f = !current_file then color_loc ~color source_view l b e
 
 let rec color_f_locs () f =
-  Util.option_iter color_loc f.Term.f_loc;
+  Util.option_iter (color_loc ~color:location_tag) f.Term.f_loc;
   Term.f_fold color_t_locs color_f_locs () f
 
 and color_t_locs () t =
-  Util.option_iter color_loc t.Term.t_loc;
+  Util.option_iter (color_loc ~color:location_tag) t.Term.t_loc;
   Term.t_fold color_t_locs color_f_locs () t
 
 let scroll_to_source_goal g =
   let t = M.get_task g in
   let id = (Task.task_goal t).Decl.pr_name in
-  scroll_to_id id;
+  scroll_to_id ~color:location_tag id;
   match t with
     | Some
         { Task.task_decl =
@@ -1090,7 +1098,49 @@ let scroll_to_source_goal g =
 let scroll_to_theory th =
   let t = M.get_theory th in
   let id = t.Theory.th_name in
-  scroll_to_id id
+  scroll_to_id ~color:location_tag id
+
+
+let reload () =
+  try
+    erase_color_loc source_view;
+    current_file := "";
+    M.reload_all gconfig.provers
+  with
+    | e ->
+        let e = match e with
+          | Loc.Located(loc,e) -> 
+              scroll_to_loc ~color:error_tag ~yalign:0.5 loc; e
+          | e -> e
+        in
+	fprintf str_formatter
+	  "@[Error:@ %a@]" Exn_printer.exn_printer e;
+	let msg = flush_str_formatter () in
+        file_info#set_text msg
+(*
+	info_window `ERROR msg
+*)
+
+let (_ : GMenu.image_menu_item) =
+  file_factory#add_image_item ~key:GdkKeysyms._R
+    ~label:"_Reload" ~callback:reload
+    ()
+
+let save_file () =
+  let f = !current_file in
+  if f <> "" then
+    begin
+      let s = source_view#source_buffer#get_text () in
+      let c = open_out f in
+      output_string c s;
+      close_out c;
+      reload ()
+    end
+
+let (_ : GMenu.image_menu_item) =
+  file_factory#add_image_item ~key:GdkKeysyms._S
+    ~label:"_Save" ~callback:save_file
+    ()
 
 (* to be run when a row in the tree view is selected *)
 let select_row p =
@@ -1184,33 +1234,6 @@ let () =
     b#connect#pressed ~callback:replay_obsolete_proofs
   in ()
 
-let reload () =
-  try
-    current_file := "";
-    M.reload_all gconfig.provers
-  with
-    | Loc.Located(loc,Parsing.Parse_error) -> 
-	fprintf str_formatter
-	  "@[Syntax error:@ %a@]" Loc.gen_report_position loc;
-	let msg = flush_str_formatter () in
-	scroll_to_loc ~yalign:0.5 loc;
-	info_window `ERROR msg	
-    | e ->
-	fprintf str_formatter
-	  "@[Error while reading file:@ %a@]" Exn_printer.exn_printer e;
-	let msg = flush_str_formatter () in
-	info_window `ERROR msg
-
- 
-let () =
-  let b = GButton.button ~packing:tools_box#add ~label:"Reload" () in
-  b#misc#set_tooltip_markup "Reloads the files";
-
-  let i = GMisc.image ~pixbuf:(!image_reload) () in
-  let () = b#set_image i#coerce in
-  let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:reload
-  in ()
 
 (*************)
 (* removing  *)
