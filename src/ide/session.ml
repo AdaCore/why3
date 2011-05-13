@@ -873,7 +873,7 @@ and reload_trans ~provers _goal_obsolete goal _ tr =
       [] goals
     in
     mtr.subgoals <- goals;
-    check_goal_proved goal
+    check_transf_proved mtr
   in
   apply_transformation ~callback tr.transf (get_task goal)
 
