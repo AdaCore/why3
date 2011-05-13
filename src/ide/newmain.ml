@@ -1020,12 +1020,13 @@ let () = source_view#set_highlight_current_line true
 let () = source_view#source_buffer#set_text (source_text fname)
 *)
 
-let move_to_line (v : GSourceView2.source_view) line =
-  if line <= v#buffer#line_count && line <> 0 then begin
-    let it = v#buffer#get_iter (`LINE line) in
-    let mark = `MARK (v#buffer#create_mark it) in
-    v#scroll_to_mark ~use_align:true ~yalign:0.0 mark
-  end
+let move_to_line ~yalign (v : GSourceView2.source_view) line =
+  let line = max 0 line in
+  let line = min line v#buffer#line_count in
+  let it = v#buffer#get_iter (`LINE line) in
+  let mark = `MARK (v#buffer#create_mark it) in
+  v#scroll_to_mark ~use_align:true ~yalign mark
+
 
 let orange_bg = source_view#buffer#create_tag
   ~name:"orange_bg" [`BACKGROUND "orange"]
@@ -1042,14 +1043,14 @@ let color_loc (v:GSourceView2.source_view) l b e =
   let stop = start#forward_chars (e-b) in
   buf#apply_tag ~start ~stop orange_bg
 
-let scroll_to_loc loc =
+let scroll_to_loc ?(yalign=0.0) loc =
   let (f,l,b,e) = Loc.get loc in
   if f <> !current_file then
     begin
       source_view#source_buffer#set_text (source_text f);
       set_current_file f;
     end;
-  move_to_line source_view (l-1);
+  move_to_line ~yalign source_view (l-1);
   erase_color_loc source_view;
   color_loc source_view l b e
 
@@ -1185,14 +1186,14 @@ let () =
 
 let reload () =
   try
-    M.reload_all gconfig.provers;
-    current_file := ""
+    current_file := "";
+    M.reload_all gconfig.provers
   with
     | Loc.Located(loc,Parsing.Parse_error) -> 
 	fprintf str_formatter
 	  "@[Syntax error:@ %a@]" Loc.gen_report_position loc;
 	let msg = flush_str_formatter () in
-	scroll_to_loc loc;
+	scroll_to_loc ~yalign:0.5 loc;
 	info_window `ERROR msg	
     | e ->
 	fprintf str_formatter
