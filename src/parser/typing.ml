@@ -125,7 +125,7 @@ let unify_raise ~loc ty1 ty2 =
 
 type denv = {
   utyvars : (string, type_var) Hashtbl.t; (* user type variables *)
-  dvars : dty Mstr.t; (* local variables, to be bound later *)
+  dvars   : dty Mstr.t;    (* local variables, to be bound later *)
 }
 
 let create_denv () = {

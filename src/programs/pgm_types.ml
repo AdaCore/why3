@@ -46,14 +46,14 @@ let create_mtsymbol ~impure ~effect ~pure ~singleton =
   mt
 
 let is_mutable_ts ts = 
-  try (Hts.find mtypes ts).mt_regions > 0 with Not_found -> assert false
+  try (Hts.find mtypes ts).mt_regions > 0 with Not_found -> false
 
 let is_mutable_ty ty = match ty.ty_node with
   | Ty.Tyapp (ts, _) -> is_mutable_ts ts
   | Ty.Tyvar _ -> false
 
 let is_singleton_ts ts = 
-  try (Hts.find mtypes ts).mt_singleton with Not_found -> assert false
+  try (Hts.find mtypes ts).mt_singleton with Not_found -> false
 
 let is_singleton_ty ty = match ty.ty_node with
   | Ty.Tyapp (ts, _) -> is_singleton_ts ts
@@ -195,8 +195,8 @@ module rec T : sig
   (* operations on program types *)
     
   val apply_type_v_var : type_v -> pvsymbol -> type_c
-(*   val apply_type_v_sym : type_v -> psymbol  -> type_c *)
-(*   val apply_type_v_ref : type_v -> R.t      -> type_c *)
+
+  val subst_type_v : ty Mtv.t -> term Mvs.t -> type_v -> type_v
     
   val occur_type_v : R.t -> type_v -> bool
     
@@ -361,12 +361,13 @@ end = struct
       Mvs.add vs (t_var vs') s, vs'
 	
   let subst_post ts s ((v, q), ql) =
-    let vq = let s, v = subst_var ~pure:true ts s v in v, f_ty_subst ts s q in
+    let ts = Mtv.map purify ts in
+    let vq = let s, v = subst_var ts s v in v, f_ty_subst ts s q in
     let handler (e, (v, q)) = match v with
       | None -> 
 	  e, (v, f_ty_subst ts s q)
       | Some v -> 
-	  let s, v = subst_var ~pure:true ts s v in 
+	  let s, v = subst_var ts s v in 
 	  e, (Some v, f_ty_subst ts s q)
     in
     vq, List.map handler ql
@@ -374,7 +375,7 @@ end = struct
   let rec subst_type_c ts s c =
     { c_result_type = subst_type_v ts s c.c_result_type;
       c_effect      = E.subst ts c.c_effect;
-      c_pre         = f_ty_subst ts s c.c_pre;
+      c_pre         = (let ts = Mtv.map purify ts in f_ty_subst ts s c.c_pre);
       c_post        = subst_post ts s c.c_post; }
       
   and subst_type_v ts s = function

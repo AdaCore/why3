@@ -5,19 +5,19 @@ module Flag
   use import int.Int
   use import module stdlib.Ref
   use import module stdlib.Array
-  use import array.ArrayPermut
+  use import module stdlib.ArrayPermut
 
   type color = Blue | White | Red
 
-  logic monochrome (a:map color) (i:int) (j:int) (c:color) =
+  logic monochrome (a:array color) (i:int) (j:int) (c:color) =
     forall k:int. i<=k<j -> a[k]=c
 
   let swap (a:array color) (i:int) (j:int) =
     { 0 <= i < length a and 0 <= j < length a }
     let v = a[i] in
     begin
-      a[i <- a[j]];
-      a[j <- v]
+      set a i a[j];
+      set a j v
     end
     { exchange a (old a) i j }
 
@@ -33,7 +33,7 @@ module Flag
   	         monochrome a b i White and 
   	         monochrome a r n Red and
   		 length a = n and
-  	         permut a (at a Init) 0 (n-1) }
+  	         permut_sub a (at a Init) 0 (n-1) }
        variant { r - i }
        match a[!i] with
        | Blue ->
@@ -51,7 +51,7 @@ module Flag
         monochrome a 0 b Blue and 
         monochrome a b r White and 
         monochrome a r n Red)
-      and permut a (old a) 0 (n-1) }
+      and permut_sub a (old a) 0 (n-1) }
 
 end
 

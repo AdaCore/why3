@@ -13,7 +13,7 @@ module HoareLogic
 
   (* Example: Slow Subtraction *)
 
-  let slow_subtraction x z =
+  let slow_subtraction (x: ref int) (z: ref int) =
     { x >= 0 }
     label Init:
     while !x <> 0 do
@@ -25,14 +25,14 @@ module HoareLogic
 
   (* Example: Reduce to Zero *)
 
-  let reduce_to_zero x =
+  let reduce_to_zero (x: ref int) =
     { x >= 0 }
     while !x <> 0 do invariant { x >= 0 } variant { x } x := !x - 1 done
     { x = 0 }
 
   (* Exercise: Slow Addition *)
 
-  let slow_addition x z =
+  let slow_addition (x: ref int) (z: ref int) =
     { x >= 0 }
     label Init:
     while !x <> 0 do
@@ -50,7 +50,7 @@ module HoareLogic
 
   lemma even_not_odd : forall x:int. even x -> even (x+1) -> false
 
-  let parity x y =
+  let parity (x: ref int) (y: ref int) =
     { x >= 0 }
     y := 0;
     label Init:
@@ -65,7 +65,7 @@ module HoareLogic
 
   (* Example: Finding Square Roots *)
 
-  let sqrt x z =
+  let sqrt (x: ref int) (z: ref int) =
     { x >= 0 }
     z := 0;
     while (!z + 1) * (!z + 1) <= !x do
@@ -80,7 +80,7 @@ module HoareLogic
   axiom fact_0 : fact 0 = 1
   axiom fact_n : forall n:int. 0 < n -> fact n = n * fact (n-1)
 
-  let factorial x y z =
+  let factorial (x: ref int) (y: ref int) (z: ref int) =
     { x >= 0 }
     y := 1;
     z := !x;
@@ -109,7 +109,7 @@ module MoreHoareLogic
   parameter head : l:list 'a -> { l<>Nil } 'a { Some result = hd l }
   parameter tail : l:list 'a -> { l<>Nil } list 'a { Some result = tl l }
 
-  let list_sum l y =
+  let list_sum (l: ref (list int)) (y: ref int) =
     {}
     y := 0;
     label Init:
@@ -126,7 +126,7 @@ module MoreHoareLogic
   use import list.Append
 
   (* note: we avoid the use of an existential quantifier in the invariant *)
-  let list_member (x : ref (list 'a)) y z =
+  let list_member (x : ref (list 'a)) (y: 'a) (z: ref int) =
     {}
     z := 0;
     label Init:

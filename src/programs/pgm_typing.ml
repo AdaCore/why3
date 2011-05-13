@@ -106,13 +106,6 @@ let dcurrying tyl ty =
   let make_arrow_type ty1 ty2 = dty_app (ts_arrow, [ty1; ty2]) in
   List.fold_right make_arrow_type tyl ty
 
-let rec dpurify_type_v = function
-  | DTpure ty ->
-      ty
-  | DTarrow (bl, c) ->
-      dcurrying (List.map (fun (_,ty,_) -> ty) bl)
-	(dpurify_type_v c.dc_result_type)
-
 type region_policy = Region_var | Region_ret | Region_glob
 
 let rec create_regions n =
@@ -166,6 +159,15 @@ let rec specialize_ty ?(policy=Region_var) ~loc htv ty = match ty.ty_node with
       let tl = List.map (specialize_ty ~policy ~loc htv) (Util.chop n tl) in
       tyapp (ts, regions @ tl)
 
+let rec specialize_type_v ?(policy=Region_var) ~loc htv = function
+  | Tpure ty ->
+      specialize_ty ~policy ~loc htv ty
+  | Tarrow (bl, c) ->
+      dcurrying 
+	(List.map (fun pv -> specialize_type_v ~loc htv pv.pv_tv) bl)
+	(specialize_type_v ~policy:Region_ret ~loc htv c.c_result_type)
+
+(***
 let specialize_effect ~loc htv e =
   let region r acc = 
     let tv = find_type_var ~loc htv r.R.r_tv in
@@ -199,6 +201,7 @@ and specialize_binder ~loc htv v =
   in
   let v = specialize_type_v ~loc htv v.pv_tv in
   id, dpurify_type_v v, v
+***)
 
 (* let specialize_global loc x uc = *)
 (*   region_vars := Htv.create 17 :: !region_vars; *)
@@ -257,11 +260,13 @@ let check_mutable_type loc dty = match view_dty dty with
 	"this expression has type %a, but is expected to have a mutable type"
 	print_dty dty
 
+(***
 let check_mutable_dtype_v loc = function
   | DTpure dty -> check_mutable_type loc dty
   | DTarrow _ -> 
       errorm ~loc 
 	"this expression is a function, but is expected to have a mutable type"
+***)
 
 let dexception uc qid =
   let sl = Typing.string_list_of_qualid [] qid in
@@ -428,13 +433,13 @@ and dexpr_desc ~ghost env loc = function
       let ps = get_psymbol ls in
       begin match ps.ps_kind with
 	| PSvar v ->
-	    let tyv = 
-	      specialize_type_v ~loc ~policy:Region_glob (Htv.create 17) v.pv_tv
-	    in
-	    DEglobal (ps, tyv), dpurify_type_v tyv
+	    let htv = Htv.create 17 in
+	    let dty = specialize_type_v ~loc ~policy:Region_glob htv v.pv_tv in
+	    DEglobal (ps, v.pv_tv, htv), dty
 	| PSfun tv ->
-	    let tyv = specialize_type_v ~loc (Htv.create 17) tv in
-	    DEglobal (ps, tyv), dpurify_type_v tyv 
+	    let htv = Htv.create 17 in
+	    let dty = specialize_type_v ~loc htv tv in
+	    DEglobal (ps, tv, htv), dty
 	| PSlogic ->
 	    let tyl, ty = Denv.specialize_lsymbol ~loc ps.ps_impure in
 	    let ty = match ty with
@@ -516,7 +521,7 @@ and dexpr_desc ~ghost env loc = function
       let ty1 = e1.dexpr_type in
       let ty = create_type_var loc in (* the type of all branches *)
       let branch (p, e) =
-	let denv, p = Typing.dpat_list (effect_uc env.uc) env.denv ty1 p in
+	let denv, p = Typing.dpat_list (impure_uc env.uc) env.denv ty1 p in
 	let env = { env with denv = denv } in
 	let env = add_local_pat env p in
 	let e = dexpr ~ghost env e in
@@ -675,7 +680,7 @@ let dfmla env l = Typing.dfmla ~localize:true env l
 
 type ienv = { 
   i_uc      : uc;
-  i_denv : Typing.denv;
+  i_denv    : Typing.denv;
   i_impures : ivsymbol Mstr.t;
   i_effects : vsymbol Mstr.t;
   i_pures   : vsymbol Mstr.t;
@@ -840,6 +845,7 @@ let ivariant env (t, ps) =
     | _ ->
 	assert false
 
+(***
 let iregion r = match view_dty (tyvar r.dr_tv) with
   | Tyvar tv -> 
       R.create (tvsymbol_of_type_var tv) (Denv.ty_of_dty r.dr_ty)
@@ -870,6 +876,7 @@ and ibinder env (x, ty, tyv) =
   let ty = Denv.ty_of_dty ty in
   let env, v = iadd_local env (id_user x.id x.id_loc) ty in
   env, (v, tyv)
+***)
 
 let ifmla env l =
   let f = dfmla (pure_uc env.i_uc) env.i_denv l in
@@ -1060,6 +1067,13 @@ let rec print_iexpr fmt e = match e.iexpr_desc with
   | _ ->
       fprintf fmt "<other>"
 
+let mtv_of_htv htv =
+  Htv.fold 
+    (fun tv tvar m -> 
+       let ty = ty_of_dty (tyvar tvar) in
+       Mtv.add tv ty m)
+    htv Mtv.empty
+
 (* [iexpr] translates dexpr into iexpr
    [env : vsymbol Mstr.t] maps strings to vsymbols for local variables *)
 
@@ -1073,8 +1087,10 @@ and iexpr_desc gl env loc ty = function
       IElogic (t_const c)
   | DElocal (x, _tyv) ->
       IElocal (Mstr.find x env.i_impures)
-  | DEglobal (s, tyv) ->
-      IEglobal (s, itype_v env tyv)
+  | DEglobal (s, tv, htv) ->
+      let ts = mtv_of_htv htv in
+      let tv = subst_type_v ts Mvs.empty tv in
+      IEglobal (s, tv)
   | DElogic ls ->
       begin match ls.ls_args, ls.ls_value with
 	| [], Some _ ->
@@ -1344,13 +1360,14 @@ let rec pattern env p =
 and pattern_node env ty p = 
   let add1 env i = add_local env i (tpure i.i_impure.vs_ty) in
   match p with
-  | IPwild -> 
+  | IPwild ->
       env, (pat_wild ty, Pwild)
-  | IPapp (ls, pl) -> 
+  | IPapp (ls, pl) ->
+      let ls = (get_psymbol ls).ps_pure in (* impure -> pure *)
       let env, pl = map_fold_left pattern env pl in
       let lpl = List.map (fun p -> p.ppat_pat) pl in
       env, (pat_app ls lpl ty, Papp (ls, pl))
-  | IPor (p1, p2) -> 
+  | IPor (p1, p2) ->
       let env, p1 = pattern env p1 in
       let _  , p2 = pattern env p2 in
       env, (pat_or p1.ppat_pat p2.ppat_pat, Por (p1, p2))
@@ -1464,7 +1481,6 @@ and expr_desc gl env loc ty = function
       let vs = Mvs.find vs.i_impure env in
       Elocal vs, vs.pv_tv, E.empty
   | IEglobal (s, tv) ->
-      let tv = type_v env tv in
       Eglobal s, tv, E.empty
   | IEapply (e1, vs) ->
       let e1 = expr gl env e1 in

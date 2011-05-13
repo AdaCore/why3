@@ -1,10 +1,20 @@
+
+theory String
+
+  type char
+  clone export map.Map
+  type string = map int char
+
+  logic create int : string  
+  logic length string : int
+  logic sub string int int : string
+  logic app string string : string
+end
+
 module M
 
   use import int.Int
-
-  type char
-  clone array.ArrayRich as S
-  type string = S.t int char
+  use import String 
 
   type rope =
     | Str string int  (len: int)
@@ -12,24 +22,24 @@ module M
 
   logic inv (r: rope) = match r with
     | Str s ofs len -> 
-        len = 0 or 0 <= ofs < S.length s and ofs + len <= S.length s
+        len = 0 or 0 <= ofs < length s and ofs + len <= length s
     | App l r _ ->
         0 < len l and inv l and 0 < len r and inv r
   end
 
   logic model (r: rope) : string = match r with
-    | Str s ofs len -> S.sub s ofs len
-    | App l r _     -> S.app (model l) (model r)
+    | Str s ofs len -> sub s ofs len
+    | App l r _     -> app (model l) (model r)
   end
 
   logic eq (s1 s2: string) =
-    S.length s1 = S.length s2 and
-    forall i:int. 0 <= i < S.length s1 -> S.get s1 i = S.get s2 i
+    length s1 = length s2 and
+    forall i:int. 0 <= i < length s1 -> get s1 i = get s2 i
 
   let empty () = 
     {} 
-    Str (S.create_length 0) 0 0 
-    { len result = 0 and inv result and eq (model result) (S.create_length 0) }
+    Str (create 0) 0 0 
+    { len result = 0 and inv result and eq (model result) (create 0) }
   
   let length r = 
     {} 
@@ -40,12 +50,12 @@ module M
     { inv r and 0 <= i < len r }
     match r with
     | Str s ofs len -> 
-        S.get s (ofs + i)
+        get s (ofs + i)
     | App l r   _   -> 
         let n = length l in
         if i < n then get l i else get r (i - n)
     end
-    { result = S.get (model r) i }
+    { result = get (model r) i }
   
 end
 

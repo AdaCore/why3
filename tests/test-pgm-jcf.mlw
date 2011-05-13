@@ -1,23 +1,9 @@
 
-(**
 module Alg
 
   type t = A
 
-  let foo (x: t) = match x with A -> 0 end
-
-end
-**)
-
-module M
-
-  type pointer model int
-
-  logic null : pointer
-
-  parameter f : 'a -> 'a
-
-  let foo () = f null
+  let foo () = match A with A -> () end
 
 end
 
@@ -76,15 +62,6 @@ module TestArray
 
 end
 **)
-
-module Q 
-
-  use import list.List
-
-  type queue model {| mutable contents : list int |}
-
-end
-
 
 (*
 Local Variables: 

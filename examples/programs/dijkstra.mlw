@@ -3,18 +3,18 @@ module M
   use import int.Int
   use import module stdlib.Ref
   use set.Fset as S
-  use array.Array as M
+  use map.Map as M
 
 (* iteration on a set *)
 
 parameter set_has_next : 
-  s:ref (S.t 'a) -> 
+  s:ref (S.set 'a) -> 
     {} 
     bool reads s 
     { if result=True then S.is_empty s else not S.is_empty s }
 
 parameter set_next :
-  s:ref (S.t 'a) -> 
+  s:ref (S.set 'a) -> 
     { not S.is_empty s }
     'a writes s 
     { S.mem result (old s) and s = S.remove result (old s) }
@@ -23,9 +23,9 @@ parameter set_next :
 
 type vertex
 
-logic v : S.t vertex
+logic v : S.set vertex
 
-logic g_succ(vertex) : S.t vertex
+logic g_succ(vertex) : S.set vertex
 
 axiom G_succ_sound : 
   forall x:vertex. S.subset (g_succ x) v
@@ -40,18 +40,18 @@ parameter eq_vertex :
 
 (* visited vertices *)
 
-parameter visited : ref (S.t vertex)
+parameter visited : ref (S.set vertex)
 
 parameter visited_add : 
   x:vertex -> {} unit writes visited { visited = S.add x (old visited) }
 
 (* current distances *)
 
-parameter d : ref (M.t vertex int)
+parameter d : ref (M.map vertex int)
 
 (* priority queue *)
 
-parameter q : ref (S.t vertex)
+parameter q : ref (S.set vertex)
 
 parameter q_is_empty : 
   unit -> 
@@ -88,7 +88,7 @@ let relax u v =
     (not S.mem v visited and not S.mem v (old q) and q = S.add v (old q) and
         d = M.set (old d) v (M.get (old d) u + weight u v)) }	
 
-logic min (m:vertex) (q:S.t vertex) (d:M.t vertex int) =
+logic min (m:vertex) (q:S.set vertex) (d:M.map vertex int) =
   S.mem m q and 
   forall x:vertex. S.mem x q -> M.get d m <= M.get d x
 
@@ -134,7 +134,7 @@ lemma Main_lemma :
     shortest_path src v' d' and S.mem v (g_succ v') and d' + weight v' v < d
 
 lemma Completeness_lemma :
-  forall s:S.t vertex. forall src:vertex. forall dst:vertex. forall d:int. 
+  forall s:S.set vertex. forall src:vertex. forall dst:vertex. forall d:int. 
   (* if s is closed under g_succ *)
   (forall v:vertex. 
      S.mem v s -> forall w:vertex. S.mem w (g_succ v) -> S.mem w s) ->
@@ -145,10 +145,10 @@ lemma Completeness_lemma :
 
 (* definitions used in loop invariants *)
 
-logic inv_src (src:vertex) (s q:S.t vertex) =
+logic inv_src (src:vertex) (s q:S.set vertex) =
   S.mem src s or S.mem src q
 
-logic inv (src:vertex) (s q:S.t vertex) (d:M.t vertex int) =
+logic inv (src:vertex) (s q:S.set vertex) (d:M.map vertex int) =
   inv_src src s q
   (* S,Q are contained in V *)
   and S.subset s v and S.subset q v
@@ -167,13 +167,13 @@ logic inv (src:vertex) (s q:S.t vertex) (d:M.t vertex int) =
      forall x:vertex. forall dx:int. shortest_path src x dx -> 
        dx < M.get d m -> S.mem x s) 
 
-logic inv_succ (src:vertex) (s q : S.t vertex) =
+logic inv_succ (src:vertex) (s q : S.set vertex) =
   (* successors of vertices in S are either in S or in Q *)
   (forall x:vertex. S.mem x s -> 
      forall y:vertex. S.mem y (g_succ x) -> S.mem y s or S.mem y q)
 
-logic inv_succ2 (src:vertex) (s q : S.t vertex)
-                (u:vertex) (su:S.t vertex) =
+logic inv_succ2 (src:vertex) (s q : S.set vertex)
+                (u:vertex) (su:S.set vertex) =
   (* successors of vertices in S are either in S or in Q,
      unless they are successors of u still in su *)
   (forall x:vertex. S.mem x s -> 

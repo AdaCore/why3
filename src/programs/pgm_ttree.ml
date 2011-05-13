@@ -18,6 +18,8 @@
 (**************************************************************************)
 
 open Why
+open Denv
+open Ty
 open Pgm_types
 open Pgm_types.T
 
@@ -36,6 +38,7 @@ type for_direction = Ptree.for_direction
 (*****************************************************************************)
 (* phase 1: introduction of destructive types *)
 
+(***
 type dregion = { 
   dr_tv : Denv.type_var;
   dr_ty : Denv.dty;
@@ -47,7 +50,6 @@ type deffect = {
   de_raises : esymbol list;
 }
 
-(* specialized type_v *)
 type dtype_v =
   | DTpure  of Denv.dty
   | DTarrow of dbinder list * dtype_c
@@ -60,6 +62,7 @@ and dtype_c =
                      (Term.lsymbol * (Denv.dty option * Denv.dfmla)) list; }
 
 and dbinder = ident * Denv.dty * dtype_v
+***)
 
 (* user type_v *)
 
@@ -95,7 +98,6 @@ type dloop_annotation = {
 
 type dexpr = {
   dexpr_desc : dexpr_desc;
-(*   dexpr_denv : Typing.denv; *)
   dexpr_type : Denv.dty;
   dexpr_loc  : loc;
 }
@@ -103,7 +105,7 @@ type dexpr = {
 and dexpr_desc =
   | DEconstant of constant
   | DElocal of string * Denv.dty
-  | DEglobal of psymbol * dtype_v
+  | DEglobal of psymbol * type_v * type_var Htv.t
   | DElogic of Term.lsymbol
   | DEapply of dexpr * dexpr
   | DEfun of dubinder list * dtriple
@@ -159,7 +161,7 @@ type ieffect = {
 }
 
 type itype_v =
-  | ITpure  of Ty.ty
+  | ITpure  of ty
   | ITarrow of ibinder list * itype_c
 
 and itype_c =
@@ -188,14 +190,14 @@ and ipat_node =
 
 type iexpr = {
   iexpr_desc : iexpr_desc;
-  iexpr_type : Ty.ty;
+  iexpr_type : ty;
   iexpr_loc  : loc;
 }
 
 and iexpr_desc =
   | IElogic of Term.term (* pure *)
   | IElocal of ivsymbol
-  | IEglobal of psymbol * itype_v
+  | IEglobal of psymbol * type_v
   | IEapply of iexpr * ivsymbol
   | IEapply_var of iexpr * ivsymbol
   | IEapply_glob of iexpr * pvsymbol
@@ -247,7 +249,7 @@ and ppat_node =
 
 type expr = {
   expr_desc  : expr_desc;
-  expr_type  : Ty.ty;
+  expr_type  : ty;
   expr_type_v: type_v;
   expr_effect: E.t;
   expr_loc   : loc;

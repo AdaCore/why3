@@ -11,14 +11,10 @@ module M
 
   use import int.Int
   use import module stdlib.Ref
-  use array.ArrayLength as A
+  use import module stdlib.Array
   use import int.MinMax
   use import int.EuclideanDivision
   use import int.Power
-
-  type array = A.t int int
-
-  logic (#) (a : array) (i : int) : int = A.get a i
 
   logic sum_digits int : int
 
@@ -27,52 +23,46 @@ module M
 
   (* interp x i j is the integer X[j-1]...X[i] *)
 
-  logic interp array int int : int
+  logic interp (M.map int int) int int : int
 
   axiom Interp_1 :
-    forall x : array, i j : int.
+    forall x : M.map int int, i j : int.
     i >= j -> interp x i j = 0
 
   axiom Interp_2 :
-    forall x : array, i j : int.
-    i < j -> interp x i j = x#i + 10 * interp x (i+1) j
+    forall x : M.map int int, i j : int.
+    i < j -> interp x i j = M.get x i + 10 * interp x (i+1) j
 
   (* to allow provers to prove that an assignment does not change the
      interpretation on the left (or on the right); requires induction *)
   lemma Interp_eq:
-    forall x1 x2 : array, i j : int.
-    (forall k : int. i <= k < j -> x1#k = x2#k) -> interp x1 i j = interp x2 i j
+    forall x1 x2 : M.map int int, i j : int.
+    (forall k : int. i <= k < j -> M.get x1 k = M.get x2 k) -> 
+    interp x1 i j = interp x2 i j
 
   (* the sum of the elements of x[i..j[ *)
-  clone export sum.Sum with type container = array, logic f = A.get
-
-  (* logic sum_digits_a (x : array) (i j : int) : int = sum x i j *)
+  type map_int = M.map int int
+  clone export sum.Sum  with type container = map_int, logic f = M.get
 
   lemma Sum_is_sum_digits_interp:
-    forall x : array, i j : int.
+    forall x : M.map int int, i j : int.
     sum x i j = sum_digits (interp x i j)
 
   lemma Sum_digits_a_set_eq:
-    forall x : array, i j k v : int.
-    (k < i or k >= j) -> sum (A.set x k v) i j = sum x i j
+    forall x : array int, i j k v : int.
+    (k < i or k >= j) -> sum (M.set x.elts k v) i j = sum x.elts i j
 
   (* interp9 X i j is the j-digit integer obtained by replacing the i least
      significant digits in X by 9, i.e. X[j-1]...X[i]9...9 *)
 
-  logic interp9 (x : array) (i j : int) : int =
+  logic interp9 (x : M.map int int) (i j : int) : int =
     power 10 i * (interp x i j + 1) - 1
 
   lemma Interp9_step:
-    forall x : array, i j : int.
-    i < j -> interp9 (A.set x i 9) i j = interp9 x (i+1) j
+    forall x : M.map int int, i j : int.
+    i < j -> interp9 (M.set x i 9) i j = interp9 x (i+1) j
 
-let array_get (a : ref array) i =
-  { 0 <= i < A.length a } A.get !a i { result = A.get a i }
-
-let array_set (a : ref array) i v =
-  { 0 <= i < A.length a } a := A.set !a i v { a = A.set (old a) i v }
-
-parameter x : ref (array)
+  parameter x : array int
 
   (* the number of digits of X *)
   logic n : int
@@ -90,30 +80,30 @@ exception Success
    (and termination, implicitely proved since we only have for loops) *)
 
 let search_safety () =
-  { A.length x = m }
+  { length x = m }
   label Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
-    s := !s + array_get x i
+    s := !s + get x i
   done;
   for d = 0 to m - 1 do
-    invariant { A.length x = m }
-    for c = array_get x d + 1 to 9 do
-      invariant { A.length x = m }
-      let delta = y - !s - c + array_get x d in
+    invariant { length x = m }
+    for c = get x d + 1 to 9 do
+      invariant { length x = m }
+      let delta = y - !s - c + get x d in
       if 0 <= delta && delta <= 9 * d then begin
-        array_set x d c;
+        set x d c;
 	let k = div delta 9 in
         for i = 0 to d - 1 do
-          invariant { A.length x = m }
-          if i < k then array_set x i 9
-	  else if i = k then array_set x i (mod delta 9)
-          else array_set x i 0
+          invariant { length x = m }
+          if i < k then set x i 9
+	  else if i = k then set x i (mod delta 9)
+          else set x i 0
         done;
         raise Success
       end
     done;
-    s := !s - array_get x d
+    s := !s - get x d
   done
   { true } | Success -> { true }
 
@@ -121,48 +111,48 @@ let search_safety () =
       with digit sum y *)
 
   (* x[0..m-1] is a well-formed integer i.e. has digits in 0..9 *)
-  logic is_integer (x : array) =
-    forall k : int. 0 <= k < m -> 0 <= x#k <= 9
+  logic is_integer (x : M.map int int) =
+    forall k : int. 0 <= k < m -> 0 <= M.get x k <= 9
 
 let search () =
-  { A.length x = m and is_integer x }
+  { length x = m and is_integer x.elts }
   label Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
-    invariant { s = sum x 0 i }
-    s := !s + array_get x i
+    invariant { s = sum x.elts 0 i }
+    s := !s + get x i
   done;
-  assert { s = sum x 0 m };
+  assert { s = sum x.elts 0 m };
   for d = 0 to m - 1 do
     invariant {
       x = at x Init and
-      s = sum x d m
+      s = sum x.elts d m
     }
-    for c = array_get x d + 1 to 9 do
+    for c = get x d + 1 to 9 do
       invariant { x = at x Init }
-      let delta = y - !s - c + array_get x d in
+      let delta = y - !s - c + get x d in
       if 0 <= delta && delta <= 9 * d then begin
-        array_set x d c;
-        assert { sum x d m = y - delta };
+        set x d c;
+        assert { sum x.elts d m = y - delta };
 	let k = div delta 9 in
         assert { k <= d };
         for i = 0 to d - 1 do
-          invariant { A.length x = m and is_integer x and
-                      sum x d m = y - delta and
-                      sum x 0 i = if i <= k then 9*i else delta }
-          if i < k then array_set x i 9
-	  else if i = k then array_set x i (mod delta 9)
-          else array_set x i 0
+          invariant { length x = m and is_integer x.elts and
+                      sum x.elts d m = y - delta and
+                      sum x.elts 0 i = if i <= k then 9*i else delta }
+          if i < k then set x i 9
+	  else if i = k then set x i (mod delta 9)
+          else set x i 0
         done;
         (* assume { sum !x 0 d = delta }; *)
-        assert { sum x 0 d = delta };
+        assert { sum x.elts 0 d = delta };
         raise Success
       end
     done;
-    s := !s - array_get x d
+    s := !s - get x d
   done
   { true }
-  | Success -> { is_integer x and sum x 0 m = y }
+  | Success -> { is_integer x.elts and sum x.elts 0 m = y }
 
 (* 3. Correctness, part 2: we now prove that, on success, x contains the
    smallest integer > old(x) with digit sum y
@@ -170,18 +160,18 @@ let search () =
    4. Completeness: we always raise the Success exception *)
 
   (* x1 > x2 since x1[d] > x2[d] and x1[d+1..m-1] = x2[d+1..m-1] *)
-  logic gt_digit (x1 x2 : array) (d : int) =
+  logic gt_digit (x1 x2 : M.map int int) (d : int) =
     is_integer x1 and is_integer x2 and 0 <= d < m and
-    x1#d > x2#d and forall k : int. d < k < m -> x1#k = x2#k
+    M.get x1 d > M.get x2 d and forall k : int. d < k < m -> M.get x1 k = M.get x2 k
 
   lemma Gt_digit_interp:
-    forall x1 x2 : array, d : int.
+    forall x1 x2 : M.map int int, d : int.
     gt_digit x1 x2 d -> interp x1 0 m > interp x2 0 m
 
   lemma Gt_digit_update:
-    forall x1 x2 : array, d i v : int.
+    forall x1 x2 : M.map int int, d i v : int.
     gt_digit x1 x2 d -> 0 <= i < d -> 0 <= v <= 9 ->
-    gt_digit (A.set x1 i v) x2 d
+    gt_digit (M.set x1 i v) x2 d
 
   (* the number of digits of a given integer *)
   logic nb_digits int : int
@@ -195,7 +185,7 @@ let search () =
   (* the smallest integer with digit sum y is (y mod 9)9..9
      with exactly floor(y/9) trailing 9s *)
 
-  logic smallest int : array
+  logic smallest int : M.map int int
 
   logic smallest_size int : int
 
@@ -209,7 +199,7 @@ let search () =
   (* smallest(y) is an integer *)
   axiom Smallest_def1:
     forall y : int. y >= 0 ->
-    forall k : int. 0 <= k < smallest_size y -> 0 <= smallest y # k <= 9
+    forall k : int. 0 <= k < smallest_size y -> 0 <= M.get (smallest y) k <= 9
 
   (* smallest(y) has digit sum y *)
   axiom Smallest_def2:
@@ -224,12 +214,12 @@ let search () =
 
   lemma Smallest_shape_1:
     forall y : int. y >= 0 -> mod y 9 = 0 ->
-    forall k : int. 0 <= k < smallest_size y -> smallest y # k = 9
+    forall k : int. 0 <= k < smallest_size y -> M.get (smallest y) k = 9
 
   lemma Smallest_shape_2:
     forall y : int. y >= 0 -> mod y 9 <> 0 ->
-    (forall k : int. 0 <= k < smallest_size y - 1 -> smallest y # k = 9) and
-    smallest y # (smallest_size y - 1) = mod y 9
+    (forall k : int. 0 <= k < smallest_size y - 1 -> M.get (smallest y) k = 9) and
+    M.get (smallest y) (smallest_size y - 1) = mod y 9
 
   lemma Smallest_nb_digits:
     forall y : int. y >= 0 ->
@@ -246,64 +236,64 @@ let search () =
     exists u : int. nb_digits u = m and sum_digits u = y
 
 let search_smallest () =
-  { A.length x = m and is_integer x and
+  { length x = m and is_integer x.elts and
     (* x has at most n digits *)
-    forall k : int. n <= k < m -> x # k = 0
+    forall k : int. n <= k < m -> x[k] = 0
   }
   label Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
-    invariant { s = sum x 0 i }
-    s := !s + array_get x i
+    invariant { s = sum x.elts 0 i }
+    s := !s + get x i
   done;
-  assert { s = sum x 0 m };
+  assert { s = sum x.elts 0 m };
   for d = 0 to m - 1 do
     invariant {
       x = at x Init and
-      s = sum x d m and
+      s = sum x.elts d m and
       forall u : int.
-         interp (at x Init) 0 m < u <= interp9 x d m -> sum_digits u <> y
+         interp (at x.elts Init) 0 m < u <= interp9 x.elts d m -> sum_digits u <> y
     }
-    for c = array_get x d + 1 to 9 do
+    for c = get x d + 1 to 9 do
       invariant {
         x = at x Init and
-	forall c' : int. x # d < c' < c ->
+	forall c' : int. x[d] < c' < c ->
           forall u : int.
-          interp (at x Init) 0 m < u <= interp9 (A.set x d c') d m ->
+          interp (at x.elts Init) 0 m < u <= interp9 (M.set x.elts d c') d m ->
   	  sum_digits u <> y }
-      let delta = y - !s - c + array_get x d in
+      let delta = y - !s - c + get x d in
       if 0 <= delta && delta <= 9 * d then begin
         assert { smallest_size delta <= d };
-        array_set x d c;
-        assert { sum x d m = y - delta };
-        assert { gt_digit x (at x Init) d };
+        set x d c;
+        assert { sum x.elts d m = y - delta };
+        assert { gt_digit x.elts (at x.elts Init) d };
 	let k = div delta 9 in
         assert { k <= d };
         for i = 0 to d - 1 do
           invariant {
-	     A.length x = m and is_integer x and
-             sum x d m = y - delta and
-             sum x 0 i = (if i <= k then 9*i else delta) and
+	     length x = m and is_integer x.elts and
+             sum x.elts d m = y - delta and
+             sum x.elts 0 i = (if i <= k then 9*i else delta) and
              (forall j : int. 0 <= j < i ->
-                (j <  smallest_size delta -> x # j = smallest delta # j) and
-                (j >= smallest_size delta -> x # j = 0)) and
-             gt_digit x (at x Init) d }
-          if i < k then array_set x i 9
-	  else if i = k then array_set x i (mod delta 9)
-          else array_set x i 0;
-          assert { is_integer x }
+                (j <  smallest_size delta -> x[j] = M.get (smallest delta) j) and
+                (j >= smallest_size delta -> x[j] = 0)) and
+             gt_digit x.elts (at x.elts Init) d }
+          if i < k then set x i 9
+	  else if i = k then set x i (mod delta 9)
+          else set x i 0;
+          assert { is_integer x.elts }
         done;
-        assert { sum x 0 d = delta };
-        assert { interp x 0 d = interp (smallest delta) 0 d };
+        assert { sum x.elts 0 d = delta };
+        assert { interp x.elts 0 d = interp (smallest delta) 0 d };
         raise Success
       end
     done;
-    s := !s - array_get x d
+    s := !s - get x d
   done
   { false }
-  | Success -> { is_integer x and sum x 0 m = y and
-                 interp x 0 m > interp (old x) 0 m and
-                 forall u : int. interp (old x) 0 m < u < interp x 0 m ->
+  | Success -> { is_integer x.elts and sum x.elts 0 m = y and
+                 interp x.elts 0 m > interp (old x.elts) 0 m and
+                 forall u : int. interp (old x.elts) 0 m < u < interp x.elts 0 m ->
                                  sum_digits u <> y }
 
 

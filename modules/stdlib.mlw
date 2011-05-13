@@ -100,12 +100,12 @@ end
 module ArraySorted
 
   use import module Array
-  clone import map.MapSorted as M
+  clone import map.MapSorted as M with type elt = int
 
-  logic sorted_sub (a : array elt) (l u : int) =
+  logic sorted_sub (a : array int) (l u : int) =
     M.sorted_sub a.elts l u
 
-  logic sorted (a : array elt) =
+  logic sorted (a : array int) =
     M.sorted_sub a.elts 0 a.length
 
 end
@@ -113,7 +113,7 @@ end
 module ArrayEq
 
   use import module Array
-  clone import map.MapEq as M
+  use import map.MapEq as M
 
   logic array_eq_sub (a1 a2: array 'a) (l u: int) =
     map_eq_sub a1.elts a2.elts l u
@@ -129,6 +129,9 @@ module ArrayPermut
   use import module Array
   clone import map.MapPermut as M
 
+  logic exchange (a1 a2: array 'a) (i j: int) =
+    M.exchange a1.elts a2.elts i j
+
   logic permut_sub (a1 a2: array 'a) (l u: int) =
     M.permut_sub a1.elts a2.elts l u
 
@@ -137,6 +140,7 @@ module ArrayPermut
 
 end
 
+(***
 module TestArray
 
   use import int.Int
@@ -171,6 +175,7 @@ module TestArray
     assert { a2[24] = False }
 
 end
+***)
 
 (*
 Local Variables:

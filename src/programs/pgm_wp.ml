@@ -185,7 +185,7 @@ let quantify ?(all=false) env rm ef f =
   (* mreg: rho -> rho' *)
   let mreg =
     let add r m = 
-      let v = create_vsymbol (id_clone r.R.r_tv.tv_name) r.R.r_ty in
+      let v = create_vsymbol (id_clone r.R.r_tv.tv_name) (purify r.R.r_ty) in
       Mreg.add r v m
     in
     Sreg.fold add sreg Mreg.empty
@@ -201,7 +201,7 @@ let quantify ?(all=false) env rm ef f =
       if has_singleton_type pv then begin
 	assert (Sreg.cardinal pv.pv_regions = 1);
 	let r = Sreg.choose pv.pv_regions in
-	let v = create_vsymbol (id_clone pv.pv_name) r.R.r_ty in
+	let v = create_vsymbol (id_clone pv.pv_name) (purify r.R.r_ty) in
 	let mreg = Mreg.add r v mreg in
 	mreg, Mvs.add pv.pv_pure v s, vv'
       end else

@@ -61,18 +61,18 @@ module Distance
   logic min_dist (w1 w2:word) (n:int) =
     dist w1 w2 n and forall m:int. dist w1 w2 m -> n <= m
 
-  logic suffix (map a) int : word
+  logic suffix (array a) int : word
 
   axiom suffix_def_1: 
-    forall m: map a. suffix m (length m) = Nil
+    forall m: array a. suffix m (length m) = Nil
   axiom suffix_def_2:
-    forall m: map a, i: int.
+    forall m: array a, i: int.
     0 <= i < length m -> suffix m i = Cons m[i] (suffix m (i+1))
 
-  logic min_suffix (w1 w2: map a) (i j n: int) =
+  logic min_suffix (w1 w2: array a) (i j n: int) =
     min_dist (suffix w1 i) (suffix w2 j) n
 
-  logic word_of_array (m: map a) : word = suffix m 0
+  logic word_of_array (m: array a) : word = suffix m 0
 
   (* The code. *)
 
@@ -83,14 +83,14 @@ module Distance
       for i = 0 to n2 do
         invariant { length t = n2+1 and
                     forall j:int. 0 <= j < i -> t[j] = n2-j }
-        t[i <- n2 - i]
+        set t i (n2 - i)
       done;
       (* loop over w1 *)
       for i = n1-1 downto 0 do
         invariant { length t = n2+1
            and forall j:int. 0 <= j <= n2 -> min_suffix w1 w2 (i+1) j t[j] }
         o := t[n2];
-        t[n2 <- t[n2] + 1];
+        set t n2 (t[n2] + 1);
         (* loop over w2 *)
         for j = n2-1 downto 0 do
           invariant { length t = n2+1
@@ -101,9 +101,9 @@ module Distance
       	    let temp = !o in
             o := t[j];
 	    if w1[i] = w2[j] then
-	      t[j <- temp]
+	      set t j temp
 	    else
-	      t[j <- (min t[j] t[j+1]) + 1]
+	      set t j ((min t[j] t[j+1]) + 1)
           end
         done
       done;

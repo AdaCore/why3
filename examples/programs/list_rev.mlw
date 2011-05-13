@@ -9,25 +9,25 @@ module M
 
   logic null : pointer
 
-  parameter value : ref (t pointer int)
-  parameter next : ref (t pointer pointer)
+  parameter value : ref (map pointer int)
+  parameter next : ref (map pointer pointer)
 
-  inductive is_list (next : t pointer pointer) (p : pointer) =
+  inductive is_list (next : map pointer pointer) (p : pointer) =
     | is_list_null: 
-        forall next : t pointer pointer, p : pointer. 
+        forall next : map pointer pointer, p : pointer. 
         p = null -> is_list next p
     | is_list_next: 
-        forall next : t pointer pointer, p : pointer. 
+        forall next : map pointer pointer, p : pointer. 
         p <> null -> is_list next (get next p) -> is_list next p
 
-  logic sep_list_list (next : t pointer pointer) (p1 p2 : pointer)
+  logic sep_list_list (next : map pointer pointer) (p1 p2 : pointer)
 
   axiom sep_list_list_p_null:
-    forall next : t pointer pointer, p : pointer. 
+    forall next : map pointer pointer, p : pointer. 
     sep_list_list next p null
 
   axiom sep_list_list_null_p:
-    forall next : t pointer pointer, p : pointer. 
+    forall next : map pointer pointer, p : pointer. 
     sep_list_list next null p
 
   let list_rev (p : ref pointer) =

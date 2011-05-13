@@ -355,6 +355,9 @@ clean::
 %.gui: %.mlw bin/why3ide.opt
 	bin/why3ide.opt $*.mlw
 
+%.type: %.mlw bin/why3ide.opt
+	bin/why3ml.opt --type-only $*.mlw
+
 install_no_local::
 	cp -f bin/why3ml.@OCAMLBEST@ $(BINDIR)/why3ml
 

@@ -75,8 +75,10 @@ theory Graph
   type graph
 
   inductive path graph vertex vertex =
-    | Path_refl : forall g:graph, x:vertex. path g x x
-    | Path_sym  : forall g:graph, x y:vertex. path g x y -> path g y x
+    | Path_refl : 
+        forall g:graph, x:vertex. path g x x
+    | Path_sym  : 
+        forall g:graph, x y:vertex. path g x y -> path g y x
     | Path_trans:
         forall g:graph, x y z:vertex. path g x y -> path g y z -> path g x z
 

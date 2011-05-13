@@ -5,13 +5,13 @@ module M
 
   (* preliminaries *)
 
-  use array.Array as A
+  use map.Map as M
 
-  type array 'a = A.t int 'a
+  type array 'a = M.map int 'a
 
   logic injective (n:int) (m:int) (a:array 'a) =
     forall i j:int. n <= i <= m -> n <= j <= m ->
-       A.get a i = A.get a j -> i = j
+       M.get a i = M.get a j -> i = j
 
   type string
 
@@ -19,14 +19,14 @@ module M
 
   type pointer = int
 
-  type region 'a = A.t pointer 'a
+  type region 'a = M.map pointer 'a
 
   type first_free_addr = int
 
   logic valid (a:first_free_addr) (p:pointer) = p < a
 
   logic valid_array (a:first_free_addr) (n:int) (m:int) (r:array pointer) =
-     forall i:int. n <= i <= m -> valid a (A.get r i)
+     forall i:int. n <= i <= m -> valid a (M.get r i)
 
 parameter alloc : ref first_free_addr
 
@@ -76,7 +76,7 @@ end
   axiom MarkSumNonEmpty :
     forall r:region student, i j:int, a : array pointer.
       i <= j ->
-        let (_,mark) = A.get r (A.get a j) in
+        let (_,mark) = M.get r (M.get a j) in
         markSum r i j a = markSum r i (j-1) a  + mark
 
 (*
@@ -92,13 +92,13 @@ end
   lemma MarkSum_set_array_outside :
      forall r:region student, i j k:int, a: array pointer, p:pointer.
      not (i <= k <= j) ->
-     markSum r i j (A.set a k p) = markSum r i j a
+     markSum r i j (M.set a k p) = markSum r i j a
 
 
   lemma MarkSum_set_region_outside :
      forall r:region student, i j:int, a: array pointer, p:pointer, s:student.
-     (forall k:int. i <= k <= j -> A.get a k <> p) ->
-     markSum (A.set r p s) i j a = markSum r i j a
+     (forall k:int. i <= k <= j -> M.get a k <> p) ->
+     markSum (M.set r p s) i j a = markSum r i j a
 
 
 
@@ -128,9 +128,9 @@ fun CreateCourse(R:[Course]): [R]
 let createCourse (r: (ref (region course))) : pointer =
   { }
     let c = new_pointer () in
-    let (rStud,student,count,sum) = A.get !r c in
+    let (rStud,student,count,sum) = M.get !r c in
     let newc = (rStud,student,0,0) in
-    r := A.set !r c newc;
+    r := M.set !r c newc;
     assert { invCourse alloc newc };
     c
   { valid alloc result }
@@ -152,12 +152,12 @@ fun RegisterStudent(R:[Course], c: [R], name: string): [R.Rstud]
 
 let registerStudent
     (r: (ref (region course))) (c:pointer) (name:string) : pointer =
-{ valid alloc c and invCourse alloc (A.get r c) }
+{ valid alloc c and invCourse alloc (M.get r c) }
   let s = new_pointer () in
-  let (rStud,student,count,sum) = A.get !r c in
+  let (rStud,student,count,sum) = M.get !r c in
   let newstud = (name,0) in
-  let newc = (A.set rStud s newstud,A.set student count s,count+1,sum) in
-  r := A.set !r c newc;
+  let newc = (M.set rStud s newstud,M.set student count s,count+1,sum) in
+  r := M.set !r c newc;
   assert { invCourse alloc newc };
   s
 { valid alloc result }

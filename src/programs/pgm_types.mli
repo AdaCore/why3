@@ -117,8 +117,8 @@ module rec T : sig
   (* operations on program types *)
 
   val apply_type_v_var : type_v -> pvsymbol -> type_c
-(*   val apply_type_v_sym : type_v -> psymbol  -> type_c *)
-(*   val apply_type_v_ref : type_v -> R.t      -> type_c *)
+
+  val subst_type_v : ty Mtv.t -> term Mvs.t -> type_v -> type_v
 
   val occur_type_v : R.t -> type_v -> bool
 
@@ -149,7 +149,7 @@ and R : sig
 
   type t = private {
     r_tv : tvsymbol;
-    r_ty : Ty.ty;
+    r_ty : Ty.ty;    (* effect type *)
   }
 
   val create : tvsymbol -> Ty.ty -> t
