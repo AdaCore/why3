@@ -142,6 +142,7 @@ and goal =
       mutable checksum : string;
       goal_key : O.key;
       mutable proved : bool;
+      mutable goal_expanded : bool;
       external_proofs: (string, proof_attempt) Hashtbl.t;
       transformations : (string, transf) Hashtbl.t;
     }
@@ -161,6 +162,7 @@ and theory =
       theory_parent : file;
       mutable goals : goal list;
       mutable verified : bool;
+      mutable theory_expanded : bool;
     }
 
 and file =
@@ -168,6 +170,7 @@ and file =
       file_key : O.key;
       mutable theories: theory list;
       mutable file_verified : bool;
+      mutable file_expanded : bool;
     }
 
 type any =
@@ -181,6 +184,9 @@ let theory_name t = t.theory_name
 let theory_key t = t.theory_key
 let verified t = t.verified
 let goals t = t.goals
+let theory_expanded t = t.theory_expanded
+let set_theory_expanded t b = t.theory_expanded <- b
+
 
 let get_theory t =
   match t.theory with
@@ -210,6 +216,8 @@ let get_task g =
 		assert false
 	end
     | Some t -> t
+
+let set_file_expanded f b = f.file_expanded <- b
 
 let all_files : file list ref = ref []
 
@@ -264,13 +272,13 @@ and save_trans fmt _ t =
   fprintf fmt "@]@\n</transf>"
 
 let save_theory fmt t =
-  fprintf fmt "@\n@[<v 1><theory name=\"%s\" verified=\"%b\">"
-    t.theory_name t.verified;
+  fprintf fmt "@\n@[<v 1><theory name=\"%s\" verified=\"%b\" expanded=\"%b\">"
+    t.theory_name t.verified t.theory_expanded;
   List.iter (save_goal fmt) t.goals;
   fprintf fmt "@]@\n</theory>"
 
 let save_file fmt f =
-  fprintf fmt "@\n@[<v 1><file name=\"%s\" verified=\"%b\">" f.file_name f.file_verified;
+  fprintf fmt "@\n@[<v 1><file name=\"%s\" verified=\"%b\" expanded=\"%b\">" f.file_name f.file_verified f.file_expanded;
   List.iter (save_theory fmt) f.theories;
   fprintf fmt "@]@\n</file>"
 
@@ -300,6 +308,8 @@ let check_file_verified f =
       f.file_verified <- b;
       !notify_fun (File f)
     end
+  else
+    !notify_fun (File f)
 
 let check_theory_proved t =
   let b = List.for_all (fun g -> g.proved) t.goals in
@@ -309,6 +319,9 @@ let check_theory_proved t =
       !notify_fun (Theory t);
       check_file_verified t.theory_parent
     end
+  else
+    !notify_fun (Theory t)
+    
 
 let rec check_goal_proved g =
   let b1 = Hashtbl.fold
@@ -328,6 +341,8 @@ let rec check_goal_proved g =
         | Parent_theory t -> check_theory_proved t
         | Parent_transf t -> check_transf_proved t
     end
+  else
+    !notify_fun (Goal g);
 
 and check_transf_proved t =
   let b = List.for_all (fun g -> g.proved) t.subgoals in
@@ -611,6 +626,7 @@ let raw_add_goal parent name expl sum topt =
                external_proofs = Hashtbl.create 7;
                transformations = Hashtbl.create 3;
                proved = false;
+	       goal_expanded = false;
              }
   in
   let any = Goal goal in
@@ -638,7 +654,7 @@ let raw_add_transformation g trans =
   !notify_fun any;
   tr
 
-let raw_add_theory mfile thopt thname =
+let raw_add_theory mfile thopt thname exp =
   let parent = mfile.file_key in
   let key = O.create ~parent () in
   let mth = { theory_name = thname;
@@ -646,7 +662,9 @@ let raw_add_theory mfile thopt thname =
               theory_key = key;
               theory_parent = mfile;
               goals = [] ;
-              verified = false }
+              verified = false;
+	      theory_expanded = exp;
+	    }
   in
   let any = Theory mth in
   !init_fun key any;
@@ -657,7 +675,7 @@ let raw_add_theory mfile thopt thname =
 
 let add_theory mfile name th =
   let tasks = List.rev (Task.split_theory th None None) in
-  let mth = raw_add_theory mfile (Some th) name in
+  let mth = raw_add_theory mfile (Some th) name true in
   let goals =
     List.fold_left
       (fun acc t ->
@@ -673,12 +691,14 @@ let add_theory mfile name th =
   check_theory_proved mth;
   mth
 
-let raw_add_file f =
+let raw_add_file f exp =
   let key = O.create () in
   let mfile = { file_name = f;
                 file_key = key;
                 theories = [] ;
-                file_verified = false }
+                file_verified = false;
+		file_expanded = exp;
+	      }
   in
   all_files := !all_files @ [mfile];
   let any = File mfile in
@@ -709,7 +729,7 @@ let read_file fn =
 
 let add_file f =
   let theories = read_file f in
-  let mfile = raw_add_file f in
+  let mfile = raw_add_file f true in
   let mths =
     List.fold_left
       (fun acc (_,name,t) ->
@@ -718,7 +738,9 @@ let add_file f =
       [] theories
   in
   mfile.theories <- List.rev mths;
-  check_file_verified mfile
+  check_file_verified mfile;
+  !notify_fun (File mfile)
+
 
 
 let file_exists fn =
@@ -737,7 +759,7 @@ let reload_proof ~provers obsolete goal pid old_a =
     let p = Util.Mstr.find pid provers in
     let old_res = old_a.proof_state in
     let obsolete = obsolete or old_a.proof_obsolete in
-    eprintf "proof_obsolete : %b@." obsolete;
+    (* eprintf "proof_obsolete : %b@." obsolete; *)
     let _a =
       raw_add_external_proof ~obsolete ~edit:old_a.edited_as goal p old_res 
     in
@@ -877,13 +899,13 @@ let reload_root_goal ~provers mth tname old_goals t : goal =
 let reload_theory ~provers mfile old_theories (_,tname,th) =
   eprintf "[Reload] theory '%s'@."tname;
   let tasks = List.rev (Task.split_theory th None None) in
-  let mth = raw_add_theory mfile (Some th) tname in
-  let old_goals =
+  let old_goals, old_exp =
     try
       let old_mth = Util.Mstr.find tname old_theories in
-      old_mth.goals
-    with Not_found -> []
+      old_mth.goals, old_mth.theory_expanded
+    with Not_found -> [], true
   in
+  let mth = raw_add_theory mfile (Some th) tname old_exp in
   let goalsmap = List.fold_left
     (fun goalsmap g -> Util.Mstr.add g.goal_name g goalsmap)
     Util.Mstr.empty old_goals
@@ -901,19 +923,7 @@ let reload_theory ~provers mfile old_theories (_,tname,th) =
 
 (* reloads a file *)
 let reload_file ~provers mf theories =
-(*
-  eprintf "[Reload] file '%s'@." mf.file_name;
-  let theories = 
-    try
-      read_file mf.file_name 
-    with e ->
-      eprintf "@[Error while reading file@ '%s':@ %a@.@]" mf.file_name
-        Exn_printer.exn_printer e;
-      (* TODO: do something clever than that! *)
-      exit 1
-  in
-*)
-  let new_mf = raw_add_file mf.file_name in
+  let new_mf = raw_add_file mf.file_name mf.file_expanded in
   let old_theories = List.fold_left
     (fun acc t -> Util.Mstr.add t.theory_name t acc)
     Util.Mstr.empty
@@ -943,6 +953,14 @@ let reload_all provers =
 (****************************)
 (*     session opening      *)
 (****************************)
+
+let bool_attribute field r def =
+  try
+    match List.assoc field r.Xml.attributes with
+      | "true" -> true
+      | "false" -> false
+      | _ -> assert false
+  with Not_found -> def
 
 let load_result r =
   match r.Xml.name with
@@ -1060,7 +1078,8 @@ let load_theory ~env ~provers mf acc th =
 	  try List.assoc "name" th.Xml.attributes
 	  with Not_found -> assert false
 	in
-	let mth = raw_add_theory mf None thname in
+	let exp = bool_attribute "expanded" th true in
+	let mth = raw_add_theory mf None thname exp in
 	mth.goals <-
 	  List.rev
 	  (List.fold_left
@@ -1078,7 +1097,8 @@ let load_file ~env ~provers f =
 	  try List.assoc "name" f.Xml.attributes
 	  with Not_found -> assert false
 	in
-	let mf = raw_add_file fn in
+	let exp = bool_attribute "expanded" f true in
+	let mf = raw_add_file fn exp in
 	mf.theories <-
 	  List.rev
 	  (List.fold_left (load_theory ~env ~provers mf) [] f.Xml.elements)

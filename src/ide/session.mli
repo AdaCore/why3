@@ -126,13 +126,18 @@ module Make(O: OBSERVER) : sig
   val theory_key : theory -> O.key
   val verified : theory -> bool
   val goals : theory -> goal list
+  val theory_expanded : theory -> bool
+  val set_theory_expanded : theory -> bool -> unit
 
   type file = private
       { file_name : string;
         file_key : O.key;
         mutable theories: theory list;
         mutable file_verified : bool;
+	mutable file_expanded : bool;
       }
+
+  val set_file_expanded : file -> bool -> unit
 
   type any =
     | File of file

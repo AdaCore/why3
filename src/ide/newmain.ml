@@ -18,42 +18,6 @@
 (**************************************************************************)
 
 
-(* TODO:
-
-* when proof attempt is finished and is it the one currently selected,
-the new output should be displayed on upper-right window
-
-* when returning from edited proofs: should we run the prover again
-   immediately ?
-
-* bug trouve par Johannes:
-
-Pour reproduire le bug :
-
-1) Partir d'un répértoire sans fichier de projet
-2) Lancer why3db, ajouter un fichier
-3) Prouver quelques buts (pas tous)
-4) Choisir "Hide Proved Goals"
-5) Prouver le reste des buts, la fênetre devient vide
-6) Décocher "Hide Proved Goals"
-
-Maintenant, le fichier réapparait dans la liste, mais on ne peut pas le
-déplier, donc accéder au sous-buts, stats des appels de prouvers etc ...
-
-Ce n'est pas un bug très grave, parce qu'il suffit de quitter l'ide,
-puis le relancer, et là on peut de nouveau déplier le fichier.
-
-* Francois :
-
-   - Les temps indiqués sont très bizarre, mais cela doit-être un bug
-   plus profond, au niveau de l'appel des prouveurs (wall time au lieu
-   de cpu time?)
-
-   - Si on modifie le fichier à droite, les buts ne sont pas marqués
-   obsolètes ou ajouté à gauche.
-
-*)
-
 open Format
 
 let () =
@@ -276,7 +240,6 @@ let (_ : GtkSignal.id) =
        gconfig.tree_width <- w)
 
 
-(* connecting to the Session model *)
 
 
 (****************)
@@ -356,6 +319,7 @@ let image_of_result ~obsolete result =
 	| Call_provers.HighFailure ->
 	    if obsolete then !image_failure_obs else !image_failure
 
+(* connecting to the Session model *)
 
 module M = Session.Make
   (struct
@@ -388,7 +352,7 @@ module M = Session.Make
 let set_row_status row b =
   if b then
     begin
-      goals_view#collapse_row row#path;
+      (* goals_view#collapse_row row#path; *)
       goals_model#set ~row:row#iter ~column:status_column !image_yes;
     end
   else
@@ -411,26 +375,56 @@ let set_proof_state ~obsolete a =
 
 let model_index = Hashtbl.create 17
 
-let get_any row =
+let get_any_from_iter row = 
   try
-    let row = goals_model#get_iter row in
     let idx = goals_model#get ~row ~column:index_column in
     Hashtbl.find model_index idx
-  with Not_found -> invalid_arg "Gmain.get_index"
+  with Not_found -> invalid_arg "Gmain.get_any_from_iter"
+
+let get_any (row:Gtk.tree_path) : M.any =
+  get_any_from_iter (goals_model#get_iter row)
+
+let row_expanded b iter _path = 
+  match get_any_from_iter iter with
+    | M.File f -> 
+	eprintf "file_expanded <- %b@." b;
+	M.set_file_expanded f b
+    | M.Theory t -> 
+	eprintf "theory_expanded <- %b@." b;
+	M.set_theory_expanded t b
+    | _ -> ()
+
+let (_:GtkSignal.id) = 
+  goals_view#connect#row_collapsed ~callback:(row_expanded false)
+
+let (_:GtkSignal.id) = 
+  goals_view#connect#row_expanded ~callback:(row_expanded true)
 
 let notify any =
+  let row,exp =
+    match any with
+      | M.Goal g -> (M.goal_key g),false (* g.M.file_expanded *)
+      | M.Theory t -> (M.theory_key t),(M.theory_expanded t)
+      | M.File f -> f.M.file_key,f.M.file_expanded
+      | M.Proof_attempt a -> a.M.proof_key,false
+      | M.Transformation tr -> tr.M.transf_key,false
+  in
+  if exp then 
+    (eprintf "exp@."; goals_view#expand_row row#path)
+  else
+    ((*eprintf "col@.";*) goals_view#collapse_row row#path);
   match any with
     | M.Goal g ->
-	set_row_status (M.goal_key g) (M.goal_proved g)
+	set_row_status row (M.goal_proved g)
     | M.Theory th ->
-	set_row_status (M.theory_key th) (M.verified th)
+	set_row_status row (M.verified th)
     | M.File file ->
-	set_row_status file.M.file_key file.M.file_verified
+	set_row_status row file.M.file_verified
     | M.Proof_attempt a ->
 	set_proof_state ~obsolete:a.M.proof_obsolete a
     | M.Transformation tr ->
-	set_row_status tr.M.transf_key tr.M.transf_proved
-
+	set_row_status row tr.M.transf_proved
+	  
 let init =
   let cpt = ref (-1) in
   fun row any ->
@@ -445,6 +439,7 @@ let init =
       begin
         Hashtbl.replace model_index ind any;
       end;
+    goals_view#expand_row row#path;
     goals_model#set ~row:row#iter ~column:icon_column
       (match any with
 	 | M.Goal _ -> !image_file
