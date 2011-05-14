@@ -244,8 +244,6 @@ type oty = ty option
 exception UnexpectedProp
 
 let oty_ty = function Some ty -> ty | None -> raise UnexpectedProp
-let oty_prop = (=) None
-let oty_value = (<>) None
 
 let oty_equal = Util.option_eq ty_equal
 let oty_hash = Util.option_apply 1 ty_hash

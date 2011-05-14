@@ -127,13 +127,10 @@ type oty = ty option
 
 exception UnexpectedProp
 
-val oty_ty : oty -> ty
-val oty_prop : oty -> bool
-val oty_value : oty -> bool
-
 val oty_equal : oty -> oty -> bool
 val oty_hash  : oty -> int
 
+val oty_ty : oty -> ty
 val oty_map : (ty -> ty) -> oty -> oty
 val oty_iter : (ty -> unit) -> oty -> unit
 val oty_apply : 'a -> (ty -> 'a) -> oty -> 'a

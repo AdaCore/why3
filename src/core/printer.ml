@@ -230,7 +230,7 @@ let query_syntax sm id = Mid.find_option id sm
 
 exception UnsupportedTysymbol   of tysymbol   * string
 exception UnsupportedType of ty   * string
-exception UnsupportedExpr of expr * string
+exception UnsupportedTerm of term * string
 exception UnsupportedDecl of decl * string
 exception NotImplemented  of        string
 exception Unsupported     of        string
@@ -239,9 +239,8 @@ exception Unsupported     of        string
 
 let unsupportedTysymbol   e s = raise (UnsupportedTysymbol (e,s))
 let unsupportedType e s = raise (UnsupportedType (e,s))
-let unsupportedTerm e s = raise (UnsupportedExpr (Term e,s))
-let unsupportedFmla e s = raise (UnsupportedExpr (Fmla e,s))
-let unsupportedExpr e s = raise (UnsupportedExpr (e,s))
+let unsupportedTerm e s = raise (UnsupportedTerm (e,s))
+let unsupportedFmla e s = raise (UnsupportedTerm (e,s))
 let unsupportedDecl e s = raise (UnsupportedDecl (e,s))
 let notImplemented    s = raise (NotImplemented s)
 let unsupported       s = raise (Unsupported s)
@@ -254,12 +253,6 @@ let catch_unsupportedTysymbol f e =
 
 let catch_unsupportedTerm f e =
   try f e with Unsupported s -> unsupportedTerm e s
-
-let catch_unsupportedFmla f e =
-  try f e with Unsupported s -> unsupportedFmla e s
-
-let catch_unsupportedExpr f e =
-  try f e with Unsupported s -> unsupportedExpr e s
 
 let catch_unsupportedDecl f e =
   try f e with Unsupported s -> unsupportedDecl e s
@@ -287,7 +280,7 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | UnsupportedTysymbol (e,s) ->
       fprintf fmt "@[<hov 3> This type isn't supported:@\n%a@\n%s@]"
         Pretty.print_ts e s
-  | UnsupportedExpr (e,s) ->
+  | UnsupportedTerm (e,s) ->
       fprintf fmt "@[<hov 3> This expression isn't supported:@\n%a@\n%s@]"
         Pretty.print_expr e s
   | UnsupportedDecl (d,s) ->

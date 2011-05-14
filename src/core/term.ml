@@ -287,6 +287,7 @@ and term_node =
   | Ffalse
 
 and fmla = term
+and expr = term
 
 and term_bound  = vsymbol * bind_info * term
 and fmla_bound  = term_bound
@@ -304,17 +305,15 @@ and bind_info = {
 
 and trigger = expr list
 
-and expr =
-  | Term of term
-  | Fmla of fmla
-
 (* term and fmla equality *)
 
 let t_equal : term -> term -> bool = (==)
 let f_equal = t_equal
+let e_equal = t_equal
 
 let t_hash t = t.t_tag
 let f_hash = t_hash
+let e_hash = t_hash
 
 (* extract the type of a term *)
 
@@ -326,7 +325,7 @@ let t_type t = match t.t_ty with
   | None -> raise (TermExpected t)
 
 let t_prop f =
-  if oty_prop f.t_ty then f else raise (FmlaExpected f)
+  if f.t_ty = None then f else raise (FmlaExpected f)
 
 let check_t_ty o t = match o, t.t_ty with
   | Some l, Some r -> check_ty_equal l r
@@ -336,22 +335,19 @@ let check_t_ty o t = match o, t.t_ty with
 
 (* expr and trigger equality *)
 
-let e_equal e1 e2 = match e1, e2 with
-  | Term t1, Term t2 -> t_equal t1 t2
-  | Fmla f1, Fmla f2 -> f_equal f1 f2
-  | _ -> false
-
 let tr_equal = list_all2 (list_all2 e_equal)
 
 (* expr and trigger traversal *)
 
-let e_map fnT fnF = function Term t -> Term (fnT t) | Fmla f -> Fmla (fnF f)
-let e_fold fnT fnF acc = function Term t -> fnT acc t | Fmla f -> fnF acc f
-let e_apply fnT fnF = function Term t -> fnT t | Fmla f -> fnF f
+let e_apply fnT fnF e =
+  if e.t_ty = None then fnF e else fnT e
 
-let e_map_fold fnT fnF acc = function
-  | Term t -> let acc, t = fnT acc t in acc, Term t
-  | Fmla f -> let acc, f = fnF acc f in acc, Fmla f
+let e_map = e_apply
+
+let e_fold fnT fnF acc e =
+  if e.t_ty = None then fnF acc e else fnT acc e
+
+let e_map_fold = e_fold
 
 let tr_map fnT fnF = List.map (List.map (e_map fnT fnF))
 let tr_fold fnT fnF = List.fold_left (List.fold_left (e_fold fnT fnF))
@@ -420,8 +416,6 @@ module Hsterm = Hashcons.Make (struct
 
   let t_hash_branch (p,b,t) =
     Hashcons.combine (pat_hash p) (bnd_hash b (t_hash t))
-
-  let e_hash = function Term t -> t_hash t | Fmla f -> f_hash f
 
   let f_hash_quant (vl,b,tl,f) =
     let h = bnd_hash b (f_hash f) in
@@ -1059,7 +1053,7 @@ let f_map_sign fnT fnF sign f = f_label_copy f (match f.t_node with
         else f_implies (f_or f1n f2n) (f_and f1p f2p)
   | Fnot f1 ->
       f_not (fnF (not sign) f1)
-  | Tif (f1, f2, f3) when oty_prop f.t_ty ->
+  | Tif (f1, f2, f3) when f.t_ty = None ->
       let f1p = fnF sign f1 in let f1n = fnF (not sign) f1 in
       let f2 = fnF sign f2 in let f3 = fnF sign f3 in
       if f_equal f1p f1n then f_if f1p f2 f3 else if sign
@@ -1141,9 +1135,7 @@ let rec list_map_cont fnL contL = function
   | [] ->
       contL []
 
-let e_map_cont fnT fnF contE = function
-  | Term t -> fnT (fun t -> contE (Term t)) t
-  | Fmla f -> fnF (fun f -> contE (Fmla f)) f
+let e_map_cont = e_fold
 
 let tr_map_cont fnT fnF =
   list_map_cont (list_map_cont (e_map_cont fnT fnF))

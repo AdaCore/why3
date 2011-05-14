@@ -58,7 +58,7 @@ let ls_selects_def_of_ts acc ts =
   let acc =
     let t = t_app ls tvars ty_type in
     let f = f_equ (t_app ls_int_of_ty [t] ty_int) (t_int_const id) in
-    let f = f_forall_close vars [[Term t]] f in
+    let f = f_forall_close vars [[t]] f in
     let prsymbol = create_prsymbol (id_clone ts.ts_name) in
     create_prop_decl Paxiom prsymbol f :: acc
   in
@@ -69,7 +69,7 @@ let ls_selects_def_of_ts acc ts =
       let t = t_app ls tvars ty_type in
       let t = t_app ls_select [t] ty_type in
       let f = f_equ t value in
-      let f = f_forall_close vars [[Term t]] f in
+      let f = f_forall_close vars [[t]] f in
       f)
     ls_selects tvars in
   let create_props ls_select fmla =
@@ -241,10 +241,7 @@ let d_monomorph ty_base kept lsmap d =
               let vl = List.map (vs_monomorph ty_base kept) ul in
               let add acc u v = Mvs.add u (t_var v) acc in
               let vmap = List.fold_left2 add Mvs.empty ul vl in
-              let e = match e with
-                | Term t -> Term (t_mono vmap t)
-                | Fmla f -> Fmla (f_mono vmap f)
-              in
+              let e = e_fold t_mono f_mono vmap e in
               make_ls_defn ls vl e
           | None ->
               ls, None

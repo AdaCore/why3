@@ -29,24 +29,20 @@ let t_unfold env fs tl ty =
   match Mls.find_option fs env with
   | None ->
       e_app fs tl ty
-  | Some (vl, Term e) ->
+  | Some (vl,e) ->
       let add (mt,mv) x y = ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
       let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vl tl in
       let mt = oty_match mt e.t_ty ty in
       t_ty_subst mt mv e
-  | _ ->
-      assert false
 
 let f_unfold env ps tl =
   match Mls.find_option ps env with
   | None ->
       f_app ps tl
-  | Some (vs, Fmla e) ->
+  | Some (vs,e) ->
       let add (mt,mv) x y = ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
       let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vs tl in
       f_ty_subst mt mv e
-  | _ ->
-      assert false
 
 (* inline every symbol *)
 
@@ -90,9 +86,9 @@ let fold in_goal notdeft notdeff notls d (env, task) =
   match d.d_node with
     | Dlogic [ls,Some ld] when not (notls ls) ->
         let vl,e = open_ls_defn ld in
-        let inline = match e with
-          | Term t when notdeft t || t_s_any ffalse (ls_equal ls) t -> false
-          | Fmla f when notdeff f || f_s_any ffalse (ls_equal ls) f -> false
+        let inline = match e.t_ty with
+          | Some _ when notdeft e || t_s_any ffalse (ls_equal ls) e -> false
+          | None   when notdeff e || f_s_any ffalse (ls_equal ls) e -> false
           | _ -> true
         in
         let env = if inline then Mls.add ls (vl,e) env else env in

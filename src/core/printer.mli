@@ -74,7 +74,7 @@ val syntax_arguments_typed : string -> term pp -> ty pp ->
 
 exception UnsupportedTysymbol   of tysymbol   * string
 exception UnsupportedType of ty   * string
-exception UnsupportedExpr of expr * string
+exception UnsupportedTerm of term * string
 exception UnsupportedDecl of decl * string
 exception NotImplemented  of        string
 
@@ -82,7 +82,6 @@ val unsupportedTysymbol   : tysymbol   -> string -> 'a
 val unsupportedType : ty   -> string -> 'a
 val unsupportedTerm : term -> string -> 'a
 val unsupportedFmla : fmla -> string -> 'a
-val unsupportedExpr : expr -> string -> 'a
 val unsupportedDecl : decl -> string -> 'a
 val notImplemented  :         string -> 'a
 
@@ -99,20 +98,11 @@ val catch_unsupportedType : (ty -> 'a) -> (ty -> 'a)
     - return [f arg] if [f arg] does not raise {!Unsupported} exception
     - raise [UnsupportedType (arg,s)] if [f arg] raises [Unsupported s]*)
 
-
 val catch_unsupportedTysymbol : (tysymbol -> 'a) -> (tysymbol -> 'a)
 (** same as {! catch_unsupportedType} but use [UnsupportedTysymbol]
     instead of [UnsupportedType]*)
 
 val catch_unsupportedTerm : (term -> 'a) -> (term -> 'a)
-(** same as {! catch_unsupportedType} but use [UnsupportedExpr]
-    instead of [UnsupportedType]*)
-
-val catch_unsupportedFmla : (fmla -> 'a) -> (fmla -> 'a)
-(** same as {! catch_unsupportedType} but use [UnsupportedExpr]
-    instead of [UnsupportedType]*)
-
-val catch_unsupportedExpr : (expr -> 'a) -> (expr -> 'a)
 (** same as {! catch_unsupportedType} but use [UnsupportedExpr]
     instead of [UnsupportedType]*)
 

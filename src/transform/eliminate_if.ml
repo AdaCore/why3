@@ -72,12 +72,12 @@ let add_ld axl d = match d with
   | _, None -> axl, d
   | ls, Some ld ->
       let vl,e = open_ls_defn ld in
-      begin match e with
-        | Term t when has_if t ->
+      begin match e.t_ty with
+        | Some _ when has_if e ->
             let nm = ls.ls_name.id_string ^ "_def" in
             let pr = create_prsymbol (id_derive nm ls.ls_name) in
-            let hd = e_app ls (List.map t_var vl) t.t_ty in
-            let f = f_forall_close vl [] (elim_f (f_equ hd t)) in
+            let hd = e_app ls (List.map t_var vl) e.t_ty in
+            let f = f_forall_close vl [] (elim_f (f_equ hd e)) in
             create_prop_decl Paxiom pr f :: axl, (ls, None)
         | _ ->
             axl, make_ls_defn ls vl (e_map elim_t elim_f e)

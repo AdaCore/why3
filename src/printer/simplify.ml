@@ -134,7 +134,7 @@ and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
 
 and print_trigger info fmt = function
   | [] -> ()
-  | [Term ({t_node=Tvar _} as t)] -> fprintf fmt "(MPAT %a)" (print_term info) t
+  | [{t_node=Tvar _} as t] -> fprintf fmt "(MPAT %a)" (print_term info) t
   | [t] -> print_expr info fmt t
   | tl -> fprintf fmt "(MPAT %a)" (print_list space (print_expr info)) tl
 

@@ -150,6 +150,7 @@ and term_node = private
   | Ffalse
 
 and fmla = term
+and expr = term
 
 and term_bound
 and fmla_bound = term_bound
@@ -159,10 +160,6 @@ and fmla_branch = term_branch
 
 and term_quant
 and fmla_quant = term_quant
-
-and expr =
-  | Term of term
-  | Fmla of fmla
 
 and trigger = expr list
 
@@ -182,6 +179,7 @@ val tr_equal : trigger list -> trigger list -> bool
 
 val t_hash : term -> int
 val f_hash : fmla -> int
+val e_hash : expr -> int
 
 (** close bindings *)
 
@@ -321,7 +319,7 @@ val f_forall_close_merge : vsymbol list -> fmla -> fmla
 (** Expr and trigger traversal *)
 
 val e_map : (term -> term) -> (fmla -> fmla) -> expr -> expr
-val e_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> expr -> 'a
+val e_fold : ('a -> term -> 'b) -> ('a -> fmla -> 'b) -> 'a -> expr -> 'b
 val e_apply : (term -> 'a) -> (fmla -> 'a) -> expr -> 'a
 
 val e_map_fold : ('a -> term -> 'a * term) ->

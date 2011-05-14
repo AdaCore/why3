@@ -104,12 +104,12 @@ module Transform = struct
         vs :: vl, Mtv.add v (t_var vs) vm
       in
       let vars,varM = Stv.fold add (ls_ty_freevars lsymbol) (vars,Mtv.empty) in
-      (match expr with
-      | Term t ->
-          let t = term_transform varM t in
+      (match expr.t_ty with
+      | Some _ ->
+          let t = term_transform varM expr in
           Decl.make_fs_defn new_lsymbol vars t
-      | Fmla f ->
-          let f = fmla_transform varM f in
+      | None ->
+          let f = fmla_transform varM expr in
           Decl.make_ps_defn new_lsymbol vars f)
     | (lsymbol, None) ->
       (findL lsymbol, None)

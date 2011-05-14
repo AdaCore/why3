@@ -244,8 +244,8 @@ and fmla env = function
       in
       let env, vl = map_fold_left uquant env uqu in
       let trigger = function
-	| TRterm t -> Term (term env t)
-	| TRfmla f -> Fmla (fmla env f)
+	| TRterm t -> term env t
+	| TRfmla f -> fmla env f
       in
       let trl = List.map (List.map trigger) trl in
       f_quant_close q vl trl (fmla env f1)
@@ -386,8 +386,8 @@ and specialize_fmla_node ~loc htv = function
       Fmatch (specialize_term ~loc htv t, List.map branch fbl)
   | Term.Tvar _ | Term.Tconst _ | Term.Teps _ -> assert false
 
-and specialize_trigger ~loc htv = function
-  | Term.Term t -> TRterm (specialize_term ~loc htv t)
-  | Term.Fmla f -> TRfmla (specialize_fmla ~loc htv f)
+and specialize_trigger ~loc htv e = if e.t_ty = None
+  then TRfmla (specialize_fmla ~loc htv e)
+  else TRterm (specialize_term ~loc htv e)
 
 

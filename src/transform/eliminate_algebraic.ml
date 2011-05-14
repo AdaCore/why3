@@ -205,7 +205,7 @@ let add_indexer (state,task) ts ty csl =
     let hd = t_app cs (List.rev_map t_var vl) (of_option cs.ls_value) in
     let ix = t_const (ConstInt (string_of_int !index)) in
     let ax = f_equ (t_app mt_ls [hd] ty_int) ix in
-    let ax = f_forall_close (List.rev vl) [[Term hd]] ax in
+    let ax = f_forall_close (List.rev vl) [[hd]] ax in
     add_decl tsk (create_prop_decl Paxiom pr ax)
   in
   let task = List.fold_left mt_add task csl in
@@ -220,8 +220,8 @@ let add_discriminator (state,task) ts ty csl =
     let t1 = t_app c1 (List.rev_map t_var ul) ty in
     let t2 = t_app c2 (List.rev_map t_var vl) ty in
     let ax = f_neq t1 t2 in
-    let ax = f_forall_close (List.rev vl) [[Term t2]] ax in
-    let ax = f_forall_close (List.rev ul) [[Term t1]] ax in
+    let ax = f_forall_close (List.rev vl) [[t2]] ax in
+    let ax = f_forall_close (List.rev ul) [[t1]] ax in
     add_decl task (create_prop_decl Paxiom pr ax)
   in
   let rec dl_add task = function

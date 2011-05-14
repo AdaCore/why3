@@ -143,8 +143,8 @@ and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
 
 and print_triggers info fmt tl =
   let filter = function
-    | Term _ -> true
-    | Fmla {t_node = Tapp (ps,_)} -> not (ls_equal ps ps_equ)
+    | { t_ty = Some _ } -> true
+    | { t_node = Tapp (ps,_) } -> not (ls_equal ps ps_equ)
     | _ -> false in
   let tl = List.map (List.filter filter) tl in
   let tl = List.filter (function [] -> false | _::_ -> true) tl in
@@ -179,19 +179,19 @@ let print_logic_decl info fmt (ls,ld) =
           (print_option_or_default "prop" (print_type info)) ls.ls_value
     | Some ld ->
         let vl,e = open_ls_defn ld in
-        begin match e with
-          | Term t ->
+        begin match e.t_ty with
+          | Some _ ->
               (* TODO AC? *)
               fprintf fmt "@[<hov 2>function %a(%a) : %a =@ %a@]@\n"
                 print_ident ls.ls_name
                 (print_list comma (print_logic_binder info)) vl
                 (print_type info) (Util.of_option ls.ls_value)
-                (print_term info) t
-          | Fmla f ->
+                (print_term info) e
+          | None ->
               fprintf fmt "@[<hov 2>predicate %a(%a) =@ %a@]"
                 print_ident ls.ls_name
                 (print_list comma (print_logic_binder info)) vl
-                (print_fmla info) f
+                (print_fmla info) e
         end;
         List.iter forget_var vl
 

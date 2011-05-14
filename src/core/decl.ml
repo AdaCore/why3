@@ -67,15 +67,15 @@ let make_ls_defn ls vl = e_apply (make_fs_defn ls vl) (make_ps_defn ls vl)
 let open_ls_defn (_,f) =
   let vl, ef = f_open_forall f in
   match ef.t_node with
-    | Tapp (_, [_; t2]) -> vl, Term t2
-    | Fbinop (_, _, f2) -> vl, Fmla f2
+    | Tapp (_, [_; t2]) -> vl, t2
+    | Fbinop (_, _, f2) -> vl, f2
     | _ -> assert false
 
 let open_fs_defn ld = let vl,e = open_ls_defn ld in
-  match e with Term t -> vl,t | _ -> assert false
+  if e.t_ty = None then assert false else vl,e
 
 let open_ps_defn ld = let vl,e = open_ls_defn ld in
-  match e with Fmla f -> vl,f | _ -> assert false
+  if e.t_ty = None then vl,e else assert false
 
 let ls_defn_axiom (_,f) = f
 
@@ -636,7 +636,7 @@ let rec check_matchT kn () t = match t.t_node with
   | Tcase (t1,bl) ->
       let bl = List.map (fun b -> let p,t = t_open_branch b in [p],t) bl in
       ignore (try Pattern.CompileTerm.compile (find_constructors kn) [t1] bl
-      with Pattern.NonExhaustive p -> raise (NonExhaustiveExpr (p,Term t)));
+      with Pattern.NonExhaustive p -> raise (NonExhaustiveExpr (p,t)));
       t_fold (check_matchT kn) (check_matchF kn) () t
   | _ -> t_fold (check_matchT kn) (check_matchF kn) () t
 
@@ -644,7 +644,7 @@ and check_matchF kn () f = match f.t_node with
   | Tcase (t1,bl) ->
       let bl = List.map (fun b -> let p,f = f_open_branch b in [p],f) bl in
       ignore (try Pattern.CompileFmla.compile (find_constructors kn) [t1] bl
-      with Pattern.NonExhaustive p -> raise (NonExhaustiveExpr (p,Fmla f)));
+      with Pattern.NonExhaustive p -> raise (NonExhaustiveExpr (p,f)));
       f_fold (check_matchT kn) (check_matchF kn) () f
   | _ -> f_fold (check_matchT kn) (check_matchF kn) () f
 

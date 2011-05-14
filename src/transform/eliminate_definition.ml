@@ -82,17 +82,17 @@ let add_ld func pred axl d = match d with
   | _, None ->
       axl, d
   | ls, Some ld ->
-      let vl,e = open_ls_defn ld in begin match e with
-        | Term t when func ->
+      let vl,e = open_ls_defn ld in begin match e.t_ty with
+        | Some _ when func ->
             let nm = ls.ls_name.id_string ^ "_def" in
-            let hd = e_app ls (List.map t_var vl) t.t_ty in
-            let ax = f_forall_close vl [] (t_insert hd t) in
+            let hd = e_app ls (List.map t_var vl) e.t_ty in
+            let ax = f_forall_close vl [] (t_insert hd e) in
             let pr = create_prsymbol (id_derive nm ls.ls_name) in
             create_prop_decl Paxiom pr ax :: axl, (ls, None)
-        | Fmla f when pred ->
+        | None when pred ->
             let nm = ls.ls_name.id_string ^ "_def" in
             let hd = f_app ls (List.map t_var vl) in
-            let ax = f_forall_close vl [] (f_insert hd f) in
+            let ax = f_forall_close vl [] (f_insert hd e) in
             let pr = create_prsymbol (id_derive nm ls.ls_name) in
             create_prop_decl Paxiom pr ax :: axl, (ls, None)
         | _ -> axl, d
@@ -112,9 +112,9 @@ let is_rec = function
   | [_, None] -> false
   | [ls, Some ld] ->
       let _, e = open_ls_defn ld in
-      begin match e with
-        | Term t -> t_s_any (const false) (ls_equal ls) t
-        | Fmla f -> f_s_any (const false) (ls_equal ls) f
+      begin match e.t_ty with
+        | Some _ -> t_s_any (const false) (ls_equal ls) e
+        | None   -> f_s_any (const false) (ls_equal ls) e
       end
   | _ -> true
 

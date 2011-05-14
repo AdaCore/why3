@@ -46,10 +46,7 @@ let remove_triggers =
 let () = Trans.register_transform "remove_triggers" remove_triggers
 
 
-let keep_no_predicate = function
-        | Term _ -> true
-        | _ -> false
-
+let keep_no_predicate e = e.t_ty <> None
 
 let filter_trigger_no_predicate =
     let rt,rf = make_rt_rf keep_no_predicate in
@@ -60,10 +57,9 @@ let () = Trans.register_transform "filter_trigger_no_predicate"
 
 
 let keep_no_fmla = function
-        | Term _ -> true
-        | Fmla {t_node = Tapp (ps,_)} -> not (ls_equal ps ps_equ)
-        | _ -> false
-
+  | { t_ty = Some _ } -> true
+  | { t_node = Tapp (ps,_) } -> not (ls_equal ps ps_equ)
+  | _ -> false
 
 let filter_trigger =
     let rt,rf = make_rt_rf keep_no_fmla in
@@ -73,8 +69,8 @@ let () = Trans.register_transform "filter_trigger" filter_trigger
 
 
 let keep_no_builtin rem_ls = function
-  | Term _ -> true
-  | Fmla {t_node = Tapp (ps,_)} -> not (Sls.mem ps rem_ls)
+  | { t_ty = Some _ } -> true
+  | { t_node = Tapp (ps,_) } -> not (Sls.mem ps rem_ls)
   | _ -> false
 
 
