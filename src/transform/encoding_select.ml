@@ -76,7 +76,7 @@ module Kept = struct
     else kept
 
   let fold_add_kept task kept = match task.task_decl.td_node with
-    | Decl { d_node = Dprop (_,_,f)} -> f_app_fold add_mono_kept kept f
+    | Decl { d_node = Dprop (_,_,f)} -> t_app_fold add_mono_kept kept f
     | _ -> kept
 
   let metas_of_kept sty decls =
@@ -125,7 +125,7 @@ module Env = struct
     else env
 
   let fold_add_instantion task env = match task.task_decl.td_node with
-    | Decl { d_node = Dprop (_,_,f)} -> f_app_fold add_mono_instantiation env f
+    | Decl { d_node = Dprop (_,_,f)} -> t_app_fold add_mono_instantiation env f
     | _ -> env
 
 (** completion functions *)
@@ -184,7 +184,7 @@ let inst_nothing _env = Trans.identity
 let inst_goal _env =
   Trans.compose (inst_nothing _env) $
   Trans.tgoal (fun pr f ->
-    let env = f_app_fold add_mono_instantiation Mls.empty f in
+    let env = t_app_fold add_mono_instantiation Mls.empty f in
     let decls = [create_decl (create_prop_decl Pgoal pr f)] in
     let decls = meta_kept_from_env decls env in
     metas_of_env env decls)
@@ -208,7 +208,7 @@ let kept_nothing _env = Trans.identity
 (** goal *)
 let kept_goal _env =
   Trans.tgoal (fun pr f ->
-    let kept = f_app_fold add_mono_kept Sty.empty f in
+    let kept = t_app_fold add_mono_kept Sty.empty f in
     metas_of_kept kept [create_decl (create_prop_decl Pgoal pr f)])
 
 (** goal + context *)
@@ -226,7 +226,7 @@ let lskept_nothing _env = Trans.identity
 (** goal *)
 let lskept_goal _env =
   Trans.tgoal (fun pr f ->
-    let lskept = f_app_fold add_mono_lskept Sls.empty f in
+    let lskept = t_app_fold add_mono_lskept Sls.empty f in
     metas_of_lskept lskept [create_decl (create_prop_decl Pgoal pr f)])
 
 (** goal + context *)

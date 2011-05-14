@@ -118,14 +118,14 @@ and rewrite_fmla tenv ud vm f =
       let f1' = fnF vm' f1 in
       f_quant q (close vl' tl' f1')
   | Tlet (t1, b) ->
-      let u,f1,close = f_open_bound_cb b in
+      let u,f1,close = t_open_bound_cb b in
       let u' = conv_vs tenv ud u in
       let t1' = fnT vm t1 in
       let f1' = fnF (Mvs.add u (t_var u') vm) f1 in
-      f_let t1' (close u' f1')
+      t_let t1' (close u' f1')
   | Tcase _ ->
       Printer.unsupportedFmla f "unsupported formula"
-  | _ -> f_map (fnT vm) (fnF vm) f
+  | _ -> t_map (fnT vm) (fnF vm) f
 
 let decl_ud ud task =
   let add ts () task = add_ty_decl task [ts,Tabstract] in

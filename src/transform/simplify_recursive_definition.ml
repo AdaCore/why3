@@ -95,7 +95,7 @@ let elt d =
              | None -> Mid.add ls.ls_name Sid.empty acc
              | Some ld ->
                  let fd = ls_defn_axiom ld in
-                 let s = f_s_fold tyoccurences loccurences Sid.empty fd in
+                 let s = t_s_fold tyoccurences loccurences Sid.empty fd in
                  Mid.add ls.ls_name s acc) Mid.empty l in
           let l = connexe m in
           List.map (fun e -> create_logic_decl (List.map (Hid.find mem) e)) l

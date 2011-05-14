@@ -61,11 +61,11 @@ let ft_enco_poly   = ((Hashtbl.create 17) : (env,task) Trans.flag_trans)
 
 let monomorphise_goal =
   Trans.goal (fun pr f ->
-    let stv = f_ty_freevars Stv.empty f in
+    let stv = t_ty_freevars Stv.empty f in
     let mty,ltv = Stv.fold (fun tv (mty,ltv) ->
       let ts = create_tysymbol (Ident.id_clone tv.tv_name) [] None in
       Mtv.add tv (ty_app ts []) mty,ts::ltv) stv (Mtv.empty,[]) in
-    let f = f_ty_subst mty Mvs.empty f in
+    let f = t_ty_subst mty Mvs.empty f in
     let acc = [Decl.create_prop_decl Decl.Pgoal pr f] in
     let acc = List.fold_left
       (fun acc ts -> (Decl.create_ty_decl [ts,Decl.Tabstract]) :: acc)

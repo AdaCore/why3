@@ -227,7 +227,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
         (print_term info) t
         (print_list newline (print_tbranch info)) bl
   | Teps fb ->
-      let v,f = f_open_bound fb in
+      let v,f = t_open_bound fb in
       fprintf fmt (protect_on opr "epsilon %a.@ %a")
         (print_vsty info) v (print_opl_fmla info) f;
       forget_var v
@@ -274,7 +274,7 @@ and print_fnode opl opr info fmt f = match f.t_node with
   | Fnot f ->
       fprintf fmt (protect_on opr "~ %a") (print_opl_fmla info) f
   | Tlet (t,f) ->
-      let v,f = f_open_bound f in
+      let v,f = t_open_bound f in
       fprintf fmt (protect_on opr "let %a :=@ %a in@ %a")
         print_vs v (print_opl_term info) t (print_opl_fmla info) f;
       forget_var v
@@ -300,7 +300,7 @@ and print_tbranch info fmt br =
   Svs.iter forget_var p.pat_vars
 
 and print_fbranch info fmt br =
-  let p,f = f_open_branch br in
+  let p,f = t_open_branch br in
   fprintf fmt "@[<hov 4>| %a =>@ %a@]"
     (print_pat info) p (print_fmla info) f;
   Svs.iter forget_var p.pat_vars
@@ -309,7 +309,7 @@ and print_tl info fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
     (print_list alt (print_list comma (print_expr info))) tl
 
-and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
+and print_expr info fmt = e_map (print_term info fmt) (print_fmla info fmt)
 
 (** Declarations *)
 
@@ -507,7 +507,7 @@ let print_decl ~old info fmt d = match d.d_node with
   | Dind il   -> print_list nothing (print_ind_decl info) fmt il
   | Dprop (_,pr,_) when Sid.mem pr.pr_name info.info_rem -> ()
   | Dprop (k,pr,f) ->
-      let params = f_ty_freevars Stv.empty f in
+      let params = t_ty_freevars Stv.empty f in
       fprintf fmt "@[<hov 2>%a %a : %a%a.@]@\n%a"
         (print_pkind info) k
         print_pr pr

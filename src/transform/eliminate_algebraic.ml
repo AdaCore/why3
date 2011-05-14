@@ -41,9 +41,9 @@ and rewriteF kn f = match f.t_node with
   | Tcase (t,bl) ->
       let t = rewriteT kn t in
       let mk_b (p,f) = ([p], rewriteF kn f) in
-      let bl = List.map (fun b -> mk_b (f_open_branch b)) bl in
-      Pattern.CompileFmla.compile (find_constructors kn) [t] bl
-  | _ -> f_map (rewriteT kn) (rewriteF kn) f
+      let bl = List.map (fun b -> mk_b (t_open_branch b)) bl in
+      Pattern.CompileTerm.compile (find_constructors kn) [t] bl
+  | _ -> t_map (rewriteT kn) (rewriteF kn) f
 
 let comp t task =
   let fnT = rewriteT t.task_known in
@@ -109,7 +109,7 @@ and rewriteF kn state av sign f = match f.t_node with
       let t1 = rewriteT kn state t1 in
       let av' = Svs.diff av (t_freevars Svs.empty t1) in
       let mk_br (w,m) br =
-        let (p,e) = f_open_branch br in
+        let (p,e) = t_open_branch br in
         let e = rewriteF kn state av' sign e in
         match p with
         | { pat_node = Papp (cs,pl) } ->
@@ -132,7 +132,7 @@ and rewriteF kn state av sign f = match f.t_node with
         let hd = e_app cs (List.map t_var vl) t1.t_ty in
         match t1.t_node with
         | Tvar v when Svs.mem v av ->
-            let hd = f_let_close_simp v hd e in if sign
+            let hd = t_let_close_simp v hd e in if sign
             then f_forall_close_simp vl [] hd
             else f_exists_close_simp vl [] hd
         | _ ->

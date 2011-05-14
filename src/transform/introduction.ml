@@ -57,7 +57,7 @@ let rec intros pr f = match f.t_node with
         create_logic_decl [ls,None]
       in
       let subst, dl = Util.map_fold_left intro_var Mvs.empty vsl in
-      let f = f_subst subst f in
+      let f = t_subst subst f in
       dl @ intros pr f
 
   | _ -> [create_prop_decl Pgoal pr f]

@@ -42,9 +42,3 @@ module CompileTerm : sig
   val compile : (tysymbol -> lsymbol list) ->
     term list -> (pattern list * term) list -> term
 end
-
-module CompileFmla : sig
-  val compile : (tysymbol -> lsymbol list) ->
-    term list -> (pattern list * fmla) list -> fmla
-end
-

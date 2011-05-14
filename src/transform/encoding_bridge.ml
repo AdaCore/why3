@@ -177,7 +177,7 @@ let rec rewrite_term tenv vsvar t =
         let t2 = fnT vsvar t2 in
         t_let t1 (close u' t2)
     | Teps b ->
-        let u,f,close = f_open_bound_cb b in
+        let u,f,close = t_open_bound_cb b in
         let u' = conv_vs tenv u in
         let vsvar = Mvs.add u (t_var u') vsvar in
         let f = fnF vsvar f in
@@ -217,17 +217,17 @@ and rewrite_fmla tenv vsvar f =
         let vl = List.rev vl in
         f_quant q (close vl tl f1)
     | Tlet (t1, b) ->
-        let u,f2,close = f_open_bound_cb b in
+        let u,f2,close = t_open_bound_cb b in
         let t1 = fnT vsvar t1 in
         let u' = conv_vs tenv u in
         let vsvar = Mvs.add u (t_var u') vsvar in
         let f2 = fnF vsvar f2 in
-        f_let t1 (close u' f2)
+        t_let t1 (close u' f2)
     | Fbinop (op,f1,f2) -> f_binary op (fnF vsvar f1) (fnF vsvar f2)
     | Fnot f1 -> f_not (fnF vsvar f1)
     | Ftrue | Ffalse -> f
     | Tif (f1,f2,f3) ->
-        f_if (fnF vsvar f1) (fnF vsvar f2) (fnF vsvar f3)
+        t_if (fnF vsvar f1) (fnF vsvar f2) (fnF vsvar f3)
     | Tcase _ ->
         Printer.unsupportedFmla f "no match expressions at this point"
     | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)

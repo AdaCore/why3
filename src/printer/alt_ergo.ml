@@ -139,7 +139,7 @@ let rec print_fmla info fmt f = match f.t_node with
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 
-and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
+and print_expr info fmt = e_map (print_term info fmt) (print_fmla info fmt)
 
 and print_triggers info fmt tl =
   let filter = function

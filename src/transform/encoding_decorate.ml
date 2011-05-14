@@ -47,7 +47,7 @@ and deco_fmla kept tvar f = match f.t_node with
       let vl,tl,f,close = f_open_quant_cb b in
       let tl = tr_map (deco_arg kept tvar) (deco_fmla kept tvar) tl in
       f_quant q (close vl tl (deco_fmla kept tvar f))
-  | _ -> f_map (deco_term kept tvar) (deco_fmla kept tvar) f
+  | _ -> t_map (deco_term kept tvar) (deco_fmla kept tvar) f
 
 let deco_decl kept d = match d.d_node with
   | Dtype tdl ->

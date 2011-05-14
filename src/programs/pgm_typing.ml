@@ -1278,7 +1278,7 @@ let declare_global ls pv =
   Hls.add globals ls pv
 
 let rec fmla_effect ef f = 
-  f_map_fold term_effect fmla_effect ef f
+  t_map_fold term_effect fmla_effect ef f
 
 and term_effect ef t = match t.t_node with
   | Term.Tapp (ls, []) when Hls.mem globals ls ->

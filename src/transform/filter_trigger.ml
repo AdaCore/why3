@@ -22,7 +22,7 @@ open Term
 let make_rt_rf keep =
   let rec rt t = t_map rt rf t
   and rf f =
-    let f = f_map rt rf f in
+    let f = t_map rt rf f in
     match f.t_node with
       | Fquant (Fforall,fq) ->
         let vsl,trl,f2 = f_open_quant fq in

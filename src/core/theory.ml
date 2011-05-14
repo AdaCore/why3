@@ -459,7 +459,7 @@ let cl_find_ls cl ls =
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     ls'
 
-let cl_trans_fmla cl f = f_s_map (cl_find_ts cl) (cl_find_ls cl) f
+let cl_trans_fmla cl f = t_s_map (cl_find_ts cl) (cl_find_ls cl) f
 
 let cl_find_pr cl pr =
   if not (Sid.mem pr.pr_name cl.cl_local) then pr

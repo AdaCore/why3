@@ -150,11 +150,3 @@ module CompileTerm  = Compile (struct
   let mk_case t bl  = t_case t bl
 end)
 
-module CompileFmla  = Compile (struct
-  type action = fmla
-  type branch = fmla_branch
-  let mk_let v t f  = f_let_close_simp v t f
-  let mk_branch p f = f_close_branch p f
-  let mk_case t bl  = f_case t bl
-end)
-

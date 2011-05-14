@@ -98,7 +98,7 @@ let type_close tvs fn f =
   f_forall_close_simp vl [] (fn tvm f)
 
 let f_type_close fn f =
-  let tvs = f_ty_freevars Stv.empty f in
+  let tvs = t_ty_freevars Stv.empty f in
   type_close tvs fn f
 
 (* convert a type declaration to a list of lsymbol declarations *)
@@ -177,7 +177,7 @@ let rec t_monomorph ty_base kept lsmap consts vmap t =
     | Tcase _ ->
         Printer.unsupportedTerm t "no match expressions at this point"
     | Teps b ->
-        let u,f,close = f_open_bound_cb b in
+        let u,f,close = t_open_bound_cb b in
         let v = vs_monomorph ty_base kept u in
         let f = f_mono (Mvs.add u (t_var v) vmap) f in
         t_eps (close v f)
@@ -186,7 +186,7 @@ let rec t_monomorph ty_base kept lsmap consts vmap t =
 and f_monomorph ty_base kept lsmap consts vmap f =
   let t_mono = t_monomorph ty_base kept lsmap consts in
   let f_mono = f_monomorph ty_base kept lsmap consts in
-  f_label_copy f (match f.t_node with
+  t_label_copy f (match f.t_node with
     | Tapp (ps,[t1;t2]) when ls_equal ps ps_equ ->
         f_equ (t_mono vmap t1) (t_mono vmap t2)
     | Tapp (ps,tl) ->
@@ -205,12 +205,12 @@ and f_monomorph ty_base kept lsmap consts vmap f =
     | Ftrue | Ffalse ->
         f
     | Tif (f1,f2,f3) ->
-        f_if (f_mono vmap f1) (f_mono vmap f2) (f_mono vmap f3)
+        t_if (f_mono vmap f1) (f_mono vmap f2) (f_mono vmap f3)
     | Tlet (t,b) ->
-        let u,f1,close = f_open_bound_cb b in
+        let u,f1,close = t_open_bound_cb b in
         let v = vs_monomorph ty_base kept u in
         let f1 = f_mono (Mvs.add u (t_var v) vmap) f1 in
-        f_let (t_mono vmap t) (close v f1)
+        t_let (t_mono vmap t) (close v f1)
     | Tcase _ ->
         Printer.unsupportedFmla f "no match expressions at this point"
     | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f))

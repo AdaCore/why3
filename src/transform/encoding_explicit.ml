@@ -80,7 +80,7 @@ module Transform = struct
       let terms = args_transform varM p terms None in
       f_app (findL p) terms
     | _ -> (* otherwise : just traverse and translate *)
-      f_map (term_transform varM) (fmla_transform varM) f
+      t_map (term_transform varM) (fmla_transform varM) f
 
   and args_transform varM ls args ty =
     (* Debug.print_list Pretty.print_ty Format.std_formatter type_vars; *)

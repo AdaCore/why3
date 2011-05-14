@@ -236,7 +236,7 @@ and fmla env = function
   | Fbinop (op, f1, f2) ->
       f_binary op (fmla env f1) (fmla env f2)
   | Fif (f1, f2, f3) ->
-      f_if (fmla env f1) (fmla env f2) (fmla env f3)
+      t_if (fmla env f1) (fmla env f2) (fmla env f3)
   | Fquant (q, uqu, trl, f1) ->
       let uquant env (id,ty) =
         let v = create_user_vs id (ty_of_dty ty) in
@@ -256,17 +256,17 @@ and fmla env = function
       let v = create_user_vs id (t_type e1) in
       let env = Mstr.add id.id v env in
       let f2 = fmla env f2 in
-      f_let_close v e1 f2
+      t_let_close v e1 f2
   | Fmatch (t, bl) ->
       let branch (p,e) =
-        let env, p = pattern env p in f_close_branch p (fmla env e)
+        let env, p = pattern env p in t_close_branch p (fmla env e)
       in
-      f_case (term env t) (List.map branch bl)
+      t_case (term env t) (List.map branch bl)
   | (Fnamed _) as f ->
       let rec collect p ll = function
         | Fnamed (Lstr l, e) -> collect p (l::ll) e
         | Fnamed (Lpos p, e) -> collect (Some p) ll e
-        | e -> f_label ?loc:p ll (fmla env e)
+        | e -> t_label ?loc:p ll (fmla env e)
       in
       collect None [] f
   | Fvar f ->
@@ -345,7 +345,7 @@ and specialize_term_node ~loc htv = function
       in
       Tmatch (specialize_term ~loc htv t1, List.map branch bl)
   | Term.Teps fb ->
-      let v, f = f_open_bound fb in
+      let v, f = t_open_bound fb in
       Teps (ident_of_vs ~loc v, specialize_ty ~loc htv v.vs_ty,
 	    specialize_fmla ~loc htv f)
   | Term.Fquant _ | Term.Fbinop _ | Term.Fnot _
@@ -376,11 +376,11 @@ and specialize_fmla_node ~loc htv = function
       Fif (specialize_fmla ~loc htv f1,
 	   specialize_fmla ~loc htv f2, specialize_fmla ~loc htv f3)
   | Term.Tlet (t1, f2b) ->
-      let v, f2 = f_open_bound f2b in
+      let v, f2 = t_open_bound f2b in
       Flet (specialize_term ~loc htv t1,
 	    ident_of_vs ~loc v, specialize_fmla ~loc htv f2)
   | Term.Tcase (t, fbl) ->
-      let branch b = let p, f = f_open_branch b in
+      let branch b = let p, f = t_open_branch b in
 	specialize_pattern ~loc htv p, specialize_fmla ~loc htv f
       in
       Fmatch (specialize_term ~loc htv t, List.map branch fbl)

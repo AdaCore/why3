@@ -821,9 +821,9 @@ and tr_formula dep tvm bv env f =
 	  let ls = tr_global_ls dep env (ConstructRef cj) in
 	  if List.length vars <> List.length ls.ls_args then raise NotFO;
 	  let pat = pat_app ls (List.map pat_var vars) ty in
-	  f_close_branch pat (tr_formula dep tvm bv env bj)
+	  t_close_branch pat (tr_formula dep tvm bv env bj)
 	in
-	f_case t (Array.to_list (Array.mapi branch br))
+	t_case t (Array.to_list (Array.mapi branch br))
     | Case _, _ :: _ ->
 	raise NotFO (* TODO: we could possibly swap case and application *)
     | _ ->
@@ -874,7 +874,7 @@ let tr_goal gl =
 	  let ty = tr_type dep tvm env ty in
 	  let vs = Term.create_vsymbol (preid_of_id id) ty in
 	  let bv = Idmap.add id vs bv in
-	  Term.f_let_close vs d (tr_ctxt tvm bv ctxt)
+	  Term.t_let_close vs d (tr_ctxt tvm bv ctxt)
 	with NotFO ->
 	  tr_ctxt tvm bv ctxt
 	end

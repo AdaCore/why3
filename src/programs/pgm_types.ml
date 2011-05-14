@@ -362,20 +362,20 @@ end = struct
 	
   let subst_post ts s ((v, q), ql) =
     let ts = Mtv.map purify ts in
-    let vq = let s, v = subst_var ts s v in v, f_ty_subst ts s q in
+    let vq = let s, v = subst_var ts s v in v, t_ty_subst ts s q in
     let handler (e, (v, q)) = match v with
       | None -> 
-	  e, (v, f_ty_subst ts s q)
+	  e, (v, t_ty_subst ts s q)
       | Some v -> 
 	  let s, v = subst_var ts s v in 
-	  e, (Some v, f_ty_subst ts s q)
+	  e, (Some v, t_ty_subst ts s q)
     in
     vq, List.map handler ql
       
   let rec subst_type_c ts s c =
     { c_result_type = subst_type_v ts s c.c_result_type;
       c_effect      = E.subst ts c.c_effect;
-      c_pre         = (let ts = Mtv.map purify ts in f_ty_subst ts s c.c_pre);
+      c_pre         = (let ts = Mtv.map purify ts in t_ty_subst ts s c.c_pre);
       c_post        = subst_post ts s c.c_post; }
       
   and subst_type_v ts s = function

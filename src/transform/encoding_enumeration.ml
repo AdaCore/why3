@@ -72,7 +72,7 @@ and rewrite_fmla tenv f = match f.t_node with
       f_app ps (List.map pin tl)
   | Tcase _ ->
       Printer.unsupportedFmla f "use eliminate_algebraic"
-  | _ -> f_map (rewrite_term tenv) (rewrite_fmla tenv) f
+  | _ -> t_map (rewrite_term tenv) (rewrite_fmla tenv) f
 
 let decl tenv d = match d.d_node with
   | Dtype tl ->

@@ -40,7 +40,7 @@ type logic_decl = lsymbol * ls_defn option
 exception UnboundVar of vsymbol
 
 let check_fvs f =
-  let fvs = f_freevars Svs.empty (t_prop f) in
+  let fvs = t_freevars Svs.empty (t_prop f) in
   Svs.iter (fun vs -> raise (UnboundVar vs)) fvs;
   f
 
@@ -62,7 +62,7 @@ let make_ps_defn ps vl f =
   List.iter2 check_vl ps.ls_args vl;
   ps, Some (ps, check_fvs pd)
 
-let make_ls_defn ls vl = e_apply (make_fs_defn ls vl) (make_ps_defn ls vl)
+let make_ls_defn ls vl = e_map (make_fs_defn ls vl) (make_ps_defn ls vl)
 
 let open_ls_defn (_,f) =
   let vl, ef = f_open_forall f in
@@ -140,24 +140,24 @@ let build_call_graph cgr syms ls =
     | _ -> t_fold (term vm) (fmla vm) () t
   and fmla vm () f = match f.t_node with
     | Tapp (s,tl) when Mls.mem s syms ->
-        f_fold (term vm) (fmla vm) () f; call vm s tl
+        t_fold (term vm) (fmla vm) () f; call vm s tl
     | Tlet ({t_node = Tvar v}, b) when Mvs.mem v vm ->
-        let u,e = f_open_bound b in
+        let u,e = t_open_bound b in
         fmla (Mvs.add u (Mvs.find v vm) vm) () e
     | Tcase (e,bl) ->
         term vm () e; List.iter (fun b ->
-          let p,f = f_open_branch b in
+          let p,f = t_open_branch b in
           let vml = match_term vm e [vm] p in
           List.iter (fun vm -> fmla vm () f) vml) bl
     | Fquant (_,b) ->
         let _,_,f = f_open_quant b in fmla vm () f
-    | _ -> f_fold (term vm) (fmla vm) () f
+    | _ -> t_fold (term vm) (fmla vm) () f
   in
   fun (vl,e) ->
     let i = ref (-1) in
     let add vm v = incr i; Mvs.add v (Equal !i) vm in
     let vm = List.fold_left add Mvs.empty vl in
-    e_apply (term vm ()) (fmla vm ()) e
+    e_map (term vm ()) (fmla vm ()) e
 
 let build_call_list cgr ls =
   let htb = Hls.create 5 in
@@ -309,12 +309,12 @@ module Hsdecl = Hashcons.Make (struct
     | _ -> false
 
   let eq_ld (ls1,ld1) (ls2,ld2) = ls_equal ls1 ls2 && match ld1,ld2 with
-    | Some (_,f1), Some (_,f2) -> f_equal f1 f2
+    | Some (_,f1), Some (_,f2) -> t_equal f1 f2
     | None, None -> true
     | _ -> false
 
   let eq_iax (pr1,fr1) (pr2,fr2) =
-    pr_equal pr1 pr2 && f_equal fr1 fr2
+    pr_equal pr1 pr2 && t_equal fr1 fr2
 
   let eq_ind (ps1,al1) (ps2,al2) =
     ls_equal ps1 ps2 && list_all2 eq_iax al1 al2
@@ -324,7 +324,7 @@ module Hsdecl = Hashcons.Make (struct
     | Dlogic l1, Dlogic l2 -> list_all2 eq_ld l1 l2
     | Dind   l1, Dind   l2 -> list_all2 eq_ind l1 l2
     | Dprop (k1,pr1,f1), Dprop (k2,pr2,f2) ->
-        k1 = k2 && pr_equal pr1 pr2 && f_equal f1 f2
+        k1 = k2 && pr_equal pr1 pr2 && t_equal f1 f2
     | _,_ -> false
 
   let hs_td (ts,td) = match td with
@@ -332,9 +332,9 @@ module Hsdecl = Hashcons.Make (struct
     | Talgebraic l -> 1 + Hashcons.combine_list ls_hash (ts_hash ts) l
 
   let hs_ld (ls,ld) = Hashcons.combine (ls_hash ls)
-    (Hashcons.combine_option (fun (_,f) -> f_hash f) ld)
+    (Hashcons.combine_option (fun (_,f) -> t_hash f) ld)
 
-  let hs_prop (pr,f) = Hashcons.combine (pr_hash pr) (f_hash f)
+  let hs_prop (pr,f) = Hashcons.combine (pr_hash pr) (t_hash f)
 
   let hs_ind (ps,al) = Hashcons.combine_list hs_prop (ls_hash ps) al
 
@@ -390,7 +390,7 @@ let syms_ls s ls = Sid.add ls.ls_name s
 
 let syms_ty s ty = ty_s_fold syms_ts s ty
 let syms_term s t = t_s_fold syms_ts syms_ls s t
-let syms_fmla s f = f_s_fold syms_ts syms_ls s f
+let syms_fmla s f = t_s_fold syms_ts syms_ls s f
 
 let create_ty_decl tdl =
   if tdl = [] then raise EmptyDecl;
@@ -465,7 +465,7 @@ let rec f_pos_ps sps pol f = match f.t_node, pol with
       f_pos_ps sps (option_map not pol) f
   | Tif (f,g,h), _ ->
       f_pos_ps sps None f && f_pos_ps sps pol g && f_pos_ps sps pol h
-  | _ -> f_all (t_pos_ps sps) (f_pos_ps sps pol) f
+  | _ -> t_all (t_pos_ps sps) (f_pos_ps sps pol) f
 
 let create_ind_decl idl =
   if idl = [] then raise EmptyDecl;
@@ -548,16 +548,16 @@ let decl_map_fold fnT fnF acc d =
   match d.d_node with
   | Dtype _ -> acc, d
   | Dprop (k,pr,f) ->
-      let acc, f = f_map_fold fnT fnF acc f in
+      let acc, f = t_map_fold fnT fnF acc f in
       acc, create_prop_decl k pr f
   | Dind l ->
       let acc, l =
-        list_rpair_map_fold (list_rpair_map_fold (f_map_fold fnT fnF)) acc l in
+        list_rpair_map_fold (list_rpair_map_fold (t_map_fold fnT fnF)) acc l in
       acc, create_ind_decl l
   | Dlogic l ->
       let acc, l =
       list_rpair_map_fold (option_map_fold
-        (rpair_map_fold (f_map_fold fnT fnF))) acc l in
+        (rpair_map_fold (t_map_fold fnT fnF))) acc l in
       acc, create_logic_decl l
 
 
@@ -642,11 +642,11 @@ let rec check_matchT kn () t = match t.t_node with
 
 and check_matchF kn () f = match f.t_node with
   | Tcase (t1,bl) ->
-      let bl = List.map (fun b -> let p,f = f_open_branch b in [p],f) bl in
-      ignore (try Pattern.CompileFmla.compile (find_constructors kn) [t1] bl
+      let bl = List.map (fun b -> let p,f = t_open_branch b in [p],f) bl in
+      ignore (try Pattern.CompileTerm.compile (find_constructors kn) [t1] bl
       with Pattern.NonExhaustive p -> raise (NonExhaustiveExpr (p,f)));
-      f_fold (check_matchT kn) (check_matchF kn) () f
-  | _ -> f_fold (check_matchT kn) (check_matchF kn) () f
+      t_fold (check_matchT kn) (check_matchF kn) () f
+  | _ -> t_fold (check_matchT kn) (check_matchF kn) () f
 
 let check_match kn d = decl_fold (check_matchT kn) (check_matchF kn) () d
 

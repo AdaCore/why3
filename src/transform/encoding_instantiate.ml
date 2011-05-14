@@ -322,14 +322,14 @@ and rewrite_fmla menv tvar vsvar f =
          peut être généré *)
       let tl = tr_map (fnT vsvar) (fnF vsvar) tl in
       f_quant q (cb vl tl f1)
-    | Tlet (t1, b) -> let u,f2,cb = f_open_bound_cb b in
+    | Tlet (t1, b) -> let u,f2,cb = t_open_bound_cb b in
       let (vsvar',u) = conv_vs menv tvar vsvar u in
       let t1 = fnT vsvar t1 and f2 = fnF vsvar' f2 in
       (* Format.eprintf "u.vs_ty : %a == t1.t_ty : %a@." *)
       (*    Pretty.print_ty u.vs_ty Pretty.print_ty t1.t_ty; *)
       check_ty_equal u.vs_ty (t_type t1);
-      f_let t1 (cb u f2)
-    | _ -> f_map (fun _ -> assert false) (fnF vsvar) f
+      t_let t1 (cb u f2)
+    | _ -> t_map (fun _ -> assert false) (fnF vsvar) f
 
 (* Generation of all the possible instantiation of a formula *)
 let gen_tvar env ts =
@@ -362,7 +362,7 @@ let ty_quant =
   let rec add_vs s ty = match ty.ty_node with
     | Tyvar vs -> Stv.add vs s
     | _ -> ty_fold add_vs s ty in
-  f_ty_fold add_vs Stv.empty
+  t_ty_fold add_vs Stv.empty
 
 let add_decl_ud menv task =
   let task = Sts.fold
@@ -453,7 +453,7 @@ Perhaps you could use eliminate_definition"
         then task
         else
         (* Format.eprintf "f0 : %a@. env : %a@." Pretty.print_fmla *)
-        (*   (f_ty_subst tvar Mvs.empty f) *)
+        (*   (t_ty_subst tvar Mvs.empty f) *)
         (*   print_env menv; *)
         let f = rewrite_fmla menv tvar Mvs.empty f in
         (* Format.eprintf "f : %a@. env : %a@." Pretty.print_fmla f *)
@@ -483,7 +483,7 @@ let monomorphise_goal =
     let mty,ltv = Stv.fold (fun tv (mty,ltv) ->
       let ts = create_tysymbol (id_clone tv.tv_name) [] None in
       Mtv.add tv (ty_app ts []) mty,ts::ltv) stv (Mtv.empty,[]) in
-    let f = f_ty_subst mty Mvs.empty f in
+    let f = t_ty_subst mty Mvs.empty f in
     let acc = [create_prop_decl Pgoal pr f] in
     let acc = List.fold_left
       (fun acc ts -> (create_ty_decl [ts,Tabstract]) :: acc)

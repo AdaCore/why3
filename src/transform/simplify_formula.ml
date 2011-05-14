@@ -82,12 +82,12 @@ let rec fmla_find_subst boundvars var sign f =
             List.fold_left (fun s v -> Svs.add v s) boundvars vsl in
           fmla_find_subst boundvars var sign f'
     | Tlet (_,fb) ->
-        let vs,f' = f_open_bound fb in
+        let vs,f' = t_open_bound fb in
         let boundvars = Svs.add vs boundvars in
         fmla_find_subst boundvars var sign f'
     | Tcase (_,fbs) ->
         let iter_fb fb =
-          let patl,f = f_open_branch fb in
+          let patl,f = t_open_branch fb in
           let boundvars = patl.pat_vars in
           fmla_find_subst boundvars var sign f in
         List.iter iter_fb fbs
@@ -102,7 +102,7 @@ let rec fmla_quant sign f = function
         fmla_find_subst (Svs.singleton vs) vs sign f;
         vs::vsl, f
       with Subst_found t ->
-        let f = f_subst_single vs t f in
+        let f = t_subst_single vs t f in
         vsl, fmla_simpl f
 
 let rec fmla_remove_quant f =
@@ -117,7 +117,7 @@ let rec fmla_remove_quant f =
             let vsl, f' = fmla_quant sign f' vsl in
             let f' = fmla_remove_quant f' in
             f_quant k (close vsl [] f')
-    | _ -> f_map (fun t -> t) fmla_remove_quant f
+    | _ -> t_map (fun t -> t) fmla_remove_quant f
 
 (*let fmla_remove_quant f =
   Format.eprintf "@[<hov>%a =>|@\n" Pretty.print_fmla f;
@@ -160,7 +160,7 @@ let fmla_flatten conj f =
 (** recreate the structure of a given formula with linearized subformulas *)
 let fmla_unflatten conj f formulas =
   let i = ref 0 in
-  let rec aux sign f = f_label_copy f (match f.t_node with
+  let rec aux sign f = t_label_copy f (match f.t_node with
     | Fnot f -> f_not (aux (not sign) f)
     | Fbinop (For, f1, f2) when sign <> conj ->
         let f1' = aux sign f1 in f_or f1' (aux sign f2)
@@ -202,7 +202,7 @@ let rec fmla_cond_subst filter f =
             for j = 0 to subl - 1 do
               if j <> i then
                 let (f, s) = subf.(j) in
-                subf.(j) <- (f_subst_term t1 t2 f, s);
+                subf.(j) <- (t_subst_term t1 t2 f, s);
             done in
           let (f, s) = subf.(i) in
           match f.t_node with
@@ -212,5 +212,5 @@ let rec fmla_cond_subst filter f =
           | _ -> ()
         done;
         fmla_unflatten conj f subf
-    | _ -> f_map (fun t -> t) aux f in
+    | _ -> t_map (fun t -> t) aux f in
   aux f

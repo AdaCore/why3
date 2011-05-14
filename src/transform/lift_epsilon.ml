@@ -32,7 +32,7 @@ let lift kind =
     match t.t_node with
     | Teps fb ->
         let fv = Svs.elements (t_freevars Svs.empty t) in
-        let x, f = f_open_bound fb in
+        let x, f = t_open_bound fb in
         let acc, f = form acc f in
         let tys = List.map (fun x -> x.vs_ty) fv in
         let xs = Ident.id_derive "epsilon" x.vs_name in
@@ -47,13 +47,13 @@ let lift kind =
           | Implied when not (is_lambda t) ->
               f_forall_close_merge fv
                 (f_implies (f_exists_close [x] [] f)
-                   (f_subst_single x xlapp f))
-          | _ -> f_subst_single x xlapp f
+                   (t_subst_single x xlapp f))
+          | _ -> t_subst_single x xlapp f
         in
         let acc = add_decl acc (Decl.create_prop_decl Decl.Paxiom axs f) in
         acc, xlapp
     | _ -> t_map_fold term form acc t
-  and form acc f = f_map_fold term form acc f in
+  and form acc f = t_map_fold term form acc f in
   fun th acc ->
     let th = th.task_decl in
     match th.td_node with

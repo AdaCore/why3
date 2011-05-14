@@ -130,7 +130,7 @@ and print_fmla info fmt f = match f.t_node with
       unsupportedFmla f "simplify : you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
-and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
+and print_expr info fmt = e_map (print_term info fmt) (print_fmla info fmt)
 
 and print_trigger info fmt = function
   | [] -> ()

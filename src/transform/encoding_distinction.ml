@@ -152,14 +152,14 @@ and rewrite_fmla env tvar vsvar f =
       let f1 = fnF vsvar f1 in
       let tl = tr_map (fnT vsvar) (fnF vsvar) tl in
       f_quant q (cb vl tl f1)
-    | Tlet (t1, b) -> let u,f2,cb = f_open_bound_cb b in
+    | Tlet (t1, b) -> let u,f2,cb = t_open_bound_cb b in
       let (vsvar',u) = conv_vs tvar vsvar u in
       let t1 = fnT vsvar t1 and f2 = fnF vsvar' f2 in
       (* Format.eprintf "u.vs_ty : %a == t1.t_ty : %a@." *)
       (*    Pretty.print_ty u.vs_ty Pretty.print_ty t1.t_ty; *)
       Ty.check_ty_equal u.vs_ty (t_type t1);
-      f_let t1 (cb u f2)
-    | _ -> f_map (fun _ -> assert false) (fnF vsvar) f
+      t_let t1 (cb u f2)
+    | _ -> t_map (fun _ -> assert false) (fnF vsvar) f
 
 
 module Ssubst =
@@ -186,7 +186,7 @@ let ty_quant env =
         Mtyl.fold fold_inst insts acc0
       with Not_found (* no such p *) -> acc0
   in
-  f_app_fold add_vs (Ssubst.singleton (Mtv.empty))
+  t_app_fold add_vs (Ssubst.singleton (Mtv.empty))
 
 (* The Core of the transformation *)
 let map env d =
@@ -213,7 +213,7 @@ Perhaps you could use eliminate_definition"
       let substs_len = Ssubst.cardinal substs in
       let conv_f tvar task =
         (* Format.eprintf "f0 : %a@. env : %a@." Pretty.print_fmla *)
-        (*   (f_ty_subst tvar Mvs.empty f) *)
+        (*   (t_ty_subst tvar Mvs.empty f) *)
         (*   print_env env; *)
         let f = rewrite_fmla env tvar Mvs.empty f in
         (* Format.eprintf "f : %a@. env : %a@." Pretty.print_fmla f *)

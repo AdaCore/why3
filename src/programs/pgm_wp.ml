@@ -42,10 +42,10 @@ let wp_and ?(sym=false) f1 f2 =
 (*   if sym then f_and_simp f1 f2 else f_and_simp f1 (f_implies_simp f1 f2)  *)
   let f = f_and_simp f1 f2 in
 (* experiment, but does not work
-  let f = f_label_add Split_goal.stop_split f in
+  let f = t_label_add Split_goal.stop_split f in
 *)
   match f.t_node with
-    | Fbinop (Fand, _, _) when not sym -> f_label_add Split_goal.asym_split f
+    | Fbinop (Fand, _, _) when not sym -> t_label_add Split_goal.asym_split f
     | _ -> f
 
 let wp_ands ?(sym=false) fl =
@@ -66,16 +66,16 @@ let is_arrow_ty ty = match ty.ty_node with
 
 let wp_forall v f =
   if is_arrow_ty v.vs_ty then f else
-  if f_occurs_single v f then f_forall_close_simp [v] [] f else f
+  if t_occurs_single v f then f_forall_close_simp [v] [] f else f
 (*
   match f.t_node with
     | Fbinop (Fimplies, {f_node = Fapp (s,[{t_node = Tvar u};r])},h)
       when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) ->
-        f_subst_single v r h
+        t_subst_single v r h
     | Fbinop (Fimplies, {f_node = Fbinop (Fand, g,
                         {f_node = Fapp (s,[{t_node = Tvar u};r])})},h)
       when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) ->
-        f_subst_single v r (f_implies_simp g h)
+        t_subst_single v r (f_implies_simp g h)
     | _ when f_occurs_single v f ->
         f_forall_close_simp [v] [] f
     | _ ->
@@ -107,7 +107,7 @@ let add_binders = List.fold_right add_binder
 
 (* replace old(t) with at(t,lab) everywhere in formula f *)
 let rec old_label env lab f =
-  f_map (old_label_term env lab) (old_label env lab) f
+  t_map (old_label_term env lab) (old_label env lab) f
 
 and old_label_term env lab t = match t.t_node with
   | Tapp (ls, [t]) when ls_equal ls (find_ls ~pure:true env "old") ->
@@ -118,7 +118,7 @@ and old_label_term env lab t = match t.t_node with
 
 (* replace at(t,lab) with t everywhere in formula f *)
 let rec erase_label env lab f =
-  f_map (erase_label_term env lab) (erase_label env lab) f
+  t_map (erase_label_term env lab) (erase_label env lab) f
 
 and erase_label_term env lab t = match t.t_node with
   | Tapp (ls, [t; {t_node = Tvar l}])
@@ -128,7 +128,7 @@ and erase_label_term env lab t = match t.t_node with
       t_map (erase_label_term env lab) (erase_label env lab) t
 
 let rec unref env s f =
-  f_map (unref_term env s) (unref env s) f
+  t_map (unref_term env s) (unref env s) f
 
 and unref_term env s t = match t.t_node with
 (***
@@ -237,7 +237,7 @@ let abstract_wp env rm ef (q',ql') (q,ql) =
   let quantify_h (e',(x',f')) (e,(x,f)) =
     assert (ls_equal e' e);
     let res, f' = match x', x with
-      | Some v', Some v -> Some v, f_subst (subst1 v' (t_var v)) f'
+      | Some v', Some v -> Some v, t_subst (subst1 v' (t_var v)) f'
       | None, None -> None, f'
       | _ -> assert false
     in
@@ -247,7 +247,7 @@ let abstract_wp env rm ef (q',ql') (q,ql) =
     let res, f = q and res', f' = q' in
     let f' = 
       if is_arrow_ty res'.vs_ty then f' 
-      else f_subst (subst1 res' (t_var res)) f' 
+      else t_subst (subst1 res' (t_var res)) f' 
     in
     quantify_res f' f (Some res)
   in
@@ -292,7 +292,7 @@ let saturate_post ef q (_, ql) =
 
 (* maximum *)
 
-let is_default_post = f_equal f_true
+let is_default_post = t_equal f_true
 
 let sup ((q, ql) : post) (_, ql') =
   assert (List.length ql = List.length ql');
@@ -312,7 +312,7 @@ let term_at env lab t =
   e_app (find_ls ~pure:true env "at") [t; t_var lab] t.t_ty
 
 let wp_expl l f =
-  f_label ?loc:f.t_loc (("expl:"^l)::Split_goal.stop_split::f.t_label) f
+  t_label ?loc:f.t_loc (("expl:"^l)::Split_goal.stop_split::f.t_label) f
 
 let while_post_block env inv var lab e =
   let decphi = match var with
@@ -344,7 +344,7 @@ let well_founded_rel = function
 
 let wp_label ?loc f =
   if List.mem "WP" f.t_label then f
-  else f_label ?loc ("WP"::f.t_label) f
+  else t_label ?loc ("WP"::f.t_label) f
 
 let t_True env =
   t_app (find_ls ~pure:true env "True") [] 
@@ -352,7 +352,7 @@ let t_True env =
 
 (*
 let add_expl msg f =
-  f_label_add Split_goal.stop_split (f_label_add ("expl:"^msg) f) 
+  t_label_add Split_goal.stop_split (t_label_add ("expl:"^msg) f) 
 *)
 
 (* 
@@ -376,15 +376,15 @@ let rec wp_expr env rm e q =
 and wp_desc env rm e q = match e.expr_desc with
   | Elogic t ->
       let (v, q), _ = q in
-      f_subst_single v t q
+      t_subst_single v t q
   | Elocal v ->
       let (res, q), _ = q in
-      f_subst (subst1 res (t_var v.pv_pure)) q
+      t_subst (subst1 res (t_var v.pv_pure)) q
   | Eglobal { ps_kind = PSfun _ } ->
       let (_, q), _ = q in q
   | Eglobal { ps_kind = PSvar pv } ->
       let (v, q), _ = q in
-      f_subst_single v (t_var pv.pv_pure) q
+      t_subst_single v (t_var pv.pv_pure) q
   | Eglobal { ps_kind = PSlogic } ->
       assert false
   | Efun (bl, t) ->
@@ -395,7 +395,7 @@ and wp_desc env rm e q = match e.expr_desc with
       let w2 = wp_expr env rm e2 (filter_post e2.expr_effect q) in
       let v1 = v_result x.pv_pure.vs_ty in
       let t1 = t_label ~loc:e1.expr_loc ["let"] (t_var v1) in
-      let q1 = v1, f_subst (subst1 x.pv_pure t1) w2 in
+      let q1 = v1, t_subst (subst1 x.pv_pure t1) w2 in
       let q1 = saturate_post e1.expr_effect q1 q in
       wp_expr env rm e1 q1
   | Eletrec (dl, e1) ->
@@ -409,7 +409,7 @@ and wp_desc env rm e q = match e.expr_desc with
 	let res = v_result e1.expr_type in
 	let test = f_equ (t_var res) (t_True env) in
 	let test = wp_label ~loc:e1.expr_loc test in
-	let q1 = f_if test w2 w3 in
+	let q1 = t_if test w2 w3 in
 	saturate_post e1.expr_effect (res, q1) q
       in
       wp_expr env rm e1 q1
@@ -435,11 +435,11 @@ and wp_desc env rm e q = match e.expr_desc with
       wp_expr env rm e (filter_post e.expr_effect q)
   | Ematch (x, bl) ->
       let branch (p, e) =
-        f_close_branch p.ppat_pat 
+        t_close_branch p.ppat_pat 
 	  (wp_expr env rm e (filter_post e.expr_effect q))
       in
       let t = t_var x.pv_pure in
-      f_case t (List.map branch bl)
+      t_case t (List.map branch bl)
   | Eabsurd ->
       f_false
   | Eraise (x, None) ->
@@ -496,13 +496,13 @@ and wp_desc env rm e q = match e.expr_desc with
       let add = find_ls~pure:true env "infix +" in
       let wp1 =
 	let xp1 = t_app add [t_var x.pv_pure; incr] ty_int in
-	let post = f_subst (subst1 x.pv_pure xp1) inv in
+	let post = t_subst (subst1 x.pv_pure xp1) inv in
 	let q1 = saturate_post e1.expr_effect (res, post) q in
 	wp_expr env rm e1 q1
       in
       let f = wp_and ~sym:true
 	(wp_expl "for loop initialization"
-	   (f_subst (subst1 x.pv_pure (t_var v1.pv_pure)) inv))
+	   (t_subst (subst1 x.pv_pure (t_var v1.pv_pure)) inv))
 	(quantify env rm e.expr_effect
 	   (wp_and ~sym:true
 	      (wp_expl "for loop preservation"
@@ -512,7 +512,7 @@ and wp_desc env rm e q = match e.expr_desc with
 		            (f_app le [t_var x.pv_pure;  t_var v2.pv_pure]))
                  (wp_implies inv wp1))))
 	      (let sv2 = t_app add [t_var v2.pv_pure; incr] ty_int in
-	       wp_implies (f_subst (subst1 x.pv_pure sv2) inv) q1)))
+	       wp_implies (t_subst (subst1 x.pv_pure sv2) inv) q1)))
       in
       wp_and ~sym:true (wp_implies v1_gt_v2 q1) (wp_implies v1_le_v2 f)
 
@@ -532,7 +532,7 @@ and wp_desc env rm e q = match e.expr_desc with
       (* TODO: propagate call labels into c.c_post *)
       let w = opaque_wp env rm c.c_effect c.c_post q in
       let p = wp_expl "precondition" c.c_pre in
-      let p = f_label ~loc:e.expr_loc p.t_label p in
+      let p = t_label ~loc:e.expr_loc p.t_label p in
       wp_and p w
 
 and wp_triple env rm bl (p, e, q) =
@@ -561,25 +561,25 @@ let wp env e =
 
 let rec t_btop env t = match t.t_node with
   | Tif (f,t1,t2) -> let f = f_btop env f in
-      f_label t.t_label (f_if_simp f (t_btop env t1) (t_btop env t2))
+      t_label t.t_label (t_if_simp f (t_btop env t1) (t_btop env t2))
   | Tapp (ls, [t1;t2]) when ls_equal ls (find_ls ~pure:true env "andb") ->
-      f_label t.t_label (f_and_simp (t_btop env t1) (t_btop env t2))
+      t_label t.t_label (f_and_simp (t_btop env t1) (t_btop env t2))
   | Tapp (ls, [t1;t2]) when ls_equal ls (find_ls ~pure:true env "orb") ->
-      f_label t.t_label (f_or_simp (t_btop env t1) (t_btop env t2))
+      t_label t.t_label (f_or_simp (t_btop env t1) (t_btop env t2))
   | Tapp (ls, [t1]) when ls_equal ls (find_ls ~pure:true env "notb") ->
-      f_label t.t_label (f_not_simp (t_btop env t1))
+      t_label t.t_label (f_not_simp (t_btop env t1))
   | Tapp (ls, []) when ls_equal ls (find_ls ~pure:true env "True") ->
-      f_label t.t_label f_true
+      t_label t.t_label f_true
   | Tapp (ls, []) when ls_equal ls (find_ls ~pure:true env "False") ->
-      f_label t.t_label f_false
+      t_label t.t_label f_false
   | _ ->
       f_equ t (t_True env)
 
 and f_btop env f = match f.t_node with
   | Tapp (ls, [{t_ty = Some {ty_node = Tyapp (ts, [])}} as l; r])
   when ls_equal ls ps_equ && ts_equal ts (find_ts ~pure:true env "bool") ->
-      f_label_copy f (f_iff_simp (t_btop env l) (t_btop env r))
-  | _ -> f_map (fun t -> t) (f_btop env) f
+      t_label_copy f (f_iff_simp (t_btop env l) (t_btop env r))
+  | _ -> t_map (fun t -> t) (f_btop env) f
 
 let add_wp_decl ps f uc =
   let name = ps.ps_impure.ls_name in

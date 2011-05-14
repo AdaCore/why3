@@ -101,7 +101,7 @@ and print_fmla info fmt f = match f.t_node with
       (* fprintf fmt "@[(if_then_else %a@ %a@ %a)@]"
 	(print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3 *)
   | Tlet (_, _) -> unsupportedFmla f "Tlet not supported"
-      (* let v, f2 = f_open_bound tb in
+      (* let v, f2 = t_open_bound tb in
       fprintf fmt "@[(let (%a %a)@ %a)@]" print_var v
         (print_term info) t1 (print_fmla info) f2;
       forget_var v *)

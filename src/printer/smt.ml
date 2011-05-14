@@ -146,7 +146,7 @@ and print_fmla info fmt f = match f.t_node with
       fprintf fmt "@[(if_then_else %a@ %a@ %a)@]"
 	(print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3
   | Tlet (t1, tb) ->
-      let v, f2 = f_open_bound tb in
+      let v, f2 = t_open_bound tb in
       fprintf fmt "@[(let (%a %a)@ %a)@]" print_var v
         (print_term info) t1 (print_fmla info) f2;
       forget_var v
@@ -154,7 +154,7 @@ and print_fmla info fmt f = match f.t_node with
       "smtv1 : you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
-and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
+and print_expr info fmt = e_map (print_term info fmt) (print_fmla info fmt)
 
 and print_triggers info fmt tl = print_list comma (print_expr info) fmt tl
 

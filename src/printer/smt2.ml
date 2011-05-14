@@ -96,12 +96,12 @@ let iter_complex_type info fmt () ty =
 
 
 let find_complex_type info fmt f =
-  f_ty_fold (iter_complex_type info fmt) () f
+  t_ty_fold (iter_complex_type info fmt) () f
 
 let find_complex_type_expr info fmt f =
   e_fold
     (t_ty_fold (iter_complex_type info fmt))
-    (f_ty_fold (iter_complex_type info fmt))
+    (t_ty_fold (iter_complex_type info fmt))
     () f
 
 let print_type info fmt ty =
@@ -212,7 +212,7 @@ and print_fmla info fmt f = match f.t_node with
       fprintf fmt "@[(if_then_else %a@ %a@ %a)@]"
 	(print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3
   | Tlet (t1, tb) ->
-      let v, f2 = f_open_bound tb in
+      let v, f2 = t_open_bound tb in
       fprintf fmt "@[(let ((%a %a))@ %a)@]" print_var v
         (print_term info) t1 (print_fmla info) f2;
       forget_var v
@@ -220,7 +220,7 @@ and print_fmla info fmt f = match f.t_node with
       "smtv2 : you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
-and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
+and print_expr info fmt = e_map (print_term info fmt) (print_fmla info fmt)
 
 and print_trigger info fmt e = fprintf fmt "(%a)" (print_expr info) e
 

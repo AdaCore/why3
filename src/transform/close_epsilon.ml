@@ -36,7 +36,7 @@ type lambda_match =
 let destruct_lambda t =
   match t.t_node with
   | Teps fb ->
-      let fn, f = f_open_bound fb in
+      let fn, f = t_open_bound fb in
       if is_func_ty fn.vs_ty then
         begin match f.t_node with
         | Fquant (Fforall, fq) ->
@@ -56,7 +56,7 @@ let rec rewriteT t =
   match t.t_node with
   | Teps fb when is_lambda t ->
       let fv = Svs.elements (t_freevars Svs.empty t) in
-      let x, f = f_open_bound fb in
+      let x, f = t_open_bound fb in
       let f = rewriteF f in
       if fv = [] then t_eps_close x f
       else
@@ -69,7 +69,7 @@ let rec rewriteT t =
         let rx =
           List.fold_left (fun acc x -> t_func_app acc (t_var x)) magic_f fv in
         (* substitute [magic] for [x] *)
-        let f = f_subst_single x rx f in
+        let f = t_subst_single x rx f in
         (* quantify over free variables and epsilon-close over [magic] *)
         let f = f_forall_close_merge fv f in
         let f = t_eps_close magic_fs f in
@@ -78,7 +78,7 @@ let rec rewriteT t =
   | _ ->
       t_map rewriteT rewriteF t
 
-and rewriteF f = f_map rewriteT rewriteF f
+and rewriteF f = t_map rewriteT rewriteF f
 
 let close d = [decl_map rewriteT rewriteF d]
 

@@ -52,30 +52,30 @@ let () = Trans.register_transform "eliminate_builtin" eliminate_builtin
 
 let rec t_insert hd t = match t.t_node with
   | Tif (f1,t2,t3) ->
-      f_if f1 (t_insert hd t2) (t_insert hd t3)
+      t_if f1 (t_insert hd t2) (t_insert hd t3)
   | Tlet (t1,bt) ->
       let v,t2 = t_open_bound bt in
-      f_let_close v t1 (t_insert hd t2)
+      t_let_close v t1 (t_insert hd t2)
   | Tcase (tl,bl) ->
       let br b =
         let pl,t1 = t_open_branch b in
-        f_close_branch pl (t_insert hd t1)
+        t_close_branch pl (t_insert hd t1)
       in
-      f_case tl (List.map br bl)
+      t_case tl (List.map br bl)
   | _ -> f_equ_simp hd t
 
 let rec f_insert hd f = match f.t_node with
   | Tif (f1,f2,f3) ->
-      f_if f1 (f_insert hd f2) (f_insert hd f3)
+      t_if f1 (f_insert hd f2) (f_insert hd f3)
   | Tlet (t1,bf) ->
-      let v,f2 = f_open_bound bf in
-      f_let_close v t1 (f_insert hd f2)
+      let v,f2 = t_open_bound bf in
+      t_let_close v t1 (f_insert hd f2)
   | Tcase (tl,bl) ->
       let br b =
-        let pl,f1 = f_open_branch b in
-        f_close_branch pl (f_insert hd f1)
+        let pl,f1 = t_open_branch b in
+        t_close_branch pl (f_insert hd f1)
       in
-      f_case tl (List.map br bl)
+      t_case tl (List.map br bl)
   | _ -> f_iff_simp hd f
 
 let add_ld func pred axl d = match d with
@@ -114,7 +114,7 @@ let is_rec = function
       let _, e = open_ls_defn ld in
       begin match e.t_ty with
         | Some _ -> t_s_any (const false) (ls_equal ls) e
-        | None   -> f_s_any (const false) (ls_equal ls) e
+        | None   -> t_s_any (const false) (ls_equal ls) e
       end
   | _ -> true
 

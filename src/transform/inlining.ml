@@ -42,7 +42,7 @@ let f_unfold env ps tl =
   | Some (vs,e) ->
       let add (mt,mv) x y = ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
       let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vs tl in
-      f_ty_subst mt mv e
+      t_ty_subst mt mv e
 
 (* inline every symbol *)
 
@@ -53,9 +53,9 @@ let rec t_replace_all env t =
   | _ -> t
 
 and f_replace_all env f =
-  let f = f_map (t_replace_all env) (f_replace_all env) f in
+  let f = t_map (t_replace_all env) (f_replace_all env) f in
   match f.t_node with
-  | Tapp (ps,tl) -> f_label_copy f (f_unfold env ps tl)
+  | Tapp (ps,tl) -> t_label_copy f (f_unfold env ps tl)
   | _ -> f
 
 (* inline the top-most symbol *)
@@ -66,11 +66,11 @@ let t_replace_top env t = match t.t_node with
 
 let rec f_replace_top env f = match f.t_node with
   | Tapp (ps,[l;r]) when ls_equal ps ps_equ ->
-      f_label_copy f (f_equ (t_replace_top env l) (t_replace_top env r))
+      t_label_copy f (f_equ (t_replace_top env l) (t_replace_top env r))
   | Tapp (ps,tl) ->
-      f_label_copy f (f_unfold env ps tl)
+      t_label_copy f (f_unfold env ps tl)
   | _ ->
-      f_map (fun t -> t) (f_replace_top env) f
+      t_map (fun t -> t) (f_replace_top env) f
 
 (* treat a declaration *)
 
@@ -88,7 +88,7 @@ let fold in_goal notdeft notdeff notls d (env, task) =
         let vl,e = open_ls_defn ld in
         let inline = match e.t_ty with
           | Some _ when notdeft e || t_s_any ffalse (ls_equal ls) e -> false
-          | None   when notdeff e || f_s_any ffalse (ls_equal ls) e -> false
+          | None   when notdeff e || t_s_any ffalse (ls_equal ls) e -> false
           | _ -> true
         in
         let env = if inline then Mls.add ls (vl,e) env else env in

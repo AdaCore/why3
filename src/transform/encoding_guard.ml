@@ -135,7 +135,7 @@ module Transform = struct
         (fmla_transform kept varM) trl in
       f_quant q (f_close_quant vsl trl fmla2)
     | _ -> (* otherwise : just traverse and translate *)
-      f_map (term_transform kept varM) (fmla_transform kept varM) f(*   in *)
+      t_map (term_transform kept varM) (fmla_transform kept varM) f(*   in *)
     (* Format.eprintf "fmla_to : %a@." Pretty.print_fmla f;f *)
 
   and guard q kept varM fmla vsl =
@@ -159,7 +159,7 @@ module Transform = struct
     Mtv.fold add tv_to_ty args
 
   and f_type_close_select kept f' =
-    let tvs = f_ty_freevars Stv.empty f' in
+    let tvs = t_ty_freevars Stv.empty f' in
     let rec trans fn acc f = match f.t_node with
       | Fquant(Fforall as q,_) -> (* Exists same thing? *)
         let vsl,trl,fmla = f_open_all_quant q f in

@@ -25,7 +25,7 @@ open Task
 
 let abstraction (keep : lsymbol -> bool) =
   let term_table = Hterm_alpha.create 257 in
-  let fmla_table = Hfmla_alpha.create 257 in
+  let fmla_table = Hterm_alpha.create 257 in
   let extra_decls = ref [] in
 
   let rec abstract_term t : term =
@@ -46,14 +46,14 @@ let abstraction (keep : lsymbol -> bool) =
     match f.t_node with
     | Ftrue | Ffalse -> f
     | Fnot _ | Fbinop _ ->
-        f_map abstract_term abstract_fmla f
+        t_map abstract_term abstract_fmla f
     | Tapp(ls,_) when keep ls ->
-        f_map abstract_term abstract_fmla f
+        t_map abstract_term abstract_fmla f
     | _ ->
-        let (ls, fabs) = try Hfmla_alpha.find fmla_table f with Not_found ->
+        let (ls, fabs) = try Hterm_alpha.find fmla_table f with Not_found ->
           let ls = create_psymbol (id_fresh "abstr") [] in
           let fabs = f_app ls [] in
-          Hfmla_alpha.add fmla_table f (ls, fabs);
+          Hterm_alpha.add fmla_table f (ls, fabs);
           ls, fabs in
         extra_decls := ls :: !extra_decls;
         fabs in

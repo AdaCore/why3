@@ -97,7 +97,7 @@ end = struct
 	t_map (term_at env old cur s) (fmla_at env old cur s) t
 
   and fmla_at env old cur s f =
-    f_map (term_at env old cur s) (fmla_at env old cur s) f
+    t_map (term_at env old cur s) (fmla_at env old cur s) f
 
   let term env      s t = term_at env None None s t
   let fmla env ?old s f = fmla_at env old  None s f

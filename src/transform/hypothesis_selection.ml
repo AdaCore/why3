@@ -50,13 +50,13 @@ module ExprNode = struct
 
     let compare x y = match x,y with
       | Term t1, Term t2 -> compare (t_hash t1) (t_hash t2)
-      | Fmla f1, Fmla f2 -> compare (f_hash f1) (f_hash f2)
+      | Fmla f1, Fmla f2 -> compare (t_hash f1) (t_hash f2)
       | Term _, Fmla _ -> -1
       | Fmla _, Term _ -> 1
 
     let hash x = match x with
       | Term t -> 2 * (t_hash t)
-      | Fmla f -> 2 * (f_hash f) + 1
+      | Fmla f -> 2 * (t_hash f) + 1
 
     let equal x y = compare x y == 0
 end
@@ -275,7 +275,7 @@ module GraphConstant = struct
 	  (fun gc term_vertex -> GC.add_edge gc pred_vertex term_vertex)
 	  gc sub_vertices in
 	(gc, pred_vertex :: vertices)
-    | _ -> f_fold (analyse_term fTbl tTbl) (analyse_fmla fTbl tTbl)
+    | _ -> t_fold (analyse_term fTbl tTbl) (analyse_fmla fTbl tTbl)
 	(gc,vertices) fmla
 
   (** explore terms. mutually recursive with the previous function *)
@@ -330,7 +330,7 @@ module GraphPredicate = struct
   let extract_symbol fmla =
     let rec search = function
       | { f_node = Tapp(p,_) } -> raise (Exit p)
-      | f -> f_map (fun t->t) search f in
+      | f -> t_map (fun t->t) search f in
     try ignore (search fmla);
       Format.eprintf "invalid formula : ";
       Pretty.print_fmla Format.err_formatter fmla; assert false
@@ -401,7 +401,7 @@ module Select = struct
     let id acc _ = acc in
     let rec explore acc fmla = match fmla.t_node with
       | Tapp (pred,_) -> pred::acc
-      | _ -> f_fold id explore acc fmla
+      | _ -> t_fold id explore acc fmla
     in explore [] fmla
 
   (** gets all predicate symbols from a clause *)
@@ -418,7 +418,7 @@ module Select = struct
       | Tapp (_,terms) ->
 	  let acc = List.fold_left (gather_sub_term fTbl tTbl) acc terms in
 	  GraphConstant.findF fTbl fmla :: acc
-      | _ -> f_fold (gather_sub_term fTbl tTbl)
+      | _ -> t_fold (gather_sub_term fTbl tTbl)
 	  (gather_sub_fmla fTbl tTbl) acc fmla
     and gather_sub_term fTbl tTbl acc term = match term.t_node with
       | Tapp (_,terms) ->

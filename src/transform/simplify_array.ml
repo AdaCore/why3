@@ -43,7 +43,7 @@ let make_rt_rf env =
             lstore.ls_name == store &&
             t_equal_alpha a1 a2 -> b
       | _ -> t
-  and rf f = f_map rt rf f  in
+  and rf f = t_map rt rf f  in
   rt,rf
 
 let t env = let rt,rf = make_rt_rf env in Trans.rewrite rt rf None
