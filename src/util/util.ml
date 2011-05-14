@@ -48,23 +48,19 @@ let option_fold f d = function None -> d | Some x -> f d x
 
 let option_iter f = function None -> () | Some x -> f x
 
-let option_map2 f x y =
-  match x,y with
-    | None, None -> None
-    | Some x, Some y -> Some (f x y)
-    | _ -> failwith "option_map2 : None and Some at the same time"
+let option_map2 f x y = match x,y with
+  | None, None -> None
+  | Some x, Some y -> Some (f x y)
+  | _ -> failwith "option_map2 : None and Some at the same time"
 
 let option_eq eq a b = match a,b with
   | None, None -> true
   | None, _ | _, None -> false
   | Some x, Some y -> eq x y
 
-let option_map_fold f acc x =
-  match x with
+let option_map_fold f acc x = match x with
   | None -> acc, None
-  | Some x ->
-      let acc, x = f acc x in
-      acc, Some x
+  | Some x -> let acc, x = f acc x in acc, Some x
 
 (* useful iterator on int *)
 let rec foldi f acc min max =
@@ -164,13 +160,13 @@ let list_fold_lefti f acc l =
   in
   fold_left acc 0 l
 
-let rec prefix n l = 
+let rec prefix n l =
   if n = 0 then []
   else if n < 0 || l = [] then invalid_arg "Util.chop"
   else List.hd l :: prefix (n - 1) l
 
-let rec chop n l = 
-  if n = 0 then l 
+let rec chop n l =
+  if n = 0 then l
   else if n < 0 || l = [] then invalid_arg "Util.chop"
   else chop (n - 1) (List.tl l)
 
