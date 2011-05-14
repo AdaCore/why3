@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session name="examples/einstein/why3session.xml">
+ <file name="../einstein.why" verified="false" expanded="true">
+  <theory name="Bijection" verified="true" expanded="true">
+  </theory>
+  <theory name="Einstein" verified="true" expanded="true">
+  </theory>
+  <theory name="EinsteinHints" verified="true" expanded="true">
+  </theory>
+  <theory name="Goals" verified="false" expanded="true">
+   <goal name="G1" sum="3ac4d6944c1b5acf60b54d125510b5ce" proved="true" expanded="true">
+    <proof prover="z3" edited="" obsolete="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+   </goal>
+   <goal name="G2" sum="1dfddc09f50e2271f110483bc42e7472" proved="false" expanded="true">
+    <proof prover="cvc3" edited="" obsolete="false">
+     <result status="unknown" time="0.42"/>
+    </proof>
+    <proof prover="simplify" edited="" obsolete="false">
+     <result status="timeout" time="10.06"/>
+    </proof>
+    <proof prover="alt-ergo" edited="" obsolete="false">
+     <result status="unknown" time="1.00"/>
+    </proof>
+    <proof prover="z3" edited="" obsolete="false">
+     <result status="timeout" time="10.03"/>
+    </proof>
+    <proof prover="gappa" edited="" obsolete="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>
