@@ -986,10 +986,12 @@ let load_result r =
 	  try float_of_string (List.assoc "time" r.Xml.attributes)
 	  with Not_found -> 0.0
 	in
-	{ Call_provers.pr_answer = answer;
+	Done { 
+	  Call_provers.pr_answer = answer;
 	  Call_provers.pr_time = time;
 	  Call_provers.pr_output = "";
 	}
+    | "undone" -> Undone
     | s ->
 	eprintf "Session.load_result: unexpected element '%s'@."  s;
 	assert false
@@ -1032,7 +1034,7 @@ and load_proof_or_transf ~env ~provers mg a =
 	  with Not_found -> assert false (* TODO *)
 	in
 	let res = match a.Xml.elements with
-	  | [r] -> Done (load_result r)
+	  | [r] -> load_result r
 	  | [] -> Undone
 	  | _ -> assert false
 	in
