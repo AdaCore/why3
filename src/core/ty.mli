@@ -119,3 +119,26 @@ val ty_tuple : ty list -> ty
 
 val is_ts_tuple : tysymbol -> bool
 
+(** {2 Operations on [ty option]} *)
+
+type oty = ty option
+
+exception UnexpectedProp
+
+val oty_ty : oty -> ty
+val oty_prop : oty -> bool
+val oty_value : oty -> bool
+
+val oty_equal : oty -> oty -> bool
+val oty_hash  : oty -> int
+
+val oty_map : (ty -> ty) -> oty -> oty
+val oty_iter : (ty -> unit) -> oty -> unit
+val oty_apply : 'a -> (ty -> 'a) -> oty -> 'a
+val oty_fold : ('a -> ty -> 'a) -> 'a -> oty -> 'a
+val oty_map_fold : ('a -> ty -> 'a * ty) -> 'a -> oty -> 'a * oty
+
+val oty_match : ty Mtv.t -> oty -> oty -> ty Mtv.t
+val oty_inst  : ty Mtv.t -> oty -> oty
+val oty_freevars : Stv.t -> oty -> Stv.t
+

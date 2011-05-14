@@ -51,7 +51,7 @@ let create_vsymbol name ty = {
 type lsymbol = {
   ls_name   : ident;
   ls_args   : ty list;
-  ls_value  : ty option;
+  ls_value  : oty;
 }
 
 module Lsym = WeakStructMake (struct
@@ -78,10 +78,7 @@ let create_fsymbol nm al vl = create_lsymbol nm al (Some vl)
 let create_psymbol nm al    = create_lsymbol nm al (None)
 
 let ls_ty_freevars ls =
-  let acc = match ls.ls_value with
-    | None -> Stv.empty
-    | Some ty -> ty_freevars Stv.empty ty
-  in
+  let acc = oty_freevars Stv.empty ls.ls_value in
   List.fold_left ty_freevars acc ls.ls_args
 
 (** Patterns *)
@@ -905,41 +902,31 @@ let f_open_quant_cb fq =
 
 (* constructors with type checking *)
 
+let ls_arg_inst ls tl =
+  let mtch s ty t = ty_match s ty t.t_ty in
+  try List.fold_left2 mtch Mtv.empty ls.ls_args tl
+  with Invalid_argument _ -> raise (BadArity
+    (ls, List.length ls.ls_args, List.length tl))
+
+let t_app_infer ls tl =
+  let s = ls_arg_inst ls tl in
+  match ls.ls_value with
+    | Some ty -> t_app ls tl (ty_inst s ty)
+    | None -> raise (FunctionSymbolExpected ls)
+
 let ls_app_inst ls tl ty =
-  let s = match ls.ls_value, ty with
+  let s = ls_arg_inst ls tl in
+  match ls.ls_value, ty with
     | Some _, None -> raise (PredicateSymbolExpected ls)
     | None, Some _ -> raise (FunctionSymbolExpected ls)
-    | Some vty, Some ty -> ty_match Mtv.empty vty ty
-    | None, None -> Mtv.empty
-  in
-  let s =
-    let mtch s ty t = ty_match s ty t.t_ty in
-    try List.fold_left2 mtch s ls.ls_args tl
-    with Invalid_argument _ -> raise (BadArity
-     (ls, List.length ls.ls_args, List.length tl))
-  in
-  let add v acc = Mtv.add v (ty_inst s (ty_var v)) acc in
-  Stv.fold add (ls_ty_freevars ls) Mtv.empty
+    | Some vty, Some ty -> ty_match s vty ty
+    | None, None -> s
 
 let fs_app_inst fs tl ty = ls_app_inst fs tl (Some ty)
-let ps_app_inst ps tl    = ls_app_inst ps tl None
+let ps_app_inst ps tl    = ls_app_inst ps tl (None)
 
 let t_app fs tl ty = ignore (fs_app_inst fs tl ty); t_app fs tl ty
-
-let f_app ps tl = ignore (ps_app_inst ps tl); f_app ps tl
-
-let t_app_infer fs tl =
-  let mtch s ty t = ty_match s ty t.t_ty in
-  let s =
-    try List.fold_left2 mtch Mtv.empty fs.ls_args tl
-    with Invalid_argument _ -> raise (BadArity
-      (fs, List.length fs.ls_args, List.length tl))
-  in
-  let ty = match fs.ls_value with
-    | Some ty -> ty_inst s ty
-    | _ -> raise (FunctionSymbolExpected fs)
-  in
-  t_app fs tl ty
+let f_app ps tl    = ignore (ps_app_inst ps tl);    f_app ps tl
 
 exception EmptyCase
 

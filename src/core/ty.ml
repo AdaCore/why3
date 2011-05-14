@@ -237,3 +237,31 @@ let ty_tuple tyl = ty_app (ts_tuple (List.length tyl)) tyl
 
 let is_ts_tuple ts = ts_equal ts (ts_tuple (List.length ts.ts_args))
 
+(** {2 Operations on [ty option]} *)
+
+type oty = ty option
+
+exception UnexpectedProp
+
+let oty_ty = function Some ty -> ty | None -> raise UnexpectedProp
+let oty_prop = (=) None
+let oty_value = (<>) None
+
+let oty_equal = Util.option_eq ty_equal
+let oty_hash = Util.option_apply 1 ty_hash
+
+let oty_map = Util.option_map
+let oty_iter = Util.option_iter
+let oty_apply = Util.option_apply
+let oty_fold = Util.option_fold
+let oty_map_fold = Util.option_map_fold
+
+let oty_match m o1 o2 = match o1,o2 with
+  | Some ty1, Some ty2 -> ty_match m ty1 ty2
+  | None, None -> m
+  | _ -> raise UnexpectedProp
+
+let oty_inst m = Util.option_map (ty_inst m)
+let oty_freevars = Util.option_fold ty_freevars
+let oty_cons = Util.option_fold (fun tl t -> t::tl)
+
