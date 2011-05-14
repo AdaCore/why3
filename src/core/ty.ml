@@ -163,7 +163,8 @@ let ty_app s tl =
   match s.ts_def with
     | Some ty ->
         let add m v t = Mtv.add v t m in
-        tv_inst (List.fold_left2 add Mtv.empty s.ts_args tl) ty
+        let m = List.fold_left2 add Mtv.empty s.ts_args tl in
+        tv_inst m ty
     | _ ->
         ty_app s tl
 
@@ -190,17 +191,16 @@ let rec ty_inst s ty = match ty.ty_node with
   | _ -> ty_map (ty_inst s) ty
 
 let rec ty_match s ty1 ty2 =
-  if ty_equal ty1 ty2 then s
-  else match ty1.ty_node, ty2.ty_node with
-    | Tyvar n1, _ ->
-        Mtv.change n1 (function
-          | None -> Some ty2
-          | Some ty1 as r when ty_equal ty1 ty2 -> r
-          | _ -> raise Exit) s
-    | Tyapp (f1, l1), Tyapp (f2, l2) when ts_equal f1 f2 ->
+  let set = function
+    | None -> Some ty2
+    | Some ty1 as r when ty_equal ty1 ty2 -> r
+    | _ -> raise Exit
+  in
+  match ty1.ty_node, ty2.ty_node with
+    | Tyapp (f1,l1), Tyapp (f2,l2) when ts_equal f1 f2 ->
         List.fold_left2 ty_match s l1 l2
-    | _ ->
-        raise Exit
+    | Tyvar n1, _ -> Mtv.change n1 set s
+    | _ -> raise Exit
 
 exception TypeMismatch of ty * ty
 
