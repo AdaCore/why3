@@ -44,16 +44,15 @@ let check_fvs f =
   Svs.iter (fun vs -> raise (UnboundVar vs)) fvs;
   f
 
-let check_ty ty ty' =
-  if not (ty_equal ty ty') then raise (TypeMismatch (ty,ty'))
+let check_ty = Ty.check_ty_equal
 
 let check_vl ty v = check_ty ty v.vs_ty
-let check_tl ty t = check_ty ty t.t_ty
+let check_tl ty t = check_ty ty (t_type t)
 
 let make_fs_defn fs vl t =
-  let hd = t_app fs (List.map t_var vl) t.t_ty in
+  let hd = e_app fs (List.map t_var vl) t.t_ty in
   let fd = f_forall_close vl [] (f_equ hd t) in
-  check_ty (of_option fs.ls_value) t.t_ty;
+  check_oty_equal fs.ls_value t.t_ty;
   List.iter2 check_vl fs.ls_args vl;
   fs, Some (fs, check_fvs fd)
 

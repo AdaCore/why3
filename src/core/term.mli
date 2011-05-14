@@ -45,7 +45,7 @@ val create_vsymbol : preid -> ty -> vsymbol
 type lsymbol = private {
   ls_name   : ident;
   ls_args   : ty list;
-  ls_value  : ty option;
+  ls_value  : oty;
 }
 
 module Mls : Map.S with type key = lsymbol
@@ -57,7 +57,7 @@ val ls_equal : lsymbol -> lsymbol -> bool
   (** equality of function and predicate symbols *)
 val ls_hash : lsymbol -> int
 
-val create_lsymbol : preid -> ty list -> ty option -> lsymbol
+val create_lsymbol : preid -> ty list -> oty -> lsymbol
 val create_fsymbol : preid -> ty list -> ty -> lsymbol
 val create_psymbol : preid -> ty list -> lsymbol
 
@@ -131,7 +131,7 @@ type term = private {
   t_label : label list;
   t_loc   : Loc.position option;
   t_vars  : Svs.t;
-  t_ty    : ty;
+  t_ty    : oty;
   t_tag   : int;
 }
 
@@ -239,9 +239,17 @@ val f_open_quant_cb :
 
 (** compute type instance *)
 
-val ls_app_inst : lsymbol -> term list -> ty option -> ty Mtv.t
+val ls_app_inst : lsymbol -> term list -> oty -> ty Mtv.t
 val fs_app_inst : lsymbol -> term list -> ty -> ty Mtv.t
 val ps_app_inst : lsymbol -> term list -> ty Mtv.t
+
+(* temporary functions for term+fmla fusion *)
+
+exception TermExpected of term
+exception FmlaExpected of term
+
+val e_app : lsymbol -> term list -> oty -> term
+val t_type : term -> ty
 
 (** Smart constructors for term *)
 
@@ -361,11 +369,8 @@ val f_ty_fold : ('a -> ty -> 'a) -> 'a -> fmla -> 'a
 
 (* fold over applications in terms and formulas (but not in patterns!) *)
 
-val t_app_fold :
-  ('a -> lsymbol -> ty list -> ty option -> 'a) -> 'a -> term -> 'a
-
-val f_app_fold :
-  ('a -> lsymbol -> ty list -> ty option -> 'a) -> 'a -> fmla -> 'a
+val t_app_fold : ('a -> lsymbol -> ty list -> oty -> 'a) -> 'a -> term -> 'a
+val f_app_fold : ('a -> lsymbol -> ty list -> oty -> 'a) -> 'a -> fmla -> 'a
 
 (** built-in symbols *)
 

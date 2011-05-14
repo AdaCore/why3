@@ -68,7 +68,7 @@ module Transform = struct
       List.fold_left2 fold acc (ls_selects_of_ts ts) tyl
 
   let type_close_select tvs ts fn f =
-    let fold acc t = extract_tvar acc (app_type t) t.t_ty in
+    let fold acc t = extract_tvar acc (app_type t) (t_type t) in
     let tvm = List.fold_left fold Mtv.empty ts in
     let tvs = Mtv.diff (const3 None) tvs tvm in
     let get_vs tv = create_vsymbol (id_clone tv.tv_name) ty_type in
@@ -114,8 +114,8 @@ module Transform = struct
   let rec term_transform kept varM t =
     match t.t_node with
     | Tapp(f, terms) ->
-      let terms = args_transform kept varM f terms t.t_ty in
-      t_app (findL f) terms t.t_ty
+      let terms = args_transform kept varM f terms (t_type t) in
+      e_app (findL f) terms t.t_ty
     | _ -> (* default case : traverse *)
       t_map (term_transform kept varM) (fmla_transform kept varM) t
 

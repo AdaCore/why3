@@ -68,8 +68,8 @@ module Transform = struct
   (** translation of terms *)
   let rec term_transform varM t = match t.t_node with
     | Tapp(f, terms) ->
-      let terms = args_transform varM f terms (Some t.t_ty) in
-      t_app (findL f) terms t.t_ty
+      let terms = args_transform varM f terms t.t_ty in
+      e_app (findL f) terms t.t_ty
     | _ -> (* default case : traverse *)
       t_map (term_transform varM) (fmla_transform varM) t
 

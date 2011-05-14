@@ -93,13 +93,13 @@ let rec rewriteT kn state t = match t.t_node with
       in
       let w,m = List.fold_left mk_br (None,Mls.empty) bl in
       let find cs = try Mls.find cs m with Not_found -> of_option w in
-      let ts = match t1.t_ty.ty_node with
-        | Tyapp (ts,_) -> ts
+      let ts = match t1.t_ty with
+        | Some { ty_node = Tyapp (ts,_) } -> ts
         | _ -> Printer.unsupportedTerm t uncompiled
       in
       begin match List.map find (find_constructors kn ts) with
         | [t] -> t
-        | tl  -> t_app (Mts.find ts state.mt_map) (t1::tl) t.t_ty
+        | tl  -> e_app (Mts.find ts state.mt_map) (t1::tl) t.t_ty
       end
   | _ ->
       t_map (rewriteT kn state) (rewriteF kn state Svs.empty true) t
@@ -126,10 +126,10 @@ and rewriteF kn state av sign f = match f.f_node with
       let find cs =
         let vl,e = try Mls.find cs m with Not_found ->
           let var = create_vsymbol (id_fresh "w") in
-          let get_var pj = var (t_app_infer pj [t1]).t_ty in
+          let get_var pj = var (t_type (t_app_infer pj [t1])) in
           List.map get_var (Mls.find cs state.pj_map), of_option w
         in
-        let hd = t_app cs (List.map t_var vl) t1.t_ty in
+        let hd = e_app cs (List.map t_var vl) t1.t_ty in
         match t1.t_node with
         | Tvar v when Svs.mem v av ->
             let hd = f_let_close_simp v hd e in if sign
@@ -140,8 +140,8 @@ and rewriteF kn state av sign f = match f.f_node with
             then f_forall_close_simp vl [] (f_implies_simp hd e)
             else f_exists_close_simp vl [] (f_and_simp     hd e)
       in
-      let ts = match t1.t_ty.ty_node with
-        | Tyapp (ts,_) -> ts
+      let ts = match t1.t_ty with
+        | Some { ty_node = Tyapp (ts,_) } -> ts
         | _ -> Printer.unsupportedFmla f uncompiled
       in
       let op = if sign then f_and_simp else f_or_simp in
@@ -246,11 +246,11 @@ let add_projections (state,task) _ts _ty csl =
     let c = ref 0 in
     let add (pjl,tsk) t =
       let id = id_derive (id ^ (incr c; string_of_int !c)) cs.ls_name in
-      let ls = create_fsymbol id [of_option cs.ls_value] t.t_ty in
+      let ls = create_lsymbol id [of_option cs.ls_value] t.t_ty in
       let tsk = add_decl tsk (create_logic_decl [ls, None]) in
       let id = id_derive (ls.ls_name.id_string ^ "_def") ls.ls_name in
       let pr = create_prsymbol id in
-      let hh = t_app ls [hd] t.t_ty in
+      let hh = e_app ls [hd] t.t_ty in
       let ax = f_forall_close (List.rev vl) [] (f_equ hh t) in
       ls::pjl, add_decl tsk (create_prop_decl Paxiom pr ax)
     in

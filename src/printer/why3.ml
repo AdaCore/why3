@@ -200,7 +200,7 @@ and print_tnode pri fmt t = match t.t_node with
       print_tapp pri fs fmt tl
   | Tapp (fs, tl) ->
       fprintf fmt (protect_on (pri > 0) "%a:%a")
-        (print_tapp 0 fs) tl print_ty t.t_ty
+        (print_tapp 0 fs) tl print_ty (t_type t)
   | Tif (f,t1,t2) ->
       fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
         print_fmla f print_term t1 print_term t2

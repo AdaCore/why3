@@ -204,7 +204,7 @@ let rec term env t = match t.dt_node with
       t_if (fmla env f) (term env t1) (term env t2)
   | Tlet (e1, id, e2) ->
       let e1 = term env e1 in
-      let v = create_user_vs id e1.t_ty in
+      let v = create_user_vs id (t_type e1) in
       let env = Mstr.add id.id v env in
       let e2 = term env e2 in
       t_let_close v e1 e2
@@ -253,7 +253,7 @@ and fmla env = function
       f_app s (List.map (term env) tl)
   | Flet (e1, id, f2) ->
       let e1 = term env e1 in
-      let v = create_user_vs id e1.t_ty in
+      let v = create_user_vs id (t_type e1) in
       let env = Mstr.add id.id v env in
       let f2 = fmla env f2 in
       f_let_close v e1 f2
@@ -319,7 +319,7 @@ and specialize_pattern_node ~loc htv = function
 let rec specialize_term ~loc htv t =
   let dt =
     { dt_node = specialize_term_node  ~loc htv t.t_node;
-      dt_ty   = specialize_ty         ~loc htv t.t_ty; }
+      dt_ty   = specialize_ty         ~loc htv (t_type t); }
   in
   let add_label l t = { t with dt_node = Tnamed (l, t) } in
   let dt = option_apply dt (fun p -> add_label (Lpos p) dt) t.t_loc in

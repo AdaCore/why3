@@ -112,7 +112,7 @@ let rec old_label env lab f =
 and old_label_term env lab t = match t.t_node with
   | Tapp (ls, [t]) when ls_equal ls (find_ls ~pure:true env "old") ->
       let t = old_label_term env lab t in (* NECESSARY? *)
-      t_app (find_ls ~pure:true env "at") [t; t_var lab] t.t_ty
+      e_app (find_ls ~pure:true env "at") [t; t_var lab] t.t_ty
   | _ ->
       t_map (old_label_term env lab) (old_label env lab) t
 
@@ -309,7 +309,7 @@ let default_exns_post ef =
   List.map default_exn_post xs
 
 let term_at env lab t =
-  t_app (find_ls ~pure:true env "at") [t; t_var lab] t.t_ty
+  e_app (find_ls ~pure:true env "at") [t; t_var lab] t.t_ty
 
 let wp_expl l f =
   f_label ?loc:f.f_loc (("expl:"^l)::Split_goal.stop_split::f.f_label) f
@@ -576,7 +576,7 @@ let rec t_btop env t = match t.t_node with
       f_equ t (t_True env)
 
 and f_btop env f = match f.f_node with
-  | Fapp (ls, [{t_ty = {ty_node = Tyapp (ts, [])}} as l; r])
+  | Fapp (ls, [{t_ty = Some {ty_node = Tyapp (ts, [])}} as l; r])
   when ls_equal ls ps_equ && ts_equal ts (find_ts ~pure:true env "bool") ->
       f_label_copy f (f_iff_simp (t_btop env l) (t_btop env r))
   | _ -> f_map (fun t -> t) (f_btop env) f

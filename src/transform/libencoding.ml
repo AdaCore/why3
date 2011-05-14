@@ -157,7 +157,7 @@ let rec t_monomorph ty_base kept lsmap consts vmap t =
   t_label_copy t (match t.t_node with
     | Tvar v ->
         Mvs.find v vmap
-    | Tconst _ when Sty.mem t.t_ty kept ->
+    | Tconst _ when Sty.mem (t_type t) kept ->
         t
     | Tconst _ ->
         let ls = ls_of_const ty_base t in

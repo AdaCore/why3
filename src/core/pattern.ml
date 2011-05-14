@@ -38,12 +38,12 @@ module Compile (X : Action) = struct
 
   let rec compile constructors tl rl = match tl,rl with
     | _, [] -> (* no actions *)
-        let pl = List.map (fun t -> pat_wild t.t_ty) tl in
+        let pl = List.map (fun t -> pat_wild (t_type t)) tl in
         raise (NonExhaustive pl)
     | [], (_,a) :: _ -> (* no terms, at least one action *)
         a
     | t :: tl, _ -> (* process the leftmost column *)
-        let ty = t.t_ty in
+        let ty = t_type t in
         (* extract the set of constructors *)
         let css = match ty.ty_node with
           | Tyapp (ts,_) ->

@@ -834,14 +834,14 @@ let ivariant env (t, ps) =
   let t = iterm env t in
   match ps with
     | None ->
-	if not (Ty.ty_equal ty_int t.t_ty) then
+	if not (Ty.ty_equal ty_int (t_type t)) then
 	  errorm ~loc "variant should have type int";
 	t, ps
-    | Some { ls_args = [t1; _] } when Ty.ty_equal t1 t.t_ty ->
+    | Some { ls_args = [t1; _] } when Ty.ty_equal t1 (t_type t) ->
 	t, ps
     | Some { ls_args = [t1; _] } ->
 	errorm ~loc "@[variant has type %a, but is expected to have type %a@]"
-	  Pretty.print_ty t.t_ty Pretty.print_ty t1
+	  Pretty.print_ty (t_type t) Pretty.print_ty t1
     | _ ->
 	assert false
 
@@ -1218,8 +1218,8 @@ and iletrec gl env dl =
 	  None, t
       | Some (phi, r) ->
 	  let p, e, q = t in
-	  let phi0 = create_ivsymbol (id_fresh "variant") phi.t_ty in
-	  let e_phi = { iexpr_desc = IElogic phi; iexpr_type = phi.t_ty;
+	  let phi0 = create_ivsymbol (id_fresh "variant") (t_type phi) in
+	  let e_phi = { iexpr_desc = IElogic phi; iexpr_type = t_type phi;
 			iexpr_loc = e.iexpr_loc } in
 	  let e = { e with iexpr_desc = IElet (phi0, e_phi, e) } in
 	  Some (phi0, phi, r), (p, e, q)

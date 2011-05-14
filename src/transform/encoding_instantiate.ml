@@ -287,8 +287,8 @@ let rec rewrite_term menv tvar vsvar t =
     | Tvar x -> Mvs.find x vsvar
     | Tapp(p,tl) ->
       let tl' = List.map (fnT vsvar) tl in
-      let p = find_logic menv tvar p tl (Some t.t_ty) in
-      t_app p tl' (projty_real menv tvar t.t_ty)
+      let p = find_logic menv tvar p tl t.t_ty in
+      t_app p tl' (projty_real menv tvar (t_type t))
     | Tif(f, t1, t2) ->
       t_if (fnF vsvar f) (fnT vsvar t1) (fnT vsvar t2)
     | Tlet (t1, b) -> let u,t2,cb = t_open_bound_cb b in
@@ -325,7 +325,7 @@ and rewrite_fmla menv tvar vsvar f =
       let t1 = fnT vsvar t1 and f2 = fnF vsvar' f2 in
       (* Format.eprintf "u.vs_ty : %a == t1.t_ty : %a@." *)
       (*    Pretty.print_ty u.vs_ty Pretty.print_ty t1.t_ty; *)
-      assert (u.vs_ty == t1.t_ty);
+      check_ty_equal u.vs_ty (t_type t1);
       f_let t1 (cb u f2)
     | _ -> f_map (fun _ -> assert false) (fnF vsvar) f
 

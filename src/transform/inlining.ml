@@ -28,11 +28,11 @@ open Task
 let t_unfold env fs tl ty =
   match Mls.find_option fs env with
   | None ->
-      t_app fs tl ty
+      e_app fs tl ty
   | Some (vl, Term e) ->
-      let add (mt,mv) x y = ty_match mt x.vs_ty y.t_ty, Mvs.add x y mv in
+      let add (mt,mv) x y = ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
       let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vl tl in
-      let mt = ty_match mt e.t_ty ty in
+      let mt = oty_match mt e.t_ty ty in
       t_ty_subst mt mv e
   | _ ->
       assert false
@@ -42,7 +42,7 @@ let f_unfold env ps tl =
   | None ->
       f_app ps tl
   | Some (vs, Fmla e) ->
-      let add (mt,mv) x y = ty_match mt x.vs_ty y.t_ty, Mvs.add x y mv in
+      let add (mt,mv) x y = ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
       let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vs tl in
       f_ty_subst mt mv e
   | _ ->

@@ -13,7 +13,7 @@ open Pgm_ttree
 let rec print_expr fmt e = match e.expr_desc with
   | Elogic t ->
       fprintf fmt "@[<hov 2><term %a : %a>@]" Pretty.print_term t
-	Pretty.print_ty t.t_ty
+	Pretty.print_ty (t_type t)
   | Elocal v ->
       fprintf fmt "%a" print_pv v
   | Eglobal { ps_kind = PSvar v } ->

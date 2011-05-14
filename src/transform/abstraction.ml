@@ -35,8 +35,8 @@ let abstraction (keep : lsymbol -> bool) =
         t_map abstract_term abstract_fmla t
     | _ ->
         let (ls, tabs) = try Hterm_alpha.find term_table t with Not_found ->
-          let ls = create_fsymbol (id_fresh "abstr") [] t.t_ty in
-          let tabs = t_app ls [] t.t_ty in
+          let ls = create_lsymbol (id_fresh "abstr") [] t.t_ty in
+          let tabs = e_app ls [] t.t_ty in
           Hterm_alpha.add term_table t (ls, tabs);
           ls, tabs in
         extra_decls := ls :: !extra_decls;

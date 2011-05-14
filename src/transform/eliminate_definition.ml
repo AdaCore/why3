@@ -85,7 +85,7 @@ let add_ld func pred axl d = match d with
       let vl,e = open_ls_defn ld in begin match e with
         | Term t when func ->
             let nm = ls.ls_name.id_string ^ "_def" in
-            let hd = t_app ls (List.map t_var vl) t.t_ty in
+            let hd = e_app ls (List.map t_var vl) t.t_ty in
             let ax = f_forall_close vl [] (t_insert hd t) in
             let pr = create_prsymbol (id_derive nm ls.ls_name) in
             create_prop_decl Paxiom pr ax :: axl, (ls, None)

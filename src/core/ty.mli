@@ -142,3 +142,6 @@ val oty_match : ty Mtv.t -> oty -> oty -> ty Mtv.t
 val oty_inst  : ty Mtv.t -> oty -> oty
 val oty_freevars : Stv.t -> oty -> Stv.t
 
+val check_ty_equal : ty -> ty -> unit
+val check_oty_equal : oty -> oty -> unit
+

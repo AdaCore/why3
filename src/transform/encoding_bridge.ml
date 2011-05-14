@@ -130,7 +130,7 @@ let conv_ls tenv ls =
 
 (* Convert the argument of a function use the bridge if needed*)
 let conv_arg tenv t aty =
-  let tty = t.t_ty in
+  let tty = t_type t in
   if ty_equal tty aty then t else
     try
       (* polymorph specials t2tb *)
@@ -168,7 +168,7 @@ let rec rewrite_term tenv vsvar t =
         let tl = List.map (fnT vsvar) tl in
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv) tl p.ls_args in
-        conv_res_app tenv p tl t.t_ty
+        conv_res_app tenv p tl (t_type t)
     | Tlet (t1, b) ->
         let u,t2,close = t_open_bound_cb b in
         let t1 = fnT vsvar t1 in

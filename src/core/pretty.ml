@@ -233,7 +233,7 @@ and print_tnode pri fmt t = match t.t_node with
       print_app pri fs fmt tl
   | Tapp (fs, tl) ->
       fprintf fmt (protect_on (pri > 0) "%a:%a")
-        (print_app 5 fs) tl print_ty t.t_ty
+        (print_app 5 fs) tl print_ty (t_type t)
   | Tif (f,t1,t2) ->
       fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
         print_fmla f print_term t1 print_term t2
@@ -494,6 +494,8 @@ let () = Exn_printer.register
       fprintf fmt "Type variable %a is used twice" print_tv tv
   | Ty.UnboundTypeVar tv ->
       fprintf fmt "Unbound type variable: %a" print_tv tv
+  | Ty.UnexpectedProp ->
+      fprintf fmt "Unexpected propositional type"
   | Term.BadArity (ls, ls_arg, app_arg) ->
       fprintf fmt "Bad arity: symbol %a must be applied \
                    to %i arguments, but is applied to %i"
@@ -508,6 +510,10 @@ let () = Exn_printer.register
       fprintf fmt "Not a function symbol: %a" print_ls ls
   | Term.PredicateSymbolExpected ls ->
       fprintf fmt "Not a predicate symbol: %a" print_ls ls
+  | Term.TermExpected t ->
+      fprintf fmt "Not a term: %a" print_term t
+  | Term.FmlaExpected t ->
+      fprintf fmt "Not a formula: %a" print_term t
   | Term.NoMatch ->
       fprintf fmt "Uncatched Term.NoMatch exception: [tf]_match failed"
   | Pattern.ConstructorExpected ls ->

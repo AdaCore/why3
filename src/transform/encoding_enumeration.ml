@@ -44,8 +44,8 @@ let add_proj tenv ts =
 let proj tenv t ty = match ty.ty_node with
   | Tyapp (ts,_) when Sts.mem ts tenv.enum ->
       let fs = Hts.find tenv.projs ts in
-      t_app fs [t] t.t_ty
-  | _ when ty_s_any (fun ts -> Sts.mem ts tenv.enum) t.t_ty ->
+      e_app fs [t] t.t_ty
+  | _ when ty_s_any (fun ts -> Sts.mem ts tenv.enum) (t_type t) ->
       Printer.unsupportedType ty "complexe finite type"
   | _ -> t
 
@@ -53,14 +53,14 @@ let proj tenv t = match t.t_node with
   | Tapp (ls,_) ->
       proj tenv t (of_option ls.ls_value)
   | Tvar _ | Tconst _ | Teps _ ->
-      proj tenv t t.t_ty
+      proj tenv t (t_type t)
   | Tif _  | Tcase _  | Tlet _ ->
       t
 
 let rec rewrite_term tenv t = match t.t_node with
   | Tapp (fs,tl) ->
       let pin t = proj tenv (rewrite_term tenv t) in
-      t_app fs (List.map pin tl) t.t_ty
+      e_app fs (List.map pin tl) t.t_ty
   | Tcase _ ->
       Printer.unsupportedTerm t "use eliminate_algebraic"
   | _ -> t_map (rewrite_term tenv) (rewrite_fmla tenv) t

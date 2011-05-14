@@ -33,12 +33,12 @@ let ls_poly_deco =
 
 let rec deco_arg kept tvar t =
   let t = deco_term kept tvar t in
-  if Sty.mem t.t_ty kept then t else
-  let tty = term_of_ty tvar t.t_ty in
-  t_app ls_poly_deco [tty;t] t.t_ty
+  if Sty.mem (t_type t) kept then t else
+  let tty = term_of_ty tvar (t_type t) in
+  e_app ls_poly_deco [tty;t] t.t_ty
 
 and deco_term kept tvar t = match t.t_node with
-  | Tapp (fs,tl) -> t_app fs (List.map (deco_arg kept tvar) tl) t.t_ty
+  | Tapp (fs,tl) -> e_app fs (List.map (deco_arg kept tvar) tl) t.t_ty
   | _ -> t_map (deco_term kept tvar) (deco_fmla kept tvar) t
 
 and deco_fmla kept tvar f = match f.f_node with

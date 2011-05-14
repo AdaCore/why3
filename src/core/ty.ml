@@ -265,3 +265,11 @@ let oty_inst m = Util.option_map (ty_inst m)
 let oty_freevars = Util.option_fold ty_freevars
 let oty_cons = Util.option_fold (fun tl t -> t::tl)
 
+let check_ty_equal ty1 ty2 =
+  if not (ty_equal ty1 ty2) then raise (TypeMismatch (ty1, ty2))
+
+let check_oty_equal o1 o2 = match o1,o2 with
+  | Some ty1, Some ty2 -> check_ty_equal ty1 ty2
+  | None, None -> ()
+  | _ -> raise UnexpectedProp
+

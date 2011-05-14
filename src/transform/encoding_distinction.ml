@@ -118,9 +118,9 @@ let rec rewrite_term env tvar vsvar t =
     | Tvar x -> Mvs.find x vsvar
     | Tapp(p,tl) ->
       let tl = List.map (fnT vsvar) tl in
-      let p = find_logic env p (List.map (fun t -> t.t_ty) tl)
-        (Some (ty_inst tvar t.t_ty)) in
-      t_app p tl (ty_inst tvar t.t_ty)
+      let ty = oty_inst tvar t.t_ty in
+      let p = find_logic env p (List.map t_type tl) ty in
+      e_app p tl ty
     | Tif(f, t1, t2) ->
       t_if (fnF vsvar f) (fnT vsvar t1) (fnT vsvar t2)
     | Tlet (t1, b) ->
@@ -142,7 +142,7 @@ and rewrite_fmla env tvar vsvar f =
   match f.f_node with
     | Fapp(p, tl) ->
       let tl = List.map (fnT vsvar) tl in
-      let p = find_logic env p (List.map (fun t -> t.t_ty) tl) None in
+      let p = find_logic env p (List.map t_type tl) None in
       f_app p tl
     | Fquant(q, b) ->
       let vl, tl, f1, cb = f_open_quant_cb b in
@@ -155,7 +155,7 @@ and rewrite_fmla env tvar vsvar f =
       let t1 = fnT vsvar t1 and f2 = fnF vsvar' f2 in
       (* Format.eprintf "u.vs_ty : %a == t1.t_ty : %a@." *)
       (*    Pretty.print_ty u.vs_ty Pretty.print_ty t1.t_ty; *)
-      assert (u.vs_ty == t1.t_ty);
+      Ty.check_ty_equal u.vs_ty (t_type t1);
       f_let t1 (cb u f2)
     | _ -> f_map (fun _ -> assert false) (fnF vsvar) f
 

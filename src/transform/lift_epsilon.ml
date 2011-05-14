@@ -40,7 +40,7 @@ let lift kind =
         let acc = add_decl acc (Decl.create_logic_decl [xl,None]) in
         let axs =
           Decl.create_prsymbol (Ident.id_derive ("epsilon_def") x.vs_name) in
-        let xlapp = t_app xl (List.map (fun x -> t_var x) fv) t.t_ty in
+        let xlapp = e_app xl (List.map t_var fv) t.t_ty in
         let f =
           match kind with
           (* assume that lambdas always exist *)

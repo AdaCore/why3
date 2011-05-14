@@ -178,9 +178,6 @@ let pat_map fn pat = match pat.pat_node with
   | Pas (p, v) -> pat_as (fn p) v
   | Por (p, q) -> pat_or (fn p) (fn q)
 
-let check_ty_equal ty1 ty2 =
-  if not (ty_equal ty1 ty2) then raise (TypeMismatch (ty1, ty2))
-
 let protect fn pat =
   let res = fn pat in
   check_ty_equal pat.pat_ty res.pat_ty;
@@ -271,7 +268,7 @@ type term = {
   t_label : label list;
   t_loc   : Loc.position option;
   t_vars  : Svs.t;
-  t_ty    : ty;
+  t_ty    : oty;
   t_tag   : int;
 }
 
@@ -329,6 +326,15 @@ let f_equal : fmla -> fmla -> bool = (==)
 
 let t_hash t = t.t_tag
 let f_hash f = f.f_tag
+
+(* extract the type of a term *)
+
+exception TermExpected of term
+exception FmlaExpected of term
+
+let t_type t = match t.t_ty with
+  | Some ty -> ty
+  | None -> raise (TermExpected t)
 
 (* expr and trigger equality *)
 
@@ -400,7 +406,7 @@ module Hsterm = Hashcons.Make (struct
     | _ -> false
 
   let equal t1 t2 =
-    ty_equal t1.t_ty t2.t_ty &&
+    oty_equal t1.t_ty t2.t_ty &&
     t_equal_node t1.t_node t2.t_node &&
     list_all2 (=) t1.t_label t2.t_label
 
@@ -424,7 +430,7 @@ module Hsterm = Hashcons.Make (struct
 
   let hash t =
     Hashcons.combine (t_hash_node t.t_node)
-      (Hashcons.combine_list Hashtbl.hash (ty_hash t.t_ty) t.t_label)
+      (Hashcons.combine_list Hashtbl.hash (oty_hash t.t_ty) t.t_label)
 
   let add_t_vars s t = Svs.union s t.t_vars
   let add_b_vars s (_,b,_) = Svs.union s b.bv_vars
@@ -552,10 +558,10 @@ let mk_term n ty = Hsterm.hashcons {
   t_tag   = -1
 }
 
-let t_var v         = mk_term (Tvar v) v.vs_ty
-let t_const c ty    = mk_term (Tconst c) ty
-let t_int_const s   = mk_term (Tconst (ConstInt s)) Ty.ty_int
-let t_real_const r  = mk_term (Tconst (ConstReal r)) Ty.ty_real
+let t_var v         = mk_term (Tvar v) (Some v.vs_ty)
+let t_const c ty    = mk_term (Tconst c) (Some ty)
+let t_int_const s   = mk_term (Tconst (ConstInt s)) (Some Ty.ty_int)
+let t_real_const r  = mk_term (Tconst (ConstReal r)) (Some Ty.ty_real)
 let t_app f tl ty   = mk_term (Tapp (f, tl)) ty
 let t_if f t1 t2    = mk_term (Tif (f, t1, t2)) t2.t_ty
 let t_let t1 bt ty  = mk_term (Tlet (t1, bt)) ty
@@ -903,16 +909,14 @@ let f_open_quant_cb fq =
 (* constructors with type checking *)
 
 let ls_arg_inst ls tl =
-  let mtch s ty t = ty_match s ty t.t_ty in
+  let mtch s ty t = ty_match s ty (t_type t) in
   try List.fold_left2 mtch Mtv.empty ls.ls_args tl
   with Invalid_argument _ -> raise (BadArity
     (ls, List.length ls.ls_args, List.length tl))
 
 let t_app_infer ls tl =
   let s = ls_arg_inst ls tl in
-  match ls.ls_value with
-    | Some ty -> t_app ls tl (ty_inst s ty)
-    | None -> raise (FunctionSymbolExpected ls)
+  t_app ls tl (oty_inst s ls.ls_value)
 
 let ls_app_inst ls tl ty =
   let s = ls_arg_inst ls tl in
@@ -925,7 +929,8 @@ let ls_app_inst ls tl ty =
 let fs_app_inst fs tl ty = ls_app_inst fs tl (Some ty)
 let ps_app_inst ps tl    = ls_app_inst ps tl (None)
 
-let t_app fs tl ty = ignore (fs_app_inst fs tl ty); t_app fs tl ty
+let e_app ls tl ty = ignore (ls_app_inst ls tl ty); t_app ls tl ty
+let t_app fs tl ty = ignore (fs_app_inst fs tl ty); t_app fs tl (Some ty)
 let f_app ps tl    = ignore (ps_app_inst ps tl);    f_app ps tl
 
 exception EmptyCase
@@ -936,8 +941,8 @@ let t_case t bl =
     | _ -> raise EmptyCase
   in
   let t_check_branch (p,_,tbr) =
-    check_ty_equal p.pat_ty t.t_ty;
-    check_ty_equal ty tbr.t_ty
+    check_ty_equal p.pat_ty (t_type t);
+    check_oty_equal ty tbr.t_ty
   in
   List.iter t_check_branch bl;
   t_case t bl ty
@@ -945,25 +950,25 @@ let t_case t bl =
 let f_case t bl =
   if bl = [] then raise EmptyCase;
   let f_check_branch (p,_,_) =
-    check_ty_equal p.pat_ty t.t_ty
+    check_ty_equal p.pat_ty (t_type t)
   in
   List.iter f_check_branch bl;
   f_case t bl
 
 let t_if f t1 t2 =
-  check_ty_equal t1.t_ty t2.t_ty;
+  check_oty_equal t1.t_ty t2.t_ty;
   t_if f t1 t2
 
 let t_let t1 ((v,_,t2) as bt) =
-  check_ty_equal v.vs_ty t1.t_ty;
+  check_ty_equal v.vs_ty (t_type t1);
   t_let t1 bt t2.t_ty
 
 let f_let t1 ((v,_,_) as bf) =
-  check_ty_equal v.vs_ty t1.t_ty;
+  check_ty_equal v.vs_ty (t_type t1);
   f_let t1 bf
 
 let t_eps ((v,_,_) as bf) =
-  t_eps bf v.vs_ty
+  t_eps bf (Some v.vs_ty)
 
 let t_const c = match c with
   | ConstInt _ -> t_const c ty_int
@@ -1024,7 +1029,7 @@ let fs_tuple = Util.memo_int 17 (fun n ->
 let is_fs_tuple fs = fs == fs_tuple (List.length fs.ls_args)
 
 let t_tuple tl =
-  let ty = ty_tuple (List.map (fun t -> t.t_ty) tl) in
+  let ty = ty_tuple (List.map t_type tl) in
   t_app (fs_tuple (List.length tl)) tl ty
 
 (** Term library *)
@@ -1040,12 +1045,12 @@ let rec t_gen_map fnT fnL m t =
   t_label_copy t (match t.t_node with
     | Tvar v ->
         let r = Mvs.find_default v t m in
-        check_ty_equal (fnT t.t_ty) r.t_ty;
+        check_ty_equal (fnT (t_type t)) (t_type r);
         r
     | Tconst _ ->
         t
     | Tapp (fs, tl) ->
-        t_app (fnL fs) (List.map fn_t tl) (fnT t.t_ty)
+        t_app (fnL fs) (List.map fn_t tl) (fnT (t_type t))
     | Tif (f, t1, t2) ->
         t_if (fn_f f) (fn_t t1) (fn_t t2)
     | Tlet (t1, (u,b,t2)) ->
@@ -1121,7 +1126,7 @@ let f_ty_subst mapT mapV f = f_gen_map (ty_inst mapT) (fun ls -> ls) mapV f
 let rec t_gen_fold fnT fnL acc t =
   let fn_t = t_gen_fold fnT fnL in
   let fn_f = f_gen_fold fnT fnL in
-  let acc = fnT acc t.t_ty in
+  let acc = fnT acc (t_type t) in
   match t.t_node with
   | Tconst _ | Tvar _ -> acc
   | Tapp (f, tl) -> List.fold_left fn_t (fnL acc f) tl
@@ -1177,13 +1182,13 @@ let f_ty_fold fn acc f = f_gen_fold fn Util.const acc f
 let rec t_app_fold fn acc t =
   let acc = t_fold_unsafe (t_app_fold fn) (f_app_fold fn) acc t in
   match t.t_node with
-    | Tapp (ls,tl) -> fn acc ls (List.map (fun t -> t.t_ty) tl) (Some t.t_ty)
+    | Tapp (ls,tl) -> fn acc ls (List.map t_type tl) t.t_ty
     | _ -> acc
 
 and f_app_fold fn acc f =
   let acc = f_fold_unsafe (t_app_fold fn) (f_app_fold fn) acc f in
   match f.f_node with
-    | Fapp (ls,tl) -> fn acc ls (List.map (fun t -> t.t_ty) tl) None
+    | Fapp (ls,tl) -> fn acc ls (List.map t_type tl) None
     | _ -> acc
 
 (* free type variables *)
@@ -1221,7 +1226,7 @@ let f_map fnT fnF f = match f.f_node with
 
 let protect fn t =
   let res = fn t in
-  check_ty_equal t.t_ty res.t_ty;
+  check_oty_equal t.t_ty res.t_ty;
   res
 
 let t_map fnT = t_map (protect fnT)
@@ -1323,7 +1328,7 @@ let f_map_fold fnT fnF acc f = match f.f_node with
 
 let protect_fold fn acc t =
   let acc,res = fn acc t in
-  check_ty_equal t.t_ty res.t_ty;
+  check_oty_equal t.t_ty res.t_ty;
   acc,res
 
 let t_map_fold fnT = t_map_fold (protect_fold fnT)
@@ -1351,7 +1356,7 @@ let t_map_cont fnT fnF contT t =
   match t.t_node with
   | Tvar _ | Tconst _ -> contT t
   | Tapp (fs, tl) ->
-      let cont_app tl = contT (t_app fs tl t.t_ty) in
+      let cont_app tl = contT (e_app fs tl t.t_ty) in
       list_map_cont fnT cont_app tl
   | Tif (f, t1, t2) ->
       let cont_else f t1 t2 = contT (t_if f t1 t2) in
@@ -1415,7 +1420,7 @@ let f_map_cont fnT fnF contF f =
       fnT cont_case t1
 
 let protect_cont t contT e =
-  check_ty_equal t.t_ty e.t_ty;
+  check_oty_equal t.t_ty e.t_ty;
   contT e
 
 let t_map_cont fnT = t_map_cont (fun c t -> fnT (protect_cont t c) t)
@@ -1425,7 +1430,7 @@ let f_map_cont fnT = f_map_cont (fun c t -> fnT (protect_cont t c) t)
 
 let protect_vs fn v =
   let res = fn v in
-  check_ty_equal v.vs_ty res.t_ty;
+  check_ty_equal v.vs_ty (t_type res);
   res
 
 let t_v_map fn t =
@@ -1455,11 +1460,11 @@ let f_occurs_single v f = Svs.mem v f.f_vars
 (* replaces variables with terms in term [t] using map [m] *)
 
 let t_subst m t =
-  Mvs.iter (fun v t -> check_ty_equal v.vs_ty t.t_ty) m;
+  Mvs.iter (fun v t -> check_ty_equal v.vs_ty (t_type t)) m;
   t_subst_unsafe m t
 
 let f_subst m f =
-  Mvs.iter (fun v t -> check_ty_equal v.vs_ty t.t_ty) m;
+  Mvs.iter (fun v t -> check_ty_equal v.vs_ty (t_type t)) m;
   f_subst_unsafe m f
 
 let t_subst_single v t1 t = t_subst (Mvs.singleton v t1) t
@@ -1495,7 +1500,7 @@ let rec pat_equal_alpha p1 p2 =
   | _ -> false
 
 let rec t_equal_alpha c1 c2 m1 m2 t1 t2 =
-  t_equal t1 t2 || ty_equal t1.t_ty t2.t_ty &&
+  t_equal t1 t2 || oty_equal t1.t_ty t2.t_ty &&
   let t_eq = t_equal_alpha c1 c2 m1 m2 in
   let f_eq = f_equal_alpha c1 c2 m1 m2 in
   match t1.t_node, t2.t_node with
@@ -1682,7 +1687,7 @@ exception NoMatch
 
 let rec t_match s t1 t2 =
   if t_equal t1 t2 then s else
-  if not (ty_equal t1.t_ty t2.t_ty) then raise NoMatch else
+  if not (oty_equal t1.t_ty t2.t_ty) then raise NoMatch else
   match t1.t_node, t2.t_node with
     | Tconst c1, Tconst c2 when c1 = c2 -> s
     | Tvar v1, _ ->
@@ -1749,11 +1754,11 @@ and f_subst_term t1 t2 f =
   f_map (t_subst_term t1 t2) (f_subst_term t1 t2) f
 
 let t_subst_term t1 t2 t =
-  check_ty_equal t1.t_ty t2.t_ty;
+  check_oty_equal t1.t_ty t2.t_ty;
   t_subst_term t1 t2 t
 
 let f_subst_term t1 t2 f =
-  check_ty_equal t1.t_ty t2.t_ty;
+  check_oty_equal t1.t_ty t2.t_ty;
   f_subst_term t1 t2 f
 
 (* substitutes fmla [f2] for fmla [f1] in term [t] *)
@@ -1773,11 +1778,11 @@ and f_subst_term_alpha t1 t2 f =
   f_map (t_subst_term_alpha t1 t2) (f_subst_term_alpha t1 t2) f
 
 let t_subst_term_alpha t1 t2 t =
-  check_ty_equal t1.t_ty t2.t_ty;
+  check_oty_equal t1.t_ty t2.t_ty;
   t_subst_term_alpha t1 t2 t
 
 let f_subst_term_alpha t1 t2 f =
-  check_ty_equal t1.t_ty t2.t_ty;
+  check_oty_equal t1.t_ty t2.t_ty;
   f_subst_term_alpha t1 t2 f
 
 (* substitutes fmla [f2] for fmla [f1] in term [t] modulo alpha *)

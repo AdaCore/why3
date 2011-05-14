@@ -132,8 +132,8 @@ let syntax_arguments_typed s print_arg print_type t fmt l =
       let grp = String.sub grp 1 (String.length grp - 1) in
       let i = int_of_string grp in
       if i = 0
-      then print_type fmt (Util.of_option t).t_ty
-      else print_type fmt args.(i-1).t_ty
+      then print_type fmt (t_type (Util.of_option t))
+      else print_type fmt (t_type args.(i-1))
     else
       let i = int_of_string grp in
       print_arg fmt args.(i-1) in
