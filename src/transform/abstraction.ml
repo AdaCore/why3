@@ -43,11 +43,11 @@ let abstraction (keep : lsymbol -> bool) =
         tabs
 
   and abstract_fmla f =
-    match f.f_node with
+    match f.t_node with
     | Ftrue | Ffalse -> f
     | Fnot _ | Fbinop _ ->
         f_map abstract_term abstract_fmla f
-    | Fapp(ls,_) when keep ls ->
+    | Tapp(ls,_) when keep ls ->
         f_map abstract_term abstract_fmla f
     | _ ->
         let (ls, fabs) = try Hfmla_alpha.find fmla_table f with Not_found ->

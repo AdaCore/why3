@@ -180,15 +180,16 @@ let rec t_monomorph ty_base kept lsmap consts vmap t =
         let u,f,close = f_open_bound_cb b in
         let v = vs_monomorph ty_base kept u in
         let f = f_mono (Mvs.add u (t_var v) vmap) f in
-        t_eps (close v f))
+        t_eps (close v f)
+    | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t))
 
 and f_monomorph ty_base kept lsmap consts vmap f =
   let t_mono = t_monomorph ty_base kept lsmap consts in
   let f_mono = f_monomorph ty_base kept lsmap consts in
-  f_label_copy f (match f.f_node with
-    | Fapp (ps,[t1;t2]) when ls_equal ps ps_equ ->
+  f_label_copy f (match f.t_node with
+    | Tapp (ps,[t1;t2]) when ls_equal ps ps_equ ->
         f_equ (t_mono vmap t1) (t_mono vmap t2)
-    | Fapp (ps,tl) ->
+    | Tapp (ps,tl) ->
         f_app (lsmap ps) (List.map (t_mono vmap) tl)
     | Fquant (q,b) ->
         let ul,tl,f1,close = f_open_quant_cb b in
@@ -203,15 +204,16 @@ and f_monomorph ty_base kept lsmap consts vmap f =
         f_not (f_mono vmap f1)
     | Ftrue | Ffalse ->
         f
-    | Fif (f1,f2,f3) ->
+    | Tif (f1,f2,f3) ->
         f_if (f_mono vmap f1) (f_mono vmap f2) (f_mono vmap f3)
-    | Flet (t,b) ->
+    | Tlet (t,b) ->
         let u,f1,close = f_open_bound_cb b in
         let v = vs_monomorph ty_base kept u in
         let f1 = f_mono (Mvs.add u (t_var v) vmap) f1 in
         f_let (t_mono vmap t) (close v f1)
-    | Fcase _ ->
-        Printer.unsupportedFmla f "no match expressions at this point")
+    | Tcase _ ->
+        Printer.unsupportedFmla f "no match expressions at this point"
+    | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f))
 
 let d_monomorph ty_base kept lsmap d =
   let kept = Sty.add ty_base kept in
@@ -270,5 +272,4 @@ let close_kept =
       let kept' = Sty.diff kept' kept in
       let fold ty acc =
         Theory.create_meta Encoding.meta_kept [Theory.MAty ty] :: acc in
-      Trans.add_tdecls (Sty.fold fold kept' [])
-  )
+      Trans.add_tdecls (Sty.fold fold kept' []))

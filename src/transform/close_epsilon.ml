@@ -38,12 +38,12 @@ let destruct_lambda t =
   | Teps fb ->
       let fn, f = f_open_bound fb in
       if is_func_ty fn.vs_ty then
-        begin match f.f_node with
+        begin match f.t_node with
         | Fquant (Fforall, fq) ->
             let args, trs, f = f_open_quant fq in
-            begin match f.f_node with
+            begin match f.t_node with
             | Fbinop (Fiff,_,body) -> Flam (args, trs, body)
-            | Fapp (ls,[_;body]) when ls_equal ls ps_equ ->
+            | Tapp (ls,[_;body]) when ls_equal ls ps_equ ->
                 Tlam (args, trs, body)
             | _ -> LNone end
         | _ -> LNone end

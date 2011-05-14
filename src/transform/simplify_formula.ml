@@ -27,7 +27,7 @@ let decl_l d =
   match d.d_node with
     | Dprop (k,pr,f) ->
         let f = fmla_simpl f in
-        begin match f.f_node, k with
+        begin match f.t_node, k with
           | Ftrue, Paxiom -> [[]]
           | Ffalse, Paxiom -> []
           | Ftrue, Pgoal -> []
@@ -63,9 +63,9 @@ exception Subst_found of term
 
 let rec fmla_find_subst boundvars var sign f =
   let fnF = fmla_find_subst boundvars var in
-  match f.f_node with
-    | Fapp (ls,[{t_node=Tvar vs} as tv;t])
-    | Fapp (ls,[t;{t_node=Tvar vs} as tv])
+  match f.t_node with
+    | Tapp (ls,[{t_node=Tvar vs} as tv;t])
+    | Tapp (ls,[t;{t_node=Tvar vs} as tv])
         when sign && ls_equal ls ps_equ && vs_equal vs var
           && not (t_equal t tv) && not (t_boundvars_in boundvars t) ->
         raise (Subst_found t)
@@ -81,17 +81,18 @@ let rec fmla_find_subst boundvars var sign f =
           let boundvars =
             List.fold_left (fun s v -> Svs.add v s) boundvars vsl in
           fmla_find_subst boundvars var sign f'
-    | Flet (_,fb) ->
+    | Tlet (_,fb) ->
         let vs,f' = f_open_bound fb in
         let boundvars = Svs.add vs boundvars in
         fmla_find_subst boundvars var sign f'
-    | Fcase (_,fbs) ->
+    | Tcase (_,fbs) ->
         let iter_fb fb =
           let patl,f = f_open_branch fb in
           let boundvars = patl.pat_vars in
           fmla_find_subst boundvars var sign f in
         List.iter iter_fb fbs
-    | Fbinop (_, _, _) | Fif ( _, _, _) | Fapp _ | Ffalse | Ftrue-> ()
+    | Fbinop (_, _, _) | Tif ( _, _, _) | Tapp _ | Ffalse | Ftrue-> ()
+    | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 let rec fmla_quant sign f = function
   | [] -> [], f
@@ -105,7 +106,7 @@ let rec fmla_quant sign f = function
         vsl, fmla_simpl f
 
 let rec fmla_remove_quant f =
-  match f.f_node with
+  match f.t_node with
     | Fquant (k,fb) ->
         let vsl,trl,f',close = f_open_quant_cb fb in
           if trl <> []
@@ -144,7 +145,7 @@ let () = Trans.register_transform
 let fmla_flatten conj f =
   let terms = ref [] in
   let rec aux sign f =
-    match f.f_node with
+    match f.t_node with
     | Fnot f -> aux (not sign) f
     | Fbinop (For, f1, f2) when sign <> conj ->
         aux sign f2; aux sign f1
@@ -159,7 +160,7 @@ let fmla_flatten conj f =
 (** recreate the structure of a given formula with linearized subformulas *)
 let fmla_unflatten conj f formulas =
   let i = ref 0 in
-  let rec aux sign f = f_label_copy f (match f.f_node with
+  let rec aux sign f = f_label_copy f (match f.t_node with
     | Fnot f -> f_not (aux (not sign) f)
     | Fbinop (For, f1, f2) when sign <> conj ->
         let f1' = aux sign f1 in f_or f1' (aux sign f2)
@@ -186,7 +187,7 @@ let fmla_unflatten conj f formulas =
     (but still correct) on formulas that have inner quantifiers *)
 let rec fmla_cond_subst filter f =
   let rec aux f =
-    match f.f_node with
+    match f.t_node with
     | Fbinop (o, _, _) when o <> Fiff ->
         let conj = match o with
           Fand -> true | For | Fimplies -> false | Fiff -> assert false in
@@ -204,8 +205,8 @@ let rec fmla_cond_subst filter f =
                 subf.(j) <- (f_subst_term t1 t2 f, s);
             done in
           let (f, s) = subf.(i) in
-          match f.f_node with
-          | Fapp (ls,[t1;t2]) when ls_equal ls ps_equ && s = conj ->
+          match f.t_node with
+          | Tapp (ls,[t1;t2]) when ls_equal ls ps_equ && s = conj ->
               if filter t1 t2 then do_subst t1 t2 else
               if filter t2 t1 then do_subst t2 t1
           | _ -> ()

@@ -58,8 +58,8 @@ let rec t_replace_all env t =
 
 and f_replace_all env f =
   let f = f_map (t_replace_all env) (f_replace_all env) f in
-  match f.f_node with
-  | Fapp (ps,tl) -> f_label_copy f (f_unfold env ps tl)
+  match f.t_node with
+  | Tapp (ps,tl) -> f_label_copy f (f_unfold env ps tl)
   | _ -> f
 
 (* inline the top-most symbol *)
@@ -68,10 +68,10 @@ let t_replace_top env t = match t.t_node with
   | Tapp (fs,tl) -> t_label_copy t (t_unfold env fs tl t.t_ty)
   | _ -> t
 
-let rec f_replace_top env f = match f.f_node with
-  | Fapp (ps,[l;r]) when ls_equal ps ps_equ ->
+let rec f_replace_top env f = match f.t_node with
+  | Tapp (ps,[l;r]) when ls_equal ps ps_equ ->
       f_label_copy f (f_equ (t_replace_top env l) (t_replace_top env r))
-  | Fapp (ps,tl) ->
+  | Tapp (ps,tl) ->
       f_label_copy f (f_unfold env ps tl)
   | _ ->
       f_map (fun t -> t) (f_replace_top env) f
@@ -145,9 +145,9 @@ let notdeft t = match t.t_node with
   | Tapp (_,tl) -> not (trivial tl)
   | _ -> true
 
-let notdeff f = match f.f_node with
+let notdeff f = match f.t_node with
   | Ftrue | Ffalse -> false
-  | Fapp (_,tl) -> not (trivial tl)
+  | Tapp (_,tl) -> not (trivial tl)
   | _ -> true
 
 let trivial = t ~use_meta:true ~in_goal:false

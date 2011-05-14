@@ -158,11 +158,12 @@ let rec print_term info fmt t = match t.t_node with
       "cvc3 : you must eliminate match"
   | Teps _ -> unsupportedTerm t
       "cvc3 : you must eliminate epsilon"
+  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
 
-and print_fmla info fmt f = match f.f_node with
-  | Fapp ({ ls_name = id }, []) ->
+and print_fmla info fmt f = match f.t_node with
+  | Tapp ({ ls_name = id }, []) ->
       print_ident fmt id
-  | Fapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
+  | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments_typed s (print_term info)
         (print_type info) None fmt tl
       | None -> begin match tl with
@@ -202,16 +203,17 @@ and print_fmla info fmt f = match f.f_node with
       fprintf fmt "TRUE"
   | Ffalse ->
       fprintf fmt "FALSE"
-  | Fif (f1, f2, f3) ->
+  | Tif (f1, f2, f3) ->
       fprintf fmt "@[(IF %a@ THEN %a@ ELSE %a ENDIF)@]"
 	(print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3
-  | Flet (t1, tb) ->
+  | Tlet (t1, tb) ->
       let v, f2 = f_open_bound tb in
       fprintf fmt "@[(LET %a =@ %a IN@ %a)@]" print_var v
         (print_term info) t1 (print_fmla info) f2;
       forget_var v
-  | Fcase _ -> unsupportedFmla f
+  | Tcase _ -> unsupportedFmla f
       "cvc3 : you must eliminate match"
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
 

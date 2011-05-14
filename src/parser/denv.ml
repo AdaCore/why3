@@ -348,14 +348,16 @@ and specialize_term_node ~loc htv = function
       let v, f = f_open_bound fb in
       Teps (ident_of_vs ~loc v, specialize_ty ~loc htv v.vs_ty,
 	    specialize_fmla ~loc htv f)
+  | Term.Fquant _ | Term.Fbinop _ | Term.Fnot _
+  | Term.Ftrue | Term.Ffalse -> assert false
 
 and specialize_fmla ~loc htv f =
-  let df = specialize_fmla_node ~loc htv f.f_node in
-  let df = option_apply df (fun p -> Fnamed (Lpos p,df)) f.f_loc in
-  List.fold_left (fun f l -> Fnamed (Lstr l, f)) df f.f_label
+  let df = specialize_fmla_node ~loc htv f.t_node in
+  let df = option_apply df (fun p -> Fnamed (Lpos p,df)) f.t_loc in
+  List.fold_left (fun f l -> Fnamed (Lstr l, f)) df f.t_label
 
 and specialize_fmla_node ~loc htv = function
-  | Term.Fapp (ls, tl) ->
+  | Term.Tapp (ls, tl) ->
       Fapp (ls, List.map (specialize_term ~loc htv) tl)
   | Term.Fquant (q, fq) ->
       let vl, tl, f = f_open_quant fq in
@@ -370,18 +372,19 @@ and specialize_fmla_node ~loc htv = function
       Ftrue
   | Term.Ffalse ->
       Ffalse
-  | Term.Fif (f1, f2, f3) ->
+  | Term.Tif (f1, f2, f3) ->
       Fif (specialize_fmla ~loc htv f1,
 	   specialize_fmla ~loc htv f2, specialize_fmla ~loc htv f3)
-  | Term.Flet (t1, f2b) ->
+  | Term.Tlet (t1, f2b) ->
       let v, f2 = f_open_bound f2b in
       Flet (specialize_term ~loc htv t1,
 	    ident_of_vs ~loc v, specialize_fmla ~loc htv f2)
-  | Term.Fcase (t, fbl) ->
+  | Term.Tcase (t, fbl) ->
       let branch b = let p, f = f_open_branch b in
 	specialize_pattern ~loc htv p, specialize_fmla ~loc htv f
       in
       Fmatch (specialize_term ~loc htv t, List.map branch fbl)
+  | Term.Tvar _ | Term.Tconst _ | Term.Teps _ -> assert false
 
 and specialize_trigger ~loc htv = function
   | Term.Term t -> TRterm (specialize_term ~loc htv t)

@@ -27,13 +27,13 @@ let axm acc (pr,f) = create_prop_decl Paxiom pr f :: acc
 let imp acc (_,al) = List.fold_left axm acc al
 
 let exi vl (_,f) =
-  let rec descend f = match f.f_node with
+  let rec descend f = match f.t_node with
     | Fquant (Fforall,f) ->
         let vl,tl,f = f_open_quant f in
         f_exists_close vl tl (descend f)
     | Fbinop (Fimplies,g,f) ->
         f_and g (descend f)
-    | Fapp (_,tl) ->
+    | Tapp (_,tl) ->
         let marry acc v t = f_and_simp acc (f_equ v t) in
         List.fold_left2 marry f_true vl tl
     | _ -> assert false

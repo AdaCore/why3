@@ -152,6 +152,7 @@ let rec print_term info fmt t =
       "gappa: you must eliminate match"
   | Teps _ -> unsupportedTerm t
       "gappa : you must eliminate epsilon"
+  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
 
 
 (* predicates *)
@@ -159,13 +160,13 @@ let rec print_term info fmt t =
 let rec print_fmla info fmt f =
   let term = print_term info in
   let fmla = print_fmla info in
-  match f.f_node with
-  | Fapp ({ ls_name = id }, []) ->
+  match f.t_node with
+  | Tapp ({ ls_name = id }, []) ->
     begin match query_syntax info.info_syn id with
       | Some s -> syntax_arguments s term fmt []
       | None -> print_ident fmt id
     end
-  | Fapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
+  | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
       (* TODO: distinguish between type of t1 and t2 
          the following is OK only for real of integer
       *)
@@ -179,7 +180,7 @@ let rec print_fmla info fmt f =
         with Not_found ->
           fprintf fmt "%a - %a in [0,0]" term t1 term t2
       end
-  | Fapp (ls, [t1;t2]) when Mls.mem ls info.info_ops_of_rel ->
+  | Tapp (ls, [t1;t2]) when Mls.mem ls info.info_ops_of_rel ->
       let s,op,rev_op = try Mls.find ls info.info_ops_of_rel
 	with Not_found -> assert false
       in
@@ -193,7 +194,7 @@ let rec print_fmla info fmt f =
         with Not_found ->
           fprintf fmt "%s%a - %a %s 0" s term t1 term t2 op
       end
-  | Fapp (ls, tl) ->
+  | Tapp (ls, tl) ->
       begin match query_syntax info.info_syn ls.ls_name with
 	| Some s -> syntax_arguments s term fmt tl
 	| None ->
@@ -228,13 +229,14 @@ let rec print_fmla info fmt f =
       fprintf fmt "(0 in [0,0])"
   | Ffalse ->
       fprintf fmt "(1 in [0,0])"
-  | Fif (_f1, _f2, _f3) ->
+  | Tif (_f1, _f2, _f3) ->
       unsupportedFmla f
         "gappa: you must eliminate if in formula"
-  | Flet _ -> unsupportedFmla f
+  | Tlet _ -> unsupportedFmla f
       "gappa: you must eliminate let in formula"
-  | Fcase _ -> unsupportedFmla f
+  | Tcase _ -> unsupportedFmla f
       "gappa: you must eliminate match"
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 (*
 let print_decl (* ?old *) info fmt d =
@@ -276,8 +278,8 @@ let print_decls ?old info fmt dl =
 exception AlreadyDefined
 
 let filter_hyp info defs eqs hyps pr f =
-  match f.f_node with
-  | Fapp(ls,[t1;t2]) when ls == ps_equ ->
+  match f.t_node with
+  | Tapp(ls,[t1;t2]) when ls == ps_equ ->
       let try_equality t1 t2 =
         match t1.t_node with
           | Tapp(l,[]) ->
@@ -294,7 +296,7 @@ let filter_hyp info defs eqs hyps pr f =
         (eqs, (pr,f)::hyps)
       end
   (* todo: support more kinds of hypotheses *)
-  | Fapp(ls,_) when Sid.mem ls.ls_name info.info_symbols ->
+  | Tapp(ls,_) when Sid.mem ls.ls_name info.info_symbols ->
       (eqs, (pr,f)::hyps)
   | _ -> (eqs,hyps)
 
@@ -304,8 +306,8 @@ type filter_goal =
   | Goal_none
 
 let filter_goal pr f =
-  match f.f_node with
-    | Fapp(ps,[]) -> Goal_bad ("symbol " ^ ps.ls_name.Ident.id_string ^ " unknown")
+  match f.t_node with
+    | Tapp(ps,[]) -> Goal_bad ("symbol " ^ ps.ls_name.Ident.id_string ^ " unknown")
 	(* todo: filter more goals *)
     | _ -> Goal_good(pr,f)
 

@@ -64,13 +64,13 @@ let rec t_insert hd t = match t.t_node with
       f_case tl (List.map br bl)
   | _ -> f_equ_simp hd t
 
-let rec f_insert hd f = match f.f_node with
-  | Fif (f1,f2,f3) ->
+let rec f_insert hd f = match f.t_node with
+  | Tif (f1,f2,f3) ->
       f_if f1 (f_insert hd f2) (f_insert hd f3)
-  | Flet (t1,bf) ->
+  | Tlet (t1,bf) ->
       let v,f2 = f_open_bound bf in
       f_let_close v t1 (f_insert hd f2)
-  | Fcase (tl,bl) ->
+  | Tcase (tl,bl) ->
       let br b =
         let pl,f1 = f_open_branch b in
         f_close_branch pl (f_insert hd f1)

@@ -1093,8 +1093,8 @@ let color_loc ~color loc =
   if f = !current_file then color_loc ~color source_view l b e
 
 let rec color_f_locs () f =
-  Util.option_iter (color_loc ~color:location_tag) f.Term.f_loc;
-  Term.f_fold color_t_locs color_f_locs () f
+  Util.option_iter (color_loc ~color:location_tag) f.Term.t_loc;
+  Term.t_fold color_t_locs color_f_locs () f
 
 and color_t_locs () t =
   Util.option_iter (color_loc ~color:location_tag) t.Term.t_loc;

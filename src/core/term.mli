@@ -135,14 +135,6 @@ type term = private {
   t_tag   : int;
 }
 
-and fmla = private {
-  f_node  : fmla_node;
-  f_label : label list;
-  f_loc   : Loc.position option;
-  f_vars  : Svs.t;
-  f_tag   : int;
-}
-
 and term_node = private
   | Tvar of vsymbol
   | Tconst of constant
@@ -151,27 +143,22 @@ and term_node = private
   | Tlet of term * term_bound
   | Tcase of term * term_branch list
   | Teps of fmla_bound
-
-and fmla_node = private
-  | Fapp of lsymbol * term list
   | Fquant of quant * fmla_quant
   | Fbinop of binop * fmla * fmla
   | Fnot of fmla
   | Ftrue
   | Ffalse
-  | Fif of fmla * fmla * fmla
-  | Flet of term * fmla_bound
-  | Fcase of term * fmla_branch list
+
+and fmla = term
 
 and term_bound
-
-and fmla_bound
-
-and fmla_quant
+and fmla_bound = term_bound
 
 and term_branch
+and fmla_branch = term_branch
 
-and fmla_branch
+and term_quant
+and fmla_quant = term_quant
 
 and expr =
   | Term of term
@@ -239,6 +226,7 @@ val f_open_quant_cb :
 
 (** compute type instance *)
 
+val ls_arg_inst : lsymbol -> term list -> ty Mtv.t
 val ls_app_inst : lsymbol -> term list -> oty -> ty Mtv.t
 val fs_app_inst : lsymbol -> term list -> ty -> ty Mtv.t
 val ps_app_inst : lsymbol -> term list -> ty Mtv.t
@@ -250,6 +238,8 @@ exception FmlaExpected of term
 
 val e_app : lsymbol -> term list -> oty -> term
 val t_type : term -> ty
+val t_prop : term -> term
+val check_t_ty : oty -> term -> unit
 
 (** Smart constructors for term *)
 

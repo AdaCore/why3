@@ -458,7 +458,7 @@ end = struct
 (*     | R.Rlocal pv -> apply_type_v_var v pv *)
 (*     | R.Rglobal s -> apply_type_v_sym v s *)
 	  
-  let occur_formula r f = Stv.mem r.R.r_tv (Term.f_ty_freevars Stv.empty f)
+  let occur_formula r f = Stv.mem r.R.r_tv (Term.t_ty_freevars Stv.empty f)
 	
   let rec occur_type_v r = function
     | Tpure ty ->

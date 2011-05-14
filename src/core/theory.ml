@@ -533,15 +533,15 @@ let cl_type cl inst tdl =
 
 let extract_ls_defn f =
   let vl, ef = f_open_forall f in
-  match ef.f_node with
-    | Fapp (s, [t1; t2]) when ls_equal s ps_equ ->
+  match ef.t_node with
+    | Tapp (s, [t1; t2]) when ls_equal s ps_equ ->
         begin match t1.t_node with
           | Tapp (fs, _) -> make_fs_defn fs vl t2
           | _ -> assert false
         end
     | Fbinop (Fiff, f1, f2) ->
-        begin match f1.f_node with
-          | Fapp (ps, _) -> make_ps_defn ps vl f2
+        begin match f1.t_node with
+          | Tapp (ps, _) -> make_ps_defn ps vl f2
           | _ -> assert false
         end
     | _ -> assert false

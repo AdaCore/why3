@@ -199,7 +199,7 @@ and print_lrterm opl opr info fmt t = match t.t_label with
       (print_list space print_label) ll (print_tnode false false info) t
 *)
 
-and print_lrfmla opl opr info fmt f = match f.f_label with
+and print_lrfmla opl opr info fmt f = match f.t_label with
   | _ -> print_fnode opl opr info fmt f
 (*
   | [] -> print_fnode opl opr info fmt f
@@ -243,8 +243,9 @@ and print_tnode opl opr info fmt t = match t.t_node with
           else fprintf fmt (protect_on opl "(%a%a:%a)") print_ls fs
             (print_paren_r (print_term info)) tl (print_ty info) (t_type t)
     end
+  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
 
-and print_fnode opl opr info fmt f = match f.f_node with
+and print_fnode opl opr info fmt f = match f.t_node with
   | Fquant (Fforall,fq) ->
       let vl,_tl,f = f_open_quant fq in
       fprintf fmt (protect_on opr "forall %a,@ %a")
@@ -272,24 +273,25 @@ and print_fnode opl opr info fmt f = match f.f_node with
         (print_opr_fmla info) f1 print_binop b (print_opl_fmla info) f2
   | Fnot f ->
       fprintf fmt (protect_on opr "~ %a") (print_opl_fmla info) f
-  | Flet (t,f) ->
+  | Tlet (t,f) ->
       let v,f = f_open_bound f in
       fprintf fmt (protect_on opr "let %a :=@ %a in@ %a")
         print_vs v (print_opl_term info) t (print_opl_fmla info) f;
       forget_var v
-  | Fcase (t,bl) ->
+  | Tcase (t,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
         (print_term info) t
         (print_list newline (print_fbranch info)) bl
-  | Fif (f1,f2,f3) ->
+  | Tif (f1,f2,f3) ->
       fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
         (print_fmla info) f1 (print_fmla info) f2 (print_opl_fmla info) f3
-  | Fapp (ps, tl) ->
+  | Tapp (ps, tl) ->
     begin match query_syntax info.info_syn ps.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | _ -> fprintf fmt "(%a %a)" print_ls ps
           (print_space_list (print_term info)) tl
     end
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and print_tbranch info fmt br =
   let p,t = t_open_branch br in

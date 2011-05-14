@@ -43,18 +43,18 @@ let split_case forig spl c acc tl bl =
 let asym_split = "asym_split"
 let stop_split = "stop_split"
 
-let asym f = List.mem asym_split f.f_label
-let stop f = List.mem stop_split f.f_label
+let asym f = List.mem asym_split f.t_label
+let stop f = List.mem stop_split f.t_label
 
 let unstop f =
-  let ll = List.filter ((<>) stop_split) f.f_label in
-  f_label ?loc:f.f_loc ll f
+  let ll = List.filter ((<>) stop_split) f.t_label in
+  f_label ?loc:f.t_loc ll f
 
-let rec split_pos ro acc f = match f.f_node with
+let rec split_pos ro acc f = match f.t_node with
   | _ when ro && stop f -> unstop f :: acc
   | Ftrue -> acc
   | Ffalse -> f::acc
-  | Fapp _ -> f::acc
+  | Tapp _ -> f::acc
   | Fbinop (Fand,f1,f2) when asym f ->
       split_pos ro (split_pos ro acc (f_implies f1 f2)) f1
   | Fbinop (Fand,f1,f2) ->
@@ -76,27 +76,28 @@ let rec split_pos ro acc f = match f.f_node with
   | Fnot f1 ->
       let fn f1 = f_label_copy f (f_not f1) in
       apply_append fn acc (split_neg ro [] f1)
-  | Fif (fif,fthen,felse) ->
+  | Tif (fif,fthen,felse) ->
       let fit = f_label_copy f (f_implies fif fthen) in
       let fie = f_label_copy f (f_implies (f_not fif) felse) in
       split_pos ro (split_pos ro acc fie) fit
-  | Flet (t,fb) ->
+  | Tlet (t,fb) ->
       let vs,f1,close = f_open_bound_cb fb in
       let fn f1 = f_label_copy f (f_let t (close vs f1)) in
       apply_append fn acc (split_pos ro [] f1)
-  | Fcase (tl,bl) ->
+  | Tcase (tl,bl) ->
       split_case f (split_pos ro) f_true acc tl bl
   | Fquant (Fforall,fq) ->
       let vsl,trl,f1,close = f_open_quant_cb fq in
       let fn f1 = f_label_copy f (f_forall (close vsl trl f1)) in
       apply_append fn acc (split_pos ro [] f1)
   | Fquant (Fexists,_) -> f::acc
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
-and split_neg ro acc f = match f.f_node with
+and split_neg ro acc f = match f.t_node with
   | _ when ro && stop f -> unstop f :: acc
   | Ftrue -> f::acc
   | Ffalse -> acc
-  | Fapp _ -> f::acc
+  | Tapp _ -> f::acc
   | Fbinop (Fand,_,_) when ro -> f::acc
   | Fbinop (Fand,f1,f2) ->
       let fn f1 f2 = f_label_copy f (f_and f1 f2) in
@@ -116,21 +117,22 @@ and split_neg ro acc f = match f.f_node with
   | Fnot f1 ->
       let fn f1 = f_label_copy f (f_not f1) in
       apply_append fn acc (split_pos ro [] f1)
-  | Fif (fif,fthen,felse) ->
+  | Tif (fif,fthen,felse) ->
       let fit = f_label_copy f (f_and fif fthen) in
       let fie = f_label_copy f (f_and (f_not fif) felse) in
       split_neg ro (split_neg ro acc fie) fit
-  | Flet (t,fb) ->
+  | Tlet (t,fb) ->
       let vs,f1,close = f_open_bound_cb fb in
       let fn f1 = f_label_copy f (f_let t (close vs f1)) in
       apply_append fn acc (split_neg ro [] f1)
-  | Fcase (tl,bl) ->
+  | Tcase (tl,bl) ->
       split_case f (split_neg ro) f_false acc tl bl
   | Fquant (Fexists,fq) ->
       let vsl,trl,f1,close = f_open_quant_cb fq in
       let fn f1 = f_label_copy f (f_exists (close vsl trl f1)) in
       apply_append fn acc (split_neg ro [] f1)
   | Fquant (Fforall,_) -> f::acc
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 let split_goal ro pr f =
   let make_prop f = [create_prop_decl Pgoal pr f] in
@@ -179,7 +181,7 @@ let ls_of_var v =
 
 let rec split_intro pr dl acc f =
   let rsp = split_intro pr dl in
-  match f.f_node with
+  match f.t_node with
   | Ftrue -> acc
   | Fbinop (Fand,f1,f2) when asym f ->
       rsp (rsp acc (f_implies f1 f2)) f1
@@ -191,9 +193,9 @@ let rec split_intro pr dl acc f =
       split_intro pr dl acc f2
   | Fbinop (Fiff,f1,f2) ->
       rsp (rsp acc (f_implies f2 f1)) (f_implies f1 f2)
-  | Fif (fif,fthen,felse) ->
+  | Tif (fif,fthen,felse) ->
       rsp (rsp acc (f_implies (f_not fif) felse)) (f_implies fif fthen)
-  | Flet (t,fb) -> let vs,f = f_open_bound fb in
+  | Tlet (t,fb) -> let vs,f = f_open_bound fb in
       let ls = ls_of_var vs in
       let f  = f_subst_single vs (t_app ls [] vs.vs_ty) f in
       let dl = create_logic_decl [make_fs_defn ls [] t] :: dl in

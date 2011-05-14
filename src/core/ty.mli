@@ -100,6 +100,8 @@ val ty_inst  : ty Mtv.t -> ty -> ty
 
 val ty_freevars : Stv.t -> ty -> Stv.t
 
+val check_ty_equal : ty -> ty -> unit
+
 (* built-in symbols *)
 
 val ts_int  : tysymbol
@@ -141,7 +143,4 @@ val oty_map_fold : ('a -> ty -> 'a * ty) -> 'a -> oty -> 'a * oty
 val oty_match : ty Mtv.t -> oty -> oty -> ty Mtv.t
 val oty_inst  : ty Mtv.t -> oty -> oty
 val oty_freevars : Stv.t -> oty -> Stv.t
-
-val check_ty_equal : ty -> ty -> unit
-val check_oty_equal : oty -> oty -> unit
 

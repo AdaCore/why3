@@ -41,8 +41,8 @@ and deco_term kept tvar t = match t.t_node with
   | Tapp (fs,tl) -> e_app fs (List.map (deco_arg kept tvar) tl) t.t_ty
   | _ -> t_map (deco_term kept tvar) (deco_fmla kept tvar) t
 
-and deco_fmla kept tvar f = match f.f_node with
-  | Fapp (ps,tl) -> f_app ps (List.map (deco_arg kept tvar) tl)
+and deco_fmla kept tvar f = match f.t_node with
+  | Tapp (ps,tl) -> f_app ps (List.map (deco_arg kept tvar) tl)
   | Fquant (q,b) ->
       let vl,tl,f,close = f_open_quant_cb b in
       let tl = tr_map (deco_arg kept tvar) (deco_fmla kept tvar) tl in

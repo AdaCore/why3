@@ -102,11 +102,12 @@ let rec print_term info fmt t = match t.t_node with
       "smtv1 : you must eliminate match"
   | Teps _ -> unsupportedTerm t
       "smtv1 : you must eliminate epsilon"
+  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
 
-and print_fmla info fmt f = match f.f_node with
-  | Fapp ({ ls_name = id }, []) ->
+and print_fmla info fmt f = match f.t_node with
+  | Tapp ({ ls_name = id }, []) ->
       print_ident fmt id
-  | Fapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
+  | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] -> fprintf fmt "%a" print_ident ls.ls_name
@@ -141,16 +142,17 @@ and print_fmla info fmt f = match f.f_node with
       fprintf fmt "true"
   | Ffalse ->
       fprintf fmt "false"
-  | Fif (f1, f2, f3) ->
+  | Tif (f1, f2, f3) ->
       fprintf fmt "@[(if_then_else %a@ %a@ %a)@]"
 	(print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3
-  | Flet (t1, tb) ->
+  | Tlet (t1, tb) ->
       let v, f2 = f_open_bound tb in
       fprintf fmt "@[(let (%a %a)@ %a)@]" print_var v
         (print_term info) t1 (print_fmla info) f2;
       forget_var v
-  | Fcase _ -> unsupportedFmla f
+  | Tcase _ -> unsupportedFmla f
       "smtv1 : you must eliminate match"
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
 

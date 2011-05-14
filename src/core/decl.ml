@@ -40,7 +40,7 @@ type logic_decl = lsymbol * ls_defn option
 exception UnboundVar of vsymbol
 
 let check_fvs f =
-  let fvs = f_freevars Svs.empty f in
+  let fvs = f_freevars Svs.empty (t_prop f) in
   Svs.iter (fun vs -> raise (UnboundVar vs)) fvs;
   f
 
@@ -52,7 +52,7 @@ let check_tl ty t = check_ty ty (t_type t)
 let make_fs_defn fs vl t =
   let hd = e_app fs (List.map t_var vl) t.t_ty in
   let fd = f_forall_close vl [] (f_equ hd t) in
-  check_oty_equal fs.ls_value t.t_ty;
+  check_t_ty fs.ls_value t;
   List.iter2 check_vl fs.ls_args vl;
   fs, Some (fs, check_fvs fd)
 
@@ -66,8 +66,8 @@ let make_ls_defn ls vl = e_apply (make_fs_defn ls vl) (make_ps_defn ls vl)
 
 let open_ls_defn (_,f) =
   let vl, ef = f_open_forall f in
-  match ef.f_node with
-    | Fapp (_, [_; t2]) -> vl, Term t2
+  match ef.t_node with
+    | Tapp (_, [_; t2]) -> vl, Term t2
     | Fbinop (_, _, f2) -> vl, Fmla f2
     | _ -> assert false
 
@@ -138,13 +138,13 @@ let build_call_graph cgr syms ls =
           let vml = match_term vm e [vm] p in
           List.iter (fun vm -> term vm () t) vml) bl
     | _ -> t_fold (term vm) (fmla vm) () t
-  and fmla vm () f = match f.f_node with
-    | Fapp (s,tl) when Mls.mem s syms ->
+  and fmla vm () f = match f.t_node with
+    | Tapp (s,tl) when Mls.mem s syms ->
         f_fold (term vm) (fmla vm) () f; call vm s tl
-    | Flet ({t_node = Tvar v}, b) when Mvs.mem v vm ->
+    | Tlet ({t_node = Tvar v}, b) when Mvs.mem v vm ->
         let u,e = f_open_bound b in
         fmla (Mvs.add u (Mvs.find v vm) vm) () e
-    | Fcase (e,bl) ->
+    | Tcase (e,bl) ->
         term vm () e; List.iter (fun b ->
           let p,f = f_open_branch b in
           let vml = match_term vm e [vm] p in
@@ -454,16 +454,16 @@ exception Found of lsymbol
 let ls_mem s sps = if Sls.mem s sps then raise (Found s) else false
 let t_pos_ps sps = t_s_all (fun _ -> true) (fun s -> not (ls_mem s sps))
 
-let rec f_pos_ps sps pol f = match f.f_node, pol with
-  | Fapp (s, _), Some false when ls_mem s sps -> false
-  | Fapp (s, _), None when ls_mem s sps -> false
+let rec f_pos_ps sps pol f = match f.t_node, pol with
+  | Tapp (s, _), Some false when ls_mem s sps -> false
+  | Tapp (s, _), None when ls_mem s sps -> false
   | Fbinop (Fiff, f, g), _ ->
       f_pos_ps sps None f && f_pos_ps sps None g
   | Fbinop (Fimplies, f, g), _ ->
       f_pos_ps sps (option_map not pol) f && f_pos_ps sps pol g
   | Fnot f, _ ->
       f_pos_ps sps (option_map not pol) f
-  | Fif (f,g,h), _ ->
+  | Tif (f,g,h), _ ->
       f_pos_ps sps None f && f_pos_ps sps pol g && f_pos_ps sps pol h
   | _ -> f_all (t_pos_ps sps) (f_pos_ps sps pol) f
 
@@ -472,15 +472,15 @@ let create_ind_decl idl =
   let add acc (ps,_) = Sls.add ps acc in
   let sps = List.fold_left add Sls.empty idl in
   let check_ax ps (syms,news) (pr,f) =
-    let rec clause acc f = match f.f_node with
+    let rec clause acc f = match f.t_node with
       | Fquant (Fforall, f) ->
           let _,_,f = f_open_quant f in clause acc f
       | Fbinop (Fimplies, g, f) -> clause (g::acc) f
       | _ -> (acc, f)
     in
     let cls, f = clause [] (check_fvs f) in
-    match f.f_node with
-      | Fapp (s, tl) when ls_equal s ps ->
+    match f.t_node with
+      | Tapp (s, tl) when ls_equal s ps ->
           List.iter2 check_tl ps.ls_args tl;
           (try ignore (List.for_all (f_pos_ps sps (Some true)) cls)
           with Found ls -> raise (NonPositiveIndDecl (ps, pr, ls)));
@@ -640,8 +640,8 @@ let rec check_matchT kn () t = match t.t_node with
       t_fold (check_matchT kn) (check_matchF kn) () t
   | _ -> t_fold (check_matchT kn) (check_matchF kn) () t
 
-and check_matchF kn () f = match f.f_node with
-  | Fcase (t1,bl) ->
+and check_matchF kn () f = match f.t_node with
+  | Tcase (t1,bl) ->
       let bl = List.map (fun b -> let p,f = f_open_branch b in [p],f) bl in
       ignore (try Pattern.CompileFmla.compile (find_constructors kn) [t1] bl
       with Pattern.NonExhaustive p -> raise (NonExhaustiveExpr (p,Fmla f)));

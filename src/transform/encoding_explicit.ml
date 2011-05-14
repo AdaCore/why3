@@ -74,9 +74,9 @@ module Transform = struct
       t_map (term_transform varM) (fmla_transform varM) t
 
   (** translation of formulae *)
-  and fmla_transform varM f = match f.f_node with
+  and fmla_transform varM f = match f.t_node with
       (* first case : predicate (not =), we must translate it and its args *)
-    | Fapp(p,terms) when not (ls_equal p ps_equ) ->
+    | Tapp(p,terms) when not (ls_equal p ps_equ) ->
       let terms = args_transform varM p terms None in
       f_app (findL p) terms
     | _ -> (* otherwise : just traverse and translate *)

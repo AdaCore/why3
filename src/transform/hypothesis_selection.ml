@@ -146,7 +146,7 @@ module NF = struct (* add memoization, one day ? *)
       of list of formulae. *)
   let rec transform fmlaTable fmla =
     Format.fprintf err "transform : @[%a@]@." Pretty.print_fmla fmla;
-    match fmla.f_node with
+    match fmla.t_node with
     | Fquant (_,f_bound) ->
 	let var,_,f =  f_open_quant f_bound in
 	traverse fmlaTable fmla var f
@@ -154,7 +154,7 @@ module NF = struct (* add memoization, one day ? *)
 	let clauses = split fmla in
 	Format.fprintf err "split : @[%a@]@." Util.print_clause clauses;
 	begin match clauses with
-	  | [f] -> begin match f.f_node with
+	  | [f] -> begin match f.t_node with
 	      | Fbinop (For,f1,f2) ->
 		  let left = transform fmlaTable f1 in
 		  let right = transform fmlaTable f2 in
@@ -164,15 +164,15 @@ module NF = struct (* add memoization, one day ? *)
 	  | _ -> List.concat (List.map (transform fmlaTable) clauses)
 	end
     | Fnot f -> handle_not fmlaTable fmla f
-    | Fapp (_,_) -> [[fmla]]
+    | Tapp (_,_) -> [[fmla]]
     | Ftrue | Ffalse -> [[fmla]]
-    | Fif (_,_,_) -> failwith "if formulae not handled"
-    | Flet (_,_) -> failwith "let formulae not handled"
-    | Fcase (_,_) -> failwith "case formulae not handled"
+    | Tif (_,_,_) -> failwith "if formulae not handled"
+    | Tlet (_,_) -> failwith "let formulae not handled"
+    | Tcase (_,_) -> failwith "case formulae not handled"
 
   (** travers prefix quantifiers until it reaches a non-quantified formula,
       collecting bounded vars encountered *)
-  and traverse fmlaTable old_fmla vars fmla = match fmla.f_node with
+  and traverse fmlaTable old_fmla vars fmla = match fmla.t_node with
     | Fquant (_,f_bound) ->
 	let var,_,f = f_open_quant f_bound in
 	traverse fmlaTable old_fmla (var@vars) f
@@ -186,14 +186,14 @@ module NF = struct (* add memoization, one day ? *)
 	  [[new_fmla]]
 
   (** skips prenex quantifiers *)
-  and skipPrenex fmlaTable fmla = match fmla.f_node with
+  and skipPrenex fmlaTable fmla = match fmla.t_node with
     | Fquant (_,f_bound) ->
 	let _,_,f = f_open_quant f_bound in
 	skipPrenex fmlaTable f
     | _ -> transform fmlaTable fmla
 
 (** logical binary operators splitting *)
-  and split f = match f.f_node with
+  and split f = match f.t_node with
     | Fbinop (Fimplies,{f_node = Fbinop (For, h1, h2)},f2) ->
 	(split (f_binary Fimplies h1 f2)) @ (split (f_binary Fimplies h2 f2))
     | Fbinop (Fimplies,f1,f2) ->
@@ -206,7 +206,7 @@ module NF = struct (* add memoization, one day ? *)
     | _ -> [f]
 
   (** negation operator handling (with de morgan rules) *)
-  and handle_not fmlaTable old_f f = match f.f_node with
+  and handle_not fmlaTable old_f f = match f.t_node with
     | Fquant (Fforall,f_bound) ->
 	let vars,triggers,f1 = f_open_quant f_bound in
 	transform fmlaTable (f_exists_close vars triggers (f_not f1))
@@ -263,8 +263,8 @@ module GraphConstant = struct
     let gc,_ = analyse_fmla fTbl tTbl (gc,[]) fmla in gc
 
   (** recursive function used by the previous function *)
-  and analyse_fmla fTbl tTbl (gc,vertices) fmla = match fmla.f_node with
-    | Fapp (_,terms) ->
+  and analyse_fmla fTbl tTbl (gc,vertices) fmla = match fmla.t_node with
+    | Tapp (_,terms) ->
 	let gc,sub_vertices =
 	  List.fold_left (analyse_term fTbl tTbl) (gc,[]) terms in
 	(* make a clique with [sub_vertices] elements *)
@@ -329,7 +329,7 @@ module GraphPredicate = struct
       returns the symbol p *)
   let extract_symbol fmla =
     let rec search = function
-      | { f_node = Fapp(p,_) } -> raise (Exit p)
+      | { f_node = Tapp(p,_) } -> raise (Exit p)
       | f -> f_map (fun t->t) search f in
     try ignore (search fmla);
       Format.eprintf "invalid formula : ";
@@ -399,23 +399,23 @@ module Select = struct
   (** gets all predicates symbols of the formula *)
   let get_predicates fmla =
     let id acc _ = acc in
-    let rec explore acc fmla = match fmla.f_node with
-      | Fapp (pred,_) -> pred::acc
+    let rec explore acc fmla = match fmla.t_node with
+      | Tapp (pred,_) -> pred::acc
       | _ -> f_fold id explore acc fmla
     in explore [] fmla
 
   (** gets all predicate symbols from a clause *)
   let get_clause_predicates acc clause =
-    let rec fmla_get_pred ?(pos=true) acc fmla = match fmla.f_node with
+    let rec fmla_get_pred ?(pos=true) acc fmla = match fmla.t_node with
       | Fnot f -> fmla_get_pred ~pos:false acc f
-      | Fapp (pred,_) -> (pred, (if pos then `Positive else `Negative))::acc
+      | Tapp (pred,_) -> (pred, (if pos then `Positive else `Negative))::acc
       | _ -> failwith "bad formula in get_predicates !"
     in List.fold_left fmla_get_pred acc clause
 
   (** get all sub-formulae *)
   let rec get_sub_fmlas fTbl tTbl fmla =
-    let rec gather_sub_fmla fTbl tTbl acc fmla = match fmla.f_node with
-      | Fapp (_,terms) ->
+    let rec gather_sub_fmla fTbl tTbl acc fmla = match fmla.t_node with
+      | Tapp (_,terms) ->
 	  let acc = List.fold_left (gather_sub_term fTbl tTbl) acc terms in
 	  GraphConstant.findF fTbl fmla :: acc
       | _ -> f_fold (gather_sub_term fTbl tTbl)

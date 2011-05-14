@@ -297,7 +297,9 @@ let rec rewrite_term menv tvar vsvar t =
       t_let t1 (cb u t2)
     | Tcase _ | Teps _ ->
       Printer.unsupportedTerm t
-        "Encoding instantiate : I can't encode this term" in
+        "Encoding instantiate : I can't encode this term"
+    | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
+  in
   (* Format.eprintf "@[<hov 2>Term : => %a : %a@\n@?" *)
   (*   Pretty.print_term t Pretty.print_ty t.t_ty; *)
   t
@@ -306,8 +308,8 @@ and rewrite_fmla menv tvar vsvar f =
   let fnT = rewrite_term menv tvar in
   let fnF = rewrite_fmla menv tvar in
   (* Format.eprintf "@[<hov 2>Fmla : %a =>@\n@?" Pretty.print_fmla f; *)
-  match f.f_node with
-    | Fapp(p, tl) ->
+  match f.t_node with
+    | Tapp(p, tl) ->
       let tl' = List.map (fnT vsvar) tl in
       let p = find_logic menv tvar p tl None in
       f_app p tl'
@@ -320,7 +322,7 @@ and rewrite_fmla menv tvar vsvar f =
          peut être généré *)
       let tl = tr_map (fnT vsvar) (fnF vsvar) tl in
       f_quant q (cb vl tl f1)
-    | Flet (t1, b) -> let u,f2,cb = f_open_bound_cb b in
+    | Tlet (t1, b) -> let u,f2,cb = f_open_bound_cb b in
       let (vsvar',u) = conv_vs menv tvar vsvar u in
       let t1 = fnT vsvar t1 and f2 = fnF vsvar' f2 in
       (* Format.eprintf "u.vs_ty : %a == t1.t_ty : %a@." *)

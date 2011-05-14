@@ -52,8 +52,8 @@ let rec elim_t contT t =
   | _ ->
       t_map_cont elim_t elim_f contT t
 
-and elim_f contF f = match f.f_node with
-  | Fapp _ | Flet _ | Fcase _ ->
+and elim_f contF f = match f.t_node with
+  | Tapp _ | Tlet _ | Tcase _ ->
       contF (f_map_cont elim_t elim_f (fun f -> f) f)
   | _ -> f_map_cont elim_tr elim_f contF f
 
@@ -97,8 +97,8 @@ let eliminate_if_term = Trans.decl elim_d None
 
 let rec elim_t t = t_map elim_t (elim_f true) t
 
-and elim_f sign f = match f.f_node with
-  | Fif (f1,f2,f3) ->
+and elim_f sign f = match f.t_node with
+  | Tif (f1,f2,f3) ->
       let f1p = elim_f sign f1 in
       let f1n = elim_f (not sign) f1 in
       let f2 = elim_f sign f2 in

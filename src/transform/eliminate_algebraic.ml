@@ -37,8 +37,8 @@ let rec rewriteT kn t = match t.t_node with
       Pattern.CompileTerm.compile (find_constructors kn) [t] bl
   | _ -> t_map (rewriteT kn) (rewriteF kn) t
 
-and rewriteF kn f = match f.f_node with
-  | Fcase (t,bl) ->
+and rewriteF kn f = match f.t_node with
+  | Tcase (t,bl) ->
       let t = rewriteT kn t in
       let mk_b (p,f) = ([p], rewriteF kn f) in
       let bl = List.map (fun b -> mk_b (f_open_branch b)) bl in
@@ -104,8 +104,8 @@ let rec rewriteT kn state t = match t.t_node with
   | _ ->
       t_map (rewriteT kn state) (rewriteF kn state Svs.empty true) t
 
-and rewriteF kn state av sign f = match f.f_node with
-  | Fcase (t1,bl) ->
+and rewriteF kn state av sign f = match f.t_node with
+  | Tcase (t1,bl) ->
       let t1 = rewriteT kn state t1 in
       let av' = Svs.diff av (t_freevars Svs.empty t1) in
       let mk_br (w,m) br =
@@ -155,7 +155,7 @@ and rewriteF kn state av sign f = match f.f_node with
       f_quant_simp q (close vl tr f1)
   | Fbinop (o, _, _) when (o = Fand && sign) || (o = For && not sign) ->
       f_map_sign (rewriteT kn state) (rewriteF kn state av) sign f
-  | Flet (t1, _) ->
+  | Tlet (t1, _) ->
       let av = Svs.diff av (t_freevars Svs.empty t1) in
       f_map_sign (rewriteT kn state) (rewriteF kn state av) sign f
   | _ ->

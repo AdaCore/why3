@@ -177,7 +177,7 @@ and print_lterm pri fmt t = match t.t_label with
   | ll -> fprintf fmt (protect_on (pri > 0) "%a %a")
       (print_list space print_label) ll (print_tnode 0) t
 
-and print_lfmla pri fmt f = match f.f_label with
+and print_lfmla pri fmt f = match f.t_label with
   | [] -> print_fnode pri fmt f
   | ll -> fprintf fmt (protect_on (pri > 0) "%a %a")
       (print_list space print_label) ll (print_fnode 0) f
@@ -217,9 +217,10 @@ and print_tnode pri fmt t = match t.t_node with
       fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
         print_vsty v print_fmla f;
       forget_var v
+  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
 
-and print_fnode pri fmt f = match f.f_node with
-  | Fapp (ps, tl) -> begin match query_syntax ps.ls_name with
+and print_fnode pri fmt f = match f.t_node with
+  | Tapp (ps, tl) -> begin match query_syntax ps.ls_name with
       | Some s -> syntax_arguments s print_term fmt tl
       | None -> begin match tl with
           | [] -> print_ls fmt ps
@@ -242,17 +243,18 @@ and print_fnode pri fmt f = match f.f_node with
         (print_lfmla (p + 1)) f1 print_binop b (print_lfmla p) f2
   | Fnot f ->
       fprintf fmt (protect_on (pri > 4) "not %a") (print_lfmla 4) f
-  | Fif (f1,f2,f3) ->
+  | Tif (f1,f2,f3) ->
       fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
         print_fmla f1 print_fmla f2 print_fmla f3
-  | Flet (t,f) ->
+  | Tlet (t,f) ->
       let v,f = f_open_bound f in
       fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
         print_vs v (print_lterm 4) t print_fmla f;
       forget_var v
-  | Fcase (t,bl) ->
+  | Tcase (t,bl) ->
       fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
         print_term t (print_list newline print_fbranch) bl
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and print_tbranch fmt br =
   let p,t = t_open_branch br in

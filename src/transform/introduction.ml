@@ -32,7 +32,7 @@ open Decl
 open Task
 
 
-let rec intros pr f = match f.f_node with
+let rec intros pr f = match f.t_node with
   | Fbinop (Fimplies,f1,f2) ->
       (* split f1 *)
       let l = Split_goal.split_pos f1 in

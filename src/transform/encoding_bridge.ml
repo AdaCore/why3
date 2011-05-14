@@ -185,19 +185,21 @@ let rec rewrite_term tenv vsvar t =
     | Tif (f,t1,t2) ->
         t_if (fnF vsvar f) (fnT vsvar t1) (fnT vsvar t2)
     | Tcase _ ->
-        Printer.unsupportedTerm t "no match expressions at this point" in
+        Printer.unsupportedTerm t "no match expressions at this point"
+    | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
+  in
   (* Format.eprintf "@[<hov 2>Term : => %a : %a@\n@?" Pretty.print_term t *)
   (*   Pretty.print_ty t.t_ty; *)
-    t
+  t
 
 and rewrite_fmla tenv vsvar f =
   (* Format.eprintf "@[<hov 2>Fmla : %a =>@\n@?" Pretty.print_fmla f; *)
   let fnT = rewrite_term tenv in
   let fnF = rewrite_fmla tenv in
-  let f = match f.f_node with
-    | Fapp(p, [t1;t2]) when ls_equal p ps_equ ->
+  let f = match f.t_node with
+    | Tapp(p, [t1;t2]) when ls_equal p ps_equ ->
         f_equ (fnT vsvar t1) (fnT vsvar t2)
-    | Fapp(p, tl) ->
+    | Tapp(p, tl) ->
         let tl = List.map (fnT vsvar) tl in
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv) tl p.ls_args in
@@ -214,7 +216,7 @@ and rewrite_fmla tenv vsvar f =
         let tl = tr_map (fnT vsvar) (fnF vsvar) tl in
         let vl = List.rev vl in
         f_quant q (close vl tl f1)
-    | Flet (t1, b) ->
+    | Tlet (t1, b) ->
         let u,f2,close = f_open_bound_cb b in
         let t1 = fnT vsvar t1 in
         let u' = conv_vs tenv u in
@@ -224,10 +226,12 @@ and rewrite_fmla tenv vsvar f =
     | Fbinop (op,f1,f2) -> f_binary op (fnF vsvar f1) (fnF vsvar f2)
     | Fnot f1 -> f_not (fnF vsvar f1)
     | Ftrue | Ffalse -> f
-    | Fif (f1,f2,f3) ->
+    | Tif (f1,f2,f3) ->
         f_if (fnF vsvar f1) (fnF vsvar f2) (fnF vsvar f3)
-    | Fcase _ ->
-        Printer.unsupportedFmla f "no match expressions at this point" in
+    | Tcase _ ->
+        Printer.unsupportedFmla f "no match expressions at this point"
+    | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+  in
   (* Format.eprintf "@[<hov 2>Fmla : => %a@\n@?" Pretty.print_fmla f; *)
   f
 

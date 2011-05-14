@@ -88,15 +88,16 @@ let rec print_term info fmt t = match t.t_node with
       "alt-ergo : you must eliminate match"
   | Teps _ -> unsupportedTerm t
       "alt-ergo : you must eliminate epsilon"
+  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
 
 and print_tapp info fmt = function
   | [] -> ()
   | tl -> fprintf fmt "(%a)" (print_list comma (print_term info)) tl
 
-let rec print_fmla info fmt f = match f.f_node with
-  | Fapp ({ ls_name = id }, []) ->
+let rec print_fmla info fmt f = match f.t_node with
+  | Tapp ({ ls_name = id }, []) ->
       print_ident fmt id
-  | Fapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
+  | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | None -> fprintf fmt "%a(%a)" print_ident ls.ls_name
                     (print_list comma (print_term info)) tl
@@ -127,14 +128,15 @@ let rec print_fmla info fmt f = match f.f_node with
       fprintf fmt "true"
   | Ffalse ->
       fprintf fmt "false"
-  | Fif (f1, f2, f3) ->
+  | Tif (f1, f2, f3) ->
       fprintf fmt "((%a and %a) or (not %a and %a))"
 	(print_fmla info) f1 (print_fmla info) f2 (print_fmla info)
         f1 (print_fmla info) f3
-  | Flet _ -> unsupportedFmla f
+  | Tlet _ -> unsupportedFmla f
       "alt-ergo : you must eliminate let in formula"
-  | Fcase _ -> unsupportedFmla f
+  | Tcase _ -> unsupportedFmla f
       "alt-ergo : you must eliminate match"
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 
 and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
@@ -142,7 +144,7 @@ and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
 and print_triggers info fmt tl =
   let filter = function
     | Term _ -> true
-    | Fmla {f_node = Fapp (ps,_)} -> not (ls_equal ps ps_equ)
+    | Fmla {t_node = Tapp (ps,_)} -> not (ls_equal ps ps_equ)
     | _ -> false in
   let tl = List.map (List.filter filter) tl in
   let tl = List.filter (function [] -> false | _::_ -> true) tl in

@@ -528,16 +528,16 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
   let expl_regexp = Str.regexp "expl:\\(.*\\)"
 
   let rec get_labels f =
-    (match f.Term.f_node with
+    (match f.Term.t_node with
       | Term.Fbinop(Term.Fimplies,_,f) -> get_labels f
       | Term.Fquant(Term.Fforall,fq) ->
 	  let (_,_,f) = Term.f_open_quant fq in get_labels f
-      | Term.Flet(_,fb) ->
-	  let (_,f) = Term.f_open_bound fb in get_labels f
-      | Term.Fcase(_,[fb]) ->
-	  let (_,f) = Term.f_open_branch fb in get_labels f
+      | Term.Tlet(_,fb) ->
+	  let (_,f) = Term.t_open_bound fb in get_labels f
+      | Term.Tcase(_,[fb]) ->
+	  let (_,f) = Term.t_open_branch fb in get_labels f
       | _ -> [])
-    @ f.Term.f_label
+    @ f.Term.t_label
 
   let get_explanation id fmla =
     let r = ref None in

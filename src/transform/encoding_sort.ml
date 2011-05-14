@@ -98,14 +98,15 @@ let rec rewrite_term tenv ud vm t =
       t_let t1' (close u' t2')
   | Tcase _ | Teps _ ->
       Printer.unsupportedTerm t "unsupported term"
+  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
 
 and rewrite_fmla tenv ud vm f =
   let fnT = rewrite_term tenv ud in
   let fnF = rewrite_fmla tenv ud in
-  match f.f_node with
-  | Fapp (ps,tl) when ls_equal ps ps_equ ->
+  match f.t_node with
+  | Tapp (ps,tl) when ls_equal ps ps_equ ->
       f_app ps (List.map (fnT vm) tl)
-  | Fapp (ps,tl) ->
+  | Tapp (ps,tl) ->
       let ps = conv_ls tenv ud ps in
       let tl = List.map (fnT vm) tl in
       f_app ps tl
@@ -116,13 +117,13 @@ and rewrite_fmla tenv ud vm f =
       let tl' = tr_map (fnT vm') (fnF vm') tl in
       let f1' = fnF vm' f1 in
       f_quant q (close vl' tl' f1')
-  | Flet (t1, b) ->
+  | Tlet (t1, b) ->
       let u,f1,close = f_open_bound_cb b in
       let u' = conv_vs tenv ud u in
       let t1' = fnT vm t1 in
       let f1' = fnF (Mvs.add u (t_var u') vm) f1 in
       f_let t1' (close u' f1')
-  | Fcase _ ->
+  | Tcase _ ->
       Printer.unsupportedFmla f "unsupported formula"
   | _ -> f_map (fnT vm) (fnF vm) f
 

@@ -728,16 +728,16 @@ let info_window ?(callback=(fun () -> ())) mt s =
   let expl_regexp = Str.regexp "expl:\\(.*\\)"
 
   let rec get_labels f =
-    (match f.Term.f_node with
+    (match f.Term.t_node with
       | Term.Fbinop(Term.Fimplies,_,f) -> get_labels f
       | Term.Fquant(Term.Fforall,fq) ->
 	  let (_,_,f) = Term.f_open_quant fq in get_labels f
-      | Term.Flet(_,fb) ->
-	  let (_,f) = Term.f_open_bound fb in get_labels f
-      | Term.Fcase(_,[fb]) ->
-	  let (_,f) = Term.f_open_branch fb in get_labels f
+      | Term.Tlet(_,fb) ->
+	  let (_,f) = Term.t_open_bound fb in get_labels f
+      | Term.Tcase(_,[fb]) ->
+	  let (_,f) = Term.t_open_branch fb in get_labels f
       | _ -> [])
-    @ f.Term.f_label
+    @ f.Term.t_label
 
   let get_explanation id fmla =
     let r = ref None in
@@ -2070,8 +2070,8 @@ let color_loc loc =
   if f = !current_file then color_loc source_view l b e
 
 let rec color_f_locs () f =
-  Util.option_iter color_loc f.Term.f_loc;
-  Term.f_fold color_t_locs color_f_locs () f
+  Util.option_iter color_loc f.Term.t_loc;
+  Term.t_fold color_t_locs color_f_locs () f
 
 and color_t_locs () t =
   Util.option_iter color_loc t.Term.t_loc;

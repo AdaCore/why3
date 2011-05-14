@@ -98,7 +98,7 @@ module Transform = struct
 
   (** {1 transformations} *)
     (** todo use callback for this one *)
-  let rec f_open_all_quant q f = match f.f_node with
+  let rec f_open_all_quant q f = match f.t_node with
     | Fquant (q', f) when q' = q ->
       let vl, tr, f = f_open_quant f in
       begin match tr with
@@ -121,9 +121,9 @@ module Transform = struct
 
   (** translation of formulae *)
   and fmla_transform kept varM f =
-    match f.f_node with
+    match f.t_node with
       (* first case : predicate are not translated *)
-    | Fapp(p,terms) ->
+    | Tapp(p,terms) ->
       let terms = List.map (term_transform kept varM) terms in
       f_app (findL p) terms
     | Fquant(q,_) ->
@@ -160,7 +160,7 @@ module Transform = struct
 
   and f_type_close_select kept f' =
     let tvs = f_ty_freevars Stv.empty f' in
-    let rec trans fn acc f = match f.f_node with
+    let rec trans fn acc f = match f.t_node with
       | Fquant(Fforall as q,_) -> (* Exists same thing? *)
         let vsl,trl,fmla = f_open_all_quant q f in
         let add acc vs = (t_var vs)::acc in

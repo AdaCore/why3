@@ -44,14 +44,14 @@ let wp_and ?(sym=false) f1 f2 =
 (* experiment, but does not work
   let f = f_label_add Split_goal.stop_split f in
 *)
-  match f.f_node with
+  match f.t_node with
     | Fbinop (Fand, _, _) when not sym -> f_label_add Split_goal.asym_split f
     | _ -> f
 
 let wp_ands ?(sym=false) fl =
   List.fold_left (wp_and ~sym) f_true fl
 
-let wp_implies f1 f2 = match f2.f_node with
+let wp_implies f1 f2 = match f2.t_node with
   | Ffalse -> f_implies f1 f2
   | _ -> f_implies_simp f1 f2
 
@@ -68,7 +68,7 @@ let wp_forall v f =
   if is_arrow_ty v.vs_ty then f else
   if f_occurs_single v f then f_forall_close_simp [v] [] f else f
 (*
-  match f.f_node with
+  match f.t_node with
     | Fbinop (Fimplies, {f_node = Fapp (s,[{t_node = Tvar u};r])},h)
       when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) ->
         f_subst_single v r h
@@ -312,7 +312,7 @@ let term_at env lab t =
   e_app (find_ls ~pure:true env "at") [t; t_var lab] t.t_ty
 
 let wp_expl l f =
-  f_label ?loc:f.f_loc (("expl:"^l)::Split_goal.stop_split::f.f_label) f
+  f_label ?loc:f.t_loc (("expl:"^l)::Split_goal.stop_split::f.t_label) f
 
 let while_post_block env inv var lab e =
   let decphi = match var with
@@ -343,8 +343,8 @@ let well_founded_rel = function
 (* Recursive computation of the weakest precondition *)
 
 let wp_label ?loc f =
-  if List.mem "WP" f.f_label then f
-  else f_label ?loc ("WP"::f.f_label) f
+  if List.mem "WP" f.t_label then f
+  else f_label ?loc ("WP"::f.t_label) f
 
 let t_True env =
   t_app (find_ls ~pure:true env "True") [] 
@@ -532,7 +532,7 @@ and wp_desc env rm e q = match e.expr_desc with
       (* TODO: propagate call labels into c.c_post *)
       let w = opaque_wp env rm c.c_effect c.c_post q in
       let p = wp_expl "precondition" c.c_pre in
-      let p = f_label ~loc:e.expr_loc p.f_label p in
+      let p = f_label ~loc:e.expr_loc p.t_label p in
       wp_and p w
 
 and wp_triple env rm bl (p, e, q) =
@@ -575,8 +575,8 @@ let rec t_btop env t = match t.t_node with
   | _ ->
       f_equ t (t_True env)
 
-and f_btop env f = match f.f_node with
-  | Fapp (ls, [{t_ty = Some {ty_node = Tyapp (ts, [])}} as l; r])
+and f_btop env f = match f.t_node with
+  | Tapp (ls, [{t_ty = Some {ty_node = Tyapp (ts, [])}} as l; r])
   when ls_equal ls ps_equ && ts_equal ts (find_ts ~pure:true env "bool") ->
       f_label_copy f (f_iff_simp (t_btop env l) (t_btop env r))
   | _ -> f_map (fun t -> t) (f_btop env) f

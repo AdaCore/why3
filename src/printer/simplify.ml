@@ -89,11 +89,12 @@ let rec print_term info fmt t = match t.t_node with
       unsupportedTerm t "simplify: you must eliminate match"
   | Teps _ ->
       unsupportedTerm t  "simplify: you must eliminate epsilon"
+  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
 
-and print_fmla info fmt f = match f.f_node with
-  | Fapp ({ ls_name = id }, []) ->
+and print_fmla info fmt f = match f.t_node with
+  | Tapp ({ ls_name = id }, []) ->
       print_ident fmt id
-  | Fapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
+  | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s ->
 	  syntax_arguments s (print_term info) fmt tl
       | None ->
@@ -121,12 +122,13 @@ and print_fmla info fmt f = match f.f_node with
       fprintf fmt "TRUE"
   | Ffalse ->
       fprintf fmt "FALSE"
-  | Fif _ ->
+  | Tif _ ->
       unsupportedFmla f "simplify : you must eliminate if"
-  | Flet _ ->
+  | Tlet _ ->
       unsupportedFmla f "simplify : you must eliminate let"
-  | Fcase _ ->
+  | Tcase _ ->
       unsupportedFmla f "simplify : you must eliminate match"
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and print_expr info fmt = e_apply (print_term info fmt) (print_fmla info fmt)
 

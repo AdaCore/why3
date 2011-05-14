@@ -23,7 +23,7 @@ let make_rt_rf keep =
   let rec rt t = t_map rt rf t
   and rf f =
     let f = f_map rt rf f in
-    match f.f_node with
+    match f.t_node with
       | Fquant (Fforall,fq) ->
         let vsl,trl,f2 = f_open_quant fq in
         let one_false = ref false in
@@ -61,7 +61,7 @@ let () = Trans.register_transform "filter_trigger_no_predicate"
 
 let keep_no_fmla = function
         | Term _ -> true
-        | Fmla {f_node = Fapp (ps,_)} -> not (ls_equal ps ps_equ)
+        | Fmla {t_node = Tapp (ps,_)} -> not (ls_equal ps ps_equ)
         | _ -> false
 
 
@@ -74,7 +74,7 @@ let () = Trans.register_transform "filter_trigger" filter_trigger
 
 let keep_no_builtin rem_ls = function
   | Term _ -> true
-  | Fmla {f_node = Fapp (ps,_)} -> not (Sls.mem ps rem_ls)
+  | Fmla {t_node = Tapp (ps,_)} -> not (Sls.mem ps rem_ls)
   | _ -> false
 
 
