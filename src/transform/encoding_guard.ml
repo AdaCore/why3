@@ -50,22 +50,6 @@ end
 
 module Transform = struct
 
-    (* really return the map that replace all the variable of ty1,
-       If the same variable appear in ty1 and ty2 Ty.ty_match doesn't
-       bind this variable
-    *)
-  let rec ty_match2 s ty1 ty2 =
-    match ty1.ty_node, ty2.ty_node with
-      | Tyvar n1, _ ->
-        Mtv.change n1 (function
-          | None -> Some ty2
-          | Some ty1 as r when ty_equal ty1 ty2 -> r
-          | _ -> assert false) s
-      | Tyapp (f1, l1), Tyapp (f2, l2) when ts_equal f1 f2 ->
-        List.fold_left2 ty_match2 s l1 l2
-      | _ -> assert false
-
-
   (** type_of *)
   let fs_type =
     let alpha = ty_var (create_tvsymbol (id_fresh "a")) in
@@ -165,7 +149,7 @@ module Transform = struct
 
   and args_transform kept varM lsymbol args ty =
     (* Debug.print_list Pretty.print_ty Format.std_formatter type_vars; *)
-    let tv_to_ty = ty_match2 Mtv.empty (of_option lsymbol.ls_value) ty in
+    let tv_to_ty = ty_match Mtv.empty (of_option lsymbol.ls_value) ty in
     let new_ty = type_variable_only_in_value lsymbol in
     let tv_to_ty = Mtv.inter (fun _ tv () -> Some tv) tv_to_ty new_ty in
     (* Debug.print_mtv Pretty.print_ty Format.err_formatter tv_to_ty; *)
