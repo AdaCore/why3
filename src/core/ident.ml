@@ -81,16 +81,19 @@ type ident_printer = {
   blacklist : string list;
 }
 
-let rec find_index indices name ind =
-  if Hashtbl.mem indices (name ^ string_of_int ind)
-  then find_index indices name (succ ind) else ind
-
 let find_unique indices name =
+  let specname ind = name ^ string_of_int ind in
+  let testname ind = Hashtbl.mem indices (specname ind) in
+  let rec advance ind =
+    if testname ind then advance (succ ind) else ind in
+  let rec retreat ind =
+    if ind = 1 || testname (pred ind) then ind else retreat (pred ind) in
+  let fetch ind =
+    if testname ind then advance (succ ind) else retreat ind in
   let name = try
-    let ind = Hashtbl.find indices name + 1 in
-    let ind = find_index indices name ind in
+    let ind = fetch (succ (Hashtbl.find indices name)) in
     Hashtbl.replace indices name ind;
-    name ^ string_of_int ind
+    specname ind
   with Not_found -> name in
   Hashtbl.replace indices name 0;
   name
